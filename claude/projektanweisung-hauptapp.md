@@ -6436,6 +6436,89 @@ PDF-Erzeuger steht so ein Zeichen in Nutztext.
 
 
 
+lange Datei die Zeilenzahl gegenprüfen, nicht nur den Rückgabewert.
+
+## Rollout-Journal · 03.09.2026, zweiter Teil — Bilanz und GuV für Gesellschaften
+
+**Was:** Marcels zweite Frage des Tages — wie Wohnungen und Häuser in einer
+GmbH oder UG anzugeben sind, ob sich mehrere Objekte einer Gesellschaft
+zuordnen lassen und ob daraus eine Bilanz und eine GuV entstehen können.
+Antwort: ja, alles vier gebaut.
+
+**Commits:** `4a14f87` (v1226) · `5027c6a` (v1227) · `a0fa555` (v1227b) ·
+`39ba8e0` (v1227c + v1228). **Staging `39ba8e0`, Prod `6047036`.**
+Kein Rebuild, keine Migration.
+
+**Nachweis, alles auf Staging gemessen:**
+
+- **v1226** — Kosten der Gesellschaft je Jahr: Jahreswechsel im Formular hält
+  den Entwurf (geprüft mit zwei Jahren im Wechsel), leere Jahre werden beim
+  Speichern verworfen, `kostenFuer()` liefert `erfasst:false` statt einer Null.
+- **v1227** — vier Seiten, GuV 30.004 € Umsatz gegen 21.078 € Verlust,
+  **Bilanz Summe Aktiva = Summe Passiva = 687.059 €** in zwei unabhängigen
+  Läufen mit unterschiedlichen Stammdaten.
+- **v1228** — 2.238 € Objektergebnis → 354 € KSt → 1.884 € → 497 €
+  Kapitalertragsteuer → **1.387 € beim Gesellschafter, Gesamtbelastung 38,0 %.**
+  Nachgerechnet: 15,825 % + 26,375 % × 84,175 % = 38,03 %.
+- Der **Cockpit-Knopf** ist über den echten Bedienweg gedrückt, nicht über
+  einen Funktionsaufruf: vier Seiten, Bilanz geht auf, Knopf setzt sich zurück.
+
+**Rest:** Prod-Rollout v1215…v1228; die § 7b-Spalte in `tax_records`; und die
+fünf Fragen an den Steuerberater aus dem Prüfbefund.
+
+### Der Grundsatz: eine Bilanz muss aufgehen, oder sie ist keine
+
+DealPilot kennt nicht jede Geldbewegung. Die Differenz wird **nicht still auf
+eine Position aufgeschlagen**, bis es passt, sondern als **Verrechnungskonto
+Gesellschafter** ausgewiesen. Bei kleinen Immobiliengesellschaften ist das
+nicht einmal ein Kunstgriff — dort läuft tatsächlich vieles über dieses Konto.
+
+**Der Posten ist ein Messgerät für fehlende Stammdaten.** Gemessen: ohne
+Stammkapital, Bankbestand und Gesellschafterdarlehen stand er bei 363.180 €,
+mit diesen drei Angaben bei 77.180 €. Deshalb sagt der Kasten seit `v1227c`,
+**welche** Angabe fehlt.
+
+### Die Gegenprobe war kein Schmuck — sie hat zwei Fehler gefangen
+
+Die Restschuld steht im gespeicherten Steuersatz nicht (geprüft an allen 45
+Feldern), musste also gerechnet werden — und war damit ein zweiter
+Wahrheitsanspruch neben `calc.js`. `_gaRestschuldProbe()` vergleicht sie für
+das geöffnete Objekt mit `State.cfRows[].rs`. **Beim ersten Lauf wich sie von
+0,63 % im ersten auf 14,25 % im achten Jahr ab.** Ursachen:
+
+1. **`d1_vertrag` ist kein Datum.** Textfeld, Inhalt `4711` — eine
+   Vertrags**nummer**. Der Rückfall auf den wirtschaftlichen Übergang griff nur
+   bei einem *leeren* Wert, also nie. Ohne Startdatum: null Monate, null
+   Tilgung, fünfzehn Jahre konstante Restschuld.
+2. **`_gaNum('3.5')` ergab 35.** Der eigene Parser hielt den Punkt für einen
+   Tausendertrenner. `parseDe()` gab es längst. **Auch das Lesen einer Zahl ist
+   ein Rechenkern, den man nicht dupliziert** — die Regel in `CLAUDE.md` nennt
+   DSCR, KPI, Score und Sachwertfaktor, gilt aber genauso hier.
+
+Nach der Korrektur: Jahr 1 exakt, zehn Jahre später 0,35 %. **Das Ergebnis der
+Probe steht im PDF**, und wo keine möglich war, steht „gerechnet, aber nicht
+geprüft" statt einer stillen Zusicherung.
+
+> **Wer eine Zahl neu rechnet, die es im Haus schon gibt, baut eine zweite
+> Wahrheit.** Der einzige Weg, das zu verantworten, ist die Gegenprobe — und
+> zwar eine, deren Ergebnis im Dokument landet, nicht nur in der Konsole.
+
+### Drei fachliche Festlegungen
+
+| | Entscheidung | Grund |
+|---|---|---|
+| `anschaffungsnah` | zählt zu den **Abschreibungen** | `tax.js:1025` trägt bereits den verteilten Jahresbetrag; aktivierte Beträge erhöhen entsprechend die AK in der Bilanz |
+| negatives Ergebnis | heißt **Jahresfehlbetrag** | handelsrechtlich, in GuV und Bilanz |
+| Ausschüttung | gerechnet wird die **volle** | nur so ist der Vergleich mit dem privaten Halten ehrlich; Thesaurierung steht daneben |
+
+### Auf Staging steht Testmaterial
+
+Mandant **„Test UG (v1226)"** mit vollständigen Stammdaten, und das Objekt
+**„Am Markt 9 Kabelsketal" trägt diese UG als Halter** — eine echte,
+gespeicherte Änderung an Marcels Staging-Daten. Steht absichtlich noch da,
+damit er den Abschluss selbst ansehen kann; der Halter ist in einem Klick
+zurückzustellen.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
@@ -6453,4 +6536,3 @@ einzige Grund, warum das gutging.
 **Konsequenz:** die Marktbericht-Fassung heißt jetzt
 `claude/projektanweisung-marktbericht-20260812-abend.md`. **Nie wieder zwei
 Projektanweisungen mit gleichem Dateinamen.** Und: nach einem `cat >>` auf eine
-lange Datei die Zeilenzahl gegenprüfen, nicht nur den Rückgabewert.

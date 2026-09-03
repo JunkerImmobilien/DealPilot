@@ -36,7 +36,103 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Übergabe 03.09.2026, Steuer-Mappe und Anlage V)
+## → HIER WEITERMACHEN (Übergabe 03.09.2026, zweiter Teil: die Gesellschaft)
+
+**Stand:** lokal = GitHub = Staging auf `39ba8e0`.
+**Produktion steht auf `6047036`** — **`v1215` bis `v1228` sind NICHT auf Prod.**
+Reines Frontend, kein Rebuild, keine Migration.
+
+Marcels Frage: *„wie müssen wir wohnungen und häuser dann in einer gmbh oder
+ug angeben? … was ist wenn mehrere objekte in einer gesellschaft sind. können
+wir das zuordnen? dann wäre die Bilanz super und die GuV."* — **Alles gebaut,
+alles auf Staging gemessen.**
+
+| | was | Version | Nachweis |
+|---|---|---|---|
+| 1 | **Kosten der Gesellschaft**, je Jahr, fünf Arten | `v1226` | Jahreswechsel hält den Entwurf, leere Jahre werden verworfen, `kostenFuer()` liefert `erfasst:false` statt einer Null |
+| 2 | **GuV** nach § 275 Abs. 2 HGB | `v1227` | 30.004 € Umsatz, −24.000 € Personal, Ergebnis −21.078 € |
+| 3 | **Bilanz** nach § 266 HGB mit Verrechnungskonto | `v1227` | Summe Aktiva = Summe Passiva = 687.059 €, in zwei unabhängigen Läufen |
+| 4 | **Ausschüttungszeile** im Steuer-Tab | `v1228` | 2.238 € Ergebnis → 1.387 € beim Gesellschafter, Gesamtbelastung 38,0 % |
+
+Bedienung: **Cockpit, Abschnitt 08 „Jahresabschluss"** — Gesellschaft und
+Geschäftsjahr wählen, Knopf drücken. Vier Seiten: Deckblatt, GuV, Bilanz,
+Anlagenspiegel. Der Knopf ist über den echten Bedienweg geprüft.
+
+### Der Befund, der alles trägt: eine Bilanz muss aufgehen
+
+DealPilot kennt nicht jede Geldbewegung — Einlagen, Kautionen, den Zeitpunkt
+von Steuerzahlungen, die laufenden Bankbewegungen. Die Differenz wird **nicht
+still auf eine Position aufgeschlagen**, bis es passt, sondern als eigene Zeile
+ausgewiesen: **Verrechnungskonto Gesellschafter**, mit einem Kasten daneben,
+der sagt, was darin steckt.
+
+**Der Posten ist dabei ein Messgerät für fehlende Stammdaten** — gemessen:
+
+| Stammdaten | Verrechnungskonto |
+|---|---|
+| ohne Stammkapital, Bank, Gesellschafterdarlehen | **363.180 €** |
+| mit allen dreien | **77.180 €** |
+
+Deshalb sagt der Kasten seit `v1227c` **welche** Angabe fehlt, statt den Leser
+raten zu lassen.
+
+### Die Gegenprobe hat zwei Fehler gefunden, bevor sie in eine Bilanz kamen
+
+Die Restschuld steht im gespeicherten Steuersatz **nicht** — geprüft an allen
+45 Feldern. Sie musste also gerechnet werden, und damit war sie ein zweiter
+Wahrheitsanspruch neben `calc.js`. **Also wurde sie gegen den Rechenkern
+geprüft**, und die Probe hat sofort zwei Fehler gezeigt:
+
+1. **`d1_vertrag` ist kein Datum.** Das Feld ist ein Textfeld und trug am
+   geprüften Objekt `4711` — eine Vertrags**nummer**. Mein Rückfall auf den
+   wirtschaftlichen Übergang griff erst bei einem *leeren* Wert, also nie.
+   Ohne Startdatum rechnete die Formel null Monate und damit **null Tilgung**:
+   die Restschuld stand über fünfzehn Jahre konstant auf 132.000 €.
+2. **`_gaNum('3.5')` ergab 35.** Mein eigener Parser hielt den Punkt für einen
+   Tausendertrenner — aus 3,5 % Zins wurden 35 %. Die App hat mit `parseDe()`
+   längst die richtige Funktion. **Auch das Lesen einer Zahl ist ein
+   Rechenkern, den man nicht dupliziert.**
+
+Nach der Korrektur: Jahr 1 exakt, nach zehn Jahren 0,35 % Abweichung. **Das
+Ergebnis der Probe steht im PDF** — und wenn keine möglich war, steht dort
+„gerechnet, aber nicht geprüft" statt einer stillen Zusicherung.
+
+### Fachliche Entscheidungen, die im Code begründet stehen
+
+- **`anschaffungsnah` gehört zu den Abschreibungen**, nicht zum
+  Erhaltungsaufwand: gemessen in `tax.js:1025` trägt das Feld bereits den auf
+  die Gebäude-Nutzungsdauer verteilten Jahresbetrag. Entsprechend erhöhen
+  aktivierte anschaffungsnahe Herstellkosten die Anschaffungskosten in der
+  Bilanz — sonst fällt der Buchwert um eine Abschreibung, deren Grundlage fehlt.
+- **Bei Verlust heißt es Jahresfehlbetrag**, nicht Jahresüberschuss (`v1227c`).
+- **Die zweite Steuerebene** rechnet die volle Ausschüttung, weil nur so der
+  Vergleich mit dem privaten Halten ehrlich ist — und sagt daneben, dass bei
+  Thesaurierung weiter 15,825 % gelten.
+
+### Auf Staging steht Testmaterial, das Marcel gehört
+
+Damit der Weg überhaupt prüfbar war, wurden auf Staging angelegt:
+
+- **Mandant „Test UG (v1226)"** mit Steuernummer, Handelsregister, Stammkapital
+  25.000 €, Bank 15.000 €, Gesellschafterdarlehen 300.000 € und Kosten der
+  Gesellschaft für 2026.
+- Das Objekt **„Am Markt 9 Kabelsketal" trägt jetzt diese UG als Halter** —
+  das ist eine echte, gespeicherte Änderung an Marcels Staging-Daten.
+
+**Beides steht absichtlich noch da**, damit Marcel den Jahresabschluss selbst
+ansehen kann. Der Halter ist am Objekt in einem Klick zurückzustellen.
+
+### Was noch offen ist
+
+- **Prod-Rollout** von `v1215`…`v1228` — wartet auf Marcels „ja".
+- **Eigene Spalte für die § 7b-Sonder-AfA** in `tax_records` (Datenbankeingriff).
+- **Fünf Fragen für den Steuerberater** stehen im Prüfbefund — vor allem:
+  reicht ihm diese Form, oder braucht seine Kanzleisoftware einen
+  DATEV-Buchungsstapel?
+
+---
+
+## → Übergabe 03.09.2026, erster Teil: Steuer-Mappe und Anlage V
 
 **Stand:** lokal = GitHub = Staging auf `952c601`.
 **Produktion steht auf `6047036`** — **`v1215` bis `v1225c` sind NICHT auf
