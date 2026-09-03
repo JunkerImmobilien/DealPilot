@@ -1065,9 +1065,9 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
    Finanzamt wertlos — und beim Steuerberater eine Rückfrage. Das Deckblatt
    holt die Angaben von genau einer Stelle:
 
-     Gesellschaft (GmbH, UG, …) -> Einstellungen → Mandanten, Block
+     Gesellschaft (GmbH, UG, …) -> Einstellungen / Mandanten, Block
                                    „Identifikation" (v1221)
-     privat                     -> Einstellungen → Account & Sicherheit
+     privat                     -> Einstellungen / Account und Sicherheit
                                    (Name, Firma, Steuernummer, USt-IdNr.)
 
    WAS FEHLT, WIRD BENANNT, NICHT WEGGELASSEN. Eine Zeile „Steuernummer —
@@ -1208,6 +1208,6 @@ function _renderMappeDeckblatt(doc, jahr, h, saetze, stamm, W, H, M, CW) {
     + 'zusammen und ordnet sie den Zeilen der amtlichen Anlage V zu. Sie ersetzt keine '
     + 'Steuererklärung und keine Beratung. Die Angaben oben stammen aus Ihren Einstellungen — '
     + 'als „nicht hinterlegt" gekennzeichnete Felder tragen Sie dort nach '
-    + '(Gesellschaften: Einstellungen → Mandanten; privat: Einstellungen → Account & Sicherheit).', CW);
+    + '(Gesellschaften: Einstellungen / Mandanten; privat: Einstellungen / Account und Sicherheit).', CW);
   doc.text(ft, M, fy);
 }
