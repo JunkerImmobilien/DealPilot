@@ -185,7 +185,13 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
   doc.setTextColor(220, 220, 220);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
-  doc.text('Vermietung & Verpachtung · Anlage V · § 21 EStG', M, 19);
+  /* v1224: die Unterzeile des Kopfes nennt die STEUERART. Bei einem Objekt der
+     GmbH stand hier bisher „Anlage V · § 21 EStG" — die falsche Einkunftsart
+     ueber richtigen Zahlen. */
+  var _reg = (q && q.regime) || null;
+  doc.text(_reg && !_reg.anlageV
+    ? 'Vermietung · Einkünfte aus Gewerbebetrieb · § 8 Abs. 2 KStG · keine Anlage V'
+    : 'Vermietung & Verpachtung · Anlage V · § 21 EStG', M, 19);
 
   doc.setTextColor(220, 220, 220);
   doc.setFontSize(11);
@@ -227,6 +233,41 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
   doc.text(bezeichnung + ' · ' + qm + ' m²', M + 5, cy + 20);
 
   cy += 28;
+  /* v1224 · HALTER UND HERKUNFT — die zwei Angaben, die ueber die Steuerart
+     entscheiden. Sie stehen unter dem Objektkasten und nicht im Fuss, weil
+     sie gelesen werden muessen, BEVOR jemand die Zahlen uebertraegt.
+     Ohne `q` (Einzel-PDF aus dem geoeffneten Objekt) bleibt alles wie bisher. */
+  if (_reg || (q && q.ueberf)) {
+    var _hb = [];
+    if (_reg) {
+      _hb.push({ b: true, t: 'Halter: ' + _reg.name + ' · ' + _reg.art
+        + (_reg.anlageV ? '' : ' · KEINE ANLAGE V') });
+      if (_reg.hinweis) _hb.push({ b: false, t: _reg.hinweis });
+    }
+    if (q && q.ueberf) q.ueberf.text.forEach(function (t) { _hb.push({ b: false, t: t }); });
+    var _warn = (_reg && !_reg.anlageV) || (q && q.ueberf && q.ueberf.wechseljahr);
+    var _hz = [];
+    _hb.forEach(function (e) {
+      doc.setFontSize(e.b ? 8 : 7.2);
+      doc.splitTextToSize(e.t, CW - 10).forEach(function (l) { _hz.push({ b: e.b, t: l }); });
+    });
+    var _hh = _hz.length * 4 + 5;
+    doc.setFillColor.apply(doc, _warn ? [250, 240, 236] : [246, 244, 238]);
+    doc.setDrawColor.apply(doc, _warn ? [176, 98, 92] : [214, 208, 198]);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(M, cy, CW, _hh, 1.6, 1.6, 'FD');
+    var _hy = cy + 5;
+    _hz.forEach(function (e) {
+      doc.setFont('helvetica', e.b ? 'bold' : 'normal');
+      doc.setFontSize(e.b ? 8 : 7.2);
+      doc.setTextColor.apply(doc, e.b ? (_warn ? [176, 98, 92] : [42, 39, 39]) : [110, 103, 100]);
+      doc.text(e.t, M + 5, _hy);
+      _hy += 4;
+    });
+    doc.setFont('helvetica', 'normal'); doc.setTextColor(42, 39, 39);
+    cy += _hh + 5;
+  }
+
 
   // ── WERBUNGSKOSTEN-TABELLE ────────────────────
   // Compute totals for this year using yearly tax form data
@@ -623,6 +664,104 @@ if (typeof g === 'undefined') {
    Gerechnet wird hier NICHTS. _computeYearTotal(jahr, 0, satz) benutzt
    dieselbe Summenformel wie der Bildschirm, nur mit vorgegebenen Werten.
    ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   v1224 · NICHT JEDES OBJEKT HAT EINE ANLAGE V.
+   ───────────────────────────────────────────────────────────────────────────
+   Marcel: „ueberarbeite die Steuer Mappe PDF so dass es fuer privat und fuer
+   ueberfuehrte Objekte passt."
+
+   Bis v1223 hat die Mappe jedem Objekt eine Anlage-V-Seite angeheftet, sobald
+   der Haken gesetzt war. Fuer ein Objekt, das einer GmbH oder UG gehoert, ist
+   das fachlich falsch: eine Kapitalgesellschaft erzielt nach § 8 Abs. 2 KStG
+   ausschliesslich Einkuenfte aus Gewerbebetrieb. Es gibt dort keine Einkuenfte
+   aus Vermietung und Verpachtung und folglich keine Anlage V — die Zahlen
+   gehoeren in die Gewinnermittlung. Ein Blatt mit der Ueberschrift „Anlage V"
+   ueber Zahlen einer GmbH ist kein Formfehler, es ist die falsche Steuerart.
+
+   Die drei Faelle, die DealPilot kennt (mandanten.js, RF):
+
+     privat  -> Anlage V zur Einkommensteuererklaerung. § 21 EStG.
+     gbr     -> Anlage V, aber zur gesonderten und einheitlichen Feststellung;
+                der Anteil geht danach in die Erklaerung der Beteiligten.
+     gmbh/ug -> KEINE Anlage V. § 8 Abs. 2 KStG.
+
+   Die Mappe darf beides enthalten — sie ist eine Uebersicht ueber den Bestand.
+   Aber sie muss je Objekt sagen, welche Steuerart gilt, statt eine zu
+   unterstellen.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function _steuerRegime(halterId) {
+  var m = null;
+  try {
+    if (window.DealPilotMandanten && DealPilotMandanten.get) m = DealPilotMandanten.get(halterId || 'privat');
+  } catch (e) {}
+  var rf = (m && m.rechtsform) || 'privat';
+  var name = (m && m.name) || 'Privat';
+  if (rf === 'gmbh' || rf === 'ug') {
+    return {
+      rf: rf, name: name, anlageV: false,
+      art: rf === 'ug' ? 'UG (haftungsbeschränkt)' : 'GmbH',
+      kurz: 'Gewerbebetrieb',
+      hinweis: 'Eine Kapitalgesellschaft erzielt nach § 8 Abs. 2 KStG ausschließlich '
+        + 'Einkünfte aus Gewerbebetrieb. Für dieses Objekt gibt es keine Anlage V — '
+        + 'die Zahlen gehören in die Gewinnermittlung der Gesellschaft.'
+    };
+  }
+  if (rf === 'gbr') {
+    return {
+      rf: rf, name: name, anlageV: true,
+      art: 'GbR / Personengesellschaft',
+      kurz: 'Feststellung',
+      hinweis: 'Bei einer vermögensverwaltenden Personengesellschaft wird die Anlage V '
+        + 'zur gesonderten und einheitlichen Feststellung eingereicht; der festgestellte '
+        + 'Anteil geht danach in die Erklärung der Beteiligten ein.'
+    };
+  }
+  return {
+    rf: 'privat', name: name, anlageV: true,
+    art: 'Privatvermögen',
+    kurz: 'Anlage V',
+    hinweis: ''
+  };
+}
+
+/* v1224 · Der Vermerk zur Ueberfuehrung — eine Zeile, wenn es eine gibt.
+   Wichtig ist nicht die Ueberfuehrung selbst, sondern was sie mit den Zahlen
+   macht: die AfA-Bemessungsgrundlage der Gesellschaft ist der Verkehrswert im
+   Zeitpunkt der Ueberfuehrung, nicht der urspruengliche Kaufpreis. Und im Jahr
+   des Wechsels sind beide Seiten Rumpfjahre. */
+function _ueberfVermerk(st, jahr) {
+  if (!st) return null;
+  var ist = (st.herkunft === 'ueberfuehrung');
+  var ende = st.ueberfEnde || '';
+  if (!ist && !ende) return null;
+  var d = function (iso) {
+    if (!iso) return '';
+    var p = String(iso).split('-');
+    return p.length === 3 ? (p[2] + '.' + p[1] + '.' + p[0]) : String(iso);
+  };
+  var stichtag = st.halterSeit || ende;
+  var jahrDesWechsels = stichtag ? parseInt(String(stichtag).slice(0, 4), 10) : null;
+  var t = [];
+  if (ist) {
+    t.push('Dieses Objekt wurde aus dem Privatbestand überführt'
+      + (st.halterSeit ? ' (Stichtag ' + d(st.halterSeit) + ')' : '') + '.');
+    if (st.vwUeberf) {
+      t.push('AfA-Bemessungsgrundlage ist der Verkehrswert zum Stichtag: '
+        + (Math.round(Number(String(st.vwUeberf).replace(/\./g, '').replace(',', '.')) || 0)).toLocaleString('de-DE')
+        + ' €, nicht der ursprüngliche Kaufpreis.');
+    }
+  } else {
+    t.push('Dieses Objekt wurde zum ' + d(ende) + ' aus dem Privatbestand abgegeben; '
+      + 'privat rechnet es nur bis zu diesem Tag.');
+  }
+  if (jahrDesWechsels === jahr) {
+    t.push('ACHTUNG: ' + jahr + ' ist das Jahr des Wechsels. Die Beträge dieses Blattes '
+      + 'decken nur den Teil des Jahres ab, in dem das Objekt hier gehalten wurde — '
+      + 'der andere Teil steht auf dem Blatt des anderen Halters.');
+  }
+  return { text: t, wechseljahr: (jahrDesWechsels === jahr) };
+}
 async function exportSteuerMappePDF(jahr, opts) {
   opts = opts || {};
   if (typeof Plan !== 'undefined' && Plan.can && !Plan.can('werbungskosten_pdf')) {
@@ -692,11 +831,25 @@ async function exportSteuerMappePDF(jahr, opts) {
       name: o.name || (stamm[id] && stamm[id].name) || '',
       addr: [strTeil, ortTeil].filter(Boolean).join(', '),
       qm: d.wfl || '',
-      art: d.objart || ''
+      art: d.objart || '',
+      /* v1224: wem es gehoert und woher es kommt. Beides entscheidet, ob es
+         ueberhaupt eine Anlage V gibt — siehe _steuerRegime(). */
+      halter: d.halter || o.halter || (stamm[id] && stamm[id].halter) || '',
+      herkunft: d.obj_herkunft || 'neukauf',
+      halterSeit: d.halter_seit || '',
+      ueberfEnde: d.ueberf_ende || '',
+      vwUeberf: d.verkehrswert_ueberf || '',
+      ueberfPreis: d.ueberf_preis || ''
     };
   });
 
+  /* v1224: sortiert wird jetzt ZUERST nach Halter, dann nach Name. Die Mappe
+     ist danach nach Steuerpflichtigen gegliedert statt alphabetisch gemischt —
+     und genau so wird sie abgegeben: eine Erklaerung je Steuerpflichtigem. */
   saetze.sort(function (a, b) {
+    var ha = ((stamm[a.object_id] || {}).halter) || '';
+    var hb = ((stamm[b.object_id] || {}).halter) || '';
+    if (ha !== hb) return ha.localeCompare(hb, 'de');
     return String(a.object_name || '').localeCompare(String(b.object_name || ''), 'de');
   });
 
@@ -711,23 +864,36 @@ async function exportSteuerMappePDF(jahr, opts) {
 
   var ohneStamm = [];
   var avFehlt = !_anlageVQuelle(jahr);
+  var ohneAnlageV = [];       /* v1224: Objekte, fuer die es fachlich keine gibt */
+  var wechseljahre = [];      /* v1224: Objekte, die dieses Jahr den Halter wechseln */
   saetze.forEach(function (s, i) {
     if (i > 0) doc.addPage();   /* Seite 1 ist das Deckblatt, danach je Objekt */
     var st = stamm[s.object_id];
     if (!st) ohneStamm.push(s.object_name || s.object_id);
     var totals = _computeYearTotal(jahr, 0, s);
+    /* v1224: das Regime haengt am Halter, der Vermerk an der Herkunft. */
+    var reg = _steuerRegime(st && st.halter);
+    var ueb = _ueberfVermerk(st, jahr);
     var q = {
       name: (st && st.name) || s.object_name || 'Objekt',
       addr: (st && st.addr) || '',
       qm: (st && st.qm) || '',
       art: (st && st.art) || '',
-      totals: totals
+      totals: totals,
+      regime: reg,
+      ueberf: ueb
     };
+    if (ueb && ueb.wechseljahr) wechseljahre.push(q.name);
     _renderWerbungskostenPage(doc, jahr, 0, W, H, M, CW, q);
     /* v1218-anlagev: die zweite Ansicht direkt hinter der Aufstellung, damit
        beide Blätter zu einem Objekt zusammenbleiben. Gibt es für das Jahr
        keine abgeschriebene Zuordnung, erscheint sie NICHT — dann sagt die
-       Schlussseite auch, warum. */
+       Schlussseite auch, warum.
+       v1224: und gehoert das Objekt einer Kapitalgesellschaft, erscheint sie
+       ebenfalls nicht — dort gibt es keine Anlage V, sondern eine
+       Gewinnermittlung. Statt der Seite steht der Grund auf dem Objektblatt
+       (_renderWerbungskostenPage, Regime-Zeile) und auf der Schlussseite. */
+    if (opts.anlageV && !reg.anlageV) { ohneAnlageV.push(q.name); return; }
     if (opts.anlageV && !avFehlt) {
       doc.addPage();
       _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW);
@@ -735,8 +901,10 @@ async function exportSteuerMappePDF(jahr, opts) {
   });
 
   doc.addPage();
+
   _renderMappeSummaryPage(doc, jahr, saetze, stamm, ohneStamm, W, H, M, CW,
-    { anlageV: !!opts.anlageV, avFehlt: avFehlt });
+    { anlageV: !!opts.anlageV, avFehlt: avFehlt,
+      ohneAnlageV: ohneAnlageV, wechseljahre: wechseljahre });
 
   doc.save('Steuermappe_' + jahr + '.pdf');
   if (typeof toast === 'function') {
@@ -823,6 +991,27 @@ function _renderMappeSummaryPage(doc, jahr, saetze, stamm, ohneStamm, W, H, M, C
           : 'Die Zuordnung zu den Zeilennummern der amtlichen Anlage V ist in dieser Mappe nicht '
             + 'enthalten — sie lässt sich beim Erstellen zuschalten.')
   ];
+  /* v1224 · WAS NICHT DABEI IST, WIRD BENANNT. Eine fehlende Anlage-V-Seite
+     kann zwei ganz verschiedene Gruende haben — keine Abschrift des Formulars,
+     oder gar keine Anlage V fuer diese Rechtsform. Wer das nicht auseinander
+     halten kann, sucht das falsche Blatt. */
+  if (av && av.ohneAnlageV && av.ohneAnlageV.length) {
+    hin.push('Für ' + av.ohneAnlageV.length + ' Objekt'
+      + (av.ohneAnlageV.length === 1 ? '' : 'e') + ' liegt bewusst KEINE Anlage-V-Seite bei: '
+      + av.ohneAnlageV.join(', ') + '. Sie gehören einer Kapitalgesellschaft; nach '
+      + '§ 8 Abs. 2 KStG gibt es dort nur Einkünfte aus Gewerbebetrieb und damit keine '
+      + 'Anlage V. Die Zahlen dieser Objektblätter gehören in die Gewinnermittlung.');
+  }
+  if (av && av.wechseljahre && av.wechseljahre.length) {
+    hin.push(av.wechseljahre.length === 1 ? 'Ein Objekt wechselt in ' + jahr
+      + ' den Halter (' + av.wechseljahre[0] + '). Sein Blatt deckt nur den Teil des Jahres ab, '
+      + 'in dem es hier gehalten wurde — der andere Teil steht auf dem Blatt des anderen Halters. '
+      + 'Die Summe unten ist deshalb keine Jahressumme eines einzelnen Steuerpflichtigen.'
+      : av.wechseljahre.length + ' Objekte wechseln in ' + jahr + ' den Halter ('
+      + av.wechseljahre.join(', ') + '). Ihre Blätter decken nur den Teil des Jahres ab, in dem '
+      + 'sie hier gehalten wurden. Die Summe unten ist deshalb keine Jahressumme eines '
+      + 'einzelnen Steuerpflichtigen.');
+  }
   if (ohneStamm.length) {
     hin.push('Zu ' + ohneStamm.length + ' Objekt' + (ohneStamm.length === 1 ? '' : 'en')
       + ' liegen keine Stammdaten vor (Adresse, Fläche, Art) — die Seiten tragen nur den Namen: '
@@ -1279,13 +1468,38 @@ function _renderMappeDeckblatt(doc, jahr, h, saetze, stamm, W, H, M, CW) {
   doc.line(M, cy, M + CW, cy);
   cy += 7;
   doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
-  saetze.forEach(function (s, i) {
+  /* v1224 · GEGLIEDERT NACH STEUERPFLICHTIGEM, nicht alphabetisch. Bei einer
+     Ueberfuehrung stehen im selben Jahr Privat- und Gesellschaftsobjekte in
+     derselben Mappe; wer sie als eine Liste liest, addiert zwei Erklaerungen.
+     Ist nur EIN Halter beteiligt, sieht die Liste aus wie bisher — dann
+     erscheint keine Zwischenueberschrift. */
+  var _letzterHalter = null, _nr = 0;
+  var _mehrereHalter = (function () {
+    var seen = {};
+    saetze.forEach(function (s) { seen[((stamm[s.object_id] || {}).halter) || 'privat'] = 1; });
+    return Object.keys(seen).length > 1;
+  })();
+  saetze.forEach(function (s) {
     if (cy > H - 46) { doc.addPage(); cy = 26; }
     var st = stamm[s.object_id];
+    var hid = (st && st.halter) || 'privat';
+    if (_mehrereHalter && hid !== _letzterHalter) {
+      var rg = _steuerRegime(hid);
+      cy += 2;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
+      doc.setTextColor.apply(doc, rg.anlageV ? [42, 39, 39] : [176, 98, 92]);
+      doc.text(rg.name + ' · ' + rg.art + ' · ' + (rg.anlageV ? 'Anlage V' : 'keine Anlage V'),
+        M, cy);
+      doc.setFont('helvetica', 'normal');
+      cy += 5.4;
+      _letzterHalter = hid;
+    }
+    _nr++;
     doc.setTextColor(122, 115, 112); doc.setFontSize(8);
-    doc.text(String(i + 1) + '.', M, cy);
+    doc.text(String(_nr) + '.', M, cy);
     doc.setTextColor(42, 39, 39); doc.setFontSize(9);
-    doc.text(String((st && st.name) || s.object_name || 'Objekt').slice(0, 52), M + 7, cy);
+    var _uv = (st && (st.herkunft === 'ueberfuehrung' || st.ueberfEnde)) ? '  (überführt)' : '';
+    doc.text(String((st && st.name) || s.object_name || 'Objekt').slice(0, 46) + _uv, M + 7, cy);
     if (st && st.addr) {
       doc.setTextColor(122, 115, 112); doc.setFontSize(7.5);
       doc.text(String(st.addr).slice(0, 44), M + CW, cy, { align: 'right' });
