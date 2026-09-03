@@ -6137,6 +6137,97 @@ Navigationsseite (Cookie-/Browser-Hinweise), nicht das Formular.
 
 **`v1216` liegt auf Staging.**
 
+### v1217 / v1218 / v1218b (03.09.2026, `4946283` · `f4995ee` · `5cd98c7`) — die Anlage V, abgeschrieben statt geraten
+
+**Was.** Backlog-Punkt **5**, Stück 1 — der Umschalter auf die
+Anlage-V-Ansicht. Er hing seit Wochen an einer Bedingung: **die
+Zeilennummern kommen aus dem amtlichen Formular oder gar nicht.** Marcel hat
+am 03.09.2026 drei PDFs geliefert (Anlage V 2025, V-Sonstige, V-FeWo); die
+erste war die richtige.
+
+**Wie das PDF gelesen wurde.** FlateDecode-komprimiert und mit Subset-Fonts
+gesetzt: die Glyph-Codes sind UTF-16BE und **um 29 verschoben**. Nachgewiesen
+an zwei Stellen im Dokument selbst — `0x15 0x13 0x15 0x18` + 29 = „2025",
+`$QODJH` + 29 = „Anlage". Dazu eine Positionsauswertung über die Textmatrix,
+weil alle vier Formularseiten dieselben y-Koordinaten benutzen und sich sonst
+überlagern.
+
+> **Werkzeug-Befund, zum vierten Mal in dieser Sitzung:** der Heredoc hat mir
+> die Backslashes halbiert und das Auswerteskript zerlegt. Es liegt jetzt als
+> Datei im Scratchpad und wird per `scp` übertragen. **Durch die Shell
+> schleuse ich keinen Code mehr.**
+
+**`v1217` — `frontend/js/anlage-v-2025.js`.** Trägt das Jahr im Namen, weil
+sich die Nummern je Veranlagungsjahr ändern. Abgeschrieben, mit amtlicher
+Kennzahl wo vorhanden:
+
+| | | Kz |
+|---|---|---|
+| 15 | Summe Mieteinnahmen für Wohnungen | 01 |
+| 20 | auf Zeilen 15/18 entfallende Neben-/Betriebskosten | |
+| 32 | Summe der Einnahmen | |
+| 35 | Absetzung für Abnutzung für Gebäude | 30 |
+| 48 | Schuldzinsen (ohne Tilgungsbeträge) | 33 |
+| 51 | Geldbeschaffungskosten | 34 |
+| 55 | voll abzuziehende Erhaltungsaufwendungen | 36 |
+| 60–72 | verteilte Erhaltungsaufwendungen 2021–2025 | 38–42 |
+| 78 | nicht umgelegte Kosten (Verwaltung, Kontoführung) | 48 |
+| 82 | sonstige Kosten | 49 |
+| 83 / 85 | Summe Werbungskosten / Überschuss | |
+| 87 / 88 | **Kürzung wegen verbilligter Vermietung** | 51 |
+
+> Die letzten beiden sind genau die Zeilen, auf die die **66-%-Warnung aus
+> `v1216`** hinausläuft. Das Formular sagt es selbst: bei verbilligter
+> Vermietung sind die Aufwendungen **in voller Höhe** einzutragen, die
+> Kürzung erfolgt ausschließlich in Zeile 87 oder 88. Die beiden Stücke des
+> Punktes greifen ineinander, ohne dass das geplant war.
+
+**Bei zwölf der 26 Felder steht `zeile: null` — mit Grund.** Gehören
+Vermittlungskosten zu den Geldbeschaffungskosten oder zu den sonstigen? Das
+wäre eine steuerfachliche Entscheidung, keine Abschrift. **Ich bin kein
+Steuerberater, und das steht so in der Datei.**
+
+**`v1218` — die zweite Ansicht.** Marcels Vorgabe: *„Anlage V und die, die
+wir jetzt haben, mit den Nummern der Anlage V drauf. Sollte nur vollständig
+sein."* **„Vollständig" ist hier die schärfste Anforderung, nicht die
+weichste** — eine Anlage-V-Ansicht, in der eine Position fehlt, sieht aus wie
+eine fertige Erklärung. Drei Blöcke:
+
+1. **zugeordnet** — Zeile und Kennzahl, Nullposten werden nicht gedruckt
+2. **ohne Zeilenzuordnung — bitte steuerlich prüfen** — Betrag steht da, in
+   der Summe enthalten, mit Begründung je Posten
+3. **Formularzeilen, die DealPilot nicht führt** — sieben Stück, benannt
+
+Darunter Zeile 83 und 85, **aus derselben Rechnung wie die Aufstellung**,
+nicht neu summiert. Im Cockpit eine Checkbox, vorausgewählt; die Seite kommt
+direkt hinter die Aufstellung desselben Objekts.
+
+**Nachweis, beide Richtungen:**
+
+- **2026** (keine Zuordnung hinterlegt): 8 Seiten, **keine** Anlage-V-Seite,
+  und die Schlussseite sagt *„Eine Anlage-V-Zuordnung liegt NICHT bei: für
+  2026 ist keine abgeschriebene Zeilenzuordnung hinterlegt."*
+- **2025** (Zuordnung da): **5 Seiten** — Aufstellung, Zuordnung, Aufstellung,
+  Zuordnung, Zusammenfassung. Auf der Zuordnungsseite: `Zeile 15 · Kz 01 ·
+  Mieteinnahmen (kalt) · 9.132 €`, `Zeile 35 · Kz 30 · AfA Gebäude · 2.347 €`,
+  `Zeile 48 · Kz 33 · Schuldzinsen · 4.591 €`. Der Block „ohne
+  Zeilenzuordnung" führt die umlagefähigen Nebenkosten mit 3.636 € **und**
+  der Begründung, dass sie ein durchlaufender Posten sind.
+
+Konsole ohne Fehler.
+
+**`v1218b`** — im Cockpit stand direkt unter der neuen Checkbox
+„Anlage-V-Zuordnung anhängen" noch der Satz aus `v1215`: *„Die Zuordnung …
+ist NICHT enthalten."* **Ein Widerspruch in einer Zeile Abstand**, an genau
+der Stelle, an der der Nutzer entscheidet. Der Satz war richtig, als er
+geschrieben wurde — und wurde durch die Funktion daneben zur Falschaussage.
+**Dasselbe Muster wie den ganzen Tag, diesmal nur zwei Stunden alt.**
+
+**Damit ist Backlog-Punkt 5 bis auf ein Stück abgearbeitet:** offen bleibt der
+Halter-Filter samt Objektauswahl in der Oberfläche — der Export kann sie
+bereits über `opts.objectIds`, es fehlt die Bedienung.
+**`v1215`–`v1218` liegen auf Staging.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

@@ -2410,6 +2410,42 @@ entfällt — nicht raten.
 
 ## Fertig
 
+### Die Anlage-V-Ansicht steht — `v1217`/`v1218`, 03.09.2026 (`4946283`…`5cd98c7`)
+
+Backlog-Punkt **5**, Stück 1. Marcel hat das amtliche Formular geliefert
+(`Anlage_V_2025.pdf`), die Zeilennummern sind daraus **abgeschrieben** —
+versioniert in `frontend/js/anlage-v-2025.js`, mit dem Jahr im Namen.
+
+Das PDF war nicht einfach zu lesen: Subset-Fonts mit einer um **29**
+verschobenen Kodierung, nachgewiesen an „2025" und „Anlage" im Dokument
+selbst, dazu eine Positionsauswertung, weil sich alle vier Formularseiten in
+den Koordinaten überlagern.
+
+**Die zweite Ansicht** liegt im PDF hinter jeder Aufstellung, zuschaltbar im
+Cockpit. Drei Blöcke: zugeordnet (Zeile + amtliche Kennzahl) · **ohne
+Zeilenzuordnung — bitte steuerlich prüfen** (Betrag und Begründung) ·
+Formularzeilen, die DealPilot nicht führt. **Nichts wird weggelassen** —
+Marcels „sollte nur vollständig sein" ist hier die schärfste Anforderung,
+nicht die weichste.
+
+Nachgewiesen in beide Richtungen: für **2026** (keine Zuordnung) erscheint
+**keine** Seite und die Schlussseite sagt warum; für **2025** stehen
+`Zeile 15 · Kz 01 · Mieteinnahmen`, `Zeile 35 · Kz 30 · AfA`,
+`Zeile 48 · Kz 33 · Schuldzinsen` mit den echten Beträgen.
+
+> **Ein Fund, der nicht geplant war:** die Zeilen **87/88** des Formulars sind
+> die Kürzung wegen **verbilligter Vermietung** — genau das, wovor die
+> 66-%-Warnung aus `v1216` warnt. Das Formular sagt selbst: Aufwendungen in
+> voller Höhe eintragen, Kürzung ausschließlich dort. Die beiden Stücke des
+> Punktes greifen ineinander.
+
+**Bei Marcel liegt:** die zwölf Felder ohne gesicherte Zeile einmal ansehen —
+Bereitstellungszinsen, Vermittlungsprovision, umlagefähige Nebenkosten,
+Steuerberatung, Sammelposten. Dort hängt die Zeile am Sachverhalt, nicht am
+Formular, und ich bin kein Steuerberater.
+
+**`v1215`–`v1218` liegen auf Staging, nicht auf Prod.**
+
 ### Die Steuer-Mappe steht — `v1215`, 03.09.2026 (`0948a6f`…`a0b9389`)
 
 Backlog-Punkt **5**, erster und größter Teil. Ein PDF über **alle** Objekte:
@@ -2439,12 +2475,22 @@ jetzt das Veranlagungsjahr).
 
 **Was an Punkt 5 noch offen ist:**
 
-1. **Der Umschalter auf die Anlage-V-Ansicht** — *bewusst* nicht gebaut. Er
-   braucht die **Zeilennummern des amtlichen Formulars**, die sich je
-   Veranlagungsjahr ändern. Marcels Vorgabe „sollte nur vollständig sein" und
-   die Regel „nicht raten" gelten. **Dafür brauche ich das amtliche Formular
-   des jeweiligen Jahres** — dann ist es Weg A aus der Tabelle oben und
-   schnell gebaut.
+1. ~~**Der Umschalter auf die Anlage-V-Ansicht** — bewusst nicht gebaut, er
+   braucht die Zeilennummern des amtlichen Formulars.~~
+   **GEBAUT — `v1217`/`v1218`, 03.09.2026.** Marcel hat das amtliche Formular
+   geliefert; die Zeilennummern sind daraus **abgeschrieben**, versioniert in
+   `frontend/js/anlage-v-2025.js`. Die zweite Ansicht liegt im PDF hinter
+   jeder Aufstellung, zuschaltbar im Cockpit.
+   **Für ein Jahr ohne hinterlegte Zuordnung erscheint sie nicht** — nachge-
+   wiesen an 2026: keine Seite, und die Schlussseite sagt warum.
+   **Zwölf der 26 Felder tragen keine Zeile, sondern eine Begründung** — dort
+   wäre die Zuordnung eine steuerfachliche Entscheidung. Sie erscheinen
+   trotzdem, im Block „ohne Zeilenzuordnung — bitte steuerlich prüfen".
+
+   > **Marcel sollte diese zwölf einmal ansehen** (oder sein Steuerberater):
+   > Bereitstellungszinsen, Vermittlungsprovision, umlagefähige Nebenkosten,
+   > Steuerberatung und die Sammelposten. Bei ihnen hängt die Zeile am
+   > Sachverhalt, nicht am Formular.
 2. **Halter-Filter und Objektauswahl** in der Oberfläche. Der Export kann sie
    bereits (`opts.objectIds`), es fehlt die Bedienung.
 3. ~~**Die 66-%-Grenze** des § 21 Abs. 2 EStG als Live-Warnung.~~
