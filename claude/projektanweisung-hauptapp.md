@@ -6288,6 +6288,81 @@ seinem Steuerberater vorlegt. Behoben.
 
 **`v1215`–`v1219` liegen auf Staging.**
 
+### v1220 / v1221 (03.09.2026, `ae16509` · `cac1275` · `98fbbb0`) — alles zugeordnet, und wem es gehört
+
+**Marcels Paket vom 03.09.2026** — sieben Punkte auf einmal. Drei sind
+gebaut, vier stehen noch aus; das ist unten festgehalten.
+
+**`v1220` · Zeile 36 stimmt nicht, der Sachverhalt schon.** Marcel: *„Die AfA
+für bewegliche Wirtschaftsgüter (wie Einbauküchen oder Möbel) finden Sie in
+der Zeile 36 der Anlage V."* Im Formular 2025 steht wörtlich:
+
+> Zeilen 42–45: „**Absetzung für Abnutzung für Wirtschaftsgüter, die keine
+> Gebäude sind (z. B. bewegliche Wirtschaftsgüter)**" — Summe in **Zeile 45,
+> Kennzahl 60**.
+
+Zeile 36 ist dort die Sonderabschreibung nach § 7b EStG. **Genau dafür ist
+die Abschrift da:** die Position war richtig benannt, die Nummer stand zwölf
+Zeilen tiefer. **Damit sind alle 26 Felder zugeordnet** — 11 aus dem
+Formular, 10 über den Auffangposten, 5 aus Sachlogik, keines mehr offen.
+
+> **Ein Befund aus derselben Gruppe, und der ist fachlich der wichtigere.**
+> Zeile 35 heißt „AfA für Gebäude **(ohne Beträge in den Zeilen 36 bis 41)**",
+> und 36–38 ist die § 7b-Sonderabschreibung. DealPilot **rechnet** § 7b
+> (`CLAUDE.md` führt sogar den Wfl-Cap von 4.000 €/m²), aber `tax.js:1009`
+> legt beides zusammen: `afa = afaGebaeude + afaSonder7bJahr`. Gemessen: der
+> gespeicherte Steuersatz hat 45 Spalten und **nur eine für `afa`** — die
+> Trennung ist dort verloren. Das PDF kann sie deshalb nicht auftrennen, aber
+> es **sagt es**: Zeile 38 steht in „Formularzeilen, die DealPilot nicht
+> führt" mit dem vollen Grund. **Die saubere Lösung wäre eine eigene Spalte
+> im Steuersatz — ein Backend-Eingriff für einen eigenen Schritt.**
+
+**`v1221` · Identifikation und Deckblatt.** Marcel: *„unter Mandanten neuer
+Mandant fehlt auch die Umsatzsteuerid und vlt noch andere nummern
+Handelsregisternummer … Vlt können wir da Informationen mit auf die PDF
+geben."* Zwei Screenshots lagen bei (`account.png`, `mandant.png`) — sie
+liegen mit im Repo, denn sie sind die Vorlage.
+
+Neuer Block **Identifikation** im Mandantenformular: für **jede** Rechtsform
+Steuernummer · Finanzamt · Straße · PLZ und Ort; für **Gesellschaften**
+zusätzlich USt-IdNr. · Handelsregister. Warum getrennt: eine natürliche
+Person hat kein Handelsregister, und ihre USt-IdNr. steht bereits im Account.
+
+Die Mappe bekommt ein **Deckblatt als Seite 1**. Eine Steuerunterlage ohne
+Angabe, wessen Einkünfte sie zeigt, ist beim Finanzamt wertlos und beim
+Steuerberater eine Rückfrage. Die Angaben kommen von genau einer Stelle —
+Gesellschaft aus den Mandanten, privat aus dem Account.
+
+> **Was fehlt, wird benannt.** Jede nicht hinterlegte Angabe steht als
+> „nicht hinterlegt" in Gold-Kursiv da, und der Fuß sagt, wo man sie
+> nachträgt. **Eine solche Zeile ist eine Aufforderung; eine fehlende Zeile
+> ist eine Lücke, die niemand sieht.**
+>
+> Und: **gehören die Objekte mehreren Haltern, sagt das Deckblatt das** — eine
+> Anlage V wird je Steuerpflichtigem abgegeben. Es behauptet nicht einen
+> Halter, nur weil er der erste ist.
+
+**Nachweis.** 6 Seiten: Deckblatt · Aufstellung · Anlage V · Aufstellung ·
+Anlage V · Zusammenfassung. Auf dem Deckblatt „Rechtsform: Privat
+(natürliche Person)", vier Felder als „nicht hinterlegt" markiert, beide
+Objekte mit Adresse gelistet. Konsole ohne Fehler.
+
+**`v1221b`** — die Fußzeile des Deckblatts war **unlesbar**: ich hatte `→`
+(U+2192) benutzt. **jsPDF-Helvetica kann nur WinAnsi**; ein Zeichen außerhalb
+schaltet den ganzen String auf eine andere Kodierung um. Im Code sieht es
+richtig aus, im PDF steht Buchstabensalat. Gehört zur `CLAUDE.md`-Reihe über
+jsPDF: kein `var()`, kein Canvas — **und keine Zeichen außerhalb WinAnsi**.
+
+**Noch offen aus Marcels Paket:**
+
+1. **Zeilennummern im Steuer-Tab (Detail-Modus)**, hinter den Info-Punkten.
+2. **Anlage-V-Auswahl auch beim Einzel-PDF** im Objekt-Tab — bisher nur in
+   der Mappe.
+3. **Die Mappe für überführte Objekte** — DealPilot führt `obj_herkunft`,
+   `verkehrswert_ueberf`, `halter_seit`; die Mappe kennt das noch nicht.
+4. **Eigene Spalte für die § 7b-Sonder-AfA** im Steuersatz (Backend).
+
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

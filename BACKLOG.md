@@ -2410,6 +2410,43 @@ entfällt — nicht raten.
 
 ## Fertig
 
+### Alle Anlage-V-Zeilen zugeordnet, Halterangaben aufs PDF — `v1220`/`v1221`, 03.09.2026
+
+Marcels Paket vom 03.09. — **drei von sieben Punkten sind gebaut.**
+
+**Zeile 45, nicht 36.** Marcel wies auf die AfA für bewegliche
+Wirtschaftsgüter hin und nannte Zeile 36. Im Formular 2025 steht sie in
+**42–45 (Kz 60)**; Zeile 36 ist die § 7b-Sonderabschreibung. Der Sachverhalt
+stimmte, die Nummer nicht — **genau dafür ist die Abschrift da.**
+**Damit sind alle 26 Felder zugeordnet**, keines mehr offen.
+
+**Neuer Block „Identifikation"** bei den Mandanten: Steuernummer, Finanzamt,
+Anschrift für jede Rechtsform; USt-IdNr. und Handelsregister für
+Gesellschaften. `mandanten.js` hing dabei auf `?v=953` — **268 Versionen
+zurück.**
+
+**Deckblatt für die Mappe.** Halter, Steuernummer, Finanzamt, ggf. USt-IdNr.
+und Handelsregister, Anschrift, dazu die Objektliste. Fehlende Angaben stehen
+als **„nicht hinterlegt"** da, mit dem Hinweis wo man sie nachträgt. Gehören
+die Objekte mehreren Haltern, sagt das Deckblatt das — eine Anlage V wird je
+Steuerpflichtigem abgegeben.
+
+> **Ein Befund, der eigenes Gewicht hat:** DealPilot rechnet die
+> § 7b-Sonderabschreibung, legt sie aber mit der Gebäude-AfA zusammen
+> (`tax.js:1009`), und der gespeicherte Steuersatz hat nur eine Spalte `afa`.
+> Das Formular verlangt sie getrennt (Zeile 35 „ohne Beträge in den Zeilen 36
+> bis 41"). Das PDF benennt die Lücke; **die Lösung wäre eine eigene Spalte im
+> Steuersatz** — Backend, eigener Schritt.
+
+**Noch offen aus dem Paket:**
+
+1. **Zeilennummern im Steuer-Tab** (Detail-Modus), hinter den Info-Punkten.
+2. **Anlage-V-Auswahl beim Einzel-PDF** im Objekt-Tab.
+3. **Die Mappe für überführte Objekte** — `obj_herkunft`,
+   `verkehrswert_ueberf`, `halter_seit` sind erfasst, die Mappe kennt sie
+   noch nicht.
+4. **Eigene Spalte für die § 7b-Sonder-AfA** (Backend).
+
 ### Jetzt ist alles zugeordnet bis auf eines — `v1219`, 03.09.2026 (`d7228f7` · `524c84e`)
 
 Marcel nach dem ersten Blick in die Mappe: *„eigentlich müssten wir alles
