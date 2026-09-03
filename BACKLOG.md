@@ -2410,6 +2410,48 @@ entfällt — nicht raten.
 
 ## Fertig
 
+### Die Steuer-Mappe steht — `v1215`, 03.09.2026 (`0948a6f`…`a0b9389`)
+
+Backlog-Punkt **5**, erster und größter Teil. Ein PDF über **alle** Objekte:
+je Objekt eine Aufstellung der Werbungskosten, am Ende eine Zusammenfassung
+mit Summe. Der Knopf sitzt als **Abschnitt 07 im Portfolio-Cockpit** — dem
+ersten Export-Knopf, den das Cockpit überhaupt hat.
+
+**Gemessen, bevor gebaut wurde:** `GET /tax-records` liefert 72 Sätze über 7
+Objekte und 12 Jahre, und alle 26 Felder, die die PDF-Seite druckt, sind in
+jedem Satz belegt — auch die gerechneten. Der Backlog-Eintrag hatte recht.
+
+> Eine Vermutung von mir dagegen **nicht**: ich hatte aus dem Code
+> geschlossen, die Sätze trügen nur Hand-Korrekturen. An den Daten widerlegt.
+> Hätte ich das nicht gemessen, hätte ich den richtigen Backlog-Eintrag
+> „korrigiert".
+
+Zwei kleine Eingriffe statt einer Zerlegung: die Seitenfunktion und
+`_computeYearTotal` nehmen die Werte jetzt optional von außen. **Die
+Summenformel bleibt, wo sie ist** — eine zweite Fassung wäre genau der
+Fehler, den der Code an anderer Stelle selbst verbietet.
+
+**Nachgewiesen:** 8 Seiten für 2026, Adressen und Flächen vollständig,
+Summenzeile, Konsole ohne Fehler. Zwei Nachbesserungen aus dem ersten Lauf:
+`GET /objects` liefert nur eine Zusammenfassung ohne Adresse (`v1215b`), und
+im Jahr-Feld stand **2040**, weil die Sätze bis dorthin reichen (`v1215c` —
+jetzt das Veranlagungsjahr).
+
+**Was an Punkt 5 noch offen ist:**
+
+1. **Der Umschalter auf die Anlage-V-Ansicht** — *bewusst* nicht gebaut. Er
+   braucht die **Zeilennummern des amtlichen Formulars**, die sich je
+   Veranlagungsjahr ändern. Marcels Vorgabe „sollte nur vollständig sein" und
+   die Regel „nicht raten" gelten. **Dafür brauche ich das amtliche Formular
+   des jeweiligen Jahres** — dann ist es Weg A aus der Tabelle oben und
+   schnell gebaut.
+2. **Halter-Filter und Objektauswahl** in der Oberfläche. Der Export kann sie
+   bereits (`opts.objectIds`), es fehlt die Bedienung.
+3. **Die 66-%-Grenze** des § 21 Abs. 2 EStG als Live-Warnung — der Nebenfund,
+   klein und eigenständig. DealPilot kennt Ist- und Marktmiete bereits.
+
+**`v1215` liegt auf Staging, nicht auf Prod.**
+
 ### Spracheingabe ist durch — Punkt 3 abgeschlossen, 03.09.2026
 
 Alle drei „Reste" sind zu. **Zwei davon waren veraltete Einträge, einer ein

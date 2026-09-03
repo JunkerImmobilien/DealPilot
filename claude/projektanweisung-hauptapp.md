@@ -5988,6 +5988,91 @@ ein zweites Modal neben einem vorhandenen").
 außerdem die Kaltmiete in `2026-001` korrigiert; das Objekt liefert wieder
 Bruttorendite und Kaufpreisfaktor.
 
+### v1215 / v1215b–c (03.09.2026, `0948a6f` · `ba3188c` · `a0b9389`) — die Steuer-Mappe
+
+**Was.** Backlog-Punkt **5**, Marcels Auftrag vom 30.08.2026: das Finanzamt-PDF
+gibt es bisher nur je Objekt im Tab Steuer. Gewünscht ist dieselbe Sache über
+**alle** Objekte, mit Jahr und Auswahl.
+
+**Gemessen, bevor gebaut wurde.** `GET /tax-records` liefert auf Staging **72
+Sätze über 7 Objekte und 12 Jahre**, und **alle 26 Felder, die die PDF-Seite
+druckt, sind in jedem Satz belegt** — auch die gerechneten (`afa`,
+`schuldzinsen`). Der Satz trägt sogar `object_name`. Es braucht also weder
+neue Datenhaltung noch ein Nachladen der Objekte in den Editor. Der
+Backlog-Eintrag hatte recht.
+
+> **Eine Vermutung, die ich gemessen zurückgenommen habe.** Aus dem Code
+> (`_getEffectiveValue` = Override ?? Automatik) hatte ich geschlossen, die
+> Sätze trügen nur die Hand-Korrekturen und ein Sammel-PDF sei deshalb
+> lückenhaft. **Falsch** — sie werden beim Rechnen geschrieben. Aus dem Code
+> geschlossen, an den Daten widerlegt. Hätte ich das nicht gemessen, hätte
+> ich den Backlog-Eintrag „korrigiert" und dabei kaputtgemacht.
+
+**Zwei kleine Eingriffe statt einer Zerlegung.**
+
+- `_renderWerbungskostenPage(…, q)` — optionaler letzter Parameter. Bis dahin
+  holte die Seite Name und Adresse aus dem DOM und die Zahlen aus
+  `_computeYearTotal` am geöffneten Objekt. Mit `q` kommen beide von außen;
+  **ohne `q` ist das Verhalten bitgleich.**
+- `_computeYearTotal(year, yearIdx, vorgabe)` — `vorgabe` setzt die 26 Werte
+  von außen. **Die Summenformel bleibt, wo sie ist.** Ich habe die Funktion
+  ausdrücklich *nicht* zerschnitten: sie ist die einzige Wahrheit über
+  Werbungskosten, Einnahmen und Ergebnis, und eine zweite Fassung wäre genau
+  der Fehler, den der Kommentar bei `_renderSteuerwirkung` verbietet.
+
+**Neu:** `exportSteuerMappePDF(jahr)` — holt die Sätze, sortiert nach
+Objektnamen, rendert je Objekt eine Seite und hängt eine Schlussseite mit
+einer Zeile je Objekt und der Summe an. Dazu **Abschnitt 07 im
+Portfolio-Cockpit — der erste Export-Knopf dort überhaupt.** Das Jahr-Dropdown
+wird aus den wirklich vorhandenen Sätzen gefüllt, mit Objektzahl je Jahr;
+gibt es keine, ist der Knopf gesperrt statt ein leeres PDF zu erzeugen.
+
+**Was die Mappe über sich selbst sagt** (Schlussseite): sie ersetzt keine
+Steuererklärung · die Zeilennummern der amtlichen Anlage V sind **nicht**
+enthalten, weil sie sich je Veranlagungsjahr ändern und nicht geraten werden ·
+und fehlen zu einem Objekt die Stammdaten, wird es **nicht übersprungen**,
+sondern gedruckt **und** auf der Schlussseite benannt. **Ein fehlendes Objekt
+still wegzulassen wäre in einer Steuerunterlage der schlimmste Fall: die Mappe
+sähe vollständig aus.**
+
+**Nachweis.** PDF im Browser erzeugt (jsPDF abgefangen, nicht
+heruntergeladen): **8 Seiten** für 2026 — 7 Objektseiten plus Zusammenfassung.
+Seite 1 `Am Markt 9, 06184 Kabelsketal · ETW · 118 m²`, Seite 2
+`Bäckerstr. 7, 32003 Musterhausen · ETW · 78 m²`. Schlussseite mit Summenzeile
+und beiden Hinweisen. Konsole ohne Fehler.
+
+**Zwei Nachbesserungen aus dem ersten Lauf:**
+
+- **`v1215b`** — auf Seite 1 stand `",  Kabelsketal"` und `"ETW ·  m²"`.
+  Gemessen: **`GET /objects` liefert nur eine Zusammenfassung** (id, name,
+  kuerzel, ort, kaufpreis, dscr, ltv, thumbnail) — **kein `data`** und damit
+  weder Straße noch Wohnfläche. Die Details liegen in `GET /objects/:id`. Das
+  ist **kein „Nachladen der Objekte"** im Sinne des Backlog-Eintrags — der
+  meinte das Laden in den *Editor*, das den Arbeitsstand überschreibt. Jetzt
+  werden die Details nur für die Objekte geholt, die wirklich ins PDF kommen,
+  und parallel.
+- **`v1215c`** — im Jahr-Feld stand **„2040 · 4 Objekte"**. Die Sätze reichen
+  bis 2040, weil sie auch die Projektion tragen, und meine Sortierung ist
+  absteigend. **Für eine Steuermappe will das niemand.** Vorausgewählt ist
+  jetzt das Veranlagungsjahr (aktuelles minus eins), sonst das nächstkleinere
+  vorhandene — gemessen: `2025 · 2 Objekte`. Dazu war das Dropdown über die
+  ganze Zeile gezogen, weil `style.css` selects auf volle Breite setzt;
+  `min-width` allein hielt das nicht.
+
+**Rest — und der ist der wichtigere Teil des Punktes.** Der **Umschalter auf
+die Anlage-V-Ansicht** ist *nicht* gebaut, und zwar bewusst: er braucht die
+**Zeilennummern des amtlichen Formulars**, die sich je Veranlagungsjahr ändern.
+Marcels eigene Vorgabe dazu lautet „sollte nur vollständig sein", und der
+Backlog hält fest, dass sie **nicht geraten** werden. Ich habe kein amtliches
+Formular vorliegen — also erscheint die Ansicht nicht, statt mit Nummern aus
+dem Gedächtnis zu raten. **Dafür braucht es das Formular des jeweiligen
+Jahres.** Ebenfalls offen: der Halter-Filter und die Objektauswahl in der
+Oberfläche (der Export kann sie bereits über `opts.objectIds`), und die
+**66-%-Grenze** des § 21 Abs. 2 EStG als Live-Warnung — der Nebenfund aus dem
+Backlog, klein und eigenständig.
+
+**`v1215` liegt auf Staging.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
