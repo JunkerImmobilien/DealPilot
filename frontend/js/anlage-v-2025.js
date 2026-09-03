@@ -140,7 +140,7 @@ window.AnlageV2025 = {
 
     /* Sachlogik — mit Begruendung, in der Ansicht gekennzeichnet. */
     bereitstellung:   { zeile: 48, art: 'wk', quelle: 'sachlogik', grund: 'Bereitstellungszinsen sind Zinsen. Die amtliche Anleitung rechnet auch Damnum / Disagio zu den Schuldzinsen.' },
-    vermittlung:      { zeile: 51, art: 'wk', quelle: 'sachlogik', grund: 'Vermittlungsprovision für ein Darlehen ist eine Kosten der Geldbeschaffung — dieselbe Gruppe wie Schätz-, Notar- und Grundbuchgebühren.' },
+    vermittlung:      { zeile: 51, art: 'wk', quelle: 'sachlogik', grund: 'Eine Vermittlungsprovision für ein Darlehen gehört zu den Kosten der Geldbeschaffung — dieselbe Gruppe wie Schätz-, Notar- und Grundbuchgebühren.' },
     finanz_sonst:     { zeile: 51, art: 'wk', quelle: 'sachlogik', grund: 'Sonstige Finanzierungsnebenkosten gehören zur Geldbeschaffung. Ist der Aufwand ein Zins, gehört er in Zeile 48.' },
     steuerber:        { zeile: 82, art: 'wk', quelle: 'sachlogik', grund: 'Steuerberatungskosten sind Werbungskosten, soweit sie auf die Ermittlung der Einkünfte entfallen. Der auf den Mantelbogen entfallende Teil ist keine Anlage-V-Position.' },
     anschaffungsnah:  { zeile: 35, art: 'wk', quelle: 'sachlogik', grund: 'Anschaffungsnahe Herstellungskosten (§ 6 Abs. 1 Nr. 1a EStG) sind nicht sofort abziehbar; sie erhöhen die Bemessungsgrundlage und wirken über die AfA in Zeile 35.' },
