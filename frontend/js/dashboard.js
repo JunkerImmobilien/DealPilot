@@ -1112,8 +1112,27 @@
       + '<div class="sl"><span class="e">06</span><h2>Gesamt-Projektion</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="rule"></span></div>'
       + '<div class="proj"><div class="ph"><span class="t">Cashflow &amp; Verm\u00f6gensaufbau</span><span class="tag">Modellprojektion</span></div>'
       + '<div class="pw"><table class="pt" id="dp-proj-table"></table></div></div>'
+      /* v1215-mappe · Abschnitt 07 — der erste Export-Knopf im Cockpit.
+         Gemessen am 03.09.2026: das Cockpit hatte keinen einzigen. Marcels
+         Entscheidung vom 30.08.: die Auswahl gehoert hierher, zusammen mit
+         dem Jahr. Die Objektauswahl kann der Export bereits (opts.objectIds),
+         die Oberflaeche dafuer fehlt noch — deshalb steht hier, dass ALLE
+         Objekte des Jahres genommen werden, statt es offenzulassen. */
+      + '<div class="sl"><span class="e">07</span><h2>Steuer-Mappe</h2><span class="tag">Anlage V · § 21 EStG</span><span class="rule"></span></div>'
+      + '<div class="dp-mappe">'
+      +   '<div class="dp-mappe-t">Ein PDF über <b>alle</b> Objekte mit erfassten Steuerdaten — je Objekt eine Aufstellung der Werbungskosten, am Ende eine Zusammenfassung mit Summe.</div>'
+      +   '<div class="dp-mappe-r">'
+      +     '<label class="dp-mappe-l">Veranlagungsjahr</label>'
+      +     '<select id="dp-mappe-jahr" class="dp-mappe-sel"></select>'
+      +     '<button class="dp-mappe-btn" onclick="DealPilotDashboard.steuerMappe()">Steuer-Mappe erstellen</button>'
+      +   '</div>'
+      +   '<div class="dp-mappe-h">Die Zuordnung zu den Zeilennummern der amtlichen Anlage V ist <b>nicht</b> enthalten — sie ändern sich je Veranlagungsjahr und werden nicht geraten.</div>'
+      + '</div>'
       + '</div></div>';
     m.setAttribute('data-dp-built','1');
+    /* v1215-mappe: Stil und Jahresliste erst hier — vorher gibt es das
+       Dropdown nicht, und die Liste kommt aus echten Saetzen. */
+    try { _mappeCss(); _mappeJahreLaden(); } catch (e) {}
     return true;
   }
 
@@ -1315,10 +1334,83 @@
     document.body.appendChild(ov);
   }
 
+  /* ════ v1215-mappe · Steuer-Mappe im Cockpit ════
+     Das Jahr-Dropdown wird aus den WIRKLICH vorhandenen Steuersätzen gefüllt,
+     nicht aus einer geratenen Jahresliste: wer ein Jahr wählen kann, für das
+     es keine Daten gibt, bekommt ein leeres PDF und sucht den Fehler bei sich.
+     Voreingestellt ist das jüngste Jahr, für das Sätze da sind. */
+  var _mappeJahre = null;
+  async function _mappeJahreLaden() {
+    var sel = document.getElementById('dp-mappe-jahr');
+    if (!sel || sel.dataset.gefuellt === '1') return;
+    sel.innerHTML = '<option value="">lädt…</option>';
+    try {
+      var r = await Auth.apiCall('/tax-records?from=2000&to=2100');
+      var recs = (r && r.records) || [];
+      _mappeJahre = {};
+      recs.forEach(function (s) { _mappeJahre[s.year] = (_mappeJahre[s.year] || 0) + 1; });
+      var jahre = Object.keys(_mappeJahre).map(Number).sort(function (a, b) { return b - a; });
+      if (!jahre.length) {
+        sel.innerHTML = '<option value="">keine Steuerdaten erfasst</option>';
+        sel.disabled = true;
+        var b = document.querySelector('.dp-mappe-btn');
+        if (b) { b.disabled = true; b.style.opacity = '.45'; b.style.cursor = 'not-allowed'; }
+        sel.dataset.gefuellt = '1';
+        return;
+      }
+      sel.innerHTML = jahre.map(function (j) {
+        return '<option value="' + j + '">' + j + '  ·  ' + _mappeJahre[j]
+             + ' Objekt' + (_mappeJahre[j] === 1 ? '' : 'e') + '</option>';
+      }).join('');
+      sel.disabled = false;
+      sel.dataset.gefuellt = '1';
+    } catch (e) {
+      sel.innerHTML = '<option value="">nicht abrufbar</option>';
+    }
+  }
+
+  async function steuerMappe() {
+    var sel = document.getElementById('dp-mappe-jahr');
+    var jahr = sel && sel.value ? parseInt(sel.value, 10) : 0;
+    if (!jahr) {
+      if (typeof toast === 'function') toast('Bitte erst ein Veranlagungsjahr wählen.');
+      return;
+    }
+    if (typeof exportSteuerMappePDF !== 'function') {
+      if (typeof toast === 'function') toast('✗ Steuer-Modul nicht geladen — Seite neu laden.');
+      return;
+    }
+    var btn = document.querySelector('.dp-mappe-btn');
+    var alt = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'erstelle…'; }
+    try { await exportSteuerMappePDF(jahr); }
+    catch (e) { if (typeof toast === 'function') toast('✗ ' + (e.message || e)); }
+    finally { if (btn) { btn.disabled = false; btn.textContent = alt; } }
+  }
+
+  function _mappeCss() {
+    if (document.getElementById('dp-mappe-css')) return;
+    var s = document.createElement('style');
+    s.id = 'dp-mappe-css';
+    s.textContent =
+      '.dp-mappe{padding:14px 16px 16px;border:1px solid rgba(128,128,128,.22);border-radius:9px;margin:2px 0 18px}'
+    + '.dp-mappe-t{font-size:13.5px;line-height:1.55;margin-bottom:12px}'
+    + '.dp-mappe-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}'
+    + '.dp-mappe-l{font:600 10px ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;opacity:.7}'
+    + '.dp-mappe-sel{padding:7px 10px;border-radius:6px;border:1px solid rgba(128,128,128,.35);'
+    +   'background:transparent;color:inherit;font-size:13px;min-width:190px}'
+    + '.dp-mappe-btn{padding:8px 16px;border-radius:6px;border:0;cursor:pointer;font-size:13px;font-weight:600;'
+    +   'background:var(--wl-c9a84c,#C9A84C);color:#141417}'
+    + '.dp-mappe-btn:hover{filter:brightness(1.06)}'
+    + '.dp-mappe-h{margin-top:11px;font-size:11.5px;line-height:1.5;opacity:.65}';
+    document.head.appendChild(s);
+  }
+
   /* ════ PUBLIC API ════ */
   window.DealPilotDashboard = {
     open: openDashboard, close: closeDashboard,
     setProjYears: setProjYears, setCardView: setCardView,
+    steuerMappe: steuerMappe,   /* v1215-mappe */
     cardPdf: cardPdf, cardDelete: cardDelete,
     headerTrackRecord: headerTrackRecord, exportPortfolioPdf: exportPortfolioPdf,
     toggleSidebar: toggleSidebar, setTheme: setTheme, applyTheme: applyTheme,

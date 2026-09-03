@@ -1032,8 +1032,16 @@ function _getEffectiveValue(year, field, autoVal) {
 /**
  * Compute the year totals (Verlust/Überschuss + Steuer) using overrides where present.
  */
-function _computeYearTotal(year, yearIdx) {
-  var auto = _computeAutoForYear(yearIdx, year);
+/* v1215-mappe · `vorgabe` erlaubt es, die 26 Werte von AUSSEN zu setzen —
+   fuer die Steuer-Mappe ueber alle Objekte, wo die Zahlen aus einem
+   gespeicherten Satz (GET /tax-records) kommen und nicht aus dem geoeffneten
+   Objekt. Die SUMMENFORMEL darunter bleibt, wo sie ist: sie ist die einzige
+   Wahrheit ueber Werbungskosten, Einnahmen und Ergebnis, und eine zweite
+   Fassung davon waere genau der Fehler, den der Kommentar bei
+   _renderSteuerwirkung verbietet.
+   OHNE `vorgabe` ist das Verhalten bitgleich zu vorher. */
+function _computeYearTotal(year, yearIdx, vorgabe) {
+  var auto = vorgabe ? {} : _computeAutoForYear(yearIdx, year);
   var fields = [
     'schuldzinsen', 'kontofuehrung', 'bereitstellung', 'notar_grundschuld',
     'vermittlung', 'finanz_sonst',
@@ -1046,7 +1054,7 @@ function _computeYearTotal(year, yearIdx) {
   ];
   var values = {};
   fields.forEach(function(f) {
-    values[f] = _getEffectiveValue(year, f, auto[f]);
+    values[f] = vorgabe ? (Number(vorgabe[f]) || 0) : _getEffectiveValue(year, f, auto[f]);
   });
 
   // Werbungskosten — umlagefähige NK ist Teil davon (Excel-Logik: durchlaufender Posten)

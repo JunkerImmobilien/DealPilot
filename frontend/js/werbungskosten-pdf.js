@@ -119,7 +119,28 @@ function _populateFaPdfYearSelect() {
   else document.addEventListener('DOMContentLoaded', function () { setTimeout(tryPop, 600); });
 })();
 
-function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW) {
+/* v1215-mappe · DIE SEITE KANN JETZT AUCH FREMDE OBJEKTE DRUCKEN.
+ *
+ * Bis hierher holte diese Funktion alles aus dem GEOEFFNETEN Objekt: Name und
+ * Adresse aus dem DOM (getCurrentObjectName, g('str')...), die Zahlen aus
+ * _computeYearTotal(), das an State.cfRows haengt. Fuer die Steuer-Mappe ueber
+ * ALLE Objekte geht das nicht — man muesste jedes Objekt nacheinander laden und
+ * dabei den Arbeitsstand des Nutzers ueberschreiben.
+ *
+ * Der neue letzte Parameter `q` (Quelle) bricht diese Kopplung, ohne das
+ * bisherige Verhalten anzufassen: FEHLT er, laeuft alles wie vorher. Ist er da,
+ * liefert er Objektangaben und Zahlen, und die Seite fragt das DOM nicht.
+ *
+ * Gemessen am 03.09.2026 auf Staging: GET /tax-records liefert 72 Saetze ueber
+ * 7 Objekte und 12 Jahre, und ALLE 26 Felder, die diese Seite druckt, sind in
+ * jedem Satz belegt — auch die gerechneten (afa, schuldzinsen). Der Satz traegt
+ * sogar object_name. Was er NICHT traegt, sind Adresse, Flaeche und Objektart;
+ * die kommen aus /objects.
+ *
+ * (Ich hatte zuerst vermutet, die Saetze truegen nur die Hand-Korrekturen, weil
+ * _getEffectiveValue so aussieht. Gemessen ist das falsch — sie werden beim
+ * Rechnen geschrieben. Aus dem Code geschlossen, an den Daten widerlegt.) */
+function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
   // ── HEADER ─────────────────────────────────────
   doc.setFillColor(42, 39, 39);
   doc.rect(0, 0, W, 26, 'F');
@@ -147,11 +168,14 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW) {
   var cy = 36;
 
   // ── OBJEKT-ANGABEN ─────────────────────────────
-  var name = (typeof getCurrentObjectName === 'function' ? getCurrentObjectName() : '') ||
-             (document.getElementById('hdr-obj') ? document.getElementById('hdr-obj').textContent : 'Objekt');
-  var addr = (g('str') || '') + ' ' + (g('hnr') || '') + ', ' + (g('plz') || '') + ' ' + (g('ort') || '');
-  var qm = g('wfl');
-  var bezeichnung = g('objart') || 'ETW';
+  /* v1215-mappe: aus `q`, sonst wie bisher aus dem geoeffneten Objekt. */
+  var name = q ? (q.name || "Objekt") :
+             ((typeof getCurrentObjectName === "function" ? getCurrentObjectName() : "") ||
+             (document.getElementById("hdr-obj") ? document.getElementById("hdr-obj").textContent : "Objekt"));
+  var addr = q ? (q.addr || "") :
+             ((g("str") || "") + " " + (g("hnr") || "") + ", " + (g("plz") || "") + " " + (g("ort") || ""));
+  var qm = q ? (q.qm || "") : g("wfl");
+  var bezeichnung = (q ? q.art : g("objart")) || "ETW";
 
   doc.setFillColor(248, 246, 240);
   doc.roundedRect(M, cy, CW, 22, 2, 2, 'F');
@@ -176,7 +200,10 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW) {
 
   // ── WERBUNGSKOSTEN-TABELLE ────────────────────
   // Compute totals for this year using yearly tax form data
-  var totals = (typeof _computeYearTotal === 'function') ? _computeYearTotal(year, yearIdx) : null;
+  /* v1215-mappe: `q.totals` schlaegt die Rechnung am geoeffneten Objekt.
+     Ohne q bleibt es exakt beim bisherigen Weg. */
+  var totals = (q && q.totals) ? q.totals
+             : ((typeof _computeYearTotal === "function") ? _computeYearTotal(year, yearIdx) : null);
   if (!totals) return;
   var v = totals.values;
   var bem = (window._taxYearlyBemerkungen && window._taxYearlyBemerkungen['y' + year]) || {};
@@ -542,4 +569,189 @@ if (typeof g === 'undefined') {
     var e = document.getElementById(id);
     return e ? (e.value || '') : '';
   };
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   v1215-mappe · STEUER-MAPPE: EIN PDF UEBER ALLE OBJEKTE
+   ───────────────────────────────────────────────────────────────────────────
+   Marcels Auftrag vom 30.08.2026: das Finanzamt-PDF gibt es bisher nur je
+   Objekt (Tab Steuer). Gewuenscht ist dieselbe Sache ueber ALLE Objekte, mit
+   Jahr und Auswahl.
+
+   Gemessen am 03.09.2026 auf Staging: GET /tax-records liefert 72 Saetze ueber
+   7 Objekte und 12 Jahre. ALLE 26 Felder, die die Seite druckt, sind in jedem
+   Satz belegt — auch die gerechneten (afa, schuldzinsen). Es braucht also
+   weder neue Datenhaltung noch ein Nachladen der Objekte in den Editor.
+
+   Was der Satz NICHT traegt: Adresse, Wohnflaeche, Objektart. Die kommen aus
+   GET /objects und werden je object_id zugeordnet. Fehlt ein Objekt dort,
+   wird es NICHT weggelassen — es bekommt seine Seite mit dem Namen aus dem
+   Satz und leeren Objektangaben, und die Schlussseite nennt es. Ein fehlendes
+   Objekt still zu ueberspringen waere in einer Steuerunterlage der
+   schlimmste Fall: die Mappe saehe vollstaendig aus.
+
+   Gerechnet wird hier NICHTS. _computeYearTotal(jahr, 0, satz) benutzt
+   dieselbe Summenformel wie der Bildschirm, nur mit vorgegebenen Werten.
+   ═══════════════════════════════════════════════════════════════════════════ */
+async function exportSteuerMappePDF(jahr, opts) {
+  opts = opts || {};
+  if (typeof Plan !== 'undefined' && Plan.can && !Plan.can('werbungskosten_pdf')) {
+    if (typeof toast === 'function') toast('🔒 Die Steuer-Mappe ist im Investor-Plan enthalten');
+    if (typeof openPricingModal === 'function') setTimeout(openPricingModal, 600);
+    return;
+  }
+  if (typeof Paywall !== 'undefined' && !Paywall.gate('exports')) return;
+  if (typeof window.jspdf === 'undefined') {
+    if (typeof toast === 'function') toast('PDF-Bibliothek lädt noch...');
+    return;
+  }
+  jahr = parseInt(jahr, 10);
+  if (!jahr) jahr = new Date().getFullYear() - 1;   /* Veranlagung betrifft das Vorjahr */
+
+  var saetze, objekte;
+  try {
+    var r = await Auth.apiCall('/tax-records?from=' + jahr + '&to=' + jahr);
+    saetze = (r && r.records) || [];
+    var ro = await Auth.apiCall('/objects');
+    objekte = (ro && (ro.objects || ro.items || ro)) || [];
+    if (!Array.isArray(objekte)) objekte = [];
+  } catch (e) {
+    if (typeof toast === 'function') toast('✗ Steuerdaten nicht abrufbar: ' + (e.message || e));
+    return;
+  }
+
+  if (opts.objectIds && opts.objectIds.length) {
+    saetze = saetze.filter(function (s) { return opts.objectIds.indexOf(s.object_id) >= 0; });
+  }
+  if (!saetze.length) {
+    if (typeof toast === 'function') toast('Für ' + jahr + ' sind keine Steuersätze erfasst.');
+    return;
+  }
+
+  /* Objektangaben je id — aus /objects, nicht aus dem Satz. */
+  var stamm = {};
+  objekte.forEach(function (o) {
+    var d = o.data || o;
+    var ortTeil = (d.plz || d.ort) ? ', ' + (d.plz || '') + ' ' + (d.ort || '') : '';
+    stamm[o.id] = {
+      name: o.name || d.objname || '',
+      addr: ((d.str || '') + ' ' + (d.hnr || '')).trim() + ortTeil,
+      qm: d.wfl || '',
+      art: d.objart || ''
+    };
+  });
+
+  saetze.sort(function (a, b) {
+    return String(a.object_name || '').localeCompare(String(b.object_name || ''), 'de');
+  });
+
+  var jsPDF = window.jspdf.jsPDF;
+  var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  var W = 210, H = 297, M = 16, CW = W - 2 * M;
+
+  var ohneStamm = [];
+  saetze.forEach(function (s, i) {
+    if (i > 0) doc.addPage();
+    var st = stamm[s.object_id];
+    if (!st) ohneStamm.push(s.object_name || s.object_id);
+    var totals = _computeYearTotal(jahr, 0, s);
+    _renderWerbungskostenPage(doc, jahr, 0, W, H, M, CW, {
+      name: (st && st.name) || s.object_name || 'Objekt',
+      addr: (st && st.addr) || '',
+      qm: (st && st.qm) || '',
+      art: (st && st.art) || '',
+      totals: totals
+    });
+  });
+
+  doc.addPage();
+  _renderMappeSummaryPage(doc, jahr, saetze, stamm, ohneStamm, W, H, M, CW);
+
+  doc.save('Steuermappe_' + jahr + '.pdf');
+  if (typeof toast === 'function') {
+    toast('✓ Steuer-Mappe ' + jahr + ' — ' + saetze.length + ' Objekt' + (saetze.length === 1 ? '' : 'e'));
+  }
+}
+
+/* Die Schlussseite: eine Zeile je Objekt, darunter die Summe. Sie ist der
+   Grund, warum die Mappe mehr ist als ein Stapel Einzel-PDFs. */
+function _renderMappeSummaryPage(doc, jahr, saetze, stamm, ohneStamm, W, H, M, CW) {
+  doc.setFillColor(42, 39, 39);
+  doc.rect(0, 0, W, 26, 'F');
+  doc.setFillColor.apply(doc, window._pdfGold());
+  doc.rect(0, 26, W, 1, 'F');
+  doc.setTextColor.apply(doc, window._pdfGold());
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
+  doc.text('STEUER-MAPPE · ZUSAMMENFASSUNG', M, 13);
+  doc.setTextColor(220, 220, 220);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
+  doc.text('Vermietung & Verpachtung · Anlage V · § 21 EStG', M, 19);
+  doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+  doc.text('Veranlagungsjahr ' + jahr, W - M, 13, { align: 'right' });
+  doc.setFontSize(8); doc.setFont('helvetica', 'normal');
+  doc.text('Erstellt: ' + new Date().toLocaleDateString('de-DE'), W - M, 19, { align: 'right' });
+
+  var cy = 38;
+  var eur = function (n) {
+    return (Math.round(Number(n) || 0)).toLocaleString('de-DE') + ' €';
+  };
+
+  doc.setTextColor(122, 115, 112); doc.setFontSize(7.5);
+  doc.text('OBJEKT', M, cy);
+  doc.text('EINNAHMEN', M + CW - 96, cy, { align: 'right' });
+  doc.text('WERBUNGSKOSTEN', M + CW - 48, cy, { align: 'right' });
+  doc.text('ERGEBNIS', M + CW, cy, { align: 'right' });
+  cy += 2;
+  doc.setDrawColor(210, 205, 198); doc.setLineWidth(0.3);
+  doc.line(M, cy, M + CW, cy);
+  cy += 5;
+
+  var sumE = 0, sumW = 0, sumR = 0;
+  saetze.forEach(function (s) {
+    var t = _computeYearTotal(jahr, 0, s);
+    sumE += t.einnahmen; sumW += t.werbungskosten; sumR += t.ergebnis;
+    var st = stamm[s.object_id];
+    doc.setTextColor(42, 39, 39); doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+    doc.text(String((st && st.name) || s.object_name || 'Objekt').slice(0, 44), M, cy);
+    doc.text(eur(t.einnahmen), M + CW - 96, cy, { align: 'right' });
+    doc.text(eur(t.werbungskosten), M + CW - 48, cy, { align: 'right' });
+    doc.setTextColor.apply(doc, t.ergebnis < 0 ? [176, 90, 84] : [46, 125, 80]);
+    doc.text(eur(t.ergebnis), M + CW, cy, { align: 'right' });
+    cy += 6;
+    if (cy > H - 40) { doc.addPage(); cy = 30; }
+  });
+
+  cy += 2;
+  doc.setDrawColor(42, 39, 39); doc.setLineWidth(0.5);
+  doc.line(M, cy, M + CW, cy);
+  cy += 6;
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(42, 39, 39);
+  doc.text('SUMME (' + saetze.length + ' Objekt' + (saetze.length === 1 ? '' : 'e') + ')', M, cy);
+  doc.text(eur(sumE), M + CW - 96, cy, { align: 'right' });
+  doc.text(eur(sumW), M + CW - 48, cy, { align: 'right' });
+  doc.setTextColor.apply(doc, sumR < 0 ? [176, 90, 84] : [46, 125, 80]);
+  doc.text(eur(sumR), M + CW, cy, { align: 'right' });
+  cy += 12;
+
+  /* Was die Mappe NICHT leisten kann, steht drin. Eine Steuerunterlage, die
+     ihre Luecken verschweigt, sieht vollstaendig aus — das ist der
+     gefaehrlichste Zustand, und es ist dasselbe Prinzip wie im Marktbericht. */
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(7.2);
+  doc.setTextColor(122, 115, 112);
+  var hin = [
+    'Diese Mappe fasst die je Objekt gespeicherten Steuersätze des Veranlagungsjahres zusammen. '
+    + 'Sie ersetzt keine Steuererklärung und keine Beratung.',
+    'Die Zuordnung zu den Zeilennummern der amtlichen Anlage V ist NICHT enthalten: die Nummern '
+    + 'ändern sich je Veranlagungsjahr und werden nicht geraten.'
+  ];
+  if (ohneStamm.length) {
+    hin.push('Zu ' + ohneStamm.length + ' Objekt' + (ohneStamm.length === 1 ? '' : 'en')
+      + ' liegen keine Stammdaten vor (Adresse, Fläche, Art) — die Seiten tragen nur den Namen: '
+      + ohneStamm.join(', ') + '.');
+  }
+  hin.forEach(function (t) {
+    var z = doc.splitTextToSize(t, CW);
+    doc.text(z, M, cy);
+    cy += z.length * 3.4 + 2;
+  });
 }
