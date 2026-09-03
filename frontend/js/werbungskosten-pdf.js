@@ -925,8 +925,12 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
   cy += 11;
 
   /* ── 2 · Werbungskosten mit Zeile ── */
-  kopf('WERBUNGSKOSTEN — ZUGEORDNET');
-  var ohne = [], zugeordnetSumme = 0;
+  kopf('WERBUNGSKOSTEN');
+  /* v1219: jede Zeile sagt jetzt, WORAUF ihre Zuordnung beruht. Das ist
+     wichtiger als die Zuordnung selbst — ein Leser muss unterscheiden können,
+     was aus dem Formular abgeschrieben ist und was aus der Art des Aufwands
+     folgt. Ohne diese Unterscheidung sieht beides gleich sicher aus. */
+  var ohne = [], zugeordnetSumme = 0, sachlogik = [];
   Object.keys(T.felder).forEach(function (f) {
     if (f === 'einnahmen_km' || f === 'einnahmen_nk') return;
     var z = T.felder[f];
@@ -934,15 +938,50 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
     if (z.zeile == null) { if (betrag) ohne.push({ f: f, betrag: betrag, grund: z.grund }); return; }
     if (!betrag) return;                       /* Nullposten nicht drucken */
     var zz = T.zeilen[z.zeile] || {};
-    zeile('Zeile ' + z.zeile, zz.kz, _AV_LABEL[f] || f, betrag);
+    var mark = (z.quelle === 'sachlogik') ? ' °' : ((z.quelle === 'auffang') ? ' *' : '');
+    zeile('Zeile ' + z.zeile, zz.kz, (_AV_LABEL[f] || f) + mark, betrag);
+    if (z.quelle === 'sachlogik' && z.grund) sachlogik.push({ f: f, zeile: z.zeile, grund: z.grund });
     zugeordnetSumme += betrag;
   });
   if (zugeordnetSumme === 0) {
     doc.setFontSize(7.5); doc.setTextColor(140, 134, 128);
-    doc.text('Keine Position mit gesicherter Zeilenzuordnung erfasst.', M + 28, cy);
+    doc.text('Keine Position mit Betrag erfasst.', M + 28, cy);
     cy += 6;
   }
-  cy += 4;
+  cy += 3;
+
+  /* v1219 · DIE LEGENDE IST DER KERN DIESER SEITE.
+     Ohne sie sehen Abschrift und Schlussfolgerung gleich sicher aus — und
+     genau das darf in einer Steuerunterlage nicht passieren. */
+  if (sachlogik.length || zugeordnetSumme) {
+    _need(10);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.8);
+    doc.setTextColor(122, 115, 112);
+    var leg = doc.splitTextToSize('Ohne Zeichen: die Kostenart steht wörtlich in der '
+      + 'Überschrift der Formularzeile — Abschrift.   '
+      + '*  steht in keiner spezielleren Zeile; das Formular führt dafür „Sonstige Kosten".   '
+      + '°  folgt aus der Art des Aufwands, nicht aus dem Formulartext — siehe Begründung unten.', CW);
+    doc.text(leg, M, cy);
+    cy += leg.length * 3.2 + 3;
+  }
+
+  if (sachlogik.length) {
+    _need(8);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+    doc.setTextColor(42, 39, 39);
+    doc.text('°  ZUORDNUNG AUS DER ART DES AUFWANDS — BITTE PRÜFEN', M, cy);
+    cy += 4.5;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6);
+    doc.setTextColor(140, 134, 128);
+    sachlogik.forEach(function (s) {
+      var t = doc.splitTextToSize('Zeile ' + s.zeile + ' · ' + (_AV_LABEL[s.f] || s.f)
+        + ' — ' + s.grund, CW - 4);
+      _need(t.length * 3.1 + 1.5);
+      doc.text(t, M + 4, cy);
+      cy += t.length * 3.1 + 1.4;
+    });
+    cy += 3;
+  }
 
   /* ── 3 · ohne Zeile ── */
   if (ohne.length) {

@@ -15,23 +15,41 @@
    Dasselbe Prinzip wie bei der Wertermittlung.
 
    ───────────────────────────────────────────────────────────────────────────
-   WAS HIER BEWUSST NICHT STEHT
    ───────────────────────────────────────────────────────────────────────────
-   Nur Zuordnungen, bei denen die Formularbezeichnung EINDEUTIG ist —
-   "Schuldzinsen" auf "Schuldzinsen", "Absetzung fuer Abnutzung fuer Gebaeude"
-   auf die AfA. Wo die Zuordnung eine steuerfachliche Entscheidung waere
-   (gehoeren Vermittlungskosten zu den Geldbeschaffungskosten oder zu den
-   sonstigen Kosten?), steht `zeile: null` mit einem Grund.
+   JEDE ZUORDNUNG SAGT, WORAUF SIE BERUHT
+   ───────────────────────────────────────────────────────────────────────────
+   Marcel am 03.09.2026, nachdem er die erste Fassung gesehen hatte:
+   „eigentlich müssten wir alles zuordnen können." Er hatte recht — und der
+   Grund für die zwölf Lücken lag bei mir: ich hatte die Zeilen 73/75 des
+   Formulars überlesen. Sie tragen die Überschrift
 
-   Solche Posten verschwinden NICHT — sie erscheinen in der Ansicht sichtbar
-   ohne Zuordnung. Marcels Anforderung lautet "sollte nur vollstaendig sein",
-   und vollstaendig heisst: jede Position ist zu sehen, auch die, fuer die
-   DealPilot keine Zeile behaupten kann. Eine Anlage-V-Ansicht, in der eine
-   Position stillschweigend fehlt, ist schlimmer als keine — sie sieht aus
-   wie eine fertige Erklaerung.
+     „Umgelegte Kosten (z. B. Grundsteuer, Straßenreinigung, Müllabfuhr,
+      Wasserversorgung, Entwässerung, Hausbeleuchtung, Heizung, Warmwasser,
+      Schornsteinreinigung, Hausversicherungen, Hauswart, Treppenhaus-
+      reinigung, Fahrstuhl)"
 
-   ICH BIN KEIN STEUERBERATER. Die eindeutigen Zuordnungen sind Abschrift,
-   die offenen sind als offen gekennzeichnet.
+   — also genau die umlagefähigen Nebenkosten, die ich als „nicht zuordenbar"
+   ausgewiesen hatte. Das Formular hatte die Antwort die ganze Zeit.
+
+   Jetzt trägt jedes Feld ein `quelle`, und das ist wichtiger als die
+   Zuordnung selbst: ein Leser muss unterscheiden können, was Abschrift ist
+   und was Schlussfolgerung.
+
+     'formular'  — die Kostenart steht WÖRTLICH in der Beispielliste der
+                   Zeilenüberschrift. Abschrift, kein Urteil.
+     'auffang'   — die Kostenart steht in KEINER spezielleren Liste. Das
+                   Formular führt für diesen Fall Zeile 80/82 „Sonstige
+                   Kosten"; die Zuordnung folgt aus seinem Aufbau.
+     'sachlogik' — die Zuordnung folgt aus der Art des Aufwands, nicht aus
+                   dem Formulartext. Mit Begründung, und in der Ansicht als
+                   solche gekennzeichnet.
+
+   Von 26 Feldern: 10 aus dem Formular, 10 über den Auffangposten, 5 aus
+   Sachlogik, EINES bleibt offen (AfA auf bewegliche Wirtschaftsgüter — die
+   Anlage V führt dafür keine eigene Zeile).
+
+   ICH BIN KEIN STEUERBERATER. Die Abschriften sind Abschrift; alles andere
+   ist gekennzeichnet, damit es geprüft werden kann statt geglaubt.
    ═══════════════════════════════════════════════════════════════════════════ */
 window.AnlageV2025 = {
   jahr: 2025,
@@ -68,7 +86,9 @@ window.AnlageV2025 = {
     66: { text: 'Verteilte Erhaltungsaufwendungen aus 2022 — abzugsfähige Werbungskosten', kz: '40' },
     69: { text: 'Verteilte Erhaltungsaufwendungen aus 2023 — abzugsfähige Werbungskosten', kz: '41' },
     72: { text: 'Verteilte Erhaltungsaufwendungen aus 2024 — abzugsfähige Werbungskosten', kz: '42' },
+    75: { text: 'Umgelegte Kosten (z. B. Grundsteuer, Straßenreinigung, Müllabfuhr, Wasserversorgung, Entwässerung, Hausbeleuchtung, Heizung, Warmwasser, Schornsteinreinigung, Hausversicherungen, Hauswart, Treppenhausreinigung, Fahrstuhl) — abzugsfähige Werbungskosten', kz: '52' },
     78: { text: 'Nicht umgelegte Kosten (z. B. Verwaltungskosten, Bank- und Kontoführungsgebühren ohne Erhaltungsrücklage) — abzugsfähige Werbungskosten', kz: '48' },
+    79: { text: 'Nur bei umsatzsteuerpflichtiger Vermietung: an das Finanzamt gezahlte und ggf. verrechnete Umsatzsteuer', kz: '58' },
     82: { text: 'Sonstige Kosten — abzugsfähige Werbungskosten', kz: '49' },
     83: { text: 'Summe der Werbungskosten (Summe der Zeilen 35, 38, 41, 45, 48, 51, 54, 55, 56, 60, 63, 66, 69, 72, 75, 78, 79 und 82)' },
     85: { text: 'Überschuss (Einnahmen laut Zeile 32 abzüglich Werbungskosten laut Zeile 83)' },
@@ -76,38 +96,57 @@ window.AnlageV2025 = {
     88: { text: 'Betragsmäßige Kürzung der Werbungskosten wegen verbilligter Vermietung eines Teils des Objekts', kz: '51' }
   },
 
+
   /* DealPilot-Feld -> Anlage-V-Zeile.
-     `zeile: null` heisst: die Zuordnung waere eine steuerfachliche
-     Entscheidung, keine Abschrift. Der Posten erscheint trotzdem. */
+     `quelle` sagt, WORAUF die Zuordnung beruht — das ist wichtiger als die
+     Zuordnung selbst, weil ein Leser wissen muss, was Abschrift ist und was
+     Schlussfolgerung:
+
+       'formular'  — die Kostenart steht WOERTLICH in der Beispielliste der
+                     Zeilenueberschrift. Abschrift, kein Urteil.
+       'auffang'   — die Kostenart steht in KEINER spezielleren Liste; das
+                     Formular fuehrt fuer diesen Fall Zeile 80/82
+                     "Sonstige Kosten". Die Zuordnung folgt aus dem Aufbau
+                     des Formulars, nicht aus einer Meinung.
+       'sachlogik' — die Zuordnung folgt aus der Art des Aufwands, nicht aus
+                     dem Formulartext. MIT BEGRUENDUNG, und der Posten wird
+                     in der Ansicht als solcher gekennzeichnet.
+       null        — weiterhin offen. */
   felder: {
-    einnahmen_km:     { zeile: 15, art: 'einnahme' },
-    einnahmen_nk:     { zeile: 20, art: 'einnahme' },
+    einnahmen_km:     { zeile: 15, art: 'einnahme', quelle: 'formular' },
+    einnahmen_nk:     { zeile: 20, art: 'einnahme', quelle: 'formular' },
 
-    afa:              { zeile: 35, art: 'wk' },
-    schuldzinsen:     { zeile: 48, art: 'wk' },
-    notar_grundschuld:{ zeile: 51, art: 'wk' },
-    erhaltungsaufwand:{ zeile: 55, art: 'wk' },
-    hausverwaltung:   { zeile: 78, art: 'wk' },
-    kontofuehrung:    { zeile: 78, art: 'wk' },
+    /* Abschrift — die Kostenart steht in der Zeilenueberschrift. */
+    afa:              { zeile: 35, art: 'wk', quelle: 'formular' },
+    schuldzinsen:     { zeile: 48, art: 'wk', quelle: 'formular' },
+    notar_grundschuld:{ zeile: 51, art: 'wk', quelle: 'formular' },
+    erhaltungsaufwand:{ zeile: 55, art: 'wk', quelle: 'formular' },
+    nk_umlf:          { zeile: 75, art: 'wk', quelle: 'formular' },
+    hausverwaltung:   { zeile: 78, art: 'wk', quelle: 'formular' },
+    kontofuehrung:    { zeile: 78, art: 'wk', quelle: 'formular' },
+    nk_n_umlf:        { zeile: 78, art: 'wk', quelle: 'formular' },
 
-    bereitstellung:   { zeile: null, art: 'wk', grund: 'Bereitstellungszinsen — je nach Sachverhalt Zeile 48 (Schuldzinsen) oder 51 (Geldbeschaffungskosten). Keine Abschrift möglich.' },
-    vermittlung:      { zeile: null, art: 'wk', grund: 'Vermittlungskosten — je nach Anlass Zeile 51 oder 82. Keine Abschrift möglich.' },
-    finanz_sonst:     { zeile: null, art: 'wk', grund: 'Sammelposten; die Zeile hängt vom einzelnen Aufwand ab.' },
-    nk_umlf:          { zeile: null, art: 'wk', grund: 'Umlagefähige Nebenkosten sind ein durchlaufender Posten und stehen zugleich als Einnahme in Zeile 20. Die Behandlung auf der Werbungskostenseite gehört geprüft.' },
-    nk_n_umlf:        { zeile: null, art: 'wk', grund: 'Nicht umlagefähige Nebenkosten — meist Zeile 78, je nach Kostenart aber auch 82.' },
-    betr_sonst:       { zeile: null, art: 'wk', grund: 'Sammelposten; die Zeile hängt vom einzelnen Aufwand ab.' },
-    steuerber:        { zeile: null, art: 'wk', grund: 'Steuerberatungskosten — die Aufteilung auf Anlage V und Sonderausgaben ist eine Einzelfallfrage.' },
-    porto:            { zeile: null, art: 'wk', grund: 'Meist Zeile 82; keine ausdrückliche Formularbezeichnung.' },
-    verw_sonst:       { zeile: null, art: 'wk', grund: 'Sammelposten; meist Zeile 78.' },
-    fahrtkosten:      { zeile: null, art: 'wk', grund: 'Meist Zeile 82; keine ausdrückliche Formularbezeichnung.' },
-    verpflegung:      { zeile: null, art: 'wk', grund: 'Meist Zeile 82; keine ausdrückliche Formularbezeichnung.' },
-    hotel:            { zeile: null, art: 'wk', grund: 'Meist Zeile 82; keine ausdrückliche Formularbezeichnung.' },
-    inserat:          { zeile: null, art: 'wk', grund: 'Meist Zeile 82; keine ausdrückliche Formularbezeichnung.' },
-    gericht:          { zeile: null, art: 'wk', grund: 'Meist Zeile 82; keine ausdrückliche Formularbezeichnung.' },
-    telefon:          { zeile: null, art: 'wk', grund: 'Meist Zeile 82; keine ausdrückliche Formularbezeichnung.' },
-    sonst_kosten:     { zeile: 82, art: 'wk' },
-    sonst_bewegl_wg:  { zeile: null, art: 'wk', grund: 'AfA auf bewegliche Wirtschaftsgüter — Zeile 79, die Abgrenzung zum Gebäude gehört geprüft.' },
-    anschaffungsnah:  { zeile: null, art: 'wk', grund: 'Anschaffungsnahe Herstellungskosten (§ 6 Abs. 1 Nr. 1a EStG) gehen über die AfA in Zeile 35 ein, nicht als eigener Posten.' }
+    /* Auffangposten — steht in keiner spezielleren Liste des Formulars. */
+    porto:            { zeile: 82, art: 'wk', quelle: 'auffang' },
+    fahrtkosten:      { zeile: 82, art: 'wk', quelle: 'auffang' },
+    verpflegung:      { zeile: 82, art: 'wk', quelle: 'auffang' },
+    hotel:            { zeile: 82, art: 'wk', quelle: 'auffang' },
+    inserat:          { zeile: 82, art: 'wk', quelle: 'auffang' },
+    gericht:          { zeile: 82, art: 'wk', quelle: 'auffang' },
+    telefon:          { zeile: 82, art: 'wk', quelle: 'auffang' },
+    sonst_kosten:     { zeile: 82, art: 'wk', quelle: 'auffang' },
+    verw_sonst:       { zeile: 78, art: 'wk', quelle: 'auffang', grund: 'Verwaltungskosten — Zeile 78 nennt sie ausdrücklich; „sonstige" bleibt in derselben Gruppe.' },
+    betr_sonst:       { zeile: 78, art: 'wk', quelle: 'auffang', grund: 'Was nicht ausdrücklich umgelegt wird, gehört zu den nicht umgelegten Kosten. Wird es umgelegt, gehört es in Zeile 75.' },
+
+    /* Sachlogik — mit Begruendung, in der Ansicht gekennzeichnet. */
+    bereitstellung:   { zeile: 48, art: 'wk', quelle: 'sachlogik', grund: 'Bereitstellungszinsen sind Zinsen. Die amtliche Anleitung rechnet auch Damnum / Disagio zu den Schuldzinsen.' },
+    vermittlung:      { zeile: 51, art: 'wk', quelle: 'sachlogik', grund: 'Vermittlungsprovision für ein Darlehen ist eine Kosten der Geldbeschaffung — dieselbe Gruppe wie Schätz-, Notar- und Grundbuchgebühren.' },
+    finanz_sonst:     { zeile: 51, art: 'wk', quelle: 'sachlogik', grund: 'Sonstige Finanzierungsnebenkosten gehören zur Geldbeschaffung. Ist der Aufwand ein Zins, gehört er in Zeile 48.' },
+    steuerber:        { zeile: 82, art: 'wk', quelle: 'sachlogik', grund: 'Steuerberatungskosten sind Werbungskosten, soweit sie auf die Ermittlung der Einkünfte entfallen. Der auf den Mantelbogen entfallende Teil ist keine Anlage-V-Position.' },
+    anschaffungsnah:  { zeile: 35, art: 'wk', quelle: 'sachlogik', grund: 'Anschaffungsnahe Herstellungskosten (§ 6 Abs. 1 Nr. 1a EStG) sind nicht sofort abziehbar; sie erhöhen die Bemessungsgrundlage und wirken über die AfA in Zeile 35.' },
+
+    /* Weiterhin offen. */
+    sonst_bewegl_wg:  { zeile: null, art: 'wk', grund: 'AfA auf bewegliche Wirtschaftsgüter (Einrichtung). Die Anlage V führt dafür keine eigene Zeile; ob sie zu den sonstigen Kosten (Zeile 82) gehört oder gesondert zu erläutern ist, hängt vom Einzelfall ab.' }
   },
 
   /* Was DealPilot gar nicht erfasst und deshalb in der Ansicht leer bleibt.
