@@ -5947,6 +5947,47 @@ sind wieder nativ, nichts wurde in die Datenbank geschrieben.
 
 **Damit ist Prod auf dem Stand von Staging.**
 
+### Punkt 3 „Spracheingabe" abgeschlossen (03.09.2026) — zwei von drei Resten waren gar keine
+
+**Was.** Marcel hat drei Dinge gemeldet: *„kaltmiete ist angepasst.
+sprechlauf auch ok. 3 keine Ahnung was du genau willst."*
+
+**Rest 3 ist damit von ihm abgenommen.** Der Sprechlauf am Gerät war der
+letzte offene Beweis für den `bool`-Zweig aus `v1214` — er läuft. Damit ist
+die Reparatur **am echten Weg** belegt, nicht nur im Laborlauf.
+
+**Rest 2 — er wusste selbst nicht mehr, was gemeint war.** Statt weiter zu
+fragen: den Code gelesen. Der Backlog sagte *„gemessen: es gibt keines"*.
+**Es gibt eines, nur woanders:**
+
+> Im Quick-Check importiert man per Sprache oder Exposé →
+> `applyMergedQc()` teilt die Werte in `qcData` (die `qc_`-Felder, gehen in
+> den iframe) und `pendingList` (der Rest) → die Liste geht per
+> `postMessage` an den iframe und wird beim Speichern gezeigt
+> („Save-Transfer", `qc-bridge.js:322`) → `applyQcPending()` schreibt sie
+> ins Vollobjekt. **Das ist genau die Auflistung „was kommt zusätzlich mit".**
+
+Und die Sorge dahinter ist gemessen ausgeräumt: **es geht nichts verloren.**
+Von 21 `qc_`-Feldern stehen 16 im Snapshot von `qcSaveAsObject()`; die fünf
+übrigen werden **separat** verarbeitet — `qc_hg` als Hausgeld (monatlich ×
+12, mit Split aufgeteilt, `quick-check.js:1928`), und `qc_str`/`qc_hnr`/
+`qc_ort` werden zu `qc_adresse` zusammengesetzt (`:206`). **Der Snapshot ist
+nicht lückenhaft, er ist nur nicht die einzige Station.**
+
+**Nichts zu bauen.** Ein zweites Modal neben das vorhandene zu setzen wäre
+genau der Fehler, den der alte Eintrag selbst befürchtet hat („sonst entsteht
+ein zweites Modal neben einem vorhandenen").
+
+> **Das Muster wiederholt sich, und es ist das Thema dieser Sitzung.** Von
+> den drei Resten waren **zwei nur deshalb offen, weil niemand nachgesehen
+> hat** — genau wie die tote CSS-Regel in `v1213` und wie Punkt 1a. **Ein
+> Backlog altert schneller als der Code.** Wer ihn liest, ohne nachzumessen,
+> baut Dinge zweimal oder sucht Fehler, die längst behoben sind.
+
+**Kein Commit an Code** — nur `BACKLOG.md` und diese Datei. Marcel hat
+außerdem die Kaltmiete in `2026-001` korrigiert; das Objekt liefert wieder
+Bruttorendite und Kaufpreisfaktor.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

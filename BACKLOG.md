@@ -277,12 +277,6 @@ Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
 
 **Entscheidungen, die bei Marcel liegen**
 
-- **Die Kaltmiete im Objekt `2026-001` ist mit 100 €/Monat auf 100 m²
-  hinterlegt** — mit ziemlicher Sicherheit ein Tippfehler. Der Bericht
-  benennt sie seit `v1211` als prüfbedürftig, statt damit zu rechnen; die
-  Zahl selbst zu ändern sind Marcels Daten. Bis dahin liefert das Objekt
-  keine Bruttorendite und keinen Kaufpreisfaktor (dafür fehlt ohnehin auch
-  der Kaufpreis).
 
 - **Die Score-Konvention für fehlende Teilwerte** (`v1197`): neutral
   ersetzen — so gebaut — oder den Teilwert weglassen und die übrigen
@@ -1667,7 +1661,7 @@ entfällt — nicht raten.
    > kuratiert, der Auswertekatalog ist es nicht** — wer auf die Chips sieht,
    > hält die Anzeige für den Umfang.
    >
-   > **Es bleiben zwei Reste** (der erste ist mit `v1214` erledigt):
+   > **ALLE DREI RESTE SIND ERLEDIGT — 03.09.2026.** Sie standen hier so:
    > 1. ~~**Checkboxen** werden in beiden Katalogbauern übersprungen.~~
    >    **ERLEDIGT — der Eintrag war veraltet, und dahinter lag ein echter
    >    Defekt.** `buildFullCatalog()` gibt Checkboxen seit `v1168` als
@@ -1681,18 +1675,36 @@ entfällt — nicht raten.
    >    (`_wertSchreiben()` als eine Schreiblogik für beide Wege), am
    >    laufenden System belegt: alte Logik `checked:false`, neuer Weg
    >    `checked:true` mit gefeuertem `change`.
-   > 2. **Das Modal beim „Als Objekt speichern"** — **gemessen: es gibt
-   >    keines.** `qcSaveAsObject()` speichert direkt über einen fest
-   >    verdrahteten Snapshot von ~20 Feldern. Die Auflistung ist damit
-   >    **ohne Vorarbeit nicht baubar** — nichts weiß, welche Werte
-   >    „zusätzlich mitkommen". Und: **welches Modal Marcel meint, ist
-   >    ungeklärt** — erst den Bedienweg gemeinsam ansehen, sonst entsteht
-   >    ein zweites Modal neben einem vorhandenen.
-   > 3. Ob die Einsortierung in der Praxis trifft — **Abnahmepunkt**, nur
-   >    durch einen echten Sprechlauf zu klären.
+   > 2. ~~**Das Modal beim „Als Objekt speichern"** — gemessen: es gibt
+   >    keines.~~ **ERLEDIGT am 03.09.2026 — es gibt eines, nur woanders.**
+   >    Marcel wusste selbst nicht mehr, was gemeint war („keine Ahnung was
+   >    du genau willst"), also den Code gelesen statt weiter zu fragen.
+   >    Die Kette: im Quick-Check importiert man per Sprache oder Exposé →
+   >    `applyMergedQc()` teilt die Werte in `qcData` (die `qc_`-Felder,
+   >    gehen in den iframe) und `pendingList` (der Rest) → die Liste geht
+   >    per `postMessage` an den iframe und wird beim Speichern gezeigt
+   >    („Save-Transfer", `qc-bridge.js:322`) → `applyQcPending()` schreibt
+   >    sie ins Vollobjekt. **Das ist genau die Auflistung „was kommt
+   >    zusätzlich mit".**
    >
-   > **Der Punkt gehört auf diese drei zusammengestrichen**, nicht als Neubau
-   > angefasst.
+   >    Und die Sorge dahinter ist gemessen ausgeräumt: **es geht nichts
+   >    verloren.** Von 21 `qc_`-Feldern stehen 16 im Snapshot von
+   >    `qcSaveAsObject()`; die fünf übrigen werden **separat** verarbeitet —
+   >    `qc_hg` als Hausgeld (monatlich × 12, mit Split aufgeteilt,
+   >    `quick-check.js:1928`), `qc_str`/`qc_hnr`/`qc_ort` werden zu
+   >    `qc_adresse` zusammengesetzt (`:206`). Der Snapshot ist nicht
+   >    lückenhaft, er ist nur nicht die einzige Station.
+   >
+   >    **Nichts zu bauen.** Ein zweites Modal neben das vorhandene zu
+   >    setzen wäre genau der Fehler, den der alte Eintrag befürchtet hat.
+   > 3. ~~Ob die Einsortierung in der Praxis trifft — Abnahmepunkt, nur
+   >    durch einen echten Sprechlauf zu klären.~~ **ERLEDIGT am
+   >    03.09.2026:** Marcel hat den Sprechlauf gemacht — *„sprechlauf auch
+   >    ok"*. Damit ist auch der `bool`-Zweig aus `v1214` am echten Weg
+   >    abgenommen, nicht nur im Laborlauf.
+   > **Damit ist Punkt 3 abgeschlossen.** Er wurde nie als Neubau angefasst —
+   > zwei der drei „Reste" waren veraltete Einträge, der dritte ein echter
+   > Defekt (`v1214`), und einer ist von Marcel am Gerät abgenommen.
 
    Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
    Rechenweg.**
@@ -2397,6 +2409,34 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Spracheingabe ist durch — Punkt 3 abgeschlossen, 03.09.2026
+
+Alle drei „Reste" sind zu. **Zwei davon waren veraltete Einträge, einer ein
+echter Defekt.**
+
+- **Rest 1 (Checkboxen)** — Eintrag veraltet, aber dahinter lag der Defekt in
+  `applyQcPending()`: ein Häkchen wurde gezählt und nie gesetzt. Behoben mit
+  `v1214`.
+- **Rest 2 (Modal beim Speichern)** — **es gibt eines, nur woanders.** Marcel
+  wusste selbst nicht mehr, was gemeint war, also den Code gelesen statt
+  weiter zu fragen: die `pendingList` aus einem Import geht per
+  `postMessage` an den Quick-Check und wird beim Speichern gezeigt
+  („Save-Transfer"). Und **es geht nichts verloren** — von 21 `qc_`-Feldern
+  stehen 16 im Snapshot, die fünf übrigen werden separat verarbeitet
+  (Hausgeld monatlich × 12 mit Split; Straße/Hausnummer/Ort zu `qc_adresse`).
+  **Nichts zu bauen** — ein zweites Modal neben das vorhandene zu setzen wäre
+  genau der Fehler, den der alte Eintrag befürchtet hat.
+- **Rest 3 (Sprechlauf)** — Marcel hat ihn gemacht: *„sprechlauf auch ok"*.
+  Damit ist der `bool`-Zweig aus `v1214` **am echten Weg** abgenommen, nicht
+  nur im Laborlauf.
+
+> **Das Muster wiederholt sich:** von drei offenen Punkten waren zwei nur
+> deshalb offen, weil niemand nachgesehen hat. Derselbe Fall wie die tote
+> CSS-Regel in `v1213`. **Ein Backlog altert schneller als der Code.**
+
+Außerdem: **Marcel hat die Kaltmiete in `2026-001` korrigiert** — das Objekt
+liefert wieder Bruttorendite und Kaufpreisfaktor.
 
 ### Ein Häkchen wurde gezählt, aber nie gesetzt — `v1214`, 03.09.2026 (`a4956f0`)
 
