@@ -1127,7 +1127,11 @@
       +     '<label class="dp-mappe-cb"><input type="checkbox" id="dp-mappe-av" checked> Anlage-V-Zuordnung anhängen</label>'
       +     '<button class="dp-mappe-btn" onclick="DealPilotDashboard.steuerMappe()">Steuer-Mappe erstellen</button>'
       +   '</div>'
-      +   '<div class="dp-mappe-h">Die Zuordnung zu den Zeilennummern der amtlichen Anlage V ist <b>nicht</b> enthalten — sie ändern sich je Veranlagungsjahr und werden nicht geraten.</div>'
+      /* v1218b · Der Hinweis stammte aus v1215, als es die Zuordnung noch
+         nicht gab. Seit v1217/v1218 gibt es sie — und damit stand direkt
+         unter der Checkbox „Anlage-V-Zuordnung anhängen" der Satz, sie sei
+         „nicht enthalten". Ein Widerspruch in einer Zeile Abstand. */
+      +   '<div class="dp-mappe-h">Die Zeilennummern stammen aus dem <b>amtlichen Formular</b> des jeweiligen Jahres. Für Jahre ohne hinterlegte Zuordnung erscheint die Ansicht nicht — die Nummern ändern sich je Veranlagungsjahr und werden nicht geraten. Positionen, deren Zeile eine steuerfachliche Entscheidung wäre, sind ausgewiesen statt weggelassen.</div>'
       + '</div>'
       + '</div></div>';
     m.setAttribute('data-dp-built','1');
