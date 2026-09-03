@@ -690,6 +690,21 @@ if (typeof g === 'undefined') {
    Aber sie muss je Objekt sagen, welche Steuerart gilt, statt eine zu
    unterstellen.
    ═══════════════════════════════════════════════════════════════════════════ */
+
+/* v1224 · Die Unterzeile im Mappenkopf nennt die Einkunftsart. Enthaelt die
+   Mappe auch Gesellschaftsobjekte, sind es zwei — und dann darf dort nicht
+   nur eine stehen. Der Satz gilt fuer das ganze Heft, also wird er aus dem
+   Bestand ermittelt, nicht behauptet. */
+function _mappeArtZeile(saetze, stamm) {
+  var v = false, g = false;
+  (saetze || []).forEach(function (s) {
+    var h = ((stamm && stamm[s.object_id]) || {}).halter;
+    if (_steuerRegime(h).anlageV) v = true; else g = true;
+  });
+  if (v && g) return 'Vermietung · Anlage V § 21 EStG und Gewerbebetrieb § 8 Abs. 2 KStG';
+  if (g) return 'Vermietung · Einkünfte aus Gewerbebetrieb · § 8 Abs. 2 KStG';
+  return 'Vermietung & Verpachtung · Anlage V · § 21 EStG';
+}
 function _steuerRegime(halterId) {
   var m = null;
   try {
@@ -858,7 +873,7 @@ async function exportSteuerMappePDF(jahr, opts) {
   var W = 210, H = 297, M = 16, CW = W - 2 * M;
 
   /* v1221: Deckblatt zuerst — wem die Zahlen gehoeren, steht vor den Zahlen. */
-  var halter = _mappeHalter(saetze, objekte);
+  var halter = _mappeHalter(saetze, objekte, stamm);
   _renderMappeDeckblatt(doc, jahr, halter, saetze, stamm, W, H, M, CW);
   doc.addPage();
 
@@ -924,7 +939,7 @@ function _renderMappeSummaryPage(doc, jahr, saetze, stamm, ohneStamm, W, H, M, C
   doc.text('STEUER-MAPPE · ZUSAMMENFASSUNG', M, 13);
   doc.setTextColor(220, 220, 220);
   doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
-  doc.text('Vermietung & Verpachtung · Anlage V · § 21 EStG', M, 19);
+  doc.text(_mappeArtZeile(saetze, stamm), M, 19);
   doc.setFontSize(11); doc.setFont('helvetica', 'bold');
   doc.text('Veranlagungsjahr ' + jahr, W - M, 13, { align: 'right' });
   doc.setFontSize(8); doc.setFont('helvetica', 'normal');
@@ -981,9 +996,14 @@ function _renderMappeSummaryPage(doc, jahr, saetze, stamm, ohneStamm, W, H, M, C
     'Diese Mappe fasst die je Objekt gespeicherten Steuersätze des Veranlagungsjahres zusammen. '
     + 'Sie ersetzt keine Steuererklärung und keine Beratung.',
     (av && av.anlageV && !av.avFehlt)
-      ? 'Zu jedem Objekt liegt eine Anlage-V-Zuordnung bei: dieselben Zahlen, sortiert nach den '
-        + 'Zeilen des amtlichen Formulars. Positionen ohne gesicherte Zeile sind dort ausgewiesen '
-        + 'und nicht weggelassen.'
+      ? ((av.ohneAnlageV && av.ohneAnlageV.length)
+          ? 'Den Objekten im Privatvermögen liegt eine Anlage-V-Zuordnung bei: dieselben Zahlen, '
+            + 'sortiert nach den Zeilen des amtlichen Formulars. Positionen ohne gesicherte Zeile '
+            + 'sind dort ausgewiesen und nicht weggelassen. Für welche Objekte sie fehlt und '
+            + 'warum, steht im nächsten Absatz.'
+          : 'Zu jedem Objekt liegt eine Anlage-V-Zuordnung bei: dieselben Zahlen, sortiert nach den '
+            + 'Zeilen des amtlichen Formulars. Positionen ohne gesicherte Zeile sind dort ausgewiesen '
+            + 'und nicht weggelassen.')
       : ((av && av.avFehlt)
           ? 'Eine Anlage-V-Zuordnung liegt NICHT bei: für ' + jahr + ' ist keine abgeschriebene '
             + 'Zeilenzuordnung hinterlegt. Die Nummern ändern sich je Veranlagungsjahr und werden '
@@ -1358,12 +1378,24 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
    nicht hinterlegt" ist eine Aufforderung; eine fehlende Zeile ist eine
    Lücke, die niemand sieht. Dasselbe Prinzip wie im Marktbericht.
    ═══════════════════════════════════════════════════════════════════════════ */
-function _mappeHalter(saetze, objekte) {
+function _mappeHalter(saetze, objekte, stamm) {
   /* Der Halter der Objekte — ist er bei allen gleich, gilt er für die Mappe.
-     Sind es mehrere, sagt das Deckblatt das, statt einen davon zu behaupten. */
-  var ids = {}, halterName = null;
-  (objekte || []).forEach(function (o) {
-    if (o && o.halter) ids[o.halter] = (ids[o.halter] || 0) + 1;
+     Sind es mehrere, sagt das Deckblatt das, statt einen davon zu behaupten.
+
+     v1224: gezaehlt wird ueber die SAETZE, die wirklich im Heft landen, und
+     der Halter kommt aus `stamm` — derselben Quelle, aus der auch Sortierung,
+     Gliederung und Regime lesen. Vorher zaehlte diese Funktion ueber ALLE
+     Objekte des Kontos aus der Listenantwort; das konnte einen Halter melden,
+     der in der Mappe gar nicht vorkommt, und einen verschweigen, dessen
+     Objektblatt drin steht. Eine Angabe, zwei Quellen — das geht schief. */
+  var ids = {};
+  (saetze || []).forEach(function (s) {
+    var h = ((stamm && stamm[s.object_id]) || {}).halter;
+    if (!h) {
+      var o = (objekte || []).filter(function (x) { return x && x.id === s.object_id; })[0];
+      h = (o && o.halter) || 'privat';
+    }
+    ids[h] = (ids[h] || 0) + 1;
   });
   var keys = Object.keys(ids);
   var mand = null;
@@ -1411,7 +1443,8 @@ function _renderMappeDeckblatt(doc, jahr, h, saetze, stamm, W, H, M, CW) {
   doc.text('STEUER-MAPPE', M, 24);
   doc.setTextColor(220, 220, 220);
   doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
-  doc.text('Vermietung & Verpachtung · Anlage V · § 21 EStG', M, 33);
+  doc.setFontSize(9.4);
+  doc.text(_mappeArtZeile(saetze, stamm), M, 33);
   doc.setFont('helvetica', 'bold'); doc.setFontSize(15);
   doc.text('Veranlagungsjahr ' + jahr, W - M, 24, { align: 'right' });
   doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
@@ -1441,9 +1474,11 @@ function _renderMappeDeckblatt(doc, jahr, h, saetze, stamm, W, H, M, CW) {
     doc.setFont('helvetica', 'italic'); doc.setFontSize(9);
     doc.setTextColor(176, 140, 90);
     var mt = doc.splitTextToSize('Die Objekte dieses Jahres gehören ' + h.anzahlHalter
-      + ' verschiedenen Haltern. Eine Anlage V wird je Steuerpflichtigem abgegeben — '
-      + 'diese Mappe fasst sie zusammen und ist deshalb nur als Übersicht zu verwenden. '
-      + 'Für die Erklärung filtern Sie bitte je Halter.', CW);
+      + ' verschiedenen Steuerpflichtigen. Erklärt wird je Steuerpflichtigem — diese Mappe '
+      + 'fasst sie zusammen und ist deshalb eine Übersicht, keine Erklärung. Die Objektliste '
+      + 'unten und die Blätter dahinter sind nach Steuerpflichtigem gegliedert; die Angaben '
+      + 'in diesem Kopf gelten nur für den ersten. Bei einer Überführung ist das der '
+      + 'Regelfall: dasselbe Objekt steht im Jahr des Wechsels auf beiden Seiten.', CW);
     doc.text(mt, M, cy);
     cy += mt.length * 4.4 + 6;
     doc.setFont('helvetica', 'normal');
