@@ -249,12 +249,6 @@ Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
 
 **Beweise, die noch fehlen**
 
-- **Hält sich das Modell an „jede Zahl genau einmal"?** `v1209` ist auf Prod
-  ausgeliefert und im Container nachgewiesen — **die Wirkung ist es nicht.**
-  Am Replay nicht prüfbar: der gespeicherte Bericht trägt den alten Text.
-  Der Beweis ist der **nächste echte Bericht**, und der kostet. Wenn Marcel
-  ohnehin einen erstellt: nachzählen, ob 195.000 (oder das Gegenstück) noch
-  in Abschnitt C steht.
 
 - **Der `402`-Pfad ist nicht end-to-end bewiesen.** Serverseitig gelesen,
   frontendseitig gemessen; der Beweis unter echten Bedingungen braucht einen
@@ -2344,6 +2338,39 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### `v1209` ist abgenommen — echter Bericht, echter Lauf, 03.09.2026
+
+Der Abnahmepunkt aus dem Prod-Rollout ist eingelöst. Auf Marcels *„ja mach
+einen bericht"* auf **Staging** erzeugt, mit demselben Objekt wie am 02.09.
+(Hermannstraße 9, Hüllhorst), Stufe 3 — **ohne Aufpreis**, weil für dieses
+Objekt bereits bezahlt. `report_id 83`, 75 Sekunden, 3.645 Zeichen KI-Text.
+
+**Zahlen je Abschnitt, aus `report_md` gezählt:**
+
+| Abschnitt | Geldbeträge / €-m²-Werte |
+|---|---|
+| A) Zusammenfassung & Empfehlung | 159.000 · 243.000 · **195.000** |
+| B) Objekt, Lage & Markt | 1.695 · 1.357 · 2.138 · 7,75 €/m² |
+| C) Bewertung, Rendite & Ausblick | **keine** |
+
+Vorher standen 195.000/159.000/243.000 in A **und** C und 7,67 €/m² in B
+**und** C. C beginnt jetzt mit *„Die genannte Wertindikation erlaubt
+Verhandlungsspielraum insbesondere am unteren Ende der Spanne…"* — genau der
+sprachliche Bezug, den die Vorgabe verlangt. **Der Abschnitt ist dabei nicht
+dünner geworden:** Chancen, Risiken, 3–5-Jahres-Einschätzung und Fazit stehen
+vollständig drin, nur ohne Zahlenwiederholung.
+
+**Im ganzen PDF steht „195.000" jetzt viermal** — Deckblatt, Sektion 03,
+Verfahrensvergleich, Zusammenfassung. Jede Nennung hat einen eigenen Zweck.
+**Vor `v1206` waren es zehn.** Inhaltsverzeichnis: 10 Abschnitte.
+
+> **Nebenbefund, der Marcel gehört.** Der Plausibilitätsdialog vor dem Lauf
+> meldete zwei echte Dinge zum Objekt `2026-001`: *„Kaltmiete 1,00 €/m² —
+> ungewöhnlich niedrig"* (im Objekt stehen 100 €/Monat auf 100 m²) und
+> *„Grundstücksfläche bei einer Wohnung — die fließt nur bei Häusern in die
+> Bewertung ein"*. Beides sind Objektdaten, keine Defekte — aber die
+> Kaltmiete ist mit ziemlicher Sicherheit ein Tippfehler.
 
 ### Der Fließtext nennt jede Zahl nur noch einmal — `v1209`, 03.09.2026 (`1f06705`)
 

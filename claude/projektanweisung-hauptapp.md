@@ -5487,6 +5487,59 @@ Replay ist es nicht prüfbar. Die Auslieferung der Datei ist bewiesen, ihre
 Wirkung nicht. **Das ist der einzige Punkt aus diesem Rollout, der noch eine
 Abnahme braucht.**
 
+### Abnahme v1209 (03.09.2026) — der Fließtext hält sich daran
+
+Der einzige offene Punkt aus dem Prod-Rollout ist eingelöst. Auf Marcels
+*„ja mach einen bericht"* auf **Staging** erzeugt — dort, weil es dieselbe
+Textvorgabe ist und kein echtes Geld kostet. Dasselbe Objekt wie am 02.09.
+(Hermannstraße 9, Hüllhorst), damit der Vergleich eins zu eins ist.
+
+**Der Lauf.** Objekt aus dem Bestand geladen, Stufe 3 gewählt — die Ampel
+meldete *„Wertermittlung nach ImmoWertV ist gewählt und vollständig"* und der
+Knopf *„Marktbericht erstellen · ohne Aufpreis"*, weil für dieses Objekt
+bereits bezahlt. `report_id 83`, **75 Sekunden**, 3.645 Zeichen KI-Text,
+Kosten `{ geomap_eur: 0.53 }` — kein Kerosin.
+
+**Ergebnis, aus `report_md` gezählt:**
+
+| Abschnitt | Geldbeträge / €-m²-Werte |
+|---|---|
+| A) Zusammenfassung & Empfehlung | 159.000 · 243.000 · **195.000** |
+| B) Objekt, Lage & Markt | 1.695 · 1.357 · 2.138 · 7,75 €/m² |
+| C) Bewertung, Rendite & Ausblick | **keine** |
+
+Vorher: 195.000/159.000/243.000 in A **und** C, 7,67 €/m² in B **und** C.
+C beginnt jetzt mit *„Die genannte Wertindikation erlaubt
+Verhandlungsspielraum insbesondere am unteren Ende der Spanne…"* — der
+sprachliche Bezug, den `v1209` verlangt. **Der Abschnitt ist nicht dünner
+geworden:** Chancen, Risiken, 3–5-Jahres-Einschätzung und Fazit sind
+vollständig da.
+
+**Im PDF steht „195.000" jetzt auf S1, S4, S5 und S9 — viermal.** Vor
+`v1206` zehnmal. Jede verbliebene Nennung hat einen eigenen Zweck: Deckblatt,
+das Band in 03, der Verfahrensvergleich in 05, die Zusammenfassung.
+Inhaltsverzeichnis: 10 Abschnitte.
+
+**Werkzeug-Disziplin bei diesem Lauf.** Vor dem ersten Klick wurden
+`window.confirm` und `window.alert` abgefangen — sie legen sonst den ganzen
+Renderer lahm. Der Plausibilitätsdialog kam auch prompt. **Danach ließen sie
+sich nicht per `delete` zurücksetzen** (in Chrome sind sie eigene
+Eigenschaften von `window`, nicht auf dem Prototyp): die Seite musste neu
+geladen werden, damit Marcel keinen Tab bekommt, der stille Rückfragen
+selbsttätig mit „ja" beantwortet. Ebenso wurde der jsPDF-Konstruktor-Patch
+sofort nach dem Zählen zurückgenommen, sonst hätte Marcels eigener Klick auf
+„Als PDF exportieren" nichts heruntergeladen. **Wer die Maschine zum Messen
+umbaut, muss sie vor der Übergabe zurückbauen — und nachweisen, dass sie
+zurückgebaut IST.** Beides wurde geprüft: `confirm` ist wieder
+`[native code]`, `jspdf.jsPDF` wieder das Original.
+
+**Nebenbefund für Marcel.** Der Plausibilitätsdialog meldete zwei echte Dinge
+zum Objekt `2026-001`: *„Kaltmiete 1,00 €/m² — ungewöhnlich niedrig"* (im
+Objekt stehen 100 €/Monat auf 100 m²) und *„Grundstücksfläche bei einer
+Wohnung"*. Beides sind Objektdaten, keine Defekte — aber die Kaltmiete ist
+mit ziemlicher Sicherheit ein Tippfehler. **Genau dafür ist die Prüfung
+gebaut, und sie hat funktioniert.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
