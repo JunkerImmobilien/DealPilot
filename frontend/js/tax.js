@@ -1830,3 +1830,122 @@ if (typeof _computeYearTotal === 'function' && typeof window !== 'undefined') {
   /* Expose für Debug */
   window._taxBestandOverlay = { open: openOverlay, close: closeOverlay };
 })();
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   v1216-miete66 · DIE 66-%-GRENZE DES § 21 ABS. 2 EStG
+   ───────────────────────────────────────────────────────────────────────────
+   Der Nebenfund aus Backlog-Punkt 5: dieselbe Art Falle wie die 15-%-Grenze,
+   fuer die es in beleg-import.js schon eine Ampel gibt. DealPilot kennt die
+   Ist-Miete (#nkm) und die Marktmiete (#ds2_marktmiete x #wfl) bereits — es
+   kann von selbst warnen, statt dass der Nutzer es merkt, wenn das Finanzamt
+   den Werbungskostenabzug kuerzt.
+
+   DIE SCHWELLEN STEHEN IM GESETZ, nicht in einem Formular: sie wechseln
+   nicht jaehrlich wie die Zeilennummern der Anlage V. Deshalb duerfen sie
+   hier stehen — aber als HINWEIS, nicht als Beratung. Der Text nennt die
+   Grenze und fordert zur Pruefung auf, genau wie die 15-%-Ampel.
+
+   Kein Wert, kein Kasten: fehlt die Marktmiete oder die Wohnflaeche, sagt
+   der Kasten das und rechnet NICHT mit einer geratenen Vergleichsmiete.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function _mieteQuote66() {
+  function n(id) {
+    var e = document.getElementById(id);
+    if (!e) return null;
+    var v = (typeof parseDe === 'function') ? parseDe(e.value) : parseFloat(String(e.value || '').replace(',', '.'));
+    return (isFinite(v) && v > 0) ? v : null;
+  }
+  var ist = n('nkm');              /* Nettokaltmiete pro Monat */
+  var marktQm = n('ds2_marktmiete'); /* ortsuebliche Miete in EUR/m2 */
+  var wfl = n('wfl');
+  if (ist == null) return { stand: 'keine-ist' };
+  if (marktQm == null || wfl == null) return { stand: 'keine-markt', ist: ist };
+  var markt = marktQm * wfl;
+  if (!(markt > 0)) return { stand: 'keine-markt', ist: ist };
+  return { stand: 'ok', ist: ist, markt: markt, quote: (ist / markt) * 100 };
+}
+
+function renderMiete66() {
+  var box = document.getElementById('tax-miete66-box');
+  if (!box) return;
+  var r = _mieteQuote66();
+  var eur = function (v) { return Math.round(v).toLocaleString('de-DE') + ' €'; };
+
+  if (r.stand === 'keine-ist') {
+    box.innerHTML = '<div class="m66 m66-n">Für die Prüfung nach § 21 Abs. 2 EStG fehlt die '
+      + '<b>Nettokaltmiete</b> im Tab Miete.</div>';
+    return;
+  }
+  if (r.stand === 'keine-markt') {
+    box.innerHTML = '<div class="m66 m66-n">Für die Prüfung nach § 21 Abs. 2 EStG fehlt die '
+      + '<b>ortsübliche Marktmiete</b> (Tab Bewertung, Feld „Marktmiete €/m²") oder die Wohnfläche. '
+      + 'Ohne beide wird hier <b>nicht</b> mit einer geschätzten Vergleichsmiete gerechnet.</div>';
+    return;
+  }
+
+  var q = r.quote, cls, kopf, txt;
+  var zahlen = 'Angesetzt ' + eur(r.ist) + ' / Monat gegen ortsüblich ' + eur(r.markt)
+             + ' / Monat — <b>' + q.toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' %</b>.';
+
+  if (q >= 66) {
+    cls = 'g'; kopf = 'Vollentgeltlich';
+    txt = 'Die Miete erreicht mindestens 66 % der ortsüblichen Marktmiete. Die Werbungskosten '
+        + 'sind in voller Höhe abziehbar.';
+  } else if (q >= 50) {
+    cls = 'a'; kopf = 'Prüfung nötig';
+    txt = 'Die Miete liegt zwischen 50 % und 66 % der ortsüblichen Marktmiete. In diesem Bereich '
+        + 'entscheidet eine <b>Totalüberschussprognose</b> darüber, ob die Werbungskosten voll '
+        + 'abziehbar bleiben. <b>Bitte steuerlich prüfen lassen.</b>';
+  } else {
+    cls = 'r'; kopf = 'Aufteilung droht';
+    txt = 'Die Miete liegt unter 50 % der ortsüblichen Marktmiete. Die Nutzungsüberlassung wird '
+        + 'dann in einen entgeltlichen und einen unentgeltlichen Teil aufgeteilt; die '
+        + 'Werbungskosten sind nur <b>anteilig</b> abziehbar. <b>Bitte steuerlich prüfen lassen.</b>';
+  }
+
+  box.innerHTML =
+      '<div class="m66 m66-' + cls + '">'
+    +   '<div class="m66-k"><span class="m66-p">§ 21 Abs. 2 EStG</span>' + kopf + '</div>'
+    +   '<div class="m66-z">' + zahlen + '</div>'
+    +   '<div class="m66-t">' + txt + '</div>'
+    +   '<div class="m66-f">Orientierung, keine Steuerberatung. Maßgeblich ist die ortsübliche '
+    +     'Marktmiete im Sinne der Rechtsprechung — hier wird der im Tab Bewertung erfasste Wert '
+    +     'verwendet.</div>'
+    + '</div>';
+}
+
+function _miete66Css() {
+  if (document.getElementById('m66-css')) return;
+  var s = document.createElement('style');
+  s.id = 'm66-css';
+  s.textContent =
+    '.m66{border:1px solid rgba(128,128,128,.25);border-left-width:4px;border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.55}'
+  + '.m66-n{border-left-color:#8a8a92;opacity:.85}'
+  + '.m66-g{border-left-color:#3FA56C}'
+  + '.m66-a{border-left-color:var(--wl-c9a84c,#C9A84C)}'
+  + '.m66-r{border-left-color:#B8625C}'
+  + '.m66-k{font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}'
+  + '.m66-p{font:600 9.5px ui-monospace,monospace;letter-spacing:.1em;opacity:.65;'
+  +   'border:1px solid rgba(128,128,128,.3);border-radius:999px;padding:2px 8px}'
+  + '.m66-z{margin-bottom:6px}'
+  + '.m66-t{margin-bottom:8px}'
+  + '.m66-f{font-size:11.5px;opacity:.6;line-height:1.45}';
+  document.head.appendChild(s);
+}
+
+/* An die Rechenkette haengen: die Quote aendert sich, sobald Miete, Marktmiete
+   oder Flaeche angefasst werden. calc() laeuft bei jeder dieser Aenderungen. */
+(function () {
+  function _hook() {
+    try { _miete66Css(); renderMiete66(); } catch (e) {}
+  }
+  if (typeof window !== 'undefined') {
+    window.renderMiete66 = renderMiete66;
+    ['nkm', 'ds2_marktmiete', 'wfl'].forEach(function (id) {
+      var e = document.getElementById(id);
+      if (e) { e.addEventListener('input', _hook); e.addEventListener('change', _hook); }
+    });
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _hook);
+    else setTimeout(_hook, 300);
+  }
+})();

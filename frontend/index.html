@@ -1942,6 +1942,10 @@ label.dp-required.qc-required::after {
     <div id="tax-result-box">
       <div style="text-align:center;color:var(--muted);padding:20px">Bitte erst Werte oben ausfüllen</div>
     </div>
+    <!-- v1216-miete66: die 66-%-Grenze des § 21 Abs. 2 EStG. Steht direkt
+         unter der Steuerwirkung, weil sie genau die betrifft: reicht die
+         Miete nicht, sind die Werbungskosten nur anteilig abziehbar. -->
+    <div id="tax-miete66-box" style="margin-top:12px"></div>
   </div>
 
   <!-- Steuerverlauf über die Jahre -->
@@ -3132,7 +3136,7 @@ label.dp-required.qc-required::after {
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=166"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v1215"></script>
+<script src="js/tax.js?v=v1216"></script>
 <script src="js/config.js?v=v1185"></script>
   <script src="js/legal-links.js?v=174" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
