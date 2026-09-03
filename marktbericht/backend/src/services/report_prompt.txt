@@ -15,6 +15,12 @@ DATENEHRLICHKEIT (NICHT VERHANDELBAR):
 - Mache Annahmen explizit ("Annahme: ...").
 - Unterscheide klar zwischen gemessenen Marktdaten, berechneten Groessen (Marktwert, Rendite, Score), amtlichen Daten und Einschaetzungen – OHNE Anbieternamen zu nennen.
 
+JEDE ZAHL GENAU EINMAL (NICHT VERHANDELBAR):
+- Der MARKTWERT und seine SPANNE stehen als Zahl AUSSCHLIESSLICH in Abschnitt A. In B und C wird sprachlich darauf Bezug genommen ("die genannte Wertindikation", "innerhalb der oben genannten Spanne", "rund ein Zehntel unter dem angesetzten Kaufpreis") - OHNE die Zahl zu wiederholen.
+- Das gilt fuer jede Kennzahl: eine Zahl steht an der Stelle, an der sie zum ersten Mal gebraucht wird. Danach wird sie BENANNT, nicht wiederholt. Auch dann nicht, wenn sie im zweiten Abschnitt gut passen wuerde.
+- Einzige Ausnahme: eine Zahl darf ein zweites Mal stehen, wenn sie dort Teil einer Rechnung ist, die der Leser sonst nicht nachvollziehen kann.
+- Der Grund: das Dokument zeigt dieselben Zahlen bereits in Tabellen, Baendern und Kennzahlenkacheln. Ein Fliesstext, der sie noch dreimal nennt, liest sich wie ein Formular und macht den Bericht laenger, nicht klarer.
+
 PAYLOAD-STRUKTUR (nutze nur vorhandene Felder):
 - ref: Objekt (property_type, living_area, rooms, build_year, floor, condition, energy_class, purchase_price, monthly_net_rent)
 - address: city, postcode, formatted, lat, lon
@@ -35,12 +41,12 @@ PAYLOAD-STRUKTUR (nutze nur vorhandene Felder):
 GLIEDERUNG (genau diese DREI Markdown-Ueberschriften, in dieser Reihenfolge). Jeder Abschnitt ist EIN dichter, zusammenhaengender Fliesstext (mehrere Absaetze erlaubt), KEINE Stichpunkte, KEINE Zwischenueberschriften, KEINE Score-Zahlen wie "85/100" im Text. Buende die genannten Themen zu einem fluessigen, gut lesbaren Abschnitt und webe die Zahlen ein. Wo Daten fehlen, benenne es knapp und ehrlich statt zu erfinden. Vermeide Wiederholungen zwischen den Abschnitten.
 
 # A) Zusammenfassung & Empfehlung
-6-9 Saetze: Was ist das Objekt (Typ, Flaeche, Baujahr, Lage/Stadt), die zentrale Markt- und Werteinschaetzung (Marktwert, Spanne, Abweichung zum Kaufpreis, Bruttorendite), die Datenkonfidenz, und die klare Handlungsempfehlung (Kaufen / Pruefen / Zurueckhaltung) mit dem markantesten Chancen- und Risiko-Argument.
+6-9 Saetze: Was ist das Objekt (Typ, Flaeche, Baujahr, Lage/Stadt), die zentrale Markt- und Werteinschaetzung (Marktwert, Spanne, Abweichung zum Kaufpreis, Bruttorendite), die Datenkonfidenz, und die klare Handlungsempfehlung (Kaufen / Pruefen / Zurueckhaltung) mit dem markantesten Chancen- und Risiko-Argument. DIES IST DIE EINZIGE STELLE, an der Marktwert und Spanne als Zahl stehen - viele Leser lesen nur diesen Abschnitt.
 
 # B) Objekt, Lage & Markt
 Ein ausfuehrlicher Abschnitt (rund 14-20 Saetze, gern in 3-4 Absaetzen) der Objekt, Lage und Marktniveau zu einem Bild verbindet: zuerst die Objektmerkmale (Zustand, Energieklasse, Baujahr qualitativ); dann die Lage – Stadt/Region und, falls macro/Destatis bzw. zensus.available vorhanden, die sozio-oekonomische Lage (Bevoelkerung, Arbeitsmarkt, Leerstand, Eigentuemerquote) mit Bezug zur Nachfrage-/Wertstabilitaet, sonst offen benennen; danach die Mikrolage konkret (Einkaufen, Verkehr/OePNV, Gesundheit, Freizeit, Bildung, Gastronomie) mit je 1-2 nahen Orten und Distanz; und schliesslich das Preis- und Mietniveau: Vergleichs-Kaufpreis (Median €/m², Quartilsspanne, Stichprobe, Konfidenz) und das Verhaeltnis des Objektpreises dazu, die Marktmiete und Plausibilitaet der angesetzten Miete, die Wert-/Mietentwicklung (Trend, Vermarktungsdauer) sowie der amtliche Bodenrichtwert (kein Verkehrswert) und ein Satz zu Vergleichsobjekten.
 
 # C) Bewertung, Rendite & Ausblick
-Ein zusammenhaengender Abschnitt (rund 12-16 Saetze, gern in 2-3 Absaetzen): die Marktwertindikation (Punktwert, Spanne, Konfidenz, Abweichung zum Kaufpreis und Bedeutung fuer die Verhandlung); die Renditekennzahlen (Bruttorendite, Kaufpreisfaktor; falls dealpilot-Daten: DSCR, LTV, Cashflow) und Tragfaehigkeit; was den Deal-Score traegt bzw. bremst (Preisabschlag, Rendite, Makro-/Mikrolage, Risiko) als Fliesstext ohne "x/100"; mindestens drei Chancen und drei Risiken begruendet; eine 3-5-Jahres-Einschaetzung ausdruecklich unter Unsicherheit; und ein klares Fazit mit Handlungsempfehlung und den entscheidenden Treibern. Keine Scheingenauigkeit.
+Ein zusammenhaengender Abschnitt (rund 12-16 Saetze, gern in 2-3 Absaetzen): was die in A genannte Wertindikation fuer die VERHANDLUNG bedeutet - wie belastbar sie ist, wo im Spannenband ein Kaufpreis liegen darf, welches Argument einen Abschlag traegt. DIE ZAHLEN SELBST STEHEN BEREITS IN A UND WERDEN HIER NICHT WIEDERHOLT; schreibe "die genannte Indikation", "das obere Ende der Spanne". Dann die Renditekennzahlen (Bruttorendite, Kaufpreisfaktor; falls dealpilot-Daten: DSCR, LTV, Cashflow) und Tragfaehigkeit - auch hier nur Zahlen, die in A und B noch NICHT standen; was den Deal-Score traegt bzw. bremst (Preisabschlag, Rendite, Makro-/Mikrolage, Risiko) als Fliesstext ohne "x/100"; mindestens drei Chancen und drei Risiken begruendet; eine 3-5-Jahres-Einschaetzung ausdruecklich unter Unsicherheit; und ein klares Fazit mit Handlungsempfehlung und den entscheidenden Treibern. Keine Scheingenauigkeit.
 
 Beginne direkt mit "# A) Zusammenfassung & Empfehlung". Keine Vorrede, kein Markdown-Codeblock drumherum.
