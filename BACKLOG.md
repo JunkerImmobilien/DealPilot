@@ -245,6 +245,13 @@ Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
 
 **Entscheidungen, die bei Marcel liegen**
 
+- **Die Kaltmiete im Objekt `2026-001` ist mit 100 €/Monat auf 100 m²
+  hinterlegt** — mit ziemlicher Sicherheit ein Tippfehler. Der Bericht
+  benennt sie seit `v1211` als prüfbedürftig, statt damit zu rechnen; die
+  Zahl selbst zu ändern sind Marcels Daten. Bis dahin liefert das Objekt
+  keine Bruttorendite und keinen Kaufpreisfaktor (dafür fehlt ohnehin auch
+  der Kaufpreis).
+
 - **Die Score-Konvention für fehlende Teilwerte** (`v1197`): neutral
   ersetzen — so gebaut — oder den Teilwert weglassen und die übrigen
   Gewichte hochnormieren.
@@ -2345,6 +2352,44 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Die Plausibilitätsprüfung wird endlich gehört — `v1211`, 03.09.2026 (`a4abcd0`…`49dcd29`)
+
+Marcels Export nach `v1208` ausgelesen. Alles Gebaute bestätigt sich — und
+ein Defekt fällt heraus, den der Bericht **selbst erkannt und dann ignoriert
+hat**.
+
+Im PDF stand: *„…mit einem geschätzten Wert von 195.000 Euro, was bei einer
+monatlichen Kaltmiete von 100 Euro eine überschaubare Nettojahresrendite
+ermöglicht."* Das sind **0,6 % brutto** — kein Ergebnis, sondern ein
+Tippfehler in den Objektdaten, den der Bericht zur Bewertung macht.
+
+**`_mbCheckup()` hatte ihn vor dem Lauf gemeldet** und im Dialog gezeigt.
+Danach war der Befund weg: das Ergebnis wurde nur für den Dialogtext
+benutzt. **Eine Prüfung, die stimmt und deren Ergebnis niemand
+weiterreicht, ist schlimmer als keine — sie erzeugt das Gefühl, es sei
+geprüft.**
+
+Die Warnungen gehen jetzt durch: Request-Body → Prompt-Payload →
+Prompt-Regel → PDF-Kasten **„Angaben, die geprüft gehören"**. Nachgewiesen
+an Bericht 85: statt der Renditeaussage steht dort *„Die fehlende
+Bruttorenditeangabe resultiert aus einer zu niedrig angegebenen Kaltmiete,
+daher ist eine valide Ertragsbewertung derzeit nicht möglich."*
+
+> **Der schwerste Einzelbefund der Sitzung** kam beim ersten Lauf danach
+> (`v1211b`): der Text schrieb *„Bruttorenditeansatz von etwa 2,56 Prozent"*
+> — `gross_yield_pct` ist aber **null**, und 2,56 % ist der
+> **Liegenschaftszinssatz**. Das Modell holte sich, weil das eigene Feld leer
+> war, eine Zahl aus einem anderen Feld. **Eine Kennzahl aus dem falschen
+> Feld ist eine erfundene Zahl.** Der Prompt nennt die Feldnamen jetzt
+> einzeln und den gemessenen Fall als Beispiel.
+
+Dazu `v1211c` (temporale Todeszone — der Kasten kippte den ganzen
+PDF-Export) und `v1211d` (ae/oe/ue standen im Kundentext, meine eigene Regel
+gebrochen). **Viermal in dieser Sitzung hat `node --check` bestanden,
+während nichts funktionierte.**
+
+**`v1210` und `v1211` liegen auf Staging, nicht auf Prod.**
 
 ### Die Rechenwege sind nachgerechnet — `v1210`, 03.09.2026 (`8788256`)
 

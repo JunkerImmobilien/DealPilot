@@ -5593,6 +5593,88 @@ Freigabe. Offen im Ergebnis-Teil bleiben die **Vergleichspreise** (die 42
 Angebote hinter dem Median: Herkunft, Filterradius, Ausreißer) und
 „**Wertverfahren im Vergleich**" in der Web-Ansicht.
 
+### v1211 / v1211b–d (03.09.2026, `a4abcd0` · `606ae7b` · `d25eb79` · `49dcd29`) — die Prüfung hatte recht, und niemand hat ihr zugehört
+
+**Was.** Marcels Export nach `v1208` ausgelesen. Alles Gebaute bestätigt sich —
+und **ein Defekt fällt heraus, den der Bericht selbst erkannt und dann
+ignoriert hat.**
+
+> Seite 9, Abschnitt A: *„…mit einem geschätzten Wert von 195.000 Euro, **was
+> bei einer monatlichen Kaltmiete von 100 Euro eine überschaubare
+> Nettojahresrendite ermöglicht**."*
+
+100 €/Monat auf 195.000 € sind **0,6 % brutto**. Das ist keine überschaubare
+Rendite, das ist ein Tippfehler in den Objektdaten — und der Bericht macht
+daraus eine **Bewertung**.
+
+**Das Bittere: die Maschine wusste es.** `_mbCheckup()` (v951) hatte vor dem
+Lauf gemeldet *„Kaltmiete 1,00 €/m² — ungewöhnlich niedrig. Ist das die
+Monatsmiete?"* und es im Bestätigungsdialog gezeigt. Danach war der Befund
+weg: das Ergebnis wurde **nur** für den Dialogtext benutzt. Das Modell bekam
+`monthly_net_rent: 100` ohne jeden Vorbehalt.
+
+> **Eine Prüfung, die stimmt und deren Ergebnis niemand weiterreicht, ist
+> schlimmer als keine: sie erzeugt das Gefühl, es sei geprüft.**
+
+**Vier Stellen, damit die Warnung durchgeht:** `app.js` legt sie in den
+Request-Body (`_w` stand seit v951 im selben Funktionsscope wie `body` — es
+fehlte eine Zeile) · `ReportOrchestrator` in den Prompt-Payload ·
+`report_prompt.txt` bekommt die Regel · das PDF den Kasten
+**„ANGABEN, DIE GEPRÜFT GEHÖREN"** unter den Stammdaten. Der Kasten steht
+**hinter** dem Energiebalken — davor hätte er die Bindung aus `v1207` wieder
+aufgerissen.
+
+**Nachweis, Bericht 85 gegen Bericht 83:**
+
+| | vorher (83) | nachher (85) |
+|---|---|---|
+| Rendite aus der unplausiblen Miete | *„überschaubare Nettojahresrendite"* | *„Die fehlende Bruttorenditeangabe resultiert aus einer zu niedrig angegebenen Kaltmiete, daher ist eine valide Ertragsbewertung derzeit nicht möglich."* |
+| „1.200 €" (100 × 12) im Text | ja | **nein** |
+| Marktwert als Punktwert in A | ja | ja |
+| Warnkasten im PDF | — | **Seite 3, beide Warnungen** |
+
+Und eine echte Handlungsempfehlung, die aus dem Befund folgt: *„Für
+Investoren empfiehlt sich eine Zurückhaltung bis zur Klärung der
+Mietstruktur oder eine deutliche Kaufpreisreduzierung."*
+
+**Drei Nachschärfungen, jede aus einer Messung:**
+
+- **`v1211b` — die schwerste Zahl dieser Sitzung.** Der erste Lauf (Bericht
+  84) schrieb in A *„mit einem Bruttorenditeansatz von etwa 2,56 Prozent"*.
+  Gemessen: `valuation.yield.gross_yield_pct` ist **null** (kein Kaufpreis
+  erfasst). Die 2,56 % sind der **Liegenschaftszinssatz** aus
+  `cross_check.ertragswert`. **Das Modell hat sich, weil das eigene Feld leer
+  war, eine Prozentzahl aus einem anderen Feld geholt und als Bruttorendite
+  ausgegeben.** Keine Ungenauigkeit — eine erfundene Kennzahl in einem
+  Bewertungsdokument. Neue Regel mit ausgeschriebenen Feldnamen: *ist das
+  Feld null, wird die Kennzahl nicht genannt und niemals durch eine andere
+  Zahl ersetzt, die zufällig passend aussieht.* Der gemessene Fall steht als
+  Beispiel im Prompt, damit die Regel nicht abstrakt bleibt.
+  Zwei weitere Befunde aus demselben Lauf: **der Zweifel vererbte sich
+  nicht** (A rechnete mit `annual_net_rent` = 100 × 12 weiter — die Regel
+  benennt die abgeleiteten Felder jetzt einzeln), und **`v1209` hatte zu gut
+  gewirkt**: A nannte 159.000 und 243.000, aber **nicht 195.000**.
+  „Ausschließlich in A" war als „möglichst wenig" gelesen worden. A trägt
+  jetzt: *der Marktwert als Punktwert MUSS hier stehen.*
+- **`v1211c` — temporale Todeszone.** Der Kasten benutzte `blockW`, das erst
+  in Sektion 03 deklariert wird. `ReferenceError: Cannot access 'blockW'
+  before initialization` — und er kippte den **ganzen** PDF-Export, nicht nur
+  sich selbst. Genau die Falle, die im `CrossCheckService` seit v1047
+  dokumentiert steht und dort nie gefeuert hat. Der Kasten rechnet seine
+  Breite jetzt selbst.
+- **`v1211d`** — der Kastentitel stand als „ANGABEN, DIE GEPRUEFT GEHOEREN".
+  Die Umschrift gehört in **Kommentare**, nie in Text, den ein Kunde liest —
+  meine eigene Regel, zwei Commits vorher selbst gebrochen. Die Umlaute sind
+  jetzt **generiert**, nicht getippt.
+
+> **Zum vierten Mal in dieser Sitzung hat `node --check` bestanden, während
+> nichts funktionierte.** Die Datei war syntaktisch tadellos; der Fehler war
+> eine Laufzeit-Zugriffsregel. Gefunden hat es jedes Mal nur der echte Lauf.
+
+**Rest.** `v1210` und `v1211` liegen auf **Staging**, nicht auf Prod — dafür
+fehlt die Freigabe. Marcels Export ist als
+`design/mockups/Marktbericht_32609_Ahlsen_Reineberg-v1208.pdf` abgelegt.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
