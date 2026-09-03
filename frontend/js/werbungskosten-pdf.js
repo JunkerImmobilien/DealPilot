@@ -64,12 +64,37 @@ async function exportWerbungskostenPDF(mode) {
   var M = 16;
   var CW = W - 2 * M;
 
+  /* v1223 · DIE ANLAGE-V-ZUORDNUNG GIBT ES JETZT AUCH BEIM EINZEL-PDF.
+     Marcel: „zudem muss auch dort die möglichkeit bestehen beim ziehen der PDF
+     die Anlage V mit auszuwählen." Bisher konnte das nur die Steuer-Mappe im
+     Cockpit — dieselbe Seite, dieselbe Funktion, nur eine Ebene tiefer.
+     Bei „Alle Jahre" folgt sie jedem Jahresblatt unmittelbar, damit die zwei
+     Blaetter zu einem Jahr zusammenbleiben. */
+  var wantAV = false;
+  try {
+    var avBox = document.getElementById('fa-pdf-anlagev');
+    wantAV = !!(avBox && avBox.checked);
+  } catch (e) {}
+  var avGezogen = 0;
+  var avSeite = function (jahr, yIdx) {
+    if (!wantAV) return;
+    if (typeof _computeYearTotal !== 'function') return;
+    if (!_anlageVQuelle(jahr)) return;   /* gar keine Zuordnung -> gar keine Seite */
+    var tot = null;
+    try { tot = _computeYearTotal(jahr, yIdx); } catch (e) { return; }
+    if (!tot) return;
+    doc.addPage();
+    _renderAnlageVPage(doc, jahr, tot, null, W, H, M, CW);
+    avGezogen++;
+  };
+
   var name;
   if (allYears) {
     var nYears = rows.length;
     for (var yi = 0; yi < nYears; yi++) {
       if (yi > 0) doc.addPage();
       _renderWerbungskostenPage(doc, rows[yi].cal, yi, W, H, M, CW);
+      avSeite(rows[yi].cal, yi);
     }
     if (nYears > 1) {
       doc.addPage();
@@ -80,11 +105,16 @@ async function exportWerbungskostenPDF(mode) {
     var idx = parseInt(mode, 10);
     if (isNaN(idx) || idx < 0 || idx >= rows.length) idx = 0;
     _renderWerbungskostenPage(doc, rows[idx].cal, idx, W, H, M, CW);
+    avSeite(rows[idx].cal, idx);
     name = 'Werbungskosten_' + rows[idx].cal;
   }
 
   doc.save(name + '.pdf');
-  if (typeof toast === 'function') toast('✓ Werbungskosten-PDF erstellt');
+  if (typeof toast === 'function') {
+    toast('✓ Werbungskosten-PDF erstellt'
+      + (wantAV ? (avGezogen ? ' · mit Anlage-V-Zuordnung'
+                             : ' · ohne Anlage-V-Zuordnung (keine hinterlegt)') : ''));
+  }
 }
 
 /* v645: Dropdown "Steuerjahr" fuer das Finanzamt-PDF aus State.cfRows befuellen. */
@@ -680,7 +710,7 @@ async function exportSteuerMappePDF(jahr, opts) {
   doc.addPage();
 
   var ohneStamm = [];
-  var avFehlt = !_anlageVTabelle(jahr);
+  var avFehlt = !_anlageVQuelle(jahr);
   saetze.forEach(function (s, i) {
     if (i > 0) doc.addPage();   /* Seite 1 ist das Deckblatt, danach je Objekt */
     var st = stamm[s.object_id];
@@ -830,6 +860,44 @@ function _anlageVTabelle(jahr) {
   return (t && t.zeilen && t.felder) ? t : null;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   v1223 · DIE STRENGE REGEL WAR RICHTIG UND HAT NICHTS GELIEFERT.
+   ───────────────────────────────────────────────────────────────────────────
+   Bis v1222 galt: gibt es fuer das Jahr keine abgeschriebene Zuordnung,
+   erscheint die Anlage-V-Seite NICHT. Gemessen am 03.09.2026 auf Staging
+   heisst das: sie erscheint nie. Das Steuerformular rechnet die Jahre ab dem
+   Kaufjahr — bei den Testobjekten 2026 aufwaerts —, abgeschrieben ist die
+   Anlage V 2025, und die Anlage V 2026 ist im September 2026 noch gar nicht
+   veroeffentlicht. Marcel kann sie also nicht nachliefern.
+
+   Der Einwand gegen einen Rueckfall war: eine Zahl OHNE VORBEHALT in einem
+   Dokument, das jemand weiterreicht, hilft niemandem. Der Einwand gilt dem
+   fehlenden Vorbehalt, nicht dem Rueckfall. Also steht der Vorbehalt jetzt
+   auf der Seite selbst — im Kopf, in Rot, ueber der ersten Zahl, und noch
+   einmal im Fuss. Wer das Blatt in die Hand nimmt, sieht vor jeder Zeile,
+   aus welchem Formularjahr die Nummern stammen.
+
+   Zurueckgegeben wird deshalb nicht mehr die Tabelle, sondern die AUSKUNFT
+   ueber sie: welche Tabelle, aus welchem Jahr, und ob das ein Ersatz ist.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function _anlageVQuelle(jahr) {
+  var t = _anlageVTabelle(jahr);
+  if (t) return { T: t, jahr: jahr, ersatz: null };
+  var kandidaten = [];
+  try {
+    kandidaten = Object.keys(window)
+      .filter(function (k) { return /^AnlageV[0-9][0-9][0-9][0-9]$/.test(k); })
+      .map(function (k) { return parseInt(k.slice(7), 10); })
+      .filter(function (j) { return j < jahr; })
+      .sort(function (a, b) { return b - a; });
+  } catch (e) { return null; }
+  for (var i = 0; i < kandidaten.length; i++) {
+    var c = _anlageVTabelle(kandidaten[i]);
+    if (c) return { T: c, jahr: kandidaten[i], ersatz: kandidaten[i] };
+  }
+  return null;
+}
+
 /* Die Bezeichnungen sind WOERTLICH die der Aufstellung — beide Ansichten
    muessen dieselbe Position gleich nennen, sonst sucht der Leser. */
 var _AV_LABEL = {
@@ -849,8 +917,9 @@ var _AV_LABEL = {
 };
 
 function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
-  var T = _anlageVTabelle(jahr);
-  if (!T || !totals) return false;
+  var Q = _anlageVQuelle(jahr);
+  if (!Q || !totals) return false;
+  var T = Q.T;
   var v = totals.values || {};
   var eur = function (n) { return (Math.round(Number(n) || 0)).toLocaleString('de-DE') + ' €'; };
 
@@ -868,7 +937,7 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
   doc.setFontSize(11); doc.setFont('helvetica', 'bold');
   doc.text('Veranlagungsjahr ' + jahr, W - M, 13, { align: 'right' });
   doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-  doc.text('Formular ' + T.formular, W - M, 19, { align: 'right' });
+  doc.text('Formular Anlage V ' + Q.jahr, W - M, 19, { align: 'right' });
 
   var cy = 34;
   var name = q ? (q.name || 'Objekt')
@@ -879,6 +948,30 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
   doc.text(String(name).slice(0, 60), M + 22, cy);
   doc.setFont('helvetica', 'normal');
   cy += 8;
+
+  /* v1223 · DER VORBEHALT STEHT VOR DER ERSTEN ZAHL, NICHT IM KLEINGEDRUCKTEN.
+     Stammen die Nummern aus einem anderen Formularjahr, sagt das Blatt das
+     zuerst — in der Warnfarbe, ueber der Tabelle. Danach darf gerechnet
+     aussehen, was gerechnet ist. */
+  if (Q.ersatz) {
+    doc.setFillColor(250, 240, 236);
+    doc.setDrawColor(176, 98, 92); doc.setLineWidth(0.4);
+    var _bt = doc.splitTextToSize('Für das Veranlagungsjahr ' + jahr + ' lag bei Erstellung '
+      + 'keine amtliche Anlage V vor. Die Zeilennummern und Kennzahlen auf diesem Blatt stammen '
+      + 'aus dem Formular ' + Q.ersatz + '. Sie ändern sich je Veranlagungsjahr — vor dem '
+      + 'Übertragen am aktuellen Vordruck prüfen. Die Beträge sind davon nicht berührt.',
+      CW - 8);
+    var _bh = _bt.length * 3.4 + 6;
+    doc.rect(M, cy - 4, CW, _bh, 'FD');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(7.6);
+    doc.setTextColor(176, 98, 92);
+    doc.text('ZEILENNUMMERN AUS EINEM ANDEREN FORMULARJAHR', M + 4, cy + 0.5);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.9);
+    doc.setTextColor(122, 90, 86);
+    doc.text(_bt, M + 4, cy + 5);
+    doc.setTextColor(42, 39, 39);
+    cy += _bh + 4;
+  }
 
   var _need = function (h) { if (cy + h > H - 20) { doc.addPage(); cy = 24; } };
 
@@ -1045,7 +1138,9 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
   _need(14);
   doc.setFont('helvetica', 'normal'); doc.setFontSize(6.8); doc.setTextColor(122, 115, 112);
   var fuss = doc.splitTextToSize('Zuordnung abgeschrieben aus dem amtlichen Formular '
-    + T.formular + '. Keine Steuererklärung und keine Steuerberatung — die Zahlen sind zum '
+    + 'Anlage V ' + Q.jahr + ' (' + T.formular + ')'
+    + (Q.ersatz ? ', ersatzweise für das Veranlagungsjahr ' + jahr : '')
+    + '. Keine Steuererklärung und keine Steuerberatung — die Zahlen sind zum '
     + 'Übertragen gedacht, die Verantwortung für den Eintrag bleibt beim Erklärenden. '
     + 'Bei verbilligter Vermietung sind die Aufwendungen laut Formular in voller Höhe '
     + 'einzutragen; die Kürzung erfolgt ausschließlich in Zeile 87 oder 88.', CW);
