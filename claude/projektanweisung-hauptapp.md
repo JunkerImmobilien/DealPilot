@@ -6228,6 +6228,66 @@ Halter-Filter samt Objektauswahl in der Oberfläche — der Export kann sie
 bereits über `opts.objectIds`, es fehlt die Bedienung.
 **`v1215`–`v1218` liegen auf Staging.**
 
+### v1219 / v1219b (03.09.2026, `d7228f7` · `524c84e`) — elf der zwölf Lücken waren meine
+
+**Was.** Marcel nach dem ersten Blick in die erzeugte Mappe: *„es gibt in der
+steuer mappe sachen die du nicht zugeordnet hast bitte schau mal im netz wo
+die zugeordnet werden. eigentlich müssten wir alles zuordnen können."*
+
+**Er hatte recht, und der Grund lag bei mir.** Ich hatte die Zeilen **73/75**
+des Formulars überlesen. Sie tragen die Überschrift:
+
+> „Umgelegte Kosten (z. B. Grundsteuer, Straßenreinigung, Müllabfuhr,
+> Wasserversorgung, Entwässerung, Hausbeleuchtung, Heizung, Warmwasser,
+> Schornsteinreinigung, Hausversicherungen, Hauswart, Treppenhausreinigung,
+> Fahrstuhl)"
+
+Das sind **genau** die umlagefähigen Nebenkosten, die ich als „nicht
+zuordenbar" ausgewiesen hatte.
+
+> **Ich habe im Netz gesucht, was zwei Zeilen tiefer im PDF stand.** Die
+> Websuche brachte nichts Belastbares — die ELSTER-Hilfeseiten führen keine
+> Zeilennummern, der Formularserver liefert nur die Navigationsseite. Was
+> geholfen hat, war das Formular ein zweites Mal zu lesen. **Dieselbe Lektion
+> wie den ganzen Tag, nur andersherum: nicht das Werkzeug hat die Ausnahme
+> versteckt, sondern ich habe die Quelle nicht zu Ende gelesen.**
+
+**Von zwölf offenen Posten sind elf zugeordnet.** Offen bleibt einer: die AfA
+auf bewegliche Wirtschaftsgüter, für die die Anlage V keine eigene Zeile
+führt.
+
+**Wichtiger als die Zuordnung ist, worauf sie beruht.** Jedes Feld trägt jetzt
+ein `quelle`, und das steht auch im PDF:
+
+| | | |
+|---|---|---|
+| *(kein Zeichen)* | **formular** — 10 Felder | die Kostenart steht **wörtlich** in der Überschrift der Zeile. Abschrift, kein Urteil. |
+| `*` | **auffang** — 10 Felder | steht in keiner spezielleren Zeile; das Formular führt dafür Zeile 80/82 „Sonstige Kosten". Folgt aus dem **Aufbau** des Formulars. |
+| `°` | **sachlogik** — 5 Felder | folgt aus der **Art des Aufwands**, nicht aus dem Formulartext. Mit Begründung, in einem eigenen Block „Zuordnung aus der Art des Aufwands — bitte prüfen". |
+
+> **Ohne diese Unterscheidung sehen Abschrift und Schlussfolgerung gleich
+> sicher aus** — und genau das darf in einer Steuerunterlage nicht passieren.
+> Die Legende ist der Kern dieser Seite, nicht ihr Beiwerk.
+
+Die fünf Sachlogik-Zuordnungen: Bereitstellungszinsen → 48 (die amtliche
+Anleitung rechnet auch Damnum/Disagio zu den Schuldzinsen) · Vermittlungs-
+provision Darlehen → 51 · sonstige Finanzierungskosten → 51 · Steuerberatung
+→ 82, soweit auf die Einkünfteermittlung entfallend · anschaffungsnahe HK →
+35, weil sie über die AfA wirken.
+
+**Nachweis.** PDF neu erzeugt: der Block „ohne Zeilenzuordnung" ist
+**verschwunden**, `Zeile 75 · Kz 52 · Umlagefähige Nebenkosten · 3.636 €`
+steht jetzt in der Zuordnung. Legende vorhanden, `*`-Markierungen an Porto
+und sonstigen Betriebskosten. Der `°`-Block wurde mit einem Prüfsatz
+(Bereitstellung 250 €, Vermittlung 1.800 €, Steuerberatung 400 €) gegengeprüft
+— alle drei markiert, alle drei mit Zeile und Begründung. Konsole ohne Fehler.
+
+**`v1219b`** — beim Nachlesen des erzeugten PDF gefunden: „ist **eine**
+Kosten der Geldbeschaffung". Falscher Artikel in einem Text, den jemand
+seinem Steuerberater vorlegt. Behoben.
+
+**`v1215`–`v1219` liegen auf Staging.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

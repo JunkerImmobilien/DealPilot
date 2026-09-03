@@ -2410,6 +2410,40 @@ entfällt — nicht raten.
 
 ## Fertig
 
+### Jetzt ist alles zugeordnet bis auf eines — `v1219`, 03.09.2026 (`d7228f7` · `524c84e`)
+
+Marcel nach dem ersten Blick in die Mappe: *„eigentlich müssten wir alles
+zuordnen können."* **Er hatte recht, und die Lücke lag bei mir.**
+
+Ich hatte die Zeilen **73/75** des Formulars überlesen — „Umgelegte Kosten
+(z. B. Grundsteuer, Straßenreinigung, Müllabfuhr, Wasserversorgung,
+Entwässerung, Hausbeleuchtung, Heizung, Warmwasser, Schornsteinreinigung,
+Hausversicherungen, Hauswart, Treppenhausreinigung, Fahrstuhl)". Das sind
+genau die umlagefähigen Nebenkosten, die ich als nicht zuordenbar ausgewiesen
+hatte.
+
+> **Ich habe im Netz gesucht, was zwei Zeilen tiefer im PDF stand.** Die
+> Websuche brachte nichts — geholfen hat, das Formular ein zweites Mal zu
+> lesen.
+
+**Elf von zwölf sind jetzt zugeordnet**, einer bleibt offen (AfA auf
+bewegliche Wirtschaftsgüter — dafür führt die Anlage V keine Zeile).
+
+**Und jede Zuordnung sagt, worauf sie beruht**, im PDF sichtbar:
+kein Zeichen = wörtliche Abschrift · `*` = Auffangposten „Sonstige Kosten" ·
+`°` = folgt aus der Art des Aufwands, mit Begründung in einem eigenen Block
+„bitte prüfen". **Ohne diese Unterscheidung sehen Abschrift und
+Schlussfolgerung gleich sicher aus** — in einer Steuerunterlage darf das
+nicht passieren.
+
+Nachgewiesen: der Block „ohne Zeilenzuordnung" ist verschwunden,
+`Zeile 75 · Kz 52 · Umlagefähige Nebenkosten · 3.636 €` steht in der
+Zuordnung, der `°`-Block mit einem Prüfsatz gegengeprüft.
+
+**Bei Marcel liegt:** die fünf `°`-Posten einmal ansehen — Bereitstellungs-
+zinsen, Vermittlungsprovision, sonstige Finanzierungskosten, Steuerberatung,
+anschaffungsnahe Herstellungskosten.
+
 ### Die Anlage-V-Ansicht steht — `v1217`/`v1218`, 03.09.2026 (`4946283`…`5cd98c7`)
 
 Backlog-Punkt **5**, Stück 1. Marcel hat das amtliche Formular geliefert
@@ -2487,10 +2521,22 @@ jetzt das Veranlagungsjahr).
    wäre die Zuordnung eine steuerfachliche Entscheidung. Sie erscheinen
    trotzdem, im Block „ohne Zeilenzuordnung — bitte steuerlich prüfen".
 
-   > **Marcel sollte diese zwölf einmal ansehen** (oder sein Steuerberater):
-   > Bereitstellungszinsen, Vermittlungsprovision, umlagefähige Nebenkosten,
-   > Steuerberatung und die Sammelposten. Bei ihnen hängt die Zeile am
-   > Sachverhalt, nicht am Formular.
+   > ~~**Marcel sollte diese zwölf einmal ansehen.**~~ **Erledigt mit `v1219`:
+   > elf der zwölf sind zugeordnet.** Marcel hatte recht mit „eigentlich
+   > müssten wir alles zuordnen können" — die Lücke lag bei mir, ich hatte
+   > die Zeilen 73/75 des Formulars („Umgelegte Kosten (z. B. Grundsteuer,
+   > Straßenreinigung, Müllabfuhr …)") überlesen. Offen bleibt **einer**: die
+   > AfA auf bewegliche Wirtschaftsgüter, für die die Anlage V keine eigene
+   > Zeile führt.
+   >
+   > **Jede Zuordnung sagt jetzt, worauf sie beruht** — im PDF sichtbar:
+   > kein Zeichen = wörtliche Abschrift aus der Zeilenüberschrift ·
+   > `*` = Auffangposten „Sonstige Kosten" · `°` = folgt aus der Art des
+   > Aufwands, mit Begründung in einem eigenen Block. **Fünf Posten tragen
+   > das `°` und gehören von Marcel oder seinem Steuerberater geprüft:**
+   > Bereitstellungszinsen (→ 48), Vermittlungsprovision Darlehen (→ 51),
+   > sonstige Finanzierungskosten (→ 51), Steuerberatung (→ 82) und
+   > anschaffungsnahe Herstellungskosten (→ 35 über die AfA).
 2. **Halter-Filter und Objektauswahl** in der Oberfläche. Der Export kann sie
    bereits (`opts.objectIds`), es fehlt die Bedienung.
 3. ~~**Die 66-%-Grenze** des § 21 Abs. 2 EStG als Live-Warnung.~~
