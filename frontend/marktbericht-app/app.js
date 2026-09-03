@@ -3684,11 +3684,28 @@ async function exportPdf(out) {
     if (cc.comparison.spread_pct != null) {
       doc.setFontSize(8); doc.setTextColor(...TXT);
       const sp = cc.comparison.spread_pct;
-      doc.text('Verfahrens-Spread: ' + sp.toLocaleString('de-DE') + ' % — ' +
-        (sp <= 15 ? 'die Verfahren stützen sich gegenseitig (hohe Plausibilität der Indikation).'
+      /* v1212b · WELCHE Verfahren sich stuetzen, stand nicht dabei.
+       * Gemessen am Bericht 85: spread_pct 0,5 % entsteht aus min 194.000 und
+       * max 195.000 — also aus Ertrags- und Vergleichswert. Der SACHWERT
+       * (242.274 EUR) ist absichtlich nicht drin, weil er vorlaeufig ist und
+       * kein Marktwert. Fachlich richtig, aber der Leser sieht drei Zahlen
+       * untereinander, von denen eine 24 % daneben liegt, und darunter den
+       * Satz "die Verfahren stuetzen sich gegenseitig". Der Satz sagt jetzt,
+       * worueber er redet — und warum der Sachwert aussen vor bleibt. */
+      const _swDraussen = !!(cc.sachwert && cc.sachwert.available && cc.sachwert.vorlaeufig);
+      /* Umbrechen, nicht in eine Zeile setzen: der Satz ist mit dem Zusatz
+       * laenger als der Satzspiegel. Genau die Falle aus v959 — dort endete
+       * Seite 4 im Prod-Bericht mit "Kein Gutachten n. § 194 Bau". */
+      const _spT = doc.splitTextToSize(
+        'Verfahrens-Spread: ' + sp.toLocaleString('de-DE') + ' % zwischen Vergleichs- und Ertragswert — '
+        + (sp <= 15 ? 'die beiden stützen sich gegenseitig (hohe Plausibilität der Indikation).'
           : sp <= 30 ? 'moderate Abweichung; Objektbesonderheiten prüfen.'
-          : 'große Abweichung; Wert nur mit weiterer Prüfung verwenden.'), M, y + 3);
-      y += 7;
+          : 'große Abweichung; Wert nur mit weiterer Prüfung verwenden.')
+        + (_swDraussen ? ' Der vorläufige Sachwert bleibt außen vor: ohne Sachwertfaktor ist er kein Marktwert.' : ''),
+        W - 2 * M);
+      need(_spT.length * 3.6 + 4);
+      doc.text(_spT, M, y + 3);
+      y += _spT.length * 3.6 + 3;
     }
     /* v1062-WAMT-1 · Amtliche Miete (v1059) und amtlicher Vergleichsfaktor
      * (v1060) liegen vollstaendig im Ergebnis und standen nirgends im
