@@ -5830,6 +5830,71 @@ in keinem Stylesheet mehr auffindbar. Konsole ohne Fehler.
 > **Die Maschine rechnet richtig. Sie hat nur nicht immer gesagt, was sie
 > tut.**
 
+### v1214 (03.09.2026, `a4956f0`) — der bool-Zweig fehlte im zweiten Schreibweg, und es wurde trotzdem gezählt
+
+**Was.** Backlog-Punkt **3** (Spracheingabe) führte als Rest 1: *„Checkboxen
+werden in beiden Katalogbauern übersprungen."* **Der Eintrag ist veraltet** —
+`buildFullCatalog()` gibt Checkboxen seit `v1168` als `kind:'bool'` weiter,
+und dass `buildCatalog()` (die Chip-Wolke) sie ausspart, ist Absicht und
+steht so im Kommentar.
+
+**Beim Nachprüfen der Kette fiel ein echter Defekt heraus.** Der
+`v1168`-Kommentar listet selbst auf, was vollständig sein muss:
+
+| Glied | Ort | |
+|---|---|---|
+| `'bool'` in der Katalog-Whitelist | `voiceExtractService:63` | ✓ |
+| eigene Prompt-Zeile | `voiceExtractService:126` | ✓ |
+| Normalisierung | `voiceExtractService:238` | ✓ |
+| Zweig in `applyMerged()` | `object-actions:1415` | ✓ |
+
+Es gibt aber einen **zweiten** Schreibweg: `applyQcPending()`, und darüber
+steht wörtlich *„gleiche Schreiblogik wie applyMerged"*. **Sie war gleich —
+bis `v1168` nur die eine Stelle angefasst hat.** `applyQcPending` hatte einen
+`star`-Zweig und einen `select`-Zweig und **keinen** `bool`-Zweig.
+
+> **Die Folge:** ein im Quick-Check diktiertes Häkchen fällt dort auf
+> `setInput()` durch — das schreibt `el.value` und lässt eine Checkbox
+> unberührt — aber `n++` und `applied.push(id)` laufen trotzdem. Der Nutzer
+> liest *„N Werte aus Import übernommen"* und hat ein leeres Häkchen.
+> **Wieder dasselbe Muster wie den ganzen Tag im Marktbericht: gemeldet
+> wird, was nicht passiert ist.**
+
+Betroffen ist derzeit **ein** Feld — `san_tax_active`, gemessen als einzige
+Checkbox in den 203 `window.FIELDS`. Es ist eine **Steuerposition**: fehlt
+das Häkchen, fehlt der Sanierungsvorteil in der Rechnung.
+
+**Nicht den Zweig ein zweites Mal kopiert.** Das wäre die dritte Fassung
+derselben Logik gewesen — und genau der Grund, warum es überhaupt
+auseinanderlief. Stattdessen `_wertSchreiben(id, it)` als **eine**
+Schreiblogik, aus beiden Stellen gerufen (`CLAUDE.md`: Rechenkerne nie
+duplizieren). Sie gibt die **Art** zurück (`'star'`/`'select'`/`'bool'`/
+`'text'`), nicht `true`/`false` — nur so bleibt `markSvwertAvm()` auf den
+Textfall beschränkt wie vorher. `null` heißt: nichts geschrieben, also auch
+nicht zählen.
+
+**Commit.** `a4956f0` — `object-actions.js`, Cache-Buster von `?v=v1194` auf
+`v1214` (er hing zwanzig Versionen zurück; ohne ihn käme die Änderung im
+Browser nicht an).
+
+**Nachweis — echter Lauf, beide Richtungen.** `ObjectActions.applyQcPending`
+ist öffentlich, der Weg ließ sich deshalb direkt fahren:
+
+| | `.checked` | `change` |
+|---|---|---|
+| alte Logik nachgestellt (`el.value = true`) | **false** — Häkchen leer | — |
+| neuer Weg (`setQcPending` → `applyQcPending`) | **true** | **1×** gefeuert |
+
+Der Stash wird geleert, die Konsole bleibt leer, der Prüfzustand wurde
+zurückgesetzt. **Das ist kein Abnahmepunkt mehr, sondern belegt.**
+
+**Rest.** Von Backlog-Punkt 3 bleiben zwei Stücke, die ich nicht allein
+klären kann: das **Modal beim „Als Objekt speichern"** (welches Marcel meint,
+ist ungeklärt — erst den Bedienweg gemeinsam ansehen, sonst entsteht ein
+zweites Modal neben einem vorhandenen) und **ob die Einsortierung in der
+Praxis trifft** — nur durch einen echten Sprechlauf am Gerät.
+**`v1214` liegt auf Staging.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

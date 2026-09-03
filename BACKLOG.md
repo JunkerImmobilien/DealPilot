@@ -1675,8 +1675,20 @@ entfällt — nicht raten.
    > kuratiert, der Auswertekatalog ist es nicht** — wer auf die Chips sieht,
    > hält die Anzeige für den Umfang.
    >
-   > **Es bleiben drei Reste:**
-   > 1. **Checkboxen** werden in beiden Katalogbauern übersprungen.
+   > **Es bleiben zwei Reste** (der erste ist mit `v1214` erledigt):
+   > 1. ~~**Checkboxen** werden in beiden Katalogbauern übersprungen.~~
+   >    **ERLEDIGT — der Eintrag war veraltet, und dahinter lag ein echter
+   >    Defekt.** `buildFullCatalog()` gibt Checkboxen seit `v1168` als
+   >    `kind:'bool'` weiter; dass `buildCatalog()` (die Chip-Wolke) sie
+   >    ausspart, ist Absicht. Beim Nachprüfen der Kette fiel auf:
+   >    `applyQcPending()` hatte **keinen** `bool`-Zweig, obwohl darüber
+   >    „gleiche Schreiblogik wie applyMerged" steht — ein diktiertes Häkchen
+   >    fiel dort auf `setInput()` durch, wurde **nicht gesetzt und trotzdem
+   >    gezählt**. Betroffen: `san_tax_active`, die einzige Checkbox in den
+   >    203 Feldern — eine Steuerposition. Behoben mit `v1214`
+   >    (`_wertSchreiben()` als eine Schreiblogik für beide Wege), am
+   >    laufenden System belegt: alte Logik `checked:false`, neuer Weg
+   >    `checked:true` mit gefeuertem `change`.
    > 2. **Das Modal beim „Als Objekt speichern"** — **gemessen: es gibt
    >    keines.** `qcSaveAsObject()` speichert direkt über einen fest
    >    verdrahteten Snapshot von ~20 Feldern. Die Auflistung ist damit
@@ -2393,6 +2405,34 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Ein Häkchen wurde gezählt, aber nie gesetzt — `v1214`, 03.09.2026 (`a4956f0`)
+
+Backlog-Punkt **3** (Spracheingabe), Rest 1. Der Eintrag war veraltet —
+Checkboxen sind seit `v1168` im Auswertekatalog. **Dahinter lag aber ein
+echter Defekt.**
+
+`applyMerged()` hat seit `v1168` einen `bool`-Zweig. Es gibt aber einen
+**zweiten** Schreibweg, `applyQcPending()`, und darüber steht wörtlich
+*„gleiche Schreiblogik wie applyMerged"*. Sie **war** gleich — bis `v1168`
+nur die eine Stelle anfasste. Dort fiel ein diktiertes Häkchen auf
+`setInput()` durch, das `el.value` schreibt und die Checkbox unberührt
+lässt — **und wurde trotzdem als übernommen gezählt.**
+
+Betroffen ist `san_tax_active`, die einzige Checkbox in den 203 Feldern —
+eine **Steuerposition**. Fehlt das Häkchen, fehlt der Sanierungsvorteil in
+der Rechnung, und der Nutzer hat „N Werte übernommen" gelesen.
+
+Behoben mit **einer** Schreiblogik für beide Wege (`_wertSchreiben()`), nicht
+mit einer dritten Kopie des Zweigs. Am laufenden System belegt: alte Logik
+`checked:false`, neuer Weg `checked:true` mit gefeuertem `change`-Ereignis.
+
+> Derselbe Fehlertyp wie den ganzen Tag im Marktbericht — **gemeldet wird,
+> was nicht passiert ist.** Nur diesmal in der Haupt-App.
+
+**`v1214` liegt auf Staging.** Von Punkt 3 bleiben zwei Reste, beide
+brauchen Marcel: das Speichern-Modal (welches gemeint ist, ist ungeklärt)
+und ein echter Sprechlauf am Gerät.
 
 ### Vergleichspreise und Verfahrenswahl geprüft — `v1212`, 03.09.2026 (`7c05d24` · `cb80d4e`)
 
