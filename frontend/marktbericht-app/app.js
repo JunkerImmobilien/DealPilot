@@ -3302,11 +3302,14 @@ async function exportPdf(out) {
    * um die es geht. Keine Warnungen, kein Kasten. */
   const _plausi = Array.isArray(d.plausibilitaet) ? d.plausibilitaet.filter(Boolean) : [];
   if (_plausi.length) {
+    /* blockW wird erst in Sektion 03 (Z. 3345) deklariert — hier waere es die
+     * temporale Todeszone. Eigene Breite, gleiche Rechnung. */
+    const _bw = W - 2 * M;
     doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setCharSpace(0);
-    const _zl = _plausi.map((t, i) => doc.splitTextToSize((i + 1) + '. ' + String(t), blockW - 12));
+    const _zl = _plausi.map((t, i) => doc.splitTextToSize((i + 1) + '. ' + String(t), _bw - 12));
     const _ph = 9.5 + _zl.reduce((s, z) => s + z.length * 3, 0) + (_plausi.length - 1) * 1.2;
     need(_ph + 4);
-    doc.setFillColor(252, 246, 244); doc.roundedRect(M, y, blockW, _ph, 2, 2, 'F');
+    doc.setFillColor(252, 246, 244); doc.roundedRect(M, y, _bw, _ph, 2, 2, 'F');
     doc.setFillColor(184, 98, 92); doc.roundedRect(M, y, 1.6, _ph, 0.8, 0.8, 'F');
     doc.setFont('helvetica', 'bold'); doc.setFontSize(6.9); doc.setTextColor(184, 98, 92);
     doc.setCharSpace(0.3);
