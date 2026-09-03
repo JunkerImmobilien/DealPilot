@@ -529,6 +529,33 @@
     function inp(id, val, ph) { return '<input id="' + id + '" type="text" value="' + esc(val == null ? '' : val) + '"' + (ph ? ' placeholder="' + ph + '"' : '') + '>'; }
     function chk(id, on, lbl) { return '<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="' + id + '"' + (on ? ' checked' : '') + '> ' + lbl + '</label>'; }
 
+    /* ═══ v1221 · IDENTIFIKATION ═══
+       Marcel am 03.09.2026: „unter Mandanten neuer Mandant fehlt auch die
+       Umsatzsteuerid und vlt noch andere nummern Handelsregisternummer."
+
+       Er hat recht, und es fehlt mehr als das. Die Steuer-Mappe soll die
+       Angaben des Halters tragen — bei einer Gesellschaft sind das andere als
+       die des Accounts. Im Account (Einstellungen → Account & Sicherheit)
+       stehen Steuernummer und USt-IdNr. bereits; sie gehören dort der
+       PERSON. Eine GmbH hat eigene.
+
+       Steuernummer, Finanzamt und Anschrift gelten für JEDE Rechtsform —
+       auch ein privater Halter hat sie. USt-IdNr. und Handelsregister stehen
+       im Gesellschaftsblock, weil sie dort hingehören; ein privater Vermieter
+       mit Option zur Umsatzsteuer trägt seine USt-IdNr. im Account ein. */
+    var ident = m.ident || {};
+    var identBlock =
+        '<hr class="dvd" style="margin:18px 0 6px">'
+      + '<h3 class="set-section-h">Identifikation <span style="font-weight:400;color:#7A7370;font-size:12px">· erscheint auf der Steuer-Mappe</span></h3>'
+      + '<div style="' + _fGrid() + '">'
+      +   fldH('Steuernummer', inp('mand-f-stnr', ident.steuernummer, 'z.B. 123/456/78901'), 'Die Steuernummer dieses Halters — bei einer Gesellschaft ihre eigene, nicht die persönliche.')
+      +   fldH('Zuständiges Finanzamt', inp('mand-f-fa', ident.finanzamt, 'z.B. Finanzamt Minden'), 'Steht im Kopf der Anlage V und auf jedem Steuerbescheid.')
+      + '</div>'
+      + '<div style="' + _fGrid() + '">'
+      +   fldH('Straße und Hausnummer', inp('mand-f-str', ident.strasse, 'z.B. Hermannstraße 9'), '')
+      +   fldH('PLZ und Ort', inp('mand-f-ort', ident.ort, 'z.B. 32609 Hüllhorst'), '')
+      + '</div>';
+
     var corpBlock =
         '<div id="mand-corp-only" style="display:' + (corp ? 'block' : 'none') + '">'
       +   '<hr class="dvd" style="margin:18px 0 6px">'
@@ -536,6 +563,13 @@
       +   '<div style="' + _fGrid() + '">'
       +     fldH('K\u00f6rperschaftsteuer + Soli (%)', inp('mand-f-kst', reg.kst != null ? reg.kst : 15.825), 'Satz, mit dem der Gewinn der Gesellschaft besteuert wird: 15 % K\u00f6rperschaftsteuer + 5,5 % Solidarit\u00e4tszuschlag darauf = 15,825 %.')
       +     fldH('Gewerbesteuer-Hebesatz (%)', inp('mand-f-gewst', reg.gewst != null ? reg.gewst : 0), 'Hebesatz deiner Gemeinde (z.B. 400). Nur relevant, wenn die erweiterte K\u00fcrzung NICHT greift. Bei reiner Vermietung mit K\u00fcrzung 0 lassen.')
+      +   '</div>'
+      +   '<div style="' + _fGrid() + '">'
+      /* v1221: USt-IdNr. und Handelsregister stehen im Gesellschaftsblock,
+         weil sie dorthin gehören — eine natürliche Person hat kein
+         Handelsregister, und ihre USt-IdNr. steht im Account. */
+      +     fldH('USt-IdNr.', inp('mand-f-ustid', ident.ustid, 'DE123456789'), 'Umsatzsteuer-Identifikationsnummer der Gesellschaft.')
+      +     fldH('Handelsregister', inp('mand-f-hr', ident.handelsregister, 'z.B. HRB 12345, AG Bad Oeynhausen'), 'Registernummer und Registergericht, wie im Handelsregisterauszug.')
       +   '</div>'
       +   '<div style="margin:6px 0 0">'
       +     chk('mand-f-kuerz', reg.erw_kuerzung !== false, 'Erweiterte Gewerbesteuer-K\u00fcrzung (\u00a7 9 GewStG) \u2014 GewSt = 0')
@@ -570,6 +604,7 @@
       +   fld('Name', inp('mand-f-name', m.name, 'z.B. Junker VV GmbH'))
       +   fld('Rechtsform', '<select id="mand-f-rf"' + (locked ? ' disabled' : ' onchange="DealPilotMandanten.uiToggleRf()"') + '>' + rfOpts() + '</select>' + (locked ? '<span class="hint">Privat ist fix.</span>' : ''))
       + '</div>'
+      + identBlock
       + transHint
       + corpBlock
       /* v827-back-btn: Zurueck-Button (uiCancel) - Rueckkehr zur Uebersicht. Speichern via unterem Global-Button. */
@@ -604,6 +639,15 @@
     var locked = id === 'privat';
     var rf = locked ? 'privat' : (_val('mand-f-rf') || 'gmbh');
     var m = { id: id || null, name: _val('mand-f-name').trim() || 'Mandant', rechtsform: rf };
+    /* v1221: Identifikation — gilt fuer jede Rechtsform. Leere Felder werden
+       NICHT gespeichert, damit ein leerer Mandant keine leeren Schluessel traegt. */
+    var _id = {};
+    ['steuernummer:mand-f-stnr','finanzamt:mand-f-fa','strasse:mand-f-str','ort:mand-f-ort',
+     'ustid:mand-f-ustid','handelsregister:mand-f-hr'].forEach(function (p) {
+      var t = p.split(':'), v = (_val(t[1]) || '').trim();
+      if (v) _id[t[0]] = v;
+    });
+    if (Object.keys(_id).length) m.ident = _id;
     if (isCorp(rf)) {
       m.regime = { kst: _toN(_val('mand-f-kst')), gewst: _toN(_val('mand-f-gewst')), erw_kuerzung: _chk('mand-f-kuerz') };
       m.bh = {

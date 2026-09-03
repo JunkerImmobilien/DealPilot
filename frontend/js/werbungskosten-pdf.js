@@ -674,10 +674,15 @@ async function exportSteuerMappePDF(jahr, opts) {
   var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   var W = 210, H = 297, M = 16, CW = W - 2 * M;
 
+  /* v1221: Deckblatt zuerst — wem die Zahlen gehoeren, steht vor den Zahlen. */
+  var halter = _mappeHalter(saetze, objekte);
+  _renderMappeDeckblatt(doc, jahr, halter, saetze, stamm, W, H, M, CW);
+  doc.addPage();
+
   var ohneStamm = [];
   var avFehlt = !_anlageVTabelle(jahr);
   saetze.forEach(function (s, i) {
-    if (i > 0) doc.addPage();
+    if (i > 0) doc.addPage();   /* Seite 1 ist das Deckblatt, danach je Objekt */
     var st = stamm[s.object_id];
     if (!st) ohneStamm.push(s.object_name || s.object_id);
     var totals = _computeYearTotal(jahr, 0, s);
@@ -1046,4 +1051,163 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
     + 'einzutragen; die Kürzung erfolgt ausschließlich in Zeile 87 oder 88.', CW);
   doc.text(fuss, M, cy);
   return true;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   v1221-deckblatt · WEM GEHÖREN DIESE ZAHLEN?
+   ───────────────────────────────────────────────────────────────────────────
+   Marcel am 03.09.2026: „Alle Angaben zum Mandanten könnten wir unter
+   Einstellungen Account und Sicherheit eintragen … Wenn es eine UG oder GmbH
+   ist geht das unter Einstellungen Mandanten. Vlt können wir da Informationen
+   mit auf die PDF geben."
+
+   Eine Steuerunterlage ohne Angabe, WESSEN Einkünfte sie zeigt, ist beim
+   Finanzamt wertlos — und beim Steuerberater eine Rückfrage. Das Deckblatt
+   holt die Angaben von genau einer Stelle:
+
+     Gesellschaft (GmbH, UG, …) -> Einstellungen → Mandanten, Block
+                                   „Identifikation" (v1221)
+     privat                     -> Einstellungen → Account & Sicherheit
+                                   (Name, Firma, Steuernummer, USt-IdNr.)
+
+   WAS FEHLT, WIRD BENANNT, NICHT WEGGELASSEN. Eine Zeile „Steuernummer —
+   nicht hinterlegt" ist eine Aufforderung; eine fehlende Zeile ist eine
+   Lücke, die niemand sieht. Dasselbe Prinzip wie im Marktbericht.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function _mappeHalter(saetze, objekte) {
+  /* Der Halter der Objekte — ist er bei allen gleich, gilt er für die Mappe.
+     Sind es mehrere, sagt das Deckblatt das, statt einen davon zu behaupten. */
+  var ids = {}, halterName = null;
+  (objekte || []).forEach(function (o) {
+    if (o && o.halter) ids[o.halter] = (ids[o.halter] || 0) + 1;
+  });
+  var keys = Object.keys(ids);
+  var mand = null;
+  try {
+    var liste = (window.DealPilotMandanten && DealPilotMandanten.getList()) || [];
+    if (keys.length === 1) {
+      mand = liste.filter(function (m) { return m.id === keys[0]; })[0] || null;
+    }
+    if (!mand && liste.length === 1) mand = liste[0];   /* nur „Privat" vorhanden */
+  } catch (e) {}
+
+  var S = {};
+  try { S = (window.Settings && Settings.get()) || {}; } catch (e) {}
+
+  var istGesellschaft = !!(mand && window.DealPilotMandanten
+    && DealPilotMandanten.isCorp && DealPilotMandanten.isCorp(mand.rechtsform));
+  var ident = (mand && mand.ident) || {};
+
+  return {
+    mehrere: keys.length > 1,
+    anzahlHalter: keys.length,
+    gesellschaft: istGesellschaft,
+    name: istGesellschaft ? (mand.name || '')
+        : ((S.user_name || '') || (S.user_company || '')),
+    rechtsform: mand ? (window.DealPilotMandanten && DealPilotMandanten.rfLabel
+                        ? DealPilotMandanten.rfLabel(mand.rechtsform) : mand.rechtsform) : null,
+    firma: istGesellschaft ? '' : (S.user_company || ''),
+    steuernummer: ident.steuernummer || (istGesellschaft ? '' : (S.user_steuernummer || '')),
+    ustid: ident.ustid || (istGesellschaft ? '' : (S.user_uid || '')),
+    finanzamt: ident.finanzamt || '',
+    handelsregister: ident.handelsregister || '',
+    strasse: ident.strasse || (istGesellschaft ? '' : (S.pdf_address || '')),
+    ort: ident.ort || (istGesellschaft ? ''
+         : ((S.pdf_plz || '') + ' ' + (S.pdf_city || '')).trim())
+  };
+}
+
+function _renderMappeDeckblatt(doc, jahr, h, saetze, stamm, W, H, M, CW) {
+  doc.setFillColor(42, 39, 39);
+  doc.rect(0, 0, W, 46, 'F');
+  doc.setFillColor.apply(doc, window._pdfGold());
+  doc.rect(0, 46, W, 1.4, 'F');
+  doc.setTextColor.apply(doc, window._pdfGold());
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(19);
+  doc.text('STEUER-MAPPE', M, 24);
+  doc.setTextColor(220, 220, 220);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+  doc.text('Vermietung & Verpachtung · Anlage V · § 21 EStG', M, 33);
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(15);
+  doc.text('Veranlagungsjahr ' + jahr, W - M, 24, { align: 'right' });
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+  doc.text('Erstellt: ' + new Date().toLocaleDateString('de-DE'), W - M, 33, { align: 'right' });
+
+  var cy = 62;
+  var zeile = function (lab, wert, fehlt) {
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
+    doc.setTextColor(122, 115, 112);
+    doc.text(lab, M, cy);
+    doc.setFontSize(10);
+    doc.setTextColor.apply(doc, fehlt ? [176, 140, 90] : [42, 39, 39]);
+    doc.setFont('helvetica', fehlt ? 'italic' : 'bold');
+    doc.text(wert, M + 46, cy);
+    cy += 8;
+  };
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+  doc.setTextColor(42, 39, 39);
+  doc.text('STEUERPFLICHTIGE / STEUERPFLICHTIGER', M, cy);
+  cy += 3;
+  doc.setDrawColor(210, 205, 198); doc.setLineWidth(0.3);
+  doc.line(M, cy, M + CW, cy);
+  cy += 8;
+
+  if (h.mehrere) {
+    doc.setFont('helvetica', 'italic'); doc.setFontSize(9);
+    doc.setTextColor(176, 140, 90);
+    var mt = doc.splitTextToSize('Die Objekte dieses Jahres gehören ' + h.anzahlHalter
+      + ' verschiedenen Haltern. Eine Anlage V wird je Steuerpflichtigem abgegeben — '
+      + 'diese Mappe fasst sie zusammen und ist deshalb nur als Übersicht zu verwenden. '
+      + 'Für die Erklärung filtern Sie bitte je Halter.', CW);
+    doc.text(mt, M, cy);
+    cy += mt.length * 4.4 + 6;
+    doc.setFont('helvetica', 'normal');
+  }
+
+  zeile('Name', h.name || 'nicht hinterlegt', !h.name);
+  if (h.rechtsform) zeile('Rechtsform', h.rechtsform, false);
+  if (h.firma) zeile('Firma', h.firma, false);
+  zeile('Steuernummer', h.steuernummer || 'nicht hinterlegt', !h.steuernummer);
+  zeile('Finanzamt', h.finanzamt || 'nicht hinterlegt', !h.finanzamt);
+  if (h.gesellschaft || h.ustid) zeile('USt-IdNr.', h.ustid || 'nicht hinterlegt', !h.ustid);
+  if (h.gesellschaft) zeile('Handelsregister', h.handelsregister || 'nicht hinterlegt', !h.handelsregister);
+  var anschrift = [h.strasse, h.ort].filter(Boolean).join(', ');
+  zeile('Anschrift', anschrift || 'nicht hinterlegt', !anschrift);
+
+  cy += 4;
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+  doc.setTextColor(42, 39, 39);
+  doc.text('ENTHALTENE OBJEKTE (' + saetze.length + ')', M, cy);
+  cy += 3;
+  doc.setDrawColor(210, 205, 198); doc.setLineWidth(0.3);
+  doc.line(M, cy, M + CW, cy);
+  cy += 7;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+  saetze.forEach(function (s, i) {
+    if (cy > H - 46) { doc.addPage(); cy = 26; }
+    var st = stamm[s.object_id];
+    doc.setTextColor(122, 115, 112); doc.setFontSize(8);
+    doc.text(String(i + 1) + '.', M, cy);
+    doc.setTextColor(42, 39, 39); doc.setFontSize(9);
+    doc.text(String((st && st.name) || s.object_name || 'Objekt').slice(0, 52), M + 7, cy);
+    if (st && st.addr) {
+      doc.setTextColor(122, 115, 112); doc.setFontSize(7.5);
+      doc.text(String(st.addr).slice(0, 44), M + CW, cy, { align: 'right' });
+    }
+    cy += 6.2;
+  });
+
+  /* Wofür die Mappe NICHT taugt, steht auf dem Deckblatt — nicht im Kleingedruckten. */
+  var fy = H - 34;
+  doc.setDrawColor(210, 205, 198); doc.setLineWidth(0.3);
+  doc.line(M, fy - 6, M + CW, fy - 6);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(7.2);
+  doc.setTextColor(122, 115, 112);
+  var ft = doc.splitTextToSize('Diese Mappe fasst die je Objekt gespeicherten Steuersätze '
+    + 'zusammen und ordnet sie den Zeilen der amtlichen Anlage V zu. Sie ersetzt keine '
+    + 'Steuererklärung und keine Beratung. Die Angaben oben stammen aus Ihren Einstellungen — '
+    + 'als „nicht hinterlegt" gekennzeichnete Felder tragen Sie dort nach '
+    + '(Gesellschaften: Einstellungen → Mandanten; privat: Einstellungen → Account & Sicherheit).', CW);
+  doc.text(ft, M, fy);
 }
