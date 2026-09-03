@@ -2447,8 +2447,28 @@ jetzt das Veranlagungsjahr).
    schnell gebaut.
 2. **Halter-Filter und Objektauswahl** in der Oberfläche. Der Export kann sie
    bereits (`opts.objectIds`), es fehlt die Bedienung.
-3. **Die 66-%-Grenze** des § 21 Abs. 2 EStG als Live-Warnung — der Nebenfund,
-   klein und eigenständig. DealPilot kennt Ist- und Marktmiete bereits.
+3. ~~**Die 66-%-Grenze** des § 21 Abs. 2 EStG als Live-Warnung.~~
+   **GEBAUT — `v1216`, 03.09.2026.** Kasten im Steuer-Tab unter der
+   Steuerwirkung, drei Zustände (≥ 66 % grün · 50–66 % gold, Prognose nötig ·
+   < 50 % rot, Aufteilung). Alle fünf Zustände am laufenden System
+   durchgefahren. Fehlt die Marktmiete oder die Fläche, sagt der Kasten das
+   und rechnet **nicht** mit einer geschätzten Vergleichsmiete.
+   *Die Schwellen stehen im Gesetz, nicht in einem Formular — deshalb dürfen
+   sie im Code stehen, anders als die Zeilennummern der Anlage V.*
+
+> **Zur Anlage V (Stück 1): Marcels Link führt nicht zum Ziel.** Er hat am
+> 03.09. `elster.de/…help_est_ufa_12_2019` geschickt. Geprüft: die Seite gilt
+> für **2019** und enthält **gar keine Zeilennummern** — nur den Satz
+> „Einkünfte aus Vermietung und Verpachtung: Dazu gehören unter anderem…".
+> Dasselbe gilt für die Entsprechung von 2025 (`…help_est_ufa_12_2025`). Der
+> Formularserver der Bundesfinanzverwaltung liefert beim Abruf nur die
+> Navigationsseite.
+>
+> **Gebraucht wird die Anlage V des zählenden Jahres als PDF** — ELSTER-Export
+> oder Download vom Formularserver, abgelegt im Ordner wie der Marktbericht.
+> Die Nummern aus dem Gedächtnis oder aus einem Forum zu nehmen wäre genau das
+> Raten, das hier verboten ist, und bei einer Steuerunterlage die teuerste
+> Sorte Fehler.
 
 **`v1215` liegt auf Staging, nicht auf Prod.**
 

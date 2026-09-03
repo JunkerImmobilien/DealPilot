@@ -6073,6 +6073,70 @@ Backlog, klein und eigenständig.
 
 **`v1215` liegt auf Staging.**
 
+### v1216 (03.09.2026, `fa2fdf0`) — die 66-%-Grenze warnt jetzt von selbst
+
+**Was.** Backlog-Punkt **5**, drittes Stück und der Nebenfund: die 66-%-Grenze
+des § 21 Abs. 2 EStG ist dieselbe Art Falle wie die 15-%-Grenze, für die es in
+`beleg-import.js` längst eine Ampel gibt. **DealPilot kennt die Ist-Miete
+(`#nkm`) und die ortsübliche Miete (`#ds2_marktmiete` × `#wfl`) bereits** — es
+kann von selbst warnen, statt dass der Nutzer es merkt, wenn das Finanzamt den
+Werbungskostenabzug kürzt.
+
+Neuer Kasten im Steuer-Tab, **direkt unter der Steuerwirkung**, weil er genau
+die betrifft. Drei Zustände nach dem Vorbild der 15-%-Ampel:
+
+| Quote | | |
+|---|---|---|
+| ≥ 66 % | grün | vollentgeltlich, Werbungskosten voll abziehbar |
+| 50 – 66 % | gold | Totalüberschussprognose entscheidet — prüfen lassen |
+| < 50 % | rot | Aufteilung, Werbungskosten nur anteilig — prüfen lassen |
+
+> **Warum diese Zahlen hier stehen dürfen und die Zeilennummern der Anlage V
+> nicht:** die Schwellen stehen im **Gesetz**, nicht in einem Formular. Sie
+> wechseln nicht jährlich. Der Text nennt die Grenze und fordert zur Prüfung
+> auf, genau wie die 15-%-Ampel; die Fußzeile sagt ausdrücklich
+> „Orientierung, keine Steuerberatung".
+
+**Kein Wert, kein Kasten.** Fehlt die Marktmiete oder die Wohnfläche, sagt der
+Kasten das und rechnet **nicht** mit einer geratenen Vergleichsmiete. Dasselbe
+Prinzip wie im Marktbericht.
+
+**Nachweis — alle fünf Zustände am laufenden System durchgefahren:**
+
+| gesetzt | Ergebnis |
+|---|---|
+| nichts | „fehlt die Nettokaltmiete im Tab Miete" |
+| 780 € gegen 1.000 € | **78 %** · „Vollentgeltlich" |
+| 600 € gegen 1.000 € | **60 %** · „Prüfung nötig" |
+| 400 € gegen 1.000 € | **40 %** · „Aufteilung droht" |
+| Marktmiete gelöscht | „…wird hier **nicht** mit einer geschätzten Vergleichsmiete gerechnet" |
+
+Die Prüfwerte wurden danach wieder abgeräumt; Konsole ohne Fehler.
+
+**Zur Anlage V — Marcels Link führt nicht zum Ziel.** Er hat
+`elster.de/eportal/helpGlobal?themaGlobal=help_est_ufa_12_2019` geschickt.
+Zwei Dinge stimmen daran nicht:
+
+1. Die Seite gilt für **2019**, nicht für das laufende Veranlagungsjahr.
+2. **Sie enthält gar keine Zeilennummern.** Geprüft, und zur Sicherheit auch
+   die Entsprechung für 2025 (`…help_est_ufa_12_2025`): beide bringen nur den
+   Satz *„Einkünfte aus Vermietung und Verpachtung: Dazu gehören unter anderem
+   Einnahmen aus der (Unter-)Vermietung…"* — eine Kategoriebeschreibung, keine
+   Zeilen.
+
+Der Formularserver der Bundesfinanzverwaltung liefert beim Abruf nur die
+Navigationsseite (Cookie-/Browser-Hinweise), nicht das Formular.
+
+> **Damit bleibt es dabei: die Zeilennummern kommen aus dem amtlichen
+> Formular oder gar nicht.** Sie aus dem Gedächtnis oder aus einem Forum zu
+> nehmen wäre genau das Raten, das der Backlog-Eintrag und `CLAUDE.md`
+> verbieten — und bei einer Steuerunterlage die teuerste Sorte Fehler.
+> **Gebraucht wird die Anlage V des zählenden Jahres als PDF** (ELSTER-Export
+> oder Formularserver-Download), abgelegt im Ordner wie der Marktbericht.
+> Dann ist es Weg A aus der Backlog-Tabelle und schnell gebaut.
+
+**`v1216` liegt auf Staging.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
