@@ -195,10 +195,11 @@ Bodenwert wird verzinst. Der eine Befund daraus ist gebaut (`v1210`, siehe
 Fertig): die Hinterlandfläche rechnete mit und stand in keiner
 Stammdatenzeile. Der **PDF-Export** ist mit `v1206`–`v1210` durch.
 
-**Nicht** geprüft bleiben: die **Vergleichspreise** (die 42 Angebote hinter
-dem Median — Herkunft, Filterradius, Ausreißer) und „**Wertverfahren im
-Vergleich**" in der Web-Ansicht (die Verrechnung der drei Werte zum
-führenden Verfahren, nicht die drei Werte selbst).
+**Damit ist 1c abgearbeitet.** Auch die **Vergleichspreise** und
+„**Wertverfahren im Vergleich**" sind geprüft (`v1212`, siehe Fertig): die
+Verfahrenswahl ist fachlich sauber — nicht gemittelt, führendes Verfahren
+mit Begründung und Quelle. Bei den Vergleichspreisen fielen drei Befunde an,
+alle behoben.
 
 **d) Der PDF-Bericht ist durchgesehen und zweimal umgebaut.** Marcel hat den
 eigenen Export gelesen. Gebaut sind: 03 und 04 zu einer Sektion mit der
@@ -2361,6 +2362,39 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Vergleichspreise und Verfahrenswahl geprüft — `v1212`, 03.09.2026 (`7c05d24` · `cb80d4e`)
+
+Die letzten ungeprüften Stücke des Ergebnis-Teils. **Backlog-Punkt 1c ist
+damit vollständig abgearbeitet.**
+
+**Drei Befunde bei den Vergleichspreisen, alle behoben:**
+
+- „Vergleichsobjekte (**10**)" stand neben einem Median aus **42**. Der
+  Median der zehn Gezeigten ist 1.888 €/m², ausgewiesen sind 1.695 — wer
+  nachrechnet, kommt nicht hin. Jetzt „(10 von 42)" plus Erklärzeile.
+- **Keine Ortsspalte.** Acht der zehn Vergleiche liegen in `32312 Lübbecke`,
+  das Objekt in `32609 Hüllhorst`. Keine Regelverletzung, aber nach
+  ImmoWertV begründungspflichtig — und unsichtbar. Neue Spalte **Ort**.
+- Die **Entfernung** zeigte achtmal identisch 3.526 m: zehn Objekte, **zwei**
+  Koordinatenpaare. Die Standorte sind je Ort zusammengefasst, die Zahl ist
+  eine Orts- und keine Objektentfernung. Steht jetzt dabei.
+
+Beide Hinweissätze entstehen **nur, wenn der Befund vorliegt** — zur Laufzeit
+gezählt. Bei sauberen Daten steht dort nichts.
+
+**„Wertverfahren im Vergleich" ist in Ordnung** — nicht gemittelt, führendes
+Verfahren mit Begründung und Quelle, vorläufiger Sachwert mit Vermerk. Nur
+der Spread-Satz sagte nicht, welche Verfahren er meint (der Sachwert liegt
+24 % daneben und ist absichtlich draußen). Sagt er jetzt (`v1212b`).
+
+> **Fast wäre ich auf mein eigenes Werkzeug hereingefallen:** ich wollte die
+> Quelle des führenden Verfahrens einbauen, weil meine Messung sie nicht
+> fand — **sie stand längst drin**. Meine Regex verschluckt alles in
+> Klammern, und die Quelle steht in Klammern. **Zum dritten Mal in dieser
+> Sitzung.**
+
+**`v1212` liegt auf Staging, nicht auf Prod.**
 
 ### Die Plausibilitätsprüfung wird endlich gehört — `v1211`, 03.09.2026 (`a4abcd0`…`49dcd29`)
 

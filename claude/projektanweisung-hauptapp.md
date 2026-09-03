@@ -5718,6 +5718,66 @@ Alle fünf Container laufen, `mb-backend` ohne Fehler im Log.
 > Dateien ankommen; nicht bewiesen ist, dass ein **dort** erzeugter Bericht
 > es zeigt. Das ist ein Abnahmepunkt, kein Verdacht.
 
+### v1212 / v1212b (03.09.2026, `7c05d24` · `cb80d4e`) — die Vergleichstabelle zeigte eine Auswahl und nannte sie nicht
+
+**Was.** Backlog-Punkt **1c**, Rest: die Vergleichspreise und
+„Wertverfahren im Vergleich" waren die letzten ungeprüften Stücke des
+Ergebnis-Teils. Am Bericht 85 nachgemessen.
+
+**Drei Befunde bei den Vergleichspreisen, alle in derselben Klasse.**
+
+1. **Die Überschrift log nicht, aber sie verschwieg.** „Vergleichsobjekte
+   (10)" stand neben einem Median, der aus `sample_size = 42` stammt. Der
+   Median der **zehn gezeigten** ist 1.888 €/m², ausgewiesen sind 1.695. Wer
+   nachrechnet, kommt nicht hin und weiß nicht warum.
+2. **Es gab keine Ortsspalte.** Gemessen: **acht der zehn** Vergleiche liegen
+   in `32312 Lübbecke`, das Objekt in `32609 Hüllhorst`. Keine
+   Regelverletzung — 5 km Radius, derselbe Kreis Minden-Lübbecke — aber nach
+   ImmoWertV muss die Vergleichbarkeit begründet sein, und „acht von zehn aus
+   dem Nachbarort" ist genau so eine Begründungspflicht. Der Leser konnte es
+   nicht sehen.
+3. **Die Entfernung war eine Ortsentfernung und sah wie eine gemessene aus.**
+   Die Spalte zeigte für acht Objekte identisch `3526 m`, für zwei `2046 m`.
+   Gemessen: zehn Objekte, **zwei** verschiedene Koordinatenpaare — die
+   Standorte sind je Ort zusammengefasst.
+
+Behoben: Titel „Vergleichsobjekte (10 von 42)", neue Spalte **Ort** mit PLZ
+und Gemeinde, und zwei Sätze unter der Tabelle. **Beide Sätze entstehen nur,
+wenn der Befund wirklich vorliegt** — der erste bei `sample_size > gezeigte`,
+der zweite, wenn weniger Koordinaten als Objekte da sind. Zur Laufzeit
+gezählt, nicht behauptet; bei sauberen Daten steht dort nichts.
+
+**„Wertverfahren im Vergleich" ist geprüft und in Ordnung.** Die Verfahren
+werden **nicht gemittelt**, das führende ist benannt, mit Begründung **und**
+Quelle (*Grundstücksmarktbericht 2025, Abschnitt 6.1 · § 6 Abs. 1
+ImmoWertV*), und der vorläufige Sachwert trägt seinen Vermerk. Kein Befund.
+
+Eine Lesefalle blieb (`v1212b`): `spread_pct` 0,5 % entsteht aus 194.000 und
+195.000, also aus Ertrags- und Vergleichswert. Der Sachwert (242.274 €) ist
+absichtlich draußen, weil vorläufig und kein Marktwert — fachlich richtig.
+Aber der Leser sieht drei Zahlen, von denen eine 24 % daneben liegt, und
+darunter *„die Verfahren stützen sich gegenseitig"*. Der Satz sagt jetzt,
+**welche** Verfahren gemeint sind und warum der Sachwert außen vor bleibt.
+Mit dem Zusatz ist er länger als der Satzspiegel und wird umbrochen —
+die Falle aus v959, wo Seite 4 mit *„Kein Gutachten n. § 194 Bau"* endete.
+
+> **Eine Fast-Fehlleistung, die hier hingehört.** Ich wollte gerade die
+> Quelle des führenden Verfahrens ins PDF einbauen, weil meine Messung sie
+> dort nicht fand. **Sie stand längst drin** (`app.js:3672`). Meine
+> Extraktions-Regex kommt ohne Backslashes aus und verschluckt damit alles in
+> Klammern — und die Quelle steht in Klammern. **Zum dritten Mal in dieser
+> Sitzung hat mein eigenes Werkzeug die Ausnahme versteckt.** Gerettet hat
+> mich nur, dass ich vor dem Bauen in den Code gesehen habe.
+
+**Nachweis.** PDF neu erzeugt: Titel „Vergleichsobjekte (10 von 42)",
+Kopfzeile `Typ · Ort · Fläche · Baujahr · Preis · €/m² · Entf.`, erste Zeile
+`wohnung · 32312 Lübbecke · 55.52 m² · 1968 · 94.000 € · 1.693 · 3526 m`,
+beide Hinweissätze unter der Tabelle, der Spread-Satz sauber auf zwei Zeilen.
+Konsole ohne Fehler.
+
+**Rest.** `v1212` liegt auf **Staging**, nicht auf Prod. Damit ist
+Backlog-Punkt **1c vollständig abgearbeitet**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
