@@ -1099,6 +1099,22 @@ function _computeYearTotal(year, yearIdx, vorgabe) {
     werbungskosten: werbungskosten,
     einnahmen: einnahmen,
     ergebnis: ergebnis,
+    /* v1225 · DIE AfA IST EINE ZAHL, ABER ZWEI FORMULARZEILEN.
+       Zeile 35 der Anlage V heisst woertlich „Absetzung fuer Abnutzung fuer
+       Gebaeude (OHNE Betraege in den Zeilen 36 bis 41)"; die Sonderab-
+       schreibung nach § 7b gehoert in Zeile 38. Oben wird beides zu einem
+       Feld addiert (afa = afaGebaeude + afaSonder7bJahr), und der gespeicherte
+       Steuersatz hat nur eine Spalte dafuer.
+
+       Hier wird nichts neu gerechnet und nichts umgebaut — die beiden Summanden
+       werden nur MITGETEILT, damit die Anlage-V-Seite sie trennen kann.
+
+       Nur ohne `vorgabe`: mit Vorgabe rechnet diese Funktion fuer ein FREMDES
+       Objekt (Steuer-Mappe), und State._afaSeries* gehoert zum geoeffneten.
+       Ein Wert aus dem falschen Objekt waere schlimmer als keiner — deshalb
+       dann null, was „nicht bekannt" heisst und auf dem Blatt auch so steht. */
+    afaLinear:    vorgabe ? null : afaGebaeude,
+    afaSonder7b:  vorgabe ? null : afaSonder7bJahr,
     refund: impact.refund,
     taxDelta: impact.taxDelta,
     /* v1133-steuerwirkung: calcImmoTaxImpact rechnet ESt vorher/nachher und

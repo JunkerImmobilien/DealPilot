@@ -1237,7 +1237,7 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
      wichtiger als die Zuordnung selbst — ein Leser muss unterscheiden können,
      was aus dem Formular abgeschrieben ist und was aus der Art des Aufwands
      folgt. Ohne diese Unterscheidung sieht beides gleich sicher aus. */
-  var ohne = [], zugeordnetSumme = 0, sachlogik = [];
+  var ohne = [], zugeordnetSumme = 0, sachlogik = [], afaHinweis = null;
   Object.keys(T.felder).forEach(function (f) {
     if (f === 'einnahmen_km' || f === 'einnahmen_nk') return;
     var z = T.felder[f];
@@ -1246,10 +1246,45 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
     if (!betrag) return;                       /* Nullposten nicht drucken */
     var zz = T.zeilen[z.zeile] || {};
     var mark = (z.quelle === 'sachlogik') ? ' °' : ((z.quelle === 'auffang') ? ' *' : '');
+    /* v1225 · DIE AfA GEHT IN ZWEI ZEILEN, WENN § 7b DRINSTECKT.
+       Zeile 35 heisst woertlich „ohne Betraege in den Zeilen 36 bis 41" — eine
+       Gebaeude-AfA, die eine Sonderabschreibung nach § 7b enthaelt, gehoert
+       dort also NICHT vollstaendig hin. Die Aufteilung kennt _computeYearTotal
+       nur fuer das geoeffnete Objekt; fuer einen gespeicherten Satz (Mappe)
+       ist sie null. Dann wird nicht geschaetzt, sondern gesagt. */
+    if (f === 'afa') {
+      var lin = totals.afaLinear, son = totals.afaSonder7b;
+      var eigen = (v.afa === (totals.auto && totals.auto.afa));   /* nicht von Hand geaendert */
+      if (son != null && son > 0 && eigen && lin != null) {
+        var zSon = T.zeilen[38] || {};
+        zeile('Zeile ' + z.zeile, zz.kz, 'AfA Gebäude (linear, ohne § 7b)', lin);
+        zeile('Zeile 38', zSon.kz, 'Sonderabschreibung § 7b EStG', son);
+        afaHinweis = 'Die Gebäude-AfA von ' + eur(betrag) + ' enthält eine Sonderabschreibung '
+          + 'nach § 7b EStG. Zeile 35 nimmt laut Formular nur den Betrag „ohne die Zeilen 36 bis 41" '
+          + 'auf, deshalb steht der § 7b-Anteil hier getrennt in Zeile 38.';
+        zugeordnetSumme += betrag;
+        return;
+      }
+      if (son == null && betrag) {
+        afaHinweis = 'Ob in dieser Gebäude-AfA eine Sonderabschreibung nach § 7b EStG steckt, '
+          + 'geht aus dem gespeicherten Steuersatz nicht hervor — er führt für beides eine Spalte. '
+          + 'Zeile 35 nimmt laut Formular nur den Betrag „ohne die Zeilen 36 bis 41" auf: enthält '
+          + 'Ihre AfA einen § 7b-Anteil, gehört dieser in Zeile 38 und ist hier abzuziehen.';
+      }
+    }
     zeile('Zeile ' + z.zeile, zz.kz, (_AV_LABEL[f] || f) + mark, betrag);
     if (z.quelle === 'sachlogik' && z.grund) sachlogik.push({ f: f, zeile: z.zeile, grund: z.grund });
     zugeordnetSumme += betrag;
   });
+  if (afaHinweis) {
+    _need(9);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.8);
+    doc.setTextColor(150, 120, 70);
+    var _ah = doc.splitTextToSize(afaHinweis, CW - 28);
+    doc.text(_ah, M + 28, cy);
+    cy += _ah.length * 3.2 + 2.5;
+    doc.setTextColor(42, 39, 39);
+  }
   if (zugeordnetSumme === 0) {
     doc.setFontSize(7.5); doc.setTextColor(140, 134, 128);
     doc.text('Keine Position mit Betrag erfasst.', M + 28, cy);

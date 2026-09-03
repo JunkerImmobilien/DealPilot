@@ -162,7 +162,7 @@ window.AnlageV2025 = {
   /* Was DealPilot nicht getrennt fuehrt und deshalb in der Ansicht benannt
      statt weggelassen wird. */
   nicht_erfasst: [
-    { zeile: 38, text: 'Sonderabschreibung nach § 7b EStG — DealPilot rechnet sie, führt sie aber NICHT getrennt: tax.js:1009 legt sie mit der Gebäude-AfA zusammen (afa = afaGebaeude + afaSonder7bJahr), und der gespeicherte Steuersatz hat nur eine Spalte „afa". Enthält Ihre AfA eine § 7b-Sonderabschreibung, gehört dieser Teil laut Formular NICHT in Zeile 35, sondern hierher.' },
+    { zeile: 38, text: 'Sonderabschreibung nach § 7b EStG — DealPilot rechnet sie und weist sie seit v1225 getrennt aus, SOLANGE die Aufteilung bekannt ist: beim geöffneten Objekt ist sie es, beim gespeicherten Steuersatz nicht (er führt für lineare AfA und § 7b nur eine Spalte „afa", tax.js:1009). Steht auf dem Blatt keine Zeile 38, obwohl Ihre AfA einen § 7b-Anteil enthält, gehört dieser Teil laut Formular NICHT in Zeile 35, sondern hierher.' },
     { zeile: 41, text: 'Erhöhte Absetzungen nach §§ 7h, 7i EStG oder Schutzbaugesetz — nicht getrennt erfasst; sie stecken gegebenenfalls in der AfA laut Zeile 35.' },
     { zeile: 19, text: 'Einnahmen für an Angehörige vermietete Wohnungen — DealPilot unterscheidet nicht nach Mieterkreis.' },
     { zeile: 25, text: 'Mieten für frühere Jahre, Mietkautionen, Mietvorauszahlungen — nicht erfasst.' },
