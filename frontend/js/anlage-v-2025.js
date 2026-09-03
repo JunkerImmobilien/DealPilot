@@ -44,9 +44,10 @@
                    dem Formulartext. Mit Begründung, und in der Ansicht als
                    solche gekennzeichnet.
 
-   Von 26 Feldern: 10 aus dem Formular, 10 über den Auffangposten, 5 aus
-   Sachlogik, EINES bleibt offen (AfA auf bewegliche Wirtschaftsgüter — die
-   Anlage V führt dafür keine eigene Zeile).
+   Von 26 Feldern: 11 aus dem Formular, 10 über den Auffangposten, 5 aus
+   Sachlogik. SEIT v1220 IST KEINES MEHR OFFEN: die AfA auf bewegliche
+   Wirtschaftsgüter steht in Zeile 45 (Kz 60) — Marcel hatte auf sie
+   hingewiesen, die Nummer stand zwölf Zeilen tiefer als vermutet.
 
    ICH BIN KEIN STEUERBERATER. Die Abschriften sind Abschrift; alles andere
    ist gekennzeichnet, damit es geprüft werden kann statt geglaubt.
@@ -76,7 +77,10 @@ window.AnlageV2025 = {
     31: { text: 'Ergebnis der Zeilen 29 und 30', kz: '08' },
     32: { text: 'Summe der Einnahmen aus den Zeilen 15, 18 bis 28 und 31' },
 
-    35: { text: 'Absetzung für Abnutzung für Gebäude — abzugsfähige Werbungskosten', kz: '30' },
+    35: { text: 'Absetzung für Abnutzung für Gebäude (ohne Beträge in den Zeilen 36 bis 41) — abzugsfähige Werbungskosten', kz: '30' },
+    38: { text: 'Sonderabschreibung für Mietwohnungsneubau nach § 7b EStG — abzugsfähige Werbungskosten', kz: '70' },
+    41: { text: 'Erhöhte Absetzungen nach den §§ 7h, 7i EStG und / oder nach dem Schutzbaugesetz — abzugsfähige Werbungskosten', kz: '31' },
+    45: { text: 'Absetzung für Abnutzung für Wirtschaftsgüter, die keine Gebäude sind (z. B. bewegliche Wirtschaftsgüter) — abzugsfähige Werbungskosten', kz: '60' },
     48: { text: 'Schuldzinsen (ohne Tilgungsbeträge) — abzugsfähige Werbungskosten', kz: '33' },
     51: { text: 'Geldbeschaffungskosten (z. B. Schätz-, Notar-, Grundbuchgebühren) — abzugsfähige Werbungskosten', kz: '34' },
     54: { text: 'Renten, dauernde Lasten — abzugsfähige Werbungskosten', kz: '35' },
@@ -146,18 +150,27 @@ window.AnlageV2025 = {
     anschaffungsnah:  { zeile: 35, art: 'wk', quelle: 'sachlogik', grund: 'Anschaffungsnahe Herstellungskosten (§ 6 Abs. 1 Nr. 1a EStG) sind nicht sofort abziehbar; sie erhöhen die Bemessungsgrundlage und wirken über die AfA in Zeile 35.' },
 
     /* Weiterhin offen. */
-    sonst_bewegl_wg:  { zeile: null, art: 'wk', grund: 'AfA auf bewegliche Wirtschaftsgüter (Einrichtung). Die Anlage V führt dafür keine eigene Zeile; ob sie zu den sonstigen Kosten (Zeile 82) gehört oder gesondert zu erläutern ist, hängt vom Einzelfall ab.' }
+    /* v1220: Marcel wies auf Zeile 36 hin. Im Formular 2025 ist 36 die
+       Sonderabschreibung nach Paragraf 7b; die beweglichen Wirtschaftsgueter
+       stehen in 42-45, Summe in Zeile 45 (Kz 60), woertlich: "Absetzung fuer
+       Abnutzung fuer Wirtschaftsgueter, die keine Gebaeude sind (z. B.
+       bewegliche Wirtschaftsgueter)". Der Sachverhalt stimmte, die Nummer
+       nicht — genau dafuer ist die Abschrift da. */
+    sonst_bewegl_wg:  { zeile: 45, art: 'wk', quelle: 'formular' }
   },
 
-  /* Was DealPilot gar nicht erfasst und deshalb in der Ansicht leer bleibt.
-     Steht hier, damit die Ansicht es BENENNEN kann statt es wegzulassen. */
+  /* Was DealPilot nicht getrennt fuehrt und deshalb in der Ansicht benannt
+     statt weggelassen wird. */
   nicht_erfasst: [
+    { zeile: 38, text: 'Sonderabschreibung nach § 7b EStG — DealPilot rechnet sie, führt sie aber NICHT getrennt: tax.js:1009 legt sie mit der Gebäude-AfA zusammen (afa = afaGebaeude + afaSonder7bJahr), und der gespeicherte Steuersatz hat nur eine Spalte „afa". Enthält Ihre AfA eine § 7b-Sonderabschreibung, gehört dieser Teil laut Formular NICHT in Zeile 35, sondern hierher.' },
+    { zeile: 41, text: 'Erhöhte Absetzungen nach §§ 7h, 7i EStG oder Schutzbaugesetz — nicht getrennt erfasst; sie stecken gegebenenfalls in der AfA laut Zeile 35.' },
     { zeile: 19, text: 'Einnahmen für an Angehörige vermietete Wohnungen — DealPilot unterscheidet nicht nach Mieterkreis.' },
     { zeile: 25, text: 'Mieten für frühere Jahre, Mietkautionen, Mietvorauszahlungen — nicht erfasst.' },
     { zeile: 26, text: 'Einnahmen aus Garagen, Werbeflächen, Kiosken — in DealPilot Teil der Mieteinnahmen, nicht getrennt.' },
     { zeile: 27, text: 'Vereinnahmte Umsatzsteuer — DealPilot rechnet ohne Umsatzsteuer.' },
     { zeile: 28, text: 'Vom Finanzamt erstattete Umsatzsteuer — nicht erfasst.' },
     { zeile: 29, text: 'Öffentliche Zuschüsse, Guthabenzinsen — nicht erfasst.' },
+    { zeile: 79, text: 'An das Finanzamt gezahlte Umsatzsteuer — nur bei umsatzsteuerpflichtiger Vermietung; DealPilot rechnet ohne.' },
     { zeile: 87, text: 'Kürzung wegen verbilligter Vermietung — DealPilot warnt seit v1216 vor der 66-%-Grenze, trägt die Kürzung aber nicht ein.' }
   ]
 };
