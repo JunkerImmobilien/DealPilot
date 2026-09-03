@@ -3313,7 +3313,7 @@ async function exportPdf(out) {
     doc.setFillColor(184, 98, 92); doc.roundedRect(M, y, 1.6, _ph, 0.8, 0.8, 'F');
     doc.setFont('helvetica', 'bold'); doc.setFontSize(6.9); doc.setTextColor(184, 98, 92);
     doc.setCharSpace(0.3);
-    doc.text('ANGABEN, DIE GEPRUEFT GEHOEREN', M + 5, y + 5.5);
+    doc.text('ANGABEN, DIE GEPRÜFT GEHÖREN', M + 5, y + 5.5);
     doc.setCharSpace(0);
     doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(...MUT);
     let _yy = y + 10;
