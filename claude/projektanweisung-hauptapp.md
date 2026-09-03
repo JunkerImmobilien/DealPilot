@@ -5895,6 +5895,58 @@ zweites Modal neben einem vorhandenen) und **ob die Einsortierung in der
 Praxis trifft** — nur durch einen echten Sprechlauf am Gerät.
 **`v1214` liegt auf Staging.**
 
+### Prod-Rollout 03.09.2026, dritter — v1212 bis v1214 sind live (`8269465`)
+
+**Freigabe.** Marcel auf die Frage *„Soll ich v1212, v1213, v1214 auf
+Produktion ziehen? Ein ja reicht"*: *„ja fang an."*
+
+**Gesichert:** `/root/backups/haupt-20260903-0958.sql.gz` (9.284 Zeilen) und
+`mb-20260903-0958.sql.gz` (35.275 Zeilen).
+
+**Weg.** Fast-Forward `b0dcfc1` → `8269465`, 8 Commits. **Kein
+Backend-Neubau** — alle drei Versionen sind reines Frontend
+(`app.js`, `wertermittlung.js`, `object-actions.js`), und das Frontend ist
+volume-mounted.
+
+**Auslieferung auf Prod gelesen:**
+
+| | |
+|---|---|
+| Tabellenkopf | `['Typ', 'Ort', 'Fläche', 'Baujahr', 'Preis', '€/m²', 'Entf.']` |
+| Auswahlhinweis „… Vergleichen gezeigt" | 1 |
+| „keine Objektentfernung" | 2 |
+| Spread-Satz „zwischen Vergleichs- und Ertragswert" | 1 |
+| tote Regel `outline:2px solid --wl-b8625c` | **0** (weg) |
+| ihre Begründung im Code | 1 |
+| `_wertSchreiben` in `object-actions.js` | 3 |
+| Cache-Buster | `app 1213` · `wertermittlung 1213` · `object-actions v1214` · `view 1213` |
+
+App neu geladen, `applyQcPending` ist da, Konsole ohne Fehler.
+
+**Die offene Abnahme aus dem zweiten Rollout ist eingelöst.** Marcel hat sich
+angemeldet, danach ließ sich der Prod-Bericht ziehen (Bielefeld, Replay,
+kostenlos):
+
+- **Negativprobe bestanden:** der Bericht hat **keine** Hinterlandfläche,
+  **keine** Plausibilitätswarnung und **keine** amtliche Miete — und
+  entsprechend erscheint **keiner** der drei neuen Kästen. Genau so ist es
+  gebaut: kein Befund, kein Kasten.
+- **Gegenprobe am Prod-Code:** mit ergänzten Daten gefüttert (nur im
+  Speicher, nichts geschrieben) zeichnet derselbe Code die
+  **Hinterland-Zeile auf S3** und den Kasten **„ANGABEN, DIE GEPRÜFT
+  GEHÖREN" auf S3** mit dem richtigen Text.
+- Der **Mietkasten** erscheint auch dann nicht — **und das ist richtig**:
+  `cross_check.available` ist bei diesem Bericht `false`, es gibt gar keine
+  Sektion „Wertverfahren im Vergleich", in der er stehen könnte. Im
+  Inhaltsverzeichnis fehlt sie folgerichtig.
+- `MARKTWERT-SPANNE` ist weg, das Inhaltsverzeichnis führt
+  `Lage & Marktumfeld` als ein Kapitel — `v1207` und `v1208` wirken auf Prod.
+
+Der Prüfzustand wurde durch Neuladen abgeräumt; `jspdf.jsPDF` und `confirm`
+sind wieder nativ, nichts wurde in die Datenbank geschrieben.
+
+**Damit ist Prod auf dem Stand von Staging.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
