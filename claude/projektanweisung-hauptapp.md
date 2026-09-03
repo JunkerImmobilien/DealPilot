@@ -5540,6 +5540,59 @@ Wohnung"*. Beides sind Objektdaten, keine Defekte — aber die Kaltmiete ist
 mit ziemlicher Sicherheit ein Tippfehler. **Genau dafür ist die Prüfung
 gebaut, und sie hat funktioniert.**
 
+### v1210 (03.09.2026, `8788256`) — 828 m² rechneten mit und standen nirgends
+
+**Was.** Backlog-Punkt **1c** abgearbeitet: die Rechenwege waren bis dahin nur
+überflogen. Am frischen Bericht 83 (Stufe 3, Hüllhorst) Zeile für Zeile
+nachgerechnet.
+
+**Alles, was rechnet, stimmt:**
+
+| | |
+|---|---|
+| Ertragswert | 9.300 + 1.080 = 10.380 Rohertrag · 27 % BWK = 2.803 · Reinertrag 7.577 · Bodenwertverzinsung 40.338 × 2,56 % = 1.033 · Gebäudereinertrag 6.544 × 23,02 = 150.643 · + 2.959 sonstige + 40.338 Bodenwert = **193.940**, angezeigt **194.000** |
+| Sachwert | 798 €/m² × 195 m² BGF = 155.610 · × 2,02 + 14.800 = 329.132 · − 184.314 (44,8 von 80 Jahren) + 8.000 + 12.000 + 37.118 = 201.936 Gebäudesachwert · + 40.338 = **242.274** |
+| Bodenwert | 950 × 90 + 828 × 5 = 89.640 · −10 % Lärm = 80.676 · × 50 % MEA = **40.338** |
+
+Die BWK-Quote steht auf dem **gesamten** Rohertrag inklusive Stellplätzen,
+nur der **rentierliche** Bodenwert wird verzinst — beides so, wie `CLAUDE.md`
+es verlangt. Die Kette kommt an; 193.940 → 194.000 ist eine Rundung und
+sonst nichts.
+
+**Der eine Befund.** Die Stammdaten sagten „Grundstück 950 m²". Die
+Bodenwertrechnung darunter rechnete **1.778 m²**. Die 828 m² Hinterland kamen
+im ganzen Dokument nicht vor, und die 4.140 € dafür waren für einen Leser
+nicht herleitbar.
+
+> **Kein Rechenfehler.** Das Eingabefeld heißt ausdrücklich „*Zusätzliche*
+> Grundstücksfläche / Hinterland", `ref.hinterland_qm` steht sauber im
+> Payload, und § 41 verlangt für selbständig nutzbare Teilflächen ohnehin die
+> getrennte Bewertung. **Es ist dasselbe Problem wie die 4,89 €/m² in
+> `v1207`, nur andersherum: dort stand eine Zahl da, die nicht rechnete —
+> hier rechnete eine, die nicht dastand.**
+
+Neue Stammdatenzeile **„Hinterland 828 m² · 5 €/m²"**. Der Wertansatz steht
+mit dabei, weil er eine *eigene* Angabe ist und keine amtliche.
+
+**Commit.** `8788256` — `app.js`, `CLAUDE.md`, Cache-Buster-Kette auf 1210.
+
+**Nachweis.** PDF neu erzeugt, Seite 3 ausgelesen: `Grundstück · 950 m²` /
+`Hinterland · 828 m²  ·  5 €/m²` / `Wohneinheiten · 3`. Konsole ohne Fehler.
+
+**`CLAUDE.md` präzisiert — der Prüfmaßstab ist der DATENSATZ, nicht die
+Adresse.** Das App-Objekt `2026-001` trägt dieselbe Anschrift wie das
+Testobjekt Hüllhorst, aber ETW **100 m² / Bj 1962** statt 165 m² / Bj 1968.
+Es rechnet folgerichtig 242.274 € Sachwert statt 305.937 und 4,89 €/m²
+amtliche Miete statt 4,83 — **die Mietpreisübersicht staffelt nach Fläche und
+Baujahr**, das ist genau dieser Effekt und kein Fehler. Wer `2026-001` lädt
+und gegen die Zeile in `CLAUDE.md` prüft, jagt ein Gespenst. Die
+nachgerechneten Werte stehen jetzt als Gegenprobe dort.
+
+**Rest.** `v1210` liegt auf **Staging**, nicht auf Prod — dafür fehlt die
+Freigabe. Offen im Ergebnis-Teil bleiben die **Vergleichspreise** (die 42
+Angebote hinter dem Median: Herkunft, Filterradius, Ausreißer) und
+„**Wertverfahren im Vergleich**" in der Web-Ansicht.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

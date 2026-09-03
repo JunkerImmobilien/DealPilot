@@ -187,11 +187,18 @@ soll, ist eine Optikfrage — Demo vor Bau.**
 anders aus. Im Code steht bewusst die Konvention, die die Datei ohnehin
 dokumentiert. **Das ist eine Bewertungsfrage, also Marcels.**
 
-**c) Der Ergebnis-Teil ist nur überflogen.** Neun Abschnitte, 3682 px.
-Angesehen wurden Kennzahlenzeile, Score-Komponenten und die Kopfzeilen der
-Verfahren. **Nicht** geprüft: Vergleichspreise, Bodenwert, „Wertverfahren
-im Vergleich" im Detail, die Rechenwege hinter „▸ Rechenweg", und der
-PDF-Export.
+**c) Der Ergebnis-Teil ist weitgehend geprüft.** Nachgerechnet am frischen
+Bericht 83 (Stufe 3, 03.09.2026), Zeile für Zeile: **Bodenwert**,
+**Sachwert-Rechenweg** und **Ertragswert-Rechenweg** stimmen durchgängig,
+die BWK-Quote steht auf dem gesamten Rohertrag, nur der rentierliche
+Bodenwert wird verzinst. Der eine Befund daraus ist gebaut (`v1210`, siehe
+Fertig): die Hinterlandfläche rechnete mit und stand in keiner
+Stammdatenzeile. Der **PDF-Export** ist mit `v1206`–`v1210` durch.
+
+**Nicht** geprüft bleiben: die **Vergleichspreise** (die 42 Angebote hinter
+dem Median — Herkunft, Filterradius, Ausreißer) und „**Wertverfahren im
+Vergleich**" in der Web-Ansicht (die Verrechnung der drei Werte zum
+führenden Verfahren, nicht die drei Werte selbst).
 
 **d) Der PDF-Bericht ist durchgesehen und zweimal umgebaut.** Marcel hat den
 eigenen Export gelesen. Gebaut sind: 03 und 04 zu einer Sektion mit der
@@ -2338,6 +2345,40 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Die Rechenwege sind nachgerechnet — `v1210`, 03.09.2026 (`8788256`)
+
+Backlog-Punkt **1c** („der Ergebnis-Teil ist nur überflogen", nicht geprüft
+waren Bodenwert und die Rechenwege). Am frischen Bericht 83 Zeile für Zeile
+nachgerechnet.
+
+**Was stimmt — alles, was gerechnet wird:**
+
+| | |
+|---|---|
+| Ertragswert | 9.300 + 1.080 = 10.380 Rohertrag · 27 % BWK = 2.803 · Reinertrag 7.577 · Bodenwertverzinsung 40.338 × 2,56 % = 1.033 · Gebäudereinertrag 6.544 × 23,02 = 150.643 · + 2.959 + 40.338 = **193.940**, angezeigt 194.000 |
+| Sachwert | 798 × 195 = 155.610 · × 2,02 + 14.800 = 329.132 · − 184.314 (44,8 von 80 J.) + 8.000 + 12.000 + 37.118 = 201.936 · + 40.338 = **242.274** |
+| Bodenwert | 950 × 90 + 828 × 5 = 89.640 · −10 % Lärm = 80.676 · × 50 % MEA = **40.338** |
+
+Die BWK-Quote steht auf dem **gesamten** Rohertrag inklusive Stellplätzen,
+wie `CLAUDE.md` es verlangt. Nur der rentierliche Bodenwert wird verzinst.
+Die Kette kommt an, die Rundung ist eine Rundung.
+
+**Ein Befund, und der ist gebaut.** Die Stammdaten sagten „Grundstück
+950 m²", die Bodenwertrechnung darunter rechnete **1.778 m²** (950 × 90 €
+plus 828 × 5 €). Die 828 m² kamen im ganzen Dokument nicht vor, die 4.140 €
+dafür waren nicht herleitbar. **Kein Rechenfehler** — das Feld heißt
+ausdrücklich „*Zusätzliche* Grundstücksfläche / Hinterland". Es ist dasselbe
+Problem wie die 4,89 €/m² in `v1207`, nur andersherum: dort stand eine Zahl
+da, die nicht rechnete, hier rechnete eine, die nicht dastand. Neue
+Stammdatenzeile **„Hinterland 828 m² · 5 €/m²"**, im PDF nachgewiesen.
+
+**`CLAUDE.md` präzisiert: der Prüfmaßstab ist der Datensatz, nicht die
+Adresse.** Das App-Objekt `2026-001` trägt dieselbe Anschrift wie das
+Testobjekt Hüllhorst, aber ETW **100 m² / Bj 1962** statt 165 m² / Bj 1968.
+Es rechnet folgerichtig 242.274 € Sachwert statt 305.937 und 4,89 €/m²
+amtliche Miete statt 4,83 — die Mietpreisübersicht staffelt nach Fläche und
+Baujahr. Wer das verwechselt, jagt ein Gespenst.
 
 ### `v1209` ist abgenommen — echter Bericht, echter Lauf, 03.09.2026
 
