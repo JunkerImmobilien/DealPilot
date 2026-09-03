@@ -38,9 +38,31 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Übergabe 03.09.2026, zweiter Teil: die Gesellschaft)
 
-**Stand:** lokal = GitHub = Staging auf `39ba8e0`.
+**Stand:** lokal = GitHub = Staging auf `cfbf1d9`.
 **Produktion steht auf `6047036`** — **`v1215` bis `v1228` sind NICHT auf Prod.**
 Reines Frontend, kein Rebuild, keine Migration.
+
+> ### Der erste Griff am 04.09.
+>
+> **Marcel fragen, ob v1215–v1228 auf Prod sollen.** Das ist der einzige
+> Punkt, der wartet und nicht von einer Entscheidung abhängt, die noch
+> aussteht. Reines Frontend: `git pull` auf `157.90.117.167`, kein Rebuild,
+> keine Migration — vorher sichern (`/root/backups/`, **beide** Datenbanken,
+> `dealpilot-mb-db` steht in keinem Backup-Skript).
+>
+> Danach in dieser Reihenfolge:
+> 1. **Die fünf Fragen an den Steuerberater** aus dem Prüfbefund — vor allem,
+>    ob ihm Bilanz und GuV in dieser Form reichen oder ob seine
+>    Kanzleisoftware einen DATEV-Buchungsstapel braucht. **Die Antwort
+>    entscheidet, ob als Nächstes ein Buchungsstapel-Export gebaut wird
+>    oder nicht** — deshalb steht sie vor allem anderen Code.
+> 2. **§ 7b-Spalte in `tax_records`** — Datenbankeingriff, braucht Marcels
+>    Freigabe. Bis dahin steht im PDF der ehrliche Hinweis statt einer Zahl.
+> 3. Aufräumen auf Staging, falls Marcel es will: Mandant „Test UG (v1226)"
+>    und der Halter am Objekt „Am Markt 9 Kabelsketal".
+>
+> **Nichts hängt halbfertig.** Kein Rebuild offen, keine Migration offen,
+> Arbeitsverzeichnis sauber.
 
 Marcels Frage: *„wie müssen wir wohnungen und häuser dann in einer gmbh oder
 ug angeben? … was ist wenn mehrere objekte in einer gesellschaft sind. können
