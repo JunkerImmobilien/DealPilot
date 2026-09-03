@@ -1334,6 +1334,36 @@ function _renderDetailForm(years) {
       var auto = totals.auto[r.f] || 0;
       var val = v[r.f] != null ? v[r.f] : auto;
       var help = helpTexts[r.f] || '';
+      /* v1222 · DIE ANLAGE-V-ZEILE GEHÖRT IN DIE INFO, NICHT DANEBEN.
+         Marcel: „prüfe das kleine Info-Teil ob dort auch beschreibungen drin
+         stehen und erklärungen und setze die Zeile mit unter das Info-Feld."
+         Er hat recht — dort steht bereits die fachliche Erklärung zu jedem
+         Posten. Eine zweite Pille daneben hätte dieselbe Sache an zwei Orten
+         erzählt; die Zeilennummer ist eine weitere Angabe ZU DIESEM Posten,
+         also gehört sie unter die vorhandene Erklärung.
+
+         Die Zuordnung ist JAHRESABHÄNGIG — sie kommt aus window.AnlageV<Jahr>,
+         der Abschrift des Formulars für genau dieses Jahr. Gibt es dafür keine
+         Datei, steht keine Zeile dort: lieber keine Nummer als die eines
+         anderen Jahres. */
+      var _avT = window['AnlageV' + y.year];
+      var _avF = (_avT && _avT.felder) ? _avT.felder[r.f] : null;
+      if (_avF && _avF.zeile != null) {
+        var _avZ = (_avT.zeilen && _avT.zeilen[_avF.zeile]) || {};
+        var _herkunft = (_avF.quelle === 'formular')
+              ? 'Wörtlich aus dem Formular übernommen.'
+            : (_avF.quelle === 'auffang')
+              ? 'Steht in keiner spezielleren Zeile — das Formular führt dafür „Sonstige Kosten".'
+            : (_avF.quelle === 'sachlogik')
+              ? 'Zuordnung aus der Art des Aufwands, nicht aus dem Formulartext — bitte prüfen.'
+              : '';
+        help += (help ? '\n\n' : '')
+          + '── ANLAGE V ' + y.year + ' ──\n'
+          + 'Zeile ' + _avF.zeile + (_avZ.kz ? '  ·  Kennzahl ' + _avZ.kz : '') + '\n'
+          + (_avZ.text ? _avZ.text + '\n' : '')
+          + (_avF.grund ? '\n' + _avF.grund + '\n' : '')
+          + (_herkunft ? '\n' + _herkunft : '');
+      }
       var labelHtml = r.l;
       if (help) {
         labelHtml += ' <span class="ytf-help" title="' + help.replace(/"/g, '&quot;') + '">ℹ</span>';
