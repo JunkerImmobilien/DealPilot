@@ -169,16 +169,21 @@ Fertig (`v1196`, `v1196b`, `v1197`). Kurzfassung:
 
 **Wo weitergemacht wird — drei benannte Baustellen:**
 
-**a) Pflichtangaben sind in den Reitern 2–5 nicht erkennbar.**
-`address`/`ptype`/`area`/`year` (Stufe 1), `cond`/`quality` (Stufe 2),
-`plot`/`units` (Stufe 3) tragen keinen Marker. Die einzige Stelle, die sie
-nennt, ist die Ampel **oben, außerhalb des Reiters**. Dazu passt: die CSS-
-Regel `.wm-f.fehlt input{outline:2px solid …}` existiert
-(`wertermittlung.js:393`), **aber die Klasse `fehlt` wird nirgends
-gesetzt** — gebaut und nie verdrahtet.
-**Vorschlag, noch nicht gebaut:** die fehlenden Felder der jeweils nächsten
-Stufe am Feld markieren, Text wieder aus der Ampel. **Wie es aussehen
-soll, ist eine Optikfrage — Demo vor Bau.**
+**a) Pflichtangaben sind in den Reitern markiert — erledigt, der Eintrag war
+veraltet.** Hier stand bis zum 03.09.2026: *„`address`/`ptype`/`area`/`year`
+… tragen keinen Marker … die CSS-Regel `.wm-f.fehlt` existiert, aber die
+Klasse `fehlt` wird nirgends gesetzt — gebaut und nie verdrahtet. Vorschlag,
+noch nicht gebaut."* **Das beschreibt den Stand vor `v1199`.** Gemessen:
+`mb-stufen.js` markiert seit `v1199`/`v1201`/`v1202` jedes offene Feld aller
+Stufen bis zur gewählten mit `mbst-fehltfeld` und hängt eine Zeile
+„fehlt für <Stufe>" ans Feld — in **Gold**, also Marcels Variante B.
+
+> Die alte Regel `.wm-f.fehlt` war **rot** — die Farbe der Variante, die
+> Marcel *nicht* gewählt hat. Sie ist mit `v1213` entfernt, an ihrer Stelle
+> steht die Begründung im Code. **Eine tote Regel in der Farbe der
+> verworfenen Variante ist die schlechteste Sorte Leiche: sie sieht aus, als
+> müsste man sie nur noch anschließen** — und genau so hat sie wochenlang
+> diesen Backlog-Punkt offen gehalten.
 
 **b) Die Konvention für fehlende Score-Teilwerte gehört entschieden.**
 `v1197` setzt „unbekannt" auf den **neutralen** Wert und nennt ihn im UI

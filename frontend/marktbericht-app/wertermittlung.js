@@ -444,7 +444,23 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
        * aber HELL (steht so in der Projektanweisung). Auf weissem Grund war
        * beides unsichtbar: Label und Platzhalter sichtbar, Feld nicht.
        * Jetzt erben die Felder die Formatierung der App wie alle anderen. */
-      '.wm-f.fehlt input,.wm-f.fehlt select{outline:2px solid var(--wl-b8625c,#B8625C);outline-offset:1px}' +
+      /* v1213 · Hier stand:
+       *   '.wm-f.fehlt input,.wm-f.fehlt select{outline:2px solid #B8625C}'
+       * DIE KLASSE `fehlt` WIRD NIRGENDS GESETZT — im ganzen frontend/ kein
+       * einziges classList.add('fehlt'). Die Regel war gebaut und nie
+       * verdrahtet; sie stand seit Wochen als offener Punkt im BACKLOG
+       * ("gebaut und nie verdrahtet") und hat dort den Eindruck erzeugt, die
+       * Feldmarkierung fehle noch.
+       * SIE FEHLT NICHT. Seit v1199/v1201/v1202 markiert mb-stufen.js die
+       * offenen Felder mit `mbst-fehltfeld` und haengt eine Zeile
+       * "fehlt fuer <Stufe>" ans Feld — in GOLD.
+       * Das Rot hier war die Variante, die Marcel am 02.09. NICHT gewaehlt
+       * hat ("b ist super" = Goldschiene). Eine tote Regel in der Farbe der
+       * verworfenen Variante ist die schlechteste Sorte Leiche: sie sieht
+       * aus, als muesste man sie nur noch anschliessen.
+       * Nicht kommentarlos geloescht, sondern hier begruendet — die Lehre
+       * aus js/bmf-modal-v292.js, das einmal faelschlich als Leiche
+       * verschwand. */
       '.wm-pf{color:var(--wl-b8625c,#B8625C);margin-left:3px}' +
       '.wm-ampel{margin:14px 0;padding:12px 14px;border:1px solid rgba(128,128,128,.22);border-radius:7px;font-size:12.5px}' +
       '.wm-z{display:flex;gap:8px;padding:5px 0;line-height:1.5;cursor:pointer}' +
