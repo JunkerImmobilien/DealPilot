@@ -1399,29 +1399,58 @@
     _importPhotos = all.slice(0, 6);
     renderMergedTable();
   }
+  /* v1214-VBOOL2 · EINE SCHREIBLOGIK FUER BEIDE WEGE.
+   *
+   * Gemessen am 03.09.2026: applyMerged() hatte seit v1168 einen bool-Zweig,
+   * applyQcPending() NICHT — obwohl der Kommentar darueber "gleiche
+   * Schreiblogik wie applyMerged" sagt. Sie WAR gleich, bis v1168 nur die
+   * eine Stelle angefasst hat.
+   *
+   * Die Folge im Quick-Check-Weg: ein diktiertes Haekchen faellt auf
+   * setInput() durch, das `el.value` schreibt und eine Checkbox unberuehrt
+   * laesst — und wird trotzdem als uebernommen GEZAEHLT. Der Nutzer liest
+   * "N Werte uebernommen" und hat ein leeres Haekchen. Wieder dasselbe
+   * Muster wie im Marktbericht: gemeldet wird, was nicht passiert ist.
+   *
+   * Rueckgabe ist die ART des Schreibens, nicht true/false — der Aufrufer
+   * braucht sie, um markSvwertAvm() weiterhin NUR im Textfall zu rufen.
+   * null heisst: nichts geschrieben, also auch nicht zaehlen. */
+  function _wertSchreiben(id, it) {
+    if (it.kind === 'star') {
+      if (it.raw > 0 && window.StarRating && typeof StarRating.setRating === 'function') {
+        StarRating.setRating(id, it.raw); return 'star';
+      }
+      return null;
+    }
+    if (it.kind === 'select') {
+      return setSelectSmart(id, it.raw, it.emptyOnly) ? 'select' : null;
+    }
+    if (it.kind === 'bool') {
+      /* `change` von Hand feuern: die Rechenkette haengt an Ereignissen, und
+         ein per Skript gesetztes .checked feuert keins. */
+      var el = document.getElementById(id);
+      if (el && el.type === 'checkbox' && !el.checked) {
+        el.checked = true;
+        try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+        return 'bool';
+      }
+      return null;
+    }
+    setInput(id, it.raw);
+    return 'text';
+  }
+
   function applyMerged() {
     var ov = $('oabi-ov'); if (!ov) return;
     if (_qcMode) { return applyMergedQc(ov); }  /* v418 */
     var n = 0, _applied = [];
     ov.querySelectorAll('.oabi-tbl input[type="checkbox"]:checked').forEach(function (cb) {
       var id = cb.getAttribute('data-id'), it = _merged[id]; if (!it) return;
-      if (it.kind === 'star') { if (it.raw > 0 && window.StarRating && typeof StarRating.setRating === 'function') { StarRating.setRating(id, it.raw); n++; _applied.push(id); } return; }
-      if (it.kind === 'select') { if (setSelectSmart(id, it.raw, it.emptyOnly)) { n++; _applied.push(id); } return; }
-      /* v1168-VBOOL: Haekchen brauchen einen eigenen Zweig — setInput()
-         schreibt in .value und laesst eine Checkbox unberuehrt. Sie waere
-         als uebernommen gezaehlt worden, ohne gesetzt zu sein.
-         `change` von Hand feuern: die Rechenkette haengt an Ereignissen,
-         und ein per Skript gesetztes .checked feuert keins. */
-      if (it.kind === 'bool') {
-        var _cbEl = document.getElementById(id);
-        if (_cbEl && _cbEl.type === 'checkbox' && !_cbEl.checked) {
-          _cbEl.checked = true;
-          try { _cbEl.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
-          n++; _applied.push(id);
-        }
-        return;
+      var _art = _wertSchreiben(id, it);
+      if (_art) {
+        if (_art === "text" && id === "svwert" && it.source === "Marktbericht") markSvwertAvm();
+        n++; _applied.push(id);
       }
-      setInput(id, it.raw); if (id === 'svwert' && it.source === 'Marktbericht') markSvwertAvm(); n++; _applied.push(id);
     });
     try {
       var pcb = ov.querySelector('.oabi-tbl input[data-photos="1"]:checked');
@@ -1494,9 +1523,11 @@
     Object.keys(_qcPendingMerged).forEach(function (id) {
       if (targets && !targets[id]) return;
       var it = _qcPendingMerged[id]; if (!it) return;
-      if (it.kind === 'star') { if (it.raw > 0 && window.StarRating && typeof StarRating.setRating === 'function') { StarRating.setRating(id, it.raw); n++; applied.push(id); } return; }
-      if (it.kind === 'select') { if (setSelectSmart(id, it.raw, it.emptyOnly)) { n++; applied.push(id); } return; }
-      setInput(id, it.raw); if (id === 'svwert') { try { markSvwertAvm(); } catch (e) {} } n++; applied.push(id);
+      var _art2 = _wertSchreiben(id, it);
+      if (_art2) {
+        if (_art2 === "text" && id === "svwert") { try { markSvwertAvm(); } catch (e) {} }
+        n++; applied.push(id);
+      }
     });
     _qcPendingMerged = {};
     try { if (typeof window._v236MarkQcLoaded === 'function' && applied.length) window._v236MarkQcLoaded(applied); } catch (e) {}
