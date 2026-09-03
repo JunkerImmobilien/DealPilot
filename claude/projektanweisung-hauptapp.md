@@ -5430,6 +5430,63 @@ Offen bleibt der **Fließtext des KI-Berichts**, der den Marktwert in fast
 jedem Absatz wiederholt — Textvorgabe, kein Layout. **Prod hat v1206 bis
 v1208 noch nicht.**
 
+### Prod-Rollout 03.09.2026 — v1205 bis v1209 sind live (`1f06705`)
+
+**Freigabe.** Marcel: *„ja umsetzen und auf prod ziehen."*
+
+**Gesichert vor dem Eingriff**, beide Datenbanken, wie die Regel es verlangt:
+`/root/backups/haupt-20260903-0440.sql.gz` (9.281 Zeilen) und
+`/root/backups/mb-20260903-0440.sql.gz` (35.275 Zeilen). Die
+Marktbericht-Datenbank steht in keinem Backup-Skript und braucht deshalb
+jedes Mal ihren eigenen `pg_dump`.
+
+**Weg.** `git push origin staging:main` (Fast-Forward, 14 Commits, vorher
+`git merge-base --is-ancestor` geprüft) · auf Prod `git pull --ff-only` von
+`39aa598` auf `1f06705` · `docker compose -f docker-compose.prod.yml up -d
+--build mb-backend`, weil drei Backend-Dateien dabei sind.
+
+**Was live geht.** `v1205` (deutsche Zahlen im Rechenweg — hing seit dem
+02.09. fest, weil es eine Backend-Änderung ohne Rebuild war) · `v1206`
+(03 und 04 zusammengelegt) · `v1207a–d` (Sektion 01 entschlackt,
+Energiebalken gebunden, Kasten „Welche Miete der Ertragswert rechnet") ·
+`v1208` (die Lage ist ein Kapitel) · `v1209` (Textvorgabe: jede Zahl genau
+einmal).
+
+**Auslieferung nachgewiesen, im Container gelesen:**
+
+| | |
+|---|---|
+| `report_prompt.txt` enthält „JEDE ZAHL GENAU EINMAL" | 1 Treffer |
+| `CrossCheckService.js` enthält `miete_vergleich` | 1 Treffer |
+| `ErtragswertService.js` enthält `deZahl` | 12 Treffer |
+| Cache-Buster-Kette, alle drei Glieder | `1208` |
+
+**Abnahme im Browser auf Prod**, am dort gespeicherten Bericht
+(Alexanderstraße 11, Bielefeld — ein **anderes** Objekt als auf Staging,
+und das ist der Punkt):
+
+- `MARKTWERT-SPANNE`: nicht mehr vorhanden.
+- `Preisstrategie`: nicht mehr vorhanden.
+- `AUSSAGEKRAFT DER INDIKATION`: nur noch in `03`.
+- `MINDESTPREIS`, `MAXIMALPREIS`, `UNTERE MIETE`, `OBERE MIETE`: alle vier
+  auf **derselben** Seite.
+- Inhaltsverzeichnis: **7 Abschnitte**, darunter ein `05 Lage & Marktumfeld`.
+- Konsole ohne Fehler, App lädt normal.
+
+> **Die Klinke aus `v1208` hat sich auf Prod sofort bewährt.** Dieser Bericht
+> hat weder `assessment` noch `macro` — `BEWERTUNG & POTENZIAL` und
+> `MAKROLAGE & SOZIOÖKONOMIE` zeichnen nicht. Nur
+> `INFRASTRUKTUR & NAHVERSORGUNG` zeichnet, und der Sektionstitel
+> `Lage & Marktumfeld` hängt korrekt an ihm. Ohne `lageSektion()` stünde dort
+> eine Zwischenüberschrift ohne Kapitel — der Fall war nicht theoretisch, er
+> tritt im ersten Prod-Bericht auf, den ich anfasse.
+
+**Offen und ehrlich gekennzeichnet.** Ob sich das Modell an „jede Zahl genau
+einmal" hält, zeigt erst der nächste **echte** Bericht — der kostet, und am
+Replay ist es nicht prüfbar. Die Auslieferung der Datei ist bewiesen, ihre
+Wirkung nicht. **Das ist der einzige Punkt aus diesem Rollout, der noch eine
+Abnahme braucht.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

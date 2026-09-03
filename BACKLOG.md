@@ -238,9 +238,6 @@ Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
 
 **Entscheidungen, die bei Marcel liegen**
 
-- **Soll der Marktwert auch im Fließtext des KI-Berichts seltener stehen?**
-  Der wiederholt ihn in fast jedem Absatz — die letzte verbliebene Quelle
-  der Wiederholung. Wäre eine Änderung an der Textvorgabe, kein Layout.
 - **Die Score-Konvention für fehlende Teilwerte** (`v1197`): neutral
   ersetzen — so gebaut — oder den Teilwert weglassen und die übrigen
   Gewichte hochnormieren.
@@ -251,6 +248,13 @@ Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
   Überschrift. Ein Einzeiler in beide Richtungen.
 
 **Beweise, die noch fehlen**
+
+- **Hält sich das Modell an „jede Zahl genau einmal"?** `v1209` ist auf Prod
+  ausgeliefert und im Container nachgewiesen — **die Wirkung ist es nicht.**
+  Am Replay nicht prüfbar: der gespeicherte Bericht trägt den alten Text.
+  Der Beweis ist der **nächste echte Bericht**, und der kostet. Wenn Marcel
+  ohnehin einen erstellt: nachzählen, ob 195.000 (oder das Gegenstück) noch
+  in Abschnitt C steht.
 
 - **Der `402`-Pfad ist nicht end-to-end bewiesen.** Serverseitig gelesen,
   frontendseitig gemessen; der Beweis unter echten Bedingungen braucht einen
@@ -2340,6 +2344,45 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Der Fließtext nennt jede Zahl nur noch einmal — `v1209`, 03.09.2026 (`1f06705`)
+
+Marcels letzter offener Punkt am Bericht. Die Ursache war **keine
+Nachlässigkeit des Modells, sondern eine Anweisung**: `report_prompt.txt`
+verlangte in Abschnitt A „die zentrale Markt- und Werteinschätzung
+(Marktwert, Spanne, Abweichung zum Kaufpreis)" **und** in Abschnitt C „die
+Marktwertindikation (Punktwert, Spanne, Konfidenz, Abweichung zum
+Kaufpreis)" — zweimal dieselbe Aussage, verlangt in derselben Datei, drei
+Zeilen unter dem Satz „Vermeide Wiederholungen zwischen den Abschnitten".
+
+Gemessen im Bericht vom 02.09.2026, welche Zahlen im Fließtext doppelt
+standen: **195.000 / 159.000 / 243.000** in A und C, **7,67 €/m²** in B und C.
+
+Neuer Block **„JEDE ZAHL GENAU EINMAL (NICHT VERHANDELBAR)"**. Der Marktwert
+steht als Zahl nur noch in A; B und C nehmen sprachlich Bezug. Der Grund
+steht im Prompt dabei, damit er nicht wegoptimiert wird.
+
+> **Abnahmepunkt:** dass die Datei ausgeliefert ist, ist bewiesen (im
+> Prod-Container gelesen). Ob das Modell sich daran hält, zeigt erst der
+> nächste **echte** Bericht — am Replay ist es nicht prüfbar.
+
+### Prod-Rollout 03.09.2026 — v1205 bis v1209 sind live
+
+Auf Marcels „ja umsetzen und auf prod ziehen". Beide Datenbanken vorher
+gesichert (`haupt-20260903-0440.sql.gz`, `mb-20260903-0440.sql.gz`), 14
+Commits per Fast-Forward, `mb-backend` neu gebaut.
+
+Abnahme am Prod-Bericht (Bielefeld — ein **anderes** Objekt als auf
+Staging): `MARKTWERT-SPANNE` weg, `Preisstrategie` weg, Aussagekraft nur
+noch in 03, beide Preisbänder auf einer Seite, **7 Abschnitte** mit einem
+`05 Lage & Marktumfeld`. Konsole ohne Fehler.
+
+> **Die Klinke aus `v1208` hat sich sofort bewährt:** dieser Bericht hat
+> weder `assessment` noch `macro`, also zeichnet nur der Infrastruktur-Block
+> — und der Sektionstitel hängt korrekt an ihm. Der Fall war nicht
+> theoretisch, er tritt im ersten Prod-Bericht auf, den ich anfasse.
+
+Details im Journal der Projektanweisung.
 
 ### Die Lage ist ein Kapitel — `v1208`, 02.09.2026 (`f61a409`)
 
