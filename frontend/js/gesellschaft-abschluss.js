@@ -54,16 +54,40 @@
    anderen Konditionen nach Ablauf der Zinsbindung. Wo ein Darlehen einen
    anderen Typ als "annuitaet" traegt, sagt der Bericht es.
    ─────────────────────────────────────────────────────────────────────────── */
+/* v1227b · ZAHLEN LIEST parseDe(), NICHT ICH.
+   Gemessen an einem echten Objekt: mein eigener Parser machte aus dem
+   Zinssatz "3.5" den Wert 35 — er hielt den Punkt fuer einen
+   Tausendertrenner. Die App hat mit parseDe() laengst die Funktion, die
+   beide Schreibweisen richtig liest ("3.5" -> 3,5 und "1.234,56" ->
+   1234,56). Sie ist ab jetzt die Quelle; der eigene Weg bleibt nur als
+   Rueckfall, falls das Modul einmal ohne calc.js geladen wird. Genau
+   dafuer gilt die Regel, Rechenkerne nicht zu duplizieren — auch das
+   Lesen einer Zahl ist einer. */
 function _gaNum(v) {
   if (v == null) return 0;
   if (typeof v === 'number') return isFinite(v) ? v : 0;
+  if (typeof window.parseDe === 'function') {
+    var p = window.parseDe(v);
+    return isFinite(p) ? p : 0;
+  }
   var s = String(v).trim().replace(/\./g, '').replace(',', '.').replace(/[^0-9.\-]/g, '');
   var n = parseFloat(s);
   return isFinite(n) ? n : 0;
 }
 
+/* v1227b · d1_vertrag IST KEIN DATUM.
+   Gemessen: das Feld ist ein Textfeld und trug am geprueften Objekt den
+   Wert "4711" — eine VertragsNUMMER. Weil mein Rueckfall erst bei einem
+   leeren Wert griff, rechnete die Restschuld mit null Monaten und blieb
+   ueber fuenfzehn Jahre auf der vollen Darlehenssumme stehen. Ein Feld,
+   das nach einem Datum klingt, ist keines: es wird nur genommen, wenn es
+   auch wie eines aussieht. */
 function _gaStartDatum(d) {
-  return d.d1_vertrag || d.wirtschaftlicher_uebergang || d.kaufdat || '';
+  var istDatum = function (x) { return /^\d{4}-\d{2}(-\d{2})?$/.test(String(x || '').trim()); };
+  if (istDatum(d.d1_vertrag)) return d.d1_vertrag;
+  if (istDatum(d.wirtschaftlicher_uebergang)) return d.wirtschaftlicher_uebergang;
+  if (istDatum(d.kaufdat)) return d.kaufdat;
+  return '';
 }
 
 /* Monate vom Start bis zum 31.12. des Bilanzjahres. Ein Darlehen, das erst
