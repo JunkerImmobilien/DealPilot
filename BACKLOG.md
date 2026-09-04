@@ -38,8 +38,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Übergabe 03.09.2026, zweiter Teil: die Gesellschaft)
 
-**Stand:** lokal = GitHub = Staging auf `cfbf1d9`.
-**Produktion steht auf `6047036`** — **`v1215` bis `v1228` sind NICHT auf Prod.**
+**Stand:** lokal = GitHub = Staging auf `15fc6f0`.
+**Produktion steht auf `8269465`** (am 04.09. auf dem Server ausgelesen, nicht auf `6047036` — die Zeile hier war veraltet) — **`v1215` bis `v1228` sind NICHT auf Prod.**
 Reines Frontend, kein Rebuild, keine Migration.
 
 > ### Der erste Griff am 04.09.
@@ -157,7 +157,7 @@ ansehen kann. Der Halter ist am Objekt in einem Klick zurückzustellen.
 ## → Übergabe 03.09.2026, erster Teil: Steuer-Mappe und Anlage V
 
 **Stand:** lokal = GitHub = Staging auf `952c601`.
-**Produktion steht auf `6047036`** — **`v1215` bis `v1225c` sind NICHT auf
+**Produktion steht auf `8269465`** — **`v1215` bis `v1225c` sind NICHT auf
 Prod.** Reines Frontend, kein Rebuild, keine Migration. Ein Prod-Rollout
 braucht nur Marcels „ja".
 
