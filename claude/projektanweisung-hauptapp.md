@@ -6589,6 +6589,103 @@ werden nicht zum Testen angelegt. Auf Staging ist der Weg vollständig geprüft
 (`v1227`, Bilanzsumme 687.059 € in zwei Läufen). Offen bleiben die fünf Fragen
 an den Steuerberater und die § 7b-Spalte in `tax_records`.
 
+### Nutzer-Spiegelung Staging → Prod, 04.09.2026 — `info@junker-immobilien.io`
+
+**Freigabe.** Marcel: *„doch du darfst einen user komplett aus staging zu prod
+spiegeln mit den daten. wir haben noch keine live kunden die bezahlen."* Auf
+Rückfrage: Ziel ist **`info@junker-immobilien.io`**, das Staging-Passwort wird
+**mitgespiegelt**.
+
+> **Es gibt trotzdem fremde echte Nutzer auf Prod** — Maxim Warkentin, Jan
+> Bischoff, Martin Bäumler, dazu `junker_immobilien@gmx.de`. „Keine zahlenden
+> Kunden" heisst nicht „keine Daten ausser meinen". Jeder Schritt war deshalb
+> auf **eine** Nutzer-ID eingegrenzt, und hinterher wurde nachgezählt, dass
+> genau eine Zeile in `users` ein neues `updated_at` trägt.
+
+**Quelle und Ziel.**
+
+| | Staging | Prod |
+|---|---|---|
+| Nutzer-ID | `2a1ac331-…81c3` | `528be31f-…3220` |
+| Rolle | `admin` | `user` (unverändert gelassen) |
+| Objekte vorher | 7 | **0** — nichts zu überschreiben |
+| Plan | Pro, aktiv | Pro, aktiv (nicht angefasst) |
+
+**Gesichert vorher:** `/root/backups/haupt-vor-spiegelung-20260904-0525.sql`
+(11,8 MB) und `mb-vor-spiegelung-20260904-0525.sql` (14,3 MB).
+
+**Zwei Befunde, bevor eine Zeile geschrieben wurde**
+
+**1 · Die Migrationstabelle beweist keine Schema-Gleichheit.** Beide
+Datenbanken führen exakt dieselben **69** Migrationen, die Differenz ist in
+beide Richtungen leer. Trotzdem hat `tax_snapshots` auf Staging die Spalte
+**`bmf_advanced`** (9 belegte Zeilen), die es auf Prod nicht gibt — von Hand
+angelegt, an den Migrationen vorbei. **Importiert wurde deshalb mit der
+Spaltenliste des Ziels**, nicht der der Quelle. Die Spalte bleibt auf
+Staging; auf Prod liest sie ohnehin niemand.
+
+**2 · Die Mandanten liegen gar nicht in der Datenbank.** `mandanten.js:14`
+legt Gesellschaften, Rechtsform, Buchhaltungs-Stammdaten und die Kosten je
+Jahr unter einem einzigen `localStorage`-Schlüssel `dp_mandanten` ab. **Eine
+reine DB-Spiegelung hätte auf Prod eine Bilanz ohne Gesellschaft ergeben** —
+der Halter am Objekt ist ein Verweis auf eine Mandanten-ID, und der Verweis
+wäre ins Leere gelaufen. Beides steht jetzt in `FALLEN.md`.
+
+**Gewandert ist**, in **einer** Transaktion, `ON_ERROR_STOP`, alles oder
+nichts:
+
+| Tabelle | Zeilen |
+|---|---|
+| `objects` | 7 |
+| `tax_records` | 95 |
+| `tax_snapshots` | 6 |
+| `tax_periods` | 3 |
+| `avm_valuations` | 5 |
+| `users.password_hash` | 1 (bcrypt, unverändert übernommen) |
+
+Die Objekt-UUIDs wurden **behalten** — auf Prod kollidierte keine — deshalb
+zeigen `tax_records.object_id` und `avm_valuations.object_id` ohne Umschreiben
+weiter richtig. Umgeschrieben wurde nur die Nutzer-ID.
+
+**Nachweis: gleicher Hash über beide Seiten.**
+
+| | Staging | Prod |
+|---|---|---|
+| `md5` über alle 7 `data` + `photos` | `67e375628a3ad28bc5d72616377eadeb` | **gleich** |
+| `md5` über alle 95 Steuersätze | `7f892e118ee1b2830c5771c80df31b8d` | **gleich** |
+
+Dazu die fünf CSV-Prüfsummen vor und nach der Übertragung, alle gleich.
+
+**Bewusst NICHT gewandert:**
+
+| | Grund |
+|---|---|
+| `shared_passes` (110) | 55 MB eingefrorene Momentaufnahmen; **98 davon zeigen auf längst gelöschte Objekte**, fast alle abgelaufen oder widerrufen. Die Links wurden auf der Staging-Domain ausgegeben und funktionieren auf Prod ohnehin nicht |
+| `ai_credits_user`, `usage_counters` | Guthaben und Verbrauch — das ist Geld, kein Datensatz |
+| `user_provider_credentials` | Zugangsdaten eines Bewertungspartners; Prod hat seine eigenen |
+| `subscriptions` | beide Seiten stehen auf Pro/aktiv, es gab nichts anzugleichen |
+| `totp_secret` | auf Staging gesetzt, aber `totp_enabled=false`. Ein abgeschaltetes Geheimnis mitzunehmen bringt nichts und kann nur schaden |
+
+**Die zweite Hälfte: `localStorage`.** `dp_mandanten` (675 Bytes, zwei
+Einträge — „Privat" und „Test UG (v1226)" mit Kosten für 2025 und 2026) von
+`app.staging.dealpilot.immo` gelesen und auf `app.dealpilot.immo` gesetzt.
+Auf Prod lag dort **nichts**, es wurde nichts überschrieben. Zeichen für
+Zeichen gleich, Umlaut heil. Dazu `ji_u_<prod-user-id>_seq_2026 = 1002` —
+**der Schlüssel trägt die Nutzer-ID im Namen**, unter dem Staging-Namen hätte
+ihn auf Prod niemand gelesen.
+
+**Im Browser nachgemessen**, Prod, Cockpit über Aktionen → Portfolio-Cockpit:
+Abschnitt 08 zeigt in der Auswahl **„Test UG (v1226) · UG
+(haftungsbeschränkt)"**. Das Geschäftsjahr sagt **„kein Objekt zugeordnet"**
+— richtig, denn im Browser war das Konto `majunker@gmx.net` angemeldet, und
+dessen zwei Objekte tragen diesen Halter nicht.
+
+**Rest — und das ist der einzige offene Punkt:** die Anmeldung als
+`info@junker-immobilien.io` auf Prod hat **niemand durchgeführt**. Ich gebe
+keine Passwörter ein; das macht Marcel selbst. Erst danach ist der letzte
+Schritt belegt — Objekt „Am Markt 9 Kabelsketal" mit der UG als Halter,
+Geschäftsjahr wählen, Knopf drücken.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

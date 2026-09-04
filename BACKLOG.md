@@ -36,16 +36,28 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Stand 04.09.2026, nach dem Prod-Rollout)
+## → HIER WEITERMACHEN (Stand 04.09.2026, nach Rollout und Spiegelung)
 
-**Stand:** lokal = GitHub = Staging = **Produktion** auf `6b69254`.
-**Alles ist live** — `v1215` bis `v1228` sind am 04.09. auf Prod gezogen
-worden, Fast-Forward `8269465` → `6b69254`, 34 Commits, reines Frontend.
-Nachweis, Backups und Messung stehen im Rollout-Journal der
+**Stand:** lokal = GitHub = Staging = **Produktion** auf `6b69254` (Doku
+darüber hinaus). **Alles ist live** — `v1215` bis `v1228` sind am 04.09. auf
+Prod gezogen, Fast-Forward `8269465` → `6b69254`, 34 Commits, reines Frontend.
+
+**Und auf Prod liegen jetzt Marcels Daten.** Der Staging-Nutzer
+`info@junker-immobilien.io` ist auf Prod ins Konto gleicher Mailadresse
+gespiegelt: 7 Objekte, 95 Steuersätze, 6 Steuer-Momentaufnahmen, 3
+Steuerperioden, 5 Bewertungen — plus die Gesellschaft „Test UG (v1226)" aus
+dem `localStorage`. Gegenprobe über `md5` beidseitig gleich. Nachweis,
+Backups, Auslassungen und beide Befunde stehen im Journal der
 Projektanweisung.
 
 > ### Der erste Griff jetzt
 >
+> 0. **Marcel meldet sich auf `app.dealpilot.immo` als
+>    `info@junker-immobilien.io` an** — mit dem **Staging-Passwort**, das ist
+>    mitgespiegelt. Dann sind die sieben Objekte da, und Abschnitt 08
+>    „Jahresabschluss" lässt sich mit der Test UG einmal auf Prod drücken.
+>    **Das ist der einzige Schritt, den ich nicht selbst gehen kann** — ich
+>    gebe keine Passwörter ein.
 > 1. **Die fünf Fragen an den Steuerberater** aus dem Prüfbefund — vor allem,
 >    ob ihm Bilanz und GuV in dieser Form reichen oder ob seine
 >    Kanzleisoftware einen DATEV-Buchungsstapel braucht. **Die Antwort
@@ -53,17 +65,16 @@ Projektanweisung.
 >    oder nicht** — deshalb steht sie vor allem anderen Code.
 > 2. **§ 7b-Spalte in `tax_records`** — Datenbankeingriff, braucht Marcels
 >    Freigabe. Bis dahin steht im PDF der ehrliche Hinweis statt einer Zahl.
-> 3. Aufräumen auf Staging, falls Marcel es will: Mandant „Test UG (v1226)"
->    und der Halter am Objekt „Am Markt 9 Kabelsketal".
->
-> **Auf Prod ungeprüft geblieben ist genau eine Sache:** der Knopf
-> „Jahresabschluss erstellen" selbst — Marcels Prod-Konto hat keine
-> Gesellschaft, und Prod-Daten werden nicht zum Testen angelegt. Der
-> Abschnitt steht, der Leerzustand greift, der Weg ist auf Staging
-> vollständig geprüft.
 >
 > **Nichts hängt halbfertig.** Kein Rebuild offen, keine Migration offen,
 > Arbeitsverzeichnis sauber.
+
+> ### Was auf Prod bewusst NICHT gespiegelt wurde
+>
+> Share-Links (110 Stück, 55 MB, 98 davon auf gelöschte Objekte zeigend),
+> Kerosin-Guthaben und Verbrauchszähler, die Zugangsdaten des
+> Bewertungspartners, das Abo (beide Seiten Pro/aktiv) und das abgeschaltete
+> TOTP-Geheimnis. Begründung je Punkt im Journal.
 
 Marcels Frage: *„wie müssen wir wohnungen und häuser dann in einer gmbh oder
 ug angeben? … was ist wenn mehrere objekte in einer gesellschaft sind. können

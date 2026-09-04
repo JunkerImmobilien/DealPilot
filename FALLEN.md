@@ -467,3 +467,40 @@ angekommen, obwohl auf dem Server alles richtig lag.**
 
 **Nach jedem Ziehen alle drei Glieder nebeneinander ausgeben lassen.** Nicht
 das Ersetzen prüfen, sondern das Ergebnis.
+
+---
+
+## Die Migrationstabelle beweist keine Schema-Gleichheit
+
+Gemessen am 04.09.2026, beim Spiegeln eines Nutzers von Staging nach Prod:
+beide Datenbanken führten **exakt dieselben 69 Migrationen** — die Differenz
+in beide Richtungen war leer. Trotzdem hatte `tax_snapshots` auf Staging eine
+Spalte, die es auf Prod nicht gibt: **`bmf_advanced`**, mit 9 belegten Zeilen.
+
+Sie ist also **von Hand** angelegt worden, an den Migrationen vorbei. Ein
+`\copy` mit der Staging-Spaltenliste wäre auf Prod mitten im Import gestorben
+— und zwar erst nach den grossen Tabellen.
+
+**Vor jedem Datentransfer zwischen zwei Umgebungen die Spaltenlisten der
+beteiligten Tabellen direkt vergleichen**, nicht die Migrationstabelle. Zwei
+Abfragen auf `information_schema.columns`, `comm -23`/`comm -13` dagegen,
+fertig. Und importiert wird mit der Spaltenliste des **Ziels**, nie der der
+Quelle.
+
+## Was im Browser liegt, wandert nicht mit der Datenbank
+
+Beim selben Vorgang: die **Mandanten** — Gesellschaften, Rechtsform,
+Buchhaltungs-Stammdaten und die Kosten der Gesellschaft je Jahr — liegen
+**nicht** in Postgres. `js/mandanten.js:14` legt alles unter einem einzigen
+`localStorage`-Schlüssel `dp_mandanten` ab.
+
+Eine vollständige DB-Spiegelung hätte auf Prod eine Bilanz ohne Gesellschaft
+ergeben: das Objekt trägt den Halter als **Verweis** auf eine Mandanten-ID,
+und der Verweis wäre ins Leere gelaufen. **Der Schlüssel gehört pro Origin
+mitkopiert** — `app.staging.dealpilot.immo` und `app.dealpilot.immo` sind
+zwei getrennte Speicher.
+
+Dasselbe gilt für den Zähler der Objektnummern, `ji_u_<user-id>_seq_<jahr>`:
+er trägt die **Nutzer-ID im Namen**, und die ist in der anderen Umgebung eine
+andere. Wer ihn stumpf kopiert, legt ihn unter dem alten Namen ab, wo ihn
+niemand liest.
