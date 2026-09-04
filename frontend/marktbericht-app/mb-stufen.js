@@ -68,7 +68,7 @@
   };
   var WAS = {
     1: 'Lage und Preisspanne aus den Daten des zuständigen Gutachterausschusses.',
-    2: 'Zusätzlich Baustatus, Zustand und Qualität — deutlich engere Spanne, mit Dossier zum Objekt.',
+    2: 'Zusätzlich Zustand und Qualität — deutlich engere Spanne, mit Dossier zum Objekt.',
     3: 'Zusätzlich Boden-, Ertrags- und Sachwert nach ImmoWertV, mit Rechenweg im PDF. Ersetzt kein Gutachten eines Sachverständigen.'
   };
   /* v1126d: Der fruehere FEHLT_TEXT ist raus. Er war eine zweite, von Hand
@@ -110,9 +110,21 @@
        sach    pflicht plot, year (bei ETW nicht anwendbar)
 
      Eine Leiste, die mehr behauptet als da ist, ist schlimmer als keine. */
+  /* ── v1229 · `baustatus` steht bei Stufe 1, nicht bei Stufe 2 ────────────
+     Er war hier auf Stufe 2 gesetzt, `VERFAHREN.markt.pflicht` in
+     wertermittlung.js führt ihn aber auf Stufe 1 — und der Erzeugen-Knopf
+     prüft gegen VERFAHREN. Solange `baustatus` nie leer sein konnte (er war
+     ein <select> ohne leere erste Option, siehe v1229 dort), fiel der
+     Widerspruch nicht auf: das Feld war immer gefüllt, also forderte ihn
+     keine der beiden Listen jemals ein.
+
+     Mit der leeren Option WÜRDE er auffallen — und zwar genau als Marcels
+     Befund aus v1152: die Ampel meldet „Marktpreisindikation erreicht",
+     der Knopf bleibt gesperrt und nennt ein Feld, das die Ampel nicht
+     verlangt hat. Deshalb wandert er hier mit hoch. */
   var BEDARF = {
-    1: [['address', 'Adresse'], ['ptype', 'Objektart'], ['area', 'Wohnfläche'], ['year', 'Baujahr']],
-    2: [['baustatus', 'Baustatus'], ['cond', 'Zustand'], ['quality', 'Qualität']],
+    1: [['address', 'Adresse'], ['ptype', 'Objektart'], ['area', 'Wohnfläche'], ['year', 'Baujahr'], ['baustatus', 'Baustatus']],
+    2: [['cond', 'Zustand'], ['quality', 'Qualität']],
     3: [['plot', 'Grundstücksfläche'], ['units', 'Wohneinheiten']]
   };
   /* ── v1201 · Der Miteigentumsanteil ist bei einer ETW ab Stufe 1 Pflicht ──
