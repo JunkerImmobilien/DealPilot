@@ -645,3 +645,35 @@ kann:** vier Einträge (`bspar_zuteil`, `mietspiegel`, `erwerbsart`,
 schreibt sie, ein `id="…"` gibt es nirgends. Die Liste ist ein
 Datenschlüssel-Verzeichnis, kein Feldverzeichnis. Wer beides gleichsetzt,
 zählt in beide Richtungen falsch.
+
+## Ein Kasten, den niemand erzeugt — die Funktion steigt still aus
+
+`_renderQcCalcInfo()` (`quick-check.js:761`) baut die Berechnungs-Info des
+Quick-Check: Kaufpreis, Nebenkosten, Gesamtinvestition, Eigenkapital,
+Darlehen, Renditen, DSCR, LTV. Sie sucht `#qc-calc-info` und
+`#qc-calc-info-body` — und **kehrt in Zeile 1 zurück, wenn es sie nicht
+gibt**:
+
+```js
+if (!box || !body) return;
+```
+
+Gemessen am 04.09.2026: die beiden Ids stehen **in keiner HTML-Datei**, nur
+im CSS (drei Regeln) und in dieser Abfrage. Zur Laufzeit, nach dem Öffnen
+des Quick Boarding und dem Füllen von Kaufpreis, Miete und Eigenkapital:
+`document.getElementById('qc-calc-info')` → **null**. **Der Kasten wurde nie
+erzeugt, seit `V63.23`.**
+
+**Ein `return` bei fehlendem Element ist eine gute Schutzregel und ein
+schlechtes Protokoll.** Nichts in der Konsole, nichts im Bild — nur eine
+Funktion, die 45 Zeilen lang etwas baut, das niemand sieht, und ein
+Stylesheet, das darauf wartet.
+
+**Wer etwas an eine bestehende Anzeige hängt, prüft zuerst im Browser, ob
+diese Anzeige überhaupt erscheint** — nicht, ob der Code sie erzeugt. Mich
+hat genau das eine Version gekostet (`v1232`, sofort zurückgenommen): der
+Text war richtig, der Träger existierte nicht.
+
+**Und die Gegenprobe gehört dazu:** `grep` auf die Id über *alle* Dateitypen,
+nicht nur über `js/`. Steht sie ausschließlich im Stylesheet und in der
+lesenden Zeile, gibt es sie nicht.

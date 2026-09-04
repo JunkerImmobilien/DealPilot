@@ -2487,9 +2487,60 @@ entfällt — nicht raten.
 
    **I · QuickBoarding**
    - Es war **schwer zu finden** (steckt unter „Aktionen").
-   - **Dasselbe Exposé ergab dort einen anderen Wert** als im Boarding. → Das
-     ist kein Gestaltungspunkt, sondern **möglicherweise ein Rechenbefund.
-     Zuerst nachstellen.**
+   - **Dasselbe Exposé ergab dort einen anderen Wert** als im Boarding.
+     **NACHGESTELLT am 04.09.2026 — es ist KEIN Rechenfehler.**
+
+     Der Quick-Check rechnet bewusst mit einem kleineren Modell, und der
+     Code sagt es selbst (`quick-check.js:469` ff.):
+
+     | | |
+     |---|---|
+     | `san = 0`, `moebl = 0` | *„im QC nicht separat"* |
+     | `uf = 0` | *„Umlagen — gibt's im QC nicht"* |
+     | `darlehen = gi − ek` | abgeleitet, **nicht** aus einem Darlehensfeld |
+     | `knk = kp × knkP/100` | ein Prozentsatz statt der fünf Einzelposten |
+
+     Dazu kommen vom Import **nur 19 Felder** an (`OBJ2QC` in
+     `object-actions.js:39`); alles andere wandert in `_qcPendingMerged` und
+     wird erst beim „Als Objekt speichern" angewandt. **Dasselbe Exposé KANN
+     dort also gar nicht dieselbe Zahl ergeben.**
+
+     **Der Befund des Testers bleibt trotzdem berechtigt:** die App sagt das
+     nirgends an der Zahl. In der Import-Tabelle steht je Zeile
+     „→ Quick-Check" oder „→ Vollobjekt" (`object-actions.js:1275`) — aber
+     wer die Zahl sieht, sieht die Tabelle längst nicht mehr.
+
+   - **DABEI GEFUNDEN: die Berechnungs-Info aus `V63.23` hat nie funktioniert.**
+
+     `_renderQcCalcInfo()` (`quick-check.js:761`) baut einen Kasten, der genau
+     das erklären würde, was der Tester vermisst — Kaufpreis, Nebenkosten,
+     Gesamtinvestition, Eigenkapital, Darlehen, Rendite, DSCR, LTV. Er sucht
+     dafür `#qc-calc-info` und `#qc-calc-info-body` und **steigt in Zeile 1
+     wieder aus, wenn es sie nicht gibt.**
+
+     | Messung | Ergebnis |
+     |---|---|
+     | `grep -rn "qc-calc-info" frontend/` | **nur** `style.css` (drei Regeln) und `quick-check.js` (die zwei Abfragen) |
+     | in irgendeiner `.html` | **kein einziger Treffer** |
+     | zur Laufzeit, nach Öffnen des Quick Boarding und Füllen von Kaufpreis, Miete und Eigenkapital | `document.getElementById('qc-calc-info')` → **null** |
+
+     **Der Kasten wird nie erzeugt.** Die Funktion ist tot, das CSS dazu
+     ebenfalls. Zwei unabhängige Messungen, gleiches Ergebnis.
+
+     > **Ein Versuch von mir ist daran gescheitert und wurde zurückgenommen**
+     > (`v1232`, `dcd8ad3`, revidiert mit `79dd8e5`): ich hatte eine Fußnote
+     > „Nicht enthalten: Sanierung, Möblierung, Umlagen" an diesen Kasten
+     > gehängt — an etwas, das nie erscheint. **Erst beim Nachmessen im
+     > Browser fiel auf, dass der Träger fehlt.** Der Text war richtig, der
+     > Ort nicht.
+
+     **→ Zu entscheiden:** soll die Berechnungs-Info wiederbelebt werden? Sie
+     ist fertig geschrieben, gestylt und mit Daten versorgt — es fehlt allein
+     der Behälter im Markup des Quick-Check (`quickcheck-app.html`, ein
+     eigenes Dokument im iframe). **Das ist eine Optikfrage in fremdem
+     Markup, deshalb nicht einfach gebaut.** Wird sie wiederbelebt, gehört
+     der Satz über die drei fehlenden Posten hinein — er beantwortet den
+     Befund des Testers an genau der richtigen Stelle.
    - Die Spanne (unten / Durchschnitt / oben) **kompakter** darstellen.
    - **„Übernehmen" ist unklar** — was übernimmt es wohin?
    - **Den Knopf „Tabelle" weglassen** — es gibt zu viele Knöpfe.
