@@ -39,9 +39,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ## → HIER WEITERMACHEN (Stand 04.09.2026, abends)
 
 **Stand:** lokal = GitHub = Staging auf `4bf9ed6`, **Produktion auf `16f5712`**.
-**`v1215`–`v1231` sind live** — vier Prod-Rollouts am 04.09. **Auf Staging
-warten `v1233`–`v1233c`** (Quick-Check erklärt seine Zahl). Nachweise im
-Rollout-Journal der Projektanweisung.
+**`v1215`–`v1231` sind live** — vier Prod-Rollouts am 04.09.
+**Auf Staging warten `v1233`–`v1238`.** Nachweise im Rollout-Journal.
 
 **Und auf Prod liegen jetzt Marcels Daten.** Der Staging-Nutzer
 `info@junker-immobilien.io` ist auf Prod ins Konto gleicher Mailadresse
