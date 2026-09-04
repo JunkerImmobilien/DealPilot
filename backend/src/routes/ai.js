@@ -1044,10 +1044,21 @@ router.post('/copilot', authenticate, async (req, res, next) => {
  * ───────────────────────────────────────────────────────────────────── */
 router.post('/extract-beleg', authenticate, extractLimiter, async (req, res, next) => {
   try {
-    const { query } = require('../db/pool');
-    // Plan-Gate: Investor+ / Pro / Partner
-    const pr = await query("SELECT plan_id FROM subscriptions WHERE user_id = $1 AND status = 'active' LIMIT 1", [req.user.id]);
-    const plan = pr.rowCount ? String(pr.rows[0].plan_id) : 'free';
+    /* v1230 · Plan-Gate: Investor+ / Pro / Partner.
+       Bis hierher stand hier eine Direktabfrage auf `subscriptions`, und die
+       kennt `plan_trials` nicht. Gemessen am 04.09.2026 auf Staging: acht
+       Nutzer mit aktivem pro-Test, deren subscriptions-Zeile `starter` sagt
+       oder gar nicht existiert — die bekamen hier 403, mitten in einer
+       Testphase, die ihnen Pro zusagt.
+
+       getEffectivePlan() liest die Testphase mit und ist die einzige
+       Funktion, die alle Quellen kennt. Faellt sie aus, gilt weiter `free`
+       — im Zweifel gesperrt, nicht im Zweifel offen. */
+    let plan = 'free';
+    try {
+      const eff = await require('../services/subscriptionService').getEffectivePlan(req.user.id);
+      if (eff && eff.plan_id) plan = String(eff.plan_id);
+    } catch (e) { /* plan bleibt 'free' */ }
     if (plan === 'free' || plan === 'starter') {
       return res.status(403).json({ error: 'Der KI-Beleg-Import ist ab dem Investor-Plan verfuegbar.' });
     }

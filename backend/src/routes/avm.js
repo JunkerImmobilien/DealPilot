@@ -26,7 +26,9 @@ const crypto = require('crypto'); // v480: Cache-Key-Hash
 const { authenticate } = require('../middleware/auth');
 const aiCreditsService = require('../services/aiCreditsService');
 const avmCreditsService = require('../services/avmCreditsService');
-const { query } = require('../db/pool');  // v387 Per-Plan-Modus
+/* v1230: `const { query } = require('../db/pool')` stand hier fuer den
+   Per-Plan-Modus (v387). Der liest jetzt getEffectivePlan(), damit ist die
+   Direktabfrage weg und der Import unbenutzt — er faellt mit. */
 const stub = require('../services/avm-stub');
 const sprengnetter = require('../services/sprengnetter-client');
 const pricehubble = require('../services/pricehubble-client');
@@ -54,11 +56,26 @@ function providerEnabled(provider) {
   if (!list.length) return true;                      // keine Allowlist -> Legacy (alle ready-Clients an)
   return list.indexOf(p) !== -1;
 }
-// v387: Plan des Users (Spiegel aiCreditsService).
+/* v1230 · Der Plan eines Nutzers wird nie aus `subscriptions` gelesen.
+   Bis hierher stand hier die Direktabfrage, und die kennt `plan_trials`
+   nicht. Gemessen am 04.09.2026 auf Staging: acht Nutzer mit aktivem
+   pro-Test, deren subscriptions-Zeile `starter` sagt oder gar nicht
+   existiert — fuer die lieferte diese Funktion `free`, und modeForUser()
+   gab ihnen den Stub statt der Live-Bewertung.
+
+   Das war genau das, was v1185 abstellen wollte: die Testphase bekommt
+   seither ein eigenes Bewertungspaket, damit der Testnutzer pruefen kann,
+   wofuer er zahlen soll. Das Paket wurde vergeben, dieser Schalter nicht
+   umgestellt — sie haetten es auf Stub-Werte verbraucht.
+
+   getEffectivePlan() ist die einzige Funktion, die alle Quellen kennt.
+   ACHTUNG, nicht verwechseln: das KI-Kontingent (_planKey/_getPlanLimit in
+   aiCreditsService) liest weiter die rohe Subscription — dass die Testphase
+   kein Kerosin verschenkt, ist Absicht (Abweichung 3 in getEffectivePlan). */
 async function getPlanId(userId) {
   try {
-    const r = await query("SELECT plan_id FROM subscriptions WHERE user_id = $1 AND status = 'active' LIMIT 1", [userId]);
-    return r.rowCount ? r.rows[0].plan_id : 'free';
+    const eff = await require('../services/subscriptionService').getEffectivePlan(userId);
+    return (eff && eff.plan_id) ? eff.plan_id : 'free';
   } catch (e) { return 'free'; }
 }
 // Free -> immer Demo (stub). Bezahlt -> live nur wenn global AVM_MODE=live, sonst stub.
