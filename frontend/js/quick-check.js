@@ -800,22 +800,7 @@
       '<div class="qc-calc-row"><span class="qc-calc-label">Nettomietrendite:</span><span class="qc-calc-val">' + fmtP(d.nmr) + '</span></div>' +
       '<div class="qc-calc-row"><span class="qc-calc-label">Cashflow / Monat:</span><span class="qc-calc-val">' + fmt(d.cfMon, ' €') + '</span></div>' +
       '<div class="qc-calc-row"><span class="qc-calc-label">DSCR:</span><span class="qc-calc-val">' + fmtR(d.dscr) + '</span></div>' +
-      '<div class="qc-calc-row"><span class="qc-calc-label">LTV:</span><span class="qc-calc-val">' + fmtP(d.ltvPct) + '</span></div>' +
-      /* v1232 · Der Testbericht, Block I: „Dasselbe Exposé ergab hier einen
-         anderen Wert als im Boarding." Nachgestellt — es ist KEIN Rechenfehler,
-         sondern ein kleineres Modell, und der Code sagt es selbst (Z. 469 ff.):
-         `san=0, moebl=0 (im QC nicht separat)`, `uf = 0`, `darlehen = gi - ek`.
-         Dazu kommen vom Import nur 19 Felder an (OBJ2QC in object-actions.js),
-         der Rest wird bis zum „Als Objekt speichern" nur zwischengelegt.
-
-         Diese Box erklaerte bisher, WOMIT gerechnet wurde — nicht, was bewusst
-         fehlt. Wer die Zahl sieht, sieht die Import-Tabelle mit ihren
-         „-> Quick-Check / -> Vollobjekt"-Vermerken laengst nicht mehr.
-         Deshalb der Satz HIER und keine zweite Box: der Bericht bemaengelt
-         ausdruecklich zu viele Flaechen und Knoepfe. */
-      '<div class="qc-calc-note">Nicht enthalten: <b>Sanierung, Möblierung, Umlagen</b>. ' +
-      'Das Darlehen ist aus Gesamtinvestition minus Eigenkapital abgeleitet, nicht aus einem Darlehensfeld. ' +
-      'Im vollen Objekt rechnen alle Posten mit — die Zahlen dort weichen deshalb ab.</div>';
+      '<div class="qc-calc-row"><span class="qc-calc-label">LTV:</span><span class="qc-calc-val">' + fmtP(d.ltvPct) + '</span></div>';
     box.style.display = 'block';
   }
 
