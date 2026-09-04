@@ -337,6 +337,21 @@ async function _gaDaten(halterId, jahr, _ohneVortrag) {
 async function _gaVortrag(halterId, jahr, objekte) {
   var jahre = [];
   objekte.forEach(function (o) { (o.jahreErfasst || []).forEach(function (y) { if (y < jahr) jahre.push(y); }); });
+  /* v1235b · Ein Jahr, in dem die Gesellschaft nur KOSTEN hatte und noch kein
+     Objekt-Steuersatz erfasst war, ist trotzdem ein Geschaeftsjahr — sein
+     Verlust gehoert in den Vortrag. Gemessen an der Test UG: 2025 ergab
+     -1.750 EUR allein aus Steuerberatung und Kammerbeitrag, tauchte im
+     Vortrag 2026 aber nicht auf, weil kein Objekt einen Satz fuer 2025 hatte.
+     Deshalb zaehlen die Kostenjahre des Mandanten mit. */
+  try {
+    var m = (window.DealPilotMandanten && DealPilotMandanten.get) ? DealPilotMandanten.get(halterId) : null;
+    if (m && m.id === halterId && m.kosten) {
+      Object.keys(m.kosten).forEach(function (k) {
+        var y = parseInt(k, 10);
+        if (isFinite(y) && y < jahr) jahre.push(y);
+      });
+    }
+  } catch (e) {}
   if (!jahre.length) return { summe: 0, jahre: [], gekappt: false, start: null };
   var start = Math.min.apply(null, jahre);
   var gekappt = false;
