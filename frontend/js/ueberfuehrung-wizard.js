@@ -353,11 +353,28 @@
 
       /* 3) Rueck-Link am Privat-Objekt (per API-Patch, non-fatal) */
       try {
-        if (window.Auth && Auth.apiCall && _gmbhKey && _privatKey) {
+        /* ── v1236 · Der Rueck-Link darf NIE auf das Privat-Objekt zeigen ──
+           Gemessen am 04.09.2026 an echten Daten: `2026-1004` trug in
+           `_ueberf_link` seine eigene Id. `_gmbhKey` wird aus
+           `_currentObjKey` gelesen, und wenn der nach dem Speichern des
+           neuen Objekts noch nicht umgesprungen ist, steht dort der
+           Privat-Schluessel.
+
+           Die Folge war nicht kosmetisch: undoUeberfuehrungFromPrivat()
+           schickt DELETE auf den Link — das Privat-Objekt haette sich
+           selbst geloescht. Dort ist der Fall jetzt abgefangen, hier wird
+           er verhindert.
+
+           Lieber KEIN Rueck-Link als ein falscher: ohne Link taut das
+           Privat-Objekt sauber auf, mit falschem Link zerstoert es sich. */
+        var _linkOk = _gmbhKey && _privatKey && String(_gmbhKey) !== String(_privatKey);
+        if (window.Auth && Auth.apiCall && _linkOk) {
           var _pObj = await Auth.apiCall('/objects/' + _privatKey);
           var _pData = _pObj.data || {};
           _pData._ueberf_link = _gmbhKey;
           await Auth.apiCall('/objects/' + _privatKey, { method: 'PUT', body: { data: _pData, aiAnalysis: _pObj.ai_analysis || null, photos: _pObj.photos || [] } });
+        } else if (!_linkOk) {
+          try { console.warn('[v1236] Rueck-Link nicht gesetzt: _gmbhKey=' + _gmbhKey + ' _privatKey=' + _privatKey); } catch (e) {}
         }
       } catch (e) { /* Rueck-Link non-fatal */ }
 

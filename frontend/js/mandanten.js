@@ -431,13 +431,46 @@
       var privatKey = (typeof _currentObjKey !== 'undefined') ? _currentObjKey : window._currentObjKey;
       var linkEl = document.getElementById('_ueberf_link');
       var gmbhKey = linkEl ? linkEl.value : '';
-      if (!window.confirm('\u00dcberf\u00fchrung aufheben?\n\nDas GESELLSCHAFTS-Objekt wird GELOESCHT und dieses Privat-Objekt aufgetaut (Einfrier-Datum entfernt). Das kann nicht rueckgaengig gemacht werden.')) return;
+
+      /* ── v1236 · Niemals sich selbst loeschen ──────────────────────────
+         Gemessen am 04.09.2026 an echten Daten: `2026-1004` trug in
+         `_ueberf_link` seine EIGENE Id. Diese Funktion haette also
+         DELETE auf das Privat-Objekt geschickt, das sie gerade retten soll —
+         Datenverlust mit einem Klick.
+
+         Der Ursprung liegt in _execute() des Assistenten (siehe dort): der
+         Rueck-Link wird aus `_currentObjKey` gebildet, und wenn der beim
+         Speichern des neuen Objekts noch nicht umgesprungen ist, zeigt er
+         auf das Privat-Objekt. Hier wird der Fall abgefangen, dort wird er
+         verhindert — beides, weil kaputte Daten schon in der Welt sind.
+
+         Ist der Link kaputt (auf sich selbst oder ins Leere), wird NUR
+         aufgetaut. Das ist genau das, was der Nutzer will: das Privat-Objekt
+         rechnet wieder. */
+      var selbstbezug = !!(gmbhKey && privatKey && String(gmbhKey) === String(privatKey));
+      if (selbstbezug) gmbhKey = '';
+
+      var frage = selbstbezug
+        ? 'Die Verknüpfung dieses Objekts ist beschädigt (sie zeigt auf sich selbst).\n\nDas Objekt wird nur AUFGETAUT — es wird nichts gelöscht. Fortfahren?'
+        : (gmbhKey
+            ? 'Überführung aufheben?\n\nDas GESELLSCHAFTS-Objekt wird GELOESCHT und dieses Privat-Objekt wieder aufgetaut.'
+            : 'Es ist kein Gesellschafts-Objekt verknüpft.\n\nDas Objekt wird nur AUFGETAUT — es wird nichts gelöscht. Fortfahren?');
+      if (!window.confirm(frage)) return;
+
       if (!window.Auth || !Auth.apiCall) { if (typeof toast === 'function') toast('Nicht eingeloggt.'); return; }
-      if (gmbhKey) { try { await Auth.apiCall('/objects/' + gmbhKey, { method: 'DELETE' }); } catch (e) {} }
+      var geloescht = false;
+      if (gmbhKey) {
+        try { await Auth.apiCall('/objects/' + gmbhKey, { method: 'DELETE' }); geloescht = true; }
+        catch (e) { /* Ziel schon weg — das Auftauen zaehlt trotzdem */ }
+      }
       var ueEl = document.getElementById('ueberf_ende'); if (ueEl) ueEl.value = '';
       if (linkEl) linkEl.value = '';
       if (typeof saveObj === 'function') await saveObj({ silent: true });
-      if (typeof toast === 'function') toast('\u2713 \u00dcberf\u00fchrung aufgehoben \u2014 Gesellschafts-Objekt geloescht, Privat-Objekt aufgetaut.');
+      if (typeof toast === 'function') {
+        toast(geloescht
+          ? '✓ Überführung aufgehoben — Gesellschafts-Objekt gelöscht, Privat-Objekt aufgetaut.'
+          : '✓ Privat-Objekt aufgetaut — es war kein Gesellschafts-Objekt (mehr) verknüpft.');
+      }
       try { _renderUeberfBadge(); } catch (e) {}
       try { if (typeof renderSaved === 'function') renderSaved({ _immediate: true }); } catch (e) {}
       try { if (typeof updateSidebarPortfolio === 'function') updateSidebarPortfolio(); } catch (e) {}
