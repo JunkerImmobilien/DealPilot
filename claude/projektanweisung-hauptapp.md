@@ -6519,6 +6519,76 @@ gespeicherte Änderung an Marcels Staging-Daten. Steht absichtlich noch da,
 damit er den Abschluss selbst ansehen kann; der Halter ist in einem Klick
 zurückzustellen.
 
+### Prod-Rollout 04.09.2026 — v1215 bis v1228 sind live (`6b69254`)
+
+**Freigabe.** Marcel auf die Frage *„Sollen v1215–v1228 (34 Commits, reines
+Frontend) auf Produktion?"*: **„Ja, ausrollen."**
+
+**Der Stand in der Übergabe war falsch.** Dort stand „Produktion steht auf
+`6047036`". **Auf dem Server ausgelesen** (`git rev-parse` in
+`/opt/dealpilot`): Prod trug `8269465` — der dritte Rollout vom 03.09. abends
+war in der Übergabe nicht nachgetragen. Die Zeile ist im Backlog korrigiert
+(`6b69254`). **Am Abstand ändert das nichts**, v1215…v1228 fehlten so oder so.
+
+**Gesichert, vor jedem Eingriff:**
+
+| Datei | Größe |
+|---|---|
+| `/root/backups/haupt-vor-v1228-20260904-0503.sql` | 11.813.615 B |
+| `/root/backups/mb-vor-v1228-20260904-0503.sql` | 14.280.052 B |
+
+`dealpilot-mb-db` steht in keinem Backup-Skript — der Dump ist von Hand
+gezogen, mit den Zugängen aus `printenv` **im** Container
+(`dealpilot_db`/`dealpilot` und `marktbericht`/`mb`).
+
+**Weg.** Fast-Forward `8269465` → `6b69254`, 34 Commits. **Kein
+Backend-Neubau, keine Migration** — der Diff berührt sieben Dateien, alle
+unter `frontend/`, und das Frontend ist volume-mounted.
+
+| Datei | Zeilen |
+|---|---|
+| `js/gesellschaft-abschluss.js` | **neu**, 941 |
+| `js/werbungskosten-pdf.js` | +1.074 |
+| `js/tax.js` | +260 |
+| `js/dashboard.js` | +220 |
+| `js/mandanten.js` | +187 |
+| `js/anlage-v-2025.js` | **neu**, 176 |
+| `index.html` | 15 (Cache-Buster) |
+
+**Auslieferung auf Prod gelesen** — über HTTPS, nicht auf der Platte:
+
+| | |
+|---|---|
+| `js/gesellschaft-abschluss.js?v=v1227c` | 200 · 45.440 B |
+| `js/anlage-v-2025.js?v=v1225` | 200 · 14.561 B |
+| `js/tax.js?v=v1228b` | 200 · 100.819 B |
+| Cache-Buster in `index.html` | `tax v1228b` · `mandanten v1226` · `anlage-v v1225` · `werbungskosten v1225c` · `gesellschaft-abschluss v1227c` · `dashboard v1227` |
+| Container | alle fünf `Up`, `dealpilot-backend` **healthy** |
+| `/health` · `/api/v1/auth/me` | 200 · 401 (ohne Token richtig) |
+
+**Im Browser nachgemessen, über den echten Bedienweg** — Aktionen →
+Portfolio-Cockpit, nicht per `DealPilotDashboard.open()`:
+
+- `#dashboard-main` trägt `data-dp-built=1` und `dp-active`
+- **Abschnitt 08 „Jahresabschluss" steht da**, mit dem Etikett
+  „Bilanz · GuV · § 8 Abs. 2 KStG", direkt unter Abschnitt 07 „Steuer-Mappe"
+- `window.AnlageV2025` und `window.exportAbschlussPDF` sind geladen
+- Konsole nach einem frischen Laden: **keine Fehler**
+
+**Der Leerzustand greift.** Marcels Prod-Konto hat keine Gesellschaft, und
+statt zweier leerer Auswahlfelder steht dort der Satz: *„Es ist noch keine
+Gesellschaft angelegt. Unter Einstellungen / Mandanten eine GmbH oder UG
+anlegen und die Objekte dort als Halter zuordnen — danach erscheint hier die
+Auswahl."* **Das ist der Beweis, dass `_abschlussInit()` auf Prod gelaufen
+ist** — den Satz gibt es nur, wenn die Funktion die Mandantenliste wirklich
+gelesen hat.
+
+**Rest.** Der Knopf selbst ist auf Prod **nicht** gedrückt worden — dazu
+bräuchte es eine echte Gesellschaft in Marcels Prod-Daten, und Prod-Daten
+werden nicht zum Testen angelegt. Auf Staging ist der Weg vollständig geprüft
+(`v1227`, Bilanzsumme 687.059 € in zwei Läufen). Offen bleiben die fünf Fragen
+an den Steuerberater und die § 7b-Spalte in `tax_records`.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

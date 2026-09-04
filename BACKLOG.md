@@ -36,21 +36,16 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Übergabe 03.09.2026, zweiter Teil: die Gesellschaft)
+## → HIER WEITERMACHEN (Stand 04.09.2026, nach dem Prod-Rollout)
 
-**Stand:** lokal = GitHub = Staging auf `15fc6f0`.
-**Produktion steht auf `8269465`** (am 04.09. auf dem Server ausgelesen, nicht auf `6047036` — die Zeile hier war veraltet) — **`v1215` bis `v1228` sind NICHT auf Prod.**
-Reines Frontend, kein Rebuild, keine Migration.
+**Stand:** lokal = GitHub = Staging = **Produktion** auf `6b69254`.
+**Alles ist live** — `v1215` bis `v1228` sind am 04.09. auf Prod gezogen
+worden, Fast-Forward `8269465` → `6b69254`, 34 Commits, reines Frontend.
+Nachweis, Backups und Messung stehen im Rollout-Journal der
+Projektanweisung.
 
-> ### Der erste Griff am 04.09.
+> ### Der erste Griff jetzt
 >
-> **Marcel fragen, ob v1215–v1228 auf Prod sollen.** Das ist der einzige
-> Punkt, der wartet und nicht von einer Entscheidung abhängt, die noch
-> aussteht. Reines Frontend: `git pull` auf `157.90.117.167`, kein Rebuild,
-> keine Migration — vorher sichern (`/root/backups/`, **beide** Datenbanken,
-> `dealpilot-mb-db` steht in keinem Backup-Skript).
->
-> Danach in dieser Reihenfolge:
 > 1. **Die fünf Fragen an den Steuerberater** aus dem Prüfbefund — vor allem,
 >    ob ihm Bilanz und GuV in dieser Form reichen oder ob seine
 >    Kanzleisoftware einen DATEV-Buchungsstapel braucht. **Die Antwort
@@ -60,6 +55,12 @@ Reines Frontend, kein Rebuild, keine Migration.
 >    Freigabe. Bis dahin steht im PDF der ehrliche Hinweis statt einer Zahl.
 > 3. Aufräumen auf Staging, falls Marcel es will: Mandant „Test UG (v1226)"
 >    und der Halter am Objekt „Am Markt 9 Kabelsketal".
+>
+> **Auf Prod ungeprüft geblieben ist genau eine Sache:** der Knopf
+> „Jahresabschluss erstellen" selbst — Marcels Prod-Konto hat keine
+> Gesellschaft, und Prod-Daten werden nicht zum Testen angelegt. Der
+> Abschnitt steht, der Leerzustand greift, der Weg ist auf Staging
+> vollständig geprüft.
 >
 > **Nichts hängt halbfertig.** Kein Rebuild offen, keine Migration offen,
 > Arbeitsverzeichnis sauber.
@@ -154,12 +155,10 @@ ansehen kann. Der Halter ist am Objekt in einem Klick zurückzustellen.
 
 ---
 
-## → Übergabe 03.09.2026, erster Teil: Steuer-Mappe und Anlage V
+## → ARCHIV: Übergabe 03.09.2026, erster Teil: Steuer-Mappe und Anlage V
 
-**Stand:** lokal = GitHub = Staging auf `952c601`.
-**Produktion steht auf `8269465`** — **`v1215` bis `v1225c` sind NICHT auf
-Prod.** Reines Frontend, kein Rebuild, keine Migration. Ein Prod-Rollout
-braucht nur Marcels „ja".
+**Stand damals:** Staging auf `952c601`, Produktion auf `8269465`.
+**Seit dem 04.09. ist alles davon auf Prod** — siehe der Block ganz oben.
 
 **Marcels Paket vom 03.09. ist abgearbeitet — alle vier Punkte, in seiner
 Reihenfolge.** Jeder auf Staging gemessen, nicht behauptet.
