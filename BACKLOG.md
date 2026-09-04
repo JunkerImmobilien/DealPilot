@@ -38,11 +38,10 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 04.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging auf `fa5f91f`, **Produktion auf `c497e31`**.
-**`v1215`–`v1230` sind live** — drei Prod-Rollouts am 04.09.: `v1215`–`v1228`,
-`v1229`–`v1229c` (beide reines Frontend) und `v1230` (Backend, mit Neubau).
-**`v1231` liegt auf Staging und ist noch nicht draußen.** Nachweise im
-Rollout-Journal der Projektanweisung.
+**Stand:** lokal = GitHub = Staging = **Produktion** auf `50cc1a4`.
+**Alles ist live** — vier Prod-Rollouts am 04.09.: `v1215`–`v1228`,
+`v1229`–`v1229c`, `v1230` (Backend, mit Neubau) und `v1231`.
+Nachweise im Rollout-Journal der Projektanweisung.
 
 **Und auf Prod liegen jetzt Marcels Daten.** Der Staging-Nutzer
 `info@junker-immobilien.io` ist auf Prod ins Konto gleicher Mailadresse
@@ -67,14 +66,14 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 
 > ### Der erste Griff jetzt
 >
-> **`v1231` liegt auf Staging und ist noch nicht auf Prod** — reines
-> Frontend, `git pull` genügt. Der Sanierungsbedarf ist damit diktierbar.
+> **Nichts wartet auf einen Rollout.** Alles ist live.
 >
-> **Der Abnahmepunkt dazu:** ein echter Sprechlauf am Gerät. „Das Dach muss
-> neu, fünfzehntausend, Heizung auch" — kommt es in den Kacheln an, geht der
-> Block auf, stehen 27.000 € in den Sanierungskosten? Alles, woran das hängt,
-> ist geprüft; der Auslöser selbst braucht ein Mikrofon. **Gehört zum selben
-> Stapel wie `v1168`/`v1169`/`v1170`.**
+> **Der eine Abnahmepunkt: ein Sprechlauf am Gerät.** Vier Änderungen warten
+> darauf, weil sie ohne Mikrofon nicht prüfbar sind — `v1168` (Häkchen
+> `san_tax_active`), `v1169` (Stichwort-Fenster), `v1169`/`v1170` (Tempo) und
+> jetzt **`v1231`**: „Das Dach muss neu, fünfzehntausend, Heizung auch" —
+> kommt es in den Kacheln an, geht der Block auf, stehen 27.000 € in den
+> Sanierungskosten? **Ein Sprechlauf erledigt alle vier.**
 >
 > **Zwei Entscheidungen liegen bei Marcel:**
 > - **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, vor und nach
@@ -95,7 +94,9 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 > eine Funktion abfragt, die es nicht gibt. **Kein Loch** (das Backend
 > sperrt), aber beides gehört geradegezogen, wenn jemand dort arbeitet.
 >
-> Der Steuerberater steht auf Marcels Wunsch ganz hinten an.
+> **Der nächste Backlog-Punkt ist 4** — der Testbericht aus
+> `design/mockups/Anmerkungen.docx`. Der Steuerberater steht auf Marcels
+> Wunsch ganz hinten an.
 >
 > **Nichts hängt halbfertig.** Kein Rebuild offen, keine Migration offen,
 > Arbeitsverzeichnis sauber.

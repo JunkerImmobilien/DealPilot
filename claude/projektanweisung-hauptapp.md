@@ -7219,6 +7219,41 @@ der Knopf gar nicht gerufen, sonst tutet seine eigene Warnung.
 > alles, woran er hängt. Der Punkt gehört zum selben Abnahmestapel wie
 > `v1168`/`v1169`/`v1170`, die ebenfalls auf einen Sprechlauf warten.
 
+### Prod-Rollout 04.09.2026, vierter — `v1231` ist live (`50cc1a4`)
+
+**Freigabe.** Marcel: **„ja"**.
+
+Reines Frontend, `git pull`, kein Rebuild. **Gesichert vorher:**
+`/root/backups/haupt-vor-v1231-20260904-1224.sql` (15,8 MB) und
+`mb-vor-v1231-20260904-1224.sql` (14,3 MB).
+
+**Über HTTPS gegengelesen**, nicht auf der Platte:
+
+| | |
+|---|---|
+| `js/voice-import.js?v=v1231` | 200 · 73.359 B · `sanKatalog` 3× · Aufruf in Z. 354 |
+| `js/object-actions.js?v=v1231` | 200 · 143.914 B · `_sanNachziehen` 2× · die Schutzzeile „blieben unverändert" 1× |
+
+**Im Browser auf Prod**, Konto `partner`, Objekt `2026-1000`:
+
+| Prüfung | Ergebnis |
+|---|---|
+| neue Fassungen geladen | `object-actions v1231`, `voice-import v1231` |
+| die 17 Felder im DOM | **17 von 17**, keines fehlt |
+| die drei Funktionen, an denen `_sanNachziehen` hängt | `updateFESH`, `applyFESHToSanierung`, `parseDe` — alle `function` |
+| Konsole | keine Fehler |
+
+> **Auf Prod wurde bewusst NICHT geschrieben.** Die Kette „Häkchen → Summe →
+> `san`" ist auf Staging real durchgespielt (27.000 €) und danach
+> zurückgestellt. Sie auf Prod zu wiederholen hieße, Testwerte in ein echtes
+> Objekt zu schreiben — für dieselbe Erkenntnis, denn der Code ist derselbe
+> und die Funktionen, an denen er hängt, sind dort nachweislich vorhanden.
+> **Gemessen wurde, was ohne Schreiben messbar ist.**
+
+**Rest.** Der Abnahmepunkt bleibt: ein echter Sprechlauf am Gerät. Ob das
+Modell „das Dach muss neu, fünfzehntausend" den Kacheln zuordnet, zeigt kein
+Prüfskript.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
