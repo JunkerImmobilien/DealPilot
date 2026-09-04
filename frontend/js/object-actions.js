@@ -1460,10 +1460,57 @@
       }
     } catch (e) {}
     try { if (typeof window._v236MarkQcLoaded === 'function' && _applied.length) window._v236MarkQcLoaded(_applied); } catch (e) {}
+    var _san = _sanNachziehen(_applied);
     try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
     try { if (typeof window.renderDealScore2 === 'function') window.renderDealScore2(); } catch (e) {}
     ov.remove(); _fireOabiDone();
-    toast('✓ ' + n + ' Werte aus Import übernommen');
+    toast('✓ ' + n + ' Werte aus Import übernommen' + (_san ? ' · ' + _san : ''));
+  }
+
+  /* ── v1231 · Der diktierte Sanierungsbedarf muss ankommen ───────────────
+     Die acht Gewerke (fesh_*) sind seit v1231 diktierbar, aber ihre Werte
+     werden NICHT gespeichert — im Datensatz steht nur `san`, die Summe. Ein
+     diktiertes „Dach fuenfzehntausend" waere also beim naechsten Laden weg,
+     und bis dahin unsichtbar, weil der Block hinter einem Schalter liegt.
+
+     Drei Dinge, in dieser Reihenfolge:
+       1. Den Schalter „Sanierungsbedarf einschaetzen" aufmachen.
+       2. updateFESH() rechnen lassen (die Summe steht sonst nicht).
+       3. Die Summe nach `san` uebernehmen — aber NUR, wenn `san` leer ist.
+
+     Punkt 3 ist die eigentliche Entscheidung. applyFESHToSanierung() ist im
+     Haus ein AUSDRUECKLICHER Knopf; ihn hier still zu druecken wuerde einen
+     von Hand getippten Betrag ueberschreiben. Steht dort schon etwas, bleibt
+     es stehen und der Nutzer wird darauf hingewiesen. */
+  function _sanNachziehen(applied) {
+    try {
+      var betroffen = (applied || []).filter(function (id) { return /^fesh_/.test(id); });
+      if (!betroffen.length) return '';
+
+      var tog = document.getElementById('sanbedarf_toggle');
+      if (tog && !tog.checked) { tog.click(); }
+      if (typeof window.updateFESH === 'function') { try { window.updateFESH(); } catch (e) {} }
+
+      /* Ein Gewerk zaehlt nur mit Haekchen — genau wie im Knopf. Ohne
+         Haekchen wuerde applyFESHToSanierung() eine Warnung tuten, die hier
+         niemand erwartet. */
+      var angehakt = ['f', 'e', 's', 'h', 'd', 'b', 'k', 'o'].some(function (a) {
+        var cb = document.getElementById('fesh_' + a); return cb && cb.checked;
+      });
+      if (!angehakt) return 'Sanierungsbereiche gesetzt';
+
+      /* v1227b-Lehre: die Summe wird NICHT nachgerechnet. applyFESHToSanierung()
+         bildet sie bereits, und eine zweite Rechnung waere eine zweite
+         Wahrheit. Gelesen wird hinterher, was im Feld steht. */
+      var sanEl = document.getElementById('san');
+      if (sanEl && String(sanEl.value || '').trim() !== '') {
+        return 'Sanierungsbereiche erkannt — Sanierungskosten blieben unverändert';
+      }
+      if (typeof window.applyFESHToSanierung !== 'function') return 'Sanierungsbereiche gesetzt';
+      window.applyFESHToSanierung();
+      var neu = sanEl ? String(sanEl.value || '').trim() : '';
+      return neu ? ('Sanierungskosten ' + neu + ' € übernommen') : 'Sanierungsbereiche gesetzt';
+    } catch (e) { return ''; }
   }
 
   // v418: QC-Modus — angehakte Zeilen splitten. Bucket A (qc_-Feld) -> zurueck an

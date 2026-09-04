@@ -277,6 +277,37 @@
      (z.B. bank_inst "Volksbank", d1_type "Annuitaetendarlehen", Bauspar-Felder,
      Investment-These, Risiken ...). Die Chip-Wolke bleibt kuratiert (buildCatalog).
      Nur Objekt-Modus; im Quick Check bleibt es bei den QC-Feldern. */
+  /* ── v1231 · Der Sanierungsbedarf war nie diktierbar ────────────────────
+     Gemessen am 04.09.2026: von 235 Formularfeldern kennt die Auswertung 203,
+     und die groesste Luecke ist EIN Block — die acht Gewerke im Reiter
+     Investition, Karte „Sanierung". „Das Dach muss neu, fuenfzehntausend"
+     ist genau das, was man vor Ort sagt, und es traf bis hierher nichts.
+
+     Sie stehen bewusst NICHT in window.FIELDS: die Kachelwerte werden gar
+     nicht gespeichert (im Datensatz steht nur `san`, die Summe). Der Block
+     ist ein Rechner mit Richtwerten aus dem HTML — anhaken, Betrag anpassen,
+     „In Sanierungskosten uebernehmen" druecken. Wer die Kacheln in FIELDS
+     aufnaehme, baute einen zweiten Speicherweg fuer Werte, die keiner sein
+     sollen (dieselbe Falle, vor der WM_FIELDS in storage.js warnt).
+
+     Deshalb: nur in den AUSWERTUNGS-Katalog, nicht in die Speicherliste.
+     Was danach mit der Summe passiert, entscheidet applyMerged(). */
+  var SAN_GEWERKE = [
+    ['f', 'Fenster'], ['e', 'Elektrik'], ['s', 'Sanitär'], ['h', 'Heizung'],
+    ['d', 'Dach/Fassade'], ['b', 'Bäder'], ['k', 'Küche'], ['o', 'Sonstiges']
+  ];
+  function sanKatalog() {
+    var out = [];
+    SAN_GEWERKE.forEach(function (g) {
+      out.push({ id: 'fesh_' + g[0], kind: 'bool',
+                 label: 'Sanierungsbedarf ' + g[1],
+                 hint: 'true, wenn ' + g[1] + ' saniert werden muss' });
+      out.push({ id: 'fesh_' + g[0] + '_cost', kind: 'num',
+                 label: 'Sanierungskosten ' + g[1] + ' (€)',
+                 hint: 'geschaetzte Kosten fuer ' + g[1] + ', nur wenn eine Zahl genannt wird' });
+    });
+    return out;
+  }
   function buildFullCatalog() {
     var ids = (window.FIELDS && window.FIELDS.length) ? window.FIELDS.slice() : [];
     var cat = [], seen = {};
@@ -316,6 +347,11 @@
       }
       cat.push(entry);
     });
+    /* v1231: die Sanierungs-Gewerke kommen aus sanKatalog(), nicht aus FIELDS
+       — und nur, wenn sie im DOM stehen. Sonst meldete der Katalog Felder,
+       die es auf dieser Seite gar nicht gibt, und das Modell ordnete ins
+       Leere zu. */
+    sanKatalog().forEach(function (e) { if ($(e.id)) cat.push(e); });
     return cat;
   }
   function catalogEntry(catalog, id) {
