@@ -36,11 +36,14 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Stand 04.09.2026, nach Rollout und Spiegelung)
+## → HIER WEITERMACHEN (Stand 04.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging = **Produktion** auf `6b69254` (Doku
-darüber hinaus). **Alles ist live** — `v1215` bis `v1228` sind am 04.09. auf
-Prod gezogen, Fast-Forward `8269465` → `6b69254`, 34 Commits, reines Frontend.
+**Stand:** lokal = GitHub = Staging auf `456a7aa`.
+**Produktion steht auf `6b69254`** — `v1229`, `v1229b` und `v1229c` sind
+**noch nicht auf Prod**. Reines Frontend, kein Rebuild, keine Migration.
+
+**Was heute live ging:** `v1215` bis `v1228` sind auf Prod gezogen worden
+(Fast-Forward `8269465` → `6b69254`, 34 Commits).
 
 **Und auf Prod liegen jetzt Marcels Daten.** Der Staging-Nutzer
 `info@junker-immobilien.io` ist auf Prod ins Konto gleicher Mailadresse
@@ -65,13 +68,25 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 
 > ### Der erste Griff jetzt
 >
-> 1. **Die fünf Fragen an den Steuerberater** aus dem Prüfbefund — vor allem,
+> 1. **`v1229`–`v1229c` auf Prod ziehen**, wenn Marcel es freigibt. Reines
+>    Frontend, `git pull`, kein Rebuild. Es sind drei Bewertungsbefunde
+>    darin, keine Kosmetik — siehe unten.
+> 2. **Die fünf Fragen an den Steuerberater** aus dem Prüfbefund — vor allem,
 >    ob ihm Bilanz und GuV in dieser Form reichen oder ob seine
 >    Kanzleisoftware einen DATEV-Buchungsstapel braucht. **Die Antwort
 >    entscheidet, ob als Nächstes ein Buchungsstapel-Export gebaut wird
 >    oder nicht** — deshalb steht sie vor allem anderen Code.
-> 2. **§ 7b-Spalte in `tax_records`** — Datenbankeingriff, braucht Marcels
+> 3. **§ 7b-Spalte in `tax_records`** — Datenbankeingriff, braucht Marcels
 >    Freigabe. Bis dahin steht im PDF der ehrliche Hinweis statt einer Zahl.
+>
+> **Zwei Fragen an Marcel, aus `v1229` herausgefallen:**
+> - **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, gemessen vor UND
+>   nach `v1229` Zahl für Zahl gleich. `CLAUDE.md` führt „RC=0 ist sauber"
+>   als Rollout-Tor. Das Tor ist seit Längerem offen. Schließen oder Regel
+>   umschreiben?
+> - **Die Objektart kennt kein Zweifamilienhaus.** `Zweifamilienhaus` fällt
+>   auf `EFH`. Das Testobjekt Löhner Str. 278 ist ein ZFH. Fehlt die Option,
+>   oder ist EFH die gewollte Näherung? **Bewertungsfrage, nicht Code.**
 >
 > **Nichts hängt halbfertig.** Kein Rebuild offen, keine Migration offen,
 > Arbeitsverzeichnis sauber.
@@ -1346,6 +1361,35 @@ entfällt — nicht raten.
 1. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
+
+   > ### ERLEDIGT am 04.09.2026 — die Messung, die hier verlangt wurde
+   >
+   > Unten stand: *„aus dem, was das Backend tatsächlich braucht, nicht aus
+   > dem Bauchgefühl. Solange das nicht gemessen ist, ist jeder
+   > Freischaltzustand geraten."* **Gemessen — und der Befund lag eine Ebene
+   > tiefer** (`v1229`/`v1229b`/`v1229c`, `cd930a1` · `d994e0f` · `456a7aa`).
+   >
+   > **`ptype` und `baustatus` waren Auswahlfelder ohne leere erste Option**
+   > und standen ohne Zutun auf `ETW` bzw. `bestand`. Alle anderen öffnen mit
+   > „– keine Angabe –". Eine Pflicht, die nie leer sein kann, wird nie
+   > eingefordert — deshalb fiel auch nicht auf, dass Ampel (`BEDARF`) und
+   > Knopf (`VERFAHREN.pflicht`) den Baustatus auf **verschiedenen Stufen**
+   > führten.
+   >
+   > Fachlich zählt vor allem `ptype`: daran hängt `istWohnung()`. Ein von
+   > Hand erfasstes Haus lief still als Eigentumswohnung, **und damit
+   > erschien das Sachwertverfahren gar nicht erst** — mit der plausibel
+   > klingenden Begründung „bei Eigentumswohnung nicht anwendbar".
+   >
+   > Dazu zwei Funde beim Nachmessen: der `.dpkt`-Import setzte die Objektart
+   > **nie** (er schrieb `'haus'`/`'wohnung'` in ein Feld, das diese Werte
+   > nicht kennt — `selectedIndex -1`), und danach zog die Ampel nicht nach,
+   > weil skriptgesteuertes Füllen kein `change` feuert.
+   >
+   > **Der Rest dieses Punktes bleibt offen:** der überarbeitete Entwurf zur
+   > Meilenstein-Führung und die beiden Geldfragen. Was jetzt gemessen ist,
+   > ist die **Grundlage** dafür — welche Angabe zu welcher Stufe gehört,
+   > steht seit `v1229` an einer Stelle statt an zwei.
 
    > ### Ist-Zustand aufgenommen am 01.09.2026 — der Wizard IST gebaut
    >

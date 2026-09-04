@@ -6720,6 +6720,144 @@ gespiegelten Steuersätzen.
 Öffnen gespeichert. **Am Ergebnis ändert das nichts**, beide Seiten rechnen
 identisch; der Unterschied liegt also nicht im Rechenstoff.
 
+### `v1229` / `v1229b` / `v1229c` (04.09.2026, `cd930a1` · `d994e0f` · `456a7aa`) — drei Pflichtangaben, die geraten statt gefragt wurden
+
+**Backlog-Punkt 1, Marktbericht.** Dort stand als nächster Schritt: *„aus dem,
+was das Backend tatsächlich braucht, nicht aus dem Bauchgefühl. Solange das
+nicht gemessen ist, ist jeder Freischaltzustand geraten."* Genau das wurde
+gemessen — und der Befund liegt eine Ebene tiefer als erwartet.
+
+#### Der Ausgangspunkt: zwei Listen derselben Sache
+
+`BEDARF` in `mb-stufen.js` sagt, was die **Ampel** je Stufe verlangt.
+`VERFAHREN[].pflicht` in `wertermittlung.js` sagt, was den **Erzeugen-Knopf**
+freigibt. Der Kommentar bei `v1152` sagt es selbst: *„Sie sind jetzt wieder
+deckungsgleich — bleibt es bei zwei Listen, gehört das zusammengeführt."*
+
+Sie waren es nicht mehr: `baustatus` steht in `VERFAHREN.markt.pflicht`
+(Stufe 1), in `BEDARF` aber auf Stufe 2.
+
+#### Warum das jahrelang niemandem auffiel
+
+**Weil das Feld nie leer sein konnte.** Im Browser auf Staging gemessen, an
+einem frisch geladenen Wizard:
+
+| Feld | Zustand ohne jede Eingabe | erste Option |
+|---|---|---|
+| `ptype` | **`ETW`** | `ETW` |
+| `baustatus` | **`bestand`** | `bestand` |
+| `standardstufe` · `nhkHaus` · `grundriss` · `cond` · `quality` | leer | `– keine Angabe –` |
+
+**Zwei Auswahlfelder ohne leere erste Option, beide als Pflicht geführt.** Eine
+Pflicht, die nie leer sein kann, wird nie eingefordert — von keiner der beiden
+Listen. Der Widerspruch war deshalb unsichtbar.
+
+#### Was daran fachlich zählt
+
+**1 · `ptype` trägt `istWohnung()`.** Ein von Hand erfasstes Haus lief still
+als Eigentumswohnung. Folge: `VERFAHREN.sach.nichtWenn` greift, das
+**Sachwertverfahren erscheint gar nicht erst** — mit der plausibel klingenden
+Begründung „bei Eigentumswohnung nicht anwendbar". Für ein Einfamilienhaus
+fällt damit das führende Verfahren weg. Stattdessen wird ein
+Miteigentumsanteil verlangt, den es nicht gibt.
+
+**2 · `baustatus` geht in den Payload** (`wertermittlung.js:882-884`) und
+steuert dort `first_time_use` und `refurbished`. Ein Neubau-Erstbezug ginge
+als Bestand hinaus, ohne dass jemand gefragt wurde.
+
+Beides verstößt gegen die eigene Regel: **fehlt eine Pflichtangabe, erscheint
+das Verfahren nicht — geraten wird nicht.**
+
+#### `v1229` — die leere Option, und die Listen wieder auf eine Stufe
+
+- `ptype` und `baustatus` bekommen `– bitte wählen –` als erste Option.
+- `baustatus` wandert in `BEDARF` von Stufe 2 auf Stufe 1. **Ohne diesen
+  Schritt kehrt Marcels `v1152`-Befund zurück**: die Ampel meldet „erreicht",
+  der Knopf bleibt gesperrt und nennt ein Feld, das die Ampel nicht verlangt
+  hat.
+- `WAS[2]` nennt den Baustatus nicht mehr als das, was Stufe 2 hinzufügt.
+
+**Nachgemessen auf Staging, frisch geladen:**
+
+| Prüfung | Ergebnis |
+|---|---|
+| beide Felder leer beim Laden | ✔ `''`, erste Option `– bitte wählen –` |
+| Ampel Stufe 1, leeres Formular | „fehlt: **Objektart, Baujahr, Baustatus**" — vorher waren zwei davon unsichtbar |
+| Stufe 1 vollständig, Stufe 1 gewählt | Ampel „ist gewählt und **vollständig**", Knopf **nicht gesperrt**, kein Titel, keine Fehlt-Box |
+| `baustatus` wieder geleert | Ampel-Zeile, Ampel-Schluss, Knopf-Titel und Fehlt-Box sagen **alle vier** „Baustatus" |
+| Konsole | keine Fehler |
+
+#### `v1229b` — der Fund beim Nachmessen: der `.dpkt`-Import setzte die Objektart nie
+
+`fillInputsFromDpkt()` in `app.js` schrieb `'haus'` bzw. `'wohnung'` in
+`<select id="ptype">`, dessen Optionen `ETW/EFH/MFH/DHH/RH/…` heißen. **Im
+Browser gemessen:**
+
+```
+s.value = 'haus'    ->  value ''    selectedIndex -1
+s.value = 'wohnung' ->  value ''    selectedIndex -1
+s.value = 'EFH'     ->  value 'EFH' selectedIndex  2
+```
+
+Der Import hat die Objektart also **in keinem Fall** gesetzt. `mapPtype()` in
+`mb-objektwahl.js` kann es seit `v1136c` richtig, inklusive Doppelhaus,
+Reihenhaus und Gewerbe — sie wird jetzt als `window._mbMapPtype` exportiert
+und dort **geholt statt abgeschrieben**. Erkennt sie nichts, liefert sie
+`null`, das Feld bleibt leer, die Ampel sagt „fehlt: Objektart".
+
+Gegenprobe an der ausgelieferten Fassung: `Einfamilienhaus → EFH`,
+`Eigentumswohnung → ETW`, `Doppelhaushälfte → DHH`, `Reihenhaus → RH`,
+`Mehrfamilienhaus → MFH`, `Quatsch → null`, `'' → null`.
+
+#### `v1229c` — und danach blieb die Ampel stehen
+
+Beim Funktionslauf zu `v1229b` gemessen: nach dem Import stand „fehlt:
+Objektart", obwohl `EFH` im Feld stand. **Skriptgesteuertes Füllen feuert kein
+`change`** — Ampel, Pflichtfeld-Sperre und die abhängigen Blöcke ziehen nicht
+nach. Der andere Füllweg im selben Haus (`setzen()`, Z. 1662) machte es
+längst richtig.
+
+Die Zeile steht jetzt **einmal** als `_mbNachziehen()` und wird von beiden
+gerufen — zwei eigene Listen wären genau die Doppelliste, an der diese App
+schon mehrfach gescheitert ist, und die zweite hätte `address` gebraucht, die
+erste nicht. Nach dem Import zweimal gerufen, sofort und nach 60 ms, weil die
+Stufenfelder dazwischen neu gezeichnet werden.
+
+**An der ausgelieferten Datei gegengelesen** (`curl` auf
+`app.js?v=1229c`): Helfer einmal definiert, aus beiden Wegen gerufen. Der
+Lauf über `fillInputsFromDpkt()` mit dem Testobjekt Löhner Str. 278 ergibt
+`ptype = EFH`, Ampel sofort „fehlt: Baustatus" — richtig, den trägt die
+`.dpkt`-Datei nicht.
+
+#### Die Cache-Kette, alle drei Glieder
+
+`frontend/index.html → marktbericht-view.js` · `marktbericht-view.js →
+marktbericht-app/index.html` · `index.html → app.js · mb-objektwahl.js ·
+wertermittlung.js · mb-stufen.js`. Bei jeder der drei Versionen nachgezogen
+und einzeln ausgelesen. `node --check` auf allen vier Skripten im Container:
+OK.
+
+#### Zwei Dinge, die dabei auffielen und offen bleiben
+
+> **Der Gold-Audit steht rot, und zwar nicht wegen dieser Änderung.**
+> `CLAUDE.md` führt „`python3 tools/gold-audit.py`, RC=0 ist sauber" als Tor
+> vor jedem Rollout. Gemessen am 04.09. auf Staging, denselben Lauf einmal
+> gegen `4a5359d` und einmal gegen `456a7aa`: **beide Male RC=1 mit 468
+> Fundstellen in 56 Dateien — Zahl für Zahl gleich.** Meine drei Versionen
+> enthalten kein einziges Farbliteral. Das Tor ist also seit Längerem offen,
+> ohne dass es jemand bemerkt hätte. **Entweder wird es geschlossen oder die
+> Regel gehört umgeschrieben** — ein Tor, an dem alle vorbeigehen, schützt
+> nichts.
+
+> **`ptype` kennt kein Zweifamilienhaus.** Die Auswahl führt
+> ETW/EFH/MFH/DHH/RH/BUERO/GESCH/HOTEL/GEW/GAR. `mapPtype('Zweifamilienhaus')`
+> fällt über die `/haus/`-Regel auf **`EFH`**. Für das Testobjekt Löhner Str.
+> 278 — ein **ZFH** — heißt das: es wird als Einfamilienhaus geführt. Das ist
+> **kein neuer Fehler** (die Zuordnung ist seit `v1136c` so und wird vom
+> funktionierenden Übernahmeweg genauso benutzt), aber es ist eine
+> Bewertungsfrage und gehört Marcel vorgelegt: Fehlt die Option, oder ist
+> EFH die gewollte Näherung?
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

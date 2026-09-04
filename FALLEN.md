@@ -504,3 +504,55 @@ Dasselbe gilt für den Zähler der Objektnummern, `ji_u_<user-id>_seq_<jahr>`:
 er trägt die **Nutzer-ID im Namen**, und die ist in der anderen Umgebung eine
 andere. Wer ihn stumpf kopiert, legt ihn unter dem alten Namen ab, wo ihn
 niemand liest.
+
+## Ein Auswahlfeld ohne leere erste Option ist keine Pflichtangabe
+
+Gemessen am 04.09.2026 im Marktbericht-Wizard, frisch geladen: `ptype` stand
+ohne jede Eingabe auf `ETW`, `baustatus` auf `bestand` — beide sind als
+Pflicht geführt. Alle übrigen Auswahlfelder öffnen mit „– keine Angabe –"
+und sind leer.
+
+**Ein `<select>` ohne leere erste Option ist immer ausgefüllt.** Damit fällt
+das Feld aus jeder Vollständigkeitsprüfung heraus: es fehlt nie, also fordert
+es niemand ein, also merkt auch niemand, wenn zwei Listen es auf verschiedenen
+Stufen führen. Genau so blieb ein Widerspruch zwischen `BEDARF` (Ampel) und
+`VERFAHREN[].pflicht` (Knopf) jahrelang unsichtbar.
+
+Schlimmer als die Logik ist die Fachlichkeit: an `ptype` hängt
+`istWohnung()`, und daran hängt, **ob das Sachwertverfahren überhaupt
+erscheint**. Ein von Hand erfasstes Haus lief still als Eigentumswohnung, und
+das führende Verfahren verschwand mit einer plausibel klingenden Begründung.
+
+**Beim Prüfen einer Pflichtangabe nie den Code lesen, sondern das Feld im
+Browser auslesen** — `value` UND `options[0].value`. `pflicht: true` im
+Feldschema sagt nichts darüber, ob die Pflicht je greifen kann.
+
+## Ein Wert, den das Auswahlfeld nicht kennt, wird still verworfen
+
+Im selben Durchgang: `fillInputsFromDpkt()` schrieb `'haus'` bzw. `'wohnung'`
+in ein `<select>`, dessen Optionen `ETW/EFH/MFH/DHH/…` heißen. Gemessen:
+
+```
+s.value = 'haus'  ->  value ''  selectedIndex -1
+s.value = 'EFH'   ->  value 'EFH'
+```
+
+**Kein Fehler, keine Ausnahme, keine Konsolenmeldung** — die Zuweisung setzt
+`selectedIndex` auf −1 und der Wert ist leer. Der Import hat die Objektart
+also nie gesetzt, in keinem einzigen Fall, und niemand hat es gesehen.
+
+**Nach jedem `select.value = …` aus einer fremden Quelle gegenlesen**, ob der
+Wert angekommen ist. Und Zuordnungstabellen nicht zweimal führen: die richtige
+stand längst als `mapPtype()` in `mb-objektwahl.js`.
+
+## Skriptgesteuertes Füllen feuert kein `change`
+
+Direkt danach gefunden: nach dem `.dpkt`-Import stand „fehlt: Objektart",
+obwohl `EFH` im Feld stand. Wer Formularfelder per Skript setzt, muss die
+Ereignisse selbst auslösen — sonst ziehen Ampel, Pflichtfeld-Sperre und alle
+abhängigen Blöcke nicht nach.
+
+Der zweite Füllweg derselben Datei machte es längst richtig. **Solche
+Nachzieh-Listen gehören an EINE Stelle**: zwei Aufrufer mit je eigener Liste
+laufen auseinander, und hier hätte der zweite `address` gebraucht, der erste
+nicht.
