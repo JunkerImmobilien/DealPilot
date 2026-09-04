@@ -7068,6 +7068,55 @@ das: **es ist noch nie jemand hineingelaufen, der erste wird es.**
 Stellen), ändert aber, wer bezahlte Funktionen bekommt, und braucht einen
 Backend-Neubau. **Wartet auf Marcels Ja.**
 
+### `v1230` (04.09.2026, `795813a`) — die Testphase erreicht jetzt auch die letzten zwei Gates
+
+**Marcels Freigabe auf den B15-Befund: „ja."**
+
+`getEffectivePlan()` liest `plan_trials` mit; sechs Stellen benutzten sie.
+Zwei Routen lasen `subscriptions` direkt und sahen die Testphase nicht:
+`ai.js:1049` (KI-Beleg-Import, → 403) und `avm.js:60` (`modeForUser`, → Stub
+statt Live-Bewertung). Beide holen den Plan jetzt über `getEffectivePlan()`.
+
+**Beim AVM wog es doppelt.** `v1185` gibt der Testphase ein eigenes
+Bewertungspaket, damit der Testnutzer prüfen kann, wofür er zahlen soll. Das
+Paket wurde vergeben, dieser Schalter nicht umgestellt — **sie hätten es auf
+Stub-Werte verbraucht.**
+
+#### Der Funktionslauf im Container — und er hat meinen Befund korrigiert
+
+Nach dem Neubau gegen zwei echte Testphasen-Nutzer gelaufen:
+
+| Fall | alter Weg | neuer Weg |
+|---|---|---|
+| Test, **keine** Subscription | `free` → 403, Stub | **`pro`** → offen, **live**, `trial:true`, 25 Tage übrig |
+| Test **+ bezahltes `starter`** | `starter` → 403 | `starter` → 403 — **richtig so** |
+
+> **Korrektur zu meinen Lasten:** Im Befund stand, **acht** Nutzer seien
+> betroffen. **Es sind fünf.** Die anderen drei haben neben dem Test ein
+> bezahltes `starter`-Abo, und **ein bezahltes Abo schlägt die Testphase** —
+> Abweichung 1 im Kommentar von `getEffectivePlan`, ausdrücklich Absicht,
+> damit ein Reseller-Mandant nicht vier Wochen Pro sieht und danach sichtbar
+> herabgestuft wird.
+>
+> **Ich hatte aus der Datenbank gezählt, nicht aus dem Verhalten.** Die
+> Mechanik stimmte, der Umfang nicht. Genau dafür ist der Funktionslauf da —
+> `node --check` hätte es nie gezeigt.
+
+#### Was bewusst NICHT angefasst wurde
+
+`_planKey` und `_getPlanLimit` in `aiCreditsService` lesen weiter die rohe
+Subscription. **Dass die Testphase kein Kerosin verschenkt, ist Absicht**
+(Abweichung 3). Es sah aus wie derselbe Fehler und war das Gegenteil —
+nachgesehen, bevor angefasst.
+
+Fällt `getEffectivePlan()` aus, gilt weiter `free`: **im Zweifel gesperrt,
+nicht im Zweifel offen.** Der `db/pool`-Import in `avm.js` war danach
+unbenutzt und ist mitgefallen.
+
+**Ausgerollt:** Staging mit `docker compose up -d --build backend`, Container
+`Up`, Code im laufenden Container gegengelesen (`grep v1230` in
+`/app/src/routes/`). **Auf Prod fehlt der Neubau noch.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

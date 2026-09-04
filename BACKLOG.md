@@ -38,11 +38,11 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 04.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging = **Produktion** auf `74fc68a`.
-**Alles ist live.** Zwei Prod-Rollouts an diesem Tag: `v1215`–`v1228`
-(Fast-Forward `8269465` → `6b69254`, 34 Commits) und `v1229`–`v1229c`
-(`6b69254` → `74fc68a`). Beide reines Frontend, kein Rebuild, keine
-Migration. Nachweise im Rollout-Journal der Projektanweisung.
+**Stand:** lokal = GitHub = Staging auf `795813a`, **Produktion auf `5418545`**.
+**`v1215`–`v1229c` sind live** (zwei Prod-Rollouts am 04.09.). **Offen ist
+`v1230`** — eine Backend-Änderung, sie braucht auf Prod einen
+`docker compose up -d --build`, kein reines `git pull`. Nachweise im
+Rollout-Journal der Projektanweisung.
 
 **Und auf Prod liegen jetzt Marcels Daten.** Der Staging-Nutzer
 `info@junker-immobilien.io` ist auf Prod ins Konto gleicher Mailadresse
@@ -67,22 +67,12 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 
 > ### Der erste Griff jetzt
 >
-> **Eine Entscheidung wartet, und sie ist die wichtigste offene Sache:**
+> **`v1230` ist auf Staging und braucht einen Prod-Rollout MIT Neubau** —
+> es ist eine Backend-Änderung, `git pull` allein reicht nicht. Sie behebt
+> B15: die Testphase erreicht jetzt auch den KI-Beleg-Import und die
+> Live-Bewertung. Im Container gegen echte Testphasen-Nutzer belegt.
 >
-> **B15 · Die 28-Tage-Testphase erreicht zwei Backend-Gates nicht.**
-> `ai.js:1049` (KI-Beleg-Import) und `avm.js:60` (Live-Bewertung) lesen die
-> Tabelle `subscriptions` direkt statt `getEffectivePlan()`, das
-> `plan_trials` mitliest. Auf Staging belegt: acht Nutzer mit aktivem
-> `pro`-Test, deren Subscription `starter` oder gar nichts sagt. **In der
-> Testphase gibt es also 403 statt Beleg-Import und Stub statt
-> Live-Bewertung.** Der Eingriff ist klein — `getEffectivePlan()` an zwei
-> Stellen —, ändert aber, wer bezahlte Funktionen bekommt, und braucht einen
-> Backend-Neubau. **Wartet auf ein Ja.**
->
-> Zusammen mit B10 (die Testphase ist auf Prod noch nie gelaufen) heißt das:
-> **der erste echte Testkunde ist der erste, der hineinläuft.**
->
-> **Zwei Entscheidungen von gestern stehen noch:**
+> **Zwei Entscheidungen stehen noch:**
 > - **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, vor und nach
 >   `v1229` gleich. `CLAUDE.md` führt „RC=0 ist sauber" als Rollout-Tor.
 >   Schließen oder Regel umschreiben?
@@ -94,11 +84,19 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 >   Betroffen ist nur ein deaktiviertes Demokonto.
 > - **§ 7b-Spalte in `tax_records`** — Datenbankeingriff.
 >
-> **Erledigt und live:** B7 — Free bekommt den Track-Record mit Wasserzeichen,
-> in beiden Datenbanken gesetzt, am laufenden System gegengelesen.
-> Der Steuerberater steht auf Marcels Wunsch ganz hinten an.
+> **Zwei kleine Befunde ohne Entscheidung** (B13/B14): der
+> `config.js`-Rückfall ist tot, weil `hasCachedFeature` nie `null` liefert —
+> ein Schlüssel nur in `config.js` wirkt nichts. Und der Beleg-Import hat
+> gar kein Frontend-Gate, weil `beleg-import.js:65` eine Funktion abfragt,
+> die es nicht gibt. **Kein Loch** (das Backend sperrt), aber beides gehört
+> geradegezogen, wenn jemand ohnehin dort arbeitet.
 >
-> **Nichts hängt halbfertig.** Kein Rebuild offen, keine Migration offen,
+> **Erledigt und live:** B7 — Free bekommt den Track-Record mit Wasserzeichen,
+> in beiden Datenbanken gesetzt. Der Steuerberater steht auf Marcels Wunsch
+> ganz hinten an.
+>
+> **Nichts hängt halbfertig.** Auf Staging steht ein Backend-Neubau, der auf
+> Prod noch fehlt — das ist der einzige offene Punkt.
 > Arbeitsverzeichnis sauber.
 
 > ### Was auf Prod bewusst NICHT gespiegelt wurde
@@ -2119,38 +2117,49 @@ entfällt — nicht raten.
    und ein Free-Nutzer sieht die Oberfläche, statt eine saubere Sperre zu
    bekommen.
 
-   #### B15 · Die 28-Tage-Testphase erreicht zwei Backend-Gates nicht
+   #### B15 · Die Testphase erreichte zwei Backend-Gates nicht — BEHOBEN mit `v1230`
 
-   **Der schwerste Befund dieses Durchgangs**, weil er den ersten echten
-   Testkunden trifft.
-
-   Es gibt `subscriptionService.getEffectivePlan()`, und **die liest
-   `plan_trials` mit** — sechs Stellen benutzen sie (`middleware/auth.js`,
-   `planLimits.js` dreifach, `apiKeys.js`, `credits.js`). **Zwei Routen tun
-   es nicht**, sie lesen die Tabelle `subscriptions` direkt:
+   `getEffectivePlan()` liest `plan_trials` mit; sechs Stellen benutzten sie.
+   **Zwei Routen lasen die Tabelle `subscriptions` direkt:**
 
    | Stelle | Folge in der Testphase |
    |---|---|
-   | `ai.js:1049` — KI-Beleg-Import | Plan wird als `free`/`starter` gelesen → **403** |
-   | `avm.js:60` — `getPlanId` → `modeForUser` | Plan `free` → **Stub statt Live-Bewertung** |
+   | `ai.js:1049` — KI-Beleg-Import | Plan als `free` gelesen → **403** |
+   | `avm.js:60` — `modeForUser` | Plan `free` → **Stub statt Live-Bewertung** |
 
-   **Auf Staging belegt, nicht vermutet:** acht Nutzer haben einen **aktiven
-   `pro`-Test** (Laufzeit bis September), und ihre `subscriptions`-Zeile sagt
-   `starter` oder es gibt gar keine — dann fällt `ai.js` auf `'free'` zurück.
-   `getEffectivePlan()` sagt für dieselben Nutzer `pro`.
+   Beim AVM wog es doppelt: `v1185` gibt der Testphase ein **eigenes
+   Bewertungspaket**, damit der Testnutzer prüfen kann, wofür er zahlen soll.
+   Das Paket wurde vergeben, dieser Schalter nicht umgestellt — **sie hätten
+   es auf Stub-Werte verbraucht.**
 
-   Genau das war der Anlass für `v1185`, im Code nachzulesen: *„der Testnutzer
-   sah Pro, hatte aber das Free-Kontingent … und konnte gerade das nicht
-   testen, wofür er zahlen soll."* **Die Kontingente sind damals umgestellt
-   worden, diese zwei Routen nicht.**
+   > ### Der erste Befund war zu weit gegriffen — Korrektur zu meinen Lasten
+   >
+   > Ich hatte geschrieben, **acht** Nutzer seien betroffen. **Es sind fünf.**
+   > Der Funktionslauf nach dem Neubau hat es gezeigt: die anderen drei haben
+   > neben dem Test ein **bezahltes `starter`-Abo**, und da sagen beide Wege
+   > `starter` — denn **ein bezahltes Abo schlägt die Testphase**. Das steht
+   > als Abweichung 1 im Kommentar von `getEffectivePlan` und ist Absicht:
+   > sonst sähe ein Reseller-Mandant vier Wochen Pro und würde danach
+   > sichtbar herabgestuft.
+   >
+   > **Ich hatte die Zahl aus der Datenbank gezählt, nicht aus dem Verhalten.**
+   > Die Mechanik stimmte, der Umfang nicht.
 
-   Zusammen mit **B10** (die Testphase ist auf Prod noch nie gelaufen) heißt
-   das: **es ist noch nie jemand hineingelaufen — der erste wird es.**
+   **Der Funktionslauf im Container**, gegen zwei echte Testphasen-Nutzer:
 
-   **Der Eingriff wäre klein** — `getEffectivePlan()` statt der eigenen
-   Abfrage, an zwei Stellen. **Er ist hier nicht gemacht:** er ändert, wer
-   bezahlte Funktionen bekommt, und er braucht einen Backend-Neubau.
-   **Wartet auf Marcels Ja.**
+   | Fall | alter Weg | neuer Weg |
+   |---|---|---|
+   | Test, **keine** Subscription | `free` → 403, Stub | **`pro`** → offen, **live**, `trial:true`, 25 Tage übrig |
+   | Test **+ bezahltes `starter`** | `starter` → 403 | `starter` → 403 — **richtig so** |
+
+   **Nicht angefasst:** `_planKey` und `_getPlanLimit` in `aiCreditsService`
+   lesen weiter die rohe Subscription. Dass die Testphase **kein Kerosin**
+   verschenkt, ist Absicht (Abweichung 3). Nachgesehen, bevor angefasst —
+   es sah aus wie derselbe Fehler und war das Gegenteil.
+
+   Fällt `getEffectivePlan()` aus, gilt weiter `free` — **im Zweifel
+   gesperrt, nicht im Zweifel offen.** Der `db/pool`-Import in `avm.js` war
+   danach unbenutzt und ist mitgefallen.
 
 
 3. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**

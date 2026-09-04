@@ -616,10 +616,13 @@ in `config.js`. Und wer einen Verdacht prüft, misst am laufenden Konto gegen
 Stellen benutzen sie. **Zwei Routen lesen die Tabelle `subscriptions`
 direkt** (`ai.js`, `avm.js`) und sehen die Testphase deshalb nicht.
 
-Gemessen: acht Staging-Nutzer mit aktivem `pro`-Test, deren
-`subscriptions`-Zeile `starter` sagt oder gar nicht existiert. Für diese
-Nutzer liefert `getEffectivePlan()` `pro`, die Direktabfrage `starter` bzw.
-`free` — und damit 403 statt Beleg-Import.
+Gemessen: **fünf** Staging-Nutzer mit aktivem `pro`-Test und **ohne**
+Subscription-Zeile — für die liefert die Direktabfrage `free`, während
+`getEffectivePlan()` `pro` sagt. Drei weitere haben einen aktiven Test
+**und** ein bezahltes `starter`-Abo; bei ihnen sagen beide Wege `starter`,
+denn **ein bezahltes Abo schlägt die Testphase** (Abweichung 1 im Kommentar
+von `getEffectivePlan`). Das ist Absicht, kein Fehler — wer den Unterschied
+nicht kennt, hält den Befund für dreimal größer, als er ist.
 
 **Der Plan eines Nutzers wird nie aus `subscriptions` gelesen.** Es gibt eine
 Funktion dafür, und sie ist die einzige, die alle Quellen kennt. Eine
