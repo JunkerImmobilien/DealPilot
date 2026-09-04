@@ -50,14 +50,21 @@ dem `localStorage`. Gegenprobe über `md5` beidseitig gleich. Nachweis,
 Backups, Auslassungen und beide Befunde stehen im Journal der
 Projektanweisung.
 
+**Die Spiegelung ist im Ergebnis belegt, nicht nur in den Bytes.** Marcel hat
+sich angemeldet; danach auf **beiden** Umgebungen dieselbe Bilanz gerechnet
+(ohne PDF, über `_gaDaten()`/`_gaRechnen()`): **Summe Aktiva = Summe Passiva =
+430.309,21 €**, Differenz **0**, Verrechnungskonto −284.287,21 €,
+Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
+
+> **Achtung, eine alte Prüfzahl ist damit hinfällig:** in der
+> Projektanweisung steht zu `v1227` „Bilanzsumme 687.059 €". Heute sind es
+> 430.309,21 €, in beiden Umgebungen. Das Objekt hat sich seither nicht
+> geändert — die Differenz kommt aus den **Stammdaten der Test UG im
+> `localStorage`**, deren alter Zustand nirgends festgehalten ist.
+> **Reproduzierbar ist, dass die Bilanz aufgeht, nicht die 687.059 €.**
+
 > ### Der erste Griff jetzt
 >
-> 0. **Marcel meldet sich auf `app.dealpilot.immo` als
->    `info@junker-immobilien.io` an** — mit dem **Staging-Passwort**, das ist
->    mitgespiegelt. Dann sind die sieben Objekte da, und Abschnitt 08
->    „Jahresabschluss" lässt sich mit der Test UG einmal auf Prod drücken.
->    **Das ist der einzige Schritt, den ich nicht selbst gehen kann** — ich
->    gebe keine Passwörter ein.
 > 1. **Die fünf Fragen an den Steuerberater** aus dem Prüfbefund — vor allem,
 >    ob ihm Bilanz und GuV in dieser Form reichen oder ob seine
 >    Kanzleisoftware einen DATEV-Buchungsstapel braucht. **Die Antwort

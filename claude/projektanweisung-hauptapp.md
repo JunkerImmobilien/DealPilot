@@ -6680,11 +6680,45 @@ Abschnitt 08 zeigt in der Auswahl **„Test UG (v1226) · UG
 — richtig, denn im Browser war das Konto `majunker@gmx.net` angemeldet, und
 dessen zwei Objekte tragen diesen Halter nicht.
 
-**Rest — und das ist der einzige offene Punkt:** die Anmeldung als
-`info@junker-immobilien.io` auf Prod hat **niemand durchgeführt**. Ich gebe
-keine Passwörter ein; das macht Marcel selbst. Erst danach ist der letzte
-Schritt belegt — Objekt „Am Markt 9 Kabelsketal" mit der UG als Halter,
-Geschäftsjahr wählen, Knopf drücken.
+**Der letzte Schritt ist eingelöst — Marcel hat sich angemeldet.** Nachgemessen
+am 04.09. unter `info@junker-immobilien.io` auf Prod, **ohne ein PDF zu
+erzeugen**: `_gaDaten()` und `_gaRechnen()` direkt gerufen, damit die Prüfung
+keinen Download auslöst.
+
+| | Prod | Staging |
+|---|---|---|
+| Objekte im Abschluss | 1 („Am Markt 9 Kabelsketal") | 1 |
+| ausgewertete Steuersätze | 16 | 16 |
+| **Summe Aktiva** | **430.309,21 €** | **430.309,21 €** |
+| **Summe Passiva** | **430.309,21 €** | **430.309,21 €** |
+| Differenz | **0** | **0** |
+| Verrechnungskonto | −284.287,21 € | −284.287,21 € |
+| Gebäude-Buchwert | 116.383,20 € | 116.383,20 € |
+| Darlehen | 127.014,38 € | 127.014,38 € |
+| Umsatz · Personal | 12.480 € · 24.000 € | gleich |
+| Jahresfehlbetrag | −21.705,17 € | −21.705,17 € |
+
+**Damit ist die Spiegelung nicht nur byteweise, sondern im Ergebnis belegt:**
+beide Umgebungen rechnen aus denselben Daten dieselbe Bilanz, auf den Cent.
+Die Kette trägt durchgehend — der Halter `mmtlt8yq2fq` am Objekt zeigt auf den
+Mandanten aus dem `localStorage`, und die Zahlen kommen aus den 95
+gespiegelten Steuersätzen.
+
+> **Eine Zahl aus dieser Datei stimmt damit nicht mehr:** oben steht zu `v1227`
+> „Summe Aktiva = Summe Passiva = 687.059 €". Heute sind es **430.309,21 €**,
+> und zwar in **beiden** Umgebungen. Das Objekt selbst hat sich seit dem
+> `v1227`-Lauf **nicht** geändert (Staging `updated_at` 03.09. 18:05, die
+> `v1227`-Commits 19:55 und 20:01) — die Differenz muss also aus den
+> **Stammdaten der Test UG** kommen, die im Browser liegen und dort seither
+> angepasst wurden. **Nicht nachgewiesen, nur eingegrenzt** — der alte Zustand
+> des `localStorage` ist nirgends festgehalten. Für die Spiegelung ist es ohne
+> Belang; für die Doku heisst es: **die 687.059 € sind keine reproduzierbare
+> Prüfzahl.** Reproduzierbar ist, dass die Bilanz aufgeht.
+
+**Nebenbefund:** das Objekt „Am Markt 9 Kabelsketal" trägt auf Prod seit
+05:48 einen anderen `data`-Hash als auf Staging — die App hat beim ersten
+Öffnen gespeichert. **Am Ergebnis ändert das nichts**, beide Seiten rechnen
+identisch; der Unterschied liegt also nicht im Rechenstoff.
 
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
