@@ -227,7 +227,7 @@ var _GA_GUV = [
    Anlagevermoegens ist die Summe aller Jahre bis einschliesslich des
    Bilanzjahres, und die steht nirgends sonst.
    ─────────────────────────────────────────────────────────────────────────── */
-async function _gaDaten(halterId, jahr) {
+async function _gaDaten(halterId, jahr, _ohneVortrag) {
   var r = await Auth.apiCall('/tax-records?from=1990&to=' + (jahr + 1));
   var alle = (r && r.records) || [];
 
@@ -291,7 +291,67 @@ async function _gaDaten(halterId, jahr) {
     });
   });
 
-  return { objekte: objekte, gesamtSaetze: alle.length };
+  /* ── v1235 · Die Gesellschaft wird aelter — der Vortrag muss mitwandern ───
+     § 252 Abs. 1 Nr. 1 HGB (Bilanzidentitaet): die Eroeffnungsbilanz eines
+     Jahres ist die Schlussbilanz des Vorjahres. § 266 Abs. 3 A. IV HGB fuehrt
+     dafuer einen eigenen Posten — Gewinnvortrag/Verlustvortrag —, getrennt
+     vom Jahresergebnis. Ein Jahresfehlbetrag wird im Folgejahr zum
+     VERLUSTvortrag.
+
+     Bis hierher stand im Vortrag nur der von Hand erfasste
+     Eroeffnungswert (`bh.eb_gewinnvortrag`), Jahr fuer Jahr derselbe.
+     Gemessen am 04.09.2026 ueber vier Jahre der Test UG:
+
+       Jahr   kum. AfA   Buchwert   Darlehen   Ergebnis    Vortrag
+       2025          0    441.652    378.126     -1.750          0
+       2026      6.153    435.499    372.756    -15.877          0   <-- falsch
+       2027     12.305    429.347    367.190     17.029          0   <-- falsch
+       2028     18.458    423.194    361.420     17.672          0   <-- falsch
+
+     Abschreibung und Tilgung wandern also korrekt mit, das Ergebnis des
+     Vorjahres nicht. **Und die Bilanz ging trotzdem jedes Jahr auf**, weil
+     die Differenz still im Verrechnungskonto landete — dieselbe Falle wie
+     beim doppelten Objekt: das Aufgehen prueft die Mechanik, nicht den
+     Inhalt.
+
+     Gerechnet wird der Vortrag NICHT neu, sondern mit derselben Maschine:
+     fuer jedes Vorjahr laufen _gaDaten() und _gaRechnen() noch einmal, und
+     die Jahresergebnisse werden summiert. Eine zweite Formel waere eine
+     zweite Wahrheit (v1227b). Der Preis sind zwei API-Aufrufe je Vorjahr;
+     dafuer kann das Ergebnis nicht auseinanderlaufen.
+
+     `_ohneVortrag` bricht die Rekursion: die Vorjahreslaeufe holen keinen
+     eigenen Vortrag mehr. */
+  var vortrag = null;
+  if (!_ohneVortrag) {
+    try { vortrag = await _gaVortrag(halterId, jahr, objekte); } catch (e) { vortrag = null; }
+  }
+
+  return { objekte: objekte, gesamtSaetze: alle.length, vortrag: vortrag };
+}
+
+/* Summe der Jahresergebnisse aller Jahre VOR dem Bilanzjahr.
+   Startjahr = fruehestes erfasstes Steuerjahr der Objekte dieser Gesellschaft.
+   Gedeckelt auf 15 Jahre: wer laenger zurueckreicht, bekommt einen ehrlichen
+   Hinweis statt eines stillen Abschneidens. */
+async function _gaVortrag(halterId, jahr, objekte) {
+  var jahre = [];
+  objekte.forEach(function (o) { (o.jahreErfasst || []).forEach(function (y) { if (y < jahr) jahre.push(y); }); });
+  if (!jahre.length) return { summe: 0, jahre: [], gekappt: false, start: null };
+  var start = Math.min.apply(null, jahre);
+  var gekappt = false;
+  if (jahr - start > 15) { start = jahr - 15; gekappt = true; }
+
+  var summe = 0, details = [];
+  for (var y = start; y < jahr; y++) {
+    var d = await _gaDaten(halterId, y, true);          /* true = ohne eigenen Vortrag */
+    if (!d.objekte.length) continue;
+    var r = _gaRechnen(halterId, y, d);
+    var e = (r && r.guv && isFinite(r.guv.jahresueberschuss)) ? r.guv.jahresueberschuss : 0;
+    summe += e;
+    details.push({ jahr: y, ergebnis: e });
+  }
+  return { summe: summe, jahre: details, gekappt: gekappt, start: start };
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
@@ -369,7 +429,14 @@ function _gaRechnen(halterId, jahr, daten) {
   var aktivaOhneAusgleich = akGrund + bwGeb + bwBwg + bank;
 
   var stammkapital = _gaNum(bh.stammkapital);
-  var gewinnvortrag = _gaNum(bh.eb_gewinnvortrag);
+  /* v1235 · Der Vortrag ist die Summe der Vorjahresergebnisse PLUS der von
+     Hand erfasste Eroeffnungswert. Beides zusammen, weil `eb_gewinnvortrag`
+     den Stand VOR dem ersten in DealPilot erfassten Jahr abbildet — die
+     Gesellschaft kann aelter sein als ihre Daten hier. Fehlt die
+     Fortschreibung (kein Vorjahr erfasst), bleibt es beim Eroeffnungswert,
+     also beim bisherigen Verhalten. */
+  var vortragAusVorjahren = (daten && daten.vortrag && isFinite(daten.vortrag.summe)) ? daten.vortrag.summe : 0;
+  var gewinnvortrag = _gaNum(bh.eb_gewinnvortrag) + vortragAusVorjahren;
   var gesdar = _gaNum(bh.eb_gesdar);
   var passivaOhneAusgleich = stammkapital + gewinnvortrag + jahresueberschuss
     + darlehen + gesdar + steuern;
@@ -393,6 +460,8 @@ function _gaRechnen(halterId, jahr, daten) {
       akBwg: akBwg, kumAfaBwg: kumBwg, bwBwg: bwBwg,
       bank: bank,
       stammkapital: stammkapital, gewinnvortrag: gewinnvortrag,
+      vortragAusVorjahren: vortragAusVorjahren,
+      vortragDetails: (daten && daten.vortrag) ? daten.vortrag : null,
       jahresueberschuss: jahresueberschuss,
       darlehen: darlehen, gesdar: gesdar, steuerrueckstellung: steuern,
       ausgleich: ausgleich,
@@ -748,8 +817,25 @@ function _gaBilanzSeite(doc, jahr, name, rech, W, H, M, CW) {
   ry = seite(rx, ry, 'PASSIVA');
   ry = zeile(rx, ry, 'A. Eigenkapital', null, { fett: true });
   ry = zeile(rx, ry, 'I. Gezeichnetes Kapital', b.stammkapital);
-  ry = zeile(rx, ry, 'II. Gewinnvortrag', b.gewinnvortrag);
-  ry = unter(rx, ry, 'Anfangsbestand aus den Stammdaten');
+  /* v1235 · § 266 Abs. 3 A. IV HGB fuehrt den Posten als „Gewinnvortrag/
+     Verlustvortrag". Ist er negativ, heisst er VERLUSTvortrag — genauso wie
+     der Jahresfehlbetrag eine Zeile tiefer. Die Unterzeile sagt jetzt, woraus
+     er besteht: Eroeffnungswert plus die fortgeschriebenen Vorjahre. */
+  ry = zeile(rx, ry, b.gewinnvortrag < 0 ? 'II. Verlustvortrag' : 'II. Gewinnvortrag', b.gewinnvortrag);
+  (function () {
+    var vd = b.vortragDetails;
+    var n = (vd && vd.jahre) ? vd.jahre.length : 0;
+    var txt;
+    if (!n) {
+      txt = 'Anfangsbestand aus den Stammdaten — kein Vorjahr erfasst';
+    } else {
+      var von = vd.jahre[0].jahr, bis = vd.jahre[n - 1].jahr;
+      txt = 'Anfangsbestand aus den Stammdaten + Ergebnisse ' + von + (bis !== von ? '–' + bis : '')
+          + ' (' + _gaEur(b.vortragAusVorjahren) + ')';
+      if (vd.gekappt) txt += ' · nur die letzten 15 Jahre';
+    }
+    ry = unter(rx, ry, txt);
+  })();
   ry = zeile(rx, ry, b.jahresueberschuss < 0 ? 'III. Jahresfehlbetrag' : 'III. Jahresüberschuss',
     b.jahresueberschuss);
   ry += 2;
