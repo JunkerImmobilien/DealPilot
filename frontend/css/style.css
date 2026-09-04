@@ -16772,6 +16772,19 @@ nav.tabs::after,
   margin-top: 2px;
   padding-top: 6px;
 }
+/* v1232 · Was der Quick-Check bewusst NICHT rechnet. Steht als Fussnote in
+   derselben Box, nicht als zweite Flaeche — der Testbericht bemaengelt
+   ausdruecklich zu viele Knoepfe und Kaesten. Kein Gold-Literal: die Linie
+   nimmt dieselbe --gold-Mischung wie die Zeile darueber. */
+.qc-calc-note {
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid color-mix(in srgb, var(--gold) 20%, transparent);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ch, #2A2727);
+  opacity: 0.8;
+}
 .qc-calc-label {
   color: var(--ch, #2A2727);
   opacity: 0.85;
