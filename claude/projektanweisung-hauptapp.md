@@ -6994,6 +6994,80 @@ gegengeprüft: `plan_trials` auf Staging, 17 Zeilen, Spanne bis 28 Tage.
 - **Die Backend-Durchsetzung ist nicht gemessen.** Alles hier ist das
   Frontend-Gate.
 
+### Nachtrag 04.09.2026 — Partner begangen, B7 entschieden, und zwei Befunde darunter
+
+**Marcel hat sich auf Prod als Partner angemeldet**, damit die letzte Stufe
+messbar wurde, und **B7 entschieden**: *„free bekommt das wasserzeichen"*.
+
+#### B7 ist umgesetzt — in beiden Datenbanken
+
+`plans.features->track_record_pdf` für `free` auf `true`, je eine Zeile
+(`UPDATE 1`), in einer Transaktion. Vorher gesichert:
+`/root/backups/plans-vor-trackrecord-20260904-0731.sql`.
+
+**Vorher geprüft, dass Free damit nicht das volle Produkt bekommt:**
+`track-record.js:24` lässt Free ausdrücklich durch, und das Wasserzeichen
+hängt seit `TR7` an `jsPDF.prototype.save` selbst — jeder PDF-Weg wird
+gestempelt. Die Stempel-Entscheidung liest `limits.watermark`, für Free
+`true`. Am laufenden System gegengelesen: `GET /plans` liefert für free jetzt
+`track_record_pdf: true` **und** `watermark: true`.
+
+#### Partner: nachgezählt, kein Loch
+
+Gegen die Datenbank gehalten, Schlüssel für Schlüssel: **kein einziger, den
+Pro hat und Partner nicht**, und keiner mit abweichendem Wert. Dazu
+`reseller`, `reseller_whitelabel`, `custom_logo` auf `true`, Wasserzeichen
+aus, Objekte unbegrenzt. Der „Pro-Klon plus drei" stimmt.
+
+#### B13 · Der `config.js`-Rückfall ist tot
+
+`hasFeature()` greift nur bei `null` auf `config.js` zurück. Gemessen:
+
+```
+Sub.hasCachedFeature('gibt_es_nicht_xyz')  ->  false     (nicht null)
+```
+
+**Der Cache antwortet auf jeden Schlüssel.** Damit ist der Zweig darunter
+unerreichbar, und **was in der Plan-Zeile der Datenbank fehlt, ist für jeden
+`false` — auch für Partner.** Drei Schlüssel betrifft das heute:
+`export_pdf` (niemand fragt ihn ab), `theme_palette` (harmlos, die Palette
+hängt an `isProOrAbove()`) und `beleg_import` (siehe unten).
+
+#### B14 · Der Beleg-Import hat gar kein Frontend-Gate
+
+`beleg-import.js:65` fragt `window.DealPilotConfig.hasFeature(...)` — **die
+Funktion gibt es nicht**, der Einstieg heißt `DealPilotConfig.pricing.hasFeature`
+bzw. `Plan.can()`. Die `typeof`-Bedingung ist nie wahr, und die Funktion fällt
+in ihren eigenen Rückfall `return true`. **Kein Loch** — das Backend sperrt
+(`ai.js:1052`, free/starter → 403) —, aber der Schlüssel steuert im Frontend
+nichts.
+
+#### B15 · Die Testphase erreicht zwei Backend-Gates nicht — der schwerste Befund
+
+`getEffectivePlan()` liest `plan_trials` mit; sechs Stellen benutzen sie.
+**Zwei Routen lesen `subscriptions` direkt:**
+
+| Stelle | Folge in der Testphase |
+|---|---|
+| `ai.js:1049` — KI-Beleg-Import | Plan als `free`/`starter` gelesen → **403** |
+| `avm.js:60` — `modeForUser` | Plan `free` → **Stub statt Live-Bewertung** |
+
+**Auf Staging belegt:** acht Nutzer mit aktivem `pro`-Test bis September,
+deren `subscriptions`-Zeile `starter` sagt oder gar nicht existiert — dann
+fällt `ai.js` auf `'free'` zurück. `getEffectivePlan()` sagt für dieselben
+Nutzer `pro`.
+
+Genau das war der Anlass für `v1185`: *„der Testnutzer sah Pro, hatte aber das
+Free-Kontingent … und konnte gerade das nicht testen, wofür er zahlen soll."*
+**Die Kontingente wurden damals umgestellt, diese zwei Routen nicht.**
+
+Mit **B10** zusammen — die Testphase ist auf Prod noch nie gelaufen — heißt
+das: **es ist noch nie jemand hineingelaufen, der erste wird es.**
+
+**Nicht behoben:** der Eingriff ist klein (`getEffectivePlan()` an zwei
+Stellen), ändert aber, wer bezahlte Funktionen bekommt, und braucht einen
+Backend-Neubau. **Wartet auf Marcels Ja.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

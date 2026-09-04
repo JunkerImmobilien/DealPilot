@@ -589,3 +589,39 @@ Tagen und hat die Kommentare überlebt, die Zahl nicht. **Bei jeder Frage nach
 einer Frist, einem Limit oder einem Preis die rechnende Zeile suchen**, nicht
 die Beschreibung — und danach an echten Daten gegenprüfen (hier:
 `plan_trials`, Spanne bis 28 Tage).
+
+## `hasCachedFeature` liefert nie `null` — der `config.js`-Rückfall ist tot
+
+`hasFeature()` fragt die Datenbank und greift **nur bei `null`** auf
+`config.js` zurück (`config.js:728`). Gemessen am 04.09.2026 an einem
+laufenden Konto:
+
+```
+Sub.hasCachedFeature('gibt_es_nicht_xyz')  ->  false     (nicht null)
+```
+
+Sobald das Abo geladen ist, antwortet der Cache auf **jeden** Schlüssel mit
+`true` oder `false`. Der Zweig darunter ist damit unerreichbar: **was in der
+Plan-Zeile der Datenbank fehlt, ist für jeden `false` — auch für Pro und
+Partner.** Ein Schlüssel in `config.js` zu vergeben, den die Datenbank nicht
+kennt, wirkt nichts.
+
+**Wer ein neues Feature einführt, trägt es in die Datenbank ein**, nicht nur
+in `config.js`. Und wer einen Verdacht prüft, misst am laufenden Konto gegen
+`Sub.hasCachedFeature`, nicht gegen die Datei.
+
+## Zwei Wege zum Plan, und nur einer kennt die Testphase
+
+`subscriptionService.getEffectivePlan()` liest `plan_trials` mit — sechs
+Stellen benutzen sie. **Zwei Routen lesen die Tabelle `subscriptions`
+direkt** (`ai.js`, `avm.js`) und sehen die Testphase deshalb nicht.
+
+Gemessen: acht Staging-Nutzer mit aktivem `pro`-Test, deren
+`subscriptions`-Zeile `starter` sagt oder gar nicht existiert. Für diese
+Nutzer liefert `getEffectivePlan()` `pro`, die Direktabfrage `starter` bzw.
+`free` — und damit 403 statt Beleg-Import.
+
+**Der Plan eines Nutzers wird nie aus `subscriptions` gelesen.** Es gibt eine
+Funktion dafür, und sie ist die einzige, die alle Quellen kennt. Eine
+Direktabfrage ist eine zweite Wahrheit — und sie fällt erst auf, wenn ein
+Kunde in der Testphase steckt.

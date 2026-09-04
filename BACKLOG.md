@@ -67,33 +67,36 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 
 > ### Der erste Griff jetzt
 >
-> **Marcel prüft gerade selbst** („das prüfe ich jetzt erst alles"). Der
-> Steuerberater steht deshalb ganz hinten an.
+> **Eine Entscheidung wartet, und sie ist die wichtigste offene Sache:**
 >
-> **Drei Entscheidungen liegen bei ihm, alle gemessen, keine ist Code:**
+> **B15 · Die 28-Tage-Testphase erreicht zwei Backend-Gates nicht.**
+> `ai.js:1049` (KI-Beleg-Import) und `avm.js:60` (Live-Bewertung) lesen die
+> Tabelle `subscriptions` direkt statt `getEffectivePlan()`, das
+> `plan_trials` mitliest. Auf Staging belegt: acht Nutzer mit aktivem
+> `pro`-Test, deren Subscription `starter` oder gar nichts sagt. **In der
+> Testphase gibt es also 403 statt Beleg-Import und Stub statt
+> Live-Bewertung.** Der Eingriff ist klein — `getEffectivePlan()` an zwei
+> Stellen —, ändert aber, wer bezahlte Funktionen bekommt, und braucht einen
+> Backend-Neubau. **Wartet auf ein Ja.**
 >
-> 1. **Der Track-Record ist Free versprochen und ihm verwehrt** (B7 in
->    Punkt 2). Die Landing sagt „Wasserzeichen", die Datenbank sagt `false`,
->    und die Datenbank gewinnt. Datenbank aufmachen oder Landing ehrlich
->    machen? **Preisversprechen — deshalb nicht angefasst.**
-> 2. **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, vor und nach
->    `v1229` Zahl für Zahl gleich. `CLAUDE.md` führt „RC=0 ist sauber" als
->    Rollout-Tor. Das Tor ist seit Längerem offen. Schließen oder Regel
->    umschreiben?
-> 3. **Die Objektart kennt kein Zweifamilienhaus.** `Zweifamilienhaus` fällt
->    auf `EFH`. Das Testobjekt Löhner Str. 278 ist ein ZFH. Fehlt die Option,
->    oder ist EFH die gewollte Näherung? **Bewertungsfrage.**
+> Zusammen mit B10 (die Testphase ist auf Prod noch nie gelaufen) heißt das:
+> **der erste echte Testkunde ist der erste, der hineinläuft.**
+>
+> **Zwei Entscheidungen von gestern stehen noch:**
+> - **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, vor und nach
+>   `v1229` gleich. `CLAUDE.md` führt „RC=0 ist sauber" als Rollout-Tor.
+>   Schließen oder Regel umschreiben?
+> - **Die Objektart kennt kein Zweifamilienhaus.** `Zweifamilienhaus` fällt
+>   auf `EFH`, das Testobjekt Löhner Str. 278 ist eines. **Bewertungsfrage.**
 >
 > **Zwei Aufräumarbeiten warten auf ein Ja:**
 > - `business` und `enterprise` liegen noch in der Prod-Datenbank (B11).
->   Auf Staging sind sie weg. Betroffen ist nur ein deaktiviertes Demokonto.
-> - **§ 7b-Spalte in `tax_records`** — Datenbankeingriff. Bis dahin steht im
->   PDF der ehrliche Hinweis statt einer Zahl.
+>   Betroffen ist nur ein deaktiviertes Demokonto.
+> - **§ 7b-Spalte in `tax_records`** — Datenbankeingriff.
 >
-> **Und eins zum Wissen, nicht zum Entscheiden:** die vier Wochen Pro sind
-> auf Produktion **noch nie gelaufen** (B10). `plan_trials` ist dort leer,
-> weil sich seit dem 06.08. niemand neu angemeldet hat und die Testphase am
-> 31.08. kam. Der erste echte Kunde ist zugleich der erste Test.
+> **Erledigt und live:** B7 — Free bekommt den Track-Record mit Wasserzeichen,
+> in beiden Datenbanken gesetzt, am laufenden System gegengelesen.
+> Der Steuerberater steht auf Marcels Wunsch ganz hinten an.
 >
 > **Nichts hängt halbfertig.** Kein Rebuild offen, keine Migration offen,
 > Arbeitsverzeichnis sauber.
@@ -2050,6 +2053,105 @@ entfällt — nicht raten.
    - [ ] **Die Backend-Durchsetzung ist nicht gemessen.** Alles hier ist das
          Frontend-Gate. Ob das Backend eine gesperrte Funktion auch abweist,
          wenn man den Aufruf von Hand schickt, ist eine eigene Prüfung.
+
+   ### NACHTRAG (04.09.2026): Partner ist begangen, B7 ist entschieden — und darunter lag mehr
+
+   Marcel hat sich auf Prod als Partner angemeldet, damit die letzte Stufe
+   messbar wurde. Aus dem Durchgang sind **drei** Dinge geworden.
+
+   #### B7 ist erledigt — Marcels Entscheidung: „free bekommt das Wasserzeichen"
+
+   `plans.features->track_record_pdf` für `free` auf **`true`** gesetzt, in
+   **beiden** Umgebungen, je eine Zeile (`UPDATE 1`). Vorher gesichert:
+   `/root/backups/plans-vor-trackrecord-20260904-0731.sql`.
+
+   **Vorher geprüft, dass Free damit nicht das volle Produkt bekommt:**
+   `track-record.js:24` lässt Free ausdrücklich durch („Free hat es mit
+   Wasserzeichen, Starter gar nicht"), und das Wasserzeichen hängt seit
+   `TR7` an `jsPDF.prototype.save` selbst — jeder PDF-Weg wird gestempelt,
+   nicht nur die drei, die es früher einzeln taten. Die Stempel-Entscheidung
+   liest `limits.watermark`, und das steht für Free auf `true`.
+   **Am laufenden System gegengelesen:** `GET /plans` liefert für free jetzt
+   `track_record_pdf: true` und `watermark: true`.
+
+   #### Partner: ein vollständiger Obermenge von Pro, nachgezählt
+
+   Gegen die Datenbank gehalten, Schlüssel für Schlüssel: **es gibt keinen
+   einzigen, den Pro hat und Partner nicht** — und keinen mit abweichendem
+   Wert. Dazu `reseller`, `reseller_whitelabel`, `custom_logo` auf `true`,
+   Wasserzeichen aus, Objekte unbegrenzt. **Der „Pro-Klon plus drei" stimmt.**
+
+   #### B13 · Der `config.js`-Rückfall ist tot — und niemand hat es gemerkt
+
+   `hasFeature()` fragt die Datenbank und greift **nur bei `null`** auf
+   `config.js` zurück (`config.js:728`). Gemessen am laufenden Partner-Konto:
+
+   ```
+   Sub.hasCachedFeature('gibt_es_nicht_xyz')  ->  false     (nicht null!)
+   ```
+
+   **`hasCachedFeature` liefert nie `null`, sobald das Abo geladen ist.**
+   Damit ist der Zweig darunter unerreichbar: **was in der Plan-Zeile der
+   Datenbank fehlt, ist für jeden `false` — auch für Partner.** Das ist die
+   W41-Mechanik eine Ebene höher, und `config.js` kann sie nicht mehr
+   abfangen.
+
+   Betroffen sind heute drei Schlüssel, die `config.js` vergibt und die
+   Datenbank nicht kennt:
+
+   | Schlüssel | Wirkung |
+   |---|---|
+   | `export_pdf` | **keine** — niemand fragt ihn ab (B12) |
+   | `theme_palette` | **keine** — die Palette hängt an `isProOrAbove()`, der `hasFeature`-Zweig darunter ist der dokumentierte „später, wenn das Backend es kennt"-Fall |
+   | `beleg_import` | siehe B14 |
+
+   #### B14 · Der Beleg-Import hat gar kein Frontend-Gate
+
+   `beleg-import.js:65` fragt `window.DealPilotConfig.hasFeature(...)` —
+   **diese Funktion gibt es nicht.** Der Einstieg heißt
+   `DealPilotConfig.pricing.hasFeature` bzw. `Plan.can()`. Die Bedingung
+   `typeof … === 'function'` ist also **nie** wahr, und die Funktion fällt in
+   ihren eigenen Rückfall: `return true; // im Zweifel entscheidet das
+   Backend (403)`.
+
+   **Kein Loch** — das Backend sperrt wirklich (`ai.js:1052`, free/starter →
+   403). Aber der Schlüssel `beleg_import` steuert im Frontend **nichts**,
+   und ein Free-Nutzer sieht die Oberfläche, statt eine saubere Sperre zu
+   bekommen.
+
+   #### B15 · Die 28-Tage-Testphase erreicht zwei Backend-Gates nicht
+
+   **Der schwerste Befund dieses Durchgangs**, weil er den ersten echten
+   Testkunden trifft.
+
+   Es gibt `subscriptionService.getEffectivePlan()`, und **die liest
+   `plan_trials` mit** — sechs Stellen benutzen sie (`middleware/auth.js`,
+   `planLimits.js` dreifach, `apiKeys.js`, `credits.js`). **Zwei Routen tun
+   es nicht**, sie lesen die Tabelle `subscriptions` direkt:
+
+   | Stelle | Folge in der Testphase |
+   |---|---|
+   | `ai.js:1049` — KI-Beleg-Import | Plan wird als `free`/`starter` gelesen → **403** |
+   | `avm.js:60` — `getPlanId` → `modeForUser` | Plan `free` → **Stub statt Live-Bewertung** |
+
+   **Auf Staging belegt, nicht vermutet:** acht Nutzer haben einen **aktiven
+   `pro`-Test** (Laufzeit bis September), und ihre `subscriptions`-Zeile sagt
+   `starter` oder es gibt gar keine — dann fällt `ai.js` auf `'free'` zurück.
+   `getEffectivePlan()` sagt für dieselben Nutzer `pro`.
+
+   Genau das war der Anlass für `v1185`, im Code nachzulesen: *„der Testnutzer
+   sah Pro, hatte aber das Free-Kontingent … und konnte gerade das nicht
+   testen, wofür er zahlen soll."* **Die Kontingente sind damals umgestellt
+   worden, diese zwei Routen nicht.**
+
+   Zusammen mit **B10** (die Testphase ist auf Prod noch nie gelaufen) heißt
+   das: **es ist noch nie jemand hineingelaufen — der erste wird es.**
+
+   **Der Eingriff wäre klein** — `getEffectivePlan()` statt der eigenen
+   Abfrage, an zwei Stellen. **Er ist hier nicht gemacht:** er ändert, wer
+   bezahlte Funktionen bekommt, und er braucht einen Backend-Neubau.
+   **Wartet auf Marcels Ja.**
+
 
 3. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
