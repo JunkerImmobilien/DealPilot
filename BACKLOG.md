@@ -38,7 +38,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 04.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging auf `abe124f`, **Produktion auf `16f5712`**.
+**Stand:** lokal = GitHub = Staging auf `4bf9ed6`, **Produktion auf `16f5712`**.
 **`v1215`–`v1231` sind live** — vier Prod-Rollouts am 04.09. **Auf Staging
 warten `v1233`–`v1233c`** (Quick-Check erklärt seine Zahl). Nachweise im
 Rollout-Journal der Projektanweisung.
@@ -66,35 +66,31 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 
 > ### Der erste Griff jetzt
 >
-> **`v1233`–`v1233c` liegen auf Staging und sind noch nicht draußen** —
-> reines Frontend, `git pull` genügt. Der Quick-Check erklärt jetzt seine
-> Zahl: Satz sichtbar, Rechenweg zum Aufklappen. Der Testbericht, Block I,
-> ist damit beantwortet.
->
-> **Der Abnahmepunkt bleibt der Sprechlauf am Gerät.** Vier Änderungen
-> hängen daran — `v1168`, `v1169`, `v1169`/`v1170` und `v1231`
-> (Sanierungsbedarf diktieren). **Ein Lauf erledigt alle vier.**
+> **`v1233` bis `v1238` liegen auf Staging und sind noch nicht auf Prod** —
+> alles reines Frontend, `git pull` genügt. Darin stecken zwei Befunde, die
+> Geld bewegen: das fehlende Grundbuchamt (`v1238`) und der fehlende
+> Ergebnisvortrag der Gesellschaft (`v1235`).
 >
 > **Zwei Entscheidungen liegen bei Marcel:**
+> - **Die 8 Objekte ohne Grundbuchamt-Prozentsatz** stehen weiter auf 0 €.
+>   Nachtragen verschiebt ihre Renditen und Scores — das macht niemand
+>   ungefragt.
 > - **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, vor und nach
 >   `v1229` gleich, während `CLAUDE.md` „RC=0 ist sauber" als Rollout-Tor
 >   führt. Schließen oder Regel umschreiben?
 > - **Die Objektart kennt kein Zweifamilienhaus.** `Zweifamilienhaus` fällt
 >   auf `EFH`, das Testobjekt Löhner Str. 278 ist eines. **Bewertungsfrage.**
 >
-> **Zwei Aufräumarbeiten warten auf ein Ja:**
-> - `business` und `enterprise` liegen noch in der Prod-Datenbank (B11).
-> - **§ 7b-Spalte in `tax_records`** — Datenbankeingriff.
+> **Der Abnahmepunkt bleibt der Sprechlauf am Gerät** — `v1168`, `v1169`,
+> `v1169`/`v1170` und `v1231` warten darauf. **Ein Lauf erledigt alle vier.**
 >
-> **Und eine Frage, die aus Punkt 4 herausgefallen ist:** `quick-check.js`
-> zeichnet nichts — alle 17 Ausgabeflächen hängen an einem Behälter, den es
-> im Markup nicht gibt. **Nicht löschen** (die Datei exportiert Funktionen,
-> die andere rufen, und `CLAUDE.md` trägt dazu eine Narbe). Aber es gehört
-> geklärt, was `qcCalc` heute noch bewirkt. **Eigener Punkt, kein Nebensatz.**
+> **Zwei Aufräumarbeiten warten auf ein Ja:** `business`/`enterprise` in der
+> Prod-Datenbank (B11) und die **§ 7b-Spalte in `tax_records`**.
 >
-> **Im Testbericht sind als Nächstes dran:** Block A (Tour anbieten statt
-> verstecken) und Block D (Grundbuchamt vorbelegen, „Sonstiges 1,5 %"
-> benennen) — beides klein und ohne Rückfrage baubar.
+> **Im Testbericht sind als Nächstes dran:** Block A (die Tour anbieten statt
+> im Hilfe-Bereich verstecken), der Rest von Block D (Hinweis, was mit den
+> Werten passiert · die Haken, die stehen bevor der Bereich besucht wurde)
+> und Block E (Marktmiete, KI-Knopf nach oben, doppelte Mietsteigerung).
 >
 > **Nichts hängt halbfertig.** Kein Rebuild offen, keine Migration offen,
 > Arbeitsverzeichnis sauber.
@@ -2447,9 +2443,26 @@ entfällt — nicht raten.
      oder die Bereiche auf- und zuklappbar machen.
 
    **D · Investition**
-   - **Grundbuchamt mit 0,5 % vorbelegen** — der Anwender kennt den Wert nicht.
-   - **„Sonstiges 1,5 %" benennen**: gemeint sind wohl Bausachverständiger,
-     Anfahrt und Ähnliches. Als unbenannter Standard steht es schlecht da.
+   - ~~**Grundbuchamt mit 0,5 % vorbelegen**~~ — **ERLEDIGT `v1238`
+     (`4bf9ed6`), und es war mehr als Bequemlichkeit.** Gemessen:
+     `setDefaults()` setzte Notar 2,20 %, Grunderwerbsteuer 6,50 % und
+     Sonstige 1,50 % — **`gba_p` stand als einzige der fünf
+     Erwerbsnebenkosten gar nicht drin.** Das Feld trug nur
+     `placeholder="0,5"`: sieht aus wie ein Wert, zählt als nichts.
+     **8 von 13 Objekten auf Staging rechneten mit 0 € Grundbuchamt** — bei
+     200.000 € Kaufpreis fehlen 1.000 € in der Gesamtinvestition.
+     **Kein Gestaltungspunkt, eine fehlende Zahl.**
+     Die Vorbelegung greift nur für **neue** Objekte (`setDefaults()` läuft
+     in `newObj()`); bestehende behalten ihren Wert, ihre Zahlen verschieben
+     sich nicht rückwirkend. **Am laufenden System gegengeprüft:**
+     `2026-001` unverändert leer, neues Objekt trägt 0,5.
+     > **Offen und Marcels Entscheidung:** die 8 Objekte ohne Wert stehen
+     > weiter auf 0. Nachtragen hieße, ihre Renditen und Scores zu
+     > verschieben — das macht niemand ungefragt.
+   - ~~**„Sonstiges 1,5 %" benennen**~~ — **ERLEDIGT `v1238`.** Die Erklärung
+     (Bausachverständiger, Anfahrt, Gutachten) gab es bereits, aber **nur als
+     `title`-Tooltip**. Sie steht jetzt sichtbar am Label, und beim
+     Grundbuchamt steht sichtbar, dass 0,5 % eine Vorbelegung ist.
    - **Hinweis, was danach passiert** — dass die Werte in die
      Steuerprogression gehen und am Ende den Cashflow über alle Investitionen
      bestimmen.
