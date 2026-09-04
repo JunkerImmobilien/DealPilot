@@ -272,7 +272,25 @@ function loadData(d) {
     'eigen_r', 'mietausfall', 'nul_sonst',        // BWK nul (calc.js Z.546)
     'weg_r',                                      // WEG-Rücklage (Info)
     'kp1', 'kp2', 'kp3', 'kp4',                   // Sonderkosten (calc.js Z.545)
-    'kp1l', 'kp2l', 'kp3l', 'kp4l'                // Sonderkosten Labels
+    'kp1l', 'kp2l', 'kp3l', 'kp4l',               // Sonderkosten Labels
+    /* ── v1237 · Die Ueberfuehrungsfelder, dieselbe Falle zum dritten Mal ──
+       V63.33 hat sie fuer die Aufaddier-Felder behoben, v1136-WMTAB-1 fuer
+       die Wertermittlung — fuer die Ueberfuehrung nicht.
+
+       Gemessen am 04.09.2026: `2026-1004` war in der Datenbank sauber
+       (kein ueberf_ende, kein Link), im Formular stand trotzdem
+       `ueberf_ende = 2026-01-01` — der Wert des zuvor geladenen Objekts.
+       Die Vorpruefung aus v1234 hat die Ueberfuehrung daraufhin
+       verweigert: „bereits ueberfuehrt und zum 01.01.2026 eingefroren."
+       Ohne diese Sperre waere der falsche Stichtag mitgespeichert worden.
+
+       `halter` steht bewusst NICHT hier: das ist ein <select> mit
+       'privat' als sinnvollem Standard, den renderHalterOptions() setzt.
+       Ein leerer Wert waere dort schlechter als der Standard. */
+    'halter_seit', 'obj_herkunft',
+    'verkehrswert_ueberf', 'ueberf_preis', 'gesellschafterdarlehen',
+    'ueberf_restschuld', 'ueberf_rest_zins',
+    'ueberf_ende', '_ueberf_link'
   ].concat(WM_FIELDS);  /* v1136-WMTAB-1: dieselbe Falle, siehe Kommentar an WM_FIELDS */
   resetFields.forEach(function(id) {
     var e = document.getElementById(id);
