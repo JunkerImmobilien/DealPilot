@@ -7254,6 +7254,86 @@ Reines Frontend, `git pull`, kein Rebuild. **Gesichert vorher:**
 Modell „das Dach muss neu, fünfzehntausend" den Kacheln zuordnet, zeigt kein
 Prüfskript.
 
+### `v1233` / `b` / `c` (04.09.2026, `8a5880e` · `24578dc` · `abe124f`) — der Quick-Check erklärt seine Zahl
+
+**Marcels Entscheidung: „erklärsatz und zum aufklappen."** Vorausgegangen war
+eine Demo (`design/Vorschläge/quickcheck-berechnungs-info.html`) und seine
+Frage *„kam der Vorschlag aus den anmerkungen?"*
+
+#### Die Antwort darauf war nein — und das hat den Bau geändert
+
+Im **Originaltext** der `Anmerkungen.docx` nachgelesen, nicht in der
+Backlog-Paraphrase. Der Tester schreibt zum QuickBoarding nur:
+
+> „Hier habe ich das Expose runtergeladen aber einen anderen Wert bekommen:"
+> „…Man muss allgemein viel klicken und es ist nicht ganz klar was genau
+> damit gemeint ist." · „Was ist z.B. der Übernehmen button?" · „Ich hätte den
+> Button ‚Tabelle' gar nicht angezeigt. **Es gibt zu viele Buttons zum
+> anklicken**"
+
+**Einen Berechnungskasten verlangt er nirgends.** Nachgezählt: **sieben** der
+49 Anmerkungen beschweren sich über zu viele Knöpfe und zu viel Klicken. Was
+er dagegen dreimal verlangt, ist ein Muster: *„zvE muss irgendwo erklärt
+werden"*, *„Sonder-AfA … die Info oben davor reinpacken"*, *„Was genau sind
+die Stufen? Der Anwender braucht eine einfache Erklärung"* — **kurze
+Erklärungen an Ort und Stelle, keine neuen Flächen.**
+
+Der elfzeilige Kasten war also **mein** Vorschlag, und er lief der Richtung
+des Berichts zuwider. Marcels Entscheidung löst das sauber: **Satz sichtbar,
+Zeilen dahinter.**
+
+#### Gebaut in der lebenden App
+
+Nicht in `quick-check.js` — dessen 17 Ausgabeflächen hängen an einem Behälter,
+den es im Markup nicht gibt. Sondern in `quickcheck-app.html`, dem iframe.
+
+**Es wird nichts nachgerechnet.** Alle Werte kommen aus `score.kpi`. Der
+Beleg dafür steht im Bild: der Cashflow der Zeile und der der Kachel darüber
+sind **dieselbe Zahl** (−85 €).
+
+#### Zwei Nachbesserungen, beide durch Messen gefunden
+
+**`v1233b` — der lebende Rechenweg gab seine Zwischenwerte nie zurück.**
+Die Kennzahlen rechneten, mein Block blieb stumm. Ursache: `updateAll()`
+nimmt `window._dpPilotScore` (der Weg über `DealKpis`/`DealScore`), nicht
+`QcEngine.computeScore`. Und `_dpPilotScore` **rechnet `gesamt`, `ek`,
+`darlehen` und den Nebenkostensatz intern längst aus, gab sie aber nie
+zurück** — sein `kpi`-Objekt trug nur die sieben Anzeigewerte.
+**Durchgereicht statt nebenan neu gebildet** (`v1227b`-Lehre);
+`QcEngine.computeScore()` gibt sie schon lange mit, die beiden Wege sind
+damit gleichauf.
+
+> Dabei zwei eigene Fehler: beim Einfügen waren `var r` und `var sub`
+> verlorengegangen — zurückgeholt. Und mein Satz behauptete Kaufnebenkosten
+> „**pauschal** 10,5 %". Falsch: der Satz kommt aus `n(i.knk)` und fällt nur
+> **ersatzweise** auf 10,5. Die Zeile zeigt jetzt den echten Satz, der Text
+> behauptet nichts mehr darüber.
+
+**`v1233c` — der Satz stand über der Karte statt unter den Kennzahlen.**
+Im DOM war er korrekt platziert (`previousElementSibling === .kpis`), aber
+**`.kpis` ist im eingebetteten Modus `display:none` und hat Höhe 0.** Der
+Hinweis stand deshalb frei über der Karte, in einem ausgegrauten Bereich.
+
+Die sichtbare Kennzahlenreihe ist eine **andere**: `#qb-kt` in `.qb-main`.
+Gefunden über die Zahl selbst — alle Knoten mit dem Text „4,8 %" gesucht und
+ihre Elternketten verglichen: vier Treffer, einer unsichtbar im
+`score-block`, einer sichtbar in der Karte. **Nicht geraten.**
+
+#### Nachweis auf Staging
+
+| Prüfung | Ergebnis |
+|---|---|
+| Platz | `#qb-kt` Unterkante **384**, Block Oberkante **384** — bündig |
+| Zustand beim Öffnen | **zugeklappt**, Satz sichtbar |
+| aufgeklappt | **11 Zeilen**, Kaufpreis bis LTV |
+| Gegenprobe „keine zweite Rechnung" | Cashflow in Zeile **−85 €** = Cashflow in der Kachel **−85 €** |
+| Konsole | keine Fehler |
+| Klammerbilanz | `div` 251/251, `details` 1/1 |
+
+**Rest.** Noch nicht auf Prod. Die Demo bleibt als Beleg der Entscheidung
+liegen — sie zeigt beide Wege, und hier steht, warum der große verworfen
+wurde.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

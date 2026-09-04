@@ -38,10 +38,10 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 04.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging = **Produktion** auf `50cc1a4`.
-**Alles ist live** — vier Prod-Rollouts am 04.09.: `v1215`–`v1228`,
-`v1229`–`v1229c`, `v1230` (Backend, mit Neubau) und `v1231`.
-Nachweise im Rollout-Journal der Projektanweisung.
+**Stand:** lokal = GitHub = Staging auf `abe124f`, **Produktion auf `16f5712`**.
+**`v1215`–`v1231` sind live** — vier Prod-Rollouts am 04.09. **Auf Staging
+warten `v1233`–`v1233c`** (Quick-Check erklärt seine Zahl). Nachweise im
+Rollout-Journal der Projektanweisung.
 
 **Und auf Prod liegen jetzt Marcels Daten.** Der Staging-Nutzer
 `info@junker-immobilien.io` ist auf Prod ins Konto gleicher Mailadresse
@@ -66,14 +66,14 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 
 > ### Der erste Griff jetzt
 >
-> **Nichts wartet auf einen Rollout.** Alles ist live.
+> **`v1233`–`v1233c` liegen auf Staging und sind noch nicht draußen** —
+> reines Frontend, `git pull` genügt. Der Quick-Check erklärt jetzt seine
+> Zahl: Satz sichtbar, Rechenweg zum Aufklappen. Der Testbericht, Block I,
+> ist damit beantwortet.
 >
-> **Der eine Abnahmepunkt: ein Sprechlauf am Gerät.** Vier Änderungen warten
-> darauf, weil sie ohne Mikrofon nicht prüfbar sind — `v1168` (Häkchen
-> `san_tax_active`), `v1169` (Stichwort-Fenster), `v1169`/`v1170` (Tempo) und
-> jetzt **`v1231`**: „Das Dach muss neu, fünfzehntausend, Heizung auch" —
-> kommt es in den Kacheln an, geht der Block auf, stehen 27.000 € in den
-> Sanierungskosten? **Ein Sprechlauf erledigt alle vier.**
+> **Der Abnahmepunkt bleibt der Sprechlauf am Gerät.** Vier Änderungen
+> hängen daran — `v1168`, `v1169`, `v1169`/`v1170` und `v1231`
+> (Sanierungsbedarf diktieren). **Ein Lauf erledigt alle vier.**
 >
 > **Zwei Entscheidungen liegen bei Marcel:**
 > - **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, vor und nach
@@ -84,19 +84,17 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 >
 > **Zwei Aufräumarbeiten warten auf ein Ja:**
 > - `business` und `enterprise` liegen noch in der Prod-Datenbank (B11).
->   Betroffen ist nur ein deaktiviertes Demokonto.
-> - **§ 7b-Spalte in `tax_records`** — Datenbankeingriff. Die fünf
->   `afa_sonder7b_*`-Felder sind auch für die Spracheingabe unerreichbar.
+> - **§ 7b-Spalte in `tax_records`** — Datenbankeingriff.
 >
-> **Zwei kleine Befunde ohne Entscheidung** (B13/B14): der
-> `config.js`-Rückfall ist tot, weil `hasCachedFeature` nie `null` liefert.
-> Und der Beleg-Import hat gar kein Frontend-Gate, weil `beleg-import.js:65`
-> eine Funktion abfragt, die es nicht gibt. **Kein Loch** (das Backend
-> sperrt), aber beides gehört geradegezogen, wenn jemand dort arbeitet.
+> **Und eine Frage, die aus Punkt 4 herausgefallen ist:** `quick-check.js`
+> zeichnet nichts — alle 17 Ausgabeflächen hängen an einem Behälter, den es
+> im Markup nicht gibt. **Nicht löschen** (die Datei exportiert Funktionen,
+> die andere rufen, und `CLAUDE.md` trägt dazu eine Narbe). Aber es gehört
+> geklärt, was `qcCalc` heute noch bewirkt. **Eigener Punkt, kein Nebensatz.**
 >
-> **Der nächste Backlog-Punkt ist 4** — der Testbericht aus
-> `design/mockups/Anmerkungen.docx`. Der Steuerberater steht auf Marcels
-> Wunsch ganz hinten an.
+> **Im Testbericht sind als Nächstes dran:** Block A (Tour anbieten statt
+> verstecken) und Block D (Grundbuchamt vorbelegen, „Sonstiges 1,5 %"
+> benennen) — beides klein und ohne Rückfrage baubar.
 >
 > **Nichts hängt halbfertig.** Kein Rebuild offen, keine Migration offen,
 > Arbeitsverzeichnis sauber.
@@ -2534,13 +2532,33 @@ entfällt — nicht raten.
      > Browser fiel auf, dass der Träger fehlt.** Der Text war richtig, der
      > Ort nicht.
 
-     **→ Zu entscheiden:** soll die Berechnungs-Info wiederbelebt werden? Sie
-     ist fertig geschrieben, gestylt und mit Daten versorgt — es fehlt allein
-     der Behälter im Markup des Quick-Check (`quickcheck-app.html`, ein
-     eigenes Dokument im iframe). **Das ist eine Optikfrage in fremdem
-     Markup, deshalb nicht einfach gebaut.** Wird sie wiederbelebt, gehört
-     der Satz über die drei fehlenden Posten hinein — er beantwortet den
-     Befund des Testers an genau der richtigen Stelle.
+     **→ ENTSCHIEDEN UND GEBAUT — `v1233`/`b`/`c` (04.09.2026).**
+
+     Marcel auf die Demo (`design/Vorschläge/quickcheck-berechnungs-info.html`):
+     **„erklärsatz und zum aufklappen."** Vorher seine Frage *„kam der
+     Vorschlag aus den anmerkungen?"* — **nein.**
+
+     Im Originaltext nachgelesen: der Tester verlangt **keinen** Kasten. Er
+     meldet ein Symptom („Hier habe ich das Expose runtergeladen aber einen
+     anderen Wert bekommen") und beschwert sich **siebenmal** über zu viele
+     Knöpfe. Was er dreimal verlangt, ist etwas anderes: *„zvE muss irgendwo
+     erklärt werden"*, *„Sonder-AfA … die Info oben davor reinpacken"*,
+     *„Was genau sind die Stufen? … einfache Erklärung"* — **kurze
+     Erklärungen an Ort und Stelle, keine neuen Flächen.** Der elfzeilige
+     Kasten war **mein** Vorschlag und lief dem zuwider.
+
+     **Gebaut ist deshalb:** der Satz steht immer unter den Kennzahlen, die
+     elf Zeilen liegen zugeklappt dahinter („So wird gerechnet ▸"). Kein
+     eigener Knopf, keine zweite Karte. **Nicht** in `quick-check.js` — dort
+     bliebe es unsichtbar —, sondern in `quickcheck-app.html`.
+
+     **Es wird nichts nachgerechnet.** Der Beleg: der Cashflow in der Zeile
+     und der in der Kachel darüber sind dieselbe Zahl (−85 €).
+
+     Zwei Nachbesserungen, beide durch Nachmessen gefunden: `_dpPilotScore`
+     gab seine Zwischenwerte nie zurück (`v1233b`), und der Satz stand über
+     der Karte statt darunter, weil `.kpis` im eingebetteten Modus
+     `display:none` ist (`v1233c`). Beides steht im Journal.
    - Die Spanne (unten / Durchschnitt / oben) **kompakter** darstellen.
    - **„Übernehmen" ist unklar** — was übernimmt es wohin?
    - **Den Knopf „Tabelle" weglassen** — es gibt zu viele Knöpfe.
