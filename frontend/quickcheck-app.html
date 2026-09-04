@@ -3378,21 +3378,6 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
         <div class="kpi" id="kpi-bwk"><div class="l">Bewirtsch.</div><div class="v">—</div><div class="h">18-35%</div></div>
       </div>
 
-      <!-- v1233 · Testbericht Block I: "Hier habe ich das Expose runtergeladen aber
-           einen anderen Wert bekommen". Der Satz beantwortet das dort, wo die Zahl
-           steht. Die Aufschluesselung darunter ist ZUGEKLAPPT — derselbe Bericht
-           beschwert sich siebenmal ueber zu viele Knoepfe und zu viel Klicken.
-           Marcels Entscheidung vom 04.09.2026: "erklaersatz und zum aufklappen". -->
-      <div class="qcb-hinweis" id="qcb-hinweis" hidden>
-        <p class="qcb-hinweis-satz">Nicht enthalten: <b>Sanierung, Möblierung, Umlagen</b>.
-          Das Darlehen ist aus Gesamtinvestition minus Eigenkapital abgeleitet, nicht aus
-          einem Darlehensfeld. Im vollen Objekt rechnen alle Posten mit — die Zahlen dort
-          weichen deshalb ab.</p>
-        <details class="qcb-rechenweg">
-          <summary>So wird gerechnet</summary>
-          <div class="qcb-rows" id="qcb-rows"></div>
-        </details>
-      </div>
 
     </div>
   </div>
@@ -6343,6 +6328,19 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
           '<div class="ghead"><span class="contrail"></span><span class="flyico" id="qb-fly"></span><span class="t">Quick Boarding</span><span class="r"><span class="hstat" id="qb-hstat"></span><span class="htier" id="qb-htier"></span></span></div>'+
           '<div class="mbody"><div class="dialwrap" id="qb-dial"></div><div class="cbars" id="qb-cbars"></div></div>'+
           '<div class="kt" id="qb-kt"></div>'+
+          /* v1233c · Der Erklaersatz gehoert unter die SICHTBARE Kennzahlenreihe.
+             Er stand zuerst unter .kpis im score-block — dort richtig platziert,
+             aber der Block ist im eingebetteten Modus display:none, und der
+             Hinweis stand dann frei ueber der Karte. Gemessen im Browser:
+             .kpis hat Hoehe 0, die sichtbare Reihe ist #qb-kt in .qb-main. */
+          '<div class="qcb-hinweis" id="qcb-hinweis" hidden>'+
+            '<p class="qcb-hinweis-satz">Nicht enthalten: <b>Sanierung, Möblierung, Umlagen</b>. '+
+            'Das Darlehen ist aus Gesamtinvestition minus Eigenkapital abgeleitet, nicht aus '+
+            'einem Darlehensfeld. Im vollen Objekt rechnen alle Posten mit — die Zahlen dort '+
+            'weichen deshalb ab.</p>'+
+            '<details class="qcb-rechenweg"><summary>So wird gerechnet</summary>'+
+            '<div class="qcb-rows" id="qcb-rows"></div></details>'+
+          '</div>'+
         '</div>'+
         '<div class="qb-tear"></div>'+
         '<div class="qb-stub" id="qb-stub"><span class="bp">QUICKBOARDING PASS</span>'+
