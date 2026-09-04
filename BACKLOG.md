@@ -68,17 +68,26 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 >
 > **Nichts wartet auf einen Rollout.** Alles ist live, `v1230` inklusive.
 >
-> **Zwei Entscheidungen liegen bei Marcel:**
-> - **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, vor und nach
->   `v1229` gleich. `CLAUDE.md` führt „RC=0 ist sauber" als Rollout-Tor.
->   Schließen oder Regel umschreiben?
-> - **Die Objektart kennt kein Zweifamilienhaus.** `Zweifamilienhaus` fällt
->   auf `EFH`, das Testobjekt Löhner Str. 278 ist eines. **Bewertungsfrage.**
+> **Drei Fragen liegen bei Marcel:**
+>
+> 1. **Soll der Sanierungsbedarf diktierbar werden?** Die Zählung zu Punkt 3
+>    ist da: von 235 Formularfeldern kennt die Auswertung 203, und die
+>    **33 echten Datenfelder, die fehlen, sind zu über der Hälfte ein
+>    einziger Block** — `fesh_*`, Sanierungsbedarf je Gewerk mit Kosten
+>    (17 Felder). „Dach neu, dreißigtausend" ist genau das, was man vor Ort
+>    sagt, und es trifft heute kein Feld.
+> 2. **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, vor und nach
+>    `v1229` gleich, während `CLAUDE.md` „RC=0 ist sauber" als Rollout-Tor
+>    führt. Schließen oder Regel umschreiben?
+> 3. **Die Objektart kennt kein Zweifamilienhaus.** `Zweifamilienhaus` fällt
+>    auf `EFH`, das Testobjekt Löhner Str. 278 ist eines. **Bewertungsfrage.**
 >
 > **Zwei Aufräumarbeiten warten auf ein Ja:**
 > - `business` und `enterprise` liegen noch in der Prod-Datenbank (B11).
 >   Betroffen ist nur ein deaktiviertes Demokonto.
-> - **§ 7b-Spalte in `tax_records`** — Datenbankeingriff.
+> - **§ 7b-Spalte in `tax_records`** — Datenbankeingriff. Hängt mit der
+>   Zählung zusammen: die fünf `afa_sonder7b_*`-Felder sind auch für die
+>   Spracheingabe unerreichbar.
 >
 > **Zwei kleine Befunde ohne Entscheidung** (B13/B14): der
 > `config.js`-Rückfall ist tot, weil `hasCachedFeature` nie `null` liefert.
@@ -2259,6 +2268,58 @@ entfällt — nicht raten.
    was die Spracheingabe geleistet hat.
 
    **→ Zählung zuerst, dann Demo des Modals, dann bauen.**
+
+   ### DIE ZÄHLUNG IST DA (04.09.2026) — der Punkt ist bezifferbar
+
+   Am laufenden System auf Staging gemessen, mit **geladenem Objekt**
+   (`2026-001`), damit alle Reiter gebaut sind — sonst zählt man die
+   Abwesenheit von Reitern statt die Abwesenheit von Feldern.
+
+   | | Anzahl |
+   |---|---|
+   | `window.FIELDS` — was die Auswertung kennt | **203** |
+   | davon im DOM vorhanden | 195 |
+   | **in `FIELDS`, aber ohne Formularfeld** | **8** (4 davon `ai_*`, also **4 echte**) |
+   | Formularfelder im DOM (ohne UI-Präfixe) | **235** |
+   | **im Formular, aber NICHT in `FIELDS`** | **60** |
+   | davon reine Bedienelemente | 27 |
+   | **davon echte Datenfelder** | **33** |
+
+   #### Die 33, gruppiert — und zwei davon tun fachlich weh
+
+   | Block | Felder | Bewertung |
+   |---|---|---|
+   | **Sanierungsbedarf je Gewerk** — `fesh_f/e/s/h/d/b/k/o` je Häkchen + Kosten, plus `sanbedarf_toggle` | **17** | **Der schwerste Verlust.** „Dach neu, dreißigtausend" ist genau das, was man vor Ort diktiert — und es trifft kein Feld. In `FIELDS` steht dazu **nichts**, kein Sammelfeld, kein Ersatz |
+   | **§ 7b Sonder-AfA** — `afa_sonder7b_aktiv/eh40/baukosten/vermietung/neubau` | **5** | Nicht diktierbar. Hängt am offenen Backlog-Punkt „§ 7b-Spalte in `tax_records`" |
+   | **Erwerbsnebenkosten in Euro** — `makler_e`, `notar_e`, `gba_e`, `gest_e`, `ji_e` | 5 | **Kein echter Verlust:** die Prozentfelder `makler_p` … `ji_p` **sind** in `FIELDS`. Wer „Courtage 7.140 Euro" sagt, trifft trotzdem nichts |
+   | **Zweite Finanzierung und Schalter** — `d2_vertrag`, `d2_bspar`, `d2_enable`, `d2_anschl_enable`, `d1_anschl_enable`, `inv_tax_active`, `inv_tax_years`, `me_inc_ze`, `ek_inkl_nk`, `mand_ueberf_cb`, `inv_detail_toggle`, `grenz_auto` | 12 | Die **Beträge** der zweiten Finanzierung und des Inventars sind in `FIELDS` (`d2`, `d2z`, `d2t`, `inv_kueche` …). Es fehlen die **Schalter**, die sie sichtbar machen — ein diktierter Betrag landet also in einem Feld, dessen Block zu ist |
+
+   #### Der Nebenbefund: vier Einträge in `FIELDS` haben gar kein Feld
+
+   `bspar_zuteil`, `mietspiegel`, `erwerbsart`, `anbietertyp` stehen in
+   `FIELDS`, aber `id="…"` gibt es dazu **nirgends** in `index.html`.
+   `storage.js` liest und schreibt sie, ein Eingabefeld existiert nicht.
+   `buildFullCatalog` wirft sie über `if (!el) return;` still hinaus — **das
+   ist hier richtig**, aber es heißt: `FIELDS` ist keine verlässliche Liste
+   dessen, was der Nutzer eingeben kann.
+
+   > **Und daraus folgt eine Falle für diese Zählung selbst:** `buildFullCatalog`
+   > überspringt jedes Feld, dessen DOM-Element im Moment des Aufrufs fehlt.
+   > **Wer ohne geladenes Objekt zählt, misst zu wenig** — und merkt es nicht,
+   > weil nichts protokolliert wird.
+
+   #### Was das für den Punkt heißt
+
+   **Der Umbau ist kleiner als gedacht.** Es geht nicht um „alle 203 Felder
+   auswerten" — das tut `buildFullCatalog` schon. Es geht um **33 Felder, die
+   nie in `FIELDS` gelandet sind**, und davon sind **17 ein einziger Block**:
+   der Sanierungsbedarf.
+
+   **→ Nächster Schritt:** Marcel fragen, ob der Sanierungsbedarf diktierbar
+   werden soll (17 Felder, ein Block, klarer Nutzen vor Ort). Die Schalter
+   dahinter sind der zweite Schritt — ein Betrag ohne geöffneten Block ist
+   für den Nutzer unsichtbar.
+
 
 ---
 

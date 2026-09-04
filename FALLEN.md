@@ -628,3 +628,20 @@ nicht kennt, hält den Befund für dreimal größer, als er ist.
 Funktion dafür, und sie ist die einzige, die alle Quellen kennt. Eine
 Direktabfrage ist eine zweite Wahrheit — und sie fällt erst auf, wenn ein
 Kunde in der Testphase steckt.
+
+## Wer den Feldkatalog ohne geladenes Objekt zählt, misst zu wenig
+
+`buildFullCatalog()` in `voice-import.js` geht `window.FIELDS` durch und
+überspringt jedes Feld, dessen DOM-Element gerade fehlt (`if (!el) return;`).
+Ohne geladenes Objekt sind ganze Reiter nicht gebaut — **gezählt wird dann die
+Abwesenheit von Reitern, nicht die von Feldern**, und nichts protokolliert es.
+
+Gemessen am 04.09.2026 mit geladenem Objekt: `FIELDS` führt **203** Einträge,
+im Formular stehen **235** Felder, und **60** davon kennt `FIELDS` nicht.
+
+**Und `FIELDS` ist keine verlässliche Liste dessen, was der Nutzer eingeben
+kann:** vier Einträge (`bspar_zuteil`, `mietspiegel`, `erwerbsart`,
+`anbietertyp`) haben **gar kein Formularfeld** — `storage.js` liest und
+schreibt sie, ein `id="…"` gibt es nirgends. Die Liste ist ein
+Datenschlüssel-Verzeichnis, kein Feldverzeichnis. Wer beides gleichsetzt,
+zählt in beide Richtungen falsch.
