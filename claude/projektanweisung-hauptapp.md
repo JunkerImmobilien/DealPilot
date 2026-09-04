@@ -6858,6 +6858,62 @@ OK.
 > Bewertungsfrage und gehört Marcel vorgelegt: Fehlt die Option, oder ist
 > EFH die gewollte Näherung?
 
+### Prod-Rollout 04.09.2026, zweiter — `v1229` bis `v1229c` sind live (`74fc68a`)
+
+**Freigabe.** Marcel auf die Frage, ob die drei Versionen auf Prod sollen:
+**„ja."**
+
+**Gesichert vorher:** `/root/backups/haupt-vor-v1229-20260904-0701.sql`
+(15,8 MB) und `mb-vor-v1229-20260904-0701.sql` (14,3 MB). Die Hauptdatenbank
+ist gegenüber dem Morgen um 4 MB gewachsen — das sind die gespiegelten
+Objekte, ein stilles Plausibilitätszeichen, dass die Spiegelung wirklich
+drin ist.
+
+**Weg.** Fast-Forward `6b69254` → `74fc68a`. Reines Frontend, kein Rebuild,
+keine Migration.
+
+**Cache-Kette auf Prod ausgelesen, alle drei Glieder:**
+
+| Glied | Wert |
+|---|---|
+| `frontend/index.html` → view | `marktbericht-view.js?v=1229c` |
+| `marktbericht-view.js` → App | `marktbericht-app/index.html?v=1229c` |
+| App-Index → Skripte | `app 1229c` · `mb-objektwahl 1229b` · `wertermittlung 1229b` · `mb-stufen 1229b` |
+
+**Über HTTPS gegengelesen, nicht auf der Platte** — die vier Skripte
+antworten mit 200, und der Inhalt trägt die Änderung:
+
+```
+<select id="ptype"><option value="">– bitte wählen –
+opt: [['', '– bitte wählen –']
+1: [['address',…], ['ptype',…], ['area',…], ['year',…], ['baustatus', 'Baustatus']]
+```
+
+**Im Browser auf Prod durchgespielt:**
+
+| Schritt | Ergebnis |
+|---|---|
+| frisch geladen | `ptype` und `baustatus` **leer**, erste Option „– bitte wählen –" |
+| Ampel Stufe 1 | „fehlt: **Objektart, Baujahr, Baustatus**" |
+| `.dpkt`-Import Löhner Str. 278 | `ptype = EFH`, Ampel **sofort** richtig: „fehlt: Baustatus" |
+| Baustatus gesetzt | Stufe 1 vollständig, kein „fehlt" mehr |
+| Miteigentumsanteil | **nicht verlangt** — richtig, es ist ein Haus |
+| Stufe 3 verlangt | Grundstücksfläche, Wohneinheiten, **Standardstufe, Hausform (NHK)** |
+
+**Die letzte Zeile ist der eigentliche Beweis.** Standardstufe und Hausform
+sind die hausspezifischen NHK-Angaben. Sie wären vorher **nie** abgefragt
+worden, weil `ptype` still auf `ETW` stand und `bedarf3()` sie nur
+`if (!istWohnung())` verlangt. Genau daran hing auch, dass der Sachwert für
+ein Haus gar nicht erst erschien.
+
+Konsole nach frischem Laden: keine Fehler. Haupt-App auf Prod gegengeprüft:
+7 Objekte, `exportAbschlussPDF` geladen, Mandanten „Privat" und „Test UG
+(v1226)" da.
+
+**Rest.** Die zwei Fragen aus dem `v1229`-Eintrag bleiben offen und liegen
+bei Marcel: der rote Gold-Audit gegen die eigene RC=0-Regel, und ob die
+Objektart ein Zweifamilienhaus bekommen soll.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

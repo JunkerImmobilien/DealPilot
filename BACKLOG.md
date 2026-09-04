@@ -38,12 +38,11 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 04.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging auf `456a7aa`.
-**Produktion steht auf `6b69254`** — `v1229`, `v1229b` und `v1229c` sind
-**noch nicht auf Prod**. Reines Frontend, kein Rebuild, keine Migration.
-
-**Was heute live ging:** `v1215` bis `v1228` sind auf Prod gezogen worden
-(Fast-Forward `8269465` → `6b69254`, 34 Commits).
+**Stand:** lokal = GitHub = Staging = **Produktion** auf `74fc68a`.
+**Alles ist live.** Zwei Prod-Rollouts an diesem Tag: `v1215`–`v1228`
+(Fast-Forward `8269465` → `6b69254`, 34 Commits) und `v1229`–`v1229c`
+(`6b69254` → `74fc68a`). Beide reines Frontend, kein Rebuild, keine
+Migration. Nachweise im Rollout-Journal der Projektanweisung.
 
 **Und auf Prod liegen jetzt Marcels Daten.** Der Staging-Nutzer
 `info@junker-immobilien.io` ist auf Prod ins Konto gleicher Mailadresse
@@ -68,18 +67,15 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 
 > ### Der erste Griff jetzt
 >
-> 1. **`v1229`–`v1229c` auf Prod ziehen**, wenn Marcel es freigibt. Reines
->    Frontend, `git pull`, kein Rebuild. Es sind drei Bewertungsbefunde
->    darin, keine Kosmetik — siehe unten.
-> 2. **Die fünf Fragen an den Steuerberater** aus dem Prüfbefund — vor allem,
+> 1. **Die fünf Fragen an den Steuerberater** aus dem Prüfbefund — vor allem,
 >    ob ihm Bilanz und GuV in dieser Form reichen oder ob seine
 >    Kanzleisoftware einen DATEV-Buchungsstapel braucht. **Die Antwort
 >    entscheidet, ob als Nächstes ein Buchungsstapel-Export gebaut wird
 >    oder nicht** — deshalb steht sie vor allem anderen Code.
-> 3. **§ 7b-Spalte in `tax_records`** — Datenbankeingriff, braucht Marcels
+> 2. **§ 7b-Spalte in `tax_records`** — Datenbankeingriff, braucht Marcels
 >    Freigabe. Bis dahin steht im PDF der ehrliche Hinweis statt einer Zahl.
 >
-> **Zwei Fragen an Marcel, aus `v1229` herausgefallen:**
+> **Zwei Fragen an Marcel, die noch offen sind:**
 > - **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, gemessen vor UND
 >   nach `v1229` Zahl für Zahl gleich. `CLAUDE.md` führt „RC=0 ist sauber"
 >   als Rollout-Tor. Das Tor ist seit Längerem offen. Schließen oder Regel
