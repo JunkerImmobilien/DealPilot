@@ -1660,10 +1660,7 @@ function _setzeEingaben(o) {
       else e.value = o[k] == null ? '' : o[k];
     });
     /* Damit Ampel, Pflichtfeld-Sperre und abhaengige Bloecke nachziehen. */
-    ['ptype', 'area', 'year', 'baustatus', 'mea'].forEach((id) => {
-      const e = document.getElementById(id);
-      if (e) e.dispatchEvent(new Event('change', { bubbles: true }));
-    });
+    _mbNachziehen();
   };
   setzen();
   setTimeout(setzen, 60);   // nach dem Neuzeichnen der Stufenfelder
@@ -1678,6 +1675,10 @@ $('dpktFile').addEventListener('change', async (e) => {
     const json = JSON.parse(await file.text());
     const obj = Array.isArray(json) ? json[0] : (json.object || json);
     fillInputsFromDpkt(obj);   // Eingabefelder sichtbar befüllen
+    /* v1229c · Ohne das blieb die Ampel nach dem Import stehen: sie meldete
+       „fehlt: Objektart", obwohl die Objektart im Feld stand. */
+    _mbNachziehen();
+    setTimeout(_mbNachziehen, 60);   // nach dem Neuzeichnen der Stufenfelder
     // "Genauere Angaben" aufklappen, damit man sofort ergänzen kann
     const box = $('precBox'), caret = $('precCaret');
     if (box) box.style.display = 'block';
@@ -2125,6 +2126,23 @@ function fillInputsFromReport(out) {
   set('price', ref.purchase_price); set('rent', ref.monthly_net_rent);
   if (ref.plot_area) set('plot', ref.plot_area);
   if (ref.units) set('units', ref.units);
+}
+
+/* ── v1229c · EINE Stelle, die die Ampel nachziehen laesst ────────────────
+   Nach dem Fuellen von Formularfeldern per Skript feuert kein `change` —
+   Ampel, Pflichtfeld-Sperre und die abhaengigen Bloecke bleiben stehen, bis
+   jemand ein Feld anfasst. Der Weg ueber `setzen()` machte das laengst; der
+   .dpkt-Import machte es nicht, und deshalb stand dort nach dem Laden
+   „fehlt: Objektart", obwohl die Objektart drin war.
+
+   Die Liste steht bewusst nur hier. Zwei Aufrufer mit je eigener Liste sind
+   genau die Doppelliste, an der diese App schon mehrfach gescheitert ist —
+   und die zweite haette `address` gebraucht, die erste nicht. */
+function _mbNachziehen() {
+  ['ptype', 'area', 'year', 'baustatus', 'mea', 'address'].forEach((id) => {
+    const e = document.getElementById(id);
+    if (e) e.dispatchEvent(new Event('change', { bubbles: true }));
+  });
 }
 
 function fillInputsFromDpkt(o) {
