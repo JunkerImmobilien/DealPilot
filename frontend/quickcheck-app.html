@@ -3385,9 +3385,9 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
            Marcels Entscheidung vom 04.09.2026: "erklaersatz und zum aufklappen". -->
       <div class="qcb-hinweis" id="qcb-hinweis" hidden>
         <p class="qcb-hinweis-satz">Nicht enthalten: <b>Sanierung, Möblierung, Umlagen</b>.
-          Die Kaufnebenkosten stehen pauschal auf <b>10,5 %</b>, und das Darlehen ist aus
-          Gesamtinvestition minus Eigenkapital abgeleitet. Im vollen Objekt rechnen alle
-          Posten mit — die Zahlen dort weichen deshalb ab.</p>
+          Das Darlehen ist aus Gesamtinvestition minus Eigenkapital abgeleitet, nicht aus
+          einem Darlehensfeld. Im vollen Objekt rechnen alle Posten mit — die Zahlen dort
+          weichen deshalb ab.</p>
         <details class="qcb-rechenweg">
           <summary>So wird gerechnet</summary>
           <div class="qcb-rows" id="qcb-rows"></div>
@@ -4256,7 +4256,7 @@ const QcApp = (function() {
 
     var z = [
       ['Kaufpreis', eur(kp), ''],
-      ['+ Kaufnebenkosten (' + pct(QCB_KNK_PCT) + ')', eur(knk), ''],
+      ['+ Kaufnebenkosten (' + pct(k.knkPct != null ? k.knkPct : QCB_KNK_PCT) + ')', eur(knk), ''],
       ['= Gesamtinvestition', eur(k.gesamt), 'stark'],
       ['– Eigenkapital', eur(k.ekValue), ''],
       ['= Darlehen', eur(k.darlehen) + ' @ ' + pct(zins) + ' / ' + pct(tilg) + ' Tilg.', 'stark'],
@@ -6461,10 +6461,17 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     var r = window.DealScore.computeFromKpis(K);
     var sub = {}; (r.breakdown||[]).forEach(function(c){ sub[c.key] = (c.score!=null)?Math.round(c.score):null; });
     var bwkPct = (k.nkm_j>0)?(k.bwk/k.nkm_j*100):null;
+    /* v1233b · gesamt/ek/darlehen/knk werden hier oben laengst gerechnet, sind aber
+       nie zurueckgegeben worden. Der Rechenweg unter den Kennzahlen braucht genau
+       sie — und er soll NICHT nachrechnen (v1227b). Also durchreichen statt
+       nebenan noch einmal bilden. QcEngine.computeScore() gibt sie schon lange
+       mit; die beiden Wege sind damit gleichauf. */
     return { score:r.score, label:r.label, tier:r.color, sub:sub,
       kpi:{ bmr:r1(k.bmy), nmr:r1(k.nmy), ekr:r1(k.ekr), cfMon:Math.round(k.cf_m),
             dscr:(k.dscr!=null)?Math.round(k.dscr*100)/100:null, ltvPct:Math.round(k.ltv),
-            bwkPctOfNkm:(bwkPct!=null)?Math.round(bwkPct):null } };
+            bwkPctOfNkm:(bwkPct!=null)?Math.round(bwkPct):null,
+            gesamt:Math.round(gesamt), ekValue:Math.round(ek||0),
+            darlehen:Math.round(darlehen), knkPct:Math.round(knk*1000)/10 } };
   };
 })();
 </script>
