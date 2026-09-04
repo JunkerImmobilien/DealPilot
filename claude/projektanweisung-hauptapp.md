@@ -7406,6 +7406,74 @@ selbst**: die Funktion löscht das Gesellschafts-Objekt und fragt vorher über
 `window.confirm`, und ein Browser-Dialog blockiert die Automatisierung. Zwei
 Klicks für Marcel, und die Bilanz stimmt inhaltlich.
 
+### `v1235` / `v1235b` (04.09.2026, `ebf167b` · `8e77b94`) — die Gesellschaft altert jetzt richtig
+
+**Marcels Frage:** *„was ist wenn die gesellschaft älter wird — berücksichtigt
+sie schon die laufende gesellschaft und die werte der immobilien und
+abschreibungen? oder bin ich da falsch unterwegs."*
+
+#### Die Antwort ist zweigeteilt, und er lag mit dem Verdacht halb richtig
+
+Über vier Jahre der Test UG gemessen, **bevor** etwas geändert wurde:
+
+| Jahr | kum. AfA | Buchwert | Darlehen | Ergebnis | Vortrag |
+|---|---|---|---|---|---|
+| 2025 | 0 | 441.652 | 378.126 | −1.750 | 0 |
+| 2026 | 6.153 | 435.499 | 372.756 | −15.877 | **0** |
+| 2027 | 12.305 | 429.347 | 367.190 | +17.029 | **0** |
+| 2028 | 18.458 | 423.194 | 361.420 | +17.672 | **0** |
+
+**Was schon stimmte:** die kumulierte Abschreibung wächst, der Buchwert sinkt,
+das Darlehen tilgt sich herunter. Das Anlagevermögen wandert also korrekt mit
+— `kumAfa` summiert alle Steuersätze mit `year <= Bilanzjahr`.
+
+**Was fehlte:** der **Ergebnisvortrag**. Jedes Jahr stand für sich, der
+Vortrag blieb der von Hand erfasste Eröffnungswert. Das verstößt gegen
+**§ 252 Abs. 1 Nr. 1 HGB** (Bilanzidentität — die Eröffnungsbilanz ist die
+Schlussbilanz des Vorjahres) und gegen **§ 266 Abs. 3 A. IV HGB**, der
+Gewinn-/Verlustvortrag als eigenen Posten neben dem Jahresergebnis führt.
+
+> **Und die Bilanz ging trotzdem jedes Jahr auf.** Die Differenz landete still
+> im Verrechnungskonto. **Zum zweiten Mal an einem Tag dieselbe Falle:** das
+> Aufgehen prüft die Mechanik, nicht den Inhalt.
+
+#### Gebaut
+
+`_gaVortrag()` summiert die Jahresergebnisse aller Vorjahre ab dem frühesten
+Geschäftsjahr, gedeckelt auf 15 Jahre **mit Hinweis** statt stillem
+Abschneiden. Der Vortrag ist **Eröffnungswert plus Fortschreibung** — die
+Gesellschaft kann älter sein als ihre Daten in DealPilot.
+
+**Gerechnet wird nicht neu:** für jedes Vorjahr laufen `_gaDaten()` und
+`_gaRechnen()` noch einmal. Eine zweite Formel wäre eine zweite Wahrheit
+(`v1227b`). Preis sind zwei API-Aufrufe je Vorjahr; dafür kann das Ergebnis
+nicht auseinanderlaufen. `_ohneVortrag` bricht die Rekursion.
+
+Die Bilanzzeile heißt bei negativem Wert **Verlustvortrag**, und die
+Unterzeile nennt die Jahre, aus denen er besteht.
+
+#### `v1235b` — die Lücke, die erst die Gegenprobe zeigte
+
+Der erste Lauf trug 2027 korrekt −15.877 € vor, **2026 aber nichts**, obwohl
+2025 einen Verlust von 1.750 € hatte. Der stammte allein aus Steuerberatung
+und Kammerbeitrag; **kein Objekt hatte für 2025 einen Steuersatz**, also fand
+die Startjahr-Suche das Jahr nicht.
+
+**Ein Jahr, in dem die Gesellschaft nur Kosten hatte, ist trotzdem ein
+Geschäftsjahr.** Die Kostenjahre des Mandanten zählen jetzt mit.
+
+#### Nachweis
+
+| Jahr | Ergebnis | Vortrag | aus den Jahren |
+|---|---|---|---|
+| 2025 | −1.750 € | 0 € | erstes Jahr |
+| 2026 | −15.877 € | **−1.750 €** | 2025 |
+| 2027 | +17.029 € | **−17.627 €** | 2025 + 2026 |
+| 2028 | +17.672 € | **−598 €** | 2025 + 2026 + 2027 |
+
+Gegenprobe: −1.750 − 15.877 + 17.029 = **−598 €** — exakt der ausgewiesene
+Wert. **Die Bilanz geht in jedem der vier Jahre auf.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

@@ -711,3 +711,26 @@ Zuordnung. Und wenn das Auflösen fehlschlägt: **lieber leer als kryptisch.**
 > Nebenfalle: `DealPilotMandanten.get(id)` liefert als Rückfall den **ersten**
 > Mandanten, nicht `null`. Wer nicht gegenprüft, ob die zurückgegebene ID auch
 > die gesuchte ist, zeigt bei jeder unbekannten Kennung „Privat" an.
+
+## Ein Jahresabschluss ohne Vortrag ist eine Momentaufnahme, keine Bilanz
+
+Gemessen am 04.09.2026 über vier Jahre: Abschreibung und Tilgung wanderten
+korrekt mit — kumulierte AfA 0 → 6.153 → 12.305 → 18.458 €, Buchwert und
+Darlehen entsprechend fallend. **Das Ergebnis des Vorjahres wanderte nicht.**
+Jedes Jahr stand für sich, der Vortrag blieb der Eröffnungswert.
+
+§ 252 Abs. 1 Nr. 1 HGB verlangt Bilanzidentität: die Eröffnungsbilanz eines
+Jahres **ist** die Schlussbilanz des Vorjahres. § 266 Abs. 3 A. IV HGB führt
+dafür einen eigenen Posten.
+
+**Und die Bilanz ging trotzdem jedes Jahr auf**, weil die Differenz still im
+Verrechnungskonto landete — dem Posten, der per Bauart alles auffängt.
+
+**Wer einen mehrjährigen Abschluss prüft, rechnet zwei Jahre nacheinander und
+hält das Ergebnis des ersten gegen den Vortrag des zweiten.** Eine einzelne
+Jahresbilanz kann diesen Fehler nicht zeigen.
+
+> Und eine zweite Lücke, die erst die Gegenprobe zeigte: das Startjahr der
+> Fortschreibung darf nicht nur aus den **Objekt**-Steuersätzen kommen. Ein
+> Jahr, in dem die Gesellschaft nur Kosten hatte, ist ebenso ein
+> Geschäftsjahr — sonst verschwindet sein Verlust lautlos.
