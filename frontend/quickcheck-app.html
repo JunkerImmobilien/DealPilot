@@ -335,6 +335,67 @@ body::before {
 .kpi.good .v { color: #5ED99E; }
 .kpi.mid  .v { color: var(--gold); }
 .kpi.bad  .v { color: #FF8A8A; }
+
+/* ── v1233 · Rechenweg unter den Kennzahlen ────────────────────────────────
+   Satz immer sichtbar, die elf Zeilen zugeklappt. Kein eigener Knopf und
+   keine zweite Karte: der Testbericht beschwert sich siebenmal ueber zu
+   viele Knoepfe. Farben ausschliesslich ueber --gold und die beiden
+   Statustoene der KPI-Kacheln — kein neues Literal. */
+.qcb-hinweis {
+  padding: 0 1.5rem 1rem;
+  background: rgba(0,0,0,0.18);
+  position: relative; z-index: 2;
+}
+.qcb-hinweis-satz {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.55;
+  color: rgba(255,255,255,0.62);
+}
+.qcb-hinweis-satz b { color: rgba(255,255,255,0.86); font-weight: 600; }
+.qcb-rechenweg { margin-top: 0.55rem; }
+.qcb-rechenweg > summary {
+  cursor: pointer;
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold, #C9A84C);
+  padding: 0.2rem 0;
+}
+.qcb-rechenweg > summary::-webkit-details-marker { display: none; }
+.qcb-rechenweg > summary::before {
+  content: '\25B8';
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+.qcb-rechenweg[open] > summary::before { transform: rotate(90deg); }
+.qcb-rows {
+  margin-top: 0.45rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--gold, #C9A84C) 14%, transparent);
+  font-size: 0.72rem;
+}
+.qcb-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.18rem 0;
+}
+.qcb-row-stark {
+  font-weight: 700;
+  border-top: 1px solid color-mix(in srgb, var(--gold, #C9A84C) 14%, transparent);
+  margin-top: 0.15rem;
+  padding-top: 0.35rem;
+}
+.qcb-l { color: rgba(255,255,255,0.58); }
+.qcb-v { font-variant-numeric: tabular-nums; color: rgba(255,255,255,0.88); white-space: nowrap; }
+.qcb-v.gruen { color: #5ED99E; }
+.qcb-v.rot   { color: #FF8A8A; }
 .kpi .h {
   font-size: 0.55rem; color: rgba(255,255,255,0.4);
   font-style: italic; margin-top: 0.08rem;
@@ -3317,6 +3378,22 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
         <div class="kpi" id="kpi-bwk"><div class="l">Bewirtsch.</div><div class="v">—</div><div class="h">18-35%</div></div>
       </div>
 
+      <!-- v1233 · Testbericht Block I: "Hier habe ich das Expose runtergeladen aber
+           einen anderen Wert bekommen". Der Satz beantwortet das dort, wo die Zahl
+           steht. Die Aufschluesselung darunter ist ZUGEKLAPPT — derselbe Bericht
+           beschwert sich siebenmal ueber zu viele Knoepfe und zu viel Klicken.
+           Marcels Entscheidung vom 04.09.2026: "erklaersatz und zum aufklappen". -->
+      <div class="qcb-hinweis" id="qcb-hinweis" hidden>
+        <p class="qcb-hinweis-satz">Nicht enthalten: <b>Sanierung, Möblierung, Umlagen</b>.
+          Die Kaufnebenkosten stehen pauschal auf <b>10,5 %</b>, und das Darlehen ist aus
+          Gesamtinvestition minus Eigenkapital abgeleitet. Im vollen Objekt rechnen alle
+          Posten mit — die Zahlen dort weichen deshalb ab.</p>
+        <details class="qcb-rechenweg">
+          <summary>So wird gerechnet</summary>
+          <div class="qcb-rows" id="qcb-rows"></div>
+        </details>
+      </div>
+
     </div>
   </div>
 
@@ -4096,6 +4173,13 @@ const QcApp = (function() {
     setKpi('kpi-ltv',  k.ltvPct != null ? k.ltvPct + '%' : null, 'ltvPct');
     setKpi('kpi-bwk',  k.bwkPctOfNkm != null ? k.bwkPctOfNkm + '%' : null, 'bwk');
 
+    /* v1233 · Rechenweg. Die Zahlen kommen ALLE aus score.kpi und den Eingaben —
+       hier wird nichts nachgerechnet. Eine zweite Rechnung waere eine zweite
+       Wahrheit (Lehre aus v1227b), und sie liefe sofort auseinander, weil
+       computeScore() den Nebenkostensatz fest auf 10,5 % haelt und das
+       Eigenkapital notfalls mit 20 % der Gesamtinvestition annimmt. */
+    _qcbRechenweg(inputs, k, gated);
+
     const derived = document.getElementById('bewirt-derived');
     if (k.hgY > 0) {
       const pctNkm = inputs.nkm ? Math.round(k.hgY / (QcEngine.num(inputs.nkm) * 12) * 100) : '–';
@@ -4130,6 +4214,64 @@ const QcApp = (function() {
     if (!gated && score.score != null) renderAI(score, inputs);
 
     /* v529-no-green-confetti: kein Konfetti mehr beim Erreichen des gruenen Bereichs */
+  }
+
+  /* ── v1233 · Der Rechenweg unter den Kennzahlen ─────────────────────────
+     Testbericht Block I, woertlich: „Hier habe ich das Expose runtergeladen
+     aber einen anderen Wert bekommen". Nachgestellt am 04.09.2026 — es ist
+     KEIN Rechenfehler: der Quick-Check rechnet bewusst kleiner. Nur sagte es
+     die App nirgends an der Zahl.
+
+     Marcels Entscheidung: „erklaersatz und zum aufklappen". Der Satz steht
+     also immer da, die elf Zeilen liegen dahinter. Beides in EINEM Kasten
+     ohne eigenen Knopf, weil derselbe Bericht sich siebenmal ueber zu viele
+     Knoepfe beschwert.
+
+     Alle Werte kommen aus score.kpi und den Eingaben. Hier wird NICHTS
+     nachgerechnet — sonst haette man zwei Wahrheiten (v1227b), und sie
+     liefen sofort auseinander: computeScore() haelt den Nebenkostensatz fest
+     auf 10,5 % und nimmt notfalls 20 % der Gesamtinvestition als
+     Eigenkapital an. Genau das steht deshalb auch im Satz. */
+  var QCB_KNK_PCT = 10.5;   /* gespiegelt aus computeScore(), NICHT neu gesetzt */
+  function _qcbRechenweg(inputs, k, gated) {
+    var box = document.getElementById('qcb-hinweis');
+    var host = document.getElementById('qcb-rows');
+    if (!box || !host) return;
+    var kp = QcEngine.num(inputs.kp);
+    if (gated || !kp || k.gesamt == null) { box.hidden = true; return; }
+    box.hidden = false;
+
+    var eur = function (n) {
+      if (n == null || !isFinite(n)) return '—';
+      return new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(Math.round(n)) + ' €';
+    };
+    var pct = function (n) {
+      if (n == null || !isFinite(n)) return '—';
+      return String(n).replace('.', ',') + ' %';
+    };
+    var zins = QcEngine.num(inputs.zins) || 3.8;
+    var tilg = QcEngine.num(inputs.tilg) || 1.5;
+    var nkm  = QcEngine.num(inputs.nkm);
+    var knk  = k.gesamt - kp;
+
+    var z = [
+      ['Kaufpreis', eur(kp), ''],
+      ['+ Kaufnebenkosten (' + pct(QCB_KNK_PCT) + ')', eur(knk), ''],
+      ['= Gesamtinvestition', eur(k.gesamt), 'stark'],
+      ['– Eigenkapital', eur(k.ekValue), ''],
+      ['= Darlehen', eur(k.darlehen) + ' @ ' + pct(zins) + ' / ' + pct(tilg) + ' Tilg.', 'stark'],
+      ['Nettokaltmiete (Mon)', eur(nkm), ''],
+      ['Bruttomietrendite', pct(k.bmr), ''],
+      ['Nettomietrendite', pct(k.nmr), ''],
+      ['Cashflow / Monat', eur(k.cfMon), (k.cfMon < 0 ? 'rot' : 'gruen')],
+      ['DSCR', k.dscr == null ? '—' : String(k.dscr).replace('.', ','), (k.dscr != null && k.dscr < 1 ? 'rot' : '')],
+      ['LTV', pct(k.ltvPct), '']
+    ];
+    host.innerHTML = z.map(function (r) {
+      return '<div class="qcb-row' + (r[2] === 'stark' ? ' qcb-row-stark' : '') + '">' +
+             '<span class="qcb-l">' + r[0] + '</span>' +
+             '<span class="qcb-v' + (r[2] === 'rot' ? ' rot' : r[2] === 'gruen' ? ' gruen' : '') + '">' + r[1] + '</span></div>';
+    }).join('');
   }
 
   function setKpi(id, val, kpiKey) {
