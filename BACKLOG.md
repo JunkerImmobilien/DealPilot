@@ -38,11 +38,10 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 04.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging auf `795813a`, **Produktion auf `5418545`**.
-**`v1215`–`v1229c` sind live** (zwei Prod-Rollouts am 04.09.). **Offen ist
-`v1230`** — eine Backend-Änderung, sie braucht auf Prod einen
-`docker compose up -d --build`, kein reines `git pull`. Nachweise im
-Rollout-Journal der Projektanweisung.
+**Stand:** lokal = GitHub = Staging = **Produktion** auf `0d3041f`.
+**Alles ist live** — drei Prod-Rollouts am 04.09.: `v1215`–`v1228`,
+`v1229`–`v1229c` (beide reines Frontend) und `v1230` (Backend, mit Neubau).
+Nachweise im Rollout-Journal der Projektanweisung.
 
 **Und auf Prod liegen jetzt Marcels Daten.** Der Staging-Nutzer
 `info@junker-immobilien.io` ist auf Prod ins Konto gleicher Mailadresse
@@ -67,12 +66,9 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 
 > ### Der erste Griff jetzt
 >
-> **`v1230` ist auf Staging und braucht einen Prod-Rollout MIT Neubau** —
-> es ist eine Backend-Änderung, `git pull` allein reicht nicht. Sie behebt
-> B15: die Testphase erreicht jetzt auch den KI-Beleg-Import und die
-> Live-Bewertung. Im Container gegen echte Testphasen-Nutzer belegt.
+> **Nichts wartet auf einen Rollout.** Alles ist live, `v1230` inklusive.
 >
-> **Zwei Entscheidungen stehen noch:**
+> **Zwei Entscheidungen liegen bei Marcel:**
 > - **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, vor und nach
 >   `v1229` gleich. `CLAUDE.md` führt „RC=0 ist sauber" als Rollout-Tor.
 >   Schließen oder Regel umschreiben?
@@ -85,18 +81,14 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 > - **§ 7b-Spalte in `tax_records`** — Datenbankeingriff.
 >
 > **Zwei kleine Befunde ohne Entscheidung** (B13/B14): der
-> `config.js`-Rückfall ist tot, weil `hasCachedFeature` nie `null` liefert —
-> ein Schlüssel nur in `config.js` wirkt nichts. Und der Beleg-Import hat
-> gar kein Frontend-Gate, weil `beleg-import.js:65` eine Funktion abfragt,
-> die es nicht gibt. **Kein Loch** (das Backend sperrt), aber beides gehört
-> geradegezogen, wenn jemand ohnehin dort arbeitet.
+> `config.js`-Rückfall ist tot, weil `hasCachedFeature` nie `null` liefert.
+> Und der Beleg-Import hat gar kein Frontend-Gate, weil `beleg-import.js:65`
+> eine Funktion abfragt, die es nicht gibt. **Kein Loch** (das Backend
+> sperrt), aber beides gehört geradegezogen, wenn jemand dort arbeitet.
 >
-> **Erledigt und live:** B7 — Free bekommt den Track-Record mit Wasserzeichen,
-> in beiden Datenbanken gesetzt. Der Steuerberater steht auf Marcels Wunsch
-> ganz hinten an.
+> Der Steuerberater steht auf Marcels Wunsch ganz hinten an.
 >
-> **Nichts hängt halbfertig.** Auf Staging steht ein Backend-Neubau, der auf
-> Prod noch fehlt — das ist der einzige offene Punkt.
+> **Nichts hängt halbfertig.** Kein Rebuild offen, keine Migration offen,
 > Arbeitsverzeichnis sauber.
 
 > ### Was auf Prod bewusst NICHT gespiegelt wurde

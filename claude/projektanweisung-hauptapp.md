@@ -7117,6 +7117,39 @@ unbenutzt und ist mitgefallen.
 `Up`, Code im laufenden Container gegengelesen (`grep v1230` in
 `/app/src/routes/`). **Auf Prod fehlt der Neubau noch.**
 
+### Prod-Rollout 04.09.2026, dritter — `v1230` ist live (`0d3041f`)
+
+**Freigabe.** Marcel: **„ja machen"**.
+
+**Erster Backend-Rollout des Tages** — die beiden davor waren reines
+Frontend. Also `docker compose -f docker-compose.prod.yml up -d --build
+backend`, kein reines `git pull`.
+
+**Gesichert vorher:** `/root/backups/haupt-vor-v1230-20260904-0756.sql`
+(15,8 MB) und `mb-vor-v1230-20260904-0756.sql` (14,3 MB).
+
+**Nachweis am laufenden Container**, nicht auf der Platte:
+`grep -c v1230` in `/app/src/routes/` ergibt `ai.js:1` und `avm.js:2`.
+Alle fünf Container `Up`, `/health` 200, `/api/v1/auth/me` 401.
+
+#### Der Funktionslauf auf Prod: für niemanden ändert sich etwas
+
+Alle zehn echten Prod-Konten durchgerechnet, alter Weg gegen neuen:
+
+| | |
+|---|---|
+| Konten geprüft | 10 |
+| Konten mit abweichendem Ergebnis | **0** |
+
+**Das ist kein enttäuschendes Ergebnis, sondern der Beweis.** Auf Prod hat
+niemand eine Testphase (**B10**: `plan_trials` ist leer, der neueste
+Prod-Nutzer stammt vom 06.08., die Testphase kam am 31.08.). Wo es keine
+Testphase gibt, liest `getEffectivePlan()` dasselbe wie die Direktabfrage.
+
+**Der Eingriff greift also erst beim ersten echten Testkunden** — und genau
+für den war er nötig. Dass er heute niemandem etwas wegnimmt und niemandem
+etwas schenkt, ist die Absicherung, dass er nichts kaputtmacht.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
