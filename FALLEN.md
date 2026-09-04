@@ -677,3 +677,37 @@ Text war richtig, der Träger existierte nicht.
 **Und die Gegenprobe gehört dazu:** `grep` auf die Id über *alle* Dateitypen,
 nicht nur über `js/`. Steht sie ausschließlich im Stylesheet und in der
 lesenden Zeile, gibt es sie nicht.
+
+## Eine Bilanz, die aufgeht, beweist ihren Inhalt nicht
+
+Gemessen am 04.09.2026: die Bilanz der Test UG ging auf — Summe Aktiva =
+Summe Passiva, Differenz null. Sie führte trotzdem **dasselbe Objekt
+zweimal**: Umsatz 24.960 € statt 12.480 €, Bilanzsumme 557.025 €.
+
+Ursache war ein Doppellauf des Überführungs-Assistenten. Er prüfte nur, ob
+überhaupt eine Gesellschaft existiert — **nicht, ob das offene Objekt
+überhaupt in Frage kommt.** So wurde ein Gesellschafts-Objekt ein zweites Mal
+überführt, mit Ringschluss in `_ueberf_link`.
+
+**Das Aufgehen ist eine Prüfung der Mechanik, keine der Menge.** Wer eine
+Bilanz abnimmt, zählt zusätzlich, **welche** Objekte darin stehen — die Liste
+der Namen, nicht nur die Summe. Ein Duplikat verschiebt beide Seiten um
+denselben Betrag und fällt deshalb nie durch die Bilanzprobe.
+
+**Und jeder Vorgang, der ein Objekt umschreibt, prüft vorher den
+Ausgangszustand** — nicht nur die Verfügbarkeit des Ziels.
+
+## Eine ID ist keine Anzeige
+
+Die Objektkarten zeigten `mmtlt8yq2fq` — die Mandanten-ID aus
+`dp_mandanten`. Aufgefallen ist es erst nach einer Überführung, obwohl der
+Fehler immer da war: bei `privat` ist die ID zufällig lesbar, und deshalb sah
+die Zeile jahrelang richtig aus.
+
+**Wo eine Kennung in die Oberfläche durchgereicht wird, gehört sie
+aufgelöst** — über die Stelle, die die Liste führt, nicht über eine zweite
+Zuordnung. Und wenn das Auflösen fehlschlägt: **lieber leer als kryptisch.**
+
+> Nebenfalle: `DealPilotMandanten.get(id)` liefert als Rückfall den **ersten**
+> Mandanten, nicht `null`. Wer nicht gegenprüft, ob die zurückgegebene ID auch
+> die gesuchte ist, zeigt bei jeder unbekannten Kennung „Privat" an.

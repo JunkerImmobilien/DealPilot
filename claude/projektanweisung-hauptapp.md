@@ -7334,6 +7334,78 @@ ihre Elternketten verglichen: vier Treffer, einer unsichtbar im
 liegen — sie zeigt beide Wege, und hier steht, warum der große verworfen
 wurde.
 
+### `v1234` (04.09.2026, `e1187f3`) — die Überführung sagt jetzt, was sie tut
+
+**Marcels Meldung:** die Überführung habe nicht geklappt, auf der Karte stehe
+etwas Kryptisches, man könne die Gesellschaft nicht auswählen, und unter
+Mandanten sehe man nicht, welche Objekte dazugehören.
+
+#### Zuerst die Korrektur an seiner Annahme: das Objekt WAR angehängt
+
+An den Staging-Daten gemessen, bevor irgendetwas geändert wurde:
+
+```
+2026-1007  halter=mmtlt8yq2fq  obj_herkunft=ueberfuehrung
+2026-1008  halter=mmtlt8yq2fq  obj_herkunft=ueberfuehrung
+```
+
+**Es lag nicht am Speichern, sondern durchgehend an der Anzeige.** Fünf
+Befunde, alle behoben:
+
+| | Befund | Behebung |
+|---|---|---|
+| 1 | Die Karte zeigte die **rohe Mandanten-ID** `mmtlt8yq2fq` | `_halterName()` löst über `DealPilotMandanten.get()` auf — **eine** Stelle, beide Aufrufer umgestellt. Passt die ID nicht, bleibt die Zeile **leer**: eine kryptische Kennung ist schlechter als keine Angabe |
+| 2 | Die Halter-Auswahl war **gesperrt ohne ein Wort dazu** | Die Sperre ist richtig, aber ein totes Feld liest sich wie ein Fehler. Hinweis darunter mit Grund und Weg zurück |
+| 3 | Unter Mandanten **fehlte die Objektliste** | `_objekteJeMandant()` — eine Abfrage für alle Karten, gezählt nach `halter`, eingefrorene gekennzeichnet. Angestoßen in `renderSettingsTab()` selbst, damit **beide** Aufrufer sie bekommen |
+| 4 | Der Assistent prüfte **nicht**, ob das Objekt in Frage kommt | Drei Vorprüfungen mit Begründung |
+| 5 | Das Modal sammelte zwei Zahlen, **ohne zu sagen wozu** | Die Regeln nachgetragen, mit Paragraph |
+
+#### Befund 4 war real und hatte eine Bilanz verdorben
+
+Die Kette in den Daten: `2026-1002` (privat) → `2026-1007` (GmbH) →
+**`2026-1008` (GmbH)**. Ein **Gesellschafts**-Objekt wurde ein zweites Mal
+überführt, mit Ringschluss: `1007._ueberf_link → 1008` und
+`1008._ueberf_link → 1007`.
+
+> **Die Folge war messbar und heimtückisch:** die Bilanz der Test UG führte
+> „Am Markt 9" **zweimal** — Umsatz 24.960 € statt 12.480 €, Bilanzsumme
+> 557.025 €. **Sie ging auf und war trotzdem falsch.** Eine Bilanz, die
+> aufgeht, ist kein Beweis für ihren Inhalt.
+
+#### Befund 5: die Regeln, gegen das Netz abgeglichen
+
+Der Assistent sammelte Verkehrswert und Überführungspreis kommentarlos.
+Nachgetragen, jeweils mit Fundstelle:
+
+| Regel | was jetzt dasteht |
+|---|---|
+| **§ 8 Abs. 1 GrEStG** | Bemessungsgrundlage ist die **Gegenleistung** — der Überführungspreis, nicht der Verkehrswert. Der BFH hat 2023 bestätigt, dass ein Preis unter Verkehrswert als Gegenleistung anzuerkennen ist. Satz je Bundesland 3,5–6,5 % |
+| **Verdeckte Einlage** | die Differenz, **live gerechnet**. Ist sie negativ, meldet der Kasten eine **verdeckte Gewinnausschüttung** statt einer Einlage |
+| **§ 42 AO** | ein niedriger Preis ist zulässig, aber angreifbar — **verbindliche Auskunft vorher** |
+| **§ 23 EStG** | die Zehnjahresfrist wird **gerechnet**, nicht erwähnt: aus `kaufdat` und Stichtag, mit Restlaufzeit in Tagen. **Fehlt das Kaufdatum, wird nichts behauptet** |
+
+#### Der Durchlauf, Schritt für Schritt auf Staging
+
+| Prüfung | Ergebnis |
+|---|---|
+| Karten nach dem Rollout | „Test UG (v1226)" und „Privat" — **keine ID mehr** |
+| Mandanten-Ansicht | Privat **7 Objekte**, Test UG **2 Objekte**, je mit Nummer und Adresse |
+| Sperre auf `2026-1008` | *„Dieses Objekt ist bereits das Ergebnis einer Überführung"* — **Assistent öffnet nicht** |
+| verdeckte Einlage | 167.529 − 30.000 = **137.529 €** |
+| Gegenprobe Preis > Verkehrswert | meldet **verdeckte Gewinnausschüttung** |
+| § 23 ohne Kaufdatum | *„nicht prüfbar — im Privat-Objekt fehlt das Kaufdatum"* |
+| **Überführung `2026-1004` → `2026-1009`** | durchgelaufen; privat eingefroren zum 01.01.2026, GmbH-Objekt mit Verkehrswert 167.529, Preis 30.000, `halter_seit` gesetzt |
+| **Bilanz über 3 Objekte** | Summe Aktiva = Summe Passiva = **681.878,97 €**, Differenz **0** |
+
+#### Was offen bleibt und Marcel gehört
+
+**`2026-1008` ist der Doppelgänger aus dem alten Fehler und steht noch da.**
+Er zählt in jeder Bilanz der Test UG doppelt. Wegräumen geht über den
+eingebauten Weg „Überführung aufheben" am Objekt — **das kann ich nicht
+selbst**: die Funktion löscht das Gesellschafts-Objekt und fragt vorher über
+`window.confirm`, und ein Browser-Dialog blockiert die Automatisierung. Zwei
+Klicks für Marcel, und die Bilanz stimmt inhaltlich.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
