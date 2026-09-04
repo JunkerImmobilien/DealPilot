@@ -79,6 +79,13 @@
     if (/haus/.test(s)) return 'EFH';
     return null;
   }
+  /* v1229b · EINE Zuordnung, nicht zwei. `fillInputsFromDpkt()` in app.js
+     schrieb bis hierher 'haus' bzw. 'wohnung' in dasselbe Auswahlfeld —
+     Werte, die es dort nicht gibt. Gemessen im Browser: der Zuweisung folgt
+     `selectedIndex = -1` und `value = ''`, die Objektart blieb also beim
+     .dpkt-Import IMMER leer. Statt die Tabelle ein zweites Mal zu tippen,
+     steht sie hier und wird dort geholt. */
+  window._mbMapPtype = mapPtype;
   /* v1136c-WMTAB-1 · Zwei gemessene Fehler in dieser Zuordnung.
    *
    * Die Haupt-App fuehrt fuenf Zustaende (ds2_zustand in index.html:991):

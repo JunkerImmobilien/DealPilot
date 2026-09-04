@@ -2155,8 +2155,19 @@ function fillInputsFromDpkt(o) {
    * Objekt. Ohne ihn blieb der Objekttyp leer, und daran hing die halbe
    * Fehlerkette im Bericht. */
   const pt = g(['objart', 'objekttyp', 'objektart', 'property_type', 'typ', 'art']);
-  if (pt && /haus|efh|zfh|dhh|reihen|mfh|mehrfamilien/i.test(String(pt))) set('ptype', 'haus');
-  else if (pt) set('ptype', 'wohnung');
+  /* v1229b · 'haus' und 'wohnung' gibt es im Auswahlfeld nicht. Die alten
+     zwei Zeilen schrieben genau diese Werte in <select id="ptype">, dessen
+     Optionen ETW/EFH/MFH/DHH/RH/… heissen — gemessen im Browser: die
+     Zuweisung setzt selectedIndex auf -1 und value auf ''. Der .dpkt-Import
+     hat die Objektart also nie gesetzt, und daran haengt istWohnung() und
+     damit, ob der Sachwert ueberhaupt erscheint.
+
+     mapPtype() in mb-objektwahl.js kann das seit v1136c richtig, inklusive
+     Doppelhaus, Reihenhaus und Gewerbe. Sie wird geholt, nicht abgeschrieben
+     — und sie liefert null, wenn sie nichts erkennt. Dann bleibt das Feld
+     leer und die Ampel sagt „fehlt: Objektart", statt etwas zu raten. */
+  const _ptCode = (pt && typeof window._mbMapPtype === 'function') ? window._mbMapPtype(pt) : null;
+  if (_ptCode) set('ptype', _ptCode);
   const us = g(['nutzung', 'usage_type', 'usage', 'nutzungsart']);
   if (us && /eigen/i.test(String(us))) set('usage', 'eigennutzung'); else if (us) set('usage', 'kapitalanlage');
   set('area', g(['wohnflaeche', 'wohnflaeche_qm', 'wohnflaeche_m2', 'flaeche', 'living_area', 'wfl']));
