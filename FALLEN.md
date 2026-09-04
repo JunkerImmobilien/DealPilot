@@ -556,3 +556,36 @@ Der zweite Füllweg derselben Datei machte es längst richtig. **Solche
 Nachzieh-Listen gehören an EINE Stelle**: zwei Aufrufer mit je eigener Liste
 laufen auseinander, und hier hätte der zweite `address` gebraucht, der erste
 nicht.
+
+## Der Prüfmodus liest die Datei, der Kunde die Datenbank
+
+`dp_plan_override` stuft die Oberfläche herab und überspringt dabei bewusst
+die Datenbank (`config.js`, `v1163`) — sonst zeigte die Oberfläche den
+simulierten Plan, die Funktionen blieben aber die des echten Abos.
+
+**Der Preis dafür:** was der Prüfmodus zeigt, ist der `config.js`-Fallback,
+nicht die Plan-Zeile aus der Datenbank. Wo beide auseinanderlaufen, **beschei-
+nigt ein bestandener Prüflauf eine Funktion, die der echte Nutzer nicht hat.**
+
+Gemessen am 04.09.2026: `track_record_pdf` steht in `config.js` für Free auf
+`true`, in der Datenbank auf `false` — in beiden Umgebungen. Der Prüfmodus
+meldet `true`, der echte Free-Nutzer bekommt nichts.
+
+**Ein Prüflauf über die Pläne ist erst vollständig, wenn beide Quellen
+nebeneinander liegen.** Die Datenbank kommt über `GET /plans`, die Datei über
+`DealPilotConfig.pricing.plans` — Schlüssel für Schlüssel vergleichen, und
+dabei so normalisieren, wie `hasFeature()` liest: ein nicht-leerer String
+(`'demo'`, `'simplified'`) ist **true**.
+
+## Ein Kommentar ist keine Messung — auch nicht drei gleichlautende
+
+Drei Stellen sagten „Testphase 7 Tage": zwei Backend-Kommentare und der
+Backlog. Eine vierte sagte „vier Wochen". **Gerechnet wird mit
+`TESTPHASE_TAGE = 28`** — die Landing wirbt mit vier Wochen, und der Code
+hält das ein.
+
+Der Name der Sache (`TR7-trial`) stammte aus der ersten Fassung mit sieben
+Tagen und hat die Kommentare überlebt, die Zahl nicht. **Bei jeder Frage nach
+einer Frist, einem Limit oder einem Preis die rechnende Zeile suchen**, nicht
+die Beschreibung — und danach an echten Daten gegenprüfen (hier:
+`plan_trials`, Spanne bis 28 Tage).

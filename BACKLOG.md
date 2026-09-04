@@ -67,22 +67,33 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 
 > ### Der erste Griff jetzt
 >
-> 1. **Die fünf Fragen an den Steuerberater** aus dem Prüfbefund — vor allem,
->    ob ihm Bilanz und GuV in dieser Form reichen oder ob seine
->    Kanzleisoftware einen DATEV-Buchungsstapel braucht. **Die Antwort
->    entscheidet, ob als Nächstes ein Buchungsstapel-Export gebaut wird
->    oder nicht** — deshalb steht sie vor allem anderen Code.
-> 2. **§ 7b-Spalte in `tax_records`** — Datenbankeingriff, braucht Marcels
->    Freigabe. Bis dahin steht im PDF der ehrliche Hinweis statt einer Zahl.
+> **Marcel prüft gerade selbst** („das prüfe ich jetzt erst alles"). Der
+> Steuerberater steht deshalb ganz hinten an.
 >
-> **Zwei Fragen an Marcel, die noch offen sind:**
-> - **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, gemessen vor UND
->   nach `v1229` Zahl für Zahl gleich. `CLAUDE.md` führt „RC=0 ist sauber"
->   als Rollout-Tor. Das Tor ist seit Längerem offen. Schließen oder Regel
->   umschreiben?
-> - **Die Objektart kennt kein Zweifamilienhaus.** `Zweifamilienhaus` fällt
->   auf `EFH`. Das Testobjekt Löhner Str. 278 ist ein ZFH. Fehlt die Option,
->   oder ist EFH die gewollte Näherung? **Bewertungsfrage, nicht Code.**
+> **Drei Entscheidungen liegen bei ihm, alle gemessen, keine ist Code:**
+>
+> 1. **Der Track-Record ist Free versprochen und ihm verwehrt** (B7 in
+>    Punkt 2). Die Landing sagt „Wasserzeichen", die Datenbank sagt `false`,
+>    und die Datenbank gewinnt. Datenbank aufmachen oder Landing ehrlich
+>    machen? **Preisversprechen — deshalb nicht angefasst.**
+> 2. **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, vor und nach
+>    `v1229` Zahl für Zahl gleich. `CLAUDE.md` führt „RC=0 ist sauber" als
+>    Rollout-Tor. Das Tor ist seit Längerem offen. Schließen oder Regel
+>    umschreiben?
+> 3. **Die Objektart kennt kein Zweifamilienhaus.** `Zweifamilienhaus` fällt
+>    auf `EFH`. Das Testobjekt Löhner Str. 278 ist ein ZFH. Fehlt die Option,
+>    oder ist EFH die gewollte Näherung? **Bewertungsfrage.**
+>
+> **Zwei Aufräumarbeiten warten auf ein Ja:**
+> - `business` und `enterprise` liegen noch in der Prod-Datenbank (B11).
+>   Auf Staging sind sie weg. Betroffen ist nur ein deaktiviertes Demokonto.
+> - **§ 7b-Spalte in `tax_records`** — Datenbankeingriff. Bis dahin steht im
+>   PDF der ehrliche Hinweis statt einer Zahl.
+>
+> **Und eins zum Wissen, nicht zum Entscheiden:** die vier Wochen Pro sind
+> auf Produktion **noch nie gelaufen** (B10). `plan_trials` ist dort leer,
+> weil sich seit dem 06.08. niemand neu angemeldet hat und die Testphase am
+> 31.08. kam. Der erste echte Kunde ist zugleich der erste Test.
 >
 > **Nichts hängt halbfertig.** Kein Rebuild offen, keine Migration offen,
 > Arbeitsverzeichnis sauber.
@@ -1928,6 +1939,117 @@ entfällt — nicht raten.
    **Zwei Grenzen, die beim Durchklicken gelten:** der Prüfmodus zeigt das
    **Frontend-Gate**, nicht die Backend-Durchsetzung — und er liest den
    `config.js`-Fallback, nicht die DB-Zeile des simulierten Plans.
+
+   ### DURCHKLICKEN ERLEDIGT (04.09.2026) — vier Stufen gemessen
+
+   Prüfmodus `dp_plan_override` je Stufe gesetzt, neu geladen, `hasFeature()`
+   ausgelesen. **Der Prüfmodus wurde danach wieder entfernt**, echter Plan
+   `pro` bestätigt.
+
+   | Schlüssel | free | starter | investor | pro |
+   |---|---|---|---|---|
+   | `full_calc` · `steuer_modul` · `ai_analysis_tab` | ✔ | ✔ | ✔ | ✔ |
+   | `track_record_pdf` | **✔** | – | ✔ | ✔ |
+   | `deal_score_v2` | **✔** (`demo`) | – | ✔ | ✔ |
+   | `marktreport` · `ai_analysis` · `excel_import` | – | ✔ | ✔ | ✔ |
+   | `bankexport` · `market_data_fields` · `live_market_rates` · `werbungskosten_pdf` | – | – | ✔ | ✔ |
+   | `export_csv` · `theme_palette` · `bmf_advanced` | – | – | – | ✔ |
+
+   **Objektgrenzen:** 1 · 5 · 25 · ∞ — **deckungsgleich mit der Landing**
+   („Objekte 1 5 25 ∞"). `export_csv` nur bei Pro — die Landing sagt
+   „Rohdatenexport (CSV / XLSX) – – – ✓", also ebenfalls deckungsgleich.
+
+   #### B7 · Der Track-Record ist Free versprochen und ihm verwehrt
+
+   **Die Landing verspricht:** `Track-Record-PDF · Free = „Wasserzeichen" ·
+   Starter = – · Investor ✔ · Pro ✔`.
+
+   | Quelle | free |
+   |---|---|
+   | Landing | **Wasserzeichen** (also ja, eingeschränkt) |
+   | `config.js` | `true` |
+   | **Datenbank, beide Umgebungen** | **`false`** |
+
+   Die Datenbank ist die Quelle der Wahrheit (`config.js:568`), und
+   `track_record_pdf` ist ein **echtes Gate** (`subscription.js:848`,
+   `deal-action-pdf-gate.js:54`). **Ein echter Free-Nutzer bekommt das PDF
+   also nicht, obwohl die Preisseite es ihm zusagt.**
+
+   Dass es ein Versehen ist und keine Absicht, sagt die Datenbank selbst:
+   `free.watermark = true`. Das Wasserzeichen ist für Free vorgesehen — nur
+   die Tür davor ist zu.
+
+   **Zwei Nebenwirkungen:** im Startfenster vor der DB-Antwort greift der
+   `config.js`-Fallback und zeigt den Knopf offen (dieselbe Mechanik wie
+   `v1160`). Und **der Prüfmodus meldet für Free `true`** — wer damit prüft,
+   bescheinigt Free eine Funktion, die es nicht hat. **Der erste Fall, in dem
+   die bekannte Grenze des Prüfmodus zu einem falschen Bestanden führt.**
+
+   **Zu entscheiden ist, welche Seite recht hat — das ist Marcels Sache:**
+   Datenbank auf `true` (Versprechen einlösen) oder Landing ehrlich machen.
+   Es ist ein Preisversprechen, deshalb wird hier nichts geändert.
+
+   #### B8 · Das Bankexport-Leck ist zu — der alte Befund gilt nicht mehr
+
+   Oben stand als bekanntes Leck: *„der Bankexport blockt nur `starter` —
+   Free rutscht mit Wasserzeichen durch."* **Gemessen: er blockt beide.**
+   Der Schlüssel, der die Oberfläche wirklich sperrt, ist `bank_pdf_a3`
+   (`subscription.js:852`), nicht `bankexport` — und er steht für free
+   **und** starter auf `false`. `bmf_calc_export` genauso. **Punkt erledigt.**
+
+   #### B9 · Die Testphase dauert 28 Tage, nicht 7 — drei Stellen sagten es falsch
+
+   Die Landing wirbt mit *„Die ersten 4 Wochen ✔ Pro"*. Der Code gibt genau
+   das: `TESTPHASE_TAGE = 28` (`aiCreditsService.js:63`), und
+   `gewaehreTestphase()` holt die Zahl von dort statt sie zu tippen.
+   **Versprechen und Gate stimmen überein.**
+
+   Falsch waren die **Beschreibungen**: zwei Kommentare im Backend
+   (`userService.js:32`, `subscriptionService.js:79`) sagten „7 Tage", und
+   dieser Backlog sagte es auch. Der Name `TR7` stammt aus der ersten
+   Fassung; `v1185` hat die Zahl auf 28 gezogen, die Kommentare nicht.
+   **Kommentare korrigiert** (nur Kommentare, kein Verhalten — geht mit dem
+   nächsten Backend-Bau mit).
+
+   > An echten Daten gegengeprüft: `plan_trials` auf Staging führt 17 Zeilen,
+   > Spanne 2 bis **28** Tage (die 2 ist eine Handvergabe über
+   > `admin.js:1505`).
+
+   #### B10 · Die Testphase ist auf Produktion noch nie gelaufen
+
+   `plan_trials` ist auf Prod **leer**. Das ist kein Defekt: der neueste
+   Prod-Nutzer hat sich am **06.08.2026** registriert, die Testphase kam mit
+   `v1185` am **31.08.** **Seither hat sich niemand neu angemeldet.** Die vier
+   Wochen Pro sind also auf Staging belegt und in Produktion **ungeprüft** —
+   das gehört gewusst, bevor der erste echte Kunde kommt.
+
+   #### B11 · `business` und `enterprise` liegen noch auf Prod (B6 halb erledigt)
+
+   Auf **Staging sind sie weg** — die `plans`-Tabelle führt fünf Zeilen. Auf
+   **Prod stehen sie noch**, mit 11 bzw. 13 Schlüsseln statt 34 bis 37.
+
+   Die Bedingung von B6 („vor dem Aufräumen prüfen, ob ein Konto darauf
+   läuft") ist geprüft: **auf `business` läuft genau eine Subscription, und
+   zwar `demo@dealpilot.local`** — ein deaktiviertes Demokonto mit Laufzeit
+   bis 2126. **Kein echter Kunde ist betroffen.** Was diesem Plan gegenüber
+   Pro fehlt, sind 27 Schlüssel, alle still `false`.
+
+   #### B12 · Tote und doppelt benannte Schlüssel
+
+   | Schlüssel | Befund |
+   |---|---|
+   | `export_pdf` | steht in `config.js` in **jedem** Plan — **niemand fragt ihn ab**. Die Datenbank führt stattdessen `pdf_export`, und das ist ein **Verbrauchszähler** (`Sub.trackUsage('pdf_export')`), kein Gate. Zwei Namen, zwei Bedeutungen, ein Topf |
+   | `bank_pdf_premium` | in `config.js` nur bei `starter` (`false`), sonst nirgends — **die Datenbank gibt ihn Pro auf `true`**. Datei und DB widersprechen sich bei einem Schlüssel, den niemand abfragt. Harmlos heute, eine Falle, sobald ihn jemand abfragt |
+   | `bank_pdf_normal` | `config.js` `true` für **alle** Pläne, DB für free `false` — niemand fragt ihn ab |
+
+   #### Was weiterhin offen bleibt
+
+   - [ ] **`partner` ist nicht begehbar.** Der Prüfmodus stuft nur herab, und
+         das Staging-Konto ist `pro`. Auf Prod trägt `majunker@gmx.net` den
+         Partner-Plan — dort ginge es, aber nur nach Anmeldung durch Marcel.
+   - [ ] **Die Backend-Durchsetzung ist nicht gemessen.** Alles hier ist das
+         Frontend-Gate. Ob das Backend eine gesperrte Funktion auch abweist,
+         wenn man den Aufruf von Hand schickt, ist eine eigene Prüfung.
 
 3. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 

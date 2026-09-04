@@ -6914,6 +6914,86 @@ Konsole nach frischem Laden: keine Fehler. Haupt-App auf Prod gegengeprüft:
 bei Marcel: der rote Gold-Audit gegen die eigene RC=0-Regel, und ob die
 Objektart ein Zweifamilienhaus bekommen soll.
 
+### Prüflauf Pläne, 04.09.2026 — Backlog-Punkt 2, das Durchklicken ist erledigt
+
+**Kein Umbau, eine Befundliste.** Prüfmodus `dp_plan_override` je Stufe
+gesetzt, neu geladen, `hasFeature()` ausgelesen, danach **entfernt** und der
+echte Plan `pro` bestätigt. Sechs neue Befunde, B7 bis B12, alle im Backlog
+unter Punkt 2.
+
+**Die vier Stufen, gemessen:**
+
+| Schlüssel | free | starter | investor | pro |
+|---|---|---|---|---|
+| `full_calc` · `steuer_modul` · `ai_analysis_tab` | ✔ | ✔ | ✔ | ✔ |
+| `track_record_pdf` | ✔ | – | ✔ | ✔ |
+| `deal_score_v2` | ✔ (`demo`) | – | ✔ | ✔ |
+| `marktreport` · `ai_analysis` · `excel_import` | – | ✔ | ✔ | ✔ |
+| `bankexport` · `market_data_fields` · `live_market_rates` · `werbungskosten_pdf` | – | – | ✔ | ✔ |
+| `export_csv` · `theme_palette` · `bmf_advanced` | – | – | – | ✔ |
+
+Objektgrenzen 1 · 5 · 25 · ∞ — **deckungsgleich mit der Landing**. CSV nur
+Pro — ebenfalls deckungsgleich.
+
+#### Der wichtigste Befund: ein Preisversprechen, das das Gate nicht einlöst
+
+Die Landing sagt `Track-Record-PDF · Free = „Wasserzeichen"`. `config.js`
+sagt `true`. **Die Datenbank sagt `false` — in beiden Umgebungen.** Und die
+Datenbank ist die Quelle der Wahrheit (`config.js:568`), `track_record_pdf`
+ein echtes Gate (`subscription.js:848`).
+
+**Ein echter Free-Nutzer bekommt das PDF also nicht, obwohl die Preisseite es
+ihm zusagt.** Dass es ein Versehen ist, sagt die Datenbank selbst:
+`free.watermark = true` — das Wasserzeichen ist für Free vorgesehen, nur die
+Tür davor ist zu. **Nicht angefasst, es ist ein Preisversprechen.**
+
+#### Und der Prüfmodus hätte es nie gezeigt
+
+`dp_plan_override` überspringt die Datenbank bewusst (`v1163`) und liest den
+`config.js`-Fallback. Für `track_record_pdf` meldet er deshalb `true` —
+**der erste Fall, in dem die bekannte Grenze des Prüfmodus zu einem falschen
+Bestanden führt.** Das steht jetzt in `FALLEN.md`, zusammen mit dem Rezept:
+Datei und Datenbank nebeneinanderlegen, `GET /plans` gegen
+`DealPilotConfig.pricing.plans`, und dabei normalisieren wie `hasFeature()`
+liest — ein nicht-leerer String ist **true**.
+
+#### Ein alter Befund ist hinfällig, ein zweiter halb erledigt
+
+**Das Bankexport-Leck ist zu.** Der Backlog führte als bekanntes Leck: „blockt
+nur `starter`, Free rutscht durch". Der Schlüssel, der wirklich sperrt, ist
+`bank_pdf_a3` (`subscription.js:852`) — und der steht für free **und** starter
+auf `false`.
+
+**`business` und `enterprise`** sind auf Staging weg, liegen auf Prod aber
+noch, mit 11 bzw. 13 Schlüsseln statt 34 bis 37. Die Bedingung aus B6 ist
+geprüft: darauf läuft genau eine Subscription, `demo@dealpilot.local` —
+deaktiviertes Demokonto, Laufzeit bis 2126. **Kein echter Kunde betroffen.**
+
+#### Die Testphase: 28 Tage, und drei Beschreibungen sagten 7
+
+Die Landing wirbt mit „Die ersten 4 Wochen ✔ Pro". Gerechnet wird mit
+**`TESTPHASE_TAGE = 28`** (`aiCreditsService.js:63`), und `gewaehreTestphase()`
+holt die Zahl von dort statt sie zu tippen. **Versprechen und Gate stimmen.**
+
+Falsch waren die Beschreibungen: zwei Backend-Kommentare und dieser Backlog
+sagten „7 Tage". Der Name `TR7` stammt aus der ersten Fassung; `v1185` zog die
+Zahl auf 28, die Kommentare nicht. **Korrigiert — nur Kommentare, kein
+Verhalten; sie gehen mit dem nächsten Backend-Bau mit.** An echten Daten
+gegengeprüft: `plan_trials` auf Staging, 17 Zeilen, Spanne bis 28 Tage.
+
+> **Und sie ist auf Produktion noch nie gelaufen.** `plan_trials` ist dort
+> leer — kein Defekt: der neueste Prod-Nutzer hat sich am 06.08. registriert,
+> die Testphase kam am 31.08. **Der erste echte Kunde ist zugleich der erste
+> Test der vier Wochen.**
+
+#### Was offen bleibt, ehrlich benannt
+
+- **`partner` ist nicht begehbar.** Der Prüfmodus stuft nur herab, das
+  Staging-Konto ist `pro`. Auf Prod trägt `majunker@gmx.net` Partner — dort
+  ginge es, aber nur nach Anmeldung durch Marcel.
+- **Die Backend-Durchsetzung ist nicht gemessen.** Alles hier ist das
+  Frontend-Gate.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

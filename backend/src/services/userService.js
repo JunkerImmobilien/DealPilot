@@ -29,7 +29,10 @@ async function createUser({ email, plainPassword, name, newsletter }) {
     [emailLower, hash, name.trim(), role, wantsNews, wantsNews ? new Date() : null]
   );
 
-  /* TR7-trial: 7 Tage Pro ab Registrierung.
+  /* TR7-trial: 28 Tage Pro ab Registrierung — vier Wochen, wie die Landing
+     sie verspricht. Der Name TR7 stammt aus der ersten Fassung mit sieben
+     Tagen; die Zahl steht seit v1185 als TESTPHASE_TAGE in
+     aiCreditsService.js und wird von dort geholt, nicht hier getippt.
      Sitzt BEWUSST hier und nicht in einer Route. Die App registriert ueber
      registerWithVerify.js, nicht ueber auth.js — ein Grant in nur einer der
      beiden Routen feuert nie (Fehler vom 23.07.). createUser ist der

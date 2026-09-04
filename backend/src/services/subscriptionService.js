@@ -76,10 +76,13 @@ function isActive(sub) {
 async function getEffectivePlan(userId) {
   /* mand v811b: aktiver Pro-Test ueberschreibt den realen Plan voruebergehend.
      Die echte subscriptions-Zeile bleibt unangetastet -> nach Ablauf gilt sie wieder. */
-  /* TR7-trial: Testphase 7 Tage Pro, automatisch ab Registrierung.
+  /* TR7-trial: Testphase 28 Tage Pro, automatisch ab Registrierung. Vier
+     Wochen, wie die Landing sie verspricht — der Name TR7 stammt aus der
+     ersten Fassung mit sieben Tagen, die Zahl steht seit v1185 als
+     TESTPHASE_TAGE in aiCreditsService.js.
      DREI Abweichungen gegenueber rohem Pro — bewusst:
        1. Ein AKTIVES BEZAHLTES Abo schlaegt die Testphase. Sonst wuerde ein
-          Reseller-Mandant (Investor per Seat) sieben Tage lang "Pro" sehen
+          Reseller-Mandant (Investor per Seat) vier Wochen lang "Pro" sehen
           und danach sichtbar herabgestuft — der Reseller hat bezahlt.
        2. export_csv / json_backup / excel_import bleiben AUS. Diese Exporte
           sind Pro-Verkaufsargumente und tragen kein Wasserzeichen.
