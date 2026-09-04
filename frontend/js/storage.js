@@ -914,6 +914,29 @@ async function renderSaved(opts) {
    */
   /* v844-card-kaufdat: Kaufdatum robust nach de-DE formatieren.
      Akzeptiert 'YYYY-MM-DD', 'DD.MM.YYYY', ISO-Strings. Faellt auf Rohwert zurueck. */
+  /* ── v1234 · Der Halter auf der Karte ist eine ID, kein Name ──────────────
+     Gemessen am 04.09.2026 auf Staging: die Karten zeigten `mmtlt8yq2fq`.
+     Das ist die Mandanten-ID aus `dp_mandanten` — fuer den Nutzer kryptisch,
+     und ausgerechnet nach einer Ueberfuehrung, wo er sehen will, DASS das
+     Objekt jetzt der Gesellschaft gehoert. Bei `privat` fiel es nie auf, weil
+     die ID zufaellig lesbar ist.
+
+     Aufgeloest wird ueber DealPilotMandanten.get() — die eine Stelle, die die
+     Liste fuehrt. ACHTUNG: get() liefert als Rueckfall den ERSTEN Mandanten,
+     nicht null. Deshalb wird die ID gegengeprueft. Passt sie nicht (Modul
+     nicht geladen, Mandant geloescht), bleibt die Zeile LEER — eine
+     kryptische Kennung ist schlechter als gar keine Angabe. */
+  function _halterName(id) {
+    var h = (id == null) ? '' : String(id).trim();
+    if (!h) return '';
+    try {
+      if (window.DealPilotMandanten && typeof DealPilotMandanten.get === 'function') {
+        var m = DealPilotMandanten.get(h);
+        if (m && m.id === h && m.name) return m.name;
+      }
+    } catch (e) {}
+    return (h === 'privat') ? 'Privat' : '';
+  }
   function _fmtKaufdat(v) {
     if (!v) return '';
     try {
@@ -1325,7 +1348,7 @@ async function renderSaved(opts) {
           /* v844-card-kaufdat: Karte zeigt Kaufdatum; updated_at nur noch als Filter-Attribut */
           date: o.kaufdat ? _fmtKaufdat(o.kaufdat) : '',
           dateUpdated: o.updated_at ? new Date(o.updated_at).toLocaleDateString('de-DE') : '',
-          halter: (o.halter && String(o.halter).trim()) ? o.halter : ''
+          halter: _halterName(o.halter)
         });
       }).join('') + _addNewBtn();
       list.querySelectorAll('.sb-card').forEach(function(el) {
@@ -1397,7 +1420,7 @@ async function renderSaved(opts) {
         /* v844-card-kaufdat: lokaler Pfad - Kaufdatum aus d.kaufdat/d.data, updated_at als Filter */
         date: (d.kaufdat || (d.data && d.data.kaufdat)) ? _fmtKaufdat(d.kaufdat || d.data.kaufdat) : '',
         dateUpdated: d._at ? new Date(d._at).toLocaleDateString('de-DE') : '',
-        halter: (function(){ var h = d.halter || (d.data && d.data.halter); return (h && String(h).trim()) ? h : ''; })()
+        halter: _halterName(d.halter || (d.data && d.data.halter))
       });
     }).join('') + _addNewBtn();
     list.querySelectorAll('.sb-card').forEach(function(el) {

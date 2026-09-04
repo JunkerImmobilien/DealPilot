@@ -36,6 +36,36 @@
       return;
     }
 
+    /* ── v1234 · Vorpruefung: schon ueberfuehrt? ──────────────────────────
+       Gemessen am 04.09.2026 an Marcels Staging-Daten, und es war real:
+         2026-1002 (privat, eingefroren) -> 2026-1007 (GmbH)
+         2026-1007 (GmbH!)               -> 2026-1008 (GmbH)
+       Der Assistent hat ein GESELLSCHAFTS-Objekt ein zweites Mal ueberfuehrt.
+       Ergebnis: eine Kette statt eines Paares, und zwischen 1007 und 1008 ein
+       gegenseitiger Ring (_ueberf_link zeigt aufeinander).
+
+       Er hat vorher NUR geprueft, ob ueberhaupt eine Gesellschaft existiert.
+       Nicht, ob das offene Objekt dafuer in Frage kommt. Beide Faelle sind
+       am Objekt selbst ablesbar und werden jetzt abgewiesen — mit dem Grund,
+       nicht nur mit einem Nein. */
+    var _herkEl = document.getElementById('obj_herkunft');
+    if (_herkEl && _herkEl.value === 'ueberfuehrung') {
+      if (typeof toast === 'function') toast('Dieses Objekt ist bereits das Ergebnis einer Überführung — es gehört schon einer Gesellschaft.');
+      return;
+    }
+    var _endeEl0 = document.getElementById('ueberf_ende');
+    if (_endeEl0 && (_endeEl0.value || '').trim()) {
+      if (typeof toast === 'function') toast('Dieses Objekt ist bereits überführt und zum ' + _endeEl0.value.split('-').reverse().join('.') + ' eingefroren.');
+      return;
+    }
+    var _haltEl0 = document.getElementById('halter');
+    if (_haltEl0 && _haltEl0.value && _haltEl0.value !== 'privat') {
+      var _mn = '';
+      try { var _m = DealPilotMandanten.get(_haltEl0.value); if (_m && _m.id === _haltEl0.value) _mn = _m.name; } catch (e) {}
+      if (typeof toast === 'function') toast('Dieses Objekt gehört bereits ' + (_mn || 'einer Gesellschaft') + '. Nur Privatobjekte lassen sich überführen.');
+      return;
+    }
+
     /* Kontext sichern */
     var _blob = (typeof collectData === 'function') ? collectData() : {};
     _ctx = {
@@ -138,6 +168,29 @@
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:13px">' +
           '<div><label style="' + lab + '">&Uuml;bernommene Restschuld</label><input id="dpuew-rs" value="' + esc(_de(defRs)) + '" style="' + inp + '"></div>' +
           '<div><label style="' + lab + '">Zins &uuml;bernommen % p.a.</label><input id="dpuew-zins" value="" style="' + inp + '"></div>' +
+        '</div>' +
+        /* ── v1234 · Die Regeln, die an dieser Stelle gelten ────────────────
+           Der Assistent sammelte Verkehrswert und Ueberfuehrungspreis, sagte
+           aber mit keinem Wort, WOZU die beiden Zahlen dienen und was der
+           Vorgang steuerlich ausloest. Nachgetragen, jeweils mit Paragraph:
+
+           § 8 Abs. 1 GrEStG — Bemessungsgrundlage ist die GEGENLEISTUNG, also
+             der Ueberfuehrungspreis, nicht der Verkehrswert. Der BFH hat 2023
+             bestaetigt, dass ein Preis unter Verkehrswert als Gegenleistung
+             anzuerkennen ist.
+           Verdeckte Einlage — die Differenz Verkehrswert minus
+             Ueberfuehrungspreis. Sie erhoeht den Buchwert in der Gesellschaft
+             und damit die AfA-Bemessungsgrundlage. Genau deshalb stehen hier
+             ZWEI Felder und nicht eins.
+           § 42 AO — ein sehr niedriger Preis ist zulaessig, aber angreifbar.
+           § 23 EStG — die Zehnjahresfrist. Sie wird GERECHNET, nicht nur
+             erwaehnt: die App kennt Kaufdatum und Stichtag. Siehe _spekPruefen(). */
+        '<div id="dpuew-regeln" style="margin-top:14px;padding:11px 13px;border-left:3px solid var(--wl-c9a84c,#C9A84C);background:#fbf8f0;border-radius:0 9px 9px 0;font-size:12px;line-height:1.55;color:#5f594f">' +
+          '<div style="font:700 10px/1 \'JetBrains Mono\',monospace;letter-spacing:1px;text-transform:uppercase;color:#8a8378;margin-bottom:6px">Was die beiden Zahlen ausl&ouml;sen</div>' +
+          '<div style="margin-bottom:5px"><b>Grunderwerbsteuer</b> f&auml;llt auf den <b>&Uuml;berf&uuml;hrungspreis</b> an, nicht auf den Verkehrswert (&sect; 8 Abs. 1 GrEStG). Der Satz liegt je nach Bundesland bei 3,5 bis 6,5 %.</div>' +
+          '<div style="margin-bottom:5px"><b>Verdeckte Einlage</b> ist die Differenz: <span id="dpuew-ve">&mdash;</span>. Sie erh&ouml;ht die AfA-Bemessungsgrundlage der Gesellschaft auf den Verkehrswert.</div>' +
+          '<div id="dpuew-spek" style="margin-bottom:5px">&mdash;</div>' +
+          '<div style="color:#8a8378">Ein Preis deutlich unter Verkehrswert ist zul&auml;ssig (BFH 2023), kann aber vom Finanzamt angegriffen werden (&sect; 42 AO). <b>Verbindliche Auskunft vorher</b> ist der sichere Weg. DealPilot rechnet, es ber&auml;t nicht.</div>' +
         '</div>';
     }
     /* Schritt 3 */
@@ -160,6 +213,56 @@
       '</div>';
   }
 
+  /* ── v1234 · Die Zehnjahresfrist wird gerechnet, nicht erwaehnt ───────────
+     § 23 Abs. 1 Nr. 1 EStG: liegen zwischen Anschaffung und Veraeusserung
+     nicht mehr als zehn Jahre, ist der Gewinn ein privates
+     Veraeusserungsgeschaeft und einkommensteuerpflichtig. Eine Ueberfuehrung
+     an die eigene Gesellschaft IST eine Veraeusserung — die Gesellschaft ist
+     ein eigener Rechtstraeger.
+
+     Die App kennt beide Daten: `kaufdat` des Privatobjekts und den Stichtag.
+     Also wird gerechnet und beim Namen genannt, statt den Nutzer raten zu
+     lassen. Fehlt das Kaufdatum, wird NICHTS behauptet — dann steht da, dass
+     es fehlt. Das ist die Hausregel: wo die Quelle endet, endet die Rechnung. */
+  function _spekPruefen(stichtag) {
+    var kd = '';
+    try { kd = (_ctx && _ctx.privatBlob && _ctx.privatBlob.kaufdat) || ''; } catch (e) {}
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(kd))) {
+      return { art: 'unbekannt', text: '<b>Zehnjahresfrist (§ 23 EStG):</b> nicht prüfbar — im Privat-Objekt fehlt das Kaufdatum.' };
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(stichtag || ''))) {
+      return { art: 'unbekannt', text: '<b>Zehnjahresfrist (§ 23 EStG):</b> wird geprüft, sobald der Stichtag steht.' };
+    }
+    var a = new Date(kd + 'T00:00:00'), b = new Date(stichtag + 'T00:00:00');
+    var frist = new Date(a.getFullYear() + 10, a.getMonth(), a.getDate());
+    var de = function (d) { return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear(); };
+    if (b > frist) {
+      return { art: 'frei', text: '<b>Zehnjahresfrist (§ 23 EStG): abgelaufen.</b> Angeschafft am ' + de(a) + ', Frist endete am ' + de(frist) + '. Ein Gewinn aus der Überführung ist einkommensteuerfrei.' };
+    }
+    var tage = Math.ceil((frist - b) / 86400000);
+    return { art: 'steuerpflichtig', text: '<b>Achtung, Zehnjahresfrist (§ 23 EStG) läuft noch.</b> Angeschafft am ' + de(a) + ', Frist endet am ' + de(frist) + ' — das sind noch <b>' + tage + ' Tage</b>. Die Überführung ist dann ein <b>privates Veräußerungsgeschäft</b>: der Gewinn (Überführungspreis minus fortgeführte Anschaffungskosten) ist einkommensteuerpflichtig.' };
+  }
+
+  function _regelnAktualisieren() {
+    var vwEl = document.getElementById('dpuew-vw'), upEl = document.getElementById('dpuew-up');
+    var veEl = document.getElementById('dpuew-ve'), spEl = document.getElementById('dpuew-spek');
+    if (!veEl || !spEl) return;
+    var num = function (el) { if (!el) return 0; var n = parseFloat(String(el.value || '').replace(/[^0-9.,-]/g, '').replace(/\./g, '').replace(',', '.')); return isFinite(n) ? n : 0; };
+    var upd = function () {
+      var vw = num(vwEl), up = num(upEl), ve = vw - up;
+      if (!vw && !up) { veEl.innerHTML = '&mdash;'; }
+      else if (ve > 0) { veEl.innerHTML = '<b>' + _de(ve) + ' €</b>'; }
+      else if (ve === 0) { veEl.innerHTML = '<b>0 €</b> — zum Verkehrswert überführt, keine verdeckte Einlage.'; }
+      else { veEl.innerHTML = '<b style="color:#B8625C">keine</b> — der Überführungspreis liegt über dem Verkehrswert. Das wäre eine verdeckte Gewinnausschüttung, kein Einlagevorgang.'; }
+      var s = _spekPruefen(_ctx && _ctx._stichtag);
+      spEl.innerHTML = s.text;
+      spEl.style.color = (s.art === 'steuerpflichtig') ? '#B8625C' : (s.art === 'frei' ? '#3FA56C' : '#8a8378');
+    };
+    if (vwEl && !vwEl._dpuewWired) { vwEl.addEventListener('input', upd); vwEl._dpuewWired = 1; }
+    if (upEl && !upEl._dpuewWired) { upEl.addEventListener('input', upd); upEl._dpuewWired = 1; }
+    upd();
+  }
+
   function _bindStichtag() {
     if (_cur === 1) {
       var d = document.getElementById('dpuew-stichtag');
@@ -169,6 +272,7 @@
         d.addEventListener('change', upd); upd();
       }
     }
+    if (_cur === 2) { _regelnAktualisieren(); }
     if (_cur === 3) {
       var halterSel = _ctx._halterName || '';
       var sh = document.getElementById('dpuew-sum-halter'); if (sh) sh.textContent = 'Halter: ' + halterSel;

@@ -327,6 +327,27 @@
         _hsel.disabled = _frozen;
         _hsel.style.opacity = _frozen ? '0.72' : '';
         _hsel.style.cursor = _frozen ? 'not-allowed' : '';
+        /* v1234 · Ein totes Feld ohne Begruendung liest sich wie ein Fehler.
+           Marcels Befund: „man kann es auch nicht auswaehlen." Die Sperre ist
+           richtig — der Halter ist Teil eines abgeschlossenen Vorgangs und
+           nicht mehr frei waehlbar —, aber sie stand ohne ein Wort da.
+           Der Hinweis sagt jetzt, WARUM, und nennt den Weg zurueck. */
+        var _hHost = _hsel.parentElement;
+        var _hHint = document.getElementById('mand-halter-lock-hint');
+        if (_frozen) {
+          if (!_hHint && _hHost) {
+            _hHint = document.createElement('span');
+            _hHint.id = 'mand-halter-lock-hint';
+            _hHint.className = 'hint';
+            _hHint.style.cssText = 'display:block;margin-top:4px;font-size:11.5px;color:#7A7370;line-height:1.45';
+            _hHost.appendChild(_hHint);
+          }
+          if (_hHint) {
+            _hHint.innerHTML = show
+              ? 'Fest, weil dieses Objekt durch eine <b>&Uuml;berf&uuml;hrung</b> entstanden ist. R&uuml;ckg&auml;ngig geht &uuml;ber die Kennung unten.'
+              : 'Fest, weil dieses Objekt zum <b>' + esc(_fmtDe((_endeEl2 && _endeEl2.value) || '')) + '</b> &uuml;berf&uuml;hrt und eingefroren wurde.';
+          }
+        } else if (_hHint) { _hHint.remove(); }
       }
     } catch (_he) {}
     try { _renderUeberfBadge(); } catch (_e) {}
@@ -444,6 +465,13 @@
     } catch (e) { console.warn('[v841b-rerender-hook] renderInline:', e.message); }
   }
   function renderSettingsTab() {
+    /* v1234 · Die Objektlisten je Mandant werden NACH dem Einfuegen gefuellt.
+       renderSettingsTab() liefert nur HTML zurueck — wer es einbaut, ist der
+       Aufrufer (settings.js beim ersten Oeffnen, _rerender() danach). Der
+       Nachtrag haengt deshalb hier an einem Timeout und nicht an einer der
+       beiden Aufrufstellen: sonst haette die eine ihn und die andere nicht,
+       und genau so entstehen zwei Wahrheiten. */
+    try { setTimeout(function () { try { _objekteJeMandant(); } catch (e) {} }, 0); } catch (e) {}
     if (!_isPro()) {
       /* v865-privat-frei: Der PRIVATE Halter (inkl. Steuerzeitraeume) bleibt fuer
          ALLE Plaene bearbeitbar — nur Gesellschaften (GmbH/UG) sind Pro. */
@@ -476,6 +504,55 @@
       + 'padding:3px 8px;border-radius:999px;border:1px solid ' + col + ';color:' + col + '">' + esc(rf) + '</span>';
   }
 
+  /* ── v1234 · Die Objekte je Mandant nachtragen ────────────────────────────
+     Laeuft NACH _renderList(), weil die Objekte ueber die API kommen. Eine
+     Abfrage fuer alle Karten, nicht eine je Karte.
+
+     Gezaehlt wird nach `halter`; ein Objekt ohne Halter gehoert zu `privat`
+     (so steht es seit jeher im Kopf dieser Datei). Ein ueberfuehrtes
+     Privat-Objekt (ueberf_ende gesetzt) wird als solches gekennzeichnet —
+     es zaehlt sonst doppelt: einmal privat, einmal in der Gesellschaft, und
+     genau dieses Doppelbild hat Marcel irritiert. */
+  function _objekteJeMandant() {
+    var hosts = document.querySelectorAll('.mand-objliste');
+    if (!hosts.length) return;
+    if (!window.Auth || typeof window.Auth.apiCall !== 'function') {
+      hosts.forEach(function (h) { h.textContent = ''; });
+      return;
+    }
+    window.Auth.apiCall('/objects', { method: 'GET' }).then(function (r) {
+      var items = (r && (r.items || r.objects)) || [];
+      hosts.forEach(function (host) {
+        var mid = host.getAttribute('data-mand-obj');
+        var mine = items.filter(function (o) {
+          var d = o.data || o;
+          var h = (d.halter || o.halter || '').toString().trim() || 'privat';
+          return h === mid;
+        });
+        if (!mine.length) {
+          host.innerHTML = '<span style="color:#8a8378">Noch kein Objekt zugeordnet.</span>';
+          return;
+        }
+        var zeilen = mine.map(function (o) {
+          var d = o.data || o;
+          var eingefroren = !!((d.ueberf_ende || '').toString().trim());
+          var name = [d.str, d.hnr].filter(Boolean).join(' ') || o.name || o.seq_no || 'Objekt';
+          var kpN = parseFloat(String(d.kp || '').replace(/[^0-9.,-]/g, '').replace(/./g, '').replace(',', '.'));
+          var kp = isFinite(kpN) && kpN ? (' · ' + Math.round(kpN).toLocaleString('de-DE') + ' €') : '';
+          return '<div style="padding:2px 0">'
+            + '<span style="font-family:\'JetBrains Mono\',monospace;font-size:10.5px;color:#8a8378">' + esc(o.seq_no || '') + '</span> '
+            + esc(name) + '<span style="color:#8a8378">' + esc(kp) + '</span>'
+            + (eingefroren ? ' <span style="font-size:10.5px;color:#B86250">· eingefroren zum ' + esc(_fmtDe(d.ueberf_ende)) + '</span>' : '')
+            + '</div>';
+        }).join('');
+        host.innerHTML = '<div style="font:700 10px/1 \'JetBrains Mono\',monospace;letter-spacing:1px;text-transform:uppercase;color:#8a8378;margin:8px 0 4px">'
+          + mine.length + ' Objekt' + (mine.length > 1 ? 'e' : '') + '</div>' + zeilen;
+      });
+    }).catch(function () {
+      hosts.forEach(function (h) { h.innerHTML = '<span style="color:#B86250">Objekte konnten nicht geladen werden.</span>'; });
+    });
+  }
+
   function _renderList() {
     var cards = _state.list.map(function (m) {
       var canDel = m.id !== 'privat';
@@ -489,6 +566,14 @@
         + '<div style="flex:1;min-width:0">'
         + '<div style="display:flex;align-items:center;gap:9px;margin-bottom:3px"><strong style="font:600 15px/1.2 \'Space Grotesk\',sans-serif">' + esc(m.name) + '</strong>' + _badge(m.rechtsform) + '</div>'
         + '<div style="font-size:12px;color:#7A7370">' + sub + '</div>'
+        /* v1234 · Welche Objekte gehoeren diesem Mandanten?
+           Marcels Befund: „waere gut wenn man unter Einstellungen dann
+           Mandanten das ganze sieht welche Objekte in der Gesellschaft sind."
+           Die Liste stand nirgends — man konnte einen Halter setzen und
+           danach nicht nachsehen, was daran haengt. Gefuellt wird sie
+           asynchron von _objekteJeMandant(), weil die Objekte ueber die API
+           kommen; bis dahin steht ein ehrliches „lade". */
+        + '<div class="mand-objliste" data-mand-obj="' + esc(m.id) + '" style="font-size:12px;color:#5f594f;margin-top:6px">lädt …</div>'
         + '</div>'
         + '<button type="button" class="btn btn-outline btn-sm" onclick="DealPilotMandanten.uiEdit(\'' + m.id + '\')">Bearbeiten</button>'
         + (canDel ? '<button type="button" class="btn btn-outline btn-sm" style="color:#B86250;border-color:#e6cbc5" onclick="DealPilotMandanten.uiDelete(\'' + m.id + '\')">L\u00f6schen</button>' : '')
