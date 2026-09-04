@@ -6,6 +6,17 @@
 
 function setDefaults() {
   sv('notar_p', 2.20);
+  /* v1238 · Testbericht Block D: „Grundbuchamt mit 0,5 % vorbelegen — der
+     Anwender kennt den Wert nicht."
+     Gemessen am 04.09.2026: `gba_p` stand in dieser Liste als EINZIGE der
+     fuenf Erwerbsnebenkosten NICHT drin. Das Feld trug nur einen
+     Platzhalter „0,5" — der sieht aus wie ein Wert und zaehlt als nichts.
+     Von 13 Objekten auf Staging hatten 8 gar keinen Wert, rechneten also
+     mit 0 EUR Grundbuchamt.
+     setDefaults() laeuft in newObj(), also gilt die Vorbelegung nur fuer
+     NEUE Objekte. Bestehende behalten ihren gespeicherten Wert — ihre
+     Zahlen verschieben sich nicht rueckwirkend. */
+  sv('gba_p',   0.50);
   sv('gest_p',  6.50);
   sv('ji_p',    1.50);
   sv('d1z',     3.50);

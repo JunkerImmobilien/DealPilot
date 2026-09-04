@@ -1397,11 +1397,11 @@ label.dp-required.qc-required::after {
           <div class="f"><label>Makler (€)</label><div class="iw"><span class="pfx">€</span><input id="makler_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('makler')"></div></div>
           <div class="f"><label>Notar (%) <button type="button" class="dp-tip" data-tip-id="tab2.notar" tabindex="-1" aria-label="Hilfe zu Notarkosten"></button></label><div class="iw"><input id="notar_p" type="text" inputmode="decimal" value="2.20" step="0.01" class="tr" oninput="syncCostPct('notar')"><span class="sfx">%</span></div></div>
           <div class="f"><label>Notar (€)</label><div class="iw"><span class="pfx">€</span><input id="notar_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('notar')"></div></div>
-          <div class="f"><label>Grundbuchamt (%) <button type="button" class="dp-tip" data-tip-id="tab2.grundbuchamt" tabindex="-1" aria-label="Hilfe zu Grundbuchamt"></button></label><div class="iw"><input id="gba_p" type="text" inputmode="decimal" placeholder="0,5" step="0.01" class="tr" oninput="syncCostPct('gba')"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Grundbuchamt (%) <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· Vorbelegung 0,5 %</span> <button type="button" class="dp-tip" data-tip-id="tab2.grundbuchamt" tabindex="-1" aria-label="Hilfe zu Grundbuchamt"></button></label><div class="iw"><input id="gba_p" type="text" inputmode="decimal" placeholder="0,5" step="0.01" class="tr" oninput="syncCostPct('gba')"><span class="sfx">%</span></div></div>
           <div class="f"><label>Grundbuchamt (€)</label><div class="iw"><span class="pfx">€</span><input id="gba_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('gba')"></div></div>
           <div class="f"><label>Grunderwerbsteuer (%) <button type="button" class="dp-tip" data-tip-id="tab2.grunderwerbsteuer" tabindex="-1" aria-label="Hilfe zu Grunderwerbsteuer"></button></label><div class="iw"><input id="gest_p" type="text" inputmode="decimal" value="6.50" step="0.01" class="tr" oninput="syncCostPct('gest')"><span class="sfx">%</span></div></div>
           <div class="f"><label>Grunderwerbsteuer (€)</label><div class="iw"><span class="pfx">€</span><input id="gest_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('gest')"></div></div>
-          <div class="f"><label>Sonstige (%) <button type="button" class="dp-tip" data-tip-id="tab2.sonstige" tabindex="-1" aria-label="Hilfe zu Sonstige Kaufnebenkosten"></button></label><div class="iw"><input id="ji_p" title="Bausachverständiger, Anfahrt, Gutachten, Behördengebühren" type="text" inputmode="decimal" value="0" step="0.01" class="tr" oninput="syncCostPct('ji')"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Sonstige (%) <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· Bausachverständiger, Anfahrt, Gutachten</span> <button type="button" class="dp-tip" data-tip-id="tab2.sonstige" tabindex="-1" aria-label="Hilfe zu Sonstige Kaufnebenkosten"></button></label><div class="iw"><input id="ji_p" title="Bausachverständiger, Anfahrt, Gutachten, Behördengebühren" type="text" inputmode="decimal" value="0" step="0.01" class="tr" oninput="syncCostPct('ji')"><span class="sfx">%</span></div></div>
           <div class="f"><label>Sonstige (€)</label><div class="iw"><span class="pfx">€</span><input id="ji_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('ji')"></div></div>
         </div>
         <hr class="dvd">
@@ -3248,7 +3248,7 @@ label.dp-required.qc-required::after {
 <script src="js/investment-profile.js?v=717"></script>
 <script src="js/dashboard.js?v=v1227"></script>
 <script src="js/score-fx.js?v=464"></script>
-<script src="js/main.js?v=951"></script>
+<script src="js/main.js?v=v1238"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
   <script src="js/object-actions.js?v=v1231"></script>
