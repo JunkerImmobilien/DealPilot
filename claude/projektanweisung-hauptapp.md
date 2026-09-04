@@ -7474,6 +7474,89 @@ Geschäftsjahr.** Die Kostenjahre des Mandanten zählen jetzt mit.
 Gegenprobe: −1.750 − 15.877 + 17.029 = **−598 €** — exakt der ausgewiesene
 Wert. **Die Bilanz geht in jedem der vier Jahre auf.**
 
+### `v1236` / `v1237` (04.09.2026, `920a872` · `87ad14a`) — zwei Fehler, die erst das Aufräumen zeigte
+
+Nach Marcels „so habe das jetzt gemacht" nachgesehen — und der Bestand war
+schlechter als erwartet. **Alle drei Gesellschafts-Objekte waren weg**, und
+zwei Privat-Objekte blieben in einem kaputten Zustand zurück. Die Datenbank
+hat es selbst benannt:
+
+```
+2026-1002   link -> ZIEL GELOESCHT
+2026-1004   link -> ZEIGT AUF SICH SELBST
+```
+
+Beide zusätzlich noch **eingefroren**, rechneten also nicht mehr.
+
+#### `v1236` — der Selbstbezug war ein Löschknopf
+
+`undoUeberfuehrungFromPrivat()` schickt `DELETE` auf den Link. Bei
+`2026-1004` zeigte der Link auf das Objekt selbst — **ein Klick auf
+„Überführung aufheben" hätte das Privat-Objekt gelöscht.** Kein
+Schönheitsfehler, sondern Datenverlust.
+
+Die Ursache liegt in `_execute()`: der Rück-Link wird aus `_currentObjKey`
+gebildet, und ist der nach dem Speichern des neuen Objekts noch nicht
+umgesprungen, steht dort der Privat-Schlüssel.
+
+**An beiden Enden behoben.** `_execute()` schreibt den Rück-Link nur, wenn er
+**nicht** dem Privat-Objekt entspricht — *lieber kein Link als ein falscher*:
+ohne Link taut das Objekt sauber auf, mit falschem zerstört es sich. Und
+`undoUeberfuehrungFromPrivat()` erkennt Selbstbezug und leeren Link, löscht
+dann nichts und taut nur auf; die Sicherheitsabfrage sagt jeweils genau das,
+was passieren wird.
+
+#### `v1237` — dieselbe Falle zum dritten Mal
+
+Beim Durchlauf danach verweigerte der Assistent die Überführung von
+`2026-1004`: *„bereits überführt und zum 01.01.2026 eingefroren."* **Die
+Datenbank war sauber** — im Formular stand trotzdem `ueberf_ende`, der Wert
+des zuvor geladenen Objekts.
+
+`loadData()` leert eine feste Liste, damit Felder nicht vom Vorgänger
+hängenbleiben. **`V63.33` hat das für die Aufaddier-Felder gemacht,
+`v1136-WMTAB-1` für die Wertermittlung — für die Überführung hat es niemand
+gemacht.** Neun Felder ergänzt.
+
+> **Und es war schon in die Datenbank durchgeschlagen:** `2026-1004` trug um
+> 19:20:53 die Werte von `2026-1002`, geschrieben vom Auto-Save. Der
+> Formularwert war also nicht nur Anzeige, er wurde gespeichert.
+>
+> **Aufgefallen ist es nur, weil die Vorprüfung aus `v1234` im Weg stand.**
+> Ohne sie wäre der falsche Stichtag stillschweigend mitgewandert — ein
+> Objekt, das sich für eingefroren hält, ohne es zu sein. **Eine Sperre, die
+> einen Fehler sichtbar macht, ist mehr wert als eine, die ihn verhindert.**
+
+#### Der saubere Durchlauf danach
+
+Zwei Objekte überführt, beide Paare gegengelesen:
+
+| Objekt | Halter | eingefroren | Link zeigt auf |
+|---|---|---|---|
+| `2026-1002` | privat | 01.01.2026 | **2026-1007** |
+| `2026-1007` | Test UG | 01.01.2026 | **2026-1002** |
+| `2026-1004` | privat | 01.01.2026 | **2026-1008** |
+| `2026-1008` | Test UG | 01.01.2026 | **2026-1004** |
+
+**Kein Selbstbezug, kein toter Link, jedes Paar gegenseitig.** Die fünf
+übrigen Privat-Objekte unberührt.
+
+Dabei beide § 23-Zweige an echten Daten gesehen: bei `2026-1002`
+*„Achtung, Zehnjahresfrist läuft noch. Angeschafft am 07.07.2024"*, bei
+`2026-1004` *„nicht prüfbar — im Privat-Objekt fehlt das Kaufdatum."*
+
+#### Die Bilanz, drei Jahre nacheinander
+
+| Jahr | Objekte | Umsatz | Ergebnis | Vortrag | Bilanzsumme |
+|---|---|---|---|---|---|
+| 2026 | 2 | 20.400,00 | −17.136,19 | −1.750,00 | **553.048,89** |
+| 2027 | 2 | 20.925,60 | +12.275,36 | −18.886,19 | **564.297,78** |
+| 2028 | 2 | 21.466,25 | +12.699,84 | −6.610,83 | **573.619,42** |
+
+**Aktiva = Passiva in jedem Jahr**, und die Vortragskette geht auf:
+−1.750 − 17.136,19 = **−18.886,19** · −18.886,19 + 12.275,36 = **−6.610,83**.
+Jedes Objekt erscheint **einmal**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

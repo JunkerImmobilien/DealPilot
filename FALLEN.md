@@ -734,3 +734,34 @@ Jahresbilanz kann diesen Fehler nicht zeigen.
 > Fortschreibung darf nicht nur aus den **Objekt**-Steuersätzen kommen. Ein
 > Jahr, in dem die Gesellschaft nur Kosten hatte, ist ebenso ein
 > Geschäftsjahr — sonst verschwindet sein Verlust lautlos.
+
+## Ein Rück-Link auf sich selbst ist ein Löschknopf
+
+`undoUeberfuehrungFromPrivat()` schickt `DELETE` auf den verknüpften
+Schlüssel. Gemessen am 04.09.2026: ein Privat-Objekt trug in
+`_ueberf_link` seine **eigene** Id — ein Klick auf „Überführung aufheben"
+hätte es selbst gelöscht.
+
+Entstanden ist der Selbstbezug beim Anlegen: der Rück-Link wird aus
+`_currentObjKey` gebildet, und wenn der nach dem Speichern des neuen Objekts
+noch nicht umgesprungen ist, steht dort der alte Schlüssel.
+
+**Wer eine Id in ein anderes Objekt schreibt, prüft vorher, dass sie nicht
+die eigene ist.** Und wer auf einer Id löscht, prüft es noch einmal —
+**lieber kein Link als ein falscher**: ohne Link lässt sich der Zustand
+sauber auflösen, mit falschem zerstört er sich.
+
+## Eine Sperre, die einen Fehler sichtbar macht, ist mehr wert als eine, die ihn verhindert
+
+Die Vorprüfung aus `v1234` verweigerte eine Überführung mit „bereits
+überführt und zum 01.01.2026 eingefroren" — obwohl die Datenbank sauber war.
+Der Wert stand nur im **Formular**, übernommen vom zuvor geladenen Objekt,
+weil `loadData()` diese Felder nicht zurücksetzt.
+
+**Ohne die Sperre wäre der falsche Stichtag stillschweigend mitgespeichert
+worden** — und war es an anderer Stelle bereits: der Auto-Save hatte die
+Werte des Vorgängers in ein fremdes Objekt geschrieben.
+
+**Wenn eine neue Prüfung etwas ablehnt, das richtig aussieht, ist das ein
+Befund und keine Fehlfunktion.** Erst messen, was die Prüfung sieht — und
+woher der Wert kommt, den sie sieht.
