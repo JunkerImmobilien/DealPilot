@@ -38,10 +38,11 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 04.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging = **Produktion** auf `0d3041f`.
-**Alles ist live** — drei Prod-Rollouts am 04.09.: `v1215`–`v1228`,
+**Stand:** lokal = GitHub = Staging auf `fa5f91f`, **Produktion auf `c497e31`**.
+**`v1215`–`v1230` sind live** — drei Prod-Rollouts am 04.09.: `v1215`–`v1228`,
 `v1229`–`v1229c` (beide reines Frontend) und `v1230` (Backend, mit Neubau).
-Nachweise im Rollout-Journal der Projektanweisung.
+**`v1231` liegt auf Staging und ist noch nicht draußen.** Nachweise im
+Rollout-Journal der Projektanweisung.
 
 **Und auf Prod liegen jetzt Marcels Daten.** Der Staging-Nutzer
 `info@junker-immobilien.io` ist auf Prod ins Konto gleicher Mailadresse
@@ -66,28 +67,27 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 
 > ### Der erste Griff jetzt
 >
-> **Nichts wartet auf einen Rollout.** Alles ist live, `v1230` inklusive.
+> **`v1231` liegt auf Staging und ist noch nicht auf Prod** — reines
+> Frontend, `git pull` genügt. Der Sanierungsbedarf ist damit diktierbar.
 >
-> **Drei Fragen liegen bei Marcel:**
+> **Der Abnahmepunkt dazu:** ein echter Sprechlauf am Gerät. „Das Dach muss
+> neu, fünfzehntausend, Heizung auch" — kommt es in den Kacheln an, geht der
+> Block auf, stehen 27.000 € in den Sanierungskosten? Alles, woran das hängt,
+> ist geprüft; der Auslöser selbst braucht ein Mikrofon. **Gehört zum selben
+> Stapel wie `v1168`/`v1169`/`v1170`.**
 >
-> 1. **Soll der Sanierungsbedarf diktierbar werden?** Die Zählung zu Punkt 3
->    ist da: von 235 Formularfeldern kennt die Auswertung 203, und die
->    **33 echten Datenfelder, die fehlen, sind zu über der Hälfte ein
->    einziger Block** — `fesh_*`, Sanierungsbedarf je Gewerk mit Kosten
->    (17 Felder). „Dach neu, dreißigtausend" ist genau das, was man vor Ort
->    sagt, und es trifft heute kein Feld.
-> 2. **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, vor und nach
->    `v1229` gleich, während `CLAUDE.md` „RC=0 ist sauber" als Rollout-Tor
->    führt. Schließen oder Regel umschreiben?
-> 3. **Die Objektart kennt kein Zweifamilienhaus.** `Zweifamilienhaus` fällt
->    auf `EFH`, das Testobjekt Löhner Str. 278 ist eines. **Bewertungsfrage.**
+> **Zwei Entscheidungen liegen bei Marcel:**
+> - **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, vor und nach
+>   `v1229` gleich, während `CLAUDE.md` „RC=0 ist sauber" als Rollout-Tor
+>   führt. Schließen oder Regel umschreiben?
+> - **Die Objektart kennt kein Zweifamilienhaus.** `Zweifamilienhaus` fällt
+>   auf `EFH`, das Testobjekt Löhner Str. 278 ist eines. **Bewertungsfrage.**
 >
 > **Zwei Aufräumarbeiten warten auf ein Ja:**
 > - `business` und `enterprise` liegen noch in der Prod-Datenbank (B11).
 >   Betroffen ist nur ein deaktiviertes Demokonto.
-> - **§ 7b-Spalte in `tax_records`** — Datenbankeingriff. Hängt mit der
->   Zählung zusammen: die fünf `afa_sonder7b_*`-Felder sind auch für die
->   Spracheingabe unerreichbar.
+> - **§ 7b-Spalte in `tax_records`** — Datenbankeingriff. Die fünf
+>   `afa_sonder7b_*`-Felder sind auch für die Spracheingabe unerreichbar.
 >
 > **Zwei kleine Befunde ohne Entscheidung** (B13/B14): der
 > `config.js`-Rückfall ist tot, weil `hasCachedFeature` nie `null` liefert.
@@ -2315,10 +2315,49 @@ entfällt — nicht raten.
    nie in `FIELDS` gelandet sind**, und davon sind **17 ein einziger Block**:
    der Sanierungsbedarf.
 
-   **→ Nächster Schritt:** Marcel fragen, ob der Sanierungsbedarf diktierbar
-   werden soll (17 Felder, ein Block, klarer Nutzen vor Ort). Die Schalter
-   dahinter sind der zweite Schritt — ein Betrag ohne geöffneten Block ist
-   für den Nutzer unsichtbar.
+   ### GEBAUT — `v1231` (04.09.2026, `fa5f91f`): der Sanierungsbedarf ist diktierbar
+
+   Marcels Freigabe: „ja bau das."
+
+   > **Vorher gemessen, und es hat den Entwurf umgeworfen — mein Vorschlag
+   > war falsch.** Ich hatte geschrieben: „die 17 Feldnamen in `FIELDS`
+   > aufnehmen". Gemessen: **die Kachelwerte werden gar nicht gespeichert.**
+   > Im Datensatz steht nur `san`, die Summe — und `'san'` steht längst in
+   > `FIELDS`, ist also **schon heute diktierbar**. Die Beträge im Formular
+   > (Fenster 8.000, Dach 15.000 …) sind `value="…"` im HTML, also
+   > **Richtwerte, keine Objektdaten**.
+   >
+   > Der Block ist ein **Rechner**: anhaken, Betrag anpassen, „In
+   > Sanierungskosten übernehmen" drücken. Hätte ich die 17 Felder in
+   > `FIELDS` aufgenommen, wäre ein zweiter Speicherweg für Werte entstanden,
+   > die keiner sein sollen — genau die Falle, vor der `WM_FIELDS` warnt.
+
+   **Gebaut wurde deshalb:**
+
+   1. `sanKatalog()` gibt die 17 Einträge **nur an den Auswertungs-Katalog**,
+      nicht an die Speicherliste. Häkchen als `bool`, Kosten als `num`, je
+      mit eigener Beschriftung und Hinweis. Nur was im DOM steht.
+   2. `_sanNachziehen()` nach `applyMerged()`: Schalter auf, `updateFESH()`
+      rechnen lassen, Summe nach `san` — **aber nur, wenn `san` leer ist.**
+      Steht dort etwas von Hand, bleibt es stehen und der Nutzer liest es im
+      Toast. Der Übernahme-Knopf ist im Haus ausdrücklich; ihn still zu
+      drücken darf keine Eingabe überschreiben.
+   3. Die Summe wird **nicht nachgerechnet** (`v1227b`-Lehre) — gelesen wird
+      hinterher das Feld.
+
+   **Auf Staging belegt:** die Kette real durchgespielt — Dach 15.000 +
+   Heizung 12.000 → Anzeige „27.000 €" → `san` = 27000. Objekt danach
+   zurückgestellt, in der Datenbank gegengelesen.
+
+   > **Abnahmepunkt, ehrlich benannt:** der Auslöser — ein echter Sprechlauf,
+   > bei dem das Modell „Dach neu, fünfzehntausend" zuordnet — **ist nicht
+   > geprüft.** `buildFullCatalog()` und `_sanNachziehen()` sind modul-intern
+   > und von außen nicht aufrufbar. Geprüft ist alles, woran sie hängen.
+   > Gehört zum selben Stapel wie `v1168`/`v1169`/`v1170`.
+
+   **→ Danach offen:** die restlichen 16 Datenfelder aus der Zählung — fünf
+   § 7b, fünf Erwerbsnebenkosten in Euro (deren Prozentfelder aber gehen)
+   und die Schalter der zweiten Finanzierung.
 
 
 ---

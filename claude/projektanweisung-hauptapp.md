@@ -7150,6 +7150,75 @@ Testphase gibt, liest `getEffectivePlan()` dasselbe wie die Direktabfrage.
 für den war er nötig. Dass er heute niemandem etwas wegnimmt und niemandem
 etwas schenkt, ist die Absicherung, dass er nichts kaputtmacht.
 
+### `v1231` (04.09.2026, `fa5f91f`) — der Sanierungsbedarf ist diktierbar
+
+**Marcels Freigabe: „ja bau das."** Aus der Zählung zu Backlog-Punkt 3: von
+235 Formularfeldern kannte die Auswertung 203, und die größte Lücke war
+**ein** Block — die acht Gewerke im Reiter Investition, Karte „Sanierung".
+
+#### Das Messen vor dem Bauen hat den Entwurf umgeworfen
+
+Mein eigener Vorschlag lautete: *„die 17 Feldnamen in `window.FIELDS`
+aufnehmen."* **Das war falsch, und ich nehme es ausdrücklich zurück.**
+
+Gemessen, bevor eine Zeile entstand:
+
+| Befund | Folge |
+|---|---|
+| Im gespeicherten Datensatz von `2026-001` steht **kein einziger `fesh_`-Schlüssel** — nur `san`, `san_tax_active`, `san_tax_years` | Die Kachelwerte werden **gar nicht gespeichert** |
+| Die Beträge im Formular (Fenster 8.000, Dach 15.000 …) stehen als `value="…"` **im HTML** | Es sind **Richtwerte**, keine Objektdaten |
+| `'san'` steht in `FIELDS` (`storage.js:60`) | **Die Sanierungskosten sind längst diktierbar** |
+
+**Der Block ist ein Rechner, kein Datenspeicher:** anhaken, Betrag anpassen,
+„In Sanierungskosten übernehmen" drücken — und `applyFESHToSanierung()`
+schreibt die Summe der **angehakten** Gewerke nach `san`.
+
+**Hätte ich die 17 Felder in `FIELDS` aufgenommen**, wäre ein zweiter
+Speicherweg für Werte entstanden, die keiner sein sollen — genau die Falle,
+vor der `WM_FIELDS` in `storage.js` seit `v1135` warnt („die 828 m² Hinterland
+von Objekt A würden beim Speichern an Objekt B kleben").
+
+#### Was stattdessen gebaut wurde
+
+**1 · `sanKatalog()` in `voice-import.js`** gibt die 17 Einträge **nur** an
+den Auswertungs-Katalog, nicht an die Speicherliste. Häkchen als `bool`,
+Kosten als `num`, jedes mit eigener Beschriftung („Sanierungskosten
+Dach/Fassade (€)") und einem Hinweis für das Modell. Gemeldet wird nur, was
+im DOM steht — sonst ordnete das Modell in Felder zu, die es auf dieser
+Seite nicht gibt.
+
+**2 · `_sanNachziehen()` nach `applyMerged()`** in `object-actions.js`, in
+dieser Reihenfolge: Schalter „Sanierungsbedarf einschätzen" auf →
+`updateFESH()` rechnen lassen → Summe nach `san`.
+
+> **Die eigentliche Entscheidung steckt im dritten Schritt.**
+> `applyFESHToSanierung()` ist im Haus ein **ausdrücklicher Knopf**. Ihn
+> still zu drücken darf keine Eingabe überschreiben. Deshalb: **nur wenn
+> `san` leer ist.** Steht dort etwas von Hand, bleibt es stehen, und der
+> Nutzer liest im Toast „Sanierungsbereiche erkannt — Sanierungskosten
+> blieben unverändert".
+
+**3 · Die Summe wird nicht nachgerechnet.** `applyFESHToSanierung()` bildet
+sie bereits; gelesen wird hinterher das Feld. Das ist die `v1227b`-Lehre —
+eine zweite Rechnung wäre eine zweite Wahrheit. Ohne gesetztes Häkchen wird
+der Knopf gar nicht gerufen, sonst tutet seine eigene Warnung.
+
+#### Nachweis auf Staging
+
+| Prüfung | Ergebnis |
+|---|---|
+| ausgelieferte Dateien | `sanKatalog` 3× in `voice-import.js?v=v1231`, `_sanNachziehen` 2× in `object-actions.js?v=v1231`, Aufruf in Z. 354 |
+| die drei Funktionen, an denen `_sanNachziehen` hängt | `updateFESH`, `applyFESHToSanierung`, `parseDe` — alle `function` |
+| **die Kette, real durchgespielt** | Dach 15.000 + Heizung 12.000 → Anzeige „27.000 €" → **`san` = 27000** |
+| Objekt danach zurückgestellt | Häkchen weg, `san` leer, Schalter aus — **in der Datenbank gegengelesen** |
+
+> **Ehrlich als Abnahmepunkt gekennzeichnet:** `buildFullCatalog()` und
+> `_sanNachziehen()` sind modul-intern und **nicht von außen aufrufbar**. Der
+> Auslöser — ein echter Sprechlauf, bei dem das Modell „Dach neu,
+> fünfzehntausend" den Feldern zuordnet — **ist nicht geprüft**. Geprüft ist
+> alles, woran er hängt. Der Punkt gehört zum selben Abnahmestapel wie
+> `v1168`/`v1169`/`v1170`, die ebenfalls auf einen Sprechlauf warten.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
