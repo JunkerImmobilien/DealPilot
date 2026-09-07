@@ -36,13 +36,31 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Stand 07.09.2026)
+## → HIER WEITERMACHEN (Stand 07.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging auf `63758ba`, **Produktion auf `4f9e38b`**.
-**`v1215`–`v1239` sind live.** Auf Staging warten `v1240` (Soll-Miete ergibt
-den Prozentsatz) und `v1241` (KI-Knopf nach oben).
+**Stand:** lokal = GitHub = Staging auf `3e5b758`, **Produktion auf
+`4ae353a`**. **`v1215`–`v1242e` sind live.** Nichts wartet auf einen
+Rollout.
 
-**Und auf Prod liegen jetzt Marcels Daten.** Der Staging-Nutzer
+**Zuletzt fertig: `v1242a–e` — die KI-Mietrecherche.** Sie nennt jetzt
+**alle** benutzten Quellen statt einer, prüft **zuerst**, ob es für den Ort
+einen **amtlichen** Mietspiegel gibt, und sagt ausdrücklich, wenn es keinen
+gibt. Eine Portal-Preisstatistik wird weder als amtlich ausgezeichnet noch
+„Mietspiegel" genannt — nach §§ 558c/558d BGB ist sie keiner. URLs werden
+vor der Anzeige angeklopft; was nicht antwortet, verliert den Link und
+behält sein Etikett. Nachweis und die fünf Zwischenschritte stehen im
+Journal der Projektanweisung, die vier neuen Fallen in `FALLEN.md`.
+
+> **Zurückgenommen:** „mehrere Quellen kosten Kerosin" war als Gegenargument
+> falsch. Kerosin ist seit `v1176`/`v1183` ausgebaut — wörtlich in
+> `backend/src/routes/ai.js`. Ich hatte die Abschaffung selbst dokumentiert
+> und danach dagegen argumentiert.
+
+**Marcels Entscheidung vom 07.09.:** das Free-Limit von einer KI-Analyse pro
+Monat (`Paywall.gate('ai_calls')` in `ki-miete.js:13`, `ki-lage.js:13`,
+`ui.js:673`) **bleibt**. Das ist kein Kerosin, sondern der Upgrade-Anreiz.
+
+**Und auf Prod liegen Marcels Daten.** Der Staging-Nutzer
 `info@junker-immobilien.io` ist auf Prod ins Konto gleicher Mailadresse
 gespiegelt: 7 Objekte, 95 Steuersätze, 6 Steuer-Momentaufnahmen, 3
 Steuerperioden, 5 Bewertungen — plus die Gesellschaft „Test UG (v1226)" aus
@@ -65,7 +83,8 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 
 > ### Der erste Griff jetzt — in dieser Reihenfolge
 >
-> **Nichts wartet auf einen Rollout.** `v1215`–`v1239` sind live.
+> **Nichts wartet auf einen Rollout.** `v1215`–`v1242e` sind live, Prod
+> steht auf `4ae353a`.
 >
 > **1 · Ein Sprechlauf am Gerät.** Den kann nur Marcel machen, und **ein
 > einziger Lauf nimmt vier Änderungen ab**: `v1168` (Häkchen
@@ -75,10 +94,11 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 > nur ob es schneller ist, sondern ob die Zahlen noch im richtigen Feld
 > landen.
 >
-> **2 · Weiter im Testbericht.** Als Nächstes **Block E** (Marktmiete zu
-> niedrig ohne KI · den KI-Knopf nach oben · die doppelt abgefragte
-> Mietsteigerung) und der Rest von **Block D** (Hinweis, was mit den Werten
-> passiert · die Haken, die stehen bevor der Bereich besucht wurde).
+> **2 · Weiter im Testbericht. Block E ist abgeschlossen** (`v1240`
+> Soll-Miete, `v1241` KI-Knopf, `v1242a–e` Quellen). Als Nächstes der **Rest
+> von Block D** (Hinweis, was mit den Werten passiert · die Haken, die
+> stehen bevor der Bereich besucht wurde), danach **Block F** (Reihenfolge
+> Kredit/Eigenkapital) und die Blöcke **B, C, G, H, J**.
 > **Das läuft ohne Rückfrage.**
 >
 > **Drei Entscheidungen liegen bei Marcel und blockieren nichts:**
@@ -90,6 +110,10 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 >   umschreiben?
 > - **Die Objektart kennt kein Zweifamilienhaus.** `Zweifamilienhaus` fällt
 >   auf `EFH`, das Testobjekt Löhner Str. 278 ist eines. **Bewertungsfrage.**
+>
+> **Eine fachliche Frage steht offen:** ob und wie der **Zustand** in die
+> KI-Marktmiete eingehen soll. Marcels Anmerkung war „für den Zustand zu
+> hoch". Das ist Bewertungsfachlichkeit — hier wird nicht geraten.
 >
 > **Zwei Aufräumarbeiten warten auf ein Ja:** `business`/`enterprise` in der
 > Prod-Datenbank (B11) und die **§ 7b-Spalte in `tax_records`** (Eingriff in
