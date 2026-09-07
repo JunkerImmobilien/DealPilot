@@ -633,12 +633,32 @@
 
   function _gesamtinvestition() {
     /* State.gi ist die Wahrheit — calc.js:756 rechnet sie aus kp, nk, san
-       und moebl. Nur wenn calc noch nicht gelaufen ist, wird ersatzweise
-       der Kaufpreis genommen; dann steht das auch dran. */
-    if (window.State && typeof State.gi === 'number' && State.gi > 0) {
-      return { wert: State.gi, sicher: true };
+       und moebl.
+
+       v1244b · Der Wert wird durch Number() gezwungen und gegen den
+       Kaufpreis plausibilisiert, statt nur `typeof === 'number'` zu
+       prüfen. Anlass war ein Messfehler von mir: ich hatte im Browser
+       versehentlich die globale v() aus calc.js überschrieben, worauf
+       `kp` als String zurückkam und `kp + nk` zu "20000020400"
+       verkettete. Die Prüfung schlug fehl, der Fallback nahm den
+       Kaufpreis — und die Zeile meldete stumm eine falsche Lücke.
+
+       In der App tritt das nicht auf. Die Lehre gilt trotzdem: eine
+       Kennzahl, die aus einer fremden Rechnung kommt, wird beim Lesen
+       zur Zahl gemacht und auf Plausibilität geprüft, nicht auf ihren
+       Typ. Die Gesamtinvestition kann nie kleiner als der Kaufpreis
+       sein. */
+    var kp = _zahl('kp');
+    var roh = (window.State && State.gi != null) ? Number(State.gi) : NaN;
+    if (isFinite(roh) && roh > 0 && (kp <= 0 || roh >= kp)) {
+      return { wert: roh, sicher: true };
     }
-    return { wert: _zahl('kp'), sicher: false };
+    /* Zweite Quelle: der KPI-Satz führt die Gesamtinvestition ebenfalls. */
+    var ausKpi = (window.State && State.kpis) ? Number(State.kpis.gi) : NaN;
+    if (isFinite(ausKpi) && ausKpi > 0 && (kp <= 0 || ausKpi >= kp)) {
+      return { wert: ausKpi, sicher: true };
+    }
+    return { wert: kp, sicher: false };
   }
 
   function _eur(n) {
@@ -730,12 +750,26 @@
   function _anhaengen() {
     if (typeof window.calc !== 'function' || window.calc._dpKdHook) return false;
     var alt = window.calc;
-    window.calc = function () {
+    var neu = function () {
       var r = alt.apply(this, arguments);
       try { window.dpKapitalDeckungRender(); } catch (e) {}
       return r;
     };
-    window.calc._dpKdHook = true;
+    /* v1244b · Marker der alten Funktion mitnehmen. window.calc ist bereits
+       zweimal umhüllt — financing.js:576 (dpFinancingRefresh) und
+       deal-action-readycheck.js:208 (v450). Letzteres erkennt an seinem
+       eigenen Marker `_v450Wrapped`, ob es schon gewrappt hat. Ein Wrapper,
+       der die Marker der alten Funktion nicht überträgt, macht sie
+       unsichtbar — und der nächste Lauf wrappt ein zweites Mal, worauf
+       `refresh()` doppelt feuert. deal-action-readycheck.js macht es
+       richtig; das wird hier übernommen. */
+    try {
+      for (var k in alt) {
+        if (Object.prototype.hasOwnProperty.call(alt, k)) neu[k] = alt[k];
+      }
+    } catch (e) {}
+    neu._dpKdHook = true;
+    window.calc = neu;
     return true;
   }
 
