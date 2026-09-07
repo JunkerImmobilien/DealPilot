@@ -97,6 +97,18 @@
       body: 'Risiken die dir bewusst sind — z.B. Sanierungsstau am Dach, anstehende GEG-Pflicht für Heizungstausch, Mieterwechsel geplant. Hilft dir bei späteren Verhandlungen ehrlich zu bleiben und fließt in die KI-Risikoanalyse.',
       severity: 'pro'
     },
+    /* v1253 · Testbericht: „Weiteres Notizfeld neben den Risiken und
+       Investitionsthese. Was soll hier rein?" — die beiden Nachbarn
+       hatten eine Erklaerung, dieses Feld nicht, und „Weitere Hinweise..."
+       sagt nichts. Gemessen, wofuer es tatsaechlich benutzt wird:
+       object-actions.js:1177 haengt Import-Inhalte HIER an, statt sie zu
+       ersetzen — als einziges Feld ueberhaupt; reseller-portal.js:466/545
+       zeigt den Inhalt dem Berater in der Mandanten-Ansicht. */
+    'tab1.notizen': {
+      title: 'Zusätzliche Notizen',
+      body: 'Alles, was kein Argument (Investitionsthese) und kein Risiko ist: Absprachen mit dem Makler, Besichtigungstermine, Nachfragen an die Verwaltung, Zustand einzelner Räume. Zwei Besonderheiten: der Exposé- und ImmoMetrica-Import hängt seine Objektbeschreibung hier an, statt sie zu überschreiben — deine eigenen Notizen bleiben also stehen. Und arbeitest du mit einem Berater über das Partner-Portal, sieht er diesen Text in seiner Mandanten-Ansicht.',
+      severity: 'pro'
+    },
     'tab1.verkehrswert': {
       title: 'Verkehrswert (§ 194 BauGB)',
       body: 'Der "objektive" Marktwert nach Sachverständigen-Gutachten — meist via Sachwertverfahren, Ertragswertverfahren oder Vergleichswertverfahren. Wenn höher als Kaufpreis → Wertpuffer und besseres Verhandlungsargument bei der Bank.',
