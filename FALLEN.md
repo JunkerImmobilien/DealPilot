@@ -1252,3 +1252,22 @@ auslässt, weil sie anderswo steht, muss es das sagen — sonst liest der
 Nutzer die Lücke als Fehler. Das Feld sagt es jetzt selbst, mitsamt der
 Folge: die BWK-Quoten rechnen auf dem *gesamten* Rohertrag, Stellplätze
 eingeschlossen.
+
+## Die Zahl, die man zuerst sehen will, kam zuletzt
+
+Der Wertpuffer — Verkehrswert minus Kaufpreis, bei `2026-001` **+14.600 €**
+— stand am Ende des Objekt-Tabs. Gemessen am 07.09.2026: **2003 px** unter
+dem Seitenanfang, hinter zwei sehr hohen Karten (Objektdaten, Qualität &
+Zustand). Und ohne jede Erklärung: kein `title`, kein Tooltip.
+
+Nach dem Verschieben unter die Überschrift: **382 px**.
+
+**Reihenfolge im DOM ist Reihenfolge im Blick.** Ein Ergebnis gehört vor
+die Eingaben, aus denen es entsteht — sonst findet es nur, wer schon
+weiß, dass es existiert.
+
+> Beim Verschieben eines Blocks ist die billigste Gegenprobe die
+> **Klammerbilanz der ganzen Datei**: 1117 `<div>` zu 1117 `</div>` davor
+> wie danach beweist, dass nur verschoben und nichts zerrissen wurde.
+> Ein Zählen im Ausschnitt beweist das *nicht* — der Ausschnitt schneidet
+> mitten in offene Elemente.
