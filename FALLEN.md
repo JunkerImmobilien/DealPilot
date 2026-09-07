@@ -992,3 +992,153 @@ Eigenkapital oder über das Darlehen.
 **Zwei Eingabefelder, die zusammen eine dritte Größe ergeben müssen,
 brauchen eine Gegenprobe.** Sonst ist jede Kennzahl darüber
 unwidersprochen falsch.
+
+## Einen Zahlen-Parser gibt es schon — `parseDe()`
+
+`v1244` baute sich in `financing.js` einen eigenen:
+
+```js
+String(e.value).split('.').join('').replace(',', '.')
+```
+
+Der behandelt **jeden** Punkt als Tausendertrenner. `"180.000"` wird
+richtig zu 180000, `"0.75"` aber zu **75** — dem Hundertfachen.
+Aufgefallen erst beim Messen der Bewirtschaftungsquoten, wo `bwk_kp_pct`
+auf `0.75` steht.
+
+Für Eigenkapital und Darlehen wäre es nie aufgefallen, weil dort ganze
+Eurobeträge stehen. **Genau deshalb ist es gefährlich: unsichtbar bis zum
+ersten Dezimalpunkt.**
+
+`parseDe()` aus `calc.js:9` unterscheidet richtig — ein Punkt mit exakt
+drei Folgeziffern ist ein Tausendertrenner, sonst ein Dezimaltrenner —
+und kennt deutsche wie amerikanische Schreibweise. Sie ist global
+verfügbar.
+
+**„Rechenkerne nie duplizieren" gilt auch für Parser.** Vor jeder eigenen
+Zahlenumwandlung nachsehen, ob die App schon eine hat.
+
+## Der Auto-Save schreibt jeden Moduswechsel mit
+
+Ein `switchBwkMode('percent')` zum Prüfen einer Anzeige genügte, damit
+der Auto-Save neun Sekunden später das Objekt speicherte — mit der
+Prozentquote statt den Detailpositionen. Der Score fiel von 84 auf 83,
+weil die Quote 3.960 € BWK ergibt und die Detailpositionen 4.940 €.
+
+Zurückgestellt und erneut gespeichert, dann stand wieder 84.
+
+**Wer an einem fremden Objekt misst, zählt vorher, was sich ändern kann,
+und stellt es hinterher nachweislich zurück** — in der Datenbank, nicht
+nur im Formular. Der Auto-Save unterscheidet nicht zwischen einer
+Messung und einer Eingabe.
+
+## Der Zweig wird vor dem Commit geprüft, nicht erst beim Ausrollen
+
+Nach einem Prod-Rollout blieb das Arbeitsverzeichnis auf `main` stehen.
+Die nächsten zwei Änderungen landeten dort statt auf `staging`.
+
+**Gefangen hat es `deploy-staging.ps1`** mit „ABBRUCH: Lokaler Zweig ist
+'main', erwartet 'staging'". Der Commit war noch nicht gepusht;
+`git cherry-pick` auf `staging` und `git branch -f main <letzter
+gepushter Stand>` haben es geradegezogen, Inhalt bitgleich geprüft
+(`git diff --stat` leer).
+
+**Nach jedem Prod-Rollout zurück auf `staging` wechseln.** Und: die
+Zweig-Sperre im Deploy-Skript ist seit `v3b` wirklich aktiv — sie hat
+hier zum ersten Mal etwas verhindert.
+
+## Eine Datei, zwei Kopien — `promo-erstflug.js`
+
+Der Kopfkommentar sagt „EINE Datei, zwei Ansichten". Tatsächlich liegt sie
+**zweimal**: `frontend/js/promo-erstflug.js` und
+`frontend/landing/promo-erstflug.js`, bitgleich bis auf die Zeilenenden.
+
+Wer nur eine ändert, schaltet den Rabatt auf der Landing ab und lässt ihn
+in der App stehen — oder umgekehrt. Der Vergleich braucht
+`diff --strip-trailing-cr`; ein normales `diff` meldet **jede** Zeile als
+verschieden, weil die eine Fassung CRLF trägt und die andere LF, und
+`md5sum` sagt dasselbe.
+
+**Vor jeder Änderung an einer Datei, die „für Landing und App" im Kopf
+trägt: nachsehen, ob es sie zweimal gibt.**
+
+## Ein Limit, das nichts begrenzt, ist eine Behauptung
+
+`max_saves: 3` stand seit V63 in `config.js`, wurde in den Einstellungen
+als „Max. 3 Speicherungen" angezeigt und auf allen Preiskarten genannt.
+**Kein einziger Prüfcode liest den Wert** — `grep` findet nur die
+Definition, die Anzeige und eine Zuweisung im Reseller-Portal.
+
+Aufgefallen ist es nicht beim Zählen, sondern weil Marcel sich nichts
+mehr darunter vorstellen konnte: *„Da kann ich mir gerade gar nichts mehr
+darunter vorstellen."*
+
+**Wenn ein Leistungsversprechen niemandem mehr erklärbar ist, ist die
+erste Frage nicht wie man es erklärt, sondern ob es überhaupt etwas
+tut.**
+
+## `if(!x) return;` am Anfang kappt alles danach
+
+Der Landing-Block „Flugklassen" begann mit
+`var g=document.getElementById('fkGrid'); if(!g) return;`. `#fkGrid` gibt
+es im HTML nicht mehr — der Block war also tot. **Und mit ihm alles, was
+danach im selben IIFE stand:** der Feature-Phasen-Wechsel darunter lief
+nie, `#luFeat` hatte vier Phasen und keine trug die Klasse `d`. Nach dem
+Entfernen sind es zwei.
+
+**Ein früher `return` in einem gemeinsamen IIFE ist ein stiller
+Abschalter für alle folgenden Aufgaben.** Wer eine Aufgabe aus einem
+solchen Block entfernt, prüft, was hinter ihr steht.
+
+> Dazu die zweite Hälfte: der tote Block trug einen **vollständigen
+> Preis-Datensatz** (29/290, Kerosin-Liter) — eine zweite Wahrheit, die
+> beim nächsten Wiedereinbau falsche Zahlen zurückgebracht hätte. Deshalb
+> entfernt statt stehengelassen.
+
+## Was ein Kauf gutschreibt, steht am Stripe-Preis — nicht im Code
+
+`bewertungsKatalog.js` sagt es im Kopf: die Mengen stehen als
+**Metadaten am Preis** (`dp_kind=bewertung_paket`, `dp_pack_sku`, `mpi`,
+`mpi_plus`, `wev`). Der Grund ist gut — eine Price-ID gilt je Konto, ein
+`lookup_key` heißt in Sandbox und Live gleich.
+
+**Beim Anlegen neuer Preise wird das leicht vergessen.** Meine drei
+Nachkauf-Preise (`v1246c`) hatten zunächst keine Metadaten. Der Kauf wäre
+sauber durchgelaufen, hätte abgebucht — und **nichts gutgeschrieben**.
+Kein Fehler, keine Meldung; `paketAusMeta()` gibt bei unbekanntem
+`dp_kind` korrekt `null` zurück, und der Aufrufer bucht dann nichts.
+
+**Ein neuer Stripe-Preis ist erst fertig, wenn seine Metadaten stehen.**
+Die Gegenprobe ist der Katalog-Endpunkt, nicht die Preisliste:
+`GET /api/v1/credits/bewertungen` muss `paket` mit den erwarteten Mengen
+zeigen.
+
+## Ein Türsteher, der drei Listen kennt, kennt die vierte nicht
+
+`_buyCreditPack()` sucht den Schlüssel in `bewertungsPakete`,
+`einzelkauf` und `aiCreditPackages`. `v1246` hat den Nachkauf **abgeleitet**
+statt ihn in eine Liste zu schreiben — er stand in keiner der drei, und
+jeder Klick wäre dort herausgefallen, **ohne dass je ein Netzwerkaufruf
+entsteht**.
+
+Genau das beschreibt `v1184` schon einmal für die Pakete. Die Falle war
+noch da, nur an anderer Stelle: **wer eine neue Bezugsquelle einführt,
+sucht alle Stellen, die die alten Quellen aufzählen.** `grep` nach dem
+Namen der bekannten Liste findet sie.
+
+## Die Billing-Portal-Konfiguration führt gar keine Preise
+
+Notiert war: „ein Preis steht an DREI Stellen — `config.js` (Anzeige),
+`plans` (Abbuchung), Billing-Portal (was der Kunde im Kundenportal
+sieht)."
+
+**Gemessen am 07.09.2026: die Portal-Konfiguration führt keine
+`products`.** Stripe nimmt das Feld auch nicht an (drei Versuche, kein
+Fehler, kein Effekt). Der Plan-Wechsel läuft in DealPilot über die eigene
+Oberfläche mit `lookup_key`; das Portal zeigt nur Rechnungen,
+Zahlungsmittel und Kündigung.
+
+**Es sind also zwei Stellen, die gepflegt werden müssen** — plus das
+Portal, *wenn* dort je ein Plan-Wechsel angeboten wird. Die alte Notiz
+war nicht falsch, aber sie hat eine Pflicht behauptet, die es heute nicht
+gibt.

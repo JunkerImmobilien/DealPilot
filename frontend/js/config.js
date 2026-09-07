@@ -276,7 +276,7 @@ window.DealPilotConfig = (function() {
       label: 'Starter',
       tagline: 'Privat-Investor',
       price_monthly_eur: 19.99,          // v1176: war 29
-      price_yearly_eur: 199,             // v1176: war 290 — 2 Monate gratis
+      price_yearly_eur: 219,             // v1246: 1 Freimonat (11 x 19,99 = 219,89, abgerundet)
       sort_order: 2,
       limits: {
         objects:       5,
@@ -326,8 +326,8 @@ window.DealPilotConfig = (function() {
       key: 'investor',
       label: 'Investor',
       tagline: 'Bestseller',
-      price_monthly_eur: 39.99,          // v1176: war 59
-      price_yearly_eur: 399,             // v1176: war 590 — 2 Monate gratis
+      price_monthly_eur: 34.99,          // v1246: war 39,99 — Marcels Preisrunde 07.09.2026
+      price_yearly_eur: 384,             // v1246: 1 Freimonat (11 x 34,99 = 384,89, abgerundet)
       sort_order: 3,
       highlight: true,                    // Bestseller-Badge
       limits: {
@@ -373,8 +373,8 @@ window.DealPilotConfig = (function() {
       key: 'pro',
       label: 'Pro',
       tagline: 'Profis · Sachverständige · White-Label',
-      price_monthly_eur: 79.99,          // v1176: war 99
-      price_yearly_eur: 799,             // v1176: war 990 — 2 Monate gratis
+      price_monthly_eur: 49.99,          // v1246: war 79,99 — Marcels Preisrunde 07.09.2026
+      price_yearly_eur: 549,             // v1246: 1 Freimonat (11 x 49,99 = 549,89, abgerundet)
       sort_order: 4,
       limits: {
         objects:       -1,                // Unbegrenzt
@@ -446,20 +446,43 @@ window.DealPilotConfig = (function() {
     { key: 'avm_b',    label: 'Marktwert-Abruf · zweiter Bewertungspartner', price_eur: 9.90 }
   ];
 
-  var BEWERTUNGS_PAKETE = [
-    { key: 'paket_kurz',  mpi: 5,  mpi_plus: 2,  wev: 0, price_eur: 7.90,
-      label: '5 · 2 · 0',   tag: 'Mal schnell prüfen',    flight: '✈ Kurzstrecke',
-      spart_pct: 4,  gauge_off: 164.8, gauge_deg: -57.6 },
-    { key: 'paket_mittel', mpi: 10, mpi_plus: 5,  wev: 1, price_eur: 19.90,
-      label: '10 · 5 · 1',  tag: 'Mehrere Deals',         flight: '✈✈ Mittelstrecke',
-      spart_pct: 13, gauge_off: 116.6, gauge_deg: -14.4 },
-    { key: 'paket_gross', mpi: 15, mpi_plus: 10, wev: 3, price_eur: 39.90,
-      label: '15 · 10 · 3', tag: 'Aktiver Investor',      flight: '✈✈✈ Langstrecke',
-      spart_pct: 18, gauge_off: 56.3,  gauge_deg: 39.6, highlight: true },
-    { key: 'paket_max',   mpi: 25, mpi_plus: 20, wev: 6, price_eur: 69.90,
-      label: '25 · 20 · 6', tag: 'Maximale Reichweite',   flight: '🌍 Interkontinental',
-      spart_pct: 24, gauge_off: 14.1,  gauge_deg: 77.4 }
-  ];
+  /* ── v1246 · Nachkauf: dasselbe Kontingent, ein Viertel des Monatsbeitrags ──
+     Marcels Vorgabe vom 07.09.2026:
+
+       „Dann faellt unten diese Reichweite Bewertungen nachkaufen. Das
+        wuerde ich komplett rausnehmen. Und wenn ein Kunde in seinem Paket
+        seine Bewertung aufgebraucht hat, dann kann er die gleichen
+        Bewertungen nochmal nachkaufen fuer ein Viertel des monatlichen
+        Preises."
+
+     Das ersetzt BEWERTUNGS_PAKETE (vier Kacheln zu 7,90 / 19,90 / 39,90 /
+     69,90 EUR). Die Regel wird ABGELEITET, nicht als zweite Preistabelle
+     gefuehrt — der Monatsbeitrag und das Kontingent stehen schon oben in
+     PRICING. Zwei Tabellen fuer denselben Preis laufen sonst auseinander;
+     genau das ist bei den Flugklassen auf der Landing passiert, die mit
+     29/290 stehenblieben, waehrend die Karten daneben 19,99 sagten.
+
+     Free ist ausgenommen: dort gibt es nichts nachzukaufen, ohne dass
+     zuerst ein Plan da ist. */
+  function nachkaufFuer(planKey) {
+    var p = PRICING[planKey];
+    if (!p || !p.price_monthly_eur || p.price_monthly_eur <= 0) return null;
+    var k = p.kontingent || {};
+    var menge = (k.mpi || 0) + (k.mpi_plus || 0) + (k.wev || 0);
+    if (menge <= 0) return null;
+    return {
+      plan:       planKey,
+      /* Der Schluessel ist zugleich der Stripe-SKU (dp_pack_sku am Preis)
+         und der lookup_key heisst dp_nachkauf_<plan>. */
+      key:        'nachkauf_' + planKey,
+      preis_eur:  Math.round(p.price_monthly_eur / 4 * 100) / 100,
+      kontingent: { mpi: k.mpi || 0, mpi_plus: k.mpi_plus || 0, wev: k.wev || 0 },
+      menge:      menge,
+      /* „5 · 5 · 5" wie in der Cockpit-Matrix */
+      label:      [k.mpi || 0, k.mpi_plus || 0, k.wev || 0].join(' · ')
+    };
+  }
+
 
   /* STILLGELEGT v1183 — die alten Liter-Pakete.
      Sie standen hier, bis der Zaehler umgestellt war; das ist er jetzt
@@ -481,7 +504,8 @@ window.DealPilotConfig = (function() {
 
   // V63: Yearly-Bonus-Konfiguration (was beim Wechsel auf jährlich extra dazu kommt)
   var YEARLY_BONUS = {
-    free_months:           2,                      // 2 Monate gratis
+    free_months:           1,                      // v1246: war 2 — Marcels Entscheidung 07.09.2026,
+                                                   // ein Freimonat fuer alle Pakete
     bonus_ai_credits:      50,                     // 50 Bonus-KI-Credits einmalig
     price_lock_months:     24                      // Preisgarantie 24 Monate
   };
@@ -713,7 +737,11 @@ window.DealPilotConfig = (function() {
       aiCreditPackages: AI_CREDIT_PACKAGES,
       /* v1176 */
       einzelkauf: EINZELKAUF,
-      bewertungsPakete: BEWERTUNGS_PAKETE,
+      /* v1246: die vier Bewertungs-Pakete sind weg — der Nachkauf wird je
+         Plan abgeleitet. Der Schluessel bleibt als leere Liste stehen, damit
+         aeltere Leser (settings.js) nicht auf undefined laufen. */
+      bewertungsPakete: [],
+      nachkaufFuer: nachkaufFuer,
       testphase: TESTPHASE,                 /* v1185 */
       yearlyBonus: YEARLY_BONUS,
       // V63.82: Service-Level

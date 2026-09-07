@@ -1,3 +1,13 @@
+/* ⚠ v1246 · DIESE DATEI WIRD VON KEINER SEITE GELADEN.
+   Gemessen am 07.09.2026: kein <script src> zeigt darauf, weder aus
+   frontend/index.html noch aus frontend/landing/index.html. Die aktive
+   Fassung ist frontend/js/pricing-modal.js.
+
+   Sie stand bis heute auf den Preisen 29 / 59 / 99 — dem Stand VOR v1176.
+   Nicht geloescht, weil eine Datei, die man nicht laden sieht, trotzdem
+   irgendwo eingebunden sein kann; aber die Preise sind mitgezogen, damit
+   sie im Fall einer Wiedereinbindung nicht falsch zurueckkommen.
+   Wer sie wirklich braucht, bindet sie ein und traegt es hier ein. */
 /**
  * DealPilot Landing-Page — Pricing-Plugin (Adaptiert für Landing)
  * Original: pricing-modal.js V63.5
@@ -19,7 +29,7 @@
       price_monthly: 0, price_yearly: 0,
       features: [
         '1 Objekt',
-        '3 Speicherungen',
+        '4 Wochen voller Pro-Umfang',
         'DealPilot Score (5 Faktoren)',
         'Investor Deal Score (24 KPIs) — Demo',
         /* v1185: die Testphase zuerst — sie ist das, was ein neues Konto
@@ -36,7 +46,7 @@
     {
       key: 'starter', letter: 'S', label: 'Starter', tag: 'Privat-Investor', title: 'Starter',
       lead: 'Fühlt sich vollständig an. Volle PDFs ohne Wasserzeichen, Werbungskosten-Modul, Mietspiegel-Vergleich — für die ersten echten Deals.',
-      price_monthly: 29, price_yearly: 290,
+      price_monthly: 19.99, price_yearly: 219,  /* v1246 */
       features: [
         '5 Objekte',
         'DealPilot Score (5 Faktoren)',
@@ -62,7 +72,7 @@
     {
       key: 'investor', letter: 'I', label: 'Investor', tag: 'Bestseller', title: 'Investor',
       lead: 'Der Plan für aktive Investoren. Investor Deal Score mit 24 KPIs, Track-Record-PDF, Bankexport, Live-Marktzinsen und BMF-Rechner — alles, was Sie für ernstgemeinte Investments brauchen.',
-      price_monthly: 59, price_yearly: 590,
+      price_monthly: 34.99, price_yearly: 384,  /* v1246 */
       best: true,
       features: [
         '25 Objekte',
@@ -83,7 +93,7 @@
     {
       key: 'pro', letter: 'P', label: 'Pro', tag: 'Profis · Sachverständige', title: 'Pro',
       lead: 'Für Investoren, Sachverständige und Vermögensverwalter. Unbegrenzte Objekte, Premium-PDF-Layouts, Custom Track-Record Cover und Migration & Setup-Service inklusive.',
-      price_monthly: 99, price_yearly: 990,
+      price_monthly: 49.99, price_yearly: 549,  /* v1246 */
       features: [
         'Unbegrenzte Objekte',
         'Alle Investor-Features',

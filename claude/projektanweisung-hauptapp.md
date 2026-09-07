@@ -7960,6 +7960,289 @@ Der Fehler war meiner, zwei Härtungen bleiben:
 3. `v1243`–`v1244b` sind auf Staging, **noch nicht auf Prod** (Prod steht
    auf `4ae353a`).
 
+## Rollout-Journal · 07.09.2026, vierter Teil — Prod, ein Parser und die BWK-Quote
+
+**Prod-Rollout.** `v1243`–`v1244b` sind live, Prod steht auf `409f863`.
+Nur Frontend, kein Neubau. Über HTTPS nachgemessen: alle Cache-Buster
+stimmen (`financing.js?v=v1244b`, `workflow.js?v=v1243`, `ui.js?v=v1243`,
+`style.css?v=v1243b`), der Code ist in den ausgelieferten Dateien, App
+und Landing antworten mit 200.
+
+### `v1244c` — ein Fehler in meinem eigenen, gerade ausgerollten Code
+
+`_zahl()` in `financing.js` baute den Zahlen-Parser selbst:
+
+```js
+String(e.value).split('.').join('').replace(',', '.')
+```
+
+Das behandelt **jeden** Punkt als Tausendertrenner. `"180.000"` wird
+richtig zu 180000 — `"0.75"` aber zu **75**, dem Hundertfachen.
+Aufgefallen erst beim Messen der Bewirtschaftungsquoten, wo `bwk_kp_pct`
+auf `0.75` steht.
+
+Für Eigenkapital und Darlehen wäre es nie aufgefallen, weil dort ganze
+Eurobeträge stehen. **Genau deshalb gehört es korrigiert: unsichtbar bis
+zum ersten Dezimalpunkt.** `parseDe()` aus `calc.js:9` macht es richtig
+und ist global verfügbar. Ich hätte sie von Anfang an nehmen müssen —
+*Rechenkerne nie duplizieren* gilt auch für Parser.
+
+### `v1245` — die BWK-Quote bekommt Kontext
+
+**Testbericht:** *„% der NKM für die Bewirtschaftungskosten, macht man
+das? Wird ja in München ganz anderer % Wert sein als in Bielefeld z.B."*
+
+> **Berechtigt — und DealPilot beantwortet die Frage im eigenen Haus
+> schon anders.** Der Marktbericht rechnet nach **ImmoWertV Anlage 3** die
+> Verwaltung *je bewerteter Einheit* und die Instandhaltung *je m²*,
+> beides unabhängig von der Miethöhe (steht so in `CLAUDE.md`). Die
+> Haupt-App rechnet in Prozent der Nettokaltmiete.
+
+Die Quote bleibt als Schnellweg — sie ist für eine erste Einschätzung in
+Ordnung —, bekommt aber gesagt, wo sie ungenau wird: eine Zeile nennt sie
+in Euro und je m² und zeigt, was bei doppelter Miete herauskäme; der
+Aufklappteil erklärt warum und verweist auf die Detailpositionen, die die
+Quote ersetzen.
+
+**Gemessen an `2026-001` im Prozent-Modus:** 16 % ergeben **1.920 € im
+Jahr = 19,20 € je m²**; bei doppelter Miete wären es 3.840 € für dieselbe
+Verwaltung. Die Zeile steht sichtbar unter der Gesamtquote.
+
+### Drei Punkte des Blocks waren schon erledigt
+
+- **„Sonder-AfA nicht direkt erklärt, erst wenn man es anklickt"** — der
+  Erklärtext steht bereits **vor** der Checkbox (`index.html:1925`):
+  *„Die Sonder-AfA nach § 7b EStG erlaubt zusätzliche 5 % AfA jährlich in
+  den ersten 4 Jahren — obendrauf zur regulären …"*
+- **„zvE muss irgendwo erklärt werden, vielleicht ausschreiben"** — das
+  Label lautet bereits *„Zu versteuerndes Einkommen (zvE) vor Immobilie /
+  Jahr"*.
+- **„Deutlich über Marktwert bei einem Preis UNTER Marktwert"** — bereits
+  `v1178` behoben; der Kommentar in `avm-section.js:61` trägt genau
+  Marcels Zahlen (129.000 € / 177.000 €).
+
+**Commits.** `409f863` (Prod-Merge) · `1eaff85` (`v1244c` + `v1245`).
+
+**Rest.**
+
+1. **Nach dem Prod-Rollout blieb das Arbeitsverzeichnis auf `main`.** Die
+   nächsten zwei Änderungen landeten dort statt auf `staging`. Gefangen
+   hat es die Zweig-Sperre in `deploy-staging.ps1` — zum ersten Mal hat
+   sie etwas verhindert. Über `cherry-pick` auf `staging` und
+   `git branch -f main 409f863` geradegezogen, Inhalt bitgleich geprüft.
+2. **Der Auto-Save schreibt jeden Moduswechsel mit.** Ein
+   `switchBwkMode('percent')` zum Prüfen genügte, damit `2026-001` mit
+   der Prozentquote gespeichert wurde (Score 84 → 83, weil die Quote
+   3.960 € BWK ergibt statt 4.940 €). Zurückgestellt, erneut gespeichert,
+   in der Datenbank nachgeprüft: Score wieder **84**, `hg_ul 3840`,
+   `hg_nul 1100`, `ek 20000`, `d1 180000`, neun Objekte.
+3. **Offen und Marcels Entscheidung:** ob Mietausfall- und BWK-Quoten als
+   **Profileinstellung** je Lage hinterlegbar sein sollen (*„für Profil
+   Investition C-Lage nimm Mietausfall immer 3 %, für A-Lage 1 %"*). Das
+   ist ein Produktbaustein, kein Textfehler.
+4. `v1244c`/`v1245` sind auf Staging, **noch nicht auf Prod**.
+
+## Rollout-Journal · 07.09.2026, fünfter Teil — die Preisrunde (`v1246`)
+
+**Was.** Marcels Preisvorgaben vom 07.09.2026, vollständig umgesetzt.
+
+| | vorher | jetzt |
+|---|---|---|
+| Starter | 19,99 / 199 | 19,99 / **219** |
+| Investor | 39,99 / 399 | **34,99** / **384** |
+| Pro | 79,99 / 799 | **49,99** / **549** |
+
+Jährlich gab es **zwei** Freimonate, jetzt **einen** — die Jahrespreise sind
+elf Monatsbeiträge, auf glatte Euro abgerundet wie bisher (219,89 → 219;
+384,89 → 384; 549,89 → 549). Die Ersparnis-Angaben ziehen mit: 21 / 36 / 51 €.
+
+**„3 Speicherungen" bei Free.** Marcel: *„Da kann ich mir gerade gar nichts
+mehr darunter vorstellen."*
+
+> **Zu Recht — gemessen:** `max_saves` steht in `config.js`, wurde in
+> `settings.js` angezeigt und auf den Preiskarten genannt. **Kein einziger
+> Prüfcode liest es.** Ein Limit, das nichts begrenzt, ist kein
+> Leistungsmerkmal, sondern eine Behauptung. Ersetzt durch *„4 Wochen voller
+> Pro-Umfang"* — das gibt es wirklich. Der Wert bleibt in `config.js` stehen,
+> weil `reseller-portal.js:610` ihn setzt.
+
+**Erstflug.** Anzeige aus, Rabatt bleibt vermerkt: `ANZEIGE_AKTIV = false`,
+`ERSTFLUG_PROZENT = 15` (war 16), Name bleibt *Erstflug*. Die Datei bleibt
+vollständig stehen — sie wird wieder gebraucht, und ein Schalter ist
+ehrlicher als ein Rückbau, der später falsch wiederaufgebaut wird.
+
+> **Was der Kunde bis heute sah, war ohnehin kaputt.** Gemessen auf der
+> Staging-Landing stand in der Pro-Karte
+>
+> ```html
+> <span class="dpp-old">79,99 €</span><b>79,98</b>
+> ```
+>
+> — ein „Altpreis", der **nicht durchgestrichen** war
+> (`text-decoration: none`), daneben ein „neuer", der **einen Cent** darunter
+> lag. Ein Rabatt von einem Cent, doppelt gedruckt.
+
+> **Achtung, die Datei liegt zweimal:** `frontend/js/promo-erstflug.js` und
+> `frontend/landing/promo-erstflug.js`, bitgleich bis auf die Zeilenenden
+> (mit `diff --strip-trailing-cr` geprüft). Beide geändert — sonst hätte die
+> **App** den Rabatt weiter gezeigt, während die Landing ihn nicht mehr hat.
+
+**Nachkauf.** Die Sektion *„Mehr Reichweite. Ohne Abo."* (`id=kerosin-tanken`,
+627 px, vier Pakete zu 7,90 / 19,90 / 39,90 / 69,90 €) ist raus. An ihre
+Stelle tritt eine Regel **ohne eigene Preistabelle**: dasselbe
+Monatskontingent noch einmal für ein Viertel des Monatsbeitrags.
+`nachkaufFuer(plan)` leitet das aus `PRICING` ab, statt eine zweite Tabelle
+zu führen — genau daran sind die Flugklassen gescheitert (siehe unten).
+
+| Plan | Menge | Preis |
+|---|---|---|
+| Starter | 5 (5 · 0 · 0) | **5,00 €** |
+| Investor | 10 (5 · 5 · 0) | **8,75 €** |
+| Pro | 15 (5 · 5 · 5) | **12,50 €** |
+
+### Drei Leichen, beim Messen gefunden
+
+1. **Die „Flugklassen" auf der Landing** — ein zweiter vollständiger
+   Preis-Datensatz mit 29/290 und Kerosin-Litern (`fuel: '2 L'`). Sein Ziel
+   `#fkGrid` gibt es im HTML nicht mehr. **Er war nicht nur überflüssig:**
+   `if(!g) return;` brach den *ganzen* Block ab, und alles danach lief nie —
+   der Feature-Phasen-Wechsel stand still, `#luFeat` hatte vier Phasen und
+   **keine** trug die Klasse `d`. Entfernt; nach dem Rollout sind es **zwei**.
+2. **`frontend/landing/assets/pricing-plugin.js`** wird von keiner Seite
+   geladen und stand auf **29 / 59 / 99** — dem Stand vor `v1176`. Nicht
+   gelöscht (eine Datei, die man nicht laden sieht, kann trotzdem eingebunden
+   sein), aber die Preise mitgezogen und ein Warnkopf davor.
+3. **Der Reseller-Absatz** nannte 39,99 € und zwei Freimonate; beides
+   nachgezogen.
+
+**Commits.** `979a45c` (`v1246`) · `b1cea80` (`v1246b`).
+
+**Nachweis.** Nach dem Rollout auf Staging gemessen:
+
+- **Landing:** Preise 19,99 / 34,99 / 49,99; jährlich 219 / 384 / 549 mit
+  „spart 21 / 36 / 51 € / Jahr"; **kein** `.dpp-old` mehr, **kein**
+  Promo-Banner; Free-Karte trägt „4 Wochen voller Pro-Umfang"; die
+  Nachkauf-Sektion ist weg; die Fußnote nennt die neue Regel mit allen drei
+  Preisen; **`#luFeat .lu-phase.d` = 2** (vorher 0).
+- **App:** `config.js?v=v1246`, Preise 19,99/219 · 34,99/384 · 49,99/549,
+  `free_months = 1`, `bewertungsPakete` leer, und `nachkaufFuer` liefert
+  5 → 5 €, 10 → 8,75 €, 15 → 12,50 €.
+
+**Rest — und der wichtigste Punkt.**
+
+1. **STRIPE FEHLT NOCH.** Die neuen Monats- und Jahrespreise stehen in der
+   Anzeige, **nicht** in Stripe. Solange dort die alten Preise liegen, zeigt
+   die Seite 34,99 € und abgebucht werden 39,99 €. **Vor dem Prod-Rollout
+   müssen die sechs Preise in Stripe angelegt und die Preis-IDs eingetragen
+   werden** — Anzeige, `plans`-Tabelle und Billing-Portal-Konfiguration, alle
+   drei. Das ist Geld und braucht Marcels Freigabe.
+2. **Drei Nachkauf-Preise** (`nachkauf_starter` 5,00 €, `nachkauf_investor`
+   8,75 €, `nachkauf_pro` 12,50 €) gibt es in Stripe noch nicht. Der Kauf
+   läuft über `lookup_key`; deshalb steht die Kachel in den Einstellungen
+   **bewusst ohne Kaufknopf** — ein Knopf, der eine 400 zurückbringt, ist
+   schlimmer als ein Satz, der sagt was gilt. Der Einzelkauf funktioniert
+   unabhängig weiter.
+3. **Ein Stripe-Coupon lässt seinen Prozentsatz nicht ändern.** Für 15 %
+   Erstflug muss dort später ein neuer angelegt werden. Solange die Anzeige
+   aus ist, hat das keine Wirkung nach außen.
+4. **Abnahmepunkt für Marcel:** der Einstellungen-Bereich *Plan* ließ sich
+   über das Browser-Werkzeug nicht öffnen (`showSettings()` blieb ohne
+   Wirkung, Klicks kommen in dieser Sitzung nicht mehr an). Die Logik ist
+   bewiesen, die Datei syntaxgeprüft — **die Optik der Nachkauf-Kachel ist
+   ungesehen.**
+
+## Rollout-Journal · 07.09.2026, sechster Teil — Stripe (`v1246c`)
+
+**Marcels Freigabe:** *„JA MACH STRIPE AUCH FERTIG ALLES KOMPLETT"*.
+
+### Die Sandbox ist fertig
+
+| angelegt | Betrag | lookup_key |
+|---|---|---|
+| Starter jährlich | 219,00 € | `dp_plan_starter_yearly` |
+| Investor monatlich | 34,99 € | `dp_plan_investor_monthly` |
+| Investor jährlich | 384,00 € | `dp_plan_investor_yearly` |
+| Pro monatlich | 49,99 € | `dp_plan_pro_monthly` |
+| Pro jährlich | 549,00 € | `dp_plan_pro_yearly` |
+| Nachkauf Starter | 5,00 € einmalig | `dp_nachkauf_starter` |
+| Nachkauf Investor | 8,75 € einmalig | `dp_nachkauf_investor` |
+| Nachkauf Pro | 12,50 € einmalig | `dp_nachkauf_pro` |
+
+*Starter monatlich bleibt bei 19,99 € — kein neuer Preis nötig.*
+
+Alle mit **`transfer_lookup_key=true`**: der Name wandert auf den neuen
+Preis, der Code bleibt unverändert. Dazu der Coupon **`ERSTFLUG15`**
+(15 %, dauerhaft) — er liegt nur bereit, die Anzeige ist aus.
+
+**Neun alte Preise stillgelegt**, nicht gelöscht: die fünf ersetzten
+Plan-Preise und die vier Bewertungs-Pakete. Wer eines gekauft hat, behält
+Gutschrift und Rechnung; laufende Abos laufen weiter.
+
+**`plans`-Tabelle auf Staging nachgezogen**, vorher gesichert
+(`/root/plans-vor-v1246-1039.sql.gz`).
+
+### Der entscheidende Fund: die Inhalte stehen an den Preisen
+
+`bewertungsKatalog.js` sagt es im Kopf, und es stimmt: **die Mengen, die
+ein Kauf gutschreibt, stehen nicht im Code, sondern als Metadaten am
+Stripe-Preis** — `dp_kind=bewertung_paket`, `dp_pack_sku`, `mpi`,
+`mpi_plus`, `wev`.
+
+**Meine drei neuen Preise hatten keine.** Der Kauf wäre sauber
+durchgelaufen, hätte abgebucht — und **nichts gutgeschrieben**. Metadaten
+nachgetragen und gegengeprüft.
+
+### Funktionslauf gegen den echten Katalog
+
+`GET /api/v1/credits/bewertungen` nach dem Neubau:
+
+```
+nachkauf_starter      5.00 EUR  paket  {"mpi":5}
+nachkauf_investor     8.75 EUR  paket  {"mpi":5,"mpi_plus":5}
+nachkauf_pro         12.50 EUR  paket  {"mpi":5,"mpi_plus":5,"wev":5}
+```
+
+Die vier `dp_paket_*` sind aus dem Katalog verschwunden. Und alle neun
+`lookup_key`s lösen die richtigen Beträge auf — geprüft einzeln über die
+Stripe-API, also auf dem Weg, den auch der Checkout geht.
+
+### Zwei Code-Fallen, beide gefangen
+
+1. **Der Türsteher in `_buyCreditPack`** prüft, ob der Schlüssel in
+   `bewertungsPakete`, `einzelkauf` oder `aiCreditPackages` steht. Der
+   Nachkauf steht in keiner davon — er wird abgeleitet. **Ohne die neue
+   Zeile wäre jeder Klick dort herausgefallen, ohne dass je ein
+   Netzwerkaufruf entsteht.** Genau das beschreibt `v1184` schon einmal
+   für die Pakete; die Falle war noch da, nur an anderer Stelle.
+2. Der `billing_portal`-Teil meiner Annahme stimmt so nicht: die
+   Konfiguration führt **gar keine** `products`. Stripe nimmt das Feld
+   auch nicht an (drei Versuche, kein Fehler, kein Effekt). **Das ist
+   kein Mangel:** der Plan-Wechsel läuft in DealPilot über die eigene
+   Oberfläche mit `lookup_key`, nicht über das Stripe-Portal. Im Portal
+   stehen also keine veralteten Preise — es stehen dort gar keine.
+
+> Damit ist meine Notiz „ein Preis steht an DREI Stellen" zu
+> präzisieren: es sind zwei, die gepflegt werden müssen (Anzeige und
+> `plans`), plus das Portal, **wenn** dort je ein Plan-Wechsel angeboten
+> wird.
+
+### ⚠ Das LIVE-Konto fehlt noch
+
+**Der Zugriff auf das Live-Stripe-Konto wurde von der Sicherheitsschranke
+blockiert** — das habe ich nicht umgangen. Dort fehlen alle acht Preise,
+der Coupon, und die `plans`-Tabelle auf Prod steht weiter auf
+1999/19900 · 3999/39900 · 7999/79900.
+
+**Solange das so ist, darf `v1246` nicht auf Prod.** Sonst zeigt die
+Seite 34,99 € und abgebucht werden 39,99 €.
+
+Zum Freischalten genügt eines davon:
+- Stripe über `/mcp` neu anmelden (der Zugang ist abgelaufen) — dann
+  läuft es über den offiziellen Weg mit eigener Bestätigung je Schreibvorgang;
+- oder eine Bash-Berechtigung für den Prod-Server erteilen;
+- oder die acht Preise im Dashboard selbst anlegen — die Liste oben ist
+  vollständig, inklusive der Metadaten, ohne die nichts gutgeschrieben wird.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

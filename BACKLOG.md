@@ -38,9 +38,11 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 07.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging auf `5a338dd`, **Produktion auf
-`4ae353a`**. **`v1215`–`v1242e` sind live**, `v1243`–`v1244b` warten auf
-den naechsten Prod-Rollout (nur Frontend, kein Neubau noetig).
+**Stand:** lokal = GitHub = Staging auf `a5bc1a6`, **Produktion auf
+`409f863`**. **`v1215`–`v1244b` sind live**, `v1244c`–`v1246c` warten auf
+den naechsten Prod-Rollout. **`v1246c` fasst `bewertungsKatalog.js` an —
+das ist Backend, der Prod-Rollout braucht einen Neubau.** Und er darf erst
+laufen, wenn die Preise im Live-Stripe-Konto stehen (siehe unten).
 
 **Zuletzt fertig: `v1242a–e` — die KI-Mietrecherche.** Sie nennt jetzt
 **alle** benutzten Quellen statt einer, prüft **zuerst**, ob es für den Ort
@@ -81,6 +83,45 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 > `localStorage`**, deren alter Zustand nirgends festgehalten ist.
 > **Reproduzierbar ist, dass die Bilanz aufgeht, nicht die 687.059 €.**
 
+> ### ⚠ ZUERST: das LIVE-Stripe-Konto — sonst darf `v1246` nicht auf Prod
+>
+> **Die Sandbox ist fertig** (`v1246c`): acht Preise angelegt, Coupon
+> `ERSTFLUG15` (15 %), neun alte stillgelegt, `plans` auf Staging
+> nachgezogen, Metadaten gesetzt, Katalog-Endpunkt gegengeprüft.
+>
+> **Im LIVE-Konto fehlt alles davon.** Der Zugriff wurde von der
+> Sicherheitsschranke blockiert. Prod-`plans` steht weiter auf
+> 1999/19900 · 3999/39900 · 7999/79900. **Ginge `v1246` so auf Prod,
+> stünde 34,99 € auf der Seite und abgebucht würden 39,99 €.**
+>
+> **Anzulegen im Live-Konto** (alle in EUR, `transfer_lookup_key=true`):
+>
+> | lookup_key | Betrag | Art |
+> |---|---|---|
+> | `dp_plan_starter_yearly` | 21900 | jährlich |
+> | `dp_plan_investor_monthly` | 3499 | monatlich |
+> | `dp_plan_investor_yearly` | 38400 | jährlich |
+> | `dp_plan_pro_monthly` | 4999 | monatlich |
+> | `dp_plan_pro_yearly` | 54900 | jährlich |
+> | `dp_nachkauf_starter` | 500 | einmalig |
+> | `dp_nachkauf_investor` | 875 | einmalig |
+> | `dp_nachkauf_pro` | 1250 | einmalig |
+>
+> *Starter monatlich bleibt 19,99 € — kein neuer Preis.*
+>
+> **Die drei Nachkauf-Preise brauchen Metadaten**, sonst bucht der Kauf ab
+> und schreibt **nichts** gut: `dp_kind=bewertung_paket`,
+> `dp_pack_sku=nachkauf_<plan>`, und `mpi`/`mpi_plus`/`wev` =
+> 5/0/0 · 5/5/0 · 5/5/5.
+>
+> Dazu: Coupon **15 %, dauerhaft**, Name *Erstflug* (eilt nicht, die
+> Anzeige ist aus). Die alten Plan- und Paket-Preise stilllegen, **nicht
+> löschen**. Danach `plans` auf Prod nachziehen — **vorher sichern**.
+>
+> **Zum Freischalten genügt eines:** Stripe über `/mcp` neu anmelden (der
+> Zugang ist abgelaufen), eine Bash-Berechtigung für den Prod-Server, oder
+> die Preise selbst im Dashboard anlegen.
+
 > ### Der erste Griff jetzt — in dieser Reihenfolge
 >
 > **Nichts wartet auf einen Rollout.** `v1215`–`v1242e` sind live, Prod
@@ -94,10 +135,14 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 > nur ob es schneller ist, sondern ob die Zahlen noch im richtigen Feld
 > landen.
 >
-> **2 · Weiter im Testbericht. Die Blöcke D, E und F sind abgeschlossen**
-> (`v1240` Soll-Miete, `v1241` KI-Knopf, `v1242a–e` Quellen, `v1243`
-> Häkchen und Steuer-Hinweis, `v1244` Kapitaldeckung). Als Nächstes die
-> Blöcke **B, C, G, H, J**. **Das läuft ohne Rückfrage.**
+> **2 · Weiter im Testbericht. Die Blöcke D, E, F und G sind
+> abgeschlossen** (`v1240` Soll-Miete, `v1241` KI-Knopf, `v1242a–e`
+> Quellen, `v1243` Häkchen und Steuer-Hinweis, `v1244` Kapitaldeckung,
+> `v1245` BWK-Quote). Drei Punkte aus G waren schon erledigt: die
+> Sonder-AfA-Erklärung steht vor der Checkbox, zvE ist im Label
+> ausgeschrieben, und die vertauschte Markteinordnung hat `v1178`
+> behoben. Als Nächstes die Blöcke **B, C, H, J**.
+> **Das läuft ohne Rückfrage.**
 >
 > **Drei Entscheidungen liegen bei Marcel und blockieren nichts:**
 > - **Die 8 Objekte ohne Grundbuchamt-Prozentsatz** stehen weiter auf 0 €.
@@ -116,6 +161,12 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 > Zahlen nachgetragen werden, verschiebt Renditen und Scores und
 > **entscheidet Marcel**. (Das ist derselbe Kreis wie die 8 Objekte ohne
 > Grundbuchamt-Prozentsatz — vermutlich dieselbe Ursache.)
+>
+> **Aus `v1245` neu und Marcels Entscheidung:** ob Mietausfall- und
+> BWK-Quoten als **Profileinstellung je Lage** hinterlegbar sein sollen
+> („für Profil Investition C-Lage nimm Mietausfall immer 3 %, für A-Lage
+> 1 %"). Das ist ein Produktbaustein, kein Textfehler — die Quote selbst
+> hat mit `v1245` erst einmal den fehlenden Kontext bekommen.
 >
 > **Ein Nebenbefund wartet auf eine Entscheidung:** `calc.js:2165–2186`
 > schreibt bei jedem Lauf in `cr-wk-other` und `cr-zve-ohne`. **Beide gibt
