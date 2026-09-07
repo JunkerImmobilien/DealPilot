@@ -38,9 +38,9 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 07.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging auf `3e5b758`, **Produktion auf
-`4ae353a`**. **`v1215`–`v1242e` sind live.** Nichts wartet auf einen
-Rollout.
+**Stand:** lokal = GitHub = Staging auf `59217ed`, **Produktion auf
+`4ae353a`**. **`v1215`–`v1242e` sind live**, `v1243`/`v1243b` warten auf
+den naechsten Prod-Rollout (nur Frontend, kein Neubau noetig).
 
 **Zuletzt fertig: `v1242a–e` — die KI-Mietrecherche.** Sie nennt jetzt
 **alle** benutzten Quellen statt einer, prüft **zuerst**, ob es für den Ort
@@ -94,10 +94,9 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 > nur ob es schneller ist, sondern ob die Zahlen noch im richtigen Feld
 > landen.
 >
-> **2 · Weiter im Testbericht. Block E ist abgeschlossen** (`v1240`
-> Soll-Miete, `v1241` KI-Knopf, `v1242a–e` Quellen). Als Nächstes der **Rest
-> von Block D** (Hinweis, was mit den Werten passiert · die Haken, die
-> stehen bevor der Bereich besucht wurde), danach **Block F** (Reihenfolge
+> **2 · Weiter im Testbericht. Block E und Block D sind abgeschlossen**
+> (`v1240` Soll-Miete, `v1241` KI-Knopf, `v1242a–e` Quellen, `v1243`
+> Häkchen und Steuer-Hinweis). Als Nächstes **Block F** (Reihenfolge
 > Kredit/Eigenkapital) und die Blöcke **B, C, G, H, J**.
 > **Das läuft ohne Rückfrage.**
 >
@@ -110,6 +109,12 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 >   umschreiben?
 > - **Die Objektart kennt kein Zweifamilienhaus.** `Zweifamilienhaus` fällt
 >   auf `EFH`, das Testobjekt Löhner Str. 278 ist eines. **Bewertungsfrage.**
+>
+> **Ein Nebenbefund wartet auf eine Entscheidung:** `calc.js:2165–2186`
+> schreibt bei jedem Lauf in `cr-wk-other` und `cr-zve-ohne`. **Beide gibt
+> es in keiner HTML-Datei und im DOM nicht.** Der V258-07-Hook ist eine
+> Anzeige ohne Anzeige — entweder die Zeile „Werbungskosten der anderen
+> Objekte" wirklich bauen oder den Hook entfernen. **Produktfrage.**
 >
 > **Eine fachliche Frage steht offen:** ob und wie der **Zustand** in die
 > KI-Marktmiete eingehen soll. Marcels Anmerkung war „für den Zustand zu
