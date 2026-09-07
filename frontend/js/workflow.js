@@ -448,20 +448,6 @@ window.DealPilotWorkflow = (function() {
     prevWizardStep: prevWizardStep,
     finishWizard: finishWizard,
     getStatus: _getCompletionStatus,
-    /* v1254: die Pflichtfeld-Liste einer Stufe, damit der Eingabemodus
-       weiss, welche Karten er stehen lassen muss. Eine Wahrheit — sie
-       kommt aus denselben FIELD_GROUPS wie die Haken oben. */
-    pflichtfelder: function (modus) {
-      var m = (modus === 'detailliert') ? 'detailliert' : 'einfach';
-      var raus = [];
-      Object.keys(FIELD_GROUPS).forEach(function (k) {
-        (FIELD_GROUPS[k][m] || []).forEach(function (id) {
-          if (raus.indexOf(id) < 0) raus.push(id);
-        });
-      });
-      return raus;
-    },
-    FIELD_GROUPS: FIELD_GROUPS,
     /* v1243: wird vom Reiter-Wechsel gerufen — siehe main.js switchTab */
     merkeBesuch: merkeBesuch
   };
