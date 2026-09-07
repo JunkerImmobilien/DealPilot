@@ -783,3 +783,73 @@ Zufallsparameter an der Seitenadresse (oder Strg+Shift+R beim Menschen).
 
 > Das ist die Umkehrung der bekannten Falle: sonst ist der Buster zu alt,
 > hier war das Dokument zu alt, das ihn trägt.
+
+## Das letzte Beispiel im Prompt schlägt jede Anweisung darüber
+
+`v1242` verlangte an drei Stellen mehrere Quellen und einen amtlichen
+Mietspiegel. Der erste echte Lauf gegen Bielefeld brachte trotzdem:
+
+```
+"reasoning": "Mietspiegel Bielefeld 2024"
+"sources":   [ { "label": "Mietspiegel Bielefeld 2024" } ]
+```
+
+Genau eine Quelle — und ein `reasoning`, das keins war, sondern ein
+Quellenname. **Beides stand so im Beispiel-JSON am Ende des Prompts.** Das
+Beispiel zeigte gar kein `sources` und trug in `reasoning` „Mietspiegel
+Herford 2024".
+
+**Ein Modell kopiert das Beispiel, nicht die Regel.** Wer einen Prompt
+ändert, ändert das Beispiel mit — sonst hat er zwei Prompts geschrieben,
+die sich widersprechen, und der letzte gewinnt. Nach der Korrektur des
+Beispiels kamen im selben Lauf zwei bis drei Quellen und echte
+Begründungen.
+
+## `node --check` sieht keinen Scope-Fehler
+
+`_renderQuellen` und `_renderSrcLink` in `ki-miete.js` benutzten `_esc`.
+`_esc` war **innerhalb** von `runKiMiete()` definiert, die neuen Funktionen
+standen daneben auf Modulebene. `node --check` meldete `OK`.
+
+Syntaktisch war die Datei tadellos; zur Laufzeit hätte die erste Quelle
+einen `ReferenceError` geworfen. Die Datei hat kein IIFE, also sieht man
+den Unterschied nicht an der Einrückung allein — man muss die Klammern
+zählen.
+
+**`node --check` beweist, dass die Datei geparst werden kann, sonst
+nichts.** Wer eine Hilfsfunktion aus einer bestehenden Funktion
+mitbenutzt, prüft zuerst, wo sie definiert ist.
+
+## Eine Sperrliste von Portalen kann man nicht fertigschreiben
+
+Die KI-Mietrecherche lieferte eine kommerzielle Preisstatistik unter dem
+Namen „Mietspiegel Hüllhorst 2026". `v1242c` sperrte `immoportal`; der
+nächste Lauf brachte `immobilienscout24`, der übernächste
+`miete-aktuell.de`, der dritte `ohne-makler.net`.
+
+**Es gibt beliebig viele Portale und je Ort genau eine amtliche Stelle.**
+`v1242e` dreht die Frage um: nicht „ist das ein bekanntes Portal?",
+sondern „*kann* dieser Host überhaupt amtlich sein?" — trägt er den
+Ortsnamen (`huellhorst.de`, `kreis-minden-luebbecke.de`) oder gehört er zu
+einer amtlichen Stelle (IHK, `bund.de`, destatis, IT.NRW)? Elf Testfälle,
+elf Treffer.
+
+> Fachlich dahinter: ein Mietspiegel ist nach §§ 558c/558d BGB eine
+> Übersicht der ortsüblichen Vergleichsmiete, erstellt von der Gemeinde
+> oder gemeinsam von den Interessenvertretern. Eine Portal-Preisstatistik
+> ist das nicht, egal wie ihre Seite heißt.
+
+## Ein Skript-Klick auf eine Objektkarte legt ein neues Objekt an
+
+Gemessen am 07.09.2026: `document.querySelectorAll('.sb-card')[0].click()`
+lud die Daten von `2026-001` in das leere Startformular, und der Auto-Save
+speicherte sie als **neues** Objekt `2026-1011` (Version 1, DSCR 0).
+
+Der Gegentest mit einem echten Mausklick auf dieselbe Karte: die Anzahl
+blieb bei zehn, kein neues Objekt. **Kein Produktfehler, ein
+Messartefakt** — dieselbe Familie wie „script-getriebenes Füllen feuert
+kein `change`".
+
+**Wer im Browser misst, klickt echt.** Und wer per Skript geklickt hat,
+zählt hinterher die Objekte, bevor er einen Fehler meldet — oder
+Testdaten hinterlässt.
