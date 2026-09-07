@@ -204,7 +204,13 @@ window.DealPilotInvestmentProfile = (function() {
 
       '<h3 class="ip-section">Bewirtschaftung</h3>',
       '<div class="ip-grid">',
-        field('ip_bwk_anteil_default', 'Bewirtschaftungs-Anteil', p.bwk_anteil_default, '% der NKM', 'nicht-umlagefähig, Schätzwert'),
+        /* v1257 · Marcels Wunsch: „Mietausfall und BWK-Quote kannst du gerne
+           in die Einstellungen packen." Die nicht-umlagefähige Quote stand
+           hier schon — sie kam nur nie im Formular an (siehe main.js
+           _dpProfil). Jetzt wirken alle drei. */
+        field('ip_bwk_ul_pct_default', 'Bewirtschaftung umlagefähig', p.bwk_ul_pct_default, '% der NKM', 'Hausgeld umlagefähig, Grundsteuer — typisch 15–20 %'),
+        field('ip_bwk_anteil_default', 'Bewirtschaftung nicht umlagefähig', p.bwk_anteil_default, '% der NKM', 'Verwaltung, Rücklagen — typisch 15–22 %'),
+        field('ip_mietausfall_pct', 'Kalkulatorischer Mietausfall', p.mietausfall_pct, '% der NKM', 'wird beim neuen Objekt in Euro umgerechnet — A-Lage eher 1 %, C-Lage eher 3 %'),
         (function(){ var presets = ['','0.5','1.0','1.5','2.0','2.5','3.0','4.0','5.0']; var cur = (p.hausgeld_pct != null && p.hausgeld_pct !== '') ? String(p.hausgeld_pct) : ''; var isP = presets.indexOf(cur) >= 0; var o = [['','— (aus)'],['0.5','0,5 % vom KP / Jahr'],['1.0','1,0 %'],['1.5','1,5 %'],['2.0','2,0 %'],['2.5','2,5 %'],['3.0','3,0 %'],['4.0','4,0 %'],['5.0','5,0 %']].map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===(isP?cur:'')?' selected':'')+'>'+x[1]+'</option>'; }).join(''); return '<div class="ip-field"><label for="ip_hausgeld_sel">Hausgeld-Annahme</label><div class="ip-field-row"><select id="ip_hausgeld_sel">'+o+'</select></div><div class="ip-hint">Anteil vom Kaufpreis p.a. — Fallback — nur wenn keine Wohnfläche vorliegt (sonst Wohnflächen-Schätzung)</div></div>'; })(),
         field('ip_hausgeld_pct', 'Eigener Hausgeld-Anteil (optional)', (p.hausgeld_pct != null && ['0.5','1.0','1.5','2.0','2.5','3.0','4.0','5.0',''].indexOf(String(p.hausgeld_pct)) < 0) ? p.hausgeld_pct : '', '% vom KP/Jahr', 'übersteuert die Schnellauswahl'),
       '</div>',
@@ -259,7 +265,9 @@ window.DealPilotInvestmentProfile = (function() {
       zins_margin:            s('ip_zins_margin'),
       hausgeld_pct:           (function(){ var own = v('ip_hausgeld_pct'); if (own != null) return own; var sl = s('ip_hausgeld_sel'); if (sl != null && String(sl).trim() !== '') { var n2 = parseFloat(String(sl).replace(',', '.')); return isFinite(n2) ? n2 : null; } return null; })(),
       ek_quote_default:       v('ip_ek_quote_default'),
+      bwk_ul_pct_default:     v('ip_bwk_ul_pct_default'),
       bwk_anteil_default:     v('ip_bwk_anteil_default'),
+      mietausfall_pct:        v('ip_mietausfall_pct'),
       min_dscr:               v('ip_min_dscr'),
       min_cashflow_vor_st:    v('ip_min_cashflow_vor_st'),
       max_ltv:                v('ip_max_ltv'),

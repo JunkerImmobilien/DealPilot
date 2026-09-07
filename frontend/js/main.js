@@ -4,8 +4,46 @@
    Initialisierung und Event-Binding
 ═══════════════════════════════════════════════════ */
 
+/* ─── v1257 · setDefaults fragt das Investmentprofil ───────────────────
+   Marcels Auftrag: „Mietausfall und BWK-Quote kannst du gerne in die
+   Einstellungen packen."
+
+   Beim Messen kam heraus, dass die Einstellungen, die es schon gab,
+   NICHTS TATEN. Zwei Gründe, beide unabhängig voneinander tödlich:
+
+   1. `applyToNewObject()` in investment-profile.js setzte Felder, die es
+      nicht gibt: `tilgung` (heisst d1t), `zinsbindung` (d1_bindj),
+      `grenzsteuersatz` (grenz), `notar_pct` (notar_p), `makler_pct`
+      (makler_p). Von neun angesprochenen IDs existierten zwei.
+   2. Selbst mit richtigen IDs wäre nichts passiert: `setIfEmpty()`
+      schreibt nur in LEERE Felder — und setDefaults() hier hatte sie
+      längst gefüllt.
+
+   Der Beweis, am 07.09.2026 im Browser gefahren: Tilgung 3,7 %,
+   Grenzsteuersatz 33,3 % und BWK 27 % ins Profil geschrieben, neues
+   Objekt angelegt — heraus kamen d1t=1, grenz=40,45, BWK leer. Kein
+   einziger Wert kam an.
+
+   Jetzt ist DIESE Funktion die eine Stelle, an der die Vorgaben
+   entstehen, und sie fragt zuerst das Profil. Die Rückfallwerte sind
+   exakt die bisherigen — und die Profil-Vorgaben in config.js wurden an
+   sie angeglichen. Wer nichts einstellt, bekommt also genau wie bisher.
+   Erst wer etwas einträgt, merkt einen Unterschied. */
+function _dpProfil(schluessel, rueckfall) {
+  try {
+    if (window.DealPilotInvestmentProfile &&
+        typeof window.DealPilotInvestmentProfile.get === 'function') {
+      var v = window.DealPilotInvestmentProfile.get(schluessel);
+      if (v !== undefined && v !== null && v !== '' && !isNaN(parseFloat(v))) {
+        return parseFloat(v);
+      }
+    }
+  } catch (e) {}
+  return rueckfall;
+}
+
 function setDefaults() {
-  sv('notar_p', 2.20);
+  sv('notar_p', _dpProfil('notar_grundbuch', 2.20));
   /* v1238 · Testbericht Block D: „Grundbuchamt mit 0,5 % vorbelegen — der
      Anwender kennt den Wert nicht."
      Gemessen am 04.09.2026: `gba_p` stand in dieser Liste als EINZIGE der
@@ -20,8 +58,8 @@ function setDefaults() {
   sv('gest_p',  6.50);
   sv('ji_p',    1.50);
   sv('d1z',     3.50);
-  sv('d1t',     1.00);
-  sv('d1_bindj',10);
+  sv('d1t',     _dpProfil('tilgung_default', 1.00));
+  sv('d1_bindj',_dpProfil('zinsbindung_default', 10));
   sv('mietstg', 3.0);
   sv('wertstg', 1.5);
   sv('kostenstg', 1.0);
@@ -32,7 +70,27 @@ function setDefaults() {
   sv('anschl_bj', 15);
   // zaer wird automatisch aus anschl_z - d1z berechnet
   sv('geb_ant',  80);
-  sv('grenz',    40.45);
+  sv('grenz',    _dpProfil('grenzsteuersatz', 40.45));
+  /* v1257 · Die Bewirtschaftungsquoten und der Mietausfall kommen jetzt
+     ebenfalls aus dem Profil. Bisher standen 17 und 16 als `value=` fest
+     im HTML — ein Wert, den man nur durch Überschreiben loswird, und der
+     bei jedem neuen Objekt wiederkommt. Der Mietausfall hatte gar keine
+     Vorgabe.
+     Die Rückfallwerte sind exakt die bisherigen HTML-Werte. */
+  sv('bwk_ul_pct',  _dpProfil('bwk_ul_pct_default', 17));
+  sv('bwk_nul_pct', _dpProfil('bwk_anteil_default', 16));
+  /* Der kalkulatorische Mietausfall steht in EURO im Formular, das Profil
+     führt ihn als Prozentsatz der Jahres-Nettokaltmiete. Ohne Miete gibt
+     es nichts zu rechnen — dann bleibt das Feld leer, statt eine Null zu
+     behaupten. */
+  (function () {
+    var pct = _dpProfil('mietausfall_pct', 0);
+    var nkmEl = document.getElementById('nkm');
+    var nkm = nkmEl ? parseFloat(String(nkmEl.value || '').replace(/\./g, '').replace(',', '.')) : 0;
+    if (pct > 0 && isFinite(nkm) && nkm > 0) {
+      sv('mietausfall', Math.round(nkm * 12 * pct / 100));
+    }
+  })();
   sv('btj', '15');
 }
 
