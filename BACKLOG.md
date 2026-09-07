@@ -38,8 +38,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 07.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging auf `59217ed`, **Produktion auf
-`4ae353a`**. **`v1215`–`v1242e` sind live**, `v1243`/`v1243b` warten auf
+**Stand:** lokal = GitHub = Staging auf `5a338dd`, **Produktion auf
+`4ae353a`**. **`v1215`–`v1242e` sind live**, `v1243`–`v1244b` warten auf
 den naechsten Prod-Rollout (nur Frontend, kein Neubau noetig).
 
 **Zuletzt fertig: `v1242a–e` — die KI-Mietrecherche.** Sie nennt jetzt
@@ -94,11 +94,10 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 > nur ob es schneller ist, sondern ob die Zahlen noch im richtigen Feld
 > landen.
 >
-> **2 · Weiter im Testbericht. Block E und Block D sind abgeschlossen**
+> **2 · Weiter im Testbericht. Die Blöcke D, E und F sind abgeschlossen**
 > (`v1240` Soll-Miete, `v1241` KI-Knopf, `v1242a–e` Quellen, `v1243`
-> Häkchen und Steuer-Hinweis). Als Nächstes **Block F** (Reihenfolge
-> Kredit/Eigenkapital) und die Blöcke **B, C, G, H, J**.
-> **Das läuft ohne Rückfrage.**
+> Häkchen und Steuer-Hinweis, `v1244` Kapitaldeckung). Als Nächstes die
+> Blöcke **B, C, G, H, J**. **Das läuft ohne Rückfrage.**
 >
 > **Drei Entscheidungen liegen bei Marcel und blockieren nichts:**
 > - **Die 8 Objekte ohne Grundbuchamt-Prozentsatz** stehen weiter auf 0 €.
@@ -109,6 +108,14 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 >   umschreiben?
 > - **Die Objektart kennt kein Zweifamilienhaus.** `Zweifamilienhaus` fällt
 >   auf `EFH`, das Testobjekt Löhner Str. 278 ist eines. **Bewertungsfrage.**
+>
+> **Und ein zweiter Befund aus `v1244`, der Marcel gehört:** die
+> **8 Objekte mit Deckungslücke**. Bei `2026-001` fehlen 20.400 € — die
+> Erwerbsnebenkosten sind weder finanziert noch als Eigenkapital
+> eingetragen. Die neue Zeile zeigt es jetzt bei jedem Objekt an; ob die
+> Zahlen nachgetragen werden, verschiebt Renditen und Scores und
+> **entscheidet Marcel**. (Das ist derselbe Kreis wie die 8 Objekte ohne
+> Grundbuchamt-Prozentsatz — vermutlich dieselbe Ursache.)
 >
 > **Ein Nebenbefund wartet auf eine Entscheidung:** `calc.js:2165–2186`
 > schreibt bei jedem Lauf in `cr-wk-other` und `cr-zve-ohne`. **Beide gibt

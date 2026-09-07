@@ -7858,6 +7858,108 @@ fiel weg statt sich durchzusetzen.
 2. `v1243`/`v1243b` sind auf Staging, **noch nicht auf Prod** (Prod steht
    auf `4ae353a`).
 
+## Rollout-Journal · 07.09.2026, dritter Teil — Block F: die Kapitaldeckung
+
+**Was.** Die zwei Anmerkungen aus Block F des Testberichts.
+
+**1 · „Sollte hier die Reihenfolge nicht anders sein? Erst eintragen was
+für ein Kredit ich bekomme und den EK-Einsatz berechnet er automatisch
+(wie Immocation Tool)"**
+
+> **Die Messung ergab etwas Schlimmeres als eine falsche Reihenfolge: es
+> gab gar keine.** Eigenkapital und Darlehen waren zwei völlig
+> unabhängige Zahlen.
+>
+> | | EK | Darlehen |
+> |---|---|---|
+> | vorher | 20.000 | 180.000 |
+> | EK auf 99.000 gesetzt | 99.000 | **180.000** (unverändert) |
+> | Darlehen auf 150.000 | **20.000** (unverändert) | 150.000 |
+>
+> Und im gespeicherten Zustand von `2026-001`: **Gesamtinvestition
+> 220.400 €, Eigenkapital plus Darlehen 200.000 €.** Die
+> Erwerbsnebenkosten waren weder finanziert noch als Eigenkapital
+> eingetragen — 20.400 € fehlten, und nichts sagte es. Die EK-Rendite
+> rechnete weiter auf 20.000 € statt auf 40.400 € und sah deshalb zu gut
+> aus.
+
+`v1244` setzt eine Zeile unter die Darlehenssumme, die die Rechnung offen
+zeigt (`EK + Darlehen = Deckung` gegen `Gesamtinvestition`), grün bei
+Deckung färbt, rot bei Fehlbetrag, gold bei Überdeckung — und zwei Knöpfe
+anbietet: *Eigenkapital passend setzen* (Marcels Weg) und *Darlehen
+passend setzen*. **Keiner der beiden Wege wird verbaut.**
+
+**2 · „Warum muss ich hier zu Bewertung schon die Bank eintragen?"**
+
+Berechtigt. Institution und Vertragsnummer gehen in keine Rechnung ein,
+standen aber als Erstes in der Karte — vor Eigenkapital, Darlehen, Zins
+und Tilgung. Jetzt zugeklappt unter *„Vertragsdaten der Bank — optional,
+gehen in keine Rechnung ein"*. Nicht verschoben: die Reihenfolge im DOM
+bleibt, nur der Weg zur Rendite wird kürzer.
+
+**Commits.** `edc9290` (`v1244`) · `d38bcc2` (`v1244b`) · `5a338dd`
+(FALLEN). Nur Frontend — kein Neubau nötig.
+
+**Nachweis.** Sauberer Lauf auf Staging, `2026-001` über `loadSaved()`
+geladen (die Funktion, die auch der Kartenklick aufruft):
+
+- `State.gi` = 220400 (Zahl), `v()` unverfälscht, Zeile: *„Es fehlen
+  20.400 €. Eigenkapital und Darlehen decken die Gesamtinvestition nicht
+  — die EK-Rendite rechnet dann auf zu wenig eingesetztes Kapital und
+  sieht zu gut aus."*
+- *Eigenkapital passend setzen* → **40.400 €** (Soll: 220.400 − 180.000),
+  danach „Kapitaldeckung stimmt".
+- *Darlehen passend setzen* → **200.400 €** (Soll: 220.400 − 20.000),
+  danach „Kapitaldeckung stimmt".
+- Danach auf den Ausgangsstand zurückgesetzt und gespeichert. In der
+  Datenbank: `2026-001` mit `ek 20000`, `d1 180000`, `kp 200000`,
+  Score **84** — wie vorher. Neun Objekte, wie vorher.
+
+### `v1244b` ist eine Korrektur an mir selbst
+
+**Ich habe im Browser einen Produktfehler gemeldet, den es nicht gab.**
+Meine Messskripte enthielten mehrfach
+
+```js
+function v(id){ var e=document.getElementById(id); return e? e.value : null; }
+```
+
+Eine Funktionsdeklaration auf oberster Ebene ist global — und
+`calc.js:59` heißt ebenfalls `v()`. Ab dem ersten solchen Skript lieferte
+`v('kp')` einen String, `calc.js:756` verkettete `kp + nk` zu
+`"20000020400"`, `State.gi` war ein String und `calc()` brach mit
+`n.toFixed is not a function` ab. Mit wiederhergestellter `v()` steht
+dort 220400 als Zahl. **Zurückgenommen.**
+
+Der Fehler war meiner, zwei Härtungen bleiben:
+
+1. `_gesamtinvestition()` prüft nicht mehr den **Typ**, sondern erzwingt
+   `Number()` und plausibilisiert gegen den Kaufpreis (die
+   Gesamtinvestition kann nie kleiner sein); zweite Quelle ist
+   `State.kpis.gi`. Vorher fiel die Prüfung bei einem String stumm auf
+   den Kaufpreis zurück — und meldete eine falsche Lücke, ohne das
+   anzuzeigen.
+2. Der `calc`-Hook überträgt jetzt die Marker der alten Funktion.
+   `window.calc` ist bereits **zweimal** umhüllt (`financing.js:576` und
+   `deal-action-readycheck.js:208`); letzteres erkennt an `_v450Wrapped`,
+   ob es schon gewrappt hat. Mein Wrapper hätte diesen Marker
+   verschluckt.
+
+**Rest.**
+
+1. **Zwei Testobjekte selbst erzeugt und wieder entfernt.** `2026-1011`
+   entstand aus einem Skript-Klick auf eine Objektkarte, `2026-1012` aus
+   einem `dpTabSwitchSave()` ohne geladenes Objekt. Beide gelöscht,
+   Endstand neun Objekte. `2026-001` steht auf Version 771 statt 762 —
+   inhaltlich unverändert, jedes Feld nachgeprüft.
+2. **Die Maussteuerung des Browser-Werkzeugs ist während der Sitzung
+   ausgefallen** und meldete weiter „Clicked at …", während ein
+   Klick-Protokoll im DOM leer blieb. Ein neuer Tab half nicht. Die
+   Abnahme lief deshalb über `loadSaved()` und `.click()` auf den echten
+   Knopf-Elementen — der Bedienweg, aber ohne echte Maus.
+3. `v1243`–`v1244b` sind auf Staging, **noch nicht auf Prod** (Prod steht
+   auf `4ae353a`).
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
