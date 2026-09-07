@@ -2305,10 +2305,23 @@ label.dp-required.qc-required::after {
   <div class="col2">
     <div>
       <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bank"/></svg></span>Darlehen I – Hauptdarlehen</div>
-        <div class="g2">
-          <div class="f"><label>Institution</label><input id="bank_inst" type="text" placeholder="Bank / Kreditinstitut"></div>
-          <div class="f"><label>Vertragsnummer</label><input id="d1_vertrag" type="text" placeholder="z.B. KD-2025-001"></div>
-        </div>
+        <!-- v1244 · Testbericht Block F: „Warum muss ich hier zu Bewertung
+             schon die Bank eintragen? Bin ich falsch abgebogen und lege
+             gerade einfach nur ein neues Objekt an? Ich dachte ich wäre im
+             schnellen Onboarding."
+             Berechtigt: Institution und Vertragsnummer gehen in keine
+             Rechnung ein — sie sind Verwaltungsdaten für ein Objekt, das man
+             schon gekauft hat. Sie standen trotzdem als Erstes in der Karte,
+             vor Eigenkapital, Darlehen, Zins und Tilgung. Nicht verschoben,
+             sondern zugeklappt: die Reihenfolge im DOM bleibt, der Weg zur
+             Rendite wird kürzer. -->
+        <details class="dp-erkl" style="margin-bottom:10px">
+          <summary style="cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted)">Vertragsdaten der Bank <span class="cf-hint" style="font-weight:400">— optional, gehen in keine Rechnung ein</span></summary>
+          <div class="g2" style="margin-top:8px">
+            <div class="f"><label>Institution</label><input id="bank_inst" type="text" placeholder="Bank / Kreditinstitut"></div>
+            <div class="f"><label>Vertragsnummer</label><input id="d1_vertrag" type="text" placeholder="z.B. KD-2025-001"></div>
+          </div>
+        </details>
         <!-- V63.57: Darlehenstyp-Auswahl für D1 -->
         <div class="g2">
           <div class="f"><label>Art des Darlehens</label>
@@ -2330,6 +2343,26 @@ label.dp-required.qc-required::after {
           </label>
         </div>
         <div class="f"><label class="dp-required" data-v236-required-set="1">Anfängl. Darlehenssumme</label><div class="iw"><span class="pfx">€</span><input id="d1" type="text" inputmode="decimal" placeholder="200000" class="trl" oninput="calc()"></div></div>
+        <!-- v1244 · Testbericht Block F: „Sollte hier die Reihenfolge nicht
+             anders sein? Erst eintragen was fuer ein Kredit ich bekomme und
+             den EK-Einsatz berechnet er automatisch (wie Immocation Tool)"
+             Gemessen ergab: es gibt gar keine Reihenfolge. Eigenkapital und
+             Darlehen sind voellig unabhaengig — EK auf 99.000 gesetzt liess
+             das Darlehen bei 180.000 stehen, und umgekehrt. Bei Objekt
+             2026-001 standen 20.000 EK + 180.000 Darlehen gegen eine
+             Gesamtinvestition von 220.400 EUR: 20.400 EUR fehlten, ohne dass
+             es irgendwo stand. Die EK-Rendite rechnete trotzdem auf 20.000.
+             Diese Zeile schliesst die Luecke in beide Richtungen. -->
+        <div class="f" id="kapital-deckung" style="margin-top:2px">
+          <div id="kd-box" style="border-radius:10px;padding:10px 14px;font-size:12.5px;line-height:1.55;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <div style="flex:1;min-width:230px">
+              <div id="kd-zeile"><span class="cf-hint">Kapitaldeckung wird berechnet …</span></div>
+              <div id="kd-rechnung" class="cf-hint" style="margin-top:3px"></div>
+            </div>
+            <button type="button" class="btn btn-outline btn-sm" id="kd-btn-ek" onclick="dpKapitalEkSetzen()" style="display:none">Eigenkapital passend setzen</button>
+            <button type="button" class="btn btn-outline btn-sm" id="kd-btn-d1" onclick="dpKapitalDarlehenSetzen()" style="display:none">Darlehen passend setzen</button>
+          </div>
+        </div>
         <div class="g2">
           <div class="f"><label class="dp-required" data-v236-required-set="1">Zinssatz nominal (% p.a.) <button type="button" class="dp-tip" data-tip-id="tab5.zinsbindung" tabindex="-1" aria-label="Hilfe zu tab5.zinsbindung"></button></label><div class="iw"><input id="d1z" type="text" inputmode="decimal" value="3.50" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
           <div class="f" id="d1t_field"><label class="dp-required" data-v236-required-set="1">Tilgung (% p.a.) <span class="cf-hint" id="d1t_hint" style="display:none">— bei Aussetzung deaktiviert</span> <button type="button" class="dp-tip" data-tip-id="tab5.tilgung" tabindex="-1" aria-label="Hilfe zu Tilgung"></button></label><div class="iw"><input id="d1t" type="text" inputmode="decimal" value="2.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
@@ -3247,7 +3280,7 @@ label.dp-required.qc-required::after {
 <script src="js/star-rating.js?v=364"></script>
 <script src="js/pdf-import.js?v=477"></script>
 <script src="js/beleg-import.js?v=v1188"></script>
-<script src="js/financing.js?v=124"></script>
+<script src="js/financing.js?v=v1244"></script>
 <script src="js/financing-pdf.js?v=20260611105943"></script>
 <script src="js/immokalk-import.js?v=124"></script>
 <script src="js/import-export-modal.js?v=893u"></script>
