@@ -85,7 +85,11 @@ function _mapResidentialArea(balkonRaw) {
 function _category(objart) {
   var o = String(objart || '').toUpperCase();
   if (o === 'ETW') return { category: 'ETW' };
-  if (o === 'EFH') return { category: 'EFH' };
+  /* v1256: ZFH auf EFH abbilden. Sprengnetter kennt keine eigene Kategorie,
+     und fachlich ist das richtig: NHK 2010 und BMF-Arbeitshilfe fuehren
+     Ein- und Zweifamilienhaeuser als eine Gruppe. Ohne diese Zeile faende
+     ein ZFH gar keine Kategorie und bekaeme keine Bewertung. */
+  if (o === 'EFH' || o === 'ZFH') return { category: 'EFH' };
   if (o === 'MFH') return { category: 'MFH' };
   if (o === 'DHH') return { category: 'EFH', construction: 'DOPPELHAUS' };
   if (o === 'RH')  return { category: 'EFH', construction: 'REIHEN_MITTELHAUS' };

@@ -183,6 +183,10 @@ function mapObjart(it) {
   if (/hotel/.test(s)) return 'HOTEL';
   if (/garage|stellplatz/.test(s)) return 'GAR';
   if (/gewerbe|industrie/.test(s)) return 'GEW';
+  /* v1256: ZFH VOR EFH prüfen. „Zweifamilienhaus" enthält kein
+     „einfamilien", aber „haus" — es wäre in der Zeile darunter als EFH
+     durchgerutscht. Reihenfolge ist hier die ganze Logik. */
+  if (/zweifamilien|\bzfh\b/.test(s)) return 'ZFH';
   if (/einfamilien|\befh\b|housebuy|haus/.test(s)) return 'EFH';
   return 'ETW';
 }
