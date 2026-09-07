@@ -8329,6 +8329,36 @@ damit im Dashboard nichts Irreführendes stehenbleibt. Reversibel,
 harmlos, und es räumt genau das auf, was aufgefallen ist. Nicht getan —
 Marcels Entscheidung.
 
+## Rollout-Journal · 07.09.2026, achter Teil — `v1247`, Block C
+
+**Was.** Zwei Punkte aus Block C des Testberichts.
+
+**1 · „DS2? Kein Informationsgehalt – muss das da rein?"** Gemessen:
+sechs Etiketten tragen das Kürzel, **keines** hatte einen `title`. Jetzt
+erklärt jedes sich selbst — *„Investor Deal Score (DS2): Dieses Feld
+fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der
+Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern
+ausgelassen."* Dazu `cursor:help` und eine gepunktete Linie.
+
+**2 · „Hausform: Mehrfamilienhaus kann ich hier nicht anklicken?"**
+Fachlich ist die Auswahl **richtig** — die NHK 2010 kennen die Hausform
+nur bei Ein- und Zweifamilienhäusern. Verwirrend war die Überschrift:
+*„nur Häuser"* schließt das MFH gerade nicht aus. Jetzt *„nur Ein- und
+Zweifamilienhäuser"* plus ein Satz, der sagt warum und dass hier kein
+Feld fehlt.
+
+> **Nebenbefund, nicht geändert:** der Block hängt gar nicht an der
+> Objektart. Über die Elternkette gemessen — er steckt allein in einem
+> zugeklappten Bereich und erscheint bei einer ETW genauso, sobald man
+> aufklappt. Ihn nach Objektart zu steuern wäre die saubere Lösung; das
+> ist eine Bewertungsentscheidung und gehört Marcel.
+
+**Commits.** `4d9c8fd` (`v1247`) · `762f02a` (Prod-Merge). Nur Frontend.
+
+**Nachweis.** Auf Staging und Prod: `style.css?v=v1247`, sechs Etiketten
+mit Titel, `cursor: help`, `border-bottom: dotted`; NHK-Überschrift und
+Hinweis stehen.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

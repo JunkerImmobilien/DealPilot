@@ -1184,3 +1184,32 @@ untrennbar zum Konto. Löschbar wäre nur eine Sandbox — und die ist die,
 die Staging benutzt.
 
 **Wer „ein Konto zu viel" sieht, prüft erst, ob es eines ist.**
+
+## Ein Kürzel ohne Titel erklärt nichts — auch nicht dem Fachmann
+
+Sechs Felder trugen das Etikett `DS2`. Gemessen am 07.09.2026: **keines
+hatte einen `title`.** Der Tester, DESAG-zertifizierter
+Sachverständiger, fragte: *„DS2? Kein Informationsgehalt – muss das da
+rein?"*
+
+**Wenn der Fachmann an einer Stelle stutzt, versteht sie sonst
+niemand.** Ein Kürzel im Interface ist eine Abkürzung für den, der es
+gebaut hat — für alle anderen ist es Rauschen, bis es sich erklärt.
+
+## Eine Überschrift, die ausschließen soll, muss die Ausnahme benennen
+
+Der NHK-Block hieß *„Gebäudeart nach NHK 2010 · nur Häuser"*. Die
+Auswahl darunter kennt nur freistehendes Ein-/Zweifamilienhaus,
+Doppelhaus und Reihenmittelhaus — **kein Mehrfamilienhaus**.
+
+Fachlich ist das richtig: die NHK 2010 kennen die Hausform nur bei Ein-
+und Zweifamilienhäusern. **Aber „nur Häuser" schließt das
+Mehrfamilienhaus gerade nicht aus** — es lädt dazu ein, es dort zu
+suchen. Jetzt: „nur Ein- und Zweifamilienhäuser", mit einem Satz, der
+sagt warum, und ausdrücklich, dass hier kein Feld fehlt.
+
+> **Nebenbefund, gemessen über die Elternkette:** der Block hängt gar
+> nicht an der Objektart. Er steckt allein in einem zugeklappten Bereich
+> (`.v212-collapse-body`) und erscheint bei einer Eigentumswohnung
+> genauso, sobald man aufklappt. Wer eine Fläche „nur für X" nennt, sollte
+> sie auch nur bei X zeigen.
