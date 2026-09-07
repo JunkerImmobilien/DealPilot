@@ -8042,6 +8042,115 @@ Verwaltung. Die Zeile steht sichtbar unter der Gesamtquote.
    ist ein Produktbaustein, kein Textfehler.
 4. `v1244c`/`v1245` sind auf Staging, **noch nicht auf Prod**.
 
+## Rollout-Journal · 07.09.2026, fünfter Teil — die Preisrunde (`v1246`)
+
+**Was.** Marcels Preisvorgaben vom 07.09.2026, vollständig umgesetzt.
+
+| | vorher | jetzt |
+|---|---|---|
+| Starter | 19,99 / 199 | 19,99 / **219** |
+| Investor | 39,99 / 399 | **34,99** / **384** |
+| Pro | 79,99 / 799 | **49,99** / **549** |
+
+Jährlich gab es **zwei** Freimonate, jetzt **einen** — die Jahrespreise sind
+elf Monatsbeiträge, auf glatte Euro abgerundet wie bisher (219,89 → 219;
+384,89 → 384; 549,89 → 549). Die Ersparnis-Angaben ziehen mit: 21 / 36 / 51 €.
+
+**„3 Speicherungen" bei Free.** Marcel: *„Da kann ich mir gerade gar nichts
+mehr darunter vorstellen."*
+
+> **Zu Recht — gemessen:** `max_saves` steht in `config.js`, wurde in
+> `settings.js` angezeigt und auf den Preiskarten genannt. **Kein einziger
+> Prüfcode liest es.** Ein Limit, das nichts begrenzt, ist kein
+> Leistungsmerkmal, sondern eine Behauptung. Ersetzt durch *„4 Wochen voller
+> Pro-Umfang"* — das gibt es wirklich. Der Wert bleibt in `config.js` stehen,
+> weil `reseller-portal.js:610` ihn setzt.
+
+**Erstflug.** Anzeige aus, Rabatt bleibt vermerkt: `ANZEIGE_AKTIV = false`,
+`ERSTFLUG_PROZENT = 15` (war 16), Name bleibt *Erstflug*. Die Datei bleibt
+vollständig stehen — sie wird wieder gebraucht, und ein Schalter ist
+ehrlicher als ein Rückbau, der später falsch wiederaufgebaut wird.
+
+> **Was der Kunde bis heute sah, war ohnehin kaputt.** Gemessen auf der
+> Staging-Landing stand in der Pro-Karte
+>
+> ```html
+> <span class="dpp-old">79,99 €</span><b>79,98</b>
+> ```
+>
+> — ein „Altpreis", der **nicht durchgestrichen** war
+> (`text-decoration: none`), daneben ein „neuer", der **einen Cent** darunter
+> lag. Ein Rabatt von einem Cent, doppelt gedruckt.
+
+> **Achtung, die Datei liegt zweimal:** `frontend/js/promo-erstflug.js` und
+> `frontend/landing/promo-erstflug.js`, bitgleich bis auf die Zeilenenden
+> (mit `diff --strip-trailing-cr` geprüft). Beide geändert — sonst hätte die
+> **App** den Rabatt weiter gezeigt, während die Landing ihn nicht mehr hat.
+
+**Nachkauf.** Die Sektion *„Mehr Reichweite. Ohne Abo."* (`id=kerosin-tanken`,
+627 px, vier Pakete zu 7,90 / 19,90 / 39,90 / 69,90 €) ist raus. An ihre
+Stelle tritt eine Regel **ohne eigene Preistabelle**: dasselbe
+Monatskontingent noch einmal für ein Viertel des Monatsbeitrags.
+`nachkaufFuer(plan)` leitet das aus `PRICING` ab, statt eine zweite Tabelle
+zu führen — genau daran sind die Flugklassen gescheitert (siehe unten).
+
+| Plan | Menge | Preis |
+|---|---|---|
+| Starter | 5 (5 · 0 · 0) | **5,00 €** |
+| Investor | 10 (5 · 5 · 0) | **8,75 €** |
+| Pro | 15 (5 · 5 · 5) | **12,50 €** |
+
+### Drei Leichen, beim Messen gefunden
+
+1. **Die „Flugklassen" auf der Landing** — ein zweiter vollständiger
+   Preis-Datensatz mit 29/290 und Kerosin-Litern (`fuel: '2 L'`). Sein Ziel
+   `#fkGrid` gibt es im HTML nicht mehr. **Er war nicht nur überflüssig:**
+   `if(!g) return;` brach den *ganzen* Block ab, und alles danach lief nie —
+   der Feature-Phasen-Wechsel stand still, `#luFeat` hatte vier Phasen und
+   **keine** trug die Klasse `d`. Entfernt; nach dem Rollout sind es **zwei**.
+2. **`frontend/landing/assets/pricing-plugin.js`** wird von keiner Seite
+   geladen und stand auf **29 / 59 / 99** — dem Stand vor `v1176`. Nicht
+   gelöscht (eine Datei, die man nicht laden sieht, kann trotzdem eingebunden
+   sein), aber die Preise mitgezogen und ein Warnkopf davor.
+3. **Der Reseller-Absatz** nannte 39,99 € und zwei Freimonate; beides
+   nachgezogen.
+
+**Commits.** `979a45c` (`v1246`) · `b1cea80` (`v1246b`).
+
+**Nachweis.** Nach dem Rollout auf Staging gemessen:
+
+- **Landing:** Preise 19,99 / 34,99 / 49,99; jährlich 219 / 384 / 549 mit
+  „spart 21 / 36 / 51 € / Jahr"; **kein** `.dpp-old` mehr, **kein**
+  Promo-Banner; Free-Karte trägt „4 Wochen voller Pro-Umfang"; die
+  Nachkauf-Sektion ist weg; die Fußnote nennt die neue Regel mit allen drei
+  Preisen; **`#luFeat .lu-phase.d` = 2** (vorher 0).
+- **App:** `config.js?v=v1246`, Preise 19,99/219 · 34,99/384 · 49,99/549,
+  `free_months = 1`, `bewertungsPakete` leer, und `nachkaufFuer` liefert
+  5 → 5 €, 10 → 8,75 €, 15 → 12,50 €.
+
+**Rest — und der wichtigste Punkt.**
+
+1. **STRIPE FEHLT NOCH.** Die neuen Monats- und Jahrespreise stehen in der
+   Anzeige, **nicht** in Stripe. Solange dort die alten Preise liegen, zeigt
+   die Seite 34,99 € und abgebucht werden 39,99 €. **Vor dem Prod-Rollout
+   müssen die sechs Preise in Stripe angelegt und die Preis-IDs eingetragen
+   werden** — Anzeige, `plans`-Tabelle und Billing-Portal-Konfiguration, alle
+   drei. Das ist Geld und braucht Marcels Freigabe.
+2. **Drei Nachkauf-Preise** (`nachkauf_starter` 5,00 €, `nachkauf_investor`
+   8,75 €, `nachkauf_pro` 12,50 €) gibt es in Stripe noch nicht. Der Kauf
+   läuft über `lookup_key`; deshalb steht die Kachel in den Einstellungen
+   **bewusst ohne Kaufknopf** — ein Knopf, der eine 400 zurückbringt, ist
+   schlimmer als ein Satz, der sagt was gilt. Der Einzelkauf funktioniert
+   unabhängig weiter.
+3. **Ein Stripe-Coupon lässt seinen Prozentsatz nicht ändern.** Für 15 %
+   Erstflug muss dort später ein neuer angelegt werden. Solange die Anzeige
+   aus ist, hat das keine Wirkung nach außen.
+4. **Abnahmepunkt für Marcel:** der Einstellungen-Bereich *Plan* ließ sich
+   über das Browser-Werkzeug nicht öffnen (`showSettings()` blieb ohne
+   Wirkung, Klicks kommen in dieser Sitzung nicht mehr an). Die Logik ist
+   bewiesen, die Datei syntaxgeprüft — **die Optik der Nachkauf-Kachel ist
+   ungesehen.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

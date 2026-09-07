@@ -1046,3 +1046,51 @@ gepushter Stand>` haben es geradegezogen, Inhalt bitgleich geprüft
 **Nach jedem Prod-Rollout zurück auf `staging` wechseln.** Und: die
 Zweig-Sperre im Deploy-Skript ist seit `v3b` wirklich aktiv — sie hat
 hier zum ersten Mal etwas verhindert.
+
+## Eine Datei, zwei Kopien — `promo-erstflug.js`
+
+Der Kopfkommentar sagt „EINE Datei, zwei Ansichten". Tatsächlich liegt sie
+**zweimal**: `frontend/js/promo-erstflug.js` und
+`frontend/landing/promo-erstflug.js`, bitgleich bis auf die Zeilenenden.
+
+Wer nur eine ändert, schaltet den Rabatt auf der Landing ab und lässt ihn
+in der App stehen — oder umgekehrt. Der Vergleich braucht
+`diff --strip-trailing-cr`; ein normales `diff` meldet **jede** Zeile als
+verschieden, weil die eine Fassung CRLF trägt und die andere LF, und
+`md5sum` sagt dasselbe.
+
+**Vor jeder Änderung an einer Datei, die „für Landing und App" im Kopf
+trägt: nachsehen, ob es sie zweimal gibt.**
+
+## Ein Limit, das nichts begrenzt, ist eine Behauptung
+
+`max_saves: 3` stand seit V63 in `config.js`, wurde in den Einstellungen
+als „Max. 3 Speicherungen" angezeigt und auf allen Preiskarten genannt.
+**Kein einziger Prüfcode liest den Wert** — `grep` findet nur die
+Definition, die Anzeige und eine Zuweisung im Reseller-Portal.
+
+Aufgefallen ist es nicht beim Zählen, sondern weil Marcel sich nichts
+mehr darunter vorstellen konnte: *„Da kann ich mir gerade gar nichts mehr
+darunter vorstellen."*
+
+**Wenn ein Leistungsversprechen niemandem mehr erklärbar ist, ist die
+erste Frage nicht wie man es erklärt, sondern ob es überhaupt etwas
+tut.**
+
+## `if(!x) return;` am Anfang kappt alles danach
+
+Der Landing-Block „Flugklassen" begann mit
+`var g=document.getElementById('fkGrid'); if(!g) return;`. `#fkGrid` gibt
+es im HTML nicht mehr — der Block war also tot. **Und mit ihm alles, was
+danach im selben IIFE stand:** der Feature-Phasen-Wechsel darunter lief
+nie, `#luFeat` hatte vier Phasen und keine trug die Klasse `d`. Nach dem
+Entfernen sind es zwei.
+
+**Ein früher `return` in einem gemeinsamen IIFE ist ein stiller
+Abschalter für alle folgenden Aufgaben.** Wer eine Aufgabe aus einem
+solchen Block entfernt, prüft, was hinter ihr steht.
+
+> Dazu die zweite Hälfte: der tote Block trug einen **vollständigen
+> Preis-Datensatz** (29/290, Kerosin-Liter) — eine zweite Wahrheit, die
+> beim nächsten Wiedereinbau falsche Zahlen zurückgebracht hätte. Deshalb
+> entfernt statt stehengelassen.
