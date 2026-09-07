@@ -992,3 +992,57 @@ Eigenkapital oder über das Darlehen.
 **Zwei Eingabefelder, die zusammen eine dritte Größe ergeben müssen,
 brauchen eine Gegenprobe.** Sonst ist jede Kennzahl darüber
 unwidersprochen falsch.
+
+## Einen Zahlen-Parser gibt es schon — `parseDe()`
+
+`v1244` baute sich in `financing.js` einen eigenen:
+
+```js
+String(e.value).split('.').join('').replace(',', '.')
+```
+
+Der behandelt **jeden** Punkt als Tausendertrenner. `"180.000"` wird
+richtig zu 180000, `"0.75"` aber zu **75** — dem Hundertfachen.
+Aufgefallen erst beim Messen der Bewirtschaftungsquoten, wo `bwk_kp_pct`
+auf `0.75` steht.
+
+Für Eigenkapital und Darlehen wäre es nie aufgefallen, weil dort ganze
+Eurobeträge stehen. **Genau deshalb ist es gefährlich: unsichtbar bis zum
+ersten Dezimalpunkt.**
+
+`parseDe()` aus `calc.js:9` unterscheidet richtig — ein Punkt mit exakt
+drei Folgeziffern ist ein Tausendertrenner, sonst ein Dezimaltrenner —
+und kennt deutsche wie amerikanische Schreibweise. Sie ist global
+verfügbar.
+
+**„Rechenkerne nie duplizieren" gilt auch für Parser.** Vor jeder eigenen
+Zahlenumwandlung nachsehen, ob die App schon eine hat.
+
+## Der Auto-Save schreibt jeden Moduswechsel mit
+
+Ein `switchBwkMode('percent')` zum Prüfen einer Anzeige genügte, damit
+der Auto-Save neun Sekunden später das Objekt speicherte — mit der
+Prozentquote statt den Detailpositionen. Der Score fiel von 84 auf 83,
+weil die Quote 3.960 € BWK ergibt und die Detailpositionen 4.940 €.
+
+Zurückgestellt und erneut gespeichert, dann stand wieder 84.
+
+**Wer an einem fremden Objekt misst, zählt vorher, was sich ändern kann,
+und stellt es hinterher nachweislich zurück** — in der Datenbank, nicht
+nur im Formular. Der Auto-Save unterscheidet nicht zwischen einer
+Messung und einer Eingabe.
+
+## Der Zweig wird vor dem Commit geprüft, nicht erst beim Ausrollen
+
+Nach einem Prod-Rollout blieb das Arbeitsverzeichnis auf `main` stehen.
+Die nächsten zwei Änderungen landeten dort statt auf `staging`.
+
+**Gefangen hat es `deploy-staging.ps1`** mit „ABBRUCH: Lokaler Zweig ist
+'main', erwartet 'staging'". Der Commit war noch nicht gepusht;
+`git cherry-pick` auf `staging` und `git branch -f main <letzter
+gepushter Stand>` haben es geradegezogen, Inhalt bitgleich geprüft
+(`git diff --stat` leer).
+
+**Nach jedem Prod-Rollout zurück auf `staging` wechseln.** Und: die
+Zweig-Sperre im Deploy-Skript ist seit `v3b` wirklich aktiv — sie hat
+hier zum ersten Mal etwas verhindert.

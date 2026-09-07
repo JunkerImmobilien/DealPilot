@@ -7960,6 +7960,88 @@ Der Fehler war meiner, zwei Härtungen bleiben:
 3. `v1243`–`v1244b` sind auf Staging, **noch nicht auf Prod** (Prod steht
    auf `4ae353a`).
 
+## Rollout-Journal · 07.09.2026, vierter Teil — Prod, ein Parser und die BWK-Quote
+
+**Prod-Rollout.** `v1243`–`v1244b` sind live, Prod steht auf `409f863`.
+Nur Frontend, kein Neubau. Über HTTPS nachgemessen: alle Cache-Buster
+stimmen (`financing.js?v=v1244b`, `workflow.js?v=v1243`, `ui.js?v=v1243`,
+`style.css?v=v1243b`), der Code ist in den ausgelieferten Dateien, App
+und Landing antworten mit 200.
+
+### `v1244c` — ein Fehler in meinem eigenen, gerade ausgerollten Code
+
+`_zahl()` in `financing.js` baute den Zahlen-Parser selbst:
+
+```js
+String(e.value).split('.').join('').replace(',', '.')
+```
+
+Das behandelt **jeden** Punkt als Tausendertrenner. `"180.000"` wird
+richtig zu 180000 — `"0.75"` aber zu **75**, dem Hundertfachen.
+Aufgefallen erst beim Messen der Bewirtschaftungsquoten, wo `bwk_kp_pct`
+auf `0.75` steht.
+
+Für Eigenkapital und Darlehen wäre es nie aufgefallen, weil dort ganze
+Eurobeträge stehen. **Genau deshalb gehört es korrigiert: unsichtbar bis
+zum ersten Dezimalpunkt.** `parseDe()` aus `calc.js:9` macht es richtig
+und ist global verfügbar. Ich hätte sie von Anfang an nehmen müssen —
+*Rechenkerne nie duplizieren* gilt auch für Parser.
+
+### `v1245` — die BWK-Quote bekommt Kontext
+
+**Testbericht:** *„% der NKM für die Bewirtschaftungskosten, macht man
+das? Wird ja in München ganz anderer % Wert sein als in Bielefeld z.B."*
+
+> **Berechtigt — und DealPilot beantwortet die Frage im eigenen Haus
+> schon anders.** Der Marktbericht rechnet nach **ImmoWertV Anlage 3** die
+> Verwaltung *je bewerteter Einheit* und die Instandhaltung *je m²*,
+> beides unabhängig von der Miethöhe (steht so in `CLAUDE.md`). Die
+> Haupt-App rechnet in Prozent der Nettokaltmiete.
+
+Die Quote bleibt als Schnellweg — sie ist für eine erste Einschätzung in
+Ordnung —, bekommt aber gesagt, wo sie ungenau wird: eine Zeile nennt sie
+in Euro und je m² und zeigt, was bei doppelter Miete herauskäme; der
+Aufklappteil erklärt warum und verweist auf die Detailpositionen, die die
+Quote ersetzen.
+
+**Gemessen an `2026-001` im Prozent-Modus:** 16 % ergeben **1.920 € im
+Jahr = 19,20 € je m²**; bei doppelter Miete wären es 3.840 € für dieselbe
+Verwaltung. Die Zeile steht sichtbar unter der Gesamtquote.
+
+### Drei Punkte des Blocks waren schon erledigt
+
+- **„Sonder-AfA nicht direkt erklärt, erst wenn man es anklickt"** — der
+  Erklärtext steht bereits **vor** der Checkbox (`index.html:1925`):
+  *„Die Sonder-AfA nach § 7b EStG erlaubt zusätzliche 5 % AfA jährlich in
+  den ersten 4 Jahren — obendrauf zur regulären …"*
+- **„zvE muss irgendwo erklärt werden, vielleicht ausschreiben"** — das
+  Label lautet bereits *„Zu versteuerndes Einkommen (zvE) vor Immobilie /
+  Jahr"*.
+- **„Deutlich über Marktwert bei einem Preis UNTER Marktwert"** — bereits
+  `v1178` behoben; der Kommentar in `avm-section.js:61` trägt genau
+  Marcels Zahlen (129.000 € / 177.000 €).
+
+**Commits.** `409f863` (Prod-Merge) · `1eaff85` (`v1244c` + `v1245`).
+
+**Rest.**
+
+1. **Nach dem Prod-Rollout blieb das Arbeitsverzeichnis auf `main`.** Die
+   nächsten zwei Änderungen landeten dort statt auf `staging`. Gefangen
+   hat es die Zweig-Sperre in `deploy-staging.ps1` — zum ersten Mal hat
+   sie etwas verhindert. Über `cherry-pick` auf `staging` und
+   `git branch -f main 409f863` geradegezogen, Inhalt bitgleich geprüft.
+2. **Der Auto-Save schreibt jeden Moduswechsel mit.** Ein
+   `switchBwkMode('percent')` zum Prüfen genügte, damit `2026-001` mit
+   der Prozentquote gespeichert wurde (Score 84 → 83, weil die Quote
+   3.960 € BWK ergibt statt 4.940 €). Zurückgestellt, erneut gespeichert,
+   in der Datenbank nachgeprüft: Score wieder **84**, `hg_ul 3840`,
+   `hg_nul 1100`, `ek 20000`, `d1 180000`, neun Objekte.
+3. **Offen und Marcels Entscheidung:** ob Mietausfall- und BWK-Quoten als
+   **Profileinstellung** je Lage hinterlegbar sein sollen (*„für Profil
+   Investition C-Lage nimm Mietausfall immer 3 %, für A-Lage 1 %"*). Das
+   ist ein Produktbaustein, kein Textfehler.
+4. `v1244c`/`v1245` sind auf Staging, **noch nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

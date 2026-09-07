@@ -38,8 +38,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 07.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging auf `5a338dd`, **Produktion auf
-`4ae353a`**. **`v1215`–`v1242e` sind live**, `v1243`–`v1244b` warten auf
+**Stand:** lokal = GitHub = Staging auf `1eaff85`, **Produktion auf
+`409f863`**. **`v1215`–`v1244b` sind live**, `v1244c`/`v1245` warten auf
 den naechsten Prod-Rollout (nur Frontend, kein Neubau noetig).
 
 **Zuletzt fertig: `v1242a–e` — die KI-Mietrecherche.** Sie nennt jetzt
@@ -94,10 +94,14 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 > nur ob es schneller ist, sondern ob die Zahlen noch im richtigen Feld
 > landen.
 >
-> **2 · Weiter im Testbericht. Die Blöcke D, E und F sind abgeschlossen**
-> (`v1240` Soll-Miete, `v1241` KI-Knopf, `v1242a–e` Quellen, `v1243`
-> Häkchen und Steuer-Hinweis, `v1244` Kapitaldeckung). Als Nächstes die
-> Blöcke **B, C, G, H, J**. **Das läuft ohne Rückfrage.**
+> **2 · Weiter im Testbericht. Die Blöcke D, E, F und G sind
+> abgeschlossen** (`v1240` Soll-Miete, `v1241` KI-Knopf, `v1242a–e`
+> Quellen, `v1243` Häkchen und Steuer-Hinweis, `v1244` Kapitaldeckung,
+> `v1245` BWK-Quote). Drei Punkte aus G waren schon erledigt: die
+> Sonder-AfA-Erklärung steht vor der Checkbox, zvE ist im Label
+> ausgeschrieben, und die vertauschte Markteinordnung hat `v1178`
+> behoben. Als Nächstes die Blöcke **B, C, H, J**.
+> **Das läuft ohne Rückfrage.**
 >
 > **Drei Entscheidungen liegen bei Marcel und blockieren nichts:**
 > - **Die 8 Objekte ohne Grundbuchamt-Prozentsatz** stehen weiter auf 0 €.
@@ -116,6 +120,12 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 > Zahlen nachgetragen werden, verschiebt Renditen und Scores und
 > **entscheidet Marcel**. (Das ist derselbe Kreis wie die 8 Objekte ohne
 > Grundbuchamt-Prozentsatz — vermutlich dieselbe Ursache.)
+>
+> **Aus `v1245` neu und Marcels Entscheidung:** ob Mietausfall- und
+> BWK-Quoten als **Profileinstellung je Lage** hinterlegbar sein sollen
+> („für Profil Investition C-Lage nimm Mietausfall immer 3 %, für A-Lage
+> 1 %"). Das ist ein Produktbaustein, kein Textfehler — die Quote selbst
+> hat mit `v1245` erst einmal den fehlenden Kontext bekommen.
 >
 > **Ein Nebenbefund wartet auf eine Entscheidung:** `calc.js:2165–2186`
 > schreibt bei jedem Lauf in `cr-wk-other` und `cr-zve-ohne`. **Beide gibt
