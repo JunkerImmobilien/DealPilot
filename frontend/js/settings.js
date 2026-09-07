@@ -1878,10 +1878,14 @@ function _renderPlanPane() {
     }
     // Wasserzeichen
     html += '<li>PDF ' + (l.watermark ? '<em>mit Wasserzeichen</em>' : '<strong>ohne Wasserzeichen</strong>') + '</li>';
-    // Max-Saves
-    if (l.max_saves !== -1 && l.max_saves != null) {
-      html += '<li>Max. ' + l.max_saves + ' Speicherungen</li>';
-    }
+    /* v1246 · Hier stand „Max. 3 Speicherungen". Marcel: „Da kann ich mir
+       gerade gar nichts mehr darunter vorstellen." Gemessen am 07.09.2026:
+       kein einziger Prüfcode liest `max_saves`. Der Wert steht in
+       config.js, wurde hier angezeigt und auf den Preiskarten genannt —
+       durchgesetzt hat er nie etwas. Ein Limit, das nichts begrenzt, ist
+       kein Leistungsmerkmal, sondern eine Behauptung.
+       Der Wert bleibt in config.js stehen (reseller-portal.js:610 setzt
+       ihn), wird aber nicht mehr als Versprechen ausgegeben. */
 
     // Features (nur die echten Goodies anzeigen) — keine Emojis mehr (wirkt billig)
     var featLabels = {
@@ -1919,6 +1923,38 @@ function _renderPlanPane() {
     html += '</div>';
   });
   html += '</div>';
+
+  /* ── v1246 · Nachkauf: dieselbe Menge, ein Viertel des Monatsbeitrags ──
+     Marcels Vorgabe vom 07.09.2026 ersetzt die vier Bewertungs-Pakete.
+     Die Zahlen werden aus dem eigenen Plan abgeleitet (config.js
+     nachkaufFuer), damit Preisseite und Einstellungen nicht auseinander
+     laufen.
+
+     BEWUSST OHNE KAUFKNOPF: der Kauf laeuft ueber einen
+     Stripe-lookup_key, und die drei Nachkauf-Preise sind dort noch nicht
+     angelegt. Ein Knopf, der eine 400 zurueckbringt, ist schlimmer als
+     ein Satz, der sagt was gilt. Sobald die Preise stehen, kommt hier
+     der Knopf dazu — der Einzelkauf darunter funktioniert unabhaengig
+     davon weiter. */
+  (function () {
+    var nk = (DealPilotConfig.pricing && typeof DealPilotConfig.pricing.nachkaufFuer === 'function')
+      ? DealPilotConfig.pricing.nachkaufFuer(current) : null;
+    if (!nk) return;
+    var eur = function (v) { return v.toFixed(2).replace('.', ',') + ' €'; };
+    html += '<div class="plan-credits-section">' +
+      '<h3 class="plan-credits-title">Bewertungen nachkaufen</h3>' +
+      '<p class="plan-credits-desc">Ist dein Monatskontingent aufgebraucht, kannst du dieselbe Menge ' +
+        'noch einmal nachkaufen — für ein Viertel deines Monatsbeitrags. ' +
+        'Zugekauftes verfällt nie und wird erst verbraucht, wenn dein Monatskontingent leer ist.</p>' +
+      '<div class="plan-credit-card plan-credit-highlight" style="max-width:340px">' +
+        '<div class="plan-credit-num">' + nk.label + '</div>' +
+        '<div class="plan-credit-sub">' + nk.kontingent.mpi + ' Marktpreisindikationen' +
+          (nk.kontingent.mpi_plus ? ' · ' + nk.kontingent.mpi_plus + ' erweiterte' : '') +
+          (nk.kontingent.wev ? ' · ' + nk.kontingent.wev + ' Wertermittlungen' : '') + '</div>' +
+        '<div class="plan-credit-price">' + eur(nk.preis_eur) + '</div>' +
+      '</div>' +
+      '</div>';
+  })();
 
   // V63.1: KI-Credit-Pakete
   if (creditPacks.length > 0) {
