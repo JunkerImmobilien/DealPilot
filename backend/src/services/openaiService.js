@@ -983,6 +983,29 @@ async function suggestDs2Fields(payload, opts) {
        optisch den amtlichen. Deshalb entscheidet jetzt ein eigenes Feld
        `amtlich` — und eine Portal-Domain kann es nicht tragen, egal wie das
        Etikett lautet. */
+    /* v1242e · Die Sperrliste aus v1242c/d verliert immer. Der naechste Lauf
+       brachte miete-aktuell.de — wieder ein Portal, wieder nicht auf der
+       Liste, wieder unter dem Namen „Mietspiegel Huellhorst 2026". Es gibt
+       beliebig viele Portale und genau eine amtliche Stelle je Ort. Also
+       wird die Frage umgedreht: nicht „ist das ein bekanntes Portal?",
+       sondern „kann dieser Host ueberhaupt amtlich sein?" Amtsfaehig ist
+       ein Host, der den Ortsnamen traegt (huellhorst.de, bielefeld.de,
+       kreis-minden-luebbecke.de) oder zu einer amtlichen Stelle gehoert
+       (IHK, bund.de, destatis, IT.NRW, Statistische Landesaemter). Alles
+       andere kann sich „Mietspiegel" nennen, wie es will. */
+    const _ortWorte = String(context.ort || '')
+      .toLowerCase()
+      .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+      .split(/[^a-z0-9]+/).filter(function (w) { return w.length >= 4; });
+    const _AMTSSTELLEN = /(\.ihk\.de|\.bund\.de|destatis\.de|it\.nrw|statistik[a-z-]*\.[a-z]{2,}|\.landkreis|landkreis-|kreis-|\.stadt-|stadt-|gemeinde-|\.de\/rathaus|haus-und-grund|hausundgrund)/i;
+    const _amtsfaehig = function (url) {
+      if (!url) return false;
+      let host = '';
+      try { host = new URL(url).hostname.toLowerCase(); } catch (e) { return false; }
+      const hostFlach = host.replace(/-/g, '');
+      if (_ortWorte.some(function (w) { return hostFlach.indexOf(w.replace(/-/g, '')) >= 0; })) return true;
+      return _AMTSSTELLEN.test(host);
+    };
     const _PORTALE = /(immoportal|immowelt|immobilienscout|immoscout|immonet|wohnungsboerse|homeday|mietspiegel\.(com|net|org)|meinestadt|wohnen-im-alter|kalaydo|ebay)/i;
     const _quellen = (function () {
       const roh = Array.isArray(sugg.sources) ? sugg.sources : [];
@@ -997,6 +1020,9 @@ async function suggestDs2Fields(payload, opts) {
         /* Eine Portal-Domain ist nie amtlich. Und wo das Modell selbst sagt,
            es gebe keinen amtlichen Mietspiegel, darf keine Quelle einen
            behaupten — der Widerspruch wird zugunsten der Aussage aufgeloest. */
+        /* v1242e: amtlich braucht jetzt einen amtsfaehigen Host — die
+           Portalpruefung bleibt als zweite Schranke fuer Faelle ohne URL. */
+        if (amtlich && url && !_amtsfaehig(url)) amtlich = false;
         if (amtlich && url && _PORTALE.test(url)) amtlich = false;
         if (amtlich && _PORTALE.test(label)) amtlich = false;
         if (amtlich && /kein\s+(amtlicher|offizieller)\s+mietspiegel/i.test(String(sugg.reasoning || ''))) amtlich = false;
@@ -1012,17 +1038,22 @@ async function suggestDs2Fields(payload, opts) {
            nicht, egal wie ihre Seite heisst. Also wird sie benannt, was
            sie ist. */
         let anzeige = label;
-        if (!amtlich && /mietspiegel/i.test(label)) {
-          const heim = _PORTALE.exec(url) || _PORTALE.exec(label);
-          if (heim) {
-            const namen = {
-              immobilienscout: 'ImmobilienScout24', immoscout: 'ImmobilienScout24',
-              immowelt: 'Immowelt', immonet: 'Immonet', immoportal: 'immoportal',
-              wohnungsboerse: 'Wohnungsboerse', homeday: 'Homeday', meinestadt: 'meinestadt.de'
-            };
-            const portal = namen[String(heim[1] || heim[0]).toLowerCase()] || heim[0];
-            anzeige = label.replace(/mietspiegel/ig, 'Mietpreisuebersicht').slice(0, 120);
-            if (anzeige.indexOf(portal) < 0) anzeige = (anzeige + ' (' + portal + ')').slice(0, 120);
+        if (!amtlich && /mietspiegel/i.test(label) && !_amtsfaehig(url)) {
+          /* Der Herausgeber steht in der Domain, nicht in einer Liste. */
+          let herkunft = '';
+          try {
+            herkunft = new URL(url).hostname.toLowerCase()
+              .replace(/^www\./, '').replace(/\.(de|com|net|org|eu|info)$/, '');
+          } catch (e) { herkunft = ''; }
+          const bekannt = {
+            'immobilienscout24': 'ImmobilienScout24', 'immowelt': 'Immowelt',
+            'immonet': 'Immonet', 'immoportal': 'immoportal', 'homeday': 'Homeday',
+            'wohnungsboerse': 'Wohnungsboerse', 'miete-aktuell': 'miete-aktuell.de'
+          };
+          const portal = bekannt[herkunft] || herkunft;
+          anzeige = label.replace(/mietspiegel/ig, 'Mietpreisuebersicht').slice(0, 120);
+          if (portal && anzeige.toLowerCase().indexOf(portal.toLowerCase()) < 0) {
+            anzeige = (anzeige + ' (' + portal + ')').slice(0, 120);
           }
         }
         const e = { label: anzeige };
