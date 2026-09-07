@@ -1271,3 +1271,46 @@ weiß, dass es existiert.
 > wie danach beweist, dass nur verschoben und nichts zerrissen wurde.
 > Ein Zählen im Ausschnitt beweist das *nicht* — der Ausschnitt schneidet
 > mitten in offene Elemente.
+
+## Eine Schranke hinter der Leistung ist keine Schranke
+
+`consumeArt()` gibt bei leerem Kontingent **`{ok:false}` zurück — es
+wirft nicht**. Beide Aufrufer in `marktbericht.js` standen hinter dem
+Bericht („Erfolg → abziehen (best effort; blockt Bericht nicht)") und
+fingen nur Exceptions ab; einer verschluckte das Ergebnis ganz:
+
+```js
+try { await aiCreditsService.consumeStufe(...); } catch (e) {}
+```
+
+**Damit bekam ein Starter-Konto die erweiterte Marktpreisindikation und
+die Wertermittlung vollständig geliefert** — sein Monatskontingent ist
+dort 0 — **und es wurde nichts gebucht.**
+
+Der Kommentar über `consumeArt()` hatte es seit `v1183` vorhergesagt:
+*„Der Aufrufer muss das behandeln: ein verschlucktes Ergebnis heisst,
+die Leistung wird erbracht und nicht bezahlt."* Er hat recht behalten.
+
+**Prüfen und Buchen sind zwei Schritte, und sie gehören auf
+verschiedene Seiten der Leistung:** die Prüfung davor, die Buchung
+danach. Umgekehrt ist es entweder ein Verschenken (Prüfung fehlt) oder
+eine Kränkung (bezahlt, aber nichts bekommen, weil die Buchung klemmte).
+
+> Und: **eine Funktion, die einen Fehler als Rückgabewert meldet, ist mit
+> `try/catch` nicht abgesichert.** `catch` fängt nur, was geworfen wird.
+> Wer `{ok:false}` zurückgibt, braucht ein `if`.
+
+## Ein Wiederverkäufer-Preis muss unter dem Einzelpreis liegen
+
+Die Seat-Staffel begann bei **24 €** — der günstigste Einzelplan kostet
+seit `v1246` **19,99 €**. Der Partner zahlte für seinen Mandanten also
+mehr, als der Mandant selbst gezahlt hätte.
+
+Durchgerechnet lohnte sich das Programm erst **ab zehn Mandanten**; bei
+fünf zahlte der Partner 44 €/Monat drauf. Die 99 € Grundgebühr allein
+kosteten fast drei Investor-Abos, bevor der erste Mandant angelegt war.
+
+**Nach jeder Preisänderung im Endkundengeschäft gehört die
+Wiederverkäufer-Staffel nachgerechnet** — sie hängt an Preisen, die sich
+woanders bewegen, und niemand merkt es, weil beide Zahlen für sich
+plausibel bleiben.
