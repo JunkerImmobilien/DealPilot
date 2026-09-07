@@ -975,6 +975,14 @@ label.dp-required.qc-required::after {
     <button type="button" class="btn btn-outline btn-sm" onclick="showMarketDataImport()">📁 PDF wählen</button>
   </div>
 
+  <!-- v1249 · Testbericht: „Mit dem Wertpuffer ist das Delta in der Bewertung
+       gemeint? Aus meiner Sicht nicht gut platziert, sollte oben sein."
+       Beides stimmte: er hatte keinerlei Erklaerung, und er stand NACH der
+       Zweispalten-Reihe — gemessen 2003 px unter dem Seitenanfang, also
+       hinter zwei sehr hohen Karten. Jetzt steht er direkt unter der
+       Ueberschrift, wo die Zahl hingehoert, und sagt selbst, was sie ist. -->
+  <div class="wert-puffer" id="wert-puffer" style="display:none" title="Verkehrswert minus Kaufpreis. Ist der Verkehrswert hoeher, kaufst du unter Wert — der Puffer ist sofortiges Eigenkapital, ohne dass du etwas dafuer eingezahlt hast. Negativ heisst: du zahlst ueber Marktwert. Der Verkehrswert kommt aus dem Feld weiter unten oder aus einem importierten Gutachten; ohne ihn bleibt die Zeile leer."><span>Sofortiger Wertpuffer / Equity</span><span id="wert-puffer-val" class="c-green fw6"></span></div>
+
   <!-- V53: Top-Reihe — Objektdaten links + Qualität & Zustand rechts (bündig, gleiche Höhe) -->
   <div class="col2 col2-stretch">
     <div class="card card-stretch"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-home"/></svg></span>Objektdaten</div><div class="g2">
@@ -1106,8 +1114,6 @@ label.dp-required.qc-required::after {
     </div>
   </div>
 
-  <!-- V53: Wertpuffer-Bar (volle Breite) -->
-  <div class="wert-puffer" id="wert-puffer" style="display:none"><span>Sofortiger Wertpuffer / Equity</span><span id="wert-puffer-val" class="c-green fw6"></span></div>
 
   <!-- V53: Lage- & Markt-Indikatoren — ALLES drin: Bewertung, Makro/Mikro, DS2-Felder -->
   <div class="card lage-markt-card">

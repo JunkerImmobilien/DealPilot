@@ -1213,3 +1213,42 @@ sagt warum, und ausdrücklich, dass hier kein Feld fehlt.
 > (`.v212-collapse-body`) und erscheint bei einer Eigentumswohnung
 > genauso, sobald man aufklappt. Wer eine Fläche „nur für X" nennt, sollte
 > sie auch nur bei X zeigen.
+
+## Siebenunddreißig Fachfelder, kein einziger Tooltip
+
+Die Karte „Wertermittlung (Marktbericht)" führt 37 Eingabefelder —
+Standardstufe NHK 2010, Modernisierungsgrad nach Anlage 2,
+Sachwertfaktor, Liegenschaftszinssatz, Bruttogrundfläche, acht
+Ausstattungsanteile. Gemessen am 07.09.2026: **keines hatte eine
+Erklärung.**
+
+Zwei Verwechslungen liegen dort besonders nah, und beide sind teuer:
+
+- **Standardstufe gegen Modernisierungsgrad** — die eine beschreibt die
+  *Ausstattung*, der andere den *Zustand*. Die Felder stehen
+  untereinander und heißen beide nach einer Anlage.
+- **Bruttogrundfläche gegen Wohnfläche** — die BGF ist außen gemessen und
+  regelmäßig deutlich größer. Sie ist die Bezugsgröße der NHK; wer die
+  Wohnfläche einträgt, rechnet den Sachwert systematisch zu klein.
+
+Die sechs schwersten tragen jetzt eine Erklärung, die aufeinander
+verweist, wo die Verwechslung droht.
+
+**Ein Feld, das nur ein Sachverständiger ausfüllen kann, braucht einen
+Satz für alle anderen** — sonst ist die Eingabemaske eine Prüfung, keine
+Hilfe.
+
+## Was zweimal danebensteht, sucht man auch zweimal
+
+*„Wieso werden hier Stellplatzmiete abgefragt usw. aber nicht die
+Kaltmiete?"*
+
+Gemessen: `nkm` und `ze` stehen beide im Tab *Miete*, in derselben Karte.
+In der Wertermittlung steht **nur** die Stellplatzmiete — die Kaltmiete
+kommt von dort und steht bewusst nicht zweimal.
+
+**Richtig gebaut, falsch erklärt.** Wo ein Formular eine Größe absichtlich
+auslässt, weil sie anderswo steht, muss es das sagen — sonst liest der
+Nutzer die Lücke als Fehler. Das Feld sagt es jetzt selbst, mitsamt der
+Folge: die BWK-Quoten rechnen auf dem *gesamten* Rohertrag, Stellplätze
+eingeschlossen.
