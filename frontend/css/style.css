@@ -7957,6 +7957,17 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   text-transform: uppercase;
 }
 
+/* v1247 · Testbericht: „DS2? Kein Informationsgehalt – muss das da rein?
+   Ist das der DealScore 2.0? wenn das wichtig ist, sollte dazu eine Info
+   sein."
+   Berechtigt: sechs Etiketten trugen das Kuerzel und KEINES einen Titel —
+   gemessen im Browser, alle `title` leer. Jetzt erklaert jedes sich
+   selbst; der Zeiger sagt, dass es etwas zu holen gibt. */
+.ds2-tag[title] {
+  cursor: help;
+  border-bottom: 1px dotted color-mix(in srgb, var(--gold) 45%, transparent);
+}
+
 /* ═══════════════════════════════════════════════════
    V38: KI-Vorschlags-Button neben Label (✨)
 ═══════════════════════════════════════════════════ */
