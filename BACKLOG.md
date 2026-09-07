@@ -38,8 +38,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 07.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging auf `1eaff85`, **Produktion auf
-`409f863`**. **`v1215`–`v1244b` sind live**, `v1244c`/`v1245` warten auf
+**Stand:** lokal = GitHub = Staging auf `75733bc`, **Produktion auf
+`409f863`**. **`v1215`–`v1244b` sind live**, `v1244c`–`v1246b` warten auf
 den naechsten Prod-Rollout (nur Frontend, kein Neubau noetig).
 
 **Zuletzt fertig: `v1242a–e` — die KI-Mietrecherche.** Sie nennt jetzt
@@ -80,6 +80,35 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 > geändert — die Differenz kommt aus den **Stammdaten der Test UG im
 > `localStorage`**, deren alter Zustand nirgends festgehalten ist.
 > **Reproduzierbar ist, dass die Bilanz aufgeht, nicht die 687.059 €.**
+
+> ### ⚠ ZUERST: Stripe, bevor die Preise auf Prod gehen
+>
+> **`v1246` hat die Preise überall geändert — außer in Stripe.**
+> Anzeige, Landing, App und Einstellungen sagen jetzt
+> **19,99 / 34,99 / 49,99** und jährlich **219 / 384 / 549**.
+> **In Stripe liegen weiter die alten Preise.** Ginge das so auf Prod,
+> stünde 34,99 € auf der Seite und abgebucht würden 39,99 €.
+>
+> Vor dem Prod-Rollout von `v1246` müssen also:
+> - **sechs Preise** in Stripe angelegt werden (drei monatlich, drei
+>   jährlich) und ihre IDs an **allen drei** Stellen eintreffen —
+>   `config.js` (Anzeige), `plans` (Abbuchung), Billing-Portal-Konfiguration
+>   (was der Kunde im Kundenportal sieht);
+> - **drei Nachkauf-Preise** dazu: `nachkauf_starter` 5,00 €,
+>   `nachkauf_investor` 8,75 €, `nachkauf_pro` 12,50 €. Bis sie da sind,
+>   steht die Nachkauf-Kachel in den Einstellungen **ohne Kaufknopf**.
+> - Für den **Erstflug mit 15 %** muss ein *neuer* Coupon angelegt werden —
+>   ein Stripe-Coupon lässt seinen Prozentsatz nicht ändern. Eilt nicht:
+>   die Anzeige ist aus.
+>
+> **Zwei Konten beachten:** Staging rechnet gegen die Sandbox, Prod gegen
+> das Hauptkonto. Das ist Geld — **nur nach Marcels ausdrücklicher
+> Freigabe.**
+>
+> **Ein Abnahmepunkt für Marcel:** die Nachkauf-Kachel in
+> *Einstellungen → Plan* ist **ungesehen**. Der Bereich ließ sich über das
+> Browser-Werkzeug nicht öffnen; Logik und Syntax sind geprüft, die Optik
+> nicht.
 
 > ### Der erste Griff jetzt — in dieser Reihenfolge
 >
