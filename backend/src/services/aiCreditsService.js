@@ -551,12 +551,59 @@ async function copilotInc(userId) {
   await query(`UPDATE copilot_usage SET used = used + 1, updated_at = NOW() WHERE user_id = $1::text`, [String(userId)]);
 }
 
+
+/* ─── v1251 · Vorher fragen, statt hinterher zu buchen ──────────────────
+   Marcels Befund vom 07.09.2026: „starter kann oder darf ja keine
+   erweiterten Marktpreisindikation machen und auch keine wertermittlung.
+   da können wir dann bezahl schranken rein machen."
+
+   Er hat recht, und es war schlimmer als eine fehlende Schranke.
+   `consumeArt()` gibt bei leerem Kontingent `{ok:false}` zurueck — es
+   WIRFT nicht. Die beiden Aufrufer in marktbericht.js standen aber
+   hinter dem Bericht („Erfolg -> abziehen (best effort; blockt Bericht
+   nicht)") und fingen nur Exceptions ab; der eine verschluckte das
+   Ergebnis sogar ganz (`catch (e) {}`).
+
+   Damit bekam ein Starter-Konto die erweiterte Marktpreisindikation und
+   die Wertermittlung vollstaendig geliefert, obwohl sein Kontingent dort
+   0 ist — und es wurde nichts gebucht. Genau das, wovor der Kommentar
+   ueber consumeArt() warnt: „ein verschlucktes Ergebnis heisst, die
+   Leistung wird erbracht und nicht bezahlt."
+
+   `pruefeArt` fragt dieselbe Quelle wie `consumeArt`, bucht aber nichts.
+   Sie gehoert VOR die Leistung. Gebucht wird weiterhin danach — wer
+   bezahlt hat, soll seinen Bericht auch dann bekommen, wenn die Buchung
+   klemmt. */
+async function pruefeArt(userId, art) {
+  if (ARTEN.indexOf(art) < 0) {
+    return { ok: false, reason: 'unbekannte_art', art: art };
+  }
+  await _ensureCurrentPeriod(userId);
+  const status = await getStatus(userId);
+  const k = status.arten[art];
+  if (!k || k.rest < 1) {
+    return { ok: false, reason: 'kein_kontingent', art: art, status: status };
+  }
+  return { ok: true, art: art, rest: k.rest };
+}
+
+/* Marktbericht-Stufe 1/2/3 -> Art, wie consumeStufe. Stufe 0 heisst
+   „schon bezahlt" und wird durchgelassen. */
+async function pruefeStufe(userId, stufe) {
+  const n = parseInt(stufe, 10);
+  if (!n) return { ok: true, art: null, rest: null };
+  const art = STUFE_ART[n];
+  if (!art) return { ok: false, reason: 'unbekannte_stufe', stufe: n };
+  return pruefeArt(userId, art);
+}
 module.exports = {
   getStatus,
   copilotUsage,
   copilotInc,
   consumeArt,                  /* v1183 — eine Bewertung je Art */
   consumeStufe,                /* v1183 — Marktbericht-Stufe 1/2/3 */
+  pruefeArt,                   /* v1251 — fragt, bucht nicht */
+  pruefeStufe,                 /* v1251 — dasselbe je Marktbericht-Stufe */
   consumeAvm,                  /* v1183 — Marktwert-Abruf */
   addKontingent,               /* v1183 — Kauf gutschreiben */
   gewaehreTestpaket,           /* v1185 — Testphase, einmalig, verfaellt */

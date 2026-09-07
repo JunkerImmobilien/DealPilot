@@ -8392,6 +8392,29 @@ Kaltmiete?"**
 **Nachweis.** Auf Staging und Prod: `style.css?v=v1248`, alle sechs
 Labels tragen einen Titel (193–282 Zeichen), `cursor: help` greift.
 
+## Rollout-Journal · 07.09.2026, zehnter Teil — `v1249`, der Wertpuffer
+
+**Testbericht:** *„Mit dem Wertpuffer ist das Delta in der Bewertung
+gemeint? Aus meiner Sicht nicht gut platziert, sollte oben sein."*
+
+**Beides stimmte.** Gemessen am geladenen `2026-001`:
+
+- **kein Tooltip, kein `title`, keine Erklärung** irgendwo am Element;
+- **2003 px** unter dem Seitenanfang — er stand *nach* der
+  Zweispalten-Reihe, also hinter Objektdaten und Qualität & Zustand.
+  Die Zahl, die man zuerst sehen will, kam zuletzt.
+
+Jetzt steht er direkt unter der Überschrift, vor den beiden Karten:
+**382 px**. Und er erklärt sich selbst — Verkehrswert minus Kaufpreis;
+positiv heißt unter Wert gekauft und sofortiges Eigenkapital, negativ
+heißt über Marktwert gezahlt; dazu, woher der Verkehrswert kommt und dass
+die Zeile ohne ihn leer bleibt.
+
+**Nur verschoben, nicht umgebaut:** die `div`-Bilanz der Datei ist vorher
+wie nachher **1117 zu 1117**.
+
+**Commits.** `c3ae89c` (`v1249`) · `5ca1deb` (Prod-Merge).
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

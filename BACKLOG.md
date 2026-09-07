@@ -38,8 +38,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 07.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging auf `b73c231`, **Produktion auf
-`09fe585`**. **`v1215`–`v1248` sind live** — die Preisrunde ist
+**Stand:** lokal = GitHub = Staging auf `c3ae89c`, **Produktion auf
+`5ca1deb`**. **`v1215`–`v1249` sind live** — die Preisrunde ist
 durch, in der Anzeige wie in Stripe. Nichts wartet auf einen Rollout.
 
 **Zuletzt fertig: `v1242a–e` — die KI-Mietrecherche.** Sie nennt jetzt

@@ -234,7 +234,7 @@ if (!window._pdfGold) {
         '<div><div class="rp-fl">Abrechnung</div><div class="rp-seg"><button class="on" data-iv="monthly">Monatlich</button><button data-iv="yearly">Jährlich · 2 Mon. frei</button></div></div>' +
         '<div><div class="rp-fl">Anzahl Seats</div><div class="rp-step"><button id="rp-minus">–</button><input id="rp-qty" value="' + _st.qty + '" readonly><button id="rp-plus">+</button></div></div>' +
         '<div class="rp-price"><div class="per"></div><div class="tot"></div></div></div>' +
-        '<div class="rp-buyfoot"><div class="rp-staffel">Volume-Staffel: <b>1–9 → 24 €</b> · <b>10–24 → 19 €</b> · <b>25+ → 15 €</b><br>Der Stückpreis gilt für alle Seats.</div>' +
+        '<div class="rp-buyfoot"><div class="rp-staffel">Volume-Staffel: <b>1–9 → 19 €</b> · <b>10–24 → 15 €</b> · <b>25+ → 12 €</b><br>Der Stückpreis gilt für alle Seats.</div>' +
         '<button class="rp-checkout" id="rp-checkout">Zur Kasse (Stripe)</button></div></div>';
     box.querySelectorAll('.rp-seg button').forEach(function (b) { b.addEventListener('click', function () { _st.iv = b.getAttribute('data-iv'); box.querySelectorAll('.rp-seg button').forEach(function (x) { x.classList.remove('on'); }); b.classList.add('on'); calcPrice(); }); });
     $('rp-minus').addEventListener('click', function () { _st.qty = Math.max(1, _st.qty - 1); $('rp-qty').value = _st.qty; calcPrice(); });
@@ -614,7 +614,7 @@ if (!window._pdfGold) {
           /* v1176: Grundgebuehr 149 -> 99. Der Seat faellt mit (24/19/15),
              sonst spart der Mandant gegenueber dem neuen Investor-Preis von
              39,99 nur noch 40 % statt der heutigen 59 %. */
-          price_monthly_eur: 99, price_yearly_eur: 990, sort_order: 5,
+          price_monthly_eur: 49, price_yearly_eur: 539, sort_order: 5,   /* v1250 */
           limits: _pl,
           /* v1176: der Partner ist ein Pro-Klon — er erbt dessen Kontingent. */
           kontingent: (_pro && _pro.kontingent)
