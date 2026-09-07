@@ -901,7 +901,25 @@ async function suggestDs2Fields(payload, opts) {
     'Recherchiere kurz für die Adresse (Bevölkerungsentwicklung, Marktmiete €/m², Nachfrage etc.) und gib für jedes Feld:',
     '  - "value": exakt einer der erlaubten ENUM-Werte (für Kategorien) ODER eine Zahl (für numerische Felder)',
     '  - "reasoning": kurze Begründung in 1 Satz, max 80 Zeichen',
-    '  - "source": Quelle, z.B. "Mietspiegel Herford 2024", "Stat. Bundesamt", "regionale Marktberichte". Bei Unsicherheit: "KI-Marktbewertung". KEINE erfundenen URLs.',
+    '  - "source": Kurzname der WICHTIGSTEN Quelle (max 80 Zeichen). Bei Unsicherheit: "KI-Marktbewertung".',
+    '  - "sources": ALLE benutzten Quellen als Array, je { "label": "...", "url": "..." }. url weglassen wenn nicht sicher bekannt.',
+    '',
+    /* v1242 · Marcels Vorgabe vom 07.09.2026: „die KI anfrage duerfte mehrere
+       quellen ausgeben und moeglichst immer bei der gemeinde oder stadt
+       nachschauen ob es da einen mietspiegel gibt, einen offiziellen."
+       Der Prompt verlangte bis hierher genau EINE Quelle (source, 80 Zeichen)
+       und nannte den Mietspiegel nur als Beispiel. Jetzt ist er der erste
+       Auftrag — und das Fehlen eines Mietspiegels ist eine Antwort, keine
+       Luecke. */
+    'AMTLICHER MIETSPIEGEL — ZUERST PRUEFEN:',
+    '  - Sieh fuer die Gemeinde/Stadt nach, ob es einen OFFIZIELLEN Mietspiegel gibt',
+    '    (Stadt, Gemeinde, Landkreis, IHK oder Haus- und Grundbesitzerverein).',
+    '  - Gibt es einen: nenne ihn mit JAHR in "sources" und stuetze ds2_marktmiete darauf.',
+    '  - Gibt es keinen: sage das ausdruecklich in "reasoning" ("kein amtlicher',
+    '    Mietspiegel fuer <Ort>") und nenne, worauf du dich stattdessen stuetzt.',
+    '  - Ein qualifizierter Mietspiegel (§ 558d BGB) hat Vorrang vor einem einfachen.',
+    '  - NICHT raten: ein Mietspiegel, den du nicht belegen kannst, wird nicht genannt.',
+    '',
     '',
     'WICHTIG:',
     '  - ENUM-Werte EXAKT so wie angegeben (keine Übersetzung, keine Kreativität)',
@@ -930,12 +948,33 @@ async function suggestDs2Fields(payload, opts) {
     const sugg = parsed.suggestions[fid];
     if (!sugg || sugg.value == null || sugg.value === '') return;
     const spec = fieldSpecs[fid];
+    /* v1242 · Quellen sind jetzt eine LISTE. `source` (Einzahl) bleibt
+       erhalten, damit aeltere Anzeigen nicht ins Leere greifen — sie
+       bekommt den ersten Eintrag. Ohne URL ist eine Quelle trotzdem eine
+       Quelle; erfundene URLs sind schlimmer als keine. */
+    const _quellen = (function () {
+      const roh = Array.isArray(sugg.sources) ? sugg.sources : [];
+      const out = [];
+      roh.forEach(function (q) {
+        if (!q) return;
+        const label = (typeof q === 'string' ? q : (q.label || q.title || q.name || '')).toString().trim().slice(0, 120);
+        if (!label) return;
+        let url = (typeof q === 'object' && q.url ? String(q.url).trim() : '');
+        if (url && !/^https?:\/\//i.test(url)) url = '';
+        if (out.some(function (x) { return x.label === label; })) return;
+        out.push(url ? { label: label, url: url } : { label: label });
+      });
+      if (!out.length && sugg.source) out.push({ label: String(sugg.source).slice(0, 120) });
+      return out.slice(0, 6);
+    })();
+    const _quelleKurz = (sugg.source || (_quellen[0] && _quellen[0].label) || 'KI-Marktbewertung').toString().slice(0, 80);
     if (spec && Array.isArray(spec.values)) {
       if (spec.values.indexOf(sugg.value) >= 0) {
         cleaned[fid] = {
           value: sugg.value,
           reasoning: (sugg.reasoning || '').toString().slice(0, 200),
-          source: (sugg.source || 'KI-Marktbewertung').toString().slice(0, 80)
+          source: _quelleKurz,
+          sources: _quellen
         };
       }
     } else {
@@ -944,7 +983,8 @@ async function suggestDs2Fields(payload, opts) {
         cleaned[fid] = {
           value: n,
           reasoning: (sugg.reasoning || '').toString().slice(0, 200),
-          source: (sugg.source || 'KI-Marktbewertung').toString().slice(0, 80)
+          source: _quelleKurz,
+          sources: _quellen
         };
       }
     }

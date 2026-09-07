@@ -171,9 +171,7 @@ async function runKiMiete() {
       if (sugMarkt.reasoning) {
         html += '<div class="ki-miete-reasoning">' + _esc(sugMarkt.reasoning) + '</div>';
       }
-      if (sugMarkt.source) {
-        html += '<div class="ki-miete-source">📎 Quelle: ' + _renderSrcLink(sugMarkt.source) + '</div>';
-      }
+      html += _renderQuellen(sugMarkt);
 
       html += '<div class="ki-miete-actions">';
       html += '<button type="button" class="btn btn-gold btn-sm" onclick="kiMieteApplyMarktmiete(' + marktVal + ')">Marktmiete (€/m²) übernehmen</button>';
@@ -196,9 +194,7 @@ async function runKiMiete() {
       if (sugAusfall.reasoning) {
         html += '<div class="ki-miete-reasoning">' + _esc(sugAusfall.reasoning) + '</div>';
       }
-      if (sugAusfall.source) {
-        html += '<div class="ki-miete-source">📎 Quelle: ' + _renderSrcLink(sugAusfall.source) + '</div>';
-      }
+      html += _renderQuellen(sugAusfall);
       html += '<div class="ki-miete-actions">';
       html += '<button type="button" class="btn btn-gold btn-sm" onclick="kiMieteApplyAusfall(\'' + _esc(ausfallVal) + '\')">Risiko-Einstufung übernehmen</button>';
       html += '</div>';
@@ -219,6 +215,33 @@ async function runKiMiete() {
     if (btn) { btn.disabled = false; btn.innerHTML = '<span data-ico="sparkles" data-ico-size="14"></span> Mietpreis recherchieren'; }
     if (typeof refreshDataIcos === 'function') setTimeout(refreshDataIcos, 10);
   }
+}
+
+/* ── v1242 · Mehrere Quellen statt einer ──────────────────────────────────
+   Marcels Vorgabe vom 07.09.2026: „die KI anfrage duerfte mehrere quellen
+   ausgeben und moeglichst immer bei der gemeinde oder stadt nachschauen ob
+   es da einen mietspiegel gibt, einen offiziellen."
+
+   Der Tester hatte bemaengelt, er sehe „nur den Mietspiegel" als Quelle.
+   Gemessen: es gab tatsaechlich nur eine — der Prompt verlangte genau eine
+   (`source`, 80 Zeichen). Seit v1242 liefert das Backend `sources` als
+   Liste; `source` bleibt als Kurzname erhalten.
+
+   Ein amtlicher Mietspiegel wird hervorgehoben: er ist die belastbarste
+   Quelle fuer eine Marktmiete, und der Nutzer soll auf einen Blick sehen,
+   ob es einen gab. */
+function _renderQuellen(sug) {
+  if (!sug) return '';
+  var liste = Array.isArray(sug.sources) ? sug.sources : [];
+  if (!liste.length && sug.source) liste = [{ label: sug.source }];
+  if (!liste.length) return '';
+  var amtlich = function (t) { return /mietspiegel/i.test(String(t || '')); };
+  var teile = liste.map(function (q) {
+    var s = _renderSrcLink(q.url ? q : (q.label || q));
+    return amtlich(q.label || q) ? '<b>' + s + '</b>' : s;
+  });
+  var wort = liste.length > 1 ? 'Quellen' : 'Quelle';
+  return '<div class="ki-miete-source">📎 ' + wort + ': ' + teile.join(' · ') + '</div>';
 }
 
 function _renderSrcLink(src) {
