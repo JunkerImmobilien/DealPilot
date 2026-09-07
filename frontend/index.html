@@ -2625,6 +2625,35 @@ label.dp-required.qc-required::after {
             <span class="hint">Typisch: 15–22% (Verwaltung, Rücklagen, Mietausfall)</span>
           </div>
           <div class="f"><label>Gesamt (% der NKM)</label><div class="cf" id="bwk_total_pct">—</div></div>
+          <!-- v1245 · Testbericht: „% der NKM für die Bewirtschaftungskosten,
+               macht man das? Wird ja in München ganz anderer % Wert sein als
+               in Bielefeld z.B."
+               Berechtigt, und DealPilot beantwortet es im eigenen Haus schon
+               anders: der Marktbericht rechnet nach ImmoWertV Anlage 3 die
+               Verwaltung je bewerteter Einheit und die Instandhaltung je m²
+               — beides unabhängig von der Miethöhe. Die Quote bleibt als
+               Schnellweg, bekommt aber gesagt, wo sie ungenau wird. -->
+          <div class="f" id="bwk-lage-hinweis" style="margin-top:6px">
+            <div style="font-size:12px;line-height:1.55;color:var(--muted);border-left:2px solid color-mix(in srgb, var(--gold) 35%, transparent);padding:2px 0 2px 10px">
+              <span id="bwk-lage-zahl"></span>
+              <details style="margin-top:5px">
+                <summary style="cursor:pointer;font-weight:600">Warum die Quote bei hohen Mieten überzeichnet</summary>
+                <div style="margin-top:6px">
+                  Die <b>nicht umlagefähigen</b> Kosten hängen mehr an der Wohnung als
+                  an der Miete: Verwaltung wird je Einheit abgerechnet, Instandhaltung
+                  je m². Verdoppelt sich die Miete, verdoppelt eine Prozentquote sie mit
+                  — der tatsächliche Aufwand bleibt gleich. Dieselbe Wohnung kostet in
+                  München nicht doppelt so viel Verwaltung wie in Bielefeld.
+                  <br><br>
+                  Der DealPilot-Marktbericht rechnet deshalb nach <b>ImmoWertV Anlage 3</b>
+                  je Einheit und je m². Für eine erste Einschätzung ist die Quote in
+                  Ordnung; wer genauer rechnen will, trägt die Positionen unten unter
+                  <i>Umlagefähige</i> und <i>Nicht umlagefähige Kosten</i> einzeln ein —
+                  dann gilt die Detailrechnung statt der Quote.
+                </div>
+              </details>
+            </div>
+          </div>
         </div>
 
         <!-- KP-Modus -->
@@ -3215,7 +3244,7 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v1190"></script>
+  <script src="js/calc.js?v=v1245"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
@@ -3280,7 +3309,7 @@ label.dp-required.qc-required::after {
 <script src="js/star-rating.js?v=364"></script>
 <script src="js/pdf-import.js?v=477"></script>
 <script src="js/beleg-import.js?v=v1188"></script>
-<script src="js/financing.js?v=v1244b"></script>
+<script src="js/financing.js?v=v1244c"></script>
 <script src="js/financing-pdf.js?v=20260611105943"></script>
 <script src="js/immokalk-import.js?v=124"></script>
 <script src="js/import-export-modal.js?v=893u"></script>

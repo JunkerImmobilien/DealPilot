@@ -606,11 +606,32 @@
 (function () {
   'use strict';
 
+  /* v1244c · Zahlen liest die App mit parseDe() aus calc.js — nicht mit
+     einem eigenen Parser.
+
+     Hier stand bis zum 07.09.2026 ein selbstgebauter:
+
+       String(e.value).split('.').join('').replace(',', '.')
+
+     Der behandelt JEDEN Punkt als Tausendertrenner. Aus "180.000" wird
+     damit richtig 180000 — aus "0.75" aber 75. Aufgefallen beim Messen
+     der Bewirtschaftungsquoten: `bwk_kp_pct` steht auf 0.75 und mein
+     Parser las 75, also das Hundertfache.
+
+     Für Eigenkapital und Darlehen wäre das nie aufgefallen, weil dort
+     ganze Eurobeträge stehen. Genau deshalb gehört es korrigiert: der
+     Fehler ist nicht sichtbar, bis jemand einen Dezimalpunkt eingibt.
+
+     parseDe() unterscheidet richtig — ein Punkt mit exakt drei
+     Folgeziffern ist ein Tausendertrenner, sonst ein Dezimaltrenner —
+     und kennt dazu deutsche wie amerikanische Schreibweise. Sie ist
+     global verfügbar; der Rückfall greift nur, wenn calc.js (noch) nicht
+     geladen ist. */
   function _zahl(id) {
     var e = document.getElementById(id);
     if (!e) return 0;
-    var s = String(e.value || '').split('.').join('').replace(',', '.');
-    var n = parseFloat(s);
+    if (typeof window.parseDe === 'function') return window.parseDe(e.value);
+    var n = parseFloat(String(e.value || '').replace(/[^\d,.-]/g, '').replace(',', '.'));
     return isFinite(n) ? n : 0;
   }
 

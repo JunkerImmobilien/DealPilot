@@ -1093,6 +1093,19 @@ function _calcImmediate(){
       st('bwk_pct_nul', fE(nul));
       st('bwk_pct_total', fE(bwk));
       st('bwk_total_pct', fP((ulPct + nulPct) * 100, 1));
+      /* v1245 · Die Quote in absoluten Zahlen daneben — Antwort auf
+         „% der NKM, macht man das? Wird ja in München ganz anderer % Wert
+         sein als in Bielefeld." Der Wert je m² ist die Brücke zur
+         ImmoWertV-Systematik, die der Marktbericht schon fährt. */
+      (function () {
+        var ziel = el('bwk-lage-zahl');
+        if (!ziel) return;
+        var wfl = v('wfl');
+        var txt = 'Das sind ' + fE(nul) + ' nicht umlagefähige Kosten im Jahr';
+        if (wfl > 0) txt += ' — ' + fE(nul / wfl, 2) + ' je m²';
+        txt += '. Bei doppelter Miete wären es ' + fE(nul * 2) + ', bei gleichem Aufwand.';
+        ziel.textContent = txt;
+      })();
     }
   } else {
     ul = v('hg_ul')+v('grundsteuer')+v('ul_sonst')+v('kp1')+v('kp2')+v('kp3')+v('kp4');
