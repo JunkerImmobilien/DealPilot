@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1247"><!-- v1148-spalt-1025px -->
+<link rel="stylesheet" href="css/style.css?v=v1248"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1192">
     <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
@@ -1267,8 +1267,8 @@ label.dp-required.qc-required::after {
         <option value="neubau_im_bau">Neubau – im Bau</option>
         <option value="geplant">Geplant / Bauträger</option>
       </select></div></div>
-      <div class="f"><label>Bruttogrundfläche (m²)</label><div class="iw"><input id="bgf" type="text" inputmode="decimal" placeholder="nur für den Sachwert bei Häusern" class="tr"><span class="sfx">m²</span></div></div>
-      <div class="f"><label>Standardstufe (NHK 2010)</label><div class="iw"><select id="standardstufe">
+      <div class="f"><label title="Bruttogrundflaeche nach DIN 277: alle Grundflaechen aller Grundrissebenen, aussen gemessen. NICHT die Wohnflaeche — die BGF ist regelmaessig deutlich groesser und ist die Bezugsgroesse der NHK.">Bruttogrundfläche (m²)</label><div class="iw"><input id="bgf" type="text" inputmode="decimal" placeholder="nur für den Sachwert bei Häusern" class="tr"><span class="sfx">m²</span></div></div>
+      <div class="f"><label title="Die Normalherstellungskosten 2010 staffeln die Baukosten nach fuenf Standardstufen — von sehr einfach (1) bis stark gehoben (5). Die Stufe beschreibt die Ausstattungsqualitaet des Gebaeudes, nicht seinen Zustand; der Zustand steckt im Modernisierungsgrad.">Standardstufe (NHK 2010)</label><div class="iw"><select id="standardstufe">
         <option value="">— keine Angabe —</option>
         <option value="1">1 · sehr einfach (nur Häuser)</option>
         <option value="2">2 · einfach (nur Häuser)</option>
@@ -1283,7 +1283,7 @@ label.dp-required.qc-required::after {
         <option value="dreispaenner">Dreispänner · 3 Wohnungen (× 0,97)</option>
         <option value="vierspaenner">Vierspänner · 4 Wohnungen (× 0,95)</option>
       </select></div></div>
-      <div class="f"><label>Modernisierungsgrad (Anlage 2)</label><div class="iw"><select id="mod_punkte">
+      <div class="f"><label title="Punktesystem der Anlage 2: durchgefuehrte Modernisierungen (Dach, Fenster, Heizung, Baeder, Leitungen ...) ergeben Punkte, aus denen sich die verlaengerte Restnutzungsdauer ableitet. Es beschreibt den Zustand — die Standardstufe daneben die Ausstattungsqualitaet.">Modernisierungsgrad (Anlage 2)</label><div class="iw"><select id="mod_punkte">
         <option value="">— keine Angabe, wird geschätzt —</option>
         <option value="0">nicht modernisiert</option>
         <option value="4">kleine Modernisierungen im Rahmen der Instandhaltung</option>
@@ -1291,8 +1291,8 @@ label.dp-required.qc-required::after {
         <option value="14">überwiegend modernisiert</option>
         <option value="19">umfassend modernisiert</option>
       </select></div></div>
-      <div class="f"><label>Sachwertfaktor</label><div class="iw"><input id="sachwertfaktor" type="text" inputmode="decimal" placeholder="leer = aus der Parametertabelle" class="tr"></div></div>
-      <div class="f"><label>Stellplatzmiete (€/Monat)</label><div class="iw"><span class="pfx">€</span><input id="stellplatz_miete_monat" type="text" inputmode="decimal" placeholder="je Stellplatz" class="trl"></div></div>
+      <div class="f"><label title="Marktanpassungsfaktor nach Paragraf 21 Abs. 3 ImmoWertV: er fuehrt den vorlaeufigen Sachwert zum marktangepassten Sachwert. Er kommt vom oertlichen Gutachterausschuss und ist keine Schaetzung — ohne Faktor bleibt der Sachwert vorlaeufig.">Sachwertfaktor</label><div class="iw"><input id="sachwertfaktor" type="text" inputmode="decimal" placeholder="leer = aus der Parametertabelle" class="tr"></div></div>
+      <div class="f"><label title="Nur die Stellplatz- und Garagenmiete. Die Nettokaltmiete der Wohnung steht im Tab Miete und wird von dort uebernommen — sie fehlt hier nicht, sie steht nur nicht zweimal. Die Bewirtschaftungskosten-Quoten rechnen auf dem GESAMTEN Rohertrag, also einschliesslich dieser Stellplaetze.">Stellplatzmiete (€/Monat)</label><div class="iw"><span class="pfx">€</span><input id="stellplatz_miete_monat" type="text" inputmode="decimal" placeholder="je Stellplatz" class="trl"></div></div>
       <div class="f"><label>Sonstige Einnahmen (€/Jahr)</label><div class="iw"><span class="pfx">€</span><input id="sonstige_jahr" type="text" inputmode="decimal" placeholder="Werbefläche, Antennenanlage …" class="trl"></div></div>
     </div>
 
@@ -1392,7 +1392,7 @@ label.dp-required.qc-required::after {
     <div class="card-title">Ansätze des Sachverständigen</div>
     <p class="sec-desc" style="margin:-6px 0 12px">Nur für den Ausnahmefall. Leer heißt: der Bericht holt den Wert selbst — Liegenschaftszins aus der Parametertabelle, Bodenrichtwert über BORIS.</p>
     <div class="g3">
-      <div class="f"><label>Liegenschaftszinssatz (%)</label><div class="iw"><input id="lzs_pct" type="text" inputmode="decimal" placeholder="leer = amtlicher bzw. gesetzlicher Wert" class="tr"><span class="sfx">%</span></div></div>
+      <div class="f"><label title="Der Zinssatz, mit dem der Verkehrswert von Grundstuecken im Durchschnitt marktueblich verzinst wird (Paragraf 21 Abs. 2 ImmoWertV). Er kommt vom oertlichen Gutachterausschuss und steuert den Ertragswert stark — schon ein halber Punkt verschiebt ihn spuerbar.">Liegenschaftszinssatz (%)</label><div class="iw"><input id="lzs_pct" type="text" inputmode="decimal" placeholder="leer = amtlicher bzw. gesetzlicher Wert" class="tr"><span class="sfx">%</span></div></div>
       <div class="f"><label>Bodenrichtwert manuell (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="brw_manuell" type="text" inputmode="decimal" placeholder="leer = amtlicher Abruf" class="trl"></div></div>
       <div class="f"><label>Bodenwert-Anpassung (%)</label><div class="iw"><input id="brw_anpassung_pct" type="text" inputmode="decimal" placeholder="z. B. -10 für Lärmbelastung" class="tr"><span class="sfx">%</span></div></div>
       <div class="f s2"><label>Begründung der Anpassung</label><div class="iw"><input id="brw_anpassung_grund" type="text" placeholder="Pflicht, sobald eine Anpassung eingetragen ist" class="tr"></div></div>
