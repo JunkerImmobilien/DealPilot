@@ -8243,6 +8243,92 @@ Zum Freischalten genügt eines davon:
 - oder die acht Preise im Dashboard selbst anlegen — die Liste oben ist
   vollständig, inklusive der Metadaten, ohne die nichts gutgeschrieben wird.
 
+## Rollout-Journal · 07.09.2026, siebter Teil — Stripe Live (`v1246d`)
+
+**Marcel hat den MCP-Zugang neu angemeldet.** Damit war das Hauptkonto
+erreichbar, und die Preisrunde ist jetzt **auf Produktion live**.
+
+### Im Live-Konto angelegt
+
+| lookup_key | Betrag | price_id |
+|---|---|---|
+| `dp_plan_starter_yearly` | 219,00 € | `price_1UD0EyGefFev8arz11VQIFDo` |
+| `dp_plan_investor_monthly` | 34,99 € | `price_1UD0F3GefFev8arzus8mGLSN` |
+| `dp_plan_investor_yearly` | 384,00 € | `price_1UD0F8GefFev8arz9afDYKTG` |
+| `dp_plan_pro_monthly` | 49,99 € | `price_1UD0FEGefFev8arznfJvi1Pf` |
+| `dp_plan_pro_yearly` | 549,00 € | `price_1UD0FJGefFev8arzHB9cc5jY` |
+| `dp_nachkauf_starter` | 5,00 € | `price_1UD0FQGefFev8arzGocCWjV0` |
+| `dp_nachkauf_investor` | 8,75 € | `price_1UD0FVGefFev8arzqeT4O9oV` |
+| `dp_nachkauf_pro` | 12,50 € | `price_1UD0FbGefFev8arzdaAPEjkn` |
+
+Alle mit `transfer_lookup_key`, alle **`tax_behavior: inclusive`** — wie die
+bestehenden Preise; eine abweichende Steuerbehandlung wäre lautlos falsch
+gewesen. Dazu Coupon **`ERSTFLUG15`** (15 %, dauerhaft). Neun alte Preise
+stillgelegt. `plans` auf Prod nachgezogen, vorher gesichert
+(`/root/backups/plans-vor-v1246-1059.sql.gz`).
+
+### `v1246d` — der Kauf wäre trotzdem gescheitert
+
+Nach dem Anlegen gemessen: Stripe hatte die Preise, der Katalog führte
+sie — **und der Kauf wäre mit HTTP 400 abgebrochen.**
+
+`credits.js:136` fragt `istBewertungsSku(pack_id)`, um den
+Bewertungs-Zweig zu wählen. Das Muster kannte nur
+`paket_*|mpi|mpi_plus|wev|avm_a|avm_b`. **`nachkauf_starter` fiel durch**,
+landete beim alten Kerosin-Weg und kam als `invalid_pack` zurück.
+
+> **Das ist dieselbe Falle wie `v1184`, eine Ebene tiefer:** dort war es
+> der Türsteher im Frontend, hier der im Backend. In *einem* Paket
+> zweimal dieselbe Bauart getroffen — wer eine neue SKU-Familie einführt,
+> sucht **alle** Stellen, die SKUs aufzählen.
+
+Gegenprobe gegen elf Fälle: die drei neuen und sechs alten werden
+angenommen, `unsinn` und das unvollständige `nachkauf_` abgelehnt.
+
+### Nachweis auf Produktion
+
+- Landing liefert `data-m="19.99"/"34.99"/"49.99"` mit `data-y`
+  `219`/`384`/`549`; App lädt `config.js?v=v1246c`,
+  `promo-erstflug.js?v=v1246`; beide Domains 200.
+- Alle neun `lookup_key`s lösen im **Live**-Konto die richtigen Beträge
+  auf.
+- Im laufenden Prod-Backend: `istBewertungsSku` sagt zu allen drei
+  Nachkauf-SKUs `true`, zu `unsinn` `false`; `LOOKUP_KEYS` führt die acht
+  neuen Namen.
+- `getBySku('nachkauf_pro')` auf **Prod**: 12,50 €, gutschreibt
+  `{"mpi":5,"mpi_plus":5,"wev":5}`, `price_1UD0Fb…`,
+  `lookup_key: dp_nachkauf_pro`.
+
+**Commits.** `951e478` (Prod-Merge) · `9f8aa88` (`v1246d`) · `fa23ee6`
+(Prod-Merge Nachtrag). Backend-Datei → beide Umgebungen neu gebaut.
+
+### Die Frage nach dem ungenutzten Stripe-Konto
+
+Marcel: *„mir ist aufgefallen dass ein stripe konto von den test dingern
+nicht genutzt wird das könntest du löschen."*
+
+**Gemessen — es sind zwei Konten, nicht drei:**
+
+| Eintrag | was es ist | genutzt von |
+|---|---|---|
+| `acct_1TWXFdGefFev8arz` (live) | Hauptkonto | **Produktion** |
+| `acct_1TWXFdGefFev8arz` (test) | der **Testmodus desselben Kontos** | **niemand** |
+| `acct_1TWXFqKEjyPDo0wo` | separate Sandbox | **Staging** |
+
+Der mittlere Eintrag ist kein eigenes Konto, sondern der Testmodus des
+Hauptkontos. **Marcels Beobachtung stimmt:** dort liegen zwölf Preise,
+und **keiner trägt einen `lookup_key`** — der Code sucht ausschließlich
+über Lookup-Keys, diese Umgebung könnte also gar nicht bedient werden.
+
+**Löschen lässt er sich trotzdem nicht:** ein Testmodus gehört
+untrennbar zum Konto. Löschbar wäre nur die Sandbox — und die nutzt
+Staging.
+
+**Was möglich wäre:** die zwölf verwaisten Testpreise dort archivieren,
+damit im Dashboard nichts Irreführendes stehenbleibt. Reversibel,
+harmlos, und es räumt genau das auf, was aufgefallen ist. Nicht getan —
+Marcels Entscheidung.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
