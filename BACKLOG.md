@@ -38,8 +38,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 07.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging auf `48e38f1`, **Produktion auf
-`60ca94c`**. **`v1215`–`v1252` sind live** — die Preisrunde ist
+**Stand:** lokal = GitHub = Staging auf `0ed29ba`, **Produktion auf
+`9ff1190`**. **`v1215`–`v1253` sind live** — die Preisrunde ist
 durch, in der Anzeige wie in Stripe. Nichts wartet auf einen Rollout.
 
 **Zuletzt fertig: `v1242a–e` — die KI-Mietrecherche.** Sie nennt jetzt
@@ -102,6 +102,19 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 > bedienen. **Löschen lässt er sich nicht**, ein Testmodus gehört zum
 > Konto. Möglich wäre, die zwölf verwaisten Preise dort zu archivieren;
 > das räumt das Dashboard auf und ist umkehrbar. **Noch nicht getan.**
+
+> ### Der Testbericht ist durch
+>
+> **Alle Anmerkungen aus `design/mockups/Anmerkungen.docx` sind
+> abgearbeitet** — `v1240` bis `v1253`. Die letzte offene, „warum so viele
+> Details für eine erste Renditeeinschätzung", wurde als `v1254` gebaut,
+> im Browser vorgeführt und von **Marcel verworfen**; zurückgenommen mit
+> `cd1a942`, Buster mit `v1255` vorwärts. Er war nie auf Prod.
+>
+> Die Demo bleibt unter `design/Vorschläge/eingabemodus-demo.html` mit dem
+> Vermerk „gebaut und verworfen" stehen — samt der Messungen (238
+> Eingabefelder, davon 14 Pflicht; der Umbau hätte 261 auf 82 sichtbare
+> Felder gebracht, ohne einen einzigen Wert zu verlieren).
 
 > ### Der erste Griff jetzt — in dieser Reihenfolge
 >

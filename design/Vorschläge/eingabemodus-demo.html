@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DealPilot · Vorschlag: Wie ausführlich soll die Eingabe sein?</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --obsidian:#050505; --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+    --green:#3FA56C; --red:#B8625C; --creme:#FDFCFA; --karte:#FBF6E9;
+    --muted:#7A7370;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--obsidian);color:var(--creme);
+       font-family:Inter,system-ui,sans-serif;line-height:1.6}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px 80px}
+  h1{font-family:'Space Grotesk',sans-serif;font-size:30px;margin:0 0 6px;color:var(--gold-hi)}
+  h2{font-family:'Space Grotesk',sans-serif;font-size:20px;margin:44px 0 14px;
+     border-left:3px solid var(--gold);padding-left:12px}
+  .lead{color:#cfc9c0;max-width:70ch;margin:0 0 8px}
+  .mono{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.04em;
+        color:var(--gold);text-transform:uppercase}
+  .quote{border-left:3px solid var(--gold-lo);padding:10px 0 10px 16px;margin:18px 0;
+         color:#d8d2c8;font-style:italic;max-width:75ch}
+
+  /* ── Zahlenband ── */
+  .zahlen{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:22px 0 8px}
+  .z{background:#0f0e0c;border:1px solid #241f16;border-radius:10px;padding:14px 16px}
+  .z-v{font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;line-height:1;
+       background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));
+       -webkit-background-clip:text;background-clip:text;color:transparent}
+  .z-l{font-size:12px;color:var(--muted);margin-top:5px}
+
+  /* ── Der Vorschlag: die Frage ── */
+  .frage{background:linear-gradient(160deg,#131109,#0b0a08);border:1px solid #2a2417;
+         border-radius:14px;padding:24px;margin:16px 0 8px}
+  .frage h3{font-family:'Space Grotesk',sans-serif;margin:0 0 4px;font-size:19px;color:var(--creme)}
+  .frage p{margin:0 0 18px;color:var(--muted);font-size:13.5px}
+  .karten{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:680px){.karten{grid-template-columns:1fr}}
+  .k{background:#0a0907;border:1.5px solid #2a2417;border-radius:12px;padding:18px;
+     cursor:pointer;transition:border-color .15s,transform .15s}
+  .k:hover{transform:translateY(-2px)}
+  .k.an{border-color:var(--gold);box-shadow:0 0 0 1px rgba(201,168,76,.25)}
+  .k-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .k-t{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700}
+  .k-n{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold)}
+  .k-s{color:var(--muted);font-size:13px;margin:6px 0 12px}
+  .k ul{margin:0;padding-left:17px;font-size:13px;color:#cfc9c0}
+  .k li{margin:3px 0}
+  .k-fuss{margin-top:12px;padding-top:10px;border-top:1px solid #201b13;
+          font-size:12px;color:var(--muted)}
+
+  /* ── Feldvergleich ── */
+  .vgl{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+  @media(max-width:680px){.vgl{grid-template-columns:1fr}}
+  .sp{background:#0c0b09;border:1px solid #201b13;border-radius:12px;overflow:hidden}
+  .sp-h{padding:11px 16px;font-family:'JetBrains Mono',monospace;font-size:11.5px;
+        letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid #201b13}
+  .sp-h.a{color:var(--gold);background:rgba(201,168,76,.07)}
+  .sp-h.b{color:var(--muted)}
+  .sp ul{list-style:none;margin:0;padding:8px 0}
+  .sp li{padding:5px 16px;font-size:13px;display:flex;justify-content:space-between;gap:10px}
+  .sp li span:last-child{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted)}
+  .sp li.aus{color:#5d574e}
+  .sp li.aus span:last-child{color:#443f38}
+
+  table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13.5px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid #1d1913}
+  th{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.05em;
+     text-transform:uppercase;color:var(--gold)}
+  td.n{font-family:'JetBrains Mono',monospace;text-align:right}
+  .ok{color:var(--green)} .weg{color:var(--muted)}
+
+  .hinweis{background:rgba(201,168,76,.06);border-left:3px solid var(--gold);
+           border-radius:0 8px 8px 0;padding:12px 16px;margin:18px 0;font-size:13.5px;max-width:78ch}
+  .fuss{margin-top:50px;padding-top:18px;border-top:1px solid #1d1913;
+        color:var(--muted);font-size:12.5px}
+  code{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold-hi);
+       background:rgba(201,168,76,.08);padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="mono" style="color:#B8625C">Vorschlag · GEBAUT UND VERWORFEN · 07.09.2026</div>
+  <h1>Wie ausführlich soll die Eingabe sein?</h1>
+  <p class="lead">Ein Vorschlag zur letzten offenen Anmerkung aus dem Testbericht.</p>
+  <div class="hinweis" style="border-left-color:#B8625C;background:rgba(184,98,92,.07)">
+    <b>Nachtrag 07.09.2026:</b> Der Vorschlag wurde als <code>v1254</code> gebaut, im
+    Browser getestet und von Marcel <b>verworfen</b> — zurückgenommen mit
+    <code>cd1a942</code>. Die gemessenen Zahlen unten stimmen weiterhin; die Seite
+    bleibt als Beleg, was untersucht wurde und was der Umbau bewirkt hätte
+    (261 auf 82 sichtbare Felder, alle 14 Pflichtfelder erhalten, keine Werte verloren).
+  </div>
+
+  <div class="quote">
+    „Allgemein: Warum werden hier so viele Details abgefragt? Ich wollte eine erste
+    Renditeeinschätzung. Vielleicht vorher fragen, wie umfangreich der Anwender jetzt
+    die Eingabe machen will? Oder die Bereiche per DropDown aufklappen oder zuklappen."
+  </div>
+
+  <h2>Das Problem in Zahlen</h2>
+  <p class="lead">Gemessen am 07.09.2026 in der laufenden App, über alle sechs
+     Eingabebereiche:</p>
+
+  <div class="zahlen">
+    <div class="z"><div class="z-v">238</div><div class="z-l">Eingabefelder insgesamt</div></div>
+    <div class="z"><div class="z-v">14</div><div class="z-l">Pflichtfelder für eine vollständige Bewertung</div></div>
+    <div class="z"><div class="z-v">93</div><div class="z-l">davon allein im Tab „Objekt"</div></div>
+    <div class="z"><div class="z-v">6 %</div><div class="z-l">der Felder genügen für den ersten Blick</div></div>
+  </div>
+
+  <div class="hinweis">
+    <b>Die Grundlage gibt es schon.</b> <code>workflow.js</code> kennt seit V56 zwei
+    Stufen — <code>einfach</code> und <code>detailliert</code> — und führt für jeden
+    Bereich, welche Felder in welcher Stufe Pflicht sind. Der Wert steht in
+    <code>dp_user_settings.workflow_detail_level</code>. <b>Was fehlt, ist nicht die
+    Mechanik, sondern die Frage.</b> Heute wird niemand gefragt; alle 238 Felder stehen
+    von Anfang an da.
+  </div>
+
+  <h2>Der Vorschlag: einmal fragen, beim ersten Objekt</h2>
+  <p class="lead">Statt eines weiteren Knopfes in den Einstellungen: eine Frage, die
+     einmal gestellt wird — dort, wo sie zählt.</p>
+
+  <div class="frage">
+    <h3>Wie genau willst du dieses Objekt rechnen?</h3>
+    <p>Du kannst jederzeit umschalten. Nichts geht verloren — ausgeblendete Felder
+       behalten ihre Werte.</p>
+    <div class="karten">
+      <div class="k an" onclick="waehle(this,'a')">
+        <div class="k-top"><span class="k-t">Erste Einschätzung</span><span class="k-n">14 Felder</span></div>
+        <div class="k-s">Reicht für Rendite, Cashflow und den DealPilot-Score.</div>
+        <ul>
+          <li>Ort, Fläche, Baujahr, Objektart</li>
+          <li>Kaufpreis und Kaltmiete</li>
+          <li>Eigenkapital, Darlehen, Zins, Tilgung</li>
+          <li>Hausgeld, Grenzsteuersatz</li>
+        </ul>
+        <div class="k-fuss">≈ 3 Minuten · alles Weitere später</div>
+      </div>
+      <div class="k" onclick="waehle(this,'b')">
+        <div class="k-top"><span class="k-t">Vollständig</span><span class="k-n">alle Felder</span></div>
+        <div class="k-s">Für Bankunterlagen, Wertermittlung und Steuer-Mappe.</div>
+        <ul>
+          <li>alles aus der ersten Einschätzung</li>
+          <li>Wertermittlung nach ImmoWertV</li>
+          <li>AfA, § 7b, Werbungskosten</li>
+          <li>Bankexport und Track-Record</li>
+        </ul>
+        <div class="k-fuss">so wie heute — nichts ändert sich</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Was das im Formular bedeutet</h2>
+  <p class="lead">Beispiel Tab <b>Objekt</b> — heute 93 Felder. Links, was in der
+     ersten Einschätzung stehen bliebe; rechts, was zunächst zugeklappt wäre.</p>
+
+  <div class="vgl">
+    <div class="sp">
+      <div class="sp-h a">bleibt sichtbar · 5 Felder</div>
+      <ul>
+        <li><span>Ort</span><span>ort</span></li>
+        <li><span>Wohnfläche</span><span>wfl</span></li>
+        <li><span>Baujahr</span><span>baujahr</span></li>
+        <li><span>Objektart</span><span>objart</span></li>
+        <li><span>Wirtschaftlicher Übergang</span><span>wirtschaftlicher_uebergang</span></li>
+      </ul>
+    </div>
+    <div class="sp">
+      <div class="sp-h b">zunächst zugeklappt · 88 Felder</div>
+      <ul>
+        <li class="aus"><span>Wertermittlung (Marktbericht)</span><span>37 Felder</span></li>
+        <li class="aus"><span>Lage- &amp; Markt-Indikatoren</span><span>DS2</span></li>
+        <li class="aus"><span>Qualität &amp; Zustand · Sterne</span><span>8 Bereiche</span></li>
+        <li class="aus"><span>Gebäudeart nach NHK 2010</span><span>nur Häuser</span></li>
+        <li class="aus"><span>Investitionsthese, Risiken, Notizen</span><span>3 Felder</span></li>
+        <li class="aus"><span>Fotos, Kürzel, Etage, Zimmer …</span><span>Rest</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="hinweis">
+    <b>Zugeklappt heißt nicht weg.</b> Jeder Block bleibt an seiner Stelle und lässt
+    sich einzeln öffnen — die Mechanik dafür ist die vorhandene
+    <code>.v212-collapse-body</code>. Wer einen Wert einträgt und dann umschaltet,
+    behält ihn: ausgeblendet wird die Anzeige, nicht der Inhalt.
+  </div>
+
+  <h2>Was der einfache Modus liefert</h2>
+  <table>
+    <thead><tr><th>Ergebnis</th><th>14 Felder</th><th>alle Felder</th></tr></thead>
+    <tbody>
+      <tr><td>Bruttomietrendite, Cashflow, DSCR</td><td class="n ok">vollständig</td><td class="n ok">vollständig</td></tr>
+      <tr><td>DealPilot-Score (5 Faktoren)</td><td class="n ok">vollständig</td><td class="n ok">vollständig</td></tr>
+      <tr><td>Investor Deal Score (24 KPIs)</td><td class="n weg">Teilscore</td><td class="n ok">vollständig</td></tr>
+      <tr><td>Steuerlicher Cashflow</td><td class="n ok">mit Grenzsteuersatz</td><td class="n ok">mit AfA &amp; § 7b</td></tr>
+      <tr><td>Wertermittlung nach ImmoWertV</td><td class="n weg">—</td><td class="n ok">vollständig</td></tr>
+      <tr><td>Bankexport, Track-Record-PDF</td><td class="n weg">—</td><td class="n ok">vollständig</td></tr>
+    </tbody>
+  </table>
+
+  <div class="hinweis">
+    <b>Der Investor Deal Score ist der ehrliche Haken.</b> Er rechnet über 24
+    Kennzahlen; fehlen Lage- und Marktangaben, lässt er diese Punkte aus, statt sie zu
+    schätzen. Im einfachen Modus wäre er also ein Teilscore — <b>und muss sich auch so
+    nennen.</b> Ein Score, der weniger weiß und trotzdem eine volle Zahl zeigt, wäre
+    schlimmer als die 238 Felder.
+  </div>
+
+  <h2>Drei Wege — meine Empfehlung ist der erste</h2>
+  <table>
+    <thead><tr><th>Weg</th><th>Aufwand</th><th>Was er ändert</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>A · Frage beim ersten Objekt</b><br><span style="color:var(--muted);font-size:12.5px">
+            einmal fragen, Antwort merken, jederzeit umschaltbar</span></td>
+        <td class="n">mittel</td>
+        <td>Die Mechanik gibt es. Neu sind die Frage, das Zuklappen nach Stufe und die
+            Umschaltung im Kopf des Objekts.</td>
+      </tr>
+      <tr>
+        <td><b>B · Nur zuklappen</b><br><span style="color:var(--muted);font-size:12.5px">
+            keine Frage, alle Blöcke außer den Pflichtfeldern zu</span></td>
+        <td class="n">klein</td>
+        <td>Schnell gemacht, aber niemand erfährt, warum. Wer sucht, klappt alles auf —
+            und steht wieder vor 238 Feldern.</td>
+      </tr>
+      <tr>
+        <td><b>C · Alles lassen</b><br><span style="color:var(--muted);font-size:12.5px">
+            Quick-Check bleibt der schnelle Weg</span></td>
+        <td class="n">keiner</td>
+        <td>Es gibt den Quick-Check bereits. Er wird nur nicht als der einfache Einstieg
+            wahrgenommen — der Tester hat ihn erst spät gefunden.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="hinweis">
+    <b>Ein Einwand vorweg, damit er nicht untergeht:</b> Der Testbericht sagt an anderer
+    Stelle „Ich habe jetzt das Quick Boarding wieder bei den Aktionen gefunden.. :-)".
+    Es gibt also bereits einen schnellen Weg — er wird nur nicht gefunden. <b>Weg A löst
+    das mit, weil die Frage am Anfang steht statt in einem Menü.</b> Wer nur C wählt,
+    sollte zumindest den Quick-Check sichtbarer machen.
+  </div>
+
+  <div class="fuss">
+    Alle Zahlen am 07.09.2026 in der laufenden Anwendung gemessen: 238 Eingabefelder
+    über <code>s0</code>, <code>s1</code>, <code>s2</code>, <code>s3</code>,
+    <code>s3-tax</code>, <code>s4</code>; die 14 Pflichtfelder aus
+    <code>DealPilotWorkflow.getStatus()</code>. Diese Seite ist ein Vorschlag und
+    verändert nichts an der App.
+  </div>
+</div>
+
+<script>
+  function waehle(el, welche){
+    document.querySelectorAll('.k').forEach(function(k){ k.classList.remove('an'); });
+    el.classList.add('an');
+  }
+</script>
+</body>
+</html>

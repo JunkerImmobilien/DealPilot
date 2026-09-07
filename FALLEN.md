@@ -1334,3 +1334,43 @@ nur die zweite Hälfte der Auskunft.
 > Dazu: die goldene Markierung trug **keinen Titel**. Eine Farbe, die
 > etwas bedeutet, muss sagen was — sonst erzeugt sie genau die Frage, die
 > sie beantworten sollte („ist das automatisch gesetzt worden?").
+
+## Zwei von drei Nachbarfeldern erklärt zu haben, ist schlimmer als keines
+
+*Investitionsthese* und *Bekannte Risiken* trugen je einen Tooltip,
+*Zusätzliche Notizen* daneben nicht — und der Platzhalter lautete
+„Weitere Hinweise…". Der Tester fragte prompt: *„Was soll hier rein?"*
+
+**Wo Nachbarn sich erklären, liest sich das Schweigen des dritten als
+Bedeutungslosigkeit.** Tatsächlich war es das wichtigste der drei:
+
+- `object-actions.js:1177` **hängt** Import-Inhalte dort **an**, statt sie
+  zu ersetzen — als einziges Feld überhaupt. Eigene Notizen überleben
+  also einen Exposé-Import.
+- `reseller-portal.js:466/545` zeigt den Inhalt dem **Berater** in der
+  Mandanten-Ansicht. Was hier steht, liest der Partner mit.
+
+Beides stand nur im Code. **Ein Feld, dessen Sonderverhalten nirgends
+außerhalb der Quelle steht, hat keine Dokumentation — es hat ein
+Geheimnis.**
+
+## `git revert` setzt den Cache-Buster ZURÜCK — und das ist gefährlich
+
+Die Rücknahme von `v1254` stellte auch die Cache-Buster wieder her:
+`style.css?v=v1254` wurde wieder zu `?v=v1248`, `workflow.js` zu
+`?v=v1243`. Das ist korrekt im Sinne des Reverts und **falsch im Sinne
+des Caches**.
+
+Wer die Fassung `v1254` bereits geladen hat, fordert danach wieder
+`v1248` an — und bekommt aus seinem Browser-Cache eine Datei, deren
+Inhalt sich inzwischen unterscheidet. Bei einem reinen Rückbau geht das
+meist gut; sobald zwischen den beiden Ständen noch etwas anderes
+passiert ist, entsteht eine Mischung aus zwei Fassungen, die es nie
+gegeben hat.
+
+**Ein Cache-Buster darf nur steigen — auch beim Zurücknehmen.** Nach
+jedem `git revert`, der eine Datei mit Buster berührt, die Nummer
+**vorwärts** setzen (`v1255`), nicht auf den alten Wert stehen lassen.
+
+> Dieselbe Familie wie „der Cache-Buster schützt die Datei, nicht das
+> Dokument": beide Male gewinnt der Cache gegen die Absicht.
