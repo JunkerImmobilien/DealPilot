@@ -1142,3 +1142,45 @@ Zahlungsmittel und Kündigung.
 Portal, *wenn* dort je ein Plan-Wechsel angeboten wird. Die alte Notiz
 war nicht falsch, aber sie hat eine Pflicht behauptet, die es heute nicht
 gibt.
+
+## Eine neue SKU-Familie fällt durch jede Weiche, die SKUs aufzählt
+
+`v1246` führte `nachkauf_starter|_investor|_pro` ein. In **einem** Paket
+sind daran **zwei** Türsteher gescheitert:
+
+1. **Frontend** — `_buyCreditPack()` sucht den Schlüssel in
+   `bewertungsPakete`, `einzelkauf`, `aiCreditPackages`. Der Nachkauf
+   wird abgeleitet und steht in keiner davon: jeder Klick wäre
+   herausgefallen, **ohne dass je ein Netzwerkaufruf entsteht**.
+2. **Backend** — `istBewertungsSku()` prüft gegen
+   `^(paket_[a-z]+|mpi|mpi_plus|wev|avm_a|avm_b)$`. `nachkauf_starter`
+   fiel durch, landete beim alten Kerosin-Weg und kam als
+   `invalid_pack` mit HTTP 400 zurück.
+
+Beide erst **nach** dem Anlegen der Stripe-Preise aufgefallen — Stripe
+hatte sie, der Katalog führte sie, und der Kauf wäre trotzdem gescheitert.
+
+**Wer eine neue SKU-Familie einführt, sucht alle Stellen, die SKUs
+aufzählen** — Regexe, Listen, `switch`. `grep` nach einem *bestehenden*
+SKU-Namen (`paket_kurz`) findet sie zuverlässiger als die Suche nach dem
+neuen.
+
+> `v1184` beschreibt genau diese Falle schon einmal, für die Pakete. Sie
+> war nicht weg, sie stand nur eine Ebene tiefer.
+
+## Ein Stripe-Testmodus ist kein zweites Konto
+
+Die Kontoliste zeigt drei Einträge, es sind aber **zwei Konten**: das
+Hauptkonto erscheint zweimal (live und Testmodus), dazu die separate
+Sandbox.
+
+Gemessen am 07.09.2026: im **Testmodus des Hauptkontos** liegen zwölf
+Preise, **keiner mit `lookup_key`**. Der Code sucht ausschließlich über
+Lookup-Keys — diese Umgebung kann er gar nicht bedienen. Sie ist echt
+verwaist.
+
+**Löschen lässt sie sich trotzdem nicht:** ein Testmodus gehört
+untrennbar zum Konto. Löschbar wäre nur eine Sandbox — und die ist die,
+die Staging benutzt.
+
+**Wer „ein Konto zu viel" sieht, prüft erst, ob es eines ist.**

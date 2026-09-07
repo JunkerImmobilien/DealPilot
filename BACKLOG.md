@@ -38,11 +38,9 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 07.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging auf `a5bc1a6`, **Produktion auf
-`409f863`**. **`v1215`–`v1244b` sind live**, `v1244c`–`v1246c` warten auf
-den naechsten Prod-Rollout. **`v1246c` fasst `bewertungsKatalog.js` an —
-das ist Backend, der Prod-Rollout braucht einen Neubau.** Und er darf erst
-laufen, wenn die Preise im Live-Stripe-Konto stehen (siehe unten).
+**Stand:** lokal = GitHub = Staging auf `1fc49e0`, **Produktion auf
+`fa23ee6`**. **`v1215`–`v1246d` sind live** — die Preisrunde ist
+durch, in der Anzeige wie in Stripe. Nichts wartet auf einen Rollout.
 
 **Zuletzt fertig: `v1242a–e` — die KI-Mietrecherche.** Sie nennt jetzt
 **alle** benutzten Quellen statt einer, prüft **zuerst**, ob es für den Ort
@@ -83,44 +81,27 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 > `localStorage`**, deren alter Zustand nirgends festgehalten ist.
 > **Reproduzierbar ist, dass die Bilanz aufgeht, nicht die 687.059 €.**
 
-> ### ⚠ ZUERST: das LIVE-Stripe-Konto — sonst darf `v1246` nicht auf Prod
+> ### ✓ Stripe ist fertig — Sandbox und Live
 >
-> **Die Sandbox ist fertig** (`v1246c`): acht Preise angelegt, Coupon
-> `ERSTFLUG15` (15 %), neun alte stillgelegt, `plans` auf Staging
-> nachgezogen, Metadaten gesetzt, Katalog-Endpunkt gegengeprüft.
+> **Die Preisrunde ist auf Produktion live.** Acht Preise im Hauptkonto
+> angelegt (219 / 34,99 / 384 / 49,99 / 549 und die drei Nachkauf-Preise
+> 5,00 / 8,75 / 12,50), Coupon `ERSTFLUG15` mit 15 %, neun alte
+> stillgelegt, `plans` auf Prod nachgezogen. Dasselbe in der Sandbox.
+> Alle Preis-IDs stehen im Journal der Projektanweisung.
 >
-> **Im LIVE-Konto fehlt alles davon.** Der Zugriff wurde von der
-> Sicherheitsschranke blockiert. Prod-`plans` steht weiter auf
-> 1999/19900 · 3999/39900 · 7999/79900. **Ginge `v1246` so auf Prod,
-> stünde 34,99 € auf der Seite und abgebucht würden 39,99 €.**
+> **`v1246d` kam noch dazu:** der Kauf wäre trotz korrekter Stripe-Preise
+> mit HTTP 400 gescheitert, weil `istBewertungsSku()` die neue
+> SKU-Familie `nachkauf_*` nicht kannte. Auf beiden Umgebungen behoben
+> und im laufenden Prod-Backend gegengeprüft.
 >
-> **Anzulegen im Live-Konto** (alle in EUR, `transfer_lookup_key=true`):
->
-> | lookup_key | Betrag | Art |
-> |---|---|---|
-> | `dp_plan_starter_yearly` | 21900 | jährlich |
-> | `dp_plan_investor_monthly` | 3499 | monatlich |
-> | `dp_plan_investor_yearly` | 38400 | jährlich |
-> | `dp_plan_pro_monthly` | 4999 | monatlich |
-> | `dp_plan_pro_yearly` | 54900 | jährlich |
-> | `dp_nachkauf_starter` | 500 | einmalig |
-> | `dp_nachkauf_investor` | 875 | einmalig |
-> | `dp_nachkauf_pro` | 1250 | einmalig |
->
-> *Starter monatlich bleibt 19,99 € — kein neuer Preis.*
->
-> **Die drei Nachkauf-Preise brauchen Metadaten**, sonst bucht der Kauf ab
-> und schreibt **nichts** gut: `dp_kind=bewertung_paket`,
-> `dp_pack_sku=nachkauf_<plan>`, und `mpi`/`mpi_plus`/`wev` =
-> 5/0/0 · 5/5/0 · 5/5/5.
->
-> Dazu: Coupon **15 %, dauerhaft**, Name *Erstflug* (eilt nicht, die
-> Anzeige ist aus). Die alten Plan- und Paket-Preise stilllegen, **nicht
-> löschen**. Danach `plans` auf Prod nachziehen — **vorher sichern**.
->
-> **Zum Freischalten genügt eines:** Stripe über `/mcp` neu anmelden (der
-> Zugang ist abgelaufen), eine Bash-Berechtigung für den Prod-Server, oder
-> die Preise selbst im Dashboard anlegen.
+> **Offen und Marcels Entscheidung — die Test-Umgebung.** Es sind **zwei**
+> Stripe-Konten, nicht drei: das Hauptkonto erscheint in der Liste zweimal
+> (live und sein Testmodus), dazu die separate Sandbox, die Staging nutzt.
+> Der **Testmodus des Hauptkontos** ist tatsächlich verwaist — zwölf
+> Preise, **keiner mit `lookup_key`**, der Code kann ihn gar nicht
+> bedienen. **Löschen lässt er sich nicht**, ein Testmodus gehört zum
+> Konto. Möglich wäre, die zwölf verwaisten Preise dort zu archivieren;
+> das räumt das Dashboard auf und ist umkehrbar. **Noch nicht getan.**
 
 > ### Der erste Griff jetzt — in dieser Reihenfolge
 >
