@@ -1822,7 +1822,7 @@ function _renderPlanPane() {
             'onclick="_setBillingCycle(\'monthly\')" type="button">Monatlich</button>' +
     '<button class="plan-toggle-btn ' + (billingCycle === 'yearly' ? 'active' : '') + '" ' +
             'onclick="_setBillingCycle(\'yearly\')" type="button">' +
-      'Jährlich · <span class="plan-toggle-bonus">2 Monate gratis + Bonus</span>' +
+      'Jährlich · <span class="plan-toggle-bonus">1 Monat gratis + Bonus</span>' +  /* v1246 */
     '</button>' +
   '</div>';
 

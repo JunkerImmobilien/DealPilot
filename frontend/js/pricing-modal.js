@@ -21,7 +21,7 @@
       price_monthly: 0, price_yearly: 0,
       features: [
         '1 Objekt',
-        '3 Speicherungen',
+        '4 Wochen voller Pro-Umfang',
         'DealPilot Score (5 Faktoren)',
         'Investor Deal Score (24 KPIs) — Demo',
         /* v1185: die Testphase steht zuerst, weil sie das ist, was ein
@@ -41,7 +41,7 @@
     {
       key: 'starter', letter: 'S', label: 'Starter', tag: 'Privat-Investor', title: 'Starter',
       lead: 'Fühlt sich vollständig an. Volle PDFs ohne Wasserzeichen, Werbungskosten-Modul, Mietspiegel-Vergleich — für die ersten echten Deals.',
-      price_monthly: 19.99, price_yearly: 199,   /* v1176 */
+      price_monthly: 19.99, price_yearly: 219,   /* v1246: 1 Freimonat statt 2 */
       features: [
         '5 Objekte',
         'DealPilot Score (5 Faktoren)',
@@ -66,7 +66,7 @@
     {
       key: 'investor', letter: 'I', label: 'Investor', tag: 'Bestseller', title: 'Investor',
       lead: 'Der Plan für aktive Investoren. Investor Deal Score mit 24 KPIs, Track-Record-PDF, Bankexport, Live-Marktzinsen und BMF-Rechner — alles, was Sie für ernstgemeinte Investments brauchen.',
-      price_monthly: 39.99, price_yearly: 399,  /* v1176 */
+      price_monthly: 34.99, price_yearly: 384,  /* v1246: Preisrunde 07.09.2026 */
       best: true,
       features: [
         '25 Objekte',
@@ -87,7 +87,7 @@
     {
       key: 'pro', letter: 'P', label: 'Pro', tag: 'Profis · Sachverständige', title: 'Pro',
       lead: 'Für Investoren, Sachverständige und Vermögensverwalter. Unbegrenzte Objekte, Premium-PDF-Layouts, Custom Track-Record Cover und Migration & Setup-Service inklusive.',
-      price_monthly: 79.99, price_yearly: 799,  /* v1176 */
+      price_monthly: 49.99, price_yearly: 549,  /* v1246: Preisrunde 07.09.2026 */
       features: [
         'Unbegrenzte Objekte',
         'Alle Investor-Features',

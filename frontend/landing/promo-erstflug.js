@@ -20,6 +20,39 @@
 (function (global) {
   'use strict';
 
+  /* ═══════════════════════════════════════════════════════════════
+     v1246 · Marcels Entscheidung vom 07.09.2026
+
+     „Generell auch dieser Dauerrabatt mit dem Erstflug, den können wir
+      auch rausnehmen. Bitte diesen Dauerrabatt nur vermerken, den
+      brauche ich später noch mit dem Erstflug. Den können wir schon mal
+      auf 15 Prozent setzen und können den auch Erstflug nennen. Aber
+      bitte nicht auf der Seite mehr angeben."
+
+     Also: die ANZEIGE ist aus, der Rabatt selbst bleibt vermerkt.
+     Die Datei bleibt vollständig stehen — sie ist die einzige Wahrheit
+     für Landing UND App, und sie wird wieder gebraucht. Ein Schalter ist
+     ehrlicher als ein Rückbau, der später falsch wiederaufgebaut wird.
+
+     Was der Kunde bis heute sah, war ohnehin kaputt: gemessen am
+     07.09.2026 auf der Staging-Landing stand in der Pro-Karte
+
+         <span class="dpp-old">79,99 €</span><b>79,98</b>
+
+     — ein „Altpreis", der nicht durchgestrichen war (text-decoration:
+     none), daneben ein „neuer" Preis, der einen Cent darunter lag. Ein
+     Rabatt von einem Cent, doppelt gedruckt.
+
+     WIEDEREINSCHALTEN: ANZEIGE_AKTIV auf true. Der Prozentsatz kommt im
+     Regelbetrieb aus Stripe (aktiver Promotion-Code); ERSTFLUG_PROZENT
+     gilt nur im Demo-Modus und hält fest, was vereinbart ist. Ein
+     Stripe-Coupon lässt seinen Prozentsatz nicht ändern — für 15 % muss
+     dort ein neuer angelegt werden.
+     ═══════════════════════════════════════════════════════════════ */
+  var ANZEIGE_AKTIV = false;
+  var ERSTFLUG_PROZENT = 15;   /* war 16 */
+  var ERSTFLUG_NAME = 'Erstflug';
+
   var CACHE_KEY = 'dp_promo_v2';   /* v2: alte Eintraege aus offenen Tabs verwerfen */
   var CACHE_TTL = 10 * 60 * 1000;      /* 10 min */
   var PLAN_WAIT = 4000;                /* max. Wartezeit auf dp:plan-ready */
@@ -439,13 +472,15 @@
      BOOT
      ═══════════════════════════════════════════════════════════════ */
   function boot() {
+    /* v1246: Anzeige aus — siehe Schalter oben. */
+    if (!ANZEIGE_AKTIV) return;
     var isApp = !!(global.Auth && typeof Auth.getApiBase === 'function');
 
     loadPromo().then(function (promo) {
       if (!promo) return;
       var dm = demoMode();
       var ctx = { app: isApp, plan: null, founding: (dm === 'founding') };
-      if (dm === 'founding') ST.percent = 16;
+      if (dm === 'founding') ST.percent = ERSTFLUG_PROZENT;
 
       var chain = (isApp && !dm)
         ? planReady().then(function (plan) {
