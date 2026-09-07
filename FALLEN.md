@@ -898,3 +898,97 @@ Regel fiel weg, der Unterschied blieb am Haken.
 
 **Bevor man Spezifität erhöht, prüft man, ob die Regel überhaupt das
 Richtige aussagt.**
+
+## Eine `function` im Prüfskript überschreibt die App
+
+Teuerste Falle des `v1244`-Zyklus, und sie kostete eine falsche
+Fehlermeldung. Meine Messskripte enthielten mehrfach diese Bequemlichkeit:
+
+```js
+function v(id){ var e=document.getElementById(id); return e? e.value : null; }
+```
+
+**Eine Funktionsdeklaration auf oberster Ebene des Prüfskripts ist
+global** — und `calc.js:59` heißt ebenfalls `v()`. Ab dem ersten solchen
+Skript lieferte `v('kp')` einen String statt einer Zahl. In `calc.js:756`
+steht `var gi = kp + nk + …`, also wurde aus 200000 + 20400 die
+Verkettung `"20000020400"`. `State.gi` war ein String, `calc()` warf
+später `n.toFixed is not a function` und brach mitten im Lauf ab.
+
+**Ich habe das als Produktfehler diagnostiziert.** Mit
+wiederhergestellter `v()` steht dort 220400 als Zahl — es war keiner.
+Ausdrücklich zurückgenommen.
+
+**In Prüfskripten nie `function name(){}` auf oberster Ebene.** Entweder
+alles in ein `(function(){ … })()` packen oder Namen wählen, die die App
+nicht kennt. Die App hat kurze globale Helfer: `v`, `g`, `el`, `st`,
+`sv`, `fE`, `fP`, `calc`. Jeder davon ist mit einem Einzeiler zerstörbar.
+
+> Dieselbe Familie wie „ein Prüfer, der nicht dieselben Quellen lädt wie
+> die laufende Maschine, misst sich selbst" — hier hat der Prüfer die
+> Maschine nicht nur gemessen, sondern verstellt.
+
+## Ein Wrapper, der fremde Marker verschluckt, lädt zum Doppelwrappen ein
+
+`window.calc` ist in DealPilot **zweimal** umhüllt: `financing.js:576`
+(zieht `dpFinancingRefresh` nach) und `deal-action-readycheck.js:208`
+(v450). Das zweite prüft an seinem Marker `_v450Wrapped`, ob es schon
+gewrappt hat — und **kopiert die Eigenschaften der alten Funktion auf die
+neue**, damit fremde Marker erhalten bleiben.
+
+Mein `v1244`-Wrapper tat das nicht. Er hätte `_v450Wrapped` unsichtbar
+gemacht; der nächste Lauf von `wrapGlobal` hätte ein zweites Mal gewrappt
+und `refresh()` doppelt gefeuert.
+
+**Wer eine globale Funktion umhüllt, überträgt ihre Eigenschaften mit.**
+`deal-action-readycheck.js` zeigt das Muster.
+
+> Und ein `grep` nach `window.calc = function` findet diese Wrapper
+> nicht: beide schreiben `var alt = window.calc; window.calc = function`
+> über mehrere Zeilen. Wer wissen will, wie oft etwas umhüllt ist, liest
+> den Stack einer echten Exception.
+
+## Wenn das Klick-Werkzeug nichts mehr zustellt, meldet es trotzdem Erfolg
+
+Vier Klicks hintereinander luden kein Objekt. Ich habe zuerst die
+Koordinaten verdächtigt (`devicePixelRatio` war 0,9) und umgerechnet —
+ohne Wirkung.
+
+**Die Diagnose kam erst aus einem Protokoll in der Seite:**
+
+```js
+document.addEventListener('click', function(e){ window._klickLog.push({x:e.clientX,y:e.clientY}); }, true);
+```
+
+Das Protokoll blieb **leer**. Die Klicks kamen gar nicht an, obwohl das
+Werkzeug jedes Mal „Clicked at (166, 219)" meldete. Ein neuer Tab half
+nicht. Vorher war schon ein `zoom` mit „renderer may be frozen"
+gescheitert — das war das erste Anzeichen.
+
+**„Clicked at …" heißt: der Befehl wurde abgesetzt, nicht: die Seite hat
+ihn bekommen.** Wer im Browser über Koordinaten bedient und keine Wirkung
+sieht, protokolliert zuerst im DOM, ob der Klick ankommt — bevor er
+Koordinaten, Zoomfaktoren oder Layout verdächtigt.
+
+## Eigenkapital und Darlehen waren zwei unabhängige Zahlen
+
+Gemessen am 07.09.2026 im Finanzierungs-Tab:
+
+| | EK | Darlehen |
+|---|---|---|
+| vorher | 20.000 | 180.000 |
+| EK auf 99.000 gesetzt | 99.000 | **180.000** (unverändert) |
+| Darlehen auf 150.000 | **20.000** (unverändert) | 150.000 |
+
+Und im gespeicherten Zustand von `2026-001`: Gesamtinvestition 220.400 €,
+Eigenkapital plus Darlehen 200.000 €. **Die Erwerbsnebenkosten waren
+weder finanziert noch als Eigenkapital eingetragen** — und nichts sagte
+es. Die EK-Rendite rechnete weiter auf 20.000 € statt auf 40.400 € und
+sah deshalb zu gut aus.
+
+`v1244` zeigt die Deckung offen und schließt sie auf Wunsch über das
+Eigenkapital oder über das Darlehen.
+
+**Zwei Eingabefelder, die zusammen eine dritte Größe ergeben müssen,
+brauchen eine Gegenprobe.** Sonst ist jede Kennzahl darüber
+unwidersprochen falsch.
