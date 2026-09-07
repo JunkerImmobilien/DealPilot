@@ -1229,6 +1229,8 @@
 
       // Gold-Streifen setzen (identisch zur QuickCheck-Übernahme)
       try { if (typeof window._v236MarkQcLoaded === 'function' && _marked.length) window._v236MarkQcLoaded(_marked); } catch(e) {}
+      /* v1252: und sagen, was NICHT kam — siehe _dpLageLuecken() unten. */
+      try { _dpLageLuecken(); } catch(e) {}
 
       if (typeof calc === 'function') calc();
       if (typeof toast === 'function') {
@@ -1335,3 +1337,55 @@
   window.pdfImportApply        = pdfImportApply;
   window.showMarketDataImport  = showMarketDataImport;
 })();
+
+/* ─── v1252 · Was NICHT aus dem Bericht kam ────────────────────────────
+   Testbericht: „Ist die Makrolage ‚Durchschnittlich' automatisch auf Basis
+   des Exposes getroffen worden? Hier ist sehr viel leer wie
+   Bevoelkerungsentwicklung. Sollte hier ein Hinweis sein, dass keine
+   Werte aus dem Expose entnommen werden konnten?"
+
+   Die App wusste es bereits: der Import sammelt in `_marked`, was er
+   gesetzt hat, und faerbt diese Felder golden (v236-qc-loaded). Sie sagte
+   aber nur, was ANKAM — nie, was fehlte. Wer ein halb gefuelltes Formular
+   sieht, kann beides nicht unterscheiden: „stand nicht im Bericht" und
+   „habe ich uebersehen".
+
+   Diese Zeile nennt die Luecken beim Namen, direkt in der Lage-Karte, wo
+   sie stehen. Sie verschwindet, sobald alle gefuellt sind. */
+function _dpLageLuecken() {
+  var FELDER = [
+    ['makrolage',           'Makrolage'],
+    ['mikrolage',           'Mikrolage'],
+    ['ds2_bevoelkerung',    'Bevölkerungsentwicklung'],
+    ['ds2_nachfrage',       'Nachfrage'],
+    ['ds2_wertsteigerung',  'Wertsteigerung'],
+    ['ds2_entwicklung',     'Entwicklungspotenzial']
+  ];
+  var karte = document.querySelector('.lage-markt-card');
+  if (!karte) return;
+
+  var leer = FELDER.filter(function (f) {
+    var e = document.getElementById(f[0]);
+    return e && !String(e.value || '').trim();
+  });
+
+  var box = document.getElementById('dp-lage-luecken');
+  if (!leer.length) { if (box) box.remove(); return; }
+
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'dp-lage-luecken';
+    box.style.cssText = 'margin:8px 0 12px;padding:9px 12px;border-radius:8px;font-size:12.5px;line-height:1.5;' +
+      'background:color-mix(in srgb, var(--gold) 7%, transparent);' +
+      'border-left:3px solid color-mix(in srgb, var(--gold) 45%, transparent)';
+    var nach = karte.querySelector('.hint') || karte.querySelector('.ct');
+    if (nach && nach.parentNode) nach.parentNode.insertBefore(box, nach.nextSibling);
+    else karte.insertBefore(box, karte.firstChild);
+  }
+  box.innerHTML =
+    '<b>Aus dem Bericht kam hier nichts:</b> ' +
+    leer.map(function (f) { return f[1]; }).join(' · ') + '.<br>' +
+    '<span style="color:var(--muted)">Das heißt nicht, dass die Lage schlecht ist — die Angaben standen nicht ' +
+    'im Dokument. Trag sie selbst ein oder lass sie über <i>Pilot-Lagebewertung</i> recherchieren; ' +
+    'ohne sie rechnet der Investor Deal Score diese Punkte nicht mit.</span>';
+}
