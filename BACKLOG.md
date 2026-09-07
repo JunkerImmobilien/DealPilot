@@ -38,9 +38,9 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 07.09.2026)
 
-**Stand:** lokal = GitHub = Staging = **Produktion** auf `5149e5b`.
-**Alles ist live** — `v1215`–`v1239`. Fünf Prod-Rollouts am 04.09. und
-einer am 07.09. Nachweise im Rollout-Journal der Projektanweisung.
+**Stand:** lokal = GitHub = Staging auf `63758ba`, **Produktion auf `4f9e38b`**.
+**`v1215`–`v1239` sind live.** Auf Staging warten `v1240` (Soll-Miete ergibt
+den Prozentsatz) und `v1241` (KI-Knopf nach oben).
 
 **Und auf Prod liegen jetzt Marcels Daten.** Der Staging-Nutzer
 `info@junker-immobilien.io` ist auf Prod ins Konto gleicher Mailadresse
@@ -2487,12 +2487,52 @@ entfällt — nicht raten.
    - **Oben stehen schon Haken, obwohl der Bereich nie besucht wurde.**
 
    **E · Miete**
-   - Marktmiete ohne KI zu niedrig; **mit KI 10,99 €/m²** — realistischer, für
-     den Zustand aber eher zu hoch. Er sieht als Quelle nur den Mietspiegel.
-   - **Den KI-Knopf nach oben** oder gleich automatisch recherchieren.
-   - **Mietsteigerung doppelt abgefragt:** wer dreimal erhöhen will, um auf
-     10 € zu kommen, hat das Ziel schon genannt — die „angestrebte
-     Entwicklung" fragt dasselbe noch einmal.
+   - **Marktmiete ohne KI zu niedrig; mit KI 10,99 €/m² — für den Zustand
+     aber eher zu hoch. Er sieht als Quelle nur den Mietspiegel.**
+     **GEMESSEN am 07.09.2026, aber NICHT gebaut — es ist eine
+     Bewertungsfrage.** Die Recherche läuft über `/api/v1/ai/ds2-suggest`,
+     und die Antwort trägt **eine** Quelle je Vorschlag (`source`, Einzahl);
+     `ki-miete.js:174` zeigt sie als „📎 Quelle: …" an. Es wird also nichts
+     unterschlagen — es gibt nur eine.
+     **Zwei Dinge stecken darin, und beide gehören Marcel:**
+     1. **Soll die Recherche mehrere Quellen nennen?** Das ändert den Prompt
+        und damit Qualität und Kerosinverbrauch.
+     2. **Der Preis war „für den Zustand zu hoch."** Ob und wie der Zustand
+        in die Marktmiete eingeht, ist eine fachliche Frage — Marcel ist
+        DESAG-zertifiziert, ich rate hier nicht.
+   - ~~**Den KI-Knopf nach oben**~~ — **ERLEDIGT `v1241` (`63758ba`).**
+     Gemessen: der Knopf saß bei **y = 1178**, am Ende der linken Spalte, bei
+     einem Fenster von 725 px. Wer die Miete einträgt, sah ihn erst nach dem
+     Scrollen — also meist gar nicht. Steht jetzt **als Erstes im Reiter,
+     über beiden Spalten**, nachgemessen bei **y = 204**, über dem
+     Nettokaltmiete-Feld (y = 400).
+     > Die zweite Möglichkeit des Testers — **automatisch recherchieren
+     > lassen** — ist bewusst **nicht** gebaut: das kostet Kerosin ohne Zutun
+     > des Nutzers und ist damit eine Geldfrage, keine Optikfrage.
+   - ~~**Mietsteigerung doppelt abgefragt**~~ — **ERLEDIGT `v1240`
+     (`bb502fd`).** Der Tester wörtlich: *„ich sage hier ich will 3x die Miete
+     erhöhen über drei Jahre, um auf 10 € zu kommen. Dann muss ich noch die
+     ‚angestrebte Entwicklung' eingeben? Ich hab doch schon ein Ziel von
+     10 €/m²."*
+
+     **Er hat recht, und der Grund liegt tiefer als gedacht:** `me_soll`
+     (Soll-Mietspiegel) geht in die **Rechnung gar nicht ein** — er dient nur
+     der Potenzial-Anzeige. Gerechnet wird mit `me_anz`, `me_int` und
+     `me_pct`. Der Prozentsatz ist aus der Soll-Miete aber **exakt
+     ableitbar**: `Soll je m² / Ist je m² − 1`.
+
+     Dieselbe Regel wie bei `v1231`: **füllen nur wenn leer, sonst anbieten.**
+     Steht schon etwas drin, kommt ein „übernehmen"-Link daneben — einen von
+     Hand getippten Wert zu überschreiben wäre schlimmer als die doppelte
+     Frage. Liegt die Soll-Miete **unter** der heutigen, wird kein negativer
+     Prozentsatz vorgeschlagen; dann steht da, dass keine Erhöhung nötig ist.
+
+     **Auf Staging an echten Zahlen belegt** (Objekt `2026-001`, heute
+     11,00 €/m²): Soll 13 € → „ergäben sich **18,2 %**", `me_pct` bleibt
+     unangetastet · „übernehmen" setzt 18,2 · Soll 9 € → „keine Erhöhung
+     nötig" · `me_pct` leer → **automatisch 18,2**, Text „berechnet" statt
+     „ergäben sich". Objekt danach zurückgestellt, in der Datenbank
+     gegengelesen.
 
    **F · Finanzierung**
    - **Reihenfolge umdrehen:** erst den Kredit eintragen, den man bekommt,

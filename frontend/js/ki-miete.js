@@ -2,6 +2,8 @@
 // Eigene Implementation analog runKiLage in ki-lage.js — Vorschläge werden in der
 // KI-Mietpreis-Analyse-Box gerendert (nicht inline am Feld).
 
+function _kmEsc(s) { return ('' + (s == null ? '' : s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
 async function runKiMiete() {
   var btn = document.getElementById('ki-miete-btn');
   var body = document.getElementById('ki-miete-body');
@@ -135,7 +137,10 @@ async function runKiMiete() {
       hoch:         { label: 'Hoch', col: '#B8625C' }
     };
 
-    function _esc(s) { return ('' + (s == null ? '' : s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    /* v1242c: eine Quelle statt zwei — die Modulfassung _kmEsc gilt auch
+       fuer _renderQuellen und _renderSrcLink, die ausserhalb dieser
+       Funktion stehen und die lokale nie gesehen haetten. */
+    var _esc = _kmEsc;
 
     var html = '';
 
@@ -171,9 +176,7 @@ async function runKiMiete() {
       if (sugMarkt.reasoning) {
         html += '<div class="ki-miete-reasoning">' + _esc(sugMarkt.reasoning) + '</div>';
       }
-      if (sugMarkt.source) {
-        html += '<div class="ki-miete-source">📎 Quelle: ' + _renderSrcLink(sugMarkt.source) + '</div>';
-      }
+      html += _renderQuellen(sugMarkt);
 
       html += '<div class="ki-miete-actions">';
       html += '<button type="button" class="btn btn-gold btn-sm" onclick="kiMieteApplyMarktmiete(' + marktVal + ')">Marktmiete (€/m²) übernehmen</button>';
@@ -196,9 +199,7 @@ async function runKiMiete() {
       if (sugAusfall.reasoning) {
         html += '<div class="ki-miete-reasoning">' + _esc(sugAusfall.reasoning) + '</div>';
       }
-      if (sugAusfall.source) {
-        html += '<div class="ki-miete-source">📎 Quelle: ' + _renderSrcLink(sugAusfall.source) + '</div>';
-      }
+      html += _renderQuellen(sugAusfall);
       html += '<div class="ki-miete-actions">';
       html += '<button type="button" class="btn btn-gold btn-sm" onclick="kiMieteApplyAusfall(\'' + _esc(ausfallVal) + '\')">Risiko-Einstufung übernehmen</button>';
       html += '</div>';
@@ -221,18 +222,53 @@ async function runKiMiete() {
   }
 }
 
+/* ── v1242 · Mehrere Quellen statt einer ──────────────────────────────────
+   Marcels Vorgabe vom 07.09.2026: „die KI anfrage duerfte mehrere quellen
+   ausgeben und moeglichst immer bei der gemeinde oder stadt nachschauen ob
+   es da einen mietspiegel gibt, einen offiziellen."
+
+   Der Tester hatte bemaengelt, er sehe „nur den Mietspiegel" als Quelle.
+   Gemessen: es gab tatsaechlich nur eine — der Prompt verlangte genau eine
+   (`source`, 80 Zeichen). Seit v1242 liefert das Backend `sources` als
+   Liste; `source` bleibt als Kurzname erhalten.
+
+   Ein amtlicher Mietspiegel wird hervorgehoben: er ist die belastbarste
+   Quelle fuer eine Marktmiete, und der Nutzer soll auf einen Blick sehen,
+   ob es einen gab. */
+/* v1242c · Hervorgehoben wird, was AMTLICH ist — nicht, was "Mietspiegel"
+   heisst. Der Gegenlauf gegen Huellhorst lieferte eine Quelle namens
+   "Mietspiegel Huellhorst 2026" von immoportal.com, waehrend das reasoning
+   im selben Atemzug sagte, es gebe keinen amtlichen. Wer auf das Wort
+   hervorhebt, macht daraus optisch den amtlichen Mietspiegel. Das Backend
+   entscheidet die Frage (Feld `amtlich`, Portal-Domains koennen es nicht
+   tragen); hier wird sie nur noch angezeigt. */
+function _renderQuellen(sug) {
+  if (!sug) return '';
+  var liste = Array.isArray(sug.sources) ? sug.sources : [];
+  if (!liste.length && sug.source) liste = [{ label: sug.source }];
+  if (!liste.length) return '';
+  var teile = liste.map(function (q) {
+    var s = _renderSrcLink(typeof q === 'object' ? q : { label: q });
+    return (q && q.amtlich) ? '<b title="Amtliche Quelle">' + s + '</b>' : s;
+  });
+  var wort = liste.length > 1 ? 'Quellen' : 'Quelle';
+  return '<div class="ki-miete-source">📎 ' + wort + ': ' + teile.join(' · ') + '</div>';
+}
+
+/* Labels und URLs kommen aus der KI-Antwort und landen in innerHTML —
+   beide werden maskiert. Die URL zusaetzlich auf http(s) geprueft, damit
+   kein javascript:-Schema in ein href geraet. */
 function _renderSrcLink(src) {
   if (!src) return '';
-  if (typeof src === 'object') {
-    var label = src.label || src.title || src.name || src.url || 'Quelle';
-    var url = src.url || src.href || '';
-    if (url) return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + label + ' ↗</a>';
-    return label;
+  if (typeof src === 'string') src = { label: src };
+  var label = String(src.label || src.title || src.name || src.url || 'Quelle');
+  var url = String(src.url || src.href || '');
+  if (url && !/^https?:\/\//i.test(url)) url = '';
+  if (!url && /^https?:\/\//i.test(label)) url = label;
+  if (url) {
+    return '<a href="' + _kmEsc(url) + '" target="_blank" rel="noopener noreferrer">' + _kmEsc(label) + ' ↗</a>';
   }
-  if (/^https?:\/\//i.test(src)) {
-    return '<a href="' + src + '" target="_blank" rel="noopener noreferrer">' + src + ' ↗</a>';
-  }
-  return src;
+  return _kmEsc(label);
 }
 
 function kiMieteApplyMarktmiete(value) {

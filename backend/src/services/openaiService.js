@@ -900,8 +900,32 @@ async function suggestDs2Fields(payload, opts) {
     'AUFGABE:',
     'Recherchiere kurz für die Adresse (Bevölkerungsentwicklung, Marktmiete €/m², Nachfrage etc.) und gib für jedes Feld:',
     '  - "value": exakt einer der erlaubten ENUM-Werte (für Kategorien) ODER eine Zahl (für numerische Felder)',
-    '  - "reasoning": kurze Begründung in 1 Satz, max 80 Zeichen',
-    '  - "source": Quelle, z.B. "Mietspiegel Herford 2024", "Stat. Bundesamt", "regionale Marktberichte". Bei Unsicherheit: "KI-Marktbewertung". KEINE erfundenen URLs.',
+    '  - "reasoning": Begruendung in 1 Satz, max 160 Zeichen. KEIN Quellenname — die Quelle steht in "sources".',
+    '  - "source": Kurzname der WICHTIGSTEN Quelle (max 80 Zeichen). Bei Unsicherheit: "KI-Marktbewertung".',
+    '  - "sources": ALLE benutzten Quellen als Array, je { "label": "...", "url": "...", "amtlich": true/false }. Typisch zwei bis vier.',
+    '    "amtlich": true NUR fuer Stadt, Gemeinde, Landkreis, Statistikamt, IHK oder Haus- und Grundbesitzerverein.',
+    '    Portale wie ImmobilienScout, Immowelt, immoportal, mietspiegel.com sind NIE amtlich — auch nicht, wenn sie',
+    '    ihre Seite "Mietspiegel" nennen. Eine kommerzielle Mietpreisuebersicht ist kein Mietspiegel.',
+    '    Nenne so eine Quelle im "label" auch nicht so: "Mietpreisuebersicht ImmobilienScout24", nicht "Mietspiegel".',
+    '    url NUR wenn du sie sicher kennst, sonst ganz weglassen — nie eine plausible URL bauen.',
+    '    Eine einzige Quelle nur, wenn es wirklich nur eine gab.',
+    '',
+    /* v1242 · Marcels Vorgabe vom 07.09.2026: „die KI anfrage duerfte mehrere
+       quellen ausgeben und moeglichst immer bei der gemeinde oder stadt
+       nachschauen ob es da einen mietspiegel gibt, einen offiziellen."
+       Der Prompt verlangte bis hierher genau EINE Quelle (source, 80 Zeichen)
+       und nannte den Mietspiegel nur als Beispiel. Jetzt ist er der erste
+       Auftrag — und das Fehlen eines Mietspiegels ist eine Antwort, keine
+       Luecke. */
+    'AMTLICHER MIETSPIEGEL — ZUERST PRUEFEN:',
+    '  - Sieh fuer die Gemeinde/Stadt nach, ob es einen OFFIZIELLEN Mietspiegel gibt',
+    '    (Stadt, Gemeinde, Landkreis, IHK oder Haus- und Grundbesitzerverein).',
+    '  - Gibt es einen: nenne ihn mit JAHR in "sources" und stuetze ds2_marktmiete darauf.',
+    '  - Gibt es keinen: sage das ausdruecklich in "reasoning" ("kein amtlicher',
+    '    Mietspiegel fuer <Ort>") und nenne, worauf du dich stattdessen stuetzt.',
+    '  - Ein qualifizierter Mietspiegel (§ 558d BGB) hat Vorrang vor einem einfachen.',
+    '  - NICHT raten: ein Mietspiegel, den du nicht belegen kannst, wird nicht genannt.',
+    '',
     '',
     'WICHTIG:',
     '  - ENUM-Werte EXAKT so wie angegeben (keine Übersetzung, keine Kreativität)',
@@ -911,9 +935,25 @@ async function suggestDs2Fields(payload, opts) {
     '',
     'Antwort STRIKT als JSON, KEIN Markdown:',
     '{',
+    /* v1242b · Der echte Lauf am 07.09.2026 hat zwei Fehler an EINER Stelle
+       gefunden: das Beispiel-JSON. Es zeigte kein "sources" und trug in
+       "reasoning" einen Quellennamen ("Mietspiegel Herford 2024") statt einer
+       Begruendung. Das Modell kopiert das Beispiel — es kam genau eine Quelle
+       zurueck und ein reasoning, das keins war. Das letzte Beispiel schlaegt
+       jede Anweisung darueber. Beide Faelle stehen jetzt drin: mit und ohne
+       amtlichen Mietspiegel. */
     '  "suggestions": {',
-    '    "ds2_zustand": { "value": "gut", "reasoning": "Baujahr 1997, vermutlich saniert", "source": "KI-Marktbewertung" },',
-    '    "ds2_marktmiete": { "value": 9.5, "reasoning": "Mietspiegel Herford 2024", "source": "Mietspiegel Herford 2024" }',
+    '    "ds2_marktmiete": { "value": 9.5,',
+    '      "reasoning": "Qualifizierter Mietspiegel, mittlere Lage, Baujahresklasse 1960-1979",',
+    '      "source": "Mietspiegel Herford 2024",',
+    '      "sources": [ { "label": "Qualifizierter Mietspiegel Herford 2024", "url": "https://www.herford.de/mietspiegel", "amtlich": true },',
+    '                   { "label": "IHK Ostwestfalen, Immobilienmarktbericht 2025", "amtlich": true },',
+    '                   { "label": "Angebotsmieten der Portale, Stand 2026" } ] },',
+    '    "ds2_mietausfall": { "value": "niedrig",',
+    '      "reasoning": "Kein amtlicher Mietspiegel fuer Huellhorst; Einschaetzung aus Kreisdaten",',
+    '      "source": "Kreis Minden-Luebbecke, Wohnungsmarktbeobachtung",',
+    '      "sources": [ { "label": "Kreis Minden-Luebbecke, Wohnungsmarktbeobachtung 2025", "amtlich": true },',
+    '                   { "label": "IT.NRW Bevoelkerungsvorausberechnung", "amtlich": true } ] }',
     '  }',
     '}'
   ].filter(Boolean).join('\n');
@@ -930,12 +970,113 @@ async function suggestDs2Fields(payload, opts) {
     const sugg = parsed.suggestions[fid];
     if (!sugg || sugg.value == null || sugg.value === '') return;
     const spec = fieldSpecs[fid];
+    /* v1242 · Quellen sind jetzt eine LISTE. `source` (Einzahl) bleibt
+       erhalten, damit aeltere Anzeigen nicht ins Leere greifen — sie
+       bekommt den ersten Eintrag. Ohne URL ist eine Quelle trotzdem eine
+       Quelle; erfundene URLs sind schlimmer als keine.
+
+       v1242c · Der Gegenlauf gegen Huellhorst hat gezeigt, warum das Wort
+       im Etikett nicht reicht: das reasoning sagte richtig „kein amtlicher
+       Mietspiegel fuer Huellhorst" — und die einzige Quelle hiess
+       „Mietspiegel Huellhorst 2026", von immoportal.com. Ein kommerzielles
+       Portal. Eine Anzeige, die auf /mietspiegel/i hervorhebt, macht daraus
+       optisch den amtlichen. Deshalb entscheidet jetzt ein eigenes Feld
+       `amtlich` — und eine Portal-Domain kann es nicht tragen, egal wie das
+       Etikett lautet. */
+    /* v1242e · Die Sperrliste aus v1242c/d verliert immer. Der naechste Lauf
+       brachte miete-aktuell.de — wieder ein Portal, wieder nicht auf der
+       Liste, wieder unter dem Namen „Mietspiegel Huellhorst 2026". Es gibt
+       beliebig viele Portale und genau eine amtliche Stelle je Ort. Also
+       wird die Frage umgedreht: nicht „ist das ein bekanntes Portal?",
+       sondern „kann dieser Host ueberhaupt amtlich sein?" Amtsfaehig ist
+       ein Host, der den Ortsnamen traegt (huellhorst.de, bielefeld.de,
+       kreis-minden-luebbecke.de) oder zu einer amtlichen Stelle gehoert
+       (IHK, bund.de, destatis, IT.NRW, Statistische Landesaemter). Alles
+       andere kann sich „Mietspiegel" nennen, wie es will. */
+    const _ortWorte = String(context.ort || '')
+      .toLowerCase()
+      .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+      .split(/[^a-z0-9]+/).filter(function (w) { return w.length >= 4; });
+    const _AMTSSTELLEN = /(\.ihk\.de|\.bund\.de|destatis\.de|it\.nrw|statistik[a-z-]*\.[a-z]{2,}|\.landkreis|landkreis-|kreis-|\.stadt-|stadt-|gemeinde-|\.de\/rathaus|haus-und-grund|hausundgrund)/i;
+    const _amtsfaehig = function (url) {
+      if (!url) return false;
+      let host = '';
+      try { host = new URL(url).hostname.toLowerCase(); } catch (e) { return false; }
+      const hostFlach = host.replace(/-/g, '');
+      if (_ortWorte.some(function (w) { return hostFlach.indexOf(w.replace(/-/g, '')) >= 0; })) return true;
+      return _AMTSSTELLEN.test(host);
+    };
+    const _PORTALE = /(immoportal|immowelt|immobilienscout|immoscout|immonet|wohnungsboerse|homeday|mietspiegel\.(com|net|org)|meinestadt|wohnen-im-alter|kalaydo|ebay)/i;
+    const _quellen = (function () {
+      const roh = Array.isArray(sugg.sources) ? sugg.sources : [];
+      const out = [];
+      roh.forEach(function (q) {
+        if (!q) return;
+        const label = (typeof q === 'string' ? q : (q.label || q.title || q.name || '')).toString().trim().slice(0, 120);
+        if (!label) return;
+        let url = (typeof q === 'object' && q.url ? String(q.url).trim() : '');
+        if (url && !/^https?:\/\//i.test(url)) url = '';
+        let amtlich = !!(typeof q === 'object' && (q.amtlich === true || q.amtlich === 'true'));
+        /* Eine Portal-Domain ist nie amtlich. Und wo das Modell selbst sagt,
+           es gebe keinen amtlichen Mietspiegel, darf keine Quelle einen
+           behaupten — der Widerspruch wird zugunsten der Aussage aufgeloest. */
+        /* v1242e: amtlich braucht jetzt einen amtsfaehigen Host — die
+           Portalpruefung bleibt als zweite Schranke fuer Faelle ohne URL. */
+        if (amtlich && url && !_amtsfaehig(url)) amtlich = false;
+        if (amtlich && url && _PORTALE.test(url)) amtlich = false;
+        if (amtlich && _PORTALE.test(label)) amtlich = false;
+        if (amtlich && /kein\s+(amtlicher|offizieller)\s+mietspiegel/i.test(String(sugg.reasoning || ''))) amtlich = false;
+        if (out.some(function (x) { return x.label === label; })) return;
+        /* v1242d · Auch das ETIKETT wird richtiggestellt, nicht nur die
+           Auszeichnung. Der Lauf gegen Huellhorst lieferte eine
+           ImmobilienScout24-Preisstatistik unter dem Namen „Mietspiegel
+           Huellhorst 2026". Wer das liest, liest einen Mietspiegel — und
+           einen solchen gibt es dort nicht. Ein Mietspiegel ist nach
+           §§ 558c/558d BGB eine Uebersicht der ortsueblichen
+           Vergleichsmiete, erstellt von der Gemeinde oder gemeinsam von
+           den Interessenvertretern. Eine Portal-Preisstatistik ist das
+           nicht, egal wie ihre Seite heisst. Also wird sie benannt, was
+           sie ist. */
+        let anzeige = label;
+        if (!amtlich && /mietspiegel/i.test(label) && !_amtsfaehig(url)) {
+          /* Der Herausgeber steht in der Domain, nicht in einer Liste. */
+          let herkunft = '';
+          try {
+            herkunft = new URL(url).hostname.toLowerCase()
+              .replace(/^www\./, '').replace(/\.(de|com|net|org|eu|info)$/, '');
+          } catch (e) { herkunft = ''; }
+          const bekannt = {
+            'immobilienscout24': 'ImmobilienScout24', 'immowelt': 'Immowelt',
+            'immonet': 'Immonet', 'immoportal': 'immoportal', 'homeday': 'Homeday',
+            'wohnungsboerse': 'Wohnungsboerse', 'miete-aktuell': 'miete-aktuell.de'
+          };
+          const portal = bekannt[herkunft] || herkunft;
+          anzeige = label.replace(/mietspiegel/ig, 'Mietpreisuebersicht').slice(0, 120);
+          if (portal && anzeige.toLowerCase().indexOf(portal.toLowerCase()) < 0) {
+            anzeige = (anzeige + ' (' + portal + ')').slice(0, 120);
+          }
+        }
+        const e = { label: anzeige };
+        if (url) e.url = url;
+        if (amtlich) e.amtlich = true;
+        out.push(e);
+      });
+      if (!out.length && sugg.source) out.push({ label: String(sugg.source).slice(0, 120) });
+      return out.slice(0, 6);
+    })();
+    /* v1242d · Der Kurzname kommt aus der BEREINIGTEN Liste, nicht mehr roh
+       aus sugg.source — sonst traegt er weiter „Mietspiegel Huellhorst 2026",
+       waehrend die Liste daneben schon „Mietpreisuebersicht (ImmobilienScout24)"
+       sagt. Zwei Namen fuer dieselbe Quelle sind schlimmer als der falsche
+       allein. */
+    const _quelleKurz = ((_quellen[0] && _quellen[0].label) || sugg.source || 'KI-Marktbewertung').toString().slice(0, 80);
     if (spec && Array.isArray(spec.values)) {
       if (spec.values.indexOf(sugg.value) >= 0) {
         cleaned[fid] = {
           value: sugg.value,
           reasoning: (sugg.reasoning || '').toString().slice(0, 200),
-          source: (sugg.source || 'KI-Marktbewertung').toString().slice(0, 80)
+          source: _quelleKurz,
+          sources: _quellen
         };
       }
     } else {
@@ -944,13 +1085,60 @@ async function suggestDs2Fields(payload, opts) {
         cleaned[fid] = {
           value: n,
           reasoning: (sugg.reasoning || '').toString().slice(0, 200),
-          source: (sugg.source || 'KI-Marktbewertung').toString().slice(0, 80)
+          source: _quelleKurz,
+          sources: _quellen
         };
       }
     }
   });
 
+
+  /* v1242c · Die URLs sind ungeprueft, solange sie niemand abruft. Der
+     Gegenlauf lieferte https://www.bielefeld.de/mietspiegel und
+     https://atlasbig.de/plz-33604 — plausibel gebaut, aber niemand hat
+     nachgesehen. Ein Link, der ins Leere fuehrt, ist schlimmer als kein
+     Link: er sieht aus wie ein Beleg. Also einmal anklopfen. Wer nicht
+     antwortet, behaelt sein Etikett und verliert den Link — die Quelle
+     bleibt lesbar, sie ist nur nicht mehr anklickbar. */
+  await _quellenUrlsPruefen(cleaned);
+
   return { success: true, model: r.model, suggestions: cleaned };
+}
+
+async function _quellenUrlsPruefen(cleaned) {
+  const urls = new Set();
+  Object.keys(cleaned).forEach(function (fid) {
+    (cleaned[fid].sources || []).forEach(function (q) { if (q.url) urls.add(q.url); });
+  });
+  if (!urls.size) return;
+
+  const lebt = new Map();
+  await Promise.all(Array.from(urls).slice(0, 12).map(async function (u) {
+    /* HEAD zuerst — viele Verwaltungsseiten mögen es, manche antworten
+       darauf mit 405. Dann GET hinterher, aber abgebrochen, sobald der
+       Status da ist; der Rumpf interessiert nicht. */
+    for (const methode of ['HEAD', 'GET']) {
+      try {
+        const res = await fetch(u, {
+          method: methode,
+          redirect: 'follow',
+          signal: AbortSignal.timeout(3000),
+          headers: { 'User-Agent': 'DealPilot-Quellenpruefung/1.0' }
+        });
+        if (res.status === 405 || res.status === 501) continue;
+        lebt.set(u, res.status >= 200 && res.status < 400);
+        return;
+      } catch (e) {
+        if (methode === 'GET') lebt.set(u, false);
+      }
+    }
+  }));
+
+  Object.keys(cleaned).forEach(function (fid) {
+    (cleaned[fid].sources || []).forEach(function (q) {
+      if (q.url && lebt.get(q.url) === false) delete q.url;
+    });
+  });
 }
 
 /**
