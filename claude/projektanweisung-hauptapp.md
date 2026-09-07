@@ -7727,6 +7727,82 @@ Zwei Fragen stecken darin, beide für Marcel:
    die Marktmiete eingeht, ist eine fachliche Frage — Marcel ist
    DESAG-zertifiziert, hier wird nicht geraten.
 
+> **Nachtrag 07.09.2026 — Punkt 1 ist beantwortet und gebaut.** Marcel:
+> *„ich möchte dass das garnichts kostet. es gibt kein kerosin mehr. das
+> haben wir ausgebaut. die KI anfrage dürfte mehrere quellen ausgeben und
+> möglichst immer bei der gemeinde oder stadt nachschauen ob es da einen
+> mietspiegel gibt einen offiziellen."*
+>
+> **Die Frage nach dem „Kerosinverbrauch" oben war falsch gestellt** —
+> Kerosin ist seit `v1176`/`v1183` ausgebaut, das steht wörtlich in
+> `backend/src/routes/ai.js`: *„keine Kontingent-Sperre mehr — diese
+> KI-Hilfe ist im Plan enthalten."* Ich hatte die Abschaffung selbst
+> dokumentiert und sie danach als Gegenargument benutzt. Zurückgenommen.
+>
+> Punkt 2 (Zustand → Marktmiete) bleibt offen und ist weiterhin Marcels
+> fachliche Entscheidung.
+
+## Rollout-Journal · 07.09.2026 — mehrere Quellen, und was ein Mietspiegel ist
+
+**Was.** Die KI-Mietrecherche (`/api/v1/ai/ds2-suggest`, Tab *Miete*) nennt
+jetzt **alle** benutzten Quellen statt einer, prüft **zuerst**, ob es für
+den Ort einen **amtlichen** Mietspiegel gibt, und sagt ausdrücklich, wenn
+es keinen gibt. Fünf Auslieferungen, weil jeder echte Lauf eine neue,
+echte Schwäche gefunden hat:
+
+| | |
+|---|---|
+| `v1242` | `sources` als Liste im Prompt und in der Antwort; Prompt-Abschnitt „AMTLICHER MIETSPIEGEL — ZUERST PRÜFEN"; `_renderQuellen()` im Frontend |
+| `v1242b` | **das Beispiel-JSON war der Fehler** — es zeigte kein `sources` und trug einen Quellennamen im `reasoning`; das Modell kopiert das Beispiel, nicht die Regel |
+| `v1242c` | `amtlich` als eigenes Feld je Quelle statt Hervorhebung nach dem Wort „Mietspiegel"; URL-Prüfung per HEAD/GET; Maskierung in `_renderSrcLink` |
+| `v1242d` | eine Portal-Preisstatistik wird auch **umbenannt**, nicht nur nicht ausgezeichnet; `source` (Einzahl) kommt aus der bereinigten Liste |
+| `v1242e` | die Frage umgedreht: nicht „bekanntes Portal?", sondern „**kann** dieser Host amtlich sein?" |
+
+**Commits.** `a0e3b95` · `d6f1192` · `940e05d` · `e334af5` · `be09075`,
+dazu `3318626` (FALLEN). Backend-Datei → jeder Schritt mit Neubau.
+
+**Nachweis.** Gemessen auf Staging, nicht behauptet:
+
+- **Vor `v1242b`**, Bielefeld: *eine* Quelle, `reasoning` = „Mietspiegel
+  Bielefeld 2024". **Danach**: zwei bis drei Quellen und echte
+  Begründungen.
+- **Hüllhorst nach `v1242e`**, durch die Oberfläche geklickt: drei Quellen
+  am Marktmiete-Block — *„Mietpreisübersicht Hüllhorst 2026
+  (miete-aktuell.de) · (ohne-makler) · (immoportal)"*, **keine** davon
+  hervorgehoben; Begründung *„Kein amtlicher Mietspiegel für Hüllhorst"*.
+  Beim Mietausfall zwei Quellen, davon *„Zahlen Daten Fakten Hüllhorst"*
+  (`huellhorst.de`) **fett** als amtliche.
+- **URL-Prüfung**, im Container gefahren: `bielefeld.de/mietspiegel`,
+  `bielefeld.de/node/10002` und `huellhorst.de/Unsere-Stadt/Zahlen-Daten`
+  antworten mit 200 und behalten ihren Link; eine erfundene Unterseite
+  (404) und eine tote Domain verlieren ihn. **Die drei echten URLs kamen
+  aus der Modellantwort — das Modell hat also wirklich gesucht**
+  (`web_search_preview` ist in `callOpenAI` aktiv), nicht plausibel
+  geraten.
+- **Amtsfähigkeit**, elf Testfälle gegen die ausgerollte Datei: elf
+  richtig. Der Prüfer zieht die Regex wörtlich aus der Datei, statt sie
+  abzutippen — der erste Anlauf hatte genau daran gelitten (die
+  SSH-Quotierung verdoppelte die Backslashes und meldete zwei Fehler, die
+  es im Code nicht gab).
+- **Anzeige**, vier Fälle in der Seite gerendert: zwei amtliche → zwei
+  Links, beide fett, „Quellen"; zwei Portale → zwei Links, keiner fett;
+  nur Kurzname → „Quelle", kein Link; bösartiges Etikett → kein `<img>`,
+  kein `href`.
+
+**Rest.**
+
+1. **Prod steht auf `4f9e38b`.** Offen für den nächsten Prod-Rollout:
+   `v1240` (Soll-Miete), `v1241` (Platzierung der KI-Box), `v1242a–e`.
+   Backend-Änderung → **Neubau nötig**, nicht nur `git pull`.
+2. **`Paywall.gate('ai_calls')`** sitzt weiterhin in `ki-miete.js:13`,
+   `ki-lage.js:13` und `ui.js:673`. Das ist **kein** Kerosin, sondern das
+   Free-Plan-Limit über einen `localStorage`-Zähler
+   (`demo-paywall.js:274`). Ob Free überhaupt KI-Recherchen bekommt, ist
+   eine **Preisfrage** — nicht angefasst.
+3. **Zustand → Marktmiete** bleibt Marcels fachliche Entscheidung.
+4. Das Testobjekt `2026-1011` war ein Messartefakt eines Skript-Klicks und
+   ist wieder entfernt; `2026-001` steht unverändert auf Version 762.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
