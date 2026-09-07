@@ -902,7 +902,10 @@ async function suggestDs2Fields(payload, opts) {
     '  - "value": exakt einer der erlaubten ENUM-Werte (für Kategorien) ODER eine Zahl (für numerische Felder)',
     '  - "reasoning": Begruendung in 1 Satz, max 160 Zeichen. KEIN Quellenname — die Quelle steht in "sources".',
     '  - "source": Kurzname der WICHTIGSTEN Quelle (max 80 Zeichen). Bei Unsicherheit: "KI-Marktbewertung".',
-    '  - "sources": ALLE benutzten Quellen als Array, je { "label": "...", "url": "..." }. Typisch zwei bis vier.',
+    '  - "sources": ALLE benutzten Quellen als Array, je { "label": "...", "url": "...", "amtlich": true/false }. Typisch zwei bis vier.',
+    '    "amtlich": true NUR fuer Stadt, Gemeinde, Landkreis, Statistikamt, IHK oder Haus- und Grundbesitzerverein.',
+    '    Portale wie ImmobilienScout, Immowelt, immoportal, mietspiegel.com sind NIE amtlich — auch nicht, wenn sie',
+    '    ihre Seite "Mietspiegel" nennen. Eine kommerzielle Mietpreisuebersicht ist kein Mietspiegel.',
     '    url NUR wenn du sie sicher kennst, sonst ganz weglassen — nie eine plausible URL bauen.',
     '    Eine einzige Quelle nur, wenn es wirklich nur eine gab.',
     '',
@@ -942,14 +945,14 @@ async function suggestDs2Fields(payload, opts) {
     '    "ds2_marktmiete": { "value": 9.5,',
     '      "reasoning": "Qualifizierter Mietspiegel, mittlere Lage, Baujahresklasse 1960-1979",',
     '      "source": "Mietspiegel Herford 2024",',
-    '      "sources": [ { "label": "Qualifizierter Mietspiegel Herford 2024", "url": "https://www.herford.de/mietspiegel" },',
-    '                   { "label": "IHK Ostwestfalen, Immobilienmarktbericht 2025" },',
+    '      "sources": [ { "label": "Qualifizierter Mietspiegel Herford 2024", "url": "https://www.herford.de/mietspiegel", "amtlich": true },',
+    '                   { "label": "IHK Ostwestfalen, Immobilienmarktbericht 2025", "amtlich": true },',
     '                   { "label": "Angebotsmieten der Portale, Stand 2026" } ] },',
     '    "ds2_mietausfall": { "value": "niedrig",',
     '      "reasoning": "Kein amtlicher Mietspiegel fuer Huellhorst; Einschaetzung aus Kreisdaten",',
     '      "source": "Kreis Minden-Luebbecke, Wohnungsmarktbeobachtung",',
-    '      "sources": [ { "label": "Kreis Minden-Luebbecke, Wohnungsmarktbeobachtung 2025" },',
-    '                   { "label": "IT.NRW Bevoelkerungsvorausberechnung" } ] }',
+    '      "sources": [ { "label": "Kreis Minden-Luebbecke, Wohnungsmarktbeobachtung 2025", "amtlich": true },',
+    '                   { "label": "IT.NRW Bevoelkerungsvorausberechnung", "amtlich": true } ] }',
     '  }',
     '}'
   ].filter(Boolean).join('\n');
@@ -969,7 +972,17 @@ async function suggestDs2Fields(payload, opts) {
     /* v1242 · Quellen sind jetzt eine LISTE. `source` (Einzahl) bleibt
        erhalten, damit aeltere Anzeigen nicht ins Leere greifen — sie
        bekommt den ersten Eintrag. Ohne URL ist eine Quelle trotzdem eine
-       Quelle; erfundene URLs sind schlimmer als keine. */
+       Quelle; erfundene URLs sind schlimmer als keine.
+
+       v1242c · Der Gegenlauf gegen Huellhorst hat gezeigt, warum das Wort
+       im Etikett nicht reicht: das reasoning sagte richtig „kein amtlicher
+       Mietspiegel fuer Huellhorst" — und die einzige Quelle hiess
+       „Mietspiegel Huellhorst 2026", von immoportal.com. Ein kommerzielles
+       Portal. Eine Anzeige, die auf /mietspiegel/i hervorhebt, macht daraus
+       optisch den amtlichen. Deshalb entscheidet jetzt ein eigenes Feld
+       `amtlich` — und eine Portal-Domain kann es nicht tragen, egal wie das
+       Etikett lautet. */
+    const _PORTALE = /(immoportal|immowelt|immobilienscout|immoscout|immonet|wohnungsboerse|homeday|mietspiegel\.(com|net|org)|meinestadt|wohnen-im-alter|kalaydo|ebay)/i;
     const _quellen = (function () {
       const roh = Array.isArray(sugg.sources) ? sugg.sources : [];
       const out = [];
@@ -979,8 +992,18 @@ async function suggestDs2Fields(payload, opts) {
         if (!label) return;
         let url = (typeof q === 'object' && q.url ? String(q.url).trim() : '');
         if (url && !/^https?:\/\//i.test(url)) url = '';
+        let amtlich = !!(typeof q === 'object' && (q.amtlich === true || q.amtlich === 'true'));
+        /* Eine Portal-Domain ist nie amtlich. Und wo das Modell selbst sagt,
+           es gebe keinen amtlichen Mietspiegel, darf keine Quelle einen
+           behaupten — der Widerspruch wird zugunsten der Aussage aufgeloest. */
+        if (amtlich && url && _PORTALE.test(url)) amtlich = false;
+        if (amtlich && _PORTALE.test(label)) amtlich = false;
+        if (amtlich && /kein\s+(amtlicher|offizieller)\s+mietspiegel/i.test(String(sugg.reasoning || ''))) amtlich = false;
         if (out.some(function (x) { return x.label === label; })) return;
-        out.push(url ? { label: label, url: url } : { label: label });
+        const e = { label: label };
+        if (url) e.url = url;
+        if (amtlich) e.amtlich = true;
+        out.push(e);
       });
       if (!out.length && sugg.source) out.push({ label: String(sugg.source).slice(0, 120) });
       return out.slice(0, 6);
@@ -1008,7 +1031,53 @@ async function suggestDs2Fields(payload, opts) {
     }
   });
 
+
+  /* v1242c · Die URLs sind ungeprueft, solange sie niemand abruft. Der
+     Gegenlauf lieferte https://www.bielefeld.de/mietspiegel und
+     https://atlasbig.de/plz-33604 — plausibel gebaut, aber niemand hat
+     nachgesehen. Ein Link, der ins Leere fuehrt, ist schlimmer als kein
+     Link: er sieht aus wie ein Beleg. Also einmal anklopfen. Wer nicht
+     antwortet, behaelt sein Etikett und verliert den Link — die Quelle
+     bleibt lesbar, sie ist nur nicht mehr anklickbar. */
+  await _quellenUrlsPruefen(cleaned);
+
   return { success: true, model: r.model, suggestions: cleaned };
+}
+
+async function _quellenUrlsPruefen(cleaned) {
+  const urls = new Set();
+  Object.keys(cleaned).forEach(function (fid) {
+    (cleaned[fid].sources || []).forEach(function (q) { if (q.url) urls.add(q.url); });
+  });
+  if (!urls.size) return;
+
+  const lebt = new Map();
+  await Promise.all(Array.from(urls).slice(0, 12).map(async function (u) {
+    /* HEAD zuerst — viele Verwaltungsseiten mögen es, manche antworten
+       darauf mit 405. Dann GET hinterher, aber abgebrochen, sobald der
+       Status da ist; der Rumpf interessiert nicht. */
+    for (const methode of ['HEAD', 'GET']) {
+      try {
+        const res = await fetch(u, {
+          method: methode,
+          redirect: 'follow',
+          signal: AbortSignal.timeout(3000),
+          headers: { 'User-Agent': 'DealPilot-Quellenpruefung/1.0' }
+        });
+        if (res.status === 405 || res.status === 501) continue;
+        lebt.set(u, res.status >= 200 && res.status < 400);
+        return;
+      } catch (e) {
+        if (methode === 'GET') lebt.set(u, false);
+      }
+    }
+  }));
+
+  Object.keys(cleaned).forEach(function (fid) {
+    (cleaned[fid].sources || []).forEach(function (q) {
+      if (q.url && lebt.get(q.url) === false) delete q.url;
+    });
+  });
 }
 
 /**
