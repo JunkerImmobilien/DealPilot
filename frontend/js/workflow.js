@@ -126,6 +126,45 @@ window.DealPilotWorkflow = (function() {
   // ───────────── Modus B: Tab-Workflow ─────────────
   // Render Progress-Bar oberhalb der Tabs
 
+  /* ═══════════════════════════════════════════════════════════════
+     v1243 · Besuchte Bereiche merken
+     Testbericht Block D: „Warum sind hier oben schon Haken, obwohl ich in
+     den Bereichen noch nicht war?" — Weil das Haekchen „alle Pflichtfelder
+     gefuellt" hiess, nicht „angesehen". Beim Steuer-Reiter genuegte dafuer
+     `grenz`, vorbelegt mit 42 % (siehe V63.29 oben). Der Bereich war
+     abgehakt, bevor jemand hingesehen hat.
+
+     Gemerkt wird je Objekt im localStorage — ein Anzeigezustand, der weder
+     in die Rechnung noch in die Datenbank gehoert. Faellt er weg (anderes
+     Geraet, geleerter Speicher), stehen die Haken wieder hohl: das ist die
+     ehrlichere Richtung als faelschlich „geprueft".
+     ═══════════════════════════════════════════════════════════════ */
+  var _BESUCHT_PREFIX = 'dp_wf_besucht_';
+
+  function _besuchtKey() {
+    var k = window._currentObjKey || '_neu';
+    return _BESUCHT_PREFIX + k;
+  }
+
+  function _besuchteBereiche() {
+    try {
+      var raw = localStorage.getItem(_besuchtKey());
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+
+  function merkeBesuch(wfKey) {
+    if (!wfKey || !FIELD_GROUPS[wfKey]) return;
+    try {
+      var arr = _besuchteBereiche();
+      if (arr.indexOf(wfKey) >= 0) return;
+      arr.push(wfKey);
+      localStorage.setItem(_besuchtKey(), JSON.stringify(arr));
+      renderProgressBar();
+    } catch (e) {}
+  }
+
   function renderProgressBar() {
     var status = _getCompletionStatus();
     var pct = Math.round(status.complete / status.total * 100);
@@ -159,25 +198,37 @@ window.DealPilotWorkflow = (function() {
 
     // V75: Häkchen direkt an die Tabs hängen (statt separate Workflow-Steps).
     // Mapping per data-wf-key (im HTML gesetzt): objekt/investition/miete/steuer/finanzierung/bewirtschaftung
+    // v1243: zwei Zustände statt einem — hohl = gefüllt aber nie geöffnet.
     try {
       var byKey = {};
       status.groups.forEach(function(g) {
         // g.key kommt aus FIELD_GROUPS-Schlüssel (objekt, investition, ...)
         if (g.key) byKey[g.key] = g.complete;
       });
+      var besucht = _besuchteBereiche();
       document.querySelectorAll('.tab[data-wf-key]').forEach(function(tab) {
         var k = tab.getAttribute('data-wf-key');
         var done = !!byKey[k];
-        tab.classList.toggle('tab-wf-done', done);
+        var geprueft = done && besucht.indexOf(k) >= 0;
+        tab.classList.toggle('tab-wf-done', geprueft);
+        tab.classList.toggle('tab-wf-done-ungeprueft', done && !geprueft);
         // Bestehendes Häkchen entfernen, neu setzen
         var oldCheck = tab.querySelector('.tab-wf-check');
         if (oldCheck) oldCheck.remove();
         if (done) {
           var check = document.createElement('span');
-          check.className = 'tab-wf-check';
+          check.className = 'tab-wf-check' + (geprueft ? '' : ' tab-wf-check-ungeprueft');
           check.setAttribute('aria-hidden', 'true');
-          check.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+          var lbl = (FIELD_GROUPS[k] && FIELD_GROUPS[k].name) || k;
+          tab.title = geprueft
+            ? lbl + ': alle Pflichtfelder gefüllt und angesehen'
+            : lbl + ': alle Pflichtfelder gefüllt — diesen Bereich hast du noch nicht geöffnet. Manche Felder sind vorbelegt (z. B. der Grenzsteuersatz mit 42 %), andere kommen aus dem Exposé.';
+          check.innerHTML = geprueft
+            ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+            : '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="16.5 9 10.5 15.5 7.5 12.5"/></svg>';
           tab.appendChild(check);
+        } else {
+          tab.removeAttribute('title');
         }
       });
     } catch (e) {}
@@ -396,7 +447,9 @@ window.DealPilotWorkflow = (function() {
     nextWizardStep: nextWizardStep,
     prevWizardStep: prevWizardStep,
     finishWizard: finishWizard,
-    getStatus: _getCompletionStatus
+    getStatus: _getCompletionStatus,
+    /* v1243: wird vom Reiter-Wechsel gerufen — siehe main.js switchTab */
+    merkeBesuch: merkeBesuch
   };
 })();
 

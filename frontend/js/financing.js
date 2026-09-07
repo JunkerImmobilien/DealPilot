@@ -581,3 +581,225 @@
   });
 
 })();
+
+/* ═══════════════════════════════════════════════════════════════
+   v1244 · Kapitaldeckung — Testbericht Block F
+   „Sollte hier die Reihenfolge nicht anders sein? Erst eintragen was für
+   ein Kredit ich bekomme und den EK-Einsatz berechnet er automatisch
+   (wie Immocation Tool)"
+
+   Gemessen ergab: es gibt gar keine Reihenfolge. Eigenkapital und
+   Darlehen waren zwei unabhängige Zahlen. Bei Objekt 2026-001 standen
+   20.000 € EK und 180.000 € Darlehen gegen eine Gesamtinvestition von
+   220.400 € — 20.400 € fehlten, und nichts sagte es. Die EK-Rendite
+   rechnete weiter auf 20.000 € und sah deshalb zu gut aus.
+
+   Diese Zeile rechnet in BEIDE Richtungen: sie zeigt die Lücke und
+   bietet je einen Knopf an, sie über das Eigenkapital oder über das
+   Darlehen zu schließen. Marcels Weg (erst Kredit, dann EK) ist damit
+   möglich, ohne den umgekehrten zu verbauen.
+
+   Bezugsgröße ist die GESAMTinvestition (kp + Nebenkosten + Sanierung +
+   Möblierung), nicht der Kaufpreis. Genau daran ist die Lücke oben
+   aufgefallen.
+   ═══════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  function _zahl(id) {
+    var e = document.getElementById(id);
+    if (!e) return 0;
+    var s = String(e.value || '').split('.').join('').replace(',', '.');
+    var n = parseFloat(s);
+    return isFinite(n) ? n : 0;
+  }
+
+  function _setzen(id, wert) {
+    var e = document.getElementById(id);
+    if (!e) return;
+    e.value = Math.round(wert).toLocaleString('de-DE');
+    e.dispatchEvent(new Event('input', { bubbles: true }));
+    if (typeof window.calc === 'function') window.calc();
+  }
+
+  /* Die Darlehen: D2 zählt nur mit, wenn es eingeschaltet ist. */
+  function _darlehenSumme() {
+    var d1 = _zahl('d1');
+    var d2 = 0;
+    var an = document.getElementById('d2_enable');
+    if (an && an.checked) d2 = _zahl('d2');
+    return { d1: d1, d2: d2, summe: d1 + d2 };
+  }
+
+  function _gesamtinvestition() {
+    /* State.gi ist die Wahrheit — calc.js:756 rechnet sie aus kp, nk, san
+       und moebl.
+
+       v1244b · Der Wert wird durch Number() gezwungen und gegen den
+       Kaufpreis plausibilisiert, statt nur `typeof === 'number'` zu
+       prüfen. Anlass war ein Messfehler von mir: ich hatte im Browser
+       versehentlich die globale v() aus calc.js überschrieben, worauf
+       `kp` als String zurückkam und `kp + nk` zu "20000020400"
+       verkettete. Die Prüfung schlug fehl, der Fallback nahm den
+       Kaufpreis — und die Zeile meldete stumm eine falsche Lücke.
+
+       In der App tritt das nicht auf. Die Lehre gilt trotzdem: eine
+       Kennzahl, die aus einer fremden Rechnung kommt, wird beim Lesen
+       zur Zahl gemacht und auf Plausibilität geprüft, nicht auf ihren
+       Typ. Die Gesamtinvestition kann nie kleiner als der Kaufpreis
+       sein. */
+    var kp = _zahl('kp');
+    var roh = (window.State && State.gi != null) ? Number(State.gi) : NaN;
+    if (isFinite(roh) && roh > 0 && (kp <= 0 || roh >= kp)) {
+      return { wert: roh, sicher: true };
+    }
+    /* Zweite Quelle: der KPI-Satz führt die Gesamtinvestition ebenfalls. */
+    var ausKpi = (window.State && State.kpis) ? Number(State.kpis.gi) : NaN;
+    if (isFinite(ausKpi) && ausKpi > 0 && (kp <= 0 || ausKpi >= kp)) {
+      return { wert: ausKpi, sicher: true };
+    }
+    return { wert: kp, sicher: false };
+  }
+
+  function _eur(n) {
+    return Math.round(n).toLocaleString('de-DE') + ' €';
+  }
+
+  window.dpKapitalEkSetzen = function () {
+    var gi = _gesamtinvestition();
+    var d = _darlehenSumme();
+    var neu = Math.max(0, gi.wert - d.summe);
+    _setzen('ek', neu);
+    if (typeof window.toast === 'function') {
+      window.toast('✓ Eigenkapital auf ' + _eur(neu) + ' gesetzt — Gesamtinvestition minus Darlehen');
+    }
+  };
+
+  window.dpKapitalDarlehenSetzen = function () {
+    var gi = _gesamtinvestition();
+    var d = _darlehenSumme();
+    var neu = Math.max(0, gi.wert - _zahl('ek') - d.d2);
+    _setzen('d1', neu);
+    if (typeof window.toast === 'function') {
+      window.toast('✓ Darlehen I auf ' + _eur(neu) + ' gesetzt — Gesamtinvestition minus Eigenkapital' + (d.d2 ? ' und Darlehen II' : ''));
+    }
+  };
+
+  window.dpKapitalDeckungRender = function () {
+    var box = document.getElementById('kd-box');
+    var zeile = document.getElementById('kd-zeile');
+    var rechnung = document.getElementById('kd-rechnung');
+    if (!box || !zeile) return;
+
+    var gi = _gesamtinvestition();
+    var d = _darlehenSumme();
+    var ek = _zahl('ek');
+    var btnEk = document.getElementById('kd-btn-ek');
+    var btnD1 = document.getElementById('kd-btn-d1');
+
+    /* Solange nichts eingetragen ist, wird nichts behauptet. */
+    if (gi.wert <= 0 || (ek === 0 && d.summe === 0)) {
+      box.style.background = 'transparent';
+      box.style.border = '1px solid transparent';
+      zeile.innerHTML = '<span class="cf-hint">Kapitaldeckung: sobald Gesamtinvestition und Finanzierung stehen.</span>';
+      rechnung.textContent = '';
+      if (btnEk) btnEk.style.display = 'none';
+      if (btnD1) btnD1.style.display = 'none';
+      return;
+    }
+
+    var deckung = ek + d.summe;
+    var diff = deckung - gi.wert;
+    var toleranz = 1;   /* Rundung auf volle Euro */
+
+    rechnung.textContent = _eur(ek) + ' Eigenkapital + ' + _eur(d.d1) + ' Darlehen I'
+      + (d.d2 ? ' + ' + _eur(d.d2) + ' Darlehen II' : '')
+      + ' = ' + _eur(deckung)
+      + '  ·  Gesamtinvestition ' + _eur(gi.wert)
+      + (gi.sicher ? '' : ' (nur Kaufpreis — noch nicht gerechnet)');
+
+    if (Math.abs(diff) <= toleranz) {
+      box.style.background = 'color-mix(in srgb, var(--green, #3FA56C) 8%, transparent)';
+      box.style.border = '1px solid color-mix(in srgb, var(--green, #3FA56C) 30%, transparent)';
+      zeile.innerHTML = '<b style="color:var(--green,#3FA56C)">Kapitaldeckung stimmt.</b> '
+                      + 'Eigenkapital und Darlehen decken die Gesamtinvestition genau.';
+      if (btnEk) btnEk.style.display = 'none';
+      if (btnD1) btnD1.style.display = 'none';
+      return;
+    }
+
+    if (diff < 0) {
+      box.style.background = 'color-mix(in srgb, var(--red, #B8625C) 8%, transparent)';
+      box.style.border = '1px solid color-mix(in srgb, var(--red, #B8625C) 32%, transparent)';
+      zeile.innerHTML = '<b style="color:var(--red,#B8625C)">Es fehlen ' + _eur(-diff) + '.</b> '
+                      + 'Eigenkapital und Darlehen decken die Gesamtinvestition nicht — '
+                      + 'die EK-Rendite rechnet dann auf zu wenig eingesetztes Kapital und sieht zu gut aus.';
+    } else {
+      box.style.background = 'color-mix(in srgb, var(--gold) 8%, transparent)';
+      box.style.border = '1px solid color-mix(in srgb, var(--gold) 32%, transparent)';
+      zeile.innerHTML = '<b style="color:var(--gold)">' + _eur(diff) + ' zu viel.</b> '
+                      + 'Eigenkapital und Darlehen liegen über der Gesamtinvestition.';
+    }
+    if (btnEk) btnEk.style.display = '';
+    if (btnD1) btnD1.style.display = '';
+  };
+
+  /* Nach jedem Rechenlauf nachziehen. calc() ist die einzige Stelle, an
+     der State.gi entsteht — deshalb hier andocken statt einen eigenen
+     Zeitgeber zu bauen. */
+  function _anhaengen() {
+    if (typeof window.calc !== 'function' || window.calc._dpKdHook) return false;
+    var alt = window.calc;
+    var neu = function () {
+      var r = alt.apply(this, arguments);
+      try { window.dpKapitalDeckungRender(); } catch (e) {}
+      return r;
+    };
+    /* v1244b · Marker der alten Funktion mitnehmen. window.calc ist bereits
+       zweimal umhüllt — financing.js:576 (dpFinancingRefresh) und
+       deal-action-readycheck.js:208 (v450). Letzteres erkennt an seinem
+       eigenen Marker `_v450Wrapped`, ob es schon gewrappt hat. Ein Wrapper,
+       der die Marker der alten Funktion nicht überträgt, macht sie
+       unsichtbar — und der nächste Lauf wrappt ein zweites Mal, worauf
+       `refresh()` doppelt feuert. deal-action-readycheck.js macht es
+       richtig; das wird hier übernommen. */
+    try {
+      for (var k in alt) {
+        if (Object.prototype.hasOwnProperty.call(alt, k)) neu[k] = alt[k];
+      }
+    } catch (e) {}
+    neu._dpKdHook = true;
+    window.calc = neu;
+    return true;
+  }
+
+  var _versuche = 0;
+
+  /* Die Feld-Listener haengen NICHT am calc-Hook: sie werden einmal
+     gesetzt, egal ob calc schon da ist. Sonst haette ein Abbruch der
+     Warteschleife auch sie mitgenommen — und die Zeile waere still tot. */
+  function _listener() {
+    ['ek', 'd1', 'd2', 'd2_enable'].forEach(function (id) {
+      var e = document.getElementById(id);
+      if (!e || e._dpKdBound) return;
+      e._dpKdBound = true;
+      e.addEventListener('input', function () { setTimeout(window.dpKapitalDeckungRender, 60); });
+      e.addEventListener('change', function () { setTimeout(window.dpKapitalDeckungRender, 60); });
+    });
+  }
+
+  function _start() {
+    _listener();
+    try { window.dpKapitalDeckungRender(); } catch (e) {}
+    /* financing.js kann vor calc.js laden. Nach zwoelf Anlaeufen (rund
+       fuenf Sekunden) kommt calc nicht mehr; dann bleibt die Zeile an den
+       Feld-Listenern haengen, die oben schon stehen. */
+    if (!_anhaengen() && ++_versuche < 12) setTimeout(_start, 400);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _start);
+  } else {
+    _start();
+  }
+})();

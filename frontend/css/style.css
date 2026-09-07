@@ -37179,3 +37179,26 @@ aside.sidebar .sb-card .sbc-btn::after {
   content: none;
 }
 /* ===== v1191-KARTENKNOPF END ===== */
+
+/* ═══════════════════════════════════════════════════════════════
+   v1243: gefüllt ist nicht geprüft
+   Testbericht Block D: „Warum sind hier oben schon Haken, obwohl ich in
+   den Bereichen noch nicht war? Soll das so angezeigt werden?"
+   Nein. Das Häkchen hieß bisher „alle Pflichtfelder gefüllt" — und beim
+   Steuer-Reiter genügte dafür `grenz`, das mit 42 % vorbelegt ist. Der
+   Bereich war abgehakt, bevor jemand hingesehen hat. Jetzt gibt es zwei
+   Zustände: hohl = gefüllt, aber noch nicht geöffnet; voll = geöffnet.
+   ═══════════════════════════════════════════════════════════════ */
+.tab .tab-wf-check.tab-wf-check-ungeprueft {
+  color: color-mix(in srgb, var(--gold) 55%, transparent);
+  filter: none;
+  opacity: .75;
+}
+/* v1243b · Hier stand eine zweite Regel, die den Reiter-TEXT der
+   ungeprüften Bereiche blasser machen sollte. Der Kaskaden-Walker hat
+   gezeigt, dass sie nie greift: `nav.tabs .tab .tab-lbl` setzt die
+   Goldfarbe dreimal mit `!important`. Sie mit einem eigenen `!important`
+   zu erzwingen wäre auch inhaltlich falsch — der Text ist bei JEDEM
+   Reiter gold, auch bei den hakenlosen. Der Unterschied gehört an den
+   Haken, nicht an die Beschriftung. Die Klasse `tab-wf-done-ungeprueft`
+   bleibt am Reiter stehen: sie macht den Zustand im DOM messbar. */
