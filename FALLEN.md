@@ -1314,3 +1314,23 @@ kosteten fast drei Investor-Abos, bevor der erste Mandant angelegt war.
 Wiederverkäufer-Staffel nachgerechnet** — sie hängt an Preisen, die sich
 woanders bewegen, und niemand merkt es, weil beide Zahlen für sich
 plausibel bleiben.
+
+## Sagen, was ankam, ist nur die halbe Auskunft
+
+Der Exposé- und Marktbericht-Import sammelt seit `V236` in `_marked`,
+welche Felder er gesetzt hat, und färbt sie golden. Er meldet danach:
+*„✓ Marktbericht übernommen: Marktpreisindikation 171k € · 6,85 €/m²"*.
+
+**Er hat nie gesagt, was er nicht finden konnte.** Wer ein halb
+gefülltes Formular sieht, kann zwei Dinge nicht unterscheiden: *„stand
+nicht im Dokument"* und *„habe ich übersehen"*. Der Tester fragte genau
+das: *„Sollte hier ein Hinweis sein, dass keine Werte aus dem Exposé
+entnommen werden konnten?"*
+
+**Ein Import ist erst fertig, wenn er beide Listen zeigt** — das
+Übernommene und das Fehlende. Die Daten dafür lagen schon vor; es fehlte
+nur die zweite Hälfte der Auskunft.
+
+> Dazu: die goldene Markierung trug **keinen Titel**. Eine Farbe, die
+> etwas bedeutet, muss sagen was — sonst erzeugt sie genau die Frage, die
+> sie beantworten sollte („ist das automatisch gesetzt worden?").
