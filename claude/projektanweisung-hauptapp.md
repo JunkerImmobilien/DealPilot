@@ -7557,6 +7557,58 @@ Dabei beide § 23-Zweige an echten Daten gesehen: bei `2026-1002`
 −1.750 − 17.136,19 = **−18.886,19** · −18.886,19 + 12.275,36 = **−6.610,83**.
 Jedes Objekt erscheint **einmal**.
 
+### `v1239` (07.09.2026, `24bdca8`) — die Tour wird angeboten, nicht gestartet
+
+**Testbericht Block A**, wörtlich: *„Eingeloggt → Sehr viele unterschiedliche
+Buttons → Pop Up mit ‚Reisebegleiter' der dir die wichtigsten Funktionen
+sofort erklärt? Mit Haken ‚beim nächsten mal nicht mehr anzeigen'."*
+
+**Der Backlog las das falsch.** Dort stand: *„Die Tour gibt es, sie ist nur im
+Hilfe-Bereich versteckt — es geht also ums Anbieten, nicht ums Bauen."*
+Gemessen: **die Tour startete von selbst**, einmal pro Browser, ohne zu
+fragen (`_maybeAutoStart`, `Tour.start()` nach 2,5 s). Sie war nicht
+versteckt, sie war **aufdringlich** — und genau das bemängelt der Bericht:
+man wird überfallen statt gefragt.
+
+**Marcels Vorgabe vom 07.09.:** *„die tour aber nicht jedes mal anbieten. vlt
+mit Fenster, Modal wo man sagen kann Tour nicht mehr anbieten. aber du bist
+der profi."*
+
+#### Drei Regeln, und die dritte ist der eigentliche Anstand
+
+1. **Es fragt, statt zu starten.** Ein kleines Fenster mit zwei Knöpfen —
+   „Später" und „Rundgang starten".
+2. **Der Haken „Nicht mehr anzeigen"** schaltet dauerhaft ab.
+3. **Es hört nach drei Angeboten von selbst auf**, und höchstens einmal am
+   Tag. **Wer den Haken nie findet, wird trotzdem in Ruhe gelassen.** Sich
+   darauf zu verlassen, dass der Nutzer einen Haken setzen *muss*, um Ruhe zu
+   bekommen, wäre die halbe Lösung. Beim letzten Angebot steht ausdrücklich
+   dabei, dass es das letzte ist.
+
+Das `STORAGE_KEY`-Setzen aus `v816h` fällt weg: es markierte die Tour als
+**abgeschlossen**, obwohl sie nur angeboten wurde. Wer „Später" wählt, soll
+sie später noch bekommen können — die Begrenzung übernehmen jetzt
+`dp_tour_offer_count` und `dp_tour_offer_day`.
+
+Der Weg über **Aktionen › Rundgang starten** bleibt unberührt. Escape und
+Klick daneben schließen, Fokus liegt auf dem Hauptknopf, `role="dialog"`
+gesetzt, Farben nur über `var(--wl-…)`-Tokens.
+
+#### Nachweis auf Staging — alle vier Fälle durchgespielt
+
+Marcels Browser hatte die Tour längst gesehen; die Merker wurden dafür
+zurückgesetzt und **danach wiederhergestellt** (`dp_tour_seen_v1` und
+`dp_tour_completed_v1` stehen wieder auf ihren Werten vom 31.08.).
+
+| Fall | Ergebnis |
+|---|---|
+| frischer Browser | **Angebot erscheint**, Tour startet **nicht** von selbst, Zähler 1 |
+| „Später" | schließt, startet nicht, kein Abschalt-Merker gesetzt |
+| **neu geladen, selber Tag** | **kein zweites Angebot**, Zähler bleibt 1 |
+| **nächster Tag** | Angebot wieder da, Zähler 2 |
+| Haken gesetzt + „Später" | `dp_tour_offer_off` gesetzt |
+| **noch ein Tag später** | **kein Angebot mehr** |
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

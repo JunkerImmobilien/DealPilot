@@ -38,9 +38,9 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 04.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging auf `4bf9ed6`, **Produktion auf `16f5712`**.
+**Stand:** lokal = GitHub = Staging auf `24bdca8`, **Produktion auf `16f5712`**.
 **`v1215`–`v1231` sind live** — vier Prod-Rollouts am 04.09.
-**Auf Staging warten `v1233`–`v1238`.** Nachweise im Rollout-Journal.
+**Auf Staging warten `v1233`–`v1239`.** Nachweise im Rollout-Journal.
 
 **Und auf Prod liegen jetzt Marcels Daten.** Der Staging-Nutzer
 `info@junker-immobilien.io` ist auf Prod ins Konto gleicher Mailadresse
@@ -2400,12 +2400,27 @@ entfällt — nicht raten.
    > beantworten, macht die App gründlicher — nicht einfacher.
 
    **A · Einstieg**
-   - Nach dem Einloggen zu viele verschiedene Knöpfe. Vorschlag des Testers:
-     ein „Reisebegleiter"-Fenster beim ersten Mal, das die wichtigsten
-     Funktionen erklärt, mit Haken „nicht mehr anzeigen". **Die Tour gibt es,
-     sie ist nur im Hilfe-Bereich versteckt** (`dp_tour_seen_v1`) — es geht
-     also ums Anbieten, nicht ums Bauen.
-   - Von dort auch auf die Hilfe-Videos verweisen.
+   - ~~Nach dem Einloggen zu viele verschiedene Knöpfe. Vorschlag des Testers:
+     ein „Reisebegleiter"-Fenster beim ersten Mal, mit Haken „nicht mehr
+     anzeigen".~~ **ERLEDIGT `v1239` (`24bdca8`).**
+
+     > **Der Satz hier war falsch.** Es stand: *„Die Tour gibt es, sie ist nur
+     > im Hilfe-Bereich versteckt — es geht also ums Anbieten, nicht ums
+     > Bauen."* Gemessen: **die Tour startete von selbst**, 2,5 Sekunden nach
+     > dem Laden, einmal pro Browser. Sie war nicht versteckt, sie war
+     > **aufdringlich** — und genau das bemängelt der Bericht.
+
+     Marcels Vorgabe: *„nicht jedes mal anbieten … Modal wo man sagen kann
+     Tour nicht mehr anbieten."* Gebaut mit drei Regeln:
+     **es fragt statt zu starten**, der Haken schaltet dauerhaft ab, und
+     **nach drei Angeboten hört es von selbst auf** — höchstens eins am Tag.
+     Wer den Haken nie findet, wird trotzdem in Ruhe gelassen. Beim letzten
+     Angebot steht dabei, dass es das letzte ist.
+
+     Alle vier Fälle auf Staging durchgespielt (Angebot · „Später" · selber
+     Tag · nächster Tag · Haken · Tag danach), Marcels Tour-Merker danach
+     wiederhergestellt.
+   - **Von dort auch auf die Hilfe-Videos verweisen.** ← noch offen
 
    **B · Boarding-Pass und Exposé-Übernahme**
    - **Zustand und Qualität werden doppelt abgefragt** — verwirrend, muss das
