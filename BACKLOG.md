@@ -40,7 +40,9 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 **Stand:** lokal = GitHub = Staging auf `a5bc1a6`, **Produktion auf
 `409f863`**. **`v1215`–`v1244b` sind live**, `v1244c`–`v1246c` warten auf
-den naechsten Prod-Rollout (nur Frontend, kein Neubau noetig).
+den naechsten Prod-Rollout. **`v1246c` fasst `bewertungsKatalog.js` an —
+das ist Backend, der Prod-Rollout braucht einen Neubau.** Und er darf erst
+laufen, wenn die Preise im Live-Stripe-Konto stehen (siehe unten).
 
 **Zuletzt fertig: `v1242a–e` — die KI-Mietrecherche.** Sie nennt jetzt
 **alle** benutzten Quellen statt einer, prüft **zuerst**, ob es für den Ort
