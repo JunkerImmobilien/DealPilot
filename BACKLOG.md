@@ -2490,9 +2490,30 @@ entfällt — nicht raten.
    - Marktmiete ohne KI zu niedrig; **mit KI 10,99 €/m²** — realistischer, für
      den Zustand aber eher zu hoch. Er sieht als Quelle nur den Mietspiegel.
    - **Den KI-Knopf nach oben** oder gleich automatisch recherchieren.
-   - **Mietsteigerung doppelt abgefragt:** wer dreimal erhöhen will, um auf
-     10 € zu kommen, hat das Ziel schon genannt — die „angestrebte
-     Entwicklung" fragt dasselbe noch einmal.
+   - ~~**Mietsteigerung doppelt abgefragt**~~ — **ERLEDIGT `v1240`
+     (`bb502fd`).** Der Tester wörtlich: *„ich sage hier ich will 3x die Miete
+     erhöhen über drei Jahre, um auf 10 € zu kommen. Dann muss ich noch die
+     ‚angestrebte Entwicklung' eingeben? Ich hab doch schon ein Ziel von
+     10 €/m²."*
+
+     **Er hat recht, und der Grund liegt tiefer als gedacht:** `me_soll`
+     (Soll-Mietspiegel) geht in die **Rechnung gar nicht ein** — er dient nur
+     der Potenzial-Anzeige. Gerechnet wird mit `me_anz`, `me_int` und
+     `me_pct`. Der Prozentsatz ist aus der Soll-Miete aber **exakt
+     ableitbar**: `Soll je m² / Ist je m² − 1`.
+
+     Dieselbe Regel wie bei `v1231`: **füllen nur wenn leer, sonst anbieten.**
+     Steht schon etwas drin, kommt ein „übernehmen"-Link daneben — einen von
+     Hand getippten Wert zu überschreiben wäre schlimmer als die doppelte
+     Frage. Liegt die Soll-Miete **unter** der heutigen, wird kein negativer
+     Prozentsatz vorgeschlagen; dann steht da, dass keine Erhöhung nötig ist.
+
+     **Auf Staging an echten Zahlen belegt** (Objekt `2026-001`, heute
+     11,00 €/m²): Soll 13 € → „ergäben sich **18,2 %**", `me_pct` bleibt
+     unangetastet · „übernehmen" setzt 18,2 · Soll 9 € → „keine Erhöhung
+     nötig" · `me_pct` leer → **automatisch 18,2**, Text „berechnet" statt
+     „ergäben sich". Objekt danach zurückgestellt, in der Datenbank
+     gegengelesen.
 
    **F · Finanzierung**
    - **Reihenfolge umdrehen:** erst den Kredit eintragen, den man bekommt,

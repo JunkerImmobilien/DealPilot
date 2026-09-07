@@ -765,3 +765,21 @@ Werte des Vorgängers in ein fremdes Objekt geschrieben.
 **Wenn eine neue Prüfung etwas ablehnt, das richtig aussieht, ist das ein
 Befund und keine Fehlfunktion.** Erst messen, was die Prüfung sieht — und
 woher der Wert kommt, den sie sieht.
+
+## Der Cache-Buster schützt die Datei, nicht das Dokument
+
+Gemessen am 07.09.2026: nach dem Ausrollen von `v1240` lud der Browser
+weiterhin `mietentwicklung.js?v=166`. Server und Platte trugen längst
+`v1240` — `curl` auf `index.html` bewies es.
+
+**Im Cache lag `index.html` selbst.** Der Buster steht *in* diesem Dokument;
+solange das Dokument alt ist, ist auch der Buster alt. Ein `location.href`
+auf dieselbe Adresse holt das Dokument nicht neu.
+
+**Wer nach einem Rollout misst, prüft zuerst, welche Fassung der Browser
+wirklich geladen hat** — `[...document.querySelectorAll('script[src]')]` —
+und nicht nur, was der Server ausliefert. Weichen sie ab, hilft ein eigener
+Zufallsparameter an der Seitenadresse (oder Strg+Shift+R beim Menschen).
+
+> Das ist die Umkehrung der bekannten Falle: sonst ist der Buster zu alt,
+> hier war das Dokument zu alt, das ihn trägt.

@@ -7646,6 +7646,51 @@ zurückgesetzt und **danach wiederhergestellt** (`dp_tour_seen_v1` und
 > auf 0 € stehen, bleiben es** — nachtragen würde ihre Renditen und Scores
 > verschieben, und das ist Marcels Entscheidung.
 
+### `v1240` (07.09.2026, `bb502fd`) — die Soll-Miete sagt den Prozentsatz schon
+
+**Testbericht Block E**, wörtlich: *„Versteh ich nicht ganz, ich sage hier ich
+will 3x die Miete erhöhen über drei Jahre, um auf 10 € zu kommen. Dann muss
+ich noch die ‚angestrebte Entwicklung' eingeben? Ich hab doch schon ein Ziel
+von 10 €/m²."*
+
+**Er hat recht, und der Grund liegt tiefer als „doppelt gefragt":**
+`me_soll` (Soll-Mietspiegel) geht in die **Rechnung gar nicht ein** — er
+dient allein der Potenzial-Anzeige (`opp_pct`). Gerechnet wird im
+Detail-Modus mit `me_anz`, `me_int` und `me_pct`. Der Nutzer trägt sein Ziel
+also ein und muss es danach noch einmal als Prozentsatz ausdrücken, den die
+App selbst ausrechnen könnte:
+
+```
+me_pct = Soll je m² / Ist je m² − 1
+```
+
+**Gebaut nach derselben Regel wie `v1231`: füllen nur wenn leer, sonst
+anbieten.** Steht schon ein Wert drin, erscheint ein „übernehmen"-Link
+daneben — einen von Hand getippten Wert zu überschreiben wäre schlimmer als
+die doppelte Frage. Und liegt die Soll-Miete **unter** der heutigen, wird
+**kein negativer Prozentsatz** vorgeschlagen; dann steht dort, dass keine
+Erhöhung nötig ist. Ein Vorschlag, der die Miete senkt, wäre Unsinn.
+
+**Auf Staging an echten Zahlen belegt** — Objekt `2026-001`, heute
+11,00 €/m² (1.000 € Kaltmiete + 100 € Zusatzeinnahmen auf 100 m²):
+
+| Fall | Ergebnis |
+|---|---|
+| Soll 13 €, `me_pct` gefüllt | „ergäben sich **18,2 %**", Wert **unangetastet**, Link daneben |
+| „übernehmen" geklickt | `me_pct` = **18,2** |
+| Soll 9 € (unter Ist) | „Die heutige Miete liegt bereits bei oder über deiner Soll-Miete — **keine Erhöhung nötig**" |
+| `me_pct` leer, Soll 13 € | **automatisch 18,2**, Text „berechnet" statt „ergäben sich" |
+
+Gegenrechnung: 13,00 / 11,00 − 1 = 0,1818 → **18,2 %**. Objekt danach
+zurückgestellt (`me_soll` leer, `me_pct` 18.0), in der Datenbank
+gegengelesen.
+
+> **Nebenbefund beim Messen:** der Browser lieferte nach dem Ausrollen noch
+> `mietentwicklung.js?v=166`, obwohl Server und Platte längst `v1240`
+> trugen — **`index.html` selbst lag im Browser-Cache.** Der Cache-Buster
+> hilft nur für die Datei, auf die er zeigt, nicht für das Dokument, das ihn
+> enthält. Ein `location.href` mit eigenem Zufallsparameter hat es gelöst.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
