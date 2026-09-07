@@ -63,14 +63,34 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 > `localStorage`**, deren alter Zustand nirgends festgehalten ist.
 > **Reproduzierbar ist, dass die Bilanz aufgeht, nicht die 687.059 €.**
 
-> ### Der erste Griff jetzt
+> ### Der erste Griff jetzt — in dieser Reihenfolge
 >
-> **`v1233` bis `v1238` liegen auf Staging und sind noch nicht auf Prod** —
-> alles reines Frontend, `git pull` genügt. Darin stecken zwei Befunde, die
-> Geld bewegen: das fehlende Grundbuchamt (`v1238`) und der fehlende
-> Ergebnisvortrag der Gesellschaft (`v1235`).
+> **1 · Prod-Rollout `v1233`–`v1239`.** Reines Frontend, `git pull`, kein
+> Neubau. **Das ist der wichtigste Punkt**, weil zwei Befunde darin Geld
+> bewegen und seit dem 04.09. ungenutzt auf Staging liegen:
+> - **`v1238`** — das Grundbuchamt hatte gar keine Vorbelegung. Neue Objekte
+>   rechneten mit 0 € statt 0,5 %; bei 200.000 € sind das 1.000 € zu wenig
+>   Gesamtinvestition, und Rendite, Cashflow und Score stehen zu gut da.
+> - **`v1235`** — der Ergebnisvortrag der Gesellschaft wanderte nicht ins
+>   Folgejahr. Die Bilanz ging trotzdem auf, weil das Verrechnungskonto die
+>   Differenz auffing.
+> Dazu `v1234`/`v1236`/`v1237` (Überführung), `v1233` (Quick-Check erklärt
+> seine Zahl) und `v1239` (Tour fragt statt zu starten).
+> **Braucht nur Marcels „ja".**
 >
-> **Zwei Entscheidungen liegen bei Marcel:**
+> **2 · Ein Sprechlauf am Gerät.** Den kann nur Marcel machen, und **ein
+> einziger Lauf nimmt vier Änderungen ab**: `v1168` (Häkchen
+> `san_tax_active`), `v1169` (Stichwort-Fenster), `v1169`/`v1170` (Tempo —
+> und ob die Zuordnung noch stimmt) und `v1231` (Sanierungsbedarf diktieren:
+> „Dach neu, fünfzehntausend").
+>
+> **3 · Weiter im Testbericht.** Als Nächstes **Block E** (Marktmiete zu
+> niedrig ohne KI · den KI-Knopf nach oben · die doppelt abgefragte
+> Mietsteigerung) und der Rest von **Block D** (Hinweis, was mit den Werten
+> passiert · die Haken, die stehen bevor der Bereich besucht wurde).
+> **Das läuft ohne Rückfrage.**
+>
+> **Drei Entscheidungen liegen bei Marcel und blockieren nichts:**
 > - **Die 8 Objekte ohne Grundbuchamt-Prozentsatz** stehen weiter auf 0 €.
 >   Nachtragen verschiebt ihre Renditen und Scores — das macht niemand
 >   ungefragt.
@@ -80,16 +100,9 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 > - **Die Objektart kennt kein Zweifamilienhaus.** `Zweifamilienhaus` fällt
 >   auf `EFH`, das Testobjekt Löhner Str. 278 ist eines. **Bewertungsfrage.**
 >
-> **Der Abnahmepunkt bleibt der Sprechlauf am Gerät** — `v1168`, `v1169`,
-> `v1169`/`v1170` und `v1231` warten darauf. **Ein Lauf erledigt alle vier.**
->
 > **Zwei Aufräumarbeiten warten auf ein Ja:** `business`/`enterprise` in der
-> Prod-Datenbank (B11) und die **§ 7b-Spalte in `tax_records`**.
->
-> **Im Testbericht sind als Nächstes dran:** Block A (die Tour anbieten statt
-> im Hilfe-Bereich verstecken), der Rest von Block D (Hinweis, was mit den
-> Werten passiert · die Haken, die stehen bevor der Bereich besucht wurde)
-> und Block E (Marktmiete, KI-Knopf nach oben, doppelte Mietsteigerung).
+> Prod-Datenbank (B11) und die **§ 7b-Spalte in `tax_records`** (Eingriff in
+> die Datenbank).
 >
 > **Nichts hängt halbfertig.** Kein Rebuild offen, keine Migration offen,
 > Arbeitsverzeichnis sauber.
