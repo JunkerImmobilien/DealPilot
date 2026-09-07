@@ -309,6 +309,31 @@ async function runReport(req, res) {
     /* v1183: faellig ist eine STUFE, kein Literbetrag. 0 = schon bezahlt. */
     const stufe = await _faelligeStufeFuer(req.user.id, body, externalRef);   /* WKERO-2 */
 
+  /* v1251 · Die Schranke steht VOR der Leistung.
+     Bis hierher wurde erst geliefert und dann gebucht — und die Buchung
+     durfte scheitern, ohne dass jemand hinsah. Ein Starter-Konto bekam
+     damit die erweiterte Marktpreisindikation und die Wertermittlung,
+     obwohl sein Kontingent dort 0 ist.
+     Stufe 0 heisst „diese Tiefe ist schon bezahlt" und wird
+     durchgelassen. */
+  if (stufe > 0) {
+    const darf = await aiCreditsService.pruefeStufe(req.user.id, stufe);
+    if (!darf.ok) {
+      const WAS = { mpi: 'Marktpreisindikation',
+                    mpi_plus: 'erweiterte Marktpreisindikation',
+                    wev: 'Wertermittlung nach ImmoWertV' };
+      const AB = { mpi: 'starter', mpi_plus: 'investor', wev: 'pro' };
+      return res.status(402).json({
+        error: 'kein_kontingent',
+        art: darf.art || null,
+        stufe: stufe,
+        message: 'Fuer die ' + (WAS[darf.art] || 'Bewertung') +
+                 ' ist dein Kontingent aufgebraucht.',
+        upgrade_to: AB[darf.art] || 'investor'
+      });
+    }
+  }
+
     /* Vorabpruefung: hat der Nutzer diese Bewertungsart ueberhaupt noch?
        Geprueft wird genau die Art, die faellig ist — wer keine
        Wertermittlung mehr hat, darf trotzdem eine Marktpreisindikation
@@ -444,6 +469,31 @@ router.post('/reports/generate-stream', authenticate, async function (req, res) 
   const externalRef = body.external_ref || body.objId || (obj && (obj.id || obj.objId)) || null;
 
   const stufe = await _faelligeStufeFuer(req.user.id, body, externalRef);   /* WKERO-3 */
+
+  /* v1251 · Die Schranke steht VOR der Leistung.
+     Bis hierher wurde erst geliefert und dann gebucht — und die Buchung
+     durfte scheitern, ohne dass jemand hinsah. Ein Starter-Konto bekam
+     damit die erweiterte Marktpreisindikation und die Wertermittlung,
+     obwohl sein Kontingent dort 0 ist.
+     Stufe 0 heisst „diese Tiefe ist schon bezahlt" und wird
+     durchgelassen. */
+  if (stufe > 0) {
+    const darf = await aiCreditsService.pruefeStufe(req.user.id, stufe);
+    if (!darf.ok) {
+      const WAS = { mpi: 'Marktpreisindikation',
+                    mpi_plus: 'erweiterte Marktpreisindikation',
+                    wev: 'Wertermittlung nach ImmoWertV' };
+      const AB = { mpi: 'starter', mpi_plus: 'investor', wev: 'pro' };
+      return res.status(402).json({
+        error: 'kein_kontingent',
+        art: darf.art || null,
+        stufe: stufe,
+        message: 'Fuer die ' + (WAS[darf.art] || 'Bewertung') +
+                 ' ist dein Kontingent aufgebraucht.',
+        upgrade_to: AB[darf.art] || 'investor'
+      });
+    }
+  }
   // v1183: Vorab-Check auf die faellige Bewertungsart
   let status;
   try {
