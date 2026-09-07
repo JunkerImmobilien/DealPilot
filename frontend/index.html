@@ -1606,6 +1606,30 @@ label.dp-required.qc-required::after {
 <!-- ═══════════ TAB 2: MIETE ═══════════ -->
 <div class="sec" id="s2">
   <h2 class="sec-title">Miete</h2><p class="sec-desc">Mietstruktur, Nettokaltmiete und Warmmiete</p>
+  <!-- v1241 · Testbericht Block E: „Den Button fuer die KI Recherche wuerde ich
+       wieder nach oben packen oder automatisch mit KI recherchieren lassen."
+       Gemessen am 07.09.2026: der Knopf sass bei y=1178, also weit unter dem
+       sichtbaren Bereich (Fenster ~725) — am Ende der linken Spalte. Wer die
+       Miete eintraegt, sieht ihn erst nach dem Scrollen, also meist gar nicht.
+       Jetzt steht er als Erstes im Reiter, ueber beiden Spalten. Automatisch
+       recherchieren lassen waere die zweite Moeglichkeit des Testers — die
+       kostet Kerosin ohne Zutun des Nutzers und ist damit eine Geldfrage,
+       keine Optikfrage. Deshalb nur der Umzug. -->
+    <div class="ki-lage-box ki-lage-box-bottom" id="ki-miete-box" style="margin-top:14px">
+      <div class="ki-lage-header">
+        <div class="ki-lage-title">
+          <span class="ki-lage-icon" data-ico="sparkles" data-ico-size="20"></span>
+          <span>Pilot-Mietpreis-Analyse</span>
+          <span class="ki-lage-tag">Marktmiete + Mietausfall</span>
+        </div>
+        <button class="btn btn-gold btn-sm" id="ki-miete-btn" onclick="runKiMiete()" type="button">
+          <span data-ico="sparkles" data-ico-size="14"></span> Mietpreis recherchieren
+        </button>
+      </div>
+      <div class="ki-lage-body" id="ki-miete-body">
+        <div class="ki-lage-empty">DealPilot recherchiert die marktübliche Miete für deine Adresse + Wohnfläche und schätzt das Mietausfall-Risiko ein. Werte können per Klick übernommen werden.</div>
+      </div>
+    </div>
   <div class="col2">
     <div><div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-key"/></svg></span>Mietstruktur</div>
       <div class="f"><label class="dp-required" data-v236-required-set="1">Nettokaltmiete / Monat <button type="button" class="dp-tip" data-tip-id="tab3.nkm" tabindex="-1" aria-label="Hilfe zu tab3.nkm"></button></label><div class="iw"><span class="pfx">€</span><input id="nkm" type="text" inputmode="decimal" placeholder="850" class="trl" oninput="calc()"></div></div>
@@ -1644,21 +1668,6 @@ label.dp-required.qc-required::after {
     </div>
 
     <!-- V63.26: KI-Mietpreis-Analyse — analog zur KI-Lage-Bewertung in Tab Objekt -->
-    <div class="ki-lage-box ki-lage-box-bottom" id="ki-miete-box" style="margin-top:14px">
-      <div class="ki-lage-header">
-        <div class="ki-lage-title">
-          <span class="ki-lage-icon" data-ico="sparkles" data-ico-size="20"></span>
-          <span>Pilot-Mietpreis-Analyse</span>
-          <span class="ki-lage-tag">Marktmiete + Mietausfall</span>
-        </div>
-        <button class="btn btn-gold btn-sm" id="ki-miete-btn" onclick="runKiMiete()" type="button">
-          <span data-ico="sparkles" data-ico-size="14"></span> Mietpreis recherchieren
-        </button>
-      </div>
-      <div class="ki-lage-body" id="ki-miete-body">
-        <div class="ki-lage-empty">DealPilot recherchiert die marktübliche Miete für deine Adresse + Wohnfläche und schätzt das Mietausfall-Risiko ein. Werte können per Klick übernommen werden.</div>
-      </div>
-    </div>
     </div>
     <div>
       <div class="card"><div class="ct ct-pro me-header"><!-- V316-miete-header -->
