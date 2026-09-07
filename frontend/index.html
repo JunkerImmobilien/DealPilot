@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1243b"><!-- v1148-spalt-1025px -->
+<link rel="stylesheet" href="css/style.css?v=v1247"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1192">
     <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
@@ -1009,7 +1009,7 @@ label.dp-required.qc-required::after {
 
     <div class="card card-stretch qz-card" id="qz-card"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-quality"/></svg></span>Qualität &amp; Zustand</div>
       <div class="g2">
-        <div class="f"><label>Energieklasse <span class="ds2-tag">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.energieklasse" tabindex="-1" aria-label="Hilfe zu Energieklasse"></button></label>
+        <div class="f"><label>Energieklasse <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.energieklasse" tabindex="-1" aria-label="Hilfe zu Energieklasse"></button></label>
           <select id="ds2_energie" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
             <option value="">– keine Angabe –</option>
             <option value="A+">A+</option><option value="A">A</option><option value="B">B</option>
@@ -1017,7 +1017,7 @@ label.dp-required.qc-required::after {
             <option value="F">F</option><option value="G">G</option><option value="H">H</option>
           </select>
         </div>
-        <div class="f"><label class="dp-required" data-v236-required-set="1">Zustand der Wohnung <span class="ds2-tag">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.ds2_zustand" tabindex="-1" aria-label="Hilfe zu Zustand der Wohnung"></button></label>
+        <div class="f"><label class="dp-required" data-v236-required-set="1">Zustand der Wohnung <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.ds2_zustand" tabindex="-1" aria-label="Hilfe zu Zustand der Wohnung"></button></label>
           <select id="ds2_zustand" onchange="if(typeof window._v234OnZustandChange==='function')window._v234OnZustandChange(this);if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
             <option value="">– bitte wählen –</option>
             <option value="neubau">Neubau / kernsaniert</option>
@@ -1111,7 +1111,7 @@ label.dp-required.qc-required::after {
 
   <!-- V53: Lage- & Markt-Indikatoren — ALLES drin: Bewertung, Makro/Mikro, DS2-Felder -->
   <div class="card lage-markt-card">
-    <div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-pin"/></svg></span>Lage- &amp; Markt-Indikatoren <span class="ds2-tag">DS2</span></div>
+    <div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-pin"/></svg></span>Lage- &amp; Markt-Indikatoren <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span></div>
     <p class="hint">Werte fließen in DealScore 2.0 (Lage 10% + Upside 10%) ein.</p>
 
     <!-- V206: Marktbericht-PDF Import — Coming Soon (ausgegraut, Button disabled) -->
@@ -1297,7 +1297,28 @@ label.dp-required.qc-required::after {
     </div>
 
     <hr class="dvd">
-    <div class="card-title">Gebäudeart nach NHK 2010 · nur Häuser</div>
+    <!-- v1247 · Testbericht: „Hausform: Mehrfamilienhaus kann ich hier nicht
+         anklicken? Ist der Bereich nicht für MFH gedacht und nicht für ETW?"
+
+         Fachlich ist die Auswahl richtig: die NHK 2010 kennen die Hausform
+         (freistehend / Doppelhaus / Reihenmittelhaus) nur bei Ein- und
+         Zweifamilienhäusern. Mehrfamilienhäuser haben dort eigene
+         Gebäudearten ohne Hausform, Eigentumswohnungen werden gar nicht
+         über die NHK bewertet.
+
+         Verwirrend war die Überschrift: „nur Häuser" schließt das MFH
+         gerade NICHT aus. Und der Block hängt nicht an der Objektart —
+         gemessen am 07.09.2026: er steckt allein in einem zugeklappten
+         Bereich, erscheint bei einer ETW also genauso, sobald man
+         aufklappt. Wenn ein DESAG-Sachverständiger hier stutzt, versteht
+         es sonst niemand. -->
+    <div class="card-title">Gebäudeart nach NHK 2010 · nur Ein- und Zweifamilienhäuser</div>
+    <p class="hint" style="margin:-4px 0 10px">
+      Die NHK 2010 kennen die Hausform nur bei <b>Ein- und Zweifamilienhäusern</b>.
+      Mehrfamilienhäuser haben dort eigene Gebäudearten ohne Hausform, Eigentumswohnungen
+      werden nicht über die NHK bewertet — bei beiden bleibt dieser Block leer.
+      <b>Das ist kein fehlendes Feld.</b>
+    </p>
     <div class="g3">
       <div class="f"><label>Hausform</label><div class="iw"><select id="nhk_haus">
         <option value="">— keine Angabe —</option>
@@ -1415,7 +1436,7 @@ label.dp-required.qc-required::after {
         </div>
         <!-- V40: Markt-Faktor wird automatisch berechnet (KP / Jahres-NKM) -->
         <div class="f" style="margin-top:12px">
-          <label>Markt-Faktor (KP / Jahres-NKM) <span class="ds2-tag">DS2</span> <span class="hint" style="font-size:9.5px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:0.04em">auto</span> <button type="button" class="dp-tip" data-tip-id="tab2.markt_faktor" tabindex="-1" aria-label="Hilfe zu Markt-Faktor"></button></label>
+          <label>Markt-Faktor (KP / Jahres-NKM) <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <span class="hint" style="font-size:9.5px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:0.04em">auto</span> <button type="button" class="dp-tip" data-tip-id="tab2.markt_faktor" tabindex="-1" aria-label="Hilfe zu Markt-Faktor"></button></label>
           <div class="cf" id="qm_marktfaktor">—</div>
           <input type="hidden" id="ds2_marktfaktor" value="">
           <span class="hint">Wird automatisch berechnet aus Kaufpreis ÷ Jahres-Nettokaltmiete. Wert fließt in den DealScore 2.0 Upside-Score.</span>
@@ -1650,12 +1671,12 @@ label.dp-required.qc-required::after {
       <!-- V38: ds2_marktmiete + ds2_mietausfall verschoben aus Kennzahlen-Card -->
       <!-- V63.29: ✨-Buttons entfernt — KI-Recherche läuft über die KI-Mietpreis-Analyse-Box unten -->
       <div class="f">
-        <label>Marktmiete (€/m²) <span class="ds2-tag">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab3.marktmiete" tabindex="-1" aria-label="Hilfe zu Marktmiete"></button></label>
+        <label>Marktmiete (€/m²) <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab3.marktmiete" tabindex="-1" aria-label="Hilfe zu Marktmiete"></button></label>
         <div class="iw"><span class="pfx">€</span><input id="ds2_marktmiete" type="text" inputmode="decimal" placeholder="9,00" class="trl" oninput="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"></div>
         <span class="hint">Markt-üblich für die Region — wird mit Ist-Miete verglichen für Upside-Score.</span>
       </div>
       <div class="f">
-        <label>Mietausfall-Risiko <span class="ds2-tag">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab3.mietausfall_risiko" tabindex="-1" aria-label="Hilfe zu Mietausfall-Risiko"></button></label>
+        <label>Mietausfall-Risiko <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab3.mietausfall_risiko" tabindex="-1" aria-label="Hilfe zu Mietausfall-Risiko"></button></label>
         <select id="ds2_mietausfall" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
           <option value="">– keine Angabe –</option>
           <option value="sehr_niedrig">Sehr niedrig</option>
