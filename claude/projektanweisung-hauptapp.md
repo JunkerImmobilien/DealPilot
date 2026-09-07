@@ -7609,6 +7609,43 @@ zurückgesetzt und **danach wiederhergestellt** (`dp_tour_seen_v1` und
 | Haken gesetzt + „Später" | `dp_tour_offer_off` gesetzt |
 | **noch ein Tag später** | **kein Angebot mehr** |
 
+### Prod-Rollout 07.09.2026 — `v1233` bis `v1239` sind live (`5149e5b`)
+
+**Freigabe.** Marcel: **„ja"**. Reines Frontend, `git pull`, kein Neubau.
+
+**Gesichert vorher:** `/root/backups/haupt-vor-v1239-20260907-0526.sql`
+(15,8 MB) und `mb-vor-v1239-20260907-0526.sql` (14,3 MB).
+
+**Sieben Versionen, davon zwei mit Geldwirkung:**
+
+| | was |
+|---|---|
+| `v1233`/`b`/`c` | Der Quick-Check erklärt seine Zahl — Satz sichtbar, Rechenweg zum Aufklappen |
+| `v1234` | Die Überführung sagt, was sie tut: Klarname statt ID, Objektliste je Mandant, Vorprüfung, die vier Steuerregeln |
+| `v1235`/`b` | **Der Ergebnisvortrag wandert ins Folgejahr** (§ 252 Abs. 1 Nr. 1, § 266 Abs. 3 A. IV HGB) |
+| `v1236` | Der Rück-Link zeigte auf sich selbst — ein Klick hätte gelöscht |
+| `v1237` | Die Überführungsfelder trugen den Wert des Vorgängers weiter |
+| `v1238` | **Das Grundbuchamt hatte gar keine Vorbelegung** — neue Objekte rechneten mit 0 € statt 0,5 % |
+| `v1239` | Die Tour fragt, statt zu starten |
+
+**Über HTTPS gegengelesen**, alle sechs Dateien 200 und mit Inhalt:
+`_halterName` 3× · `_gaVortrag` 2× · `sv('gba_p'` 1× · `_angebotZeigen` 2× ·
+`selbstbezug` 3×.
+
+**Im Browser auf Prod**, Konto `partner`:
+
+| Prüfung | Ergebnis |
+|---|---|
+| geladene Fassungen | `mandanten v1236` · `ueberfuehrung-wizard v1236` · `gesellschaft-abschluss v1235b` · `storage v1237` · `tour-engine v1239` · `main v1238` |
+| Karten | „Privat" — **kein roher Schlüssel mehr** |
+| Tour-Angebot | **erscheint nicht** — richtig: dieser Browser hat die Tour am 06.08. gesehen. Wer sie kennt, wird nicht gefragt |
+| Konsole | keine Fehler |
+
+> **Der Grundbuchamt-Befund wirkt nur nach vorn.** `setDefaults()` läuft in
+> `newObj()`, bestehende Objekte behalten ihren Wert. **Die acht Objekte, die
+> auf 0 € stehen, bleiben es** — nachtragen würde ihre Renditen und Scores
+> verschieben, und das ist Marcels Entscheidung.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

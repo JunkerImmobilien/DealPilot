@@ -36,11 +36,11 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Stand 04.09.2026, abends)
+## → HIER WEITERMACHEN (Stand 07.09.2026)
 
-**Stand:** lokal = GitHub = Staging auf `24bdca8`, **Produktion auf `16f5712`**.
-**`v1215`–`v1231` sind live** — vier Prod-Rollouts am 04.09.
-**Auf Staging warten `v1233`–`v1239`.** Nachweise im Rollout-Journal.
+**Stand:** lokal = GitHub = Staging = **Produktion** auf `5149e5b`.
+**Alles ist live** — `v1215`–`v1239`. Fünf Prod-Rollouts am 04.09. und
+einer am 07.09. Nachweise im Rollout-Journal der Projektanweisung.
 
 **Und auf Prod liegen jetzt Marcels Daten.** Der Staging-Nutzer
 `info@junker-immobilien.io` ist auf Prod ins Konto gleicher Mailadresse
@@ -65,26 +65,17 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 
 > ### Der erste Griff jetzt — in dieser Reihenfolge
 >
-> **1 · Prod-Rollout `v1233`–`v1239`.** Reines Frontend, `git pull`, kein
-> Neubau. **Das ist der wichtigste Punkt**, weil zwei Befunde darin Geld
-> bewegen und seit dem 04.09. ungenutzt auf Staging liegen:
-> - **`v1238`** — das Grundbuchamt hatte gar keine Vorbelegung. Neue Objekte
->   rechneten mit 0 € statt 0,5 %; bei 200.000 € sind das 1.000 € zu wenig
->   Gesamtinvestition, und Rendite, Cashflow und Score stehen zu gut da.
-> - **`v1235`** — der Ergebnisvortrag der Gesellschaft wanderte nicht ins
->   Folgejahr. Die Bilanz ging trotzdem auf, weil das Verrechnungskonto die
->   Differenz auffing.
-> Dazu `v1234`/`v1236`/`v1237` (Überführung), `v1233` (Quick-Check erklärt
-> seine Zahl) und `v1239` (Tour fragt statt zu starten).
-> **Braucht nur Marcels „ja".**
+> **Nichts wartet auf einen Rollout.** `v1215`–`v1239` sind live.
 >
-> **2 · Ein Sprechlauf am Gerät.** Den kann nur Marcel machen, und **ein
+> **1 · Ein Sprechlauf am Gerät.** Den kann nur Marcel machen, und **ein
 > einziger Lauf nimmt vier Änderungen ab**: `v1168` (Häkchen
 > `san_tax_active`), `v1169` (Stichwort-Fenster), `v1169`/`v1170` (Tempo —
 > und ob die Zuordnung noch stimmt) und `v1231` (Sanierungsbedarf diktieren:
-> „Dach neu, fünfzehntausend").
+> „Dach neu, fünfzehntausend"). **Der Tempo-Punkt ist der wichtigste:** nicht
+> nur ob es schneller ist, sondern ob die Zahlen noch im richtigen Feld
+> landen.
 >
-> **3 · Weiter im Testbericht.** Als Nächstes **Block E** (Marktmiete zu
+> **2 · Weiter im Testbericht.** Als Nächstes **Block E** (Marktmiete zu
 > niedrig ohne KI · den KI-Knopf nach oben · die doppelt abgefragte
 > Mietsteigerung) und der Rest von **Block D** (Hinweis, was mit den Werten
 > passiert · die Haken, die stehen bevor der Bereich besucht wurde).
@@ -94,9 +85,9 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 > - **Die 8 Objekte ohne Grundbuchamt-Prozentsatz** stehen weiter auf 0 €.
 >   Nachtragen verschiebt ihre Renditen und Scores — das macht niemand
 >   ungefragt.
-> - **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, vor und nach
->   `v1229` gleich, während `CLAUDE.md` „RC=0 ist sauber" als Rollout-Tor
->   führt. Schließen oder Regel umschreiben?
+> - **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, während
+>   `CLAUDE.md` „RC=0 ist sauber" als Rollout-Tor führt. Schließen oder Regel
+>   umschreiben?
 > - **Die Objektart kennt kein Zweifamilienhaus.** `Zweifamilienhaus` fällt
 >   auf `EFH`, das Testobjekt Löhner Str. 278 ist eines. **Bewertungsfrage.**
 >
