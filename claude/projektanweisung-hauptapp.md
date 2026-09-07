@@ -8495,6 +8495,38 @@ MPI+-Kontingent bekommt bei Stufe 2 **NEIN**, bei Stufe 1 und 3 **JA**.
 **Commits.** `7079b21` (`v1250`) · `4d7581b` (`v1251`) · `2bdea1b`
 (Prod-Merge). Backend → beide Umgebungen neu gebaut.
 
+## Rollout-Journal · 07.09.2026, zwölfter Teil — `v1252`, was NICHT kam
+
+**Testbericht:** *„Ist die Makrolage ‚Durchschnittlich' automatisch auf
+Basis des Exposés getroffen worden? Hier ist sehr viel leer wie
+Bevölkerungsentwicklung. Sollte hier ein Hinweis sein, dass keine Werte
+aus dem Exposé entnommen werden konnten?"*
+
+> **Die App wusste es bereits.** Der Import sammelt seit `V236` in
+> `_marked`, was er gesetzt hat, und färbt diese Felder golden. Sie sagte
+> aber nur, was **ankam** — nie, was fehlte. Und die Farbe erklärte sich
+> nicht.
+
+Zwei Ergänzungen:
+
+1. **`_dpLageLuecken()`** nennt nach jedem Import die leer gebliebenen
+   Lagefelder beim Namen, direkt in der Lage-Karte — mit dem Zusatz, dass
+   das nichts über die Lage sagt, sondern über das Dokument, und dass der
+   Investor Deal Score diese Punkte ohne Angabe nicht mitrechnet.
+2. **Der goldene Streifen trägt einen Titel:** *„Automatisch übernommen —
+   aus dem Exposé, Marktbericht oder Quick-Check. Die Markierung
+   verschwindet, sobald du den Wert selbst änderst."* Damit beantwortet
+   die Farbe die Frage, die sie ausgelöst hat.
+
+**Nachweis, beide Richtungen:** am leeren Startformular nennt der Kasten
+alle sechs Felder (Makrolage · Mikrolage · Bevölkerungsentwicklung ·
+Nachfrage · Wertsteigerung · Entwicklungspotenzial); nach dem Laden von
+`2026-001` — wo alle gefüllt sind — **verschwindet er**. Und über den
+Bedienweg `_v236MarkQcLoaded(['makrolage', …])`: Markierung und Titel
+kommen zusammen, und beim ersten `change` fallen sie zusammen.
+
+**Commits.** `48e38f1` (`v1252`) · `60ca94c` (Prod-Merge).
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
