@@ -38,8 +38,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 07.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging auf `75733bc`, **Produktion auf
-`409f863`**. **`v1215`–`v1244b` sind live**, `v1244c`–`v1246b` warten auf
+**Stand:** lokal = GitHub = Staging auf `a5bc1a6`, **Produktion auf
+`409f863`**. **`v1215`–`v1244b` sind live**, `v1244c`–`v1246c` warten auf
 den naechsten Prod-Rollout (nur Frontend, kein Neubau noetig).
 
 **Zuletzt fertig: `v1242a–e` — die KI-Mietrecherche.** Sie nennt jetzt
@@ -81,34 +81,44 @@ Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
 > `localStorage`**, deren alter Zustand nirgends festgehalten ist.
 > **Reproduzierbar ist, dass die Bilanz aufgeht, nicht die 687.059 €.**
 
-> ### ⚠ ZUERST: Stripe, bevor die Preise auf Prod gehen
+> ### ⚠ ZUERST: das LIVE-Stripe-Konto — sonst darf `v1246` nicht auf Prod
 >
-> **`v1246` hat die Preise überall geändert — außer in Stripe.**
-> Anzeige, Landing, App und Einstellungen sagen jetzt
-> **19,99 / 34,99 / 49,99** und jährlich **219 / 384 / 549**.
-> **In Stripe liegen weiter die alten Preise.** Ginge das so auf Prod,
-> stünde 34,99 € auf der Seite und abgebucht würden 39,99 €.
+> **Die Sandbox ist fertig** (`v1246c`): acht Preise angelegt, Coupon
+> `ERSTFLUG15` (15 %), neun alte stillgelegt, `plans` auf Staging
+> nachgezogen, Metadaten gesetzt, Katalog-Endpunkt gegengeprüft.
 >
-> Vor dem Prod-Rollout von `v1246` müssen also:
-> - **sechs Preise** in Stripe angelegt werden (drei monatlich, drei
->   jährlich) und ihre IDs an **allen drei** Stellen eintreffen —
->   `config.js` (Anzeige), `plans` (Abbuchung), Billing-Portal-Konfiguration
->   (was der Kunde im Kundenportal sieht);
-> - **drei Nachkauf-Preise** dazu: `nachkauf_starter` 5,00 €,
->   `nachkauf_investor` 8,75 €, `nachkauf_pro` 12,50 €. Bis sie da sind,
->   steht die Nachkauf-Kachel in den Einstellungen **ohne Kaufknopf**.
-> - Für den **Erstflug mit 15 %** muss ein *neuer* Coupon angelegt werden —
->   ein Stripe-Coupon lässt seinen Prozentsatz nicht ändern. Eilt nicht:
->   die Anzeige ist aus.
+> **Im LIVE-Konto fehlt alles davon.** Der Zugriff wurde von der
+> Sicherheitsschranke blockiert. Prod-`plans` steht weiter auf
+> 1999/19900 · 3999/39900 · 7999/79900. **Ginge `v1246` so auf Prod,
+> stünde 34,99 € auf der Seite und abgebucht würden 39,99 €.**
 >
-> **Zwei Konten beachten:** Staging rechnet gegen die Sandbox, Prod gegen
-> das Hauptkonto. Das ist Geld — **nur nach Marcels ausdrücklicher
-> Freigabe.**
+> **Anzulegen im Live-Konto** (alle in EUR, `transfer_lookup_key=true`):
 >
-> **Ein Abnahmepunkt für Marcel:** die Nachkauf-Kachel in
-> *Einstellungen → Plan* ist **ungesehen**. Der Bereich ließ sich über das
-> Browser-Werkzeug nicht öffnen; Logik und Syntax sind geprüft, die Optik
-> nicht.
+> | lookup_key | Betrag | Art |
+> |---|---|---|
+> | `dp_plan_starter_yearly` | 21900 | jährlich |
+> | `dp_plan_investor_monthly` | 3499 | monatlich |
+> | `dp_plan_investor_yearly` | 38400 | jährlich |
+> | `dp_plan_pro_monthly` | 4999 | monatlich |
+> | `dp_plan_pro_yearly` | 54900 | jährlich |
+> | `dp_nachkauf_starter` | 500 | einmalig |
+> | `dp_nachkauf_investor` | 875 | einmalig |
+> | `dp_nachkauf_pro` | 1250 | einmalig |
+>
+> *Starter monatlich bleibt 19,99 € — kein neuer Preis.*
+>
+> **Die drei Nachkauf-Preise brauchen Metadaten**, sonst bucht der Kauf ab
+> und schreibt **nichts** gut: `dp_kind=bewertung_paket`,
+> `dp_pack_sku=nachkauf_<plan>`, und `mpi`/`mpi_plus`/`wev` =
+> 5/0/0 · 5/5/0 · 5/5/5.
+>
+> Dazu: Coupon **15 %, dauerhaft**, Name *Erstflug* (eilt nicht, die
+> Anzeige ist aus). Die alten Plan- und Paket-Preise stilllegen, **nicht
+> löschen**. Danach `plans` auf Prod nachziehen — **vorher sichern**.
+>
+> **Zum Freischalten genügt eines:** Stripe über `/mcp` neu anmelden (der
+> Zugang ist abgelaufen), eine Bash-Berechtigung für den Prod-Server, oder
+> die Preise selbst im Dashboard anlegen.
 
 > ### Der erste Griff jetzt — in dieser Reihenfolge
 >
