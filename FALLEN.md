@@ -1334,3 +1334,22 @@ nur die zweite Hälfte der Auskunft.
 > Dazu: die goldene Markierung trug **keinen Titel**. Eine Farbe, die
 > etwas bedeutet, muss sagen was — sonst erzeugt sie genau die Frage, die
 > sie beantworten sollte („ist das automatisch gesetzt worden?").
+
+## Zwei von drei Nachbarfeldern erklärt zu haben, ist schlimmer als keines
+
+*Investitionsthese* und *Bekannte Risiken* trugen je einen Tooltip,
+*Zusätzliche Notizen* daneben nicht — und der Platzhalter lautete
+„Weitere Hinweise…". Der Tester fragte prompt: *„Was soll hier rein?"*
+
+**Wo Nachbarn sich erklären, liest sich das Schweigen des dritten als
+Bedeutungslosigkeit.** Tatsächlich war es das wichtigste der drei:
+
+- `object-actions.js:1177` **hängt** Import-Inhalte dort **an**, statt sie
+  zu ersetzen — als einziges Feld überhaupt. Eigene Notizen überleben
+  also einen Exposé-Import.
+- `reseller-portal.js:466/545` zeigt den Inhalt dem **Berater** in der
+  Mandanten-Ansicht. Was hier steht, liest der Partner mit.
+
+Beides stand nur im Code. **Ein Feld, dessen Sonderverhalten nirgends
+außerhalb der Quelle steht, hat keine Dokumentation — es hat ein
+Geheimnis.**

@@ -8527,6 +8527,31 @@ kommen zusammen, und beim ersten `change` fallen sie zusammen.
 
 **Commits.** `48e38f1` (`v1252`) · `60ca94c` (Prod-Merge).
 
+## Rollout-Journal · 07.09.2026, dreizehnter Teil — `v1253`, das dritte Notizfeld
+
+**Testbericht:** *„Weiteres Notizfeld neben den Risiken und
+Investitionsthese. Was soll hier rein?"*
+
+Gemessen: die beiden Nachbarn haben je einen Tooltip
+(`tab1.investitionsthese`, `tab1.bekannte_risiken`), *Zusätzliche
+Notizen* hatte **keinen** — und der Platzhalter lautete „Weitere
+Hinweise…".
+
+> **Wofür das Feld wirklich da ist, stand nur im Code:**
+> `object-actions.js:1177` **hängt** Import-Inhalte dort **an**, statt zu
+> ersetzen — als einziges Feld überhaupt; alle anderen werden
+> überschrieben. Und `reseller-portal.js:466/545` zeigt den Inhalt dem
+> **Berater** in der Mandanten-Ansicht.
+
+Beides steht jetzt im Tooltip, samt Abgrenzung zu den Nachbarn: *alles,
+was kein Argument und kein Risiko ist*. Der Platzhalter nennt Beispiele
+statt „Weitere Hinweise…".
+
+**Nachweis:** über den echten Hilfe-Knopf geklickt — das Popup öffnet und
+zeigt den Text; alle drei Felder tragen jetzt ein `data-tip-id`.
+
+**Commits.** `87595a3` (`v1253`) · `9ff1190` (Prod-Merge).
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
