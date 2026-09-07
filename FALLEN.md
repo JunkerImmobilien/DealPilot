@@ -853,3 +853,48 @@ kein `change`".
 **Wer im Browser misst, klickt echt.** Und wer per Skript geklickt hat,
 zählt hinterher die Objekte, bevor er einen Fehler meldet — oder
 Testdaten hinterlässt.
+
+## Ein Häkchen, das „gefüllt" heißt, liest sich als „geprüft"
+
+`workflow.js` setzte den Haken am Reiter, sobald alle Pflichtfelder der
+Gruppe einen Wert hatten. Beim Steuer-Reiter besteht die Gruppe aus einem
+einzigen Feld — `grenz`, vorbelegt mit 42 %. Der Kommentar sagt es seit
+V63.29 selbst: *„hat einen Default-Wert der schon beim Init steht"*.
+
+**Der Bereich war also abgehakt, bevor jemand hingesehen hatte** — und
+genau das hat der Tester gefragt: „Warum sind hier oben schon Haken,
+obwohl ich in den Bereichen noch nicht war?"
+
+**Eine Zustandsanzeige muss sagen, was sie meint.** `v1243` trennt beides:
+hohler Haken = gefüllt, aber nie geöffnet; voller Haken = geöffnet. Der
+Merker liegt je Objekt im `localStorage` — fällt er weg, stehen die Haken
+wieder hohl. **Die Richtung des Zweifels gehört auf die vorsichtige
+Seite.**
+
+## Zwei DOM-Felder, in die seit V258-07 niemand schreiben konnte
+
+`calc.js:2165–2186` befüllt bei jedem Lauf `cr-wk-other` und
+`cr-zve-ohne`. Beide gibt es in **keiner** HTML-Datei, und
+`getElementById` liefert im laufenden Browser `null`.
+
+Der Hook wirft nichts — `if (wkEl)` fängt es ab. Er tut nur nichts. Die
+Absicht (Werbungskosten der anderen Objekte anzeigen) ist nie angekommen,
+und der `try/catch` drumherum hätte es auch dann verdeckt.
+
+**Ein `if (el)` vor dem Schreiben schützt vor dem Absturz, nicht vor der
+Wirkungslosigkeit.** Wer eine Anzeige baut, prüft im Browser, ob das Ziel
+existiert — `grep` über die HTML-Dateien genügt schon.
+
+## Eine CSS-Regel, die nicht greift, gehört raus statt durchgedrückt
+
+`v1243` setzte `.tab.tab-wf-done-ungeprueft .tab-lbl { color: … }`. Der
+Kaskaden-Walker zeigte: `nav.tabs .tab .tab-lbl` setzt die Goldfarbe
+**dreimal mit `!important`**. Ein eigenes `!important` hätte gewonnen.
+
+**Es wäre trotzdem falsch gewesen.** Der Reiter-Text ist bei *jedem*
+Reiter gold, auch bei den hakenlosen — ein blasserer Text hätte nicht
+„ungeprüft" bedeutet, sondern nur Unruhe in die Leiste gebracht. Die
+Regel fiel weg, der Unterschied blieb am Haken.
+
+**Bevor man Spezifität erhöht, prüft man, ob die Regel überhaupt das
+Richtige aussagt.**
