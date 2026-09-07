@@ -8552,6 +8552,45 @@ zeigt den Text; alle drei Felder tragen jetzt ein `data-tip-id`.
 
 **Commits.** `87595a3` (`v1253`) · `9ff1190` (Prod-Merge).
 
+## Rollout-Journal · 07.09.2026, vierzehnter Teil — `v1254` gebaut und verworfen
+
+**Was.** Der Eingabemodus aus der Demo wurde gebaut, im Browser
+vorgeführt — und von Marcel verworfen. Zurückgenommen mit `cd1a942`,
+Cache-Buster mit `v1255` vorwärts gesetzt.
+
+**Er war nie auf Produktion.** `v1254` lag ausschließlich auf `staging`;
+Prod stand die ganze Zeit auf `9ff1190` (`v1253`).
+
+**Was er getan hätte** — gemessen, bevor er zurückging:
+
+| | |
+|---|---|
+| sichtbare Felder vorher | 261 |
+| im einfachen Modus | **82** |
+| zugeklappte Karten | 18 |
+| Pflichtfelder erhalten | **14 von 14** |
+| Werte nach Hin- und Herschalten | **bit-identisch** |
+
+Zugeklappt worden wären unter anderem *Wertermittlung (Marktbericht)*
+(37 Felder), *Sanierungsbedarf* (20), *Lage- & Markt-Indikatoren*,
+*Grund & Boden*. Geklappt wurde auf Kartenebene — der Inhalt blieb
+vollständig im DOM, jedes Feld behielt seinen Wert, die Kennzahlen
+rechneten durchgehend weiter (Equity Multiple stand konstant auf 6,0×).
+
+**Was bleibt.** Die Demo unter `design/Vorschläge/eingabemodus-demo.html`
+trägt jetzt den Vermerk „gebaut und verworfen" und bleibt als Beleg
+stehen: die gemessenen Zahlen (238 Felder, davon 14 Pflicht) gelten
+weiter, und wenn die Frage je wieder aufkommt, muss niemand von vorn
+messen.
+
+**Eine Falle kam dabei heraus:** `git revert` setzt den Cache-Buster
+**zurück** — nach der Rücknahme stand wieder `style.css?v=v1248`. Ein
+Buster darf nur steigen, sonst holt ein Browser, der die neuere Fassung
+schon hat, aus seinem Cache eine Datei mit inzwischen anderem Inhalt.
+
+**Commits.** `995f14a` (`v1254`) · `cd1a942` (Revert) · `27451dd`
+(`v1255`, Buster vorwärts + Demo-Vermerk).
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

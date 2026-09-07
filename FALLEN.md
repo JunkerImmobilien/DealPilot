@@ -1353,3 +1353,24 @@ Bedeutungslosigkeit.** Tatsächlich war es das wichtigste der drei:
 Beides stand nur im Code. **Ein Feld, dessen Sonderverhalten nirgends
 außerhalb der Quelle steht, hat keine Dokumentation — es hat ein
 Geheimnis.**
+
+## `git revert` setzt den Cache-Buster ZURÜCK — und das ist gefährlich
+
+Die Rücknahme von `v1254` stellte auch die Cache-Buster wieder her:
+`style.css?v=v1254` wurde wieder zu `?v=v1248`, `workflow.js` zu
+`?v=v1243`. Das ist korrekt im Sinne des Reverts und **falsch im Sinne
+des Caches**.
+
+Wer die Fassung `v1254` bereits geladen hat, fordert danach wieder
+`v1248` an — und bekommt aus seinem Browser-Cache eine Datei, deren
+Inhalt sich inzwischen unterscheidet. Bei einem reinen Rückbau geht das
+meist gut; sobald zwischen den beiden Ständen noch etwas anderes
+passiert ist, entsteht eine Mischung aus zwei Fassungen, die es nie
+gegeben hat.
+
+**Ein Cache-Buster darf nur steigen — auch beim Zurücknehmen.** Nach
+jedem `git revert`, der eine Datei mit Buster berührt, die Nummer
+**vorwärts** setzen (`v1255`), nicht auf den alten Wert stehen lassen.
+
+> Dieselbe Familie wie „der Cache-Buster schützt die Datei, nicht das
+> Dokument": beide Male gewinnt der Cache gegen die Absicht.
