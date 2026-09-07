@@ -7691,6 +7691,42 @@ gegengelesen.
 > hilft nur für die Datei, auf die er zeigt, nicht für das Dokument, das ihn
 > enthält. Ein `location.href` mit eigenem Zufallsparameter hat es gelöst.
 
+### `v1241` (07.09.2026, `63758ba`) — der KI-Knopf stand unter dem Bildschirmrand
+
+**Testbericht Block E:** *„Den Button für die KI Recherche würde ich wieder
+nach oben packen oder automatisch mit KI recherchieren lassen."*
+
+**Gemessen, nicht geschätzt:** der Knopf saß bei **y = 1178** — am Ende der
+linken Spalte, bei einer Fensterhöhe von 725 px. **Wer die Miete einträgt,
+sieht ihn erst nach dem Scrollen, also meist gar nicht.** Genau das meint
+der Bericht mit „nach oben".
+
+Der Block steht jetzt **als Erstes im Reiter, über beiden Spalten**.
+Nachgemessen nach dem Rollout: **y = 204**, über dem Nettokaltmiete-Feld
+(y = 400), ohne Scrollen sichtbar. Klammerbilanz in `index.html`
+ausgeglichen (1106/1106).
+
+> **Die zweite Möglichkeit des Testers ist bewusst nicht gebaut.**
+> „Automatisch mit KI recherchieren lassen" verbraucht Kerosin **ohne Zutun
+> des Nutzers** — das ist eine Geldfrage, keine Optikfrage, und die
+> entscheidet Marcel.
+
+#### Der dritte Punkt aus Block E: gemessen, aber nicht gebaut
+
+*„Marktmiete … mit KI 10,99 €/m² — realistischer, für den Zustand aber eher
+zu hoch. Er verweist, soweit ich sehe, nur auf den Mietspiegel."*
+
+Die Recherche läuft über `/api/v1/ai/ds2-suggest`. Die Antwort trägt
+**eine** Quelle je Vorschlag (`source`, Einzahl), und `ki-miete.js:174`
+zeigt sie an. **Es wird also nichts unterschlagen — es gibt nur eine.**
+
+Zwei Fragen stecken darin, beide für Marcel:
+1. **Soll die Recherche mehrere Quellen nennen?** Das ändert den Prompt und
+   damit Qualität und Kerosinverbrauch.
+2. **Der Preis war „für den Zustand zu hoch".** Ob und wie der Zustand in
+   die Marktmiete eingeht, ist eine fachliche Frage — Marcel ist
+   DESAG-zertifiziert, hier wird nicht geraten.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
