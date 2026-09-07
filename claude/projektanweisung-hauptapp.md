@@ -7803,6 +7803,61 @@ dazu `3318626` (FALLEN). Backend-Datei → jeder Schritt mit Neubau.
 4. Das Testobjekt `2026-1011` war ein Messartefakt eines Skript-Klicks und
    ist wieder entfernt; `2026-001` steht unverändert auf Version 762.
 
+## Rollout-Journal · 07.09.2026, zweiter Teil — Block D: gefüllt ist nicht geprüft
+
+**Was.** Die zwei offenen Punkte aus Block D des Testberichts.
+
+**1 · Die Häkchen, die stehen, bevor man im Bereich war.** Sie hießen
+„alle Pflichtfelder gefüllt", nicht „angesehen" — und beim Steuer-Reiter
+besteht die Gruppe aus einem einzigen Feld, `grenz`, vorbelegt mit 42 %.
+Der Kommentar sagt es seit V63.29 selbst. Jetzt zwei Zustände: hohler
+Haken = gefüllt, aber nie geöffnet (mit Erklärung im `title`), voller
+Haken = geöffnet. Der Merker liegt je Objekt im `localStorage`; fällt er
+weg, stehen die Haken wieder hohl — die vorsichtige Richtung.
+
+**2 · Der Hinweis, was mit den Steuerwerten passiert.** Marcels Vermutung
+war: *„Er übernimmt dann die Werte in die Steuerprogressionsbewertung um
+dann am Ende den Cashflow über ALLE Investitionen zu bewerten oder?"*
+
+> **Gemessen statt bestätigt — sie stimmt zur Hälfte.** Die Steuer dieses
+> Objekts rechnet über `_mtx(base) = base * grenz`, und der Cashflow nach
+> Steuer wird im Cockpit über die Bestandsobjekte addiert
+> (`dashboard.js:457`). **Eine Progression über mehrere Objekte gibt es
+> nicht.** `calc.js:2174` sagt wörtlich *„Eigentliche Steuerberechnung
+> weiterhin auf `K.zve_immo` basiert"*; der WK-Aggregator holt die
+> Werbungskosten der anderen Objekte nur für einen Hinweis.
+>
+> Der neue Kasten im Steuer-Bereich sagt beides — **und der zweite Teil
+> ist der wichtigere:** wer eine Gesamtprogression annimmt, unterschätzt
+> seine echte Entlastung bei mehreren Objekten mit Anfangsverlusten.
+
+**Commits.** `1bdfd89` (`v1243`) · `bef13d8` (`v1243b`) · `89ea78b`
+(FALLEN). Nur Frontend — kein Neubau nötig.
+
+**Nachweis.** Im Browser gemessen, mit vorher geleertem Besuchsmerker:
+nach dem Laden von `2026-001` steht **nur** der aktive Reiter *Objekt*
+voll, die fünf anderen hohl; der `title` des Steuer-Reiters lautet *„alle
+Pflichtfelder gefüllt — diesen Bereich hast du noch nicht geöffnet"*. Nach
+einem Klick auf *Steuer*: Merker `["objekt","steuer"]`, Haken voll, `title`
+*„gefüllt und angesehen"*. Der Erklärkasten steht sichtbar über der Karte
+*Persönliche Steuer*, der Aufklappteil zu.
+
+**`v1243b` ist eine Korrektur an mir selbst.** Die Nachmessung zeigte,
+dass meine zweite CSS-Regel (blasserer Reiter-Text) nie griff:
+`nav.tabs .tab .tab-lbl` setzt Gold dreimal mit `!important`. Ein eigenes
+`!important` hätte gewonnen — **wäre aber inhaltlich falsch gewesen**, weil
+der Text bei *jedem* Reiter gold ist, auch bei den hakenlosen. Die Regel
+fiel weg statt sich durchzusetzen.
+
+**Rest.**
+
+1. **Nebenbefund, nicht angefasst:** `cr-wk-other` und `cr-zve-ohne`, in
+   die `calc.js` bei jedem Lauf schreibt, gibt es in **keiner** HTML-Datei
+   und im DOM nicht. Der V258-07-Hook ist eine Anzeige ohne Anzeige —
+   entweder die Zeile bauen oder den Hook entfernen. **Produktfrage.**
+2. `v1243`/`v1243b` sind auf Staging, **noch nicht auf Prod** (Prod steht
+   auf `4ae353a`).
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
