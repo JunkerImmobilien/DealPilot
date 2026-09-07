@@ -1374,3 +1374,36 @@ jedem `git revert`, der eine Datei mit Buster berührt, die Nummer
 
 > Dieselbe Familie wie „der Cache-Buster schützt die Datei, nicht das
 > Dokument": beide Male gewinnt der Cache gegen die Absicht.
+
+## Eine Einstellung, die niemand liest — zum dritten Mal
+
+Nach `max_saves` („3 Speicherungen", von keinem Prüfcode gelesen) und
+`cr-wk-other` (ein Feld, das es im DOM nicht gibt) nun das
+**Investmentprofil**: eine ganze Einstellungsseite, gespeichert,
+geladen, angezeigt — und **wirkungslos**.
+
+Zwei Ursachen, jede für sich tödlich:
+
+1. `applyToNewObject()` sprach Feld-IDs an, die es nicht gibt:
+   `tilgung` (heißt `d1t`), `zinsbindung` (`d1_bindj`),
+   `grenzsteuersatz` (`grenz`), `notar_pct` (`notar_p`), `makler_pct`
+   (`makler_p`). **Von neun IDs existierten zwei.** `setIfEmpty()` prüft
+   `if (!el) return;` — es fällt still durch.
+2. Selbst mit richtigen IDs wäre nichts passiert: `setIfEmpty` schreibt
+   nur in **leere** Felder, und `setDefaults()` in `main.js` hatte sie
+   längst hart gefüllt.
+
+**Der Beweis dauerte zwei Minuten:** einen unverwechselbaren Wert ins
+Profil schreiben (Tilgung 3,7 %), neues Objekt anlegen, nachsehen. Es kam
+`1`.
+
+**Bei jeder Einstellung, die man baut oder erbt, ist die erste Frage
+nicht „wird sie gespeichert?", sondern „kommt sie an?"** — und die
+Antwort ist ein Wert, den man im Formular wiedererkennt, kein Blick in
+den Code.
+
+> Beim Reparieren dann die zweite Regel: **die Vorgabewerte der
+> Einstellung an den gelebten Stand angleichen**, nicht umgekehrt. In
+> `config.js` standen 2,5 % Tilgung und 42 % Grenzsteuer — Zahlen, die
+> nie jemand gesehen hat. Hätte ich sie wirksam gemacht, hätten sich für
+> alle Nutzer stillschweigend die Vorgaben geändert.
