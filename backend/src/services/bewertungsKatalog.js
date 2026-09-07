@@ -22,10 +22,20 @@
 
 const stripeService = require('./stripeService');
 
-/* Die neun Namen. Stripe nimmt bis zu 10 lookup_keys je Abfrage — wer hier
-   einen zehnten ergaenzt, muss auf Bloecke umstellen. */
+/* Die acht Namen. Stripe nimmt bis zu 10 lookup_keys je Abfrage — wer hier
+   einen elften ergaenzt, muss auf Bloecke umstellen.
+
+   v1246 · Die vier `dp_paket_*` sind weg. Marcels Entscheidung vom
+   07.09.2026: die Bewertungs-Pakete werden nicht mehr angeboten, statt
+   dessen kauft man sein eigenes Monatskontingent noch einmal — fuer ein
+   Viertel des Monatsbeitrags. Die drei `dp_nachkauf_*` tragen dieselben
+   Metadaten wie die alten Pakete (dp_kind=bewertung_paket plus mpi,
+   mpi_plus, wev), damit der Webhook unveraendert gutschreibt. Die alten
+   Preise sind in Stripe stillgelegt, nicht geloescht: wer eines der
+   Pakete frueher gekauft hat, behaelt seine Gutschrift und seine
+   Rechnung. */
 const LOOKUP_KEYS = [
-  'dp_paket_kurz', 'dp_paket_mittel', 'dp_paket_gross', 'dp_paket_max',
+  'dp_nachkauf_starter', 'dp_nachkauf_investor', 'dp_nachkauf_pro',
   'dp_einzeln_mpi', 'dp_einzeln_mpi_plus', 'dp_einzeln_wev',
   'dp_einzeln_avm_a', 'dp_einzeln_avm_b'
 ];

@@ -1930,12 +1930,11 @@ function _renderPlanPane() {
      nachkaufFuer), damit Preisseite und Einstellungen nicht auseinander
      laufen.
 
-     BEWUSST OHNE KAUFKNOPF: der Kauf laeuft ueber einen
-     Stripe-lookup_key, und die drei Nachkauf-Preise sind dort noch nicht
-     angelegt. Ein Knopf, der eine 400 zurueckbringt, ist schlimmer als
-     ein Satz, der sagt was gilt. Sobald die Preise stehen, kommt hier
-     der Knopf dazu — der Einzelkauf darunter funktioniert unabhaengig
-     davon weiter. */
+     v1246c: Der Kaufknopf ist da. Die drei Preise (dp_nachkauf_starter,
+     _investor, _pro) sind in der Stripe-Sandbox angelegt und tragen die
+     Metadaten, aus denen der Webhook gutschreibt (dp_kind=bewertung_paket
+     plus mpi/mpi_plus/wev). Im LIVE-Konto fehlen sie noch — dort laeuft
+     der Knopf in eine 404 des Katalogs, bis sie angelegt sind. */
   (function () {
     var nk = (DealPilotConfig.pricing && typeof DealPilotConfig.pricing.nachkaufFuer === 'function')
       ? DealPilotConfig.pricing.nachkaufFuer(current) : null;
@@ -1952,6 +1951,7 @@ function _renderPlanPane() {
           (nk.kontingent.mpi_plus ? ' · ' + nk.kontingent.mpi_plus + ' erweiterte' : '') +
           (nk.kontingent.wev ? ' · ' + nk.kontingent.wev + ' Wertermittlungen' : '') + '</div>' +
         '<div class="plan-credit-price">' + eur(nk.preis_eur) + '</div>' +
+        '<button class="btn btn-outline btn-sm" onclick="_buyCreditPack(\'' + nk.key + '\')">Dazubuchen</button>' +
       '</div>' +
       '</div>';
   })();
@@ -2041,7 +2041,18 @@ async function _buyCreditPack(packKey) {
      den Stripe-lookup_key selbst auf. Die Suche ist nur dazu da, einen
      Tippfehler im Aufruf zu fangen, bevor er zu einer 400 wird. */
   var p = (DealPilotConfig.pricing || {});
+  /* v1246: Der Nachkauf steht in keiner der drei Listen — er wird je Plan
+     abgeleitet. Ohne diese Zeile faellt jeder Nachkauf-Klick hier heraus,
+     genau wie v1184 es schon einmal fuer die Pakete beschrieben hat. */
+  var nachkauf = [];
+  if (typeof p.nachkaufFuer === 'function') {
+    ['starter', 'investor', 'pro'].forEach(function (k) {
+      var n = p.nachkaufFuer(k);
+      if (n) nachkauf.push(n);
+    });
+  }
   var packs = (p.bewertungsPakete || [])
+    .concat(nachkauf)
     .concat(p.einzelkauf || [])
     .concat(p.aiCreditPackages || []);
   var pack = packs.find(function(x){ return x.key === packKey; });

@@ -472,6 +472,9 @@ window.DealPilotConfig = (function() {
     if (menge <= 0) return null;
     return {
       plan:       planKey,
+      /* Der Schluessel ist zugleich der Stripe-SKU (dp_pack_sku am Preis)
+         und der lookup_key heisst dp_nachkauf_<plan>. */
+      key:        'nachkauf_' + planKey,
       preis_eur:  Math.round(p.price_monthly_eur / 4 * 100) / 100,
       kontingent: { mpi: k.mpi || 0, mpi_plus: k.mpi_plus || 0, wev: k.wev || 0 },
       menge:      menge,
