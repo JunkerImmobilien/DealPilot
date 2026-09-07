@@ -8415,6 +8415,86 @@ wie nachher **1117 zu 1117**.
 
 **Commits.** `c3ae89c` (`v1249`) · `5ca1deb` (Prod-Merge).
 
+## Rollout-Journal · 07.09.2026, elfter Teil — `v1250`/`v1251`
+
+### Die Landing war nie unterschiedlich
+
+Marcel: *„prod und staging da unterscheidet sich aktuell die
+landingpage."* **Gemessen: sie ist bitgleich.** Die Datei auf beiden
+Servern hat denselben `md5`; die über HTTPS ausgelieferten Seiten haben
+dieselbe Länge (1.151.703 Bytes), denselben `md5` und **null**
+Unterschiede im `diff`. Auch `promo-erstflug.js`, `landing-motion.js`,
+`landing-mobile.js` und beide CSS sind identisch.
+
+**Es war der Browser-Cache** — dieselbe Falle wie am Vormittag: der
+Cache-Buster steckt *in* der Seite, die selbst im Cache liegt.
+
+### `v1250` — die Seats waren teurer als der Selbstkauf
+
+Marcel: *„die seats sind zu teuer jetzt. mach da was sinnvolles."*
+
+Durchgerechnet gegen den Einzelpreis (Investor 34,99 €):
+
+| Mandanten | Partner gesamt | je Mandant | Einzelkauf | Differenz |
+|---|---|---|---|---|
+| 1 | 123 € | 123,00 | 34,99 | **−88 €** |
+| 5 | 219 € | 43,80 | 174,95 | **−44 €** |
+| 7 | 267 € | 38,14 | 244,93 | **−22 €** |
+| 10 | 289 € | 28,90 | 349,90 | +61 € |
+
+> **Das Programm lohnte sich erst ab zehn Mandanten.** Und die erste
+> Seat-Stufe (24 €) lag **über** dem Starter-Einzelpreis (19,99 €) — der
+> Partner zahlte für seinen Mandanten mehr, als der Mandant selbst
+> gezahlt hätte. Nach `v1246` war das noch deutlicher geworden.
+
+**Marcels Wahl (Variante B):** Grundgebühr **99 → 49 €**, Seat-Staffel
+**24/19/15 → 19/15/12**. Jahrespreise mit einem Freimonat: Partner
+539 €, Seats 209/165/132. **Damit lohnt es sich ab vier Mandanten**, und
+die erste Stufe liegt unter Starter — nie teurer als der Selbstkauf.
+
+Vier neue Preise je Konto (Live *und* Sandbox), vier alte stillgelegt,
+`plans` in beiden Umgebungen nachgezogen.
+
+### `v1251` — die Bezahlschranke stand hinter der Leistung
+
+Marcel: *„starter kann oder darf ja keine erweiterten
+Marktpreisindikation machen und auch keine wertermittlung. da können wir
+dann bezahl schranken rein machen."*
+
+> **Er hat recht, und es war schlimmer als eine fehlende Schranke.**
+> `consumeArt()` gibt bei leerem Kontingent `{ok:false}` zurück — es
+> **wirft nicht**. Beide Aufrufer standen hinter dem Bericht („best
+> effort; blockt Bericht nicht") und fingen nur Exceptions ab; einer
+> verschluckte das Ergebnis ganz (`catch (e) {}`).
+>
+> Ein Starter-Konto bekam damit die erweiterte Marktpreisindikation und
+> die Wertermittlung **vollständig geliefert** — Kontingent dort 0 — und
+> **es wurde nichts gebucht.** Der Kommentar über `consumeArt()` sagt es
+> seit `v1183` voraus: *„ein verschlucktes Ergebnis heisst, die Leistung
+> wird erbracht und nicht bezahlt."*
+
+`pruefeArt()`/`pruefeStufe()` fragen dieselbe Quelle, buchen nichts und
+stehen **vor** der Leistung. Reicht es nicht: **402** mit Art,
+Klartext und Upgrade-Ziel (`mpi→starter`, `mpi_plus→investor`,
+`wev→pro`). Gebucht wird weiterhin danach — wer bezahlt hat, soll seinen
+Bericht auch bekommen, wenn die Buchung klemmt.
+
+**Nachweis auf Staging und Prod:**
+
+```
+Plan       | MPI | MPI+ | WEV   -> Schranke
+free       |   1 |    0 |   0   -> MPI+ GESPERRT, WEV GESPERRT
+starter    |   5 |    0 |   0   -> MPI+ GESPERRT, WEV GESPERRT
+investor   |   5 |    5 |   0   -> MPI+ darf,     WEV GESPERRT
+pro        |   5 |    5 |   5   -> beides
+```
+
+Und funktional gegen echte Konten: ein Pro-Nutzer mit aufgebrauchtem
+MPI+-Kontingent bekommt bei Stufe 2 **NEIN**, bei Stufe 1 und 3 **JA**.
+
+**Commits.** `7079b21` (`v1250`) · `4d7581b` (`v1251`) · `2bdea1b`
+(Prod-Merge). Backend → beide Umgebungen neu gebaut.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
