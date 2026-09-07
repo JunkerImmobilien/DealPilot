@@ -900,9 +900,11 @@ async function suggestDs2Fields(payload, opts) {
     'AUFGABE:',
     'Recherchiere kurz für die Adresse (Bevölkerungsentwicklung, Marktmiete €/m², Nachfrage etc.) und gib für jedes Feld:',
     '  - "value": exakt einer der erlaubten ENUM-Werte (für Kategorien) ODER eine Zahl (für numerische Felder)',
-    '  - "reasoning": kurze Begründung in 1 Satz, max 80 Zeichen',
+    '  - "reasoning": Begruendung in 1 Satz, max 160 Zeichen. KEIN Quellenname — die Quelle steht in "sources".',
     '  - "source": Kurzname der WICHTIGSTEN Quelle (max 80 Zeichen). Bei Unsicherheit: "KI-Marktbewertung".',
-    '  - "sources": ALLE benutzten Quellen als Array, je { "label": "...", "url": "..." }. url weglassen wenn nicht sicher bekannt.',
+    '  - "sources": ALLE benutzten Quellen als Array, je { "label": "...", "url": "..." }. Typisch zwei bis vier.',
+    '    url NUR wenn du sie sicher kennst, sonst ganz weglassen — nie eine plausible URL bauen.',
+    '    Eine einzige Quelle nur, wenn es wirklich nur eine gab.',
     '',
     /* v1242 · Marcels Vorgabe vom 07.09.2026: „die KI anfrage duerfte mehrere
        quellen ausgeben und moeglichst immer bei der gemeinde oder stadt
@@ -929,9 +931,25 @@ async function suggestDs2Fields(payload, opts) {
     '',
     'Antwort STRIKT als JSON, KEIN Markdown:',
     '{',
+    /* v1242b · Der echte Lauf am 07.09.2026 hat zwei Fehler an EINER Stelle
+       gefunden: das Beispiel-JSON. Es zeigte kein "sources" und trug in
+       "reasoning" einen Quellennamen ("Mietspiegel Herford 2024") statt einer
+       Begruendung. Das Modell kopiert das Beispiel — es kam genau eine Quelle
+       zurueck und ein reasoning, das keins war. Das letzte Beispiel schlaegt
+       jede Anweisung darueber. Beide Faelle stehen jetzt drin: mit und ohne
+       amtlichen Mietspiegel. */
     '  "suggestions": {',
-    '    "ds2_zustand": { "value": "gut", "reasoning": "Baujahr 1997, vermutlich saniert", "source": "KI-Marktbewertung" },',
-    '    "ds2_marktmiete": { "value": 9.5, "reasoning": "Mietspiegel Herford 2024", "source": "Mietspiegel Herford 2024" }',
+    '    "ds2_marktmiete": { "value": 9.5,',
+    '      "reasoning": "Qualifizierter Mietspiegel, mittlere Lage, Baujahresklasse 1960-1979",',
+    '      "source": "Mietspiegel Herford 2024",',
+    '      "sources": [ { "label": "Qualifizierter Mietspiegel Herford 2024", "url": "https://www.herford.de/mietspiegel" },',
+    '                   { "label": "IHK Ostwestfalen, Immobilienmarktbericht 2025" },',
+    '                   { "label": "Angebotsmieten der Portale, Stand 2026" } ] },',
+    '    "ds2_mietausfall": { "value": "niedrig",',
+    '      "reasoning": "Kein amtlicher Mietspiegel fuer Huellhorst; Einschaetzung aus Kreisdaten",',
+    '      "source": "Kreis Minden-Luebbecke, Wohnungsmarktbeobachtung",',
+    '      "sources": [ { "label": "Kreis Minden-Luebbecke, Wohnungsmarktbeobachtung 2025" },',
+    '                   { "label": "IT.NRW Bevoelkerungsvorausberechnung" } ] }',
     '  }',
     '}'
   ].filter(Boolean).join('\n');
