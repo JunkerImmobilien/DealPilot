@@ -8359,6 +8359,39 @@ Feld fehlt.
 mit Titel, `cursor: help`, `border-bottom: dotted`; NHK-Überschrift und
 Hinweis stehen.
 
+## Rollout-Journal · 07.09.2026, neunter Teil — `v1248`, die Wertermittlung erklärt sich
+
+**Was.** Zwei weitere Punkte des Testberichts, beide aus dem
+Wertermittlungs-Block.
+
+**„Woher weiß der Anwender, was Standardstufe NHK 2010 z.B. ist? Oder den
+Sachwertfaktor."** und **„Was genau sind die Stufen?"**
+
+> Gemessen: die Karte hat **37 Felder** und hatte **nicht einen**
+> Tooltip. Sechs tragen jetzt eine Erklärung — Standardstufe (fünf
+> Stufen, beschreibt die *Ausstattung*), Modernisierungsgrad nach Anlage 2
+> (beschreibt den *Zustand*; die beiden verweisen aufeinander, weil sie
+> regelmäßig verwechselt werden), Sachwertfaktor (§ 21 Abs. 3 ImmoWertV,
+> vom Gutachterausschuss — keine Schätzung), Liegenschaftszinssatz (§ 21
+> Abs. 2), Bruttogrundfläche (DIN 277, **nicht** die Wohnfläche).
+
+**„Wieso werden hier Stellplatzmiete abgefragt usw. aber nicht die
+Kaltmiete?"**
+
+> Gemessen: `nkm` und `ze` stehen beide im Tab *Miete*, in derselben
+> Karte. In der Wertermittlung steht nur die Stellplatzmiete — die
+> Kaltmiete kommt von dort und steht nicht zweimal. **Richtig gebaut,
+> falsch erklärt.** Das Feld sagt es jetzt selbst, samt der Folge: die
+> BWK-Quoten rechnen auf dem *gesamten* Rohertrag, Stellplätze
+> eingeschlossen.
+
+**Keine Rechnung geändert, nur Text.**
+
+**Commits.** `b73c231` (`v1248`) · `09fe585` (Prod-Merge).
+
+**Nachweis.** Auf Staging und Prod: `style.css?v=v1248`, alle sechs
+Labels tragen einen Titel (193–282 Zeichen), `cursor: help` greift.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
