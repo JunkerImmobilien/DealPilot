@@ -175,6 +175,74 @@ window.MietEntwicklung = (function() {
     wrap.innerHTML = html;
   }
 
+  /* ── v1240 · Die Soll-Miete sagt den Prozentsatz schon ────────────────────
+     Testbericht Block E, woertlich: „Versteh ich nicht ganz, ich sage hier
+     ich will 3x die Miete erhoehen ueber drei Jahre, um auf 10 € zu kommen.
+     Dann muss ich noch die ‚angestrebte Entwicklung' eingeben? Ich hab doch
+     schon ein Ziel von 10€/m²."
+
+     Er hat recht. Gemessen am 07.09.2026: `me_soll` (Soll-Mietspiegel) geht
+     in die RECHNUNG gar nicht ein — er dient nur der Potenzial-Anzeige
+     (`opp_pct`). Gerechnet wird im Detail-Modus mit `me_anz`, `me_int` und
+     `me_pct`. Der Prozentsatz ist aus der Soll-Miete aber exakt ableitbar:
+
+         me_pct = Soll je m2 / Ist je m2 - 1
+
+     Dieselbe Regel wie bei v1231: **fuellen nur wenn leer, sonst anbieten.**
+     Einen von Hand getippten Wert zu ueberschreiben waere schlimmer als die
+     doppelte Frage.
+
+     Liegt die Soll-Miete UNTER der heutigen, wird kein negativer Prozentsatz
+     vorgeschlagen — dann steht da, dass das Ziel bereits erreicht ist. Ein
+     Vorschlag, der die Miete senkt, waere Unsinn. */
+  function _sollProzent() {
+    var snap = snapshot();
+    if (!(snap.soll > 0) || !(snap.ist_qm > 0)) return null;
+    return (snap.soll / snap.ist_qm - 1) * 100;
+  }
+
+  function _renderSollHinweis() {
+    var pctEl = document.getElementById('me_pct');
+    if (!pctEl) return;
+    var host = document.getElementById('me-soll-hint');
+    if (!host) {
+      var box = pctEl.closest('.f') || pctEl.parentElement;
+      if (!box) return;
+      host = document.createElement('div');
+      host.id = 'me-soll-hint';
+      host.style.cssText = 'margin-top:4px;font-size:11.5px;line-height:1.45;color:#7A7370';
+      box.appendChild(host);
+    }
+    var p = _sollProzent();
+    if (p == null) { host.innerHTML = ''; return; }
+
+    var snap = snapshot();
+    var qm = function (v) { return v.toFixed(2).replace('.', ',') + ' €/m²'; };
+    if (p <= 0.05) {
+      host.innerHTML = 'Die heutige Miete (' + qm(snap.ist_qm) + ') liegt bereits bei oder über '
+        + 'deiner Soll-Miete von ' + qm(snap.soll) + ' — <b>keine Erhöhung nötig</b>.';
+      return;
+    }
+    var pTxt = p.toFixed(1).replace('.', ',') + ' %';
+    var leer = String(pctEl.value || '').trim() === '';
+    if (leer) {
+      pctEl.value = p.toFixed(1).replace('.', ',');
+      try { pctEl.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+      host.innerHTML = 'Aus deiner Soll-Miete von ' + qm(snap.soll) + ' berechnet: <b>' + pTxt + '</b>.';
+      return;
+    }
+    host.innerHTML = 'Aus deiner Soll-Miete von ' + qm(snap.soll) + ' ergäben sich <b>' + pTxt + '</b>. '
+      + '<button type="button" id="me-soll-uebernehmen" style="background:none;border:0;padding:0;'
+      + 'font:inherit;color:var(--wl-b8932f,#b8932f);text-decoration:underline;cursor:pointer">übernehmen</button>';
+    var btn = document.getElementById('me-soll-uebernehmen');
+    if (btn) btn.addEventListener('click', function () {
+      pctEl.value = p.toFixed(1).replace('.', ',');
+      try { pctEl.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+      try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
+      _renderSollHinweis();
+    });
+  }
+
   function _renderOpp() {
     var el = document.getElementById('me_opp');
     if (!el) return;
@@ -190,7 +258,7 @@ window.MietEntwicklung = (function() {
   }
 
   // Re-render Tabelle bei jeder calc()-Aktualisierung
-  function refresh() { _renderUI(); }
+  function refresh() { _renderUI(); try { _renderSollHinweis(); } catch (e) {} }
 
   // Initial-Setup nach DOMContentLoaded
   document.addEventListener('DOMContentLoaded', function() {
