@@ -8151,6 +8151,98 @@ zu führen — genau daran sind die Flugklassen gescheitert (siehe unten).
    bewiesen, die Datei syntaxgeprüft — **die Optik der Nachkauf-Kachel ist
    ungesehen.**
 
+## Rollout-Journal · 07.09.2026, sechster Teil — Stripe (`v1246c`)
+
+**Marcels Freigabe:** *„JA MACH STRIPE AUCH FERTIG ALLES KOMPLETT"*.
+
+### Die Sandbox ist fertig
+
+| angelegt | Betrag | lookup_key |
+|---|---|---|
+| Starter jährlich | 219,00 € | `dp_plan_starter_yearly` |
+| Investor monatlich | 34,99 € | `dp_plan_investor_monthly` |
+| Investor jährlich | 384,00 € | `dp_plan_investor_yearly` |
+| Pro monatlich | 49,99 € | `dp_plan_pro_monthly` |
+| Pro jährlich | 549,00 € | `dp_plan_pro_yearly` |
+| Nachkauf Starter | 5,00 € einmalig | `dp_nachkauf_starter` |
+| Nachkauf Investor | 8,75 € einmalig | `dp_nachkauf_investor` |
+| Nachkauf Pro | 12,50 € einmalig | `dp_nachkauf_pro` |
+
+*Starter monatlich bleibt bei 19,99 € — kein neuer Preis nötig.*
+
+Alle mit **`transfer_lookup_key=true`**: der Name wandert auf den neuen
+Preis, der Code bleibt unverändert. Dazu der Coupon **`ERSTFLUG15`**
+(15 %, dauerhaft) — er liegt nur bereit, die Anzeige ist aus.
+
+**Neun alte Preise stillgelegt**, nicht gelöscht: die fünf ersetzten
+Plan-Preise und die vier Bewertungs-Pakete. Wer eines gekauft hat, behält
+Gutschrift und Rechnung; laufende Abos laufen weiter.
+
+**`plans`-Tabelle auf Staging nachgezogen**, vorher gesichert
+(`/root/plans-vor-v1246-1039.sql.gz`).
+
+### Der entscheidende Fund: die Inhalte stehen an den Preisen
+
+`bewertungsKatalog.js` sagt es im Kopf, und es stimmt: **die Mengen, die
+ein Kauf gutschreibt, stehen nicht im Code, sondern als Metadaten am
+Stripe-Preis** — `dp_kind=bewertung_paket`, `dp_pack_sku`, `mpi`,
+`mpi_plus`, `wev`.
+
+**Meine drei neuen Preise hatten keine.** Der Kauf wäre sauber
+durchgelaufen, hätte abgebucht — und **nichts gutgeschrieben**. Metadaten
+nachgetragen und gegengeprüft.
+
+### Funktionslauf gegen den echten Katalog
+
+`GET /api/v1/credits/bewertungen` nach dem Neubau:
+
+```
+nachkauf_starter      5.00 EUR  paket  {"mpi":5}
+nachkauf_investor     8.75 EUR  paket  {"mpi":5,"mpi_plus":5}
+nachkauf_pro         12.50 EUR  paket  {"mpi":5,"mpi_plus":5,"wev":5}
+```
+
+Die vier `dp_paket_*` sind aus dem Katalog verschwunden. Und alle neun
+`lookup_key`s lösen die richtigen Beträge auf — geprüft einzeln über die
+Stripe-API, also auf dem Weg, den auch der Checkout geht.
+
+### Zwei Code-Fallen, beide gefangen
+
+1. **Der Türsteher in `_buyCreditPack`** prüft, ob der Schlüssel in
+   `bewertungsPakete`, `einzelkauf` oder `aiCreditPackages` steht. Der
+   Nachkauf steht in keiner davon — er wird abgeleitet. **Ohne die neue
+   Zeile wäre jeder Klick dort herausgefallen, ohne dass je ein
+   Netzwerkaufruf entsteht.** Genau das beschreibt `v1184` schon einmal
+   für die Pakete; die Falle war noch da, nur an anderer Stelle.
+2. Der `billing_portal`-Teil meiner Annahme stimmt so nicht: die
+   Konfiguration führt **gar keine** `products`. Stripe nimmt das Feld
+   auch nicht an (drei Versuche, kein Fehler, kein Effekt). **Das ist
+   kein Mangel:** der Plan-Wechsel läuft in DealPilot über die eigene
+   Oberfläche mit `lookup_key`, nicht über das Stripe-Portal. Im Portal
+   stehen also keine veralteten Preise — es stehen dort gar keine.
+
+> Damit ist meine Notiz „ein Preis steht an DREI Stellen" zu
+> präzisieren: es sind zwei, die gepflegt werden müssen (Anzeige und
+> `plans`), plus das Portal, **wenn** dort je ein Plan-Wechsel angeboten
+> wird.
+
+### ⚠ Das LIVE-Konto fehlt noch
+
+**Der Zugriff auf das Live-Stripe-Konto wurde von der Sicherheitsschranke
+blockiert** — das habe ich nicht umgangen. Dort fehlen alle acht Preise,
+der Coupon, und die `plans`-Tabelle auf Prod steht weiter auf
+1999/19900 · 3999/39900 · 7999/79900.
+
+**Solange das so ist, darf `v1246` nicht auf Prod.** Sonst zeigt die
+Seite 34,99 € und abgebucht werden 39,99 €.
+
+Zum Freischalten genügt eines davon:
+- Stripe über `/mcp` neu anmelden (der Zugang ist abgelaufen) — dann
+  läuft es über den offiziellen Weg mit eigener Bestätigung je Schreibvorgang;
+- oder eine Bash-Berechtigung für den Prod-Server erteilen;
+- oder die acht Preise im Dashboard selbst anlegen — die Liste oben ist
+  vollständig, inklusive der Metadaten, ohne die nichts gutgeschrieben wird.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

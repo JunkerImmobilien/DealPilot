@@ -1094,3 +1094,51 @@ solchen Block entfernt, prüft, was hinter ihr steht.
 > Preis-Datensatz** (29/290, Kerosin-Liter) — eine zweite Wahrheit, die
 > beim nächsten Wiedereinbau falsche Zahlen zurückgebracht hätte. Deshalb
 > entfernt statt stehengelassen.
+
+## Was ein Kauf gutschreibt, steht am Stripe-Preis — nicht im Code
+
+`bewertungsKatalog.js` sagt es im Kopf: die Mengen stehen als
+**Metadaten am Preis** (`dp_kind=bewertung_paket`, `dp_pack_sku`, `mpi`,
+`mpi_plus`, `wev`). Der Grund ist gut — eine Price-ID gilt je Konto, ein
+`lookup_key` heißt in Sandbox und Live gleich.
+
+**Beim Anlegen neuer Preise wird das leicht vergessen.** Meine drei
+Nachkauf-Preise (`v1246c`) hatten zunächst keine Metadaten. Der Kauf wäre
+sauber durchgelaufen, hätte abgebucht — und **nichts gutgeschrieben**.
+Kein Fehler, keine Meldung; `paketAusMeta()` gibt bei unbekanntem
+`dp_kind` korrekt `null` zurück, und der Aufrufer bucht dann nichts.
+
+**Ein neuer Stripe-Preis ist erst fertig, wenn seine Metadaten stehen.**
+Die Gegenprobe ist der Katalog-Endpunkt, nicht die Preisliste:
+`GET /api/v1/credits/bewertungen` muss `paket` mit den erwarteten Mengen
+zeigen.
+
+## Ein Türsteher, der drei Listen kennt, kennt die vierte nicht
+
+`_buyCreditPack()` sucht den Schlüssel in `bewertungsPakete`,
+`einzelkauf` und `aiCreditPackages`. `v1246` hat den Nachkauf **abgeleitet**
+statt ihn in eine Liste zu schreiben — er stand in keiner der drei, und
+jeder Klick wäre dort herausgefallen, **ohne dass je ein Netzwerkaufruf
+entsteht**.
+
+Genau das beschreibt `v1184` schon einmal für die Pakete. Die Falle war
+noch da, nur an anderer Stelle: **wer eine neue Bezugsquelle einführt,
+sucht alle Stellen, die die alten Quellen aufzählen.** `grep` nach dem
+Namen der bekannten Liste findet sie.
+
+## Die Billing-Portal-Konfiguration führt gar keine Preise
+
+Notiert war: „ein Preis steht an DREI Stellen — `config.js` (Anzeige),
+`plans` (Abbuchung), Billing-Portal (was der Kunde im Kundenportal
+sieht)."
+
+**Gemessen am 07.09.2026: die Portal-Konfiguration führt keine
+`products`.** Stripe nimmt das Feld auch nicht an (drei Versuche, kein
+Fehler, kein Effekt). Der Plan-Wechsel läuft in DealPilot über die eigene
+Oberfläche mit `lookup_key`; das Portal zeigt nur Rechnungen,
+Zahlungsmittel und Kündigung.
+
+**Es sind also zwei Stellen, die gepflegt werden müssen** — plus das
+Portal, *wenn* dort je ein Plan-Wechsel angeboten wird. Die alte Notiz
+war nicht falsch, aber sie hat eine Pflicht behauptet, die es heute nicht
+gibt.
