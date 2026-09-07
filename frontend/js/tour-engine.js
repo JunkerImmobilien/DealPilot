@@ -1171,12 +1171,106 @@
 
   window.DpTour = Tour;
 
+  /* ── v1239 · Die Tour wird ANGEBOTEN, nicht gestartet ─────────────────────
+     Testbericht Block A, woertlich: „Eingeloggt -> Sehr viele
+     unterschiedliche Buttons -> Pop Up mit ‚Reisebegleiter' der dir die
+     wichtigsten Funktionen sofort erklaert? Mit Haken ‚beim naechsten mal
+     nicht mehr anzeigen'."
+
+     Bis hierher startete die Tour von SELBST — einmal pro Browser, ohne zu
+     fragen. Das ist aufdringlicher als ein Angebot und genau das, was der
+     Bericht bemaengelt: man wird ueberfallen statt gefragt.
+
+     Marcels Vorgabe vom 07.09.2026: „die tour aber nicht jedes mal anbieten.
+     vlt mit Fenster, Modal wo man sagen kann Tour nicht mehr anbieten."
+
+     Drei Regeln, und die dritte ist der eigentliche Anstand:
+       1. Es fragt, statt zu starten.
+       2. Der Haken „Nicht mehr anzeigen" schaltet es dauerhaft ab.
+       3. Es hoert nach DREI Angeboten von selbst auf — und hoechstens
+          einmal am Tag. Wer den Haken nie findet, wird trotzdem in Ruhe
+          gelassen. Sich auf einen Haken zu verlassen, den der Nutzer setzen
+          MUSS, um Ruhe zu bekommen, waere die halbe Loesung.
+
+     Der Weg ueber Aktionen -> „Rundgang starten" bleibt unberuehrt: wer die
+     Tour will, findet sie weiter. */
+  var OFFER_OFF   = 'dp_tour_offer_off';    /* Nutzer hat abgeschaltet */
+  var OFFER_COUNT = 'dp_tour_offer_count';  /* wie oft schon gefragt */
+  var OFFER_LAST  = 'dp_tour_offer_day';    /* an welchem Tag zuletzt */
+  var OFFER_MAX   = 3;
+
+  function _ls(k)      { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function _lsSet(k,v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function _heute()    { return new Date().toISOString().slice(0, 10); }
+
+  function _angebotFaellig() {
+    if (_ls(OFFER_OFF)) return false;
+    if (Tour.isComplete()) return false;
+    if (_ls(SEEN_KEY)) return false;
+    var n = parseInt(_ls(OFFER_COUNT) || '0', 10);
+    if (!isFinite(n)) n = 0;
+    if (n >= OFFER_MAX) return false;
+    if (_ls(OFFER_LAST) === _heute()) return false;   /* hoechstens einmal am Tag */
+    return true;
+  }
+
+  function _angebotZeigen() {
+    if (document.getElementById('dp-tour-offer')) return;
+    var n = parseInt(_ls(OFFER_COUNT) || '0', 10); if (!isFinite(n)) n = 0;
+    _lsSet(OFFER_COUNT, String(n + 1));
+    _lsSet(OFFER_LAST, _heute());
+    var letzte = (n + 1) >= OFFER_MAX;
+
+    var ov = document.createElement('div');
+    ov.id = 'dp-tour-offer';
+    ov.setAttribute('role', 'dialog');
+    ov.setAttribute('aria-modal', 'true');
+    ov.setAttribute('aria-labelledby', 'dp-tour-offer-h');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(10,10,10,.55);z-index:99998;'
+      + 'display:flex;align-items:center;justify-content:center;padding:20px';
+    ov.innerHTML =
+      '<div style="background:var(--wl-fdfcfa,#FDFCFA);border-radius:16px;max-width:430px;width:100%;'
+      + 'box-shadow:0 18px 50px rgba(0,0,0,.32);overflow:hidden;font-family:Inter,system-ui,sans-serif">'
+      + '<div style="background:var(--wl-050505,#050505);padding:16px 22px">'
+      +   '<div style="font:700 9.5px/1 \'JetBrains Mono\',monospace;letter-spacing:2px;text-transform:uppercase;color:var(--wl-c9a84c,#C9A84C)">DealPilot · Rundgang</div>'
+      + '</div>'
+      + '<div style="padding:20px 22px 18px">'
+      +   '<h2 id="dp-tour-offer-h" style="font-family:\'Space Grotesk\',sans-serif;font-size:18px;margin:0 0 7px;color:var(--wl-2a2727,#2A2727)">Soll ich dir kurz zeigen, wo was liegt?</h2>'
+      +   '<p style="margin:0 0 16px;font-size:13.5px;line-height:1.55;color:#5f594f">Ein kurzer Rundgang durch die wichtigsten Funktionen. Du kannst ihn jederzeit abbrechen — und sp&auml;ter unter <b>Aktionen &rsaquo; Rundgang starten</b> wieder aufrufen.</p>'
+      +   '<label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#5f594f;margin-bottom:16px;cursor:pointer">'
+      +     '<input type="checkbox" id="dp-tour-offer-nie" style="width:15px;height:15px;cursor:pointer"> Nicht mehr anzeigen'
+      +   '</label>'
+      +   '<div style="display:flex;gap:9px;justify-content:flex-end">'
+      +     '<button type="button" id="dp-tour-offer-no" style="padding:9px 16px;border:1px solid #e6e0d3;background:#fff;border-radius:9px;font:inherit;font-size:13.5px;cursor:pointer;color:#5f594f">Sp&auml;ter</button>'
+      +     '<button type="button" id="dp-tour-offer-yes" style="padding:9px 18px;border:0;border-radius:9px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;color:#2a2205;background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f))">Rundgang starten</button>'
+      +   '</div>'
+      +   (letzte ? '<p style="margin:13px 0 0;font-size:11.5px;color:#8a8378">Das war die letzte Nachfrage — danach meldet sich der Rundgang nicht mehr von allein.</p>' : '')
+      + '</div></div>';
+    document.body.appendChild(ov);
+
+    function schliessen(starten) {
+      try { if (document.getElementById('dp-tour-offer-nie').checked) _lsSet(OFFER_OFF, new Date().toISOString()); } catch (e) {}
+      try { ov.remove(); } catch (e) {}
+      document.removeEventListener('keydown', aufEsc);
+      if (starten) { try { Tour.start(); } catch (e) {} }
+    }
+    function aufEsc(e) { if (e.key === 'Escape') schliessen(false); }
+
+    ov.querySelector('#dp-tour-offer-yes').addEventListener('click', function () { schliessen(true); });
+    ov.querySelector('#dp-tour-offer-no').addEventListener('click', function () { schliessen(false); });
+    ov.addEventListener('click', function (e) { if (e.target === ov) schliessen(false); });
+    document.addEventListener('keydown', aufEsc);
+    try { ov.querySelector('#dp-tour-offer-yes').focus(); } catch (e) {}
+  }
+
   function _maybeAutoStart() {
     try {
       var token = localStorage.getItem('ji_token');
       if (!token) return;
       if (Tour.isComplete()) return;
       try { if (localStorage.getItem(SEEN_KEY)) return; } catch (e) {}
+      /* v1239: Angebot statt Start — und nur, wenn es faellig ist. */
+      if (!_angebotFaellig()) return;
       if (!window.DpTourVariants) return;
       // V247: NICHT starten wenn Auth-Modal noch offen (Verify-Email → Passwort setzen)
       // oder wenn URL einen ?token=/?verify=/?register=-Param hat
@@ -1203,9 +1297,13 @@
           console.log('[DpTour V247] Auto-Start unterdrueckt: User nicht eingeloggt');
           return;
         }
-        /* v816h-tour-once: Flag SOFORT setzen, damit Auto-Start nur EINMAL passiert. */
-        try { localStorage.setItem(STORAGE_KEY, new Date().toISOString()); } catch(e) {}
-        Tour.start();
+        /* v1239 · Nicht mehr starten, sondern fragen.
+           Das STORAGE_KEY-Setzen von v816h faellt hier weg: es hat die Tour
+           als „abgeschlossen" markiert, obwohl sie nur angeboten wurde. Wer
+           „Spaeter" waehlt, soll sie spaeter noch bekommen koennen — die
+           Begrenzung uebernehmen jetzt OFFER_COUNT und OFFER_LAST. */
+        if (!_angebotFaellig()) return;
+        _angebotZeigen();
       }, 2500);
     } catch(e) {
       console.warn('[DpTour V247] Auto-Start fehlgeschlagen:', e.message);
