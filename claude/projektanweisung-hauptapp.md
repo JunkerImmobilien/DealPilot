@@ -8591,6 +8591,88 @@ schon hat, aus seinem Cache eine Datei mit inzwischen anderem Inhalt.
 **Commits.** `995f14a` (`v1254`) · `cd1a942` (Revert) · `27451dd`
 (`v1255`, Buster vorwärts + Demo-Vermerk).
 
+## Rollout-Journal · 07.09.2026, fünfzehnter Teil — `v1256`/`v1257` und das Aufräumen
+
+Marcels vier Entscheidungen, der Reihe nach.
+
+### Die 8 Objekte bleiben bei 0 €
+
+> *„die 8 objekte da trägst du nichts nach das bleibt bei 0"*
+
+**Nichts nachgetragen.** Der Grundbuchamt-Prozentsatz bleibt dort leer;
+`v1238` belegt neue Objekte mit 0,5 % vor, bestehende sind unberührt. Der
+Punkt ist damit **entschieden, nicht offen**.
+
+### `v1256` — Zweifamilienhaus als Objektart
+
+> *„zweifamilienhaus kannst du mit reinnehmen wenn es sinn macht"*
+
+**Erst geprüft, ob es Sinn macht.** Das Ergebnis stützt es, aber anders
+als erwartet: `objart` steuert in `calc.js` **keine Rechnung**, nur die
+Bezeichnung. Und die amtlichen Systematiken fassen beide zusammen — die
+NHK 2010 führen eine Gruppe „Ein- und Zweifamilienhäuser", die
+BMF-Arbeitshilfe nennt sie wörtlich so (`bmfService.js:110`).
+
+**ZFH ist also ein Etikett — aber ein nötiges:** wer ein Zweifamilienhaus
+rechnet, musste „Einfamilienhaus" wählen. In jedem PDF, jedem Export,
+jeder Partneranfrage stand die falsche Objektart.
+
+Eingebaut mit Abbildung überall, wo es weitergereicht wird: PriceHubble
+(`house`), Sprengnetter (`category: EFH` — **ohne diese Zeile fände ein
+ZFH gar keine Kategorie und bekäme keine Bewertung**), ImmoMetrica-Import
+(**vor** der EFH-Regel, weil „Zweifamilienhaus" kein „einfamilien"
+enthält, aber „haus"). Gegenprobe gegen sechs Inseratstexte: alle sechs
+richtig.
+
+### `v1257` — das Investmentprofil tat nichts
+
+> *„Mietausfall und BWK-Quote kannst du gerne in die Einstellungen packen"*
+
+> **Beim Messen kam heraus, dass die Einstellungen, die es schon gab,
+> wirkungslos waren.** Der Beweis: Tilgung 3,7 %, Grenzsteuersatz 33,3 %
+> und BWK-Anteil 27 % ins Profil geschrieben, neues Objekt angelegt —
+> heraus kamen `d1t=1`, `grenz=40,45`, BWK leer. **Kein einziger Wert kam
+> an.**
+
+Zwei Ursachen: `applyToNewObject()` sprach Feld-IDs an, die es nicht gibt
+(von neun existierten zwei), und selbst mit richtigen IDs hätte
+`setIfEmpty` nichts getan, weil `setDefaults()` die Felder längst hart
+gefüllt hatte.
+
+Jetzt ist `setDefaults()` die eine Stelle, an der Vorgaben entstehen, und
+sie fragt zuerst das Profil. Daran hängen Tilgung, Zinsbindung,
+Grenzsteuersatz, Notarkosten — und Marcels drei: **umlagefähige und
+nicht umlagefähige BWK-Quote sowie der kalkulatorische Mietausfall**
+(im Profil als Prozentsatz, im Formular in Euro umgerechnet).
+
+**Risikoarm gebaut:** die Rückfallwerte sind exakt die bisherigen, und
+die Profil-Vorgaben in `config.js` wurden an sie angeglichen (2,5 → 1,0;
+42 → 40,45; 2,0 → 2,20; 22 → 16). Diese Zahlen standen zwar in der
+Konfiguration, sind aber nie angekommen. **Gegenprobe: ohne Profil keine
+einzige Abweichung** — und mit Profil kommen alle fünf Werte an.
+
+### Aufgeräumt
+
+> *„aufräumen kannst du auch"*
+
+**`business` und `enterprise`** stehen jetzt auf `is_active=false,
+is_public=false`. **Nicht gelöscht** — an `business` hängt ein aktives
+Abo (`demo@dealpilot.local`, seit 28.04.2026). Ein Löschen hätte den
+Fremdschlüssel gebrochen; stillgelegt verschwinden sie aus jeder Auswahl,
+und das Abo bleibt gültig. Vorher gesichert:
+`/root/backups/vor-aufraeumen-1919.sql.gz`.
+
+**Die § 7b-Spalte in `tax_records` ist NICHT erledigt** — und sie ist
+auch kein Aufräumen. Gemessen: eine `7b`-Spalte gibt es dort gar nicht.
+Der Backlog-Punkt meint das Gegenteil, nämlich eine **neue** Spalte
+anzulegen, damit gespeicherte Steuersätze die Sonder-AfA getrennt führen
+(heute addiert `tax.js` lineare AfA und § 7b in ein Feld). Das ist ein
+**Ausbau** mit Migration, Rebuild und Änderungen an `tax.js` und am PDF —
+zurückgestellt, bis Marcel es ausdrücklich als Ausbau beauftragt.
+
+**Commits.** `bfba658` (`v1256`) · `acc2024` (`v1257`) · `e27e568`
+(FALLEN).
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
