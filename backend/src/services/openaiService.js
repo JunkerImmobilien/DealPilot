@@ -906,6 +906,7 @@ async function suggestDs2Fields(payload, opts) {
     '    "amtlich": true NUR fuer Stadt, Gemeinde, Landkreis, Statistikamt, IHK oder Haus- und Grundbesitzerverein.',
     '    Portale wie ImmobilienScout, Immowelt, immoportal, mietspiegel.com sind NIE amtlich — auch nicht, wenn sie',
     '    ihre Seite "Mietspiegel" nennen. Eine kommerzielle Mietpreisuebersicht ist kein Mietspiegel.',
+    '    Nenne so eine Quelle im "label" auch nicht so: "Mietpreisuebersicht ImmobilienScout24", nicht "Mietspiegel".',
     '    url NUR wenn du sie sicher kennst, sonst ganz weglassen — nie eine plausible URL bauen.',
     '    Eine einzige Quelle nur, wenn es wirklich nur eine gab.',
     '',
@@ -1000,7 +1001,31 @@ async function suggestDs2Fields(payload, opts) {
         if (amtlich && _PORTALE.test(label)) amtlich = false;
         if (amtlich && /kein\s+(amtlicher|offizieller)\s+mietspiegel/i.test(String(sugg.reasoning || ''))) amtlich = false;
         if (out.some(function (x) { return x.label === label; })) return;
-        const e = { label: label };
+        /* v1242d · Auch das ETIKETT wird richtiggestellt, nicht nur die
+           Auszeichnung. Der Lauf gegen Huellhorst lieferte eine
+           ImmobilienScout24-Preisstatistik unter dem Namen „Mietspiegel
+           Huellhorst 2026". Wer das liest, liest einen Mietspiegel — und
+           einen solchen gibt es dort nicht. Ein Mietspiegel ist nach
+           §§ 558c/558d BGB eine Uebersicht der ortsueblichen
+           Vergleichsmiete, erstellt von der Gemeinde oder gemeinsam von
+           den Interessenvertretern. Eine Portal-Preisstatistik ist das
+           nicht, egal wie ihre Seite heisst. Also wird sie benannt, was
+           sie ist. */
+        let anzeige = label;
+        if (!amtlich && /mietspiegel/i.test(label)) {
+          const heim = _PORTALE.exec(url) || _PORTALE.exec(label);
+          if (heim) {
+            const namen = {
+              immobilienscout: 'ImmobilienScout24', immoscout: 'ImmobilienScout24',
+              immowelt: 'Immowelt', immonet: 'Immonet', immoportal: 'immoportal',
+              wohnungsboerse: 'Wohnungsboerse', homeday: 'Homeday', meinestadt: 'meinestadt.de'
+            };
+            const portal = namen[String(heim[1] || heim[0]).toLowerCase()] || heim[0];
+            anzeige = label.replace(/mietspiegel/ig, 'Mietpreisuebersicht').slice(0, 120);
+            if (anzeige.indexOf(portal) < 0) anzeige = (anzeige + ' (' + portal + ')').slice(0, 120);
+          }
+        }
+        const e = { label: anzeige };
         if (url) e.url = url;
         if (amtlich) e.amtlich = true;
         out.push(e);
@@ -1008,7 +1033,12 @@ async function suggestDs2Fields(payload, opts) {
       if (!out.length && sugg.source) out.push({ label: String(sugg.source).slice(0, 120) });
       return out.slice(0, 6);
     })();
-    const _quelleKurz = (sugg.source || (_quellen[0] && _quellen[0].label) || 'KI-Marktbewertung').toString().slice(0, 80);
+    /* v1242d · Der Kurzname kommt aus der BEREINIGTEN Liste, nicht mehr roh
+       aus sugg.source — sonst traegt er weiter „Mietspiegel Huellhorst 2026",
+       waehrend die Liste daneben schon „Mietpreisuebersicht (ImmobilienScout24)"
+       sagt. Zwei Namen fuer dieselbe Quelle sind schlimmer als der falsche
+       allein. */
+    const _quelleKurz = ((_quellen[0] && _quellen[0].label) || sugg.source || 'KI-Marktbewertung').toString().slice(0, 80);
     if (spec && Array.isArray(spec.values)) {
       if (spec.values.indexOf(sugg.value) >= 0) {
         cleaned[fid] = {
