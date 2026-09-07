@@ -147,8 +147,21 @@ async function getBySku(sku) {
   return frisch[sku] || null;
 }
 
+/* v1246d · Die Weiche in credits.js:136 fragt hier, ob ein SKU zum
+   Bewertungs-Zweig gehoert. Fiel er durch, landete er beim alten
+   Kerosin-Weg und kam als `invalid_pack` mit HTTP 400 zurueck.
+
+   `nachkauf_starter` und seine beiden Geschwister fielen genau so durch:
+   das Muster kannte nur `paket_*`. Gemessen nach dem Anlegen der Preise —
+   Stripe hatte sie, der Katalog fuehrte sie, und der Kauf waere trotzdem
+   an dieser Zeile gescheitert.
+
+   Das ist dieselbe Falle wie v1184, nur eine Ebene tiefer: dort war es
+   der Tuersteher im Frontend, hier der im Backend. Wer eine neue
+   SKU-Familie einfuehrt, sucht ALLE Stellen, die SKUs aufzaehlen. */
 function istBewertungsSku(sku) {
-  return typeof sku === 'string' && /^(paket_[a-z]+|mpi|mpi_plus|wev|avm_a|avm_b)$/.test(sku);
+  return typeof sku === 'string' &&
+    /^(paket_[a-z]+|nachkauf_[a-z]+|mpi|mpi_plus|wev|avm_a|avm_b)$/.test(sku);
 }
 
 module.exports = {
