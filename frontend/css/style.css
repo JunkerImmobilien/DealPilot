@@ -37213,3 +37213,15 @@ aside.sidebar .sb-card .sbc-btn::after {
    Reiter gold, auch bei den hakenlosen. Der Unterschied gehört an den
    Haken, nicht an die Beschriftung. Die Klasse `tab-wf-done-ungeprueft`
    bleibt am Reiter stehen: sie macht den Zustand im DOM messbar. */
+
+/* v1248 · Testbericht: „Woher weiß der Anwender, was Standardstufe NHK 2010
+   z.B. ist? Oder den Sachwertfaktor." und „Was genau sind die Stufen? Der
+   Anwender braucht eine einfache Erklärung."
+   Gemessen: die Karte „Wertermittlung (Marktbericht)" hat 37 Felder und
+   hatte NICHT EINEN Tooltip. Die fachlich schwersten tragen jetzt eine
+   Erklärung; der Zeiger zeigt, wo eine liegt. */
+.f label[title] {
+  cursor: help;
+  text-decoration: underline dotted color-mix(in srgb, var(--gold) 40%, transparent);
+  text-underline-offset: 3px;
+}
