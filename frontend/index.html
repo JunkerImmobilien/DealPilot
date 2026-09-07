@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1191"><!-- v1148-spalt-1025px -->
+<link rel="stylesheet" href="css/style.css?v=v1243"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1192">
     <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
@@ -1760,6 +1760,48 @@ label.dp-required.qc-required::after {
     unter diesen Bereich.
   </div>
 
+  <!-- v1243 · Testbericht Block D: „Hier hinweis geben, was dann passiert.
+       Er uebernimmt dann die Werte in die Steuerprogressionsbewertung um dann
+       am Ende den Cashflow ueber ALLE Investitionen zu bewerten oder?"
+       Gemessen statt bestaetigt: die erste Haelfte stimmt, die zweite nicht.
+       calc.js rechnet die Steuer dieses Objekts ueber _mtx(base) = base * grenz;
+       eine Progression ueber mehrere Objekte gibt es nicht. Der WK-Aggregator
+       holt die Werbungskosten der anderen Objekte, aber calc.js:2174 sagt
+       selbst „Eigentliche Steuerberechnung weiterhin auf K.zve_immo basiert". -->
+  <div class="card" id="tax-flow-hint" style="margin-top:14px">
+    <div class="ct"><span class="ct-ico"><svg width="22" height="22"><use href="#i-info"/></svg></span>Was mit diesen Werten passiert</div>
+    <p class="hint" style="margin-bottom:0">
+      Dein Grenzsteuersatz wirkt auf das steuerliche Ergebnis <b>dieses</b> Objekts —
+      Miete abzüglich Kosten und AfA. Daraus entsteht die Steuer und daraus der
+      <b>Cashflow nach Steuer</b>. Im Portfolio-Cockpit werden die Cashflows nach
+      Steuer deiner Bestandsobjekte addiert.
+    </p>
+    <details class="dp-erkl" style="margin-top:10px">
+      <summary style="cursor:pointer;font-size:12.5px;font-weight:600">Und was DealPilot dabei <u>nicht</u> tut</summary>
+      <div style="font-size:12.5px;line-height:1.6;margin-top:8px">
+        <p style="margin:0 0 8px">
+          <b>Die Objekte verschieben sich gegenseitig nicht die Progression.</b>
+          Jedes rechnet mit demselben Grenzsteuersatz aus deinem zvE. Ein Verlust
+          aus Objekt A senkt in dieser Rechnung <b>nicht</b> den Steuersatz von
+          Objekt B — in deiner echten Steuererklärung tut er das sehr wohl, weil
+          dort alle Einkünfte aus Vermietung und Verpachtung zusammenfließen.
+        </p>
+        <p style="margin:0 0 8px">
+          <b>Was das heißt:</b> je Objekt ist die Zahl eine saubere Einzelbetrachtung.
+          Die Summe im Cockpit ist die Summe dieser Einzelbetrachtungen — nicht die
+          Steuer, die am Ende auf deinem Bescheid steht. Bei mehreren Objekten mit
+          Anfangsverlusten liegt die tatsächliche Entlastung eher höher.
+        </p>
+        <p style="margin:0;color:var(--muted)">
+          Ein Sonderfall ist bereits abgebildet: gehört das Objekt einer
+          Gesellschaft, rechnet DealPilot ab dem Übergabestichtag mit dem
+          Körperschaftsteuersatz statt mit deinem Grenzsteuersatz — im Stichtagsjahr
+          monatsgenau geteilt.
+        </p>
+      </div>
+    </details>
+  </div>
+
   <div class="card" id="tax-personal-card" style="margin-top:14px">
     <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-user"/></svg></span>Persönliche Steuer</div>
     <p class="hint">Diese Werte fließen in alle Steuer-Berechnungen ein. Der Grenzsteuersatz wird automatisch aus dem zvE nach §32a EStG (Tarif 2026) berechnet — manuelles Übersteuern möglich.</p>
@@ -3183,7 +3225,7 @@ label.dp-required.qc-required::after {
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
-<script src="js/ui.js?v=v1194"></script>
+<script src="js/ui.js?v=v1243"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
 <script src="js/storage.js?v=v1237"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
@@ -3214,7 +3256,7 @@ label.dp-required.qc-required::after {
 <script src="js/bodenrichtwert.js?v=v1188"></script>
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
 <script src="js/ai-credits.js?v=v1185d"></script>
-<script src="js/workflow.js?v=124"></script>
+<script src="js/workflow.js?v=v1243"></script>
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=W35"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->

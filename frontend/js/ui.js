@@ -166,6 +166,15 @@ function switchTab(i) {
   
   document.querySelectorAll('.tab').forEach(function(t, j) { t.classList.toggle('active', j === i); });
 
+  /* v1243: Der geöffnete Bereich gilt ab jetzt als angesehen. Vorher hieß das
+     Häkchen nur „alle Pflichtfelder gefüllt" — und beim Steuer-Reiter genügte
+     dafür der vorbelegte Grenzsteuersatz von 42 %. */
+  try {
+    if (tabs[i] && window.DealPilotWorkflow && DealPilotWorkflow.merkeBesuch) {
+      DealPilotWorkflow.merkeBesuch(tabs[i].getAttribute('data-wf-key'));
+    }
+  } catch (e) {}
+
   // V62: Workflow-Bar Titel + Beschreibung pro Tab aktualisieren
   if (typeof updateTabWorkflowBar === 'function') {
     updateTabWorkflowBar(i);
