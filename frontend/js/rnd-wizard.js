@@ -248,6 +248,7 @@
       objekt_typ: dpObj.objart === 'ETW' ? 'Eigentumswohnung'
                 : dpObj.objart === 'MFH' ? 'Mehrfamilienhaus'
                 : dpObj.objart === 'EFH' ? 'Einfamilienhaus'
+                : dpObj.objart === 'ZFH' ? 'Zweifamilienhaus'
                 : dpObj.objart || 'Eigentumswohnung',
       str: dpObj.str || '',
       hnr: dpObj.hnr || '',

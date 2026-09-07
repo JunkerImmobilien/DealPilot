@@ -907,24 +907,33 @@ window.DealPilotConfig = (function() {
 
     investmentProfileDefaults: {
       // Finanzierung
-      tilgung_default:        2.5,    // % p.a.
+      /* v1257: an setDefaults() in main.js angeglichen — das war der
+         gelebte Stand. Vorher standen hier andere Zahlen (2,5 statt 1,0;
+         42 statt 40,45; 2,0 statt 2,20), sie sind nur nie angekommen.
+         Wer jetzt nichts einstellt, bekommt exakt wie bisher. */
+      tilgung_default:        1.0,    // % p.a.  (war 2,5 — nie wirksam)
       zinsbindung_default:    10,     // Jahre
       zins_override:          null,   // eigener Zinssatz (%); null = indikativer Pfandbrief-Satz
       zins_margin:            'standard', // Zins-Stufe: premium (LTV<=60%) / standard (60-80%) / schwach (>90%)
       hausgeld_pct:           null,   // Hausgeld-Annahme als % vom Kaufpreis p.a.; null = aus
       ek_quote_default:       20,     // % vom Kaufpreis
-      // Bewirtschaftung
-      bwk_anteil_default:     22,     // % der NKM (nicht-umlagefähig)
+      /* Bewirtschaftung — v1257: Marcels Wunsch, „Mietausfall und BWK-Quote
+         in die Einstellungen". Die nicht-umlagefähige Quote stand hier
+         schon, sie kam nur nie an; der Mietausfall fehlte ganz. Die Werte
+         entsprechen den Vorbelegungen im Formular. */
+      bwk_ul_pct_default:     17,     // % der NKM (umlagefähig)
+      bwk_anteil_default:     16,     // % der NKM (nicht-umlagefähig; war 22, nie wirksam)
+      mietausfall_pct:         2,     // % der NKM — kalkulatorischer Mietausfall
       // Kennzahl-Schwellen (persönliche Mindest-Anforderungen)
       min_dscr:               1.20,   // <—— "ab hier kauf ich"
       min_cashflow_vor_st:    0,      // €/Monat
       max_ltv:                90,     // %
       // Steuern
-      grenzsteuersatz:        42,     // %
+      grenzsteuersatz:        40.45,  /* % — war 42, nie wirksam */
       // Bundesland (für Grunderwerbsteuer-Default)
       bundesland:             'NW',   // ISO-Kürzel
       // Nebenkosten-Pauschalen
-      notar_grundbuch:        2.0,    // %
+      notar_grundbuch:        2.20,   /* % — war 2,0, nie wirksam */
       maklerkosten:           3.57,   // %
       // V63.90: KI-Analyse-Standardparameter (vorher nur als Selects im KI-Tab,
       // jetzt persönlicher Default — nutzt der KI-Prompt-Builder via hidden inputs)

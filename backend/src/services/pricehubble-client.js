@@ -59,7 +59,11 @@ async function _login() {
 function _phPropertyType(objektart) {
   var o = String(objektart || '').toUpperCase();
   if (o === 'ETW' || o === 'WOHNUNG' || o === 'APARTMENT') return 'apartment';
-  if (o === 'EFH' || o === 'DHH' || o === 'RH' || o === 'HAUS' || o === 'MFH') return 'house';
+  /* v1256: ZFH gehoert zu den Haeusern. PriceHubble kennt keine eigene
+     Kategorie dafuer — die amtlichen Systematiken auch nicht: NHK 2010 und
+     die BMF-Arbeitshilfe fuehren 'Ein- und Zweifamilienhaeuser' als EINE
+     Gruppe (bmfService.js:110). */
+  if (o === 'EFH' || o === 'ZFH' || o === 'DHH' || o === 'RH' || o === 'HAUS' || o === 'MFH') return 'house';
   return 'apartment';
 }
 
