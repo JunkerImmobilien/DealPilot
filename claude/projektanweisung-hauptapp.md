@@ -8933,6 +8933,311 @@ Server-Log steht sie immer.
 (`v1259b`) · `56b4571` (`v1259c`) · `19b6566` (`v1259d`). Staging-Backend
 zweimal neu gebaut.
 
+## Rollout-Journal · 08.09.2026, dritter Teil — `v1259f` und der Prod-Rollout
+
+**Marcels Auftrag:** *„ja rollout und mach mir die preisaufschlüsslung
+nochmal und hol dir die preise aus dem netz von gpt 5.4 mini"*
+
+### Die Preise stehen — jeder aus zwei unabhängigen Quellen
+
+USD je 1 Mio Token, recherchiert am 08.09.2026:
+
+| Modell | Eingabe | zwischengespeichert | Audio-Eingabe | Ausgabe |
+|---|---|---|---|---|
+| `gpt-5.4-mini` | 0,75 | **0,075** | — | 4,50 |
+| `gpt-4o-transcribe` | 2,50 | — | **6,00** | 10,00 |
+| `gpt-4o-mini-transcribe` | 1,25 | — | **3,00** | 5,00 |
+| `gpt-4o-mini` | 0,15 | — | — | 0,60 |
+
+Die beiden Transkriptionspreise, die in `v1259d` aus dem Gedächtnis
+eingetragen worden waren, sind damit **bestätigt**. `gpt-5.5` bleibt
+bewusst offen: es läuft hier gar nicht, die ENV setzt `gpt-5.4-mini`.
+
+### Der Fund, der die Rechnung ändert: der Prompt-Zwischenspeicher
+
+`gpt-5.4-mini` kostet für **wiederverwendete Prompt-Präfixe nur ein
+Zehntel** — 0,075 statt 0,75. Das ist hier kein Randfall, sondern der
+Hauptposten: von rund 6.200 Eingabe-Token der Auswertung sind über 6.000
+der **immer gleiche Feldkatalog**, und der steht im Prompt **vor** dem
+Transkript. Genau diese Reihenfolge macht ihn zwischenspeicherfähig.
+
+Die Erfassung liest jetzt `usage.input_tokens_details.cached_tokens`.
+Ohne diese Zeilen hätte die Anzeige den Katalog jedes Mal zum vollen
+Preis gerechnet und **zu viel gemeldet**.
+
+**Zwei Läufe hintereinander, dieselbe Datei, 45 s Diktat, 174
+Katalogfelder:**
+
+| | Lauf 1 (kalt) | Lauf 2 (warm) |
+|---|---|---|
+| Transkription `gpt-4o-transcribe` | 529 Audio-Token → $0,004824 | unverändert $0,004824 |
+| Auswertung `gpt-5.4-mini` | 6.044 ein, **0** aus dem Zwischenspeicher → $0,005204 | 6.044 ein, **5.888 aus dem Zwischenspeicher** → $0,001238 |
+| **gesamt** | **0,92 Cent** | **0,56 Cent** |
+
+Die Auswertung fiel damit **auf ein Viertel**. Beide Läufe erkannten
+19 von 19 genannten Feldern.
+
+> **Damit hat sich das Kostenbild umgedreht.** Im warmen Zustand ist die
+> **Transkription mit 80 % der größte Posten** — nicht die Auswertung.
+> Und `gpt-4o-mini-transcribe` kostet mit 3,00 statt 6,00 je Mio
+> Audio-Token **die Hälfte** und ist 37 % schneller. Genau das wollte
+> `v1169`, und genau das verhindert die ENV auf dem Server. Der Wechsel
+> würde die Gesamtkosten einer Aufnahme um rund 40 % senken.
+
+**Hochrechnung auf die neuen 4 Minuten**, warm, mit Live-Hilfe:
+
+| | mit `gpt-4o-transcribe` | mit `gpt-4o-mini-transcribe` |
+|---|---|---|
+| Transkription | $0,0169 | $0,0085 |
+| Auswertung | $0,0012 | $0,0012 |
+| Live-Hilfe (bis 6 Läufe) | $0,0003 | $0,0003 |
+| **gesamt** | **≈ 1,7 Cent** | **≈ 0,9 Cent** |
+
+**Der Satz, der bleibt:** die Kostenlast ist der **Katalog und das
+Transkriptionsmodell**, nicht die Sprechdauer. Die Verdopplung der
+Redezeit von 2 auf 4 Minuten kostet knapp einen Cent — und nur, weil das
+große Transkriptionsmodell läuft.
+
+### Der Prod-Rollout
+
+**Freigabe:** Marcels „ja rollout". Merge-Commit `f311d8f`, Prod von
+`84ab605` auf `f311d8f`. **Keine Migration, keine Datenbankänderung** —
+das Backend meldete „No new migrations to apply".
+
+**Vorher gesichert**, beide Datenbanken:
+`/root/backups/haupt-20260908-1158.sql.gz` (11 MB) und
+`mb-20260908-1200.sql.gz` (685 KB).
+
+> **Die erste mb-Sicherung war leer — 20 Byte.** `pg_dump -U postgres
+> postgres` lief ins Nichts; die Marktbericht-Datenbank heißt
+> `marktbericht` mit Nutzer `mb`. Eine Sicherung, die man nicht ansieht,
+> ist keine. Die leere Datei wurde entfernt und der Dump richtig
+> wiederholt. **`CLAUDE.md` sagt zu Recht: eigener `pg_dump` vor jedem
+> Eingriff** — es fehlt dort nur der Zugang. Er lautet
+> `docker exec dealpilot-mb-db pg_dump -U mb marktbericht`.
+
+**Auf Prod nachgemessen** (angemeldet als `majunker@gmx.net`, dem
+Zweitkonto — Marcels sieben Objekte liegen unter
+`info@junker-immobilien.io` und sind unberührt):
+
+| | |
+|---|---|
+| geladen | `voice-import.js?v=v1259f`, `object-actions.js?v=v1259` |
+| Kerosin-Modal | erscheint nicht |
+| Pillen | 31 gebaut, 8 sichtbar, alle sieben Fragen dabei |
+| Kopfzeile | „NOCH OFFEN · 31 Angaben" |
+| Untertitel | „… Bis zu 4 Minuten." |
+| Weiter-Knopf | „Weiter — auswerten" |
+| Gold-Audit auf Prod | **RC=0**, 181 Dateien, genau auf der Basislinie |
+| Backend | `healthy`, keine Fehler im Log |
+
+**Commits.** `1036025` (`v1259f`) · `f311d8f` (Prod-Merge).
+Staging, GitHub und Produktion stehen alle auf `f311d8f`.
+
+## Rollout-Journal · 08.09.2026, vierter Teil — `v1260`–`v1264`, was aus dem Excel-Abgleich wurde
+
+Marcels Freigabe auf die Empfehlung: „zuerst reparieren, was wir schon
+versprechen". Vier Punkte, drei davon Lücken zwischen Versprechen und
+Wirklichkeit. Dazu die 15 %-Frage, der Sprechlauf-Befund und der
+Bodenrichtwert.
+
+---
+
+### `v1260`–`v1260c` · IRR und Break-Even
+
+**IRR wurde beworben und nicht gerechnet.** Die Landingpage nennt ihn
+(`landing/index.html:847`), das Glossar erklärt ihn (`help.js:364`),
+`ui.js:572` schrieb ihn in den KI-Prompt. Im Browser gemessen: `State.kpis`
+führte 59 Schlüssel, `irr` war keiner davon. `fP(undefined)` ergibt `—`,
+die KI bekam also „IRR: —".
+
+Neu: `frontend/js/irr-engine.js`, **Bisektion statt Newton**. Newton ist
+schneller, springt aber bei Immobilien-Reihen weg — mehrere Jahre negativer
+Cashflow, am Ende ein großer Verkaufserlös, die Ableitung dort flach.
+Bisektion findet die Wurzel immer, sofern es im Suchbereich einen
+Vorzeichenwechsel gibt, und gibt sonst `null` zurück. **`null` heißt „nicht
+bestimmbar" und ist etwas anderes als null Prozent.**
+
+Gegen Referenzwerte geprüft: `[-100, 110]` → 10,0000 %,
+`[-1000, 5×300]` → 15,2382 % (Excel-Referenz). Leere Reihe, nur
+Auszahlungen, `NaN` → alle `null` statt Absturz.
+
+> **`v1260c` — die Gegenprobe fand einen Fehler in meinem eigenen Code.**
+> Der erste Lauf zeigte **40,6 %**, meine Handrechnung 33,7 %. Statt die
+> Lücke wegzuerklären, wurde die Zahlungsreihe offengelegt (`v1260b`,
+> `State._irrReihe`) — und dann war es eindeutig: Reihe Jahr 1 **5.280 €**,
+> Cashflow-Karte **3.480 €**, Differenz exakt **1.800 € = 1 % Tilgung auf
+> 180.000 €**.
+>
+> **Die Ursache war ein Denkfehler:** Ich habe die vorhandene
+> Projektionsschleife benutzt, ohne ihre Voraussetzung zu prüfen. Sie
+> rechnet den **Vermögenszuwachs** — und dafür ist Tilgung kein Aufwand,
+> sondern Aufbau. Für eine Zahlungsreihe gilt das nicht: Wer die Tilgung
+> nicht als Abfluss zählt, aber am Ende die dadurch **gesunkene**
+> Restschuld abzieht, schreibt sie sich zweimal gut.
+>
+> Nach der Korrektur: IRR **34,96 %**, Reihe Jahr 1 = 3.480 € = Karte,
+> **Barwert beim gefundenen Zinssatz 0,000002**. Break-Even inklusive
+> Eigenkapital verschob sich von Jahr 4 auf **Jahr 6** — auch das war zu
+> optimistisch.
+
+**Break-Even**, drei Zeitpunkte wie bei immocation: Cashflow erstmals
+positiv, kumuliert positiv, kumuliert inklusive Eigenkapital. Die Daten
+lagen vollständig in der Projektion, es fehlte die Auswertung.
+
+### `v1260` · § 7b-Baukostenobergrenze
+
+Zwei Zahlen, die leicht verwechselt werden: **4.000 €/m²** ist die
+Bemessungsgrundlage (wie viel gefördert wird, seit V227.1 im Code),
+**5.200 €/m²** die Baukostenobergrenze (ob überhaupt).
+
+> **Korrektur an meinem eigenen Befund:** In der Analyse stand, die Grenze
+> werde „nicht geprüft". Genauer ist: sie wird vom Nutzer per Checkbox
+> **bestätigt**, nur nicht gegen seine eigenen Zahlen gehalten. Die
+> Analyse war an der Stelle zu hart formuliert.
+
+`Afa.sonder7bBaukosten()` rechnet jetzt die Gebäude-AHK je m² und warnt bei
+Widerspruch. **Bewusst mit `afa_geb_basis`, nicht mit dem Kaufpreis** —
+§ 7b stellt auf das Gebäude ab; wer `kp/wfl` rechnete, löste bei jedem
+Objekt mit teurem Grundstück falschen Alarm aus. **Abgeschaltet wird
+nichts:** die Bestätigung ist eine Erklärung des Nutzers, und er kann
+Gründe haben, die DealPilot nicht kennt.
+
+Sechs Fälle geprüft: 4.000 ok, genau 5.200 ok, 6.000 gerissen, fehlende
+Wohnfläche/AHK „nicht prüfbar" (bewusst keine Warnung), ohne Bestätigung
+keine Warnung. Der 4.000er-Deckel unverändert.
+
+### `v1260` · Import: Darlehen II–IV
+
+immocation führt im Cockpit **vier** Darlehensblöcke; gelesen wurde nur der
+erste. Drei fielen still unter den Tisch — die schlimmere Sorte
+Importfehler, weil der Nutzer eine gefüllte Maske sieht und beim Suchen am
+falschen Ende anfängt.
+
+Mit der echten Mappe geprüft: Darlehen I 44.000 € (2 %/2 %), **Darlehen II
+5.000 € (2 %/8 %) kommt an**, Darlehen III wird gemeldet:
+*„NICHT übernommen — DealPilot rechnet mit zwei Darlehen: III: 5.000 € zu
+3,00 %."* **Zusammengefasst wird nichts** — eine gemittelte Zahl stünde in
+keinem Vertrag.
+
+---
+
+### `v1261` · Die 15 %-Grenze misst ohne Umsatzsteuer
+
+Marcels Frage aus dem Abgleich. **§ 6 Abs. 1 Nr. 1a EStG, Wortlaut:**
+Aufwendungen sind anschaffungsnahe Herstellungskosten, wenn sie **„ohne die
+Umsatzsteuer"** 15 % der Anschaffungskosten des Gebäudes übersteigen.
+
+DealPilot hielt den eingetragenen Betrag ungeprüft gegen die Grenze. Ein
+privater Vermieter trägt ein, was auf der Handwerkerrechnung steht —
+brutto. **Damit warnte DealPilot um 19 % zu früh.** immocation löst dasselbe
+andersherum: es rechnet die Grenze × 1,19 hoch.
+
+Jetzt: Schalter **brutto/netto** unter dem Betrag (Standard brutto), die
+Prüfung rechnet netto, die Aufschlüsselung zeigt den Weg, und die Grenze
+wird zusätzlich brutto genannt.
+
+**Nicht umgestellt:** `san` bleibt als Kostenposition brutto — ein privater
+Vermieter zieht keine Vorsteuer, seine Werbungskosten *sind* der
+Bruttobetrag. Nur die Prüfung rechnet netto.
+
+Gemessen an 2026-001 (Grenze 27.430 € netto / 32.642 € brutto):
+30.000 € **brutto** → 25.210 € maßgeblich → **grün, 91,9 %**.
+Dieselben 30.000 € **netto** → **rot, 109,4 %**.
+
+---
+
+### `v1262` · Die diktierte Möblierung wurde von der Küche überschrieben
+
+Marcels Befund aus dem Sprechlauf. Nachgemessen über die **ganze Kette**
+(Audio → Auswertung → Import-Tabelle → Übernehmen-Knopf), 175 Katalogfelder:
+**16 von 17 Feldern kamen richtig an, auch `san` und `inv_kueche`.**
+
+Nicht angekommen war die Möblierung: diktiert 3.000 €, im Feld standen
+8.000 € — der Küchenbetrag.
+
+**Ursache:** Auf „Küche 8.000, übrige Möblierung 3.000" setzte die
+Auswertung `inv_kueche=8000` UND `moebl=3000`. Beides für sich plausibel.
+Aber `inventar-sync.js` macht `moebl` zur **Summe** der `inv_*`-Felder und
+sperrt es, sobald ein Detail gefüllt ist (V291). Die 3.000 wurden von der
+Summe überschrieben — und weil danach der Küchenbetrag dort stand, sah es
+aus, als sei die Küche falsch gelandet.
+
+Behoben an **zwei** Stellen: Katalog-Hinweis zu `moebl` (Gesamtsumme, bei
+Einzelposten weglassen) und Regel 14 im Prompt. Ein Hinweis allein wird
+überlesen, wenn zwei Felder fast gleich heißen — die Hausgeld-Regel 13 steht
+aus demselben Grund im Prompt. Gegenprobe mit demselben Diktat:
+`inv_kueche` 8.000, `inv_moebel` 3.000, Summe 11.000, `moebl` gar nicht
+mehr gesetzt.
+
+> **Kein Fehler war:** dass „25.000" als 22.000 ankam. Das Transkript sagt
+> selbst 22.000 — die Kunststimme des Testdiktats wurde falsch verstanden,
+> die Extraktion hat korrekt übernommen, was dastand. Ebenso die PLZ, die
+> **richtigerweise als unsicher markiert** wurde.
+
+---
+
+### `v1263`/`v1264` · Der Bodenrichtwert holt sich selbst
+
+**Den Knopf gab es schon** (`#brw-ai-btn`, direkt neben dem Feld, daneben
+einen BORIS-Knopf). Gefehlt hat das Von-selbst.
+
+Drei Regeln: nur wenn das Feld **leer** ist (ein BORIS-Wert wird nie
+überschrieben) · nur **einmal je Adresse** (sonst löst jeder Tastenanschlag
+einen KI-Aufruf aus) · bei **geänderter Adresse und gefülltem Feld** wird
+nicht nachgeladen, sondern der Knopf markiert. Auslösung 1,2 s nach der
+letzten Eingabe.
+
+Gemessen: 8 Tastenanschläge → **genau 1 Abruf** → `brw` automatisch
+gefüllt, Ergebnisbox mit Begründung und Konfidenz. Adresse geändert → Wert
+**bleibt**, Knopf markiert („Die Adresse hat sich geändert — neu abrufen").
+
+> **`v1264`: Beim Bauen der Automatik fiel auf, dass der Abruf selbst nicht
+> funktionierte.** Gemessen mit „Sachsenstraße, 32052 Herford": **HTTP 502**,
+> „KI-Antwort konnte nicht als JSON gelesen werden". Im verworfenen Text
+> stand: *„Für Herford, eine Mittelstadt, ist ein Wert von etwa 200 EUR/m²
+> realistisch."* Die Antwort war brauchbar, nur nicht im Format — das Modell
+> recherchiert im Web und neigt dann zum Erzählen.
+>
+> Behoben in zwei Stufen: eine **Nachlese** führt den Fließtext per
+> `gpt-4o-mini` (ohne Websuche) in JSON über — zuverlässiger als eine Regex,
+> denn „zwischen 20 und 600 EUR/m², für Herford etwa 200" enthält drei
+> Zahlen. Die Konfidenz wird dabei auf „niedrig" gedeckelt. Und **kein 502
+> mehr**, wenn auch das scheitert: `value = 0`, Feld bleibt leer, der
+> Recherchetext wird als Begründung gezeigt.
+>
+> Dazu ein additiver Schalter `noWebSearch` in `callOpenAI`. Er stand im
+> Nachlese-Aufruf schon als Option, aber die `tools`-Zeile war fest
+> verdrahtet — **eine Option, die nichts tut, ist eine Lüge im Code.**
+>
+> Danach: Hüllhorst **65 €/m², Konfidenz hoch**, mit Stichtag 01.01.2026.
+> Herford `value = 0` mit ehrlicher Begründung statt Fehlermeldung.
+
+Nebenbefund: Das Objektlade-Event heißt **`dp:object-ready` und feuert auf
+`window`** (`storage.js:115`). `inventar-sync.js:117` hört auf ein
+`dp:object-loaded` auf `document` — **das gibt es nirgends.** Ein falsch
+geratener Event-Name kostet nichts Sichtbares: der Listener schweigt für
+immer.
+
+---
+
+### Nicht reproduzierbar: zwei Objekte beim Anlegen
+
+Marcels Meldung. Drei Wege getestet — der Knopf „+ Neues Objekt
+hinzufügen", das Aktionen-Menü `sbActionsAction('new')`, und zwei Klicks in
+schneller Folge. **Jedes Mal genau ein Objekt.** Der Doppel-Schutz aus v728
+(`_dpEmptyCardSaving`) greift; `auto-save.js` ist auf Staging vorhanden,
+aber **nicht eingebunden**, auf Prod gar nicht vorhanden.
+
+**Offen — es fehlen Marcels Angaben:** Umgebung, Weg, ob sofort oder erst
+nach dem Speichern, Handy oder Rechner.
+
+**Commits.** `a59cc31` (`v1260`) · `b852e5b` (`v1260b`) · `f15c261`
+(`v1260c`) · `0179075` (`v1261`) · `06b0d27` (`v1262`) · `0cf5fea`
+(`v1263`) · `5a17d52` (`v1264`). Staging-Backend dreimal neu gebaut.
+Gold-Audit nach jedem Schritt RC=0 — er hat dabei einmal **mein eigenes
+frisches Hartgold** im Knopf-Stil gefangen (`v1263`), tokenisiert.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

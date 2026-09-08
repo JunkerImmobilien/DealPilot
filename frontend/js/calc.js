@@ -859,21 +859,60 @@ function _calcImmediate(){
   var sanLimit = gebAHK * 0.15;
 
   var sanIst = v('san');
+
+  /* ═══ v1261 · Die 15 %-Grenze misst OHNE Umsatzsteuer ═══════════════════
+     § 6 Abs. 1 Nr. 1a EStG, Wortlaut: Aufwendungen für Instandsetzungs- und
+     Modernisierungsmaßnahmen sind anschaffungsnahe Herstellungskosten, wenn
+     sie „OHNE DIE UMSATZSTEUER 15 Prozent der Anschaffungskosten des
+     Gebäudes übersteigen".
+
+     BIS v1260 verglich DealPilot den eingetragenen Betrag ungeprüft mit der
+     Grenze. Ein privater Vermieter trägt dort ein, was auf der
+     Handwerkerrechnung steht — brutto. Damit warnte DealPilot bei 15 %
+     netto bereits ab 12,6 % tatsächlichem Aufwand, also VIEL zu früh: bei
+     einer Grenze von 45.000 € schlug er schon bei 45.001 € brutto an,
+     obwohl netto erst 53.550 € brutto die Grenze reißen.
+
+     Aufgefallen beim Excel-Abgleich: immocation rechnet die Grenze × 1,19
+     hoch, um Bruttobeträge vergleichbar zu machen — derselbe Gedanke, nur
+     andersherum gelöst.
+
+     WAS NICHT umgestellt wird: `san` bleibt als KOSTENPOSITION brutto. Ein
+     privater Vermieter zieht keine Vorsteuer; seine Werbungskosten sind der
+     Bruttobetrag. Nur die 15 %-PRÜFUNG rechnet netto. Das ist genau die
+     Feinheit, die der Gesetzestext meint, und der Grund, warum hier zwei
+     verschiedene Zahlen nebeneinander stehen dürfen. */
+  var sanIstBrutto = sanIst;
+  var _sanUst = g('san_ust') || 'brutto';
+  var sanIstNetto = (_sanUst === 'netto') ? sanIst : (sanIst / 1.19);
+
   st('san_limit_max', fE(sanLimit, 0));
-  st('san_limit_actual', fE(sanIst, 0));
-  var sanPct = sanLimit > 0 ? (sanIst / sanLimit * 100) : 0;
+  st('san_limit_actual', fE(sanIstNetto, 0));
+  var sanPct = sanLimit > 0 ? (sanIstNetto / sanLimit * 100) : 0;
   var sanStatusEl = el('san_limit_status');
   if (sanStatusEl) {
     if (sanIst === 0) {
       sanStatusEl.innerHTML = '<span class="badge badge-muted">Keine Sanierung</span>';
-    } else if (sanIst <= sanLimit) {
+    } else if (sanIstNetto <= sanLimit) {
       sanStatusEl.innerHTML = '<span class="badge badge-green">✓ Unter Grenze ('+sanPct.toFixed(1)+'%) – voll abzugsfähig</span>';
     } else {
       sanStatusEl.innerHTML = '<span class="badge badge-red">⚠ Über 15% ('+sanPct.toFixed(1)+'%) – anschaffungsnahe HK (50 Jahre AfA)</span>';
     }
   }
+  /* Die USt-Zeilen nur zeigen, wenn brutto gerechnet wird — sonst stünde
+     dort dreimal dieselbe Zahl. */
+  var _ustRow = el('san_ust_row');
+  var _brutto = (_sanUst !== 'netto') && sanIst > 0;
+  if (_ustRow) _ustRow.style.display = _brutto ? '' : 'none';
+  st('san_brutto_val', fE(sanIstBrutto, 0));
+  if (_brutto) st('san_ust_val', fE(sanIstBrutto - sanIstNetto, 0));
+  /* Die Grenze auch als Bruttobetrag nennen: das ist die Zahl, gegen die ein
+     Nutzer seine Rechnungen wirklich hält. */
+  st('san_limit_max_brutto', fE(sanLimit * 1.19, 0));
+
   var hint = el('san_limit_hint');
-  if (hint) hint.textContent = 'Max. ' + fE(sanLimit, 0) + ' in 3 Jahren (15%-Grenze)';
+  if (hint) hint.textContent = 'Max. ' + fE(sanLimit, 0) + ' netto in 3 Jahren'
+    + (_sanUst === 'netto' ? '' : ' (= ' + fE(sanLimit * 1.19, 0) + ' brutto)');
 
   // V63.99: Aufschlüsselung der AHK-Berechnung in der Info-Box
   var ahkDetailBlock = el('ahk_detail_block');
@@ -1058,7 +1097,14 @@ function _calcImmediate(){
     window.afaSonder7bUpdateDisplay({
       basis: sonder7bBasis,
       jaehrlich: sonder7bGueltig ? (sonder7bBasis * 0.05) : 0,
-      gueltig: sonder7bGueltig
+      gueltig: sonder7bGueltig,
+      /* v1260: die Baukostenobergrenze gegen die eigenen Zahlen halten.
+         Bewusst mit afa_geb_basis und NICHT mit dem Kaufpreis: § 7b stellt
+         auf die Anschaffungs-/Herstellungskosten des GEBÄUDES ab, der
+         Grundstücksanteil zählt nicht mit. Wer hier kp/wfl rechnete, würde
+         bei jedem Objekt mit teurem Grundstück falschen Alarm auslösen. */
+      baukosten: (window.Afa && Afa.sonder7bBaukosten)
+        ? Afa.sonder7bBaukosten(afa_geb_basis, v('wfl')) : null
     });
   }
   // Neubau-Banner prüfen
@@ -1517,6 +1563,12 @@ function _calcImmediate(){
   // V63.60: Anschluss-Logik korrigiert — bei 'after_ezb'/'never' bleibt RS voll
   //   (Sparguthaben bleibt im Vertrag gebunden, wird NICHT Sondertilgung), Sparrate läuft weiter.
   var rs_loop = d1, cfkum = 0;
+  /* v1260: Die Jahres-Cashflows MITSCHREIBEN. Die Schleife unten rechnet
+     `cf_y_ns` für jedes Jahr und addiert es sofort in `cfkum` — der einzelne
+     Wert war danach weg. Genau den brauchen IRR und Break-Even: der IRR muss
+     wissen, WANN ein Euro fließt, und Break-Even, ab wann das Vorzeichen
+     kippt. Nur ein Array, keine zweite Rechnung. */
+  var _cfReihe = [];
   // V357-d1anschl: bei deaktiviertem D1-Schieber durchfinanziert (d1z/d1t)
   var az_eff_v = d1_anschl_enable ? (az > 0 ? az : d1z) : d1z;       // Anschluss-Zins
   var at_eff_v = d1_anschl_enable ? (at > 0 ? at : d1t) : d1t;       // Anschluss-Tilgung
@@ -1600,6 +1652,34 @@ function _calcImmediate(){
     // V63.58: BSV-Sparrate ist CF-Abfluss (gebundenes Geld), gehört in CF-Berechnung
     var cf_y_ns=cf_y_op-tax_y_loop-bspar_y_loop;
     cfkum+=cf_y_ns;
+    /* ═══ v1260c · Die Tilgung MUSS hier abgezogen werden ═══════════════════
+       ZURÜCKGENOMMEN: v1260 hat `cf_y_ns` roh in die Reihe gelegt. Das war
+       falsch, und die Gegenprobe hat es gefunden — die KPI-Karte zeigte
+       3.480 €, die Reihe 5.280 €, Differenz exakt 1.800 € = 1 % Tilgung auf
+       180.000 € Darlehen.
+
+       WARUM DAS DEN IRR AUFBLÄHT: `cf_y_op` in dieser Schleife ist Miete
+       minus Bewirtschaftung minus ZINSEN — die Tilgung fehlt dort bewusst,
+       weil die Schleife ursprünglich den VERMÖGENSZUWACHS rechnet, und für
+       den ist Tilgung kein Aufwand, sondern Aufbau.
+
+       Für eine Zahlungsreihe gilt das nicht. Wer die Tilgung nicht als
+       Abfluss zählt, aber am Ende die um genau diese Tilgung GESUNKENE
+       Restschuld abzieht, schreibt sie sich zweimal gut. Genau das ist
+       passiert: 40,6 % statt 33,7 %.
+
+       Zwei Wege wären richtig — Tilgung abziehen und die gesunkene
+       Restschuld ansetzen, oder Tilgung stehen lassen und die
+       ANFANGS-Schuld abziehen. Der erste ist der übliche und der, den auch
+       immocation im Cockpit rechnet (Warmmiete − BWK − Zinsen − Tilgung −
+       Steuern = Cashflow nach Steuern).
+
+       Die Bauspar-Sparrate ist bereits in cf_y_ns abgezogen und das
+       Guthaben wird am Ende zurückgegeben — dort stimmt die Logik schon.
+
+       `_ef` ist der Anteilsfaktor des letzten Jahres (v816) und gehört an
+       die Tilgung genauso wie an Zins und AfA. */
+    _cfReihe.push(cf_y_ns - ty * _ef);   /* v1260c */
     bspar_kum += bspar_y_loop;
     rs_loop=Math.max(0,rs_loop-ty*_ef);  /* v816-ef-tilg: Tilgung im letzten Jahr anteilig */
     miete_kum += nkm_y;
@@ -1636,6 +1716,51 @@ function _calcImmediate(){
   // Netto-Vermögenszuwachs: Tilgung-vom-Mieter + Sparguthaben-vom-Mieter + CF-Überschuss + Wertsteigerung
   var verm_zuwachs = tilg_durch_einnahmen + bspar_durch_einnahmen + cf_ueberschuss + Math.max(0, wertsteig_kum);
   var em = ekv > 0 ? verm_zuwachs / ekv : 0;
+
+  /* ═══ v1260 · IRR und Break-Even ═══════════════════════════════════════
+     Marcels Freigabe vom 08.09.2026 nach dem Excel-Abgleich.
+
+     DIE ZAHLUNGSREIHE, Zeitpunkt für Zeitpunkt:
+       t=0        − eingesetztes Eigenkapital
+       t=1..btj   Cashflow nach Steuern (aus _cfReihe, oben mitgeschrieben)
+       t=btj      zusätzlich der Verkauf:
+                    Verkaufspreis nach btj Jahren  (exit_vkp)
+                  − Restschuld nach btj Jahren     (rs_loop am Schleifenende)
+                  + verbliebenes Bauspar-Guthaben  (bspar_guth)
+
+     Zum Bauspar-Guthaben: die Sparraten sind in cf_y_ns bereits als Abfluss
+     enthalten. Wurde das Guthaben zur Ablösung verwendet, steht es schon in
+     einem kleineren rs_loop und `bspar_guth` ist dann 0 (Zeile ~1566) —
+     doppelt gezählt wird also nichts. Blieb es im Vertrag, gehört es dem
+     Investor und fließt ihm beim Verkauf zu. Ohne diese Zeile wäre der IRR
+     jedes Objekts mit Bausparvertrag systematisch zu niedrig.
+
+     rs_loop und NICHT rs: `rs` ist die Restschuld am Ende der ZINSBINDUNG,
+     `rs_loop` die nach btj Jahren. Verkauft wird am Ende des
+     Betrachtungszeitraums. (Die vorhandene Größe `net_exit` mischt genau
+     das — sie ist mit „nicht in Card verwendet" gekennzeichnet und wird
+     hier bewusst nicht benutzt.) */
+  var _exitErloes = exit_vkp - Math.max(0, rs_loop) + Math.max(0, bspar_guth);
+  var irr = null, be = { cf: null, kum: null, kumEk: null };
+  try {
+    if (window.IrrEngine && _cfReihe.length) {
+      var _reihe = [-ekv].concat(_cfReihe);
+      _reihe[_reihe.length - 1] += _exitErloes;
+      irr = window.IrrEngine.compute(_reihe);
+      be = window.IrrEngine.breakEven(_cfReihe, ekv);
+      /* v1260b · Die Zahlungsreihe OFFENLEGEN. Beim ersten Nachmessen ergab
+         eine Handrechnung 34 %, die App 40,6 % — und ich konnte die Lücke
+         nicht aufklären, weil die Reihe nur in dieser Funktion lebte. Eine
+         Kennzahl, die auf der Landingpage steht, muss nachvollziehbar sein:
+         wer sie anzweifelt, soll die Zahlungen sehen können, aus denen sie
+         entsteht. Kostet nichts und ist die einzige Art, den IRR zu prüfen. */
+      State._irrReihe = {
+        ek: ekv, cf: _cfReihe.slice(), exit: _exitErloes,
+        exit_vkp: exit_vkp, rs_ende: rs_loop, bspar_guth: bspar_guth,
+        reihe: _reihe.slice(), irr: irr
+      };
+    }
+  } catch (e) { /* eine Kennzahl darf die Seite nie anhalten */ }
   // PE-Definition als Alternative behalten für Vergleich:
   var em_pe = ekv > 0 ? (Math.max(0,cfkum)+Math.max(0,net_exit))/ekv : 0;
   var ekr=ekv>0?cf_ns/ekv*100:0;
@@ -1810,6 +1935,26 @@ function _calcImmediate(){
   st('kpi-em', (ekv <= 100) ? '∞' : fX(em));
   st('kpi-em-sub', (ekv <= 100) ? 'max. Hebel' : 'geschätzt');
   setKpiColor('kpi-em', (ekv <= 100 ? 99 : em), 2, 1);  // V318-fak-em-color: ≥2 gn, 1-2 gold, <1 rd; ∞ (Vollfin) = gn
+
+  /* ═══ v1260 · IRR und Break-Even anzeigen ══════════════════════════════
+     Beide dürfen NULL sein, und beide zeigen dann „—". Das ist kein
+     Versäumnis, sondern die Aussage: Der IRR existiert nicht, wenn die
+     Zahlungsreihe im ganzen Suchbereich kein Vorzeichen wechselt; der
+     Break-Even liegt nicht vor, wenn der Cashflow im Betrachtungszeitraum
+     nie kippt. Eine 0 stünde für „null Prozent" bzw. „im Jahr null" —
+     beides falsch. Deshalb wird hier auf `== null` geprüft und nicht mit
+     `||` gearbeitet: 0 ist ein gültiger Wert und darf nicht durchfallen. */
+  st('kpi-irr', (irr == null) ? '—' : fP(irr, 1));
+  if (irr != null) setKpiColor('kpi-irr', irr, 8, 4);   /* ≥8 % grün, 4–8 gold, <4 rot */
+  if (be.cf == null) {
+    st('kpi-be', '—');
+    st('kpi-be-sub', 'in ' + btj + ' Jahren nicht');
+  } else {
+    st('kpi-be', 'Jahr ' + be.cf);
+    /* Der zweite Zeitpunkt ist der ehrlichere: bis der KUMULIERTE Cashflow
+       positiv ist, hat das Objekt unterm Strich noch Geld gekostet. */
+    st('kpi-be-sub', be.kum != null ? ('kumuliert ab Jahr ' + be.kum) : 'kumuliert offen');
+  }
   st('sc-today',fE(cf_ns,0,true));st('sc-ezb',fE(cf_ezb,0,true));
   st('sc-exit',fE(exit_vkp-Math.max(0,rs),0,true));
   // V63.35: Initial-Setter für Cashflow-Box (renderCFCalc überschreibt mit Phase-Werten)
@@ -2122,7 +2267,12 @@ function _calcImmediate(){
   st('vz-plausi-statisch', fE(nkm_j * btj, 0));
   st('vz-plausi-mstg', mstg_pct.toFixed(1).replace('.', ','));
   st('vz-plausi-mit', fE(miete_kum, 0));
-  State.kpis={bmy:bmy,nmy:nmy,fak:fak,em:em,ekr:ekr,dscr:dscr,dscr_netto:dscr_netto,noi_dscr:noi_dscr,kd_dscr:kd_dscr,ltv:ltv,cf_op:cf_op,cf_ns:cf_ns,cf_m:cf_m,cf_ezb:cf_ezb,cf_op_ezb:cf_op_ezb,cf_ns_ezb:cf_ns_ezb,zins_ezb:zins_ezb,tilg_ezb:tilg_ezb,bspar_ezb:bspar_y_ezb,bwk_ezb:bwk_ezb,wm_ezb:wm_ezb,nkm_ezb:nkm_ezb,bwk_cf_ezb:bwk_cf_ezb,ster_ezb:ster_ezb,afa_ezb:afa,cf_op_an:cf_op_an,cf_ns_an:cf_ns_an,zins_an:zins_an,tilg_an:tilg_an,bspar_an:bspar_y_an,wm_an:wm_an,bwk_an:bwk_an,nkm_an:nkm_an,bwk_cf_an:bwk_cf_an,rate_an_m:rate_an_m,ster_an:ster_an,exit_vkp:exit_vkp,wm_j:wm_j,nkm_j:nkm_j,bwk:bwk,bwk_cf:bwk_cf,zins_j:zins_j,tilg_j:tilg_j,bspar_j:bspar_y,steuer:steuer,afa:afa,zve_immo:zve_immo,zaer_m:zaer_m,zaer_pct:zaer_pct,wp_kpi:wp_kpi,d1:d1,ek:ekv,gi:gi,kp:kp,bwk_ul:ul,bwk_nul:nul,d1z_pct:d1z*100,d1t_pct:d1t*100,d1IsAussetzung:_d1IsAussetzung};
+  /* v1260: irr, be_* und em_pe neu. `irr` ist in PROZENT (die Engine gibt
+     Prozent zurück) und darf NULL sein — „nicht bestimmbar" ist etwas
+     anderes als „null Prozent". Jeder Leser muss auf Abwesenheit prüfen,
+     bevor er rechnet: Number(null) ist 0 und besteht Number.isFinite. */
+  State.kpis={bmy:bmy,nmy:nmy,fak:fak,em:em,em_pe:em_pe,ekr:ekr,
+    irr:irr,be_cf:be.cf,be_kum:be.kum,be_kum_ek:be.kumEk,dscr:dscr,dscr_netto:dscr_netto,noi_dscr:noi_dscr,kd_dscr:kd_dscr,ltv:ltv,cf_op:cf_op,cf_ns:cf_ns,cf_m:cf_m,cf_ezb:cf_ezb,cf_op_ezb:cf_op_ezb,cf_ns_ezb:cf_ns_ezb,zins_ezb:zins_ezb,tilg_ezb:tilg_ezb,bspar_ezb:bspar_y_ezb,bwk_ezb:bwk_ezb,wm_ezb:wm_ezb,nkm_ezb:nkm_ezb,bwk_cf_ezb:bwk_cf_ezb,ster_ezb:ster_ezb,afa_ezb:afa,cf_op_an:cf_op_an,cf_ns_an:cf_ns_an,zins_an:zins_an,tilg_an:tilg_an,bspar_an:bspar_y_an,wm_an:wm_an,bwk_an:bwk_an,nkm_an:nkm_an,bwk_cf_an:bwk_cf_an,rate_an_m:rate_an_m,ster_an:ster_an,exit_vkp:exit_vkp,wm_j:wm_j,nkm_j:nkm_j,bwk:bwk,bwk_cf:bwk_cf,zins_j:zins_j,tilg_j:tilg_j,bspar_j:bspar_y,steuer:steuer,afa:afa,zve_immo:zve_immo,zaer_m:zaer_m,zaer_pct:zaer_pct,wp_kpi:wp_kpi,d1:d1,ek:ekv,gi:gi,kp:kp,bwk_ul:ul,bwk_nul:nul,d1z_pct:d1z*100,d1t_pct:d1t*100,d1IsAussetzung:_d1IsAussetzung};
 
   // V258-07: WK-Snapshot + andere Objekte beruecksichtigen
   try {

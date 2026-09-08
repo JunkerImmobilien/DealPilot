@@ -81,6 +81,7 @@ var FIELDS = [
   'qual_kueche','qual_bad','qual_boden','qual_fenster','zimmer','bad_anz','etage','etagen_ges','modernis','garagen','stellpl_aussen','balkon_flae','_avm_state','_mb_state','einheiten',
   /* V292.6.5-fields-checkboxes: Werbungskosten-Übernahme Checkboxen + Select-Felder */
   'san_tax_active','san_tax_years','moebl_tax_active','moebl_tax_years',
+  'san_ust',   /* v1261: brutto/netto fuer die 15%-Grenze */
   'erwerbsart','anbietertyp','_immometrica_id','_immometrica_online_since','_immometrica_portals',
   /* v727-ausst: Ausstattungsdetails fuer AVM-Bewertung (Sprengnetter-Enums als Wert) */
   'eq_heating','eq_windows','eq_floor','eq_bath','eq_guest_wc','eq_store_room','eq_walls','eq_roof','eq_elevator',

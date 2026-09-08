@@ -129,7 +129,16 @@ Host-Node ist 18, Container-Node 22.
 - `dealpilot-postgres` (Haupt-DB), Migrationstabelle `schema_migrations`
 - `dealpilot-mb-db` (Marktbericht, Schema `mb.`), Migrationstabelle
   `public._mb_migrations` — führt **Dateinamen**, keine Versionsnummern.
-  **Steht in keinem Backup-Skript** → vor jedem Eingriff eigener `pg_dump`.
+  **Steht in keinem Backup-Skript** → vor jedem Eingriff eigener `pg_dump`:
+  ```
+  docker exec dealpilot-mb-db pg_dump -U mb marktbericht | gzip > /root/backups/mb-$(date +%Y%m%d-%H%M).sql.gz
+  ```
+  > **Datenbank `marktbericht`, Nutzer `mb` — nicht `postgres`.** Am
+  > 08.09.2026 lief `pg_dump -U postgres postgres` ins Nichts und erzeugte
+  > eine **20 Byte große Sicherung**, die wie eine Sicherung aussah. Der
+  > Befehl gab keinen Fehler zurück, den man ohne Hinsehen bemerkt hätte.
+  > **Eine Sicherung, die man nicht ansieht, ist keine** — immer `ls -lh`
+  > und einen Blick in den Anfang (`zcat … | head -2`).
 
 ---
 

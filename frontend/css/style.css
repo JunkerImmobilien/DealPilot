@@ -37225,3 +37225,27 @@ aside.sidebar .sb-card .sbc-btn::after {
   text-decoration: underline dotted color-mix(in srgb, var(--gold) 40%, transparent);
   text-underline-offset: 3px;
 }
+
+/* ═══ v1263 · Bodenrichtwert: Knopf markieren, wenn die Adresse sich geaendert hat ═══
+   Der Wert im Feld gehoert dann noch zur alten Adresse. Nicht ueberschreiben,
+   nur zeigen, dass etwas nachzuholen ist — ein geprueftes BORIS-Ergebnis ist
+   mehr wert als jede Schaetzung, und still ersetzen waere ein Datenverlust,
+   den niemand bemerkt.
+   Gold tokenisiert (Whitelabel-Pflicht); statt rgba() color-mix, weil der
+   Gold-Audit rgba(201,168,76,..) zu Recht als hartes Gold zaehlt. */
+button.btn-brw.brw-veraltet {
+  border-color: var(--wl-c9a84c, #C9A84C);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent);
+  animation: brwVeraltetPuls 2.4s ease-in-out infinite;
+}
+@keyframes brwVeraltetPuls {
+  0%, 100% { box-shadow: 0 0 0 2px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent); }
+  50%      { box-shadow: 0 0 0 4px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent); }
+}
+button.btn-brw.brw-veraltet::after {
+  content: '•';
+  margin-left: 4px;
+  color: var(--wl-c9a84c, #C9A84C);
+  font-size: 15px;
+  line-height: 1;
+}

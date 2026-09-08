@@ -81,8 +81,28 @@
     vermstand: 'Vermietungsstand', exitstr: 'Exit-Strategie',
     kp: 'Kaufpreis in Euro', makler_p: 'Maklerprovision in Prozent', notar_p: 'Notarkosten in Prozent',
     gba_p: 'Grundbuchamt in Prozent', gest_p: 'Grunderwerbsteuer in Prozent',
-    san: 'Sanierungskosten in Euro', moebl: 'Moeblierungskosten in Euro',
-    inv_kueche: 'Investition Kueche in Euro', inv_moebel: 'Investition Moebel in Euro',
+    san: 'Sanierungskosten in Euro',
+    /* ── v1262 · moebl ist die SUMME, nicht ein Posten ──────────────────────
+       Gemessen am 08.09.2026 mit einem Testdiktat: „Die Kueche wird fuer
+       8.000 Euro mitgekauft, die uebrige Moeblierung kostet 3.000 Euro."
+       Die KI setzte inv_kueche=8000 UND moebl=3000 — beides fuer sich
+       plausibel. Im Formular stand danach moebl=8.000.
+
+       Der Grund liegt nicht in der Auswertung: inventar-sync.js macht
+       `moebl` zur Summe der inv_*-Felder und sperrt es, sobald EIN
+       Detailfeld gefuellt ist (V291, „Inventar-Detail-Box ist Single Source
+       of Truth"). Der diktierte moebl-Wert wird also von der Summe
+       ueberschrieben — die 3.000 Euro waren weg, und weil in `moebl` danach
+       der Kuechenbetrag stand, sah es aus, als sei die Kueche falsch
+       gelandet.
+
+       Die Auswertung darf `moebl` deshalb nur noch fuellen, wenn EIN
+       Gesamtbetrag ohne Einzelposten genannt wird. Der Hinweis sagt das —
+       er landet ueber buildFullCatalog im Prompt. Die zweite Haelfte steht
+       als Regel 14 im Backend-Prompt; ein Hinweis allein wird gern
+       ueberlesen, wenn zwei Felder fast gleich heissen. */
+    moebl: 'GESAMTSUMME Inventar (Kueche + Moebel + Geraete). NUR nutzen, wenn EIN Gesamtbetrag genannt wird. Werden Einzelposten genannt, stattdessen inv_kueche / inv_moebel / inv_geraete fuellen und dieses Feld WEGLASSEN',
+    inv_kueche: 'Kueche als Einzelposten in Euro', inv_moebel: 'Moebel/Einrichtung als Einzelposten in Euro (ohne Kueche)',
     inv_geraete: 'Investition Geraete in Euro', inv_pv: 'Investition Photovoltaik in Euro',
     inv_stellplatz: 'Investition Stellplatz in Euro', inv_sonst: 'Investition Sonstiges in Euro',
     brw: 'Bodenrichtwert in Euro pro m2', mea: 'Miteigentumsanteil',
