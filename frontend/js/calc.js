@@ -1058,7 +1058,14 @@ function _calcImmediate(){
     window.afaSonder7bUpdateDisplay({
       basis: sonder7bBasis,
       jaehrlich: sonder7bGueltig ? (sonder7bBasis * 0.05) : 0,
-      gueltig: sonder7bGueltig
+      gueltig: sonder7bGueltig,
+      /* v1260: die Baukostenobergrenze gegen die eigenen Zahlen halten.
+         Bewusst mit afa_geb_basis und NICHT mit dem Kaufpreis: § 7b stellt
+         auf die Anschaffungs-/Herstellungskosten des GEBÄUDES ab, der
+         Grundstücksanteil zählt nicht mit. Wer hier kp/wfl rechnete, würde
+         bei jedem Objekt mit teurem Grundstück falschen Alarm auslösen. */
+      baukosten: (window.Afa && Afa.sonder7bBaukosten)
+        ? Afa.sonder7bBaukosten(afa_geb_basis, v('wfl')) : null
     });
   }
   // Neubau-Banner prüfen
@@ -1517,6 +1524,12 @@ function _calcImmediate(){
   // V63.60: Anschluss-Logik korrigiert — bei 'after_ezb'/'never' bleibt RS voll
   //   (Sparguthaben bleibt im Vertrag gebunden, wird NICHT Sondertilgung), Sparrate läuft weiter.
   var rs_loop = d1, cfkum = 0;
+  /* v1260: Die Jahres-Cashflows MITSCHREIBEN. Die Schleife unten rechnet
+     `cf_y_ns` für jedes Jahr und addiert es sofort in `cfkum` — der einzelne
+     Wert war danach weg. Genau den brauchen IRR und Break-Even: der IRR muss
+     wissen, WANN ein Euro fließt, und Break-Even, ab wann das Vorzeichen
+     kippt. Nur ein Array, keine zweite Rechnung. */
+  var _cfReihe = [];
   // V357-d1anschl: bei deaktiviertem D1-Schieber durchfinanziert (d1z/d1t)
   var az_eff_v = d1_anschl_enable ? (az > 0 ? az : d1z) : d1z;       // Anschluss-Zins
   var at_eff_v = d1_anschl_enable ? (at > 0 ? at : d1t) : d1t;       // Anschluss-Tilgung
@@ -1600,6 +1613,7 @@ function _calcImmediate(){
     // V63.58: BSV-Sparrate ist CF-Abfluss (gebundenes Geld), gehört in CF-Berechnung
     var cf_y_ns=cf_y_op-tax_y_loop-bspar_y_loop;
     cfkum+=cf_y_ns;
+    _cfReihe.push(cf_y_ns);   /* v1260 */
     bspar_kum += bspar_y_loop;
     rs_loop=Math.max(0,rs_loop-ty*_ef);  /* v816-ef-tilg: Tilgung im letzten Jahr anteilig */
     miete_kum += nkm_y;
@@ -1636,6 +1650,40 @@ function _calcImmediate(){
   // Netto-Vermögenszuwachs: Tilgung-vom-Mieter + Sparguthaben-vom-Mieter + CF-Überschuss + Wertsteigerung
   var verm_zuwachs = tilg_durch_einnahmen + bspar_durch_einnahmen + cf_ueberschuss + Math.max(0, wertsteig_kum);
   var em = ekv > 0 ? verm_zuwachs / ekv : 0;
+
+  /* ═══ v1260 · IRR und Break-Even ═══════════════════════════════════════
+     Marcels Freigabe vom 08.09.2026 nach dem Excel-Abgleich.
+
+     DIE ZAHLUNGSREIHE, Zeitpunkt für Zeitpunkt:
+       t=0        − eingesetztes Eigenkapital
+       t=1..btj   Cashflow nach Steuern (aus _cfReihe, oben mitgeschrieben)
+       t=btj      zusätzlich der Verkauf:
+                    Verkaufspreis nach btj Jahren  (exit_vkp)
+                  − Restschuld nach btj Jahren     (rs_loop am Schleifenende)
+                  + verbliebenes Bauspar-Guthaben  (bspar_guth)
+
+     Zum Bauspar-Guthaben: die Sparraten sind in cf_y_ns bereits als Abfluss
+     enthalten. Wurde das Guthaben zur Ablösung verwendet, steht es schon in
+     einem kleineren rs_loop und `bspar_guth` ist dann 0 (Zeile ~1566) —
+     doppelt gezählt wird also nichts. Blieb es im Vertrag, gehört es dem
+     Investor und fließt ihm beim Verkauf zu. Ohne diese Zeile wäre der IRR
+     jedes Objekts mit Bausparvertrag systematisch zu niedrig.
+
+     rs_loop und NICHT rs: `rs` ist die Restschuld am Ende der ZINSBINDUNG,
+     `rs_loop` die nach btj Jahren. Verkauft wird am Ende des
+     Betrachtungszeitraums. (Die vorhandene Größe `net_exit` mischt genau
+     das — sie ist mit „nicht in Card verwendet" gekennzeichnet und wird
+     hier bewusst nicht benutzt.) */
+  var _exitErloes = exit_vkp - Math.max(0, rs_loop) + Math.max(0, bspar_guth);
+  var irr = null, be = { cf: null, kum: null, kumEk: null };
+  try {
+    if (window.IrrEngine && _cfReihe.length) {
+      var _reihe = [-ekv].concat(_cfReihe);
+      _reihe[_reihe.length - 1] += _exitErloes;
+      irr = window.IrrEngine.compute(_reihe);
+      be = window.IrrEngine.breakEven(_cfReihe, ekv);
+    }
+  } catch (e) { /* eine Kennzahl darf die Seite nie anhalten */ }
   // PE-Definition als Alternative behalten für Vergleich:
   var em_pe = ekv > 0 ? (Math.max(0,cfkum)+Math.max(0,net_exit))/ekv : 0;
   var ekr=ekv>0?cf_ns/ekv*100:0;
@@ -1810,6 +1858,26 @@ function _calcImmediate(){
   st('kpi-em', (ekv <= 100) ? '∞' : fX(em));
   st('kpi-em-sub', (ekv <= 100) ? 'max. Hebel' : 'geschätzt');
   setKpiColor('kpi-em', (ekv <= 100 ? 99 : em), 2, 1);  // V318-fak-em-color: ≥2 gn, 1-2 gold, <1 rd; ∞ (Vollfin) = gn
+
+  /* ═══ v1260 · IRR und Break-Even anzeigen ══════════════════════════════
+     Beide dürfen NULL sein, und beide zeigen dann „—". Das ist kein
+     Versäumnis, sondern die Aussage: Der IRR existiert nicht, wenn die
+     Zahlungsreihe im ganzen Suchbereich kein Vorzeichen wechselt; der
+     Break-Even liegt nicht vor, wenn der Cashflow im Betrachtungszeitraum
+     nie kippt. Eine 0 stünde für „null Prozent" bzw. „im Jahr null" —
+     beides falsch. Deshalb wird hier auf `== null` geprüft und nicht mit
+     `||` gearbeitet: 0 ist ein gültiger Wert und darf nicht durchfallen. */
+  st('kpi-irr', (irr == null) ? '—' : fP(irr, 1));
+  if (irr != null) setKpiColor('kpi-irr', irr, 8, 4);   /* ≥8 % grün, 4–8 gold, <4 rot */
+  if (be.cf == null) {
+    st('kpi-be', '—');
+    st('kpi-be-sub', 'in ' + btj + ' Jahren nicht');
+  } else {
+    st('kpi-be', 'Jahr ' + be.cf);
+    /* Der zweite Zeitpunkt ist der ehrlichere: bis der KUMULIERTE Cashflow
+       positiv ist, hat das Objekt unterm Strich noch Geld gekostet. */
+    st('kpi-be-sub', be.kum != null ? ('kumuliert ab Jahr ' + be.kum) : 'kumuliert offen');
+  }
   st('sc-today',fE(cf_ns,0,true));st('sc-ezb',fE(cf_ezb,0,true));
   st('sc-exit',fE(exit_vkp-Math.max(0,rs),0,true));
   // V63.35: Initial-Setter für Cashflow-Box (renderCFCalc überschreibt mit Phase-Werten)
@@ -2122,7 +2190,12 @@ function _calcImmediate(){
   st('vz-plausi-statisch', fE(nkm_j * btj, 0));
   st('vz-plausi-mstg', mstg_pct.toFixed(1).replace('.', ','));
   st('vz-plausi-mit', fE(miete_kum, 0));
-  State.kpis={bmy:bmy,nmy:nmy,fak:fak,em:em,ekr:ekr,dscr:dscr,dscr_netto:dscr_netto,noi_dscr:noi_dscr,kd_dscr:kd_dscr,ltv:ltv,cf_op:cf_op,cf_ns:cf_ns,cf_m:cf_m,cf_ezb:cf_ezb,cf_op_ezb:cf_op_ezb,cf_ns_ezb:cf_ns_ezb,zins_ezb:zins_ezb,tilg_ezb:tilg_ezb,bspar_ezb:bspar_y_ezb,bwk_ezb:bwk_ezb,wm_ezb:wm_ezb,nkm_ezb:nkm_ezb,bwk_cf_ezb:bwk_cf_ezb,ster_ezb:ster_ezb,afa_ezb:afa,cf_op_an:cf_op_an,cf_ns_an:cf_ns_an,zins_an:zins_an,tilg_an:tilg_an,bspar_an:bspar_y_an,wm_an:wm_an,bwk_an:bwk_an,nkm_an:nkm_an,bwk_cf_an:bwk_cf_an,rate_an_m:rate_an_m,ster_an:ster_an,exit_vkp:exit_vkp,wm_j:wm_j,nkm_j:nkm_j,bwk:bwk,bwk_cf:bwk_cf,zins_j:zins_j,tilg_j:tilg_j,bspar_j:bspar_y,steuer:steuer,afa:afa,zve_immo:zve_immo,zaer_m:zaer_m,zaer_pct:zaer_pct,wp_kpi:wp_kpi,d1:d1,ek:ekv,gi:gi,kp:kp,bwk_ul:ul,bwk_nul:nul,d1z_pct:d1z*100,d1t_pct:d1t*100,d1IsAussetzung:_d1IsAussetzung};
+  /* v1260: irr, be_* und em_pe neu. `irr` ist in PROZENT (die Engine gibt
+     Prozent zurück) und darf NULL sein — „nicht bestimmbar" ist etwas
+     anderes als „null Prozent". Jeder Leser muss auf Abwesenheit prüfen,
+     bevor er rechnet: Number(null) ist 0 und besteht Number.isFinite. */
+  State.kpis={bmy:bmy,nmy:nmy,fak:fak,em:em,em_pe:em_pe,ekr:ekr,
+    irr:irr,be_cf:be.cf,be_kum:be.kum,be_kum_ek:be.kumEk,dscr:dscr,dscr_netto:dscr_netto,noi_dscr:noi_dscr,kd_dscr:kd_dscr,ltv:ltv,cf_op:cf_op,cf_ns:cf_ns,cf_m:cf_m,cf_ezb:cf_ezb,cf_op_ezb:cf_op_ezb,cf_ns_ezb:cf_ns_ezb,zins_ezb:zins_ezb,tilg_ezb:tilg_ezb,bspar_ezb:bspar_y_ezb,bwk_ezb:bwk_ezb,wm_ezb:wm_ezb,nkm_ezb:nkm_ezb,bwk_cf_ezb:bwk_cf_ezb,ster_ezb:ster_ezb,afa_ezb:afa,cf_op_an:cf_op_an,cf_ns_an:cf_ns_an,zins_an:zins_an,tilg_an:tilg_an,bspar_an:bspar_y_an,wm_an:wm_an,bwk_an:bwk_an,nkm_an:nkm_an,bwk_cf_an:bwk_cf_an,rate_an_m:rate_an_m,ster_an:ster_an,exit_vkp:exit_vkp,wm_j:wm_j,nkm_j:nkm_j,bwk:bwk,bwk_cf:bwk_cf,zins_j:zins_j,tilg_j:tilg_j,bspar_j:bspar_y,steuer:steuer,afa:afa,zve_immo:zve_immo,zaer_m:zaer_m,zaer_pct:zaer_pct,wp_kpi:wp_kpi,d1:d1,ek:ekv,gi:gi,kp:kp,bwk_ul:ul,bwk_nul:nul,d1z_pct:d1z*100,d1t_pct:d1t*100,d1IsAussetzung:_d1IsAussetzung};
 
   // V258-07: WK-Snapshot + andere Objekte beruecksichtigen
   try {

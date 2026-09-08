@@ -1996,6 +1996,12 @@ label.dp-required.qc-required::after {
             <strong style="color:#9C7223">⚠ Wohnfläche fehlt</strong><br>
             <span style="color:var(--muted)">Um die § 7b-Förderfähigkeit zu berechnen, brauchen wir die Wohnfläche (Cap: 4.000 €/m²). Bitte im Tab <a href="#" onclick="switchTab(0);return false" style="color:var(--gold);font-weight:600">Objekt → Wohnfläche (m²)</a> eintragen.</span>
           </div>
+          <!-- v1260: Widerspricht die abgehakte Baukostenobergrenze den eigenen Zahlen?
+               Rot, nicht gelb: hier entfaellt die Sonder-AfA GANZ, das ist keine Feinheit. -->
+          <div id="afa_sonder7b_baukosten_warning" style="display:none;margin-top:10px;padding:10px 12px;background:rgba(216,86,76,0.10);border-left:3px solid var(--wl-d8564c, #D8564C);border-radius:4px;font-size:12.5px">
+            <strong style="color:var(--wl-b8625c, #B8625C)">⚠ Baukostenobergrenze überschritten</strong><br>
+            <span style="color:var(--muted)">Deine Angaben ergeben <b id="afa_sonder7b_proqm">—</b> pro m² Wohnfläche. § 7b verlangt höchstens <b>5.200 €/m²</b> — darüber entfällt die Sonder-AfA <b>vollständig</b>, nicht nur anteilig. Die Rechnung unten läuft trotzdem weiter, weil du Gründe haben kannst, die DealPilot nicht kennt (Herstellungskosten abweichend vom Kaufpreis, gemischt genutztes Gebäude). Prüfe die Bestätigung oben.</span>
+          </div>
           <div class="f" style="margin-top:10px"><label>§ 7b Förderfähige Basis (berechnet)</label><div class="cf" id="afa_sonder7b_basis">—</div></div>
           <div class="f"><label>§ 7b Zusätzliche AfA / Jahr (J. 1–4)</label><div class="cf" id="afa_sonder7b_jaehrlich">—</div></div>
         </div>
@@ -2928,6 +2934,10 @@ label.dp-required.qc-required::after {
     <div class="kpi"><div class="kpi-label">DSCR <button type="button" class="dp-tip" data-tip-id="tab5.dscr" tabindex="-1" aria-label="Hilfe zu DSCR"></button></div><div class="kpi-val" id="kpi-dscr">—</div><div class="kpi-sub">Schuldendeckung</div></div>
     <div class="kpi"><div class="kpi-label">Faktor</div><div class="kpi-val" id="kpi-fak">—</div><div class="kpi-sub">Jahresmieten</div></div>
     <div class="kpi"><div class="kpi-label">Equity Multiple <button type="button" class="dp-tip" data-tip-id="tab8.equity_multiple" tabindex="-1" aria-label="Hilfe zu Equity Multiple"></button></div><div class="kpi-val" id="kpi-em">—</div><div class="kpi-sub" id="kpi-em-sub">geschätzt</div></div>
+    <!-- v1260: IRR wurde auf der Landingpage beworben und im Glossar erklaert,
+         aber nie gerechnet. Jetzt steht er da, wo er hingehoert. -->
+    <div class="kpi"><div class="kpi-label">IRR <button type="button" class="dp-tip" data-tip-id="tab5.irr" tabindex="-1" aria-label="Hilfe zu IRR"></button></div><div class="kpi-val" id="kpi-irr">—</div><div class="kpi-sub">interner Zinsfuß p.a.</div></div>
+    <div class="kpi"><div class="kpi-label">Break-Even</div><div class="kpi-val" id="kpi-be">—</div><div class="kpi-sub" id="kpi-be-sub">Cashflow positiv</div></div>
   </div>
   <div class="col2">
     <div class="card">
@@ -3258,8 +3268,9 @@ label.dp-required.qc-required::after {
 <script src="js/dp-qr.js?v=721"></script>
 <script src="js/hausgeld-engine.js?v=717"></script>
 <script src="js/deal-kpis.js?v=231"></script>
-<script src="js/afa-engine.js?v=227"></script>
-  <script src="js/afa-ui.js?v=671"></script>
+<script src="js/afa-engine.js?v=v1260"></script>
+<script src="js/irr-engine.js?v=v1260"></script>
+  <script src="js/afa-ui.js?v=v1260"></script>
   <script src="js/zve-manager.js?v=1"></script>
   <script src="js/tax-periods.js?v=841"></script>
   <script src="js/tax-periods-sync.js?v=1"></script>
@@ -3272,7 +3283,7 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v1245"></script>
+  <script src="js/calc.js?v=v1260"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
@@ -3339,7 +3350,7 @@ label.dp-required.qc-required::after {
 <script src="js/beleg-import.js?v=v1188"></script>
 <script src="js/financing.js?v=v1244c"></script>
 <script src="js/financing-pdf.js?v=20260611105943"></script>
-<script src="js/immokalk-import.js?v=124"></script>
+<script src="js/immokalk-import.js?v=v1260"></script>
 <script src="js/import-export-modal.js?v=893u"></script>
 <script src="js/quick-check.js?v=463"></script>
 <script src="js/qc-bridge.js?v=v1233c"></script>

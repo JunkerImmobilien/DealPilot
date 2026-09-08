@@ -231,6 +231,45 @@ window.ImmoKalkImport = (function() {
     }
     issues.push('Hinweis immocation-Format: Zinsbindung wurde auf ' + d1bind + ' Jahre gesetzt (immocation kennt keine Bindung). Bitte ggf. anpassen.');
 
+    /* ═══ v1260 · Darlehen II–IV ═══════════════════════════════════════════
+       Bis v1259 las dieser Import NUR Darlehen I. immocation führt im
+       Cockpit vier Blöcke — Darlehen I (N17–N19), II (N25–N27),
+       III (N32–N34) und IV (N39–N41) — jeder mit eigener Summe, eigenem
+       Zins und eigener Tilgung. Drei davon fielen still unter den Tisch.
+
+       Das ist die schlimmere Sorte Importfehler: Der Nutzer sieht eine
+       gefüllte Maske und glaubt, es sei alles da. Erst wenn die Zahlen
+       nicht stimmen, sucht er — und sucht am falschen Ende, nämlich bei
+       der Rechnung statt beim Import.
+
+       DealPilot kennt zwei Darlehen plus Bausparvertrag. Darlehen II
+       kommt also an. Für III und IV wird NICHT summiert: verschiedene
+       Zinssätze zu einem Mittelwert zu verschmelzen, ergäbe eine Zahl, die
+       in keinem Vertrag steht und die niemand nachvollziehen kann. Sie
+       werden stattdessen ausdrücklich GEMELDET — mit ihren Werten, damit
+       der Nutzer sie von Hand nachtragen kann. Lieber eine ehrliche Lücke
+       als eine erfundene Zahl. */
+    var d2     = _toNum(R('N25'));
+    var d2z    = _toNum(R('N26')) * 100;
+    var d2t    = _toNum(R('N27')) * 100;
+    var d3     = _toNum(R('N32'));
+    var d4     = _toNum(R('N39'));
+    if (d2 > 0) {
+      issues.push('Darlehen II übernommen: ' + Math.round(d2).toLocaleString('de-DE') +
+                  ' € zu ' + d2z.toFixed(2).replace('.', ',') + ' % Zins, ' +
+                  d2t.toFixed(2).replace('.', ',') + ' % Tilgung.');
+    }
+    if (d3 > 0 || d4 > 0) {
+      var rest = [];
+      if (d3 > 0) rest.push('III: ' + Math.round(d3).toLocaleString('de-DE') + ' € zu ' +
+                            (_toNum(R('N33')) * 100).toFixed(2).replace('.', ',') + ' %');
+      if (d4 > 0) rest.push('IV: ' + Math.round(d4).toLocaleString('de-DE') + ' € zu ' +
+                            (_toNum(R('N40')) * 100).toFixed(2).replace('.', ',') + ' %');
+      issues.push('NICHT übernommen — DealPilot rechnet mit zwei Darlehen: ' + rest.join(' · ') +
+                  '. Bitte von Hand ergänzen oder mit Darlehen II zusammenlegen; ' +
+                  'automatisch zusammengefasst wird nichts, weil die Zinssätze verschieden sind.');
+    }
+
     // ═════ Annahmen — Pro: H30/H31/H32, Roter Faden: H25/H26/H27 ═════
     var kostenstg = (_toNum(R('H30')) || _toNum(R('H25'))) * 100;
     var mietstg   = (_toNum(R('H31')) || _toNum(R('H26'))) * 100;
@@ -253,6 +292,12 @@ window.ImmoKalkImport = (function() {
       hg_ul: hg_ul, grundsteuer: grundsteuer, ul_sonst: ul_sonst,
       hg_nul: hg_nul, weg_r: weg_r, eigen_r: eigen_r, mietausfall: mietausfall,
       d1: d1, ek: ek, d1z: d1z, d1t: d1t, d1_bindj: d1bind,
+      /* v1260: Darlehen II. Nur setzen, wenn es eines gibt — eine 0 würde
+         in der Maske als „zweites Darlehen über 0 €" stehen und die
+         Finanzierungskarte aufklappen. */
+      d2: d2 > 0 ? d2 : undefined,
+      d2z: d2 > 0 ? d2z : undefined,
+      d2t: d2 > 0 ? d2t : undefined,
       grenz: grenz > 0 ? (grenz < 1 ? grenz * 100 : grenz) : 42,
       zve: zvE,
       mietstg: mietstg || 1.5,

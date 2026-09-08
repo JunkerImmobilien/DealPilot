@@ -255,6 +255,48 @@
     return Math.min(ahkGebaeude || 0, cap);
   }
 
+  /* ═══ v1260 · Die ZWEITE Grenze — Zugang statt Höhe ═══════════════════════
+     § 7b kennt zwei Zahlen, die leicht verwechselt werden:
+
+       4.000 €/m²  BEMESSUNGSGRUNDLAGE — wie viel gefördert wird.
+                   Steht seit V227.1 in sonder7bBasis() darüber.
+       5.200 €/m²  BAUKOSTENOBERGRENZE — OB überhaupt gefördert wird.
+                   Wird überschritten, entfällt die Sonder-AfA GANZ.
+
+     Bis v1259 stand die zweite Zahl nur im Kopfkommentar dieser Datei und
+     als Text neben einer Checkbox, die der Nutzer selbst abhakt
+     („Baukosten ≤ 5.200 €/m² Wohnfläche"). Geprüft hat sie niemand —
+     dabei kennt DealPilot Gebäude-AHK und Wohnfläche und kann rechnen.
+
+     WARUM DAS HIER NUR PRÜFT UND NICHTS ABSCHALTET: Die Bestätigung ist
+     eine Erklärung des Nutzers, und er kann Gründe haben, die DealPilot
+     nicht kennt — bei Herstellung weichen die Baukosten vom Kaufpreis ab,
+     bei gemischt genutzten Gebäuden zählt nur der Wohnteil. Wer hier hart
+     abschaltet, nimmt einem Sachverständigen die Entscheidung aus der Hand
+     und liefert ihm eine Zahl, die er nicht mehr erklären kann. Also:
+     rechnen, den Widerspruch zeigen, entscheiden lassen.
+
+     @returns {{proQm:number, grenze:number, ok:boolean, pruefbar:boolean}}
+              `pruefbar:false` heißt „zu wenig Angaben" — das ist etwas
+              anderes als „Grenze gerissen" und darf nie als Warnung
+              erscheinen. */
+  var SONDER_7B_BAUKOSTEN_GRENZE = 5200;
+
+  function sonder7bBaukosten(ahkGebaeude, wohnflaeche) {
+    var wfl = parseFloat(wohnflaeche) || 0;
+    var ahk = parseFloat(ahkGebaeude) || 0;
+    if (wfl <= 0 || ahk <= 0) {
+      return { proQm: 0, grenze: SONDER_7B_BAUKOSTEN_GRENZE, ok: true, pruefbar: false };
+    }
+    var proQm = ahk / wfl;
+    return {
+      proQm: proQm,
+      grenze: SONDER_7B_BAUKOSTEN_GRENZE,
+      ok: proQm <= SONDER_7B_BAUKOSTEN_GRENZE,
+      pruefbar: true
+    };
+  }
+
   // ════════════ Export ═══════════════════════════════════════════════════
   window.Afa = {
     computeSeries: computeSeries,
@@ -265,6 +307,7 @@
     checkDegressivEligibility: checkDegressivEligibility,
     parseSelectValue: parseAfaSelectValue,
     sonder7bBasis: sonder7bBasis,
+    sonder7bBaukosten: sonder7bBaukosten,   /* v1260 */
     VERSION: 'V227'
   };
 })();

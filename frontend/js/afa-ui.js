@@ -177,6 +177,25 @@
       // Generelle Warnung NUR zeigen wenn nicht alle Bedingungen ✓ — und nicht der Wfl-Spezialfall
       w.style.display = (aktiv && !info.gueltig && !wflFehlt) ? 'block' : 'none';
     }
+
+    /* v1260 · Die abgehakte Baukostenobergrenze gegen die eigenen Zahlen halten.
+       calc.js reicht `baukosten` durch (Ergebnis von Afa.sonder7bBaukosten).
+       Gezeigt wird die Warnung NUR, wenn drei Dinge zusammenkommen: der Nutzer
+       hat die Grenze bestätigt, sie ist rechnerisch prüfbar, und sie ist
+       gerissen. Fehlen Angaben (`pruefbar:false`), bleibt es still — „zu wenig
+       Daten" ist keine Beanstandung, und eine Warnung, die bei leerem Formular
+       aufblitzt, wird nach dem dritten Mal weggeklickt statt gelesen. */
+    var bkWarn = $('afa_sonder7b_baukosten_warning');
+    if (bkWarn) {
+      var bk = info.baukosten;
+      var bestaetigt = ($('afa_sonder7b_baukosten') || {}).checked || false;
+      var zeigen = !!(aktiv && bestaetigt && bk && bk.pruefbar && !bk.ok);
+      bkWarn.style.display = zeigen ? 'block' : 'none';
+      if (zeigen) {
+        var pq = $('afa_sonder7b_proqm');
+        if (pq) pq.textContent = fE(bk.proQm, 0) + '/m²';
+      }
+    }
   };
 
   // ───── Vorschau-Tabelle ────────────────────────────────────────────────
