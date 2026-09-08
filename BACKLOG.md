@@ -38,7 +38,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 07.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging auf `6ed646b`, **Produktion auf
+**Stand:** lokal = GitHub = Staging auf `784380a`, **Produktion auf
 `9ff1190`**. **`v1215`–`v1253` sind live** — die Preisrunde ist
 durch, in der Anzeige wie in Stripe. Nichts wartet auf einen Rollout.
 

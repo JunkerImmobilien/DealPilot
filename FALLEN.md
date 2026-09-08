@@ -1407,3 +1407,33 @@ den Code.
 > `config.js` standen 2,5 % Tilgung und 42 % Grenzsteuer — Zahlen, die
 > nie jemand gesehen hat. Hätte ich sie wirksam gemacht, hätten sich für
 > alle Nutzer stillschweigend die Vorgaben geändert.
+
+## Ein Kommentar, der behauptet, etwas werde weitergereicht
+
+`tax.js:1061` sagte seit `v1225`: *„`_computeYearTotal` reicht sie
+weiter"* — gemeint waren `_afaLinear` und `_afaSonder7b`, die Aufteilung
+der Gebäude-AfA.
+
+**Sie tat es nicht.** Die Funktion baut ihr `values`-Objekt
+ausschliesslich aus einer `fields`-Liste, und dort stehen nur
+Formularfelder. Die beiden Unterstrich-Werte standen nie darin.
+
+Aufgefallen erst beim Bauen von `v1258` — Migration, Backend-Route,
+Sendeweg, alles fertig — als der Funktionslauf zeigte:
+
+```
+_computeYearTotal(...).values -> afa: 1936
+                                 _afaLinear: undefined
+                                 _afaSonder7b: undefined
+```
+
+**Ohne diesen Lauf wäre die Migration sauber durchgelaufen und hätte für
+immer NULL geschrieben.** Die Spalten wären da, die Route korrekt, die
+Prüfung „ist die Migration angekommen?" positiv — und das Ergebnis leer.
+
+**Ein Kommentar ist eine Behauptung, kein Nachweis.** Wer auf ihn baut,
+prüft den Wert am Ende der Kette — nicht die Zeile, die ihn verspricht.
+
+> Und: **eine Feldliste, die als Filter dient, ist ein stiller
+> Ausschluss.** `fields.forEach` überträgt genau, was drinsteht; alles
+> andere fehlt, ohne Fehler und ohne Warnung.

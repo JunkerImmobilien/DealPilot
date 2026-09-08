@@ -8673,6 +8673,65 @@ zurückgestellt, bis Marcel es ausdrücklich als Ausbau beauftragt.
 **Commits.** `bfba658` (`v1256`) · `acc2024` (`v1257`) · `e27e568`
 (FALLEN).
 
+## Rollout-Journal · 08.09.2026 — `v1258`/`v1258b`, die § 7b-Spalte
+
+**Marcels Freigabe.** Der letzte Punkt, der eine Datenbankänderung
+brauchte, stand seit `v1225` offen.
+
+**Das Problem.** `tax_records.afa` führte lineare Gebäude-AfA und § 7b in
+**einer** Zahl. Für das geöffneten Objekt war die Aufteilung seit `v1225`
+bekannt, für einen gespeicherten Satz nicht — die Anlage V verlangt sie
+aber: Zeile 35 nimmt die lineare AfA, Zeile 38 die erhöhten Absetzungen
+nach § 7b. Wer den gespeicherten Satz ausdruckte, musste selbst rechnen.
+
+**Migration 070** legt `afa_linear` und `afa_sonder_7b` an.
+
+> **Warum zwei Spalten und nicht eine:** `afa` **bleibt** und behält seine
+> Bedeutung — die Summe. Alles, was damit rechnet (`immo_result`,
+> `tax_before/after`, jede Auswertung, jeder Export), liest weiter
+> dieselbe Zahl. Die neuen Spalten sind eine **Auskunft** über die
+> Zusammensetzung, keine zweite Wahrheit. Wäre `afa` zur linearen AfA
+> umgedeutet worden, hätte sich jede gespeicherte Steuerlast rückwirkend
+> verschoben.
+>
+> **NULL statt null Euro:** der Altbestand bekommt `NULL`. „Nicht
+> erhoben" ist etwas anderes als „kein § 7b", und für alte Sätze wissen
+> wir es nicht. Deshalb steht an diesen beiden Werten als einzigen **kein
+> `|| 0`** — im Frontend nicht und im Service nicht. Der Zeile-38-Hinweis
+> der Anlage V bleibt für genau diese Fälle stehen.
+
+### `v1258b` — die Kette riss eine Stelle früher
+
+Migration, Route, Sendeweg waren fertig, als der Funktionslauf zeigte:
+
+```
+_computeYearTotal(...).values -> afa: 1936
+                                 _afaLinear: undefined
+                                 _afaSonder7b: undefined
+```
+
+`_computeYearTotal` baut `values` ausschliesslich aus seiner
+`fields`-Liste — dort stehen nur Formularfelder, und die beiden
+Unterstrich-Werte standen nie darin. **Der Kommentar bei `tax.js:1061`
+behauptete seit `v1225` das Gegenteil** („reicht sie weiter"). Das war
+falsch; ich habe es zurückgenommen und den Satz dort korrigiert.
+
+**Ohne diesen Lauf wäre die Migration sauber durchgelaufen und hätte für
+immer NULL geschrieben.**
+
+**Nachweis, ganze Kette:**
+
+| | |
+|---|---|
+| Rechnung | `afa 1936` = `_afaLinear 1936` + `_afaSonder7b 0` |
+| Datenbank (Staging) | zehn Sätze, bei allen `afa_linear + afa_sonder_7b = afa` |
+| Altbestand | `afa` unverändert, neue Spalten `NULL` |
+| Prod nach Migration | 280 Sätze, 280 mit `afa`, 0 mit Aufteilung — unberührt |
+
+**Commits.** `0b5f075` (`v1258`) · `784380a` (`v1258b`) · `84ab605`
+(Prod-Merge). Beide Umgebungen neu gebaut, beide Datenbanken vorher
+gesichert.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
