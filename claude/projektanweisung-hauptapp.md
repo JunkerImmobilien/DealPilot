@@ -9238,6 +9238,65 @@ nach dem Speichern, Handy oder Rechner.
 Gold-Audit nach jedem Schritt RC=0 — er hat dabei einmal **mein eigenes
 frisches Hartgold** im Knopf-Stil gefangen (`v1263`), tokenisiert.
 
+## Rollout-Journal · 08.09.2026, fünfter Teil — Prod-Rollout und `v1265`
+
+### Prod-Rollout `v1260`–`v1264`
+
+Marcels Freigabe: „ja rollout". Merge `b0e7976`, Prod von `f311d8f` auf
+`b0e7976`. **Keine Migration** („No new migrations to apply"), Backend neu
+gebaut und gesund, Gold-Audit auf Prod RC=0. Beide Datenbanken vorher
+gesichert (`haupt-20260908-1814.sql.gz` 11 MB,
+`mb-20260908-1814.sql.gz` 685 KB).
+
+### `v1265` · Amtlicher Bodenrichtwert zuerst
+
+Marcels Hinweis: *„der Bodenrichtwert-Button sollte die
+Bodenrichtwert-Funktion aufrufen, so wie wir sie im Marktbericht
+verwenden. Dort haben wir ja mittlerweile alle Bundesländer oder? Prüf das
+nochmal."*
+
+**Geprüft — er hat recht.** `/marktbericht/boris/coverage` meldet
+**11 von 11 Ländern live, 0 eingeschränkt**, darunter zwei bundesweite
+BORIS-D-Quellen als `catchAll`. Schleswig-Holstein, Bayern,
+Baden-Württemberg und das Saarland tragen „Freigabe (Aktennotiz Junker
+Solution)".
+
+> **Der Kopfkommentar der Registry ist veraltet.** Er sagt noch „BW:
+> Vermarktung untersagt, Bayern: gebuehrenpflichtig, restliche Laender noch
+> nicht verifiziert" — der Code darunter hat sie alle freigeschaltet.
+
+**Der Unterschied, an denselben Adressen gemessen:**
+
+| Adresse | BORIS | KI-Schätzung |
+|---|---|---|
+| Hüllhorst, Hermannstr. 9 | **90 €/m²**, Stichtag 01.01.2026, Zone 167, 0,5 s | 50–65 €/m², Konfidenz niedrig |
+| Herford, Sachsenstr. 16 | **190 €/m²**, Zone 99173, 0,4 s | nichts gefunden |
+| Stuttgart, Marktplatz | **7.700 €/m²**, Zone 14605025 | — |
+| München, Marienplatz | kein Wert (Lage ohne Zone) | 5.000 €/m², niedrig |
+
+**Die 90 €/m² sind genau der Wert, mit dem das Testobjekt Hüllhorst in
+`CLAUDE.md` rechnet** (`950 × 90 + 828 × 5`). BORIS ist also nicht nur
+genauer, sondern die Quelle, gegen die ohnehin geprüft wird — mit Stichtag
+und Bodenrichtwertzone, beides gutachterlich zitierfähig. Dazu schneller
+und kostenlos, während die Schätzung einen KI-Aufruf verbraucht.
+
+Die Automatik aus `v1263` ruft jetzt **BORIS zuerst**; nur wenn dort kein
+Wert liegt, kommt die Schätzung. Beide Knöpfe bleiben von Hand bedienbar.
+
+**Gemessen nach dem Rollout:** Hüllhorst eingetippt → `brw` = **90**
+(amtlich, nicht die Schätzung). München eingetippt → BORIS leer → Rückfall
+greift, 5.000 €/m² mit „Niedrige Konfidenz · Nur grobe Schätzung".
+
+> **Zweiter Befund:** `borisAvailableForPlz()` hatte als Rückfall
+> `{sh:1, by:1, bw:1, sl:1}` — vier Länder gesperrt, die längst frei sind.
+> Der Rückfall griff nur bei fehlgeschlagener Coverage-Abfrage und
+> verweigerte dann einen Abruf, der funktioniert hätte. Jetzt leer: im
+> Zweifel probieren. Ein Fehlversuch kostet eine halbe Sekunde, ein zu
+> Unrecht gesperrtes Land kostet den amtlichen Wert.
+
+**Commits.** `b0e7976` (Prod-Merge) · `67e9da1` (`v1265`).
+`v1265` ist auf Staging, **noch nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

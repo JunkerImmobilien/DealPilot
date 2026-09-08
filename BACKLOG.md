@@ -38,8 +38,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 08.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging auf `5a17d52`. **Produktion auf
-`f311d8f`** — `v1260`…`v1264` sind **noch nicht** auf Prod.
+**Stand:** lokal = GitHub = Staging auf `67e9da1`. **Produktion auf
+`b0e7976`** — `v1260`…`v1264` sind live, **`v1265` noch nicht**.
 
 ### Was jetzt Marcels Angabe braucht
 
@@ -54,7 +54,7 @@ Handy oder Rechner.
 | | Punkt | Stand |
 |---|---|---|
 | 1 | Sprechlauf: kommen alle Felder an | **geprüft** — 16/17, der eine Fehler (Möblierung) ist mit `v1262` behoben |
-| 2 | Bodenrichtwert automatisch nach Adresse | **fertig** (`v1263`), dabei den kaputten Abruf mitrepariert (`v1264`) |
+| 2 | Bodenrichtwert automatisch nach Adresse | **fertig** — `v1263` Automatik, `v1264` der kaputte KI-Abruf repariert, `v1265` **amtlicher BORIS-Wert zuerst** (11 von 11 Ländern live), Schätzung nur als Rückfall |
 | 3 | Pillen unterschiedlich lang einblenden | **offen** — nicht jeder Punkt wird gesagt, der Orbit darf nicht auf eine Antwort warten |
 | 4 | Kontextbezug im Sprechlauf prüfen | **teilweise** — Hausgeld-Aufteilung und Inventar sitzen, weitere Fälle offen |
 | 5 | Chatbot-Dialog statt Monolog, mit Demo | **offen** — größter Brocken, braucht ein Konzept vor dem Bauen |
