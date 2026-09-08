@@ -499,8 +499,20 @@
           var cb = _ovT && _ovT.querySelector('.oabi-tbl input[type="checkbox"][data-id="' + id + '"]');
           if (!cb || !cb.checked) return;         /* wird gar nicht übernommen */
           var zeile = cb.closest('tr');
-          var zellen = zeile ? zeile.querySelectorAll('td') : [];
-          var kommt = zellen.length ? String(zellen[zellen.length - 1].textContent || '').trim() : '';
+          /* v1267b: NICHT die letzte Zelle — die traegt die Quelle
+             („Sprachaufzeichnung"). Im Browser gemessen ist die Reihenfolge
+             Haken · Label · WERT · Quelle(.src). Also die Zelle vor `.src`,
+             mit der vorletzten als Rueckfall, falls die Klasse mal fehlt. */
+          var kommt = '';
+          if (zeile) {
+            var srcTd = zeile.querySelector('td.src');
+            var wertTd = srcTd ? srcTd.previousElementSibling : null;
+            if (!wertTd) {
+              var alle = zeile.querySelectorAll('td');
+              wertTd = alle.length >= 2 ? alle[alle.length - 2] : null;
+            }
+            kommt = wertTd ? String(wertTd.textContent || '').trim() : '';
+          }
           /* Ziffern vergleichen, damit „200.000" und „200000" nicht als
              Änderung durchgehen — sonst warnt es bei jeder Formatierung. */
           var nurZiffern = function (s) { return s.replace(/[^0-9a-zA-ZäöüÄÖÜß]/g, '').toLowerCase(); };
