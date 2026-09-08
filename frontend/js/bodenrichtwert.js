@@ -413,11 +413,126 @@
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else setTimeout(go, 300);
   })();
 
+  /* ═══ v1263 · Der Bodenrichtwert holt sich selbst ═══════════════════════
+     Marcels Auftrag vom 08.09.2026: „kann man das auch so machen, dass wenn
+     die Objektadresse eingegeben wurde, automatisch der Bodenrichtwert
+     eingetragen wird? Wenn die Adresse geändert wird, dann wird er halt
+     wieder abgerufen oder mit Button neben dem Eingabefeld."
+
+     Den KNOPF gab es schon (#brw-ai-btn, direkt neben dem Feld) — was
+     fehlte, war das Von-selbst.
+
+     DREI REGELN, und jede hat einen Grund:
+
+     1. NUR wenn das Feld LEER ist. Ein eingetragener Bodenrichtwert ist
+        oft von BORIS abgeschrieben oder aus einem Gutachten — der ist mehr
+        wert als jede Schätzung und wird nie überschrieben.
+
+     2. NUR EINMAL je Adresse. Der Abruf ist ein KI-Aufruf. Ohne Merker
+        würde jede Änderung an PLZ, Ort oder Straße einen neuen auslösen —
+        beim Tippen von „32052" wären das fünf.
+
+     3. Bei GEÄNDERTER Adresse und gefülltem Feld wird NICHT nachgeladen,
+        sondern der Knopf markiert. Sonst überschreibt ein Tippfehler in der
+        Hausnummer stillschweigend einen geprüften Wert. Der Nutzer sieht,
+        dass etwas nachzuholen ist, und entscheidet.
+
+     Ausgelöst wird verzögert (1,2 s nach der letzten Eingabe), damit
+     zwischen zwei Tastenanschlägen nichts losläuft. */
+  var _brwAuto = { letzteAdresse: '', timer: null, laeuft: false };
+
+  function _adresseJetzt() {
+    var plz = _val('plz'), ort = _val('ort'), str = _val('str');
+    if (!plz || !ort) return '';               /* unvollständig — nichts tun */
+    if (String(plz).length < 5) return '';     /* halb getippte PLZ ist keine */
+    return (plz + '|' + ort + '|' + str).toLowerCase();
+  }
+
+  function _brwLeer() {
+    var el = _el('brw');
+    return !el || String(el.value || '').trim() === '';
+  }
+
+  function _knopfMarkieren(an) {
+    var btn = document.getElementById('brw-ai-btn');
+    if (!btn) return;
+    btn.classList.toggle('brw-veraltet', !!an);
+    btn.title = an
+      ? 'Die Adresse hat sich geändert — Bodenrichtwert neu abrufen'
+      : 'DealPilot schätzt den Bodenrichtwert anhand der Adresse — bitte trotzdem auf BORIS verifizieren';
+  }
+
+  function _brwAutoPruefen() {
+    try {
+      var adr = _adresseJetzt();
+      if (!adr) return;
+      if (adr === _brwAuto.letzteAdresse) return;
+
+      if (!_brwLeer()) {
+        /* Feld gefüllt: nur markieren, sobald die Adresse wirklich eine
+           andere ist als die, zu der der Wert gehört. Beim ERSTEN Erkennen
+           einer Adresse (letzteAdresse noch leer) wäre das ein Fehlalarm —
+           dann stammt der Wert ja aus dem geladenen Objekt. */
+        if (_brwAuto.letzteAdresse) _knopfMarkieren(true);
+        _brwAuto.letzteAdresse = adr;
+        return;
+      }
+
+      if (_brwAuto.laeuft) return;
+      _brwAuto.letzteAdresse = adr;
+      _brwAuto.laeuft = true;
+      _knopfMarkieren(false);
+      Promise.resolve(askAi()).catch(function () {}).then(function () {
+        _brwAuto.laeuft = false;
+      });
+    } catch (e) { _brwAuto.laeuft = false; }
+  }
+
+  function _brwAutoAnstossen() {
+    if (_brwAuto.timer) clearTimeout(_brwAuto.timer);
+    _brwAuto.timer = setTimeout(_brwAutoPruefen, 1200);
+  }
+
+  (function _wireBrwAuto() {
+    function go() {
+      try {
+        ['plz', 'ort', 'str', 'hnr'].forEach(function (id) {
+          var e = _el(id);
+          if (e && !e._brwAutoWired) {
+            e._brwAutoWired = 1;
+            e.addEventListener('input', _brwAutoAnstossen);
+            e.addEventListener('change', _brwAutoAnstossen);
+          }
+        });
+        /* Ein Objektwechsel füllt die Felder ohne input-Event. Den Merker
+           dabei zurücksetzen, sonst hielte die Automatik die Adresse des
+           VORIGEN Objekts für die aktuelle und bliebe stumm. */
+        if (!window._brwAutoObjWired) {
+          window._brwAutoObjWired = 1;
+          /* v1263: `dp:object-ready` auf WINDOW — gemessen in storage.js:115.
+             Ein `dp:obj-loaded` auf document gibt es nicht; inventar-sync.js
+             hört auf ein drittes, ebenfalls nirgends gefeuertes
+             `dp:object-loaded`. Namen raten kostet hier nichts sichtbar:
+             der Listener schweigt einfach für immer. */
+          window.addEventListener('dp:object-ready', function () {
+            setTimeout(function () {
+              _brwAuto.letzteAdresse = _adresseJetzt();
+              _knopfMarkieren(false);
+            }, 300);   /* die Felder werden nach dem Event befüllt */
+          });
+        }
+      } catch (e) {}
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
+    else go();
+  })();
+
   window.DealPilotBrw = {
     openBoris: openBoris,
     fetchBoris: fetchBoris,
     refreshBorisBtn: _refreshBorisBtn,
     askAi: askAi,
+    autoPruefen: _brwAutoPruefen,   /* v1263: Prüfhaken, damit die Automatik messbar ist */
     renderResult: _renderResult,
     clearResult: _clearResult,
     _debug: { plzToBundesland: _plzToBundesland, BORIS_URLS: BORIS_URLS }
