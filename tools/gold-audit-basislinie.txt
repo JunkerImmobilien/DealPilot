@@ -1,0 +1,70 @@
+# gold-audit — Basislinie (Altbestand an hartem Gold je Datei)
+# Erzeugt mit: python3 tools/gold-audit.py --basislinie-schreiben
+#
+# Diese Zahlen sind KEIN Ziel, sondern ein Deckel. Sie duerfen sinken,
+# nie steigen. Wer eine Datei ohnehin anfasst und Gold tokenisiert,
+# schreibt die Basislinie danach neu — dann ist der Deckel dichter.
+# Format: <pfad><TAB><anzahl>
+#
+# ASSETS	181
+# ^ Zahl der eingelesenen Dateien. Deckungspruefung: liest ein
+#   spaeterer Lauf deutlich weniger, hat er weniger GESUCHT, nicht
+#   weniger gefunden. Dann ist "sauber" eine Luege.
+#
+# Gesamt zum Zeitpunkt des Einfrierens: 468 Fundstellen in 56 Datei(en)
+js/apikeys.js	1
+js/auth-401-handler.js	2
+js/auth.js	7
+js/autocomplete.js	1
+js/beleg-import.js	2
+js/bmf-modal.js	1
+js/bodenrichtwert.js	2
+js/branding-darstellung.js	3
+js/calc.js	5
+js/charts.js	4
+js/config.js	10
+js/d1-type-handler.js	2
+js/darstellung-reseller.js	4
+js/datenraum.js	4
+js/deal-action-pilot.js	7
+js/dealscore2-ui.js	4
+js/feedback-modal.js	2
+js/financing-pdf.js	3
+js/financing.js	9
+js/help.js	13
+js/immometrica-import.js	2
+js/ki-lage.js	6
+js/ki-miete.js	2
+js/mandanten.js	6
+js/market-rates-pf.js	1
+js/market-rates.js	5
+js/netzwerk-einreichung.js	1
+js/pdf-import.js	4
+js/pricing-modal.js	53
+js/provider-keys.js	2
+js/qc-bridge.js	39
+js/quick-boarding-share.js	18
+js/quick-check.js	3
+js/register-easter-egg.js	7
+js/reseller-portal.js	46
+js/rnd-wizard.js	27
+js/session-expired-banner.js	5
+js/settings.js	26
+js/star-rating.js	1
+js/tax-periods.js	20
+js/tax.js	8
+js/textfarben-karten.js	2
+js/ueberfuehrung-wizard.js	12
+js/ui-varianten.js	10
+js/ui.js	11
+js/voice-import.js	5
+js/wirtschaftlicher-uebergang.js	2
+js/zve-manager.js	9
+js/zve-smart.js	8
+marktbericht-app/app.js	8
+marktbericht-app/feldhilfe.js	1
+marktbericht-app/mb-stufen.js	6
+marktbericht-app/mb-wizard.js	1
+marktbericht-app/wertermittlung.js	5
+pass.html	17
+reseller.html	3

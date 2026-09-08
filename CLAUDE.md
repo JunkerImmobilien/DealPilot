@@ -291,7 +291,33 @@ Jedes Gold-Literal steht als `var(--wl-<hex>, #<hex>)`. Tokens stehen in
 **keinem** `:root`; nur `whitelabel-override.js` setzt sie.
 `DealPilotWhitelabel.apply()` setzt `--gold`, `--gold-hi/-lo/-l/-2/-3/-bg/-d/-soft`,
 `--obsidian` und 25 `--wl-<hex>`-Tokens am `<html>`.
-Vor jedem Rollout: `python3 tools/gold-audit.py`, RC=0 ist sauber.
+Vor jedem Rollout: `python3 tools/gold-audit.py /opt/dealpilot/frontend`,
+RC=0 ist sauber. **Den Pfad mitgeben** — ohne ihn nimmt das Skript seinen
+eingebauten Default, und der stimmt nur auf dem Server.
+
+> **Hier stand bis zum 08.09.2026 nur „RC=0 ist sauber".** Der Audit gab
+> aber seit Langem RC=1 zurück: **468 Fundstellen in 56 Dateien** hartes
+> Gold, das sich beim Mandanten nicht umfärbt. Ein Rot, das immer rot ist,
+> wird nicht gelesen — der Wächter war damit wirkungslos, obwohl er lief.
+>
+> **Seit v1259 vergleicht er gegen `tools/gold-audit-basislinie.txt`** —
+> je Datei eine Zahl, 468 eingefroren. **Mehr als dort steht = rot**, auch
+> wenn die Gesamtzahl gleich bliebe; eine Datei, die dort gar nicht steht,
+> ist immer rot. Weniger = grün mit dem Hinweis, die Basislinie zu senken
+> (`--basislinie-schreiben`). **Der Deckel darf sinken, nie steigen.**
+>
+> Der Altbestand wird abgetragen, wenn eine Datei ohnehin angefasst wird —
+> kein eigener Umbau. Vor dem ersten echten Whitelabel-Kunden gehören die
+> sichtbaren Flächen gezielt nachgezogen: `pricing-modal.js` (53),
+> `reseller-portal.js` (43), `qc-bridge.js` (39). Heute trifft es
+> niemanden — es gibt genau **ein** Partner-Abo.
+>
+> **Beim Einfrieren fiel ein Fehler im Wächter selbst auf:** mit einem
+> RELATIVEN Pfad las er **6 statt 181 Dateien** und meldete trotzdem
+> „sauber" — 175 Dateien ungeprüft. Ursache war eine doppelte
+> Pfadauflösung. Behoben (`BASE` wird absolut), und die Basislinie führt
+> jetzt die Zahl der eingelesenen Dateien mit: unter 90 % Deckung bricht
+> der Audit ab, statt grün zu werden.
 **Statusfarben nie tokenisieren** — Grün und Rot bleiben in jeder Marke gleich.
 
 **Anbieter-Neutralität:** Sprengnetter und PriceHubble nie namentlich nach
