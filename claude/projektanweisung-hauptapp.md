@@ -8732,6 +8732,207 @@ immer NULL geschrieben.**
 (Prod-Merge). Beide Umgebungen neu gebaut, beide Datenbanken vorher
 gesichert.
 
+## Rollout-Journal · 08.09.2026, zweiter Teil — `v1259`, der Gold-Audit und die Sprachaufzeichnung
+
+**Marcels Auftrag.** Zwei Themen in einem Zug: „mit dem gold audit musst du
+mir genau erklären was da los ist und was wir ändern sollten" — und sechs
+Punkte zur Sprachaufzeichnung, davon einer ausdrücklich zurückgestellt:
+*„doppelte prüfung noch rauslassen."*
+
+---
+
+### `v1259a` — Der Wächter war selbst blind
+
+Der Gold-Audit gab seit Langem `RC=1` zurück: **468 Fundstellen in 56
+Dateien** hartes Gold, das sich beim Mandanten nicht umfärbt. **Ein Rot,
+das immer rot ist, wird nicht gelesen** — der Wächter lief und war
+wirkungslos.
+
+**Marcels Entscheidung: den Deckel drauf, nicht alles nachziehen.** Es gibt
+genau ein Partner-Abo; 56 Dateien mit Gold in Gradienten, `color-mix` und
+Inline-Stilen anzufassen wäre viel Risiko für einen Nutzen, den heute
+niemand hat.
+
+Seit `v1259a` vergleicht er gegen `tools/gold-audit-basislinie.txt` — je
+Datei eine Zahl. **Mehr = rot**, auch wenn die Gesamtsumme gleich bliebe;
+eine Datei, die dort gar nicht steht, ist immer rot. Weniger = grün mit
+dem Hinweis, den Deckel zu senken. Fehlt die Basislinie, gilt das alte
+strenge Verhalten.
+
+> **Beim Einfrieren fiel ein Fehler im Wächter selbst auf.** Mit einem
+> RELATIVEN Pfad (`gold-audit.py frontend`) las er **6 statt 181 Dateien** —
+> 175 ungeprüft — und meldete trotzdem „sauber". Ursache: die gefundenen
+> Treffer wurden ein zweites Mal gegen `BASE` aufgelöst, aus
+> `frontend/js/auth.js` wurde `frontend/frontend/js/auth.js`, die Datei gibt
+> es nicht, sie flog raus. **Ein Prüfer, der bei falschem Aufruf grün wird,
+> ist gefährlicher als keiner.** Behoben (`BASE` wird absolut), dazu als
+> Gürtel eine Deckungsprüfung: die Basislinie führt die Zahl der
+> eingelesenen Dateien mit (`# ASSETS 181`), unter 90 % bricht der Audit ab.
+
+**Gegenprobe, vier Fälle auf Staging:**
+
+| Fall | Ergebnis |
+|---|---|
+| absoluter Pfad, unverändert | `RC=0` „genau auf der Basislinie" |
+| relativer Pfad (die alte Falle) | `RC=0`, jetzt 181 statt 6 Dateien |
+| Gold in `apikeys.js` + `dashboard.js` | `RC=1`, „1 → 2" und „0 → 1 (Datei war sauber!)" |
+| Pfad mit nur 2 Dateien | `RC=1` „DECKUNG ZU GERING: 2 von 181" |
+
+**Der Altbestand wird abgetragen, wenn eine Datei ohnehin angefasst wird.**
+Vor dem ersten echten Whitelabel-Kunden gehören die sichtbaren Flächen
+gezielt nachgezogen: `pricing-modal.js` (53), `reseller-portal.js` (43),
+`qc-bridge.js` (39).
+
+---
+
+### `v1259`/`v1259b` — Die Sprachaufzeichnung
+
+**1 · Das Kerosin-Modal vor der Aufnahme ist weg.** Es war ohnehin unwahr
+geworden: seit `v1183` zieht `/ai/extract-voice` **kein Kerosin mehr ab**
+(`ai.js:513`, „im Plan enthalten"). Das Modal kündigte eine Belastung an,
+die nicht stattfand. `voice` fällt aus der Kostenliste `KL` — **entfernt,
+nicht auf 0 gesetzt**: der Filter darunter prüft auf `!= null`, eine Null
+stünde weiterhin mit „0 L" im Kasten. Für PriceHubble und Sprengnetter
+bleibt die Frage, die kosten wirklich. Das „(1 L)" auf dem Weiter-Knopf ist
+an allen drei Stellen raus.
+
+**2 · Sprechdauer 2 → 4 Minuten.** Die 120 s standen seit `v512` als
+„Kostenkontrolle" da. Was das wirklich kostet, steht unten — es ist fast
+nichts.
+
+**3 · Ein Orbit statt fünf Etappen.** Bis `v1258` zeigte der Orbit immer
+nur EINE Kategorie und sprang weiter, sobald sie voll war. **Wer den
+Kaufpreis nachschob, während der Orbit schon bei „Finanzierung" stand, sah
+seine Bestätigung nicht** — sie lag in einer ausgeblendeten Gruppe. Jetzt:
+acht feste **Plätze** um das Mikro. Ein erkanntes Wort leuchtet 900 ms grün
+nach, verschwindet, und das nächste offene rückt **genau dort** nach.
+Plätze statt Positionen ist der Punkt — beim Neuverteilen im Kreis hüpfte
+sonst bei jedem erkannten Wort die ganze Wolke.
+
+**4 · Fragen statt Schlagwörter** bei den Freitextfeldern: „Gibt es
+Risiken?", „Warum dieses Objekt?", „Was wird mitverkauft?", „Wie ist die
+Region?". Bei Zahlenfeldern bleibt es beim Schlagwort — „Kaufpreis" ist als
+Pille kürzer und genauso klar. **`thesis`, `risiken` und `notizen` standen
+bisher in KEINEM Chip**: ausgewertet wurden sie schon (voller Katalog seit
+`v519`), aber niemand wurde aufgefordert, sie zu sagen — deshalb blieben
+sie fast immer leer.
+
+> **`v1259b`: die drei neuen Pillen waren zuerst unsichtbar.** Im Browser
+> gezählt statt geglaubt: **28 statt 31**. `WL_GROUPS` hatte fünf Einträge,
+> `WL` kannte längst ein `g:5` (Nachfrage, Bevölkerung, Marktmiete,
+> Miet-/Wertsteigerung, Mietausfallwagnis) — und beide Render-Schleifen
+> laufen `gi < WL_GROUPS.length`. **Gruppe 5 wurde nie durchlaufen.** Nie
+> aufgefallen, weil alle sechs `noc:1` tragen und ohnehin keine Pille
+> bekommen; ich hatte meine drei Neuen an genau dieses `g:5` gehängt.
+> Jetzt heißt 5 `Markt` und die Einschätzung bekommt Gruppe 6.
+
+**Gemessen auf Staging** (Mikrofonquelle durch einen stummen `MediaStream`
+ersetzt — nur die Quelle, die Anzeige-Logik lief echt):
+
+| | |
+|---|---|
+| Kerosin-Modal | erscheint nicht mehr, Sprach-Modal direkt auf |
+| Weiter-Knopf | „Weiter — auswerten", ohne Litertank |
+| Kopfzeile | „Bis zu 4 Minuten", Uhr läuft |
+| Pillen | 31 gebaut, 8 sichtbar auf 8 gleichmäßigen Ringplätzen (R = 168) |
+| Kopfzeile Orbit | „NOCH OFFEN · 31 Angaben" statt „Kategorie 1 / 5" |
+| Nachrücken | PLZ/Ort/Wohnfläche grün → weg → Kaufdatum/Übergang/Kaufpreis auf **exakt denselben drei Koordinaten**; die anderen fünf unbewegt |
+
+Dafür gibt es jetzt `window.VoiceImport._orbit` — ein **Prüf-Haken, kein
+Bedienweg**. Ohne ihn ließe sich das Nachrücken nur durch echtes Sprechen
+auslösen, und im automatisierten Browser gibt es kein Mikrofon. Vorbild:
+`window._dpDispSkin`.
+
+---
+
+### `v1259c`/`v1259d` — Was die Sprachaufzeichnung kostet
+
+Marcels Frage: *„Was kostet uns denn jetzt diese Sprachaufzeichnung?
+Können wir das irgendwie ermitteln?"*
+
+**Der naheliegende Weg ist versperrt:** die Nutzungs-API von OpenAI
+antwortet mit `Missing scopes: api.usage.read` — unser Schlüssel hat die
+Berechtigung nicht, dafür bräuchte es einen Admin-Key.
+
+**Der bessere Weg lag näher:** jede OpenAI-Antwort trägt ihren Verbrauch
+selbst mit. `voiceExtractService` hat ihn bis `v1258` weggeworfen — es las
+`data.text` bzw. `data.output` und ließ `data.usage` liegen. Jetzt wird er
+an allen **vier** Stellen eingesammelt: Transkription, Auswertung,
+Gegenprüfung und die Live-Hilfe während des Sprechens. Die läuft bis zu
+sechsmal je Aufnahme; ohne sie zählte die Rechnung nur die Hälfte.
+
+**Was gemessen ist und was angenommen:** die **Tokenzahlen sind gemessen**,
+sie kommen von OpenAI. Die **Preise sind hinterlegte Annahmen**, und
+deshalb trägt jeder Posten ein `bepreist ja/nein`. Nachtragen ohne
+Codeänderung: `OPENAI_PREISE` (USD je 1 Mio Token), `OPENAI_USD_EUR`.
+
+**Ein echter Lauf** (45 s Diktat, 174 Katalogfelder, TTS-erzeugte
+Sprachdatei, danach gelöscht):
+
+| Schritt | Modell | ein | aus |
+|---|---|---|---|
+| Transkription | `gpt-4o-transcribe` | 505 (Audio) | 165 |
+| Auswertung | `gpt-5.4-mini` | **6.044** | 150 |
+
+Gesamtdauer 5,6 s, **19 von 19 genannten Feldern erkannt**, Hausgeld
+250 − 80 = 170 korrekt aufgeteilt (Prompt-Regel 13).
+
+> **Die Zahl, auf die es ankommt:** von den 6.044 Eingabe-Token der
+> Auswertung sind nur rund **165 das Gesagte** — der Rest ist der
+> Feldkatalog. **Die Kostenlast ist der Katalog, nicht die Sprechdauer.**
+> Damit ist belegt, was zu 2 → 4 Minuten behauptet worden war: länger
+> sprechen kostet fast nichts. Wer die Kosten wirklich senken will, kürzt
+> den Katalog — nicht die Redezeit.
+
+**`v1259d` — die laufenden Modelle sind andere als die Code-Vorgaben.**
+Gemessen mit `printenv` IM Container:
+
+| | Code-Default | läuft wirklich |
+|---|---|---|
+| Transkription | `gpt-4o-mini-transcribe` | **`gpt-4o-transcribe`** |
+| Auswertung | `gpt-5.5` | **`gpt-5.4-mini`** |
+| Live-Hilfe | `gpt-4o-mini` | `gpt-4o-mini` |
+
+**`v1169` hat den Transkriptions-Default bewusst auf das mini gestellt, um
+Tempo zu gewinnen — die ENV setzt weiter das große Modell. Diese
+Optimierung ist im Betrieb nie angekommen.** Direktvergleich derselben
+Datei: 2944 ms (groß) gegen 1864 ms (mini).
+
+> **Über die QUALITÄT sagt der Vergleich nichts.** Dieselbe Datei ergab bei
+> zwei Läufen desselben großen Modells zwei verschiedene Ortsnamen
+> („Hüllhorst" und „Höhlhorst"). **Transkription ist nicht deterministisch**
+> — aus einem Einzellauf je Modell wäre fast eine Qualitätsaussage
+> geworden, die keine ist. Ob die ENV so bleibt, ist Marcels Entscheidung.
+
+**Nebenbefund, mitrepariert:** `logExtract` stand in der Route **zweimal**
+hintereinander — einmal im `if`-Block für den Server-Key, einmal
+ungeschützt danach. Jede Sprachauswertung schrieb zwei Zeilen ins
+Protokoll, und bei eigenem Nutzerschlüssel sogar eine, obwohl wir gar
+nichts bezahlt haben.
+
+**Anzeige der Kosten:** nicht für jeden. Für einen Kunden ist die
+Auswertung im Plan enthalten — eine Cent-Angabe würde ihn nur fragen
+lassen, was sie ihm abzieht. Einschalten mit **`?kosten=1`** an der Adresse
+(merkt es sich), abschalten mit `?kosten=0`. In Browser-Konsole und
+Server-Log steht sie immer.
+
+---
+
+**Offen und Marcels Entscheidung:**
+
+- **Der Listenpreis von `gpt-5.4-mini`** fehlt — ausgerechnet das Modell,
+  das die Auswertung macht. Ohne ihn bleibt der größte Posten unbepreist.
+  Zwei Wege: den Preis eintragen (`OPENAI_PREISE`) oder dem API-Schlüssel
+  `api.usage.read` geben.
+- **Die doppelte Prüfung** (`OPENAI_VOICE_VERIFY=1`) bleibt auf Marcels
+  Wunsch weiter aus.
+- **`OPENAI_TRANSCRIBE_MODEL`** — großes oder mini-Modell.
+- **Prod-Rollout** von `v1259`–`v1259d` steht noch aus.
+
+**Commits.** `e898f4f` (`v1259a`) · `6ce1894` (`v1259`) · `a60de87`
+(`v1259b`) · `56b4571` (`v1259c`) · `19b6566` (`v1259d`). Staging-Backend
+zweimal neu gebaut.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

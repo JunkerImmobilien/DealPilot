@@ -36,7 +36,60 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Stand 07.09.2026, abends)
+## → HIER WEITERMACHEN (Stand 08.09.2026, mittags)
+
+**Stand:** lokal = GitHub = Staging auf `19b6566`. **Produktion auf
+`84ab605`** — `v1259`…`v1259d` sind **noch nicht** auf Prod.
+
+**Zuletzt fertig: `v1259`–`v1259d` — Gold-Audit und Sprachaufzeichnung.**
+Vier von sechs Punkten aus Marcels Sprechlauf-Liste; die doppelte Prüfung
+bleibt auf seinen Wunsch aus. Nachweis im Journal der Projektanweisung.
+
+### Was jetzt Marcels Entscheidung braucht
+
+1. **Prod-Rollout `v1259`…`v1259d`.** Frontend-Änderungen plus ein
+   Backend-Rebuild (Kostenerfassung). Keine Migration, keine
+   Datenbankberührung.
+
+2. **Der Listenpreis von `gpt-5.4-mini`.** Das ist das Modell, das die
+   Sprachauswertung wirklich macht — und der mit Abstand größte Posten
+   (6.044 Eingabe-Token je Aufnahme). Ohne den Preis bleibt die
+   Kostenanzeige unvollständig. **Zwei Wege:** den Preis eintragen
+   (`OPENAI_PREISE='{"gpt-5.4-mini":{"ein":X,"aus":Y}}'`, USD je 1 Mio) —
+   oder dem OpenAI-Schlüssel die Berechtigung `api.usage.read` geben, dann
+   lässt sich die echte Abrechnung abfragen.
+
+3. **`OPENAI_TRANSCRIBE_MODEL` — groß oder mini?** Auf dem Server steht
+   `gpt-4o-transcribe`, obwohl `v1169` den Code-Default bewusst auf
+   `gpt-4o-mini-transcribe` gestellt hat, um Tempo zu gewinnen. **Die
+   Optimierung ist im Betrieb nie angekommen.** Gemessen: 2944 ms gegen
+   1864 ms an derselben Datei. **Über die Qualität sagt das nichts** —
+   dieselbe Datei ergab bei zwei Läufen desselben Modells zwei
+   verschiedene Ortsnamen. Wer das entscheiden will, braucht eine
+   Messreihe, keinen Einzellauf.
+
+4. **Der Gold-Altbestand.** 468 Fundstellen sind jetzt als Basislinie
+   eingefroren, der Wächter meldet nur noch Neues. Abgetragen wird, wenn
+   eine Datei ohnehin angefasst wird. Vor dem ersten echten
+   Whitelabel-Kunden gehören `pricing-modal.js` (53),
+   `reseller-portal.js` (43) und `qc-bridge.js` (39) gezielt nachgezogen.
+
+### Was aus der Sprechlauf-Liste noch offen ist
+
+Marcels sechs Punkte, Stand nach `v1259d`:
+
+| | Punkt | Stand |
+|---|---|---|
+| 1 | Kerosin-Modal vor der Aufnahme weg | **fertig** |
+| 2 | Ein Orbit statt fünf Tabs, Grünes verschwindet | **fertig** |
+| 3 | Doppelt auf Plausibilität prüfen | **zurückgestellt** — Marcels Wunsch vom 08.09. Der Code liegt vollständig da, `OPENAI_VOICE_VERIFY=1` schaltet ihn an |
+| 4 | Freitextfelder als Fragen | **fertig** |
+| 5 | Sprechdauer auf 4 Minuten | **fertig** |
+| 6 | Was kostet die Sprachaufzeichnung | **fertig, aber unvollständig** — siehe Punkt 2 oben |
+
+---
+
+## → ARCHIV: Übergabe 07.09.2026, abends
 
 **Stand:** lokal = GitHub = Staging auf `784380a`, **Produktion auf
 `9ff1190`**. **`v1215`–`v1253` sind live** — die Preisrunde ist
