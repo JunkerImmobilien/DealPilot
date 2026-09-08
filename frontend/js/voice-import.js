@@ -12,7 +12,7 @@
  *       (Web Speech API als Vorschau; Browser ohne Web Speech: Pegel +
  *       Hinweis). MASSGEBLICH ist immer die Audio-Aufnahme am Backend.
  *     - Recorder-Buttons: Pause / Fortsetzen / Stopp
- *     - "Weiter \u2014 auswerten (1 L)" -> Audio + Laufzeit-Feldkatalog an
+ *     - "Weiter \u2014 auswerten" -> Audio + Laufzeit-Feldkatalog an
  *       POST /api/v1/ai/extract-voice
  *   Ergebnis laeuft ueber die ECHTE Import-Mechanik (ObjectActions._voice
  *   Bridge, v503-voice-bridge): renderMergedTable (gleiche Tabelle/Optik
@@ -28,7 +28,14 @@
   if (window.VoiceImport) return;
 
   var TOKEN_KEY = 'ji_token';
-  var MAX_SEC = 120;  /* v512: Aufnahme auf 2 Minuten begrenzt (Kostenkontrolle) */
+  /* v1259 · Sprechdauer 2 -> 4 Minuten. Marcels Auftrag vom 08.09.2026.
+     Die 120 s standen seit v512 als "Kostenkontrolle" da. Gemessen kostet
+     die Transkription 0,003 $/Minute (gpt-4o-mini-transcribe) — zwei
+     Minuten mehr sind ein halber Cent. Der teure Teil ist die Extraktion,
+     und die haengt am Feldkatalog, nicht an der Laenge des Diktats.
+     Das Backend-Limit liegt bei 26 MB Base64 (~10 Minuten Opus), 4 Minuten
+     bleiben also weit darunter. */
+  var MAX_SEC = 240;
   var API_TIMEOUT = 180000;
 
   var st = {
@@ -248,6 +255,7 @@
       if (tag !== 'INPUT' && tag !== 'SELECT' && tag !== 'TEXTAREA') return;
       if (el.type === 'checkbox' || el.type === 'hidden') return;
       var entry = { id: id, label: w.label, g: w.g };
+      if (w.frage) entry.frage = w.frage;  /* v1259: Freitextfelder werden gefragt, nicht beschriftet */
       if (w.noc) entry.noc = 1;  /* v514: nicht als Chip zeigen/zaehlen, aber beim Auswerten fuellbar */
       if (HINTS[id]) entry.hint = HINTS[id];
       if (tag === 'SELECT') {
@@ -380,7 +388,7 @@
     ov.innerHTML =
       '<div class="oabi-modal">' +
         '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + micSvg(22) + '</span><h3>Sprachaufzeichnung</h3></div>' +
-        '<div class="oabi-sub">Objekt frei einsprechen \u2014 Adresse, Kaufpreis, Fl\u00e4chen, Miete und Zusatzeinnahmen, Zustand, Lage, Bodenrichtwert, Annahmen, Bewirtschaftung, Finanzierung. Freie Formulierungen werden auf die passenden Felder gebr\u00fcckt.</div>' +
+        '<div class="oabi-sub">Objekt frei einsprechen \u2014 Adresse, Kaufpreis, Fl\u00e4chen, Miete und Zusatzeinnahmen, Zustand, Lage, Bodenrichtwert, Annahmen, Bewirtschaftung, Finanzierung \u2014 und was du davon h\u00e4ltst: Risiken, deine These. Freie Formulierungen werden auf die passenden Felder gebr\u00fcckt. Bis zu 4 Minuten.</div>' +
         '<div class="oabi-body">' +
           '<div id="vi-rec">' +
             '<div class="vi-status" id="vi-status"><span class="vi-dot"></span><span class="vi-time" id="vi-time">00:00</span><span id="vi-statetxt">Aufnahme l\u00e4uft \u2026</span></div>' +
@@ -408,7 +416,7 @@
         '</div>' +
         '<div class="oabi-foot">' +
           '<button type="button" class="oabi-btn" id="oabi-cancel">Abbrechen</button>' +
-          '<button type="button" class="oabi-btn primary" id="vi-next">Weiter \u2014 auswerten (1\u00a0L)</button>' +
+          '<button type="button" class="oabi-btn primary" id="vi-next">Weiter \u2014 auswerten</button>' +
           '<button type="button" class="oabi-btn primary" id="oabi-apply" disabled style="display:none">' + checkSvg() + ' Ausgew\u00e4hlte \u00fcbernehmen</button>' +
         '</div>' +
       '</div>';
@@ -484,7 +492,7 @@
       var now = Date.now();
       st.elapsed += (now - st.lastTick) / 1000;
       st.lastTick = now;
-      if (st.elapsed >= MAX_SEC) { stopRecordingKeep(); setState('stopped', '2-Minuten-Limit erreicht \u2014 jetzt auswerten'); }
+      if (st.elapsed >= MAX_SEC) { stopRecordingKeep(); setState('stopped', '4-Minuten-Limit erreicht \u2014 jetzt auswerten'); }
     } else {
       st.lastTick = Date.now();
     }
@@ -615,7 +623,7 @@
     { id:'gba_p',      g:1, noc:1, label:'Grundbuch %',         kw:['grundbuch'] },
     { id:'gest_p',     g:1, noc:1, label:'Grunderwerbsteuer %', kw:['grunderwerbsteuer','grunderwerb'] },
     { id:'san',        g:1, label:'Sanierungskosten',    kw:['sanierung','sanierungskosten','renovierung'] },
-    { id:'moebl',      g:1, label:'Moeblierung',         kw:['moeblierung','inventar','einrichtung'] },
+    { id:'moebl',      g:1, frage:'Was wird mitverkauft?', label:'Moeblierung', kw:['moeblierung','inventar','einrichtung'] },
 
     { id:'nkm',        g:2, label:'Kaltmiete',           kw:['kaltmiete','miete','nettokaltmiete','grundmiete'] },
     { id:'ze',         g:2, label:'Zusatzeinnahmen',     kw:['zusatzeinnahmen','zusatz'] },
@@ -631,9 +639,9 @@
     { id:'brw',        g:4, label:'Bodenrichtwert',      kw:['bodenrichtwert'] },
     { id:'mea',        g:4, label:'Miteigentumsanteil',  kw:['miteigentumsanteil','mea'] },
     { id:'gsfl',       g:4, label:'Grundstuecksflaeche', kw:['grundstueck','grundstuecksflaeche'] },
-    { id:'makrolage',  g:4, label:'Makrolage',           kw:['makrolage','makro','region'] },
-    { id:'mikrolage',  g:4, label:'Mikrolage',           kw:['mikrolage','mikro','viertel','umfeld'] },
-    { id:'ds2_zustand',g:4, label:'Zustand',             kw:['zustand'] },
+    { id:'makrolage',  g:4, frage:'Wie ist die Region?',  label:'Makrolage', kw:['makrolage','makro','region'] },
+    { id:'mikrolage',  g:4, frage:'Wie ist die Strasse?', label:'Mikrolage', kw:['mikrolage','mikro','viertel','umfeld'] },
+    { id:'ds2_zustand',g:4, frage:'In welchem Zustand?',  label:'Zustand',   kw:['zustand'] },
     { id:'ds2_energie',g:4, label:'Energieklasse',       kw:['energie','energieklasse','effizienz'] },
 
     { id:'ds2_nachfrage',    g:5, noc:1, label:'Nachfrage',           kw:['nachfrage'] },
@@ -641,7 +649,28 @@
     { id:'ds2_marktmiete',   g:5, noc:1, label:'Marktmiete',          kw:['marktmiete'] },
     { id:'mietstg',          g:5, noc:1, label:'Mietsteigerung %',    kw:['mietsteigerung'] },
     { id:'wertstg',          g:5, noc:1, label:'Wertsteigerung %',    kw:['wertsteigerung'] },
-    { id:'ds2_mietausfall',  g:5, noc:1, label:'Mietausfallwagnis',   kw:['mietausfall','mietausfallwagnis'] }
+    { id:'ds2_mietausfall',  g:5, noc:1, label:'Mietausfallwagnis',   kw:['mietausfall','mietausfallwagnis'] },
+
+    /* ── v1259 · Die drei Freitextfelder, gefragt statt beschriftet ────────
+       Marcels Auftrag vom 08.09.2026: „Felder wie bekannte Risiken,
+       Investitionsthese — das sind ja keine Schlagwoerter, sondern
+       vielleicht Fragen: Gibt es Risiken? Welche Moeblierung wird
+       mitverkauft?"
+
+       Der Unterschied ist nicht kosmetisch. „Risiken" als Pille sagt einem
+       Sprechenden nicht, was er tun soll — „Gibt es Risiken?" schon. Bei
+       Zahlenfeldern bleibt es beim Schlagwort: „Kaufpreis" ist als Pille
+       kuerzer und genauso klar wie „Was kostet es?".
+
+       Diese drei standen bisher in KEINEM Chip. Ausgewertet wurden sie
+       schon (der volle Katalog aus v519 kennt sie), aber niemand wurde
+       aufgefordert, sie zu sagen — deshalb blieben sie fast immer leer. */
+    { id:'thesis',  g:5, frage:'Warum dieses Objekt?', label:'Investment-These',
+      kw:['these','investmentthese','strategie','warum'] },
+    { id:'risiken', g:5, frage:'Gibt es Risiken?',     label:'Risiken',
+      kw:['risiko','risiken','gefahr','problem','schwachstelle'] },
+    { id:'notizen', g:5, frage:'Sonst noch etwas?',    label:'Notizen',
+      kw:['notiz','anmerkung','bemerkung','uebrigens'] }
   ];
   var WL_MAP = {}; WL.forEach(function (w) { WL_MAP[w.id] = w; });
   /* v517: Quick-Check-Felder (= Keys aus object-actions OBJ2QC + ze_*). Im QC
@@ -659,7 +688,7 @@
     zimmer:'Anzahl Zimmer', etage:'Etage / Geschoss',
     stellpl_aussen:'Anzahl Aussenstellplaetze', garagen:'Anzahl Garagen / Tiefgaragen',
     kp:'Kaufpreis in Euro', san:'Geplante Sanierungs-/Renovierungskosten in Euro',
-    moebl:'Wert der Moeblierung / Inventar in Euro',
+    moebl:'Was wird mitverkauft? Kueche, Moebel, Geraete — Wert in Euro',
     nkm:'Netto-Kaltmiete (ohne Nebenkosten)', ze:'Zusatzeinnahmen pro Monat (Stellplatz, Kueche \u2026) \u2014 Summe',
     hg_ul:'Hausgeld-Anteil, der auf den Mieter UMLEGBAR ist',
     hg_nul:'Hausgeld-Anteil, der NICHT umlegbar ist (traegt der Eigentuemer)',
@@ -672,7 +701,11 @@
     mikrolage:'Lage im Kleinen (Viertel / Strasse / Umfeld)',
     ds2_zustand:'Zustand der Wohnung', ds2_energie:'Energieeffizienzklasse',
     ze_stp:'Stellplatzmiete pro Monat', ze_kueche:'Kuechen-/Inventarmiete pro Monat',
-    ze_sonst:'Sonstige Zusatzeinnahmen pro Monat'
+    ze_sonst:'Sonstige Zusatzeinnahmen pro Monat',
+    /* v1259 — bei den Frage-Pillen erklaert der Tooltip, WAS gemeint ist */
+    thesis:'Warum lohnt sich dieses Objekt? Deine Investment-These in einem Satz',
+    risiken:'Was koennte schiefgehen? Sanierungsstau, Mieter, Lage, Recht …',
+    notizen:'Alles, was sonst noch wichtig ist und kein eigenes Feld hat'
   };
   /* QC-Einzelposten (virtuell) — Gruppe Miete */
   var WL_VIRT = [
@@ -706,7 +739,7 @@
       var m=ov.querySelector('.oabi-modal')||ov; var bg=getComputedStyle(m).backgroundColor;
       var c=/(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec(bg||'');
       if(c){ var lum=0.299*+c[1]+0.587*+c[2]+0.114*+c[3]; ov.classList.toggle('vi-darkbg', lum<128); } }catch(e){} }, 60);
-    _activeGrp = -1;
+    _slots = [];  /* v1259: Plaetze fuer den neuen Aufbau leeren */
     var byGroup = {};
     _catalog.forEach(function (e) {
       if (e.noc) return;  /* NK-Einzelfelder/Markt nicht als Chip */
@@ -718,8 +751,13 @@
     for (var gi = 0; gi < WL_GROUPS.length; gi++) {
       var items = byGroup[gi]; if (!items || !items.length) continue;
       html += items.map(function (e) {
-        var short = (e.label || e.id).split('(')[0].trim();
-        if (short.length > 22) short = short.slice(0, 21) + '\u2026';
+        /* v1259: Fragen gewinnen. `split('(')` darf hier nicht laufen \u2014 eine
+           Frage traegt keine Klammer, ein Label wie \u201eZinsbindung (J.)" schon.
+           Und Fragen duerfen ein paar Zeichen laenger sein: "Was wird
+           mitverkauft?" hat 21, die alte Grenze haette es angeschnitten. */
+        var short = e.frage ? e.frage.trim() : (e.label || e.id).split('(')[0].trim();
+        var grenze = e.frage ? 26 : 22;
+        if (short.length > grenze) short = short.slice(0, grenze - 1) + '\u2026';
         return '<span class="vi-chip" data-cid="' + escH(e.id) + '" data-g="' + gi + '" title="' + escH(EXPLAIN[e.id] || e.label || e.id) + '"><span class="vi-ck">\u2713</span>' + escH(short) + '</span>';
       }).join('');
     }
@@ -727,7 +765,7 @@
     var nk = $('vi-nkhint');
     if (nk) nk.textContent = _qcTarget ? '' : 'Kaufnebenkosten (Makler/Notar/Grundbuch/Grunderwerbsteuer) werden automatisch gef\u00fcllt, wenn du sie nennst.';
     updateChipsCount();
-    chipsNachruecken();   /* v1169-VFENSTER */
+    chipOrbit();   /* v1259 */
   }
   /* ═══ v1169-VFENSTER · Immer nur ein Fenster von Stichwoertern ══════════
      Bisher standen ALLE Chips gleichzeitig da (je nach Modus 30+). Wer
@@ -743,27 +781,100 @@
      `.vi-chip[data-cid=...]` — wer hier Elemente entfernt, bricht drei
      Stellen still. Und der Fortschrittszaehler zaehlt weiter ALLE, nicht die
      sichtbaren; sonst staende dort dauernd „9". */
-  var CHIP_FENSTER = 9;
   var CHIP_NACHLEUCHTEN = 900;   /* ms, in denen das erkannte Wort gruen stehen bleibt */
 
-  function chipsNachruecken() {
+  /* ═══ v1259 · EIN Orbit, keine Etappen ═════════════════════════════════
+     Marcels Auftrag vom 08.09.2026: „Toll waere, wenn wir einfach die
+     Sprachaufzeichnung haben und um dem Sprechsymbol erscheinen einfach
+     Punkte, die wir noch nicht gesagt haben, und die, die gruen sind, die
+     verschwinden dann einfach automatisch."
+
+     WAS WEG IST: die fuenf Kategorien. Bis v1258 zeigte der Orbit immer nur
+     EINE Gruppe (refreshGroupProgress blendete alle anderen per
+     style.display aus) und sprang weiter, sobald sie voll war. Wer beim
+     Sprechen den Kaufpreis nachschob, waehrend der Orbit schon bei
+     „Finanzierung" stand, sah seine Bestaetigung nicht — sie lag in einer
+     ausgeblendeten Gruppe.
+
+     WAS BLEIBT: das Fenster. Nicht 35 Pillen gleichzeitig, sondern SLOT_N
+     Plaetze. Neu daran ist, dass es PLAETZE sind und keine Positionen:
+     jeder Platz hat eine feste Koordinate, ein Chip belegt ihn, und erst
+     wenn es gruen war und verschwindet, rueckt das naechste GENAU DORT
+     nach. Wuerde ich stattdessen bei jedem Nachruecken neu im Kreis
+     verteilen, huepfte bei jedem erkannten Wort die ganze Wolke.
+
+     Reihenfolge = DOM-Reihenfolge = die WL-Liste, also weiterhin
+     Stammdaten zuerst. Die Gruppen leben in WL weiter (die Auswertungs-
+     Karten am Ende nutzen sie), sie steuern nur die Anzeige nicht mehr.
+
+     Alle Chips bleiben im DOM — updateChipsFromText, markChipsFinal und
+     markChipsByIds suchen per `.vi-chip[data-cid=...]`. Wer hier Elemente
+     entfernt, bricht drei Stellen still. */
+  var SLOT_N = 8;
+  var _slots = [];   /* Platz-Index -> Chip-id ('' = frei) */
+
+  function _slotPos(i, n) {
+    var R = 168, ang = (-90 + i * 360 / n) * Math.PI / 180;
+    return { l: 'calc(50% + ' + Math.round(R * Math.cos(ang)) + 'px)',
+             t: 'calc(50% + ' + Math.round(R * Math.sin(ang)) + 'px)' };
+  }
+
+  function chipOrbit() {
     var host = $('vi-chips'); if (!host) return;
-    var chips = host.querySelectorAll('.vi-chip');
-    var offen = 0;
-    Array.prototype.forEach.call(chips, function (c) {
-      if (c.classList.contains('on')) {
-        /* Erkannt: kurz stehen lassen, dann raus. _weg verhindert, dass bei
-           jedem Neuaufruf ein zweiter Timer auf dasselbe Chip laeuft. */
-        if (!c._weg) {
-          c._weg = 1;
-          setTimeout(function () { c.classList.add('vi-weg'); chipsNachruecken(); }, CHIP_NACHLEUCHTEN);
-        }
-        return;
-      }
-      if (c.classList.contains('vi-weg')) return;
-      if (offen < CHIP_FENSTER) { c.classList.remove('vi-aus'); offen++; }
-      else { c.classList.add('vi-aus'); }
+    var chips = Array.prototype.slice.call(host.querySelectorAll('.vi-chip'));
+    if (!chips.length) return;
+    var byId = {};
+    chips.forEach(function (c) { byId[c.getAttribute('data-cid')] = c; });
+
+    /* 1) Erkannt: kurz gruen stehen lassen, dann raeumen. _weg verhindert,
+          dass bei jedem Neuaufruf ein zweiter Timer auf dasselbe Chip laeuft. */
+    chips.forEach(function (c) {
+      if (!c.classList.contains('on') || c._weg) return;
+      c._weg = 1;
+      setTimeout(function () { c.classList.add('vi-weg'); chipOrbit(); }, CHIP_NACHLEUCHTEN);
     });
+
+    /* 2) Plaetze freigeben, deren Chip abgeraeumt ist */
+    for (var i = 0; i < SLOT_N; i++) {
+      var c0 = _slots[i] ? byId[_slots[i]] : null;
+      if (!c0 || c0.classList.contains('vi-weg')) _slots[i] = '';
+    }
+
+    /* 3) Freie Plaetze nachbesetzen. Wer schon steht, BLEIBT stehen. */
+    var belegt = {};
+    _slots.forEach(function (id) { if (id) belegt[id] = 1; });
+    var warte = chips.filter(function (c) {
+      return !belegt[c.getAttribute('data-cid')] &&
+             !c.classList.contains('vi-weg') && !c.classList.contains('on');
+    });
+    for (var k = 0; k < SLOT_N && warte.length; k++) {
+      if (!_slots[k]) _slots[k] = warte.shift().getAttribute('data-cid');
+    }
+
+    /* 4) Anzeigen — nur wer einen Platz hat, und zwar auf seinem Platz.
+          Sichtbarkeit ueber die Klasse, nicht ueber style.display: bis v1258
+          setzte refreshGroupProgress hier inline, und ein inline 'none'
+          schlaegt jede spaetere CSS-Regel. */
+    var platzVon = {};
+    _slots.forEach(function (id, i) { if (id) platzVon[id] = i; });
+    chips.forEach(function (c) {
+      var idx = platzVon[c.getAttribute('data-cid')];
+      if (idx === undefined) { c.classList.add('vi-aus'); return; }
+      c.classList.remove('vi-aus');
+      var p = _slotPos(idx, SLOT_N);
+      c.style.left = p.l; c.style.top = p.t;
+    });
+
+    /* 5) Kopfzeile: kein Kategoriename mehr, nur noch was offen ist. */
+    var cl = $('vi-catline');
+    if (cl) {
+      var offen = chips.filter(function (c) {
+        return !c.classList.contains('on') && !c.classList.contains('pre');
+      }).length;
+      cl.innerHTML = offen
+        ? '<b>NOCH OFFEN</b><span class="vi-catsub">' + offen + ' Angabe' + (offen === 1 ? '' : 'n') + '</span>'
+        : '<b>ALLES ERKANNT</b>';
+    }
   }
 
   function updateChipsFromText(txt) {
@@ -786,7 +897,7 @@
       for (var i = 0; i < kws.length; i++) { if (kws[i] && t.indexOf(_de(kws[i])) >= 0) { chip.classList.add('on'); break; } }
     });
     updateChipsCount();
-    chipsNachruecken();   /* v1169-VFENSTER */
+    chipOrbit();   /* v1259 */
   }
   function markChipsFinal(fields) {
     var host = $('vi-chips'); if (!host) return;
@@ -795,54 +906,7 @@
       if (chip) chip.classList.add('on');
     });
     updateChipsCount();
-    chipsNachruecken();   /* v1169-VFENSTER */
-  }
-  var _activeGrp = -1;  /* v517 */
-  /* v517: markiert komplette Gruppen + scrollt zur ersten offenen Gruppe (gefuehrte Hilfe) */
-  function refreshGroupProgress() {
-    var host = $('vi-chips'); if (!host) return;
-    var chips = host.querySelectorAll('.vi-chip');
-    if (!chips.length) return;
-    var groups = {};
-    Array.prototype.forEach.call(chips, function (c) {
-      var g = +c.getAttribute('data-g');
-      (groups[g] = groups[g] || []).push(c);
-    });
-    var order = Object.keys(groups).map(Number).sort(function (a, b) { return a - b; });
-    function filled(c) { return c.classList.contains('on') || c.classList.contains('pre'); }
-    var active = order[order.length - 1];
-    for (var i = 0; i < order.length; i++) {
-      if (groups[order[i]].some(function (c) { return !filled(c); })) { active = order[i]; break; }
-    }
-    _activeGrp = active;
-    var cl = $('vi-catline');
-    if (cl) {
-      cl.innerHTML = '<b>' + escH((WL_GROUPS[active] || '').toUpperCase()) + '</b>' +
-        '<span class="vi-catsub">Kategorie ' + (order.indexOf(active) + 1) + ' / ' + order.length + '</span>';
-    }
-    var ring = groups[active] || [];
-    var n = ring.length;
-    Array.prototype.forEach.call(chips, function (c) {
-      c.style.display = (+c.getAttribute('data-g') === active) ? '' : 'none';
-    });
-    if (n <= 9) {
-      var R = Math.min(168, 116 + n * 6);
-      ring.forEach(function (c, i) {
-        var ang = (-90 + i * 360 / n) * Math.PI / 180;
-        c.style.left = 'calc(50% + ' + Math.round(R * Math.cos(ang)) + 'px)';
-        c.style.top  = 'calc(50% + ' + Math.round(R * Math.sin(ang)) + 'px)';
-      });
-    } else {
-      /* v979-voice-merge: zwei Ringe fuer volle Merge-Orbits */
-      var inN = Math.ceil(n / 2);
-      ring.forEach(function (c, i) {
-        var inner = i < inN, idx = inner ? i : (i - inN), cnt = inner ? inN : (n - inN);
-        var R = inner ? 112 : 178, off = inner ? 0 : (180 / cnt);
-        var ang = (-90 + off + idx * 360 / cnt) * Math.PI / 180;
-        c.style.left = 'calc(50% + ' + Math.round(R * Math.cos(ang)) + 'px)';
-        c.style.top  = 'calc(50% + ' + Math.round(R * Math.sin(ang)) + 'px)';
-      });
-    }
+    chipOrbit();   /* v1259 */
   }
     function updateChipsCount() {
     var host = $('vi-chips'); if (!host) return;
@@ -853,7 +917,7 @@
     var fill = $('vi-fill'); if (fill) fill.style.width = pct + '%';
     var pc = $('vi-prog-pct'); if (pc) pc.textContent = pct + ' %';
     var lt = $('vi-listen-txt'); if (lt) lt.textContent = (tot && on >= tot) ? 'Alle Felder erkannt' : 'H\u00f6rt zu';
-    refreshGroupProgress();
+    chipOrbit();   /* v1259 */
   }
     function _chipMarked(id) {
     var host = $('vi-chips'); if (!host) return false;
@@ -998,7 +1062,7 @@
       if (chip) chip.classList.add('on');
     });
     updateChipsCount();
-    chipsNachruecken();   /* v1169-VFENSTER */
+    chipOrbit();   /* v1259 */
   }
 
 
@@ -1074,7 +1138,7 @@
       stopAll();
       if (!blob || blob.size < 2000) {
         toast('Aufnahme zu kurz \u2014 keine Auswertung');
-        if (nx) { nx.disabled = false; nx.textContent = 'Weiter \u2014 auswerten (1\u00a0L)'; }
+        if (nx) { nx.disabled = false; nx.textContent = 'Weiter \u2014 auswerten'; }
         return;
       }
       return blobToB64(blob)
@@ -1090,7 +1154,7 @@
       } else {
         toast('Sprachauswertung fehlgeschlagen: ' + ((err && err.message) || err));
       }
-      if (nx) { nx.disabled = false; nx.textContent = 'Weiter \u2014 auswerten (1\u00a0L)'; }
+      if (nx) { nx.disabled = false; nx.textContent = 'Weiter \u2014 auswerten'; }
     });
   }
 

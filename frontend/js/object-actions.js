@@ -443,12 +443,30 @@
     try { if (localStorage.getItem('dp_skip_kerosin_confirm') === '1') { runSelected(); return; } } catch (e) {}
     _v754Style();
     var sel = []; try { sel = selectedSources(); } catch (e) {}
-    var KL = { voice: 1, pricehubble: 40, sprengnetter: 20, dealpilot: 2 };
+    /* v1259 · Die Sprachaufzeichnung fragt nicht mehr nach. Marcels Auftrag
+       vom 08.09.2026: "dieses Modal kann ja weg, das muss auch nicht mehr
+       gefragt werden."
+
+       Es war ohnehin unwahr geworden: seit v1183 zieht /ai/extract-voice
+       KEIN Kerosin mehr ab (ai.js:513 — "im Plan enthalten", der 402 gegen
+       den Litertank ist dort ausgebaut). Das Modal kuendigte also eine
+       Belastung an, die nicht stattfand, und stellte eine Ruecktrittsfrage
+       zu einer Entscheidung, die nichts kostet.
+
+       Der Eintrag wird ENTFERNT, nicht auf 0 gesetzt: die Zeile darunter
+       filtert auf `KL[x] != null`, eine Null waere weiterhin "abrechenbar"
+       und stuende mit "0 L" im Kasten. Wer nur die Sprachaufzeichnung
+       waehlt, sieht jetzt gar kein Modal (costing ist leer -> direkt los).
+       Fuer die AVM-Abrufe bleibt die Frage: die kosten wirklich. */
+    var KL = { pricehubble: 40, sprengnetter: 20, dealpilot: 2 };
     var demo = !!(typeof _avmHealth !== 'undefined' && _avmHealth && _avmHealth.mode === 'stub');
     var billed = sel.filter(function (x) { return KL[x] != null; });
-    var costing = demo ? billed.filter(function (x) { return x === 'voice'; }) : billed;
+    /* v1259: Im Demo-/Stub-Modus kostet kein AVM-Abruf etwas — und die
+       Sprachaufzeichnung, die hier bis v1258 als einzige uebrig blieb,
+       kostet jetzt nirgends mehr. Also faellt das Modal im Demo ganz weg. */
+    var costing = demo ? [] : billed;
     if (!costing.length) { try { runSelected(); } catch (e) {} return; }
-    var NM = { voice: 'Sprachauswertung', pricehubble: 'PriceHubble', sprengnetter: 'Sprengnetter', dealpilot: 'DealPilot' };
+    var NM = { pricehubble: 'PriceHubble', sprengnetter: 'Sprengnetter', dealpilot: 'DealPilot' };  /* v1259: voice raus */
     var total = costing.reduce(function (a, x) { return a + KL[x]; }, 0);
     var parts = costing.map(function (x) { return '<b>' + KL[x] + '\u00a0L</b> ' + NM[x]; }).join(' + ');
     var ov = document.createElement('div'); ov.className = 'v754-ov';
