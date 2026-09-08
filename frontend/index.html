@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1263"><!-- v1148-spalt-1025px -->
+<link rel="stylesheet" href="css/style.css?v=v1266"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1192">
     <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
@@ -648,6 +648,19 @@ label.dp-required.qc-required::after {
       <img class="app-logo-simple app-logo-simple-sidebar" src="assets/dealpilot-wortmarke.png" alt="DealPilot by Junker Immobilien" />
     </div>
   </div>
+
+  <!-- v1266 · Objekt anlegen, direkt unter dem Logo.
+       Marcels Vorgabe aus design/mockups/anischt.png: der rote Strich sitzt
+       zwischen Logo-Kasten und der Portfolio-/Suchzeile. „Im gleichen Stil"
+       heisst hier: derselbe Goldrahmen, dieselben 14 px Radius, dasselbe
+       transparente Innere wie beim Logo darueber (gemessen: 1 px solid
+       #C9A84C, radius 14 px, padding 13/16 px).
+       Den Weg gab es bisher nur im Aktionen-Menue am unteren Rand und als
+       Knopf unter der Objektliste — beide muss man erst suchen. -->
+  <button type="button" class="sb-neu-btn" onclick="newObj()"
+          title="Neues Objekt anlegen und direkt zur Eingabe springen">
+    <span class="sb-neu-plus">+</span><span class="sb-neu-lbl">Objekt anlegen</span>
+  </button>
 
   <!-- Free-Plan Badge slot (rendered by demo-paywall.js) -->
 

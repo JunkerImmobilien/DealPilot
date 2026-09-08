@@ -37249,3 +37249,47 @@ button.btn-brw.brw-veraltet::after {
   font-size: 15px;
   line-height: 1;
 }
+
+/* ═══ v1266 · „Objekt anlegen" unter dem Logo ════════════════════════════
+   Marcels Vorgabe aus design/mockups/anischt.png. Der Stil ist bewusst der
+   des Logo-Kastens darueber: derselbe Goldrahmen, dieselben 14 px Radius,
+   transparentes Inneres. So liest sich der Kopfbereich als ein Block und
+   nicht als zwei fremde Elemente.
+   Gold tokenisiert (Whitelabel-Pflicht), Flaechen ueber color-mix statt
+   rgba — der Gold-Audit zaehlt rgba(201,168,76,..) zu Recht als hartes Gold. */
+.sb-neu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: calc(100% - 56px);
+  margin: 0 28px 14px;
+  padding: 11px 16px;
+  border: 1px solid var(--wl-c9a84c, #C9A84C);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--wl-c9a84c, #C9A84C);
+  font: 600 13px/1.2 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .16s ease, box-shadow .16s ease, transform .08s ease;
+}
+.sb-neu-btn:hover {
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);
+}
+.sb-neu-btn:active { transform: translateY(1px); }
+.sb-neu-btn:focus-visible {
+  outline: 2px solid var(--wl-c9a84c, #C9A84C);
+  outline-offset: 2px;
+}
+.sb-neu-plus {
+  font: 400 18px/1 ui-monospace, monospace;
+  margin-top: -2px;
+}
+/* Eingeklappte Sidebar: nur das Plus, der Text wuerde sonst umbrechen. */
+.sidebar.collapsed .sb-neu-lbl,
+.sb-collapsed .sb-neu-lbl { display: none; }
+.sidebar.collapsed .sb-neu-btn,
+.sb-collapsed .sb-neu-btn { width: auto; margin-left: auto; margin-right: auto; padding: 11px 13px; }
