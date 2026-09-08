@@ -1286,7 +1286,10 @@
             }
             var kd = document.createElement('details');
             kd.style.cssText = 'margin:10px 0 4px;font-size:12px;color:#7A7370';
-            kd.innerHTML = '<summary style="cursor:pointer;font-weight:600;color:#9a7f33">Kosten dieser Aufnahme: ' +
+            /* v1259e: tokenisiert. Der Gold-Audit hat diese Zeile gefangen,
+               eine Stunde nachdem seine Basislinie gebaut war — ich hatte das
+               #9a7f33 aus der Zeile darunter kopiert. Genau dafuer ist er da. */
+            kd.innerHTML = '<summary style="cursor:pointer;font-weight:600;color:var(--wl-9a7f33, #9a7f33)">Kosten dieser Aufnahme: ' +
               centGesamt.toFixed(2).replace('.', ',') + ' Cent' +
               (k.vollstaendig ? '' : ' (unvollständig)') + '</summary>' +
               '<div style="margin:8px 0 0;line-height:1.7;background:rgba(229,168,71,.08);border:1px solid rgba(229,168,71,.3);border-radius:8px;padding:10px">' +
