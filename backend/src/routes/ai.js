@@ -707,12 +707,68 @@ router.post('/bodenrichtwert', authenticate, plzValidator.middleware, /* V229: P
       console.warn('[ai/bodenrichtwert] JSON-Parse failed:', e.message, '— rawText len:', rawText.length);
     }
 
+    /* ═══ v1264 · Wenn die KI erzählt statt JSON zu liefern ═══════════════
+       Gemessen am 08.09.2026 mit „Sachsenstraße, 32052 Herford": HTTP 502,
+       „KI-Antwort konnte nicht als JSON gelesen werden." Im verworfenen Text
+       stand: „Für Herford, eine Mittelstadt, ist ein Wert von etwa 200 EUR/m²
+       realistisch. Da keine genauen Daten vorliegen, ist die Zuverlässigkeit
+       dieser Schätzung jedoch gering."
+
+       Also: die Antwort war brauchbar, nur nicht im geforderten Format. Das
+       Modell recherchiert im Web und neigt dann zum Erzählen — die
+       JSON-Anweisung steht mitten in einem langen Prompt und geht unter.
+
+       Statt den Fund wegzuwerfen, lassen wir ein kleines Modell den Text in
+       JSON überführen. Das ist zuverlässiger als eine Regex: „zwischen 20
+       und 600 EUR/m², für Herford etwa 200" enthält drei Zahlen, und ein
+       Mustertreffer erwischt leicht die falsche. Eine falsche
+       Bodenrichtwert-Zahl wandert in Sachwert und Bewertung — da ist ein
+       zweiter Aufruf für 0,004 Cent die günstigere Lösung.
+
+       Die Konfidenz wird dabei auf „niedrig" gedeckelt: Wer das Format nicht
+       einhält, hat meist auch keine belastbare Quelle gefunden. */
     if (!parsed || typeof parsed !== 'object') {
-      return res.status(502).json({
-        error: 'KI-Antwort konnte nicht als JSON gelesen werden.',
-        raw: rawText ? rawText.substring(0, 500) : 'leer',
-        rawType: typeof raw,
-        rawKeys: (raw && typeof raw === 'object') ? Object.keys(raw).slice(0, 10) : null
+      if (rawText && rawText.length > 20) {
+        try {
+          const nachlese = await openaiService.callOpenAI(
+            'Aus dem folgenden deutschen Text soll EIN Bodenrichtwert in EUR pro Quadratmeter ' +
+            'herausgelesen werden. Nenne die Zahl, die der Text als Schaetzung FUER DIESEN ORT ' +
+            'angibt — NICHT die Raender einer allgemeinen Bandbreite.\n' +
+            'Antworte ausschliesslich mit JSON: {"value": <Zahl oder 0>, "reasoning": "<max 150 Zeichen>"}\n' +
+            'Findet sich keine ortsbezogene Zahl: value = 0.\n\nTEXT:\n"""\n' +
+            rawText.substring(0, 3000) + '\n"""',
+            { userApiKey: userApiKey, aiOptions: { temperature: 0 }, model: 'gpt-4o-mini', noWebSearch: true }
+          );
+          const nachText = (typeof nachlese === 'string') ? nachlese
+            : (nachlese && (nachlese.text || nachlese.output_text || nachlese.content)) || '';
+          const nachJson = nachText ? openaiService.extractJson(nachText) : null;
+          if (nachJson && typeof nachJson === 'object') {
+            parsed = {
+              value: nachJson.value,
+              confidence: 'niedrig',
+              reasoning: String(nachJson.reasoning || '').substring(0, 200),
+              source_url: ''
+            };
+            console.log('[ai/bodenrichtwert] v1264 Nachlese griff:', parsed.value);
+          }
+        } catch (e) {
+          console.warn('[ai/bodenrichtwert] v1264 Nachlese fehlgeschlagen:', e.message);
+        }
+      }
+    }
+
+    /* Auch die Nachlese kann scheitern. Dann KEIN 502 mehr: der Text der KI
+       ist für den Nutzer immer noch die bessere Auskunft als eine
+       Fehlermeldung. value = 0 heisst „nichts übernommen", das Feld bleibt
+       leer, und die Begründung sagt, was die Recherche ergeben hat. */
+    if (!parsed || typeof parsed !== 'object') {
+      return res.json({
+        value: 0,
+        confidence: 'niedrig',
+        reasoning: rawText
+          ? ('Keine verwertbare Zahl gefunden. Die Recherche ergab: ' + rawText.substring(0, 300))
+          : 'Die Recherche lieferte keine Antwort.',
+        source: 'openai'
       });
     }
 

@@ -488,7 +488,12 @@ async function callOpenAI(prompt, opts) {
     // V34: Output-Limit deutlich erhöht — die ausführlichen Texte aus V33
     // brauchen mehr Platz. Vorher Default (~4k) → JSON-Truncate.
     max_output_tokens: 8000,
-    tools: [{ type: 'web_search_preview' }]
+    /* v1264: Web-Suche abschaltbar. Additiv — wer die Option nicht setzt,
+       bekommt sie weiter, also ändert sich für alle bestehenden Aufrufer
+       nichts. Gebraucht wird das für Nachbearbeitungs-Aufrufe, die einen
+       bereits vorliegenden Text nur umformen: dort ist die Websuche reine
+       Wartezeit und kostet zusätzlich. */
+    tools: opts.noWebSearch ? [] : [{ type: 'web_search_preview' }]
   };
 
   // V51/V62.3: Determinismus aus opts.aiOptions durchreichen, wenn vorhanden.
