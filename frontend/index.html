@@ -1487,6 +1487,16 @@ label.dp-required.qc-required::after {
             <label>Sanierungskosten</label>
             <div class="iw"><span class="pfx">€</span><input id="san" type="text" inputmode="decimal" placeholder="" class="trl" oninput="syncSanTaxOnSanInput(); calc(); _v292_6_toggle15pct();"></div>
             <span class="hint" id="san_limit_hint">Grenze wird berechnet...</span>
+            <!-- v1261: § 6 Abs. 1 Nr. 1a EStG misst die Aufwendungen AUSDRUECKLICH
+                 "ohne die Umsatzsteuer". Wer Handwerkerrechnungen brutto eintraegt und
+                 gegen eine Nettogrenze vergleicht, wird zu frueh gewarnt. -->
+            <div class="f" style="margin-top:8px">
+              <label>Angegebener Betrag <span class="hint" style="font-weight:400">— für die 15 %-Grenze</span></label>
+              <select id="san_ust" onchange="calc()">
+                <option value="brutto">brutto — 19 % USt enthalten (Regelfall)</option>
+                <option value="netto">netto — ohne USt</option>
+              </select>
+            </div>
 
             <!-- V32: Steuerliche Verteilung — kompakt nebeneinander -->
             <!-- V301-san-verteilung-kompakt: inline-styles raus, nutzt jetzt .san-tax-options wie Inventar-Detail -->
@@ -1518,8 +1528,13 @@ label.dp-required.qc-required::after {
         <details class="info-box info-gold" id="san_15pct_details" style="margin-top:-2px;border-top-left-radius:0;border-top-right-radius:0"><!-- V305-15pct-optisch: schliesst direkt an Sanierung-Card an -->
           <summary class="info-box-title" style="cursor:pointer;list-style:none">📐 15%-Grenze (§ 6 Abs. 1 Nr. 1a EStG) <span class="hint" style="font-size:10px;font-weight:400;color:var(--muted)">— klick für Details</span></summary>
           <div class="info-box-content" style="margin-top:10px">
-            <div class="kv"><span>Max. Sanierungskosten in 3 Jahren</span><span class="kv-v c-gold" id="san_limit_max">—</span></div>
-            <div class="kv"><span>Ihre Sanierungskosten</span><span class="kv-v" id="san_limit_actual">—</span></div>
+            <div class="kv"><span>Max. Sanierungskosten in 3 Jahren <span class="hint" style="font-weight:400">netto</span></span><span class="kv-v c-gold" id="san_limit_max">—</span></div>
+            <div class="kv" style="font-size:12px;color:var(--muted)"><span>… das entspricht brutto</span><span class="kv-v" id="san_limit_max_brutto">—</span></div>
+            <!-- v1261: Der Gesetzestext misst "ohne die Umsatzsteuer". Wer brutto
+                 eintraegt, sieht hier, wie DealPilot darauf kommt. -->
+            <div class="kv" id="san_brutto_row" style="font-size:12px"><span>Ihre Sanierungskosten (wie eingetragen)</span><span class="kv-v" id="san_brutto_val">—</span></div>
+            <div class="kv" id="san_ust_row" style="font-size:12px;display:none"><span>− Umsatzsteuer 19 %</span><span class="kv-v" id="san_ust_val">—</span></div>
+            <div class="kv"><span>= maßgeblich für die Grenze <span class="hint" style="font-weight:400">netto</span></span><span class="kv-v" id="san_limit_actual">—</span></div>
             <div class="kv"><span>Status</span><span class="kv-v" id="san_limit_status">—</span></div>
 
             <!-- V63.99: Aufschlüsselung der Berechnung — wird nur gezeigt wenn Küche aktiviert oder bei größeren Beträgen -->
@@ -3283,7 +3298,7 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v1260c"></script>
+  <script src="js/calc.js?v=v1261"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
@@ -3328,7 +3343,7 @@ label.dp-required.qc-required::after {
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=v1243"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v1258"></script>
+<script src="js/storage.js?v=v1261"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=W33"></script>

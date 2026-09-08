@@ -859,21 +859,60 @@ function _calcImmediate(){
   var sanLimit = gebAHK * 0.15;
 
   var sanIst = v('san');
+
+  /* ═══ v1261 · Die 15 %-Grenze misst OHNE Umsatzsteuer ═══════════════════
+     § 6 Abs. 1 Nr. 1a EStG, Wortlaut: Aufwendungen für Instandsetzungs- und
+     Modernisierungsmaßnahmen sind anschaffungsnahe Herstellungskosten, wenn
+     sie „OHNE DIE UMSATZSTEUER 15 Prozent der Anschaffungskosten des
+     Gebäudes übersteigen".
+
+     BIS v1260 verglich DealPilot den eingetragenen Betrag ungeprüft mit der
+     Grenze. Ein privater Vermieter trägt dort ein, was auf der
+     Handwerkerrechnung steht — brutto. Damit warnte DealPilot bei 15 %
+     netto bereits ab 12,6 % tatsächlichem Aufwand, also VIEL zu früh: bei
+     einer Grenze von 45.000 € schlug er schon bei 45.001 € brutto an,
+     obwohl netto erst 53.550 € brutto die Grenze reißen.
+
+     Aufgefallen beim Excel-Abgleich: immocation rechnet die Grenze × 1,19
+     hoch, um Bruttobeträge vergleichbar zu machen — derselbe Gedanke, nur
+     andersherum gelöst.
+
+     WAS NICHT umgestellt wird: `san` bleibt als KOSTENPOSITION brutto. Ein
+     privater Vermieter zieht keine Vorsteuer; seine Werbungskosten sind der
+     Bruttobetrag. Nur die 15 %-PRÜFUNG rechnet netto. Das ist genau die
+     Feinheit, die der Gesetzestext meint, und der Grund, warum hier zwei
+     verschiedene Zahlen nebeneinander stehen dürfen. */
+  var sanIstBrutto = sanIst;
+  var _sanUst = g('san_ust') || 'brutto';
+  var sanIstNetto = (_sanUst === 'netto') ? sanIst : (sanIst / 1.19);
+
   st('san_limit_max', fE(sanLimit, 0));
-  st('san_limit_actual', fE(sanIst, 0));
-  var sanPct = sanLimit > 0 ? (sanIst / sanLimit * 100) : 0;
+  st('san_limit_actual', fE(sanIstNetto, 0));
+  var sanPct = sanLimit > 0 ? (sanIstNetto / sanLimit * 100) : 0;
   var sanStatusEl = el('san_limit_status');
   if (sanStatusEl) {
     if (sanIst === 0) {
       sanStatusEl.innerHTML = '<span class="badge badge-muted">Keine Sanierung</span>';
-    } else if (sanIst <= sanLimit) {
+    } else if (sanIstNetto <= sanLimit) {
       sanStatusEl.innerHTML = '<span class="badge badge-green">✓ Unter Grenze ('+sanPct.toFixed(1)+'%) – voll abzugsfähig</span>';
     } else {
       sanStatusEl.innerHTML = '<span class="badge badge-red">⚠ Über 15% ('+sanPct.toFixed(1)+'%) – anschaffungsnahe HK (50 Jahre AfA)</span>';
     }
   }
+  /* Die USt-Zeilen nur zeigen, wenn brutto gerechnet wird — sonst stünde
+     dort dreimal dieselbe Zahl. */
+  var _ustRow = el('san_ust_row');
+  var _brutto = (_sanUst !== 'netto') && sanIst > 0;
+  if (_ustRow) _ustRow.style.display = _brutto ? '' : 'none';
+  st('san_brutto_val', fE(sanIstBrutto, 0));
+  if (_brutto) st('san_ust_val', fE(sanIstBrutto - sanIstNetto, 0));
+  /* Die Grenze auch als Bruttobetrag nennen: das ist die Zahl, gegen die ein
+     Nutzer seine Rechnungen wirklich hält. */
+  st('san_limit_max_brutto', fE(sanLimit * 1.19, 0));
+
   var hint = el('san_limit_hint');
-  if (hint) hint.textContent = 'Max. ' + fE(sanLimit, 0) + ' in 3 Jahren (15%-Grenze)';
+  if (hint) hint.textContent = 'Max. ' + fE(sanLimit, 0) + ' netto in 3 Jahren'
+    + (_sanUst === 'netto' ? '' : ' (= ' + fE(sanLimit * 1.19, 0) + ' brutto)');
 
   // V63.99: Aufschlüsselung der AHK-Berechnung in der Info-Box
   var ahkDetailBlock = el('ahk_detail_block');
