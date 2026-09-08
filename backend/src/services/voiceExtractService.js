@@ -56,13 +56,32 @@ const MAX_OPTIONS = 40;        /* Optionen je Select */
  *   OPENAI_PREISE='{"gpt-5.5":{"ein":1.25,"aus":10}}'
  * (USD je 1 Mio Token). Der Umrechnungskurs steht in OPENAI_USD_EUR.
  * ════════════════════════════════════════════════════════════════════ */
+/* WELCHE MODELLE WIRKLICH LAUFEN — gemessen am 08.09.2026 mit
+   `docker exec dealpilot-backend printenv`, nicht aus dem Code gelesen:
+
+     Transkription   OPENAI_TRANSCRIBE_MODEL=gpt-4o-transcribe
+     Auswertung      OPENAI_VOICE_EXTRACT_MODEL=gpt-5.4-mini
+     Live-Hilfe      (kein Override) -> gpt-4o-mini
+     Gegenpruefung   (kein Override) -> gpt-5.4-mini, steht auf AUS
+
+   Die Defaults hier im Code sind also NICHT das, was laeuft. Besonders bei
+   der Transkription: v1169 hat den Default bewusst von `gpt-4o-transcribe`
+   auf `gpt-4o-mini-transcribe` gestellt, um Tempo zu gewinnen — die ENV auf
+   dem Server setzt aber weiter das grosse Modell. Diese Optimierung ist im
+   Betrieb nie angekommen. Ein Direktvergleich derselben Datei ergab 2944 ms
+   (gross) gegen 1864 ms (mini); die Qualitaet liess sich aus Einzellaeufen
+   NICHT beurteilen, weil dieselbe Datei bei zwei Laeufen desselben Modells
+   zwei verschiedene Ortsnamen ergab. Transkription ist nicht deterministisch.
+   Ob die ENV so bleiben soll, ist Marcels Entscheidung. */
 const PREISE_FEST = {
   /* USD je 1 Mio Token. `einAudio` gilt nur fuer Audio-Eingabe. */
   'gpt-4o-mini':            { ein: 0.15, aus: 0.60 },
+  'gpt-4o-transcribe':      { ein: 2.50, einAudio: 6.00, aus: 10.00 },
   'gpt-4o-mini-transcribe': { ein: 1.25, einAudio: 3.00, aus: 5.00 }
   /* gpt-5.5 und gpt-5.4-mini fehlen bewusst: ich kenne ihre Listenpreise
-     nicht sicher. Lieber ein ehrliches "nicht bepreist" als eine Zahl, der
-     jemand glaubt. Nachtragen per OPENAI_PREISE. */
+     nicht sicher, und gpt-5.4-mini ist ausgerechnet das Modell, das die
+     Auswertung macht. Lieber ein ehrliches "nicht bepreist" als eine Zahl,
+     der jemand glaubt. Nachtragen ohne Codeaenderung per OPENAI_PREISE. */
 };
 const USD_EUR = Number(process.env.OPENAI_USD_EUR || 0.92);
 
