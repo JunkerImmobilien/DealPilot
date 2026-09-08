@@ -1682,6 +1682,17 @@ function _calcImmediate(){
       _reihe[_reihe.length - 1] += _exitErloes;
       irr = window.IrrEngine.compute(_reihe);
       be = window.IrrEngine.breakEven(_cfReihe, ekv);
+      /* v1260b · Die Zahlungsreihe OFFENLEGEN. Beim ersten Nachmessen ergab
+         eine Handrechnung 34 %, die App 40,6 % — und ich konnte die Lücke
+         nicht aufklären, weil die Reihe nur in dieser Funktion lebte. Eine
+         Kennzahl, die auf der Landingpage steht, muss nachvollziehbar sein:
+         wer sie anzweifelt, soll die Zahlungen sehen können, aus denen sie
+         entsteht. Kostet nichts und ist die einzige Art, den IRR zu prüfen. */
+      State._irrReihe = {
+        ek: ekv, cf: _cfReihe.slice(), exit: _exitErloes,
+        exit_vkp: exit_vkp, rs_ende: rs_loop, bspar_guth: bspar_guth,
+        reihe: _reihe.slice(), irr: irr
+      };
     }
   } catch (e) { /* eine Kennzahl darf die Seite nie anhalten */ }
   // PE-Definition als Alternative behalten für Vergleich:
