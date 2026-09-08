@@ -600,7 +600,17 @@
      me_*, rate_*, ji_p, kuerzel, thesis, exitstr, bankval ...) sind bewusst NICHT
      dabei. Reihenfolge = Anzeigereihenfolge; DS2/Markt kommt ans Ende. */
   /* v979-voice-merge: 5 -> 3 Kategorien; Kauf(1)+Finanzierung(3)+Lage(4) zusammengelegt */
-  var WL_GROUPS = ['Stammdaten', 'Kauf & Nebenkosten', 'Miete', 'Finanzierung', 'Lage & Bewertung'];  /* v998-groups: zurueck auf 5 */
+  /* v1259 · Zwei Gruppen dazu. Gemessen am 08.09.2026: die Liste hatte fuenf
+     Eintraege, aber WL kannte laengst ein `g:5` (Nachfrage, Bevoelkerung,
+     Marktmiete, Miet-/Wertsteigerung, Mietausfallwagnis). Beide Schleifen
+     laufen `gi < WL_GROUPS.length` — Gruppe 5 wurde also NIE gerendert. Das
+     fiel nie auf, weil alle sechs `noc:1` tragen und ohnehin nicht als Chip
+     erscheinen. Meine drei neuen Frage-Pillen hatten dasselbe g:5 und waren
+     damit unsichtbar: 28 Chips statt 31, im Browser gezaehlt.
+     Jetzt heisst 5 'Markt' (was es immer war) und die Einschaetzung bekommt
+     eine eigene Gruppe 6. */
+  var WL_GROUPS = ['Stammdaten', 'Kauf & Nebenkosten', 'Miete', 'Finanzierung',
+                   'Lage & Bewertung', 'Markt', 'Einschätzung'];
   var WL = [
     /* v977-voice-layout: Reihenfolge Objektart->Adresse->Flaechen; Aussenstellpl./Etage/Garagen ohne Chip; Kaufdatum/Uebergang -> Kauf */
     { id:'objart',     g:0, label:'Objektart',           kw:['eigentumswohnung','mehrfamilien','einfamilien','wohnung','haus','etw','mfh','efh','reihenhaus'] },
@@ -640,7 +650,7 @@
     { id:'mea',        g:4, label:'Miteigentumsanteil',  kw:['miteigentumsanteil','mea'] },
     { id:'gsfl',       g:4, label:'Grundstuecksflaeche', kw:['grundstueck','grundstuecksflaeche'] },
     { id:'makrolage',  g:4, frage:'Wie ist die Region?',  label:'Makrolage', kw:['makrolage','makro','region'] },
-    { id:'mikrolage',  g:4, frage:'Wie ist die Strasse?', label:'Mikrolage', kw:['mikrolage','mikro','viertel','umfeld'] },
+    { id:'mikrolage',  g:4, frage:'Wie ist die Straße?', label:'Mikrolage', kw:['mikrolage','mikro','viertel','umfeld'] },
     { id:'ds2_zustand',g:4, frage:'In welchem Zustand?',  label:'Zustand',   kw:['zustand'] },
     { id:'ds2_energie',g:4, label:'Energieklasse',       kw:['energie','energieklasse','effizienz'] },
 
@@ -665,11 +675,11 @@
        Diese drei standen bisher in KEINEM Chip. Ausgewertet wurden sie
        schon (der volle Katalog aus v519 kennt sie), aber niemand wurde
        aufgefordert, sie zu sagen — deshalb blieben sie fast immer leer. */
-    { id:'thesis',  g:5, frage:'Warum dieses Objekt?', label:'Investment-These',
+    { id:'thesis',  g:6, frage:'Warum dieses Objekt?', label:'Investment-These',
       kw:['these','investmentthese','strategie','warum'] },
-    { id:'risiken', g:5, frage:'Gibt es Risiken?',     label:'Risiken',
+    { id:'risiken', g:6, frage:'Gibt es Risiken?',     label:'Risiken',
       kw:['risiko','risiken','gefahr','problem','schwachstelle'] },
-    { id:'notizen', g:5, frage:'Sonst noch etwas?',    label:'Notizen',
+    { id:'notizen', g:6, frage:'Sonst noch etwas?',    label:'Notizen',
       kw:['notiz','anmerkung','bemerkung','uebrigens'] }
   ];
   var WL_MAP = {}; WL.forEach(function (w) { WL_MAP[w.id] = w; });
@@ -1245,5 +1255,11 @@
   }
 
   injectCss();
-  window.VoiceImport = { srcLabel: srcLabel, open: open };
+  /* v1259 · `_orbit` ist ein Pruef-Haken, kein Bedienweg. Das Nachruecken der
+     Pillen laesst sich sonst nur durch echtes Sprechen ausloesen — im
+     automatisierten Browser gibt es kein Mikrofon, und damit bliebe die
+     Kernmechanik des Umbaus unbeweisbar. Mit dem Haken kann man einen Chip
+     auf `on` setzen und zusehen, ob der Platz frei wird und der naechste
+     genau dort nachrueckt. Vorbild: window._dpDispSkin. */
+  window.VoiceImport = { srcLabel: srcLabel, open: open, _orbit: chipOrbit };
 })();
