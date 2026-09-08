@@ -36,37 +36,42 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Stand 08.09.2026, mittags)
+## → HIER WEITERMACHEN (Stand 08.09.2026, nachmittags)
 
-**Stand:** lokal = GitHub = Staging auf `19b6566`. **Produktion auf
-`84ab605`** — `v1259`…`v1259d` sind **noch nicht** auf Prod.
+**Stand:** lokal = GitHub = Staging = **Produktion** auf `f311d8f`.
+`v1259`…`v1259f` sind **live**. Nichts wartet auf einen Rollout.
 
-**Zuletzt fertig: `v1259`–`v1259d` — Gold-Audit und Sprachaufzeichnung.**
+**Zuletzt fertig: `v1259`–`v1259f` — Gold-Audit und Sprachaufzeichnung.**
 Vier von sechs Punkten aus Marcels Sprechlauf-Liste; die doppelte Prüfung
 bleibt auf seinen Wunsch aus. Nachweis im Journal der Projektanweisung.
 
 ### Was jetzt Marcels Entscheidung braucht
 
-1. **Prod-Rollout `v1259`…`v1259d`.** Frontend-Änderungen plus ein
-   Backend-Rebuild (Kostenerfassung). Keine Migration, keine
-   Datenbankberührung.
-
-2. **Der Listenpreis von `gpt-5.4-mini`.** Das ist das Modell, das die
-   Sprachauswertung wirklich macht — und der mit Abstand größte Posten
-   (6.044 Eingabe-Token je Aufnahme). Ohne den Preis bleibt die
-   Kostenanzeige unvollständig. **Zwei Wege:** den Preis eintragen
-   (`OPENAI_PREISE='{"gpt-5.4-mini":{"ein":X,"aus":Y}}'`, USD je 1 Mio) —
-   oder dem OpenAI-Schlüssel die Berechtigung `api.usage.read` geben, dann
-   lässt sich die echte Abrechnung abfragen.
-
-3. **`OPENAI_TRANSCRIBE_MODEL` — groß oder mini?** Auf dem Server steht
+1. **`OPENAI_TRANSCRIBE_MODEL` — groß oder mini?** Das ist jetzt die
+   **teuerste offene Frage.** Auf beiden Servern steht
    `gpt-4o-transcribe`, obwohl `v1169` den Code-Default bewusst auf
    `gpt-4o-mini-transcribe` gestellt hat, um Tempo zu gewinnen. **Die
-   Optimierung ist im Betrieb nie angekommen.** Gemessen: 2944 ms gegen
-   1864 ms an derselben Datei. **Über die Qualität sagt das nichts** —
-   dieselbe Datei ergab bei zwei Läufen desselben Modells zwei
-   verschiedene Ortsnamen. Wer das entscheiden will, braucht eine
-   Messreihe, keinen Einzellauf.
+   Optimierung ist im Betrieb nie angekommen.**
+
+   Seit die Preise stehen, ist die Tragweite messbar: im warmen Zustand
+   (Prompt-Zwischenspeicher greift) ist die **Transkription mit 80 % der
+   größte Kostenposten**. Das mini kostet **die Hälfte** (3,00 statt 6,00
+   USD je Mio Audio-Token) und ist **37 % schneller** (1864 ms gegen
+   2944 ms). Der Wechsel senkt die Kosten einer Aufnahme um rund 40 %:
+   bei 4 Minuten von ≈ 1,7 auf ≈ 0,9 Cent.
+
+   **Über die Qualität ist damit nichts gesagt.** Dieselbe Datei ergab bei
+   zwei Läufen desselben Modells zwei verschiedene Ortsnamen —
+   Transkription ist nicht deterministisch. Wer das entscheiden will,
+   braucht eine Messreihe mit echten Diktaten, keinen Einzellauf. **Das
+   wäre der nächste sinnvolle Schritt**, und Marcels Sprechlauf liefert
+   das Material dafür.
+
+2. **Wenn die Kosten weiter runter sollen: den Feldkatalog kürzen.** Von
+   rund 6.200 Eingabe-Token der Auswertung sind über 6.000 der Katalog und
+   nur ~165 das Gesagte. Der Zwischenspeicher senkt das bereits auf ein
+   Viertel; darüber hinaus hilft nur ein kleinerer Katalog. **Die
+   Sprechdauer ist es nicht** — sie kostet fast nichts.
 
 4. **Der Gold-Altbestand.** 468 Fundstellen sind jetzt als Basislinie
    eingefroren, der Wächter meldet nur noch Neues. Abgetragen wird, wenn
@@ -85,7 +90,13 @@ Marcels sechs Punkte, Stand nach `v1259d`:
 | 3 | Doppelt auf Plausibilität prüfen | **zurückgestellt** — Marcels Wunsch vom 08.09. Der Code liegt vollständig da, `OPENAI_VOICE_VERIFY=1` schaltet ihn an |
 | 4 | Freitextfelder als Fragen | **fertig** |
 | 5 | Sprechdauer auf 4 Minuten | **fertig** |
-| 6 | Was kostet die Sprachaufzeichnung | **fertig, aber unvollständig** — siehe Punkt 2 oben |
+| 6 | Was kostet die Sprachaufzeichnung | **fertig** — alle Preise recherchiert und hinterlegt, Zwischenspeicher eingerechnet |
+
+**Die Antwort auf Punkt 6, kurz:** eine Aufnahme kostet **0,56 Cent**
+gemessen (45 s Diktat, warmer Zwischenspeicher), hochgerechnet **rund
+1,7 Cent** bei den neuen 4 Minuten. Mit dem kleinen
+Transkriptionsmodell wären es **0,9 Cent**. Ansehen mit `?kosten=1` an
+der Adresse.
 
 ---
 

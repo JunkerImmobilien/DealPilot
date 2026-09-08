@@ -8933,6 +8933,107 @@ Server-Log steht sie immer.
 (`v1259b`) · `56b4571` (`v1259c`) · `19b6566` (`v1259d`). Staging-Backend
 zweimal neu gebaut.
 
+## Rollout-Journal · 08.09.2026, dritter Teil — `v1259f` und der Prod-Rollout
+
+**Marcels Auftrag:** *„ja rollout und mach mir die preisaufschlüsslung
+nochmal und hol dir die preise aus dem netz von gpt 5.4 mini"*
+
+### Die Preise stehen — jeder aus zwei unabhängigen Quellen
+
+USD je 1 Mio Token, recherchiert am 08.09.2026:
+
+| Modell | Eingabe | zwischengespeichert | Audio-Eingabe | Ausgabe |
+|---|---|---|---|---|
+| `gpt-5.4-mini` | 0,75 | **0,075** | — | 4,50 |
+| `gpt-4o-transcribe` | 2,50 | — | **6,00** | 10,00 |
+| `gpt-4o-mini-transcribe` | 1,25 | — | **3,00** | 5,00 |
+| `gpt-4o-mini` | 0,15 | — | — | 0,60 |
+
+Die beiden Transkriptionspreise, die in `v1259d` aus dem Gedächtnis
+eingetragen worden waren, sind damit **bestätigt**. `gpt-5.5` bleibt
+bewusst offen: es läuft hier gar nicht, die ENV setzt `gpt-5.4-mini`.
+
+### Der Fund, der die Rechnung ändert: der Prompt-Zwischenspeicher
+
+`gpt-5.4-mini` kostet für **wiederverwendete Prompt-Präfixe nur ein
+Zehntel** — 0,075 statt 0,75. Das ist hier kein Randfall, sondern der
+Hauptposten: von rund 6.200 Eingabe-Token der Auswertung sind über 6.000
+der **immer gleiche Feldkatalog**, und der steht im Prompt **vor** dem
+Transkript. Genau diese Reihenfolge macht ihn zwischenspeicherfähig.
+
+Die Erfassung liest jetzt `usage.input_tokens_details.cached_tokens`.
+Ohne diese Zeilen hätte die Anzeige den Katalog jedes Mal zum vollen
+Preis gerechnet und **zu viel gemeldet**.
+
+**Zwei Läufe hintereinander, dieselbe Datei, 45 s Diktat, 174
+Katalogfelder:**
+
+| | Lauf 1 (kalt) | Lauf 2 (warm) |
+|---|---|---|
+| Transkription `gpt-4o-transcribe` | 529 Audio-Token → $0,004824 | unverändert $0,004824 |
+| Auswertung `gpt-5.4-mini` | 6.044 ein, **0** aus dem Zwischenspeicher → $0,005204 | 6.044 ein, **5.888 aus dem Zwischenspeicher** → $0,001238 |
+| **gesamt** | **0,92 Cent** | **0,56 Cent** |
+
+Die Auswertung fiel damit **auf ein Viertel**. Beide Läufe erkannten
+19 von 19 genannten Feldern.
+
+> **Damit hat sich das Kostenbild umgedreht.** Im warmen Zustand ist die
+> **Transkription mit 80 % der größte Posten** — nicht die Auswertung.
+> Und `gpt-4o-mini-transcribe` kostet mit 3,00 statt 6,00 je Mio
+> Audio-Token **die Hälfte** und ist 37 % schneller. Genau das wollte
+> `v1169`, und genau das verhindert die ENV auf dem Server. Der Wechsel
+> würde die Gesamtkosten einer Aufnahme um rund 40 % senken.
+
+**Hochrechnung auf die neuen 4 Minuten**, warm, mit Live-Hilfe:
+
+| | mit `gpt-4o-transcribe` | mit `gpt-4o-mini-transcribe` |
+|---|---|---|
+| Transkription | $0,0169 | $0,0085 |
+| Auswertung | $0,0012 | $0,0012 |
+| Live-Hilfe (bis 6 Läufe) | $0,0003 | $0,0003 |
+| **gesamt** | **≈ 1,7 Cent** | **≈ 0,9 Cent** |
+
+**Der Satz, der bleibt:** die Kostenlast ist der **Katalog und das
+Transkriptionsmodell**, nicht die Sprechdauer. Die Verdopplung der
+Redezeit von 2 auf 4 Minuten kostet knapp einen Cent — und nur, weil das
+große Transkriptionsmodell läuft.
+
+### Der Prod-Rollout
+
+**Freigabe:** Marcels „ja rollout". Merge-Commit `f311d8f`, Prod von
+`84ab605` auf `f311d8f`. **Keine Migration, keine Datenbankänderung** —
+das Backend meldete „No new migrations to apply".
+
+**Vorher gesichert**, beide Datenbanken:
+`/root/backups/haupt-20260908-1158.sql.gz` (11 MB) und
+`mb-20260908-1200.sql.gz` (685 KB).
+
+> **Die erste mb-Sicherung war leer — 20 Byte.** `pg_dump -U postgres
+> postgres` lief ins Nichts; die Marktbericht-Datenbank heißt
+> `marktbericht` mit Nutzer `mb`. Eine Sicherung, die man nicht ansieht,
+> ist keine. Die leere Datei wurde entfernt und der Dump richtig
+> wiederholt. **`CLAUDE.md` sagt zu Recht: eigener `pg_dump` vor jedem
+> Eingriff** — es fehlt dort nur der Zugang. Er lautet
+> `docker exec dealpilot-mb-db pg_dump -U mb marktbericht`.
+
+**Auf Prod nachgemessen** (angemeldet als `majunker@gmx.net`, dem
+Zweitkonto — Marcels sieben Objekte liegen unter
+`info@junker-immobilien.io` und sind unberührt):
+
+| | |
+|---|---|
+| geladen | `voice-import.js?v=v1259f`, `object-actions.js?v=v1259` |
+| Kerosin-Modal | erscheint nicht |
+| Pillen | 31 gebaut, 8 sichtbar, alle sieben Fragen dabei |
+| Kopfzeile | „NOCH OFFEN · 31 Angaben" |
+| Untertitel | „… Bis zu 4 Minuten." |
+| Weiter-Knopf | „Weiter — auswerten" |
+| Gold-Audit auf Prod | **RC=0**, 181 Dateien, genau auf der Basislinie |
+| Backend | `healthy`, keine Fehler im Log |
+
+**Commits.** `1036025` (`v1259f`) · `f311d8f` (Prod-Merge).
+Staging, GitHub und Produktion stehen alle auf `f311d8f`.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
