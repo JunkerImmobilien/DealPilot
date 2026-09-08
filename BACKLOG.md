@@ -36,10 +36,30 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Stand 08.09.2026, nachmittags)
+## → HIER WEITERMACHEN (Stand 08.09.2026, abends)
 
-**Stand:** lokal = GitHub = Staging = **Produktion** auf `f311d8f`.
-`v1259`…`v1259f` sind **live**. Nichts wartet auf einen Rollout.
+**Stand:** lokal = GitHub = Staging auf `5a17d52`. **Produktion auf
+`f311d8f`** — `v1260`…`v1264` sind **noch nicht** auf Prod.
+
+### Was jetzt Marcels Angabe braucht
+
+**Zwei Objekte beim Anlegen** — nicht reproduzierbar. Drei Wege getestet
+(Knopf „+ Neues Objekt hinzufügen", Aktionen-Menü, Doppelklick), jedes Mal
+genau ein Objekt; der Schutz aus v728 greift. **Es fehlen:** Umgebung
+(Staging oder Prod), welcher Weg, sofort oder erst nach dem Speichern,
+Handy oder Rechner.
+
+### Was aus Marcels Liste noch offen ist
+
+| | Punkt | Stand |
+|---|---|---|
+| 1 | Sprechlauf: kommen alle Felder an | **geprüft** — 16/17, der eine Fehler (Möblierung) ist mit `v1262` behoben |
+| 2 | Bodenrichtwert automatisch nach Adresse | **fertig** (`v1263`), dabei den kaputten Abruf mitrepariert (`v1264`) |
+| 3 | Pillen unterschiedlich lang einblenden | **offen** — nicht jeder Punkt wird gesagt, der Orbit darf nicht auf eine Antwort warten |
+| 4 | Kontextbezug im Sprechlauf prüfen | **teilweise** — Hausgeld-Aufteilung und Inventar sitzen, weitere Fälle offen |
+| 5 | Chatbot-Dialog statt Monolog, mit Demo | **offen** — größter Brocken, braucht ein Konzept vor dem Bauen |
+| 6 | Bild „Ansicht": Objekt anlegen links über der Suche | **offen** |
+| 7 | IRR/Break-Even „passend in Auswertung" einordnen | **teilweise** — sie stehen in den Kennzahlen-Kacheln (Reiter Bewertung); Portfolio-Cockpit noch nicht |
 
 **Zuletzt fertig: `v1259`–`v1259f` — Gold-Audit und Sprachaufzeichnung.**
 Vier von sechs Punkten aus Marcels Sprechlauf-Liste; die doppelte Prüfung
