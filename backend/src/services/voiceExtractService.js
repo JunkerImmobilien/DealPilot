@@ -289,6 +289,12 @@ function buildPrompt(transcript, catalog) {
     '12. Leite NIEMALS einen Wert aus einem anderen Feld ab und setze KEINE Defaults/Annahmen.\n' +
     '    Beispiel: Sind Zinssatz und Tilgung genannt, aber KEINE Zinsbindung in Jahren, dann lass\n' +
     '    d1_bindj WEG. Nur ausdruecklich genannte Werte aufnehmen.\n' +
+    '14. INVENTAR: `moebl` ist die GESAMTSUMME des Inventars. Werden EINZELPOSTEN\n' +
+    '    genannt ("Kueche 8.000, Moebel 3.000"), fuelle NUR inv_kueche, inv_moebel,\n' +
+    '    inv_geraete und lass `moebl` WEG — es wird aus den Einzelposten berechnet.\n' +
+    '    Nur wenn ein einziger Gesamtbetrag ohne Aufschluesselung genannt wird\n' +
+    '    ("Inventar 11.000 Euro"), gehoert er nach `moebl`. Beides gleichzeitig\n' +
+    '    zu setzen zerstoert den Einzelposten-Wert.\n' +
     '13. HAUSGELD-AUFTEILUNG: hg_ul = umlagefaehiger Anteil, hg_nul = NICHT\n' +
     '    umlagefaehiger Anteil. Wird ein GESAMT-Hausgeld plus ein nicht-umlagefaehiger\n' +
     '    Anteil genannt (z.B. "Hausgeld 300, davon 100 nicht umlagefaehig"), dann\n' +
