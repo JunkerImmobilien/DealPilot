@@ -73,15 +73,18 @@ const MAX_OPTIONS = 40;        /* Optionen je Select */
    NICHT beurteilen, weil dieselbe Datei bei zwei Laeufen desselben Modells
    zwei verschiedene Ortsnamen ergab. Transkription ist nicht deterministisch.
    Ob die ENV so bleiben soll, ist Marcels Entscheidung. */
+/* USD je 1 Mio Token. `einAudio` gilt nur fuer Audio-Eingabe, `einCached`
+   fuer wiederverwendete Prompt-Praefixe.
+   Recherchiert am 08.09.2026, jeder Wert aus zwei unabhaengigen Quellen. */
 const PREISE_FEST = {
-  /* USD je 1 Mio Token. `einAudio` gilt nur fuer Audio-Eingabe. */
+  'gpt-5.4-mini':           { ein: 0.75, einCached: 0.075, aus: 4.50 },
   'gpt-4o-mini':            { ein: 0.15, aus: 0.60 },
   'gpt-4o-transcribe':      { ein: 2.50, einAudio: 6.00, aus: 10.00 },
   'gpt-4o-mini-transcribe': { ein: 1.25, einAudio: 3.00, aus: 5.00 }
-  /* gpt-5.5 und gpt-5.4-mini fehlen bewusst: ich kenne ihre Listenpreise
-     nicht sicher, und gpt-5.4-mini ist ausgerechnet das Modell, das die
-     Auswertung macht. Lieber ein ehrliches "nicht bepreist" als eine Zahl,
-     der jemand glaubt. Nachtragen ohne Codeaenderung per OPENAI_PREISE. */
+  /* gpt-5.5 fehlt weiter — es laeuft hier nicht (die ENV setzt
+     gpt-5.4-mini), und einen Preis einzutragen, den niemand braucht und
+     den ich nicht geprueft habe, waere die schlechtere Haelfte von beidem.
+     Nachtragen ohne Codeaenderung per OPENAI_PREISE. */
 };
 const USD_EUR = Number(process.env.OPENAI_USD_EUR || 0.92);
 
@@ -110,14 +113,24 @@ function usageErfassen(sammler, schritt, modell, data) {
     const aus = Number(u.output_tokens != null ? u.output_tokens : (u.completion_tokens || 0)) || 0;
     const det = u.input_token_details || u.input_tokens_details || {};
     const einAudio = Number(det.audio_tokens || 0) || 0;
-    const einText = Math.max(0, ein - einAudio);
+    /* v1259f · Zwischengespeicherte Prompt-Teile kosten nur einen Bruchteil.
+       Das ist hier KEIN Randfall: von rund 6.200 Eingabe-Token der Auswertung
+       sind ueber 6.000 der immer gleiche Feldkatalog, und der steht im Prompt
+       VOR dem Transkript. Genau diese Reihenfolge macht ihn zwischenspeicher-
+       faehig. Ohne diese Zeilen rechnete die Anzeige den Katalog jedes Mal
+       zum vollen Preis und meldete damit zu viel. */
+    const einCached = Number(det.cached_tokens || 0) || 0;
+    const einText = Math.max(0, ein - einAudio - einCached);
     const sekunden = (u.type === 'duration') ? (Number(u.seconds) || 0) : 0;
 
     const p = preisFuer(modell);
-    const posten = { schritt, modell, ein, aus, einAudio, sekunden, bepreist: false, usd: 0 };
+    const posten = { schritt, modell, ein, aus, einAudio, einCached, sekunden, bepreist: false, usd: 0 };
     if (p) {
-      const satzAudio = (p.einAudio != null) ? p.einAudio : p.ein;
-      posten.usd = (einText * p.ein + einAudio * satzAudio + aus * p.aus) / 1e6;
+      const satzAudio  = (p.einAudio  != null) ? p.einAudio  : p.ein;
+      /* Kein Cache-Preis hinterlegt: zum vollen Satz rechnen. Lieber zu hoch
+         als eine Ersparnis behaupten, die vielleicht nicht gilt. */
+      const satzCached = (p.einCached != null) ? p.einCached : p.ein;
+      posten.usd = (einText * p.ein + einAudio * satzAudio + einCached * satzCached + aus * p.aus) / 1e6;
       posten.bepreist = true;
       sammler.usdGesamt += posten.usd;
     } else if (sammler.ohnePreis.indexOf(modell) < 0) {

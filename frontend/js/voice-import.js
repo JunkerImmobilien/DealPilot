@@ -1277,7 +1277,9 @@
             var zeilen = (k.posten || []).map(function (p) {
               return '<div style="display:flex;justify-content:space-between;gap:12px">' +
                 '<span>' + escH(p.schritt) + ' <span style="opacity:.6">' + escH(p.modell || '') + '</span></span>' +
-                '<span>' + (p.ein || 0) + ' ein / ' + (p.aus || 0) + ' aus' +
+                '<span>' + (p.ein || 0) + ' ein' +
+                (p.einCached ? ' (davon ' + p.einCached + ' aus dem Zwischenspeicher)' : '') +
+                ' / ' + (p.aus || 0) + ' aus' +
                 (p.bepreist ? '' : ' <b>· kein Preis hinterlegt</b>') + '</span></div>';
             }).join('');
             if (qm.calls) {
