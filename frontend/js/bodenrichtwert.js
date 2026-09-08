@@ -335,6 +335,19 @@
     'NRW':'nrw', 'NRW-NI':'nrw', 'RP':'borisd', 'SH':'sh', 'SL':'sl', 'SL-RP':'sl',
     'SN':'borisd', 'ST':'borisd', 'TH':'borisd'
   };
+  /* v1265 · Der Rückfall sperrte vier Länder, die längst frei sind.
+     Hier stand `{sh:1, by:1, bw:1, sl:1}` — aus der Zeit, als für
+     Schleswig-Holstein, Bayern, Baden-Württemberg und das Saarland keine
+     Lizenz vorlag. Am 08.09.2026 gegen /boris/coverage gemessen: **11 von
+     11 Ländern live, 0 eingeschränkt**, die vier tragen „Freigabe
+     (Aktennotiz Junker Solution)", dazu zwei bundesweite BORIS-D-Quellen
+     als catchAll.
+
+     Der alte Rückfall griff nur, wenn die Coverage-Abfrage scheitert — und
+     verweigerte dann in vier Bundesländern einen Abruf, der funktioniert
+     hätte. Jetzt leer: im Zweifel probieren. Ein Fehlversuch kostet eine
+     halbe Sekunde, ein zu Unrecht gesperrtes Land kostet den amtlichen
+     Wert. */
   var _borisRestricted = null; /* Set der gesperrten Codes; null = noch nicht geladen */
   function _loadBorisCoverage() {
     if (_borisRestricted !== null) return Promise.resolve(_borisRestricted);
@@ -344,17 +357,17 @@
       .then(function (list) {
         var set = {};
         if (Array.isArray(list)) { list.forEach(function (a) { if (a && a.restricted) set[a.code] = 1; }); }
-        else { set = { 'sh':1, 'by':1, 'bw':1, 'sl':1 }; } /* Fallback = bekannter Stand */
+        else { set = {}  /* v1265: siehe Kommentar bei _loadBorisCoverage */; } /* Fallback = bekannter Stand */
         _borisRestricted = set; return set;
       })
-      .catch(function () { _borisRestricted = { 'sh':1, 'by':1, 'bw':1, 'sl':1 }; return _borisRestricted; });
+      .catch(function () { _borisRestricted = {}  /* v1265: siehe Kommentar bei _loadBorisCoverage */; return _borisRestricted; });
   }
   function borisAvailableForPlz(plz) {
     var bl = _plzToBundesland(plz);
     if (!bl) return false;
     var code = PLZ_TO_BORIS[bl] || 'borisd';
     /* solange coverage nicht geladen: optimistisch erlauben ausser bekannt gesperrt */
-    var restricted = _borisRestricted || { 'sh':1, 'by':1, 'bw':1, 'sl':1 };
+    var restricted = _borisRestricted || {}  /* v1265: siehe Kommentar bei _loadBorisCoverage */;
     return !restricted[code];
   }
   function _refreshBorisBtn() {
@@ -482,9 +495,38 @@
       _brwAuto.letzteAdresse = adr;
       _brwAuto.laeuft = true;
       _knopfMarkieren(false);
-      Promise.resolve(askAi()).catch(function () {}).then(function () {
-        _brwAuto.laeuft = false;
-      });
+
+      /* ═══ v1265 · AMTLICH ZUERST, Schätzung nur als Rückfall ════════════
+         Marcels Hinweis: „der Bodenrichtwert-Button sollte die
+         Bodenrichtwert-Funktion aufrufen, so wie wir sie im Marktbericht
+         verwenden. Dort haben wir ja mittlerweile alle Bundesländer."
+
+         Er hat recht, und der Unterschied ist groß. Am 08.09.2026 an
+         denselben Adressen gemessen:
+
+           Hüllhorst, Hermannstr. 9   BORIS  90 €/m², Stichtag 01.01.2026,
+                                             Zone 167, 0,5 s
+                                      KI     50–65 €/m², Konfidenz niedrig
+           Herford, Sachsenstr. 16    BORIS 190 €/m², Zone 99173, 0,4 s
+                                      KI     nichts gefunden
+
+         Die 90 €/m² sind genau der Wert, mit dem das Testobjekt Hüllhorst
+         in CLAUDE.md rechnet. BORIS ist also nicht nur genauer, sondern
+         die Quelle, gegen die ohnehin geprüft wird — mit Stichtag und
+         Bodenrichtwertzone, beides gutachterlich zitierfähig. Dazu ist der
+         Abruf schneller und kostet nichts, während die KI-Schätzung einen
+         Aufruf verbraucht.
+
+         Reihenfolge deshalb: BORIS. Nur wenn dort kein Wert liegt — es
+         gibt Lagen ohne Zone, München-Marienplatz etwa —, kommt die
+         Schätzung. Beide Knöpfe bleiben von Hand bedienbar. */
+      Promise.resolve(fetchBoris())
+        .catch(function () {})
+        .then(function () {
+          if (!_brwLeer()) return;          /* BORIS hat geliefert — fertig */
+          return Promise.resolve(askAi()).catch(function () {});
+        })
+        .then(function () { _brwAuto.laeuft = false; });
     } catch (e) { _brwAuto.laeuft = false; }
   }
 
