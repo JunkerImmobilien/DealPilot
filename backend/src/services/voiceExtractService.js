@@ -31,6 +31,96 @@ const QUICKMATCH_MODEL = process.env.OPENAI_QUICKMATCH_MODEL || 'gpt-4o-mini';  
 const MAX_CATALOG = 250;       /* Eintraege */
 const MAX_OPTIONS = 40;        /* Optionen je Select */
 
+/* ════════════════════════════════════════════════════════════════════
+ * v1259 · WAS KOSTET EINE AUFNAHME?
+ *
+ * Marcels Frage vom 08.09.2026: „Was kostet uns denn jetzt diese
+ * Sprachaufzeichnung? Koennen wir das irgendwie ermitteln?"
+ *
+ * Der naheliegende Weg ist versperrt: die Nutzungs-API von OpenAI
+ * antwortet mit `Missing scopes: api.usage.read` — der Schluessel hat die
+ * Berechtigung nicht (dafuer braeuchte es einen Admin-Key).
+ *
+ * Der bessere Weg liegt ohnehin naeher: JEDE OpenAI-Antwort traegt ihren
+ * Verbrauch selbst mit. Bis v1258 hat dieser Dienst ihn weggeworfen — er
+ * las `data.text` bzw. `data.output` und liess `data.usage` liegen. Jetzt
+ * wird er eingesammelt.
+ *
+ * WAS GEMESSEN IST UND WAS GESCHAETZT: Die Tokenzahlen sind gemessen, sie
+ * kommen von OpenAI. Die PREISE sind hinterlegte Annahmen — ein Preis, der
+ * sich aendert, ohne dass es jemand merkt, waere schlimmer als kein Preis.
+ * Deshalb steht jeder Posten mit `bepreist: true|false` da, und was nicht
+ * bepreist ist, wird ausdruecklich genannt statt still als 0 gerechnet.
+ *
+ * PREISE NACHTRAGEN, ohne den Code anzufassen:
+ *   OPENAI_PREISE='{"gpt-5.5":{"ein":1.25,"aus":10}}'
+ * (USD je 1 Mio Token). Der Umrechnungskurs steht in OPENAI_USD_EUR.
+ * ════════════════════════════════════════════════════════════════════ */
+const PREISE_FEST = {
+  /* USD je 1 Mio Token. `einAudio` gilt nur fuer Audio-Eingabe. */
+  'gpt-4o-mini':            { ein: 0.15, aus: 0.60 },
+  'gpt-4o-mini-transcribe': { ein: 1.25, einAudio: 3.00, aus: 5.00 }
+  /* gpt-5.5 und gpt-5.4-mini fehlen bewusst: ich kenne ihre Listenpreise
+     nicht sicher. Lieber ein ehrliches "nicht bepreist" als eine Zahl, der
+     jemand glaubt. Nachtragen per OPENAI_PREISE. */
+};
+const USD_EUR = Number(process.env.OPENAI_USD_EUR || 0.92);
+
+function preisFuer(modell) {
+  let extra = {};
+  try { extra = JSON.parse(process.env.OPENAI_PREISE || '{}'); } catch (e) { extra = {}; }
+  return extra[modell] || PREISE_FEST[modell] || null;
+}
+
+function neuerSammler() {
+  return { posten: [], usdGesamt: 0, ohnePreis: [] };
+}
+
+/* Nimmt die `usage` einer OpenAI-Antwort entgegen. Fail-soft in jeder
+   Richtung: fehlt sie, fehlt der Posten — die Auswertung laeuft weiter.
+   Eine Kostenmessung darf nie der Grund sein, dass ein Diktat scheitert. */
+function usageErfassen(sammler, schritt, modell, data) {
+  try {
+    if (!sammler) return;
+    const u = (data && data.usage) || null;
+    if (!u) { sammler.posten.push({ schritt, modell, hinweis: 'ohne usage-Angabe' }); return; }
+
+    /* /v1/responses zaehlt input_tokens/output_tokens; die Transkription
+       kann stattdessen eine Dauer melden (usage.type === 'duration'). */
+    const ein = Number(u.input_tokens != null ? u.input_tokens : (u.prompt_tokens || 0)) || 0;
+    const aus = Number(u.output_tokens != null ? u.output_tokens : (u.completion_tokens || 0)) || 0;
+    const det = u.input_token_details || u.input_tokens_details || {};
+    const einAudio = Number(det.audio_tokens || 0) || 0;
+    const einText = Math.max(0, ein - einAudio);
+    const sekunden = (u.type === 'duration') ? (Number(u.seconds) || 0) : 0;
+
+    const p = preisFuer(modell);
+    const posten = { schritt, modell, ein, aus, einAudio, sekunden, bepreist: false, usd: 0 };
+    if (p) {
+      const satzAudio = (p.einAudio != null) ? p.einAudio : p.ein;
+      posten.usd = (einText * p.ein + einAudio * satzAudio + aus * p.aus) / 1e6;
+      posten.bepreist = true;
+      sammler.usdGesamt += posten.usd;
+    } else if (sammler.ohnePreis.indexOf(modell) < 0) {
+      sammler.ohnePreis.push(modell);
+    }
+    sammler.posten.push(posten);
+  } catch (e) { /* eine Kostenmessung bricht nie eine Auswertung ab */ }
+}
+
+function kostenAbschluss(sammler) {
+  if (!sammler) return null;
+  const eur = sammler.usdGesamt * USD_EUR;
+  return {
+    eur_cent: Math.round(eur * 10000) / 100,   /* zwei Nachkommastellen im Cent */
+    usd: Math.round(sammler.usdGesamt * 1e6) / 1e6,
+    kurs: USD_EUR,
+    vollstaendig: sammler.ohnePreis.length === 0,
+    ohne_preis: sammler.ohnePreis,
+    posten: sammler.posten
+  };
+}
+
 function httpErr(status, message) {
   const e = new Error(message);
   e.status = status;
@@ -78,7 +168,7 @@ function sanitizeCatalog(raw) {
   return out;
 }
 
-async function transcribe(buf, mime, apiKey) {
+async function transcribe(buf, mime, apiKey, sammler) {
   const fd = new FormData();
   fd.append('model', TRANSCRIBE_MODEL);
   fd.append('language', 'de');
@@ -99,6 +189,7 @@ async function transcribe(buf, mime, apiKey) {
     throw httpErr(502, 'Transkription fehlgeschlagen (HTTP ' + r.status + '): ' + t.slice(0, 300));
   }
   const data = await r.json().catch(() => ({}));
+  usageErfassen(sammler, 'Transkription', TRANSCRIBE_MODEL, data);  /* v1259 */
   return String(data.text || '').trim();
 }
 
@@ -175,7 +266,7 @@ function buildPrompt(transcript, catalog) {
     'TRANSKRIPT:\n"""\n' + transcript + '\n"""';
 }
 
-async function extractFields(transcript, catalog, apiKey) {
+async function extractFields(transcript, catalog, apiKey, sammler) {
   transcript = stripTermDump(transcript);  /* v515 */
   let r;
   try {
@@ -197,6 +288,7 @@ async function extractFields(transcript, catalog, apiKey) {
     throw httpErr(502, 'Extraktion fehlgeschlagen (HTTP ' + r.status + '): ' + t.slice(0, 300));
   }
   const data = await r.json().catch(() => ({}));
+  usageErfassen(sammler, 'Auswertung', EXTRACT_MODEL, data);  /* v1259 */
   let text = '';
   (data.output || []).forEach(item => {
     (item.content || []).forEach(c => {
@@ -270,11 +362,24 @@ async function extractFromAudio(audioB64, mime, catalog, opts) {
   let buf;
   try { buf = Buffer.from(audioB64, 'base64'); } catch (e) { throw httpErr(400, 'Audio konnte nicht dekodiert werden.'); }
   if (!buf || buf.length < 2000) throw httpErr(400, 'Aufnahme zu kurz oder leer.');
-  const transcript = await transcribe(buf, mime, key);
+  const sammler = neuerSammler();  /* v1259 */
+  const transcript = await transcribe(buf, mime, key, sammler);
   if (!transcript || transcript.length < 10) throw httpErr(422, 'Keine Sprache erkannt \u2014 bitte erneut aufnehmen.');
-  let out = await extractFields(transcript, cat, key);
-  if (VERIFY_ON) { try { out = await verifyFields(transcript, out, cat, key); } catch (e) {} }  /* v522 verify-pass, fail-soft */
-  return { transcript, fields: out.fields, unsicher: out.unsicher };
+  let out = await extractFields(transcript, cat, key, sammler);
+  if (VERIFY_ON) { try { out = await verifyFields(transcript, out, cat, key, sammler); } catch (e) {} }  /* v522 verify-pass, fail-soft */
+
+  /* v1259 \u00b7 Der eigene Schluessel eines Nutzers ist SEINE Rechnung, nicht
+     unsere. Kosten werden nur ausgewiesen, wenn der Server-Key gezahlt hat. */
+  const kosten = o.userApiKey ? null : kostenAbschluss(sammler);
+  if (kosten) {
+    try {
+      console.log('[voice/kosten] %s ct (EUR) | %s | %s',
+        kosten.eur_cent.toFixed(2),
+        kosten.vollstaendig ? 'vollstaendig' : ('ohne Preis: ' + kosten.ohne_preis.join(', ')),
+        kosten.posten.map(p => p.schritt + ' ' + (p.ein || 0) + '/' + (p.aus || 0)).join(' | '));
+    } catch (e) {}
+  }
+  return { transcript, fields: out.fields, unsicher: out.unsicher, kosten };
 }
 
 /* v513: Live-Zwischenauswertung. Transkript-Text -> Array erkannter Feld-ids
@@ -311,6 +416,12 @@ async function quickMatch(transcript, catalog, apiKey) {
   } catch (e) { return { ids: [] }; }
   if (!r.ok) return { ids: [] };
   const data = await r.json().catch(() => ({}));
+  /* v1259 · Die Live-Hilfe laeuft bis zu sechsmal je Aufnahme und kostet
+     jedes Mal. Sie gehoert in die Rechnung, sonst zaehlt „was kostet eine
+     Aufnahme" nur die Haelfte. Eigener Sammler, weil dieser Aufruf ueber
+     eine eigene Route laeuft — das Frontend addiert beide Seiten. */
+  const sammler = neuerSammler();
+  usageErfassen(sammler, 'Live-Hilfe', QUICKMATCH_MODEL, data);
   let text = '';
   (data.output || []).forEach(item => {
     (item.content || []).forEach(c => {
@@ -325,7 +436,7 @@ async function quickMatch(transcript, catalog, apiKey) {
   let arr = [];
   try { const pp = JSON.parse(text); arr = Array.isArray(pp) ? pp : (Array.isArray(pp.ids) ? pp.ids : []); } catch (e) { arr = []; }
   const valid = new Set(cat.map(e => e.id));
-  return { ids: arr.filter(id => valid.has(id)) };
+  return { ids: arr.filter(id => valid.has(id)), kosten: kostenAbschluss(sammler) };  /* v1259 */
 }
 
 /* v522: Verifikations-Pass (2. KI-Call), prueft/korrigiert Felder gegen das Transkript. */
@@ -375,7 +486,7 @@ function buildVerifyPrompt(transcript, fields, catalog) {
     'TRANSKRIPT:\n"""\n' + transcript + '\n"""';
 }
 
-async function verifyFields(transcript, prev, catalog, apiKey) {
+async function verifyFields(transcript, prev, catalog, apiKey, sammler) {
   /* fail-soft: bei jedem Fehler bleibt prev unveraendert. */
   const seed = {};
   Object.keys((prev && prev.fields) || {}).forEach(function (k) { seed[k] = prev.fields[k]; });
@@ -394,6 +505,7 @@ async function verifyFields(transcript, prev, catalog, apiKey) {
   } catch (e) { return prev; }
   if (!r || !r.ok) return prev;
   const data = await r.json().catch(function () { return {}; });
+  usageErfassen(sammler, 'Gegenpruefung', VERIFY_MODEL, data);  /* v1259 */
   let text = '';
   (data.output || []).forEach(function (item) {
     (item.content || []).forEach(function (c) {

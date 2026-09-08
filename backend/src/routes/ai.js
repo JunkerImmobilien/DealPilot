@@ -508,19 +508,19 @@ router.post('/extract-voice', authenticate, extractLimiter, async (req, res, nex
       userApiKey: userApiKey
     });
 
-    // Kerosin abziehen (nur Server-Key), erst NACH erfolgreicher Auswertung
+    /* v1259: Protokollieren, nicht abbuchen — diese KI-Hilfe ist im Plan
+       enthalten (v1183). Der Aufruf stand hier ZWEIMAL hintereinander: einmal
+       im if-Block, einmal ungeschuetzt danach. Jede Sprachauswertung hat also
+       zwei Zeilen ins Protokoll geschrieben, und bei eigenem Nutzerschluessel
+       sogar eine, obwohl wir gar nichts bezahlt haben. Auf einen Aufruf
+       zusammengezogen, im if-Block, wo er hingehoert. */
     if (!userApiKey) {
       try {
-        await aiCreditsService.logExtract(req.user.id, 'extract-voice'); /* v1183: im Plan enthalten */
+        await aiCreditsService.logExtract(req.user.id, 'extract-voice');
       } catch (e) {
-        console.warn('[ai/extract-voice] Credits consume failed:', e.message);
+        console.warn('[ai/extract-voice] logExtract fehlgeschlagen:', e.message);
       }
     }
-    try {
-      if (aiCreditsService && typeof aiCreditsService.logExtract === 'function') {
-        await aiCreditsService.logExtract(req.user.id, 'extract-voice');
-      }
-    } catch (e) { /* nicht kritisch */ }
     res.json(result);
   } catch (err) {
     if (err.code === 'NO_API_KEY') return res.status(503).json({ error: err.message, needs_user_key: true });
@@ -550,7 +550,7 @@ router.post('/voice-quickmatch', authenticate, quickMatchLimiter, async (req, re
     if (!config.openai.apiKey) return res.json({ ids: [] });  // nur Server-Key
     if (!transcript || typeof transcript !== 'string' || transcript.length < 3) return res.json({ ids: [] });
     const out = await voiceExtractService.quickMatch(transcript.slice(0, 8000), catalog, config.openai.apiKey);
-    res.json({ ids: (out && out.ids) || [] });
+    res.json({ ids: (out && out.ids) || [], kosten: (out && out.kosten) || null });  /* v1259 */
   } catch (err) {
     res.json({ ids: [] });  // Live-Hilfe darf nie hart fehlschlagen
   }

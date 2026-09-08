@@ -51,7 +51,20 @@
   var sx = { ws: null, ctx: null, src: null, proc: null, on: false, finalText: '', delta: '' };
   var _catalog = [];  /* fuer Chip-Wolke + finale Markierung */
   /* v513: Live-KI-Zwischenauswertung (event-gesteuert, hart begrenzt) */
-  var qm = { calls: 0, max: 6, lastLen: 0, inflight: false, timer: null };
+  var qm = { calls: 0, max: 6, lastLen: 0, inflight: false, timer: null, kostenCent: 0 };  /* v1259: kostenCent */
+
+  /* v1259 · Schalter fuer die Kostenanzeige. `?kosten=1` schaltet ein und
+     merkt es sich, `?kosten=0` aus. Ein Kunde soll die Zahl nicht sehen —
+     fuer ihn ist die Auswertung im Plan enthalten, eine Cent-Angabe wuerde
+     ihn nur fragen lassen, was sie ihm abzieht. */
+  function _kostenZeigen() {
+    try {
+      var p = new URLSearchParams(location.search).get('kosten');
+      if (p === '1') { localStorage.setItem('dp_voice_kosten', '1'); return true; }
+      if (p === '0') { localStorage.removeItem('dp_voice_kosten'); return false; }
+      return localStorage.getItem('dp_voice_kosten') === '1';
+    } catch (e) { return false; }
+  }
 
   function $(id) { return document.getElementById(id); }
 
@@ -538,7 +551,7 @@
     }
     sx.finalText = ''; sx.delta = '';
     /* v537-qmreset: quickMatch-State je Aufnahme zuruecksetzen (Greening + Cap) */
-    qm.calls = 0; qm.lastLen = 0; qm.inflight = false;
+    qm.calls = 0; qm.lastLen = 0; qm.inflight = false; qm.kostenCent = 0;  /* v1259: auch die Rechnung */
     if (qm.timer) { clearTimeout(qm.timer); qm.timer = null; }
     if (typeof qm.max !== 'number') qm.max = 60;
     if (sx.liveTimer) { clearInterval(sx.liveTimer); sx.liveTimer = null; }
@@ -1061,7 +1074,12 @@
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok },
       body: JSON.stringify({ transcript: txt, catalog: cat })
     }).then(function (r) { return r.ok ? r.json() : { ids: [] }; })
-      .then(function (d) { markChipsByIds((d && d.ids) || []); })
+      .then(function (d) {
+        markChipsByIds((d && d.ids) || []);
+        /* v1259: die Live-Hilfe laeuft bis zu sechsmal je Aufnahme und kostet
+           jedes Mal — ohne sie zaehlte die Rechnung nur die Haelfte. */
+        try { if (d && d.kosten && d.kosten.eur_cent) qm.kostenCent += d.kosten.eur_cent; } catch (e) {}
+      })
       .catch(function () {})
       .then(function () { qm.inflight = false; });
   }
@@ -1235,6 +1253,54 @@
     var nx = $('vi-next'); if (nx) nx.style.display = 'none';
     var ap = $('oabi-apply'); if (ap) ap.style.display = '';
     OA.render();  /* renderMergedTable -> #oabi-result, aktiviert oabi-apply */
+
+    /* ── v1259 · Was hat diese Aufnahme gekostet? ────────────────────────
+       Marcels Frage vom 08.09.2026. Die Zahlen kommen vom Backend, das sie
+       aus den `usage`-Angaben jeder OpenAI-Antwort einsammelt; die
+       Live-Hilfe waehrend des Sprechens ist eingerechnet (qm.kostenCent).
+
+       NICHT fuer jeden sichtbar: fuer einen Kunden ist die Auswertung im
+       Plan enthalten, eine Cent-Angabe wuerde ihn nur fragen lassen, was
+       sie ihm abzieht. Anzeigen mit `?kosten=1` an der Adresse (merkt sich
+       das Fenster), abschalten mit `?kosten=0`. In der Browser-Konsole und
+       im Server-Log steht sie immer. */
+    try {
+      var k = data && data.kosten;
+      if (k) {
+        var centGesamt = (k.eur_cent || 0) + (qm.kostenCent || 0);
+        console.log('[voice-import] Kosten: ' + centGesamt.toFixed(2) + ' ct' +
+          (k.vollstaendig ? '' : ' (ohne Preis: ' + (k.ohne_preis || []).join(', ') + ')'),
+          { auswertung: k, liveHilfe_ct: qm.kostenCent, laeufe: qm.calls });
+        if (_kostenZeigen()) {
+          var kh = $('oabi-result');
+          if (kh) {
+            var zeilen = (k.posten || []).map(function (p) {
+              return '<div style="display:flex;justify-content:space-between;gap:12px">' +
+                '<span>' + escH(p.schritt) + ' <span style="opacity:.6">' + escH(p.modell || '') + '</span></span>' +
+                '<span>' + (p.ein || 0) + ' ein / ' + (p.aus || 0) + ' aus' +
+                (p.bepreist ? '' : ' <b>· kein Preis hinterlegt</b>') + '</span></div>';
+            }).join('');
+            if (qm.calls) {
+              zeilen += '<div style="display:flex;justify-content:space-between;gap:12px">' +
+                '<span>Live-Hilfe waehrend des Sprechens</span><span>' + qm.calls + ' Laufe' + '</span></div>';
+            }
+            var kd = document.createElement('details');
+            kd.style.cssText = 'margin:10px 0 4px;font-size:12px;color:#7A7370';
+            kd.innerHTML = '<summary style="cursor:pointer;font-weight:600;color:#9a7f33">Kosten dieser Aufnahme: ' +
+              centGesamt.toFixed(2).replace('.', ',') + ' Cent' +
+              (k.vollstaendig ? '' : ' (unvollständig)') + '</summary>' +
+              '<div style="margin:8px 0 0;line-height:1.7;background:rgba(229,168,71,.08);border:1px solid rgba(229,168,71,.3);border-radius:8px;padding:10px">' +
+              zeilen +
+              (k.vollstaendig ? '' :
+                '<div style="margin-top:8px"><b>Nicht bepreist:</b> ' + escH((k.ohne_preis || []).join(', ')) +
+                ' — die Tokenzahlen sind gemessen, der Listenpreis dieser Modelle ist nicht hinterlegt.</div>') +
+              '<div style="margin-top:8px;opacity:.7">Kurs 1&nbsp;USD = ' + String(k.kurs).replace('.', ',') + '&nbsp;EUR</div>' +
+              '</div>';
+            kh.appendChild(kd);
+          }
+        }
+      }
+    } catch (e) {}
 
     var host = $('oabi-result');
     if (host && data && data.transcript) {
