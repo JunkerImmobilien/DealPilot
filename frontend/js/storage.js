@@ -635,7 +635,15 @@ async function saveObj(opts) {
               anschaffungsnah: v.anschaffungsnah || 0,
               erhaltungsaufwand: v.erhaltungsaufwand || 0,
               einnahmen_km: v.einnahmen_km || 0,
-              einnahmen_nk: v.einnahmen_nk || 0
+              einnahmen_nk: v.einnahmen_nk || 0,
+              /* v1258 · Die Aufteilung von `afa` mitschicken. tax.js:1064
+                 fuehrt sie seit v1225 als `_afaLinear` und `_afaSonder7b` —
+                 sie kam bisher nur nie ueber die Leitung.
+                 KEIN `|| 0`: fehlt der Wert, muss null ankommen. Eine 0
+                 hiesse „kein Paragraf 7b", und das ist etwas anderes als
+                 „nicht erhoben". */
+              afa_linear: (v._afaLinear != null ? v._afaLinear : null),
+              afa_sonder_7b: (v._afaSonder7b != null ? v._afaSonder7b : null)
             };
           });
 

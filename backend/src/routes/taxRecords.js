@@ -19,6 +19,10 @@ const taxRecordSchema = z.object({
   schuldzinsen: z.number().nullable().optional(),
   bewirtschaftung: z.number().nullable().optional(),
   afa: z.number().nullable().optional(),
+  /* v1258: die Aufteilung von afa. Optional — aeltere Clients senden sie
+     nicht, und dann bleibt sie null statt 0. */
+  afa_linear: z.number().nullable().optional(),
+  afa_sonder_7b: z.number().nullable().optional(),
   sanierung_erhaltungsaufwand: z.number().nullable().optional(),
   sonstige_werbungskosten: z.number().nullable().optional(),
   immo_result: z.number().nullable().optional(),
