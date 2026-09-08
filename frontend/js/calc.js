@@ -1613,7 +1613,34 @@ function _calcImmediate(){
     // V63.58: BSV-Sparrate ist CF-Abfluss (gebundenes Geld), gehört in CF-Berechnung
     var cf_y_ns=cf_y_op-tax_y_loop-bspar_y_loop;
     cfkum+=cf_y_ns;
-    _cfReihe.push(cf_y_ns);   /* v1260 */
+    /* ═══ v1260c · Die Tilgung MUSS hier abgezogen werden ═══════════════════
+       ZURÜCKGENOMMEN: v1260 hat `cf_y_ns` roh in die Reihe gelegt. Das war
+       falsch, und die Gegenprobe hat es gefunden — die KPI-Karte zeigte
+       3.480 €, die Reihe 5.280 €, Differenz exakt 1.800 € = 1 % Tilgung auf
+       180.000 € Darlehen.
+
+       WARUM DAS DEN IRR AUFBLÄHT: `cf_y_op` in dieser Schleife ist Miete
+       minus Bewirtschaftung minus ZINSEN — die Tilgung fehlt dort bewusst,
+       weil die Schleife ursprünglich den VERMÖGENSZUWACHS rechnet, und für
+       den ist Tilgung kein Aufwand, sondern Aufbau.
+
+       Für eine Zahlungsreihe gilt das nicht. Wer die Tilgung nicht als
+       Abfluss zählt, aber am Ende die um genau diese Tilgung GESUNKENE
+       Restschuld abzieht, schreibt sie sich zweimal gut. Genau das ist
+       passiert: 40,6 % statt 33,7 %.
+
+       Zwei Wege wären richtig — Tilgung abziehen und die gesunkene
+       Restschuld ansetzen, oder Tilgung stehen lassen und die
+       ANFANGS-Schuld abziehen. Der erste ist der übliche und der, den auch
+       immocation im Cockpit rechnet (Warmmiete − BWK − Zinsen − Tilgung −
+       Steuern = Cashflow nach Steuern).
+
+       Die Bauspar-Sparrate ist bereits in cf_y_ns abgezogen und das
+       Guthaben wird am Ende zurückgegeben — dort stimmt die Logik schon.
+
+       `_ef` ist der Anteilsfaktor des letzten Jahres (v816) und gehört an
+       die Tilgung genauso wie an Zins und AfA. */
+    _cfReihe.push(cf_y_ns - ty * _ef);   /* v1260c */
     bspar_kum += bspar_y_loop;
     rs_loop=Math.max(0,rs_loop-ty*_ef);  /* v816-ef-tilg: Tilgung im letzten Jahr anteilig */
     miete_kum += nkm_y;
