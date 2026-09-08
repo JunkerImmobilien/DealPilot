@@ -1058,7 +1058,10 @@ function _computeAutoForYear(yearIdx, year) {
     // V227: + § 7b Sonder-AfA (wirkt nur in den ersten 4 Jahren)
     /* v1225 · die beiden Summanden bleiben getrennt VERFUEGBAR. Der Unterstrich
        sagt: kein Formularfeld, sondern eine Auskunft ueber die Zusammensetzung
-       von `afa`. _computeYearTotal reicht sie weiter, die Anlage-V-Seite
+       von `afa`. (v1258: der Satz „_computeYearTotal reicht sie weiter"
+       stand hier und war FALSCH — die Funktion baut ihre Werte nur aus
+       ihrer `fields`-Liste, und dort stehen die beiden nicht. Behoben in
+       _computeYearTotal selbst.) Die Anlage-V-Seite
        braucht sie fuer Zeile 35 gegen Zeile 38. Die Summe oben bleibt exakt
        dieselbe — hier wird nichts umgerechnet. */
     _afaLinear: afaGebaeude,
@@ -1113,6 +1116,31 @@ function _computeYearTotal(year, yearIdx, vorgabe) {
   fields.forEach(function(f) {
     values[f] = vorgabe ? (Number(vorgabe[f]) || 0) : _getEffectiveValue(year, f, auto[f]);
   });
+
+  /* v1258 · Die Aufteilung von `afa` mitführen.
+     `fields` listet nur Formularfelder — Werte, die der Nutzer
+     überschreiben kann. `_afaLinear` und `_afaSonder7b` sind keine
+     Eingaben, sondern eine Auskunft darüber, woraus `afa` besteht; sie
+     gehören deshalb NICHT in die Liste und nicht durch
+     _getEffectiveValue.
+
+     Der Kommentar bei tax.js:1061 behauptete seit v1225, diese Funktion
+     reiche die beiden weiter. Sie tat es nicht — sie baut `values`
+     ausschliesslich aus `fields`. Gemessen am 08.09.2026: `afa` kam mit
+     1936 an, beide Unterstrich-Felder als undefined. Zurückgenommen und
+     hier behoben.
+
+     Bei einem GESPEICHERTEN Satz (`vorgabe`) kommen sie aus der
+     Datenbank und heissen dort afa_linear / afa_sonder_7b. Fehlen sie —
+     jeder Satz vor v1258 — bleibt es bei null, NICHT bei 0: „nicht
+     erhoben" ist etwas anderes als „kein Paragraf 7b". */
+  if (vorgabe) {
+    values._afaLinear   = (vorgabe.afa_linear    != null) ? Number(vorgabe.afa_linear)    : null;
+    values._afaSonder7b = (vorgabe.afa_sonder_7b != null) ? Number(vorgabe.afa_sonder_7b) : null;
+  } else {
+    values._afaLinear   = (auto._afaLinear   != null) ? auto._afaLinear   : null;
+    values._afaSonder7b = (auto._afaSonder7b != null) ? auto._afaSonder7b : null;
+  }
 
   // Werbungskosten — umlagefähige NK ist Teil davon (Excel-Logik: durchlaufender Posten)
   var werbungskosten =

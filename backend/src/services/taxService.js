@@ -25,12 +25,17 @@ async function upsert({ userId, objectId, year, data }) {
        hausverwaltung, steuerber, porto, verw_sonst,
        fahrtkosten, verpflegung, hotel, inserat, gericht, telefon, sonst_kosten,
        sonst_bewegl_wg, anschaffungsnah, erhaltungsaufwand,
-       einnahmen_km, einnahmen_nk
+       einnahmen_km, einnahmen_nk,
+       -- v1258: die Aufteilung von afa. Ans ENDE gehaengt, damit die
+       -- Nummerierung der 41 bestehenden Parameter unveraendert bleibt --
+       -- eine verschobene Position waere lautlos falsch.
+       afa_linear, afa_sonder_7b
      )
      VALUES (
        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17,
        $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29,
-       $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $40, $41
+       $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $40, $41,
+       $42, $43
      )
      ON CONFLICT (user_id, object_id, year) DO UPDATE SET
        base_income = EXCLUDED.base_income,
@@ -39,6 +44,8 @@ async function upsert({ userId, objectId, year, data }) {
        schuldzinsen = EXCLUDED.schuldzinsen,
        bewirtschaftung = EXCLUDED.bewirtschaftung,
        afa = EXCLUDED.afa,
+       afa_linear = EXCLUDED.afa_linear,
+       afa_sonder_7b = EXCLUDED.afa_sonder_7b,
        sanierung_erhaltungsaufwand = EXCLUDED.sanierung_erhaltungsaufwand,
        sonstige_werbungskosten = EXCLUDED.sonstige_werbungskosten,
        immo_result = EXCLUDED.immo_result,
@@ -112,7 +119,14 @@ async function upsert({ userId, objectId, year, data }) {
       safeNumeric(data.anschaffungsnah) || 0,
       safeNumeric(data.erhaltungsaufwand) || 0,
       safeNumeric(data.einnahmen_km) || 0,
-      safeNumeric(data.einnahmen_nk) || 0
+      safeNumeric(data.einnahmen_nk) || 0,
+      /* v1258 · Die Aufteilung von `afa`. KEIN `|| 0` — hier ist die
+         Unterscheidung zwischen „null Euro Sonder-AfA" und „nicht erhoben"
+         die ganze Aussage. safeNumeric gibt null zurueck, wenn nichts kam;
+         ein `|| 0` daraus zu machen hiesse, fuer jeden alten Satz „kein
+         Paragraf 7b" zu behaupten, ohne es zu wissen. */
+      safeNumeric(data.afa_linear),
+      safeNumeric(data.afa_sonder_7b)
     ]
   );
   return r.rows[0];
