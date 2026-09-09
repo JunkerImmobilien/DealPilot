@@ -1721,8 +1721,15 @@
       var blob = new Blob(_fs.chunks, { type: _fs.rec.mimeType || 'audio/webm' });
       _fs.chunks = [];
       if (!_rf || !eintrag || _rf.offen[_rf.i] !== eintrag) return;   /* Frage inzwischen weiter */
-      if (!blob || blob.size < 1500) { _fsHinweis('Das war zu kurz — nochmal, oder tippen.'); _fsHoeren(); return; }
-      _rfMelden('Ich ordne das zu …', true);
+      /* v1276c: Ein Fehlversuch gehoert in den VERLAUF, nicht in die
+         Lauschzeile - die wird von der naechsten Runde sofort
+         ueberschrieben. Eine Antwort, die spurlos verschwindet, laesst
+         einen ratlos zurueck: hat er mich gehoert oder nicht? */
+      if (!blob || blob.size < 1500) {
+        _rfBlase('co', 'Das war zu kurz — sag es gern nochmal.');
+        _fsHoeren(); return;
+      }
+      _rfMelden('', true);
       blobToB64(blob).then(function (b64) {
         return Auth.apiCall('/ai/extract-voice', {
           method: 'POST',
@@ -1732,11 +1739,13 @@
         if (!_rf || _rf.offen[_rf.i] !== eintrag) return;
         if (r && r.transcript) {
           try { console.log('[voice-import] Freisprech-Antwort:', r.transcript); } catch (x) {}
-          _fsGesagt(r.transcript);
+          _rfDenkt(false);
+          _rfBlase('ich', escH(r.transcript));   /* v1276c: was verstanden wurde, steht da */
         }
         _rfUebernehmen(r && r.fields, true);
       }).catch(function (err) {
-        _rfMelden('⚠ ' + ((err && err.message) || 'Das hat gerade nicht geklappt.'));
+        _rfDenkt(false);
+        _rfBlase('co', escH((err && err.message) || 'Das habe ich nicht verstanden — nochmal, oder tippe es.'));
         _fsHoeren();
       });
     };
