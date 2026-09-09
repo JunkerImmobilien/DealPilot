@@ -9602,6 +9602,82 @@ Gold-Audit auf Prod RC=0.
 > **Der Nummernkreis gilt auch auf Prod:** dort liegt ebenfalls ein
 > Demo-Objekt `2026-999`, das den Zähler auf vierstellige Nummern hebt.
 
+### `v1271` · Nach der Wahl blieb die Straßenliste stehen
+
+Marcels Befund beim Testen auf Prod: *„wenn ich die strasse ausgewählt habe
+bleibt leider das dropdown für strasse stehen obwohl ich das feld gewechselt
+habe."*
+
+**Ursache war das eigene Setzen.** `_setzen()` feuert ein `input`-Ereignis,
+damit `calc()` rechnet — und **derselbe** `input`-Handler startet die Suche
+erneut. Die Antwort kam 300 ms später zurück und riss die Liste wieder auf;
+da war der Fokus längst in der Hausnummer.
+
+> **Ein Handler, der auf Eingaben hört, hört auch die eigenen.** Wer einen
+> Feldwert programmatisch setzt und dabei ein Ereignis auslöst, muss damit
+> rechnen, dass er sich selbst antriggert.
+
+**Zwei Riegel:**
+
+1. Der eben gewählte Text löst **keine neue Suche** aus (`_gewaehlt`).
+2. `_zeigen()` öffnet die Liste **nur, wenn das Straßenfeld noch den Fokus
+   hat**. Das fängt jede spät eintreffende Antwort ab, egal woher sie kommt
+   — auch die, an die ich heute noch nicht gedacht habe.
+
+**Abnahme (Staging und Prod):** Auswahl → Liste zu, auch 3,2 s später;
+Straße übernommen, Fokus in der Hausnummer. Weitertippen öffnet die Liste
+wieder (Gegentest: „Hüll" → drei Treffer). Fokuswechsel während laufender
+Suche → Liste bleibt zu.
+
+**Commit** `d7939d6`, Prod von `124e6c1` auf `d7939d6`. Reine
+Frontend-Änderung, kein Rebuild, keine Migration.
+
+### `v1272` · Der Orbit wartet nicht mehr auf eine Antwort
+
+Marcels Punkt 3 aus der Sprechlauf-Liste: *„Pillen unterschiedlich lang
+einblenden — nicht jeder Punkt wird gesagt, der Orbit darf nicht auf eine
+Antwort warten."*
+
+**Der Befund, gemessen:** Bis `v1271` wurde ein Platz **nur** frei, wenn
+sein Stichwort erkannt wurde. Wer über Denkmalschutz nichts sagt, bekam
+die Pille bis zum Ende der Aufnahme angezeigt — und die restlichen rund 23
+Stichwörter dahinter **nie zu sehen**. Der Kranz stand still und wartete
+auf etwas, das nie kam.
+
+**Jetzt hat jeder Platz eine Standzeit.** Läuft sie ab und wartet noch
+etwas, rückt das nächste nach; das Verdrängte geht ans Ende der Schlange
+und kommt später wieder. So dreht der Kranz einmal durch alles, was offen
+ist.
+
+> **Die Standzeiten sind bewusst verschieden** — 6,5 s + 0,8 s je Platz +
+> bis 1,5 s Streuung, also rund **6,5 bis 15 s**. Wären sie gleich,
+> wechselte der ganze Kranz im Gleichtakt und das Auge hätte nichts mehr,
+> woran es sich festhält. Genau das meint „unterschiedlich lang".
+
+**Drei Sicherungen:**
+
+- Gedreht wird **nur während der Aufnahme** (nicht pausiert, nicht
+  gestoppt) und nur, wenn überhaupt jemand wartet. Ein Kranz, in dem alles
+  Platz hat, steht still.
+- Ein **erkanntes** Stichwort ohne Platz bekommt einen — sonst bliebe die
+  grüne Bestätigung unsichtbar, und die ist der Sinn der Sache.
+- Ab der Endauswertung wird nicht mehr gedreht (`_final`): dort kommen 17
+  Felder auf einmal, das wäre Flackern statt Rückmeldung.
+
+**Abnahme (Staging, Mikrofon durch einen stummen `MediaStream` ersetzt):**
+Aufnahme gestartet, 31 Stichwörter, 8 Plätze. In **32 Sekunden** waren
+**alle 31** mindestens einmal zu sehen, danach begann die Runde von vorn.
+Vorher wären es acht geblieben. Gegenprobe: ein verstecktes Stichwort auf
+`on` gesetzt → **sofort sichtbar**, nach dem Nachleuchten wieder weg.
+
+**Commit** — auf Staging, **nicht auf Prod**.
+
+> **Notiz zum Werkzeug:** Ein `cat`-Heredoc mit dem kompletten Modulcode
+> ist zweimal an der Shell gescheitert (`unexpected EOF while looking for
+> matching`), obwohl er in Anführungszeichen stand. Was zuverlässig
+> funktioniert: die Patch-Datei mit dem Write-Werkzeug in den Scratchpad
+> schreiben und mit `awk -v P=...` einsetzen.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

@@ -199,6 +199,14 @@
       '.oabi-ov.vi-mode .vi-chip.on,.oabi-ov.vi-mode .vi-chip.pre{opacity:1;border-color:#2f8f5c;background:linear-gradient(180deg,#37a06a,#2f8f5c);color:#fff;box-shadow:0 6px 18px rgba(47,143,92,.45);transform:translate(-50%,-50%) scale(1.06)}',
       '.oabi-ov.vi-mode .vi-chip.on .vi-ck,.oabi-ov.vi-mode .vi-chip.pre .vi-ck{color:#fff}',
       '.oabi-ov.vi-mode .vi-chip.on .vi-ck,.oabi-ov.vi-mode .vi-chip.pre .vi-ck{opacity:1}',
+      /* v1272: Auf- und Abtritt beim Weiterdrehen. Ohne sie taeuschten die
+         Pillen einen Sprung vor - sie waren einfach woanders. Die Klassen
+         sitzen ABSICHTLICH auf .oabi-ov.vi-mode .vi-chip.X (0,4,0): die
+         Grundregel darueber ist 0,3,0 und wuerde sonst gewinnen. */
+      '.oabi-ov.vi-mode .vi-chip.vi-fort{animation:viFort .28s ease forwards;pointer-events:none}',
+      '.oabi-ov.vi-mode .vi-chip.vi-ein{animation:viEin .38s ease both}',
+      '@keyframes viFort{to{opacity:0;transform:translate(-50%,-50%) scale(.72)}}',
+      '@keyframes viEin{from{opacity:0;transform:translate(-50%,-50%) scale(.72)}to{opacity:.94;transform:translate(-50%,-50%)}}',
       /* Hoert-zu Zeile + Punkte */
       '.vi-listen{text-align:center;font:600 11px/1 "JetBrains Mono",monospace;letter-spacing:.24em;text-transform:uppercase;color:var(--vi-muted);margin:6px 0 14px}',
       '.vi-dots{display:inline-flex;gap:3px;margin-left:6px}',
@@ -850,6 +858,10 @@
       var c=/(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec(bg||'');
       if(c){ var lum=0.299*+c[1]+0.587*+c[2]+0.114*+c[3]; ov.classList.toggle('vi-darkbg', lum<128); } }catch(e){} }, 60);
     _slots = [];  /* v1259: Plaetze fuer den neuen Aufbau leeren */
+    /* v1272: Standzeiten und Endauswertungs-Merker gehoeren dazu - sonst
+       traegt der zweite Sprechlauf die Uhren des ersten. */
+    _bis = []; _final = 0;
+    if (_tick) { clearTimeout(_tick); _tick = null; }
     var byGroup = {};
     _catalog.forEach(function (e) {
       if (e.noc) return;  /* NK-Einzelfelder/Markt nicht als Chip */
@@ -923,6 +935,48 @@
   var SLOT_N = 8;
   var _slots = [];   /* Platz-Index -> Chip-id ('' = frei) */
 
+  /* ═══ v1272 · Der Orbit wartet nicht mehr auf eine Antwort ══════════════
+     Marcels Punkt 3: "Pillen unterschiedlich lang einblenden - nicht jeder
+     Punkt wird gesagt, der Orbit darf nicht auf eine Antwort warten."
+
+     Bis v1271 wurde ein Platz NUR frei, wenn sein Stichwort erkannt wurde.
+     Wer ueber Denkmalschutz nichts sagt, bekam die Pille bis zum Ende der
+     Aufnahme angezeigt - und die restlichen rund 27 Stichwoerter dahinter
+     nie zu sehen. Der Kranz stand still und wartete auf etwas, das nie kam.
+
+     Jetzt hat jeder Platz eine STANDZEIT. Laeuft sie ab und wartet noch
+     etwas, rueckt das naechste nach; das Verdraengte geht ans Ende der
+     Schlange und kommt spaeter wieder. So dreht der Kranz einmal durch
+     alles, was noch offen ist.
+
+     Die Standzeiten sind BEWUSST verschieden (6,5 s + 0,8 s je Platz + bis
+     1,5 s Streuung, also rund 6,5 bis 15 s): waeren sie gleich, wechselte
+     der ganze Kranz im Gleichtakt und das Auge haette nichts mehr, woran es
+     sich festhaelt. Genau das meint "unterschiedlich lang".
+
+     Drei Dinge bleiben, wie sie waren:
+     - Gedreht wird NUR waehrend der Aufnahme (nicht pausiert, nicht
+       gestoppt) und nur, wenn ueberhaupt jemand wartet. Ein Kranz, in dem
+       alles Platz hat, steht still.
+     - Erkanntes leuchtet gruen nach und verschwindet dann (v1259).
+     - Alle Chips bleiben im DOM; nur die Sichtbarkeit wandert. */
+  var STAND_MIN = 6500, STAND_STUFE = 800, STAND_STREU = 1500, ROT_ABGANG = 280;
+  var _bis = [];      /* Platz-Index -> Zeitpunkt, ab dem der Platz raeumen darf */
+  var _tick = null;   /* Uhr, die den Ablauf prueft */
+  var _final = 0;     /* 1 ab der Endauswertung: dann nicht mehr drehen */
+
+  function _standzeit(i) {
+    return STAND_MIN + i * STAND_STUFE + Math.round(Math.random() * STAND_STREU);
+  }
+
+  function _laeuft() { return !!(st.running && !st.paused && !st.stopped); }
+
+  function _tickPlan(wartende) {
+    if (_tick) { clearTimeout(_tick); _tick = null; }
+    if (_final || !wartende || !_laeuft() || !$('vi-chips')) return;
+    _tick = setTimeout(chipOrbit, 600);
+  }
+
   function _slotPos(i, n) {
     var R = 168, ang = (-90 + i * 360 / n) * Math.PI / 180;
     return { l: 'calc(50% + ' + Math.round(R * Math.cos(ang)) + 'px)',
@@ -930,9 +984,11 @@
   }
 
   function chipOrbit() {
+    if (_tick) { clearTimeout(_tick); _tick = null; }
     var host = $('vi-chips'); if (!host) return;
     var chips = Array.prototype.slice.call(host.querySelectorAll('.vi-chip'));
     if (!chips.length) return;
+    var jetzt = Date.now();
     var byId = {};
     chips.forEach(function (c) { byId[c.getAttribute('data-cid')] = c; });
 
@@ -944,38 +1000,108 @@
       setTimeout(function () { c.classList.add('vi-weg'); chipOrbit(); }, CHIP_NACHLEUCHTEN);
     });
 
+    var platz = {};
+    _slots.forEach(function (id, i) { if (id) platz[id] = i; });
+
+    /* 1b) v1272: erkannt, aber gerade nicht im Kranz -> Platz verschaffen.
+           Sonst bliebe die Bestaetigung unsichtbar, und genau die ist der
+           Sinn der Sache. In der Endauswertung nicht: dort kommen 17 auf
+           einmal, das waere ein Flackern statt einer Rueckmeldung. */
+    if (!_final) {
+      chips.forEach(function (c) {
+        var id = c.getAttribute('data-cid');
+        if (!c.classList.contains('on') || c.classList.contains('vi-weg') || platz[id] !== undefined) return;
+        var j = -1, aelt = Infinity;
+        for (var q = 0; q < SLOT_N; q++) {
+          if (!_slots[q]) { j = q; break; }
+          var cq = byId[_slots[q]];
+          if (cq && cq.classList.contains('on')) continue;   /* andere Bestaetigung nicht verdraengen */
+          if ((_bis[q] || 0) < aelt) { aelt = _bis[q] || 0; j = q; }
+        }
+        if (j < 0) return;
+        if (_slots[j]) {
+          var alt = byId[_slots[j]];
+          if (alt) { alt.classList.add('vi-aus'); alt.classList.remove('vi-ein'); alt._zuletzt = jetzt; }
+          delete platz[_slots[j]];
+        }
+        _slots[j] = id; _bis[j] = jetzt + CHIP_NACHLEUCHTEN + 400; platz[id] = j;
+      });
+    }
+
     /* 2) Plaetze freigeben, deren Chip abgeraeumt ist */
     for (var i = 0; i < SLOT_N; i++) {
       var c0 = _slots[i] ? byId[_slots[i]] : null;
-      if (!c0 || c0.classList.contains('vi-weg')) _slots[i] = '';
+      if (!c0 || c0.classList.contains('vi-weg')) {
+        if (_slots[i]) delete platz[_slots[i]];
+        _slots[i] = ''; _bis[i] = 0;
+      }
     }
 
-    /* 3) Freie Plaetze nachbesetzen. Wer schon steht, BLEIBT stehen. */
-    var belegt = {};
-    _slots.forEach(function (id) { if (id) belegt[id] = 1; });
-    var warte = chips.filter(function (c) {
-      return !belegt[c.getAttribute('data-cid')] &&
-             !c.classList.contains('vi-weg') && !c.classList.contains('on');
+    /* 3) Wer wartet? Alles, was offen ist und gerade keinen Platz hat. */
+    var wartend = chips.filter(function (c) {
+      return platz[c.getAttribute('data-cid')] === undefined &&
+             !c.classList.contains('vi-weg') && !c.classList.contains('on') && !c._fort;
     });
-    for (var k = 0; k < SLOT_N && warte.length; k++) {
-      if (!_slots[k]) _slots[k] = warte.shift().getAttribute('data-cid');
+
+    /* 3b) v1272: abgelaufene Plaetze weiterdrehen - aber nur, wenn jemand
+           wartet. Ohne Wartende waere das Ausblenden ein reiner Verlust. */
+    if (!_final && _laeuft() && wartend.length) {
+      for (var r = 0; r < SLOT_N; r++) {
+        if (!_slots[r] || !_bis[r] || _bis[r] > jetzt) continue;
+        var cr = byId[_slots[r]];
+        if (!cr || cr.classList.contains('on') || cr._fort) continue;
+        _bis[r] = jetzt + 60000;   /* nicht ein zweites Mal ausloesen */
+        (function (chip, idx) {
+          chip._fort = 1;
+          chip.classList.add('vi-fort');
+          setTimeout(function () {
+            chip._fort = 0;
+            chip.classList.remove('vi-fort');
+            chip.classList.remove('vi-ein');
+            chip.classList.add('vi-aus');
+            chip._zuletzt = Date.now();
+            if (_slots[idx] === chip.getAttribute('data-cid')) { _slots[idx] = ''; _bis[idx] = 0; }
+            chipOrbit();
+          }, ROT_ABGANG);
+        })(cr, r);
+      }
     }
 
-    /* 4) Anzeigen — nur wer einen Platz hat, und zwar auf seinem Platz.
+    /* 4) Freie Plaetze nachbesetzen. Wer schon steht, BLEIBT stehen.
+          Reihenfolge: wer noch nie dran war zuerst, dann der am laengsten
+          Verdraengte - so dreht der Kranz durch ALLE offenen Angaben, statt
+          zwischen denselben zwei zu pendeln. */
+    wartend.sort(function (a, b) { return (a._zuletzt || 0) - (b._zuletzt || 0); });
+    var neu = 0;
+    for (var k = 0; k < SLOT_N && wartend.length; k++) {
+      if (_slots[k]) continue;
+      var c1 = wartend.shift();
+      var id1 = c1.getAttribute('data-cid');
+      _slots[k] = id1; _bis[k] = jetzt + _standzeit(k); platz[id1] = k;
+      var p1 = _slotPos(k, SLOT_N);
+      c1.style.left = p1.l; c1.style.top = p1.t;
+      c1.classList.remove('vi-aus'); c1.classList.remove('vi-fort');
+      /* Auftritt neu anstossen: Klasse weg, Reflow, Klasse hin. */
+      c1.classList.remove('vi-ein');
+      void c1.offsetWidth;
+      c1.style.animationDelay = (neu * 70) + 'ms';
+      c1.classList.add('vi-ein');
+      neu++;
+    }
+
+    /* 5) Anzeigen - nur wer einen Platz hat, und zwar auf seinem Platz.
           Sichtbarkeit ueber die Klasse, nicht ueber style.display: bis v1258
           setzte refreshGroupProgress hier inline, und ein inline 'none'
           schlaegt jede spaetere CSS-Regel. */
-    var platzVon = {};
-    _slots.forEach(function (id, i) { if (id) platzVon[id] = i; });
     chips.forEach(function (c) {
-      var idx = platzVon[c.getAttribute('data-cid')];
+      var idx = platz[c.getAttribute('data-cid')];
       if (idx === undefined) { c.classList.add('vi-aus'); return; }
       c.classList.remove('vi-aus');
       var p = _slotPos(idx, SLOT_N);
       c.style.left = p.l; c.style.top = p.t;
     });
 
-    /* 5) Kopfzeile: kein Kategoriename mehr, nur noch was offen ist. */
+    /* 6) Kopfzeile: kein Kategoriename mehr, nur noch was offen ist. */
     var cl = $('vi-catline');
     if (cl) {
       var offen = chips.filter(function (c) {
@@ -985,6 +1111,9 @@
         ? '<b>NOCH OFFEN</b><span class="vi-catsub">' + offen + ' Angabe' + (offen === 1 ? '' : 'n') + '</span>'
         : '<b>ALLES ERKANNT</b>';
     }
+
+    /* 7) v1272: Uhr weiterstellen, solange gesprochen wird und jemand wartet. */
+    _tickPlan(wartend.length > 0);
   }
 
   function updateChipsFromText(txt) {
@@ -1010,6 +1139,10 @@
     chipOrbit();   /* v1259 */
   }
   function markChipsFinal(fields) {
+    /* v1272: ab hier nicht mehr drehen - die Auswertung markiert alle Felder
+       auf einmal, ein rotierender Kranz waere dabei nur Unruhe. */
+    _final = 1;
+    if (_tick) { clearTimeout(_tick); _tick = null; }
     var host = $('vi-chips'); if (!host) return;
     Object.keys(fields || {}).forEach(function (id) {
       var chip = host.querySelector('.vi-chip[data-cid="' + id + '"]');
