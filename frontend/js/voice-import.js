@@ -1507,6 +1507,16 @@
     return v || null;
   }
 
+  /* v1273d: derselbe Wert, nur lesbar. „3.5" ist eine Zahl aus einem
+     Eingabefeld, „3,5 %" ist eine Angabe. Die Einheit kommt aus dem Label
+     des Feldes - steht dort ein Prozentzeichen, gehoert es an den Wert. */
+  function _rfLesbar(wert, eintrag) {
+    var v = String(wert).replace('.', ',');
+    var kat = (_rf && _rf.catalog || []).filter(function (c) { return c.id === eintrag.ids[0]; })[0];
+    if (kat && /%/.test(kat.label || '') && !/%/.test(v)) v += ' %';
+    return v;
+  }
+
   function _rfLuecken(fields) {
     var out = [];
     for (var i = 0; i < RFRAGEN.length && out.length < RF_MAX; i++) {
@@ -1576,7 +1586,7 @@
     h.innerHTML =
       '<div class="vi-rf-kopf">Noch eine Frage</div>' +
       '<div class="vi-rf-fund">Ich habe <b>' + gefunden + ' Angaben</b> aus deiner Aufnahme gelesen. ' +
-        'Für die Rechnung fehlt mir noch ' + (_rf.offen.length === 1 ? 'eine' : _rf.offen.length) + '.</div>' +
+        (_rf.offen.length === 1 ? 'Für die Rechnung fehlt mir noch eine.' : 'Für die Rechnung fehlen mir noch ' + _rf.offen.length + '.') + '</div>' +
       '<div class="vi-rf-frage">' + escH(e.frage) + '</div>' +
       '<div class="vi-rf-zaehler">' + (_rf.i + 1) + ' von ' + _rf.offen.length + '</div>' +
       '<div class="vi-rf-zeile">' +
@@ -1585,7 +1595,7 @@
         '<button type="button" class="vi-rf-btn" id="vi-rf-ok">Übernehmen</button>' +
       '</div>' +
       '<div class="vi-rf-neben">' +
-        (vorschlag ? '<button type="button" id="vi-rf-passt">Passt so (' + escH(vorschlag) + ')</button>' : '') +
+        (vorschlag ? '<button type="button" id="vi-rf-passt">Passt so (' + escH(_rfLesbar(vorschlag, e)) + ')</button>' : '') +
         '<button type="button" id="vi-rf-nix">Weiß ich nicht</button>' +
         '<button type="button" id="vi-rf-ende">Fertig — zur Übersicht</button>' +
       '</div>' +
@@ -1606,7 +1616,7 @@
     var pb = $('vi-rf-passt');
     if (pb) pb.addEventListener('click', function () {
       var v = _rfVorschlag(e);
-      if (v) { _rf.data.fields[e.ids[0]] = v; _rfMelden('✓ Übernommen: ' + escH(v)); }
+      if (v) { _rf.data.fields[e.ids[0]] = v; _rfMelden('✓ Übernommen: ' + escH(_rfLesbar(v, e))); }
       setTimeout(_rfWeiter, 700);
     });
   }
