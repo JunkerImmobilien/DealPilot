@@ -9670,7 +9670,11 @@ Aufnahme gestartet, 31 Stichwörter, 8 Plätze. In **32 Sekunden** waren
 Vorher wären es acht geblieben. Gegenprobe: ein verstecktes Stichwort auf
 `on` gesetzt → **sofort sichtbar**, nach dem Nachleuchten wieder weg.
 
-**Commit** — auf Staging, **nicht auf Prod**.
+**Commit** `a21fe9c` — Prod von `d7939d6` auf `a21fe9c`, reine Frontend-Aenderung.
+
+**Auf Prod nachgemessen:** 31 Stichwoerter, 8 Plaetze, alle 31 in **32
+Sekunden** mindestens einmal zu sehen, danach beginnt die Runde von vorn.
+Das Fenster blieb dabei durchgehend offen.
 
 > **Notiz zum Werkzeug:** Ein `cat`-Heredoc mit dem kompletten Modulcode
 > ist zweimal an der Shell gescheitert (`unexpected EOF while looking for
