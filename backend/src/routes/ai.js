@@ -558,7 +558,8 @@ router.post('/extract-text', authenticate, extractLimiter, async (req, res, next
     const result = await voiceExtractService.extractFromText(text, catalog, {
       apiKey: config.openai.apiKey,
       userApiKey: userApiKey,
-      modus: _modus
+      modus: _modus,
+      kontext: (req.body && req.body.kontext) || null   /* v1280 */
     });
 
     /* Protokollieren, nicht abbuchen - wie bei extract-voice (v1183). */

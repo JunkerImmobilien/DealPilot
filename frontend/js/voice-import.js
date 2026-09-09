@@ -1734,7 +1734,7 @@
       blobToB64(blob).then(function (b64) {
         return Auth.apiCall('/ai/extract-voice', {
           method: 'POST',
-          body: { audio: b64, mime: blob.type, catalog: _rfKatalog(eintrag, _rf.catalog) }
+          body: { audio: b64, mime: blob.type, catalog: _rfKatalog(eintrag, _rf.catalog), kontext: _rfKontext() }
         });
       }).then(function (r) {
         if (!_rf || _rf.offen[_rf.i] !== eintrag) return;
@@ -1810,40 +1810,41 @@
 
      Der Ablauf ist in beiden Wegen derselbe: nach dem freien Diktat als
      Lückenfüller (höchstens drei Fragen, nach `rang` sortiert), im
-     geführten Weg über alles. */
-  /* ═══ v1276 · ALLE Felder, in Erzähl-Reihenfolge ═══════════════════════
-     Marcels Befund: „wir haben irgendwie auch nur acht Felder drin."
-     Stimmt — die erste Liste deckte 12 der 31 Katalogfelder ab. Jetzt sind
-     es 18 Blöcke über ALLE 31.
+  /* ═══ v1280 · Weniger Fragen, mehr Zusammenhang ════════════════════════
+     Marcels Wunsch: „ich würde mir wünschen, dass dieser Co-Pilot, der die
+     Fragen stellt, ein paar mehr Sachen zusammennimmt … zum Beispiel Zins,
+     Tilgung, also wie sind die Finanzierungskonditionen."
+
+     Aus 18 Blöcken werden 13: Finanzierung ist EINE Frage (Eigenkapital,
+     Zins, Tilgung, Zinsbindung), Grundstück ist EINE Frage, Lage und
+     Zustand rücken zusammen.
 
      ZWEI ORDNUNGEN, ein Grund: der geführte Weg fragt in der Reihenfolge,
-     in der ein Mensch von einem Objekt erzählt (was, wo, wie groß, was
-     kostet es, was kommt rein, wie finanziert, wie liegt es, was denkst
-     du). Die Rückfragen nach einem freien Diktat sortieren dagegen nach
-     `rang` — dort zählt das Gewicht für die Rechnung, weil nur drei Fragen
-     gestellt werden und die wichtigsten dabei sein müssen.
+     in der ein Mensch von einem Objekt erzählt. Die Rückfragen nach einem
+     freien Diktat sortieren nach `rang` — dort zählt das Gewicht für die
+     Rechnung, weil nur drei Fragen gestellt werden.
 
-     Blöcke statt Einzelfelder, wo es zusammengehört: „Wohnfläche und
-     Zimmer" ist eine Frage, nicht zwei. Vier Einzelfragen nach Straße,
-     Hausnummer, PLZ und Ort wären ein Verhör. */
+     `profil` markiert die Blöcke, für die es in den Einstellungen
+     hinterlegte Werte gibt. Dort bietet der Co-Pilot sie an, statt sie
+     stillschweigend zu nehmen — siehe _rfProfilVorschlag. */
   var RFRAGEN = [
     { ids: ['objart'],                       rang: 9,  frage: 'Was für ein Objekt ist es — Eigentumswohnung, Haus, Mehrfamilienhaus?' },
     { ids: ['plz', 'ort', 'str', 'hnr'],     rang: 5,  frage: 'Wo steht das Objekt? Straße, Hausnummer, PLZ und Ort.' },
     { ids: ['wfl', 'zimmer'],                rang: 3,  frage: 'Wie groß ist es? Wohnfläche und Zimmerzahl.' },
     { ids: ['baujahr'],                      rang: 4,  frage: 'Aus welchem Jahr stammt das Gebäude?' },
     { ids: ['kp'],                           rang: 1,  frage: 'Was soll das Objekt kosten?' },
-    { ids: ['kaufdat', 'wirtschaftlicher_uebergang'], rang: 12, frage: 'Wann wird gekauft, und ab wann gehören dir Mieten und Kosten?' },
-    { ids: ['san'],                          rang: 11, frage: 'Muss etwas saniert oder renoviert werden? Was hast du eingeplant?' },
-    { ids: ['moebl'],                        rang: 15, frage: 'Wird etwas mitverkauft — Küche, Möbel, Geräte?' },
+    { ids: ['san', 'moebl'],                 rang: 11, frage: 'Muss etwas saniert werden, und wird etwas mitverkauft — Küche, Möbel?' },
     { ids: ['nkm', 'ze'],                    rang: 2,  frage: 'Was kommt monatlich rein? Kaltmiete und Zusatzeinnahmen wie Stellplatz.' },
     { ids: ['hg_ul', 'hg_nul'],              rang: 10, frage: 'Wie hoch ist das Hausgeld, und wie viel davon ist nicht umlagefähig?' },
-    { ids: ['ek'],                           rang: 8,  frage: 'Wie viel Eigenkapital bringst du ein?' },
-    { ids: ['d1z'], vorbelegt: 1,            rang: 6,  frage: 'Zu welchem Zinssatz finanzierst du?' },
-    { ids: ['d1t'], vorbelegt: 1,            rang: 7,  frage: 'Wie hoch ist die anfängliche Tilgung?' },
-    { ids: ['d1_bindj'], vorbelegt: 1,       rang: 13, frage: 'Wie lange läuft die Zinsbindung?' },
+    /* v1280: Finanzierung als EIN Block — vier Einzelfragen nach EK, Zins,
+       Tilgung und Bindung sind vier Mal dasselbe Thema. */
+    { ids: ['ek', 'd1z', 'd1t', 'd1_bindj'], rang: 6, vorbelegt: 1, profil: 'finanzierung',
+      frage: 'Wie finanzierst du? Eigenkapital, Zinssatz, Tilgung und Zinsbindung.' },
+    { ids: ['kaufdat', 'wirtschaftlicher_uebergang'], rang: 12,
+      frage: 'Wann wird gekauft, und ab wann gehören dir Mieten und Kosten?' },
     { ids: ['brw', 'gsfl', 'mea'],           rang: 14, frage: 'Was weißt du zum Grundstück — Bodenrichtwert, Fläche, Miteigentumsanteil?' },
-    { ids: ['makrolage', 'mikrolage'],       rang: 16, frage: 'Wie ist die Lage — die Region im Großen und die Straße im Kleinen?' },
-    { ids: ['ds2_zustand', 'ds2_energie'],   rang: 17, frage: 'In welchem Zustand ist die Wohnung, und was sagt der Energieausweis?' },
+    { ids: ['makrolage', 'mikrolage', 'ds2_zustand', 'ds2_energie'], rang: 16,
+      frage: 'Wie ist die Lage und der Zustand — Region, Straße, Wohnung, Energieausweis?' },
     { ids: ['thesis', 'risiken', 'notizen'], rang: 18, frage: 'Warum lohnt sich das Objekt für dich, was könnte schiefgehen, und was ist sonst wichtig?' }
   ];
 
@@ -1886,6 +1887,54 @@
 
   /* Derselbe Wert, nur lesbar. „3.5" ist eine Zahl aus einem Eingabefeld,
      „3,5 %" ist eine Angabe. */
+  /* ═══ v1280 · „Oder soll ich die aus deinen Einstellungen nehmen?" ══════
+     Marcels Wunsch: „dass wir das vielleicht auch koppeln und er fragt:
+     Oder soll ich die Zinskonditionen aus den Einstellungen nehmen? … wir
+     haben ja auch diese Kondition im Tab Finanzierung … und dass er dann
+     den passenden Zins zieht aus dieser indikativen Konditionsberechnung."
+
+     Die Werte liegen längst bereit:
+       DealPilotInvestmentProfile.get('tilgung_default' | 'zinsbindung_default'
+         | 'ek_quote_default')      — was der Nutzer als Standard gesetzt hat
+       DealPilotInvestmentProfile.getZins()  — der EFFEKTIVE Zins: eigener
+         Wert, sonst der indikative Pfandbrief-Satz zur eingestellten
+         Zinsbindung samt Marge (window.dpGetIndicativeZins)
+
+     Der Unterschied zu v1273c ist wichtig: dort ging es um Werte, die schon
+     IM FELD stehen. Hier geht es um Werte, die in den EINSTELLUNGEN stehen
+     und noch nirgends eingetragen sind. Beides wird angeboten, nie
+     stillschweigend genommen — der Knopf sagt, was er einträgt.
+
+     Das Eigenkapital kommt aus der EK-Quote mal Kaufpreis: eine Quote ohne
+     Kaufpreis ist keine Zahl, deshalb erscheint es nur, wenn der Kaufpreis
+     schon steht. */
+  function _rfProfilVorschlag(eintrag) {
+    if (!eintrag || eintrag.profil !== 'finanzierung') return null;
+    var P = window.DealPilotInvestmentProfile;
+    if (!P || typeof P.get !== 'function') return null;
+    var w = {}, teile = [];
+    try {
+      var zins = (typeof P.getZins === 'function') ? P.getZins() : null;
+      if (typeof zins === 'number' && isFinite(zins) && zins > 0) {
+        w.d1z = String(zins).replace('.', ',');
+        teile.push(w.d1z + ' % Zins');
+      }
+      var tilg = P.get('tilgung_default');
+      if (tilg) { w.d1t = String(tilg).replace('.', ','); teile.push(w.d1t + ' % Tilgung'); }
+      var bind = P.get('zinsbindung_default');
+      if (bind) { w.d1_bindj = String(bind); teile.push(bind + ' Jahre fest'); }
+      var qu = P.get('ek_quote_default');
+      var kpEl = document.getElementById('kp');
+      var kp = kpEl ? parseFloat(String(kpEl.value || '').replace(/\./g, '').replace(',', '.')) : NaN;
+      if (qu && isFinite(kp) && kp > 0) {
+        w.ek = String(Math.round(kp * qu / 100));
+        teile.push(qu + ' % Eigenkapital');
+      }
+    } catch (e) { return null; }
+    if (!teile.length) return null;
+    return { werte: w, text: teile.join(' · ') };
+  }
+
   function _rfLesbar(wert, eintrag) {
     var v = String(wert).replace('.', ',');
     var kat = (_rf && _rf.catalog || []).filter(function (c) { return c.id === eintrag.ids[0]; })[0];
@@ -1895,6 +1944,28 @@
 
   /* Mini-Katalog: nur die gefragten Felder. Das ist der halbe
      Kostenvorteil - der volle Katalog traegt ueber 6000 Token. */
+  /* v1280 · Was der Co-Pilot ueber dieses Objekt schon weiss.
+     Geht als Kontext an die Auswertung - erst damit wird aus „10 Prozent
+     vom Kaufpreis" eine Zahl. Quelle ist beides: was im Gespraech schon
+     gefallen ist UND was im Formular steht. Nur gefuellte Felder, und nur
+     die, die als Bezugsgroesse taugen. */
+  var KONTEXT_IDS = ['kp', 'nkm', 'wfl', 'zimmer', 'baujahr', 'ze', 'hg_ul', 'ek',
+                     'd1', 'd1z', 'd1t', 'gsfl', 'brw', 'plz', 'ort', 'str'];
+  function _rfKontext() {
+    var k = {};
+    try {
+      KONTEXT_IDS.forEach(function (id) {
+        var v = (_rf && _rf.data && _rf.data.fields && _rf.data.fields[id]);
+        if (v === undefined || v === '' || v === null) {
+          var el = document.getElementById(id);
+          v = el ? String(el.value || '').trim() : '';
+        }
+        if (v !== '' && v !== null && v !== undefined) k[id] = v;
+      });
+    } catch (e) {}
+    return Object.keys(k).length ? k : null;
+  }
+
   function _rfKatalog(eintrag, catalog) {
     return (catalog || []).filter(function (e) { return eintrag.ids.indexOf(e.id) >= 0; });
   }
@@ -1929,6 +2000,10 @@
       '.vi-rf-treffer{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.14);',
       '  font:600 11.5px/1.5 "JetBrains Mono",ui-monospace,monospace;color:#3FA56C}',
       '.vi-rf-zaehler{font:600 10.5px/1 "JetBrains Mono",monospace;opacity:.5;margin-top:7px}',
+      '.vi-rf-vorschlag{margin-top:9px;padding:8px 11px;border-radius:9px;font:400 12.5px/1.45 Inter,system-ui,sans-serif;',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent);',
+      '  border:1px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent)}',
+      '.vi-rf-vorschlag b{color:var(--wl-e8cc7a, #E8CC7A)}',
       '.vi-rf-denkt{align-self:flex-start;opacity:.55;font-size:13px;padding:2px}',
       '.vi-rf-denkt i{display:inline-block;width:5px;height:5px;border-radius:50%;',
       '  background:var(--wl-c9a84c, #C9A84C);margin-right:3px;animation:viRfPp 1.1s infinite}',
@@ -2071,8 +2146,27 @@
     $('vi-rf-nix').addEventListener('click', function () { _rfUeberspringen(); });
     $('vi-rf-ende').addEventListener('click', function () { _rfFertig(); });
     $('vi-rf-passt').addEventListener('click', function () {
-      var e = _rf.offen[_rf.i], v = _rfVorschlag(e);
+      var e = _rf.offen[_rf.i];
       _fsStopHoeren();
+      /* v1280: Zwei Faelle hinter demselben Knopf, und der Unterschied ist
+         wichtig. `profilVorschlag` traegt Werte aus den EINSTELLUNGEN, die
+         noch nirgends stehen - da kommen mehrere Felder auf einmal.
+         `_rfVorschlag` traegt einen Wert, der schon IM FELD steht (v1273c).
+         Beides wird angeboten, nie stillschweigend genommen. */
+      var pv = _rf.profilVorschlag;
+      if (pv && pv.werte) {
+        var namen = [];
+        Object.keys(pv.werte).forEach(function (id) {
+          _rf.data.fields[id] = pv.werte[id];
+          var kat = _rf.catalog.filter(function (c) { return c.id === id; })[0];
+          namen.push((kat ? kat.label : id) + ' = ' + pv.werte[id]);
+        });
+        _rfBlase('ich', 'Nimm die aus meinen Einstellungen.');
+        _rfBlase('co', 'Übernommen — du kannst sie in der Tabelle noch ändern.', namen.join(' · '));
+        _rf.profilVorschlag = null;
+        return _rfWeiter();
+      }
+      var v = _rfVorschlag(e);
       if (v) {
         _rf.data.fields[e.ids[0]] = v;
         _rfBlase('ich', 'Passt so.');
@@ -2091,11 +2185,20 @@
   function _rfFrage() {
     if (_rf.i >= _rf.offen.length) return _rfFertig();
     var e = _rf.offen[_rf.i];
+    /* v1280: Der Vorschlag aus den Einstellungen steht IN der Frage - nicht
+       als stiller Knopf daneben. Wer gefragt wird, soll sehen, was der
+       Co-Pilot vorhat, bevor er ja sagt. */
+    var pv = _rfProfilVorschlag(e);
     _rfBlase('co', escH(e.frage) +
+      (pv ? '<div class="vi-rf-vorschlag">Aus deinen Einstellungen hätte ich: <b>' +
+            escH(pv.text) + '</b></div>' : '') +
       '<div class="vi-rf-zaehler">Frage ' + (_rf.i + 1) + ' von ' + _rf.offen.length + '</div>');
+    _rf.profilVorschlag = pv;
+
     var v = _rfVorschlag(e), pb = $('vi-rf-passt');
     if (pb) {
-      if (v) { pb.textContent = 'Passt so (' + _rfLesbar(v, e) + ')'; pb.style.display = ''; }
+      if (pv) { pb.textContent = 'Einstellungen übernehmen'; pb.style.display = ''; }
+      else if (v) { pb.textContent = 'Passt so (' + _rfLesbar(v, e) + ')'; pb.style.display = ''; }
       else { pb.style.display = 'none'; }
     }
     var inp = $('vi-rf-in');
@@ -2160,7 +2263,7 @@
     _rfMelden('', true);
     Auth.apiCall('/ai/extract-text', {
       method: 'POST',
-      body: { text: text, catalog: _rfKatalog(e, _rf.catalog) }
+      body: { text: text, catalog: _rfKatalog(e, _rf.catalog), kontext: _rfKontext() }
     }).then(function (r) {
       inp.disabled = false;
       _rfUebernehmen(r && r.fields, false);

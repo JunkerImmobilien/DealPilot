@@ -404,7 +404,10 @@ async function extractFromAudio(audioB64, mime, catalog, opts) {
   const sammler = neuerSammler();  /* v1259 */
   const transcript = await transcribe(buf, mime, key, sammler);
   if (!transcript || transcript.length < 10) throw httpErr(422, 'Keine Sprache erkannt \u2014 bitte erneut aufnehmen.');
-  let out = await extractFields(transcript, cat, key, sammler);
+  /* v1280: Auch die gesprochene Kurzantwort soll mit dem bekannten Stand
+     rechnen koennen ("zehn Prozent vom Kaufpreis"). Der Zusatz entsteht in
+     _zusatzAusKontext, damit Text- und Sprachweg dieselbe Regel sehen. */
+  let out = await extractFields(transcript, cat, key, sammler, _zusatzAusKontext(o.kontext, o.modus));
   if (VERIFY_ON) { try { out = await verifyFields(transcript, out, cat, key, sammler); } catch (e) {} }  /* v522 verify-pass, fail-soft */
 
   /* v1259 \u00b7 Der eigene Schluessel eines Nutzers ist SEINE Rechnung, nicht
@@ -619,6 +622,73 @@ async function verifyFields(transcript, prev, catalog, apiKey, sammler) {
  * braucht ihn gar nicht erst zu beruehren: der Mensch kopiert, was er
  * ohnehin vor sich hat.
  * ════════════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════════════
+ * v1280 · Der Co-Pilot rechnet mit dem, was er schon weiss
+ *
+ * Marcels Befund: „wenn ich sage, ich möchte 10 Prozent vom Kaufpreis als
+ * Kaufnebenkosten ansetzen, das rechnet er dann nicht passend aus."
+ *
+ * Konnte er auch nicht: der Aufruf bekam nur den Satz und den
+ * Feldkatalog. Was der Kaufpreis IST, stand nirgends - also gab es
+ * nichts, wovon 10 % zu nehmen waeren.
+ *
+ * Jetzt reist der bekannte Stand mit. Damit wird aus „10 % vom Kaufpreis"
+ * eine Zahl, aus „so viel wie die Kaltmiete" eine Zahl. Ohne Kontext
+ * bleibt alles wie vorher - die Funktion gibt dann nur die Grundregel
+ * zurueck.
+ *
+ * BEIDE WEGE sehen dieselbe Regel: getippt (extractFromText) und
+ * gesprochen (extractFromAudio). Zwei Regelwerke fuer dieselbe Frage
+ * waeren zwei Verhaltensweisen, und der Unterschied faellt erst dem
+ * Nutzer auf.
+ * ════════════════════════════════════════════════════════════════════ */
+const ZUSATZ_ANTWORT = [
+  'ZUSATZREGEL FUER DIESE ANFRAGE: Der Text ist die kurze ANTWORT auf eine',
+  'gezielte Rueckfrage zu genau den Feldern im Katalog. Uebernimm NUR den',
+  'WERT, niemals den ganzen Satz. "490 Euro kalt im Monat" -> 490,',
+  '"so um die hundert Quadratmeter" -> 100, "Baujahr war 62" -> 1962.',
+  'Enthaelt die Antwort keinen verwertbaren Wert ("weiss nicht", "keine',
+  'Ahnung"), gib ein leeres JSON-Objekt zurueck.'
+].join(String.fromCharCode(10));
+
+const ZUSATZ_INSERAT = [
+  'ZUSATZREGEL FUER DIESE ANFRAGE: Der Text ist eine aus dem Browser',
+  'kopierte INSERATSSEITE eines Immobilienportals.',
+  '- Es geht um GENAU EIN Objekt: das, dessen Ueberschrift und Eckdaten',
+  '  oben stehen. Navigation, Cookie-Texte, Werbung und Listen',
+  '  "aehnlicher Objekte" zaehlen NICHT.',
+  '- KAUFPREIS ist der Kaufpreis, nicht die Warmmiete und nicht der Preis',
+  '  pro Quadratmeter. Bei einem MIETobjekt gibt es keinen Kaufpreis.',
+  '- Kaltmiete = Nettokaltmiete ohne Nebenkosten. Portale stellen den',
+  '  Betrag oft in eine eigene Zeile UEBER das Wort "Kaltmiete"',
+  '  ("850 EUR" / "Kaltmiete 17 EUR/m2") - dann ist das die Kaltmiete.',
+  '- Hausgeld/Wohngeld ist keine Miete.',
+  '- Was nicht im Text steht, wird WEGGELASSEN.'
+].join(String.fromCharCode(10));
+
+function _zusatzAusKontext(kontext, modus) {
+  const basis = (modus === 'inserat') ? ZUSATZ_INSERAT : ZUSATZ_ANTWORT;
+  const zeilen = [];
+  if (kontext && typeof kontext === 'object') {
+    Object.keys(kontext).slice(0, 40).forEach(function (k) {
+      const v = kontext[k];
+      if (v === '' || v === null || v === undefined) return;
+      zeilen.push('  ' + k + ' = ' + String(v).slice(0, 60));
+    });
+  }
+  if (!zeilen.length) return basis;
+  return [
+    basis,
+    'BEKANNTER STAND DIESES OBJEKTS (Feld-id = Wert):',
+    zeilen.join(String.fromCharCode(10)),
+    'RECHNEN IST ERLAUBT UND ERWUENSCHT: Bezieht sich die Antwort auf einen',
+    'dieser Werte, rechne sie aus. "10 Prozent vom Kaufpreis" bei kp=200000',
+    '-> 20000. "so viel wie die Kaltmiete" bei nkm=490 -> 490. Fehlt der',
+    'Bezugswert im bekannten Stand, lass das Feld WEG - niemals einen',
+    'Bezugswert erfinden.'
+  ].join(String.fromCharCode(10));
+}
+
 const TEXT_MAX = { antwort: 4000, inserat: 40000 };
 
 async function extractFromText(text, catalog, opts) {
@@ -631,43 +701,7 @@ async function extractFromText(text, catalog, opts) {
   const t = String(text || '').trim().slice(0, TEXT_MAX[modus]);
   if (t.length < 1) throw httpErr(400, 'Keine Antwort uebergeben.');
   const sammler = neuerSammler();
-
-  /* v1275b · Der Zusatz macht aus einem Diktat-Parser einen Antwort-Parser.
-     Gemessen: auf "490 Euro kalt im Monat" kam bei EINEM Feld im Katalog der
-     ganze Satz als Wert zurueck - das Modell hatte ja nur dieses eine Fach.
-     Bei "245.000 Euro" ging es gut. Der Unterschied ist Zufall, solange im
-     Prompt nichts steht, was den Fall benennt. */
-  const ZUSATZ_ANTWORT = [
-    'ZUSATZREGEL FUER DIESE ANFRAGE: Der Text ist die kurze ANTWORT auf eine',
-    'gezielte Rueckfrage zu genau den Feldern im Katalog. Uebernimm NUR den',
-    'WERT, niemals den ganzen Satz. "490 Euro kalt im Monat" -> 490,',
-    '"so um die hundert Quadratmeter" -> 100, "Baujahr war 62" -> 1962.',
-    'Enthaelt die Antwort keinen verwertbaren Wert ("weiss nicht", "keine',
-    'Ahnung"), gib ein leeres JSON-Objekt zurueck.'
-  ].join(String.fromCharCode(10));
-
-  const ZUSATZ_INSERAT = [
-    'ZUSATZREGEL FUER DIESE ANFRAGE: Der Text ist eine aus dem Browser',
-    'kopierte INSERATSSEITE eines Immobilienportals (ImmobilienScout24,',
-    'ImmoWelt, Kleinanzeigen, willhaben o.ae.).',
-    '- Es geht um GENAU EIN Objekt: das, dessen Ueberschrift und Eckdaten',
-    '  oben stehen. Die Seite enthaelt ausserdem Navigation, Cookie-Texte,',
-    '  Werbung und Listen "aehnlicher Objekte" - daraus NICHTS uebernehmen.',
-    '- KAUFPREIS ist der Kaufpreis, nicht die Warmmiete und nicht der',
-    '  Preis pro Quadratmeter. Bei einem MIETobjekt gibt es keinen',
-    '  Kaufpreis - dann das Feld weglassen.',
-    '- Kaltmiete = Nettokaltmiete ohne Nebenkosten. Warmmiete, Nebenkosten',
-    '  und Heizkosten sind NICHT die Kaltmiete. Portale stellen den Betrag',
-    '  oft in eine eigene Zeile UEBER oder NEBEN das Wort "Kaltmiete"',
-    '  ("850 EUR" / "Kaltmiete 17 EUR/m2") - dann ist dieser Betrag die',
-    '  Kaltmiete. Der Wert je Quadratmeter ist es nicht.',
-    '- Hausgeld/Wohngeld gehoert zu den Bewirtschaftungskosten, nicht zur',
-    '  Miete.',
-    '- Was nicht im Text steht, wird WEGGELASSEN. Nichts aus dem Bild, dem',
-    '  Stadtteil oder der Erfahrung ergaenzen.'
-  ].join(String.fromCharCode(10));
-
-  const out = await extractFields(t, cat, key, sammler, modus === 'inserat' ? ZUSATZ_INSERAT : ZUSATZ_ANTWORT);
+  const out = await extractFields(t, cat, key, sammler, _zusatzAusKontext(o.kontext, modus));
   const kosten = o.userApiKey ? null : kostenAbschluss(sammler);
   return { transcript: t, fields: out.fields, unsicher: out.unsicher, kosten, modus };
 }
