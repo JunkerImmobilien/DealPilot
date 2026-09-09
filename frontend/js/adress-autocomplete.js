@@ -29,6 +29,10 @@
 
   var BOX_ID = 'dp-adr-box';
   var _timer = null, _plzTimer = null, _treffer = [], _aktiv = -1, _plzMerker = '';
+  /* v1270b: Koordinaten der Postleitzahl. Sie sind der Ortsbezug fuer die
+     Strassensuche - der ORTSNAME im Suchtext taugt dafuer nicht, siehe
+     Kommentar bei _strSuchen. { plz, lat, lon } oder null. */
+  var _koord = null;
 
   function _el(id) { return document.getElementById(id); }
   function _wert(id) { var e = _el(id); return e ? String(e.value || '').trim() : ''; }
@@ -130,14 +134,50 @@
     }
   }
 
-  /* ─── Straßen suchen ────────────────────────────────────────────────── */
+  /* Koordinaten zur aktuellen Postleitzahl besorgen (einmal je PLZ). */
+  function _koordHolen() {
+    var plz = _wert('plz');
+    if (!/^\d{5}$/.test(plz)) return Promise.resolve(null);
+    if (_koord && _koord.plz === plz) return Promise.resolve(_koord);
+    return _api('/marktbericht/geocode/autocomplete?type=postcode&limit=1&text=' + encodeURIComponent(plz))
+      .then(function (r) {
+        var t = (r && r.results && r.results[0]) || null;
+        if (!t || t.lat == null || t.lon == null) return null;
+        _koord = { plz: plz, lat: t.lat, lon: t.lon, city: t.city || '' };
+        return _koord;
+      })
+      .catch(function () { return null; });
+  }
+
+  /* ─── Straßen suchen ──────────────────────────────────────────────────
+     Gesucht wird mit einem KREIS um die Postleitzahl, nicht mit dem
+     Ortsnamen im Text. Gemessen am 09.09.2026: "32120 Hiddenhausen Löh"
+     lieferte die Hiddenhauser Straße in ENGER und eine Hiddenhausener
+     Straße in Loitz (Vorpommern) — der Ortsname wiegt bei Geoapify
+     schwerer als das Präfix der Straße. Ohne Koordinaten (keine oder halbe
+     PLZ) bleibt der alte Weg als Rückfall. */
   function _strSuchen() {
     var el = _el('str'); if (!el) return;
     var q = String(el.value || '').trim();
     var plz = _wert('plz'), ort = _wert('ort');
     if (q.length < 2 || (!plz && !ort)) return _schliessen();
-    var text = (plz + ' ' + ort + ' ' + q).replace(/\s+/g, ' ').trim();
-    _api('/marktbericht/geocode/autocomplete?type=street&limit=8&text=' + encodeURIComponent(text))
+    _koordHolen().then(function (k) {
+      if (String(el.value || '').trim() !== q) return;   /* schon weitergetippt */
+      var pfad;
+      if (k) {
+        pfad = '/marktbericht/geocode/autocomplete?type=street&limit=8' +
+               '&lat=' + encodeURIComponent(k.lat) + '&lon=' + encodeURIComponent(k.lon) +
+               '&text=' + encodeURIComponent(q);
+      } else {
+        var text = (plz + ' ' + ort + ' ' + q).replace(/\s+/g, ' ').trim();
+        pfad = '/marktbericht/geocode/autocomplete?type=street&limit=8&text=' + encodeURIComponent(text);
+      }
+      return _suchAbruf(pfad, el, q);
+    });
+  }
+
+  function _suchAbruf(pfad, el, q) {
+    return _api(pfad)
       .then(function (r) {
         /* Nur zeigen, wenn der Text seither nicht weitergewandert ist. */
         if (String(el.value || '').trim() !== q) return;
