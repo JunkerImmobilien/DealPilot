@@ -1467,11 +1467,11 @@
   var RFRAGEN = [
     { ids: ['kp'],                         frage: 'Was soll das Objekt kosten?' },
     { ids: ['nkm'],                        frage: 'Was kommt an Nettokaltmiete im Monat rein?' },
-    { ids: ['wfl'],                        frage: 'Wie gross ist die Wohnflaeche?' },
-    { ids: ['plz', 'ort', 'str', 'hnr'],   frage: 'Wo steht das Objekt? Strasse, Hausnummer, PLZ und Ort.' },
-    { ids: ['baujahr'],                    frage: 'Aus welchem Jahr stammt das Gebaeude?' },
+    { ids: ['wfl'],                        frage: 'Wie groß ist die Wohnfläche?' },
+    { ids: ['plz', 'ort', 'str', 'hnr'],   frage: 'Wo steht das Objekt? Straße, Hausnummer, PLZ und Ort.' },
+    { ids: ['baujahr'],                    frage: 'Aus welchem Jahr stammt das Gebäude?' },
     { ids: ['d1z'], vorbelegt: 1,             frage: 'Zu welchem Zinssatz finanzierst du?' },
-    { ids: ['d1t'], vorbelegt: 1,             frage: 'Wie hoch ist die anfaengliche Tilgung?' },
+    { ids: ['d1t'], vorbelegt: 1,             frage: 'Wie hoch ist die anfängliche Tilgung?' },
     { ids: ['ds2_zustand'],                frage: 'In welchem Zustand ist die Wohnung?' }
   ];
   var RF_MAX = 3;
