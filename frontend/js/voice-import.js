@@ -606,6 +606,13 @@
     var nx = $('vi-next'); if (nx) nx.style.display = 'none';
     var body = document.querySelector('.oabi-ov.vi-mode .oabi-body');
     if (!body) { startRecording(); return; }   /* im Zweifel wie bisher */
+    /* v1275b: Der Kopftext beschreibt bis hierher NUR das freie Einsprechen
+       („Bis zu 4 Minuten"). Vor der Wahl waere das eine halbe Auskunft -
+       also neutral, und nach der Wahl der Text, der zum Weg passt. */
+    var sub = document.querySelector('.oabi-ov.vi-mode .oabi-sub');
+    var subOriginal = sub ? sub.textContent : '';
+    if (sub) sub.textContent = 'Zwei Wege, dasselbe Ziel: sprich frei über das Objekt, ' +
+      'oder lass dich Frage für Frage durchführen.';
     var h = document.createElement('div');
     h.id = 'vi-start';
     h.innerHTML =
@@ -629,6 +636,7 @@
     body.insertBefore(h, body.firstChild);
     $('vi-sk-frei').addEventListener('click', function () {
       h.remove();
+      if (sub) sub.textContent = subOriginal;   /* v1275b: wieder der Text zum freien Weg */
       if (rec) rec.style.display = '';
       if (nx) nx.style.display = '';
       startRecording();
