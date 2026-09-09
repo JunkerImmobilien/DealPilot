@@ -1106,25 +1106,8 @@
       c.style.left = p.l; c.style.top = p.t;
     });
 
-    /* 6) v1274 · Der Zähler über dem Orbit.
-          Marcels Vorgabe: „Dann gibt es einen Zähler mit maximal anzahl und
-          wieviel wir schon haben." Bis v1273 stand hier die Gegenrichtung
-          („NOCH OFFEN · 30 Angaben") — sie sagt nicht, wie weit man ist,
-          sondern wie weit man noch nicht ist. Wer spricht, will das
-          Wachsen sehen. Die Zahl unten im Fortschrittsbalken bleibt; sie
-          steht dort für den Blick nach der Aufnahme, diese hier für den
-          Blick währenddessen. */
-    var cl = $('vi-catline');
-    if (cl) {
-      var erkannt = chips.filter(function (c) {
-        return c.classList.contains('on') || c.classList.contains('pre');
-      }).length;
-      var gesamt = chips.length;
-      cl.innerHTML = (erkannt >= gesamt && gesamt > 0)
-        ? '<b>ALLES ERKANNT</b><span class="vi-catsub">' + gesamt + ' von ' + gesamt + '</span>'
-        : '<b>' + erkannt + ' VON ' + gesamt + '</b><span class="vi-catsub">Angaben erkannt · noch ' +
-          (gesamt - erkannt) + ' offen</span>';
-    }
+    /* 6) v1274b: beide Zähler aus EINER Funktion — siehe _zaehlerZeichnen. */
+    _zaehlerZeichnen();
 
     /* 7) v1272: Uhr weiterstellen, solange gesprochen wird und jemand wartet. */
     _tickPlan(wartend.length > 0);
@@ -1165,15 +1148,44 @@
     updateChipsCount();
     chipOrbit();   /* v1259 */
   }
-    function updateChipsCount() {
+  /* ═══ v1274b · EINE Zahl, eine Quelle ═══════════════════════════════
+     Im Fenster standen zwei Zaehler mit zwei Rechenwegen: die Kopfzeile
+     ueber dem Orbit (aus chipOrbit) und die Leiste darunter (aus
+     updateChipsCount). Gemessen am 09.09.2026 zeigten sie gleichzeitig
+     „10 VON 31" und „5 / 31 Felder" - dieselbe Sache, zwei Zahlen.
+
+     Zwei Zaehler koennen nur so lange stimmen, wie beide bei jeder
+     Aenderung laufen. Einer davon lief nicht. Jetzt zaehlt eine Funktion,
+     und beide Anzeigen lesen von ihr. */
+  function _zaehlerZeichnen() {
     var host = $('vi-chips'); if (!host) return;
-    var on  = host.querySelectorAll('.vi-chip.on,.vi-chip.pre').length;
     var tot = host.querySelectorAll('.vi-chip').length;
+    var on  = host.querySelectorAll('.vi-chip.on,.vi-chip.pre').length;
+    var offen = tot - on;
+
+    /* Kopfzeile ueber dem Orbit - der Blick WAEHREND des Sprechens.
+       Marcels Vorgabe: „ein Zaehler mit maximal anzahl und wieviel wir
+       schon haben". Bis v1273 stand hier die Gegenrichtung („NOCH OFFEN"),
+       die sagt nicht, wie weit man ist, sondern wie weit man noch nicht
+       ist. Wer spricht, will das Wachsen sehen. */
+    var cl = $('vi-catline');
+    if (cl) {
+      cl.innerHTML = (tot > 0 && on >= tot)
+        ? '<b>ALLES ERKANNT</b><span class="vi-catsub">' + tot + ' von ' + tot + '</span>'
+        : '<b>' + on + ' VON ' + tot + '</b><span class="vi-catsub">Angaben erkannt · noch ' +
+          offen + ' offen</span>';
+    }
+
+    /* Leiste darunter - der Blick DANACH. */
     var c = $('vi-chips-count'); if (c) c.innerHTML = '<b>' + on + '</b> / ' + tot + ' Felder';
     var pct = tot ? Math.round(on / tot * 100) : 0;
     var fill = $('vi-fill'); if (fill) fill.style.width = pct + '%';
     var pc = $('vi-prog-pct'); if (pc) pc.textContent = pct + ' %';
-    var lt = $('vi-listen-txt'); if (lt) lt.textContent = (tot && on >= tot) ? 'Alle Felder erkannt' : 'H\u00f6rt zu';
+    var lt = $('vi-listen-txt'); if (lt) lt.textContent = (tot && on >= tot) ? 'Alle Felder erkannt' : 'Hört zu';
+  }
+
+    function updateChipsCount() {
+    _zaehlerZeichnen();   /* v1274b */
     chipOrbit();   /* v1259 */
   }
     function _chipMarked(id) {
