@@ -38,8 +38,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 09.09.2026)
 
-**Stand:** lokal = GitHub = Staging = **Produktion** auf `d7939d6`.
-`v1265` bis `v1271` sind seit dem 09.09.2026 live.
+**Stand:** lokal = GitHub = Staging auf `v1272`. **Produktion auf `d7939d6`**.
+`v1265` bis `v1271` sind live, **`v1272` noch nicht**.
 
 ### Erledigt am 09.09.2026
 
@@ -56,7 +56,7 @@ im Journal der Projektanweisung.
 |---|---|---|
 | 1 | Sprechlauf: kommen alle Felder an | **geprüft** — 16/17, der eine Fehler (Möblierung) ist mit `v1262` behoben |
 | 2 | Bodenrichtwert automatisch nach Adresse | **fertig** — `v1263` Automatik, `v1264` der kaputte KI-Abruf repariert, `v1265` **amtlicher BORIS-Wert zuerst** (11 von 11 Ländern live), Schätzung nur als Rückfall |
-| 3 | Pillen unterschiedlich lang einblenden | **offen** — nicht jeder Punkt wird gesagt, der Orbit darf nicht auf eine Antwort warten |
+| 3 | Pillen unterschiedlich lang einblenden | **fertig** — `v1272`, Standzeit je Platz (6,5–15 s), der Kranz dreht durch alle offenen Angaben |
 | 4 | Kontextbezug im Sprechlauf prüfen | **teilweise** — Hausgeld-Aufteilung und Inventar sitzen, weitere Fälle offen |
 | 5 | Chatbot-Dialog statt Monolog, mit Demo | **offen** — größter Brocken, braucht ein Konzept vor dem Bauen |
 | 6 | Bild „Ansicht": Objekt anlegen links über der Suche | **fertig** — `v1266`, Knopf unter dem Logo im Stil des Logo-Kastens |
