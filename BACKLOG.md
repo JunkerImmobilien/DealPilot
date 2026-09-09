@@ -38,8 +38,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 09.09.2026)
 
-**Stand:** lokal = GitHub = Staging auf `f1ec52a`. **Produktion auf
-`b0e7976`** — `v1260`…`v1264` sind live, **`v1265` bis `v1268c` noch nicht**.
+**Stand:** lokal = GitHub = Staging auf `04327f1`. **Produktion auf
+`b0e7976`** — `v1260`…`v1264` sind live, **`v1265` bis `v1270d` noch nicht**.
 
 ### Erledigt am 09.09.2026
 
@@ -61,12 +61,14 @@ im Journal der Projektanweisung.
 | 5 | Chatbot-Dialog statt Monolog, mit Demo | **offen** — größter Brocken, braucht ein Konzept vor dem Bauen |
 | 6 | Bild „Ansicht": Objekt anlegen links über der Suche | **fertig** — `v1266`, Knopf unter dem Logo im Stil des Logo-Kastens |
 | 7 | IRR/Break-Even „passend in Auswertung" einordnen | **teilweise** — sie stehen in den Kennzahlen-Kacheln (Reiter Bewertung); Portfolio-Cockpit noch nicht |
-
-**Zuletzt fertig: `v1268`–`v1268c` — der Doppel-Anlage-Fehler ist gefunden**
-**und behoben.** Ein Klick auf „Objekt anlegen" legte zwei Objekte an, weil
-der Sicherungs-Save nach seinem `await` einen leergeräumten Kontext vorfand
-und statt eines PUT einen POST machte. Dazu: der amtliche BORIS-Abruf hat
-endlich einen Knopf (er fehlte im HTML, seit es ihn gibt). Nachweis im
+**Zuletzt fertig: `v1268`–`v1270d`.** Der Doppel-Anlage-Fehler ist gefunden
+und behoben (ein Klick legte zwei Objekte an, weil der Sicherungs-Save nach
+seinem `await` einen leergeräumten Kontext vorfand). Dazu: der amtliche
+BORIS-Abruf hat endlich einen Knopf, neben „Objekt anlegen" stehen jetzt
+Quick-Check und Marktbericht als Zeichen, die Postleitzahl füllt den Ort
+und das Straßenfeld schlägt Straßen vor. 15 Testnutzer und zwei
+Karteileichen sind aus der Staging-Datenbank raus. Nachweis im Journal der
+Projektanweisung.
 Journal der Projektanweisung.
 
 ### Was jetzt Marcels Entscheidung braucht

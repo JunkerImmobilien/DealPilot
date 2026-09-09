@@ -9469,6 +9469,104 @@ Wert, mit dem das Testobjekt in `CLAUDE.md` rechnet.
 > Beide Nummernkreise sind für sich korrekt, nebeneinander sehen sie falsch
 > aus. Gehört aufgeräumt, sobald jemand die Demo-Objekte anfasst.
 
+## Rollout-Journal · 09.09.2026, zweiter Teil — Aufräumen, `v1269`, `v1270`
+
+### Aufgeräumt: 15 Testnutzer und zwei Karteileichen
+
+Marcels Auftrag: *„du hast mal testuser angelegt die sollten auch alle raus."*
+
+Auf Staging standen **15 Nutzer** mit Adressen wie
+`v1185-lauf-halbzeit-1788188100474@dealpilot.test` — Reste der Prüfläufe
+zu `v1184`, `v1185` und `v1189`. Alle ohne ein einziges Objekt, keiner
+Reseller-Besitzer, keiner mit Stripe-Kundenkonto; sieben trugen ein
+Sandbox-Abo. Vor dem Löschen gesichert
+(`/root/backups/haupt-vor-testuser-20260909-0544.sql.gz`, 46 MB, Anfang
+angesehen). Gelöscht in **einer** Transaktion, zusammen mit Marcels beiden
+Geisterobjekten `2026-002` und `2026-1009`.
+
+Danach: **5 Nutzer**, davon zwei bereits vorher soft-gelöschte, und
+**9 Objekte** — Marcels Bestand unverändert.
+
+> **Auf Produktion konnte ich nicht nachsehen** — der Zugriff wurde
+> blockiert. Ob dort ebenfalls `@dealpilot.test`-Nutzer liegen, ist
+> **offen**; die Prüfläufe liefen auf Staging, es spricht also wenig
+> dafür.
+
+> **Nebenbefund zu den Nummern:** Das Demo-Objekt **`2026-999`** treibt
+> den Zähler. `ObjNumbering` hebt ihn auf jede höhere gefundene Nummer an,
+> deshalb vergibt der Client seit Langem vierstellige Nummern. Beide
+> Nummernkreise sind für sich korrekt, nebeneinander sehen sie falsch aus.
+
+### `v1269` · Drei Einstiege in einer Zeile
+
+Marcels Vorgabe: *„Könne wir vlt daneben auch etwas machen mit Quickcheck
+und Marktbericht? Das darf genau in die Zeile alles sein und vlt mit icons
+die das aussagen anstatt mit text."*
+
+Die Hauptaktion behält ihren Text — sie ist die häufigste und war die
+Vorgabe von `v1266`. Die beiden Nachbarn tragen nur ihr Zeichen: **Tacho**
+für den Quick-Check, **Balken** für den Marktbericht, beide mit Tooltip
+und verstecktem Text für Vorleseprogramme. Drei Beschriftungen
+nebeneinander passen bei 323 px Seitenleiste nicht ohne Umbruch —
+gemessen: 219 px für die Hauptaktion, 2 × 44 px für die Zeichen.
+
+Rahmen, Radius und Farbe bleiben die des Logo-Kastens. Eingeklappte
+Seitenleiste: untereinander, sonst wäre jeder Knopf 14 px breit.
+
+### `v1270`–`v1270d` · Postleitzahl füllt den Ort, das Straßenfeld schlägt vor
+
+Marcels Vorgabe: *„wenn man plz eingibt das der ort automatisch ausgefüllt
+wird und man unter Straße dann eine Liste der Straßen hat. man kann aber
+weiterhin die straße eintippen."*
+
+**Die Quelle gab es schon:** `/geocode/autocomplete` (Geoapify, Schlüssel
+bleibt auf dem Server). Sie taugte nur nichts, weil sie ohne Art-Filter
+suchte.
+
+**Drei Messungen, drei Nachbesserungen — jede hat den Fehler der
+vorherigen behoben:**
+
+| Stand | Eingabe | Ergebnis |
+|---|---|---|
+| `v1270` roh | „32120 Hiddenhausen Ha" | drei **Ortszeilen**, keine Straße |
+| `v1270` mit `type=street` | „32120 Hiddenhausen Löh" | Hiddenhauser Str. in **Enger**, Hiddenhausener Str. in **Loitz** (Vorpommern) |
+| `v1270b` mit Kreis | „Löh" + Koordinaten | **Löhner Straße 32120** zuerst — richtig |
+| `v1270b`, zweiter Fall | „Her" in 32609 | Hermannstraße in **32278 Kirchlengern** oben |
+| `v1270c` | „Herm" in 32609 | **Hermannstraße** (eigene PLZ) oben, Nachbarorte benannt darunter |
+
+> **Der Ortsname im Suchtext wiegt bei Geoapify schwerer als das Präfix
+> der Straße.** Deshalb wird die Postleitzahl einmal in Koordinaten
+> aufgelöst und die Suche läuft mit `filter=circle` (9 km) plus
+> `bias=proximity` um diesen Punkt; im Text steht nur noch das Präfix.
+> Weil im Umkreis mehr als eine gleichnamige Straße liegt, sortiert die
+> Liste zusätzlich selbst: **gleiche PLZ oben**, die übrigen bleiben
+> stehen und tragen sichtbar ihren Ort. Eine Straße stillschweigend aus
+> dem Nachbarort zu übernehmen wäre schlimmer, als sie zu zeigen.
+
+**`v1270d` war ein Optikfehler, im Browser gefunden:** die Liste stand mit
+`position:fixed` nach jeder Layoutverschiebung falsch — gemessen Feld bei
+y=488, Liste bei y=501, also **25 px zu hoch und mitten auf dem
+Eingabefeld**. Jetzt hängt sie als absolut positioniertes Kind im
+Feld-Container und wandert mit. Der `.f`-Container bekommt dafür per
+Inline-Stil `position:relative` — gezielt an diesem einen Element, **keine
+Sammelregel auf `.f`**, die träfe die halbe Maske. Damit fiel auch der
+Scroll-Handler weg: er hatte `capture` und fing das Scrollen in
+`.main-col` mit, machte die Liste also sofort wieder zu.
+
+**Abnahme (Staging):** „32120" getippt → Ort **Hiddenhausen** von selbst.
+„Löh" im Straßenfeld → Liste sitzt **4 px** unter dem Feld, gleiche
+Breite, **Löhner Straße** zuerst. Klick übernimmt und springt in die
+Hausnummer, Pfeiltaste + Enter ebenso, Esc schließt. Gold-Audit RC=0.
+
+**Zwei Regeln im Modul, jede mit Grund:** der Ort wird **nur** gefüllt,
+wenn das Feld leer ist (ein eingetragener Ortsteil ist mehr wert als der
+Gemeindename), und die Straßenliste ist ein **Vorschlag, kein Zwang** —
+wer nichts anklickt, behält seinen Text.
+
+**Commits.** `7817f0a` (`v1270`) und die Folgestände `v1269`, `v1270b`,
+`v1270c`, `v1270d`. **mb-Backend dreimal neu gebaut** (der Code liegt im
+Image). Alles auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
