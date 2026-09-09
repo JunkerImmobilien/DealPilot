@@ -9297,6 +9297,76 @@ greift, 5.000 €/m² mit „Niedrige Konfidenz · Nur grobe Schätzung".
 **Commits.** `b0e7976` (Prod-Merge) · `67e9da1` (`v1265`).
 `v1265` ist auf Staging, **noch nicht auf Prod**.
 
+## Rollout-Journal · 08.09.2026, sechster Teil — `v1266` bis `v1267b`
+
+### `v1266` · „Objekt anlegen" sitzt jetzt unter dem Logo
+
+Marcels Vorgabe kam als Bild: `design/mockups/anischt.png`, ein roter
+Strich zwischen Logo-Kasten und der Portfolio-/Suchzeile. Dazu gesagt:
+*„dass wir im gleichen Stil irgendwas haben wie Objekt anlegen und dass
+man vielleicht auch einfach von dort aus einen Absprung machen kann."*
+
+Den Weg gab es bisher **nur** im Aktionen-Menü am unteren Rand und als
+Knopf unter der Objektliste — beide muss man erst suchen. Jetzt steht er
+da, wo der Blick ohnehin hinfällt.
+
+**„Im gleichen Stil" wörtlich genommen, nicht geschätzt.** Am Logo-Kasten
+gemessen: `1px solid`, Radius **14 px**, Polsterung **13/16 px**,
+transparentes Inneres. Dieselben Werte trägt der neue Knopf — so liest
+sich der Kopfbereich als ein Block und nicht als zwei fremde Elemente.
+Eingeklappte Seitenleiste: nur das Plus, der Text würde sonst umbrechen.
+
+> **Gold-Audit-Befund an der eigenen Arbeit:** die Flächen standen zuerst
+> als `rgba(201,168,76,…)` da. Der Wächter zählt das **zu Recht** als
+> hartes Gold — ein Mandant färbt es nicht um. Ersetzt durch `color-mix`
+> auf dem Token.
+
+### `v1267` · Der Sprechlauf warnt, bevor er ein gefülltes Objekt überschreibt
+
+**Aus einem eigenen Fehler entstanden, und der Fehler wird hier
+ausdrücklich zugegeben.** Am 08.09.2026 war Marcels Objekt `2026-001`
+geöffnet, ein Sprechlauf-Test lief, und der Übernehmen-Knopf hat **17
+Felder eines fremden Datensatzes** darüber geschrieben — Adresse,
+Wohnfläche, Baujahr, Kaufpreis, Miete. Die Zeile darunter (`v514`)
+speichert anschließend **sofort und ohne Rückfrage**; der alte Stand war
+weg, bevor irgendetwas auffiel.
+
+Das ist keine Ungeschicklichkeit, sondern eine Falle im Ablauf. Wer ein
+Objekt offen hat und eine Aufnahme macht, will fast immer **dieses**
+Objekt ergänzen — aber nicht seine Stammdaten überschreiben. Und es gibt
+**keinen Rückweg**: die Objekt-Historie speichert nur Metadaten, ein
+Rückgängig existiert nicht.
+
+**Jetzt wird gefragt — aber nur, wenn wirklich etwas auf dem Spiel steht:**
+das Objekt trägt bereits Kerndaten (Straße, Hausnummer, PLZ, Ort,
+Wohnfläche, Baujahr, Kaufpreis, Kaltmiete) **und** die Übernahme würde
+mindestens eines davon ändern. Beim leeren Objekt — dem Normalfall nach
+„Objekt anlegen" — kommt keine Frage. Die Meldung zeigt **alt → neu**,
+damit man sieht, was man verliert.
+
+> **Gelesen wird die gerenderte Tabelle, nicht `_merged`.** Das ist
+> modul-intern in `object-actions.js`, und die Bridge gibt es nicht heraus
+> — sie kennt nur `reset/setMode/addRow/render/apply`. Nur **angehakte**
+> Zeilen zählen. Verglichen wird ohne Trennzeichen, damit „200.000" gegen
+> „200000" nicht als Änderung gilt.
+
+### `v1267b` · Die Warnung zeigte die Quelle statt des neuen Werts
+
+Im Browser nachgemessen, weil die erste Fassung Unsinn anzeigte: die
+Zeilen der Import-Tabelle sind **Haken · Label · Wert · Quelle(`.src`)**.
+Gelesen hatte ich die **letzte** Zelle — dort steht „Sprachaufzeichnung".
+Die Warnung lautete damit „Ort: Hüllhorst → **Sprachaufzeichnung**" statt
+„→ Bielefeld". Jetzt die Zelle **vor** `.src`, mit der vorletzten als
+Rückfall.
+
+**Das ist genau Regel 1**: die Spaltenzahl war angenommen, nicht
+ausgelesen. Eine Warnung, die den falschen Wert nennt, ist schlimmer als
+keine — sie sieht richtig aus.
+
+**Commits.** `991b07f` (`v1266`) · `8d6747a` (`v1267`) · `e623df3`
+(`v1267b`). Alle drei auf Staging, **nicht auf Prod** — Prod steht
+weiterhin auf `b0e7976`, es fehlen `v1265` bis `v1267b`.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

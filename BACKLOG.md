@@ -36,10 +36,10 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Stand 08.09.2026, abends)
+## → HIER WEITERMACHEN (Stand 09.09.2026)
 
-**Stand:** lokal = GitHub = Staging auf `67e9da1`. **Produktion auf
-`b0e7976`** — `v1260`…`v1264` sind live, **`v1265` noch nicht**.
+**Stand:** lokal = GitHub = Staging auf `e623df3`. **Produktion auf
+`b0e7976`** — `v1260`…`v1264` sind live, **`v1265` bis `v1267b` noch nicht**.
 
 ### Was jetzt Marcels Angabe braucht
 
@@ -58,12 +58,14 @@ Handy oder Rechner.
 | 3 | Pillen unterschiedlich lang einblenden | **offen** — nicht jeder Punkt wird gesagt, der Orbit darf nicht auf eine Antwort warten |
 | 4 | Kontextbezug im Sprechlauf prüfen | **teilweise** — Hausgeld-Aufteilung und Inventar sitzen, weitere Fälle offen |
 | 5 | Chatbot-Dialog statt Monolog, mit Demo | **offen** — größter Brocken, braucht ein Konzept vor dem Bauen |
-| 6 | Bild „Ansicht": Objekt anlegen links über der Suche | **offen** |
+| 6 | Bild „Ansicht": Objekt anlegen links über der Suche | **fertig** — `v1266`, Knopf unter dem Logo im Stil des Logo-Kastens |
 | 7 | IRR/Break-Even „passend in Auswertung" einordnen | **teilweise** — sie stehen in den Kennzahlen-Kacheln (Reiter Bewertung); Portfolio-Cockpit noch nicht |
 
-**Zuletzt fertig: `v1259`–`v1259f` — Gold-Audit und Sprachaufzeichnung.**
-Vier von sechs Punkten aus Marcels Sprechlauf-Liste; die doppelte Prüfung
-bleibt auf seinen Wunsch aus. Nachweis im Journal der Projektanweisung.
+**Zuletzt fertig: `v1266`–`v1267b`.** „Objekt anlegen" sitzt jetzt unter
+dem Logo (Marcels Bild `anischt.png`), und der Sprechlauf warnt, bevor er
+ein gefülltes Objekt überschreibt — entstanden aus einem eigenen Fehler,
+bei dem 17 Felder von `2026-001` ohne Rückfrage überschrieben wurden.
+Nachweis im Journal der Projektanweisung.
 
 ### Was jetzt Marcels Entscheidung braucht
 
