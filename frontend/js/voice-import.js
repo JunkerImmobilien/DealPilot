@@ -547,7 +547,106 @@
       }
     });
 
-    startRecording();
+    _startkarte(OA);   /* v1275: erst die Wahl, dann die Aufnahme */
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     v1275 · DIE WAHL BEIM ÖFFNEN — frei erzählen oder durchfragen lassen
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Entscheidung zur Demo (design/Vorschlaege/sprechlauf-dialog-*):
+     „das kann man auswaehlen ob co pilot oder frei sprechen." Das ist
+     Variante C aus dem Konzept.
+
+     Bis v1274 startete die Aufnahme sofort beim Oeffnen. Wer nicht weiss,
+     was DealPilot hoeren will, stand damit vor einem laufenden Mikrofon -
+     der unfreundlichste Moment der ganzen App.
+
+     Jetzt steht davor eine Frage mit zwei Antworten:
+
+       Ich erzaehle frei   -> alles wie bisher (Aufnahme, Orbit, Auswertung,
+                              danach die Rueckfragen aus v1273)
+       Frag mich durch     -> derselbe Fragen-Ablauf, nur von Anfang an und
+                              ueber ALLE Bloecke statt nur ueber die Luecken
+
+     Der geführte Weg braucht KEINE neue Maschinerie: er ist der
+     Rueckfragen-Zustand aus v1273 mit `alle = true`. Deshalb gelten dort
+     auch dieselben Regeln - tippen oder sprechen, „Weiss ich nicht"
+     beendet eine Frage, „Fertig" springt jederzeit zur Tabelle.
+
+     Kein Modus wird gemerkt: die Wahl faellt bei jedem Oeffnen neu. Ein
+     gemerkter Modus waere genau dann falsch, wenn er am meisten stoert -
+     beim naechsten Objekt, das anders liegt als das letzte. */
+  function _startkarteStil() {
+    if ($('vi-sk-stil')) return;
+    var s = document.createElement('style');
+    s.id = 'vi-sk-stil';
+    s.textContent = [
+      '#vi-start{padding:6px 2px 2px}',
+      '.vi-sk-frage{font:600 19px/1.35 "Space Grotesk",system-ui,sans-serif;margin:0 0 4px}',
+      '.vi-sk-sub{font:400 13.5px/1.5 Inter,system-ui,sans-serif;opacity:.75;margin:0 0 18px}',
+      '.vi-sk-wahl{display:grid;grid-template-columns:1fr 1fr;gap:12px}',
+      '@media(max-width:620px){.vi-sk-wahl{grid-template-columns:1fr}}',
+      '.vi-sk-btn{text-align:left;cursor:pointer;border-radius:14px;padding:16px 18px;',
+      '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 38%, transparent);',
+      '  background:rgba(0,0,0,.22);color:inherit;transition:background .16s ease, box-shadow .16s ease}',
+      '.vi-sk-btn:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);',
+      '  box-shadow:0 0 0 3px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent)}',
+      '.vi-sk-btn .t{display:block;font:700 14.5px/1.2 "Space Grotesk",system-ui,sans-serif;',
+      '  color:var(--wl-c9a84c, #C9A84C);margin-bottom:6px}',
+      '.vi-sk-btn .u{display:block;font:400 12.5px/1.45 Inter,system-ui,sans-serif;opacity:.72}',
+      '.vi-sk-btn .z{display:block;margin-top:9px;font:600 10px/1 "JetBrains Mono",ui-monospace,monospace;',
+      '  letter-spacing:.1em;text-transform:uppercase;opacity:.5}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+
+  function _startkarte(OA) {
+    _startkarteStil();
+    var rec = $('vi-rec'); if (rec) rec.style.display = 'none';
+    var nx = $('vi-next'); if (nx) nx.style.display = 'none';
+    var body = document.querySelector('.oabi-ov.vi-mode .oabi-body');
+    if (!body) { startRecording(); return; }   /* im Zweifel wie bisher */
+    var h = document.createElement('div');
+    h.id = 'vi-start';
+    h.innerHTML =
+      '<div class="vi-sk-frage">Wie möchtest du das Objekt aufnehmen?</div>' +
+      '<div class="vi-sk-sub">Beide Wege enden gleich — in der Übernahme-Tabelle, ' +
+        'in der du jede Zeile noch abwählen kannst.</div>' +
+      '<div class="vi-sk-wahl">' +
+        '<button type="button" class="vi-sk-btn" id="vi-sk-frei">' +
+          '<span class="t">Ich erzähle frei</span>' +
+          '<span class="u">Sprich einfach los — Adresse, Preis, Miete, Zustand, was dir einfällt. ' +
+            'Danach frage ich nach, was für die Rechnung noch fehlt.</span>' +
+          '<span class="z">Bis zu 4 Minuten · schnellster Weg</span>' +
+        '</button>' +
+        '<button type="button" class="vi-sk-btn" id="vi-sk-fuehr">' +
+          '<span class="t">Frag mich durch</span>' +
+          '<span class="u">Ich frage der Reihe nach — Preis, Miete, Fläche, Adresse und den Rest. ' +
+            'Antworten kannst du tippen oder sprechen.</span>' +
+          '<span class="z">Frage für Frage · nichts vergessen</span>' +
+        '</button>' +
+      '</div>';
+    body.insertBefore(h, body.firstChild);
+    $('vi-sk-frei').addEventListener('click', function () {
+      h.remove();
+      if (rec) rec.style.display = '';
+      if (nx) nx.style.display = '';
+      startRecording();
+    });
+    $('vi-sk-fuehr').addEventListener('click', function () {
+      h.remove();
+      _gefuehrt(OA);
+    });
+  }
+
+  /* Der geführte Weg: derselbe Fragen-Ablauf wie die Rückfragen, nur über
+     ALLE Blöcke und ohne Aufnahme davor. */
+  function _gefuehrt(OA) {
+    var sub = document.querySelector('.oabi-ov.vi-mode .oabi-sub');
+    if (sub) sub.textContent = 'Der Co-Pilot fragt der Reihe nach. Antworten kannst du tippen oder ' +
+      'sprechen — „Weiß ich nicht" überspringt, „Fertig" bringt dich jederzeit zur Übersicht.';
+    var catalog = _qcTarget ? buildCatalog() : buildFullCatalog();
+    rueckfragen(OA, { transcript: '', fields: {}, unsicher: [] }, catalog, true);
   }
 
   /* ── Aufnahme + Live-Vorschau ─────────────────────────────────────── */
@@ -1610,9 +1709,15 @@
     var gefunden = Object.keys(_rf.data.fields || {}).length;
     var vorschlag = _rfVorschlag(e);
     h.innerHTML =
-      '<div class="vi-rf-kopf">Noch eine Frage</div>' +
-      '<div class="vi-rf-fund">Ich habe <b>' + gefunden + ' Angaben</b> aus deiner Aufnahme gelesen. ' +
-        (_rf.offen.length === 1 ? 'Für die Rechnung fehlt mir noch eine.' : 'Für die Rechnung fehlen mir noch ' + _rf.offen.length + '.') + '</div>' +
+      /* v1275: im gefuehrten Weg gab es keine Aufnahme davor - „Ich habe 0
+         Angaben aus deiner Aufnahme gelesen" waere dort schlicht falsch. */
+      '<div class="vi-rf-kopf">' + (_rf.alle ? 'Der Co-Pilot fragt' : 'Noch eine Frage') + '</div>' +
+      '<div class="vi-rf-fund">' + (_rf.alle
+        ? 'Ich gehe die Angaben der Reihe nach durch — <b>' + _rf.offen.length + '</b> insgesamt. ' +
+          'Was du nicht weißt, überspringen wir.'
+        : 'Ich habe <b>' + gefunden + ' Angaben</b> aus deiner Aufnahme gelesen. ' +
+          (_rf.offen.length === 1 ? 'Für die Rechnung fehlt mir noch eine.'
+                                  : 'Für die Rechnung fehlen mir noch ' + _rf.offen.length + '.')) + '</div>' +
       '<div class="vi-rf-frage">' + escH(e.frage) + '</div>' +
       '<div class="vi-rf-zaehler">' + (_rf.i + 1) + ' von ' + _rf.offen.length + '</div>' +
       '<div class="vi-rf-zeile">' +
@@ -1765,11 +1870,17 @@
   }
 
   /* Einstieg: nach der Auswertung, vor der Tabelle. */
-  function rueckfragen(OA, data, catalog) {
+  function rueckfragen(OA, data, catalog, alle) {
     var fields = (data && data.fields) || {};
-    var luecken = _rfLuecken(fields);
+    /* v1275: `alle` ist der gefuehrte Weg - dann wird nicht nach LUECKEN
+       gefragt, sondern der Reihe nach durch alles, was noch nicht steht.
+       Der Deckel von drei Fragen gilt dort nicht: wer „Frag mich durch"
+       waehlt, hat genau darum gebeten. */
+    var luecken = alle
+      ? RFRAGEN.filter(function (e) { return _rfFehlt(e, fields); })
+      : _rfLuecken(fields);
     if (!luecken.length) return showResults(OA, data, catalog);   /* nichts offen - direkt zur Tabelle */
-    _rf = { offen: luecken, i: 0, data: data, catalog: catalog, OA: OA };
+    _rf = { offen: luecken, i: 0, data: data, catalog: catalog, OA: OA, alle: !!alle };
     if (!_rf.data.fields) _rf.data.fields = {};
     var rec = $('vi-rec'); if (rec) rec.style.display = 'none';
     var nx = $('vi-next'); if (nx) nx.style.display = 'none';
@@ -1902,5 +2013,6 @@
      Sprechen laesst sich nicht automatisiert nachmessen. */
   window.VoiceImport = { srcLabel: srcLabel, open: open, _orbit: chipOrbit,
                          _rueckfragen: rueckfragen, _luecken: _rfLuecken,
-                         _text: updateChipsFromText };   /* v1274: Live-Weg pruefbar */
+                         _text: updateChipsFromText,   /* v1274: Live-Weg pruefbar */
+                         _gefuehrt: _gefuehrt };       /* v1275 */
 })();
