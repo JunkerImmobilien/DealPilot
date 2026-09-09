@@ -9238,6 +9238,335 @@ nach dem Speichern, Handy oder Rechner.
 Gold-Audit nach jedem Schritt RC=0 — er hat dabei einmal **mein eigenes
 frisches Hartgold** im Knopf-Stil gefangen (`v1263`), tokenisiert.
 
+## Rollout-Journal · 08.09.2026, fünfter Teil — Prod-Rollout und `v1265`
+
+### Prod-Rollout `v1260`–`v1264`
+
+Marcels Freigabe: „ja rollout". Merge `b0e7976`, Prod von `f311d8f` auf
+`b0e7976`. **Keine Migration** („No new migrations to apply"), Backend neu
+gebaut und gesund, Gold-Audit auf Prod RC=0. Beide Datenbanken vorher
+gesichert (`haupt-20260908-1814.sql.gz` 11 MB,
+`mb-20260908-1814.sql.gz` 685 KB).
+
+### `v1265` · Amtlicher Bodenrichtwert zuerst
+
+Marcels Hinweis: *„der Bodenrichtwert-Button sollte die
+Bodenrichtwert-Funktion aufrufen, so wie wir sie im Marktbericht
+verwenden. Dort haben wir ja mittlerweile alle Bundesländer oder? Prüf das
+nochmal."*
+
+**Geprüft — er hat recht.** `/marktbericht/boris/coverage` meldet
+**11 von 11 Ländern live, 0 eingeschränkt**, darunter zwei bundesweite
+BORIS-D-Quellen als `catchAll`. Schleswig-Holstein, Bayern,
+Baden-Württemberg und das Saarland tragen „Freigabe (Aktennotiz Junker
+Solution)".
+
+> **Der Kopfkommentar der Registry ist veraltet.** Er sagt noch „BW:
+> Vermarktung untersagt, Bayern: gebuehrenpflichtig, restliche Laender noch
+> nicht verifiziert" — der Code darunter hat sie alle freigeschaltet.
+
+**Der Unterschied, an denselben Adressen gemessen:**
+
+| Adresse | BORIS | KI-Schätzung |
+|---|---|---|
+| Hüllhorst, Hermannstr. 9 | **90 €/m²**, Stichtag 01.01.2026, Zone 167, 0,5 s | 50–65 €/m², Konfidenz niedrig |
+| Herford, Sachsenstr. 16 | **190 €/m²**, Zone 99173, 0,4 s | nichts gefunden |
+| Stuttgart, Marktplatz | **7.700 €/m²**, Zone 14605025 | — |
+| München, Marienplatz | kein Wert (Lage ohne Zone) | 5.000 €/m², niedrig |
+
+**Die 90 €/m² sind genau der Wert, mit dem das Testobjekt Hüllhorst in
+`CLAUDE.md` rechnet** (`950 × 90 + 828 × 5`). BORIS ist also nicht nur
+genauer, sondern die Quelle, gegen die ohnehin geprüft wird — mit Stichtag
+und Bodenrichtwertzone, beides gutachterlich zitierfähig. Dazu schneller
+und kostenlos, während die Schätzung einen KI-Aufruf verbraucht.
+
+Die Automatik aus `v1263` ruft jetzt **BORIS zuerst**; nur wenn dort kein
+Wert liegt, kommt die Schätzung. Beide Knöpfe bleiben von Hand bedienbar.
+
+**Gemessen nach dem Rollout:** Hüllhorst eingetippt → `brw` = **90**
+(amtlich, nicht die Schätzung). München eingetippt → BORIS leer → Rückfall
+greift, 5.000 €/m² mit „Niedrige Konfidenz · Nur grobe Schätzung".
+
+> **Zweiter Befund:** `borisAvailableForPlz()` hatte als Rückfall
+> `{sh:1, by:1, bw:1, sl:1}` — vier Länder gesperrt, die längst frei sind.
+> Der Rückfall griff nur bei fehlgeschlagener Coverage-Abfrage und
+> verweigerte dann einen Abruf, der funktioniert hätte. Jetzt leer: im
+> Zweifel probieren. Ein Fehlversuch kostet eine halbe Sekunde, ein zu
+> Unrecht gesperrtes Land kostet den amtlichen Wert.
+
+**Commits.** `b0e7976` (Prod-Merge) · `67e9da1` (`v1265`).
+`v1265` ist auf Staging, **noch nicht auf Prod**.
+
+## Rollout-Journal · 08.09.2026, sechster Teil — `v1266` bis `v1267b`
+
+### `v1266` · „Objekt anlegen" sitzt jetzt unter dem Logo
+
+Marcels Vorgabe kam als Bild: `design/mockups/anischt.png`, ein roter
+Strich zwischen Logo-Kasten und der Portfolio-/Suchzeile. Dazu gesagt:
+*„dass wir im gleichen Stil irgendwas haben wie Objekt anlegen und dass
+man vielleicht auch einfach von dort aus einen Absprung machen kann."*
+
+Den Weg gab es bisher **nur** im Aktionen-Menü am unteren Rand und als
+Knopf unter der Objektliste — beide muss man erst suchen. Jetzt steht er
+da, wo der Blick ohnehin hinfällt.
+
+**„Im gleichen Stil" wörtlich genommen, nicht geschätzt.** Am Logo-Kasten
+gemessen: `1px solid`, Radius **14 px**, Polsterung **13/16 px**,
+transparentes Inneres. Dieselben Werte trägt der neue Knopf — so liest
+sich der Kopfbereich als ein Block und nicht als zwei fremde Elemente.
+Eingeklappte Seitenleiste: nur das Plus, der Text würde sonst umbrechen.
+
+> **Gold-Audit-Befund an der eigenen Arbeit:** die Flächen standen zuerst
+> als `rgba(201,168,76,…)` da. Der Wächter zählt das **zu Recht** als
+> hartes Gold — ein Mandant färbt es nicht um. Ersetzt durch `color-mix`
+> auf dem Token.
+
+### `v1267` · Der Sprechlauf warnt, bevor er ein gefülltes Objekt überschreibt
+
+**Aus einem eigenen Fehler entstanden, und der Fehler wird hier
+ausdrücklich zugegeben.** Am 08.09.2026 war Marcels Objekt `2026-001`
+geöffnet, ein Sprechlauf-Test lief, und der Übernehmen-Knopf hat **17
+Felder eines fremden Datensatzes** darüber geschrieben — Adresse,
+Wohnfläche, Baujahr, Kaufpreis, Miete. Die Zeile darunter (`v514`)
+speichert anschließend **sofort und ohne Rückfrage**; der alte Stand war
+weg, bevor irgendetwas auffiel.
+
+Das ist keine Ungeschicklichkeit, sondern eine Falle im Ablauf. Wer ein
+Objekt offen hat und eine Aufnahme macht, will fast immer **dieses**
+Objekt ergänzen — aber nicht seine Stammdaten überschreiben. Und es gibt
+**keinen Rückweg**: die Objekt-Historie speichert nur Metadaten, ein
+Rückgängig existiert nicht.
+
+**Jetzt wird gefragt — aber nur, wenn wirklich etwas auf dem Spiel steht:**
+das Objekt trägt bereits Kerndaten (Straße, Hausnummer, PLZ, Ort,
+Wohnfläche, Baujahr, Kaufpreis, Kaltmiete) **und** die Übernahme würde
+mindestens eines davon ändern. Beim leeren Objekt — dem Normalfall nach
+„Objekt anlegen" — kommt keine Frage. Die Meldung zeigt **alt → neu**,
+damit man sieht, was man verliert.
+
+> **Gelesen wird die gerenderte Tabelle, nicht `_merged`.** Das ist
+> modul-intern in `object-actions.js`, und die Bridge gibt es nicht heraus
+> — sie kennt nur `reset/setMode/addRow/render/apply`. Nur **angehakte**
+> Zeilen zählen. Verglichen wird ohne Trennzeichen, damit „200.000" gegen
+> „200000" nicht als Änderung gilt.
+
+### `v1267b` · Die Warnung zeigte die Quelle statt des neuen Werts
+
+Im Browser nachgemessen, weil die erste Fassung Unsinn anzeigte: die
+Zeilen der Import-Tabelle sind **Haken · Label · Wert · Quelle(`.src`)**.
+Gelesen hatte ich die **letzte** Zelle — dort steht „Sprachaufzeichnung".
+Die Warnung lautete damit „Ort: Hüllhorst → **Sprachaufzeichnung**" statt
+„→ Bielefeld". Jetzt die Zelle **vor** `.src`, mit der vorletzten als
+Rückfall.
+
+**Das ist genau Regel 1**: die Spaltenzahl war angenommen, nicht
+ausgelesen. Eine Warnung, die den falschen Wert nennt, ist schlimmer als
+keine — sie sieht richtig aus.
+
+**Commits.** `991b07f` (`v1266`) · `8d6747a` (`v1267`) · `e623df3`
+(`v1267b`). Alle drei auf Staging, **nicht auf Prod** — Prod steht
+weiterhin auf `b0e7976`, es fehlen `v1265` bis `v1267b`.
+
+## Rollout-Journal · 09.09.2026 — `v1268` bis `v1268c`
+
+### `v1268` · Ein Klick auf „Objekt anlegen" legte zwei Objekte an
+
+**Der Fehler war seit Wochen bekannt und galt als nicht reproduzierbar.**
+Marcel hat ihn diesmal mit Bild gemeldet (`design/mockups/objekt.png`):
+`2026-002` und `2026-1009`, beide leer, beide um **05:10:39** angelegt —
+in der Datenbank nachgesehen **28 ms auseinander**.
+
+**Gemessen auf Staging**, Objekt `2026-001` geladen, **ein** Klick auf den
+neuen Knopf: der POST kam aus `performSave`, also aus dem
+`dpTabSwitchSave()` in der **ersten Zeile von `newObj`** — und er legte ein
+**neues, leeres** Objekt an (`2026-1025`).
+
+**Der Ablauf, Schritt für Schritt:**
+
+1. `dpTabSwitchSave()` startet `saveObj` für das **geladene** Objekt.
+2. `saveObj` läuft bis zu seinem ersten `await` — `_checkObjIdConflict`
+   holt die Objektliste vom Server — und gibt die Kontrolle ab.
+3. `newObj` läuft synchron weiter: `_currentObjKey = null`, alle Felder
+   geleert, neue Vorschau-Nummer.
+4. `saveObj` kommt vom `await` zurück und liest **beides neu**: kein Key
+   mehr → **POST statt PUT**; leeres Formular → **leeres Objekt**.
+
+> **Der Sicherungs-Save sicherte also nicht das alte Objekt, sondern
+> erzeugte eine Karteileiche.** Zwei Schäden auf einmal: die Änderungen am
+> offenen Objekt waren weg, und in der Liste stand eine Karte zu viel. Kam
+> kurz darauf noch die leere Karte aus `newobj-fixes.js` durch, waren es
+> zwei — Marcels Bild.
+
+**Zwei Riegel, weil einer die Lücke nur an einer Stelle schließt:**
+
+1. **`newObj` wartet** einen laufenden Sicherungs-Save ab, wenn wirklich
+   ein Objekt geladen ist; erst danach wird geleert (`_newObjLeeren`). Ohne
+   geladenes Objekt — der Normalfall — bleibt alles synchron wie bisher.
+2. **`saveObj` merkt sich beim Start, zu welchem Objekt es gehört**, und
+   bricht still ab, wenn der Kontext während eines `await` gewechselt hat.
+   Das deckt auch Tab-Wechsel und `loadSaved` ab.
+
+Die leere Karte hängt jetzt zusätzlich am Ereignis `dp:newobj-ready` —
+beim abgewarteten Save käme das `setTimeout(60)` in `newobj-fixes.js`
+sonst zu früh, sähe den noch gesetzten `_currentObjKey` und legte **gar
+keine** Karte an.
+
+**Nachgemessen nach dem Rollout:** Objekt `2026-001` geladen, ein Klick →
+**PUT** auf `2026-001` mit `ort: Hüllhorst` (die Sicherung kommt jetzt
+an!) und **ein** POST für das neue leere Objekt. Vorher: ein POST mit
+leeren Daten und gar kein PUT.
+
+### `v1268b` und `v1268c` · Mehrfach klicken, und der Fehler dabei
+
+Nach `v1268` gemessen: **drei Klicks in 150 ms ergaben zwei
+Karteileichen** — der Guard `_dpEmptyCardSaving` hält nur, solange der
+Save läuft. `v1268b` merkt sich deshalb die zuletzt angelegte leere Karte
+und verwendet sie wieder, solange das Formular unangetastet leer ist.
+
+> **Dabei ist mir ein Fehler unterlaufen, der schlimmer war als der
+> behobene.** Leeres Objekt angelegt, gefüllt, gespeichert, dann wieder
+> „Objekt anlegen": der Merker zeigte weiter auf dieselbe Karte, das
+> Formular war leer, die Wiederverwendung griff — **der nächste
+> Tastendruck hätte das gefüllte Objekt überschrieben.** Aus einem Schutz
+> vor Karteileichen wäre ein Datenverlust geworden.
+>
+> **Das leere Formular sagt nur, dass HIER nichts steht, nicht was in der
+> Karte steht.** `v1268c` holt die gemerkte Karte deshalb vom Server und
+> verwendet sie nur wieder, wenn sie **dort** leer ist (`ort/str/kp/wfl`).
+
+**Abnahme (Staging, `v1268c`):** vier Klicks hintereinander → **ein**
+Objekt. Leer angelegt, gefüllt, wieder angelegt → das gefüllte bleibt
+unangetastet, ein neues entsteht. Gold-Audit RC=0 (genau auf der
+Basislinie).
+
+### `v1268` · Der amtliche Bodenrichtwert hat endlich einen Knopf
+
+Marcels Frage: *„haben wir jetzt einen Knopf oder wie wird der unter dem
+Tab Objekt ermittelt?"* — **Gemessen: der Knopf fehlte.** Das Modul
+erwartet `#brw-boris-btn` seit `v785` (`_refreshBorisBtn` sucht ihn,
+`fetchBoris` beschriftet ihn), aber im HTML stand er **nie** — `git log -S`
+über `index.html` findet keinen einzigen Treffer. Der amtliche Direktabruf
+war damit nur über die Automatik aus `v1265` erreichbar, von Hand gar
+nicht.
+
+Jetzt stehen drei Knöpfe am Feld, in dieser Reihenfolge:
+**📍 BORIS abrufen** (amtlich, sofort) · **🔗 BORIS-Portal** (öffnet das
+Landesportal) · **Bodenrichtwert schätzen** (KI, als Rückfall).
+
+**Nachgemessen:** Hüllhorst, Hermannstr. 9 eingetippt, Knopf gedrückt →
+`90 €/m², Stichtag 2026-01-01, Zone 167, BORIS-NRW`. Das ist genau der
+Wert, mit dem das Testobjekt in `CLAUDE.md` rechnet.
+
+**Commits.** `881d0f0` (`v1268` + BORIS-Knopf) · `3970814` (`v1268b`) ·
+`v1268c`. Alles auf Staging, **nicht auf Prod** — dort fehlen weiterhin
+`v1265` bis `v1268c`.
+
+> **Nebenbefund, offen:** die Objektnummern laufen auseinander. In der
+> Datenbank steht ein Demo-Objekt **`2026-999`**; `ObjNumbering` zieht
+> seinen Zähler auf jede höhere gefundene Nummer nach, deshalb vergibt der
+> Client seit Langem **vierstellige** Nummern (`2026-1009`), während der
+> Server bei einer Neuanlage ohne Nummer sauber weiterzählt (`2026-002`).
+> Beide Nummernkreise sind für sich korrekt, nebeneinander sehen sie falsch
+> aus. Gehört aufgeräumt, sobald jemand die Demo-Objekte anfasst.
+
+## Rollout-Journal · 09.09.2026, zweiter Teil — Aufräumen, `v1269`, `v1270`
+
+### Aufgeräumt: 15 Testnutzer und zwei Karteileichen
+
+Marcels Auftrag: *„du hast mal testuser angelegt die sollten auch alle raus."*
+
+Auf Staging standen **15 Nutzer** mit Adressen wie
+`v1185-lauf-halbzeit-1788188100474@dealpilot.test` — Reste der Prüfläufe
+zu `v1184`, `v1185` und `v1189`. Alle ohne ein einziges Objekt, keiner
+Reseller-Besitzer, keiner mit Stripe-Kundenkonto; sieben trugen ein
+Sandbox-Abo. Vor dem Löschen gesichert
+(`/root/backups/haupt-vor-testuser-20260909-0544.sql.gz`, 46 MB, Anfang
+angesehen). Gelöscht in **einer** Transaktion, zusammen mit Marcels beiden
+Geisterobjekten `2026-002` und `2026-1009`.
+
+Danach: **5 Nutzer**, davon zwei bereits vorher soft-gelöschte, und
+**9 Objekte** — Marcels Bestand unverändert.
+
+> **Auf Produktion konnte ich nicht nachsehen** — der Zugriff wurde
+> blockiert. Ob dort ebenfalls `@dealpilot.test`-Nutzer liegen, ist
+> **offen**; die Prüfläufe liefen auf Staging, es spricht also wenig
+> dafür.
+
+> **Nebenbefund zu den Nummern:** Das Demo-Objekt **`2026-999`** treibt
+> den Zähler. `ObjNumbering` hebt ihn auf jede höhere gefundene Nummer an,
+> deshalb vergibt der Client seit Langem vierstellige Nummern. Beide
+> Nummernkreise sind für sich korrekt, nebeneinander sehen sie falsch aus.
+
+### `v1269` · Drei Einstiege in einer Zeile
+
+Marcels Vorgabe: *„Könne wir vlt daneben auch etwas machen mit Quickcheck
+und Marktbericht? Das darf genau in die Zeile alles sein und vlt mit icons
+die das aussagen anstatt mit text."*
+
+Die Hauptaktion behält ihren Text — sie ist die häufigste und war die
+Vorgabe von `v1266`. Die beiden Nachbarn tragen nur ihr Zeichen: **Tacho**
+für den Quick-Check, **Balken** für den Marktbericht, beide mit Tooltip
+und verstecktem Text für Vorleseprogramme. Drei Beschriftungen
+nebeneinander passen bei 323 px Seitenleiste nicht ohne Umbruch —
+gemessen: 219 px für die Hauptaktion, 2 × 44 px für die Zeichen.
+
+Rahmen, Radius und Farbe bleiben die des Logo-Kastens. Eingeklappte
+Seitenleiste: untereinander, sonst wäre jeder Knopf 14 px breit.
+
+### `v1270`–`v1270d` · Postleitzahl füllt den Ort, das Straßenfeld schlägt vor
+
+Marcels Vorgabe: *„wenn man plz eingibt das der ort automatisch ausgefüllt
+wird und man unter Straße dann eine Liste der Straßen hat. man kann aber
+weiterhin die straße eintippen."*
+
+**Die Quelle gab es schon:** `/geocode/autocomplete` (Geoapify, Schlüssel
+bleibt auf dem Server). Sie taugte nur nichts, weil sie ohne Art-Filter
+suchte.
+
+**Drei Messungen, drei Nachbesserungen — jede hat den Fehler der
+vorherigen behoben:**
+
+| Stand | Eingabe | Ergebnis |
+|---|---|---|
+| `v1270` roh | „32120 Hiddenhausen Ha" | drei **Ortszeilen**, keine Straße |
+| `v1270` mit `type=street` | „32120 Hiddenhausen Löh" | Hiddenhauser Str. in **Enger**, Hiddenhausener Str. in **Loitz** (Vorpommern) |
+| `v1270b` mit Kreis | „Löh" + Koordinaten | **Löhner Straße 32120** zuerst — richtig |
+| `v1270b`, zweiter Fall | „Her" in 32609 | Hermannstraße in **32278 Kirchlengern** oben |
+| `v1270c` | „Herm" in 32609 | **Hermannstraße** (eigene PLZ) oben, Nachbarorte benannt darunter |
+
+> **Der Ortsname im Suchtext wiegt bei Geoapify schwerer als das Präfix
+> der Straße.** Deshalb wird die Postleitzahl einmal in Koordinaten
+> aufgelöst und die Suche läuft mit `filter=circle` (9 km) plus
+> `bias=proximity` um diesen Punkt; im Text steht nur noch das Präfix.
+> Weil im Umkreis mehr als eine gleichnamige Straße liegt, sortiert die
+> Liste zusätzlich selbst: **gleiche PLZ oben**, die übrigen bleiben
+> stehen und tragen sichtbar ihren Ort. Eine Straße stillschweigend aus
+> dem Nachbarort zu übernehmen wäre schlimmer, als sie zu zeigen.
+
+**`v1270d` war ein Optikfehler, im Browser gefunden:** die Liste stand mit
+`position:fixed` nach jeder Layoutverschiebung falsch — gemessen Feld bei
+y=488, Liste bei y=501, also **25 px zu hoch und mitten auf dem
+Eingabefeld**. Jetzt hängt sie als absolut positioniertes Kind im
+Feld-Container und wandert mit. Der `.f`-Container bekommt dafür per
+Inline-Stil `position:relative` — gezielt an diesem einen Element, **keine
+Sammelregel auf `.f`**, die träfe die halbe Maske. Damit fiel auch der
+Scroll-Handler weg: er hatte `capture` und fing das Scrollen in
+`.main-col` mit, machte die Liste also sofort wieder zu.
+
+**Abnahme (Staging):** „32120" getippt → Ort **Hiddenhausen** von selbst.
+„Löh" im Straßenfeld → Liste sitzt **4 px** unter dem Feld, gleiche
+Breite, **Löhner Straße** zuerst. Klick übernimmt und springt in die
+Hausnummer, Pfeiltaste + Enter ebenso, Esc schließt. Gold-Audit RC=0.
+
+**Zwei Regeln im Modul, jede mit Grund:** der Ort wird **nur** gefüllt,
+wenn das Feld leer ist (ein eingetragener Ortsteil ist mehr wert als der
+Gemeindename), und die Straßenliste ist ein **Vorschlag, kein Zwang** —
+wer nichts anklickt, behält seinen Text.
+
+**Commits.** `7817f0a` (`v1270`) und die Folgestände `v1269`, `v1270b`,
+`v1270c`, `v1270d`. **mb-Backend dreimal neu gebaut** (der Code liegt im
+Image). Alles auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

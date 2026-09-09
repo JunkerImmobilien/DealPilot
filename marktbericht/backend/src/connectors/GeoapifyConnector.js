@@ -65,18 +65,46 @@ export const GeoapifyConnector = {
     };
   },
 
-  // Adress-Autocomplete (Standortsuche): liefert bis zu 6 Vorschläge in DE
-  async autocomplete(text) {
-    if (!geoEnabled() || !text || String(text).trim().length < 3) return [];
+  /* v1270 · Autocomplete kann jetzt nach Art filtern.
+     Ohne Filter mischt Geoapify Orte, Ortsteile und Strassen: die Eingabe
+     "32120 Hiddenhausen Ha" lieferte gemessen DREI Ortszeilen und keine
+     einzige Strasse. Mit type=street kommen Strassen, mit type=postcode der
+     Ort zur Postleitzahl. Beides braucht das Objekt-Tab der Haupt-App.
+     Ohne Argumente verhaelt sich die Funktion wie bisher. */
+  async autocomplete(text, opts) {
+    if (!geoEnabled() || !text) return [];
+    opts = opts || {};
+    const ERLAUBT = ['street', 'postcode', 'city', 'amenity', 'locality'];
+    const type = ERLAUBT.indexOf(String(opts.type || '')) >= 0 ? String(opts.type) : null;
+    let limit = parseInt(opts.limit, 10);
+    if (!Number.isFinite(limit) || limit < 1 || limit > 12) limit = 6;
+    /* v1270b · Ortsbezug ueber KOORDINATEN, nicht ueber den Ortsnamen.
+       Gemessen: "32120 Hiddenhausen Löh" lieferte die Hiddenhauser Strasse
+       in ENGER und eine Hiddenhausener Strasse in Loitz (Vorpommern) - der
+       Ortsname im Suchtext wiegt bei Geoapify schwerer als das Praefix der
+       Strasse. Mit einem Kreis um die Postleitzahl faellt der Ortsname aus
+       dem Text weg und die Treffer liegen dort, wo das Objekt steht.
+       Der Kreis ersetzt den Landesfilter; er liegt ohnehin in Deutschland. */
+    const lat = parseFloat(opts.lat), lon = parseFloat(opts.lon);
+    let radius = parseInt(opts.radius, 10);
+    if (!Number.isFinite(radius) || radius < 500 || radius > 50000) radius = 9000;
+    const mitKreis = Number.isFinite(lat) && Number.isFinite(lon);
+    if (String(text).trim().length < (mitKreis ? 2 : 3)) return [];
     const url =
       `${cfg.geoapify.base}/v1/geocode/autocomplete` +
-      `?text=${encodeURIComponent(text)}&filter=countrycode:de&limit=6&lang=de&apiKey=${cfg.geoapify.key}`;
+      `?text=${encodeURIComponent(text)}` +
+      (mitKreis ? `&filter=circle:${lon},${lat},${radius}&bias=proximity:${lon},${lat}`
+                : `&filter=countrycode:de`) +
+      `&limit=${limit}&lang=de` +
+      (type ? `&type=${type}` : '') +
+      `&apiKey=${cfg.geoapify.key}`;
     const data = await httpJson(url, { timeoutMs: 8000 });
     const feats = (data && data.features) || [];
     return feats
       .map((f) => {
         const p = f.properties || {};
-        return { formatted: p.formatted, lat: p.lat, lon: p.lon, postcode: p.postcode || null, city: p.city || p.town || p.village || null };
+        return { formatted: p.formatted, lat: p.lat, lon: p.lon, postcode: p.postcode || null,
+                 city: p.city || p.town || p.village || null, street: p.street || null };
       })
       .filter((x) => x.formatted);
   },

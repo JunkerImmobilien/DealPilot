@@ -465,6 +465,73 @@
     $('vi-stop').addEventListener('click', stopRecordingKeep);
     $('vi-next').addEventListener('click', function () { evaluate(OA); });
     $('oabi-apply').addEventListener('click', function () {
+      /* ═══ v1267 · Warnen, bevor ein GEFÜLLTES Objekt überschrieben wird ═══
+         Am 08.09.2026 selbst hineingelaufen: Objekt 2026-001 war geöffnet,
+         ein Sprechlauf-Test lief, und mit dem Übernehmen-Knopf wurden
+         17 Felder eines fremden Datensatzes überschrieben — Adresse,
+         Wohnfläche, Baujahr, Kaufpreis, Miete. Die Zeile darunter (v514)
+         speichert anschliessend SOFORT und ohne Rückfrage; damit war der
+         alte Stand weg, bevor irgendetwas auffiel.
+
+         Das ist keine Ungeschicklichkeit, sondern eine Falle im Ablauf:
+         Wer ein Objekt offen hat und eine Aufnahme macht, will fast immer
+         DIESES Objekt ergänzen — aber eben nicht seine Stammdaten
+         überschreiben. Und es gibt keinen Rückweg: die Objekt-Historie
+         speichert nur Metadaten, ein Rückgängig gibt es nicht.
+
+         Gewarnt wird NUR, wenn wirklich etwas auf dem Spiel steht: das
+         Objekt trägt bereits Kerndaten UND die Übernahme würde mindestens
+         eines davon ändern. Bei einem leeren Objekt — dem Normalfall nach
+         „Objekt anlegen" — kommt keine Frage. */
+      /* Gelesen wird die gerenderte Tabelle, nicht `_merged` — das ist
+         modul-intern in object-actions.js, und die Bridge gibt es nicht
+         heraus (sie kennt nur reset/setMode/addRow/render/apply). Der
+         angezeigte Wert reicht: er ist genau das, was der Nutzer gleich
+         übernimmt. Nur ANGEHAKTE Zeilen zählen — abgewählte ändern nichts. */
+      var _kern = ['str', 'hnr', 'plz', 'ort', 'wfl', 'baujahr', 'kp', 'nkm'];
+      var _kollision = [];
+      try {
+        var _ovT = $('oabi-ov');
+        _kern.forEach(function (id) {
+          var el = document.getElementById(id);
+          var alt = el ? String(el.value || '').trim() : '';
+          if (!alt) return;                       /* leer: nichts zu verlieren */
+          var cb = _ovT && _ovT.querySelector('.oabi-tbl input[type="checkbox"][data-id="' + id + '"]');
+          if (!cb || !cb.checked) return;         /* wird gar nicht übernommen */
+          var zeile = cb.closest('tr');
+          /* v1267b: NICHT die letzte Zelle — die traegt die Quelle
+             („Sprachaufzeichnung"). Im Browser gemessen ist die Reihenfolge
+             Haken · Label · WERT · Quelle(.src). Also die Zelle vor `.src`,
+             mit der vorletzten als Rueckfall, falls die Klasse mal fehlt. */
+          var kommt = '';
+          if (zeile) {
+            var srcTd = zeile.querySelector('td.src');
+            var wertTd = srcTd ? srcTd.previousElementSibling : null;
+            if (!wertTd) {
+              var alle = zeile.querySelectorAll('td');
+              wertTd = alle.length >= 2 ? alle[alle.length - 2] : null;
+            }
+            kommt = wertTd ? String(wertTd.textContent || '').trim() : '';
+          }
+          /* Ziffern vergleichen, damit „200.000" und „200000" nicht als
+             Änderung durchgehen — sonst warnt es bei jeder Formatierung. */
+          var nurZiffern = function (s) { return s.replace(/[^0-9a-zA-ZäöüÄÖÜß]/g, '').toLowerCase(); };
+          if (kommt && nurZiffern(kommt) !== nurZiffern(alt)) {
+            _kollision.push(labelFor(id) + ': ' + alt + ' → ' + kommt);
+          }
+        });
+      } catch (e) { _kollision = []; }
+
+      if (_kollision.length) {
+        var frage = 'Dieses Objekt hat bereits Stammdaten. Die Übernahme ändert:\n\n  ' +
+          _kollision.slice(0, 8).join('\n  ') +
+          (_kollision.length > 8 ? '\n  … und ' + (_kollision.length - 8) + ' weitere' : '') +
+          '\n\nDas lässt sich nicht rückgängig machen. Wirklich überschreiben?';
+        /* confirm() blockiert und ist hier genau richtig: es geht um einen
+           Datenverlust, der sonst unbemerkt bliebe. */
+        if (!window.confirm(frage)) return;
+      }
+
       OA.apply();  /* applyMerged: schreibt, schliesst, fired done */
       /* v514: nach Sprach-Uebernahme das Objekt einmal speichern (nur Objekt-Kontext) */
       if (!_qcTarget) {

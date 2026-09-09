@@ -481,6 +481,12 @@ function loadData(d) {
 // ══════════════════════════════════════════════════
 async function saveObj(opts) {
   opts = opts || {};
+  /* v1268-kontext: Mit welchem Objekt hat dieser Save angefangen? Zwischen
+     hier und collectData() liegt mindestens ein await (_checkObjIdConflict
+     holt die Objektliste vom Server). In dieser Luecke kann newObj den
+     Kontext wegziehen - dann schreibt der Save leere Felder in ein NEUES
+     Objekt. Gemessen am 09.09.2026 (2026-1025). */
+  var _ctxKey = _currentObjKey;
   /* v968-qc-takeover: waehrend QC-Uebernehmen (_handleSave) nur der EINE finale Save (_qcFinal) durch.
      Alle Auto-Save-/Sofort-Anlage-/Wrapper-saveObj werden stillgelegt -> genau eine Anlage, kein Doppel. */
   if (window._qcTakeover && !(opts && opts._qcFinal)) { return; }
@@ -542,6 +548,15 @@ async function saveObj(opts) {
       }
       window._objSeqIsPreview = false;
     }
+  }
+  /* v1268-kontext: Kontext gewechselt? Dann gehoert dieser Save zu einem
+     Objekt, das nicht mehr offen ist - und das Formular zeigt laengst etwas
+     anderes. Still abbrechen ist richtig: weiterschreiben hiesse, fremde
+     (meist leere) Daten unter einer neuen Nummer anzulegen. */
+  if (_currentObjKey !== _ctxKey) {
+    try { console.warn('[storage] saveObj: Objektwechsel waehrend des Speicherns -> abgebrochen (v1268)'); } catch (e) {}
+    _newObjSaveInflight = false;
+    return;
   }
   if (typeof updHeader === 'function') updHeader();
 
@@ -740,8 +755,41 @@ window._clearFormForNewObject = _clearFormForNewObject;
 
 function newObj() {
   /* v379-autosave: confirm entfernt (Auto-Save aktiv) */
-  /* v736-save-before-switch: aktuelles Objekt sichern bevor gewechselt/neu */
-  try { if (window.dpTabSwitchSave) { window.dpTabSwitchSave(); } } catch (e) {} /* v782-always-save */
+  /* ═══ v1268 · Erst sichern, DANN leeren ════════════════════════════════
+     Marcels Befund vom 09.09.2026: ein Klick auf "Objekt anlegen" legt ZWEI
+     Objekte an (Bild design/mockups/objekt.png, 2026-002 und 2026-1009,
+     beide leer, beide um 05:10:39 - 28 ms auseinander).
+
+     GEMESSEN auf Staging am 09.09.2026, Objekt 2026-001 geladen, ein Klick:
+     der POST kam aus performSave, also aus dem dpTabSwitchSave() dieser
+     Zeile - und er legte ein NEUES, LEERES Objekt an (2026-1025).
+
+     Der Ablauf: dpTabSwitchSave() startet saveObj fuer das GELADENE Objekt.
+     saveObj laeuft bis zu seinem ersten await (_checkObjIdConflict, ein
+     GET /objects) und gibt die Kontrolle ab. newObj laeuft synchron weiter,
+     setzt _currentObjKey = null und leert alle Felder. Wenn saveObj vom
+     await zurueckkommt, liest es beides NEU: kein Key mehr -> POST statt
+     PUT, leeres Formular -> leeres Objekt. Der Sicherungs-Save sichert also
+     nicht das alte Objekt, sondern erzeugt eine Karteileiche. Kommt kurz
+     darauf noch die leere Karte aus newobj-fixes.js durch, sind es zwei.
+
+     Jetzt: laeuft wirklich ein Save fuer ein GELADENES Objekt, wird er
+     abgewartet - erst danach wird geleert. Ohne geladenes Objekt (der
+     Normalfall) bleibt alles synchron wie bisher.
+     Der zweite Riegel sitzt in saveObj selbst (Kontextwechsel-Abbruch). */
+  var _p = null;
+  try { if (window.dpTabSwitchSave) { _p = window.dpTabSwitchSave(); } } catch (e) {} /* v782-always-save */
+  if (_p && typeof _p.then === 'function' && window._currentObjKey) {
+    var _weiter = function () { try { _newObjLeeren(); } catch (e) {} };
+    _p.then(_weiter, _weiter);
+    return;
+  }
+  _newObjLeeren();
+}
+
+/* v1268: der bisherige Rumpf von newObj - alles ab dem Leeren der Felder.
+   Eigene Funktion, damit er auch NACH einem abgewarteten Save laufen kann. */
+function _newObjLeeren() {
   FIELDS.forEach(function(id) {
     var e = document.getElementById(id);
     if (e) e.value = '';
@@ -848,7 +896,12 @@ function newObj() {
   if (typeof window.applyWorkflowBarVisibility === 'function') {
     setTimeout(window.applyWorkflowBarVisibility, 100);
   }
+  /* v1268: "das Leeren ist durch". newobj-fixes.js haengt daran die leere
+     Karte - beim abgewarteten Save kaeme sein setTimeout(60) sonst zu frueh,
+     saehe den noch gesetzten _currentObjKey und legte gar keine Karte an. */
+  try { window.dispatchEvent(new Event('dp:newobj-ready')); } catch (e) {}
 }
+window._newObjLeeren = _newObjLeeren;
 
 // ══════════════════════════════════════════════════
 // LIST / RENDER SIDEBAR

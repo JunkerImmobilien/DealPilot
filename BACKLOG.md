@@ -36,34 +36,40 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Stand 08.09.2026, abends)
+## → HIER WEITERMACHEN (Stand 09.09.2026)
 
-**Stand:** lokal = GitHub = Staging auf `5a17d52`. **Produktion auf
-`f311d8f`** — `v1260`…`v1264` sind **noch nicht** auf Prod.
+**Stand:** lokal = GitHub = Staging auf `04327f1`. **Produktion auf
+`b0e7976`** — `v1260`…`v1264` sind live, **`v1265` bis `v1270d` noch nicht**.
 
-### Was jetzt Marcels Angabe braucht
+### Erledigt am 09.09.2026
 
-**Zwei Objekte beim Anlegen** — nicht reproduzierbar. Drei Wege getestet
-(Knopf „+ Neues Objekt hinzufügen", Aktionen-Menü, Doppelklick), jedes Mal
-genau ein Objekt; der Schutz aus v728 greift. **Es fehlen:** Umgebung
-(Staging oder Prod), welcher Weg, sofort oder erst nach dem Speichern,
-Handy oder Rechner.
+**Zwei Objekte beim Anlegen** — **gefunden und behoben (`v1268`).** Der
+Fehler war nicht der Anlegeweg, sondern der Sicherungs-Save davor: er
+startete für das geladene Objekt, verlor während seines `await` den
+Kontext an `newObj` und legte danach ein leeres NEUES Objekt an, statt das
+alte zu aktualisieren. Reproduziert, behoben, nachgemessen — Einzelheiten
+im Journal der Projektanweisung.
 
 ### Was aus Marcels Liste noch offen ist
 
 | | Punkt | Stand |
 |---|---|---|
 | 1 | Sprechlauf: kommen alle Felder an | **geprüft** — 16/17, der eine Fehler (Möblierung) ist mit `v1262` behoben |
-| 2 | Bodenrichtwert automatisch nach Adresse | **fertig** (`v1263`), dabei den kaputten Abruf mitrepariert (`v1264`) |
+| 2 | Bodenrichtwert automatisch nach Adresse | **fertig** — `v1263` Automatik, `v1264` der kaputte KI-Abruf repariert, `v1265` **amtlicher BORIS-Wert zuerst** (11 von 11 Ländern live), Schätzung nur als Rückfall |
 | 3 | Pillen unterschiedlich lang einblenden | **offen** — nicht jeder Punkt wird gesagt, der Orbit darf nicht auf eine Antwort warten |
 | 4 | Kontextbezug im Sprechlauf prüfen | **teilweise** — Hausgeld-Aufteilung und Inventar sitzen, weitere Fälle offen |
 | 5 | Chatbot-Dialog statt Monolog, mit Demo | **offen** — größter Brocken, braucht ein Konzept vor dem Bauen |
-| 6 | Bild „Ansicht": Objekt anlegen links über der Suche | **offen** |
+| 6 | Bild „Ansicht": Objekt anlegen links über der Suche | **fertig** — `v1266`, Knopf unter dem Logo im Stil des Logo-Kastens |
 | 7 | IRR/Break-Even „passend in Auswertung" einordnen | **teilweise** — sie stehen in den Kennzahlen-Kacheln (Reiter Bewertung); Portfolio-Cockpit noch nicht |
 
-**Zuletzt fertig: `v1259`–`v1259f` — Gold-Audit und Sprachaufzeichnung.**
-Vier von sechs Punkten aus Marcels Sprechlauf-Liste; die doppelte Prüfung
-bleibt auf seinen Wunsch aus. Nachweis im Journal der Projektanweisung.
+**Zuletzt fertig: `v1268`–`v1270d`.** Der Doppel-Anlage-Fehler ist gefunden
+und behoben (ein Klick legte zwei Objekte an, weil der Sicherungs-Save nach
+seinem `await` einen leergeräumten Kontext vorfand). Dazu: der amtliche
+BORIS-Abruf hat endlich einen Knopf, neben „Objekt anlegen" stehen jetzt
+Quick-Check und Marktbericht als Zeichen, die Postleitzahl füllt den Ort
+und das Straßenfeld schlägt Straßen vor. 15 Testnutzer und zwei
+Karteileichen sind aus der Staging-Datenbank raus. Nachweis im Journal der
+Projektanweisung.
 
 ### Was jetzt Marcels Entscheidung braucht
 

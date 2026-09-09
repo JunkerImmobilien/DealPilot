@@ -396,12 +396,20 @@ router.get('/isoline', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// GET /geocode/autocomplete?text= — Adress-/Standortsuche (Key bleibt serverseitig)
+// GET /geocode/autocomplete?text=[&type=street|postcode&limit=n] — Adress-/Standortsuche
+// (Key bleibt serverseitig). v1270: type/limit durchgereicht, damit das
+// Objekt-Tab der Haupt-App gezielt Strassen bzw. den Ort zur PLZ bekommt.
 router.get('/geocode/autocomplete', async (req, res) => {
   try {
     const text = String(req.query.text || '').trim();
-    if (text.length < 3) return res.json({ results: [] });
-    const results = await GeoapifyConnector.autocomplete(text);
+    /* v1270b: mit Koordinaten reichen 2 Zeichen - der Ortsbezug kommt dann
+       aus dem Kreis, nicht aus dem Text. */
+    const minLen = (req.query.lat && req.query.lon) ? 2 : 3;
+    if (text.length < minLen) return res.json({ results: [] });
+    const results = await GeoapifyConnector.autocomplete(text, {
+      type: req.query.type, limit: req.query.limit,
+      lat: req.query.lat, lon: req.query.lon, radius: req.query.radius
+    });
     res.json({ results });
   } catch (e) { res.json({ results: [], error: e.message }); }
 });
