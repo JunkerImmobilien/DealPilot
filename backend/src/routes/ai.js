@@ -530,6 +530,97 @@ router.post('/extract-voice', authenticate, extractLimiter, async (req, res, nex
   }
 });
 
+/* v1281-FRAGE · POST /api/v1/ai/copilot-frage
+ *
+ * Marcels Wunsch: „dann wäre es cool, wenn man ihm vielleicht auch einfach
+ * Fragen stellen könnte … und dass er darauf dann antwortet zu dem Kontext,
+ * den er bis dahin hat."
+ *
+ * Der Unterschied zu extract-text ist der Zweck: dort geht ein Wert INS
+ * Formular, hier kommt eine Auskunft AN DEN MENSCHEN. Deshalb ein eigener
+ * Endpunkt statt eines Schalters - zwei Zwecke in einer Route heisst, dass
+ * ein Fehler im einen den anderen mitreisst.
+ *
+ * DREI REGELN stehen im Prompt, und jede hat einen Grund:
+ *  1. Kurz. Zwei bis vier Saetze. Wer mitten in einer Aufnahme fragt, will
+ *     weitermachen, nicht lesen.
+ *  2. Keine Zahl erfinden. Was nicht im bekannten Stand steht, wird als
+ *     unbekannt benannt - nicht geschaetzt. Das ist dieselbe Regel, nach
+ *     der der Marktbericht ein Verfahren weglaesst, wenn eine Pflichtangabe
+ *     fehlt.
+ *  3. Keine Anlageberatung. Rechnen und einordnen ja, „kauf das" nein.
+ */
+router.post('/copilot-frage', authenticate, extractLimiter, async (req, res, next) => {
+  try {
+    const { frage, kontext } = req.body || {};
+    if (!config.openai.apiKey) return res.status(503).json({ error: 'Kein OpenAI-API-Key verfuegbar.' });
+    if (!frage || typeof frage !== 'string' || frage.trim().length < 2) {
+      return res.status(400).json({ error: 'Body muss "frage" enthalten.' });
+    }
+    const zeilen = [];
+    if (kontext && typeof kontext === 'object') {
+      Object.keys(kontext).slice(0, 40).forEach(function (k) {
+        const v = kontext[k];
+        if (v === '' || v === null || v === undefined) return;
+        zeilen.push('  ' + k + ' = ' + String(v).slice(0, 60));
+      });
+    }
+    const prompt = [
+      'Du bist der Co-Pilot einer deutschen Immobilien-Investitionssoftware.',
+      'Der Nutzer nimmt gerade ein Objekt auf und stellt zwischendurch eine Frage.',
+      '',
+      zeilen.length ? 'BEKANNTER STAND DIESES OBJEKTS (Feld-id = Wert):' : 'Zu diesem Objekt ist noch nichts bekannt.',
+      zeilen.join('\n'),
+      '',
+      'REGELN:',
+      '1. Antworte auf DEUTSCH, im Du, in zwei bis vier Saetzen. Kein Markdown,',
+      '   keine Aufzaehlung, keine Ueberschrift.',
+      '2. Rechne gern mit den bekannten Werten und nenne dabei, WORAUS du',
+      '   rechnest ("bei 200.000 Kaufpreis und 490 Miete sind das ...").',
+      '3. Was nicht im bekannten Stand steht, ERFINDE NICHT. Sag stattdessen,',
+      '   welche Angabe dir fehlt. Lieber eine Luecke benennen als eine Zahl,',
+      '   die niemand belegen kann.',
+      '4. Keine Anlageberatung und keine Kaufempfehlung. Einordnen ja,',
+      '   entscheiden nein - das bleibt beim Nutzer.',
+      '5. Fragt der Nutzer nach einem Fachbegriff (DSCR, IRR, AfA, Sonder-AfA,',
+      '   Liegenschaftszins), erklaere ihn in einem Satz und rechne ihn, wenn',
+      '   die noetigen Werte bekannt sind.',
+      '',
+      'FRAGE DES NUTZERS:',
+      '"""',
+      String(frage).slice(0, 800),
+      '"""'
+    ].join('\n');
+
+    const modell = process.env.OPENAI_COPILOT_MODEL || process.env.OPENAI_VOICE_EXTRACT_MODEL || 'gpt-5.4-mini';
+    const r = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + config.openai.apiKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: modell, input: [{ role: 'user', content: prompt }], max_output_tokens: 700 })
+    });
+    const data = await r.json().catch(() => null);
+    if (!r.ok) {
+      const msg = (data && data.error && data.error.message) || ('Fehler ' + r.status);
+      return res.status(502).json({ error: msg });
+    }
+    let text = '';
+    try {
+      if (typeof data.output_text === 'string') text = data.output_text;
+      else if (Array.isArray(data.output)) {
+        data.output.forEach(function (o) {
+          (o.content || []).forEach(function (c) { if (c.type === 'output_text' && c.text) text += c.text; });
+        });
+      }
+    } catch (e) {}
+    text = String(text || '').trim();
+    if (!text) return res.status(502).json({ error: 'Keine Antwort erhalten.' });
+    res.json({ antwort: text });
+  } catch (err) {
+    if (err.status) return res.status(err.status >= 500 ? 502 : err.status).json({ error: err.message });
+    next(err);
+  }
+});
+
 /* v1273-RUECKFRAGE · POST /api/v1/ai/extract-text
  * Kurzantwort auf eine gezielte Rueckfrage: Text + Mini-Katalog rein,
  * Werte raus. Kein Audio, also keine Transkription - der teuerste Posten

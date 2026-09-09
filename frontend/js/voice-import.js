@@ -1741,6 +1741,10 @@
         if (r && r.transcript) {
           try { console.log('[voice-import] Freisprech-Antwort:', r.transcript); } catch (x) {}
           _rfDenkt(false);
+          /* v1281: Auch gesprochen darf man fragen. Erkannt wird dasselbe
+             wie beim Tippen - und weil die Extraktion ohnehin schon lief,
+             kostet die Erkennung hier nichts extra. */
+          if (_rfIstFrage(r.transcript)) { return _rfFrageBeantworten(r.transcript); }
           _rfBlase('ich', escH(r.transcript));   /* v1276c: was verstanden wurde, steht da */
         }
         _rfUebernehmen(r && r.fields, true);
@@ -1983,6 +1987,24 @@
       '  font:600 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;opacity:.75}',
       '.vi-rf-fs input{accent-color:var(--wl-c9a84c, #C9A84C)}',
       /* Der Verlauf. Feste Hoehe, damit das Fenster beim Wachsen nicht springt. */
+      /* v1281: zwei Spalten - links der Verlauf, rechts der Stand. Unter
+         720 px untereinander; die Spalte wandert dann NACH OBEN, weil sie
+         dort die Frage einordnet, statt sie zu verdecken. */
+      '.vi-rf-buehne{display:grid;grid-template-columns:1fr 196px;gap:14px;align-items:start}',
+      '@media(max-width:720px){.vi-rf-buehne{grid-template-columns:1fr}',
+      '  .vi-rf-stand{order:-1;max-height:132px}}',
+      '.vi-rf-stand{border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:10px 11px;',
+      '  max-height:268px;overflow-y:auto;background:rgba(255,255,255,.03)}',
+      '.vi-rf-stand-kopf{font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;',
+      '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);opacity:.85;margin-bottom:9px}',
+      '.vi-rf-st{display:flex;gap:7px;align-items:center;padding:4px 0;font:400 12.5px/1.3 Inter,system-ui,sans-serif;opacity:.55}',
+      '.vi-rf-st .z{width:11px;flex:0 0 11px;text-align:center;font:600 11px/1 "JetBrains Mono",monospace}',
+      '.vi-rf-st.ok{opacity:1} .vi-rf-st.ok .z{color:#3FA56C}',
+      '.vi-rf-st.dran{opacity:1;font-weight:600} .vi-rf-st.dran .z{color:var(--wl-c9a84c, #C9A84C)}',
+      '.vi-rf-st.dran .n{color:var(--wl-e8cc7a, #E8CC7A)}',
+      '.vi-rf-stand-fuss{margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.09);',
+      '  font:600 11px/1 "JetBrains Mono",ui-monospace,monospace;opacity:.6}',
+      '.vi-rf-stand-fuss b{color:var(--wl-c9a84c, #C9A84C)}',
       '.vi-rf-chat{height:268px;overflow-y:auto;display:flex;flex-direction:column;gap:11px;',
       '  padding:2px 4px 2px 2px}',
       '.vi-rf-blase{max-width:82%;padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.45;',
@@ -2110,6 +2132,54 @@
   }
 
   /* ── Aufbau der Ansicht (einmal je Dialog) ───────────────────────── */
+  /* ═══ v1281 · „Was schon steht" — die Spalte aus der Demo ══════════════
+     Marcels Wunsch: „da gibt es sowas mit was schon steht. Eigentlich wäre
+     das ganz cool, wenn man sieht, was man, worum es geht, was man sagen
+     muss."
+
+     Der Chat allein zeigt den VERLAUF - was war. Er zeigt nicht den STAND -
+     was ist. Wer mitten im Gespräch überlegt, ob er die Miete schon gesagt
+     hat, muss zurückscrollen. Die Spalte beantwortet das mit einem Blick,
+     und nebenbei beantwortet sie die zweite Frage: was kommt noch?
+
+     Drei Zustände, mehr braucht es nicht:
+       ✓ steht    — gefüllt, aus dem Gespräch oder dem Formular
+       ▸ dran     — die Frage, die gerade offen ist
+       · offen    — kommt noch
+
+     Gezählt wird über dieselben RFRAGEN-Blöcke, aus denen auch gefragt
+     wird. Zwei Listen, die dasselbe meinen, laufen irgendwann auseinander -
+     eine reicht. */
+  function _rfStandZeichnen() {
+    var host = $('vi-rf-stand'); if (!host || !_rf) return;
+    var zeilen = _rf.offen.map(function (e, i) {
+      var fertig = !_rfFehlt(e, _rf.data.fields || {});
+      var dran = (i === _rf.i) && !fertig;
+      var kurz = _rfKurzname(e);
+      return '<div class="vi-rf-st ' + (fertig ? 'ok' : (dran ? 'dran' : '')) + '">' +
+             '<span class="z">' + (fertig ? '✓' : (dran ? '▸' : '·')) + '</span>' +
+             '<span class="n">' + escH(kurz) + '</span></div>';
+    }).join('');
+    var fertigN = _rf.offen.filter(function (e) { return !_rfFehlt(e, _rf.data.fields || {}); }).length;
+    host.innerHTML =
+      '<div class="vi-rf-stand-kopf">Was schon steht</div>' + zeilen +
+      '<div class="vi-rf-stand-fuss"><b>' + fertigN + '</b> von ' + _rf.offen.length + '</div>';
+  }
+
+  /* Aus „Wie finanzierst du? Eigenkapital, Zinssatz, …" wird „Finanzierung".
+     Die ganze Frage passt nicht in eine 210 px breite Spalte, und eine
+     abgeschnittene Frage ist schlechter als ein kurzer Name. */
+  var RF_KURZ = {
+    objart: 'Objektart', plz: 'Adresse', wfl: 'Größe', baujahr: 'Baujahr', kp: 'Kaufpreis',
+    san: 'Sanierung & Inventar', nkm: 'Mieteinnahmen', hg_ul: 'Hausgeld',
+    ek: 'Finanzierung', kaufdat: 'Kauf & Übergang', brw: 'Grundstück',
+    makrolage: 'Lage & Zustand', thesis: 'Deine Einschätzung'
+  };
+  function _rfKurzname(e) {
+    for (var i = 0; i < e.ids.length; i++) { if (RF_KURZ[e.ids[i]]) return RF_KURZ[e.ids[i]]; }
+    return String(e.frage).split(/[?,–—]/)[0].slice(0, 22);
+  }
+
   function _rfAufbau() {
     var h = _rfHost();
     h.innerHTML =
@@ -2117,7 +2187,12 @@
         '<span class="vi-rf-kopf">' + (_rf.alle ? 'Der Co-Pilot fragt' : 'Noch offen') + '</span>' +
         '<label class="vi-rf-fs"><input type="checkbox" id="vi-rf-fs" checked> Freisprechen</label>' +
       '</div>' +
-      '<div class="vi-rf-chat" id="vi-rf-chat"></div>' +
+      /* v1281: Verlauf und Stand nebeneinander - der Chat zeigt was WAR,
+         die Spalte zeigt was IST. */
+      '<div class="vi-rf-buehne">' +
+        '<div class="vi-rf-chat" id="vi-rf-chat"></div>' +
+        '<div class="vi-rf-stand" id="vi-rf-stand"></div>' +
+      '</div>' +
       /* v1277: Sprechen ist der Hauptweg — er steht auch so da. */
       '<div class="vi-rf-mikro" id="vi-rf-mikro">' +
         '<span class="vi-rf-mikro-icon">🎤</span>' +
@@ -2127,7 +2202,7 @@
           '<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>' +
       '</div>' +
       '<div class="vi-rf-zeile">' +
-        '<input id="vi-rf-in" placeholder="… oder tippen" autocomplete="off">' +
+        '<input id="vi-rf-in" placeholder="… oder tippen — du darfst mich auch etwas fragen" autocomplete="off">' +
         '<button type="button" class="vi-rf-btn" id="vi-rf-ok">Übernehmen</button>' +
       '</div>' +
       '<div class="vi-rf-neben">' +
@@ -2194,6 +2269,7 @@
             escH(pv.text) + '</b></div>' : '') +
       '<div class="vi-rf-zaehler">Frage ' + (_rf.i + 1) + ' von ' + _rf.offen.length + '</div>');
     _rf.profilVorschlag = pv;
+    _rfStandZeichnen();   /* v1281 */
 
     var v = _rfVorschlag(e), pb = $('vi-rf-passt');
     if (pb) {
@@ -2248,7 +2324,56 @@
       return;
     }
     _rfBlase('co', 'Notiert.', namen.join(' · '));
+    _rfStandZeichnen();   /* v1281: der Haken wandert sofort, nicht erst bei der naechsten Frage */
     setTimeout(_rfWeiter, 650);
+  }
+
+  /* ═══ v1281 · Wenn der Nutzer selbst fragt ═════════════════════════════
+     Marcels Wunsch: „dann wäre es cool, wenn man ihm vielleicht auch
+     einfach Fragen stellen könnte … und dass er darauf dann antwortet zu
+     dem Kontext, den er bis dahin hat."
+
+     Der Dialog hat bis hierher nur ZUGEHOERT. Alles, was hereinkam, war
+     eine Antwort auf seine Frage. Jetzt muss er unterscheiden: „490 Euro"
+     ist eine Antwort, „ist das viel für die Lage?" ist eine Frage.
+
+     Die Unterscheidung ist absichtlich VORSICHTIG: erkannt wird nur, was
+     deutlich nach Frage aussieht - Fragezeichen oder ein Fragewort am
+     Anfang. Im Zweifel gilt es als Antwort, denn eine falsch als Frage
+     verstandene Angabe geht verloren, eine falsch als Angabe verstandene
+     Frage steht wenigstens in der Tabelle und faellt auf.
+
+     „Wie hoch ist die Miete?" waere ein Grenzfall - aber wer im Dialog
+     nach seiner eigenen Miete fragt, will tatsaechlich eine Auskunft. */
+  var RF_FRAGEWORT = /^(was|wie|wieso|warum|weshalb|wer|wo|wann|welche[rsn]?|kannst du|kannst|koenntest|könntest|erklaer|erklär|rechne|zeig|sag mir|ist das|macht das|lohnt|passt das|waere|wäre|soll ich|hab ich|habe ich)\b/i;
+
+  function _rfIstFrage(text) {
+    var t = String(text || '').trim();
+    if (!t) return false;
+    if (/\?\s*$/.test(t)) return true;
+    if (RF_FRAGEWORT.test(t) && t.split(/\s+/).length >= 3) return true;
+    return false;
+  }
+
+  function _rfFrageBeantworten(text) {
+    _rfBlase('ich', escH(text));
+    _rfMelden('', true);
+    return Auth.apiCall('/ai/copilot-frage', {
+      method: 'POST',
+      body: { frage: text, kontext: _rfKontext() }
+    }).then(function (r) {
+      _rfDenkt(false);
+      _rfBlase('co', escH((r && r.antwort) || 'Dazu weiß ich gerade nichts.'));
+      /* Nach der Auskunft geht es weiter, wo es aufgehoert hat - die Frage,
+         die offen war, ist immer noch offen. */
+      var e = _rf.offen[_rf.i];
+      if (e) _rfBlase('co', '<span style="opacity:.7">Zurück zur Frage:</span> ' + escH(e.frage));
+      if (_fs.an && _fs.stream) _fsHoeren();
+    }).catch(function (err) {
+      _rfDenkt(false);
+      _rfBlase('co', escH((err && err.message) || 'Das konnte ich gerade nicht beantworten.'));
+      if (_fs.an && _fs.stream) _fsHoeren();
+    });
   }
 
   function _rfSenden() {
@@ -2257,6 +2382,8 @@
     if (!text) return;
     _fsStopHoeren();
     if (/^(wei(ss|ß) ich nicht|keine ahnung|nichts|\-)$/i.test(text)) { inp.value = ''; return _rfUeberspringen(); }
+    /* v1281: eine Frage wird beantwortet, nicht eingetragen. */
+    if (_rfIstFrage(text)) { inp.value = ""; return _rfFrageBeantworten(text); }
     var e = _rf.offen[_rf.i];
     inp.value = ''; inp.disabled = true;
     _rfBlase('ich', escH(text));
