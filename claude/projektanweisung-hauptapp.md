@@ -9872,6 +9872,86 @@ Adresse), „Fertig" sprang in die Tabelle.
 **Commits.** `v1275` (Wahl + geführter Weg) · `v1275b` (Antwort-Regel im
 Prompt, Kopftext). Backend auf Staging neu gebaut. **Nicht auf Prod.**
 
+### `v1276`–`v1276c` · Freisprechen, Chat-Verlauf, alle 31 Felder
+
+Marcels drei Befunde nach dem ersten eigenen Durchlauf:
+
+> *„Man muss jedes Mal auf Sprechen klicken und dann fragt er wieder nach.
+> Das wäre irgendwie toll, wenn man das einfach bestehen lässt und dann die
+> Frage automatisch weitergeht und wir haben irgendwie auch nur acht Felder
+> drin."* — dazu: *„kannst du variante a umsetzen aus der demo"*
+
+**1 · Das Mikrofon bleibt an.** Ein Gespräch, in dem man vor jeder Antwort
+einen Knopf drückt, ist kein Gespräch — es ist ein Formular mit Umweg. Das
+Ende einer Antwort erkennt jetzt eine Pegelmessung:
+
+| Schritt | Regel | warum so |
+|---|---|---|
+| Grundrauschen | erste **500 ms** messen | eine feste Schwelle taugt nicht — ein Laptoplüfter ist lauter als ein stiller Raum |
+| Schwelle | Rauschen × 2,5, mindestens 0,012 | passt sich dem Raum an |
+| „spricht" | **180 ms** über der Schwelle | kürzer wäre jedes Rascheln |
+| „fertig" | **1400 ms** Stille | kürzer wäre falsch: zwischen „vierhundert" und „neunzig" liegt eine Pause |
+| Notbremse | 25 s je Abschnitt | eine Antwort auf eine gezielte Frage ist kurz |
+
+> **`setInterval`, nicht `requestAnimationFrame`.** rAF steht still, sobald
+> der Tab in den Hintergrund geht — wer beim Sprechen kurz ins Exposé
+> schaut, würde mitten im Satz nicht mehr gehört.
+
+**Ein Stream, ein `MediaRecorder`** für den ganzen Dialog, nicht je Frage
+neu: jede `getUserMedia`-Anfrage ist eine Zäsur — Berechtigung, Anlauf,
+verlorene erste Silbe.
+
+**2 · Der Chat-Verlauf aus der Demo.** Die Umsetzung war eine Fragekarte,
+die sich selbst überschreibt. Jetzt bleibt stehen, was gesagt wurde —
+Blasen für „Co-Pilot" und „Du", grüne Trefferzeile, drei tanzende Punkte
+beim Nachdenken. **Beim Freisprechen ist genau das der Beweis, dass
+richtig verstanden wurde.** `v1276c` zieht deshalb auch das Transkript und
+jeden Fehlversuch in den Verlauf: vorher standen sie in der Lauschzeile,
+die die nächste Runde sofort überschreibt.
+
+**3 · Alle 31 Felder.** Die erste Liste deckte 12 ab. Jetzt **18 Blöcke**
+über den gesamten Katalog, in **Erzähl-Reihenfolge** (was, wo, wie groß,
+was kostet es, was kommt rein, wie finanziert, wie liegt es, was denkst
+du). Zusammengehöriges in einem Block: „Wohnfläche und Zimmer" ist eine
+Frage, nicht zwei.
+
+> **Zwei Ordnungen, ein Grund.** Der geführte Weg fragt in Erzähl-Reihenfolge.
+> Die Rückfragen nach einem freien Diktat sortieren nach `rang` — dort
+> zählt das Gewicht für die Rechnung, weil nur **drei** Fragen gestellt
+> werden und die wichtigsten dabei sein müssen.
+
+#### Abnahme (Staging)
+
+Mit einem **steuerbaren Sprecher** geprüft (Sägezahn über
+`MediaStreamDestination`, an/aus schaltbar): Ton an → „… ich höre";
+Ton aus → nach der Stillepause endet der Abschnitt von selbst, die
+Auswertung läuft (drei Punkte), danach wird wieder gelauscht. **Kein
+Klick.**
+
+Getippt: „Hermannstraße 9 in 32609 Hüllhorst" → **vier Felder aus einem
+Satz** (`Strasse · Hausnummer · PLZ · Ort`), dann von selbst Frage 2 von 17.
+
+#### `v1276b` · Ein eigener Fehler, der teuer hätte werden können
+
+Beim Austausch des ganzen Rückfragen-Blocks lag die **Fragenliste mit
+drin** — sie war zwei Schritte vorher genau dort eingefügt worden.
+`ReferenceError: RFRAGEN is not defined`, das Fenster blieb leer.
+
+> **`node --check` sagte „ok".** Syntaktisch war die Datei einwandfrei —
+> es fehlte nur eine Variable, die erst zur Laufzeit gebraucht wird. **Nach
+> einem Blocktausch gehören die betroffenen Bezeichner gezählt**
+> (`grep -c`), nicht nur die Syntax geprüft. Seitdem läuft die Zählung im
+> selben Befehl wie der Syntaxtest mit.
+
+> **Und noch einer:** die Commit-Message enthielt Backticks in doppelten
+> Anführungszeichen — die Shell hat `rang` als Befehl ausgeführt und ein
+> Loch in den Text gerissen. Repariert per `--amend`; danach musste der
+> Staging-Server einmal auf `origin/staging` zurückgesetzt werden, weil das
+> Ausrollen an der umgeschriebenen Historie scheiterte (Exit 128).
+
+**Commits.** `v1276` · `v1276b` (Fragenliste zurück) · `v1276c` (Verlauf
+statt Lauschzeile). Auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
