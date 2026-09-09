@@ -408,6 +408,7 @@ async function extractFromAudio(audioB64, mime, catalog, opts) {
      rechnen koennen ("zehn Prozent vom Kaufpreis"). Der Zusatz entsteht in
      _zusatzAusKontext, damit Text- und Sprachweg dieselbe Regel sehen. */
   let out = await extractFields(transcript, cat, key, sammler, _zusatzAusKontext(o.kontext, o.modus));
+  if (!o.kontext) out.fields = _prozentFalle(transcript, out.fields, cat);   /* v1280c */
   if (VERIFY_ON) { try { out = await verifyFields(transcript, out, cat, key, sammler); } catch (e) {} }  /* v522 verify-pass, fail-soft */
 
   /* v1259 \u00b7 Der eigene Schluessel eines Nutzers ist SEINE Rechnung, nicht
@@ -670,6 +671,56 @@ const ZUSATZ_INSERAT = [
   '- Was nicht im Text steht, wird WEGGELASSEN.'
 ].join(String.fromCharCode(10));
 
+/* ════════════════════════════════════════════════════════════════════
+ * v1280c · Die Prozentfalle
+ *
+ * Gemessen: „Zwanzig Prozent vom Kaufpreis als Eigenkapital" ergab mit
+ * bekanntem Kaufpreis richtig 40000. OHNE Kaufpreis erst 0, nach der
+ * geschaerften Prompt-Regel dann 20 - also die Prozentzahl als Euro.
+ *
+ * Das Modell WILL liefern. Zwei Anlaeufe im Prompt haben es nicht davon
+ * abgebracht, und ein dritter wuerde es auch nicht: eine Bitte ist keine
+ * Sperre. Also eine Sperre.
+ *
+ * Die Regel ist eng gefasst, damit sie nichts Richtiges wegwirft:
+ * Sie greift NUR, wenn die Antwort einen Bezug der Form „X Prozent von
+ * <etwas>" enthaelt UND das Feld eine Geldangabe ist UND der gelieferte
+ * Wert verdaechtig genau der Prozentzahl entspricht. Alles andere bleibt.
+ *
+ * Lieber eine Luecke als eine Zahl, die niemand belegen kann - dieselbe
+ * Regel, nach der auch der Marktbericht ein Verfahren weglaesst, wenn eine
+ * Pflichtangabe fehlt.
+ * ════════════════════════════════════════════════════════════════════ */
+function _prozentFalle(text, felder, katalog) {
+  try {
+    const t = String(text || '');
+    const m = t.match(/(\d{1,3}(?:[.,]\d+)?)\s*(?:%|prozent)\s+(?:vom|von|des|der)\b/i);
+    if (!m) return felder;
+    const proz = parseFloat(String(m[1]).replace(',', '.'));
+    if (!isFinite(proz)) return felder;
+    const geld = {};
+    (katalog || []).forEach(function (e) {
+      if (/euro|eur\b|€|betrag|kosten|preis|kapital|summe|miete/i.test(e.label || '')) geld[e.id] = 1;
+    });
+    const raus = [];
+    Object.keys(felder || {}).forEach(function (id) {
+      if (!geld[id]) return;
+      const v = parseFloat(String(felder[id]).replace(/\./g, '').replace(',', '.'));
+      if (!isFinite(v)) return;
+      /* Der gelieferte Wert IST die Prozentzahl (20 statt 40000) - dann hat
+         das Modell den Bezug nicht aufgeloest, sondern abgeschrieben. */
+      if (Math.abs(v - proz) < 0.001) raus.push(id);
+    });
+    if (raus.length) {
+      const kopie = Object.assign({}, felder);
+      raus.forEach(function (id) { delete kopie[id]; });
+      try { console.warn('[voice] Prozentbezug ohne Bezugswert - Feld(er) verworfen:', raus.join(', ')); } catch (e) {}
+      return kopie;
+    }
+  } catch (e) {}
+  return felder;
+}
+
 function _zusatzAusKontext(kontext, modus) {
   const basis = (modus === 'inserat') ? ZUSATZ_INSERAT : ZUSATZ_ANTWORT;
   const zeilen = [];
@@ -706,6 +757,8 @@ async function extractFromText(text, catalog, opts) {
   if (t.length < 1) throw httpErr(400, 'Keine Antwort uebergeben.');
   const sammler = neuerSammler();
   const out = await extractFields(t, cat, key, sammler, _zusatzAusKontext(o.kontext, modus));
+  /* v1280c: Prozentbezug ohne Bezugswert -> Feld verwerfen statt raten. */
+  if (!o.kontext) out.fields = _prozentFalle(t, out.fields, cat);
   const kosten = o.userApiKey ? null : kostenAbschluss(sammler);
   return { transcript: t, fields: out.fields, unsicher: out.unsicher, kosten, modus };
 }
