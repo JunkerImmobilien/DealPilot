@@ -307,7 +307,6 @@
         '</div></div>' +
         '<div class="dp-pf-sep"></div>' +
         '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Daten einlesen</span><div class="dp-pf-row">' +
-          pfTileTool('inserat', _link, 'Inserat einf\u00fcgen', 'Inseratsseite als Text oder Link \u2014 geht bei jedem Portal') +
           pfTileTool('import', _doc, 'Expos\u00e9 / Marktbericht', '') +
           (window.VoiceImport ? pfTileTool('voice', _mic, 'Sprache', 'Objekt frei einsprechen 2014 im Plan enthalten') : '') +
           '<label class="dp-pf-tile tool" data-src="immometrica" id="oab-imo-tile" title="Aus ImmoMetrica importieren"><input type="checkbox" value="immometrica" disabled style="display:none"><span class="dp-pf-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h11M4 12h11M4 18h7"/><circle cx="19" cy="6" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></span><span class="dp-pf-lbl">ImmoMetrica</span><span class="dp-pf-led"></span></label>' +
@@ -504,14 +503,13 @@
   async function runSelected() {
     var srcs = selectedSources();
     if (!srcs.length) { toast('Bitte mindestens eine Quelle auswählen'); return; }
-    var order = ['voice', 'inserat', 'import', 'immometrica', 'pricehubble', 'sprengnetter', 'dealpilot'];  /* v503-voice-first; v667 immometrica */
+    var order = ['voice', 'import', 'immometrica', 'pricehubble', 'sprengnetter', 'dealpilot'];  /* v503-voice-first; v667 immometrica */
     var ordered = order.filter(function (s) { return srcs.indexOf(s) !== -1; });
     var btn = $('oab-run'); if (btn) btn.disabled = true;
     for (var i = 0; i < ordered.length; i++) {
       var s = ordered[i];
       try {
         if (s === 'voice') { setProg('Sprachaufzeichnung …'); await new Promise(function (res) { if (window.VoiceImport) { window.VoiceImport.open(res); } else { res(); } }); }  /* v503-voice-run */
-        else if (s === 'inserat') { setProg('Inserat einlesen …'); await new Promise(function (res) { openInseratImport(res); }); }   /* v1278 */
         else if (s === 'import') { setProg('Import …'); await new Promise(function (res) { openCombinedImport(res); }); }
         else if (s === 'immometrica') { setProg('ImmoMetrica …'); await new Promise(function (res) { if (window.ImmoMetricaImport) window.ImmoMetricaImport.open(function (picked) { applyImmometrica(picked); res(); }, { target: 'obj', onClose: function () { res(); } }); else res(); }); }
         else if (s === 'pricehubble' || s === 'sprengnetter') { setProg((s === 'pricehubble' ? 'PriceHubble' : 'Sprengnetter') + ' …'); await avmFetch(s); }
@@ -1311,235 +1309,6 @@
       r.addEventListener('change', function () { _addrChoice = r.value; renderMergedTable(); });
     });
   }
-  function _fireOabiDone() { var d = _oabiDone; _oabiDone = null; if (typeof d === 'function') { try { setTimeout(d, 0); } catch (e) { d(); } } }
-  /* ═══════════════════════════════════════════════════════════════════
-     v1278 · INSERAT EINFÜGEN — der Weg, der bei jedem Portal geht
-     ═══════════════════════════════════════════════════════════════════
-     Marcels Frage: „kriegen wir es hin dass wir diese Seiten auslesen
-     können?" — mit einer echten IS24-Adresse.
-
-     GEMESSEN am 09.09.2026:
-       vom Server aus   IS24 401 · ImmoWelt 403 · Immonet 301 auf ImmoWelt
-                        (das Portal gibt es nicht mehr) · meinestadt Timeout
-       vom Server aus   Kleinanzeigen 200 · willhaben.at 200
-       im BROWSER       dieselbe IS24-Seite vollstaendig: Kaltmiete 850,
-                        50 m², Adresse, Ausstattung, 6.104 Zeichen Text
-
-     Die Portale blocken keine Nutzer, sie blocken RECHENZENTREN. Unser
-     Server steht bei Hetzner - genau in den Netzen, die zuerst gesperrt
-     werden. Kein Prompt und kein Kniff aendert daran etwas.
-
-     Also nicht dagegen anrennen, sondern daneben vorbei: Der Mensch hat
-     die Seite ohnehin offen. Strg+A, Strg+C, einfuegen - fertig. Kein
-     Bot-Schutz greift, weil kein Bot abruft.
-
-     DREI WEGE in einem Fenster, in dieser Reihenfolge:
-       1. Text einfuegen  - geht IMMER, auch bei IS24 und ImmoWelt
-       2. Link einfuegen  - der schnellste Weg, wo er funktioniert
-                            (Kleinanzeigen, willhaben); scheitert er,
-                            fuehrt die Meldung zum Text-Weg
-       3. (PDF gibt es schon unter „Exposé / Marktbericht")
-
-     Das Ergebnis laeuft durch dieselbe Import-Tabelle wie Sprache und
-     Exposé - gleiche Haken, gleicher Schreibweg, gleiche Warnung vor dem
-     Ueberschreiben (v1267). */
-  function _inseratStil() {
-    if (document.getElementById('oab-ins-stil')) return;
-    var s = document.createElement('style');
-    s.id = 'oab-ins-stil';
-    s.textContent = [
-      '#oab-ins-ov{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.62);',
-      '  display:flex;align-items:center;justify-content:center;padding:20px}',
-      '.oab-ins{background:#14130f;color:#FDFCFA;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent);',
-      '  border-radius:18px;max-width:660px;width:100%;box-shadow:0 30px 70px rgba(0,0,0,.55);overflow:hidden}',
-      '.oab-ins-kopf{background:linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C) 55%, var(--wl-b8932f, #b8932f));',
-      '  color:#100e08;padding:15px 20px}',
-      '.oab-ins-kopf b{display:block;font:700 18px/1.2 "Space Grotesk",system-ui,sans-serif}',
-      '.oab-ins-kopf span{display:block;font-size:12.5px;opacity:.8;margin-top:3px}',
-      '.oab-ins-body{padding:18px 20px}',
-      '.oab-ins-tabs{display:flex;gap:8px;margin-bottom:14px}',
-      '.oab-ins-tab{border-radius:10px;padding:8px 14px;cursor:pointer;background:transparent;',
-      '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent);color:var(--wl-c9a84c, #C9A84C);',
-      '  font:600 11.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.05em}',
-      '.oab-ins-tab.an{background:linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C) 55%, var(--wl-b8932f, #b8932f));',
-      '  color:#100e08;border-color:transparent}',
-      '.oab-ins-hilfe{font:400 12.5px/1.5 Inter,system-ui,sans-serif;opacity:.72;margin-bottom:11px}',
-      '.oab-ins-hilfe b{color:var(--wl-e8cc7a, #E8CC7A);font-weight:600}',
-      '.oab-ins textarea,.oab-ins input{width:100%;border-radius:11px;padding:11px 13px;',
-      '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent);',
-      '  background:rgba(0,0,0,.28);color:inherit;font:400 13.5px/1.5 Inter,system-ui,sans-serif;resize:vertical}',
-      '.oab-ins textarea{min-height:186px}',
-      '.oab-ins textarea:focus,.oab-ins input:focus{outline:none;border-color:var(--wl-c9a84c, #C9A84C)}',
-      '.oab-ins-fuss{display:flex;gap:9px;justify-content:flex-end;align-items:center;margin-top:14px}',
-      '.oab-ins-stand{flex:1;font:400 12.5px/1.4 Inter,system-ui,sans-serif;opacity:.75;min-height:18px}',
-      '.oab-ins-btn{border-radius:11px;padding:10px 16px;cursor:pointer;border:1px solid rgba(255,255,255,.16);',
-      '  background:transparent;color:inherit;font:600 12.5px "JetBrains Mono",ui-monospace,monospace}',
-      '.oab-ins-btn.voll{background:linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C) 55%, var(--wl-b8932f, #b8932f));',
-      '  color:#100e08;border-color:transparent;font-weight:700}',
-      '.oab-ins-btn[disabled]{opacity:.5;cursor:default}'
-    ].join('');
-    document.head.appendChild(s);
-  }
-
-  /* v1278: Der Katalog fuer den Inserat-Weg. Bewusst KURZ und fest statt aus
-     dem DOM gebaut: ein Inserat nennt nie mehr als diese Angaben, und ein
-     kleiner Katalog ist billiger und praeziser als 250 Felder, von denen 230
-     nie vorkommen. */
-  var INS_KATALOG = [
-    { id:'objart',  label:'Objektart (Wohnung, Haus, Mehrfamilienhaus)', kind:'input' },
-    { id:'str',     label:'Straße', kind:'input' },
-    { id:'hnr',     label:'Hausnummer', kind:'input' },
-    { id:'plz',     label:'PLZ', kind:'input' },
-    { id:'ort',     label:'Ort', kind:'input' },
-    { id:'wfl',     label:'Wohnfläche in m²', kind:'num' },
-    { id:'zimmer',  label:'Anzahl Zimmer', kind:'num' },
-    { id:'baujahr', label:'Baujahr', kind:'int' },
-    { id:'kp',      label:'Kaufpreis in Euro', kind:'num' },
-    { id:'nkm',     label:'Nettokaltmiete pro Monat in Euro', kind:'num' },
-    { id:'ze',      label:'Zusatzeinnahmen pro Monat (Stellplatz, Garage)', kind:'num' },
-    { id:'hg_ul',   label:'Hausgeld pro Monat in Euro', kind:'num' },
-    { id:'gsfl',    label:'Grundstücksfläche in m²', kind:'num' },
-    { id:'ds2_zustand', label:'Zustand der Wohnung', kind:'input' },
-    { id:'ds2_energie', label:'Energieklasse (A+ bis H)', kind:'input' },
-    { id:'notizen', label:'Sonstiges aus dem Inserat (Ausstattung, Lage, Besonderheiten)', kind:'input' }
-  ];
-
-  function openInseratImport(done) {
-    _inseratStil();
-    var fertig = function () { try { if (typeof done === 'function') done(); } catch (e) {} };
-    var ov = document.createElement('div');
-    ov.id = 'oab-ins-ov';
-    ov.innerHTML =
-      '<div class="oab-ins">' +
-        '<div class="oab-ins-kopf"><b>Inserat einlesen</b>' +
-          '<span>Aus ImmobilienScout24, ImmoWelt, Kleinanzeigen, willhaben — oder jedem anderen Portal.</span></div>' +
-        '<div class="oab-ins-body">' +
-          '<div class="oab-ins-tabs">' +
-            '<button type="button" class="oab-ins-tab an" data-w="text">Text einfügen</button>' +
-            '<button type="button" class="oab-ins-tab" data-w="url">Link einfügen</button>' +
-          '</div>' +
-          '<div id="oab-ins-w-text">' +
-            '<div class="oab-ins-hilfe">Inserat im Browser öffnen, <b>Strg&nbsp;+&nbsp;A</b> und ' +
-              '<b>Strg&nbsp;+&nbsp;C</b>, hier einfügen. Das geht bei <b>jedem</b> Portal — auch bei ' +
-              'denen, die einen Abruf durch Programme sperren.</div>' +
-            '<textarea id="oab-ins-text" placeholder="Hier die kopierte Inseratsseite einfügen …"></textarea>' +
-          '</div>' +
-          '<div id="oab-ins-w-url" style="display:none">' +
-            '<div class="oab-ins-hilfe">Adresse des Inserats einfügen. Funktioniert bei ' +
-              '<b>Kleinanzeigen</b> und <b>willhaben</b>. ImmobilienScout24 und ImmoWelt sperren ' +
-              'automatische Abrufe — dort nimm den Weg über <b>Text einfügen</b>.</div>' +
-            '<input id="oab-ins-url" type="url" placeholder="https://www.kleinanzeigen.de/s-anzeige/…" autocomplete="off">' +
-          '</div>' +
-          '<div class="oab-ins-fuss">' +
-            '<span class="oab-ins-stand" id="oab-ins-stand"></span>' +
-            '<button type="button" class="oab-ins-btn" id="oab-ins-ab">Abbrechen</button>' +
-            '<button type="button" class="oab-ins-btn voll" id="oab-ins-los">Auslesen</button>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
-    document.body.appendChild(ov);
-
-    var weg = 'text';
-    var stand = function (t) { var e = document.getElementById('oab-ins-stand'); if (e) e.innerHTML = t || ''; };
-    var zu = function () { try { ov.remove(); } catch (e) {} };
-
-    ov.querySelectorAll('.oab-ins-tab').forEach(function (b) {
-      b.addEventListener('click', function () {
-        weg = b.getAttribute('data-w');
-        ov.querySelectorAll('.oab-ins-tab').forEach(function (x) { x.classList.toggle('an', x === b); });
-        document.getElementById('oab-ins-w-text').style.display = (weg === 'text') ? '' : 'none';
-        document.getElementById('oab-ins-w-url').style.display  = (weg === 'url')  ? '' : 'none';
-        stand('');
-      });
-    });
-    document.getElementById('oab-ins-ab').addEventListener('click', function () { zu(); fertig(); });
-    ov.addEventListener('mousedown', function (ev) { if (ev.target === ov) { zu(); fertig(); } });
-
-    document.getElementById('oab-ins-los').addEventListener('click', function () {
-      var los = this;
-      los.disabled = true;
-      if (weg === 'url') {
-        var url = String(document.getElementById('oab-ins-url').value || '').trim();
-        if (!url) { los.disabled = false; return stand('Bitte eine Adresse einfügen.'); }
-        stand('Rufe das Inserat ab …');
-        Auth.apiCall('/listing/scrape', { method: 'POST', body: { url: url } })
-          .then(function (r) {
-            los.disabled = false;
-            if (r && r.is_blocked) {
-              return stand('<b>' + escInsH(r.platform || 'Dieses Portal') + '</b> sperrt automatische Abrufe. ' +
-                'Nimm den Weg über <b>Text einfügen</b> — Strg+A, Strg+C auf der Inseratsseite.');
-            }
-            if (!r || !r.success || !r.data) return stand('Daraus kam nichts Verwertbares. Versuch es mit <b>Text einfügen</b>.');
-            _inseratUebernehmen(_inseratAusScrape(r.data), 'Inserat (Link)', zu, fertig, stand);
-          })
-          .catch(function (e) { los.disabled = false; stand('⚠ ' + escInsH((e && e.message) || 'Abruf fehlgeschlagen')); });
-        return;
-      }
-      var text = String(document.getElementById('oab-ins-text').value || '').trim();
-      if (text.length < 80) { los.disabled = false; return stand('Da fehlt noch Text — bitte die ganze Seite einfügen.'); }
-      stand('Lese das Inserat …');
-      var katalog = INS_KATALOG;
-      Auth.apiCall('/ai/extract-text', { method: 'POST', body: { text: text, modus: 'inserat', catalog: katalog } })
-        .then(function (r) {
-          los.disabled = false;
-          var f = (r && r.fields) || {};
-          if (!Object.keys(f).length) return stand('Daraus konnte ich nichts entnehmen. Steht die ganze Seite im Feld?');
-          _inseratUebernehmen(f, 'Inserat (Text)', zu, fertig, stand);
-        })
-        .catch(function (e) { los.disabled = false; stand('⚠ ' + escInsH((e && e.message) || 'Das hat nicht geklappt')); });
-    });
-
-    try { document.getElementById('oab-ins-text').focus(); } catch (e) {}
-  }
-
-  function escInsH(s) {
-    return String(s).replace(/[&<>"]/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
-    });
-  }
-
-  /* Der Link-Weg liefert andere Namen als der Feldkatalog - hier die
-     Bruecke. Nur was eindeutig ist; alles andere bleibt weg. */
-  function _inseratAusScrape(d) {
-    var f = {};
-    if (d.price) f.kp = d.price;
-    if (d.rentNet) f.nkm = d.rentNet;
-    if (d.livingArea) f.wfl = d.livingArea;
-    if (d.rooms) f.zimmer = d.rooms;
-    if (d.yearBuilt) f.baujahr = d.yearBuilt;
-    if (d.address) {
-      var m = String(d.address).match(/^(.*?)\s*,?\s*(\d{5})\s+(.+)$/);
-      if (m) { f.str = m[1].replace(/\s+\d+[a-z]?$/i, '').trim(); f.plz = m[2]; f.ort = m[3].trim();
-        var h = m[1].match(/(\d+[a-z]?)$/i); if (h) f.hnr = h[1]; }
-      else f.ort = String(d.address).trim();
-    }
-    return f;
-  }
-
-  /* In dieselbe Import-Tabelle wie Sprache und Exposé. */
-  function _inseratUebernehmen(felder, quelle, zu, fertig, stand) {
-    var OA = window.ObjectActions && window.ObjectActions._voice;
-    if (!OA) { stand('Import-Modul nicht bereit — bitte Seite neu laden.'); return; }
-    var labels = {
-      kp: 'Kaufpreis', nkm: 'Nettokaltmiete / Monat', wfl: 'Wohnfläche (m²)', zimmer: 'Zimmer',
-      baujahr: 'Baujahr', str: 'Straße', hnr: 'Hausnummer', plz: 'PLZ', ort: 'Ort',
-      hg_ul: 'Hausgeld', ze: 'Zusatzeinnahmen', objart: 'Objektart', gsfl: 'Grundstücksfläche',
-      ds2_zustand: 'Zustand der Wohnung', ds2_energie: 'Energieklasse', notizen: 'Notizen'
-    };
-    OA.reset();
-    var n = 0;
-    Object.keys(felder).forEach(function (id) {
-      var v = felder[id];
-      if (v === '' || v == null) return;
-      OA.addRow(id, labels[id] || id, String(v), v, quelle, 'input');
-      n++;
-    });
-    zu();
-    OA.render();
-    try { if (typeof toast === 'function') toast('✓ ' + n + ' Angaben aus dem Inserat — bitte prüfen und übernehmen'); } catch (e) {}
-    fertig();
-  }
-
   function openCombinedImport(onDone, opts) {
     _oabiDone = (typeof onDone === 'function') ? onDone : null;
     _qcMode = !!(opts && opts.target === 'qc');  /* v418 */
