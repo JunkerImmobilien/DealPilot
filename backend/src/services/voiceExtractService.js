@@ -234,7 +234,7 @@ function stripTermDump(t) {
   return s.trim();
 }
 
-function buildPrompt(transcript, catalog) {
+function buildPrompt(transcript, catalog, zusatz) {
   const lines = catalog.map(e => {
     let l = '- ' + e.id + ' | ' + e.kind + ' | ' + e.label;
     if (e.hint) l += ' (' + e.hint + ')';
@@ -301,10 +301,11 @@ function buildPrompt(transcript, catalog) {
     '    hg_nul = 100 und hg_ul = Gesamt minus nicht-umlagefaehig = 200. Werden beide\n' +
     '    Anteile direkt genannt, uebernimm sie 1:1. Nur ein Hausgeld-Wert ohne\n' +
     '    Aufteilung -> in hg_ul.\n' +
+    (zusatz ? zusatz + String.fromCharCode(10) : "") +
     'TRANSKRIPT:\n"""\n' + transcript + '\n"""';
 }
 
-async function extractFields(transcript, catalog, apiKey, sammler) {
+async function extractFields(transcript, catalog, apiKey, sammler, zusatz) {
   transcript = stripTermDump(transcript);  /* v515 */
   let r;
   try {
@@ -313,7 +314,7 @@ async function extractFields(transcript, catalog, apiKey, sammler) {
       headers: { Authorization: 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: EXTRACT_MODEL,
-        input: [{ role: 'user', content: buildPrompt(transcript, catalog) }],
+        input: [{ role: 'user', content: buildPrompt(transcript, catalog, zusatz) }],
         max_output_tokens: 5000
       })
     });
@@ -624,7 +625,20 @@ async function extractFromText(text, catalog, opts) {
   const t = String(text || '').trim().slice(0, 4000);
   if (t.length < 1) throw httpErr(400, 'Keine Antwort uebergeben.');
   const sammler = neuerSammler();
-  const out = await extractFields(t, cat, key, sammler);
+  /* v1275b · Der Zusatz macht aus einem Diktat-Parser einen Antwort-Parser.
+     Gemessen: auf "490 Euro kalt im Monat" kam bei EINEM Feld im Katalog der
+     ganze Satz als Wert zurueck - das Modell hatte ja nur dieses eine Fach.
+     Bei "245.000 Euro" ging es gut. Der Unterschied ist Zufall, solange im
+     Prompt nichts steht, was den Fall benennt. */
+  const ZUSATZ = [
+    'ZUSATZREGEL FUER DIESE ANFRAGE: Der Text ist die kurze ANTWORT auf eine',
+    'gezielte Rueckfrage zu genau den Feldern im Katalog. Uebernimm NUR den',
+    'WERT, niemals den ganzen Satz. "490 Euro kalt im Monat" -> 490,',
+    '"so um die hundert Quadratmeter" -> 100, "Baujahr war 62" -> 1962.',
+    'Enthaelt die Antwort keinen verwertbaren Wert ("weiss nicht", "keine',
+    'Ahnung"), gib ein leeres JSON-Objekt zurueck.'
+  ].join(String.fromCharCode(10));
+  const out = await extractFields(t, cat, key, sammler, ZUSATZ);
   const kosten = o.userApiKey ? null : kostenAbschluss(sammler);
   return { transcript: t, fields: out.fields, unsicher: out.unsicher, kosten };
 }
