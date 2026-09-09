@@ -61,6 +61,7 @@ im Journal der Projektanweisung.
 | 5 | Chatbot-Dialog statt Monolog, mit Demo | **offen** — größter Brocken, braucht ein Konzept vor dem Bauen |
 | 6 | Bild „Ansicht": Objekt anlegen links über der Suche | **fertig** — `v1266`, Knopf unter dem Logo im Stil des Logo-Kastens |
 | 7 | IRR/Break-Even „passend in Auswertung" einordnen | **teilweise** — sie stehen in den Kennzahlen-Kacheln (Reiter Bewertung); Portfolio-Cockpit noch nicht |
+
 **Zuletzt fertig: `v1268`–`v1270d`.** Der Doppel-Anlage-Fehler ist gefunden
 und behoben (ein Klick legte zwei Objekte an, weil der Sicherungs-Save nach
 seinem `await` einen leergeräumten Kontext vorfand). Dazu: der amtliche
@@ -69,7 +70,6 @@ Quick-Check und Marktbericht als Zeichen, die Postleitzahl füllt den Ort
 und das Straßenfeld schlägt Straßen vor. 15 Testnutzer und zwei
 Karteileichen sind aus der Staging-Datenbank raus. Nachweis im Journal der
 Projektanweisung.
-Journal der Projektanweisung.
 
 ### Was jetzt Marcels Entscheidung braucht
 
