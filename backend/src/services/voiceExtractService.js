@@ -648,7 +648,11 @@ const ZUSATZ_ANTWORT = [
   'WERT, niemals den ganzen Satz. "490 Euro kalt im Monat" -> 490,',
   '"so um die hundert Quadratmeter" -> 100, "Baujahr war 62" -> 1962.',
   'Enthaelt die Antwort keinen verwertbaren Wert ("weiss nicht", "keine',
-  'Ahnung"), gib ein leeres JSON-Objekt zurueck.'
+  'Ahnung"), gib ein leeres JSON-Objekt zurueck.',
+  'BEZIEHT sich die Antwort auf einen Wert, der NICHT im bekannten Stand',
+  'steht ("zwanzig Prozent vom Kaufpreis", ohne dass ein Kaufpreis bekannt',
+  'ist), lass das Feld WEG. Niemals 0 oder einen geschaetzten Wert setzen -',
+  'eine 0 sieht aus wie eine Angabe und ist keine.'
 ].join(String.fromCharCode(10));
 
 const ZUSATZ_INSERAT = [
