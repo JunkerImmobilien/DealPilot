@@ -694,27 +694,28 @@ const ZUSATZ_INSERAT = [
 function _prozentFalle(text, felder, katalog) {
   try {
     const t = String(text || '');
-    const m = t.match(/(\d{1,3}(?:[.,]\d+)?)\s*(?:%|prozent)\s+(?:vom|von|des|der)\b/i);
-    if (!m) return felder;
-    const proz = parseFloat(String(m[1]).replace(',', '.'));
-    if (!isFinite(proz)) return felder;
+    /* Der Bezug kann als Ziffer ODER als Zahlwort dastehen - gemessen:
+       "Zwanzig Prozent vom Kaufpreis" fiel durch einen Ziffern-Regex.
+       Also nur auf den BEZUG pruefen, nicht auf die Zahl davor. */
+    if (!/(%|prozent)\s+(vom|von|des|der)\b/i.test(t)) return felder;
     const geld = {};
     (katalog || []).forEach(function (e) {
-      if (/euro|eur\b|€|betrag|kosten|preis|kapital|summe|miete/i.test(e.label || '')) geld[e.id] = 1;
+      if (/euro|eur\b|€|betrag|kosten|preis|kapital|summe|miete|ruecklage|rücklage/i.test(e.label || '')) geld[e.id] = 1;
     });
     const raus = [];
     Object.keys(felder || {}).forEach(function (id) {
       if (!geld[id]) return;
       const v = parseFloat(String(felder[id]).replace(/\./g, '').replace(',', '.'));
       if (!isFinite(v)) return;
-      /* Der gelieferte Wert IST die Prozentzahl (20 statt 40000) - dann hat
-         das Modell den Bezug nicht aufgeloest, sondern abgeschrieben. */
-      if (Math.abs(v - proz) < 0.001) raus.push(id);
+      /* Ein Geldbetrag, der aussieht wie eine Prozentzahl (<= 100), nachdem
+         im Text ein Prozentbezug stand: da hat das Modell den Bezug nicht
+         aufgeloest, sondern die Prozentzahl abgeschrieben. */
+      if (v <= 100) raus.push(id);
     });
     if (raus.length) {
       const kopie = Object.assign({}, felder);
       raus.forEach(function (id) { delete kopie[id]; });
-      try { console.warn('[voice] Prozentbezug ohne Bezugswert - Feld(er) verworfen:', raus.join(', ')); } catch (e) {}
+      try { console.warn('[voice] Prozentbezug ohne Bezugswert - verworfen:', raus.join(', ')); } catch (e) {}
       return kopie;
     }
   } catch (e) {}
