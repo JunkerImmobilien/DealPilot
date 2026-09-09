@@ -31,6 +31,19 @@
     } catch (e) {}
   }
 
+  /* v1268b: Ist im Formular ueberhaupt etwas eingetragen? Die sechs Felder
+     sind die, die eine Karte erst zu einem Objekt machen. */
+  function _formularLeer() {
+    try {
+      var ids = ['ort', 'str', 'plz', 'kp', 'wfl', 'baujahr'];
+      for (var i = 0; i < ids.length; i++) {
+        var e = document.getElementById(ids[i]);
+        if (e && String(e.value || '').trim() !== '') return false;
+      }
+      return true;
+    } catch (e) { return false; }
+  }
+
   function saveEmptyCard() {
     // #1: leeres neues Objekt sofort als Kartei speichern (umgeht hasCoreData).
     // saveObj() committet die Preview-ID, setzt _currentObjKey und rendert die Sidebar.
@@ -39,9 +52,34 @@
        das sofort sperrt und nach 1.5s (bzw. nach Erfolg) wieder freigibt. */
     try {
       if (window._dpEmptyCardSaving) return;
+      /* ═══ v1268b · Zweimal klicken gibt trotzdem EINE leere Karte ═════════
+         Der Guard oben haelt nur, solange der Save laeuft. Wer danach noch
+         einmal klickt, bekommt ein zweites leeres Objekt - gemessen am
+         09.09.2026: drei Klicks in 150 ms ergaben zwei Karteileichen.
+         Solange das Formular unangetastet leer ist, wird deshalb die zuletzt
+         angelegte leere Karte WIEDERVERWENDET statt eine neue anzulegen. Ein
+         leeres Objekt zweimal zu haben hat keinen Zweck; sobald der Nutzer
+         etwas eintraegt, greift die Wiederverwendung nicht mehr. */
+      var _m = window._dpLetzteLeereKarte;
+      if (!window._currentObjKey && _m && _m.key && (Date.now() - _m.t) < 30000 && _formularLeer()) {
+        window._currentObjKey = _m.key;
+        window._currentObjSeq = _m.seq || null;
+        window._objSeqIsPreview = false;
+        try { if (typeof updHeader === 'function') updHeader(); } catch (e) {}
+        try { if (typeof renderSaved === 'function') renderSaved(); } catch (e) {}
+        return;
+      }
       if (window._currentObjKey) return; /* bereits eine ID -> kein leeres Anlegen noetig */
       window._dpEmptyCardSaving = true;
-      var _rel = function () { window._dpEmptyCardSaving = false; };
+      var _rel = function () {
+        window._dpEmptyCardSaving = false;
+        /* v1268b: merken, WELCHE leere Karte gerade entstanden ist */
+        try {
+          if (window._currentObjKey && _formularLeer()) {
+            window._dpLetzteLeereKarte = { key: window._currentObjKey, seq: window._currentObjSeq, t: Date.now() };
+          }
+        } catch (e) {}
+      };
       setTimeout(_rel, 1500); /* Sicherheitsnetz falls Promise nie aufloest */
       if (typeof window.saveObj === 'function') {
         var p = window.saveObj({ silent: true });
