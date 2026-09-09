@@ -38,16 +38,17 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 09.09.2026)
 
-**Stand:** lokal = GitHub = Staging auf `e623df3`. **Produktion auf
-`b0e7976`** — `v1260`…`v1264` sind live, **`v1265` bis `v1267b` noch nicht**.
+**Stand:** lokal = GitHub = Staging auf `f1ec52a`. **Produktion auf
+`b0e7976`** — `v1260`…`v1264` sind live, **`v1265` bis `v1268c` noch nicht**.
 
-### Was jetzt Marcels Angabe braucht
+### Erledigt am 09.09.2026
 
-**Zwei Objekte beim Anlegen** — nicht reproduzierbar. Drei Wege getestet
-(Knopf „+ Neues Objekt hinzufügen", Aktionen-Menü, Doppelklick), jedes Mal
-genau ein Objekt; der Schutz aus v728 greift. **Es fehlen:** Umgebung
-(Staging oder Prod), welcher Weg, sofort oder erst nach dem Speichern,
-Handy oder Rechner.
+**Zwei Objekte beim Anlegen** — **gefunden und behoben (`v1268`).** Der
+Fehler war nicht der Anlegeweg, sondern der Sicherungs-Save davor: er
+startete für das geladene Objekt, verlor während seines `await` den
+Kontext an `newObj` und legte danach ein leeres NEUES Objekt an, statt das
+alte zu aktualisieren. Reproduziert, behoben, nachgemessen — Einzelheiten
+im Journal der Projektanweisung.
 
 ### Was aus Marcels Liste noch offen ist
 
@@ -61,11 +62,12 @@ Handy oder Rechner.
 | 6 | Bild „Ansicht": Objekt anlegen links über der Suche | **fertig** — `v1266`, Knopf unter dem Logo im Stil des Logo-Kastens |
 | 7 | IRR/Break-Even „passend in Auswertung" einordnen | **teilweise** — sie stehen in den Kennzahlen-Kacheln (Reiter Bewertung); Portfolio-Cockpit noch nicht |
 
-**Zuletzt fertig: `v1266`–`v1267b`.** „Objekt anlegen" sitzt jetzt unter
-dem Logo (Marcels Bild `anischt.png`), und der Sprechlauf warnt, bevor er
-ein gefülltes Objekt überschreibt — entstanden aus einem eigenen Fehler,
-bei dem 17 Felder von `2026-001` ohne Rückfrage überschrieben wurden.
-Nachweis im Journal der Projektanweisung.
+**Zuletzt fertig: `v1268`–`v1268c` — der Doppel-Anlage-Fehler ist gefunden**
+**und behoben.** Ein Klick auf „Objekt anlegen" legte zwei Objekte an, weil
+der Sicherungs-Save nach seinem `await` einen leergeräumten Kontext vorfand
+und statt eines PUT einen POST machte. Dazu: der amtliche BORIS-Abruf hat
+endlich einen Knopf (er fehlte im HTML, seit es ihn gibt). Nachweis im
+Journal der Projektanweisung.
 
 ### Was jetzt Marcels Entscheidung braucht
 

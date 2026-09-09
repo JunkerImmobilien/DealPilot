@@ -9367,6 +9367,108 @@ keine — sie sieht richtig aus.
 (`v1267b`). Alle drei auf Staging, **nicht auf Prod** — Prod steht
 weiterhin auf `b0e7976`, es fehlen `v1265` bis `v1267b`.
 
+## Rollout-Journal · 09.09.2026 — `v1268` bis `v1268c`
+
+### `v1268` · Ein Klick auf „Objekt anlegen" legte zwei Objekte an
+
+**Der Fehler war seit Wochen bekannt und galt als nicht reproduzierbar.**
+Marcel hat ihn diesmal mit Bild gemeldet (`design/mockups/objekt.png`):
+`2026-002` und `2026-1009`, beide leer, beide um **05:10:39** angelegt —
+in der Datenbank nachgesehen **28 ms auseinander**.
+
+**Gemessen auf Staging**, Objekt `2026-001` geladen, **ein** Klick auf den
+neuen Knopf: der POST kam aus `performSave`, also aus dem
+`dpTabSwitchSave()` in der **ersten Zeile von `newObj`** — und er legte ein
+**neues, leeres** Objekt an (`2026-1025`).
+
+**Der Ablauf, Schritt für Schritt:**
+
+1. `dpTabSwitchSave()` startet `saveObj` für das **geladene** Objekt.
+2. `saveObj` läuft bis zu seinem ersten `await` — `_checkObjIdConflict`
+   holt die Objektliste vom Server — und gibt die Kontrolle ab.
+3. `newObj` läuft synchron weiter: `_currentObjKey = null`, alle Felder
+   geleert, neue Vorschau-Nummer.
+4. `saveObj` kommt vom `await` zurück und liest **beides neu**: kein Key
+   mehr → **POST statt PUT**; leeres Formular → **leeres Objekt**.
+
+> **Der Sicherungs-Save sicherte also nicht das alte Objekt, sondern
+> erzeugte eine Karteileiche.** Zwei Schäden auf einmal: die Änderungen am
+> offenen Objekt waren weg, und in der Liste stand eine Karte zu viel. Kam
+> kurz darauf noch die leere Karte aus `newobj-fixes.js` durch, waren es
+> zwei — Marcels Bild.
+
+**Zwei Riegel, weil einer die Lücke nur an einer Stelle schließt:**
+
+1. **`newObj` wartet** einen laufenden Sicherungs-Save ab, wenn wirklich
+   ein Objekt geladen ist; erst danach wird geleert (`_newObjLeeren`). Ohne
+   geladenes Objekt — der Normalfall — bleibt alles synchron wie bisher.
+2. **`saveObj` merkt sich beim Start, zu welchem Objekt es gehört**, und
+   bricht still ab, wenn der Kontext während eines `await` gewechselt hat.
+   Das deckt auch Tab-Wechsel und `loadSaved` ab.
+
+Die leere Karte hängt jetzt zusätzlich am Ereignis `dp:newobj-ready` —
+beim abgewarteten Save käme das `setTimeout(60)` in `newobj-fixes.js`
+sonst zu früh, sähe den noch gesetzten `_currentObjKey` und legte **gar
+keine** Karte an.
+
+**Nachgemessen nach dem Rollout:** Objekt `2026-001` geladen, ein Klick →
+**PUT** auf `2026-001` mit `ort: Hüllhorst` (die Sicherung kommt jetzt
+an!) und **ein** POST für das neue leere Objekt. Vorher: ein POST mit
+leeren Daten und gar kein PUT.
+
+### `v1268b` und `v1268c` · Mehrfach klicken, und der Fehler dabei
+
+Nach `v1268` gemessen: **drei Klicks in 150 ms ergaben zwei
+Karteileichen** — der Guard `_dpEmptyCardSaving` hält nur, solange der
+Save läuft. `v1268b` merkt sich deshalb die zuletzt angelegte leere Karte
+und verwendet sie wieder, solange das Formular unangetastet leer ist.
+
+> **Dabei ist mir ein Fehler unterlaufen, der schlimmer war als der
+> behobene.** Leeres Objekt angelegt, gefüllt, gespeichert, dann wieder
+> „Objekt anlegen": der Merker zeigte weiter auf dieselbe Karte, das
+> Formular war leer, die Wiederverwendung griff — **der nächste
+> Tastendruck hätte das gefüllte Objekt überschrieben.** Aus einem Schutz
+> vor Karteileichen wäre ein Datenverlust geworden.
+>
+> **Das leere Formular sagt nur, dass HIER nichts steht, nicht was in der
+> Karte steht.** `v1268c` holt die gemerkte Karte deshalb vom Server und
+> verwendet sie nur wieder, wenn sie **dort** leer ist (`ort/str/kp/wfl`).
+
+**Abnahme (Staging, `v1268c`):** vier Klicks hintereinander → **ein**
+Objekt. Leer angelegt, gefüllt, wieder angelegt → das gefüllte bleibt
+unangetastet, ein neues entsteht. Gold-Audit RC=0 (genau auf der
+Basislinie).
+
+### `v1268` · Der amtliche Bodenrichtwert hat endlich einen Knopf
+
+Marcels Frage: *„haben wir jetzt einen Knopf oder wie wird der unter dem
+Tab Objekt ermittelt?"* — **Gemessen: der Knopf fehlte.** Das Modul
+erwartet `#brw-boris-btn` seit `v785` (`_refreshBorisBtn` sucht ihn,
+`fetchBoris` beschriftet ihn), aber im HTML stand er **nie** — `git log -S`
+über `index.html` findet keinen einzigen Treffer. Der amtliche Direktabruf
+war damit nur über die Automatik aus `v1265` erreichbar, von Hand gar
+nicht.
+
+Jetzt stehen drei Knöpfe am Feld, in dieser Reihenfolge:
+**📍 BORIS abrufen** (amtlich, sofort) · **🔗 BORIS-Portal** (öffnet das
+Landesportal) · **Bodenrichtwert schätzen** (KI, als Rückfall).
+
+**Nachgemessen:** Hüllhorst, Hermannstr. 9 eingetippt, Knopf gedrückt →
+`90 €/m², Stichtag 2026-01-01, Zone 167, BORIS-NRW`. Das ist genau der
+Wert, mit dem das Testobjekt in `CLAUDE.md` rechnet.
+
+**Commits.** `881d0f0` (`v1268` + BORIS-Knopf) · `3970814` (`v1268b`) ·
+`v1268c`. Alles auf Staging, **nicht auf Prod** — dort fehlen weiterhin
+`v1265` bis `v1268c`.
+
+> **Nebenbefund, offen:** die Objektnummern laufen auseinander. In der
+> Datenbank steht ein Demo-Objekt **`2026-999`**; `ObjNumbering` zieht
+> seinen Zähler auf jede höhere gefundene Nummer nach, deshalb vergibt der
+> Client seit Langem **vierstellige** Nummern (`2026-1009`), während der
+> Server bei einer Neuanlage ohne Nummer sauber weiterzählt (`2026-002`).
+> Beide Nummernkreise sind für sich korrekt, nebeneinander sehen sie falsch
+> aus. Gehört aufgeräumt, sobald jemand die Demo-Objekte anfasst.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
