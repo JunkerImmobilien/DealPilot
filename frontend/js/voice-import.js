@@ -171,7 +171,7 @@
       '@keyframes viPulse{0%,100%{box-shadow:0 0 0 0 rgba(217,104,95,.45)}50%{box-shadow:0 0 0 7px rgba(217,104,95,0)}}',
       /* Kategorie-Zeile */
       '.vi-catline{text-align:center;font:600 12px/1.3 "JetBrains Mono",monospace;letter-spacing:.18em;color:var(--vi-accent);margin:4px 0 2px}',
-      '.vi-catline b{letter-spacing:.22em}',
+      '.vi-catline b{letter-spacing:.16em;font-size:15px}',   /* v1274: der Zaehler ist die Hauptzahl im Fenster */
       '.vi-catsub{display:block;font-size:10.5px;letter-spacing:.08em;color:var(--vi-muted);margin-top:3px}',
       /* Orbit-Buehne */
       '.vi-orbit{position:relative;width:100%;max-width:480px;height:446px;margin:2px auto 0}',
@@ -190,8 +190,8 @@
       '.vi-chip.vi-aus,.vi-chip.vi-weg{display:none}',
       /* Das erkannte Wort bekommt einen kurzen Abgang, damit das Verschwinden
          als Bestaetigung gelesen wird und nicht als Fehler. */
-      '.vi-chip.on{animation:viAb .9s ease forwards}',
-      '@keyframes viAb{0%,55%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-6px) scale(.94)}}',
+      '.vi-chip.on{animation:viAb 2s ease forwards}',   /* v1274: so lang wie CHIP_NACHLEUCHTEN */
+      '@keyframes viAb{0%,72%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-6px) scale(.94)}}',   /* v1274: 72 % von 2 s = 1,44 s voll sichtbar */
       /* v975-voice-nachzug: coolere, immer lesbare Chips */
       '.oabi-ov.vi-mode .vi-chip{position:absolute;width:auto;max-width:134px;transform:translate(-50%,-50%);background:linear-gradient(180deg,#413b32,#332e27);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 42%, transparent);border-radius:12px;padding:6px 9px;text-align:left;white-space:nowrap;font:600 10.5px/1.2 "JetBrains Mono",monospace;color:#fff;opacity:.94;box-shadow:0 4px 13px rgba(0,0,0,.2);transition:all .3s ease;z-index:2}',
       '.oabi-ov.vi-darkbg .vi-chip{background:linear-gradient(180deg,#1b1a17,#121110);border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);box-shadow:0 4px 13px rgba(0,0,0,.5)}',
@@ -903,7 +903,12 @@
      `.vi-chip[data-cid=...]` — wer hier Elemente entfernt, bricht drei
      Stellen still. Und der Fortschrittszaehler zaehlt weiter ALLE, nicht die
      sichtbaren; sonst staende dort dauernd „9". */
-  var CHIP_NACHLEUCHTEN = 900;   /* ms, in denen das erkannte Wort gruen stehen bleibt */
+  /* v1274 · Marcels Vorgabe vom 09.09.2026: „die sachen die gesagt wurden
+     sollen gruen werden und nach 2 sekunden dann verschwinden."
+     Vorher 900 ms. Das war die Zeit einer Bestaetigung, die man sieht, wenn
+     man hinsieht - nicht die Zeit einer Bestaetigung, die man BEMERKT,
+     waehrend man spricht und woandershin schaut. */
+  var CHIP_NACHLEUCHTEN = 2000;   /* ms, in denen das erkannte Wort gruen stehen bleibt */
 
   /* ═══ v1259 · EIN Orbit, keine Etappen ═════════════════════════════════
      Marcels Auftrag vom 08.09.2026: „Toll waere, wenn wir einfach die
@@ -1101,15 +1106,24 @@
       c.style.left = p.l; c.style.top = p.t;
     });
 
-    /* 6) Kopfzeile: kein Kategoriename mehr, nur noch was offen ist. */
+    /* 6) v1274 · Der Zähler über dem Orbit.
+          Marcels Vorgabe: „Dann gibt es einen Zähler mit maximal anzahl und
+          wieviel wir schon haben." Bis v1273 stand hier die Gegenrichtung
+          („NOCH OFFEN · 30 Angaben") — sie sagt nicht, wie weit man ist,
+          sondern wie weit man noch nicht ist. Wer spricht, will das
+          Wachsen sehen. Die Zahl unten im Fortschrittsbalken bleibt; sie
+          steht dort für den Blick nach der Aufnahme, diese hier für den
+          Blick währenddessen. */
     var cl = $('vi-catline');
     if (cl) {
-      var offen = chips.filter(function (c) {
-        return !c.classList.contains('on') && !c.classList.contains('pre');
+      var erkannt = chips.filter(function (c) {
+        return c.classList.contains('on') || c.classList.contains('pre');
       }).length;
-      cl.innerHTML = offen
-        ? '<b>NOCH OFFEN</b><span class="vi-catsub">' + offen + ' Angabe' + (offen === 1 ? '' : 'n') + '</span>'
-        : '<b>ALLES ERKANNT</b>';
+      var gesamt = chips.length;
+      cl.innerHTML = (erkannt >= gesamt && gesamt > 0)
+        ? '<b>ALLES ERKANNT</b><span class="vi-catsub">' + gesamt + ' von ' + gesamt + '</span>'
+        : '<b>' + erkannt + ' VON ' + gesamt + '</b><span class="vi-catsub">Angaben erkannt · noch ' +
+          (gesamt - erkannt) + ' offen</span>';
     }
 
     /* 7) v1272: Uhr weiterstellen, solange gesprochen wird und jemand wartet. */
@@ -1875,5 +1889,6 @@
      Rueckfragen-Zustand nur mit echtem Sprechen erreichen - und echtes
      Sprechen laesst sich nicht automatisiert nachmessen. */
   window.VoiceImport = { srcLabel: srcLabel, open: open, _orbit: chipOrbit,
-                         _rueckfragen: rueckfragen, _luecken: _rfLuecken };
+                         _rueckfragen: rueckfragen, _luecken: _rfLuecken,
+                         _text: updateChipsFromText };   /* v1274: Live-Weg pruefbar */
 })();
