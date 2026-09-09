@@ -1470,8 +1470,8 @@
     { ids: ['wfl'],                        frage: 'Wie gross ist die Wohnflaeche?' },
     { ids: ['plz', 'ort', 'str', 'hnr'],   frage: 'Wo steht das Objekt? Strasse, Hausnummer, PLZ und Ort.' },
     { ids: ['baujahr'],                    frage: 'Aus welchem Jahr stammt das Gebaeude?' },
-    { ids: ['d1z'],                        frage: 'Zu welchem Zinssatz finanzierst du?' },
-    { ids: ['d1t'],                        frage: 'Wie hoch ist die anfaengliche Tilgung?' },
+    { ids: ['d1z'], vorbelegt: 1,             frage: 'Zu welchem Zinssatz finanzierst du?' },
+    { ids: ['d1t'], vorbelegt: 1,             frage: 'Wie hoch ist die anfaengliche Tilgung?' },
     { ids: ['ds2_zustand'],                frage: 'In welchem Zustand ist die Wohnung?' }
   ];
   var RF_MAX = 3;
@@ -1482,10 +1482,29 @@
   function _rfFehlt(eintrag, fields) {
     for (var i = 0; i < eintrag.ids.length; i++) {
       var id = eintrag.ids[i];
-      var da = (fields && (id in fields) && fields[id] !== '' && fields[id] != null) || fieldHasValue(id);
+      var gesagt = !!(fields && (id in fields) && fields[id] !== '' && fields[id] != null);
+      /* v1273c · VORBELEGTE Felder zaehlen NICHT als Angabe.
+         Gemessen am 09.09.2026: die Lueckenpruefung meldete nichts offen,
+         obwohl weder Zins noch Tilgung gesagt worden waren - beide standen
+         als Wert im Formular, gesetzt vom Investmentprofil (V63.76). Nach
+         der urspruenglichen Regel „was im Formular steht, ist keine Luecke"
+         galten sie als beantwortet, und die Rechnung haette stillschweigend
+         mit einer Vorbelegung gerechnet, die niemand bestaetigt hat.
+         Jetzt wird gefragt - aber mit dem Vorschlag im Text und einem
+         Knopf, der ihn mit einem Klick bestaetigt. Das ist der Unterschied
+         zwischen „einen Wert annehmen" und „einen Wert vorschlagen". */
+      var da = eintrag.vorbelegt ? gesagt : (gesagt || fieldHasValue(id));
       if (!da) return true;   /* eine Luecke im Block genuegt */
     }
     return false;
+  }
+
+  /* Was steht gerade im Formular? Fuer den „Passt so"-Knopf. */
+  function _rfVorschlag(eintrag) {
+    if (!eintrag.vorbelegt) return null;
+    var el = document.getElementById(eintrag.ids[0]);
+    var v = el ? String(el.value || '').trim() : '';
+    return v || null;
   }
 
   function _rfLuecken(fields) {
@@ -1553,6 +1572,7 @@
     var h = _rfHost();
     var e = _rf.offen[_rf.i];
     var gefunden = Object.keys(_rf.data.fields || {}).length;
+    var vorschlag = _rfVorschlag(e);
     h.innerHTML =
       '<div class="vi-rf-kopf">Noch eine Frage</div>' +
       '<div class="vi-rf-fund">Ich habe <b>' + gefunden + ' Angaben</b> aus deiner Aufnahme gelesen. ' +
@@ -1565,6 +1585,7 @@
         '<button type="button" class="vi-rf-btn" id="vi-rf-ok">Übernehmen</button>' +
       '</div>' +
       '<div class="vi-rf-neben">' +
+        (vorschlag ? '<button type="button" id="vi-rf-passt">Passt so (' + escH(vorschlag) + ')</button>' : '') +
         '<button type="button" id="vi-rf-nix">Weiß ich nicht</button>' +
         '<button type="button" id="vi-rf-ende">Fertig — zur Übersicht</button>' +
       '</div>' +
@@ -1579,6 +1600,15 @@
     $('vi-rf-mic').addEventListener('click', _rfSprechen);
     $('vi-rf-nix').addEventListener('click', function () { _rfWeiter(); });
     $('vi-rf-ende').addEventListener('click', function () { _rfFertig(); });
+    /* v1273c: den Vorschlag bestaetigen kostet KEINEN KI-Aufruf - der Wert
+       steht ja schon im Feld. Er wandert trotzdem in die Tabelle, damit in
+       der Uebersicht steht, was uebernommen wurde. */
+    var pb = $('vi-rf-passt');
+    if (pb) pb.addEventListener('click', function () {
+      var v = _rfVorschlag(e);
+      if (v) { _rf.data.fields[e.ids[0]] = v; _rfMelden('✓ Übernommen: ' + escH(v)); }
+      setTimeout(_rfWeiter, 700);
+    });
   }
 
   function _rfMelden(text, warte) {
