@@ -92,5 +92,19 @@
   } else {
     setTimeout(wrap, 800);
   }
+
+  /* ═══ v1268 · Die leere Karte haengt jetzt am Ereignis, nicht nur an 60 ms ══
+     storage.js wartet seit v1268 einen laufenden Sicherungs-Save ab, bevor es
+     das Formular leert (sonst legt der Save selbst eine Karteileiche an).
+     In dem Fall kaeme das setTimeout(60) unten zu frueh: es saehe den noch
+     gesetzten _currentObjKey des alten Objekts, wuerde per Guard aussteigen -
+     und es entstuende gar keine neue Karte. Darum zusaetzlich auf das
+     Fertig-Signal hoeren. Doppelt schadet nicht: saveEmptyCard ist durch
+     _dpEmptyCardSaving und _currentObjKey selbst gesperrt. */
+  window.addEventListener('dp:newobj-ready', function () {
+    resetActionBar();
+    scrollTopMain();
+    setTimeout(saveEmptyCard, 60);
+  });
   setTimeout(wrap, 2500);
 })();
