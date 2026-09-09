@@ -38,8 +38,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 09.09.2026)
 
-**Stand:** lokal = GitHub = Staging auf `v1273e`. **Produktion auf `a21fe9c`**.
-`v1265` bis `v1272` sind live, **`v1273` noch nicht**.
+**Stand:** lokal = GitHub = Staging auf `v1274b`. **Produktion auf `a21fe9c`**.
+`v1265` bis `v1272` sind live, **`v1273` und `v1274` noch nicht**.
 
 ### Erledigt am 09.09.2026
 

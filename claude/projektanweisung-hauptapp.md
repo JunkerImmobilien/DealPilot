@@ -9758,6 +9758,53 @@ Backend auf Staging neu gebaut. **Nicht auf Prod.**
 **Offen für `v1274`:** die Auswahl beim Öffnen — „Ich erzähle frei" gegen
 „Frag mich durch" — und der geführte Weg dahinter.
 
+### `v1274`/`v1274b` · Zwei Sekunden Grün und ein Zähler, der wächst
+
+Marcels Vorgaben nach seinem **eigenen Sprechlauf**: *„die sachen die
+gesagt wurden sollen grün werden und nach 2 sekunden dann verschwinden.
+dann kommen dafür neue Schlagwörter bis keine mehr da sind. Dann gibt es
+einen Zähler mit maximal anzahl und wieviel wir schon haben."*
+
+**1 · Das Nachleuchten: 900 ms → 2000 ms**, Abgangs-Animation mit
+(`viAb` von 0,9 s auf 2 s, Haltepunkt von 55 % auf 72 %).
+
+> 900 ms ist die Zeit einer Bestätigung, die man sieht, **wenn man
+> hinsieht**. Sie ist nicht die Zeit einer Bestätigung, die man **bemerkt**,
+> während man spricht und woandershin schaut.
+
+**2 · Der Zähler zeigt jetzt den Stand, nicht den Rest.** Über dem Orbit
+stand „NOCH OFFEN · 30 Angaben" — die Gegenrichtung. Sie sagt nicht, wie
+weit man ist, sondern wie weit man noch nicht ist. Jetzt:
+**„7 VON 31 · Angaben erkannt · noch 24 offen"**, und am Ende
+**„ALLES ERKANNT · 31 von 31"**.
+
+#### `v1274b` · Zwei Zähler, zwei Zahlen
+
+Im Bild der Abnahme stand oben **„10 VON 31"** und darunter
+**„5 / 31 Felder"** — dieselbe Sache, zwei Rechenwege: die Kopfzeile kam
+aus `chipOrbit`, die Leiste aus `updateChipsCount`.
+
+> **Zwei Zähler stimmen nur so lange, wie beide bei jeder Änderung
+> laufen.** Einer davon lief nicht. Jetzt zählt `_zaehlerZeichnen()`, und
+> beide Anzeigen lesen von ihr.
+
+#### Abnahme (Staging, mit Prüfhaken `_text`, ohne echtes Sprechen)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Ein Stichwort erkannt | grün, `vi-weg` nach **2240 ms** (MutationObserver) |
+| Vier gleichzeitig | alle **2,65 s** grün, dann weg |
+| Beide Zähler nach der Erkennung | **4 VON 31** oben, **4 / 31 · 13 %** unten — gleich |
+| Nach dem Verschwinden | wieder **8** Pillen im Kranz, es rückt nach |
+| Alles erkannt | **ALLES ERKANNT · 31 von 31**, Kranz leer, „Alle Felder erkannt" |
+
+Die 2,2 bis 2,65 s statt exakt 2,0 s sind die Uhr des Orbits: sie prüft
+alle 600 ms. Für den Zweck genau richtig — genauer wäre ein Timer je Pille
+und damit ein Timer mehr, der schiefgehen kann.
+
+**Commits.** `v1274` (Nachleuchten, Zähler, Prüfhaken `_text`) · `v1274b`
+(eine Zahl, eine Quelle). Auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
