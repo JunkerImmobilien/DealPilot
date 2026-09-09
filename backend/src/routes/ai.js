@@ -530,6 +530,50 @@ router.post('/extract-voice', authenticate, extractLimiter, async (req, res, nex
   }
 });
 
+/* v1273-RUECKFRAGE · POST /api/v1/ai/extract-text
+ * Kurzantwort auf eine gezielte Rueckfrage: Text + Mini-Katalog rein,
+ * Werte raus. Kein Audio, also keine Transkription - der teuerste Posten
+ * faellt weg. Derselbe Limiter wie extract-voice; der Katalog ist hier
+ * absichtlich klein (die zwei, drei gefragten Felder), was den Aufruf
+ * zusaetzlich billig macht.
+ */
+router.post('/extract-text', authenticate, extractLimiter, async (req, res, next) => {
+  try {
+    const { text, catalog, userApiKey: rawUserKey } = req.body || {};
+    const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
+
+    if (!config.openai.apiKey && !userApiKey) {
+      return res.status(503).json({ error: 'Kein OpenAI-API-Key verfuegbar.', needs_user_key: true });
+    }
+    if (!text || typeof text !== 'string' || !text.trim()) {
+      return res.status(400).json({ error: 'Body muss "text" enthalten.' });
+    }
+    if (text.length > 4000) {
+      return res.status(413).json({ error: 'Antwort zu lang.' });
+    }
+
+    const result = await voiceExtractService.extractFromText(text, catalog, {
+      apiKey: config.openai.apiKey,
+      userApiKey: userApiKey
+    });
+
+    /* Protokollieren, nicht abbuchen - wie bei extract-voice (v1183). */
+    if (!userApiKey) {
+      try {
+        await aiCreditsService.logExtract(req.user.id, 'extract-text');
+      } catch (e) {
+        console.warn('[ai/extract-text] logExtract fehlgeschlagen:', e.message);
+      }
+    }
+    res.json(result);
+  } catch (err) {
+    if (err.code === 'NO_API_KEY') return res.status(503).json({ error: err.message, needs_user_key: true });
+    if (err.status === 401) return res.status(401).json({ error: err.message });
+    if (err.status) return res.status(err.status >= 500 ? 502 : err.status).json({ error: err.message });
+    next(err);
+  }
+});
+
 /**
  * V39: POST /api/v1/ai/qc-suggest — KI-Vorschläge für Quick Check Felder.
  *

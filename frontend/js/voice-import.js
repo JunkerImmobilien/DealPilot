@@ -1393,7 +1393,7 @@
         .then(function (b64) { return post(b64, blob.type || st.mime, catalog); })
         .then(function (data) {
           try { console.log('[voice-import] Transkript:', data && data.transcript); } catch (e) {}
-          showResults(OA, data, catalog);
+          rueckfragen(OA, data, catalog);   /* v1273: erst nachfragen, dann Tabelle */
         });
     }).catch(function (err) {
       if (err && err.needs_credits) {
@@ -1429,6 +1429,285 @@
       if (to) clearTimeout(to);
       throw (err && err.name === 'AbortError') ? new Error('Zeit\u00fcberschreitung (180 s)') : err;
     });
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     v1273 · RUECKFRAGEN — der Co-Pilot fragt nach, was fehlt
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Punkt 5: „Chatbot-Dialog statt Monolog." Demo und Konzept
+     liegen in design/Vorschlaege/sprechlauf-dialog-*.
+
+     Der Bruch war zwischen Auswertung und Tabelle: Wer etwas vergisst,
+     erfaehrt es erst dort - als fehlende Zeile. Niemand fragt nach.
+
+     Jetzt liegt dazwischen ein Zustand: bis zu DREI gezielte Fragen nach
+     dem, was fuer die Rechnung fehlt. Beantwortbar per Tippen oder per
+     kurzer Aufnahme.
+
+     WELCHE FRAGE, IN WELCHER REIHENFOLGE: nach Gewicht fuer die Rechnung,
+     nicht nach Reihenfolge im Formular. Ohne Kaufpreis gibt es keine
+     einzige Kennzahl, ohne Miete keinen Cashflow. Die zwoelf Pflichtfelder
+     stehen als `label.dp-required` im DOM (gemessen 09.09.2026); die
+     Adresse wird als EIN Block gefragt - vier Einzelfragen nach Strasse,
+     Hausnummer, PLZ und Ort waeren ein Verhoer.
+
+     DREI REGELN:
+     1. Gefragt wird nur, was WIRKLICH fehlt - weder im Auswertungsergebnis
+        noch im Formular. Ein Feld, das der Nutzer vorhin selbst getippt
+        hat, ist keine Luecke.
+     2. Hoechstens DREI Fragen. Mehr liest niemand, und der Weg zur Tabelle
+        darf nie laenger werden als der Nutzen.
+     3. „Weiss ich nicht" beendet eine Frage endgueltig. Ein Assistent, der
+        nicht aufhoeren kann, wird abgeschaltet.
+
+     KOSTEN: eine getippte Antwort kostet NUR die Extraktion auf einem
+     Katalog von ein bis vier Feldern - keine Transkription. Gesprochen
+     kommen 3 bis 8 Sekunden Audio dazu. Beides liegt weit unter dem, was
+     die Aufnahme selbst kostet. */
+  var RFRAGEN = [
+    { ids: ['kp'],                         frage: 'Was soll das Objekt kosten?' },
+    { ids: ['nkm'],                        frage: 'Was kommt an Nettokaltmiete im Monat rein?' },
+    { ids: ['wfl'],                        frage: 'Wie gross ist die Wohnflaeche?' },
+    { ids: ['plz', 'ort', 'str', 'hnr'],   frage: 'Wo steht das Objekt? Strasse, Hausnummer, PLZ und Ort.' },
+    { ids: ['baujahr'],                    frage: 'Aus welchem Jahr stammt das Gebaeude?' },
+    { ids: ['d1z'],                        frage: 'Zu welchem Zinssatz finanzierst du?' },
+    { ids: ['d1t'],                        frage: 'Wie hoch ist die anfaengliche Tilgung?' },
+    { ids: ['ds2_zustand'],                frage: 'In welchem Zustand ist die Wohnung?' }
+  ];
+  var RF_MAX = 3;
+  var _rf = null;   /* { offen:[], i:0, data:{}, catalog:[], OA:{} } */
+
+  /* Fehlt der Eintrag wirklich? Ein Feld gilt als vorhanden, wenn die
+     Auswertung es gefunden hat ODER im Formular schon etwas steht. */
+  function _rfFehlt(eintrag, fields) {
+    for (var i = 0; i < eintrag.ids.length; i++) {
+      var id = eintrag.ids[i];
+      var da = (fields && (id in fields) && fields[id] !== '' && fields[id] != null) || fieldHasValue(id);
+      if (!da) return true;   /* eine Luecke im Block genuegt */
+    }
+    return false;
+  }
+
+  function _rfLuecken(fields) {
+    var out = [];
+    for (var i = 0; i < RFRAGEN.length && out.length < RF_MAX; i++) {
+      if (_rfFehlt(RFRAGEN[i], fields)) out.push(RFRAGEN[i]);
+    }
+    return out;
+  }
+
+  /* Mini-Katalog: nur die gefragten Felder. Das ist der halbe Kostenvorteil
+     - der volle Katalog traegt ueber 6000 Token, dieser hier keine 60. */
+  function _rfKatalog(eintrag, catalog) {
+    return (catalog || []).filter(function (e) { return eintrag.ids.indexOf(e.id) >= 0; });
+  }
+
+  function _rfStil() {
+    if ($('vi-rf-stil')) return;
+    var s = document.createElement('style');
+    s.id = 'vi-rf-stil';
+    s.textContent = [
+      '#vi-frage{padding:4px 2px 2px}',
+      '.vi-rf-kopf{font:700 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;',
+      '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);margin-bottom:10px}',
+      '.vi-rf-fund{font:400 13px/1.5 Inter,system-ui,sans-serif;opacity:.8;margin-bottom:16px}',
+      '.vi-rf-frage{font:600 19px/1.35 "Space Grotesk",system-ui,sans-serif;margin:0 0 4px}',
+      '.vi-rf-zaehler{font:600 11px/1 "JetBrains Mono",monospace;opacity:.55;margin-bottom:16px}',
+      '.vi-rf-zeile{display:flex;gap:8px;align-items:stretch}',
+      '.vi-rf-zeile input{flex:1;min-width:0;border-radius:11px;padding:11px 14px;',
+      '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);',
+      '  background:rgba(0,0,0,.25);color:inherit;font:400 14.5px Inter,system-ui,sans-serif}',
+      '.vi-rf-zeile input:focus{outline:none;border-color:var(--wl-c9a84c, #C9A84C)}',
+      '.vi-rf-btn{border-radius:11px;padding:0 15px;cursor:pointer;white-space:nowrap;',
+      '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);',
+      '  background:transparent;color:var(--wl-c9a84c, #C9A84C);',
+      '  font:600 12px "JetBrains Mono",ui-monospace,monospace}',
+      '.vi-rf-btn:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent)}',
+      '.vi-rf-btn.an{background:#B8625C;border-color:#B8625C;color:#fff}',
+      '.vi-rf-neben{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}',
+      '.vi-rf-neben button{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);',
+      '  color:inherit;opacity:.75;border-radius:9px;padding:7px 12px;cursor:pointer;',
+      '  font:400 12.5px Inter,system-ui,sans-serif}',
+      '.vi-rf-neben button:hover{opacity:1}',
+      '.vi-rf-echo{margin-top:14px;font:600 12.5px/1.5 "JetBrains Mono",monospace;color:#3FA56C}',
+      '.vi-rf-warte{margin-top:14px;font:400 13px Inter,sans-serif;opacity:.6}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+
+  function _rfHost() {
+    var h = $('vi-frage');
+    if (!h) {
+      _rfStil();
+      var rec = $('vi-rec');
+      h = document.createElement('div');
+      h.id = 'vi-frage';
+      h.style.display = 'none';
+      if (rec && rec.parentNode) rec.parentNode.insertBefore(h, rec.nextSibling);
+      else { var b = document.querySelector('.oabi-ov.vi-mode .oabi-body'); if (b) b.appendChild(h); }
+    }
+    return h;
+  }
+
+  function _rfZeichnen() {
+    var h = _rfHost();
+    var e = _rf.offen[_rf.i];
+    var gefunden = Object.keys(_rf.data.fields || {}).length;
+    h.innerHTML =
+      '<div class="vi-rf-kopf">Noch eine Frage</div>' +
+      '<div class="vi-rf-fund">Ich habe <b>' + gefunden + ' Angaben</b> aus deiner Aufnahme gelesen. ' +
+        'Für die Rechnung fehlt mir noch ' + (_rf.offen.length === 1 ? 'eine' : _rf.offen.length) + '.</div>' +
+      '<div class="vi-rf-frage">' + escH(e.frage) + '</div>' +
+      '<div class="vi-rf-zaehler">' + (_rf.i + 1) + ' von ' + _rf.offen.length + '</div>' +
+      '<div class="vi-rf-zeile">' +
+        '<input id="vi-rf-in" placeholder="Antwort tippen …" autocomplete="off">' +
+        '<button type="button" class="vi-rf-btn" id="vi-rf-mic">\u{1F3A4} Sprechen</button>' +
+        '<button type="button" class="vi-rf-btn" id="vi-rf-ok">Übernehmen</button>' +
+      '</div>' +
+      '<div class="vi-rf-neben">' +
+        '<button type="button" id="vi-rf-nix">Weiß ich nicht</button>' +
+        '<button type="button" id="vi-rf-ende">Fertig — zur Übersicht</button>' +
+      '</div>' +
+      '<div class="vi-rf-echo" id="vi-rf-echo"></div>';
+    h.style.display = '';
+    var inp = $('vi-rf-in');
+    if (inp) {
+      inp.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); _rfSenden(); } });
+      try { inp.focus(); } catch (ex) {}
+    }
+    $('vi-rf-ok').addEventListener('click', _rfSenden);
+    $('vi-rf-mic').addEventListener('click', _rfSprechen);
+    $('vi-rf-nix').addEventListener('click', function () { _rfWeiter(); });
+    $('vi-rf-ende').addEventListener('click', function () { _rfFertig(); });
+  }
+
+  function _rfMelden(text, warte) {
+    var e = $('vi-rf-echo'); if (!e) return;
+    e.className = warte ? 'vi-rf-warte' : 'vi-rf-echo';
+    e.innerHTML = text;
+  }
+
+  function _rfWeiter() {
+    _rf.i++;
+    if (_rf.i >= _rf.offen.length) return _rfFertig();
+    _rfZeichnen();
+  }
+
+  function _rfFertig() {
+    var h = $('vi-frage'); if (h) h.style.display = 'none';
+    _rfStopKurz();
+    showResults(_rf.OA, _rf.data, _rf.catalog);
+    _rf = null;
+  }
+
+  /* Antwort verarbeiten - egal ob getippt oder gesprochen. */
+  function _rfUebernehmen(neu) {
+    var e = _rf.offen[_rf.i];
+    var namen = [];
+    Object.keys(neu || {}).forEach(function (id) {
+      if (e.ids.indexOf(id) < 0) return;            /* nur was gefragt war */
+      var v = neu[id];
+      if (v === '' || v == null) return;
+      _rf.data.fields[id] = v;
+      var kat = _rf.catalog.filter(function (c) { return c.id === id; })[0];
+      namen.push((kat ? kat.label : id) + ' = ' + v);
+    });
+    if (!namen.length) {
+      _rfMelden('⚠ Daraus konnte ich nichts entnehmen — nochmal, oder überspringen.');
+      return;
+    }
+    _rfMelden('✓ ' + namen.join(' · '));
+    setTimeout(_rfWeiter, 900);
+  }
+
+  function _rfSenden() {
+    var inp = $('vi-rf-in'); if (!inp) return;
+    var text = String(inp.value || '').trim();
+    if (!text) return;
+    if (/^(wei(ss|ß) ich nicht|keine ahnung|nichts|\-)$/i.test(text)) return _rfWeiter();
+    var e = _rf.offen[_rf.i];
+    inp.disabled = true;
+    _rfMelden('Ich ordne das zu …', true);
+    Auth.apiCall('/ai/extract-text', {
+      method: 'POST',
+      body: { text: text, catalog: _rfKatalog(e, _rf.catalog) }
+    }).then(function (r) {
+      inp.disabled = false;
+      _rfUebernehmen(r && r.fields);
+    }).catch(function (err) {
+      inp.disabled = false;
+      _rfMelden('⚠ ' + ((err && err.message) || 'Das hat gerade nicht geklappt.'));
+    });
+  }
+
+  /* ── Kurzaufnahme fuer EINE Antwort ────────────────────────────────
+     Eigener Recorder, unabhaengig von `st`: die Hauptaufnahme ist zu
+     diesem Zeitpunkt beendet und das Mikrofon frei. Laeuft hoechstens
+     20 Sekunden - eine Antwort auf eine gezielte Frage ist kurz, und ein
+     Aufnahmeknopf, den man versehentlich laufen laesst, kostet Geld. */
+  var _kurz = { rec: null, stream: null, chunks: [], timer: null };
+
+  function _rfStopKurz() {
+    try { if (_kurz.timer) { clearTimeout(_kurz.timer); _kurz.timer = null; } } catch (e) {}
+    try { if (_kurz.rec && _kurz.rec.state !== 'inactive') _kurz.rec.stop(); } catch (e) {}
+    try { (_kurz.stream ? _kurz.stream.getTracks() : []).forEach(function (t) { t.stop(); }); } catch (e) {}
+    _kurz.rec = null; _kurz.stream = null;
+  }
+
+  function _rfSprechen() {
+    var btn = $('vi-rf-mic');
+    if (_kurz.rec && _kurz.rec.state === 'recording') { _kurz.rec.stop(); return; }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      _rfMelden('⚠ Dieser Browser kann nicht aufnehmen — bitte tippen.');
+      return;
+    }
+    _rfMelden('Höre zu … nochmal drücken zum Beenden.', true);
+    if (btn) { btn.textContent = '■ Stopp'; btn.classList.add('an'); }
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+      _kurz.stream = stream; _kurz.chunks = [];
+      var mime = (window.MediaRecorder && MediaRecorder.isTypeSupported &&
+                  MediaRecorder.isTypeSupported('audio/webm')) ? 'audio/webm' : '';
+      _kurz.rec = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+      _kurz.rec.ondataavailable = function (ev) { if (ev.data && ev.data.size) _kurz.chunks.push(ev.data); };
+      _kurz.rec.onstop = function () {
+        if (btn) { btn.textContent = '\u{1F3A4} Sprechen'; btn.classList.remove('an'); }
+        var blob = new Blob(_kurz.chunks, { type: _kurz.rec.mimeType || 'audio/webm' });
+        _rfStopKurz();
+        if (!blob || blob.size < 1200) { _rfMelden('⚠ Nichts gehört — nochmal, oder tippen.'); return; }
+        _rfMelden('Ich höre hin …', true);
+        var e = _rf.offen[_rf.i];
+        blobToB64(blob).then(function (b64) {
+          return Auth.apiCall('/ai/extract-voice', {
+            method: 'POST',
+            body: { audio: b64, mime: blob.type, catalog: _rfKatalog(e, _rf.catalog) }
+          });
+        }).then(function (r) {
+          if (r && r.transcript) { try { console.log('[voice-import] Rueckfrage-Antwort:', r.transcript); } catch (x) {} }
+          _rfUebernehmen(r && r.fields);
+        }).catch(function (err) {
+          _rfMelden('⚠ ' + ((err && err.message) || 'Das hat gerade nicht geklappt.'));
+        });
+      };
+      _kurz.rec.start();
+      _kurz.timer = setTimeout(function () {
+        try { if (_kurz.rec && _kurz.rec.state === 'recording') _kurz.rec.stop(); } catch (e) {}
+      }, 20000);
+    }).catch(function (err) {
+      if (btn) { btn.textContent = '\u{1F3A4} Sprechen'; btn.classList.remove('an'); }
+      _rfMelden('⚠ Mikrofon nicht verfügbar (' + ((err && err.name) || err) + ') — bitte tippen.');
+    });
+  }
+
+  /* Einstieg: nach der Auswertung, vor der Tabelle. */
+  function rueckfragen(OA, data, catalog) {
+    var fields = (data && data.fields) || {};
+    var luecken = _rfLuecken(fields);
+    if (!luecken.length) return showResults(OA, data, catalog);   /* nichts offen - direkt zur Tabelle */
+    _rf = { offen: luecken, i: 0, data: data, catalog: catalog, OA: OA };
+    if (!_rf.data.fields) _rf.data.fields = {};
+    var rec = $('vi-rec'); if (rec) rec.style.display = 'none';
+    var nx = $('vi-next'); if (nx) nx.style.display = 'none';
+    _rfZeichnen();
   }
 
   /* Ergebnisse in die ECHTE Import-Tabelle (gleiche Optik, gleicher Schreibweg) */

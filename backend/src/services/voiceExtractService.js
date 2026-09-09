@@ -597,4 +597,36 @@ async function verifyFields(transcript, prev, catalog, apiKey, sammler) {
   return { fields: fields, unsicher: unsicher };
 }
 
-module.exports = { extractFromAudio, quickMatch, transcribe };  /* v536: transcribe fuer Live-Chunks */
+/* ════════════════════════════════════════════════════════════════════
+ * v1273 · Kurzantwort aus TEXT statt aus Audio
+ *
+ * Fuer die Rueckfragen nach der Auswertung: der Co-Pilot fragt nach dem,
+ * was fehlt, und man darf tippen statt zu sprechen. Getippt gibt es kein
+ * Audio - also faellt die Transkription weg, und mit ihr der groesste
+ * Kostenposten. Uebrig bleibt EIN kleiner Extraktionslauf auf einem
+ * Katalog von zwei, drei Feldern statt 250.
+ *
+ * Bewusst dieselbe Antwortform wie extractFromAudio ({fields, unsicher,
+ * kosten}), damit das Frontend beide Wege gleich behandelt. `transcript`
+ * ist der eingegebene Text - so bleibt nachvollziehbar, worauf sich eine
+ * Zuordnung stuetzt.
+ *
+ * Die Verifikationsrunde laeuft hier NICHT: sie prueft das Transkript
+ * gegen die Felder, und bei einer getippten Antwort auf eine gezielte
+ * Frage gibt es nichts zu verifizieren - der Text IST die Antwort.
+ * ════════════════════════════════════════════════════════════════════ */
+async function extractFromText(text, catalog, opts) {
+  const o = opts || {};
+  const key = o.userApiKey || o.apiKey;
+  if (!key) { const e = new Error('Kein OpenAI-API-Key verfuegbar.'); e.code = 'NO_API_KEY'; throw e; }
+  const cat = sanitizeCatalog(catalog);
+  if (!cat.length) throw httpErr(400, 'Feld-Katalog fehlt oder ist leer.');
+  const t = String(text || '').trim().slice(0, 4000);
+  if (t.length < 1) throw httpErr(400, 'Keine Antwort uebergeben.');
+  const sammler = neuerSammler();
+  const out = await extractFields(t, cat, key, sammler);
+  const kosten = o.userApiKey ? null : kostenAbschluss(sammler);
+  return { transcript: t, fields: out.fields, unsicher: out.unsicher, kosten };
+}
+
+module.exports = { extractFromAudio, extractFromText, quickMatch, transcribe };  /* v536: transcribe fuer Live-Chunks */
