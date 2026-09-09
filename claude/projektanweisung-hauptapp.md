@@ -10064,6 +10064,107 @@ Backend auf Staging neu gebaut. **Nicht auf Prod.**
 > („Inserat einf\ufffdgen") — Zeilen mit Escape-Sequenzen gehören per
 > `printf` erzeugt, nicht durch awk geschleust.
 
+### `v1279`–`v1281` · Der Co-Pilot wird ein Gesprächspartner
+
+#### `v1279` · Der Inserat-Import ist wieder raus
+
+Marcels Entscheidung: *„ich will das man den link eingibt und alles
+automatisch funktioniert. falls das nicht geht nimm es wieder raus."*
+
+**Es geht nicht — jedenfalls nicht ohne Geld.** IS24 antwortet unserem
+Server mit 401, ImmoWelt mit 403. Der Text-Weg funktionierte gemessen
+einwandfrei (1,8 s, 0,14 ct, Kaltmiete und Eckdaten korrekt, fremde
+Objekte auf der Seite ignoriert) — er ist eben nicht „alles automatisch".
+Was bliebe: ein Abrufdienst mit Wohn-IPs, je Abruf bezahlt. **Das ist eine
+Geldentscheidung und gehört Marcel, nicht mir.**
+
+> Der Backend-Teil (`extract-text` mit `modus=inserat`) bleibt stehen: er
+> stört niemanden, kostet nichts und wäre sofort wieder nutzbar.
+
+#### `v1280` · Rechnen, bündeln, anbieten
+
+**Rechnen mit Kontext.** *„wenn ich sage, ich möchte 10 Prozent vom
+Kaufpreis als Kaufnebenkosten ansetzen, das rechnet er dann nicht passend
+aus."* — Konnte er nicht: der Aufruf bekam nur den Satz und den
+Feldkatalog. Was der Kaufpreis **ist**, stand nirgends. Jetzt reist der
+bekannte Stand mit, aus dem Gespräch **und** aus dem Formular.
+
+| Antwort | bekannt | Ergebnis |
+|---|---|---|
+| „20 % vom Kaufpreis als Eigenkapital" | `kp = 200000` | **40.000** ✓ |
+| „so viel wie eine Kaltmiete" | `nkm = 490` | **490** ✓ |
+| dieselbe Antwort | **nichts** | **leer** ✓ |
+
+> **Der letzte Fall kostete drei Anläufe.** Erst kam `0`, nach der ersten
+> Prompt-Regel `20` (die Prozentzahl als Euro), nach der zweiten wieder
+> `20`. **Das Modell will liefern — eine Bitte ist keine Sperre.** Jetzt
+> gibt es eine im Code (`_prozentFalle`): steht im Text ein Bezug
+> „Prozent vom/von" und liefert ein Geldfeld einen Wert ≤ 100, fällt er
+> weg. Eng gefasst, damit nichts Richtiges verloren geht — „Rücklage 30 €"
+> ohne Prozentbezug bleibt stehen, geprüft.
+
+**Bündeln.** Aus 18 Blöcken werden 11–13: Finanzierung ist **eine** Frage
+(Eigenkapital, Zins, Tilgung, Bindung), ebenso Sanierung+Inventar und
+Lage+Zustand.
+
+**Die Einstellungen anbieten.** *„Oder soll ich die Zinskonditionen aus den
+Einstellungen nehmen? … und dass er den passenden Zins zieht aus dieser
+indikativen Konditionsberechnung."* Der Vorschlag steht **in** der Frage:
+
+> *Aus deinen Einstellungen hätte ich: **4,07 % Zins · 1 % Tilgung ·
+> 10 Jahre fest · 20 % Eigenkapital*** — `[Einstellungen übernehmen]`
+
+Die 4,07 % kommen aus `DealPilotInvestmentProfile.getZins()`, also dem
+eigenen Wert **oder** dem indikativen Pfandbrief-Satz zur eingestellten
+Bindung samt Marge. Das Eigenkapital entsteht aus EK-Quote × Kaufpreis und
+erscheint nur, wenn der Kaufpreis steht — eine Quote ohne Kaufpreis ist
+keine Zahl. **Gemessen:** ein Klick → vier Felder, `ek = 40000`.
+
+#### `v1281` · „Was schon steht" und eigene Fragen
+
+**Die Spalte aus der Demo.** Der Chat zeigt den **Verlauf**, nicht den
+**Stand**. Wer mitten im Gespräch überlegt, ob er die Miete schon gesagt
+hat, müsste zurückscrollen. Jetzt steht rechts die Liste aller Blöcke mit
+drei Zuständen — ✓ steht, ▸ dran, · offen — und darunter „4 von 11". Auf
+schmalen Fenstern wandert sie **nach oben**: dort ordnet sie die Frage
+ein, statt sie zu verdecken.
+
+> Gezählt wird über **dieselben** `RFRAGEN`-Blöcke, aus denen auch gefragt
+> wird. Zwei Listen, die dasselbe meinen, laufen irgendwann auseinander.
+
+**Eigene Fragen.** Neuer Endpunkt `POST /ai/copilot-frage`: Frage plus
+bekannter Stand rein, zwei bis vier Sätze raus.
+
+> **Eigener Endpunkt statt eines Schalters an `extract-text`:** dort geht
+> ein Wert **ins Formular**, hier kommt eine Auskunft **an den Menschen**.
+> Zwei Zwecke in einer Route heißt, dass ein Fehler im einen den anderen
+> mitreißt.
+
+Der Prompt verbietet drei Dinge: Zahlen erfinden (was fehlt, wird
+benannt), Anlageberatung (einordnen ja, entscheiden nein) und Länge.
+
+**Erkannt wird vorsichtig** — Fragezeichen oder Fragewort am Anfang. Im
+Zweifel gilt es als Antwort: eine falsch als Frage verstandene Angabe geht
+verloren, eine falsch als Angabe verstandene Frage steht wenigstens in der
+Tabelle und fällt auf. Gilt getippt **und** gesprochen; nach der Auskunft
+wiederholt der Co-Pilot die offene Frage.
+
+**Abnahme (Staging).** „Was bedeutet eigentlich DSCR?" mitten im Dialog:
+
+> *„DSCR bedeutet ‚Debt Service Coverage Ratio' und zeigt, wie oft die
+> laufende Miete den Schuldendienst aus Zins und Tilgung deckt. Mit den
+> bekannten Werten kann ich das noch nicht sauber rechnen, weil mir dafür
+> die Darlehensdaten wie Zinssatz, Tilgung, Darlehensbetrag und die
+> laufenden Bewirtschaftungskosten fehlen."*
+
+**Genau das war das Ziel:** erklären, rechnen wo es geht, und die Lücke
+benennen statt sie zu füllen. Danach: *„Zurück zur Frage: Wie groß ist
+es?"*
+
+**Commits.** `v1279` (Rückbau) · `v1280`–`v1280d` (Kontext, Bündelung,
+Profil-Vorschlag, Prozentfalle) · `v1281` (Spalte, Fragen). Backend
+mehrfach neu gebaut. Auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
