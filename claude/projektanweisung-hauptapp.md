@@ -9682,6 +9682,82 @@ Das Fenster blieb dabei durchgehend offen.
 > funktioniert: die Patch-Datei mit dem Write-Werkzeug in den Scratchpad
 > schreiben und mit `awk -v P=...` einsetzen.
 
+### `v1273`–`v1273e` · Der Co-Pilot fragt nach, was fehlt
+
+Marcels Punkt 5, erster Teil. Zuvor entstand — Demo-first, wie CLAUDE.md
+es verlangt — das Paar in `design/Vorschläge/`:
+`sprechlauf-dialog-konzept.md` und `sprechlauf-dialog-demo.html` (drei
+Varianten klickbar, im Markenstil, ohne Backend). **Marcels Entscheidung:
+*„das kann man auswählen ob co pilot oder frei sprechen"*** — also
+Variante C. Die Auswahl kommt mit `v1274`; die Rückfragen sind der Teil,
+der schon für sich nützt.
+
+**Der Bruch lag zwischen Auswertung und Tabelle.** Wer etwas vergisst,
+erfährt es erst dort, als fehlende Zeile. Jetzt liegt dazwischen ein
+Zustand mit **bis zu drei** gezielten Fragen.
+
+**Reihenfolge nach Gewicht für die Rechnung**, nicht nach Formular:
+Kaufpreis, Miete, Wohnfläche, Adresse **als ein Block** (vier Einzelfragen
+nach Straße, Hausnummer, PLZ und Ort wären ein Verhör), Baujahr, Zins,
+Tilgung, Zustand. Die zwölf Pflichtfelder stehen als `label.dp-required`
+im DOM — ausgelesen, nicht angenommen.
+
+**Antworten per Tippen oder per Kurzaufnahme.** Die Kurzaufnahme hat einen
+eigenen Recorder (die Hauptaufnahme ist beendet, das Mikrofon frei) und
+läuft **höchstens 20 Sekunden**: ein Aufnahmeknopf, den man versehentlich
+laufen lässt, kostet Geld.
+
+#### Der neue Endpunkt: `POST /ai/extract-text`
+
+Getippt gibt es kein Audio — also fällt die **Transkription** weg, der
+größte Kostenposten. Übrig bleibt ein Extraktionslauf auf einem Katalog
+von ein bis vier Feldern statt 250.
+
+> **Gemessen auf Staging:** „Der Kaufpreis liegt bei 245.000 Euro und ich
+> finanziere zu 3,8 Prozent" → `kp=245000`, `d1z=3.8` in **2,0 s** für
+> **0,09 Cent**. Das Konzept hatte 0,05–0,1 Cent geschätzt; die Schätzung
+> war richtig und ist jetzt eine Messung.
+
+#### `v1273c` · Der Befund, der das Feature erst richtig macht
+
+Die Lückenprüfung meldete beim ersten Testlauf **nichts offen**, obwohl
+weder Zins noch Tilgung gesagt worden waren. Beide standen als Wert im
+Formular — gesetzt vom Investmentprofil (`V63.76`). Nach der ersten Regel
+(„was im Formular steht, ist keine Lücke") galten sie als beantwortet.
+
+> **Die Rechnung hätte stillschweigend mit einer Vorbelegung gerechnet,
+> die niemand bestätigt hat.** Genau der Fall, den die Demo als Problem
+> zeigt — und er wäre unbemerkt geblieben, hätte die Prüfung nicht
+> zufällig auf diesen Datensatz gezeigt.
+
+`d1z` und `d1t` tragen jetzt den Merker `vorbelegt`: bei ihnen zählt nur,
+was **gesagt** wurde. Gefragt wird trotzdem freundlich — mit dem Vorschlag
+im Text und einem Knopf **„Passt so (3,5 %)"**, der ihn mit einem Klick
+bestätigt und dabei **keinen KI-Aufruf** kostet. Das ist der Unterschied
+zwischen einen Wert *annehmen* und einen Wert *vorschlagen*.
+
+#### Abnahme (Staging)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Lücken erkannt | `d1z`, `d1t` — 9 Angaben gefunden, 2 offen |
+| Getippt: „drei Komma neun Prozent" | **Zinssatz 3,9** in der Tabelle |
+| „Passt so (3,5 %)" | Wert übernommen, kein KI-Aufruf |
+| „Weiß ich nicht" | nächste Frage, **kein** Wert eingetragen |
+| „Fertig — zur Übersicht" | Tabelle mit 9 Zeilen, **ohne** Zins und Tilgung |
+
+**Zwei eigene Fehler in der Abnahme gefunden und behoben:** „Für die
+Rechnung fehlt mir noch 2" (`v1273d`, jetzt „fehlen") und `ae/oe/ue` in
+den **Fragetexten** (`v1273e`) — die Regel gilt für Kommentare, nicht für
+Nutztext.
+
+**Commits.** `820f93f` (`v1273`) · `v1273b` (Prüfhaken) · `v1273c`
+(vorbelegt) · `v1273d` (Zahlwort, Einheit) · `v1273e` (Umlaute).
+Backend auf Staging neu gebaut. **Nicht auf Prod.**
+
+**Offen für `v1274`:** die Auswahl beim Öffnen — „Ich erzähle frei" gegen
+„Frag mich durch" — und der geführte Weg dahinter.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
