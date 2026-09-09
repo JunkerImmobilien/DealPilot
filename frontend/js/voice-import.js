@@ -1831,5 +1831,9 @@
      Kernmechanik des Umbaus unbeweisbar. Mit dem Haken kann man einen Chip
      auf `on` setzen und zusehen, ob der Platz frei wird und der naechste
      genau dort nachrueckt. Vorbild: window._dpDispSkin. */
-  window.VoiceImport = { srcLabel: srcLabel, open: open, _orbit: chipOrbit };
+  /* v1259 & v1273 · Pruefhaken, keine Bedienwege. Ohne sie liesse sich der
+     Rueckfragen-Zustand nur mit echtem Sprechen erreichen - und echtes
+     Sprechen laesst sich nicht automatisiert nachmessen. */
+  window.VoiceImport = { srcLabel: srcLabel, open: open, _orbit: chipOrbit,
+                         _rueckfragen: rueckfragen, _luecken: _rfLuecken };
 })();
