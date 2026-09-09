@@ -62,11 +62,31 @@
          etwas eintraegt, greift die Wiederverwendung nicht mehr. */
       var _m = window._dpLetzteLeereKarte;
       if (!window._currentObjKey && _m && _m.key && (Date.now() - _m.t) < 30000 && _formularLeer()) {
-        window._currentObjKey = _m.key;
-        window._currentObjSeq = _m.seq || null;
-        window._objSeqIsPreview = false;
-        try { if (typeof updHeader === 'function') updHeader(); } catch (e) {}
-        try { if (typeof renderSaved === 'function') renderSaved(); } catch (e) {}
+        /* ═══ v1268c · Ist die gemerkte Karte UEBERHAUPT noch leer? ═════════
+           Gemessen am 09.09.2026: Objekt leer angelegt, dann gefuellt und
+           gespeichert, dann "Objekt anlegen" - der Merker zeigte weiter auf
+           dieselbe Karte, und der naechste Tastendruck haette das gefuellte
+           Objekt ueberschrieben. Das leere Formular sagt nur, dass HIER
+           nichts steht, nicht was in der Karte steht. Also nachsehen; nur
+           was der Server als leer meldet, wird wiederverwendet. */
+        window._dpEmptyCardSaving = true;   /* sperrt, bis die Antwort da ist */
+        Promise.resolve(
+          (typeof Auth !== 'undefined' && Auth.apiCall) ? Auth.apiCall('/objects/' + _m.key) : null
+        ).then(function (o) {
+          window._dpEmptyCardSaving = false;
+          var d = (o && o.data) || {};
+          var leer = !String(d.ort || '').trim() && !String(d.str || '').trim() &&
+                     !String(d.kp || '').trim() && !String(d.wfl || '').trim();
+          if (!o || !leer) { window._dpLetzteLeereKarte = null; saveEmptyCard(); return; }
+          window._currentObjKey = _m.key;
+          window._currentObjSeq = _m.seq || null;
+          window._objSeqIsPreview = false;
+          try { if (typeof updHeader === 'function') updHeader(); } catch (e) {}
+          try { if (typeof renderSaved === 'function') renderSaved(); } catch (e) {}
+        }).catch(function () {
+          window._dpEmptyCardSaving = false;
+          window._dpLetzteLeereKarte = null;
+        });
         return;
       }
       if (window._currentObjKey) return; /* bereits eine ID -> kein leeres Anlegen noetig */
