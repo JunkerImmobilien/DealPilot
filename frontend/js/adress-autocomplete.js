@@ -56,16 +56,21 @@
   }
 
   /* ─── Stil ───────────────────────────────────────────────────────────
-     position:fixed, weil der Vorfahre .f static ist und die Eingabemaske in
-     einem eigenen Scroll-Container sitzt - ein absolut gesetztes Overlay
-     wuerde beim Scrollen stehenbleiben oder abgeschnitten. Beim Scrollen
-     wird die Liste deshalb geschlossen. Gold tokenisiert. */
+     v1270d: position:absolute IM Feld-Container, nicht fixed am Fenster.
+     Mit fixed stand die Liste nach jeder Layoutverschiebung falsch -
+     gemessen: Feld bei y=488, Liste bei y=501, also 25 px zu hoch und
+     mitten auf dem Eingabefeld. Ein absolut gesetztes Kind wandert mit,
+     ohne dass irgendetwas nachgerechnet werden muss. Der .f-Container
+     bekommt dafuer per Inline-Stil position:relative - gezielt an DIESEM
+     einen Element, keine Sammelregel auf .f (die traefe die halbe Maske).
+     Alle Vorfahren bis .main-col sind overflow:visible, gemessen - die
+     Liste wird also nicht abgeschnitten. Gold tokenisiert. */
   function _stil() {
     if (_el('dp-adr-stil')) return;
     var s = document.createElement('style');
     s.id = 'dp-adr-stil';
     s.textContent = [
-      '#dp-adr-box{position:fixed;z-index:9999;max-height:246px;overflow:auto;',
+      '#dp-adr-box{position:absolute;z-index:9999;max-height:246px;overflow:auto;',
       '  background:#14130f;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 46%, transparent);',
       '  border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.45);padding:4px}',
       '#dp-adr-box[hidden]{display:none}',
@@ -101,6 +106,16 @@
     return b;
   }
 
+  /* Die Liste unter das Feld haengen - im Feld-Container, nicht am Fenster. */
+  function _andocken(b, el) {
+    var par = el.parentElement; if (!par) return;
+    if (getComputedStyle(par).position === 'static') par.style.position = 'relative';
+    if (b.parentElement !== par) par.appendChild(b);
+    b.style.left = el.offsetLeft + 'px';
+    b.style.top = (el.offsetTop + el.offsetHeight + 4) + 'px';
+    b.style.width = el.offsetWidth + 'px';
+  }
+
   function _schliessen() { var b = _el(BOX_ID); if (b) b.hidden = true; _aktiv = -1; }
 
   function _waehlen(i) {
@@ -116,7 +131,6 @@
     _treffer = liste; _aktiv = -1;
     var el = _el('str'); if (!el) return;
     var plzJetzt = _wert('plz');
-    var r = el.getBoundingClientRect();
     var b = _box();
     b.innerHTML = '<div class="dp-adr-kopf">Straße wählen oder weitertippen</div>' +
       liste.map(function (e, i) {
@@ -125,9 +139,7 @@
           ? '<span class="dp-adr-fremd">' + _esc((e.plz + ' ' + e.ort).trim()) + '</span>' : '';
         return '<div class="dp-adr-opt" data-i="' + i + '">' + _esc(e.name) + fremd + '</div>';
       }).join('');
-    b.style.left = Math.round(r.left) + 'px';
-    b.style.top = Math.round(r.bottom + 4) + 'px';
-    b.style.width = Math.round(r.width) + 'px';
+    _andocken(b, el);
     b.hidden = false;
   }
 
@@ -259,7 +271,9 @@
     return !!(plz && str);
   }
 
-  window.addEventListener('scroll', function () { _schliessen(); }, true);
+  /* v1270d: KEIN Schliessen beim Scrollen mehr - die Liste haengt jetzt am
+     Feld und wandert mit. Der alte Handler mit capture fing auch das
+     Scrollen in .main-col und machte die Liste sofort wieder zu. */
   window.addEventListener('resize', function () { _schliessen(); });
 
   var _n = 0;
