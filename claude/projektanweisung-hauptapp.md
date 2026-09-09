@@ -9952,6 +9952,39 @@ drin** — sie war zwei Schritte vorher genau dort eingefügt worden.
 **Commits.** `v1276` · `v1276b` (Fragenliste zurück) · `v1276c` (Verlauf
 statt Lauschzeile). Auf Staging, **nicht auf Prod**.
 
+### `v1277` · Sprechen ist der Hauptweg — und sieht auch so aus
+
+Marcels Frage: *„könnte man das jetzt so machen dass man direkt sprechen
+kann anstatt tippen?"*
+
+**Es ging schon seit `v1276`.** Es sah nur nicht so aus: Bei jeder neuen
+Frage sprang der Cursor ins Tippfeld, und dass das Mikrofon läuft, stand
+als graue Zeile in 12 px darunter.
+
+> **Wer ein blinkendes Textfeld sieht, tippt.** Eine Funktion, die da ist,
+> aber nicht als erstes ins Auge fällt, ist für den Benutzer nicht da. Das
+> ist kein Fehler im Code — es ist einer in der Reihenfolge, in der das
+> Fenster seine Möglichkeiten zeigt.
+
+**Was jetzt anders ist:**
+
+- Eine **Mikrofon-Anzeige groß und mittig** über der Eingabe, mit einem
+  **Pegel, der sich bewegt**. „Hört er mich?" ist die einzige Frage, die
+  ein Sprecher wirklich hat — ein Ausschlag beantwortet sie ohne ein Wort,
+  deutlicher als jeder Hinweistext, den man beim Sprechen ohnehin nicht
+  liest.
+- Der Kasten **pulsiert**, solange gesprochen wird, und sagt „Ich höre
+  dich … — sprich zu Ende, ich warte auf die Pause".
+- **Kein Fokus mehr ins Tippfeld.** Es heißt nur noch „… oder tippen".
+- Ohne Mikrofon wird der Kasten blass und nennt Grund **und** Ausweg.
+
+**Nachgemessen (steuerbarer Sprecher):** Fokus nirgends, Pegel bei Stille
+flach (8 × 3 px), beim Sprechen ausschlagend (8/13/18/23/23/18/13/8 px,
+mittig am höchsten), Kasten trägt `hoert`, Text wechselt auf „Ich höre
+dich …".
+
+**Commit** `v1277`. Auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
