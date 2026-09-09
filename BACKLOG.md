@@ -58,7 +58,7 @@ im Journal der Projektanweisung.
 | 2 | Bodenrichtwert automatisch nach Adresse | **fertig** — `v1263` Automatik, `v1264` der kaputte KI-Abruf repariert, `v1265` **amtlicher BORIS-Wert zuerst** (11 von 11 Ländern live), Schätzung nur als Rückfall |
 | 3 | Pillen unterschiedlich lang einblenden | **fertig** — `v1272`, Standzeit je Platz (6,5–15 s), der Kranz dreht durch alle offenen Angaben |
 | 4 | Kontextbezug im Sprechlauf prüfen | **teilweise** — Hausgeld-Aufteilung und Inventar sitzen, weitere Fälle offen |
-| 5 | Chatbot-Dialog statt Monolog, mit Demo | **offen** — größter Brocken, braucht ein Konzept vor dem Bauen |
+| 5 | Chatbot-Dialog statt Monolog, mit Demo | **Demo liegt vor** — `design/Vorschläge/sprechlauf-dialog-konzept.md` und `…-demo.html`, drei Varianten klickbar. **Marcels Entscheidung fehlt: A, B oder C?** |
 | 6 | Bild „Ansicht": Objekt anlegen links über der Suche | **fertig** — `v1266`, Knopf unter dem Logo im Stil des Logo-Kastens |
 | 7 | IRR/Break-Even „passend in Auswertung" einordnen | **teilweise** — sie stehen in den Kennzahlen-Kacheln (Reiter Bewertung); Portfolio-Cockpit noch nicht |
 
@@ -73,12 +73,12 @@ Projektanweisung.
 
 ### Was jetzt Marcels Entscheidung braucht
 
-1. **`OPENAI_TRANSCRIBE_MODEL` — groß oder mini?** Das ist jetzt die
-   **teuerste offene Frage.** Auf beiden Servern steht
-   `gpt-4o-transcribe`, obwohl `v1169` den Code-Default bewusst auf
-   `gpt-4o-mini-transcribe` gestellt hat, um Tempo zu gewinnen. **Die
-   Optimierung ist im Betrieb nie angekommen.**
-
+1. **`OPENAI_TRANSCRIBE_MODEL` — entschieden am 09.09.2026: das mini.**
+   Marcels Wort: „das mini bleibt erstmal". **Achtung, es blieb nicht** —
+   gemessen mit `printenv` IM Container lief auf **beiden** Servern das
+   große `gpt-4o-transcribe`. Auf **Staging jetzt umgestellt** (auch
+   `OPENAI_REALTIME_MODEL`), nachgemessen im Container. **Auf Prod steht
+   weiter das große** — dafür fehlt die Freigabe. Die alte Begründung:
    Seit die Preise stehen, ist die Tragweite messbar: im warmen Zustand
    (Prompt-Zwischenspeicher greift) ist die **Transkription mit 80 % der
    größte Kostenposten**. Das mini kostet **die Hälfte** (3,00 statt 6,00
