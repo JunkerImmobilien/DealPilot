@@ -1774,6 +1774,42 @@
      Der Ablauf ist in beiden Wegen derselbe: nach dem freien Diktat als
      Lückenfüller (höchstens drei Fragen, nach `rang` sortiert), im
      geführten Weg über alles. */
+  /* ═══ v1276 · ALLE Felder, in Erzähl-Reihenfolge ═══════════════════════
+     Marcels Befund: „wir haben irgendwie auch nur acht Felder drin."
+     Stimmt — die erste Liste deckte 12 der 31 Katalogfelder ab. Jetzt sind
+     es 18 Blöcke über ALLE 31.
+
+     ZWEI ORDNUNGEN, ein Grund: der geführte Weg fragt in der Reihenfolge,
+     in der ein Mensch von einem Objekt erzählt (was, wo, wie groß, was
+     kostet es, was kommt rein, wie finanziert, wie liegt es, was denkst
+     du). Die Rückfragen nach einem freien Diktat sortieren dagegen nach
+     `rang` — dort zählt das Gewicht für die Rechnung, weil nur drei Fragen
+     gestellt werden und die wichtigsten dabei sein müssen.
+
+     Blöcke statt Einzelfelder, wo es zusammengehört: „Wohnfläche und
+     Zimmer" ist eine Frage, nicht zwei. Vier Einzelfragen nach Straße,
+     Hausnummer, PLZ und Ort wären ein Verhör. */
+  var RFRAGEN = [
+    { ids: ['objart'],                       rang: 9,  frage: 'Was für ein Objekt ist es — Eigentumswohnung, Haus, Mehrfamilienhaus?' },
+    { ids: ['plz', 'ort', 'str', 'hnr'],     rang: 5,  frage: 'Wo steht das Objekt? Straße, Hausnummer, PLZ und Ort.' },
+    { ids: ['wfl', 'zimmer'],                rang: 3,  frage: 'Wie groß ist es? Wohnfläche und Zimmerzahl.' },
+    { ids: ['baujahr'],                      rang: 4,  frage: 'Aus welchem Jahr stammt das Gebäude?' },
+    { ids: ['kp'],                           rang: 1,  frage: 'Was soll das Objekt kosten?' },
+    { ids: ['kaufdat', 'wirtschaftlicher_uebergang'], rang: 12, frage: 'Wann wird gekauft, und ab wann gehören dir Mieten und Kosten?' },
+    { ids: ['san'],                          rang: 11, frage: 'Muss etwas saniert oder renoviert werden? Was hast du eingeplant?' },
+    { ids: ['moebl'],                        rang: 15, frage: 'Wird etwas mitverkauft — Küche, Möbel, Geräte?' },
+    { ids: ['nkm', 'ze'],                    rang: 2,  frage: 'Was kommt monatlich rein? Kaltmiete und Zusatzeinnahmen wie Stellplatz.' },
+    { ids: ['hg_ul', 'hg_nul'],              rang: 10, frage: 'Wie hoch ist das Hausgeld, und wie viel davon ist nicht umlagefähig?' },
+    { ids: ['ek'],                           rang: 8,  frage: 'Wie viel Eigenkapital bringst du ein?' },
+    { ids: ['d1z'], vorbelegt: 1,            rang: 6,  frage: 'Zu welchem Zinssatz finanzierst du?' },
+    { ids: ['d1t'], vorbelegt: 1,            rang: 7,  frage: 'Wie hoch ist die anfängliche Tilgung?' },
+    { ids: ['d1_bindj'], vorbelegt: 1,       rang: 13, frage: 'Wie lange läuft die Zinsbindung?' },
+    { ids: ['brw', 'gsfl', 'mea'],           rang: 14, frage: 'Was weißt du zum Grundstück — Bodenrichtwert, Fläche, Miteigentumsanteil?' },
+    { ids: ['makrolage', 'mikrolage'],       rang: 16, frage: 'Wie ist die Lage — die Region im Großen und die Straße im Kleinen?' },
+    { ids: ['ds2_zustand', 'ds2_energie'],   rang: 17, frage: 'In welchem Zustand ist die Wohnung, und was sagt der Energieausweis?' },
+    { ids: ['thesis', 'risiken', 'notizen'], rang: 18, frage: 'Warum lohnt sich das Objekt für dich, was könnte schiefgehen, und was ist sonst wichtig?' }
+  ];
+
   var RF_MAX = 3;
   var _rf = null;   /* { offen:[], i:0, data:{}, catalog:[], OA:{}, alle:bool } */
 
