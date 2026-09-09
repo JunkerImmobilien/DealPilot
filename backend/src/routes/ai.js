@@ -548,13 +548,17 @@ router.post('/extract-text', authenticate, extractLimiter, async (req, res, next
     if (!text || typeof text !== 'string' || !text.trim()) {
       return res.status(400).json({ error: 'Body muss "text" enthalten.' });
     }
-    if (text.length > 4000) {
-      return res.status(413).json({ error: 'Antwort zu lang.' });
+    /* v1278: Inseratstexte sind laenger als Kurzantworten - ein aus dem
+       Browser kopiertes IS24-Expose hat gemessen ueber 6.000 Zeichen. */
+    var _modus = (req.body && req.body.modus === "inserat") ? "inserat" : "antwort";
+    if (text.length > (_modus === "inserat" ? 40000 : 4000)) {
+      return res.status(413).json({ error: "Text zu lang." });
     }
 
     const result = await voiceExtractService.extractFromText(text, catalog, {
       apiKey: config.openai.apiKey,
-      userApiKey: userApiKey
+      userApiKey: userApiKey,
+      modus: _modus
     });
 
     /* Protokollieren, nicht abbuchen - wie bei extract-voice (v1183). */

@@ -599,38 +599,45 @@ async function verifyFields(transcript, prev, catalog, apiKey, sammler) {
 }
 
 /* ════════════════════════════════════════════════════════════════════
- * v1273 · Kurzantwort aus TEXT statt aus Audio
+ * v1278 · ZWEI ARTEN VON TEXT
  *
- * Fuer die Rueckfragen nach der Auswertung: der Co-Pilot fragt nach dem,
- * was fehlt, und man darf tippen statt zu sprechen. Getippt gibt es kein
- * Audio - also faellt die Transkription weg, und mit ihr der groesste
- * Kostenposten. Uebrig bleibt EIN kleiner Extraktionslauf auf einem
- * Katalog von zwei, drei Feldern statt 250.
+ * `antwort` (Vorgabe): eine kurze Antwort auf eine gezielte Rueckfrage.
+ *   Ein bis vier Felder im Katalog, ein Satz Text - da soll der WERT
+ *   heraus, nicht der Satz.
  *
- * Bewusst dieselbe Antwortform wie extractFromAudio ({fields, unsicher,
- * kosten}), damit das Frontend beide Wege gleich behandelt. `transcript`
- * ist der eingegebene Text - so bleibt nachvollziehbar, worauf sich eine
- * Zuordnung stuetzt.
+ * `inserat`: der komplette Text einer Inseratsseite, wie man ihn mit
+ *   Strg+A / Strg+C aus dem Browser holt. Gemessen an einem echten
+ *   IS24-Expose am 09.09.2026: 6.104 Zeichen, darin Kaltmiete, Flaeche,
+ *   Adresse, Baujahr, Ausstattung - alles, was wir brauchen. Dazu aber
+ *   auch Navigation, Cookie-Hinweise, Werbung und die Inserate "aehnlicher
+ *   Objekte". Deshalb steht in der Zusatzregel ausdruecklich, dass nur das
+ *   EINE Objekt zaehlt, um das es auf der Seite geht.
  *
- * Die Verifikationsrunde laeuft hier NICHT: sie prueft das Transkript
- * gegen die Felder, und bei einer getippten Antwort auf eine gezielte
- * Frage gibt es nichts zu verifizieren - der Text IST die Antwort.
+ * WARUM DAS UEBERHAUPT NOETIG IST: IS24 (401) und ImmoWelt (403) blocken
+ * Abrufe aus Rechenzentren. Im Browser des Nutzers ist dieselbe Seite
+ * vollstaendig da - gemessen. Der Text-Weg umgeht den Bot-Schutz nicht, er
+ * braucht ihn gar nicht erst zu beruehren: der Mensch kopiert, was er
+ * ohnehin vor sich hat.
  * ════════════════════════════════════════════════════════════════════ */
+const TEXT_MAX = { antwort: 4000, inserat: 40000 };
+
 async function extractFromText(text, catalog, opts) {
   const o = opts || {};
   const key = o.userApiKey || o.apiKey;
   if (!key) { const e = new Error('Kein OpenAI-API-Key verfuegbar.'); e.code = 'NO_API_KEY'; throw e; }
   const cat = sanitizeCatalog(catalog);
   if (!cat.length) throw httpErr(400, 'Feld-Katalog fehlt oder ist leer.');
-  const t = String(text || '').trim().slice(0, 4000);
+  const modus = (o.modus === 'inserat') ? 'inserat' : 'antwort';
+  const t = String(text || '').trim().slice(0, TEXT_MAX[modus]);
   if (t.length < 1) throw httpErr(400, 'Keine Antwort uebergeben.');
   const sammler = neuerSammler();
+
   /* v1275b · Der Zusatz macht aus einem Diktat-Parser einen Antwort-Parser.
      Gemessen: auf "490 Euro kalt im Monat" kam bei EINEM Feld im Katalog der
      ganze Satz als Wert zurueck - das Modell hatte ja nur dieses eine Fach.
      Bei "245.000 Euro" ging es gut. Der Unterschied ist Zufall, solange im
      Prompt nichts steht, was den Fall benennt. */
-  const ZUSATZ = [
+  const ZUSATZ_ANTWORT = [
     'ZUSATZREGEL FUER DIESE ANFRAGE: Der Text ist die kurze ANTWORT auf eine',
     'gezielte Rueckfrage zu genau den Feldern im Katalog. Uebernimm NUR den',
     'WERT, niemals den ganzen Satz. "490 Euro kalt im Monat" -> 490,',
@@ -638,9 +645,28 @@ async function extractFromText(text, catalog, opts) {
     'Enthaelt die Antwort keinen verwertbaren Wert ("weiss nicht", "keine',
     'Ahnung"), gib ein leeres JSON-Objekt zurueck.'
   ].join(String.fromCharCode(10));
-  const out = await extractFields(t, cat, key, sammler, ZUSATZ);
+
+  const ZUSATZ_INSERAT = [
+    'ZUSATZREGEL FUER DIESE ANFRAGE: Der Text ist eine aus dem Browser',
+    'kopierte INSERATSSEITE eines Immobilienportals (ImmobilienScout24,',
+    'ImmoWelt, Kleinanzeigen, willhaben o.ae.).',
+    '- Es geht um GENAU EIN Objekt: das, dessen Ueberschrift und Eckdaten',
+    '  oben stehen. Die Seite enthaelt ausserdem Navigation, Cookie-Texte,',
+    '  Werbung und Listen "aehnlicher Objekte" - daraus NICHTS uebernehmen.',
+    '- KAUFPREIS ist der Kaufpreis, nicht die Warmmiete und nicht der',
+    '  Preis pro Quadratmeter. Bei einem MIETobjekt gibt es keinen',
+    '  Kaufpreis - dann das Feld weglassen.',
+    '- Kaltmiete = Nettokaltmiete ohne Nebenkosten. Warmmiete, Nebenkosten',
+    '  und Heizkosten sind NICHT die Kaltmiete.',
+    '- Hausgeld/Wohngeld gehoert zu den Bewirtschaftungskosten, nicht zur',
+    '  Miete.',
+    '- Was nicht im Text steht, wird WEGGELASSEN. Nichts aus dem Bild, dem',
+    '  Stadtteil oder der Erfahrung ergaenzen.'
+  ].join(String.fromCharCode(10));
+
+  const out = await extractFields(t, cat, key, sammler, modus === 'inserat' ? ZUSATZ_INSERAT : ZUSATZ_ANTWORT);
   const kosten = o.userApiKey ? null : kostenAbschluss(sammler);
-  return { transcript: t, fields: out.fields, unsicher: out.unsicher, kosten };
+  return { transcript: t, fields: out.fields, unsicher: out.unsicher, kosten, modus };
 }
 
 module.exports = { extractFromAudio, extractFromText, quickMatch, transcribe };  /* v536: transcribe fuer Live-Chunks */
