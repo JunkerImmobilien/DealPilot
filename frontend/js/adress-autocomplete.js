@@ -74,7 +74,9 @@
       '.dp-adr-opt:hover,.dp-adr-opt.dp-adr-an{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent);',
       '  color:var(--wl-e8cc7a, #E8CC7A)}',
       '.dp-adr-kopf{padding:5px 10px 3px;color:var(--wl-c9a84c, #C9A84C);opacity:.75;',
-      '  font:600 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase}'
+      '  font:600 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase}',
+      '.dp-adr-fremd{float:right;margin-left:10px;opacity:.6;color:#C8C0AE;',
+      '  font:500 10.5px/1.5 "JetBrains Mono",ui-monospace,monospace}'
     ].join('');
     document.head.appendChild(s);
   }
@@ -103,21 +105,25 @@
 
   function _waehlen(i) {
     if (!(i >= 0) || !_treffer[i]) return;
-    _setzen(_el('str'), _treffer[i]);
+    _setzen(_el('str'), _treffer[i].name);
     _schliessen();
     var h = _el('hnr');
     if (h && !String(h.value || '').trim()) { try { h.focus(); } catch (e) {} }
   }
 
-  function _zeigen(namen) {
-    if (!namen || !namen.length) return _schliessen();
-    _treffer = namen; _aktiv = -1;
+  function _zeigen(liste) {
+    if (!liste || !liste.length) return _schliessen();
+    _treffer = liste; _aktiv = -1;
     var el = _el('str'); if (!el) return;
+    var plzJetzt = _wert('plz');
     var r = el.getBoundingClientRect();
     var b = _box();
     b.innerHTML = '<div class="dp-adr-kopf">Straße wählen oder weitertippen</div>' +
-      namen.map(function (n, i) {
-        return '<div class="dp-adr-opt" data-i="' + i + '">' + _esc(n) + '</div>';
+      liste.map(function (e, i) {
+        /* Nachbarort dazuschreiben - sonst waehlt man ihn versehentlich. */
+        var fremd = (e.plz && plzJetzt && e.plz !== plzJetzt)
+          ? '<span class="dp-adr-fremd">' + _esc((e.plz + ' ' + e.ort).trim()) + '</span>' : '';
+        return '<div class="dp-adr-opt" data-i="' + i + '">' + _esc(e.name) + fremd + '</div>';
       }).join('');
     b.style.left = Math.round(r.left) + 'px';
     b.style.top = Math.round(r.bottom + 4) + 'px';
@@ -176,18 +182,31 @@
     });
   }
 
+  /* v1270c · Die eigene Postleitzahl zuerst, die Nachbarschaft benannt.
+     Gemessen: "Her" in 32609 Hüllhorst brachte die Hermannstraße in 32278
+     Kirchlengern nach oben — im Umkreis liegt eben mehr als eine. Geoapify
+     sortiert nach eigener Gewichtung, nicht streng nach Entfernung. Also
+     sortiert die Liste selbst: gleiche PLZ oben. Die übrigen bleiben
+     stehen, tragen aber sichtbar ihren Ort — eine Straße stillschweigend
+     aus dem Nachbarort zu übernehmen wäre schlimmer, als sie zu zeigen. */
   function _suchAbruf(pfad, el, q) {
+    var plzJetzt = _wert('plz');
     return _api(pfad)
       .then(function (r) {
         /* Nur zeigen, wenn der Text seither nicht weitergewandert ist. */
         if (String(el.value || '').trim() !== q) return;
-        var namen = [];
+        var gesehen = {}, eigene = [], fremde = [];
         ((r && r.results) || []).forEach(function (x) {
-          var n = x.street || String(x.formatted || '').split(',')[0];
-          n = String(n || '').trim();
-          if (n && namen.indexOf(n) < 0) namen.push(n);
+          var n = String(x.street || String(x.formatted || '').split(',')[0] || '').trim();
+          if (!n) return;
+          var plz = String(x.postcode || '').trim();
+          var schl = n + '|' + plz;
+          if (gesehen[schl]) return;
+          gesehen[schl] = 1;
+          var e = { name: n, plz: plz, ort: String(x.city || '').trim() };
+          if (plz && plzJetzt && plz === plzJetzt) eigene.push(e); else fremde.push(e);
         });
-        _zeigen(namen);
+        _zeigen(eigene.concat(fremde));
       })
       .catch(function () { _schliessen(); });
   }

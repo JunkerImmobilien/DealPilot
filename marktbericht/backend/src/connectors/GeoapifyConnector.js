@@ -87,7 +87,7 @@ export const GeoapifyConnector = {
        Der Kreis ersetzt den Landesfilter; er liegt ohnehin in Deutschland. */
     const lat = parseFloat(opts.lat), lon = parseFloat(opts.lon);
     let radius = parseInt(opts.radius, 10);
-    if (!Number.isFinite(radius) || radius < 500 || radius > 50000) radius = 12000;
+    if (!Number.isFinite(radius) || radius < 500 || radius > 50000) radius = 9000;
     const mitKreis = Number.isFinite(lat) && Number.isFinite(lon);
     if (String(text).trim().length < (mitKreis ? 2 : 3)) return [];
     const url =
