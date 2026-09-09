@@ -9985,6 +9985,85 @@ dich …".
 
 **Commit** `v1277`. Auf Staging, **nicht auf Prod**.
 
+### `v1278`/`v1278b` · Inserat einlesen — der Weg, der bei jedem Portal geht
+
+Marcels Frage, mit einer echten IS24-Adresse: *„kriegen wir es hin, dass
+wir diese Seiten auslesen können?"*
+
+#### Erst gemessen, dann gebaut
+
+| von wo | IS24 | ImmoWelt | Immonet | meinestadt | Kleinanzeigen | willhaben |
+|---|---|---|---|---|---|---|
+| **Server** | 401 | 403 | 301 → ImmoWelt → 403 | Timeout | **200** | **200** |
+| **Browser** | **alles da** | — | — | — | — | — |
+
+Dieselbe IS24-Seite, im Browser geöffnet: **6.104 Zeichen** Text,
+`IS24.expose.baseRent = 850`, Fläche, Adresse, Ausstattung, JSON-LD,
+Open-Graph. Kein Block, kein Captcha.
+
+> **Die Portale blocken keine Nutzer, sie blocken Rechenzentren.** Unser
+> Server steht bei Hetzner — genau in den Netzen, die zuerst gesperrt
+> werden. Daran ändert kein Prompt und kein Kniff etwas.
+>
+> **Immonet gibt es nicht mehr:** die Domain leitet auf ImmoWelt um
+> (`x-sunset-redirect=imn`), und die blockt. Unsere Whitelist führte ein
+> totes Portal.
+
+#### Also nicht dagegen anrennen, sondern daneben vorbei
+
+Der Mensch hat die Seite ohnehin offen. **Strg+A, Strg+C, einfügen.** Kein
+Bot-Schutz greift, weil kein Bot abruft.
+
+Neue Kachel **„Inserat einfügen"** in der Pre-Flight-Leiste, zwei Wege im
+selben Fenster:
+
+1. **Text einfügen** — geht **immer**, auch bei IS24 und ImmoWelt.
+2. **Link einfügen** — schneller, wo er geht (Kleinanzeigen, willhaben).
+   Scheitert er, führt die Meldung ausdrücklich zum Text-Weg statt in eine
+   Sackgasse.
+
+Das Ergebnis läuft durch **dieselbe Import-Tabelle** wie Sprache und
+Exposé — gleiche Haken, gleicher Schreibweg, gleiche Warnung vor dem
+Überschreiben (`v1267`).
+
+#### Der Prompt musste den Fall kennen
+
+`extract-text` unterscheidet jetzt zwei Textarten: `antwort` (bis 4.000
+Zeichen, wie `v1273`) und **`inserat`** (bis 40.000) mit eigener
+Zusatzregel — es geht um **genau ein** Objekt, Navigation und „ähnliche
+Angebote" zählen nicht, Warmmiete ist nicht die Kaltmiete, Hausgeld ist
+keine Miete, und was nicht dasteht, wird weggelassen.
+
+> **`v1278b` kam aus der ersten Messung.** Baujahr, Energieklasse, Fläche,
+> Zimmer, PLZ und Ort kamen an — **die Kaltmiete nicht.** Portale stellen
+> den Betrag in eine eigene Zeile über das Wort: „850 €", darunter
+> „Kaltmiete 17 €/m²". Für einen Menschen offensichtlich, für ein Modell
+> ohne Hinweis mehrdeutig. Die Regel nennt den Fall jetzt beim Namen,
+> samt Gegenprobe (der Wert je Quadratmeter ist es nicht).
+
+#### Abnahme am echten Inserat (IS24, München-Feldmoching)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Kaltmiete | **850 €** ✓ |
+| Wohnfläche · Zimmer · Baujahr | **50 m² · 2 · 1972** ✓ |
+| PLZ · Ort · Energieklasse | **80935 · München · D** ✓ |
+| Kaufpreis | **kein Wert** — es ist ein Mietobjekt ✓ |
+| „Ähnliche Objekte" (95 m², 1.850 €, Bj 1998) | **nicht übernommen** ✓ |
+| Dauer · Kosten | **1,8 s · 0,14 Cent** |
+
+**Commits.** `v1278` (Kachel, Dialog, Modus) · `v1278b` (Kaltmiete-Regel).
+Backend auf Staging neu gebaut. **Nicht auf Prod.**
+
+> **Zwei Werkzeugfehler auf dem Weg, beide teuer genug zum Aufschreiben:**
+> Ein `awk`-Ersetzen mit **leerer** Bereichsvariable hat
+> `voiceExtractService.js` von 646 auf **2 Zeilen** eingedampft — `NR>=""`
+> ist wahr. Gerettet mit `git checkout --`, wie es die Regel vorsieht.
+> **Seitdem wird die Bereichsgrenze vor dem Ersetzen geprüft** (`test -gt`)
+> und die Zeilenzahl danach verglichen. Und: `awk` frisst `\u`-Escapes
+> („Inserat einf\ufffdgen") — Zeilen mit Escape-Sequenzen gehören per
+> `printf` erzeugt, nicht durch awk geschleust.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
