@@ -9602,6 +9602,36 @@ Gold-Audit auf Prod RC=0.
 > **Der Nummernkreis gilt auch auf Prod:** dort liegt ebenfalls ein
 > Demo-Objekt `2026-999`, das den Zähler auf vierstellige Nummern hebt.
 
+### `v1271` · Nach der Wahl blieb die Straßenliste stehen
+
+Marcels Befund beim Testen auf Prod: *„wenn ich die strasse ausgewählt habe
+bleibt leider das dropdown für strasse stehen obwohl ich das feld gewechselt
+habe."*
+
+**Ursache war das eigene Setzen.** `_setzen()` feuert ein `input`-Ereignis,
+damit `calc()` rechnet — und **derselbe** `input`-Handler startet die Suche
+erneut. Die Antwort kam 300 ms später zurück und riss die Liste wieder auf;
+da war der Fokus längst in der Hausnummer.
+
+> **Ein Handler, der auf Eingaben hört, hört auch die eigenen.** Wer einen
+> Feldwert programmatisch setzt und dabei ein Ereignis auslöst, muss damit
+> rechnen, dass er sich selbst antriggert.
+
+**Zwei Riegel:**
+
+1. Der eben gewählte Text löst **keine neue Suche** aus (`_gewaehlt`).
+2. `_zeigen()` öffnet die Liste **nur, wenn das Straßenfeld noch den Fokus
+   hat**. Das fängt jede spät eintreffende Antwort ab, egal woher sie kommt
+   — auch die, an die ich heute noch nicht gedacht habe.
+
+**Abnahme (Staging und Prod):** Auswahl → Liste zu, auch 3,2 s später;
+Straße übernommen, Fokus in der Hausnummer. Weitertippen öffnet die Liste
+wieder (Gegentest: „Hüll" → drei Treffer). Fokuswechsel während laufender
+Suche → Liste bleibt zu.
+
+**Commit** `d7939d6`, Prod von `124e6c1` auf `d7939d6`. Reine
+Frontend-Änderung, kein Rebuild, keine Migration.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
