@@ -1563,55 +1563,220 @@
       throw (err && err.name === 'AbortError') ? new Error('Zeit\u00fcberschreitung (180 s)') : err;
     });
   }
+  /* ═══════════════════════════════════════════════════════════════════
+     v1276 · FREISPRECHEN — das Mikrofon bleibt an
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Befund nach dem ersten Durchlauf: „Man muss jedes Mal auf
+     Sprechen klicken und dann fragt er wieder nach. Das wäre irgendwie
+     toll, wenn man das einfach bestehen lässt und dann die Frage
+     automatisch weitergeht."
+
+     Er hat recht: ein Gespräch, in dem man vor jeder Antwort einen Knopf
+     drückt, ist kein Gespräch. Es ist ein Formular mit Umweg.
+
+     Jetzt läuft das Mikrofon durch. Je Frage wird ein Abschnitt
+     aufgenommen; das Ende erkennt eine Pegelmessung, kein Klick:
+
+       1. Grundrauschen messen (die ersten 500 ms nach der Frage).
+          Schwelle = Rauschen x 2,5, mindestens 0,012. Eine feste Schwelle
+          taugt nicht - ein Laptoplüfter ist lauter als ein stiller Raum.
+       2. Warten, bis jemand SPRICHT (Pegel über Schwelle, 180 ms lang).
+       3. Danach warten, bis er FERTIG ist (Pegel unter Schwelle,
+          1400 ms lang). Kürzer wäre falsch: zwischen „vierhundert" und
+          „neunzig" liegt eine Pause.
+       4. Abschnitt auswerten, Ergebnis zeigen, nächste Frage - von selbst.
+
+     WARUM setInterval UND NICHT requestAnimationFrame: rAF steht still,
+     sobald der Tab in den Hintergrund geht. Wer beim Sprechen kurz ins
+     Exposé schaut, würde sonst mitten im Satz nicht mehr gehört.
+
+     WER LIEBER TIPPT, tippt: das Eingabefeld bleibt, und sobald jemand
+     hineinschreibt, hört die Automatik für diese Frage auf zu lauschen.
+     Der Schalter oben rechts hält sie ganz an.
+
+     EIN Stream, EIN MediaRecorder für den ganzen Dialog - nicht je Frage
+     neu. Jede getUserMedia-Anfrage ist eine Zäsur (Berechtigung, Anlauf,
+     verlorene erste Silbe). */
+  var _fs = {
+    an: true,        /* Freisprechen eingeschaltet? */
+    stream: null, ctx: null, analyser: null, daten: null,
+    rec: null, chunks: [], uhr: null,
+    phase: '',       /* 'ruhe' | 'rauschen' | 'warte' | 'spricht' | 'aus' */
+    rausch: 0, schwelle: 0.012, t0: 0, tSprach: 0, tStill: 0, aufnahme: false
+  };
+  var FS_MIN_SCHWELLE = 0.012, FS_SPRACHE_MS = 180, FS_STILLE_MS = 1400,
+      FS_RAUSCH_MS = 500, FS_GEDULD_MS = 30000, FS_MAX_MS = 25000;
+
+  function _fsPegel() {
+    if (!_fs.analyser || !_fs.daten) return 0;
+    _fs.analyser.getByteTimeDomainData(_fs.daten);
+    var summe = 0;
+    for (var i = 0; i < _fs.daten.length; i++) {
+      var v = (_fs.daten[i] - 128) / 128;
+      summe += v * v;
+    }
+    return Math.sqrt(summe / _fs.daten.length);
+  }
+
+  function _fsAus() {
+    try { if (_fs.uhr) { clearInterval(_fs.uhr); _fs.uhr = null; } } catch (e) {}
+    try { if (_fs.rec && _fs.rec.state === 'recording') { _fs.rec.onstop = null; _fs.rec.stop(); } } catch (e) {}
+    try { (_fs.stream ? _fs.stream.getTracks() : []).forEach(function (t) { t.stop(); }); } catch (e) {}
+    try { if (_fs.ctx && _fs.ctx.state !== 'closed') _fs.ctx.close(); } catch (e) {}
+    _fs.stream = null; _fs.ctx = null; _fs.analyser = null; _fs.rec = null;
+    _fs.phase = 'aus'; _fs.aufnahme = false;
+  }
+
+  /* Einmal öffnen, für den ganzen Dialog. */
+  function _fsStart() {
+    if (!_fs.an) return Promise.resolve(false);
+    if (_fs.stream) return Promise.resolve(true);
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+      return Promise.resolve(false);
+    }
+    return navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+      _fs.stream = stream;
+      try {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        _fs.ctx = new AC();
+        var src = _fs.ctx.createMediaStreamSource(stream);
+        _fs.analyser = _fs.ctx.createAnalyser();
+        _fs.analyser.fftSize = 1024;
+        _fs.daten = new Uint8Array(_fs.analyser.fftSize);
+        src.connect(_fs.analyser);
+      } catch (e) { _fs.analyser = null; }
+      var mime = (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/webm;codecs=opus'))
+        ? 'audio/webm;codecs=opus'
+        : ((MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/webm')) ? 'audio/webm' : '');
+      _fs.rec = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+      _fs.rec.ondataavailable = function (ev) { if (ev.data && ev.data.size) _fs.chunks.push(ev.data); };
+      return true;
+    }).catch(function () { return false; });
+  }
+
+  /* Für EINE Frage zuhören. Endet von selbst - durch Stille oder Geduld. */
+  function _fsHoeren() {
+    if (!_fs.an || !_fs.stream || !_fs.rec) return;
+    if (_fs.uhr) { clearInterval(_fs.uhr); _fs.uhr = null; }
+    _fs.chunks = [];
+    _fs.phase = 'rauschen'; _fs.rausch = 0; _fs.t0 = Date.now();
+    _fs.tSprach = 0; _fs.tStill = 0;
+    var proben = 0, summe = 0;
+    try { if (_fs.rec.state === 'inactive') { _fs.rec.start(); _fs.aufnahme = true; } } catch (e) { return; }
+    _fsHinweis('Ich höre zu — sprich einfach los.');
+
+    _fs.uhr = setInterval(function () {
+      if (!_rf || !_fs.an) { return; }
+      var p = _fsPegel(), jetzt = Date.now(), seit = jetzt - _fs.t0;
+
+      if (_fs.phase === 'rauschen') {
+        summe += p; proben++;
+        if (seit >= FS_RAUSCH_MS) {
+          _fs.rausch = proben ? summe / proben : 0;
+          _fs.schwelle = Math.max(FS_MIN_SCHWELLE, _fs.rausch * 2.5);
+          _fs.phase = 'warte';
+        }
+        return;
+      }
+
+      if (_fs.phase === 'warte') {
+        if (p > _fs.schwelle) {
+          if (!_fs.tSprach) _fs.tSprach = jetzt;
+          if (jetzt - _fs.tSprach >= FS_SPRACHE_MS) { _fs.phase = 'spricht'; _fs.tStill = 0;
+            _fsHinweis('… ich höre'); }
+        } else { _fs.tSprach = 0; }
+        /* Geduld: wer nicht spricht, wird nicht gedrängt - aber irgendwann
+           soll der Hinweis kommen, dass Tippen auch geht. */
+        if (seit > FS_GEDULD_MS) {
+          _fsHinweis('Ich höre nichts — du kannst auch tippen.');
+          _fs.t0 = jetzt;   /* Uhr zurückstellen, weiter lauschen */
+        }
+        return;
+      }
+
+      if (_fs.phase === 'spricht') {
+        if (p <= _fs.schwelle) {
+          if (!_fs.tStill) _fs.tStill = jetzt;
+          if (jetzt - _fs.tStill >= FS_STILLE_MS) { _fsAbschnittFertig(); return; }
+        } else { _fs.tStill = 0; }
+        /* Notbremse: eine Antwort auf eine gezielte Frage ist kurz. */
+        if (jetzt - _fs.t0 > FS_MAX_MS) { _fsAbschnittFertig(); }
+      }
+    }, 80);
+  }
+
+  function _fsStopHoeren() {
+    if (_fs.uhr) { clearInterval(_fs.uhr); _fs.uhr = null; }
+    _fs.phase = '';
+    try { if (_fs.rec && _fs.rec.state === 'recording') { _fs.rec.onstop = null; _fs.rec.stop(); _fs.aufnahme = false; } } catch (e) {}
+  }
+
+  function _fsAbschnittFertig() {
+    if (_fs.uhr) { clearInterval(_fs.uhr); _fs.uhr = null; }
+    _fs.phase = '';
+    if (!_fs.rec || _fs.rec.state !== 'recording') return;
+    var eintrag = _rf && _rf.offen[_rf.i];
+    _fs.rec.onstop = function () {
+      _fs.aufnahme = false;
+      var blob = new Blob(_fs.chunks, { type: _fs.rec.mimeType || 'audio/webm' });
+      _fs.chunks = [];
+      if (!_rf || !eintrag || _rf.offen[_rf.i] !== eintrag) return;   /* Frage inzwischen weiter */
+      if (!blob || blob.size < 1500) { _fsHinweis('Das war zu kurz — nochmal, oder tippen.'); _fsHoeren(); return; }
+      _rfMelden('Ich ordne das zu …', true);
+      blobToB64(blob).then(function (b64) {
+        return Auth.apiCall('/ai/extract-voice', {
+          method: 'POST',
+          body: { audio: b64, mime: blob.type, catalog: _rfKatalog(eintrag, _rf.catalog) }
+        });
+      }).then(function (r) {
+        if (!_rf || _rf.offen[_rf.i] !== eintrag) return;
+        if (r && r.transcript) {
+          try { console.log('[voice-import] Freisprech-Antwort:', r.transcript); } catch (x) {}
+          _fsGesagt(r.transcript);
+        }
+        _rfUebernehmen(r && r.fields, true);
+      }).catch(function (err) {
+        _rfMelden('⚠ ' + ((err && err.message) || 'Das hat gerade nicht geklappt.'));
+        _fsHoeren();
+      });
+    };
+    try { _fs.rec.stop(); } catch (e) {}
+  }
+
+  /* Was verstanden wurde, sichtbar machen - eine Antwort, die stumm
+     verschwindet, lässt einen ratlos zurück. */
+  function _fsGesagt(text) {
+    var e = $('vi-rf-gesagt');
+    if (e) e.textContent = '„' + String(text).slice(0, 160) + '"';
+  }
+  function _fsHinweis(text) {
+    var e = $('vi-rf-lausch');
+    if (e) e.textContent = text;
+  }
 
   /* ═══════════════════════════════════════════════════════════════════
-     v1273 · RUECKFRAGEN — der Co-Pilot fragt nach, was fehlt
+     v1276 · DER DIALOG — Chat-Verlauf, Freisprechen, alle Felder
      ═══════════════════════════════════════════════════════════════════
-     Marcels Punkt 5: „Chatbot-Dialog statt Monolog." Demo und Konzept
-     liegen in design/Vorschlaege/sprechlauf-dialog-*.
+     Marcels drei Befunde nach dem ersten Durchlauf:
 
-     Der Bruch war zwischen Auswertung und Tabelle: Wer etwas vergisst,
-     erfaehrt es erst dort - als fehlende Zeile. Niemand fragt nach.
+     1. „Man muss jedes Mal auf Sprechen klicken." Ein Gespräch, in dem man
+        vor jeder Antwort einen Knopf drückt, ist kein Gespräch - es ist
+        ein Formular mit Umweg. Das Mikrofon bleibt jetzt an; das Ende
+        einer Antwort erkennt eine Pegelmessung, kein Klick.
+     2. „Kannst du Variante A umsetzen aus der Demo." Die Demo zeigte einen
+        CHAT-Verlauf mit Blasen, die Umsetzung war eine Fragekarte, die
+        sich selbst überschreibt. Jetzt bleibt stehen, was gesagt wurde -
+        beim Freisprechen ist genau das der Beweis, dass richtig verstanden
+        wurde.
+     3. „Wir haben irgendwie auch nur acht Felder drin." Stimmt. Jetzt
+        18 Blöcke über alle 31 Katalogfelder (siehe RFRAGEN).
 
-     Jetzt liegt dazwischen ein Zustand: bis zu DREI gezielte Fragen nach
-     dem, was fuer die Rechnung fehlt. Beantwortbar per Tippen oder per
-     kurzer Aufnahme.
-
-     WELCHE FRAGE, IN WELCHER REIHENFOLGE: nach Gewicht fuer die Rechnung,
-     nicht nach Reihenfolge im Formular. Ohne Kaufpreis gibt es keine
-     einzige Kennzahl, ohne Miete keinen Cashflow. Die zwoelf Pflichtfelder
-     stehen als `label.dp-required` im DOM (gemessen 09.09.2026); die
-     Adresse wird als EIN Block gefragt - vier Einzelfragen nach Strasse,
-     Hausnummer, PLZ und Ort waeren ein Verhoer.
-
-     DREI REGELN:
-     1. Gefragt wird nur, was WIRKLICH fehlt - weder im Auswertungsergebnis
-        noch im Formular. Ein Feld, das der Nutzer vorhin selbst getippt
-        hat, ist keine Luecke.
-     2. Hoechstens DREI Fragen. Mehr liest niemand, und der Weg zur Tabelle
-        darf nie laenger werden als der Nutzen.
-     3. „Weiss ich nicht" beendet eine Frage endgueltig. Ein Assistent, der
-        nicht aufhoeren kann, wird abgeschaltet.
-
-     KOSTEN: eine getippte Antwort kostet NUR die Extraktion auf einem
-     Katalog von ein bis vier Feldern - keine Transkription. Gesprochen
-     kommen 3 bis 8 Sekunden Audio dazu. Beides liegt weit unter dem, was
-     die Aufnahme selbst kostet. */
-  var RFRAGEN = [
-    { ids: ['kp'],                         frage: 'Was soll das Objekt kosten?' },
-    { ids: ['nkm'],                        frage: 'Was kommt an Nettokaltmiete im Monat rein?' },
-    { ids: ['wfl'],                        frage: 'Wie groß ist die Wohnfläche?' },
-    { ids: ['plz', 'ort', 'str', 'hnr'],   frage: 'Wo steht das Objekt? Straße, Hausnummer, PLZ und Ort.' },
-    { ids: ['baujahr'],                    frage: 'Aus welchem Jahr stammt das Gebäude?' },
-    { ids: ['d1z'], vorbelegt: 1,             frage: 'Zu welchem Zinssatz finanzierst du?' },
-    { ids: ['d1t'], vorbelegt: 1,             frage: 'Wie hoch ist die anfängliche Tilgung?' },
-    { ids: ['ds2_zustand'],                frage: 'In welchem Zustand ist die Wohnung?' }
-  ];
+     Der Ablauf ist in beiden Wegen derselbe: nach dem freien Diktat als
+     Lückenfüller (höchstens drei Fragen, nach `rang` sortiert), im
+     geführten Weg über alles. */
   var RF_MAX = 3;
-  var _rf = null;   /* { offen:[], i:0, data:{}, catalog:[], OA:{} } */
+  var _rf = null;   /* { offen:[], i:0, data:{}, catalog:[], OA:{}, alle:bool } */
 
-  /* Fehlt der Eintrag wirklich? Ein Feld gilt als vorhanden, wenn die
-     Auswertung es gefunden hat ODER im Formular schon etwas steht. */
   function _rfFehlt(eintrag, fields) {
     for (var i = 0; i < eintrag.ids.length; i++) {
       var id = eintrag.ids[i];
@@ -1622,14 +1787,20 @@
          als Wert im Formular, gesetzt vom Investmentprofil (V63.76). Nach
          der urspruenglichen Regel „was im Formular steht, ist keine Luecke"
          galten sie als beantwortet, und die Rechnung haette stillschweigend
-         mit einer Vorbelegung gerechnet, die niemand bestaetigt hat.
-         Jetzt wird gefragt - aber mit dem Vorschlag im Text und einem
-         Knopf, der ihn mit einem Klick bestaetigt. Das ist der Unterschied
-         zwischen „einen Wert annehmen" und „einen Wert vorschlagen". */
+         mit einer Vorbelegung gerechnet, die niemand bestaetigt hat. */
       var da = eintrag.vorbelegt ? gesagt : (gesagt || fieldHasValue(id));
       if (!da) return true;   /* eine Luecke im Block genuegt */
     }
     return false;
+  }
+
+  /* v1276: Bei nur drei Fragen entscheidet die Reihenfolge, ob die
+     wichtigste dabei ist. Deshalb hier nach `rang` (Gewicht fuer die
+     Rechnung), nicht nach Listenreihenfolge (Erzaehl-Logik). */
+  function _rfLuecken(fields) {
+    var offen = RFRAGEN.filter(function (e) { return _rfFehlt(e, fields); });
+    offen.sort(function (a, b) { return (a.rang || 99) - (b.rang || 99); });
+    return offen.slice(0, RF_MAX);
   }
 
   /* Was steht gerade im Formular? Fuer den „Passt so"-Knopf. */
@@ -1640,9 +1811,8 @@
     return v || null;
   }
 
-  /* v1273d: derselbe Wert, nur lesbar. „3.5" ist eine Zahl aus einem
-     Eingabefeld, „3,5 %" ist eine Angabe. Die Einheit kommt aus dem Label
-     des Feldes - steht dort ein Prozentzeichen, gehoert es an den Wert. */
+  /* Derselbe Wert, nur lesbar. „3.5" ist eine Zahl aus einem Eingabefeld,
+     „3,5 %" ist eine Angabe. */
   function _rfLesbar(wert, eintrag) {
     var v = String(wert).replace('.', ',');
     var kat = (_rf && _rf.catalog || []).filter(function (c) { return c.id === eintrag.ids[0]; })[0];
@@ -1650,16 +1820,8 @@
     return v;
   }
 
-  function _rfLuecken(fields) {
-    var out = [];
-    for (var i = 0; i < RFRAGEN.length && out.length < RF_MAX; i++) {
-      if (_rfFehlt(RFRAGEN[i], fields)) out.push(RFRAGEN[i]);
-    }
-    return out;
-  }
-
-  /* Mini-Katalog: nur die gefragten Felder. Das ist der halbe Kostenvorteil
-     - der volle Katalog traegt ueber 6000 Token, dieser hier keine 60. */
+  /* Mini-Katalog: nur die gefragten Felder. Das ist der halbe
+     Kostenvorteil - der volle Katalog traegt ueber 6000 Token. */
   function _rfKatalog(eintrag, catalog) {
     return (catalog || []).filter(function (e) { return eintrag.ids.indexOf(e.id) >= 0; });
   }
@@ -1669,12 +1831,45 @@
     var s = document.createElement('style');
     s.id = 'vi-rf-stil';
     s.textContent = [
-      '#vi-frage{padding:4px 2px 2px}',
+      '#vi-frage{padding:2px 2px 0}',
+      '.vi-rf-kopfzeile{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}',
       '.vi-rf-kopf{font:700 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;',
-      '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);margin-bottom:10px}',
-      '.vi-rf-fund{font:400 13px/1.5 Inter,system-ui,sans-serif;opacity:.8;margin-bottom:16px}',
-      '.vi-rf-frage{font:600 19px/1.35 "Space Grotesk",system-ui,sans-serif;margin:0 0 4px}',
-      '.vi-rf-zaehler{font:600 11px/1 "JetBrains Mono",monospace;opacity:.55;margin-bottom:16px}',
+      '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C)}',
+      '.vi-rf-fs{display:flex;align-items:center;gap:7px;cursor:pointer;',
+      '  font:600 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;opacity:.75}',
+      '.vi-rf-fs input{accent-color:var(--wl-c9a84c, #C9A84C)}',
+      /* Der Verlauf. Feste Hoehe, damit das Fenster beim Wachsen nicht springt. */
+      '.vi-rf-chat{height:268px;overflow-y:auto;display:flex;flex-direction:column;gap:11px;',
+      '  padding:2px 4px 2px 2px}',
+      '.vi-rf-blase{max-width:82%;padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.45;',
+      '  animation:viRfAuf .3s ease both}',
+      '@keyframes viRfAuf{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}',
+      '.vi-rf-co{align-self:flex-start;background:rgba(255,255,255,.055);border-top-left-radius:5px;',
+      '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 26%, transparent)}',
+      '.vi-rf-ich{align-self:flex-end;border-top-right-radius:5px;',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);',
+      '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent)}',
+      '.vi-rf-wer{font:700 9px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;',
+      '  text-transform:uppercase;margin-bottom:6px;opacity:.65}',
+      '.vi-rf-co .vi-rf-wer{color:var(--wl-c9a84c, #C9A84C);opacity:.85}',
+      '.vi-rf-ich .vi-rf-wer{text-align:right}',
+      '.vi-rf-treffer{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.14);',
+      '  font:600 11.5px/1.5 "JetBrains Mono",ui-monospace,monospace;color:#3FA56C}',
+      '.vi-rf-zaehler{font:600 10.5px/1 "JetBrains Mono",monospace;opacity:.5;margin-top:7px}',
+      '.vi-rf-denkt{align-self:flex-start;opacity:.55;font-size:13px;padding:2px}',
+      '.vi-rf-denkt i{display:inline-block;width:5px;height:5px;border-radius:50%;',
+      '  background:var(--wl-c9a84c, #C9A84C);margin-right:3px;animation:viRfPp 1.1s infinite}',
+      '.vi-rf-denkt i:nth-child(2){animation-delay:.18s}.vi-rf-denkt i:nth-child(3){animation-delay:.36s}',
+      '@keyframes viRfPp{0%,60%,100%{opacity:.25}30%{opacity:1}}',
+      /* Fuss: Lauschzeile und Eingabe */
+      '.vi-rf-lausch{min-height:16px;margin:10px 2px 6px;font:400 12px/1.3 Inter,system-ui,sans-serif;',
+      '  opacity:.6;display:flex;align-items:center;gap:7px}',
+      '.vi-rf-welle{display:inline-flex;align-items:flex-end;gap:2px;height:12px}',
+      '.vi-rf-welle i{width:2px;background:var(--wl-c9a84c, #C9A84C);border-radius:1px;height:3px;',
+      '  animation:viRfW .9s ease-in-out infinite}',
+      '.vi-rf-welle i:nth-child(2){animation-delay:.15s}.vi-rf-welle i:nth-child(3){animation-delay:.3s}',
+      '.vi-rf-welle i:nth-child(4){animation-delay:.45s}',
+      '@keyframes viRfW{0%,100%{height:3px}50%{height:12px}}',
       '.vi-rf-zeile{display:flex;gap:8px;align-items:stretch}',
       '.vi-rf-zeile input{flex:1;min-width:0;border-radius:11px;padding:11px 14px;',
       '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);',
@@ -1685,14 +1880,11 @@
       '  background:transparent;color:var(--wl-c9a84c, #C9A84C);',
       '  font:600 12px "JetBrains Mono",ui-monospace,monospace}',
       '.vi-rf-btn:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent)}',
-      '.vi-rf-btn.an{background:#B8625C;border-color:#B8625C;color:#fff}',
-      '.vi-rf-neben{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}',
+      '.vi-rf-neben{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}',
       '.vi-rf-neben button{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);',
       '  color:inherit;opacity:.75;border-radius:9px;padding:7px 12px;cursor:pointer;',
       '  font:400 12.5px Inter,system-ui,sans-serif}',
-      '.vi-rf-neben button:hover{opacity:1}',
-      '.vi-rf-echo{margin-top:14px;font:600 12.5px/1.5 "JetBrains Mono",monospace;color:#3FA56C}',
-      '.vi-rf-warte{margin-top:14px;font:400 13px Inter,sans-serif;opacity:.6}'
+      '.vi-rf-neben button:hover{opacity:1}'
     ].join('');
     document.head.appendChild(s);
   }
@@ -1711,76 +1903,121 @@
     return h;
   }
 
-  function _rfZeichnen() {
-    var h = _rfHost();
-    var e = _rf.offen[_rf.i];
-    var gefunden = Object.keys(_rf.data.fields || {}).length;
-    var vorschlag = _rfVorschlag(e);
-    h.innerHTML =
-      /* v1275: im gefuehrten Weg gab es keine Aufnahme davor - „Ich habe 0
-         Angaben aus deiner Aufnahme gelesen" waere dort schlicht falsch. */
-      '<div class="vi-rf-kopf">' + (_rf.alle ? 'Der Co-Pilot fragt' : 'Noch eine Frage') + '</div>' +
-      '<div class="vi-rf-fund">' + (_rf.alle
-        ? 'Ich gehe die Angaben der Reihe nach durch — <b>' + _rf.offen.length + '</b> insgesamt. ' +
-          'Was du nicht weißt, überspringen wir.'
-        : 'Ich habe <b>' + gefunden + ' Angaben</b> aus deiner Aufnahme gelesen. ' +
-          (_rf.offen.length === 1 ? 'Für die Rechnung fehlt mir noch eine.'
-                                  : 'Für die Rechnung fehlen mir noch ' + _rf.offen.length + '.')) + '</div>' +
-      '<div class="vi-rf-frage">' + escH(e.frage) + '</div>' +
-      '<div class="vi-rf-zaehler">' + (_rf.i + 1) + ' von ' + _rf.offen.length + '</div>' +
-      '<div class="vi-rf-zeile">' +
-        '<input id="vi-rf-in" placeholder="Antwort tippen …" autocomplete="off">' +
-        '<button type="button" class="vi-rf-btn" id="vi-rf-mic">\u{1F3A4} Sprechen</button>' +
-        '<button type="button" class="vi-rf-btn" id="vi-rf-ok">Übernehmen</button>' +
-      '</div>' +
-      '<div class="vi-rf-neben">' +
-        (vorschlag ? '<button type="button" id="vi-rf-passt">Passt so (' + escH(_rfLesbar(vorschlag, e)) + ')</button>' : '') +
-        '<button type="button" id="vi-rf-nix">Weiß ich nicht</button>' +
-        '<button type="button" id="vi-rf-ende">Fertig — zur Übersicht</button>' +
-      '</div>' +
-      '<div class="vi-rf-echo" id="vi-rf-echo"></div>';
-    h.style.display = '';
-    var inp = $('vi-rf-in');
-    if (inp) {
-      inp.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); _rfSenden(); } });
-      try { inp.focus(); } catch (ex) {}
-    }
-    $('vi-rf-ok').addEventListener('click', _rfSenden);
-    $('vi-rf-mic').addEventListener('click', _rfSprechen);
-    $('vi-rf-nix').addEventListener('click', function () { _rfWeiter(); });
-    $('vi-rf-ende').addEventListener('click', function () { _rfFertig(); });
-    /* v1273c: den Vorschlag bestaetigen kostet KEINEN KI-Aufruf - der Wert
-       steht ja schon im Feld. Er wandert trotzdem in die Tabelle, damit in
-       der Uebersicht steht, was uebernommen wurde. */
-    var pb = $('vi-rf-passt');
-    if (pb) pb.addEventListener('click', function () {
-      var v = _rfVorschlag(e);
-      if (v) { _rf.data.fields[e.ids[0]] = v; _rfMelden('✓ Übernommen: ' + escH(_rfLesbar(v, e))); }
-      setTimeout(_rfWeiter, 700);
-    });
+  /* ── Der Verlauf ─────────────────────────────────────────────────── */
+  function _rfBlase(wer, html, treffer) {
+    var chat = $('vi-rf-chat'); if (!chat) return null;
+    var d = document.createElement('div');
+    d.className = 'vi-rf-blase ' + (wer === 'co' ? 'vi-rf-co' : 'vi-rf-ich');
+    d.innerHTML = '<div class="vi-rf-wer">' + (wer === 'co' ? 'Co-Pilot' : 'Du') + '</div>' + html +
+      (treffer ? '<div class="vi-rf-treffer">✓ ' + treffer + '</div>' : '');
+    chat.appendChild(d);
+    chat.scrollTop = chat.scrollHeight;
+    return d;
+  }
+
+  function _rfDenkt(an) {
+    var chat = $('vi-rf-chat'); if (!chat) return;
+    var alt = chat.querySelector('.vi-rf-denkt');
+    if (!an) { if (alt) alt.remove(); return; }
+    if (alt) return;
+    var d = document.createElement('div');
+    d.className = 'vi-rf-denkt';
+    d.innerHTML = '<i></i><i></i><i></i> einen Moment …';
+    chat.appendChild(d);
+    chat.scrollTop = chat.scrollHeight;
   }
 
   function _rfMelden(text, warte) {
-    var e = $('vi-rf-echo'); if (!e) return;
-    e.className = warte ? 'vi-rf-warte' : 'vi-rf-echo';
-    e.innerHTML = text;
+    _rfDenkt(!!warte);
+    if (!warte && text) _fsHinweis(text);
+  }
+
+  /* ── Aufbau der Ansicht (einmal je Dialog) ───────────────────────── */
+  function _rfAufbau() {
+    var h = _rfHost();
+    h.innerHTML =
+      '<div class="vi-rf-kopfzeile">' +
+        '<span class="vi-rf-kopf">' + (_rf.alle ? 'Der Co-Pilot fragt' : 'Noch offen') + '</span>' +
+        '<label class="vi-rf-fs"><input type="checkbox" id="vi-rf-fs" checked> Freisprechen</label>' +
+      '</div>' +
+      '<div class="vi-rf-chat" id="vi-rf-chat"></div>' +
+      '<div class="vi-rf-lausch" id="vi-rf-lausch"></div>' +
+      '<div class="vi-rf-zeile">' +
+        '<input id="vi-rf-in" placeholder="Antwort tippen …" autocomplete="off">' +
+        '<button type="button" class="vi-rf-btn" id="vi-rf-ok">Übernehmen</button>' +
+      '</div>' +
+      '<div class="vi-rf-neben">' +
+        '<button type="button" id="vi-rf-nix">Weiß ich nicht</button>' +
+        '<button type="button" id="vi-rf-passt" style="display:none"></button>' +
+        '<button type="button" id="vi-rf-ende">Fertig — zur Übersicht</button>' +
+      '</div>' +
+      '<div id="vi-rf-gesagt" style="display:none"></div>';
+    h.style.display = '';
+
+    var inp = $('vi-rf-in');
+    inp.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); _rfSenden(); } });
+    /* Wer tippt, will nicht gleichzeitig belauscht werden. */
+    inp.addEventListener('input', function () { if (inp.value.trim()) _fsStopHoeren(); });
+    $('vi-rf-ok').addEventListener('click', _rfSenden);
+    $('vi-rf-nix').addEventListener('click', function () { _rfUeberspringen(); });
+    $('vi-rf-ende').addEventListener('click', function () { _rfFertig(); });
+    $('vi-rf-passt').addEventListener('click', function () {
+      var e = _rf.offen[_rf.i], v = _rfVorschlag(e);
+      _fsStopHoeren();
+      if (v) {
+        _rf.data.fields[e.ids[0]] = v;
+        _rfBlase('ich', 'Passt so.');
+        _rfBlase('co', 'Übernommen.', _rfLesbar(v, e));
+      }
+      _rfWeiter();
+    });
+    $('vi-rf-fs').addEventListener('change', function () {
+      _fs.an = this.checked;
+      if (_fs.an) { _fsStart().then(function (ok) { if (ok) _fsHoeren(); else _fsHinweis('Mikrofon nicht verfügbar — bitte tippen.'); }); }
+      else { _fsStopHoeren(); _fsAus(); _fsHinweis(''); }
+    });
+  }
+
+  /* ── Eine Frage stellen ──────────────────────────────────────────── */
+  function _rfFrage() {
+    if (_rf.i >= _rf.offen.length) return _rfFertig();
+    var e = _rf.offen[_rf.i];
+    _rfBlase('co', escH(e.frage) +
+      '<div class="vi-rf-zaehler">Frage ' + (_rf.i + 1) + ' von ' + _rf.offen.length + '</div>');
+    var v = _rfVorschlag(e), pb = $('vi-rf-passt');
+    if (pb) {
+      if (v) { pb.textContent = 'Passt so (' + _rfLesbar(v, e) + ')'; pb.style.display = ''; }
+      else { pb.style.display = 'none'; }
+    }
+    var inp = $('vi-rf-in');
+    if (inp) { inp.value = ''; inp.disabled = false; try { inp.focus(); } catch (ex) {} }
+    if (_fs.an && _fs.stream) _fsHoeren();
   }
 
   function _rfWeiter() {
+    _fsStopHoeren();
     _rf.i++;
     if (_rf.i >= _rf.offen.length) return _rfFertig();
-    _rfZeichnen();
+    _rfFrage();
+  }
+
+  function _rfUeberspringen() {
+    _fsStopHoeren();
+    _rfBlase('ich', 'Weiß ich nicht.');
+    _rfBlase('co', 'Gut — das lasse ich leer.');
+    _rfWeiter();
   }
 
   function _rfFertig() {
+    _fsStopHoeren(); _fsAus();
     var h = $('vi-frage'); if (h) h.style.display = 'none';
-    _rfStopKurz();
     showResults(_rf.OA, _rf.data, _rf.catalog);
     _rf = null;
   }
 
   /* Antwort verarbeiten - egal ob getippt oder gesprochen. */
-  function _rfUebernehmen(neu) {
+  function _rfUebernehmen(neu, ausSprache) {
+    _rfDenkt(false);
     var e = _rf.offen[_rf.i];
     var namen = [];
     Object.keys(neu || {}).forEach(function (id) {
@@ -1792,107 +2029,67 @@
       namen.push((kat ? kat.label : id) + ' = ' + v);
     });
     if (!namen.length) {
-      _rfMelden('⚠ Daraus konnte ich nichts entnehmen — nochmal, oder überspringen.');
+      _rfBlase('co', 'Daraus konnte ich nichts entnehmen — sag es gern nochmal oder tippe es.');
+      if (ausSprache && _fs.an) _fsHoeren();
       return;
     }
-    _rfMelden('✓ ' + namen.join(' · '));
-    setTimeout(_rfWeiter, 900);
+    _rfBlase('co', 'Notiert.', namen.join(' · '));
+    setTimeout(_rfWeiter, 650);
   }
 
   function _rfSenden() {
     var inp = $('vi-rf-in'); if (!inp) return;
     var text = String(inp.value || '').trim();
     if (!text) return;
-    if (/^(wei(ss|ß) ich nicht|keine ahnung|nichts|\-)$/i.test(text)) return _rfWeiter();
+    _fsStopHoeren();
+    if (/^(wei(ss|ß) ich nicht|keine ahnung|nichts|\-)$/i.test(text)) { inp.value = ''; return _rfUeberspringen(); }
     var e = _rf.offen[_rf.i];
-    inp.disabled = true;
-    _rfMelden('Ich ordne das zu …', true);
+    inp.value = ''; inp.disabled = true;
+    _rfBlase('ich', escH(text));
+    _rfMelden('', true);
     Auth.apiCall('/ai/extract-text', {
       method: 'POST',
       body: { text: text, catalog: _rfKatalog(e, _rf.catalog) }
     }).then(function (r) {
       inp.disabled = false;
-      _rfUebernehmen(r && r.fields);
+      _rfUebernehmen(r && r.fields, false);
     }).catch(function (err) {
       inp.disabled = false;
-      _rfMelden('⚠ ' + ((err && err.message) || 'Das hat gerade nicht geklappt.'));
+      _rfDenkt(false);
+      _rfBlase('co', '⚠ ' + escH((err && err.message) || 'Das hat gerade nicht geklappt.'));
     });
   }
 
-  /* ── Kurzaufnahme fuer EINE Antwort ────────────────────────────────
-     Eigener Recorder, unabhaengig von `st`: die Hauptaufnahme ist zu
-     diesem Zeitpunkt beendet und das Mikrofon frei. Laeuft hoechstens
-     20 Sekunden - eine Antwort auf eine gezielte Frage ist kurz, und ein
-     Aufnahmeknopf, den man versehentlich laufen laesst, kostet Geld. */
-  var _kurz = { rec: null, stream: null, chunks: [], timer: null };
-
-  function _rfStopKurz() {
-    try { if (_kurz.timer) { clearTimeout(_kurz.timer); _kurz.timer = null; } } catch (e) {}
-    try { if (_kurz.rec && _kurz.rec.state !== 'inactive') _kurz.rec.stop(); } catch (e) {}
-    try { (_kurz.stream ? _kurz.stream.getTracks() : []).forEach(function (t) { t.stop(); }); } catch (e) {}
-    _kurz.rec = null; _kurz.stream = null;
-  }
-
-  function _rfSprechen() {
-    var btn = $('vi-rf-mic');
-    if (_kurz.rec && _kurz.rec.state === 'recording') { _kurz.rec.stop(); return; }
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      _rfMelden('⚠ Dieser Browser kann nicht aufnehmen — bitte tippen.');
-      return;
-    }
-    _rfMelden('Höre zu … nochmal drücken zum Beenden.', true);
-    if (btn) { btn.textContent = '■ Stopp'; btn.classList.add('an'); }
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
-      _kurz.stream = stream; _kurz.chunks = [];
-      var mime = (window.MediaRecorder && MediaRecorder.isTypeSupported &&
-                  MediaRecorder.isTypeSupported('audio/webm')) ? 'audio/webm' : '';
-      _kurz.rec = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
-      _kurz.rec.ondataavailable = function (ev) { if (ev.data && ev.data.size) _kurz.chunks.push(ev.data); };
-      _kurz.rec.onstop = function () {
-        if (btn) { btn.textContent = '\u{1F3A4} Sprechen'; btn.classList.remove('an'); }
-        var blob = new Blob(_kurz.chunks, { type: _kurz.rec.mimeType || 'audio/webm' });
-        _rfStopKurz();
-        if (!blob || blob.size < 1200) { _rfMelden('⚠ Nichts gehört — nochmal, oder tippen.'); return; }
-        _rfMelden('Ich höre hin …', true);
-        var e = _rf.offen[_rf.i];
-        blobToB64(blob).then(function (b64) {
-          return Auth.apiCall('/ai/extract-voice', {
-            method: 'POST',
-            body: { audio: b64, mime: blob.type, catalog: _rfKatalog(e, _rf.catalog) }
-          });
-        }).then(function (r) {
-          if (r && r.transcript) { try { console.log('[voice-import] Rueckfrage-Antwort:', r.transcript); } catch (x) {} }
-          _rfUebernehmen(r && r.fields);
-        }).catch(function (err) {
-          _rfMelden('⚠ ' + ((err && err.message) || 'Das hat gerade nicht geklappt.'));
-        });
-      };
-      _kurz.rec.start();
-      _kurz.timer = setTimeout(function () {
-        try { if (_kurz.rec && _kurz.rec.state === 'recording') _kurz.rec.stop(); } catch (e) {}
-      }, 20000);
-    }).catch(function (err) {
-      if (btn) { btn.textContent = '\u{1F3A4} Sprechen'; btn.classList.remove('an'); }
-      _rfMelden('⚠ Mikrofon nicht verfügbar (' + ((err && err.name) || err) + ') — bitte tippen.');
-    });
-  }
-
-  /* Einstieg: nach der Auswertung, vor der Tabelle. */
+  /* Einstieg: nach der Auswertung (Lücken) oder von Anfang an (geführt). */
   function rueckfragen(OA, data, catalog, alle) {
     var fields = (data && data.fields) || {};
-    /* v1275: `alle` ist der gefuehrte Weg - dann wird nicht nach LUECKEN
-       gefragt, sondern der Reihe nach durch alles, was noch nicht steht.
-       Der Deckel von drei Fragen gilt dort nicht: wer „Frag mich durch"
-       waehlt, hat genau darum gebeten. */
     var luecken = alle
       ? RFRAGEN.filter(function (e) { return _rfFehlt(e, fields); })
       : _rfLuecken(fields);
-    if (!luecken.length) return showResults(OA, data, catalog);   /* nichts offen - direkt zur Tabelle */
+    if (!luecken.length) return showResults(OA, data, catalog);   /* nichts offen */
     _rf = { offen: luecken, i: 0, data: data, catalog: catalog, OA: OA, alle: !!alle };
     if (!_rf.data.fields) _rf.data.fields = {};
     var rec = $('vi-rec'); if (rec) rec.style.display = 'none';
     var nx = $('vi-next'); if (nx) nx.style.display = 'none';
-    _rfZeichnen();
+    _rfAufbau();
+
+    var gefunden = Object.keys(_rf.data.fields).length;
+    _rfBlase('co', alle
+      ? 'Ich gehe die Angaben der Reihe nach durch — <b>' + luecken.length + '</b> Fragen. ' +
+        'Sprich einfach los, ich höre mit. Was du nicht weißt, überspringen wir.'
+      : 'Ich habe <b>' + gefunden + ' Angaben</b> aus deiner Aufnahme gelesen. ' +
+        (luecken.length === 1 ? 'Für die Rechnung fehlt mir noch eine.'
+                              : 'Für die Rechnung fehlen mir noch ' + luecken.length + '.'));
+
+    _fs.an = true;
+    _fsStart().then(function (ok) {
+      if (!ok) {
+        var s = $('vi-rf-fs'); if (s) { s.checked = false; s.disabled = true; }
+        _fs.an = false;
+        _fsHinweis('Mikrofon nicht verfügbar — tippe deine Antworten.');
+      }
+      _rfFrage();
+    });
   }
 
   /* Ergebnisse in die ECHTE Import-Tabelle (gleiche Optik, gleicher Schreibweg) */
