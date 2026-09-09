@@ -9567,6 +9567,41 @@ wer nichts anklickt, behält seinen Text.
 `v1270c`, `v1270d`. **mb-Backend dreimal neu gebaut** (der Code liegt im
 Image). Alles auf Staging, **nicht auf Prod**.
 
+### Prod-Rollout 09.09.2026 · `v1265`–`v1270d`
+
+Marcels Freigabe: „ja" / „ich erlaube dir den zugriff hau rein".
+
+Merge `124e6c1`, Prod von `b0e7976` auf `124e6c1`. **Keine Migration**,
+Haupt-Backend unverändert — nur `mb-backend` neu gebaut (Geoapify-Connector
+und Route). Beide Datenbanken vorher gesichert (`haupt-20260909-0727.sql.gz`
+11 MB, `mb-20260909-0727.sql.gz` 685 KB, Anfang beider Dateien angesehen).
+Gold-Audit auf Prod RC=0.
+
+**Auf Prod nachgemessen, nicht behauptet:**
+
+| Prüfung | Ergebnis |
+|---|---|
+| Dateistände | `storage v1268` · `newobj-fixes v1268c` · `adress-autocomplete v1270d` · `style v1269` |
+| Drei Einstiege in der Zeile | Objekt anlegen · Quick-Check · Marktbericht |
+| „32609" getippt | Ort **Hüllhorst** von selbst |
+| „Herm" im Straßenfeld | **Hermannstraße** (eigene PLZ) oben, Nachbarorte benannt, Liste 5 px unter dem Feld |
+| BORIS-Knopf | **90 €/m², Stichtag 01.01.2026, Zone 167, BORIS-NRW** |
+| Ein Klick auf „Objekt anlegen" | **genau ein** Objekt |
+
+> **Testnutzer auf Prod: keine.** `SELECT count(*) … LIKE '%@dealpilot.test'`
+> ergibt **0** bei 14 Nutzern — die Prüfläufe liefen alle auf Staging. Damit
+> ist die offene Frage aus dem ersten Teil beantwortet.
+
+> **Ein leeres Testobjekt `2026-001` steht noch auf Prod** — angelegt beim
+> Nachmessen des Doppel-Anlage-Fixes. Das Löschen in Produktion wurde
+> blockiert; es gehört per „×" auf der Karte weg. Getipptes ist **nirgends**
+> gelandet: kein Objekt trägt Hüllhorst, die beiden Bestandsobjekte
+> (`2026-999` Dealhausen, `2026-1000` leer) sind seit dem 13.08. unverändert.
+> Genau das ist der neue Riegel aus `v1268` bei der Arbeit.
+
+> **Der Nummernkreis gilt auch auf Prod:** dort liegt ebenfalls ein
+> Demo-Objekt `2026-999`, das den Zähler auf vierstellige Nummern hebt.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

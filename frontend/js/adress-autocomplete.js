@@ -29,6 +29,9 @@
 
   var BOX_ID = 'dp-adr-box';
   var _timer = null, _plzTimer = null, _treffer = [], _aktiv = -1, _plzMerker = '';
+  /* v1271: zuletzt aus der Liste gewaehlter Strassenname - er darf keine
+     neue Suche ausloesen. */
+  var _gewaehlt = '';
   /* v1270b: Koordinaten der Postleitzahl. Sie sind der Ortsbezug fuer die
      Strassensuche - der ORTSNAME im Suchtext taugt dafuer nicht, siehe
      Kommentar bei _strSuchen. { plz, lat, lon } oder null. */
@@ -118,8 +121,22 @@
 
   function _schliessen() { var b = _el(BOX_ID); if (b) b.hidden = true; _aktiv = -1; }
 
+  /* ═══ v1271 · Nach der Wahl bleibt die Liste zu ══════════════════════
+     Marcels Befund: "wenn ich die strasse ausgewählt habe bleibt leider das
+     dropdown stehen obwohl ich das feld gewechselt habe."
+
+     Ursache war das eigene Setzen: _setzen() feuert ein input-Event, damit
+     calc() rechnet - und derselbe input-Handler startet die Suche erneut.
+     Die Antwort kam 300 ms spaeter zurueck und riss die Liste wieder auf,
+     da war der Fokus laengst in der Hausnummer.
+
+     Zwei Riegel: der gewaehlte Text loest keine neue Suche aus, und
+     _zeigen() oeffnet die Liste nur, wenn das Strassenfeld ueberhaupt noch
+     den Fokus hat. Der zweite faengt jede spaete Antwort ab, egal woher. */
   function _waehlen(i) {
     if (!(i >= 0) || !_treffer[i]) return;
+    clearTimeout(_timer);
+    _gewaehlt = _treffer[i].name;
     _setzen(_el('str'), _treffer[i].name);
     _schliessen();
     var h = _el('hnr');
@@ -128,8 +145,12 @@
 
   function _zeigen(liste) {
     if (!liste || !liste.length) return _schliessen();
-    _treffer = liste; _aktiv = -1;
     var el = _el('str'); if (!el) return;
+    /* v1271: keine Liste ohne Fokus im Feld - sonst reisst eine spaet
+       eintreffende Antwort sie wieder auf, waehrend man schon woanders
+       tippt. */
+    if (document.activeElement !== el) return _schliessen();
+    _treffer = liste; _aktiv = -1;
     var plzJetzt = _wert('plz');
     var b = _box();
     b.innerHTML = '<div class="dp-adr-kopf">Straße wählen oder weitertippen</div>' +
@@ -256,6 +277,9 @@
       str._dpAdrWired = 1;
       str.addEventListener('input', function () {
         clearTimeout(_timer);
+        /* v1271: der eben gewaehlte Text sucht nicht noch einmal. */
+        if (String(str.value || '').trim() === _gewaehlt) { _schliessen(); return; }
+        _gewaehlt = '';
         _timer = setTimeout(_strSuchen, 320);
       });
       str.addEventListener('keydown', function (ev) {
