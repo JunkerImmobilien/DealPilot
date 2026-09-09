@@ -1663,11 +1663,12 @@
     _fs.tSprach = 0; _fs.tStill = 0;
     var proben = 0, summe = 0;
     try { if (_fs.rec.state === 'inactive') { _fs.rec.start(); _fs.aufnahme = true; } } catch (e) { return; }
-    _fsHinweis('Ich höre zu — sprich einfach los.');
+    _fsMikroKasten(true, 'Ich höre zu — sprich einfach los.', 'Ich merke selbst, wenn du fertig bist.');
 
     _fs.uhr = setInterval(function () {
       if (!_rf || !_fs.an) { return; }
       var p = _fsPegel(), jetzt = Date.now(), seit = jetzt - _fs.t0;
+      _fsPegelZeigen(p);   /* v1277: der Ausschlag beantwortet "hoert er mich?" */
 
       if (_fs.phase === 'rauschen') {
         summe += p; proben++;
@@ -1683,7 +1684,7 @@
         if (p > _fs.schwelle) {
           if (!_fs.tSprach) _fs.tSprach = jetzt;
           if (jetzt - _fs.tSprach >= FS_SPRACHE_MS) { _fs.phase = 'spricht'; _fs.tStill = 0;
-            _fsHinweis('… ich höre'); }
+            _fsMikroKasten(true, 'Ich höre dich …', 'Sprich zu Ende — ich warte auf die Pause.'); }
         } else { _fs.tSprach = 0; }
         /* Geduld: wer nicht spricht, wird nicht gedrängt - aber irgendwann
            soll der Hinweis kommen, dass Tippen auch geht. */
@@ -1758,6 +1759,33 @@
     var e = $('vi-rf-gesagt');
     if (e) e.textContent = '„' + String(text).slice(0, 160) + '"';
   }
+  /* v1277 · Der Pegel, der sich bewegt.
+     „Hoert er mich?" ist die einzige Frage, die ein Sprecher wirklich hat.
+     Ein Ausschlag beantwortet sie ohne ein Wort - deutlicher als jeder
+     Hinweistext, den man beim Sprechen ohnehin nicht liest.
+     Acht Balken, in der Mitte am hoechsten, wie es ein Pegel eben tut. */
+  function _fsPegelZeigen(p) {
+    var host = $('vi-rf-pegel'); if (!host) return;
+    var balken = host.children, n = balken.length;
+    var voll = Math.max(0, Math.min(1, p / Math.max(0.06, _fs.schwelle * 6)));
+    for (var i = 0; i < n; i++) {
+      var mitte = 1 - Math.abs((i - (n - 1) / 2)) / ((n - 1) / 2);   /* 0 aussen, 1 mittig */
+      var h = 3 + Math.round(voll * (5 + mitte * 18));
+      balken[i].style.height = h + 'px';
+      balken[i].style.opacity = (0.3 + voll * 0.7).toFixed(2);
+    }
+    var kasten = $('vi-rf-mikro');
+    if (kasten) kasten.classList.toggle('hoert', p > _fs.schwelle);
+  }
+
+  function _fsMikroKasten(an, text, unter) {
+    var k = $('vi-rf-mikro');
+    if (k) k.classList.toggle('taub', !an);
+    if (text) _fsHinweis(text);
+    var s = $('vi-rf-mikro-sub');
+    if (s && unter !== undefined) s.textContent = unter;
+  }
+
   function _fsHinweis(text) {
     var e = $('vi-rf-lausch');
     if (e) e.textContent = text;
@@ -1907,6 +1935,35 @@
       '.vi-rf-denkt i:nth-child(2){animation-delay:.18s}.vi-rf-denkt i:nth-child(3){animation-delay:.36s}',
       '@keyframes viRfPp{0%,60%,100%{opacity:.25}30%{opacity:1}}',
       /* Fuss: Lauschzeile und Eingabe */
+      /* ═══ v1277 · Sprechen ist der Hauptweg, Tippen der Nebenweg ═══════
+         Marcels Frage: „koennte man das jetzt so machen dass man direkt
+         sprechen kann anstatt tippen?" - Es GING schon, aber es sah nicht
+         so aus: der Cursor sprang ins Tippfeld, und dass das Mikrofon
+         laeuft, stand als graue Zeile in 12 px darunter. Wer ein blinkendes
+         Textfeld sieht, tippt.
+
+         Jetzt steht die Mikrofon-Anzeige gross und mittig ueber der
+         Eingabe, mit einem Pegel, der sich BEWEGT, wenn man spricht. Ein
+         Ausschlag, den man sieht, beantwortet die Frage „hoert er mich?"
+         ohne ein Wort. Das Tippfeld rueckt darunter und heisst nur noch
+         „... oder tippen". Und der Fokus springt nicht mehr hinein. */
+      '.vi-rf-mikro{display:flex;align-items:center;gap:12px;margin:12px 2px 10px;padding:11px 14px;',
+      '  border-radius:12px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent);transition:border-color .2s ease}',
+      '.vi-rf-mikro.hoert{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 70%, transparent)}',
+      '.vi-rf-mikro.taub{opacity:.55}',
+      '.vi-rf-mikro-icon{width:30px;height:30px;border-radius:50%;flex:0 0 30px;display:flex;',
+      '  align-items:center;justify-content:center;font-size:15px;',
+      '  background:linear-gradient(160deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C));color:#100e08}',
+      '.vi-rf-mikro.hoert .vi-rf-mikro-icon{animation:viRfPuls 1.4s ease-in-out infinite}',
+      '@keyframes viRfPuls{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent)}',
+      '  60%{box-shadow:0 0 0 9px transparent}}',
+      '.vi-rf-mikro-txt{flex:1;min-width:0;font:600 13px/1.35 Inter,system-ui,sans-serif}',
+      '.vi-rf-mikro-txt small{display:block;font:400 11.5px/1.3 Inter,system-ui,sans-serif;opacity:.6;margin-top:2px}',
+      /* Der Pegel: acht Balken, die der Lautstaerke folgen. */
+      '.vi-rf-pegel{display:flex;align-items:flex-end;gap:3px;height:26px;flex:0 0 auto}',
+      '.vi-rf-pegel i{width:3px;height:3px;border-radius:2px;background:var(--wl-c9a84c, #C9A84C);',
+      '  opacity:.35;transition:height .09s linear, opacity .09s linear}',
       '.vi-rf-lausch{min-height:16px;margin:10px 2px 6px;font:400 12px/1.3 Inter,system-ui,sans-serif;',
       '  opacity:.6;display:flex;align-items:center;gap:7px}',
       '.vi-rf-welle{display:inline-flex;align-items:flex-end;gap:2px;height:12px}',
@@ -1986,9 +2043,16 @@
         '<label class="vi-rf-fs"><input type="checkbox" id="vi-rf-fs" checked> Freisprechen</label>' +
       '</div>' +
       '<div class="vi-rf-chat" id="vi-rf-chat"></div>' +
-      '<div class="vi-rf-lausch" id="vi-rf-lausch"></div>' +
+      /* v1277: Sprechen ist der Hauptweg — er steht auch so da. */
+      '<div class="vi-rf-mikro" id="vi-rf-mikro">' +
+        '<span class="vi-rf-mikro-icon">🎤</span>' +
+        '<span class="vi-rf-mikro-txt"><span id="vi-rf-lausch">Ich höre zu — sprich einfach los.</span>' +
+          '<small id="vi-rf-mikro-sub">Ich merke selbst, wenn du fertig bist.</small></span>' +
+        '<span class="vi-rf-pegel" id="vi-rf-pegel">' +
+          '<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>' +
+      '</div>' +
       '<div class="vi-rf-zeile">' +
-        '<input id="vi-rf-in" placeholder="Antwort tippen …" autocomplete="off">' +
+        '<input id="vi-rf-in" placeholder="… oder tippen" autocomplete="off">' +
         '<button type="button" class="vi-rf-btn" id="vi-rf-ok">Übernehmen</button>' +
       '</div>' +
       '<div class="vi-rf-neben">' +
@@ -2018,8 +2082,8 @@
     });
     $('vi-rf-fs').addEventListener('change', function () {
       _fs.an = this.checked;
-      if (_fs.an) { _fsStart().then(function (ok) { if (ok) _fsHoeren(); else _fsHinweis('Mikrofon nicht verfügbar — bitte tippen.'); }); }
-      else { _fsStopHoeren(); _fsAus(); _fsHinweis(''); }
+      if (_fs.an) { _fsStart().then(function (ok) { if (ok) _fsHoeren(); else _fsMikroKasten(false, 'Mikrofon nicht verfügbar', 'Bitte tippen.'); }); }
+      else { _fsStopHoeren(); _fsAus(); _fsMikroKasten(false, 'Freisprechen ist aus', 'Tippe deine Antworten.'); }
     });
   }
 
@@ -2035,7 +2099,9 @@
       else { pb.style.display = 'none'; }
     }
     var inp = $('vi-rf-in');
-    if (inp) { inp.value = ''; inp.disabled = false; try { inp.focus(); } catch (ex) {} }
+    /* v1277: KEIN Fokus ins Tippfeld - wer einen blinkenden Cursor sieht,
+       tippt. Gesprochen wird trotzdem gehoert; wer tippen will, klickt. */
+    if (inp) { inp.value = ''; inp.disabled = false; }
     if (_fs.an && _fs.stream) _fsHoeren();
   }
 
@@ -2131,7 +2197,7 @@
       if (!ok) {
         var s = $('vi-rf-fs'); if (s) { s.checked = false; s.disabled = true; }
         _fs.an = false;
-        _fsHinweis('Mikrofon nicht verfügbar — tippe deine Antworten.');
+        _fsMikroKasten(false, 'Mikrofon nicht verfügbar', 'Tippe deine Antworten — oder gib das Mikrofon im Browser frei und öffne neu.');
       }
       _rfFrage();
     });
