@@ -38,8 +38,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Stand 09.09.2026)
 
-**Stand:** lokal = GitHub = Staging auf `v1274b`. **Produktion auf `a21fe9c`**.
-`v1265` bis `v1272` sind live, **`v1273` und `v1274` noch nicht**.
+**Stand:** lokal = GitHub = Staging auf `v1275b`. **Produktion auf `a21fe9c`**.
+`v1265` bis `v1272` sind live, **`v1273` bis `v1275` noch nicht**.
 
 ### Erledigt am 09.09.2026
 
@@ -58,7 +58,7 @@ im Journal der Projektanweisung.
 | 2 | Bodenrichtwert automatisch nach Adresse | **fertig** — `v1263` Automatik, `v1264` der kaputte KI-Abruf repariert, `v1265` **amtlicher BORIS-Wert zuerst** (11 von 11 Ländern live), Schätzung nur als Rückfall |
 | 3 | Pillen unterschiedlich lang einblenden | **fertig** — `v1272`, Standzeit je Platz (6,5–15 s), der Kranz dreht durch alle offenen Angaben |
 | 4 | Kontextbezug im Sprechlauf prüfen | **teilweise** — Hausgeld-Aufteilung und Inventar sitzen, weitere Fälle offen |
-| 5 | Chatbot-Dialog statt Monolog, mit Demo | **halb fertig** — `v1273` fragt nach, was fehlt (bis zu 3 Fragen, tippen oder sprechen, „Passt so" für Vorbelegtes). **Offen: die Auswahl beim Öffnen** (Marcels Wunsch) und der geführte Weg — `v1274` |
+| 5 | Chatbot-Dialog statt Monolog, mit Demo | **fertig** — `v1273` fragt nach, was fehlt; `v1275` bringt die Wahl beim Öffnen („Ich erzähle frei" / „Frag mich durch") und den geführten Weg |
 | 6 | Bild „Ansicht": Objekt anlegen links über der Suche | **fertig** — `v1266`, Knopf unter dem Logo im Stil des Logo-Kastens |
 | 7 | IRR/Break-Even „passend in Auswertung" einordnen | **teilweise** — sie stehen in den Kennzahlen-Kacheln (Reiter Bewertung); Portfolio-Cockpit noch nicht |
 

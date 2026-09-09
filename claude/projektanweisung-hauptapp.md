@@ -9805,6 +9805,73 @@ und damit ein Timer mehr, der schiefgehen kann.
 **Commits.** `v1274` (Nachleuchten, Zähler, Prüfhaken `_text`) · `v1274b`
 (eine Zahl, eine Quelle). Auf Staging, **nicht auf Prod**.
 
+### `v1275`/`v1275b` · Die Wahl beim Öffnen — der Bot ist da
+
+Marcels Frage: *„ist der bot jetzt auch drin? und wenn ja wo?"* — bis
+`v1274` **nein**: drin war nur die Nachfrage-Runde nach der Auswertung.
+Jetzt ist auch der geführte Weg da, und davor steht die Wahl. Das ist
+Variante C aus dem Konzept, die Marcel entschieden hatte: *„das kann man
+auswählen ob co pilot oder frei sprechen."*
+
+**Bis `v1274` startete die Aufnahme sofort beim Öffnen.** Wer nicht weiß,
+was DealPilot hören will, stand damit vor einem laufenden Mikrofon — der
+unfreundlichste Moment der ganzen App. Jetzt steht davor eine Frage mit
+zwei Antworten:
+
+| Weg | was passiert |
+|---|---|
+| **Ich erzähle frei** | alles wie bisher: Aufnahme, Orbit, Auswertung — danach die Rückfragen aus `v1273` |
+| **Frag mich durch** | derselbe Fragen-Ablauf, aber von Anfang an und über **alle** Blöcke statt nur über die Lücken |
+
+> **Der geführte Weg brauchte keine neue Maschinerie.** Er ist der
+> Rückfragen-Zustand aus `v1273` mit `alle = true`. Deshalb gelten dort
+> dieselben Regeln: tippen oder sprechen, „Weiß ich nicht" überspringt,
+> „Fertig" bringt jederzeit zur Tabelle. Der Deckel von drei Fragen gilt
+> dort nicht — wer „Frag mich durch" wählt, hat genau darum gebeten.
+
+**Kein Modus wird gemerkt.** Die Wahl fällt bei jedem Öffnen neu. Ein
+gemerkter Modus wäre genau dann falsch, wenn er am meisten stört: beim
+nächsten Objekt, das anders liegt als das letzte.
+
+#### `v1275b` · Der Satz statt des Werts
+
+**Gemessen im ersten Durchlauf:** auf „490 Euro kalt im Monat" stand in
+der Tabelle **„490 Euro kalt im Monat"** — der ganze Satz als Wert. Bei
+„245.000 Euro" ging es gut.
+
+> **Der Unterschied war Zufall.** Der Prompt ist für **Diktate** gebaut:
+> viel Text, viele Felder, such dir heraus, was passt. Bei einer
+> Kurzantwort mit **einem** Feld im Katalog hat das Modell nur dieses eine
+> Fach — und legt alles hinein, was es bekommt. Im Prompt stand nichts,
+> was diesen Fall benennt.
+
+`buildPrompt` und `extractFields` nehmen jetzt einen optionalen Zusatz;
+`extractFromText` setzt damit eine Antwort-Regel mit Beispielen. Der
+gemeinsame Prompt für Diktate bleibt unverändert.
+
+**Nachgemessen, je 0,09 Cent:**
+
+| Antwort | Ergebnis |
+|---|---|
+| „490 Euro kalt im Monat" | `nkm = 490` |
+| „so um die hundert Quadratmeter" | `wfl = 100` |
+| „Baujahr war 62" | `baujahr = 1962` |
+| „keine Ahnung ehrlich gesagt" | `{}` — nichts erfunden |
+
+Dazu: der Kopftext beschrieb vor der Wahl nur das freie Einsprechen („Bis
+zu 4 Minuten") — eine halbe Auskunft, wenn zwei Wege zur Wahl stehen.
+Jetzt neutral, und nach der Wahl der Text, der zum Weg passt.
+
+#### Abnahme (Staging)
+
+Geführter Weg: „245.000 Euro" → **Kaufpreis 245000**, „490 Euro kalt im
+Monat" → **Kaltmiete 490**, „rund hundert Quadratmeter" → **Wohnfläche
+100**; die Fragen kamen der Reihe nach (Preis → Miete → Fläche →
+Adresse), „Fertig" sprang in die Tabelle.
+
+**Commits.** `v1275` (Wahl + geführter Weg) · `v1275b` (Antwort-Regel im
+Prompt, Kopftext). Backend auf Staging neu gebaut. **Nicht auf Prod.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
