@@ -829,15 +829,15 @@
   var WL = [
     /* v977-voice-layout: Reihenfolge Objektart->Adresse->Flaechen; Aussenstellpl./Etage/Garagen ohne Chip; Kaufdatum/Uebergang -> Kauf */
     { id:'objart',     g:0, label:'Objektart',           kw:['eigentumswohnung','mehrfamilien','einfamilien','wohnung','haus','etw','mfh','efh','reihenhaus'] },
-    { id:'str',        g:0, label:'Strasse',             kw:['strasse','str'] },
+    { id:'str',        g:0, label:'Straße',             kw:['strasse','str'] },
     { id:'hnr',        g:0, label:'Hausnummer',          kw:['hausnummer','nummer'] },
     { id:'plz',        g:0, label:'PLZ',                 kw:['postleitzahl','plz'] },
     { id:'ort',        g:0, label:'Ort',                 kw:['ort','stadt','gemeinde'] },
-    { id:'wfl',        g:0, label:'Wohnflaeche',         kw:['wohnflaeche','quadratmeter','qm','quadrat'] },
+    { id:'wfl',        g:0, label:'Wohnfläche',         kw:['wohnflaeche','quadratmeter','qm','quadrat'] },
     { id:'zimmer',     g:0, label:'Zimmer',              kw:['zimmer'] },
     { id:'baujahr',    g:0, label:'Baujahr',             kw:['baujahr','gebaut','errichtet'] },
     { id:'etage',      g:0, noc:1, label:'Etage',               kw:['etage','stock','geschoss','obergeschoss'] },
-    { id:'stellpl_aussen', g:0, noc:1, label:'Aussenstellplaetze', kw:['stellplatz','aussenstellplatz','parkplatz'] },
+    { id:'stellpl_aussen', g:0, noc:1, label:'Außenstellplätze', kw:['stellplatz','aussenstellplatz','parkplatz'] },
     { id:'garagen',    g:0, noc:1, label:'Garagen',             kw:['garage','tiefgarage'] },
     { id:'kaufdat',    g:1, label:'Kaufdatum',           kw:['kaufdatum','gekauft','erworben'] },
     { id:'wirtschaftlicher_uebergang', g:1, label:'Wirtsch. Uebergang', kw:['wirtschaftlicher uebergang','nutzen lasten','nutzen und lasten','lastenwechsel','besitzuebergang','uebergang'] },
@@ -848,7 +848,7 @@
     { id:'gba_p',      g:1, noc:1, label:'Grundbuch %',         kw:['grundbuch'] },
     { id:'gest_p',     g:1, noc:1, label:'Grunderwerbsteuer %', kw:['grunderwerbsteuer','grunderwerb'] },
     { id:'san',        g:1, label:'Sanierungskosten',    kw:['sanierung','sanierungskosten','renovierung'] },
-    { id:'moebl',      g:1, frage:'Was wird mitverkauft?', label:'Moeblierung', kw:['moeblierung','inventar','einrichtung'] },
+    { id:'moebl',      g:1, frage:'Was wird mitverkauft?', label:'Möblierung', kw:['moeblierung','inventar','einrichtung'] },
 
     { id:'nkm',        g:2, label:'Kaltmiete',           kw:['kaltmiete','miete','nettokaltmiete','grundmiete'] },
     { id:'ze',         g:2, label:'Zusatzeinnahmen',     kw:['zusatzeinnahmen','zusatz'] },
@@ -863,14 +863,14 @@
 
     { id:'brw',        g:4, label:'Bodenrichtwert',      kw:['bodenrichtwert'] },
     { id:'mea',        g:4, label:'Miteigentumsanteil',  kw:['miteigentumsanteil','mea'] },
-    { id:'gsfl',       g:4, label:'Grundstuecksflaeche', kw:['grundstueck','grundstuecksflaeche'] },
+    { id:'gsfl',       g:4, label:'Grundstücksfläche', kw:['grundstueck','grundstuecksflaeche'] },
     { id:'makrolage',  g:4, frage:'Wie ist die Region?',  label:'Makrolage', kw:['makrolage','makro','region'] },
     { id:'mikrolage',  g:4, frage:'Wie ist die Straße?', label:'Mikrolage', kw:['mikrolage','mikro','viertel','umfeld'] },
     { id:'ds2_zustand',g:4, frage:'In welchem Zustand?',  label:'Zustand',   kw:['zustand'] },
     { id:'ds2_energie',g:4, label:'Energieklasse',       kw:['energie','energieklasse','effizienz'] },
 
     { id:'ds2_nachfrage',    g:5, noc:1, label:'Nachfrage',           kw:['nachfrage'] },
-    { id:'ds2_bevoelkerung', g:5, noc:1, label:'Bevoelkerung',        kw:['bevoelkerung','einwohner'] },
+    { id:'ds2_bevoelkerung', g:5, noc:1, label:'Bevölkerung',        kw:['bevoelkerung','einwohner'] },
     { id:'ds2_marktmiete',   g:5, noc:1, label:'Marktmiete',          kw:['marktmiete'] },
     { id:'mietstg',          g:5, noc:1, label:'Mietsteigerung %',    kw:['mietsteigerung'] },
     { id:'wertstg',          g:5, noc:1, label:'Wertsteigerung %',    kw:['wertsteigerung'] },
@@ -935,7 +935,7 @@
   /* QC-Einzelposten (virtuell) — Gruppe Miete */
   var WL_VIRT = [
     { id:'ze_stp',    g:2, label:'Stellplatzmiete', kw:['stellplatz','garage','parkplatz','tiefgarage'] },
-    { id:'ze_kueche', g:2, label:'Kuechenmiete',    kw:['kueche','kuche'] },
+    { id:'ze_kueche', g:2, label:'Küchenmiete',    kw:['kueche','kuche'] },
     { id:'ze_sonst',  g:2, label:'Sonstige Einnahmen', kw:['sonstige einnahmen','sonstiges'] }
   ];
 
@@ -2202,7 +2202,10 @@
       if (v === '' || v === null || v === undefined) return;
       var kat = (_rf.catalog || []).filter(function (c) { return c.id === id; })[0];
       var name = kat ? String(kat.label).replace(/\s*\(.*?\)\s*$/, '') : id;
-      out.push({ n: name, v: String(v), f: ausFormular });
+      /* v1284: Zahlen lesbar - "3.5" ist ein Feldwert, "3,5" eine Angabe. */
+      var anzeige = String(v);
+      if (anzeige.indexOf(",") < 0 && /^-?[0-9]+\.[0-9]+$/.test(anzeige)) anzeige = anzeige.replace(".", ",");
+      out.push({ n: name, v: anzeige, f: ausFormular });
     });
     return out;
   }
