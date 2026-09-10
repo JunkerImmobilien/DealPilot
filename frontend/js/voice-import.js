@@ -1741,10 +1741,11 @@
         if (r && r.transcript) {
           try { console.log('[voice-import] Freisprech-Antwort:', r.transcript); } catch (x) {}
           _rfDenkt(false);
-          /* v1281: Auch gesprochen darf man fragen. Erkannt wird dasselbe
-             wie beim Tippen - und weil die Extraktion ohnehin schon lief,
-             kostet die Erkennung hier nichts extra. */
-          if (_rfIstFrage(r.transcript)) { return _rfFrageBeantworten(r.transcript); }
+          /* v1283: Verneinung, Profil-Ja und Frage werden auch GESPROCHEN
+             erkannt - und zwar hier, nachdem das Transkript da ist. Die
+             Extraktion lief zwar schon mit, aber ihr Ergebnis wird dann
+             verworfen: „haben wir nicht" darf keine Zahl erzeugen. */
+          if (_rfVorabErkennen(r.transcript, true)) return;
           _rfBlase('ich', escH(r.transcript));   /* v1276c: was verstanden wurde, steht da */
         }
         _rfUebernehmen(r && r.fields, true);
@@ -1991,11 +1992,26 @@
       /* v1281: zwei Spalten - links der Verlauf, rechts der Stand. Unter
          720 px untereinander; die Spalte wandert dann NACH OBEN, weil sie
          dort die Frage einordnet, statt sie zu verdecken. */
-      '.vi-rf-buehne{display:grid;grid-template-columns:1fr 196px;gap:14px;align-items:start}',
+      /* v1283: Marcels Punkt „das Modal ist sehr klein". 740 px waren fuer
+         EINE Spalte gedacht; seit v1281 stehen zwei nebeneinander, und der
+         rechten blieben 196 px - genug fuer einen Oberbegriff, zu wenig
+         fuer die Werte. Jetzt 1080 px, die Spalte bekommt 300. Nur im
+         Sprechlauf-Modus: die anderen Dialoge sind schmal richtig. */
+      '.oabi-ov.vi-mode .oabi-modal{width:min(1080px,100%)}',
+      '@media(max-width:1120px){.oabi-ov.vi-mode .oabi-modal{width:min(860px,100%)}}',
+      /* Die Spalte zeigt jetzt Werte, nicht nur Namen. */
+      '.vi-rf-st{display:block;padding:6px 0}',
+      '.vi-rf-st-k{display:flex;gap:7px;align-items:center}',
+      '.vi-rf-st-w{margin:3px 0 0 18px;display:flex;flex-direction:column;gap:2px}',
+      '.vi-rf-st-w span{font:500 11.5px/1.35 "JetBrains Mono",ui-monospace,monospace;',
+      '  color:#3FA56C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.vi-rf-st-w i{font-style:normal;opacity:.55;font-weight:400}',
+      '.vi-rf-st.weg{opacity:.4} .vi-rf-st.weg .z{color:#B8625C}',
+      '.vi-rf-buehne{display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start}',
       '@media(max-width:720px){.vi-rf-buehne{grid-template-columns:1fr}',
       '  .vi-rf-stand{order:-1;max-height:132px}}',
-      '.vi-rf-stand{border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:10px 11px;',
-      '  max-height:268px;overflow-y:auto;background:rgba(255,255,255,.03)}',
+      '.vi-rf-stand{border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:11px 13px;',
+      '  max-height:340px;overflow-y:auto;background:rgba(255,255,255,.03)}',
       '.vi-rf-stand-kopf{font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;',
       '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);opacity:.85;margin-bottom:9px}',
       '.vi-rf-st{display:flex;gap:7px;align-items:center;padding:4px 0;font:400 12.5px/1.3 Inter,system-ui,sans-serif;opacity:.55}',
@@ -2006,7 +2022,7 @@
       '.vi-rf-stand-fuss{margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.09);',
       '  font:600 11px/1 "JetBrains Mono",ui-monospace,monospace;opacity:.6}',
       '.vi-rf-stand-fuss b{color:var(--wl-c9a84c, #C9A84C)}',
-      '.vi-rf-chat{height:268px;overflow-y:auto;display:flex;flex-direction:column;gap:11px;',
+      '.vi-rf-chat{height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:11px;',
       '  padding:2px 4px 2px 2px}',
       '.vi-rf-blase{max-width:82%;padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.45;',
       '  animation:viRfAuf .3s ease both}',
@@ -2133,39 +2149,89 @@
   }
 
   /* ── Aufbau der Ansicht (einmal je Dialog) ───────────────────────── */
-  /* ═══ v1281 · „Was schon steht" — die Spalte aus der Demo ══════════════
-     Marcels Wunsch: „da gibt es sowas mit was schon steht. Eigentlich wäre
-     das ganz cool, wenn man sieht, was man, worum es geht, was man sagen
-     muss."
+  /* ═══════════════════════════════════════════════════════════════════
+     v1283 · SCHNELLER, BREITER, SCHLAUER
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Befund nach dem ersten echten Sprechlauf, fünf Punkte:
 
-     Der Chat allein zeigt den VERLAUF - was war. Er zeigt nicht den STAND -
-     was ist. Wer mitten im Gespräch überlegt, ob er die Miete schon gesagt
-     hat, muss zurückscrollen. Die Spalte beantwortet das mit einem Blick,
-     und nebenbei beantwortet sie die zweite Frage: was kommt noch?
+     1. „Das Modal ist sehr klein." → 740 auf 1080 px. Zwei Spalten
+        brauchen Platz; bei 740 px blieben der Spalte 196 px, und darin
+        passte nur ein Oberbegriff.
 
-     Drei Zustände, mehr braucht es nicht:
-       ✓ steht    — gefüllt, aus dem Gespräch oder dem Formular
-       ▸ dran     — die Frage, die gerade offen ist
-       · offen    — kommt noch
+     2. „Da steht nur die Oberbegriffe und gar nicht das, was ich gesagt
+        habe." → Die Spalte zeigt jetzt die WERTE, Feld für Feld, grün mit
+        Haken. Sie ist damit nicht mehr ein Inhaltsverzeichnis, sondern das
+        Protokoll.
 
-     Gezählt wird über dieselben RFRAGEN-Blöcke, aus denen auch gefragt
-     wird. Zwei Listen, die dasselbe meinen, laufen irgendwann auseinander -
-     eine reicht. */
+     3. „Bei Sanierung und Inventar habe ich gesagt: Haben wir nicht. Das
+        hat er nicht erkannt." → Verneinungen werden jetzt VOR dem KI-Aufruf
+        erkannt: „haben wir nicht", „gibt es nicht", „kommt nicht in Frage",
+        „brauchen wir nicht", „nichts", „weiter", „überspringen", „passt",
+        „nein". Das spart nicht nur den Fehler, sondern auch den Aufruf —
+        eine Verneinung braucht keine Auswertung.
+
+     4. „Bei den Zinssätzen sollte man sagen können: übernimm die aus den
+        Einstellungen." → Auch das wird vor dem Aufruf erkannt, wenn ein
+        Vorschlag offen steht.
+
+     5. „Wir brauchen dazwischen nicht mehr 'erkannt wurde das und das in
+        Grün'." → Die Bestätigungsblase entfällt. Was erkannt wurde, steht
+        in der Spalte; die nächste Frage kommt sofort statt nach 650 ms.
+
+     ALLE VIER ERKENNUNGEN LAUFEN OHNE KI. Das ist der eigentliche
+     Geschwindigkeitsgewinn: eine Verneinung, die früher 2 Sekunden und
+     0,1 Cent gekostet hat, kostet jetzt nichts und dauert nichts. */
+  var RF_NEIN = /^(nein|nee|ne|nichts|kein[es]?|keine[rs]?|gibt('s| es)? (hier )?(nicht|keine)|haben wir (nicht|keine)|hab(e)? ich (nicht|keine)|brauchen wir (nicht|keine)|kommt nicht in frage|entf(ä|ae)llt|weiter|(ü|ue)berspringen|(ü|ue)berspring|weiss nicht|wei(ß|ss) ich nicht|keine ahnung|passt so|passt|unbekannt|k\.?a\.?)\b[\s.!]*$/i;
+
+  var RF_PROFIL_JA = /(übernimm|uebernimm|nimm|nehmen|übernehmen|uebernehmen|ja bitte|ja gern|einverstanden)\b.*(einstellung|profil|vorschlag|vorgabe|standard)|^(ja|okay|ok|passt|gerne|klar)\b[\s.!]*$/i;
+
+  /* Was hat der Nutzer zu diesem Block schon gesagt? Für die Spalte. */
+  function _rfWerteZuBlock(e) {
+    var out = [];
+    (e.ids || []).forEach(function (id) {
+      var v = _rf && _rf.data && _rf.data.fields ? _rf.data.fields[id] : null;
+      if (v === undefined || v === null || v === '') return;
+      var kat = (_rf.catalog || []).filter(function (c) { return c.id === id; })[0];
+      var name = kat ? String(kat.label).replace(/\s*\(.*?\)\s*$/, '') : id;
+      out.push({ n: name, v: String(v) });
+    });
+    return out;
+  }
+
   function _rfStandZeichnen() {
     var host = $('vi-rf-stand'); if (!host || !_rf) return;
     var zeilen = _rf.offen.map(function (e, i) {
-      var fertig = !_rfFehlt(e, _rf.data.fields || {});
+      var werte = _rfWerteZuBlock(e);
+      var fertig = werte.length > 0 || !_rfFehlt(e, _rf.data.fields || {});
       var dran = (i === _rf.i) && !fertig;
-      var kurz = _rfKurzname(e);
-      return '<div class="vi-rf-st ' + (fertig ? 'ok' : (dran ? 'dran' : '')) + '">' +
-             '<span class="z">' + (fertig ? '✓' : (dran ? '▸' : '·')) + '</span>' +
-             '<span class="n">' + escH(kurz) + '</span></div>';
+      var uebersprungen = !!(_rf.weg && _rf.weg[i]);
+      var zeichen = werte.length ? '✓' : (uebersprungen ? '–' : (dran ? '▸' : '·'));
+      var klasse = werte.length ? 'ok' : (uebersprungen ? 'weg' : (dran ? 'dran' : ''));
+      /* v1283: Der Wert steht DA, nicht nur der Oberbegriff. Marcels Punkt:
+         „das wäre gut, wenn man dort gleich die Sachen sieht, die ich gesagt
+         habe." */
+      var detail = werte.length
+        ? '<div class="vi-rf-st-w">' + werte.map(function (w) {
+            return '<span><i>' + escH(w.n) + '</i> ' + escH(w.v) + '</span>';
+          }).join('') + '</div>'
+        : '';
+      return '<div class="vi-rf-st ' + klasse + '">' +
+             '<div class="vi-rf-st-k"><span class="z">' + zeichen + '</span>' +
+             '<span class="n">' + escH(_rfKurzname(e)) + '</span></div>' + detail + '</div>';
     }).join('');
-    var fertigN = _rf.offen.filter(function (e) { return !_rfFehlt(e, _rf.data.fields || {}); }).length;
+    var fertigN = _rf.offen.filter(function (e) {
+      return _rfWerteZuBlock(e).length > 0 || !_rfFehlt(e, _rf.data.fields || {});
+    }).length;
     host.innerHTML =
       '<div class="vi-rf-stand-kopf">Was schon steht</div>' + zeilen +
       '<div class="vi-rf-stand-fuss"><b>' + fertigN + '</b> von ' + _rf.offen.length + '</div>';
+    /* Die gerade beantwortete Zeile in Sicht holen. */
+    try {
+      var dranEl = host.querySelector('.vi-rf-st.dran, .vi-rf-st.ok:last-of-type');
+      if (dranEl) dranEl.scrollIntoView({ block: 'nearest' });
+    } catch (ex) {}
   }
+
 
   /* Aus „Wie finanzierst du? Eigenkapital, Zinssatz, …" wird „Finanzierung".
      Die ganze Frage passt nicht in eine 210 px breite Spalte, und eine
@@ -2319,10 +2385,15 @@
     _rfFrage();
   }
 
-  function _rfUeberspringen() {
+  function _rfUeberspringen(stumm) {
     _fsStopHoeren();
-    _rfBlase('ich', 'Weiß ich nicht.');
-    _rfBlase('co', 'Gut — das lasse ich leer.');
+    /* v1283: Beim Ueberspringen keine zwei Blasen mehr. Wer „haben wir
+       nicht" gesagt hat, hat seine Blase schon; eine Quittung darauf ist
+       eine Zeile, die niemand liest. Die Spalte merkt sich den Strich. */
+    if (!stumm) _rfBlase('ich', 'Weiß ich nicht.');
+    if (!_rf.weg) _rf.weg = {};
+    _rf.weg[_rf.i] = 1;
+    _rfStandZeichnen();
     _rfWeiter();
   }
 
@@ -2491,9 +2562,13 @@
       if (ausSprache && _fs.an) _fsHoeren();
       return;
     }
-    _rfBlase('co', 'Notiert.', namen.join(' · '));
-    _rfStandZeichnen();   /* v1281: der Haken wandert sofort, nicht erst bei der naechsten Frage */
-    setTimeout(_rfWeiter, 650);
+    /* v1283: KEINE Bestaetigungsblase mehr. Marcels Punkt: "wir brauchen
+       dazwischen nicht mehr erkannt wurde das und das in Gruen, sondern wenn
+       wir die Liste haben, kann man das ja gleich dort eintragen". Der
+       Verlauf bleibt dadurch lesbar - er zeigt das GESPRAECH, nicht die
+       Quittungen. */
+    _rfStandZeichnen();
+    setTimeout(_rfWeiter, 120);   /* v1283: zuegiger - die Bestaetigung steht ja schon in der Spalte */
   }
 
   /* ═══ v1281 · Wenn der Nutzer selbst fragt ═════════════════════════════
@@ -2544,16 +2619,45 @@
     });
   }
 
+  /* v1283 · Was ohne KI entschieden werden kann, wird ohne KI entschieden.
+     Drei Fälle fängt diese Funktion ab, bevor irgendein Aufruf losgeht:
+     eine Verneinung, ein „ja, nimm die Einstellungen" und eine Frage.
+     Das ist der Geschwindigkeitsgewinn, den Marcel meint - eine
+     Verneinung kostete vorher zwei Sekunden und 0,1 Cent. */
+  function _rfVorabErkennen(text, ausSprache) {
+    var t = String(text || '').trim();
+    if (!t) return true;
+
+    /* 1. Frage? Dann beantworten statt eintragen. */
+    if (_rfIstFrage(t)) { _rfFrageBeantworten(t); return true; }
+
+    /* 2. „Ja, nimm die aus den Einstellungen" - nur wenn einer offen ist. */
+    if (_rf.profilVorschlag && RF_PROFIL_JA.test(t)) {
+      _rfBlase('ich', escH(t));
+      var pb = $('vi-rf-passt');
+      if (pb) { pb.click(); return true; }
+    }
+
+    /* 3. Verneinung: „haben wir nicht", „kommt nicht in Frage", „weiter".
+       Marcels Fall - „Bei Sanierung und Inventar habe ich gesagt: Haben wir
+       nicht. Das hat er nicht erkannt." */
+    if (RF_NEIN.test(t)) {
+      _rfBlase('ich', escH(t));
+      _rfUeberspringen(true);
+      return true;
+    }
+    return false;
+  }
+
   function _rfSenden() {
     var inp = $('vi-rf-in'); if (!inp) return;
     var text = String(inp.value || '').trim();
     if (!text) return;
     _fsStopHoeren();
-    if (/^(wei(ss|ß) ich nicht|keine ahnung|nichts|\-)$/i.test(text)) { inp.value = ''; return _rfUeberspringen(); }
-    /* v1281: eine Frage wird beantwortet, nicht eingetragen. */
-    if (_rfIstFrage(text)) { inp.value = ""; return _rfFrageBeantworten(text); }
+    inp.value = '';
+    if (_rfVorabErkennen(text, false)) return;   /* v1283 */
     var e = _rf.offen[_rf.i];
-    inp.value = ''; inp.disabled = true;
+    inp.disabled = true;
     _rfBlase('ich', escH(text));
     _rfMelden('', true);
     Auth.apiCall('/ai/extract-text', {
