@@ -5796,6 +5796,13 @@
      dass vor ihm etwas lief. Jetzt bekommt er es gesagt.
 
      GEZAEHLT wird nur, was die KETTE als neu meldet — siehe unten. */
+  /* v1293f: Die Namen der Quellen. Standen bis v1293c ueber
+     _rfVorbefuellt und sind beim Umbau mit dem Kommentarblock
+     verschwunden — ein ReferenceError, den `node --check` nicht findet
+     und der den ganzen gefuehrten Weg lahmlegte, sobald die Kette lief.
+     „Vertraege prueft nur ein echter Lauf" (CLAUDE.md). */
+  var VORLAUF_NAME = { import: 'Exposé / Marktbericht', immometrica: 'ImmoMetrica',
+                       voice: 'Sprachaufzeichnung' };
   /* v1293d: OHNE die Liste der Kette gibt es KEINEN Vorlauf-Satz.
      Gemessen an einem frisch angelegten Objekt: „61 Angaben stehen schon
      im Objekt" — bei leerem Formular. Gezaehlt wurden die Vorgaben aus
