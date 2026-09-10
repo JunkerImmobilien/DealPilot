@@ -412,6 +412,61 @@
   }
 
   /* ── Modal oeffnen (wird aus runSelected awaited, wie der Import) ──── */
+  /* ═══════════════════════════════════════════════════════════════════
+     v1293e · DAS MIKROFON LIEF NACH DEM ABBRECHEN WEITER
+     ═══════════════════════════════════════════════════════════════════
+     Beim Durchgehen der Quellen-Kombinationen gemessen — mit einem
+     synthetischen Audiostrom, damit der Recorder echt laeuft:
+
+       vor  „Abbrechen":  recState recording · phase spricht · chunks 5
+       nach „Abbrechen":  recState recording · phase spricht · chunks 8
+
+     Der Recorder lief weiter, die Stuecke wuchsen, und `_rf` stand noch
+     komplett da. Im Browser bleibt damit das Aufnahme-Symbol an —
+     **jemand hat den Dialog beendet, und sein Mikrofon horcht weiter.**
+
+     Das ist kein Schoenheitsfehler. Ein laufendes Mikrofon, von dem der
+     Nutzer glaubt, es sei aus, ist ein Vertrauensbruch.
+
+     URSACHE: der Abbrechen-Knopf rief `stopAll()` — das ist die Aufnahme
+     des FREIEN Weges — und `done()`. Der Freisprech-Strom des DIALOGS
+     (`_fs`) hat damit nichts zu tun und blieb unberuehrt. Beim zweiten
+     Weg hinaus, `OA.apply()`, ist es dasselbe: dort schliesst ein
+     anderes Modul das Fenster und weiss von `_fs` gar nichts.
+
+     ZWEI RIEGEL, weil einer nicht reicht:
+
+       1. `_viAufraeumen()` — eine Stelle, die alles abraeumt, gerufen von
+          jedem bekannten Weg hinaus.
+       2. EIN BEOBACHTER auf dem Overlay. Verschwindet es auf IRGENDEINEM
+          Weg — Abbrechen, X, Uebernehmen, ein fremdes Modul, ein Fehler
+          mittendrin —, raeumt er auf. Ein Mikrofon darf nicht davon
+          abhaengen, dass jemand an eine Codezeile gedacht hat. */
+  function _viAufraeumen(grund) {
+    try { _fsStopHoeren(); } catch (e) {}
+    try { _fsAus(); } catch (e) {}
+    try { stopAll(); } catch (e) {}
+    _rf = null;
+    _vorlauf = []; _vorlaufFelder = null; _mbGewollt = false;
+    /* `_mbGeholt` NICHT hier zuruecksetzen — es wird nach dem Schliessen
+       noch gelesen (die Kette fragt ueber `done`, ob der Abruf lief).
+       Geloescht wird es am ANFANG des naechsten Dialogs (v1293c). */
+    try { if (_viWache) { _viWache.disconnect(); _viWache = null; } } catch (e) {}
+    try { console.log('[voice] aufgeraeumt (' + (grund || '?') + ')'); } catch (e) {}
+  }
+
+  var _viWache = null;
+  function _viWacheStarten() {
+    try {
+      if (_viWache) { _viWache.disconnect(); _viWache = null; }
+      if (typeof MutationObserver !== 'function') return;
+      _viWache = new MutationObserver(function () {
+        if (!document.getElementById('oabi-ov')) _viAufraeumen('Overlay verschwunden');
+      });
+      _viWache.observe(document.body, { childList: true });
+    } catch (e) {}
+  }
+
   function open(onDone, opts) {
     injectCss();
     var OA = window.ObjectActions && window.ObjectActions._voice;
@@ -484,7 +539,7 @@
     document.body.appendChild(ov);
 
     $('oabi-cancel').addEventListener('click', function () {
-      stopAll();
+      _viAufraeumen('Abbrechen');   /* v1293e: samt Mikrofon */
       var x = $('oabi-ov'); if (x) x.remove();
       OA.setMode(false, null);
       done();
@@ -567,6 +622,7 @@
       }
     });
 
+    _viWacheStarten();  /* v1293e: raeumt auf, egal wer das Fenster schliesst */
     _startkarte(OA);   /* v1275: erst die Wahl, dann die Aufnahme */
   }
 
