@@ -1606,6 +1606,37 @@
   };
   var FS_MIN_SCHWELLE = 0.012, FS_SPRACHE_MS = 180, FS_STILLE_MS = 1400,
       FS_RAUSCH_MS = 500, FS_GEDULD_MS = 30000, FS_MAX_MS = 25000;
+  /* ═══ v1285 · Der Ringpuffer — eine Aufnahme darf nicht wachsen ════════
+     Marcels Fehler: „ich spreche rein und bekomme einen http413".
+
+     Im Caddy-Log gemessen: Content-Length **238.137.157** Bytes. 238 MB
+     für eine Antwort auf eine Frage. Caddy bricht bei 50 MB ab — daher
+     der 413, und daher erst nach neun Sekunden Upload.
+
+     URSACHE: In der Phase „warte" — Mikrofon an, aber noch niemand spricht
+     — lief der MediaRecorder ohne Ende. Die Notbremse (25 s) greift nur in
+     der Phase „spricht"; wer das Fenster offen liegen lässt oder dessen
+     Mikrofon stumm bleibt, sammelt stundenlang Daten, die beim ersten
+     Stopp alle auf einmal hochgehen.
+
+     LÖSUNG: Zeitscheiben statt eines Blocks. `rec.start(500)` liefert alle
+     500 ms ein Stück; behalten werden nur die letzten FS_RING_MS. Damit ist
+     jede Abschnittsgröße nach oben begrenzt — egal wie lange das Fenster
+     offen steht —, und der Anfang eines Satzes geht trotzdem nicht
+     verloren, weil der Puffer zurückreicht.
+
+     ZWEITER RIEGEL: Vor dem Senden wird die Größe geprüft. Was über
+     FS_MAX_BYTES liegt, wird gar nicht erst geschickt. Ein Fehler, der
+     erst nach neun Sekunden Upload sichtbar wird, ist ein schlechter
+     Fehler. */
+  var FS_SCHEIBE_MS = 500;      /* Länge eines Stücks */
+  var FS_RING_MS = 40000;       /* so weit reicht der Puffer zurück */
+  var FS_MAX_BYTES = 8 * 1024 * 1024;   /* was größer ist, geht nicht raus */
+
+  function _fsRingBegrenzen() {
+    var max = Math.ceil(FS_RING_MS / FS_SCHEIBE_MS);
+    if (_fs.chunks.length > max) _fs.chunks = _fs.chunks.slice(-max);
+  }
 
   function _fsPegel() {
     if (!_fs.analyser || !_fs.daten) return 0;
@@ -1649,7 +1680,9 @@
         ? 'audio/webm;codecs=opus'
         : ((MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/webm')) ? 'audio/webm' : '');
       _fs.rec = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
-      _fs.rec.ondataavailable = function (ev) { if (ev.data && ev.data.size) _fs.chunks.push(ev.data); };
+      _fs.rec.ondataavailable = function (ev) {
+        if (ev.data && ev.data.size) { _fs.chunks.push(ev.data); _fsRingBegrenzen(); }   /* v1285 */
+      };
       return true;
     }).catch(function () { return false; });
   }
@@ -1662,7 +1695,8 @@
     _fs.phase = 'rauschen'; _fs.rausch = 0; _fs.t0 = Date.now();
     _fs.tSprach = 0; _fs.tStill = 0;
     var proben = 0, summe = 0;
-    try { if (_fs.rec.state === 'inactive') { _fs.rec.start(); _fs.aufnahme = true; } } catch (e) { return; }
+    /* v1285: Zeitscheiben - nur so laesst sich der Puffer begrenzen. */
+    try { if (_fs.rec.state === 'inactive') { _fs.rec.start(FS_SCHEIBE_MS); _fs.aufnahme = true; } } catch (e) { return; }
     _fsMikroKasten(true, 'Ich höre zu — sprich einfach los.', 'Ich merke selbst, wenn du fertig bist.');
 
     _fs.uhr = setInterval(function () {
@@ -1726,8 +1760,12 @@
          Lauschzeile - die wird von der naechsten Runde sofort
          ueberschrieben. Eine Antwort, die spurlos verschwindet, laesst
          einen ratlos zurueck: hat er mich gehoert oder nicht? */
-      if (!blob || blob.size < 1500) {
-        _rfBlase('co', 'Das war zu kurz — sag es gern nochmal.');
+      /* v1285: Zweiter Riegel - was zu gross ist, geht gar nicht erst raus.
+         Ein Fehler, der erst nach neun Sekunden Upload sichtbar wird, ist
+         ein schlechter Fehler. */
+      if (blob && blob.size > FS_MAX_BYTES) {
+        try { console.warn('[voice] Abschnitt zu gross:', blob.size, 'Bytes - verworfen'); } catch (e) {}
+        _rfBlase('co', 'Das war zu lang für eine Antwort — sag es bitte kürzer.');
         _fsHoeren(); return;
       }
       _rfMelden('', true);
