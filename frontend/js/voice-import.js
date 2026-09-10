@@ -2582,6 +2582,7 @@
       '.oabi-ov.vi-mode.vi-dialog #vi-frage{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}',
       '.oabi-ov.vi-mode.vi-dialog .vi-rf-kopfzeile,',
       '.oabi-ov.vi-mode.vi-dialog #vi-rf-band,',
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-dran,',
       '.oabi-ov.vi-mode.vi-dialog .vi-rf-mikro,',
       '.oabi-ov.vi-mode.vi-dialog .vi-rf-zeile,',
       '.oabi-ov.vi-mode.vi-dialog .vi-rf-neben{flex:0 0 auto}',
@@ -2671,6 +2672,44 @@
       '  color:inherit;opacity:.75;border-radius:9px;padding:7px 12px;cursor:pointer;',
       '  font:400 12.5px Inter,system-ui,sans-serif}',
       '.vi-rf-neben button:hover{opacity:1}',
+      /* ═══ v1291 · Die Aktionsleiste ═══════════════════════════════════
+         Marcels Befund: Angebote in einer Chatblase wandern mit dem
+         Verlauf aus dem Bild, und dann weiss niemand, dass noch etwas
+         offen ist. Diese Leiste steht fest zwischen Verlauf und Mikrofon.
+         Sie traegt IMMER die aktuelle Frage und, wenn es welche gibt, die
+         Angebote — an EINEM Ort, gold umrandet, nicht zu uebersehen. */
+      '.vi-rf-dran{margin:12px 2px 2px;border-radius:12px;overflow:hidden;',
+      '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent);',
+      '  background:var(--wl-fffdf7, #FFFDF7)}',
+      '.vi-dran-f{display:flex;gap:9px;align-items:baseline;padding:9px 13px;',
+      '  font:400 12.5px/1.45 Inter,system-ui,sans-serif}',
+      '.vi-dran-f i{font-style:normal;color:var(--wl-c9a84c, #C9A84C);font-weight:700}',
+      '.vi-dran-f span{flex:1;min-width:0}',
+      '.vi-dran-f b{font-weight:700}',
+      '.vi-dran-a{padding:9px 13px 11px;border-top:1px dashed rgba(42,39,39,.14);',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 9%, transparent)}',
+      '.vi-dran-lbl{display:block;margin-bottom:7px;',
+      '  font:700 9px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.11em;',
+      '  text-transform:uppercase;color:var(--wl-b8932f, #b8932f)}',
+      '.vi-dran-btn{display:inline-flex;align-items:center;gap:7px;margin:0 8px 6px 0;',
+      '  border-radius:10px;padding:8px 14px;cursor:pointer;',
+      '  border:1px solid var(--wl-c9a84c, #C9A84C);',
+      '  background:linear-gradient(160deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C));',
+      '  color:#221c08;font:700 12.5px Inter,system-ui,sans-serif;',
+      '  box-shadow:0 1px 3px rgba(42,39,39,.14);transition:transform .12s ease, box-shadow .12s ease}',
+      '.vi-dran-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 3px 9px rgba(42,39,39,.2)}',
+      '.vi-dran-btn:disabled,.vi-dran-btn.laeuft{opacity:.5;cursor:default;transform:none}',
+      '.vi-dran-btn b{font-size:14px;line-height:1}',
+      '.vi-dran-btn i{font-style:normal;font-size:10px;font-weight:600;padding:2px 7px;',
+      '  border-radius:99px;background:rgba(42,39,39,.14)}',
+      '.vi-dran-t{margin-top:2px;font:400 11.5px/1.5 Inter,system-ui,sans-serif;opacity:.7}',
+      /* Die Begruendungen der Lage-Recherche. */
+      '.vi-lg-t{margin:7px 0 0;font:400 11.5px/1.55 Inter,system-ui,sans-serif;opacity:.85}',
+      '.vi-lg-t b{display:block;font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;',
+      '  letter-spacing:.09em;text-transform:uppercase;color:var(--wl-b8932f, #b8932f);margin-bottom:3px}',
+      '.vi-adr{display:inline-block;padding:3px 10px;border-radius:8px;',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent);',
+      '  font:700 13.5px/1.35 "JetBrains Mono",ui-monospace,monospace}',
       /* ═══ v1288 · Das Etappenband ══════════════════════════════════════
          Steht ueber dem Verlauf und beantwortet die Frage, die ein
          Fragezaehler nicht beantwortet: nicht „die wievielte Frage",
@@ -3569,6 +3608,145 @@
      UND: ein Ja genuegt. Kein Modal, kein zweiter Dialog — der Knopf steht
      in der Frage, „ja" tut es auch gesprochen. */
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1291 · DIE AKTIONSLEISTE — was jetzt dran ist, steht UNTEN
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Befund: „ab und zu haben wir sowas wie Bodenrichtwert abholen
+     und solche Sachen und erweiterte Marktpreisindikation. Die stehen dann
+     meistens darunter und dann weiß man nicht, dass man jetzt weitermachen
+     soll."
+
+     Er hat recht, und die Ursache ist der Ort. Ein Angebot, das IN einer
+     Chatblase steht, wandert mit dem Verlauf nach oben und ist zwei
+     Antworten später aus dem Bild. Der Nutzer sieht unten das Mikrofon,
+     hört „ich höre zu" — und weiss nicht, dass oben noch eine
+     Entscheidung offen liegt.
+
+     JETZT: eine feste Leiste zwischen Verlauf und Mikrofon. Dort steht
+       - was gerade GEFRAGT ist (immer, in einer Zeile), und
+       - was gerade ANGEBOTEN wird (Knöpfe, wenn es welche gibt).
+     Sie scrollt nicht mit. Was dort steht, ist offen; was verschwindet,
+     ist erledigt.
+
+     EIN ORT FÜR ALLE ENTSCHEIDUNGEN: Bodenrichtwert, Lage-Recherche,
+     Marktpreisindikation, ihre Vertiefung, die Feinheiten-Frage und der
+     Weg zur Übersicht. Vorher lagen die an vier verschiedenen Stellen —
+     mal in der Blase, mal unter den Nebenknöpfen. */
+
+  /* Eine Aktion anmelden. Gleiche `art` ersetzt die vorige — ein Angebot
+     gibt es nie zweimal. */
+  function _rfAktion(art, txt, knopf, extra) {
+    if (!_rf) return;
+    if (!_rf.aktionen) _rf.aktionen = [];
+    _rf.aktionen = _rf.aktionen.filter(function (a) { return a.art !== art; });
+    _rf.aktionen.push(Object.assign({ art: art, txt: txt, knopf: knopf }, extra || {}));
+    _rfDranZeichnen();
+  }
+  function _rfAktionWeg(art) {
+    if (!_rf || !_rf.aktionen) return;
+    var vorher = _rf.aktionen.length;
+    _rf.aktionen = _rf.aktionen.filter(function (a) { return a.art !== art; });
+    if (vorher !== _rf.aktionen.length) _rfDranZeichnen();
+  }
+  function _rfAktionenLeeren() {
+    if (!_rf) return;
+    _rf.aktionen = [];
+    _rfDranZeichnen();
+  }
+
+  var AKT_ICON = {
+    brw: '📍', lage: '🌍', markt: '📊', markt2: '📈',
+    tiefe: '＋', tabelle: '✓', adresse: '📮'
+  };
+
+  function _rfDranZeichnen() {
+    var host = $('vi-rf-dran'); if (!host || !_rf) return;
+    var e = _rf.offen[_rf.i];
+    var akt = (_rf.aktionen || []);
+    /* Die Frage steht immer da — auch ohne Angebot. Wer nach einer langen
+       Auskunft wieder hinsieht, muss nicht nach oben scrollen, um zu
+       wissen, was gerade gefragt war. */
+    var frage = '';
+    if (_rf.abschlussOffen) {
+      frage = '<b>Fertig</b> — deine Werte warten in der Übersicht. Fragen darfst du mich weiter.';
+    } else if (_rf.wartetAufMarkt) {
+      frage = '<b>Deine Entscheidung</b> — dann geht es weiter.';
+    } else if (e) {
+      frage = '<b>Jetzt dran</b> · ' + escH(_rfKurzname(e)) + ' — ' + escH(e.frage);
+    }
+    if (!frage && !akt.length) { host.style.display = 'none'; host.innerHTML = ''; return; }
+    host.style.display = '';
+    host.innerHTML =
+      (frage ? '<div class="vi-dran-f"><i>▸</i><span>' + frage + '</span></div>' : '') +
+      (akt.length
+        ? '<div class="vi-dran-a">' +
+          '<span class="vi-dran-lbl">Ich kann das für dich holen:</span>' +
+          akt.map(function (a) {
+            return '<button type="button" class="vi-dran-btn" data-akt="' + escH(a.art) + '"' +
+                   (a.hinweis ? ' title="' + escH(a.hinweis) + '"' : '') + '>' +
+                   '<b>' + (AKT_ICON[a.art] || '›') + '</b>' + escH(a.knopf) +
+                   (a.frei != null ? '<i>' + escH(String(a.frei)) + ' frei</i>' : '') +
+                   '</button>';
+          }).join('') +
+          (akt.filter(function (a) { return a.txt; }).map(function (a) {
+            return '<div class="vi-dran-t">' + a.txt + '</div>';
+          }).join('')) +
+          '</div>'
+        : '');
+    [].slice.call(host.querySelectorAll('.vi-dran-btn')).forEach(function (b) {
+      b.addEventListener('click', function () { _rfAktionKlick(b.getAttribute('data-akt'), b); });
+    });
+  }
+
+  /* EIN Klickweg für alle Angebote. Vorher hatte jedes seinen eigenen —
+     und der des Markt-Angebots vergass, den Dialog fortzusetzen (v1290). */
+  function _rfAktionKlick(art, knopf) {
+    if (!_rf || !art) return;
+    if (knopf) { knopf.disabled = true; knopf.classList.add('laeuft'); }
+    var a = (_rf.aktionen || []).filter(function (x) { return x.art === art; })[0] || {};
+    _rfAktionWeg(art);
+    if (art === 'tabelle')  { _rfZurTabelle(); return; }
+    if (art === 'tiefe')    { _rfBlase('ich', 'Ja, lass uns weitermachen.'); _rfTiefeStarten(); return; }
+    if (art === 'brw')      { _rfBlase('ich', 'Hol den Bodenrichtwert.'); _rfBrwHolen(); return; }
+    if (art === 'lage')     { _rfBlase('ich', 'Recherchier die Lage.'); _rfLageRecherche(); return; }
+    if (art === 'markt' || art === 'markt2') {
+      var st = a.stufe || (art === 'markt2' ? 2 : 1);
+      _rfBlase('ich', st >= 2 ? 'Nimm die erweiterte.' : 'Ja, hol sie.');
+      var wartete = _rf.wartetAufMarkt;
+      _rfMarktWaehlen(st);
+      if (wartete) _rfNachAngebot();
+      return;
+    }
+  }
+
+  /* Gesprochen oder getippt: „ja" gilt fuer die OBERSTE offene Aktion.
+     Steht mehr als eine zur Wahl, wird nachgefragt statt geraten — eine
+     falsch verstandene Zusage kostet ein Kontingent. */
+  function _rfAktionJa(text) {
+    var akt = (_rf && _rf.aktionen) || [];
+    if (!akt.length) return false;
+    if (akt.length > 1) {
+      /* „hol den bodenrichtwert" / „die lage" — wer die Aktion NENNT,
+         bekommt sie; sonst fragt der Co-Pilot einmal nach. */
+      var t = _de(text);
+      var treffer = akt.filter(function (a) {
+        return t.indexOf(_de(a.knopf.split(' ')[0])) >= 0 ||
+               (a.art === 'brw' && /bodenrichtwert|boris/.test(t)) ||
+               (a.art === 'lage' && /lage|umgebung|region|stadtteil/.test(t)) ||
+               (a.art === 'markt' && /markt|indikation|preis/.test(t)) ||
+               (a.art === 'markt2' && /erweitert|voll|gross|gr(oe|ö)ss/.test(t));
+      });
+      if (treffer.length === 1) { _rfBlase('ich', escH(text)); _rfAktionKlick(treffer[0].art); return true; }
+      _rfBlase('ich', escH(text));
+      _rfBlase('co', 'Beides kann ich holen — sag mir welches: ' +
+        akt.map(function (a) { return '<b>' + escH(a.knopf) + '</b>'; }).join(' oder ') + '.');
+      return true;
+    }
+    _rfBlase('ich', escH(text));
+    _rfAktionKlick(akt[0].art);
+    return true;
+  }
+
   /* Ein Wert plus seine Herkunft. Ueberschreibt NICHT, was gesagt wurde:
      wer den Bodenrichtwert selbst genannt hat, behaelt seinen. */
   function _rfSetzen(id, wert, quelle) {
@@ -3582,29 +3760,34 @@
     return true;
   }
 
-  /* ── Das Angebot in der Frage ──────────────────────────────────────── */
+  /* ── Die Angebote zu einer Frage ──────────────────────────────────
+     v1291: Sie erscheinen nicht mehr IN der Frageblase, sondern in der
+     Aktionsleiste unten. Was hier passiert, ist deshalb nur noch
+     anmelden — das Zeichnen macht `_rfDranZeichnen`. */
   function _rfAbrufAngebot(eintrag) {
-    if (!eintrag || !eintrag.abruf || !_rf) return '';
+    if (!eintrag || !_rf) return '';
+    if (!eintrag.abruf) return '';
     if (_rf.abrufGetan && _rf.abrufGetan[eintrag.abruf]) return '';
-    var txt = '', knopf = '';
     if (eintrag.abruf === 'brw') {
       if (!_rfBrwMoeglich()) return '';
-      txt = 'Den <b>Bodenrichtwert</b> kann ich selbst holen — amtlich aus BORIS, mit Stichtag und Zone.';
-      knopf = 'Bodenrichtwert holen';
-    } else if (eintrag.abruf === 'lage') {
+      _rfAktion('brw', 'Amtlich aus BORIS, mit Stichtag und Zone — kostet nichts.',
+                'Bodenrichtwert holen');
+      _rf.abrufOffen = 'brw';
+      return '';
+    }
+    if (eintrag.abruf === 'lage') {
       if (_rf.markt) {
-        txt = 'Die Lagewerte aus der Marktpreisindikation liegen mir vor — ich kann sie eintragen.';
-        knopf = 'Lagewerte übernehmen';
-      } else if (_rf.marktLaeuft) {
-        return '<div class="vi-rf-abruf laeuft">Die Marktpreisindikation läuft noch — ' +
-               'sag ruhig, wie du die Lage siehst, ich melde mich, sobald sie da ist.</div>';
+        _rfAktion('lage', 'Aus der Marktpreisindikation liegen Makro- und Mikrolage vor.',
+                  'Lagewerte übernehmen');
+      } else if (_rfLageMoeglich()) {
+        _rfAktion('lage', 'Ich recherchiere Makrolage, Mikrolage, Bevölkerungsentwicklung, ' +
+                  'Nachfrage, Wertsteigerung und Entwicklung — mit Quellenangabe.',
+                  'Lage recherchieren');
       } else return '';
-    } else return '';
-    _rf.abrufOffen = eintrag.abruf;
-    return '<div class="vi-rf-abruf">' + txt +
-      '<button type="button" class="vi-rf-abruf-btn" data-abruf="' + escH(eintrag.abruf) + '">' +
-      escH(knopf) + '</button>' +
-      '<small>Ein „ja" genügt.</small></div>';
+      _rf.abrufOffen = 'lage';
+      return '';
+    }
+    return '';
   }
 
   function _rfBrwMoeglich() {
@@ -3618,30 +3801,147 @@
     } catch (e) { return false; }
   }
 
-  /* Der Knopf steht IN der Blase, also wird er nach dem Zeichnen
-     verdrahtet — nicht ueber eine id, die es zweimal geben koennte,
-     sondern ueber den zuletzt eingefuegten Knopf im Verlauf. */
-  function _rfAbrufWiring() {
-    var chat = $('vi-rf-chat'); if (!chat) return;
-    var knoepfe = chat.querySelectorAll('.vi-rf-abruf-btn[data-abruf]:not([data-wired])');
-    [].slice.call(knoepfe).forEach(function (b) {
-      b.setAttribute('data-wired', '1');
-      b.addEventListener('click', function () { _rfAbrufStarten(b.getAttribute('data-abruf')); });
+  function _rfLageMoeglich() {
+    var plz = _rfFeld('plz'), ort = _rfFeld('ort');
+    return !!(plz || ort);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     v1291 · DIE LAGE RECHERCHIEREN — sechs Dimensionen auf einmal
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Wunsch: „er soll auch micro und makrolage einzeln abrufen
+     können … vielleicht auch Bevölkerungsentwicklung. Das kann er
+     einerseits über unsere Schnittstelle Marktbewertung machen, aber auch
+     über KI aus dem Netz."
+
+     BEIDES GIBT ES SCHON, und sie ergaenzen sich:
+
+       Marktpreisindikation   Makro und Mikro als SCORE (0-100), aus
+                              Marktdaten gerechnet. Kostet ein Kontingent.
+       /ai/lage               SECHS Dimensionen mit Quelle und Begruendung,
+                              recherchiert. Kostet einen KI-Aufruf.
+
+     `/ai/lage` liefert genau die Enum-Werte, die unsere Felder fuehren —
+     im Browser Feld fuer Feld gegengeprueft, alle sechs stimmen ueberein:
+
+       makro          -> makrolage           sehr_gut … sehr_schwach
+       mikro          -> mikrolage           sehr_gut … sehr_schwach
+       bevoelkerung   -> ds2_bevoelkerung    stark_wachsend … stark_fallend
+       nachfrage      -> ds2_nachfrage       sehr_stark … sehr_schwach
+       wertsteigerung -> ds2_wertsteigerung  sehr_hoch … keines
+       entwicklung    -> ds2_entwicklung     mehrere … keine
+
+     Das sind SECHS Felder des Deal Score 2 aus einem Aufruf — und mit
+     Quellenangabe, also mit einer Herkunft, die den Namen verdient.
+
+     WAS NICHT UEBERSCHRIEBEN WIRD: was der Nutzer selbst gesagt hat.
+     `_rfSetzen` laesst bestehende Werte stehen; die Recherche fuellt nur
+     Luecken. Wer die Lage selbst einschaetzt, behaelt seine Einschaetzung. */
+  var LAGE_ZIEL = {
+    makro: 'makrolage', mikro: 'mikrolage', bevoelkerung: 'ds2_bevoelkerung',
+    nachfrage: 'ds2_nachfrage', wertsteigerung: 'ds2_wertsteigerung',
+    entwicklung: 'ds2_entwicklung'
+  };
+  var LAGE_NAME = {
+    makro: 'Makrolage', mikro: 'Mikrolage', bevoelkerung: 'Bevölkerung',
+    nachfrage: 'Nachfrage', wertsteigerung: 'Wertsteigerung', entwicklung: 'Entwicklung'
+  };
+
+  function _rfLageRecherche() {
+    if (!_rf) return;
+    if (!_rf.abrufGetan) _rf.abrufGetan = {};
+    _rf.abrufGetan.lage = 1;
+    _rf.abrufOffen = null;
+    /* Liegen die Werte schon aus der Marktpreisindikation vor, wird nichts
+       nachgeholt — zwei Quellen fuer dieselbe Zahl ist eine zu viel. */
+    if (_rf.markt) return _rfLageUebernehmen();
+
+    var adr = [ _rfFeld('str'), _rfFeld('hnr') ].filter(Boolean).join(' ');
+    var ortT = [ _rfFeld('plz'), _rfFeld('ort') ].filter(Boolean).join(' ');
+    _rfBlase('co', '<span style="opacity:.75">Ich sehe mir die Lage an — Region, Stadtteil, ' +
+      'Bevölkerung, Nachfrage. Das dauert einen Moment.</span>');
+    _rfMelden('', true);
+    return Auth.apiCall('/ai/lage', {
+      method: 'POST', timeout: 150000,
+      body: {
+        adresse: [adr, ortT].filter(Boolean).join(', '),
+        str: _rfFeld('str') || '', hnr: _rfFeld('hnr') || '',
+        plz: _rfFeld('plz') || '', ort: _rfFeld('ort') || '',
+        kaufpreis: _rfNum(_rfFeld('kp')),
+        wohnflaeche: _rfNum(_rfFeld('wfl')),
+        nettokaltmiete: _rfNum(_rfFeld('nkm'))
+      }
+    }).then(function (r) {
+      _rfDenkt(false);
+      if (!r || !r.success) throw new Error((r && r.error) || 'Keine Daten zurückgekommen');
+      _rf.lage = r;
+      var Q = 'Lage-Recherche';
+      var zeilen = [], quellen = [], gesetzt = [];
+      Object.keys(LAGE_ZIEL).forEach(function (k) {
+        var d = r[k];
+        if (!d || !d.value) return;
+        var feld = LAGE_ZIEL[k];
+        var wort = _optionText(feld, d.value) || d.label || d.value;
+        zeilen.push(_zeile(LAGE_NAME[k], wort,
+                    (d.score != null && d.score >= 70) ? 'gut' : ((d.score != null && d.score < 40) ? 'schlecht' : '')));
+        if (_rfSetzen(feld, d.value, Q + (d.source && d.source.label ? ' · ' + d.source.label : ''))) gesetzt.push(LAGE_NAME[k]);
+        if (d.source && d.source.label && quellen.indexOf(d.source.label) < 0) quellen.push(d.source.label);
+      });
+      if (!zeilen.length) throw new Error('Die Recherche kam ohne verwertbare Angaben zurück');
+      /* Die Begruendungen: kurz, aber DA. Wer eine Lagebewertung
+         uebernimmt, soll lesen koennen, worauf sie beruht. */
+      var texte = Object.keys(LAGE_ZIEL).map(function (k) {
+        var d = r[k];
+        if (!d || !d.text) return '';
+        return '<div class="vi-lg-t"><b>' + escH(LAGE_NAME[k]) + '</b> ' + escH(String(d.text).slice(0, 260)) + '</div>';
+      }).filter(Boolean).join('');
+      _rfBlase('co', '<b>Die Lage-Recherche ist da.</b>' +
+        '<div class="vi-sc"><div class="vi-sc-kopf"><span class="vi-sc-titel">Lage · recherchiert</span></div>' +
+        '<div class="vi-sc-gitter">' + zeilen.join('') + '</div>' +
+        (texte ? '<details class="vi-sc-mehr"><summary>Woran das liegt</summary>' + texte + '</details>' : '') +
+        (gesetzt.length
+          ? '<div class="vi-sc-annahmen"><b>Übernommen:</b> ' + escH(gesetzt.join(', ')) +
+            (quellen.length ? ' · <b>Quellen:</b> ' + escH(quellen.slice(0, 4).join(', ')) : '') +
+            '</div>'
+          : '<div class="vi-sc-annahmen">Deine eigenen Angaben bleiben stehen — ich habe nur ergänzt, was fehlte.</div>') +
+        '</div>');
+      _rfStandZeichnen();
+      _rfLageWeiter();
+    }).catch(function (err) {
+      _rfDenkt(false);
+      var m = (err && err.data && err.data.error) || (err && err.message) || '';
+      try { console.warn('[voice] Lage-Recherche:', m, err); } catch (e) {}
+      _rfBlase('co', 'Die Lage-Recherche hat nicht geklappt' +
+        (m ? ' (' + escH(String(m).slice(0, 100)) + ')' : '') +
+        ' — sag mir einfach, wie du die Lage einschätzt.');
+      if (_fs.an && _fs.stream) _fsHoeren(true);
     });
   }
 
-  function _rfAbrufStarten(art) {
-    if (!_rf || !art) return;
-    _rf.abrufOffen = null;
-    if (!_rf.abrufGetan) _rf.abrufGetan = {};
-    _rf.abrufGetan[art] = 1;
-    var chat = $('vi-rf-chat');
-    if (chat) [].slice.call(chat.querySelectorAll('.vi-rf-abruf-btn[data-abruf="' + art + '"]'))
-      .forEach(function (b) { b.disabled = true; b.textContent = 'läuft …'; });
-    if (art === 'brw') return _rfBrwHolen();
-    if (art === 'lage') return _rfLageUebernehmen();
+  /* Der Klartext einer Auswahl — aus dem <select>, nicht aus einer
+     zweiten Liste. */
+  function _optionText(feldId, wert) {
+    try {
+      var el = document.getElementById(feldId);
+      if (!el || el.tagName !== 'SELECT') return null;
+      for (var i = 0; i < el.options.length; i++) {
+        if (String(el.options[i].value) === String(wert)) return String(el.options[i].text).trim();
+      }
+    } catch (e) {}
+    return null;
   }
 
+  /* Ist die Frage damit beantwortet, geht es weiter. */
+  function _rfLageWeiter() {
+    try {
+      var e = _rf.offen[_rf.i];
+      if (e && !_rfFehlt(e, _rf.data.fields)) {
+        _rfBlase('co', '<span style="opacity:.7">Damit habe ich die Lage — weiter.</span>');
+        return setTimeout(_rfWeiter, 500);
+      }
+    } catch (ex) {}
+    if (_fs.an && _fs.stream) _fsHoeren(true);
+  }
   function _rfBrwHolen() {
     var adr = { plz: _rfFeld('plz'), ort: _rfFeld('ort'), str: _rfFeld('str') };
     _rfMelden('', true);
@@ -3775,42 +4075,18 @@
     }
     _rf.marktGefragt = 1;
     _rf.abrufOffen = 'markt';
-    var knoepfe = '';
-    if (kg.mpi) knoepfe += '<button type="button" class="vi-rf-abruf-btn" data-markt="1">' +
-      'Jetzt: Marktpreisindikation <i>' + kg.mpi + ' frei</i></button>';
-    if (kg.mpi_plus) knoepfe += '<button type="button" class="vi-rf-abruf-btn" data-markt="2">' +
-      'Später: erweiterte Indikation <i>' + kg.mpi_plus + ' frei</i></button>';
+    /* v1291: Die Angebote stehen in der Aktionsleiste unten, nicht in der
+       Blase — dort wandern sie mit dem Verlauf aus dem Bild. */
     _rfBlase('co', 'Für diese Adresse kann ich eine <b>Marktpreisindikation</b> holen — ' +
-      'Kaufpreisniveau, Mietniveau und die Lagebewertung.' +
-      '<div class="vi-rf-abruf">' + knoepfe +
-      '<small>' +
-      (kg.mpi ? '<b>Jetzt</b> heißt: sie läuft gleich im Hintergrund, und wir machen weiter. ' : '') +
-      (kg.mpi_plus ? '<b>Später</b> ist die erweiterte — sie liest auch Zustand, Energieausweis, ' +
-        'Bodenrichtwert und deine Lagebewertung, und die kommen erst in den nächsten Etappen. ' +
-        'Ich hole sie, sobald das steht.' : '') +
-      '</small></div>');
-    _rfMarktWiring();
-  }
-
-  function _rfMarktWiring() {
-    var chat = $('vi-rf-chat'); if (!chat) return;
-    [].slice.call(chat.querySelectorAll('.vi-rf-abruf-btn[data-markt]:not([data-wired])')).forEach(function (b) {
-      b.setAttribute('data-wired', '1');
-      b.addEventListener('click', function () {
-        _rf.abrufOffen = null;
-        var st = parseInt(b.getAttribute('data-markt'), 10) || 1;
-        _rfBlase('ich', st >= 2 ? 'Nimm die erweiterte.' : 'Ja, hol sie.');
-        var wartete = _rf.wartetAufMarkt;
-        _rfMarktWaehlen(st);
-        /* v1290: WER KLICKT, MUSS AUCH WEITERKOMMEN.
-           Bis hierher setzte nur die gesprochene Zusage den Dialog fort
-           (_rfVorabErkennen -> _rfNachAngebot). Der Knopf tat es nicht —
-           wer ihn drueckte, waehrend der Ablauf auf die Entscheidung
-           wartete, blieb ohne naechste Frage stehen. Beim Messen ist es
-           mir entgangen, weil ich die Zusage immer getippt habe. */
-        if (wartete) _rfNachAngebot();
-      });
-    });
+      'Kaufpreisniveau, <b>Marktmiete</b> und die Lagebewertung. Sie läuft im Hintergrund; ' +
+      'wir machen solange weiter.');
+    if (kg.mpi) _rfAktion('markt',
+      'Läuft gleich im Hintergrund — Kaufpreisniveau, Marktmiete, Makro- und Mikrolage.',
+      'Marktpreisindikation', { frei: kg.mpi, stufe: 1 });
+    if (kg.mpi_plus) _rfAktion('markt2',
+      'Die erweiterte liest auch Zustand, Energieausweis, Bodenrichtwert und deine ' +
+      'Lagebewertung — die kommen erst in den nächsten Etappen. Ich hole sie, sobald das steht.',
+      'Erweiterte (später)', { frei: kg.mpi_plus, stufe: 2 });
   }
 
   function _rfMarktWaehlen(stufe) {
@@ -3852,16 +4128,12 @@
       var kg = _rfKontingent();
       if (!kg || !kg.mpi_plus) return;
       _rf.marktPlusGefragt = 1;
-      _rf.abrufOffen = 'markt';
+      _rf.abrufOffen = 'markt2';
       _rfBlase('co', 'Jetzt hätte ich alles beisammen für die <b>erweiterte Marktpreisindikation</b> — ' +
         'Zustand, Energieausweis, Bodenrichtwert und deine Lagebewertung. Sie bringt zusätzlich ' +
-        'die Preishistorie, die amtliche Makrolage und eine Einordnung im Fließtext.' +
-        '<div class="vi-rf-abruf">' +
-        '<button type="button" class="vi-rf-abruf-btn" data-markt="2">Erweiterte holen <i>' +
-        kg.mpi_plus + ' frei</i></button>' +
-        '<small>Die Vertiefung kostet nur die Differenz — die erste Stufe ist schon bezahlt.</small>' +
-        '</div>');
-      _rfMarktWiring();
+        'die Preishistorie, die amtliche Makrolage und eine Einordnung im Fließtext.');
+      _rfAktion('markt2', 'Die Vertiefung kostet nur die Differenz — die erste Stufe ist schon bezahlt.',
+                'Erweiterte holen', { frei: kg.mpi_plus, stufe: 2 });
     }
   }
 
@@ -4065,6 +4337,9 @@
         '<div class="vi-rf-chat" id="vi-rf-chat"></div>' +
         '<div class="vi-rf-stand" id="vi-rf-stand"></div>' +
       '</div>' +
+      /* v1291: Die Aktionsleiste — was jetzt dran ist und was der Co-Pilot
+         anbietet. Fest zwischen Verlauf und Mikrofon, scrollt nicht mit. */
+      '<div class="vi-rf-dran" id="vi-rf-dran" style="display:none"></div>' +
       /* v1277: Sprechen ist der Hauptweg — er steht auch so da. */
       '<div class="vi-rf-mikro" id="vi-rf-mikro">' +
         '<span class="vi-rf-mikro-icon">🎤</span>' +
@@ -4177,6 +4452,11 @@
        nimmt die naechste Frage ein "ja" entgegen, das dem alten Knopf galt. */
     _rf.abrufOffen = null;
     _rf.nachgehakt = 0;   /* v1290: Nachhaken gilt nur fuer die Frage, in der es passiert ist */
+    /* v1291: Angebote gelten fuer IHRE Frage. Was bleibt, ist der
+       Marktabruf — der laeuft ueber den ganzen Dialog. */
+    (_rf.aktionen || []).slice().forEach(function (a) {
+      if (a.art !== 'markt' && a.art !== 'markt2') _rfAktionWeg(a.art);
+    });
     /* v1280: Der Vorschlag aus den Einstellungen steht IN der Frage - nicht
        als stiller Knopf daneben. Wer gefragt wird, soll sehen, was der
        Co-Pilot vorhat, bevor er ja sagt. */
@@ -4192,7 +4472,7 @@
     _rf.profilVorschlag = pv;
     _rfStandZeichnen();   /* v1281 */
     _rfBandZeichnen();    /* v1288 */
-    _rfAbrufWiring();     /* v1288: der Knopf steht in der Frage */
+    _rfDranZeichnen();    /* v1291: die Aktionsleiste unten */
 
     var v = _rfVorschlag(e), pb = $('vi-rf-passt');
     if (pb) {
@@ -4509,23 +4789,12 @@
       'Das sind <b>' + felder + ' weitere Angaben</b> in ' + bloecke.length + ' Fragen — ' +
       'Kaufnebenkosten, Bewirtschaftung, Steuer, Entwicklung. ' +
       '<span style="opacity:.7">Du kannst jederzeit „Fertig" sagen.</span>');
-    var neben = $('vi-rf-neben');
-    if (!neben) {
-      /* v1287: Ohne Knopf gaebe es keinen Weg weiter UND keinen Weg zur
-         Tabelle - eine Sackgasse. Genau das ist passiert: der Container
-         trug nur eine Klasse, gesucht wurde per id. Lieber ohne Nachfrage
-         zur Tabelle als steckenbleiben. */
-      try { console.warn('[voice] Tiefe-Knopf konnte nicht gesetzt werden'); } catch (e) {}
-      return false;
-    }
-    neben.insertAdjacentHTML('afterbegin',
-      '<button type="button" id="vi-rf-tiefe-ja">Ja, weiter ins Detail</button>');
-    var b = $('vi-rf-tiefe-ja');
-    if (b) b.addEventListener('click', function () {
-      b.remove();
-      _rfBlase('ich', 'Ja, lass uns weitermachen.');
-      _rfTiefeStarten();
-    });
+    /* v1291: Auch diese Frage steht jetzt in der Aktionsleiste unten —
+       ein Angebot, das man erst suchen muss, ist keins (Marcels Befund).
+       Damit entfaellt auch die Sackgasse aus v1287: die Leiste gibt es
+       immer, sie ist Teil des Aufbaus. */
+    _rfAktion('tiefe', bloecke.length + ' weitere Fragen · ' + felder + ' Angaben.',
+              'Ja, weiter ins Detail');
     /* v1287: „ja" darf man auch SAGEN oder tippen - nicht nur klicken. */
     _rf.tiefeOffen = 1;
     var pb = $('vi-rf-passt'); if (pb) pb.style.display = 'none';
@@ -4624,16 +4893,11 @@
           'angenommen. Sag mir die echten Sätze, und die Rechnung stimmt.</div>'
         : ''));
 
-    var neben = $('vi-rf-neben');
-    if (!neben) return false;   /* v1287: lieber ohne Abschluss als steckenbleiben */
-    var alt = $('vi-rf-zur-tabelle'); if (alt) alt.remove();
-    neben.insertAdjacentHTML('afterbegin',
-      '<button type="button" id="vi-rf-zur-tabelle">Zur Übersicht — Werte übernehmen</button>');
-    var b = $('vi-rf-zur-tabelle');
-    if (!b) return false;
-    b.addEventListener('click', function () { _rfZurTabelle(); });
+    /* v1291: Der Weg zur Tabelle steht in der Aktionsleiste — dort, wo
+       alle Entscheidungen stehen, und nicht zwischen den Nebenknöpfen. */
     _rf.abschlussOffen = 1;
-    var pb = $('vi-rf-passt'); if (pb) pb.style.display = 'none';
+    _rfAktion('tabelle', 'Nichts davon steht schon im Objekt — in der Übersicht wählst du Zeile für Zeile.',
+              'Zur Übersicht — Werte übernehmen');
     var inp = $('vi-rf-in'); if (inp) inp.disabled = false;
     if (_fs.an && _fs.stream) _fsHoeren(true);
     return true;
@@ -4691,8 +4955,93 @@
       if (_fs.an) _fsHoeren(true);
       return;
     }
+    /* v1291: Die Adresse wird bestaetigt, bevor Bodenrichtwert, Marktdaten
+       und Lage darauf aufbauen. Die einzige Rueckfrage im ganzen Dialog. */
+    if (e.ids && e.ids.indexOf("plz") >= 0 && _rfAdresseBestaetigen()) return;
     _rf.nachgehakt = 0;
     _rfWeiterGleich();
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     v1291 · DIE ADRESSE WIRD BESTÄTIGT, BEVOR ETWAS DARAUF AUFBAUT
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Wunsch: „die Adresse sollte man nochmal bestätigen und eine
+     Rückfrage stellen."
+
+     Und er hat den wunden Punkt getroffen. Ein Strassenname ist das, was
+     eine Transkription am haeufigsten verfehlt — „Hermannstrasse" wird zu
+     „Hermann Strasse", „Herrmannstrasse", „Hermanns Trasse". Bei einer
+     Zahl faellt das auf; bei einem Namen nicht.
+
+     UND AN DER ADRESSE HAENGT ALLES, was danach kommt: der amtliche
+     Bodenrichtwert (Geokodierung), die Marktpreisindikation
+     (Adress-Treffer), die Lage-Recherche, die Grunderwerbsteuer. Eine
+     falsch verstandene Strasse macht aus vier richtigen Abrufen vier
+     falsche — und keiner davon meldet einen Fehler, denn die Nachbarstadt
+     hat auch Marktdaten.
+
+     Deshalb ist das hier die EINZIGE Stelle im ganzen Dialog, an der
+     zurueckgefragt wird. Ueberall sonst gilt „lieber weiter als
+     nachhaken"; hier ist es umgekehrt. */
+  function _rfAdresseBestaetigen() {
+    if (!_rf || _rf.adresseGeprueft) return false;
+    var str = _rfFeld('str'), hnr = _rfFeld('hnr'), plz = _rfFeld('plz'), ort = _rfFeld('ort');
+    if (!str && !ort) return false;
+    _rf.adresseGeprueft = 1;
+    _rf.adresseFrage = 1;
+    var zeile = [ [str, hnr].filter(Boolean).join(' '), [plz, ort].filter(Boolean).join(' ') ]
+                .filter(Boolean).join(', ');
+    var fehlt = [];
+    if (!str) fehlt.push('Straße');
+    if (!hnr) fehlt.push('Hausnummer');
+    if (!plz) fehlt.push('Postleitzahl');
+    if (!ort) fehlt.push('Ort');
+    var g = _rfGrest();
+    _rfBlase('co',
+      'Ich habe verstanden: <b class="vi-adr">' + escH(zeile) + '</b>' +
+      (g ? '<div class="vi-rf-zaehler">' + escH(g.name) + ' · Grunderwerbsteuer ' +
+           escH(_pz(g.rate)) + ' %</div>' : '') +
+      (fehlt.length
+        ? '<div style="margin-top:8px">Mir fehlt noch: <b>' + escH(fehlt.join(', ')) + '</b>. ' +
+          'Sag sie mir einfach — oder „passt so", wenn du sie nicht hast.</div>'
+        : '<div style="margin-top:8px"><b>Stimmt das so?</b> Sag „ja" — oder sag mir die Adresse ' +
+          'nochmal, wenn ich etwas falsch verstanden habe. ' +
+          '<span style="opacity:.7">Daran hängen der Bodenrichtwert, die Marktdaten und die Lage.</span></div>'));
+    _rfAktion('adresse', 'Danach hole ich Bodenrichtwert, Marktdaten und Lage zu genau dieser Adresse.',
+              fehlt.length ? 'Passt so, weiter' : 'Ja, stimmt');
+    if (_fs.an && _fs.stream) _fsHoeren(true);
+    return true;
+  }
+
+  /* Die Antwort auf die Adress-Rueckfrage. „ja" geht weiter, alles andere
+     wird als NEUE Adresse gelesen — wer korrigiert, sagt die Adresse noch
+     einmal, nicht das Wort „nein". */
+  function _rfAdresseAntwort(t, ausSprache) {
+    if (!_rf || !_rf.adresseFrage) return false;
+    if (RF_JA.test(t) || /^(stimmt|passt|richtig|genau|korrekt)\b[\s.!,]*$/i.test(t)) {
+      _rf.adresseFrage = 0;
+      _rfAktionWeg('adresse');
+      _rfBlase('ich', escH(t));
+      _rfWeiter();
+      return true;
+    }
+    if (RF_NEIN_ANGEBOT.test(t) || /^(nein|falsch|nicht ganz|so nicht)\b[\s.!,]*$/i.test(t)) {
+      _rfBlase('ich', escH(t));
+      _rfBlase('co', 'Dann sag mir die Adresse bitte noch einmal — Straße, Hausnummer, Postleitzahl und Ort.');
+      /* Die alten Werte raus: sonst mischt sich die falsche Strasse mit
+         der neuen Hausnummer. */
+      ['str', 'hnr', 'plz', 'ort'].forEach(function (id) { delete _rf.data.fields[id]; });
+      _rf.adresseFrage = 0; _rf.adresseGeprueft = 0;
+      _rfAktionWeg('adresse');
+      _rfStandZeichnen();
+      if (ausSprache && _fs.an) _fsHoeren(true);
+      return true;
+    }
+    /* Alles andere ist eine Korrektur — sie geht durch die normale
+       Auswertung und ueberschreibt, was dort steht. */
+    _rf.adresseFrage = 0; _rf.adresseGeprueft = 0;
+    _rfAktionWeg('adresse');
+    return false;
   }
 
   /* v1290: Nicht weitergehen, solange jemand redet. Der Recorder laeuft
@@ -4778,19 +5127,23 @@
     var t = String(text || '').trim();
     if (!t) return true;
 
-    /* v1288: Steht ein Abruf-Angebot offen, ist „ja" die Antwort darauf. */
-    if (_rf.abrufOffen && RF_JA.test(t)) {
-      var art = _rf.abrufOffen;
-      _rf.abrufOffen = null;
-      _rfBlase('ich', escH(t));
-      if (art === 'markt') { _rfMarktWaehlen(1); return _rfNachAngebot(); }
-      _rfAbrufStarten(art);
-      return true;
+    /* v1291: Die Adress-Rueckfrage hat Vorrang vor allem anderen. */    if (_rf.adresseFrage && _rfAdresseAntwort(t, ausSprache)) return true;
+    /* v1291: Steht ein Angebot in der Aktionsleiste, ist „ja" die Antwort
+       darauf. EIN Weg fuer alle Angebote — vorher hatte jedes seinen
+       eigenen, und einer davon vergass die Fortsetzung (v1290). Wer die
+       Aktion beim Namen nennt („hol den Bodenrichtwert"), bekommt sie
+       auch dann, wenn mehrere offenstehen. */
+    if ((_rf.aktionen || []).length && RF_JA.test(t)) {
+      if (_rfAktionJa(t)) return true;
+    }
+    if ((_rf.aktionen || []).length > 1 && /^(hol|nimm|mach|recherchier|bodenrichtwert|die lage|marktpreis)/i.test(t)) {
+      if (_rfAktionJa(t)) return true;
     }
     /* Auf ein WARTENDES Angebot ist auch das Nein eine Antwort — dort
        steht keine Frage offen, die es ueberspringen koennte. */
     if (_rf.wartetAufMarkt && (RF_NEIN_ANGEBOT.test(t) || RF_NEIN.test(t))) {
       _rf.abrufOffen = null;
+      _rfAktionWeg('markt'); _rfAktionWeg('markt2');
       _rfBlase('ich', escH(t));
       _rfBlase('co', '<span style="opacity:.7">Alles klar — dann frage ich die Werte ganz normal ab.</span>');
       return _rfNachAngebot();
