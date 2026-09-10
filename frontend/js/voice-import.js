@@ -3887,26 +3887,64 @@
   };
   var TIEFE_PRO_FRAGE = 4;
 
-  /* Nur die direkten Textknoten — was in einem Kind-Element steht, ist
-     Knopf, Marke oder Hilfetext, nicht der Titel. */
+  /* Der Titel steht in der `.ct` — aber nicht allein.
+     GEMESSEN am 10.09.2026 an der Inventar-Karte, Kind fuer Kind:
+
+       TEXT ""  ·  SPAN.ct-ico  ·  SPAN (der Titel)  ·  LABEL (ein Schalter)
+
+     Die direkten TEXTKNOTEN sind leer — der Titel steckt in einem <span>.
+     Der erste Versuch (nur direkte Textknoten lesen, sonst
+     firstElementChild) lieferte deshalb nichts und fiel auf den
+     Abschnittsnamen zurueck: „Kaufpreis & Nebenkosten — Kueche, Moebel,
+     Geraete, PV-Anlage?" statt „Inventar — …".
+
+     Jetzt andersherum: den ganzen Text nehmen und das entfernen, was
+     KEIN Titel ist — Knopf, Schalter, Symbol, Live-Marke, Eingabefeld.
+     Gegengeprueft an allen 21 Karten mit Feldern; jede traegt danach
+     einen sauberen Namen (Objektdaten · Qualitaet & Zustand · Grund &
+     Boden · Inventar · Sanierung · Mietstruktur · Persoenliche Steuer ·
+     Darlehen I – Hauptdarlehen · Umlagefaehige Kosten / Jahr · …). */
+  var CT_KEIN_TITEL = 'button,a,label,svg,input,select,textarea,.btn,.ct-ico,.live,.chip,.badge,.pill';
   function _kartenTitel(karte) {
     if (!karte) return '';
-    var ct = karte.querySelector(':scope > .ct') || karte.querySelector('.ct');
+    var ct = karte.querySelector('.ct');
     if (!ct) return '';
     var t = '';
-    for (var i = 0; i < ct.childNodes.length; i++) {
-      var n = ct.childNodes[i];
-      if (n.nodeType === 3) t += n.nodeValue;
-    }
+    try {
+      var k = ct.cloneNode(true);
+      [].slice.call(k.querySelectorAll(CT_KEIN_TITEL)).forEach(function (x) { x.remove(); });
+      t = String(k.textContent || '');
+    } catch (e) { t = String(ct.textContent || ''); }
     t = t.replace(/\s+/g, ' ').trim().replace(/[·:\-–—]+$/, '').trim();
-    /* Ohne direkte Textknoten (alles steckt in einem <span>) lieber den
-       ganzen Text als gar keinen — dann aber nur bis zum ersten Kind. */
-    if (!t && ct.firstElementChild) {
-      t = String(ct.firstElementChild.textContent || '').replace(/\s+/g, ' ').trim();
-    }
     if (t.length > 38) t = t.slice(0, 38).replace(/\s+\S*$/, '') + '…';
     return t;
   }
+
+  /* ═══ v1289b · Was der Sprechlauf NICHT fragt ══════════════════════════
+     Gemessen im ersten Durchlauf: 93 Felder in 29 Fragen — davon **37 in
+     zehn Fragen allein aus der Karte „Wertermittlung (Marktbericht)"**.
+     Das sind Saetze wie „Aussenwaende · 23 %", „Standardstufe (NHK 2010)",
+     „Modernisierungsgrad (Anlage 2)", „Liegenschaftszinssatz".
+
+     DAS IST EINE EIGENE STRECKE, und sie gehoert nicht ins Diktat.
+     CLAUDE.md ist dort eindeutig: jeder Parameter traegt einen
+     Modellvermerk, jede Zahl ihre Herkunft (Stufe A–E, Ausschuss), und
+     „kein Verfahren rechnet halb". Ein gesprochener Wert kaeme in der
+     Uebernahme-Tabelle als „Sprachaufzeichnung" an — eine Herkunft, die
+     nach § 10 ImmoWertV keine ist. Wer die Wertermittlung fuellen will,
+     tut das im Marktbericht, wo die Vermerke mitlaufen.
+
+     Dazu die Ueberfuehrungsfelder (`ueberf_*`, `verkehrswert_ueberf`,
+     `gesellschafterdarlehen`): sie gehoeren zum Ueberfuehrungs-Wizard
+     einer Gesellschaft, nicht zur Aufnahme eines Objekts.
+
+     Ausgeschlossen wird ueber den KARTENTITEL, nicht ueber Feld-ids: die
+     Karte ist die Einheit, die der Nutzer sieht, und eine neue Zeile
+     darin faellt damit automatisch mit heraus. Bei den
+     Ueberfuehrungsfeldern geht es umgekehrt — sie stehen mitten in
+     „Objektdaten", also bleibt nur die id. */
+  var TIEFE_NICHT_KARTE = /^(Wertermittlung \(Marktbericht\))/i;
+  var TIEFE_NICHT_ID = /^(ueberf_|_ueberf|verkehrswert_ueberf|gesellschafterdarlehen|obj_herkunft|halter)/;
 
   function _rfTiefeBloecke() {
     var schon = {};
@@ -3916,6 +3954,7 @@
     var proKarte = {}, folge = [];
     (window.FIELDS || []).forEach(function (id) {
       if (schon[id]) return;
+      if (TIEFE_NICHT_ID.test(id)) return;                    /* v1289b */
       var el = document.getElementById(id);
       if (!el) return;
       if (el.readOnly || el.disabled || el.type === 'hidden') return;
@@ -3928,8 +3967,10 @@
       var name = lab ? lab.textContent.replace(/\s+/g, ' ').replace(/\s*ℹ.*$/, '').trim() : id;
       if (!name || name.length > 42) return;                  /* ohne Namen keine Frage */
       var karte = el.closest('.card');
-      var titel = _kartenTitel(karte) || TIEFE_SEC[k];
-      var schluessel = k + ' ' + titel;
+      var titel = _kartenTitel(karte);
+      if (titel && TIEFE_NICHT_KARTE.test(titel)) return;      /* v1289b */
+      if (!titel) titel = TIEFE_SEC[k];
+      var schluessel = k + ' ' + titel;
       if (!proKarte[schluessel]) {
         proKarte[schluessel] = { sec: k, titel: titel, felder: [] };
         folge.push(schluessel);
@@ -3941,8 +3982,7 @@
        die Reihenfolge der Karten im Formular. */
     var secFolge = Object.keys(TIEFE_SEC);
     folge.sort(function (a, b) {
-      var d = secFolge.indexOf(proKarte[a].sec) - secFolge.indexOf(proKarte[b].sec);
-      return d;
+      return secFolge.indexOf(proKarte[a].sec) - secFolge.indexOf(proKarte[b].sec);
     });
 
     var bloecke = [];
