@@ -434,6 +434,13 @@
     _vorlauf = (opts && Array.isArray(opts.vorlauf)) ? opts.vorlauf.slice() : [];
     _mbGewollt = !!(opts && opts.marktbewertung);
     _vorlaufFelder = (opts && Array.isArray(opts.vorlaufFelder)) ? opts.vorlaufFelder.slice() : null;
+    /* v1293c: MODULVARIABLE — beim zweiten Oeffnen zuruecksetzen.
+       Gemessen: der zweite Sprechlauf meldete "schon geholt", obwohl
+       er selbst nichts geholt hatte; die Kette haette daraufhin ihren
+       eigenen Abruf uebersprungen und der Nutzer stuende ohne
+       Marktbewertung da. Ein Zustand, der einen Dialog ueberlebt, gehoert
+       an dessen Anfang geloescht. */
+    _mbGeholt = false;
     OA.reset();
     OA.setMode(!!(opts && opts.target === 'qc'), done);
 
