@@ -1604,8 +1604,13 @@
     phase: '',       /* 'ruhe' | 'rauschen' | 'warte' | 'spricht' | 'aus' */
     rausch: 0, schwelle: 0.012, t0: 0, tSprach: 0, tStill: 0, aufnahme: false
   };
-  var FS_MIN_SCHWELLE = 0.012, FS_SPRACHE_MS = 180, FS_STILLE_MS = 1400,
-      FS_RAUSCH_MS = 500, FS_GEDULD_MS = 30000, FS_MAX_MS = 25000;
+  /* v1286: Marcels "es dauert auch immer noch recht lange". Die Stillepause
+     von 1,4 s war der groesste Einzelposten zwischen Satzende und naechster
+     Frage. 1,1 s traegt eine Denkpause im Satz noch, spart aber je Antwort
+     0,3 s - bei elf Fragen mehr als drei Sekunden. Die Rauschmessung von
+     500 auf 400 ms, sie muss nur den Raum kennen, nicht ihn ausmessen. */
+  var FS_MIN_SCHWELLE = 0.012, FS_SPRACHE_MS = 160, FS_STILLE_MS = 1100,
+      FS_RAUSCH_MS = 400, FS_GEDULD_MS = 30000, FS_MAX_MS = 25000;
   /* ═══ v1285 · Der Ringpuffer — eine Aufnahme darf nicht wachsen ════════
      Marcels Fehler: „ich spreche rein und bekomme einen http413".
 
@@ -1856,39 +1861,34 @@
   /* ═══ v1280 · Weniger Fragen, mehr Zusammenhang ════════════════════════
      Marcels Wunsch: „ich würde mir wünschen, dass dieser Co-Pilot, der die
      Fragen stellt, ein paar mehr Sachen zusammennimmt … zum Beispiel Zins,
-     Tilgung, also wie sind die Finanzierungskonditionen."
+  /* ═══ v1286 · Zwei, drei Stichwörter auf einmal ════════════════════════
+     Marcels Wunsch: „Baujahr und Kaufpreis, sowas könnte man jetzt auch
+     zusammen abfragen, sodass man immer so zwei, drei Keywords gleichzeitig
+     abfragt."
 
-     Aus 18 Blöcken werden 13: Finanzierung ist EINE Frage (Eigenkapital,
-     Zins, Tilgung, Zinsbindung), Grundstück ist EINE Frage, Lage und
-     Zustand rücken zusammen.
+     Aus 13 Blöcken werden 10. Zusammengelegt wird, was man in EINEM Satz
+     sagt: „Baujahr 1965, kostet 200.000" ist ein Satz, keine zwei Fragen.
+     Objektart wandert zur Größe („Was für ein Objekt, wie groß?").
 
      ZWEI ORDNUNGEN, ein Grund: der geführte Weg fragt in der Reihenfolge,
-     in der ein Mensch von einem Objekt erzählt. Die Rückfragen nach einem
-     freien Diktat sortieren nach `rang` — dort zählt das Gewicht für die
-     Rechnung, weil nur drei Fragen gestellt werden.
-
-     `profil` markiert die Blöcke, für die es in den Einstellungen
-     hinterlegte Werte gibt. Dort bietet der Co-Pilot sie an, statt sie
-     stillschweigend zu nehmen — siehe _rfProfilVorschlag. */
+     in der ein Mensch erzählt. Die Rückfragen nach einem freien Diktat
+     sortieren nach `rang` — dort zählt das Gewicht für die Rechnung, weil
+     nur drei Fragen gestellt werden. */
   var RFRAGEN = [
-    { ids: ['objart'],                       rang: 9,  frage: 'Was für ein Objekt ist es — Eigentumswohnung, Haus, Mehrfamilienhaus?' },
     { ids: ['plz', 'ort', 'str', 'hnr'],     rang: 5,  frage: 'Wo steht das Objekt? Straße, Hausnummer, PLZ und Ort.' },
-    { ids: ['wfl', 'zimmer'],                rang: 3,  frage: 'Wie groß ist es? Wohnfläche und Zimmerzahl.' },
-    { ids: ['baujahr'],                      rang: 4,  frage: 'Aus welchem Jahr stammt das Gebäude?' },
-    { ids: ['kp'],                           rang: 1,  frage: 'Was soll das Objekt kosten?' },
-    { ids: ['san', 'moebl'],                 rang: 11, frage: 'Muss etwas saniert werden, und wird etwas mitverkauft — Küche, Möbel?' },
+    { ids: ['objart', 'wfl', 'zimmer'],      rang: 3,  frage: 'Was für ein Objekt ist es, und wie groß? Art, Wohnfläche, Zimmer.' },
+    { ids: ['baujahr', 'kp'],                rang: 1,  frage: 'Baujahr und Kaufpreis?' },
     { ids: ['nkm', 'ze'],                    rang: 2,  frage: 'Was kommt monatlich rein? Kaltmiete und Zusatzeinnahmen wie Stellplatz.' },
-    { ids: ['hg_ul', 'hg_nul'],              rang: 10, frage: 'Wie hoch ist das Hausgeld, und wie viel davon ist nicht umlagefähig?' },
-    /* v1280: Finanzierung als EIN Block — vier Einzelfragen nach EK, Zins,
-       Tilgung und Bindung sind vier Mal dasselbe Thema. */
-    { ids: ['ek', 'd1z', 'd1t', 'd1_bindj'], rang: 6, vorbelegt: 1, profil: 'finanzierung',
+    { ids: ['hg_ul', 'hg_nul'],              rang: 8,  frage: 'Wie hoch ist das Hausgeld, und wie viel davon ist nicht umlagefähig?' },
+    { ids: ['ek', 'd1z', 'd1t', 'd1_bindj'], rang: 4, vorbelegt: 1, profil: 'finanzierung',
       frage: 'Wie finanzierst du? Eigenkapital, Zinssatz, Tilgung und Zinsbindung.' },
-    { ids: ['kaufdat', 'wirtschaftlicher_uebergang'], rang: 12,
+    { ids: ['san', 'moebl'],                 rang: 9,  frage: 'Muss etwas saniert werden, und wird etwas mitverkauft — Küche, Möbel?' },
+    { ids: ['kaufdat', 'wirtschaftlicher_uebergang'], rang: 10,
       frage: 'Wann wird gekauft, und ab wann gehören dir Mieten und Kosten?' },
-    { ids: ['brw', 'gsfl', 'mea'],           rang: 14, frage: 'Was weißt du zum Grundstück — Bodenrichtwert, Fläche, Miteigentumsanteil?' },
-    { ids: ['makrolage', 'mikrolage', 'ds2_zustand', 'ds2_energie'], rang: 16,
+    { ids: ['brw', 'gsfl', 'mea'],           rang: 11, frage: 'Was weißt du zum Grundstück — Bodenrichtwert, Fläche, Miteigentumsanteil?' },
+    { ids: ['makrolage', 'mikrolage', 'ds2_zustand', 'ds2_energie'], rang: 12,
       frage: 'Wie ist die Lage und der Zustand — Region, Straße, Wohnung, Energieausweis?' },
-    { ids: ['thesis', 'risiken', 'notizen'], rang: 18, frage: 'Warum lohnt sich das Objekt für dich, was könnte schiefgehen, und was ist sonst wichtig?' }
+    { ids: ['thesis', 'risiken', 'notizen'], rang: 13, frage: 'Warum lohnt sich das Objekt für dich, was könnte schiefgehen, und was ist sonst wichtig?' }
   ];
 
   var RF_MAX = 3;
@@ -2035,21 +2035,35 @@
          rechten blieben 196 px - genug fuer einen Oberbegriff, zu wenig
          fuer die Werte. Jetzt 1080 px, die Spalte bekommt 300. Nur im
          Sprechlauf-Modus: die anderen Dialoge sind schmal richtig. */
-      '.oabi-ov.vi-mode .oabi-modal{width:min(1080px,100%)}',
-      '@media(max-width:1120px){.oabi-ov.vi-mode .oabi-modal{width:min(860px,100%)}}',
+      /* v1286: Marcels Befund "das Modal ist generell ein bisschen klein" -
+         auch nach v1283. Jetzt 1240 px breit und bis 94 vh hoch; die Spalte
+         bekommt 330, der Verlauf 410 px. Damit passen 11 Bloecke ohne
+         Scrollen ins Bild. */
+      '.oabi-ov.vi-mode .oabi-modal{width:min(1240px,100%);max-height:94vh}',
+      '@media(max-width:1280px){.oabi-ov.vi-mode .oabi-modal{width:min(1000px,100%)}}',
+      '@media(max-width:1040px){.oabi-ov.vi-mode .oabi-modal{width:min(860px,100%)}}',
       /* Die Spalte zeigt jetzt Werte, nicht nur Namen. */
       '.vi-rf-st{display:block;padding:6px 0}',
       '.vi-rf-st-k{display:flex;gap:7px;align-items:center}',
-      '.vi-rf-st-w{margin:3px 0 0 18px;display:flex;flex-direction:column;gap:2px}',
-      '.vi-rf-st-w span{font:500 11.5px/1.35 "JetBrains Mono",ui-monospace,monospace;',
-      '  color:#3FA56C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-      '.vi-rf-st-w i{font-style:normal;opacity:.55;font-weight:400}',
+      /* v1286: Die Werte FLUCHTEN. Marcels Befund: „die Daten, die
+         angegeben werden rechts, die fluchten nicht miteinander." Ursache
+         war ein Fliesstext-Layout - jede Zeile begann dort, wo die vorige
+         aufhoerte. Jetzt ein Raster: Name links in fester Breite, Wert
+         rechts. Zahlen in Mono, damit auch die Ziffern untereinander
+         stehen. */
+      '.vi-rf-st-w{margin:4px 0 0 18px;display:grid;grid-template-columns:minmax(0,1fr) auto;',
+      '  gap:1px 10px;align-items:baseline}',
+      '.vi-rf-st-w span{display:contents}',
+      '.vi-rf-st-w i{font-style:normal;opacity:.6;font:400 11px/1.5 Inter,system-ui,sans-serif;',
+      '  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.vi-rf-st-w b{font:600 11.5px/1.5 "JetBrains Mono",ui-monospace,monospace;color:#3FA56C;',
+      '  text-align:right;white-space:nowrap}',
       '.vi-rf-st.weg{opacity:.4} .vi-rf-st.weg .z{color:#B8625C}',
-      '.vi-rf-buehne{display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start}',
+      '.vi-rf-buehne{display:grid;grid-template-columns:1fr 330px;gap:16px;align-items:start}',
       '@media(max-width:720px){.vi-rf-buehne{grid-template-columns:1fr}',
       '  .vi-rf-stand{order:-1;max-height:132px}}',
       '.vi-rf-stand{border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:11px 13px;',
-      '  max-height:340px;overflow-y:auto;background:rgba(255,255,255,.03)}',
+      '  max-height:410px;overflow-y:auto;background:rgba(255,255,255,.03)}',
       '.vi-rf-stand-kopf{font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;',
       '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);opacity:.85;margin-bottom:9px}',
       '.vi-rf-st{display:flex;gap:7px;align-items:center;padding:4px 0;font:400 12.5px/1.3 Inter,system-ui,sans-serif;opacity:.55}',
@@ -2060,7 +2074,7 @@
       '.vi-rf-stand-fuss{margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.09);',
       '  font:600 11px/1 "JetBrains Mono",ui-monospace,monospace;opacity:.6}',
       '.vi-rf-stand-fuss b{color:var(--wl-c9a84c, #C9A84C)}',
-      '.vi-rf-chat{height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:11px;',
+      '.vi-rf-chat{height:410px;overflow-y:auto;display:flex;flex-direction:column;gap:11px;',
       '  padding:2px 4px 2px 2px}',
       '.vi-rf-blase{max-width:82%;padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.45;',
       '  animation:viRfAuf .3s ease both}',
@@ -2221,7 +2235,48 @@
      0,1 Cent gekostet hat, kostet jetzt nichts und dauert nichts. */
   var RF_NEIN = /^(nein|nee|ne|nichts|kein[es]?|keine[rs]?|gibt('s| es)? (hier )?(nicht|keine)|haben wir (nicht|keine)|hab(e)? ich (nicht|keine)|brauchen wir (nicht|keine)|kommt nicht in frage|entf(ä|ae)llt|weiter|(ü|ue)berspringen|(ü|ue)berspring|weiss nicht|wei(ß|ss) ich nicht|keine ahnung|passt so|passt|unbekannt|k\.?a\.?)\b[\s.!]*$/i;
 
-  var RF_PROFIL_JA = /(übernimm|uebernimm|nimm|nehmen|übernehmen|uebernehmen|ja bitte|ja gern|einverstanden)\b.*(einstellung|profil|vorschlag|vorgabe|standard)|^(ja|okay|ok|passt|gerne|klar)\b[\s.!]*$/i;
+  /* ═══ v1286 · Ein Satz, zwei Anliegen ══════════════════════════════════
+     Marcels Bild (design/mockups/sprechlauf.png). Er sagt:
+
+       „Ich finanziere über die Sparkasse und du kannst es aus den
+        Einstellungen übernehmen. Eigenkapital sind 10% vom Kaufpreis."
+
+     Antwort: „Daraus konnte ich nichts entnehmen." Zwei Fehler auf einmal:
+
+     1. Das Muster für die Profil-Übernahme verlangte die Wörter in FESTER
+        Reihenfolge — erst „übernimm", dann „Einstellungen". Marcel sagt es
+        andersherum („aus den Einstellungen übernehmen"), also griff es
+        nicht. Jetzt zählt nur, dass BEIDE Teile vorkommen: eine
+        Übernahme-Absicht und ein Wort für die Quelle. In welcher Folge,
+        ist Sache des Sprechers.
+
+     2. Selbst wenn es gegriffen hätte, wäre der zweite Satzteil verloren
+        gewesen — die Übernahme sprang sofort zur nächsten Frage. Ein Satz
+        kann aber zwei Anliegen tragen. Jetzt wird erst das Profil
+        eingetragen und DANACH derselbe Satz ausgewertet; was ausdrücklich
+        gesagt wurde, gewinnt gegen die Vorbelegung. „Eigenkapital sind
+        10 % vom Kaufpreis" überschreibt also die 20 % aus den
+        Einstellungen — und wird mit dem bekannten Kaufpreis gerechnet. */
+  function _rfWillProfil(text) {
+    var t = String(text || '');
+    if (!_rf || !_rf.profilVorschlag) return false;
+    /* Kurzform: „ja", „passt", „ok" - allein stehend. */
+    if (/^(ja|jo|jup|okay|ok|passt|gerne|gern|klar|mach das|einverstanden)\b[\s.!,]*$/i.test(t.trim())) return true;
+    var quelle = /(einstellung|profil|vorgabe|standard|vorschlag|voreinstellung)/i.test(t);
+    var wille  = /(übernimm|uebernimm|übernehmen|uebernehmen|nimm|nehmen|verwende|benutz|kannst du|kannst es|kannst die|hol|zieh)/i.test(t);
+    return quelle && wille;
+  }
+
+  /* Profil eintragen, ohne die Frage abzuschliessen - der Satz kann noch
+     mehr enthalten. Gibt zurueck, was eingetragen wurde. */
+  function _rfProfilEintragen() {
+    var pv = _rf && _rf.profilVorschlag;
+    if (!pv || !pv.werte) return null;
+    Object.keys(pv.werte).forEach(function (id) { _rf.data.fields[id] = pv.werte[id]; });
+    _rf.profilVorschlag = null;
+    var pb = $('vi-rf-passt'); if (pb) pb.style.display = 'none';
+    return pv;
+  }
   /* Was steht zu diesem Block — aus dem Gespräch ODER aus dem Formular?
      v1283d: auch das Formular zählt. Wer den Kaufpreis vorher eingetippt
      hat, bekommt ihn nicht mehr gefragt — dann darf er in der Übersicht
@@ -2272,7 +2327,7 @@
       var klasse = werte.length ? 'ok' : (uebersprungen ? 'weg' : (dran ? 'dran' : ''));
       var detail = werte.length
         ? '<div class="vi-rf-st-w">' + werte.map(function (w) {
-            return '<span><i>' + escH(w.n) + '</i> ' + escH(w.v) + '</span>';
+            return '<span><i>' + escH(w.n) + '</i><b>' + escH(w.v) + '</b></span>';
           }).join('') + '</div>'
         : '';
       return '<div class="vi-rf-st ' + klasse + '">' +
@@ -2294,7 +2349,7 @@
      Die ganze Frage passt nicht in eine 210 px breite Spalte, und eine
      abgeschnittene Frage ist schlechter als ein kurzer Name. */
   var RF_KURZ = {
-    objart: 'Objektart', plz: 'Adresse', wfl: 'Größe', baujahr: 'Baujahr', kp: 'Kaufpreis',
+    plz: 'Adresse', objart: 'Objekt & Größe', baujahr: 'Baujahr & Kaufpreis',
     san: 'Sanierung & Inventar', nkm: 'Mieteinnahmen', hg_ul: 'Hausgeld',
     ek: 'Finanzierung', kaufdat: 'Kauf & Übergang', brw: 'Grundstück',
     makrolage: 'Lage & Zustand', thesis: 'Deine Einschätzung'
@@ -2620,10 +2675,20 @@
       namen.push((kat ? kat.label : id) + ' = ' + v);
     });
     if (!namen.length) {
+      /* v1286: Wurde vorher schon das Profil eingetragen, ist die Frage
+         beantwortet - dann ist "nichts entnommen" falsch und verwirrend.
+         Der Satz trug eben nur die Zusage und sonst nichts Zaehlbares. */
+      if (_rf.profilSchonDrin) {
+        _rf.profilSchonDrin = 0;
+        _rfBlase('co', 'Übernommen — in der Tabelle kannst du sie noch ändern.');
+        _rfStandZeichnen();
+        return setTimeout(_rfWeiter, 120);
+      }
       _rfBlase('co', 'Daraus konnte ich nichts entnehmen — sag es gern nochmal oder tippe es.');
       if (ausSprache && _fs.an) _fsHoeren();
       return;
     }
+    _rf.profilSchonDrin = 0;
     /* v1283: KEINE Bestaetigungsblase mehr. Marcels Punkt: "wir brauchen
        dazwischen nicht mehr erkannt wurde das und das in Gruen, sondern wenn
        wir die Liste haben, kann man das ja gleich dort eintragen". Der
@@ -2681,11 +2746,6 @@
     });
   }
 
-  /* v1283 · Was ohne KI entschieden werden kann, wird ohne KI entschieden.
-     Drei Fälle fängt diese Funktion ab, bevor irgendein Aufruf losgeht:
-     eine Verneinung, ein „ja, nimm die Einstellungen" und eine Frage.
-     Das ist der Geschwindigkeitsgewinn, den Marcel meint - eine
-     Verneinung kostete vorher zwei Sekunden und 0,1 Cent. */
   function _rfVorabErkennen(text, ausSprache) {
     var t = String(text || '').trim();
     if (!t) return true;
@@ -2693,22 +2753,53 @@
     /* 1. Frage? Dann beantworten statt eintragen. */
     if (_rfIstFrage(t)) { _rfFrageBeantworten(t); return true; }
 
-    /* 2. „Ja, nimm die aus den Einstellungen" - nur wenn einer offen ist. */
-    if (_rf.profilVorschlag && RF_PROFIL_JA.test(t)) {
-      _rfBlase('ich', escH(t));
-      var pb = $('vi-rf-passt');
-      if (pb) { _rf.stummeUebernahme = 1; pb.click(); return true; }
-    }
-
-    /* 3. Verneinung: „haben wir nicht", „kommt nicht in Frage", „weiter".
-       Marcels Fall - „Bei Sanierung und Inventar habe ich gesagt: Haben wir
-       nicht. Das hat er nicht erkannt." */
+    /* 2. Verneinung: „haben wir nicht", „kommt nicht in Frage", „weiter". */
     if (RF_NEIN.test(t)) {
       _rfBlase('ich', escH(t));
       _rfUeberspringen(true);
       return true;
     }
+
+    /* 3. v1286 · „… aus den Einstellungen übernehmen" — in beliebiger
+       Wortstellung. Ist der Satz damit erschöpft (kurze Zusage), sind wir
+       fertig. Trägt er noch mehr („Eigenkapital sind 10 % vom Kaufpreis"),
+       wird das Profil eingetragen UND der Satz danach ausgewertet: was
+       ausdrücklich gesagt wurde, gewinnt gegen die Vorbelegung. */
+    if (_rfWillProfil(t)) {
+      var pv = _rfProfilEintragen();
+      _rfBlase('ich', escH(t));
+      var nurZusage = t.split(/\s+/).length <= 8;
+      if (nurZusage || !pv) {
+        _rfBlase('co', 'Übernommen — in der Tabelle kannst du sie noch ändern.');
+        _rfStandZeichnen();
+        _rfWeiter();
+        return true;
+      }
+      /* Weiter im Text: derselbe Satz geht zusätzlich an die Auswertung. */
+      _rf.profilSchonDrin = 1;
+      _rfMelden('', true);
+      _rfAuswerten(t, ausSprache);
+      return true;
+    }
     return false;
+  }
+
+  /* v1286: Ein Weg für beide Eingaben - getippt und gesprochen laufen
+     seit jeher durch dieselbe Auswertung, aber an zwei Stellen im Code.
+     Zwei Stellen heisst zwei Verhaltensweisen, sobald eine sich aendert. */
+  function _rfAuswerten(text, ausSprache) {
+    var e = _rf.offen[_rf.i];
+    return Auth.apiCall('/ai/extract-text', {
+      method: 'POST',
+      body: { text: text, catalog: _rfKatalog(e, _rf.catalog), kontext: _rfKontext() }
+    }).then(function (r) {
+      var inp = $('vi-rf-in'); if (inp) inp.disabled = false;
+      _rfUebernehmen(r && r.fields, ausSprache);
+    }).catch(function (err) {
+      var inp = $('vi-rf-in'); if (inp) inp.disabled = false;
+      _rfDenkt(false);
+      _rfBlase('co', '⚠ ' + escH((err && err.message) || 'Das hat gerade nicht geklappt.'));
+    });
   }
 
   function _rfSenden() {
@@ -2717,22 +2808,11 @@
     if (!text) return;
     _fsStopHoeren();
     inp.value = '';
-    if (_rfVorabErkennen(text, false)) return;   /* v1283 */
-    var e = _rf.offen[_rf.i];
+    if (_rfVorabErkennen(text, false)) return;
     inp.disabled = true;
     _rfBlase('ich', escH(text));
     _rfMelden('', true);
-    Auth.apiCall('/ai/extract-text', {
-      method: 'POST',
-      body: { text: text, catalog: _rfKatalog(e, _rf.catalog), kontext: _rfKontext() }
-    }).then(function (r) {
-      inp.disabled = false;
-      _rfUebernehmen(r && r.fields, false);
-    }).catch(function (err) {
-      inp.disabled = false;
-      _rfDenkt(false);
-      _rfBlase('co', '⚠ ' + escH((err && err.message) || 'Das hat gerade nicht geklappt.'));
-    });
+    _rfAuswerten(text, false);
   }
 
   /* Einstieg: nach der Auswertung (Lücken) oder von Anfang an (geführt). */
