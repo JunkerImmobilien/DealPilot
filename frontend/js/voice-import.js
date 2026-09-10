@@ -3552,8 +3552,11 @@
       ist: ist, markt: markt, diffQm: diffQm, diffMon: diffMon,
       diffJahr: diffMon * 12,
       pct: ist > 0 ? (diffQm / ist * 100) : null,
-      quelle: (_rf && _rf.markt && _rf.markt.mietSqm != null && _rfNum(_rfFeld('ds2_marktmiete')) == null)
-              ? 'Marktpreisindikation' : 'deine Angabe'
+      /* v1292b: WOHER die Marktmiete kommt, steht in _rf.quelle — nicht
+         daran, ob das Feld gefuellt ist. Die Marktpreisindikation FUELLT
+         es ja; die alte Pruefung meldete deshalb „deine Angabe" an einem
+         Wert, den der Co-Pilot selbst geholt hatte. */
+      quelle: (_rf && _rf.quelle && _rf.quelle['ds2_marktmiete']) || 'deine Angabe'
     };
   }
 
@@ -3580,39 +3583,94 @@
            '</details>';
   }
 
-  /* ── Die Hebel: gerechnet, nicht geraten ─────────────────────────── */
+  /* ── Die Hebel: gerechnet, nicht geraten ─────────────────────────────
+     v1292b · IN STUFEN, nicht mit einem festen Schritt.
+
+     Gemessen am Testobjekt (200.000 € bei 490 € Miete, Score 53): ein
+     Kaufpreis 5 % tiefer aenderte den Score um **null Punkte**. Kein
+     Fehler — bei einem so schwachen Objekt liegen die Renditekennzahlen
+     am unteren Anschlag, und dort ist die Interpolation flach. Vom Boden
+     faellt man nicht tiefer, aber man steigt auch nicht leicht auf.
+
+     Ergebnis war eine LEERE Hebel-Liste — ausgerechnet dort, wo man sie
+     am dringendsten braucht. Ein Ratgeber, der bei einem schlechten Deal
+     schweigt, ist kein Ratgeber.
+
+     Jetzt wird je Hebel eine STAFFEL probiert und der KLEINSTE Schritt
+     gezeigt, der wirklich etwas bewegt. „Kaufpreis 15 % tiefer: +6" sagt
+     mehr als Schweigen — und es ist dieselbe Rechnung, nur ehrlicher
+     dosiert.
+
+     Und die Miete bekommt einen eigenen Zielwert: liegt eine Marktmiete
+     vor, wird auf sie gerechnet statt auf einen Prozentsatz. „Miete auf
+     Marktniveau (782 €): +9" ist ein Satz, mit dem man etwas anfangen
+     kann. Damit hängen Mietpotenzial und Hebel an derselben Zahl. */
+  function _rfHebelProben() {
+    var kp = _rfNum(_rfFeld('kp')), nkm = _rfNum(_rfFeld('nkm'));
+    var ek = _rfNum(_rfFeld('ek')) || 0, d1z = _rfNum(_rfFeld('d1z')), d1t = _rfNum(_rfFeld('d1t'));
+    var wfl = _rfNum(_rfFeld('wfl'));
+    var P = null; try { P = _rfMietPotenzial(_rfKennzahlen()); } catch (e) {}
+    var proben = [];
+
+    if (kp > 0) proben.push({ id: 'kp', wie: 'Verhandeln — der stärkste Hebel, den du selbst in der Hand hast.',
+      stufen: [0.05, 0.10, 0.15, 0.20].map(function (q) {
+        return { wert: Math.round(kp * (1 - q)),
+                 txt: 'Kaufpreis <b>' + Math.round(q * 100) + ' % tiefer</b> (' + _euroKurz(kp * (1 - q)) + ')' };
+      }) });
+
+    if (nkm > 0) {
+      var mietStufen = [];
+      /* Der Marktwert zuerst: er ist kein Wunsch, sondern eine Zahl. */
+      if (P && P.diffMon > 20 && wfl > 0) {
+        mietStufen.push({ wert: Math.round(P.markt * wfl),
+          txt: 'Miete auf <b>Marktniveau</b> (' + _euroKurz(P.markt * wfl) + '/Mon)' });
+      }
+      [0.10, 0.20, 0.30].forEach(function (q) {
+        mietStufen.push({ wert: Math.round(nkm * (1 + q)),
+          txt: 'Miete <b>' + Math.round(q * 100) + ' % höher</b> (' + _euroKurz(nkm * (1 + q)) + '/Mon)' });
+      });
+      proben.push({ id: 'nkm', stufen: mietStufen,
+        wie: 'Über Neuvermietung, Anhebung zur Vergleichsmiete oder Modernisierung.' });
+    }
+
+    if (kp > 0) proben.push({ id: 'ek', wie: 'Senkt LTV und Kapitaldienst — wirkt auf Finanzierung und Risiko zugleich.',
+      stufen: [0.10, 0.20, 0.30].map(function (q) {
+        return { wert: Math.round(ek + kp * q),
+                 txt: '<b>' + Math.round(q * 100) + ' % mehr Eigenkapital</b> (' + _euroKurz(ek + kp * q) + ')' };
+      }) });
+
+    if (d1z > 0) proben.push({ id: 'd1z', wie: 'Mehrere Banken anfragen, Eigenkapital oder Sicherheiten nachlegen.',
+      stufen: [0.5, 1.0].filter(function (s) { return d1z - s > 0.3; }).map(function (s) {
+        return { wert: String(Math.round((d1z - s) * 100) / 100).replace('.', ','),
+                 txt: 'Zins <b>' + _pz(s) + ' Punkte tiefer</b> (' + _pz(d1z - s) + ' %)' };
+      }) });
+
+    if (d1t > 0) proben.push({ id: 'd1t', wie: 'Kostet Cashflow, bringt Entschuldung — der Score wägt beides ab.',
+      stufen: [1, 2].map(function (s) {
+        return { wert: String(Math.round((d1t + s) * 100) / 100).replace('.', ','),
+                 txt: 'Tilgung <b>' + _pz(s) + ' Punkt' + (s > 1 ? 'e' : '') + ' höher</b> (' + _pz(d1t + s) + ' %)' };
+      }) });
+
+    return proben.filter(function (p) { return p.stufen && p.stufen.length; });
+  }
+
   function _rfHebel() {
     var basis = _rfScore2();
     if (!basis || !basis.R) return [];
     var b = Math.round(basis.R.score);
-    var kp = _rfNum(_rfFeld('kp')), nkm = _rfNum(_rfFeld('nkm'));
-    var ek = _rfNum(_rfFeld('ek')), d1z = _rfNum(_rfFeld('d1z')), d1t = _rfNum(_rfFeld('d1t'));
-    var proben = [];
-    if (kp > 0)  proben.push({ id: 'kp',  wert: Math.round(kp * 0.95),
-                               txt: 'Kaufpreis <b>5 % tiefer</b> (' + _euroKurz(kp * 0.95) + ')',
-                               wie: 'Verhandeln — das ist der stärkste Hebel, den du selbst in der Hand hast.' });
-    if (nkm > 0) proben.push({ id: 'nkm', wert: Math.round(nkm * 1.1),
-                               txt: 'Miete <b>10 % höher</b> (' + _euroKurz(nkm * 1.1) + '/Mon)',
-                               wie: 'Über Neuvermietung, Anhebung zur Vergleichsmiete oder Modernisierung.' });
-    if (kp > 0)  proben.push({ id: 'ek',  wert: Math.round((ek || 0) + kp * 0.1),
-                               txt: '<b>10 % mehr Eigenkapital</b> (' + _euroKurz((ek || 0) + kp * 0.1) + ')',
-                               wie: 'Senkt LTV und Kapitaldienst — verbessert Finanzierung und Risiko.' });
-    if (d1z > 0) proben.push({ id: 'd1z', wert: String(Math.round((d1z - 0.5) * 100) / 100).replace('.', ','),
-                               txt: 'Zins <b>0,5 Punkte tiefer</b> (' + _pz(d1z - 0.5) + ' %)',
-                               wie: 'Mehrere Banken anfragen, Eigenkapital oder Sicherheiten nachlegen.' });
-    if (d1t > 0) proben.push({ id: 'd1t', wert: String(Math.round((d1t + 1) * 100) / 100).replace('.', ','),
-                               txt: 'Tilgung <b>1 Punkt höher</b> (' + _pz(d1t + 1) + ' %)',
-                               wie: 'Kostet Cashflow, bringt Entschuldung — der Score wägt beides ab.' });
     var raus = [];
-    proben.forEach(function (p) {
+    _rfHebelProben().forEach(function (p) {
       var alt = _rf.data.fields[p.id];
-      _rf.data.fields[p.id] = String(p.wert);
-      var neu = null;
-      try { var r = _rfScore2(); neu = r ? Math.round(r.R.score) : null; } catch (e) {}
+      var treffer = null;
+      for (var i = 0; i < p.stufen.length; i++) {
+        var s = p.stufen[i];
+        _rf.data.fields[p.id] = String(s.wert);
+        var neu = null;
+        try { var r = _rfScore2(); neu = r ? Math.round(r.R.score) : null; } catch (e) {}
+        if (neu != null && (neu - b) >= 2) { treffer = { txt: s.txt, plus: neu - b, ziel: neu }; break; }
+      }
       if (alt === undefined) delete _rf.data.fields[p.id]; else _rf.data.fields[p.id] = alt;
-      if (neu == null) return;
-      var d = neu - b;
-      if (d >= 2) raus.push({ txt: p.txt, wie: p.wie, plus: d, ziel: neu });
+      if (treffer) { treffer.wie = p.wie; raus.push(treffer); }
     });
     raus.sort(function (x, y) { return y.plus - x.plus; });
     return raus.slice(0, 4);
