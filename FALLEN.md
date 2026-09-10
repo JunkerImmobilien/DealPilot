@@ -1833,3 +1833,62 @@ immer vergessen.
 **Und beim Prüfen:** der zweite Durchlauf ist der, der die Wahrheit
 zeigt. Beim ersten sieht jeder Zustand richtig aus, weil er noch
 niemandem gehört hat.
+
+---
+
+## Das Mikrofon lief nach dem Abbrechen weiter
+
+Der Sprechlauf-Dialog hält einen eigenen Mikrofon-Strom (`_fs`) für das
+Freisprechen. Der „Abbrechen"-Knopf räumte die Aufnahme des **freien
+Weges** ab (`stopAll()`) und meldete `done()` — den Dialog-Strom rührte er
+nicht an.
+
+Mit einem synthetischen Audiostrom gemessen, damit der Recorder echt
+läuft:
+
+```
+vor  „Abbrechen":  recState recording · phase spricht · chunks 5
+nach „Abbrechen":  recState recording · phase spricht · chunks 8
+```
+
+Der Recorder lief weiter, die Stücke wuchsen. Im Browser bleibt das
+Aufnahme-Symbol an: **jemand hat den Dialog beendet, und sein Mikrofon
+horcht weiter.** Und der zweite Weg hinaus (Werte übernehmen) schließt
+das Fenster aus einem **anderen Modul**, das von diesem Strom gar nichts
+weiß.
+
+**Die Regel:** ein Fenster hat mehr Wege hinaus, als man beim Bauen
+zählt — Abbrechen, das X der Kopfleiste, Übernehmen, ein fremdes Modul,
+ein Fehler mittendrin. Für alles, was **Hardware** hält (Mikrofon,
+Kamera, Standort), reicht deshalb kein Handler: es braucht **einen
+Beobachter**, der anspringt, sobald das Fenster verschwindet — egal wer
+es entfernt hat.
+
+Nebenwirkung, die derselbe Fix erledigt: der Dialogzustand überlebte das
+Schließen und verfälschte jede Messung danach. Wer in einem Testlauf
+mehrere Fälle hintereinander misst, misst sonst den ersten immer wieder
+mit.
+
+---
+
+## Fragen zu Feldern, die der Katalog gar nicht kennt
+
+Der Sprechlauf kennt zwei Ziele: das ganze Objekt (Katalog: 192 Felder)
+und den Quick-Check (Katalog: 19). Die Fragenliste war für beide
+dieselbe.
+
+Gemessen im Quick-Check: **13 Fragen, neun davon zu Feldern, die es dort
+nicht gibt** — Kaufnebenkosten, Lage, Sanierung, Grundstück, Steuer.
+
+Das ist nicht nur unnütz. Die Auswertung schickt zu jeder Frage die
+zugehörigen Katalogeinträge mit; bei diesen Blöcken bleibt ein **leeres
+Array**, und der Server antwortet korrekt mit *„Feld-Katalog fehlt oder
+ist leer"* — **HTTP 400 bei jeder einzelnen Antwort.**
+
+**Die Regel:** wo derselbe Ablauf mit verschiedenen Katalogen läuft,
+gehört die Fragenliste **am Katalog gemessen**, bevor gefragt wird. Was
+kein einziges Feld darin hat, wird nicht gefragt; wo nur ein Teil
+enthalten ist, wird auf den Teil eingekürzt.
+
+Und beim Prüfen: das **zweite Ziel** ist das, an dem solche Fehler
+sitzen. Der Hauptweg hat den vollen Katalog und zeigt nichts davon.

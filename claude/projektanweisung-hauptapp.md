@@ -11307,6 +11307,132 @@ gegen `document.querySelector('script[src*="voice-import"]').src` im Browser
 
 **Commits** `34a31c6`, `1acea49`, `eaa80f6`. Auf Staging, **nicht auf Prod**.
 
+## Rollout-Journal · 11.09.2026 — der Kombinations-Test (`v1293d`–`v1293g`)
+
+Marcels Auftrag: *„Bitte alles durchtesten auf Plausibilität und ganz
+ausführlich auch andere Kombinationen testen. Das muss immer funktionieren, egal
+was man auswählt."*
+
+**Fünf echte Fehler kamen dabei heraus** — vier davon hätte der Hauptweg nie
+gezeigt.
+
+### Was geprüft wurde
+
+| Prüfung | Ergebnis |
+|---|---|
+| **63 Quellen-Kombinationen** (alle Teilmengen der sechs Kacheln) | Reihenfolge in allen korrekt: `import` und `immometrica` immer vor `voice`, `voice` immer vor den Marktbewertungen, nichts geht verloren |
+| **Kennzahlen gegen Handrechnung** | exakt — siehe Tabelle unten |
+| **10 Monotonie-Proben** des Deal Score 2 | alle bestanden: was besser ist, senkt den Score nie; was schlechter ist, hebt ihn nie |
+| **9 Verhaltens-Kombinationen** (leer / Adresse / Marktbewertung / Import / ImmoMetrica / beides / freier Weg / Quick-Check) | nach den Korrekturen alle sauber, kein Laufzeitfehler |
+
+**Die Kennzahlen, Zeile für Zeile nachgerechnet** (200.000 € · 490 € Miete ·
+100 m² · 12,27 % Nebenkosten · 40.000 € EK · 4,09 % / 1 %):
+
+| | Handrechnung | App |
+|---|---|---|
+| Cashflow | 5.880 − 940,80 − 7.547,69 − 1.845,40 = **−4.453,89**/Jahr | −371 €/Mon ✓ |
+| Nettomietrendite | (5.880 − 940,80) / 224.540 = **2,20 %** | 2,2 % ✓ |
+| Faktor | 200.000 / 5.880 = **34,01** | 34 ✓ |
+| LTV | 184.540 / 200.000 = **92,27 %** | 92,3 % ✓ |
+| Break-even Jahr 1 | **−4.453,89** | −4.453,886 ✓ |
+| Break-even Jahr 2 (3 % / 1 %) | 6.056,40 − 950,21 − 9.393,08 = **−4.286,89** | −4.286,894 ✓ |
+
+### `v1293d` · Zwei Befunde aus den Kombinationen
+
+**1. „61 Angaben stehen schon im Objekt" — bei leerem Formular.** Gemessen an
+einem frisch angelegten Objekt ohne Vorlauf. Gezählt wurden die Vorgaben aus
+`index.html`: Notar 2,20 %, Grunderwerbsteuer 6,50 %, die acht
+Sanierungsgewerke, die Bauspar-Sätze. Derselbe Fehler wie `v1293b`, nur im
+anderen Zweig — dort hat ihn die Kette behoben, hier fiel er auf „alles im
+Formular" zurück. **Der Rückfall ist weg: nur wer sagen kann, woher die Werte
+kommen, sagt überhaupt etwas.**
+
+**2. Ein ausgefallener Kontingent-Abruf kostete das Angebot für immer.**
+Gemessen mit abgelaufenem Token (HTTP 401 auf `/ai/credits`): der Abruf
+scheiterte einmal, `marktGefragt` wurde gesetzt, und damit gab es im **ganzen**
+Dialog kein Marktpreis-Angebot mehr — auch nachdem die Anmeldung wieder stand.
+Jetzt wird bei fehlendem Stand einmal nachgeladen und danach erneut angeboten.
+
+### `v1293e` · Das Mikrofon lief nach dem Abbrechen weiter
+
+Mit einem synthetischen Audiostrom gemessen, damit der Recorder echt läuft:
+
+```
+vor  „Abbrechen":  recState recording · phase spricht · chunks 5
+nach „Abbrechen":  recState recording · phase spricht · chunks 8
+```
+
+**Der Recorder lief weiter, die Stücke wuchsen, `_rf` stand noch komplett da.**
+Im Browser bleibt damit das Aufnahme-Symbol an — jemand hat den Dialog beendet,
+und sein Mikrofon horcht weiter.
+
+> Das ist kein Schönheitsfehler. Ein laufendes Mikrofon, von dem der Nutzer
+> glaubt, es sei aus, ist ein Vertrauensbruch.
+
+**Ursache:** der Abbrechen-Knopf rief `stopAll()` — das ist die Aufnahme des
+**freien** Weges — und `done()`. Der Freisprech-Strom des **Dialogs** (`_fs`)
+blieb unberührt. Beim zweiten Weg hinaus, `OA.apply()`, schließt ein anderes
+Modul das Fenster und weiß von `_fs` gar nichts.
+
+**Zwei Riegel, weil einer nicht reicht:** `_viAufraeumen()` an jedem bekannten
+Weg — und ein **Beobachter auf dem Overlay**, der aufräumt, sobald es
+verschwindet, egal wer es entfernt hat.
+
+> Ein Mikrofon darf nicht davon abhängen, dass jemand an eine Codezeile gedacht
+> hat.
+
+Nebenbefund, dadurch mit erledigt: `_rf` überlebte das Schließen und
+verfälschte jede Messung danach — meine eigenen Kombinationstests D bis H
+hatten deshalb den **alten** Zustand gemessen und mussten wiederholt werden.
+
+### `v1293f` · Ein ReferenceError legte den geführten Weg lahm
+
+Der Chat blieb **leer**, der Dialog stand. In der Konsole:
+
+```
+ReferenceError: VORLAUF_NAME is not defined
+  at rueckfragen (voice-import.js:5848)
+```
+
+Die Definition stand in `v1293` über `_rfVorbefuellt` und ist bei der
+`v1293d`-Ersetzung **mit dem umgebenden Kommentarblock mitgelöscht** worden.
+
+> **`node --check` hat es nicht gefunden** — eine nicht definierte Variable ist
+> kein Syntaxfehler. Genau das steht in `CLAUDE.md`: *„node --check prüft nur
+> Syntax. Verträge prüft nur ein echter Lauf."*
+
+Vier Kombinationstests hintereinander meldeten „(keiner)" beim Vorlauf-Satz und
+leere Angebote, und ich habe zuerst den **Beobachter aus `v1293e`** verdächtigt
+— erst die Konsole hat es aufgeklärt. Der Fehler traf **nur** den Weg über die
+Pre-Flight-Kette: wer den Sprechlauf direkt öffnet, hat kein `_vorlauf`, und
+der Zweig lief nie an.
+
+### `v1293g` · Der Quick-Check stellte neun Fragen, die nicht ankommen konnten
+
+Gemessen im Quick-Check-Ziel (`target: 'qc'`): der Katalog führt dort **19**
+Felder, der Dialog stellte aber **13 Fragen — neun davon zu Feldern, die es im
+QC-Katalog gar nicht gibt**: Kaufnebenkosten, Lage, Sanierung, Grundstück,
+Entwicklung, Steuer, These.
+
+Das ist nicht nur unnütz. `_rfKatalog()` filtert die Frage auf die
+Katalogfelder — bei diesen Blöcken bleibt ein **leeres Array**, und das Backend
+antwortet darauf mit **HTTP 400 · „Feld-Katalog fehlt oder ist leer."**
+**Neun Fragen, von denen jede Antwort in einer Fehlermeldung endet.**
+
+Jetzt werden die Blöcke vor dem Start am Katalog gemessen. Nachgemessen:
+**Quick-Check 13 → 7 Fragen, davon 0 ohne Katalogfeld.** Gegenprobe auf dem
+Objekt-Weg: **unverändert 16 Fragen** bei 192 Katalogfeldern — der Filter
+ändert dort nichts.
+
+### Die Lehre aus dieser Runde
+
+Vier der fünf Fehler lagen **außerhalb des Hauptwegs**: im Quick-Check-Ziel, im
+Weg über die Kette, im zweiten Durchlauf, im Fehlerfall des Kontingents. Der
+Hauptweg lief die ganze Zeit sauber — und hätte keinen davon gezeigt.
+
+**Commits** `8fc559d`, `1a0a307`, `987aac9`, `8215c50`. Auf Staging, **nicht auf
+Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
