@@ -38,11 +38,11 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
 
-**Stand:** `v1273`–`v1288b` liegen auf Staging. **Produktion steht auf
+**Stand:** `v1273`–`v1289b` liegen auf Staging und sind dort abgenommen. **Produktion steht auf
 `a21fe9c`** — nichts davon ist live.
 
 **Der Sprechlauf ist jetzt ein geführter Ablauf in sechs Etappen** mit einem
-Ergebnis dazwischen. Was `v1288`/`v1288b` gebracht haben, steht ausführlich im
+Ergebnis dazwischen. Was `v1288`–`v1289b` gebracht haben, steht ausführlich im
 Rollout-Journal der Projektanweisung; die Kurzfassung:
 
 | | Etappe | danach |
@@ -61,32 +61,7 @@ der Frage, und ein Co-Pilot, der seine eigenen Kennzahlen kennt.
 
 ---
 
-### 1 · Die Feinheiten thematisch gruppieren
-
-**Der einzige Punkt aus Marcels Liste vom 10.09., der noch offen ist.**
-
-Heute entstehen sie stumpf: vier Felder je Frage, in der Reihenfolge des
-Formulars. Das ergibt Fragen wie *„Objekt: Kürzel, Bankbewertung,
-Bevölkerungsentwicklung, Nachfrage-Indikatoren?"* — vier Dinge, die inhaltlich
-nichts miteinander zu tun haben.
-
-**Besser:** nach **Thema** gruppieren, nicht nach Reihenfolge — Inventar,
-Bewirtschaftung, Anschlussfinanzierung, Bauspar.
-
-**Kompromiss (steht seit `v1282`):** Themen über die *Karten-Überschriften* im
-DOM ziehen, die gibt es schon; nur wo keine existiert, greift die Reihenfolge.
-Eine gepflegte Zweitliste von 145 Feldern würde beim ersten neuen Feld
-veralten — und niemand würde es merken.
-
-**Aufwand:** klein bis mittel. **Nutzen:** betrifft nur, wer „Alle Felder"
-einschaltet.
-
-> Ein Teil davon hat sich mit `v1288` erledigt: Kaufnebenkosten, Entwicklung,
-> Markt & Potenzial und Steuer sind aus den Feinheiten in die Pflichtstrecke
-> gewandert und dort thematisch sauber. Die Feinheiten sind entsprechend
-> kleiner geworden.
-
-### 2 · Die Sprachqualität messen — mit echtem Material
+### 1 · Die Sprachqualität messen — mit echtem Material
 
 `OPENAI_TRANSCRIBE_MODEL`: **auf Staging steht seit dem 09.09. das mini**, auf
 Prod weiterhin das große `gpt-4o-transcribe` (dafür fehlt die Freigabe).
@@ -102,6 +77,16 @@ gesprochen hat, ist die Reihe da.
 Die Zahlen dahinter: mini kostet die Hälfte (3,00 statt 6,00 USD je Mio
 Audio-Token) und ist 37 % schneller (1864 ms gegen 2944 ms). Der Wechsel senkt
 die Kosten einer Aufnahme um rund 40 % — bei 4 Minuten von ≈ 1,7 auf ≈ 0,9 Cent.
+
+### 2 · Der Sprechlauf gehört auf Produktion
+
+**`v1273`–`v1289b` liegen auf Staging und sind dort abgenommen.** Prod steht auf
+`a21fe9c` — der Co-Pilot, die Etappen, beide Scores, BORIS-Abruf und
+Marktpreisindikation im Hintergrund sind für keinen Kunden erreichbar.
+
+**Das braucht Marcels ausdrückliche Freigabe** (Produktion, und der Rollout
+berührt einen Backend-Endpunkt: `/ai/copilot-frage`). Vorher wie immer
+sichern — beide Datenbanken, `dealpilot-mb-db` mit eigenem `pg_dump`.
 
 ### 3 · Der Gold-Altbestand
 
@@ -124,12 +109,12 @@ Bewertung); im Portfolio-Cockpit noch nicht.
 
 ## → Erledigt am 10.09.2026
 
-**Marcels Plan vom Abend des 10.09. ist bis auf Punkt 1 umgesetzt** (`v1288`,
-`v1288b`, Commits `28ff503` und `fdba8aa`):
+**Marcels Plan vom Abend des 10.09. ist vollständig umgesetzt** (`v1288`,
+`v1288b`, `v1289`, `v1289b` — Commits `28ff503`, `fdba8aa`, `224382a`, `99e4308`):
 
 | | Punkt aus dem Plan | Stand |
 |---|---|---|
-| 1 | Feinheiten feiner aufgliedern | **offen** — siehe oben |
+| 1 | Feinheiten feiner aufgliedern | **fertig** — `v1289`/`v1289b`, nach Karten-Überschrift statt nach Formularreihenfolge; 18 statt 29 Fragen, 54 statt 93 Felder |
 | 2 | Makro-/Mikrolage: die Skalen abfragen | **fertig** — die Stufen stehen in der Frage, gelesen aus dem `<select>` |
 | 3 | Alles für den Deal Score 2 abfragen | **fertig** — Etappe 3 und 4 decken das Datenmodell ab, der Halt zeigt „17 von 24 Kennzahlen belegt" |
 | 4 | Statt fragen: abrufen | **fertig** — BORIS, Grunderwerbsteuer aus der PLZ, Lagewerte aus der Marktpreisindikation |

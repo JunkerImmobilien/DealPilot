@@ -10670,6 +10670,101 @@ eingeschlossen.**
 **Commit** `fdba8aa`. Auf Staging, **nicht auf Prod**. Backend geändert →
 Rebuild gelaufen, `UMGEKEHRT GILT DASSELBE` im laufenden Container gegengeprüft.
 
+### `v1289`/`v1289b` · Die Feinheiten nach Thema statt nach Reihenfolge
+
+**Der letzte offene Punkt aus Marcels Plan vom 10.09.2026.**
+
+Bis `v1288b` entstanden die Feinheiten stumpf: vier Felder je Frage, in der
+Reihenfolge des Formulars, gruppiert nur nach **Abschnitt**. Das ergab Fragen
+wie
+
+> „Objekt: Kürzel, Bankbewertung, Bevölkerungsentwicklung,
+> Nachfrage-Indikatoren?"
+
+Vier Dinge, die man nicht in einem Satz beantworten kann.
+
+**Der Anker ist die Karten-Überschrift**, im Browser gemessen statt angenommen:
+`.ct` sitzt in `.card`, und `.card` trägt die `.f`-Felder. 37 solche
+Überschriften gibt es in den sechs Abschnitten — und sie sind bereits das, was
+gesucht war: Inventar · Sanierung · Mietstruktur · Mietentwicklung · Persönliche
+Steuer · Darlehen I · Umlagefähige Kosten · Nicht umlagefähige Kosten · Grund &
+Boden.
+
+> **Aus dem DOM und nicht aus einer Liste** — das war der Vorbehalt aus `v1282`,
+> und er gilt weiter. Eine gepflegte Zweitliste von 145 Feldern veraltet beim
+> ersten neuen Feld, und **niemand merkt es**. Die Überschrift steht ohnehin da,
+> sie wurde nur nicht gelesen. Wo keine ist, greift wie bisher der
+> Abschnittsname — und *das fällt auf*, weil der Block dann den Bereichsnamen
+> trägt statt eines Themas.
+
+#### Zwei Befunde aus dem ersten Durchlauf — `v1289b`
+
+**1. Der Titel war leer, also griff der Rückfall.** Kind für Kind an der
+Inventar-Karte gemessen:
+
+```
+TEXT ""  ·  SPAN.ct-ico  ·  SPAN (der Titel)  ·  LABEL (ein Schalter)
+```
+
+Die direkten **Textknoten sind leer** — der Titel steckt in einem `<span>`.
+`v1289` las nur direkte Textknoten und fiel deshalb auf den Abschnittsnamen
+zurück: *„Kaufpreis & Nebenkosten — Küche, Möbel, Geräte, PV-Anlage?"* statt
+*„Inventar — …"*.
+
+Jetzt andersherum: **den ganzen Text nehmen und entfernen, was kein Titel ist**
+— Knopf, Schalter, Symbol, Live-Marke, Eingabefeld. Gegengeprüft an allen 21
+Karten mit Feldern; jede trägt danach einen sauberen Namen.
+
+**2. 37 von 93 Feldern waren Gutachterfelder.** Zehn der 29 Fragen kamen allein
+aus der Karte **„Wertermittlung (Marktbericht)"**: *„Außenwände · 23 %"*,
+*„Standardstufe (NHK 2010)"*, *„Modernisierungsgrad (Anlage 2)"*,
+*„Liegenschaftszinssatz"*.
+
+> **Das ist eine eigene Strecke, und sie gehört nicht ins Diktat.** `CLAUDE.md`
+> ist dort eindeutig: jeder Parameter trägt einen Modellvermerk, jede Zahl ihre
+> Herkunft (Stufe A–E, Ausschuss), und *kein Verfahren rechnet halb*. Ein
+> gesprochener Wert käme in der Übernahme-Tabelle als „Sprachaufzeichnung" an —
+> eine Herkunft, die nach § 10 ImmoWertV keine ist. Wer die Wertermittlung
+> füllen will, tut das im Marktbericht, wo die Vermerke mitlaufen.
+
+Dazu die Überführungsfelder (`ueberf_*`, `verkehrswert_ueberf`,
+`gesellschafterdarlehen`): sie gehören zum Überführungs-Wizard einer
+Gesellschaft, nicht zur Aufnahme eines Objekts.
+
+**Ausgeschlossen wird über den Kartentitel, nicht über Feld-ids** — die Karte
+ist die Einheit, die der Nutzer sieht, und eine neue Zeile darin fällt damit
+automatisch mit heraus. Bei den Überführungsfeldern geht es umgekehrt: sie
+stehen mitten in „Objektdaten", also bleibt nur die id.
+
+#### Gemessen, vorher und nachher
+
+| | vorher (`v1288b`) | `v1289` | `v1289b` |
+|---|---|---|---|
+| Blöcke | 24 (nach Abschnitt) | 29 | **18** |
+| Felder | 93 | 93 | **54** |
+| Wertermittlungs-Fragen | — | 10 | **0** |
+| Beispiel | *„Objekt: Kürzel, Bankbewertung, Bevölkerungsentwicklung, Nachfrage-Indikatoren?"* | *„Kaufpreis & Nebenkosten (1 von 2) — Küche, Möbel, Geräte, PV-Anlage?"* | *„**Inventar** (1 von 2) — Küche, Möbel, Geräte, PV-Anlage?"* |
+
+#### Voller Durchlauf zur Abnahme — zweites Testobjekt
+
+Löhner Str. 278, 32120 Hiddenhausen, ZFH 233 m², Bj 1964, 350.000 €,
+1.450 € Kaltmiete + 60 € Stellplatz:
+
+- **Das Formular bleibt leer**, bis übernommen wird — vor dem Lauf und nach dem
+  Abbruch gemessen: `plz=""`, `ort=""`, `kp=""`, `nkm=""`, `brw=""`.
+- **Deal Score 56/100 SOLIDE** (Faktor 19,3 · DSCR 1,10 · LTV 92,3 % ·
+  CF −92 €/Mon), **Deal Score 2 71/100 GUT**.
+- **Marktpreisindikation** 431.000 €, Mikrolage *Gut*, Makrolage
+  *Durchschnittlich* — die Lage-Frage wurde daraufhin übersprungen.
+- **BORIS** 150 €/m², Stichtag 2026-01-01, **Zone 379**.
+- *„nichts zu sanieren, nichts wird mitverkauft"* — als Verneinung erkannt,
+  **ohne KI-Aufruf**.
+- **Übernahme-Tabelle, 27 Zeilen, vier Herkünfte:** Sprachaufzeichnung 14 ·
+  Deine Einstellungen 8 · Marktpreisindikation 4 · BORIS 1.
+- Alle Umlaute im Nutztext korrekt (Einschätzung, umlagefähig, zählt).
+
+**Commits** `224382a`, `99e4308`. Auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

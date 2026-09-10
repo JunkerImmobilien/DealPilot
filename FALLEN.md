@@ -1554,3 +1554,57 @@ und das sieht aus wie ein Serverfehler, ist aber Ungeduld auf unserer Seite.
 
 **Vor jedem `Auth.apiCall` auf einen rechnenden Endpunkt: `timeout` mitgeben.**
 Die 15 Sekunden sind für Datensätze gedacht, nicht für Bewertungen.
+
+---
+
+## Ein Titel, den `textContent` findet, ist noch lange nicht der Titel
+
+Die Feinheiten-Fragen des Sprechlaufs holen ihren Themennamen aus der
+Karten-Überschrift `.ct`. Zwei Anläufe, zwei verschiedene Fehler.
+
+**Erster Anlauf: nur die direkten Textknoten lesen.** Begründung war richtig —
+`textContent` lieferte gemessen „Sanierung Sanierungsbedarf einschätzen" und
+„Markt-Kontext (EZB & Geldmarkt) Live · ECB EZB 2,40 % · EURIBOR 3M 2,51 %".
+Da hängt der Knopftext und die Live-Marke mit dran.
+
+**Nur:** an der Inventar-Karte sind die direkten Textknoten **leer**. Kind für
+Kind gemessen:
+
+```
+TEXT ""  ·  SPAN.ct-ico  ·  SPAN (der Titel)  ·  LABEL (ein Schalter)
+```
+
+Der Titel steckt in einem `<span>`. Ergebnis: leerer Titel, Rückfall auf den
+Abschnittsnamen, und die Frage hieß *„Kaufpreis & Nebenkosten — Küche, Möbel,
+Geräte, PV-Anlage?"*. **Ein Rückfall, der plausibel aussieht, verbirgt den
+Fehler** — die Frage war ja nicht sinnlos, nur falsch beschriftet.
+
+**Die Regel:** nicht auswählen, was der Titel *ist* — entfernen, was er
+*nicht* ist. Klon der Überschrift, `button, a, label, svg, input, select,
+.btn, .ct-ico, .live, .chip, .badge` heraus, Rest ist Titel. Und dann **an
+allen Karten gegenprüfen**, nicht an einer: 21 Karten mit Feldern, 21 saubere
+Namen.
+
+---
+
+## Was ein eigenes Verfahren hat, gehört nicht ins Diktat
+
+Der „Alle Felder"-Modus des Sprechlaufs sammelt alles ein, was im Formular
+leer ist. Gemessen: **93 Felder in 29 Fragen — davon 37 in zehn Fragen allein
+aus der Karte „Wertermittlung (Marktbericht)".** Sätze wie *„Außenwände ·
+23 %"*, *„Standardstufe (NHK 2010)"*, *„Modernisierungsgrad (Anlage 2)"*.
+
+Technisch war daran nichts falsch: es sind Felder, sie sind leer, sie haben
+ein Label. **Fachlich war es ein Fehler.** Die Wertermittlung nach ImmoWertV
+hat eigene Anforderungen an jede einzelne Zahl — Modellvermerk, Stufe A–E,
+Ausschuss. Ein gesprochener Wert käme in der Übernahme-Tabelle als
+„Sprachaufzeichnung" an, und das ist nach § 10 ImmoWertV keine Herkunft.
+
+**Die Regel:** bevor ein Sammelmechanismus über „alle Felder" läuft, prüfen,
+ob darunter eine Strecke ist, die anderen Regeln unterliegt. Ein Feld ist nicht
+nur ein Feld — es kann Teil eines Verfahrens sein.
+
+Ausgeschlossen wird über die **Karte**, nicht über einzelne Feld-ids: die Karte
+ist die Einheit, die der Nutzer sieht, und eine neue Zeile darin fällt damit
+automatisch mit heraus. Eine id-Liste hätte beim nächsten neuen Gutachterfeld
+schweigend versagt.
