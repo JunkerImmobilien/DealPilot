@@ -10218,6 +10218,87 @@ schon — welche Felder es sind, steht in der Frage selbst.
 
 **Commits.** `v1282` · `v1282b`. Auf Staging, **nicht auf Prod**.
 
+### `v1283`/`v1284` · Schneller, breiter, schlauer
+
+Marcels fünf Befunde nach dem ersten **echten** Sprechlauf — jeder einzeln
+abgearbeitet:
+
+**1 · „Das Modal ist sehr klein."** 740 px waren für **eine** Spalte
+gedacht; seit `v1281` stehen zwei nebeneinander, und der rechten blieben
+196 px — genug für einen Oberbegriff, zu wenig für Werte. Jetzt **1080 px**,
+Spalte 300, Verlauf 340 px hoch. Nur im Sprechlauf-Modus: die anderen
+Dialoge sind schmal richtig.
+
+**2 · „Da steht nur die Oberbegriffe und gar nicht das, was ich gesagt
+habe."** Die Spalte zeigt jetzt die **Werte**, Feld für Feld, grün mit
+Haken:
+
+```
+✓ Adresse        PLZ 32609
+                 Ort Hüllhorst
+                 Straße Hermannstraße
+✓ Finanzierung   Zinssatz 3,5
+                 Tilgung 1
+```
+
+Sie ist damit kein Inhaltsverzeichnis mehr, sondern das **Protokoll**.
+
+**3 · „Bei Sanierung habe ich gesagt: Haben wir nicht. Das hat er nicht
+erkannt."** Verneinungen werden jetzt **vor** dem KI-Aufruf erkannt: *haben
+wir nicht · gibt es nicht · kommt nicht in Frage · brauchen wir nicht ·
+nichts · weiter · überspringen · nein*. Gesprochen wie getippt.
+
+**4 · „Bei den Zinssätzen sollte man sagen können: übernimm die aus den
+Einstellungen."** Ebenfalls vorab erkannt, solange ein Vorschlag offen
+steht — *„ja bitte übernimm die aus den Einstellungen"* trägt Zins,
+Tilgung und Bindung ein.
+
+**5 · „Wir brauchen dazwischen nicht mehr ‚erkannt wurde das und das in
+Grün'."** Die Bestätigungsblase entfällt; die nächste Frage kommt nach
+**120 statt 650 ms**. Auch das Überspringen quittiert nicht mehr doppelt.
+
+> **Alle vier Erkennungen laufen ohne KI.** Das ist der eigentliche
+> Geschwindigkeitsgewinn: eine Verneinung kostete vorher zwei Sekunden und
+> 0,1 Cent — jetzt kostet sie nichts und dauert nichts.
+
+#### `v1283d` · Die Übersicht verschwieg das Eingetippte
+
+Gemessen: Kaufpreis war im Formular gefüllt, wurde also nicht gefragt —
+und **fehlte damit in der Spalte ganz**. Eine Liste, die „Was schon steht"
+heißt und ausgerechnet das Eingetippte verschweigt, ist keine Übersicht.
+Jetzt stehen alle Blöcke da, die vorher gefüllten mit Haken und Wert oben.
+
+**Nachgemessen:** 13 Zeilen, **6 davon schon gefüllt** — Objektart ETW,
+Kaufpreis 200000, Wohnfläche 100, Kaltmiete 490, Zinssatz 3,5, Übergang.
+
+#### Zwei eigene Fehler auf dem Weg
+
+> **Der Cache-Buster stand zwei Stände zurück.** `v1283c` hatte nur die
+> JS-Datei committet, nicht die `index.html` — die nächste Ersetzung suchte
+> dann nach `v1283c`, das dort nie stand. Der Browser lud `v1283b`, während
+> die Datei `v1283d` war. **Das kostet doppelt:** die Messung danach misst
+> die alte Datei, und man sucht den Fehler im Code. Seitdem wird der
+> geladene `?v=` im Browser mitgelesen, bevor ein Befund als Befund gilt.
+
+> **Eine Zeile landete hinter `return`.** `node --check` meldet das nicht —
+> es ist gültiges JavaScript, nur unerreichbar. Beim Nachlesen der
+> eingefügten Stelle gesehen.
+
+#### `v1284` · Umlaute, die jahrelang durchgingen
+
+Seit die Spalte Werte zeigt, stehen die Chip-Labels **sichtbar** im
+Fenster — und die trugen seit jeher `ae/oe/ue`: *Wohnflaeche, Strasse,
+Grundstuecksflaeche, Moeblierung, Kuechenmiete, Bevoelkerung,
+Aussenstellplaetze, Wirtsch. Uebergang*. Im Orbit sind sie durchgegangen,
+in einer Werteliste fallen sie auf. Korrigiert; die **Suchwörter** (`kw`)
+bleiben ohne Umlaut, sie werden gegen entumlauteten Text geprüft.
+
+Dazu: „3.5" ist ein Feldwert, „3,5" eine Angabe — in der Spalte steht
+jetzt das Komma.
+
+**Commits.** `v1283`–`v1283d` · `v1284`/`v1284b`. Auf Staging, **nicht auf
+Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
