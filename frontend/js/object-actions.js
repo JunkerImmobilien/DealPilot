@@ -530,6 +530,33 @@
      ihre Werte landen in derselben Uebernahme-Tabelle wie alles andere.
      Danach meldet der Sprechlauf zurueck, dass er sie erledigt hat —
      sonst liefe sie zweimal und kostete zweimal. */
+  /* v1293b: Ein Schnappschuss der Formularwerte. Nur so laesst sich
+     sagen, was der IMPORT gebracht hat — und nicht, was ohnehin schon
+     dastand. Gemessen ohne ihn: „71 Angaben aus dem Exposé", obwohl der
+     Import zehn Felder gefuellt hatte. Der Rest waren die Vorgaben aus
+     `index.html` (Notar 2,20 %, Grunderwerbsteuer 6,50 %, Mietsteigerung
+     3 % …). Eine Zahl, die der Nutzer nicht wiedererkennt, ist schlimmer
+     als keine. */
+  function _formularStand() {
+    var out = {};
+    try {
+      (window.FIELDS || []).forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el || el.type === 'checkbox') return;
+        var v = String(el.value || '').trim();
+        if (v !== '') out[id] = v;
+      });
+    } catch (e) {}
+    return out;
+  }
+  function _formularNeu(vorher) {
+    var jetzt = _formularStand(), neu = [];
+    Object.keys(jetzt).forEach(function (id) {
+      if (vorher[id] !== jetzt[id]) neu.push(id);
+    });
+    return neu;
+  }
+
   async function runSelected() {
     var srcs = selectedSources();
     if (!srcs.length) { toast('Bitte mindestens eine Quelle auswählen'); return; }
@@ -540,6 +567,9 @@
     /* Was vorher lief, weiss der naechste Schritt — der Sprechlauf sagt
        dann „ich habe X Angaben aus dem Exposé" statt bei null anzufangen. */
     var vorlauf = [], mbImSprechlauf = false;
+    /* v1293b: Der Stand VOR der Kette — die Differenz sagt, was die
+       automatischen Quellen wirklich gebracht haben. */
+    var standVorher = _formularStand();
     for (var i = 0; i < ordered.length; i++) {
       var s = ordered[i];
       try {
@@ -548,7 +578,8 @@
           var _mbGewaehlt = srcs.indexOf('dealpilot') !== -1;
           var _erg = await new Promise(function (res) {
             if (window.VoiceImport) {
-              window.VoiceImport.open(res, { vorlauf: vorlauf.slice(), marktbewertung: _mbGewaehlt });
+              window.VoiceImport.open(res, { vorlauf: vorlauf.slice(), marktbewertung: _mbGewaehlt,
+                                             vorlaufFelder: _formularNeu(standVorher) });
             } else res();
           });
           /* Hat der Sprechlauf die Marktbewertung selbst geholt, faellt sie

@@ -48,7 +48,7 @@
   var _doneFired = false;
   /* v1293: Was vor dem Sprechlauf lief (Pre-Flight-Kette), und ob die
      Marktbewertung dort mit angehakt war. */
-  var _vorlauf = [], _mbGewollt = false, _mbGeholt = false;
+  var _vorlauf = [], _mbGewollt = false, _mbGeholt = false, _vorlaufFelder = null;
   var _qcTarget = false;  /* v506-qc-items: Quick-Check-Kontext */
   /* v507-stream: Live-Transkription per WebSocket (ueberall lauffaehig, auch App) */
   var sx = { ws: null, ctx: null, src: null, proc: null, on: false, finalText: '', delta: '' };
@@ -433,6 +433,7 @@
        der Pre-Flight-Karte mit angehakt war. */
     _vorlauf = (opts && Array.isArray(opts.vorlauf)) ? opts.vorlauf.slice() : [];
     _mbGewollt = !!(opts && opts.marktbewertung);
+    _vorlaufFelder = (opts && Array.isArray(opts.vorlaufFelder)) ? opts.vorlaufFelder.slice() : null;
     OA.reset();
     OA.setMode(!!(opts && opts.target === 'qc'), done);
 
@@ -5725,7 +5726,14 @@
 
   function _rfVorbefuellt(catalog) {
     var out = {};
+    /* v1293b: Kennt die Kette die Felder, die WIRKLICH aus dem Vorlauf
+       kamen, zaehlen nur die. Sonst faellt es auf „was im Formular steht"
+       zurueck — dann stehen dort aber auch die Vorgaben aus index.html,
+       und die hat niemand eingelesen. */
+    var nurDiese = _vorlaufFelder ? {} : null;
+    if (nurDiese) _vorlaufFelder.forEach(function (id) { nurDiese[id] = 1; });
     (catalog || []).forEach(function (e) {
+      if (nurDiese && !nurDiese[e.id]) return;
       var el = document.getElementById(e.id);
       if (!el) return;
       var v = String(el.value || '').trim();
@@ -5733,7 +5741,6 @@
     });
     return out;
   }
-
   /* Einstieg: nach der Auswertung (Lücken) oder von Anfang an (geführt). */
   function rueckfragen(OA, data, catalog, alle) {
     var fields = (data && data.fields) || {};
