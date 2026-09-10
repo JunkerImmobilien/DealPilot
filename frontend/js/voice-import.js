@@ -5871,6 +5871,10 @@
                          _kennzahlen: _rfKennzahlen,
                          _score1: _rfScore1, _score2: _rfScore2,
                          _nkAnnahme: _rfNkAnnahme,
+                         _hebel: _rfHebel,             /* v1292b */
+                         _breakEven: function () { return _rfBreakEven(_rfKennzahlen()); },
+                         _mietPotenzial: function () { return _rfMietPotenzial(_rfKennzahlen()); },
+                         _score2Karte: _rfScore2Karte,
                          _kontingent: _rfKontingent,
                          _verneinung: _rfIstVerneinung,  /* v1288b */
                          _kontextKlar: _rfKontextKlar,
