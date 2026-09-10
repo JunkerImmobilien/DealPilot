@@ -10299,6 +10299,67 @@ jetzt das Komma.
 **Commits.** `v1283`–`v1283d` · `v1284`/`v1284b`. Auf Staging, **nicht auf
 Prod**.
 
+### `v1285` · HTTP 413 beim Sprechen — die Aufnahme wuchs unbegrenzt
+
+Marcels Fehler: *„ich spreche rein und bekomme einen http413"*.
+
+**Im Caddy-Log gemessen, nicht geraten:**
+
+```
+"uri": "/api/v1/ai/extract-voice",
+"Content-Length": ["238137157"],     ← 238 MB
+"bytes_read": 50000001,               ← Caddy bricht bei 50 MB ab
+"status": 413, "duration": 9.39
+```
+
+**238 MB für die Antwort auf eine Frage.** Neun Sekunden Upload, dann der
+Abbruch. Weder das Backend-Limit (26 MB) noch `express.json` (50 MB) kamen
+überhaupt zum Zug — Caddy war vorher dran.
+
+#### Die Ursache
+
+In der Phase **„warte"** — Mikrofon an, aber noch niemand spricht — lief
+der `MediaRecorder` **ohne Ende**. Die Notbremse von 25 Sekunden greift nur
+in der Phase „spricht" (`FS_MAX_MS`). Wer das Fenster offen liegen lässt
+oder dessen Mikrofon stumm bleibt, sammelt stundenlang Daten, die beim
+ersten Stopp **alle auf einmal** hochgehen.
+
+> **Ein Puffer ohne Obergrenze ist keine Frage des Ob, sondern des Wann.**
+> Die Notbremse stand an der einen Stelle, an der ohnehin gesprochen wurde
+> — nicht an der, an der jemand schweigt.
+
+#### Die Lösung: Zeitscheiben statt eines Blocks
+
+`rec.start(500)` liefert alle 500 ms ein Stück; behalten werden nur die
+letzten **40 Sekunden**. Damit ist jeder Abschnitt nach oben begrenzt, egal
+wie lange das Fenster offen steht — und der **Anfang eines Satzes geht
+trotzdem nicht verloren**, weil der Puffer zurückreicht.
+
+**Zweiter Riegel:** vor dem Senden wird die Größe geprüft; was über 8 MB
+liegt, geht gar nicht erst raus. Ein Fehler, der erst nach neun Sekunden
+Upload sichtbar wird, ist ein schlechter Fehler.
+
+#### Nachweis (im Browser, beide Verfahren nebeneinander)
+
+Zwei `MediaRecorder` auf demselben Stream, 20 Sekunden:
+
+| | nach 20 s | hochgerechnet auf 1 Stunde |
+|---|---|---|
+| **ohne Ring** (bis `v1284`) | 315 KB | **55 MB** |
+| **mit Ring** (ab `v1285`) | **77 KB** | **77 KB** — konstant |
+
+Verhältnis nach 20 Sekunden bereits **4 : 1**, und der Abstand wächst mit
+jeder Minute. Marcels 238 MB entsprechen bei dieser Rate rund **vier
+Stunden** offenem Fenster.
+
+> **Randnotiz zur Prüfung:** Der Pegelweg der App ließ sich mit einem
+> synthetischen Stream nicht messen — ein `MediaStreamDestination` aus
+> einem fremden `AudioContext` erreicht ihren Analyser nicht. Deshalb ist
+> oben die **Mechanik** nachgewiesen, nicht der Durchlauf: zwei Recorder,
+> gleicher Stream, einziger Unterschied der Ring.
+
+**Commit** `v1285`. Auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
