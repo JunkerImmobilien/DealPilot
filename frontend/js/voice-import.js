@@ -2184,32 +2184,51 @@
   var RF_NEIN = /^(nein|nee|ne|nichts|kein[es]?|keine[rs]?|gibt('s| es)? (hier )?(nicht|keine)|haben wir (nicht|keine)|hab(e)? ich (nicht|keine)|brauchen wir (nicht|keine)|kommt nicht in frage|entf(ä|ae)llt|weiter|(ü|ue)berspringen|(ü|ue)berspring|weiss nicht|wei(ß|ss) ich nicht|keine ahnung|passt so|passt|unbekannt|k\.?a\.?)\b[\s.!]*$/i;
 
   var RF_PROFIL_JA = /(übernimm|uebernimm|nimm|nehmen|übernehmen|uebernehmen|ja bitte|ja gern|einverstanden)\b.*(einstellung|profil|vorschlag|vorgabe|standard)|^(ja|okay|ok|passt|gerne|klar)\b[\s.!]*$/i;
-
-  /* Was hat der Nutzer zu diesem Block schon gesagt? Für die Spalte. */
+  /* Was steht zu diesem Block — aus dem Gespräch ODER aus dem Formular?
+     v1283d: auch das Formular zählt. Wer den Kaufpreis vorher eingetippt
+     hat, bekommt ihn nicht mehr gefragt — dann darf er in der Übersicht
+     aber auch nicht FEHLEN. Eine Liste, die „was schon steht" heißt und
+     ausgerechnet das Eingetippte verschweigt, ist keine Übersicht. */
   function _rfWerteZuBlock(e) {
     var out = [];
     (e.ids || []).forEach(function (id) {
       var v = _rf && _rf.data && _rf.data.fields ? _rf.data.fields[id] : null;
-      if (v === undefined || v === null || v === '') return;
+      var ausFormular = false;
+      if (v === undefined || v === null || v === '') {
+        var el = document.getElementById(id);
+        v = el ? String(el.value || '').trim() : '';
+        ausFormular = true;
+      }
+      if (v === '' || v === null || v === undefined) return;
       var kat = (_rf.catalog || []).filter(function (c) { return c.id === id; })[0];
       var name = kat ? String(kat.label).replace(/\s*\(.*?\)\s*$/, '') : id;
-      out.push({ n: name, v: String(v) });
+      out.push({ n: name, v: String(v), f: ausFormular });
     });
     return out;
   }
 
   function _rfStandZeichnen() {
     var host = $('vi-rf-stand'); if (!host || !_rf) return;
-    var zeilen = _rf.offen.map(function (e, i) {
+    /* v1283d: ALLE Blöcke, nicht nur die offenen. Die Reihenfolge ist die
+       der Fragen; was vorher schon stand, steht davor. */
+    var alle = _rf.offen.slice();
+    var drin = {};
+    _rf.offen.forEach(function (e) { drin[e.ids.join(',')] = 1; });
+    var vorher = [];
+    RFRAGEN.forEach(function (e) {
+      if (drin[e.ids.join(',')]) return;
+      if (_rfWerteZuBlock(e).length) vorher.push(e);
+    });
+    alle = vorher.concat(alle);
+    var offenAb = vorher.length;
+
+    var zeilen = alle.map(function (e, idx) {
       var werte = _rfWerteZuBlock(e);
-      var fertig = werte.length > 0 || !_rfFehlt(e, _rf.data.fields || {});
-      var dran = (i === _rf.i) && !fertig;
-      var uebersprungen = !!(_rf.weg && _rf.weg[i]);
+      var i = idx - offenAb;                         /* Index in _rf.offen */
+      var dran = (i === _rf.i) && !werte.length;
+      var uebersprungen = !!(_rf.weg && i >= 0 && _rf.weg[i]);
       var zeichen = werte.length ? '✓' : (uebersprungen ? '–' : (dran ? '▸' : '·'));
       var klasse = werte.length ? 'ok' : (uebersprungen ? 'weg' : (dran ? 'dran' : ''));
-      /* v1283: Der Wert steht DA, nicht nur der Oberbegriff. Marcels Punkt:
-         „das wäre gut, wenn man dort gleich die Sachen sieht, die ich gesagt
-         habe." */
       var detail = werte.length
         ? '<div class="vi-rf-st-w">' + werte.map(function (w) {
             return '<span><i>' + escH(w.n) + '</i> ' + escH(w.v) + '</span>';
@@ -2219,15 +2238,12 @@
              '<div class="vi-rf-st-k"><span class="z">' + zeichen + '</span>' +
              '<span class="n">' + escH(_rfKurzname(e)) + '</span></div>' + detail + '</div>';
     }).join('');
-    var fertigN = _rf.offen.filter(function (e) {
-      return _rfWerteZuBlock(e).length > 0 || !_rfFehlt(e, _rf.data.fields || {});
-    }).length;
+    var fertigN = alle.filter(function (e) { return _rfWerteZuBlock(e).length > 0; }).length;
     host.innerHTML =
       '<div class="vi-rf-stand-kopf">Was schon steht</div>' + zeilen +
-      '<div class="vi-rf-stand-fuss"><b>' + fertigN + '</b> von ' + _rf.offen.length + '</div>';
-    /* Die gerade beantwortete Zeile in Sicht holen. */
+      '<div class="vi-rf-stand-fuss"><b>' + fertigN + '</b> von ' + alle.length + '</div>';
     try {
-      var dranEl = host.querySelector('.vi-rf-st.dran, .vi-rf-st.ok:last-of-type');
+      var dranEl = host.querySelector('.vi-rf-st.dran');
       if (dranEl) dranEl.scrollIntoView({ block: 'nearest' });
     } catch (ex) {}
   }
