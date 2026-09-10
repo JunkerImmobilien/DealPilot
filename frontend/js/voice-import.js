@@ -840,7 +840,7 @@
     { id:'stellpl_aussen', g:0, noc:1, label:'Außenstellplätze', kw:['stellplatz','aussenstellplatz','parkplatz'] },
     { id:'garagen',    g:0, noc:1, label:'Garagen',             kw:['garage','tiefgarage'] },
     { id:'kaufdat',    g:1, label:'Kaufdatum',           kw:['kaufdatum','gekauft','erworben'] },
-    { id:'wirtschaftlicher_uebergang', g:1, label:'Wirtsch. Uebergang', kw:['wirtschaftlicher uebergang','nutzen lasten','nutzen und lasten','lastenwechsel','besitzuebergang','uebergang'] },
+    { id:'wirtschaftlicher_uebergang', g:1, label:'Wirtsch. Übergang', kw:['wirtschaftlicher uebergang','nutzen lasten','nutzen und lasten','lastenwechsel','besitzuebergang','uebergang'] },
 
     { id:'kp',         g:1, label:'Kaufpreis',           kw:['kaufpreis','kostet','preis','kaufsumme'] },
     { id:'makler_p',   g:1, noc:1, label:'Maklerprovision %',   kw:['makler','maklerprovision','courtage'] },
