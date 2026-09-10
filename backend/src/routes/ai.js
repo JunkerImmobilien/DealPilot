@@ -78,7 +78,58 @@ const extractLimiter = rateLimit({
   keyGenerator: function(req) {
     return req.user && req.user.id ? 'u:' + req.user.id : req.ip;
   },
-  message: { error: 'Zu viele PDF-Extraktionen — bitte 1h warten oder eigenen OpenAI-Key in Settings hinterlegen.' }
+  message: { error: 'Zu viele Dokument-Auswertungen — bitte eine Stunde warten oder einen eigenen OpenAI-Key in den Einstellungen hinterlegen.' }
+});
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1290d · DER DIALOG BRAUCHT EINE EIGENE SCHRANKE
+   ═══════════════════════════════════════════════════════════════════════
+   Gemessen am 10.09.2026 beim Testen des Sprechlaufs: nach zwei
+   Durchlaeufen kam
+
+     „Zu viele PDF-Extraktionen — bitte 1h warten"
+
+   mitten im Gespraech. Zwei Fehler auf einmal.
+
+   1. DIE ZAHL PASST NICHT ZUM WEG. Der Limiter stammt aus der Zeit, als
+      es nur den PDF-Exposé-Import gab: 30 Auswertungen je Stunde, „mehr
+      als jeder legitime Workflow braucht". Fuer ein Dokument stimmt das.
+      Der gefuehrte Sprechlauf stellt aber **16 Fragen**, und jede Antwort
+      ist ein Aufruf — dazu Nachhaken, Zwischenfragen, ein zweiter Anlauf,
+      wenn etwas nicht verstanden wurde. **Nach EINEM Durchlauf ist die
+      Haelfte weg, nach zweien ist der Nutzer gesperrt.** Der Hauptweg der
+      Objektaufnahme faellt damit an seiner eigenen Schutzschranke aus.
+
+   2. DER TEXT NENNT PDFs, waehrend jemand spricht. Eine Fehlermeldung,
+      die vom falschen Vorgang redet, schickt den Nutzer in die falsche
+      Richtung — er sucht den Fehler bei einem Dokument, das er gar nicht
+      hochgeladen hat.
+
+   DER SCHUTZZWECK BLEIBT. Es geht darum, dass niemand unbegrenzt Aufrufe
+   auf dem Server-Schluessel ausloest. Der wird nicht aufgegeben, nur
+   richtig bemessen:
+
+     Dialog   150 Aufrufe/Stunde je Nutzer.
+              Ein voller Sprechlauf braucht 20 bis 30; das sind fuenf
+              Durchlaeufe in einer Stunde, und mehr macht niemand.
+              Eine gesprochene Antwort kostet gemessen unter 0,1 Cent
+              (die Transkription ist der groesste Posten, das Gesagte
+              selbst faellt kaum ins Gewicht) — 150 Aufrufe bleiben damit
+              deutlich unter 20 Cent je Nutzer und Stunde.
+     Dokument  30 Aufrufe/Stunde je Nutzer, unveraendert. Ein Exposé ist
+              ein Vorgang, kein Gespraech.
+
+   GETRENNTE ZAEHLER, nicht ein groesserer: wer viele Exposés einliest,
+   soll nicht den Sprechlauf blockieren, und umgekehrt. */
+const dialogLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 150,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: function(req) {
+    return req.user && req.user.id ? 'd:' + req.user.id : req.ip;
+  },
+  message: { error: 'Das waren sehr viele Antworten in einer Stunde. Warte einen Moment — oder hinterlege in den Einstellungen einen eigenen OpenAI-Key, dann gilt die Grenze nicht.' }
 });
 
 /**
@@ -482,7 +533,7 @@ router.post('/transcribe-chunk', authenticate, liveTranscribeLimiter, async (req
   } catch (err) { next(err); }
 });
 
-router.post('/extract-voice', authenticate, extractLimiter, async (req, res, next) => {
+router.post('/extract-voice', authenticate, dialogLimiter, async (req, res, next) => {
   try {
     const { audio, mime, catalog, userApiKey: rawUserKey } = req.body || {};
     const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
@@ -550,7 +601,7 @@ router.post('/extract-voice', authenticate, extractLimiter, async (req, res, nex
  *     fehlt.
  *  3. Keine Anlageberatung. Rechnen und einordnen ja, „kauf das" nein.
  */
-router.post('/copilot-frage', authenticate, extractLimiter, async (req, res, next) => {
+router.post('/copilot-frage', authenticate, dialogLimiter, async (req, res, next) => {
   try {
     const { frage, kontext } = req.body || {};
     if (!config.openai.apiKey) return res.status(503).json({ error: 'Kein OpenAI-API-Key verfuegbar.' });
@@ -659,7 +710,7 @@ router.post('/copilot-frage', authenticate, extractLimiter, async (req, res, nex
  * absichtlich klein (die zwei, drei gefragten Felder), was den Aufruf
  * zusaetzlich billig macht.
  */
-router.post('/extract-text', authenticate, extractLimiter, async (req, res, next) => {
+router.post('/extract-text', authenticate, dialogLimiter, async (req, res, next) => {
   try {
     const { text, catalog, userApiKey: rawUserKey } = req.body || {};
     const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
