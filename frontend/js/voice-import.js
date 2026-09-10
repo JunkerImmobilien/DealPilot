@@ -2177,6 +2177,11 @@
     makrolage: 'Lage & Zustand', thesis: 'Deine Einschätzung'
   };
   function _rfKurzname(e) {
+    /* v1282: Die Feinheiten-Bloecke tragen ihren Bereich, nicht die halbe
+       Frage. "Objekt: Kuerzel, Wertsteigerung, Anzahl Etagen" passt nicht
+       in 196 px - "Objekt · Detail" schon, und mehr braucht die Spalte
+       nicht: welche Felder es sind, steht in der Frage selbst. */
+    if (e.tiefe && e.bereich) return e.bereich;
     for (var i = 0; i < e.ids.length; i++) { if (RF_KURZ[e.ids[i]]) return RF_KURZ[e.ids[i]]; }
     return String(e.frage).split(/[?,–—]/)[0].slice(0, 22);
   }
