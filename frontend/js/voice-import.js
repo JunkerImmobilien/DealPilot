@@ -650,9 +650,12 @@
   /* Der geführte Weg: derselbe Fragen-Ablauf wie die Rückfragen, nur über
      ALLE Blöcke und ohne Aufnahme davor. */
   function _gefuehrt(OA) {
-    var sub = document.querySelector('.oabi-ov.vi-mode .oabi-sub');
-    if (sub) sub.textContent = 'Der Co-Pilot fragt der Reihe nach. Antworten kannst du tippen oder ' +
-      'sprechen — „Weiß ich nicht" überspringt, „Fertig" bringt dich jederzeit zur Übersicht.';
+    /* v1290: Der Kopf sagt jetzt, welcher Weg laeuft. Bis hierher stand
+       ueber dem gefuehrten Dialog „FREI EINSPRECHEN · Sprachaufzeichnung"
+       — der Titel des ANDEREN Weges (design/mockups/sprechlauf2.png). */
+    _rfKopfSetzen('CO-PILOT · GEFÜHRTE AUFNAHME', 'Objekt aufnehmen',
+      'Ich frage der Reihe nach und rechne unterwegs mit. Antworten kannst du sprechen oder tippen — ' +
+      '„Weiß ich nicht" überspringt, „Fertig" bringt dich jederzeit zur Übersicht.');
     var catalog = _qcTarget ? buildCatalog() : buildFullCatalog();
     rueckfragen(OA, { transcript: '', fields: {}, unsicher: [] }, catalog, true);
   }
@@ -1582,8 +1585,9 @@
           taugt nicht - ein Laptoplüfter ist lauter als ein stiller Raum.
        2. Warten, bis jemand SPRICHT (Pegel über Schwelle, 180 ms lang).
        3. Danach warten, bis er FERTIG ist (Pegel unter Schwelle,
-          1400 ms lang). Kürzer wäre falsch: zwischen „vierhundert" und
-          „neunzig" liegt eine Pause.
+          1600 ms lang, seit v1290). Kuerzer waere falsch: zwischen
+          „vierhundert" und „neunzig" liegt eine Pause — und zwischen
+          „das Objekt steht in" und „Huellhorst" auch.
        4. Abschnitt auswerten, Ergebnis zeigen, nächste Frage - von selbst.
 
      WARUM setInterval UND NICHT requestAnimationFrame: rAF steht still,
@@ -1597,47 +1601,98 @@
      EIN Stream, EIN MediaRecorder für den ganzen Dialog - nicht je Frage
      neu. Jede getUserMedia-Anfrage ist eine Zäsur (Berechtigung, Anlauf,
      verlorene erste Silbe). */
+  /* ═══════════════════════════════════════════════════════════════════
+     v1290 · DAS FREISPRECHEN, NEU GEBAUT
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Durchlauf am 10.09.2026 (design/mockups/sprechlauf2.png und
+     sprechlauf3.png), drei Befunde in einer Kette:
+
+       1. „Bei der ersten Frage hat er nur die Hälfte aufgenommen."
+          Im Bild: „Oh, das Objekt steht in…" — mitten im Satz abgeschnitten.
+       2. „Dann wollte ich es nochmal sagen. Er hat mir aber gar nicht mehr
+          zugehört."
+       3. „Transkription fehlgeschlagen (HTTP 400): Audio file might be
+          corrupted or unsupported"
+
+     ── URSACHE 1: DER RINGPUFFER WARF DEN CONTAINER-HEADER WEG ──────────
+
+     `rec.start(500)` liefert Zeitscheiben. **Das erste Stück ist der
+     WebM-Header** (EBML, Segment-Info, Track-Definition); alle weiteren
+     sind Cluster — reine Fortsetzungen, die für sich genommen keine Datei
+     ergeben.
+
+     `_fsRingBegrenzen()` hielt die Größe mit `chunks.slice(-max)` in
+     Schranken. Das schneidet die ÄLTESTEN Stücke ab — also nach 40
+     Sekunden Lauschen genau den Header. Was danach zusammengesetzt wurde,
+     war ein Haufen Cluster ohne Container: **„Audio file might be
+     corrupted or unsupported"**, wörtlich.
+
+     Der Riegel aus v1285 war richtig gedacht und an genau einer Stelle
+     falsch: der Kopf ist kein Ballast, er ist die Datei.
+
+     ── URSACHE 2: `_fsHoeren()` LEERTE DEN PUFFER MITTEN IM STROM ───────
+
+     14 Stellen im Code rufen `_fsHoeren()` auf. Jede setzte `chunks = []`
+     und startete den Recorder, falls er inaktiv war. Kamen zwei Aufrufe
+     kurz hintereinander — nach einer Rückfrage, nach einer beantworteten
+     Zwischenfrage, nach einem Abruf —, wurde der Puffer geleert, WÄHREND
+     der Recorder lief. Der Header war damit weg, obwohl der Ring gar nicht
+     gegriffen hatte. Zweiter Weg in denselben Fehler.
+
+     ── URSACHE 3: 1,1 SEKUNDEN SIND KEINE DENKPAUSE ────────────────────
+
+     v1286 hat die Stillepause von 1,4 auf 1,1 s gesenkt, um Zeit zu
+     sparen. Bei „Oh, das Objekt steht in… ähm…" ist das zu wenig. Der
+     Satz ging weg, bevor er zu Ende war.
+
+     ── DIE NEUE MECHANIK ───────────────────────────────────────────────
+
+     DER RECORDER LÄUFT DURCH. Einmal gestartet, bis der Dialog endet. Kein
+     stop/start-Zyklus mehr — jeder davon ist eine Gelegenheit, den Header
+     zu verlieren.
+
+       _fs.kopf     das erste Stück, für immer aufgehoben
+       _fs.chunks   der laufende Abschnitt (Ring, ohne den Kopf)
+
+     Ein Abschnitt wird mit `requestData()` geschnitten, nicht mit `stop()`.
+     Der Blob ist `[kopf].concat(chunks)` — immer eine vollständige Datei.
+
+     DAMIT KOMMT DER NACHSCHLAG GESCHENKT. Weil das Mikrofon nach dem
+     Absenden weiterläuft, kann man einfach weiterreden. Genau das ist
+     Marcels Wunsch: „notfalls auch, dass man es einfach nochmal sagen
+     kann, sodass er da direkt mithört."
+
+     UND EIN ANGEFANGENER SATZ WIRD NICHT AUSGEWERTET, sondern gemerkt.
+     Endet das Transkript offen („… steht in", „… und", „… bei"), fragt der
+     Co-Pilot nicht nach, sondern sagt „ich höre weiter zu" und hängt den
+     nächsten Abschnitt an. Zwei Hälften ergeben einen Satz. */
+
   var _fs = {
     an: true,        /* Freisprechen eingeschaltet? */
     stream: null, ctx: null, analyser: null, daten: null,
-    rec: null, chunks: [], uhr: null,
+    rec: null,
+    kopf: null,      /* v1290: das erste Stueck = Container-Header, NIE wegwerfen */
+    chunks: [], uhr: null,
     phase: '',       /* 'ruhe' | 'rauschen' | 'warte' | 'spricht' | 'aus' */
-    rausch: 0, schwelle: 0.012, t0: 0, tSprach: 0, tStill: 0, aufnahme: false
+    rausch: 0, schwelle: 0.012, t0: 0, tSprach: 0, tStill: 0, aufnahme: false,
+    sprechMs: 0,     /* v1290: wie lange wirklich gesprochen wurde */
+    rest: '',        /* v1290: ein angefangener Satz, der auf seine Fortsetzung wartet */
+    laeuft: 0        /* v1290: eine Auswertung ist unterwegs */
   };
-  /* v1286: Marcels "es dauert auch immer noch recht lange". Die Stillepause
-     von 1,4 s war der groesste Einzelposten zwischen Satzende und naechster
-     Frage. 1,1 s traegt eine Denkpause im Satz noch, spart aber je Antwort
-     0,3 s - bei elf Fragen mehr als drei Sekunden. Die Rauschmessung von
-     500 auf 400 ms, sie muss nur den Raum kennen, nicht ihn ausmessen. */
-  var FS_MIN_SCHWELLE = 0.012, FS_SPRACHE_MS = 160, FS_STILLE_MS = 1100,
-      FS_RAUSCH_MS = 400, FS_GEDULD_MS = 30000, FS_MAX_MS = 25000;
-  /* ═══ v1285 · Der Ringpuffer — eine Aufnahme darf nicht wachsen ════════
-     Marcels Fehler: „ich spreche rein und bekomme einen http413".
 
-     Im Caddy-Log gemessen: Content-Length **238.137.157** Bytes. 238 MB
-     für eine Antwort auf eine Frage. Caddy bricht bei 50 MB ab — daher
-     der 413, und daher erst nach neun Sekunden Upload.
-
-     URSACHE: In der Phase „warte" — Mikrofon an, aber noch niemand spricht
-     — lief der MediaRecorder ohne Ende. Die Notbremse (25 s) greift nur in
-     der Phase „spricht"; wer das Fenster offen liegen lässt oder dessen
-     Mikrofon stumm bleibt, sammelt stundenlang Daten, die beim ersten
-     Stopp alle auf einmal hochgehen.
-
-     LÖSUNG: Zeitscheiben statt eines Blocks. `rec.start(500)` liefert alle
-     500 ms ein Stück; behalten werden nur die letzten FS_RING_MS. Damit ist
-     jede Abschnittsgröße nach oben begrenzt — egal wie lange das Fenster
-     offen steht —, und der Anfang eines Satzes geht trotzdem nicht
-     verloren, weil der Puffer zurückreicht.
-
-     ZWEITER RIEGEL: Vor dem Senden wird die Größe geprüft. Was über
-     FS_MAX_BYTES liegt, wird gar nicht erst geschickt. Ein Fehler, der
-     erst nach neun Sekunden Upload sichtbar wird, ist ein schlechter
-     Fehler. */
+  /* v1290: 1,6 s statt 1,1 s. Marcels „Oh, das Objekt steht in… ähm…" ist
+     eine Denkpause, kein Satzende. Die 0,5 s, die v1286 gespart hat,
+     kosten einen halben Satz — das ist der schlechteste Tausch von allen.
+     FS_MIN_SPRECH_MS: was kuerzer ist als ein Wort, wird nicht gesendet;
+     ein Huesteln erzeugt sonst einen Aufruf und eine Fehlermeldung. */
+  var FS_MIN_SCHWELLE = 0.012, FS_SPRACHE_MS = 160, FS_STILLE_MS = 1600,
+      FS_RAUSCH_MS = 400, FS_GEDULD_MS = 30000, FS_MAX_MS = 25000,
+      FS_MIN_SPRECH_MS = 350;
   var FS_SCHEIBE_MS = 500;      /* Länge eines Stücks */
   var FS_RING_MS = 40000;       /* so weit reicht der Puffer zurück */
   var FS_MAX_BYTES = 8 * 1024 * 1024;   /* was größer ist, geht nicht raus */
 
+  /* Der Ring gilt fuer die CLUSTER, nie fuer den Kopf. */
   function _fsRingBegrenzen() {
     var max = Math.ceil(FS_RING_MS / FS_SCHEIBE_MS);
     if (_fs.chunks.length > max) _fs.chunks = _fs.chunks.slice(-max);
@@ -1660,10 +1715,11 @@
     try { (_fs.stream ? _fs.stream.getTracks() : []).forEach(function (t) { t.stop(); }); } catch (e) {}
     try { if (_fs.ctx && _fs.ctx.state !== 'closed') _fs.ctx.close(); } catch (e) {}
     _fs.stream = null; _fs.ctx = null; _fs.analyser = null; _fs.rec = null;
+    _fs.kopf = null; _fs.chunks = []; _fs.rest = ''; _fs.laeuft = 0;
     _fs.phase = 'aus'; _fs.aufnahme = false;
   }
 
-  /* Einmal öffnen, für den ganzen Dialog. */
+  /* Einmal öffnen, für den ganzen Dialog — und einmal starten. */
   function _fsStart() {
     if (!_fs.an) return Promise.resolve(false);
     if (_fs.stream) return Promise.resolve(true);
@@ -1685,24 +1741,42 @@
         ? 'audio/webm;codecs=opus'
         : ((MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/webm')) ? 'audio/webm' : '');
       _fs.rec = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+      _fs.kopf = null; _fs.chunks = [];
       _fs.rec.ondataavailable = function (ev) {
-        if (ev.data && ev.data.size) { _fs.chunks.push(ev.data); _fsRingBegrenzen(); }   /* v1285 */
+        if (!ev.data || !ev.data.size) return;
+        /* v1290: Das ERSTE Stueck ist der Container-Header. Es wandert
+           nicht in den Ring, sondern in `kopf` — und bleibt dort, solange
+           der Recorder laeuft. Ohne ihn ist jeder Blob ein Fragment. */
+        if (!_fs.kopf) { _fs.kopf = ev.data; return; }
+        _fs.chunks.push(ev.data);
+        _fsRingBegrenzen();
       };
+      try { _fs.rec.start(FS_SCHEIBE_MS); _fs.aufnahme = true; } catch (e) { return false; }
       return true;
     }).catch(function () { return false; });
   }
 
-  /* Für EINE Frage zuhören. Endet von selbst - durch Stille oder Geduld. */
-  function _fsHoeren() {
+  /* Für EINE Frage zuhören. Endet von selbst - durch Stille oder Geduld.
+     v1290: Der Recorder LAEUFT WEITER; hier beginnt nur ein neuer
+     Abschnitt. Wird waehrend eines laufenden Abschnitts noch einmal
+     gerufen (14 Aufrufstellen im Code), passiert nichts — sonst ginge
+     mitten im Satz der Puffer verloren. */
+  function _fsHoeren(neu) {
     if (!_fs.an || !_fs.stream || !_fs.rec) return;
+    if (!neu && (_fs.phase === 'warte' || _fs.phase === 'spricht' || _fs.phase === 'rauschen')) return;
     if (_fs.uhr) { clearInterval(_fs.uhr); _fs.uhr = null; }
-    _fs.chunks = [];
+    _fs.chunks = [];                 /* der KOPF bleibt */
     _fs.phase = 'rauschen'; _fs.rausch = 0; _fs.t0 = Date.now();
-    _fs.tSprach = 0; _fs.tStill = 0;
+    _fs.tSprach = 0; _fs.tStill = 0; _fs.sprechMs = 0;
     var proben = 0, summe = 0;
-    /* v1285: Zeitscheiben - nur so laesst sich der Puffer begrenzen. */
-    try { if (_fs.rec.state === 'inactive') { _fs.rec.start(FS_SCHEIBE_MS); _fs.aufnahme = true; } } catch (e) { return; }
-    _fsMikroKasten(true, 'Ich höre zu — sprich einfach los.', 'Ich merke selbst, wenn du fertig bist.');
+    /* Sollte der Recorder wider Erwarten stehen, wieder anwerfen — dann
+       liefert er auch einen frischen Kopf. */
+    try {
+      if (_fs.rec.state === 'inactive') { _fs.kopf = null; _fs.rec.start(FS_SCHEIBE_MS); _fs.aufnahme = true; }
+    } catch (e) { return; }
+    _fsMikroKasten(true,
+      _fs.rest ? 'Ich höre weiter zu — sag den Rest.' : 'Ich höre zu — sprich einfach los.',
+      _fs.rest ? 'Deinen Satzanfang habe ich mir gemerkt.' : 'Ich merke selbst, wenn du fertig bist.');
 
     _fs.uhr = setInterval(function () {
       if (!_rf || !_fs.an) { return; }
@@ -1723,7 +1797,7 @@
         if (p > _fs.schwelle) {
           if (!_fs.tSprach) _fs.tSprach = jetzt;
           if (jetzt - _fs.tSprach >= FS_SPRACHE_MS) { _fs.phase = 'spricht'; _fs.tStill = 0;
-            _fsMikroKasten(true, 'Ich höre dich …', 'Sprich zu Ende — ich warte auf die Pause.'); }
+            _fsMikroKasten(true, 'Ich höre dich …', 'Sprich in Ruhe zu Ende — ich warte auf die Pause.'); }
         } else { _fs.tSprach = 0; }
         /* Geduld: wer nicht spricht, wird nicht gedrängt - aber irgendwann
            soll der Hinweis kommen, dass Tippen auch geht. */
@@ -1738,7 +1812,7 @@
         if (p <= _fs.schwelle) {
           if (!_fs.tStill) _fs.tStill = jetzt;
           if (jetzt - _fs.tStill >= FS_STILLE_MS) { _fsAbschnittFertig(); return; }
-        } else { _fs.tStill = 0; }
+        } else { _fs.tStill = 0; _fs.sprechMs += 80; }
         /* Notbremse: eine Antwort auf eine gezielte Frage ist kurz. */
         if (jetzt - _fs.t0 > FS_MAX_MS) { _fsAbschnittFertig(); }
       }
@@ -1748,31 +1822,62 @@
   function _fsStopHoeren() {
     if (_fs.uhr) { clearInterval(_fs.uhr); _fs.uhr = null; }
     _fs.phase = '';
-    try { if (_fs.rec && _fs.rec.state === 'recording') { _fs.rec.onstop = null; _fs.rec.stop(); _fs.aufnahme = false; } } catch (e) {}
+    /* v1290: Der Recorder wird NICHT gestoppt — er laeuft durch, und der
+       Kopf bleibt gueltig. Nur der laufende Abschnitt wird verworfen. */
+    _fs.chunks = [];
+  }
+
+  /* Spricht der Nutzer gerade? Dann darf die naechste Frage warten. */
+  function _fsSprichtGerade() { return _fs.an && (_fs.phase === 'spricht'); }
+
+  /* v1290 · Endet der Satz offen, ist er nicht zu Ende.
+     „Oh, das Objekt steht in" — da kommt noch was. Ein Co-Pilot, der
+     darauf mit „daraus konnte ich nichts entnehmen" antwortet, hat recht
+     und hilft trotzdem nicht. */
+  var FS_OFFEN_ENDE = new RegExp(
+    '\\b(' +
+    'in|im|an|am|auf|bei|beim|von|vom|zu|zum|zur|mit|nach|ueber|über|unter|fuer|für|' +
+    'und|oder|aber|dass|weil|wenn|also|dann|noch|etwa|circa|ca|rund|' +
+    'der|die|das|den|dem|des|ein|eine|einen|einem|einer|' +
+    'ist|sind|war|waren|hat|habe|haben|wird|werden|steht|liegt|kostet|betraegt|beträgt|' +
+    'ungefaehr|ungefähr|so|ganz|sehr|mehr|weniger|etwas' +
+    ')\\s*$', 'i');
+  function _fsOffenesEnde(t) {
+    var s = String(t || '').trim().replace(/[.,;!?…]+$/, '').trim();
+    if (!s) return false;
+    if (s.split(/\s+/).length < 2) return false;   /* ein Wort ist eine Antwort */
+    return FS_OFFEN_ENDE.test(s);
   }
 
   function _fsAbschnittFertig() {
     if (_fs.uhr) { clearInterval(_fs.uhr); _fs.uhr = null; }
     _fs.phase = '';
     if (!_fs.rec || _fs.rec.state !== 'recording') return;
+    /* v1290: Was kuerzer ist als ein Wort, war ein Geraeusch. Kein Aufruf,
+       keine Fehlermeldung, einfach weiter zuhoeren. */
+    if (_fs.sprechMs < FS_MIN_SPRECH_MS) { _fsHoeren(true); return; }
     var eintrag = _rf && _rf.offen[_rf.i];
-    _fs.rec.onstop = function () {
-      _fs.aufnahme = false;
-      var blob = new Blob(_fs.chunks, { type: _fs.rec.mimeType || 'audio/webm' });
+
+    /* v1290: Geschnitten wird mit requestData(), NICHT mit stop(). Der
+       Recorder laeuft weiter — damit bleibt der Kopf gueltig und der
+       Nutzer kann sofort nachschieben. */
+    var fertig = function () {
+      var stuecke = _fs.kopf ? [_fs.kopf].concat(_fs.chunks) : _fs.chunks.slice();
+      var blob = new Blob(stuecke, { type: (_fs.rec && _fs.rec.mimeType) || 'audio/webm' });
       _fs.chunks = [];
-      if (!_rf || !eintrag || _rf.offen[_rf.i] !== eintrag) return;   /* Frage inzwischen weiter */
-      /* v1276c: Ein Fehlversuch gehoert in den VERLAUF, nicht in die
-         Lauschzeile - die wird von der naechsten Runde sofort
-         ueberschrieben. Eine Antwort, die spurlos verschwindet, laesst
-         einen ratlos zurueck: hat er mich gehoert oder nicht? */
-      /* v1285: Zweiter Riegel - was zu gross ist, geht gar nicht erst raus.
-         Ein Fehler, der erst nach neun Sekunden Upload sichtbar wird, ist
-         ein schlechter Fehler. */
+      /* Sofort wieder lauschen: wer nachschieben will, soll nicht warten. */
+      _fsHoeren(true);
+      if (!_rf || !eintrag || _rf.offen[_rf.i] !== eintrag) return;
       if (blob && blob.size > FS_MAX_BYTES) {
         try { console.warn('[voice] Abschnitt zu gross:', blob.size, 'Bytes - verworfen'); } catch (e) {}
         _rfBlase('co', 'Das war zu lang für eine Antwort — sag es bitte kürzer.');
-        _fsHoeren(); return;
+        return;
       }
+      if (!blob || blob.size < 1200) {   /* nichts Verwertbares im Puffer */
+        try { console.warn('[voice] Abschnitt zu klein:', blob && blob.size); } catch (e) {}
+        return;
+      }
+      _fs.laeuft++;
       _rfMelden('', true);
       blobToB64(blob).then(function (b64) {
         return Auth.apiCall('/ai/extract-voice', {
@@ -1780,26 +1885,71 @@
           body: { audio: b64, mime: blob.type, catalog: _rfKatalog(eintrag, _rf.catalog), kontext: _rfKontext() }
         });
       }).then(function (r) {
+        _fs.laeuft--;
         if (!_rf || _rf.offen[_rf.i] !== eintrag) return;
-        if (r && r.transcript) {
-          try { console.log('[voice-import] Freisprech-Antwort:', r.transcript); } catch (x) {}
+        var txt = (r && r.transcript) ? String(r.transcript).trim() : '';
+        /* v1290: Der gemerkte Satzanfang wird vorangestellt. */
+        if (_fs.rest) { txt = (_fs.rest + ' ' + txt).replace(/\s+/g, ' ').trim(); _fs.rest = ''; }
+        if (txt) {
+          try { console.log('[voice-import] Freisprech-Antwort:', txt); } catch (x) {}
           _rfDenkt(false);
-          /* v1283: Verneinung, Profil-Ja und Frage werden auch GESPROCHEN
-             erkannt - und zwar hier, nachdem das Transkript da ist. Die
-             Extraktion lief zwar schon mit, aber ihr Ergebnis wird dann
-             verworfen: „haben wir nicht" darf keine Zahl erzeugen. */
-          if (_rfVorabErkennen(r.transcript, true)) return;
-          _rfBlase('ich', escH(r.transcript));   /* v1276c: was verstanden wurde, steht da */
+          /* Angefangener Satz? Merken statt auswerten. */
+          if (_fsOffenesEnde(txt)) {
+            _fs.rest = txt;
+            _rfBlase('ich', escH(txt) + ' <span style="opacity:.5">…</span>');
+            _rfBlase('co', '<span style="opacity:.75">Ich höre weiter zu — sag den Rest.</span>');
+            _fsHoeren(true);
+            return;
+          }
+          if (_rfVorabErkennen(txt, true)) return;
+          _rfBlase('ich', escH(txt));   /* v1276c: was verstanden wurde, steht da */
         }
-        _rfUebernehmen(r && r.fields, true);
+        _rfUebernehmen(r && r.fields, true, txt);
       }).catch(function (err) {
+        _fs.laeuft--;
         _rfDenkt(false);
-        _rfBlase('co', escH((err && err.message) || 'Das habe ich nicht verstanden — nochmal, oder tippe es.'));
-        _fsHoeren();
+        _rfBlase('co', _fsFehlerText(err));
+        _fsHoeren(true);
       });
     };
-    try { _fs.rec.stop(); } catch (e) {}
+    try {
+      _fs.rec.onstop = null;
+      var einmal = false;
+      var alt = _fs.rec.ondataavailable;
+      _fs.rec.ondataavailable = function (ev) {
+        alt(ev);
+        if (einmal) return;
+        einmal = true;
+        _fs.rec.ondataavailable = alt;
+        setTimeout(fertig, 0);
+      };
+      _fs.rec.requestData();
+    } catch (e) { fertig(); }
   }
+
+  /* v1290 · Eine rohe API-Antwort gehoert nicht in einen Chat.
+     Im Bild sprechlauf3.png steht woertlich:
+       „Transkription fehlgeschlagen (HTTP 400): { "error": { "message":
+        "Audio file might be corrupted or unsupported", "type":
+        "invalid_request_error", "param": "file", ... } }"
+     Das ist ein Protokolleintrag, keine Auskunft. Der Nutzer erfaehrt
+     daraus nicht, was er tun soll — und dass er es einfach nochmal sagen
+     kann, steht nirgends. Die Einzelheiten bleiben in der Konsole. */
+  function _fsFehlerText(err) {
+    var roh = (err && (err.message || err.error)) || '';
+    try { console.warn('[voice] Freisprechen:', roh, err); } catch (e) {}
+    if (/corrupt|unsupported|invalid_value|invalid_request/i.test(roh)) {
+      return 'Die Aufnahme kam nicht sauber an — <b>sag es einfach nochmal</b>, ich höre schon zu.';
+    }
+    if (/timeout|nicht erreichbar|network/i.test(roh)) {
+      return 'Die Verbindung hat gehakt — <b>sag es nochmal</b>, ich höre zu.';
+    }
+    if (/413|zu lang|zu gross|zu groß/i.test(roh)) {
+      return 'Das war zu lang für eine Antwort — sag es bitte kürzer.';
+    }
+    return 'Das habe ich nicht verstanden — <b>sag es nochmal</b> oder tippe es.';
+  }
+
 
   /* Was verstanden wurde, sichtbar machen - eine Antwort, die stumm
      verschwindet, lässt einen ratlos zurück. */
@@ -2352,48 +2502,77 @@
          auch nach v1283. Jetzt 1240 px breit und bis 94 vh hoch; die Spalte
          bekommt 330, der Verlauf 410 px. Damit passen 11 Bloecke ohne
          Scrollen ins Bild. */
+      /* ═══ v1290 · Das Modal atmet mit dem Fenster ═════════════════════
+         Feste 410 px fuer Verlauf und Spalte waren der Grund, warum von
+         16 Bloecken nur 11 zu sehen waren (gemessen: Inhalt 644 px). Jetzt
+         wachsen beide mit der Fensterhoehe und bleiben gleich hoch. */
       '.oabi-ov.vi-mode .oabi-modal{width:min(1240px,100%);max-height:94vh}',
       '@media(max-width:1280px){.oabi-ov.vi-mode .oabi-modal{width:min(1000px,100%)}}',
       '@media(max-width:1040px){.oabi-ov.vi-mode .oabi-modal{width:min(860px,100%)}}',
-      /* Die Spalte zeigt jetzt Werte, nicht nur Namen. */
-      '.vi-rf-st{display:block;padding:6px 0}',
-      '.vi-rf-st-k{display:flex;gap:7px;align-items:center}',
-      /* v1286: Die Werte FLUCHTEN. Marcels Befund: „die Daten, die
-         angegeben werden rechts, die fluchten nicht miteinander." Ursache
-         war ein Fliesstext-Layout - jede Zeile begann dort, wo die vorige
-         aufhoerte. Jetzt ein Raster: Name links in fester Breite, Wert
-         rechts. Zahlen in Mono, damit auch die Ziffern untereinander
-         stehen. */
-      '.vi-rf-st-w{margin:4px 0 0 18px;display:grid;grid-template-columns:minmax(0,1fr) auto;',
-      '  gap:1px 10px;align-items:baseline}',
-      '.vi-rf-st-w span{display:contents}',
-      '.vi-rf-st-w i{font-style:normal;opacity:.6;font:400 11px/1.5 Inter,system-ui,sans-serif;',
-      '  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-      '.vi-rf-st-w b{font:600 11.5px/1.5 "JetBrains Mono",ui-monospace,monospace;color:#3FA56C;',
-      '  text-align:right;white-space:nowrap}',
-      '.vi-rf-st.weg{opacity:.4} .vi-rf-st.weg .z{color:#B8625C}',
-      /* v1288b: „vorbelegt" ist ein eigener Zustand — sichtbar, aber nicht
-         gruen. Gruen heisst beantwortet, und beantwortet hat das niemand. */
-      '.vi-rf-st.vor{opacity:.72} .vi-rf-st.vor .z{color:#7A7370}',
-      '.vi-rf-st-vor{margin-left:auto;font:600 8.5px/1 "JetBrains Mono",ui-monospace,monospace;',
-      '  letter-spacing:.1em;text-transform:uppercase;opacity:.45;white-space:nowrap}',
-      '.vi-rf-st-w b.vorbelegt{color:#8A837F;font-weight:400}',
-      '.vi-rf-buehne{display:grid;grid-template-columns:1fr 330px;gap:16px;align-items:start}',
-      '@media(max-width:720px){.vi-rf-buehne{grid-template-columns:1fr}',
-      '  .vi-rf-stand{order:-1;max-height:132px}}',
-      '.vi-rf-stand{border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:11px 13px;',
-      '  max-height:410px;overflow-y:auto;background:rgba(255,255,255,.03)}',
-      '.vi-rf-stand-kopf{font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;',
-      '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);opacity:.85;margin-bottom:9px}',
-      '.vi-rf-st{display:flex;gap:7px;align-items:center;padding:4px 0;font:400 12.5px/1.3 Inter,system-ui,sans-serif;opacity:.55}',
-      '.vi-rf-st .z{width:11px;flex:0 0 11px;text-align:center;font:600 11px/1 "JetBrains Mono",monospace}',
+
+      /* ═══ v1290 · DIE ÜBERSICHTSSPALTE ════════════════════════════════
+         EINE Regel je Klasse. Vorher standen zwei `.vi-rf-st`-Regeln im
+         selben Stylesheet (`display:block` und `display:flex`); bei
+         gleicher Spezifitaet gewinnt die spaetere, und damit stand der
+         Blockname NEBEN den Werten statt darueber. Der Kaskaden-Walker
+         hat es gezeigt, `matches()` haette es verschwiegen. */
+      '.vi-rf-stand{border:1px solid rgba(255,255,255,.09);border-radius:12px;',
+      '  padding:0;background:rgba(255,255,255,.03);display:flex;flex-direction:column;',
+      '  height:min(58vh,560px);overflow:hidden}',
+      '.vi-rf-stand-kopf{display:flex;align-items:center;justify-content:space-between;gap:8px;',
+      '  padding:10px 13px 9px;flex:0 0 auto;',
+      '  border-bottom:1px solid rgba(255,255,255,.09);',
+      '  font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;',
+      '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);opacity:.9}',
+      '.vi-rf-stand-kopf b{letter-spacing:.04em;opacity:.85}',
+      /* Flex-Kind in einem overflow-Container schrumpft, statt zu scrollen
+         (FALLEN.md) — deshalb min-height:0 und flex:1 1 auto. */
+      '.vi-rf-stand-body{flex:1 1 auto;min-height:0;overflow-y:auto;padding:7px 11px 11px}',
+
+      /* Die Etappen-Ueberschrift in der Spalte. */
+      '.vi-rf-gr{display:flex;align-items:center;gap:7px;margin:11px 0 4px;',
+      '  font:700 9px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;',
+      '  text-transform:uppercase;opacity:.55}',
+      '.vi-rf-gr:first-child{margin-top:1px}',
+      '.vi-rf-gr-nr{width:14px;height:14px;flex:0 0 14px;border-radius:50%;display:flex;',
+      '  align-items:center;justify-content:center;background:rgba(255,255,255,.09);font-size:8px}',
+      '.vi-rf-gr-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.vi-rf-gr-z{opacity:.7}',
+
+      /* Eine Zeile je Block: Zeichen · Name · Werte kompakt. */
+      '.vi-rf-st{display:block;padding:0;opacity:.5;',
+      '  font:400 12px/1.3 Inter,system-ui,sans-serif}',
+      '.vi-rf-st-k{display:flex;align-items:baseline;gap:6px;padding:3px 0;border-radius:6px}',
+      '.vi-rf-st.hatwerte .vi-rf-st-k{cursor:pointer}',
+      '.vi-rf-st.hatwerte:hover .vi-rf-st-k{background:rgba(255,255,255,.045)}',
+      '.vi-rf-st .z{width:10px;flex:0 0 10px;text-align:center;',
+      '  font:600 10px/1.35 "JetBrains Mono",ui-monospace,monospace}',
+      '.vi-rf-st .n{flex:0 0 auto;max-width:47%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.vi-rf-st .v{flex:1 1 auto;min-width:0;text-align:right;overflow:hidden;',
+      '  text-overflow:ellipsis;white-space:nowrap;',
+      '  font:600 11px/1.35 "JetBrains Mono",ui-monospace,monospace;color:#3FA56C}',
+      '.vi-rf-st .v.vorbelegt{color:#8A837F;font-weight:400}',
       '.vi-rf-st.ok{opacity:1} .vi-rf-st.ok .z{color:#3FA56C}',
+      '.vi-rf-st.vor{opacity:.7} .vi-rf-st.vor .z{color:#7A7370}',
+      '.vi-rf-st.weg{opacity:.4} .vi-rf-st.weg .z{color:#B8625C}',
       '.vi-rf-st.dran{opacity:1;font-weight:600} .vi-rf-st.dran .z{color:var(--wl-c9a84c, #C9A84C)}',
       '.vi-rf-st.dran .n{color:var(--wl-e8cc7a, #E8CC7A)}',
-      '.vi-rf-stand-fuss{margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.09);',
-      '  font:600 11px/1 "JetBrains Mono",ui-monospace,monospace;opacity:.6}',
-      '.vi-rf-stand-fuss b{color:var(--wl-c9a84c, #C9A84C)}',
-      '.vi-rf-chat{height:410px;overflow-y:auto;display:flex;flex-direction:column;gap:11px;',
+      /* Die Einzelwerte: erst beim Klick, dann sauber im Raster. */
+      '.vi-rf-st-w{display:none}',
+      '.vi-rf-st.auf .vi-rf-st-w{display:grid;grid-template-columns:minmax(0,1fr) auto;',
+      '  gap:1px 10px;align-items:baseline;margin:2px 0 6px 16px;',
+      '  padding:5px 8px;border-radius:7px;background:rgba(0,0,0,.22)}',
+      '.vi-rf-st-w span{display:contents}',
+      '.vi-rf-st-w i{font-style:normal;opacity:.6;font:400 10.5px/1.5 Inter,system-ui,sans-serif;',
+      '  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.vi-rf-st-w b{font:600 11px/1.5 "JetBrains Mono",ui-monospace,monospace;color:#3FA56C;',
+      '  text-align:right;white-space:nowrap}',
+      '.vi-rf-st-w b.vorbelegt{color:#8A837F;font-weight:400}',
+
+      '.vi-rf-buehne{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start}',
+      '@media(max-width:720px){.vi-rf-buehne{grid-template-columns:1fr}',
+      '  .vi-rf-stand{order:-1;height:150px}}',
+      '.vi-rf-chat{height:min(58vh,560px);overflow-y:auto;display:flex;flex-direction:column;gap:11px;',
       '  padding:2px 4px 2px 2px}',
       '.vi-rf-blase{max-width:82%;padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.45;',
       '  animation:viRfAuf .3s ease both}',
@@ -2476,18 +2655,32 @@
          Steht ueber dem Verlauf und beantwortet die Frage, die ein
          Fragezaehler nicht beantwortet: nicht „die wievielte Frage",
          sondern „wovon handelt das hier gerade und was kommt danach". */
-      '#vi-rf-band{display:flex;gap:6px;flex-wrap:wrap;margin:0 2px 12px}',
-      '.vi-rf-et{display:inline-flex;align-items:center;gap:6px;padding:5px 11px 5px 6px;border-radius:99px;',
-      '  border:1px solid rgba(255,255,255,.11);opacity:.45;',
-      '  font:600 11px/1 Inter,system-ui,sans-serif;white-space:nowrap}',
-      '.vi-rf-et i{font-style:normal;width:16px;height:16px;border-radius:50%;display:inline-flex;',
-      '  align-items:center;justify-content:center;background:rgba(255,255,255,.09);',
-      '  font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace}',
-      '.vi-rf-et.fertig{opacity:.8;border-color:rgba(63,165,108,.4)}',
-      '.vi-rf-et.fertig i{background:#3FA56C;color:#08130c}',
-      '.vi-rf-et.jetzt{opacity:1;border-color:var(--wl-c9a84c, #C9A84C);',
-      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent)}',
-      '.vi-rf-et.jetzt i{background:linear-gradient(160deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C));color:#100e08}',
+      /* ═══ v1290 · Das Etappenband als Weg, nicht als Etikettenreihe ═══
+         Verbindungslinie, runder Punkt, Fortschritt je Etappe. Erst die
+         Linie macht aus einer Reihe von Namen einen Weg, auf dem man
+         sieht, wie weit man ist. */
+      '#vi-rf-band{margin:0 2px 14px}',
+      '.vi-et-band{display:flex;align-items:flex-start;gap:0;flex-wrap:wrap}',
+      '.vi-et{display:flex;align-items:center;gap:8px;flex:1 1 0;min-width:0;opacity:.4}',
+      '.vi-et-linie{flex:1 1 auto;min-width:12px;height:2px;border-radius:2px;',
+      '  background:rgba(255,255,255,.13);margin:0 4px}',
+      '.vi-et.fertig .vi-et-linie,.vi-et.jetzt .vi-et-linie{background:var(--wl-c9a84c, #C9A84C);opacity:.55}',
+      '.vi-et-punkt{width:22px;height:22px;flex:0 0 22px;border-radius:50%;display:flex;',
+      '  align-items:center;justify-content:center;background:rgba(255,255,255,.08);',
+      '  border:1px solid rgba(255,255,255,.14);',
+      '  font:700 10px/1 "JetBrains Mono",ui-monospace,monospace}',
+      '.vi-et-txt{display:flex;flex-direction:column;gap:2px;min-width:0}',
+      '.vi-et-txt b{font:600 11px/1.2 Inter,system-ui,sans-serif;white-space:nowrap;',
+      '  overflow:hidden;text-overflow:ellipsis}',
+      '.vi-et-txt small{font:600 9px/1 "JetBrains Mono",ui-monospace,monospace;opacity:.6}',
+      '.vi-et.fertig{opacity:.85}',
+      '.vi-et.fertig .vi-et-punkt{background:#3FA56C;border-color:#3FA56C;color:#08130c}',
+      '.vi-et.jetzt{opacity:1}',
+      '.vi-et.jetzt .vi-et-punkt{border-color:var(--wl-c9a84c, #C9A84C);color:#100e08;',
+      '  background:linear-gradient(160deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C));',
+      '  box-shadow:0 0 0 3px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent)}',
+      '.vi-et.jetzt .vi-et-txt b{color:var(--wl-e8cc7a, #E8CC7A)}',
+      '@media(max-width:820px){.vi-et-txt small{display:none}}',
       /* ═══ v1288 · Die Score-Karte im Verlauf ══════════════════════════
          Sie sitzt IN einer Co-Pilot-Blase, deshalb kein eigener Rahmen um
          das Ganze, sondern eine abgesetzte Flaeche darin. */
@@ -2512,6 +2705,14 @@
       '  font:400 11px/1.5 Inter,system-ui,sans-serif;opacity:.6}',
       '.vi-sc-annahmen b{opacity:.85}',
       '.vi-sc-weiter{margin-top:10px;font:400 12.5px/1.45 Inter,system-ui,sans-serif;opacity:.8}',
+      /* v1290: der Fliesstext der vollen Stufe — eingeklappt, damit er die
+         Karte nicht sprengt, aber vorhanden. Wer dafuer bezahlt, soll ihn
+         auch sehen koennen. */
+      '.vi-sc-mehr{margin-top:11px;border-top:1px dashed rgba(255,255,255,.12);padding-top:9px}',
+      '.vi-sc-mehr summary{cursor:pointer;font:600 10px/1 "JetBrains Mono",ui-monospace,monospace;',
+      '  letter-spacing:.1em;text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);opacity:.9}',
+      '.vi-sc-mehr p{margin:9px 0 0;font:400 12px/1.6 Inter,system-ui,sans-serif;opacity:.82;',
+      '  max-height:220px;overflow-y:auto}',
       /* Die Stufen einer Auswahl, in der Frage genannt (Backlog-Punkt 2). */
       '.vi-rf-skala{margin-top:9px;padding:8px 11px;border-radius:9px;',
       '  font:400 12px/1.55 Inter,system-ui,sans-serif;',
@@ -2758,30 +2959,58 @@
     return out;
   }
 
-  /* ═══ v1288b · Der Haken bedeutet „erledigt", nicht „steht irgendwo" ═══
-     Gemessen am 10.09.2026, direkt nach dem Öffnen des geführten Wegs:
-     die Spalte meldete **„6 von 16"** — bei NULL gesagten Angaben. Sechs
-     Blöcke trugen einen grünen Haken, der ausschließlich aus
-     Formular-Vorbelegungen kam: Zinssatz 3,5 · Tilgung 1 · Notar 2,2 ·
-     Grunderwerbsteuer 6,5 · Mietsteigerung 3 · AfA 2,0 · Grenzsteuersatz
-     40,45.
+  /* ═══════════════════════════════════════════════════════════════════
+     v1290 · DIE ÜBERSICHTSSPALTE, NEU
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Befund zu design/mockups/sprechlauf2.png: „Ich finde, dass es
+     unübersichtlich ist. Wir sollten das deutlich übersichtlicher machen,
+     was schon steht. Da stehen schon irgendwelche Werte drin. Man kann
+     nicht alles sehen direkt."
 
-     Das ist derselbe Denkfehler wie in v1273c, nur eine Etage höher: dort
-     hielt die Lückenprüfung eine Vorbelegung für eine Antwort, hier tut es
-     die Anzeige. Eine Fortschrittsleiste, die vor dem ersten Wort bei 38 %
-     steht, misst keinen Fortschritt — sie misst das Formular.
+     Zwei Ursachen, beide gemessen.
 
-     Jetzt drei Zustände statt zwei:
-       ✓  erledigt   — mindestens ein Wert kam aus DIESEM Gespräch
-       ◦  vorbelegt  — es steht etwas da, aber gesagt hat es niemand
-       ·  offen      — nichts da
-     Der Zähler unten zählt nur die ersten. Die vorbelegten Werte bleiben
-     sichtbar — sie zu verstecken wäre der Fehler von v1283d in die andere
-     Richtung — aber sie stehen gedämpft und nicht in Grün. */
+     ── 1. EIN KASKADEN-KONFLIKT, den nur der Walker zeigt ───────────────
+
+     `.vi-rf-st` stand ZWEIMAL im selben Stylesheet:
+
+         .vi-rf-st { display: block; padding: 6px 0 }        (v1286)
+         .vi-rf-st { display: flex; gap: 7px; ... }          (aelter, spaeter notiert)
+
+     **Bei gleicher Spezifitaet gewinnt die spaetere Regel** (CLAUDE.md) —
+     also `flex`. Damit standen Blockname und Werte NEBENEINANDER statt
+     untereinander, und die Werte wurden in eine 64 px schmale Spalte
+     gequetscht, waehrend rechts daneben 250 px leer blieben. Genau das
+     Bild, das Marcel geschickt hat.
+
+     Die v1286-Regel „die Werte fluchten" war damit seit ihrer Einfuehrung
+     wirkungslos. `element.matches()` haette beide Regeln gefunden und
+     nichts darueber gesagt, welche gewinnt.
+
+     ── 2. NUR 11 VON 16 ZEILEN WAREN SICHTBAR ──────────────────────────
+
+     Gemessen: Spalte 410 px hoch, Inhalt 644 px. Fuenf Bloecke standen
+     unter dem Rand. Eine Uebersicht, die man scrollen muss, um sie zu
+     ueberblicken, ist keine.
+
+     ── DIE NEUE SPALTE ─────────────────────────────────────────────────
+
+     EINE ZEILE JE BLOCK, gruppiert nach ETAPPE. Die Werte stehen kompakt
+     in derselben Zeile — nicht als Liste darunter, sondern als eine
+     Zusammenfassung, die der Klick aufklappt. Damit passen alle Bloecke
+     samt Etappenkoepfen ins Bild, und die Struktur des Sprechlaufs ist
+     auf einen Blick da: wo war ich, wo bin ich, was kommt.
+
+     Je Etappe steht rechts, wie viel davon beantwortet ist. Das ist der
+     Fortschritt, den ein blosser Gesamtzaehler verschweigt. */
+
+  /* Kompakte Fassung der Werte eines Blocks: „ETW · 100 m² · 3". */
+  function _rfWerteKurz(werte) {
+    return werte.map(function (w) { return w.v; }).join(' · ');
+  }
+
   function _rfStandZeichnen() {
     var host = $('vi-rf-stand'); if (!host || !_rf) return;
-    /* v1283d: ALLE Blöcke, nicht nur die offenen. Die Reihenfolge ist die
-       der Fragen; was vorher schon stand, steht davor. */
+    /* v1283d: ALLE Blöcke, nicht nur die offenen. */
     var alle = _rf.offen.slice();
     var drin = {};
     _rf.offen.forEach(function (e) { drin[e.ids.join(',')] = 1; });
@@ -2794,48 +3023,75 @@
     var offenAb = vorher.length;
 
     /* Ein Block gilt als erledigt, wenn wenigstens EIN Wert nicht aus dem
-       Formular kommt (`w.f` markiert die Formularherkunft, v1283d). */
+       Formular kommt (`w.f` markiert die Formularherkunft, v1283d/v1288b). */
     function _echt(werte) {
       for (var i = 0; i < werte.length; i++) { if (!werte[i].f) return true; }
       return false;
     }
 
-    var fertigN = 0;
-    var zeilen = alle.map(function (e, idx) {
+    /* Nach Etappe gruppieren; was keine trägt (freier Weg), kommt in eine
+       namenlose Gruppe — dann sieht die Spalte aus wie bisher. */
+    var gruppen = [], nachNr = {};
+    var fertigN = 0, gesamtN = alle.length;
+    alle.forEach(function (e, idx) {
       var werte = _rfWerteZuBlock(e);
-      var i = idx - offenAb;                         /* Index in _rf.offen */
+      var i = idx - offenAb;
       var erledigt = _echt(werte);
       if (erledigt) fertigN++;
-      var dran = (i === _rf.i) && !erledigt;
-      var uebersprungen = !!(_rf.weg && i >= 0 && _rf.weg[i]);
-      var zeichen = erledigt ? '✓'
-                  : (uebersprungen ? '–'
-                  : (dran ? '▸' : (werte.length ? '◦' : '·')));
-      var klasse = erledigt ? 'ok'
-                 : (uebersprungen ? 'weg'
-                 : (dran ? 'dran' : (werte.length ? 'vor' : '')));
-      var detail = werte.length
-        ? '<div class="vi-rf-st-w">' + werte.map(function (w) {
-            return '<span><i>' + escH(w.n) + '</i><b' + (w.f ? ' class="vorbelegt"' : '') + '>' +
-                   escH(w.v) + '</b></span>';
-          }).join('') + '</div>'
+      var nr = e.et || 0;
+      if (!nachNr[nr]) { nachNr[nr] = { nr: nr, name: _etName(nr), zeilen: [], fertig: 0 }; gruppen.push(nachNr[nr]); }
+      if (erledigt) nachNr[nr].fertig++;
+      nachNr[nr].zeilen.push({ e: e, werte: werte, i: i, erledigt: erledigt });
+    });
+
+    var html = gruppen.map(function (g) {
+      var kopf = g.nr
+        ? '<div class="vi-rf-gr"><span class="vi-rf-gr-nr">' + g.nr + '</span>' +
+          '<span class="vi-rf-gr-n">' + escH(g.name) + '</span>' +
+          '<span class="vi-rf-gr-z">' + g.fertig + '/' + g.zeilen.length + '</span></div>'
         : '';
-      return '<div class="vi-rf-st ' + klasse + '">' +
-             '<div class="vi-rf-st-k"><span class="z">' + zeichen + '</span>' +
-             '<span class="n">' + escH(_rfKurzname(e)) + '</span>' +
-             (!erledigt && werte.length ? '<span class="vi-rf-st-vor">vorbelegt</span>' : '') +
-             '</div>' + detail + '</div>';
+      return kopf + g.zeilen.map(function (z) {
+        var e = z.e, werte = z.werte, i = z.i;
+        var dran = (i === _rf.i) && !z.erledigt;
+        var uebersprungen = !!(_rf.weg && i >= 0 && _rf.weg[i]);
+        var zeichen = z.erledigt ? '✓'
+                    : (uebersprungen ? '–'
+                    : (dran ? '▸' : (werte.length ? '◦' : '·')));
+        var klasse = z.erledigt ? 'ok'
+                   : (uebersprungen ? 'weg'
+                   : (dran ? 'dran' : (werte.length ? 'vor' : '')));
+        var kurz = werte.length ? _rfWerteKurz(werte) : '';
+        var detail = werte.length
+          ? '<div class="vi-rf-st-w">' + werte.map(function (w) {
+              return '<span><i>' + escH(w.n) + '</i><b' + (w.f ? ' class="vorbelegt"' : '') + '>' +
+                     escH(w.v) + '</b></span>';
+            }).join('') + '</div>'
+          : '';
+        return '<div class="vi-rf-st ' + klasse + (werte.length ? ' hatwerte' : '') + '"' +
+               (werte.length ? ' title="' + escH(kurz) + '"' : '') + '>' +
+               '<div class="vi-rf-st-k">' +
+                 '<span class="z">' + zeichen + '</span>' +
+                 '<span class="n">' + escH(_rfKurzname(e)) + '</span>' +
+                 (kurz ? '<span class="v' + (z.erledigt ? '' : ' vorbelegt') + '">' + escH(kurz) + '</span>' : '') +
+               '</div>' + detail + '</div>';
+      }).join('');
     }).join('');
+
     host.innerHTML =
-      '<div class="vi-rf-stand-kopf">Was schon steht</div>' + zeilen +
-      '<div class="vi-rf-stand-fuss"><b>' + fertigN + '</b> von ' + alle.length +
-      ' beantwortet</div>';
+      '<div class="vi-rf-stand-kopf">Was schon steht' +
+        '<b>' + fertigN + ' / ' + gesamtN + '</b></div>' +
+      '<div class="vi-rf-stand-body">' + html + '</div>';
+
+    /* Ein Klick klappt die Einzelwerte auf — die Zusammenfassung in der
+       Zeile reicht zum Ueberblicken, nicht zum Nachpruefen. */
+    [].slice.call(host.querySelectorAll('.vi-rf-st.hatwerte')).forEach(function (z) {
+      z.addEventListener('click', function () { z.classList.toggle('auf'); });
+    });
     try {
       var dranEl = host.querySelector('.vi-rf-st.dran');
       if (dranEl) dranEl.scrollIntoView({ block: 'nearest' });
     } catch (ex) {}
   }
-
 
   /* Aus „Wie finanzierst du? Eigenkapital, Zinssatz, …" wird „Finanzierung".
      Die ganze Frage passt nicht in eine 210 px breite Spalte, und eine
@@ -3175,22 +3431,76 @@
   function _etName(nr) { for (var i = 0; i < ETAPPEN.length; i++) if (ETAPPEN[i].nr === nr) return ETAPPEN[i].name; return ''; }
   function _etZiel(nr) { for (var i = 0; i < ETAPPEN.length; i++) if (ETAPPEN[i].nr === nr) return ETAPPEN[i].ziel; return ''; }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1290 · DER KOPF SAGT, WO MAN IST
+     ═══════════════════════════════════════════════════════════════════
+     Im Bild sprechlauf2.png steht ueber dem gefuehrten Dialog „FREI
+     EINSPRECHEN · Sprachaufzeichnung". Das ist der Titel des ANDEREN
+     Weges — der Nutzer hat gerade „Frag mich durch" gewaehlt. Ein Kopf,
+     der den falschen Modus nennt, ist schlimmer als keiner.
+
+     Der Kicker kommt aus modal-boarding-skin.js und wird dort einmal beim
+     Oeffnen aus dem <h3> abgeleitet. Statt jenes Modul umzubauen (es
+     bedient fuenf andere Dialoge mit), wird der Text hier gesetzt, wenn
+     die Wahl gefallen ist. */
+  function _rfKopfSetzen(kick, titel, unter) {
+    try {
+      var k = document.querySelector('.oabi-ov.vi-mode .bdg-kick');
+      if (k && kick) k.textContent = kick;
+      var h = document.querySelector('.oabi-ov.vi-mode .oabi-head h3');
+      if (h && titel) h.textContent = titel;
+      var s = document.querySelector('.oabi-ov.vi-mode .oabi-sub');
+      if (s && unter) s.textContent = unter;
+    } catch (e) {}
+  }
+
   /* ── Das Etappenband ────────────────────────────────────────────────
      Gezeigt werden nur Etappen, die auch wirklich Fragen haben. Im freien
      Weg sind das oft nur zwei — dann steht da auch nur zwei. Ein Band mit
-     sechs Punkten, von denen vier nie kommen, waere ein Versprechen. */
+     sechs Punkten, von denen vier nie kommen, waere ein Versprechen.
+
+     v1290: Mit Verbindungslinie und Fortschritt je Etappe. Ein Band ohne
+     Linie ist eine Reihe von Etiketten; erst die Linie macht daraus einen
+     Weg, auf dem man sieht, wie weit man ist. */
   function _rfBandZeichnen() {
     var host = $('vi-rf-band'); if (!host || !_rf) return;
-    var da = {};
-    _rf.offen.forEach(function (e) { if (e.et) da[e.et] = 1; });
+    var da = {}, fertig = {}, gesamt = {};
+    _rf.offen.forEach(function (e, i) {
+      if (!e.et) return;
+      da[e.et] = 1;
+      gesamt[e.et] = (gesamt[e.et] || 0) + 1;
+      var w = _rfWerteZuBlock(e);
+      var echt = w.some(function (x) { return !x.f; });
+      if (echt) fertig[e.et] = (fertig[e.et] || 0) + 1;
+    });
     var akt = (_rf.offen[_rf.i] && _rf.offen[_rf.i].et) || 0;
     var liste = ETAPPEN.filter(function (E) { return da[E.nr]; });
     if (liste.length < 2) { host.innerHTML = ''; host.style.display = 'none'; return; }
     host.style.display = '';
-    host.innerHTML = liste.map(function (E) {
-      var zu = E.nr < akt ? 'fertig' : (E.nr === akt ? 'jetzt' : '');
-      return '<span class="vi-rf-et ' + zu + '"><i>' + (E.nr < akt ? '✓' : E.nr) + '</i>' + escH(E.name) + '</span>';
-    }).join('');
+    var eigen = 0;
+    liste.forEach(function (E) { if (E.nr === akt) eigen = 1; });
+    host.innerHTML =
+      '<div class="vi-et-band">' +
+      liste.map(function (E, i) {
+        var durch = E.nr < akt, jetzt = E.nr === akt;
+        var zu = durch ? 'fertig' : (jetzt ? 'jetzt' : '');
+        var f = fertig[E.nr] || 0, g = gesamt[E.nr] || 0;
+        return '<span class="vi-et ' + zu + '">' +
+          (i ? '<i class="vi-et-linie"></i>' : '') +
+          '<span class="vi-et-punkt">' + (durch ? '✓' : E.nr) + '</span>' +
+          '<span class="vi-et-txt"><b>' + escH(E.name) + '</b>' +
+          '<small>' + f + ' / ' + g + '</small></span>' +
+          '</span>';
+      }).join('') + '</div>';
+    /* Die Kopfzeile links nennt die Etappe samt Ziel — „DER CO-PILOT
+       FRAGT" sagt nur, dass jemand fragt, nicht worueber. */
+    var kopf = document.querySelector('.oabi-ov.vi-mode .vi-rf-kopf');
+    if (kopf) {
+      kopf.textContent = akt
+        ? 'Etappe ' + akt + ' von ' + liste.length + ' · ' + _etName(akt)
+        : (_rf.alle ? 'Der Co-Pilot fragt' : 'Noch offen');
+      kopf.title = akt ? _etZiel(akt) : '';
+    }
   }
 
   /* ── Die Skalen in der Frage nennen (Backlog-Punkt 2) ───────────────
@@ -3321,7 +3631,7 @@
         _rfBlase('co', 'Der amtliche Abruf hat nichts geliefert' +
           (r && r.fehler ? ' (' + escH(r.fehler) + ')' : '') +
           ' — sag mir den Bodenrichtwert, wenn du ihn kennst, sonst überspringen wir ihn.');
-        if (_fs.an && _fs.stream) _fsHoeren();
+        if (_fs.an && _fs.stream) _fsHoeren(true);
         return;
       }
       var herkunft = 'BORIS' + (r.stichtag ? ' ' + r.stichtag : '') + (r.zone ? ' · Zone ' + r.zone : '');
@@ -3330,11 +3640,11 @@
         '<span style="opacity:.7">' + escH(herkunft) + '</span>' +
         '<div class="vi-rf-zaehler">Herkunft steht in der Übersicht — nicht „Sprachaufzeichnung".</div>');
       _rfStandZeichnen();
-      if (_fs.an && _fs.stream) _fsHoeren();
+      if (_fs.an && _fs.stream) _fsHoeren(true);
     }).catch(function (e) {
       _rfDenkt(false);
       _rfBlase('co', 'Der Abruf ist fehlgeschlagen — sag mir den Bodenrichtwert einfach selbst.');
-      if (_fs.an && _fs.stream) _fsHoeren();
+      if (_fs.an && _fs.stream) _fsHoeren(true);
     });
   }
 
@@ -3361,6 +3671,48 @@
      3. OHNE KONTINGENT KEIN ANGEBOT. Wer nichts frei hat, bekommt keinen
         Knopf, der ihn zu einer Bezahlschranke fuehrt — er wird ganz normal
         gefragt. Ein Angebot, das man nicht annehmen kann, ist Werbung. */
+  /* ═══════════════════════════════════════════════════════════════════
+     v1290 · DIE STUFEN HOLEN SICH ZU IHRER ZEIT
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Frage: „funktionieren die Abrufe, je nach Plan die
+     Marktpreisindikation oder die erweiterte? Je nachdem wie es abgestuft
+     ist, müssen bis dahin ja die richtigen Fragen gestellt worden sein."
+
+     GEMESSEN am 10.09.2026, im Container statt im Repo (der Repo-Stand
+     fuehrte auf eine falsche Faehrte — `fast` steht dort scheinbar neben
+     `overrides`, tatsaechlich schickt der laufende Code es DARIN, und der
+     Microservice reicht `overrides` durch):
+
+       Stufe 1  `fast: true`      -> `ai_mode=schnell`, 850 ms.
+                Nur Marktwert und Miete samt Spanne. KI-Bericht,
+                Preishistorie und Makro-Statistik werden UEBERSPRUNGEN.
+       Stufe 2  `wert_stufe: 2`   -> voller Bericht: KI-Text,
+                Preishistorie, amtliche Makrolage.
+
+     Die Stufen funktionieren also. ABER Marcels Schluss stimmt trotzdem —
+     der volle Bericht liest deutlich mehr aus dem Objekt, und im
+     Sprechlauf entsteht das erst spaeter:
+
+       address, property_type, living_area, rooms, build_year   Etappe 1
+       purchase_price, monthly_net_rent                         Etappe 1
+       condition   (ds2_zustand)                                Etappe 3
+       energy_class (ds2_energie)                               Etappe 3
+       land_value_manual (brw)                                  Etappe 3
+       mikrolage / makrolage / ds2_bevoelkerung / ds2_nachfrage
+         / ds2_entwicklung / ds2_wertsteigerung  (assessment)   Etappe 3+4
+
+     Und `condition` faellt ohne Angabe auf **'gepflegt'** zurueck — eine
+     stille Annahme, die in einen bezahlten Bericht einfliesst.
+
+     DESHALB: jede Stufe startet dort, wo ihre Angaben stehen.
+
+       Stufe 1  Ende Etappe 1 — sie braucht nicht mehr.
+       Stufe 2  Ende Etappe 4 — dann sind Zustand, Energieausweis,
+                Bodenrichtwert und die ganze Lagebewertung da.
+
+     Wer Stufe 1 gezogen hat, wird am Ende von Etappe 4 noch einmal
+     gefragt: dann ist alles beisammen, und der Server rechnet die
+     Vertiefung als DIFFERENZ ab (v1154), nicht als zweiten vollen Abruf. */
   function _rfKontingent() {
     try {
       var A = window.AiCredits;
@@ -3405,14 +3757,18 @@
     _rf.abrufOffen = 'markt';
     var knoepfe = '';
     if (kg.mpi) knoepfe += '<button type="button" class="vi-rf-abruf-btn" data-markt="1">' +
-      'Marktpreisindikation holen <i>' + kg.mpi + ' frei</i></button>';
+      'Jetzt: Marktpreisindikation <i>' + kg.mpi + ' frei</i></button>';
     if (kg.mpi_plus) knoepfe += '<button type="button" class="vi-rf-abruf-btn" data-markt="2">' +
-      'Erweiterte Indikation <i>' + kg.mpi_plus + ' frei</i></button>';
+      'Später: erweiterte Indikation <i>' + kg.mpi_plus + ' frei</i></button>';
     _rfBlase('co', 'Für diese Adresse kann ich eine <b>Marktpreisindikation</b> holen — ' +
-      'Kaufpreisniveau, Mietniveau und die Lagebewertung. ' +
-      '<span style="opacity:.75">Sie läuft im Hintergrund; wir machen solange weiter.</span>' +
+      'Kaufpreisniveau, Mietniveau und die Lagebewertung.' +
       '<div class="vi-rf-abruf">' + knoepfe +
-      '<small>Ein „ja" nimmt die erste. „Nein danke" überspringt.</small></div>');
+      '<small>' +
+      (kg.mpi ? '<b>Jetzt</b> heißt: sie läuft gleich im Hintergrund, und wir machen weiter. ' : '') +
+      (kg.mpi_plus ? '<b>Später</b> ist die erweiterte — sie liest auch Zustand, Energieausweis, ' +
+        'Bodenrichtwert und deine Lagebewertung, und die kommen erst in den nächsten Etappen. ' +
+        'Ich hole sie, sobald das steht.' : '') +
+      '</small></div>');
     _rfMarktWiring();
   }
 
@@ -3422,8 +3778,17 @@
       b.setAttribute('data-wired', '1');
       b.addEventListener('click', function () {
         _rf.abrufOffen = null;
-        _rfBlase('ich', 'Ja, hol sie.');
-        _rfMarktWaehlen(parseInt(b.getAttribute('data-markt'), 10) || 1);
+        var st = parseInt(b.getAttribute('data-markt'), 10) || 1;
+        _rfBlase('ich', st >= 2 ? 'Nimm die erweiterte.' : 'Ja, hol sie.');
+        var wartete = _rf.wartetAufMarkt;
+        _rfMarktWaehlen(st);
+        /* v1290: WER KLICKT, MUSS AUCH WEITERKOMMEN.
+           Bis hierher setzte nur die gesprochene Zusage den Dialog fort
+           (_rfVorabErkennen -> _rfNachAngebot). Der Knopf tat es nicht —
+           wer ihn drueckte, waehrend der Ablauf auf die Entscheidung
+           wartete, blieb ohne naechste Frage stehen. Beim Messen ist es
+           mir entgangen, weil ich die Zusage immer getippt habe. */
+        if (wartete) _rfNachAngebot();
       });
     });
   }
@@ -3435,6 +3800,12 @@
     var chat = $('vi-rf-chat');
     if (chat) [].slice.call(chat.querySelectorAll('.vi-rf-abruf-btn[data-markt]'))
       .forEach(function (b) { b.disabled = true; });
+    if (stufe >= 2) {
+      _rfBlase('co', '<span style="opacity:.8">Gemerkt. Die erweiterte hole ich am Ende von ' +
+        '<b>Etappe 4</b> — dann kennt sie Zustand, Energieausweis, Bodenrichtwert und deine ' +
+        'Lagebewertung. Vorher gerechnet wäre sie schlechter, als sie sein kann.</span>');
+      return;
+    }
     /* Stehen Flaeche, Baujahr und Kaufpreis schon, geht es sofort los —
        sonst wartet der Start auf das Ende von Etappe 1. */
     if (_rfMarktBereit()) _rfMarktStarten();
@@ -3446,51 +3817,102 @@
     return !!(_rfFeld('plz') || _rfFeld('ort')) && _rfNum(_rfFeld('wfl')) != null;
   }
 
-  function _rfMarktStarten() {
-    if (!_rf || _rf.marktLaeuft || _rf.markt) return;
+  /* Nach Etappe 4: alles da, was der volle Bericht liest. Wer Stufe 1
+     gezogen hat, bekommt hier das Angebot zur Vertiefung — der Server
+     rechnet sie als Differenz ab, nicht als zweiten vollen Abruf. */
+  function _rfMarktStufe2Faellig() {
+    if (!_rf || _rf.marktPlusGetan) return;
+    if (_rf.marktStufe >= 2 && _rf.marktGewollt && !_rf.markt2) {
+      _rf.marktPlusGetan = 1;
+      _rfMarktStarten(2);
+      return;
+    }
+    /* Stufe 1 lief schon: einmal die Vertiefung anbieten. */
+    if (_rf.markt && !_rf.markt2 && !_rf.marktPlusGefragt) {
+      var kg = _rfKontingent();
+      if (!kg || !kg.mpi_plus) return;
+      _rf.marktPlusGefragt = 1;
+      _rf.abrufOffen = 'markt';
+      _rfBlase('co', 'Jetzt hätte ich alles beisammen für die <b>erweiterte Marktpreisindikation</b> — ' +
+        'Zustand, Energieausweis, Bodenrichtwert und deine Lagebewertung. Sie bringt zusätzlich ' +
+        'die Preishistorie, die amtliche Makrolage und eine Einordnung im Fließtext.' +
+        '<div class="vi-rf-abruf">' +
+        '<button type="button" class="vi-rf-abruf-btn" data-markt="2">Erweiterte holen <i>' +
+        kg.mpi_plus + ' frei</i></button>' +
+        '<small>Die Vertiefung kostet nur die Differenz — die erste Stufe ist schon bezahlt.</small>' +
+        '</div>');
+      _rfMarktWiring();
+    }
+  }
+
+  function _rfMarktStarten(stufeErzwungen) {
+    if (!_rf) return;
+    var stufe = stufeErzwungen || _rf.marktStufe || 1;
+    if (stufe < 2 && (_rf.marktLaeuft || _rf.markt)) return;
+    if (stufe >= 2 && (_rf.marktLaeuft || _rf.markt2)) return;
     if (!_rf.marktGewollt) return;
-    _rf.marktLaeuft = 1;
+    _rf.marktLaeuft = stufe;
     var obj = {
       plz: _rfFeld('plz') || '', ort: _rfFeld('ort') || '',
       str: _rfFeld('str') || '', hnr: _rfFeld('hnr') || '',
-      objektart: _rfFeld('objart') || '',
-      wfl: _rfNum(_rfFeld('wfl')), baujahr: _rfNum(_rfFeld('baujahr')), kp: _rfNum(_rfFeld('kp'))
+      objart: _rfFeld('objart') || '', objektart: _rfFeld('objart') || '',
+      wfl: _rfNum(_rfFeld('wfl')), zimmer: _rfNum(_rfFeld('zimmer')),
+      baujahr: _rfNum(_rfFeld('baujahr')), kp: _rfNum(_rfFeld('kp')),
+      nkm: _rfNum(_rfFeld('nkm'))
     };
-    var stufe = _rf.marktStufe || 1;
+    /* v1290: Was der VOLLE Bericht zusaetzlich liest, geht nur bei Stufe 2
+       mit — bei Stufe 1 wird es ohnehin nicht ausgewertet, und ein Feld,
+       das nichts bewirkt, gehoert nicht in den Aufruf. */
+    if (stufe >= 2) {
+      ['ds2_zustand', 'ds2_energie', 'brw', 'etage', 'mikrolage', 'makrolage',
+       'ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_entwicklung', 'ds2_wertsteigerung',
+       'ds2_mietausfall', 'ds2_marktmiete', 'ausst', 'vermstand', 'gsfl', 'mea'
+      ].forEach(function (id) {
+        var v = _rfFeld(id);
+        if (v !== null && v !== undefined && v !== '') obj[id] = v;
+      });
+    }
     var koerper = (stufe >= 2) ? { wert_stufe: 2, object: obj } : { fast: true, object: obj };
     try { koerper.external_ref = window._currentObjKey || null; } catch (e) {}
-    _rfBlase('co', '<span style="opacity:.75">Die Marktpreisindikation läuft — ich melde mich, sobald sie da ist. ' +
-                   'Weiter im Text:</span>');
+    _rfBlase('co', '<span style="opacity:.75">' +
+      (stufe >= 2 ? 'Die erweiterte Marktpreisindikation läuft — sie rechnet länger, weil sie ' +
+                    'Preishistorie und Makrolage mitnimmt. '
+                  : 'Die Marktpreisindikation läuft — ich melde mich, sobald sie da ist. ') +
+      'Weiter im Text:</span>');
     /* Auth.apiCall geht durch den zentralen 401-Handler; nacktes fetch
-       wuerde ihn umgehen (FALLEN.md). */
-    /* 90 s statt der 15 s Vorgabe: der Marktbericht rechnet, und ein
-       Zeitueberlauf saehe hier aus wie ein Fehler, waere aber Ungeduld. */
-    Auth.apiCall('/marktbericht/reports/from-dealpilot', { method: 'POST', body: koerper, timeout: 90000 })
-      .then(function (d) { _rf && _rfMarktFertig(d); })
-      .catch(function (err) { _rf && _rfMarktFehler(err); });
+       wuerde ihn umgehen (FALLEN.md). 90 s statt der 15 s Vorgabe: der
+       Marktbericht rechnet, und ein Zeitueberlauf saehe hier aus wie ein
+       Fehler, waere aber Ungeduld. */
+    Auth.apiCall('/marktbericht/reports/from-dealpilot',
+                 { method: 'POST', body: koerper, timeout: (stufe >= 2 ? 180000 : 90000) })
+      .then(function (d) { if (_rf) _rfMarktFertig(d, stufe); })
+      .catch(function (err) { if (_rf) _rfMarktFehler(err, stufe); });
   }
 
-  function _rfMarktFehler(err) {
+  function _rfMarktFehler(err, stufe) {
     _rf.marktLaeuft = 0;
     var d = (err && err.data) || {};
     var m = d.message || d.error || (err && err.message) || '';
     try { console.warn('[voice] Marktpreisindikation fehlgeschlagen:', m, err); } catch (e) {}
+    var was = (stufe >= 2) ? 'erweiterte Marktpreisindikation' : 'Marktpreisindikation';
     /* Leise. Der Ablauf darf nie auf einen Abruf warten — und er darf auch
        nicht von einem gescheiterten Abruf gestoert werden. Ein fehlendes
        Kontingent wird trotzdem BENANNT: es ist kein Fehler, sondern eine
        Auskunft, und der Nutzer soll wissen, warum nichts kam. */
     if (d.error === 'kein_kontingent') {
-      _rfBlase('co', '<span style="opacity:.7">Für die Marktpreisindikation ist dein Kontingent ' +
+      _rfBlase('co', '<span style="opacity:.7">Für die ' + escH(was) + ' ist dein Kontingent ' +
         'aufgebraucht — es wurde nichts abgebucht. Ich frage die Werte stattdessen ab.</span>');
       return;
     }
-    _rfBlase('co', '<span style="opacity:.6">Die Marktpreisindikation kam nicht durch' +
+    _rfBlase('co', '<span style="opacity:.6">Die ' + escH(was) + ' kam nicht durch' +
       (m ? ' (' + escH(String(m).slice(0, 120)) + ')' : '') +
       ' — es wurde nichts abgebucht. Wir machen ohne sie weiter.</span>');
   }
 
-  function _rfMarktFertig(d) {
+  function _rfMarktFertig(d, stufe) {
+    stufe = stufe || 1;
     _rf.marktLaeuft = 0;
+    var was = (stufe >= 2) ? 'Erweiterte Marktpreisindikation' : 'Marktpreisindikation';
     if (!d || d.no_data) {
       _rfBlase('co', '<span style="opacity:.6">Für diese Adresse liegen keine Marktdaten vor — ' +
                      'es wurde nichts abgebucht.</span>');
@@ -3501,6 +3923,7 @@
     var rent = p.rent || {};
     var wfl = _rfNum(_rfFeld('wfl'));
     var M = {
+      stufe: stufe,
       mw: (mv.estimated != null) ? mv.estimated : null,
       low: mv.low != null ? mv.low : null, high: mv.high != null ? mv.high : null,
       sqm: (mv.basis_median_sqm != null) ? mv.basis_median_sqm
@@ -3511,9 +3934,12 @@
                : (((p.valuation && p.valuation.inputs) || {}).market_rent_sqm != null
                   ? p.valuation.inputs.market_rent_sqm : null),
       trend: (p.price_trend_pct != null) ? p.price_trend_pct : null,
-      konfidenz: mv.confidence_label || null
+      konfidenz: mv.confidence_label || null,
+      /* v1290: nur die volle Stufe liefert Fliesstext und Historie. */
+      text: (p.report_md && !/Schnell-Modus/.test(String(p.report_md))) ? String(p.report_md) : null
     };
     _rf.markt = M;
+    if (stufe >= 2) _rf.markt2 = M;
 
     /* Die Lagestufen: 0-100 vom Marktbericht auf die fuenf Stufen des
        Formulars. Die Grenzen sind dieselben wie in dealpilot-mb.js
@@ -3535,17 +3961,27 @@
     if (M.mikro) zeilen.push(_zeile('Mikrolage', _lageWort(M.mikro)));
     if (M.trend != null) zeilen.push(_zeile('Preistrend', (M.trend >= 0 ? '+' : '') + _pctTxt(M.trend, 1) + ' p.a.'));
 
-    var Q = 'Marktpreisindikation' + (_rf.marktStufe >= 2 ? ' (Stufe 2)' : '');
+    var Q = (stufe >= 2) ? 'Marktpreisindikation (erweitert)' : 'Marktpreisindikation';
     var eingetragen = [];
     if (M.makro && _rfSetzen('makrolage', M.makro, Q)) eingetragen.push('Makrolage');
     if (M.mikro && _rfSetzen('mikrolage', M.mikro, Q)) eingetragen.push('Mikrolage');
     if (M.mietSqm != null && _rfSetzen('ds2_marktmiete', String(Math.round(M.mietSqm * 100) / 100).replace('.', ','), Q)) eingetragen.push('Marktmiete');
     if (M.mw != null && _rfSetzen('svwert', String(Math.round(M.mw)), Q)) eingetragen.push('Marktwert');
 
-    _rfBlase('co', '<b>Die Marktpreisindikation ist da.</b>' +
-      '<div class="vi-sc"><div class="vi-sc-kopf"><span class="vi-sc-titel">Marktpreisindikation' +
+    /* v1290: Wer fuer die volle Stufe bezahlt, bekommt auch zu sehen, was
+       sie mehr kann. Ein Fliesstext, der nur in der Antwort steht und
+       nirgends erscheint, ist bezahlte Unsichtbarkeit. */
+    var text = '';
+    if (M.text) {
+      var kurz = M.text.replace(/[#*_>`]/g, '').replace(/\s+/g, ' ').trim();
+      text = '<details class="vi-sc-mehr"><summary>Einordnung im Fließtext</summary>' +
+             '<p>' + escH(kurz.slice(0, 1400)) + (kurz.length > 1400 ? ' …' : '') + '</p></details>';
+    }
+
+    _rfBlase('co', '<b>Die ' + escH(was) + ' ist da.</b>' +
+      '<div class="vi-sc"><div class="vi-sc-kopf"><span class="vi-sc-titel">' + escH(was) +
         (M.konfidenz ? ' · ' + escH(M.konfidenz) : '') + '</span></div>' +
-      '<div class="vi-sc-gitter">' + zeilen.join('') + '</div>' +
+      '<div class="vi-sc-gitter">' + zeilen.join('') + '</div>' + text +
       (eingetragen.length
         ? '<div class="vi-sc-annahmen"><b>Übernommen:</b> ' + escH(eingetragen.join(', ')) +
           ' — in der Übersicht mit Herkunft „' + escH(Q) + '", nicht als etwas, das du gesagt hast.</div>'
@@ -3693,7 +4129,7 @@
     });
     $('vi-rf-fs').addEventListener('change', function () {
       _fs.an = this.checked;
-      if (_fs.an) { _fsStart().then(function (ok) { if (ok) _fsHoeren(); else _fsMikroKasten(false, 'Mikrofon nicht verfügbar', 'Bitte tippen.'); }); }
+      if (_fs.an) { _fsStart().then(function (ok) { if (ok) _fsHoeren(true); else _fsMikroKasten(false, 'Mikrofon nicht verfügbar', 'Bitte tippen.'); }); }
       else { _fsStopHoeren(); _fsAus(); _fsMikroKasten(false, 'Freisprechen ist aus', 'Tippe deine Antworten.'); }
     });
   }
@@ -3717,6 +4153,7 @@
     /* v1288: Ein Angebot gilt nur fuer die Frage, in der es steht. Sonst
        nimmt die naechste Frage ein "ja" entgegen, das dem alten Knopf galt. */
     _rf.abrufOffen = null;
+    _rf.nachgehakt = 0;   /* v1290: Nachhaken gilt nur fuer die Frage, in der es passiert ist */
     /* v1280: Der Vorschlag aus den Einstellungen steht IN der Frage - nicht
        als stiller Knopf daneben. Wer gefragt wird, soll sehen, was der
        Co-Pilot vorhat, bevor er ja sagt. */
@@ -3744,7 +4181,7 @@
     /* v1277: KEIN Fokus ins Tippfeld - wer einen blinkenden Cursor sieht,
        tippt. Gesprochen wird trotzdem gehoert; wer tippen will, klickt. */
     if (inp) { inp.value = ''; inp.disabled = false; }
-    if (_fs.an && _fs.stream) _fsHoeren();
+    if (_fs.an && _fs.stream) _fsHoeren(true);
   }
 
   /* ═══ v1288 · Der Uebergang zwischen zwei Etappen ═════════════════════
@@ -3772,7 +4209,9 @@
     var jetzt = _rf.offen[_rf.i];
     if (vorher && jetzt && vorher.et && jetzt.et && jetzt.et > vorher.et) {
       /* Ende der Basis: jetzt kennt der Abruf Flaeche, Baujahr und Preis. */
-      if (vorher.et === 1) { try { _rfMarktStarten(); } catch (ex) {} }
+      /* v1290: jede Stufe startet dort, wo ihre Angaben stehen. */
+      if (vorher.et === 1) { try { _rfMarktStarten(1); } catch (ex) {} }
+      if (vorher.et === 4) { try { _rfMarktStufe2Faellig(); } catch (ex) {} }
       try { _rfHalt(jetzt.et); } catch (ex) { try { console.warn('[voice] Halt uebersprungen', ex); } catch (e2) {} }
     }
     _rfFrage();
@@ -3783,7 +4222,7 @@
   function _rfLauschen() {
     var inp = $('vi-rf-in'); if (inp) { inp.value = ''; inp.disabled = false; }
     var pb = $('vi-rf-passt'); if (pb) pb.style.display = 'none';
-    if (_fs.an && _fs.stream) _fsHoeren();
+    if (_fs.an && _fs.stream) _fsHoeren(true);
   }
 
   /* Nach einer Entscheidung ueber ein Angebot geht es dort weiter, wo der
@@ -3794,7 +4233,9 @@
     if (!jetzt) { _rfFertig(); return true; }
     var vorher = (_rf.i > 0) ? _rf.offen[_rf.i - 1] : null;
     if (vorher && vorher.et && jetzt.et && jetzt.et > vorher.et) {
-      if (vorher.et === 1) { try { _rfMarktStarten(); } catch (ex) {} }
+      /* v1290: jede Stufe startet dort, wo ihre Angaben stehen. */
+      if (vorher.et === 1) { try { _rfMarktStarten(1); } catch (ex) {} }
+      if (vorher.et === 4) { try { _rfMarktStufe2Faellig(); } catch (ex) {} }
       try { _rfHalt(jetzt.et); } catch (ex) {}
     }
     _rfFrage();
@@ -4066,7 +4507,7 @@
     _rf.tiefeOffen = 1;
     var pb = $('vi-rf-passt'); if (pb) pb.style.display = 'none';
     var inp = $('vi-rf-in'); if (inp) { inp.disabled = false; }
-    if (_fs.an && _fs.stream) _fsHoeren();
+    if (_fs.an && _fs.stream) _fsHoeren(true);
     return true;
   }
 
@@ -4170,14 +4611,15 @@
     _rf.abschlussOffen = 1;
     var pb = $('vi-rf-passt'); if (pb) pb.style.display = 'none';
     var inp = $('vi-rf-in'); if (inp) inp.disabled = false;
-    if (_fs.an && _fs.stream) _fsHoeren();
+    if (_fs.an && _fs.stream) _fsHoeren(true);
     return true;
   }
   /* Antwort verarbeiten - egal ob getippt oder gesprochen. */
-  function _rfUebernehmen(neu, ausSprache) {
+  function _rfUebernehmen(neu, ausSprache, txt) {
     _rfDenkt(false);
     var e = _rf.offen[_rf.i];
-    var namen = [];
+    if (!e) return;
+    var namen = [], teil = [];
     Object.keys(neu || {}).forEach(function (id) {
       if (e.ids.indexOf(id) < 0) return;            /* nur was gefragt war */
       var v = neu[id];
@@ -4194,21 +4636,63 @@
         _rf.profilSchonDrin = 0;
         _rfBlase('co', 'Übernommen — in der Tabelle kannst du sie noch ändern.');
         _rfStandZeichnen();
-        return setTimeout(_rfWeiter, 120);
+        return _rfWeiterGleich();
       }
-      _rfBlase('co', 'Daraus konnte ich nichts entnehmen — sag es gern nochmal oder tippe es.');
-      if (ausSprache && _fs.an) _fsHoeren();
+      /* v1290: Wer nichts entnehmen konnte, sagt WAS er gehoert hat und
+         WAS er sucht. „Daraus konnte ich nichts entnehmen" laesst einen
+         raten, ob das Mikrofon, das Verstaendnis oder die Frage schuld
+         war. Und der Hinweis, dass man es einfach nochmal sagen kann,
+         gehoert dazu — das Mikrofon laeuft ja weiter. */
+      _rfBlase('co', (txt
+          ? 'Ich habe „' + escH(String(txt).slice(0, 90)) + '" verstanden, aber nichts gefunden, was hierher passt.'
+          : 'Da war nichts zu verstehen.') +
+        '<div style="margin-top:7px">Gesucht ist: <b>' + escH(_rfWasGesucht(e)) + '</b>.</div>' +
+        '<div style="margin-top:5px;opacity:.75">Sag es einfach nochmal — ich höre schon zu.</div>');
+      if (ausSprache && _fs.an) _fsHoeren(true);
       return;
     }
     _rf.profilSchonDrin = 0;
-    /* v1283: KEINE Bestaetigungsblase mehr. Marcels Punkt: "wir brauchen
-       dazwischen nicht mehr erkannt wurde das und das in Gruen, sondern wenn
-       wir die Liste haben, kann man das ja gleich dort eintragen". Der
-       Verlauf bleibt dadurch lesbar - er zeigt das GESPRAECH, nicht die
-       Quittungen. */
+    /* v1290: Wurde nur EIN TEIL des Blocks verstanden, wird nicht
+       weitergesprungen — sonst geht die andere Haelfte verloren, und genau
+       das ist Marcel passiert („er hat nur die Haelfte aufgenommen").
+       Gefragt wird gezielt nach dem Rest. */
+    (e.ids || []).forEach(function (id) {
+      var v = _rf.data.fields[id];
+      if (v === undefined || v === null || v === '') teil.push(id);
+    });
     _rfStandZeichnen();
-    setTimeout(_rfWeiter, 120);   /* v1283: zuegiger - die Bestaetigung steht ja schon in der Spalte */
+    if (ausSprache && teil.length && teil.length < (e.ids || []).length && !_rf.nachgehakt) {
+      _rf.nachgehakt = 1;
+      _rfBlase('co', 'Das habe ich. Fehlt noch: <b>' + escH(_rfFelderNamen(teil)) + '</b>.');
+      if (_fs.an) _fsHoeren(true);
+      return;
+    }
+    _rf.nachgehakt = 0;
+    _rfWeiterGleich();
   }
+
+  /* v1290: Nicht weitergehen, solange jemand redet. Der Recorder laeuft
+     durch — wer nachschiebt, soll noch zur GLEICHEN Frage gehoert werden.
+     Ohne das landet der Nachschlag bei der naechsten. */
+  function _rfWeiterGleich() {
+    var versuche = 0;
+    (function warte() {
+      if (!_rf) return;
+      if ((_fsSprichtGerade() || _fs.laeuft > 0) && versuche++ < 40) {
+        return setTimeout(warte, 150);
+      }
+      _rfWeiter();
+    })();
+  }
+
+  /* Die Namen der Felder eines Blocks, lesbar. */
+  function _rfFelderNamen(ids) {
+    return (ids || []).map(function (id) {
+      var kat = (_rf && _rf.catalog || []).filter(function (c) { return c.id === id; })[0];
+      return kat ? String(kat.label).replace(/\s*\(.*?\)\s*$/, '') : id;
+    }).join(', ');
+  }
+  function _rfWasGesucht(e) { return _rfFelderNamen(e && e.ids); }
 
   /* ═══ v1281 · Wenn der Nutzer selbst fragt ═════════════════════════════
      Marcels Wunsch: „dann wäre es cool, wenn man ihm vielleicht auch
@@ -4250,11 +4734,11 @@
          die offen war, ist immer noch offen. */
       var e = _rf.offen[_rf.i];
       if (e) _rfBlase('co', '<span style="opacity:.7">Zurück zur Frage:</span> ' + escH(e.frage));
-      if (_fs.an && _fs.stream) _fsHoeren();
+      if (_fs.an && _fs.stream) _fsHoeren(true);
     }).catch(function (err) {
       _rfDenkt(false);
       _rfBlase('co', escH((err && err.message) || 'Das konnte ich gerade nicht beantworten.'));
-      if (_fs.an && _fs.stream) _fsHoeren();
+      if (_fs.an && _fs.stream) _fsHoeren(true);
     });
   }
 
