@@ -10360,6 +10360,64 @@ Stunden** offenem Fenster.
 
 **Commit** `v1285`. Auf Staging, **nicht auf Prod**.
 
+### `v1286` · Ein Satz darf zwei Anliegen tragen
+
+Marcels Bild: `design/mockups/sprechlauf.png`. Er sagt in den Dialog:
+
+> *„Ich finanziere über die Sparkasse und du kannst es aus den
+> Einstellungen übernehmen. **Eigenkapital sind 10% vom Kaufpreis.**"*
+
+Antwort: **„Daraus konnte ich nichts entnehmen."** — Zwei Fehler auf
+einmal.
+
+**1 · Das Muster verlangte eine feste Wortstellung.** Es suchte erst
+„übernimm", dann „Einstellungen". Marcel sagt es andersherum („aus den
+Einstellungen übernehmen") — also griff nichts. Jetzt zählt nur, dass
+**beide Teile vorkommen**: eine Übernahme-Absicht und ein Wort für die
+Quelle. In welcher Folge, ist Sache des Sprechers.
+
+> **Ein Muster, das eine Reihenfolge erzwingt, prüft die Grammatik des
+> Programmierers, nicht die Absicht des Sprechers.**
+
+**2 · Der zweite Satzteil wäre trotzdem verloren gewesen.** Die Übernahme
+sprang sofort zur nächsten Frage. Jetzt wird erst das Profil eingetragen
+und **danach derselbe Satz ausgewertet**: was ausdrücklich gesagt wurde,
+gewinnt gegen die Vorbelegung.
+
+**Nachgemessen mit genau Marcels Satz:**
+
+| Feld | Wert | Herkunft |
+|---|---|---|
+| Eigenkapital | **20.000** | gerechnet: 10 % von 200.000 |
+| Zinssatz | 4,09 | Einstellungen |
+| Tilgung | 1 | Einstellungen |
+| Zinsbindung | 10 | Einstellungen |
+
+Beides aus **einem** Satz — und die 10 % schlagen die 20 % aus dem Profil,
+weil sie ausdrücklich genannt wurden.
+
+#### Drei weitere Punkte aus demselben Durchlauf
+
+**„Baujahr und Kaufpreis könnte man zusammen abfragen."** Aus 13 Blöcken
+werden 10. Zusammengelegt wird, was man in **einem** Satz sagt: „Baujahr
+1965, kostet 200.000" ist ein Satz, keine zwei Fragen. Objektart wandert
+zur Größe.
+
+**„Die Daten rechts fluchten nicht miteinander."** Sie standen im
+Fließtext — jede Zeile begann dort, wo die vorige aufhörte. Jetzt ein
+Raster: Name links, Wert rechts, Ziffern in Mono untereinander.
+
+**„Das Modal ist generell ein bisschen klein."** Auch nach `v1283`: jetzt
+**1240 px** breit und bis **94 vh** hoch, Spalte 330, Verlauf 410 px. Damit
+stehen alle elf Blöcke ohne Scrollen im Bild.
+
+**„Es dauert immer noch recht lange."** Die Stillepause von 1,4 s war der
+größte Einzelposten zwischen Satzende und nächster Frage — jetzt **1,1 s**;
+die Rauschmessung von 500 auf 400 ms. Bei elf Fragen sind das über drei
+Sekunden, und die drei entfallenen Fragen sparen noch einmal mehr.
+
+**Commit** `v1286`. Auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
