@@ -2320,8 +2320,8 @@
         _rfBlase('co', 'Übernommen — in der Tabelle kannst du sie noch ändern.');
         _rf.stummeUebernahme = 0;
         _rf.profilVorschlag = null;
+        _rfStandZeichnen();   /* v1283b: der Haken sofort */
         return _rfWeiter();
-      _rfStandZeichnen();   /* v1283b: der Haken sofort, nicht erst bei der naechsten Frage */
       }
       var v = _rfVorschlag(e);
       if (v) {
