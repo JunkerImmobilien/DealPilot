@@ -3697,16 +3697,27 @@
       b.addEventListener('click', function () { _rfAktionKlick(b.getAttribute('data-akt'), b); });
     });
   }
-
   /* EIN Klickweg für alle Angebote. Vorher hatte jedes seinen eigenen —
-     und der des Markt-Angebots vergass, den Dialog fortzusetzen (v1290). */
+     und der des Markt-Angebots vergass, den Dialog fortzusetzen (v1290).
+
+     v1291b: Eine `art` OHNE Zweig fiel hier still durch — der Knopf war
+     danach weg, und nichts geschah. Gemessen an genau dem Fall: der
+     Adress-Knopf hatte keinen Handler, der Dialog stand. Ein stiller
+     Ausfall in einem Verteiler ist der teuerste, den es gibt; deshalb
+     protestiert er jetzt, statt zu schweigen. */
   function _rfAktionKlick(art, knopf) {
     if (!_rf || !art) return;
     if (knopf) { knopf.disabled = true; knopf.classList.add('laeuft'); }
     var a = (_rf.aktionen || []).filter(function (x) { return x.art === art; })[0] || {};
     _rfAktionWeg(art);
+    if (art === 'adresse') {
+      _rf.adresseFrage = 0;
+      _rfBlase('ich', 'Ja, stimmt.');
+      _rfWeiter();
+      return;
+    }
     if (art === 'tabelle')  { _rfZurTabelle(); return; }
-    if (art === 'tiefe')    { _rfBlase('ich', 'Ja, lass uns weitermachen.'); _rfTiefeStarten(); return; }
+    if (art === 'tiefe')    { _rf.tiefeOffen = 0; _rfBlase('ich', 'Ja, lass uns weitermachen.'); _rfTiefeStarten(); return; }
     if (art === 'brw')      { _rfBlase('ich', 'Hol den Bodenrichtwert.'); _rfBrwHolen(); return; }
     if (art === 'lage')     { _rfBlase('ich', 'Recherchier die Lage.'); _rfLageRecherche(); return; }
     if (art === 'markt' || art === 'markt2') {
@@ -3717,6 +3728,9 @@
       if (wartete) _rfNachAngebot();
       return;
     }
+    try { console.error('[voice] Aktion ohne Zweig:', art); } catch (e) {}
+    _rfBlase('co', '<span style="opacity:.6">Das hat nicht funktioniert — sag es mir bitte selbst.</span>');
+    if (_fs.an && _fs.stream) _fsHoeren(true);
   }
 
   /* Gesprochen oder getippt: „ja" gilt fuer die OBERSTE offene Aktion.
