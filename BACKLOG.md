@@ -38,11 +38,21 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
 
-**Stand:** `v1273`–`v1289b` liegen auf Staging und sind dort abgenommen. **Produktion steht auf
-`a21fe9c`** — nichts davon ist live.
+**Stand:** `v1273`–`v1290e` liegen auf Staging. **Produktion steht auf `a21fe9c`**
+— nichts davon ist live.
+
+> **Nach Marcels erstem echten Sprechlauf am 10.09. abends** (Bilder
+> `design/mockups/sprechlauf2.png` und `sprechlauf3.png`) sind fuenf Befunde
+> behoben: das Freisprechen war kaputt (der Ringpuffer warf den WebM-Header
+> weg — daher „Audio file might be corrupted"), die Uebersichtsspalte riss
+> auseinander (zwei `.vi-rf-st`-Regeln, die spaetere gewann), der Dialog war
+> fuer dunklen Grund gebaut und laeuft auf Weiss, der Klick-Weg des
+> Markt-Angebots blieb haengen, und das Rate-Limit sperrte nach zwei
+> Durchlaeufen mit der Meldung „Zu viele PDF-Extraktionen". Einzelheiten im
+> Rollout-Journal.
 
 **Der Sprechlauf ist jetzt ein geführter Ablauf in sechs Etappen** mit einem
-Ergebnis dazwischen. Was `v1288`–`v1289b` gebracht haben, steht ausführlich im
+Ergebnis dazwischen. Was `v1288`–`v1290e` gebracht haben, steht ausführlich im
 Rollout-Journal der Projektanweisung; die Kurzfassung:
 
 | | Etappe | danach |
@@ -61,7 +71,26 @@ der Frage, und ein Co-Pilot, der seine eigenen Kennzahlen kennt.
 
 ---
 
-### 1 · Die Sprachqualität messen — mit echtem Material
+### 1 · Echtes Sprechen abnehmen — das kann nur Marcel
+
+Die Reparatur des Freisprechens (`v1290`) ist am Kern **bewiesen**: der
+WebM-Header überlebt den Ringpuffer, der Recorder läuft durch, und
+`[kopf].concat(chunks)` ergibt `1a 45 df a3` — eine gültige Datei. Gemessen
+mit einem synthetischen Audiostrom im Browser.
+
+**Was ein automatisierter Browser nicht kann, ist sprechen.** Diese Punkte
+bleiben ein Abnahmepunkt:
+
+- Löst die Stillepause von **1,6 s** bei einer echten Denkpause noch aus?
+- Wird ein **Nachschlag** („… ähm … in Hüllhorst") wirklich an dieselbe Frage
+  gehängt?
+- Greift die Erkennung des **offenen Satzendes** bei echten Transkripten?
+
+Wenn dabei wieder etwas hakt: die Konsole trägt jetzt `[voice]`-Zeilen mit dem
+Grund, und `window.VoiceImport._fsStand()` zeigt Phase, Kopf, Chunks und den
+gemerkten Satzanfang.
+
+### 2 · Die Sprachqualität messen — mit echtem Material
 
 `OPENAI_TRANSCRIBE_MODEL`: **auf Staging steht seit dem 09.09. das mini**, auf
 Prod weiterhin das große `gpt-4o-transcribe` (dafür fehlt die Freigabe).
@@ -78,9 +107,9 @@ Die Zahlen dahinter: mini kostet die Hälfte (3,00 statt 6,00 USD je Mio
 Audio-Token) und ist 37 % schneller (1864 ms gegen 2944 ms). Der Wechsel senkt
 die Kosten einer Aufnahme um rund 40 % — bei 4 Minuten von ≈ 1,7 auf ≈ 0,9 Cent.
 
-### 2 · Der Sprechlauf gehört auf Produktion
+### 3 · Der Sprechlauf gehört auf Produktion
 
-**`v1273`–`v1289b` liegen auf Staging und sind dort abgenommen.** Prod steht auf
+**`v1273`–`v1290e` liegen auf Staging.** Prod steht auf
 `a21fe9c` — der Co-Pilot, die Etappen, beide Scores, BORIS-Abruf und
 Marktpreisindikation im Hintergrund sind für keinen Kunden erreichbar.
 
@@ -88,19 +117,19 @@ Marktpreisindikation im Hintergrund sind für keinen Kunden erreichbar.
 berührt einen Backend-Endpunkt: `/ai/copilot-frage`). Vorher wie immer
 sichern — beide Datenbanken, `dealpilot-mb-db` mit eigenem `pg_dump`.
 
-### 3 · Der Gold-Altbestand
+### 4 · Der Gold-Altbestand
 
 468 Fundstellen sind als Basislinie eingefroren, der Wächter meldet nur noch
 Neues. Abgetragen wird, wenn eine Datei ohnehin angefasst wird. Vor dem ersten
 echten Whitelabel-Kunden gehören `pricing-modal.js` (53),
 `reseller-portal.js` (43) und `qc-bridge.js` (39) gezielt nachgezogen.
 
-### 4 · Doppelte Plausibilitätsprüfung
+### 5 · Doppelte Plausibilitätsprüfung
 
 Marcels Wunsch vom 08.09., **zurückgestellt**. Der Code liegt vollständig da,
 `OPENAI_VOICE_VERIFY=1` schaltet ihn an.
 
-### 5 · IRR/Break-Even ins Portfolio-Cockpit
+### 6 · IRR/Break-Even ins Portfolio-Cockpit
 
 **Teilweise erledigt** — sie stehen in den Kennzahlen-Kacheln (Reiter
 Bewertung); im Portfolio-Cockpit noch nicht.

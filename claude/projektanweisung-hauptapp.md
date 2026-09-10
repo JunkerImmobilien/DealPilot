@@ -10765,6 +10765,245 @@ Löhner Str. 278, 32120 Hiddenhausen, ZFH 233 m², Bj 1964, 350.000 €,
 
 **Commits** `224382a`, `99e4308`. Auf Staging, **nicht auf Prod**.
 
+## Rollout-Journal · 10.09.2026, abends — `v1290` bis `v1290e`
+
+Marcels Durchlauf, belegt mit zwei Bildern: `design/mockups/sprechlauf2.png`
+(die Übersicht) und `sprechlauf3.png` (der Fehler).
+
+> „Ich finde, dass es unübersichtlich ist. … Man kann nicht alles sehen direkt.
+> Dann hat er bei der ersten Frage nur die Hälfte aufgenommen. Dann wollte ich
+> es nochmal sagen. Er hat mir aber gar nicht mehr zugehört. Dann hat er schon
+> abgebrochen. Und dann kam jetzt ein Fehler: Transcription fehlgeschlagen."
+
+### `v1290` · Das Freisprechen war kaputt — und der Grund war ein Byte
+
+Drei Befunde in einer Kette, alle mit gemessener Ursache.
+
+#### 1. Der Ringpuffer warf den Container-Header weg
+
+`rec.start(500)` liefert Zeitscheiben. **Das erste Stück ist der WebM-Header**
+(EBML, Segment-Info, Track-Definition); alle weiteren sind Cluster — reine
+Fortsetzungen, die für sich keine Datei ergeben.
+
+`_fsRingBegrenzen()` hielt die Größe mit `chunks.slice(-max)` in Schranken.
+Das schneidet die **ältesten** Stücke ab — also nach 40 Sekunden Lauschen
+genau den Header. Was danach zusammengesetzt wurde, war ein Haufen Cluster
+ohne Container.
+
+**Im Browser nachgemessen, Byte für Byte:**
+
+| | erste vier Bytes | |
+|---|---|---|
+| mit Kopf (`v1290`) | `1a 45 df a3` | EBML-Magic — **gültige WebM-Datei** |
+| ohne Kopf (`v1285`) | `43 c3 81 01` | mitten in einem Cluster — **keine Datei** |
+
+Genau das ging an OpenAI, und genau das antwortete OpenAI: *„Audio file might
+be corrupted or unsupported"*. Der Kopf war 7.890 von 51.439 Bytes — 15 %,
+ohne die der Rest wertlos ist.
+
+> Der Riegel aus `v1285` war richtig gedacht und an genau einer Stelle falsch:
+> **der Kopf ist kein Ballast, er ist die Datei.**
+
+#### 2. `_fsHoeren()` leerte den Puffer mitten im Strom
+
+**14 Stellen** im Code rufen `_fsHoeren()` auf. Jede setzte `chunks = []` und
+startete den Recorder, falls er inaktiv war. Kamen zwei Aufrufe kurz
+hintereinander — nach einer Rückfrage, nach einem Abruf, nach einer
+beantworteten Zwischenfrage —, wurde der Puffer geleert, **während** der
+Recorder lief. Der Header war weg, obwohl der Ring gar nicht gegriffen hatte.
+Zweiter Weg in denselben Fehler.
+
+`_fsHoeren()` ist jetzt idempotent; nur `_fsHoeren(true)` beginnt einen neuen
+Abschnitt.
+
+#### 3. 1,1 Sekunden sind keine Denkpause
+
+`v1286` hatte die Stillepause von 1,4 auf 1,1 s gesenkt, um Zeit zu sparen.
+*„Oh, das Objekt steht in… ähm…"* ging damit weg, bevor der Satz zu Ende war —
+im Bild steht der abgeschnittene Satz. **Jetzt 1,6 s.** Die 0,5 Sekunden, die
+`v1286` gespart hat, kosteten einen halben Satz; das ist der schlechteste
+Tausch von allen.
+
+#### Die neue Mechanik
+
+**Der Recorder läuft durch.** Einmal gestartet, bis der Dialog endet — kein
+stop/start-Zyklus mehr, denn jeder davon ist eine Gelegenheit, den Header zu
+verlieren. Geschnitten wird mit `requestData()`, nicht mit `stop()`. Der Blob
+ist `[kopf].concat(chunks)` — immer eine vollständige Datei.
+
+**Damit kommt der Nachschlag geschenkt.** Weil das Mikrofon nach dem Absenden
+weiterläuft, kann man einfach weiterreden. Genau Marcels Wunsch: *„notfalls
+auch, dass man es einfach nochmal sagen kann, sodass er da direkt mithört."*
+`_rfWeiterGleich()` hält die nächste Frage zurück, solange jemand spricht oder
+eine Auswertung unterwegs ist.
+
+**Ein offen endender Satz wird gemerkt statt ausgewertet.** Endet das
+Transkript auf „… steht in", „… und", „… bei", „… beträgt", sagt der Co-Pilot
+*„Ich höre weiter zu — sag den Rest"* und hängt den nächsten Abschnitt an.
+Zwei Hälften ergeben einen Satz. **Zwölf Proben gemessen, alle richtig** —
+einschließlich der Gegenproben („Hermannstraße 9 in 32609 Hüllhorst" endet
+nicht offen, obwohl „in" darin vorkommt).
+
+**Wurde nur ein Teil eines Blocks verstanden**, wird gezielt nach dem Rest
+gefragt statt weiterzuspringen — *„Das habe ich. Fehlt noch: Hausnummer."*
+
+**Und die rohe API-Antwort landet nicht mehr im Chat.** Im Bild stand wörtlich
+`{ "error": { "message": "Audio file might be corrupted…", "type":
+"invalid_request_error", "param": "file", "code": "invalid_value" } }`. Das ist
+ein Protokolleintrag, keine Auskunft — der Nutzer erfährt daraus nicht, was er
+tun soll. Jetzt: *„Die Aufnahme kam nicht sauber an — sag es einfach nochmal,
+ich höre schon zu."* Die Einzelheiten bleiben in der Konsole.
+
+### `v1290` · Die Übersichtsspalte, neu
+
+Zwei Ursachen für „unübersichtlich", beide gemessen.
+
+**Ein Kaskaden-Konflikt, den nur der Walker zeigt.** `.vi-rf-st` stand
+**zweimal** im selben Stylesheet:
+
+```
+.vi-rf-st { display: block; padding: 6px 0 }     (v1286)
+.vi-rf-st { display: flex;  gap: 7px; ... }      (älter, später notiert)
+```
+
+Bei gleicher Spezifität gewinnt die spätere — also `flex`. Damit standen
+Blockname und Werte **nebeneinander** statt untereinander, die Werte in eine
+64 px schmale Spalte gequetscht, während rechts 250 px leer blieben. Genau das
+Bild. Die `v1286`-Regel „die Werte fluchten" war seit ihrer Einführung
+wirkungslos. `matches()` hätte beide Regeln gefunden und nichts darüber gesagt,
+welche gewinnt.
+
+**Nur 11 von 16 Zeilen waren sichtbar** (Spalte 410 px, Inhalt 644 px).
+
+**Jetzt:** eine Zeile je Block, **gruppiert nach Etappe**, mit Fortschritt je
+Etappe (`1 BASIS 4/4`), Werte kompakt in derselben Zeile, Klick klappt die
+Einzelwerte auf. Höhe nicht mehr fest, sondern was übrig bleibt.
+
+### `v1290b` · Der Dialog scrollte
+
+Gemessen: Bühne 560 + Band 24 + Kopfzeile 33 + Mikro 59 + Eingabe 43 + Knöpfe
+33 = **752 px in einem Body von 699**. Man musste scrollen, um das Mikrofon zu
+sehen — bei einem Dialog, dessen ganzer Sinn das Mikrofon ist.
+
+Jetzt bestimmt der Platz die Höhe des Verlaufs: alles außer der Bühne ist
+`flex:0 0 auto`, die Bühne nimmt den Rest. `min-height:0` ist dabei Pflicht
+(FALLEN.md). Das Flex-Layout hängt an einer eigenen Klasse `vi-dialog`, die nur
+während des Dialogs am Overlay sitzt — ohne sie würde dieselbe Regel die
+Übernahme-Tabelle am Scrollen hindern.
+
+### `v1290c` · Der Dialog war für DUNKEL gebaut und läuft auf WEISS
+
+**Der eigentliche Grund für „muss deutlich professioneller sein".** Im Browser
+gemessen:
+
+| | Wert | auf weißem Grund |
+|---|---|---|
+| `.oabi-body` | `rgb(255,255,255)` | — |
+| Spalte, Fläche | `rgba(255,255,255,.03)` | **unsichtbar** |
+| Spalte, Rand | `rgba(255,255,255,.09)` | **unsichtbar** |
+| Etappenlinie | `rgba(255,255,255,.13)` | **unsichtbar** |
+| Co-Blase | `rgba(255,255,255,.055)` | **unsichtbar** |
+| Eingabefeld | `rgba(0,0,0,.25)` bei `color:#2A2727` | **dunkel auf dunkel** |
+
+Der Boarding-Skin setzt den Body auf `#fff`. Der Sprechlauf-Dialog wurde aber
+von `v1276` an mit weißen Transparenzen gebaut — also für dunklen Grund. Auf
+Weiß ist **alles davon weg**: jede Trennlinie, jede Fläche, jeder Rahmen. Übrig
+blieben graue Texte im Nichts.
+
+> `CLAUDE.md` sagt es wörtlich: *„Token-Überschreibungen reichen nicht —
+> farbtragende Flächen müssen einzeln benannt werden."* Also einzeln: **19
+> Flächen und Ränder** auf schwarzbasierte Transparenzen, die Spalte auf Creme
+> `#FBF8F2`, die Score-Karte auf die Markenkarte `#FBF6E9`, das Eingabefeld auf
+> Weiß. Dazu die Kontraste: auf Weiß trägt grauer Text weniger als auf Schwarz
+> (Spaltenzeilen .5 → .62, Etappengruppen .55 → .68, Band .4 → .52). Und die
+> Stufe SOLIDE bekommt das dunkle Gold `#b8932f` statt des hellen `#C9A84C`.
+
+Gold-Audit danach: **RC=0, genau auf der Basislinie.**
+
+### `v1290` · Die Stufen holen sich zu ihrer Zeit
+
+Marcels Frage: *„funktionieren die Abrufe, je nach Plan die
+Marktpreisindikation oder die erweiterte? Je nachdem wie es abgestuft ist,
+müssen bis dahin ja die richtigen Fragen gestellt worden sein."*
+
+**Im Container gemessen, nicht im Repo gelesen** — der Repo-Stand führte auf
+eine falsche Fährte: dort steht `fast` scheinbar **neben** `overrides`, der
+laufende Code schickt es **darin**, und der Microservice reicht `overrides`
+durch. Beinahe hätte ich einen falschen Befund gemeldet.
+
+| Stufe | Aufruf | Ergebnis |
+|---|---|---|
+| 1 | `fast: true` | `ai_mode=schnell`, 850 ms. Nur Marktwert und Miete samt Spanne. |
+| 2 | `wert_stufe: 2` | Voller Bericht: KI-Text, Preishistorie, amtliche Makrolage. |
+
+**Die Stufen funktionieren.** Marcels Schluss stimmt trotzdem: der volle
+Bericht liest deutlich mehr aus dem Objekt, und das entsteht im Sprechlauf
+erst später.
+
+| Feld im Bericht | im Sprechlauf ab |
+|---|---|
+| `address`, `property_type`, `living_area`, `rooms`, `build_year` | Etappe 1 |
+| `purchase_price`, `monthly_net_rent` | Etappe 1 |
+| **`condition`** (`ds2_zustand`) | **Etappe 3** — sonst still `'gepflegt'` |
+| **`energy_class`** (`ds2_energie`) | **Etappe 3** |
+| **`land_value_manual`** (`brw`) | **Etappe 3** |
+| `mikrolage`, `makrolage`, `ds2_*` (assessment) | Etappe 3 + 4 |
+
+**Deshalb startet jede Stufe dort, wo ihre Angaben stehen:** Stufe 1 am Ende
+von Etappe 1, **Stufe 2 am Ende von Etappe 4**. Das Angebot sagt das
+ausdrücklich („Jetzt" / „Später"). Wer Stufe 1 gezogen hat, wird am Ende von
+Etappe 4 noch einmal gefragt — die Vertiefung kostet nur die Differenz
+(`v1154`). Und bei Stufe 2 wird der **Fließtext auch gezeigt**, sonst ist er
+bezahlte Unsichtbarkeit.
+
+### Ein Fehler, den ich beim Messen übersehen hatte
+
+**Wer den Markt-Knopf klickte statt „ja" zu sagen, blieb ohne nächste Frage
+stehen.** Nur der Sprachweg rief `_rfNachAngebot()`. Mir entgangen, weil ich
+die Zusage beim Prüfen **immer getippt** habe — und der getippte Weg läuft
+durch dieselbe Erkennung wie der gesprochene, der geklickte nicht.
+
+> **Die Lehre:** wenn es zwei Bedienwege gibt, muss die Prüfung beide gehen.
+> Ein Weg, der im Test nie benutzt wird, ist ein Weg, der nicht geprüft ist.
+
+### `v1290d` · Der Sprechlauf fiel an seiner eigenen Schutzschranke aus
+
+Beim Testen kam mitten im Gespräch:
+
+> „Zu viele PDF-Extraktionen — bitte 1h warten"
+
+Zwei Fehler auf einmal. **Die Zahl passt nicht zum Weg:** der Limiter stammt
+aus der Zeit des PDF-Exposé-Imports — 30 Auswertungen je Stunde, *„mehr als
+jeder legitime Workflow braucht"*. Für ein Dokument stimmt das. Der geführte
+Sprechlauf stellt aber **16 Fragen**, und jede Antwort ist ein Aufruf — dazu
+Nachhaken, Zwischenfragen, ein zweiter Anlauf. **Nach einem Durchlauf ist die
+Hälfte weg, nach zweien ist der Nutzer gesperrt.** Und **der Text nennt PDFs,
+während jemand spricht.**
+
+Getrennte Zähler, nicht ein größerer: `dialogLimiter` 150/h für
+`extract-text` / `extract-voice` / `copilot-frage`, `extractLimiter` 30/h
+unverändert für Exposé, Marktdaten, Belege. Wer viele Exposés einliest, soll
+nicht den Sprechlauf blockieren, und umgekehrt. Eine gesprochene Antwort kostet
+gemessen unter 0,1 Cent — 150 Aufrufe bleiben unter 20 Cent je Nutzer und
+Stunde.
+
+### Abnahme
+
+- **Layout:** alle 16 Blöcke im Bild, kein Scrollen im Body, Mikrofon und
+  Eingabe sichtbar. Kopf sagt „CO-PILOT · GEFÜHRTE AUFNAHME / Objekt
+  aufnehmen", Kopfzeile „Etappe 3 von 5 · Lage & Zustand".
+- **Freisprechen:** Recorder läuft durch (`recording`), Kopf bleibt auch
+  nachdem der Ring gegriffen hat (80 Chunks = Obergrenze), Kopf + Cluster
+  ergibt `1a 45 df a3`.
+- **Klick-Weg** des Markt-Angebots führt weiter.
+- **Stufen:** Angebot mit „Jetzt"/„Später" und Kontingentzahl; Stufe 1 lief,
+  Marktwert 169.000 €.
+- Formular vor und nach dem Lauf leer.
+
+**Commits** `8222612`, `e02464e`, `8f90890`, `b51a7b2`, `f6b5f84`. Auf Staging,
+**nicht auf Prod**. Backend geändert → Rebuild gelaufen und im Container
+gegengeprüft.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

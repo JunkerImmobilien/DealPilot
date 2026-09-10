@@ -1608,3 +1608,108 @@ Ausgeschlossen wird über die **Karte**, nicht über einzelne Feld-ids: die Kart
 ist die Einheit, die der Nutzer sieht, und eine neue Zeile darin fällt damit
 automatisch mit heraus. Eine id-Liste hätte beim nächsten neuen Gutachterfeld
 schweigend versagt.
+
+---
+
+## Ein Ringpuffer, der den Container-Header wegwirft
+
+`MediaRecorder.start(500)` liefert Zeitscheiben. **Das erste Stück ist der
+Container-Header** (bei WebM: EBML, Segment-Info, Track-Definition). Alle
+weiteren sind Cluster — reine Fortsetzungen, die für sich genommen keine
+Datei ergeben.
+
+Ein Ringpuffer, der die Größe mit `chunks.slice(-max)` in Schranken hält,
+schneidet die **ältesten** Stücke ab. Nach `FS_RING_MS` ist das genau der
+Header. Was danach zusammengesetzt wird, ist ein Haufen Cluster ohne
+Container — und OpenAI antwortet, korrekt:
+
+> „Audio file might be corrupted or unsupported"
+
+**Im Browser nachgemessen, erste vier Bytes:**
+
+| | | |
+|---|---|---|
+| mit Kopf | `1a 45 df a3` | EBML-Magic, gültige Datei |
+| ohne Kopf | `43 c3 81 01` | mitten in einem Cluster, keine Datei |
+
+Der Header war 7.890 von 51.439 Bytes — 15 %, ohne die der Rest wertlos ist.
+
+**Die Regel:** wer einen Strom aus Zeitscheiben begrenzt, hebt Stück 0
+getrennt auf und setzt es jedem Ausschnitt voran. Der Ring gilt für die
+Cluster, nie für den Kopf. Und ein Ausschnitt aus der Mitte ergibt damit
+eine Datei, die bei Sekunde X beginnt — das kann ein Decoder, ein
+Fragment ohne Header nicht.
+
+**Zweiter Weg in denselben Fehler:** eine Funktion, die den Puffer leert
+(`chunks = []`), darf nicht laufen, während der Recorder aufnimmt. Bei 14
+Aufrufstellen passiert das, sobald zwei kurz hintereinander kommen. Solche
+Funktionen gehören idempotent gebaut — „lausche, falls du nicht schon
+lauschst" — mit einem ausdrücklichen Argument für „fang wirklich neu an".
+
+---
+
+## Ein Dialog, der für Dunkel gebaut ist und auf Weiß läuft
+
+Der Sprechlauf-Dialog wurde von Anfang an mit weißen Transparenzen gebaut:
+`rgba(255,255,255,.09)` für Ränder, `rgba(255,255,255,.03)` für Flächen,
+`rgba(0,0,0,.25)` für Eingabefelder. Auf dunklem Grund ergibt das eine
+saubere, ruhige Struktur.
+
+Der Boarding-Skin (`modal-boarding-skin.js`) setzt den Body aber auf
+`#fff`. Damit ist **jede einzelne dieser Flächen weg**: unsichtbare
+Ränder, unsichtbare Trennlinien, unsichtbare Blasen — und ein Eingabefeld
+mit dunklem Grund und dunklem Text.
+
+**Der Eindruck beim Nutzer ist nicht „falsche Farben", sondern
+„unübersichtlich" und „unfertig".** Genau so kam die Rückmeldung. Kein
+einzelnes Element sah kaputt aus; es fehlte nur alles, was Struktur gibt.
+
+**Die Regel:** vor jeder Gestaltung in einem fremden Rahmen den
+tatsächlichen Untergrund **messen** — `getComputedStyle(host).background`
+—, nicht aus dem eigenen CSS erschließen. Und `CLAUDE.md` gilt hier
+doppelt: farbtragende Flächen einzeln benennen, denn ein Token, das der
+Rahmen setzt, hilft der Transparenz nicht, die darauf liegt.
+
+Nebenbefund: auf Weiß trägt grauer Text weniger als auf Schwarz. Dieselbe
+`opacity` ergibt zwei verschiedene Lesbarkeiten.
+
+---
+
+## Wer zwei Bedienwege baut, muss beide prüfen
+
+Das Angebot für die Marktpreisindikation hatte zwei Wege: „ja" sagen oder
+tippen — und den Knopf klicken. Beim Prüfen habe ich die Zusage **immer
+getippt**, weil das im automatisierten Browser der einfachere Weg ist.
+
+Der getippte Weg läuft durch dieselbe Erkennung wie der gesprochene und
+setzte den Dialog fort. **Der geklickte tat es nicht** — sein Handler rief
+die Fortsetzung nicht auf. Wer klickte, blieb ohne nächste Frage stehen:
+also genau der Weg, den ein echter Nutzer zuerst nimmt.
+
+**Die Regel:** ein Bedienweg, der im Test nie benutzt wird, ist nicht
+geprüft. Bei zwei Wegen zum selben Ziel beide gehen — und beim Prüfen
+bewusst den wählen, der im Test unbequemer ist.
+
+---
+
+## Eine Schutzschranke, die den Hauptweg blockiert
+
+`/ai/*` war mit **30 Auswertungen je Stunde und Nutzer** gedeckelt.
+Begründet und richtig: der Schutz stammt aus der Zeit des
+PDF-Exposé-Imports, wo niemand mehr als eine Handvoll Dokumente einliest.
+
+Dann kam der geführte Sprechlauf: **16 Fragen, jede Antwort ein Aufruf** —
+dazu Nachhaken, Zwischenfragen, ein zweiter Anlauf, wenn etwas nicht
+verstanden wurde. Nach **einem** Durchlauf war die Hälfte weg, nach zwei
+Durchläufen war der Nutzer gesperrt. Der Hauptweg der Objektaufnahme fiel
+an seiner eigenen Schutzschranke aus.
+
+Und die Meldung lautete „Zu viele **PDF**-Extraktionen", während jemand
+sprach — sie schickte den Nutzer auf die Suche nach einem Dokument, das er
+gar nicht hochgeladen hatte.
+
+**Die Regel:** ein Limit ist an einen Vorgang gebunden, nicht an einen
+Endpunkt. Kommt ein neuer Vorgang mit anderer Aufruf-Häufigkeit dazu,
+bekommt er einen **eigenen Zähler** — nicht einen größeren gemeinsamen.
+Sonst blockiert der eine Vorgang den anderen. Und die Meldung nennt den
+Vorgang, den der Nutzer gerade macht.
