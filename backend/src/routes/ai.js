@@ -559,17 +559,23 @@ router.post('/copilot-frage', authenticate, extractLimiter, async (req, res, nex
     }
     const zeilen = [];
     if (kontext && typeof kontext === 'object') {
-      Object.keys(kontext).slice(0, 40).forEach(function (k) {
+      /* v1288b: 80 statt 40 Zeilen und 200 statt 60 Zeichen je Wert.
+         Der Sprechlauf schickt seit v1288b KLARTEXT-Bezeichnungen samt
+         der abgeleiteten Groessen (Score, Cashflow, DSCR, Marktwert) —
+         das sind mehr und laengere Zeilen als die 16 Feld-ids von v1280.
+         Bei 40 waere ausgerechnet das Ende abgeschnitten worden, und dort
+         stehen die Kennzahlen, nach denen gefragt wird. */
+      Object.keys(kontext).slice(0, 80).forEach(function (k) {
         const v = kontext[k];
         if (v === '' || v === null || v === undefined) return;
-        zeilen.push('  ' + k + ' = ' + String(v).slice(0, 60));
+        zeilen.push('  ' + k + ' = ' + String(v).slice(0, 200));
       });
     }
     const prompt = [
       'Du bist der Co-Pilot einer deutschen Immobilien-Investitionssoftware.',
       'Der Nutzer nimmt gerade ein Objekt auf und stellt zwischendurch eine Frage.',
       '',
-      zeilen.length ? 'BEKANNTER STAND DIESES OBJEKTS (Feld-id = Wert):' : 'Zu diesem Objekt ist noch nichts bekannt.',
+      zeilen.length ? 'BEKANNTER STAND DIESES OBJEKTS (Bezeichnung = Wert):' : 'Zu diesem Objekt ist noch nichts bekannt.',
       zeilen.join('\n'),
       '',
       'REGELN:',
@@ -580,11 +586,36 @@ router.post('/copilot-frage', authenticate, extractLimiter, async (req, res, nex
       '3. Was nicht im bekannten Stand steht, ERFINDE NICHT. Sag stattdessen,',
       '   welche Angabe dir fehlt. Lieber eine Luecke benennen als eine Zahl,',
       '   die niemand belegen kann.',
+      /* v1288b: Die Umkehrung derselben Regel. Gemessen am 10.09.2026:
+         auf "Warum ist der Cashflow so negativ?" antwortete das Modell
+         "fuer eine saubere Erklaerung fehlt mir noch der Zinssatz, die
+         Tilgung" — beide standen im Kontext, damals aber als `d1z` und
+         `d1t`. Der Kontext traegt jetzt Klartext; damit ist eine gemeldete
+         Luecke, die keine ist, kein Verstaendnisproblem mehr, sondern ein
+         Fehler. */
+      '3b. UMGEKEHRT GILT DASSELBE: was oben steht, IST bekannt. Behaupte',
+      '   nie, dir fehle eine Angabe, die in der Liste steht — lies sie',
+      '   dort nach und rechne damit. Der Stand enthaelt neben den',
+      '   Eingaben auch bereits berechnete Kennzahlen (Cashflow, DSCR,',
+      '   LTV, Renditen, Deal Score); nutze sie, statt sie neu zu schaetzen.',
       '4. Keine Anlageberatung und keine Kaufempfehlung. Einordnen ja,',
       '   entscheiden nein - das bleibt beim Nutzer.',
       '5. Fragt der Nutzer nach einem Fachbegriff (DSCR, IRR, AfA, Sonder-AfA,',
       '   Liegenschaftszins), erklaere ihn in einem Satz und rechne ihn, wenn',
       '   die noetigen Werte bekannt sind.',
+      /* v1288b: Die Score-Stufen sind in der Haupt-App eine feste Kette
+         (CLAUDE.md, js/dashboard.js:390). Ein Modell, das denselben Score
+         mit einem anderen Wort belegt, erzeugt genau den Widerspruch, der
+         in v1203 im Marktbericht aufgefallen ist. */
+      '6. Score-Stufen, falls du einen Score einordnest: ab 85 Top, ab 70',
+      '   Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch. Benutze',
+      '   genau diese Woerter.',
+      /* v1288b: Steht bei einem Wert eine Quelle, gehoert sie zur Auskunft.
+         Ein amtlicher Bodenrichtwert und eine Schaetzung sind nicht
+         dasselbe, und der Unterschied ist im Zweifel die ganze Antwort. */
+      '7. Steht hinter einem Wert "[Quelle: ...]", stammt er nicht vom',
+      '   Nutzer, sondern aus einem Abruf oder seinen Einstellungen. Sag',
+      '   das dazu, wenn du dich auf so einen Wert stuetzt.',
       '',
       'FRAGE DES NUTZERS:',
       '"""',

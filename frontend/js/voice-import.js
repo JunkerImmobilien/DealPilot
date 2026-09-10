@@ -2175,8 +2175,8 @@
     if (nkm == null || nkm <= 0) return null;
     var ul = _profilZahl('bwk_ul_pct_default'), nul = _profilZahl('bwk_anteil_default');
     var w = {}, teile = [];
-    if (ul != null)  { w.hg_ul  = String(Math.round(nkm * 12 * ul / 100));  teile.push(_euroKurz(_rfNum(w.hg_ul)) + ' umlagefaehig'); }
-    if (nul != null) { w.hg_nul = String(Math.round(nkm * 12 * nul / 100)); teile.push(_euroKurz(_rfNum(w.hg_nul)) + ' nicht umlagefaehig'); }
+    if (ul != null)  { w.hg_ul  = String(Math.round(nkm * 12 * ul / 100));  teile.push(_euroKurz(_rfNum(w.hg_ul)) + ' umlagefähig'); }
+    if (nul != null) { w.hg_nul = String(Math.round(nkm * 12 * nul / 100)); teile.push(_euroKurz(_rfNum(w.hg_nul)) + ' nicht umlagefähig'); }
     if (!teile.length) return null;
     return { werte: w, text: teile.join(' · ') + ' pro Jahr (' + (ul || 0) + ' / ' + (nul || 0) + ' % der Kaltmiete)' };
   }
@@ -2208,11 +2208,32 @@
 
   /* Mini-Katalog: nur die gefragten Felder. Das ist der halbe
      Kostenvorteil - der volle Katalog traegt ueber 6000 Token. */
-  /* v1280 · Was der Co-Pilot ueber dieses Objekt schon weiss.
-     Geht als Kontext an die Auswertung - erst damit wird aus „10 Prozent
-     vom Kaufpreis" eine Zahl. Quelle ist beides: was im Gespraech schon
-     gefallen ist UND was im Formular steht. Nur gefuellte Felder, und nur
-     die, die als Bezugsgroesse taugen. */
+  /* ═══ v1288b · Der Co-Pilot bekommt seinen Kontext in KLARTEXT ════════
+     Gemessen am 10.09.2026: auf die Frage „Warum ist der Cashflow so
+     negativ?" antwortete er unter anderem „fuer eine saubere Erklaerung
+     fehlt mir aber noch der Zinssatz, die Tilgung" — beides stand seit
+     zwei Fragen im Gespraech (4,09 % und 1 %).
+
+     Die Werte WAREN im Kontext, aber als `d1z = 4,09` und `d1t = 1`.
+     Das sind unsere internen Feldnamen, keine Sprache. Ein Modell, das
+     „d1z" nicht als Zinssatz erkennt, haelt den Zinssatz fuer unbekannt —
+     und benennt die Luecke dann korrekt, nur eben faelschlich.
+
+     ZWEI KONTEXTE, ZWEI ZWECKE, und der Unterschied ist wichtig:
+
+       `_rfKontext()`      geht an /ai/extract-text. Dort MUESSEN es die
+                           Feld-ids sein: der Prompt rechnet mit ihnen
+                           („10 Prozent vom Kaufpreis" bei kp=200000).
+                           Bleibt unveraendert.
+       `_rfKontextKlar()`  geht an /ai/copilot-frage. Dort spricht jemand
+                           mit einem Menschen. Bezeichnung statt id, dazu
+                           die abgeleiteten Groessen, die im Formular gar
+                           nicht stehen: Score, Cashflow, Rendite, DSCR,
+                           Marktwert — genau die Zahlen, nach denen
+                           gefragt wird.
+
+     Erfunden wird dabei nichts: alles kommt aus derselben Rechnung, die
+     auch die Score-Karte zeigt. Was sich nicht rechnen laesst, fehlt. */
   var KONTEXT_IDS = ['kp', 'nkm', 'wfl', 'zimmer', 'baujahr', 'ze', 'hg_ul', 'ek',
                      'd1', 'd1z', 'd1t', 'gsfl', 'brw', 'plz', 'ort', 'str'];
   function _rfKontext() {
@@ -2226,6 +2247,77 @@
         }
         if (v !== '' && v !== null && v !== undefined) k[id] = v;
       });
+    } catch (e) {}
+    return Object.keys(k).length ? k : null;
+  }
+
+  /* Alles, was gerade bekannt ist — mit Namen, die ein Mensch versteht. */
+  var KLAR_NAME = {
+    plz: 'Postleitzahl', ort: 'Ort', str: 'Straße', hnr: 'Hausnummer',
+    objart: 'Objektart', wfl: 'Wohnfläche (m²)', zimmer: 'Zimmer', baujahr: 'Baujahr',
+    kp: 'Kaufpreis (€)', nkm: 'Nettokaltmiete (€/Monat)', ze: 'Zusatzeinnahmen (€/Monat)',
+    ek: 'Eigenkapital (€)', d1z: 'Sollzins (% p.a.)', d1t: 'Anfangstilgung (% p.a.)',
+    d1_bindj: 'Zinsbindung (Jahre)',
+    makler_p: 'Maklerprovision (%)', notar_p: 'Notarkosten (%)',
+    gba_p: 'Grundbuchamt (%)', gest_p: 'Grunderwerbsteuer (%)', ji_p: 'Sonstige Kaufnebenkosten (%)',
+    hg_ul: 'Hausgeld umlagefähig (€/Jahr)', hg_nul: 'Hausgeld nicht umlagefähig (€/Jahr)',
+    brw: 'Bodenrichtwert (€/m²)', gsfl: 'Grundstücksfläche (m²)', mea: 'Miteigentumsanteil',
+    san: 'Sanierungskosten (€)', moebl: 'Möblierung (€)',
+    makrolage: 'Makrolage', mikrolage: 'Mikrolage', ds2_zustand: 'Zustand',
+    ds2_energie: 'Energieklasse', ds2_marktmiete: 'Marktmiete (€/m²)',
+    ds2_bevoelkerung: 'Bevölkerungsentwicklung', ds2_nachfrage: 'Nachfrage',
+    ds2_wertsteigerung: 'Wertsteigerungserwartung', ds2_entwicklung: 'Entwicklungsmöglichkeiten',
+    mietstg: 'Mietsteigerung (% p.a.)', wertstg: 'Wertsteigerung (% p.a.)',
+    leerstand: 'Leerstand (%)', afa_satz: 'AfA-Satz (%)', geb_ant: 'Gebäudeanteil (%)',
+    grenz: 'Grenzsteuersatz (%)', svwert: 'Marktwert / Verkehrswert (€)',
+    kaufdat: 'Kaufdatum', wirtschaftlicher_uebergang: 'Wirtschaftlicher Übergang',
+    thesis: 'Investitionsthese', risiken: 'Bekannte Risiken', notizen: 'Notizen'
+  };
+
+  function _rfKontextKlar() {
+    var k = {};
+    try {
+      var f = (_rf && _rf.data && _rf.data.fields) || {};
+      Object.keys(f).forEach(function (id) {
+        var v = f[id];
+        if (v === '' || v === null || v === undefined) return;
+        var name = KLAR_NAME[id];
+        if (!name) {
+          var kat = (_rf.catalog || []).filter(function (c) { return c.id === id; })[0];
+          name = kat ? String(kat.label) : id;
+        }
+        var q = (_rf.quelle || {})[id];
+        k[name] = String(v) + (q ? '  [Quelle: ' + q + ']' : '');
+      });
+      /* Die abgeleiteten Groessen — sie stehen in keinem Feld, aber genau
+         nach ihnen wird gefragt. Dieselbe Rechnung wie auf der Karte. */
+      var Z = null;
+      try { Z = _rfKennzahlen(); } catch (e) {}
+      if (Z && Z.K) {
+        var K = Z.K;
+        k['Gesamtinvestition (€)']       = Math.round(Z.gi);
+        k['Kaufnebenkosten (€)']         = Math.round(Z.nkEur) + ' (' + _pz(Z.nk.pct) + ' %, ' + Z.nk.quelle + ')';
+        k['Darlehen (€)']                = Math.round(Z.d1) + ' (angenommen: Gesamtinvestition minus Eigenkapital)';
+        if (K.cf_m   != null) k['Cashflow vor Steuer (€/Monat)'] = Math.round(K.cf_m);
+        if (K.cf_ns_m!= null) k['Cashflow nach Steuer (€/Monat)'] = Math.round(K.cf_ns_m);
+        if (K.bmy    != null) k['Bruttomietrendite (%)'] = Math.round(K.bmy * 100) / 100;
+        if (K.nmy    != null) k['Nettomietrendite (%)']  = Math.round(K.nmy * 100) / 100;
+        if (K.fak    != null) k['Kaufpreisfaktor']       = Math.round(K.fak * 10) / 10;
+        if (K.ltv    != null) k['LTV (%)']               = Math.round(K.ltv * 10) / 10;
+        if (K.dscr   != null) k['DSCR']                  = Math.round(K.dscr * 100) / 100;
+        if (K.rate_j != null) k['Kapitaldienst (€/Jahr)'] = Math.round(K.rate_j);
+        if (K.bwk    != null) k['Bewirtschaftungskosten (€/Jahr)'] = Math.round(K.bwk);
+      }
+      try {
+        var s1 = _rfScore1();
+        if (s1) k['Deal Score (0-100)'] = s1.S.score + ' — ' + _stufe(s1.S.score).kamel;
+        var s2 = _rfScore2();
+        if (s2) k['Investor Deal Score 2.0 (0-100)'] = Math.round(s2.R.score) + ' — ' + _stufe(s2.R.score).kamel;
+      } catch (e) {}
+      if (_rf && _rf.markt && _rf.markt.mw != null) {
+        k['Marktpreisindikation Marktwert (€)'] = Math.round(_rf.markt.mw);
+        if (_rf.markt.sqm) k['Marktpreisindikation (€/m²)'] = Math.round(_rf.markt.sqm);
+      }
     } catch (e) {}
     return Object.keys(k).length ? k : null;
   }
@@ -2280,6 +2372,12 @@
       '.vi-rf-st-w b{font:600 11.5px/1.5 "JetBrains Mono",ui-monospace,monospace;color:#3FA56C;',
       '  text-align:right;white-space:nowrap}',
       '.vi-rf-st.weg{opacity:.4} .vi-rf-st.weg .z{color:#B8625C}',
+      /* v1288b: „vorbelegt" ist ein eigener Zustand — sichtbar, aber nicht
+         gruen. Gruen heisst beantwortet, und beantwortet hat das niemand. */
+      '.vi-rf-st.vor{opacity:.72} .vi-rf-st.vor .z{color:#7A7370}',
+      '.vi-rf-st-vor{margin-left:auto;font:600 8.5px/1 "JetBrains Mono",ui-monospace,monospace;',
+      '  letter-spacing:.1em;text-transform:uppercase;opacity:.45;white-space:nowrap}',
+      '.vi-rf-st-w b.vorbelegt{color:#8A837F;font-weight:400}',
       '.vi-rf-buehne{display:grid;grid-template-columns:1fr 330px;gap:16px;align-items:start}',
       '@media(max-width:720px){.vi-rf-buehne{grid-template-columns:1fr}',
       '  .vi-rf-stand{order:-1;max-height:132px}}',
@@ -2526,6 +2624,56 @@
      0,1 Cent gekostet hat, kostet jetzt nichts und dauert nichts. */
   var RF_NEIN = /^(nein|nee|ne|nichts|kein[es]?|keine[rs]?|gibt('s| es)? (hier )?(nicht|keine)|haben wir (nicht|keine)|hab(e)? ich (nicht|keine)|brauchen wir (nicht|keine)|kommt nicht in frage|entf(ä|ae)llt|weiter|(ü|ue)berspringen|(ü|ue)berspring|weiss nicht|wei(ß|ss) ich nicht|keine ahnung|passt so|passt|unbekannt|k\.?a\.?)\b[\s.!]*$/i;
 
+  /* ═══ v1288b · Eine Verneinung darf auch ein SATZ sein ═════════════════
+     Gemessen am 10.09.2026 im Sprechlauf. Auf „Muss etwas saniert werden,
+     und wird etwas mitverkauft?" die Antwort:
+
+       „Nichts zu sanieren, nichts wird mitverkauft"
+
+     Ergebnis: ein KI-Aufruf, zwei Sekunden, und „Daraus konnte ich nichts
+     entnehmen." Zwei Verneinungen auf eine Doppelfrage — die natuerlichste
+     Antwort, die es auf diese Frage gibt.
+
+     `RF_NEIN` verlangt, dass die Verneinung den GANZEN Text ausmacht. Das
+     ist die richtige Vorsicht (v1283): „nichts unter 300.000" darf nicht
+     als Verneinung durchgehen, sonst geht eine Angabe verloren. Aber der
+     Satz oben besteht aus ZWEI Teilen, und jeder einzelne ist eine
+     Verneinung.
+
+     Also: an Komma, „und", „auch" und Punkt trennen, und nur dann
+     verneinen, wenn JEDER Teil fuer sich eine Verneinung ist. Ein einziger
+     Teil mit Inhalt — „nichts zu sanieren, Kueche bleibt drin" — und der
+     ganze Satz geht wie bisher an die Auswertung.
+
+     Die Ergaenzungen im Muster sind genau die Wendungen, die auf eine
+     Doppelfrage passen: „nichts zu sanieren", „nichts wird mitverkauft",
+     „nichts davon", „ist nichts", „alles in Ordnung", „alles gut". */
+  var RF_NEIN_TEIL = new RegExp(
+    '^(ist |war |wird |wurde |sind |es |da |dazu |davon |hier )*' +
+    '(nichts|keine[rsn]?|kein|nein|nee|ne)' +
+    '( (zu|weiter|davon|dabei|dazu|drin|dran|mit)?[a-zäöüß]*)*' +
+    '( (zu )?(sanieren|machen|tun|erneuern|renovieren))?' +
+    '( (wird|werden|ist|sind|war|waren)?( (mit)?(verkauft|uebernommen|übernommen|geplant|noetig|nötig|vorhanden|bekannt))?)*' +
+    '[\\s.!]*$', 'i');
+  var RF_ALLES_GUT = /^(alles (in ordnung|gut|ok|okay|klar|frisch|neu|saniert))[\s.!]*$/i;
+
+  function _rfIstVerneinung(text) {
+    var t = String(text || '').trim();
+    if (!t) return false;
+    if (RF_NEIN.test(t)) return true;
+    /* Nur kurze Antworten: ein langer Satz mit einer Verneinung darin ist
+       fast immer eine Angabe mit Einschraenkung, keine Absage. */
+    if (t.split(/\s+/).length > 12) return false;
+    var teile = t.split(/\s*(?:,|;|\bund\b|\bauch\b|\.|\/)\s*/i)
+                 .map(function (s) { return s.trim(); })
+                 .filter(function (s) { return s.length > 0; });
+    if (teile.length < 2) return false;
+    for (var i = 0; i < teile.length; i++) {
+      if (!RF_NEIN.test(teile[i]) && !RF_NEIN_TEIL.test(teile[i]) && !RF_ALLES_GUT.test(teile[i])) return false;
+    }
+    return true;
+  }
+
   /* ═══ v1286 · Ein Satz, zwei Anliegen ══════════════════════════════════
      Marcels Bild (design/mockups/sprechlauf.png). Er sagt:
 
@@ -2560,10 +2708,26 @@
 
   /* Profil eintragen, ohne die Frage abzuschliessen - der Satz kann noch
      mehr enthalten. Gibt zurueck, was eingetragen wurde. */
+
+  /* v1288b · Werte aus den Einstellungen tragen IHRE Herkunft.
+     Gemessen am 10.09.2026 im Sprechlauf: Zinssatz, Tilgung, Zinsbindung,
+     Eigenkapital und alle vier Nebenkostensaetze standen in der
+     Uebernahme-Tabelle unter „Sprachaufzeichnung" — gesprochen hatte
+     davon niemand ein Wort. Es war ein Knopfdruck auf „Einstellungen
+     uebernehmen". Derselbe Fehler wie bei einem abgerufenen Wert, nur
+     eine Quelle weiter: was nicht gesagt wurde, darf nicht so aussehen. */
+  function _rfProfilWerte(pv, herkunft) {
+    if (!pv || !pv.werte || !_rf) return;
+    if (!_rf.quelle) _rf.quelle = {};
+    Object.keys(pv.werte).forEach(function (id) {
+      _rf.data.fields[id] = pv.werte[id];
+      _rf.quelle[id] = herkunft || 'Deine Einstellungen';
+    });
+  }
   function _rfProfilEintragen() {
     var pv = _rf && _rf.profilVorschlag;
     if (!pv || !pv.werte) return null;
-    Object.keys(pv.werte).forEach(function (id) { _rf.data.fields[id] = pv.werte[id]; });
+    _rfProfilWerte(pv);
     _rf.profilVorschlag = null;
     var pb = $('vi-rf-passt'); if (pb) pb.style.display = 'none';
     return pv;
@@ -2594,6 +2758,26 @@
     return out;
   }
 
+  /* ═══ v1288b · Der Haken bedeutet „erledigt", nicht „steht irgendwo" ═══
+     Gemessen am 10.09.2026, direkt nach dem Öffnen des geführten Wegs:
+     die Spalte meldete **„6 von 16"** — bei NULL gesagten Angaben. Sechs
+     Blöcke trugen einen grünen Haken, der ausschließlich aus
+     Formular-Vorbelegungen kam: Zinssatz 3,5 · Tilgung 1 · Notar 2,2 ·
+     Grunderwerbsteuer 6,5 · Mietsteigerung 3 · AfA 2,0 · Grenzsteuersatz
+     40,45.
+
+     Das ist derselbe Denkfehler wie in v1273c, nur eine Etage höher: dort
+     hielt die Lückenprüfung eine Vorbelegung für eine Antwort, hier tut es
+     die Anzeige. Eine Fortschrittsleiste, die vor dem ersten Wort bei 38 %
+     steht, misst keinen Fortschritt — sie misst das Formular.
+
+     Jetzt drei Zustände statt zwei:
+       ✓  erledigt   — mindestens ein Wert kam aus DIESEM Gespräch
+       ◦  vorbelegt  — es steht etwas da, aber gesagt hat es niemand
+       ·  offen      — nichts da
+     Der Zähler unten zählt nur die ersten. Die vorbelegten Werte bleiben
+     sichtbar — sie zu verstecken wäre der Fehler von v1283d in die andere
+     Richtung — aber sie stehen gedämpft und nicht in Grün. */
   function _rfStandZeichnen() {
     var host = $('vi-rf-stand'); if (!host || !_rf) return;
     /* v1283d: ALLE Blöcke, nicht nur die offenen. Die Reihenfolge ist die
@@ -2609,26 +2793,43 @@
     alle = vorher.concat(alle);
     var offenAb = vorher.length;
 
+    /* Ein Block gilt als erledigt, wenn wenigstens EIN Wert nicht aus dem
+       Formular kommt (`w.f` markiert die Formularherkunft, v1283d). */
+    function _echt(werte) {
+      for (var i = 0; i < werte.length; i++) { if (!werte[i].f) return true; }
+      return false;
+    }
+
+    var fertigN = 0;
     var zeilen = alle.map(function (e, idx) {
       var werte = _rfWerteZuBlock(e);
       var i = idx - offenAb;                         /* Index in _rf.offen */
-      var dran = (i === _rf.i) && !werte.length;
+      var erledigt = _echt(werte);
+      if (erledigt) fertigN++;
+      var dran = (i === _rf.i) && !erledigt;
       var uebersprungen = !!(_rf.weg && i >= 0 && _rf.weg[i]);
-      var zeichen = werte.length ? '✓' : (uebersprungen ? '–' : (dran ? '▸' : '·'));
-      var klasse = werte.length ? 'ok' : (uebersprungen ? 'weg' : (dran ? 'dran' : ''));
+      var zeichen = erledigt ? '✓'
+                  : (uebersprungen ? '–'
+                  : (dran ? '▸' : (werte.length ? '◦' : '·')));
+      var klasse = erledigt ? 'ok'
+                 : (uebersprungen ? 'weg'
+                 : (dran ? 'dran' : (werte.length ? 'vor' : '')));
       var detail = werte.length
         ? '<div class="vi-rf-st-w">' + werte.map(function (w) {
-            return '<span><i>' + escH(w.n) + '</i><b>' + escH(w.v) + '</b></span>';
+            return '<span><i>' + escH(w.n) + '</i><b' + (w.f ? ' class="vorbelegt"' : '') + '>' +
+                   escH(w.v) + '</b></span>';
           }).join('') + '</div>'
         : '';
       return '<div class="vi-rf-st ' + klasse + '">' +
              '<div class="vi-rf-st-k"><span class="z">' + zeichen + '</span>' +
-             '<span class="n">' + escH(_rfKurzname(e)) + '</span></div>' + detail + '</div>';
+             '<span class="n">' + escH(_rfKurzname(e)) + '</span>' +
+             (!erledigt && werte.length ? '<span class="vi-rf-st-vor">vorbelegt</span>' : '') +
+             '</div>' + detail + '</div>';
     }).join('');
-    var fertigN = alle.filter(function (e) { return _rfWerteZuBlock(e).length > 0; }).length;
     host.innerHTML =
       '<div class="vi-rf-stand-kopf">Was schon steht</div>' + zeilen +
-      '<div class="vi-rf-stand-fuss"><b>' + fertigN + '</b> von ' + alle.length + '</div>';
+      '<div class="vi-rf-stand-fuss"><b>' + fertigN + '</b> von ' + alle.length +
+      ' beantwortet</div>';
     try {
       var dranEl = host.querySelector('.vi-rf-st.dran');
       if (dranEl) dranEl.scrollIntoView({ block: 'nearest' });
@@ -2708,13 +2909,25 @@
                          vom Kaufpreis oder Sonstiges") */
   var NK_IDS = ['makler_p', 'notar_p', 'gba_p', 'gest_p', 'ji_p'];
   function _rfNkAnnahme() {
-    var summe = 0, gesagt = 0;
+    var summe = 0, gesagt = 0, ausProfil = 0;
     NK_IDS.forEach(function (id) {
       var v = (_rf && _rf.data && _rf.data.fields) ? _rf.data.fields[id] : undefined;
       var n = _rfNum(v);
-      if (n != null) { summe += n; gesagt++; }
+      if (n == null) return;
+      summe += n; gesagt++;
+      /* v1288b: WOHER der Wert kommt, steht in `_rf.quelle`. Ohne diese
+         Unterscheidung meldete die Karte „von dir genannt" an Saetzen,
+         die aus einem Knopfdruck auf „Einstellungen uebernehmen" kamen —
+         gemessen am 10.09.2026: 12,27 %, kein Wort davon gesprochen. */
+      var q = (_rf && _rf.quelle) ? _rf.quelle[id] : null;
+      if (q) ausProfil++;
     });
-    if (gesagt) return { pct: summe, quelle: 'gesagt', text: 'Kaufnebenkosten ' + _pz(summe) + ' % — von dir genannt' };
+    if (gesagt) {
+      var alleAusProfil = (ausProfil === gesagt);
+      return { pct: summe, quelle: alleAusProfil ? 'profil' : 'gesagt',
+               text: 'Kaufnebenkosten ' + _pz(summe) + ' % — ' +
+                     (alleAusProfil ? 'aus deinen Einstellungen übernommen' : 'von dir genannt') };
+    }
 
     var pv = null;
     try { pv = _pvNebenkosten(); } catch (e) { pv = null; }
@@ -2725,7 +2938,7 @@
         var g = _rfGrest();
         return { pct: s2, quelle: 'profil',
                  text: 'Kaufnebenkosten ' + _pz(s2) + ' % — aus deinen Einstellungen' +
-                       (g ? ', Grunderwerbsteuer ' + _pz(g.rate) + ' % fuer ' + g.name : '') };
+                       (g ? ', Grunderwerbsteuer ' + _pz(g.rate) + ' % für ' + g.name : '') };
       }
     }
     return { pct: 10, quelle: 'pauschal', text: 'Kaufnebenkosten 10 % pauschal — angenommen, nicht gesagt' };
@@ -2923,7 +3136,7 @@
       '<div class="vi-sc-gitter">' + gitter + '</div>' +
       (R.explanation ? '<div class="vi-sc-text">' + escH(String(R.explanation).replace(/\s+/g, ' ').slice(0, 420)) + '</div>' : '') +
       (vollst ? '<div class="vi-sc-annahmen"><b>Datenlage:</b> ' + escH(vollst) +
-                ' — was fehlt, zaehlt nicht gegen dich, es zaehlt gar nicht.</div>' : '') +
+                ' — was fehlt, zählt nicht gegen dich, es zählt gar nicht.</div>' : '') +
     '</div>';
   }
 
@@ -2941,14 +3154,14 @@
       karte = _rfScore1Karte();
       if (karte) {
         _rf.halte.s1 = 1;
-        satz = 'Das reicht schon fuer eine erste Antwort auf <b>„lohnt sich das?"</b>';
+        satz = 'Das reicht schon für eine erste Antwort auf <b>„lohnt sich das?"</b>';
       }
     }
     if (!karte && nachEtappe >= 4 && !_rf.halte.s2) {
       karte = _rfScore2Karte();
       if (karte) {
         _rf.halte.s2 = 1;
-        satz = 'Mit Lage und Zustand wird aus der Rechnung eine <b>Einschaetzung</b> — das ist derselbe Score, den du in der Pilotanalyse siehst.';
+        satz = 'Mit Lage und Zustand wird aus der Rechnung eine <b>Einschätzung</b> — das ist derselbe Score, den du in der Pilotanalyse siehst.';
       }
     }
     if (!karte) return false;
@@ -3434,8 +3647,8 @@
       var pv = _rf.profilVorschlag;
       if (pv && pv.werte) {
         var namen = [];
+        _rfProfilWerte(pv);   /* v1288b: samt Herkunft */
         Object.keys(pv.werte).forEach(function (id) {
-          _rf.data.fields[id] = pv.werte[id];
           var kat = _rf.catalog.filter(function (c) { return c.id === id; })[0];
           namen.push((kat ? kat.label : id) + ' = ' + pv.werte[id]);
         });
@@ -3452,6 +3665,10 @@
       var v = _rfVorschlag(e);
       if (v) {
         _rf.data.fields[e.ids[0]] = v;
+        /* v1288b: Ein Wert, der schon im Formular stand, ist keine Aussage
+           des Nutzers — er hat ihn nur bestaetigt. */
+        if (!_rf.quelle) _rf.quelle = {};
+        _rf.quelle[e.ids[0]] = 'Vorbelegung, von dir bestätigt';
         if (!_rf.stummeUebernahme) _rfBlase('ich', 'Passt so.');
         _rf.stummeUebernahme = 0;
       }
@@ -3900,7 +4117,7 @@
     _rfMelden('', true);
     return Auth.apiCall('/ai/copilot-frage', {
       method: 'POST',
-      body: { frage: text, kontext: _rfKontext() }
+      body: { frage: text, kontext: _rfKontextKlar() || _rfKontext() }
     }).then(function (r) {
       _rfDenkt(false);
       _rfBlase('co', escH((r && r.antwort) || 'Dazu weiß ich gerade nichts.'));
@@ -3985,7 +4202,7 @@
     if (_rfIstFrage(t)) { _rfFrageBeantworten(t); return true; }
 
     /* 2. Verneinung: „haben wir nicht", „kommt nicht in Frage", „weiter". */
-    if (RF_NEIN.test(t)) {
+    if (_rfIstVerneinung(t)) {   /* v1288b: auch satzweise */
       _rfBlase('ich', escH(t));
       _rfUeberspringen(true);
       return true;
@@ -4251,5 +4468,7 @@
                          _score1: _rfScore1, _score2: _rfScore2,
                          _nkAnnahme: _rfNkAnnahme,
                          _kontingent: _rfKontingent,
+                         _verneinung: _rfIstVerneinung,  /* v1288b */
+                         _kontextKlar: _rfKontextKlar,
                          _stand: function () { return _rf; } };
 })();
