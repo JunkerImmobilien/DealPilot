@@ -3669,8 +3669,8 @@
     var frage = '';
     if (_rf.abschlussOffen) {
       frage = '<b>Fertig</b> — deine Werte warten in der Übersicht. Fragen darfst du mich weiter.';
-    } else if (_rf.wartetAufMarkt) {
-      frage = '<b>Deine Entscheidung</b> — dann geht es weiter.';
+    } else if (_rf.adresseFrage) {
+      frage = '<b>Stimmt die Adresse?</b> Sag „ja" — oder nenn sie mir noch einmal.';
     } else if (e) {
       frage = '<b>Jetzt dran</b> · ' + escH(_rfKurzname(e)) + ' — ' + escH(e.frage);
     }
@@ -4519,9 +4519,13 @@
        Marktpreisindikation — dort weiss der Abruf genug ueber das WO, und
        die Entscheidung steht, bevor irgendetwas laeuft. Gefragt wird
        einmal; wer ablehnt, wird nicht wieder gefragt. */
+    /* v1291b: Der Dialog HAELT HIER NICHT MEHR AN. Das Angebot steht in
+       der Aktionsleiste und bleibt dort sichtbar, bis es angenommen oder
+       eine Frage weiter ist — genau dafuer ist die Leiste da. Vorher
+       wartete der Ablauf auf eine Entscheidung, und wer sie nicht traf,
+       sass fest. Jetzt laeuft er weiter, und das Angebot laeuft mit. */
     if (vorher && vorher.ids && vorher.ids.indexOf('plz') >= 0 && !_rf.marktGefragt) {
       try { _rfMarktAnbieten(); } catch (ex) { try { console.warn('[voice] Marktangebot', ex); } catch (e2) {} }
-      if (_rf.abrufOffen === 'markt') { _rf.wartetAufMarkt = 1; return _rfLauschen(); }
     }
     var jetzt = _rf.offen[_rf.i];
     if (vorher && jetzt && vorher.et && jetzt.et && jetzt.et > vorher.et) {
@@ -5153,16 +5157,17 @@
     if ((_rf.aktionen || []).length > 1 && /^(hol|nimm|mach|recherchier|bodenrichtwert|die lage|marktpreis)/i.test(t)) {
       if (_rfAktionJa(t)) return true;
     }
-    /* Auf ein WARTENDES Angebot ist auch das Nein eine Antwort — dort
-       steht keine Frage offen, die es ueberspringen koennte. */
-    if (_rf.wartetAufMarkt && (RF_NEIN_ANGEBOT.test(t) || RF_NEIN.test(t))) {
+    /* v1291b: „nein danke" raeumt die Angebote weg, ohne die Frage zu
+       ueberspringen. Wer ein Angebot ablehnt, will nicht die Frage
+       ueberspringen — er will nur den Abruf nicht. */
+    if ((_rf.aktionen || []).length && RF_NEIN_ANGEBOT.test(t)) {
       _rf.abrufOffen = null;
-      _rfAktionWeg('markt'); _rfAktionWeg('markt2');
+      (_rf.aktionen || []).slice().forEach(function (a) { _rfAktionWeg(a.art); });
       _rfBlase('ich', escH(t));
       _rfBlase('co', '<span style="opacity:.7">Alles klar — dann frage ich die Werte ganz normal ab.</span>');
-      return _rfNachAngebot();
+      if (ausSprache && _fs.an) _fsHoeren(true);
+      return true;
     }
-
     /* v1288: Am Abschluss steht keine Feldfrage mehr offen. Eine Zusage
        fuehrt zur Tabelle, alles andere ist eine FRAGE — dort will niemand
        mehr Werte nennen, dort will man wissen, was die Zahlen bedeuten.
@@ -5318,7 +5323,7 @@
          der ersten Frage — dann läuft sie über den ganzen Dialog. */
       if (!_rf.marktGefragt && (_rfFeld('plz') || _rfFeld('ort'))) {
         try { _rfMarktAnbieten(); } catch (ex) { try { console.warn('[voice] Marktangebot', ex); } catch (e2) {} }
-        if (_rf.abrufOffen === 'markt') { _rf.wartetAufMarkt = 1; _rfBandZeichnen(); return _rfLauschen(); }
+        _rfBandZeichnen();   /* v1291b: kein Anhalten mehr — das Angebot steht in der Leiste */
       }
       _rfFrage();
     });
