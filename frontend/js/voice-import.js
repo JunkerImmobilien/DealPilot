@@ -5103,5 +5103,9 @@
                          _kontingent: _rfKontingent,
                          _verneinung: _rfIstVerneinung,  /* v1288b */
                          _kontextKlar: _rfKontextKlar,
+                         _offenesEnde: _fsOffenesEnde,   /* v1290 */
+                         _fsStand: function () { return { phase: _fs.phase, kopf: !!_fs.kopf,
+                             chunks: _fs.chunks.length, rest: _fs.rest, laeuft: _fs.laeuft,
+                             recState: _fs.rec ? _fs.rec.state : null }; },
                          _stand: function () { return _rf; } };
 })();
