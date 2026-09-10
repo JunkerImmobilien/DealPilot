@@ -1983,6 +1983,7 @@
       '.vi-rf-kopfzeile{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}',
       '.vi-rf-kopf{font:700 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;',
       '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C)}',
+      '.vi-rf-schalter{display:flex;align-items:center;gap:14px;flex-wrap:wrap}',
       '.vi-rf-fs{display:flex;align-items:center;gap:7px;cursor:pointer;',
       '  font:600 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;opacity:.75}',
       '.vi-rf-fs input{accent-color:var(--wl-c9a84c, #C9A84C)}',
@@ -2185,7 +2186,12 @@
     h.innerHTML =
       '<div class="vi-rf-kopfzeile">' +
         '<span class="vi-rf-kopf">' + (_rf.alle ? 'Der Co-Pilot fragt' : 'Noch offen') + '</span>' +
-        '<label class="vi-rf-fs"><input type="checkbox" id="vi-rf-fs" checked> Freisprechen</label>' +
+        '<span class="vi-rf-schalter">' +
+          '<label class="vi-rf-fs"><input type="checkbox" id="vi-rf-fs" checked> Freisprechen</label>' +
+          /* v1282: Wer gleich alles will, muss nicht erst die Pflichtstrecke
+             abwarten. Der Schalter haengt die Feinheiten sofort an. */
+          '<label class="vi-rf-fs" id="vi-rf-alles-w"><input type="checkbox" id="vi-rf-alles"> Alle Felder</label>' +
+        '</span>' +
       '</div>' +
       /* v1281: Verlauf und Stand nebeneinander - der Chat zeigt was WAR,
          die Spalte zeigt was IST. */
@@ -2219,7 +2225,7 @@
     inp.addEventListener('input', function () { if (inp.value.trim()) _fsStopHoeren(); });
     $('vi-rf-ok').addEventListener('click', _rfSenden);
     $('vi-rf-nix').addEventListener('click', function () { _rfUeberspringen(); });
-    $('vi-rf-ende').addEventListener('click', function () { _rfFertig(); });
+    $('vi-rf-ende').addEventListener('click', function () { _rfFertig(true); });   /* v1282: ausdruecklich beendet - nicht nach den Feinheiten fragen */
     $('vi-rf-passt').addEventListener('click', function () {
       var e = _rf.offen[_rf.i];
       _fsStopHoeren();
@@ -2248,6 +2254,23 @@
         _rfBlase('co', 'Übernommen.', _rfLesbar(v, e));
       }
       _rfWeiter();
+    });
+    /* v1282: „Alle Felder" haengt die Feinheiten sofort an - und wieder ab,
+       solange sie noch nicht dran waren. Wer schon mitten drin ist, behaelt
+       sie: eine Frage zurueckzunehmen, die gerade gestellt wird, waere
+       verwirrender als eine zu viel. */
+    var alles = $('vi-rf-alles');
+    if (alles) alles.addEventListener('change', function () {
+      if (this.checked) {
+        if (_rf.tiefeAn) return;
+        _rf.tiefeGefragt = 1;
+        _rfTiefeStarten();
+      } else if (_rf.tiefeAn) {
+        var vorher = _rf.offen.length;
+        _rf.offen = _rf.offen.filter(function (e, i) { return !e.tiefe || i <= _rf.i; });
+        _rf.tiefeAn = 0; _rf.tiefeGefragt = 0;
+        if (vorher !== _rf.offen.length) _rfStandZeichnen();
+      }
     });
     $('vi-rf-fs').addEventListener('change', function () {
       _fs.an = this.checked;
@@ -2298,13 +2321,153 @@
     _rfWeiter();
   }
 
-  function _rfFertig() {
+  /* ═══════════════════════════════════════════════════════════════════
+     v1282 · DIE FEINHEITEN — der Co-Pilot fragt auch den Rest ab
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Wunsch: „können wir das auch mit dem Sprechlauf so
+     weiterentwickeln, dass er auch alle anderen Felder entgegennimmt, wenn
+     man das will? Du hast ja alles vorbereitet dafür."
+
+     Stimmt - vorbereitet war es. Die 13 festen Blöcke decken 31 Felder ab;
+     `window.FIELDS` führt aber **204**, davon rund 145 frei ausfüllbar
+     (gemessen am 10.09.2026: s0 Objekt 72 · s3 Finanzierung 25 · s4
+     Bewirtschaftung 17 · s1 Investition 14 · s2 Miete 13 · Steuer 4).
+
+     WARUM NICHT EINFACH ALLES FRAGEN: 145 Fragen sind kein Gespräch, das
+     ist ein Fragebogen. Die 13 Blöcke bleiben der Weg; die Feinheiten
+     kommen NACH ihnen und nur, wenn jemand sie will.
+
+     Zwei Wege dorthin:
+       - Am Ende der Pflichtstrecke fragt der Co-Pilot einmal nach.
+       - Wer es gleich weiss, schaltet oben „Alles fragen" ein.
+
+     GEBILDET werden die Blöcke aus dem DOM, nicht aus einer zweiten Liste:
+     Abschnitt (.sec) gibt das Thema, das Label gibt den Namen, je vier
+     Felder eine Frage. Eine gepflegte Zweitliste von 145 Feldern würde
+     beim ersten neuen Feld veralten - und niemand würde es merken.
+
+     WAS NICHT GEFRAGT WIRD: berechnete Felder (readonly), gesperrte,
+     versteckte, bereits gefüllte und die 31 aus der Pflichtstrecke. Wer
+     schon geantwortet hat, wird nicht zweimal gefragt. */
+  var TIEFE_SEC = {
+    s0: 'Objekt', s1: 'Kaufpreis & Nebenkosten', s2: 'Miete & Entwicklung',
+    s3: 'Finanzierung', 's3-tax': 'Steuer', s4: 'Bewirtschaftung'
+  };
+  var TIEFE_PRO_FRAGE = 4;
+
+  function _rfTiefeBloecke() {
+    var schon = {};
+    RFRAGEN.forEach(function (e) { e.ids.forEach(function (id) { schon[id] = 1; }); });
+    var proSec = {};
+    (window.FIELDS || []).forEach(function (id) {
+      if (schon[id]) return;
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (el.readOnly || el.disabled || el.type === 'hidden') return;
+      if (String(el.value || '').trim() !== '') return;      /* steht schon */
+      var sec = el.closest('.sec');
+      var k = sec ? sec.id : '';
+      if (!TIEFE_SEC[k]) return;                              /* nur bekannte Bereiche */
+      var f = el.closest('.f');
+      var lab = f && f.querySelector('label');
+      var name = lab ? lab.textContent.replace(/\s+/g, ' ').replace(/\s*ℹ.*$/, '').trim() : id;
+      if (!name || name.length > 42) return;                  /* ohne Namen keine Frage */
+      (proSec[k] = proSec[k] || []).push({ id: id, label: name });
+    });
+    var bloecke = [];
+    Object.keys(TIEFE_SEC).forEach(function (k) {
+      var liste = proSec[k] || [];
+      for (var i = 0; i < liste.length; i += TIEFE_PRO_FRAGE) {
+        var teil = liste.slice(i, i + TIEFE_PRO_FRAGE);
+        bloecke.push({
+          ids: teil.map(function (x) { return x.id; }),
+          tiefe: 1,
+          bereich: TIEFE_SEC[k],
+          frage: TIEFE_SEC[k] + ': ' + teil.map(function (x) { return x.label; }).join(', ') + '?'
+        });
+      }
+    });
+    return bloecke;
+  }
+
+  /* Der Katalog muss die Felder auch KENNEN - sonst hat die Auswertung
+     kein Fach, in das sie den Wert legen kann. */
+  function _rfKatalogErgaenzen(bloecke) {
+    var da = {};
+    (_rf.catalog || []).forEach(function (e) { da[e.id] = 1; });
+    bloecke.forEach(function (b) {
+      b.ids.forEach(function (id) {
+        if (da[id]) return;
+        var el = document.getElementById(id);
+        if (!el) return;
+        var f = el.closest('.f');
+        var lab = f && f.querySelector('label');
+        var eintrag = {
+          id: id,
+          label: lab ? lab.textContent.replace(/\s+/g, ' ').replace(/\s*ℹ.*$/, '').trim() : id,
+          kind: (el.tagName === 'SELECT') ? 'select' : (el.tagName === 'TEXTAREA' ? 'input' : 'input')
+        };
+        if (eintrag.kind === 'select') {
+          eintrag.options = [].slice.call(el.options || []).slice(0, 40).map(function (o) {
+            return { v: o.value, t: o.text };
+          }).filter(function (o) { return o.v !== ''; });
+        }
+        _rf.catalog.push(eintrag);
+        da[id] = 1;
+      });
+    });
+  }
+
+  /* Nach der Pflichtstrecke: einmal fragen, nicht einfach weitermachen. */
+  function _rfTiefeAnbieten() {
+    var bloecke = _rfTiefeBloecke();
+    if (!bloecke.length) return false;
+    var felder = bloecke.reduce(function (n, b) { return n + b.ids.length; }, 0);
+    _rf.tiefeBloecke = bloecke;
+    _rfBlase('co', 'Das Wichtigste steht. Willst du die Feinheiten auch noch durchgehen? ' +
+      'Das sind <b>' + felder + ' weitere Angaben</b> in ' + bloecke.length + ' Fragen — ' +
+      'Kaufnebenkosten, Bewirtschaftung, Steuer, Entwicklung. ' +
+      '<span style="opacity:.7">Du kannst jederzeit „Fertig" sagen.</span>');
+    var neben = $('vi-rf-neben');
+    if (neben) {
+      neben.insertAdjacentHTML('afterbegin',
+        '<button type="button" id="vi-rf-tiefe-ja">Ja, weiter ins Detail</button>');
+      var b = $('vi-rf-tiefe-ja');
+      if (b) b.addEventListener('click', function () {
+        b.remove();
+        _rfBlase('ich', 'Ja, lass uns weitermachen.');
+        _rfTiefeStarten();
+      });
+    }
+    var pb = $('vi-rf-passt'); if (pb) pb.style.display = 'none';
+    _fsStopHoeren();
+    return true;
+  }
+
+  function _rfTiefeStarten() {
+    var bloecke = _rf.tiefeBloecke || _rfTiefeBloecke();
+    if (!bloecke.length) return _rfFertig();
+    _rfKatalogErgaenzen(bloecke);
+    _rf.offen = _rf.offen.concat(bloecke);
+    _rf.tiefeAn = 1;
+    _rf.tiefeBloecke = null;
+    _rfStandZeichnen();
+    _rfFrage();
+  }
+
+  function _rfFertig(erzwungen) {
+    /* v1282: Ist die Pflichtstrecke durch, wird EINMAL nach den Feinheiten
+       gefragt - aber nur im gefuehrten Weg und nur, wenn der Nutzer nicht
+       selbst „Fertig" gedrueckt hat. Wer abbricht, will abbrechen. */
+    if (!erzwungen && _rf && _rf.alle && !_rf.tiefeAn && !_rf.tiefeGefragt) {
+      _rf.tiefeGefragt = 1;
+      if (_rfTiefeAnbieten()) return;
+    }
     _fsStopHoeren(); _fsAus();
     var h = $('vi-frage'); if (h) h.style.display = 'none';
     showResults(_rf.OA, _rf.data, _rf.catalog);
     _rf = null;
   }
-
   /* Antwort verarbeiten - egal ob getippt oder gesprochen. */
   function _rfUebernehmen(neu, ausSprache) {
     _rfDenkt(false);
