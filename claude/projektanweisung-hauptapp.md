@@ -10418,6 +10418,258 @@ Sekunden, und die drei entfallenen Fragen sparen noch einmal mehr.
 
 **Commit** `v1286`. Auf Staging, **nicht auf Prod**.
 
+### `v1287` · Die Feinheiten-Frage war eine Sackgasse
+
+**Was:** Nach „Willst du die Feinheiten auch noch durchgehen?" ging es nicht
+weiter. Der Knopf sollte in einen Container mit *Klasse* `vi-rf-neben` — gesucht
+wurde per *id*. Kein Knopf, und weil `_rfTiefeAnbieten()` trotzdem „ja, ich habe
+gefragt" meldete, führte auch kein Weg mehr zur Tabelle.
+
+**Behoben:** id gesetzt, „ja"/„nein" wirken auch gesprochen, und ohne Knopf geht
+es ohne Nachfrage zur Tabelle statt in die Sackgasse.
+
+**Die Lehre:** eine Funktion, die „ich habe gefragt" zurückgibt, ohne dass die
+Frage sichtbar ist, verwandelt einen fehlenden Knopf in einen Stillstand. Wer
+`true` meldet, muss auch geliefert haben.
+
+**Commit** `733f700`. Auf Staging, **nicht auf Prod**.
+
+## Rollout-Journal · 10.09.2026 — der Sprechlauf bekommt Etappen
+
+### `v1288` · Aus einer Fragenliste wird ein geführter Sprechlauf
+
+**Marcels Plan vom 10.09.2026, im Kern:**
+
+> „Im Sprachlauf könnte erst mal sein, dass wir die Standardfelder abfragen,
+> dass wir dann einen Deal-Score bekommen und einen Deal-Score 2, dass wir im
+> Deal-Score schon mal sagen: okay, wohin geht die Reise, lohnt sich das,
+> lohnt sich das nicht."
+
+**Was:** Bis `v1287` war der Dialog **eine flache Liste** — elf Fragen, danach
+die Tabelle. Wer bei Frage 7 stand, wusste nicht, wozu die Fragen 1–6 gut
+waren: es gab kein Zwischenergebnis, nur ein Ende.
+
+**Jetzt sechs Etappen mit einem Halt dazwischen:**
+
+| | Etappe | Fragen | danach |
+|---|---|---|---|
+| 1 | **Basis** | Adresse · Objekt & Größe · Baujahr & Kaufpreis · Mieteinnahmen | Marktpreisindikation startet |
+| 2 | **Geld** | Finanzierung · **Kaufnebenkosten** (neu) | **Deal Score** |
+| 3 | **Lage & Zustand** | Lage · Zustand & Energie · Sanierung · Grundstück | **Deal Score 2.0** |
+| 4 | **Feinschliff** | Hausgeld · Entwicklung · Markt & Potenzial · Kauf & Übergang · Steuer | — |
+| 5 | **Deine Sicht** | These · Risiken · Notizen | **Abschluss** |
+| 6 | **Feinheiten** | alle übrigen Felder, nur auf Wunsch | — |
+
+**Warum diese Reihenfolge:** der Deal Score braucht Kaufpreis, Miete,
+Nebenkosten und Finanzierung — mehr nicht. Das ist genau Etappe 1 + 2. Der
+Deal Score 2 braucht zusätzlich Lage, Zustand und Energie — Etappe 3. Alles
+danach verfeinert, entscheidet aber nichts mehr. **Wer nach Etappe 2 abbricht,
+hat trotzdem eine Antwort auf „lohnt sich das".**
+
+Aus 11 Blöcken über 31 Felder werden **16 Blöcke über 45 Felder**. Neu im
+Dialog: Kaufnebenkosten, Entwicklung (Miet-/Wertsteigerung/Leerstand), Markt &
+Potenzial (die vier DS2-Selects), Steuer (AfA/Gebäudeanteil/Grenzsteuersatz).
+
+#### Gerechnet wird aus dem GESPRÄCH, nicht aus dem Formular
+
+**Das ist die entscheidende Regel des ganzen Umbaus.** `DealScore.compute()` und
+`_buildDeal2FromState()` lesen beide aus dem DOM — sie sind hier unbrauchbar,
+denn im Sprechlauf steht noch nichts im Formular.
+
+Würde man die Werte vorher hineinschreiben, um rechnen zu können, wäre die
+Übernahme-Tabelle am Ende sinnlos **und der Schutz aus `v1267` umgangen** — die
+Warnung, bevor ein gefülltes Objekt überschrieben wird.
+
+Also die **reinen** Rechenkerne: `DealKpis.compute(i)` und
+`DealScore.computeFromKpis(k)` nehmen beide ein einfaches Objekt entgegen und
+fassen kein DOM an. Für den Deal Score 2 gibt es keinen solchen Weg — sein
+Datenmodell ist ein eigenes (`kaufpreis`, `dscr`, `zustand`, `mikrolage` …).
+Das Objekt wird deshalb im Sprechlauf gebaut, aus denselben KPIs plus den Lage-
+und Zustandsfeldern des Gesprächs. **`DealScore2.compute(deal)` selbst bleibt
+unberührt** — Rechenkerne werden nie dupliziert.
+
+#### Was angenommen wird, steht auf der Karte
+
+Jede Score-Karte führt ihre Annahmen mit: welcher Nebenkostensatz und woher er
+kommt, ob Zins und Tilgung aus den Einstellungen stammen, und dass das Darlehen
+als „Gesamtinvestition minus Eigenkapital" gerechnet ist (der Sprechlauf fragt
+nach Eigenkapital, nicht nach der Darlehenshöhe).
+
+**Lässt sich nichts rechnen, fällt der Halt aus.** Ein Halt, der „leider keine
+Daten" sagt, ist ein Umweg.
+
+#### Kaufnebenkosten — drei Quellen, und die Karte sagt welche
+
+> „Also natürlich musst du auch Nebenkosten, natürlich musst du nachfragen. Wir
+> können auch die Standards nehmen, da kann auch erst mal nach den Einstellungen
+> fragen. Ansonsten kann man aber auch sagen 10 Prozent vom Kaufpreis."
+
+1. **gesagt** — der Nutzer nennt die Sätze
+2. **Einstellungen** — Investmentprofil (Makler, Notar & Grundbuch) **plus der
+   amtliche Grunderwerbsteuersatz zur Postleitzahl** über `DealPilotGrest`
+3. **Pauschale** — 10 % vom Kaufpreis, und die Karte sagt ausdrücklich
+   „angenommen, nicht gesagt"
+
+**Die Grunderwerbsteuer kommt nicht aus dem Profil, sondern aus der PLZ** — sie
+ist Landesrecht, kein Geschmack. Die Formular-Vorbelegung von 6,5 % ist in acht
+Bundesländern falsch.
+
+#### Abrufen statt fragen
+
+> „Makro-, Mikrolage. Ich meine, das können wir abdecken und abfragen über
+> unsere Schnittstelle und auch den Bodenrichtwert."
+
+| Angabe | Quelle | Kosten |
+|---|---|---|
+| **Bodenrichtwert** | `DealPilotBrw.borisHolen()` — amtlich, mit Stichtag und Zone | 0 |
+| **Grunderwerbsteuer** | `DealPilotGrest.forPlz()` — ohne Netz | 0 |
+| **Lage, Marktwert, Mietniveau** | `/marktbericht/reports/from-dealpilot` | ein MPI-Kontingent |
+
+Der Knopf steht **in der Frage**, kein Modal, kein zweiter Dialog. **Ein „ja"
+genügt — auch gesprochen.**
+
+Dafür ist der BORIS-Abruf getrennt worden: `borisHolen()` macht die zwei
+Aufrufe **ohne DOM**, `fetchBoris()` bleibt der Bedienweg am Knopf und nutzt
+denselben Abruf. Ein Weg zur Quelle, zwei Bedienungen.
+
+#### Die Marktpreisindikation läuft im Hintergrund
+
+**Marcels beste Idee des Abends, und sie funktioniert:**
+
+- **Gefragt wird früh** — gleich nach der Adresse, mit der Zahl der freien
+  Abrufe („48 frei"). Der Dialog wartet dort auf die Entscheidung.
+- **Gestartet wird am Ende der Basis** — dann kennt der Abruf Fläche, Baujahr
+  und Kaufpreis.
+- **Geliefert wird mitten im Gespräch** — eine Blase im Verlauf, die Werte
+  wandern in die Übersicht.
+- **Ohne Kontingent kein Angebot.** Wer nichts frei hat, bekommt keinen Knopf,
+  der ihn zu einer Bezahlschranke führt — er wird normal gefragt. *Ein Angebot,
+  das man nicht annehmen kann, ist Werbung.*
+- **Der Ablauf wartet nie.** Kommt nichts zurück, merkt es niemand außer im
+  Protokoll.
+
+#### Die Herkunft je Feld
+
+**Das war der ausdrückliche Vorbehalt im Backlog.** Sobald der Co-Pilot selbst
+Daten beschafft, darf in der Übernahme-Tabelle nicht „Sprachaufzeichnung" an
+einer Zahl stehen, die niemand ausgesprochen hat. `_rf.quelle` führt die
+Herkunft je Feld, `showResults` zeigt sie: *BORIS 2026-01-01 · Zone 167*,
+*Marktpreisindikation*, *Deine Einstellungen*.
+
+#### Dazu
+
+- **Skalen in der Frage** (Backlog-Punkt 2): bei einer Auswahl nennt der
+  Co-Pilot die Stufen, gelesen aus dem `<select>` im DOM — nicht aus einer
+  Zweitliste, die beim ersten neuen Eintrag veraltet.
+- **Was von selbst hereinkam, wird nicht noch einmal gefragt.** Füllt die
+  Marktpreisindikation Makro- und Mikrolage, überspringt der Dialog die
+  Lage-Frage.
+- **Der Abschluss** vor der Tabelle: beide Scores, **was der Score nicht weiß**
+  (die fehlenden Kennzahlen werden benannt, nicht weggerechnet), und der
+  Hinweis, falls mit der 10-%-Pauschale gerechnet wurde. Dort ist jede Eingabe
+  eine **Frage** an den Co-Piloten — es steht keine Feldfrage mehr offen.
+
+**Commit** `28ff503`.
+
+### `v1288b` · Sechs Befunde aus dem ersten echten Durchlauf
+
+Gemessen im Browser auf Staging, Objekt `2026-1033`, Hermannstr. 9, 32609
+Hüllhorst.
+
+**1. Die Spalte meldete „6 von 16" bei NULL gesagten Angaben.** Sechs Blöcke
+trugen einen grünen Haken, der ausschließlich aus Formular-Vorbelegungen kam:
+Zins 3,5 · Tilgung 1 · Notar 2,2 · Grunderwerbsteuer 6,5 · Mietsteigerung 3 ·
+AfA 2,0 · Grenzsteuersatz 40,45.
+
+> **Derselbe Denkfehler wie `v1273c`, eine Etage höher.** Dort hielt die
+> Lückenprüfung eine Vorbelegung für eine Antwort, hier tut es die Anzeige.
+> Eine Fortschrittsleiste, die vor dem ersten Wort bei 38 % steht, misst keinen
+> Fortschritt — sie misst das Formular.
+
+Jetzt **drei Zustände** statt zwei: `✓` erledigt (kam aus diesem Gespräch),
+`◦` vorbelegt (steht da, gesagt hat es niemand), `·` offen. Der Zähler zählt
+nur die ersten. **Nachgemessen: „0 von 16 beantwortet".**
+
+**2. Werte aus den Einstellungen standen unter „Sprachaufzeichnung".**
+Zinssatz, Tilgung, Zinsbindung, Eigenkapital und alle vier Nebenkostensätze —
+gesprochen hatte davon niemand ein Wort, es war ein Knopfdruck auf
+„Einstellungen übernehmen". **Derselbe Vorbehalt, nur eine Quelle weiter.**
+Jetzt *Deine Einstellungen* bzw. *Vorbelegung, von dir bestätigt*. Die
+Score-Karte las denselben Fehler und meldete „Kaufnebenkosten 12,27 % — von dir
+genannt"; sie liest jetzt die Herkunft.
+
+**3. Der Co-Pilot kannte seine eigenen Werte nicht wieder.** Auf „Warum ist der
+Cashflow so negativ?" antwortete er:
+
+> „Für eine saubere Erklärung fehlt mir aber noch der Zinssatz, die Tilgung …"
+
+Beides stand seit zwei Fragen im Gespräch (4,09 % und 1 %). **Die Werte WAREN
+im Kontext — aber als `d1z = 4,09` und `d1t = 1`.** Das sind unsere internen
+Feldnamen, keine Sprache.
+
+> **Zwei Kontexte, zwei Zwecke, und der Unterschied ist wichtig.**
+> `_rfKontext()` geht an `/ai/extract-text` und **muss** die Feld-ids führen —
+> der Prompt rechnet mit ihnen („10 Prozent vom Kaufpreis" bei `kp=200000`).
+> `_rfKontextKlar()` geht an `/ai/copilot-frage`; dort spricht jemand mit einem
+> Menschen.
+
+Der Klartext-Kontext trägt zusätzlich die **abgeleiteten Größen, die in keinem
+Feld stehen**: Cashflow vor und nach Steuer, Brutto- und Nettomietrendite,
+Faktor, LTV, DSCR, Kapitaldienst, Bewirtschaftungskosten, beide Scores,
+Marktwert. Erfunden wird nichts — alles kommt aus derselben Rechnung wie die
+Score-Karte.
+
+Backend dazu: Beschriftung `(Bezeichnung = Wert)`, **80 statt 40 Zeilen**,
+**200 statt 60 Zeichen** je Wert, und drei neue Regeln — *was oben steht IST
+bekannt*, die Score-Stufen der Haupt-App (85/70/50/35), und *Quellen
+mitnennen*.
+
+**Dieselbe Frage nach der Änderung, wörtlich:**
+
+> „Der Cashflow ist vor allem deshalb negativ, weil du bei 200.000 Kaufpreis und
+> 490 € Miete nur eine sehr niedrige Bruttomietrendite von 2,94 % hast, während
+> das Darlehen von 184.540 € bei 4,09 % Sollzins und 1 % Anfangstilgung einen
+> hohen Kapitaldienst von 9.393 € pro Jahr erzeugt. […] sodass der Cashflow vor
+> Steuer bei −371 € pro Monat liegt. Nach Steuer verbessert sich das zwar auf
+> −162 € pro Monat …"
+
+Nachgerechnet: Darlehen = 224.540 − 40.000 = **184.540 ✓** · Kapitaldienst =
+184.540 × 5,09 % = **9.393 ✓** · Bruttomietrendite = 5.880 / 200.000 =
+**2,94 % ✓**.
+
+**4. „Nichts zu sanieren, nichts wird mitverkauft" wurde nicht verstanden** —
+ein KI-Aufruf, zwei Sekunden, „daraus konnte ich nichts entnehmen". Auf eine
+**Doppelfrage** ist eine doppelte Verneinung die natürlichste Antwort.
+
+`RF_NEIN` verlangt, dass die Verneinung den ganzen Text ausmacht — das ist die
+richtige Vorsicht aus `v1283` („nichts unter 300.000" darf nicht durchgehen).
+Jetzt **satzweise**: an Komma, „und", „auch" und Punkt trennen und nur
+verneinen, wenn **jeder** Teil für sich eine Verneinung ist. Ein Teil mit
+Inhalt — „nichts zu sanieren, Küche bleibt drin" — und der ganze Satz geht wie
+bisher an die Auswertung. **Acht Proben gemessen, alle richtig, Gegenproben
+eingeschlossen.**
+
+**5. Umlaut-Ersatzschreibung im Nutztext** („fuer", „Einschaetzung", „zaehlt",
+„umlagefaehig"). Kommentare dürfen das, Nutztext nie.
+
+#### Was im Durchlauf funktioniert hat — gemessen, nicht behauptet
+
+- **Etappenband** und beide Halte: Deal Score **8/100 KRITISCH** (Faktor 34,
+  DSCR 0,63), Deal Score 2 **53/100 SOLIDE** mit *17 von 24 Kennzahlen belegt*
+- **Marktpreisindikation im Hintergrund**: Angebot direkt nach der Adresse mit
+  „48 frei", gestartet am Ende der Basis, Ergebnis **mitten im Gespräch** —
+  169.000 €, *dein Preis +18,3 % darüber*, Mietniveau 7,82 €/m². Vier Werte
+  übernommen, jeder mit eigener Herkunft.
+- **BORIS über ein gesprochenes „ja"**: **90 €/m², Stichtag 2026-01-01,
+  Zone 167** — derselbe Wert, den `CLAUDE.md` für Hüllhorst führt
+  (950 × 90 + 828 × 5).
+- **Skalen in der Frage**, Überspringen bereits abgerufener Blöcke, freie Frage
+  am Abschluss, Übernahme-Tabelle mit acht Zeilen *Deine Einstellungen* und elf
+  *Sprachaufzeichnung*.
+
+**Commit** `fdba8aa`. Auf Staging, **nicht auf Prod**. Backend geändert →
+Rebuild gelaufen, `UMGEKEHRT GILT DASSELBE` im laufenden Container gegengeprüft.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

@@ -1437,3 +1437,120 @@ prüft den Wert am Ende der Kette — nicht die Zeile, die ihn verspricht.
 > Und: **eine Feldliste, die als Filter dient, ist ein stiller
 > Ausschluss.** `fields.forEach` überträgt genau, was drinsteht; alles
 > andere fehlt, ohne Fehler und ohne Warnung.
+
+---
+
+## Eine Fortschrittsanzeige, die Vorbelegungen mitzählt, misst das Formular
+
+Der geführte Sprechlauf zeigt rechts eine Spalte „Was schon steht" mit einem
+Zähler darunter. Gemessen am 10.09.2026, **unmittelbar nach dem Öffnen, vor dem
+ersten Wort**: `6 von 16`.
+
+Sechs Blöcke trugen einen grünen Haken. Kein einziger Wert kam von einem
+Nutzer — es waren die `value`-Attribute aus `index.html`: Zins 3,5 · Tilgung 1 ·
+Notar 2,2 · Grunderwerbsteuer 6,5 · Mietsteigerung 3 · AfA 2,0 ·
+Grenzsteuersatz 40,45.
+
+**Der Haken sagt „erledigt". Eine Vorbelegung ist nicht erledigt — sie ist
+vorgeschlagen.** Und ein Fortschrittsbalken, der bei 38 % startet, misst nicht
+den Fortschritt, sondern das Formular.
+
+Es ist **derselbe Denkfehler wie in `v1273c`**, nur eine Etage höher: dort hielt
+die Lückenprüfung eine Vorbelegung für eine Antwort und fragte deshalb nicht
+nach Zins und Tilgung; hier tut es die Anzeige.
+
+**Die Regel:** wo eine Anzeige „beantwortet" behauptet, muss sie zwischen *kam
+aus dem Gespräch* und *stand schon da* unterscheiden können — und tun. Drei
+Zustände statt zwei: erledigt, vorbelegt, offen. Verstecken ist dabei die
+falsche Gegenrichtung: was im Formular steht, gehört in eine Übersicht, die
+„was schon steht" heißt. Es gehört nur nicht in den Zähler.
+
+---
+
+## Ein Knopfdruck ist keine Aussage — die Herkunft muss mitwandern
+
+Im Sprechlauf gibt es „Einstellungen übernehmen": ein Klick trägt Zins,
+Tilgung, Zinsbindung und Eigenkapital ein. In der Übernahme-Tabelle standen
+sie danach unter **„Sprachaufzeichnung"**. Gesprochen hatte davon niemand ein
+Wort.
+
+Das ist derselbe Vorbehalt, der beim automatischen Abrufen von Daten ausdrücklich
+notiert worden war — nur eine Quelle weiter gedacht. **Wer eine Herkunftsspalte
+einführt, muss jeden Schreibweg in die Daten daraufhin durchgehen, nicht nur den
+neuen.** Ein Feld hat im Sprechlauf vier Wege hinein: gesagt, abgerufen, aus den
+Einstellungen übernommen, aus dem Formular bestätigt. Drei davon sind nicht
+„Sprachaufzeichnung".
+
+Nebenwirkung, die es leicht macht, den Fehler zu übersehen: eine Karte, die
+ihrerseits die Daten liest, erbt ihn. Die Score-Karte meldete „Kaufnebenkosten
+12,27 % — **von dir genannt**", weil sie nur prüfte, *ob* ein Wert dasteht.
+
+---
+
+## Interne Feld-ids im KI-Kontext: das Modell hält Bekanntes für unbekannt
+
+Der Co-Pilot bekommt den bekannten Stand des Objekts in den Prompt, damit er
+mitrechnen kann. Übergeben wurden die **Feld-ids**: `d1z = 4,09`, `d1t = 1`,
+`nkm = 490`.
+
+Auf die Frage „Warum ist der Cashflow so negativ?" kam:
+
+> „Für eine saubere Erklärung fehlt mir aber noch der Zinssatz, die Tilgung …"
+
+Beide standen im Kontext. **Das Modell hat sie nur nicht wiedererkannt** — `d1z`
+ist kein Wort. Und weil es die Regel „erfinde nichts, benenne die Lücke" korrekt
+befolgt hat, sah der Fehler wie vorbildliches Verhalten aus.
+
+**Die Falle ist doppelt:** ein Kontext, der nicht verstanden wird, erzeugt keine
+Fehlermeldung. Er erzeugt eine höfliche, plausible, falsche Auskunft.
+
+**Aber Klartext ist nicht überall richtig.** Derselbe Kontext geht an zwei
+Endpunkte mit gegenläufigen Anforderungen:
+
+| Endpunkt | Zweck | braucht |
+|---|---|---|
+| `/ai/extract-text` | ein Wert geht **ins Formular** | die **Feld-id** — der Prompt rechnet damit („10 % vom Kaufpreis" bei `kp=200000`) |
+| `/ai/copilot-frage` | eine Auskunft geht **an den Menschen** | die **Bezeichnung** |
+
+Zwei Zwecke, zwei Kontexte. Und wenn ein Kontext wächst, wächst auch das Limit:
+`slice(0, 40)` hätte ausgerechnet das Ende abgeschnitten — dort standen die
+Kennzahlen, nach denen gefragt wird.
+
+---
+
+## Eine Verneinung kann ein ganzer Satz aus Verneinungen sein
+
+Auf die Doppelfrage „Muss etwas saniert werden, und wird etwas mitverkauft?"
+antwortet ein Mensch:
+
+> „Nichts zu sanieren, nichts wird mitverkauft"
+
+Das Muster für Verneinungen verlangte, dass die Verneinung den **ganzen** Text
+ausmacht. Ergebnis: ein KI-Aufruf, zwei Sekunden, „daraus konnte ich nichts
+entnehmen".
+
+Die Vorsicht war richtig — „nichts unter 300.000" darf nicht als Absage
+durchgehen, sonst geht eine Angabe verloren. **Der Fehler war, den Satz als
+Einheit zu prüfen.** Er besteht aus zwei Teilen, und jeder ist für sich eine
+Verneinung.
+
+**Die Regel:** an Komma, „und", „auch" und Punkt trennen, dann jeden Teil
+einzeln prüfen. Verneint wird nur, wenn **jeder** Teil verneint. Ein Teil mit
+Inhalt — „nichts zu sanieren, Küche bleibt drin" — und der ganze Satz geht wie
+bisher an die Auswertung. Dazu eine Längengrenze: ein langer Satz mit einer
+Verneinung darin ist fast immer eine Angabe mit Einschränkung, keine Absage.
+
+---
+
+## `Auth.apiCall` bricht nach 15 Sekunden ab — außer bei `/ai/`
+
+`auth.js` setzt einen Vorgabe-Timeout: **120 s für Pfade mit `/ai/`, 15 s für
+alles andere**, `options.timeout` überschreibt.
+
+Der Marktbericht ist kein `/ai/`-Pfad, rechnet aber. Ein Abruf über
+`/marktbericht/reports/from-dealpilot` ohne eigenen Timeout bricht nach
+15 Sekunden mit *„Anfrage-Timeout (Server antwortet nicht rechtzeitig)"* ab —
+und das sieht aus wie ein Serverfehler, ist aber Ungeduld auf unserer Seite.
+
+**Vor jedem `Auth.apiCall` auf einen rechnenden Endpunkt: `timeout` mitgeben.**
+Die 15 Sekunden sind für Datensätze gedacht, nicht für Bewertungen.
