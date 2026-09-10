@@ -38,7 +38,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
 
-**Stand:** `v1273`–`v1292d` liegen auf Staging. **Produktion steht auf `a21fe9c`**
+**Stand:** `v1273`–`v1293c` liegen auf Staging. **Produktion steht auf `a21fe9c`**
 — nichts davon ist live.
 
 > **Nach Marcels erstem echten Sprechlauf am 10.09. abends** (Bilder
@@ -130,7 +130,7 @@ die Kosten einer Aufnahme um rund 40 % — bei 4 Minuten von ≈ 1,7 auf ≈ 0,9
 
 ### 4 · Der Sprechlauf gehört auf Produktion
 
-**`v1273`–`v1292d` liegen auf Staging.** Prod steht auf
+**`v1273`–`v1293c` liegen auf Staging.** Prod steht auf
 `a21fe9c` — der Co-Pilot, die Etappen, beide Scores, BORIS-Abruf und
 Marktpreisindikation im Hintergrund sind für keinen Kunden erreichbar.
 
@@ -156,6 +156,16 @@ Marcels Wunsch vom 08.09., **zurückgestellt**. Der Code liegt vollständig da,
 Bewertung); im Portfolio-Cockpit noch nicht.
 
 ---
+
+## → Erledigt in der Nacht (`v1293`–`v1293c`) — die Pre-Flight-Kette
+
+| Marcels Wunsch | Stand |
+|---|---|
+| Exposé/Marktbericht **zuerst**, dann Sprache | **fertig** — `import` → `immometrica` → `voice` → AVM (war „voice-first" seit `v503`) |
+| Die extrahierten Daten im Sprechlauf **mitnehmen** | **fertig** — das Überspringen gab es schon, jetzt sagt der Co-Pilot es auch: „Aus Exposé / Marktbericht stehen schon 9 Angaben" |
+| Nur noch **fehlende** Sachen fragen | **fertig** — gemessen 13 statt 16 Fragen, Etappe 1 von vier auf eine |
+| Marktbewertung **im Sprechlauf**, Stufe wählbar | **fertig** — „Du hast die Marktbewertung mit ausgewählt — welche Stufe?" mit *Einfach* / *Erweitert* und Kontingentzahl |
+| Nicht zweimal abrufen | **fertig** — `done({marktGeholt})`, die Kette überspringt ihren Abruf |
 
 ## → Erledigt am 10.09.2026, spät (`v1291`–`v1292d`)
 
