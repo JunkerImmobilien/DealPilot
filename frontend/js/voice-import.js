@@ -4488,11 +4488,26 @@
     if (!plz && !ort) return;                 /* ohne Adresse kein Abruf */
     var kg = _rfKontingent();
     if (!kg) {
-      /* Kein Kontingentstand da — das ist ein technischer Ausfall, keine
-         Plan-Auskunft. Dazu sagen wir NICHTS: eine Fehlermeldung ueber ein
-         Angebot, das niemand angefordert hat, ist reine Beunruhigung. */
-      _rf.marktGefragt = 1;
-      return;
+      /* v1293d: Kein Kontingentstand — ein technischer Ausfall, keine
+         Plan-Auskunft. Gemessen mit abgelaufenem Token (HTTP 401): der
+         Abruf scheiterte einmal, `marktGefragt` wurde gesetzt, und damit
+         gab es im GANZEN Dialog kein Angebot mehr — auch nachdem die
+         Anmeldung wieder stand.
+         Jetzt wird NICHT gemerkt, dass gefragt wurde: einmal wird der
+         Stand nachgeladen und danach erneut angeboten. Klappt auch das
+         nicht, bleibt es still — eine Fehlermeldung ueber ein Angebot,
+         das niemand angefordert hat, ist reine Beunruhigung. */
+      if (!_rf.kontingentVersuch) {
+        _rf.kontingentVersuch = 1;
+        try {
+          if (window.AiCredits && typeof window.AiCredits.refresh === 'function') {
+            Promise.resolve(window.AiCredits.refresh(true)).then(function () {
+              if (_rf && !_rf.marktGefragt) { try { _rfMarktAnbieten(); } catch (e) {} }
+            }).catch(function () {});
+          }
+        } catch (e) {}
+      }
+      return;                                 /* KEIN marktGefragt = 1 */
     }
     if (!kg.mpi && !kg.mpi_plus) {
       /* Einmal sagen, nicht draengen. Danach laeuft der Dialog normal
@@ -5724,23 +5739,26 @@
      Beides haengt an derselben Kleinigkeit: der Sprechlauf wusste nicht,
      dass vor ihm etwas lief. Jetzt bekommt er es gesagt.
 
-     GEZAEHLT wird beim Start, was im Katalog schon steht. Das ist genauer
-     als jede Verfolgung im Import-Modul — und es funktioniert fuer JEDE
-     Quelle, auch fuer ImmoMetrica und fuer Felder, die der Nutzer selbst
-     eingetippt hat, bevor er den Sprechlauf oeffnete. */
-  var VORLAUF_NAME = { import: 'Exposé / Marktbericht', immometrica: 'ImmoMetrica',
-                       voice: 'Sprachaufzeichnung' };
+     GEZAEHLT wird nur, was die KETTE als neu meldet — siehe unten. */
+  /* v1293d: OHNE die Liste der Kette gibt es KEINEN Vorlauf-Satz.
+     Gemessen an einem frisch angelegten Objekt: „61 Angaben stehen schon
+     im Objekt" — bei leerem Formular. Gezaehlt wurden die Vorgaben aus
+     `index.html` (Notar 2,20 %, Grunderwerbsteuer 6,50 %, die acht
+     Sanierungsgewerke, die Bauspar-Saetze …).
 
+     Es ist derselbe Fehler wie in v1293b, nur im anderen Zweig: dort hat
+     ihn die Kette behoben, hier fiel er auf „alles im Formular" zurueck.
+     Der Rueckfall ist damit erledigt — nur wer sagen kann, WOHER die
+     Werte kommen, sagt ueberhaupt etwas. Wer den Sprechlauf direkt
+     oeffnet, bekommt keinen Satz, und das ist richtig: er weiss ja
+     selbst, was in seinem Objekt steht. */
   function _rfVorbefuellt(catalog) {
     var out = {};
-    /* v1293b: Kennt die Kette die Felder, die WIRKLICH aus dem Vorlauf
-       kamen, zaehlen nur die. Sonst faellt es auf „was im Formular steht"
-       zurueck — dann stehen dort aber auch die Vorgaben aus index.html,
-       und die hat niemand eingelesen. */
-    var nurDiese = _vorlaufFelder ? {} : null;
-    if (nurDiese) _vorlaufFelder.forEach(function (id) { nurDiese[id] = 1; });
+    if (!_vorlaufFelder) return out;
+    var nurDiese = {};
+    _vorlaufFelder.forEach(function (id) { nurDiese[id] = 1; });
     (catalog || []).forEach(function (e) {
-      if (nurDiese && !nurDiese[e.id]) return;
+      if (!nurDiese[e.id]) return;
       var el = document.getElementById(e.id);
       if (!el) return;
       var v = String(el.value || '').trim();
@@ -5777,7 +5795,7 @@
       vorTxt = 'Aus <b>' + escH(vorQuelle) + '</b> stehen schon <b>' + vorN + ' Angaben</b> — ' +
                'die frage ich nicht noch einmal. ';
     } else if (vorN) {
-      vorTxt = '<b>' + vorN + ' Angaben</b> stehen schon im Objekt — die frage ich nicht noch einmal. ';
+      vorTxt = '<b>' + vorN + ' Angaben</b> waren schon da — die frage ich nicht noch einmal. ';
     }
 
     /* v1288: Der geführte Weg sagt jetzt, WOHIN er führt — nicht nur, wie
