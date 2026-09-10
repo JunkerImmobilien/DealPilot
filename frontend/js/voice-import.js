@@ -2313,16 +2313,21 @@
           var kat = _rf.catalog.filter(function (c) { return c.id === id; })[0];
           namen.push((kat ? kat.label : id) + ' = ' + pv.werte[id]);
         });
-        _rfBlase('ich', 'Nimm die aus meinen Einstellungen.');
-        _rfBlase('co', 'Übernommen — du kannst sie in der Tabelle noch ändern.', namen.join(' · '));
+        /* v1283b: Wer den Wunsch selbst gesagt hat, hat seine Blase schon -
+           sonst steht sein Satz zweimal da, einmal in eigenen Worten und
+           einmal in unseren. */
+        if (!_rf.stummeUebernahme) _rfBlase('ich', 'Nimm die aus meinen Einstellungen.');
+        _rfBlase('co', 'Übernommen — in der Tabelle kannst du sie noch ändern.');
+        _rf.stummeUebernahme = 0;
         _rf.profilVorschlag = null;
         return _rfWeiter();
+      _rfStandZeichnen();   /* v1283b: der Haken sofort, nicht erst bei der naechsten Frage */
       }
       var v = _rfVorschlag(e);
       if (v) {
         _rf.data.fields[e.ids[0]] = v;
-        _rfBlase('ich', 'Passt so.');
-        _rfBlase('co', 'Übernommen.', _rfLesbar(v, e));
+        if (!_rf.stummeUebernahme) _rfBlase('ich', 'Passt so.');
+        _rf.stummeUebernahme = 0;
       }
       _rfWeiter();
     });
@@ -2635,7 +2640,7 @@
     if (_rf.profilVorschlag && RF_PROFIL_JA.test(t)) {
       _rfBlase('ich', escH(t));
       var pb = $('vi-rf-passt');
-      if (pb) { pb.click(); return true; }
+      if (pb) { _rf.stummeUebernahme = 1; pb.click(); return true; }
     }
 
     /* 3. Verneinung: „haben wir nicht", „kommt nicht in Frage", „weiter".
