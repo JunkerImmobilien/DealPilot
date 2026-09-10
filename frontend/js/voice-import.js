@@ -2750,8 +2750,64 @@
       '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);opacity:.9}',
       '.vi-sc-pille{border:1px solid;border-radius:99px;padding:3px 9px;',
       '  font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em}',
-      '.vi-sc-zahl{font:700 32px/1.1 "Space Grotesk",system-ui,sans-serif;margin:4px 0 10px}',
-      '.vi-sc-zahl small{font:600 12px/1 "JetBrains Mono",ui-monospace,monospace;opacity:.45;margin-left:6px}',
+      /* ═══ v1292 · Die grosse Zahl ══════════════════════════════════════
+         Sie zaehlt hoch, sie leuchtet, und darunter faehrt ein Balken aus.
+         Das Leuchten haengt an der STUFE: ab 85 kraeftig, ab 70
+         zurueckhaltend, darunter gar nicht — ein schwacher Deal, der
+         leuchtet, waere eine Luege in Lichtform. */
+      '.vi-sc-zahl{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;',
+      '  font:700 40px/1.05 "Space Grotesk",system-ui,sans-serif;margin:6px 0 8px}',
+      '.vi-sc-zahl-n{font-variant-numeric:tabular-nums;letter-spacing:-.02em}',
+      '.vi-sc-zahl small{font:600 12px/1 "JetBrains Mono",ui-monospace,monospace;opacity:.4}',
+      '.vi-sc-zahl em{font-style:normal;margin-left:auto;font:700 11px/1 "JetBrains Mono",ui-monospace,monospace;',
+      '  letter-spacing:.1em;text-transform:uppercase;opacity:.55;align-self:center}',
+      '.vi-sc-zahl.gut .vi-sc-zahl-n{text-shadow:0 0 14px color-mix(in srgb, currentColor 45%, transparent)}',
+      '.vi-sc-zahl.top .vi-sc-zahl-n{text-shadow:0 0 10px color-mix(in srgb, currentColor 60%, transparent),',
+      '  0 0 28px color-mix(in srgb, currentColor 40%, transparent);animation:viScGlanz 2.6s ease-in-out infinite}',
+      '@keyframes viScGlanz{0%,100%{filter:brightness(1)}50%{filter:brightness(1.18)}}',
+      '@media (prefers-reduced-motion: reduce){.vi-sc-zahl.top .vi-sc-zahl-n{animation:none}}',
+      '.vi-sc-bar{height:5px;border-radius:99px;background:rgba(42,39,39,.09);overflow:hidden;margin:0 0 12px}',
+      '.vi-sc-bar i{display:block;height:100%;width:0;border-radius:99px;',
+      '  transition:width 1.1s cubic-bezier(.22,.9,.3,1)}',
+      /* Das Fazit in einem Satz — das erste, was man liest. */
+      '.vi-sc-fazit{margin:0 0 11px;padding:9px 12px;border-radius:9px;',
+      '  font:400 13px/1.5 Inter,system-ui,sans-serif;',
+      '  background:rgba(42,39,39,.05);border-left:3px solid rgba(42,39,39,.2)}',
+      '.vi-sc-fazit.top{background:rgba(63,165,108,.13);border-left-color:#3FA56C}',
+      '.vi-sc-fazit.gut{background:rgba(63,165,108,.08);border-left-color:#3FA56C}',
+      '.vi-sc-fazit.schwach{background:rgba(184,98,92,.1);border-left-color:#B8625C}',
+      /* Break-even */
+      '.vi-sc-be{margin-top:11px;padding:9px 12px;border-radius:9px;',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent);',
+      '  font:400 12.5px/1.55 Inter,system-ui,sans-serif}',
+      '.vi-sc-be>b{display:inline-block;margin-right:7px;',
+      '  font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;',
+      '  text-transform:uppercase;color:var(--wl-b8932f, #b8932f)}',
+      '.vi-sc-be small{display:block;margin-top:6px;font-size:10.5px;line-height:1.5;opacity:.62}',
+      /* Mietpotenzial */
+      '.vi-sc-mp{margin-top:11px;padding:10px 12px;border-radius:9px;',
+      '  font:400 12.5px/1.6 Inter,system-ui,sans-serif}',
+      '.vi-sc-mp.plus{background:rgba(63,165,108,.1);border:1px solid rgba(63,165,108,.28)}',
+      '.vi-sc-mp.minus{background:rgba(184,98,92,.09);border:1px solid rgba(184,98,92,.28)}',
+      '.vi-sc-mp>b:first-child{display:block;margin-bottom:4px;',
+      '  font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase}',
+      '.vi-sc-mp.plus>b:first-child{color:#2F7D51}.vi-sc-mp.minus>b:first-child{color:#9E4A45}',
+      /* Die Hebel */
+      '.vi-sc-hebel{margin-top:12px;padding-top:10px;border-top:1px dashed rgba(42,39,39,.16)}',
+      '.vi-sc-hebel>b{display:block;margin-bottom:8px;',
+      '  font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;',
+      '  text-transform:uppercase;color:var(--wl-b8932f, #b8932f)}',
+      '.vi-sc-hebel>small{display:block;margin-top:8px;font-size:10.5px;opacity:.55}',
+      '.vi-hb{display:flex;align-items:flex-start;gap:10px;padding:6px 0;',
+      '  border-bottom:1px solid rgba(42,39,39,.06)}',
+      '.vi-hb:last-of-type{border-bottom:none}',
+      '.vi-hb-p{flex:0 0 auto;min-width:34px;text-align:center;padding:3px 7px;border-radius:7px;',
+      '  background:rgba(63,165,108,.16);color:#2F7D51;',
+      '  font:700 12px/1.25 "JetBrains Mono",ui-monospace,monospace}',
+      '.vi-hb-t{flex:1;min-width:0;font:400 12.5px/1.45 Inter,system-ui,sans-serif}',
+      '.vi-hb-t small{display:block;margin-top:2px;font-size:11px;opacity:.62}',
+      '.vi-hb-z{flex:0 0 auto;align-self:center;font:700 12px/1 "JetBrains Mono",ui-monospace,monospace;',
+      '  opacity:.5}',
       '.vi-sc-gitter{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 16px}',
       '@media(max-width:560px){.vi-sc-gitter{grid-template-columns:1fr}}',
       '.vi-sc-z{display:flex;align-items:baseline;justify-content:space-between;gap:8px;',
@@ -2829,6 +2885,10 @@
       (treffer ? '<div class="vi-rf-treffer">✓ ' + treffer + '</div>' : '');
     chat.appendChild(d);
     chat.scrollTop = chat.scrollHeight;
+    /* v1292: Steht eine Score-Karte in der Blase, zaehlen ihre Zahlen hoch
+       und die Balken fahren aus — an EINER Stelle, damit keine Karte es
+       vergisst. */
+    try { if (d.querySelector(".vi-sc-zahl-n,.vi-sc-bar")) _rfKarteBeleben(d); } catch (e) {}
     return d;
   }
 
@@ -3388,6 +3448,176 @@
     return { R: R, Z: Z, deal: deal };
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1292 · AUS ZAHLEN WIRD EINE ENTSCHEIDUNG
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Auftrag: „Mach da einfach was richtig Geiles, dass man, wenn
+     man da durchgeführt wird, direkt eine Kaufentscheidung treffen kann."
+
+     Ein Score allein trifft keine Entscheidung. Was fehlt, sind drei
+     Dinge, und alle drei lassen sich RECHNEN — keins davon ist geraten:
+
+       1. WANN LOHNT ES SICH?      Break-even.
+       2. WAS IST NOCH DRIN?       Mietpotenzial gegen die Marktmiete.
+       3. WAS MUESSTE SICH AENDERN? Die Hebel, mit ihrer Wirkung in Punkten.
+
+     ── 1. BREAK-EVEN ───────────────────────────────────────────────────
+     `IrrEngine.breakEven(cfReihe, ek)` ist ein reiner Rechenkern — er
+     nimmt eine Zahlungsreihe und gibt drei Jahre zurueck: wann der
+     Cashflow positiv wird, wann die Summe positiv wird, wann das
+     Eigenkapital zurueck ist. Denselben, den die Kennzahlen-Kachel nutzt.
+
+     Die REIHE muss der Sprechlauf bauen, und dabei ist er ehrlich: er
+     rechnet mit Mietsteigerung und Kostensteigerung, aber ohne
+     Tilgungsverlauf, Steuerwirkung und Anschlussfinanzierung — die
+     braeuchten Angaben, die im Gespraech nicht alle fallen. Das steht
+     als Annahme auf der Karte. Eine Naeherung, die sich als solche zeigt,
+     ist brauchbar; eine, die sich als Rechnung ausgibt, nicht.
+
+     ── 2. MIETPOTENZIAL ────────────────────────────────────────────────
+     Marcel: „mit der Marktpreisindikation holen wir uns ja auch gleich
+     passend die Marktmieten mit rein. Dass wir das einmal abgleichen,
+     dann auch Mietpotenzial angeben und vielleicht auch eine Steigerung."
+
+     Die Marktmiete kommt aus der Marktpreisindikation (`rent.median_per_sqm`),
+     die Ist-Miete aus dem Gespraech. Die Luecke dazwischen ist das
+     Potenzial — in Euro je Monat und im Jahr.
+
+     UND DANN WIRD ES MIETRECHT, nicht Rechnen. Marcels Punkt: „je nachdem,
+     was du vorhast, die Wohnung ist ja vermietet, was das fuer ein
+     Mietvertrag ist … wenn's ein Indexmietvertrag ist, dann kannst du
+     halt keine Renovierungsmassnahmen geltend machen … ansonsten
+     koenntest du vielleicht nach drei Jahren erhoehen. Vielleicht schaut
+     man dann in der Region auch, ob's da eine Kappungsgrenze ist."
+
+     Was hier steht, ist BEWUSST allgemein gehalten und als Hinweis
+     gekennzeichnet — es ist keine Rechtsberatung, und die Kappungsgrenze
+     haengt an einer Verordnung des jeweiligen Landes, die wir nicht
+     fuehren. Der Co-Pilot sagt, WAS zu pruefen ist, und rechnet, WAS es
+     brachte. Das Pruefen bleibt beim Nutzer.
+
+     ── 3. DIE HEBEL ────────────────────────────────────────────────────
+     Marcel: „wenn das und das, die und die Werte sind nicht so gut, wenn
+     du die und die steigern koenntest, dann waere es super."
+
+     Das laesst sich BEWEISEN statt behaupten: `DealScore2.compute(deal)`
+     ist rein. Also wird der Deal einmal mit einer realistischen Aenderung
+     nachgerechnet und die Differenz gezeigt — „Kaufpreis 5 % tiefer:
+     Score +7". Keine Faustregel, kein Gefuehl: dieselbe Rechnung, ein
+     Wert anders.
+
+     Gezeigt werden nur Hebel, die wirklich etwas bewegen (>= 2 Punkte),
+     hoechstens vier, der staerkste zuerst. */
+
+  /* Die Zahlungsreihe fuer den Break-even. Bewusst schlicht und benannt. */
+  function _rfCfReihe(Z, jahre) {
+    if (!Z || !Z.K) return null;
+    jahre = jahre || 15;
+    var mietStg = (_rfNum(_rfFeld('mietstg')) || 1.5) / 100;
+    var kostStg = (_rfNum(_rfFeld('kostenstg')) || 2.0) / 100;
+    var K = Z.K;
+    var mieteJ = K.nkm_j || 0;
+    var bwkJ   = K.bwk_cf || 0;
+    var rateJ  = K.rate_j || 0;
+    var reihe = [];
+    for (var i = 0; i < jahre; i++) {
+      var m = mieteJ * Math.pow(1 + mietStg, i);
+      var b = bwkJ   * Math.pow(1 + kostStg, i);
+      reihe.push(m - b - rateJ);
+    }
+    return reihe;
+  }
+
+  function _rfBreakEven(Z) {
+    try {
+      if (!window.IrrEngine || typeof window.IrrEngine.breakEven !== 'function') return null;
+      var reihe = _rfCfReihe(Z, 20);
+      if (!reihe) return null;
+      var be = window.IrrEngine.breakEven(reihe, Z.ek || 0);
+      return { cf: be.cf, kum: be.kum, kumEk: be.kumEk, reihe: reihe };
+    } catch (e) { return null; }
+  }
+
+  /* ── Mietpotenzial ───────────────────────────────────────────────── */
+  function _rfMietPotenzial(Z) {
+    var wfl = _rfNum(_rfFeld('wfl'));
+    if (!Z || !wfl || wfl <= 0) return null;
+    var ist = (Z.nkm || 0) / wfl;
+    var markt = _rfNum(_rfFeld('ds2_marktmiete'));
+    if (markt == null && _rf && _rf.markt && _rf.markt.mietSqm != null) markt = _rf.markt.mietSqm;
+    if (markt == null || markt <= 0) return null;
+    var diffQm = markt - ist;
+    var diffMon = diffQm * wfl;
+    return {
+      ist: ist, markt: markt, diffQm: diffQm, diffMon: diffMon,
+      diffJahr: diffMon * 12,
+      pct: ist > 0 ? (diffQm / ist * 100) : null,
+      quelle: (_rf && _rf.markt && _rf.markt.mietSqm != null && _rfNum(_rfFeld('ds2_marktmiete')) == null)
+              ? 'Marktpreisindikation' : 'deine Angabe'
+    };
+  }
+
+  /* Was mit dem Potenzial anzufangen ist — Mietrecht in Stichworten,
+     ausdruecklich als Hinweis, nicht als Beratung. */
+  function _rfMietWege(P) {
+    if (!P || P.diffMon <= 20) return '';
+    var wege = [];
+    wege.push('<b>Bei Neuvermietung</b> ist der Sprung sofort möglich — dort begrenzt nur eine ' +
+              'etwaige Mietpreisbremse, nicht die Kappungsgrenze.');
+    wege.push('<b>Im laufenden Vertrag</b> geht eine Anhebung zur ortsüblichen Vergleichsmiete ' +
+              'frühestens 15 Monate nach der letzten Änderung, und die <b>Kappungsgrenze</b> ' +
+              'deckelt sie auf 20 % in drei Jahren — in Gebieten mit angespanntem Wohnungsmarkt ' +
+              'auf 15 %. Ob dein Ort dazugehört, steht in der Verordnung deines Bundeslandes.');
+    wege.push('<b>Index- oder Staffelmietvertrag?</b> Dann gilt die Vereinbarung statt der ' +
+              'Vergleichsmiete — und bei einem Indexmietvertrag lässt sich eine Modernisierung ' +
+              '<b>nicht</b> zusätzlich umlegen. Das ändert die Rechnung für eine Sanierung.');
+    wege.push('<b>Nach einer Modernisierung</b> sind bis zu 8 % der Kosten jährlich umlegbar, ' +
+              'gedeckelt auf 3 €/m² in sechs Jahren (bei Mieten unter 7 €/m²: 2 €).');
+    return '<details class="vi-sc-mehr"><summary>Wie du da hinkommst</summary>' +
+           wege.map(function (w) { return '<div class="vi-lg-t">' + w + '</div>'; }).join('') +
+           '<div class="vi-lg-t" style="opacity:.6">Das sind Anhaltspunkte, keine Rechtsberatung — ' +
+           'welcher Weg offensteht, hängt an deinem Mietvertrag und am Ort.</div>' +
+           '</details>';
+  }
+
+  /* ── Die Hebel: gerechnet, nicht geraten ─────────────────────────── */
+  function _rfHebel() {
+    var basis = _rfScore2();
+    if (!basis || !basis.R) return [];
+    var b = Math.round(basis.R.score);
+    var kp = _rfNum(_rfFeld('kp')), nkm = _rfNum(_rfFeld('nkm'));
+    var ek = _rfNum(_rfFeld('ek')), d1z = _rfNum(_rfFeld('d1z')), d1t = _rfNum(_rfFeld('d1t'));
+    var proben = [];
+    if (kp > 0)  proben.push({ id: 'kp',  wert: Math.round(kp * 0.95),
+                               txt: 'Kaufpreis <b>5 % tiefer</b> (' + _euroKurz(kp * 0.95) + ')',
+                               wie: 'Verhandeln — das ist der stärkste Hebel, den du selbst in der Hand hast.' });
+    if (nkm > 0) proben.push({ id: 'nkm', wert: Math.round(nkm * 1.1),
+                               txt: 'Miete <b>10 % höher</b> (' + _euroKurz(nkm * 1.1) + '/Mon)',
+                               wie: 'Über Neuvermietung, Anhebung zur Vergleichsmiete oder Modernisierung.' });
+    if (kp > 0)  proben.push({ id: 'ek',  wert: Math.round((ek || 0) + kp * 0.1),
+                               txt: '<b>10 % mehr Eigenkapital</b> (' + _euroKurz((ek || 0) + kp * 0.1) + ')',
+                               wie: 'Senkt LTV und Kapitaldienst — verbessert Finanzierung und Risiko.' });
+    if (d1z > 0) proben.push({ id: 'd1z', wert: String(Math.round((d1z - 0.5) * 100) / 100).replace('.', ','),
+                               txt: 'Zins <b>0,5 Punkte tiefer</b> (' + _pz(d1z - 0.5) + ' %)',
+                               wie: 'Mehrere Banken anfragen, Eigenkapital oder Sicherheiten nachlegen.' });
+    if (d1t > 0) proben.push({ id: 'd1t', wert: String(Math.round((d1t + 1) * 100) / 100).replace('.', ','),
+                               txt: 'Tilgung <b>1 Punkt höher</b> (' + _pz(d1t + 1) + ' %)',
+                               wie: 'Kostet Cashflow, bringt Entschuldung — der Score wägt beides ab.' });
+    var raus = [];
+    proben.forEach(function (p) {
+      var alt = _rf.data.fields[p.id];
+      _rf.data.fields[p.id] = String(p.wert);
+      var neu = null;
+      try { var r = _rfScore2(); neu = r ? Math.round(r.R.score) : null; } catch (e) {}
+      if (alt === undefined) delete _rf.data.fields[p.id]; else _rf.data.fields[p.id] = alt;
+      if (neu == null) return;
+      var d = neu - b;
+      if (d >= 2) raus.push({ txt: p.txt, wie: p.wie, plus: d, ziel: neu });
+    });
+    raus.sort(function (x, y) { return y.plus - x.plus; });
+    return raus.slice(0, 4);
+  }
+
   /* ── Die Karten ───────────────────────────────────────────────────── */
   function _zeile(name, wert, ton) {
     return '<span class="vi-sc-z' + (ton ? ' ' + ton : '') + '"><i>' + escH(name) + '</i><b>' + escH(wert) + '</b></span>';
@@ -3395,6 +3625,65 @@
   function _pctTxt(n, d) {
     if (n == null || !isFinite(n)) return '–';
     return String(Math.round(n * Math.pow(10, d || 1)) / Math.pow(10, d || 1)).replace('.', ',') + ' %';
+  }
+
+  /* ═══ v1292 · Die Zahl zaehlt hoch, und ein Top-Deal leuchtet ══════════
+     Marcels Wunsch: „Deal Score und Deal Score zwei muss richtig geil son
+     bisschen animiert werden mit den Zahlen, vielleicht der Deal Score
+     etwas leuchtend oder so."
+
+     Die Animation laeuft ueber `requestAnimationFrame` — aber NUR, wenn
+     der Reiter sichtbar ist: im verborgenen Tab feuert rAF nie, und die
+     Zahl bliebe auf 0 stehen (FALLEN.md). Deshalb prueft `_zahlAnimieren`
+     `document.visibilityState` und setzt sonst sofort den Endwert.
+
+     Das Leuchten haengt an der STUFE, nicht am Geschmack: ab 85 (TOP) ein
+     kraeftiger Schein, ab 70 (GUT) ein zurueckhaltender. Darunter gar
+     keiner — ein schwacher Deal, der leuchtet, waere eine Luege in
+     Lichtform. */
+  function _zahlAnimieren(el, ziel, dauer) {
+    if (!el) return;
+    var end = Number(ziel) || 0;
+    try {
+      if (document.visibilityState === 'hidden') { el.textContent = String(end); return; }
+    } catch (e) {}
+    var t0 = null, ms = dauer || 1100;
+    function schritt(t) {
+      if (t0 === null) t0 = t;
+      var p = Math.min(1, (t - t0) / ms);
+      /* Weich auslaufend — die letzten Punkte sollen "ankommen", nicht
+         durchrauschen. */
+      var e = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(end * e));
+      if (p < 1) requestAnimationFrame(schritt);
+      else el.textContent = String(end);
+    }
+    try { requestAnimationFrame(schritt); } catch (e) { el.textContent = String(end); }
+  }
+
+  /* Nach dem Einfuegen einer Karte: Zahlen animieren, Balken fuellen. */
+  function _rfKarteBeleben(wurzel) {
+    if (!wurzel) return;
+    [].slice.call(wurzel.querySelectorAll('.vi-sc-zahl-n[data-ziel]')).forEach(function (el) {
+      _zahlAnimieren(el, parseInt(el.getAttribute('data-ziel'), 10) || 0);
+    });
+    [].slice.call(wurzel.querySelectorAll('.vi-sc-bar i[data-w]')).forEach(function (b, i) {
+      setTimeout(function () { b.style.width = b.getAttribute('data-w') + '%'; }, 90 + i * 70);
+    });
+  }
+
+  /* Der Kopf einer Score-Karte: grosse Zahl, Stufe, Leuchten. */
+  function _scoreKopf(titel, score, st, unter) {
+    var glanz = score >= 85 ? ' top' : (score >= 70 ? ' gut' : '');
+    return '<div class="vi-sc-kopf"><span class="vi-sc-titel">' + escH(titel) + '</span>' +
+      '<span class="vi-sc-pille" style="color:' + st.farbe + ';border-color:' + st.farbe + '">' + st.wort + '</span></div>' +
+      '<div class="vi-sc-zahl' + glanz + '" style="color:' + st.farbe + '">' +
+        '<span class="vi-sc-zahl-n" data-ziel="' + Math.round(score) + '">0</span>' +
+        '<small>/ 100</small>' +
+        (unter ? '<em>' + escH(unter) + '</em>' : '') +
+      '</div>' +
+      '<div class="vi-sc-bar"><i data-w="' + Math.max(0, Math.min(100, Math.round(score))) +
+        '" style="background:' + st.farbe + '"></i></div>';
   }
 
   function _rfScore1Karte() {
@@ -3408,10 +3697,23 @@
     if (Z.quellen.bwk === 'profil')  annahmen.push('Bewirtschaftung als Quote der Kaltmiete');
     annahmen.push('Darlehen = Gesamtinvestition minus Eigenkapital');
 
+    /* v1292: Break-even — „ab wann lohnt es sich" ist die Frage, die ein
+       Score allein nicht beantwortet. */
+    var be = _rfBreakEven(Z), beZeile = '';
+    if (be) {
+      var teile = [];
+      if (be.cf)    teile.push('Cashflow ab Jahr <b>' + be.cf + '</b>');
+      else          teile.push('Cashflow bleibt in 20 Jahren negativ');
+      if (be.kum)   teile.push('Summe im Plus ab Jahr <b>' + be.kum + '</b>');
+      if (be.kumEk) teile.push('Eigenkapital zurück in Jahr <b>' + be.kumEk + '</b>');
+      beZeile = '<div class="vi-sc-be"><b>Break-even</b> ' + teile.join(' · ') +
+        '<small>Gerechnet mit ' + _pctTxt(_rfNum(_rfFeld('mietstg')) || 1.5) + ' Mietsteigerung und ' +
+        _pctTxt(_rfNum(_rfFeld('kostenstg')) || 2.0) + ' Kostensteigerung, ohne Tilgungsverlauf, ' +
+        'Steuerwirkung und Anschlussfinanzierung — die kommen in der vollen Rechnung dazu.</small></div>';
+    }
+
     return '<div class="vi-sc">' +
-      '<div class="vi-sc-kopf"><span class="vi-sc-titel">Deal Score · Zwischenstand</span>' +
-        '<span class="vi-sc-pille" style="color:' + st.farbe + ';border-color:' + st.farbe + '">' + st.wort + '</span></div>' +
-      '<div class="vi-sc-zahl" style="color:' + st.farbe + '">' + S.score + '<small>/ 100</small></div>' +
+      _scoreKopf('Deal Score · Zwischenstand', S.score, st, S.label) +
       '<div class="vi-sc-gitter">' +
         _zeile('Cashflow', _euroKurz(cf) + '/Mon', cf >= 0 ? 'gut' : 'schlecht') +
         _zeile('Nettomietrendite', _pctTxt(K.nmy, 2)) +
@@ -3420,7 +3722,7 @@
         _zeile('DSCR', K.dscr != null ? String(Math.round(K.dscr * 100) / 100).replace('.', ',') : '–',
                (K.dscr || 0) >= 1.1 ? 'gut' : 'schlecht') +
         _zeile('Gesamtinvestition', _euroKurz(Z.gi)) +
-      '</div>' +
+      '</div>' + beZeile +
       '<div class="vi-sc-text">' + escH(S.interpretation || '') + '</div>' +
       '<div class="vi-sc-annahmen"><b>Gerechnet mit:</b> ' + escH(annahmen.join(' · ')) + '</div>' +
     '</div>';
@@ -3429,7 +3731,7 @@
   function _rfScore2Karte() {
     var r = _rfScore2();
     if (!r) return null;
-    var R = r.R, st = _stufe(R.score);
+    var R = r.R, Z = r.Z, st = _stufe(R.score);
     var cats = R.categories || {};
     var namen = { rendite: 'Rendite', finanzierung: 'Finanzierung', risiko: 'Risiko', lage: 'Lage', upside: 'Upside' };
     var gitter = Object.keys(namen).map(function (k) {
@@ -3444,11 +3746,50 @@
       Object.keys(cats).forEach(function (k) { av += (cats[k].availableKpis || 0); ge += (cats[k].totalKpis || 0); });
       if (ge) vollst = av + ' von ' + ge + ' Kennzahlen belegt';
     } catch (e) {}
+
+    /* v1292 · Mietpotenzial gegen die Marktmiete. */
+    var P = _rfMietPotenzial(Z), mp = '';
+    if (P && Math.abs(P.diffMon) >= 15) {
+      var hoch = P.diffMon > 0;
+      mp = '<div class="vi-sc-mp' + (hoch ? ' plus' : ' minus') + '">' +
+        '<b>' + (hoch ? 'Mietpotenzial' : 'Über Marktniveau') + '</b> ' +
+        'Du liegst bei <b>' + escH(String(Math.round(P.ist * 100) / 100).replace('.', ',')) + ' €/m²</b>, ' +
+        'der Markt bei <b>' + escH(String(Math.round(P.markt * 100) / 100).replace('.', ',')) + ' €/m²</b>' +
+        ' <span style="opacity:.6">(' + escH(P.quelle) + ')</span>. ' +
+        (hoch
+          ? 'Das sind <b>' + _euroKurz(P.diffMon) + ' im Monat</b> oder ' + _euroKurz(P.diffJahr) +
+            ' im Jahr, die noch nicht in der Rechnung stehen.'
+          : 'Die Miete liegt <b>' + _euroKurz(-P.diffMon) + '/Mon über</b> dem Marktniveau — ' +
+            'bei einem Mieterwechsel könnte sie sinken. Das ist ein Risiko, kein Potenzial.') +
+        (hoch ? _rfMietWege(P) : '') +
+      '</div>';
+    }
+
+    /* v1292 · Die Hebel — gerechnet, nicht geraten. */
+    var hebel = [], hb = '';
+    try { hebel = _rfHebel(); } catch (e) {}
+    if (hebel.length) {
+      hb = '<div class="vi-sc-hebel"><b>Was den Score hebt</b>' +
+        hebel.map(function (h) {
+          return '<div class="vi-hb"><span class="vi-hb-p">+' + h.plus + '</span>' +
+                 '<span class="vi-hb-t">' + h.txt + '<small>' + escH(h.wie) + '</small></span>' +
+                 '<span class="vi-hb-z">' + h.ziel + '</span></div>';
+        }).join('') +
+        '<small>Jede Zeile ist nachgerechnet: derselbe Score, ein Wert geändert.</small></div>';
+    }
+
+    var fazit = R.score >= 85
+      ? '<div class="vi-sc-fazit top">Das ist ein <b>Top-Deal</b> — die Zahlen tragen sich selbst.</div>'
+      : (R.score >= 70
+        ? '<div class="vi-sc-fazit gut">Ein <b>guter Deal</b>. Mit den Hebeln unten wird mehr daraus.</div>'
+        : (R.score >= 50
+          ? '<div class="vi-sc-fazit">Ein <b>solider Deal</b> — er trägt, aber er verzeiht wenig. Sieh dir die Hebel an.</div>'
+          : '<div class="vi-sc-fazit schwach">So wie er dasteht, rechnet er sich <b>nicht</b>. Die Hebel zeigen, was fehlt.</div>'));
+
     return '<div class="vi-sc">' +
-      '<div class="vi-sc-kopf"><span class="vi-sc-titel">Investor Deal Score 2.0</span>' +
-        '<span class="vi-sc-pille" style="color:' + st.farbe + ';border-color:' + st.farbe + '">' + st.wort + '</span></div>' +
-      '<div class="vi-sc-zahl" style="color:' + st.farbe + '">' + Math.round(R.score) + '<small>/ 100</small></div>' +
-      '<div class="vi-sc-gitter">' + gitter + '</div>' +
+      _scoreKopf('Investor Deal Score 2.0', R.score, st, st.kamel) +
+      fazit +
+      '<div class="vi-sc-gitter">' + gitter + '</div>' + mp + hb +
       (R.explanation ? '<div class="vi-sc-text">' + escH(String(R.explanation).replace(/\s+/g, ' ').slice(0, 420)) + '</div>' : '') +
       (vollst ? '<div class="vi-sc-annahmen"><b>Datenlage:</b> ' + escH(vollst) +
                 ' — was fehlt, zählt nicht gegen dich, es zählt gar nicht.</div>' : '') +
