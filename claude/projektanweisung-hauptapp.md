@@ -10165,6 +10165,59 @@ es?"*
 Profil-Vorschlag, Prozentfalle) · `v1281` (Spalte, Fragen). Backend
 mehrfach neu gebaut. Auf Staging, **nicht auf Prod**.
 
+### `v1282` · Der Co-Pilot fragt auf Wunsch auch die Feinheiten ab
+
+Marcels Wunsch: *„können wir das auch mit dem Sprechlauf so
+weiterentwickeln, dass er auch alle anderen Felder entgegennimmt, wenn man
+das will? du hast ja alles vorbereitet dafür."*
+
+**Vorbereitet war es.** Die 13 festen Blöcke decken **31** Felder ab;
+`window.FIELDS` führt aber **204**, davon rund **145 frei ausfüllbar** —
+gemessen am 10.09.2026: Objekt 72 · Finanzierung 25 · Bewirtschaftung 17 ·
+Investition 14 · Miete 13 · Steuer 4.
+
+> **145 Fragen sind kein Gespräch, das ist ein Fragebogen.** Die 13 Blöcke
+> bleiben der Weg; die Feinheiten kommen **danach** und nur, wenn jemand
+> sie will.
+
+**Zwei Wege dorthin:**
+
+1. Am Ende der Pflichtstrecke fragt der Co-Pilot **einmal** nach: *„Das
+   Wichtigste steht. Willst du die Feinheiten auch noch durchgehen?"*
+2. Wer es gleich weiß, schaltet oben **„Alle Felder"** ein.
+
+> **Wer selbst „Fertig" drückt, wird nicht gefragt.** Wer abbricht, will
+> abbrechen — die Nachfrage käme dort als Bevormundung an.
+
+#### Gebildet aus dem DOM, nicht aus einer zweiten Liste
+
+Der Abschnitt (`.sec`) gibt das Thema, das Label den Namen, je **vier**
+Felder eine Frage. Nicht gefragt wird, was berechnet (`readonly`),
+gesperrt, versteckt oder **schon gefüllt** ist — und nichts aus der
+Pflichtstrecke: wer geantwortet hat, wird nicht zweimal gefragt. Der
+Feldkatalog wird um die neuen Felder ergänzt, samt Optionen bei Auswahlen;
+ohne Fach kein Wert.
+
+> **Eine gepflegte Zweitliste von 145 Feldern würde beim ersten neuen Feld
+> veralten — und niemand würde es merken.** Deshalb liest sie sich selbst
+> aus dem Formular, das ohnehin die Wahrheit ist.
+
+#### Abnahme (Staging)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Dialog ohne Schalter | **12 Fragen** |
+| „Alle Felder" an | **38 Fragen**, Spalte und Zähler wandern mit |
+| Beispiel-Block | „Kaufpreis & Nebenkosten: Makler, Notar, Grundbuchamt, Grunderwerbsteuer?" |
+| Antwort darauf | „Makler 3,57 Prozent, Notar 1,5 und Grunderwerbsteuer 6,5 in NRW" → **`makler_p 3.57 · notar_p 1.5 · gest_p 6.5`**, 0,12 ct |
+| Unpassende Antwort | „Daraus konnte ich nichts entnehmen" — **richtig**, die Antwort gehörte zu einer anderen Frage |
+
+`v1282b` kürzt die Namen in der Spalte auf den Bereich: „Objekt: Kürzel,
+Bankbewertung, Bevölkerungsentwicklung…" passt nicht in 196 px, „Objekt"
+schon — welche Felder es sind, steht in der Frage selbst.
+
+**Commits.** `v1282` · `v1282b`. Auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
