@@ -38,7 +38,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
 
-**Stand:** `v1273`–`v1290e` liegen auf Staging. **Produktion steht auf `a21fe9c`**
+**Stand:** `v1273`–`v1292d` liegen auf Staging. **Produktion steht auf `a21fe9c`**
 — nichts davon ist live.
 
 > **Nach Marcels erstem echten Sprechlauf am 10.09. abends** (Bilder
@@ -71,7 +71,28 @@ der Frage, und ein Co-Pilot, der seine eigenen Kennzahlen kennt.
 
 ---
 
-### 1 · Echtes Sprechen abnehmen — das kann nur Marcel
+### 1 · Zwei Wünsche aus dem 10.09., die noch offen sind
+
+**„Die KI muss alles raushören und nachfragen."** Teilweise da: seit `v1290`
+hakt der Co-Pilot nach, wenn er nur einen Teil eines Blocks verstanden hat
+(„Das habe ich. Fehlt noch: Hausnummer"), und ein offen endender Satz wird
+gemerkt statt ausgewertet. Was fehlt, ist das **Heraushören von Angaben, die
+gar nicht gefragt waren** — wer bei der Miete schon das Baujahr mitnennt, soll
+es behalten dürfen. Heute filtert `_rfUebernehmen` auf `e.ids`, also auf das,
+wonach gefragt war. **Aufwand:** klein. **Vorsicht:** die Filterung war
+Absicht — sie verhindert, dass ein Modell Felder rät, die im Satz nicht
+vorkommen. Der Weg wäre, den Katalog um die *nächsten* Blöcke zu erweitern
+statt um alle.
+
+**„Unter Deal-Aktion die Werte einbeziehen."** Der Break-even ist drin
+(`IrrEngine.breakEven`, dieselbe Rechnung wie die Kennzahlen-Kachel). Was der
+Sprechlauf noch nicht liest, sind die übrigen Größen aus dem Deal-Aktion-Modul
+— IRR, Exit-Erlös, Restschuld am Ende der Zinsbindung. Sie brauchen die volle
+`calc()`-Kette und damit ein gefülltes Formular; im Sprechlauf gibt es das
+bewusst nicht. **Zu klären:** ob eine Näherung dafür reicht, oder ob diese
+Zahlen erst nach der Übernahme gehören.
+
+### 2 · Echtes Sprechen abnehmen — das kann nur Marcel
 
 Die Reparatur des Freisprechens (`v1290`) ist am Kern **bewiesen**: der
 WebM-Header überlebt den Ringpuffer, der Recorder läuft durch, und
@@ -90,7 +111,7 @@ Wenn dabei wieder etwas hakt: die Konsole trägt jetzt `[voice]`-Zeilen mit dem
 Grund, und `window.VoiceImport._fsStand()` zeigt Phase, Kopf, Chunks und den
 gemerkten Satzanfang.
 
-### 2 · Die Sprachqualität messen — mit echtem Material
+### 3 · Die Sprachqualität messen — mit echtem Material
 
 `OPENAI_TRANSCRIBE_MODEL`: **auf Staging steht seit dem 09.09. das mini**, auf
 Prod weiterhin das große `gpt-4o-transcribe` (dafür fehlt die Freigabe).
@@ -107,9 +128,9 @@ Die Zahlen dahinter: mini kostet die Hälfte (3,00 statt 6,00 USD je Mio
 Audio-Token) und ist 37 % schneller (1864 ms gegen 2944 ms). Der Wechsel senkt
 die Kosten einer Aufnahme um rund 40 % — bei 4 Minuten von ≈ 1,7 auf ≈ 0,9 Cent.
 
-### 3 · Der Sprechlauf gehört auf Produktion
+### 4 · Der Sprechlauf gehört auf Produktion
 
-**`v1273`–`v1290e` liegen auf Staging.** Prod steht auf
+**`v1273`–`v1292d` liegen auf Staging.** Prod steht auf
 `a21fe9c` — der Co-Pilot, die Etappen, beide Scores, BORIS-Abruf und
 Marktpreisindikation im Hintergrund sind für keinen Kunden erreichbar.
 
@@ -117,24 +138,39 @@ Marktpreisindikation im Hintergrund sind für keinen Kunden erreichbar.
 berührt einen Backend-Endpunkt: `/ai/copilot-frage`). Vorher wie immer
 sichern — beide Datenbanken, `dealpilot-mb-db` mit eigenem `pg_dump`.
 
-### 4 · Der Gold-Altbestand
+### 5 · Der Gold-Altbestand
 
 468 Fundstellen sind als Basislinie eingefroren, der Wächter meldet nur noch
 Neues. Abgetragen wird, wenn eine Datei ohnehin angefasst wird. Vor dem ersten
 echten Whitelabel-Kunden gehören `pricing-modal.js` (53),
 `reseller-portal.js` (43) und `qc-bridge.js` (39) gezielt nachgezogen.
 
-### 5 · Doppelte Plausibilitätsprüfung
+### 6 · Doppelte Plausibilitätsprüfung
 
 Marcels Wunsch vom 08.09., **zurückgestellt**. Der Code liegt vollständig da,
 `OPENAI_VOICE_VERIFY=1` schaltet ihn an.
 
-### 6 · IRR/Break-Even ins Portfolio-Cockpit
+### 7 · IRR/Break-Even ins Portfolio-Cockpit
 
 **Teilweise erledigt** — sie stehen in den Kennzahlen-Kacheln (Reiter
 Bewertung); im Portfolio-Cockpit noch nicht.
 
 ---
+
+## → Erledigt am 10.09.2026, spät (`v1291`–`v1292d`)
+
+| Marcels Wunsch | Stand |
+|---|---|
+| Offene Fragen und Abrufe **unten** und sichtbar | **fertig** — feste Aktionsleiste zwischen Verlauf und Mikrofon; ein Ort für alle Entscheidungen |
+| **Adresse bestätigen** und Rückfrage stellen | **fertig** — mit Bundesland und Grunderwerbsteuersatz; die einzige Rückfrage im Dialog |
+| Makro-/Mikrolage **einzeln abrufen**, auch Bevölkerung | **fertig** — `/ai/lage` liefert sechs Dimensionen mit Quelle, Enums Feld für Feld gegengeprüft |
+| **Break-even** nennen | **fertig** — über `IrrEngine.breakEven`, mit benannten Annahmen |
+| **Marktmieten abgleichen**, Mietpotenzial, Steigerung | **fertig** — €/m² gegen Markt, in €/Monat und Jahr, mit Herkunft |
+| **Mietvertrag**, Index, Kappungsgrenze, Modernisierung | **fertig** — als Anhaltspunkte, ausdrücklich keine Rechtsberatung |
+| **Upside auf den Deal Score** | **fertig** — gerechnete Hebel in Staffeln, kleinster wirksamer Schritt |
+| Score **animiert und leuchtend** | **fertig** — Hochzählen, Balken, Leuchten ab Stufe GUT, Pulsieren ab TOP |
+| KI hört alles raus und fragt nach | **teilweise** — siehe Punkt 1 |
+| Deal-Aktion-Werte einbeziehen | **teilweise** — Break-even ja, IRR und Exit nein; siehe Punkt 1 |
 
 ## → Erledigt am 10.09.2026
 
