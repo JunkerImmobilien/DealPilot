@@ -3841,16 +3841,79 @@
      WAS NICHT GEFRAGT WIRD: berechnete Felder (readonly), gesperrte,
      versteckte, bereits gefüllte und die 31 aus der Pflichtstrecke. Wer
      schon geantwortet hat, wird nicht zweimal gefragt. */
+  /* ═══════════════════════════════════════════════════════════════════
+     v1289 · DIE FEINHEITEN NACH THEMA, NICHT NACH REIHENFOLGE
+     ═══════════════════════════════════════════════════════════════════
+     Der letzte offene Punkt aus Marcels Plan vom 10.09.2026.
+
+     Bis v1288b entstanden die Feinheiten stumpf: vier Felder je Frage, in
+     der Reihenfolge des Formulars, gruppiert nur nach ABSCHNITT. Das ergab
+     Fragen wie
+
+       „Objekt: Kuerzel, Bankbewertung, Bevoelkerungsentwicklung,
+        Nachfrage-Indikatoren?"
+
+     Vier Dinge, die inhaltlich nichts miteinander zu tun haben — eine
+     Frage, die man nicht in einem Satz beantworten kann.
+
+     DER ANKER IST DIE KARTEN-UEBERSCHRIFT, gemessen am 10.09.2026 im
+     Browser: `.ct` sitzt in `.card`, und `.card` traegt die `.f`-Felder.
+     37 solche Ueberschriften gibt es in den sechs Abschnitten, und sie
+     sind bereits das, was wir suchen — echte Themen:
+
+       Objektdaten · Qualitaet & Zustand · Lage- & Markt-Indikatoren ·
+       Grund & Boden · Kaufpreis & Nebenkosten · Sanierung · Inventar ·
+       Mietstruktur · Mietpreis-Analyse · Mietentwicklung · Persoenliche
+       Steuer · Darlehen I · Bauspardarlehen · Umlagefaehige Kosten ·
+       Nicht umlagefaehige Kosten · Detailpositionen
+
+     WARUM AUS DEM DOM UND NICHT AUS EINER LISTE: das war der Vorbehalt aus
+     v1282, und er gilt weiter. Eine gepflegte Zweitliste von 145 Feldern
+     veraltet beim ersten neuen Feld, und niemand merkt es. Die
+     Ueberschrift steht ohnehin da, sie wird nur bisher nicht gelesen.
+
+     WO KEINE UEBERSCHRIFT IST, greift wie bisher der Abschnittsname. Das
+     ist kein Rueckschritt, sondern der Rueckfall — und er faellt auf,
+     weil der Block dann den Bereichsnamen traegt statt eines Themas.
+
+     DIE UEBERSCHRIFT MUSS GESAEUBERT WERDEN. `.ct` enthaelt neben dem
+     Titel oft einen Knopf oder eine Live-Marke: gemessen ergaben
+     `textContent` die Titel „Sanierung Sanierungsbedarf einschaetzen" und
+     „Markt-Kontext (EZB & Geldmarkt) Live · ECB E…". Gelesen werden
+     deshalb nur die DIREKTEN Textknoten. */
   var TIEFE_SEC = {
     s0: 'Objekt', s1: 'Kaufpreis & Nebenkosten', s2: 'Miete & Entwicklung',
     s3: 'Finanzierung', 's3-tax': 'Steuer', s4: 'Bewirtschaftung'
   };
   var TIEFE_PRO_FRAGE = 4;
 
+  /* Nur die direkten Textknoten — was in einem Kind-Element steht, ist
+     Knopf, Marke oder Hilfetext, nicht der Titel. */
+  function _kartenTitel(karte) {
+    if (!karte) return '';
+    var ct = karte.querySelector(':scope > .ct') || karte.querySelector('.ct');
+    if (!ct) return '';
+    var t = '';
+    for (var i = 0; i < ct.childNodes.length; i++) {
+      var n = ct.childNodes[i];
+      if (n.nodeType === 3) t += n.nodeValue;
+    }
+    t = t.replace(/\s+/g, ' ').trim().replace(/[·:\-–—]+$/, '').trim();
+    /* Ohne direkte Textknoten (alles steckt in einem <span>) lieber den
+       ganzen Text als gar keinen — dann aber nur bis zum ersten Kind. */
+    if (!t && ct.firstElementChild) {
+      t = String(ct.firstElementChild.textContent || '').replace(/\s+/g, ' ').trim();
+    }
+    if (t.length > 38) t = t.slice(0, 38).replace(/\s+\S*$/, '') + '…';
+    return t;
+  }
+
   function _rfTiefeBloecke() {
     var schon = {};
     RFRAGEN.forEach(function (e) { e.ids.forEach(function (id) { schon[id] = 1; }); });
-    var proSec = {};
+    /* v1289: gesammelt wird je KARTE, die Reihenfolge der Abschnitte
+       bleibt die des Formulars — dort ist sie eine Erzaehl-Logik. */
+    var proKarte = {}, folge = [];
     (window.FIELDS || []).forEach(function (id) {
       if (schon[id]) return;
       var el = document.getElementById(id);
@@ -3864,18 +3927,40 @@
       var lab = f && f.querySelector('label');
       var name = lab ? lab.textContent.replace(/\s+/g, ' ').replace(/\s*ℹ.*$/, '').trim() : id;
       if (!name || name.length > 42) return;                  /* ohne Namen keine Frage */
-      (proSec[k] = proSec[k] || []).push({ id: id, label: name });
+      var karte = el.closest('.card');
+      var titel = _kartenTitel(karte) || TIEFE_SEC[k];
+      var schluessel = k + ' ' + titel;
+      if (!proKarte[schluessel]) {
+        proKarte[schluessel] = { sec: k, titel: titel, felder: [] };
+        folge.push(schluessel);
+      }
+      proKarte[schluessel].felder.push({ id: id, label: name });
     });
+
+    /* Die Abschnitts-Reihenfolge aus TIEFE_SEC gewinnt, innerhalb bleibt
+       die Reihenfolge der Karten im Formular. */
+    var secFolge = Object.keys(TIEFE_SEC);
+    folge.sort(function (a, b) {
+      var d = secFolge.indexOf(proKarte[a].sec) - secFolge.indexOf(proKarte[b].sec);
+      return d;
+    });
+
     var bloecke = [];
-    Object.keys(TIEFE_SEC).forEach(function (k) {
-      var liste = proSec[k] || [];
-      for (var i = 0; i < liste.length; i += TIEFE_PRO_FRAGE) {
-        var teil = liste.slice(i, i + TIEFE_PRO_FRAGE);
+    folge.forEach(function (schluessel) {
+      var K = proKarte[schluessel];
+      var teile = Math.ceil(K.felder.length / TIEFE_PRO_FRAGE);
+      for (var i = 0, nr = 1; i < K.felder.length; i += TIEFE_PRO_FRAGE, nr++) {
+        var teil = K.felder.slice(i, i + TIEFE_PRO_FRAGE);
+        /* Der Bereich steht VOR der Frage, nicht als Doppelpunkt-Praefix:
+           „Inventar — Kueche, Moebel, Geraete?" liest sich wie eine Frage,
+           „Inventar: Kueche, Moebel, Geraete?" wie eine Tabellenzeile. */
+        var zusatz = (teile > 1) ? ' (' + nr + ' von ' + teile + ')' : '';
         bloecke.push({
           ids: teil.map(function (x) { return x.id; }),
           tiefe: 1, et: 6,   /* v1288: die Feinheiten sind eine eigene Etappe */
-          bereich: TIEFE_SEC[k],
-          frage: TIEFE_SEC[k] + ': ' + teil.map(function (x) { return x.label; }).join(', ') + '?'
+          bereich: K.titel + zusatz,
+          frage: K.titel + zusatz + ' — ' +
+                 teil.map(function (x) { return x.label; }).join(', ') + '?'
         });
       }
     });
