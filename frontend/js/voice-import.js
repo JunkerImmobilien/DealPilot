@@ -2569,9 +2569,29 @@
       '  text-align:right;white-space:nowrap}',
       '.vi-rf-st-w b.vorbelegt{color:#8A837F;font-weight:400}',
 
-      '.vi-rf-buehne{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start}',
+      /* ═══ v1290b · Das Modal scrollt nicht mehr ═══════════════════════
+         Gemessen: Buehne 560 + Band 24 + Kopfzeile 33 + Mikro 59 +
+         Eingabe 43 + Knoepfe 33 = 752 px in einem Body von 699. Man
+         musste scrollen, um das Mikrofon zu sehen — bei einem Dialog,
+         dessen ganzer Sinn das Mikrofon ist.
+         Jetzt bestimmt der PLATZ die Hoehe des Verlaufs, nicht eine feste
+         Zahl: alles ausser der Buehne ist `flex:0 0 auto`, die Buehne
+         nimmt den Rest. `min-height:0` ist dabei Pflicht — ein Flex-Kind
+         schrumpft sonst nicht unter seinen Inhalt (FALLEN.md). */
+      '.oabi-ov.vi-mode.vi-dialog .oabi-body{display:flex;flex-direction:column;overflow:hidden}',
+      '.oabi-ov.vi-mode.vi-dialog #vi-frage{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}',
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-kopfzeile,',
+      '.oabi-ov.vi-mode.vi-dialog #vi-rf-band,',
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-mikro,',
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-zeile,',
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-neben{flex:0 0 auto}',
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{flex:1 1 auto;min-height:0}',
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-chat,',
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-stand{height:100%;min-height:180px}',
+      '.vi-rf-buehne{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:stretch}',
       '@media(max-width:720px){.vi-rf-buehne{grid-template-columns:1fr}',
-      '  .vi-rf-stand{order:-1;height:150px}}',
+      '  .vi-rf-stand{order:-1}',
+      '  .oabi-ov.vi-mode.vi-dialog .vi-rf-stand{height:auto;max-height:150px}}',
       '.vi-rf-chat{height:min(58vh,560px);overflow-y:auto;display:flex;flex-direction:column;gap:11px;',
       '  padding:2px 4px 2px 2px}',
       '.vi-rf-blase{max-width:82%;padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.45;',
@@ -2661,7 +2681,7 @@
          sieht, wie weit man ist. */
       '#vi-rf-band{margin:0 2px 14px}',
       '.vi-et-band{display:flex;align-items:flex-start;gap:0;flex-wrap:wrap}',
-      '.vi-et{display:flex;align-items:center;gap:8px;flex:1 1 0;min-width:0;opacity:.4}',
+      '.vi-et{display:flex;align-items:center;gap:8px;flex:1 1 auto;min-width:0;opacity:.4}',
       '.vi-et-linie{flex:1 1 auto;min-width:12px;height:2px;border-radius:2px;',
       '  background:rgba(255,255,255,.13);margin:0 4px}',
       '.vi-et.fertig .vi-et-linie,.vi-et.jetzt .vi-et-linie{background:var(--wl-c9a84c, #C9A84C);opacity:.55}',
@@ -4064,6 +4084,9 @@
       '</div>' +
       '<div id="vi-rf-gesagt" style="display:none"></div>';
     h.style.display = '';
+    /* v1290b: Der Dialog-Modus schaltet das Flex-Layout ein — der Verlauf
+       nimmt den Platz, der uebrig ist, statt einer festen Hoehe. */
+    try { var _ov = $('oabi-ov'); if (_ov) _ov.classList.add('vi-dialog'); } catch (e) {}
 
     var inp = $('vi-rf-in');
     inp.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); _rfSenden(); } });
@@ -4555,6 +4578,7 @@
     if (!_rf) return;
     _fsStopHoeren(); _fsAus();
     var h = $('vi-frage'); if (h) h.style.display = 'none';
+    try { var _ov = $('oabi-ov'); if (_ov) _ov.classList.remove('vi-dialog'); } catch (e) {}   /* v1290b: die Tabelle scrollt wieder normal */
     /* v1288: Die Herkunft je Feld geht mit in die Tabelle. Ohne sie stuende
        dort „Sprachaufzeichnung" an Zahlen, die der Co-Pilot selbst geholt
        hat — und genau das war der Vorbehalt im Backlog. */
