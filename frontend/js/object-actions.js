@@ -500,20 +500,70 @@
   function selectedSources() { var out = [], m = $(MOUNT_ID); if (!m) return out; m.querySelectorAll('.dp-pf-tile input:checked').forEach(function (c) { out.push(c.value); }); return out; }
   function setProg(t) { var p = $('oab-prog'); if (p) { p.style.display = t ? '' : 'none'; p.textContent = t || ''; } }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1293 · DIE KETTE — was sich auslesen laesst, wird zuerst ausgelesen
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Auftrag: „Wenn da jemand Marktbewertung anklickt, aber auch
+     Exposé/Marktbericht und Sprache, dann sollte auf jeden Fall als
+     Erstes die Exposé- und Marktberichte eingelesen werden. Dann sollten
+     wir die Daten, die wir daraus schon extrahieren, auch im Sprachlauf
+     mit integrieren, wenn es sie schon gibt, und nur noch die Sachen
+     nachfragen, die uns fehlen."
+
+     Bis hierher lief `voice` ZUERST (v503, „voice-first"). Das war
+     richtig, solange der Sprechlauf ein Diktat war: erst reden, dann
+     Dokumente nachschieben. Seit v1288 ist er ein gefuehrter Dialog — und
+     ein Dialog, der nach dem Kaufpreis fragt, waehrend er zwei Klicks
+     spaeter im Exposé steht, ist kein guter Dialog.
+
+     DIE NEUE ORDNUNG folgt dem Aufwand fuer den Menschen:
+
+       1. import        Exposé/Marktbericht — Maschine liest, Mensch wartet
+       2. immometrica   dasselbe aus dem Portal
+       3. voice         der Mensch ergaenzt, was die Maschine nicht fand
+       4. pricehubble / sprengnetter / dealpilot
+                        Marktbewertung — braucht die Adresse, also zuletzt
+
+     UND DIE MARKTBEWERTUNG WANDERT IN DEN SPRECHLAUF, wenn beide gewaehlt
+     sind: dort kann der Nutzer die Stufe waehlen (einfach oder erweitert,
+     je nach Plan und Kontingent), sie laeuft im Hintergrund weiter, und
+     ihre Werte landen in derselben Uebernahme-Tabelle wie alles andere.
+     Danach meldet der Sprechlauf zurueck, dass er sie erledigt hat —
+     sonst liefe sie zweimal und kostete zweimal. */
   async function runSelected() {
     var srcs = selectedSources();
     if (!srcs.length) { toast('Bitte mindestens eine Quelle auswählen'); return; }
-    var order = ['voice', 'import', 'immometrica', 'pricehubble', 'sprengnetter', 'dealpilot'];  /* v503-voice-first; v667 immometrica */
+    /* v1293: Dokumente vor Sprache vor Marktbewertung (war: voice-first). */
+    var order = ['import', 'immometrica', 'voice', 'pricehubble', 'sprengnetter', 'dealpilot'];
     var ordered = order.filter(function (s) { return srcs.indexOf(s) !== -1; });
     var btn = $('oab-run'); if (btn) btn.disabled = true;
+    /* Was vorher lief, weiss der naechste Schritt — der Sprechlauf sagt
+       dann „ich habe X Angaben aus dem Exposé" statt bei null anzufangen. */
+    var vorlauf = [], mbImSprechlauf = false;
     for (var i = 0; i < ordered.length; i++) {
       var s = ordered[i];
       try {
-        if (s === 'voice') { setProg('Sprachaufzeichnung …'); await new Promise(function (res) { if (window.VoiceImport) { window.VoiceImport.open(res); } else { res(); } }); }  /* v503-voice-run */
-        else if (s === 'import') { setProg('Import …'); await new Promise(function (res) { openCombinedImport(res); }); }
-        else if (s === 'immometrica') { setProg('ImmoMetrica …'); await new Promise(function (res) { if (window.ImmoMetricaImport) window.ImmoMetricaImport.open(function (picked) { applyImmometrica(picked); res(); }, { target: 'obj', onClose: function () { res(); } }); else res(); }); }
+        if (s === 'voice') {
+          setProg('Sprachaufzeichnung …');
+          var _mbGewaehlt = srcs.indexOf('dealpilot') !== -1;
+          var _erg = await new Promise(function (res) {
+            if (window.VoiceImport) {
+              window.VoiceImport.open(res, { vorlauf: vorlauf.slice(), marktbewertung: _mbGewaehlt });
+            } else res();
+          });
+          /* Hat der Sprechlauf die Marktbewertung selbst geholt, faellt sie
+             hier aus — zweimal abrufen heisst zweimal bezahlen. */
+          if (_erg && _erg.marktGeholt) mbImSprechlauf = true;
+          vorlauf.push('voice');
+        }
+        else if (s === 'import') { setProg('Import …'); await new Promise(function (res) { openCombinedImport(res); }); vorlauf.push('import'); }
+        else if (s === 'immometrica') { setProg('ImmoMetrica …'); await new Promise(function (res) { if (window.ImmoMetricaImport) window.ImmoMetricaImport.open(function (picked) { applyImmometrica(picked); res(); }, { target: 'obj', onClose: function () { res(); } }); else res(); }); vorlauf.push('immometrica'); }
         else if (s === 'pricehubble' || s === 'sprengnetter') { setProg((s === 'pricehubble' ? 'PriceHubble' : 'Sprengnetter') + ' …'); await avmFetch(s); }
-        else if (s === 'dealpilot') { setProg('DealPilot-Marktbewertung …'); try { if (window.DealPilotMB) await window.DealPilotMB.run(); } catch (e) {} }
+        else if (s === 'dealpilot') {
+          if (mbImSprechlauf) { try { console.log('[obj-actions] DealPilot-Marktbewertung lief schon im Sprechlauf'); } catch (e) {} continue; }
+          setProg('DealPilot-Marktbewertung …');
+          try { if (window.DealPilotMB) await window.DealPilotMB.run(); } catch (e) {}
+        }
       } catch (e) { try { console.warn('[obj-actions] step', s, e); } catch (_) {} }
     }
     setProg(''); if (btn) btn.disabled = false;

@@ -46,6 +46,9 @@
     analyser: null, audioCtx: null
   };
   var _doneFired = false;
+  /* v1293: Was vor dem Sprechlauf lief (Pre-Flight-Kette), und ob die
+     Marktbewertung dort mit angehakt war. */
+  var _vorlauf = [], _mbGewollt = false, _mbGeholt = false;
   var _qcTarget = false;  /* v506-qc-items: Quick-Check-Kontext */
   /* v507-stream: Live-Transkription per WebSocket (ueberall lauffaehig, auch App) */
   var sx = { ws: null, ctx: null, src: null, proc: null, on: false, finalText: '', delta: '' };
@@ -418,9 +421,18 @@
     _doneFired = false;
     var done = function (payload) {
       if (_doneFired) return; _doneFired = true;
-      try { if (typeof onDone === 'function') onDone(payload); } catch (e) {}
+      /* v1293: Der Aufrufer (die Pre-Flight-Kette) muss erfahren, ob die
+         Marktbewertung hier schon gelaufen ist — sonst startet er sie ein
+         zweites Mal, und zweimal abrufen heisst zweimal bezahlen. */
+      var p = payload || {};
+      try { p.marktGeholt = !!_mbGeholt; } catch (e) {}
+      try { if (typeof onDone === 'function') onDone(p); } catch (e) {}
     };
     _qcTarget = !!(opts && opts.target === 'qc');  /* v506-qc-items */
+    /* v1293: Was vor dem Sprechlauf lief, und ob die Marktbewertung auf
+       der Pre-Flight-Karte mit angehakt war. */
+    _vorlauf = (opts && Array.isArray(opts.vorlauf)) ? opts.vorlauf.slice() : [];
+    _mbGewollt = !!(opts && opts.marktbewertung);
     OA.reset();
     OA.setMode(!!(opts && opts.target === 'qc'), done);
 
@@ -4489,17 +4501,27 @@
     _rf.marktGefragt = 1;
     _rf.abrufOffen = 'markt';
     /* v1291: Die Angebote stehen in der Aktionsleiste unten, nicht in der
-       Blase — dort wandern sie mit dem Verlauf aus dem Bild. */
-    _rfBlase('co', 'Für diese Adresse kann ich eine <b>Marktpreisindikation</b> holen — ' +
-      'Kaufpreisniveau, <b>Marktmiete</b> und die Lagebewertung. Sie läuft im Hintergrund; ' +
-      'wir machen solange weiter.');
+       Blase — dort wandern sie mit dem Verlauf aus dem Bild.
+       v1293: Wurde die Marktbewertung auf der Pre-Flight-Karte MIT
+       angehakt, ist sie hier keine Frage mehr, sondern eine Wahl: der
+       Nutzer hat sie schon gewollt, offen ist nur noch die Stufe. Und
+       laeuft sie hier, faellt sie nach dem Sprechlauf aus — sonst
+       kostete sie zweimal. */
+    _rfBlase('co', (_mbGewollt
+        ? 'Du hast die <b>Marktbewertung</b> mit ausgewählt — ich hole sie hier gleich mit, ' +
+          'dann landen ihre Werte in derselben Übersicht wie alles andere. ' +
+          '<b>Welche Stufe?</b>'
+        : 'Für diese Adresse kann ich eine <b>Marktpreisindikation</b> holen — ' +
+          'Kaufpreisniveau, <b>Marktmiete</b> und die Lagebewertung. ') +
+      ' Sie läuft im Hintergrund; wir machen solange weiter.');
     if (kg.mpi) _rfAktion('markt',
-      'Läuft gleich im Hintergrund — Kaufpreisniveau, Marktmiete, Makro- und Mikrolage.',
-      'Marktpreisindikation', { frei: kg.mpi, stufe: 1 });
+      'Kaufpreisniveau, Marktmiete, Makro- und Mikrolage — läuft gleich im Hintergrund.',
+      _mbGewollt ? 'Einfach' : 'Marktpreisindikation', { frei: kg.mpi, stufe: 1 });
     if (kg.mpi_plus) _rfAktion('markt2',
-      'Die erweiterte liest auch Zustand, Energieausweis, Bodenrichtwert und deine ' +
-      'Lagebewertung — die kommen erst in den nächsten Etappen. Ich hole sie, sobald das steht.',
-      'Erweiterte (später)', { frei: kg.mpi_plus, stufe: 2 });
+      'Zusätzlich Preishistorie, amtliche Makrolage und eine Einordnung im Fließtext. ' +
+      'Sie liest auch Zustand, Energieausweis, Bodenrichtwert und deine Lagebewertung — ' +
+      'die kommen erst in den nächsten Etappen, deshalb hole ich sie am Ende von Etappe 4.',
+      _mbGewollt ? 'Erweitert' : 'Erweiterte (später)', { frei: kg.mpi_plus, stufe: 2 });
   }
 
   function _rfMarktWaehlen(stufe) {
@@ -4645,6 +4667,7 @@
     };
     _rf.markt = M;
     if (stufe >= 2) _rf.markt2 = M;
+    _mbGeholt = true;   /* v1293: die Pre-Flight-Kette ueberspringt den eigenen Abruf */
 
     /* Die Lagestufen: 0-100 vom Marktbericht auf die fuenf Stufen des
        Formulars. Die Grenzen sind dieselben wie in dealpilot-mb.js
@@ -5668,6 +5691,49 @@
     _rfAuswerten(text, false);
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1293 · DER SPRECHLAUF WEISS, WAS VORHER LIEF
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Auftrag: die Daten aus Exposé und Marktbericht sollen im
+     Sprechlauf „mit integriert" werden, und gefragt wird „nur noch, was
+     uns fehlt".
+
+     DAS ÜBERSPRINGEN GAB ES SCHON — `rueckfragen(..., alle)` filtert mit
+     `_rfFehlt`, und das prueft neben dem Gespraech auch das Formular.
+     Wer ein Exposé eingelesen hat, wird nach dem Kaufpreis nicht mehr
+     gefragt. WAS FEHLTE, war zweierlei:
+
+       1. Der Co-Pilot SAGTE es nicht. Er begann bei „16 Fragen in 5
+          Etappen", obwohl neun davon schon beantwortet waren. Wer gerade
+          ein Exposé hochgeladen hat und dann dieselbe Begruessung
+          bekommt wie beim leeren Objekt, glaubt, der Import sei
+          verpufft.
+       2. Die Uebersichtsspalte nannte die Werte „VORBELEGT" — dasselbe
+          Wort wie fuer eine Formular-Vorgabe aus `index.html`. Ein Wert
+          aus dem Exposé ist aber etwas ganz anderes als eine Vorgabe:
+          er ist eine ANGABE, nur eben keine gesprochene.
+
+     Beides haengt an derselben Kleinigkeit: der Sprechlauf wusste nicht,
+     dass vor ihm etwas lief. Jetzt bekommt er es gesagt.
+
+     GEZAEHLT wird beim Start, was im Katalog schon steht. Das ist genauer
+     als jede Verfolgung im Import-Modul — und es funktioniert fuer JEDE
+     Quelle, auch fuer ImmoMetrica und fuer Felder, die der Nutzer selbst
+     eingetippt hat, bevor er den Sprechlauf oeffnete. */
+  var VORLAUF_NAME = { import: 'Exposé / Marktbericht', immometrica: 'ImmoMetrica',
+                       voice: 'Sprachaufzeichnung' };
+
+  function _rfVorbefuellt(catalog) {
+    var out = {};
+    (catalog || []).forEach(function (e) {
+      var el = document.getElementById(e.id);
+      if (!el) return;
+      var v = String(el.value || '').trim();
+      if (v !== '') out[e.id] = v;
+    });
+    return out;
+  }
+
   /* Einstieg: nach der Auswertung (Lücken) oder von Anfang an (geführt). */
   function rueckfragen(OA, data, catalog, alle) {
     var fields = (data && data.fields) || {};
@@ -5683,6 +5749,23 @@
     _rfAufbau();
 
     var gefunden = Object.keys(_rf.data.fields).length;
+    /* v1293: Was schon im Formular steht, wird beim Start gezaehlt — und
+       gesagt. Wer gerade ein Exposé eingelesen hat und dann dieselbe
+       Begruessung bekommt wie beim leeren Objekt, glaubt, der Import sei
+       verpufft. */
+    _rf.vorbefuellt = _rfVorbefuellt(catalog);
+    _rf.vorlauf = _vorlauf.slice();
+    var vorN = Object.keys(_rf.vorbefuellt).length;
+    var vorQuelle = _vorlauf.filter(function (q) { return q !== 'voice'; })
+                            .map(function (q) { return VORLAUF_NAME[q] || q; }).join(' und ');
+    var vorTxt = '';
+    if (vorN && vorQuelle) {
+      vorTxt = 'Aus <b>' + escH(vorQuelle) + '</b> stehen schon <b>' + vorN + ' Angaben</b> — ' +
+               'die frage ich nicht noch einmal. ';
+    } else if (vorN) {
+      vorTxt = '<b>' + vorN + ' Angaben</b> stehen schon im Objekt — die frage ich nicht noch einmal. ';
+    }
+
     /* v1288: Der geführte Weg sagt jetzt, WOHIN er führt — nicht nur, wie
        viele Fragen kommen. Eine Zahl allein ist eine Zumutung, ein Ziel
        ist eine Einladung. */
@@ -5691,12 +5774,13 @@
     var etTxt = ETAPPEN.filter(function (E) { return etDa[E.nr]; })
                        .map(function (E) { return E.name; }).join(' · ');
     _rfBlase('co', alle
-      ? 'Ich führe dich durch — <b>' + luecken.length + '</b> Fragen in ' +
+      ? vorTxt + 'Ich führe dich durch — <b>' + luecken.length + '</b> ' +
+        (luecken.length === 1 ? 'Frage' : 'Fragen') + ' in ' +
         Object.keys(etDa).length + ' Etappen: <b>' + escH(etTxt) + '</b>. ' +
         'Nach der Finanzierung siehst du deinen <b>Deal Score</b>, nach Lage und Zustand den ' +
         '<b>Investor Deal Score 2.0</b>. ' +
         'Sprich einfach los — was du nicht weißt, überspringen wir, und fragen darfst du mich jederzeit.'
-      : 'Ich habe <b>' + gefunden + ' Angaben</b> aus deiner Aufnahme gelesen. ' +
+      : 'Ich habe <b>' + gefunden + ' Angaben</b> aus deiner Aufnahme gelesen. ' + vorTxt +
         (luecken.length === 1 ? 'Für die Rechnung fehlt mir noch eine.'
                               : 'Für die Rechnung fehlen mir noch ' + luecken.length + '.'));
 
