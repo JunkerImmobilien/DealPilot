@@ -36,8 +36,132 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Stand 09.09.2026)
+## → HIER WEITERMACHEN: Der Co-Pilot wird zum Aufnehmer (Marcels Plan vom 10.09.2026)
 
+**Stand:** `v1273`–`v1287` liegen auf Staging. Der geführte Dialog läuft:
+Wahl beim Öffnen, Freisprechen ohne Klicken, Chat-Verlauf, Übersichtsspalte
+mit Werten, Rechnen mit Kontext, Profil-Übernahme, Verneinungen ohne
+KI-Aufruf, auf Wunsch alle 145 Felder. **Produktion steht auf `a21fe9c`** —
+nichts davon ist live.
+
+> **Zuerst behoben (`v1287`):** Nach „Willst du die Feinheiten auch noch
+> durchgehen?" ging es nicht weiter — der Knopf sollte in einen Container
+> mit *Klasse* `vi-rf-neben`, gesucht wurde per *id*. Kein Knopf, und weil
+> die Funktion trotzdem „ja, ich habe gefragt" meldete, auch kein Weg zur
+> Tabelle. Jetzt: id gesetzt, „ja"/„nein" wirken auch gesprochen, und ohne
+> Knopf geht es ohne Nachfrage zur Tabelle statt in die Sackgasse.
+
+---
+
+### 1 · Die 98 Feinheiten feiner aufgliedern
+
+Heute entstehen sie stumpf: vier Felder je Frage, in der Reihenfolge des
+Formulars. Das ergibt Fragen wie *„Objekt: Kürzel, Bankbewertung,
+Bevölkerungsentwicklung, Nachfrage-Indikatoren?"* — vier Dinge, die
+inhaltlich nichts miteinander zu tun haben.
+
+**Besser:** nach **Thema** gruppieren, nicht nach Reihenfolge. Kandidaten
+für echte Blöcke:
+
+| Block | Felder |
+|---|---|
+| Kaufnebenkosten | Makler, Notar, Grundbuch, Grunderwerbsteuer, Sonstige |
+| Inventar | Küche, Möbel, Geräte, PV, Stellplatz |
+| Bewirtschaftung | Hausgeld, Grundsteuer, Rücklage, Mietausfall, Verwaltung |
+| Entwicklung | Miet-, Wert-, Kostensteigerung, Leerstand, Haltedauer |
+| Steuer | AfA-Satz, Gebäudeanteil, zvE, Grenzsteuersatz |
+| Anschluss­finanzierung | Zins, Tilgung, Bindung nach Ablauf |
+
+**Aufwand:** klein bis mittel. Die Zuordnung braucht eine gepflegte Liste —
+und genau davor hatte ich in `v1282` gewarnt (eine Zweitliste veraltet).
+**Kompromiss:** Themen über die *Karten-Überschriften* im DOM ziehen, die
+gibt es schon; nur wo keine existiert, greift die Reihenfolge.
+
+### 2 · Makro- und Mikrolage: die Skalen abfragen
+
+Wir bewerten danach — also sollte der Co-Pilot die Stufen kennen und
+anbieten („sehr gut / gut / durchschnittlich / …"), statt Freitext zu
+sammeln. Die Optionen stehen im `<select>`; der Katalog trägt sie schon
+(`kind: 'select'` mit Optionen). **Fehlt nur:** sie in der Frage nennen und
+die Antwort dagegen prüfen.
+
+**Aufwand:** klein.
+
+### 3 · Alles für den Deal Score 2 abfragen
+
+`DealScore2.compute()` erwartet ein festes Datenmodell (Kaufpreis,
+Gesamtkosten, EK, Jahreskaltmiete, DSCR, LTV, Leerstand,
+Instandhaltung, Zustand, Lage …). **Heute fragt der Dialog nicht danach,
+sondern nach Formularfeldern** — die Deckung ist zufällig.
+
+**Vorschlag:** eine eigene Strecke „Deal Score vervollständigen", die genau
+die Felder abfragt, die `DealScore2` noch fehlen, und die fehlenden
+benennt: *„Für den vollen Score fehlen mir noch drei Angaben."*
+
+**Aufwand:** mittel. **Nutzen:** hoch — es ist der einzige Weg, aus dem
+Sprechlauf direkt einen vollständigen Score zu bekommen.
+
+### 4 · Statt fragen: abrufen
+
+Wir haben die Funktionen bereits. Der Co-Pilot soll sie **anbieten**:
+
+| Angabe | Was schon da ist |
+|---|---|
+| **Bodenrichtwert** | `DealPilotBrw.fetchBoris()` — amtlich, mit Stichtag und Zone, 0,4–0,5 s, kostenlos (`v1265`/`v1268`) |
+| **Makro-/Mikrolage** | Marktbericht-Backend liefert Lagedaten zur Adresse |
+| **Marktpreisindikation** | Stufe 1 (`mpi`) und Stufe 2 (`mpi_plus`) — je nach Plan |
+
+**Dialog:** *„Den Bodenrichtwert kann ich selbst holen — soll ich?"* Ein Ja
+genügt; das Ergebnis erscheint in der Übersicht wie eine gesagte Angabe,
+mit Quelle statt „Sprachaufzeichnung".
+
+**Aufwand:** klein je Quelle (die Aufrufe existieren), zusammen mittel.
+
+### 5 · Lange Abrufe früh anstoßen, später zusammenfassen
+
+**Marcels Kern-Idee, und die beste des ganzen Abends.** Die
+Marktpreisindikation dauert; sie mitten im Gespräch abzuwarten wäre
+Stillstand.
+
+**Also:** früh fragen (gleich nach der Adresse — mehr braucht der Abruf
+nicht), im Hintergrund laufen lassen, weiterfragen. Wenn die Daten da sind:
+eine Blase im Verlauf, ein kurzes Statement — *„Der Marktbericht ist da:
+Kaufpreisniveau 2.850 €/m², dein Preis liegt 6 % darunter."* Und die Werte
+wandern in die Übersicht.
+
+> **Der Ablauf darf nie auf einen Abruf warten.** Kommt nichts zurück,
+> merkt es niemand außer im Protokoll; kommt etwas, ist es ein Gewinn
+> mitten im Gespräch.
+
+**Aufwand:** mittel. **Zu klären:** Kerosin/Plan-Prüfung vor dem Start
+(Stufe 2 kostet), und was passiert, wenn der Nutzer vorher „Fertig" sagt —
+Vorschlag: das Ergebnis landet trotzdem in der Import-Tabelle.
+
+---
+
+### Meine Einschätzung zur Reihenfolge
+
+1. **Punkt 4 (abrufen statt fragen) zuerst** — kleinster Aufwand, größter
+   sofortiger Nutzen, und der Bodenrichtwert ist amtlich statt geschätzt.
+2. **Punkt 5 (früh anstoßen)** direkt danach; die beiden gehören zusammen.
+3. **Punkt 2 (Skalen)** — klein, macht die Antworten sofort brauchbarer.
+4. **Punkt 3 (Deal Score 2)** — der eigentliche Wertzuwachs, aber erst
+   sinnvoll, wenn 4 und 5 stehen (sonst fragt er nach Lagewerten, die er
+   sich holen könnte).
+5. **Punkt 1 (Feinheiten gruppieren)** zuletzt — es ist Feinschliff an
+   einem Teil, den ohnehin nur benutzt, wer „Alle Felder" einschaltet.
+
+**Ein Vorbehalt:** Mit 4 und 5 wird aus dem Sprechlauf ein Werkzeug, das
+selbständig Daten beschafft. Dann gilt die Herkunftsregel doppelt — jede
+abgerufene Zahl muss in der Übersicht **als abgerufen erkennbar** sein,
+nicht als etwas, das der Nutzer gesagt hat. Sonst steht am Ende in der
+Tabelle „Sprachaufzeichnung" an einem Wert, den niemand ausgesprochen hat.
+
+---
+
+## → Frühere Notizen (Stand 09.09.2026)
+
+**Stand:** lokal = GitHub = Staging auf `v1287`. **Produktion auf `a21fe9c`**.
 **Stand:** lokal = GitHub = Staging auf `v1286`. **Produktion auf `a21fe9c`**.
 `v1265` bis `v1272` sind live, **`v1273` bis `v1275` noch nicht**.
 
