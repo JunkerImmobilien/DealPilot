@@ -3642,13 +3642,13 @@
     if (d1z > 0) proben.push({ id: 'd1z', wie: 'Mehrere Banken anfragen, Eigenkapital oder Sicherheiten nachlegen.',
       stufen: [0.5, 1.0].filter(function (s) { return d1z - s > 0.3; }).map(function (s) {
         return { wert: String(Math.round((d1z - s) * 100) / 100).replace('.', ','),
-                 txt: 'Zins <b>' + _pz(s) + ' Punkte tiefer</b> (' + _pz(d1z - s) + ' %)' };
+                 txt: 'Zins <b>' + _pz(s) + ' Punkt' + (s === 1 ? '' : 'e') + ' tiefer</b> (' + _pz(d1z - s) + ' %)' };
       }) });
 
     if (d1t > 0) proben.push({ id: 'd1t', wie: 'Kostet Cashflow, bringt Entschuldung — der Score wägt beides ab.',
       stufen: [1, 2].map(function (s) {
         return { wert: String(Math.round((d1t + s) * 100) / 100).replace('.', ','),
-                 txt: 'Tilgung <b>' + _pz(s) + ' Punkt' + (s > 1 ? 'e' : '') + ' höher</b> (' + _pz(d1t + s) + ' %)' };
+                 txt: 'Tilgung <b>' + _pz(s) + ' Punkt' + (s === 1 ? '' : 'e') + ' höher</b> (' + _pz(d1t + s) + ' %)' };
       }) });
 
     return proben.filter(function (p) { return p.stufen && p.stufen.length; });
