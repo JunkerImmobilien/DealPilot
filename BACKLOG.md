@@ -162,8 +162,6 @@ Tabelle „Sprachaufzeichnung" an einem Wert, den niemand ausgesprochen hat.
 ## → Frühere Notizen (Stand 09.09.2026)
 
 **Stand:** lokal = GitHub = Staging auf `v1287`. **Produktion auf `a21fe9c`**.
-**Stand:** lokal = GitHub = Staging auf `v1286`. **Produktion auf `a21fe9c`**.
-`v1265` bis `v1272` sind live, **`v1273` bis `v1275` noch nicht**.
 
 ### Erledigt am 09.09.2026
 
