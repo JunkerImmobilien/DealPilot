@@ -2394,7 +2394,7 @@
         '<input id="vi-rf-in" placeholder="… oder tippen — du darfst mich auch etwas fragen" autocomplete="off">' +
         '<button type="button" class="vi-rf-btn" id="vi-rf-ok">Übernehmen</button>' +
       '</div>' +
-      '<div class="vi-rf-neben">' +
+      '<div class="vi-rf-neben" id="vi-rf-neben">' +
         '<button type="button" id="vi-rf-nix">Weiß ich nicht</button>' +
         '<button type="button" id="vi-rf-passt" style="display:none"></button>' +
         '<button type="button" id="vi-rf-ende">Fertig — zur Übersicht</button>' +
@@ -2622,18 +2622,27 @@
       'Kaufnebenkosten, Bewirtschaftung, Steuer, Entwicklung. ' +
       '<span style="opacity:.7">Du kannst jederzeit „Fertig" sagen.</span>');
     var neben = $('vi-rf-neben');
-    if (neben) {
-      neben.insertAdjacentHTML('afterbegin',
-        '<button type="button" id="vi-rf-tiefe-ja">Ja, weiter ins Detail</button>');
-      var b = $('vi-rf-tiefe-ja');
-      if (b) b.addEventListener('click', function () {
-        b.remove();
-        _rfBlase('ich', 'Ja, lass uns weitermachen.');
-        _rfTiefeStarten();
-      });
+    if (!neben) {
+      /* v1287: Ohne Knopf gaebe es keinen Weg weiter UND keinen Weg zur
+         Tabelle - eine Sackgasse. Genau das ist passiert: der Container
+         trug nur eine Klasse, gesucht wurde per id. Lieber ohne Nachfrage
+         zur Tabelle als steckenbleiben. */
+      try { console.warn('[voice] Tiefe-Knopf konnte nicht gesetzt werden'); } catch (e) {}
+      return false;
     }
+    neben.insertAdjacentHTML('afterbegin',
+      '<button type="button" id="vi-rf-tiefe-ja">Ja, weiter ins Detail</button>');
+    var b = $('vi-rf-tiefe-ja');
+    if (b) b.addEventListener('click', function () {
+      b.remove();
+      _rfBlase('ich', 'Ja, lass uns weitermachen.');
+      _rfTiefeStarten();
+    });
+    /* v1287: „ja" darf man auch SAGEN oder tippen - nicht nur klicken. */
+    _rf.tiefeOffen = 1;
     var pb = $('vi-rf-passt'); if (pb) pb.style.display = 'none';
-    _fsStopHoeren();
+    var inp = $('vi-rf-in'); if (inp) { inp.disabled = false; }
+    if (_fs.an && _fs.stream) _fsHoeren();
     return true;
   }
 
@@ -2654,7 +2663,7 @@
        selbst „Fertig" gedrueckt hat. Wer abbricht, will abbrechen. */
     if (!erzwungen && _rf && _rf.alle && !_rf.tiefeAn && !_rf.tiefeGefragt) {
       _rf.tiefeGefragt = 1;
-      if (_rfTiefeAnbieten()) return;
+      if (_rfTiefeAnbieten()) return;   /* v1287: nur wenn der Knopf wirklich steht */
     }
     _fsStopHoeren(); _fsAus();
     var h = $('vi-frage'); if (h) h.style.display = 'none';
@@ -2749,6 +2758,24 @@
   function _rfVorabErkennen(text, ausSprache) {
     var t = String(text || '').trim();
     if (!t) return true;
+
+    /* v1287: Steht die Feinheiten-Frage offen, ist „ja" die Antwort darauf -
+       nicht eine Angabe zu einem Feld. Auch gesprochen. */
+    if (_rf.tiefeOffen) {
+      if (/^(ja|jo|klar|gerne|gern|okay|ok|mach|weiter ins detail|los)\b/i.test(t)) {
+        _rf.tiefeOffen = 0;
+        var jb = $('vi-rf-tiefe-ja'); if (jb) jb.remove();
+        _rfBlase('ich', escH(t));
+        _rfTiefeStarten();
+        return true;
+      }
+      if (RF_NEIN.test(t) || /^(nein|nee|reicht|fertig|passt so|das reicht)\b/i.test(t)) {
+        _rf.tiefeOffen = 0;
+        _rfBlase('ich', escH(t));
+        _rfFertig(true);
+        return true;
+      }
+    }
 
     /* 1. Frage? Dann beantworten statt eintragen. */
     if (_rfIstFrage(t)) { _rfFrageBeantworten(t); return true; }
