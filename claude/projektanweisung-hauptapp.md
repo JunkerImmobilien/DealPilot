@@ -11004,6 +11004,211 @@ Stunde.
 **nicht auf Prod**. Backend geändert → Rebuild gelaufen und im Container
 gegengeprüft.
 
+## Rollout-Journal · 10.09.2026, spät — `v1291` bis `v1292d`
+
+Marcels Auftrag in einem Satz: *„Mach da einfach was richtig Geiles, dass man,
+wenn man da durchgeführt wird, direkt eine Kaufentscheidung treffen kann."*
+
+### `v1291` · Die Aktionsleiste — was jetzt dran ist, steht unten
+
+> „Ab und zu haben wir sowas wie Bodenrichtwert abholen und solche Sachen und
+> erweiterte Marktpreisindikation. Die stehen dann meistens darunter und dann
+> weiß man nicht, dass man jetzt weitermachen soll."
+
+**Die Ursache ist der Ort.** Ein Angebot *in* einer Chatblase wandert mit dem
+Verlauf nach oben und ist zwei Antworten später aus dem Bild. Der Nutzer sieht
+unten das Mikrofon, hört „ich höre zu" — und weiß nicht, dass oben eine
+Entscheidung offen liegt.
+
+Jetzt eine **feste Leiste zwischen Verlauf und Mikrofon**. Sie trägt immer die
+aktuelle Frage und, wenn es welche gibt, die Angebote. Sie scrollt nicht mit:
+was dort steht, ist offen; was verschwindet, ist erledigt.
+
+**Ein Ort für alle Entscheidungen** — Bodenrichtwert, Lage-Recherche,
+Marktpreisindikation, ihre Vertiefung, die Feinheiten-Frage, der Weg zur
+Übersicht. Vorher lagen die an vier verschiedenen Stellen, mal in der Blase,
+mal unter den Nebenknöpfen. Und **ein** Klickweg statt vier eigener — genau
+dort war der Fehler aus `v1290`, wo einer die Fortsetzung vergaß.
+
+### `v1291` · Die Adresse wird bestätigt
+
+> „Die Adresse sollte man nochmal bestätigen und eine Rückfrage stellen."
+
+Marcel trifft den wunden Punkt. Ein **Straßenname** ist das, was eine
+Transkription am häufigsten verfehlt — bei einer Zahl fällt das auf, bei einem
+Namen nicht. Und an der Adresse hängt **alles**, was danach kommt: der amtliche
+Bodenrichtwert (Geokodierung), die Marktpreisindikation, die Lage-Recherche,
+die Grunderwerbsteuer.
+
+> Eine falsch verstandene Straße macht aus vier richtigen Abrufen vier falsche
+> — und **keiner meldet einen Fehler**, denn die Nachbarstadt hat auch
+> Marktdaten.
+
+Der Co-Pilot liest die Adresse zurück, nennt Bundesland und
+Grunderwerbsteuersatz und fragt einmal nach. Gemessen: *„Ich habe verstanden:
+Hermannstraße 9, 32609 Hüllhorst · Nordrhein-Westfalen · Grunderwerbsteuer
+6,5 %"*.
+
+Das ist die **einzige** Rückfrage im ganzen Dialog — überall sonst gilt „lieber
+weiter als nachhaken", hier ist es umgekehrt. Wer korrigiert, sagt einfach die
+Adresse noch einmal; die alten Werte werden gelöscht, damit sich nicht die
+falsche Straße mit der neuen Hausnummer mischt.
+
+### `v1291` · Die Lage wird recherchiert — sechs Dimensionen, eine Anfrage
+
+> „Er soll auch Mikro- und Makrolage einzeln abrufen können … vielleicht auch
+> Bevölkerungsentwicklung. Das kann er über unsere Schnittstelle Marktbewertung
+> machen, aber auch über KI aus dem Netz."
+
+**Beides gab es schon**, und sie ergänzen sich:
+
+| | liefert | kostet |
+|---|---|---|
+| Marktpreisindikation | Makro/Mikro als Score aus Marktdaten | ein Kontingent |
+| `/ai/lage` | **sechs** Dimensionen mit Quelle und Begründung | einen KI-Aufruf |
+
+Im Browser Feld für Feld gegengeprüft: **alle sechs Enum-Sätze stimmen exakt**
+mit unseren Feldern überein.
+
+| KI-Antwort | Feld | Werte |
+|---|---|---|
+| `makro` | `makrolage` | sehr_gut … sehr_schwach |
+| `mikro` | `mikrolage` | sehr_gut … sehr_schwach |
+| `bevoelkerung` | `ds2_bevoelkerung` | stark_wachsend … stark_fallend |
+| `nachfrage` | `ds2_nachfrage` | sehr_stark … sehr_schwach |
+| `wertsteigerung` | `ds2_wertsteigerung` | sehr_hoch … keines |
+| `entwicklung` | `ds2_entwicklung` | mehrere … keine |
+
+**Sechs Deal-Score-2-Felder aus einem Aufruf, mit Quellenangabe.** Was der
+Nutzer selbst gesagt hat, bleibt stehen — die Recherche füllt nur Lücken.
+
+### `v1291b`/`v1291c` · Zwei Befunde aus dem eigenen Umbau
+
+**Eine Aktion ohne Zweig fiel still durch.** Der Klick auf „Ja, stimmt" bei der
+Adress-Rückfrage entfernte den Knopf — und sonst nichts. Der Verteiler kannte
+die `art` `adresse` nicht und fiel unten heraus, ohne ein Wort.
+
+> Ein stiller Ausfall in einem Verteiler ist der teuerste, den es gibt: der
+> Nutzer sieht, dass etwas passiert ist (der Knopf ist weg), und wartet auf
+> etwas, das nie kommt. Jetzt protestiert er, in der Konsole und im Gespräch.
+
+**Der Dialog hält für ein Angebot nicht mehr an.** Gemessen: nach der
+Adress-Bestätigung stand die Leiste auf „Jetzt dran · Objekt & Größe", während
+der Ablauf noch auf die Marktpreis-Entscheidung wartete. Die Leiste sagte das
+eine, der Zustand war das andere. Der Grund für das Warten war der alte — ein
+Angebot in einer Blase verschwindet, also musste der Ablauf stehenbleiben. Mit
+der Leiste fällt der Grund weg. **Damit gibt es keine Stelle mehr, an der man
+feststeckt, weil man eine Entscheidung nicht trifft.**
+
+### `v1292` · Aus Zahlen wird eine Entscheidung
+
+Drei Dinge fehlten, und **alle drei lassen sich rechnen**:
+
+**1. Break-even.** `IrrEngine.breakEven(reihe, ek)` ist ein reiner Rechenkern —
+derselbe, den die Kennzahlen-Kachel nutzt. Die Zahlungsreihe baut der
+Sprechlauf mit Miet- und Kostensteigerung, aber **ohne** Tilgungsverlauf,
+Steuerwirkung und Anschlussfinanzierung; die bräuchten Angaben, die im Gespräch
+nicht alle fallen. **Das steht als Annahme auf der Karte.** Eine Näherung, die
+sich als solche zeigt, ist brauchbar; eine, die sich als Rechnung ausgibt,
+nicht.
+
+Gemessen am guten Testobjekt: *Cashflow ab Jahr 1 · Summe im Plus ab Jahr 1 ·
+Eigenkapital zurück in Jahr 13.* Am schwachen: *bleibt in 20 Jahren negativ* —
+die Reihe läuft von −4.454 auf −219 und dreht nie.
+
+**2. Mietpotenzial.**
+
+> „Mit der Marktpreisindikation holen wir uns ja auch gleich passend die
+> Marktmieten mit rein. Dass wir das einmal abgleichen, dann auch Mietpotenzial
+> angeben und vielleicht auch eine Steigerung."
+
+Gemessen: *„Du liegst bei 11,33 €/m², der Markt bei 12,50 €/m²
+(Marktpreisindikation). Das sind 87 € im Monat oder 1.050 € im Jahr, die noch
+nicht in der Rechnung stehen."*
+
+Liegt die Miete **über** dem Markt, wird daraus kein Potenzial, sondern ein
+benanntes Risiko — bei Mieterwechsel kann sie sinken.
+
+Und dann wird es **Mietrecht statt Rechnen** (Marcels Punkt): bei
+Neuvermietung sofort möglich, im laufenden Vertrag frühestens 15 Monate nach
+der letzten Änderung und gedeckelt durch die **Kappungsgrenze** (20 %, in
+angespannten Märkten 15 %), bei **Index- oder Staffelmiete** gilt die
+Vereinbarung — und bei Indexmiete ist eine Modernisierung **nicht** zusätzlich
+umlegbar. Nach einer Modernisierung 8 % der Kosten jährlich, gedeckelt auf
+3 €/m² in sechs Jahren.
+
+> Ausdrücklich als **Anhaltspunkte** gekennzeichnet, nicht als Rechtsberatung:
+> welcher Weg offensteht, hängt am Vertrag und am Ort, und die Kappungsgrenze
+> steht in einer Landesverordnung, die wir nicht führen.
+
+**3. Die Hebel — gerechnet, nicht behauptet.**
+
+> „Wenn die und die Werte sind nicht so gut, wenn du die steigern könntest,
+> dann wäre es super."
+
+`DealScore2.compute` ist rein. Also wird der Deal mit einer Änderung
+**nachgerechnet** und die Differenz gezeigt. Gemessen am guten Objekt:
+*„Kaufpreis 10 % tiefer: +3 auf 86", „Miete 30 % höher: +2", „Zins 1 Punkt
+tiefer: +2"* — jeweils mit einem Satz, **wie** man dahin kommt.
+
+### `v1292b` · Ein Ratgeber, der beim schlechten Deal schweigt, ist keiner
+
+Gemessen am schwachen Testobjekt (200.000 € bei 490 € Miete, Score 53): ein
+Kaufpreis **5 % tiefer änderte den Score um null Punkte**.
+
+**Kein Fehler** — bei einem so schwachen Objekt liegen die Renditekennzahlen am
+unteren Anschlag, und dort ist die Interpolation flach. Vom Boden fällt man
+nicht tiefer, aber man steigt auch nicht leicht auf. Ergebnis war eine **leere
+Hebel-Liste**, ausgerechnet dort, wo man sie am dringendsten braucht.
+
+Jetzt eine **Staffel** je Hebel (Kaufpreis 5/10/15/20 %, Miete 10/20/30 %,
+Eigenkapital 10/20/30 %, Zins 0,5/1,0 Punkte, Tilgung 1/2 Punkte) und gezeigt
+wird der **kleinste Schritt, der mindestens zwei Punkte bringt**. Danach fand
+sich auch am schwachen Objekt etwas: *„Miete auf Marktniveau (782 €): +3",
+„Kaufpreis 20 % tiefer: +2", „Zins 1 Punkt tiefer: +2"*.
+
+Und die Miete bekommt einen **eigenen Zielwert**: liegt eine Marktmiete vor,
+wird zuerst auf sie gerechnet statt auf einen Prozentsatz. Damit hängen
+Mietpotenzial und Hebel an derselben Zahl.
+
+**Zweiter Befund aus demselben Lauf:** das Mietpotenzial wies die Marktmiete
+als *„deine Angabe"* aus, obwohl sie aus der Marktpreisindikation kam. Die
+Prüfung fragte, ob das **Feld** gefüllt ist — die Indikation füllt es ja gerade.
+Jetzt wird `_rf.quelle` gelesen, wie überall sonst.
+
+### `v1292` · Die Zahl zählt hoch und leuchtet
+
+> „Deal Score und Deal Score zwei muss richtig geil son bisschen animiert
+> werden mit den Zahlen, vielleicht der Deal Score etwas leuchtend oder so."
+
+Die Zahl zählt in 1,1 s hoch (weich auslaufend — die letzten Punkte sollen
+ankommen, nicht durchrauschen), darunter fährt ein Balken aus.
+
+**Über `requestAnimationFrame`, aber nur bei sichtbarem Reiter**: im verborgenen
+Tab feuert rAF nie, und die Zahl bliebe auf 0 stehen (FALLEN.md). Sonst wird
+sofort der Endwert gesetzt.
+
+**Das Leuchten hängt an der Stufe**, nicht am Geschmack: ab 85 (TOP) kräftig
+mit langsamem Pulsieren, ab 70 (GUT) zurückhaltend, darunter gar nicht.
+
+> Ein schwacher Deal, der leuchtet, wäre eine Lüge in Lichtform.
+
+`prefers-reduced-motion` schaltet das Pulsieren ab. Dazu ein **Fazit in einem
+Satz** über den Kennzahlen — das erste, was man liest.
+
+### Abnahme
+
+- **Aktionsleiste** sichtbar unter dem Verlauf, mit Frage und Angeboten;
+  Klick-Weg und Sprach-Weg führen beide weiter.
+- **Adress-Bestätigung** mit Bundesland und Grunderwerbsteuersatz.
+- **Score 83** in Grün mit Leuchten, Balken gefüllt, Fazit, fünf Kategorien,
+  Mietpotenzial mit Mietrecht-Hinweisen, drei gerechnete Hebel.
+- **Break-even** auf beiden Testobjekten plausibel und benannt.
+- Gold-Audit **RC=0**, genau auf der Basislinie.
+
+**Commits** `93ef10a`, `3ba055f`, `9318894`, `2fea6eb`, `843cae8`, `516fab4`,
+`e8ddc96`. Auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

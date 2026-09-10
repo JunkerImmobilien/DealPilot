@@ -1713,3 +1713,71 @@ Endpunkt. Kommt ein neuer Vorgang mit anderer Aufruf-Häufigkeit dazu,
 bekommt er einen **eigenen Zähler** — nicht einen größeren gemeinsamen.
 Sonst blockiert der eine Vorgang den anderen. Und die Meldung nennt den
 Vorgang, den der Nutzer gerade macht.
+
+---
+
+## Ein Angebot in einer Chatblase ist zwei Antworten später weg
+
+Der Sprechlauf bot mitten im Gespräch Dinge an: den Bodenrichtwert holen,
+die Marktpreisindikation starten, die Lage recherchieren. Alle standen
+**in** der Co-Piloten-Blase, dort wo sie inhaltlich hingehörten.
+
+Rückmeldung aus der Praxis: *„Die stehen dann meistens darunter und dann
+weiß man nicht, dass man jetzt weitermachen soll."*
+
+Ein Chat-Verlauf scrollt. Was gerade noch mittig stand, ist nach zwei
+Antworten oben aus dem Bild. Der Nutzer sieht unten das Mikrofon, hört
+„ich höre zu" — und hat keine Ahnung, dass oben eine Entscheidung
+wartet. Schlimmer noch: der Ablauf blieb an dieser Entscheidung stehen,
+also wartete jeder auf den anderen.
+
+**Die Regel:** was eine Entscheidung verlangt, gehört an einen **festen
+Ort außerhalb des Verlaufs** — dort, wo der Nutzer ohnehin hinsieht, also
+unmittelbar über der Eingabe. Ein Verlauf zeigt, was **war**; eine Leiste
+zeigt, was **ist**.
+
+Und zwei Nebenwirkungen, die es gleich mit erledigt: **ein** Klickweg
+statt vier eigenen (jeder eigene ist eine Gelegenheit, die Fortsetzung zu
+vergessen — genau das war passiert), und der Ablauf muss nicht mehr
+anhalten, weil das Angebot ja sichtbar bleibt.
+
+---
+
+## Eine `art` ohne Zweig fällt still durch
+
+Ein Verteiler nimmt eine Kennung und verzweigt: `if (art === 'brw') …
+if (art === 'lage') …`. Kommt eine Kennung an, für die es keinen Zweig
+gibt, fällt sie unten heraus — **ohne ein Wort**.
+
+Genau das passierte, als eine neue Aktion dazukam und der Zweig vergessen
+wurde. Der Knopf war nach dem Klick weg (das Aufräumen lief ja), und
+sonst geschah nichts. Der Nutzer sieht: es ist etwas passiert. Er wartet
+auf ein Ergebnis, das nie kommt.
+
+**Ein stiller Ausfall in einem Verteiler ist der teuerste, den es gibt** —
+er sieht aus wie ein Erfolg. Jeder Verteiler bekommt deshalb einen
+letzten Zweig, der protestiert: in der Konsole für die Diagnose, im
+Gespräch für den Nutzer.
+
+---
+
+## Ein Ratgeber, der beim schlechten Fall schweigt, ist keiner
+
+Die Verbesserungs-Hebel im Sprechlauf rechnen den Score mit einer
+Änderung nach und zeigen die Differenz — „Kaufpreis 5 % tiefer: +7".
+Sauber belegt, weil dieselbe Rechnung mit einem anderen Wert läuft.
+
+Gemessen an einem schwachen Objekt (Score 53): **5 % weniger Kaufpreis
+ergaben null Punkte.** Kein Fehler in der Rechnung — bei schwachen
+Kennzahlen liegt die Interpolation am unteren Anschlag und ist dort
+flach. Vom Boden fällt man nicht tiefer, aber man steigt auch nicht
+leicht auf.
+
+Das Ergebnis war eine **leere Liste** — ausgerechnet bei dem Objekt, für
+das man den Rat am dringendsten braucht. Bei guten Objekten sah alles
+prima aus, was den Fehler beim Prüfen versteckt.
+
+**Die Regel:** wer eine Wirkung mit einem festen Schritt misst, misst
+nur einen Punkt der Kurve. Eine **Staffel** probieren und den kleinsten
+Schritt zeigen, der wirklich etwas bewegt. Und beim Prüfen bewusst den
+schlechten Fall wählen — der gute deckt nichts auf.
