@@ -1781,3 +1781,55 @@ prima aus, was den Fehler beim Prüfen versteckt.
 nur einen Punkt der Kurve. Eine **Staffel** probieren und den kleinsten
 Schritt zeigen, der wirklich etwas bewegt. Und beim Prüfen bewusst den
 schlechten Fall wählen — der gute deckt nichts auf.
+
+---
+
+## `location.reload(true)` holt das HTML nicht neu
+
+Nach einem Rollout zeigte der Browser hartnäckig den alten Stand, obwohl
+der Cache-Buster längst hochgezogen war und der Server die neue Fassung
+auslieferte.
+
+Der Buster steht **im HTML**. Kommt das HTML aus dem Cache, kommt auch
+der alte Buster — und damit die alte JS-Datei. `location.reload(true)`
+hat den erzwungenen Neuladen-Parameter in modernen Browsern **ohne
+Wirkung**; er ist seit Jahren ignoriert.
+
+**Die Gegenprobe, die es aufklärt** — zwei Zeilen, und sie zeigen sofort,
+wo es hakt:
+
+```
+curl -s https://<host>/index.html | grep -o 'datei.js?v=[a-z0-9]*'
+document.querySelector('script[src*="datei"]').getAttribute('src')
+```
+
+Sagt der Server `v1293b` und der Browser `v1293`, liegt es nicht am
+Rollout. **Ein neuer Tab** holt das HTML frisch; im alten hilft nur
+Strg+Shift+R oder das Leeren der Site-Daten.
+
+Die Falle ist besonders teuer, weil sie wie ein Fehler im eigenen Code
+aussieht: man misst dieselbe falsche Zahl wieder und wieder und sucht
+sie im JavaScript, das längst richtig ist.
+
+---
+
+## Eine Modulvariable überlebt den Dialog — und lügt beim zweiten Mal
+
+Der Sprechlauf meldet der aufrufenden Kette zurück, ob er die
+Marktbewertung schon geholt hat: `done({ marktGeholt })`. Die Kette
+überspringt daraufhin ihren eigenen Abruf — richtig so, denn zweimal
+abrufen heißt zweimal bezahlen.
+
+Das Kennzeichen lag in einer **Modulvariablen**. Beim ersten Lauf
+stimmte alles. Beim zweiten meldete der Dialog `true`, obwohl er selbst
+nichts geholt hatte — **die Kette übersprang ihren Abruf, und der Nutzer
+stünde ohne Marktbewertung da.**
+
+**Die Regel:** jeder Zustand, der einen Dialog überlebt, gehört an
+dessen Anfang gelöscht — nicht an sein Ende. Am Ende gibt es zu viele
+Wege hinaus (Abbrechen, Übernehmen, Fenster zu, Fehler), und einer wird
+immer vergessen.
+
+**Und beim Prüfen:** der zweite Durchlauf ist der, der die Wahrheit
+zeigt. Beim ersten sieht jeder Zustand richtig aus, weil er noch
+niemandem gehört hat.

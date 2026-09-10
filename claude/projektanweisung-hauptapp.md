@@ -11209,6 +11209,104 @@ Satz** über den Kennzahlen — das erste, was man liest.
 **Commits** `93ef10a`, `3ba055f`, `9318894`, `2fea6eb`, `843cae8`, `516fab4`,
 `e8ddc96`. Auf Staging, **nicht auf Prod**.
 
+## Rollout-Journal · 10.09.2026, Nacht — `v1293` bis `v1293c`
+
+Marcels Auftrag: *„Wenn da jemand Marktbewertung anklickt, aber auch
+Exposé/Marktbericht und Sprache, dann sollte auf jeden Fall als Erstes die
+Exposé- und Marktberichte eingelesen werden. Dann sollten wir die Daten, die
+wir daraus schon extrahieren, auch im Sprachlauf mit integrieren … und nur noch
+die Sachen nachfragen, die uns fehlen."*
+
+### `v1293` · Die Reihenfolge ist umgedreht
+
+`runSelected()` lief seit `v503` **„voice-first"**: erst reden, dann Dokumente
+nachschieben. Das war richtig, solange der Sprechlauf ein Diktat war. Seit
+`v1288` ist er ein geführter Dialog — und **ein Dialog, der nach dem Kaufpreis
+fragt, während er zwei Klicks später im Exposé steht, ist kein guter Dialog.**
+
+| alt | neu |
+|---|---|
+| `voice` → `import` → `immometrica` → AVM | `import` → `immometrica` → **`voice`** → AVM |
+
+Die Ordnung folgt dem **Aufwand für den Menschen**: was die Maschine lesen kann,
+liest sie zuerst; der Mensch ergänzt danach nur noch, was fehlt; die
+Marktbewertung braucht die Adresse und kommt zuletzt.
+
+### `v1293` · Der Sprechlauf weiß, was vorher lief
+
+**Das Überspringen gab es schon** — `_rfFehlt` prüft neben dem Gespräch auch das
+Formular. Wer ein Exposé eingelesen hat, wurde nach dem Kaufpreis nicht mehr
+gefragt. **Was fehlte, war, dass der Co-Pilot es sagt.** Er begann mit „16
+Fragen in 5 Etappen", obwohl neun davon schon beantwortet waren.
+
+> Wer gerade ein Exposé hochgeladen hat und dann dieselbe Begrüßung bekommt wie
+> beim leeren Objekt, glaubt, der Import sei verpufft.
+
+Gemessen nach dem Umbau: *„Aus **Exposé / Marktbericht** stehen schon **9
+Angaben** — die frage ich nicht noch einmal. Ich führe dich durch — **13**
+Fragen in 5 Etappen."* Etappe 1 schrumpft dabei von vier Fragen auf eine.
+
+### `v1293` · Die Marktbewertung wandert in den Sprechlauf
+
+Sind **beide** angehakt, holt der Sprechlauf sie — dort kann der Nutzer die
+**Stufe** wählen (Plan- und kontingentabhängig), sie läuft im Hintergrund
+weiter, und ihre Werte landen in derselben Übernahme-Tabelle wie alles andere.
+
+Der Co-Pilot sagt dann auch, dass sie schon gewollt war: *„Du hast die
+Marktbewertung mit ausgewählt — ich hole sie hier gleich mit. **Welche
+Stufe?**"* mit den Knöpfen **Einfach** (43 frei) und **Erweitert** (9 frei) in
+der Aktionsleiste — statt sie noch einmal anzubieten.
+
+Danach meldet der Sprechlauf über `done({marktGeholt})` zurück, und die Kette
+überspringt ihren eigenen Abruf. **Zweimal abrufen heißt zweimal bezahlen.**
+
+### `v1293b` · „71 Angaben aus dem Exposé" — es waren neun
+
+Gemessen direkt nach dem Ausrollen. Gezählt wurde, **was im Formular steht** —
+und dort stehen auch die Vorgaben aus `index.html`: Notar 2,20 %,
+Grunderwerbsteuer 6,50 %, Mietsteigerung 3 %, AfA 2,0 %, die acht
+Sanierungsgewerke, die Bauspar-Vorgaben …
+
+> Eine Zahl, die der Nutzer nicht wiedererkennt, ist schlimmer als keine — sie
+> lässt ihn glauben, das Exposé habe etwas gebracht, was es nicht gebracht hat.
+
+Jetzt macht **die Kette** einen Schnappschuss der Formularwerte, bevor sie
+läuft, und übergibt dem Sprechlauf die **Differenz**. Der richtige Ort dafür ist
+die Kette, nicht der Sprechlauf: nur sie weiß, wie es vorher aussah. Fällt der
+Schnappschuss aus (Sprechlauf direkt geöffnet), gilt wie bisher „was im Objekt
+steht" — und die Aussage lautet dann auch so.
+
+Nachgemessen: **9 Angaben**, und die Liste enthält genau `plz, ort, str, hnr,
+wfl, baujahr, kp, nkm, zimmer`.
+
+### `v1293c` · Der zweite Sprechlauf meldete fälschlich „schon geholt"
+
+Beim Prüfen der Rückmeldung aufgefallen: `_mbGeholt` ist eine **Modulvariable**
+und überlebte das Schließen des Dialogs. Der zweite Sprechlauf meldete
+`marktGeholt: true`, obwohl er selbst nichts geholt hatte — **die Kette hätte
+ihren eigenen Abruf übersprungen, und der Nutzer stünde ohne Marktbewertung
+da.**
+
+> Ein Zustand, der einen Dialog überlebt, gehört an dessen Anfang gelöscht.
+> Aufgefallen nur, weil ich den **zweiten** Lauf überhaupt gemessen habe — beim
+> ersten sieht alles richtig aus.
+
+Nachgemessen: zwei Läufe hintereinander, beide `marktGeholt: false`.
+
+### Eine Falle beim Messen selbst
+
+Zwischendurch zeigte der Browser hartnäckig „71 Angaben", obwohl der Server
+längst die neue Fassung auslieferte. Ursache: **`location.reload(true)` holt das
+HTML nicht neu.** Der Cache-Buster stand richtig auf `v1293b`, aber das
+`index.html` mit diesem Buster kam aus dem Cache — geladen wurde weiter
+`voice-import.js?v=v1293`. Erst ein **neuer Tab** zeigte den echten Stand.
+
+Gegenprobe, die das aufgeklärt hat: `curl` auf den Server (liefert `v1293b`)
+gegen `document.querySelector('script[src*="voice-import"]').src` im Browser
+(zeigte `v1293`).
+
+**Commits** `34a31c6`, `1acea49`, `eaa80f6`. Auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
