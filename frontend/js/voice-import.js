@@ -588,7 +588,7 @@
       '@media(max-width:620px){.vi-sk-wahl{grid-template-columns:1fr}}',
       '.vi-sk-btn{text-align:left;cursor:pointer;border-radius:14px;padding:16px 18px;',
       '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 38%, transparent);',
-      '  background:rgba(0,0,0,.22);color:inherit;transition:background .16s ease, box-shadow .16s ease}',
+      '  background:var(--wl-fbf8f2, #FBF8F2);color:inherit;transition:background .16s ease, box-shadow .16s ease}',   /* v1290c: heller Grund */
       '.vi-sk-btn:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);',
       '  box-shadow:0 0 0 3px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent)}',
       '.vi-sk-btn .t{display:block;font:700 14.5px/1.2 "Space Grotesk",system-ui,sans-serif;',
@@ -2516,12 +2516,12 @@
          gleicher Spezifitaet gewinnt die spaetere, und damit stand der
          Blockname NEBEN den Werten statt darueber. Der Kaskaden-Walker
          hat es gezeigt, `matches()` haette es verschwiegen. */
-      '.vi-rf-stand{border:1px solid rgba(255,255,255,.09);border-radius:12px;',
-      '  padding:0;background:rgba(255,255,255,.03);display:flex;flex-direction:column;',
+      '.vi-rf-stand{border:1px solid rgba(42,39,39,.14);border-radius:12px;',
+      '  padding:0;background:var(--wl-fbf8f2, #FBF8F2);display:flex;flex-direction:column;',
       '  height:min(58vh,560px);overflow:hidden}',
       '.vi-rf-stand-kopf{display:flex;align-items:center;justify-content:space-between;gap:8px;',
       '  padding:10px 13px 9px;flex:0 0 auto;',
-      '  border-bottom:1px solid rgba(255,255,255,.09);',
+      '  border-bottom:1px solid rgba(42,39,39,.13);',
       '  font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;',
       '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);opacity:.9}',
       '.vi-rf-stand-kopf b{letter-spacing:.04em;opacity:.85}',
@@ -2532,19 +2532,19 @@
       /* Die Etappen-Ueberschrift in der Spalte. */
       '.vi-rf-gr{display:flex;align-items:center;gap:7px;margin:11px 0 4px;',
       '  font:700 9px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;',
-      '  text-transform:uppercase;opacity:.55}',
+      '  text-transform:uppercase;opacity:.68}',
       '.vi-rf-gr:first-child{margin-top:1px}',
       '.vi-rf-gr-nr{width:14px;height:14px;flex:0 0 14px;border-radius:50%;display:flex;',
-      '  align-items:center;justify-content:center;background:rgba(255,255,255,.09);font-size:8px}',
+      '  align-items:center;justify-content:center;background:rgba(42,39,39,.09);font-size:8px}',
       '.vi-rf-gr-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
       '.vi-rf-gr-z{opacity:.7}',
 
       /* Eine Zeile je Block: Zeichen · Name · Werte kompakt. */
-      '.vi-rf-st{display:block;padding:0;opacity:.5;',
+      '.vi-rf-st{display:block;padding:0;opacity:.62;',
       '  font:400 12px/1.3 Inter,system-ui,sans-serif}',
       '.vi-rf-st-k{display:flex;align-items:baseline;gap:6px;padding:3px 0;border-radius:6px}',
       '.vi-rf-st.hatwerte .vi-rf-st-k{cursor:pointer}',
-      '.vi-rf-st.hatwerte:hover .vi-rf-st-k{background:rgba(255,255,255,.045)}',
+      '.vi-rf-st.hatwerte:hover .vi-rf-st-k{background:rgba(42,39,39,.055)}',
       '.vi-rf-st .z{width:10px;flex:0 0 10px;text-align:center;',
       '  font:600 10px/1.35 "JetBrains Mono",ui-monospace,monospace}',
       '.vi-rf-st .n{flex:0 0 auto;max-width:47%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
@@ -2553,7 +2553,7 @@
       '  font:600 11px/1.35 "JetBrains Mono",ui-monospace,monospace;color:#3FA56C}',
       '.vi-rf-st .v.vorbelegt{color:#8A837F;font-weight:400}',
       '.vi-rf-st.ok{opacity:1} .vi-rf-st.ok .z{color:#3FA56C}',
-      '.vi-rf-st.vor{opacity:.7} .vi-rf-st.vor .z{color:#7A7370}',
+      '.vi-rf-st.vor{opacity:.78} .vi-rf-st.vor .z{color:#8A837F}',
       '.vi-rf-st.weg{opacity:.4} .vi-rf-st.weg .z{color:#B8625C}',
       '.vi-rf-st.dran{opacity:1;font-weight:600} .vi-rf-st.dran .z{color:var(--wl-c9a84c, #C9A84C)}',
       '.vi-rf-st.dran .n{color:var(--wl-e8cc7a, #E8CC7A)}',
@@ -2561,7 +2561,7 @@
       '.vi-rf-st-w{display:none}',
       '.vi-rf-st.auf .vi-rf-st-w{display:grid;grid-template-columns:minmax(0,1fr) auto;',
       '  gap:1px 10px;align-items:baseline;margin:2px 0 6px 16px;',
-      '  padding:5px 8px;border-radius:7px;background:rgba(0,0,0,.22)}',
+      '  padding:5px 8px;border-radius:7px;background:rgba(42,39,39,.055)}',
       '.vi-rf-st-w span{display:contents}',
       '.vi-rf-st-w i{font-style:normal;opacity:.6;font:400 10.5px/1.5 Inter,system-ui,sans-serif;',
       '  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
@@ -2597,7 +2597,7 @@
       '.vi-rf-blase{max-width:82%;padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.45;',
       '  animation:viRfAuf .3s ease both}',
       '@keyframes viRfAuf{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}',
-      '.vi-rf-co{align-self:flex-start;background:rgba(255,255,255,.055);border-top-left-radius:5px;',
+      '.vi-rf-co{align-self:flex-start;background:var(--wl-fffdf7, #FFFDF7);border-top-left-radius:5px;',
       '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 26%, transparent)}',
       '.vi-rf-ich{align-self:flex-end;border-top-right-radius:5px;',
       '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);',
@@ -2606,7 +2606,7 @@
       '  text-transform:uppercase;margin-bottom:6px;opacity:.65}',
       '.vi-rf-co .vi-rf-wer{color:var(--wl-c9a84c, #C9A84C);opacity:.85}',
       '.vi-rf-ich .vi-rf-wer{text-align:right}',
-      '.vi-rf-treffer{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.14);',
+      '.vi-rf-treffer{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(42,39,39,.16);',
       '  font:600 11.5px/1.5 "JetBrains Mono",ui-monospace,monospace;color:#3FA56C}',
       '.vi-rf-zaehler{font:600 10.5px/1 "JetBrains Mono",monospace;opacity:.5;margin-top:7px}',
       '.vi-rf-vorschlag{margin-top:9px;padding:8px 11px;border-radius:9px;font:400 12.5px/1.45 Inter,system-ui,sans-serif;',
@@ -2659,7 +2659,7 @@
       '.vi-rf-zeile{display:flex;gap:8px;align-items:stretch}',
       '.vi-rf-zeile input{flex:1;min-width:0;border-radius:11px;padding:11px 14px;',
       '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);',
-      '  background:rgba(0,0,0,.25);color:inherit;font:400 14.5px Inter,system-ui,sans-serif}',
+      '  background:#fff;color:inherit;font:400 14.5px Inter,system-ui,sans-serif}',
       '.vi-rf-zeile input:focus{outline:none;border-color:var(--wl-c9a84c, #C9A84C)}',
       '.vi-rf-btn{border-radius:11px;padding:0 15px;cursor:pointer;white-space:nowrap;',
       '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);',
@@ -2667,7 +2667,7 @@
       '  font:600 12px "JetBrains Mono",ui-monospace,monospace}',
       '.vi-rf-btn:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent)}',
       '.vi-rf-neben{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}',
-      '.vi-rf-neben button{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);',
+      '.vi-rf-neben button{background:rgba(42,39,39,.04);border:1px solid rgba(42,39,39,.16);',
       '  color:inherit;opacity:.75;border-radius:9px;padding:7px 12px;cursor:pointer;',
       '  font:400 12.5px Inter,system-ui,sans-serif}',
       '.vi-rf-neben button:hover{opacity:1}',
@@ -2681,19 +2681,19 @@
          sieht, wie weit man ist. */
       '#vi-rf-band{margin:0 2px 14px}',
       '.vi-et-band{display:flex;align-items:flex-start;gap:0;flex-wrap:wrap}',
-      '.vi-et{display:flex;align-items:center;gap:8px;flex:1 1 auto;min-width:0;opacity:.4}',
+      '.vi-et{display:flex;align-items:center;gap:8px;flex:1 1 auto;min-width:0;opacity:.52}',
       '.vi-et-linie{flex:1 1 auto;min-width:12px;height:2px;border-radius:2px;',
-      '  background:rgba(255,255,255,.13);margin:0 4px}',
+      '  background:rgba(42,39,39,.15);margin:0 4px}',
       '.vi-et.fertig .vi-et-linie,.vi-et.jetzt .vi-et-linie{background:var(--wl-c9a84c, #C9A84C);opacity:.55}',
       '.vi-et-punkt{width:22px;height:22px;flex:0 0 22px;border-radius:50%;display:flex;',
-      '  align-items:center;justify-content:center;background:rgba(255,255,255,.08);',
-      '  border:1px solid rgba(255,255,255,.14);',
+      '  align-items:center;justify-content:center;background:rgba(42,39,39,.07);',
+      '  border:1px solid rgba(42,39,39,.18);',
       '  font:700 10px/1 "JetBrains Mono",ui-monospace,monospace}',
       '.vi-et-txt{display:flex;flex-direction:column;gap:2px;min-width:0}',
       '.vi-et-txt b{font:600 11px/1.2 Inter,system-ui,sans-serif;white-space:nowrap;',
       '  overflow:hidden;text-overflow:ellipsis}',
       '.vi-et-txt small{font:600 9px/1 "JetBrains Mono",ui-monospace,monospace;opacity:.6}',
-      '.vi-et.fertig{opacity:.85}',
+      '.vi-et.fertig{opacity:.9}',
       '.vi-et.fertig .vi-et-punkt{background:#3FA56C;border-color:#3FA56C;color:#08130c}',
       '.vi-et.jetzt{opacity:1}',
       '.vi-et.jetzt .vi-et-punkt{border-color:var(--wl-c9a84c, #C9A84C);color:#100e08;',
@@ -2705,7 +2705,7 @@
          Sie sitzt IN einer Co-Pilot-Blase, deshalb kein eigener Rahmen um
          das Ganze, sondern eine abgesetzte Flaeche darin. */
       '.vi-sc{margin:11px -4px 2px;padding:12px 13px;border-radius:12px;',
-      '  background:rgba(0,0,0,.26);border:1px solid rgba(255,255,255,.09)}',
+      '  background:var(--wl-fbf6e9, #FBF6E9);border:1px solid rgba(42,39,39,.14)}',
       '.vi-sc-kopf{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:2px}',
       '.vi-sc-titel{font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;',
       '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);opacity:.9}',
@@ -2716,19 +2716,19 @@
       '.vi-sc-gitter{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 16px}',
       '@media(max-width:560px){.vi-sc-gitter{grid-template-columns:1fr}}',
       '.vi-sc-z{display:flex;align-items:baseline;justify-content:space-between;gap:8px;',
-      '  padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05)}',
+      '  padding:3px 0;border-bottom:1px solid rgba(42,39,39,.08)}',
       '.vi-sc-z i{font-style:normal;opacity:.6;font:400 11.5px/1.4 Inter,system-ui,sans-serif}',
       '.vi-sc-z b{font:600 12px/1.4 "JetBrains Mono",ui-monospace,monospace;white-space:nowrap}',
       '.vi-sc-z.gut b{color:#3FA56C} .vi-sc-z.schlecht b{color:#B8625C}',
-      '.vi-sc-text{margin-top:10px;font:400 12.5px/1.5 Inter,system-ui,sans-serif;opacity:.85}',
-      '.vi-sc-annahmen{margin-top:9px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.12);',
-      '  font:400 11px/1.5 Inter,system-ui,sans-serif;opacity:.6}',
-      '.vi-sc-annahmen b{opacity:.85}',
+      '.vi-sc-text{margin-top:10px;font:400 12.5px/1.5 Inter,system-ui,sans-serif;opacity:.9}',
+      '.vi-sc-annahmen{margin-top:9px;padding-top:8px;border-top:1px dashed rgba(42,39,39,.16);',
+      '  font:400 11px/1.5 Inter,system-ui,sans-serif;opacity:.72}',
+      '.vi-sc-annahmen b{opacity:.9}',
       '.vi-sc-weiter{margin-top:10px;font:400 12.5px/1.45 Inter,system-ui,sans-serif;opacity:.8}',
       /* v1290: der Fliesstext der vollen Stufe — eingeklappt, damit er die
          Karte nicht sprengt, aber vorhanden. Wer dafuer bezahlt, soll ihn
          auch sehen koennen. */
-      '.vi-sc-mehr{margin-top:11px;border-top:1px dashed rgba(255,255,255,.12);padding-top:9px}',
+      '.vi-sc-mehr{margin-top:11px;border-top:1px dashed rgba(42,39,39,.16);padding-top:9px}',
       '.vi-sc-mehr summary{cursor:pointer;font:600 10px/1 "JetBrains Mono",ui-monospace,monospace;',
       '  letter-spacing:.1em;text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);opacity:.9}',
       '.vi-sc-mehr p{margin:9px 0 0;font:400 12px/1.6 Inter,system-ui,sans-serif;opacity:.82;',
@@ -2736,7 +2736,7 @@
       /* Die Stufen einer Auswahl, in der Frage genannt (Backlog-Punkt 2). */
       '.vi-rf-skala{margin-top:9px;padding:8px 11px;border-radius:9px;',
       '  font:400 12px/1.55 Inter,system-ui,sans-serif;',
-      '  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09)}',
+      '  background:rgba(42,39,39,.04);border:1px solid rgba(42,39,39,.12)}',
       '.vi-rf-skala b{font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;',
       '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);opacity:.85}',
       '.vi-rf-skala i{font-style:normal;font-weight:600;opacity:.85}',
@@ -2756,7 +2756,7 @@
       '.vi-rf-abruf-btn:hover:not(:disabled){background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent)}',
       '.vi-rf-abruf-btn:disabled{opacity:.45;cursor:default}',
       '.vi-rf-abruf-btn i{font-style:normal;font-size:10px;opacity:.7;',
-      '  padding:2px 6px;border-radius:99px;background:rgba(255,255,255,.09)}',
+      '  padding:2px 6px;border-radius:99px;background:rgba(42,39,39,.08)}',
       /* Der Knopf zur Tabelle am Abschluss traegt Gewicht — er beendet den
          Sprechlauf, waehrend „Weiss ich nicht" nur eine Frage beendet. */
       '#vi-rf-zur-tabelle{border-color:var(--wl-c9a84c, #C9A84C) !important;',
@@ -3171,7 +3171,7 @@
     if (!isFinite(s)) return { wort: '–', kamel: '–', farbe: '#7A7370' };
     if (s >= 85) return { wort: 'TOP',       kamel: 'Top',       farbe: '#3FA56C' };
     if (s >= 70) return { wort: 'GUT',       kamel: 'Gut',       farbe: '#3FA56C' };
-    if (s >= 50) return { wort: 'SOLIDE',    kamel: 'Solide',    farbe: 'var(--wl-c9a84c, #C9A84C)' };
+    if (s >= 50) return { wort: 'SOLIDE',    kamel: 'Solide',    farbe: 'var(--wl-b8932f, #b8932f)' };   /* v1290c: auf hellem Grund traegt das helle Gold nicht */
     if (s >= 35) return { wort: 'SCHWACH',   kamel: 'Schwach',   farbe: '#B8625C' };
     return          { wort: 'KRITISCH',  kamel: 'Kritisch',  farbe: '#D8564C' };
   }
