@@ -5326,7 +5326,7 @@
     var bloecke = _rf.tiefeBloecke || _rfTiefeBloecke();
     if (!bloecke.length) return _rfFertig();
     _rfKatalogErgaenzen(bloecke);
-    _rf.offen = _rf.offen.concat(bloecke);
+    _rf.offen = _rf.offen.concat(_rfAufKatalog(bloecke, _rf.catalog));   /* v1293g */
     _rf.tiefeAn = 1;
     _rf.tiefeBloecke = null;
     _rfStandZeichnen();
@@ -5829,12 +5829,50 @@
     });
     return out;
   }
+  /* ═══ v1293g · Nur fragen, was auch ankommen kann ═══════════════════
+     Gemessen im Quick-Check-Ziel (`target: 'qc'`): der Katalog fuehrt
+     dort **19** Felder, der Dialog stellte aber **13 Fragen — neun davon
+     zu Feldern, die es im QC-Katalog gar nicht gibt**: Kaufnebenkosten,
+     Lage, Sanierung, Grundstueck, Entwicklung, Steuer, These.
+
+     Das ist nicht nur unnuetz, es ist ein harter Fehler. `_rfKatalog()`
+     filtert die Frage auf die Katalogfelder — bei diesen Bloecken bleibt
+     ein LEERES Array, und das Backend antwortet darauf mit
+
+         HTTP 400 · „Feld-Katalog fehlt oder ist leer."
+
+     Neun Fragen, von denen jede Antwort in einer Fehlermeldung endet.
+
+     Jetzt werden die Bloecke vor dem Start am Katalog gemessen: was kein
+     einziges Feld darin hat, wird nicht gefragt. Bloecke, von denen nur
+     ein TEIL im Katalog steht, bleiben — dort kommt wenigstens etwas an,
+     und der Rest faellt beim Uebernehmen ohnehin weg.
+
+     Der Objekt-Weg ist davon nicht betroffen: `buildFullCatalog()` kennt
+     alle Felder, also aendert der Filter dort nichts. Gegengeprueft. */
+  function _rfAufKatalog(bloecke, catalog) {
+    var da = {};
+    (catalog || []).forEach(function (c) { da[c.id] = 1; });
+    var raus = [];
+    (bloecke || []).forEach(function (e) {
+      var ids = (e.ids || []).filter(function (id) { return da[id]; });
+      if (!ids.length) return;
+      if (ids.length === (e.ids || []).length) { raus.push(e); return; }
+      var kopie = {}; Object.keys(e).forEach(function (k) { kopie[k] = e[k]; });
+      kopie.ids = ids;
+      raus.push(kopie);
+    });
+    return raus;
+  }
+
   /* Einstieg: nach der Auswertung (Lücken) oder von Anfang an (geführt). */
   function rueckfragen(OA, data, catalog, alle) {
     var fields = (data && data.fields) || {};
     var luecken = alle
       ? RFRAGEN.filter(function (e) { return _rfFehlt(e, fields); })
       : _rfLuecken(fields);
+    /* v1293g: Was der Katalog nicht kennt, wird nicht gefragt. */
+    luecken = _rfAufKatalog(luecken, catalog);
     if (!luecken.length) return showResults(OA, data, catalog);   /* nichts offen */
     _rf = { offen: luecken, i: 0, data: data, catalog: catalog, OA: OA, alle: !!alle,
             quelle: {}, halte: {}, abrufGetan: {} };   /* v1288 */
