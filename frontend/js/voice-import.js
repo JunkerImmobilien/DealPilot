@@ -1874,21 +1874,108 @@
      in der ein Mensch erzählt. Die Rückfragen nach einem freien Diktat
      sortieren nach `rang` — dort zählt das Gewicht für die Rechnung, weil
      nur drei Fragen gestellt werden. */
+  /* ═══════════════════════════════════════════════════════════════════
+     v1288 · DIE ETAPPEN — aus einer Fragenliste wird ein Sprechlauf
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Plan vom 10.09.2026: „Im Sprachlauf könnte erst mal sein, dass
+     wir die Standardfelder abfragen, dass wir dann einen Deal-Score
+     bekommen und einen Deal-Score 2 … dass wir im Deal-Score schon mal
+     sagen: okay, wohin geht die Reise, lohnt sich das, lohnt sich das
+     nicht."
+
+     Bis v1287 war der Dialog EINE flache Liste: elf Fragen, danach die
+     Tabelle. Wer bei Frage 7 war, wusste nicht, wozu die Fragen 1-6 gut
+     waren — es gab kein Zwischenergebnis, nur ein Ende.
+
+     JETZT: fünf Etappen mit einem Halt dazwischen. Jeder Halt ist ein
+     Ergebnis, das ohne die nächste Etappe schon etwas wert ist:
+
+       1 Basis          Adresse, Objekt, Preis, Miete
+       2 Geld           Finanzierung, Kaufnebenkosten   -> DEAL SCORE
+       3 Lage & Zustand Lage, Zustand, Grundstück       -> DEAL SCORE 2
+       4 Feinschliff    Bewirtschaftung, Entwicklung, Steuer
+       5 Deine Sicht    These, Risiken
+       6 Feinheiten     alle übrigen Felder (nur auf Wunsch)
+
+     WARUM DIE REIHENFOLGE SO IST: der Deal Score braucht Kaufpreis,
+     Miete, Nebenkosten und Finanzierung — mehr nicht. Das ist genau
+     Etappe 1 + 2. Der Deal Score 2 braucht zusätzlich Lage, Zustand und
+     Energie — Etappe 3. Alles danach verfeinert, entscheidet aber nichts
+     mehr. Wer nach Etappe 2 abbricht, hat trotzdem eine Antwort auf
+     „lohnt sich das".
+
+     `et` ist die Etappe, `rang` bleibt das Gewicht für die Rechnung.
+     ZWEI ORDNUNGEN, ein Grund (seit v1286): der geführte Weg fragt nach
+     Etappe und Erzähl-Logik, die Rückfragen nach einem freien Diktat
+     sortieren nach `rang` — dort zählt das Gewicht, weil nur drei Fragen
+     gestellt werden. */
+  var ETAPPEN = [
+    { nr: 1, name: 'Basis',          ziel: 'Objekt, Preis und Miete' },
+    { nr: 2, name: 'Geld',           ziel: 'Finanzierung und Kaufnebenkosten' },
+    { nr: 3, name: 'Lage & Zustand', ziel: 'wo es steht und wie es dasteht' },
+    { nr: 4, name: 'Feinschliff',    ziel: 'Bewirtschaftung, Entwicklung, Steuer' },
+    { nr: 5, name: 'Deine Sicht',    ziel: 'These und Risiken' },
+    { nr: 6, name: 'Feinheiten',     ziel: 'alle übrigen Felder' }
+  ];
+
   var RFRAGEN = [
-    { ids: ['plz', 'ort', 'str', 'hnr'],     rang: 5,  frage: 'Wo steht das Objekt? Straße, Hausnummer, PLZ und Ort.' },
-    { ids: ['objart', 'wfl', 'zimmer'],      rang: 3,  frage: 'Was für ein Objekt ist es, und wie groß? Art, Wohnfläche, Zimmer.' },
-    { ids: ['baujahr', 'kp'],                rang: 1,  frage: 'Baujahr und Kaufpreis?' },
-    { ids: ['nkm', 'ze'],                    rang: 2,  frage: 'Was kommt monatlich rein? Kaltmiete und Zusatzeinnahmen wie Stellplatz.' },
-    { ids: ['hg_ul', 'hg_nul'],              rang: 8,  frage: 'Wie hoch ist das Hausgeld, und wie viel davon ist nicht umlagefähig?' },
-    { ids: ['ek', 'd1z', 'd1t', 'd1_bindj'], rang: 4, vorbelegt: 1, profil: 'finanzierung',
+    /* ── Etappe 1 · Basis ─────────────────────────────────────────────
+       Was jede Rechnung braucht. Ohne diese vier Blöcke gibt es keinen
+       Score, keine Marktpreisindikation und keinen Bodenrichtwert. */
+    { et: 1, ids: ['plz', 'ort', 'str', 'hnr'],     rang: 5,
+      frage: 'Wo steht das Objekt? Straße, Hausnummer, PLZ und Ort.' },
+    { et: 1, ids: ['objart', 'wfl', 'zimmer'],      rang: 3,
+      frage: 'Was für ein Objekt ist es, und wie groß? Art, Wohnfläche, Zimmer.' },
+    { et: 1, ids: ['baujahr', 'kp'],                rang: 1,
+      frage: 'Baujahr und Kaufpreis?' },
+    { et: 1, ids: ['nkm', 'ze'],                    rang: 2,
+      frage: 'Was kommt monatlich rein? Kaltmiete und Zusatzeinnahmen wie Stellplatz.' },
+
+    /* ── Etappe 2 · Geld ──────────────────────────────────────────────
+       v1288: Die Kaufnebenkosten sind NEU im Dialog. Marcels Wort:
+       „natürlich musst du auch Nebenkosten, natürlich musst du
+       nachfragen. Wir können auch die Standards nehmen, da kann auch
+       erst mal nach den Einstellungen fragen. Ansonsten kann man aber
+       auch sagen 10 Prozent vom Kaufpreis oder Sonstiges."
+       Bis v1287 rechnete der Zwischenstand still mit einer Vorbelegung,
+       die niemand bestätigt hat — genau der Fehler aus v1273c, nur eine
+       Etage tiefer. */
+    { et: 2, ids: ['ek', 'd1z', 'd1t', 'd1_bindj'], rang: 4, vorbelegt: 1, profil: 'finanzierung',
       frage: 'Wie finanzierst du? Eigenkapital, Zinssatz, Tilgung und Zinsbindung.' },
-    { ids: ['san', 'moebl'],                 rang: 9,  frage: 'Muss etwas saniert werden, und wird etwas mitverkauft — Küche, Möbel?' },
-    { ids: ['kaufdat', 'wirtschaftlicher_uebergang'], rang: 10,
+    { et: 2, ids: ['makler_p', 'notar_p', 'gba_p', 'gest_p'], rang: 6, vorbelegt: 1, profil: 'nebenkosten',
+      frage: 'Die Kaufnebenkosten — Makler, Notar, Grundbuch und Grunderwerbsteuer, jeweils in Prozent vom Kaufpreis.' },
+
+    /* ── Etappe 3 · Lage & Zustand ────────────────────────────────────
+       Was der Deal Score 2 zusätzlich braucht. `skalen` heisst: die
+       Stufen stehen IN der Frage — wir bewerten danach, also soll der
+       Nutzer sie kennen, statt Freitext zu raten (v1288, Backlog-Punkt 2).
+       `abruf` heisst: das kann der Co-Pilot selbst holen. */
+    { et: 3, ids: ['makrolage', 'mikrolage'],       rang: 12, skalen: 1, abruf: 'lage',
+      frage: 'Wie schätzt du die Lage ein — erst die Region, dann die Straße?' },
+    { et: 3, ids: ['ds2_zustand', 'ds2_energie'],   rang: 12, skalen: 1,
+      frage: 'Wie ist der Zustand der Wohnung, und was steht im Energieausweis?' },
+    { et: 3, ids: ['san', 'moebl'],                 rang: 9,
+      frage: 'Muss etwas saniert werden, und wird etwas mitverkauft — Küche, Möbel?' },
+    { et: 3, ids: ['brw', 'gsfl', 'mea'],           rang: 11, abruf: 'brw',
+      frage: 'Was weißt du zum Grundstück — Bodenrichtwert, Fläche, Miteigentumsanteil?' },
+
+    /* ── Etappe 4 · Feinschliff ───────────────────────────────────────
+       Verfeinert die Rechnung, entscheidet aber nichts mehr. */
+    { et: 4, ids: ['hg_ul', 'hg_nul'],              rang: 8, vorbelegt: 1, profil: 'bewirtschaftung',
+      frage: 'Wie hoch ist das Hausgeld pro Jahr, und wie viel davon ist nicht umlagefähig?' },
+    { et: 4, ids: ['mietstg', 'wertstg', 'leerstand'], rang: 14, vorbelegt: 1,
+      frage: 'Womit rechnest du langfristig — Mietsteigerung, Wertsteigerung und Leerstand in Prozent?' },
+    { et: 4, ids: ['ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_wertsteigerung', 'ds2_entwicklung'],
+      rang: 15, skalen: 1,
+      frage: 'Wie entwickelt sich der Ort — Bevölkerung, Nachfrage, Wertsteigerung, Entwicklungsmöglichkeiten?' },
+    { et: 4, ids: ['kaufdat', 'wirtschaftlicher_uebergang'], rang: 10,
       frage: 'Wann wird gekauft, und ab wann gehören dir Mieten und Kosten?' },
-    { ids: ['brw', 'gsfl', 'mea'],           rang: 11, frage: 'Was weißt du zum Grundstück — Bodenrichtwert, Fläche, Miteigentumsanteil?' },
-    { ids: ['makrolage', 'mikrolage', 'ds2_zustand', 'ds2_energie'], rang: 12,
-      frage: 'Wie ist die Lage und der Zustand — Region, Straße, Wohnung, Energieausweis?' },
-    { ids: ['thesis', 'risiken', 'notizen'], rang: 13, frage: 'Warum lohnt sich das Objekt für dich, was könnte schiefgehen, und was ist sonst wichtig?' }
+    { et: 4, ids: ['afa_satz', 'geb_ant', 'grenz'], rang: 16, vorbelegt: 1, profil: 'steuer',
+      frage: 'Zur Steuer — AfA-Satz, Gebäudeanteil und dein Grenzsteuersatz.' },
+
+    /* ── Etappe 5 · Deine Sicht ───────────────────────────────────── */
+    { et: 5, ids: ['thesis', 'risiken', 'notizen'], rang: 13,
+      frage: 'Warum lohnt sich das Objekt für dich, was könnte schiefgehen, und was ist sonst wichtig?' }
   ];
 
   var RF_MAX = 3;
@@ -1928,56 +2015,190 @@
     return v || null;
   }
 
-  /* Derselbe Wert, nur lesbar. „3.5" ist eine Zahl aus einem Eingabefeld,
-     „3,5 %" ist eine Angabe. */
-  /* ═══ v1280 · „Oder soll ich die aus deinen Einstellungen nehmen?" ══════
-     Marcels Wunsch: „dass wir das vielleicht auch koppeln und er fragt:
-     Oder soll ich die Zinskonditionen aus den Einstellungen nehmen? … wir
-     haben ja auch diese Kondition im Tab Finanzierung … und dass er dann
-     den passenden Zins zieht aus dieser indikativen Konditionsberechnung."
+  /* v1288 · Zahlen aus dem Investmentprofil, tolerant gelesen.
+     `P.get` liefert den eigenen Wert oder die Vorgabe aus
+     DealPilotConfig.investmentProfileDefaults. Was dort nicht als Zahl
+     ankommt, wird hier zu null — NICHT zu 0. `Number(null)` ist 0 und
+     besteht `Number.isFinite`; ein Nebenkostensatz von 0 % saehe aus wie
+     eine Angabe und waere eine Luecke (FALLEN.md). */
+  function _profilZahl(schluessel) {
+    try {
+      var P = window.DealPilotInvestmentProfile;
+      if (!P || typeof P.get !== 'function') return null;
+      var v = P.get(schluessel);
+      if (v === null || v === undefined || v === '') return null;
+      var n = parseFloat(String(v).replace(',', '.'));
+      return isFinite(n) ? n : null;
+    } catch (e) { return null; }
+  }
 
-     Die Werte liegen längst bereit:
+  /* Eine deutsche Zahl aus einem Feld- oder Sprachwert. Gibt null zurueck,
+     wenn nichts dasteht — nie 0. */
+  function _rfNum(v) {
+    if (v === undefined || v === null) return null;
+    var s = String(v).trim();
+    if (!s) return null;
+    s = s.replace(/[^\d,.\-]/g, '');
+    if (!s || s === '-' || s === '.' || s === ',') return null;
+    if (s.indexOf(',') >= 0) s = s.replace(/\./g, '').replace(',', '.');
+    else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+    var n = parseFloat(s);
+    return isFinite(n) ? n : null;
+  }
+
+  /* Ein Feldwert aus dem Gespraech, sonst aus dem Formular. */
+  function _rfFeld(id) {
+    var v = (_rf && _rf.data && _rf.data.fields) ? _rf.data.fields[id] : undefined;
+    if (v === undefined || v === null || v === '') {
+      var el = document.getElementById(id);
+      v = el ? String(el.value || '').trim() : '';
+    }
+    return (v === '' || v === null || v === undefined) ? null : v;
+  }
+
+  function _rfKp() { return _rfNum(_rfFeld('kp')); }
+
+  function _euroKurz(n) {
+    if (n == null || !isFinite(n)) return '–';
+    try { return new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(Math.round(n)) + ' €'; }
+    catch (e) { return Math.round(n) + ' €'; }
+  }
+
+  /* ═══ v1280/v1288 · „Oder soll ich die aus deinen Einstellungen nehmen?"
+     Marcels Wunsch war zuerst die Finanzierung, mit v1288 kommen die
+     Kaufnebenkosten, die Bewirtschaftung und die Steuer dazu:
+
+       „Also natuerlich musst du auch Nebenkosten, natuerlich musst du
+        nachfragen. Wir koennen auch die Standards nehmen, da kann auch
+        erst mal nach den Einstellungen fragen. Ansonsten kann man aber
+        auch sagen 10 Prozent vom Kaufpreis oder Sonstiges."
+
+     Die Werte liegen laengst bereit:
        DealPilotInvestmentProfile.get('tilgung_default' | 'zinsbindung_default'
-         | 'ek_quote_default')      — was der Nutzer als Standard gesetzt hat
+         | 'ek_quote_default' | 'notar_grundbuch' | 'maklerkosten'
+         | 'bwk_ul_pct_default' | 'bwk_anteil_default' | 'grenzsteuersatz')
        DealPilotInvestmentProfile.getZins()  — der EFFEKTIVE Zins: eigener
          Wert, sonst der indikative Pfandbrief-Satz zur eingestellten
          Zinsbindung samt Marge (window.dpGetIndicativeZins)
+       DealPilotGrest.forPlz(plz)            — der AMTLICHE Satz des
+         Bundeslands zur Postleitzahl, ohne Netz und ohne Kosten
 
      Der Unterschied zu v1273c ist wichtig: dort ging es um Werte, die schon
      IM FELD stehen. Hier geht es um Werte, die in den EINSTELLUNGEN stehen
      und noch nirgends eingetragen sind. Beides wird angeboten, nie
-     stillschweigend genommen — der Knopf sagt, was er einträgt.
+     stillschweigend genommen — der Knopf sagt, was er eintraegt.
 
      Das Eigenkapital kommt aus der EK-Quote mal Kaufpreis: eine Quote ohne
      Kaufpreis ist keine Zahl, deshalb erscheint es nur, wenn der Kaufpreis
-     schon steht. */
+     schon steht. Dasselbe gilt fuer die Nebenkosten in Euro. */
   function _rfProfilVorschlag(eintrag) {
-    if (!eintrag || eintrag.profil !== 'finanzierung') return null;
+    if (!eintrag || !eintrag.profil) return null;
     var P = window.DealPilotInvestmentProfile;
     if (!P || typeof P.get !== 'function') return null;
-    var w = {}, teile = [];
     try {
-      var zins = (typeof P.getZins === 'function') ? P.getZins() : null;
-      if (typeof zins === 'number' && isFinite(zins) && zins > 0) {
-        w.d1z = String(zins).replace('.', ',');
-        teile.push(w.d1z + ' % Zins');
-      }
-      var tilg = P.get('tilgung_default');
-      if (tilg) { w.d1t = String(tilg).replace('.', ','); teile.push(w.d1t + ' % Tilgung'); }
-      var bind = P.get('zinsbindung_default');
-      if (bind) { w.d1_bindj = String(bind); teile.push(bind + ' Jahre fest'); }
-      var qu = P.get('ek_quote_default');
-      var kpEl = document.getElementById('kp');
-      var kp = kpEl ? parseFloat(String(kpEl.value || '').replace(/\./g, '').replace(',', '.')) : NaN;
-      if (qu && isFinite(kp) && kp > 0) {
-        w.ek = String(Math.round(kp * qu / 100));
-        teile.push(qu + ' % Eigenkapital');
-      }
+      if (eintrag.profil === 'finanzierung')    return _pvFinanzierung(P);
+      if (eintrag.profil === 'nebenkosten')     return _pvNebenkosten();
+      if (eintrag.profil === 'bewirtschaftung') return _pvBewirtschaftung();
+      if (eintrag.profil === 'steuer')          return _pvSteuer();
     } catch (e) { return null; }
+    return null;
+  }
+
+  function _pvFinanzierung(P) {
+    var w = {}, teile = [];
+    var zins = (typeof P.getZins === 'function') ? P.getZins() : null;
+    if (typeof zins === 'number' && isFinite(zins) && zins > 0) {
+      w.d1z = String(zins).replace('.', ',');
+      teile.push(w.d1z + ' % Zins');
+    }
+    var tilg = _profilZahl('tilgung_default');
+    if (tilg != null) { w.d1t = String(tilg).replace('.', ','); teile.push(w.d1t + ' % Tilgung'); }
+    var bind = _profilZahl('zinsbindung_default');
+    if (bind != null) { w.d1_bindj = String(bind); teile.push(bind + ' Jahre fest'); }
+    var qu = _profilZahl('ek_quote_default'), kp = _rfKp();
+    if (qu != null && kp != null && kp > 0) {
+      w.ek = String(Math.round(kp * qu / 100));
+      teile.push(qu + ' % Eigenkapital');
+    }
     if (!teile.length) return null;
     return { werte: w, text: teile.join(' · ') };
   }
 
+  /* Die Grunderwerbsteuer kommt NICHT aus dem Profil, sondern aus der
+     Postleitzahl: sie ist Landesrecht, kein Geschmack. Steht keine PLZ,
+     bleibt das Feld offen statt auf einer 6,5-%-Vorbelegung zu sitzen,
+     die in acht Bundeslaendern falsch ist. */
+  function _pvNebenkosten() {
+    var w = {}, teile = [];
+    var mak = _profilZahl('maklerkosten');
+    if (mak != null) { w.makler_p = String(mak).replace('.', ','); teile.push(w.makler_p + ' % Makler'); }
+    /* notar_grundbuch ist EIN Satz fuer beides. Aufgeteilt wird nach der
+       Vorbelegung des Formulars: 0,5 % Grundbuchamt, der Rest Notar. */
+    var ng = _profilZahl('notar_grundbuch');
+    if (ng != null) {
+      var gba = Math.min(0.5, ng), notar = Math.round((ng - gba) * 100) / 100;
+      w.gba_p = String(gba).replace('.', ',');
+      w.notar_p = String(notar).replace('.', ',');
+      teile.push(w.notar_p + ' % Notar', w.gba_p + ' % Grundbuch');
+    }
+    var g = _rfGrest();
+    if (g) { w.gest_p = String(g.rate).replace('.', ','); teile.push(w.gest_p + ' % Grunderwerbsteuer (' + g.name + ')'); }
+    if (!teile.length) return null;
+    var kp = _rfKp(), summe = 0;
+    Object.keys(w).forEach(function (id) { summe += (_rfNum(w[id]) || 0); });
+    var text = teile.join(' · ');
+    if (kp != null && kp > 0 && summe > 0) {
+      text += ' — zusammen ' + _euroKurz(kp * summe / 100) +
+              ' (' + String(Math.round(summe * 100) / 100).replace('.', ',') + ' %)';
+    }
+    return { werte: w, text: text };
+  }
+
+  /* Der amtliche Grunderwerbsteuersatz zur Postleitzahl. Ohne Netz,
+     ohne Kosten, ohne KI — DealPilotGrest fuehrt die 16 Saetze (V226). */
+  function _rfGrest() {
+    try {
+      var plz = _rfFeld('plz');
+      if (!plz) return null;
+      plz = String(plz).trim();
+      if (!/^\d{5}$/.test(plz)) return null;
+      if (!window.DealPilotGrest || typeof window.DealPilotGrest.forPlz !== 'function') return null;
+      return window.DealPilotGrest.forPlz(plz);
+    } catch (e) { return null; }
+  }
+
+  /* Hausgeld als Quote der Jahres-Kaltmiete — so steht es in den
+     Einstellungen (bwk_ul_pct_default / bwk_anteil_default, % der NKM).
+     Ohne Miete keine Zahl. */
+  function _pvBewirtschaftung() {
+    var nkm = _rfNum(_rfFeld('nkm'));
+    if (nkm == null || nkm <= 0) return null;
+    var ul = _profilZahl('bwk_ul_pct_default'), nul = _profilZahl('bwk_anteil_default');
+    var w = {}, teile = [];
+    if (ul != null)  { w.hg_ul  = String(Math.round(nkm * 12 * ul / 100));  teile.push(_euroKurz(_rfNum(w.hg_ul)) + ' umlagefaehig'); }
+    if (nul != null) { w.hg_nul = String(Math.round(nkm * 12 * nul / 100)); teile.push(_euroKurz(_rfNum(w.hg_nul)) + ' nicht umlagefaehig'); }
+    if (!teile.length) return null;
+    return { werte: w, text: teile.join(' · ') + ' pro Jahr (' + (ul || 0) + ' / ' + (nul || 0) + ' % der Kaltmiete)' };
+  }
+
+  function _pvSteuer() {
+    var w = {}, teile = [];
+    var gr = _profilZahl('grenzsteuersatz');
+    if (gr != null) { w.grenz = String(gr).replace('.', ','); teile.push(w.grenz + ' % Grenzsteuersatz'); }
+    /* AfA-Satz nach Baujahr: 2 % ab 1925, 2,5 % davor (§ 7 Abs. 4 EStG).
+       Das ist Gesetz, keine Einstellung — deshalb wird es nur dann
+       vorgeschlagen, wenn das Baujahr auch wirklich bekannt ist. */
+    var bj = _rfNum(_rfFeld('baujahr'));
+    if (bj != null && bj > 1500 && bj < 2200) {
+      w.afa_satz = (bj < 1925) ? '2,5' : '2';
+      teile.push(w.afa_satz + ' % AfA (Baujahr ' + bj + ')');
+    }
+    if (!teile.length) return null;
+    return { werte: w, text: teile.join(' · ') };
+  }
+
+  /* Derselbe Wert, nur lesbar. "3.5" ist eine Zahl aus einem Eingabefeld,
+     "3,5 %" ist eine Angabe. */
   function _rfLesbar(wert, eintrag) {
     var v = String(wert).replace('.', ',');
     var kat = (_rf && _rf.catalog || []).filter(function (c) { return c.id === eintrag.ids[0]; })[0];
@@ -2152,7 +2373,77 @@
       '.vi-rf-neben button{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);',
       '  color:inherit;opacity:.75;border-radius:9px;padding:7px 12px;cursor:pointer;',
       '  font:400 12.5px Inter,system-ui,sans-serif}',
-      '.vi-rf-neben button:hover{opacity:1}'
+      '.vi-rf-neben button:hover{opacity:1}',
+      /* ═══ v1288 · Das Etappenband ══════════════════════════════════════
+         Steht ueber dem Verlauf und beantwortet die Frage, die ein
+         Fragezaehler nicht beantwortet: nicht „die wievielte Frage",
+         sondern „wovon handelt das hier gerade und was kommt danach". */
+      '#vi-rf-band{display:flex;gap:6px;flex-wrap:wrap;margin:0 2px 12px}',
+      '.vi-rf-et{display:inline-flex;align-items:center;gap:6px;padding:5px 11px 5px 6px;border-radius:99px;',
+      '  border:1px solid rgba(255,255,255,.11);opacity:.45;',
+      '  font:600 11px/1 Inter,system-ui,sans-serif;white-space:nowrap}',
+      '.vi-rf-et i{font-style:normal;width:16px;height:16px;border-radius:50%;display:inline-flex;',
+      '  align-items:center;justify-content:center;background:rgba(255,255,255,.09);',
+      '  font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace}',
+      '.vi-rf-et.fertig{opacity:.8;border-color:rgba(63,165,108,.4)}',
+      '.vi-rf-et.fertig i{background:#3FA56C;color:#08130c}',
+      '.vi-rf-et.jetzt{opacity:1;border-color:var(--wl-c9a84c, #C9A84C);',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent)}',
+      '.vi-rf-et.jetzt i{background:linear-gradient(160deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C));color:#100e08}',
+      /* ═══ v1288 · Die Score-Karte im Verlauf ══════════════════════════
+         Sie sitzt IN einer Co-Pilot-Blase, deshalb kein eigener Rahmen um
+         das Ganze, sondern eine abgesetzte Flaeche darin. */
+      '.vi-sc{margin:11px -4px 2px;padding:12px 13px;border-radius:12px;',
+      '  background:rgba(0,0,0,.26);border:1px solid rgba(255,255,255,.09)}',
+      '.vi-sc-kopf{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:2px}',
+      '.vi-sc-titel{font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;',
+      '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);opacity:.9}',
+      '.vi-sc-pille{border:1px solid;border-radius:99px;padding:3px 9px;',
+      '  font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em}',
+      '.vi-sc-zahl{font:700 32px/1.1 "Space Grotesk",system-ui,sans-serif;margin:4px 0 10px}',
+      '.vi-sc-zahl small{font:600 12px/1 "JetBrains Mono",ui-monospace,monospace;opacity:.45;margin-left:6px}',
+      '.vi-sc-gitter{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 16px}',
+      '@media(max-width:560px){.vi-sc-gitter{grid-template-columns:1fr}}',
+      '.vi-sc-z{display:flex;align-items:baseline;justify-content:space-between;gap:8px;',
+      '  padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05)}',
+      '.vi-sc-z i{font-style:normal;opacity:.6;font:400 11.5px/1.4 Inter,system-ui,sans-serif}',
+      '.vi-sc-z b{font:600 12px/1.4 "JetBrains Mono",ui-monospace,monospace;white-space:nowrap}',
+      '.vi-sc-z.gut b{color:#3FA56C} .vi-sc-z.schlecht b{color:#B8625C}',
+      '.vi-sc-text{margin-top:10px;font:400 12.5px/1.5 Inter,system-ui,sans-serif;opacity:.85}',
+      '.vi-sc-annahmen{margin-top:9px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.12);',
+      '  font:400 11px/1.5 Inter,system-ui,sans-serif;opacity:.6}',
+      '.vi-sc-annahmen b{opacity:.85}',
+      '.vi-sc-weiter{margin-top:10px;font:400 12.5px/1.45 Inter,system-ui,sans-serif;opacity:.8}',
+      /* Die Stufen einer Auswahl, in der Frage genannt (Backlog-Punkt 2). */
+      '.vi-rf-skala{margin-top:9px;padding:8px 11px;border-radius:9px;',
+      '  font:400 12px/1.55 Inter,system-ui,sans-serif;',
+      '  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09)}',
+      '.vi-rf-skala b{font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;',
+      '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);opacity:.85}',
+      '.vi-rf-skala i{font-style:normal;font-weight:600;opacity:.85}',
+      /* ═══ v1288 · Das Abruf-Angebot in der Frage ═════════════════════
+         Kein Modal, kein zweiter Dialog: der Knopf steht dort, wo die
+         Frage steht. Wer ihn nicht braucht, redet einfach weiter. */
+      '.vi-rf-abruf{margin-top:10px;padding:9px 11px;border-radius:9px;',
+      '  font:400 12.5px/1.5 Inter,system-ui,sans-serif;',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 9%, transparent);',
+      '  border:1px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent)}',
+      '.vi-rf-abruf.laeuft{border-style:solid;opacity:.75}',
+      '.vi-rf-abruf small{display:block;margin-top:6px;opacity:.55;font-size:11px}',
+      '.vi-rf-abruf-btn{display:inline-flex;align-items:center;gap:7px;margin:8px 8px 0 0;',
+      '  border-radius:9px;padding:7px 13px;cursor:pointer;',
+      '  border:1px solid var(--wl-c9a84c, #C9A84C);background:transparent;',
+      '  color:var(--wl-c9a84c, #C9A84C);font:600 12px "JetBrains Mono",ui-monospace,monospace}',
+      '.vi-rf-abruf-btn:hover:not(:disabled){background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent)}',
+      '.vi-rf-abruf-btn:disabled{opacity:.45;cursor:default}',
+      '.vi-rf-abruf-btn i{font-style:normal;font-size:10px;opacity:.7;',
+      '  padding:2px 6px;border-radius:99px;background:rgba(255,255,255,.09)}',
+      /* Der Knopf zur Tabelle am Abschluss traegt Gewicht — er beendet den
+         Sprechlauf, waehrend „Weiss ich nicht" nur eine Frage beendet. */
+      '#vi-rf-zur-tabelle{border-color:var(--wl-c9a84c, #C9A84C) !important;',
+      '  color:var(--wl-e8cc7a, #E8CC7A) !important;opacity:1 !important;',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent) !important;',
+      '  font-weight:600 !important}'
     ].join('');
     document.head.appendChild(s);
   }
@@ -2352,7 +2643,11 @@
     plz: 'Adresse', objart: 'Objekt & Größe', baujahr: 'Baujahr & Kaufpreis',
     san: 'Sanierung & Inventar', nkm: 'Mieteinnahmen', hg_ul: 'Hausgeld',
     ek: 'Finanzierung', kaufdat: 'Kauf & Übergang', brw: 'Grundstück',
-    makrolage: 'Lage & Zustand', thesis: 'Deine Einschätzung'
+    makrolage: 'Lage', thesis: 'Deine Einschätzung',
+    /* v1288 · die neuen Blöcke */
+    makler_p: 'Kaufnebenkosten', ds2_zustand: 'Zustand & Energie',
+    mietstg: 'Entwicklung', ds2_bevoelkerung: 'Markt & Potenzial',
+    afa_satz: 'Steuer'
   };
   function _rfKurzname(e) {
     /* v1282: Die Feinheiten-Bloecke tragen ihren Bereich, nicht die halbe
@@ -2362,6 +2657,723 @@
     if (e.tiefe && e.bereich) return e.bereich;
     for (var i = 0; i < e.ids.length; i++) { if (RF_KURZ[e.ids[i]]) return RF_KURZ[e.ids[i]]; }
     return String(e.frage).split(/[?,–—]/)[0].slice(0, 22);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     v1288 · DIE HALTE — was nach jeder Etappe herauskommt
+     ═══════════════════════════════════════════════════════════════════
+     Marcel: „dass wir im Deal-Score schon mal sagen: okay, wohin geht die
+     Reise, lohnt sich das, lohnt sich das nicht."
+
+     DIE ENTSCHEIDENDE REGEL: gerechnet wird aus dem GESPRAECH, nicht aus
+     dem Formular. `DealScore.compute()` und `_buildDeal2FromState()` lesen
+     beide aus dem DOM — sie sind hier unbrauchbar, denn im Sprechlauf
+     steht noch nichts im Formular. Wuerden wir die Werte vorher
+     hineinschreiben, um rechnen zu koennen, waere die Uebernahme-Tabelle
+     am Ende sinnlos und der Schutz aus v1267 (Warnung vor dem
+     Ueberschreiben) umgangen. Also: die REINEN Rechenkerne benutzen —
+     `DealKpis.compute(i)` und `DealScore.computeFromKpis(k)` nehmen beide
+     ein einfaches Objekt entgegen und fassen kein DOM an.
+
+     Fuer den Deal Score 2 gibt es keinen solchen reinen Weg: sein
+     Datenmodell ist ein eigenes (`kaufpreis`, `dscr`, `zustand`, `lage` …).
+     Deshalb wird es hier gebaut — aus denselben KPIs plus den Lage- und
+     Zustandsfeldern des Gespraechs. `DealScore2.compute(deal)` selbst
+     bleibt unberuehrt; es ist der Rechenkern, und Rechenkerne werden nie
+     dupliziert (CLAUDE.md).
+
+     WAS ANGENOMMEN WIRD, STEHT DA. Jede Karte fuehrt ihre Annahmen mit:
+     welcher Nebenkostensatz, woher der kommt, und dass das Darlehen als
+     „Gesamtinvestition minus Eigenkapital" gerechnet ist. Eine Zahl ohne
+     Herkunft ist im Sprechlauf dasselbe Problem wie im Marktbericht. */
+
+  /* Die Stufen der Objektkarte (js/dashboard.js:390) — dieselben Worte,
+     dieselben Schwellen. Versalien auf der Pille, Kamelschrift im Text. */
+  function _stufe(score) {
+    var s = Number(score);
+    if (!isFinite(s)) return { wort: '–', kamel: '–', farbe: '#7A7370' };
+    if (s >= 85) return { wort: 'TOP',       kamel: 'Top',       farbe: '#3FA56C' };
+    if (s >= 70) return { wort: 'GUT',       kamel: 'Gut',       farbe: '#3FA56C' };
+    if (s >= 50) return { wort: 'SOLIDE',    kamel: 'Solide',    farbe: 'var(--wl-c9a84c, #C9A84C)' };
+    if (s >= 35) return { wort: 'SCHWACH',   kamel: 'Schwach',   farbe: '#B8625C' };
+    return          { wort: 'KRITISCH',  kamel: 'Kritisch',  farbe: '#D8564C' };
+  }
+
+  /* ── Die Kaufnebenkosten, die der Rechnung zugrunde liegen ──────────
+     Drei Quellen in dieser Reihenfolge, und die Karte sagt, welche es war:
+       1. gesagt      — der Nutzer hat die Saetze genannt
+       2. Einstellung — Investmentprofil + amtlicher GrESt-Satz zur PLZ
+       3. Pauschale   — 10 % vom Kaufpreis, Marcels ausdrueckliche Vorgabe
+                        („Ansonsten kann man aber auch sagen 10 Prozent
+                         vom Kaufpreis oder Sonstiges") */
+  var NK_IDS = ['makler_p', 'notar_p', 'gba_p', 'gest_p', 'ji_p'];
+  function _rfNkAnnahme() {
+    var summe = 0, gesagt = 0;
+    NK_IDS.forEach(function (id) {
+      var v = (_rf && _rf.data && _rf.data.fields) ? _rf.data.fields[id] : undefined;
+      var n = _rfNum(v);
+      if (n != null) { summe += n; gesagt++; }
+    });
+    if (gesagt) return { pct: summe, quelle: 'gesagt', text: 'Kaufnebenkosten ' + _pz(summe) + ' % — von dir genannt' };
+
+    var pv = null;
+    try { pv = _pvNebenkosten(); } catch (e) { pv = null; }
+    if (pv && pv.werte) {
+      var s2 = 0;
+      Object.keys(pv.werte).forEach(function (id) { s2 += (_rfNum(pv.werte[id]) || 0); });
+      if (s2 > 0) {
+        var g = _rfGrest();
+        return { pct: s2, quelle: 'profil',
+                 text: 'Kaufnebenkosten ' + _pz(s2) + ' % — aus deinen Einstellungen' +
+                       (g ? ', Grunderwerbsteuer ' + _pz(g.rate) + ' % fuer ' + g.name : '') };
+      }
+    }
+    return { pct: 10, quelle: 'pauschal', text: 'Kaufnebenkosten 10 % pauschal — angenommen, nicht gesagt' };
+  }
+
+  function _pz(n) { return String(Math.round(n * 100) / 100).replace('.', ','); }
+
+  /* ── Die Kennzahlen aus dem Gespraech ───────────────────────────────
+     Gibt null zurueck, wenn Kaufpreis oder Miete fehlen. Kein halber
+     Score: „Wo die Quelle endet, endet die Rechnung." */
+  function _rfKennzahlen() {
+    if (!window.DealKpis || typeof window.DealKpis.compute !== 'function') return null;
+    var kp  = _rfNum(_rfFeld('kp'));
+    var nkm = _rfNum(_rfFeld('nkm'));
+    if (kp == null || kp <= 0 || nkm == null || nkm <= 0) return null;
+
+    var nk = _rfNkAnnahme();
+    var nkEur = kp * nk.pct / 100;
+    var san   = _rfNum(_rfFeld('san')) || 0;
+    var moebl = _rfNum(_rfFeld('moebl')) || 0;
+    var ze    = _rfNum(_rfFeld('ze')) || 0;
+    var gi    = kp + nkEur + san + moebl;
+
+    /* Eigenkapital: gesagt, sonst aus der EK-Quote der Einstellungen. */
+    var ek = _rfNum(_rfFeld('ek')), ekQuelle = 'gesagt';
+    if (ek == null) {
+      var q = _profilZahl('ek_quote_default');
+      if (q != null) { ek = kp * q / 100; ekQuelle = 'profil'; }
+      else { ek = 0; ekQuelle = 'null'; }
+    }
+    /* Das Darlehen wird im Sprechlauf nicht gefragt — dort geht es um
+       Eigenkapital. Also die Gegenrechnung: was nicht Eigenkapital ist,
+       ist finanziert. Das steht als Annahme auf der Karte. */
+    var d1 = Math.max(0, gi - ek);
+    var d1z = _rfNum(_rfFeld('d1z'));
+    var d1t = _rfNum(_rfFeld('d1t'));
+    var zinsQuelle = 'gesagt';
+    if (d1z == null) {
+      try {
+        var P = window.DealPilotInvestmentProfile;
+        var z = (P && typeof P.getZins === 'function') ? P.getZins() : null;
+        if (typeof z === 'number' && isFinite(z) && z > 0) { d1z = z; zinsQuelle = 'profil'; }
+      } catch (e) {}
+    }
+    if (d1t == null) { d1t = _profilZahl('tilgung_default'); if (d1t != null) zinsQuelle = (zinsQuelle === 'gesagt' ? 'gemischt' : zinsQuelle); }
+
+    /* Bewirtschaftung — dieselbe Aufteilung wie calc.js:1157/1158.
+       Steht nichts, greifen die Quoten aus den Einstellungen. */
+    var ul  = (_rfNum(_rfFeld('hg_ul'))  || 0) + (_rfNum(_rfFeld('grundsteuer')) || 0) + (_rfNum(_rfFeld('ul_sonst')) || 0);
+    var nul = (_rfNum(_rfFeld('hg_nul')) || 0) + (_rfNum(_rfFeld('eigen_r'))     || 0) +
+              (_rfNum(_rfFeld('mietausfall')) || 0) + (_rfNum(_rfFeld('nul_sonst')) || 0);
+    var bwkQuelle = (ul || nul) ? 'gesagt' : 'profil';
+    if (!ul && !nul) {
+      var qUl = _profilZahl('bwk_ul_pct_default'), qNul = _profilZahl('bwk_anteil_default');
+      if (qUl != null)  ul  = nkm * 12 * qUl / 100;
+      if (qNul != null) nul = nkm * 12 * qNul / 100;
+    }
+
+    var afaSatz = _rfNum(_rfFeld('afa_satz'));
+    var gebAnt  = _rfNum(_rfFeld('geb_ant'));
+    var afa = 0;
+    if (afaSatz != null && gebAnt != null) afa = gi * gebAnt / 100 * afaSatz / 100;
+
+    var K = window.DealKpis.compute({
+      kp: kp, nk: nkEur, san: san, moebl: moebl,
+      nkm: nkm, ze: ze,
+      bwk_ul: ul, bwk_nul: nul,
+      d1: d1, d1z: d1z || 0, d1t: d1t || 0,
+      ek: ek, afa: afa, grenz: _rfNum(_rfFeld('grenz')) || 0
+    });
+
+    /* Wertpuffer: nur, wenn es einen Verkehrswert GIBT. Ohne
+       Marktpreisindikation gibt es keinen — dann ist der Puffer 0 und
+       nicht etwa „unbekannt gleich gut" (calc.js:1506 macht es genauso). */
+    var svw = _rfNum(_rfFeld('svwert'));
+    if (svw == null && _rf && _rf.markt && _rf.markt.mw) svw = _rf.markt.mw;
+    var wp = (svw != null && svw > 0) ? (svw - kp) : 0;
+
+    return {
+      K: K, kp: kp, nkm: nkm, ze: ze, gi: gi, ek: ek, d1: d1,
+      d1z: d1z, d1t: d1t, nk: nk, nkEur: nkEur, wp: wp, svw: svw,
+      quellen: { ek: ekQuelle, zins: zinsQuelle, bwk: bwkQuelle }
+    };
+  }
+
+  /* ── Deal Score (Stufe 1) ─────────────────────────────────────────── */
+  function _rfScore1() {
+    var Z = _rfKennzahlen();
+    if (!Z || !window.DealScore || typeof window.DealScore.computeFromKpis !== 'function') return null;
+    var S = window.DealScore.computeFromKpis({
+      kp: Z.kp, cf_m: Z.K.cf_m || 0, nmy: Z.K.nmy || 0, ltv: Z.K.ltv || 0,
+      dscr: Z.K.dscr || 0, wp_kpi: Z.wp, mstg: _rfNum(_rfFeld('mietstg')) || 1.5
+    });
+    return { S: S, Z: Z };
+  }
+
+  /* ── Deal Score 2 (Stufe 2) ───────────────────────────────────────── */
+  var _ML_MAP = { sehr_gut: 'sehr_gut', gut: 'gut', durchschnittlich: 'mittel',
+                  schwach: 'einfach', sehr_schwach: 'problematisch' };
+  function _rfScore2() {
+    var Z = _rfKennzahlen();
+    if (!Z || !window.DealScore2 || typeof window.DealScore2.compute !== 'function') return null;
+    var K = Z.K, wfl = _rfNum(_rfFeld('wfl'));
+    var deal = {};
+    deal.bruttorendite = K.bmy;
+    deal.nettorendite  = K.nmy;
+    deal.cashflowMonatlich = K.cf_m;
+    deal.cashOnCash = (Z.ek > 0 && K.cf_ns != null) ? (K.cf_ns / Z.ek) * 100
+                    : (K.cf_ns > 0 ? 999 : (K.cf_ns < 0 ? -50 : 0));
+    deal.dscr = K.dscr;
+    deal.ltv  = K.ltv;
+    deal.zinsSatz = Z.d1z;
+    deal.tilgung  = Z.d1t;
+    deal.eigenkapitalQuote = (Z.gi > 0) ? (Z.ek / Z.gi) * 100 : null;
+    deal.leerstandPct = _rfNum(_rfFeld('leerstand'));
+    if (K.bwk_nul > 0 && Z.nkm > 0) deal.instandhaltungPctNkm = (K.bwk_nul * 0.35) / (Z.nkm * 12) * 100;
+    deal.zustand       = _rfFeld('ds2_zustand') || null;
+    deal.energieKlasse = _rfFeld('ds2_energie') || null;
+    deal.mietausfallRisiko = _rfFeld('ds2_mietausfall') || null;
+    if (wfl != null && wfl > 0) deal.istMieteEurQm = (Z.nkm + Z.ze) / wfl;
+    deal.marktmieteEurQm = _rfNum(_rfFeld('ds2_marktmiete'));
+    if (deal.marktmieteEurQm == null && _rf && _rf.markt && _rf.markt.mietSqm) deal.marktmieteEurQm = _rf.markt.mietSqm;
+    deal.mietwachstumPct = _rfNum(_rfFeld('mietstg'));
+    deal.bevoelkerung = _rfFeld('ds2_bevoelkerung') || null;
+    deal.nachfrage    = _rfFeld('ds2_nachfrage') || null;
+    deal.mikrolage    = _ML_MAP[_rfFeld('mikrolage')] || null;
+    if (Z.kp > 0 && Z.nkm > 0) deal.eigenerFaktor = Z.kp / (Z.nkm * 12);
+    deal.marktFaktor = _rfNum(_rfFeld('ds2_marktfaktor'));
+    deal.wertsteigerung = _rfFeld('ds2_wertsteigerung') || null;
+    deal.entwicklungsmoeglichkeiten = _rfFeld('ds2_entwicklung') || null;
+    var R = window.DealScore2.compute(deal);
+    return { R: R, Z: Z, deal: deal };
+  }
+
+  /* ── Die Karten ───────────────────────────────────────────────────── */
+  function _zeile(name, wert, ton) {
+    return '<span class="vi-sc-z' + (ton ? ' ' + ton : '') + '"><i>' + escH(name) + '</i><b>' + escH(wert) + '</b></span>';
+  }
+  function _pctTxt(n, d) {
+    if (n == null || !isFinite(n)) return '–';
+    return String(Math.round(n * Math.pow(10, d || 1)) / Math.pow(10, d || 1)).replace('.', ',') + ' %';
+  }
+
+  function _rfScore1Karte() {
+    var r = _rfScore1();
+    if (!r) return null;
+    var S = r.S, Z = r.Z, K = Z.K, st = _stufe(S.score);
+    var cf = K.cf_m || 0;
+    var annahmen = [Z.nk.text];
+    if (Z.quellen.ek === 'profil')   annahmen.push('Eigenkapital aus deiner Standard-Quote');
+    if (Z.quellen.zins !== 'gesagt') annahmen.push('Zins und Tilgung aus deinen Einstellungen');
+    if (Z.quellen.bwk === 'profil')  annahmen.push('Bewirtschaftung als Quote der Kaltmiete');
+    annahmen.push('Darlehen = Gesamtinvestition minus Eigenkapital');
+
+    return '<div class="vi-sc">' +
+      '<div class="vi-sc-kopf"><span class="vi-sc-titel">Deal Score · Zwischenstand</span>' +
+        '<span class="vi-sc-pille" style="color:' + st.farbe + ';border-color:' + st.farbe + '">' + st.wort + '</span></div>' +
+      '<div class="vi-sc-zahl" style="color:' + st.farbe + '">' + S.score + '<small>/ 100</small></div>' +
+      '<div class="vi-sc-gitter">' +
+        _zeile('Cashflow', _euroKurz(cf) + '/Mon', cf >= 0 ? 'gut' : 'schlecht') +
+        _zeile('Nettomietrendite', _pctTxt(K.nmy, 2)) +
+        _zeile('Faktor', K.fak != null ? String(Math.round(K.fak * 10) / 10).replace('.', ',') : '–') +
+        _zeile('LTV', _pctTxt(K.ltv, 1)) +
+        _zeile('DSCR', K.dscr != null ? String(Math.round(K.dscr * 100) / 100).replace('.', ',') : '–',
+               (K.dscr || 0) >= 1.1 ? 'gut' : 'schlecht') +
+        _zeile('Gesamtinvestition', _euroKurz(Z.gi)) +
+      '</div>' +
+      '<div class="vi-sc-text">' + escH(S.interpretation || '') + '</div>' +
+      '<div class="vi-sc-annahmen"><b>Gerechnet mit:</b> ' + escH(annahmen.join(' · ')) + '</div>' +
+    '</div>';
+  }
+
+  function _rfScore2Karte() {
+    var r = _rfScore2();
+    if (!r) return null;
+    var R = r.R, st = _stufe(R.score);
+    var cats = R.categories || {};
+    var namen = { rendite: 'Rendite', finanzierung: 'Finanzierung', risiko: 'Risiko', lage: 'Lage', upside: 'Upside' };
+    var gitter = Object.keys(namen).map(function (k) {
+      var c = cats[k];
+      if (!c) return '';
+      var s = Math.round(c.score || 0);
+      return _zeile(namen[k], s + ' / 100', s >= 70 ? 'gut' : (s < 50 ? 'schlecht' : ''));
+    }).join('');
+    var vollst = '';
+    try {
+      var av = 0, ge = 0;
+      Object.keys(cats).forEach(function (k) { av += (cats[k].availableKpis || 0); ge += (cats[k].totalKpis || 0); });
+      if (ge) vollst = av + ' von ' + ge + ' Kennzahlen belegt';
+    } catch (e) {}
+    return '<div class="vi-sc">' +
+      '<div class="vi-sc-kopf"><span class="vi-sc-titel">Investor Deal Score 2.0</span>' +
+        '<span class="vi-sc-pille" style="color:' + st.farbe + ';border-color:' + st.farbe + '">' + st.wort + '</span></div>' +
+      '<div class="vi-sc-zahl" style="color:' + st.farbe + '">' + Math.round(R.score) + '<small>/ 100</small></div>' +
+      '<div class="vi-sc-gitter">' + gitter + '</div>' +
+      (R.explanation ? '<div class="vi-sc-text">' + escH(String(R.explanation).replace(/\s+/g, ' ').slice(0, 420)) + '</div>' : '') +
+      (vollst ? '<div class="vi-sc-annahmen"><b>Datenlage:</b> ' + escH(vollst) +
+                ' — was fehlt, zaehlt nicht gegen dich, es zaehlt gar nicht.</div>' : '') +
+    '</div>';
+  }
+
+  /* ── Der Halt zwischen zwei Etappen ─────────────────────────────────
+     Kommt NIE ungefragt in den Weg: laesst sich der Score nicht rechnen,
+     faellt der Halt aus und der Dialog geht weiter, als haette es ihn nie
+     gegeben. Ein Halt, der „leider keine Daten" sagt, ist ein Umweg. */
+  function _rfHalt(nachEtappe) {
+    if (!_rf) return false;
+    if (!_rf.halte) _rf.halte = {};
+    if (_rf.halte[nachEtappe]) return false;
+
+    var karte = null, satz = '';
+    if (nachEtappe >= 3 && !_rf.halte.s1) {
+      karte = _rfScore1Karte();
+      if (karte) {
+        _rf.halte.s1 = 1;
+        satz = 'Das reicht schon fuer eine erste Antwort auf <b>„lohnt sich das?"</b>';
+      }
+    }
+    if (!karte && nachEtappe >= 4 && !_rf.halte.s2) {
+      karte = _rfScore2Karte();
+      if (karte) {
+        _rf.halte.s2 = 1;
+        satz = 'Mit Lage und Zustand wird aus der Rechnung eine <b>Einschaetzung</b> — das ist derselbe Score, den du in der Pilotanalyse siehst.';
+      }
+    }
+    if (!karte) return false;
+    _rf.halte[nachEtappe] = 1;
+    _rfBlase('co', satz + karte +
+      '<div class="vi-sc-weiter">Weiter geht es mit <b>' + escH(_etName(nachEtappe)) + '</b> — ' +
+      escH(_etZiel(nachEtappe)) + '.</div>');
+    return true;
+  }
+
+  function _etName(nr) { for (var i = 0; i < ETAPPEN.length; i++) if (ETAPPEN[i].nr === nr) return ETAPPEN[i].name; return ''; }
+  function _etZiel(nr) { for (var i = 0; i < ETAPPEN.length; i++) if (ETAPPEN[i].nr === nr) return ETAPPEN[i].ziel; return ''; }
+
+  /* ── Das Etappenband ────────────────────────────────────────────────
+     Gezeigt werden nur Etappen, die auch wirklich Fragen haben. Im freien
+     Weg sind das oft nur zwei — dann steht da auch nur zwei. Ein Band mit
+     sechs Punkten, von denen vier nie kommen, waere ein Versprechen. */
+  function _rfBandZeichnen() {
+    var host = $('vi-rf-band'); if (!host || !_rf) return;
+    var da = {};
+    _rf.offen.forEach(function (e) { if (e.et) da[e.et] = 1; });
+    var akt = (_rf.offen[_rf.i] && _rf.offen[_rf.i].et) || 0;
+    var liste = ETAPPEN.filter(function (E) { return da[E.nr]; });
+    if (liste.length < 2) { host.innerHTML = ''; host.style.display = 'none'; return; }
+    host.style.display = '';
+    host.innerHTML = liste.map(function (E) {
+      var zu = E.nr < akt ? 'fertig' : (E.nr === akt ? 'jetzt' : '');
+      return '<span class="vi-rf-et ' + zu + '"><i>' + (E.nr < akt ? '✓' : E.nr) + '</i>' + escH(E.name) + '</span>';
+    }).join('');
+  }
+
+  /* ── Die Skalen in der Frage nennen (Backlog-Punkt 2) ───────────────
+     Wir bewerten nach diesen Stufen — also soll der Nutzer sie hoeren,
+     statt Freitext zu raten, den die Auswertung dann irgendwie zuordnet.
+     Gelesen wird das `<select>` im DOM, nicht eine zweite Liste: eine
+     Zweitliste veraltet beim ersten neuen Eintrag, und niemand merkt es. */
+  function _rfSkalen(eintrag) {
+    if (!eintrag || !eintrag.skalen) return '';
+    var teile = [];
+    (eintrag.ids || []).forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el || el.tagName !== 'SELECT') return;
+      var opts = [].slice.call(el.options || [])
+        .filter(function (o) { return String(o.value || '') !== ''; })
+        .map(function (o) { return String(o.text || '').replace(/\s+/g, ' ').trim(); })
+        .filter(function (t) { return t && t.charAt(0) !== '–'; });
+      if (!opts.length || opts.length > 12) return;
+      var kat = (_rf && _rf.catalog || []).filter(function (c) { return c.id === id; })[0];
+      var name = kat ? String(kat.label).replace(/\s*\(.*?\)\s*$/, '') : id;
+      teile.push('<i>' + escH(name) + '</i> ' + escH(opts.join(' · ')));
+    });
+    if (!teile.length) return '';
+    return '<div class="vi-rf-skala"><b>Die Stufen:</b><br>' + teile.join('<br>') + '</div>';
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     v1288 · ABRUFEN STATT FRAGEN
+     ═══════════════════════════════════════════════════════════════════
+     Marcel: „Makro-, Mikrolage. Ich meine, das koennen wir abdecken und
+     abfragen ueber unsere Schnittstelle und auch den Bodenrichtwert, dass
+     diese Sachen erfragt werden."
+
+     Wir haben die Quellen laengst — sie standen nur nie im Gespraech:
+
+       Bodenrichtwert   DealPilotBrw.borisHolen()   amtlich, 0,4-0,5 s, gratis
+       Grunderwerbsteuer DealPilotGrest.forPlz()    Landesrecht, ohne Netz
+       Lage & Marktwert  /marktbericht/reports/from-dealpilot
+
+     DIE HERKUNFTSREGEL GILT HIER DOPPELT. Sobald der Co-Pilot selbst Daten
+     beschafft, darf in der Uebernahme-Tabelle nicht „Sprachaufzeichnung"
+     an einer Zahl stehen, die niemand ausgesprochen hat. Deshalb fuehrt
+     `_rf.quelle` je Feld die Herkunft mit, und `showResults` zeigt sie
+     statt der Pauschale.
+
+     UND: ein Ja genuegt. Kein Modal, kein zweiter Dialog — der Knopf steht
+     in der Frage, „ja" tut es auch gesprochen. */
+
+  /* Ein Wert plus seine Herkunft. Ueberschreibt NICHT, was gesagt wurde:
+     wer den Bodenrichtwert selbst genannt hat, behaelt seinen. */
+  function _rfSetzen(id, wert, quelle) {
+    if (!_rf || wert === null || wert === undefined || wert === '') return false;
+    if (!_rf.data.fields) _rf.data.fields = {};
+    var alt = _rf.data.fields[id];
+    if (alt !== undefined && alt !== null && alt !== '') return false;
+    _rf.data.fields[id] = wert;
+    if (!_rf.quelle) _rf.quelle = {};
+    if (quelle) _rf.quelle[id] = quelle;
+    return true;
+  }
+
+  /* ── Das Angebot in der Frage ──────────────────────────────────────── */
+  function _rfAbrufAngebot(eintrag) {
+    if (!eintrag || !eintrag.abruf || !_rf) return '';
+    if (_rf.abrufGetan && _rf.abrufGetan[eintrag.abruf]) return '';
+    var txt = '', knopf = '';
+    if (eintrag.abruf === 'brw') {
+      if (!_rfBrwMoeglich()) return '';
+      txt = 'Den <b>Bodenrichtwert</b> kann ich selbst holen — amtlich aus BORIS, mit Stichtag und Zone.';
+      knopf = 'Bodenrichtwert holen';
+    } else if (eintrag.abruf === 'lage') {
+      if (_rf.markt) {
+        txt = 'Die Lagewerte aus der Marktpreisindikation liegen mir vor — ich kann sie eintragen.';
+        knopf = 'Lagewerte übernehmen';
+      } else if (_rf.marktLaeuft) {
+        return '<div class="vi-rf-abruf laeuft">Die Marktpreisindikation läuft noch — ' +
+               'sag ruhig, wie du die Lage siehst, ich melde mich, sobald sie da ist.</div>';
+      } else return '';
+    } else return '';
+    _rf.abrufOffen = eintrag.abruf;
+    return '<div class="vi-rf-abruf">' + txt +
+      '<button type="button" class="vi-rf-abruf-btn" data-abruf="' + escH(eintrag.abruf) + '">' +
+      escH(knopf) + '</button>' +
+      '<small>Ein „ja" genügt.</small></div>';
+  }
+
+  function _rfBrwMoeglich() {
+    try {
+      var plz = _rfFeld('plz');
+      if (!plz || !/^\d{5}$/.test(String(plz).trim())) return false;
+      var B = window.DealPilotBrw;
+      if (!B || typeof B.borisHolen !== 'function') return false;
+      if (typeof B.verfuegbarFuerPlz === 'function' && !B.verfuegbarFuerPlz(String(plz).trim())) return false;
+      return true;
+    } catch (e) { return false; }
+  }
+
+  /* Der Knopf steht IN der Blase, also wird er nach dem Zeichnen
+     verdrahtet — nicht ueber eine id, die es zweimal geben koennte,
+     sondern ueber den zuletzt eingefuegten Knopf im Verlauf. */
+  function _rfAbrufWiring() {
+    var chat = $('vi-rf-chat'); if (!chat) return;
+    var knoepfe = chat.querySelectorAll('.vi-rf-abruf-btn[data-abruf]:not([data-wired])');
+    [].slice.call(knoepfe).forEach(function (b) {
+      b.setAttribute('data-wired', '1');
+      b.addEventListener('click', function () { _rfAbrufStarten(b.getAttribute('data-abruf')); });
+    });
+  }
+
+  function _rfAbrufStarten(art) {
+    if (!_rf || !art) return;
+    _rf.abrufOffen = null;
+    if (!_rf.abrufGetan) _rf.abrufGetan = {};
+    _rf.abrufGetan[art] = 1;
+    var chat = $('vi-rf-chat');
+    if (chat) [].slice.call(chat.querySelectorAll('.vi-rf-abruf-btn[data-abruf="' + art + '"]'))
+      .forEach(function (b) { b.disabled = true; b.textContent = 'läuft …'; });
+    if (art === 'brw') return _rfBrwHolen();
+    if (art === 'lage') return _rfLageUebernehmen();
+  }
+
+  function _rfBrwHolen() {
+    var adr = { plz: _rfFeld('plz'), ort: _rfFeld('ort'), str: _rfFeld('str') };
+    _rfMelden('', true);
+    return Promise.resolve(window.DealPilotBrw.borisHolen(adr)).then(function (r) {
+      _rfDenkt(false);
+      if (!r || !r.ok) {
+        _rfBlase('co', 'Der amtliche Abruf hat nichts geliefert' +
+          (r && r.fehler ? ' (' + escH(r.fehler) + ')' : '') +
+          ' — sag mir den Bodenrichtwert, wenn du ihn kennst, sonst überspringen wir ihn.');
+        if (_fs.an && _fs.stream) _fsHoeren();
+        return;
+      }
+      var herkunft = 'BORIS' + (r.stichtag ? ' ' + r.stichtag : '') + (r.zone ? ' · Zone ' + r.zone : '');
+      _rfSetzen('brw', String(r.wert).replace('.', ','), herkunft);
+      _rfBlase('co', '<b>' + escH(String(r.wert).replace('.', ',')) + ' €/m²</b> — amtlicher Bodenrichtwert. ' +
+        '<span style="opacity:.7">' + escH(herkunft) + '</span>' +
+        '<div class="vi-rf-zaehler">Herkunft steht in der Übersicht — nicht „Sprachaufzeichnung".</div>');
+      _rfStandZeichnen();
+      if (_fs.an && _fs.stream) _fsHoeren();
+    }).catch(function (e) {
+      _rfDenkt(false);
+      _rfBlase('co', 'Der Abruf ist fehlgeschlagen — sag mir den Bodenrichtwert einfach selbst.');
+      if (_fs.an && _fs.stream) _fsHoeren();
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     v1288 · DIE MARKTPREISINDIKATION LAEUFT IM HINTERGRUND
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Kern-Idee: „Vorher aber auch eine Marktpreisindikation, die man
+     vorher auswaehlen kann … Je nachdem, welchen Plan man hat, wird das
+     angeboten oder auch nicht. Vor allen Dingen auch wenn man da noch
+     Kontingent zur Verfuegung hat, wird es einmal abgerufen: wir haben noch
+     so und so viel frei."
+
+     DREI REGELN:
+
+     1. GEFRAGT WIRD FRUEH, GESTARTET WIRD NACH DER BASIS. Der Abruf
+        braucht Adresse, Flaeche, Baujahr und Kaufpreis — das ist Etappe 1.
+        Gefragt wird trotzdem gleich nach der Adresse, damit die Entscheidung
+        gefallen ist, bevor es losgeht.
+
+     2. DER ABLAUF WARTET NIE. Der Abruf laeuft neben dem Gespraech.
+        Kommt nichts zurueck, merkt es niemand ausser im Protokoll; kommt
+        etwas, ist es ein Gewinn mitten im Satz.
+
+     3. OHNE KONTINGENT KEIN ANGEBOT. Wer nichts frei hat, bekommt keinen
+        Knopf, der ihn zu einer Bezahlschranke fuehrt — er wird ganz normal
+        gefragt. Ein Angebot, das man nicht annehmen kann, ist Werbung. */
+  function _rfKontingent() {
+    try {
+      var A = window.AiCredits;
+      if (!A || typeof A.getStatus !== 'function') return null;
+      var s = A.getStatus();
+      if (!s || !s.arten) return null;
+      function rest(k) {
+        var a = s.arten[k];
+        if (!a) return 0;
+        var r = (a.rest != null) ? a.rest : null;
+        return (r == null) ? 0 : r;
+      }
+      return { plan: s.plan || null, mpi: rest('mpi'), mpi_plus: rest('mpi_plus') };
+    } catch (e) { return null; }
+  }
+
+  function _rfMarktAnbieten() {
+    if (!_rf || _rf.marktGefragt) return;
+    var plz = _rfFeld('plz'), ort = _rfFeld('ort');
+    if (!plz && !ort) return;                 /* ohne Adresse kein Abruf */
+    var kg = _rfKontingent();
+    if (!kg) {
+      /* Kein Kontingentstand da — das ist ein technischer Ausfall, keine
+         Plan-Auskunft. Dazu sagen wir NICHTS: eine Fehlermeldung ueber ein
+         Angebot, das niemand angefordert hat, ist reine Beunruhigung. */
+      _rf.marktGefragt = 1;
+      return;
+    }
+    if (!kg.mpi && !kg.mpi_plus) {
+      /* Einmal sagen, nicht draengen. Danach laeuft der Dialog normal
+         weiter und fragt die Werte, statt sie zu holen. Ein Angebot, das
+         man nicht annehmen kann, ist Werbung. */
+      if (!_rf.marktGesagt) {
+        _rf.marktGesagt = 1;
+        _rfBlase('co', '<span style="opacity:.75">Eine Marktpreisindikation ist in deinem Plan gerade nicht frei — ' +
+          'ich frage die Werte stattdessen ab. Nachkaufen kannst du sie jederzeit im Marktbericht.</span>');
+      }
+      _rf.marktGefragt = 1;
+      return;
+    }
+    _rf.marktGefragt = 1;
+    _rf.abrufOffen = 'markt';
+    var knoepfe = '';
+    if (kg.mpi) knoepfe += '<button type="button" class="vi-rf-abruf-btn" data-markt="1">' +
+      'Marktpreisindikation holen <i>' + kg.mpi + ' frei</i></button>';
+    if (kg.mpi_plus) knoepfe += '<button type="button" class="vi-rf-abruf-btn" data-markt="2">' +
+      'Erweiterte Indikation <i>' + kg.mpi_plus + ' frei</i></button>';
+    _rfBlase('co', 'Für diese Adresse kann ich eine <b>Marktpreisindikation</b> holen — ' +
+      'Kaufpreisniveau, Mietniveau und die Lagebewertung. ' +
+      '<span style="opacity:.75">Sie läuft im Hintergrund; wir machen solange weiter.</span>' +
+      '<div class="vi-rf-abruf">' + knoepfe +
+      '<small>Ein „ja" nimmt die erste. „Nein danke" überspringt.</small></div>');
+    _rfMarktWiring();
+  }
+
+  function _rfMarktWiring() {
+    var chat = $('vi-rf-chat'); if (!chat) return;
+    [].slice.call(chat.querySelectorAll('.vi-rf-abruf-btn[data-markt]:not([data-wired])')).forEach(function (b) {
+      b.setAttribute('data-wired', '1');
+      b.addEventListener('click', function () {
+        _rf.abrufOffen = null;
+        _rfBlase('ich', 'Ja, hol sie.');
+        _rfMarktWaehlen(parseInt(b.getAttribute('data-markt'), 10) || 1);
+      });
+    });
+  }
+
+  function _rfMarktWaehlen(stufe) {
+    if (!_rf) return;
+    _rf.marktStufe = stufe;
+    _rf.marktGewollt = 1;
+    var chat = $('vi-rf-chat');
+    if (chat) [].slice.call(chat.querySelectorAll('.vi-rf-abruf-btn[data-markt]'))
+      .forEach(function (b) { b.disabled = true; });
+    /* Stehen Flaeche, Baujahr und Kaufpreis schon, geht es sofort los —
+       sonst wartet der Start auf das Ende von Etappe 1. */
+    if (_rfMarktBereit()) _rfMarktStarten();
+    else _rfBlase('co', '<span style="opacity:.75">Merke ich mir — ich starte sie, sobald ich Fläche, ' +
+                        'Baujahr und Kaufpreis habe.</span>');
+  }
+
+  function _rfMarktBereit() {
+    return !!(_rfFeld('plz') || _rfFeld('ort')) && _rfNum(_rfFeld('wfl')) != null;
+  }
+
+  function _rfMarktStarten() {
+    if (!_rf || _rf.marktLaeuft || _rf.markt) return;
+    if (!_rf.marktGewollt) return;
+    _rf.marktLaeuft = 1;
+    var obj = {
+      plz: _rfFeld('plz') || '', ort: _rfFeld('ort') || '',
+      str: _rfFeld('str') || '', hnr: _rfFeld('hnr') || '',
+      objektart: _rfFeld('objart') || '',
+      wfl: _rfNum(_rfFeld('wfl')), baujahr: _rfNum(_rfFeld('baujahr')), kp: _rfNum(_rfFeld('kp'))
+    };
+    var stufe = _rf.marktStufe || 1;
+    var koerper = (stufe >= 2) ? { wert_stufe: 2, object: obj } : { fast: true, object: obj };
+    try { koerper.external_ref = window._currentObjKey || null; } catch (e) {}
+    _rfBlase('co', '<span style="opacity:.75">Die Marktpreisindikation läuft — ich melde mich, sobald sie da ist. ' +
+                   'Weiter im Text:</span>');
+    /* Auth.apiCall geht durch den zentralen 401-Handler; nacktes fetch
+       wuerde ihn umgehen (FALLEN.md). */
+    /* 90 s statt der 15 s Vorgabe: der Marktbericht rechnet, und ein
+       Zeitueberlauf saehe hier aus wie ein Fehler, waere aber Ungeduld. */
+    Auth.apiCall('/marktbericht/reports/from-dealpilot', { method: 'POST', body: koerper, timeout: 90000 })
+      .then(function (d) { _rf && _rfMarktFertig(d); })
+      .catch(function (err) { _rf && _rfMarktFehler(err); });
+  }
+
+  function _rfMarktFehler(err) {
+    _rf.marktLaeuft = 0;
+    var d = (err && err.data) || {};
+    var m = d.message || d.error || (err && err.message) || '';
+    try { console.warn('[voice] Marktpreisindikation fehlgeschlagen:', m, err); } catch (e) {}
+    /* Leise. Der Ablauf darf nie auf einen Abruf warten — und er darf auch
+       nicht von einem gescheiterten Abruf gestoert werden. Ein fehlendes
+       Kontingent wird trotzdem BENANNT: es ist kein Fehler, sondern eine
+       Auskunft, und der Nutzer soll wissen, warum nichts kam. */
+    if (d.error === 'kein_kontingent') {
+      _rfBlase('co', '<span style="opacity:.7">Für die Marktpreisindikation ist dein Kontingent ' +
+        'aufgebraucht — es wurde nichts abgebucht. Ich frage die Werte stattdessen ab.</span>');
+      return;
+    }
+    _rfBlase('co', '<span style="opacity:.6">Die Marktpreisindikation kam nicht durch' +
+      (m ? ' (' + escH(String(m).slice(0, 120)) + ')' : '') +
+      ' — es wurde nichts abgebucht. Wir machen ohne sie weiter.</span>');
+  }
+
+  function _rfMarktFertig(d) {
+    _rf.marktLaeuft = 0;
+    if (!d || d.no_data) {
+      _rfBlase('co', '<span style="opacity:.6">Für diese Adresse liegen keine Marktdaten vor — ' +
+                     'es wurde nichts abgebucht.</span>');
+      return;
+    }
+    var p = d.data || d;
+    var mv = (p.valuation && p.valuation.market_value) || {};
+    var rent = p.rent || {};
+    var wfl = _rfNum(_rfFeld('wfl'));
+    var M = {
+      mw: (mv.estimated != null) ? mv.estimated : null,
+      low: mv.low != null ? mv.low : null, high: mv.high != null ? mv.high : null,
+      sqm: (mv.basis_median_sqm != null) ? mv.basis_median_sqm
+           : ((mv.estimated != null && wfl) ? Math.round(mv.estimated / wfl) : null),
+      mikroRaw: (p.micro && p.micro.score != null) ? p.micro.score : null,
+      makroRaw: (p.macro && p.macro.score != null) ? p.macro.score : null,
+      mietSqm: (rent.median_per_sqm != null) ? rent.median_per_sqm
+               : (((p.valuation && p.valuation.inputs) || {}).market_rent_sqm != null
+                  ? p.valuation.inputs.market_rent_sqm : null),
+      trend: (p.price_trend_pct != null) ? p.price_trend_pct : null,
+      konfidenz: mv.confidence_label || null
+    };
+    _rf.markt = M;
+
+    /* Die Lagestufen: 0-100 vom Marktbericht auf die fuenf Stufen des
+       Formulars. Die Grenzen sind dieselben wie in dealpilot-mb.js
+       (_v746lbl, Skala 0-10): >=8 sehr gut, >=6 gut, >=4 durchschnittlich,
+       >=2 schwach, darunter sehr schwach. EINE Umrechnung, nicht zwei. */
+    M.makro = _lageStufe(M.makroRaw);
+    M.mikro = _lageStufe(M.mikroRaw);
+
+    var zeilen = [];
+    if (M.mw != null) zeilen.push(_zeile('Marktwert', _euroKurz(M.mw) + (M.sqm ? ' · ' + _euroKurz(M.sqm) + '/m²' : '')));
+    var kp = _rfNum(_rfFeld('kp'));
+    if (M.mw != null && kp != null && kp > 0) {
+      var abw = (kp - M.mw) / M.mw * 100;
+      zeilen.push(_zeile('Dein Preis', (abw >= 0 ? '+' : '') + _pctTxt(abw, 1) + (abw <= 0 ? ' darunter' : ' darüber'),
+                         abw <= 0 ? 'gut' : 'schlecht'));
+    }
+    if (M.mietSqm != null) zeilen.push(_zeile('Mietniveau', String(Math.round(M.mietSqm * 100) / 100).replace('.', ',') + ' €/m²'));
+    if (M.makro) zeilen.push(_zeile('Makrolage', _lageWort(M.makro)));
+    if (M.mikro) zeilen.push(_zeile('Mikrolage', _lageWort(M.mikro)));
+    if (M.trend != null) zeilen.push(_zeile('Preistrend', (M.trend >= 0 ? '+' : '') + _pctTxt(M.trend, 1) + ' p.a.'));
+
+    var Q = 'Marktpreisindikation' + (_rf.marktStufe >= 2 ? ' (Stufe 2)' : '');
+    var eingetragen = [];
+    if (M.makro && _rfSetzen('makrolage', M.makro, Q)) eingetragen.push('Makrolage');
+    if (M.mikro && _rfSetzen('mikrolage', M.mikro, Q)) eingetragen.push('Mikrolage');
+    if (M.mietSqm != null && _rfSetzen('ds2_marktmiete', String(Math.round(M.mietSqm * 100) / 100).replace('.', ','), Q)) eingetragen.push('Marktmiete');
+    if (M.mw != null && _rfSetzen('svwert', String(Math.round(M.mw)), Q)) eingetragen.push('Marktwert');
+
+    _rfBlase('co', '<b>Die Marktpreisindikation ist da.</b>' +
+      '<div class="vi-sc"><div class="vi-sc-kopf"><span class="vi-sc-titel">Marktpreisindikation' +
+        (M.konfidenz ? ' · ' + escH(M.konfidenz) : '') + '</span></div>' +
+      '<div class="vi-sc-gitter">' + zeilen.join('') + '</div>' +
+      (eingetragen.length
+        ? '<div class="vi-sc-annahmen"><b>Übernommen:</b> ' + escH(eingetragen.join(', ')) +
+          ' — in der Übersicht mit Herkunft „' + escH(Q) + '", nicht als etwas, das du gesagt hast.</div>'
+        : '') +
+      '</div>');
+    _rfStandZeichnen();
+    /* v1288: Steht die Lage-Frage gerade an, ist sie damit beantwortet. */
+    try {
+      var e = _rf.offen[_rf.i];
+      if (e && e.abruf === 'lage' && !_rfFehlt(e, _rf.data.fields)) {
+        _rfBlase('co', '<span style="opacity:.7">Die Lage habe ich damit — weiter.</span>');
+        setTimeout(_rfWeiter, 400);
+      }
+    } catch (ex) {}
+  }
+
+  function _lageStufe(raw) {
+    if (raw == null || !isFinite(raw)) return null;
+    var s = raw / 10;
+    if (s >= 8) return 'sehr_gut';
+    if (s >= 6) return 'gut';
+    if (s >= 4) return 'durchschnittlich';
+    if (s >= 2) return 'schwach';
+    return 'sehr_schwach';
+  }
+  var _LAGE_WORT = { sehr_gut: 'Sehr gut', gut: 'Gut', durchschnittlich: 'Durchschnittlich',
+                     schwach: 'Schwach', sehr_schwach: 'Sehr schwach' };
+  function _lageWort(k) { return _LAGE_WORT[k] || '–'; }
+
+  function _rfLageUebernehmen() {
+    var M = _rf && _rf.markt;
+    if (!M) return;
+    var Q = 'Marktpreisindikation';
+    var n = [];
+    if (M.makro && _rfSetzen('makrolage', M.makro, Q)) n.push('Makrolage ' + _lageWort(M.makro));
+    if (M.mikro && _rfSetzen('mikrolage', M.mikro, Q)) n.push('Mikrolage ' + _lageWort(M.mikro));
+    _rfBlase('co', n.length
+      ? 'Übernommen: <b>' + escH(n.join(' · ')) + '</b> — Herkunft ' + escH(Q) + '.'
+      : 'Die Lagewerte standen schon — ich lasse sie, wie du sie gesagt hast.');
+    _rfStandZeichnen();
+    setTimeout(_rfWeiter, 300);
   }
 
   function _rfAufbau() {
@@ -2376,6 +3388,8 @@
           '<label class="vi-rf-fs" id="vi-rf-alles-w"><input type="checkbox" id="vi-rf-alles"> Alle Felder</label>' +
         '</span>' +
       '</div>' +
+      /* v1288: das Etappenband - wo im Sprechlauf stehen wir gerade. */
+      '<div id="vi-rf-band" style="display:none"></div>' +
       /* v1281: Verlauf und Stand nebeneinander - der Chat zeigt was WAR,
          die Spalte zeigt was IST. */
       '<div class="vi-rf-buehne">' +
@@ -2471,16 +3485,37 @@
   function _rfFrage() {
     if (_rf.i >= _rf.offen.length) return _rfFertig();
     var e = _rf.offen[_rf.i];
+    /* v1288: Was inzwischen VON SELBST hereingekommen ist — der amtliche
+       Bodenrichtwert, die Lagewerte aus der Marktpreisindikation — wird
+       nicht noch einmal gefragt. Ein Co-Pilot, der nach etwas fragt, das
+       er gerade selbst geholt hat, wirkt nicht schlau, sondern taub.
+       Geprueft wird nur, was IN DIESEM Gespraech zusammengekommen ist;
+       das Formular zaehlt hier nicht mit (das hat schon `_rfFehlt` beim
+       Zusammenstellen der Liste getan). */
+    var alleDa = (e.ids || []).length > 0 && (e.ids || []).every(function (id) {
+      var v = _rf.data.fields[id];
+      return v !== undefined && v !== null && v !== '';
+    });
+    if (alleDa) { _rfStandZeichnen(); return _rfWeiter(); }
+    /* v1288: Ein Angebot gilt nur fuer die Frage, in der es steht. Sonst
+       nimmt die naechste Frage ein "ja" entgegen, das dem alten Knopf galt. */
+    _rf.abrufOffen = null;
     /* v1280: Der Vorschlag aus den Einstellungen steht IN der Frage - nicht
        als stiller Knopf daneben. Wer gefragt wird, soll sehen, was der
        Co-Pilot vorhat, bevor er ja sagt. */
     var pv = _rfProfilVorschlag(e);
-    _rfBlase('co', escH(e.frage) +
+    /* v1288: Bei einer Auswahl stehen die STUFEN in der Frage. Wir bewerten
+       danach - also soll der Nutzer sie hoeren, statt Freitext zu raten. */
+    _rfBlase('co', escH(e.frage) + _rfSkalen(e) +
       (pv ? '<div class="vi-rf-vorschlag">Aus deinen Einstellungen hätte ich: <b>' +
             escH(pv.text) + '</b></div>' : '') +
-      '<div class="vi-rf-zaehler">Frage ' + (_rf.i + 1) + ' von ' + _rf.offen.length + '</div>');
+      _rfAbrufAngebot(e) +
+      '<div class="vi-rf-zaehler">Frage ' + (_rf.i + 1) + ' von ' + _rf.offen.length +
+        (e.et ? ' · Etappe ' + e.et + ' · ' + escH(_etName(e.et)) : '') + '</div>');
     _rf.profilVorschlag = pv;
     _rfStandZeichnen();   /* v1281 */
+    _rfBandZeichnen();    /* v1288 */
+    _rfAbrufWiring();     /* v1288: der Knopf steht in der Frage */
 
     var v = _rfVorschlag(e), pb = $('vi-rf-passt');
     if (pb) {
@@ -2495,11 +3530,58 @@
     if (_fs.an && _fs.stream) _fsHoeren();
   }
 
+  /* ═══ v1288 · Der Uebergang zwischen zwei Etappen ═════════════════════
+     Wechselt die Etappe, kann ein HALT dazwischen stehen: eine Karte mit
+     dem Score, der aus dem bisher Gesagten schon rechenbar ist. Der Halt
+     stellt keine Frage - er wird gezeigt, und die naechste Frage kommt
+     unmittelbar danach. Wer nichts wissen will, ueberliest ihn.
+
+     Der Dialog darf dabei NIE stehenbleiben: `_rfHalt` gibt false zurueck,
+     wenn sich nichts rechnen laesst, und dann geht es weiter, als haette
+     es den Halt nie gegeben. */
   function _rfWeiter() {
     _fsStopHoeren();
+    var vorher = _rf.offen[_rf.i];
     _rf.i++;
     if (_rf.i >= _rf.offen.length) return _rfFertig();
+    /* v1288: Direkt nach der Adresse faellt die Entscheidung ueber die
+       Marktpreisindikation — dort weiss der Abruf genug ueber das WO, und
+       die Entscheidung steht, bevor irgendetwas laeuft. Gefragt wird
+       einmal; wer ablehnt, wird nicht wieder gefragt. */
+    if (vorher && vorher.ids && vorher.ids.indexOf('plz') >= 0 && !_rf.marktGefragt) {
+      try { _rfMarktAnbieten(); } catch (ex) { try { console.warn('[voice] Marktangebot', ex); } catch (e2) {} }
+      if (_rf.abrufOffen === 'markt') { _rf.wartetAufMarkt = 1; return _rfLauschen(); }
+    }
+    var jetzt = _rf.offen[_rf.i];
+    if (vorher && jetzt && vorher.et && jetzt.et && jetzt.et > vorher.et) {
+      /* Ende der Basis: jetzt kennt der Abruf Flaeche, Baujahr und Preis. */
+      if (vorher.et === 1) { try { _rfMarktStarten(); } catch (ex) {} }
+      try { _rfHalt(jetzt.et); } catch (ex) { try { console.warn('[voice] Halt uebersprungen', ex); } catch (e2) {} }
+    }
     _rfFrage();
+  }
+
+  /* Zuhoeren, ohne eine neue Frage zu stellen — fuer die Momente, in denen
+     ein Angebot offen steht und nur ein Ja oder Nein fehlt. */
+  function _rfLauschen() {
+    var inp = $('vi-rf-in'); if (inp) { inp.value = ''; inp.disabled = false; }
+    var pb = $('vi-rf-passt'); if (pb) pb.style.display = 'none';
+    if (_fs.an && _fs.stream) _fsHoeren();
+  }
+
+  /* Nach einer Entscheidung ueber ein Angebot geht es dort weiter, wo der
+     Ablauf stand — samt Etappenwechsel, falls einer faellig war. */
+  function _rfNachAngebot() {
+    _rf.wartetAufMarkt = 0;
+    var jetzt = _rf.offen[_rf.i];
+    if (!jetzt) { _rfFertig(); return true; }
+    var vorher = (_rf.i > 0) ? _rf.offen[_rf.i - 1] : null;
+    if (vorher && vorher.et && jetzt.et && jetzt.et > vorher.et) {
+      if (vorher.et === 1) { try { _rfMarktStarten(); } catch (ex) {} }
+      try { _rfHalt(jetzt.et); } catch (ex) {}
+    }
+    _rfFrage();
+    return true;
   }
 
   function _rfUeberspringen(stumm) {
@@ -2574,7 +3656,7 @@
         var teil = liste.slice(i, i + TIEFE_PRO_FRAGE);
         bloecke.push({
           ids: teil.map(function (x) { return x.id; }),
-          tiefe: 1,
+          tiefe: 1, et: 6,   /* v1288: die Feinheiten sind eine eigene Etappe */
           bereich: TIEFE_SEC[k],
           frage: TIEFE_SEC[k] + ': ' + teil.map(function (x) { return x.label; }).join(', ') + '?'
         });
@@ -2657,6 +3739,20 @@
     _rfFrage();
   }
 
+  /* ═══ v1288 · Der Abschluss ═══════════════════════════════════════════
+     Vor der Tabelle steht die Antwort auf die Frage, mit der Marcel den
+     ganzen Umbau begonnen hat: „wohin geht die Reise, lohnt sich das,
+     lohnt sich das nicht." Beide Scores nebeneinander, mit dem, was der
+     Score NICHT weiss.
+
+     Er kommt auch dann, wenn der Nutzer „Fertig" gedrueckt hat — wer
+     abbricht, hat trotzdem ein Recht auf das Ergebnis dessen, was er
+     schon gesagt hat. Was er nicht bekommt, ist eine weitere FRAGE;
+     deshalb steht hier nur ein Knopf und keine Rueckfrage.
+
+     Laesst sich nichts rechnen (kein Kaufpreis, keine Miete), faellt der
+     Abschluss aus und es geht direkt zur Tabelle. Ein Fazit, das „keine
+     Daten" sagt, ist ein Umweg. */
   function _rfFertig(erzwungen) {
     /* v1282: Ist die Pflichtstrecke durch, wird EINMAL nach den Feinheiten
        gefragt - aber nur im gefuehrten Weg und nur, wenn der Nutzer nicht
@@ -2665,10 +3761,75 @@
       _rf.tiefeGefragt = 1;
       if (_rfTiefeAnbieten()) return;   /* v1287: nur wenn der Knopf wirklich steht */
     }
+    if (_rf && !_rf.abschlussGezeigt) {
+      _rf.abschlussGezeigt = 1;
+      if (_rfAbschluss()) return;       /* wartet auf „Zur Übersicht" */
+    }
+    _rfZurTabelle();
+  }
+
+  function _rfZurTabelle() {
+    if (!_rf) return;
     _fsStopHoeren(); _fsAus();
     var h = $('vi-frage'); if (h) h.style.display = 'none';
+    /* v1288: Die Herkunft je Feld geht mit in die Tabelle. Ohne sie stuende
+       dort „Sprachaufzeichnung" an Zahlen, die der Co-Pilot selbst geholt
+       hat — und genau das war der Vorbehalt im Backlog. */
+    if (_rf.quelle) _rf.data.quellen = _rf.quelle;
     showResults(_rf.OA, _rf.data, _rf.catalog);
     _rf = null;
+  }
+
+  function _rfAbschluss() {
+    var k1 = null, k2 = null;
+    try { k1 = _rfScore1Karte(); } catch (e) {}
+    try { k2 = _rfScore2Karte(); } catch (e) {}
+    if (!k1 && !k2) return false;
+
+    /* Was der Score NICHT weiss. Die Luecken werden benannt, nicht
+       weggerechnet — ein Score aus halben Daten ist kein besserer Score,
+       er sieht nur so aus. */
+    var fehlt = [];
+    var pruef = [
+      ['kp', 'Kaufpreis'], ['nkm', 'Kaltmiete'], ['wfl', 'Wohnfläche'],
+      ['ek', 'Eigenkapital'], ['d1z', 'Zinssatz'], ['hg_nul', 'Hausgeld nicht umlagefähig'],
+      ['makrolage', 'Makrolage'], ['mikrolage', 'Mikrolage'],
+      ['ds2_zustand', 'Zustand'], ['ds2_energie', 'Energieausweis'],
+      ['ds2_bevoelkerung', 'Bevölkerungsentwicklung'], ['ds2_nachfrage', 'Nachfrage']
+    ];
+    pruef.forEach(function (p) { if (_rfFeld(p[0]) == null) fehlt.push(p[1]); });
+
+    var nk = null;
+    try { nk = _rfNkAnnahme(); } catch (e) {}
+
+    _rfBlase('co',
+      '<b>Das ist der Stand.</b> Beide Scores rechnen mit dem, was du gesagt hast — ' +
+      'nichts davon steht schon im Objekt; das entscheidest du gleich in der Übersicht.' +
+      (k1 || '') + (k2 || '') +
+      (fehlt.length
+        ? '<div class="vi-sc-annahmen" style="margin-top:12px"><b>Was ich nicht weiß:</b> ' +
+          escH(fehlt.slice(0, 8).join(', ')) +
+          (fehlt.length > 8 ? ' und ' + (fehlt.length - 8) + ' weitere' : '') +
+          '. Diese Kennzahlen zählen im Score gar nicht mit — weder für dich noch gegen dich.</div>'
+        : '') +
+      (nk && nk.quelle === 'pauschal'
+        ? '<div class="vi-sc-annahmen"><b>Achtung:</b> die Kaufnebenkosten sind mit 10 % pauschal ' +
+          'angenommen. Sag mir die echten Sätze, und die Rechnung stimmt.</div>'
+        : ''));
+
+    var neben = $('vi-rf-neben');
+    if (!neben) return false;   /* v1287: lieber ohne Abschluss als steckenbleiben */
+    var alt = $('vi-rf-zur-tabelle'); if (alt) alt.remove();
+    neben.insertAdjacentHTML('afterbegin',
+      '<button type="button" id="vi-rf-zur-tabelle">Zur Übersicht — Werte übernehmen</button>');
+    var b = $('vi-rf-zur-tabelle');
+    if (!b) return false;
+    b.addEventListener('click', function () { _rfZurTabelle(); });
+    _rf.abschlussOffen = 1;
+    var pb = $('vi-rf-passt'); if (pb) pb.style.display = 'none';
+    var inp = $('vi-rf-in'); if (inp) inp.disabled = false;
+    if (_fs.an && _fs.stream) _fsHoeren();
+    return true;
   }
   /* Antwort verarbeiten - egal ob getippt oder gesprochen. */
   function _rfUebernehmen(neu, ausSprache) {
@@ -2755,9 +3916,52 @@
     });
   }
 
+  /* v1288 · Ein Angebot annehmen darf man auch SAGEN. Erkannt wird nur
+     eine klare, alleinstehende Zusage — „ja, hol den mal" ja, „ja, der
+     Bodenrichtwert liegt bei 320" nein. Im Zweifel gilt der Satz als
+     Angabe: eine falsch als Zusage verstandene Zahl waere verloren, ein
+     nicht erkanntes Ja kostet nur einen Klick. */
+  var RF_JA = /^(ja|jo|jup|klar|gerne|gern|okay|ok|mach(\s+(das|mal))?|los|bitte|hol(\s+(sie|ihn|das|den|mal))?|holen|unbedingt|auf jeden fall|ja bitte|ja gerne|ja klar)\b[\s.!,]*$/i;
+  var RF_NEIN_ANGEBOT = /^(nein|nee|ne|danke|nein danke|kein bedarf|brauch(e)? ich nicht|lass mal|lass(en)? wir|sp(ä|ae)ter|nicht n(ö|oe)tig|ohne)\b[\s.!,]*$/i;
+
   function _rfVorabErkennen(text, ausSprache) {
     var t = String(text || '').trim();
     if (!t) return true;
+
+    /* v1288: Steht ein Abruf-Angebot offen, ist „ja" die Antwort darauf. */
+    if (_rf.abrufOffen && RF_JA.test(t)) {
+      var art = _rf.abrufOffen;
+      _rf.abrufOffen = null;
+      _rfBlase('ich', escH(t));
+      if (art === 'markt') { _rfMarktWaehlen(1); return _rfNachAngebot(); }
+      _rfAbrufStarten(art);
+      return true;
+    }
+    /* Auf ein WARTENDES Angebot ist auch das Nein eine Antwort — dort
+       steht keine Frage offen, die es ueberspringen koennte. */
+    if (_rf.wartetAufMarkt && (RF_NEIN_ANGEBOT.test(t) || RF_NEIN.test(t))) {
+      _rf.abrufOffen = null;
+      _rfBlase('ich', escH(t));
+      _rfBlase('co', '<span style="opacity:.7">Alles klar — dann frage ich die Werte ganz normal ab.</span>');
+      return _rfNachAngebot();
+    }
+
+    /* v1288: Am Abschluss steht keine Feldfrage mehr offen. Eine Zusage
+       fuehrt zur Tabelle, alles andere ist eine FRAGE — dort will niemand
+       mehr Werte nennen, dort will man wissen, was die Zahlen bedeuten.
+       Genau das war Marcels Wunsch: „dass man aber auch andere Sachen
+       fragen kann dann zu der Wohnung." */
+    if (_rf.abschlussOffen) {
+      if (RF_JA.test(t) || /^(weiter|(ü|ue)bersicht|zur (tabelle|(ü|ue)bersicht)|fertig|passt|(ü|ue)bernehmen)\b[\s.!,]*$/i.test(t)) {
+        _rfBlase('ich', escH(t));
+        _rfZurTabelle();
+        return true;
+      }
+      _rfFrageBeantworten(t);
+      return true;
+    }
+
+
 
     /* v1287: Steht die Feinheiten-Frage offen, ist „ja" die Antwort darauf -
        nicht eine Angabe zu einem Feld. Auch gesprochen. */
@@ -2816,6 +4020,7 @@
      Zwei Stellen heisst zwei Verhaltensweisen, sobald eine sich aendert. */
   function _rfAuswerten(text, ausSprache) {
     var e = _rf.offen[_rf.i];
+    if (!e) return;   /* v1288: nach dem letzten Block gibt es nichts mehr einzuordnen */
     return Auth.apiCall('/ai/extract-text', {
       method: 'POST',
       body: { text: text, catalog: _rfKatalog(e, _rf.catalog), kontext: _rfKontext() }
@@ -2849,26 +4054,54 @@
       ? RFRAGEN.filter(function (e) { return _rfFehlt(e, fields); })
       : _rfLuecken(fields);
     if (!luecken.length) return showResults(OA, data, catalog);   /* nichts offen */
-    _rf = { offen: luecken, i: 0, data: data, catalog: catalog, OA: OA, alle: !!alle };
+    _rf = { offen: luecken, i: 0, data: data, catalog: catalog, OA: OA, alle: !!alle,
+            quelle: {}, halte: {}, abrufGetan: {} };   /* v1288 */
     if (!_rf.data.fields) _rf.data.fields = {};
     var rec = $('vi-rec'); if (rec) rec.style.display = 'none';
     var nx = $('vi-next'); if (nx) nx.style.display = 'none';
     _rfAufbau();
 
     var gefunden = Object.keys(_rf.data.fields).length;
+    /* v1288: Der geführte Weg sagt jetzt, WOHIN er führt — nicht nur, wie
+       viele Fragen kommen. Eine Zahl allein ist eine Zumutung, ein Ziel
+       ist eine Einladung. */
+    var etDa = {};
+    luecken.forEach(function (e) { if (e.et) etDa[e.et] = 1; });
+    var etTxt = ETAPPEN.filter(function (E) { return etDa[E.nr]; })
+                       .map(function (E) { return E.name; }).join(' · ');
     _rfBlase('co', alle
-      ? 'Ich gehe die Angaben der Reihe nach durch — <b>' + luecken.length + '</b> Fragen. ' +
-        'Sprich einfach los, ich höre mit. Was du nicht weißt, überspringen wir.'
+      ? 'Ich führe dich durch — <b>' + luecken.length + '</b> Fragen in ' +
+        Object.keys(etDa).length + ' Etappen: <b>' + escH(etTxt) + '</b>. ' +
+        'Nach der Finanzierung siehst du deinen <b>Deal Score</b>, nach Lage und Zustand den ' +
+        '<b>Investor Deal Score 2.0</b>. ' +
+        'Sprich einfach los — was du nicht weißt, überspringen wir, und fragen darfst du mich jederzeit.'
       : 'Ich habe <b>' + gefunden + ' Angaben</b> aus deiner Aufnahme gelesen. ' +
         (luecken.length === 1 ? 'Für die Rechnung fehlt mir noch eine.'
                               : 'Für die Rechnung fehlen mir noch ' + luecken.length + '.'));
 
     _fs.an = true;
-    _fsStart().then(function (ok) {
-      if (!ok) {
+    /* Das Kontingent wird MIT dem Mikrofon geladen, nicht danach: das
+       Angebot für die Marktpreisindikation braucht die Zahl, und ein
+       Angebot, das zu spät kommt, kommt gar nicht. */
+    var kg = Promise.resolve(null);
+    try {
+      if (window.AiCredits && typeof window.AiCredits.refresh === 'function') {
+        kg = Promise.resolve(window.AiCredits.refresh()).catch(function () { return null; });
+      }
+    } catch (e) {}
+    Promise.all([_fsStart(), kg]).then(function (r) {
+      if (!_rf) return;
+      if (!r[0]) {
         var s = $('vi-rf-fs'); if (s) { s.checked = false; s.disabled = true; }
         _fs.an = false;
         _fsMikroKasten(false, 'Mikrofon nicht verfügbar', 'Tippe deine Antworten — oder gib das Mikrofon im Browser frei und öffne neu.');
+      }
+      /* v1288: Steht die Adresse schon (freier Weg, oder ein Objekt war
+         offen), fällt die Entscheidung über die Marktpreisindikation VOR
+         der ersten Frage — dann läuft sie über den ganzen Dialog. */
+      if (!_rf.marktGefragt && (_rfFeld('plz') || _rfFeld('ort'))) {
+        try { _rfMarktAnbieten(); } catch (ex) { try { console.warn('[voice] Marktangebot', ex); } catch (e2) {} }
+        if (_rf.abrufOffen === 'markt') { _rf.wartetAufMarkt = 1; _rfBandZeichnen(); return _rfLauschen(); }
       }
       _rfFrage();
     });
@@ -2879,6 +4112,13 @@
     var fields = (data && data.fields) || {};
     var unsicher = (data && data.unsicher) || [];
     var S = 'Sprachaufzeichnung';
+    /* v1288: Was der Co-Pilot SELBST geholt hat, traegt seine eigene
+       Herkunft — BORIS mit Stichtag, Marktpreisindikation, Einstellungen.
+       Eine abgerufene Zahl als „Sprachaufzeichnung" auszuweisen waere
+       falsch: niemand hat sie ausgesprochen. Genau das war der Vorbehalt
+       im Backlog zu „abrufen statt fragen". */
+    var QUELLEN = (data && data.quellen) || {};
+    var _q = function (id) { return QUELLEN[id] || S; };
 
     OA.reset();  /* _merged leeren (Mode/done bleiben gesetzt) */
     markChipsFinal(fields);  /* v507: erkannte Felder gruen */
@@ -2890,25 +4130,25 @@
       var mark = uns ? ' \u26A0' : '';
       if (/^rate_/.test(id)) {
         var n = parseInt(v, 10);
-        if (n >= 1 && n <= 5) OA.addRow(id, entry.label, n + ' \u2605' + mark, n, S, 'star');
+        if (n >= 1 && n <= 5) OA.addRow(id, entry.label, n + ' \u2605' + mark, n, _q(id), 'star');
         return;
       }
       if (entry.kind === 'select') {
         var opt = null;
         for (var i = 0; i < (entry.options || []).length; i++) { if (entry.options[i].v === String(v)) { opt = entry.options[i]; break; } }
-        OA.addRow(id, entry.label, (opt ? opt.t : String(v)) + mark, v, S, 'select');
+        OA.addRow(id, entry.label, (opt ? opt.t : String(v)) + mark, v, _q(id), 'select');
         return;
       }
       /* v1168-VBOOL: Der Server laesst nur JA-Antworten durch, hier kommt
          also nie ein false an. Angezeigt wird trotzdem Klartext — „true" in
          einer Import-Tabelle liest niemand gern. */
       if (entry.kind === 'bool') {
-        OA.addRow(id, entry.label, 'Ja' + mark, true, S, 'bool');
+        OA.addRow(id, entry.label, 'Ja' + mark, true, _q(id), 'bool');
         return;
       }
       var raw = v, disp = String(v);
       if (typeof v === 'number' && !Number.isInteger(v)) { raw = String(v).replace('.', ','); disp = raw; }
-      OA.addRow(id, entry.label, disp + mark, raw, S, 'input');
+      OA.addRow(id, entry.label, disp + mark, raw, _q(id), 'input');
     });
 
     /* Aufnahme-Panel weg, Tabelle rein, Footer umschalten */
@@ -2995,11 +4235,21 @@
      Kernmechanik des Umbaus unbeweisbar. Mit dem Haken kann man einen Chip
      auf `on` setzen und zusehen, ob der Platz frei wird und der naechste
      genau dort nachrueckt. Vorbild: window._dpDispSkin. */
-  /* v1259 & v1273 · Pruefhaken, keine Bedienwege. Ohne sie liesse sich der
-     Rueckfragen-Zustand nur mit echtem Sprechen erreichen - und echtes
-     Sprechen laesst sich nicht automatisiert nachmessen. */
+  /* v1259/v1273/v1288 · Pruefhaken, keine Bedienwege. Ohne sie liesse sich
+     der Sprechlauf nur mit echtem Sprechen erreichen — und echtes Sprechen
+     laesst sich nicht automatisiert nachmessen. `_kennzahlen`, `_score1`
+     und `_score2` rechnen aus dem laufenden Gespraech; `_etappen` und
+     `_fragen` geben die Struktur heraus, damit die Zuordnung Feld ->
+     Etappe pruefbar ist, ohne sie ein zweites Mal aufzuschreiben. */
   window.VoiceImport = { srcLabel: srcLabel, open: open, _orbit: chipOrbit,
                          _rueckfragen: rueckfragen, _luecken: _rfLuecken,
                          _text: updateChipsFromText,   /* v1274: Live-Weg pruefbar */
-                         _gefuehrt: _gefuehrt };       /* v1275 */
+                         _gefuehrt: _gefuehrt,         /* v1275 */
+                         _etappen: ETAPPEN,            /* v1288 */
+                         _fragen: RFRAGEN,
+                         _kennzahlen: _rfKennzahlen,
+                         _score1: _rfScore1, _score2: _rfScore2,
+                         _nkAnnahme: _rfNkAnnahme,
+                         _kontingent: _rfKontingent,
+                         _stand: function () { return _rf; } };
 })();
