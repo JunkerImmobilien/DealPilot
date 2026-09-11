@@ -506,6 +506,10 @@
         '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + micSvg(22) + '</span><h3>Sprachaufzeichnung</h3></div>' +
         '<div class="oabi-sub">Objekt frei einsprechen \u2014 Adresse, Kaufpreis, Fl\u00e4chen, Miete und Zusatzeinnahmen, Zustand, Lage, Bodenrichtwert, Annahmen, Bewirtschaftung, Finanzierung \u2014 und was du davon h\u00e4ltst: Risiken, deine These. Freie Formulierungen werden auf die passenden Felder gebr\u00fcckt. Bis zu 4 Minuten.</div>' +
         '<div class="oabi-body">' +
+          /* v1300b: geteilte Ansicht \u2014 links das Mikrofon, rechts \u201ewas
+             schon steht". Der Beh\u00e4lter ist ein Grid, das bei schmalem
+             Fenster auf eine Spalte f\u00e4llt (CSS weiter unten). */
+          '<div class="vi-frei-buehne">' +
           '<div id="vi-rec">' +
             '<div class="vi-status" id="vi-status"><span class="vi-dot"></span><span class="vi-time" id="vi-time">00:00</span><span id="vi-statetxt">Aufnahme l\u00e4uft \u2026</span></div>' +
             '<div class="vi-catline" id="vi-catline"></div>' +
@@ -527,6 +531,10 @@
               '<button type="button" class="vi-rbtn" id="vi-pause">' + pauseSvg() + ' Pause</button>' +
               '<button type="button" class="vi-rbtn" id="vi-stop">' + stopSvg() + ' Stopp</button>' +
             '</div>' +
+          '</div>' +
+          /* v1300b: dieselbe Spalte wie im geführten Weg, gefüllt aus dem
+             Formular und dem, was die laufende Auswertung erkannt hat. */
+          '<div class="vi-rf-stand" id="vi-frei-stand"></div>' +
           '</div>' +
           '<div id="oabi-result"></div>' +
         '</div>' +
@@ -764,6 +772,11 @@
         st.timer = setInterval(tick, 300);
         _catalog = buildCatalog();
         buildChips();
+        /* v1300b: die Spalte steht von Anfang an da — mit dem, was aus dem
+           Formular schon bekannt ist. Erst dadurch sieht man beim Sprechen,
+           was noch fehlt, statt es am Ende zu erfahren. */
+        _viFrei = {};
+        try { _freiStandZeichnen(); } catch (e) {}
         startStream(stream);  /* v507: Streaming statt Web Speech */
         setState('rec', 'Aufnahme l\u00e4uft \u2026');
       })
@@ -1327,10 +1340,17 @@
     _final = 1;
     if (_tick) { clearTimeout(_tick); _tick = null; }
     var host = $('vi-chips'); if (!host) return;
+    /* v1300b: dieselben Werte füllen die Spalte „Was schon steht". Sie
+       lebt neben dem Orbit und beantwortet, was die Chips nicht können:
+       nicht „was wurde gerade erkannt", sondern „was steht insgesamt und
+       was fehlt noch". */
+    if (!_viFrei) _viFrei = {};
     Object.keys(fields || {}).forEach(function (id) {
+      if (fields[id] != null && String(fields[id]).trim() !== '') _viFrei[id] = fields[id];
       var chip = host.querySelector('.vi-chip[data-cid="' + id + '"]');
       if (chip) chip.classList.add('on');
     });
+    try { _freiStandZeichnen(); } catch (e) {}
     updateChipsCount();
     chipOrbit();   /* v1259 */
   }
@@ -2638,6 +2658,28 @@
          sieht es aus wie eine eigene Seite und der Weg zurück fehlt. */
       '.oabi-ov.vi-mode.vi-dialog .oabi-modal{max-height:97vh;width:min(1360px,100%)}',
 
+      /* ═══ v1300b · Der freie Weg wird geteilt ═══════════════════════════
+         Marcels Vorgabe: „wenn ich frei erzähle, dass wir dort dann auch
+         einmal, was schon steht, dass wir das dort halt auch einmal
+         auflisten."
+
+         Links das Mikrofon mit dem Orbit, rechts dieselbe Spalte wie im
+         geführten Weg. Die Chips im Orbit zeigen, was GERADE erkannt wurde;
+         die Spalte zeigt, was insgesamt steht und was fehlt. Das eine
+         ersetzt das andere nicht.
+
+         `min-height:0` an beiden Spalten ist Pflicht — ein Grid-Kind
+         schrumpft sonst nicht unter seinen Inhalt, und die Spalte würde
+         das Modal aufblähen statt zu scrollen (FALLEN.md). */
+      '.vi-frei-buehne{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start}',
+      '.vi-frei-buehne > #vi-rec{min-width:0}',
+      '.oabi-ov.vi-mode #vi-frei-stand{min-height:0;max-height:min(62vh,560px)}',
+      /* Unter 900 px trägt die Breite keine zwei Spalten mehr. Die Liste
+         wandert dann NACH UNTEN, nicht nach oben: beim freien Erzählen ist
+         das Mikrofon das Hauptelement, anders als im geführten Weg. */
+      '@media(max-width:900px){.vi-frei-buehne{grid-template-columns:1fr}',
+      '  .oabi-ov.vi-mode #vi-frei-stand{max-height:210px}}',
+
       /* ═══ v1290 · DIE ÜBERSICHTSSPALTE ════════════════════════════════
          EINE Regel je Klasse. Vorher standen zwei `.vi-rf-st`-Regeln im
          selben Stylesheet (`display:block` und `display:flex`); bei
@@ -3449,6 +3491,93 @@
   /* Kompakte Fassung der Werte eines Blocks: „ETW · 100 m² · 3". */
   function _rfWerteKurz(werte) {
     return werte.map(function (w) { return w.v; }).join(' · ');
+  }
+
+  /* ═══ v1300b · „Was schon steht" auch beim freien Erzählen ══════════════
+     Marcels Vorgabe vom 11.09.2026: „das können wir ja natürlich auch für
+     den normalen Sprachabruf machen. Also wenn ich frei erzähle, dass wir
+     dort dann auch einmal, was schon steht, dass wir das dort halt auch
+     einmal auflisten."
+
+     Der geführte Weg hat die Spalte seit `v1290`. Der freie hatte nur die
+     Chips im Orbit — sie zeigen, was GERADE erkannt wurde, aber nicht, was
+     insgesamt steht und was noch fehlt. Wer vier Minuten frei spricht, weiß
+     am Ende nicht, ob er das Baujahr genannt hat.
+
+     WARUM EINE EIGENE FUNKTION UND KEIN AUFRUF VON `_rfStandZeichnen`:
+     die hängt an `_rf` — an Blockreihenfolge, aktuellem Index,
+     übersprungenen Fragen. Nichts davon gibt es beim freien Erzählen. Was
+     beide teilen, ist die DARSTELLUNG (dieselben CSS-Klassen) und die
+     Gliederung nach Etappen; die Quelle ist eine andere.
+
+     `_viFrei` sammelt, was die laufende Auswertung erkannt hat. Steht
+     nichts darin, gilt das Formular — dieselbe Regel wie im geführten
+     Weg. */
+  var _viFrei = null;
+
+  function _freiWerte(e) {
+    var out = [];
+    (e.ids || []).forEach(function (id) {
+      var v = (_viFrei && _viFrei[id] != null && String(_viFrei[id]).trim() !== '')
+        ? _viFrei[id] : null;
+      var ausFormular = false;
+      if (v == null) {
+        var el = document.getElementById(id);
+        v = el ? String(el.value || '').trim() : '';
+        ausFormular = true;
+      }
+      if (v === '' || v == null) return;
+      var el2 = document.getElementById(id);
+      var name = id;
+      try {
+        var lab = el2 && el2.closest ? el2.closest('.fg,.form-group,label') : null;
+        var l = lab ? lab.querySelector('label') : null;
+        if (l) name = String(l.textContent || id).replace(/\s*\(.*?\)\s*$/, '').replace(/\*/g, '').trim();
+      } catch (x) {}
+      var anzeige = String(v);
+      if (anzeige.indexOf(',') < 0 && /^-?[0-9]+\.[0-9]+$/.test(anzeige)) anzeige = anzeige.replace('.', ',');
+      out.push({ n: name, v: anzeige, f: ausFormular });
+    });
+    return out;
+  }
+
+  function _freiStandZeichnen() {
+    var host = $('vi-frei-stand'); if (!host) return;
+    var gruppen = [], nachNr = {}, fertigN = 0, gesamtN = 0;
+    RFRAGEN.forEach(function (e) {
+      var werte = _freiWerte(e);
+      /* Erledigt heisst: wenigstens ein Wert, der NICHT aus dem Formular
+         kommt — also etwas, das in diesem Lauf gesprochen wurde. */
+      var erledigt = werte.some(function (w) { return !w.f; });
+      gesamtN++;
+      if (erledigt) fertigN++;
+      var nr = e.et || 0;
+      if (!nachNr[nr]) { nachNr[nr] = { nr: nr, name: _etName(nr), zeilen: [], fertig: 0 }; gruppen.push(nachNr[nr]); }
+      if (erledigt) nachNr[nr].fertig++;
+      nachNr[nr].zeilen.push({ e: e, werte: werte, erledigt: erledigt });
+    });
+
+    var html = gruppen.map(function (g) {
+      var kopf = g.nr
+        ? '<div class="vi-rf-gr"><span class="vi-rf-gr-nr">' + g.nr + '</span>' +
+          '<span class="vi-rf-gr-n">' + escH(g.name) + '</span>' +
+          '<span class="vi-rf-gr-z">' + g.fertig + '/' + g.zeilen.length + '</span></div>'
+        : '';
+      return kopf + g.zeilen.map(function (z) {
+        var zeichen = z.erledigt ? '✓' : (z.werte.length ? '◦' : '·');
+        var wert = z.werte.length
+          ? '<span class="vi-rf-st-v">' + escH(z.werte.map(function (w) { return w.v; }).join(' · ')) + '</span>'
+          : '';
+        return '<div class="vi-rf-st' + (z.erledigt ? ' ok' : '') + '">' +
+               '<span class="vi-rf-st-z">' + zeichen + '</span>' +
+               '<span class="vi-rf-st-n">' + escH(_rfKurzname(z.e)) + '</span>' + wert + '</div>';
+      }).join('');
+    }).join('');
+
+    host.innerHTML =
+      '<div class="vi-rf-stand-kopf">Was schon steht' +
+        '<b>' + fertigN + ' / ' + gesamtN + '</b></div>' +
+      '<div class="vi-rf-stand-body">' + html + '</div>';
   }
 
   function _rfStandZeichnen() {
