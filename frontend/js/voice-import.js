@@ -3399,8 +3399,13 @@
       (treffer ? '<div class="vi-rf-treffer">✓ ' + treffer + '</div>' : '');
     chat.appendChild(d);
     /* Eine neue Blase ist immer gewollt sichtbar — auch wenn der Nutzer
-       gerade oben liest, denn er hat sie selbst ausgeloest. */
-    _rfAnsEnde(chat, true);
+       gerade oben liest, denn er hat sie selbst ausgeloest.
+
+       v1306b: AUSSER nach einem Halt. Dort steht eine Score-Karte, die
+       gelesen werden soll; die Frage darunter darf den Blick nicht
+       wegziehen. Der Merker fällt beim ersten eigenen Beitrag. */
+    if (_rf && _rf.haltBlase && wer === 'ich') _rf.haltBlase = null;
+    _rfAnsEnde(chat, !(_rf && _rf.haltBlase));
     /* ═══ v1299 · Eine Score-Karte ist keine Sprechblase ═════════════════
        Marcels Befund: „Dann ist das irgendwie ein bisschen komisch
        eingerückt. Also man kann den Deal Score und den Investor Deal Score
@@ -4610,6 +4615,19 @@
        den Blick sonst weiterzieht, geschieht das erst im nächsten Bild —
        nach ihr. Wer weiterlesen will, scrollt; wer nur den Score wollte,
        hat ihn vor sich. */
+    /* v1306b — NACHGEMESSEN, und der erste Versuch reichte nicht: hier
+       stand ein Scroll auf den Kartenanfang mit 320 ms Verzögerung. Die
+       nächste Frage kommt aber erst nach dem KI-Aufruf, also SEKUNDEN
+       später — und ihr `_rfAnsEnde(chat, true)` zog den Blick wieder ans
+       Ende. Gemessen: Karte bei −222 px, also oberhalb des sichtbaren
+       Bereichs.
+
+       Deshalb merkt sich der Halt seine Blase. Solange sie gilt, erzwingt
+       KEINE neue Blase mehr den Sprung ans Ende; der Blick bleibt auf der
+       Karte, darunter steht „Weiter geht es mit …". Wer weiterlesen will,
+       scrollt — und sobald er das tut oder antwortet, ist der Merker weg
+       und der Verlauf verhält sich wieder wie immer. */
+    _rf.haltBlase = b || null;
     if (b) {
       var hin = function () {
         try {
