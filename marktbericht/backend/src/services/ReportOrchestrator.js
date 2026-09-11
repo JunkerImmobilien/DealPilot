@@ -34,6 +34,7 @@ import { AgsResolver } from '../connectors/AgsResolver.js';
 import { ZensusConnector } from '../connectors/ZensusConnector.js';
 import * as Erbbaurecht from '../lib/erbbaurecht.js';   /* v1320 */
 import { finde as findeKennzahl } from '../lib/ausschuss_register.js';   /* v1320b */
+import { MarktkontextService } from './MarktkontextService.js';   /* v1321 */
 
 export const ReportOrchestrator = {
   async generate(input, opts = {}) {
@@ -230,6 +231,18 @@ export const ReportOrchestrator = {
     })().catch((e) => { step('macro: fehler ' + e.message); return { agsInfo: null, macroRaw: { available: false, reason: e.message } }; });
 
     // Zensus 2022 (Leerstand/Eigentuemerquote/Ø-Miete, gratis offline-CSV) als eigener Strang:
+    /* ═══ v1321 · Marktkontext - eigener paralleler Strang ═══════════
+       Acht KPI-Abrufe: vermietet gegen frei, drei Energieklassen-Gruppen,
+       Angebotsrendite, Erbbaurechts-Anteil. Sie kosten NICHTS - gemessen
+       am 11.09.2026, Guthaben vor und nach acht Abfragen unveraendert
+       (257,115 -> 257,115). Nur Detail-Abrufe ziehen Geld.
+       Faellt der Strang aus, fehlt der Kontext und sonst nichts. */
+    const kontextP = FAST
+      ? Promise.resolve(null)
+      : MarktkontextService.derive(ref)
+          .then((k) => { if (k) step('Marktkontext ausgewertet'); return k; })
+          .catch((e) => { step('marktkontext: fehler ' + e.message); return null; });
+
     const zensusP = (async () => {
       const agsInfo = await agsP;
       const z = ZensusConnector.lookup(agsInfo?.kreis_ags);
@@ -244,8 +257,8 @@ export const ReportOrchestrator = {
       return lv;
     })().catch((e) => { step('boris: fehler ' + e.message); return null; });
 
-    const [balanceBefore, sale, rent, micro, insights, macroBundle, zensus, landValue] =
-      await Promise.all([balanceBeforeP, saleP, rentP, microP, insightsP, macroP, zensusP, borisP]);
+    const [balanceBefore, sale, rent, micro, insights, macroBundle, zensus, landValue, marktkontext] =
+      await Promise.all([balanceBeforeP, saleP, rentP, microP, insightsP, macroP, zensusP, borisP, kontextP]);
 
     const macroRaw = macroBundle.macroRaw;
     const macro = ScoringService.macroScore(macroRaw.metrics || null);
@@ -900,6 +913,11 @@ export const ReportOrchestrator = {
          Unterschied; wer nur eine gekuerzte Zahl sieht, fragt sich, warum
          sie so niedrig ist. */
       erbbaurecht: erbbau,
+      /* v1321: der Marktkontext - vermietet gegen frei, Energieklassen-
+         Spreizung, Angebotsrendite, Erbbaurechts-Anteil. Alles aus
+         KPI-Abrufen, also gratis. Was die Datenlage nicht hergibt,
+         fehlt hier; keine Zahl wird geschaetzt. */
+      marktkontext,
       bevoelkerung_trend_pct: (macroRaw && macroRaw.metrics && macroRaw.metrics.bevoelkerung_trend != null)
         ? macroRaw.metrics.bevoelkerung_trend : null,
       days_on_market: (insights && insights.dynamics && insights.dynamics.days_on_market != null)

@@ -114,6 +114,18 @@ export const GeoMapConnector = {
       if (filters.objectTypes && filters.objectTypes.length) body.objectTypes = filters.objectTypes;
       if (filters.heatingTypes && filters.heatingTypes.length) body.heatingTypes = filters.heatingTypes;
       if (filters.energyRatings && filters.energyRatings.length) body.energyRatings = filters.energyRatings;
+      /* ═══ v1321 · Gegen die echte API geprueft, 11.09.2026 ═══════════
+       * leased      true/false - vermietet gegen frei. Gemessen Bielefeld:
+       *             2.769,33 gegen 2.980,96 EUR/m2, also -7,1 Prozent.
+       * searchString Volltext in Titel, Beschreibung, Strasse, Ort, Anbieter.
+       *             Mehrere Woerter sind ODER-verknuepft, es gibt KEINE
+       *             Ausschlusslogik - wer "Erbbaurecht" sucht, findet auch
+       *             "kein Erbbaurecht". Signal, kein Beleg.
+       * NICHT verwendbar (alle 400): priceChanged, hasPriceChange,
+       *             priceChangeCountRange. priceChangeDirection wird
+       *             angenommen, filtert aber nicht. */
+      if (filters.leased != null) body.leased = !!filters.leased;
+      if (filters.searchString) body.searchString = String(filters.searchString).slice(0, 200);
     }
     let d;
     try {
