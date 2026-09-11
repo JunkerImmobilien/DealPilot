@@ -794,7 +794,7 @@ function _zusatzAusKontext(kontext, modus) {
   const basis = (modus === 'inserat') ? ZUSATZ_INSERAT : ZUSATZ_ANTWORT;
   const zeilen = [];
   if (kontext && typeof kontext === 'object') {
-    Object.keys(kontext).slice(0, 40).forEach(function (k) {
+    Object.keys(kontext).slice(0, 60).forEach(function (k) {
       const v = kontext[k];
       if (v === '' || v === null || v === undefined) return;
       zeilen.push('  ' + k + ' = ' + String(v).slice(0, 60));
@@ -805,6 +805,12 @@ function _zusatzAusKontext(kontext, modus) {
     basis,
     'BEKANNTER STAND DIESES OBJEKTS (Feld-id = Wert):',
     zeilen.join(String.fromCharCode(10)),
+    'EINE BESTAETIGUNG IST EINE ANGABE: Sagt der Nutzer, dass etwas "passt",',
+    '"stimmt so" oder "bleibt", und steht der Wert oben im bekannten Stand,',
+    'dann gib GENAU DIESEN WERT zurueck. Bestaetigt jemand einen OBERBEGRIFF',
+    '("die Adresse passt", "die Finanzierung bleibt"), gilt das fuer alle',
+    'Felder dieses Begriffs, die oben stehen. ERFINDE DABEI NICHTS: was oben',
+    'nicht steht, bleibt leer - auch wenn es plausibel waere.',
     'RECHNEN IST ERLAUBT UND ERWUENSCHT: Bezieht sich die Antwort auf einen',
     'dieser Werte, rechne sie aus. "10 Prozent vom Kaufpreis" bei kp=200000',
     '-> 20000. "so viel wie die Kaltmiete" bei nkm=490 -> 490. Fehlt der',

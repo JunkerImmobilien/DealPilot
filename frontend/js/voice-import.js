@@ -2766,18 +2766,55 @@
 
      Erfunden wird dabei nichts: alles kommt aus derselben Rechnung, die
      auch die Score-Karte zeigt. Was sich nicht rechnen laesst, fehlt. */
-  var KONTEXT_IDS = ['kp', 'nkm', 'wfl', 'zimmer', 'baujahr', 'ze', 'hg_ul', 'ek',
-                     'd1', 'd1z', 'd1t', 'gsfl', 'brw', 'plz', 'ort', 'str'];
+  /* ═══ v1315 · Der Kontext war eine Liste von sechzehn Feldern ═══════
+     Hier standen bis zum 11.09.2026 sechzehn feste Ids. Nicht dabei:
+     Hausnummer, Objektart, Zinsbindung, Nebenkostensätze, Lage, Zustand,
+     Sanierung — und vor allem die Information, WOHER ein Wert kam.
+
+     Marcels Befund: „er muss mehr verstehen und du könntest ihm ja den
+     kontext mitgeben, der ist ja da." Genau so ist es — der Stand liegt
+     in `_rf.data.fields` und im Formular, er wurde nur nicht mitgegeben.
+
+     Jetzt geht ALLES mit, was einen Wert hat. Die Grenze zieht das
+     Backend (`_zusatzAusKontext` schneidet bei 40 Zeilen); wir sortieren
+     deshalb so, dass das Wichtige vorn steht: erst was zur laufenden
+     Frage gehört, dann der Rest.
+
+     Die Herkunft steht dabei: ein Wert aus dem Exposé darf überschrieben
+     werden, ein amtlich abgerufener Bodenrichtwert nicht stillschweigend. */
+  var KONTEXT_VORN = ['str', 'hnr', 'plz', 'ort', 'objart', 'wfl', 'zimmer', 'baujahr',
+                      'kp', 'nkm', 'ze', 'ek', 'd1z', 'd1t', 'd1_bindj', 'gsfl', 'brw', 'mea'];
+
   function _rfKontext() {
     var k = {};
     try {
-      KONTEXT_IDS.forEach(function (id) {
-        var v = (_rf && _rf.data && _rf.data.fields && _rf.data.fields[id]);
+      var f = (_rf && _rf.data && _rf.data.fields) || {};
+      var q = (_rf && _rf.quelle) || {};
+      var dran = ((_rf && _rf.offen && _rf.offen[_rf.i]) || {}).ids || [];
+
+      /* Reihenfolge: die Felder der laufenden Frage, dann die wichtigen
+         Stammdaten, dann alles Übrige. */
+      var reihe = [];
+      var gesehen = {};
+      function anhaengen(id) { if (!gesehen[id]) { gesehen[id] = 1; reihe.push(id); } }
+      dran.forEach(anhaengen);
+      KONTEXT_VORN.forEach(anhaengen);
+      Object.keys(f).forEach(anhaengen);
+      ((_rf && _rf.catalog) || []).forEach(function (c) { anhaengen(c.id); });
+
+      reihe.forEach(function (id) {
+        if (id.charAt(0) === '_') return;
+        var v = f[id];
+        var herkunft = q[id] || null;
         if (v === undefined || v === '' || v === null) {
           var el = document.getElementById(id);
-          v = el ? String(el.value || '').trim() : '';
+          if (!el) return;
+          if (el.type === 'checkbox') { v = el.checked ? 'ja' : ''; }
+          else { v = String(el.value || '').trim(); }
+          if (v !== '') herkunft = herkunft || 'steht im Formular';
         }
-        if (v !== '' && v !== null && v !== undefined) k[id] = v;
+        if (v === '' || v === null || v === undefined) return;
+        k[id] = String(v).slice(0, 60) + (herkunft ? '  [' + herkunft + ']' : '');
       });
     } catch (e) {}
     return Object.keys(k).length ? k : null;
@@ -7422,9 +7459,129 @@
   /* v1286: Ein Weg für beide Eingaben - getippt und gesprochen laufen
      seit jeher durch dieselbe Auswertung, aber an zwei Stellen im Code.
      Zwei Stellen heisst zwei Verhaltensweisen, sobald eine sich aendert. */
+  /* ═══════════════════════════════════════════════════════════════════
+     v1315 · „DIE ADRESSE PASST SO" — EINE BESTÄTIGUNG GILT FÜR ALLES,
+             WAS ZUM BEGRIFF GEHÖRT
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Befund vom 11.09.2026: „der sprechlauf sollte auch so schlau
+     sein zu verstehen dass wenn ich frage ob die plz so ist und er ja
+     sagt dass er straße und hausnummer und ort auch übernimmt wenn ich
+     sage dass die adresse so passt. … das ist kein schlauer Agent."
+
+     Er hat recht, und der Grund ist gemessen: an die Auswertung ging
+     `_rfKontext()` — eine feste Liste von SECHZEHN Feld-Ids, ohne
+     Hausnummer, ohne Objektart, ohne die Information, was davon woher
+     kam. Dazu der Katalog des gerade offenen Blocks. Ein Modell, das
+     einen Zettel mit 16 Zahlen bekommt, KANN nicht wissen, dass „die
+     Adresse passt" vier Felder freigibt, von denen drei nicht auf dem
+     Zettel stehen.
+
+     Zwei Dinge ändern das:
+
+     1. Der Kontext wird vollständig (siehe `_rfKontext`) — alles, was
+        bekannt ist, mit Feld-Id und Herkunft.
+
+     2. Diese Funktion hier. Sie läuft VOR der Auswertung durch das
+        Modell und fängt den Fall ab, in dem jemand einen BEGRIFF
+        bestätigt statt einen Wert zu nennen. Der Begriff wird auf seine
+        Felder abgebildet; was im Formular oder aus dem Import schon
+        dasteht, gilt damit als gesagt.
+
+     WARUM IM CODE UND NICHT IM PROMPT: eine Bestätigung darf nichts
+     erfinden. Sie übernimmt ausschliesslich Werte, die bereits
+     dastehen — aus dem Formular, aus dem Exposé, aus einem Abruf. Ein
+     Modell, das „die Adresse stimmt" liest, könnte eine plausible
+     Hausnummer ergänzen. Diese Funktion kann das nicht. */
+
+  var RF_GRUPPEN = [
+    { wort: /\b(adresse|anschrift|lage des objekts|wohnort)\b/i,
+      ids: ['str', 'hnr', 'plz', 'ort'], name: 'Adresse' },
+    { wort: /\b(objektdaten|eckdaten|die daten|grunddaten|das objekt)\b/i,
+      ids: ['objart', 'wfl', 'zimmer', 'baujahr', 'etage'], name: 'Objektdaten' },
+    { wort: /\b(finanzierung|darlehen|kredit|konditionen)\b/i,
+      ids: ['ek', 'd1z', 'd1t', 'd1_bindj'], name: 'Finanzierung' },
+    { wort: /\b(kaufnebenkosten|nebenkosten|erwerbsnebenkosten)\b/i,
+      ids: ['makler_p', 'notar_p', 'gba_p', 'gest_p'], name: 'Kaufnebenkosten' },
+    { wort: /\b(miete|mieteinnahmen|einnahmen)\b/i,
+      ids: ['nkm', 'ze'], name: 'Mieteinnahmen' },
+    { wort: /\b(hausgeld|bewirtschaftung)\b/i,
+      ids: ['hg_ul', 'hg_nul'], name: 'Hausgeld' },
+    { wort: /\b(grundst(ü|ue)ck|boden)\b/i,
+      ids: ['brw', 'gsfl', 'mea'], name: 'Grundstück' },
+    { wort: /\b(lage|umgebung)\b/i,
+      ids: ['makrolage', 'mikrolage'], name: 'Lage' }
+  ];
+
+  /* Steht zu dieser Id schon ein Wert — im Gespräch oder im Formular? */
+  function _rfWertDa(id) {
+    var f = (_rf && _rf.data && _rf.data.fields) || {};
+    if (f[id] !== undefined && f[id] !== null && f[id] !== '') return f[id];
+    var el = document.getElementById(id);
+    if (!el) return null;
+    if (el.type === 'checkbox') return el.checked ? true : null;
+    var v = String(el.value || '').trim();
+    return v || null;
+  }
+
+  /**
+   * _rfBestaetigungUebertragen(text) -> false | Anzahl übernommener Felder
+   *
+   * Gibt false zurück, wenn der Satz keine Bestätigung ist oder nichts zu
+   * übernehmen war — dann läuft die normale Auswertung wie bisher.
+   */
+  function _rfBestaetigungUebertragen(text) {
+    if (!_rf) return false;
+    var t = String(text || '').trim();
+    if (!t) return false;
+
+    /* Nur eine reine Bestätigung. Steht eine Zahl im Satz, ist es eine
+       Korrektur — „ja, 450" bestätigt nichts, es setzt 450. */
+    if (/\d/.test(t)) return false;
+
+    /* Welche Gruppe ist gemeint? Ohne Begriff bleibt es der aktuelle
+       Block — dafür gibt es den Weg weiter unten. */
+    var gruppe = null;
+    for (var g = 0; g < RF_GRUPPEN.length; g++) {
+      if (RF_GRUPPEN[g].wort.test(t)) { gruppe = RF_GRUPPEN[g]; break; }
+    }
+
+    /* Ist das überhaupt eine Zustimmung? „passt", „stimmt so", „ja genau".
+       `_istZustimmung` verlangt, dass der GANZE Satz aus Zustimmungswörtern
+       besteht — „die Adresse passt so" tut das nicht, weil „Adresse"
+       darin vorkommt. Steht ein Gruppenbegriff im Satz, prüfen wir
+       deshalb den Rest. */
+    var pruef = gruppe ? t.replace(gruppe.wort, ' ') : t;
+    pruef = pruef.replace(/\b(die|der|das|den|dem|des|so|ist|sind|war|waren|alles|damit|dann|auch|noch|schon|bleibt|bleiben|steht|stehen)\b/gi, ' ');
+    if (!_istZustimmung(pruef)) return false;
+
+    var ids = gruppe ? gruppe.ids : ((_rf.offen[_rf.i] || {}).ids || []);
+    if (!ids.length) return false;
+
+    var uebernommen = [];
+    ids.forEach(function (id) {
+      var f = _rf.data.fields || {};
+      if (f[id] !== undefined && f[id] !== null && f[id] !== '') return;  /* schon gesagt */
+      var w = _rfWertDa(id);
+      if (w === null) return;
+      _rfSetzen(id, w, 'bestätigt');
+      uebernommen.push(id);
+    });
+
+    if (!uebernommen.length) return false;
+
+    var namen = uebernommen.map(function (id) { return _rfFeldName(id); });
+    _rfBlase('co', '...Gut — <b>' + escH(namen.join(', ')) + '</b> ' +
+      (uebernommen.length === 1 ? 'übernehme ich so' : 'übernehme ich so') + '.');
+    _rfStandZeichnen();
+    return uebernommen.length;
+  }
+
   function _rfAuswerten(text, ausSprache) {
     var e = _rf.offen[_rf.i];
     if (!e) return;   /* v1288: nach dem letzten Block gibt es nichts mehr einzuordnen */
+    /* v1315: Erst die Bestaetigung. Sie uebernimmt nur, was schon
+       dasteht - das Modell koennte hier eine Hausnummer erfinden. */
+    if (_rfBestaetigungUebertragen(text)) { _rfWeiter(); return; }
     return Auth.apiCall('/ai/extract-text', {
       method: 'POST',
       body: { text: text, catalog: _rfKatalog(e, _rf.catalog), kontext: _rfKontext() }
