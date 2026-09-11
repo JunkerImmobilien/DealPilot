@@ -379,6 +379,30 @@ async function extractFields(transcript, catalog, apiKey, sammler, zusatz) {
       if (!bv) return;
       fields[k] = true;
     } else {
+      /* ═══ v1308c · Eine Verneinung ist kein Text ═══════════════════════
+         GEMESSEN am 11.09.2026: „Das Objekt liegt in 32609 Huellhorst,
+         keine Strasse bekannt" ergab `str: "keine Strasse bekannt"`. Der
+         Sprechlauf hielt die Strasse damit fuer ausgefuellt — und das
+         Angebot, das Ortszentrum zu nehmen, erschien nicht.
+
+         Die Prompt-Regel dazu steht seit v1308b in ZUSATZ_ANTWORT und hat
+         nicht gegriffen: das Modell ueberliest sie. Ein Riegel im Code tut
+         das nicht.
+
+         Was hier faellt, ist nur das, was ALS GANZES eine Verneinung ist —
+         „keine Strasse bekannt", „weiss ich nicht", „unbekannt". Ein Text,
+         der eine Verneinung ENTHAELT („Nordstrasse, keine Hausnummer"),
+         bleibt: dort steht eine echte Angabe daneben.
+
+         Bei Zahlenfeldern gilt das NICHT: dort ist die Verneinung eine 0
+         und damit die Antwort (v1306). */
+      var sv = String(v).trim();
+      if (sv && /^(kein|keine|keiner|keines|nichts|nein|unbekannt|unklar|nicht bekannt|k\.?\s?a\.?)\b/i.test(sv) &&
+          /(bekannt|vorhanden|angegeben|genannt|da|dabei|weiss|wei(ß|ss)|vorliegend)?\s*$/i.test(sv) &&
+          sv.split(/\s+/).length <= 4) {
+        return;   /* Feld bleibt leer — eine Luecke ist kein Wert */
+      }
+      if (/^(wei(ß|ss)\s+(ich\s+)?nicht|keine\s+ahnung|unbekannt|unklar)\b/i.test(sv)) return;
       fields[k] = v;
     }
   });
