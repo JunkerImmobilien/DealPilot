@@ -38,7 +38,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
 
-**Stand:** `v1273`–`v1307` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
+**Stand:** `v1273`–`v1308c` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
 — nichts davon ist live.
 
 > **Nach Marcels erstem echten Sprechlauf am 10.09. abends** (Bilder
@@ -130,7 +130,7 @@ die Kosten einer Aufnahme um rund 40 % — bei 4 Minuten von ≈ 1,7 auf ≈ 0,9
 
 ### 4 · Der Sprechlauf gehört auf Produktion
 
-**`v1273`–`v1307` liegen auf Staging.** Prod steht auf
+**`v1273`–`v1308c` liegen auf Staging.** Prod steht auf
 `a21fe9c` — der Co-Pilot, die Etappen, beide Scores, BORIS-Abruf und
 Marktpreisindikation im Hintergrund sind für keinen Kunden erreichbar.
 
@@ -174,14 +174,14 @@ Meldung, nicht der Ausweg.
 **BLOCKIERT:** wartet auf Marcels Wahl aus der Demo. Geld und Optik —
 das entscheidet er.
 
-### 9 · Der Sprechlauf: was aus Marcels Auftrag vom 11.09. noch fehlt
+### 9 · Der Sprechlauf: Marcels Auftrag vom 11.09. — ABGEARBEITET
 
-Fünf Punkte aus der Rückmeldung zu den Bildern `fragen.png`,
-`sanierung.png`, `dealscore2.png`, `entwicklung.png` sind gebaut
-(`v1306`–`v1306d`, siehe Journal). **Diese hier stehen noch aus** — in
-Marcels Reihenfolge, weil sie aufeinander aufbauen:
+Die Rückmeldung zu den Bildern `fragen.png`, `sanierung.png`,
+`dealscore2.png`, `entwicklung.png` ist gebaut (`v1306`–`v1306d`), und die
+fünf Punkte darunter sind es ebenfalls (`v1307`–`v1308c`). **Offen bleiben
+nur zwei Läufe gegen echte Daten**, beide unten vermerkt.
 
-**a) Den Marktbericht auswerten** — **GEBAUT in `v1307`**, Kernfunktion gemessen; der volle Lauf mit echter erweiterter Marktpreisindikation steht noch aus.
+**a) Den Marktbericht auswerten** — **FERTIG in `v1307`**. Kernfunktion gemessen (Berichtstext → `wachsend` · `mittel` · `mittel` · `begrenzt`); der volle Lauf mit einer echten erweiterten Marktpreisindikation kostet Kontingent und steht noch aus.
 *„Diese Sachen wie Entwicklung, also Bevölkerung, Nachfrage,
 Wertsteigerung, Entwicklungsmöglichkeiten, das kriegen wir ja bei der
 erweiterten Marktpreisindikation ausgewertet im Marktbericht. Also du
@@ -198,16 +198,16 @@ Text.
 Dialog ging selbstständig zur nächsten Frage. Gilt für jede Frage mit
 Auswahlfeldern, auch Qualität und Zustand.
 
-**c) Die Pre-Flight-Kombination in einem Lauf.** Marktbewertung + Exposé /
+**c) Die Pre-Flight-Kombination** — **FERTIG in `v1308`**, gemessen: 8 Angaben übernommen, Liste zum Nachsehen, Stufenwahl, 14 statt 16 Fragen. Marktbewertung + Exposé /
 Marktbericht + Sprache zusammen: erst die Quellen lesen, dann sagen *„ich
 habe schon einige Werte aus dem Marktbericht und dem Exposé gelesen"*, dann
 **nur** Adresse und Übernahme bestätigen lassen — und danach ausschließlich
 die fehlenden Felder fragen. Der Bericht gehört ins Objekt, die
 Marktpreisindikation unter die Pre-Flight-Karte wie sonst auch.
 
-**d) ImmoMetrica genauso** — gegen die Testobjekte durchspielen.
+**d) ImmoMetrica** — **FERTIG in `v1308`**: läuft durch dieselbe Kette (`import → immometrica → voice`), `VORLAUF_NAME` kennt es, die Vorlaufkarte zeigt seine Werte. Ein Lauf gegen ein echtes ImmoMetrica-Testobjekt steht noch aus.
 
-**e) Fehlende Straße → Ortszentrum vorschlagen.** *„Da fehlt manchmal zum
+**e) Fehlende Straße → Ortszentrum** — **FERTIG in `v1308`**, gemessen: Angebot erscheint, Klick und Sprache führen zum Ziel, Herkunft trägt „Näherung". *„Da fehlt manchmal zum
 Beispiel die Straße. Da könnten wir auch den Vorschlag machen, ob wir
 vielleicht einfach das Zentrum dann annehmen."* Bei bekanntem Ort ohne
 Straße also anbieten, mit dem Zentrum zu rechnen.

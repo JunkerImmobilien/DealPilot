@@ -2435,3 +2435,40 @@ auslesen. Wer sie nachbaut, prüft seine Nachbildung.
 Und wenn ein Befund überraschend schlecht ausfällt: **erst den Prüfaufbau
 verdächtigen, dann den Code.** Hier hätte die falsche Diagnose zu einem
 Umbau geführt, den niemand gebraucht hätte.
+
+## Eine Regel im Prompt braucht ihre Grenze im selben Satz
+
+Dreimal hintereinander an einem Tag hat eine Prompt-Regel, die aus einem
+Einzelfall entstand, einen Fall getroffen, für den sie nie gedacht war:
+
+1. *„Niemals 0 setzen — eine 0 sieht aus wie eine Angabe und ist keine."*
+   Gedacht für „zwanzig Prozent vom Kaufpreis" ohne bekannten Kaufpreis.
+   Getroffen hat sie **„keine Sanierungskosten"** — dort **ist** 0 die
+   Angabe.
+2. Die Gegenregel *„Verneinungen sind Angaben"* traf dann **„keine Straße
+   bekannt"** — und trug den Satz als Straßennamen ein. Bei einem Betrag
+   ist die Verneinung eine 0, bei einem **Textfeld** ist sie gar nichts.
+
+**Die Regel:** jede Prompt-Regel bekommt ihre **Grenze in denselben Satz**
+— am billigsten als Gegenbeispiel: „In DIESEM Fall 0, in JENEM nicht."
+Eine Regel ohne Grenze wächst sich zur allgemeinen Wahrheit aus, und die
+nächste Regel, die sie einfängt, macht denselben Fehler in die andere
+Richtung.
+
+## Ein Modell überliest, ein `if` nicht
+
+Gegen „keine Straße bekannt" als Straßenname wurde zuerst eine Prompt-Regel
+geschrieben — ausführlich, mit Beispiel, an der richtigen Stelle.
+
+**Gemessen nach dem Rebuild: unverändert.** Das Modell hielt sich nicht
+daran. Erst ein Riegel im Code hat es behoben.
+
+**Die Regel:** ein Prompt ist eine **Bitte**, kein Vertrag. Wo das Ergebnis
+verlässlich sein muss — weil es in ein Formular, einen Export oder ein PDF
+läuft —, gehört die Prüfung in den Code. Der Prompt sagt, was gewollt ist;
+der Code stellt sicher, dass nichts durchkommt, was nicht sein darf.
+
+Und beim Nachmessen: **nach jeder Prompt-Änderung wirklich messen.** Eine
+Prompt-Regel, die man nur schreibt und für wirksam hält, ist eine
+Vermutung — und sie sieht im Diff genauso überzeugend aus wie eine, die
+greift.

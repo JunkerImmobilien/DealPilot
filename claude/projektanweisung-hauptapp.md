@@ -12421,6 +12421,112 @@ Kernfunktion gemessen, aber noch nicht im vollen Lauf mit einer echten
 erweiterten Marktpreisindikation — das kostet Kontingent und gehört in den
 nächsten Durchgang.
 
+## Rollout-Journal · 11.09.2026, elfter Teil — `v1308` bis `v1308c`
+
+Die letzten drei Punkte aus Marcels Auftrag. Damit ist die Liste
+abgearbeitet.
+
+### Das Ortszentrum, wenn die Straße fehlt (`v1308`)
+
+*„Da fehlt manchmal zum Beispiel die Straße. Und da könnten wir auch den
+Vorschlag machen, ob wir vielleicht einfach das Zentrum dann annehmen. Und
+dann holt sie dir einfach automatisch das Zentrum, wenn du einen Ort
+hast."*
+
+Der Fall kommt aus ImmoMetrica und aus manchen Exposés. Bisher hieß er
+„passt so, weiter" — und damit **kein** Bodenrichtwert, **keine**
+Marktdaten, **keine** Lage: alle drei hängen an einer Adresse.
+
+Jetzt steht ein Angebot daneben, per Klick und per Sprache („nimm die
+Ortsmitte"). Zwei Entscheidungen darin:
+
+- **Die Straße bleibt leer.** Ein erfundener Name stünde im Bankexport und
+  im PDF; „Ortsmitte" wäre eine Behauptung über eine Anschrift, die es so
+  nicht gibt.
+- **Die Herkunft trägt es mit** („Ortszentrum (Näherung)"), und dass die
+  Mikrolage dadurch ungenau wird, steht ausdrücklich dabei — Makrolage und
+  Marktniveau gelten für den Ort und stimmen.
+
+**Gemessen:** „Das Objekt liegt in 32609 Hüllhorst" → Angebot
+„Ortszentrum Hüllhorst nehmen" erscheint, Klick führt zu „Gut — ich rechne
+mit dem Ortszentrum von Hüllhorst (32609)" und weiter zu Frage 2.
+
+### Was aus Exposé und Bericht kam, zum Nachsehen (`v1308`)
+
+*„Dann sagt er: Ich habe schon einige Werte aus dem Marktbericht oder aus
+dem Exposé gelesen, und dann holst du dir nur noch die Bestätigung, ob das
+richtig ist mit der Adresse und ob die Sachen so übernommen werden sollen."*
+
+Bisher stand nur eine Zahl da: „Aus Exposé stehen schon 9 Angaben". **Eine
+Zahl ist keine Grundlage für ein Ja.** Ein Exposé kann die Wohnfläche
+falsch führen, und dann rechnet der ganze Lauf mit einer falschen Zahl
+weiter.
+
+Jetzt stehen die Werte da — die wichtigsten zuerst (Adresse, Fläche,
+Baujahr, Preis, Miete), der Rest im Aufklapper. **Ohne Rückfrage, die den
+Dialog anhält:** wer nichts sagt, hat zugestimmt, und die erste Frage kommt
+ohnehin gleich danach.
+
+### Die Kombination, gemessen (`v1308`)
+
+Marcels Ablauf, mit vorbefülltem Formular und `vorlauf: ['import']`:
+
+```
+„Aus Exposé / Marktbericht stehen schon 8 Angaben — die frage ich nicht
+ noch einmal. Ich führe dich durch — 14 Fragen in 5 Etappen."
+„Das habe ich aus Exposé / Marktbericht übernommen:
+ Straße Hermannstraße · Hausnummer 9 · PLZ 32609 · Ort Hüllhorst ·
+ Wohnfläche 100 · Baujahr 1995 · Kaufpreis 200000 · Kaltmiete 940"
+„Du hast die Marktbewertung mit ausgewählt — welche Stufe?"
+„Was für ein Objekt ist es? ✓Objektart ✓Wohnfläche Zimmer — Frage 1 von 14"
+```
+
+**14 statt 16 Fragen**, zwei Pillen schon abgehakt. Genau das, was Marcel
+beschrieben hat. **ImmoMetrica läuft durch dieselbe Kette** (`order`:
+`import → immometrica → voice → …`) und trägt seine Werte über denselben
+Weg ein — `VORLAUF_NAME` kennt es, die Vorlaufkarte zeigt es.
+
+### Zwei Fehler, die beim Testen herausfielen
+
+**„keine Straße bekannt" war ein Straßenname (`v1308b`/`v1308c`).** Beim
+Prüfen des Ortszentrums gesagt: *„Das Objekt liegt in 32609 Hüllhorst,
+keine Straße bekannt"* — und `str` stand auf `"keine Straße bekannt"`.
+Damit galt die Straße als ausgefüllt, und das Zentrum-Angebot erschien
+nicht.
+
+Ursache war meine eigene Regel aus `v1306`: „Verneinungen sind Angaben".
+Sie stimmt für **Beträge** — dort ist die Verneinung eine 0. Für ein
+**Textfeld** ist sie gar nichts.
+
+Der erste Versuch war eine Prompt-Regel (`v1308b`). **Sie hat nicht
+gegriffen** — gemessen kam der Satz unverändert zurück, das Modell
+überliest sie. Deshalb ein Riegel im Code (`v1308c`): was **als Ganzes**
+eine Verneinung ist, fällt; ein Text, der eine Verneinung **enthält**,
+bleibt.
+
+**Gemessen nach dem Riegel:**
+
+| Eingabe | Ergebnis |
+|---|---|
+| „32609 Hüllhorst, keine Straße bekannt" | `plz`, `ort` — **`str` fällt weg** |
+| „keine Sanierungskosten" | `san_kosten: 0` (Betrag, Verneinung = Angabe) |
+| „Hermannstraße 9 in 32609 Hüllhorst" | alle vier Felder |
+| „Nordstraße in 32609 Hüllhorst, Hausnummer weiß ich nicht" | `str`, `plz`, `ort` — **`hnr` fällt weg** |
+
+**Commits** `c42535e`, `e6613c7`, `aba1138`. Gold-Audit RC=0. Backend neu
+gebaut. Auf Staging, **nicht auf Prod**.
+
+### Die Lehre dieser Runde
+
+Dreimal in Folge hat eine Regel, die aus einem Einzelfall entstand, einen
+Fall getroffen, für den sie nie gedacht war: erst „niemals 0" gegen
+„keine Sanierungskosten", dann „Verneinungen sind Angaben" gegen „keine
+Straße bekannt".
+
+**Eine Regel im Prompt braucht ihre Grenze im selben Satz.** Und wo es auf
+Verlässlichkeit ankommt, gehört sie zusätzlich in den Code — ein Modell
+überliest, ein `if` nicht.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
