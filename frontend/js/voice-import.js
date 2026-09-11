@@ -752,9 +752,35 @@
     document.head.appendChild(s);
   }
 
+  /* ═══ v1302 · Die Spalte geht MIT der Aufnahme ══════════════════════════
+     Marcels Befund vom 11.09.2026: „da siehst du ein merkwürdiges Feld
+     rechts in schwarz, und wenn ich Eingaben gemacht habe und auf
+     Übernehmen klicke, dann ist das Eingabefenster weg."
+
+     Beides derselbe Fehler, und er ist meiner aus `v1300b`. Die neue
+     Spalte „Was schon steht" hängt in `.vi-frei-buehne`, einem Grid mit
+     zwei Spalten. An DREI Stellen wird `vi-rec` auf `display:none`
+     gesetzt — beim Start der Startkarte, beim Aufbau des geführten
+     Dialogs und nach der Auswertung.
+
+     Die Spalte blieb dabei stehen: ein leerer, fast schwarzer Kasten
+     (`--vi-card` auf `--vi-surface`) an der rechten Seite. Und weil das
+     Grid weiter zwei Spalten aufspannte, bekam der nachfolgende Inhalt
+     nur noch die linke — das „Eingabefenster weg".
+
+     `_recAus()` räumt jetzt beides zusammen ab. Wer das Aufnahmefenster
+     versteckt, versteckt seine Spalte mit; die Bühne fällt auf eine
+     Spalte zurück, damit das, was danach kommt, die volle Breite hat. */
+  function _recAus() {
+    var rec = $('vi-rec'); if (rec) rec.style.display = 'none';
+    var st = $('vi-frei-stand'); if (st) st.style.display = 'none';
+    var b = document.querySelector('.vi-frei-buehne');
+    if (b) b.style.display = 'block';
+  }
+
   function _startkarte(OA) {
     _startkarteStil();
-    var rec = $('vi-rec'); if (rec) rec.style.display = 'none';
+    _recAus();
     var nx = $('vi-next'); if (nx) nx.style.display = 'none';
     var body = document.querySelector('.oabi-ov.vi-mode .oabi-body');
     if (!body) { startRecording(); return; }   /* im Zweifel wie bisher */
@@ -6503,7 +6529,7 @@
     _rf = { offen: luecken, i: 0, data: data, catalog: catalog, OA: OA, alle: !!alle,
             quelle: {}, halte: {}, abrufGetan: {} };   /* v1288 */
     if (!_rf.data.fields) _rf.data.fields = {};
-    var rec = $('vi-rec'); if (rec) rec.style.display = 'none';
+    _recAus();   /* v1302: Aufnahmefenster UND seine Spalte */
     var nx = $('vi-next'); if (nx) nx.style.display = 'none';
     _rfAufbau();
 
@@ -6615,8 +6641,10 @@
       OA.addRow(id, entry.label, disp + mark, raw, _q(id), 'input');
     });
 
-    /* Aufnahme-Panel weg, Tabelle rein, Footer umschalten */
-    var rec = $('vi-rec'); if (rec) rec.style.display = 'none';
+    /* Aufnahme-Panel weg, Tabelle rein, Footer umschalten.
+       v1302: samt der Spalte 'Was schon steht' - sonst bleibt sie als
+       schwarzer Kasten neben der Uebernahme-Tabelle stehen. */
+    _recAus();
     var nx = $('vi-next'); if (nx) nx.style.display = 'none';
     var ap = $('oabi-apply'); if (ap) ap.style.display = '';
     OA.render();  /* renderMergedTable -> #oabi-result, aktiviert oabi-apply */
