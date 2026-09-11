@@ -529,5 +529,9 @@ if (!window._wlc) {
   global.DealPilotMB = { run: run, restore: restore, /* v752-api */
     getData: function () { return (D && D.mw) ? { D: D, mode: mode } : null; },
     setMode: function (m) { mode = (m === 'mid') ? 'med' : m; try { persistLight(); } catch (e) {} },
-    apply: applyToFields };
+    apply: applyToFields,
+    /* v1316: Pruefhaken. Ein echter Abruf kostet Guthaben - ohne diese
+       beiden laesst sich die Zuordnung nur durch Bezahlen messen. */
+    _mapCard: mapCard,
+    _autoLage: function (payload) { if (payload) D = mapCard(payload); return autoLage(); } };
 })(window);
