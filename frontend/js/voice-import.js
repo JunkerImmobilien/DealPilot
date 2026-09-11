@@ -4632,7 +4632,15 @@
       var hin = function () {
         try {
           var chat = $('vi-rf-chat'); if (!chat) return;
-          chat.scrollTop = Math.max(0, b.offsetTop - 8);
+          /* v1306d: NICHT `offsetTop` — das zählt ab dem nächsten
+             positionierten Vorfahren, und der ist hier nicht der Chat.
+             Gemessen landete die Karte dadurch bei 17 px statt bei 232,
+             also oberhalb des sichtbaren Bereichs.
+
+             Der Abstand zwischen zwei Rechtecken plus der aktuelle
+             Scrollstand ist unabhängig davon, wo `position` gesetzt ist. */
+          var ab = b.getBoundingClientRect().top - chat.getBoundingClientRect().top;
+          chat.scrollTop = Math.max(0, chat.scrollTop + ab - 8);
         } catch (e) {}
       };
       if (window.requestAnimationFrame) requestAnimationFrame(hin);
