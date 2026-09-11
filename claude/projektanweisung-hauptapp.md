@@ -12077,6 +12077,83 @@ hoch.
 **Commits** `63446bf` (v1302), `de73ebc` (v1302b), `d17c5d3` (v1303).
 Gold-Audit RC=0. Auf Staging, **nicht auf Prod**.
 
+## Rollout-Journal · 11.09.2026, siebter Teil — `v1304`
+
+Marcels Befund, diesmal **mit Bild**: `design/mockups/sp2.png` (13:51) —
+der erste Upload, der ankam.
+
+*„nach Eingabe der Adresse per Sprache kann ich unten nicht auswählen, man
+kann auch nicht runter scrollen."*
+
+Das Bild zeigt es eindeutig: die Aktionsleiste („Stimmt die Adresse?") ist
+am unteren Rand **angeschnitten**, darunter fehlen Mikrofonzeile,
+Eingabefeld und die beiden Knöpfe **ganz**. Sichtbar ist nur noch
+„Abbrechen". Der Verlauf läuft über die volle Höhe, ohne eigenen
+Scrollbalken.
+
+### Die Ursache ist meine aus `v1300b`
+
+In `_rfHost()` stand:
+
+```js
+rec.parentNode.insertBefore(h, rec.nextSibling)
+```
+
+Der geführte Dialog wurde als **Geschwister von `vi-rec`** eingehängt. Bis
+`v1300b` war dessen Elternteil `oabi-body` — seit ich `.vi-frei-buehne` um
+`vi-rec` gelegt habe, ist es die Bühne. **Der ganze geführte Dialog landete
+also im Behälter für den freien Weg.**
+
+Damit riss die Kette, die ihn scrollen lässt:
+
+```css
+.vi-dialog .oabi-body { display:flex; flex-direction:column; overflow:hidden }
+.vi-dialog #vi-frage  { flex:1 1 auto; min-height:0 }
+```
+
+Beide setzen voraus, dass `#vi-frage` ein **direktes Kind** von
+`.oabi-body` ist. Eine Ebene dazwischen, und der Chat bekommt seine Höhe
+nicht mehr vom Körper, sondern wächst mit dem Inhalt. Das Modal wird höher
+als das Fenster, und unten fällt heraus, was nicht mehr hineinpasst — genau
+das, was Marcel nicht mehr anklicken konnte.
+
+**`insertBefore` an einem Geschwister ist bequem, macht die Einhängung aber
+von einer Struktur abhängig, die jemand später ändert.** Jetzt hängt
+`#vi-frage` ausdrücklich am Körper — hinter der Bühne, falls es sie gibt,
+sonst ans Ende.
+
+### Nachgemessen
+
+| | oben | unten |
+|---|---|---|
+| Aktionsleiste | 656 | 763 |
+| Mikrofon | 771 | 820 |
+| Eingabefeld | 826 | 862 |
+| „Weiß ich nicht" · „Fertig" | 868 | 896 |
+| Fußleiste | 916 | 972 |
+
+Fenster 987 px, Modal endet bei 973. `allesImBild: true`,
+`chatScrollt: true`.
+
+**Gegenprobe auf dem Tablet** (767 px, weil ich die DOM-Struktur angefasst
+habe): `#vi-frage` direktes Kind, Modal 994 bei 1024 px Fensterhöhe,
+Knöpfe enden bei 929, Chat scrollt, Bühne einspaltig.
+
+### Die Lehre
+
+Das ist der **dritte** Fehler in Folge aus derselben Änderung — erst die
+Spalte, die stehenblieb (`v1302`), dann das fehlende Gegenstück
+(`v1302b`), jetzt die zerrissene Flex-Kette. Alle drei stammen daher, dass
+`v1300b` einen **neuen Behälter in eine bestehende Hierarchie** geschoben
+hat.
+
+Wer das tut, ändert nicht nur das Aussehen: er ändert `parentNode` für
+jeden, der sich daran orientiert, und die Vorfahrenkette für jede Regel,
+die auf `>` oder auf Flex-Vererbung baut. **Beides gehört vor dem Einbau
+geprüft**, nicht nach dem dritten Bild vom Nutzer.
+
+**Commit** `f632c9b`. Auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

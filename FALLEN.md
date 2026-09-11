@@ -2288,3 +2288,33 @@ findet den Grund.
 Und gemessen wird im **gleich-Origin-iframe**. Das Fenster kleiner zu
 ziehen wirkt auf Media-Queries nicht zuverlässig — der Rahmen muss echt
 sein, sonst prüft man eine Breite, die der Browser nie auswertet.
+
+## Ein neuer Behälter verschiebt `parentNode` für alle anderen
+
+Eine neue Spalte kam neben ein bestehendes Element — dafür wurde ein
+Behälter um beide gelegt. Optisch genau richtig.
+
+Drei Fehler in Folge kamen daraus, alle erst beim Nutzer sichtbar:
+
+1. Der Behälter blieb als leerer Kasten stehen, wenn sein Inhalt versteckt
+   wurde (`display:none` galt nur dem Inhalt).
+2. Das Gegenstück zum Verstecken fehlte, also blieb nach dem Zurückschalten
+   alles unsichtbar.
+3. **Ein ganz anderes Modul hängte sich per `parentNode.insertBefore` an
+   das umschlossene Element** — und landete damit im neuen Behälter statt
+   im ursprünglichen Elternteil. Die Flex-Kette, die es scrollen ließ,
+   verlangte aber ein DIREKTES Kind. Ergebnis: der Dialog wuchs über das
+   Fenster hinaus, und die Knöpfe unten waren nicht mehr erreichbar.
+
+**Die Regel:** ein neuer Behälter ist ein Eingriff in die Hierarchie, nicht
+in die Optik. Vor dem Einbau wird zweierlei geprüft:
+
+- `grep` nach `parentNode`, `insertBefore`, `nextSibling`, `closest` und
+  `:scope >` auf das umschlossene Element — **wer hängt sich daran?**
+- jede CSS-Regel mit `>` oder mit Flex-/Grid-Vererbung, die vom alten
+  Elternteil ausgeht — **eine Ebene mehr, und sie greift nicht.**
+
+Und wer etwas einhängt, nennt sein Ziel **ausdrücklich** (`body.appendChild`)
+statt es über ein Geschwister zu suchen. `insertBefore(h, x.nextSibling)`
+ist bequem und macht die Einhängung von einer Struktur abhängig, die
+jemand später ändert — ohne zu ahnen, dass er es tut.
