@@ -2548,8 +2548,54 @@
     return Object.keys(k).length ? k : null;
   }
 
+  /* ═══ v1299 · Hören, was gesagt wird — nicht nur, was gefragt war ══════
+     Marcels Gesamtziel vom 11.09.2026: „der sollte das schon verstehen, was
+     ich ihm sage, auch wenn es nicht zu der Frage passt. Dann sollte er
+     nicht immer eine Standardfrage nehmen, sondern gucken, was kann er
+     damit machen, um dann in der App das Passende damit zu gestalten."
+
+     Bis hierher ging an die Auswertung NUR der Katalog der aktuellen Frage.
+     Wer bei der Miete das Baujahr mitnennt, dessen Angabe fiel durch —
+     nicht weil das Modell sie nicht erkannt hätte, sondern weil sie in der
+     Liste der erlaubten Felder gar nicht vorkam. Danach stand da „nichts
+     gefunden, was hierher passt", und der Nutzer sagte es beim nächsten
+     Mal noch einmal.
+
+     WARUM NICHT EINFACH ALLES: mit 192 Feldern im Katalog fängt ein Modell
+     an zu raten — es findet für jedes Wort irgendein Feld. Genau davor
+     schützte die enge Liste, und dieser Schutz bleibt richtig.
+
+     Der Mittelweg ist die REICHWEITE: gefragte Felder zuerst, dann die
+     der nächsten Blöcke, gedeckelt. Was in den nächsten Fragen ohnehin
+     drankommt, darf jetzt schon gehört werden; was weit weg liegt, nicht.
+     Ein früh gesagtes Baujahr landet damit im Feld, und die Frage danach
+     entfällt — `_rfOffeneBloecke` überspringt, was schon steht.
+
+     Die Reihenfolge zählt: das Backend liest die Liste von oben, und was
+     zuerst steht, gewinnt bei Mehrdeutigkeit. Die gefragten Felder stehen
+     deshalb vorn. */
+  var RF_REICHWEITE = 24;   /* Felder insgesamt, inkl. der gefragten */
+
   function _rfKatalog(eintrag, catalog) {
-    return (catalog || []).filter(function (e) { return eintrag.ids.indexOf(e.id) >= 0; });
+    var alle = catalog || [];
+    var ids  = eintrag.ids || [];
+    var dran = alle.filter(function (c) { return ids.indexOf(c.id) >= 0; });
+    if (!_rf || !_rf.offen) return dran;
+
+    /* Die Felder der noch offenen Blöcke, in ihrer Reihenfolge — das ist
+       die Strecke, die ohnehin vor uns liegt. */
+    var kommt = [], gesehen = {};
+    ids.forEach(function (id) { gesehen[id] = 1; });
+    for (var i = _rf.i + 1; i < _rf.offen.length && dran.length + kommt.length < RF_REICHWEITE; i++) {
+      var b = _rf.offen[i];
+      (b && b.ids || []).forEach(function (id) {
+        if (gesehen[id]) return;
+        gesehen[id] = 1;
+        var c = alle.filter(function (x) { return x.id === id; })[0];
+        if (c && dran.length + kommt.length < RF_REICHWEITE) kommt.push(c);
+      });
+    }
+    return dran.concat(kommt);
   }
 
   function _rfStil() {
@@ -2727,14 +2773,21 @@
 
          Alles hier gilt NUR im Sprechlauf-Dialog (`.vi-mode.vi-dialog`),
          damit andere Modale mit derselben Hülle unberührt bleiben. */
-      '.oabi-ov.vi-mode.vi-dialog .bdg-brand{padding-top:10px;padding-bottom:10px}',
-      '.oabi-ov.vi-mode.vi-dialog .bdg-hero{padding:11px 22px 10px}',
-      '.oabi-ov.vi-mode.vi-dialog .bdg-hero h3{font-size:18px;margin:2px 0 3px}',
-      '.oabi-ov.vi-mode.vi-dialog .bdg-hero .bdg-kick{font-size:9.5px}',
-      /* Der Erklärsatz bleibt lesbar, wird aber zur Fußnote statt zum
-         Absatz — er sagt zweimal dasselbe wie die Etappenleiste darunter. */
-      '.oabi-ov.vi-mode.vi-dialog .bdg-hero p{font-size:11.5px;line-height:1.4;opacity:.8;margin:0}',
-      '.oabi-ov.vi-mode.vi-dialog .oabi-foot{padding-top:11px;padding-bottom:11px}',
+      '.oabi-ov.vi-mode.vi-dialog .bdg-brand{padding-top:8px;padding-bottom:8px}',
+      '.oabi-ov.vi-mode.vi-dialog .bdg-hero{padding:9px 22px 8px}',
+      '.oabi-ov.vi-mode.vi-dialog .oabi-head h3{font-size:17px;margin:1px 0 0}',
+      /* NACHGEMESSEN: der Erklärsatz ist `.oabi-sub`, kein `<p>` — eine
+         Regel auf `p` traf hier gar nichts, und `.bdg-hero` wuchs dabei
+         von 101 auf 120 px, statt zu schrumpfen.
+
+         Er verschwindet jetzt ganz, und zwar NUR im geführten Dialog: was
+         er sagt („ich frage der Reihe nach, ‚Weiß ich nicht‘ überspringt,
+         ‚Fertig‘ bringt dich zur Übersicht"), steht zwei Zeilen weiter
+         unten in der ersten Co-Pilot-Blase UND auf den Knöpfen selbst.
+         Dreimal derselbe Hinweis kostet 38 px an der Stelle, an der
+         Marcel mehr sehen will. */
+      '.oabi-ov.vi-mode.vi-dialog .oabi-sub{display:none}',
+      '.oabi-ov.vi-mode.vi-dialog .oabi-foot{padding-top:9px;padding-bottom:9px}',
       /* Der Mikrofon-Streifen: flacher, ohne an Treffsicherheit zu verlieren.
          Die Fläche zum Klicken bleibt über 40 px hoch. */
       '.oabi-ov.vi-mode.vi-dialog .vi-rf-mikro{margin:8px 2px 7px;padding:8px 13px}',
@@ -5669,15 +5722,46 @@
     _rfDenkt(false);
     var e = _rf.offen[_rf.i];
     if (!e) return;
-    var namen = [], teil = [];
+    var namen = [], teil = [], extra = [];
     Object.keys(neu || {}).forEach(function (id) {
-      if (e.ids.indexOf(id) < 0) return;            /* nur was gefragt war */
       var v = neu[id];
       if (v === '' || v == null) return;
+      /* ═══ v1299 · Was nebenbei gesagt wurde, wird BEHALTEN ═════════════
+         Hier stand `if (e.ids.indexOf(id) < 0) return;` — „nur was gefragt
+         war". Zusammen mit dem engen Katalog hiess das: wer bei der Miete
+         das Baujahr mitnennt, sagt es zweimal.
+
+         Jetzt reicht `_rfKatalog` die Felder der naechsten Bloecke mit
+         (RF_REICHWEITE), und was davon zurueckkommt, wird eingetragen
+         statt verworfen. Die Frage selbst gilt weiter erst als
+         beantwortet, wenn IHRE Felder stehen — `teil` prueft unveraendert
+         nur `e.ids`. Nebenbei Gesagtes beschleunigt also, es ueberspringt
+         nichts. */
+      var gefragt = e.ids.indexOf(id) >= 0;
       _rf.data.fields[id] = v;
       var kat = _rf.catalog.filter(function (c) { return c.id === id; })[0];
-      namen.push((kat ? kat.label : id) + ' = ' + v);
+      var name = (kat ? kat.label : id) + ' = ' + v;
+      if (gefragt) namen.push(name); else extra.push(name);
     });
+    /* Nebenbei Gesagtes allein traegt die Frage nicht — aber es soll auch
+       nicht stillschweigend verschwinden. Wer es sagt, sieht, dass es
+       angekommen ist. */
+    if (extra.length) {
+      _rfBlase('co', '<span style="opacity:.85">Das nehme ich gleich mit: <b>' +
+        escH(extra.join(' · ')) + '</b></span>');
+      _rfStandZeichnen();
+    }
+    if (!namen.length && extra.length) {
+      /* Die Frage steht noch offen, aber der Satz war nicht umsonst. */
+      var fehlt = (e.ids || []).filter(function (id) {
+        var w = _rf.data.fields[id];
+        return w === undefined || w === null || w === '';
+      });
+      if (!fehlt.length) { _rfStandZeichnen(); return _rfWeiterGleich(); }
+      _rfBlase('co', 'Hier fehlt mir noch: <b>' + escH(_rfFelderNamen(fehlt)) + '</b>.');
+      if (ausSprache && _fs.an) _fsHoeren(true);
+      return;
+    }
     if (!namen.length) {
       /* v1286: Wurde vorher schon das Profil eingetragen, ist die Frage
          beantwortet - dann ist "nichts entnommen" falsch und verwirrend.
