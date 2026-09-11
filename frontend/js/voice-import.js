@@ -2867,6 +2867,13 @@
       '.vi-sc-mp.minus{background:rgba(184,98,92,.09);border:1px solid rgba(184,98,92,.28)}',
       '.vi-sc-mp>b:first-child{display:block;margin-bottom:4px;',
       '  font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase}',
+      /* v1295 · Wie viel vom Potenzial wirklich erreichbar ist. */
+      '.vi-mp-teil{margin-top:10px;padding-top:9px;border-top:1px dashed rgba(42,39,39,.18)}',
+      '.vi-mp-z{display:flex;align-items:baseline;justify-content:space-between;gap:10px;',
+      '  padding:3px 0;font:400 12.5px/1.5 Inter,system-ui,sans-serif}',
+      '.vi-mp-z i{font-style:normal;opacity:.72}',
+      '.vi-mp-z b{font:700 13px/1.4 "JetBrains Mono",ui-monospace,monospace;white-space:nowrap}',
+      '.vi-mp-teil small{display:block;margin-top:7px;font-size:11px;line-height:1.55;opacity:.68}',
       '.vi-sc-mp.plus>b:first-child{color:#2F7D51}.vi-sc-mp.minus>b:first-child{color:#9E4A45}',
       /* Die Hebel */
       '.vi-sc-hebel{margin-top:12px;padding-top:10px;border-top:1px dashed rgba(42,39,39,.16)}',
@@ -3636,10 +3643,73 @@
     };
   }
 
+  /* ═══ v1295 · Wie viel davon ist WIRKLICH erreichbar ═══════════════════
+     Marcels Punkt: „Vielleicht schaut man dann in der Region auch, ob's da
+     eine Kappungsgrenze ist und ob man dann schon oben liegt und ob man da
+     noch erhoehen koennte."
+
+     Das Mietpotenzial allein beantwortet das nicht. 292 € im Monat klingen
+     nach 292 € — im laufenden Vertrag sind es aber hoechstens, was die
+     KAPPUNGSGRENZE zulaesst: +20 % in drei Jahren, in Gebieten mit
+     angespanntem Wohnungsmarkt +15 %, und in beiden Faellen nie ueber die
+     ortsuebliche Vergleichsmiete hinaus.
+
+     Also wird die Luecke GETEILT:
+
+       im Vertrag erreichbar  = min(Marktmiete, Ist x 1,20) - Ist
+       erst bei Neuvermietung = der Rest
+
+     GERECHNET WIRD MIT 20 %, nicht mit 15. Ob ein Ort als angespannt gilt,
+     steht in einer Verordnung des jeweiligen Landes, die wir nicht fuehren
+     — und die 15 % zu unterstellen, wo sie vielleicht nicht gelten, waere
+     eine erfundene Einschraenkung. Der Hinweis steht daneben: wer in einem
+     solchen Gebiet kauft, rechnet mit 15.
+
+     DIE MARKTMIETE IST DIE GRENZE, nicht ein Wunsch: liegt die Ist-Miete
+     schon nahe am Markt, ist die Kappungsgrenze gar nicht das Hindernis —
+     dann steht da „du liegst schon fast oben", und das ist die ehrlichere
+     Auskunft als eine Prozentzahl. */
+  function _rfMietSpielraum(P) {
+    if (!P || !P.ist || !P.markt || P.diffMon <= 0) return null;
+    var wfl = _rfNum(_rfFeld('wfl'));
+    if (!wfl || wfl <= 0) return null;
+    var istMon    = P.ist * wfl;
+    var marktMon  = P.markt * wfl;
+    var kappMon   = istMon * 1.20;              /* Kappungsgrenze, Regelfall */
+    var kapp15Mon = istMon * 1.15;              /* angespannter Markt */
+    var imVertrag   = Math.max(0, Math.min(marktMon, kappMon) - istMon);
+    var imVertrag15 = Math.max(0, Math.min(marktMon, kapp15Mon) - istMon);
+    var rest        = Math.max(0, marktMon - istMon - imVertrag);
+    return {
+      istMon: istMon, marktMon: marktMon,
+      imVertrag: imVertrag, imVertrag15: imVertrag15, rest: rest,
+      /* Bremst die Kappungsgrenze, oder ist der Markt schon fast erreicht? */
+      gebremst: kappMon < marktMon,
+      ausgereizt: (marktMon - istMon) / istMon < 0.05
+    };
+  }
+
   /* Was mit dem Potenzial anzufangen ist — Mietrecht in Stichworten,
      ausdruecklich als Hinweis, nicht als Beratung. */
   function _rfMietWege(P) {
     if (!P || P.diffMon <= 20) return '';
+    var S = _rfMietSpielraum(P);
+    var kopf = '';
+    if (S) {
+      kopf = '<div class="vi-mp-teil">' +
+        (S.gebremst
+          ? '<div class="vi-mp-z"><i>Im laufenden Vertrag</i><b>bis ' + _euroKurz(S.imVertrag) + '/Mon</b></div>' +
+            '<div class="vi-mp-z"><i>Erst bei Neuvermietung</i><b>' + _euroKurz(S.rest) + '/Mon</b></div>' +
+            '<small>Die <b>Kappungsgrenze</b> deckelt die Anhebung auf 20 % in drei Jahren — und nie über ' +
+            'die ortsübliche Vergleichsmiete hinaus. In Gebieten mit angespanntem Wohnungsmarkt sind es ' +
+            'nur 15 %, dann wären es <b>' + _euroKurz(S.imVertrag15) + '/Mon</b>. Ob dein Ort dazugehört, ' +
+            'steht in der Verordnung deines Bundeslandes.</small>'
+          : '<div class="vi-mp-z"><i>Im laufenden Vertrag erreichbar</i><b>' + _euroKurz(S.imVertrag) + '/Mon</b></div>' +
+            '<small>Die Kappungsgrenze (20 % in drei Jahren) bremst hier <b>nicht</b> — der Abstand zur ' +
+            'ortsüblichen Vergleichsmiete ist kleiner als das, was sie zuließe. Die Miete ist die Grenze, ' +
+            'nicht das Gesetz.</small>') +
+        '</div>';
+    }
     var wege = [];
     wege.push('<b>Bei Neuvermietung</b> ist der Sprung sofort möglich — dort begrenzt nur eine ' +
               'etwaige Mietpreisbremse, nicht die Kappungsgrenze.');
@@ -3652,7 +3722,8 @@
               '<b>nicht</b> zusätzlich umlegen. Das ändert die Rechnung für eine Sanierung.');
     wege.push('<b>Nach einer Modernisierung</b> sind bis zu 8 % der Kosten jährlich umlegbar, ' +
               'gedeckelt auf 3 €/m² in sechs Jahren (bei Mieten unter 7 €/m²: 2 €).');
-    return '<details class="vi-sc-mehr"><summary>Wie du da hinkommst</summary>' +
+    return kopf +
+           '<details class="vi-sc-mehr"><summary>Wie du da hinkommst</summary>' +
            wege.map(function (w) { return '<div class="vi-lg-t">' + w + '</div>'; }).join('') +
            '<div class="vi-lg-t" style="opacity:.6">Das sind Anhaltspunkte, keine Rechtsberatung — ' +
            'welcher Weg offensteht, hängt an deinem Mietvertrag und am Ort.</div>' +
