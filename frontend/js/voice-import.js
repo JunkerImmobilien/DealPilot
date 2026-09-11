@@ -6239,14 +6239,19 @@
      einmal, nicht das Wort „nein". */
   function _rfAdresseAntwort(t, ausSprache) {
     if (!_rf || !_rf.adresseFrage) return false;
-    if (RF_JA.test(t) || /^(stimmt|passt|richtig|genau|korrekt)\b[\s.!,]*$/i.test(t)) {
+    /* v1305: `_istZustimmung` statt eines Musters, das auf ein einzelnes
+       Wort endet — gesprochen sagt niemand nur „ja". */
+    if (RF_JA.test(t) || _istZustimmung(t)) {
       _rf.adresseFrage = 0;
       _rfAktionWeg('adresse');
       _rfBlase('ich', escH(t));
       _rfWeiter();
       return true;
     }
-    if (RF_NEIN_ANGEBOT.test(t) || /^(nein|falsch|nicht ganz|so nicht)\b[\s.!,]*$/i.test(t)) {
+    /* v1305: dasselbe für die Ablehnung. „nein stimmt nicht", „nein das
+       ist falsch" — auch hier endet der Satz selten beim „nein". */
+    if (RF_NEIN_ANGEBOT.test(t) || _istAblehnung(t) ||
+        /^(nein|falsch|nicht ganz|so nicht)\b[\s.!,]*$/i.test(t)) {
       _rfBlase('ich', escH(t));
       _rfBlase('co', 'Dann sag mir die Adresse bitte noch einmal — Straße, Hausnummer, Postleitzahl und Ort.');
       /* Die alten Werte raus: sonst mischt sich die falsche Strasse mit
@@ -6344,6 +6349,71 @@
   var RF_JA = /^(ja|jo|jup|klar|gerne|gern|okay|ok|mach(\s+(das|mal))?|los|bitte|hol(\s+(sie|ihn|das|den|mal))?|holen|unbedingt|auf jeden fall|ja bitte|ja gerne|ja klar)\b[\s.!,]*$/i;
   var RF_NEIN_ANGEBOT = /^(nein|nee|ne|danke|nein danke|kein bedarf|brauch(e)? ich nicht|lass mal|lass(en)? wir|sp(ä|ae)ter|nicht n(ö|oe)tig|ohne)\b[\s.!,]*$/i;
 
+  /* ═══ v1305 · „ja stimmt" ist auch ein Ja ═══════════════════════════════
+     Marcels Befund vom 11.09.2026: „dann hab ich die Adresse diktiert, er
+     fragt ‚Stimmt das so?‘, ich sage ‚ja stimmt‘ — und er fängt wieder an,
+     nach der Adresse zu fragen. Die Bestätigung muss auch per Sprache
+     gehen."
+
+     `RF_JA` verlangt, dass der Satz MIT dem Ja ENDET (`\b[\s.!,]*$`).
+     „ja stimmt" hat ein Wort zu viel; das zweite Muster verlangte
+     „stimmt" am ANFANG. Der Satz fiel durch beide, galt damit als
+     Korrektur, ging an die Auswertung — und die fand in „ja stimmt" keine
+     Adresse. Also kam die Frage noch einmal.
+
+     GESPROCHEN SAGT NIEMAND NUR „JA". Man sagt „ja stimmt", „ja genau so",
+     „passt so", „jo, richtig". Ein Muster, das auf ein einzelnes Wort
+     endet, ist für getippte Antworten gebaut, nicht für gesprochene.
+
+     `_istZustimmung` prüft deshalb, ob der Satz AUSSCHLIESSLICH aus
+     Zustimmungswörtern besteht — in beliebiger Zahl und Folge.
+
+     DIE GRENZE IST WICHTIG: „ja, aber die Hausnummer ist zwölf" darf KEINE
+     Bestätigung sein. Deshalb steigt die Prüfung bei jedem Wort aus, das
+     nicht in der Liste steht — und Ziffern stehen nie darin. Ein „aber"
+     ebenso wenig. Wer einschränkt, bestätigt nicht. */
+  var RF_ZU_WORT = /^(ja|jo|jup|jawohl|yep|yes|genau|stimmt|stimmts|richtig|korrekt|passt|passt?e|perfekt|super|prima|gut|klar|sicher|absolut|exakt|so|das|es|ist|war|alles|voll|total|sehr|schon|damit|einverstanden|bestaetigt|best(ä|ae)tigt|ok|okay|okey|joa|mhm|hm|aha|eben)$/i;
+
+  /* Das Gegenstück. Wer „nein, stimmt nicht" sagt, lehnt ab — auch wenn
+     „nicht" darin steht, das die Zustimmung ausschliesst. Deshalb eine
+     eigene Wortliste statt einer Verneinung der ersten.
+
+     Ziffern beenden auch hier die Prüfung: „nein, Hausnummer zwölf" ist
+     eine Korrektur mit Inhalt und gehört an die Auswertung, nicht in die
+     Schleife „sag es noch einmal". */
+  var RF_AB_WORT = /^(nein|nee|ne|n(ö|oe)|falsch|nicht|nichts|stimmt|so|das|es|ist|war|leider|garnicht|gar|quatsch|unsinn|bl(ö|oe)dsinn|daneben|vertan|versprochen|ganz)$/i;
+
+  function _istAblehnung(text) {
+    var t = String(text || '').trim();
+    if (!t) return false;
+    if (/\d/.test(t)) return false;
+    var worte = t.toLowerCase().replace(/[.,!?;:„“"']/g, ' ').split(/\s+/).filter(Boolean);
+    if (!worte.length || worte.length > 6) return false;
+    var kern = 0;
+    for (var i = 0; i < worte.length; i++) {
+      if (!RF_AB_WORT.test(worte[i])) return false;
+      if (/^(nein|nee|ne|n(ö|oe)|falsch|quatsch|unsinn|bl(ö|oe)dsinn|daneben)$/i.test(worte[i])) kern++;
+    }
+    return kern > 0;
+  }
+
+  function _istZustimmung(text) {
+    var t = String(text || '').trim();
+    if (!t) return false;
+    if (/\d/.test(t)) return false;              /* Zahlen = Korrektur */
+    if (/\b(aber|jedoch|allerdings|nur|au(ss|ß)er|nicht|kein)\b/i.test(t)) return false;
+    var worte = t.toLowerCase().replace(/[.,!?;:„“"']/g, ' ').split(/\s+/).filter(Boolean);
+    if (!worte.length || worte.length > 6) return false;
+    /* Mindestens EIN echtes Zustimmungswort — „so ist das" allein wäre
+       sonst eine Bestätigung, obwohl darin keine steht. */
+    var kern = 0;
+    for (var i = 0; i < worte.length; i++) {
+      if (!RF_ZU_WORT.test(worte[i])) return false;
+      if (/^(ja|jo|jup|jawohl|yep|yes|genau|stimmt|stimmts|richtig|korrekt|passt|perfekt|einverstanden|ok|okay|okey|exakt|absolut)$/i.test(worte[i])) kern++;
+    }
+    return kern > 0;
+  }
+
   function _rfVorabErkennen(text, ausSprache) {
     var t = String(text || '').trim();
     if (!t) return true;
@@ -6354,7 +6424,8 @@
        eigenen, und einer davon vergass die Fortsetzung (v1290). Wer die
        Aktion beim Namen nennt („hol den Bodenrichtwert"), bekommt sie
        auch dann, wenn mehrere offenstehen. */
-    if ((_rf.aktionen || []).length && RF_JA.test(t)) {
+    /* v1305: auch hier ein gesprochenes „ja gerne, mach das" statt nur „ja". */
+    if ((_rf.aktionen || []).length && (RF_JA.test(t) || _istZustimmung(t))) {
       if (_rfAktionJa(t)) return true;
     }
     if ((_rf.aktionen || []).length > 1 && /^(hol|nimm|mach|recherchier|bodenrichtwert|die lage|marktpreis)/i.test(t)) {
@@ -6363,7 +6434,7 @@
     /* v1291b: „nein danke" raeumt die Angebote weg, ohne die Frage zu
        ueberspringen. Wer ein Angebot ablehnt, will nicht die Frage
        ueberspringen — er will nur den Abruf nicht. */
-    if ((_rf.aktionen || []).length && RF_NEIN_ANGEBOT.test(t)) {
+    if ((_rf.aktionen || []).length && (RF_NEIN_ANGEBOT.test(t) || _istAblehnung(t))) {
       _rf.abrufOffen = null;
       (_rf.aktionen || []).slice().forEach(function (a) { _rfAktionWeg(a.art); });
       _rfBlase('ich', escH(t));
@@ -6377,7 +6448,8 @@
        Genau das war Marcels Wunsch: „dass man aber auch andere Sachen
        fragen kann dann zu der Wohnung." */
     if (_rf.abschlussOffen) {
-      if (RF_JA.test(t) || /^(weiter|(ü|ue)bersicht|zur (tabelle|(ü|ue)bersicht)|fertig|passt|(ü|ue)bernehmen)\b[\s.!,]*$/i.test(t)) {
+      if (RF_JA.test(t) || _istZustimmung(t) ||
+          /^(weiter|(ü|ue)bersicht|zur (tabelle|(ü|ue)bersicht)|fertig|passt|(ü|ue)bernehmen)\b[\s.!,]*$/i.test(t)) {
         _rfBlase('ich', escH(t));
         _rfZurTabelle();
         return true;
