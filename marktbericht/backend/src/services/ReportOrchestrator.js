@@ -779,6 +779,21 @@ export const ReportOrchestrator = {
       dealpilot: dealpilotMeta, // berechneter DealScore + KI-Analyse (Zweitmeinung)
       rent_trend_pct: insights && insights.series ? insights.series.rent_cagr_pct : null,
       price_trend_pct: insights && insights.series ? insights.series.price_cagr_pct : null,
+      /* v1316 - Marcels Frage: "wenn ich ganz am anfang die erweiterte
+         marktpreisindikation ausgewaehlt habe sollte er auch die daten fuer
+         bevoelkerung micro und makrolage haben warum fuellt er das nicht
+         automatisch aus? fehlen ihm werte?"
+
+         Gemessen: die Werte waren DA, sie kamen nur nie vorn an. Destatis
+         liefert bevoelkerung_trend (Kreis Herford: +0,152 Prozent pro Jahr,
+         live geprueft am 11.09.2026), die Angebotsdauer steckt in
+         insights.dynamics - beides blieb im Bericht stehen, statt ins
+         Formular zu wandern. Jetzt stehen sie flach im Payload, damit die
+         Karte sie ohne Umweg lesen kann. */
+      bevoelkerung_trend_pct: (macroRaw && macroRaw.metrics && macroRaw.metrics.bevoelkerung_trend != null)
+        ? macroRaw.metrics.bevoelkerung_trend : null,
+      days_on_market: (insights && insights.dynamics && insights.dynamics.days_on_market != null)
+        ? insights.dynamics.days_on_market : null,
       meta: {
         generated_at: new Date().toISOString(),
         sources: ['geoapify', 'overpass', 'geomap', (landValue && landValue.available) ? 'boris-nrw' : null].filter(Boolean),
