@@ -122,7 +122,7 @@ router.get('/balance', userAuth, async (req, res) => {
 
 router.post('/checkout', userAuth, async (req, res) => {
   const db = req.app.get('db');
-  const { pack_id } = req.body || {};
+  const { pack_id, menge } = req.body || {};
 
   if (!stripe) {
     return res.status(500).json({ error: 'stripe_not_configured' });
@@ -134,7 +134,7 @@ router.post('/checkout', userAuth, async (req, res) => {
      ueberschneiden und der alte Weg sonst mit `invalid_pack` abbraeche —
      genau das tat er bis v1183 bei jedem einzelnen Kaufversuch. */
   if (bewertungsKatalog.istBewertungsSku(pack_id)) {
-    return _checkoutBewertung(req, res, db, pack_id);
+    return _checkoutBewertung(req, res, db, pack_id, menge);
   }
 
   let pack = getPack(pack_id);
@@ -242,7 +242,7 @@ router.post('/checkout', userAuth, async (req, res) => {
    Der Kauf-Eintrag entsteht hier als `pending`; auf `completed` setzt ihn
    erst der Webhook, und zwar in demselben Zug, in dem er gutschreibt.
    Wer ihn hier schon fertig meldete, haette eine Kaufhistorie ohne Ware. */
-async function _checkoutBewertung(req, res, db, sku) {
+async function _checkoutBewertung(req, res, db, sku, mengeRoh) {
   let eintrag;
   try {
     eintrag = await bewertungsKatalog.getBySku(sku);
@@ -253,6 +253,25 @@ async function _checkoutBewertung(req, res, db, sku) {
   if (!eintrag) {
     return res.status(400).json({ error: 'invalid_pack', sku: sku });
   }
+
+  /* ═══ v1296 · Der Kunde waehlt die Menge ═══════════════════════════════
+     Marcels Vorgabe vom 11.09.2026: „Ich wuerde gerne was haben, wo der
+     Kunde selber auswaehlen kann, wieviele er nachkaufen moechte."
+
+     Die Menge geht als `quantity` an die Stripe-Position. Der Webhook
+     rechnet sie bereits mit (`paketAusMeta(meta, it.quantity)`) — er war
+     von Anfang an dafuer gebaut, nur schickte niemand je etwas anderes
+     als 1.
+
+     DIE OBERGRENZE IST KEINE SCHIKANE, SONDERN EIN RIEGEL. `menge` kommt
+     aus dem Browser; ohne Deckel kauft ein manipulierter Aufruf 100.000
+     Bewertungen in einem Zug, und der Webhook schreibt sie gut. 25 ist
+     hoch genug fuer jeden echten Bedarf (25 x Pro-Nachkauf sind 375
+     Bewertungen) und niedrig genug, dass ein Fehlgriff keine Katastrophe
+     ist. Was darueber liegt, wird GEKAPPT statt abgelehnt: wer sich
+     vertippt, soll nicht vor einem Fehler stehen. */
+  const MENGE_MAX = 25;
+  const menge = Math.min(MENGE_MAX, Math.max(1, parseInt(mengeRoh, 10) || 1));
 
   try {
     /* 1) Wer darf zukaufen?
@@ -297,19 +316,24 @@ async function _checkoutBewertung(req, res, db, sku) {
     const user = userResult.rows[0];
 
     /* 2) Die Sitzung. `paket` faehrt als Metadatum mit, aber nur als
-       Rueckfall — der Webhook liest die Menge aus den Positionen. */
+       Rueckfall — der Webhook liest die Menge aus den Positionen.
+       v1296: `menge` faehrt SEPARAT mit. Der Rueckfall las bisher nur
+       `paket` und haette bei Menge 3 genau eine Gutschrift gemacht —
+       ein stiller Fehlbetrag genau dann, wenn Stripe die Positionen
+       nicht hergibt. */
     const successBase = process.env.APP_URL || process.env.FRONTEND_URL || `https://${req.headers.host}`;
     const meta = {
       user_id: user.id,
       sku: eintrag.sku,
       lookup_key: eintrag.lookup_key,
       paket: JSON.stringify(eintrag.paket),
+      menge: String(menge),
       type: 'bewertung'
     };
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
-      line_items: [{ price: eintrag.price_id, quantity: 1 }],
+      line_items: [{ price: eintrag.price_id, quantity: menge }],
       customer_email: !userPlan.stripe_customer_id ? user.email : undefined,
       customer: userPlan.stripe_customer_id || undefined,
       client_reference_id: user.id,
@@ -325,18 +349,22 @@ async function _checkoutBewertung(req, res, db, sku) {
         (user_id, pack_id, credits_granted, amount_cents, currency, stripe_session_id, status, kind)
       VALUES ($1, $2, $3, $4, $5, $6, 'pending', 'bewertung')
     `, [
-      user.id, eintrag.sku, bewertungsKatalog.summe(eintrag.paket),
-      eintrag.amount_cents, eintrag.currency, session.id
+      /* v1296: die Historie fuehrt das GEKAUFTE, nicht den Listenpreis —
+         bei Menge 3 sind es drei Pakete und der dreifache Betrag. */
+      user.id, eintrag.sku, bewertungsKatalog.summe(eintrag.paket) * menge,
+      eintrag.amount_cents * menge, eintrag.currency, session.id
     ]);
 
     return res.json({
       url: session.url,
       session_id: session.id,
+      menge: menge,
       pack: {
         id: eintrag.sku,
         label: eintrag.label,
         paket: eintrag.paket,
-        amount_cents: eintrag.amount_cents
+        amount_cents: eintrag.amount_cents,
+        amount_cents_gesamt: eintrag.amount_cents * menge
       }
     });
   } catch (err) {

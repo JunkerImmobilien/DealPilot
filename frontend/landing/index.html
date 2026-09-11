@@ -2852,7 +2852,7 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
             '<span class="dp-pill dp-pill-alt">Bewertungen nachkaufen</span>' +
             '<h2 class="dp-h2">Aufgebraucht? Einfach nachlegen.</h2>' +
             '<p class="dp-sub">' +
-              '<strong>Gezählt werden Bewertungen, getrennt nach Art.</strong> Dein Plan setzt sie monatlich neu (Starter 5 · Investor 5 · 5 · Pro 5 · 5 · 5) — was du nicht nutzt, wandert ins Guthaben; Zugekauftes verfällt nie und wird zuletzt verbraucht.' +
+              '<strong>Gezählt werden Bewertungen, getrennt nach Art.</strong> Dein Plan setzt sie monatlich neu (Starter 5 · Investor 5 · 5 · Pro 5 · 5 · 5) — was du im Monat nicht nutzt, verfällt zum Monatsende. Zugekauftes verfällt nie und wird erst verbraucht, wenn dein Monatskontingent leer ist.' +
             '</p>' +
           '</div>' +
           '<div class="dp-credits-grid dp-nk-grid">' +
@@ -2866,8 +2866,7 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
               _einzelZeile('Marktpreisindikation', '0,90') +
               _einzelZeile('Erweiterte Marktpreisindikation', '1,90') +
               _einzelZeile('Wertermittlung nach ImmoWertV', '3,90') +
-              _einzelZeile('Marktwert-Abruf · Bewertungspartner', '5,90') +
-              _einzelZeile('Marktwert-Abruf · zweiter Partner', '9,90') +
+              /* v1296: die beiden Marktwert-Abrufe (5,90 / 9,90) sind raus. */
             '</div>' +
           '</div>' +
           '<p class="dp-note" style="text-align:center;margin-top:14px">Nachkaufen geht ab dem Starter-Plan · Zugekauftes verfällt nie · kein Abo.</p>' +
@@ -3734,7 +3733,7 @@ html{scroll-behavior:smooth}
         DealPilot rechnet in <strong>Bewertungen</strong> — und zwar getrennt nach Art, weil sie unterschiedlich aufwendig sind: die <strong>Marktpreisindikation</strong> als schneller Marktabgleich, die <strong>erweiterte Marktpreisindikation</strong> mit Vergleichswerten und Korridor, und die <strong>Wertermittlung nach ImmoWertV</strong> als vollständiges Verfahren mit Modellvermerken. Jede Art hat ihr eigenes Kontingent. Wir rechnen so statt mit einer Flatrate, weil die Verfahren für uns echte Kosten bedeuten — und ein Pauschalmodell entweder zu teuer für Gelegenheitsnutzer wäre oder zu beschränkt für Power-Nutzer.
       </p>
       <p>
-        Dein Plan setzt die Kontingente jeden Monat neu (Starter: 5 Marktpreisindikationen, Investor zusätzlich 5 erweiterte, Pro zusätzlich 5 Wertermittlungen). <strong>Was du nicht nutzt, verfällt nicht</strong> — es wandert ins Guthaben, bis zum Dreifachen deines Monatskontingents. Brauchst du mehr, kaufst du nach: dein Monatskontingent noch einmal für ein Viertel deines Monatsbeitrags (Starter 5,00 €, Investor 8,75 €, Pro 12,50 €) — oder einzeln ab 0,90 € für eine Marktpreisindikation. Zugekaufte Bewertungen verfallen nie und werden zuletzt verbraucht.
+        Dein Plan setzt die Kontingente jeden Monat neu (Starter: 5 Marktpreisindikationen, Investor zusätzlich 5 erweiterte, Pro zusätzlich 5 Wertermittlungen). <strong>Was du im Monat nicht nutzt, verfällt zum Monatsende</strong> — das Kontingent gehört zum Plan, nicht auf ein Konto. Brauchst du mehr, kaufst du nach: dein Monatskontingent noch einmal für ein Viertel deines Monatsbeitrags (Starter 5,00 €, Investor 8,75 €, Pro 12,50 €) — oder einzeln ab 0,90 € für eine Marktpreisindikation. Zugekaufte Bewertungen verfallen nie und werden zuletzt verbraucht.
       </p>
       <p>
         Die kleinen KI-Hilfen — Spracheingabe, Beleg-Import, Bodenrichtwert-Abruf, Feldvorschläge — sind <strong>in jedem Plan enthalten</strong> und zählen gegen kein Kontingent.
@@ -3868,7 +3867,7 @@ html{scroll-behavior:smooth}
         Eine Kalkulation ist nur so gut wie ihre Annahmen. DealPilot holt deshalb echte Marktdaten in die Analyse: <strong>Live-Marktzinsen</strong> für realistische Finanzierungskonditionen, den automatischen <strong>Mietspiegel-Vergleich</strong> für deine Mietansätze und den <strong>Bodenrichtwert-Abruf</strong> für die Einordnung des Grundstücksanteils.
       </p>
       <p>
-        Für die Preisfrage selbst gibt es die <strong>Marktwert-Indikation</strong> über <strong>unabhängige Bewertungspartner</strong> — dieselben Datengrundlagen, mit denen Banken und Sachverständige arbeiten. Die Abrufe kaufst du einzeln, ohne Abo-Bindung an einen Datenanbieter. So siehst du schwarz auf weiß, ob der Angebotspreis im Marktkorridor liegt, bevor du verhandelst.
+        Für die Preisfrage selbst gibt es <strong>drei Stufen</strong> — von der schnellen <strong>Marktpreisindikation</strong> über die <strong>erweiterte Indikation mit Korridor</strong> bis zur vollen <strong>Wertermittlung nach ImmoWertV</strong>, dem Verfahren, mit dem auch Sachverständige arbeiten. Jede Stufe liegt in deinem Monatskontingent; reicht es nicht, kaufst du nach, ohne zusätzliche Abo-Bindung. So siehst du schwarz auf weiß, ob der Angebotspreis im Marktkorridor liegt, bevor du verhandelst.
       </p>
     </div>
   </section>
@@ -3898,7 +3897,7 @@ html{scroll-behavior:smooth}
       <div class="head">
         <span class="eye">// Dein Kontingent</span>
         <h2>Drei Tiefen, <span class="ac">du entscheidest.</span></h2>
-        <p>Gez&auml;hlt werden <strong>Bewertungen</strong>, getrennt nach Art &mdash; weil sie unterschiedlich aufwendig sind. Dein Plan setzt die Kontingente jeden Monat neu. <strong>Was du nicht nutzt, verf&auml;llt nicht</strong>, es wandert ins Guthaben.</p>
+        <p>Gez&auml;hlt werden <strong>Bewertungen</strong>, getrennt nach Art &mdash; weil sie unterschiedlich aufwendig sind. Dein Plan setzt die Kontingente jeden Monat neu. <strong>Was du im Monat nicht nutzt, verf&auml;llt zum Monatsende</strong>. Nur Zugekauftes bleibt dauerhaft.</p>
       </div>
 
       <div class="lu-sub">Monatliches Kontingent je Plan</div>
@@ -3914,8 +3913,15 @@ html{scroll-behavior:smooth}
         <div class="lu-cost"><span class="c-n">Marktpreisindikation &middot; schneller Marktabgleich</span><span class="c-v">0,90&nbsp;&euro;</span></div>
         <div class="lu-cost"><span class="c-n">Erweiterte Marktpreisindikation &middot; mit Korridor</span><span class="c-v">1,90&nbsp;&euro;</span></div>
         <div class="lu-cost"><span class="c-n">Wertermittlung nach ImmoWertV &middot; volles Verfahren</span><span class="c-v">3,90&nbsp;&euro;</span></div>
-        <div class="lu-cost"><span class="c-n">Marktwert-Abruf &middot; unabh&auml;ngiger Bewertungspartner</span><span class="c-v">5,90&nbsp;&euro;</span></div>
-        <div class="lu-cost"><span class="c-n">Marktwert-Abruf &middot; zweiter Bewertungspartner</span><span class="c-v">9,90&nbsp;&euro;</span></div>
+        <!-- v1296: Hier standen zwei weitere Zeilen - Marktwert-Abruf beim
+             Bewertungspartner (5,90) und beim zweiten (9,90). Sie sind raus:
+             Marcels Entscheidung vom 11.09.2026, die Abrufe werden erstmal
+             nicht angeboten.
+             Nebenbei stimmt damit die Ueberschrift wieder. Sie sagte "Die
+             drei Bewertungsarten" und darunter standen FUENF - der
+             Widerspruch, an dem die Frage aufkam, was die beiden ueberhaupt
+             sind. Sie waren etwas anderes: die drei oben rechnen wir selbst,
+             die beiden unten kauften einen fremden Wert zu. -->
       </div>
 
       <div class="lu-sub">Nachkaufen &mdash; jederzeit, ohne Abo</div>

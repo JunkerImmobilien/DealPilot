@@ -34,13 +34,27 @@ const stripeService = require('./stripeService');
    Preise sind in Stripe stillgelegt, nicht geloescht: wer eines der
    Pakete frueher gekauft hat, behaelt seine Gutschrift und seine
    Rechnung. */
+/* v1296 · `dp_einzeln_avm_a` und `dp_einzeln_avm_b` sind hier RAUS.
+   Marcels Entscheidung vom 11.09.2026: die Marktwert-Abrufe bei den beiden
+   externen Bewertungspartnern werden erstmal nicht angeboten. Wer den
+   Schluessel trotzdem schickt, bekommt `invalid_pack` — dieselbe Antwort
+   wie bei den alten Paketen, und die richtige: ein Preis, der nicht im
+   Katalog steht, wird nicht verkauft.
+
+   Die Stripe-Preise bleiben bestehen, nur stillgelegt. Wer frueher einen
+   gekauft haette, behielte Gutschrift und Rechnung. */
 const LOOKUP_KEYS = [
   'dp_nachkauf_starter', 'dp_nachkauf_investor', 'dp_nachkauf_pro',
-  'dp_einzeln_mpi', 'dp_einzeln_mpi_plus', 'dp_einzeln_wev',
-  'dp_einzeln_avm_a', 'dp_einzeln_avm_b'
+  'dp_einzeln_mpi', 'dp_einzeln_mpi_plus', 'dp_einzeln_wev'
 ];
 
-/* Die Arten, die addKontingent() kennt. Alles andere wird verworfen. */
+/* Die Arten, die addKontingent() kennt. Alles andere wird verworfen.
+
+   avm_a und avm_b bleiben hier BEWUSST stehen, obwohl sie nicht mehr
+   kaufbar sind: ein bestehender Bestand muss weiter gutschreibbar und
+   abrufbar sein. Was nicht mehr im Katalog steht, kann ohnehin keinen
+   neuen Kauf ausloesen — die Liste hier ist der Empfaenger, nicht das
+   Schaufenster. */
 const ARTEN = ['mpi', 'mpi_plus', 'wev', 'avm_a', 'avm_b'];
 
 const TTL_MS = 10 * 60 * 1000;

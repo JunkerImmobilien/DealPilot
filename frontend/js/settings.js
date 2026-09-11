@@ -1935,6 +1935,22 @@ function _renderPlanPane() {
      Metadaten, aus denen der Webhook gutschreibt (dp_kind=bewertung_paket
      plus mpi/mpi_plus/wev). Im LIVE-Konto fehlen sie noch — dort laeuft
      der Knopf in eine 404 des Katalogs, bis sie angelegt sind. */
+  /* ═══ v1296 · Der Mengenwähler, geliehen statt kopiert ══════════════════
+     Er wohnt in `pricing-modal.js` und wird über `window.DealPilotMenge`
+     bereitgestellt. Hier steht NUR der Zugriff darauf — zwei Kopien
+     desselben Bausteins laufen auseinander, genau wie die Nachkauf-Zahlen
+     es bis v1294 getan haben.
+
+     Fehlt der Export (alte ausgelieferte Fassung), gibt es KEINEN Wähler
+     statt eines kaputten: der Kaufknopf trägt dann `data-menge="1"` und
+     kauft eine — richtig, nur ohne Wahl. */
+  function _mengeWaehler(id, cent) {
+    var M = window.DealPilotMenge;
+    if (!M || typeof M.html !== 'function') return '';
+    if (typeof M.binden === 'function') M.binden();
+    return M.html(id, cent);
+  }
+
   (function () {
     var nk = (DealPilotConfig.pricing && typeof DealPilotConfig.pricing.nachkaufFuer === 'function')
       ? DealPilotConfig.pricing.nachkaufFuer(current) : null;
@@ -1945,13 +1961,23 @@ function _renderPlanPane() {
       '<p class="plan-credits-desc">Ist dein Monatskontingent aufgebraucht, kannst du dieselbe Menge ' +
         'noch einmal nachkaufen — für ein Viertel deines Monatsbeitrags. ' +
         'Zugekauftes verfällt nie und wird erst verbraucht, wenn dein Monatskontingent leer ist.</p>' +
-      '<div class="plan-credit-card plan-credit-highlight" style="max-width:340px">' +
+      /* v1296: `pm-menge-wrap` an der KARTE, nicht an der Knopfzeile — der
+         Waehler sucht Preisfeld und Kaufknopf in diesem Behaelter, und der
+         Preis steht zwei Zeilen weiter oben. */
+      '<div class="plan-credit-card plan-credit-highlight pm-menge-wrap" style="max-width:340px">' +
         '<div class="plan-credit-num">' + nk.label + '</div>' +
         '<div class="plan-credit-sub">' + nk.kontingent.mpi + ' Marktpreisindikationen' +
           (nk.kontingent.mpi_plus ? ' · ' + nk.kontingent.mpi_plus + ' erweiterte' : '') +
           (nk.kontingent.wev ? ' · ' + nk.kontingent.wev + ' Wertermittlungen' : '') + '</div>' +
-        '<div class="plan-credit-price">' + eur(nk.preis_eur) + '</div>' +
-        '<button class="btn btn-outline btn-sm" onclick="_buyCreditPack(\'' + nk.key + '\')">Dazubuchen</button>' +
+        /* v1296 · Menge waehlbar. `data-summe` traegt den Gesamtpreis, den
+           der Waehler fortschreibt; `plan-menge-wrap` ist der Behaelter,
+           an dem er Preis und Knopf wiederfindet. */
+        '<div class="plan-credit-price" data-summe>' + eur(nk.preis_eur) + '</div>' +
+        '<div class="plan-menge-zeile">' +
+          _mengeWaehler('nk-' + nk.key, Math.round(nk.preis_eur * 100)) +
+          '<button class="btn btn-outline btn-sm" data-pack-id="' + nk.key + '" data-menge="1" ' +
+            'onclick="_buyCreditPack(\'' + nk.key + '\', this)">Dazubuchen</button>' +
+        '</div>' +
       '</div>' +
       '</div>';
   })();
@@ -2013,10 +2039,17 @@ function _renderPlanPane() {
         'was du wirklich brauchst. Auch sie verfallen nie.</p>' +
       '<div class="plan-einzel-grid">';
     einzelkauf.forEach(function (e) {
-      html += '<div class="plan-einzel-row">' +
+      /* v1296: Menge auch hier — fuenf Marktpreisindikationen sind ein Kauf,
+         nicht fuenf. Rechts steht der Gesamtpreis, darunter klein der
+         Stueckpreis, sonst weiss bei Menge 5 niemand mehr, was eine kostet. */
+      var preis = e.price_eur.toFixed(2).replace('.', ',') + ' €';
+      html += '<div class="plan-einzel-row pm-menge-wrap">' +
         '<span class="plan-einzel-l">' + e.label + '</span>' +
-        '<span class="plan-einzel-p">' + e.price_eur.toFixed(2).replace('.', ',') + ' €</span>' +
-        '<button class="btn btn-outline btn-sm" onclick="_buyCreditPack(\'' + e.key + '\')">Kaufen</button>' +
+        _mengeWaehler('ez-' + e.key, Math.round(e.price_eur * 100)) +
+        '<span class="plan-einzel-p"><b data-summe>' + preis + '</b>' +
+          '<small>' + preis + ' je Stück</small></span>' +
+        '<button class="btn btn-outline btn-sm" data-pack-id="' + e.key + '" data-menge="1" ' +
+          'onclick="_buyCreditPack(\'' + e.key + '\', this)">Kaufen</button>' +
       '</div>';
     });
     html += '</div></div>';
@@ -2039,7 +2072,12 @@ window._setBillingCycle = _setBillingCycle;
 // V63.1: Credit-Pack kaufen (Demo — nur Toast)
 // V224: Echter Stripe-Checkout (vorher V197-Toast-Stub).
 // Identische Logik wie _buyCreditPackDirect in pricing-modal.js.
-async function _buyCreditPack(packKey) {
+async function _buyCreditPack(packKey, el) {
+  /* v1296: die gewaehlte Menge haengt am Knopf (der Waehler schreibt sie
+     dorthin). Ein Aufruf ohne `el` — es gibt noch aeltere Knoepfe ohne
+     Waehler — bedeutet eine. */
+  var _menge = Math.max(1, parseInt(el && el.dataset && el.dataset.menge, 10) || 1);
+
   /* v1184: Der Tuersteher suchte nur in `aiCreditPackages` — der Liter-
      Liste, die v1183 stillgelegt hat. Die Knoepfe darueber schicken seit
      v1176 aber `paket_kurz` und `mpi`, also fiel JEDER Kaufversuch hier
@@ -2088,7 +2126,7 @@ async function _buyCreditPack(packKey) {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + token
       },
-      body: JSON.stringify({ pack_id: packKey })
+      body: JSON.stringify({ pack_id: packKey, menge: _menge })
     });
     var data = null;
     try { data = await r.json(); } catch (e) {}

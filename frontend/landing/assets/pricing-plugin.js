@@ -203,7 +203,7 @@
             '<span class="dp-pill dp-pill-alt">Bewertungen nachkaufen</span>' +
             '<h2 class="dp-h2">Volltanken. Durchstarten.</h2>' +
             '<p class="dp-sub">' +
-              '<strong>Gezählt werden Bewertungen, getrennt nach Art.</strong> Dein Plan setzt sie monatlich neu (Starter 5 · Investor 5 · 5 · Pro 5 · 5 · 5) — was du nicht nutzt, wandert ins Guthaben; Zugekauftes verfällt nie und wird zuletzt verbraucht.' /* v1183 */ +
+              '<strong>Gezählt werden Bewertungen, getrennt nach Art.</strong> Dein Plan setzt sie monatlich neu (Starter 5 · Investor 5 · 5 · Pro 5 · 5 · 5) — was du im Monat nicht nutzt, verfällt zum Monatsende. Zugekauftes verfällt nie und wird erst verbraucht, wenn dein Monatskontingent leer ist.' /* v1183 */ +
             '</p>' +
           '</div>' +
           '<div class="dp-credits-grid">' +

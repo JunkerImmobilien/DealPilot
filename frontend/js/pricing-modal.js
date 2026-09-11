@@ -221,9 +221,32 @@
       P+" .pm-einzel-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(42,39,39,.08)}"+
       P+" .pm-einzel-row:last-child{border-bottom:none}"+
       P+" .pm-einzel-l{flex:1;min-width:0;font-size:13px}"+
-      P+" .pm-einzel-p{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;white-space:nowrap}"+
+      P+" .pm-einzel-p{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;white-space:nowrap;text-align:right;min-width:74px}"+
+      P+" .pm-einzel-p small{display:block;font-size:9.5px;font-weight:400;opacity:.55;letter-spacing:.01em}"+
       P+" .pm-einzel-cta{flex:0 0 auto;padding:5px 13px;border-radius:8px;border:1px solid var(--wl-c9a84c, #C9A84C);color:var(--wl-b8932f, #b8932f);font-size:11.5px;font-weight:700;text-decoration:none;white-space:nowrap}"+
       P+" .pm-einzel-cta:hover{background:var(--wl-c9a84c, #C9A84C);color:#221c08}"+
+
+      /* v1296 · Mengenwaehler. Die Ziffer sitzt in JetBrains Mono, damit
+         zwei- und einstellige Mengen gleich breit bleiben und die Zeile
+         beim Tippen nicht springt. `flex:0 0 auto` ist Pflicht: die Zeile
+         ist ein Flex-Behaelter, ohne das schrumpft der Waehler auf die
+         Knoepfe zusammen, sobald das Label lang wird.
+
+         KEINE HARTE FLAECHE, KEINE HARTE SCHRIFTFARBE. Derselbe Baustein
+         laeuft im Preis-Modal auf HELLEM Grund und in den Einstellungen
+         auf DUNKLEM. Ein `background:#fff` waere dort ein weisser Klotz —
+         genau der Fehler, der den Sprechlauf-Dialog in v1292 unlesbar
+         gemacht hat (fuer Dunkel gebaut, auf Weiss gelaufen).
+         Neutrales Grau mit Alpha traegt beide Gruende, `color:inherit`
+         nimmt die Schriftfarbe der Umgebung. */
+      P+" .pm-menge{flex:0 0 auto;display:inline-flex;align-items:center;gap:0;border:1px solid rgba(128,124,120,.38);border-radius:9px;overflow:hidden;background:transparent;color:inherit}"+
+      P+" .pm-menge-b{width:26px;height:26px;border:0;background:transparent;cursor:pointer;font:600 15px/1 Inter,system-ui,sans-serif;color:var(--wl-b8932f, #b8932f);padding:0}"+
+      P+" .pm-menge-b:hover:not(:disabled){background:rgba(201,168,76,.18)}"+
+      P+" .pm-menge-b:disabled{opacity:.28;cursor:default}"+
+      P+" .pm-menge-n{width:30px;height:26px;border:0;border-left:1px solid rgba(128,124,120,.28);border-right:1px solid rgba(128,124,120,.28);text-align:center;font:700 12px/1 'JetBrains Mono',ui-monospace,monospace;color:inherit;background:transparent;padding:0}"+
+      P+" .pm-menge-n:focus{outline:2px solid var(--wl-c9a84c, rgba(201,168,76,.5));outline-offset:-2px}"+
+      P+" .bw-gate .pm-menge{align-self:center}"+
+      P+" .bw-price-je{opacity:.75}"+
       _kerosinMatrixCss();
     document.head.appendChild(st);
   }
@@ -265,6 +288,7 @@
         name: plan.label || k,
         l: n.label,
         p: n.preis_eur.toFixed(2).replace('.', ','),
+        preis_cent: Math.round(n.preis_eur * 100),
         id: n.key,
         reach: n.kontingent.mpi + ' Marktpreisindikationen' +
                (n.kontingent.mpi_plus ? ' · ' + n.kontingent.mpi_plus + ' erweiterte' : '') +
@@ -291,6 +315,94 @@
         '<span class="bw-seg-l">'+k.l+'</span><span class="bw-seg-p">'+k.p+' €</span></div>';
     }).join('') + '</div>';
   }
+
+  /* ═══ v1296 · Der Mengenwähler ══════════════════════════════════════════
+     Marcels Vorgabe vom 11.09.2026: „Ich würde gerne was haben, wo der
+     Kunde selber auswählen kann, wieviele er nachkaufen möchte."
+
+     Ein Baustein für beide Stellen — die Nachkauf-Karte und jede
+     Einzelkauf-Zeile. Er trägt die Menge in `data-menge` am Kaufknopf und
+     schreibt den Gesamtpreis fort, damit niemand im Kopf multiplizieren
+     muss. Der Server nimmt sie als `menge` entgegen und kappt bei 25;
+     dieselbe Grenze steht hier, damit der Knopf nicht mehr verspricht,
+     als der Checkout einlöst.
+
+     WARUM KEIN <input type="number">: der Zahlenpfeil sieht in jedem
+     Browser anders aus, lässt sich kaum gestalten und nimmt auf dem Handy
+     die falsche Tastatur. Zwei Knöpfe und eine Zahl tun dasselbe und sehen
+     überall gleich aus. Eingetippt wird trotzdem — das Feld ist `inputmode
+     numeric`, nur ohne die Pfeile. */
+  var MENGE_MAX = 25;
+
+  function _mengeHtml(id, preisCent) {
+    return '<div class="pm-menge" data-mid="' + id + '" data-cent="' + preisCent + '">' +
+      '<button type="button" class="pm-menge-b" data-d="-1" aria-label="Weniger">−</button>' +
+      '<input class="pm-menge-n" value="1" inputmode="numeric" aria-label="Anzahl">' +
+      '<button type="button" class="pm-menge-b" data-d="1" aria-label="Mehr">+</button>' +
+    '</div>';
+  }
+
+  /* Eine Änderung: Zahl begrenzen, Knopf beschriften, Preis nachziehen.
+     `wurzel` ist der Behälter, in dem Wähler, Preisfeld und Kaufknopf
+     zusammen liegen — so bleibt der Baustein mehrfach verwendbar, ohne
+     dass die Stellen voneinander wissen. */
+  function _mengeSetzen(wurzel, n) {
+    var w = wurzel.querySelector('.pm-menge');
+    if (!w) return;
+    n = Math.min(MENGE_MAX, Math.max(1, parseInt(n, 10) || 1));
+    var feld = w.querySelector('.pm-menge-n');
+    if (feld) feld.value = String(n);
+    w.querySelectorAll('.pm-menge-b').forEach(function (b) {
+      var d = parseInt(b.dataset.d, 10);
+      b.disabled = (d < 0 && n <= 1) || (d > 0 && n >= MENGE_MAX);
+    });
+    var cent = parseInt(w.dataset.cent, 10) || 0;
+    var summe = wurzel.querySelector('[data-summe]');
+    if (summe) summe.textContent = ((cent * n) / 100).toFixed(2).replace('.', ',') + ' €';
+    var cta = wurzel.querySelector('[data-pack-id]');
+    if (cta) cta.dataset.menge = String(n);
+  }
+
+  /* EIN Zuhörer am Dokument statt einer je Knopf: die Karten werden neu
+     gezeichnet, sobald jemand das Segment wechselt, und ein Zuhörer an
+     einem Knopf, den es nicht mehr gibt, tut nichts mehr. */
+  function _mengeBinden() {
+    if (window.__pmMengeGebunden) return;
+    window.__pmMengeGebunden = true;
+    document.addEventListener('click', function (ev) {
+      var b = ev.target.closest && ev.target.closest('.pm-menge-b');
+      if (!b) return;
+      ev.preventDefault();
+      var w = b.closest('.pm-menge');
+      var wurzel = b.closest('.pm-menge-wrap') || b.closest('.bw') || b.closest('.pm-einzel-row');
+      if (!w || !wurzel) return;
+      var jetzt = parseInt(w.querySelector('.pm-menge-n').value, 10) || 1;
+      _mengeSetzen(wurzel, jetzt + parseInt(b.dataset.d, 10));
+    });
+    document.addEventListener('input', function (ev) {
+      var f = ev.target;
+      if (!f.classList || !f.classList.contains('pm-menge-n')) return;
+      var wurzel = f.closest('.pm-menge-wrap') || f.closest('.bw') || f.closest('.pm-einzel-row');
+      if (wurzel) _mengeSetzen(wurzel, f.value);
+    });
+  }
+
+  /* Der Waehler wird an ZWEI Stellen gebraucht: hier im Preis-Modal und in
+     den Einstellungen unter „Plan wechseln". Deshalb liegt er EINMAL hier
+     und wird exportiert — zwei Kopien laufen sonst auseinander, so wie es
+     die Nachkauf-Zahlen schon einmal getan haben (v1294).
+
+     `settings.js` laedt VOR dieser Datei (index.html:3360/3361). Das ist
+     unkritisch, weil beide erst beim Klick bzw. beim Oeffnen des Reiters
+     laufen — dann steht der Export. Einen Rueckfall hat settings.js
+     trotzdem, damit eine alte ausgelieferte Fassung nicht auf einen
+     Knopf ohne Menge fuehrt. */
+  window.DealPilotMenge = {
+    html:   _mengeHtml,
+    setzen: _mengeSetzen,
+    binden: _mengeBinden,
+    MAX:    MENGE_MAX
+  };
   function _bwPassHtml(idx){
     var k = KPACKS[idx];
     if (!k) return '';
@@ -304,8 +416,14 @@
         '<div class="bw-col"><span class="bw-k">Einsatz</span><span class="bw-v">Dein Kontingent noch einmal</span></div>' +
         '<div class="bw-col"><span class="bw-k">Verfall</span><span class="bw-v"><span class="dp">nie</span> · kein Abo</span></div>' +
       '</div>' +
-      '<div class="bw-gate"><div class="bw-price">'+k.p+' €<small>einmalig · '+k.l+'</small></div>' +
-        '<a class="bw-cta" href="#" data-pack-id="'+k.id+'" onclick="window._buyCreditPackDirect(this); return false;">Bewertungen kaufen</a></div>' +
+      /* v1296: Menge davor, Gesamtpreis daneben. `data-summe` traegt den
+         fortgeschriebenen Betrag — der Kunde soll nicht multiplizieren. */
+      '<div class="bw-gate">' +
+        '<div class="bw-price"><span data-summe>'+k.p+' €</span>' +
+          '<small>einmalig · <span class="bw-price-je">'+k.l+' je Paket</span></small></div>' +
+        _mengeHtml('nk-'+k.plan, Math.round(k.preis_cent)) +
+        '<a class="bw-cta" href="#" data-pack-id="'+k.id+'" data-menge="1" onclick="window._buyCreditPackDirect(this); return false;">Bewertungen kaufen</a>' +
+      '</div>' +
     '</div>';
   }
 
@@ -320,10 +438,17 @@
       '<div class="pm-einzel-h">Oder einzeln — genau die eine, die gerade fehlt</div>' +
       '<div class="pm-einzel-grid">' +
       e.map(function (x) {
+        /* v1296: auch hier die Menge. Wer fünf Marktpreisindikationen
+           braucht, soll nicht fünfmal durch den Checkout. Der Preis rechts
+           ist der GESAMTPREIS und wandert mit; der Einzelpreis steht klein
+           darunter, sonst weiß bei Menge 5 niemand mehr, was eine kostet. */
+        var cent = Math.round(x.price_eur * 100);
         return '<div class="pm-einzel-row">' +
           '<span class="pm-einzel-l">' + x.label + '</span>' +
-          '<span class="pm-einzel-p">' + x.price_eur.toFixed(2).replace('.', ',') + ' €</span>' +
-          '<a class="pm-einzel-cta" href="#" data-pack-id="' + x.key + '" ' +
+          _mengeHtml('ez-' + x.key, cent) +
+          '<span class="pm-einzel-p"><b data-summe>' + x.price_eur.toFixed(2).replace('.', ',') + ' €</b>' +
+            '<small>' + x.price_eur.toFixed(2).replace('.', ',') + ' € je Stück</small></span>' +
+          '<a class="pm-einzel-cta" href="#" data-pack-id="' + x.key + '" data-menge="1" ' +
             'onclick="window._buyCreditPackDirect(this); return false;">Kaufen</a>' +
         '</div>';
       }).join('') +
@@ -339,11 +464,23 @@
   function _wireKerosinStrip(){
     var wrap = document.getElementById('pm-kerosin-strip');
     if (!wrap) return;
+    _mengeBinden();          /* v1296 — einmal je Sitzung, am Dokument */
     function bind(){
       Array.prototype.forEach.call(wrap.querySelectorAll('.bw-seg'), function(seg){
         seg.addEventListener('click', function(){
           var i = +seg.getAttribute('data-i');
-          wrap.innerHTML = _bwSegsHtml(i) + _bwPassHtml(i);
+          /* v1296 — GEMESSEN beim Einbau des Mengenwaehlers: hier stand
+             `_bwSegsHtml(i) + _bwPassHtml(i)` OHNE `_einzelHtml()`. Ein
+             Klick auf ein anderes Segment loeschte damit den kompletten
+             Einzelkauf-Block aus dem Modal, und er kam erst beim naechsten
+             Oeffnen wieder.
+
+             Seit v1294 drin, beim Nachmessen nicht gesehen, weil ich das
+             Segment nie gewechselt habe — dasselbe Muster wie beim
+             Markt-Angebot (Sprachweg geprueft, Klickweg nicht). Wer eine
+             Ansicht an ZWEI Stellen zusammensetzt, muss beide gleich
+             halten. */
+          wrap.innerHTML = _bwSegsHtml(i) + _bwPassHtml(i) + _einzelHtml();
           bind();
         });
       });
@@ -790,6 +927,10 @@
   // V197.2: Direkter Checkout-Aufruf — Stripe ohne Zwischenmodal
   window._buyCreditPackDirect = async function(el) {
     var packId = el.dataset.packId;
+    /* v1296: die gewaehlte Menge haengt am Knopf selbst (der Mengenwaehler
+       schreibt sie dorthin). Fehlt sie — ein Kaufknopf ohne Waehler, etwa
+       in einer aelteren Ansicht —, ist 1 richtig. */
+    var menge = Math.max(1, parseInt(el.dataset.menge, 10) || 1);
     var origText = el.textContent;
     el.style.pointerEvents = 'none';
     el.textContent = 'Wird gestartet…';
@@ -802,7 +943,7 @@
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + token
         },
-        body: JSON.stringify({ pack_id: packId })
+        body: JSON.stringify({ pack_id: packId, menge: menge })
       });
       var data = null;
       try { data = await r.json(); } catch (e) {}

@@ -37327,3 +37327,38 @@ button.btn-brw.brw-veraltet::after {
 .sb-collapsed .sb-neu-row { flex-direction: column; gap: 6px; margin: 0 8px 14px; }
 .sidebar.collapsed .sb-neu-row .sb-neu-nur-ico,
 .sb-collapsed .sb-neu-row .sb-neu-nur-ico { flex: 0 0 auto; padding: 11px 13px; }
+
+/* ═══ v1296 · Mengenwähler in den Einstellungen ═════════════════════════
+   Die FARBEN des Wählers stehen in `pricing-modal.js` (bewusst neutral,
+   damit derselbe Baustein hellen und dunklen Grund trägt). Hier steht nur,
+   wie er sich in diese beiden Zeilen einfügt.
+
+   `.plan-einzel-row` ist ein Flex-Behälter: ohne `flex:0 0 auto` schrumpft
+   der Wähler, sobald ein Label lang wird — dieselbe Falle wie bei Flex-
+   Kindern in Overflow-Containern. Der Baustein bringt sie schon mit; die
+   Regel hier hält sie auch, wenn eine spätere Regel dazwischengrätscht. */
+.plan-einzel-row .pm-menge { flex: 0 0 auto; }
+.plan-einzel-p {
+  text-align: right;
+  min-width: 78px;
+}
+.plan-einzel-p small {
+  display: block;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 9.5px;
+  font-weight: 400;
+  opacity: .55;
+  color: inherit;
+}
+.plan-menge-zeile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+@media (max-width: 520px) {
+  .plan-einzel-row .pm-menge { order: 3; }
+  .plan-einzel-p { flex: 1 1 auto; }
+}
