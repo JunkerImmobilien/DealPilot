@@ -2856,8 +2856,26 @@
       '.oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{flex:1 1 auto;min-height:0}',
       '.oabi-ov.vi-mode.vi-dialog .vi-rf-chat,',
       '.oabi-ov.vi-mode.vi-dialog .vi-rf-stand{height:100%;min-height:180px}',
+      /* ═══ v1303 · Tablet: die Liste war breiter als das Gespräch ═════════
+         Marcels Vorgabe vom 11.09.2026: „wichtig ist auch, dass beide
+         Sprachaufzeichnungen für Tablet und Handy funktionieren."
+
+         GEMESSEN im gleich-Origin-iframe bei 767 px (Tablet hochkant):
+         der Umbruch stand bei 720 px und griff deshalb NICHT. Ergebnis
+         zweispaltig — Gespräch **330 px**, Liste **340 px**. Die
+         Nebenspalte war breiter als die Hauptsache.
+
+         Der Umbruch liegt jetzt bei 900 px, genau wie beim freien Weg
+         (`.vi-frei-buehne`). Zwei Wege mit demselben Problem sollen
+         denselben Schwellenwert haben — sonst bricht das eine Fenster um
+         und das andere nicht, auf demselben Gerät.
+
+         Dazwischen, zwischen 900 und 1100 px, wird die Liste schmaler
+         statt zu verschwinden: 340 px sind für einen 1000-px-Dialog zu
+         viel, aber die Spalte ganz zu opfern wäre zu früh. */
       '.vi-rf-buehne{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:stretch}',
-      '@media(max-width:720px){.vi-rf-buehne{grid-template-columns:1fr}',
+      '@media(max-width:1100px){.vi-rf-buehne{grid-template-columns:1fr 270px;gap:12px}}',
+      '@media(max-width:900px){.vi-rf-buehne{grid-template-columns:1fr;gap:12px}',
       '  .vi-rf-stand{order:-1}',
       '  .oabi-ov.vi-mode.vi-dialog .vi-rf-stand{height:auto;max-height:150px}}',
       '.vi-rf-chat{height:min(58vh,560px);overflow-y:auto;display:flex;flex-direction:column;gap:11px;',
