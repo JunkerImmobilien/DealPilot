@@ -667,6 +667,37 @@ router.post('/copilot-frage', authenticate, dialogLimiter, async (req, res, next
       '7. Steht hinter einem Wert "[Quelle: ...]", stammt er nicht vom',
       '   Nutzer, sondern aus einem Abruf oder seinen Einstellungen. Sag',
       '   das dazu, wenn du dich auf so einen Wert stuetzt.',
+      /* ═══ v1319 · Allgemeinwissen ist keine erfundene Zahl ═══════════════
+         Marcels Wunsch: „Ich würde gerne dem Co-Piloten einfach im Chat auch
+         Fragen stellen. Zum Beispiel: Wie ist denn die Postleitzahl von
+         Herford? Und dann schaltet er einmal um, sucht die Postleitzahl von
+         Herford … und würde danach aber in seinem normalen Jargon
+         weitermachen."
+
+         WARUM DAS BISHER NICHT GING: Regel 3 verbietet alles, was nicht im
+         bekannten Stand steht. Diese Regel ist richtig und bleibt — sie
+         verhindert, dass das Modell eine Wohnflaeche schaetzt oder einen
+         Kaufpreis erfindet. Nur trifft sie auch „Wie ist die Postleitzahl
+         von Herford?", und darauf ist „das steht nicht im Stand" keine
+         Antwort, sondern eine Ausrede.
+
+         DIE GRENZE, die den Unterschied macht: es geht darum, ob eine
+         Angabe zu DIESEM Objekt gehoert oder allgemein nachschlagbar ist.
+         Die Wohnflaeche dieser Wohnung kennt nur der Nutzer. Die
+         Postleitzahl von Herford kennt jeder — sie ist keine Schaetzung,
+         sie ist ein Fakt. */
+      '8. ALLGEMEINE SACHFRAGEN BEANTWORTEST DU AUS DEINEM WISSEN. Postleitzahl,',
+      '   Vorwahl, Einwohnerzahl, Bundesland, Grunderwerbsteuersatz eines Landes,',
+      '   was ein Erbbaurecht ist, wie ein Liegenschaftszins wirkt - das sind',
+      '   Fakten, keine Schaetzungen. Antworte darauf normal und sag, wenn du',
+      '   dir bei einem Detail unsicher bist. Gibt es mehrere richtige Antworten',
+      '   (Herford hat mehrere Postleitzahlen), nenne sie.',
+      '   DIE GRENZE ZU REGEL 3: dort geht es um Angaben zu DIESEM Objekt -',
+      '   Wohnflaeche, Kaufpreis, Miete, Baujahr. Die kennt nur der Nutzer, die',
+      '   erfindest du nie. Was jeder nachschlagen kann, darfst du sagen.',
+      '9. Nach einer solchen Auskunft machst du im normalen Ton weiter - kein',
+      '   Themenwechsel, keine Entschuldigung, kein "zurueck zum Thema". Die',
+      '   offene Frage blendet die Oberflaeche selbst wieder ein.',
       '',
       'FRAGE DES NUTZERS:',
       '"""',
