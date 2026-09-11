@@ -1025,6 +1025,27 @@
   }
   function setSelIfEmpty(id, v) { var el = $(id); if (!el || !v || el.value) return; el.value = v; try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} }
   function setInput(id, v) { var el = $(id); if (!el || v == null || v === '') return; el.value = v; try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {} }
+  /* v1313: die Erbbau-Zeile ueber dem Ergebnisblock der Marktbewertung.
+     Sie wird angelegt, wenn sie gebraucht wird, und verschwindet wieder,
+     sobald das Erbbaurecht abgewaehlt ist - sonst bliebe sie an einem
+     Volleigentums-Objekt stehen und behauptete etwas Falsches. */
+  function _erbHinweisZeigen(html) {
+    var id = 'oab-erb-hinweis';
+    var alt = document.getElementById(id);
+    if (!html) { if (alt) alt.remove(); return; }
+    var host = document.getElementById('oab-results');
+    if (!host || !host.parentNode) return;
+    var box = alt;
+    if (!box) {
+      box = document.createElement('div');
+      box.id = id;
+      box.style.cssText = 'margin:8px 0;padding:8px 10px;border-radius:8px;font-size:12px;line-height:1.5;' +
+        'border:1px solid var(--wl-c9a84c, #C9A84C);background:rgba(201,168,76,.08)';
+      host.parentNode.insertBefore(box, host);
+    }
+    box.innerHTML = html;
+  }
+
   function applyAvm(r) {
     if (!r) return;
     var mw = pickMW(r), mm = pickMM(r), wfl = numDe(val('wfl')) || 0, _ap = [];
@@ -1038,6 +1059,39 @@
     try { if (typeof window._v236MarkQcLoaded === 'function' && _ap.length) window._v236MarkQcLoaded(_ap); } catch (e) {}
     try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
     try { if (typeof window.renderDealScore2 === 'function') window.renderDealScore2(); } catch (e) {}
+    /* ═══ v1313 · Erbbaurecht in der Marktbewertung ═══════════════════════
+       Marcels Vorgabe: „ganz wichtig mit unter Marktbewertung mit einbauen."
+
+       Kein Bewertungspartner nimmt das Erbbaurecht entgegen. Gemessen am
+       11.09.2026 gegen die echte GeoMap-API (Guthaben 258,00 -> 257,90 EUR):
+       leasehold, heritableBuildingRight, groundLease, erbbaurecht und
+       erbpacht quittiert sie samt und sonders mit 400 „Unrecognized field",
+       und der Detail-Abruf kennt keins der Woerter. Sprengnetter und
+       PriceHubble bekommen den Parameter ebenfalls nicht uebergeben.
+
+       Was hier also ankommt, ist IMMER ein Volleigentumswert - auch bei
+       einem Erbbaurechts-Objekt. Der Wert wandert unveraendert nach
+       #svwert (das ist richtig so: dort steht der Volleigentumswert, und
+       calc() kuerzt ihn beim Rechnen). Was fehlte, war der Satz dazu -
+       sonst liest jemand 320.000 und haelt das fuer den Wert SEINER
+       Wohnung. */
+    try {
+      if (window.DealPilotErbbau && DealPilotErbbau.istAn()) {
+        var _er = DealPilotErbbau.rechnen();
+        var _txt = '<b>Erbbaurecht:</b> ' + r.provider + ' bewertet Volleigentum — das Grundstück ist hier nicht dabei. ';
+        if (_er && _er.ok) {
+          _txt += 'DealPilot rechnet nach § 50 ImmoWertV einen Abschlag von <b>' +
+            Math.round(_er.abschlag).toLocaleString('de-DE') + ' € · ' +
+            _er.abschlagPct.toFixed(1).replace('.', ',') + ' %</b> — der Verkehrswert im Formular bleibt der Volleigentumswert, ' +
+            'Wertpuffer, Wertsteigerung und Deal Score rechnen aber mit dem gekürzten Wert.';
+        } else {
+          _txt += 'Für den Abschlag fehlen noch Angaben (Restlaufzeit, Bodenwert) — siehe Reiter Objekt, Grund &amp; Boden.';
+        }
+        _erbHinweisZeigen(_txt);
+      } else {
+        _erbHinweisZeigen(null);
+      }
+    } catch (e) {}
     toast('✓ ' + r.provider + '-Werte übernommen (' + spanLabel() + ')');
   }
 

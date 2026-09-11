@@ -978,7 +978,8 @@ function _calcImmediate(){
       if (_erbErg && _erbErg.ok && !_schonErb && _erbErg.abschlag > 0) _erbAbzug = _erbErg.abschlag;
     }
   } catch (_e) {}
-  st('erb_abzug_wert', _erbAbzug > 0 ? '-' + fE(_erbAbzug) : '–');
+  st('erb_abzug_wert', _erbAbzug > 0 ? '-' + fE(_erbAbzug) + (_erbErg && _erbErg.ok ? ' · ' + _erbErg.abschlagPct.toFixed(1).replace('.', ',') + ' %' : '') : '–');
+  (function () { var _z = el('erb-abzug-zeile'); if (_z) _z.style.display = (_erbAbzug > 0) ? 'flex' : 'none'; })();
   var svw=v('svwert');
   if (_erbAbzug > 0 && svw > 0) svw = Math.max(0, svw - _erbAbzug);
   var wp=svw>0?svw-kp:0;

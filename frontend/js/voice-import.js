@@ -472,6 +472,15 @@
        die es auf dieser Seite gar nicht gibt, und das Modell ordnete ins
        Leere zu. */
     sanKatalog().forEach(function (e) { if ($(e.id)) cat.push(e); });
+    /* v1313 · Erbbaurecht. Die Checkbox steht NICHT in window.FIELDS - dort
+       laufen nur die vier Zahlen; ein Haekchen geht ueber _erbpacht einen
+       eigenen Speicherweg. Damit die KI „das ist Erbpacht“ trotzdem zuordnen
+       kann, kommt der Eintrag von Hand dazu - wie die Sanierungs-Gewerke.
+       kind 'bool' ist der Weg, den _wertSchreiben() in object-actions.js
+       versteht: er setzt das Haekchen und feuert change, sonst bliebe die
+       Rechenkette stehen. */
+    if ($("erbpacht")) cat.push({ id: 'erbpacht', kind: 'bool', label: 'Erbbaurecht / Erbpacht',
+      hint: 'Das Grundstueck gehoert nicht mit, es wird gegen Erbbauzins ueberlassen. Nur setzen, wenn ausdruecklich von Erbbaurecht, Erbpacht oder Erbbauzins die Rede ist.' });
     return cat;
   }
   function catalogEntry(catalog, id) {
@@ -1128,6 +1137,12 @@
     { id:'brw',        g:4, label:'Bodenrichtwert',      kw:['bodenrichtwert'] },
     { id:'mea',        g:4, label:'Miteigentumsanteil',  kw:['miteigentumsanteil','mea'] },
     { id:'gsfl',       g:4, label:'Grundstücksfläche', kw:['grundstueck','grundstuecksflaeche'] },
+    /* v1313 · Erbbaurecht. Die Checkbox selbst laeuft ueber den bool-Zweig
+       weiter unten (Chips koennen keine Haekchen), diese beiden Zahlen sind
+       gewoehnliche Felder und gehoeren in die Wolke - ohne sie kann man den
+       Abschlag nicht rechnen. */
+    { id:'erbbauzins',  g:4, label:'Erbbauzins (€/Jahr)',  kw:['erbbauzins','erbpachtzins','pachtzins'] },
+    { id:'erb_restlz',  g:4, label:'Restlaufzeit Erbbaurecht', kw:['restlaufzeit','laeuft noch','vertrag laeuft'] },
     { id:'makrolage',  g:4, frage:'Wie ist die Region?',  label:'Makrolage', kw:['makrolage','makro','region'] },
     { id:'mikrolage',  g:4, frage:'Wie ist die Straße?', label:'Mikrolage', kw:['mikrolage','mikro','viertel','umfeld'] },
     { id:'ds2_zustand',g:4, frage:'In welchem Zustand?',  label:'Zustand',   kw:['zustand'] },
@@ -2388,7 +2403,20 @@
     { et: 3, ids: ['san', 'moebl'],                 rang: 9,
       frage: 'Muss etwas saniert werden, und wird etwas mitverkauft — Küche, Möbel?' },
     { et: 3, ids: ['brw', 'gsfl', 'mea'],           rang: 11, abruf: 'brw',
-      frage: 'Was weißt du zum Grundstück — Bodenrichtwert, Fläche, Miteigentumsanteil?' },
+      frage: 'Was weißt du zum Grundstück — Bodenrichtwert, Fläche, Miteigentumsanteil? Und: ist das Grundstück Erbbaurecht?',
+      /* v1313 · Marcel: „den brauchst du nicht abfragen wenn man den
+         abrufen kann. nur wenn man ihn nicht abruft." Der Bodenrichtwert
+         ist die einzige Zahl im ganzen Lauf, die amtlich UND gratis zu
+         holen ist. Danach zu fragen ist verschenkte Zeit — und die Antwort
+         waere obendrein schlechter als der Abruf. Fläche und
+         Miteigentumsanteil bleiben offen, die weiß nur der Nutzer. */
+      frageWennAbruf: 'Wie groß ist das Grundstück, und wie hoch ist dein Miteigentumsanteil? Den Bodenrichtwert hole ich gleich amtlich. Und: ist das Grundstück Erbbaurecht?' },
+    /* v1313 · Nur wenn Erbbaurecht bejaht wurde. An einem normalen Objekt
+       waere das eine Frage ins Leere; an einem Erbbaurechts-Objekt sind es
+       die beiden Zahlen, ohne die sich kein Abschlag rechnen laesst — und
+       der bewegt schnell 15 bis 30 Prozent des Werts. */
+    { et: 3, ids: ['erbbauzins', 'erb_restlz'],     rang: 10, nurWenn: 'erbpacht',
+      frage: 'Zum Erbbaurecht brauche ich noch zwei Zahlen: wie hoch ist der Erbbauzins im Jahr, und wie lange läuft der Vertrag noch?' },
 
     /* ── Etappe 4 · Feinschliff ───────────────────────────────────────
        Verfeinert die Rechnung, entscheidet aber nichts mehr. */
@@ -2413,6 +2441,22 @@
   var _rf = null;   /* { offen:[], i:0, data:{}, catalog:[], OA:{}, alle:bool } */
 
   function _rfFehlt(eintrag, fields) {
+    /* ═══ v1313 · Ein Block, der an einer Bedingung haengt ═════════════
+       `nurWenn` nennt die Id einer Checkbox. Steht sie nicht, gibt es
+       nichts zu fragen — der Erbbauzins ist keine Luecke an einem
+       Objekt ohne Erbbaurecht, sondern eine sinnlose Frage.
+
+       Gelesen wird BEIDES: das Haekchen im Formular und das, was im
+       laufenden Gespraech gesagt wurde. Waehrend des Sprechlaufs steht
+       der Wert noch in `fields`; ins Formular kommt er erst mit der
+       Uebernahme am Ende. Nur das Formular zu lesen hiesse: die
+       Nachfrage kommt eine Runde zu spaet oder gar nicht. */
+    if (eintrag.nurWenn) {
+      var _cbEl = document.getElementById(eintrag.nurWenn);
+      var _gesagt = fields ? fields[eintrag.nurWenn] : undefined;
+      var _an = (_cbEl && _cbEl.checked) || _gesagt === true || _gesagt === 'true' || _gesagt === 1;
+      if (!_an) return false;
+    }
     for (var i = 0; i < eintrag.ids.length; i++) {
       var id = eintrag.ids[i];
       var gesagt = !!(fields && (id in fields) && fields[id] !== '' && fields[id] != null);
@@ -2432,8 +2476,31 @@
   /* v1276: Bei nur drei Fragen entscheidet die Reihenfolge, ob die
      wichtigste dabei ist. Deshalb hier nach `rang` (Gewicht fuer die
      Rechnung), nicht nach Listenreihenfolge (Erzaehl-Logik). */
+  /* ═══ v1313 · Eine Frage, die den Abruf kennt ════════════════════════
+     Ein Block wird ZUGESCHNITTEN, nicht gestrichen: der Bodenrichtwert
+     faellt aus der Frage, Fläche und Miteigentumsanteil bleiben stehen.
+     Den Block ganz zu streichen waere falsch — die beiden anderen Werte
+     kann niemand abrufen.
+
+     Der Zuschnitt passiert VOR der Lueckenpruefung. Danach waere es zu
+     spaet: `_rfFehlt` haette `brw` schon als Luecke gezaehlt und den
+     Block auch dann gestellt, wenn sonst nichts fehlt.
+
+     Kopie statt Aenderung am Original — RFRAGEN ist eine Konstante, die
+     ueber den ganzen Lauf gelesen wird. Wer sie in Ort aendert, aendert
+     sie fuer jeden folgenden Durchgang mit. */
+  function _rfZuschnitt(e) {
+    if (e.abruf === 'brw' && e.frageWennAbruf && _rfBrwMoeglich()) {
+      var k = {}; for (var s in e) { if (Object.prototype.hasOwnProperty.call(e, s)) k[s] = e[s]; }
+      k.ids = e.ids.filter(function (id) { return id !== 'brw'; });
+      k.frage = e.frageWennAbruf;
+      return k;
+    }
+    return e;
+  }
+
   function _rfLuecken(fields) {
-    var offen = RFRAGEN.filter(function (e) { return _rfFehlt(e, fields); });
+    var offen = RFRAGEN.map(_rfZuschnitt).filter(function (e) { return _rfFehlt(e, fields); });
     offen.sort(function (a, b) { return (a.rang || 99) - (b.rang || 99); });
     return offen.slice(0, RF_MAX);
   }
@@ -7528,7 +7595,7 @@
   function rueckfragen(OA, data, catalog, alle) {
     var fields = (data && data.fields) || {};
     var luecken = alle
-      ? RFRAGEN.filter(function (e) { return _rfFehlt(e, fields); })
+      ? RFRAGEN.map(_rfZuschnitt).filter(function (e) { return _rfFehlt(e, fields); })
       : _rfLuecken(fields);
     /* v1293g: Was der Katalog nicht kennt, wird nicht gefragt. */
     luecken = _rfAufKatalog(luecken, catalog);

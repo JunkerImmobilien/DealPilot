@@ -1008,6 +1008,11 @@ label.dp-required.qc-required::after {
        Ueberschrift, wo die Zahl hingehoert, und sagt selbst, was sie ist. -->
   <div class="wert-puffer" id="wert-puffer" style="display:none" title="Verkehrswert minus Kaufpreis. Ist der Verkehrswert hoeher, kaufst du unter Wert — der Puffer ist sofortiges Eigenkapital, ohne dass du etwas dafuer eingezahlt hast. Negativ heisst: du zahlst ueber Marktwert. Der Verkehrswert kommt aus dem Feld weiter unten oder aus einem importierten Gutachten; ohne ihn bleibt die Zeile leer."><span>Sofortiger Wertpuffer / Equity</span><span id="wert-puffer-val" class="c-green fw6"></span></div>
 
+  <!-- v1313: Der Wertpuffer darueber rechnet beim Erbbaurecht auf einem
+       bereits GEKUERZTEN Verkehrswert. Ohne diese Zeile faellt der Puffer
+       kommentarlos kleiner aus oder ganz weg, und niemand weiss warum. -->
+  <div class="wert-puffer" id="erb-abzug-zeile" style="display:none" title="Kein Bewertungspartner nimmt das Erbbaurecht entgegen - jede Marktbewertung ist ein Volleigentumswert. Dieser Abschlag nach § 50 ImmoWertV wird davon abgezogen, bevor Wertpuffer, Wertsteigerung und Deal Score daraus rechnen."><span>davon Erbbaurechts-Abschlag (§ 50 ImmoWertV)</span><span id="erb_abzug_wert" class="fw6"></span></div>
+
   <!-- V53: Top-Reihe — Objektdaten links + Qualität & Zustand rechts (bündig, gleiche Höhe) -->
   <div class="col2 col2-stretch">
     <div class="card card-stretch"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-home"/></svg></span>Objektdaten</div><div class="g2">
@@ -3485,10 +3490,10 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=v1257"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v1293b"></script>
+  <script src="js/object-actions.js?v=v1313"></script>
   <script src="js/dpsh-score-hero.js?v=v1116"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v1183"></script>
-  <script src="js/voice-import.js?v=v1311"></script>
+  <script src="js/voice-import.js?v=v1313"></script>
 </div><!-- .main-col --></div><!-- .app-wrap -->
 </form><!-- V32 dp-noform -->
 <!-- V54: Floating Save-Button entfernt — Speichern steht in der Tab-Leiste rechts. -->
