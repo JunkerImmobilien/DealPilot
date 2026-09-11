@@ -12214,6 +12214,123 @@ alleinstehendes „ja" zählte.
 
 **Commit** `696145f`. Auf Staging, **nicht auf Prod**.
 
+## Rollout-Journal · 11.09.2026, neunter Teil — `v1306` bis `v1306d`
+
+Marcels Rückmeldung zu vier Bildern: `fragen.png`, `sanierung.png`,
+`dealscore2.png`, `entwicklung.png`. Kernsatz: *„grundsätzlich gibt es
+manchmal noch Probleme beim Verständnis … da würde ich mir einfach
+wünschen, dass es deutlich schlauer ist."*
+
+### Eine Verneinung IST eine Angabe (`v1306`)
+
+`sanierung.png`: auf *„Wir haben keine Sanierungskosten und auch keine
+Möblierung."* antwortete der Co-Pilot **„nichts gefunden, was hierher
+passt."**
+
+Die Ursache stand im Prompt, und zwar als ausdrückliche Regel:
+
+> Niemals 0 oder einen geschaetzten Wert setzen — eine 0 sieht aus wie eine
+> Angabe und ist keine.
+
+Sie kam aus `v1280c` und zielte auf einen **anderen** Fall: „zwanzig
+Prozent vom Kaufpreis", ohne dass ein Kaufpreis bekannt ist. Dort ist 0
+tatsächlich falsch.
+
+**Bei einer ausdrücklichen Verneinung ist 0 aber genau die Angabe.** „Keine
+Sanierungskosten" heißt nicht „ich weiß es nicht", sondern „der Wert ist
+null". Dieser Unterschied stand nirgends — und er ist der ganze Punkt.
+
+Der Prompt sagt jetzt beides: Verneinungen sind Antworten, „weiß nicht" ist
+eine Lücke. Dazu die Regel, dass **mehrere Aussagen in einem Satz einzeln
+auszuwerten** sind — ein „und" trennt, es verbindet nicht zu einer Aussage.
+
+**Gemessen gegen das laufende Backend:**
+
+| Satz | vorher | jetzt |
+|---|---|---|
+| „Wir haben keine Sanierungskosten und auch keine Möblierung." | nichts | `san_kosten: 0` **und** `moebliert: nein` |
+| „Nein, es muss nicht saniert werden." | nichts | `san_kosten: 0` |
+
+### Zweimal warten ist Geduld, dreimal ist Sturheit (`v1306`)
+
+Dasselbe Bild zeigt darunter zweimal hintereinander nur **„Ich höre weiter
+zu — sag den Rest."** `_fsOffenesEnde` hielt den Satz für angefangen und
+merkte ihn — **ohne Obergrenze**. Jeder Nachschlag verlängerte den Satz und
+endete wieder offen. Wer da hineingerät, kommt allein nicht heraus.
+
+Nach dem zweiten Nachschub wird jetzt ausgewertet, wie der Satz auch endet.
+Im Zweifel versteht das Modell einen Satz zu viel — besser, als den
+Sprecher hängen zu lassen.
+
+### Die Score-Karte muss man sehen (`v1306` → `v1306d`)
+
+`dealscore2.png`: *„der hat jetzt ganz runtergescrollt … man weiß gar nicht
+genau, mache ich jetzt einfach weiter? Man könnte das vielleicht
+überlesen."* Im Bild ist von der Karte nur das Ende zu sehen; die große
+Zahl steht oberhalb des Bildes.
+
+**Drei Anläufe, zwei eigene Fehler:**
+
+1. Scroll auf den Kartenanfang mit 320 ms Verzögerung. Griff nicht: die
+   nächste Frage kommt erst nach dem KI-Aufruf, **Sekunden später**, und
+   ihr `_rfAnsEnde(chat, true)` zog den Blick wieder ans Ende.
+2. Merker `_rf.haltBlase`, solange er gilt erzwingt keine Blase mehr das
+   Ende. Griff immer noch nicht — **gemessen: Karte bei 17 px, Chat beginnt
+   bei 232.**
+3. Der Grund: `b.offsetTop` zählt ab dem nächsten **positionierten**
+   Vorfahren, und der ist hier nicht der Chat. Richtig ist der Abstand
+   zwischen den beiden Rechtecken plus der aktuelle Scrollstand — das ist
+   unabhängig davon, wo `position` gesetzt ist.
+
+**Nachgemessen:** Karte bei 239, Chat bei 232, die Zahl **71** sichtbar.
+Darunter steht „▸ Weiter geht es mit Lage & Zustand".
+
+### Die Frage nach einem Abruf (`v1306`)
+
+`fragen.png`: „Hol den Bodenrichtwert" **hat funktioniert** — 90 €/m² aus
+BORIS. Danach stand aber nur der Wert da; die Frage war nach oben
+weggerutscht. Ein Abruf beantwortet **einen** Teil der Frage; solange andere
+Felder offen sind, gehört sie wieder hin. Steht nichts mehr offen, wird
+nicht wiederholt.
+
+### Die Frage, die gerade gilt (`v1306`)
+
+*„dass man das nochmal visualisiert, was gerade aktuell ist … den Rahmen
+aufscheinen lässt."* Die aktuelle Frage trägt jetzt einen goldenen Rand mit
+**einmaligem** Puls — ein Rahmen, der dauernd pulsiert, ist Unruhe statt
+Hinweis. Genau eine Blase trägt ihn; die vorige verliert ihn.
+
+### „Erweiterte Marktpreisindikation" (`v1306`)
+
+*„so sollte die auch heißen. Du nennst die nur erweiterte."* Die Knöpfe
+hießen `Einfach` und `Erweitert` — Kurzformen aus der Stufenwahl, die neben
+„Lage recherchieren" nichts sagen.
+
+### „nimm die aus den Einstellungen" war ein Abruf-Befehl (`v1306b`)
+
+**Beim Durchlauf herausgefallen:** der Satz landete im Zweig für „nenn die
+Aktion beim Namen" (`/^(hol|nimm|mach|…)/`), und der Co-Pilot fragte, welchen
+Abruf er holen soll. „nimm" ist zweideutig — **wo eine Quelle genannt wird,
+ist es kein Abruf-Befehl.**
+
+**Commits** `0908293`, `a337fbb`, `ecc8fad`, `3a77bd3`. Gold-Audit RC=0.
+Backend neu gebaut (Prompt-Änderung). Auf Staging, **nicht auf Prod**.
+
+### Was aus diesem Auftrag noch offen ist
+
+Marcel hat mehr genannt, als in diesen Zyklus passte. Offen und im Backlog:
+
+- **Den Marktbericht der erweiterten Marktpreisindikation auswerten** und
+  seine Werte (Bevölkerung, Nachfrage, Wertsteigerung, Entwicklung)
+  vorschlagen: „Aus der erweiterten Marktpreisindikation habe ich entnehmen
+  können, dass … sollen wir die so übernehmen?"
+- **Auswahlfelder anklickbar** statt als Fließtext („leicht fallend"), und
+  wenn alle gewählt sind, läuft es weiter. Auch für Qualität und Zustand.
+- **Die Pre-Flight-Kombination**: Marktbewertung + Exposé/Marktbericht +
+  Sprache in einem Lauf, mit Bericht im Objekt und Ausgabe unter der Karte.
+- **ImmoMetrica** genauso, gegen die Testobjekte.
+- **Fehlende Straße** → Ortszentrum vorschlagen.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

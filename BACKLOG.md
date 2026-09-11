@@ -38,7 +38,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
 
-**Stand:** `v1273`–`v1305` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
+**Stand:** `v1273`–`v1306d` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
 — nichts davon ist live.
 
 > **Nach Marcels erstem echten Sprechlauf am 10.09. abends** (Bilder
@@ -130,7 +130,7 @@ die Kosten einer Aufnahme um rund 40 % — bei 4 Minuten von ≈ 1,7 auf ≈ 0,9
 
 ### 4 · Der Sprechlauf gehört auf Produktion
 
-**`v1273`–`v1305` liegen auf Staging.** Prod steht auf
+**`v1273`–`v1306d` liegen auf Staging.** Prod steht auf
 `a21fe9c` — der Co-Pilot, die Etappen, beide Scores, BORIS-Abruf und
 Marktpreisindikation im Hintergrund sind für keinen Kunden erreichbar.
 
@@ -174,7 +174,51 @@ Meldung, nicht der Ausweg.
 **BLOCKIERT:** wartet auf Marcels Wahl aus der Demo. Geld und Optik —
 das entscheidet er.
 
-### 9 · Was uns eine Bewertung im Einkauf kostet — ungeführt
+### 9 · Der Sprechlauf: was aus Marcels Auftrag vom 11.09. noch fehlt
+
+Fünf Punkte aus der Rückmeldung zu den Bildern `fragen.png`,
+`sanierung.png`, `dealscore2.png`, `entwicklung.png` sind gebaut
+(`v1306`–`v1306d`, siehe Journal). **Diese hier stehen noch aus** — in
+Marcels Reihenfolge, weil sie aufeinander aufbauen:
+
+**a) Den Marktbericht auswerten, nicht nur abrufen.**
+*„Diese Sachen wie Entwicklung, also Bevölkerung, Nachfrage,
+Wertsteigerung, Entwicklungsmöglichkeiten, das kriegen wir ja bei der
+erweiterten Marktpreisindikation ausgewertet im Marktbericht. Also du
+kannst den kompletten Marktbericht dann auch auswerten und auch die Sachen
+übernehmen."*
+
+Danach der Vorschlag im Dialog: *„Aus der erweiterten Marktpreisindikation
+habe ich entnehmen können, dass die und die Werte so und so angenommen
+sind, sollen wir die auch so übernehmen?"* — bestätigbar per Sprache oder
+Text.
+
+**b) Auswahlfelder anklickbar.** Heute stehen die Stufen als Fließtext
+(`entwicklung.png`: „Bevölkerung Stark wachsend · Wachsend · Stabil ·
+Leicht fallend · Stark fallend"). Marcel will sie als Knöpfe — *„zum
+Beispiel leicht fallend, dann könnte man es anklicken, und wenn man alles
+angeklickt hat, dann läuft es automatisch weiter."* Gilt auch für Qualität
+und Zustand.
+
+**c) Die Pre-Flight-Kombination in einem Lauf.** Marktbewertung + Exposé /
+Marktbericht + Sprache zusammen: erst die Quellen lesen, dann sagen *„ich
+habe schon einige Werte aus dem Marktbericht und dem Exposé gelesen"*, dann
+**nur** Adresse und Übernahme bestätigen lassen — und danach ausschließlich
+die fehlenden Felder fragen. Der Bericht gehört ins Objekt, die
+Marktpreisindikation unter die Pre-Flight-Karte wie sonst auch.
+
+**d) ImmoMetrica genauso** — gegen die Testobjekte durchspielen.
+
+**e) Fehlende Straße → Ortszentrum vorschlagen.** *„Da fehlt manchmal zum
+Beispiel die Straße. Da könnten wir auch den Vorschlag machen, ob wir
+vielleicht einfach das Zentrum dann annehmen."* Bei bekanntem Ort ohne
+Straße also anbieten, mit dem Zentrum zu rechnen.
+
+**Marcels Maßstab dazu:** *„hier jetzt nochmal ganz genau drauf achten. Das
+muss wirklich hundertprozentig werden. Und der muss sehr schlau reagieren
+können, also im gesamten Kontext."*
+
+### 10 · Was uns eine Bewertung im Einkauf kostet — ungeführt
 
 **Es gibt keine Einkaufspreisliste.** Die einzigen Kostenzahlen im ganzen
 Repo stehen in einem Kommentar, der ausdrücklich als *„STILLGELEGT v1183"*
@@ -192,7 +236,7 @@ zeigt — an **einer** Stelle, so wie die Verkaufspreise in `config.js`.
 
 **BLOCKIERT:** braucht Marcels Vertragszahlen.
 
-### 10 · Vor dem Prod-Rollout: wem nimmt der Verfall etwas?
+### 11 · Vor dem Prod-Rollout: wem nimmt der Verfall etwas?
 
 `v1296` dreht die Regel um — das Monatskontingent verfällt, nur Gekauftes
 bleibt. Auf Staging ist das ohne Folgen (Testkonten). **Auf Produktion ist

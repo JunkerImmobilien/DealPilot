@@ -2346,3 +2346,64 @@ einschränkt, bestätigt nicht.**
 Das Gegenstück (Ablehnung) braucht dabei eine **eigene** Wortliste, nicht
 die Verneinung der ersten: „nein, stimmt nicht" enthält genau das „nicht",
 das eine Zustimmung ausschließt.
+
+## Eine Schutzregel, die im falschen Fall zuschlägt
+
+Im Auswertungs-Prompt stand: *„Niemals 0 setzen — eine 0 sieht aus wie eine
+Angabe und ist keine."* Sie stammte aus einem echten Befund: „zwanzig
+Prozent vom Kaufpreis" ohne bekannten Kaufpreis hatte einmal 0 ergeben.
+
+Dann sagte jemand **„Wir haben keine Sanierungskosten"** — und bekam
+„nichts gefunden, was hierher passt". Denn dort **ist** 0 die Angabe.
+
+**Eine Verneinung ist eine Antwort, keine Lücke.** „Gibt es nicht" und
+„weiß ich nicht" klingen ähnlich und bedeuten das Gegenteil: das eine füllt
+das Feld mit null, das andere lässt es offen. Der Prompt kannte den
+Unterschied nicht, weil ihn niemand aufgeschrieben hatte.
+
+**Die Regel:** eine Prompt-Regel, die aus einem Einzelfall entstanden ist,
+gehört auf ihren Fall **eingegrenzt** — mit dem Gegenbeispiel daneben. Sonst
+wächst sie sich zur allgemeinen Wahrheit aus und trifft Fälle, für die sie
+nie gedacht war. Am billigsten ist das Gegenbeispiel im Prompt selbst: „In
+DIESEM Fall ist 0 richtig, in JENEM nicht."
+
+Dasselbe gilt für die zweite Hälfte: dass **mehrere Aussagen in einem Satz
+einzeln** auszuwerten sind, muss dastehen. Ein Modell, dem man sagt
+„übernimm den Wert", übernimmt einen — nicht zwei.
+
+## Warten ohne Obergrenze ist eine Falle
+
+Der Sprechlauf merkt sich einen angefangenen Satz, statt ihn auszuwerten:
+wer „die Wohnung hat …" sagt und Luft holt, soll weitersprechen können.
+
+Nur gab es keine Grenze. Endete auch der nachgeschobene Satz „offen", wurde
+wieder gewartet — und der zusammengesetzte Satz endete erst recht offen.
+Im Bild des Nutzers steht zweimal hintereinander dieselbe Zeile: „Ich höre
+weiter zu — sag den Rest." Er kam allein nicht mehr heraus.
+
+**Die Regel:** jede Schleife, die auf eine Benutzeraktion wartet, braucht
+einen Zähler. Zweimal warten ist Geduld, dreimal ist Sturheit. Und im
+Zweifel lieber einmal zu früh auswerten: ein Modell, das einen halben Satz
+bekommt, antwortet schlechter — ein Nutzer, der festhängt, hört auf.
+
+## `offsetTop` misst nicht, was man denkt
+
+Eine Karte sollte im Blick bleiben: `chat.scrollTop = karte.offsetTop - 8`.
+Gemessen landete sie bei 17 px, während der Container bei 232 begann — weit
+oberhalb des sichtbaren Bereichs.
+
+`offsetTop` zählt ab dem nächsten **positionierten** Vorfahren
+(`position` ≠ `static`), nicht ab dem scrollenden Container. Sind die beiden
+nicht dasselbe Element — und das sind sie selten —, ist die Zahl für einen
+Scroll unbrauchbar.
+
+**Die Regel:** zum Scrollen innerhalb eines Containers wird der **Abstand
+zweier Rechtecke** genommen, plus der aktuelle Scrollstand:
+
+```js
+var ab = ziel.getBoundingClientRect().top - box.getBoundingClientRect().top;
+box.scrollTop = box.scrollTop + ab - rand;
+```
+
+Das ist unabhängig davon, wo `position` gesetzt ist — und wer es prüfen
+will, misst `getBoundingClientRect().top` beider Elemente nach dem Scrollen.
