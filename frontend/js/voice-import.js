@@ -5289,6 +5289,38 @@
     return '';
   }
 
+  /* ═══ v1310 · Die Vertiefung dort anbieten, wo sie hilft ════════════════
+     Marcels Befund vom 11.09.2026: „Ist mir ganz klar aufgefallen bei
+     Bevölkerungsentwicklungen. Ich hatte erst eine Marktbewertung
+     abgerufen. Dort könnte er auch fragen nach einer erweiterten
+     Marktbewertung, so die abzurufen. Und dort haben wir doch die ganzen
+     Felder. Die kannst du dann ja automatisch ausfüllen."
+
+     Das Angebot zur Vertiefung gab es schon — aber erst NACH Etappe 4
+     (`_rfMarktStufe2Faellig`). Die Entwicklungsfrage steht MITTEN in
+     Etappe 4. Wer sie beantwortet, hat vier Felder von Hand ausgefüllt,
+     die zwei Fragen später von selbst gekommen wären.
+
+     Das Angebot gehört an die Frage, deren Arbeit es abnimmt. Angeboten
+     wird nur, wenn Stufe 1 schon lief (sonst wäre es ein anderer Kauf),
+     Stufe 2 noch nicht, und Kontingent da ist. */
+  function _rfVertiefungHier(eintrag) {
+    if (!_rf || !eintrag || !eintrag.ids) return;
+    if (_rf.markt2 || _rf.marktPlusGefragt || _rf.marktPlusHier) return;
+    if (!_rf.markt) return;                      /* Stufe 1 lief noch nicht */
+    var ENTW = ['ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_wertsteigerung', 'ds2_entwicklung'];
+    var trifft = eintrag.ids.some(function (id) { return ENTW.indexOf(id) >= 0; });
+    if (!trifft) return;
+    var kg = _rfKontingent();
+    if (!kg || !kg.mpi_plus) return;
+    _rf.marktPlusHier = 1;
+    _rfAktion('markt2',
+      'Sie liefert Bevölkerung, Nachfrage, Wertsteigerung und Entwicklung mit — ' +
+      'du musst sie dann nicht schätzen. Die erste Stufe ist schon bezahlt, es kostet die Differenz.',
+      'Erweiterte Marktpreisindikation holen', { frei: kg.mpi_plus, stufe: 2 });
+    _rf.abrufOffen = 'markt2';
+  }
+
   function _rfBrwMoeglich() {
     try {
       var plz = _rfFeld('plz');
@@ -6209,6 +6241,7 @@
           '<span style="opacity:.75">Banken rechnen meist vorsichtiger — ' +
           'sag einfach <b>ja</b>, oder nenn mir deine Zahl.</span></div>';
       })() +
+      (function(){ try { _rfVertiefungHier(e); } catch(x){} return ''; })() +
       _rfAbrufAngebot(e) +
       '<div class="vi-rf-zaehler">Frage ' + (_rf.i + 1) + ' von ' + _rf.offen.length +
         (e.et ? ' · Etappe ' + e.et + ' · ' + escH(_etName(e.et)) : '') + '</div>'));
