@@ -3272,6 +3272,31 @@
       '.vi-sc-mehr p{margin:9px 0 0;font:400 12px/1.6 Inter,system-ui,sans-serif;opacity:.82;',
       '  max-height:220px;overflow-y:auto}',
       /* Die Stufen einer Auswahl, in der Frage genannt (Backlog-Punkt 2). */
+      /* ═══ v1307 · Die Stufen als Knöpfe ═══════════════════════════════
+         Der Grund ist die Co-Pilot-Blase (`--wl-fffdf7`, hell) — gemessen,
+         nicht angenommen. Schrift also dunkel; die gewählte Stufe kehrt
+         das um und trägt Gold. */
+      '.vi-rf-bericht{margin-top:8px;padding:9px 11px;border-radius:9px;display:flex;flex-direction:column;gap:3px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 28%, transparent)}',
+      '.vi-rf-bericht .vi-rf-st{display:flex;justify-content:space-between;gap:10px;font:400 12.5px/1.45 Inter,system-ui,sans-serif}',
+      '.vi-rf-bericht .vi-rf-st-v{font:700 12px/1.45 "JetBrains Mono",ui-monospace,monospace;color:var(--wl-b8932f, #b8932f);white-space:nowrap}',
+      '.vi-rf-wahlen{margin-top:10px;display:flex;flex-direction:column;gap:8px}',
+      '.vi-rf-wahl{display:flex;flex-direction:column;gap:4px}',
+      '.vi-rf-wahl-n{font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;',
+      '  letter-spacing:.1em;text-transform:uppercase;color:var(--wl-b8932f, #b8932f);opacity:.85}',
+      '.vi-rf-wahl-o{display:flex;flex-wrap:wrap;gap:5px}',
+      '.vi-rf-wahl-b{padding:5px 11px;border-radius:99px;cursor:pointer;white-space:nowrap;',
+      '  border:1px solid rgba(42,39,39,.22);background:rgba(255,255,255,.6);color:#2A2727;',
+      '  font:500 12px Inter,system-ui,sans-serif;transition:background .12s ease,border-color .12s ease}',
+      '.vi-rf-wahl-b:hover{border-color:var(--wl-c9a84c, #C9A84C);',
+      '  background:var(--wl-c9a84c, rgba(201,168,76,.14))}',
+      '.vi-rf-wahl-b.an{border-color:var(--wl-c9a84c, #C9A84C);font-weight:700;color:#221c08;',
+      '  background:linear-gradient(160deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C))}',
+      /* In einer alten Blase sind die Knöpfe Verlauf, kein Bedienfeld —
+         der Klick wird ohnehin abgewiesen, das Aussehen sagt es vorher. */
+      '.vi-rf-blase:not(.vi-rf-dran-blase) .vi-rf-wahl-b{opacity:.5;cursor:default}',
+      '.vi-rf-blase:not(.vi-rf-dran-blase) .vi-rf-wahl-b:hover{border-color:rgba(42,39,39,.22);',
+      '  background:rgba(255,255,255,.6)}',
+
       '.vi-rf-skala{margin-top:9px;padding:8px 11px;border-radius:9px;',
       '  font:400 12px/1.55 Inter,system-ui,sans-serif;',
       '  background:rgba(42,39,39,.04);border:1px solid rgba(42,39,39,.12)}',
@@ -4759,23 +4784,107 @@
     return '<div class="vi-rf-pillen">' + teile.join('') + '</div>';
   }
 
+  /* ═══ v1307 · Die Stufen sind Knöpfe, kein Vorlesetext ══════════════════
+     Marcels Vorgabe vom 11.09.2026 (design/mockups/entwicklung.png): „zum
+     Beispiel leicht fallend, dann könnte man es anklicken, und wenn man
+     alles angeklickt hat, dann läuft es automatisch weiter. Das könnte man
+     bei allen Sachen machen, wo man so Auswahlfelder hat."
+
+     Bis hierher standen die Stufen als Fließtext: „Bevölkerung Stark
+     wachsend · Wachsend · Stabil · Leicht fallend · Stark fallend". Wer
+     antworten wollte, musste eine davon ABSCHREIBEN oder aussprechen — und
+     bei vier Feldern in einer Frage wird daraus ein Vortrag.
+
+     Jetzt ist jede Stufe ein Knopf. Sprechen geht weiter, das ist kein
+     Entweder-oder: wer „leicht fallend" sagt, wird verstanden wie bisher.
+
+     SIND ALLE FELDER DER FRAGE GEWÄHLT, GEHT ES VON SELBST WEITER. Das ist
+     Marcels eigentlicher Punkt — vier Klicks und keine fünfte Handlung. */
   function _rfSkalen(eintrag) {
     if (!eintrag || !eintrag.skalen) return '';
-    var teile = [];
+    var bloecke = [];
     (eintrag.ids || []).forEach(function (id) {
       var el = document.getElementById(id);
       if (!el || el.tagName !== 'SELECT') return;
       var opts = [].slice.call(el.options || [])
         .filter(function (o) { return String(o.value || '') !== ''; })
-        .map(function (o) { return String(o.text || '').replace(/\s+/g, ' ').trim(); })
-        .filter(function (t) { return t && t.charAt(0) !== '–'; });
+        .filter(function (o) { return String(o.text || '').trim().charAt(0) !== '–'; });
       if (!opts.length || opts.length > 12) return;
       var kat = (_rf && _rf.catalog || []).filter(function (c) { return c.id === id; })[0];
       var name = kat ? String(kat.label).replace(/\s*\(.*?\)\s*$/, '') : id;
-      teile.push('<i>' + escH(name) + '</i> ' + escH(opts.join(' · ')));
+      /* Was schon steht, ist vorgewählt — auch wenn es aus dem Marktbericht
+         oder dem Exposé kam. Der Knopf zeigt dann, was gilt. */
+      var jetzt = (_rf && _rf.data && _rf.data.fields && _rf.data.fields[id] != null)
+        ? String(_rf.data.fields[id]) : String(el.value || '');
+      bloecke.push(
+        '<div class="vi-rf-wahl" data-feld="' + escH(id) + '">' +
+          '<span class="vi-rf-wahl-n">' + escH(name) + '</span>' +
+          '<span class="vi-rf-wahl-o">' +
+            opts.map(function (o) {
+              var v = String(o.value);
+              return '<button type="button" class="vi-rf-wahl-b' + (v === jetzt ? ' an' : '') + '"' +
+                     ' data-feld="' + escH(id) + '" data-wert="' + escH(v) + '">' +
+                     escH(String(o.text).replace(/\s+/g, ' ').trim()) + '</button>';
+            }).join('') +
+          '</span>' +
+        '</div>');
     });
-    if (!teile.length) return '';
-    return '<div class="vi-rf-skala"><b>Die Stufen:</b><br>' + teile.join('<br>') + '</div>';
+    if (!bloecke.length) return '';
+    return '<div class="vi-rf-wahlen">' + bloecke.join('') + '</div>';
+  }
+
+  /* Ein Klick auf eine Stufe. EIN Zuhörer am Verlauf statt einer je Knopf:
+     die Blasen entstehen laufend neu, und ein Zuhörer an einem Knopf, den
+     es nicht mehr gibt, hält nur Speicher fest. */
+  function _rfWahlBinden() {
+    var chat = $('vi-rf-chat');
+    if (!chat || chat.__wahlGebunden) return;
+    chat.__wahlGebunden = 1;
+    chat.addEventListener('click', function (ev) {
+      var b = ev.target.closest && ev.target.closest('.vi-rf-wahl-b');
+      if (!b || !_rf) return;
+      ev.preventDefault();
+      var id = b.getAttribute('data-feld');
+      var wert = b.getAttribute('data-wert');
+      var blase = b.closest('.vi-rf-blase');
+      /* Nur die Frage, die gerade gilt — eine alte Blase ist Verlauf, kein
+         Bedienfeld. Sonst ändert ein Klick weit oben stillschweigend einen
+         Wert, den der Nutzer längst hinter sich hat. */
+      if (!blase || !blase.classList.contains('vi-rf-dran-blase')) return;
+
+      _rfSetzen(id, wert, 'Ausgewählt');
+      [].slice.call(blase.querySelectorAll('.vi-rf-wahl-b[data-feld="' + id + '"]'))
+        .forEach(function (x) { x.classList.toggle('an', x === b); });
+      _rfStandZeichnen();
+
+      /* Alle Felder dieser Frage beisammen? Dann weiter — ohne dass noch
+         ein Knopf gedrückt werden muss. */
+      var e = _rf.offen[_rf.i];
+      if (!e || !e.ids) return;
+      var fehlt = e.ids.filter(function (fid) {
+        var v = _rf.data.fields[fid];
+        if (v != null && String(v).trim() !== '') return false;
+        var el = document.getElementById(fid);
+        return !(el && String(el.value || '').trim() !== '');
+      });
+      if (fehlt.length) {
+        _rfPillenAuffrischen(blase, e);
+        return;
+      }
+      _fsStopHoeren();
+      _rfBlase('ich', 'Ausgewählt: ' + escH(_rfFelderNamen(e.ids)));
+      _rfWeiterGleich();
+    });
+  }
+
+  /* Nach einem Klick stimmen die Pillen nicht mehr — das eben gewählte Feld
+     trägt jetzt einen Haken. Sie neu zu zeichnen ist billiger und ehrlicher,
+     als sie stehenzulassen. */
+  function _rfPillenAuffrischen(blase, e) {
+    try {
+      var p = blase.querySelector('.vi-rf-pillen');
+      if (p) p.outerHTML = _rfPillen(e);
+    } catch (x) {}
   }
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -5529,6 +5638,125 @@
       ' — es wurde nichts abgebucht. Wir machen ohne sie weiter.</span>');
   }
 
+  /* ═══ v1307 · Den Marktbericht LESEN, nicht nur abrufen ═════════════════
+     Marcels Vorgabe vom 11.09.2026: „diese Sachen wie Entwicklung, also
+     Bevölkerung, Nachfrage, Wertsteigerung, Entwicklungsmöglichkeiten, das
+     kriegen wir ja bei der erweiterten Marktpreisindikation ausgewertet im
+     Marktbericht. Also du kannst den kompletten Marktbericht dann auch
+     auswerten und auch die Sachen übernehmen."
+
+     Bis hierher wurden vier Werte übernommen — Makrolage, Mikrolage,
+     Marktmiete, Marktwert. Der Fließtext daneben stand nur in einem
+     Aufklapper. Darin steht aber genau das, was drei Etappen später
+     GEFRAGT wird: wie sich Bevölkerung, Nachfrage und Preise entwickeln.
+
+     Wer für die erweiterte Stufe bezahlt und dieselbe Frage danach noch
+     einmal beantworten muss, hat sie zweimal beantwortet.
+
+     WARUM ALS VORSCHLAG UND NICHT STILL GESETZT: es ist eine Auslegung.
+     Ein Bericht sagt „die Einwohnerzahl wächst leicht" — welche der fünf
+     Stufen das ist, entscheidet der Leser. Marcels eigene Vorgabe:
+     „sollen wir die auch so übernehmen? Und dann kann man das per Sprache
+     oder per Text bestätigen." Also fragen, nicht setzen. */
+  function _rfBerichtLesen(M, quelle) {
+    if (!_rf || !M || !M.text) return;
+    if (_rf.berichtGelesen) return;          /* einmal je Lauf */
+    _rf.berichtGelesen = 1;
+
+    var FELDER = ['ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_wertsteigerung', 'ds2_entwicklung'];
+    /* Nur fragen, was noch offen ist — was der Nutzer schon gesagt hat,
+       gewinnt gegen einen Bericht. */
+    var offen = FELDER.filter(function (id) {
+      var v = _rf.data.fields[id];
+      if (v != null && String(v).trim() !== '') return false;
+      var el = document.getElementById(id);
+      return !(el && String(el.value || '').trim() !== '');
+    });
+    if (!offen.length) return;
+
+    var kat = (_rf.catalog || []).filter(function (c) { return offen.indexOf(c.id) >= 0; });
+    if (!kat.length) return;
+
+    var txt = String(M.text).replace(/[#*_>`]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (txt.length < 80) return;
+
+    Auth.apiCall('/ai/extract-text', {
+      method: 'POST',
+      body: { text: txt.slice(0, 3800), catalog: kat, kontext: _rfKontext() }
+    }).then(function (r) {
+      var f = (r && r.fields) || {};
+      var treffer = Object.keys(f).filter(function (id) {
+        return offen.indexOf(id) >= 0 && f[id] != null && String(f[id]).trim() !== '';
+      });
+      if (!treffer.length) return;
+      _rf.berichtVorschlag = { werte: {}, quelle: quelle || 'Marktbericht' };
+      var zeilen = treffer.map(function (id) {
+        _rf.berichtVorschlag.werte[id] = f[id];
+        var c = (_rf.catalog || []).filter(function (x) { return x.id === id; })[0];
+        var name = c ? String(c.label).replace(/\s*\(.*?\)\s*$/, '') : id;
+        return '<div class="vi-rf-st"><span class="vi-rf-st-n">' + escH(name) + '</span>' +
+               '<span class="vi-rf-st-v">' + escH(_rfLesbarId(id, f[id])) + '</span></div>';
+      });
+      _rfDranBlase(_rfBlase('co',
+        'Aus der <b>' + escH(quelle || 'Marktpreisindikation') + '</b> habe ich zur Entwicklung ' +
+        'das hier entnommen:' +
+        '<div class="vi-rf-bericht">' + zeilen.join('') + '</div>' +
+        '<div style="margin-top:8px">Soll ich das so übernehmen? Sag <b>ja</b> — oder nenn mir, ' +
+        'was anders ist.</div>'));
+      _rf.berichtOffen = 1;
+      _rfDranZeichnen();
+      if (_fs.an && _fs.stream) _fsHoeren(true);
+    }).catch(function () { /* Ein Vorschlag, der nicht kommt, fehlt niemandem. */ });
+  }
+
+  /* Der lesbare Text zu einem Auswahlwert — „leicht_fallend" ist ein
+     Schlüssel, „Leicht fallend" die Antwort. */
+  function _rfLesbarId(id, wert) {
+    try {
+      var el = document.getElementById(id);
+      if (el && el.tagName === 'SELECT') {
+        for (var i = 0; i < el.options.length; i++) {
+          if (String(el.options[i].value) === String(wert)) return String(el.options[i].text).trim();
+        }
+      }
+    } catch (e) {}
+    return String(wert);
+  }
+
+  /* Die Antwort auf den Bericht-Vorschlag. Steht vor der normalen
+     Auswertung, weil „ja" hier etwas anderes heißt als bei einer Frage. */
+  function _rfBerichtAntwort(t, ausSprache) {
+    if (!_rf || !_rf.berichtOffen || !_rf.berichtVorschlag) return false;
+    if (RF_JA.test(t) || _istZustimmung(t)) {
+      var w = _rf.berichtVorschlag.werte, q = _rf.berichtVorschlag.quelle;
+      var namen = [];
+      Object.keys(w).forEach(function (id) {
+        if (_rfSetzen(id, w[id], q)) {
+          var c = (_rf.catalog || []).filter(function (x) { return x.id === id; })[0];
+          namen.push((c ? c.label : id) + ' = ' + _rfLesbarId(id, w[id]));
+        }
+      });
+      _rf.berichtOffen = 0; _rf.berichtVorschlag = null;
+      _rfBlase('ich', escH(t));
+      _rfBlase('co', 'Übernommen — in der Übersicht mit Herkunft „' + escH(q) + '". ' +
+        'Ändern kannst du das in der Tabelle jederzeit.');
+      _rfStandZeichnen();
+      /* Ist die Entwicklungsfrage damit erledigt, überspringt sie der
+         Dialog von selbst — `_rfOffeneBloecke` prüft die Felder. */
+      return true;
+    }
+    if (RF_NEIN_ANGEBOT.test(t) || _istAblehnung(t)) {
+      _rf.berichtOffen = 0; _rf.berichtVorschlag = null;
+      _rfBlase('ich', escH(t));
+      _rfBlase('co', '<span style="opacity:.75">Gut — dann frage ich die Werte ganz normal ab.</span>');
+      return true;
+    }
+    /* Alles andere ist eine Korrektur: der Vorschlag fällt, der Satz geht
+       durch die normale Auswertung. */
+    _rf.berichtOffen = 0; _rf.berichtVorschlag = null;
+    return false;
+  }
+
   function _rfMarktFertig(d, stufe) {
     stufe = stufe || 1;
     _rf.marktLaeuft = 0;
@@ -5609,6 +5837,9 @@
         : '') +
       '</div>');
     _rfStandZeichnen();
+    /* v1307: Der Bericht trägt mehr als Marktwert und Lage — er sagt auch,
+       wie sich der Ort entwickelt. Das wird jetzt gelesen. */
+    _rfBerichtLesen(M, Q);
     /* v1288: Steht die Lage-Frage gerade an, ist sie damit beantwortet. */
     try {
       var e = _rf.offen[_rf.i];
@@ -5802,6 +6033,7 @@
     _rfStandZeichnen();   /* v1281 */
     _rfBandZeichnen();    /* v1288 */
     _rfDranZeichnen();    /* v1291: die Aktionsleiste unten */
+    _rfWahlBinden();      /* v1307: die Stufen-Knoepfe */
 
     var v = _rfVorschlag(e), pb = $('vi-rf-passt');
     if (pb) {
@@ -6561,7 +6793,11 @@
     var t = String(text || '').trim();
     if (!t) return true;
 
-    /* v1291: Die Adress-Rueckfrage hat Vorrang vor allem anderen. */    if (_rf.adresseFrage && _rfAdresseAntwort(t, ausSprache)) return true;
+    /* v1291: Die Adress-Rueckfrage hat Vorrang vor allem anderen. */
+    if (_rf.adresseFrage && _rfAdresseAntwort(t, ausSprache)) return true;
+    /* v1307: Der Bericht-Vorschlag ebenso - "ja" heisst dort etwas
+       anderes als bei einer Feldfrage. */
+    if (_rf.berichtOffen && _rfBerichtAntwort(t, ausSprache)) return true;
     /* v1291: Steht ein Angebot in der Aktionsleiste, ist „ja" die Antwort
        darauf. EIN Weg fuer alle Angebote — vorher hatte jedes seinen
        eigenen, und einer davon vergass die Fortsetzung (v1290). Wer die
