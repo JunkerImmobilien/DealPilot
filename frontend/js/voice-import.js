@@ -180,6 +180,25 @@
          `min-width:0` am linken Kind ist Pflicht: ein Grid-Kind schrumpft
          sonst nicht unter seinen Inhalt, und der Orbit drückt die Spalte
          aus dem Bild. */
+      /* ═══ v1301 · Die Aufnahme ist so breit wie der geführte Dialog ══════
+         Marcels Vorgabe vom 11.09.2026: „bei der Sprachaufzeichnung darf
+         das Modal schon breiter sein, also so breit wie bei dem anderen
+         Sprechlauf auch."
+
+         GEMESSEN: die Breitenregel `width:min(1240px,100%)` steht in
+         `_rfStil()` — im Block `vi-rf-stil`, den NUR der geführte Dialog
+         einhängt. Der freie Weg blieb deshalb bei der Basisregel aus
+         `vi-style`: 760 px. Dieselbe Ursache wie bei der geteilten Ansicht
+         eine Version zuvor, nur an einer anderen Eigenschaft.
+
+         Die Breite hängt am Zustand, nicht am Fenster: `vi-breit` wird
+         gesetzt, sobald die Aufnahme läuft. Die Wahlseite davor („Wie
+         möchtest du das Objekt aufnehmen?") bleibt schmal — zwei Karten
+         nebeneinander brauchen keine 1360 px, und ein Dialog, der beim
+         Klick die Breite wechselt, wirkt unruhig. */
+      '.oabi-ov.vi-mode.vi-breit .oabi-modal{width:min(1360px,100%);max-height:97vh}',
+      '@media(max-width:1400px){.oabi-ov.vi-mode.vi-breit .oabi-modal{width:min(1180px,100%)}}',
+      '@media(max-width:1200px){.oabi-ov.vi-mode.vi-breit .oabi-modal{width:min(960px,100%)}}',
       '.vi-frei-buehne{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}',
       '.vi-frei-buehne > #vi-rec{min-width:0}',
       '.oabi-ov.vi-mode #vi-frei-stand{min-height:0;max-height:min(62vh,560px);',
@@ -825,6 +844,8 @@
            Formular schon bekannt ist. Erst dadurch sieht man beim Sprechen,
            was noch fehlt, statt es am Ende zu erfahren. */
         _viFrei = {};
+        /* v1301: ab jetzt breit — die Aufnahme trägt zwei Spalten. */
+        try { document.querySelector('.oabi-ov.vi-mode').classList.add('vi-breit'); } catch (e) {}
         /* v1300c: zweimal — sofort und im nächsten Bild. Beim Messen blieb
            die Spalte leer, obwohl die Funktion fehlerfrei läuft: zu diesem
            Zeitpunkt ist `vi-frei-stand` je nach Startweg noch nicht im DOM.
