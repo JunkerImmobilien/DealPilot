@@ -33,6 +33,7 @@ import { vergleichsfaktor as amtlicherVf } from '../lib/vergleichsfaktoren_nrw.j
 import { AgsResolver } from '../connectors/AgsResolver.js';
 import { ZensusConnector } from '../connectors/ZensusConnector.js';
 import * as Erbbaurecht from '../lib/erbbaurecht.js';   /* v1320 */
+import { finde as findeKennzahl } from '../lib/ausschuss_register.js';   /* v1320b */
 
 export const ReportOrchestrator = {
   async generate(input, opts = {}) {
@@ -697,6 +698,36 @@ export const ReportOrchestrator = {
         const _anteil = (Number(ref.mea_pct) > 0 && Number(ref.mea_pct) <= 100) ? Number(ref.mea_pct) / 100 : 1;
         const _bwGesamt = (_brwSqm != null && Number(ref.plot_area) > 0)
           ? _brwSqm * Number(ref.plot_area) * _anteil : null;
+        /* ═══ Der ANGEMESSENE Erbbauzins kommt amtlich, wo es ihn gibt ═════
+           § 50 Abs. 3 ImmoWertV verlangt den Zinssatz, der "bei Neubestellung
+           von Erbbaurechten der betroffenen Grundstuecksart am
+           Wertermittlungsstichtag im gewoehnlichen Geschaeftsverkehr
+           ueblich" ist. Eine bundesweite Marktmitte von 3,5 % ist dafuer
+           nur der Notnagel.
+
+           Das Register fuehrt 15 oertliche Erbbauzinssaetze (gemessen im
+           Betrieb: "erbbauzinssatz=15"), Gemeindemittel aus ausgewerteten
+           Kauffaellen, mit eigenem Modellvermerk. Wo einer vorliegt, gilt
+           er - mit seinem Hinweis, denn er ist ausdruecklich KEIN vom
+           Gutachterausschuss abgeleiteter Modellparameter. Wer damit
+           bewertet, muss es begruenden; also sagen wir, woher er kommt.
+
+           Modellkonformitaet ist das Leitprinzip: wo die Quelle endet,
+           endet die Rechnung, und jede Zahl traegt ihre Herkunft. */
+        let _zinsAmtlich = null, _zinsQuelle = null, _zinsHinweis = null;
+        try {
+          const _gAgs = (macroBundle && macroBundle.agsInfo && macroBundle.agsInfo.gemeinde_ags) || null;
+          const _kAgs = (macroBundle && macroBundle.agsInfo && macroBundle.agsInfo.kreis_ags) || null;
+          const _tref = _gAgs ? findeKennzahl('erbbauzinssatz', _gAgs)
+                    : (_kAgs ? findeKennzahl('erbbauzinssatz', _kAgs) : []);
+          const _e = (_tref && _tref.length) ? _tref[0] : null;
+          if (_e && _e.formel && _e.formel.form === 'konstante' && Number(_e.formel.wert) > 0) {
+            _zinsAmtlich = Number(_e.formel.wert);
+            _zinsQuelle = _e.formel.bezeichnung || 'oertlicher Erbbauzinssatz';
+            _zinsHinweis = _e.formel.hinweis || null;
+          }
+        } catch (e) { /* ohne amtlichen Satz rechnet die Vorgabe weiter */ }
+
         const _mv = (valuation && valuation.market_value && valuation.market_value.estimated != null)
           ? valuation.market_value.estimated : null;
         const _rnd = (_wertParams && _wertParams.restnutzungsdauer != null)
@@ -709,7 +740,13 @@ export const ReportOrchestrator = {
           erbbauzins: ref.leasehold_rent_year,
           objektart: ref.property_type,
           restnutzungsdauer: _rnd,
+          zinssatzAngemessen: _zinsAmtlich,
         });
+        if (erbbau && erbbau.ok && _zinsAmtlich != null) {
+          erbbau.annahmen.zinsQuelle = _zinsQuelle;
+          erbbau.annahmen.zinsHinweis = _zinsHinweis;
+          erbbau.hinweise.push(`Der angemessene Erbbauzins von ${_zinsAmtlich.toFixed(1).replace('.', ',')} % ist oertlich erhoben (${_zinsQuelle}), nicht die bundesweite Marktmitte.`);
+        }
         step(erbbau.ok
           ? `Erbbaurecht: Abschlag ${Math.round(erbbau.abschlag).toLocaleString('de-DE')} EUR (${erbbau.abschlagPct.toFixed(1)} %)`
           : `Erbbaurecht: erkannt, aber nicht rechenbar (fehlt: ${erbbau.fehlt.join(', ')})`);
