@@ -38,7 +38,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
 
-**Stand:** `v1273`–`v1295` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
+**Stand:** `v1273`–`v1296f` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
 — nichts davon ist live.
 
 > **Nach Marcels erstem echten Sprechlauf am 10.09. abends** (Bilder
@@ -130,7 +130,7 @@ die Kosten einer Aufnahme um rund 40 % — bei 4 Minuten von ≈ 1,7 auf ≈ 0,9
 
 ### 4 · Der Sprechlauf gehört auf Produktion
 
-**`v1273`–`v1295` liegen auf Staging.** Prod steht auf
+**`v1273`–`v1296f` liegen auf Staging.** Prod steht auf
 `a21fe9c` — der Co-Pilot, die Etappen, beide Scores, BORIS-Abruf und
 Marktpreisindikation im Hintergrund sind für keinen Kunden erreichbar.
 
@@ -174,7 +174,65 @@ Meldung, nicht der Ausweg.
 **BLOCKIERT:** wartet auf Marcels Wahl aus der Demo. Geld und Optik —
 das entscheidet er.
 
+### 9 · Was uns eine Bewertung im Einkauf kostet — ungeführt
+
+**Es gibt keine Einkaufspreisliste.** Die einzigen Kostenzahlen im ganzen
+Repo stehen in einem Kommentar, der ausdrücklich als *„STILLGELEGT v1183"*
+markiert ist (`backend/src/routes/avm.js:92`):
+
+> PriceHubble 40 L (Kosten 6 EUR), Sprengnetter 20 L (Kosten 3 EUR, 2 API-Calls)
+
+Aus der Kerosin-Zeit, nie gegen einen aktuellen Vertrag nachgeführt. Für
+`mpi` / `mpi_plus` / `wev` gibt es **gar keine** Zahl; sie kosten real nur
+KI-Token (`gpt-4.1-mini`) und liegen erfahrungsgemäß im Zehntel-Cent-Bereich.
+
+**Was fehlt:** die echten Vertragspreise je Abruf. Die hat nur Marcel. Mit
+ihnen entsteht eine Übersicht, die je Posten Verkaufspreis, Einkauf und Marge
+zeigt — an **einer** Stelle, so wie die Verkaufspreise in `config.js`.
+
+**BLOCKIERT:** braucht Marcels Vertragszahlen.
+
+### 10 · Vor dem Prod-Rollout: wem nimmt der Verfall etwas?
+
+`v1296` dreht die Regel um — das Monatskontingent verfällt, nur Gekauftes
+bleibt. Auf Staging ist das ohne Folgen (Testkonten). **Auf Produktion ist
+ungezählt, wie viel angespartes Guthaben in `mpi_bank` / `mpi_plus_bank` /
+`wev_bank` liegt.**
+
+Der bestehende Bestand bleibt bewusst stehen (siehe Journal), es geht also
+niemandem etwas verloren. Trotzdem gehört die Zahl vor dem Rollout auf den
+Tisch: wer bisher angespart hat, wird ab dem nächsten Monatswechsel **nichts
+Neues** mehr ansammeln, und das ist eine Änderung an einer Zusage.
+
+```sql
+SELECT COUNT(*) FILTER (WHERE mpi_bank + mpi_plus_bank + wev_bank > 0),
+       SUM(mpi_bank), SUM(mpi_plus_bank), SUM(wev_bank)
+  FROM ai_credits_user;
+```
+
+**BLOCKIERT:** der Lesezugriff auf die Prod-Datenbank ist in dieser Sitzung
+abgelehnt worden. Marcel kann die Abfrage selbst fahren oder den Zugriff
+freigeben.
+
 ---
+
+## → Erledigt am 11.09.2026, dritter Teil (`v1296`–`v1296f`)
+
+| Marcels Vorgabe | Stand |
+|---|---|
+| Die Preise für die Bewertungspartner raus | **fertig** — `avm_a`/`avm_b` aus Angebot und Katalog; gemessen: `avm_a` → HTTP 400 `invalid_pack`, beide Bänke auf Staging 0 |
+| Der Kunde wählt selbst, wie viele er nachkauft | **fertig** — Mengenwähler an Nachkauf-Karte und jeder Einzelzeile, in beiden Oberflächen; Deckel 25, gekappt statt abgelehnt |
+| Plan-Bewertungen verfallen am Monatsende | **fertig** — `_monatsReset` überträgt nichts mehr; gemessen am abgesetzten SQL, `_bank` kommt darin nicht vor |
+| Nur selbst Nachgekauftes bleibt dauerhaft | **fertig** — Verbrauchsreihenfolge Monat → Testphase → Bank passte bereits; sieben Textstellen nachgezogen |
+
+**Vier Befunde fielen beim Bauen heraus** und sind mitbehoben: der Einzelkauf
+verschwand beim Segmentwechsel; seine CSS-Regeln hingen am falschen Anker
+(seit `v1294` nackte Divs); der ganze Kaufblock stand im toten Zweig und war
+für zahlende Kunden unerreichbar; der Webhook-Rückfall multiplizierte die
+Menge nicht. Einzelheiten im Rollout-Journal.
+
+**Commits** `784ec2d`, `2bacff6`, `883da9a`, `2905a55`, `208b244`, `233112c`.
+Gold-Audit RC=0.
 
 ## → Erledigt am 11.09.2026, zweiter Teil (`v1294`–`v1295`)
 

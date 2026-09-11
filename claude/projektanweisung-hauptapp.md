@@ -11543,6 +11543,167 @@ auszulesen ist billiger, als einer Null-Messung zu glauben.
 Varianten A ruhige Liste · B am Fehlerpunkt · C Kacheln — Empfehlung A + B).
 Und das echte Sprechen am Mikrofon, das nur er abnehmen kann.
 
+## Rollout-Journal · 11.09.2026, dritter Teil — `v1296` bis `v1296f`
+
+Drei Vorgaben von Marcel, ausgelöst durch eine Frage, die er sich selbst
+nicht beantworten konnte: *„Ich werd nicht ganz schlau daraus, was sind die
+anderen beiden Pakete? Also zum Beispiel Marktwertabruf, Bewertungspartner
+und Marktwertabruf zweiter Partner, das versteh ich nicht."*
+
+**Wenn der Betreiber seine eigene Preisliste nicht lesen kann, kann es der
+Kunde erst recht nicht.** Die Antwort war: in der Liste standen zwei
+verschiedene Dinge nebeneinander, ohne dass das irgendwo stand.
+
+| | Posten | Preis | wer rechnet |
+|---|---|---|---|
+| `mpi` | Marktpreisindikation | 0,90 € | **wir selbst** |
+| `mpi_plus` | Erweiterte Marktpreisindikation | 1,90 € | **wir selbst** |
+| `wev` | Wertermittlung nach ImmoWertV | 3,90 € | **wir selbst** |
+| `avm_a` | Marktwert-Abruf · Bewertungspartner | 5,90 € | Sprengnetter |
+| `avm_b` | Marktwert-Abruf · zweiter Partner | 9,90 € | PriceHubble |
+
+Die ersten drei rechnet das Marktbericht-Backend aus amtlichen Daten. Die
+letzten beiden kaufen einen **fremden** Wert zu — daher der Preissprung von
+3,90 auf 5,90. Auf der Landing hieß die Überschrift **„Die drei
+Bewertungsarten"** und darunter standen **fünf**; genau dieser Widerspruch
+stand ungelöst auf der Seite.
+
+### Was uns die Abrufe kosten, wissen wir nicht
+
+**Eine geführte Einkaufspreisliste gibt es nicht.** Die einzigen Kostenzahlen
+im Repo stehen in einem Kommentar, der als *„STILLGELEGT v1183"* markiert ist
+(`avm.js:92`): PriceHubble ≈ 6 €, Sprengnetter ≈ 3 € je Abruf. Aus der
+Kerosin-Zeit, nie gegen einen aktuellen Vertrag nachgeführt. **Das gehört
+geführt** — sonst weiß in drei Monaten wieder niemand, ob 5,90 € Marge macht.
+
+### 1 · Die Partner-Abrufe sind raus (`v1296`)
+
+Raus aus `EINZELKAUF`, aus `LOOKUP_KEYS` (damit unverkäuflich), aus der
+Landing und dem Leistungsumfang. **Die ART bleibt im System**: `avm_a_bank`
+und `avm_b_bank` gibt es weiter, ein Bestand bliebe abrufbar. Gemessen auf
+Staging: beide Bänke **0**, niemand betroffen.
+
+Gemessen gegen den laufenden Checkout: `avm_a` → **HTTP 400 `invalid_pack`**.
+
+### 2 · Der Kunde wählt die Menge (`v1296`)
+
+Mengenwähler an der Nachkauf-Karte und an jeder Einzelkauf-Zeile, in beiden
+Oberflächen. Er wohnt **einmal** in `pricing-modal.js` und wird über
+`window.DealPilotMenge` geliehen — zwei Kopien laufen auseinander, wie die
+Nachkauf-Zahlen es bis `v1294` taten.
+
+Der Checkout nimmt `menge`, **kappt bei 25** statt abzulehnen (wer sich
+vertippt, soll nicht vor einem Fehler stehen) und schreibt Stückzahl und
+Betrag in die Historie. Gemessen:
+
+| gesendet | zurück | Betrag |
+|---|---|---|
+| `mpi` × 3 | 3 | 2,70 € |
+| `mpi` × 999 | **25** | 22,50 € |
+| `mpi` × 0 | **1** | 0,90 € |
+| `nachkauf_pro` × 3 | 3 | 37,50 € |
+
+In `credit_purchases` steht `nachkauf_pro | 45 | 3750` — 15 Bewertungen × 3.
+
+**Nebenbefund, mitgefixt:** der Webhook-Rückfall `_paketAusMetadaten` las nur
+`paket`, **nicht die Menge**. Wäre er je zum Zug gekommen, hätte er bei Menge
+3 **eine** gutgeschrieben — ein stiller Fehlbetrag genau nach dem Bezahlen.
+
+### 3 · Das Monatskontingent verfällt (`v1296`)
+
+Marcels Regel kehrt die von `v1183` um: *„die im Plan integrierten
+Bewertungen verfallen am Ende des Monats. Nur selber nachgekaufte bleiben
+dauerhaft."*
+
+`_carryOver` heißt jetzt `_monatsReset` und überträgt nichts mehr. **Die Bank
+bleibt unangetastet** — darin liegen Gekauftes und ein Rest aus der
+Ansparzeit, die man nicht mehr trennen kann; rückwirkend zu streichen, was
+nach den damals geltenden Regeln angespart wurde, wäre eine Enteignung.
+
+Der Beweis ist das abgesetzte SQL, nicht der gelesene Code — der Monats-
+wechsel setzt ausschließlich `mpi_used`, `mpi_plus_used`, `wev_used` auf
+null und schreibt den Merker `kontingent_carry_at` fort. **`_bank` kommt
+darin nicht vor** — für keinen Plan, weil der Plan gar nicht mehr gelesen
+wird. Gegenprobe: Bänke 7 und 4 vor und nach dem Wechsel unverändert,
+`used` 3/2/1 → 0/0/0. Idempotenz: drei Auskünfte nach dem Wechsel, **null**
+weitere Resets, ein frischer Verbrauch von 2 blieb stehen.
+
+Die Verbrauchsreihenfolge passte schon: **Monat → Testphase → Bank**. Was
+verfällt, geht zuerst; Gekauftes zuletzt. **Sieben Textstellen** sagten das
+Gegenteil („wandert ins Guthaben") und sind nachgezogen.
+
+### Vier Befunde, die beim Bauen herausfielen
+
+**Der Einzelkauf verschwand beim Segmentwechsel.** `_wireKerosinStrip`
+zeichnete `_bwSegsHtml + _bwPassHtml` **ohne** `_einzelHtml()` — ein Klick
+auf ein anderes Segment löschte den kompletten Block. Seit `v1294` drin,
+beim Nachmessen nicht gesehen, weil ich das Segment nie gewechselt habe.
+
+**Die Regeln des Streifens hingen am falschen Anker (`v1296b`).** Sie standen
+unter `P = "#pricing-modal .ppg"` — dem Planraster. Der Streifen liegt aber
+in `#pricing-modal #pricing-plugin-host.dp-wrap`. Der Kaskaden-Walker zeigte
+auf `.pm-menge` **zwei** Treffer, beide Sammelregeln (`*`, `.dp-wrap *`),
+keine einzige eigene. `.pm-einzel-row` stand auf `display:block` und
+`padding:0` — **die Einzelkauf-Liste war seit `v1294` nackte Divs**, der
+Mengenwähler lief auf 1180 px Breite.
+
+**Der Kaufblock stand im toten Zweig (`v1296d`).** `_renderPlanPane()` kehrt
+bei jedem bezahlten Plan nach vier Zeilen zurück; Nachkauf und Einzelkauf
+standen **hinter** diesem Return:
+
+> zahlender Kunde → sieht den Block nie · Free-Kunde → sieht ihn, darf aber
+> nicht kaufen (`upgrade_required`)
+
+**Gezeigt wurde er genau denen, die ihn nicht nutzen dürfen.** Gemessen im
+DOM bei Plan `pro`: `.plan-credits-section` **0 Treffer**. Jetzt in
+`_kaufBlockHtml(planKey)`, gerufen aus beiden Zweigen.
+
+**Vier Farbrunden hintereinander (`v1296b`, `c`, `e`).** Derselbe Wähler
+läuft an drei Orten, und ich habe den Grund dreimal falsch angenommen statt
+gemessen:
+
+| Ort | angenommen | gemessen |
+|---|---|---|
+| Modal, Einzelzeilen | hell | **dunkel** `rgb(26,24,24)` |
+| Modal, `.bw-gate` | dunkel | **weiß** `#fff`, Kontrast **16** |
+| Einstellungen | dunkel | **weiß** `#fff`, Kontrast **16** |
+
+Der letzte Fehlschluss ist der lehrreichste: ich las die Nachbarregel
+`background: rgba(255,255,255,.04)` und folgerte „dunkler Grund". **Eine
+4-%-Weiß-Aufhellung funktioniert auf beiden Gründen und sagt über keinen
+etwas aus.** Aus einer CSS-Zeile auf die Grundfarbe zu schließen ist keine
+Messung — der erste **opake** Vorfahre ist es. Danach überall Kontrast 215.
+
+Dabei ist mir zusätzlich ein Token `--wl-f4efe6` untergekommen, das ich
+selbst erfunden hatte: `whitelabel-override.js` setzt es nicht, der Fallback
+hätte immer gegriffen. **Ein toter Anker mit plausiblem Aussehen**, dieselbe
+Sorte wie die `#app`-Regel aus `v1147`. Wieder entfernt.
+
+### Der Wächter hat gearbeitet (`v1296f`)
+
+`gold-audit` gegen die Basislinie: `style.css` **0 → 1** („Datei war
+sauber!"), `pricing-modal.js` **53 → 55**. Drei harte Gold-Literale, alle
+drei an diesem Tag von mir. Auf `var(--wl-c9a84c, rgba(…))` gezogen, danach
+**RC=0, genau auf der Basislinie**.
+
+### Die Lehre aus dieser Runde
+
+Bei `v1294` habe ich den Einzelkauf als erledigt gemeldet — er war aus der
+Bedingung heraus, die ihn verbarg, und lag danach in einem Zweig, der nie
+läuft, ungestylt, und verschwand beim ersten Segmentwechsel. **Gemessen
+hatte ich, DASS die Zeilen im DOM sind. Nicht, ob sie jemand zu sehen
+bekommt, wie sie aussehen, und ob sie einen Klick überleben.** Eine
+Existenzprüfung ist keine Abnahme.
+
+**Commits** `784ec2d` (v1296), `2bacff6` (v1296b), `883da9a` (v1296c),
+`2905a55` (v1296d), `208b244` (v1296e), `233112c` (v1296f). Auf Staging,
+**nicht auf Prod**.
+
+**Rest:** die Einkaufspreise der beiden Partner (nur Marcel hat die
+Verträge), und die Prod-Bestände an `*_bank` — der Lesezugriff auf die
+Prod-Datenbank ist in dieser Sitzung blockiert, und vor einem Prod-Rollout
+gehört gezählt, wem der Wegfall des Übertrags etwas nimmt.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

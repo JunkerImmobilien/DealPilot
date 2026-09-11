@@ -1961,3 +1961,118 @@ Richtung, und sie kostet den Kunden ein Drittel seines Spielraums.
 Gerechnet wird mit 20 %. Die 15 % stehen daneben, ausgerechnet, mit dem
 Satz, wo nachzusehen ist. **Wo die Quelle endet, endet die Rechnung** —
 und was dann bleibt, ist ein Hinweis, keine Zahl.
+
+## Eine Existenzprüfung ist keine Abnahme
+
+Bei `v1294` habe ich gemeldet, der Einzelkauf sei jetzt sichtbar. Gemessen
+hatte ich: fünf `.pm-einzel-row` im DOM, fünf Kaufknöpfe. Das stimmte.
+
+Nicht gemessen hatte ich:
+
+- **ob sie jemand zu sehen bekommt** — der Block lag hinter einem frühen
+  `return`, der bei jedem bezahlten Plan greift. Wer kaufen durfte, sah ihn
+  nie; wer ihn sah, durfte nicht kaufen.
+- **wie sie aussehen** — die CSS-Regeln hingen am falschen Anker, also stand
+  die Liste auf `display:block` und `padding:0`. Nackte Divs.
+- **ob sie einen Klick überleben** — ein Wechsel des Nachkauf-Segments zeichnete
+  den Streifen neu und ließ den Einzelkauf dabei weg.
+
+**Die Regel:** `querySelectorAll(...).length > 0` beweist, dass Markup
+entstanden ist — sonst nichts. Eine Abnahme fragt vier Dinge: **Kommt jemand
+hin? Sieht es aus wie gedacht? Übersteht es Bedienung? Tut es, was draufsteht?**
+Jede dieser Fragen hat hier einen eigenen Fehler verborgen.
+
+## Aus einer CSS-Zeile auf die Grundfarbe schließen ist keine Messung
+
+Ein Mengenwähler sollte an zwei Orten laufen. Die Nachbarregel im
+Einstellungs-CSS lautete `background: rgba(255,255,255,.04)`, und daraus habe
+ich gefolgert: dunkler Grund, also helle Schrift.
+
+Gemessen war der erste **opake** Vorfahre `rgb(255,255,255)` — reines Weiß.
+Creme-Schrift darauf ergibt **Kontrast 16**. Unsichtbar.
+
+**Eine 4-%-Weiß-Aufhellung funktioniert auf hellem wie auf dunklem Grund und
+sagt über keinen von beiden etwas aus.** Dasselbe gilt für jede Farbe mit
+kleinem Alpha, für `currentColor` und für `color: inherit` — sie sind gerade
+deshalb beliebt, weil sie überall irgendwie passen.
+
+**Die Regel:** vor jeder Farbentscheidung den ersten Vorfahren mit **opakem**
+Hintergrund auslesen und die Helligkeit beider Farben vergleichen. Ein
+Kontrast unter etwa 60 ist nicht lesbar, unter 20 nicht sichtbar. Vier
+Ausrollzyklen an einem Tag gingen für diese eine Zeile drauf — dreimal
+geraten, einmal gemessen.
+
+## Ein Baustein an drei Orten braucht drei gemessene Gründe
+
+Derselbe Mengenwähler lief im Preis-Modal in den Einzelzeilen (dunkel), im
+selben Modal in der Boarding-Pass-Karte (`background:#fff`) und in den
+Einstellungen (weiß). **Drei Orte, zwei Gründe, eine Farbfassung** — das kann
+nicht aufgehen.
+
+Der Versuch, sich mit neutralen Werten herauszuhalten (`color:inherit`,
+Grau mit Alpha), schlug fehl: geerbt kam Schwarz an, und Grau auf Weiß ist
+genauso blass wie Grau auf Schwarz.
+
+**Die Regel:** ein wiederverwendeter Baustein bekommt **je Einsatzort** eine
+gemessene Farbfassung, angehängt an den Behälter dieses Ortes
+(`.bw-gate .pm-menge{…}`). Der Baustein selbst — Markup und Verhalten —
+bleibt einmal im Code und wird exportiert. **Logik teilen, Farben nicht.**
+
+## Zwei Dinge in einer Liste, ohne dass es dasteht
+
+Die Einzelkauf-Liste führte fünf Posten zu 0,90 / 1,90 / 3,90 / 5,90 / 9,90 €.
+Die ersten drei rechnet die eigene Maschine, die letzten beiden kaufen einen
+fremden Wert bei einem externen Anbieter zu. **Nirgends stand das.**
+
+Aufgefallen ist es, weil der Betreiber selbst fragte, was die beiden letzten
+Posten eigentlich seien. Auf der Landing stand über der Liste sogar „Die drei
+Bewertungsarten" — und darunter fünf Zeilen. Der Widerspruch stand da,
+monatelang, und niemand las ihn.
+
+**Die Regel:** wo eine Preisliste Posten mit **verschiedener Herkunft** führt
+— selbst gerechnet gegen zugekauft, Pauschale gegen Verbrauch —, gehört die
+Herkunft in die Liste, nicht in den Kopf dessen, der sie gebaut hat. Und wenn
+eine Überschrift eine Anzahl nennt, ist sie ein Prüfwert: **stimmt die Zahl
+noch mit dem, was darunter steht?**
+
+## Wer die Menge wählbar macht, muss jeden Weg mitziehen
+
+Der Checkout bekam einen Mengenparameter, die Stripe-Position eine
+`quantity`, die Kaufhistorie Stückzahl und Gesamtbetrag. Der Webhook
+multiplizierte bereits korrekt — **aber nur auf dem Hauptweg.**
+
+Sein Rückfall (`_paketAusMetadaten`, greift wenn Stripe die Positionen nicht
+hergibt) las das Paket aus den Sitzungsdaten und **ignorierte die Menge**.
+Wer drei kauft und in diesen Zweig gerät, bekommt eines. Ein stiller
+Fehlbetrag, sichtbar erst beim Kunden, der zwei Bewertungen vermisst — nach
+dem Bezahlen.
+
+**Die Regel:** eine neue Größe im Kaufweg wird durch **alle** Zweige
+gezogen, Rückfälle eingeschlossen. Rückfälle sind besonders gefährlich: sie
+laufen selten, also fällt dort nichts auf, und sie laufen genau dann, wenn
+ohnehin etwas schiefging.
+
+Dazu ein Deckel gegen den Browser: die Menge kommt aus dem Client. Ohne
+Obergrenze kauft ein manipulierter Aufruf zehntausend. **Gekappt, nicht
+abgelehnt** — wer sich vertippt, soll nicht vor einem Fehler stehen.
+
+## Eine Regel umdrehen heißt, ihre Sätze zu suchen
+
+Das Monatskontingent sollte künftig verfallen; bis dahin wanderte es ins
+Guthaben. Die Änderung im Rechenweg war eine Funktion.
+
+**Die Aussage darüber stand an sieben Stellen** — im Kontingent-Panel, im
+Preis-Modal, in den Einstellungen, zweimal auf der Landing, im
+Leistungsumfang, in einem toten Landing-Modul. Alle sagten das Gegenteil von
+dem, was der Code ab sofort tat.
+
+**Die Regel:** wird eine Zusage umgedreht, wird nach ihrem **Wortlaut**
+gesucht, nicht nach dem Feldnamen. „verfällt nicht", „wandert ins Guthaben",
+„bleibt erhalten" — jede Formulierung einzeln, auch in Dateien, die
+niemand mehr lädt. Ein Kommentar, der eine alte Regel erklärt
+(`sparfaktor` = Obergrenze des Angesparten), gehört mit berichtigt, sonst
+erklärt er beim nächsten Mal etwas Falsches mit voller Überzeugung.
+
+Und was Bestandskunden bereits angespart haben, bleibt stehen. **Rückwirkend
+zu streichen, was nach den damals geltenden Regeln erworben wurde, ist eine
+Enteignung** — auch wenn es technisch nur eine Spalte ist.
