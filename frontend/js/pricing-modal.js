@@ -215,38 +215,68 @@
       P+" .tk-rip .bp-txt{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:#8a7c60;white-space:nowrap}"+
       '@media(max-width:820px){'+P+'{grid-template-columns:1fr 1fr}}'+
       '@media(max-width:520px){'+P+'{grid-template-columns:1fr}}'+
-      P+" .pm-einzel{margin-top:18px;padding:16px 18px;border:1px solid var(--wl-c9a84c, rgba(201,168,76,.3));border-radius:14px;background:var(--wl-fffdf7, rgba(201,168,76,.05))}"+
-      P+" .pm-einzel-h{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--wl-b8932f, #b8932f);margin-bottom:11px}"+
-      P+" .pm-einzel-grid{display:flex;flex-direction:column;gap:1px}"+
-      P+" .pm-einzel-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(42,39,39,.08)}"+
-      P+" .pm-einzel-row:last-child{border-bottom:none}"+
-      P+" .pm-einzel-l{flex:1;min-width:0;font-size:13px}"+
-      P+" .pm-einzel-p{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;white-space:nowrap;text-align:right;min-width:74px}"+
-      P+" .pm-einzel-p small{display:block;font-size:9.5px;font-weight:400;opacity:.55;letter-spacing:.01em}"+
-      P+" .pm-einzel-cta{flex:0 0 auto;padding:5px 13px;border-radius:8px;border:1px solid var(--wl-c9a84c, #C9A84C);color:var(--wl-b8932f, #b8932f);font-size:11.5px;font-weight:700;text-decoration:none;white-space:nowrap}"+
-      P+" .pm-einzel-cta:hover{background:var(--wl-c9a84c, #C9A84C);color:#221c08}"+
+      /* ═══ v1296 · DIESE REGELN HINGEN AM FALSCHEN ANKER ══════════════════
+         Hier stand `P + " .pm-einzel…"`, und `P` ist `#pricing-modal .ppg`
+         — die Planraster-Flaeche. Der Einzelkauf-Streifen liegt aber in
+         `#pricing-modal #pricing-plugin-host.dp-wrap`, NICHT in `.ppg`.
 
-      /* v1296 · Mengenwaehler. Die Ziffer sitzt in JetBrains Mono, damit
-         zwei- und einstellige Mengen gleich breit bleiben und die Zeile
-         beim Tippen nicht springt. `flex:0 0 auto` ist Pflicht: die Zeile
-         ist ein Flex-Behaelter, ohne das schrumpft der Waehler auf die
-         Knoepfe zusammen, sobald das Label lang wird.
+         GEMESSEN am 11.09.2026 mit dem Kaskaden-Walker: auf `.pm-menge`
+         trafen ZWEI Regeln, beide Sammelregeln (`*` und `.dp-wrap *`).
+         Keine einzige eigene. `.pm-einzel-row` stand auf `display:block`
+         und `padding:0` — die Einzelkauf-Liste war seit v1294 nackte
+         Divs, und der Mengenwaehler lief auf 1180 px Breite.
 
-         KEINE HARTE FLAECHE, KEINE HARTE SCHRIFTFARBE. Derselbe Baustein
-         laeuft im Preis-Modal auf HELLEM Grund und in den Einstellungen
-         auf DUNKLEM. Ein `background:#fff` waere dort ein weisser Klotz —
-         genau der Fehler, der den Sprechlauf-Dialog in v1292 unlesbar
-         gemacht hat (fuer Dunkel gebaut, auf Weiss gelaufen).
-         Neutrales Grau mit Alpha traegt beide Gruende, `color:inherit`
-         nimmt die Schriftfarbe der Umgebung. */
-      P+" .pm-menge{flex:0 0 auto;display:inline-flex;align-items:center;gap:0;border:1px solid rgba(128,124,120,.38);border-radius:9px;overflow:hidden;background:transparent;color:inherit}"+
-      P+" .pm-menge-b{width:26px;height:26px;border:0;background:transparent;cursor:pointer;font:600 15px/1 Inter,system-ui,sans-serif;color:var(--wl-b8932f, #b8932f);padding:0}"+
-      P+" .pm-menge-b:hover:not(:disabled){background:rgba(201,168,76,.18)}"+
-      P+" .pm-menge-b:disabled{opacity:.28;cursor:default}"+
-      P+" .pm-menge-n{width:30px;height:26px;border:0;border-left:1px solid rgba(128,124,120,.28);border-right:1px solid rgba(128,124,120,.28);text-align:center;font:700 12px/1 'JetBrains Mono',ui-monospace,monospace;color:inherit;background:transparent;padding:0}"+
-      P+" .pm-menge-n:focus{outline:2px solid var(--wl-c9a84c, rgba(201,168,76,.5));outline-offset:-2px}"+
-      P+" .bw-gate .pm-menge{align-self:center}"+
-      P+" .bw-price-je{opacity:.75}"+
+         ICH HABE DAS BEI v1294 ALS "FERTIG" GEMELDET. Gemessen hatte ich
+         damals, DASS die fuenf Zeilen da sind — nicht, WIE sie aussehen.
+         Eine Existenzpruefung ist keine Gestaltpruefung.
+
+         Richtiger Anker ist `#pricing-modal` (dasselbe, was die
+         `.bw`-Regeln weiter unten als `M` benutzen — die greifen deshalb).
+         Er steht hier als eigene Konstante, damit beim naechsten Mal
+         sichtbar ist, dass dieser Block NICHT zum Planraster gehoert. */
+      (function () {
+        var S = '#pricing-modal';   /* der Streifen, nicht das Planraster */
+
+        /* DER GRUND IST DUNKEL — gemessen rgb(26,24,24), Helligkeit 25.
+           Beide Orte, an denen der Waehler laeuft (dieses Modal und die
+           Einstellungen), stehen auf Obsidian. `color:inherit` half nicht:
+           geerbt kam SCHWARZ an, also schwarze Ziffern auf schwarzem
+           Grund. Deshalb jetzt ausdruecklich Creme.
+           Gold laeuft ueber `--wl-…`, damit es sich beim Mandanten
+           umfaerbt. CREME NICHT: ein `--wl-f4efe6` gibt es nicht, und ein
+           Token zu erfinden, das `whitelabel-override.js` nie setzt, waere
+           ein toter Anker mit plausiblem Aussehen — dieselbe Sorte wie die
+           `#app`-Regel, die v1147 einen Ausrollzyklus gekostet hat. Creme
+           ist die Schriftfarbe auf Obsidian und bleibt in jeder Marke. */
+        var CREME  = '#F4EFE6';
+        var RAHMEN = 'rgba(244,239,230,.24)';
+
+        return '' +
+        S+" .pm-einzel{margin-top:18px;padding:16px 18px;border:1px solid var(--wl-c9a84c, rgba(201,168,76,.3));border-radius:14px;background:rgba(201,168,76,.06)}"+
+        S+" .pm-einzel-h{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);margin-bottom:11px}"+
+        S+" .pm-einzel-grid{display:flex;flex-direction:column;gap:1px}"+
+        S+" .pm-einzel-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid "+RAHMEN+"}"+
+        S+" .pm-einzel-row:last-child{border-bottom:none}"+
+        S+" .pm-einzel-l{flex:1 1 auto;min-width:0;font-size:13px;color:"+CREME+"}"+
+        S+" .pm-einzel-p{flex:0 0 auto;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;font-weight:700;white-space:nowrap;text-align:right;min-width:78px;color:var(--wl-c9a84c, #C9A84C)}"+
+        S+" .pm-einzel-p small{display:block;font-family:Inter,system-ui,sans-serif;font-size:9.5px;font-weight:400;opacity:.55;color:"+CREME+"}"+
+        S+" .pm-einzel-cta{flex:0 0 auto;padding:5px 13px;border-radius:8px;border:1px solid var(--wl-c9a84c, #C9A84C);color:var(--wl-c9a84c, #C9A84C);font-size:11.5px;font-weight:700;text-decoration:none;white-space:nowrap}"+
+        S+" .pm-einzel-cta:hover{background:var(--wl-c9a84c, #C9A84C);color:#221c08}"+
+
+        /* Mengenwaehler. Die Ziffer sitzt in JetBrains Mono, damit ein- und
+           zweistellige Mengen gleich breit bleiben und die Zeile beim
+           Tippen nicht springt. `flex:0 0 auto` ist Pflicht: die Zeile ist
+           ein Flex-Behaelter, sonst laeuft der Waehler auf volle Breite. */
+        S+" .pm-menge{flex:0 0 auto;display:inline-flex;align-items:center;gap:0;border:1px solid "+RAHMEN+";border-radius:9px;overflow:hidden;background:rgba(255,255,255,.04);color:"+CREME+"}"+
+        S+" .pm-menge-b{flex:0 0 auto;width:26px;height:26px;border:0;background:transparent;cursor:pointer;font:600 15px/1 Inter,system-ui,sans-serif;color:var(--wl-c9a84c, #C9A84C);padding:0}"+
+        S+" .pm-menge-b:hover:not(:disabled){background:rgba(201,168,76,.20)}"+
+        S+" .pm-menge-b:disabled{opacity:.3;cursor:default}"+
+        S+" .pm-menge-n{flex:0 0 auto;width:30px;height:26px;border:0;border-left:1px solid "+RAHMEN+";border-right:1px solid "+RAHMEN+";text-align:center;font:700 12px/1 'JetBrains Mono',ui-monospace,monospace;color:"+CREME+";background:transparent;padding:0}"+
+        S+" .pm-menge-n:focus{outline:2px solid var(--wl-c9a84c, rgba(201,168,76,.55));outline-offset:-2px}"+
+        S+" .bw-gate .pm-menge{align-self:center}"+
+        S+" .bw-price-je{opacity:.75}"+
+        '@media(max-width:520px){'+S+' .pm-einzel-row{flex-wrap:wrap}'+S+' .pm-einzel-l{flex:1 1 100%}}';
+      })() +
       _kerosinMatrixCss();
     document.head.appendChild(st);
   }
