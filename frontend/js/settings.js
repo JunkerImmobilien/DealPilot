@@ -1993,23 +1993,33 @@ function _renderPlanPane() {
     });
     html += '</div>';
 
-    /* v1183: der Einzelkauf. Marcels Vorgabe in config.js: „der Knopf, an
-       dem gerade eine Bewertung fehlt, verkauft genau diese eine" — ein
-       Paket ist wieder ein Vorrat, den man nicht ueberblickt. Deshalb steht
-       die Einzelliste gleichberechtigt darunter und nicht versteckt. */
-    if (einzelkauf.length > 0) {
-      html += '<h4 class="plan-credits-title" style="font-size:14px;margin-top:22px">Oder einzeln</h4>' +
-        '<div class="plan-einzel-grid">';
-      einzelkauf.forEach(function (e) {
-        html += '<div class="plan-einzel-row">' +
-          '<span class="plan-einzel-l">' + e.label + '</span>' +
-          '<span class="plan-einzel-p">' + e.price_eur.toFixed(2).replace('.', ',') + ' €</span>' +
-          '<button class="btn btn-outline btn-sm" onclick="_buyCreditPack(\'' + e.key + '\')">Kaufen</button>' +
-        '</div>';
-      });
-      html += '</div>';
-    }
     html += '</div>';
+  }
+
+  /* ═══ v1294 · Der Einzelkauf war unsichtbar ═══════════════════════════
+     Er funktioniert seit v1183 — gemessen am 11.09.2026 antwortet der
+     Checkout auf `mpi` mit HTTP 200 —, aber niemand bekam ihn je zu
+     sehen: er stand INNERHALB von `if (creditPacks.length > 0)`, und
+     `creditPacks` ist seit v1246 die leere Liste. Ein Kaufweg, der da
+     ist, den aber keiner findet.
+
+     Jetzt steht er eigenstaendig unter dem Nachkauf — so, wie es die
+     Vorgabe in config.js immer schon sagte: „der Knopf, an dem gerade
+     eine Bewertung fehlt, verkauft genau diese eine". */
+  if (einzelkauf.length > 0) {
+    html += '<div class="plan-credits-section plan-einzel-section">' +
+      '<h4 class="plan-credits-title" style="font-size:14px">Oder einzeln — genau die eine, die gerade fehlt</h4>' +
+      '<p class="plan-credits-desc">Einzelne Bewertungen kosten mehr als im Kontingent; dafür zahlst du nur, ' +
+        'was du wirklich brauchst. Auch sie verfallen nie.</p>' +
+      '<div class="plan-einzel-grid">';
+    einzelkauf.forEach(function (e) {
+      html += '<div class="plan-einzel-row">' +
+        '<span class="plan-einzel-l">' + e.label + '</span>' +
+        '<span class="plan-einzel-p">' + e.price_eur.toFixed(2).replace('.', ',') + ' €</span>' +
+        '<button class="btn btn-outline btn-sm" onclick="_buyCreditPack(\'' + e.key + '\')">Kaufen</button>' +
+      '</div>';
+    });
+    html += '</div></div>';
   }
 
   // V180: Stripe-Hinweis entfernt — Stripe ist jetzt der einzige Flow.

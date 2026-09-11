@@ -215,51 +215,126 @@
       P+" .tk-rip .bp-txt{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:#8a7c60;white-space:nowrap}"+
       '@media(max-width:820px){'+P+'{grid-template-columns:1fr 1fr}}'+
       '@media(max-width:520px){'+P+'{grid-template-columns:1fr}}'+
+      P+" .pm-einzel{margin-top:18px;padding:16px 18px;border:1px solid var(--wl-c9a84c, rgba(201,168,76,.3));border-radius:14px;background:var(--wl-fffdf7, rgba(201,168,76,.05))}"+
+      P+" .pm-einzel-h{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--wl-b8932f, #b8932f);margin-bottom:11px}"+
+      P+" .pm-einzel-grid{display:flex;flex-direction:column;gap:1px}"+
+      P+" .pm-einzel-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(42,39,39,.08)}"+
+      P+" .pm-einzel-row:last-child{border-bottom:none}"+
+      P+" .pm-einzel-l{flex:1;min-width:0;font-size:13px}"+
+      P+" .pm-einzel-p{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;white-space:nowrap}"+
+      P+" .pm-einzel-cta{flex:0 0 auto;padding:5px 13px;border-radius:8px;border:1px solid var(--wl-c9a84c, #C9A84C);color:var(--wl-b8932f, #b8932f);font-size:11.5px;font-weight:700;text-decoration:none;white-space:nowrap}"+
+      P+" .pm-einzel-cta:hover{background:var(--wl-c9a84c, #C9A84C);color:#221c08}"+
       _kerosinMatrixCss();
     document.head.appendChild(st);
   }
   // ═══════════════════════════════════════════════════════════════
   // v885-plan-landing: Kerosin-Streifen (bw) + Cockpit-Matrix (mx) + CSS
   // ═══════════════════════════════════════════════════════════════
-  var KPACKS = [
-    /* v1176 · Aus Litern werden Bewertungen. `l` ist jetzt die Aufteilung
-       „MPI · erweitert · Wertermittlung", `ppl` der Stückpreis der
-       einfachsten Bewertung im Paket. Die Reichweitentexte bleiben, sie
-       waren immer schon die eigentliche Auskunft. */
-    { l:'5 · 2 · 0',   p:'7,90',  ppl:'0,90', id:'paket_kurz',   cls:'✈ Kurzstrecke',
-      use:'Mal schnell prüfen',    reach:'5 Marktpreisindikationen · 2 erweiterte' },
-    { l:'10 · 5 · 1',  p:'19,90', ppl:'0,85', id:'paket_mittel', cls:'✈✈ Mittelstrecke',
-      use:'Mehrere Deals',              reach:'10 Indikationen · 5 erweiterte · 1 Wertermittlung' },
-    { l:'15 · 10 · 3', p:'39,90', ppl:'0,80', id:'paket_gross',  cls:'✈✈✈ Langstrecke',
-      use:'Aktiver Investor',           reach:'15 Indikationen · 10 erweiterte · 3 Wertermittlungen', best:true },
-    { l:'25 · 20 · 6', p:'69,90', ppl:'0,75', id:'paket_max',    cls:'🌍 Interkontinental',
-      use:'Maximale Reichweite',        reach:'25 Indikationen · 20 erweiterte · 6 Wertermittlungen' }
-  ];
+  /* ═══ v1294 · Nachkauf statt Pakete ═════════════════════════════════
+     Hier standen die vier Bewertungs-Pakete zu 7,90 / 19,90 / 39,90 /
+     69,90 EUR. Seit v1246 sind sie nicht mehr kaufbar: das Backend kennt
+     nur noch `dp_nachkauf_*` und `dp_einzeln_*`, die alten Stripe-Preise
+     sind stillgelegt.
+
+     GEMESSEN am 11.09.2026 gegen den laufenden Checkout:
+
+         paket_kurz        -> HTTP 400  invalid_pack
+         paket_gross       -> HTTP 400  invalid_pack
+         nachkauf_starter  -> HTTP 200
+         nachkauf_pro      -> HTTP 200
+         mpi               -> HTTP 200
+
+     Vier Kaufknoepfe, die nichts kaufen — und zwar an der Stelle, an der
+     jemand gerade Geld ausgeben will. Der Kommentar in config.js sagte
+     seit v1246 „das ersetzt BEWERTUNGS_PAKETE"; die Ersetzung ist in
+     settings.js angekommen, hier und auf der Landing nicht.
+
+     Jetzt zeigt das Modal, was es wirklich gibt: das eigene Kontingent
+     noch einmal, fuer ein Viertel des Monatsbeitrags. Die Zahlen kommen
+     aus `nachkaufFuer()` — dieselbe Quelle wie in den Einstellungen,
+     damit die beiden nicht auseinanderlaufen koennen. */
+  function _nkListe() {
+    var P = (window.DealPilotConfig && window.DealPilotConfig.pricing) || {};
+    if (typeof P.nachkaufFuer !== 'function') return [];
+    return ['starter', 'investor', 'pro'].map(function (k) {
+      var n = P.nachkaufFuer(k);
+      if (!n) return null;
+      var plan = (P.plans && P.plans[k]) || {};
+      return {
+        plan: k,
+        name: plan.label || k,
+        l: n.label,
+        p: n.preis_eur.toFixed(2).replace('.', ','),
+        id: n.key,
+        reach: n.kontingent.mpi + ' Marktpreisindikationen' +
+               (n.kontingent.mpi_plus ? ' · ' + n.kontingent.mpi_plus + ' erweiterte' : '') +
+               (n.kontingent.wev ? ' · ' + n.kontingent.wev + ' Wertermittlungen' : ''),
+        best: k === 'investor'
+      };
+    }).filter(Boolean);
+  }
+
+  /* Der eigene Plan zuerst — wer nachkauft, kauft seinen eigenen. */
+  function _nkIndex(liste) {
+    try {
+      var cur = window.DealPilotConfig.pricing.currentKey();
+      for (var i = 0; i < liste.length; i++) if (liste[i].plan === cur) return i;
+    } catch (e) {}
+    for (var j = 0; j < liste.length; j++) if (liste[j].best) return j;
+    return 0;
+  }
+
+  var KPACKS = _nkListe();
   function _bwSegsHtml(idx){
     return '<div class="bw-segs">' + KPACKS.map(function(k,i){
       return '<div class="bw-seg'+(i===idx?' on':'')+'" data-i="'+i+'">' +
-        '<span class="bw-seg-l">'+k.l+'</span><span class="bw-seg-p">'+k.p+' \u20ac</span></div>';
+        '<span class="bw-seg-l">'+k.l+'</span><span class="bw-seg-p">'+k.p+' €</span></div>';
     }).join('') + '</div>';
   }
   function _bwPassHtml(idx){
     var k = KPACKS[idx];
+    if (!k) return '';
     return '<div class="bw'+(k.best?' best':'')+'" id="pm-bw">' +
       (k.best?'<span class="bw-pop">Beliebt</span>':'') +
-      '<div class="bw-stub"><div class="bw-class">'+k.cls+'</div><div class="bw-l">'+k.p+' €</div><div class="bw-ll">Bewertungen</div></div>' +
+      '<div class="bw-stub"><div class="bw-class">Für '+k.name+'</div><div class="bw-l">'+k.p+' €</div><div class="bw-ll">Bewertungen</div></div>' +
       '<div class="bw-perf"></div>' +
       '<div class="bw-body">' +
-        '<div class="bw-col"><span class="bw-k">Reichweite</span><span class="bw-v">'+k.reach+'</span></div>' +
-        '<div class="bw-col"><span class="bw-k">ab</span><span class="bw-v"><span class="dp">'+k.ppl+' \u20ac</span> je Bewertung</span></div>' +
-        '<div class="bw-col"><span class="bw-k">Einsatz</span><span class="bw-v">'+k.use+'</span></div>' +
-        '<div class="bw-col"><span class="bw-k">Verfall</span><span class="bw-v"><span class="dp">nie</span> \u00b7 kein Abo</span></div>' +
+        '<div class="bw-col"><span class="bw-k">Du bekommst</span><span class="bw-v">'+k.reach+'</span></div>' +
+        '<div class="bw-col"><span class="bw-k">Preis</span><span class="bw-v"><span class="dp">ein Viertel</span> deines Monatsbeitrags</span></div>' +
+        '<div class="bw-col"><span class="bw-k">Einsatz</span><span class="bw-v">Dein Kontingent noch einmal</span></div>' +
+        '<div class="bw-col"><span class="bw-k">Verfall</span><span class="bw-v"><span class="dp">nie</span> · kein Abo</span></div>' +
       '</div>' +
-      '<div class="bw-gate"><div class="bw-price">'+k.p+' \u20ac<small>einmalig \u00b7 '+k.l+'</small></div>' +
+      '<div class="bw-gate"><div class="bw-price">'+k.p+' €<small>einmalig · '+k.l+'</small></div>' +
         '<a class="bw-cta" href="#" data-pack-id="'+k.id+'" onclick="window._buyCreditPackDirect(this); return false;">Bewertungen kaufen</a></div>' +
     '</div>';
   }
+
+  /* Der Einzelkauf: genau die eine, die gerade fehlt. Er funktioniert seit
+     v1183, wurde aber nirgends angeboten — in settings.js hing er hinter
+     einer Bedingung auf die leere Paketliste. */
+  function _einzelHtml() {
+    var P = (window.DealPilotConfig && window.DealPilotConfig.pricing) || {};
+    var e = P.einzelkauf || [];
+    if (!e.length) return '';
+    return '<div class="pm-einzel">' +
+      '<div class="pm-einzel-h">Oder einzeln — genau die eine, die gerade fehlt</div>' +
+      '<div class="pm-einzel-grid">' +
+      e.map(function (x) {
+        return '<div class="pm-einzel-row">' +
+          '<span class="pm-einzel-l">' + x.label + '</span>' +
+          '<span class="pm-einzel-p">' + x.price_eur.toFixed(2).replace('.', ',') + ' €</span>' +
+          '<a class="pm-einzel-cta" href="#" data-pack-id="' + x.key + '" ' +
+            'onclick="window._buyCreditPackDirect(this); return false;">Kaufen</a>' +
+        '</div>';
+      }).join('') +
+      '</div></div>';
+  }
+
   function _kerosinStripHtml(){
-    var i = 2; // 90 L (Beliebt) als Default
-    return '<div id="pm-kerosin-strip">' + _bwSegsHtml(i) + _bwPassHtml(i) + '</div>';
+    if (!KPACKS.length) KPACKS = _nkListe();
+    if (!KPACKS.length) return '';
+    var i = _nkIndex(KPACKS);
+    return '<div id="pm-kerosin-strip">' + _bwSegsHtml(i) + _bwPassHtml(i) + _einzelHtml() + '</div>';
   }
   function _wireKerosinStrip(){
     var wrap = document.getElementById('pm-kerosin-strip');
