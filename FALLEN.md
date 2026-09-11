@@ -2318,3 +2318,31 @@ Und wer etwas einhängt, nennt sein Ziel **ausdrücklich** (`body.appendChild`)
 statt es über ein Geschwister zu suchen. `insertBefore(h, x.nextSibling)`
 ist bequem und macht die Einhängung von einer Struktur abhängig, die
 jemand später ändert — ohne zu ahnen, dass er es tut.
+
+## Ein Muster, das auf ein Wort endet, ist für Getipptes gebaut
+
+Die Bestätigung einer Adresse akzeptierte `^(ja|jo|klar|…)\b[\s.!,]*$` —
+der Satz musste **mit dem Ja enden**. Ein danebenstehendes Muster verlangte
+„stimmt" am **Anfang**.
+
+Gesagt wurde: **„ja stimmt".** Ein Wort zu viel für das erste Muster, ein
+Wort zu früh für das zweite. Der Satz galt als Korrektur, ging an die
+Auswertung, enthielt keine Adresse — und die Frage kam noch einmal. Für
+den Sprecher sah es aus, als hätte der Co-Pilot nicht zugehört.
+
+**Gesprochen sagt niemand nur „ja".** Man sagt „ja stimmt", „ja genau so",
+„passt so", „jo, richtig". Muster mit `$` am Ende stammen aus einer Zeit,
+in der dieselbe Stelle ein Tippfeld war; sie überleben die Umstellung auf
+Sprache, ohne dass es jemandem auffällt — sie funktionieren ja noch, nur
+eben seltener.
+
+**Die Regel:** wo eine Antwort **gesprochen** ankommt, wird nicht auf einen
+Wortlaut geprüft, sondern darauf, ob der Satz **nur aus Wörtern einer
+Klasse** besteht. Und die Gegenprobe gehört dazu: „ja, aber die Hausnummer
+ist zwölf" darf **keine** Zustimmung sein. Eine Ziffer, ein „aber", ein
+„nicht" — und der Satz trägt Inhalt, nicht nur Zustimmung. **Wer
+einschränkt, bestätigt nicht.**
+
+Das Gegenstück (Ablehnung) braucht dabei eine **eigene** Wortliste, nicht
+die Verneinung der ersten: „nein, stimmt nicht" enthält genau das „nicht",
+das eine Zustimmung ausschließt.

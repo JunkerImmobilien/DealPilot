@@ -12154,6 +12154,66 @@ geprüft**, nicht nach dem dritten Bild vom Nutzer.
 
 **Commit** `f632c9b`. Auf Staging, **nicht auf Prod**.
 
+## Rollout-Journal · 11.09.2026, achter Teil — `v1305`
+
+*„Dann hab ich die Adresse diktiert, er fragt ‚Stimmt das so?‘, ich sage
+‚ja stimmt‘ — und er fängt wieder an, nach der Adresse zu fragen. Die
+Bestätigung muss auch so gehen per Sprache."*
+
+### Ein Wort zu viel
+
+`RF_JA` verlangt, dass der Satz **mit dem Ja endet**:
+
+```js
+/^(ja|jo|jup|klar|…)\b[\s.!,]*$/i
+```
+
+„ja stimmt" hat ein Wort zu viel. Das zweite Muster daneben verlangte
+„stimmt" am **Anfang** — „ja stimmt" beginnt aber mit „ja". Der Satz fiel
+durch beide, galt damit als **Korrektur**, ging an die Auswertung, und die
+fand in „ja stimmt" keine Adresse. Also kam die Frage noch einmal.
+
+**Gesprochen sagt niemand nur „ja".** Man sagt „ja stimmt", „ja genau so",
+„passt so", „jo, richtig". Ein Muster, das auf ein einzelnes Wort endet,
+ist für **getippte** Antworten gebaut — es stammt aus einer Zeit, in der
+der Sprechlauf ein Tippfeld mit Mikrofon daneben war.
+
+### Die Lösung und ihre Grenze
+
+`_istZustimmung(t)` prüft, ob der Satz **ausschließlich** aus
+Zustimmungswörtern besteht — in beliebiger Zahl und Folge, bis sechs Wörter.
+
+**Die Grenze ist der eigentliche Punkt.** „ja, aber die Hausnummer ist
+zwölf" darf **keine** Bestätigung sein: der Satz bestätigt und korrigiert
+zugleich, und die Korrektur ist das Wichtigere. Deshalb steigt die Prüfung
+aus bei
+
+- **jeder Ziffer** — wer eine Zahl nennt, liefert Inhalt, keine Zustimmung,
+- **einschränkenden Wörtern** (`aber`, `jedoch`, `allerdings`, `nur`,
+  `außer`, `nicht`, `kein`) — **wer einschränkt, bestätigt nicht**,
+- **jedem Wort, das nicht in der Liste steht.**
+
+`_istAblehnung(t)` ist das Gegenstück mit **eigener** Wortliste — nicht als
+Verneinung der ersten, weil „nein, stimmt nicht" ein „nicht" enthält, das
+die Zustimmung gerade ausschließt.
+
+### Gemessen
+
+| Eingabe | erkannt |
+|---|---|
+| „ja stimmt", „ja genau so", „stimmt so", „passt so", „jo richtig", „ja das stimmt", „korrekt", „einverstanden", „alles richtig" (13 Formen) | **alle als Zustimmung** |
+| „nein", „nein stimmt nicht", „nee falsch", „nein das ist falsch", „quatsch" | **alle als Ablehnung** |
+| „ja aber die Hausnummer ist zwölf", „ja, Hausnummer 12", „nein, Hausnummer zwölf", „Hermannstraße 9", „der Kaufpreis liegt bei 200000", „ja aber nicht ganz", „Münster" | **keines von beiden** ✓ |
+
+**Im echten Durchlauf:** Adresse diktiert → „Stimmt das so?" → „ja stimmt"
+→ **Frage 2 von 16**. Keine Wiederholung.
+
+Dieselbe Erkennung gilt jetzt auch für die **Abruf-Angebote** („ja gerne,
+mach das") und den **Abschluss** — überall dort, wo vorher nur ein
+alleinstehendes „ja" zählte.
+
+**Commit** `696145f`. Auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

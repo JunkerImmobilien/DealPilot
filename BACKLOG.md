@@ -38,7 +38,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
 
-**Stand:** `v1273`–`v1304` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
+**Stand:** `v1273`–`v1305` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
 — nichts davon ist live.
 
 > **Nach Marcels erstem echten Sprechlauf am 10.09. abends** (Bilder
@@ -130,7 +130,7 @@ die Kosten einer Aufnahme um rund 40 % — bei 4 Minuten von ≈ 1,7 auf ≈ 0,9
 
 ### 4 · Der Sprechlauf gehört auf Produktion
 
-**`v1273`–`v1304` liegen auf Staging.** Prod steht auf
+**`v1273`–`v1305` liegen auf Staging.** Prod steht auf
 `a21fe9c` — der Co-Pilot, die Etappen, beide Scores, BORIS-Abruf und
 Marktpreisindikation im Hintergrund sind für keinen Kunden erreichbar.
 
@@ -229,8 +229,9 @@ freigeben.
 | Schwarzes Feld rechts, Eingabefenster nach „Übernehmen" weg | **fertig** — die Spalte blieb stehen, wenn das Aufnahmefenster ging (mein Fehler aus v1300b); `_recAus`/`_recAn` räumen jetzt als Paar |
 | Beide Sprachaufzeichnungen auf Tablet und Handy | **fertig** — im iframe gemessen: der geführte Weg brach erst bei 720 px um und war auf dem Tablet zweispaltig (Gespräch 330, Liste 340); jetzt beide bei 900 px |
 | Nach der Adresse unten nichts anklickbar, kein Scrollen (`sp2.png`) | **fertig** — `_rfHost` hängte den Dialog neben `vi-rec` und damit IN meine neue Bühne; die Flex-Kette braucht ein direktes Kind von `.oabi-body` |
+| „ja stimmt" wurde nicht als Bestätigung erkannt | **fertig** — `RF_JA` verlangte, dass der Satz MIT dem Ja endet; jetzt prüft `_istZustimmung`, ob der Satz nur aus Zustimmungswörtern besteht — 13 Formen erkannt, 7 Grenzfälle korrekt abgelehnt |
 
-**Commits** `f757dee`, `aeffda1`, `9fca4b8`, `122360f`, `63446bf`, `de73ebc`, `d17c5d3`, `f632c9b`. Gold-Audit RC=0.
+**Commits** `f757dee`, `aeffda1`, `9fca4b8`, `122360f`, `63446bf`, `de73ebc`, `d17c5d3`, `f632c9b`, `696145f`. Gold-Audit RC=0.
 
 **Hinweis:** Marcel hat ein neues Bild angekündigt, das nicht im Repo
 angekommen ist — das neueste bleibt `design/mockups/sprechlauf3.png` vom
