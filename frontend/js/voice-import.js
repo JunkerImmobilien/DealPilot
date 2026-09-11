@@ -3268,16 +3268,55 @@
     document.head.appendChild(s);
   }
 
+  /* ═══ v1304 · `vi-frage` gehört DIREKT in den Körper ════════════════════
+     Marcels Befund vom 11.09.2026 (Bild `design/mockups/sp2.png`): „nach
+     Eingabe der Adresse per Sprache kann ich unten nicht auswählen, man
+     kann auch nicht runter scrollen."
+
+     Im Bild ist die Aktionsleiste angeschnitten, und Mikrofonzeile,
+     Eingabefeld und Knöpfe fehlen ganz — das Modal ist höher als das
+     Fenster, und nichts davon scrollt.
+
+     URSACHE, und sie ist meine aus `v1300b`: hier stand
+
+         rec.parentNode.insertBefore(h, rec.nextSibling)
+
+     — der geführte Dialog wurde als GESCHWISTER von `vi-rec` eingehängt.
+     Bis `v1300b` war dessen Elternteil `oabi-body`; seit ich
+     `.vi-frei-buehne` um `vi-rec` gelegt habe, ist es die Bühne. Der ganze
+     Dialog landete also IN meinem Behälter für den freien Weg.
+
+     Damit riss die Flex-Kette, die ihn scrollen lässt:
+
+         .vi-dialog .oabi-body{display:flex;flex-direction:column;overflow:hidden}
+         .vi-dialog #vi-frage{flex:1 1 auto;min-height:0}
+
+     Beide setzen voraus, dass `#vi-frage` ein DIREKTES Kind von
+     `.oabi-body` ist. Eine Ebene dazwischen, und der Chat wächst
+     unbegrenzt, statt seine Höhe vom Körper zu bekommen — das Modal wird
+     zu hoch, und unten fällt heraus, was nicht mehr hineinpasst.
+
+     `insertBefore` an einem Geschwister ist bequem, macht die Einhängung
+     aber von einer Struktur abhängig, die jemand später ändert. Deshalb
+     jetzt AUSDRÜCKLICH am Körper. */
   function _rfHost() {
     var h = $('vi-frage');
     if (!h) {
       _rfStil();
-      var rec = $('vi-rec');
       h = document.createElement('div');
       h.id = 'vi-frage';
       h.style.display = 'none';
-      if (rec && rec.parentNode) rec.parentNode.insertBefore(h, rec.nextSibling);
-      else { var b = document.querySelector('.oabi-ov.vi-mode .oabi-body'); if (b) b.appendChild(h); }
+      var body = document.querySelector('.oabi-ov.vi-mode .oabi-body');
+      if (body) {
+        /* Hinter die Bühne des freien Wegs, falls es sie gibt — sonst ans
+           Ende. In beiden Fällen als direktes Kind. */
+        var buehne = body.querySelector(':scope > .vi-frei-buehne');
+        if (buehne) body.insertBefore(h, buehne.nextSibling);
+        else body.appendChild(h);
+      } else {
+        var rec = $('vi-rec');
+        if (rec && rec.parentNode) rec.parentNode.insertBefore(h, rec.nextSibling);
+      }
     }
     return h;
   }
