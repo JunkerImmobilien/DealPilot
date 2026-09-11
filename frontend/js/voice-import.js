@@ -2392,6 +2392,40 @@
     return v || null;
   }
 
+  /* ═══ v1309 · Die Bankbewertung kennt fast niemand ══════════════════════
+     Marcels Befund vom 11.09.2026: „bei den erweiterten Daten fragt er
+     nach der Bankeinschätzung. Die können wir in der Regel nicht angeben.
+     Da würde ich einfach eine Frage formulieren: Ist das bekannt oder
+     nicht? Oder sollen wir erst mal den Marktwert annehmen aus der
+     Indikation?"
+
+     Er hat recht: eine Bankbewertung hat man erst NACH dem Gespräch mit
+     der Bank — beim Aufnehmen eines Objekts also so gut wie nie. Eine
+     Frage danach ist eine Frage ins Leere, und sie steht mitten in einer
+     Strecke, die sonst zügig läuft.
+
+     Liegt eine Marktpreisindikation vor, gibt es eine bessere Antwort als
+     „weiß ich nicht": ihren Marktwert. Er ist nicht dasselbe wie eine
+     Bankbewertung — Banken rechnen vorsichtiger —, aber er ist die
+     belastbarste Zahl, die zu diesem Zeitpunkt existiert.
+
+     Deshalb steht er als VORSCHLAG daneben, mit dem Hinweis, was er ist.
+     Wer die Bankbewertung kennt, sagt sie; wer nicht, nimmt den Marktwert
+     oder überspringt. */
+  function _rfMarktwertVorschlag(eintrag) {
+    if (!eintrag || !eintrag.ids) return null;
+    if (eintrag.ids.indexOf('bankval') < 0) return null;
+    var el = document.getElementById('bankval');
+    if (el && String(el.value || '').trim() !== '') return null;   /* steht schon */
+    var mw = (_rf && _rf.markt && _rf.markt.mw != null) ? _rf.markt.mw : null;
+    if (mw == null) {
+      var sv = _rfNum(_rfFeld('svwert'));
+      if (sv != null && sv > 0) mw = sv;
+    }
+    if (mw == null || !(mw > 0)) return null;
+    return { wert: String(Math.round(mw)), text: _euroKurz(mw) };
+  }
+
   /* v1288 · Zahlen aus dem Investmentprofil, tolerant gelesen.
      `P.get` liefert den eigenen Wert oder die Vorgabe aus
      DealPilotConfig.investmentProfileDefaults. Was dort nicht als Zahl
@@ -4767,14 +4801,46 @@
      GEFÜLLTE FELDER BEKOMMEN EINEN HAKEN. Das ist der eigentliche Gewinn:
      bei einem Block, aus dem das Exposé schon die Hälfte geliefert hat,
      sieht man sofort, was noch fehlt, statt die Antwort zu wiederholen. */
+  /* ═══ v1309 · Ein Feldname ist nie eine Feld-ID ═════════════════════════
+     Marcels Bild `design/mockups/weiter.png`: die Pillen zeigten
+     `eq_heating`, `eq_windows`, `eq_floor`, `eq_guest_wc` — *„das ist
+     etwas kryptisch"*. Die Frage darüber nannte die richtigen Namen
+     („Heizung, Verglasung, Bodenbelag, Gäste-WC?"), die Pillen nicht.
+
+     Ursache: die Feinheiten-Felder stehen nicht in der kuratierten
+     Whitelist `WL`, also findet `_rf.catalog` kein Label — und der
+     Rückfall war `id`. Eine interne Kennung als Beschriftung ist nie
+     richtig; sie steht dem Nutzer gegenüber für nichts.
+
+     Der Name steht im Formular, im `<label>` neben dem Feld. Diese
+     Auflösung gilt jetzt für ALLE Stellen, die einen Feldnamen brauchen —
+     Pillen, „noch offen", Übernahme-Meldungen. */
+  function _rfFeldName(id) {
+    var c = (_rf && _rf.catalog || []).filter(function (x) { return x.id === id; })[0];
+    if (c && c.label) return String(c.label).replace(/\s*\(.*?\)\s*$/, '').trim();
+    try {
+      var el = document.getElementById(id);
+      var box = el && el.closest ? el.closest('.f,.form-group,.fg') : null;
+      var lab = box ? box.querySelector('label') : null;
+      if (lab) {
+        /* Der Hilfe-Knopf im Label trägt eigenen Text — er gehört nicht
+           in den Namen. `cloneNode` lässt das Original unberührt. */
+        var k = lab.cloneNode(true);
+        [].slice.call(k.querySelectorAll('button,.dp-tip')).forEach(function (b) { b.remove(); });
+        var t = String(k.textContent || '').replace(/\s+/g, ' ').replace(/\*/g, '').trim();
+        t = t.replace(/\s*\(.*?\)\s*$/, '').trim();
+        if (t) return t;
+      }
+    } catch (e) {}
+    return id;
+  }
+
   function _rfPillen(eintrag) {
     if (!eintrag || !eintrag.ids || !eintrag.ids.length) return '';
-    var kat = (_rf && _rf.catalog) || [];
     var teile = (eintrag.ids).map(function (id) {
-      var c = kat.filter(function (x) { return x.id === id; })[0];
       /* Klammerzusätze raus — „Wohnfläche (m²)" wird zu „Wohnfläche".
          Auf einer Pille zählt das Wort, nicht die Einheit. */
-      var name = c ? String(c.label).replace(/\s*\(.*?\)\s*$/, '').trim() : id;
+      var name = _rfFeldName(id);
       var da = _rf && _rf.data && _rf.data.fields &&
                _rf.data.fields[id] != null && String(_rf.data.fields[id]).trim() !== '';
       if (!da) { var v = _rfFeld(id); da = (v != null && String(v).trim() !== ''); }
@@ -5064,6 +5130,43 @@
   /* Gesprochen oder getippt: „ja" gilt fuer die OBERSTE offene Aktion.
      Steht mehr als eine zur Wahl, wird nachgefragt statt geraten — eine
      falsch verstandene Zusage kostet ein Kontingent. */
+  /* ═══ v1309 · Einen Abruf sagt man mitten im Satz ═══════════════════════
+     Marcels Befund vom 11.09.2026 (`design/mockups/weiter.png`): „wenn ich
+     sage Bodenrichtwert abrufen, das macht er irgendwie nicht. Also dass
+     wir da nicht unbedingt klicken müssen, sondern dass wir das auch per
+     Sprache auslesen können."
+
+     Im Bild steht in der Übersicht bei Grundstück der Wert
+     **„Ja, hol den Bodenrichtwert ab."** — der Satz wurde als ANTWORT
+     eingetragen statt als Befehl erkannt.
+
+     Die Ursache ist die Form der bisherigen Prüfungen:
+       · `RF_JA` verlangt, dass der Satz MIT dem Ja ENDET → „Ja, hol den
+         Bodenrichtwert ab" hat sechs Wörter zu viel.
+       · das Muster `/^(hol|nimm|mach|…)/` verlangt das Verb am ANFANG →
+         der Satz beginnt mit „Ja".
+       · `_istZustimmung` sieht „hol", „Bodenrichtwert" — keine
+         Zustimmungswörter, also false.
+
+     Der Satz fiel durch alles und ging an die Feldauswertung. Dort war er
+     ein Text wie jeder andere.
+
+     `_istAbrufWunsch` sucht deshalb NICHT am Satzanfang, sondern nach zwei
+     Dingen IRGENDWO: einem Abruf-Verb und einer Sache, die man abrufen
+     kann. Beides zusammen ist ein Befehl, egal wie der Satz anfängt. */
+  var RF_ABRUF_VERB = /\b(hol|hole|holen|holst|abruf|abrufen|ruf|rufe|abzurufen|besorg|besorge|zieh|ziehe|nimm|nehmen|mach|mache|starte|frag|frage)\b/i;
+  var RF_ABRUF_SACHE = /\b(bodenrichtwert|boris|richtwert|lage|makrolage|mikrolage|umgebung|marktpreisindikation|indikation|marktbewertung|marktwert|marktbericht|erweiterte)\b/i;
+
+  function _istAbrufWunsch(text) {
+    var t = String(text || '');
+    if (!_rf || !(_rf.aktionen || []).length) return false;
+    /* Eine Frage ist kein Befehl: „was ist der Bodenrichtwert?" will eine
+       Auskunft, keinen Abruf. */
+    if (/\?\s*$/.test(t.trim())) return false;
+    if (/^(was|wie|warum|wieso|wozu|welche|welcher|wann|wo)\b/i.test(t.trim())) return false;
+    return RF_ABRUF_VERB.test(t) && RF_ABRUF_SACHE.test(t);
+  }
+
   function _rfAktionJa(text) {
     var akt = (_rf && _rf.aktionen) || [];
     if (!akt.length) return false;
@@ -6031,6 +6134,18 @@
     _rfDranBlase(_rfBlase('co', escH(e.frage) + _rfPillen(e) + _rfSkalen(e) +
       (pv ? '<div class="vi-rf-vorschlag">Aus deinen Einstellungen hätte ich: <b>' +
             escH(pv.text) + '</b></div>' : '') +
+      /* v1309: Die Bankbewertung kennt beim Aufnehmen fast niemand — der
+         Marktwert aus der Indikation ist die beste Zahl, die es zu diesem
+         Zeitpunkt gibt. Als Angebot, nicht als Behauptung. */
+      (function () {
+        var mv = _rfMarktwertVorschlag(e);
+        if (!mv) return '';
+        _rf.mwVorschlag = mv;
+        return '<div class="vi-rf-vorschlag">Kennst du sie nicht, nehme ich den ' +
+          '<b>Marktwert aus der Indikation: ' + escH(mv.text) + '</b>. ' +
+          '<span style="opacity:.75">Banken rechnen meist vorsichtiger — ' +
+          'sag einfach <b>ja</b>, oder nenn mir deine Zahl.</span></div>';
+      })() +
       _rfAbrufAngebot(e) +
       '<div class="vi-rf-zaehler">Frage ' + (_rf.i + 1) + ' von ' + _rf.offen.length +
         (e.et ? ' · Etappe ' + e.et + ' · ' + escH(_etName(e.et)) : '') + '</div>'));
@@ -6111,6 +6226,44 @@
       if (vorher.et === 4) { try { _rfMarktStufe2Faellig(); } catch (ex) {} }
       try { _rfHalt(jetzt.et); } catch (ex) {}
     }
+    _rfFrage();
+    return true;
+  }
+
+  /* ═══ v1309 · Zurück zur vorigen Frage ══════════════════════════════════
+     Marcels Wunsch vom 11.09.2026: „Wünschen würde ich mir zudem, dass wir
+     auch sagen können: Ich möchte überspringen oder weiter oder ich möchte
+     auch eine Frage zurückspringen, dass er dann an diese Stelle wieder
+     zurückgeht."
+
+     Überspringen gab es, zurück nicht. Wer sich verspricht oder merkt,
+     dass die vorige Antwort falsch war, musste bis zur Übersicht am Ende
+     durchhalten.
+
+     Gesprungen wird auf den letzten Block, der TATSÄCHLICH gefragt wurde —
+     übersprungene und automatisch gefüllte zählen mit, denn sie standen
+     ja im Verlauf. Was dort schon eingetragen war, bleibt stehen und wird
+     als Vorschlag angeboten; wer etwas anderes sagt, überschreibt es. */
+  function _rfZurueck(n) {
+    if (!_rf) return false;
+    n = Math.max(1, parseInt(n, 10) || 1);
+    var ziel = _rf.i - n;
+    if (ziel < 0) ziel = 0;
+    if (ziel === _rf.i) {
+      _rfBlase('co', '<span style="opacity:.75">Wir sind schon bei der ersten Frage.</span>');
+      return true;
+    }
+    _fsStopHoeren();
+    _rf.i = ziel;
+    /* Ein übersprungener Block gilt wieder als offen — sonst springt der
+       Dialog gleich weiter, und der Sprung wäre wirkungslos. */
+    if (_rf.weg) delete _rf.weg[ziel];
+    _rf.nachgehakt = 0;
+    _rf.abrufOffen = null;
+    var e = _rf.offen[ziel];
+    _rfBlase('co', '<span style="opacity:.8">Zurück zu <b>' +
+      escH(_rfKurzname(e)) + '</b>.</span>');
+    _rfStandZeichnen();
     _rfFrage();
     return true;
   }
@@ -6737,10 +6890,7 @@
 
   /* Die Namen der Felder eines Blocks, lesbar. */
   function _rfFelderNamen(ids) {
-    return (ids || []).map(function (id) {
-      var kat = (_rf && _rf.catalog || []).filter(function (c) { return c.id === id; })[0];
-      return kat ? String(kat.label).replace(/\s*\(.*?\)\s*$/, '') : id;
-    }).join(', ');
+    return (ids || []).map(_rfFeldName).join(', ');
   }
   function _rfWasGesucht(e) { return _rfFelderNamen(e && e.ids); }
 
@@ -6874,6 +7024,17 @@
     /* v1307: Der Bericht-Vorschlag ebenso - "ja" heisst dort etwas
        anderes als bei einer Feldfrage. */
     if (_rf.berichtOffen && _rfBerichtAntwort(t, ausSprache)) return true;
+    /* v1309: "ja" auf den Marktwert-Vorschlag zur Bankbewertung. */
+    if (_rf.mwVorschlag && (RF_JA.test(t) || _istZustimmung(t))) {
+      var mv = _rf.mwVorschlag; _rf.mwVorschlag = null;
+      _rfBlase('ich', escH(t));
+      _rfSetzen('bankval', mv.wert, 'Marktpreisindikation (als Näherung)');
+      _rfBlase('co', 'Übernommen: <b>' + escH(mv.text) + '</b> — in der Übersicht steht, ' +
+        'dass es der Marktwert ist, keine Bankbewertung.');
+      _rfStandZeichnen();
+      _rfWeiterGleich();
+      return true;
+    }
     /* v1291: Steht ein Angebot in der Aktionsleiste, ist „ja" die Antwort
        darauf. EIN Weg fuer alle Angebote — vorher hatte jedes seinen
        eigenen, und einer davon vergass die Fortsetzung (v1290). Wer die
@@ -6881,6 +7042,12 @@
        auch dann, wenn mehrere offenstehen. */
     /* v1305: auch hier ein gesprochenes „ja gerne, mach das" statt nur „ja". */
     if ((_rf.aktionen || []).length && (RF_JA.test(t) || _istZustimmung(t))) {
+      if (_rfAktionJa(t)) return true;
+    }
+    /* v1309: „Ja, hol den Bodenrichtwert ab" — Verb und Sache stehen
+       mitten im Satz, nicht am Anfang und nicht am Ende. Steht die Quelle
+       drin („aus den Einstellungen"), ist es keiner. */
+    if (_istAbrufWunsch(t) && !/(einstellung|profil|vorgabe|voreinstellung)/i.test(t)) {
       if (_rfAktionJa(t)) return true;
     }
     /* v1306: „nimm" ist zweideutig. „Nimm den Bodenrichtwert" meint einen
@@ -6939,6 +7106,29 @@
         _rf.tiefeOffen = 0;
         _rfBlase('ich', escH(t));
         _rfFertig(true);
+        return true;
+      }
+    }
+
+    /* ═══ v1309 · Navigation per Sprache ══════════════════════════════════
+       Marcels Wunsch: „Ich möchte überspringen oder weiter oder ich möchte
+       auch eine Frage zurückspringen."
+
+       Steht VOR der Feldauswertung: „zurück" ist ein Befehl, kein Wert.
+       Und eng gefasst — nur kurze Sätze, die AUS NICHTS ANDEREM bestehen.
+       „Zurück zur Hauptstraße" wäre sonst ein Sprung statt einer Adresse. */
+    if (t.split(/\s+/).length <= 5) {
+      var zurueck = t.match(/^\s*(?:(?:geh|gehe|spring|springe|ich m(ö|oe)chte|kannst du)\s+)?(?:eine?\s+)?(?:frage\s+)?zur(ü|ue)ck(?:\s+(?:zur|zum)\s+(?:letzten|vorigen|vorherigen)\s+frage)?\s*[.!,]*$/i);
+      if (zurueck) { _rfBlase('ich', escH(t)); _rfZurueck(1); return true; }
+      if (/^\s*(?:zwei|2)\s+fragen?\s+zur(ü|ue)ck\s*[.!,]*$/i.test(t)) {
+        _rfBlase('ich', escH(t)); _rfZurueck(2); return true;
+      }
+      /* „weiter" und „überspringen" meinen dasselbe: diese Frage ohne
+         Antwort lassen. `_rfUeberspringen` setzt den Strich in der
+         Übersicht — so bleibt nachvollziehbar, was offen blieb. */
+      if (/^\s*(?:weiter|(ü|ue)berspringen|(ü|ue)berspring|(ü|ue)bersprich|n(ä|ae)chste\s+frage|skip|lass\s+(?:das|die|den)\s+aus)\s*[.!,]*$/i.test(t)) {
+        _rfBlase('ich', escH(t));
+        _rfUeberspringen(true);
         return true;
       }
     }
