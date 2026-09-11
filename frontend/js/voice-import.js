@@ -7994,6 +7994,11 @@
                          _kontingent: _rfKontingent,
                          _verneinung: _rfIstVerneinung,  /* v1288b */
                          _kontextKlar: _rfKontextKlar,
+                         /* v1315: Pruefhaken - der Kontext und die
+                            Bestaetigungs-Uebertragung sind von aussen
+                            nicht messbar, wenn sie nicht heraussehen. */
+                         _kontext: _rfKontext,
+                         _bestaetigung: _rfBestaetigungUebertragen,
                          _offenesEnde: _fsOffenesEnde,   /* v1290 */
                          _fsStand: function () { return { phase: _fs.phase, kopf: !!_fs.kopf,
                              chunks: _fs.chunks.length, rest: _fs.rest, laeuft: _fs.laeuft,
