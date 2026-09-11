@@ -567,6 +567,33 @@
     OA.reset();
     OA.setMode(!!(opts && opts.target === 'qc'), done);
 
+    /* ═══ v1310 · Zwei Fenster, eine ID — daran brach die Kette ═══════════
+       Marcels Befund vom 11.09.2026: „die Kombination Exposé, Marktbericht
+       und der Sprechlauf funktionieren nicht. Er bricht dann ab."
+
+       NACHGESTELLT und bestätigt: der Import (`openCombinedImport`) baut
+       sein Overlay mit `id="oabi-ov"` — und der Sprechlauf benutzt
+       DIESELBE ID. Steht das Import-Fenster beim Öffnen noch im DOM,
+       liefert `getElementById('oabi-ov')` das ALTE Element. Der Sprechlauf
+       baut sein Fenster zwar, findet darin aber nichts wieder: gemessen
+       blieb `#vi-sk-frei` leer, die Startkarte erschien nie. Für den
+       Nutzer sieht das aus wie ein Abbruch.
+
+       Warum das lange gutging: wer den Sprechlauf einzeln öffnet, hat kein
+       zweites Fenster. Erst die KETTE bringt beide zusammen — und dort
+       schließt der Import erst, wenn sein `onDone` durch ist.
+
+       Ein vorhandenes Fenster wird deshalb abgeräumt, bevor das eigene
+       entsteht. Die Klasse bleibt (`.oabi-ov` trägt das gesamte CSS), die
+       ID gehört aber immer dem Fenster, das gerade offen ist. */
+    try {
+      var _alt = document.getElementById('oabi-ov');
+      if (_alt) {
+        try { console.log('[voice-import] altes oabi-ov gefunden und abgeraeumt'); } catch (x) {}
+        _alt.remove();
+      }
+    } catch (e) {}
+
     var ov = document.createElement('div');
     ov.className = 'oabi-ov vi-mode'; ov.id = 'oabi-ov';  /* v504-white: gescopter Restyle */
     ov.innerHTML =
