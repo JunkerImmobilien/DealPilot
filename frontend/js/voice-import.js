@@ -6545,7 +6545,17 @@
     if ((_rf.aktionen || []).length && (RF_JA.test(t) || _istZustimmung(t))) {
       if (_rfAktionJa(t)) return true;
     }
-    if ((_rf.aktionen || []).length > 1 && /^(hol|nimm|mach|recherchier|bodenrichtwert|die lage|marktpreis)/i.test(t)) {
+    /* v1306: „nimm" ist zweideutig. „Nimm den Bodenrichtwert" meint einen
+       Abruf, „nimm die aus den Einstellungen" die Profil-Übernahme —
+       GEMESSEN im Durchlauf: der zweite Satz landete hier und der Co-Pilot
+       fragte, welchen Abruf er holen soll.
+
+       Wo eine Quelle genannt wird, ist es kein Abruf-Befehl. Die Prüfung
+       auf die Übernahme-Absicht steht weiter unten und bekommt den Satz
+       jetzt zu sehen. */
+    if ((_rf.aktionen || []).length > 1 &&
+        !/(einstellung|profil|vorgabe|voreinstellung|standard)/i.test(t) &&
+        /^(hol|nimm|mach|recherchier|bodenrichtwert|die lage|marktpreis)/i.test(t)) {
       if (_rfAktionJa(t)) return true;
     }
     /* v1291b: „nein danke" raeumt die Angebote weg, ohne die Frage zu
