@@ -161,6 +161,55 @@
       '.oabi-ov.vi-mode{--vi-surface:#0a0a0a;--vi-card:#151412;--vi-text:#FDFCFA;--vi-muted:#A89F8E;--vi-line:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);--vi-track:#1c1a16;--vi-accent:var(--wl-c9a84c, #C9A84C);--vi-donebd:rgba(63,165,108,.7);--vi-donebg:rgba(63,165,108,.14);--vi-donetx:#c9f0d8}',
       'body[data-dp-skin="hell"] .oabi-ov.vi-mode{--vi-surface:#FDFCFA;--vi-card:#FFFFFF;--vi-text:#1e1a12;--vi-muted:#8a8272;--vi-line:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);--vi-track:#ECE4D2;--vi-accent:#9a7a24;--vi-donebd:rgba(63,165,108,.6);--vi-donebg:rgba(63,165,108,.14);--vi-donetx:#1c6b41}',
       '.oabi-ov.vi-mode .oabi-modal{background:var(--vi-surface)}',
+
+      /* ═══ v1300c · Der freie Weg wird geteilt ═══════════════════════════
+         Marcels Vorgabe: „wenn ich frei erzähle, dass wir dort dann auch
+         einmal, was schon steht, dass wir das dort halt auch einmal
+         auflisten."
+
+         DIESE REGELN STANDEN IN `_rfStil()` — GEMESSEN: das Style-Tag
+         `vi-rf-stil` existiert im freien Weg GAR NICHT, es wird nur für den
+         geführten Dialog eingehängt. `.vi-frei-buehne` stand deshalb auf
+         `display:block` statt Grid, und die Spalte lief über die volle
+         Breite. Dieselbe Sorte wie der falsche Anker in `v1296b`: eine
+         Regel am Ort, den der Code nie erreicht.
+
+         Sie gehören hierher, in `vi-style` — der Block wird bei JEDEM
+         Öffnen gesetzt, für beide Wege.
+
+         `min-width:0` am linken Kind ist Pflicht: ein Grid-Kind schrumpft
+         sonst nicht unter seinen Inhalt, und der Orbit drückt die Spalte
+         aus dem Bild. */
+      '.vi-frei-buehne{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}',
+      '.vi-frei-buehne > #vi-rec{min-width:0}',
+      '.oabi-ov.vi-mode #vi-frei-stand{min-height:0;max-height:min(62vh,560px);',
+      '  border:1px solid var(--vi-line);border-radius:12px;background:var(--vi-card);',
+      '  display:flex;flex-direction:column;overflow:hidden;color:var(--vi-text)}',
+      '.oabi-ov.vi-mode #vi-frei-stand .vi-rf-stand-kopf{display:flex;align-items:center;',
+      '  justify-content:space-between;gap:8px;padding:10px 13px 9px;flex:0 0 auto;',
+      '  border-bottom:1px solid var(--vi-line);',
+      '  font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;',
+      '  text-transform:uppercase;color:var(--vi-accent)}',
+      '.oabi-ov.vi-mode #vi-frei-stand .vi-rf-stand-body{flex:1 1 auto;min-height:0;',
+      '  overflow-y:auto;padding:7px 11px 11px}',
+      '.oabi-ov.vi-mode #vi-frei-stand .vi-rf-gr{display:flex;align-items:center;gap:7px;',
+      '  margin:9px 0 4px;font:700 9px/1 "JetBrains Mono",ui-monospace,monospace;',
+      '  letter-spacing:.1em;text-transform:uppercase;color:var(--vi-muted)}',
+      '.oabi-ov.vi-mode #vi-frei-stand .vi-rf-gr-n{flex:1;min-width:0}',
+      '.oabi-ov.vi-mode #vi-frei-stand .vi-rf-st{display:flex;align-items:baseline;gap:7px;',
+      '  padding:3px 0;font:400 11.5px/1.4 Inter,system-ui,sans-serif;color:var(--vi-text)}',
+      '.oabi-ov.vi-mode #vi-frei-stand .vi-rf-st.ok{color:var(--vi-donetx)}',
+      '.oabi-ov.vi-mode #vi-frei-stand .vi-rf-st-z{flex:0 0 auto;width:11px;opacity:.7}',
+      '.oabi-ov.vi-mode #vi-frei-stand .vi-rf-st-n{flex:1;min-width:0}',
+      '.oabi-ov.vi-mode #vi-frei-stand .vi-rf-st-v{flex:0 0 auto;max-width:52%;text-align:right;',
+      '  font-family:"JetBrains Mono",ui-monospace,monospace;font-size:10.5px;',
+      '  color:var(--vi-accent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      /* Unter 900 px trägt die Breite keine zwei Spalten. Die Liste wandert
+         nach UNTEN, nicht nach oben: beim freien Erzählen ist das Mikrofon
+         das Hauptelement — anders als im geführten Weg. */
+      '@media(max-width:900px){.vi-frei-buehne{grid-template-columns:1fr}',
+      '  .oabi-ov.vi-mode #vi-frei-stand{max-height:210px}}',
+
       '.oabi-ov.vi-mode .oabi-head h3{color:var(--vi-text)}',
       '.oabi-ov.vi-mode .oabi-sub{color:var(--vi-muted)}',
       '.oabi-ov.vi-mode .oabi-foot{background:var(--vi-surface);border-top:1px solid var(--vi-line)}',
@@ -776,7 +825,13 @@
            Formular schon bekannt ist. Erst dadurch sieht man beim Sprechen,
            was noch fehlt, statt es am Ende zu erfahren. */
         _viFrei = {};
+        /* v1300c: zweimal — sofort und im nächsten Bild. Beim Messen blieb
+           die Spalte leer, obwohl die Funktion fehlerfrei läuft: zu diesem
+           Zeitpunkt ist `vi-frei-stand` je nach Startweg noch nicht im DOM.
+           Ein `try/catch` verschluckt das lautlos, deshalb der zweite
+           Anlauf statt einer stillen Niederlage. */
         try { _freiStandZeichnen(); } catch (e) {}
+        setTimeout(function () { try { _freiStandZeichnen(); } catch (e) {} }, 0);
         startStream(stream);  /* v507: Streaming statt Web Speech */
         setState('rec', 'Aufnahme l\u00e4uft \u2026');
       })
@@ -2658,27 +2713,6 @@
          sieht es aus wie eine eigene Seite und der Weg zurück fehlt. */
       '.oabi-ov.vi-mode.vi-dialog .oabi-modal{max-height:97vh;width:min(1360px,100%)}',
 
-      /* ═══ v1300b · Der freie Weg wird geteilt ═══════════════════════════
-         Marcels Vorgabe: „wenn ich frei erzähle, dass wir dort dann auch
-         einmal, was schon steht, dass wir das dort halt auch einmal
-         auflisten."
-
-         Links das Mikrofon mit dem Orbit, rechts dieselbe Spalte wie im
-         geführten Weg. Die Chips im Orbit zeigen, was GERADE erkannt wurde;
-         die Spalte zeigt, was insgesamt steht und was fehlt. Das eine
-         ersetzt das andere nicht.
-
-         `min-height:0` an beiden Spalten ist Pflicht — ein Grid-Kind
-         schrumpft sonst nicht unter seinen Inhalt, und die Spalte würde
-         das Modal aufblähen statt zu scrollen (FALLEN.md). */
-      '.vi-frei-buehne{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start}',
-      '.vi-frei-buehne > #vi-rec{min-width:0}',
-      '.oabi-ov.vi-mode #vi-frei-stand{min-height:0;max-height:min(62vh,560px)}',
-      /* Unter 900 px trägt die Breite keine zwei Spalten mehr. Die Liste
-         wandert dann NACH UNTEN, nicht nach oben: beim freien Erzählen ist
-         das Mikrofon das Hauptelement, anders als im geführten Weg. */
-      '@media(max-width:900px){.vi-frei-buehne{grid-template-columns:1fr}',
-      '  .oabi-ov.vi-mode #vi-frei-stand{max-height:210px}}',
 
       /* ═══ v1290 · DIE ÜBERSICHTSSPALTE ════════════════════════════════
          EINE Regel je Klasse. Vorher standen zwei `.vi-rf-st`-Regeln im
