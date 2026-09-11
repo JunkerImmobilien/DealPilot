@@ -12527,6 +12527,127 @@ Straße bekannt".
 Verlässlichkeit ankommt, gehört sie zusätzlich in den Code — ein Modell
 überliest, ein `if` nicht.
 
+## Rollout-Journal · 11.09.2026, zwölfter Teil — `v1309` bis `v1310d`
+
+Marcels Rückmeldung zum Bild `design/mockups/weiter.png`. Sieben Punkte.
+
+### Feldnamen statt interner Kennungen (`v1309`)
+
+Im Bild zeigten die Pillen `eq_heating`, `eq_windows`, `eq_floor`,
+`eq_guest_wc` — *„das ist etwas kryptisch"*. Die Frage darüber nannte die
+richtigen Namen („Heizung, Verglasung, Bodenbelag, Gäste-WC?"), die Pillen
+nicht.
+
+Ursache: die Feinheiten-Felder stehen nicht in der kuratierten Whitelist,
+also fand der Katalog kein Label — und der Rückfall war die `id`. **Eine
+interne Kennung als Beschriftung ist nie richtig.** Der Name steht im
+Formular, im `<label>` neben dem Feld; `_rfFeldName` liest ihn jetzt, für
+alle Stellen, die einen Feldnamen brauchen.
+
+Gemessen: `eq_heating → Heizung`, `eq_guest_wc → Gäste-WC`,
+`eq_store_room → Keller / Abstellraum`.
+
+### Ein Abruf steht mitten im Satz (`v1309`)
+
+Im Bild steht in der Übersicht bei Grundstück der Wert **„Ja, hol den
+Bodenrichtwert ab."** — der Befehl wurde als Antwort eingetragen.
+
+Drei Prüfungen, und keine passte:
+
+| Prüfung | verlangt | „Ja, hol den Bodenrichtwert ab" |
+|---|---|---|
+| `RF_JA` | Ja am **Satzende** | sechs Wörter zu viel |
+| `/^(hol\|nimm\|…)/` | Verb am **Anfang** | beginnt mit „Ja" |
+| `_istZustimmung` | nur Zustimmungswörter | „hol", „Bodenrichtwert" |
+
+`_istAbrufWunsch` sucht deshalb **Verb und Sache irgendwo** im Satz. Eine
+Frage bleibt eine Frage: „was ist der Bodenrichtwert?" löst nichts aus.
+
+**Gemessen im Durchlauf:** „Ja, hol den Bodenrichtwert ab." →
+**90 €/m², BORIS 2026-01-01, Zone 167** → die Frage kommt mit
+**✓Bodenrichtwert** zurück, und der Knopf ist aus der Leiste verschwunden.
+Genau Marcels Ablauf: *„dann muss natürlich die Anzeige auch weggehen und
+dann sagen: Ja, ich rufe den ab und dann zeigt er den auch an."*
+
+### Navigation per Sprache (`v1309`/`v1309b`)
+
+*„Ich möchte überspringen oder weiter oder ich möchte auch eine Frage
+zurückspringen."* Überspringen gab es, **zurück nicht** — wer sich
+verspricht, musste bis zur Übersicht durchhalten.
+
+Eng gefasst auf kurze Sätze, die aus nichts anderem bestehen: „zurück zur
+Hauptstraße" ist eine Adresse, kein Sprung.
+
+**Der erste Anlauf reichte nicht:** „zurück" meldete „Zurück zu
+Mieteinnahmen." und stellte dann wieder die Finanzierungsfrage — `_rfFrage`
+überspringt Blöcke, deren Felder stehen, und der Mietblock war gefüllt.
+**Wer zurückspringt, will genau das ändern, was dort steht.** Ein Flag für
+eine Frage.
+
+### Die Bankbewertung kennt fast niemand (`v1309`)
+
+*„Die können wir in der Regel nicht angeben."* Stimmt — eine Bankbewertung
+hat man erst nach dem Gespräch mit der Bank. Liegt eine
+Marktpreisindikation vor, steht ihr Marktwert jetzt als Vorschlag daneben,
+mit dem Hinweis, dass Banken vorsichtiger rechnen. „ja" übernimmt ihn mit
+der Herkunft „Marktpreisindikation (als Näherung)".
+
+### Der Abbruch der Kette (`v1310`/`v1310b`)
+
+*„Die Kombination Exposé, Marktbericht und der Sprechlauf funktionieren
+nicht. Er bricht dann ab."*
+
+**Nachgestellt und gefunden.** `openCombinedImport` baut sein Fenster mit
+`id="oabi-ov"` — und der Sprechlauf benutzt **dieselbe ID**. In `open()`
+stand:
+
+```js
+if ($('oabi-ov')) { onDone(); return; }
+```
+
+Gedacht war das gegen zwei übereinanderliegende Sprechläufe. Getroffen hat
+es das **Import-Fenster**: steht dessen Rest noch im DOM, steigt der
+Sprechlauf sofort aus und meldet „fertig", **ohne je gelaufen zu sein**.
+Die Kette geht weiter, als wäre nichts gewesen.
+
+Warum es lange gutging: wer den Sprechlauf einzeln öffnet, hat kein zweites
+Fenster. **Erst die Kette bringt beide zusammen.**
+
+Jetzt hält nur noch ein laufender Sprechlauf (`.vi-mode`) ihn auf; ein
+fremdes Fenster wird abgeräumt. Gemessen: Startkarte erscheint, `onDone`
+feuert nicht mehr vorzeitig.
+
+### Die Vertiefung dort, wo sie Arbeit abnimmt (`v1310c`)
+
+*„Ist mir ganz klar aufgefallen bei Bevölkerungsentwicklungen … dort
+könnte er auch fragen nach einer erweiterten Marktbewertung. Und dort haben
+wir doch die ganzen Felder."*
+
+Das Angebot gab es — aber erst **nach** Etappe 4. Die Entwicklungsfrage
+steht **mitten** in Etappe 4. Wer sie beantwortet, füllt vier Felder von
+Hand, die zwei Fragen später von selbst gekommen wären.
+
+### Wer etwas nennt, das hier nicht ansteht (`v1310d`)
+
+Beim Prüfen herausgefallen: bei offenem Markt-Angebot „Ja, hol den
+Bodenrichtwert ab." gesagt — Antwort: *„Beides kann ich holen:
+Marktpreisindikation oder Erweiterte."* Der Bodenrichtwert stand dort gar
+nicht zur Wahl. Die Antwort ging an der Frage vorbei, und beim nächsten
+Versuch wiederholte sie sich.
+
+Jetzt sagt der Co-Pilot, dass die genannte Sache gerade nicht ansteht —
+und wann sie drankommt.
+
+### Eine eigene Falle: der Cache-Buster, der nie hochging
+
+`v1309` wurde ausgerollt, und der Ersetzungsbefehl suchte `v1308c` — diese
+Version gab es nur im **Backend**, im HTML stand weiter `v1308b`. Ohne die
+Gegenprobe wäre die ganze Version im Browser nicht angekommen, und ich
+hätte an einem Stand gemessen, den es nicht gab.
+
+**Commits** `f58e677`, `31b967a`, `a6db332`, `c055bd4`, `c5c67be`,
+`c1cbf39`, `044001e`. Gold-Audit RC=0. Auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

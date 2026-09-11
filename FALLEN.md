@@ -2472,3 +2472,55 @@ Und beim Nachmessen: **nach jeder Prompt-Änderung wirklich messen.** Eine
 Prompt-Regel, die man nur schreibt und für wirksam hält, ist eine
 Vermutung — und sie sieht im Diff genauso überzeugend aus wie eine, die
 greift.
+
+## Eine Sperre, die auf eine geteilte ID prüft
+
+Ein Dialog schützte sich davor, zweimal übereinander zu öffnen:
+
+```js
+if ($('oabi-ov')) { onDone(); return; }
+```
+
+Richtig gedacht. Nur gehört `oabi-ov` **nicht nur ihm**: das Import-Fenster
+desselben Moduls benutzt dieselbe ID. Steht dessen Rest noch im DOM, steigt
+der Dialog sofort aus — **und meldet „fertig", ohne gelaufen zu sein.**
+Die aufrufende Kette geht weiter, als wäre alles in Ordnung.
+
+Für den Nutzer sah das aus wie ein Abbruch: er wählte drei Quellen, zwei
+liefen, die dritte erschien nie.
+
+**Warum es lange gutging:** einzeln geöffnet gibt es kein zweites Fenster.
+**Erst die Kombination bringt beide zusammen** — und genau die probiert
+man selten aus.
+
+**Die Regel:** eine Sperre prüft auf das, was sie meint. „Läuft schon EIN
+SOLCHER Dialog" ist etwas anderes als „existiert ein Element mit dieser
+ID". Wo mehrere Fenster sich eine ID teilen (weil sie sich ein Stylesheet
+teilen), unterscheidet die **Klasse**, nicht die ID — und ein fremdes
+Fenster mit derselben ID wird abgeräumt, nicht respektiert.
+
+Und: **ein `onDone()` im Fehlerfall ist eine Lüge an den Aufrufer.** Wer
+nicht gelaufen ist, meldet nicht „fertig" — sonst kann die Kette den
+Unterschied nicht sehen.
+
+## Drei Prüfungen, und keine passt auf gesprochene Sprache
+
+„Ja, hol den Bodenrichtwert ab." fiel durch alles:
+
+| Prüfung | verlangt | warum sie versagt |
+|---|---|---|
+| `RF_JA` | Ja am **Satzende** | sechs Wörter zu viel |
+| `/^(hol\|nimm\|…)/` | Verb am **Anfang** | Satz beginnt mit „Ja" |
+| `_istZustimmung` | nur Zustimmungswörter | enthält Inhalt |
+
+Der Satz landete als **Wert im Feld** — in der Übersicht stand bei
+Grundstück „Ja, hol den Bodenrichtwert ab."
+
+**Die Regel:** gesprochene Sätze haben keine feste Wortstellung. Ein
+Befehl wird daran erkannt, dass **ein Verb und ein Gegenstand** darin
+vorkommen — nicht daran, wo sie stehen. Anker am Satzanfang (`^`) und am
+Satzende (`$`) sind für getippte Kurzantworten gebaut und überleben die
+Umstellung auf Sprache nicht.
+
+Die Gegenprobe gehört dazu: eine **Frage** („was ist der Bodenrichtwert?")
+enthält dieselben Wörter und ist kein Befehl.
