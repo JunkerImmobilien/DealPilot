@@ -673,6 +673,18 @@ const ZUSATZ_ANTWORT = [
   'es sie gibt. Gibt es kein passendes Feld fuer die Verneinung, lass sie',
   'weg - aber erfinde keine Luecke, wo eine klare Aussage steht.',
   '',
+  /* v1308: gemessen im Sprechlauf — „Das Objekt liegt in 32609 Huellhorst,
+     keine Strasse bekannt" trug „keine Strasse bekannt" als STRASSENNAMEN
+     ein. Bei einem Zahlenfeld ist die Verneinung eine 0; bei einem TEXTfeld
+     ist sie gar nichts. Eine Strasse, die „keine Strasse bekannt" heisst,
+     steht danach im Bankexport und im PDF. */
+  'ACHTUNG bei TEXTfeldern (Strasse, Ort, Name, Beschreibung): dort ist',
+  'eine Verneinung KEINE Angabe, sondern eine Luecke. "keine Strasse',
+  'bekannt", "weiss die Hausnummer nicht", "Ort unbekannt" heisst: Feld',
+  'WEGLASSEN. Niemals die Verneinung selbst als Text eintragen - ein',
+  'Strassenname "keine Strasse bekannt" landet sonst in Exporten und',
+  'Dokumenten. Die 0-Regel oben gilt fuer BETRAEGE und MENGEN.',
+  '',
   'MEHRERE AUSSAGEN IN EINEM SATZ werden EINZELN ausgewertet. "Wir haben',
   'keine Sanierungskosten und auch keine Moeblierung" enthaelt ZWEI',
   'Angaben zu ZWEI Feldern - beide gehoeren ins Ergebnis. Ein "und", ein',
