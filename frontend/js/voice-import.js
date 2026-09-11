@@ -3099,14 +3099,43 @@
         gesagt wurde, gewinnt gegen die Vorbelegung. „Eigenkapital sind
         10 % vom Kaufpreis" überschreibt also die 20 % aus den
         Einstellungen — und wird mit dem bekannten Kaufpreis gerechnet. */
+  /* ═══ v1298 · „oder kann genauso bleiben" ══════════════════════════════
+     Marcels Befund vom 11.09.2026 zu den Kaufnebenkosten: „das kannst du
+     aus den Einstellungen übernehmen oder kann genauso bleiben. Das hat er
+     überhaupt gar nicht verstanden."
+
+     Der Satz trägt DREI Signale, und keines davon war vollständig erfasst:
+
+     1. „aus den Einstellungen übernehmen" — das griff seit v1286, ABER nur
+        wenn für diese Frage überhaupt ein Vorschlag vorliegt. Liefert
+        `_pvNebenkosten()` nichts (kein Maklersatz im Profil, keine PLZ für
+        die Grunderwerbsteuer), war `profilVorschlag` null und die Funktion
+        stieg in Zeile eins aus. Der Nutzer bekam „nichts entnehmen" zu
+        hören, obwohl er klar und richtig gesprochen hatte.
+     2. „kann genauso bleiben" — eine Zustimmung zur VORBELEGUNG, die im
+        Feld steht. Sie stand in keinem Muster.
+     3. Das „oder" dazwischen: er nennt zwei Wege und überlässt die Wahl.
+        Beide enden am selben Punkt — nimm, was du hast, frag mich nicht.
+
+     `_rfWillProfil` erkennt jetzt alle drei. Ob am Ende etwas zu übernehmen
+     IST, entscheidet der Aufrufer — und sagt es, wenn nicht. Eine Absicht
+     nicht zu erkennen ist ein Fehler; sie zu erkennen und ehrlich zu
+     melden, dass nichts hinterlegt ist, ist eine Auskunft. */
   function _rfWillProfil(text) {
     var t = String(text || '');
-    if (!_rf || !_rf.profilVorschlag) return false;
-    /* Kurzform: „ja", „passt", „ok" - allein stehend. */
-    if (/^(ja|jo|jup|okay|ok|passt|gerne|gern|klar|mach das|einverstanden)\b[\s.!,]*$/i.test(t.trim())) return true;
+    if (!_rf) return false;
+    /* Kurzform: „ja", „passt", „ok" - allein stehend. Nur sinnvoll, wenn
+       tatsaechlich ein Vorschlag danebensteht, auf den sie sich beziehen. */
+    if (_rf.profilVorschlag &&
+        /^(ja|jo|jup|okay|ok|passt|gerne|gern|klar|mach das|einverstanden)\b[\s.!,]*$/i.test(t.trim())) return true;
     var quelle = /(einstellung|profil|vorgabe|standard|vorschlag|voreinstellung)/i.test(t);
     var wille  = /(übernimm|uebernimm|übernehmen|uebernehmen|nimm|nehmen|verwende|benutz|kannst du|kannst es|kannst die|hol|zieh)/i.test(t);
-    return quelle && wille;
+    if (quelle && wille) return true;
+    /* „kann genauso bleiben", „lass es so", „so lassen", „bleibt wie es ist" */
+    if (/\b(genauso|so)\s+(bleiben|lassen)\b/i.test(t)) return true;
+    if (/\b(l(a|ä)ss?t?|lassen)\s+(es|das|die|den)?\s*(einfach\s+)?so\b/i.test(t)) return true;
+    if (/\bbleibt?\s+(so|wie es ist|wies ist)\b/i.test(t)) return true;
+    return false;
   }
 
   /* Profil eintragen, ohne die Frage abzuschliessen - der Satz kann noch
@@ -4113,6 +4142,36 @@
      statt Freitext zu raten, den die Auswertung dann irgendwie zuordnet.
      Gelesen wird das `<select>` im DOM, nicht eine zweite Liste: eine
      Zweitliste veraltet beim ersten neuen Eintrag, und niemand merkt es. */
+  /* ═══ v1298 · Pillen mit den Schlagwörtern ═════════════════════════════
+     Marcels Vorgabe vom 11.09.2026: „Vielleicht wäre es auch gut, wenn wir
+     hinter den Fragen noch Pillen machen mit den Schlagwörtern, die gefragt
+     sind. Dann kann man das noch besser verstehen."
+
+     Eine Frage wie „Was kommt monatlich rein? Kaltmiete und Zusatzeinnahmen
+     wie Stellplatz." nennt zwei Felder im Fließtext. Wer schnell hört, hört
+     eins. Die Pillen zeigen ohne Lesen, WIE VIELE Angaben erwartet werden —
+     und welche davon schon stehen.
+
+     GEFÜLLTE FELDER BEKOMMEN EINEN HAKEN. Das ist der eigentliche Gewinn:
+     bei einem Block, aus dem das Exposé schon die Hälfte geliefert hat,
+     sieht man sofort, was noch fehlt, statt die Antwort zu wiederholen. */
+  function _rfPillen(eintrag) {
+    if (!eintrag || !eintrag.ids || !eintrag.ids.length) return '';
+    var kat = (_rf && _rf.catalog) || [];
+    var teile = (eintrag.ids).map(function (id) {
+      var c = kat.filter(function (x) { return x.id === id; })[0];
+      /* Klammerzusätze raus — „Wohnfläche (m²)" wird zu „Wohnfläche".
+         Auf einer Pille zählt das Wort, nicht die Einheit. */
+      var name = c ? String(c.label).replace(/\s*\(.*?\)\s*$/, '').trim() : id;
+      var da = _rf && _rf.data && _rf.data.fields &&
+               _rf.data.fields[id] != null && String(_rf.data.fields[id]).trim() !== '';
+      if (!da) { var v = _rfFeld(id); da = (v != null && String(v).trim() !== ''); }
+      return '<span class="vi-rf-pille' + (da ? ' da' : '') + '">' +
+             (da ? '<i>✓</i>' : '') + escH(name) + '</span>';
+    });
+    return '<div class="vi-rf-pillen">' + teile.join('') + '</div>';
+  }
+
   function _rfSkalen(eintrag) {
     if (!eintrag || !eintrag.skalen) return '';
     var teile = [];
@@ -4681,6 +4740,26 @@
     var chat = $('vi-rf-chat');
     if (chat) [].slice.call(chat.querySelectorAll('.vi-rf-abruf-btn[data-markt]'))
       .forEach(function (b) { b.disabled = true; });
+
+    /* ═══ v1298 · Die Wahl schliesst BEIDE Angebote ══════════════════════
+       Marcels Befund vom 11.09.2026: „mir ist aufgefallen, dass er das
+       Modal mit ‚Ich kann das für dich holen, Marktpreisindikation‘ und so
+       offen lässt, obwohl ich erweiterte Marktpreisindikation angeklickt
+       habe. Und das könnte er dann zuklappen, weil man braucht es ja nicht
+       mehr."
+
+       Er hat recht, und die Ursache stand eine Ebene hoeher: beim
+       Frageuebergang werden alle Angebote abgeraeumt AUSSER `markt` und
+       `markt2` (v1291) — die sollten den ganzen Dialog ueberdauern, weil
+       sie nicht zu einer einzelnen Frage gehoeren.
+
+       Richtig ist das, SOLANGE NICHTS GEWAEHLT WURDE. Sobald eine Stufe
+       steht, ist die Frage beantwortet; beide Knoepfe daneben sind dann
+       nur noch Angebote fuer eine Entscheidung, die schon gefallen ist.
+       Die Ausnahme galt zu lange, nicht zu breit. */
+    _rfAktionWeg('markt');
+    _rfAktionWeg('markt2');
+    _rfDranZeichnen();
     if (stufe >= 2) {
       _rfBlase('co', '<span style="opacity:.8">Gemerkt. Die erweiterte hole ich am Ende von ' +
         '<b>Etappe 4</b> — dann kennt sie Zustand, Energieausweis, Bodenrichtwert und deine ' +
@@ -5049,7 +5128,7 @@
     var pv = _rfProfilVorschlag(e);
     /* v1288: Bei einer Auswahl stehen die STUFEN in der Frage. Wir bewerten
        danach - also soll der Nutzer sie hoeren, statt Freitext zu raten. */
-    _rfBlase('co', escH(e.frage) + _rfSkalen(e) +
+    _rfBlase('co', escH(e.frage) + _rfPillen(e) + _rfSkalen(e) +
       (pv ? '<div class="vi-rf-vorschlag">Aus deinen Einstellungen hätte ich: <b>' +
             escH(pv.text) + '</b></div>' : '') +
       _rfAbrufAngebot(e) +
@@ -5793,8 +5872,31 @@
     if (_rfWillProfil(t)) {
       var pv = _rfProfilEintragen();
       _rfBlase('ich', escH(t));
+      /* v1298: Kein Vorschlag da? Dann steht vielleicht eine VORBELEGUNG im
+         Feld — „kann genauso bleiben" meint genau die. Und wenn auch die
+         fehlt, wird das gesagt, statt so zu tun, als sei etwas passiert.
+         Vorher lief beides in denselben Satz „Übernommen", auch wenn
+         nichts übernommen wurde. */
+      if (!pv) {
+        var e0 = _rf.offen[_rf.i];
+        var vb = e0 ? _rfVorschlag(e0) : null;
+        if (vb) {
+          _rf.data.fields[e0.ids[0]] = vb;
+          if (!_rf.quelle) _rf.quelle = {};
+          _rf.quelle[e0.ids[0]] = 'Vorbelegung, von dir bestätigt';
+          _rfBlase('co', 'Bleibt bei <b>' + escH(_rfLesbar(vb, e0)) + '</b> — in der Tabelle kannst du das noch ändern.');
+        } else {
+          _rfBlase('co', 'Dazu ist in deinen Einstellungen nichts hinterlegt, und im Feld steht auch ' +
+            'noch nichts. Sag mir einen Wert, oder sag <b>überspringen</b> — dann lasse ich es offen.');
+          _rfDranZeichnen();
+          return true;   /* NICHT weitergehen: die Frage ist unbeantwortet */
+        }
+        _rfStandZeichnen();
+        _rfWeiter();
+        return true;
+      }
       var nurZusage = t.split(/\s+/).length <= 8;
-      if (nurZusage || !pv) {
+      if (nurZusage) {
         _rfBlase('co', 'Übernommen — in der Tabelle kannst du sie noch ändern.');
         _rfStandZeichnen();
         _rfWeiter();

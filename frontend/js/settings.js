@@ -1848,8 +1848,12 @@ function _kaufBlockHtml(planKey) {
         return n ? { pk: pk, n: n, eigen: pk === planKey } : null;
       }).filter(Boolean)
     : [];
-  /* Das eigene zuerst, die Reihenfolge der uebrigen bleibt. */
-  pakete.sort(function (a, b) { return (b.eigen ? 1 : 0) - (a.eigen ? 1 : 0); });
+  /* KEINE Umsortierung. Erst stand hier das eigene Paket vorn — im Browser
+     ergab das die Reihenfolge Langstrecke · Kurzstrecke · Mittelstrecke,
+     und drei Pakete, deren Groesse hin und her springt, liest niemand als
+     Staffel. Die natuerliche Ordnung klein → gross traegt die Aussage; das
+     eigene wird durch die Pille „Dein Plan" hervorgehoben, nicht durch die
+     Position. */
 
   if (pakete.length) {
     h += '<div class="plan-credits-section">' +
