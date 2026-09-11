@@ -11433,6 +11433,116 @@ Hauptweg lief die ganze Zeit sauber — und hätte keinen davon gezeigt.
 **Commits** `8fc559d`, `1a0a307`, `987aac9`, `8215c50`. Auf Staging, **nicht auf
 Prod**.
 
+## Rollout-Journal · 11.09.2026, zweiter Teil — `v1294` bis `v1295`
+
+### Vier Kaufknöpfe, die nichts kauften (`v1294`)
+
+Marcels Auftrag war eine Durchsicht: „unter Plan wechseln steht da noch die
+alten Preise für diese Bewertungen … das müsste eigentlich noch raus."
+
+**Gemessen gegen den laufenden Checkout**, nicht gegen den Code:
+
+| Paket-Schlüssel | Antwort |
+|---|---|
+| `paket_kurz` | **HTTP 400 · `invalid_pack`** |
+| `paket_gross` | **HTTP 400 · `invalid_pack`** |
+| `nachkauf_starter` | HTTP 200 |
+| `nachkauf_pro` | HTTP 200 |
+| `mpi` | HTTP 200 |
+
+Die vier Bewertungs-Pakete zu **7,90 / 19,90 / 39,90 / 69,90 €** standen seit
+`v1246` nur noch als Anzeige da — das Backend kennt seither ausschließlich
+`dp_nachkauf_*` und `dp_einzeln_*`. Der Kommentar in `config.js` sagte seit
+`v1246` „das ersetzt BEWERTUNGS_PAKETE"; angekommen war die Ersetzung in
+`settings.js`, **nicht** im Preis-Modal und **nicht** auf der Landing.
+
+Das ist die unangenehmste Sorte Fehler: er trifft genau die Person, die gerade
+Geld ausgeben will, und er sieht bis zum Klick vollkommen in Ordnung aus.
+
+**Jetzt zeigt das Modal, was es wirklich gibt.** `KPACKS` wird nicht mehr
+hartgeschrieben, sondern aus `nachkaufFuer()` erzeugt — **dieselbe Quelle wie
+in den Einstellungen**, damit die beiden nicht wieder auseinanderlaufen können.
+Der eigene Plan steht vorn (`_nkIndex()`): wer nachkauft, kauft seinen eigenen.
+
+### Der Einzelkauf war die ganze Zeit da — nur unsichtbar
+
+Der Einzelkauf (`dp_einzeln_*`, 0,90 bis 9,90 €) **funktioniert seit `v1183`**.
+In `settings.js` hing er hinter `if (creditPacks.length > 0)`, und
+`creditPacks` ist `[]`, seit die Pakete abgeschaltet wurden. **Eine
+funktionierende Kaufmöglichkeit, die niemand sehen konnte** — versteckt hinter
+der Bedingung auf genau das, was sie ersetzen sollte.
+
+Jetzt steht er als eigener Block unter dem Nachkauf, in beiden Oberflächen.
+
+**Nachgemessen im Browser:** das „Plan wechseln"-Modal zeigt **null** alte
+Preise, die drei Nachkauf-Segmente `5 · 0 · 0 → 5,00 €`, `5 · 5 · 0 → 8,75 €`,
+`5 · 5 · 5 → 12,50 €` und alle **fünf** Einzelkauf-Zeilen mit Kaufknopf.
+
+### Die Landing-Karten waren schon vorher tot (`v1294b`)
+
+Beim Nachziehen der Landing fiel auf: `landing/assets/pricing-plugin.js` und die
+zweite Kopie in `leistungsumfang.html` hängen beide an `#pricing-host` — **und
+dieses Element gibt es auf keiner Seite.** Der Code lief nie. Beide Kopien
+tragen die neuen Zahlen und sind zusätzlich als toter Code gekennzeichnet;
+gelöscht wurden sie nicht, weil sie die einzige Fassung der Preistexte sind,
+falls der Host je zurückkommt.
+
+### Wie viel vom Mietpotenzial wirklich erreichbar ist (`v1295`)
+
+Marcels Punkt aus dem Sprechlauf-Auftrag: *„Vielleicht schaut man dann in der
+Region auch, ob's da eine Kappungsgrenze ist und ob man dann schon oben liegt
+und ob man da noch erhöhen könnte."*
+
+Das Mietpotenzial allein beantwortet das nicht. **292 € im Monat klingen nach
+292 €** — im laufenden Vertrag sind es höchstens, was die Kappungsgrenze
+zulässt. Also wird die Lücke geteilt:
+
+```
+im Vertrag erreichbar  = min(Marktmiete, Ist × 1,20) − Ist
+erst bei Neuvermietung = der Rest
+```
+
+**Gerechnet wird mit 20 %, nicht mit 15.** Ob ein Ort als angespannter
+Wohnungsmarkt gilt, steht in einer Verordnung des jeweiligen Landes, die wir
+nicht führen — die 15 % zu unterstellen, wo sie vielleicht nicht gelten, wäre
+eine **erfundene Einschränkung**. Der Hinweis steht daneben, mit der Zahl für
+den Fall, dass sie gelten.
+
+Und: **die Marktmiete ist die Grenze, nicht ein Wunsch.** Liegt die Ist-Miete
+schon nahe am Markt, ist die Kappungsgrenze gar nicht das Hindernis — dann
+steht dort „die Kappungsgrenze bremst hier **nicht**", und das ist die
+ehrlichere Auskunft als eine Prozentzahl.
+
+**Nachgemessen am ausgelieferten Bundle** (`voice-import.js?v=v1295`, die
+Funktion aus dem geladenen Quelltext geschnitten und mit Stubs gefahren):
+
+| Fall | Ist | Markt | im Vertrag | erst neu | bei 15 % |
+|---|---|---|---|---|---|
+| Hüllhorst 100 m² | 490 € | 782 € | **98 €** | **194 €** | 73,50 € |
+| fast am Markt | 700 € | 782 € | 82 € (ganz) | 0 € | — |
+| Ist über Markt | 800 € | 782 € | *keine Karte* | — | — |
+| ohne Wohnfläche | — | — | *`null`* | — | — |
+
+98 + 194 = 292 — **die volle Lücke, nichts geht verloren.** Ohne Wohnfläche
+gibt die Funktion `null` statt einer erfundenen Zahl. Die fünf `.vi-mp-*`-Regeln
+erben ihre Farbe vom Eltern-Element; die Dunkel-auf-Hell-Falle aus `v1292` ist
+hier **nicht** wiederholt.
+
+### Die Falle, in die ich beim Nachmessen selbst gefallen bin
+
+`.vi-mp-teil` gab **0 Treffer**. Der Grund stand in `FALLEN.md`, von mir selbst
+notiert: `location.reload(true)` holt das **HTML** nicht neu, also blieb der
+alte Cache-Buster stehen, also lud der Browser `voice-import.js?v=v1293g`. **Ein
+neuer Tab ist die einzige verlässliche Gegenprobe** — und `script.src`
+auszulesen ist billiger, als einer Null-Messung zu glauben.
+
+**Commits** `39995bf` (v1294), `902c74a` (Demo), `ecffdbb` (v1294b), `cd1e78c`
+(v1295). Auf Staging, **nicht auf Prod**.
+
+**Rest:** Marcels Wahl aus der Einzelkauf-Demo (`design/Vorschläge/einzelkauf-demo.html`,
+Varianten A ruhige Liste · B am Fehlerpunkt · C Kacheln — Empfehlung A + B).
+Und das echte Sprechen am Mikrofon, das nur er abnehmen kann.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

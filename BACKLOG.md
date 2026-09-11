@@ -38,7 +38,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
 
-**Stand:** `v1273`–`v1293g` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
+**Stand:** `v1273`–`v1295` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
 — nichts davon ist live.
 
 > **Nach Marcels erstem echten Sprechlauf am 10.09. abends** (Bilder
@@ -130,7 +130,7 @@ die Kosten einer Aufnahme um rund 40 % — bei 4 Minuten von ≈ 1,7 auf ≈ 0,9
 
 ### 4 · Der Sprechlauf gehört auf Produktion
 
-**`v1273`–`v1293g` liegen auf Staging.** Prod steht auf
+**`v1273`–`v1295` liegen auf Staging.** Prod steht auf
 `a21fe9c` — der Co-Pilot, die Etappen, beide Scores, BORIS-Abruf und
 Marktpreisindikation im Hintergrund sind für keinen Kunden erreichbar.
 
@@ -155,7 +155,43 @@ Marcels Wunsch vom 08.09., **zurückgestellt**. Der Code liegt vollständig da,
 **Teilweise erledigt** — sie stehen in den Kennzahlen-Kacheln (Reiter
 Bewertung); im Portfolio-Cockpit noch nicht.
 
+### 8 · Der Einzelkauf — welche Fassung?
+
+`design/Vorschläge/einzelkauf-demo.html` zeigt drei Wege, die eine fehlende
+Bewertung zu verkaufen:
+
+| | Variante | wirkt |
+|---|---|---|
+| **A** | ruhige Liste unter dem Nachkauf | überall, auch ohne Anlass |
+| **B** | am Fehlerpunkt in der Aktionsleiste | genau dann, wenn das Kontingent leer ist |
+| **C** | Kacheln | — |
+
+**Empfehlung: A und B, C weglassen.** A ist gebaut und liegt seit `v1294`
+live auf Staging (Preis-Modal und Einstellungen). **B fehlt noch** — wenn
+der Sprechlauf am leeren Kontingent hängt, steht dort heute nur die
+Meldung, nicht der Ausweg.
+
+**BLOCKIERT:** wartet auf Marcels Wahl aus der Demo. Geld und Optik —
+das entscheidet er.
+
 ---
+
+## → Erledigt am 11.09.2026, zweiter Teil (`v1294`–`v1295`)
+
+| Marcels Wunsch | Stand |
+|---|---|
+| Landing-Pläne durchgehen, ob sie passen | **fertig** — Pläne stimmen; die Nachkauf-Sektion trug alte Zahlen |
+| Wie ist der Nachkauf gestaffelt? | **beantwortet** — je Plan das eigene Kontingent noch einmal, für ein Viertel des Monatsbeitrags: Starter `5·0·0` → 5,00 €, Investor `5·5·0` → 8,75 €, Pro `5·5·5` → 12,50 € |
+| Alte Bewertungspreise unter „Plan wechseln" raus | **fertig** — sie kauften nichts: `paket_kurz` → **HTTP 400 `invalid_pack`**, gemessen gegen den laufenden Checkout |
+| Vielleicht Bewertungspakete anbieten | **fertig** — Nachkauf **und** Einzelkauf (0,90 bis 9,90 €); der Einzelkauf lief seit `v1183`, hing aber hinter `if (creditPacks.length > 0)` und war unsichtbar |
+| Kappungsgrenze prüfen — „liegt man schon oben?" | **fertig** (`v1295`) — das Mietpotenzial wird geteilt in *im laufenden Vertrag* und *erst bei Neuvermietung*; gerechnet mit 20 %, die 15 % stehen als Hinweis daneben |
+
+**Nachgemessen:** das „Plan wechseln"-Modal zeigt **null** alte Preise, drei
+Nachkauf-Segmente, fünf Einzelkauf-Zeilen. Der Mietspielraum rechnet am
+Testobjekt Hüllhorst (490 € Ist, 782 € Markt, 100 m²) **98 € im Vertrag +
+194 € bei Neuvermietung = 292 €** — die volle Lücke.
+
+**Commits** `39995bf`, `902c74a`, `ecffdbb`, `cd1e78c`.
 
 ## → Erledigt in der Nacht (`v1293`–`v1293c`) — die Pre-Flight-Kette
 

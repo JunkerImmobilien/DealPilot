@@ -1892,3 +1892,72 @@ enthalten ist, wird auf den Teil eingekürzt.
 
 Und beim Prüfen: das **zweite Ziel** ist das, an dem solche Fehler
 sitzen. Der Hauptweg hat den vollen Katalog und zeigt nichts davon.
+
+## Ein Kaufknopf, der nichts kauft
+
+Vier Bewertungs-Pakete zu 7,90 / 19,90 / 39,90 / 69,90 € standen im
+Preis-Modal und auf der Landing. Sie sahen aus wie immer. Der Checkout
+antwortete auf `paket_kurz` mit **HTTP 400 · `invalid_pack`** — seit
+`v1246`, also seit vier Tagen unbemerkt.
+
+Der Code war nicht stumm dazu. In `config.js` stand seit `v1246` ein
+Kommentar: *„das ersetzt BEWERTUNGS_PAKETE"*. Die Ersetzung war in
+`settings.js` angekommen, **nicht** im Modal und **nicht** auf der
+Landing.
+
+**Ein Kommentar, der eine Ersetzung ankündigt, ist kein Nachweis, dass
+sie überall angekommen ist** — er ist eine offene Aufgabe, formuliert
+wie ein Ergebnis. Dasselbe Muster wie beim Server-Kommentar „bleibt
+stehen, bis der letzte alte Aufrufer weg ist".
+
+**Die Regel:** Kaufwege werden **gegen den laufenden Checkout gemessen**,
+nicht gegen den Code, der sie zeichnet. Ein Schlüssel, ein `POST`, ein
+Statuscode — das dauert eine Minute und trifft genau die Stelle, an der
+jemand gerade Geld ausgeben will.
+
+## Eine Funktion, versteckt hinter der Bedingung auf das, was sie ersetzt
+
+Der Einzelkauf funktioniert seit `v1183`. Gesehen hat ihn nie jemand: in
+`settings.js` hing er in einem Block, der mit `if (creditPacks.length > 0)`
+beginnt — und `creditPacks` ist `[]`, seit die Pakete abgeschaltet
+wurden.
+
+Die Bedingung war einmal richtig: der Einzelkauf stand als Zusatz unter
+den Paketen. Als die Pakete gingen, nahmen sie ihren Nachfolger mit.
+
+**Die Regel:** wird ein Angebot abgeschaltet, wird geprüft, **was in
+seinem Block noch mit drin steht.** Ein `if` auf die alte Liste ist ein
+Schalter für alles, was darunter steht — auch für das, was sie ablösen
+sollte.
+
+## Ein Modul, das an einem Anker hängt, den es nirgends gibt
+
+`landing/assets/pricing-plugin.js` baut die kompletten Preiskarten und
+hängt sie in `#pricing-host`. **Dieses Element gibt es auf keiner Seite
+des Projekts.** Der Code lief nie — und wurde trotzdem gepflegt, zuletzt
+mit Preisen, die nie jemand gesehen hat.
+
+Dieselbe Sorte wie `#app` in der Haupt-App (kostete `v1147` einen
+Ausrollzyklus): **eine Regel oder ein Modul mit einem Anker, den es nicht
+gibt, sieht vollkommen plausibel aus.** Kein Fehler, keine Konsole, kein
+Unterschied.
+
+**Die Regel:** bevor ein Modul geändert wird, wird sein Einstiegspunkt
+**im ausgelieferten HTML gesucht** — `grep` nach der id, nicht nach dem
+Dateinamen. Findet sich nichts, ist die Änderung keine Änderung.
+
+## Eine Obergrenze ohne Grundlage ist auch eine Erfindung
+
+Die Kappungsgrenze liegt bei 20 % in drei Jahren — in Gebieten mit
+angespanntem Wohnungsmarkt bei 15 %. Welche Orte dazugehören, steht in
+einer Verordnung des jeweiligen Landes. **Die führen wir nicht.**
+
+Die Versuchung ist, vorsichtshalber mit 15 % zu rechnen: die kleinere
+Zahl fühlt sich wie die sicherere an. Sie ist es nicht. **Eine
+Einschränkung zu unterstellen, für die keine Quelle vorliegt, ist
+dieselbe Erfindung wie eine Zahl zu erfinden** — nur in die andere
+Richtung, und sie kostet den Kunden ein Drittel seines Spielraums.
+
+Gerechnet wird mit 20 %. Die 15 % stehen daneben, ausgerechnet, mit dem
+Satz, wo nachzusehen ist. **Wo die Quelle endet, endet die Rechnung** —
+und was dann bleibt, ist ein Hinweis, keine Zahl.
