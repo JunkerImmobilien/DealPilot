@@ -2076,3 +2076,105 @@ erklärt er beim nächsten Mal etwas Falsches mit voller Überzeugung.
 Und was Bestandskunden bereits angespart haben, bleibt stehen. **Rückwirkend
 zu streichen, was nach den damals geltenden Regeln erworben wurde, ist eine
 Enteignung** — auch wenn es technisch nur eine Spalte ist.
+
+## Dieselbe Falle zweimal am selben Tag
+
+Vormittags in `FALLEN.md` geschrieben: *„Eine Existenzprüfung ist keine
+Abnahme."* Nachmittags Pillen gebaut, im Browser gezählt — **vier
+`.vi-rf-pille` im DOM** —, ausgerollt und gemeldet.
+
+Im Browser stand: **„PLZOrtStraßeHausnummer"**. Ein Wort. Ich hatte das
+Markup geschrieben und **keine einzige CSS-Regel** dazu.
+
+Die Zählung war richtig. Sie sagte nur nichts darüber, ob man vier Pillen
+**sieht**.
+
+**Die Regel — konkreter als beim ersten Mal:** wer ein neues Element
+einführt, prüft in derselben Messung **eine Eigenschaft, die nur mit CSS
+existiert**: `display`, `padding`, `borderRadius`. Steht dort `inline`,
+`0px`, `0px`, gibt es keine Regel, und das Element sieht aus wie roher
+Text. Ein Blick auf den Screenshot tut dasselbe in einer Sekunde.
+
+## Eine Notation ist keine Bezeichnung
+
+Im Nachkauf standen Pakete als `5 · 0 · 0`, `5 · 5 · 0`, `5 · 5 · 5`. Die
+Schreibweise stammt aus der Cockpit-Matrix — dort stehen Spaltenköpfe
+darüber, und sie ist auf einen Blick lesbar.
+
+Aus dem Zusammenhang gelöst, ist sie eine Zahlenreihe. Der Betreiber
+selbst fragte, was die Pakete unterscheidet.
+
+Daneben stand als Überschrift „Für Pro". **Das beschreibt den Käufer, nicht
+die Ware** — wer wissen will, was er bekommt, liest die falsche Zeile.
+
+**Die Regel:** eine Kurzform, die an einer Stelle funktioniert, funktioniert
+nicht überall. Sie braucht ihren Zusammenhang. Wo er fehlt, gehört ein
+Name hin — und der Name beschreibt, **was drin ist**, nicht, wer es kauft.
+
+## Eine Zahl, die nicht mitrechnet, ist schlimmer als keine
+
+Der Mengenwähler änderte Preis und Kaufknopf. Die Zeile darüber, „5
+Marktpreisindikationen", blieb stehen.
+
+Bei Menge 3 stand damit **„5 Marktpreisindikationen" über einem Preis für
+15**. Nicht falsch gerechnet — falsch gesagt. Der Kunde musste glauben,
+dass das Dreifache ankommt, obwohl die Karte etwas anderes behauptete.
+
+**Die Regel:** wird eine Größe wählbar, wird **jede** Anzeige gesucht, die
+von ihr abhängt — nicht nur die offensichtliche. Der Preis fällt sofort
+auf, die Inhaltsbeschreibung nicht. Dieselbe Sorte wie eine
+Währungsangabe, die nach der Umstellung stehenbleibt.
+
+## Eine Ausnahme, die zu lange gilt
+
+Beim Frageübergang räumt der Sprechlauf alle Angebote ab — außer den
+Markt-Abrufen. Die Ausnahme war richtig: sie gehören zu keiner einzelnen
+Frage, sondern zum ganzen Dialog.
+
+Sie hatte nur kein Ende. Nach der Wahl einer Stufe standen **beide Knöpfe
+weiter da** — Angebote für eine Entscheidung, die schon gefallen war.
+
+**Die Regel:** eine Ausnahme von „räum das ab" braucht eine Bedingung,
+**wann sie endet**. „Gilt für den ganzen Dialog" ist selten gemeint —
+gemeint ist meistens „gilt, bis es erledigt ist". Wer die Ausnahme
+schreibt, schreibt ihr Ende mit.
+
+## Ein Filter, der zu eng wird, wenn das Umfeld wächst
+
+Der Sprechlauf schickte dem Modell nur die Felder der **aktuellen** Frage.
+Das war eine gute Entscheidung: mit 192 Feldern fängt ein Modell an zu
+raten und findet für jedes Wort irgendein Feld.
+
+Als der Dialog geführter wurde, kippte es. Wer bei der Miete das Baujahr
+mitnennt, bekam „nichts gefunden, was hierher passt" — und sagte es beim
+nächsten Mal noch einmal. **Der Schutz vor Raten war zum Hindernis gegen
+Zuhören geworden.**
+
+**Die Regel:** zwischen „nur das eine" und „alles" liegt eine
+**Reichweite**. Hier: die Felder der nächsten Blöcke, gedeckelt auf 24 —
+was ohnehin gleich drankommt, darf jetzt schon gehört werden; was weit weg
+liegt, nicht. Und die Reihenfolge zählt, weil bei Mehrdeutigkeit das
+gewinnt, was zuerst steht.
+
+Dazu gehört die zweite Hälfte: was durchkommt, muss auch **behalten**
+werden. Ein Filter an der Eingabe und ein zweiter an der Übernahme sehen
+wie doppelte Vorsicht aus — sie heben sich gegenseitig auf.
+
+## Ein Kostenlog, das niemand liest
+
+Die Frage „was kostet uns ein Marktbericht" hing seit Monaten offen. Die
+Antwort stand in `marktbericht_cost_log`: 184 Läufe mit Betrag je Abruf,
+Stufe und Zeitstempel — sauber geführt, nie ausgewertet.
+
+**Eine Zahl, die geschrieben und nie gelesen wird, ist keine Messung,
+sondern Datenmüll mit gutem Gewissen.**
+
+**Die Regel:** bevor eine Kostenfrage mit „das führen wir nicht" beantwortet
+wird, wird nach einer Log-Tabelle gesucht. Und wenn es sie gibt: die
+Nullwerte getrennt zählen. Hier kostet **mehr als die Hälfte** der
+Berichte gar nichts (Cache) — ein Durchschnitt über alle Läufe hätte den
+Einkaufspreis halbiert und die Marge falsch dargestellt.
+
+Nebenbefund derselben Tabelle: `openai_eur` existiert als Spalte und ist in
+**jeder** Zeile NULL. Eine Spalte, die nie gefüllt wird, sieht in einem
+Schema aus wie eine Messung, die es gibt.

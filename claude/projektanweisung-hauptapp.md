@@ -11704,6 +11704,172 @@ Verträge), und die Prod-Bestände an `*_bank` — der Lesezugriff auf die
 Prod-Datenbank ist in dieser Sitzung blockiert, und vor einem Prod-Rollout
 gehört gezählt, wem der Wegfall des Übertrags etwas nimmt.
 
+## Rollout-Journal · 11.09.2026, vierter Teil — `v1297` bis `v1299b`
+
+Marcels Rückmeldung nach einem echten Durchlauf, dazu die Preisfrage aus
+dem Vormittag. Zehn Punkte, alle gemessen statt vermutet.
+
+### Was GeoMap wirklich kostet
+
+Marcels eigentliche Frage: *„Ich wollte eigentlich nur wissen, was GeoMap
+dann dafür nimmt. Also wenn wir so einen Marktbericht erstellen, das sind
+ja unsere eigenen, und da müssen wir ja wissen, was wir kalkulatorisch
+dafür bezahlen."*
+
+Die Zahl steht seit jeher in `marktbericht_cost_log` — sie wurde nur nie
+ausgewertet. **184 echte Läufe auf Staging**, `liters` trägt dort noch den
+alten Litertarif und ist damit die Stufe (2 = MPI, 5 = MPI+, 12 = WEV):
+
+| Stufe | Verkauf | GeoMap je Abruf | Läufe mit Kosten | ohne Kosten |
+|---|---|---|---|---|
+| Marktpreisindikation | 0,90 € | **0,10 €** | 2 | 68 |
+| Erweiterte MPI | 1,90 € | **0,38 €** | 15 | 30 |
+| Wertermittlung | 3,90 € | **0,51 €** | 25 | 13 |
+
+Der Vollbericht streut zwischen 0,20 und 0,55 €, Schwerpunkt bei 0,52–0,55
+(34 von 51). **Viele Läufe kosten gar nichts** — Cache oder Wiederholung
+derselben Adresse. Über alle Vollberichte gerechnet sind es im Schnitt
+**0,2285 €**, über 106 Läufe zusammen 24,22 €.
+
+**`openai_eur` ist in jeder Zeile NULL** — die Spalte existiert, wird aber
+nicht befüllt. Die KI-Kosten eines Berichts sind damit ungemessen; sie
+laufen über `gpt-4.1-mini` und liegen erfahrungsgemäß im Zehntel-Cent.
+
+Die Marge trägt also selbst im teuersten Fall: 3,90 € Verkauf gegen 0,51 €
+Einkauf. Sprengnetter und PriceHubble spielen hier keine Rolle — die sind
+seit `v1296` nicht mehr im Angebot.
+
+### Drei Bewertungspakete mit Namen (`v1297`)
+
+*„Ich finde das Bewertungen nachkaufen nicht schön mit dem 5-5-5. … bietet
+einfach drei Pakete an, aber nennt sie besser."*
+
+Drei Befunde dahinter, alle berechtigt:
+
+1. **`5 · 5 · 5` ist keine Bezeichnung**, sondern eine Notation aus der
+   Cockpit-Matrix. Dort stehen Spaltenköpfe daneben, im Nachkauf nicht.
+2. **„Für Pro" beschrieb den Käufer, nicht die Ware.**
+3. **„Auch wenn man die Menge ändert, ändert sich nicht die Anzahl der
+   Bewertungen."** Das stimmte: `reach` wurde einmal gebaut und blieb
+   stehen, während Preis und Kaufknopf mitwanderten. Bei Menge 3 stand
+   „5 Marktpreisindikationen" über einem Preis für 15.
+
+Jetzt **Kurzstrecke · Mittelstrecke · Langstrecke** — die Namen standen
+schon an den alten Kerosin-Paketen und brauchen keine Erklärung. Die
+Inhalte stehen als lesbare Zeilen mit großer Zahl vorn und **rechnen mit
+der Menge**: bei 3 zeigt die Langstrecke 15/15/15 zu 37,50 €.
+
+**Preise und Inhalte unverändert**, dieselben drei Stripe-Preise. Ein neues
+Paket hieße ein neuer Preis in zwei Stripe-Konten — das ist Marcels
+Entscheidung, nicht meine.
+
+In den Einstellungen stehen jetzt **alle drei** statt nur des eigenen. Die
+Einschränkung war rein optisch: `_checkoutBewertung` prüft nur „nicht
+free", nie den Plan. Ein Starter-Kunde durfte die Langstrecke immer schon
+kaufen, sah sie bloß nirgends. Nach dem ersten Rollout stand die Reihe
+Lang · Kurz · Mittel da (eigenes Paket vorn sortiert) — drei Pakete, deren
+Größe hin und her springt, liest niemand als Staffel. Die Sortierung ist
+wieder raus, hervorgehoben wird über die Pille „Dein Plan".
+
+### Der Sprechlauf: sieben Befunde
+
+**Das Markt-Angebot blieb offen (`v1298`).** *„obwohl ich erweiterte
+Marktpreisindikation angeklickt habe."* Die Ursache stand eine Ebene
+höher: beim Frageübergang werden alle Angebote abgeräumt **außer**
+`markt`/`markt2` (`v1291`) — richtig, solange nichts gewählt ist. Sobald
+eine Stufe steht, ist die Frage beantwortet. **Die Ausnahme galt zu lange,
+nicht zu breit.** Nachgemessen: nach dem Klick beide Knöpfe weg, die Zeile
+„Ich kann das für dich holen" verschwunden.
+
+**„oder kann genauso bleiben" wurde nicht verstanden (`v1298`).** Der Satz
+trägt drei Signale, und keines war vollständig erfasst: die
+Übernahme-Absicht (griff seit `v1286`, **aber nur mit vorliegendem
+Vorschlag** — ohne einen stieg die Funktion in Zeile eins aus), die
+Wendung „kann genauso bleiben" (stand in keinem Muster), und das „oder",
+das beide Wege gleich meint. Jetzt werden alle drei erkannt; gemessen
+gegen sieben Formulierungen, alle `true`, ein echter Wert korrekt `false`.
+
+**Und wenn nichts zu übernehmen da ist, wird das gesagt** — vorher lief
+beides in denselben Satz „Übernommen", auch wenn nichts übernommen wurde.
+
+**Pillen mit den Schlagwörtern (`v1298`/`v1299`).** Sie waren in `v1298`
+schon im DOM — **ohne eine einzige CSS-Regel**. Im Browser stand
+„PLZOrtStraßeHausnummer" als ein Wort. Genau die Falle, die ich am selben
+Tag in `FALLEN.md` geschrieben hatte. Jetzt tragen gefüllte Felder einen
+grünen Haken: bei Frage 2 stand **✓Objektart ✓Wohnfläche · Zimmer** — man
+sieht ohne Lesen, was noch fehlt.
+
+**Mehr Platz für Gespräch und Liste (`v1299`).** Gemessen im laufenden
+Dialog bei 987 px Fensterhöhe:
+
+```
+Modal 929 = Markenleiste 60 + Kopf 101 + Körper 699 + Fußleiste 66
+                                          davon Bühne nur 367
+```
+
+**Es fehlte nicht an Platz — er wurde oben und unten verbraucht.** Der
+Erklärsatz im Kopf (`.oabi-sub`, 38 px) steht bei jedem Durchlauf da und
+sagt dreimal dasselbe: in der ersten Co-Pilot-Blase, auf den Knöpfen
+(„Weiß ich nicht", „Fertig") und dort. Im geführten Dialog fällt er weg.
+
+Beim ersten Anlauf traf meine Regel `.bdg-hero p` **nichts** — der Satz ist
+kein `<p>`, sondern `.oabi-sub`. Der Kopf wuchs dabei von 101 auf 120 px,
+statt zu schrumpfen. Nach der Korrektur: **Kopf 75, Bühne 428** (+17 %).
+
+**Die Liste rechts.** *„dass man die Liste auf einer Seite auf jeden Fall
+komplett sehen kann."* Nachgemessen war sie **nie unerreichbar** —
+`.vi-rf-stand-body` scrollt seit jeher. Der Eindruck entstand anders: die
+Liste endete ohne Kante mitten in „Etappe 4", und eine Liste, die so
+abbricht, sieht aus wie eine, die etwas verschweigt. Jetzt mehr Höhe plus
+ein Verlauf an der Unterkante.
+
+**Die Score-Karten waren eingerückt (`v1299`).** `.vi-rf-blase{max-width:82%}`
+ist richtig für Gesprochenes — eine Karte mit großer Zahl, Balken und
+Kennzahlen ist aber kein Redebeitrag. Sie verlor ein Fünftel Breite, und
+die Zahl saß eingerückt. Blasen mit Karte bekommen jetzt volle Breite, die
+Karte einen Schatten gegen Creme-auf-Creme.
+
+### Der wichtigste Punkt: hören, was gesagt wird (`v1299b`)
+
+*„der sollte das schon verstehen, was ich ihm sage, auch wenn es nicht zu
+der Frage passt. Dann sollte er nicht immer eine Standardfrage nehmen,
+sondern gucken, was kann er damit machen."*
+
+Zwei Engstellen, beide einmal bewusst gesetzt, beide zu eng geworden:
+
+1. **`_rfKatalog` reichte nur die Felder der aktuellen Frage ans Modell.**
+   Wer bei der Miete das Baujahr mitnennt, dessen Angabe konnte gar nicht
+   erkannt werden — sie stand nicht in der Liste der erlaubten Felder.
+2. **`_rfUebernehmen` verwarf alles außerhalb von `e.ids`** („nur was
+   gefragt war").
+
+Jetzt kommen die Felder der **nächsten Blöcke** mit, gedeckelt auf 24.
+Alles zu öffnen (192 Felder) lädt ein Modell zum Raten ein — davor schützte
+die enge Liste zu Recht, deshalb eine Reichweite statt eines Freibriefs.
+
+**Gemessen an einem echten Durchlauf.** Auf die Adressfrage geantwortet:
+*„Hermannstraße 9 in 32609 Hüllhorst, das ist eine Eigentumswohnung mit
+100 Quadratmetern, Baujahr 1962"* — Antwort:
+
+> Das nehme ich gleich mit: **Objektart = ETW · Wohnfläche = 100 ·
+> Baujahr = 1962**
+
+Drei Felder aus späteren Blöcken, vorher alle verworfen. Die Adressfrage
+lief danach normal weiter, und bei Frage 2 trugen zwei der drei Pillen
+schon einen Haken.
+
+**Die Frage gilt weiter erst als beantwortet, wenn IHRE Felder stehen** —
+`teil` prüft unverändert nur `e.ids`. Nebenbei Gesagtes beschleunigt also,
+es überspringt nichts.
+
+**Commits** `3b3fc0c` (v1297), `e45a06a` (v1298), `4525bdb` (v1299),
+`c262a93` (v1299b). Gold-Audit RC=0. Auf Staging, **nicht auf Prod**.
+
+**Rest:** Die Score-Karte im Verlauf ist noch nicht im echten Durchlauf
+nachgemessen — dafür braucht es eine vollständige Etappe 2. Und Marcels
+„Ich höre nichts" habe ich als Layout-Punkt gelesen (alles kleiner, Feld
+größer); falls er damit das Mikrofon meinte, steht das noch offen.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

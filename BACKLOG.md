@@ -38,7 +38,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
 
-**Stand:** `v1273`–`v1296f` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
+**Stand:** `v1273`–`v1299b` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
 — nichts davon ist live.
 
 > **Nach Marcels erstem echten Sprechlauf am 10.09. abends** (Bilder
@@ -130,7 +130,7 @@ die Kosten einer Aufnahme um rund 40 % — bei 4 Minuten von ≈ 1,7 auf ≈ 0,9
 
 ### 4 · Der Sprechlauf gehört auf Produktion
 
-**`v1273`–`v1296f` liegen auf Staging.** Prod steht auf
+**`v1273`–`v1299b` liegen auf Staging.** Prod steht auf
 `a21fe9c` — der Co-Pilot, die Etappen, beide Scores, BORIS-Abruf und
 Marktpreisindikation im Hintergrund sind für keinen Kunden erreichbar.
 
@@ -215,6 +215,32 @@ abgelehnt worden. Marcel kann die Abfrage selbst fahren oder den Zugriff
 freigeben.
 
 ---
+
+## → Erledigt am 11.09.2026, vierter Teil (`v1297`–`v1299b`)
+
+| Marcels Punkt | Stand |
+|---|---|
+| Was nimmt GeoMap je Marktbericht? | **beantwortet** — aus 184 echten Läufen: MPI 0,10 € · erweiterte 0,38 € · Wertermittlung 0,51 €. Über die Hälfte der Berichte kostet gar nichts (Cache). Gegen 0,90 / 1,90 / 3,90 € Verkauf trägt die Marge in jedem Fall |
+| „5-5-5 ist nicht schön, nennt die Pakete besser" | **fertig** — Kurzstrecke · Mittelstrecke · Langstrecke, Inhalte als lesbare Zeilen; in den Einstellungen alle drei statt nur dem eigenen |
+| „Menge ändern ändert nicht die Anzahl" | **fertig** — bei Menge 3 zeigt die Langstrecke 15/15/15 zu 37,50 € |
+| Markt-Angebot bleibt offen nach der Wahl | **fertig** — beide Knöpfe verschwinden, gemessen |
+| „aus den Einstellungen übernehmen oder kann genauso bleiben" | **fertig** — sieben Formulierungen geprüft, alle erkannt; fehlt ein Vorschlag, wird das gesagt statt „nichts entnommen" |
+| Pillen mit den Schlagwörtern hinter den Fragen | **fertig** — mit grünem Haken für Felder, die schon stehen |
+| Deal Score / Investor Deal Score schlecht zu sehen | **fertig** — Score-Blasen auf volle Breite (waren auf 82 % eingerückt), Karte mit Schatten |
+| „alles kleiner, Eingabefeld größer" | **fertig** — Kopf 120 → 75 px, Bühne 367 → 428 px |
+| Liste komplett sehen | **fertig** — mehr Höhe plus Kante an der Unterkante; sie scrollte übrigens schon immer |
+| „soll verstehen, auch wenn es nicht zur Frage passt" | **fertig** — Katalog reicht die nächsten Blöcke mit (Deckel 24); gemessen: „Hermannstraße 9 … 100 Quadratmeter, Baujahr 1962" trägt Objektart, Fläche und Baujahr ein, die Fragen danach entfallen |
+
+**Commits** `3b3fc0c`, `e45a06a`, `4525bdb`, `c262a93`. Gold-Audit RC=0.
+
+### Offen aus dieser Runde
+
+- **Die Score-Karte im echten Durchlauf nachmessen.** Die Breiten-Korrektur
+  ist gebaut, aber nur die Regel ist geprüft — es braucht eine
+  vollständige Etappe 2, bis die Karte erscheint.
+- **„Ich höre nichts"** habe ich als Layout-Punkt gelesen (alles kleiner,
+  Eingabefeld größer). Falls Marcel damit das **Mikrofon** meinte, ist das
+  ein eigener Befund und noch offen.
 
 ## → Erledigt am 11.09.2026, dritter Teil (`v1296`–`v1296f`)
 
