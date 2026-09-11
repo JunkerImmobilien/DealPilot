@@ -38,7 +38,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
 
-**Stand:** `v1273`–`v1306d` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
+**Stand:** `v1273`–`v1307` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
 — nichts davon ist live.
 
 > **Nach Marcels erstem echten Sprechlauf am 10.09. abends** (Bilder
@@ -130,7 +130,7 @@ die Kosten einer Aufnahme um rund 40 % — bei 4 Minuten von ≈ 1,7 auf ≈ 0,9
 
 ### 4 · Der Sprechlauf gehört auf Produktion
 
-**`v1273`–`v1306d` liegen auf Staging.** Prod steht auf
+**`v1273`–`v1307` liegen auf Staging.** Prod steht auf
 `a21fe9c` — der Co-Pilot, die Etappen, beide Scores, BORIS-Abruf und
 Marktpreisindikation im Hintergrund sind für keinen Kunden erreichbar.
 
@@ -181,7 +181,7 @@ Fünf Punkte aus der Rückmeldung zu den Bildern `fragen.png`,
 (`v1306`–`v1306d`, siehe Journal). **Diese hier stehen noch aus** — in
 Marcels Reihenfolge, weil sie aufeinander aufbauen:
 
-**a) Den Marktbericht auswerten, nicht nur abrufen.**
+**a) Den Marktbericht auswerten** — **GEBAUT in `v1307`**, Kernfunktion gemessen; der volle Lauf mit echter erweiterter Marktpreisindikation steht noch aus.
 *„Diese Sachen wie Entwicklung, also Bevölkerung, Nachfrage,
 Wertsteigerung, Entwicklungsmöglichkeiten, das kriegen wir ja bei der
 erweiterten Marktpreisindikation ausgewertet im Marktbericht. Also du
@@ -193,12 +193,10 @@ habe ich entnehmen können, dass die und die Werte so und so angenommen
 sind, sollen wir die auch so übernehmen?"* — bestätigbar per Sprache oder
 Text.
 
-**b) Auswahlfelder anklickbar.** Heute stehen die Stufen als Fließtext
-(`entwicklung.png`: „Bevölkerung Stark wachsend · Wachsend · Stabil ·
-Leicht fallend · Stark fallend"). Marcel will sie als Knöpfe — *„zum
-Beispiel leicht fallend, dann könnte man es anklicken, und wenn man alles
-angeklickt hat, dann läuft es automatisch weiter."* Gilt auch für Qualität
-und Zustand.
+**b) Auswahlfelder anklickbar** — **FERTIG in `v1307`**. Gemessen bei
+„Zustand & Energieausweis": 24 Knöpfe in 4 Gruppen, zwei Klicks, und der
+Dialog ging selbstständig zur nächsten Frage. Gilt für jede Frage mit
+Auswahlfeldern, auch Qualität und Zustand.
 
 **c) Die Pre-Flight-Kombination in einem Lauf.** Marktbewertung + Exposé /
 Marktbericht + Sprache zusammen: erst die Quellen lesen, dann sagen *„ich

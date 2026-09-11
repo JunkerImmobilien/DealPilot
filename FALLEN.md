@@ -2407,3 +2407,31 @@ box.scrollTop = box.scrollTop + ab - rand;
 
 Das ist unabhängig davon, wo `position` gesetzt ist — und wer es prüfen
 will, misst `getBoundingClientRect().top` beider Elemente nach dem Scrollen.
+
+## Ein Prüfaufbau, der die Wirklichkeit nur nachahmt, misst sich selbst
+
+Eine neue Funktion schickt einen Berichtstext an die KI-Auswertung und
+erwartet Auswahlwerte zurück — `wachsend`, `mittel`, `begrenzt`. Zum
+Prüfen wurde ein Katalog von Hand gebaut:
+
+```js
+{ id:'ds2_bevoelkerung', options:['stark_wachsend','wachsend', …] }
+```
+
+Die Antwort kam als **Fließtext**: „in den letzten fünf Jahren leicht
+gewachsen, der Trend zeigt weiter nach oben". Das sah nach einem echten
+Fehler aus.
+
+Der echte Katalog sieht anders aus — `buildCatalog()` liefert
+`{ kind:'select', options:[{v,t}] }`. Ohne diese Form weiß das Modell
+nicht, dass es aus einer Liste wählen soll. **Der Fehler lag im Prüfaufbau,
+nicht im Code.**
+
+**Die Regel:** ein Prüfaufbau wird nicht nachgebaut, sondern **von der
+Quelle geholt** — dieselbe Funktion aufrufen, die auch im Betrieb läuft
+(`buildCatalog()`), oder die echte Struktur aus dem laufenden Fenster
+auslesen. Wer sie nachbaut, prüft seine Nachbildung.
+
+Und wenn ein Befund überraschend schlecht ausfällt: **erst den Prüfaufbau
+verdächtigen, dann den Code.** Hier hätte die falsche Diagnose zu einem
+Umbau geführt, den niemand gebraucht hätte.

@@ -12331,6 +12331,96 @@ Marcel hat mehr genannt, als in diesen Zyklus passte. Offen und im Backlog:
 - **ImmoMetrica** genauso, gegen die Testobjekte.
 - **Fehlende Straße** → Ortszentrum vorschlagen.
 
+## Rollout-Journal · 11.09.2026, zehnter Teil — `v1307`
+
+Zwei der fünf offenen Punkte aus Marcels Auftrag.
+
+### Die Stufen sind Knöpfe (`v1307`)
+
+*„Zum Beispiel leicht fallend, dann könnte man es anklicken, und wenn man
+alles angeklickt hat, dann läuft es automatisch weiter. Das könnte man bei
+allen Sachen machen, wo man so Auswahlfelder hat."*
+
+Bis hierher standen die Stufen als Fließtext (`entwicklung.png`):
+„Bevölkerung Stark wachsend · Wachsend · Stabil · Leicht fallend · Stark
+fallend". Wer antworten wollte, musste eine davon **abschreiben oder
+aussprechen** — bei vier Feldern in einer Frage ein Vortrag.
+
+Jetzt ist jede Stufe ein Knopf. **Sprechen bleibt möglich**; das ist kein
+Entweder-oder. Und sind alle Felder der Frage gewählt, geht es von selbst
+weiter — Marcels eigentlicher Punkt.
+
+Zwei Entscheidungen dabei, beide aus dem Verhalten heraus:
+
+- **Knöpfe in alten Blasen sind inaktiv** und sehen auch so aus. Ein Klick
+  weit oben im Verlauf soll keinen Wert ändern, den man längst hinter sich
+  hat.
+- **Was schon steht, ist vorgewählt** — auch wenn es aus dem Exposé oder
+  dem Marktbericht kam. Der Knopf zeigt dann, was gilt.
+
+**Gemessen im Durchlauf:** bei „Zustand & Energieausweis" 24 Knöpfe in
+4 Gruppen; zwei Klicks („Guter Zustand", „A") und der Dialog ging
+selbstständig zur nächsten Frage, mit „Ausgewählt: Zustand, Energieklasse"
+im Verlauf.
+
+### Der Marktbericht wird gelesen (`v1307`)
+
+*„Du kannst den kompletten Marktbericht dann auch auswerten und auch die
+Sachen übernehmen … Aus der erweiterten Marktpreisindikation habe ich
+entnehmen können, dass die und die Werte so und so angenommen sind, sollen
+wir die auch so übernehmen?"*
+
+Bis hierher wurden vier Werte übernommen — Makrolage, Mikrolage,
+Marktmiete, Marktwert. Der **Fließtext** daneben stand nur in einem
+Aufklapper. Darin steht aber genau das, was drei Etappen später gefragt
+wird: wie sich Bevölkerung, Nachfrage und Preise entwickeln. **Wer für die
+erweiterte Stufe bezahlt und dieselbe Frage danach noch einmal beantworten
+muss, hat sie zweimal beantwortet.**
+
+Der Text geht jetzt an dieselbe Auswertung wie eine gesprochene Antwort,
+mit dem Katalog der vier Entwicklungsfelder. Was herauskommt, wird als
+**Vorschlag** gezeigt, nicht still gesetzt: es ist eine Auslegung. Ein
+Bericht sagt „die Einwohnerzahl wächst leicht" — welche der fünf Stufen das
+ist, entscheidet der Leser. Bestätigt wird per Sprache, Text oder Knopf;
+eine Ablehnung führt zur normalen Frage, eine Korrektur gewinnt.
+
+Gefragt wird nur, was **noch offen** ist — was der Nutzer schon gesagt hat,
+schlägt den Bericht.
+
+**Gemessen gegen das laufende Backend**, mit einem Berichtstext im Format
+des echten `report_md`:
+
+| Feld | erkannt |
+|---|---|
+| Bevölkerungsentwicklung | `wachsend` |
+| Nachfrage-Indikatoren | `mittel` |
+| Wertsteigerungs-Erwartung | `mittel` |
+| Entwicklung der Lage | `begrenzt` |
+
+### Ein eigener Messfehler, der fast zu einem falschen Befund geführt hätte
+
+Der erste Lauf derselben Messung gab **Fließtext** zurück:
+`ds2_bevoelkerung: "in den letzten fünf Jahren leicht gewachsen, der Trend
+zeigt weiter nach oben"`. Das sah nach einem echten Fehler aus — ein
+Vorschlag, der Sätze statt Stufen anbietet, wäre unbrauchbar.
+
+Die Ursache lag in **meinem Prüfkatalog**: ich hatte `options` als
+Zeichenketten gebaut, `buildCatalog()` liefert aber
+`{ kind:'select', options:[{v,t}] }`. Ohne die echte Form weiß das Modell
+nicht, dass es aus einer Liste wählen soll.
+
+**Ein Prüfaufbau, der die Wirklichkeit nur nachahmt, misst den Aufbau.**
+Mit dem echten Katalogformat kamen sofort die richtigen Schlüssel.
+
+**Commit** `082deba`. Gold-Audit RC=0. Auf Staging, **nicht auf Prod**.
+
+**Rest aus Marcels Auftrag:** die Pre-Flight-Kombination (Marktbewertung +
+Exposé + Sprache in einem Lauf), ImmoMetrica gegen die Testobjekte, und
+das Ortszentrum bei fehlender Straße. Der Bericht-Vorschlag ist in seiner
+Kernfunktion gemessen, aber noch nicht im vollen Lauf mit einer echten
+erweiterten Marktpreisindikation — das kostet Kontingent und gehört in den
+nächsten Durchgang.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
