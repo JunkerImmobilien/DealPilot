@@ -5043,6 +5043,7 @@
       _rfWeiter();
       return;
     }
+    if (art === 'zentrum')  { _rfBlase('ich', 'Nimm das Ortszentrum.'); _rfZentrumNehmen(); return; }
     if (art === 'tabelle')  { _rfZurTabelle(); return; }
     if (art === 'tiefe')    { _rf.tiefeOffen = 0; _rfBlase('ich', 'Ja, lass uns weitermachen.'); _rfTiefeStarten(); return; }
     if (art === 'brw')      { _rfBlase('ich', 'Hol den Bodenrichtwert.'); _rfBrwHolen(); return; }
@@ -5295,7 +5296,11 @@
         if (_fs.an && _fs.stream) _fsHoeren(true);
         return;
       }
-      var herkunft = 'BORIS' + (r.stichtag ? ' ' + r.stichtag : '') + (r.zone ? ' · Zone ' + r.zone : '');
+      /* v1308: Ohne Straße traf der Abruf das Ortszentrum — das gehört in
+         die Herkunft, sonst sieht die Zahl später aus wie ein Wert zur
+         genauen Anschrift. */
+      var herkunft = 'BORIS' + (r.stichtag ? ' ' + r.stichtag : '') + (r.zone ? ' · Zone ' + r.zone : '') +
+                     ((_rf && _rf.zentrum) ? ' · Ortszentrum (Näherung)' : '');
       _rfSetzen('brw', String(r.wert).replace('.', ','), herkunft);
       _rfBlase('co', '<b>' + escH(String(r.wert).replace('.', ',')) + ' €/m²</b> — amtlicher Bodenrichtwert. ' +
         '<span style="opacity:.7">' + escH(herkunft) + '</span>' +
@@ -6579,6 +6584,40 @@
      Deshalb ist das hier die EINZIGE Stelle im ganzen Dialog, an der
      zurueckgefragt wird. Ueberall sonst gilt „lieber weiter als
      nachhaken"; hier ist es umgekehrt. */
+  /* ═══ v1308 · Das Ortszentrum als Näherung ══════════════════════════════
+     Ohne Straße gibt es keinen Bodenrichtwert, keine Marktdaten und keine
+     Lage — alle drei hängen an einer Adresse. Mit dem Ortszentrum gibt es
+     sie wieder, und zwar richtig für alles, was ohnehin für den Ort gilt.
+
+     WAS EINGETRAGEN WIRD, IST EINE NÄHERUNG UND SAGT DAS AUCH. Die
+     Herkunft heißt „Ortszentrum (Näherung)" — nicht „Sprachaufzeichnung",
+     nicht „amtlich". Wer später in die Übersicht sieht, erkennt, worauf
+     die Zahlen beruhen.
+
+     Die Straße bleibt LEER. Ein erfundener Straßenname stünde im
+     Bankexport und im PDF; „Ortsmitte" wäre eine Behauptung über eine
+     Anschrift, die es so nicht gibt. Gefüllt wird nur, was stimmt. */
+  function _rfZentrumNehmen() {
+    if (!_rf) return;
+    var ort = _rfFeld('ort'), plz = _rfFeld('plz');
+    if (!ort) return;
+    _rf.zentrum = 1;
+    _rf.adresseFrage = 0;
+    _rfAktionWeg('zentrum');
+    _rfAktionWeg('adresse');
+    if (!_rf.quelle) _rf.quelle = {};
+    _rf.quelle.__zentrum = 'Ortszentrum (Näherung)';
+    _rfBlase('co',
+      'Gut — ich rechne mit dem <b>Ortszentrum von ' + escH(ort) + '</b>' +
+      (plz ? ' (' + escH(plz) + ')' : '') + '.' +
+      '<div style="margin-top:7px;opacity:.8">Bodenrichtwert, Marktdaten und Makrolage gelten für ' +
+      'den Ort und stimmen damit. <b>Die Mikrolage ist eine Näherung</b> — sie hängt an der Straße. ' +
+      'Sobald du die Adresse hast, kannst du sie in der Tabelle nachtragen.</div>' +
+      '<div class="vi-rf-zaehler">Herkunft in der Übersicht: „Ortszentrum (Näherung)".</div>');
+    _rfStandZeichnen();
+    _rfWeiter();
+  }
+
   function _rfAdresseBestaetigen() {
     if (!_rf || _rf.adresseGeprueft) return false;
     var str = _rfFeld('str'), hnr = _rfFeld('hnr'), plz = _rfFeld('plz'), ort = _rfFeld('ort');
@@ -6599,10 +6638,38 @@
            escH(_pz(g.rate)) + ' %</div>' : '') +
       (fehlt.length
         ? '<div style="margin-top:8px">Mir fehlt noch: <b>' + escH(fehlt.join(', ')) + '</b>. ' +
-          'Sag sie mir einfach — oder „passt so", wenn du sie nicht hast.</div>'
+          'Sag sie mir einfach' +
+          /* ═══ v1308 · Ohne Straße geht es auch — mit dem Ortszentrum ═══
+             Marcels Vorgabe vom 11.09.2026: „da fehlt manchmal zum Beispiel
+             die Straße. Und da könnten wir auch den Vorschlag machen, wenn
+             die Straße fehlt, ob wir vielleicht einfach das Zentrum dann
+             annehmen. Und dann holt sie dir einfach automatisch das
+             Zentrum, wenn du einen Ort hast."
+
+             Der Fall kommt aus ImmoMetrica und aus manchen Exposés: Ort und
+             Postleitzahl stehen, die Straße nicht. Bisher hiess das
+             „passt so, weiter" — und damit KEIN Bodenrichtwert, KEINE
+             Marktdaten, KEINE Lage, denn alle drei hängen an einer Adresse.
+
+             Das Ortszentrum ist dafür eine brauchbare Näherung: Makrolage
+             und Marktniveau gelten für den Ort, nicht für die Hausnummer.
+             Nur die MIKROlage wird damit ungenau — deshalb steht das
+             ausdrücklich dabei, und die Herkunft trägt es mit. */
+          ((!str && ort)
+            ? ' — oder ich nehme das <b>Ortszentrum von ' + escH(ort) + '</b> als Näherung.'
+            : ' — oder „passt so", wenn du sie nicht hast.') +
+          '</div>'
         : '<div style="margin-top:8px"><b>Stimmt das so?</b> Sag „ja" — oder sag mir die Adresse ' +
           'nochmal, wenn ich etwas falsch verstanden habe. ' +
           '<span style="opacity:.7">Daran hängen der Bodenrichtwert, die Marktdaten und die Lage.</span></div>'));
+    /* v1308: Fehlt die Strasse, ist das Zentrum das bessere Angebot als ein
+       blosses „weiter" — es macht die Abrufe überhaupt erst möglich. */
+    if (!str && ort) {
+      _rfAktion('zentrum',
+        'Makrolage und Marktniveau gelten für den Ort. Nur die Mikrolage wird ungenau — ' +
+        'sie steht dann als Näherung in der Übersicht.',
+        'Ortszentrum ' + ort + ' nehmen');
+    }
     _rfAktion('adresse', 'Danach hole ich Bodenrichtwert, Marktdaten und Lage zu genau dieser Adresse.',
               fehlt.length ? 'Passt so, weiter' : 'Ja, stimmt');
     if (_fs.an && _fs.stream) _fsHoeren(true);
@@ -6614,6 +6681,15 @@
      einmal, nicht das Wort „nein". */
   function _rfAdresseAntwort(t, ausSprache) {
     if (!_rf || !_rf.adresseFrage) return false;
+    /* v1308: „nimm das Zentrum" muss gesprochen genauso gehen wie geklickt.
+       Die Prüfung steht VOR der Zustimmung: „ja, nimm die Ortsmitte" trägt
+       beides, und gemeint ist das Zentrum. */
+    if (/(ortszentrum|ortsmitte|stadtmitte|zentrum|ortskern|stadtkern|mitte des orts)/i.test(t) &&
+        !_rfFeld('str') && _rfFeld('ort')) {
+      _rfBlase('ich', escH(t));
+      _rfZentrumNehmen();
+      return true;
+    }
     /* v1305: `_istZustimmung` statt eines Musters, das auf ein einzelnes
        Wort endet — gesprochen sagt niemand nur „ja". */
     if (RF_JA.test(t) || _istZustimmung(t)) {
@@ -7001,6 +7077,51 @@
      Werte kommen, sagt ueberhaupt etwas. Wer den Sprechlauf direkt
      oeffnet, bekommt keinen Satz, und das ist richtig: er weiss ja
      selbst, was in seinem Objekt steht. */
+  /* ═══ v1308 · Was aus Exposé und Marktbericht kam, zum Nachsehen ════════
+     Marcels Vorgabe: „dann holst du dir nur noch die Bestätigung, ob das
+     richtig ist mit der Adresse und ob die Sachen so übernommen werden
+     sollen."
+
+     Die Werte STEHEN bereits im Formular — sie kommen aus dem Import, nicht
+     aus diesem Dialog. Hier geht es nicht ums Eintragen, sondern ums
+     Hinsehen: ein Exposé kann die Wohnfläche falsch führen, und dann
+     rechnet der ganze Lauf mit einer falschen Zahl.
+
+     Deshalb eine Liste und zwei Wege: „passt" führt weiter, ein
+     ausgesprochener Wert korrigiert. Keine Rückfrage, die den Dialog
+     anhält — wer nichts sagt, hat zugestimmt, und die erste Frage kommt
+     ohnehin gleich danach. */
+  function _rfVorlaufKarte(quelle) {
+    if (!_rf || !_rf.vorbefuellt) return;
+    var ids = Object.keys(_rf.vorbefuellt);
+    if (!ids.length) return;
+
+    /* Die wichtigsten zuerst — wer prüft, prüft Fläche und Preis, nicht den
+       Grundbuchsatz. Der Rest steht im Aufklapper. */
+    var WICHTIG = ['str', 'hnr', 'plz', 'ort', 'objart', 'wfl', 'zimmer', 'baujahr',
+                   'kp', 'nkm', 'ze', 'hausgeld'];
+    var vorn = [], hinten = [];
+    ids.forEach(function (id) { (WICHTIG.indexOf(id) >= 0 ? vorn : hinten).push(id); });
+    vorn.sort(function (a, b) { return WICHTIG.indexOf(a) - WICHTIG.indexOf(b); });
+
+    function zeile(id) {
+      var c = (_rf.catalog || []).filter(function (x) { return x.id === id; })[0];
+      var name = c ? String(c.label).replace(/\s*\(.*?\)\s*$/, '') : id;
+      return '<div class="vi-rf-st"><span class="vi-rf-st-n">' + escH(name) + '</span>' +
+             '<span class="vi-rf-st-v">' + escH(_rfLesbarId(id, _rf.vorbefuellt[id])) + '</span></div>';
+    }
+
+    _rfBlase('co',
+      'Das habe ich <b>aus ' + escH(quelle || 'den Quellen') + '</b> übernommen:' +
+      '<div class="vi-rf-bericht">' + vorn.map(zeile).join('') + '</div>' +
+      (hinten.length
+        ? '<details class="vi-sc-mehr"><summary>' + hinten.length + ' weitere</summary>' +
+          '<div class="vi-rf-bericht">' + hinten.map(zeile).join('') + '</div></details>'
+        : '') +
+      '<div style="margin-top:8px;opacity:.8">Stimmt etwas nicht, sag es einfach — ' +
+      'sonst rechne ich damit weiter. In der Übersicht kannst du jede Zeile ändern.</div>');
+  }
+
   function _rfVorbefuellt(catalog) {
     var out = {};
     if (!_vorlaufFelder) return out;
@@ -7084,6 +7205,17 @@
     } else if (vorN) {
       vorTxt = '<b>' + vorN + ' Angaben</b> waren schon da — die frage ich nicht noch einmal. ';
     }
+    /* v1308: Und sie werden GEZEIGT. Marcels Vorgabe vom 11.09.2026: „Dann
+       sagt er: Ich habe schon einige Werte aus dem Marktbericht oder aus
+       dem Exposé gelesen, und dann holst du dir nur noch die Bestätigung,
+       ob das richtig ist mit der Adresse und ob die Sachen so übernommen
+       werden sollen."
+
+       Eine Zahl allein („9 Angaben") ist keine Grundlage für ein Ja. Wer
+       bestätigen soll, muss sehen, WAS er bestätigt — ein Exposé kann die
+       Wohnfläche falsch führen, und dann rechnet der ganze Lauf mit einer
+       falschen Zahl weiter. Die Liste steht unten, nach der Begrüßung. */
+    if (vorN) _rf.vorlaufZeigen = 1;
 
     /* v1288: Der geführte Weg sagt jetzt, WOHIN er führt — nicht nur, wie
        viele Fragen kommen. Eine Zahl allein ist eine Zumutung, ein Ziel
@@ -7102,6 +7234,9 @@
       : 'Ich habe <b>' + gefunden + ' Angaben</b> aus deiner Aufnahme gelesen. ' + vorTxt +
         (luecken.length === 1 ? 'Für die Rechnung fehlt mir noch eine.'
                               : 'Für die Rechnung fehlen mir noch ' + luecken.length + '.'));
+
+    /* v1308: Die übernommenen Werte zum Nachsehen — vor der ersten Frage. */
+    if (_rf.vorlaufZeigen) _rfVorlaufKarte(vorQuelle);
 
     _fs.an = true;
     /* Das Kontingent wird MIT dem Mikrofon geladen, nicht danach: das
