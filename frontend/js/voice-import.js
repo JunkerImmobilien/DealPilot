@@ -6099,7 +6099,19 @@
           '<label class="vi-rf-fs"><input type="checkbox" id="vi-rf-fs" checked> Freisprechen</label>' +
           /* v1282: Wer gleich alles will, muss nicht erst die Pflichtstrecke
              abwarten. Der Schalter haengt die Feinheiten sofort an. */
-          '<label class="vi-rf-fs" id="vi-rf-alles-w"><input type="checkbox" id="vi-rf-alles"> Alle Felder</label>' +
+          /* ═══ v1311 · Im Quick-Check gibt es „Alle Felder" nicht ═══════
+             Marcels Vorgabe vom 11.09.2026: „im QuickCheck sollte der
+             Sprechlauf natürlich reduziert sein."
+
+             Der Katalog ist dort schon begrenzt (19 Felder statt 192,
+             `QC_IDS`) — der Schalter daneben hätte ihn aber wieder
+             aufgebläht: `_rfTiefeStarten` hängt die Feinheiten an, und die
+             gehören nicht zum Quick-Check. Ein Schalter, der den schnellen
+             Weg in den langen verwandelt, nimmt ihm seinen Zweck.
+
+             Wer mehr will, legt ein Objekt an — dort steht der Schalter. */
+          (_qcTarget ? '' :
+            '<label class="vi-rf-fs" id="vi-rf-alles-w"><input type="checkbox" id="vi-rf-alles"> Alle Felder</label>') +
         '</span>' +
       '</div>' +
       /* v1288: das Etappenband - wo im Sprechlauf stehen wir gerade. */
@@ -6691,8 +6703,42 @@
        dort „Sprachaufzeichnung" an Zahlen, die der Co-Pilot selbst geholt
        hat — und genau das war der Vorbehalt im Backlog. */
     if (_rf.quelle) _rf.data.quellen = _rf.quelle;
+    /* ═══ v1311 · Die Herkunft überlebt den Dialog ═════════════════════
+       Marcels Vorgabe: „dass all das was wir ausgearbeitet haben auch
+       nach dem Speichern im Tab Pilot-Analyse zur Verfügung steht und der
+       Co-Pilot dieses Wissen dann mitnimmt."
+
+       Bis hierher ging `_rf.quelle` nur an die Übernahme-Tabelle — mit
+       dem Schließen war es weg. Für die Pilot-Analyse ist es aber der
+       Unterschied zwischen „der Bodenrichtwert liegt bei 90 €" und „der
+       Bodenrichtwert ist amtlich belegt, Stichtag 01.01.2026, Zone 167".
+
+       Geschrieben wird ERGÄNZEND: ein zweiter Sprechlauf am selben Objekt
+       überschreibt nicht, was der erste belegt hat. Und nur für Felder,
+       die auch übernommen werden — eine Herkunft ohne Wert ist eine
+       Behauptung über ein leeres Feld. */
+    try { _herkunftMerken(_rf.quelle, _rf.data && _rf.data.fields); } catch (e) {}
     showResults(_rf.OA, _rf.data, _rf.catalog);
     _rf = null;
+  }
+
+  function _herkunftMerken(quellen, felder) {
+    if (!quellen) return;
+    var el = document.getElementById('_dp_herkunft');
+    if (!el) return;
+    var alt = {};
+    try { alt = JSON.parse(el.value || '{}') || {}; } catch (e) { alt = {}; }
+    var n = 0;
+    Object.keys(quellen).forEach(function (id) {
+      if (id.charAt(0) === '_') return;               /* interne Merker */
+      if (felder && !(id in felder)) return;           /* kein Wert, keine Herkunft */
+      alt[id] = String(quellen[id]).slice(0, 120);
+      n++;
+    });
+    if (!n) return;
+    el.value = JSON.stringify(alt);
+    try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+    try { console.log('[voice-import] Herkunft gemerkt:', n, 'Felder'); } catch (e) {}
   }
 
   function _rfAbschluss() {

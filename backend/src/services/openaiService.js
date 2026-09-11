@@ -40,6 +40,15 @@ function buildPrompt(payload) {
   const mr = payload.marktradar || [];
   const mbr = payload.marktbericht || null;   /* v947-mbsource: der echte Bericht */
   const isc = payload.investor_score || null;
+  /* ═══ v1311 · Woher die Zahlen kommen ════════════════════════════════
+     Marcels Vorgabe vom 11.09.2026: der Co-Pilot soll das Wissen aus dem
+     Sprechlauf mitnehmen. Die WERTE kamen schon an — was fehlte, war ihre
+     Herkunft: amtlich, abgerufen, geschaetzt oder genaehert.
+
+     Fuer eine Analyse ist das kein Beiwerk. Eine belegte Zahl traegt eine
+     Empfehlung; eine genaeherte traegt einen Vorbehalt, und der gehoert in
+     den Text — nicht ins Kleingedruckte. */
+  const hk = payload.herkunft || null;
 
   // Kennzahlen sicher formatieren
   const fmtPct = (v, dec) => v == null ? '–' : (v * (Math.abs(v) > 1 ? 1 : 100)).toFixed(dec || 1) + ' %';
@@ -144,6 +153,20 @@ function buildPrompt(payload) {
     o.risiken ? '- Vom Investor benannte Risiken: ' + o.risiken : '',
     o.notizen ? '- Sonstige Bemerkungen des Investors: ' + o.notizen : '',
     '',
+    /* v1311: Die Herkunft je Feld — amtlich, abgerufen, geschaetzt. */
+    hk ? '## HERKUNFT DER ANGABEN' : '',
+    hk ? 'So sind die Werte dieses Objekts zustande gekommen:' : '',
+    hk ? Object.keys(hk).slice(0, 40).map(function (id) {
+           return '- ' + id + ': ' + hk[id];
+         }).join('\n') : '',
+    hk ? '' : '',
+    hk ? 'NUTZE DAS. Eine amtlich belegte Zahl (BORIS, Stichtag, Zone) traegt eine' : '',
+    hk ? 'Empfehlung; eine Naeherung ("Ortszentrum", "als Naeherung") traegt einen' : '',
+    hk ? 'Vorbehalt, und der gehoert in den Text statt ins Kleingedruckte. Werte aus' : '',
+    hk ? 'einer Marktpreisindikation sind belastbarer als Selbstbewertungen des' : '',
+    hk ? 'Investors — sage das, wo es den Unterschied macht. ERFINDE KEINE Herkunft' : '',
+    hk ? 'fuer Felder, die hier nicht stehen.' : '',
+    hk ? '' : '',
     '## INPUT-DATEN',
     '',
     'DealScore: ' + (ds.total != null ? ds.total : '–') + ' / 100',

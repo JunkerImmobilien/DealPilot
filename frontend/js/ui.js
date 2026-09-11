@@ -739,6 +739,29 @@ function _buildAIPayload() {
      * weglassen koennen, und es muss fuer JEDEN Aufrufer gelten, nicht nur fuer
      * die zwei, die es heute gibt (ui.js:822 / ui.js:1236). */
     objId: (typeof window._currentObjKey === 'string' && window._currentObjKey) ? window._currentObjKey : null,
+    /* ═══ v1311 · Die Pilot-Analyse erfährt, WOHER die Zahlen kommen ═════
+       Marcels Vorgabe vom 11.09.2026: „dass all das was wir ausgearbeitet
+       haben auch nach dem Speichern im Tab Pilot-Analyse zur Verfügung
+       steht und der Co-Pilot dieses Wissen dann mitnimmt."
+
+       Die Werte kamen schon an — sie stehen im Formular. Was fehlte, ist
+       ihre Herkunft: ob 90 €/m² amtlich aus BORIS stammen oder geschätzt
+       sind, ob die Makrolage aus einer bezahlten Marktpreisindikation
+       kommt oder aus dem Bauchgefühl, ob die Bankbewertung eine Näherung
+       ist.
+
+       Für eine Analyse ist das kein Beiwerk: eine belegte Zahl trägt eine
+       Empfehlung, eine geschätzte trägt einen Vorbehalt. Der Sprechlauf
+       schreibt die Herkunft nach `_dp_herkunft` (storage.js FIELDS), und
+       von dort geht sie mit. */
+    herkunft: (function () {
+      try {
+        var roh = g('_dp_herkunft');
+        if (!roh) return null;
+        var o = JSON.parse(roh);
+        return (o && typeof o === 'object' && Object.keys(o).length) ? o : null;
+      } catch (e) { return null; }
+    })(),
     marktbewertung: {
       marktwert: parseDe(g('svwert')) || null,
       marktmiete_qm: parseDe(g('ds2_marktmiete')) || null

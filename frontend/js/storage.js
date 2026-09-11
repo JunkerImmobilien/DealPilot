@@ -90,7 +90,25 @@ var FIELDS = [
   /* v813-3d: uebernommene Restschuld bei Ueberfuehrung */
   'ueberf_restschuld','ueberf_rest_zins',
   /* v816: Privat-Cut Enddatum + Wizard-Verknuepfung */
-  'ueberf_ende','_ueberf_link'
+  'ueberf_ende','_ueberf_link',
+  /* ═══ v1311 · Die Herkunft überlebt das Speichern ═══════════════════
+     Marcels Vorgabe vom 11.09.2026: „wäre es super, wenn all das was wir
+     ausgearbeitet haben auch nach dem Speichern im Tab Pilot-Analyse zur
+     Verfügung steht und der Co-Pilot dieses Wissen dann mitnimmt."
+
+     Die Werte selbst standen schon im Objekt — sie kommen aus dem
+     Formular. Was fehlte, war die HERKUNFT: dass 90 €/m² amtlich aus
+     BORIS sind, dass die Makrolage aus der Marktpreisindikation stammt,
+     dass die Bankbewertung eine Näherung ist.
+
+     Der Sprechlauf kennt das je Feld (`_rf.quelle`), gab es aber nur an
+     die Übernahme-Tabelle weiter — mit dem Schließen war es weg. Für die
+     Pilot-Analyse ist es der Unterschied zwischen „der Bodenrichtwert
+     liegt bei 90 €" und „der Bodenrichtwert ist amtlich belegt".
+
+     Ein Feld, JSON darin. Kein zweiter Speicherweg, keine zweite Tabelle:
+     `FIELDS` wird ohnehin gespeichert, geladen und synchronisiert. */
+  '_dp_herkunft'
 ].concat(WM_FIELDS);  /* v1136-WMTAB-1 · siehe oben */
 
 var _currentObjKey = null;  // Local mode key OR API object id
