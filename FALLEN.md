@@ -2242,3 +2242,49 @@ den der Zweig nie erreicht.
 Dazu gehört die Farbfrage: die beiden Fenster stehen auf verschiedenem
 Grund (`--vi-surface` dunkel gegen den hellen Dialog). Wer Regeln von einem
 in den anderen Block verschiebt, verschiebt sie in eine andere Umgebung.
+
+## Wer etwas einblendet, muss es auch ausblenden — und umgekehrt
+
+Eine neue Spalte kam neben das Aufnahmefenster, in einem Grid mit zwei
+Spalten. Das Aufnahmefenster wird an **drei** Stellen versteckt
+(`display:none`) — die Spalte an keiner.
+
+Ergebnis: ein leerer Kasten in der Kartenfarbe auf dem Grundton des
+Fensters, **fast schwarz auf schwarz**, den niemand einordnen konnte. Und
+weil das Grid weiter zwei Spalten aufspannte, bekam der nachfolgende
+Inhalt nur die Hälfte der Breite — für den Nutzer sah es aus, als sei das
+Fenster verschwunden.
+
+Der Reflex, das an den drei Stellen nachzuziehen, führte prompt in die
+Gegenrichtung: das Einblenden gab es nur an **einer** Stelle, und die
+setzte nur das Aufnahmefenster zurück. Danach war die ganze Aufnahme
+unsichtbar.
+
+**Die Regel:** wer ein Element in einen bestehenden Behälter hängt, sucht
+**alle** Stellen, die diesen Behälter oder seine Geschwister umschalten —
+`grep` nach `display`, nicht nach dem eigenen Klassennamen. Und Zeigen und
+Verstecken gehören als **Paar** in je eine Funktion. Zwei halbe Lösungen
+sind schlechter als keine, weil die zweite den Fehler der ersten verdeckt.
+
+Beim Zurücksetzen `''` statt eines festen Wertes: nur so gilt wieder, was
+im Stylesheet steht. Ein hartgesetztes `grid` hebelt jede Media-Query aus,
+und der Fehler zeigt sich erst auf einem schmalen Gerät.
+
+## Zwei Wege, zwei Schwellenwerte — auf demselben Gerät
+
+Derselbe Dialog hat zwei Oberflächen, beide mit einer Spalte daneben,
+beide mit einem Umbruch für schmale Geräte. Die eine brach bei 900 px um,
+die andere bei 720 px.
+
+Auf einem Tablet hochkant (767 px) hieß das: die eine Ansicht einspaltig,
+die andere zweispaltig — **mit einer Nebenspalte von 340 px neben einem
+Gespräch von 330 px.** Die Hauptsache war schmaler als das Beiwerk.
+
+**Die Regel:** Schwellenwerte gehören zum Problem, nicht zur Datei. Zwei
+Ansichten mit derselben Struktur bekommen denselben Breakpoint; sonst
+verhält sich dasselbe Gerät in zwei Fenstern verschieden, und niemand
+findet den Grund.
+
+Und gemessen wird im **gleich-Origin-iframe**. Das Fenster kleiner zu
+ziehen wirkt auf Media-Queries nicht zuverlässig — der Rahmen muss echt
+sein, sonst prüft man eine Breite, die der Browser nie auswertet.

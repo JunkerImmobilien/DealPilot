@@ -38,7 +38,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
 
-**Stand:** `v1273`–`v1301` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
+**Stand:** `v1273`–`v1303` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
 — nichts davon ist live.
 
 > **Nach Marcels erstem echten Sprechlauf am 10.09. abends** (Bilder
@@ -130,7 +130,7 @@ die Kosten einer Aufnahme um rund 40 % — bei 4 Minuten von ≈ 1,7 auf ≈ 0,9
 
 ### 4 · Der Sprechlauf gehört auf Produktion
 
-**`v1273`–`v1301` liegen auf Staging.** Prod steht auf
+**`v1273`–`v1303` liegen auf Staging.** Prod steht auf
 `a21fe9c` — der Co-Pilot, die Etappen, beide Scores, BORIS-Abruf und
 Marktpreisindikation im Hintergrund sind für keinen Kunden erreichbar.
 
@@ -216,7 +216,7 @@ freigeben.
 
 ---
 
-## → Erledigt am 11.09.2026, fünfter Teil (`v1300`–`v1301`)
+## → Erledigt am 11.09.2026, fünfter Teil (`v1300`–`v1303`)
 
 | Marcels Punkt | Stand |
 |---|---|
@@ -226,8 +226,10 @@ freigeben.
 | Modal größer | **fertig** — 94→97 vh, 1240→1360 px; Modal 929→958 px |
 | „Was schon steht" auch beim freien Erzählen | **fertig** — geteilte Ansicht, Spalte 320×512 px, 16 Zeilen in 5 Etappen, gefüllt aus Formular und Auswertung |
 | Sprachaufzeichnung so breit wie der geführte Sprechlauf | **fertig** — Wahlseite 760 px, Aufnahme 1360 px; die Breitenregel lag im Block, den der freie Weg nie lädt |
+| Schwarzes Feld rechts, Eingabefenster nach „Übernehmen" weg | **fertig** — die Spalte blieb stehen, wenn das Aufnahmefenster ging (mein Fehler aus v1300b); `_recAus`/`_recAn` räumen jetzt als Paar |
+| Beide Sprachaufzeichnungen auf Tablet und Handy | **fertig** — im iframe gemessen: der geführte Weg brach erst bei 720 px um und war auf dem Tablet zweispaltig (Gespräch 330, Liste 340); jetzt beide bei 900 px |
 
-**Commits** `f757dee`, `aeffda1`, `9fca4b8`, `122360f`. Gold-Audit RC=0.
+**Commits** `f757dee`, `aeffda1`, `9fca4b8`, `122360f`, `63446bf`, `de73ebc`, `d17c5d3`. Gold-Audit RC=0.
 
 **Hinweis:** Marcel hat ein neues Bild angekündigt, das nicht im Repo
 angekommen ist — das neueste bleibt `design/mockups/sprechlauf3.png` vom

@@ -12008,6 +12008,75 @@ eingefügt"), das nicht im Repo angekommen ist — das neueste bleibt
 `sprechlauf3.png` vom 10.09. Gearbeitet wurde nach seiner Beschreibung und
 eigenen Messungen.
 
+## Rollout-Journal · 11.09.2026, sechster Teil — `v1302` bis `v1303`
+
+Marcels Rückmeldung zum Bild `sprechlauf4` — **das wieder nicht im Repo
+ankam.** Zum zweiten Mal an diesem Tag; das neueste bleibt
+`design/mockups/sprechlauf3.png` vom 10.09. Gearbeitet wurde nach seiner
+Beschreibung, und die traf einen Fehler, der von mir stammt.
+
+### Das schwarze Feld und das verschwundene Fenster (`v1302`)
+
+*„da siehst du ein merkwürdiges Feld rechts in schwarz, und wenn ich
+Eingaben gemacht habe und auf Übernehmen klicke, dann ist das
+Eingabefenster weg."*
+
+**Beides derselbe Fehler, und er ist meiner aus `v1300b`.** Die neue Spalte
+„Was schon steht" hängt in `.vi-frei-buehne`, einem Grid mit zwei Spalten.
+An **drei** Stellen wird `vi-rec` auf `display:none` gesetzt — beim Zeigen
+der Startkarte, beim Aufbau des geführten Dialogs und nach der Auswertung.
+
+Die Spalte blieb dabei stehen: ein leerer Kasten in `--vi-card` (#151412)
+auf `--vi-surface` (#0a0a0a) — **fast schwarz auf schwarz**, genau das
+„merkwürdige Feld". Und weil das Grid weiter zwei Spalten aufspannte, bekam
+der nachfolgende Inhalt nur noch die linke: das „Eingabefenster weg".
+
+`_recAus()` räumt jetzt beides zusammen ab und setzt die Bühne auf eine
+Spalte zurück. Nachgemessen: Spalte `display:none`, Breite 0, Bühne
+`block`, Ergebnisbereich **1318 px** statt der halben Breite.
+
+### Ein Ausblenden ohne Einblenden (`v1302b`)
+
+Beim Nachmessen von `v1302` war nach dem Klick auf „Ich erzähle frei"
+**die ganze Aufnahme unsichtbar.** `_startkarte()` ruft `_recAus()`, und
+der Knopf blendete danach nur `vi-rec` wieder ein — Spalte und Grid blieben
+abgeräumt.
+
+**Eine halbe Lösung ist keine, sondern eine neue Falle.** `_recAn()` setzt
+alle drei auf `''` zurück, damit wieder gilt, was im Stylesheet steht; ein
+hier hartgesetztes `grid` würde die Media-Query für schmale Geräte
+aushebeln.
+
+### Tablet und Handy (`v1303`)
+
+*„wichtig ist auch, dass beide Sprachaufzeichnungen für Tablet und Handy
+funktionieren."*
+
+Gemessen im gleich-Origin-iframe — Fenstergröße allein wirkt nicht, die
+Media-Queries greifen nur in einem echten Rahmen.
+
+| Weg | Breite | vorher | jetzt |
+|---|---|---|---|
+| frei | 767 px | eine Spalte ✓ | eine Spalte |
+| frei | 390 px | eine Spalte ✓ | eine Spalte |
+| geführt | 767 px | **zwei Spalten: Gespräch 330, Liste 340** | eine Spalte |
+| geführt | 390 px | eine Spalte ✓ | eine Spalte |
+
+**Der freie Weg war in Ordnung** (Umbruch bei 900 px, von `v1300b`). **Der
+geführte nicht:** sein Umbruch stand bei 720 px und griff auf einem Tablet
+hochkant nicht — dort war die Nebenspalte breiter als die Hauptsache.
+
+Beide liegen jetzt bei **900 px**. Zwei Wege mit demselben Problem sollen
+auf demselben Gerät gleich reagieren; zwei verschiedene Schwellenwerte
+heißen, dass ein Fenster umbricht und das andere nicht. Zwischen 900 und
+1100 px wird die Liste schmaler (270 px) statt zu verschwinden.
+
+Kein horizontaler Überlauf in keiner der vier Messungen, Stopp-Knopf 44 px
+hoch.
+
+**Commits** `63446bf` (v1302), `de73ebc` (v1302b), `d17c5d3` (v1303).
+Gold-Audit RC=0. Auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
