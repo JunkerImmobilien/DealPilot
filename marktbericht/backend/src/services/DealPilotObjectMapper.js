@@ -62,6 +62,24 @@ export const DealPilotObjectMapper = {
       vacancy: vacancyFrom(d),
       // Bodenrichtwert aus DealPilot als BORIS-Fallback
       land_value_manual: num(pick(d, ['brw'])),
+      /* ═══ v1320 · Erbbaurecht ═══════════════════════════════════════
+         Marcels Frage: "funktioniert die erbpacht jetzt in jedem
+         marktbericht unter marktbewertung?"
+
+         Bisher nicht - der Marktbericht wusste nichts davon. Kein
+         Bewertungspartner nimmt den Parameter entgegen (gemessen gegen
+         GeoMap: leasehold, heritableBuildingRight, groundLease,
+         erbbaurecht, erbpacht - alle 400 Unrecognized field), also muss
+         der Bericht es selbst wissen, um es selbst zu rechnen.
+
+         Drei Angaben, mehr braucht § 50 ImmoWertV nicht: ob ueberhaupt,
+         wie hoch der Zins und wie lange der Vertrag noch laeuft. Der
+         Bodenwert steht schon oben (land_value_manual). */
+      plot_area: num(pick(d, ['gsfl', 'grundstuecksflaeche'])),
+      mea_pct: num(pick(d, ['mea'])),
+      leasehold: !!pick(d, ['_erbpacht', 'erbpacht']),
+      leasehold_rent_year: num(pick(d, ['erbbauzins'])),
+      leasehold_years_left: num(pick(d, ['erb_restlz'])),
       /* v727-equipment: Ausstattungsdetails (fliessen in DealPilot-Marktanalyse ein) */
       heating: pick(d, ['eq_heating']),
       windows: pick(d, ['eq_windows']),

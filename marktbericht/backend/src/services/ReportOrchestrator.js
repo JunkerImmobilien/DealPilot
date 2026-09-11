@@ -32,6 +32,7 @@ import { marktmiete as amtlicheMiete } from '../lib/mietmodell_nrw.js';   /* v10
 import { vergleichsfaktor as amtlicherVf } from '../lib/vergleichsfaktoren_nrw.js';   /* v1060-WVF-1 */   /* v1053-WIRW-1 */
 import { AgsResolver } from '../connectors/AgsResolver.js';
 import { ZensusConnector } from '../connectors/ZensusConnector.js';
+import * as Erbbaurecht from '../lib/erbbaurecht.js';   /* v1320 */
 
 export const ReportOrchestrator = {
   async generate(input, opts = {}) {
@@ -104,6 +105,16 @@ export const ReportOrchestrator = {
       // Manuell in DealPilot eingegebener Bodenrichtwert (Feld "brw") als BORIS-Fallback
       land_value_manual: input.land_value_manual ?? input.brw ?? null,
 
+
+      /* ═══ v1320 · Erbbaurecht ═══════════════════════════════════════
+         Dieselbe Falle wie bei WREF-1 direkt darunter: das Frontend
+         schickt die Felder, und `ref` liess sie fallen. Ohne diese drei
+         Zeilen ist der Erbbau-Block weiter unten eine Attrappe - er
+         fragt `ref.leasehold` ab, und das waere immer undefined. */
+      leasehold: input.leasehold === true || input.leasehold === 'true' || false,
+      leasehold_rent_year: input.leasehold_rent_year != null ? Number(input.leasehold_rent_year) : null,
+      leasehold_years_left: input.leasehold_years_left != null ? Number(input.leasehold_years_left) : null,
+      mea_pct: input.mea_pct != null ? Number(input.mea_pct) : null,
       /* WREF-1 · Wertermittlung Stufe 2/3. Diese Felder fehlten hier komplett:
        * das Frontend schickte sie, der Orchestrator liess sie fallen. Sichtbar
        * wurde es daran, dass Neubau und Bestand denselben Wert lieferten —
@@ -652,6 +663,62 @@ export const ReportOrchestrator = {
     let _kiGegen = null;
 
     // 6b) Sachwert/Ertragswert-Quercheck (reine Rechnung, keine API-Kosten)
+    /* ═══ v1320 · Erbbaurecht im Bericht ═══════════════════════════════
+       Marcels Frage: "funktioniert die erbpacht jetzt in jedem
+       marktbericht unter marktbewertung?"
+
+       Bis heute nicht. Der Bericht rechnete einen Marktwert aus
+       Vergleichsangeboten - und die sind Volleigentum, weil GeoMap den
+       Parameter gar nicht kennt (gemessen: 400 "Unrecognized field" fuer
+       jede Schreibweise). An einem Erbbaurechts-Objekt stand damit eine
+       Zahl im Bericht, die um 5 bis 50 Prozent daneben lag, ohne dass
+       irgendwo ein Hinweis darauf stand.
+
+       Der Abschlag wird HIER gerechnet, nicht in der Bewertung selbst:
+       `valuation` bleibt der Volleigentumswert (das ist er, und so wird
+       er auch gemeldet), der Abschlag steht als eigene Groesse daneben.
+       Wer beides sieht, versteht den Unterschied; wer nur eine gekuerzte
+       Zahl sieht, fragt sich, warum sie so niedrig ist.
+
+       Der Bodenwert kommt aus derselben Quelle wie ueberall im Bericht -
+       BORIS oder die Nutzereingabe, mal Flaeche. Fehlt er, fehlt auch der
+       Abschlag: kein Verfahren rechnet halb. */
+    let erbbau = null;
+    if (ref && ref.leasehold) {
+      try {
+        /* Bodenwert: Bodenrichtwert mal Flaeche, bei einer ETW auf den
+           Miteigentumsanteil heruntergerechnet. Ohne den MEA faellt der
+           Bodenwert um den Faktor der Einheitenzahl zu hoch aus - und mit
+           ihm der ganze Abschlag. Der Bodenrichtwert kommt aus BORIS oder,
+           wenn der nichts liefert, aus der Nutzereingabe. */
+        const _brwSqm = (landValue && landValue.available && Number(landValue.value_sqm) > 0)
+          ? Number(landValue.value_sqm)
+          : (Number(ref.land_value_manual) > 0 ? Number(ref.land_value_manual) : null);
+        const _anteil = (Number(ref.mea_pct) > 0 && Number(ref.mea_pct) <= 100) ? Number(ref.mea_pct) / 100 : 1;
+        const _bwGesamt = (_brwSqm != null && Number(ref.plot_area) > 0)
+          ? _brwSqm * Number(ref.plot_area) * _anteil : null;
+        const _mv = (valuation && valuation.market_value && valuation.market_value.estimated != null)
+          ? valuation.market_value.estimated : null;
+        const _rnd = (_wertParams && _wertParams.restnutzungsdauer != null)
+          ? _wertParams.restnutzungsdauer
+          : (ref.build_year ? Math.max(20, 80 - (new Date().getFullYear() - ref.build_year)) : null);
+        erbbau = Erbbaurecht.compute({
+          volleigentum: _mv,
+          bodenwert: _bwGesamt,
+          restlaufzeit: ref.leasehold_years_left,
+          erbbauzins: ref.leasehold_rent_year,
+          objektart: ref.property_type,
+          restnutzungsdauer: _rnd,
+        });
+        step(erbbau.ok
+          ? `Erbbaurecht: Abschlag ${Math.round(erbbau.abschlag).toLocaleString('de-DE')} EUR (${erbbau.abschlagPct.toFixed(1)} %)`
+          : `Erbbaurecht: erkannt, aber nicht rechenbar (fehlt: ${erbbau.fehlt.join(', ')})`);
+      } catch (e) {
+        step('erbbaurecht: fehler ' + e.message);
+        erbbau = null;
+      }
+    }
+
     const crossCheck = CrossCheckService.compute(ref, landValue, rent, valuation, _wertParams);
 
     /* v1141b · Der Bodenwert-Rechenweg blieb im Backend liegen.
@@ -790,6 +857,12 @@ export const ReportOrchestrator = {
          insights.dynamics - beides blieb im Bericht stehen, statt ins
          Formular zu wandern. Jetzt stehen sie flach im Payload, damit die
          Karte sie ohne Umweg lesen kann. */
+      /* v1320: der Erbbaurechts-Abschlag steht NEBEN dem Marktwert,
+         nicht darin. valuation bleibt der Volleigentumswert - das ist er,
+         und so wird er gemeldet. Wer beides sieht, versteht den
+         Unterschied; wer nur eine gekuerzte Zahl sieht, fragt sich, warum
+         sie so niedrig ist. */
+      erbbaurecht: erbbau,
       bevoelkerung_trend_pct: (macroRaw && macroRaw.metrics && macroRaw.metrics.bevoelkerung_trend != null)
         ? macroRaw.metrics.bevoelkerung_trend : null,
       days_on_market: (insights && insights.dynamics && insights.dynamics.days_on_market != null)
