@@ -273,7 +273,24 @@
         S+" .pm-menge-b:disabled{opacity:.3;cursor:default}"+
         S+" .pm-menge-n{flex:0 0 auto;width:30px;height:26px;border:0;border-left:1px solid "+RAHMEN+";border-right:1px solid "+RAHMEN+";text-align:center;font:700 12px/1 'JetBrains Mono',ui-monospace,monospace;color:"+CREME+";background:transparent;padding:0}"+
         S+" .pm-menge-n:focus{outline:2px solid var(--wl-c9a84c, rgba(201,168,76,.55));outline-offset:-2px}"+
-        S+" .bw-gate .pm-menge{align-self:center}"+
+        /* ═══ DER DRITTE GRUND — und der einzige HELLE ════════════════════
+           GEMESSEN: `.bw-gate` (die Abriss-Seite des Boarding-Passes) hat
+           `background:#fff`. Derselbe Waehler stand dort mit Creme-Schrift
+           auf Weiss: Helligkeit 239 auf 255, KONTRAST 16. Lesbar war das
+           nicht, sichtbar kaum.
+
+           Das ist innerhalb eines Ausrollzyklus die DRITTE Auspraegung
+           derselben Falle — erst dunkel fuer hell gehalten, dann hell fuer
+           dunkel, jetzt ein heller Fleck mitten im dunklen Modal. Die
+           Lehre steht in FALLEN.md: ein Baustein, der an mehreren Orten
+           laeuft, braucht je Ort eine GEMESSENE Grundfarbe. Raten trifft
+           irgendwann, aber nie zuverlaessig.
+
+           `--ch` ist hier richtig (dunkle Schrift auf Weiss) — die Regel
+           „--ch nie auf Obsidian" gilt fuer den umgekehrten Fall. */
+        S+" .bw-gate .pm-menge{align-self:center;background:rgba(27,24,21,.05);border-color:rgba(27,24,21,.22);color:#2A2727}"+
+        S+" .bw-gate .pm-menge-n{color:#2A2727;border-left-color:rgba(27,24,21,.18);border-right-color:rgba(27,24,21,.18)}"+
+        S+" .bw-gate .pm-menge-b{color:var(--wl-b8932f, #b8932f)}"+
         S+" .bw-price-je{opacity:.75}"+
         '@media(max-width:520px){'+S+' .pm-einzel-row{flex-wrap:wrap}'+S+' .pm-einzel-l{flex:1 1 100%}}';
       })() +
