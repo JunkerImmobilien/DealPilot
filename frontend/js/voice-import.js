@@ -6115,7 +6115,16 @@
       var v = _rf.data.fields[id];
       return v !== undefined && v !== null && v !== '';
     });
-    if (alleDa) { _rfStandZeichnen(); return _rfWeiter(); }
+    /* v1309b: NACH EINEM RÜCKSPRUNG WIRD IMMER GEFRAGT. Gemessen: „zurück"
+       meldete „Zurück zu Mieteinnahmen." — und stellte dann wieder die
+       Finanzierungsfrage, weil der Mietblock ja gefüllt war.
+
+       Wer zurückspringt, will genau das ändern, was dort steht. Ihn
+       weiterzuschicken, weil es schon ausgefüllt ist, macht den Sprung
+       wirkungslos. Das Flag gilt für EINE Frage und fällt hier. */
+    var zurueck = !!_rf.zurueckSprung;
+    _rf.zurueckSprung = 0;
+    if (alleDa && !zurueck) { _rfStandZeichnen(); return _rfWeiter(); }
     /* v1288: Ein Angebot gilt nur fuer die Frage, in der es steht. Sonst
        nimmt die naechste Frage ein "ja" entgegen, das dem alten Knopf galt. */
     _rf.abrufOffen = null;
@@ -6260,6 +6269,7 @@
     if (_rf.weg) delete _rf.weg[ziel];
     _rf.nachgehakt = 0;
     _rf.abrufOffen = null;
+    _rf.zurueckSprung = 1;   /* v1309b: diese Frage wird gestellt, auch wenn sie steht */
     var e = _rf.offen[ziel];
     _rfBlase('co', '<span style="opacity:.8">Zurück zu <b>' +
       escH(_rfKurzname(e)) + '</b>.</span>');
