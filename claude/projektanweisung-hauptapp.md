@@ -13037,6 +13037,111 @@ begründen."
 `210efda`, `73f26a4`, `c3fc331`, `eff9f75`, `85e4832`, `27b5f5c`.
 Gold-Audit RC=0. Auf Staging, **nicht auf Prod**.
 
+## v1321–v1322 · Marktkontext und drei Abnahmen — 11.09.2026 (Nacht)
+
+### Die Abnahmen, die offen waren
+
+Marcel gab die kostenpflichtigen Abrufe frei. Alle drei sind gefahren.
+
+**1 · Marktbericht mit echtem Erbbau-Objekt.** Hermannstr. 9, Hüllhorst,
+100 m², Bj 1968, Grundstück 950 m², MEA 50 %, BRW 90 €/m², Erbbauzins
+1.200 €/Jahr, Restlaufzeit 50 Jahre:
+
+```
+Marktwert (Volleigentum):  175.000 €
+Abschlag:                   35.801 €  ·  20,5 %
+Erbbaurechtswert:          139.199 €
+Bodenwert:                  42.750 €   (950 × 90 × 50 % MEA)
+angemessener Zins:             3,5 %   (Vorgabe — für Hüllhorst kein amtlicher)
+Bevölkerung:               +0,298 %/J   Tage online: 57
+im Verlauf: "Erbbaurecht: Abschlag 35.801 EUR (20.5 %)"
+```
+
+**2 · Erbbau-Hinweis in der Marktbewertung — und dabei ein Fehler.**
+v1313b hat ihn in `applyAvm()` gebaut. Das ist der Weg von Sprengnetter
+und PriceHubble, und genau die bieten wir nicht an. Der Weg, den Marcel
+benutzt, ist die DealPilot-Karte. Dazu kam: `_oabApplyExternal` nimmt
+einen NAMEN und holt `_avm[name]` — ein durchgereichtes Ergebnisobjekt
+landet nirgends. Der Hinweis war nicht nur am falschen Ort, er war auf
+dem genutzten Weg überhaupt nicht erreichbar.
+
+**Aufgefallen nur, weil die Abnahme wirklich gefahren wurde** statt sie
+als „gebaut" abzuhaken. Behoben in v1322, danach gemessen:
+
+```
+ohne Erbpacht        (leer)
+mit Erbpacht         "Der Marktwert oben ist Volleigentum … 38.890 € · 12,2 %"
+ohne Restlaufzeit    "Für den Abschlag fehlen noch Angaben …"
+```
+
+**3 · Bestätigungs-Übertragung im laufenden Sprechlauf.** Genau Marcels
+Beispiel:
+
+```
+"die Adresse passt so"                              -> 4 Felder übernommen
+"die Adresse passt, aber die Hausnummer ist zwölf"  -> false (Einschränkung)
+"ja 450"                                            -> false (Zahl = Korrektur)
+```
+
+### v1321 · Was GeoMap sonst noch hergibt
+
+Marcels Frage zu seinem eigenen Papier: *„was kann das dann mehr? bringt
+uns das was und wo könnten wir das integrieren?"*
+
+Alles gegen die echte API gemessen, Bielefeld 5 km:
+
+| | Median €/m² | n | |
+|---|---|---|---|
+| Basis, Wohnungen Kauf | 2.948,68 | 1.120 | |
+| vermietet (`leased:true`) | 2.769,33 | 140 | **−7,1 %** |
+| frei (`leased:false`) | 2.980,96 | 978 | |
+| Energie A/B/C | 3.227,73 | 77 | |
+| Energie D/E | 2.594,20 | 159 | |
+| Energie F/G/H | 2.549,35 | 38 | **−21,0 %** |
+| Angebotsrendite (`RENDITE`) | 4,26 % | 1.116 | |
+| Erbbaurecht (`searchString`) | 2.012,20 | 9 | **−31,8 %** |
+
+**Das wichtigste Ergebnis: KPI-Abrufe kosten nichts.** Guthaben vor und
+nach acht Abfragen: 257,115 → 257,115. Nur Detail-Abrufe
+(`getDetailsById`) ziehen Geld, rund einen Cent je Angebot. Der ganze
+Block ist gratis — er kostet nur Zeit, und die läuft parallel.
+
+**Was NICHT geht, damit es niemand zweimal versucht** (auch gemessen):
+
+```
+objectClasses ['StellplatzGarage']   n=0 in Bielefeld
+priceChanged / hasPriceChange        400 Unrecognized field
+priceChangeCountRange                400 Unrecognized field
+priceChangeDirection allein          filtert NICHT (n=1.120 = alle)
+energyRatings 'A_PLUS' / 'A+'        400 Unknown energyRating
+```
+
+Der **Verhandlungsspielraum** aus dem Papier ist per KPI also **nicht** zu
+holen — er ginge nur über Detail-Abrufe, und die kosten. Gültige
+Energieklassen sind A bis H, ohne A+.
+
+Im echten Bericht gemessen (Bielefeld, Detmolder Str.):
+
+```
+Basis 2.925,64 €/m² (n=1.130)
+vermietet 2.750 (n=135)  frei 2.957,56 (n=994)   ->  −7,0 %
+Energie gut 3.161,57 | mittel 2.507,34 | schlecht 2.466,58  -> −22,0 %
+Angebotsrendite 4,26 % (q25 3,43 – q75 5,00), n=1.129
+Erbbau am Markt 2.043 €/m², Anteil 4,0 %, Abstand −30,2 %
+```
+
+**Der Erbbau-Marktabstand ist die schönste Bestätigung:** −30,2 % aus
+echten Angeboten gegen 20,5 % aus meiner Rechnung am Hüllhorster Objekt.
+Dieselbe Größenordnung, zwei völlig verschiedene Wege. Die Zahl ist
+allerdings ein **Signal, kein Beleg** — `searchString` ist Volltext ohne
+Ausschlusslogik und trifft auch ein Angebot, das „kein Erbbaurecht"
+schreibt. Steht so auch im Payload.
+
+`MIN_N = 15`: unter fünfzehn Treffern ist der Median Zufall, und eine Zahl
+ohne Grundlage ist schlimmer als keine. Dann fehlt der Block.
+
+**Commits** `bee4ed7`, `abc738d`. Auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

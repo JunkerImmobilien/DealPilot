@@ -2666,3 +2666,26 @@ gegengeprüft hätte statt sie anzunehmen.
 **Eine Falle, die in der Datei schon dokumentiert ist, ist trotzdem eine
 Falle.** Beim Durchreichen eines Feldes gehört die ganze Kette abgelaufen:
 Mapper → `ref` → Nutzung → Payload. Jede Station einzeln nachgezählt.
+
+## Eine Abnahme, die man nicht fährt, ist keine
+
+Der Erbbau-Hinweis für die Marktbewertung war gebaut, syntaktisch geprüft,
+ausgerollt — und stand im **falschen Weg**: in `applyAvm()`, dem Pfad von
+Sprengnetter und PriceHubble. Genau die beiden Anbieter sind abgeschaltet.
+Der Weg, den der Nutzer geht, ist die DealPilot-Karte, und dort fehlte er.
+
+Zwei Runden vorher hatte ich ihn selbst als „gebaut, bei echtem Abruf noch
+nicht gesehen" gemeldet. Genau dieser Satz war die Warnung, und ich bin
+trotzdem weitergegangen.
+
+Aufgefallen erst, als die Abnahme wirklich lief. Dabei fiel gleich noch
+auf, dass `_oabApplyExternal(name)` einen **Namen** nimmt und `_avm[name]`
+holt — ein durchgereichtes Ergebnisobjekt landet nirgends. Der Baustein war
+also nicht nur am falschen Ort, er war auf dem genutzten Weg überhaupt
+nicht erreichbar.
+
+**Regel: „Gebaut, aber nicht gemessen" ist kein Zwischenstand, sondern eine
+offene Aufgabe mit einem Datum.** Und die erste Frage bei einem UI-Baustein
+lautet nicht „funktioniert er", sondern **„liegt er auf dem Weg, den der
+Nutzer geht"** — in einer App mit mehreren Anbieterpfaden ist das die
+teurere Frage.
