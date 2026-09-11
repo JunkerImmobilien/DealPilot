@@ -12823,6 +12823,220 @@ investiert, der keiner war: die Aufrufe lagen alle im selben JS-Tick. Mit
 350 ms Abstand stimmte auf Anhieb alles. **Wer eine ereignisgetriebene
 Rechenkette synchron hintereinander anstößt, misst seinen eigenen Takt.**
 
+## v1314–v1320b · GeoMap, die Kette, der Kontext — 11.09.2026 (Abend)
+
+### v1314 · MFH wurde am falschen Markt gemessen
+
+Aus Marcels GeoMap-Papier, Punkte 1 und 2. Beide gegen die echte API
+nachgemessen (Bielefeld, 5 km, 11.09.2026):
+
+| | heute | richtig | |
+|---|---|---|---|
+| MFH Kauf €/m² | 2.553,47 (`Haus`, n=6.684) | 2.093,15 (`Mehrfamilienhaus`, n=1.541) | **+22,0 %** |
+| MFH Miete €/m² | 9,49 (`Haus`, n=1.017) | 8,82 (`Wohnung`, n=55.056) | **+7,6 %** |
+| EFH Kauf €/m² | 2.553,47 | 2.729,15 (`EinZweiFamilienhaus`) | −6,4 % |
+
+Beim MFH wirkten beide Fehler in dieselbe Richtung, und im
+`MarketInsightsService` gingen **dieselben** Klassen an die Kauf- UND die
+Mietreihe — beide zu hoch, beides in derselben Wertentwicklung. Der
+Rohertrag im Ertragswert stand auf einer Miete, gemessen an vermieteten
+HÄUSERN; ein MFH vermietet aber Wohnungen. Dazu die Stichprobe: 1.017
+gegen 55.056.
+
+`geomapClasses()` stand wortgleich in zwei Dateien. Jetzt eine Quelle:
+`lib/marktsegment.js`, und sie kennt den Unterschied zwischen Kauf und
+Miete.
+
+**Welche `objectTypes` es gibt, nennt die API nicht** — ein falscher Wert
+kommt als `400 Unknown objectType` zurück. Aus 14 echten Haus-Angeboten
+gesammelt: `EinZweiFamilienhaus` (9), `Mehrfamilienhaus` (3), `Sonstige`
+(2). Reihenhaus, Doppelhaushälfte, Villa, Bungalow — alle 400.
+
+**Zeitfenster:** TAGEONLINE und die Rendite im Standort-Finder liefen ohne
+`onlineDateRange`, also über alle Angebote seit 2015. „Wie lange steht
+hier etwas im Schaufenster" wurde zur Antwort auf „wie lange stand hier je
+etwas". Beide jetzt auf 12 Monate.
+
+**`market=seed` ist wirklich nur ein Etikett** — gemessen: `MB_DEMO=0`,
+`GEOMAP_TOKEN=gesetzt`. GeoMap läuft.
+
+Messkosten: 257,79 → 257,72 €.
+
+### v1315 · Der Sprechlauf bekommt den Kontext, den er braucht
+
+Marcels Befund: *„das ist kein schlauer Agent … du könntest ihm ja den
+kontext mitgeben, der ist ja da."*
+
+**Gemessen, warum:** an die Auswertung gingen `KONTEXT_IDS` — **sechzehn
+feste Feld-Ids**. Ohne Hausnummer, ohne Objektart, ohne Zinsbindung, ohne
+Lage, und ohne die Information, woher ein Wert kam. Ein Modell mit so
+einem Zettel *kann* „die Adresse passt" nicht auflösen.
+
+Jetzt geht alles mit, was einen Wert hat, mit Herkunft
+(`[amtlich aus BORIS]`, `[steht im Formular]`), sortiert nach Nähe zur
+laufenden Frage. Dazu `_rfBestaetigungUebertragen()` **vor** dem Modell:
+sie bildet einen Begriff auf seine Felder ab (Adresse → str/hnr/plz/ort,
+Finanzierung → ek/d1z/d1t/d1_bindj, dazu sechs weitere Gruppen) und
+übernimmt, was schon dasteht.
+
+**Bewusst im Code, nicht im Prompt:** eine Bestätigung darf nichts
+erfinden. Ein Modell, das „die Adresse stimmt" liest, könnte eine
+plausible Hausnummer ergänzen. Diese Funktion kann das nicht. Steht eine
+Zahl im Satz, ist es keine Bestätigung, sondern eine Korrektur.
+
+**v1315c:** Die Objektart hatte gar keine leere Option — ETW war an jedem
+leeren Objekt vorausgewählt, und der Sprechlauf fragte nicht danach, weil
+`fieldHasValue('objart')` wahr war. Seit v1314 wählt die Objektart auch
+das Marktsegment; der Fehler war damit gerade größer geworden.
+
+### v1316 · Die erweiterte Marktpreisindikation füllt aus, was sie weiss
+
+Marcels Frage: *„warum füllt er das nicht automatisch aus? fehlen ihm
+werte?"* — **Es fehlte kein einziger Wert.** Destatis liefert
+`bevoelkerung_trend` (Kreis Herford +0,152 %/Jahr, live geprüft), GeoMap
+die Angebotsdauer. Beides stand im Bericht und blieb dort: `mapCard()` las
+`micro.score`, `macro.score`, `price_trend_pct` — mehr nicht.
+
+Die Trennung, die jetzt gilt:
+
+- **automatisch** — Makrolage, Mikrolage, Bevölkerung, Nachfrage,
+  Wertsteigerung. Einstufungen ohne Spannen-Wahl.
+- **per Knopf** — Verkehrswert und Marktmiete. Daran hängt die Wahl
+  niedrig/mittel/hoch, und die ist eine Entscheidung des Nutzers.
+
+**Leere Felder nur.** Gemessen: 5 gesetzt, zweiter Lauf 0, eine von Hand
+gewählte Makrolage bleibt stehen.
+
+`ds2_entwicklung` bleibt bewusst aussen vor — das Feld fragt nach
+Entwicklungsmöglichkeiten AM OBJEKT (Ausbau, Aufstockung, Teilung), der
+Bericht liefert eine Markt-Einschätzung. Nicht dasselbe, es sieht nur so
+aus.
+
+### v1317 · Die Funktion, die es nie gab
+
+Marcels grösstes Thema, seit Wochen und in drei Sitzungen wiederholt:
+*„er liest die Daten aus dem Exposé und dem Marktbericht, geht aber diesen
+Sprechlauf nicht."*
+
+Gemessen im Browser:
+
+```
+Uncaught ReferenceError: _fireOabiDone is not defined
+```
+
+`_fireOabiDone()` wurde an zwei Stellen gerufen und war **nirgendwo
+definiert**. Der Import meldete der Kette nie „fertig";
+`await new Promise(res => openCombinedImport(res))` wurde nie aufgelöst.
+Die Kette blieb beim **ersten** Schritt stehen.
+
+Unsichtbar blieb es, weil das Overlay VOR dem Aufruf entfernt wird: der
+Import schliesst sauber, die Werte stehen im Formular. Dass danach nichts
+mehr passiert, sieht aus wie „fertig".
+
+Nachgewiesen, Kette von Hand durchgespielt — vorher:
+
+```
+Import-Fenster da: true
+nach Schliessen weg: true
+IMPORT onDone: NIE GERUFEN
+```
+
+nachher, volle Kette Exposé → Sprechlauf:
+
+```
+Fortschritt: "Sprachaufzeichnung …"
+Overlay: oabi-ov vi-mode oabi-boarding
+Startkarte: da
+```
+
+Der v1310-Fix (zwei Fenster, eine ID) war richtig und hat einen **zweiten**
+Abbruch behoben, der darunter lag. Dieser hier war der erste.
+
+### v1318 · „Erweiterte Marktpreisindikation" traf beide — und damit keins
+
+Die Sprachauswahl verlangte **genau einen** Treffer. Wer „erweiterte
+Marktpreisindikation" sagt, trifft `markt` (wegen „markt") UND `markt2`
+(wegen „erweitert"). Zwei Treffer sind damit so gut wie keiner; der
+Co-Pilot fragte zurück, welches denn — bei dem Satz, der die Antwort schon
+enthielt.
+
+Rangfolge statt Menge (`RF_ABRUF_SPEZ`), und nur geprüft wird, was gerade
+zur Wahl steht. Die Zuordnung ist jetzt eine reine Funktion
+(`_abrufAusText`) — vorher stand sie als Filter zwischen DOM-Ausgaben und
+war nur messbar, indem man einen ganzen Sprechlauf startet.
+
+Gemessen, 10 von 10 Fällen richtig, inklusive der Gegenproben
+(„Bodenrichtwert" bei Markt-Angeboten → null, „ja" → null).
+
+### v1319 · Der Co-Pilot darf auch Allgemeines beantworten
+
+Marcels Wunsch: *„Wie ist denn die Postleitzahl von Herford?"*
+
+Der Weg existiert seit v1281. Was ihn blockierte, war Regel 3 im Prompt:
+„Was nicht im bekannten Stand steht, ERFINDE NICHT." Die Regel ist richtig
+und bleibt — nur trifft sie auch die Postleitzahl von Herford, und darauf
+ist „das steht nicht im Stand" keine Antwort, sondern eine Ausrede.
+
+**Die Grenze:** gehört die Angabe zu DIESEM Objekt oder ist sie allgemein
+nachschlagbar? Die Wohnfläche dieser Wohnung kennt nur der Nutzer. Die
+Postleitzahl von Herford kennt jeder.
+
+Gemessen, beide Seiten:
+
+> „Herford hat mehrere Postleitzahlen, nämlich 32049, 32051, 32052 und
+> 32053."
+
+> „Die Wohnfläche ist mir in den bekannten Objektdaten noch nicht
+> angegeben."
+
+### v1320 / v1320b · Das Erbbaurecht im Marktbericht
+
+Marcels Frage: *„funktioniert die erbpacht jetzt in jedem marktbericht
+unter marktbewertung?"* — bis dahin nicht.
+
+Drei Stellen, jede einzelne nötig: der `DealPilotObjectMapper` gibt
+`leasehold`, `leasehold_rent_year`, `leasehold_years_left`, `plot_area`
+und `mea_pct` weiter · `ref` im Orchestrator nimmt sie auf (ohne das wäre
+der ganze Block eine Attrappe) · der Abschlag wird nach § 50 ImmoWertV
+gerechnet und steht **neben** dem Marktwert, nicht darin.
+
+**Zweite Fassung derselben Formel — Absicht.** `lib/erbbaurecht.js` (ESM,
+Node) trägt dieselbe Rechnung wie `frontend/js/erbbau-engine.js` (ES5,
+Browser). Es gibt keinen Build-Schritt, der sie zusammenführen könnte.
+`pruefwert()` hält sie zusammen:
+
+```
+pruefwert im Betrieb = 41277   (Frontend: Abschlag 41.277 €)
+```
+
+**v1320b:** Beim Rollout fiel im Containerlog auf:
+
+```
+[register] ... erbbauzinssatz=15 ...
+```
+
+Das Register führt seit Langem **15 örtliche Erbbauzinssätze** —
+Gemeindemittel aus ausgewerteten Kauffällen, mit eigenem Modellvermerk.
+Sie lagen da und wurden nie gelesen. § 50 Abs. 3 ImmoWertV verlangt genau
+den örtlich üblichen Satz; 3,5 % bundesweit ist nur der Notnagel.
+
+Die Wirkung ist erheblich:
+
+```
+Vorgabe 3,5 %   Abschlag 41.277 €  · 13,8 %
+amtlich 2,7 %   Abschlag 52.536 €  · 17,5 %
+amtlich 5,1 %   Abschlag 18.760 €  ·  6,3 %
+```
+
+Faktor 2,8 zwischen den Extremen. Der Satz wird **mit seinem Hinweis**
+übernommen — er trägt ausdrücklich „Kein vom Gutachterausschuss
+abgeleiteter Modellparameter, wer damit ein Erbbaurecht bewertet, muss es
+begründen."
+
+**Commits** `0c4d8c8`, `492d9a8`, `025d9af`, `7365a32`, `61cd39f`,
+`210efda`, `73f26a4`, `c3fc331`, `eff9f75`, `85e4832`, `27b5f5c`.
+Gold-Audit RC=0. Auf Staging, **nicht auf Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

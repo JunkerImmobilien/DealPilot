@@ -2579,3 +2579,90 @@ misst seinen eigenen Takt, nicht das Produkt.** Zwischen zwei Zuständen
 immer `await` mit echter Pause — und wenn eine Messreihe konstante Werte
 liefert, wo Veränderung sein müsste, ist der Takt der erste Verdächtige,
 nicht der Code.
+
+## Eine Funktion, die nur aufgerufen wird
+
+`_fireOabiDone()` stand an zwei Stellen in `object-actions.js` — beim
+Schliessen des Import-Fensters und beim Übernehmen der Werte. **Definiert war
+sie nirgends.** Ein `grep` über das ganze Frontend fand genau diese zwei
+Aufrufe und keine Definition.
+
+Was daran fünf Wochen unsichtbar blieb: das Overlay wird **vor** dem Aufruf
+entfernt (`ov.remove(); _fireOabiDone();`). Der Nutzer sieht seinen Import
+sauber schliessen, die Werte stehen im Formular. Dass danach nichts mehr
+passiert, sieht aus wie „fertig", nicht wie ein Absturz. Die Kette
+
+```js
+await new Promise(function (res) { openCombinedImport(res); });
+```
+
+wurde nie aufgelöst und blieb beim ersten Schritt stehen. Wer den Import
+**einzeln** öffnet, merkt es nie — dort wartet niemand auf den Rückruf.
+
+**Regel: Ein Ablauf, der „einfach aufhört", hat als Erstes einen Verdacht —
+ein Rückruf, der nie feuert.** Und `grep -n "name"` zeigt dann in einer Zeile,
+ob es die Funktion überhaupt gibt. Das kostet zehn Sekunden und stand hier
+gegen mehrere Anläufe an der falschen Stelle.
+
+Dazu: **die Konsole lesen, bevor man Code liest.** `window.addEventListener
+('error', ...)` beim Nachstellen im Browser hätte den `ReferenceError` sofort
+gezeigt. Ich hatte vorher zwei Ursachen-Hypothesen aus dem Quelltext gebaut,
+beide plausibel, beide falsch.
+
+## Zwei überlappende Muster ergeben keinen Treffer
+
+Die Sprachauswahl der Abrufe verlangte **genau einen** Treffer:
+
+```js
+var treffer = akt.filter(...);
+if (treffer.length === 1) { ...  }
+```
+
+„Erweiterte Marktpreisindikation" trifft `markt` (wegen „markt") **und**
+`markt2` (wegen „erweitert"). Zwei Treffer sind damit so gut wie keiner — der
+Co-Pilot fragte zurück, welches denn gemeint sei. Bei genau dem Satz, der die
+Antwort schon enthielt.
+
+**Wo sich Muster überlappen, braucht es eine Rangfolge statt einer Menge.**
+Das spezifischere Wort gewinnt: „erweitert" kommt nur in einem der beiden
+Namen vor, „markt" in beiden. Und die Rangfolge prüft nur, was gerade zur
+Wahl steht — sonst löst ein „Bodenrichtwert" eine Aktion aus, die es an
+dieser Stelle nicht gibt.
+
+## Ein Wert, der da ist und nie ankommt
+
+Marcel fragte, warum die erweiterte Marktpreisindikation Bevölkerung, Mikro-
+und Makrolage nicht ausfüllt — „fehlen ihm Werte?". Es fehlte **kein einziger
+Wert**. Destatis liefert `bevoelkerung_trend` (Kreis Herford +0,152 %/Jahr,
+live geprüft), GeoMap die Angebotsdauer. Beides stand im Bericht und blieb
+dort: `mapCard()` las genau drei Felder, alles andere fiel unter den Tisch.
+
+Dieselbe Klasse ein zweites Mal am selben Tag: das Register führt seit Langem
+**15 örtliche Erbbauzinssätze** (2,7 bis 5,1 %, mit Modellvermerk). Aufgefallen
+nur, weil beim Rollout die Logzeile durchlief:
+
+```
+[register] ... erbbauzinssatz=15 ...
+```
+
+Der Unterschied zwischen 2,7 % und 5,1 % macht beim Abschlag 18.760 € gegen
+52.536 € — Faktor 2,8.
+
+**Bevor eine Quelle angebunden wird, erst prüfen, was die vorhandene schon
+liefert.** Und: die Startlogs eines Dienstes einmal wirklich lesen. Dort steht
+oft, was er alles kann.
+
+## `ref` lässt Felder fallen — und der Kommentar daneben sagt es schon
+
+Im `ReportOrchestrator` baut `ref` sich aus `input`. Wer ein neues Feld
+durchreicht, muss es **dort** eintragen; sonst ist es `undefined`, und jeder
+Code, der darauf prüft, ist eine Attrappe, die aussieht wie eine Funktion.
+
+Genau das steht zwei Zeilen darunter schon einmal: *„Diese Felder fehlten hier
+komplett: das Frontend schickte sie, der Orchestrator liess sie fallen."*
+(WREF-1). Ich wäre in dieselbe Grube gefallen, wenn ich die Feldnamen nicht
+gegengeprüft hätte statt sie anzunehmen.
+
+**Eine Falle, die in der Datei schon dokumentiert ist, ist trotzdem eine
+Falle.** Beim Durchreichen eines Feldes gehört die ganze Kette abgelaufen:
+Mapper → `ref` → Nutzung → Payload. Jede Station einzeln nachgezählt.
