@@ -778,6 +778,17 @@
     if (b) b.style.display = 'block';
   }
 
+  /* Das Gegenstück. Beide gehören zusammen: `''` statt eines festen Wertes,
+     damit wieder gilt, was im Stylesheet steht — die Bühne ist dort ein
+     Grid, und auf schmalen Geräten eine einzelne Spalte. Ein hier
+     hartgesetztes `grid` würde die Media-Query aushebeln. */
+  function _recAn() {
+    var rec = $('vi-rec'); if (rec) rec.style.display = '';
+    var st = $('vi-frei-stand'); if (st) st.style.display = '';
+    var b = document.querySelector('.vi-frei-buehne');
+    if (b) b.style.display = '';
+  }
+
   function _startkarte(OA) {
     _startkarteStil();
     _recAus();
@@ -815,7 +826,12 @@
     $('vi-sk-frei').addEventListener('click', function () {
       h.remove();
       if (sub) sub.textContent = subOriginal;   /* v1275b: wieder der Text zum freien Weg */
-      if (rec) rec.style.display = '';
+      /* v1302: `_recAus()` hat beim Zeigen der Startkarte auch die Spalte
+         und das Grid abgeräumt — beides muss hier zurück. Ein Ausblenden
+         ohne passendes Einblenden ist keine halbe Lösung, sondern eine
+         neue Falle: gemessen war nach diesem Klick die ganze Aufnahme
+         unsichtbar. */
+      _recAn();
       if (nx) nx.style.display = '';
       startRecording();
     });
