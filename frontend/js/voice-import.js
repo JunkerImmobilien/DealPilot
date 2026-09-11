@@ -539,7 +539,34 @@
     injectCss();
     var OA = window.ObjectActions && window.ObjectActions._voice;
     if (!OA) { toast('Sprachmodul nicht bereit \u2014 Seite neu laden'); if (typeof onDone === 'function') onDone(); return; }
-    if ($('oabi-ov')) { if (typeof onDone === 'function') onDone(); return; }
+    /* ═══ v1310 · HIER brach die Kette ab ═════════════════════════════════
+       Marcels Befund: „die Kombination Exposé, Marktbericht und der
+       Sprechlauf funktionieren nicht. Er bricht dann ab."
+
+       Diese Zeile war der Abbruch. Sie sollte verhindern, dass zwei
+       Sprechläufe übereinander liegen — und das ist richtig. Nur prüft sie
+       auf `#oabi-ov`, und diese ID gehört **auch dem Import-Fenster**
+       (`openCombinedImport`). Steht das noch im DOM, steigt der Sprechlauf
+       sofort wieder aus und meldet „fertig", ohne je gelaufen zu sein. Die
+       Kette geht dann zum nächsten Schritt weiter, als wäre nichts
+       gewesen.
+
+       Wer den Sprechlauf EINZELN öffnet, hat kein zweites Fenster —
+       deshalb fiel es nie auf. Erst die Kette bringt beide zusammen.
+
+       Jetzt hält nur noch ein LAUFENDER SPRECHLAUF (`.vi-mode`) ihn auf.
+       Ein fremdes Fenster mit derselben ID wird abgeräumt, nicht
+       respektiert: die Kette hat es gerade geschlossen, sein Rest im DOM
+       ist ein Überbleibsel, kein Anspruch. */
+    var _offen = $('oabi-ov');
+    if (_offen && _offen.classList.contains('vi-mode')) {
+      if (typeof onDone === 'function') onDone();
+      return;
+    }
+    if (_offen) {
+      try { console.log('[voice-import] fremdes oabi-ov abgeraeumt (Kette)'); } catch (e) {}
+      _offen.remove();
+    }
 
     _doneFired = false;
     var done = function (payload) {
