@@ -11982,7 +11982,25 @@ Gruppen. Ohne diesen Test hätte ich in der Funktion gesucht.
 aus dem Formular stehen drin (ETW, Finanzierung 3,5 · 1 · 10, Nebenkosten
 2,2 · 0,5 · 6,5).
 
-**Commits** `f757dee` (v1300), `aeffda1` (v1300b), `9fca4b8` (v1300c).
+### Die Aufnahme war halb so breit wie der Dialog (`v1301`)
+
+Marcels Nachtrag: „bei der Sprachaufzeichnung darf das Modal schon breiter
+sein, also so breit wie bei dem anderen Sprechlauf auch."
+
+**Dieselbe Ursache noch einmal, an einer anderen Eigenschaft.** Die Regel
+`width:min(1240px,100%)` steht in `_rfStil()` — im Block `vi-rf-stil`, den
+nur der geführte Dialog einhängt. Der freie Weg blieb bei der Basisregel
+aus `vi-style`: **760 px**. Mit der neuen Spalte daneben war das zu eng.
+
+Die Breite hängt jetzt am ZUSTAND, nicht am Fenster: `vi-breit` wird
+gesetzt, sobald die Aufnahme läuft. Die Wahlseite davor bleibt schmal —
+zwei Karten nebeneinander brauchen keine 1360 px, und ein Dialog, der beim
+Klick die Breite wechselt, wirkt unruhig.
+
+Gemessen: Wahlseite **760 px**, Aufnahme **1360 px**, Grid
+`980 px | 320 px`.
+
+**Commits** `f757dee` (v1300), `aeffda1` (v1300b), `9fca4b8` (v1300c). `122360f` (v1301).
 Gold-Audit RC=0. Auf Staging, **nicht auf Prod**.
 
 **Rest:** Marcel hat ein Bild angekündigt („unter Sprechlauf neu ein Bild
