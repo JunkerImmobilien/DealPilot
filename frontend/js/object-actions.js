@@ -1040,7 +1040,7 @@
       box = document.createElement('div');
       box.id = id;
       box.style.cssText = 'margin:8px 0;padding:8px 10px;border-radius:8px;font-size:12px;line-height:1.5;' +
-        'border:1px solid var(--wl-c9a84c, #C9A84C);background:rgba(201,168,76,.08)';
+        'border:1px solid var(--wl-c9a84c, #C9A84C);background:var(--gold-bg, rgba(201,168,76,.08))';
       host.parentNode.insertBefore(box, host);
     }
     box.innerHTML = html;
