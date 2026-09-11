@@ -2178,3 +2178,67 @@ Einkaufspreis halbiert und die Marge falsch dargestellt.
 Nebenbefund derselben Tabelle: `openai_eur` existiert als Spalte und ist in
 **jeder** Zeile NULL. Eine Spalte, die nie gefüllt wird, sieht in einem
 Schema aus wie eine Messung, die es gibt.
+
+## „Manchmal" ist der Hinweis auf eine Zeitfrage
+
+Ein Verlauf sollte nach jeder Antwort ans Ende scrollen. Er tat es
+**manchmal** nicht. Genau dieses Wort ist der Befund: was immer schiefgeht,
+ist ein Logikfehler; was manchmal schiefgeht, ist fast immer **eine
+Messung zum falschen Zeitpunkt**.
+
+Hier stand `el.scrollTop = el.scrollHeight` direkt nach `appendChild`. Die
+Höhe in dem Moment ist nicht die Höhe danach: eine Einblend-Animation
+startet versetzt, Schriften laden nach und brechen Zeilen um, eine Karte
+wächst, während ihre Balken ausfahren.
+
+**Die Regel:** eine Größe, die nach dem Einhängen noch wachsen kann, wird
+**mehrfach** gelesen — sofort, im nächsten Frame (`requestAnimationFrame`,
+nach dem Layout) und einmal nach Ablauf der längsten Animation. Das ist
+billiger als ein `ResizeObserver` und deckt dieselben Fälle ab.
+
+Und die Gegenprobe, die oft vergessen wird: **wer selbst gescrollt hat,
+darf nicht zurückgerissen werden.** Automatisches Scrollen ist nur
+erwünscht, solange der Leser ohnehin unten steht.
+
+## Ein try/catch, das eine ganze Funktion verschluckt
+
+Eine neue Spalte blieb leer. Die Zeichenfunktion stand im Code, wurde
+aufgerufen, warf keinen sichtbaren Fehler — der Aufruf war in
+`try { … } catch (e) {}` gekapselt, damit ein Fehler den Rest nicht
+aufhält.
+
+Genau das tat er dann auch: der Host war zum Aufrufzeitpunkt noch nicht im
+DOM, die Funktion stieg still aus, und **nichts deutete darauf hin**.
+
+Gefunden wurde es, indem die Funktion aus dem ausgelieferten Bundle
+geschnitten und isoliert gefahren wurde — dort erzeugte sie sofort 16
+Zeilen. **Damit war bewiesen, dass nicht die Funktion das Problem war,
+sondern ihr Aufrufzeitpunkt.** Ohne diesen Test wäre die Suche in der
+Funktion weitergegangen.
+
+**Die Regel:** ein leeres `catch` ist an einer Stelle richtig, die
+**scheitern darf** — nicht an einer, die scheitern **könnte**. Wo ein
+Aufruf von der DOM-Reihenfolge abhängt, gehört ein zweiter Anlauf dazu
+(`setTimeout(…, 0)`), nicht ein stilles Achselzucken. Und beim Suchen:
+erst beweisen, ob die Funktion funktioniert, dann fragen, wann sie läuft.
+
+## Zwei Wege, zwei Style-Blöcke
+
+Der Sprechlauf hat zwei Oberflächen — frei erzählen und geführt fragen.
+Beide leben in derselben Datei, aber ihr CSS nicht: `vi-style` wird bei
+jedem Öffnen gesetzt, `vi-rf-stil` **nur für den geführten Dialog**.
+
+Eine Regel für das freie Fenster, geschrieben in den Block des geführten,
+existiert im freien Fenster nicht. Gemessen: `grid-template-columns: none`
+statt zweier Spalten, 718 px breit statt 320, Höhe 0.
+
+**Die Regel:** bevor eine CSS-Regel geschrieben wird, wird geprüft, **in
+welchem Block sie landet und wann dieser Block injiziert wird**. Ein
+`document.getElementById('<style-id>')` im laufenden Fenster beantwortet
+das in einer Sekunde. Dieselbe Sorte wie der falsche Anker (`.ppg` statt
+`#pricing-modal`) und wie `#app` — plausibel aussehender Code an einem Ort,
+den der Zweig nie erreicht.
+
+Dazu gehört die Farbfrage: die beiden Fenster stehen auf verschiedenem
+Grund (`--vi-surface` dunkel gegen den hellen Dialog). Wer Regeln von einem
+in den anderen Block verschiebt, verschiebt sie in eine andere Umgebung.

@@ -11870,6 +11870,126 @@ nachgemessen — dafür braucht es eine vollständige Etappe 2. Und Marcels
 „Ich höre nichts" habe ich als Layout-Punkt gelesen (alles kleiner, Feld
 größer); falls er damit das Mikrofon meinte, steht das noch offen.
 
+## Rollout-Journal · 11.09.2026, fünfter Teil — `v1300` bis `v1300c`
+
+Marcels Rückmeldung zum Sprechlauf-Layout. Fünf Punkte.
+
+### Der Verlauf scrollte „manchmal" nicht ans Ende (`v1300`)
+
+*„das Feld, wo jetzt die Ausgaben drinne stehen, das muss immer ganz nach
+unten gescrollt werden. Das ist mir aufgefallen, dass das manchmal nicht so
+ist."*
+
+**„Manchmal" war der Hinweis auf die Ursache.** `chat.scrollTop =
+chat.scrollHeight` direkt nach `appendChild` misst die Höhe in **dem**
+Moment — und in dem Moment stimmt sie oft noch nicht:
+
+- die Einblend-Animation startet mit `translateY(7px)`,
+- Schriften laden nach und brechen Zeilen um,
+- eine Score-Karte wächst, während ihre Balken ausfahren,
+- `<details>` und Bilder ändern die Höhe nach dem Einhängen.
+
+Jetzt fährt `_rfAnsEnde()` **dreimal** ans Ende: sofort, im nächsten Bild
+(nach dem Layout) und nach 260 ms — da ist auch die Karten-Animation durch.
+Billiger als ein `ResizeObserver` und deckt alle vier Fälle ab.
+
+**Wer selbst hochgescrollt hat, wird nicht zurückgerissen.** Liest jemand
+im Verlauf nach oben, während eine Antwort eintrifft, bleibt er dort; nur
+eine neue Blase, die er selbst ausgelöst hat, erzwingt den Sprung.
+
+### Der Balken war zu hoch (`v1300`)
+
+*„der Balken für Marktindikation, erweiterte Marktindikation und Lage
+recherchieren ist recht breit. Vielleicht können wir das ein bisschen
+flacher machen."*
+
+In `_rfDranZeichnen` stand `akt.map(...)` über den Erklärtexten — **für
+jede Aktion ein eigener Absatz**. Bei drei Angeboten also drei Textblöcke
+untereinander, dauerhaft sichtbar, zusammen über 70 px. Sie erklären
+etwas, das man einmal liest.
+
+Jetzt **eine** Zeile, die dem Zeiger folgt (`mouseenter` **und** `focus`,
+damit sie nicht nur mit Maus erreichbar ist), auf zwei Zeilen gedeckelt.
+Der volle Text steht im `title` des Knopfes. Knopfreihe und Beschriftung
+(„Ich kann das für dich holen") liegen in derselben Zeile statt
+untereinander.
+
+Gemessen: `vi-rf-dran` bei drei Angeboten **107 px** statt vorher rund 180.
+
+### Flacher unten, größer oben (`v1300`)
+
+*„genauso wie da drunter ‚Ich höre weiter zu‘ und allem und auch, ja, wenn
+man tippen möchte … dass das Visualisierungsfenster, wo der Co-Pilot
+antwortet, dass das größer ist. Oder wir machen das Modal noch ein bisschen
+größer."*
+
+Beides. Mikrofon-Streifen 53 → 49, Tippzeile 43 → 36, Nebenknöpfe 33 → 28.
+**Die Klickflächen bleiben über 36 px** — flacher wäre auf dem Handy nicht
+mehr sicher zu treffen. Das Modal im geführten Dialog von 94 auf **97 vh**
+und von 1240 auf **1360 px** Breite.
+
+Gemessen: Modal **929 → 958 px**.
+
+### „Was schon steht" auch beim freien Erzählen (`v1300b`/`v1300c`)
+
+*„das können wir ja natürlich auch für den normalen Sprachabruf machen.
+Also wenn ich frei erzähle, dass wir dort dann auch einmal, was schon
+steht, dass wir das dort halt auch einmal auflisten."*
+
+Der geführte Weg hat die Spalte seit `v1290`. Der freie hatte nur die Chips
+im Orbit — sie zeigen, was **gerade** erkannt wurde, nicht, was insgesamt
+steht und was fehlt. **Wer vier Minuten frei spricht, wusste am Ende nicht,
+ob er das Baujahr genannt hat.**
+
+Das freie Fenster ist jetzt geteilt: links Mikrofon und Orbit, rechts
+dieselbe Spalte, nach Etappen gegliedert. Sie steht **von Anfang an** da,
+gefüllt aus dem Formular, und wächst mit jeder Auswertung
+(`markChipsFinal` schreibt die erkannten Werte nach `_viFrei`).
+
+**Eigene Funktion statt Aufruf von `_rfStandZeichnen`:** die hängt an `_rf`
+— Blockreihenfolge, aktueller Index, übersprungene Fragen. Nichts davon
+gibt es beim freien Erzählen. Geteilt werden Darstellung und Gliederung,
+nicht die Quelle.
+
+Unter 900 px wandert die Liste **nach unten**, nicht nach oben: beim freien
+Erzählen ist das Mikrofon das Hauptelement — anders als im geführten Weg,
+wo die Liste nach oben rutscht.
+
+### Zwei Fehler beim Bauen, beide gemessen (`v1300c`)
+
+**Die Regeln standen im falschen Style-Block.** Ich hatte
+`.vi-frei-buehne` nach `_rfStil()` geschrieben — und **das Style-Tag
+`vi-rf-stil` existiert im freien Weg gar nicht**, es wird nur für den
+geführten Dialog eingehängt. Gemessen: `grid-template-columns: none`,
+Spaltenbreite 718 px statt 320, Höhe 0.
+
+Dieselbe Sorte wie der falsche Anker in `v1296b`: **eine Regel am Ort, den
+der Code nie erreicht.** Sie gehören nach `vi-style` — der Block wird bei
+jedem Öffnen gesetzt, für beide Wege. Dazu eine eigene Farbfassung: der
+freie Weg läuft auf `--vi-surface` (dunkel), nicht auf dem hellen Grund des
+Dialogs.
+
+**Der Zeichenaufruf lief ins Leere.** `vi-frei-stand` ist zum Zeitpunkt des
+Aufrufs je nach Startweg noch nicht im DOM — und das `try/catch` darum
+verschluckte es lautlos. Jetzt zweimal: sofort und im nächsten Bild.
+
+**Die Funktion selbst war nie das Problem.** Isoliert aus dem
+ausgelieferten Bundle gefahren, erzeugte sie von Anfang an 16 Zeilen in 5
+Gruppen. Ohne diesen Test hätte ich in der Funktion gesucht.
+
+**Nachgemessen im laufenden Fenster:** Grid `375 px | 320 px`, Spalte 320 ×
+512 px, 16 Zeilen, 5 Gruppen, Kopf „Was schon steht 0 / 16", und die Werte
+aus dem Formular stehen drin (ETW, Finanzierung 3,5 · 1 · 10, Nebenkosten
+2,2 · 0,5 · 6,5).
+
+**Commits** `f757dee` (v1300), `aeffda1` (v1300b), `9fca4b8` (v1300c).
+Gold-Audit RC=0. Auf Staging, **nicht auf Prod**.
+
+**Rest:** Marcel hat ein Bild angekündigt („unter Sprechlauf neu ein Bild
+eingefügt"), das nicht im Repo angekommen ist — das neueste bleibt
+`sprechlauf3.png` vom 10.09. Gearbeitet wurde nach seiner Beschreibung und
+eigenen Messungen.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

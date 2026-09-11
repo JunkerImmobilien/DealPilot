@@ -38,7 +38,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
 
-**Stand:** `v1273`–`v1299b` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
+**Stand:** `v1273`–`v1300c` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
 — nichts davon ist live.
 
 > **Nach Marcels erstem echten Sprechlauf am 10.09. abends** (Bilder
@@ -130,7 +130,7 @@ die Kosten einer Aufnahme um rund 40 % — bei 4 Minuten von ≈ 1,7 auf ≈ 0,9
 
 ### 4 · Der Sprechlauf gehört auf Produktion
 
-**`v1273`–`v1299b` liegen auf Staging.** Prod steht auf
+**`v1273`–`v1300c` liegen auf Staging.** Prod steht auf
 `a21fe9c` — der Co-Pilot, die Etappen, beide Scores, BORIS-Abruf und
 Marktpreisindikation im Hintergrund sind für keinen Kunden erreichbar.
 
@@ -215,6 +215,23 @@ abgelehnt worden. Marcel kann die Abfrage selbst fahren oder den Zugriff
 freigeben.
 
 ---
+
+## → Erledigt am 11.09.2026, fünfter Teil (`v1300`–`v1300c`)
+
+| Marcels Punkt | Stand |
+|---|---|
+| Verlauf scrollt „manchmal" nicht ans Ende | **fertig** — dreimal ans Ende (sofort, nächstes Bild, nach 260 ms); wer selbst hochgescrollt hat, bleibt oben |
+| Balken mit den Abruf-Knöpfen zu hoch | **fertig** — statt einem Erklärabsatz je Aktion EINE Zeile, die dem Zeiger folgt; `vi-rf-dran` 107 px statt ~180 |
+| Mikrofon- und Tippzeile flacher | **fertig** — 53→49, 43→36, 33→28; Klickflächen bleiben über 36 px |
+| Modal größer | **fertig** — 94→97 vh, 1240→1360 px; Modal 929→958 px |
+| „Was schon steht" auch beim freien Erzählen | **fertig** — geteilte Ansicht, Spalte 320×512 px, 16 Zeilen in 5 Etappen, gefüllt aus Formular und Auswertung |
+
+**Commits** `f757dee`, `aeffda1`, `9fca4b8`. Gold-Audit RC=0.
+
+**Hinweis:** Marcel hat ein neues Bild angekündigt, das nicht im Repo
+angekommen ist — das neueste bleibt `design/mockups/sprechlauf3.png` vom
+10.09. Gearbeitet wurde nach seiner Beschreibung und eigenen Messungen im
+laufenden Dialog.
 
 ## → Erledigt am 11.09.2026, vierter Teil (`v1297`–`v1299b`)
 
