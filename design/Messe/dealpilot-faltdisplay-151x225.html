@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>DealPilot · Faltdisplay Cologne 151 × 225 · Konfigurator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Cormorant+Garamond:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gold:#C9A84C; --gold-l:#E8CC7A; --gold-d:#b8932f;
+    --cream:#FDFCFA; --obsidian:#050505;
+    --gruen:#3FA56C; --rot:#D8564C;
+    --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+
+    /* ─────────────────────────────────────────────────────────────
+       Faltdisplay Cologne PREMIUM gerade · 2 x 3 Felder
+       Gemessen auf der Produktseite am 11.09.2026:
+         Gestell  B 151 x H 225 x T 35 cm
+         Druck    B 151 x H 225 x T 33 cm
+         Textil   Stretch 210 g/m2, Sublimation, Klettband, B1
+
+       ACHTUNG - ZUGABE UND SICHERHEIT SIND VORBELEGT, NICHT BELEGT.
+       Die produktgenaue Druckvorlage gibt der Hersteller erst nach
+       Bestellung heraus; das oeffentliche Datenblatt nennt nur
+       allgemeine Werte (Grossformat 100-150 dpi, CMYK, PDF/X).
+       Sobald die echte Vorlage da ist: die zwei Regler oben rechts
+       auf die Herstellerwerte stellen - alles andere rechnet mit.
+       Bei Stretch-Textil auf Klettband ist Zugabe = Umschlag um den
+       Rahmen; 20 mm je Seite ist der uebliche Anhalt.
+    ───────────────────────────────────────────────────────────── */
+    --end-w:1510mm;  /* sichtbares Endformat Breite  */
+    --end-h:2250mm;  /* sichtbares Endformat Hoehe   */
+    --bleed:20mm;    /* Zugabe je Seite (Regler)     */
+    --safe:60mm;     /* Sicherheitsabstand (Regler)  */
+    --sicht:1000mm;  /* Sichtlinie ueber Boden       */
+
+    --scrim:.62; --tx:0%; --ty:0%; --z:1;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html,body{background:#141414;font-family:Inter,system-ui,sans-serif;color:var(--cream)}
+
+  /* ══ Buehne ══════════════════════════════════════════════ */
+  .stagewrap{margin:20px auto;position:relative}
+  .sheet{width:calc(var(--end-w) + 2*var(--bleed));
+         height:calc(var(--end-h) + 2*var(--bleed));
+         position:relative;overflow:hidden;background:var(--obsidian);
+         color:var(--cream);transform-origin:top left;cursor:grab}
+  .bg{position:absolute;inset:0;background-size:cover;background-position:center;
+      background-repeat:no-repeat;transform:translate(var(--tx),var(--ty)) scale(var(--z));
+      transform-origin:center center}
+  .scrim{position:absolute;inset:0;opacity:var(--scrim);background:
+    linear-gradient(180deg,rgba(5,5,5,.95) 0%,rgba(5,5,5,.74) 22%,rgba(5,5,5,.34) 44%,rgba(5,5,5,.82) 70%,rgba(5,5,5,.98) 100%),
+    radial-gradient(120% 76% at 50% 40%,rgba(5,5,5,0) 28%,rgba(5,5,5,.88) 100%)}
+
+  /* Hilfslinien - nur am Bildschirm */
+  .cutline{position:absolute;inset:var(--bleed);border:1mm dashed rgba(255,255,255,.55);
+           pointer-events:none;display:none;z-index:40}
+  .safeline{position:absolute;inset:calc(var(--bleed) + var(--safe));
+            border:1mm dashed rgba(216,86,76,.9);pointer-events:none;display:none;z-index:40}
+  body.guides .cutline,body.guides .safeline{display:block}
+
+  /* Sichtlinie: was auf einer Messe verdeckt ist */
+  .sichtzone{position:absolute;left:0;right:0;bottom:0;height:calc(var(--sicht) + var(--bleed));
+             display:none;z-index:39;pointer-events:none;
+             background:repeating-linear-gradient(135deg,rgba(216,86,76,.13) 0 30mm,rgba(216,86,76,0) 30mm 60mm);
+             border-top:2mm solid rgba(216,86,76,.75)}
+  .sichtzone b{position:absolute;top:12mm;left:24mm;font-family:'JetBrains Mono',monospace;
+               font-weight:700;font-size:26mm;letter-spacing:.16em;color:rgba(216,86,76,.95);
+               text-transform:uppercase}
+  body.sicht .sichtzone{display:block}
+
+  /* Die verdeckte Zone bleibt nicht leer, sie traegt Flaeche: ein sehr
+     stilles Wortzeichen und der Runway am Fuss. Wer davorsteht, sieht
+     nichts davon - wer von der Seite kommt, sieht Marke statt Loch. */
+  .grund{position:absolute;left:var(--bleed);right:var(--bleed);bottom:var(--bleed);
+         height:calc(var(--sicht));z-index:5;overflow:hidden;display:none;
+         align-items:center;justify-content:center;pointer-events:none}
+  body.oberhalb .grund{display:flex}
+  .grund .wm{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:230mm;
+             letter-spacing:-.04em;color:rgba(201,168,76,.055);white-space:nowrap}
+  .grund .rw{position:absolute;left:0;right:0;bottom:0;height:26mm;background:var(--runway);opacity:.9}
+
+  .canvas{position:absolute;inset:0;padding:calc(var(--bleed) + var(--safe));
+          display:flex;flex-direction:column;z-index:10}
+
+  /* ── DIE WICHTIGSTE REGEL DIESES FORMATS ──────────────────────────
+     Gemessen am eigenen Entwurf: ohne diese Zwangsjacke lagen fuenf von
+     neun Kettengliedern unter der Sichtlinie - darunter ausgerechnet
+     Bankexport und Anlage V. Ein Faltdisplay ist 225 cm hoch, aber nur
+     die oberen ~125 cm sind auf einer Messe wirklich zu sehen.
+     Mit dieser Klasse endet der gesamte Inhalt oberhalb der Sichtlinie;
+     darunter bleibt nur Flaeche. Der QR sitzt dann direkt darueber -
+     genau auf Greifhoehe. Standard: AN. */
+  body.oberhalb .canvas{padding-bottom:calc(var(--bleed) + var(--sicht) + 18mm)}
+
+  /* verschiebbare Bloecke */
+  .head,.stage,.foot{transform:translate(var(--mvx,0),var(--mvy,0))}
+  body.movable .head,body.movable .stage,body.movable .foot{
+    outline:2mm dashed rgba(201,168,76,.45);cursor:move}
+
+  /* ══ Kopf ════════════════════════════════════════════════ */
+  .head{display:flex;align-items:flex-start;justify-content:space-between;gap:40mm;flex:0 0 auto}
+  .logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:78mm;
+        line-height:.98;letter-spacing:-.025em}
+  .logo i{font-style:normal;color:var(--gold)}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:19mm;
+           letter-spacing:.28em;text-transform:uppercase;color:var(--gold);
+           text-align:right;padding-top:10mm;line-height:1.5}
+  .eyebrow span{color:rgba(253,252,250,.5)}
+
+  .stage{flex:1 1 auto;display:flex;flex-direction:column;min-height:0;padding-top:56mm}
+
+  /* ══ Fuss ════════════════════════════════════════════════ */
+  .foot{flex:0 0 auto;display:flex;align-items:flex-end;justify-content:space-between;
+        gap:40mm;padding-top:44mm;border-top:3mm solid rgba(201,168,76,.34)}
+  .foot .claim{font-family:'Cormorant Garamond',serif;font-style:italic;
+               font-size:36mm;line-height:1.3;color:rgba(253,252,250,.82);max-width:900mm}
+  .qrbox{display:flex;align-items:center;gap:22mm;flex:0 0 auto}
+  .qr{width:190mm;height:190mm;border-radius:10mm;background-color:#2a2418;
+      background-image:
+        repeating-linear-gradient(0deg,var(--cream) 0 11mm,transparent 11mm 22mm),
+        repeating-linear-gradient(90deg,var(--cream) 0 11mm,transparent 11mm 22mm)}
+  .qrtx strong{display:block;font-family:'Space Grotesk',sans-serif;font-size:34mm;
+               line-height:1.12;color:var(--cream)}
+  .qrtx em{display:block;font-style:normal;font-family:'JetBrains Mono',monospace;
+           font-size:20mm;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-top:8mm}
+  .url{font-family:'JetBrains Mono',monospace;font-size:26mm;letter-spacing:.1em;
+       color:rgba(253,252,250,.62);margin-top:10mm}
+  .url b{color:var(--gold-l);font-weight:700}
+
+  /* ══════════════════════════════════════════════════════════
+     LAYOUT 1 · KETTE - die neun Stationen des Deals
+     Nutzt die Hoehe, die das Hochformat vorgibt.
+     ══════════════════════════════════════════════════════════ */
+  .l-kette{display:none;flex:1 1 auto;flex-direction:column}
+  body.lay-kette .l-kette{display:flex}
+  .kt-hl{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:82mm;
+         line-height:1.05;letter-spacing:-.025em;margin-bottom:14mm}
+  .kt-hl em{font-style:normal;color:var(--gold)}
+  .kt-sub{font-size:30mm;line-height:1.35;color:rgba(253,252,250,.78);
+          max-width:1150mm;margin-bottom:40mm}
+  .kt-list{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-between;
+           position:relative;padding-left:66mm}
+  .kt-list::before{content:"";position:absolute;left:20mm;top:12mm;bottom:12mm;width:3mm;
+                   background:linear-gradient(180deg,var(--gold-l),var(--gold) 55%,rgba(184,147,47,.25))}
+  .kt{position:relative;display:flex;align-items:baseline;gap:20mm}
+  .kt::before{content:"";position:absolute;left:-53mm;top:12mm;width:18mm;height:18mm;
+              border-radius:50%;background:var(--gold);box-shadow:0 0 0 6mm rgba(5,5,5,.9)}
+  .kt.stark::before{background:var(--gold-l);width:26mm;height:26mm;left:-57mm;top:9mm}
+  .kt-n{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:19mm;
+        color:rgba(201,168,76,.75);letter-spacing:.1em;flex:0 0 52mm}
+  .kt-t{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:46mm;
+        line-height:1.12;flex:0 0 auto}
+  .kt.stark .kt-t{color:var(--gold-l);font-size:50mm}
+  .kt-d{font-size:26mm;line-height:1.28;color:rgba(253,252,250,.64)}
+
+  /* ══════════════════════════════════════════════════════════
+     LAYOUT 2 · ZAHLEN - was drinsteckt, ohne Fliesstext
+     ══════════════════════════════════════════════════════════ */
+  .l-zahlen{display:none;flex:1 1 auto;flex-direction:column}
+  body.lay-zahlen .l-zahlen{display:flex}
+  .zh-hl{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:76mm;
+         line-height:1.06;letter-spacing:-.025em;margin-bottom:46mm}
+  .zh-hl em{font-style:normal;color:var(--gold)}
+  .zh-grid{flex:1 1 auto;display:grid;grid-template-columns:1fr 1fr;
+           gap:34mm 46mm;align-content:space-between}
+  .zh{border-left:4mm solid rgba(201,168,76,.55);padding-left:26mm}
+  .zh .n{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:104mm;
+         line-height:.94;color:var(--gold-l);letter-spacing:-.03em;
+         font-variant-numeric:tabular-nums}
+  .zh .n small{font-size:44mm;color:rgba(253,252,250,.7);letter-spacing:0}
+  .zh .t{font-family:'JetBrains Mono',monospace;font-size:20mm;letter-spacing:.16em;
+         text-transform:uppercase;color:var(--gold);margin-top:12mm}
+  .zh .d{font-size:23mm;line-height:1.3;color:rgba(253,252,250,.66);margin-top:8mm}
+
+  /* ══════════════════════════════════════════════════════════
+     LAYOUT 3 · DEMO - Einladung an den Stand, Bild traegt
+     ══════════════════════════════════════════════════════════ */
+  .l-demo{display:none;flex:1 1 auto;flex-direction:column}
+  body.lay-demo .l-demo{display:flex}
+  .dm-hl{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:104mm;
+         line-height:1.02;letter-spacing:-.03em}
+  .dm-hl em{font-style:normal;color:var(--gold)}
+  .dm-rule{width:420mm;height:5mm;background:var(--runway);border-radius:3mm;margin:34mm 0 28mm}
+  .dm-sub{font-size:34mm;line-height:1.34;color:rgba(253,252,250,.84);max-width:1150mm}
+  .dm-sub b{color:var(--gold-l);font-weight:600}
+  /* min-height gemessen zurueckgenommen: bei 520 mm lief das Layout mit
+     aktiver Sichtlinie um sechs Elemente unter die verdeckte Zone. */
+  .dm-shot{flex:1 1 auto;margin-top:34mm;border:3mm solid rgba(201,168,76,.42);
+           border-radius:18mm;background:rgba(5,5,5,.55);position:relative;overflow:hidden;
+           display:flex;align-items:center;justify-content:center;min-height:180mm}
+  .dm-shot img{width:100%;height:100%;object-fit:cover;object-position:top center;display:none}
+  body.hasshot .dm-shot img{display:block}
+  .dm-shot .ph{font-family:'JetBrains Mono',monospace;font-size:24mm;letter-spacing:.22em;
+               color:rgba(201,168,76,.6);text-transform:uppercase;text-align:center;padding:40mm;line-height:1.7}
+  body.hasshot .dm-shot .ph{display:none}
+  .dm-steps{display:flex;gap:30mm;margin-top:34mm;flex:0 0 auto}
+  .dm-st{flex:1 1 0;background:rgba(5,5,5,.62);border:2mm solid rgba(201,168,76,.3);
+         border-radius:14mm;padding:24mm 22mm}
+  .dm-st .s{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:18mm;
+            color:var(--gold);letter-spacing:.18em}
+  .dm-st .x{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:27mm;
+            margin-top:9mm;line-height:1.18}
+
+  /* ══════════════════════════════════════════════════════════
+     LAYOUT 4 · EHRLICH - was DealPilot nicht tut
+     ══════════════════════════════════════════════════════════ */
+  .l-ehrlich{display:none;flex:1 1 auto;flex-direction:column}
+  body.lay-ehrlich .l-ehrlich{display:flex}
+  .eh-kick{font-family:'JetBrains Mono',monospace;font-size:21mm;letter-spacing:.26em;
+           text-transform:uppercase;color:var(--gold);margin-bottom:24mm}
+  .eh-hl{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:94mm;
+         line-height:1.04;letter-spacing:-.028em;margin-bottom:36mm}
+  .eh-hl em{font-style:normal;color:var(--gold)}
+  .eh-quote{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:40mm;
+            line-height:1.36;color:var(--gold-l);border-left:5mm solid var(--gold);
+            padding-left:32mm;margin-bottom:44mm;max-width:1200mm}
+  .eh-list{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-around;gap:16mm}
+  .eh-row{display:flex;align-items:baseline;gap:22mm;
+          border-bottom:1.5mm solid rgba(201,168,76,.22);padding-bottom:18mm}
+  .eh-row:last-child{border-bottom:none}
+  .eh-a{flex:1 1 0;font-size:28mm;line-height:1.24;color:rgba(253,252,250,.72)}
+  .eh-p{font-family:'JetBrains Mono',monospace;font-size:30mm;color:var(--gold);flex:0 0 auto}
+  .eh-b{flex:1 1 0;font-family:'Space Grotesk',sans-serif;font-weight:700;
+        font-size:29mm;line-height:1.2;color:var(--cream)}
+
+  /* ══════════════════════════════════════════════════════════
+     LAYOUT 5 · ANGEBOT - der Abschluss-Aufsteller
+     ══════════════════════════════════════════════════════════ */
+  .l-angebot{display:none;flex:1 1 auto;flex-direction:column}
+  body.lay-angebot .l-angebot{display:flex}
+  .ag-hl{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:100mm;
+         line-height:1.03;letter-spacing:-.03em}
+  .ag-hl em{font-style:normal;color:var(--gold)}
+  .ag-sub{font-size:32mm;line-height:1.34;color:rgba(253,252,250,.8);
+          max-width:1150mm;margin-top:28mm}
+  .ag-preise{display:flex;gap:26mm;margin-top:52mm;flex:0 0 auto}
+  .ag-p{flex:1 1 0;background:rgba(5,5,5,.6);border:2mm solid rgba(201,168,76,.3);
+        border-radius:16mm;padding:30mm 24mm;text-align:center}
+  .ag-p.hero{border-color:var(--gold);background:rgba(201,168,76,.1)}
+  .ag-p .nm{font-family:'JetBrains Mono',monospace;font-size:19mm;letter-spacing:.2em;
+            text-transform:uppercase;color:var(--gold)}
+  .ag-p .pr{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:62mm;
+            margin-top:14mm;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .ag-p.hero .pr{color:var(--gold-l)}
+  .ag-p .mo{font-size:21mm;color:rgba(253,252,250,.6);margin-top:6mm}
+  .ag-erst{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;
+           margin-top:48mm;border:4mm solid var(--gold);border-radius:20mm;
+           padding:46mm 40mm;background:rgba(5,5,5,.68)}
+  .ag-erst .lb{font-family:'JetBrains Mono',monospace;font-size:22mm;letter-spacing:.26em;
+               text-transform:uppercase;color:var(--gold)}
+  .ag-erst .bg2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:74mm;
+                line-height:1.08;margin-top:18mm;letter-spacing:-.025em}
+  .ag-erst .bg2 em{font-style:normal;color:var(--gold-l)}
+  .ag-erst .kl{font-size:26mm;line-height:1.34;color:rgba(253,252,250,.7);margin-top:20mm}
+
+  /* ══ Bearbeiten ══════════════════════════════════════════ */
+  body.edit [data-tx]{outline:1mm dashed rgba(201,168,76,.5);cursor:text}
+  body.edit [data-tx]:focus{outline:2.5mm solid var(--gold-l);background:rgba(201,168,76,.1)}
+
+  /* ══ Bedienpanel ═════════════════════════════════════════ */
+  .ui{position:fixed;top:0;right:0;width:318px;height:100vh;overflow-y:auto;z-index:100;
+      background:#101010;border-left:1px solid #262626;padding:16px 16px 40px;
+      font-size:12.5px;line-height:1.45}
+  .ui h4{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.16em;
+         text-transform:uppercase;color:var(--gold);margin:18px 0 7px;font-weight:700}
+  .ui h4:first-child{margin-top:0}
+  .ui .row{display:flex;flex-wrap:wrap;gap:5px}
+  .ui button{flex:1 1 auto;background:#1b1b1b;color:#d8d3c6;border:1px solid #333;
+             border-radius:7px;padding:7px 9px;cursor:pointer;font:inherit;font-size:12px}
+  .ui button:hover{border-color:var(--gold-d);color:var(--cream)}
+  .ui button.on{background:var(--gold);color:#14100a;border-color:var(--gold);font-weight:600}
+  .ui label{display:block;color:#8e887a;margin:9px 0 3px;font-size:11.5px}
+  .ui label b{color:var(--gold-l);font-family:'JetBrains Mono',monospace;float:right}
+  .ui input[type=range]{width:100%;accent-color:var(--gold)}
+  .ui input[type=text]{width:100%;background:#1b1b1b;border:1px solid #333;border-radius:7px;
+                       color:#d8d3c6;padding:7px 9px;font:inherit;font-size:12px}
+  .hint{color:#7d776a;font-size:11.5px;line-height:1.5;margin-top:7px}
+  .warn{background:rgba(216,86,76,.12);border:1px solid rgba(216,86,76,.45);
+        border-radius:8px;padding:10px 11px;color:#e8b0aa;font-size:11.5px;line-height:1.5;margin-top:9px}
+  .warn b{color:#ffd5d0}
+  .go{width:100%;margin-top:18px;background:var(--runway);color:#14100a;font-weight:700;
+      border:none;border-radius:9px;padding:12px;cursor:pointer;font-size:13px}
+
+  /* Wächter: sagt, was nicht stimmt — und was er geprüft hat */
+  .pruef{font-size:11.5px;line-height:1.55}
+  .pruef .z{display:flex;gap:7px;align-items:flex-start;padding:5px 0;
+            border-bottom:1px solid #1e1e1e}
+  .pruef .z:last-child{border-bottom:none}
+  .pruef .ic{flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-weight:700}
+  .pruef .ok .ic{color:var(--gruen)} .pruef .bad .ic{color:var(--rot)}
+  .pruef .ok{color:#8e887a} .pruef .bad{color:#e8b0aa}
+  .pruef .bad b{color:#ffd5d0}
+
+  /* ══ Stellprobe ══════════════════════════════════════════ */
+  .probe{position:fixed;left:0;bottom:0;width:calc(100% - 318px);background:#0c0c0c;
+         border-top:1px solid #262626;padding:14px 18px;display:none;z-index:90;
+         align-items:flex-end;gap:26px}
+  body.probe-on .probe{display:flex}
+  .probe .gr{display:flex;align-items:flex-end;gap:9px}
+  .pdisp{width:80px;height:119px;background:var(--obsidian);border:1px solid #333;
+         border-radius:2px;position:relative;overflow:hidden;flex:0 0 auto}
+  .pdisp .pt{position:absolute;left:5px;right:5px;top:7px;font-family:'Space Grotesk',sans-serif;
+             font-size:7px;line-height:1.15;font-weight:700;color:var(--cream)}
+  .pdisp .pt i{font-style:normal;color:var(--gold)}
+  .pdisp .pr2{position:absolute;left:5px;right:22px;top:34px;height:1.5px;background:var(--runway)}
+  .pdisp .pb{position:absolute;left:5px;right:5px;top:42px;font-size:5.2px;line-height:1.3;
+             color:rgba(253,252,250,.55)}
+  .pdisp .verdeckt{position:absolute;left:0;right:0;bottom:0;height:53%;
+                   background:repeating-linear-gradient(135deg,rgba(216,86,76,.22) 0 4px,transparent 4px 8px);
+                   border-top:1px solid rgba(216,86,76,.6)}
+  .pmensch{width:26px;height:95px;flex:0 0 auto;position:relative}
+  .pmensch::before{content:"";position:absolute;left:50%;transform:translateX(-50%);top:0;
+                   width:17px;height:17px;border-radius:50%;background:#3a3a3a}
+  .pmensch::after{content:"";position:absolute;left:50%;transform:translateX(-50%);top:19px;
+                  width:26px;height:76px;border-radius:11px 11px 0 0;background:#3a3a3a}
+  .probe .lg{color:#8e887a;font-size:11.5px;line-height:1.6;max-width:430px}
+  .probe .lg b{color:var(--gold-l)}
+  .probe .lg .rt{color:#e8b0aa}
+
+  /* ══ Druck ═══════════════════════════════════════════════ */
+  @page{size:1550mm 2290mm;margin:0}
+  @media print{
+    .ui,.probe{display:none!important}
+    body{background:#fff}
+    .stagewrap{margin:0!important;width:auto!important;height:auto!important}
+    .sheet{transform:none!important}
+    .cutline,.safeline,.sichtzone{display:none!important}
+    body.movable .head,body.movable .stage,body.movable .foot{outline:none!important}
+    body.edit [data-tx]{outline:none!important;background:none!important}
+  }
+</style>
+</head>
+<body class="lay-kette">
+
+<!-- ══════════ BEDIENUNG ══════════ -->
+<div class="ui">
+  <h4>Layout-Idee · Display 2</h4>
+  <div class="row" id="lays">
+    <button data-l="kette" class="on">1 · Kette</button>
+    <button data-l="zahlen">2 · Zahlen</button>
+    <button data-l="demo">3 · Demo</button>
+    <button data-l="ehrlich">4 · Ehrlich</button>
+    <button data-l="angebot">5 · Angebot</button>
+  </div>
+  <div class="hint" id="layhint"></div>
+
+  <h4>Motiv (Hintergrundbild)</h4>
+  <label>Bild-URL einfügen</label>
+  <input type="text" id="bgurl" placeholder="https://… oder leer = nur Obsidian">
+  <div class="row" style="margin-top:6px">
+    <button id="bgclr">Ohne Bild</button>
+    <button id="shoturl">Screenshot in Layout 3</button>
+  </div>
+
+  <h4>Motiv verschieben <span style="float:right;color:#5e5a50;font-weight:400;letter-spacing:0">im Bild ziehen</span></h4>
+  <label>links / rechts <b id="vx">0</b></label>
+  <input type="range" id="px" min="-90" max="90" value="0" step="0.5">
+  <label>hoch / runter <b id="vy">0</b></label>
+  <input type="range" id="py" min="-90" max="90" value="0" step="0.5">
+  <label>Zoom (Mausrad im Bild) <b id="vz">100 %</b></label>
+  <input type="range" id="pz" min="30" max="300" value="100" step="1">
+  <button id="reset" style="width:100%;margin-top:7px">Bildlage zurücksetzen</button>
+
+  <h4>Abdunklung</h4>
+  <input type="range" id="dark" min="0" max="100" value="62">
+
+  <h4>Druckmaße · Herstellerwerte eintragen</h4>
+  <label>Zugabe je Seite <b id="vb">20 mm</b></label>
+  <input type="range" id="bl" min="0" max="60" value="20" step="1">
+  <label>Sicherheitsabstand <b id="vs">60 mm</b></label>
+  <input type="range" id="sf" min="20" max="180" value="60" step="5">
+  <div class="warn">
+    <b>Vorbelegt, nicht belegt.</b> Der Hersteller gibt die produktgenaue
+    Vorlage erst nach Bestellung heraus. Öffentlich stehen nur allgemeine
+    Werte (Großformat 100–150 dpi, CMYK, PDF/X). <b>Sobald die echte
+    Vorlage da ist: diese zwei Regler darauf stellen</b> — Seitenformat und
+    Sicherheitsbereich rechnen automatisch mit.
+  </div>
+
+  <h4>Was auf der Messe verdeckt ist</h4>
+  <label>Sichtlinie über Boden <b id="vsi">100 cm</b></label>
+  <input type="range" id="si" min="60" max="150" value="100" step="5">
+  <div class="row" style="margin-top:6px">
+    <button id="obOn" class="on">Inhalt oberhalb halten</button>
+    <button id="siOn">Zone zeigen</button>
+  </div>
+  <div class="row" style="margin-top:5px">
+    <button id="prOn">Stellprobe</button>
+  </div>
+  <div class="hint">Theke, Stühle und Besucher verdecken auf jeder Messe
+    das untere Drittel. <b style="color:#E8CC7A">Alles, was zählt, gehört
+    über diese Linie</b> — der Schalter erzwingt das für alle fünf Layouts.
+    Ausschalten nur, wenn das Display frei steht.</div>
+
+  <h4>Hilfslinien &amp; Bearbeiten</h4>
+  <div class="row">
+    <button id="gOn">Schnitt &amp; Sicherheit</button>
+    <button id="edOn">Texte bearbeiten</button>
+  </div>
+  <div class="row" style="margin-top:5px">
+    <button id="mvOn">Verschieben: aus</button>
+    <button id="mvReset">zurück</button>
+  </div>
+
+  <h4>Prüfung</h4>
+  <div id="pruef" class="pruef"></div>
+
+  <button class="go" onclick="window.print()">Druck-PDF erzeugen</button>
+  <div class="hint" id="printhint"></div>
+</div>
+
+<!-- ══════════ STELLPROBE ══════════ -->
+<div class="probe">
+  <div class="gr">
+    <div class="pdisp">
+      <div class="pt">Andere sagen dir,<br>ob du kaufen sollst.<br><i>Wir sagen dir, was<br>deine Bank sagt.</i></div>
+      <div class="pr2"></div>
+      <div class="pb">Vom ersten Inserat bis zur Anlage V.</div>
+      <div class="verdeckt"></div>
+    </div>
+    <div class="pdisp">
+      <div class="pt" id="probe2">Die ersten drei<br>Minuten kann jeder.<br><i>Wir sind die<br>nächsten drei Monate.</i></div>
+      <div class="pr2"></div>
+      <div class="pb" id="probe2b">Quick-Check → Score → ImmoWertV → Bank → Anlage V</div>
+      <div class="verdeckt"></div>
+    </div>
+    <div class="pmensch"></div>
+  </div>
+  <div class="lg">
+    <b>Stellprobe 1 : 19</b> — zwei Displays à 151 cm nebeneinander ergeben
+    <b>302 cm</b> Wand, daneben ein Mensch mit 1,80 m.<br>
+    <span class="rt">Rot schraffiert = die unteren 100 cm</span>, die auf einer
+    Messe praktisch immer verdeckt sind. Beide Köpfe müssen darüber stehen —
+    und die beiden dürfen <b>nicht dasselbe sagen</b>.
+  </div>
+</div>
+
+<!-- ══════════ BÜHNE ══════════ -->
+<div class="stagewrap" id="wrap">
+<div class="sheet" id="sheet">
+  <div class="bg" id="bg"></div>
+  <div class="scrim"></div>
+  <div class="cutline"></div>
+  <div class="safeline"></div>
+  <div class="grund"><span class="wm">DealPilot</span><span class="rw"></span></div>
+  <div class="sichtzone"><b>verdeckt · Theke &amp; Besucher</b></div>
+
+  <div class="canvas">
+
+    <div class="head">
+      <div class="logo">Deal<i>Pilot</i></div>
+      <div class="eyebrow" data-tx>Immobilien-<br>Investitionsanalyse<br><span>Stand 23</span></div>
+    </div>
+
+    <div class="stage">
+
+      <!-- ─── 1 · KETTE ─── -->
+      <div class="l-kette">
+        <div class="kt-hl" data-tx>Die ersten drei Minuten<br>kann jeder. Wir sind die<br><em>nächsten drei Monate.</em></div>
+        <div class="kt-sub" data-tx>Eine Software, dieselben Daten — vom Inserat
+          bis zur Steuererklärung.</div>
+        <!-- SECHS, nicht neun. Gemessen: mit neun Gliedern klebten die Zeilen
+             aneinander, sobald der Inhalt oberhalb der Sichtlinie bleiben muss.
+             Sechs grosse Stationen tragen aus zehn Metern; die feineren
+             Schritte stehen ohnehin auf dem Tisch und im Gespraech. -->
+        <div class="kt-list">
+          <div class="kt"><span class="kt-n" data-tx>01</span><span class="kt-t" data-tx>Quick-Check</span><span class="kt-d" data-tx>Eckdaten rein, Score raus — 60 Sekunden</span></div>
+          <div class="kt"><span class="kt-n" data-tx>02</span><span class="kt-t" data-tx>Sprechlauf</span><span class="kt-d" data-tx>Erzählen statt tippen, der Co-Pilot fragt nach</span></div>
+          <div class="kt"><span class="kt-n" data-tx>03</span><span class="kt-t" data-tx>Deal Score</span><span class="kt-d" data-tx>24 Kennzahlen, nach deinem Profil gewichtet</span></div>
+          <div class="kt stark"><span class="kt-n" data-tx>04</span><span class="kt-t" data-tx>ImmoWertV</span><span class="kt-d" data-tx>Sachwert · Ertragswert · Vergleichswert</span></div>
+          <div class="kt stark"><span class="kt-n" data-tx>05</span><span class="kt-t" data-tx>Bankexport</span><span class="kt-d" data-tx>DSCR, IRR — und das PDF, das man einreicht</span></div>
+          <div class="kt stark"><span class="kt-n" data-tx>06</span><span class="kt-t" data-tx>Anlage V</span><span class="kt-d" data-tx>BMF-Aufteilung, AfA-Hebel, § 7b</span></div>
+        </div>
+      </div>
+
+      <!-- ─── 2 · ZAHLEN ─── -->
+      <div class="l-zahlen">
+        <div class="zh-hl" data-tx>Was in einer einzigen<br>Wohnung <em>alles steckt.</em></div>
+        <div class="zh-grid">
+          <div class="zh"><div class="n" data-tx>64</div><div class="t" data-tx>Kennzahlen</div>
+            <div class="d" data-tx>aus einem Objekt — DSCR, IRR, Break-Even</div></div>
+          <div class="zh"><div class="n" data-tx>24</div><div class="t" data-tx>Score-Kriterien</div>
+            <div class="d" data-tx>in fünf Kategorien, jede einzeln begründet</div></div>
+          <div class="zh"><div class="n" data-tx>3</div><div class="t" data-tx>Verfahren</div>
+            <div class="d" data-tx>Sachwert, Ertragswert, Vergleichswert nach ImmoWertV</div></div>
+          <div class="zh"><div class="n" data-tx>11<small> / 11</small></div><div class="t" data-tx>Bundesländer</div>
+            <div class="d" data-tx>amtliche Bodenrichtwerte mit Stichtag und Zone</div></div>
+          <div class="zh"><div class="n" data-tx>4<small> Min.</small></div><div class="t" data-tx>Erzählen</div>
+            <div class="d" data-tx>statt 204 Felder zu tippen</div></div>
+          <div class="zh"><div class="n" data-tx>0<small> €</small></div><div class="t" data-tx>zum Ausprobieren</div>
+            <div class="d" data-tx>Vollzugang danach ab 19,99 € im Monat</div></div>
+        </div>
+      </div>
+
+      <!-- ─── 3 · DEMO ─── -->
+      <div class="l-demo">
+        <div class="dm-hl" data-tx>Erzähl mir<br><em>dein Objekt.</em></div>
+        <div class="dm-rule"></div>
+        <div class="dm-sub" data-tx>Vier Minuten reden. Danach stehen <b>Score, Cashflow,
+          Steuer und ein Bank-PDF</b> — und der Co-Pilot fragt nach, was du vergessen hast.</div>
+        <div class="dm-shot">
+          <img id="shotimg" alt="App-Ansicht">
+          <div class="ph">Hier der Screenshot<br>des Sprechlaufs<br>·<br>URL oben einfügen</div>
+        </div>
+        <div class="dm-steps">
+          <div class="dm-st"><div class="s" data-tx>01</div><div class="x" data-tx>Du erzählst</div></div>
+          <div class="dm-st"><div class="s" data-tx>02</div><div class="x" data-tx>Er fragt nach</div></div>
+          <div class="dm-st"><div class="s" data-tx>03</div><div class="x" data-tx>Du hakst ab</div></div>
+        </div>
+      </div>
+
+      <!-- ─── 4 · EHRLICH ─── -->
+      <div class="l-ehrlich">
+        <div class="eh-kick" data-tx>Was DealPilot nicht tut</div>
+        <div class="eh-hl" data-tx>Lieber eine Lücke<br>als eine Zahl, die<br><em>niemand belegen kann.</em></div>
+        <div class="eh-quote" data-tx>„Fehlt eine Pflichtangabe, zeigen wir das
+          Verfahren gar nicht erst.“</div>
+        <div class="eh-list">
+          <div class="eh-row"><span class="eh-a" data-tx>Kein amtlicher Treffer</span>
+            <span class="eh-p">→</span><span class="eh-b" data-tx>kein Nachbarkreis, kein Landesmittel</span></div>
+          <div class="eh-row"><span class="eh-a" data-tx>Der Bezugswert fehlt</span>
+            <span class="eh-p">→</span><span class="eh-b" data-tx>das Feld bleibt leer, nicht geschätzt</span></div>
+          <div class="eh-row"><span class="eh-a" data-tx>Score aus halben Daten</span>
+            <span class="eh-p">→</span><span class="eh-b" data-tx>die Datendeckung steht daneben</span></div>
+          <div class="eh-row"><span class="eh-a" data-tx>Die KI weicht ab</span>
+            <span class="eh-p">→</span><span class="eh-b" data-tx>ein Prüfsignal, kein neuer Wert</span></div>
+          <div class="eh-row"><span class="eh-a" data-tx>Jede Zahl</span>
+            <span class="eh-p">→</span><span class="eh-b" data-tx>trägt Quelle, Stichtag und Modellvermerk</span></div>
+        </div>
+      </div>
+
+      <!-- ─── 5 · ANGEBOT ─── -->
+      <div class="l-angebot">
+        <div class="ag-hl" data-tx>Woanders kostet die<br>Ersteinschätzung <em>99 €.</em><br>Im Monat.</div>
+        <div class="ag-sub" data-tx>Bei uns ist sie der Anfang — und der volle Zugang
+          kostet die Hälfte.</div>
+        <div class="ag-preise">
+          <div class="ag-p"><div class="nm" data-tx>Starter</div><div class="pr" data-tx>19,99 €</div><div class="mo" data-tx>im Monat</div></div>
+          <div class="ag-p hero"><div class="nm" data-tx>Investor</div><div class="pr" data-tx>34,99 €</div><div class="mo" data-tx>im Monat · Bestseller</div></div>
+          <div class="ag-p"><div class="nm" data-tx>Pro</div><div class="pr" data-tx>49,99 €</div><div class="mo" data-tx>im Monat · alles drin</div></div>
+        </div>
+        <div class="ag-erst">
+          <div class="lb" data-tx>Erstflug · nur hier am Stand</div>
+          <div class="bg2" data-tx>Founding Member:<br><em>16 % dauerhaft.</em></div>
+          <div class="kl" data-tx>Auf jeden Plan, monatlich wie jährlich, solange du Kunde
+            bleibst. Auf 100 Plätze begrenzt.</div>
+        </div>
+      </div>
+
+    </div><!-- /stage -->
+
+    <div class="foot">
+      <div>
+        <div class="claim" data-tx>„Immobilienentscheidungen sind zu groß
+          für ein Bauchgefühl.“</div>
+        <div class="url">https://<b>dealpilot.immo</b></div>
+      </div>
+      <div class="qrbox">
+        <div class="qr"></div>
+        <div class="qrtx"><strong data-tx>Jetzt live<br>testen</strong><em data-tx>Scan &amp; Start</em></div>
+      </div>
+    </div>
+
+  </div><!-- /canvas -->
+</div><!-- /sheet -->
+</div><!-- /stagewrap -->
+
+<script>
+'use strict';
+const root = document.documentElement, body = document.body;
+const sheet = document.getElementById('sheet'), wrap = document.getElementById('wrap');
+const bg = document.getElementById('bg');
+const MMPX = 96/25.4;
+
+/* Endformat fest, Zugabe variabel -> Blattmass rechnet mit */
+const END_W = 1510, END_H = 2250;
+let bleed = 20, safe = 60, sichtCm = 100;
+
+const HINTS = {
+  kette:  'Die Kette ist der USP, den kein Wettbewerber hat, und sechs Stationen '
+        + 'rechtfertigen das Hochformat. Stärkster Gegenpol zum Marken-Display. '
+        + 'Neun waren zu viel — gemessen, siehe Kommentar im Quelltext.',
+  zahlen: 'Aus zehn Metern lesbar, ohne einen Satz zu lesen. Gut, wenn Display 1 '
+        + 'schon viel Text trägt.',
+  demo:   'Zieht direkt in die Vorführung. Braucht einen guten Screenshot — '
+        + 'sonst wirkt die Fläche leer.',
+  ehrlich:'Das mutigste. Differenziert am schärfsten, verlangt aber, dass jemand '
+        + 'stehenbleibt und liest.',
+  angebot:'Der Abschluss-Aufsteller. Gehört an die Seite, an der abgeschlossen wird — '
+        + 'nicht nach vorn.'
+};
+
+/* ── Layout ── */
+document.querySelectorAll('#lays button').forEach(b=>b.onclick=()=>{
+  body.className = body.className.replace(/lay-\w+/,'').trim() + ' lay-' + b.dataset.l;
+  document.querySelectorAll('#lays button').forEach(x=>x.classList.toggle('on', x===b));
+  document.getElementById('layhint').textContent = HINTS[b.dataset.l] || '';
+  syncProbe(b.dataset.l);
+  fit();
+});
+
+/* Stellprobe spiegelt das gewaehlte Layout */
+const PROBE = {
+  kette:  ['Die ersten drei<br>Minuten kann jeder.<br><i>Wir sind die<br>nächsten drei Monate.</i>',
+           'Quick-Check → Score → ImmoWertV → Bank → Anlage V'],
+  zahlen: ['Was in einer<br>einzigen Wohnung<br><i>alles steckt.</i>',
+           '64 Kennzahlen · 24 Kriterien · 3 Verfahren'],
+  demo:   ['Erzähl mir<br><i>dein Objekt.</i>',
+           'Vier Minuten reden. Score, Steuer, Bank-PDF fertig.'],
+  ehrlich:['Lieber eine Lücke<br>als eine Zahl, die<br><i>niemand belegen kann.</i>',
+           'Was DealPilot nicht tut'],
+  angebot:['Woanders kostet die<br>Ersteinschätzung<br><i>99 €. Im Monat.</i>',
+           'Starter 19,99 · Investor 34,99 · Pro 49,99']
+};
+function syncProbe(l){
+  const p = PROBE[l]; if(!p) return;
+  document.getElementById('probe2').innerHTML  = p[0];
+  document.getElementById('probe2b').textContent = p[1];
+}
+
+/* ── Motiv ── */
+document.getElementById('bgurl').oninput = e=>{
+  const u = e.target.value.trim();
+  bg.style.backgroundImage = u ? 'url("'+u.replace(/"/g,'%22')+'")' : 'none';
+};
+document.getElementById('bgclr').onclick = ()=>{
+  bg.style.backgroundImage='none'; document.getElementById('bgurl').value='';
+};
+document.getElementById('shoturl').onclick = ()=>{
+  const u = prompt('URL oder Pfad des App-Screenshots für Layout 3:');
+  if(u===null) return;
+  const img = document.getElementById('shotimg');
+  if(u.trim()){ img.src = u.trim(); body.classList.add('hasshot'); }
+  else { body.classList.remove('hasshot'); }
+};
+
+/* ── Bildlage ── */
+const elX=document.getElementById('px'), elY=document.getElementById('py'), elZ=document.getElementById('pz');
+let tx=0, ty=0, zm=1;
+function applyBg(){
+  root.style.setProperty('--tx', tx.toFixed(2)+'%');
+  root.style.setProperty('--ty', ty.toFixed(2)+'%');
+  root.style.setProperty('--z',  zm.toFixed(3));
+  elX.value=tx; elY.value=ty; elZ.value=Math.round(zm*100);
+  document.getElementById('vx').textContent = tx.toFixed(0);
+  document.getElementById('vy').textContent = ty.toFixed(0);
+  document.getElementById('vz').textContent = Math.round(zm*100)+' %';
+}
+elX.oninput=e=>{tx=+e.target.value;applyBg()};
+elY.oninput=e=>{ty=+e.target.value;applyBg()};
+elZ.oninput=e=>{zm=+e.target.value/100;applyBg()};
+document.getElementById('reset').onclick=()=>{tx=0;ty=0;zm=1;applyBg()};
+
+let drag=null, mdrag=null;
+const MOVE_SEL=['.head','.stage','.foot'];
+sheet.addEventListener('pointerdown',e=>{
+  if(mdrag) return;
+  if(body.classList.contains('edit') && e.target.closest('[data-tx]')) return;
+  if(body.classList.contains('movable') && MOVE_SEL.some(s=>e.target.closest(s))) return;
+  drag={x:e.clientX,y:e.clientY,tx,ty};
+  sheet.setPointerCapture(e.pointerId); sheet.style.cursor='grabbing';
+});
+sheet.addEventListener('pointermove',e=>{
+  if(!drag) return;
+  const r=sheet.getBoundingClientRect();
+  tx = drag.tx + (e.clientX-drag.x)/r.width*100;
+  ty = drag.ty + (e.clientY-drag.y)/r.height*100;
+  applyBg();
+});
+['pointerup','pointercancel'].forEach(t=>sheet.addEventListener(t,()=>{drag=null;sheet.style.cursor='grab'}));
+sheet.addEventListener('wheel',e=>{
+  e.preventDefault();
+  zm = Math.min(3, Math.max(.3, zm*(e.deltaY<0?1.06:1/1.06)));
+  applyBg();
+},{passive:false});
+
+document.getElementById('dark').oninput = e=>root.style.setProperty('--scrim', e.target.value/100);
+
+/* ── Druckmasse ── */
+function applyMasse(){
+  root.style.setProperty('--bleed', bleed+'mm');
+  root.style.setProperty('--safe',  safe+'mm');
+  root.style.setProperty('--sicht', (sichtCm*10)+'mm');
+  document.getElementById('vb').textContent  = bleed+' mm';
+  document.getElementById('vs').textContent  = safe+' mm';
+  document.getElementById('vsi').textContent = sichtCm+' cm';
+  const w = END_W + 2*bleed, h = END_H + 2*bleed;
+  /* @page nimmt keine CSS-Variable — die Regel wird ersetzt.
+     setProperty('size',…) wirkt nicht in jedem Browser, deshalb
+     loeschen und neu einfuegen. Das ist der einzige Weg, der ueberall traegt. */
+  setPageSize(w, h);
+  document.getElementById('printhint').innerHTML =
+    'Chrome → „Als PDF speichern“, Papierformat <b style="color:#E8CC7A">'+w+' × '+h+' mm</b>, '
+    + 'Ränder „Keine“, Hintergrundgrafiken an. Sichtbar bleiben '+END_W+' × '+END_H+' mm; '
+    + 'Text steht im roten Bereich '+(END_W-2*safe)+' × '+(END_H-2*safe)+' mm. '
+    + 'Beim Drucker: 100–150 dpi, CMYK, Schriften in Kurven.';
+  fit();
+}
+/* @page-Regel: eigenes <style> im Kopf, das bei jeder Aenderung neu geschrieben
+   wird. Kein Herumfassen an document.styleSheets — das ist der Weg, der auch
+   dann traegt, wenn der Browser die Regel nicht anfassen laesst. */
+const pageStyle = document.createElement('style');
+document.head.appendChild(pageStyle);
+function setPageSize(w,h){ pageStyle.textContent = '@page{size:'+w+'mm '+h+'mm;margin:0}'; }
+
+document.getElementById('bl').oninput = e=>{bleed=+e.target.value; applyMasse();};
+document.getElementById('sf').oninput = e=>{safe =+e.target.value; applyMasse();};
+document.getElementById('si').oninput = e=>{sichtCm=+e.target.value; applyMasse();};
+
+/* ── Schalter ── */
+function toggler(id, cls, onTxt, offTxt){
+  const b=document.getElementById(id);
+  b.textContent = offTxt;
+  b.onclick=()=>{
+    body.classList.toggle(cls);
+    const on = body.classList.contains(cls);
+    b.classList.toggle('on', on);
+    b.textContent = on ? onTxt : offTxt;
+    if(cls==='edit') document.querySelectorAll('[data-tx]').forEach(el=>el.contentEditable=on);
+    if(cls==='probe-on') fit();
+  };
+}
+toggler('gOn','guides','Hilfslinien aus','Schnitt & Sicherheit');
+toggler('siOn','sicht','Zone ausblenden','Zone zeigen');
+toggler('obOn','oberhalb','Inhalt oberhalb halten','Volle Höhe nutzen');
+/* Standard AN — siehe Kommentar bei body.oberhalb im CSS.
+   toggler() schreibt beim Aufbau den Aus-Text; hier den An-Zustand nachziehen. */
+body.classList.add('oberhalb');
+(function(){ const b=document.getElementById('obOn');
+  b.classList.add('on'); b.textContent='Inhalt oberhalb halten'; })();
+toggler('prOn','probe-on','Stellprobe aus','Stellprobe');
+toggler('edOn','edit','Bearbeiten: an','Texte bearbeiten');
+toggler('mvOn','movable','Verschieben: an','Verschieben: aus');
+
+/* ── Bloecke ziehen ── */
+const moff={}; MOVE_SEL.forEach(s=>moff[s]={x:0,y:0});
+function applyMove(s){
+  const el=document.querySelector(s), o=moff[s];
+  el.style.setProperty('--mvx', o.x.toFixed(1)+'px');
+  el.style.setProperty('--mvy', o.y.toFixed(1)+'px');
+}
+function sheetScale(){ const m=/scale\(([\d.]+)\)/.exec(sheet.style.transform||''); return m?+m[1]:1; }
+sheet.addEventListener('pointerdown',e=>{
+  if(!body.classList.contains('movable')) return;
+  if(body.classList.contains('edit') && e.target.closest('[data-tx]')) return;
+  let sel=null;
+  for(const s of MOVE_SEL){ if(e.target.closest(s)){ sel=s; break; } }
+  if(!sel) return;
+  e.stopPropagation(); e.preventDefault();
+  mdrag={sel,sx:e.clientX,sy:e.clientY,ox:moff[sel].x,oy:moff[sel].y};
+  sheet.setPointerCapture(e.pointerId);
+},true);
+window.addEventListener('pointermove',e=>{
+  if(!mdrag) return;
+  const k=sheetScale()||1;
+  moff[mdrag.sel]={x:mdrag.ox+(e.clientX-mdrag.sx)/k, y:mdrag.oy+(e.clientY-mdrag.sy)/k};
+  applyMove(mdrag.sel);
+});
+['pointerup','pointercancel'].forEach(t=>window.addEventListener(t,()=>{mdrag=null;}));
+document.getElementById('mvReset').onclick=()=>{
+  MOVE_SEL.forEach(s=>{moff[s]={x:0,y:0}; applyMove(s);});
+};
+
+/* ── Einpassen ── */
+function fit(){
+  const SW=(END_W+2*bleed)*MMPX, SH=(END_H+2*bleed)*MMPX;
+  const hProbe = body.classList.contains('probe-on') ? 180 : 0;
+  const k = Math.min((window.innerWidth-360)/SW, (window.innerHeight-40-hProbe)/SH);
+  sheet.style.transform='scale('+k+')';
+  wrap.style.width=(SW*k)+'px'; wrap.style.height=(SH*k)+'px';
+}
+window.addEventListener('resize', fit);
+
+/* ── Der Wächter ──────────────────────────────────────────────────
+   Misst am gerenderten Blatt, nicht an der Absicht. Drei Fragen:
+   steht alles im Sicherheitsbereich, bleibt alles über der Sichtlinie,
+   und ist die kleinste Schrift aus drei Metern noch lesbar.
+   Er nennt immer auch, WIE VIELE Elemente er geprüft hat — ein Prüfer,
+   der schweigt, weil er nichts gefunden hat, ist von einem, der nichts
+   gesucht hat, sonst nicht zu unterscheiden. */
+function pruefe(){
+  const box = document.getElementById('pruef'); if(!box) return;
+  const k = sheetScale() || 1;
+  /* Grenzen RECHNEN, nicht aus .safeline/.sichtzone lesen: die sind
+     display:none, solange die Hilfslinien aus sind, und liefern dann
+     ein Null-Rechteck. Der erste Entwurf meldete dadurch "30 von 30
+     ragen heraus" — ein Prüfer, der gegen Unsichtbares misst, misst
+     sich selbst. */
+  const sr = sheet.getBoundingClientRect(), px = MMPX*k;
+  const safeR = {left: sr.left + (bleed+safe)*px, right: sr.right - (bleed+safe)*px,
+                 top:  sr.top  + (bleed+safe)*px, bottom: sr.bottom - (bleed+safe)*px};
+  const zoneT = sr.bottom - (bleed + sichtCm*10)*px;
+  const sichtAktiv = body.classList.contains('oberhalb');
+
+  /* jedes sichtbare Text-Element im aktiven Layout */
+  const els = [...document.querySelectorAll('.canvas [data-tx], .canvas .kt, .canvas .zh, .canvas .ag-p')]
+    .filter(e=>e.offsetParent !== null && e.getBoundingClientRect().height > 0);
+
+  let ausSafe = 0, unterLinie = 0, minPt = Infinity;
+  els.forEach(e=>{
+    const r = e.getBoundingClientRect();
+    if(r.left < safeR.left-1 || r.right > safeR.right+1 ||
+       r.top  < safeR.top-1  || r.bottom > safeR.bottom+1) ausSafe++;
+    if(r.bottom > zoneT+1) unterLinie++;
+    /* getComputedStyle liefert die UNgeskalierte Groesse — der
+       transform des Blattes wirkt darauf nicht. Also nur durch MMPX,
+       nicht zusaetzlich durch k.
+       Und nur Elemente messen, die SELBST Text tragen: ein Behaelter
+       wie .kt hat keine eigene Schriftgroesse, erbt 16 px = 4,2 mm und
+       zog die Messung jedes Mal auf "4 mm". */
+    const hatText = [...e.childNodes].some(n=>n.nodeType===3 && n.textContent.trim());
+    if(hatText){
+      const fs = parseFloat(getComputedStyle(e).fontSize)/MMPX;
+      if(fs > 1 && fs < minPt) minPt = fs;
+    }
+  });
+
+  const z = [];
+  z.push(ausSafe===0
+    ? ['ok','✓', els.length+' Elemente geprüft — alle im Sicherheitsbereich']
+    : ['bad','✕', '<b>'+ausSafe+' von '+els.length+'</b> ragen aus dem Sicherheitsbereich']);
+  z.push(!sichtAktiv
+    ? ['ok','–', 'Sichtlinie nicht erzwungen (volle Höhe gewählt)']
+    : unterLinie===0
+      ? ['ok','✓', 'nichts unter der Sichtlinie bei '+sichtCm+' cm']
+      : ['bad','✕', '<b>'+unterLinie+'</b> Element(e) unter der Sichtlinie — auf der Messe verdeckt']);
+  /* Faustregel Fernlesbarkeit: Schrifthöhe in mm ≈ Abstand in m × 5 */
+  const min3m = 15;
+  z.push(minPt>=min3m
+    ? ['ok','✓', 'kleinste Schrift '+minPt.toFixed(0)+' mm — aus 3 m lesbar']
+    : ['bad','✕', 'kleinste Schrift <b>'+minPt.toFixed(0)+' mm</b> — unter '+min3m+' mm wird es aus 3 m mühsam']);
+
+  box.innerHTML = z.map(r=>'<div class="z '+r[0]+'"><span class="ic">'+r[1]+'</span><span>'+r[2]+'</span></div>').join('');
+}
+
+document.getElementById('layhint').textContent = HINTS.kette;
+syncProbe('kette');
+applyBg(); applyMasse();
+/* nach jedem Eingriff neu messen */
+new MutationObserver(()=>clearTimeout(window._pt)||(window._pt=setTimeout(pruefe,180)))
+  .observe(document.querySelector('.canvas'), {subtree:true,childList:true,characterData:true,attributes:true});
+['click','input'].forEach(t=>document.querySelector('.ui').addEventListener(t,()=>setTimeout(pruefe,220)));
+window.addEventListener('resize',()=>setTimeout(pruefe,220));
+setTimeout(pruefe, 400);
+</script>
+</body>
+</html>
