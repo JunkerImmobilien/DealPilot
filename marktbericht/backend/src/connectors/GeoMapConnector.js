@@ -53,7 +53,7 @@ export const GeoMapConnector = {
   // analyzedField: 'PREISPROQM' | 'PREIS' | 'RENDITE' | 'NUTZFLAECHE' | 'TAGEONLINE'
   // offerType: 'Kauf' | 'Miete'. period: optional {from:'YYYY-MM-DD', to:'YYYY-MM-DD'}.
   // Liefert {count,median,average,min,max,q25,q75} o. null.
-  async kpiCollection({ lat, lon, radiusKm, offerType, analyzedField, objectClasses, period, filters }) {
+  async kpiCollection({ lat, lon, radiusKm, offerType, analyzedField, objectClasses, objectTypes, period, filters }) {
     if (!geomapEnabled()) return null;
     const body = {
       coordinate: { lat, lon },
@@ -64,6 +64,13 @@ export const GeoMapConnector = {
       analyzedField: analyzedField || 'PREISPROQM',
       cutOutlier: 'GEOMAP', // GeoMaps eigene Ausreißerbereinigung
     };
+    /* v1314 - die OBJEKTART, nicht ein Praezisierungsfilter. Sie gehoert zur
+     * Frage selbst: ein Mehrfamilienhaus wird am MFH-Markt gemessen, nicht am
+     * Hausmarkt. Steht vor dem filters-Block, damit eine ausdrueckliche
+     * Filter-Angabe sie weiterhin ueberschreiben kann.
+     * Gemessen 11.09.2026 Bielefeld 5 km: Haus pauschal 2.553,47 EUR/m2
+     * gegen Mehrfamilienhaus 2.093,15 - 22 Prozent Unterschied. */
+    if (objectTypes && objectTypes.length) body.objectTypes = objectTypes;
     // Zeitraum-Filter (fuer historische Auswertung). Laut GeoMap-Doku (kpi v1.5):
     // onlineDateRange = Objekt { from, to } im Format YYYY-MM-DD (Angebote online verfuegbar).
     if (period && period.from && period.to) {
@@ -133,12 +140,12 @@ export const GeoMapConnector = {
 
   // HISTORIE: KPI je Jahr -> Zeitreihe. field z.B. 'PREISPROQM' (Wert) oder 'TAGEONLINE' (Markttempo).
   // Liefert [{year, median, count}] fuer die angefragten Jahre.
-  async timeSeries({ lat, lon, radiusKm, offerType, analyzedField, objectClasses, years }) {
+  async timeSeries({ lat, lon, radiusKm, offerType, analyzedField, objectClasses, objectTypes, years }) {
     if (!geomapEnabled()) return [];
     // Jahre parallel abrufen (war sequenziell -> bei 9 Jahren x2 Reihen der grösste Zeitfresser).
     const out = await Promise.all(years.map(async (y) => {
       const kpi = await this.kpiCollection({
-        lat, lon, radiusKm, offerType, analyzedField, objectClasses,
+        lat, lon, radiusKm, offerType, analyzedField, objectClasses, objectTypes,
         period: { from: `${y}-01-01`, to: `${y}-12-31` },
       });
       return { year: y, median: kpi && !kpi.error ? kpi.median : null, count: kpi && !kpi.error ? kpi.count : null };
@@ -149,7 +156,7 @@ export const GeoMapConnector = {
   // Holt echte Vergleichsangebote um einen Punkt.
   // params: { lat, lon, radiusKm, offerType:'Kauf'|'Miete', maxDetails }
   // Gibt { offers:[...], totalResults, fetchedDetails } zurück.
-  async marketOffers({ lat, lon, radiusKm, offerType, maxDetails, filters, period, objectClasses }) {   /* WSEG12-1 */
+  async marketOffers({ lat, lon, radiusKm, offerType, maxDetails, filters, period, objectClasses, objectTypes }) {   /* WSEG12-1 */
     if (!geomapEnabled()) return { offers: [], totalResults: 0, fetchedDetails: 0, reason: 'no_token' };
 
     const radius = radiusKm || cfg.geomap.radiusKm;
@@ -169,6 +176,9 @@ export const GeoMapConnector = {
     };
     /* WSEG12-3 · Dieselbe Segmentierung wie bei der KPI-Abfrage. Ohne sie zeigt
      * die Beispielliste etwas voellig anderes als der Median darueber. */
+    /* v1314: die Objektart auch fuer die Beispielliste - sonst zeigt sie
+     * Einfamilienhaeuser unter einem MFH-Median. */
+    if (objectTypes && objectTypes.length) body.objectTypes = objectTypes;
     if (period && period.from) body.onlineDateRange = { from: period.from, to: period.to };
     if (filters) {
       const r = (a, b) => ({ ...(a != null ? { from: a } : {}), ...(b != null ? { to: b } : {}) });
