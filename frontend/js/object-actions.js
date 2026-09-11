@@ -1444,6 +1444,53 @@
       r.addEventListener('change', function () { _addrChoice = r.value; renderMergedTable(); });
     });
   }
+  /* ═══════════════════════════════════════════════════════════════════
+     v1317 · DIE FUNKTION, DIE ES NIE GAB
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Befund, seit Wochen und in drei Sitzungen wiederholt: „wenn
+     ich Exposé und Marktbericht auswähle und Sprache, dass er die Daten
+     dann ausliest … aber er dann nicht weiter zum Sprechlauf geht."
+
+     GEMESSEN am 11.09.2026 im Browser:
+
+       Uncaught ReferenceError: _fireOabiDone is not defined
+
+     `_fireOabiDone()` wird an ZWEI Stellen gerufen — beim Schliessen des
+     Import-Fensters (Z. 1466) und beim Übernehmen der Werte (Z. 1620) —
+     und war NIRGENDWO definiert. Ein `grep` über das ganze Frontend
+     findet genau diese zwei Aufrufe und keine Definition.
+
+     WAS DAS HEISST: der Import meldet der Kette nie „fertig". Die Zeile
+
+       await new Promise(function (res) { openCombinedImport(res); });
+
+     in `runSelected()` wird nie aufgelöst. Die Kette bleibt beim ersten
+     Schritt stehen — für immer. Sprechlauf und Marktbewertung kommen nie
+     dran.
+
+     WARUM ES SO LANGE UNSICHTBAR WAR: das Overlay wird VOR dem Aufruf
+     entfernt (`ov.remove(); _fireOabiDone();`). Der Nutzer sieht also,
+     wie sein Import sauber schliesst und die Werte im Formular stehen.
+     Dass danach nichts mehr passiert, sieht aus wie „fertig", nicht wie
+     ein Absturz. Und wer den Import EINZELN öffnet, merkt es nie: dort
+     wartet niemand auf den Rückruf.
+
+     Der v1310-Fix (zwei Fenster, eine ID) war richtig und ist nicht
+     umsonst — er hat einen ZWEITEN Abbruch behoben, der darunter lag.
+     Dieser hier war der erste.
+
+     `_oabiDone` wird VOR dem Aufruf geleert: ein zweiter Aufruf — etwa
+     weil `close()` nach `applyMerged()` noch einmal durchläuft — darf die
+     Kette nicht ein zweites Mal weiterschieben. */
+  function _fireOabiDone(payload) {
+    var done = _oabiDone;
+    _oabiDone = null;
+    if (typeof done !== 'function') return;
+    try { done(payload || {}); } catch (e) {
+      try { console.warn('[obj-actions] onDone warf:', e); } catch (_) {}
+    }
+  }
+
   function openCombinedImport(onDone, opts) {
     _oabiDone = (typeof onDone === 'function') ? onDone : null;
     _qcMode = !!(opts && opts.target === 'qc');  /* v418 */
