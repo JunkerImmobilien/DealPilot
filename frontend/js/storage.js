@@ -171,6 +171,8 @@ function collectData() {
   /* v1312: Erbbaurecht-Schalter. Die Zahlen dazu laufen ueber FIELDS. */
   var erbCb = document.getElementById('erbpacht');
   if (erbCb) d['_erbpacht'] = erbCb.checked;
+  var erbW = document.getElementById('erb_wert_ist_erb');
+  if (erbW) d['_erb_wert_ist_erb'] = erbW.checked;
   // V63.99: Küche-im-Kaufpreis-Checkbox
   /* V291.1-storage-cleanup: kueche_im_kp-Checkbox entfernt — kein Save mehr nötig */
   // BWK mode
@@ -382,6 +384,10 @@ function loadData(d) {
   if (d._erbpacht !== undefined) {
     var erbCbL = document.getElementById('erbpacht');
     if (erbCbL) erbCbL.checked = !!d._erbpacht;
+  }
+  if (d._erb_wert_ist_erb !== undefined) {
+    var erbWL = document.getElementById('erb_wert_ist_erb');
+    if (erbWL) erbWL.checked = !!d._erb_wert_ist_erb;
   }
   try { if (window.DealPilotErbbau) window.DealPilotErbbau.sync(); } catch (e) {}
   // V63.99: Küche-im-Kaufpreis-Toggle wiederherstellen + Wrap-Sichtbarkeit
