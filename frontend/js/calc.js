@@ -972,6 +972,10 @@ function _calcImmediate(){
   State.wert_basis = wert_basis;
   var gs_a=v('gsfl')*(v('mea')/100);
   st('gs_ant',gs_a.toFixed(2)+' m²');st('bodenwert',fE(gs_a*v('brw')));
+  /* v1312: der Erbbaurechts-Abschlag haengt am Bodenwert direkt darueber.
+     rechnen() liest die Felder selbst und malt die Ergebniskarte; faellt
+     still aus, wenn die Checkbox nicht gesetzt ist. */
+  try { if (window.DealPilotErbbau) DealPilotErbbau.rechnen(); } catch (_e) {}
   var nkm=v('nkm'),ze=v('ze'),uf=v('umlagef');
   var wm_m=nkm+ze+uf,wm_j=wm_m*12,nkm_j=(nkm+ze)*12;
   st('wm_m',fE(wm_m,2));st('wm_j',fE(wm_j,2));st('nkm_j_out',fE(nkm_j));
@@ -1159,6 +1163,25 @@ function _calcImmediate(){
     // WEG-Rücklage: nur Info-Anzeige, NICHT summieren (ist bereits Teil des Hausgeldes)
     bwk = ul + nul;
   }
+  /* ═══ v1312 · Erbbauzins ════════════════════════════════
+     Steht NACH dem if/else, damit er in allen drei BWK-Modi greift
+     (Detail, % der NKM, % vom Kaufpreis) - in nur einem Zweig waere er
+     zwei Drittel der Zeit still verschwunden.
+
+     Warum nicht umlagefaehig: der Erbbauzins ist Sache des Eigentuemers,
+     § 2 BetrKV kennt ihn nicht. Er ist Werbungskosten und damit
+     steuerlich abziehbar - genau das tut nul im Cashflow: es geht in
+     cf_operativ und ueber zve_immo in die Steuer.
+
+     Er waechst in der Jahresschleife mit kstg. Das ist sogar realistisch:
+     fast jeder Vertrag traegt eine Wertsicherungsklausel am
+     Verbraucherpreisindex. */
+  var erbZins = 0;
+  try {
+    if (window.DealPilotErbbau && DealPilotErbbau.istAn()) erbZins = DealPilotErbbau.zinsJahr() || 0;
+  } catch (_e) {}
+  if (erbZins > 0) { nul += erbZins; bwk += erbZins; }
+  st('erb_zins_j', erbZins > 0 ? fE(erbZins) : '–');
   State.bwk=bwk;
   st('ul_sum',fE(ul));st('nul_sum',fE(nul));st('r-ul',fE(ul));st('r-nul',fE(nul));
   st('r-bwk',fE(bwk));st('r-bwk-pct',nkm_j>0?fP(bwk/nkm_j*100,1):'—');st('r-hg-ges',fE(v('hg_ul')+v('hg_nul')));

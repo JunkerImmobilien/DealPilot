@@ -1270,6 +1270,31 @@ label.dp-required.qc-required::after {
 <div class="f"><label>Grundstücksfläche (m²)</label><div class="iw"><input id="gsfl" type="text" inputmode="decimal" placeholder="1570" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
         <div class="f"><label>Grundstücksanteil (m²)</label><div class="cf" id="gs_ant">—</div></div>
         <div class="f s2"><label>Bodenwert</label><div class="cf" id="bodenwert">—</div></div>
+        <!-- ═══ v1312 · Erbbaurecht (Erbpacht) ═══════════════════════════
+             Steht hier, weil das Erbbaurecht eine Belastung des BODENS ist -
+             der Bodenwert direkt darueber ist die Groesse, an der es haengt.
+             Kein Bewertungspartner nimmt den Parameter entgegen (gemessen
+             11.09.2026 gegen GeoMap: leasehold, heritableBuildingRight,
+             groundLease, erbbaurecht, erbpacht - alle 400 Unrecognized
+             field). Die Marktbewertung liefert also IMMER Volleigentum;
+             den Abschlag rechnen wir selbst, nach § 50 ImmoWertV. -->
+        <div class="f s2" style="border-top:1px solid var(--border);padding-top:10px;margin-top:6px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600">
+            <input type="checkbox" id="erbpacht" onchange="if(window.DealPilotErbbau)DealPilotErbbau.toggle(this.checked);calc()">
+            <span>Erbbaurecht / Erbpacht</span>
+            <button type="button" class="dp-tip" data-tip-id="tab1.erbpacht" tabindex="-1" aria-label="Hilfe zu Erbbaurecht"></button>
+          </label>
+          <div class="dz-sub" style="margin-top:2px">Das Grundstück gehört nicht mit — es wird gegen Erbbauzins überlassen.</div>
+        </div>
+        <div class="f s2" id="erbpacht_body" style="display:none">
+          <div class="g2">
+            <div class="f"><label>Erbbauzins (€ pro Jahr)</label><div class="iw"><span class="pfx">€</span><input id="erbbauzins" type="text" inputmode="decimal" placeholder="1.800" class="trl" oninput="calc()"></div></div>
+            <div class="f"><label>Restlaufzeit (Jahre)</label><div class="iw"><input id="erb_restlz" type="text" inputmode="numeric" placeholder="55" class="tr" oninput="calc()"><span class="sfx">J</span></div></div>
+            <div class="f"><label>Angemessener Erbbauzinssatz (%)</label><div class="iw"><input id="erb_zs_ang" type="text" inputmode="decimal" placeholder="3,5" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+            <div class="f"><label>Entschädigung bei Zeitablauf (%)</label><div class="iw"><input id="erb_entsch" type="text" inputmode="decimal" placeholder="66,7" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+          </div>
+          <div id="erb_ergebnis" class="brw-ki-result" style="display:none;margin-top:8px"></div>
+        </div>
       </div></div>
     </div>
   </div>
@@ -3317,6 +3342,9 @@ label.dp-required.qc-required::after {
 <script src="js/deal-kpis.js?v=231"></script>
 <script src="js/afa-engine.js?v=v1260"></script>
 <script src="js/irr-engine.js?v=v1260"></script>
+<!-- v1312: Erbbaurecht - Rechenkern (rein) + DOM-Schicht -->
+<script src="js/erbbau-engine.js?v=v1312"></script>
+<script src="js/erbbau-ui.js?v=v1312"></script>
   <script src="js/afa-ui.js?v=v1260"></script>
   <script src="js/zve-manager.js?v=1"></script>
   <script src="js/tax-periods.js?v=841"></script>
@@ -3330,7 +3358,7 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v1261"></script>
+  <script src="js/calc.js?v=v1312"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
@@ -3375,7 +3403,7 @@ label.dp-required.qc-required::after {
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=v1311"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v1311"></script>
+<script src="js/storage.js?v=v1312"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=W33"></script>
