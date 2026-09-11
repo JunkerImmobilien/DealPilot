@@ -2686,6 +2686,80 @@
       '.vi-rf-treffer{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(42,39,39,.16);',
       '  font:600 11.5px/1.5 "JetBrains Mono",ui-monospace,monospace;color:#3FA56C}',
       '.vi-rf-zaehler{font:600 10.5px/1 "JetBrains Mono",monospace;opacity:.5;margin-top:7px}',
+
+      /* ═══ v1299 · Die Pillen mit den Schlagwörtern ═══════════════════════
+         Marcels Vorgabe: „hinter den Fragen noch Pillen mit den
+         Schlagwörtern, die gefragt sind."
+
+         SIE WAREN IN v1298 SCHON DA — ohne eine einzige CSS-Regel. Im
+         Browser stand deshalb „PLZOrtStraßeHausnummer" als ein Wort.
+         Genau die Falle, die ich am selben Tag in FALLEN.md geschrieben
+         habe: eine Existenzprüfung ist keine Abnahme. Vier `.vi-rf-pille`
+         im DOM heißt nicht, dass man vier Pillen sieht. */
+      '.vi-rf-pillen{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}',
+      '.vi-rf-pille{display:inline-flex;align-items:center;gap:4px;',
+      '  padding:3px 9px;border-radius:99px;white-space:nowrap;',
+      '  font:600 11px/1.35 Inter,system-ui,sans-serif;',
+      '  border:1px solid rgba(42,39,39,.20);color:rgba(42,39,39,.78);',
+      '  background:rgba(42,39,39,.035)}',
+      /* Was schon steht, ist gruen und abgehakt — Statusfarben bleiben in
+         jeder Marke gleich (CLAUDE.md), deshalb kein --wl-Token. */
+      '.vi-rf-pille.da{border-color:rgba(63,165,108,.45);color:#2f7d51;',
+      '  background:rgba(63,165,108,.10)}',
+      '.vi-rf-pille.da i{font-style:normal;font-size:10px;line-height:1}',
+
+      /* ═══ v1299 · Mehr Platz für Gespräch und Liste ══════════════════════
+         Marcels Befund: „das kann man alles ein bisschen kleiner machen,
+         dass das Feld, wo die Ein- und Ausgaben gemacht werden, ein
+         bisschen größer zu sehen ist."
+
+         GEMESSEN im laufenden Dialog (Fenster 987 px hoch):
+
+           Modal gesamt      929
+             Markenleiste     60
+             Kopf mit Titel  101
+             Körper          699  ← davon Bühne nur 367
+             Fußleiste        66
+
+         Es fehlt nicht an Platz — er wird oben und unten verbraucht. Der
+         Kopf trägt bei JEDEM Durchlauf denselben Erklärtext, den man
+         einmal liest; die Bühne darunter trägt das Gespräch.
+
+         Alles hier gilt NUR im Sprechlauf-Dialog (`.vi-mode.vi-dialog`),
+         damit andere Modale mit derselben Hülle unberührt bleiben. */
+      '.oabi-ov.vi-mode.vi-dialog .bdg-brand{padding-top:10px;padding-bottom:10px}',
+      '.oabi-ov.vi-mode.vi-dialog .bdg-hero{padding:11px 22px 10px}',
+      '.oabi-ov.vi-mode.vi-dialog .bdg-hero h3{font-size:18px;margin:2px 0 3px}',
+      '.oabi-ov.vi-mode.vi-dialog .bdg-hero .bdg-kick{font-size:9.5px}',
+      /* Der Erklärsatz bleibt lesbar, wird aber zur Fußnote statt zum
+         Absatz — er sagt zweimal dasselbe wie die Etappenleiste darunter. */
+      '.oabi-ov.vi-mode.vi-dialog .bdg-hero p{font-size:11.5px;line-height:1.4;opacity:.8;margin:0}',
+      '.oabi-ov.vi-mode.vi-dialog .oabi-foot{padding-top:11px;padding-bottom:11px}',
+      /* Der Mikrofon-Streifen: flacher, ohne an Treffsicherheit zu verlieren.
+         Die Fläche zum Klicken bleibt über 40 px hoch. */
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-mikro{margin:8px 2px 7px;padding:8px 13px}',
+
+      /* ═══ v1299 · Die Liste soll man am Stück sehen ═════════════════════
+         Marcels Vorgabe: „dass man die Liste auf einer Seite auf jeden Fall
+         komplett sehen kann."
+
+         NACHGEMESSEN: `.vi-rf-stand-body` scrollt längst (`overflow-y:auto`,
+         Zeile 2606) — erreichbar war also alles. Der Eindruck entstand
+         anders: die Liste endete mitten in „Etappe 4", und eine Liste, die
+         ohne Kante abbricht, sieht aus wie eine, die etwas verschweigt.
+
+         Zwei Dinge helfen, nicht eins: mehr Höhe (kommt aus dem
+         kompakteren Kopf oben) und eine sichtbare UNTERKANTE, die sagt
+         „hier geht es weiter". Der Verlauf steht am Rahmen, nicht am
+         scrollenden Inhalt — sonst scrollt er mit und verschwindet.
+
+         `position:relative` am Rahmen ist Pflicht, sonst hängt das
+         Pseudoelement am nächsten positionierten Vorfahren — irgendwo
+         weit oben im Modal. */
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-stand{min-height:220px;position:relative}',
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-stand::after{content:"";position:absolute;',
+      '  left:1px;right:1px;bottom:1px;height:26px;pointer-events:none;border-radius:0 0 11px 11px;',
+      '  background:linear-gradient(to top, var(--wl-fbf8f2, #FBF8F2) 22%, transparent)}',
       '.vi-rf-vorschlag{margin-top:9px;padding:8px 11px;border-radius:9px;font:400 12.5px/1.45 Inter,system-ui,sans-serif;',
       '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent);',
       '  border:1px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent)}',
@@ -2819,8 +2893,15 @@
       /* ═══ v1288 · Die Score-Karte im Verlauf ══════════════════════════
          Sie sitzt IN einer Co-Pilot-Blase, deshalb kein eigener Rahmen um
          das Ganze, sondern eine abgesetzte Flaeche darin. */
-      '.vi-sc{margin:11px -4px 2px;padding:12px 13px;border-radius:12px;',
-      '  background:var(--wl-fbf6e9, #FBF6E9);border:1px solid rgba(42,39,39,.14)}',
+      /* v1299: Volle Breite für Blasen, die eine Score-Karte tragen —
+         siehe `_rfBlase`. Die Zahl darf nicht eingerückt sitzen. */
+      '.vi-rf-blase.vi-rf-karte{max-width:100%;width:100%}',
+      '.vi-sc{margin:11px -4px 2px;padding:14px 15px;border-radius:12px;',
+      '  background:var(--wl-fbf6e9, #FBF6E9);border:1px solid rgba(42,39,39,.20);',
+      /* Ein Hauch Schatten hebt die Karte aus der Blase heraus. Ohne ihn
+         steht Creme auf Creme und die Kante verschwindet — genau das
+         „schlecht sehen" aus Marcels Rückmeldung. */
+      '  box-shadow:0 2px 10px -4px rgba(27,24,21,.22)}',
       '.vi-sc-kopf{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:2px}',
       '.vi-sc-titel{font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;',
       '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);opacity:.9}',
@@ -2968,10 +3049,22 @@
       (treffer ? '<div class="vi-rf-treffer">✓ ' + treffer + '</div>' : '');
     chat.appendChild(d);
     chat.scrollTop = chat.scrollHeight;
-    /* v1292: Steht eine Score-Karte in der Blase, zaehlen ihre Zahlen hoch
-       und die Balken fahren aus — an EINER Stelle, damit keine Karte es
-       vergisst. */
-    try { if (d.querySelector(".vi-sc-zahl-n,.vi-sc-bar")) _rfKarteBeleben(d); } catch (e) {}
+    /* ═══ v1299 · Eine Score-Karte ist keine Sprechblase ═════════════════
+       Marcels Befund: „Dann ist das irgendwie ein bisschen komisch
+       eingerückt. Also man kann den Deal Score und den Investor Deal Score
+       schlecht sehen."
+
+       Die Ursache steht in `.vi-rf-blase{max-width:82%}` — richtig für
+       Gesprochenes, das links steht und rechts Luft lässt. Eine Karte mit
+       Zahl, Balken und Kennzahlen ist aber kein Redebeitrag: sie verliert
+       bei 82 % Breite fast ein Fünftel, und die grosse Zahl sitzt dann
+       eingerückt statt am Rand.
+
+       Trägt die Blase eine Karte, bekommt sie die volle Breite. */
+    try {
+      if (d.querySelector('.vi-sc')) d.classList.add('vi-rf-karte');
+      if (d.querySelector(".vi-sc-zahl-n,.vi-sc-bar")) _rfKarteBeleben(d);
+    } catch (e) {}
     return d;
   }
 
