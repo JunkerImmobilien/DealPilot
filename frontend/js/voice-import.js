@@ -5236,6 +5236,25 @@
                (a.art === 'markt2' && /erweitert|voll|gross|gr(oe|ö)ss/.test(t));
       });
       if (treffer.length === 1) { _rfBlase('ich', escH(text)); _rfAktionKlick(treffer[0].art); return true; }
+      /* ═══ v1310d · Wer etwas nennt, das hier nicht ansteht ══════════════
+         GEMESSEN im Durchlauf: bei offenem Markt-Angebot gesagt „Ja, hol
+         den Bodenrichtwert ab." — der Co-Pilot antwortete „Beides kann ich
+         holen: Marktpreisindikation oder Erweiterte". Der Bodenrichtwert
+         stand dort gar nicht zur Wahl; die Frage ging an der Antwort
+         vorbei und wiederholte sich beim nächsten Versuch.
+
+         Wer eine Sache BEIM NAMEN nennt, die gerade nicht offensteht, soll
+         das hören — nicht eine Auswahl, in der sie fehlt. */
+      var genannt = null;
+      if (/bodenrichtwert|boris|richtwert/i.test(text)) genannt = 'den Bodenrichtwert';
+      else if (/\blage\b|makrolage|mikrolage/i.test(text)) genannt = 'die Lage';
+      if (genannt && !treffer.length) {
+        _rfBlase('ich', escH(text));
+        _rfBlase('co', 'Hier steht ' + escH(genannt) + ' gerade nicht an — ' +
+          'ich frage danach, wenn wir beim Grundstück sind. ' +
+          'Offen ist jetzt: ' + akt.map(function (a) { return '<b>' + escH(a.knopf) + '</b>'; }).join(' oder ') + '.');
+        return true;
+      }
       _rfBlase('ich', escH(text));
       _rfBlase('co', 'Beides kann ich holen — sag mir welches: ' +
         akt.map(function (a) { return '<b>' + escH(a.knopf) + '</b>'; }).join(' oder ') + '.');
