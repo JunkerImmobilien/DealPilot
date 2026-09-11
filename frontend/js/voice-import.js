@@ -2107,14 +2107,27 @@
         if (txt) {
           try { console.log('[voice-import] Freisprech-Antwort:', txt); } catch (x) {}
           _rfDenkt(false);
-          /* Angefangener Satz? Merken statt auswerten. */
-          if (_fsOffenesEnde(txt)) {
+          /* ═══ v1306 · Warten hat eine Grenze ═══════════════════════════
+             Marcels Bild `design/mockups/sanierung.png`: zweimal
+             hintereinander nur „Ich höre weiter zu — sag den Rest." Der
+             Satz endete jedes Mal so, dass `_fsOffenesEnde` ihn für
+             angefangen hielt — und es gab keine Obergrenze. Wer in diese
+             Schleife gerät, kommt allein nicht mehr heraus: jeder
+             Nachschlag verlängert den Satz und endet wieder offen.
+
+             Zweimal warten ist Geduld, dreimal ist Sturheit. Nach dem
+             zweiten Nachschub wird ausgewertet, wie der Satz auch endet —
+             im Zweifel versteht das Modell einen Satz zu viel, und das
+             ist allemal besser, als den Sprecher hängen zu lassen. */
+          if (_fsOffenesEnde(txt) && (_fs.warten || 0) < 2) {
+            _fs.warten = (_fs.warten || 0) + 1;
             _fs.rest = txt;
             _rfBlase('ich', escH(txt) + ' <span style="opacity:.5">…</span>');
             _rfBlase('co', '<span style="opacity:.75">Ich höre weiter zu — sag den Rest.</span>');
             _fsHoeren(true);
             return;
           }
+          _fs.warten = 0;
           if (_rfVorabErkennen(txt, true)) return;
           _rfBlase('ich', escH(txt));   /* v1276c: was verstanden wurde, steht da */
         }
@@ -2885,6 +2898,30 @@
       '@keyframes viRfAuf{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}',
       '.vi-rf-co{align-self:flex-start;background:var(--wl-fffdf7, #FFFDF7);border-top-left-radius:5px;',
       '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 26%, transparent)}',
+
+      /* ═══ v1306 · Die Frage, die GERADE gilt ═══════════════════════════
+         Marcels Vorgabe: „das wäre gut, dass man sieht, dass man das
+         nochmal visualisiert, was gerade aktuell ist … vielleicht einfach
+         den Hintergrund farblich anders darstellen oder ein bisschen
+         aufleuchten lassen, den Rahmen aufscheinen lassen."
+
+         Im Verlauf sehen alle Co-Pilot-Blasen gleich aus — die Frage von
+         vor drei Antworten so wie die, die gerade offen ist. Wer nach
+         einer längeren Auskunft zurückkommt, sucht.
+
+         Die aktuelle Frage bekommt deshalb einen goldenen Rand und einen
+         kurzen Puls. `animation` läuft EINMAL, nicht dauernd: ein Rahmen,
+         der pulsiert, solange man tippt, ist Unruhe, kein Hinweis. */
+      '.vi-rf-blase.vi-rf-dran-blase{border-color:var(--wl-c9a84c, #C9A84C);',
+      '  box-shadow:0 0 0 1px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent),',
+      '  0 3px 16px -6px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 60%, transparent);',
+      '  animation:viDranAuf .9s ease-out 1}',
+      '@keyframes viDranAuf{',
+      '  0%{box-shadow:0 0 0 0 color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 70%, transparent)}',
+      '  55%{box-shadow:0 0 0 5px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent)}',
+      '  100%{box-shadow:0 0 0 1px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent),',
+      '       0 3px 16px -6px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 60%, transparent)}}',
+      '@media (prefers-reduced-motion: reduce){.vi-rf-blase.vi-rf-dran-blase{animation:none}}',
       '.vi-rf-ich{align-self:flex-end;border-top-right-radius:5px;',
       '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);',
       '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent)}',
@@ -4551,9 +4588,38 @@
     }
     if (!karte) return false;
     _rf.halte[nachEtappe] = 1;
-    _rfBlase('co', satz + karte +
-      '<div class="vi-sc-weiter">Weiter geht es mit <b>' + escH(_etName(nachEtappe)) + '</b> — ' +
+    var b = _rfBlase('co', satz + karte +
+      '<div class="vi-sc-weiter"><i>▸</i> Weiter geht es mit <b>' + escH(_etName(nachEtappe)) + '</b> — ' +
       escH(_etZiel(nachEtappe)) + '.</div>');
+
+    /* ═══ v1306 · Die Score-Karte muss man SEHEN ════════════════════════
+       Marcels Befund (design/mockups/dealscore2.png): „der hat jetzt ganz
+       runtergescrollt … man weiß gar nicht genau, mache ich jetzt einfach
+       weiter? Man könnte das vielleicht überlesen."
+
+       Im Bild ist genau das passiert: von der Karte ist nur das Ende zu
+       sehen, die grosse Zahl steht oben ausserhalb des Bildes, und
+       darunter läuft schon die nächste Frage.
+
+       Ursache ist `_rfAnsEnde` — richtig für ein Gespräch, falsch für
+       einen Zwischenstand. Eine Antwort will man unten sehen, eine Karte
+       von OBEN: dort steht die Zahl, um die es geht.
+
+       Deshalb wird hier der KARTENANFANG in den Blick geholt, nicht das
+       Ende des Verlaufs. Und weil die nächste Frage unmittelbar folgt und
+       den Blick sonst weiterzieht, geschieht das erst im nächsten Bild —
+       nach ihr. Wer weiterlesen will, scrollt; wer nur den Score wollte,
+       hat ihn vor sich. */
+    if (b) {
+      var hin = function () {
+        try {
+          var chat = $('vi-rf-chat'); if (!chat) return;
+          chat.scrollTop = Math.max(0, b.offsetTop - 8);
+        } catch (e) {}
+      };
+      if (window.requestAnimationFrame) requestAnimationFrame(hin);
+      setTimeout(hin, 320);   /* nach der Zähl-Animation der Karte */
+    }
     return true;
   }
 
@@ -5100,12 +5166,58 @@
         '<span style="opacity:.7">' + escH(herkunft) + '</span>' +
         '<div class="vi-rf-zaehler">Herkunft steht in der Übersicht — nicht „Sprachaufzeichnung".</div>');
       _rfStandZeichnen();
+      _rfFrageNochmal();     /* v1306 */
       if (_fs.an && _fs.stream) _fsHoeren(true);
     }).catch(function (e) {
       _rfDenkt(false);
       _rfBlase('co', 'Der Abruf ist fehlgeschlagen — sag mir den Bodenrichtwert einfach selbst.');
       if (_fs.an && _fs.stream) _fsHoeren(true);
     });
+  }
+
+  /* ═══ v1306 · Nach einem Abruf steht die Frage wieder da ════════════════
+     Marcels Vorgabe (design/mockups/fragen.png): „die Frage vom Co-Piloten
+     danach, die muss darunter gestellt werden."
+
+     Im Bild hat „Hol den Bodenrichtwert" sauber funktioniert — der Wert
+     kam, 90 €/m² aus BORIS. Danach stand aber nur noch der Wert da. Die
+     Frage („Was weisst du zum Grundstueck?") war nach oben weggerutscht,
+     und was als Naechstes zu tun ist, stand nur klein in der Leiste.
+
+     Ein Abruf beantwortet EINEN Teil der Frage. Solange andere Felder
+     desselben Blocks offen sind, gehoert die Frage wieder hin — mit den
+     Pillen, die zeigen, was jetzt noch fehlt.
+
+     Steht nichts mehr offen, wird NICHT wiederholt: dann ist der Block
+     fertig, und die Frage noch einmal zu stellen waere eine Aufforderung
+     zu etwas, das es nicht mehr gibt. */
+  /* Genau EINE Blase trägt die Hervorhebung — die Frage, die gerade gilt.
+     Die vorige verliert sie, sonst leuchtet nach zehn Fragen der halbe
+     Verlauf und die Auszeichnung sagt nichts mehr. */
+  function _rfDranBlase(b) {
+    try {
+      var chat = $('vi-rf-chat');
+      if (chat) [].slice.call(chat.querySelectorAll('.vi-rf-dran-blase'))
+        .forEach(function (x) { x.classList.remove('vi-rf-dran-blase'); });
+      if (b) b.classList.add('vi-rf-dran-blase');
+    } catch (e) {}
+    return b;
+  }
+
+  function _rfFrageNochmal() {
+    if (!_rf) return;
+    var e = _rf.offen[_rf.i];
+    if (!e || !e.ids) return;
+    var fehlt = e.ids.filter(function (id) {
+      var v = _rf.data.fields[id];
+      if (v != null && String(v).trim() !== '') return false;
+      var el = document.getElementById(id);
+      return !(el && String(el.value || '').trim() !== '');
+    });
+    if (!fehlt.length) return;
+    _rfDranBlase(_rfBlase('co', escH(e.frage) + _rfPillen(e) +
+      '<div class="vi-rf-zaehler">Noch offen: ' + escH(_rfFelderNamen(fehlt)) + '</div>'));
+    _rfDranZeichnen();
   }
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -5244,14 +5356,19 @@
         : 'Für diese Adresse kann ich eine <b>Marktpreisindikation</b> holen — ' +
           'Kaufpreisniveau, <b>Marktmiete</b> und die Lagebewertung. ') +
       ' Sie läuft im Hintergrund; wir machen solange weiter.');
+    /* v1306: Die Leistungen heissen, wie sie heissen. „Einfach" und
+       „Erweitert" waren Kurzformen fuer die Stufenwahl — auf einem Knopf,
+       der neben „Lage recherchieren" steht, sagen sie nichts. Marcels
+       Vorgabe: „ich habe zum Beispiel die erweiterte Marktpreisindikation,
+       so sollte die auch heissen. Du nennst die nur erweiterte." */
     if (kg.mpi) _rfAktion('markt',
       'Kaufpreisniveau, Marktmiete, Makro- und Mikrolage — läuft gleich im Hintergrund.',
-      _mbGewollt ? 'Einfach' : 'Marktpreisindikation', { frei: kg.mpi, stufe: 1 });
+      'Marktpreisindikation', { frei: kg.mpi, stufe: 1 });
     if (kg.mpi_plus) _rfAktion('markt2',
       'Zusätzlich Preishistorie, amtliche Makrolage und eine Einordnung im Fließtext. ' +
       'Sie liest auch Zustand, Energieausweis, Bodenrichtwert und deine Lagebewertung — ' +
       'die kommen erst in den nächsten Etappen, deshalb hole ich sie am Ende von Etappe 4.',
-      _mbGewollt ? 'Erweitert' : 'Erweiterte (später)', { frei: kg.mpi_plus, stufe: 2 });
+      'Erweiterte Marktpreisindikation', { frei: kg.mpi_plus, stufe: 2 });
   }
 
   function _rfMarktWaehlen(stufe) {
@@ -5649,12 +5766,12 @@
     var pv = _rfProfilVorschlag(e);
     /* v1288: Bei einer Auswahl stehen die STUFEN in der Frage. Wir bewerten
        danach - also soll der Nutzer sie hoeren, statt Freitext zu raten. */
-    _rfBlase('co', escH(e.frage) + _rfPillen(e) + _rfSkalen(e) +
+    _rfDranBlase(_rfBlase('co', escH(e.frage) + _rfPillen(e) + _rfSkalen(e) +
       (pv ? '<div class="vi-rf-vorschlag">Aus deinen Einstellungen hätte ich: <b>' +
             escH(pv.text) + '</b></div>' : '') +
       _rfAbrufAngebot(e) +
       '<div class="vi-rf-zaehler">Frage ' + (_rf.i + 1) + ' von ' + _rf.offen.length +
-        (e.et ? ' · Etappe ' + e.et + ' · ' + escH(_etName(e.et)) : '') + '</div>');
+        (e.et ? ' · Etappe ' + e.et + ' · ' + escH(_etName(e.et)) : '') + '</div>'));
     _rf.profilVorschlag = pv;
     _rfStandZeichnen();   /* v1281 */
     _rfBandZeichnen();    /* v1288 */

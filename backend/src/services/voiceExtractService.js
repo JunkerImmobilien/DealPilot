@@ -648,12 +648,44 @@ const ZUSATZ_ANTWORT = [
   'gezielte Rueckfrage zu genau den Feldern im Katalog. Uebernimm NUR den',
   'WERT, niemals den ganzen Satz. "490 Euro kalt im Monat" -> 490,',
   '"so um die hundert Quadratmeter" -> 100, "Baujahr war 62" -> 1962.',
+  '',
+  /* ═══ v1306 · Eine Verneinung IST eine Angabe ═══════════════════════
+     Marcels Befund vom 11.09.2026 (design/mockups/sanierung.png): auf
+     "Wir haben keine Sanierungskosten und auch keine Moeblierung"
+     antwortete der Co-Pilot "nichts gefunden, was hierher passt".
+
+     Die Ursache stand direkt darunter: "Niemals 0 setzen - eine 0 sieht
+     aus wie eine Angabe und ist keine." Diese Regel kam aus v1280c und
+     zielte auf einen ANDEREN Fall: "zwanzig Prozent vom Kaufpreis", ohne
+     dass ein Kaufpreis bekannt ist. Dort ist 0 tatsaechlich falsch.
+
+     Bei einer ausdruecklichen Verneinung ist 0 aber GENAU die Angabe.
+     "Keine Sanierungskosten" heisst nicht "ich weiss es nicht", sondern
+     "der Wert ist null". Der Unterschied ist der ganze Punkt, und er
+     stand nirgends. */
+  'VERNEINUNGEN SIND ANGABEN, keine Luecken. Wer ausdruecklich sagt, dass',
+  'etwas NICHT vorhanden ist, hat die Frage BEANTWORTET:',
+  '  "keine Sanierungskosten" / "nichts zu sanieren" -> Betragsfeld 0',
+  '  "nichts wird mitverkauft" / "keine Moebel" -> 0 bzw. "nein"',
+  '  "kein Stellplatz", "keine Zusatzeinnahmen" -> 0',
+  '  "steht leer" -> Leerstand ja, Miete 0',
+  'Bei Auswahlfeldern nimm die Stufe, die "nichts/keines" bedeutet, wenn',
+  'es sie gibt. Gibt es kein passendes Feld fuer die Verneinung, lass sie',
+  'weg - aber erfinde keine Luecke, wo eine klare Aussage steht.',
+  '',
+  'MEHRERE AUSSAGEN IN EINEM SATZ werden EINZELN ausgewertet. "Wir haben',
+  'keine Sanierungskosten und auch keine Moeblierung" enthaelt ZWEI',
+  'Angaben zu ZWEI Feldern - beide gehoeren ins Ergebnis. Ein "und", ein',
+  'Komma oder ein "aber" trennt Aussagen, es verbindet sie nicht zu einer.',
+  '',
   'Enthaelt die Antwort keinen verwertbaren Wert ("weiss nicht", "keine',
-  'Ahnung"), gib ein leeres JSON-Objekt zurueck.',
+  'Ahnung", "muss ich nachsehen"), gib ein leeres JSON-Objekt zurueck.',
+  'Das ist etwas anderes als eine Verneinung: "weiss nicht" ist eine',
+  'Luecke, "gibt es nicht" ist eine Antwort.',
   'BEZIEHT sich die Antwort auf einen Wert, der NICHT im bekannten Stand',
   'steht ("zwanzig Prozent vom Kaufpreis", ohne dass ein Kaufpreis bekannt',
-  'ist), lass das Feld WEG. Niemals 0 oder einen geschaetzten Wert setzen -',
-  'eine 0 sieht aus wie eine Angabe und ist keine.'
+  'ist), lass das Feld WEG und schaetze nichts - DORT sieht eine 0 aus wie',
+  'eine Angabe und ist keine.'
 ].join(String.fromCharCode(10));
 
 const ZUSATZ_INSERAT = [
