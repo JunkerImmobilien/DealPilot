@@ -1,14 +1,20 @@
 # DealPilot auf der Messe — der eine Satz, die 30 Argumente, das Plakat
 
-**Stand 11.09.2026.** Ausgearbeitet am laufenden Staging-Stand: eigenes Objekt
-angelegt (MFH Bielefeld, 620.000 €, 312 m², 4 Einheiten, Bj 1974), durch alle
-neun Reiter gefahren, Sprechlauf geöffnet, BMF-Rechner, Marktbericht,
-Portfolio-Cockpit. **Jede Zahl in diesem Papier ist eine gemessene, keine
-geschätzte.**
+**Stand 11.09.2026, Sprechlauf-Teil auf `v1310d` nachgezogen.** Ausgearbeitet am
+laufenden Staging-Stand: eigenes Objekt angelegt (MFH Bielefeld, 620.000 €,
+312 m², 4 Einheiten, Bj 1974), durch alle neun Reiter gefahren, Sprechlauf
+geöffnet, BMF-Rechner, Marktbericht, Portfolio-Cockpit. **Jede Zahl in diesem
+Papier ist eine gemessene, keine geschätzte.**
 
 Vorgänger: `usp-dealpilot-2026-09.md` (Wettbewerbsvergleich gegen
 immobewertung.ai) — der bleibt gültig und ergänzt dieses hier.
 Gestaltete Fassung zum Zeigen und Drucken: `messeplakat-2026-11.html`
+
+> **Diese beiden Dateien sagen dasselbe und müssen zusammen gepflegt werden.**
+> Am 11.09. abends wurden die Sprechlauf-Argumente auf `v1310d` gezogen
+> (`ed76844`) — aber nur in der HTML-Fassung. Die Zahlen hier standen danach
+> einen Tag lang falsch da (*„11 Fragen in 4 Etappen"*, *„16 → 13"*). **Wer
+> eine von beiden anfasst, fasst beide an.**
 
 ---
 
@@ -42,20 +48,22 @@ Software — so erzählt man sie auch am Stand.
 ### A · Reinkommen: die Daten, ohne zu tippen
 
 **1 · Der Co-Pilot führt das Interview**
-„Frag mich durch" — er stellt **11 Fragen in 4 Etappen** (Geld · Lage &
-Zustand · Feinschliff · Deine Sicht), freihändig, das Mikrofon bleibt an. Er
-merkt selbst, wann du fertig bist. *„Weiß ich nicht"* ist eine gültige
-Antwort und kommt nicht wieder.
+„Frag mich durch" — er stellt **16 Fragen in 5 Etappen**, freihändig, das
+Mikrofon bleibt an. Er merkt selbst, wann du fertig bist. Du darfst
+*„zurück"*, *„weiter"* oder *„überspringen"* sagen; bei Auswahlfeldern reicht
+ein Klick auf die Stufe, und sind alle gewählt, läuft er von selbst weiter.
+*„Weiß ich nicht"* ist eine gültige Antwort und kommt nicht wieder.
 
 **2 · Vier Minuten erzählen statt 204 Felder tippen**
 Der freie Sprechlauf nimmt bis zu vier Minuten auf und verteilt, was du
-gesagt hast, auf über **200 Eingabefelder**. Du bestätigst am Ende in einer
-Tabelle — nichts wird ungefragt übernommen.
+gesagt hast, auf über **200 Eingabefelder**. Er hört auch, was du **nebenbei**
+sagst: nennst du bei der Adresse schon das Baujahr, entfällt die Frage danach.
+Du bestätigst am Ende in einer Tabelle — nichts wird ungefragt übernommen.
 
 **3 · Er fragt nicht, was er schon weiß**
 Wer vorher ein Exposé eingelesen hat, hört: *„Aus Exposé/Marktbericht stehen
-schon 9 Angaben — die frage ich nicht noch einmal."* Aus 16 Fragen werden 13,
-Etappe 1 schrumpft von vier Fragen auf eine.
+schon 8 Angaben"* — **und sieht sie einzeln aufgelistet**, zum Nachsehen statt
+zum Glauben. Aus 16 Fragen werden 14.
 
 **4 · Er bietet an, statt zu raten**
 Fehlt die Finanzierung, sagt er, was er hätte: *„Aus deinen Einstellungen
@@ -66,7 +74,13 @@ Assistenten und einer Zahlenfabrik.
 **5 · Vier Wege hinein, alle enden in derselben Tabelle**
 Exposé/Marktbericht als PDF · Sprache · ImmoMetrica · Belegfotos für die
 Steuer. Die Reihenfolge ist bewusst: **was die Maschine lesen kann, liest sie
-zuerst**; der Mensch ergänzt nur den Rest.
+zuerst**; der Mensch ergänzt nur den Rest. Fehlt die Straße, rechnet er auf
+Wunsch mit dem **Ortszentrum** weiter, statt die Abrufe scheitern zu lassen.
+
+> **Am Stand vorführen:** mitten im Gespräch *„Hol den Bodenrichtwert"* sagen —
+> er holt ihn amtlich, zeigt ihn mit Stichtag und Zone und stellt die Frage mit
+> einem Haken davor wieder hin. **Kein Klick.** Dasselbe für die
+> Marktpreisindikation.
 
 ---
 
@@ -132,6 +146,13 @@ Eine unabhängige KI-Gegenrechnung läuft neben der eigenen Engine als
 Schiedsspruch**: der Modellwert wandert nie in den Marktwert, nie ins Dossier.
 Die Engine bleibt die Quelle — deterministisch, gegen Handrechnung geprüft,
 im PDF Zeile für Zeile nachvollziehbar.
+
+> **Der Marktbericht wird gelesen, nicht nur abgerufen.** Aus dem Fließtext der
+> erweiterten Marktpreisindikation zieht der Co-Pilot Bevölkerung, Nachfrage,
+> Wertsteigerung und Entwicklung — und **schlägt sie vor, statt sie zu setzen**:
+> *„Aus der erweiterten Marktpreisindikation habe ich das hier entnommen — soll
+> ich es so übernehmen?"* Eine Auslegung bleibt eine Auslegung, auch wenn sie
+> stimmt.
 
 ---
 
