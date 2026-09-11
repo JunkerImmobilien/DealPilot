@@ -2631,6 +2631,12 @@
       '.oabi-ov.vi-mode .oabi-modal{width:min(1240px,100%);max-height:94vh}',
       '@media(max-width:1280px){.oabi-ov.vi-mode .oabi-modal{width:min(1000px,100%)}}',
       '@media(max-width:1040px){.oabi-ov.vi-mode .oabi-modal{width:min(860px,100%)}}',
+      /* v1300: Marcels zweiter Weg — „oder wir machen das Modal noch ein
+         bisschen größer". Im geführten Dialog von 94 auf 97 vh; bei 987 px
+         Fensterhöhe sind das 30 px mehr, die direkt in die Bühne fließen.
+         Weiter als 97 wäre falsch: das Modal braucht sichtbaren Rand, sonst
+         sieht es aus wie eine eigene Seite und der Weg zurück fehlt. */
+      '.oabi-ov.vi-mode.vi-dialog .oabi-modal{max-height:97vh;width:min(1360px,100%)}',
 
       /* ═══ v1290 · DIE ÜBERSICHTSSPALTE ════════════════════════════════
          EINE Regel je Klasse. Vorher standen zwei `.vi-rf-st`-Regeln im
@@ -2790,7 +2796,22 @@
       '.oabi-ov.vi-mode.vi-dialog .oabi-foot{padding-top:9px;padding-bottom:9px}',
       /* Der Mikrofon-Streifen: flacher, ohne an Treffsicherheit zu verlieren.
          Die Fläche zum Klicken bleibt über 40 px hoch. */
-      '.oabi-ov.vi-mode.vi-dialog .vi-rf-mikro{margin:8px 2px 7px;padding:8px 13px}',
+      /* ═══ v1300 · Der untere Rand, so flach wie möglich ═════════════════
+         Marcels Vorgabe: „genauso wie da drunter ‚Ich höre weiter zu‘ und
+         allem und auch, ja, wenn man tippen möchte … dass man das alles ein
+         bisschen flacher macht, dass dieses Visualisierungsfenster, wo der
+         Co-Pilot antwortet, dass das größer ist."
+
+         GEMESSEN vorher: Mikro 53 + Tippzeile 43 + Nebenknöpfe 33 = 129 px
+         plus Abstände. Alles davon ist Bedienung, die man kennt, sobald man
+         sie einmal gesehen hat.
+
+         Die Klickflächen bleiben über 36 px hoch — flacher wäre auf dem
+         Handy nicht mehr sicher zu treffen. */
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-mikro{margin:6px 2px 6px;padding:6px 12px;gap:10px}',
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-zeile input{padding:8px 13px;font-size:13.5px}',
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-neben{margin-top:6px;gap:6px}',
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-neben button{padding:5px 11px;font-size:11.5px}',
 
       /* ═══ v1299 · Die Liste soll man am Stück sehen ═════════════════════
          Marcels Vorgabe: „dass man die Liste auf einer Seite auf jeden Fall
@@ -2884,17 +2905,22 @@
       '.vi-rf-dran{margin:12px 2px 2px;border-radius:12px;overflow:hidden;',
       '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent);',
       '  background:var(--wl-fffdf7, #FFFDF7)}',
-      '.vi-dran-f{display:flex;gap:9px;align-items:baseline;padding:9px 13px;',
-      '  font:400 12.5px/1.45 Inter,system-ui,sans-serif}',
+      /* v1300: flacher. Die Zeile mit der Frage trug 9 px oben und unten
+         und eine Zeilenhöhe von 1.45 — zusammen fast 40 px für einen Satz. */
+      '.vi-dran-f{display:flex;gap:8px;align-items:baseline;padding:6px 13px;',
+      '  font:400 12px/1.35 Inter,system-ui,sans-serif}',
       '.vi-dran-f i{font-style:normal;color:var(--wl-c9a84c, #C9A84C);font-weight:700}',
       '.vi-dran-f span{flex:1;min-width:0}',
       '.vi-dran-f b{font-weight:700}',
-      '.vi-dran-a{padding:9px 13px 11px;border-top:1px dashed rgba(42,39,39,.14);',
+      /* Die Knopfreihe liegt jetzt in EINER Zeile mit ihrer Beschriftung —
+         das spart die 7 px Abstand darunter und eine ganze Textzeile. */
+      '.vi-dran-a{display:flex;align-items:center;flex-wrap:wrap;gap:6px;',
+      '  padding:6px 13px 6px;border-top:1px dashed rgba(42,39,39,.14);',
       '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 9%, transparent)}',
-      '.vi-dran-lbl{display:block;margin-bottom:7px;',
+      '.vi-dran-lbl{flex:0 0 auto;margin:0 3px 0 0;',
       '  font:700 9px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.11em;',
       '  text-transform:uppercase;color:var(--wl-b8932f, #b8932f)}',
-      '.vi-dran-btn{display:inline-flex;align-items:center;gap:7px;margin:0 8px 6px 0;',
+      '.vi-dran-btn{display:inline-flex;align-items:center;gap:7px;margin:0;',
       '  border-radius:10px;padding:8px 14px;cursor:pointer;',
       '  border:1px solid var(--wl-c9a84c, #C9A84C);',
       '  background:linear-gradient(160deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C));',
@@ -2905,7 +2931,13 @@
       '.vi-dran-btn b{font-size:14px;line-height:1}',
       '.vi-dran-btn i{font-style:normal;font-size:10px;font-weight:600;padding:2px 7px;',
       '  border-radius:99px;background:rgba(42,39,39,.14)}',
-      '.vi-dran-t{margin-top:2px;font:400 11.5px/1.5 Inter,system-ui,sans-serif;opacity:.7}',
+      /* v1300: EINE Zeile, die dem Zeiger folgt — nicht mehr eine je Knopf.
+         Zwei Zeilen Höhe sind der Deckel: was länger ist, wird abgeschnitten
+         statt die Leiste wachsen zu lassen. Der volle Text steht im
+         `title` des Knopfes. */
+      '.vi-dran-t{margin:0;padding:5px 13px 7px;font:400 11.5px/1.4 Inter,system-ui,sans-serif;',
+      '  opacity:.72;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 9%, transparent);',
+      '  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}',
       /* Die Begruendungen der Lage-Recherche. */
       '.vi-lg-t{margin:7px 0 0;font:400 11.5px/1.55 Inter,system-ui,sans-serif;opacity:.85}',
       '.vi-lg-t b{display:block;font:700 9.5px/1 "JetBrains Mono",ui-monospace,monospace;',
@@ -3093,6 +3125,38 @@
     return h;
   }
 
+  /* ═══ v1300 · Der Verlauf muss WIRKLICH unten stehen ════════════════════
+     Marcels Befund vom 11.09.2026: „das Feld, wo jetzt die Ausgaben
+     drinne stehen, das muss immer ganz nach unten gescrollt werden. Das
+     ist mir aufgefallen, dass das manchmal nicht so ist."
+
+     „Manchmal" ist der Hinweis auf die Ursache. `scrollTop = scrollHeight`
+     direkt nach `appendChild` misst die Höhe in DEM Moment — und in dem
+     Moment stimmt sie oft noch nicht:
+
+       · die Einblend-Animation startet mit `translateY(7px)`,
+       · Schriften können noch nachladen und Zeilen umbrechen,
+       · eine Score-Karte wächst, während ihre Balken ausfahren,
+       · Bilder und `<details>` ändern die Höhe nach dem Einhängen.
+
+     Deshalb wird jetzt DREIMAL ans Ende gefahren: sofort, im nächsten
+     Bild (nach Layout), und noch einmal nach 260 ms — da ist auch die
+     Karten-Animation durch. Das ist billiger als ein ResizeObserver und
+     deckt alle vier Fälle ab.
+
+     WER SELBST HOCHGESCROLLT HAT, WIRD NICHT ZURÜCKGERISSEN. Wer im
+     Verlauf nach oben liest, während eine Antwort eintrifft, soll dort
+     bleiben — sonst springt ihm die Ansicht mitten im Lesen weg. */
+  function _rfAnsEnde(chat, erzwingen) {
+    if (!chat) return;
+    var nah = (chat.scrollHeight - chat.clientHeight - chat.scrollTop) < 120;
+    if (!nah && !erzwingen) return;
+    var tu = function () { chat.scrollTop = chat.scrollHeight; };
+    tu();
+    if (window.requestAnimationFrame) requestAnimationFrame(tu);
+    setTimeout(tu, 260);
+  }
+
   /* ── Der Verlauf ─────────────────────────────────────────────────── */
   function _rfBlase(wer, html, treffer) {
     var chat = $('vi-rf-chat'); if (!chat) return null;
@@ -3101,7 +3165,9 @@
     d.innerHTML = '<div class="vi-rf-wer">' + (wer === 'co' ? 'Co-Pilot' : 'Du') + '</div>' + html +
       (treffer ? '<div class="vi-rf-treffer">✓ ' + treffer + '</div>' : '');
     chat.appendChild(d);
-    chat.scrollTop = chat.scrollHeight;
+    /* Eine neue Blase ist immer gewollt sichtbar — auch wenn der Nutzer
+       gerade oben liest, denn er hat sie selbst ausgeloest. */
+    _rfAnsEnde(chat, true);
     /* ═══ v1299 · Eine Score-Karte ist keine Sprechblase ═════════════════
        Marcels Befund: „Dann ist das irgendwie ein bisschen komisch
        eingerückt. Also man kann den Deal Score und den Investor Deal Score
@@ -3130,7 +3196,7 @@
     d.className = 'vi-rf-denkt';
     d.innerHTML = '<i></i><i></i><i></i> einen Moment …';
     chat.appendChild(d);
-    chat.scrollTop = chat.scrollHeight;
+    _rfAnsEnde(chat);
   }
 
   function _rfMelden(text, warte) {
@@ -4432,20 +4498,46 @@
       (akt.length
         ? '<div class="vi-dran-a">' +
           '<span class="vi-dran-lbl">Ich kann das für dich holen:</span>' +
-          akt.map(function (a) {
+          /* ═══ v1300 · EINE Erklärzeile statt einer je Knopf ══════════════
+             Marcels Befund vom 11.09.2026: „der Balken für Marktindikation,
+             erweiterte Marktindikation und Lage recherchieren ist recht
+             breit. Vielleicht können wir das ein bisschen flacher machen."
+
+             Hier stand `akt.map(...)` — für JEDE Aktion ein eigener
+             Absatz. Bei drei Angeboten also drei Textblöcke untereinander,
+             dauerhaft sichtbar, zusammen über 70 px. Sie erklären etwas,
+             das man einmal liest und danach nie wieder braucht.
+
+             Die Texte gehen nicht verloren: sie stehen jetzt in EINER
+             Zeile, die zeigt, was zum gerade berührten Knopf gehört. Ohne
+             Berührung steht dort der Text der ersten Aktion. Drei Absätze
+             werden so zu einer Zeile — und beim Überfahren sagt sie mehr
+             als vorher, weil sie zum Knopf gehört, auf den man zeigt. */
+          akt.map(function (a, i) {
             return '<button type="button" class="vi-dran-btn" data-akt="' + escH(a.art) + '"' +
+                   ' data-i="' + i + '"' +
                    (a.hinweis ? ' title="' + escH(a.hinweis) + '"' : '') + '>' +
                    '<b>' + (AKT_ICON[a.art] || '›') + '</b>' + escH(a.knopf) +
                    (a.frei != null ? '<i>' + escH(String(a.frei)) + ' frei</i>' : '') +
                    '</button>';
           }).join('') +
-          (akt.filter(function (a) { return a.txt; }).map(function (a) {
-            return '<div class="vi-dran-t">' + a.txt + '</div>';
-          }).join('')) +
-          '</div>'
+          '</div>' +
+          (function () {
+            var mit = akt.filter(function (a) { return a.txt; });
+            if (!mit.length) return '';
+            return '<div class="vi-dran-t" data-dran-t>' + mit[0].txt + '</div>';
+          })()
         : '');
+    var tz = host.querySelector('[data-dran-t]');
     [].slice.call(host.querySelectorAll('.vi-dran-btn')).forEach(function (b) {
       b.addEventListener('click', function () { _rfAktionKlick(b.getAttribute('data-akt'), b); });
+      /* Die Zeile folgt dem Zeiger — auch der Tastatur, damit sie nicht
+         nur mit Maus erreichbar ist. */
+      if (!tz) return;
+      var i = parseInt(b.getAttribute('data-i'), 10);
+      var zeig = function () { if (akt[i] && akt[i].txt) tz.innerHTML = akt[i].txt; };
+      b.addEventListener('mouseenter', zeig);
+      b.addEventListener('focus', zeig);
     });
   }
   /* EIN Klickweg für alle Angebote. Vorher hatte jedes seinen eigenen —
