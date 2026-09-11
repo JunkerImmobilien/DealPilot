@@ -1771,6 +1771,101 @@ function _v234_1RenderPlanStatusHeader() {
 }
 window._v234_1RenderPlanStatusHeader = _v234_1RenderPlanStatusHeader;
 
+/* ═══ v1296d · Der Kaufblock stand im TOTEN Zweig ════════════════════════
+   GEMESSEN am 11.09.2026: `_renderPlanPane()` kehrt bei jedem bezahlten
+   Plan nach vier Zeilen zurueck —
+
+       if (_v234_1CurrentPlan !== 'free') { return … Kontingent … }
+
+   — und der Nachkauf samt Einzelkauf stand HINTER diesem Return. Ergebnis:
+
+     · zahlender Kunde  -> frueher Return, sieht den Kaufblock NIE
+     · Free-Kunde       -> sieht ihn, darf aber nicht kaufen
+                           (`/credits/checkout` antwortet `upgrade_required`)
+
+   Der Block wurde also genau denen gezeigt, die ihn nicht nutzen duerfen,
+   und genau denen verborgen, fuer die er gebaut ist. Gemessen im DOM:
+   `.plan-credits-section` 0 Treffer, `.plan-einzel-row` 0 Treffer.
+
+   ICH HABE IHN BEI v1294 „SICHTBAR GEMACHT" — aus einer Bedingung
+   herausgeloest, die ihn verbarg, und dabei in einem Zweig gelassen, der
+   nie laeuft. Von einer Falle in die naechste, und beide Male habe ich
+   gemeldet, es sei erledigt, ohne den Bedienweg abzugehen.
+
+   Jetzt liegt er in einer eigenen Funktion und wird aus BEIDEN Zweigen
+   gerufen. `planKey` kommt vom Aufrufer, weil die beiden Zweige den Plan
+   unterschiedlich ermitteln. */
+function _kaufBlockHtml(planKey) {
+  if (!window.DealPilotConfig || !DealPilotConfig.pricing) return '';
+  var P = DealPilotConfig.pricing;
+  var h = '';
+
+  /* Der Waehler wohnt in `pricing-modal.js` und wird ueber
+     `window.DealPilotMenge` geliehen — zwei Kopien desselben Bausteins
+     laufen sonst auseinander, wie die Nachkauf-Zahlen es bis v1294 taten.
+     Fehlt der Export, gibt es KEINEN Waehler statt eines kaputten: der
+     Knopf traegt dann `data-menge="1"` und kauft eine. */
+  function waehler(id, cent) {
+    var M = window.DealPilotMenge;
+    if (!M || typeof M.html !== 'function') return '';
+    if (typeof M.binden === 'function') M.binden();
+    return M.html(id, cent);
+  }
+  var eur = function (v) { return v.toFixed(2).replace('.', ',') + ' €'; };
+
+  var nk = (typeof P.nachkaufFuer === 'function') ? P.nachkaufFuer(planKey) : null;
+  if (nk) {
+    h += '<div class="plan-credits-section">' +
+      '<h3 class="plan-credits-title">Bewertungen nachkaufen</h3>' +
+      '<p class="plan-credits-desc">Ist dein Monatskontingent aufgebraucht, kannst du dieselbe Menge ' +
+        'noch einmal nachkaufen — für ein Viertel deines Monatsbeitrags. ' +
+        'Zugekauftes verfällt nie und wird erst verbraucht, wenn dein Monatskontingent leer ist.</p>' +
+      /* `pm-menge-wrap` an der KARTE, nicht an der Knopfzeile: der Waehler
+         sucht Preisfeld und Kaufknopf in diesem Behaelter, und der Preis
+         steht zwei Zeilen weiter oben. */
+      '<div class="plan-credit-card plan-credit-highlight pm-menge-wrap" style="max-width:340px">' +
+        '<div class="plan-credit-num">' + nk.label + '</div>' +
+        '<div class="plan-credit-sub">' + nk.kontingent.mpi + ' Marktpreisindikationen' +
+          (nk.kontingent.mpi_plus ? ' · ' + nk.kontingent.mpi_plus + ' erweiterte' : '') +
+          (nk.kontingent.wev ? ' · ' + nk.kontingent.wev + ' Wertermittlungen' : '') + '</div>' +
+        '<div class="plan-credit-price" data-summe>' + eur(nk.preis_eur) + '</div>' +
+        '<div class="plan-menge-zeile">' +
+          waehler('nk-' + nk.key, Math.round(nk.preis_eur * 100)) +
+          '<button class="btn btn-outline btn-sm" data-pack-id="' + nk.key + '" data-menge="1" ' +
+            'onclick="_buyCreditPack(\'' + nk.key + '\', this)">Dazubuchen</button>' +
+        '</div>' +
+      '</div>' +
+      '</div>';
+  }
+
+  /* v1294: Der Einzelkauf funktioniert seit v1183, wurde aber nie
+     angeboten — er stand INNERHALB von `if (creditPacks.length > 0)`, und
+     `creditPacks` ist seit v1246 leer. */
+  var einzeln = P.einzelkauf || [];
+  if (einzeln.length > 0) {
+    h += '<div class="plan-credits-section plan-einzel-section">' +
+      '<h4 class="plan-credits-title" style="font-size:14px">Oder einzeln — genau die eine, die gerade fehlt</h4>' +
+      '<p class="plan-credits-desc">Einzelne Bewertungen kosten mehr als im Kontingent; dafür zahlst du nur, ' +
+        'was du wirklich brauchst. Auch sie verfallen nie.</p>' +
+      '<div class="plan-einzel-grid">';
+    einzeln.forEach(function (e) {
+      /* Rechts der GESAMTPREIS, darunter klein der Stueckpreis — sonst
+         weiss bei Menge 5 niemand mehr, was eine einzelne kostet. */
+      var preis = eur(e.price_eur);
+      h += '<div class="plan-einzel-row pm-menge-wrap">' +
+        '<span class="plan-einzel-l">' + e.label + '</span>' +
+        waehler('ez-' + e.key, Math.round(e.price_eur * 100)) +
+        '<span class="plan-einzel-p"><b data-summe>' + preis + '</b>' +
+          '<small>' + preis + ' je Stück</small></span>' +
+        '<button class="btn btn-outline btn-sm" data-pack-id="' + e.key + '" data-menge="1" ' +
+          'onclick="_buyCreditPack(\'' + e.key + '\', this)">Kaufen</button>' +
+      '</div>';
+    });
+    h += '</div></div>';
+  }
+  return h;
+}
+
 function _renderPlanPane() {
 
   // V234.1: Status-Header oben anzeigen — bei bezahltem Plan reicht das
@@ -1785,9 +1880,18 @@ function _renderPlanPane() {
     }
   } catch (e) {}
 
-  // Bei bezahltem Plan: nur Status-Header zurückgeben (keine Plan-Cards)
+  /* Bei bezahltem Plan: Status-Header statt Plan-Karten — wer schon zahlt,
+     braucht keine Verkaufsseite.
+
+     v1296d: DER KAUFBLOCK GEHOERT TROTZDEM HIERHIN. Er stand bis heute
+     hinter diesem Return und war damit fuer jeden zahlenden Kunden
+     unerreichbar — also fuer genau die Gruppe, die als einzige nachkaufen
+     DARF (`/credits/checkout` weist Free mit `upgrade_required` ab).
+     Gemessen im DOM: `.plan-credits-section` 0 Treffer bei Plan „pro". */
   if (_v234_1CurrentPlan !== 'free') {
-    return '<h3 class="set-section-h">Dein Kontingent</h3><div id="set-ai-credits-host"><div class="hint">Lädt…</div></div><hr class="dvd">' + _v234_1Header; /* v611-kerosin-paid */
+    return '<h3 class="set-section-h">Dein Kontingent</h3><div id="set-ai-credits-host"><div class="hint">Lädt…</div></div><hr class="dvd">' +
+           _v234_1Header +
+           _kaufBlockHtml(_v234_1CurrentPlan); /* v611-kerosin-paid · v1296d */
   }
 
   // Free-User: Status-Header + bisherige Plan-Card-Logik (siehe unten)
@@ -1934,126 +2038,13 @@ function _renderPlanPane() {
      _investor, _pro) sind in der Stripe-Sandbox angelegt und tragen die
      Metadaten, aus denen der Webhook gutschreibt (dp_kind=bewertung_paket
      plus mpi/mpi_plus/wev). Im LIVE-Konto fehlen sie noch — dort laeuft
-     der Knopf in eine 404 des Katalogs, bis sie angelegt sind. */
-  /* ═══ v1296 · Der Mengenwähler, geliehen statt kopiert ══════════════════
-     Er wohnt in `pricing-modal.js` und wird über `window.DealPilotMenge`
-     bereitgestellt. Hier steht NUR der Zugriff darauf — zwei Kopien
-     desselben Bausteins laufen auseinander, genau wie die Nachkauf-Zahlen
-     es bis v1294 getan haben.
+     der Knopf in eine 404 des Katalogs, bis sie angelegt sind.
 
-     Fehlt der Export (alte ausgelieferte Fassung), gibt es KEINEN Wähler
-     statt eines kaputten: der Kaufknopf trägt dann `data-menge="1"` und
-     kauft eine — richtig, nur ohne Wahl. */
-  function _mengeWaehler(id, cent) {
-    var M = window.DealPilotMenge;
-    if (!M || typeof M.html !== 'function') return '';
-    if (typeof M.binden === 'function') M.binden();
-    return M.html(id, cent);
-  }
-
-  (function () {
-    var nk = (DealPilotConfig.pricing && typeof DealPilotConfig.pricing.nachkaufFuer === 'function')
-      ? DealPilotConfig.pricing.nachkaufFuer(current) : null;
-    if (!nk) return;
-    var eur = function (v) { return v.toFixed(2).replace('.', ',') + ' €'; };
-    html += '<div class="plan-credits-section">' +
-      '<h3 class="plan-credits-title">Bewertungen nachkaufen</h3>' +
-      '<p class="plan-credits-desc">Ist dein Monatskontingent aufgebraucht, kannst du dieselbe Menge ' +
-        'noch einmal nachkaufen — für ein Viertel deines Monatsbeitrags. ' +
-        'Zugekauftes verfällt nie und wird erst verbraucht, wenn dein Monatskontingent leer ist.</p>' +
-      /* v1296: `pm-menge-wrap` an der KARTE, nicht an der Knopfzeile — der
-         Waehler sucht Preisfeld und Kaufknopf in diesem Behaelter, und der
-         Preis steht zwei Zeilen weiter oben. */
-      '<div class="plan-credit-card plan-credit-highlight pm-menge-wrap" style="max-width:340px">' +
-        '<div class="plan-credit-num">' + nk.label + '</div>' +
-        '<div class="plan-credit-sub">' + nk.kontingent.mpi + ' Marktpreisindikationen' +
-          (nk.kontingent.mpi_plus ? ' · ' + nk.kontingent.mpi_plus + ' erweiterte' : '') +
-          (nk.kontingent.wev ? ' · ' + nk.kontingent.wev + ' Wertermittlungen' : '') + '</div>' +
-        /* v1296 · Menge waehlbar. `data-summe` traegt den Gesamtpreis, den
-           der Waehler fortschreibt; `plan-menge-wrap` ist der Behaelter,
-           an dem er Preis und Knopf wiederfindet. */
-        '<div class="plan-credit-price" data-summe>' + eur(nk.preis_eur) + '</div>' +
-        '<div class="plan-menge-zeile">' +
-          _mengeWaehler('nk-' + nk.key, Math.round(nk.preis_eur * 100)) +
-          '<button class="btn btn-outline btn-sm" data-pack-id="' + nk.key + '" data-menge="1" ' +
-            'onclick="_buyCreditPack(\'' + nk.key + '\', this)">Dazubuchen</button>' +
-        '</div>' +
-      '</div>' +
-      '</div>';
-  })();
-
-  // V63.1: KI-Credit-Pakete
-  if (creditPacks.length > 0) {
-    html += '<div class="plan-credits-section">' +
-      '<h3 class="plan-credits-title">Bewertungen nachkaufen</h3>' +
-      /* v1183: Marcels Befund zum alten Stand war „total unuebersichtlich".
-         Ursache: die Kachel zeigte eine Zahl (Liter) und einen Preis, und
-         was man dafuer BEKOMMT, stand nirgends — der Nutzer musste selbst
-         wissen, dass eine Wertermittlung 12 L kostet. Jetzt steht auf der
-         Kachel, was drin ist: 15 · 10 · 3, darunter ausgeschrieben. */
-      '<p class="plan-credits-desc">Jedes Paket enthält eine feste Zahl je Bewertungsart. ' +
-        'Zugekauftes verfällt nie und wird erst verbraucht, wenn dein Monatskontingent leer ist.</p>' +
-      '<div class="plan-credits-grid">';
-    creditPacks.forEach(function(pack) {
-      /* Beide Formen lesen: die neuen Pakete tragen mpi/mpi_plus/wev, die
-         alten Liter-Pakete nur `liter`. So bleibt die Kachel auch mit einer
-         alten config.js sinnvoll, statt „undefined" zu zeigen. */
-      var istNeu = (pack.mpi != null);
-      var num = istNeu
-        ? (pack.mpi + ' · ' + pack.mpi_plus + ' · ' + pack.wev)
-        : (pack.liter != null ? pack.liter : pack.credits);
-      var stueck = istNeu ? null
-        : (pack.per_liter != null ? pack.per_liter : pack.per_anfrage);
-      html += '<div class="plan-credit-card' + (pack.highlight ? ' plan-credit-highlight' : '') + '">' +
-        (pack.highlight ? '<span class="plan-credit-best">Beliebt</span>' : '') +
-        '<div class="plan-credit-flight">' + (pack.flight || '') + '</div>' +
-        '<div class="plan-credit-num">' + num + '</div>' +
-        '<div class="plan-credit-label">' +
-          (istNeu ? 'MPI · erweitert · Wertermittlung' : 'Abrufe') + '</div>' +
-        '<div class="plan-credit-price">' + pack.price_eur + ' €</div>' +
-        '<div class="plan-credit-sub">' +
-          (istNeu ? (pack.tag || '') : ('≈ ' + stueck.toFixed(2).replace('.', ',') + ' € je Abruf')) +
-        '</div>' +
-        '<button class="btn btn-outline btn-sm" onclick="_buyCreditPack(\'' + pack.key + '\')">Dazubuchen</button>' +
-      '</div>';
-    });
-    html += '</div>';
-
-    html += '</div>';
-  }
-
-  /* ═══ v1294 · Der Einzelkauf war unsichtbar ═══════════════════════════
-     Er funktioniert seit v1183 — gemessen am 11.09.2026 antwortet der
-     Checkout auf `mpi` mit HTTP 200 —, aber niemand bekam ihn je zu
-     sehen: er stand INNERHALB von `if (creditPacks.length > 0)`, und
-     `creditPacks` ist seit v1246 die leere Liste. Ein Kaufweg, der da
-     ist, den aber keiner findet.
-
-     Jetzt steht er eigenstaendig unter dem Nachkauf — so, wie es die
-     Vorgabe in config.js immer schon sagte: „der Knopf, an dem gerade
-     eine Bewertung fehlt, verkauft genau diese eine". */
-  if (einzelkauf.length > 0) {
-    html += '<div class="plan-credits-section plan-einzel-section">' +
-      '<h4 class="plan-credits-title" style="font-size:14px">Oder einzeln — genau die eine, die gerade fehlt</h4>' +
-      '<p class="plan-credits-desc">Einzelne Bewertungen kosten mehr als im Kontingent; dafür zahlst du nur, ' +
-        'was du wirklich brauchst. Auch sie verfallen nie.</p>' +
-      '<div class="plan-einzel-grid">';
-    einzelkauf.forEach(function (e) {
-      /* v1296: Menge auch hier — fuenf Marktpreisindikationen sind ein Kauf,
-         nicht fuenf. Rechts steht der Gesamtpreis, darunter klein der
-         Stueckpreis, sonst weiss bei Menge 5 niemand mehr, was eine kostet. */
-      var preis = e.price_eur.toFixed(2).replace('.', ',') + ' €';
-      html += '<div class="plan-einzel-row pm-menge-wrap">' +
-        '<span class="plan-einzel-l">' + e.label + '</span>' +
-        _mengeWaehler('ez-' + e.key, Math.round(e.price_eur * 100)) +
-        '<span class="plan-einzel-p"><b data-summe>' + preis + '</b>' +
-          '<small>' + preis + ' je Stück</small></span>' +
-        '<button class="btn btn-outline btn-sm" data-pack-id="' + e.key + '" data-menge="1" ' +
-          'onclick="_buyCreditPack(\'' + e.key + '\', this)">Kaufen</button>' +
-      '</div>';
-    });
-    html += '</div></div>';
-  }
+     v1296d: Der Block steht jetzt in `_kaufBlockHtml()` und wird aus
+     BEIDEN Zweigen gerufen — hier fuer Free, oben fuer den bezahlten
+     Plan. Vorher stand er nur hier, also nur im Zweig derer, die gar
+     nicht kaufen duerfen. */
+  html += _kaufBlockHtml(current);
 
   // V180: Stripe-Hinweis entfernt — Stripe ist jetzt der einzige Flow.
   // V234.1: Status-Header vor das Free-HTML prependen
