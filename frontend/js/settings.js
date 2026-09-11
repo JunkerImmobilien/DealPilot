@@ -1811,31 +1811,74 @@ function _kaufBlockHtml(planKey) {
     if (typeof M.binden === 'function') M.binden();
     return M.html(id, cent);
   }
+
+  /* v1297: Paketname und Inhalt kommen aus derselben Quelle wie im
+     Preis-Modal. Fehlt der Export, faellt die Karte auf das zurueck, was
+     sie vorher zeigte — die Zahlenreihe. Kein Absturz, nur weniger schoen. */
+  function _paketName(planKey) {
+    var M = window.DealPilotMenge;
+    return (M && typeof M.paket === 'function') ? M.paket(planKey)
+                                                : { name: 'Bewertungspaket', flug: '', claim: '' };
+  }
+  function _paketInhalt(kont, menge) {
+    var M = window.DealPilotMenge;
+    if (!M || typeof M.zeilen !== 'function') {
+      return kont.mpi + ' · ' + (kont.mpi_plus || 0) + ' · ' + (kont.wev || 0);
+    }
+    return M.zeilen(kont, menge).map(function (z) { return z.zahl + ' ' + z.text; }).join(' · ');
+  }
   var eur = function (v) { return v.toFixed(2).replace('.', ',') + ' €'; };
 
-  var nk = (typeof P.nachkaufFuer === 'function') ? P.nachkaufFuer(planKey) : null;
-  if (nk) {
+  /* ═══ v1297 · ALLE DREI Pakete, nicht nur das eigene ═══════════════════
+     Marcels Vorgabe: „Vielleicht bieten wir einfach dort drei Pakete an,
+     die man kaufen kann, aber nenn sie besser."
+
+     Hier stand bis eben nur EINE Karte — die zum eigenen Plan. Das war
+     eine Einschraenkung, die es im Backend nie gab: `_checkoutBewertung`
+     prueft nur „nicht free", nie den Plan. Ein Starter-Kunde durfte die
+     Langstrecke also immer schon kaufen, sah sie bloss nirgends.
+
+     Das eigene Paket steht vorn und ist hervorgehoben — wer nachkauft,
+     kauft meistens seine Menge noch einmal. Eine Vorauswahl, keine
+     Bindung. */
+  var PAKET_PLAENE = ['starter', 'investor', 'pro'];
+  var pakete = (typeof P.nachkaufFuer === 'function')
+    ? PAKET_PLAENE.map(function (pk) {
+        var n = P.nachkaufFuer(pk);
+        return n ? { pk: pk, n: n, eigen: pk === planKey } : null;
+      }).filter(Boolean)
+    : [];
+  /* Das eigene zuerst, die Reihenfolge der uebrigen bleibt. */
+  pakete.sort(function (a, b) { return (b.eigen ? 1 : 0) - (a.eigen ? 1 : 0); });
+
+  if (pakete.length) {
     h += '<div class="plan-credits-section">' +
-      '<h3 class="plan-credits-title">Bewertungen nachkaufen</h3>' +
-      '<p class="plan-credits-desc">Ist dein Monatskontingent aufgebraucht, kannst du dieselbe Menge ' +
-        'noch einmal nachkaufen — für ein Viertel deines Monatsbeitrags. ' +
+      '<h3 class="plan-credits-title">Bewertungspakete</h3>' +
+      '<p class="plan-credits-desc">Ist dein Monatskontingent aufgebraucht, legst du hier nach. ' +
+        'Jedes Paket ist für jeden Plan kaufbar — such dir aus, was du brauchst. ' +
         'Zugekauftes verfällt nie und wird erst verbraucht, wenn dein Monatskontingent leer ist.</p>' +
+      '<div class="plan-paket-grid">';
+    pakete.forEach(function (x) {
+      var b = _paketName(x.pk);
       /* `pm-menge-wrap` an der KARTE, nicht an der Knopfzeile: der Waehler
-         sucht Preisfeld und Kaufknopf in diesem Behaelter, und der Preis
-         steht zwei Zeilen weiter oben. */
-      '<div class="plan-credit-card plan-credit-highlight pm-menge-wrap" style="max-width:340px">' +
-        '<div class="plan-credit-num">' + nk.label + '</div>' +
-        '<div class="plan-credit-sub">' + nk.kontingent.mpi + ' Marktpreisindikationen' +
-          (nk.kontingent.mpi_plus ? ' · ' + nk.kontingent.mpi_plus + ' erweiterte' : '') +
-          (nk.kontingent.wev ? ' · ' + nk.kontingent.wev + ' Wertermittlungen' : '') + '</div>' +
-        '<div class="plan-credit-price" data-summe>' + eur(nk.preis_eur) + '</div>' +
+         sucht Preisfeld, Inhalt und Kaufknopf in diesem Behaelter.
+         `data-plan` sagt ihm, welches Paket er neu rechnen soll. */
+      h += '<div class="plan-credit-card pm-menge-wrap' + (x.eigen ? ' plan-credit-highlight' : '') +
+             '" data-plan="' + x.pk + '">' +
+        (x.eigen ? '<span class="plan-credit-best">Dein Plan</span>' : '') +
+        '<div class="plan-credit-flug">' + b.flug + '</div>' +
+        '<div class="plan-credit-num">' + b.name + '</div>' +
+        '<div class="plan-credit-sub" data-inhalt>' + _paketInhalt(x.n.kontingent, 1) + '</div>' +
+        '<div class="plan-credit-claim">' + b.claim + '</div>' +
+        '<div class="plan-credit-price" data-summe>' + eur(x.n.preis_eur) + '</div>' +
         '<div class="plan-menge-zeile">' +
-          waehler('nk-' + nk.key, Math.round(nk.preis_eur * 100)) +
-          '<button class="btn btn-outline btn-sm" data-pack-id="' + nk.key + '" data-menge="1" ' +
-            'onclick="_buyCreditPack(\'' + nk.key + '\', this)">Dazubuchen</button>' +
+          waehler('nk-' + x.n.key, Math.round(x.n.preis_eur * 100)) +
+          '<button class="btn btn-outline btn-sm" data-pack-id="' + x.n.key + '" data-menge="1" ' +
+            'onclick="_buyCreditPack(\'' + x.n.key + '\', this)">Kaufen</button>' +
         '</div>' +
-      '</div>' +
       '</div>';
+    });
+    h += '</div></div>';
   }
 
   /* v1294: Der Einzelkauf funktioniert seit v1183, wurde aber nie

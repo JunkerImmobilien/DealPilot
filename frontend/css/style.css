@@ -37405,3 +37405,78 @@ button.btn-brw.brw-veraltet::after {
   .plan-einzel-row .pm-menge { order: 3; }
   .plan-einzel-p { flex: 1 1 auto; }
 }
+
+/* ═══ v1297 · Die drei Bewertungspakete in den Einstellungen ═══════════
+   Marcels Befund: „Ich finde das Bewertungen nachkaufen nicht schön mit
+   dem 5-5-5."
+
+   `.plan-credit-num` ist 44 px Cormorant in Gold — gebaut für eine ZAHL.
+   „Mittelstrecke" in 44 px sprengt jede Karte. Die Regeln hier erhöhen
+   deshalb die Spezifität über den Behälter `.plan-paket-grid`, statt auf
+   die Ladereihenfolge zu bauen: `.plan-paket-grid .plan-credit-num` ist
+   (0,2,0) und schlägt `.plan-credit-num` (0,1,0) sicher.
+
+   GRUND GEMESSEN: der Einstellungs-Dialog ist WEISS (rgb(255,255,255)),
+   nicht dunkel — siehe die Waehler-Regeln weiter oben. Schrift also dunkel. */
+.plan-paket-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 14px;
+}
+.plan-paket-grid .plan-credit-card {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 16px 16px;
+}
+.plan-paket-grid .plan-credit-flug {
+  font-size: 13px;
+  letter-spacing: .18em;
+  color: var(--wl-c9a84c, #C9A84C);
+  opacity: .8;
+  margin-bottom: 7px;
+}
+.plan-paket-grid .plan-credit-num {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--ch);
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+/* Der Inhalt. Er ZAEHLT MIT der Menge — deshalb `min-height`: bei Menge 10
+   wird aus „5 Marktpreisindikationen" ein laengerer Text, und ohne feste
+   Mindesthoehe springen die drei Karten unterschiedlich hoch. */
+.plan-paket-grid .plan-credit-sub {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ch2);
+  min-height: 52px;
+  margin-bottom: 6px;
+}
+.plan-paket-grid .plan-credit-claim {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 9.5px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--ch2);
+  opacity: .62;
+  margin-bottom: 12px;
+}
+/* `margin-top:auto` schiebt Preis und Kaufzeile an den unteren Rand, damit
+   die Knoepfe der drei Karten auf einer Linie sitzen, auch wenn der Inhalt
+   darueber verschieden lang ist. */
+.plan-paket-grid .plan-credit-price {
+  margin-top: auto;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 24px;
+  color: var(--ch);
+}
+.plan-paket-grid .plan-menge-zeile {
+  justify-content: space-between;
+  gap: 8px;
+}
+@media (max-width: 760px) {
+  .plan-paket-grid { grid-template-columns: 1fr; }
+  .plan-paket-grid .plan-credit-sub { min-height: 0; }
+}
