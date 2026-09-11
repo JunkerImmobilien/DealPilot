@@ -252,7 +252,7 @@
         var RAHMEN = 'rgba(244,239,230,.24)';
 
         return '' +
-        S+" .pm-einzel{margin-top:18px;padding:16px 18px;border:1px solid var(--wl-c9a84c, rgba(201,168,76,.3));border-radius:14px;background:rgba(201,168,76,.06)}"+
+        S+" .pm-einzel{margin-top:18px;padding:16px 18px;border:1px solid var(--wl-c9a84c, rgba(201,168,76,.3));border-radius:14px;background:var(--wl-c9a84c, rgba(201,168,76,.06))}"+
         S+" .pm-einzel-h{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);margin-bottom:11px}"+
         S+" .pm-einzel-grid{display:flex;flex-direction:column;gap:1px}"+
         S+" .pm-einzel-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid "+RAHMEN+"}"+
@@ -269,7 +269,7 @@
            ein Flex-Behaelter, sonst laeuft der Waehler auf volle Breite. */
         S+" .pm-menge{flex:0 0 auto;display:inline-flex;align-items:center;gap:0;border:1px solid "+RAHMEN+";border-radius:9px;overflow:hidden;background:rgba(255,255,255,.04);color:"+CREME+"}"+
         S+" .pm-menge-b{flex:0 0 auto;width:26px;height:26px;border:0;background:transparent;cursor:pointer;font:600 15px/1 Inter,system-ui,sans-serif;color:var(--wl-c9a84c, #C9A84C);padding:0}"+
-        S+" .pm-menge-b:hover:not(:disabled){background:rgba(201,168,76,.20)}"+
+        S+" .pm-menge-b:hover:not(:disabled){background:var(--wl-c9a84c, rgba(201,168,76,.20))}"+
         S+" .pm-menge-b:disabled{opacity:.3;cursor:default}"+
         S+" .pm-menge-n{flex:0 0 auto;width:30px;height:26px;border:0;border-left:1px solid "+RAHMEN+";border-right:1px solid "+RAHMEN+";text-align:center;font:700 12px/1 'JetBrains Mono',ui-monospace,monospace;color:"+CREME+";background:transparent;padding:0}"+
         S+" .pm-menge-n:focus{outline:2px solid var(--wl-c9a84c, rgba(201,168,76,.55));outline-offset:-2px}"+

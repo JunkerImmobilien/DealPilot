@@ -37382,7 +37382,7 @@ button.btn-brw.brw-veraltet::after {
   color: var(--wl-b8932f, #b8932f);
 }
 .plan-einzel-row .pm-menge-b:hover:not(:disabled),
-.plan-menge-zeile .pm-menge-b:hover:not(:disabled) { background: rgba(201,168,76,.22); }
+.plan-menge-zeile .pm-menge-b:hover:not(:disabled) { background: var(--wl-c9a84c, rgba(201,168,76,.22)); }
 .plan-einzel-row .pm-menge-b:disabled,
 .plan-menge-zeile .pm-menge-b:disabled { opacity: .3; cursor: default; }
 .plan-einzel-row .pm-menge-n,
