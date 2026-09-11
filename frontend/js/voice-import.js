@@ -5325,12 +5325,65 @@
     return RF_ABRUF_VERB.test(t) && RF_ABRUF_SACHE.test(t);
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1318 · Welchen Abruf meint dieser Satz?
+     ═══════════════════════════════════════════════════════════════════
+     Rein: ein Satz und die Liste der Abrufe, die gerade offenstehen.
+     Raus: die eine gemeinte Art, oder null.
+
+     Warum eine eigene Funktion: die Zuordnung stand als Filter mitten in
+     `_rfAktionJa`, zwischen DOM-Ausgaben. Damit war sie nur messbar, indem
+     man einen ganzen Sprechlauf startet. Hier ist sie prüfbar.
+
+     DER FEHLER, DEN SIE BEHEBT: wer „erweiterte Marktpreisindikation"
+     sagte, traf `markt` (wegen „markt") UND `markt2` (wegen „erweitert").
+     Zwei Treffer sind kein Treffer — der alte Code verlangte genau einen,
+     also fragte der Co-Pilot zurück, welches denn. Bei genau dem Satz, der
+     die Antwort schon enthielt.
+
+     RANGFOLGE STATT MENGE: das spezifischere Wort gewinnt. „Erweitert"
+     kommt nur in einem der beiden Namen vor, „Markt" in beiden. */
+  var RF_ABRUF_SPEZ = [
+    { art: 'markt2', wort: /\b(erweitert\w*|vertieft\w*|voll\w*|gro(ss|ß)\w*|plus|zweite|ausf(ü|ue)hrlich\w*)\b/i },
+    { art: 'markt',  wort: /\b(einfach\w*|klein\w*|erste|normal\w*|schnell\w*|kurz\w*)\b/i },
+    { art: 'brw',    wort: /\b(bodenrichtwert\w*|boris|richtwert)\b/i },
+    { art: 'lage',   wort: /\b(lage|makrolage|mikrolage|umgebung|region|stadtteil|viertel)\b/i }
+  ];
+
+  function _abrufAusText(text, arten) {
+    var t = String(text || '');
+    if (!t || !arten || !arten.length) return null;
+    for (var i = 0; i < RF_ABRUF_SPEZ.length; i++) {
+      var s = RF_ABRUF_SPEZ[i];
+      if (arten.indexOf(s.art) < 0) continue;   /* steht gar nicht zur Wahl */
+      if (s.wort.test(t)) return s.art;
+    }
+    return null;
+  }
+
   function _rfAktionJa(text) {
     var akt = (_rf && _rf.aktionen) || [];
     if (!akt.length) return false;
     if (akt.length > 1) {
       /* „hol den bodenrichtwert" / „die lage" — wer die Aktion NENNT,
          bekommt sie; sonst fragt der Co-Pilot einmal nach. */
+      /* ═══ v1318 · „Erweiterte Marktpreisindikation" traf BEIDE ══════════
+         Marcels Befund: „zeigt er an, dass man auswählen kann, was er holen
+         kann: Marktpreisindikation, erweiterte Marktpreisindikation, und
+         ich möchte einfach das auch per Sprache sagen können. Das macht er
+         gerade nicht."
+
+         GEMESSEN am Muster: wer „erweiterte Marktpreisindikation" sagt,
+         trifft `markt` (wegen „markt") UND `markt2` (wegen „erweitert").
+         Zwei Treffer sind kein Treffer — `treffer.length === 1` schlägt
+         fehl, und der Co-Pilot fragt zurück, welches denn. Bei genau dem
+         Satz, der die Antwort schon enthielt.
+
+         Die Lösung ist eine RANGFOLGE statt einer Menge: das spezifischere
+         Wort gewinnt. „Erweitert" ist spezifisch — es kommt nur in einem
+         der beiden Namen vor. „Markt" ist allgemein und steht in beiden. */
+      var _sp = _abrufAusText(text, akt.map(function (a) { return a.art; }));
+      if (_sp) { _rfBlase('ich', escH(text)); _rfAktionKlick(_sp); return true; }
       var t = _de(text);
       var treffer = akt.filter(function (a) {
         return t.indexOf(_de(a.knopf.split(' ')[0])) >= 0 ||
@@ -7998,6 +8051,7 @@
                             Bestaetigungs-Uebertragung sind von aussen
                             nicht messbar, wenn sie nicht heraussehen. */
                          _kontext: _rfKontext,
+                         _abruf: _abrufAusText,   /* v1318 */
                          _bestaetigung: _rfBestaetigungUebertragen,
                          _offenesEnde: _fsOffenesEnde,   /* v1290 */
                          _fsStand: function () { return { phase: _fs.phase, kopf: !!_fs.kopf,
