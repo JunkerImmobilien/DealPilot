@@ -2524,3 +2524,58 @@ Umstellung auf Sprache nicht.
 
 Die Gegenprobe gehört dazu: eine **Frage** („was ist der Bodenrichtwert?")
 enthält dieselben Wörter und ist kein Befehl.
+
+## Eine mehrzeilige Ersetzung kann eine Zeile verschlucken
+
+`perl -0pi -e "s/…/…/s"` mit einem Suchmuster über mehrere Zeilen: die
+Ersetzung hat den Anker mitkonsumiert und nicht zurückgeschrieben. Konkret
+fiel `sanKatalog().forEach(...)` aus `buildFullCatalog()` — die acht
+Sanierungs-Gewerke wären damit still aus dem Sprechlauf-Katalog
+verschwunden.
+
+**Nichts wäre rot geworden.** `node --check` prüft Syntax, kein
+Vorhandensein. Der Katalog hätte einfach acht Einträge weniger gehabt, und
+ein diktiertes „Dach fünfzehntausend" wäre ins Leere gelaufen.
+
+Gefunden nur durch `grep -c "sanKatalog()"` danach — die erwartete Zahl war
+3, gezählt wurden 2.
+
+**Regel: nach jeder mehrzeiligen Ersetzung den ANKER gegenzählen, nicht nur
+die neue Zeile suchen.** Dass das Neue drin ist, beweist nicht, dass das
+Alte noch da ist.
+
+## `node --check /dev/stdin` wird nie rot
+
+```
+scp datei server:/tmp/chk.js
+ssh server "docker exec -i container node --check /dev/stdin < /tmp/chk.js"
+```
+
+gibt einen `fs`-Fehler aus (`binding.readFileUtf8`) und trotzdem
+Rückgabewert 0. Vier Dateien meldeten „OK", geprüft war keine einzige.
+
+Der Weg, der misst: `docker cp` in den Container, dann `node --check` auf
+eine echte Datei. **Leere Ausgabe = sauber**, jede Ausgabe = Fehler. Den
+Rückgabewert nach einer Pipe (`| head`) gar nicht erst lesen, der gehört
+dem letzten Glied.
+
+Und die Gegenprobe gehört dazu: einmal mit einer absichtlich kaputten Datei
+laufen lassen. Ein Prüfer, der nicht rot werden kann, ist keiner.
+
+## calc() verschluckt den zweiten Aufruf im selben Tick
+
+Vier Messungen hintereinander — Checkbox an, aus, an, aus, jedes Mal
+`calc()` — zeigten **eingefrorene Werte**. Immer dieselbe Zahl, egal in
+welcher Stellung. Das sah nach einem abgebrochenen `calc()` aus, nach einer
+geschluckten Ausnahme, nach einer doppelten Element-Id. Es war nichts davon.
+
+Alle Aufrufe lagen im **selben JS-Tick**. Die Rechenkette hängt an
+Ereignissen und ist entprellt; der erste Aufruf rechnet, alle folgenden in
+derselben Runde werden verworfen. Mit 350 ms Abstand stimmte auf Anhieb
+alles.
+
+**Wer eine ereignisgetriebene Rechenkette synchron hintereinander anstößt,
+misst seinen eigenen Takt, nicht das Produkt.** Zwischen zwei Zuständen
+immer `await` mit echter Pause — und wenn eine Messreihe konstante Werte
+liefert, wo Veränderung sein müsste, ist der Takt der erste Verdächtige,
+nicht der Code.

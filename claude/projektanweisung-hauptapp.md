@@ -12648,6 +12648,181 @@ hätte an einem Stand gemessen, den es nicht gab.
 **Commits** `f58e677`, `31b967a`, `a6db332`, `c055bd4`, `c5c67be`,
 `c1cbf39`, `044001e`. Gold-Audit RC=0. Auf Staging, **nicht auf Prod**.
 
+## v1311–v1313 · Herkunft, Erbbaurecht, Bodenrichtwert — 11.09.2026
+
+### v1311 · Die Herkunft überlebt das Speichern
+
+Marcels Vorgabe: „wäre es super, wenn all das was wir ausgearbeitet haben
+auch nach dem speichern im tab Pilot-Analyse zu verfügung steht und der Co
+Pilot dieses wissen dann mitnimmt."
+
+Die **Werte** standen schon im Objekt — sie kommen aus dem Formular. Was
+fehlte, war die **Herkunft**: dass 90 €/m² amtlich aus BORIS sind, dass die
+Makrolage aus der Marktpreisindikation stammt, dass die Bankbewertung eine
+Näherung ist. Der Sprechlauf kannte das je Feld (`_rf.quelle`), gab es aber
+nur an die Übernahme-Tabelle weiter — mit dem Schließen war es weg.
+
+Ein verstecktes Feld `_dp_herkunft`, JSON darin, über `FIELDS` gespeichert,
+über `ui.js` in die runAI-Nutzlast, in `openaiService.js` als Prompt-Sektion
+„HERKUNFT DER ANGABEN". Kein zweiter Speicherweg, keine zweite Tabelle.
+
+Dazu: im QuickCheck ist der Schalter „auch die erweiterten Felder abfragen"
+ausgeblendet. Marcels Entscheidung: „quickcheck und da der sprechlauf sollte
+sich auf quickcheck begrenzen."
+
+**Commit** `f849e8b`.
+
+### v1312 · Erbbaurecht — es gab schlicht nichts
+
+Marcels Frage: „was ist eigentlich mit erbpacht grundstücken? hast du das in
+der Marktbewertung drin? gibt es abschläge dafür und wenn ja wieviel."
+
+**Gemessen, vorher:**
+
+| Ebene | Ergebnis |
+|---|---|
+| Feld im Formular | 0 |
+| `calc.js` | 0 |
+| an Sprengnetter/PriceHubble gesendet | 0 |
+| im Sprechlauf gefragt | 0 |
+| ImmoMetrica liefert es | ja (`leasehold` → `target:'note'`) |
+
+**Gegen die echte GeoMap-API getestet** (Guthaben 258,00 → 257,90 €, also
+10 Cent):
+
+```
+ohne Zusatzfilter        200 OK, 757 Treffer
+preservationOrder        200 OK,   8 Treffer
+leasehold                400 Unrecognized field 'leasehold'
+heritableBuildingRight   400 Unrecognized field
+groundLease              400 Unrecognized field
+erbbaurecht              400 Unrecognized field
+erbpacht                 400 Unrecognized field
+```
+
+Der Detail-Abruf kennt keins der Wörter. **Kein Bewertungspartner nimmt den
+Parameter entgegen** — jede Marktbewertung ist ein Volleigentumswert. Der
+Abschlag muss aus eigener Kraft kommen.
+
+**Der Standard, nach dem gerechnet wird:** § 50 ImmoWertV 2021. Die
+steuerliche Schwester § 193 BewG rechnet dieselbe Mechanik mit festen
+Zinssätzen aus Anlage 21/26.
+
+```
+Erbbaurechtswert = Wert des fiktiven Volleigentums
+                 − Bodenwert des fiktiv unbelasteten Grundstücks
+                 + Barwert der Erbbauzins-Differenz über die Restlaufzeit
+                 − Barwert des bei Zeitablauf NICHT entschädigten
+                   Gebäudewertanteils
+```
+
+Voreinstellungen, alle überschreibbar: angemessener Erbbauzins **3,5 %**
+(marktüblich 3–5 %, Schnitt 2023 bei 3–4 %; kommunale und kirchliche
+Ausgeber darunter, Berlin 2,25 %). Kapitalisierung nach § 193 Abs. 4 S. 3
+BewG: **2,5 %** EFH/ZFH · **3,5 %** MFH/ETW · **4,5 %** gemischt ·
+**5,0 %** über 50 % gewerblich · **6,0 %** Geschäftsgrundstück.
+Entschädigung bei Zeitablauf **66,67 %** — das gesetzliche Minimum für
+Wohnraum nach § 27 ErbbauRG, von dem der Grundstückseigentümer nicht nach
+unten abweichen darf.
+
+**Die Marktampel daneben** ist kein Rechenweg, sondern eine
+Plausibilitätsprüfung gegen beobachtete Kaufpreisabschläge:
+
+| Restlaufzeit | beobachteter Abschlag |
+|---|---|
+| ab 70 Jahre | 5–15 % |
+| 40–70 Jahre | 15–30 % |
+| 20–40 Jahre | 30–50 % |
+| unter 20 Jahre | ab 50 % |
+
+Banken setzen bei der Beleihung üblicherweise 15–30 % an. Liegt die Rechnung
+mehr als 5 Punkte außerhalb, sagt die Karte das — und nennt den Grund: ein
+sehr günstiger oder sehr teurer Vertragszins wirkt genau so.
+
+**Kein Verfahren rechnet halb.** Fehlt Volleigentumswert, Bodenwert oder
+Restlaufzeit, kommt kein Wert — auch kein vorsichtiger. Stattdessen steht
+da, was fehlt und wo es herkommt.
+
+**Commit** `0405c8d`. Neue Dateien `erbbau-engine.js` (rein) und
+`erbbau-ui.js` (DOM).
+
+### v1313 · Der Abschlag greift überall
+
+Marcel: „bitte arbeite das in allen bewertungen und auch ganz wichtig mit
+unter marktbewertung mit ein."
+
+**Der Abzug sitzt an der Wurzel.** `svw` in `calc.js` wird gekürzt, bevor
+Wertpuffer, `wert_basis`, Exit-Preis und über `K.wp_kpi` der Deal Score
+daraus rechnen. Weiter unten abgezogen wären oben schon drei Zahlen zu hoch
+gewesen, und der Score hätte es nie gemerkt. Die Bankbewertung fällt genauso.
+
+**Gegen doppelte Kürzung** gibt es den Schalter „Verkehrswert /
+Bankbewertung ist bereits der Erbbaurechtswert" — wer ein echtes
+Erbbaurechts-Gutachten eingetragen hat, würde sonst zweimal gekürzt.
+
+**Der Erbbauzins** hängt NACH dem if/else an `nul` und `bwk`, damit er in
+allen drei BWK-Modi greift (Detail, % der NKM, % vom Kaufpreis) — in nur
+einem Zweig wäre er zwei Drittel der Zeit still verschwunden. Nicht
+umlagefähig (§ 2 BetrKV kennt ihn nicht), steuerlich abziehbar — läuft damit
+durch Cashflow, DSCR, IRR und Steuer.
+
+**Im Sprechlauf** fragt die Grundstücksfrage mit; ein Folgeblock über das
+neue Flag `nurWenn: 'erbpacht'` holt Erbbauzins und Restlaufzeit nach — aber
+nur, wenn Erbbaurecht bejaht wurde. `_rfFehlt` liest dafür **beides**: das
+Häkchen im Formular und was im laufenden Gespräch gesagt wurde; ins Formular
+kommt es erst mit der Übernahme am Ende.
+
+**Der Bodenrichtwert wird nicht mehr gefragt, wenn er abrufbar ist.**
+Marcels Vorgabe: „den brauchst du nicht abfragen wenn man den abrufen kann.
+nur wenn man ihn nicht abruft." `_rfZuschnitt()` nimmt `brw` aus Frage und
+Lückenprüfung, sobald `_rfBrwMoeglich()` wahr ist — **zugeschnitten, nicht
+gestrichen**: Fläche und Miteigentumsanteil kann niemand abrufen. Der
+Zuschnitt läuft VOR der Lückenprüfung; danach hätte `_rfFehlt` `brw` schon
+als Lücke gezählt.
+
+**Gemessen auf Staging:**
+
+```
+ohne Erbpacht           Wertpuffer +20.000 €, Abzugszeile aus
+mit Erbpacht, Zins 1200 Wertpuffer weg, Abzug -38.890 € · 12,2 %, nul 1.200 €
+Schalter „schon Erb"    Wertpuffer wieder +20.000 €, Abzugszeile aus
+Sprechlauf ohne Erbpacht        Erbbau-Block erscheint NICHT
+Sprechlauf mit Häkchen          Erbbau-Block erscheint
+Sprechlauf nur gesagt           Erbbau-Block erscheint
+Grundstücksfrage ohne PLZ       „… Bodenrichtwert, Fläche, Miteigentumsanteil?"
+Grundstücksfrage mit PLZ 32120  „… Den Bodenrichtwert hole ich gleich amtlich."
+                                ids: gsfl+mea (brw ist raus)
+```
+
+Der Rechenkern stimmt Ziffer für Ziffer mit der Handrechnung überein:
+BWF 23,4556 · AZF 0,1791 · Zinsvorteil 21.110 € · Heimfall 2.387 €.
+
+**Commits** `195caa9`, `d198646`, `47dc7f9`. Gold-Audit RC=0 (Basislinie
+468/56). Auf Staging, **nicht auf Prod**.
+
+### Drei eigene Fallen in diesem Paket
+
+**Die verschluckte Zeile.** Ein `perl -0pi -e "s/…/…/"` mit mehrzeiligem
+Suchmuster hat `sanKatalog().forEach(...)` mitkonsumiert und nicht
+zurückgeschrieben. Die acht Sanierungs-Gewerke wären damit aus dem
+Sprechlauf-Katalog gefallen — **ohne dass irgendetwas rot geworden wäre**:
+`node --check` prüft Syntax, kein Vorhandensein. Gefunden nur, weil ich
+danach `grep -c "sanKatalog()"` gefahren bin. **Nach jeder mehrzeiligen
+Ersetzung den Anker gegenzählen, nicht nur die neue Zeile suchen.**
+
+**Der Prüfer, der nie rot wird.** `node --check /dev/stdin < datei` gibt
+einen `fs`-Fehler aus und trotzdem Rückgabewert 0. Vier Dateien meldeten
+„OK", geprüft war keine. Erst `docker cp` in den Container und `node --check`
+auf eine echte Datei misst wirklich. Gegenprobe mit einer absichtlich
+kaputten Datei gehört dazu.
+
+**calc() verschluckt den zweiten Aufruf im selben Tick.** Vier Messungen
+hintereinander zeigten eingefrorene Werte — an- und ausgeschaltet, immer
+dieselbe Zahl. Ich habe eine ganze Diagnose-Runde in einen Produktfehler
+investiert, der keiner war: die Aufrufe lagen alle im selben JS-Tick. Mit
+350 ms Abstand stimmte auf Anhieb alles. **Wer eine ereignisgetriebene
+Rechenkette synchron hintereinander anstößt, misst seinen eigenen Takt.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
