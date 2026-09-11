@@ -222,6 +222,43 @@ if (!window._wlc) {
     return '<span class="l">Spanne</span>' + piece(o.low, 'low') + '<span class="sep">–</span>' + piece(o.med, 'med') + '<span class="sep">–</span>' + piece(o.high, 'high');
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1322 · Der Erbbau-Hinweis stand im falschen Weg
+     ═══════════════════════════════════════════════════════════════════
+     v1313b hat ihn in `applyAvm()` gebaut — und das ist der Weg von
+     Sprengnetter und PriceHubble. Genau die beiden bieten wir nicht an
+     („die preise für die bewertungspartner nehmen wir raus", Marcel,
+     11.09.2026). Der Weg, den Marcel benutzt, ist DIESE Karte.
+
+     Bei der Abnahme aufgefallen: `_oabApplyExternal` nimmt einen NAMEN
+     und holt `_avm[name]` — ein durchgereichtes Ergebnisobjekt landet
+     nirgends. Der Hinweis war damit nicht nur am falschen Ort, er war
+     auf dem genutzten Weg überhaupt nicht erreichbar.
+
+     Steht direkt unter dem Marktwert, weil er genau ihn einordnet: was
+     die Karte zeigt, ist Volleigentum. Kein Bewertungspartner nimmt das
+     Erbbaurecht entgegen — gemessen gegen GeoMap, 400 „Unrecognized
+     field" für jede Schreibweise. */
+  function erbZeileHtml() {
+    try {
+      if (!global.DealPilotErbbau || !global.DealPilotErbbau.istAn()) return '';
+      var r = global.DealPilotErbbau.rechnen();
+      var G = 'var(--wl-c9a84c, #C9A84C)';
+      var kopf = '<b>Erbbaurecht:</b> Der Marktwert oben ist <b>Volleigentum</b> — das Grundstück ist nicht dabei. ';
+      var rest;
+      if (r && r.ok) {
+        rest = 'Abschlag nach § 50 ImmoWertV: <b>'
+          + Math.round(r.abschlag).toLocaleString('de-DE') + ' € · '
+          + r.abschlagPct.toFixed(1).replace('.', ',') + ' %</b>. '
+          + 'Wertpuffer, Wertsteigerung und Deal Score rechnen bereits damit.';
+      } else {
+        rest = 'Für den Abschlag fehlen noch Angaben — siehe Reiter <b>Objekt</b>, Grund &amp; Boden.';
+      }
+      return '<div class="dpx-erb" style="margin:8px 0 0;padding:8px 10px;border-radius:9px;font-size:11px;line-height:1.5;'
+        + 'border:1px solid ' + G + ';background:var(--gold-bg, rgba(201,168,76,.08))">' + kopf + rest + '</div>';
+    } catch (e) { return ''; }
+  }
+
   function render() { /* v752-bridge */
     if (!D) return;
     persistLight();
@@ -256,7 +293,7 @@ if (!window._wlc) {
           '<button data-k="med"' + (mode === 'med' ? ' class="on"' : '') + '>\u00d8</button>' +
           '<button data-k="high"' + (mode === 'high' ? ' class="on"' : '') + '>Oben</button></div></div>' +
           '<button class="dpx-apply" id="dpx-apply"><span id="dpx-applytxt"></span></button>' +
-        '</div></div>';
+        erbZeileHtml() + '</div></div>';
     var seg = $('dpx-seg');
     if (seg) seg.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { mode = b.dataset.k; persistLight(); paint(); }); });
     var ap = $('dpx-apply'); if (ap) ap.addEventListener('click', applyToFields);
@@ -532,6 +569,7 @@ if (!window._wlc) {
     apply: applyToFields,
     /* v1316: Pruefhaken. Ein echter Abruf kostet Guthaben - ohne diese
        beiden laesst sich die Zuordnung nur durch Bezahlen messen. */
+    _erbZeile: erbZeileHtml,   /* v1322 */
     _mapCard: mapCard,
     _autoLage: function (payload) { if (payload) D = mapCard(payload); return autoLage(); } };
 })(window);
