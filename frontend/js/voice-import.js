@@ -5396,6 +5396,47 @@
        FRAGEWORT am Anfang, nicht das Zeichen am Ende. "Was ist der
        Bodenrichtwert?" will Auskunft. "Bodenrichtwert abrufen?" will den
        Abruf. Die Zeile unten faengt den ersten Fall weiterhin ab. */
+  /* ═══════════════════════════════════════════════════════════════════
+     v1327 · EIN SATZ KANN EINEN BEFEHL UND ANGABEN TRAGEN
+     ═══════════════════════════════════════════════════════════════════
+     Im durchgehenden Lauf zweimal gemessen — und beide Male ging
+     dieselbe Sorte Angabe verloren:
+
+       „Bodenrichtwert 300, Grundstück 1000 m², Miteigentumsanteil 20 %"
+         -> BORIS-Abruf lief, die beiden anderen Zahlen fielen weg
+       „Nimm die erweiterte Marktpreisindikation. Baujahr 1975,
+        Kaufpreis 300.000"
+         -> Indikation vorgemerkt, Baujahr und Kaufpreis fielen weg
+
+     Der Grund ist in beiden Fällen derselbe: eine Aktion wird erkannt,
+     ausgeführt, und der Code steigt mit `return true` aus. Was im selben
+     Satz noch stand, sieht danach niemand mehr.
+
+     Bei der Profil-Übernahme gibt es das richtige Verhalten schon seit
+     v1286: „Ist der Satz damit erschöpft, sind wir fertig. Trägt er noch
+     mehr, wird das Profil eingetragen UND der Satz danach ausgewertet."
+     Genau das fehlte den Abrufen.
+
+     Wer spricht, trennt nicht in Befehle und Angaben. „Nimm die
+     erweiterte, Baujahr 1975" ist EIN Gedanke. */
+  function _rfRestNachAktion(text) {
+    if (!_rf) return;
+    var t = String(text || '');
+    /* Ohne Zahl ist nichts nachzutragen — „nimm die erweiterte" allein
+       ist der ganze Satz. Ein Datum oder ein Prozentwert zählt mit. */
+    if (!/\d/.test(t)) return;
+    /* Der Befehlsteil wird entfernt, damit die Auswertung nicht darüber
+       stolpert. Was übrig bleibt, muss noch eine Zahl tragen. */
+    var rest = t
+      .replace(/\b(nimm|hol|hole|holen|mach|mache|starte|ruf|rufe|abrufen|besorge?|zieh|ziehe)\b/gi, ' ')
+      .replace(/\b(die|den|das|der|mir|mal|bitte|auch|doch)\b/gi, ' ')
+      .replace(/\b(erweiterte|erweiterten|einfache|vertiefte|volle)\b/gi, ' ')
+      .replace(/\b(marktpreisindikation|marktbewertung|marktwert|indikation|bodenrichtwert|boris|lage|makrolage|mikrolage)\w*/gi, ' ')
+      .replace(/\s{2,}/g, ' ').trim();
+    if (!/\d/.test(rest) || rest.length < 4) return;
+    try { _rfAuswerten(rest, false); } catch (e) {}
+  }
+
     if (/^(was|wie|warum|wieso|wozu|welche|welcher|wann|wo)\b/i.test(t.trim())) return false;
     return RF_ABRUF_VERB.test(t) && RF_ABRUF_SACHE.test(t);
   }
@@ -7727,13 +7768,15 @@
        auch dann, wenn mehrere offenstehen. */
     /* v1305: auch hier ein gesprochenes „ja gerne, mach das" statt nur „ja". */
     if ((_rf.aktionen || []).length && (RF_JA.test(t) || _istZustimmung(t))) {
-      if (_rfAktionJa(t)) return true;
+      /* v1327: was der Satz SONST noch trug, geht nicht verloren. */
+      if (_rfAktionJa(t)) { _rfRestNachAktion(t); return true; }
     }
     /* v1309: „Ja, hol den Bodenrichtwert ab" — Verb und Sache stehen
        mitten im Satz, nicht am Anfang und nicht am Ende. Steht die Quelle
        drin („aus den Einstellungen"), ist es keiner. */
     if (_istAbrufWunsch(t) && !/(einstellung|profil|vorgabe|voreinstellung)/i.test(t)) {
-      if (_rfAktionJa(t)) return true;
+      /* v1327: was der Satz SONST noch trug, geht nicht verloren. */
+      if (_rfAktionJa(t)) { _rfRestNachAktion(t); return true; }
     }
     /* v1306: „nimm" ist zweideutig. „Nimm den Bodenrichtwert" meint einen
        Abruf, „nimm die aus den Einstellungen" die Profil-Übernahme —
@@ -7758,7 +7801,8 @@
         !/(einstellung|profil|vorgabe|voreinstellung|standard)/i.test(t) &&
         !/^\s*(?:hol|nimm|mach|recherchier\w*|bodenrichtwert|die lage|marktpreis\w*)\W{0,3}\d/i.test(t) &&
         /^(hol|nimm|mach|recherchier|bodenrichtwert|die lage|marktpreis)/i.test(t)) {
-      if (_rfAktionJa(t)) return true;
+      /* v1327: was der Satz SONST noch trug, geht nicht verloren. */
+      if (_rfAktionJa(t)) { _rfRestNachAktion(t); return true; }
     }
     /* v1291b: „nein danke" raeumt die Angebote weg, ohne die Frage zu
        ueberspringen. Wer ein Angebot ablehnt, will nicht die Frage
@@ -7837,7 +7881,8 @@
        und nichts eintragen KANN. */
     var _hoeflich = _istHoeflicheAnweisung(t);
     if (_hoeflich && _istAbrufWunsch(t) && (_rf.aktionen || []).length) {
-      if (_rfAktionJa(t)) return true;
+      /* v1327: was der Satz SONST noch trug, geht nicht verloren. */
+      if (_rfAktionJa(t)) { _rfRestNachAktion(t); return true; }
     }
     /* 1. Frage? Dann beantworten statt eintragen. */
     if (!_hoeflich && _rfIstFrage(t)) { _rfFrageBeantworten(t); return true; }
