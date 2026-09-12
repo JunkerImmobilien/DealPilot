@@ -36,6 +36,98 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+## → HIER WEITERMACHEN: Marcels Auftrag vom 13.09.2026
+
+Drei große Blöcke, von Marcel in einem Zug beauftragt. **Reihenfolge wie
+hier** — der Audit zuerst, weil er den kleinsten Vorlauf braucht und
+Erkenntnisse für die anderen beiden liefert.
+
+---
+
+### A · Audit „Aktionen / Einstellungen" — alle Reiter
+
+Marcel: *„geh das einmal komplett durch, mach da mal einen Audit, überleg
+dir mal: können wir es besser sortieren, können wir es übersichtlicher
+machen?"*
+
+**Er will vor dem Löschen gefragt werden:** *„Sachen, die überflüssig sind,
+könnten wir rausschmeißen. Müsstest du aber vorher einmal sagen."*
+
+| # | Punkt | Stand |
+|---|---|---|
+| A1 | Alle Reiter unter Aktionen/Einstellungen durchgehen: Formatierung, Anordnung, Doppeltes | offen |
+| A2 | **Co-Pilot-Bereich**: greift das überhaupt? Brauchen wir das? | offen |
+| A3 | **Bewertungsprofile unter Deal Score** (Ausgewogen, Konservativ, Optimistisch, Lagefokus): Wie setzen sie sich zusammen? Welchen Einfluss haben sie auf den Score? Das gehört sichtbar | offen |
+| A4 | **Deal Score Quick Check**: Farbe, Form, Formatierung stimmen nicht | offen |
+| A5 | **Datenraum** und **externe Anbieter**: passt das noch? | offen |
+| A6 | Vorschlag: bessere Sortierung, weniger Reiter, was raus kann — **erst fragen, dann löschen** | offen |
+| A7 | Co-Pilot / KI: was können wir zusätzlich einbringen? | offen |
+
+---
+
+### B · Schutz gegen Auslesen, Scraping und Nachbau
+
+Zwanzig Unterpunkte aus Marcels Auftrag. **Der Kern ist nicht
+Bot-Erkennung, sondern:** *„unabhängig vom verwendeten Werkzeug erkennen, ob
+ein Account versucht, die Anwendung automatisiert, systematisch oder in
+ungewöhnlichem Umfang auszulesen."*
+
+| # | Punkt | Stand |
+|---|---|---|
+| B1 | **Bestandsaufnahme**: welche Berechnungen, Formeln, Gewichtungen, Schwellen laufen heute im Browser? Was wird an den Client übertragen, das dort nicht hingehört? | offen |
+| B2 | Sensible Rechenlogik ins Backend verschieben, soweit technisch möglich | offen |
+| B3 | Anomalie-Erkennung je Account (Frequenz, Regelmäßigkeit, Parametervariation, parallele Sitzungen, Limitüberschreitungen) | offen |
+| B4 | Risikostufen NORMAL → AUFFÄLLIG → WARNUNG → HOHES RISIKO → EINGESCHRÄNKT → GESPERRT → MANUELL FREIGEGEBEN | offen |
+| B5 | Erste Warnstufe: sichtbare Meldung + serverseitiges Sicherheitsereignis | offen |
+| B6 | Zweite Stufe: schärfere Limits, Cooldown, Teilsperre | offen |
+| B7 | Automatische Sperre, Stufen und Dauer **im Admin konfigurierbar** | offen |
+| B8 | Adminbenachrichtigung bei allen wichtigen Ereignissen | offen |
+| B9 | Admin-Bereich „Sicherheit / Missbrauchserkennung" mit Filtern und Fallakte | offen |
+| B10 | Audit Trail, append-only, nicht über das Admin-Interface editierbar | offen |
+| B11 | Rollen OWNER/ADMIN/DEVELOPER/SUPPORT/USER + `security_exempt` — **Ausnahmen werden trotzdem protokolliert** | offen |
+| B12 | Manuelle Entsperrung, Fehlalarm-Kennzeichnung, Fall abschließen | offen |
+| B13 | AGB: Abschnitt gegen Scraping, Bots, LLM-Rekonstruktion, Reverse Engineering | offen |
+| B14 | **Vertragsstrafe 25.000 €** — ausdrücklich als *juristisch zu prüfender Entwurf*, B2C und B2B getrennt, **nie automatisch durch einen Risikoscore ausgelöst** | offen |
+| B15 | Datenschutzerklärung: Zweck, Daten, Aufbewahrung, Rechtsgrundlage, Löschkonzept | offen |
+| B16 | API-Endpunkte: Auth, Autorisierung, serverseitige Validierung, Rate-Limits, Logging | offen |
+| B17 | Konfigurationsbereich im Admin für alle Schwellen | offen |
+| B18 | Fehlalarmschutz: Nutzungshistorie und Accounttyp berücksichtigen, Eskalation statt Sofortsperre | offen |
+| B19 | Fallakte zur Beweissicherung, chronologisch | offen |
+| B20 | Tests: Normalnutzung, jede Eskalationsstufe, Adminausnahme, Entsperrung, Audit-Log, Fehlalarm | offen |
+
+**Zwei Leitplanken aus Marcels eigenem Auftrag, die beim Bauen gelten:**
+bestehende Funktionen dürfen nicht beschädigt werden, und ein technischer
+Risikoscore ist **kein** rechtlich bewiesener Verstoß.
+
+---
+
+### C · Vom Sprechlauf zum Investment-Co-Piloten
+
+Marcels Grundprinzip: *„Nicht mehr: Formular per Sprache ausfüllen.
+Sondern: Ein intelligenter Investment-Co-Pilot kennt Objekt, Dokumente,
+Daten und aktuellen Bearbeitungsstand."*
+
+| # | Punkt | Stand |
+|---|---|---|
+| C1 | Kontextbezogene Begrüßung: was liegt vor, was wurde erkannt, was rechnet schon, was fehlt | offen |
+| C2 | Zwei Begleitmodi: **Lernmodus** (erklärt wozu) und **Investor-Modus** (kompakt), jederzeit wechselbar | offen |
+| C3 | Sprache als vollwertige Bedienform: Rückfragen, Korrekturen, Exkurse — und danach zurück in den Prozess | offen |
+| C4 | Vor jeder Frage prüfen: **Datenbank → Dokumente → bisherige Angaben → erst dann fragen** | offen |
+| C5 | Steuersatz / zu versteuerndes Einkommen: vorschlagen, bestätigen lassen, Überspringen erlauben und später zurückkommen | offen |
+| C6 | Permanenter Prozesskontext statt starrem Fragebogen | offen |
+| C7 | Datenherkunft sichtbar (Exposé / Marktbericht / berechnet / abgeleitet / selbst angegeben) + Konflikte nachfragen | offen |
+| C8 | Änderungen jederzeit per Sprache, abhängige Berechnungen ziehen nach | offen |
+| C9 | Alles strukturiert speichern — die **Pilot-Analyse** greift darauf zu | offen |
+| C10 | Abschluss: Zusammenfassung + „Objekt speichern und anlegen" | offen |
+
+**Vieles davon steht schon** (v1315 Kontext, v1324 Ort/Markt, v1325
+Auskunft nutzen, v1327 Satz mit Befehl und Angabe, v1331 Färbung). Der
+erste Schritt ist deshalb eine **Bestandsaufnahme: was von C1–C10 läuft
+bereits, was fehlt wirklich.** Ohne sie wird ein zweiter Sprechlauf neben
+den ersten gebaut.
+
+---
+
 ## Marktbericht: Marcels Liste vom 12.09.2026 — ERLEDIGT bis auf zwei Reste
 
 Alles auf Staging, `b307c50` bis `343ed2b`. Einzelheiten im Journal der

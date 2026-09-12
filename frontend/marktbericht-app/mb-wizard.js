@@ -219,6 +219,12 @@
       'html.mb-breit .mbw-reiter{max-width:960px;margin-left:auto;margin-right:auto}',
       'html.mb-breit .mbw-r{font-size:14px;padding:13px 20px}',
       'html.mb-breit .mbw-kurz{max-width:960px;margin-left:auto;margin-right:auto;font-size:12px}',
+      /* v1349: dieselbe Ausrichtung wie Reiterleiste und Kurztext. Sie
+         hatte nur max-width und klebte deshalb im Breit-Modus am linken
+         Rand, waehrend alles andere zentriert stand - im Bild sofort zu
+         sehen, im Code nicht. Wer eine Breite setzt, muss auch sagen, wo
+         der Rest hin soll. */
+      'html.mb-breit .mbw-spaeter-fuss{max-width:960px;margin-left:auto;margin-right:auto}',
       'html.mb-breit input:not([type=checkbox]):not([type=radio]),html.mb-breit select{',
         'font-size:15px;padding:11px 12px}',
       'html.mb-breit label{font-size:13px}',
