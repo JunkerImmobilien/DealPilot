@@ -14594,6 +14594,115 @@ Zwei Wege, beide brauchen seine Entscheidung:
 `6ba2e99` v1355
 
 
+## v1356 / v1357 · Die Kaufgrenzen bekommen einen Leser
+
+Marcels Entscheidung zu A8 war **anschließen, nicht wegräumen**. Die drei
+Schwellen stehen jetzt als eigene Ampel im Deal-Score-Panel.
+
+**Neben dem Score, nicht im Score.** Die Schwellen sind seine persönliche
+Kaufgrenze, keine Bewertung. Ein Objekt kann 82 Punkte holen und trotzdem
+unter seinem Mindest-DSCR liegen. Würde die Schwelle in den Score
+einfließen, wäre sie nicht mehr ablesbar — und der Score hätte zwei
+Bedeutungen. Die Fußzeile sagt das dem Nutzer auch ausdrücklich.
+
+Die Istwerte kommen aus `deal`, nicht aus einer zweiten Rechnung:
+`_buildDeal2FromState()` trägt `dscr`, `ltv` und `cashflowMonatlich`
+bereits — **dieselben Zahlen, die der Score benutzt.**
+
+### Vier Korrekturen, alle beim Nachmessen gefunden
+
+Das Stück ist in vier Anläufen entstanden. Jeder Fehler kam aus einer
+Annahme, die eine Messung widerlegt hat.
+
+**v1356b — die Spanne gehört zur Kennzahl, nicht in eine Formel.**
+Erst stand dort `Math.abs(sollN) * 0.1`. Im Trockentest, bevor die Ampel
+je ein Objekt gesehen hatte:
+
+| | Spanne aus der Formel | passend? |
+|---|---|---|
+| DSCR, Grenze 1,20 | 0,12 | ja |
+| LTV, Grenze 90 % | **9 Punkte** | nein — 95 % galt noch als „knapp" |
+| Cashflow, Grenze 0 € | **0,10 €** | nein — `Math.abs(0)*0.1 \|\| 0.1` |
+
+**Eine Formel, die für alle drei gleichzeitig falsch ist, ist schlechter
+als drei ehrliche Zahlen.** Jetzt: 0,10 · 100 € · 2 Prozentpunkte, als
+Parameter.
+
+**v1357 — die Kaufgrenzen warten nicht auf den Score.** Gemessen am
+Objekt `d9f56595`: Kaufpreis 300.000, Miete 900 — DSCR, Cashflow und LTV
+stehen damit fest. Der Investor Deal Score erscheint aber erst ab 70 %
+von 24 KPIs, hier waren es **46 %**. Die Ampel hing an ihm und war damit
+genau dann unsichtbar, wenn man sie am dringendsten braucht: beim ersten
+Blick auf ein neues Objekt. Sie steht jetzt auch im Sperrbildschirm.
+
+**v1357 — zwei Gründe, eine Ampel.** Dabei fiel auf: der volle Panel
+liegt auf Obsidian (`#050505`), der Sperrbildschirm dagegen auf der
+hellen Grundfläche (`#F8F6F1`) — gemessen, nicht vermutet. Dieselben
+hellen Töne wären dort unsichtbar gewesen. Statt jede Regel doppelt zu
+schreiben, tragen die Regeln lokale Variablen; `.ds2-grenzen-hell`
+tauscht sechs Werte aus. **Die Ampelfarben bleiben in beiden Fällen
+dieselben** — Grün und Rot bedeuten auf hellem wie auf dunklem Grund
+dasselbe.
+
+**v1357b/c — null ist kein Wert, und `d_total` gibt es nicht.**
+Zwei Befunde nacheinander, beide am selben Objekt:
+
+Ohne eingetragene Finanzierung liefert die KPI-Engine `dscr = 0` und
+`ltv = 0`. Die Ampel las das als „Grenze 1,20 verfehlt" und zeigte ein
+rotes Kreuz — obwohl es kein Darlehen gibt, das gedeckt werden müsste.
+Genau die Falle aus `CLAUDE.md`: **`Number(null)` ist 0 und besteht
+`Number.isFinite`.**
+
+Die Reparatur war dann selbst falsch: ich prüfte auf
+`State.kpis.d_total` — **diesen Schlüssel gibt es dort nicht.** Die
+Bedingung war damit immer unerfüllt, und beide Zeilen sagten in jedem
+Fall „ohne Finanzierung", auch bei eingetragenem Darlehen. Gefunden nur,
+weil der Durchlauf **mit** Eigenkapital exakt dasselbe Ergebnis lieferte
+wie der ohne.
+
+> **Ein Leser, der ins Leere greift, sieht aus wie ein Leser.** In dieser
+> Sitzung zum achten Mal dasselbe Muster — diesmal von mir selbst gebaut,
+> beim Beheben genau dieses Musters.
+
+Die Schlüssel, die es wirklich gibt, sind `kd_dscr` (Kapitaldienst) und
+`d1` (Darlehen). Sie werden getrennt geprüft, weil sie verschiedene
+Fragen beantworten: **der DSCR deckt den Kapitaldienst, der LTV misst die
+Darlehenssumme.**
+
+### Abnahme
+
+Neun Fälle im Trockentest (grün/gelb/rot je Kennzahl, beide Richtungen,
+fehlender Ist- und fehlender Sollwert) und zwei echte Objekte:
+
+| Objekt | DSCR | Cashflow | LTV |
+|---|---|---|---|
+| `2026-1004` | 1,83 ✓ | 494 €/Mon ✓ | 83,9 % ✓ |
+| `2026-1033` | 1,37 ✓ | 86 €/Mon ✓ | 70,5 % ✓ |
+
+Die Werte stimmen mit `State.kpis` überein — der Leser greift.
+
+### Nebenbefund: die PRE-FLIGHT-Karte nennt zwei Anbieter beim Namen
+
+Beim Screenshot der Objektansicht aufgefallen: in der PRE-FLIGHT-Karte
+stehen unter „Marktbewertung" die **Logos von Sprengnetter und
+PriceHubble**, mit `alt="Sprengnetter"` und `alt="PriceHubble"`.
+
+`CLAUDE.md` ist eindeutig: *Sprengnetter und PriceHubble nie namentlich
+nach außen — „unabhängige Bewertungspartner". ImmoMetrica darf genannt
+werden.* Ein Markenlogo ist eine namentliche Nennung, und diese hier steht
+prominenter als die Textstelle, die `v1354` im Einstellungsreiter behoben
+hat.
+
+**Nicht angefasst** — die Karte ist ein zentrales Bedienelement, und
+welche Quellen dem Nutzer wie angeboten werden, ist eine
+Produktentscheidung. Marcel bekommt den Befund vorgelegt.
+
+### Commits
+
+`17a4d5f` v1356 · `f35f238` v1356b · `6cf0cbc` v1357 ·
+`5bee222` v1357b · `be6ef13` v1357c
+
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
