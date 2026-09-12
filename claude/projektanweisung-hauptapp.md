@@ -14522,6 +14522,78 @@ Dazu drei kleinere Befunde aus demselben Durchgang:
 `882fb86` v1354
 
 
+### v1355 · Marcels Entscheidungen, umgesetzt
+
+Er hat alle vier Empfehlungen übernommen. Zwei davon waren Umbau:
+
+**„Profil & Anzeige" ist jetzt „Standardwerte" und „Darstellung".**
+Gemessen nach der Teilung — die Hälften sind fast exakt gleich groß:
+
+| | vorher | nachher |
+|---|---|---|
+| Profil & Anzeige | 3.933 z · 3.038 px · 14 Blöcke | — |
+| Standardwerte | — | 1.971 z · 1.495 px · 5 Blöcke |
+| Darstellung | — | 1.961 z · 1.489 px · 9 Blöcke |
+
+**Der Schnitt lag schon im Reiter drin.** Die Trennlinie zwischen
+„Standort & Nebenkosten" und „Anzeige-Optionen" hat die beiden Hälften
+vorher im selben Reiter getrennt; sie ist damit überflüssig geworden.
+
+**„Externe Anbieter" ist kein Reiter mehr.** 380 Zeichen, vier
+Bedienelemente, ein Anbieter. Der Host steht jetzt im Account-Pane, der
+Lazy-Render hängt an `'account'` statt an `'anbieter'`. Account wuchs
+von 1.185 auf 1.566 Zeichen — genau die 381, die der andere Reiter trug.
+
+**Elf Reiter sind zehn geworden**, und keiner davon ist mehr über
+3.000 px hoch.
+
+Die Initialisierung bedient beide neuen Reiter gemeinsam
+(`pane === 'standardwerte' || pane === 'darstellung'`). Sie ist
+durchgehend defensiv — jeder Griff prüft erst, ob sein Ziel existiert.
+**Eine aufgeteilte Initialisierung wäre die nächste Doppelliste**
+gewesen.
+
+### Der Befund zu den Schwellen — gemessen, noch nicht entschieden
+
+Marcels vierte Antwort war „erst messen, dann entscheiden". Die Messung
+ist eindeutig und fällt anders aus als die Frage vermuten ließ:
+
+**Die drei „Persönlichen Mindest-Schwellen" haben keinen Leser.**
+
+```
+min_dscr · min_cashflow_vor_st · max_ltv
+  geschrieben in  investment-profile.js  (das Formular)
+  vorbelegt in    config.js              (1,20 · 0 € · 90 %)
+  gelesen von     — niemandem —
+```
+
+Gegengeprüft über alle Konsumenten des Profils: `main.js` fragt über
+`_dpProfil()` genau sieben Schlüssel ab — `bwk_anteil_default`,
+`bwk_ul_pct_default`, `grenzsteuersatz`, `mietausfall_pct`,
+`notar_grundbuch`, `tilgung_default`, `zinsbindung_default`. Die drei
+Schwellen sind nicht darunter, und auch sonst nirgends im Frontend, im
+Backend oder in einer Anzeige.
+
+**Die Frage nach zwei konkurrierenden Schwellensystemen hat sich damit
+erledigt — es gibt nur eines.** Das andere ist ein Formular, das in
+einen Speicher schreibt, aus dem nie jemand liest.
+
+Das ist zum siebten Mal in dieser Sitzung dasselbe Muster: **ein Feld
+ohne Leser sieht aus wie ein Feld.** Marcel trägt dort eine Zahl ein,
+sieht sie beim nächsten Öffnen wieder und darf annehmen, sie wirke.
+
+Zwei Wege, beide brauchen seine Entscheidung:
+
+- **Anschließen** — die Schwellen als persönliche Ampel neben den Score
+  stellen („dein Mindest-DSCR ist 1,20, dieses Objekt liegt bei 1,08").
+  Das wäre das, was die Felder versprechen.
+- **Wegräumen** — drei Felder weniger, dafür keine falsche Zusage mehr.
+
+### Commits
+
+`6ba2e99` v1355
+
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
