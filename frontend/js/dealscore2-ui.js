@@ -181,7 +181,7 @@ function _buildDeal2FromState() {
 
    Statusfarben bleiben Statusfarben: Gruen und Rot werden NICHT
    tokenisiert, sie bedeuten in jeder Marke dasselbe. */
-function _ds2Schwelle(name, soll, ist, einheit, besserIstGroesser, nachkomma) {
+function _ds2Schwelle(name, soll, ist, einheit, besserIstGroesser, nachkomma, spanne) {
   /* Number(null) ist 0 und besteht Number.isFinite - deshalb zuerst auf
      Abwesenheit pruefen, dann rechnen. */
   var hatSoll = (soll != null && soll !== '' && isFinite(Number(soll)));
@@ -197,11 +197,21 @@ function _ds2Schwelle(name, soll, ist, einheit, besserIstGroesser, nachkomma) {
     if (erfuellt) {
       zustand = 'erfuellt';
     } else {
-      /* „knapp" ist eine Zehntel-Spanne um die Grenze. Ohne diese Stufe
-         sieht ein DSCR von 1,19 genauso rot aus wie einer von 0,80. */
-      var spanne = Math.abs(sollN) * 0.1 || 0.1;
+      /* v1356b - DIE SPANNE KOMMT VON AUSSEN, SIE WIRD NICHT GERECHNET.
+         Erst stand hier `Math.abs(sollN) * 0.1` - eine Zehntel-Spanne.
+         Gemessen im Trockentest fiel auf: die Formel passt fuer den DSCR
+         (0,12 um 1,20), ist beim LTV viel zu weit (9 Prozentpunkte, damit
+         gilt 95 % gegen eine Grenze von 90 % noch als „knapp") und beim
+         Cashflow-Sollwert 0 viel zu eng, weil `Math.abs(0)*0.1 || 0.1`
+         auf zehn Cent faellt.
+
+         Eine Formel, die fuer alle drei gleichzeitig falsch ist, ist
+         schlechter als drei ehrliche Zahlen. Die Spanne gehoert zur
+         Kennzahl, nicht zur Rechnung. */
+      var sp = (spanne != null && isFinite(Number(spanne))) ? Math.abs(Number(spanne)) : 0;
       var abstand = Math.abs(istN - sollN);
-      zustand = (abstand <= spanne) ? 'knapp' : 'verfehlt';
+      zustand = (sp > 0 && abstand <= sp) ? 'knapp' : 'verfehlt';
+
     }
   }
 
@@ -242,12 +252,17 @@ function _ds2GrenzenBlock(deal) {
   }
 
   var zeilen =
+    /* Die letzte Zahl ist die Spanne, ab der es nicht mehr „knapp" heisst.
+       Sie gehoert zur Kennzahl und steht deshalb hier, nicht in einer
+       Formel: 0,10 beim DSCR, 100 Euro beim Monats-Cashflow, zwei
+       Prozentpunkte beim LTV. */
     _ds2Schwelle('Kapitaldienstdeckung (DSCR)', soll('min_dscr'),
-                 deal.dscr, '', true, 2) +
+                 deal.dscr, '', true, 2, 0.10) +
     _ds2Schwelle('Cashflow vor Steuer', soll('min_cashflow_vor_st'),
-                 deal.cashflowMonatlich, '\u00a0\u20ac/Mon', true, 0) +
+                 deal.cashflowMonatlich, '\u00a0\u20ac/Mon', true, 0, 100) +
     _ds2Schwelle('Beleihungsauslauf (LTV)', soll('max_ltv'),
-                 deal.ltv, '\u00a0%', false, 1);
+                 deal.ltv, '\u00a0%', false, 1, 2);
+
 
   if (!zeilen) return '';
 
