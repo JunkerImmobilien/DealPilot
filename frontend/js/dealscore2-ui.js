@@ -218,7 +218,7 @@ function _ds2Schwelle(name, soll, ist, einheit, besserIstGroesser, nachkomma, sp
   var farbe = zustand === 'erfuellt' ? '#2FBE6E'
             : zustand === 'knapp'    ? '#E5BD53'
             : zustand === 'verfehlt' ? '#D55B5B'
-            : 'rgba(255,255,255,0.30)';
+            : 'var(--g-leer, rgba(255,255,255,0.30))';
   var zeichen = zustand === 'erfuellt' ? '\u2713'
               : zustand === 'knapp'    ? '\u2248'
               : zustand === 'verfehlt' ? '\u2717'
@@ -241,7 +241,7 @@ function _ds2Schwelle(name, soll, ist, einheit, besserIstGroesser, nachkomma, sp
   '</div>';
 }
 
-function _ds2GrenzenBlock(deal) {
+function _ds2GrenzenBlock(deal, aufHell) {
   var P = window.DealPilotInvestmentProfile;
   var D = (window.DealPilotConfig && window.DealPilotConfig.investmentProfileDefaults) || {};
   function soll(k) {
@@ -266,7 +266,7 @@ function _ds2GrenzenBlock(deal) {
 
   if (!zeilen) return '';
 
-  return '<div class="ds2-grenzen">' +
+  return '<div class="ds2-grenzen' + (aufHell ? ' ds2-grenzen-hell' : '') + '">' +
     '<div class="ds2-grenzen-kopf">' +
       '<span>Deine Kaufgrenzen</span>' +
       '<span class="ds2-grenzen-quelle">Einstellungen \u203a Standardwerte</span>' +
@@ -388,11 +388,23 @@ function renderDealScore2() {
             '📋 Welche KPIs fehlen noch?' +
           '</button>' +
         '</div>' +
-        '<div class="ds2-threshold-hint">' +
+        '<div class="ds2-threshold-hint">'  +
           'Trag in den Tabs <strong>Objekt</strong> (Lage, Energieklasse, Zustand), ' +
           '<strong>Bewirtschaftung</strong> und <strong>Steuer</strong> die fehlenden Werte ein.' +
         '</div>' +
-      '</div>';
+      '</div>' +
+      /* === v1357 - DIE KAUFGRENZEN WARTEN NICHT AUF DEN SCORE ==========
+         Gemessen am Objekt d9f56595: Kaufpreis 300.000, Miete 900 - DSCR,
+         Cashflow und LTV stehen damit fest, aber der Investor Deal Score
+         erscheint erst ab 70 % von 24 KPIs (hier: 46 %). Die Ampel hing
+         an ihm und war deshalb genau dann unsichtbar, wenn man sie am
+         dringendsten braucht: beim ersten Blick auf ein neues Objekt.
+
+         Marcels Kaufgrenzen brauchen keine 24 Kennzahlen. Sie brauchen
+         drei, und die drei stehen mit Kaufpreis, Miete und Finanzierung.
+         `deal` wird ohnehin VOR dieser Pruefung gebaut - der Block kostet
+         also keine zusaetzliche Rechnung. */
+      _ds2GrenzenBlock(deal, true);
     if (typeof window._updateDs2CollapseSummary === 'function') {
       window._updateDs2CollapseSummary(null, 'Daten unvollständig (' + pct + '%)');
     }

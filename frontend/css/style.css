@@ -7093,13 +7093,40 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 
    Die Ampelfarben stehen im JS und sind bewusst NICHT tokenisiert:
    Gruen und Rot bedeuten in jeder Marke dasselbe. */
+/* v1357: DIE AMPEL STEHT AUF ZWEI VERSCHIEDENEN GRUENDEN.
+   Gemessen: der volle Score-Panel liegt auf Obsidian (#050505), der
+   Sperrbildschirm „Bitte 70 % ausfuellen" dagegen auf der hellen
+   Grundflaeche (#F8F6F1). Dieselben hellen Toene waeren dort unsichtbar
+   gewesen.
+
+   Statt jede Regel doppelt zu schreiben, tragen die Regeln lokale
+   Variablen - `.ds2-grenzen-hell` tauscht nur die sechs Werte aus. Die
+   Ampelfarben bleiben in beiden Faellen dieselben: Gruen und Rot
+   bedeuten auf hellem wie auf dunklem Grund dasselbe. */
 .ds2-grenzen {
+  --g-flaeche: rgba(255,255,255,0.035);
+  --g-rand:    rgba(255,255,255,0.08);
+  --g-kopf:    rgba(255,255,255,0.72);
+  --g-text:    rgba(255,255,255,0.80);
+  --g-schwach: rgba(255,255,255,0.42);
+  --g-linie:   rgba(255,255,255,0.055);
+  --g-leer:    rgba(255,255,255,0.30);
   margin: 18px 0 4px;
   padding: 14px 16px 12px;
-  background: rgba(255,255,255,0.035);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--g-flaeche);
+  border: 1px solid var(--g-rand);
   border-radius: 10px;
 }
+.ds2-grenzen-hell {
+  --g-flaeche: rgba(0,0,0,0.022);
+  --g-rand:    rgba(0,0,0,0.09);
+  --g-kopf:    var(--ch, #2A2727);
+  --g-text:    var(--ch, #2A2727);
+  --g-schwach: var(--muted, #7A7370);
+  --g-linie:   rgba(0,0,0,0.07);
+  --g-leer:    rgba(0,0,0,0.28);
+}
+
 .ds2-grenzen-kopf {
   display: flex;
   align-items: baseline;
@@ -7109,7 +7136,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   font-weight: 700;
   letter-spacing: 0.7px;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.72);
+  color: var(--g-kopf);
   margin-bottom: 10px;
 }
 .ds2-grenzen-quelle {
@@ -7117,7 +7144,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   letter-spacing: 0.2px;
   text-transform: none;
   font-size: 10.5px;
-  color: rgba(255,255,255,0.38);
+  color: var(--g-schwach);
 }
 
 /* Vier Spalten: Ampel, Name, Istwert, Sollwert. Der Istwert steht vor
@@ -7129,7 +7156,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   align-items: baseline;
   gap: 4px 10px;
   padding: 6px 0;
-  border-top: 1px solid rgba(255,255,255,0.055);
+  border-top: 1px solid var(--g-linie);
 }
 .ds2-grenze-zeile:first-of-type {
   border-top: 0;
@@ -7142,7 +7169,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 }
 .ds2-grenze-name {
   font-size: 12.5px;
-  color: rgba(255,255,255,0.80);
+  color: var(--g-text);
 }
 .ds2-grenze-ist {
   font-family: "JetBrains Mono", ui-monospace, monospace;
@@ -7153,7 +7180,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 .ds2-grenze-soll {
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 11px;
-  color: rgba(255,255,255,0.42);
+  color: var(--g-schwach);
   white-space: nowrap;
   min-width: 76px;
   text-align: right;
@@ -7161,13 +7188,13 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 .ds2-grenzen-fuss {
   margin-top: 9px;
   padding-top: 9px;
-  border-top: 1px solid rgba(255,255,255,0.055);
+  border-top: 1px solid var(--g-linie);
   font-size: 10.5px;
   line-height: 1.5;
-  color: rgba(255,255,255,0.44);
+  color: var(--g-schwach);
 }
 .ds2-grenzen-fuss strong {
-  color: rgba(255,255,255,0.68);
+  color: var(--g-text);
   font-weight: 700;
 }
 
