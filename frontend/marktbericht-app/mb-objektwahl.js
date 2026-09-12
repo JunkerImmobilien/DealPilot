@@ -19,8 +19,101 @@
   function token() { try { return localStorage.getItem('ji_token') || ''; } catch (e) { return ''; } }
   function authHeaders() { var t = token(); return t ? { 'Authorization': 'Bearer ' + t } : {}; }
 
+  /* ===================================================================
+     v1333 - WAS DER NUTZER GETIPPT HAT, WIRD NICHT UEBERSCHRIEBEN
+     ===================================================================
+     Marcels Befund, woertlich: "beim ersten mal habe ich eine andere
+     adresse eingegeben und alle werte angegeben und dann hat er einfach
+     das letzte objekt genommen ... erst beim 2 mal aendern hat er die
+     neue Adresse uebernommen."
+
+     GEMESSEN am 12.09.2026 im Staging-iframe, Objekt 2026-1033:
+
+       load     @128 ms
+       getippt  @129 ms   "Meine Teststrasse 1, 38300 Wolfenbuettel"
+       @605 ms  ->        "32120 Hiddenhausen"
+
+     Die eigene Eingabe stand 476 ms, dann war sie weg. Kein Fehler, keine
+     Meldung - das Feld sah danach aus, als haette man nie getippt.
+
+     URSACHE, nicht Symptom: zwischen dem Laden des Formulars und
+     `fillFromData()` liegen ZWEI Netzrunden - erst die Objektliste
+     (`buildDropdown`), dann das Detail (`loadDetail`). Der Auto-Select aus
+     `?ref` feuert also erst eine halbe Sekunde nach dem Laden, und
+     `setVal()` schrieb bis dahin bedingungslos. Wer schnell tippt, tippt
+     gegen einen Fetch an - und beim zweiten Versuch ist der Fetch durch,
+     deshalb hielt es dann. Genau das hat Marcel beschrieben.
+
+     Die Regel gilt ab jetzt in dieser ganzen Datei:
+     EIN FELD, DAS DER NUTZER SELBST ANGEFASST HAT, GEHOERT IHM.
+
+     Gemerkt wird nur, was aus einem ECHTEN Ereignis kommt (`isTrusted`) -
+     die Fuellwege loesen selbst `input` aus, die duerfen sich nicht
+     gegenseitig aussperren. Waehlt der Nutzer im Dropdown von Hand ein
+     Objekt, ist das eine ausdrueckliche Ansage: dann wird das Register
+     geleert und wirklich alles uebernommen. Nur der stille Weg ueber
+     `?ref` muss sich zurueckhalten. */
+  var _angefasst = Object.create(null);
+  function _merken(ev) {
+    if (!ev || !ev.isTrusted) return;
+    var t = ev.target;
+    if (!t || !t.id) return;
+    if (!/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName || '')) return;
+    _angefasst[t.id] = 1;
+    if (t.id === 'address') _adresseGeaendert();
+  }
+  document.addEventListener('input', _merken, true);
+  document.addEventListener('change', _merken, true);
+  window._mbAngefasst = function (id) {
+    return id ? !!_angefasst[id] : Object.keys(_angefasst);
+  };
+
+  /* === v1333 - Der Objektbezug folgt der Adresse =====================
+     Zweiter Teil desselben Befunds, und der teurere. `window._mbwRef`
+     wird beim Dropdown-Klick gesetzt (unten) und NIE wieder geloest. Wer
+     danach eine andere Adresse eintraegt, bekommt einen Bericht, der
+
+       - unter dem ALTEN Objekt abgelegt wird (external_ref, app.js:398),
+       - das ALTE Label traegt (object_label, app.js:399),
+       - und den Preis des alten Objekts bekommt - samt "ist bereits
+         bezahlt" fuer eine Adresse, fuer die nie jemand gezahlt hat
+         (mb-stufen.js:206 ff.).
+
+     Deshalb: aendert sich die Adresse und passt sie nicht mehr zur
+     geladenen, ist der Bezug weg. Sichtbar, nicht still - ein Bericht,
+     der beim falschen Objekt landet, faellt sonst erst Wochen spaeter
+     auf. */
+  var _refAdresse = null;
+  function _norm(x) { return String(x || '').replace(/\s+/g, ' ').trim().toLowerCase(); }
+  function _adresseGeaendert() {
+    var el = $('address'); if (!el) return;
+    if (!window._mbwRef || !_refAdresse) return;
+    if (_norm(el.value) === _refAdresse) return;
+    window._mbwRef = null;
+    window._mbwLabel = null;
+    _refAdresse = null;
+    var sel = $('mbow-select'); if (sel) { try { sel.selectedIndex = 0; } catch (e) {} }
+    var note = $('mbow-note');
+    if (note) {
+      note.innerHTML = 'Andere Adresse \u2014 der Bericht wird <b>keinem</b> Bestandsobjekt '
+        + 'zugeordnet. W\u00e4hl oben ein Objekt, wenn er dorthin geh\u00f6ren soll.';
+      note.style.color = 'var(--wl-c9a84c, #C9A84C)';
+    }
+    try { window.dispatchEvent(new CustomEvent('mb:object-picked', { detail: { ref: null } })); } catch (e) {}
+    try {
+      if (window.DealPilotMbStufen && window.DealPilotMbStufen.preisHolen) window.DealPilotMbStufen.preisHolen();
+    } catch (e) {}
+  }
+
+
   function setVal(id, v) {
     var el = $(id); if (!el || v == null || v === '') return;
+    /* v1333: Nutzereingabe schlaegt Objektdaten. Siehe Block oben. */
+    if (_angefasst[id]) {
+      try { console.info('[v1333] ' + id + ' bleibt stehen - vom Nutzer gesetzt.'); } catch (e) {}
+      return;
+    }
+
     el.value = v;
     /* v1135-WMBACK-2 · Ein Auswahlfeld nimmt einen unbekannten Wert nicht
      * an — es bleibt STILL leer. Beim Messen selbst hereingefallen: die
@@ -146,6 +239,12 @@
       [d.plz, d.ort].filter(Boolean).join(' ')
     ].filter(Boolean).join(', ');
     if (addr) setVal('address', addr);
+    /* v1333: merken, WELCHE Adresse zum geladenen Objekt gehoert - und
+       sofort pruefen. Hat der Nutzer laengst eine andere getippt, hat
+       `setVal` sie oben stehen lassen; dann darf auch der Objektbezug
+       nicht bleiben. */
+    if (addr) { _refAdresse = _norm(addr); _adresseGeaendert(); }
+
     // Typ
     var pt = mapPtype(d.objart); if (pt) setVal('ptype', pt);
     // Flaeche / Zimmer / Baujahr / Etage
@@ -372,8 +471,12 @@
       } catch (e) {}
     } catch (e) { host.style.display = 'none'; }
 
-    async function uebernehmen() {
+    async function uebernehmen(ev) {
       var id = sel.value;
+      /* v1333: Ein Klick des Nutzers ist eine Ansage - dann darf alles
+         ueberschrieben werden. Der stille Auto-Select aus ?ref nicht. */
+      if (ev && ev.isTrusted) { _angefasst = Object.create(null); }
+
       /* v942-publish
          * BUG bis v941: die id wurde nur zum Nachladen der Daten benutzt und
          * dann WEGGEWORFEN. app.js las external_ref ausschliesslich aus

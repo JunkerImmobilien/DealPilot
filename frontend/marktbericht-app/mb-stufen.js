@@ -148,6 +148,54 @@
      v1201: `mea` ist hier RAUS — er wird jetzt schon in bedarf1() verlangt,
      und zweimal dieselbe Forderung in zwei Stufen zu fuehren waere genau die
      Doppelliste, an der der Marktbericht schon sechsmal gescheitert ist. */
+  /* === v1333 - "Wohneinheiten" darf niemanden mehr aussperren ========
+     Marcels Befund: "Dann wollte er unbedingt fuer das Objekt
+     Wolfenbuettel dass ich bei Wohneinheiten was eintrage sonst konnte
+     ich den Bericht erst garnicht erzeugen."
+
+     Er hat recht, und der Widerspruch stand im Formular selbst: das Feld
+     ist mit "- nur MFH" beschriftet (index.html), die Pflichtregel hier
+     verlangt es aber bei JEDER Objektart. Wer eine Eigentumswohnung
+     bewertet, liest "nur MFH", laesst es leer und kommt nicht weiter.
+
+     Weglassen geht nicht: der Ertragswert braucht die Zahl, weil die
+     Verwaltungskosten je BEWERTETER Einheit angesetzt werden
+     (Anlage 3 ImmoWertV). Ohne sie rechnet das Verfahren halb, und das
+     ist die eine Sache, die der Marktbericht nie tut.
+
+     Aber bei den meisten Objektarten muss man gar nicht fragen - die
+     Antwort steht in der Objektart:
+
+       ETW  - die bewertete Einheit IST die Wohnung          -> 1
+       EFH  - ein Einfamilienhaus hat eine Wohnung           -> 1
+       DHH  - eine Haelfte ist eine Einheit                  -> 1
+       RH   - ein Reihenhaus ist eine Einheit                -> 1
+       GAR  - Garage/Stellplatz, kein Wohnraum               -> 1
+       MFH  - unbekannt, muss gefragt werden                 -> Pflicht
+       Gewerbe - Zahl der Nutzungseinheiten, unbekannt       -> Pflicht
+
+     Der Wert wird SICHTBAR ins Feld geschrieben, nicht heimlich in die
+     Rechnung geschoben: er steht da, er ist begruendet, und wer es
+     besser weiss, ueberschreibt ihn. Angefasst wird nur ein LEERES Feld
+     - eine eigene Eingabe bleibt unangetastet (dieselbe Regel wie
+     v1333 in mb-objektwahl.js). */
+  var EINHEIT_JE_ART = { ETW: 1, EFH: 1, DHH: 1, RH: 1, GAR: 1 };
+  function _einheitenSelbstverstaendlich() {
+    var pt = wert('ptype').toUpperCase();
+    return Object.prototype.hasOwnProperty.call(EINHEIT_JE_ART, pt) ? EINHEIT_JE_ART[pt] : 0;
+  }
+  function einheitenVorbelegen() {
+    var el = $('units'); if (!el) return;
+    var n = _einheitenSelbstverstaendlich();
+    if (!n) { if (el.getAttribute('data-mbst-auto')) { el.value = ''; el.removeAttribute('data-mbst-auto'); } return; }
+    /* Nur ein leeres Feld oder ein zuvor selbst gesetztes anfassen. */
+    if (String(el.value || '').trim() !== '' && !el.getAttribute('data-mbst-auto')) return;
+    if (String(el.value || '').trim() === String(n)) { el.setAttribute('data-mbst-auto', '1'); return; }
+    el.value = String(n);
+    el.setAttribute('data-mbst-auto', '1');
+    try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+  }
+
   function bedarf3() {
     var l = BEDARF[3].slice();
     if (!istWohnung()) { l.push(['standardstufe', 'Standardstufe']); l.push(['nhkHaus', 'Hausform (NHK)']); }
@@ -564,6 +612,13 @@
       } catch (e) {}
       _letzte = -1;                             /* Neuzeichnen erzwingen */
       melden();
+    }, true);
+    /* v1333: Die Objektart beantwortet die Wohneinheiten meistens selbst. */
+    try { einheitenVorbelegen(); } catch (e) {}
+    document.addEventListener('change', function (ev) {
+      if (ev && ev.target && ev.target.id === 'ptype') {
+        try { einheitenVorbelegen(); } catch (e) {}
+      }
     }, true);
     _letzte = 0;
     melden();
