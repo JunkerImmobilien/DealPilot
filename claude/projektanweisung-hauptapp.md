@@ -13897,6 +13897,61 @@ Hilfetexten wie das echte Formular. Nichts gebaut, bevor Marcel gewählt hat.
 
 **Alles auf Staging, nichts auf Produktion.**
 
+## v1340–v1340d · Die Eingabe-Karten (Variante B) — 12.09.2026 (Nacht)
+
+Marcels Wahl aus der Demo: „mach b das ist cool". Neue Datei
+`frontend/marktbericht-app/mb-karten.js`, geladen NACH `mb-wizard.js` —
+vorher liegen die Zeilen noch nicht in ihren Reitern.
+
+**Neun Blöcke**, jeder mit Goldkante links, Titel und Zähler rechts:
+
+```
+Wo steht das Objekt      3 / 3      Dach und Wände        0 / 3
+Eckdaten                 3 / 4      Flächen               1 / 4
+Geld            2 / 2 · optional    Stellplätze u. Aufzug 0 / 3
+Zustand                  1 / 4      Energie und Heizung   0 / 4
+Innen                    0 / 5
+```
+
+Der Zähler ist der Grund für diese Variante: er beantwortet „wie weit bin
+ich?" **innerhalb eines Reiters**. Die Stufenleiste beantwortet sie nur für
+den ganzen Bericht.
+
+**Es wird verschoben, nicht neu gebaut** — dieselben DOM-Knoten, dieselben
+Ids, dieselben Listener. Ein Neubau hätte v1129b wiederholt (doppelte Ids,
+`getElementById` nimmt die erste, der Nutzerwert steht in der anderen).
+Gemessen: keine doppelten Ids, `payload()` läuft, die ⓘ aus v1334 sind
+mitgewandert, die Flucht aus v1336c hält.
+
+**Keine zweite Pflichtliste.** Was Pflicht ist, weiß `mb-stufen.js` und
+niemand sonst; `optional` hier steuert nur die Beschriftung.
+
+### Drei eigene Fehler, alle beim Nachmessen gefunden
+
+| | Fehler | Wie er sichtbar wurde |
+|---|---|---|
+| v1340b | Der Zähler fragte `offsetParent` — also „ist das Feld gerade auf dem Schirm". Acht von neun Blöcken liegen in einem geschlossenen Reiter | acht Zähler blieben leer |
+| v1340c | Die Mono-Labels kamen als Inter 13px an | der Hell-Skin in `index.html:74` setzt `font-family` selbst mit `!important` — dagegen hilft nur `!important` |
+| v1340d | `zeileVon()` fiel für Felder ohne `.row` auf `parentElement` zurück. Beim Adressfeld ist das der ganze Reiter-Container | **im Screenshot gesehen**: „Eckdaten" saß INNERHALB von „Wo steht das Objekt" |
+
+v1340d ist dieselbe Sorte Fehler wie v1334b — ein zu weit gefasster
+Vorfahre. Deshalb jetzt zwei Sicherungen: eine eigene Hülle für Felder ohne
+`.row`, **und** die Regel, dass eine Zeile nie übernommen wird, wenn sie ein
+Feld einer anderen Gruppe trägt. Die zweite fängt auch Fälle ab, die ich
+noch nicht gesehen habe.
+
+### Abnahme
+
+- 390 / 768 / 1024 px: kein Überlauf, kein Versatz, kein Block steht über
+- Labels: JetBrains Mono 10px uppercase, `letter-spacing` 1,1px
+- keine Verschachtelung, keine doppelten Ids, `payload()` in Ordnung
+- **Gold-Audit: „Genau auf der Basislinie. Kein neues Hartgold."** — die neue
+  Datei nutzt durchgehend `var(--wl-…)`
+
+### Commits
+
+`4c6b153` v1340 · `a1d3908` v1340b · `0ad54a0` v1340c · `acd4529` v1340d
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

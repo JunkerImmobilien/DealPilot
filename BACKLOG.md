@@ -83,9 +83,10 @@ Projektanweisung unter **v1332–v1337**.
    rechnet weiter rein finanzmathematisch. Wo ein marktabgeleiteter
    Koeffizient vorliegt, muss er vorgehen.
 
-3. **Optik: Marcel wählt.** Demo liegt in
-   `design/Vorschläge/marktbericht-eingabe-varianten.html` — Ist-Zustand gegen
-   Variante A (Ruhig) und B (Karten). Nichts gebaut, bevor er gewählt hat.
+3. **Optik: erledigt.** Marcel hat **Variante B** gewählt („mach b das ist
+   cool“). Gebaut in `v1340`–`v1340d`: neun Blöcke mit Goldkante, Titel und
+   Zähler. Abgenommen über 390/768/1024 px, Gold-Audit auf der Basislinie.
+   Die Demo bleibt als Vergleichsstand liegen.
 
 ## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
 

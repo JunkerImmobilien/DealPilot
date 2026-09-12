@@ -3006,3 +3006,26 @@ aus und widerspricht der Zeile darüber.
 **Regel: eine Spanne wird zuletzt gebildet, auf demselben Endwert, den sie
 beschreibt.** Gefunden nur, weil der Funktionslauf beide Zahlen
 nebeneinander ausgab — die Einzelprüfung des Streuungsblocks war grün.
+
+## 139 · Ein zu weit gefasster Vorfahre, zum zweiten Mal
+
+`mb-karten.js` fasst `.row`-Zeilen in benannte Blöcke. Für Felder ohne
+`.row` — das Adressfeld etwa — fiel der Code auf `el.parentElement`
+zurück. Das ist dort der **ganze Reiter-Container**: er wurde samt allem,
+was darin stand, in den ersten Block geschoben. Im Bild saß „Eckdaten"
+innerhalb von „Wo steht das Objekt".
+
+**Dieselbe Sorte Fehler wie v1334b**, wo das Info-Zeichen am ersten
+`<label>` im Panel landete statt am eigenen.
+
+**Regel: wer von einem Feld aufwärts sucht, braucht eine Abbruchbedingung
+UND eine Gegenprobe.** Die Abbruchbedingung allein reicht nicht — hier ist
+es die Gegenprobe, die trägt: *enthält der gefundene Behälter ein Element,
+das zu einer anderen Gruppe gehört?* Wenn ja, ist er der falsche. Diese
+Prüfung fängt auch Fälle ab, die man noch nicht gesehen hat.
+
+**Und: sichtbar ist nicht dasselbe wie vorhanden.** Ein Zähler im selben
+Modul fragte `offsetParent` und blieb deshalb in jedem geschlossenen
+Reiter leer — also überall dort, wo er helfen sollte. Die richtige Frage
+war, ob das Feld ÜBERHAUPT existiert; was nicht gebraucht wird, baut die
+Wertermittlung gar nicht erst.
