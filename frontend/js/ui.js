@@ -739,6 +739,29 @@ function _buildAIPayload() {
      * weglassen koennen, und es muss fuer JEDEN Aufrufer gelten, nicht nur fuer
      * die zwei, die es heute gibt (ui.js:822 / ui.js:1236). */
     objId: (typeof window._currentObjKey === 'string' && window._currentObjKey) ? window._currentObjKey : null,
+    /* ═══ v1311 · Die Pilot-Analyse erfährt, WOHER die Zahlen kommen ═════
+       Marcels Vorgabe vom 11.09.2026: „dass all das was wir ausgearbeitet
+       haben auch nach dem Speichern im Tab Pilot-Analyse zur Verfügung
+       steht und der Co-Pilot dieses Wissen dann mitnimmt."
+
+       Die Werte kamen schon an — sie stehen im Formular. Was fehlte, ist
+       ihre Herkunft: ob 90 €/m² amtlich aus BORIS stammen oder geschätzt
+       sind, ob die Makrolage aus einer bezahlten Marktpreisindikation
+       kommt oder aus dem Bauchgefühl, ob die Bankbewertung eine Näherung
+       ist.
+
+       Für eine Analyse ist das kein Beiwerk: eine belegte Zahl trägt eine
+       Empfehlung, eine geschätzte trägt einen Vorbehalt. Der Sprechlauf
+       schreibt die Herkunft nach `_dp_herkunft` (storage.js FIELDS), und
+       von dort geht sie mit. */
+    herkunft: (function () {
+      try {
+        var roh = g('_dp_herkunft');
+        if (!roh) return null;
+        var o = JSON.parse(roh);
+        return (o && typeof o === 'object' && Object.keys(o).length) ? o : null;
+      } catch (e) { return null; }
+    })(),
     marktbewertung: {
       marktwert: parseDe(g('svwert')) || null,
       marktmiete_qm: parseDe(g('ds2_marktmiete')) || null
@@ -797,6 +820,16 @@ function _buildAIPayload() {
         if (_ma) _dpmb.makrolage = _ma;
         if (_card.trendRaw != null) _dpmb.wertentwicklung_pct_pa = _card.trendRaw;
         if (_card.mw && _card.mw.med != null) _dpmb.marktwert = _card.mw.med;
+        /* ═══ v1323 · Der Marktkontext gehoert in die Bewertung ═══════
+           Marcels Vorgabe: "wichtig waere auch dass dem Co-Pilot und der
+           Analyse diese Daten zur Bewertung zur Verfuegung stehen."
+
+           Vermietet gegen frei, die Energieklassen-Spreizung am Ort, die
+           Angebotsrendite - das sind genau die Zahlen, gegen die sich ein
+           Deal einordnen laesst. Sie lagen bisher im Bericht und kamen in
+           der Analyse nie an. */
+        if (_card.marktkontext) _dpmb.marktkontext = _card.marktkontext;
+        if (_card.erbbaurecht) _dpmb.erbbaurecht = _card.erbbaurecht;
         if (Object.keys(_dpmb).length) payload.dealpilot_marktbewertung = _dpmb;
       }
     }

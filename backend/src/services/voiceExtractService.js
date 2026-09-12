@@ -234,7 +234,7 @@ function stripTermDump(t) {
   return s.trim();
 }
 
-function buildPrompt(transcript, catalog) {
+function buildPrompt(transcript, catalog, zusatz) {
   const lines = catalog.map(e => {
     let l = '- ' + e.id + ' | ' + e.kind + ' | ' + e.label;
     if (e.hint) l += ' (' + e.hint + ')';
@@ -301,10 +301,11 @@ function buildPrompt(transcript, catalog) {
     '    hg_nul = 100 und hg_ul = Gesamt minus nicht-umlagefaehig = 200. Werden beide\n' +
     '    Anteile direkt genannt, uebernimm sie 1:1. Nur ein Hausgeld-Wert ohne\n' +
     '    Aufteilung -> in hg_ul.\n' +
+    (zusatz ? zusatz + String.fromCharCode(10) : "") +
     'TRANSKRIPT:\n"""\n' + transcript + '\n"""';
 }
 
-async function extractFields(transcript, catalog, apiKey, sammler) {
+async function extractFields(transcript, catalog, apiKey, sammler, zusatz) {
   transcript = stripTermDump(transcript);  /* v515 */
   let r;
   try {
@@ -313,7 +314,7 @@ async function extractFields(transcript, catalog, apiKey, sammler) {
       headers: { Authorization: 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: EXTRACT_MODEL,
-        input: [{ role: 'user', content: buildPrompt(transcript, catalog) }],
+        input: [{ role: 'user', content: buildPrompt(transcript, catalog, zusatz) }],
         max_output_tokens: 5000
       })
     });
@@ -378,6 +379,30 @@ async function extractFields(transcript, catalog, apiKey, sammler) {
       if (!bv) return;
       fields[k] = true;
     } else {
+      /* ═══ v1308c · Eine Verneinung ist kein Text ═══════════════════════
+         GEMESSEN am 11.09.2026: „Das Objekt liegt in 32609 Huellhorst,
+         keine Strasse bekannt" ergab `str: "keine Strasse bekannt"`. Der
+         Sprechlauf hielt die Strasse damit fuer ausgefuellt — und das
+         Angebot, das Ortszentrum zu nehmen, erschien nicht.
+
+         Die Prompt-Regel dazu steht seit v1308b in ZUSATZ_ANTWORT und hat
+         nicht gegriffen: das Modell ueberliest sie. Ein Riegel im Code tut
+         das nicht.
+
+         Was hier faellt, ist nur das, was ALS GANZES eine Verneinung ist —
+         „keine Strasse bekannt", „weiss ich nicht", „unbekannt". Ein Text,
+         der eine Verneinung ENTHAELT („Nordstrasse, keine Hausnummer"),
+         bleibt: dort steht eine echte Angabe daneben.
+
+         Bei Zahlenfeldern gilt das NICHT: dort ist die Verneinung eine 0
+         und damit die Antwort (v1306). */
+      var sv = String(v).trim();
+      if (sv && /^(kein|keine|keiner|keines|nichts|nein|unbekannt|unklar|nicht bekannt|k\.?\s?a\.?)\b/i.test(sv) &&
+          /(bekannt|vorhanden|angegeben|genannt|da|dabei|weiss|wei(ß|ss)|vorliegend)?\s*$/i.test(sv) &&
+          sv.split(/\s+/).length <= 4) {
+        return;   /* Feld bleibt leer — eine Luecke ist kein Wert */
+      }
+      if (/^(wei(ß|ss)\s+(ich\s+)?nicht|keine\s+ahnung|unbekannt|unklar)\b/i.test(sv)) return;
       fields[k] = v;
     }
   });
@@ -403,7 +428,11 @@ async function extractFromAudio(audioB64, mime, catalog, opts) {
   const sammler = neuerSammler();  /* v1259 */
   const transcript = await transcribe(buf, mime, key, sammler);
   if (!transcript || transcript.length < 10) throw httpErr(422, 'Keine Sprache erkannt \u2014 bitte erneut aufnehmen.');
-  let out = await extractFields(transcript, cat, key, sammler);
+  /* v1280: Auch die gesprochene Kurzantwort soll mit dem bekannten Stand
+     rechnen koennen ("zehn Prozent vom Kaufpreis"). Der Zusatz entsteht in
+     _zusatzAusKontext, damit Text- und Sprachweg dieselbe Regel sehen. */
+  let out = await extractFields(transcript, cat, key, sammler, _zusatzAusKontext(o.kontext, o.modus));
+  if (!o.kontext) out.fields = _prozentFalle(transcript, out.fields, cat);   /* v1280c */
   if (VERIFY_ON) { try { out = await verifyFields(transcript, out, cat, key, sammler); } catch (e) {} }  /* v522 verify-pass, fail-soft */
 
   /* v1259 \u00b7 Der eigene Schluessel eines Nutzers ist SEINE Rechnung, nicht
@@ -597,4 +626,216 @@ async function verifyFields(transcript, prev, catalog, apiKey, sammler) {
   return { fields: fields, unsicher: unsicher };
 }
 
-module.exports = { extractFromAudio, quickMatch, transcribe };  /* v536: transcribe fuer Live-Chunks */
+/* ════════════════════════════════════════════════════════════════════
+ * v1278 · ZWEI ARTEN VON TEXT
+ *
+ * `antwort` (Vorgabe): eine kurze Antwort auf eine gezielte Rueckfrage.
+ *   Ein bis vier Felder im Katalog, ein Satz Text - da soll der WERT
+ *   heraus, nicht der Satz.
+ *
+ * `inserat`: der komplette Text einer Inseratsseite, wie man ihn mit
+ *   Strg+A / Strg+C aus dem Browser holt. Gemessen an einem echten
+ *   IS24-Expose am 09.09.2026: 6.104 Zeichen, darin Kaltmiete, Flaeche,
+ *   Adresse, Baujahr, Ausstattung - alles, was wir brauchen. Dazu aber
+ *   auch Navigation, Cookie-Hinweise, Werbung und die Inserate "aehnlicher
+ *   Objekte". Deshalb steht in der Zusatzregel ausdruecklich, dass nur das
+ *   EINE Objekt zaehlt, um das es auf der Seite geht.
+ *
+ * WARUM DAS UEBERHAUPT NOETIG IST: IS24 (401) und ImmoWelt (403) blocken
+ * Abrufe aus Rechenzentren. Im Browser des Nutzers ist dieselbe Seite
+ * vollstaendig da - gemessen. Der Text-Weg umgeht den Bot-Schutz nicht, er
+ * braucht ihn gar nicht erst zu beruehren: der Mensch kopiert, was er
+ * ohnehin vor sich hat.
+ * ════════════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════════════
+ * v1280 · Der Co-Pilot rechnet mit dem, was er schon weiss
+ *
+ * Marcels Befund: „wenn ich sage, ich möchte 10 Prozent vom Kaufpreis als
+ * Kaufnebenkosten ansetzen, das rechnet er dann nicht passend aus."
+ *
+ * Konnte er auch nicht: der Aufruf bekam nur den Satz und den
+ * Feldkatalog. Was der Kaufpreis IST, stand nirgends - also gab es
+ * nichts, wovon 10 % zu nehmen waeren.
+ *
+ * Jetzt reist der bekannte Stand mit. Damit wird aus „10 % vom Kaufpreis"
+ * eine Zahl, aus „so viel wie die Kaltmiete" eine Zahl. Ohne Kontext
+ * bleibt alles wie vorher - die Funktion gibt dann nur die Grundregel
+ * zurueck.
+ *
+ * BEIDE WEGE sehen dieselbe Regel: getippt (extractFromText) und
+ * gesprochen (extractFromAudio). Zwei Regelwerke fuer dieselbe Frage
+ * waeren zwei Verhaltensweisen, und der Unterschied faellt erst dem
+ * Nutzer auf.
+ * ════════════════════════════════════════════════════════════════════ */
+const ZUSATZ_ANTWORT = [
+  'ZUSATZREGEL FUER DIESE ANFRAGE: Der Text ist die kurze ANTWORT auf eine',
+  'gezielte Rueckfrage zu genau den Feldern im Katalog. Uebernimm NUR den',
+  'WERT, niemals den ganzen Satz. "490 Euro kalt im Monat" -> 490,',
+  '"so um die hundert Quadratmeter" -> 100, "Baujahr war 62" -> 1962.',
+  '',
+  /* ═══ v1306 · Eine Verneinung IST eine Angabe ═══════════════════════
+     Marcels Befund vom 11.09.2026 (design/mockups/sanierung.png): auf
+     "Wir haben keine Sanierungskosten und auch keine Moeblierung"
+     antwortete der Co-Pilot "nichts gefunden, was hierher passt".
+
+     Die Ursache stand direkt darunter: "Niemals 0 setzen - eine 0 sieht
+     aus wie eine Angabe und ist keine." Diese Regel kam aus v1280c und
+     zielte auf einen ANDEREN Fall: "zwanzig Prozent vom Kaufpreis", ohne
+     dass ein Kaufpreis bekannt ist. Dort ist 0 tatsaechlich falsch.
+
+     Bei einer ausdruecklichen Verneinung ist 0 aber GENAU die Angabe.
+     "Keine Sanierungskosten" heisst nicht "ich weiss es nicht", sondern
+     "der Wert ist null". Der Unterschied ist der ganze Punkt, und er
+     stand nirgends. */
+  'VERNEINUNGEN SIND ANGABEN, keine Luecken. Wer ausdruecklich sagt, dass',
+  'etwas NICHT vorhanden ist, hat die Frage BEANTWORTET:',
+  '  "keine Sanierungskosten" / "nichts zu sanieren" -> Betragsfeld 0',
+  '  "nichts wird mitverkauft" / "keine Moebel" -> 0 bzw. "nein"',
+  '  "kein Stellplatz", "keine Zusatzeinnahmen" -> 0',
+  '  "steht leer" -> Leerstand ja, Miete 0',
+  'Bei Auswahlfeldern nimm die Stufe, die "nichts/keines" bedeutet, wenn',
+  'es sie gibt. Gibt es kein passendes Feld fuer die Verneinung, lass sie',
+  'weg - aber erfinde keine Luecke, wo eine klare Aussage steht.',
+  '',
+  /* v1308: gemessen im Sprechlauf — „Das Objekt liegt in 32609 Huellhorst,
+     keine Strasse bekannt" trug „keine Strasse bekannt" als STRASSENNAMEN
+     ein. Bei einem Zahlenfeld ist die Verneinung eine 0; bei einem TEXTfeld
+     ist sie gar nichts. Eine Strasse, die „keine Strasse bekannt" heisst,
+     steht danach im Bankexport und im PDF. */
+  'ACHTUNG bei TEXTfeldern (Strasse, Ort, Name, Beschreibung): dort ist',
+  'eine Verneinung KEINE Angabe, sondern eine Luecke. "keine Strasse',
+  'bekannt", "weiss die Hausnummer nicht", "Ort unbekannt" heisst: Feld',
+  'WEGLASSEN. Niemals die Verneinung selbst als Text eintragen - ein',
+  'Strassenname "keine Strasse bekannt" landet sonst in Exporten und',
+  'Dokumenten. Die 0-Regel oben gilt fuer BETRAEGE und MENGEN.',
+  '',
+  'MEHRERE AUSSAGEN IN EINEM SATZ werden EINZELN ausgewertet. "Wir haben',
+  'keine Sanierungskosten und auch keine Moeblierung" enthaelt ZWEI',
+  'Angaben zu ZWEI Feldern - beide gehoeren ins Ergebnis. Ein "und", ein',
+  'Komma oder ein "aber" trennt Aussagen, es verbindet sie nicht zu einer.',
+  '',
+  'Enthaelt die Antwort keinen verwertbaren Wert ("weiss nicht", "keine',
+  'Ahnung", "muss ich nachsehen"), gib ein leeres JSON-Objekt zurueck.',
+  'Das ist etwas anderes als eine Verneinung: "weiss nicht" ist eine',
+  'Luecke, "gibt es nicht" ist eine Antwort.',
+  'BEZIEHT sich die Antwort auf einen Wert, der NICHT im bekannten Stand',
+  'steht ("zwanzig Prozent vom Kaufpreis", ohne dass ein Kaufpreis bekannt',
+  'ist), lass das Feld WEG und schaetze nichts - DORT sieht eine 0 aus wie',
+  'eine Angabe und ist keine.'
+].join(String.fromCharCode(10));
+
+const ZUSATZ_INSERAT = [
+  'ZUSATZREGEL FUER DIESE ANFRAGE: Der Text ist eine aus dem Browser',
+  'kopierte INSERATSSEITE eines Immobilienportals.',
+  '- Es geht um GENAU EIN Objekt: das, dessen Ueberschrift und Eckdaten',
+  '  oben stehen. Navigation, Cookie-Texte, Werbung und Listen',
+  '  "aehnlicher Objekte" zaehlen NICHT.',
+  '- KAUFPREIS ist der Kaufpreis, nicht die Warmmiete und nicht der Preis',
+  '  pro Quadratmeter. Bei einem MIETobjekt gibt es keinen Kaufpreis.',
+  '- Kaltmiete = Nettokaltmiete ohne Nebenkosten. Portale stellen den',
+  '  Betrag oft in eine eigene Zeile UEBER das Wort "Kaltmiete"',
+  '  ("850 EUR" / "Kaltmiete 17 EUR/m2") - dann ist das die Kaltmiete.',
+  '- Hausgeld/Wohngeld ist keine Miete.',
+  '- Was nicht im Text steht, wird WEGGELASSEN.'
+].join(String.fromCharCode(10));
+
+/* ════════════════════════════════════════════════════════════════════
+ * v1280c · Die Prozentfalle
+ *
+ * Gemessen: „Zwanzig Prozent vom Kaufpreis als Eigenkapital" ergab mit
+ * bekanntem Kaufpreis richtig 40000. OHNE Kaufpreis erst 0, nach der
+ * geschaerften Prompt-Regel dann 20 - also die Prozentzahl als Euro.
+ *
+ * Das Modell WILL liefern. Zwei Anlaeufe im Prompt haben es nicht davon
+ * abgebracht, und ein dritter wuerde es auch nicht: eine Bitte ist keine
+ * Sperre. Also eine Sperre.
+ *
+ * Die Regel ist eng gefasst, damit sie nichts Richtiges wegwirft:
+ * Sie greift NUR, wenn die Antwort einen Bezug der Form „X Prozent von
+ * <etwas>" enthaelt UND das Feld eine Geldangabe ist UND der gelieferte
+ * Wert verdaechtig genau der Prozentzahl entspricht. Alles andere bleibt.
+ *
+ * Lieber eine Luecke als eine Zahl, die niemand belegen kann - dieselbe
+ * Regel, nach der auch der Marktbericht ein Verfahren weglaesst, wenn eine
+ * Pflichtangabe fehlt.
+ * ════════════════════════════════════════════════════════════════════ */
+function _prozentFalle(text, felder, katalog) {
+  try {
+    const t = String(text || '');
+    /* Der Bezug kann als Ziffer ODER als Zahlwort dastehen - gemessen:
+       "Zwanzig Prozent vom Kaufpreis" fiel durch einen Ziffern-Regex.
+       Also nur auf den BEZUG pruefen, nicht auf die Zahl davor. */
+    if (!/(%|prozent)\s+(vom|von|des|der)\b/i.test(t)) return felder;
+    const geld = {};
+    (katalog || []).forEach(function (e) {
+      if (/euro|eur\b|€|betrag|kosten|preis|kapital|summe|miete|ruecklage|rücklage/i.test(e.label || '')) geld[e.id] = 1;
+    });
+    const raus = [];
+    Object.keys(felder || {}).forEach(function (id) {
+      if (!geld[id]) return;
+      const v = parseFloat(String(felder[id]).replace(/\./g, '').replace(',', '.'));
+      if (!isFinite(v)) return;
+      /* Ein Geldbetrag, der aussieht wie eine Prozentzahl (<= 100), nachdem
+         im Text ein Prozentbezug stand: da hat das Modell den Bezug nicht
+         aufgeloest, sondern die Prozentzahl abgeschrieben. */
+      if (v <= 100) raus.push(id);
+    });
+    if (raus.length) {
+      const kopie = Object.assign({}, felder);
+      raus.forEach(function (id) { delete kopie[id]; });
+      try { console.warn('[voice] Prozentbezug ohne Bezugswert - verworfen:', raus.join(', ')); } catch (e) {}
+      return kopie;
+    }
+  } catch (e) {}
+  return felder;
+}
+
+function _zusatzAusKontext(kontext, modus) {
+  const basis = (modus === 'inserat') ? ZUSATZ_INSERAT : ZUSATZ_ANTWORT;
+  const zeilen = [];
+  if (kontext && typeof kontext === 'object') {
+    Object.keys(kontext).slice(0, 60).forEach(function (k) {
+      const v = kontext[k];
+      if (v === '' || v === null || v === undefined) return;
+      zeilen.push('  ' + k + ' = ' + String(v).slice(0, 60));
+    });
+  }
+  if (!zeilen.length) return basis;
+  return [
+    basis,
+    'BEKANNTER STAND DIESES OBJEKTS (Feld-id = Wert):',
+    zeilen.join(String.fromCharCode(10)),
+    'EINE BESTAETIGUNG IST EINE ANGABE: Sagt der Nutzer, dass etwas "passt",',
+    '"stimmt so" oder "bleibt", und steht der Wert oben im bekannten Stand,',
+    'dann gib GENAU DIESEN WERT zurueck. Bestaetigt jemand einen OBERBEGRIFF',
+    '("die Adresse passt", "die Finanzierung bleibt"), gilt das fuer alle',
+    'Felder dieses Begriffs, die oben stehen. ERFINDE DABEI NICHTS: was oben',
+    'nicht steht, bleibt leer - auch wenn es plausibel waere.',
+    'RECHNEN IST ERLAUBT UND ERWUENSCHT: Bezieht sich die Antwort auf einen',
+    'dieser Werte, rechne sie aus. "10 Prozent vom Kaufpreis" bei kp=200000',
+    '-> 20000. "so viel wie die Kaltmiete" bei nkm=490 -> 490. Fehlt der',
+    'Bezugswert im bekannten Stand, lass das Feld WEG - niemals einen',
+    'Bezugswert erfinden.'
+  ].join(String.fromCharCode(10));
+}
+
+const TEXT_MAX = { antwort: 4000, inserat: 40000 };
+
+async function extractFromText(text, catalog, opts) {
+  const o = opts || {};
+  const key = o.userApiKey || o.apiKey;
+  if (!key) { const e = new Error('Kein OpenAI-API-Key verfuegbar.'); e.code = 'NO_API_KEY'; throw e; }
+  const cat = sanitizeCatalog(catalog);
+  if (!cat.length) throw httpErr(400, 'Feld-Katalog fehlt oder ist leer.');
+  const modus = (o.modus === 'inserat') ? 'inserat' : 'antwort';
+  const t = String(text || '').trim().slice(0, TEXT_MAX[modus]);
+  if (t.length < 1) throw httpErr(400, 'Keine Antwort uebergeben.');
+  const sammler = neuerSammler();
+  const out = await extractFields(t, cat, key, sammler, _zusatzAusKontext(o.kontext, modus));
+  /* v1280c: Prozentbezug ohne Bezugswert -> Feld verwerfen statt raten. */
+  if (!o.kontext) out.fields = _prozentFalle(t, out.fields, cat);
+  const kosten = o.userApiKey ? null : kostenAbschluss(sammler);
+  return { transcript: t, fields: out.fields, unsicher: out.unsicher, kosten, modus };
+}
+
+module.exports = { extractFromAudio, extractFromText, quickMatch, transcribe };  /* v536: transcribe fuer Live-Chunks */

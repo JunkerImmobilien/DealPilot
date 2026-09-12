@@ -40,6 +40,24 @@ function buildPrompt(payload) {
   const mr = payload.marktradar || [];
   const mbr = payload.marktbericht || null;   /* v947-mbsource: der echte Bericht */
   const isc = payload.investor_score || null;
+  /* ═══ v1311 · Woher die Zahlen kommen ════════════════════════════════
+     Marcels Vorgabe vom 11.09.2026: der Co-Pilot soll das Wissen aus dem
+     Sprechlauf mitnehmen. Die WERTE kamen schon an — was fehlte, war ihre
+     Herkunft: amtlich, abgerufen, geschaetzt oder genaehert.
+
+     Fuer eine Analyse ist das kein Beiwerk. Eine belegte Zahl traegt eine
+     Empfehlung; eine genaeherte traegt einen Vorbehalt, und der gehoert in
+     den Text — nicht ins Kleingedruckte. */
+  const hk = payload.herkunft || null;
+  /* v1323: der Marktkontext und das Erbbaurecht aus der
+     DealPilot-Marktbewertung. GEMESSEN: dealpilot_marktbewertung wird seit
+     v746 geschickt und hatte im ganzen Backend KEINEN Leser. */
+  const _dpmb = payload.dealpilot_marktbewertung || null;
+  const mk = (_dpmb && _dpmb.marktkontext) || null;
+  const eb = (_dpmb && _dpmb.erbbaurecht) || null;
+  const _z = function (n) { return (n == null || !isFinite(n)) ? '-' : Math.round(n).toLocaleString('de-DE'); };
+  const _p = function (n) { return (n == null || !isFinite(n)) ? '-' : (n.toFixed(1).replace('.', ',') + ' %'); };
+  const _p2 = function (n) { return (n == null || !isFinite(n)) ? '-' : (n.toFixed(2).replace('.', ',') + ' %'); };
 
   // Kennzahlen sicher formatieren
   const fmtPct = (v, dec) => v == null ? '–' : (v * (Math.abs(v) > 1 ? 1 : 100)).toFixed(dec || 1) + ' %';
@@ -144,6 +162,57 @@ function buildPrompt(payload) {
     o.risiken ? '- Vom Investor benannte Risiken: ' + o.risiken : '',
     o.notizen ? '- Sonstige Bemerkungen des Investors: ' + o.notizen : '',
     '',
+    /* v1311: Die Herkunft je Feld — amtlich, abgerufen, geschaetzt. */
+    hk ? '## HERKUNFT DER ANGABEN' : '',
+    hk ? 'So sind die Werte dieses Objekts zustande gekommen:' : '',
+    hk ? Object.keys(hk).slice(0, 40).map(function (id) {
+           return '- ' + id + ': ' + hk[id];
+         }).join('\n') : '',
+    hk ? '' : '',
+    hk ? 'NUTZE DAS. Eine amtlich belegte Zahl (BORIS, Stichtag, Zone) traegt eine' : '',
+    hk ? 'Empfehlung; eine Naeherung ("Ortszentrum", "als Naeherung") traegt einen' : '',
+    hk ? 'Vorbehalt, und der gehoert in den Text statt ins Kleingedruckte. Werte aus' : '',
+    hk ? 'einer Marktpreisindikation sind belastbarer als Selbstbewertungen des' : '',
+    hk ? 'Investors — sage das, wo es den Unterschied macht. ERFINDE KEINE Herkunft' : '',
+    hk ? 'fuer Felder, die hier nicht stehen.' : '',
+    hk ? '' : '',
+    /* ═══ v1323 · Marktkontext und Erbbaurecht in der Analyse ════════════
+       Marcels Vorgabe: „wichtig waere auch dass dem Co-Pilot und der
+       Analyse diese Daten zur Bewertung zur Verfuegung stehen."
+
+       GEMESSEN, warum sie es bisher nicht taten: `dealpilot_marktbewertung`
+       wird vom Frontend seit v746 geschickt — ein `grep` ueber das ganze
+       Backend findet KEINEN Leser. Dieselbe Falle wie beim Orchestrator
+       (FALLEN.md, „ref laesst Felder fallen"): das Frontend schickt, die
+       Gegenseite laesst fallen, und niemand merkt es, weil nichts rot wird.
+
+       Die Zahlen hier sind echte Marktaggregate, keine Selbsteinschaetzung.
+       Sie sind damit belastbarer als alles, was der Investor selbst
+       eingestuft hat — und genau das soll der Text auch sagen. */
+    mk ? '## MARKTKONTEXT (echte Angebotsdaten im Umkreis, 12 Monate)' : '',
+    mk && mk.segment === 'gewerbe' ? ('Segment: Gewerbe / ' + (mk.klasse || '?')) : '',
+    mk && mk.segment === 'gewerbe' && mk.kauf ? ('- Kauf eigene Klasse ' + _z(mk.kauf.klasse_median_sqm) + ' EUR/m2 (n=' + (mk.kauf.klasse_n || 0) + '), gesamter Gewerbemarkt ' + _z(mk.kauf.markt_median_sqm) + ' EUR/m2') : '',
+    mk && mk.segment === 'gewerbe' && mk.miete ? ('- Miete eigene Klasse ' + _z(mk.miete.klasse_median_sqm) + ' EUR/m2 (n=' + (mk.miete.klasse_n || 0) + ')') : '',
+    mk && mk.segment !== 'gewerbe' && mk.basis_median_sqm != null ? ('Vergleichsbasis: ' + _z(mk.basis_median_sqm) + ' EUR/m2 (n=' + mk.basis_n + ')') : '',
+    mk && mk.vermietung ? ('- VERMIETET GEGEN FREI: vermietet ' + _z(mk.vermietung.vermietet_median_sqm) + ' EUR/m2 (n=' + mk.vermietung.vermietet_n + '), frei ' + _z(mk.vermietung.frei_median_sqm) + ' EUR/m2 (n=' + mk.vermietung.frei_n + '), Unterschied ' + _p(mk.vermietung.abschlag_pct) + '. Bei einer Kapitalanlage ist die VERMIETETE Gruppe die richtige Vergleichsbasis.') : '',
+    mk && mk.energie ? ('- ENERGIEKLASSEN AM ORT: A-C ' + _z(mk.energie.gut_median_sqm) + ' EUR/m2 (n=' + mk.energie.gut_n + '), F-H ' + _z(mk.energie.schlecht_median_sqm) + ' EUR/m2 (n=' + mk.energie.schlecht_n + '), Spreizung ' + _p(mk.energie.spreizung_pct) + '. Das ist der oertlich GEMESSENE Abschlag fuer einen schlechten Energieausweis, kein Studienwert - nutze ihn, wenn die Energieklasse des Objekts bekannt ist.') : '',
+    mk && mk.rendite ? ('- ANGEBOTSRENDITE AM ORT: Median ' + _p2(mk.rendite.median_pct) + ' (Q25 ' + _p2(mk.rendite.q25_pct) + ', Q75 ' + _p2(mk.rendite.q75_pct) + ', n=' + mk.rendite.n + '). Stelle die Bruttorendite des Objekts dagegen und sage, wo es liegt.') : '',
+    mk && mk.erbbau_markt ? ('- Erbbaurechts-Angebote im Umkreis: ' + _z(mk.erbbau_markt.median_sqm) + ' EUR/m2, Anteil ' + _p(mk.erbbau_markt.anteil_pct) + ' der Angebote, Abstand zur Basis ' + _p(mk.erbbau_markt.abstand_pct) + '. VORSICHT: Volltextsuche ohne Ausschlusslogik, ein Angebot mit "kein Erbbaurecht" zaehlt mit. Signal, kein Beleg - nur als Groessenordnung verwenden.') : '',
+    mk ? 'Diese Zahlen sind AGGREGATE ECHTER ANGEBOTE, keine Selbsteinschaetzung. Sie' : '',
+    mk ? 'wiegen damit schwerer als die Lage- und Zustandsnoten des Investors. Rechne' : '',
+    mk ? 'mit ihnen, nenne die Stichprobengroesse, und erfinde keine Zahl dazu.' : '',
+    mk ? '' : '',
+    eb && eb.ok ? '## ERBBAURECHT (§ 50 ImmoWertV)' : '',
+    eb && eb.ok ? 'Das Objekt steht auf einem Erbbaurechtsgrundstueck. Der Marktwert ist ein' : '',
+    eb && eb.ok ? 'VOLLEIGENTUMSWERT - kein Bewertungspartner nimmt den Parameter entgegen.' : '',
+    eb && eb.ok ? ('- Bodenwert (gehoert dem Erbbaurechtsgeber): ' + _z(eb.teile.bodenwert) + ' EUR') : '',
+    eb && eb.ok ? ('- ' + (eb.teile.zinsvorteil >= 0 ? 'Vorteil' : 'Nachteil') + ' aus dem Vertragszins: ' + _z(Math.abs(eb.teile.zinsvorteil)) + ' EUR (angemessen ' + eb.annahmen.zinssatzAngemessen + ' %' + (eb.annahmen.zinsQuelle ? ', oertlich erhoben' : '') + ')') : '',
+    eb && eb.ok ? ('- ERBBAURECHTSWERT ' + _z(eb.erbbaurechtswert) + ' EUR, Abschlag ' + _z(eb.abschlag) + ' EUR = ' + _p(eb.abschlagPct)) : '',
+    eb && eb.ok ? 'Der Abschlag ist in Wertpuffer, Wertsteigerung und Deal Score bereits' : '',
+    eb && eb.ok ? 'eingerechnet. Erwaehne ihn trotzdem - er ist fuer Finanzierung und' : '',
+    eb && eb.ok ? 'Wiederverkauf der wichtigste Einzelfaktor an diesem Objekt.' : '',
+    eb && eb.ok && eb.annahmen.restlaufzeit < 30 ? 'ACHTUNG: unter 30 Jahren Restlaufzeit finanzieren die meisten Banken nicht mehr voll.' : '',
+    eb && eb.ok ? '' : '',
     '## INPUT-DATEN',
     '',
     'DealScore: ' + (ds.total != null ? ds.total : '–') + ' / 100',

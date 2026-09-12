@@ -59,6 +59,31 @@ ${[
 ].filter(([, v]) => v != null && v !== '').map(([k, v]) => `- **${k}:** ${v}`).join('\n')}
 ${p.assessment.marktmiete_eur_qm != null ? `\nEingeschätzte Marktmiete: **${p.assessment.marktmiete_eur_qm} €/m²**` : ''}${p.assessment.marktfaktor != null ? `, Marktfaktor: **${p.assessment.marktfaktor}**` : ''}
 ` : ''}
+${p.marktkontext ? `
+## D3) Marktkontext (GeoMap-Aggregate, 12 Monate, Radius ${p.marktkontext.radiusKm} km)
+${p.marktkontext.segment === 'gewerbe' ? [
+  `Segment: **Gewerbe / ${p.marktkontext.klasse}**`,
+  p.marktkontext.kauf ? `- Kauf eigene Klasse: **${fmt(p.marktkontext.kauf.klasse_median_sqm, ' €/m²')}** (n=${p.marktkontext.kauf.klasse_n ?? 0}), gesamter Gewerbemarkt: ${fmt(p.marktkontext.kauf.markt_median_sqm, ' €/m²')} (n=${p.marktkontext.kauf.markt_n ?? 0})${p.marktkontext.kauf.abstand_pct != null ? ` — Abstand ${p.marktkontext.kauf.abstand_pct.toFixed(1)} %` : ''}` : null,
+  p.marktkontext.miete ? `- Miete eigene Klasse: **${fmt(p.marktkontext.miete.klasse_median_sqm, ' €/m²')}** (n=${p.marktkontext.miete.klasse_n ?? 0}), gesamter Gewerbemarkt: ${fmt(p.marktkontext.miete.markt_median_sqm, ' €/m²')} (n=${p.marktkontext.miete.markt_n ?? 0})` : null,
+  p.marktkontext.rendite ? `- Angebotsrendite im Segment: **${p.marktkontext.rendite.median_pct} %** (Q25 ${p.marktkontext.rendite.q25_pct} / Q75 ${p.marktkontext.rendite.q75_pct}, n=${p.marktkontext.rendite.n})` : null,
+].filter(Boolean).join('\n') : [
+  p.marktkontext.basis_median_sqm != null ? `Vergleichsbasis: ${fmt(p.marktkontext.basis_median_sqm, ' €/m²')} (n=${p.marktkontext.basis_n})` : null,
+  p.marktkontext.vermietung ? `- **Vermietet gegen frei:** vermietet ${fmt(p.marktkontext.vermietung.vermietet_median_sqm, ' €/m²')} (n=${p.marktkontext.vermietung.vermietet_n}), frei ${fmt(p.marktkontext.vermietung.frei_median_sqm, ' €/m²')} (n=${p.marktkontext.vermietung.frei_n}) — Unterschied **${p.marktkontext.vermietung.abschlag_pct.toFixed(1)} %**. Für einen Kapitalanleger ist die vermietete Gruppe die passende Vergleichsbasis.` : null,
+  p.marktkontext.energie ? `- **Energieklassen am Ort:** A–C ${fmt(p.marktkontext.energie.gut_median_sqm, ' €/m²')} (n=${p.marktkontext.energie.gut_n})${p.marktkontext.energie.mittel_median_sqm != null ? `, D–E ${fmt(p.marktkontext.energie.mittel_median_sqm, ' €/m²')} (n=${p.marktkontext.energie.mittel_n})` : ''}, F–H ${fmt(p.marktkontext.energie.schlecht_median_sqm, ' €/m²')} (n=${p.marktkontext.energie.schlecht_n}) — Spreizung **${p.marktkontext.energie.spreizung_pct.toFixed(1)} %**. Das ist der lokal gemessene Abschlag für einen schlechten Energieausweis, nicht ein Studienwert.` : null,
+  p.marktkontext.rendite ? `- **Angebotsrendite am Ort:** Median **${p.marktkontext.rendite.median_pct} %** (Q25 ${p.marktkontext.rendite.q25_pct} / Q75 ${p.marktkontext.rendite.q75_pct}, n=${p.marktkontext.rendite.n}). Vergleiche die Bruttorendite des Objekts damit.` : null,
+  p.marktkontext.erbbau_markt ? `- **Erbbaurecht am Markt:** ${fmt(p.marktkontext.erbbau_markt.median_sqm, ' €/m²')} (n=${p.marktkontext.erbbau_markt.n}, Anteil ${p.marktkontext.erbbau_markt.anteil_pct.toFixed(1)} % der Angebote), Abstand zur Basis **${p.marktkontext.erbbau_markt.abstand_pct.toFixed(1)} %**. ACHTUNG: Volltextsuche, kein Filter — ein Angebot mit „kein Erbbaurecht" wird mitgezählt. Signal, kein Beleg.` : null,
+].filter(Boolean).join('\n')}
+` : ''}${p.erbbaurecht && p.erbbaurecht.ok ? `
+## D4) Erbbaurecht (§ 50 ImmoWertV)
+Das Objekt steht auf einem Erbbaurechtsgrundstück. Der Marktwert oben ist ein
+**Volleigentumswert** — kein Bewertungspartner nimmt den Parameter entgegen.
+- Bodenwert (gehört dem Erbbaurechtsgeber): ${fmt(p.erbbaurecht.teile.bodenwert, ' €')}
+- ${p.erbbaurecht.teile.zinsvorteil >= 0 ? 'Vorteil' : 'Nachteil'} aus dem Vertragszins: ${fmt(Math.abs(p.erbbaurecht.teile.zinsvorteil), ' €')} (angemessen ${p.erbbaurecht.annahmen.zinssatzAngemessen} %${p.erbbaurecht.annahmen.zinsQuelle ? `, örtlich erhoben: ${p.erbbaurecht.annahmen.zinsQuelle}` : ''})
+- Nicht entschädigter Gebäudeanteil bei Zeitablauf: ${fmt(p.erbbaurecht.teile.heimfallabschlag, ' €')}
+- **Erbbaurechtswert: ${fmt(p.erbbaurecht.erbbaurechtswert, ' €')} — Abschlag ${fmt(p.erbbaurecht.abschlag, ' €')} · ${p.erbbaurecht.abschlagPct.toFixed(1)} %**
+${p.erbbaurecht.markt ? `Am Markt beobachtet bei ${p.erbbaurecht.markt.text}: ${p.erbbaurecht.markt.von}–${p.erbbaurecht.markt.bis} % — die Rechnung liegt ${p.erbbaurecht.markt.imRahmen ? 'darin' : 'daneben'}.` : ''}
+${(p.erbbaurecht.hinweise || []).map((h) => `- ${h}`).join('\n')}
+` : ''}
 ## E) Kaufpreisanalyse
 Vergleichs-Kaufpreis Median: **${fmt(sale.median_per_sqm, ' €/m²')}**
 (Q25 ${fmt(sale.q25_per_sqm)} / Q75 ${fmt(sale.q75_per_sqm)} €/m²).
@@ -209,6 +234,65 @@ async function callOpenAI(payload, opts = {}) {
         + ((mvc.input_missing && mvc.input_missing.length)
           ? `Schliesse die Zusammenfassung mit einer kurzen Empfehlung: Folgende Angaben wuerden die Bewertung weiter praezisieren: ${mvc.input_missing.join(', ')}.`
           : `Alle wertrelevanten Objektangaben liegen vor – betone die hohe Belastbarkeit der Indikation.`);
+    }
+    /* ═══ v1323b · Der Marktkontext muss BENANNT werden ══════════════════
+       Der ganze Payload geht ohnehin als JSON an das Modell — `marktkontext`
+       und `erbbaurecht` sind also da. Nur: ein Feld im JSON ist noch keine
+       Anweisung. Gemessen am Bericht vom 12.09.2026 — die Zahlen standen
+       drin und kamen im Text nicht vor.
+
+       Die Gruppen g2 (Objekt, Lage & Markt) und g3 (Bewertung, Rendite &
+       Ausblick) sind die Orte, an denen sie hingehören: g2 ordnet den Ort
+       ein, g3 die Zahlen. */
+    if ((g.id === 'g2' || g.id === 'g3') && payload.marktkontext) {
+      const mk = payload.marktkontext;
+      const teile = [];
+      if (mk.segment === 'gewerbe') {
+        if (mk.kauf && mk.kauf.klasse_median_sqm != null) {
+          teile.push(`Kaufpreisniveau der eigenen Gewerbeklasse (${mk.klasse}): ${fmt(mk.kauf.klasse_median_sqm, ' EUR/m2')} bei ${mk.kauf.klasse_n} Angeboten`
+            + (mk.kauf.markt_median_sqm != null ? `, gesamter Gewerbemarkt ${fmt(mk.kauf.markt_median_sqm, ' EUR/m2')}` : ''));
+        }
+        if (mk.miete && mk.miete.klasse_median_sqm != null) {
+          teile.push(`Mietniveau der eigenen Klasse: ${fmt(mk.miete.klasse_median_sqm, ' EUR/m2')} bei ${mk.miete.klasse_n} Angeboten`);
+        }
+      } else {
+        if (mk.vermietung) {
+          teile.push(`vermietete Wohnungen liegen bei ${fmt(mk.vermietung.vermietet_median_sqm, ' EUR/m2')} (${mk.vermietung.vermietet_n} Angebote), freie bei ${fmt(mk.vermietung.frei_median_sqm, ' EUR/m2')} (${mk.vermietung.frei_n}) — Unterschied ${mk.vermietung.abschlag_pct.toFixed(1)} %`);
+        }
+        if (mk.energie) {
+          teile.push(`Energieklassen A-C ${fmt(mk.energie.gut_median_sqm, ' EUR/m2')} gegen F-H ${fmt(mk.energie.schlecht_median_sqm, ' EUR/m2')} — Spreizung ${mk.energie.spreizung_pct.toFixed(1)} % (oertlich GEMESSEN, kein Studienwert)`);
+        }
+      }
+      if (mk.rendite) {
+        teile.push(`Angebotsrendite am Ort: Median ${mk.rendite.median_pct} % (Q25 ${mk.rendite.q25_pct}, Q75 ${mk.rendite.q75_pct}, ${mk.rendite.n} Angebote)`);
+      }
+      if (teile.length) {
+        /* v1323c: Die erste Fassung sagte "nenne mindestens einen dieser
+           Werte" - und das Modell tat es mal, mal nicht. Zwei Laeufe an
+           derselben Adresse: einmal mit Marktkontext-Satz, einmal ohne.
+           Die Erbbau-Anweisung daneben sagt "DAS MUSS IM TEXT VORKOMMEN"
+           und wurde in jedem Lauf befolgt. Also dieselbe Tonlage. */
+        extra += '\n\nPFLICHT - MARKTKONTEXT: Das JSON-Feld "marktkontext" enthaelt Aggregate '
+          + `ECHTER Angebote im Umkreis von ${mk.radiusKm} km ueber 12 Monate, keine Schaetzung und keine `
+          + `Selbsteinschaetzung des Investors. Konkret: ${teile.join('; ')}. `
+          + `DU MUSST MINDESTENS EINEN DIESER WERTE MIT SEINER STICHPROBENGROESSE IM TEXT NENNEN `
+          + `und das Objekt dagegen einordnen. Schreibe die Zahl aus, etwa "2.750 Euro je `
+          + `Quadratmeter bei 135 Angeboten". `
+          + `Erfinde keine Zahl dazu.`;
+      }
+    }
+    if (payload.erbbaurecht && payload.erbbaurecht.ok && (g.id === 'g1' || g.id === 'g3')) {
+      const eb = payload.erbbaurecht;
+      extra += `\n\nERBBAURECHT: Das Objekt steht auf einem Erbbaurechtsgrundstueck. Der ermittelte `
+        + `Marktwert ist ein VOLLEIGENTUMSWERT — kein Bewertungspartner nimmt den Parameter entgegen. `
+        + `Nach § 50 ImmoWertV betraegt der Abschlag ${fmt(eb.abschlag, ' EUR')} = ${eb.abschlagPct.toFixed(1)} %, `
+        + `der Erbbaurechtswert also ${fmt(eb.erbbaurechtswert, ' EUR')} `
+        + `(Bodenwert ${fmt(eb.teile.bodenwert, ' EUR')}, Restlaufzeit ${eb.annahmen.restlaufzeit} Jahre, `
+        + `angemessener Erbbauzins ${eb.annahmen.zinssatzAngemessen} %`
+        + `${eb.annahmen.zinsQuelle ? ' (oertlich erhoben)' : ''}). `
+        + `DAS MUSS IM TEXT VORKOMMEN — es ist fuer Finanzierung und Wiederverkauf der wichtigste `
+        + `Einzelfaktor an diesem Objekt.`
+        + (eb.annahmen.restlaufzeit < 30 ? ` Unter 30 Jahren Restlaufzeit finanzieren die meisten Banken nicht mehr voll.` : '');
     }
     const userMsg =
       userJson +

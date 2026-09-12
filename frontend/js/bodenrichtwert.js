@@ -377,48 +377,80 @@
     btn.title = ok ? 'Bodenrichtwert direkt abrufen — gratis (Open Data)' /* v785f-tooltip */
                    : 'Direkt-Abruf hier nicht verfügbar (Bayern, Baden-Württemberg, Schleswig-Holstein, Saarland) — BORIS-Portal nutzen';
   }
+  /* ═══ v1288 · Der reine Abruf, ohne DOM ══════════════════════════════
+     Bis hierher steckte der BORIS-Abruf IN `fetchBoris()`: Adresse aus dem
+     Formular lesen, Wert ins Formular schreiben, Knopf umbeschriften. Der
+     Sprechlauf braucht denselben Abruf, hat aber kein Formular — dort steht
+     die Adresse im Gespraech, und der Wert darf erst mit der
+     Uebernahme-Tabelle ins Feld.
+
+     Also getrennt: `borisHolen()` macht die zwei Aufrufe und gibt zurueck,
+     was zurueckkam. `fetchBoris()` bleibt der Bedienweg am Knopf und nutzt
+     denselben Abruf. EIN Weg zur Quelle, zwei Bedienungen — sonst haetten
+     wir zwei Stellen, die sich beim naechsten Endpunkt-Wechsel
+     auseinanderentwickeln. */
+  async function borisHolen(adr) {
+    adr = adr || {};
+    var plz = String(adr.plz || '').trim();
+    var ort = String(adr.ort || '').trim();
+    var str = String(adr.str || '').trim();
+    if (!borisAvailableForPlz(plz)) {
+      return { ok: false, grund: 'nicht_verfuegbar',
+               fehler: 'Direkt-Abruf hier nicht verfügbar — BORIS-Portal nutzen' };
+    }
+    var token = _token();
+    if (!token) return { ok: false, grund: 'kein_token', fehler: 'Bitte einloggen' };
+    var addr = [str, (plz + ' ' + ort).trim()].filter(Boolean).join(', ');
+    if (!addr) return { ok: false, grund: 'keine_adresse', fehler: 'Keine Adresse' };
+    var g = await fetch(_apiBase() + '/marktbericht/geocode?address=' + encodeURIComponent(addr), {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    var gd = await g.json().catch(function () { return null; });
+    if (!g.ok || !gd || gd.lat == null || gd.lon == null) {
+      return { ok: false, grund: 'geocode', fehler: 'Adresse nicht geokodierbar' };
+    }
+    var b = await fetch(_apiBase() + '/marktbericht/boris?lat=' + gd.lat + '&lon=' + gd.lon, {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    var bd = await b.json().catch(function () { return null; });
+    if (!b.ok || !bd) {
+      return { ok: false, grund: 'boris', fehler: (bd && (bd.error || bd.message)) || ('Fehler ' + b.status) };
+    }
+    if (!(bd.available && bd.value_sqm != null && bd.value_sqm > 0)) {
+      return { ok: false, grund: 'kein_wert', fehler: 'Kein BORIS-Wert für diese Lage' };
+    }
+    return { ok: true, wert: bd.value_sqm, stichtag: bd.stichtag || null,
+             zone: bd.zone || null, quelle: bd.source || 'BORIS', roh: bd };
+  }
+
   async function fetchBoris() {
     var btn = _el('brw-boris-btn');
     var plz = _val('plz'), ort = _val('ort'), str = _val('str');
-    if (!borisAvailableForPlz(plz)) {
-      _setStatus('⚠ Direkt-Abruf hier nicht verfügbar — BORIS-Portal nutzen', 'err'); /* v785f-tooltip */
-      if (typeof toast === 'function') toast('⚠ BORIS-Direktabruf hier nicht verfügbar — BORIS-Portal nutzen'); /* v785f-tooltip */
-      return;
-    }
-    var token = _token();
-    if (!token) { _setStatus('\u26a0 Bitte einloggen', 'err'); return; }
-    var addr = [str, (plz + ' ' + ort).trim()].filter(Boolean).join(', ');
-    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="btn-brw-icon">\u23f3</span> BORIS \u2026'; }
-    _setStatus('Bodenrichtwert wird abgerufen \u2026', '');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="btn-brw-icon">⏳</span> BORIS …'; }
+    _setStatus('Bodenrichtwert wird abgerufen …', '');
     try {
-      var g = await fetch(_apiBase() + '/marktbericht/geocode?address=' + encodeURIComponent(addr), {
-        headers: { 'Authorization': 'Bearer ' + token }
-      });
-      var gd = await g.json().catch(function () { return null; });
-      if (!g.ok || !gd || gd.lat == null || gd.lon == null) { throw new Error('Adresse nicht geokodierbar'); }
-      var b = await fetch(_apiBase() + '/marktbericht/boris?lat=' + gd.lat + '&lon=' + gd.lon, {
-        headers: { 'Authorization': 'Bearer ' + token }
-      });
-      var bd = await b.json().catch(function () { return null; });
-      if (!b.ok || !bd) { throw new Error((bd && (bd.error || bd.message)) || ('Fehler ' + b.status)); }
-      if (bd.available && bd.value_sqm != null && bd.value_sqm > 0) {
-        var brwEl = _el('brw');
-        if (brwEl) { brwEl.value = String(bd.value_sqm).replace('.', ','); brwEl.dispatchEvent(new Event('input', { bubbles: true })); }
-        var extra = [];
-        if (bd.stichtag) extra.push('Stichtag ' + bd.stichtag);
-        if (bd.zone) extra.push('Zone ' + bd.zone);
-        if (bd.source) extra.push(bd.source);
-        _setStatus('\u2713 BORIS: ' + bd.value_sqm + ' \u20ac/m\u00b2' + (extra.length ? ' (' + extra.join(' \u00b7 ') + ')' : ''), 'ok');
-        if (typeof toast === 'function') toast('\u2713 Bodenrichtwert (BORIS): ' + bd.value_sqm + ' \u20ac/m\u00b2');
-      } else {
-        _setStatus('\u26a0 Kein BORIS-Wert für diese Lage \u2014 bitte Portal prüfen', 'err');
-        if (typeof toast === 'function') toast('\u26a0 Kein BORIS-Wert gefunden \u2014 BORIS-Portal pruefen');
+      var r = await borisHolen({ plz: plz, ort: ort, str: str });
+      if (!r.ok) {
+        var msg = (r.grund === 'nicht_verfuegbar' || r.grund === 'kein_wert')
+          ? '⚠ ' + r.fehler + (r.grund === 'kein_wert' ? ' — bitte Portal prüfen' : '')
+          : '⚠ ' + r.fehler;
+        _setStatus(msg, 'err');
+        if (typeof toast === 'function') toast(msg);
+        return;
       }
+      var brwEl = _el('brw');
+      if (brwEl) { brwEl.value = String(r.wert).replace('.', ','); brwEl.dispatchEvent(new Event('input', { bubbles: true })); }
+      var extra = [];
+      if (r.stichtag) extra.push('Stichtag ' + r.stichtag);
+      if (r.zone) extra.push('Zone ' + r.zone);
+      if (r.quelle) extra.push(r.quelle);
+      _setStatus('✓ BORIS: ' + r.wert + ' €/m²' + (extra.length ? ' (' + extra.join(' · ') + ')' : ''), 'ok');
+      if (typeof toast === 'function') toast('✓ Bodenrichtwert (BORIS): ' + r.wert + ' €/m²');
     } catch (err) {
-      _setStatus('\u26a0 ' + (err.message || 'BORIS-Fehler'), 'err');
-      if (typeof toast === 'function') toast('\u26a0 ' + (err.message || 'BORIS-Fehler'));
+      _setStatus('⚠ ' + (err.message || 'BORIS-Fehler'), 'err');
+      if (typeof toast === 'function') toast('⚠ ' + (err.message || 'BORIS-Fehler'));
     } finally {
-      if (btn) { btn.innerHTML = '<span class="btn-brw-icon">\ud83d\udccd</span> BORIS abrufen'; _refreshBorisBtn(); }
+      if (btn) { btn.innerHTML = '<span class="btn-brw-icon">📍</span> BORIS abrufen'; _refreshBorisBtn(); }
     }
   }
   (function _wireBoris(){
@@ -572,6 +604,8 @@
   window.DealPilotBrw = {
     openBoris: openBoris,
     fetchBoris: fetchBoris,
+    borisHolen: borisHolen,          /* v1288: der reine Abruf, ohne DOM */
+    verfuegbarFuerPlz: borisAvailableForPlz,
     refreshBorisBtn: _refreshBorisBtn,
     askAi: askAi,
     autoPruefen: _brwAutoPruefen,   /* v1263: Prüfhaken, damit die Automatik messbar ist */

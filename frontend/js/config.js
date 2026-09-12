@@ -215,9 +215,11 @@ window.DealPilotConfig = (function() {
            mpi        Stufe 1 · Marktpreisindikation           (frueher 2 L)
            mpi_plus   Stufe 2 · Erweiterte Marktpreisindikation (frueher 5 L)
            wev        Stufe 3 · Wertermittlung nach ImmoWertV   (frueher 12 L)
-         `sparfaktor` ist die Obergrenze des Angesparten als Vielfaches des
-         Monatskontingents: nicht genutzte Abrufe verfallen NICHT, wachsen
-         aber auch nicht unbegrenzt. */
+         `sparfaktor` war die Obergrenze des Angesparten. SEIT v1296 OHNE
+         WIRKUNG: Marcels Entscheidung vom 11.09.2026 — das Monatskontingent
+         verfaellt zum Monatsende, nur Gekauftes bleibt. Das Feld steht noch
+         da, weil `reseller-portal.js` und die Statusauskunft es mitfuehren;
+         GELESEN WIRD ES NIRGENDS MEHR (`aiCreditsService._monatsReset`). */
       kontingent: { mpi: 1, mpi_plus: 0, wev: 0, sparfaktor: 0 },
       features: {
         marktreport: false, rnd_full: false, json_backup: false, excel_import: false, // v494-matrix
@@ -441,9 +443,23 @@ window.DealPilotConfig = (function() {
   var EINZELKAUF = [
     { key: 'mpi',      label: 'Marktpreisindikation',             price_eur: 0.90 },
     { key: 'mpi_plus', label: 'Erweiterte Marktpreisindikation',  price_eur: 1.90 },
-    { key: 'wev',      label: 'Wertermittlung nach ImmoWertV',    price_eur: 3.90 },
-    { key: 'avm_a',    label: 'Marktwert-Abruf · Bewertungspartner',        price_eur: 5.90 },
-    { key: 'avm_b',    label: 'Marktwert-Abruf · zweiter Bewertungspartner', price_eur: 9.90 }
+    { key: 'wev',      label: 'Wertermittlung nach ImmoWertV',    price_eur: 3.90 }
+    /* ── v1296 · Die beiden Marktwert-Abrufe sind RAUS ───────────────────
+       Hier standen `avm_a` (5,90 €) und `avm_b` (9,90 €) — die Abrufe bei
+       den zwei externen Bewertungspartnern. Marcels Entscheidung vom
+       11.09.2026: „die Preise fuer die Bewertungspartner nehmen wir raus,
+       die bieten wir erstmal nicht an."
+
+       SIE SIND ETWAS ANDERES ALS DIE DREI DARUEBER, und genau daran hat
+       sich die Frage entzuendet: mpi, mpi_plus und wev rechnen WIR selbst
+       aus amtlichen Daten. Die beiden Abrufe kaufen einen FREMDEN Wert
+       zu — daher der Preissprung von 3,90 auf 5,90.
+
+       Der Kaufweg ist mit stillgelegt (`bewertungsKatalog.js`: die beiden
+       `dp_einzeln_avm_*` sind aus LOOKUP_KEYS raus). Die ART bleibt im
+       System: `avm_a_bank` und `avm_b_bank` gibt es weiter, und wer noch
+       einen Bestand haette, duerfte ihn abrufen. GEMESSEN am 11.09.2026
+       auf Staging: beide Baenke stehen bei 0, kein Nutzer betroffen. */
   ];
 
   /* ── v1246 · Nachkauf: dasselbe Kontingent, ein Viertel des Monatsbeitrags ──

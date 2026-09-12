@@ -215,60 +215,432 @@
       P+" .tk-rip .bp-txt{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:#8a7c60;white-space:nowrap}"+
       '@media(max-width:820px){'+P+'{grid-template-columns:1fr 1fr}}'+
       '@media(max-width:520px){'+P+'{grid-template-columns:1fr}}'+
+      /* ═══ v1296 · DIESE REGELN HINGEN AM FALSCHEN ANKER ══════════════════
+         Hier stand `P + " .pm-einzel…"`, und `P` ist `#pricing-modal .ppg`
+         — die Planraster-Flaeche. Der Einzelkauf-Streifen liegt aber in
+         `#pricing-modal #pricing-plugin-host.dp-wrap`, NICHT in `.ppg`.
+
+         GEMESSEN am 11.09.2026 mit dem Kaskaden-Walker: auf `.pm-menge`
+         trafen ZWEI Regeln, beide Sammelregeln (`*` und `.dp-wrap *`).
+         Keine einzige eigene. `.pm-einzel-row` stand auf `display:block`
+         und `padding:0` — die Einzelkauf-Liste war seit v1294 nackte
+         Divs, und der Mengenwaehler lief auf 1180 px Breite.
+
+         ICH HABE DAS BEI v1294 ALS "FERTIG" GEMELDET. Gemessen hatte ich
+         damals, DASS die fuenf Zeilen da sind — nicht, WIE sie aussehen.
+         Eine Existenzpruefung ist keine Gestaltpruefung.
+
+         Richtiger Anker ist `#pricing-modal` (dasselbe, was die
+         `.bw`-Regeln weiter unten als `M` benutzen — die greifen deshalb).
+         Er steht hier als eigene Konstante, damit beim naechsten Mal
+         sichtbar ist, dass dieser Block NICHT zum Planraster gehoert. */
+      (function () {
+        var S = '#pricing-modal';   /* der Streifen, nicht das Planraster */
+
+        /* DER GRUND IST DUNKEL — gemessen rgb(26,24,24), Helligkeit 25.
+           Beide Orte, an denen der Waehler laeuft (dieses Modal und die
+           Einstellungen), stehen auf Obsidian. `color:inherit` half nicht:
+           geerbt kam SCHWARZ an, also schwarze Ziffern auf schwarzem
+           Grund. Deshalb jetzt ausdruecklich Creme.
+           Gold laeuft ueber `--wl-…`, damit es sich beim Mandanten
+           umfaerbt. CREME NICHT: ein `--wl-f4efe6` gibt es nicht, und ein
+           Token zu erfinden, das `whitelabel-override.js` nie setzt, waere
+           ein toter Anker mit plausiblem Aussehen — dieselbe Sorte wie die
+           `#app`-Regel, die v1147 einen Ausrollzyklus gekostet hat. Creme
+           ist die Schriftfarbe auf Obsidian und bleibt in jeder Marke. */
+        var CREME  = '#F4EFE6';
+        var RAHMEN = 'rgba(244,239,230,.24)';
+
+        return '' +
+        S+" .pm-einzel{margin-top:18px;padding:16px 18px;border:1px solid var(--wl-c9a84c, rgba(201,168,76,.3));border-radius:14px;background:var(--wl-c9a84c, rgba(201,168,76,.06))}"+
+        S+" .pm-einzel-h{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);margin-bottom:11px}"+
+        S+" .pm-einzel-grid{display:flex;flex-direction:column;gap:1px}"+
+        S+" .pm-einzel-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid "+RAHMEN+"}"+
+        S+" .pm-einzel-row:last-child{border-bottom:none}"+
+        S+" .pm-einzel-l{flex:1 1 auto;min-width:0;font-size:13px;color:"+CREME+"}"+
+        S+" .pm-einzel-p{flex:0 0 auto;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;font-weight:700;white-space:nowrap;text-align:right;min-width:78px;color:var(--wl-c9a84c, #C9A84C)}"+
+        S+" .pm-einzel-p small{display:block;font-family:Inter,system-ui,sans-serif;font-size:9.5px;font-weight:400;opacity:.55;color:"+CREME+"}"+
+        S+" .pm-einzel-cta{flex:0 0 auto;padding:5px 13px;border-radius:8px;border:1px solid var(--wl-c9a84c, #C9A84C);color:var(--wl-c9a84c, #C9A84C);font-size:11.5px;font-weight:700;text-decoration:none;white-space:nowrap}"+
+        S+" .pm-einzel-cta:hover{background:var(--wl-c9a84c, #C9A84C);color:#221c08}"+
+
+        /* Mengenwaehler. Die Ziffer sitzt in JetBrains Mono, damit ein- und
+           zweistellige Mengen gleich breit bleiben und die Zeile beim
+           Tippen nicht springt. `flex:0 0 auto` ist Pflicht: die Zeile ist
+           ein Flex-Behaelter, sonst laeuft der Waehler auf volle Breite. */
+        S+" .pm-menge{flex:0 0 auto;display:inline-flex;align-items:center;gap:0;border:1px solid "+RAHMEN+";border-radius:9px;overflow:hidden;background:rgba(255,255,255,.04);color:"+CREME+"}"+
+        S+" .pm-menge-b{flex:0 0 auto;width:26px;height:26px;border:0;background:transparent;cursor:pointer;font:600 15px/1 Inter,system-ui,sans-serif;color:var(--wl-c9a84c, #C9A84C);padding:0}"+
+        S+" .pm-menge-b:hover:not(:disabled){background:var(--wl-c9a84c, rgba(201,168,76,.20))}"+
+        S+" .pm-menge-b:disabled{opacity:.3;cursor:default}"+
+        S+" .pm-menge-n{flex:0 0 auto;width:30px;height:26px;border:0;border-left:1px solid "+RAHMEN+";border-right:1px solid "+RAHMEN+";text-align:center;font:700 12px/1 'JetBrains Mono',ui-monospace,monospace;color:"+CREME+";background:transparent;padding:0}"+
+        S+" .pm-menge-n:focus{outline:2px solid var(--wl-c9a84c, rgba(201,168,76,.55));outline-offset:-2px}"+
+        /* ═══ DER DRITTE GRUND — und der einzige HELLE ════════════════════
+           GEMESSEN: `.bw-gate` (die Abriss-Seite des Boarding-Passes) hat
+           `background:#fff`. Derselbe Waehler stand dort mit Creme-Schrift
+           auf Weiss: Helligkeit 239 auf 255, KONTRAST 16. Lesbar war das
+           nicht, sichtbar kaum.
+
+           Das ist innerhalb eines Ausrollzyklus die DRITTE Auspraegung
+           derselben Falle — erst dunkel fuer hell gehalten, dann hell fuer
+           dunkel, jetzt ein heller Fleck mitten im dunklen Modal. Die
+           Lehre steht in FALLEN.md: ein Baustein, der an mehreren Orten
+           laeuft, braucht je Ort eine GEMESSENE Grundfarbe. Raten trifft
+           irgendwann, aber nie zuverlaessig.
+
+           `--ch` ist hier richtig (dunkle Schrift auf Weiss) — die Regel
+           „--ch nie auf Obsidian" gilt fuer den umgekehrten Fall. */
+        S+" .bw-gate .pm-menge{align-self:center;background:rgba(27,24,21,.05);border-color:rgba(27,24,21,.22);color:#2A2727}"+
+        S+" .bw-gate .pm-menge-n{color:#2A2727;border-left-color:rgba(27,24,21,.18);border-right-color:rgba(27,24,21,.18)}"+
+        S+" .bw-gate .pm-menge-b{color:var(--wl-b8932f, #b8932f)}"+
+        S+" .bw-price-je{opacity:.75}"+
+        '@media(max-width:520px){'+S+' .pm-einzel-row{flex-wrap:wrap}'+S+' .pm-einzel-l{flex:1 1 100%}}';
+      })() +
       _kerosinMatrixCss();
     document.head.appendChild(st);
   }
   // ═══════════════════════════════════════════════════════════════
   // v885-plan-landing: Kerosin-Streifen (bw) + Cockpit-Matrix (mx) + CSS
   // ═══════════════════════════════════════════════════════════════
-  var KPACKS = [
-    /* v1176 · Aus Litern werden Bewertungen. `l` ist jetzt die Aufteilung
-       „MPI · erweitert · Wertermittlung", `ppl` der Stückpreis der
-       einfachsten Bewertung im Paket. Die Reichweitentexte bleiben, sie
-       waren immer schon die eigentliche Auskunft. */
-    { l:'5 · 2 · 0',   p:'7,90',  ppl:'0,90', id:'paket_kurz',   cls:'✈ Kurzstrecke',
-      use:'Mal schnell prüfen',    reach:'5 Marktpreisindikationen · 2 erweiterte' },
-    { l:'10 · 5 · 1',  p:'19,90', ppl:'0,85', id:'paket_mittel', cls:'✈✈ Mittelstrecke',
-      use:'Mehrere Deals',              reach:'10 Indikationen · 5 erweiterte · 1 Wertermittlung' },
-    { l:'15 · 10 · 3', p:'39,90', ppl:'0,80', id:'paket_gross',  cls:'✈✈✈ Langstrecke',
-      use:'Aktiver Investor',           reach:'15 Indikationen · 10 erweiterte · 3 Wertermittlungen', best:true },
-    { l:'25 · 20 · 6', p:'69,90', ppl:'0,75', id:'paket_max',    cls:'🌍 Interkontinental',
-      use:'Maximale Reichweite',        reach:'25 Indikationen · 20 erweiterte · 6 Wertermittlungen' }
-  ];
+  /* ═══ v1294 · Nachkauf statt Pakete ═════════════════════════════════
+     Hier standen die vier Bewertungs-Pakete zu 7,90 / 19,90 / 39,90 /
+     69,90 EUR. Seit v1246 sind sie nicht mehr kaufbar: das Backend kennt
+     nur noch `dp_nachkauf_*` und `dp_einzeln_*`, die alten Stripe-Preise
+     sind stillgelegt.
+
+     GEMESSEN am 11.09.2026 gegen den laufenden Checkout:
+
+         paket_kurz        -> HTTP 400  invalid_pack
+         paket_gross       -> HTTP 400  invalid_pack
+         nachkauf_starter  -> HTTP 200
+         nachkauf_pro      -> HTTP 200
+         mpi               -> HTTP 200
+
+     Vier Kaufknoepfe, die nichts kaufen — und zwar an der Stelle, an der
+     jemand gerade Geld ausgeben will. Der Kommentar in config.js sagte
+     seit v1246 „das ersetzt BEWERTUNGS_PAKETE"; die Ersetzung ist in
+     settings.js angekommen, hier und auf der Landing nicht.
+
+     Jetzt zeigt das Modal, was es wirklich gibt: das eigene Kontingent
+     noch einmal, fuer ein Viertel des Monatsbeitrags. Die Zahlen kommen
+     aus `nachkaufFuer()` — dieselbe Quelle wie in den Einstellungen,
+     damit die beiden nicht auseinanderlaufen koennen. */
+  /* ═══ v1297 · Drei Bewertungspakete mit NAMEN ═══════════════════════════
+     Marcels Befund vom 11.09.2026: „Ich finde das Bewertungen nachkaufen
+     nicht schön mit dem 5-5-5. Das ist irgendwie nicht gut. … Vielleicht
+     bieten wir einfach dort drei Pakete an, die man kaufen kann, aber nenn
+     sie besser."
+
+     Er hat recht, und zwar aus drei Gründen:
+
+     1. `5 · 5 · 5` ist keine Bezeichnung, sondern eine Notation aus der
+        Cockpit-Matrix. Dort stehen Spaltenköpfe daneben, hier nicht — die
+        Zahlenreihe erklärt sich nur dem, der sie schon kennt.
+     2. „Für Pro" als Überschrift beschreibt den KÄUFER, nicht die Ware.
+        Wer wissen will, was er bekommt, liest die falsche Zeile.
+     3. Die Pakete hingen optisch am eigenen Plan, obwohl der Checkout sie
+        NIE am Plan prüft (`_checkoutBewertung` fragt nur „nicht free").
+        Jeder zahlende Kunde konnte längst jedes der drei kaufen; nur sah
+        es nicht danach aus.
+
+     Die NAMEN kommen aus der eigenen Bildsprache — Kurz-, Mittel- und
+     Langstrecke standen schon an den alten Kerosin-Paketen und sind ohne
+     Erklärung verständlich: je weiter der Flug, desto mehr ist an Bord.
+
+     PREISE UND INHALTE BLEIBEN UNVERÄNDERT. Sie kommen weiter aus
+     `nachkaufFuer()`, also aus derselben Quelle wie die Einstellungen, und
+     hängen an denselben drei Stripe-Preisen (`dp_nachkauf_*`). Ein neues
+     Paket hieße ein neuer Preis in zwei Stripe-Konten — das ist Marcels
+     Entscheidung, nicht meine. Hier ändert sich, wie es heißt und aussieht. */
+  var PAKET_NAMEN = {
+    starter:  { name: 'Kurzstrecke',   flug: '✈',   claim: 'Ein paar Objekte durchrechnen' },
+    investor: { name: 'Mittelstrecke', flug: '✈✈',  claim: 'Der normale Monat' },
+    pro:      { name: 'Langstrecke',   flug: '✈✈✈', claim: 'Mit Wertermittlung nach ImmoWertV' }
+  };
+
+  /* Der Inhalt als LESBARE Zeilen statt als Zahlenreihe — und mit der
+     Menge multipliziert. Marcels zweiter Befund: „Auch wenn man die Menge
+     ändert, ändert sich nicht die Anzahl der Bewertungen."
+
+     Das war schlicht falsch angezeigt: `reach` wurde EINMAL gebaut und
+     blieb stehen, während Preis und Kaufknopf mitwanderten. Bei Menge 3
+     stand „5 Marktpreisindikationen" über einem Preis für 15. */
+  function _paketZeilen(kont, menge) {
+    menge = Math.max(1, menge || 1);
+    var arten = [
+      { n: kont.mpi,      ein: 'Marktpreisindikation',        mehr: 'Marktpreisindikationen' },
+      { n: kont.mpi_plus, ein: 'erweiterte Indikation',       mehr: 'erweiterte Indikationen' },
+      { n: kont.wev,      ein: 'Wertermittlung nach ImmoWertV', mehr: 'Wertermittlungen nach ImmoWertV' }
+    ];
+    return arten.filter(function (a) { return a.n > 0; }).map(function (a) {
+      var z = a.n * menge;
+      return { zahl: z, text: (z === 1 ? a.ein : a.mehr) };
+    });
+  }
+
+  function _nkListe() {
+    var P = (window.DealPilotConfig && window.DealPilotConfig.pricing) || {};
+    if (typeof P.nachkaufFuer !== 'function') return [];
+    return ['starter', 'investor', 'pro'].map(function (k) {
+      var n = P.nachkaufFuer(k);
+      if (!n) return null;
+      var b = PAKET_NAMEN[k] || { name: k, flug: '', claim: '' };
+      return {
+        plan: k,
+        name: b.name,
+        flug: b.flug,
+        claim: b.claim,
+        l: n.label,                         /* „5 · 5 · 5" — nur noch klein */
+        p: n.preis_eur.toFixed(2).replace('.', ','),
+        preis_cent: Math.round(n.preis_eur * 100),
+        id: n.key,
+        kontingent: n.kontingent,
+        menge: n.menge,                     /* Bewertungen im Paket, gesamt */
+        best: k === 'investor'
+      };
+    }).filter(Boolean);
+  }
+
+  /* Der eigene Plan zuerst — wer nachkauft, kauft meistens seine Menge
+     noch einmal. Das ist jetzt nur noch eine VORAUSWAHL, keine Bindung:
+     jedes der drei Pakete ist für jeden kaufbar. */
+  function _nkIndex(liste) {
+    try {
+      var cur = window.DealPilotConfig.pricing.currentKey();
+      for (var i = 0; i < liste.length; i++) if (liste[i].plan === cur) return i;
+    } catch (e) {}
+    for (var j = 0; j < liste.length; j++) if (liste[j].best) return j;
+    return 0;
+  }
+
+  var KPACKS = _nkListe();
+  /* v1297: Die Segmente tragen den NAMEN, nicht die Zahlenreihe. `5 · 5 · 5`
+     stand hier als Hauptbeschriftung und war fuer niemanden lesbar, der die
+     Cockpit-Matrix nicht auswendig kennt. Die Reihe steht jetzt klein
+     darunter — als Kurzform fuer den, der sie kennt, nicht als Titel. */
   function _bwSegsHtml(idx){
     return '<div class="bw-segs">' + KPACKS.map(function(k,i){
       return '<div class="bw-seg'+(i===idx?' on':'')+'" data-i="'+i+'">' +
-        '<span class="bw-seg-l">'+k.l+'</span><span class="bw-seg-p">'+k.p+' \u20ac</span></div>';
+        '<span class="bw-seg-l">'+k.name+'</span>' +
+        '<span class="bw-seg-s">'+k.menge+' Bewertungen · '+k.p+' €</span></div>';
     }).join('') + '</div>';
   }
-  function _bwPassHtml(idx){
-    var k = KPACKS[idx];
-    return '<div class="bw'+(k.best?' best':'')+'" id="pm-bw">' +
-      (k.best?'<span class="bw-pop">Beliebt</span>':'') +
-      '<div class="bw-stub"><div class="bw-class">'+k.cls+'</div><div class="bw-l">'+k.p+' €</div><div class="bw-ll">Bewertungen</div></div>' +
-      '<div class="bw-perf"></div>' +
-      '<div class="bw-body">' +
-        '<div class="bw-col"><span class="bw-k">Reichweite</span><span class="bw-v">'+k.reach+'</span></div>' +
-        '<div class="bw-col"><span class="bw-k">ab</span><span class="bw-v"><span class="dp">'+k.ppl+' \u20ac</span> je Bewertung</span></div>' +
-        '<div class="bw-col"><span class="bw-k">Einsatz</span><span class="bw-v">'+k.use+'</span></div>' +
-        '<div class="bw-col"><span class="bw-k">Verfall</span><span class="bw-v"><span class="dp">nie</span> \u00b7 kein Abo</span></div>' +
-      '</div>' +
-      '<div class="bw-gate"><div class="bw-price">'+k.p+' \u20ac<small>einmalig \u00b7 '+k.l+'</small></div>' +
-        '<a class="bw-cta" href="#" data-pack-id="'+k.id+'" onclick="window._buyCreditPackDirect(this); return false;">Bewertungen kaufen</a></div>' +
+
+  /* ═══ v1296 · Der Mengenwähler ══════════════════════════════════════════
+     Marcels Vorgabe vom 11.09.2026: „Ich würde gerne was haben, wo der
+     Kunde selber auswählen kann, wieviele er nachkaufen möchte."
+
+     Ein Baustein für beide Stellen — die Nachkauf-Karte und jede
+     Einzelkauf-Zeile. Er trägt die Menge in `data-menge` am Kaufknopf und
+     schreibt den Gesamtpreis fort, damit niemand im Kopf multiplizieren
+     muss. Der Server nimmt sie als `menge` entgegen und kappt bei 25;
+     dieselbe Grenze steht hier, damit der Knopf nicht mehr verspricht,
+     als der Checkout einlöst.
+
+     WARUM KEIN <input type="number">: der Zahlenpfeil sieht in jedem
+     Browser anders aus, lässt sich kaum gestalten und nimmt auf dem Handy
+     die falsche Tastatur. Zwei Knöpfe und eine Zahl tun dasselbe und sehen
+     überall gleich aus. Eingetippt wird trotzdem — das Feld ist `inputmode
+     numeric`, nur ohne die Pfeile. */
+  var MENGE_MAX = 25;
+
+  function _mengeHtml(id, preisCent) {
+    return '<div class="pm-menge" data-mid="' + id + '" data-cent="' + preisCent + '">' +
+      '<button type="button" class="pm-menge-b" data-d="-1" aria-label="Weniger">−</button>' +
+      '<input class="pm-menge-n" value="1" inputmode="numeric" aria-label="Anzahl">' +
+      '<button type="button" class="pm-menge-b" data-d="1" aria-label="Mehr">+</button>' +
     '</div>';
   }
+
+  /* Eine Änderung: Zahl begrenzen, Knopf beschriften, Preis nachziehen.
+     `wurzel` ist der Behälter, in dem Wähler, Preisfeld und Kaufknopf
+     zusammen liegen — so bleibt der Baustein mehrfach verwendbar, ohne
+     dass die Stellen voneinander wissen. */
+  function _mengeSetzen(wurzel, n) {
+    var w = wurzel.querySelector('.pm-menge');
+    if (!w) return;
+    n = Math.min(MENGE_MAX, Math.max(1, parseInt(n, 10) || 1));
+    var feld = w.querySelector('.pm-menge-n');
+    if (feld) feld.value = String(n);
+    w.querySelectorAll('.pm-menge-b').forEach(function (b) {
+      var d = parseInt(b.dataset.d, 10);
+      b.disabled = (d < 0 && n <= 1) || (d > 0 && n >= MENGE_MAX);
+    });
+    var cent = parseInt(w.dataset.cent, 10) || 0;
+    var summe = wurzel.querySelector('[data-summe]');
+    if (summe) summe.textContent = ((cent * n) / 100).toFixed(2).replace('.', ',') + ' €';
+    var cta = wurzel.querySelector('[data-pack-id]');
+    if (cta) cta.dataset.menge = String(n);
+
+    /* ═══ v1297 · DER INHALT MUSS MITZAEHLEN ═══════════════════════════
+       Marcels Befund: „Auch wenn man die Menge ändert, ändert sich nicht
+       die Anzahl der Bewertungen."
+
+       Genau so war es. Preis und Kaufknopf wanderten mit, die Liste
+       darueber stand still — bei Menge 3 also „5 Marktpreisindikationen"
+       ueber einem Preis fuer 15. Der Kunde musste glauben, dass das
+       Dreifache ankommt, obwohl die Karte etwas anderes behauptete.
+
+       Dieselbe Sorte wie eine Waehrungsangabe, die nach der Umstellung
+       stehenblieb: nicht falsch gerechnet, sondern falsch GESAGT. */
+    var inhalt = wurzel.querySelector('[data-inhalt]');
+    if (inhalt) {
+      var plan = (wurzel.dataset && wurzel.dataset.plan) ||
+                 (wurzel.closest && wurzel.closest('[data-plan]') ? wurzel.closest('[data-plan]').dataset.plan : null);
+      var k = null;
+      for (var i = 0; i < KPACKS.length; i++) if (KPACKS[i].plan === plan) k = KPACKS[i];
+      if (k) {
+        /* ZWEI DARSTELLUNGEN, EINE QUELLE. Im Preis-Modal stehen die
+           Inhalte als Zeilen mit grosser Zahl vorn; in den Einstellungen
+           ist dafuer kein Platz, dort reicht eine Aufzaehlung. Welche
+           gebraucht wird, sagt der Behaelter selbst — `.bw` ist der
+           Boarding-Pass. So bleibt die RECHNUNG (`_paketZeilen`) einmal
+           im Code, und nur die Schreibweise unterscheidet sich. */
+        inhalt.innerHTML = wurzel.closest && wurzel.closest('.bw')
+          ? _inhaltHtml(k, n)
+          : _paketZeilen(k.kontingent, n).map(function (z) {
+              return z.zahl + ' ' + z.text;
+            }).join(' · ');
+      }
+    }
+  }
+
+  /* EIN Zuhörer am Dokument statt einer je Knopf: die Karten werden neu
+     gezeichnet, sobald jemand das Segment wechselt, und ein Zuhörer an
+     einem Knopf, den es nicht mehr gibt, tut nichts mehr. */
+  function _mengeBinden() {
+    if (window.__pmMengeGebunden) return;
+    window.__pmMengeGebunden = true;
+    document.addEventListener('click', function (ev) {
+      var b = ev.target.closest && ev.target.closest('.pm-menge-b');
+      if (!b) return;
+      ev.preventDefault();
+      var w = b.closest('.pm-menge');
+      var wurzel = b.closest('.pm-menge-wrap') || b.closest('.bw') || b.closest('.pm-einzel-row');
+      if (!w || !wurzel) return;
+      var jetzt = parseInt(w.querySelector('.pm-menge-n').value, 10) || 1;
+      _mengeSetzen(wurzel, jetzt + parseInt(b.dataset.d, 10));
+    });
+    document.addEventListener('input', function (ev) {
+      var f = ev.target;
+      if (!f.classList || !f.classList.contains('pm-menge-n')) return;
+      var wurzel = f.closest('.pm-menge-wrap') || f.closest('.bw') || f.closest('.pm-einzel-row');
+      if (wurzel) _mengeSetzen(wurzel, f.value);
+    });
+  }
+
+  /* Der Waehler wird an ZWEI Stellen gebraucht: hier im Preis-Modal und in
+     den Einstellungen unter „Plan wechseln". Deshalb liegt er EINMAL hier
+     und wird exportiert — zwei Kopien laufen sonst auseinander, so wie es
+     die Nachkauf-Zahlen schon einmal getan haben (v1294).
+
+     `settings.js` laedt VOR dieser Datei (index.html:3360/3361). Das ist
+     unkritisch, weil beide erst beim Klick bzw. beim Oeffnen des Reiters
+     laufen — dann steht der Export. Einen Rueckfall hat settings.js
+     trotzdem, damit eine alte ausgelieferte Fassung nicht auf einen
+     Knopf ohne Menge fuehrt. */
+  window.DealPilotMenge = {
+    html:   _mengeHtml,
+    setzen: _mengeSetzen,
+    binden: _mengeBinden,
+    MAX:    MENGE_MAX,
+    /* v1297: Namen und Inhalte gehoeren dazu — die Einstellungen zeichnen
+       dieselbe Karte und muessen sie genauso nennen. Zwei Listen mit
+       Paketnamen wuerden auseinanderlaufen, sobald einer umbenannt wird. */
+    paket:  function (planKey) { return PAKET_NAMEN[planKey] || { name: planKey, flug: '', claim: '' }; },
+    zeilen: _paketZeilen
+  };
+  /* Der Inhalt als Zeilen — `data-inhalt` markiert den Behaelter, damit der
+     Mengenwaehler ihn beim Zaehlen wiederfindet. Die Zahl steht VORNE und
+     gross: sie ist die Antwort auf „was bekomme ich dafuer". */
+  function _inhaltHtml(k, menge) {
+    return _paketZeilen(k.kontingent, menge).map(function (z) {
+      return '<div class="bw-inh"><b>' + z.zahl + '</b><span>' + z.text + '</span></div>';
+    }).join('');
+  }
+
+  function _bwPassHtml(idx){
+    var k = KPACKS[idx];
+    if (!k) return '';
+    return '<div class="bw'+(k.best?' best':'')+'" id="pm-bw" data-plan="'+k.plan+'">' +
+      (k.best?'<span class="bw-pop">Beliebt</span>':'') +
+      /* Der Abriss traegt jetzt den NAMEN, nicht den Kaeufer. Der Preis
+         steht rechts am Kaufknopf, wo entschieden wird — zweimal derselbe
+         Betrag an zwei Stellen war schon vorher unruhig, und mit der Menge
+         waeren es zwei Betraege gewesen, die auseinanderlaufen. */
+      '<div class="bw-stub">' +
+        '<div class="bw-flug">'+k.flug+'</div>' +
+        '<div class="bw-name">'+k.name+'</div>' +
+        '<div class="bw-ll">Bewertungspaket</div>' +
+      '</div>' +
+      '<div class="bw-perf"></div>' +
+      '<div class="bw-body">' +
+        '<div class="bw-col bw-col-inh"><span class="bw-k">Du bekommst</span>' +
+          '<div class="bw-inhalte" data-inhalt>' + _inhaltHtml(k, 1) + '</div></div>' +
+        '<div class="bw-col"><span class="bw-k">Wofür</span><span class="bw-v">'+k.claim+'</span></div>' +
+        '<div class="bw-col"><span class="bw-k">Verfall</span><span class="bw-v"><span class="dp">nie</span> · kein Abo</span></div>' +
+      '</div>' +
+      '<div class="bw-gate">' +
+        '<div class="bw-price"><span data-summe>'+k.p+' €</span>' +
+          '<small>einmalig · <span class="bw-price-je">'+k.p+' € je Paket</span></small></div>' +
+        _mengeHtml('nk-'+k.plan, Math.round(k.preis_cent)) +
+        '<a class="bw-cta" href="#" data-pack-id="'+k.id+'" data-menge="1" onclick="window._buyCreditPackDirect(this); return false;">Paket kaufen</a>' +
+      '</div>' +
+    '</div>';
+  }
+
+  /* Der Einzelkauf: genau die eine, die gerade fehlt. Er funktioniert seit
+     v1183, wurde aber nirgends angeboten — in settings.js hing er hinter
+     einer Bedingung auf die leere Paketliste. */
+  function _einzelHtml() {
+    var P = (window.DealPilotConfig && window.DealPilotConfig.pricing) || {};
+    var e = P.einzelkauf || [];
+    if (!e.length) return '';
+    return '<div class="pm-einzel">' +
+      '<div class="pm-einzel-h">Oder einzeln — genau die eine, die gerade fehlt</div>' +
+      '<div class="pm-einzel-grid">' +
+      e.map(function (x) {
+        /* v1296: auch hier die Menge. Wer fünf Marktpreisindikationen
+           braucht, soll nicht fünfmal durch den Checkout. Der Preis rechts
+           ist der GESAMTPREIS und wandert mit; der Einzelpreis steht klein
+           darunter, sonst weiß bei Menge 5 niemand mehr, was eine kostet. */
+        var cent = Math.round(x.price_eur * 100);
+        return '<div class="pm-einzel-row">' +
+          '<span class="pm-einzel-l">' + x.label + '</span>' +
+          _mengeHtml('ez-' + x.key, cent) +
+          '<span class="pm-einzel-p"><b data-summe>' + x.price_eur.toFixed(2).replace('.', ',') + ' €</b>' +
+            '<small>' + x.price_eur.toFixed(2).replace('.', ',') + ' € je Stück</small></span>' +
+          '<a class="pm-einzel-cta" href="#" data-pack-id="' + x.key + '" data-menge="1" ' +
+            'onclick="window._buyCreditPackDirect(this); return false;">Kaufen</a>' +
+        '</div>';
+      }).join('') +
+      '</div></div>';
+  }
+
   function _kerosinStripHtml(){
-    var i = 2; // 90 L (Beliebt) als Default
-    return '<div id="pm-kerosin-strip">' + _bwSegsHtml(i) + _bwPassHtml(i) + '</div>';
+    if (!KPACKS.length) KPACKS = _nkListe();
+    if (!KPACKS.length) return '';
+    var i = _nkIndex(KPACKS);
+    return '<div id="pm-kerosin-strip">' + _bwSegsHtml(i) + _bwPassHtml(i) + _einzelHtml() + '</div>';
   }
   function _wireKerosinStrip(){
     var wrap = document.getElementById('pm-kerosin-strip');
     if (!wrap) return;
+    _mengeBinden();          /* v1296 — einmal je Sitzung, am Dokument */
     function bind(){
       Array.prototype.forEach.call(wrap.querySelectorAll('.bw-seg'), function(seg){
         seg.addEventListener('click', function(){
           var i = +seg.getAttribute('data-i');
-          wrap.innerHTML = _bwSegsHtml(i) + _bwPassHtml(i);
+          /* v1296 — GEMESSEN beim Einbau des Mengenwaehlers: hier stand
+             `_bwSegsHtml(i) + _bwPassHtml(i)` OHNE `_einzelHtml()`. Ein
+             Klick auf ein anderes Segment loeschte damit den kompletten
+             Einzelkauf-Block aus dem Modal, und er kam erst beim naechsten
+             Oeffnen wieder.
+
+             Seit v1294 drin, beim Nachmessen nicht gesehen, weil ich das
+             Segment nie gewechselt habe — dasselbe Muster wie beim
+             Markt-Angebot (Sprachweg geprueft, Klickweg nicht). Wer eine
+             Ansicht an ZWEI Stellen zusammensetzt, muss beide gleich
+             halten. */
+          wrap.innerHTML = _bwSegsHtml(i) + _bwPassHtml(i) + _einzelHtml();
           bind();
         });
       });
@@ -346,10 +718,15 @@
       /* bw-Streifen */
       M+'.bw-segs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:720px;margin:8px auto 20px}' +
       M+'.bw-seg{display:flex;flex-direction:column;gap:2px;align-items:center;font-family:\'JetBrains Mono\',monospace;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 8px;cursor:pointer;transition:.15s;color:rgba(255,255,255,.6)}' +
-      M+'.bw-seg .bw-seg-l{font-family:\'Space Grotesk\',sans-serif;font-size:19px;font-weight:700;color:#fff}' +
+      /* v1297: Der Name traegt die Zeile, die Zahlen stehen klein darunter.
+         Die Schriftgroesse faellt von 19 auf 16 px — „Mittelstrecke" ist
+         laenger als „5 · 5 · 0" und bricht sonst im Segment um. */
+      M+'.bw-seg .bw-seg-l{font-family:\'Space Grotesk\',sans-serif;font-size:16px;font-weight:700;color:#fff;line-height:1.2}' +
+      M+'.bw-seg .bw-seg-s{display:block;font-family:\'JetBrains Mono\',ui-monospace,monospace;font-size:9.5px;letter-spacing:.02em;color:rgba(255,255,255,.62);margin-top:3px}' +
       M+'.bw-seg .bw-seg-p{font-size:11px}' +
       M+'.bw-seg.on{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);border-color:transparent}' +
       M+'.bw-seg.on .bw-seg-l,'+M+'.bw-seg.on .bw-seg-p{color:#221a06}' +
+      M+'.bw-seg.on .bw-seg-s{color:rgba(34,26,6,.72)}' +
       M+'.bw{width:100%;margin:0;position:relative;display:grid;grid-template-columns:220px 22px 1fr 230px;align-items:stretch;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 40px 90px -40px rgba(0,0,0,.8),0 0 0 1px rgba(201,168,76,.35)}' +
       M+'.bw.best{box-shadow:0 44px 100px -40px rgba(201,168,76,.5),0 0 0 1.5px #C9A84C}' +
       M+'.bw-pop{position:absolute;top:12px;right:18px;font-family:\'JetBrains Mono\',monospace;font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:#221a06;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);border-radius:20px;padding:3px 11px;font-weight:700;z-index:3}' +
@@ -357,8 +734,30 @@
       M+'.bw-class{font-family:\'JetBrains Mono\',monospace;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;opacity:.88}' +
       M+'.bw-l{font-family:\'Space Grotesk\',sans-serif;font-size:50px;font-weight:700;line-height:1;margin-top:3px}' +
       M+'.bw-ll{font-family:\'JetBrains Mono\',monospace;font-size:9px;font-weight:600}' +
-      M+'.bw-perf{background-image:radial-gradient(circle,#0d0c0a 3.5px,transparent 3.8px);background-size:20px 14px;background-position:center;background-repeat:repeat-y}' +
-      M+'.bw-body{background:#fff;display:grid;grid-template-columns:repeat(4,1fr);gap:0}' +
+      /* v1297 · Der Abriss traegt den Paketnamen. Grund ist der Gold-Verlauf
+         aus `.bw-stub`, die Schrift dort ist #221a06 — GEMESSEN, nicht
+         angenommen: derselbe dunkle Ton, den `.bw-class` und `.bw-ll`
+         daneben schon benutzen, damit der Abriss einheitlich bleibt.
+         Die Namen sind laenger als eine Zahl, deshalb 27 px statt 50 und
+         ein weicher Umbruch statt `white-space:nowrap`. */
+      M+'.bw-flug{font-size:15px;letter-spacing:.16em;opacity:.72;margin-bottom:6px}' +
+      M+'.bw-name{font-family:\'Space Grotesk\',sans-serif;font-size:27px;font-weight:700;line-height:1.08;margin-bottom:5px}' +
+      /* Die Inhaltszeilen: Zahl vorn und gross, Text dahinter. Sie sind die
+         Antwort auf „was bekomme ich", und sie ZAEHLEN MIT der Menge. */
+      M+'.bw-inhalte{display:flex;flex-direction:column;gap:5px}' +
+      M+'.bw-inh{display:flex;align-items:baseline;gap:7px;line-height:1.25}' +
+      M+'.bw-inh b{font-family:\'Space Grotesk\',sans-serif;font-size:17px;font-weight:700;color:#1a1305;min-width:24px;text-align:right}' +
+      M+'.bw-inh span{font-size:12px;color:#463f32}' +
+            M+'.bw-perf{background-image:radial-gradient(circle,#0d0c0a 3.5px,transparent 3.8px);background-size:20px 14px;background-position:center;background-repeat:repeat-y}' +
+      /* v1297: DREI Spalten statt vier. „Preis" und „Einsatz" sind raus —
+         der Preis steht rechts am Kaufknopf (zweimal derselbe Betrag war
+         schon vorher unruhig und waere mit der Menge auseinandergelaufen),
+         und „Dein Kontingent noch einmal" stimmt nicht mehr, seit jedes
+         Paket fuer jeden kaufbar ist. Die Inhaltsspalte bekommt mehr
+         Breite, weil dort jetzt drei Zeilen stehen statt einer.
+         `grid-template-columns` MUSS mitgezogen werden: bei `repeat(4,1fr)`
+         und drei Kindern bliebe rechts eine leere Spalte stehen. */
+      M+'.bw-body{background:#fff;display:grid;grid-template-columns:1.45fr 1fr 1fr;gap:0}' +
       M+'.bw-col{padding:22px;border-right:1px solid rgba(27,24,21,.08);display:flex;flex-direction:column;justify-content:center}' +
       M+'.bw-col:last-child{border-right:0}' +
       M+'.bw-k{display:block;font-family:\'JetBrains Mono\',monospace;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:#6b6250;margin-bottom:5px}' +
@@ -715,6 +1114,10 @@
   // V197.2: Direkter Checkout-Aufruf — Stripe ohne Zwischenmodal
   window._buyCreditPackDirect = async function(el) {
     var packId = el.dataset.packId;
+    /* v1296: die gewaehlte Menge haengt am Knopf selbst (der Mengenwaehler
+       schreibt sie dorthin). Fehlt sie — ein Kaufknopf ohne Waehler, etwa
+       in einer aelteren Ansicht —, ist 1 richtig. */
+    var menge = Math.max(1, parseInt(el.dataset.menge, 10) || 1);
     var origText = el.textContent;
     el.style.pointerEvents = 'none';
     el.textContent = 'Wird gestartet…';
@@ -727,7 +1130,7 @@
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + token
         },
-        body: JSON.stringify({ pack_id: packId })
+        body: JSON.stringify({ pack_id: packId, menge: menge })
       });
       var data = null;
       try { data = await r.json(); } catch (e) {}

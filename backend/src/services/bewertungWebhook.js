@@ -56,16 +56,26 @@ async function _paketAusSitzung(session) {
 }
 
 /* Rueckfall: was wir beim Anlegen der Sitzung selbst hineingeschrieben
-   haben. Kommt nur zum Zug, wenn Stripe die Positionen nicht hergibt. */
+   haben. Kommt nur zum Zug, wenn Stripe die Positionen nicht hergibt.
+
+   v1296 — DIE MENGE GEHOERT HIERHER. Seit der Kunde die Stueckzahl waehlt,
+   ist `paket` allein nur noch der INHALT EINES Pakets. Wer drei kauft und
+   in diesen Rueckfall geraet, bekaeme sonst eines: ein stiller Fehlbetrag,
+   sichtbar erst beim Kunden, der zwei Bewertungen vermisst — und zwar an
+   der Stelle, an der er gerade bezahlt hat.
+
+   `menge` schreibt `credits.js` beim Anlegen der Sitzung mit. Fehlt sie
+   (Sitzung von vor v1296), ist 1 richtig. */
 function _paketAusMetadaten(session) {
   try {
     const roh = session.metadata && session.metadata.paket;
     if (!roh) return null;
     const p = JSON.parse(roh);
+    const menge = Math.max(1, parseInt(session.metadata.menge, 10) || 1);
     const sauber = {};
     katalog.ARTEN.forEach(function (art) {
       const n = parseInt(p[art], 10);
-      if (Number.isFinite(n) && n > 0) sauber[art] = n;
+      if (Number.isFinite(n) && n > 0) sauber[art] = n * menge;
     });
     return Object.keys(sauber).length ? sauber : null;
   } catch (e) {

@@ -32,6 +32,9 @@ import { marktmiete as amtlicheMiete } from '../lib/mietmodell_nrw.js';   /* v10
 import { vergleichsfaktor as amtlicherVf } from '../lib/vergleichsfaktoren_nrw.js';   /* v1060-WVF-1 */   /* v1053-WIRW-1 */
 import { AgsResolver } from '../connectors/AgsResolver.js';
 import { ZensusConnector } from '../connectors/ZensusConnector.js';
+import * as Erbbaurecht from '../lib/erbbaurecht.js';   /* v1320 */
+import { finde as findeKennzahl } from '../lib/ausschuss_register.js';   /* v1320b */
+import { MarktkontextService } from './MarktkontextService.js';   /* v1321 */
 
 export const ReportOrchestrator = {
   async generate(input, opts = {}) {
@@ -104,6 +107,16 @@ export const ReportOrchestrator = {
       // Manuell in DealPilot eingegebener Bodenrichtwert (Feld "brw") als BORIS-Fallback
       land_value_manual: input.land_value_manual ?? input.brw ?? null,
 
+
+      /* ═══ v1320 · Erbbaurecht ═══════════════════════════════════════
+         Dieselbe Falle wie bei WREF-1 direkt darunter: das Frontend
+         schickt die Felder, und `ref` liess sie fallen. Ohne diese drei
+         Zeilen ist der Erbbau-Block weiter unten eine Attrappe - er
+         fragt `ref.leasehold` ab, und das waere immer undefined. */
+      leasehold: input.leasehold === true || input.leasehold === 'true' || false,
+      leasehold_rent_year: input.leasehold_rent_year != null ? Number(input.leasehold_rent_year) : null,
+      leasehold_years_left: input.leasehold_years_left != null ? Number(input.leasehold_years_left) : null,
+      mea_pct: input.mea_pct != null ? Number(input.mea_pct) : null,
       /* WREF-1 · Wertermittlung Stufe 2/3. Diese Felder fehlten hier komplett:
        * das Frontend schickte sie, der Orchestrator liess sie fallen. Sichtbar
        * wurde es daran, dass Neubau und Bestand denselben Wert lieferten —
@@ -218,6 +231,18 @@ export const ReportOrchestrator = {
     })().catch((e) => { step('macro: fehler ' + e.message); return { agsInfo: null, macroRaw: { available: false, reason: e.message } }; });
 
     // Zensus 2022 (Leerstand/Eigentuemerquote/Ø-Miete, gratis offline-CSV) als eigener Strang:
+    /* ═══ v1321 · Marktkontext - eigener paralleler Strang ═══════════
+       Acht KPI-Abrufe: vermietet gegen frei, drei Energieklassen-Gruppen,
+       Angebotsrendite, Erbbaurechts-Anteil. Sie kosten NICHTS - gemessen
+       am 11.09.2026, Guthaben vor und nach acht Abfragen unveraendert
+       (257,115 -> 257,115). Nur Detail-Abrufe ziehen Geld.
+       Faellt der Strang aus, fehlt der Kontext und sonst nichts. */
+    const kontextP = FAST
+      ? Promise.resolve(null)
+      : MarktkontextService.derive(ref)
+          .then((k) => { if (k) step('Marktkontext ausgewertet'); return k; })
+          .catch((e) => { step('marktkontext: fehler ' + e.message); return null; });
+
     const zensusP = (async () => {
       const agsInfo = await agsP;
       const z = ZensusConnector.lookup(agsInfo?.kreis_ags);
@@ -232,8 +257,8 @@ export const ReportOrchestrator = {
       return lv;
     })().catch((e) => { step('boris: fehler ' + e.message); return null; });
 
-    const [balanceBefore, sale, rent, micro, insights, macroBundle, zensus, landValue] =
-      await Promise.all([balanceBeforeP, saleP, rentP, microP, insightsP, macroP, zensusP, borisP]);
+    const [balanceBefore, sale, rent, micro, insights, macroBundle, zensus, landValue, marktkontext] =
+      await Promise.all([balanceBeforeP, saleP, rentP, microP, insightsP, macroP, zensusP, borisP, kontextP]);
 
     const macroRaw = macroBundle.macroRaw;
     const macro = ScoringService.macroScore(macroRaw.metrics || null);
@@ -652,6 +677,98 @@ export const ReportOrchestrator = {
     let _kiGegen = null;
 
     // 6b) Sachwert/Ertragswert-Quercheck (reine Rechnung, keine API-Kosten)
+    /* ═══ v1320 · Erbbaurecht im Bericht ═══════════════════════════════
+       Marcels Frage: "funktioniert die erbpacht jetzt in jedem
+       marktbericht unter marktbewertung?"
+
+       Bis heute nicht. Der Bericht rechnete einen Marktwert aus
+       Vergleichsangeboten - und die sind Volleigentum, weil GeoMap den
+       Parameter gar nicht kennt (gemessen: 400 "Unrecognized field" fuer
+       jede Schreibweise). An einem Erbbaurechts-Objekt stand damit eine
+       Zahl im Bericht, die um 5 bis 50 Prozent daneben lag, ohne dass
+       irgendwo ein Hinweis darauf stand.
+
+       Der Abschlag wird HIER gerechnet, nicht in der Bewertung selbst:
+       `valuation` bleibt der Volleigentumswert (das ist er, und so wird
+       er auch gemeldet), der Abschlag steht als eigene Groesse daneben.
+       Wer beides sieht, versteht den Unterschied; wer nur eine gekuerzte
+       Zahl sieht, fragt sich, warum sie so niedrig ist.
+
+       Der Bodenwert kommt aus derselben Quelle wie ueberall im Bericht -
+       BORIS oder die Nutzereingabe, mal Flaeche. Fehlt er, fehlt auch der
+       Abschlag: kein Verfahren rechnet halb. */
+    let erbbau = null;
+    if (ref && ref.leasehold) {
+      try {
+        /* Bodenwert: Bodenrichtwert mal Flaeche, bei einer ETW auf den
+           Miteigentumsanteil heruntergerechnet. Ohne den MEA faellt der
+           Bodenwert um den Faktor der Einheitenzahl zu hoch aus - und mit
+           ihm der ganze Abschlag. Der Bodenrichtwert kommt aus BORIS oder,
+           wenn der nichts liefert, aus der Nutzereingabe. */
+        const _brwSqm = (landValue && landValue.available && Number(landValue.value_sqm) > 0)
+          ? Number(landValue.value_sqm)
+          : (Number(ref.land_value_manual) > 0 ? Number(ref.land_value_manual) : null);
+        const _anteil = (Number(ref.mea_pct) > 0 && Number(ref.mea_pct) <= 100) ? Number(ref.mea_pct) / 100 : 1;
+        const _bwGesamt = (_brwSqm != null && Number(ref.plot_area) > 0)
+          ? _brwSqm * Number(ref.plot_area) * _anteil : null;
+        /* ═══ Der ANGEMESSENE Erbbauzins kommt amtlich, wo es ihn gibt ═════
+           § 50 Abs. 3 ImmoWertV verlangt den Zinssatz, der "bei Neubestellung
+           von Erbbaurechten der betroffenen Grundstuecksart am
+           Wertermittlungsstichtag im gewoehnlichen Geschaeftsverkehr
+           ueblich" ist. Eine bundesweite Marktmitte von 3,5 % ist dafuer
+           nur der Notnagel.
+
+           Das Register fuehrt 15 oertliche Erbbauzinssaetze (gemessen im
+           Betrieb: "erbbauzinssatz=15"), Gemeindemittel aus ausgewerteten
+           Kauffaellen, mit eigenem Modellvermerk. Wo einer vorliegt, gilt
+           er - mit seinem Hinweis, denn er ist ausdruecklich KEIN vom
+           Gutachterausschuss abgeleiteter Modellparameter. Wer damit
+           bewertet, muss es begruenden; also sagen wir, woher er kommt.
+
+           Modellkonformitaet ist das Leitprinzip: wo die Quelle endet,
+           endet die Rechnung, und jede Zahl traegt ihre Herkunft. */
+        let _zinsAmtlich = null, _zinsQuelle = null, _zinsHinweis = null;
+        try {
+          const _gAgs = (macroBundle && macroBundle.agsInfo && macroBundle.agsInfo.gemeinde_ags) || null;
+          const _kAgs = (macroBundle && macroBundle.agsInfo && macroBundle.agsInfo.kreis_ags) || null;
+          const _tref = _gAgs ? findeKennzahl('erbbauzinssatz', _gAgs)
+                    : (_kAgs ? findeKennzahl('erbbauzinssatz', _kAgs) : []);
+          const _e = (_tref && _tref.length) ? _tref[0] : null;
+          if (_e && _e.formel && _e.formel.form === 'konstante' && Number(_e.formel.wert) > 0) {
+            _zinsAmtlich = Number(_e.formel.wert);
+            _zinsQuelle = _e.formel.bezeichnung || 'oertlicher Erbbauzinssatz';
+            _zinsHinweis = _e.formel.hinweis || null;
+          }
+        } catch (e) { /* ohne amtlichen Satz rechnet die Vorgabe weiter */ }
+
+        const _mv = (valuation && valuation.market_value && valuation.market_value.estimated != null)
+          ? valuation.market_value.estimated : null;
+        const _rnd = (_wertParams && _wertParams.restnutzungsdauer != null)
+          ? _wertParams.restnutzungsdauer
+          : (ref.build_year ? Math.max(20, 80 - (new Date().getFullYear() - ref.build_year)) : null);
+        erbbau = Erbbaurecht.compute({
+          volleigentum: _mv,
+          bodenwert: _bwGesamt,
+          restlaufzeit: ref.leasehold_years_left,
+          erbbauzins: ref.leasehold_rent_year,
+          objektart: ref.property_type,
+          restnutzungsdauer: _rnd,
+          zinssatzAngemessen: _zinsAmtlich,
+        });
+        if (erbbau && erbbau.ok && _zinsAmtlich != null) {
+          erbbau.annahmen.zinsQuelle = _zinsQuelle;
+          erbbau.annahmen.zinsHinweis = _zinsHinweis;
+          erbbau.hinweise.push(`Der angemessene Erbbauzins von ${_zinsAmtlich.toFixed(1).replace('.', ',')} % ist oertlich erhoben (${_zinsQuelle}), nicht die bundesweite Marktmitte.`);
+        }
+        step(erbbau.ok
+          ? `Erbbaurecht: Abschlag ${Math.round(erbbau.abschlag).toLocaleString('de-DE')} EUR (${erbbau.abschlagPct.toFixed(1)} %)`
+          : `Erbbaurecht: erkannt, aber nicht rechenbar (fehlt: ${erbbau.fehlt.join(', ')})`);
+      } catch (e) {
+        step('erbbaurecht: fehler ' + e.message);
+        erbbau = null;
+      }
+    }
+
     const crossCheck = CrossCheckService.compute(ref, landValue, rent, valuation, _wertParams);
 
     /* v1141b · Der Bodenwert-Rechenweg blieb im Backend liegen.
@@ -779,6 +896,32 @@ export const ReportOrchestrator = {
       dealpilot: dealpilotMeta, // berechneter DealScore + KI-Analyse (Zweitmeinung)
       rent_trend_pct: insights && insights.series ? insights.series.rent_cagr_pct : null,
       price_trend_pct: insights && insights.series ? insights.series.price_cagr_pct : null,
+      /* v1316 - Marcels Frage: "wenn ich ganz am anfang die erweiterte
+         marktpreisindikation ausgewaehlt habe sollte er auch die daten fuer
+         bevoelkerung micro und makrolage haben warum fuellt er das nicht
+         automatisch aus? fehlen ihm werte?"
+
+         Gemessen: die Werte waren DA, sie kamen nur nie vorn an. Destatis
+         liefert bevoelkerung_trend (Kreis Herford: +0,152 Prozent pro Jahr,
+         live geprueft am 11.09.2026), die Angebotsdauer steckt in
+         insights.dynamics - beides blieb im Bericht stehen, statt ins
+         Formular zu wandern. Jetzt stehen sie flach im Payload, damit die
+         Karte sie ohne Umweg lesen kann. */
+      /* v1320: der Erbbaurechts-Abschlag steht NEBEN dem Marktwert,
+         nicht darin. valuation bleibt der Volleigentumswert - das ist er,
+         und so wird er gemeldet. Wer beides sieht, versteht den
+         Unterschied; wer nur eine gekuerzte Zahl sieht, fragt sich, warum
+         sie so niedrig ist. */
+      erbbaurecht: erbbau,
+      /* v1321: der Marktkontext - vermietet gegen frei, Energieklassen-
+         Spreizung, Angebotsrendite, Erbbaurechts-Anteil. Alles aus
+         KPI-Abrufen, also gratis. Was die Datenlage nicht hergibt,
+         fehlt hier; keine Zahl wird geschaetzt. */
+      marktkontext,
+      bevoelkerung_trend_pct: (macroRaw && macroRaw.metrics && macroRaw.metrics.bevoelkerung_trend != null)
+        ? macroRaw.metrics.bevoelkerung_trend : null,
+      days_on_market: (insights && insights.dynamics && insights.dynamics.days_on_market != null)
+        ? insights.dynamics.days_on_market : null,
       meta: {
         generated_at: new Date().toISOString(),
         sources: ['geoapify', 'overpass', 'geomap', (landValue && landValue.available) ? 'boris-nrw' : null].filter(Boolean),

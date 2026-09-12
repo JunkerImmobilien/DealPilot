@@ -277,6 +277,8 @@
     var avmOff = !(_avmHealth && _avmHealth.available);
     var _doc = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>';
     var _mic = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>';
+    /* v1278: Kette als Zeichen fuer den Inserat-Weg. */
+    var _link = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
     var _plane = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><g transform="rotate(90 12 12)"><path d="M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></g></svg>';
     // PRE-FLIGHT-Kachel mit verstecktem Checkbox-Input (Logik unveraendert) + LED an .on
     function pfTileLogo(value, inner, disabled, title, extraCls) {
@@ -498,20 +500,101 @@
   function selectedSources() { var out = [], m = $(MOUNT_ID); if (!m) return out; m.querySelectorAll('.dp-pf-tile input:checked').forEach(function (c) { out.push(c.value); }); return out; }
   function setProg(t) { var p = $('oab-prog'); if (p) { p.style.display = t ? '' : 'none'; p.textContent = t || ''; } }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1293 · DIE KETTE — was sich auslesen laesst, wird zuerst ausgelesen
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Auftrag: „Wenn da jemand Marktbewertung anklickt, aber auch
+     Exposé/Marktbericht und Sprache, dann sollte auf jeden Fall als
+     Erstes die Exposé- und Marktberichte eingelesen werden. Dann sollten
+     wir die Daten, die wir daraus schon extrahieren, auch im Sprachlauf
+     mit integrieren, wenn es sie schon gibt, und nur noch die Sachen
+     nachfragen, die uns fehlen."
+
+     Bis hierher lief `voice` ZUERST (v503, „voice-first"). Das war
+     richtig, solange der Sprechlauf ein Diktat war: erst reden, dann
+     Dokumente nachschieben. Seit v1288 ist er ein gefuehrter Dialog — und
+     ein Dialog, der nach dem Kaufpreis fragt, waehrend er zwei Klicks
+     spaeter im Exposé steht, ist kein guter Dialog.
+
+     DIE NEUE ORDNUNG folgt dem Aufwand fuer den Menschen:
+
+       1. import        Exposé/Marktbericht — Maschine liest, Mensch wartet
+       2. immometrica   dasselbe aus dem Portal
+       3. voice         der Mensch ergaenzt, was die Maschine nicht fand
+       4. pricehubble / sprengnetter / dealpilot
+                        Marktbewertung — braucht die Adresse, also zuletzt
+
+     UND DIE MARKTBEWERTUNG WANDERT IN DEN SPRECHLAUF, wenn beide gewaehlt
+     sind: dort kann der Nutzer die Stufe waehlen (einfach oder erweitert,
+     je nach Plan und Kontingent), sie laeuft im Hintergrund weiter, und
+     ihre Werte landen in derselben Uebernahme-Tabelle wie alles andere.
+     Danach meldet der Sprechlauf zurueck, dass er sie erledigt hat —
+     sonst liefe sie zweimal und kostete zweimal. */
+  /* v1293b: Ein Schnappschuss der Formularwerte. Nur so laesst sich
+     sagen, was der IMPORT gebracht hat — und nicht, was ohnehin schon
+     dastand. Gemessen ohne ihn: „71 Angaben aus dem Exposé", obwohl der
+     Import zehn Felder gefuellt hatte. Der Rest waren die Vorgaben aus
+     `index.html` (Notar 2,20 %, Grunderwerbsteuer 6,50 %, Mietsteigerung
+     3 % …). Eine Zahl, die der Nutzer nicht wiedererkennt, ist schlimmer
+     als keine. */
+  function _formularStand() {
+    var out = {};
+    try {
+      (window.FIELDS || []).forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el || el.type === 'checkbox') return;
+        var v = String(el.value || '').trim();
+        if (v !== '') out[id] = v;
+      });
+    } catch (e) {}
+    return out;
+  }
+  function _formularNeu(vorher) {
+    var jetzt = _formularStand(), neu = [];
+    Object.keys(jetzt).forEach(function (id) {
+      if (vorher[id] !== jetzt[id]) neu.push(id);
+    });
+    return neu;
+  }
+
   async function runSelected() {
     var srcs = selectedSources();
     if (!srcs.length) { toast('Bitte mindestens eine Quelle auswählen'); return; }
-    var order = ['voice', 'import', 'immometrica', 'pricehubble', 'sprengnetter', 'dealpilot'];  /* v503-voice-first; v667 immometrica */
+    /* v1293: Dokumente vor Sprache vor Marktbewertung (war: voice-first). */
+    var order = ['import', 'immometrica', 'voice', 'pricehubble', 'sprengnetter', 'dealpilot'];
     var ordered = order.filter(function (s) { return srcs.indexOf(s) !== -1; });
     var btn = $('oab-run'); if (btn) btn.disabled = true;
+    /* Was vorher lief, weiss der naechste Schritt — der Sprechlauf sagt
+       dann „ich habe X Angaben aus dem Exposé" statt bei null anzufangen. */
+    var vorlauf = [], mbImSprechlauf = false;
+    /* v1293b: Der Stand VOR der Kette — die Differenz sagt, was die
+       automatischen Quellen wirklich gebracht haben. */
+    var standVorher = _formularStand();
     for (var i = 0; i < ordered.length; i++) {
       var s = ordered[i];
       try {
-        if (s === 'voice') { setProg('Sprachaufzeichnung …'); await new Promise(function (res) { if (window.VoiceImport) { window.VoiceImport.open(res); } else { res(); } }); }  /* v503-voice-run */
-        else if (s === 'import') { setProg('Import …'); await new Promise(function (res) { openCombinedImport(res); }); }
-        else if (s === 'immometrica') { setProg('ImmoMetrica …'); await new Promise(function (res) { if (window.ImmoMetricaImport) window.ImmoMetricaImport.open(function (picked) { applyImmometrica(picked); res(); }, { target: 'obj', onClose: function () { res(); } }); else res(); }); }
+        if (s === 'voice') {
+          setProg('Sprachaufzeichnung …');
+          var _mbGewaehlt = srcs.indexOf('dealpilot') !== -1;
+          var _erg = await new Promise(function (res) {
+            if (window.VoiceImport) {
+              window.VoiceImport.open(res, { vorlauf: vorlauf.slice(), marktbewertung: _mbGewaehlt,
+                                             vorlaufFelder: _formularNeu(standVorher) });
+            } else res();
+          });
+          /* Hat der Sprechlauf die Marktbewertung selbst geholt, faellt sie
+             hier aus — zweimal abrufen heisst zweimal bezahlen. */
+          if (_erg && _erg.marktGeholt) mbImSprechlauf = true;
+          vorlauf.push('voice');
+        }
+        else if (s === 'import') { setProg('Import …'); await new Promise(function (res) { openCombinedImport(res); }); vorlauf.push('import'); }
+        else if (s === 'immometrica') { setProg('ImmoMetrica …'); await new Promise(function (res) { if (window.ImmoMetricaImport) window.ImmoMetricaImport.open(function (picked) { applyImmometrica(picked); res(); }, { target: 'obj', onClose: function () { res(); } }); else res(); }); vorlauf.push('immometrica'); }
         else if (s === 'pricehubble' || s === 'sprengnetter') { setProg((s === 'pricehubble' ? 'PriceHubble' : 'Sprengnetter') + ' …'); await avmFetch(s); }
-        else if (s === 'dealpilot') { setProg('DealPilot-Marktbewertung …'); try { if (window.DealPilotMB) await window.DealPilotMB.run(); } catch (e) {} }
+        else if (s === 'dealpilot') {
+          if (mbImSprechlauf) { try { console.log('[obj-actions] DealPilot-Marktbewertung lief schon im Sprechlauf'); } catch (e) {} continue; }
+          setProg('DealPilot-Marktbewertung …');
+          try { if (window.DealPilotMB) await window.DealPilotMB.run(); } catch (e) {}
+        }
       } catch (e) { try { console.warn('[obj-actions] step', s, e); } catch (_) {} }
     }
     setProg(''); if (btn) btn.disabled = false;
@@ -942,6 +1025,27 @@
   }
   function setSelIfEmpty(id, v) { var el = $(id); if (!el || !v || el.value) return; el.value = v; try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} }
   function setInput(id, v) { var el = $(id); if (!el || v == null || v === '') return; el.value = v; try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {} }
+  /* v1313: die Erbbau-Zeile ueber dem Ergebnisblock der Marktbewertung.
+     Sie wird angelegt, wenn sie gebraucht wird, und verschwindet wieder,
+     sobald das Erbbaurecht abgewaehlt ist - sonst bliebe sie an einem
+     Volleigentums-Objekt stehen und behauptete etwas Falsches. */
+  function _erbHinweisZeigen(html) {
+    var id = 'oab-erb-hinweis';
+    var alt = document.getElementById(id);
+    if (!html) { if (alt) alt.remove(); return; }
+    var host = document.getElementById('oab-results');
+    if (!host || !host.parentNode) return;
+    var box = alt;
+    if (!box) {
+      box = document.createElement('div');
+      box.id = id;
+      box.style.cssText = 'margin:8px 0;padding:8px 10px;border-radius:8px;font-size:12px;line-height:1.5;' +
+        'border:1px solid var(--wl-c9a84c, #C9A84C);background:var(--gold-bg, rgba(201,168,76,.08))';
+      host.parentNode.insertBefore(box, host);
+    }
+    box.innerHTML = html;
+  }
+
   function applyAvm(r) {
     if (!r) return;
     var mw = pickMW(r), mm = pickMM(r), wfl = numDe(val('wfl')) || 0, _ap = [];
@@ -955,6 +1059,39 @@
     try { if (typeof window._v236MarkQcLoaded === 'function' && _ap.length) window._v236MarkQcLoaded(_ap); } catch (e) {}
     try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
     try { if (typeof window.renderDealScore2 === 'function') window.renderDealScore2(); } catch (e) {}
+    /* ═══ v1313 · Erbbaurecht in der Marktbewertung ═══════════════════════
+       Marcels Vorgabe: „ganz wichtig mit unter Marktbewertung mit einbauen."
+
+       Kein Bewertungspartner nimmt das Erbbaurecht entgegen. Gemessen am
+       11.09.2026 gegen die echte GeoMap-API (Guthaben 258,00 -> 257,90 EUR):
+       leasehold, heritableBuildingRight, groundLease, erbbaurecht und
+       erbpacht quittiert sie samt und sonders mit 400 „Unrecognized field",
+       und der Detail-Abruf kennt keins der Woerter. Sprengnetter und
+       PriceHubble bekommen den Parameter ebenfalls nicht uebergeben.
+
+       Was hier also ankommt, ist IMMER ein Volleigentumswert - auch bei
+       einem Erbbaurechts-Objekt. Der Wert wandert unveraendert nach
+       #svwert (das ist richtig so: dort steht der Volleigentumswert, und
+       calc() kuerzt ihn beim Rechnen). Was fehlte, war der Satz dazu -
+       sonst liest jemand 320.000 und haelt das fuer den Wert SEINER
+       Wohnung. */
+    try {
+      if (window.DealPilotErbbau && DealPilotErbbau.istAn()) {
+        var _er = DealPilotErbbau.rechnen();
+        var _txt = '<b>Erbbaurecht:</b> ' + r.provider + ' bewertet Volleigentum — das Grundstück ist hier nicht dabei. ';
+        if (_er && _er.ok) {
+          _txt += 'DealPilot rechnet nach § 50 ImmoWertV einen Abschlag von <b>' +
+            Math.round(_er.abschlag).toLocaleString('de-DE') + ' € · ' +
+            _er.abschlagPct.toFixed(1).replace('.', ',') + ' %</b> — der Verkehrswert im Formular bleibt der Volleigentumswert, ' +
+            'Wertpuffer, Wertsteigerung und Deal Score rechnen aber mit dem gekürzten Wert.';
+        } else {
+          _txt += 'Für den Abschlag fehlen noch Angaben (Restlaufzeit, Bodenwert) — siehe Reiter Objekt, Grund &amp; Boden.';
+        }
+        _erbHinweisZeigen(_txt);
+      } else {
+        _erbHinweisZeigen(null);
+      }
+    } catch (e) {}
     toast('✓ ' + r.provider + '-Werte übernommen (' + spanLabel() + ')');
   }
 
@@ -1307,7 +1444,53 @@
       r.addEventListener('change', function () { _addrChoice = r.value; renderMergedTable(); });
     });
   }
-  function _fireOabiDone() { var d = _oabiDone; _oabiDone = null; if (typeof d === 'function') { try { setTimeout(d, 0); } catch (e) { d(); } } }
+  /* ═══════════════════════════════════════════════════════════════════
+     v1317 · DIE FUNKTION, DIE ES NIE GAB
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Befund, seit Wochen und in drei Sitzungen wiederholt: „wenn
+     ich Exposé und Marktbericht auswähle und Sprache, dass er die Daten
+     dann ausliest … aber er dann nicht weiter zum Sprechlauf geht."
+
+     GEMESSEN am 11.09.2026 im Browser:
+
+       Uncaught ReferenceError: _fireOabiDone is not defined
+
+     `_fireOabiDone()` wird an ZWEI Stellen gerufen — beim Schliessen des
+     Import-Fensters (Z. 1466) und beim Übernehmen der Werte (Z. 1620) —
+     und war NIRGENDWO definiert. Ein `grep` über das ganze Frontend
+     findet genau diese zwei Aufrufe und keine Definition.
+
+     WAS DAS HEISST: der Import meldet der Kette nie „fertig". Die Zeile
+
+       await new Promise(function (res) { openCombinedImport(res); });
+
+     in `runSelected()` wird nie aufgelöst. Die Kette bleibt beim ersten
+     Schritt stehen — für immer. Sprechlauf und Marktbewertung kommen nie
+     dran.
+
+     WARUM ES SO LANGE UNSICHTBAR WAR: das Overlay wird VOR dem Aufruf
+     entfernt (`ov.remove(); _fireOabiDone();`). Der Nutzer sieht also,
+     wie sein Import sauber schliesst und die Werte im Formular stehen.
+     Dass danach nichts mehr passiert, sieht aus wie „fertig", nicht wie
+     ein Absturz. Und wer den Import EINZELN öffnet, merkt es nie: dort
+     wartet niemand auf den Rückruf.
+
+     Der v1310-Fix (zwei Fenster, eine ID) war richtig und ist nicht
+     umsonst — er hat einen ZWEITEN Abbruch behoben, der darunter lag.
+     Dieser hier war der erste.
+
+     `_oabiDone` wird VOR dem Aufruf geleert: ein zweiter Aufruf — etwa
+     weil `close()` nach `applyMerged()` noch einmal durchläuft — darf die
+     Kette nicht ein zweites Mal weiterschieben. */
+  function _fireOabiDone(payload) {
+    var done = _oabiDone;
+    _oabiDone = null;
+    if (typeof done !== 'function') return;
+    try { done(payload || {}); } catch (e) {
+      try { console.warn('[obj-actions] onDone warf:', e); } catch (_) {}
+    }
+  }
+
   function openCombinedImport(onDone, opts) {
     _oabiDone = (typeof onDone === 'function') ? onDone : null;
     _qcMode = !!(opts && opts.target === 'qc');  /* v418 */

@@ -36,10 +36,363 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Stand 09.09.2026)
+## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
 
-**Stand:** lokal = GitHub = Staging auf `v1272`. **Produktion auf `d7939d6`**.
-`v1265` bis `v1271` sind live, **`v1272` noch nicht**.
+**Stand:** `v1273`–`v1310d` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
+— nichts davon ist live.
+
+> **Nach Marcels erstem echten Sprechlauf am 10.09. abends** (Bilder
+> `design/mockups/sprechlauf2.png` und `sprechlauf3.png`) sind fuenf Befunde
+> behoben: das Freisprechen war kaputt (der Ringpuffer warf den WebM-Header
+> weg — daher „Audio file might be corrupted"), die Uebersichtsspalte riss
+> auseinander (zwei `.vi-rf-st`-Regeln, die spaetere gewann), der Dialog war
+> fuer dunklen Grund gebaut und laeuft auf Weiss, der Klick-Weg des
+> Markt-Angebots blieb haengen, und das Rate-Limit sperrte nach zwei
+> Durchlaeufen mit der Meldung „Zu viele PDF-Extraktionen". Einzelheiten im
+> Rollout-Journal.
+
+**Der Sprechlauf ist jetzt ein geführter Ablauf in sechs Etappen** mit einem
+Ergebnis dazwischen. Was `v1288`–`v1290e` gebracht haben, steht ausführlich im
+Rollout-Journal der Projektanweisung; die Kurzfassung:
+
+| | Etappe | danach |
+|---|---|---|
+| 1 | Basis (Adresse, Objekt, Preis, Miete) | Marktpreisindikation startet |
+| 2 | Geld (Finanzierung, **Kaufnebenkosten**) | **Deal Score** |
+| 3 | Lage & Zustand | **Deal Score 2.0** |
+| 4 | Feinschliff (Hausgeld, Entwicklung, Markt, Steuer) | — |
+| 5 | Deine Sicht | **Abschluss** mit beiden Scores |
+| 6 | Feinheiten (auf Wunsch) | — |
+
+Dazu: Kaufnebenkosten aus drei Quellen mit Herkunftsangabe, amtliche
+Grunderwerbsteuer aus der PLZ, BORIS und Marktpreisindikation auf ein
+gesprochenes „ja", die Herkunft je Feld in der Übernahme-Tabelle, die Skalen in
+der Frage, und ein Co-Pilot, der seine eigenen Kennzahlen kennt.
+
+---
+
+### 1 · Zwei Wünsche aus dem 10.09., die noch offen sind
+
+**„Die KI muss alles raushören und nachfragen."** Teilweise da: seit `v1290`
+hakt der Co-Pilot nach, wenn er nur einen Teil eines Blocks verstanden hat
+(„Das habe ich. Fehlt noch: Hausnummer"), und ein offen endender Satz wird
+gemerkt statt ausgewertet. Was fehlt, ist das **Heraushören von Angaben, die
+gar nicht gefragt waren** — wer bei der Miete schon das Baujahr mitnennt, soll
+es behalten dürfen. Heute filtert `_rfUebernehmen` auf `e.ids`, also auf das,
+wonach gefragt war. **Aufwand:** klein. **Vorsicht:** die Filterung war
+Absicht — sie verhindert, dass ein Modell Felder rät, die im Satz nicht
+vorkommen. Der Weg wäre, den Katalog um die *nächsten* Blöcke zu erweitern
+statt um alle.
+
+**„Unter Deal-Aktion die Werte einbeziehen."** Der Break-even ist drin
+(`IrrEngine.breakEven`, dieselbe Rechnung wie die Kennzahlen-Kachel). Was der
+Sprechlauf noch nicht liest, sind die übrigen Größen aus dem Deal-Aktion-Modul
+— IRR, Exit-Erlös, Restschuld am Ende der Zinsbindung. Sie brauchen die volle
+`calc()`-Kette und damit ein gefülltes Formular; im Sprechlauf gibt es das
+bewusst nicht. **Zu klären:** ob eine Näherung dafür reicht, oder ob diese
+Zahlen erst nach der Übernahme gehören.
+
+### 2 · Echtes Sprechen abnehmen — das kann nur Marcel
+
+Die Reparatur des Freisprechens (`v1290`) ist am Kern **bewiesen**: der
+WebM-Header überlebt den Ringpuffer, der Recorder läuft durch, und
+`[kopf].concat(chunks)` ergibt `1a 45 df a3` — eine gültige Datei. Gemessen
+mit einem synthetischen Audiostrom im Browser.
+
+**Was ein automatisierter Browser nicht kann, ist sprechen.** Diese Punkte
+bleiben ein Abnahmepunkt:
+
+- Löst die Stillepause von **1,6 s** bei einer echten Denkpause noch aus?
+- Wird ein **Nachschlag** („… ähm … in Hüllhorst") wirklich an dieselbe Frage
+  gehängt?
+- Greift die Erkennung des **offenen Satzendes** bei echten Transkripten?
+
+Wenn dabei wieder etwas hakt: die Konsole trägt jetzt `[voice]`-Zeilen mit dem
+Grund, und `window.VoiceImport._fsStand()` zeigt Phase, Kopf, Chunks und den
+gemerkten Satzanfang.
+
+### 3 · Die Sprachqualität messen — mit echtem Material
+
+`OPENAI_TRANSCRIBE_MODEL`: **auf Staging steht seit dem 09.09. das mini**, auf
+Prod weiterhin das große `gpt-4o-transcribe` (dafür fehlt die Freigabe).
+
+**Über die Qualität ist damit nichts gesagt.** Dieselbe Datei ergab bei zwei
+Läufen desselben Modells zwei verschiedene Ortsnamen — Transkription ist nicht
+deterministisch. Wer das entscheiden will, braucht eine **Messreihe mit echten
+Diktaten**, keinen Einzellauf.
+
+**Der Sprechlauf liefert das Material.** Sobald Marcel ihn ein paar Mal
+gesprochen hat, ist die Reihe da.
+
+Die Zahlen dahinter: mini kostet die Hälfte (3,00 statt 6,00 USD je Mio
+Audio-Token) und ist 37 % schneller (1864 ms gegen 2944 ms). Der Wechsel senkt
+die Kosten einer Aufnahme um rund 40 % — bei 4 Minuten von ≈ 1,7 auf ≈ 0,9 Cent.
+
+### 4 · Der Sprechlauf gehört auf Produktion
+
+**`v1273`–`v1310d` liegen auf Staging.** Prod steht auf
+`a21fe9c` — der Co-Pilot, die Etappen, beide Scores, BORIS-Abruf und
+Marktpreisindikation im Hintergrund sind für keinen Kunden erreichbar.
+
+**Das braucht Marcels ausdrückliche Freigabe** (Produktion, und der Rollout
+berührt einen Backend-Endpunkt: `/ai/copilot-frage`). Vorher wie immer
+sichern — beide Datenbanken, `dealpilot-mb-db` mit eigenem `pg_dump`.
+
+### 5 · Der Gold-Altbestand
+
+468 Fundstellen sind als Basislinie eingefroren, der Wächter meldet nur noch
+Neues. Abgetragen wird, wenn eine Datei ohnehin angefasst wird. Vor dem ersten
+echten Whitelabel-Kunden gehören `pricing-modal.js` (53),
+`reseller-portal.js` (43) und `qc-bridge.js` (39) gezielt nachgezogen.
+
+### 6 · Doppelte Plausibilitätsprüfung
+
+Marcels Wunsch vom 08.09., **zurückgestellt**. Der Code liegt vollständig da,
+`OPENAI_VOICE_VERIFY=1` schaltet ihn an.
+
+### 7 · IRR/Break-Even ins Portfolio-Cockpit
+
+**Teilweise erledigt** — sie stehen in den Kennzahlen-Kacheln (Reiter
+Bewertung); im Portfolio-Cockpit noch nicht.
+
+### 8 · Der Einzelkauf — welche Fassung?
+
+`design/Vorschläge/einzelkauf-demo.html` zeigt drei Wege, die eine fehlende
+Bewertung zu verkaufen:
+
+| | Variante | wirkt |
+|---|---|---|
+| **A** | ruhige Liste unter dem Nachkauf | überall, auch ohne Anlass |
+| **B** | am Fehlerpunkt in der Aktionsleiste | genau dann, wenn das Kontingent leer ist |
+| **C** | Kacheln | — |
+
+**Empfehlung: A und B, C weglassen.** A ist gebaut und liegt seit `v1294`
+live auf Staging (Preis-Modal und Einstellungen). **B fehlt noch** — wenn
+der Sprechlauf am leeren Kontingent hängt, steht dort heute nur die
+Meldung, nicht der Ausweg.
+
+**BLOCKIERT:** wartet auf Marcels Wahl aus der Demo. Geld und Optik —
+das entscheidet er.
+
+### 9 · Der Sprechlauf: Marcels Auftrag vom 11.09. — ABGEARBEITET
+
+Die Rückmeldung zu den Bildern `fragen.png`, `sanierung.png`,
+`dealscore2.png`, `entwicklung.png` ist gebaut (`v1306`–`v1306d`), und die
+fünf Punkte darunter sind es ebenfalls (`v1307`–`v1308c`). **Offen bleiben
+nur zwei Läufe gegen echte Daten**, beide unten vermerkt.
+
+**a) Den Marktbericht auswerten** — **FERTIG in `v1307`**. Kernfunktion gemessen (Berichtstext → `wachsend` · `mittel` · `mittel` · `begrenzt`); der volle Lauf mit einer echten erweiterten Marktpreisindikation kostet Kontingent und steht noch aus.
+*„Diese Sachen wie Entwicklung, also Bevölkerung, Nachfrage,
+Wertsteigerung, Entwicklungsmöglichkeiten, das kriegen wir ja bei der
+erweiterten Marktpreisindikation ausgewertet im Marktbericht. Also du
+kannst den kompletten Marktbericht dann auch auswerten und auch die Sachen
+übernehmen."*
+
+Danach der Vorschlag im Dialog: *„Aus der erweiterten Marktpreisindikation
+habe ich entnehmen können, dass die und die Werte so und so angenommen
+sind, sollen wir die auch so übernehmen?"* — bestätigbar per Sprache oder
+Text.
+
+**b) Auswahlfelder anklickbar** — **FERTIG in `v1307`**. Gemessen bei
+„Zustand & Energieausweis": 24 Knöpfe in 4 Gruppen, zwei Klicks, und der
+Dialog ging selbstständig zur nächsten Frage. Gilt für jede Frage mit
+Auswahlfeldern, auch Qualität und Zustand.
+
+**c) Die Pre-Flight-Kombination** — **FERTIG in `v1308`**, gemessen: 8 Angaben übernommen, Liste zum Nachsehen, Stufenwahl, 14 statt 16 Fragen. Marktbewertung + Exposé /
+Marktbericht + Sprache zusammen: erst die Quellen lesen, dann sagen *„ich
+habe schon einige Werte aus dem Marktbericht und dem Exposé gelesen"*, dann
+**nur** Adresse und Übernahme bestätigen lassen — und danach ausschließlich
+die fehlenden Felder fragen. Der Bericht gehört ins Objekt, die
+Marktpreisindikation unter die Pre-Flight-Karte wie sonst auch.
+
+**d) ImmoMetrica** — **FERTIG in `v1308`**: läuft durch dieselbe Kette (`import → immometrica → voice`), `VORLAUF_NAME` kennt es, die Vorlaufkarte zeigt seine Werte. Ein Lauf gegen ein echtes ImmoMetrica-Testobjekt steht noch aus.
+
+**e) Fehlende Straße → Ortszentrum** — **FERTIG in `v1308`**, gemessen: Angebot erscheint, Klick und Sprache führen zum Ziel, Herkunft trägt „Näherung". *„Da fehlt manchmal zum
+Beispiel die Straße. Da könnten wir auch den Vorschlag machen, ob wir
+vielleicht einfach das Zentrum dann annehmen."* Bei bekanntem Ort ohne
+Straße also anbieten, mit dem Zentrum zu rechnen.
+
+**Marcels Maßstab dazu:** *„hier jetzt nochmal ganz genau drauf achten. Das
+muss wirklich hundertprozentig werden. Und der muss sehr schlau reagieren
+können, also im gesamten Kontext."*
+
+### 10 · Was uns eine Bewertung im Einkauf kostet — ungeführt
+
+**Es gibt keine Einkaufspreisliste.** Die einzigen Kostenzahlen im ganzen
+Repo stehen in einem Kommentar, der ausdrücklich als *„STILLGELEGT v1183"*
+markiert ist (`backend/src/routes/avm.js:92`):
+
+> PriceHubble 40 L (Kosten 6 EUR), Sprengnetter 20 L (Kosten 3 EUR, 2 API-Calls)
+
+Aus der Kerosin-Zeit, nie gegen einen aktuellen Vertrag nachgeführt. Für
+`mpi` / `mpi_plus` / `wev` gibt es **gar keine** Zahl; sie kosten real nur
+KI-Token (`gpt-4.1-mini`) und liegen erfahrungsgemäß im Zehntel-Cent-Bereich.
+
+**Was fehlt:** die echten Vertragspreise je Abruf. Die hat nur Marcel. Mit
+ihnen entsteht eine Übersicht, die je Posten Verkaufspreis, Einkauf und Marge
+zeigt — an **einer** Stelle, so wie die Verkaufspreise in `config.js`.
+
+**BLOCKIERT:** braucht Marcels Vertragszahlen.
+
+### 11 · Vor dem Prod-Rollout: wem nimmt der Verfall etwas?
+
+`v1296` dreht die Regel um — das Monatskontingent verfällt, nur Gekauftes
+bleibt. Auf Staging ist das ohne Folgen (Testkonten). **Auf Produktion ist
+ungezählt, wie viel angespartes Guthaben in `mpi_bank` / `mpi_plus_bank` /
+`wev_bank` liegt.**
+
+Der bestehende Bestand bleibt bewusst stehen (siehe Journal), es geht also
+niemandem etwas verloren. Trotzdem gehört die Zahl vor dem Rollout auf den
+Tisch: wer bisher angespart hat, wird ab dem nächsten Monatswechsel **nichts
+Neues** mehr ansammeln, und das ist eine Änderung an einer Zusage.
+
+```sql
+SELECT COUNT(*) FILTER (WHERE mpi_bank + mpi_plus_bank + wev_bank > 0),
+       SUM(mpi_bank), SUM(mpi_plus_bank), SUM(wev_bank)
+  FROM ai_credits_user;
+```
+
+**BLOCKIERT:** der Lesezugriff auf die Prod-Datenbank ist in dieser Sitzung
+abgelehnt worden. Marcel kann die Abfrage selbst fahren oder den Zugriff
+freigeben.
+
+---
+
+## → Erledigt am 11.09.2026, fünfter Teil (`v1300`–`v1303`)
+
+| Marcels Punkt | Stand |
+|---|---|
+| Verlauf scrollt „manchmal" nicht ans Ende | **fertig** — dreimal ans Ende (sofort, nächstes Bild, nach 260 ms); wer selbst hochgescrollt hat, bleibt oben |
+| Balken mit den Abruf-Knöpfen zu hoch | **fertig** — statt einem Erklärabsatz je Aktion EINE Zeile, die dem Zeiger folgt; `vi-rf-dran` 107 px statt ~180 |
+| Mikrofon- und Tippzeile flacher | **fertig** — 53→49, 43→36, 33→28; Klickflächen bleiben über 36 px |
+| Modal größer | **fertig** — 94→97 vh, 1240→1360 px; Modal 929→958 px |
+| „Was schon steht" auch beim freien Erzählen | **fertig** — geteilte Ansicht, Spalte 320×512 px, 16 Zeilen in 5 Etappen, gefüllt aus Formular und Auswertung |
+| Sprachaufzeichnung so breit wie der geführte Sprechlauf | **fertig** — Wahlseite 760 px, Aufnahme 1360 px; die Breitenregel lag im Block, den der freie Weg nie lädt |
+| Schwarzes Feld rechts, Eingabefenster nach „Übernehmen" weg | **fertig** — die Spalte blieb stehen, wenn das Aufnahmefenster ging (mein Fehler aus v1300b); `_recAus`/`_recAn` räumen jetzt als Paar |
+| Beide Sprachaufzeichnungen auf Tablet und Handy | **fertig** — im iframe gemessen: der geführte Weg brach erst bei 720 px um und war auf dem Tablet zweispaltig (Gespräch 330, Liste 340); jetzt beide bei 900 px |
+| Nach der Adresse unten nichts anklickbar, kein Scrollen (`sp2.png`) | **fertig** — `_rfHost` hängte den Dialog neben `vi-rec` und damit IN meine neue Bühne; die Flex-Kette braucht ein direktes Kind von `.oabi-body` |
+| „ja stimmt" wurde nicht als Bestätigung erkannt | **fertig** — `RF_JA` verlangte, dass der Satz MIT dem Ja endet; jetzt prüft `_istZustimmung`, ob der Satz nur aus Zustimmungswörtern besteht — 13 Formen erkannt, 7 Grenzfälle korrekt abgelehnt |
+
+**Commits** `f757dee`, `aeffda1`, `9fca4b8`, `122360f`, `63446bf`, `de73ebc`, `d17c5d3`, `f632c9b`, `696145f`. Gold-Audit RC=0.
+
+**Hinweis:** Marcel hat ein neues Bild angekündigt, das nicht im Repo
+angekommen ist — das neueste bleibt `design/mockups/sprechlauf3.png` vom
+10.09. Gearbeitet wurde nach seiner Beschreibung und eigenen Messungen im
+laufenden Dialog.
+
+## → Erledigt am 11.09.2026, vierter Teil (`v1297`–`v1299b`)
+
+| Marcels Punkt | Stand |
+|---|---|
+| Was nimmt GeoMap je Marktbericht? | **beantwortet** — aus 184 echten Läufen: MPI 0,10 € · erweiterte 0,38 € · Wertermittlung 0,51 €. Über die Hälfte der Berichte kostet gar nichts (Cache). Gegen 0,90 / 1,90 / 3,90 € Verkauf trägt die Marge in jedem Fall |
+| „5-5-5 ist nicht schön, nennt die Pakete besser" | **fertig** — Kurzstrecke · Mittelstrecke · Langstrecke, Inhalte als lesbare Zeilen; in den Einstellungen alle drei statt nur dem eigenen |
+| „Menge ändern ändert nicht die Anzahl" | **fertig** — bei Menge 3 zeigt die Langstrecke 15/15/15 zu 37,50 € |
+| Markt-Angebot bleibt offen nach der Wahl | **fertig** — beide Knöpfe verschwinden, gemessen |
+| „aus den Einstellungen übernehmen oder kann genauso bleiben" | **fertig** — sieben Formulierungen geprüft, alle erkannt; fehlt ein Vorschlag, wird das gesagt statt „nichts entnommen" |
+| Pillen mit den Schlagwörtern hinter den Fragen | **fertig** — mit grünem Haken für Felder, die schon stehen |
+| Deal Score / Investor Deal Score schlecht zu sehen | **fertig** — Score-Blasen auf volle Breite (waren auf 82 % eingerückt), Karte mit Schatten |
+| „alles kleiner, Eingabefeld größer" | **fertig** — Kopf 120 → 75 px, Bühne 367 → 428 px |
+| Liste komplett sehen | **fertig** — mehr Höhe plus Kante an der Unterkante; sie scrollte übrigens schon immer |
+| „soll verstehen, auch wenn es nicht zur Frage passt" | **fertig** — Katalog reicht die nächsten Blöcke mit (Deckel 24); gemessen: „Hermannstraße 9 … 100 Quadratmeter, Baujahr 1962" trägt Objektart, Fläche und Baujahr ein, die Fragen danach entfallen |
+
+**Commits** `3b3fc0c`, `e45a06a`, `4525bdb`, `c262a93`. Gold-Audit RC=0.
+
+### Offen aus dieser Runde
+
+- **Die Score-Karte im echten Durchlauf nachmessen.** Die Breiten-Korrektur
+  ist gebaut, aber nur die Regel ist geprüft — es braucht eine
+  vollständige Etappe 2, bis die Karte erscheint.
+- **„Ich höre nichts"** habe ich als Layout-Punkt gelesen (alles kleiner,
+  Eingabefeld größer). Falls Marcel damit das **Mikrofon** meinte, ist das
+  ein eigener Befund und noch offen.
+
+## → Erledigt am 11.09.2026, dritter Teil (`v1296`–`v1296f`)
+
+| Marcels Vorgabe | Stand |
+|---|---|
+| Die Preise für die Bewertungspartner raus | **fertig** — `avm_a`/`avm_b` aus Angebot und Katalog; gemessen: `avm_a` → HTTP 400 `invalid_pack`, beide Bänke auf Staging 0 |
+| Der Kunde wählt selbst, wie viele er nachkauft | **fertig** — Mengenwähler an Nachkauf-Karte und jeder Einzelzeile, in beiden Oberflächen; Deckel 25, gekappt statt abgelehnt |
+| Plan-Bewertungen verfallen am Monatsende | **fertig** — `_monatsReset` überträgt nichts mehr; gemessen am abgesetzten SQL, `_bank` kommt darin nicht vor |
+| Nur selbst Nachgekauftes bleibt dauerhaft | **fertig** — Verbrauchsreihenfolge Monat → Testphase → Bank passte bereits; sieben Textstellen nachgezogen |
+
+**Vier Befunde fielen beim Bauen heraus** und sind mitbehoben: der Einzelkauf
+verschwand beim Segmentwechsel; seine CSS-Regeln hingen am falschen Anker
+(seit `v1294` nackte Divs); der ganze Kaufblock stand im toten Zweig und war
+für zahlende Kunden unerreichbar; der Webhook-Rückfall multiplizierte die
+Menge nicht. Einzelheiten im Rollout-Journal.
+
+**Commits** `784ec2d`, `2bacff6`, `883da9a`, `2905a55`, `208b244`, `233112c`.
+Gold-Audit RC=0.
+
+## → Erledigt am 11.09.2026, zweiter Teil (`v1294`–`v1295`)
+
+| Marcels Wunsch | Stand |
+|---|---|
+| Landing-Pläne durchgehen, ob sie passen | **fertig** — Pläne stimmen; die Nachkauf-Sektion trug alte Zahlen |
+| Wie ist der Nachkauf gestaffelt? | **beantwortet** — je Plan das eigene Kontingent noch einmal, für ein Viertel des Monatsbeitrags: Starter `5·0·0` → 5,00 €, Investor `5·5·0` → 8,75 €, Pro `5·5·5` → 12,50 € |
+| Alte Bewertungspreise unter „Plan wechseln" raus | **fertig** — sie kauften nichts: `paket_kurz` → **HTTP 400 `invalid_pack`**, gemessen gegen den laufenden Checkout |
+| Vielleicht Bewertungspakete anbieten | **fertig** — Nachkauf **und** Einzelkauf (0,90 bis 9,90 €); der Einzelkauf lief seit `v1183`, hing aber hinter `if (creditPacks.length > 0)` und war unsichtbar |
+| Kappungsgrenze prüfen — „liegt man schon oben?" | **fertig** (`v1295`) — das Mietpotenzial wird geteilt in *im laufenden Vertrag* und *erst bei Neuvermietung*; gerechnet mit 20 %, die 15 % stehen als Hinweis daneben |
+
+**Nachgemessen:** das „Plan wechseln"-Modal zeigt **null** alte Preise, drei
+Nachkauf-Segmente, fünf Einzelkauf-Zeilen. Der Mietspielraum rechnet am
+Testobjekt Hüllhorst (490 € Ist, 782 € Markt, 100 m²) **98 € im Vertrag +
+194 € bei Neuvermietung = 292 €** — die volle Lücke.
+
+**Commits** `39995bf`, `902c74a`, `ecffdbb`, `cd1e78c`.
+
+## → Erledigt in der Nacht (`v1293`–`v1293c`) — die Pre-Flight-Kette
+
+| Marcels Wunsch | Stand |
+|---|---|
+| Exposé/Marktbericht **zuerst**, dann Sprache | **fertig** — `import` → `immometrica` → `voice` → AVM (war „voice-first" seit `v503`) |
+| Die extrahierten Daten im Sprechlauf **mitnehmen** | **fertig** — das Überspringen gab es schon, jetzt sagt der Co-Pilot es auch: „Aus Exposé / Marktbericht stehen schon 9 Angaben" |
+| Nur noch **fehlende** Sachen fragen | **fertig** — gemessen 13 statt 16 Fragen, Etappe 1 von vier auf eine |
+| Marktbewertung **im Sprechlauf**, Stufe wählbar | **fertig** — „Du hast die Marktbewertung mit ausgewählt — welche Stufe?" mit *Einfach* / *Erweitert* und Kontingentzahl |
+| Nicht zweimal abrufen | **fertig** — `done({marktGeholt})`, die Kette überspringt ihren Abruf |
+
+## → Erledigt am 10.09.2026, spät (`v1291`–`v1292d`)
+
+| Marcels Wunsch | Stand |
+|---|---|
+| Offene Fragen und Abrufe **unten** und sichtbar | **fertig** — feste Aktionsleiste zwischen Verlauf und Mikrofon; ein Ort für alle Entscheidungen |
+| **Adresse bestätigen** und Rückfrage stellen | **fertig** — mit Bundesland und Grunderwerbsteuersatz; die einzige Rückfrage im Dialog |
+| Makro-/Mikrolage **einzeln abrufen**, auch Bevölkerung | **fertig** — `/ai/lage` liefert sechs Dimensionen mit Quelle, Enums Feld für Feld gegengeprüft |
+| **Break-even** nennen | **fertig** — über `IrrEngine.breakEven`, mit benannten Annahmen |
+| **Marktmieten abgleichen**, Mietpotenzial, Steigerung | **fertig** — €/m² gegen Markt, in €/Monat und Jahr, mit Herkunft |
+| **Mietvertrag**, Index, Kappungsgrenze, Modernisierung | **fertig** — als Anhaltspunkte, ausdrücklich keine Rechtsberatung |
+| **Upside auf den Deal Score** | **fertig** — gerechnete Hebel in Staffeln, kleinster wirksamer Schritt |
+| Score **animiert und leuchtend** | **fertig** — Hochzählen, Balken, Leuchten ab Stufe GUT, Pulsieren ab TOP |
+| KI hört alles raus und fragt nach | **teilweise** — siehe Punkt 1 |
+| Deal-Aktion-Werte einbeziehen | **teilweise** — Break-even ja, IRR und Exit nein; siehe Punkt 1 |
+
+## → Erledigt am 10.09.2026
+
+**Marcels Plan vom Abend des 10.09. ist vollständig umgesetzt** (`v1288`,
+`v1288b`, `v1289`, `v1289b` — Commits `28ff503`, `fdba8aa`, `224382a`, `99e4308`):
+
+| | Punkt aus dem Plan | Stand |
+|---|---|---|
+| 1 | Feinheiten feiner aufgliedern | **fertig** — `v1289`/`v1289b`, nach Karten-Überschrift statt nach Formularreihenfolge; 18 statt 29 Fragen, 54 statt 93 Felder |
+| 2 | Makro-/Mikrolage: die Skalen abfragen | **fertig** — die Stufen stehen in der Frage, gelesen aus dem `<select>` |
+| 3 | Alles für den Deal Score 2 abfragen | **fertig** — Etappe 3 und 4 decken das Datenmodell ab, der Halt zeigt „17 von 24 Kennzahlen belegt" |
+| 4 | Statt fragen: abrufen | **fertig** — BORIS, Grunderwerbsteuer aus der PLZ, Lagewerte aus der Marktpreisindikation |
+| 5 | Lange Abrufe früh anstoßen | **fertig** — gefragt nach der Adresse, gestartet am Ende der Basis, geliefert mitten im Gespräch |
+| — | Deal Score als Zwischenstand | **fertig** — Halt nach Etappe 2 |
+| — | Deal Score 2 / Pilotanalyse-Einschätzung | **fertig** — Halt nach Etappe 3 |
+| — | Nebenkosten nachfragen, Einstellungen oder Pauschale | **fertig** — drei Quellen, jede benannt |
+| — | Miete, Mietentwicklung, Sanierung | **fertig** — Etappe 3 und 4 |
+| — | Fragen zur Wohnung stellen dürfen | **fertig** — jederzeit im Dialog und am Abschluss; der Kontext trägt jetzt Klartext samt Kennzahlen |
+| — | Herkunft abgerufener Werte | **fertig** — je Feld in der Übernahme-Tabelle |
+
+**Der Vorbehalt aus dem Backlog ist eingelöst:** keine abgerufene Zahl steht
+mehr als „Sprachaufzeichnung" in der Tabelle.
+
+---
+
+## → Frühere Notizen (Stand 09.09.2026)
+
+**Stand:** lokal = GitHub = Staging auf `v1287`. **Produktion auf `a21fe9c`**.
 
 ### Erledigt am 09.09.2026
 
@@ -58,7 +411,7 @@ im Journal der Projektanweisung.
 | 2 | Bodenrichtwert automatisch nach Adresse | **fertig** — `v1263` Automatik, `v1264` der kaputte KI-Abruf repariert, `v1265` **amtlicher BORIS-Wert zuerst** (11 von 11 Ländern live), Schätzung nur als Rückfall |
 | 3 | Pillen unterschiedlich lang einblenden | **fertig** — `v1272`, Standzeit je Platz (6,5–15 s), der Kranz dreht durch alle offenen Angaben |
 | 4 | Kontextbezug im Sprechlauf prüfen | **teilweise** — Hausgeld-Aufteilung und Inventar sitzen, weitere Fälle offen |
-| 5 | Chatbot-Dialog statt Monolog, mit Demo | **offen** — größter Brocken, braucht ein Konzept vor dem Bauen |
+| 5 | Chatbot-Dialog statt Monolog, mit Demo | **fertig** — `v1273` fragt nach, was fehlt; `v1275` bringt die Wahl beim Öffnen („Ich erzähle frei" / „Frag mich durch") und den geführten Weg |
 | 6 | Bild „Ansicht": Objekt anlegen links über der Suche | **fertig** — `v1266`, Knopf unter dem Logo im Stil des Logo-Kastens |
 | 7 | IRR/Break-Even „passend in Auswertung" einordnen | **teilweise** — sie stehen in den Kennzahlen-Kacheln (Reiter Bewertung); Portfolio-Cockpit noch nicht |
 
@@ -73,12 +426,12 @@ Projektanweisung.
 
 ### Was jetzt Marcels Entscheidung braucht
 
-1. **`OPENAI_TRANSCRIBE_MODEL` — groß oder mini?** Das ist jetzt die
-   **teuerste offene Frage.** Auf beiden Servern steht
-   `gpt-4o-transcribe`, obwohl `v1169` den Code-Default bewusst auf
-   `gpt-4o-mini-transcribe` gestellt hat, um Tempo zu gewinnen. **Die
-   Optimierung ist im Betrieb nie angekommen.**
-
+1. **`OPENAI_TRANSCRIBE_MODEL` — entschieden am 09.09.2026: das mini.**
+   Marcels Wort: „das mini bleibt erstmal". **Achtung, es blieb nicht** —
+   gemessen mit `printenv` IM Container lief auf **beiden** Servern das
+   große `gpt-4o-transcribe`. Auf **Staging jetzt umgestellt** (auch
+   `OPENAI_REALTIME_MODEL`), nachgemessen im Container. **Auf Prod steht
+   weiter das große** — dafür fehlt die Freigabe. Die alte Begründung:
    Seit die Preise stehen, ist die Tragweite messbar: im warmen Zustand
    (Prompt-Zwischenspeicher greift) ist die **Transkription mit 80 % der
    größte Kostenposten**. Das mini kostet **die Hälfte** (3,00 statt 6,00

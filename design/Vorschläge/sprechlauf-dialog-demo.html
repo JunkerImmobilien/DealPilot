@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sprechlauf als Dialog — Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --obsidian:#050505; --karte:#14130f; --karte2:#1b1a16;
+    --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+    --gruen:#3FA56C; --rot:#B8625C; --creme:#FDFCFA; --grau:#9a948a;
+    --rand:rgba(201,168,76,.28);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--obsidian);color:var(--creme);
+       font:400 15px/1.55 Inter,system-ui,sans-serif;padding:32px 20px 80px}
+  .wrap{max-width:1180px;margin:0 auto}
+  h1{font:700 30px/1.15 'Space Grotesk',system-ui,sans-serif;margin:0 0 6px;letter-spacing:-.01em}
+  h1 em{font-style:normal;color:var(--gold)}
+  .sub{color:var(--grau);margin:0 0 28px;max-width:760px}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+
+  .schalter{display:flex;gap:10px;margin:0 0 26px;flex-wrap:wrap}
+  .sbtn{background:transparent;border:1px solid var(--rand);color:var(--gold);
+        border-radius:12px;padding:10px 16px;cursor:pointer;
+        font:600 12px/1 'JetBrains Mono',monospace;letter-spacing:.06em;
+        text-transform:uppercase;transition:all .16s ease}
+  .sbtn:hover{background:rgba(201,168,76,.1)}
+  .sbtn.an{background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));
+           color:#100e08;border-color:transparent}
+
+  .buehne{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;align-items:start}
+  @media(max-width:900px){.buehne{grid-template-columns:1fr}}
+
+  .fenster{background:var(--karte);border:1px solid var(--rand);border-radius:18px;
+           overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+  .fkopf{background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));
+         color:#100e08;padding:16px 22px}
+  .fkopf .k1{font:700 11px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
+  .fkopf .k2{font:700 21px/1.2 'Space Grotesk',sans-serif;margin-top:4px}
+  .fkopf .k3{font-size:13px;margin-top:5px;opacity:.85;max-width:640px}
+  .finhalt{padding:22px}
+
+  .chat{display:flex;flex-direction:column;gap:14px;min-height:330px}
+  .blase{max-width:78%;padding:12px 15px;border-radius:14px;font-size:14.5px;animation:auf .34s ease both}
+  @keyframes auf{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .co{align-self:flex-start;background:var(--karte2);border:1px solid var(--rand);border-top-left-radius:5px}
+  .co .wer{font:700 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.12em;
+           text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+  .ich{align-self:flex-end;background:rgba(201,168,76,.14);border:1px solid var(--rand);
+       border-top-right-radius:5px;color:var(--creme)}
+  .ich .wer{font:700 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.12em;
+            text-transform:uppercase;color:var(--grau);margin-bottom:6px;text-align:right}
+  .treffer{margin-top:9px;padding-top:9px;border-top:1px dashed var(--rand);
+           font:600 11.5px/1.5 'JetBrains Mono',monospace;color:var(--gruen)}
+  .tippt{align-self:flex-start;color:var(--grau);font-size:13px;padding:6px 2px}
+  .tippt i{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--gold);
+           margin-right:3px;animation:pp 1.1s infinite}
+  .tippt i:nth-child(2){animation-delay:.18s} .tippt i:nth-child(3){animation-delay:.36s}
+  @keyframes pp{0%,60%,100%{opacity:.25}30%{opacity:1}}
+
+  .antwortzeile{display:flex;gap:9px;margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.07)}
+  .antwortzeile input{flex:1;background:#0d0c09;border:1px solid var(--rand);border-radius:11px;
+        padding:11px 14px;color:var(--creme);font:400 14px Inter,sans-serif}
+  .antwortzeile input:focus{outline:none;border-color:var(--gold)}
+  .abtn{background:transparent;border:1px solid var(--rand);color:var(--gold);border-radius:11px;
+        padding:0 15px;cursor:pointer;font:600 12px 'JetBrains Mono',monospace;white-space:nowrap}
+  .abtn:hover{background:rgba(201,168,76,.12)}
+  .abtn.voll{background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));
+             color:#100e08;border-color:transparent;font-weight:700}
+  .schnell{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+  .schnell button{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+        color:var(--grau);border-radius:9px;padding:6px 11px;cursor:pointer;font-size:12.5px}
+  .schnell button:hover{border-color:var(--rand);color:var(--creme)}
+
+  .seite{background:var(--karte);border:1px solid var(--rand);border-radius:18px;padding:18px}
+  .seite h3{font:700 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.12em;
+            text-transform:uppercase;color:var(--gold);margin:0 0 14px}
+  .feld{display:flex;justify-content:space-between;align-items:center;gap:10px;
+        padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13.5px}
+  .feld:last-child{border-bottom:none}
+  .feld .n{color:var(--grau)}
+  .feld .w{font:600 13px 'JetBrains Mono',monospace;color:var(--grau)}
+  .feld.hat .n{color:var(--creme)}
+  .feld.hat .w{color:var(--gruen)}
+  .feld.neu{animation:blitz 1.1s ease}
+  @keyframes blitz{0%{background:rgba(63,165,108,.22)}100%{background:transparent}}
+  .balken{height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin:14px 0 6px}
+  .balken i{display:block;height:100%;width:0;border-radius:3px;
+            background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));
+            transition:width .5s ease}
+  .stand{font:600 11px 'JetBrains Mono',monospace;color:var(--grau);display:flex;justify-content:space-between}
+
+  .notiz{margin-top:22px;background:rgba(201,168,76,.07);border-left:3px solid var(--gold);
+         border-radius:0 12px 12px 0;padding:14px 18px;font-size:13.5px;color:#ded7c8}
+  .notiz b{color:var(--gold-hi)}
+  .fuss{margin-top:34px;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+  .karte{background:var(--karte);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px}
+  .karte h4{font:700 12px/1 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;
+            color:var(--gold);margin:0 0 9px}
+  .karte p{margin:0;font-size:13px;color:#cfc8bb}
+  .karte .pro{color:var(--gruen);font-weight:600} .karte .con{color:var(--rot);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Sprechlauf als <em>Dialog</em> — Demo</h1>
+  <p class="sub">Marcels Punkt 5: „Chatbot-Dialog statt Monolog." Hier stehen die zwei
+  Wege nebeneinander, klickbar. Alles simuliert — keine Aufnahme, kein KI-Aufruf.
+  Das Konzept dahinter: <span class="mono">sprechlauf-dialog-konzept.md</span></p>
+
+  <div class="schalter">
+    <button class="sbtn an" data-v="a">Variante A · frei sprechen, dann nachfragen</button>
+    <button class="sbtn" data-v="b">Variante B · der Co-Pilot führt durch</button>
+    <button class="sbtn" data-v="heute">Heute (zum Vergleich)</button>
+  </div>
+
+  <div class="buehne">
+    <div class="fenster">
+      <div class="fkopf">
+        <div class="k1">Frei einsprechen</div>
+        <div class="k2" id="titel">Sprachaufzeichnung</div>
+        <div class="k3" id="untertitel">Objekt frei einsprechen — bis zu 4 Minuten.</div>
+      </div>
+      <div class="finhalt">
+        <div class="chat" id="chat"></div>
+        <div class="antwortzeile" id="zeile" style="display:none">
+          <input id="eingabe" placeholder="Antwort tippen …" autocomplete="off">
+          <button class="abtn" id="mic">🎙 Sprechen</button>
+          <button class="abtn voll" id="senden">Senden</button>
+        </div>
+        <div class="schnell" id="schnell"></div>
+      </div>
+    </div>
+
+    <div class="seite">
+      <h3>Was schon steht</h3>
+      <div id="felder"></div>
+      <div class="balken"><i id="fill"></i></div>
+      <div class="stand"><span id="zahl">0 / 8 Pflichtfeldern</span><span id="pct">0 %</span></div>
+    </div>
+  </div>
+
+  <div class="notiz" id="notiz"></div>
+
+  <div class="fuss">
+    <div class="karte">
+      <h4>Variante A</h4>
+      <p><span class="pro">Dafür:</span> Redefluss bleibt ungestört, wer alles weiß ist nach
+      einem Durchgang fertig. Kleiner Umbau — das meiste steht schon.<br><br>
+      <span class="con">Dagegen:</span> Wer wenig weiß, führt trotzdem erst einen Monolog.</p>
+    </div>
+    <div class="karte">
+      <h4>Variante B</h4>
+      <p><span class="pro">Dafür:</span> Niemand muss wissen, was DealPilot hören will —
+      für den ersten Deal eines neuen Kunden deutlich freundlicher.<br><br>
+      <span class="con">Dagegen:</span> Für Geübte langsamer als ein Diktat, und je Antwort
+      ein KI-Aufruf statt einem für alles.</p>
+    </div>
+    <div class="karte">
+      <h4>Empfehlung</h4>
+      <p>Erst <b>A</b> bauen, <b>C</b> als Ziel: beim Öffnen zwei Knöpfe —
+      „Ich erzähle frei" oder „Frag mich durch". A bringt den größten Nutzen sofort,
+      B lohnt sich, sobald es fremde Nutzer gibt.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var PFLICHT = [
+    { id:'ort',   name:'Ort / PLZ',        frage:'Wo steht das Objekt? Straße, Hausnummer und Ort genügen.' },
+    { id:'wfl',   name:'Wohnfläche',       frage:'Wie groß ist die Wohnfläche?' },
+    { id:'bj',    name:'Baujahr',          frage:'Aus welchem Jahr stammt das Gebäude?' },
+    { id:'kp',    name:'Kaufpreis',        frage:'Was soll das Objekt kosten?' },
+    { id:'miete', name:'Kaltmiete',        frage:'Was kommt an Nettokaltmiete im Monat rein?' },
+    { id:'zins',  name:'Zinssatz',         frage:'Zu welchem Zinssatz finanzierst du?' },
+    { id:'tilg',  name:'Tilgung',          frage:'Wie hoch ist die anfängliche Tilgung?' },
+    { id:'zust',  name:'Zustand',          frage:'In welchem Zustand ist die Wohnung?' }
+  ];
+  var chat = document.getElementById('chat'), felder = document.getElementById('felder'),
+      zeile = document.getElementById('zeile'), eingabe = document.getElementById('eingabe'),
+      schnell = document.getElementById('schnell'), notiz = document.getElementById('notiz'),
+      titel = document.getElementById('titel'), unter = document.getElementById('untertitel');
+  var stand = {}, variante = 'a', schritt = 0, offen = [];
+
+  function felderZeichnen(neuId){
+    felder.innerHTML = PFLICHT.map(function(f){
+      var w = stand[f.id];
+      return '<div class="feld' + (w?' hat':'') + (f.id===neuId?' neu':'') + '">' +
+             '<span class="n">' + f.name + '</span><span class="w">' + (w || '—') + '</span></div>';
+    }).join('');
+    var n = Object.keys(stand).length, p = Math.round(n/PFLICHT.length*100);
+    document.getElementById('fill').style.width = p + '%';
+    document.getElementById('zahl').textContent = n + ' / ' + PFLICHT.length + ' Pflichtfeldern';
+    document.getElementById('pct').textContent = p + ' %';
+  }
+  function blase(wer, text, treffer){
+    var d = document.createElement('div');
+    d.className = 'blase ' + (wer==='co'?'co':'ich');
+    d.innerHTML = '<div class="wer">' + (wer==='co'?'Co-Pilot':'Du') + '</div>' + text +
+      (treffer ? '<div class="treffer">✓ ' + treffer + '</div>' : '');
+    chat.appendChild(d); chat.scrollTop = chat.scrollHeight;
+    return d;
+  }
+  function tippt(dann){
+    var d = document.createElement('div');
+    d.className = 'tippt'; d.innerHTML = '<i></i><i></i><i></i> Co-Pilot überlegt …';
+    chat.appendChild(d);
+    setTimeout(function(){ d.remove(); dann(); }, 850);
+  }
+  function knoepfe(liste){
+    schnell.innerHTML = '';
+    liste.forEach(function(b){
+      var el = document.createElement('button');
+      el.textContent = b.t;
+      el.onclick = b.f;
+      schnell.appendChild(el);
+    });
+  }
+
+  /* ─── Variante A ────────────────────────────────────────────────── */
+  function startA(){
+    titel.textContent = 'Sprachaufzeichnung';
+    unter.textContent = 'Objekt frei einsprechen — bis zu 4 Minuten. Danach fragt der Co-Pilot nach, was fehlt.';
+    notiz.innerHTML = '<b>Variante A.</b> Der Sprechlauf bleibt, wie er ist. Neu ist nur der ' +
+      'Zustand <i>zwischen</i> Auswertung und Übernahme-Tabelle: höchstens drei Fragen, ' +
+      'beantwortbar per Sprache oder Tippen. „Weiß ich nicht" beendet eine Frage endgültig.';
+    zeile.style.display = 'none';
+    blase('ich','„Also, ich hab da eine Wohnung in Hüllhorst, Hermannstraße 9, hundert Quadratmeter, ' +
+      'Baujahr 62. Die wollen 200.000 haben, vermietet ist sie für 490 im Monat. Zustand ist okay, ' +
+      'nichts Wildes."');
+    knoepfe([{ t:'▶ Auswerten', f: auswertenA }]);
+  }
+  function auswertenA(){
+    knoepfe([]);
+    tippt(function(){
+      stand.ort='Hüllhorst'; stand.wfl='100 m²'; stand.bj='1962';
+      stand.kp='200.000 €'; stand.miete='490 €'; stand.zust='normal';
+      felderZeichnen();
+      blase('co','Ich habe <b>6 von 8</b> Pflichtangaben gefunden. Zwei fehlen mir noch für die Rechnung.',
+        'Ort · Fläche · Baujahr · Kaufpreis · Miete · Zustand');
+      offen = ['zins','tilg']; schritt = 0;
+      frageA();
+    });
+  }
+  function frageA(){
+    if (schritt >= offen.length) return fertig();
+    var f = PFLICHT.filter(function(x){ return x.id===offen[schritt]; })[0];
+    tippt(function(){
+      blase('co', f.frage + ' <span style="opacity:.6">(' + (schritt+1) + ' von ' + offen.length + ')</span>');
+      zeile.style.display = 'flex';
+      eingabe.value = ''; eingabe.focus();
+      knoepfe([
+        { t:'Weiß ich nicht', f: function(){ antwortA('weiss nicht'); } },
+        { t:'Fertig — Rest später', f: fertig }
+      ]);
+    });
+  }
+  function antwortA(text){
+    if (!text) return;
+    var f = PFLICHT.filter(function(x){ return x.id===offen[schritt]; })[0];
+    var unbekannt = /wei(ß|ss) (ich )?nicht|keine ahnung/i.test(text);
+    blase('ich', text);
+    zeile.style.display = 'none'; knoepfe([]);
+    tippt(function(){
+      if (unbekannt){
+        blase('co','Gut — das lasse ich leer. Ich frage in dieser Aufnahme nicht noch einmal danach.');
+      } else {
+        stand[f.id] = text.replace(/[^0-9,.%€ a-zA-ZäöüÄÖÜß]/g,'').trim();
+        felderZeichnen(f.id);
+        blase('co','Notiert.', f.name + ' = ' + stand[f.id]);
+      }
+      schritt++; frageA();
+    });
+  }
+
+  /* ─── Variante B ────────────────────────────────────────────────── */
+  function startB(){
+    titel.textContent = 'Co-Pilot — geführte Aufnahme';
+    unter.textContent = 'Der Co-Pilot fragt Block für Block. Antworten per Sprache oder Tippen.';
+    notiz.innerHTML = '<b>Variante B.</b> Kein freies Diktat als Einstieg, sondern ein Gespräch ' +
+      'von der ersten Sekunde an. Freundlicher für den ersten Deal eines neuen Kunden — für ' +
+      'Geübte langsamer, und je Antwort ein KI-Aufruf statt einem für alles.';
+    offen = PFLICHT.map(function(f){ return f.id; }); schritt = 0;
+    tippt(function(){
+      blase('co','Lass uns dein Objekt zusammen aufnehmen. Ich frage der Reihe nach — ' +
+        'du kannst jederzeit „überspringen" sagen.');
+      frageB();
+    });
+  }
+  function frageB(){
+    if (schritt >= offen.length) return fertig();
+    var f = PFLICHT.filter(function(x){ return x.id===offen[schritt]; })[0];
+    tippt(function(){
+      blase('co', f.frage + ' <span style="opacity:.6">(' + (schritt+1) + ' von ' + offen.length + ')</span>');
+      zeile.style.display = 'flex'; eingabe.value = ''; eingabe.focus();
+      knoepfe([
+        { t:'Überspringen', f: function(){ antwortB('überspringen'); } },
+        { t:'Beispielantwort', f: function(){ antwortB(beispiel(f.id)); } },
+        { t:'Fertig — Rest später', f: fertig }
+      ]);
+    });
+  }
+  function beispiel(id){
+    return { ort:'Hermannstraße 9, 32609 Hüllhorst', wfl:'100 Quadratmeter', bj:'1962',
+             kp:'200.000 Euro', miete:'490 Euro kalt', zins:'3,8 Prozent',
+             tilg:'2 Prozent', zust:'normal, nichts Wildes' }[id] || 'keine Angabe';
+  }
+  function antwortB(text){
+    if (!text) return;
+    var f = PFLICHT.filter(function(x){ return x.id===offen[schritt]; })[0];
+    var weg = /überspringen|wei(ß|ss) (ich )?nicht/i.test(text);
+    blase('ich', text);
+    zeile.style.display = 'none'; knoepfe([]);
+    tippt(function(){
+      if (weg){ blase('co','Übersprungen.'); }
+      else { stand[f.id] = text; felderZeichnen(f.id); blase('co','Habe ich.', f.name + ' = ' + text); }
+      schritt++; frageB();
+    });
+  }
+
+  /* ─── Heute ─────────────────────────────────────────────────────── */
+  function startHeute(){
+    titel.textContent = 'Sprachaufzeichnung (heutiger Stand)';
+    unter.textContent = 'Ein Monolog, dann eine Tabelle. Was fehlt, muss man selbst sehen.';
+    notiz.innerHTML = '<b>Heute.</b> Der Bruch liegt zwischen Auswertung und Tabelle: Wer etwas ' +
+      'vergisst, erfährt es erst dort — als fehlende Zeile. Der Co-Pilot sagt nichts, ' +
+      'fragt nichts, schlägt nichts vor.';
+    zeile.style.display = 'none';
+    blase('ich','„Also, ich hab da eine Wohnung in Hüllhorst, Hermannstraße 9, hundert Quadratmeter, ' +
+      'Baujahr 62. Die wollen 200.000 haben, vermietet ist sie für 490 im Monat. Zustand ist okay."');
+    knoepfe([{ t:'▶ Auswerten', f: function(){
+      knoepfe([]);
+      tippt(function(){
+        stand.ort='Hüllhorst'; stand.wfl='100 m²'; stand.bj='1962';
+        stand.kp='200.000 €'; stand.miete='490 €'; stand.zust='normal';
+        felderZeichnen();
+        blase('co','<b>6 Felder übernommen.</b> Die Tabelle ist offen — Haken prüfen und übernehmen.');
+        tippt(function(){
+          blase('co','<span style="color:var(--rot)">Zinssatz und Tilgung bleiben leer. ' +
+            'Darauf weist niemand hin; die Rechnung nimmt stillschweigend die Standardwerte.</span>');
+        });
+      });
+    }}]);
+  }
+
+  function fertig(){
+    zeile.style.display = 'none'; knoepfe([]);
+    tippt(function(){
+      var n = Object.keys(stand).length;
+      blase('co','<b>' + n + ' von ' + PFLICHT.length + ' Pflichtangaben stehen.</b> ' +
+        'Ich öffne die Übernahme-Tabelle — dort kannst du jede Zeile noch abwählen.',
+        'Weiter zur Tabelle');
+      knoepfe([{ t:'↻ Nochmal', f: function(){ setzeVariante(variante); } }]);
+    });
+  }
+
+  function setzeVariante(v){
+    variante = v; stand = {}; schritt = 0; offen = [];
+    chat.innerHTML = ''; schnell.innerHTML = ''; zeile.style.display='none';
+    felderZeichnen();
+    [].forEach.call(document.querySelectorAll('.sbtn'), function(b){
+      b.classList.toggle('an', b.getAttribute('data-v') === v);
+    });
+    if (v==='a') startA(); else if (v==='b') startB(); else startHeute();
+  }
+
+  [].forEach.call(document.querySelectorAll('.sbtn'), function(b){
+    b.onclick = function(){ setzeVariante(b.getAttribute('data-v')); };
+  });
+  document.getElementById('senden').onclick = function(){
+    var t = eingabe.value.trim(); if (!t) return;
+    variante==='a' ? antwortA(t) : antwortB(t);
+  };
+  eingabe.addEventListener('keydown', function(e){
+    if (e.key==='Enter') document.getElementById('senden').click();
+  });
+  document.getElementById('mic').onclick = function(){
+    var f = PFLICHT.filter(function(x){ return x.id===offen[schritt]; })[0];
+    eingabe.value = beispiel(f ? f.id : 'ort');
+    eingabe.focus();
+  };
+
+  setzeVariante('a');
+})();
+</script>
+</body>
+</html>

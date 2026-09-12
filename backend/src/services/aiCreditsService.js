@@ -159,51 +159,59 @@ async function _getPlanLimit(userId) {
   const plan = r.rowCount ? r.rows[0].plan_id : 'free';
   return PLAN_LIMITS[plan] != null ? PLAN_LIMITS[plan] : 1;
 }
+/* ─── v1296 · Monatswechsel: das Kontingent verfaellt, Gekauftes bleibt ──
+   MARCELS REGEL VOM 11.09.2026: „die im Plan integrierten Bewertungen
+   verfallen am Ende des Monats. Nur selber nachgekaufte bleiben
+   dauerhaft."
 
-/* ─── Monatsuebertrag ───────────────────────────────────────────────────
-   Marcels Regel: nicht genutzte Abrufe verfallen NICHT. Beim Monatswechsel
-   wandert der Rest ins Sparguthaben, gedeckelt auf das Dreifache des
-   Monatskontingents (`sparfaktor`).
+   Das kehrt die Regel von v1183 um. Bis hierher wanderte der ungenutzte
+   Rest ins Sparguthaben, gedeckelt auf das Dreifache des Monats-
+   kontingents (`sparfaktor`). Diese Uebertragung faellt weg — `used`
+   wird auf null gesetzt, und das war es.
 
-   Warum ein eigener Merker (`kontingent_carry_at`) und nicht
+   WAS BEWUSST STEHEN BLEIBT: die Bank (`<art>_bank`) wird NICHT geleert.
+   In ihr liegen zwei Dinge nebeneinander, die man nicht mehr trennen
+   kann — Gekauftes und der Uebertrag aus der Zeit, als er noch galt.
+   Wer angespart hat, hat das nach den damals geltenden Regeln getan;
+   ihm das rueckwirkend wegzunehmen waere eine Enteignung fuer eine
+   Regel, die es beim Ansparen nicht gab. Ab dem naechsten Monatswechsel
+   fuellt sich die Bank ohnehin nur noch durch Kaeufe.
+
+   `sparfaktor` bleibt als Feld bestehen, wird hier aber nicht mehr
+   gelesen — die Anzeige fuehrt ihn noch mit, bis auch dort das letzte
+   „waechst ins Guthaben" verschwunden ist.
+
+   Warum weiterhin ein eigener Merker (`kontingent_carry_at`) und nicht
    `current_period_start`: letzteres wird beim Reset gesetzt, egal ob der
-   Uebertrag lief. Bricht der Vorgang dazwischen ab, waere das Guthaben
-   still weg. Der eigene Merker macht den Uebertrag idempotent — zweimal
-   aufgerufen traegt er nur einmal ueber.
-
-   Zwei Monate Pause sind kein Sonderfall: es wird der Rest EINES Monats
-   uebertragen, nicht je verpasstem Monat einer. Wer drei Monate nicht da
-   war, hat auch nur einmal etwas uebrig gehabt. */
-async function _carryOver(userId, plan) {
-  const k = KONTINGENT[plan] || KONTINGENT.free;
-  const r = await query(`
-    SELECT mpi_used, mpi_plus_used, wev_used,
-           mpi_bank, mpi_plus_bank, wev_bank,
-           kontingent_carry_at
-      FROM ai_credits_user WHERE user_id = $1
-  `, [userId]);
+   Monatswechsel lief. Der eigene Merker macht ihn idempotent — zweimal
+   aufgerufen setzt er nur einmal zurueck. Das war beim Uebertragen
+   wichtig (sonst haette er doppelt gutgeschrieben) und bleibt es beim
+   Zuruecksetzen (sonst faende ein zweiter Lauf einen frischen Verbrauch
+   des neuen Monats vor und loeschte ihn mit). */
+async function _monatsReset(userId) {
+  const r = await query(
+    'SELECT kontingent_carry_at FROM ai_credits_user WHERE user_id = $1', [userId]
+  );
   if (!r.rowCount) return;
-  const row = r.rows[0];
 
   const monatsAnfang = new Date();
   monatsAnfang.setUTCDate(1);
   monatsAnfang.setUTCHours(0, 0, 0, 0);
-  const carryAt = row.kontingent_carry_at ? new Date(row.kontingent_carry_at) : null;
+  const carryAt = r.rows[0].kontingent_carry_at
+    ? new Date(r.rows[0].kontingent_carry_at) : null;
   if (carryAt && carryAt >= monatsAnfang) return;   /* schon gelaufen */
 
-  /* v1184: KEIN Merker heisst NEUE Zeile, nicht "seit je nichts uebertragen".
+  /* v1184: KEIN Merker heisst NEUE Zeile, nicht "seit je nichts gelaufen".
      GEMESSEN am 31.08.2026: ein frisch angelegter Pro-Nutzer stand ohne
      einen einzigen Kauf auf mpi=5 mpi_plus=5 wev=5 in der Bank — sein
      volles Monatskontingent, zusaetzlich zum Monatskontingent selbst.
-     Ursache war die fehlende Vorbelegung: `_ensureCurrentPeriod()` legt die
-     Zeile mit `INSERT (user_id)` an, und Migration 066 hatte nur die damals
-     bestehenden Zeilen gesetzt.
+     Ursache war die fehlende Vorbelegung: `_ensureCurrentPeriod()` legt
+     die Zeile mit `INSERT (user_id)` an, und Migration 066 hatte nur die
+     damals bestehenden Zeilen gesetzt.
 
-     Migration 067 gibt der Spalte einen DEFAULT. Dieser Riegel bleibt
-     trotzdem: Produktion hat 067 noch nicht, und eine Zeile aus einer
-     Wiederherstellung kann den Merker jederzeit wieder leer mitbringen.
-     Also nur den Merker setzen und nichts uebertragen — wer diesen Monat
-     erst angelegt wurde, hatte im Vormonat nichts uebrig. */
+     Der Riegel bleibt auch ohne Uebertrag richtig: wer diesen Monat erst
+     angelegt wurde, hat noch keinen Monatswechsel erlebt — sein Verbrauch
+     gehoert IHM, nicht einem Vormonat. Nur den Merker setzen. */
   if (!carryAt) {
     await query(
       "UPDATE ai_credits_user SET kontingent_carry_at = date_trunc('month', NOW())::date," +
@@ -212,30 +220,15 @@ async function _carryOver(userId, plan) {
     return;
   }
 
-  const setzt = [];
-  const werte = [];
-  ARTEN.forEach(function (art) {
-    const limit = k[art] || 0;
-    const used  = parseInt(row[art + '_used'], 10) || 0;
-    const bank  = parseInt(row[art + '_bank'], 10) || 0;
-    const rest  = Math.max(0, limit - used);
-    const deckel = limit * (k.sparfaktor || 0);
-    /* Nie ueber den Deckel — und nie unter den Bestand, den der Nutzer
-       gekauft hat. Gekauftes ist kein Uebertrag und faellt nicht unter den
-       Deckel; deshalb wird nur der ZUWACHS begrenzt, nicht die Bank. */
-    const platz = Math.max(0, deckel - bank);
-    const neu   = bank + Math.min(rest, platz);
-    werte.push(neu);
-    setzt.push(art + '_bank = $' + (werte.length + 1));
-    werte.push(0);
-    setzt.push(art + '_used = $' + (werte.length + 1));
-  });
-
+  /* Der ganze Monatswechsel: Verbrauch auf null. Die Bank bleibt, wie sie
+     ist — sie traegt Gekauftes. Zwei Monate Pause sind kein Sonderfall,
+     weil nichts mehr aufsummiert wird. */
+  const setzt = ARTEN.map(function (art) { return art + '_used = 0'; }).join(', ');
   await query(
-    'UPDATE ai_credits_user SET ' + setzt.join(', ') +
+    'UPDATE ai_credits_user SET ' + setzt +
     ", kontingent_carry_at = date_trunc('month', NOW())::date, updated_at = NOW()" +
     ' WHERE user_id = $1',
-    [userId].concat(werte)
+    [userId]
   );
 }
 
@@ -245,7 +238,7 @@ async function _carryOver(userId, plan) {
 async function getStatus(userId) {
   await _ensureCurrentPeriod(userId);
   const plan = await _planKey(userId);
-  await _carryOver(userId, plan);
+  await _monatsReset(userId);
   await _verfallTestphase(userId);      /* v1185 — vor jeder Auskunft */
 
   const r = await query(`

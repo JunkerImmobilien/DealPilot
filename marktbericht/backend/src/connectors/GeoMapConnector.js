@@ -53,17 +53,33 @@ export const GeoMapConnector = {
   // analyzedField: 'PREISPROQM' | 'PREIS' | 'RENDITE' | 'NUTZFLAECHE' | 'TAGEONLINE'
   // offerType: 'Kauf' | 'Miete'. period: optional {from:'YYYY-MM-DD', to:'YYYY-MM-DD'}.
   // Liefert {count,median,average,min,max,q25,q75} o. null.
-  async kpiCollection({ lat, lon, radiusKm, offerType, analyzedField, objectClasses, period, filters }) {
+  async kpiCollection({ lat, lon, radiusKm, offerType, analyzedField, objectClasses, objectTypes, objectCategories, period, filters }) {
     if (!geomapEnabled()) return null;
     const body = {
       coordinate: { lat, lon },
       radiusInKm: radiusKm || cfg.geomap.radiusKm,
-      objectCategories: ['Wohnen'],
-      objectClasses: objectClasses && objectClasses.length ? objectClasses : ['Wohnung', 'Haus'],
+      /* v1323: die Kategorie war hart auf Wohnen - damit liess sich Gewerbe
+       * gar nicht abfragen, obwohl die API es kann (gemessen Bielefeld:
+       * Kauf 1.499,98 EUR/m2 n=153, Miete 10,00 EUR/m2 n=856). */
+      objectCategories: (objectCategories && objectCategories.length) ? objectCategories : ['Wohnen'],
+      /* v1323b: der Wohn-Default darf NICHT greifen, wenn die Kategorie
+       * Gewerbe ist - ['Wohnung','Haus'] passt dort zu nichts und liefert
+       * n=0. Gemessen: der Gesamtmarkt-Vergleich kam als null zurueck. */
+      ...(( objectClasses && objectClasses.length )
+        ? { objectClasses }
+        : ((objectCategories && objectCategories.length && objectCategories[0] !== 'Wohnen')
+            ? {} : { objectClasses: ['Wohnung', 'Haus'] })),
       offerTypes: [offerType],
       analyzedField: analyzedField || 'PREISPROQM',
       cutOutlier: 'GEOMAP', // GeoMaps eigene Ausreißerbereinigung
     };
+    /* v1314 - die OBJEKTART, nicht ein Praezisierungsfilter. Sie gehoert zur
+     * Frage selbst: ein Mehrfamilienhaus wird am MFH-Markt gemessen, nicht am
+     * Hausmarkt. Steht vor dem filters-Block, damit eine ausdrueckliche
+     * Filter-Angabe sie weiterhin ueberschreiben kann.
+     * Gemessen 11.09.2026 Bielefeld 5 km: Haus pauschal 2.553,47 EUR/m2
+     * gegen Mehrfamilienhaus 2.093,15 - 22 Prozent Unterschied. */
+    if (objectTypes && objectTypes.length) body.objectTypes = objectTypes;
     // Zeitraum-Filter (fuer historische Auswertung). Laut GeoMap-Doku (kpi v1.5):
     // onlineDateRange = Objekt { from, to } im Format YYYY-MM-DD (Angebote online verfuegbar).
     if (period && period.from && period.to) {
@@ -107,6 +123,18 @@ export const GeoMapConnector = {
       if (filters.objectTypes && filters.objectTypes.length) body.objectTypes = filters.objectTypes;
       if (filters.heatingTypes && filters.heatingTypes.length) body.heatingTypes = filters.heatingTypes;
       if (filters.energyRatings && filters.energyRatings.length) body.energyRatings = filters.energyRatings;
+      /* ═══ v1321 · Gegen die echte API geprueft, 11.09.2026 ═══════════
+       * leased      true/false - vermietet gegen frei. Gemessen Bielefeld:
+       *             2.769,33 gegen 2.980,96 EUR/m2, also -7,1 Prozent.
+       * searchString Volltext in Titel, Beschreibung, Strasse, Ort, Anbieter.
+       *             Mehrere Woerter sind ODER-verknuepft, es gibt KEINE
+       *             Ausschlusslogik - wer "Erbbaurecht" sucht, findet auch
+       *             "kein Erbbaurecht". Signal, kein Beleg.
+       * NICHT verwendbar (alle 400): priceChanged, hasPriceChange,
+       *             priceChangeCountRange. priceChangeDirection wird
+       *             angenommen, filtert aber nicht. */
+      if (filters.leased != null) body.leased = !!filters.leased;
+      if (filters.searchString) body.searchString = String(filters.searchString).slice(0, 200);
     }
     let d;
     try {
@@ -133,12 +161,12 @@ export const GeoMapConnector = {
 
   // HISTORIE: KPI je Jahr -> Zeitreihe. field z.B. 'PREISPROQM' (Wert) oder 'TAGEONLINE' (Markttempo).
   // Liefert [{year, median, count}] fuer die angefragten Jahre.
-  async timeSeries({ lat, lon, radiusKm, offerType, analyzedField, objectClasses, years }) {
+  async timeSeries({ lat, lon, radiusKm, offerType, analyzedField, objectClasses, objectTypes, years }) {
     if (!geomapEnabled()) return [];
     // Jahre parallel abrufen (war sequenziell -> bei 9 Jahren x2 Reihen der grösste Zeitfresser).
     const out = await Promise.all(years.map(async (y) => {
       const kpi = await this.kpiCollection({
-        lat, lon, radiusKm, offerType, analyzedField, objectClasses,
+        lat, lon, radiusKm, offerType, analyzedField, objectClasses, objectTypes,
         period: { from: `${y}-01-01`, to: `${y}-12-31` },
       });
       return { year: y, median: kpi && !kpi.error ? kpi.median : null, count: kpi && !kpi.error ? kpi.count : null };
@@ -149,7 +177,7 @@ export const GeoMapConnector = {
   // Holt echte Vergleichsangebote um einen Punkt.
   // params: { lat, lon, radiusKm, offerType:'Kauf'|'Miete', maxDetails }
   // Gibt { offers:[...], totalResults, fetchedDetails } zurück.
-  async marketOffers({ lat, lon, radiusKm, offerType, maxDetails, filters, period, objectClasses }) {   /* WSEG12-1 */
+  async marketOffers({ lat, lon, radiusKm, offerType, maxDetails, filters, period, objectClasses, objectTypes, objectCategories }) {   /* WSEG12-1 */
     if (!geomapEnabled()) return { offers: [], totalResults: 0, fetchedDetails: 0, reason: 'no_token' };
 
     const radius = radiusKm || cfg.geomap.radiusKm;
@@ -159,9 +187,16 @@ export const GeoMapConnector = {
     const body = {
       coordinate: { lat, lon },
       radiusInKm: radius,
-      objectCategories: ['Wohnen'],
+      /* v1323: die Kategorie war hart auf Wohnen - damit liess sich Gewerbe
+       * gar nicht abfragen, obwohl die API es kann (gemessen Bielefeld:
+       * Kauf 1.499,98 EUR/m2 n=153, Miete 10,00 EUR/m2 n=856). */
+      objectCategories: (objectCategories && objectCategories.length) ? objectCategories : ['Wohnen'],
       /* WSEG12-2 */
-      objectClasses: (objectClasses && objectClasses.length) ? objectClasses : ['Wohnung', 'Haus'],
+      /* v1323b: wie oben - kein Wohn-Default im Gewerbe. */
+      ...((objectClasses && objectClasses.length)
+        ? { objectClasses }
+        : ((objectCategories && objectCategories.length && objectCategories[0] !== 'Wohnen')
+            ? {} : { objectClasses: ['Wohnung', 'Haus'] })),
       offerTypes: [offerType], // 'Kauf' | 'Miete'
       size: Math.min(1000, Math.max(cap, 50)),
       sortField: 'DATUM',
@@ -169,6 +204,9 @@ export const GeoMapConnector = {
     };
     /* WSEG12-3 · Dieselbe Segmentierung wie bei der KPI-Abfrage. Ohne sie zeigt
      * die Beispielliste etwas voellig anderes als der Median darueber. */
+    /* v1314: die Objektart auch fuer die Beispielliste - sonst zeigt sie
+     * Einfamilienhaeuser unter einem MFH-Median. */
+    if (objectTypes && objectTypes.length) body.objectTypes = objectTypes;
     if (period && period.from) body.onlineDateRange = { from: period.from, to: period.to };
     if (filters) {
       const r = (a, b) => ({ ...(a != null ? { from: a } : {}), ...(b != null ? { to: b } : {}) });

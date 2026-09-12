@@ -173,6 +173,15 @@ if (!window._wlc) {
     out.microRaw = (d.micro && d.micro.score != null) ? d.micro.score : null;
     out.macroRaw = (d.macro && d.macro.score != null) ? d.macro.score : null;
     out.trendRaw = (d.price_trend_pct != null) ? d.price_trend_pct : null;
+    /* v1316: was bisher im Bericht liegenblieb */
+    out.bevRaw = (d.bevoelkerung_trend_pct != null) ? d.bevoelkerung_trend_pct : null;
+    out.tageRaw = (d.days_on_market != null) ? d.days_on_market
+                : (d.market_dynamics && d.market_dynamics.days_on_market != null) ? d.market_dynamics.days_on_market : null;
+    /* v1323: Marktkontext und Erbbaurecht wandern mit in die Karte -
+       von dort holt ui.js sie fuer die Pilot-Analyse und den Co-Pilot.
+       Ohne diese zwei Zeilen bleibt beides im Bericht liegen. */
+    out.marktkontext = d.marktkontext || null;
+    out.erbbaurecht = d.erbbaurecht || null;
     out.trend = (d.price_trend_pct != null) ? ((d.price_trend_pct >= 0 ? '+' : '') + deNum(d.price_trend_pct, 1) + '%/J') : '–';
     if (mv.estimated != null) {
       out.mw = { low: mv.low != null ? mv.low : Math.round(mv.estimated * 0.9), med: mv.estimated, high: mv.high != null ? mv.high : Math.round(mv.estimated * 1.1), sqm: (mv.basis_median_sqm != null) ? (deNum(mv.basis_median_sqm, 0) + ' €/m²') : (area ? (deNum(Math.round(mv.estimated / area), 0) + ' €/m²') : '') }; /* v892-sqm */
@@ -218,6 +227,43 @@ if (!window._wlc) {
     return '<span class="l">Spanne</span>' + piece(o.low, 'low') + '<span class="sep">–</span>' + piece(o.med, 'med') + '<span class="sep">–</span>' + piece(o.high, 'high');
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1322 · Der Erbbau-Hinweis stand im falschen Weg
+     ═══════════════════════════════════════════════════════════════════
+     v1313b hat ihn in `applyAvm()` gebaut — und das ist der Weg von
+     Sprengnetter und PriceHubble. Genau die beiden bieten wir nicht an
+     („die preise für die bewertungspartner nehmen wir raus", Marcel,
+     11.09.2026). Der Weg, den Marcel benutzt, ist DIESE Karte.
+
+     Bei der Abnahme aufgefallen: `_oabApplyExternal` nimmt einen NAMEN
+     und holt `_avm[name]` — ein durchgereichtes Ergebnisobjekt landet
+     nirgends. Der Hinweis war damit nicht nur am falschen Ort, er war
+     auf dem genutzten Weg überhaupt nicht erreichbar.
+
+     Steht direkt unter dem Marktwert, weil er genau ihn einordnet: was
+     die Karte zeigt, ist Volleigentum. Kein Bewertungspartner nimmt das
+     Erbbaurecht entgegen — gemessen gegen GeoMap, 400 „Unrecognized
+     field" für jede Schreibweise. */
+  function erbZeileHtml() {
+    try {
+      if (!global.DealPilotErbbau || !global.DealPilotErbbau.istAn()) return '';
+      var r = global.DealPilotErbbau.rechnen();
+      var G = 'var(--wl-c9a84c, #C9A84C)';
+      var kopf = '<b>Erbbaurecht:</b> Der Marktwert oben ist <b>Volleigentum</b> — das Grundstück ist nicht dabei. ';
+      var rest;
+      if (r && r.ok) {
+        rest = 'Abschlag nach § 50 ImmoWertV: <b>'
+          + Math.round(r.abschlag).toLocaleString('de-DE') + ' € · '
+          + r.abschlagPct.toFixed(1).replace('.', ',') + ' %</b>. '
+          + 'Wertpuffer, Wertsteigerung und Deal Score rechnen bereits damit.';
+      } else {
+        rest = 'Für den Abschlag fehlen noch Angaben — siehe Reiter <b>Objekt</b>, Grund &amp; Boden.';
+      }
+      return '<div class="dpx-erb" style="margin:8px 0 0;padding:8px 10px;border-radius:9px;font-size:11px;line-height:1.5;'
+        + 'border:1px solid ' + G + ';background:var(--gold-bg, rgba(201,168,76,.08))">' + kopf + rest + '</div>';
+    } catch (e) { return ''; }
+  }
+
   function render() { /* v752-bridge */
     if (!D) return;
     persistLight();
@@ -252,7 +298,7 @@ if (!window._wlc) {
           '<button data-k="med"' + (mode === 'med' ? ' class="on"' : '') + '>\u00d8</button>' +
           '<button data-k="high"' + (mode === 'high' ? ' class="on"' : '') + '>Oben</button></div></div>' +
           '<button class="dpx-apply" id="dpx-apply"><span id="dpx-applytxt"></span></button>' +
-        '</div></div>';
+        erbZeileHtml() + '</div></div>';
     var seg = $('dpx-seg');
     if (seg) seg.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { mode = b.dataset.k; persistLight(); paint(); }); });
     var ap = $('dpx-apply'); if (ap) ap.addEventListener('click', applyToFields);
@@ -277,6 +323,100 @@ if (!window._wlc) {
   /* \u2500\u2500 In Felder \u00fcbernehmen (wie applyAvm: svwert + ds2_marktmiete \u20ac/m\u00b2) \u2500\u2500 */
   function setInput(id, val) { var el = $(id); if (!el || val == null || val === '') return; el.value = val; try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {} }
   function setSel(id, v) { var el = $(id); if (!el || !v) return; el.value = v; try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} }
+  /* ═══════════════════════════════════════════════════════════════════
+     v1316 · Die erweiterte Marktpreisindikation füllt jetzt aus, was sie
+             weiss — und tut es von selbst
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Frage: „wenn ich ganz am anfang die erweiterte
+     marktpreisindikation ausgewählt habe sollte er auch die daten für
+     bevölkerung micro und makrolage haben warum füllt er das nicht
+     automatisch aus? fehlen ihm werte?"
+
+     GEMESSEN: es fehlten keine Werte. Destatis liefert die
+     Bevölkerungsentwicklung (Kreis Herford +0,152 %/Jahr, live geprüft),
+     GeoMap die Angebotsdauer. Beides stand im Bericht — und blieb dort.
+     `mapCard()` las nur micro.score, macro.score und price_trend_pct;
+     alles andere fiel unter den Tisch. Und selbst diese drei landeten
+     erst im Formular, wenn jemand „In Felder übernehmen" drückte.
+
+     ds2_entwicklung bleibt bewusst AUSSEN VOR. Das Feld fragt nach
+     Entwicklungsmöglichkeiten AM OBJEKT — Ausbau, Aufstockung, Teilung.
+     Der Marktbericht liefert eine Markt-Einschätzung („steigend",
+     „stabil"). Das ist nicht dasselbe, und es sieht nur so aus. */
+
+  /* Bevölkerungsentwicklung in %/Jahr -> die fünf Stufen des Feldes.
+     Die Schwellen sind bewusst eng: unter einem halben Prozent im Jahr
+     ist ein Ort weder wachsend noch schrumpfend, er steht. */
+  function _bevStufe(pctProJahr) {
+    if (pctProJahr == null || !isFinite(pctProJahr)) return null;
+    if (pctProJahr >= 1.0) return 'stark_wachsend';
+    if (pctProJahr >= 0.3) return 'wachsend';
+    if (pctProJahr >= -0.3) return 'stabil';
+    if (pctProJahr >= -1.0) return 'leicht_fallend';
+    return 'stark_fallend';
+  }
+
+  /* Angebotsdauer in Tagen -> Nachfrage. Kurz im Schaufenster heisst:
+     es wird gekauft. Die Schwellen folgen denen im Marktbericht
+     (MarketInsightsService: <=60 hoch, <=120 mittel). */
+  function _nachfrageStufe(tage) {
+    if (tage == null || !isFinite(tage)) return null;
+    if (tage <= 30) return 'sehr_stark';
+    if (tage <= 60) return 'stark';
+    if (tage <= 120) return 'mittel';
+    if (tage <= 200) return 'schwach';
+    return 'sehr_schwach';
+  }
+  /* ═══ v1316 · Die Einstufungen wandern von selbst ins Formular ═══════
+     Marcels eigentliche Frage war nicht „kann er das", sondern „warum
+     macht er es nicht von allein". Die Antwort war: weil jemand auf „In
+     Felder übernehmen" drücken musste — für ALLES, auch für Zahlen, die
+     gar keine Entscheidung verlangen.
+
+     Die Trennung, die jetzt gilt:
+
+       AUTOMATISCH   Makrolage, Mikrolage, Bevölkerung, Nachfrage,
+                     Wertsteigerung. Das sind Einstufungen. Es gibt keine
+                     Spanne zu wählen, keine zweite Meinung einzuholen —
+                     die Zahl ist die Zahl.
+
+       PER KNOPF     Verkehrswert und Marktmiete. An denen hängt die
+                     Spannen-Wahl (niedrig / mittel / hoch), und die ist
+                     eine Entscheidung des Nutzers. Sie ihm abzunehmen
+                     hiesse, ihm eine Zahl unterzuschieben.
+
+     LEERE FELDER NUR. Was schon dasteht, bleibt stehen — auch wenn es
+     aus einem alten Abruf kommt. Wer von Hand „Sehr gut" gewählt hat,
+     soll das nicht beim nächsten Abruf still verlieren. */
+  function setSelLeer(id, v) {
+    var el = $(id);
+    if (!el || !v) return false;
+    if (String(el.value || '').trim() !== '') return false;   /* steht schon */
+    el.value = v;
+    if (String(el.value || '') !== String(v)) return false;   /* Option gibt es nicht */
+    try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+    return true;
+  }
+
+  function autoLage() {
+    if (!D) return 0;
+    var lc = function (sc) { return sc >= 8 ? 'sehr_gut' : sc >= 6 ? 'gut' : sc >= 4 ? 'durchschnittlich' : sc >= 2 ? 'schwach' : 'sehr_schwach'; };
+    var wc = function (p) { return p >= 3 ? 'sehr_hoch' : p >= 2 ? 'hoch' : p >= 1 ? 'mittel' : p > 0 ? 'niedrig' : 'keines'; };
+    var gesetzt = [];
+    if (D.macroRaw != null && setSelLeer('makrolage', lc(D.macroRaw / 10))) gesetzt.push('Makrolage');
+    if (D.microRaw != null && setSelLeer('mikrolage', lc(D.microRaw / 10))) gesetzt.push('Mikrolage');
+    if (D.trendRaw != null && setSelLeer('ds2_wertsteigerung', wc(D.trendRaw))) gesetzt.push('Wertsteigerung');
+    var b = _bevStufe(D.bevRaw);
+    if (b && setSelLeer('ds2_bevoelkerung', b)) gesetzt.push('Bevölkerung');
+    var n = _nachfrageStufe(D.tageRaw);
+    if (n && setSelLeer('ds2_nachfrage', n)) gesetzt.push('Nachfrage');
+    if (!gesetzt.length) return 0;
+    try { if (typeof global.calc === 'function') global.calc(); } catch (e) {}
+    try { if (typeof global.renderDealScore2 === 'function') global.renderDealScore2(); } catch (e) {}
+    try { toast('✓ ' + gesetzt.join(' + ') + ' automatisch übernommen'); } catch (e) {}
+    return gesetzt.length;
+  }
+
   function applyToFields() {
     if (!D) return; var applied = [];
     if (D.mw) { setInput('svwert', fmt0(D.mw[mode])); applied.push('Verkehrswert'); }
@@ -290,6 +430,11 @@ if (!window._wlc) {
     if (D.macroRaw != null) { setSel('makrolage', lc(D.macroRaw / 10)); applied.push('Makrolage'); }
     if (D.microRaw != null) { setSel('mikrolage', lc(D.microRaw / 10)); applied.push('Mikrolage'); }
     if (D.trendRaw != null) { var _w = wc(D.trendRaw); if (_w) { setSel('ds2_wertsteigerung', _w); applied.push('Wertsteigerung'); } }
+    /* v1316: die beiden, die es schon gab, aber nie ankamen. */
+    var _bev = _bevStufe(D.bevRaw);
+    if (_bev) { setSel('ds2_bevoelkerung', _bev); applied.push('Bevölkerung'); }
+    var _nf = _nachfrageStufe(D.tageRaw);
+    if (_nf) { setSel('ds2_nachfrage', _nf); applied.push('Nachfrage'); }
     try { if (typeof global.calc === 'function') global.calc(); } catch (e) {}
     try { if (typeof global.renderDealScore2 === 'function') global.renderDealScore2(); } catch (e) {}
     toast('✓ ' + (applied.join(' + ') || 'Werte') + ' übernommen (' + spanLabel() + ')');
@@ -397,6 +542,10 @@ if (!window._wlc) {
       var payload = data.data || data;
       D = mapCard(payload); mode = (_prefSpan() || 'med'); collapsed = false; /* v830-mb-expanded; v969c: Vorwahl-Spanne */
       render();
+      /* v1316: die Einstufungen wandern jetzt von selbst ins Formular -
+         nur in leere Felder, und nur die, an denen keine Spannen-Wahl
+         haengt. Verkehrswert und Marktmiete bleiben beim Knopf. */
+      try { autoLage(); } catch (e) {}
       persistFull({
         object_key: data.object_key || null, cost: (typeof data.cost === 'number' ? data.cost : (data.charged || data.liters || 0)),
         market_value: (payload.valuation && payload.valuation.market_value) || null,
@@ -422,5 +571,10 @@ if (!window._wlc) {
   global.DealPilotMB = { run: run, restore: restore, /* v752-api */
     getData: function () { return (D && D.mw) ? { D: D, mode: mode } : null; },
     setMode: function (m) { mode = (m === 'mid') ? 'med' : m; try { persistLight(); } catch (e) {} },
-    apply: applyToFields };
+    apply: applyToFields,
+    /* v1316: Pruefhaken. Ein echter Abruf kostet Guthaben - ohne diese
+       beiden laesst sich die Zuordnung nur durch Bezahlen messen. */
+    _erbZeile: erbZeileHtml,   /* v1322 */
+    _mapCard: mapCard,
+    _autoLage: function (payload) { if (payload) D = mapCard(payload); return autoLage(); } };
 })(window);

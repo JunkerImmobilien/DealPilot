@@ -138,9 +138,13 @@
     var zeilen = ARTEN.map(function (a) {
       var k = (s.arten && s.arten[a.key]) || {};
       var rest = _rest(s, a.key);
+      /* v1296: die Bank traegt ab jetzt nur noch Gekauftes — das Monats-
+         kontingent verfaellt. Bei Bestandsnutzern liegt darin noch ein
+         Rest aus der Ansparzeit, deshalb heisst es neutral "dauerhaft"
+         und nicht "gekauft": beides stimmt, "gespart" stimmt nicht mehr. */
       var gespart = k.bank || 0;
       var sub = (k.limit ? (k.limit + '/Monat') : 'nicht im Plan');
-      if (gespart > 0) sub = '+' + gespart + ' gespart';
+      if (gespart > 0) sub = '+' + gespart + ' dauerhaft';
       /* v1185: Die Testphase gewinnt die Beschriftung. Ohne sie stand bei
          einem Testnutzer „nicht im Plan" neben einer Zahl groesser null —
          die Wertermittlung liegt im Testpaket, nicht im Free-Plan. */
@@ -245,7 +249,7 @@
       var rest = _rest(s, a.key);
       var sub;
       if (!k.limit) sub = (k.bank ? 'nur zugekauft' : 'nicht in deinem Plan');
-      else if (k.bank) sub = k.limit + ' im Monat · ' + k.bank + ' gespart';
+      else if (k.bank) sub = k.limit + ' im Monat · ' + k.bank + ' dauerhaft';
       else sub = k.limit + ' im Monat';
       /* v1185: Die Testphase gewinnt die Beschriftung — aber sie darf den
          Rest nicht verschweigen. Bei 1 aus der Testphase und 2 gekauften
@@ -277,8 +281,12 @@
        dem Testpaket kommt, verfaellt sehr wohl. Beim Nachmessen im
        Browser aufgefallen: die Zellen waren schon richtig, der Text
        darunter widersprach ihnen. */
-    var hinweis = 'Was du in einem Monat nicht nutzt, verfällt nicht — es wandert ins Guthaben, ' +
-      'bis zum Dreifachen deines Monatskontingents. Zugekaufte Bewertungen verfallen nie.';
+    /* v1296: der Satz stand hier seit v1183 und sagt ab heute das Gegenteil
+       der Regel. Marcels Entscheidung vom 11.09.2026: das Monatskontingent
+       verfaellt, nur Gekauftes bleibt. */
+    var hinweis = 'Dein Monatskontingent gilt für den laufenden Monat — was du ' +
+      'bis zum Monatsende nicht nutzt, verfällt. Zugekaufte Bewertungen verfallen ' +
+      'nie und werden erst verbraucht, wenn dein Monatskontingent leer ist.';
     if (s.testphase && s.testphase.laeuft) {
       hinweis = 'Testphase: noch ' + s.testphase.tage_rest +
         (s.testphase.tage_rest === 1 ? ' Tag' : ' Tage') + ' Pro, bis ' +

@@ -953,7 +953,36 @@ function _calcImmediate(){
       gebQuoteOhneK: gebQuoteOhneK
     };
   }
-  var svw=v('svwert'),wp=svw>0?svw-kp:0;
+  /* ═══ v1313 · Der Erbbau-Abschlag greift VOR jedem Wertvergleich ═══════
+     Marcels Vorgabe: „bitte arbeite das in allen bewertungen mit ein."
+
+     Warum genau hier: `svw` ist die Wurzel. Daran haengen der Wertpuffer
+     (wp / wp_kpi), der Wert-Anker fuer die Wertsteigerung (wert_basis),
+     der Exit-Preis und ueber K.wp_kpi der Deal Score. Wer den Abschlag
+     erst weiter unten abzieht, hat oben schon drei Zahlen zu hoch
+     gerechnet - und der Score merkt es nie.
+
+     Kein Bewertungspartner nimmt das Erbbaurecht entgegen (gemessen gegen
+     GeoMap, 400 Unrecognized field fuer jede Schreibweise). Was im
+     Verkehrswert-Feld steht, ist deshalb im Regelfall Volleigentum, auch
+     wenn oben „Erbpacht" angekreuzt ist.
+
+     Wer ein echtes Erbbaurechts-Gutachten eingetragen hat, setzt den
+     Schalter „Wert ist bereits der Erbbaurechtswert" - dann bleibt svw
+     unangetastet. Ohne den Schalter waere die Kuerzung doppelt. */
+  var _erbAbzug = 0;
+  try {
+    if (window.DealPilotErbbau) {
+      var _erbErg = DealPilotErbbau.rechnen();
+      var _schonErb = (document.getElementById('erb_wert_ist_erb') || {}).checked;
+      if (_erbErg && _erbErg.ok && !_schonErb && _erbErg.abschlag > 0) _erbAbzug = _erbErg.abschlag;
+    }
+  } catch (_e) {}
+  st('erb_abzug_wert', _erbAbzug > 0 ? '-' + fE(_erbAbzug) + (_erbErg && _erbErg.ok ? ' · ' + _erbErg.abschlagPct.toFixed(1).replace('.', ',') + ' %' : '') : '–');
+  (function () { var _z = el('erb-abzug-zeile'); if (_z) _z.style.display = (_erbAbzug > 0) ? 'flex' : 'none'; })();
+  var svw=v('svwert');
+  if (_erbAbzug > 0 && svw > 0) svw = Math.max(0, svw - _erbAbzug);
+  var wp=svw>0?svw-kp:0;
   var wpBox=el('wert-puffer');if(wpBox)wpBox.style.display=wp>0?'flex':'none';
   st('wert-puffer-val',wp>0?fE(wp,0,true):'');
   // V63.65: Startwert für Wertsteigerung — Reihenfolge:
@@ -961,6 +990,10 @@ function _calcImmediate(){
   //   2. Bankbewertung (bankval) wenn > Kaufpreis
   //   3. Kaufpreis (kp) als Fallback
   var _bankval = v('bankval') || 0;
+  /* v1313: die Bankbewertung ist genauso ein Volleigentumswert - die Bank
+     bewertet nach BelWertV und setzt beim Erbbaurecht ihren eigenen
+     Abschlag, aber was hier eingetippt wird, ist der Wert VOR Abschlag. */
+  if (_erbAbzug > 0 && _bankval > 0) _bankval = Math.max(0, _bankval - _erbAbzug);
   var wert_basis;
   if (svw > 0) {
     wert_basis = svw;
@@ -1159,6 +1192,25 @@ function _calcImmediate(){
     // WEG-Rücklage: nur Info-Anzeige, NICHT summieren (ist bereits Teil des Hausgeldes)
     bwk = ul + nul;
   }
+  /* ═══ v1312 · Erbbauzins ════════════════════════════════
+     Steht NACH dem if/else, damit er in allen drei BWK-Modi greift
+     (Detail, % der NKM, % vom Kaufpreis) - in nur einem Zweig waere er
+     zwei Drittel der Zeit still verschwunden.
+
+     Warum nicht umlagefaehig: der Erbbauzins ist Sache des Eigentuemers,
+     § 2 BetrKV kennt ihn nicht. Er ist Werbungskosten und damit
+     steuerlich abziehbar - genau das tut nul im Cashflow: es geht in
+     cf_operativ und ueber zve_immo in die Steuer.
+
+     Er waechst in der Jahresschleife mit kstg. Das ist sogar realistisch:
+     fast jeder Vertrag traegt eine Wertsicherungsklausel am
+     Verbraucherpreisindex. */
+  var erbZins = 0;
+  try {
+    if (window.DealPilotErbbau && DealPilotErbbau.istAn()) erbZins = DealPilotErbbau.zinsJahr() || 0;
+  } catch (_e) {}
+  if (erbZins > 0) { nul += erbZins; bwk += erbZins; }
+  st('erb_zins_j', erbZins > 0 ? fE(erbZins) : '–');st('r-erb-zins', erbZins > 0 ? fE(erbZins) : '–');
   State.bwk=bwk;
   st('ul_sum',fE(ul));st('nul_sum',fE(nul));st('r-ul',fE(ul));st('r-nul',fE(nul));
   st('r-bwk',fE(bwk));st('r-bwk-pct',nkm_j>0?fP(bwk/nkm_j*100,1):'—');st('r-hg-ges',fE(v('hg_ul')+v('hg_nul')));

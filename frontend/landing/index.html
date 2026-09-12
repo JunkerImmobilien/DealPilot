@@ -546,6 +546,8 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
 .lu-tank b{position:relative;font-family:var(--disp);font-weight:700;font-size:26px;color:var(--ink);display:block}
 .lu-tank span{position:relative;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
 .lu-packs{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.lu-packs-3{grid-template-columns:repeat(3,1fr)}   /* v1294 */
+@media(max-width:640px){.lu-packs-3{grid-template-columns:1fr}}
 @media(max-width:640px){.lu-packs{grid-template-columns:1fr 1fr}}
 .lu-pack{position:relative;background:#fff;border:1px solid var(--cream-line);border-radius:14px;padding:20px 18px;text-align:center}
 .lu-pack.pop{border-color:var(--gd)}
@@ -2108,6 +2110,24 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
 }
 @media (max-width: 980px) { .dp-credits-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 540px) { .dp-credits-grid { grid-template-columns: 1fr; } }
+/* v1294 · Nachkauf statt Pakete: drei Karten statt vier. */
+.dp-nk-grid { grid-template-columns: repeat(3, 1fr); max-width: 860px; margin-left: auto; margin-right: auto; }
+@media (max-width: 980px) { .dp-nk-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 540px) { .dp-nk-grid { grid-template-columns: 1fr; } }
+/* Der Einzelkauf: eine ruhige Liste unter den Karten. Kein Knopf — auf
+   der Landing ist noch niemand angemeldet, gekauft wird in der App. */
+.dp-einzel-wrap { max-width: 640px; margin: 26px auto 0; padding: 18px 22px;
+  border: 1px solid rgba(201,168,76,.26); border-radius: 14px;
+  background: rgba(201,168,76,.045); }
+.dp-einzel-h { font: 700 11px/1 'JetBrains Mono', monospace; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--wl-c9a84c, #C9A84C); margin-bottom: 12px; }
+.dp-einzel-grid { display: flex; flex-direction: column; gap: 2px; }
+.dp-einzel-row { display: flex; align-items: baseline; justify-content: space-between;
+  gap: 14px; padding: 7px 0; border-bottom: 1px solid rgba(201,168,76,.14); }
+.dp-einzel-row:last-child { border-bottom: none; }
+.dp-einzel-l { font-size: 13.5px; opacity: .88; }
+.dp-einzel-p { font: 700 13.5px 'JetBrains Mono', monospace; white-space: nowrap;
+  color: var(--wl-e8cc7a, #E8CC7A); }
 
 .dp-credits-card {
   position: relative;
@@ -2813,22 +2833,43 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
           '</article>' +
         '</div>' +
 
-        // v489-kerosin-landing: Kerosin-Tacho-Karten (ersetzt KI-Credits + Marktdaten-Credits)
+        // ACHTUNG: dieser Block ist TOTER CODE. Er braucht ein Element
+        // `#pricing-host`, das es im ganzen Frontend nicht gibt (geprueft
+        // am 11.09.2026). Sichtbar sind auf der Landing nur die statischen
+        // `lu-pack`-Kacheln weiter unten und die Fliesstexte. Angeglichen
+        // wurde er trotzdem, damit eine Wiederbelebung nicht vier tote
+        // Kaufknoepfe mitbringt.
+        // v1294: Hier standen bis heute die vier Bewertungs-Pakete zu
+        // 7,90 / 19,90 / 39,90 / 69,90 EUR. Sie sind seit v1246 nicht mehr
+        // kaufbar — das Backend kennt nur noch dp_nachkauf_* und
+        // dp_einzeln_*, die alten Stripe-Preise sind stillgelegt. Gemessen
+        // am 11.09.2026: der Checkout antwortete auf `paket_kurz` mit
+        // HTTP 400 `invalid_pack`, auf `nachkauf_starter` mit 200.
+        // Vier Kaufknoepfe, die nichts kaufen. Jetzt steht dort, was es
+        // wirklich gibt: das eigene Kontingent noch einmal, oder einzeln.
         '<div class="dp-container dp-section">' +
           '<div class="dp-section-head">' +
             '<span class="dp-pill dp-pill-alt">Bewertungen nachkaufen</span>' +
-            '<h2 class="dp-h2">Mehr Reichweite. Ohne Abo.</h2>' +
+            '<h2 class="dp-h2">Aufgebraucht? Einfach nachlegen.</h2>' +
             '<p class="dp-sub">' +
-              '<strong>Gezählt werden Bewertungen, getrennt nach Art.</strong> Dein Plan setzt sie monatlich neu (Starter 5 · Investor 5 · 5 · Pro 5 · 5 · 5) — was du nicht nutzt, wandert ins Guthaben; Zugekauftes verfällt nie und wird zuletzt verbraucht.' /* v1183 */ +
+              '<strong>Gezählt werden Bewertungen, getrennt nach Art.</strong> Dein Plan setzt sie monatlich neu (Starter 5 · Investor 5 · 5 · Pro 5 · 5 · 5) — was du im Monat nicht nutzt, verfällt zum Monatsende. Zugekauftes verfällt nie und wird erst verbraucht, wenn dein Monatskontingent leer ist.' +
             '</p>' +
           '</div>' +
-          '<div class="dp-credits-grid">' +
-            _kerosinCard('5 · 2 · 0',   '7,90',  0.90, 'Mal schnell prüfen',  '✈ Kurzstrecke',       164.8, -57.6, '5 Marktpreisindikationen · 2 erweiterte', false) +
-            _kerosinCard('10 · 5 · 1',  '19,90', 0.85, 'Mehrere Deals',       '✈✈ Mittelstrecke',   116.6, -14.4, '10 · 5 · 1 Wertermittlung', false) +
-            _kerosinCard('15 · 10 · 3', '39,90', 0.80, 'Aktiver Investor',    '✈✈✈ Langstrecke',  56.3,  39.6,  '15 · 10 · 3 Wertermittlungen', true)  +
-            _kerosinCard('25 · 20 · 6', '69,90', 0.75, 'Maximale Reichweite', '🌍 Interkontinental', 14.1,  77.4,  '25 · 20 · 6 Wertermittlungen', false) +
+          '<div class="dp-credits-grid dp-nk-grid">' +
+            _nachkaufCard('Starter', '5 · 0 · 0', '5,00', '5 Marktpreisindikationen', false) +
+            _nachkaufCard('Investor', '5 · 5 · 0', '8,75', '5 Indikationen · 5 erweiterte', true) +
+            _nachkaufCard('Pro', '5 · 5 · 5', '12,50', '5 · 5 · 5 Wertermittlungen', false) +
           '</div>' +
-          '<p class="dp-note" style="text-align:center;margin-top:14px">Bewertungen sind ab dem Starter-Plan zubuchbar · verfallen nicht · kein Abo.</p>' +
+          '<div class="dp-einzel-wrap">' +
+            '<div class="dp-einzel-h">Oder einzeln — genau die eine, die gerade fehlt</div>' +
+            '<div class="dp-einzel-grid">' +
+              _einzelZeile('Marktpreisindikation', '0,90') +
+              _einzelZeile('Erweiterte Marktpreisindikation', '1,90') +
+              _einzelZeile('Wertermittlung nach ImmoWertV', '3,90') +
+              /* v1296: die beiden Marktwert-Abrufe (5,90 / 9,90) sind raus. */
+            '</div>' +
+          '</div>' +
+          '<p class="dp-note" style="text-align:center;margin-top:14px">Nachkaufen geht ab dem Starter-Plan · Zugekauftes verfällt nie · kein Abo.</p>' +
         '</div>' +
 
         // Feature-Übersicht
@@ -2951,6 +2992,37 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
      der Stueckpreis der einfachsten Bewertung im Paket. Die Parameternamen
      bleiben, damit die Aufrufer nicht mitwandern muessen — der angezeigte
      Text nennt keine Liter mehr. */
+  /* ═══ v1294 · Nachkauf statt Pakete ═════════════════════════════════
+     Eine Karte je Plan: dieselbe Menge noch einmal, fuer ein Viertel des
+     Monatsbeitrags. Die Zahlen stehen hier als Text, nicht als Rechnung —
+     die Landing hat kein `config.js`. Wer die Planpreise aendert, aendert
+     sie hier mit; die Quelle ist und bleibt PRICING in config.js.
+       Starter  19,99 / 4 = 5,00      5 · 0 · 0
+       Investor 34,99 / 4 = 8,75      5 · 5 · 0
+       Pro      49,99 / 4 = 12,50     5 · 5 · 5 */
+  function _nachkaufCard(plan, menge, preis, reach, best) {
+    return '<div class="dp-credits-card kp-card dp-nk-card' + (best ? ' dp-credits-card-best' : '') + '">' +
+      (best ? '<span class="dp-credits-best">Beliebt</span>' : '') +
+      '<div class="kp-flight">Für ' + plan + '</div>' +
+      '<div class="dp-credits-amount">' + menge + '</div>' +
+      '<div class="dp-credits-amount-label">MPI · erweitert · Wertermittlung</div>' +
+      '<div class="dp-credits-divider"></div>' +
+      '<div class="dp-credits-price">' + preis + ' €</div>' +
+      '<div class="dp-credits-perunit">ein Viertel deines Monatsbeitrags</div>' +
+      '<div class="dp-credits-target">Dein Kontingent noch einmal</div>' +
+      '<div class="kp-reach">' + reach + '</div>' +
+      '<a class="dp-credits-cta" href="https://app.dealpilot.junker-immobilien.io/?register=1&plan=' +
+        encodeURIComponent(plan.toLowerCase()) + '">Zum ' + plan + '-Plan</a>' +
+    '</div>';
+  }
+
+  function _einzelZeile(label, preis) {
+    return '<div class="dp-einzel-row">' +
+      '<span class="dp-einzel-l">' + label + '</span>' +
+      '<span class="dp-einzel-p">' + preis + ' €</span>' +
+    '</div>';
+  }
+
   function _kerosinCard(liter, price, perLiter, target, flight, off, deg, reach, best) {
     var perStr = (typeof perLiter === 'number')
       ? perLiter.toFixed(2).replace('.', ',') + ' €'
@@ -3661,7 +3733,7 @@ html{scroll-behavior:smooth}
         DealPilot rechnet in <strong>Bewertungen</strong> — und zwar getrennt nach Art, weil sie unterschiedlich aufwendig sind: die <strong>Marktpreisindikation</strong> als schneller Marktabgleich, die <strong>erweiterte Marktpreisindikation</strong> mit Vergleichswerten und Korridor, und die <strong>Wertermittlung nach ImmoWertV</strong> als vollständiges Verfahren mit Modellvermerken. Jede Art hat ihr eigenes Kontingent. Wir rechnen so statt mit einer Flatrate, weil die Verfahren für uns echte Kosten bedeuten — und ein Pauschalmodell entweder zu teuer für Gelegenheitsnutzer wäre oder zu beschränkt für Power-Nutzer.
       </p>
       <p>
-        Dein Plan setzt die Kontingente jeden Monat neu (Starter: 5 Marktpreisindikationen, Investor zusätzlich 5 erweiterte, Pro zusätzlich 5 Wertermittlungen). <strong>Was du nicht nutzt, verfällt nicht</strong> — es wandert ins Guthaben, bis zum Dreifachen deines Monatskontingents. Brauchst du mehr, kaufst du nach: ab 7,90 € für ein Paket oder 0,90 € für eine einzelne Marktpreisindikation. Zugekaufte Bewertungen verfallen nie und werden zuletzt verbraucht.
+        Dein Plan setzt die Kontingente jeden Monat neu (Starter: 5 Marktpreisindikationen, Investor zusätzlich 5 erweiterte, Pro zusätzlich 5 Wertermittlungen). <strong>Was du im Monat nicht nutzt, verfällt zum Monatsende</strong> — das Kontingent gehört zum Plan, nicht auf ein Konto. Brauchst du mehr, kaufst du nach: dein Monatskontingent noch einmal für ein Viertel deines Monatsbeitrags (Starter 5,00 €, Investor 8,75 €, Pro 12,50 €) — oder einzeln ab 0,90 € für eine Marktpreisindikation. Zugekaufte Bewertungen verfallen nie und werden zuletzt verbraucht.
       </p>
       <p>
         Die kleinen KI-Hilfen — Spracheingabe, Beleg-Import, Bodenrichtwert-Abruf, Feldvorschläge — sind <strong>in jedem Plan enthalten</strong> und zählen gegen kein Kontingent.
@@ -3795,7 +3867,7 @@ html{scroll-behavior:smooth}
         Eine Kalkulation ist nur so gut wie ihre Annahmen. DealPilot holt deshalb echte Marktdaten in die Analyse: <strong>Live-Marktzinsen</strong> für realistische Finanzierungskonditionen, den automatischen <strong>Mietspiegel-Vergleich</strong> für deine Mietansätze und den <strong>Bodenrichtwert-Abruf</strong> für die Einordnung des Grundstücksanteils.
       </p>
       <p>
-        Für die Preisfrage selbst gibt es die <strong>Marktwert-Indikation</strong> über <strong>unabhängige Bewertungspartner</strong> — dieselben Datengrundlagen, mit denen Banken und Sachverständige arbeiten. Die Abrufe kaufst du einzeln, ohne Abo-Bindung an einen Datenanbieter. So siehst du schwarz auf weiß, ob der Angebotspreis im Marktkorridor liegt, bevor du verhandelst.
+        Für die Preisfrage selbst gibt es <strong>drei Stufen</strong> — von der schnellen <strong>Marktpreisindikation</strong> über die <strong>erweiterte Indikation mit Korridor</strong> bis zur vollen <strong>Wertermittlung nach ImmoWertV</strong>, dem Verfahren, mit dem auch Sachverständige arbeiten. Jede Stufe liegt in deinem Monatskontingent; reicht es nicht, kaufst du nach, ohne zusätzliche Abo-Bindung. So siehst du schwarz auf weiß, ob der Angebotspreis im Marktkorridor liegt, bevor du verhandelst.
       </p>
     </div>
   </section>
@@ -3825,7 +3897,7 @@ html{scroll-behavior:smooth}
       <div class="head">
         <span class="eye">// Dein Kontingent</span>
         <h2>Drei Tiefen, <span class="ac">du entscheidest.</span></h2>
-        <p>Gez&auml;hlt werden <strong>Bewertungen</strong>, getrennt nach Art &mdash; weil sie unterschiedlich aufwendig sind. Dein Plan setzt die Kontingente jeden Monat neu. <strong>Was du nicht nutzt, verf&auml;llt nicht</strong>, es wandert ins Guthaben.</p>
+        <p>Gez&auml;hlt werden <strong>Bewertungen</strong>, getrennt nach Art &mdash; weil sie unterschiedlich aufwendig sind. Dein Plan setzt die Kontingente jeden Monat neu. <strong>Was du im Monat nicht nutzt, verf&auml;llt zum Monatsende</strong>. Nur Zugekauftes bleibt dauerhaft.</p>
       </div>
 
       <div class="lu-sub">Monatliches Kontingent je Plan</div>
@@ -3841,16 +3913,26 @@ html{scroll-behavior:smooth}
         <div class="lu-cost"><span class="c-n">Marktpreisindikation &middot; schneller Marktabgleich</span><span class="c-v">0,90&nbsp;&euro;</span></div>
         <div class="lu-cost"><span class="c-n">Erweiterte Marktpreisindikation &middot; mit Korridor</span><span class="c-v">1,90&nbsp;&euro;</span></div>
         <div class="lu-cost"><span class="c-n">Wertermittlung nach ImmoWertV &middot; volles Verfahren</span><span class="c-v">3,90&nbsp;&euro;</span></div>
-        <div class="lu-cost"><span class="c-n">Marktwert-Abruf &middot; unabh&auml;ngiger Bewertungspartner</span><span class="c-v">5,90&nbsp;&euro;</span></div>
-        <div class="lu-cost"><span class="c-n">Marktwert-Abruf &middot; zweiter Bewertungspartner</span><span class="c-v">9,90&nbsp;&euro;</span></div>
+        <!-- v1296: Hier standen zwei weitere Zeilen - Marktwert-Abruf beim
+             Bewertungspartner (5,90) und beim zweiten (9,90). Sie sind raus:
+             Marcels Entscheidung vom 11.09.2026, die Abrufe werden erstmal
+             nicht angeboten.
+             Nebenbei stimmt damit die Ueberschrift wieder. Sie sagte "Die
+             drei Bewertungsarten" und darunter standen FUENF - der
+             Widerspruch, an dem die Frage aufkam, was die beiden ueberhaupt
+             sind. Sie waren etwas anderes: die drei oben rechnen wir selbst,
+             die beiden unten kauften einen fremden Wert zu. -->
       </div>
 
       <div class="lu-sub">Nachkaufen &mdash; jederzeit, ohne Abo</div>
-      <div class="lu-packs">
-        <div class="lu-pack"><div class="lp-l">5&nbsp;&middot;&nbsp;2&nbsp;&middot;&nbsp;0</div><div class="lp-p">7,90&nbsp;&euro;</div><div class="lp-u">Kurzstrecke</div></div>
-        <div class="lu-pack"><div class="lp-l">10&nbsp;&middot;&nbsp;5&nbsp;&middot;&nbsp;1</div><div class="lp-p">19,90&nbsp;&euro;</div><div class="lp-u">Mittelstrecke</div></div>
-        <div class="lu-pack pop"><span class="lp-tag">beliebt</span><div class="lp-l">15&nbsp;&middot;&nbsp;10&nbsp;&middot;&nbsp;3</div><div class="lp-p">39,90&nbsp;&euro;</div><div class="lp-u">Langstrecke</div></div>
-        <div class="lu-pack"><div class="lp-l">25&nbsp;&middot;&nbsp;20&nbsp;&middot;&nbsp;6</div><div class="lp-p">69,90&nbsp;&euro;</div><div class="lp-u">Interkontinental</div></div>
+      <!-- v1294: Hier standen die vier Bewertungs-Pakete (7,90 / 19,90 /
+           39,90 / 69,90 EUR). Seit v1246 sind sie nicht mehr kaufbar - das
+           Backend kennt nur dp_nachkauf_* und dp_einzeln_*. Jetzt steht
+           hier, was es wirklich gibt: das eigene Kontingent noch einmal. -->
+      <div class="lu-packs lu-packs-3">
+        <div class="lu-pack"><div class="lp-l">5&nbsp;&middot;&nbsp;0&nbsp;&middot;&nbsp;0</div><div class="lp-p">5,00&nbsp;&euro;</div><div class="lp-u">Starter</div></div>
+        <div class="lu-pack pop"><span class="lp-tag">beliebt</span><div class="lp-l">5&nbsp;&middot;&nbsp;5&nbsp;&middot;&nbsp;0</div><div class="lp-p">8,75&nbsp;&euro;</div><div class="lp-u">Investor</div></div>
+        <div class="lu-pack"><div class="lp-l">5&nbsp;&middot;&nbsp;5&nbsp;&middot;&nbsp;5</div><div class="lp-p">12,50&nbsp;&euro;</div><div class="lp-u">Pro</div></div>
       </div>
 
       <p class="dp-note" style="text-align:center;margin-top:16px">Spracheingabe, Beleg-Import, Bodenrichtwert und Feldvorschl&auml;ge sind in jedem Plan enthalten und z&auml;hlen gegen kein Kontingent.</p>

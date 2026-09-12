@@ -203,14 +203,25 @@
             '<span class="dp-pill dp-pill-alt">Bewertungen nachkaufen</span>' +
             '<h2 class="dp-h2">Volltanken. Durchstarten.</h2>' +
             '<p class="dp-sub">' +
-              '<strong>Gezählt werden Bewertungen, getrennt nach Art.</strong> Dein Plan setzt sie monatlich neu (Starter 5 · Investor 5 · 5 · Pro 5 · 5 · 5) — was du nicht nutzt, wandert ins Guthaben; Zugekauftes verfällt nie und wird zuletzt verbraucht.' /* v1183 */ +
+              '<strong>Gezählt werden Bewertungen, getrennt nach Art.</strong> Dein Plan setzt sie monatlich neu (Starter 5 · Investor 5 · 5 · Pro 5 · 5 · 5) — was du im Monat nicht nutzt, verfällt zum Monatsende. Zugekauftes verfällt nie und wird erst verbraucht, wenn dein Monatskontingent leer ist.' /* v1183 */ +
             '</p>' +
           '</div>' +
           '<div class="dp-credits-grid">' +
-            _kerosinCard('5 · 2 · 0',   '7,90',  0.90, 'Mal schnell prüfen',  '✈ Kurzstrecke',       164.8, -57.6, '5 Marktpreisindikationen · 2 erweiterte', false) +
-            _kerosinCard('10 · 5 · 1',  '19,90', 0.85, 'Mehrere Deals',       '✈✈ Mittelstrecke',   116.6, -14.4, '10 · 5 · 1 Wertermittlung', false) +
-            _kerosinCard('15 · 10 · 3', '39,90', 0.80, 'Aktiver Investor',    '✈✈✈ Langstrecke',  56.3,  39.6,  '15 · 10 · 3 Wertermittlungen', true)  +
-            _kerosinCard('25 · 20 · 6', '69,90', 0.75, 'Maximale Reichweite', '🌍 Interkontinental', 14.1,  77.4,  '25 · 20 · 6 Wertermittlungen', false) +
+            /* v1294 · TOTER CODE, absichtlich stehengelassen.
+               Diese Datei wird von KEINER Seite eingebunden (geprueft am
+               11.09.2026: kein <script src=".../pricing-plugin.js">), und
+               der Block braucht ein Element `#pricing-host`, das es im
+               ganzen Frontend nicht gibt. Dasselbe gilt fuer die zweite
+               Kopie in landing/index.html.
+
+               Die vier Bewertungs-Pakete (7,90 / 19,90 / 39,90 / 69,90 EUR)
+               standen hier. Sie sind seit v1246 nicht mehr kaufbar - der
+               Checkout antwortet auf `paket_kurz` mit HTTP 400. Sie stehen
+               deshalb auch hier nicht mehr: wer die Datei eines Tages
+               wiederbelebt, soll nicht vier tote Kaufknoepfe mitbringen. */
+            _nkCard('Starter',  '5 · 0 · 0', '5,00',  '5 Marktpreisindikationen') +
+            _nkCard('Investor', '5 · 5 · 0', '8,75',  '5 Indikationen · 5 erweiterte') +
+            _nkCard('Pro',      '5 · 5 · 5', '12,50', '5 · 5 · 5 Wertermittlungen') +
           '</div>' +
           '<p class="dp-note" style="text-align:center;margin-top:14px">Bewertungen sind ab dem Starter-Plan zubuchbar · verfallen nicht · kein Abo.</p>' +
         '</div>' +
@@ -327,6 +338,7 @@
     '</svg>';
   }
 
+  function _nkCard(plan, menge, preis, reach) {    return '<div class="dp-credits-card kp-card">' +      '<div class="kp-flight">Für ' + plan + '</div>' +      '<div class="dp-credits-amount">' + menge + '</div>' +      '<div class="dp-credits-amount-label">MPI · erweitert · Wertermittlung</div>' +      '<div class="dp-credits-price">' + preis + ' €</div>' +      '<div class="kp-reach">' + reach + '</div>' +    '</div>';  }
   function _kerosinCard(liter, price, perLiter, target, flight, off, deg, reach, best) {
     var perStr = (typeof perLiter === 'number') ? perLiter.toFixed(2).replace('.', ',') + ' €' : String(perLiter);
     return '<div class="dp-credits-card kp-card' + (best ? ' dp-credits-card-best' : '') + '">' +

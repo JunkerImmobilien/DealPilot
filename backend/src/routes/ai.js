@@ -78,7 +78,58 @@ const extractLimiter = rateLimit({
   keyGenerator: function(req) {
     return req.user && req.user.id ? 'u:' + req.user.id : req.ip;
   },
-  message: { error: 'Zu viele PDF-Extraktionen — bitte 1h warten oder eigenen OpenAI-Key in Settings hinterlegen.' }
+  message: { error: 'Zu viele Dokument-Auswertungen — bitte eine Stunde warten oder einen eigenen OpenAI-Key in den Einstellungen hinterlegen.' }
+});
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1290d · DER DIALOG BRAUCHT EINE EIGENE SCHRANKE
+   ═══════════════════════════════════════════════════════════════════════
+   Gemessen am 10.09.2026 beim Testen des Sprechlaufs: nach zwei
+   Durchlaeufen kam
+
+     „Zu viele PDF-Extraktionen — bitte 1h warten"
+
+   mitten im Gespraech. Zwei Fehler auf einmal.
+
+   1. DIE ZAHL PASST NICHT ZUM WEG. Der Limiter stammt aus der Zeit, als
+      es nur den PDF-Exposé-Import gab: 30 Auswertungen je Stunde, „mehr
+      als jeder legitime Workflow braucht". Fuer ein Dokument stimmt das.
+      Der gefuehrte Sprechlauf stellt aber **16 Fragen**, und jede Antwort
+      ist ein Aufruf — dazu Nachhaken, Zwischenfragen, ein zweiter Anlauf,
+      wenn etwas nicht verstanden wurde. **Nach EINEM Durchlauf ist die
+      Haelfte weg, nach zweien ist der Nutzer gesperrt.** Der Hauptweg der
+      Objektaufnahme faellt damit an seiner eigenen Schutzschranke aus.
+
+   2. DER TEXT NENNT PDFs, waehrend jemand spricht. Eine Fehlermeldung,
+      die vom falschen Vorgang redet, schickt den Nutzer in die falsche
+      Richtung — er sucht den Fehler bei einem Dokument, das er gar nicht
+      hochgeladen hat.
+
+   DER SCHUTZZWECK BLEIBT. Es geht darum, dass niemand unbegrenzt Aufrufe
+   auf dem Server-Schluessel ausloest. Der wird nicht aufgegeben, nur
+   richtig bemessen:
+
+     Dialog   150 Aufrufe/Stunde je Nutzer.
+              Ein voller Sprechlauf braucht 20 bis 30; das sind fuenf
+              Durchlaeufe in einer Stunde, und mehr macht niemand.
+              Eine gesprochene Antwort kostet gemessen unter 0,1 Cent
+              (die Transkription ist der groesste Posten, das Gesagte
+              selbst faellt kaum ins Gewicht) — 150 Aufrufe bleiben damit
+              deutlich unter 20 Cent je Nutzer und Stunde.
+     Dokument  30 Aufrufe/Stunde je Nutzer, unveraendert. Ein Exposé ist
+              ein Vorgang, kein Gespraech.
+
+   GETRENNTE ZAEHLER, nicht ein groesserer: wer viele Exposés einliest,
+   soll nicht den Sprechlauf blockieren, und umgekehrt. */
+const dialogLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 150,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: function(req) {
+    return req.user && req.user.id ? 'd:' + req.user.id : req.ip;
+  },
+  message: { error: 'Das waren sehr viele Antworten in einer Stunde. Warte einen Moment — oder hinterlege in den Einstellungen einen eigenen OpenAI-Key, dann gilt die Grenze nicht.' }
 });
 
 /**
@@ -482,7 +533,7 @@ router.post('/transcribe-chunk', authenticate, liveTranscribeLimiter, async (req
   } catch (err) { next(err); }
 });
 
-router.post('/extract-voice', authenticate, extractLimiter, async (req, res, next) => {
+router.post('/extract-voice', authenticate, dialogLimiter, async (req, res, next) => {
   try {
     const { audio, mime, catalog, userApiKey: rawUserKey } = req.body || {};
     const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
@@ -519,6 +570,208 @@ router.post('/extract-voice', authenticate, extractLimiter, async (req, res, nex
         await aiCreditsService.logExtract(req.user.id, 'extract-voice');
       } catch (e) {
         console.warn('[ai/extract-voice] logExtract fehlgeschlagen:', e.message);
+      }
+    }
+    res.json(result);
+  } catch (err) {
+    if (err.code === 'NO_API_KEY') return res.status(503).json({ error: err.message, needs_user_key: true });
+    if (err.status === 401) return res.status(401).json({ error: err.message });
+    if (err.status) return res.status(err.status >= 500 ? 502 : err.status).json({ error: err.message });
+    next(err);
+  }
+});
+
+/* v1281-FRAGE · POST /api/v1/ai/copilot-frage
+ *
+ * Marcels Wunsch: „dann wäre es cool, wenn man ihm vielleicht auch einfach
+ * Fragen stellen könnte … und dass er darauf dann antwortet zu dem Kontext,
+ * den er bis dahin hat."
+ *
+ * Der Unterschied zu extract-text ist der Zweck: dort geht ein Wert INS
+ * Formular, hier kommt eine Auskunft AN DEN MENSCHEN. Deshalb ein eigener
+ * Endpunkt statt eines Schalters - zwei Zwecke in einer Route heisst, dass
+ * ein Fehler im einen den anderen mitreisst.
+ *
+ * DREI REGELN stehen im Prompt, und jede hat einen Grund:
+ *  1. Kurz. Zwei bis vier Saetze. Wer mitten in einer Aufnahme fragt, will
+ *     weitermachen, nicht lesen.
+ *  2. Keine Zahl erfinden. Was nicht im bekannten Stand steht, wird als
+ *     unbekannt benannt - nicht geschaetzt. Das ist dieselbe Regel, nach
+ *     der der Marktbericht ein Verfahren weglaesst, wenn eine Pflichtangabe
+ *     fehlt.
+ *  3. Keine Anlageberatung. Rechnen und einordnen ja, „kauf das" nein.
+ */
+router.post('/copilot-frage', authenticate, dialogLimiter, async (req, res, next) => {
+  try {
+    const { frage, kontext } = req.body || {};
+    if (!config.openai.apiKey) return res.status(503).json({ error: 'Kein OpenAI-API-Key verfuegbar.' });
+    if (!frage || typeof frage !== 'string' || frage.trim().length < 2) {
+      return res.status(400).json({ error: 'Body muss "frage" enthalten.' });
+    }
+    const zeilen = [];
+    if (kontext && typeof kontext === 'object') {
+      /* v1288b: 80 statt 40 Zeilen und 200 statt 60 Zeichen je Wert.
+         Der Sprechlauf schickt seit v1288b KLARTEXT-Bezeichnungen samt
+         der abgeleiteten Groessen (Score, Cashflow, DSCR, Marktwert) —
+         das sind mehr und laengere Zeilen als die 16 Feld-ids von v1280.
+         Bei 40 waere ausgerechnet das Ende abgeschnitten worden, und dort
+         stehen die Kennzahlen, nach denen gefragt wird. */
+      Object.keys(kontext).slice(0, 80).forEach(function (k) {
+        const v = kontext[k];
+        if (v === '' || v === null || v === undefined) return;
+        zeilen.push('  ' + k + ' = ' + String(v).slice(0, 200));
+      });
+    }
+    const prompt = [
+      'Du bist der Co-Pilot einer deutschen Immobilien-Investitionssoftware.',
+      'Der Nutzer nimmt gerade ein Objekt auf und stellt zwischendurch eine Frage.',
+      '',
+      zeilen.length ? 'BEKANNTER STAND DIESES OBJEKTS (Bezeichnung = Wert):' : 'Zu diesem Objekt ist noch nichts bekannt.',
+      zeilen.join('\n'),
+      '',
+      'REGELN:',
+      '1. Antworte auf DEUTSCH, im Du, in zwei bis vier Saetzen. Kein Markdown,',
+      '   keine Aufzaehlung, keine Ueberschrift.',
+      '2. Rechne gern mit den bekannten Werten und nenne dabei, WORAUS du',
+      '   rechnest ("bei 200.000 Kaufpreis und 490 Miete sind das ...").',
+      '3. Was nicht im bekannten Stand steht, ERFINDE NICHT. Sag stattdessen,',
+      '   welche Angabe dir fehlt. Lieber eine Luecke benennen als eine Zahl,',
+      '   die niemand belegen kann.',
+      /* v1288b: Die Umkehrung derselben Regel. Gemessen am 10.09.2026:
+         auf "Warum ist der Cashflow so negativ?" antwortete das Modell
+         "fuer eine saubere Erklaerung fehlt mir noch der Zinssatz, die
+         Tilgung" — beide standen im Kontext, damals aber als `d1z` und
+         `d1t`. Der Kontext traegt jetzt Klartext; damit ist eine gemeldete
+         Luecke, die keine ist, kein Verstaendnisproblem mehr, sondern ein
+         Fehler. */
+      '3b. UMGEKEHRT GILT DASSELBE: was oben steht, IST bekannt. Behaupte',
+      '   nie, dir fehle eine Angabe, die in der Liste steht — lies sie',
+      '   dort nach und rechne damit. Der Stand enthaelt neben den',
+      '   Eingaben auch bereits berechnete Kennzahlen (Cashflow, DSCR,',
+      '   LTV, Renditen, Deal Score); nutze sie, statt sie neu zu schaetzen.',
+      '4. Keine Anlageberatung und keine Kaufempfehlung. Einordnen ja,',
+      '   entscheiden nein - das bleibt beim Nutzer.',
+      '5. Fragt der Nutzer nach einem Fachbegriff (DSCR, IRR, AfA, Sonder-AfA,',
+      '   Liegenschaftszins), erklaere ihn in einem Satz und rechne ihn, wenn',
+      '   die noetigen Werte bekannt sind.',
+      /* v1288b: Die Score-Stufen sind in der Haupt-App eine feste Kette
+         (CLAUDE.md, js/dashboard.js:390). Ein Modell, das denselben Score
+         mit einem anderen Wort belegt, erzeugt genau den Widerspruch, der
+         in v1203 im Marktbericht aufgefallen ist. */
+      '6. Score-Stufen, falls du einen Score einordnest: ab 85 Top, ab 70',
+      '   Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch. Benutze',
+      '   genau diese Woerter.',
+      /* v1288b: Steht bei einem Wert eine Quelle, gehoert sie zur Auskunft.
+         Ein amtlicher Bodenrichtwert und eine Schaetzung sind nicht
+         dasselbe, und der Unterschied ist im Zweifel die ganze Antwort. */
+      '7. Steht hinter einem Wert "[Quelle: ...]", stammt er nicht vom',
+      '   Nutzer, sondern aus einem Abruf oder seinen Einstellungen. Sag',
+      '   das dazu, wenn du dich auf so einen Wert stuetzt.',
+      /* ═══ v1319 · Allgemeinwissen ist keine erfundene Zahl ═══════════════
+         Marcels Wunsch: „Ich würde gerne dem Co-Piloten einfach im Chat auch
+         Fragen stellen. Zum Beispiel: Wie ist denn die Postleitzahl von
+         Herford? Und dann schaltet er einmal um, sucht die Postleitzahl von
+         Herford … und würde danach aber in seinem normalen Jargon
+         weitermachen."
+
+         WARUM DAS BISHER NICHT GING: Regel 3 verbietet alles, was nicht im
+         bekannten Stand steht. Diese Regel ist richtig und bleibt — sie
+         verhindert, dass das Modell eine Wohnflaeche schaetzt oder einen
+         Kaufpreis erfindet. Nur trifft sie auch „Wie ist die Postleitzahl
+         von Herford?", und darauf ist „das steht nicht im Stand" keine
+         Antwort, sondern eine Ausrede.
+
+         DIE GRENZE, die den Unterschied macht: es geht darum, ob eine
+         Angabe zu DIESEM Objekt gehoert oder allgemein nachschlagbar ist.
+         Die Wohnflaeche dieser Wohnung kennt nur der Nutzer. Die
+         Postleitzahl von Herford kennt jeder — sie ist keine Schaetzung,
+         sie ist ein Fakt. */
+      '8. ALLGEMEINE SACHFRAGEN BEANTWORTEST DU AUS DEINEM WISSEN. Postleitzahl,',
+      '   Vorwahl, Einwohnerzahl, Bundesland, Grunderwerbsteuersatz eines Landes,',
+      '   was ein Erbbaurecht ist, wie ein Liegenschaftszins wirkt - das sind',
+      '   Fakten, keine Schaetzungen. Antworte darauf normal und sag, wenn du',
+      '   dir bei einem Detail unsicher bist. Gibt es mehrere richtige Antworten',
+      '   (Herford hat mehrere Postleitzahlen), nenne sie.',
+      '   DIE GRENZE ZU REGEL 3: dort geht es um Angaben zu DIESEM Objekt -',
+      '   Wohnflaeche, Kaufpreis, Miete, Baujahr. Die kennt nur der Nutzer, die',
+      '   erfindest du nie. Was jeder nachschlagen kann, darfst du sagen.',
+      '9. Nach einer solchen Auskunft machst du im normalen Ton weiter - kein',
+      '   Themenwechsel, keine Entschuldigung, kein "zurueck zum Thema". Die',
+      '   offene Frage blendet die Oberflaeche selbst wieder ein.',
+      '',
+      'FRAGE DES NUTZERS:',
+      '"""',
+      String(frage).slice(0, 800),
+      '"""'
+    ].join('\n');
+
+    const modell = process.env.OPENAI_COPILOT_MODEL || process.env.OPENAI_VOICE_EXTRACT_MODEL || 'gpt-5.4-mini';
+    const r = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + config.openai.apiKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: modell, input: [{ role: 'user', content: prompt }], max_output_tokens: 700 })
+    });
+    const data = await r.json().catch(() => null);
+    if (!r.ok) {
+      const msg = (data && data.error && data.error.message) || ('Fehler ' + r.status);
+      return res.status(502).json({ error: msg });
+    }
+    let text = '';
+    try {
+      if (typeof data.output_text === 'string') text = data.output_text;
+      else if (Array.isArray(data.output)) {
+        data.output.forEach(function (o) {
+          (o.content || []).forEach(function (c) { if (c.type === 'output_text' && c.text) text += c.text; });
+        });
+      }
+    } catch (e) {}
+    text = String(text || '').trim();
+    if (!text) return res.status(502).json({ error: 'Keine Antwort erhalten.' });
+    res.json({ antwort: text });
+  } catch (err) {
+    if (err.status) return res.status(err.status >= 500 ? 502 : err.status).json({ error: err.message });
+    next(err);
+  }
+});
+
+/* v1273-RUECKFRAGE · POST /api/v1/ai/extract-text
+ * Kurzantwort auf eine gezielte Rueckfrage: Text + Mini-Katalog rein,
+ * Werte raus. Kein Audio, also keine Transkription - der teuerste Posten
+ * faellt weg. Derselbe Limiter wie extract-voice; der Katalog ist hier
+ * absichtlich klein (die zwei, drei gefragten Felder), was den Aufruf
+ * zusaetzlich billig macht.
+ */
+router.post('/extract-text', authenticate, dialogLimiter, async (req, res, next) => {
+  try {
+    const { text, catalog, userApiKey: rawUserKey } = req.body || {};
+    const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
+
+    if (!config.openai.apiKey && !userApiKey) {
+      return res.status(503).json({ error: 'Kein OpenAI-API-Key verfuegbar.', needs_user_key: true });
+    }
+    if (!text || typeof text !== 'string' || !text.trim()) {
+      return res.status(400).json({ error: 'Body muss "text" enthalten.' });
+    }
+    /* v1278: Inseratstexte sind laenger als Kurzantworten - ein aus dem
+       Browser kopiertes IS24-Expose hat gemessen ueber 6.000 Zeichen. */
+    var _modus = (req.body && req.body.modus === "inserat") ? "inserat" : "antwort";
+    if (text.length > (_modus === "inserat" ? 40000 : 4000)) {
+      return res.status(413).json({ error: "Text zu lang." });
+    }
+
+    const result = await voiceExtractService.extractFromText(text, catalog, {
+      apiKey: config.openai.apiKey,
+      userApiKey: userApiKey,
+      modus: _modus,
+      kontext: (req.body && req.body.kontext) || null   /* v1280 */
+    });
+
+    /* Protokollieren, nicht abbuchen - wie bei extract-voice (v1183). */
+    if (!userApiKey) {
+      try {
+        await aiCreditsService.logExtract(req.user.id, 'extract-text');
+      } catch (e) {
+        console.warn('[ai/extract-text] logExtract fehlgeschlagen:', e.message);
       }
     }
     res.json(result);

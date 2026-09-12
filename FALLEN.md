@@ -1437,3 +1437,1286 @@ prüft den Wert am Ende der Kette — nicht die Zeile, die ihn verspricht.
 > Und: **eine Feldliste, die als Filter dient, ist ein stiller
 > Ausschluss.** `fields.forEach` überträgt genau, was drinsteht; alles
 > andere fehlt, ohne Fehler und ohne Warnung.
+
+---
+
+## Eine Fortschrittsanzeige, die Vorbelegungen mitzählt, misst das Formular
+
+Der geführte Sprechlauf zeigt rechts eine Spalte „Was schon steht" mit einem
+Zähler darunter. Gemessen am 10.09.2026, **unmittelbar nach dem Öffnen, vor dem
+ersten Wort**: `6 von 16`.
+
+Sechs Blöcke trugen einen grünen Haken. Kein einziger Wert kam von einem
+Nutzer — es waren die `value`-Attribute aus `index.html`: Zins 3,5 · Tilgung 1 ·
+Notar 2,2 · Grunderwerbsteuer 6,5 · Mietsteigerung 3 · AfA 2,0 ·
+Grenzsteuersatz 40,45.
+
+**Der Haken sagt „erledigt". Eine Vorbelegung ist nicht erledigt — sie ist
+vorgeschlagen.** Und ein Fortschrittsbalken, der bei 38 % startet, misst nicht
+den Fortschritt, sondern das Formular.
+
+Es ist **derselbe Denkfehler wie in `v1273c`**, nur eine Etage höher: dort hielt
+die Lückenprüfung eine Vorbelegung für eine Antwort und fragte deshalb nicht
+nach Zins und Tilgung; hier tut es die Anzeige.
+
+**Die Regel:** wo eine Anzeige „beantwortet" behauptet, muss sie zwischen *kam
+aus dem Gespräch* und *stand schon da* unterscheiden können — und tun. Drei
+Zustände statt zwei: erledigt, vorbelegt, offen. Verstecken ist dabei die
+falsche Gegenrichtung: was im Formular steht, gehört in eine Übersicht, die
+„was schon steht" heißt. Es gehört nur nicht in den Zähler.
+
+---
+
+## Ein Knopfdruck ist keine Aussage — die Herkunft muss mitwandern
+
+Im Sprechlauf gibt es „Einstellungen übernehmen": ein Klick trägt Zins,
+Tilgung, Zinsbindung und Eigenkapital ein. In der Übernahme-Tabelle standen
+sie danach unter **„Sprachaufzeichnung"**. Gesprochen hatte davon niemand ein
+Wort.
+
+Das ist derselbe Vorbehalt, der beim automatischen Abrufen von Daten ausdrücklich
+notiert worden war — nur eine Quelle weiter gedacht. **Wer eine Herkunftsspalte
+einführt, muss jeden Schreibweg in die Daten daraufhin durchgehen, nicht nur den
+neuen.** Ein Feld hat im Sprechlauf vier Wege hinein: gesagt, abgerufen, aus den
+Einstellungen übernommen, aus dem Formular bestätigt. Drei davon sind nicht
+„Sprachaufzeichnung".
+
+Nebenwirkung, die es leicht macht, den Fehler zu übersehen: eine Karte, die
+ihrerseits die Daten liest, erbt ihn. Die Score-Karte meldete „Kaufnebenkosten
+12,27 % — **von dir genannt**", weil sie nur prüfte, *ob* ein Wert dasteht.
+
+---
+
+## Interne Feld-ids im KI-Kontext: das Modell hält Bekanntes für unbekannt
+
+Der Co-Pilot bekommt den bekannten Stand des Objekts in den Prompt, damit er
+mitrechnen kann. Übergeben wurden die **Feld-ids**: `d1z = 4,09`, `d1t = 1`,
+`nkm = 490`.
+
+Auf die Frage „Warum ist der Cashflow so negativ?" kam:
+
+> „Für eine saubere Erklärung fehlt mir aber noch der Zinssatz, die Tilgung …"
+
+Beide standen im Kontext. **Das Modell hat sie nur nicht wiedererkannt** — `d1z`
+ist kein Wort. Und weil es die Regel „erfinde nichts, benenne die Lücke" korrekt
+befolgt hat, sah der Fehler wie vorbildliches Verhalten aus.
+
+**Die Falle ist doppelt:** ein Kontext, der nicht verstanden wird, erzeugt keine
+Fehlermeldung. Er erzeugt eine höfliche, plausible, falsche Auskunft.
+
+**Aber Klartext ist nicht überall richtig.** Derselbe Kontext geht an zwei
+Endpunkte mit gegenläufigen Anforderungen:
+
+| Endpunkt | Zweck | braucht |
+|---|---|---|
+| `/ai/extract-text` | ein Wert geht **ins Formular** | die **Feld-id** — der Prompt rechnet damit („10 % vom Kaufpreis" bei `kp=200000`) |
+| `/ai/copilot-frage` | eine Auskunft geht **an den Menschen** | die **Bezeichnung** |
+
+Zwei Zwecke, zwei Kontexte. Und wenn ein Kontext wächst, wächst auch das Limit:
+`slice(0, 40)` hätte ausgerechnet das Ende abgeschnitten — dort standen die
+Kennzahlen, nach denen gefragt wird.
+
+---
+
+## Eine Verneinung kann ein ganzer Satz aus Verneinungen sein
+
+Auf die Doppelfrage „Muss etwas saniert werden, und wird etwas mitverkauft?"
+antwortet ein Mensch:
+
+> „Nichts zu sanieren, nichts wird mitverkauft"
+
+Das Muster für Verneinungen verlangte, dass die Verneinung den **ganzen** Text
+ausmacht. Ergebnis: ein KI-Aufruf, zwei Sekunden, „daraus konnte ich nichts
+entnehmen".
+
+Die Vorsicht war richtig — „nichts unter 300.000" darf nicht als Absage
+durchgehen, sonst geht eine Angabe verloren. **Der Fehler war, den Satz als
+Einheit zu prüfen.** Er besteht aus zwei Teilen, und jeder ist für sich eine
+Verneinung.
+
+**Die Regel:** an Komma, „und", „auch" und Punkt trennen, dann jeden Teil
+einzeln prüfen. Verneint wird nur, wenn **jeder** Teil verneint. Ein Teil mit
+Inhalt — „nichts zu sanieren, Küche bleibt drin" — und der ganze Satz geht wie
+bisher an die Auswertung. Dazu eine Längengrenze: ein langer Satz mit einer
+Verneinung darin ist fast immer eine Angabe mit Einschränkung, keine Absage.
+
+---
+
+## `Auth.apiCall` bricht nach 15 Sekunden ab — außer bei `/ai/`
+
+`auth.js` setzt einen Vorgabe-Timeout: **120 s für Pfade mit `/ai/`, 15 s für
+alles andere**, `options.timeout` überschreibt.
+
+Der Marktbericht ist kein `/ai/`-Pfad, rechnet aber. Ein Abruf über
+`/marktbericht/reports/from-dealpilot` ohne eigenen Timeout bricht nach
+15 Sekunden mit *„Anfrage-Timeout (Server antwortet nicht rechtzeitig)"* ab —
+und das sieht aus wie ein Serverfehler, ist aber Ungeduld auf unserer Seite.
+
+**Vor jedem `Auth.apiCall` auf einen rechnenden Endpunkt: `timeout` mitgeben.**
+Die 15 Sekunden sind für Datensätze gedacht, nicht für Bewertungen.
+
+---
+
+## Ein Titel, den `textContent` findet, ist noch lange nicht der Titel
+
+Die Feinheiten-Fragen des Sprechlaufs holen ihren Themennamen aus der
+Karten-Überschrift `.ct`. Zwei Anläufe, zwei verschiedene Fehler.
+
+**Erster Anlauf: nur die direkten Textknoten lesen.** Begründung war richtig —
+`textContent` lieferte gemessen „Sanierung Sanierungsbedarf einschätzen" und
+„Markt-Kontext (EZB & Geldmarkt) Live · ECB EZB 2,40 % · EURIBOR 3M 2,51 %".
+Da hängt der Knopftext und die Live-Marke mit dran.
+
+**Nur:** an der Inventar-Karte sind die direkten Textknoten **leer**. Kind für
+Kind gemessen:
+
+```
+TEXT ""  ·  SPAN.ct-ico  ·  SPAN (der Titel)  ·  LABEL (ein Schalter)
+```
+
+Der Titel steckt in einem `<span>`. Ergebnis: leerer Titel, Rückfall auf den
+Abschnittsnamen, und die Frage hieß *„Kaufpreis & Nebenkosten — Küche, Möbel,
+Geräte, PV-Anlage?"*. **Ein Rückfall, der plausibel aussieht, verbirgt den
+Fehler** — die Frage war ja nicht sinnlos, nur falsch beschriftet.
+
+**Die Regel:** nicht auswählen, was der Titel *ist* — entfernen, was er
+*nicht* ist. Klon der Überschrift, `button, a, label, svg, input, select,
+.btn, .ct-ico, .live, .chip, .badge` heraus, Rest ist Titel. Und dann **an
+allen Karten gegenprüfen**, nicht an einer: 21 Karten mit Feldern, 21 saubere
+Namen.
+
+---
+
+## Was ein eigenes Verfahren hat, gehört nicht ins Diktat
+
+Der „Alle Felder"-Modus des Sprechlaufs sammelt alles ein, was im Formular
+leer ist. Gemessen: **93 Felder in 29 Fragen — davon 37 in zehn Fragen allein
+aus der Karte „Wertermittlung (Marktbericht)".** Sätze wie *„Außenwände ·
+23 %"*, *„Standardstufe (NHK 2010)"*, *„Modernisierungsgrad (Anlage 2)"*.
+
+Technisch war daran nichts falsch: es sind Felder, sie sind leer, sie haben
+ein Label. **Fachlich war es ein Fehler.** Die Wertermittlung nach ImmoWertV
+hat eigene Anforderungen an jede einzelne Zahl — Modellvermerk, Stufe A–E,
+Ausschuss. Ein gesprochener Wert käme in der Übernahme-Tabelle als
+„Sprachaufzeichnung" an, und das ist nach § 10 ImmoWertV keine Herkunft.
+
+**Die Regel:** bevor ein Sammelmechanismus über „alle Felder" läuft, prüfen,
+ob darunter eine Strecke ist, die anderen Regeln unterliegt. Ein Feld ist nicht
+nur ein Feld — es kann Teil eines Verfahrens sein.
+
+Ausgeschlossen wird über die **Karte**, nicht über einzelne Feld-ids: die Karte
+ist die Einheit, die der Nutzer sieht, und eine neue Zeile darin fällt damit
+automatisch mit heraus. Eine id-Liste hätte beim nächsten neuen Gutachterfeld
+schweigend versagt.
+
+---
+
+## Ein Ringpuffer, der den Container-Header wegwirft
+
+`MediaRecorder.start(500)` liefert Zeitscheiben. **Das erste Stück ist der
+Container-Header** (bei WebM: EBML, Segment-Info, Track-Definition). Alle
+weiteren sind Cluster — reine Fortsetzungen, die für sich genommen keine
+Datei ergeben.
+
+Ein Ringpuffer, der die Größe mit `chunks.slice(-max)` in Schranken hält,
+schneidet die **ältesten** Stücke ab. Nach `FS_RING_MS` ist das genau der
+Header. Was danach zusammengesetzt wird, ist ein Haufen Cluster ohne
+Container — und OpenAI antwortet, korrekt:
+
+> „Audio file might be corrupted or unsupported"
+
+**Im Browser nachgemessen, erste vier Bytes:**
+
+| | | |
+|---|---|---|
+| mit Kopf | `1a 45 df a3` | EBML-Magic, gültige Datei |
+| ohne Kopf | `43 c3 81 01` | mitten in einem Cluster, keine Datei |
+
+Der Header war 7.890 von 51.439 Bytes — 15 %, ohne die der Rest wertlos ist.
+
+**Die Regel:** wer einen Strom aus Zeitscheiben begrenzt, hebt Stück 0
+getrennt auf und setzt es jedem Ausschnitt voran. Der Ring gilt für die
+Cluster, nie für den Kopf. Und ein Ausschnitt aus der Mitte ergibt damit
+eine Datei, die bei Sekunde X beginnt — das kann ein Decoder, ein
+Fragment ohne Header nicht.
+
+**Zweiter Weg in denselben Fehler:** eine Funktion, die den Puffer leert
+(`chunks = []`), darf nicht laufen, während der Recorder aufnimmt. Bei 14
+Aufrufstellen passiert das, sobald zwei kurz hintereinander kommen. Solche
+Funktionen gehören idempotent gebaut — „lausche, falls du nicht schon
+lauschst" — mit einem ausdrücklichen Argument für „fang wirklich neu an".
+
+---
+
+## Ein Dialog, der für Dunkel gebaut ist und auf Weiß läuft
+
+Der Sprechlauf-Dialog wurde von Anfang an mit weißen Transparenzen gebaut:
+`rgba(255,255,255,.09)` für Ränder, `rgba(255,255,255,.03)` für Flächen,
+`rgba(0,0,0,.25)` für Eingabefelder. Auf dunklem Grund ergibt das eine
+saubere, ruhige Struktur.
+
+Der Boarding-Skin (`modal-boarding-skin.js`) setzt den Body aber auf
+`#fff`. Damit ist **jede einzelne dieser Flächen weg**: unsichtbare
+Ränder, unsichtbare Trennlinien, unsichtbare Blasen — und ein Eingabefeld
+mit dunklem Grund und dunklem Text.
+
+**Der Eindruck beim Nutzer ist nicht „falsche Farben", sondern
+„unübersichtlich" und „unfertig".** Genau so kam die Rückmeldung. Kein
+einzelnes Element sah kaputt aus; es fehlte nur alles, was Struktur gibt.
+
+**Die Regel:** vor jeder Gestaltung in einem fremden Rahmen den
+tatsächlichen Untergrund **messen** — `getComputedStyle(host).background`
+—, nicht aus dem eigenen CSS erschließen. Und `CLAUDE.md` gilt hier
+doppelt: farbtragende Flächen einzeln benennen, denn ein Token, das der
+Rahmen setzt, hilft der Transparenz nicht, die darauf liegt.
+
+Nebenbefund: auf Weiß trägt grauer Text weniger als auf Schwarz. Dieselbe
+`opacity` ergibt zwei verschiedene Lesbarkeiten.
+
+---
+
+## Wer zwei Bedienwege baut, muss beide prüfen
+
+Das Angebot für die Marktpreisindikation hatte zwei Wege: „ja" sagen oder
+tippen — und den Knopf klicken. Beim Prüfen habe ich die Zusage **immer
+getippt**, weil das im automatisierten Browser der einfachere Weg ist.
+
+Der getippte Weg läuft durch dieselbe Erkennung wie der gesprochene und
+setzte den Dialog fort. **Der geklickte tat es nicht** — sein Handler rief
+die Fortsetzung nicht auf. Wer klickte, blieb ohne nächste Frage stehen:
+also genau der Weg, den ein echter Nutzer zuerst nimmt.
+
+**Die Regel:** ein Bedienweg, der im Test nie benutzt wird, ist nicht
+geprüft. Bei zwei Wegen zum selben Ziel beide gehen — und beim Prüfen
+bewusst den wählen, der im Test unbequemer ist.
+
+---
+
+## Eine Schutzschranke, die den Hauptweg blockiert
+
+`/ai/*` war mit **30 Auswertungen je Stunde und Nutzer** gedeckelt.
+Begründet und richtig: der Schutz stammt aus der Zeit des
+PDF-Exposé-Imports, wo niemand mehr als eine Handvoll Dokumente einliest.
+
+Dann kam der geführte Sprechlauf: **16 Fragen, jede Antwort ein Aufruf** —
+dazu Nachhaken, Zwischenfragen, ein zweiter Anlauf, wenn etwas nicht
+verstanden wurde. Nach **einem** Durchlauf war die Hälfte weg, nach zwei
+Durchläufen war der Nutzer gesperrt. Der Hauptweg der Objektaufnahme fiel
+an seiner eigenen Schutzschranke aus.
+
+Und die Meldung lautete „Zu viele **PDF**-Extraktionen", während jemand
+sprach — sie schickte den Nutzer auf die Suche nach einem Dokument, das er
+gar nicht hochgeladen hatte.
+
+**Die Regel:** ein Limit ist an einen Vorgang gebunden, nicht an einen
+Endpunkt. Kommt ein neuer Vorgang mit anderer Aufruf-Häufigkeit dazu,
+bekommt er einen **eigenen Zähler** — nicht einen größeren gemeinsamen.
+Sonst blockiert der eine Vorgang den anderen. Und die Meldung nennt den
+Vorgang, den der Nutzer gerade macht.
+
+---
+
+## Ein Angebot in einer Chatblase ist zwei Antworten später weg
+
+Der Sprechlauf bot mitten im Gespräch Dinge an: den Bodenrichtwert holen,
+die Marktpreisindikation starten, die Lage recherchieren. Alle standen
+**in** der Co-Piloten-Blase, dort wo sie inhaltlich hingehörten.
+
+Rückmeldung aus der Praxis: *„Die stehen dann meistens darunter und dann
+weiß man nicht, dass man jetzt weitermachen soll."*
+
+Ein Chat-Verlauf scrollt. Was gerade noch mittig stand, ist nach zwei
+Antworten oben aus dem Bild. Der Nutzer sieht unten das Mikrofon, hört
+„ich höre zu" — und hat keine Ahnung, dass oben eine Entscheidung
+wartet. Schlimmer noch: der Ablauf blieb an dieser Entscheidung stehen,
+also wartete jeder auf den anderen.
+
+**Die Regel:** was eine Entscheidung verlangt, gehört an einen **festen
+Ort außerhalb des Verlaufs** — dort, wo der Nutzer ohnehin hinsieht, also
+unmittelbar über der Eingabe. Ein Verlauf zeigt, was **war**; eine Leiste
+zeigt, was **ist**.
+
+Und zwei Nebenwirkungen, die es gleich mit erledigt: **ein** Klickweg
+statt vier eigenen (jeder eigene ist eine Gelegenheit, die Fortsetzung zu
+vergessen — genau das war passiert), und der Ablauf muss nicht mehr
+anhalten, weil das Angebot ja sichtbar bleibt.
+
+---
+
+## Eine `art` ohne Zweig fällt still durch
+
+Ein Verteiler nimmt eine Kennung und verzweigt: `if (art === 'brw') …
+if (art === 'lage') …`. Kommt eine Kennung an, für die es keinen Zweig
+gibt, fällt sie unten heraus — **ohne ein Wort**.
+
+Genau das passierte, als eine neue Aktion dazukam und der Zweig vergessen
+wurde. Der Knopf war nach dem Klick weg (das Aufräumen lief ja), und
+sonst geschah nichts. Der Nutzer sieht: es ist etwas passiert. Er wartet
+auf ein Ergebnis, das nie kommt.
+
+**Ein stiller Ausfall in einem Verteiler ist der teuerste, den es gibt** —
+er sieht aus wie ein Erfolg. Jeder Verteiler bekommt deshalb einen
+letzten Zweig, der protestiert: in der Konsole für die Diagnose, im
+Gespräch für den Nutzer.
+
+---
+
+## Ein Ratgeber, der beim schlechten Fall schweigt, ist keiner
+
+Die Verbesserungs-Hebel im Sprechlauf rechnen den Score mit einer
+Änderung nach und zeigen die Differenz — „Kaufpreis 5 % tiefer: +7".
+Sauber belegt, weil dieselbe Rechnung mit einem anderen Wert läuft.
+
+Gemessen an einem schwachen Objekt (Score 53): **5 % weniger Kaufpreis
+ergaben null Punkte.** Kein Fehler in der Rechnung — bei schwachen
+Kennzahlen liegt die Interpolation am unteren Anschlag und ist dort
+flach. Vom Boden fällt man nicht tiefer, aber man steigt auch nicht
+leicht auf.
+
+Das Ergebnis war eine **leere Liste** — ausgerechnet bei dem Objekt, für
+das man den Rat am dringendsten braucht. Bei guten Objekten sah alles
+prima aus, was den Fehler beim Prüfen versteckt.
+
+**Die Regel:** wer eine Wirkung mit einem festen Schritt misst, misst
+nur einen Punkt der Kurve. Eine **Staffel** probieren und den kleinsten
+Schritt zeigen, der wirklich etwas bewegt. Und beim Prüfen bewusst den
+schlechten Fall wählen — der gute deckt nichts auf.
+
+---
+
+## `location.reload(true)` holt das HTML nicht neu
+
+Nach einem Rollout zeigte der Browser hartnäckig den alten Stand, obwohl
+der Cache-Buster längst hochgezogen war und der Server die neue Fassung
+auslieferte.
+
+Der Buster steht **im HTML**. Kommt das HTML aus dem Cache, kommt auch
+der alte Buster — und damit die alte JS-Datei. `location.reload(true)`
+hat den erzwungenen Neuladen-Parameter in modernen Browsern **ohne
+Wirkung**; er ist seit Jahren ignoriert.
+
+**Die Gegenprobe, die es aufklärt** — zwei Zeilen, und sie zeigen sofort,
+wo es hakt:
+
+```
+curl -s https://<host>/index.html | grep -o 'datei.js?v=[a-z0-9]*'
+document.querySelector('script[src*="datei"]').getAttribute('src')
+```
+
+Sagt der Server `v1293b` und der Browser `v1293`, liegt es nicht am
+Rollout. **Ein neuer Tab** holt das HTML frisch; im alten hilft nur
+Strg+Shift+R oder das Leeren der Site-Daten.
+
+Die Falle ist besonders teuer, weil sie wie ein Fehler im eigenen Code
+aussieht: man misst dieselbe falsche Zahl wieder und wieder und sucht
+sie im JavaScript, das längst richtig ist.
+
+---
+
+## Eine Modulvariable überlebt den Dialog — und lügt beim zweiten Mal
+
+Der Sprechlauf meldet der aufrufenden Kette zurück, ob er die
+Marktbewertung schon geholt hat: `done({ marktGeholt })`. Die Kette
+überspringt daraufhin ihren eigenen Abruf — richtig so, denn zweimal
+abrufen heißt zweimal bezahlen.
+
+Das Kennzeichen lag in einer **Modulvariablen**. Beim ersten Lauf
+stimmte alles. Beim zweiten meldete der Dialog `true`, obwohl er selbst
+nichts geholt hatte — **die Kette übersprang ihren Abruf, und der Nutzer
+stünde ohne Marktbewertung da.**
+
+**Die Regel:** jeder Zustand, der einen Dialog überlebt, gehört an
+dessen Anfang gelöscht — nicht an sein Ende. Am Ende gibt es zu viele
+Wege hinaus (Abbrechen, Übernehmen, Fenster zu, Fehler), und einer wird
+immer vergessen.
+
+**Und beim Prüfen:** der zweite Durchlauf ist der, der die Wahrheit
+zeigt. Beim ersten sieht jeder Zustand richtig aus, weil er noch
+niemandem gehört hat.
+
+---
+
+## Das Mikrofon lief nach dem Abbrechen weiter
+
+Der Sprechlauf-Dialog hält einen eigenen Mikrofon-Strom (`_fs`) für das
+Freisprechen. Der „Abbrechen"-Knopf räumte die Aufnahme des **freien
+Weges** ab (`stopAll()`) und meldete `done()` — den Dialog-Strom rührte er
+nicht an.
+
+Mit einem synthetischen Audiostrom gemessen, damit der Recorder echt
+läuft:
+
+```
+vor  „Abbrechen":  recState recording · phase spricht · chunks 5
+nach „Abbrechen":  recState recording · phase spricht · chunks 8
+```
+
+Der Recorder lief weiter, die Stücke wuchsen. Im Browser bleibt das
+Aufnahme-Symbol an: **jemand hat den Dialog beendet, und sein Mikrofon
+horcht weiter.** Und der zweite Weg hinaus (Werte übernehmen) schließt
+das Fenster aus einem **anderen Modul**, das von diesem Strom gar nichts
+weiß.
+
+**Die Regel:** ein Fenster hat mehr Wege hinaus, als man beim Bauen
+zählt — Abbrechen, das X der Kopfleiste, Übernehmen, ein fremdes Modul,
+ein Fehler mittendrin. Für alles, was **Hardware** hält (Mikrofon,
+Kamera, Standort), reicht deshalb kein Handler: es braucht **einen
+Beobachter**, der anspringt, sobald das Fenster verschwindet — egal wer
+es entfernt hat.
+
+Nebenwirkung, die derselbe Fix erledigt: der Dialogzustand überlebte das
+Schließen und verfälschte jede Messung danach. Wer in einem Testlauf
+mehrere Fälle hintereinander misst, misst sonst den ersten immer wieder
+mit.
+
+---
+
+## Fragen zu Feldern, die der Katalog gar nicht kennt
+
+Der Sprechlauf kennt zwei Ziele: das ganze Objekt (Katalog: 192 Felder)
+und den Quick-Check (Katalog: 19). Die Fragenliste war für beide
+dieselbe.
+
+Gemessen im Quick-Check: **13 Fragen, neun davon zu Feldern, die es dort
+nicht gibt** — Kaufnebenkosten, Lage, Sanierung, Grundstück, Steuer.
+
+Das ist nicht nur unnütz. Die Auswertung schickt zu jeder Frage die
+zugehörigen Katalogeinträge mit; bei diesen Blöcken bleibt ein **leeres
+Array**, und der Server antwortet korrekt mit *„Feld-Katalog fehlt oder
+ist leer"* — **HTTP 400 bei jeder einzelnen Antwort.**
+
+**Die Regel:** wo derselbe Ablauf mit verschiedenen Katalogen läuft,
+gehört die Fragenliste **am Katalog gemessen**, bevor gefragt wird. Was
+kein einziges Feld darin hat, wird nicht gefragt; wo nur ein Teil
+enthalten ist, wird auf den Teil eingekürzt.
+
+Und beim Prüfen: das **zweite Ziel** ist das, an dem solche Fehler
+sitzen. Der Hauptweg hat den vollen Katalog und zeigt nichts davon.
+
+## Ein Kaufknopf, der nichts kauft
+
+Vier Bewertungs-Pakete zu 7,90 / 19,90 / 39,90 / 69,90 € standen im
+Preis-Modal und auf der Landing. Sie sahen aus wie immer. Der Checkout
+antwortete auf `paket_kurz` mit **HTTP 400 · `invalid_pack`** — seit
+`v1246`, also seit vier Tagen unbemerkt.
+
+Der Code war nicht stumm dazu. In `config.js` stand seit `v1246` ein
+Kommentar: *„das ersetzt BEWERTUNGS_PAKETE"*. Die Ersetzung war in
+`settings.js` angekommen, **nicht** im Modal und **nicht** auf der
+Landing.
+
+**Ein Kommentar, der eine Ersetzung ankündigt, ist kein Nachweis, dass
+sie überall angekommen ist** — er ist eine offene Aufgabe, formuliert
+wie ein Ergebnis. Dasselbe Muster wie beim Server-Kommentar „bleibt
+stehen, bis der letzte alte Aufrufer weg ist".
+
+**Die Regel:** Kaufwege werden **gegen den laufenden Checkout gemessen**,
+nicht gegen den Code, der sie zeichnet. Ein Schlüssel, ein `POST`, ein
+Statuscode — das dauert eine Minute und trifft genau die Stelle, an der
+jemand gerade Geld ausgeben will.
+
+## Eine Funktion, versteckt hinter der Bedingung auf das, was sie ersetzt
+
+Der Einzelkauf funktioniert seit `v1183`. Gesehen hat ihn nie jemand: in
+`settings.js` hing er in einem Block, der mit `if (creditPacks.length > 0)`
+beginnt — und `creditPacks` ist `[]`, seit die Pakete abgeschaltet
+wurden.
+
+Die Bedingung war einmal richtig: der Einzelkauf stand als Zusatz unter
+den Paketen. Als die Pakete gingen, nahmen sie ihren Nachfolger mit.
+
+**Die Regel:** wird ein Angebot abgeschaltet, wird geprüft, **was in
+seinem Block noch mit drin steht.** Ein `if` auf die alte Liste ist ein
+Schalter für alles, was darunter steht — auch für das, was sie ablösen
+sollte.
+
+## Ein Modul, das an einem Anker hängt, den es nirgends gibt
+
+`landing/assets/pricing-plugin.js` baut die kompletten Preiskarten und
+hängt sie in `#pricing-host`. **Dieses Element gibt es auf keiner Seite
+des Projekts.** Der Code lief nie — und wurde trotzdem gepflegt, zuletzt
+mit Preisen, die nie jemand gesehen hat.
+
+Dieselbe Sorte wie `#app` in der Haupt-App (kostete `v1147` einen
+Ausrollzyklus): **eine Regel oder ein Modul mit einem Anker, den es nicht
+gibt, sieht vollkommen plausibel aus.** Kein Fehler, keine Konsole, kein
+Unterschied.
+
+**Die Regel:** bevor ein Modul geändert wird, wird sein Einstiegspunkt
+**im ausgelieferten HTML gesucht** — `grep` nach der id, nicht nach dem
+Dateinamen. Findet sich nichts, ist die Änderung keine Änderung.
+
+## Eine Obergrenze ohne Grundlage ist auch eine Erfindung
+
+Die Kappungsgrenze liegt bei 20 % in drei Jahren — in Gebieten mit
+angespanntem Wohnungsmarkt bei 15 %. Welche Orte dazugehören, steht in
+einer Verordnung des jeweiligen Landes. **Die führen wir nicht.**
+
+Die Versuchung ist, vorsichtshalber mit 15 % zu rechnen: die kleinere
+Zahl fühlt sich wie die sicherere an. Sie ist es nicht. **Eine
+Einschränkung zu unterstellen, für die keine Quelle vorliegt, ist
+dieselbe Erfindung wie eine Zahl zu erfinden** — nur in die andere
+Richtung, und sie kostet den Kunden ein Drittel seines Spielraums.
+
+Gerechnet wird mit 20 %. Die 15 % stehen daneben, ausgerechnet, mit dem
+Satz, wo nachzusehen ist. **Wo die Quelle endet, endet die Rechnung** —
+und was dann bleibt, ist ein Hinweis, keine Zahl.
+
+## Eine Existenzprüfung ist keine Abnahme
+
+Bei `v1294` habe ich gemeldet, der Einzelkauf sei jetzt sichtbar. Gemessen
+hatte ich: fünf `.pm-einzel-row` im DOM, fünf Kaufknöpfe. Das stimmte.
+
+Nicht gemessen hatte ich:
+
+- **ob sie jemand zu sehen bekommt** — der Block lag hinter einem frühen
+  `return`, der bei jedem bezahlten Plan greift. Wer kaufen durfte, sah ihn
+  nie; wer ihn sah, durfte nicht kaufen.
+- **wie sie aussehen** — die CSS-Regeln hingen am falschen Anker, also stand
+  die Liste auf `display:block` und `padding:0`. Nackte Divs.
+- **ob sie einen Klick überleben** — ein Wechsel des Nachkauf-Segments zeichnete
+  den Streifen neu und ließ den Einzelkauf dabei weg.
+
+**Die Regel:** `querySelectorAll(...).length > 0` beweist, dass Markup
+entstanden ist — sonst nichts. Eine Abnahme fragt vier Dinge: **Kommt jemand
+hin? Sieht es aus wie gedacht? Übersteht es Bedienung? Tut es, was draufsteht?**
+Jede dieser Fragen hat hier einen eigenen Fehler verborgen.
+
+## Aus einer CSS-Zeile auf die Grundfarbe schließen ist keine Messung
+
+Ein Mengenwähler sollte an zwei Orten laufen. Die Nachbarregel im
+Einstellungs-CSS lautete `background: rgba(255,255,255,.04)`, und daraus habe
+ich gefolgert: dunkler Grund, also helle Schrift.
+
+Gemessen war der erste **opake** Vorfahre `rgb(255,255,255)` — reines Weiß.
+Creme-Schrift darauf ergibt **Kontrast 16**. Unsichtbar.
+
+**Eine 4-%-Weiß-Aufhellung funktioniert auf hellem wie auf dunklem Grund und
+sagt über keinen von beiden etwas aus.** Dasselbe gilt für jede Farbe mit
+kleinem Alpha, für `currentColor` und für `color: inherit` — sie sind gerade
+deshalb beliebt, weil sie überall irgendwie passen.
+
+**Die Regel:** vor jeder Farbentscheidung den ersten Vorfahren mit **opakem**
+Hintergrund auslesen und die Helligkeit beider Farben vergleichen. Ein
+Kontrast unter etwa 60 ist nicht lesbar, unter 20 nicht sichtbar. Vier
+Ausrollzyklen an einem Tag gingen für diese eine Zeile drauf — dreimal
+geraten, einmal gemessen.
+
+## Ein Baustein an drei Orten braucht drei gemessene Gründe
+
+Derselbe Mengenwähler lief im Preis-Modal in den Einzelzeilen (dunkel), im
+selben Modal in der Boarding-Pass-Karte (`background:#fff`) und in den
+Einstellungen (weiß). **Drei Orte, zwei Gründe, eine Farbfassung** — das kann
+nicht aufgehen.
+
+Der Versuch, sich mit neutralen Werten herauszuhalten (`color:inherit`,
+Grau mit Alpha), schlug fehl: geerbt kam Schwarz an, und Grau auf Weiß ist
+genauso blass wie Grau auf Schwarz.
+
+**Die Regel:** ein wiederverwendeter Baustein bekommt **je Einsatzort** eine
+gemessene Farbfassung, angehängt an den Behälter dieses Ortes
+(`.bw-gate .pm-menge{…}`). Der Baustein selbst — Markup und Verhalten —
+bleibt einmal im Code und wird exportiert. **Logik teilen, Farben nicht.**
+
+## Zwei Dinge in einer Liste, ohne dass es dasteht
+
+Die Einzelkauf-Liste führte fünf Posten zu 0,90 / 1,90 / 3,90 / 5,90 / 9,90 €.
+Die ersten drei rechnet die eigene Maschine, die letzten beiden kaufen einen
+fremden Wert bei einem externen Anbieter zu. **Nirgends stand das.**
+
+Aufgefallen ist es, weil der Betreiber selbst fragte, was die beiden letzten
+Posten eigentlich seien. Auf der Landing stand über der Liste sogar „Die drei
+Bewertungsarten" — und darunter fünf Zeilen. Der Widerspruch stand da,
+monatelang, und niemand las ihn.
+
+**Die Regel:** wo eine Preisliste Posten mit **verschiedener Herkunft** führt
+— selbst gerechnet gegen zugekauft, Pauschale gegen Verbrauch —, gehört die
+Herkunft in die Liste, nicht in den Kopf dessen, der sie gebaut hat. Und wenn
+eine Überschrift eine Anzahl nennt, ist sie ein Prüfwert: **stimmt die Zahl
+noch mit dem, was darunter steht?**
+
+## Wer die Menge wählbar macht, muss jeden Weg mitziehen
+
+Der Checkout bekam einen Mengenparameter, die Stripe-Position eine
+`quantity`, die Kaufhistorie Stückzahl und Gesamtbetrag. Der Webhook
+multiplizierte bereits korrekt — **aber nur auf dem Hauptweg.**
+
+Sein Rückfall (`_paketAusMetadaten`, greift wenn Stripe die Positionen nicht
+hergibt) las das Paket aus den Sitzungsdaten und **ignorierte die Menge**.
+Wer drei kauft und in diesen Zweig gerät, bekommt eines. Ein stiller
+Fehlbetrag, sichtbar erst beim Kunden, der zwei Bewertungen vermisst — nach
+dem Bezahlen.
+
+**Die Regel:** eine neue Größe im Kaufweg wird durch **alle** Zweige
+gezogen, Rückfälle eingeschlossen. Rückfälle sind besonders gefährlich: sie
+laufen selten, also fällt dort nichts auf, und sie laufen genau dann, wenn
+ohnehin etwas schiefging.
+
+Dazu ein Deckel gegen den Browser: die Menge kommt aus dem Client. Ohne
+Obergrenze kauft ein manipulierter Aufruf zehntausend. **Gekappt, nicht
+abgelehnt** — wer sich vertippt, soll nicht vor einem Fehler stehen.
+
+## Eine Regel umdrehen heißt, ihre Sätze zu suchen
+
+Das Monatskontingent sollte künftig verfallen; bis dahin wanderte es ins
+Guthaben. Die Änderung im Rechenweg war eine Funktion.
+
+**Die Aussage darüber stand an sieben Stellen** — im Kontingent-Panel, im
+Preis-Modal, in den Einstellungen, zweimal auf der Landing, im
+Leistungsumfang, in einem toten Landing-Modul. Alle sagten das Gegenteil von
+dem, was der Code ab sofort tat.
+
+**Die Regel:** wird eine Zusage umgedreht, wird nach ihrem **Wortlaut**
+gesucht, nicht nach dem Feldnamen. „verfällt nicht", „wandert ins Guthaben",
+„bleibt erhalten" — jede Formulierung einzeln, auch in Dateien, die
+niemand mehr lädt. Ein Kommentar, der eine alte Regel erklärt
+(`sparfaktor` = Obergrenze des Angesparten), gehört mit berichtigt, sonst
+erklärt er beim nächsten Mal etwas Falsches mit voller Überzeugung.
+
+Und was Bestandskunden bereits angespart haben, bleibt stehen. **Rückwirkend
+zu streichen, was nach den damals geltenden Regeln erworben wurde, ist eine
+Enteignung** — auch wenn es technisch nur eine Spalte ist.
+
+## Dieselbe Falle zweimal am selben Tag
+
+Vormittags in `FALLEN.md` geschrieben: *„Eine Existenzprüfung ist keine
+Abnahme."* Nachmittags Pillen gebaut, im Browser gezählt — **vier
+`.vi-rf-pille` im DOM** —, ausgerollt und gemeldet.
+
+Im Browser stand: **„PLZOrtStraßeHausnummer"**. Ein Wort. Ich hatte das
+Markup geschrieben und **keine einzige CSS-Regel** dazu.
+
+Die Zählung war richtig. Sie sagte nur nichts darüber, ob man vier Pillen
+**sieht**.
+
+**Die Regel — konkreter als beim ersten Mal:** wer ein neues Element
+einführt, prüft in derselben Messung **eine Eigenschaft, die nur mit CSS
+existiert**: `display`, `padding`, `borderRadius`. Steht dort `inline`,
+`0px`, `0px`, gibt es keine Regel, und das Element sieht aus wie roher
+Text. Ein Blick auf den Screenshot tut dasselbe in einer Sekunde.
+
+## Eine Notation ist keine Bezeichnung
+
+Im Nachkauf standen Pakete als `5 · 0 · 0`, `5 · 5 · 0`, `5 · 5 · 5`. Die
+Schreibweise stammt aus der Cockpit-Matrix — dort stehen Spaltenköpfe
+darüber, und sie ist auf einen Blick lesbar.
+
+Aus dem Zusammenhang gelöst, ist sie eine Zahlenreihe. Der Betreiber
+selbst fragte, was die Pakete unterscheidet.
+
+Daneben stand als Überschrift „Für Pro". **Das beschreibt den Käufer, nicht
+die Ware** — wer wissen will, was er bekommt, liest die falsche Zeile.
+
+**Die Regel:** eine Kurzform, die an einer Stelle funktioniert, funktioniert
+nicht überall. Sie braucht ihren Zusammenhang. Wo er fehlt, gehört ein
+Name hin — und der Name beschreibt, **was drin ist**, nicht, wer es kauft.
+
+## Eine Zahl, die nicht mitrechnet, ist schlimmer als keine
+
+Der Mengenwähler änderte Preis und Kaufknopf. Die Zeile darüber, „5
+Marktpreisindikationen", blieb stehen.
+
+Bei Menge 3 stand damit **„5 Marktpreisindikationen" über einem Preis für
+15**. Nicht falsch gerechnet — falsch gesagt. Der Kunde musste glauben,
+dass das Dreifache ankommt, obwohl die Karte etwas anderes behauptete.
+
+**Die Regel:** wird eine Größe wählbar, wird **jede** Anzeige gesucht, die
+von ihr abhängt — nicht nur die offensichtliche. Der Preis fällt sofort
+auf, die Inhaltsbeschreibung nicht. Dieselbe Sorte wie eine
+Währungsangabe, die nach der Umstellung stehenbleibt.
+
+## Eine Ausnahme, die zu lange gilt
+
+Beim Frageübergang räumt der Sprechlauf alle Angebote ab — außer den
+Markt-Abrufen. Die Ausnahme war richtig: sie gehören zu keiner einzelnen
+Frage, sondern zum ganzen Dialog.
+
+Sie hatte nur kein Ende. Nach der Wahl einer Stufe standen **beide Knöpfe
+weiter da** — Angebote für eine Entscheidung, die schon gefallen war.
+
+**Die Regel:** eine Ausnahme von „räum das ab" braucht eine Bedingung,
+**wann sie endet**. „Gilt für den ganzen Dialog" ist selten gemeint —
+gemeint ist meistens „gilt, bis es erledigt ist". Wer die Ausnahme
+schreibt, schreibt ihr Ende mit.
+
+## Ein Filter, der zu eng wird, wenn das Umfeld wächst
+
+Der Sprechlauf schickte dem Modell nur die Felder der **aktuellen** Frage.
+Das war eine gute Entscheidung: mit 192 Feldern fängt ein Modell an zu
+raten und findet für jedes Wort irgendein Feld.
+
+Als der Dialog geführter wurde, kippte es. Wer bei der Miete das Baujahr
+mitnennt, bekam „nichts gefunden, was hierher passt" — und sagte es beim
+nächsten Mal noch einmal. **Der Schutz vor Raten war zum Hindernis gegen
+Zuhören geworden.**
+
+**Die Regel:** zwischen „nur das eine" und „alles" liegt eine
+**Reichweite**. Hier: die Felder der nächsten Blöcke, gedeckelt auf 24 —
+was ohnehin gleich drankommt, darf jetzt schon gehört werden; was weit weg
+liegt, nicht. Und die Reihenfolge zählt, weil bei Mehrdeutigkeit das
+gewinnt, was zuerst steht.
+
+Dazu gehört die zweite Hälfte: was durchkommt, muss auch **behalten**
+werden. Ein Filter an der Eingabe und ein zweiter an der Übernahme sehen
+wie doppelte Vorsicht aus — sie heben sich gegenseitig auf.
+
+## Ein Kostenlog, das niemand liest
+
+Die Frage „was kostet uns ein Marktbericht" hing seit Monaten offen. Die
+Antwort stand in `marktbericht_cost_log`: 184 Läufe mit Betrag je Abruf,
+Stufe und Zeitstempel — sauber geführt, nie ausgewertet.
+
+**Eine Zahl, die geschrieben und nie gelesen wird, ist keine Messung,
+sondern Datenmüll mit gutem Gewissen.**
+
+**Die Regel:** bevor eine Kostenfrage mit „das führen wir nicht" beantwortet
+wird, wird nach einer Log-Tabelle gesucht. Und wenn es sie gibt: die
+Nullwerte getrennt zählen. Hier kostet **mehr als die Hälfte** der
+Berichte gar nichts (Cache) — ein Durchschnitt über alle Läufe hätte den
+Einkaufspreis halbiert und die Marge falsch dargestellt.
+
+Nebenbefund derselben Tabelle: `openai_eur` existiert als Spalte und ist in
+**jeder** Zeile NULL. Eine Spalte, die nie gefüllt wird, sieht in einem
+Schema aus wie eine Messung, die es gibt.
+
+## „Manchmal" ist der Hinweis auf eine Zeitfrage
+
+Ein Verlauf sollte nach jeder Antwort ans Ende scrollen. Er tat es
+**manchmal** nicht. Genau dieses Wort ist der Befund: was immer schiefgeht,
+ist ein Logikfehler; was manchmal schiefgeht, ist fast immer **eine
+Messung zum falschen Zeitpunkt**.
+
+Hier stand `el.scrollTop = el.scrollHeight` direkt nach `appendChild`. Die
+Höhe in dem Moment ist nicht die Höhe danach: eine Einblend-Animation
+startet versetzt, Schriften laden nach und brechen Zeilen um, eine Karte
+wächst, während ihre Balken ausfahren.
+
+**Die Regel:** eine Größe, die nach dem Einhängen noch wachsen kann, wird
+**mehrfach** gelesen — sofort, im nächsten Frame (`requestAnimationFrame`,
+nach dem Layout) und einmal nach Ablauf der längsten Animation. Das ist
+billiger als ein `ResizeObserver` und deckt dieselben Fälle ab.
+
+Und die Gegenprobe, die oft vergessen wird: **wer selbst gescrollt hat,
+darf nicht zurückgerissen werden.** Automatisches Scrollen ist nur
+erwünscht, solange der Leser ohnehin unten steht.
+
+## Ein try/catch, das eine ganze Funktion verschluckt
+
+Eine neue Spalte blieb leer. Die Zeichenfunktion stand im Code, wurde
+aufgerufen, warf keinen sichtbaren Fehler — der Aufruf war in
+`try { … } catch (e) {}` gekapselt, damit ein Fehler den Rest nicht
+aufhält.
+
+Genau das tat er dann auch: der Host war zum Aufrufzeitpunkt noch nicht im
+DOM, die Funktion stieg still aus, und **nichts deutete darauf hin**.
+
+Gefunden wurde es, indem die Funktion aus dem ausgelieferten Bundle
+geschnitten und isoliert gefahren wurde — dort erzeugte sie sofort 16
+Zeilen. **Damit war bewiesen, dass nicht die Funktion das Problem war,
+sondern ihr Aufrufzeitpunkt.** Ohne diesen Test wäre die Suche in der
+Funktion weitergegangen.
+
+**Die Regel:** ein leeres `catch` ist an einer Stelle richtig, die
+**scheitern darf** — nicht an einer, die scheitern **könnte**. Wo ein
+Aufruf von der DOM-Reihenfolge abhängt, gehört ein zweiter Anlauf dazu
+(`setTimeout(…, 0)`), nicht ein stilles Achselzucken. Und beim Suchen:
+erst beweisen, ob die Funktion funktioniert, dann fragen, wann sie läuft.
+
+## Zwei Wege, zwei Style-Blöcke
+
+Der Sprechlauf hat zwei Oberflächen — frei erzählen und geführt fragen.
+Beide leben in derselben Datei, aber ihr CSS nicht: `vi-style` wird bei
+jedem Öffnen gesetzt, `vi-rf-stil` **nur für den geführten Dialog**.
+
+Eine Regel für das freie Fenster, geschrieben in den Block des geführten,
+existiert im freien Fenster nicht. Gemessen: `grid-template-columns: none`
+statt zweier Spalten, 718 px breit statt 320, Höhe 0.
+
+**Die Regel:** bevor eine CSS-Regel geschrieben wird, wird geprüft, **in
+welchem Block sie landet und wann dieser Block injiziert wird**. Ein
+`document.getElementById('<style-id>')` im laufenden Fenster beantwortet
+das in einer Sekunde. Dieselbe Sorte wie der falsche Anker (`.ppg` statt
+`#pricing-modal`) und wie `#app` — plausibel aussehender Code an einem Ort,
+den der Zweig nie erreicht.
+
+Dazu gehört die Farbfrage: die beiden Fenster stehen auf verschiedenem
+Grund (`--vi-surface` dunkel gegen den hellen Dialog). Wer Regeln von einem
+in den anderen Block verschiebt, verschiebt sie in eine andere Umgebung.
+
+## Wer etwas einblendet, muss es auch ausblenden — und umgekehrt
+
+Eine neue Spalte kam neben das Aufnahmefenster, in einem Grid mit zwei
+Spalten. Das Aufnahmefenster wird an **drei** Stellen versteckt
+(`display:none`) — die Spalte an keiner.
+
+Ergebnis: ein leerer Kasten in der Kartenfarbe auf dem Grundton des
+Fensters, **fast schwarz auf schwarz**, den niemand einordnen konnte. Und
+weil das Grid weiter zwei Spalten aufspannte, bekam der nachfolgende
+Inhalt nur die Hälfte der Breite — für den Nutzer sah es aus, als sei das
+Fenster verschwunden.
+
+Der Reflex, das an den drei Stellen nachzuziehen, führte prompt in die
+Gegenrichtung: das Einblenden gab es nur an **einer** Stelle, und die
+setzte nur das Aufnahmefenster zurück. Danach war die ganze Aufnahme
+unsichtbar.
+
+**Die Regel:** wer ein Element in einen bestehenden Behälter hängt, sucht
+**alle** Stellen, die diesen Behälter oder seine Geschwister umschalten —
+`grep` nach `display`, nicht nach dem eigenen Klassennamen. Und Zeigen und
+Verstecken gehören als **Paar** in je eine Funktion. Zwei halbe Lösungen
+sind schlechter als keine, weil die zweite den Fehler der ersten verdeckt.
+
+Beim Zurücksetzen `''` statt eines festen Wertes: nur so gilt wieder, was
+im Stylesheet steht. Ein hartgesetztes `grid` hebelt jede Media-Query aus,
+und der Fehler zeigt sich erst auf einem schmalen Gerät.
+
+## Zwei Wege, zwei Schwellenwerte — auf demselben Gerät
+
+Derselbe Dialog hat zwei Oberflächen, beide mit einer Spalte daneben,
+beide mit einem Umbruch für schmale Geräte. Die eine brach bei 900 px um,
+die andere bei 720 px.
+
+Auf einem Tablet hochkant (767 px) hieß das: die eine Ansicht einspaltig,
+die andere zweispaltig — **mit einer Nebenspalte von 340 px neben einem
+Gespräch von 330 px.** Die Hauptsache war schmaler als das Beiwerk.
+
+**Die Regel:** Schwellenwerte gehören zum Problem, nicht zur Datei. Zwei
+Ansichten mit derselben Struktur bekommen denselben Breakpoint; sonst
+verhält sich dasselbe Gerät in zwei Fenstern verschieden, und niemand
+findet den Grund.
+
+Und gemessen wird im **gleich-Origin-iframe**. Das Fenster kleiner zu
+ziehen wirkt auf Media-Queries nicht zuverlässig — der Rahmen muss echt
+sein, sonst prüft man eine Breite, die der Browser nie auswertet.
+
+## Ein neuer Behälter verschiebt `parentNode` für alle anderen
+
+Eine neue Spalte kam neben ein bestehendes Element — dafür wurde ein
+Behälter um beide gelegt. Optisch genau richtig.
+
+Drei Fehler in Folge kamen daraus, alle erst beim Nutzer sichtbar:
+
+1. Der Behälter blieb als leerer Kasten stehen, wenn sein Inhalt versteckt
+   wurde (`display:none` galt nur dem Inhalt).
+2. Das Gegenstück zum Verstecken fehlte, also blieb nach dem Zurückschalten
+   alles unsichtbar.
+3. **Ein ganz anderes Modul hängte sich per `parentNode.insertBefore` an
+   das umschlossene Element** — und landete damit im neuen Behälter statt
+   im ursprünglichen Elternteil. Die Flex-Kette, die es scrollen ließ,
+   verlangte aber ein DIREKTES Kind. Ergebnis: der Dialog wuchs über das
+   Fenster hinaus, und die Knöpfe unten waren nicht mehr erreichbar.
+
+**Die Regel:** ein neuer Behälter ist ein Eingriff in die Hierarchie, nicht
+in die Optik. Vor dem Einbau wird zweierlei geprüft:
+
+- `grep` nach `parentNode`, `insertBefore`, `nextSibling`, `closest` und
+  `:scope >` auf das umschlossene Element — **wer hängt sich daran?**
+- jede CSS-Regel mit `>` oder mit Flex-/Grid-Vererbung, die vom alten
+  Elternteil ausgeht — **eine Ebene mehr, und sie greift nicht.**
+
+Und wer etwas einhängt, nennt sein Ziel **ausdrücklich** (`body.appendChild`)
+statt es über ein Geschwister zu suchen. `insertBefore(h, x.nextSibling)`
+ist bequem und macht die Einhängung von einer Struktur abhängig, die
+jemand später ändert — ohne zu ahnen, dass er es tut.
+
+## Ein Muster, das auf ein Wort endet, ist für Getipptes gebaut
+
+Die Bestätigung einer Adresse akzeptierte `^(ja|jo|klar|…)\b[\s.!,]*$` —
+der Satz musste **mit dem Ja enden**. Ein danebenstehendes Muster verlangte
+„stimmt" am **Anfang**.
+
+Gesagt wurde: **„ja stimmt".** Ein Wort zu viel für das erste Muster, ein
+Wort zu früh für das zweite. Der Satz galt als Korrektur, ging an die
+Auswertung, enthielt keine Adresse — und die Frage kam noch einmal. Für
+den Sprecher sah es aus, als hätte der Co-Pilot nicht zugehört.
+
+**Gesprochen sagt niemand nur „ja".** Man sagt „ja stimmt", „ja genau so",
+„passt so", „jo, richtig". Muster mit `$` am Ende stammen aus einer Zeit,
+in der dieselbe Stelle ein Tippfeld war; sie überleben die Umstellung auf
+Sprache, ohne dass es jemandem auffällt — sie funktionieren ja noch, nur
+eben seltener.
+
+**Die Regel:** wo eine Antwort **gesprochen** ankommt, wird nicht auf einen
+Wortlaut geprüft, sondern darauf, ob der Satz **nur aus Wörtern einer
+Klasse** besteht. Und die Gegenprobe gehört dazu: „ja, aber die Hausnummer
+ist zwölf" darf **keine** Zustimmung sein. Eine Ziffer, ein „aber", ein
+„nicht" — und der Satz trägt Inhalt, nicht nur Zustimmung. **Wer
+einschränkt, bestätigt nicht.**
+
+Das Gegenstück (Ablehnung) braucht dabei eine **eigene** Wortliste, nicht
+die Verneinung der ersten: „nein, stimmt nicht" enthält genau das „nicht",
+das eine Zustimmung ausschließt.
+
+## Eine Schutzregel, die im falschen Fall zuschlägt
+
+Im Auswertungs-Prompt stand: *„Niemals 0 setzen — eine 0 sieht aus wie eine
+Angabe und ist keine."* Sie stammte aus einem echten Befund: „zwanzig
+Prozent vom Kaufpreis" ohne bekannten Kaufpreis hatte einmal 0 ergeben.
+
+Dann sagte jemand **„Wir haben keine Sanierungskosten"** — und bekam
+„nichts gefunden, was hierher passt". Denn dort **ist** 0 die Angabe.
+
+**Eine Verneinung ist eine Antwort, keine Lücke.** „Gibt es nicht" und
+„weiß ich nicht" klingen ähnlich und bedeuten das Gegenteil: das eine füllt
+das Feld mit null, das andere lässt es offen. Der Prompt kannte den
+Unterschied nicht, weil ihn niemand aufgeschrieben hatte.
+
+**Die Regel:** eine Prompt-Regel, die aus einem Einzelfall entstanden ist,
+gehört auf ihren Fall **eingegrenzt** — mit dem Gegenbeispiel daneben. Sonst
+wächst sie sich zur allgemeinen Wahrheit aus und trifft Fälle, für die sie
+nie gedacht war. Am billigsten ist das Gegenbeispiel im Prompt selbst: „In
+DIESEM Fall ist 0 richtig, in JENEM nicht."
+
+Dasselbe gilt für die zweite Hälfte: dass **mehrere Aussagen in einem Satz
+einzeln** auszuwerten sind, muss dastehen. Ein Modell, dem man sagt
+„übernimm den Wert", übernimmt einen — nicht zwei.
+
+## Warten ohne Obergrenze ist eine Falle
+
+Der Sprechlauf merkt sich einen angefangenen Satz, statt ihn auszuwerten:
+wer „die Wohnung hat …" sagt und Luft holt, soll weitersprechen können.
+
+Nur gab es keine Grenze. Endete auch der nachgeschobene Satz „offen", wurde
+wieder gewartet — und der zusammengesetzte Satz endete erst recht offen.
+Im Bild des Nutzers steht zweimal hintereinander dieselbe Zeile: „Ich höre
+weiter zu — sag den Rest." Er kam allein nicht mehr heraus.
+
+**Die Regel:** jede Schleife, die auf eine Benutzeraktion wartet, braucht
+einen Zähler. Zweimal warten ist Geduld, dreimal ist Sturheit. Und im
+Zweifel lieber einmal zu früh auswerten: ein Modell, das einen halben Satz
+bekommt, antwortet schlechter — ein Nutzer, der festhängt, hört auf.
+
+## `offsetTop` misst nicht, was man denkt
+
+Eine Karte sollte im Blick bleiben: `chat.scrollTop = karte.offsetTop - 8`.
+Gemessen landete sie bei 17 px, während der Container bei 232 begann — weit
+oberhalb des sichtbaren Bereichs.
+
+`offsetTop` zählt ab dem nächsten **positionierten** Vorfahren
+(`position` ≠ `static`), nicht ab dem scrollenden Container. Sind die beiden
+nicht dasselbe Element — und das sind sie selten —, ist die Zahl für einen
+Scroll unbrauchbar.
+
+**Die Regel:** zum Scrollen innerhalb eines Containers wird der **Abstand
+zweier Rechtecke** genommen, plus der aktuelle Scrollstand:
+
+```js
+var ab = ziel.getBoundingClientRect().top - box.getBoundingClientRect().top;
+box.scrollTop = box.scrollTop + ab - rand;
+```
+
+Das ist unabhängig davon, wo `position` gesetzt ist — und wer es prüfen
+will, misst `getBoundingClientRect().top` beider Elemente nach dem Scrollen.
+
+## Ein Prüfaufbau, der die Wirklichkeit nur nachahmt, misst sich selbst
+
+Eine neue Funktion schickt einen Berichtstext an die KI-Auswertung und
+erwartet Auswahlwerte zurück — `wachsend`, `mittel`, `begrenzt`. Zum
+Prüfen wurde ein Katalog von Hand gebaut:
+
+```js
+{ id:'ds2_bevoelkerung', options:['stark_wachsend','wachsend', …] }
+```
+
+Die Antwort kam als **Fließtext**: „in den letzten fünf Jahren leicht
+gewachsen, der Trend zeigt weiter nach oben". Das sah nach einem echten
+Fehler aus.
+
+Der echte Katalog sieht anders aus — `buildCatalog()` liefert
+`{ kind:'select', options:[{v,t}] }`. Ohne diese Form weiß das Modell
+nicht, dass es aus einer Liste wählen soll. **Der Fehler lag im Prüfaufbau,
+nicht im Code.**
+
+**Die Regel:** ein Prüfaufbau wird nicht nachgebaut, sondern **von der
+Quelle geholt** — dieselbe Funktion aufrufen, die auch im Betrieb läuft
+(`buildCatalog()`), oder die echte Struktur aus dem laufenden Fenster
+auslesen. Wer sie nachbaut, prüft seine Nachbildung.
+
+Und wenn ein Befund überraschend schlecht ausfällt: **erst den Prüfaufbau
+verdächtigen, dann den Code.** Hier hätte die falsche Diagnose zu einem
+Umbau geführt, den niemand gebraucht hätte.
+
+## Eine Regel im Prompt braucht ihre Grenze im selben Satz
+
+Dreimal hintereinander an einem Tag hat eine Prompt-Regel, die aus einem
+Einzelfall entstand, einen Fall getroffen, für den sie nie gedacht war:
+
+1. *„Niemals 0 setzen — eine 0 sieht aus wie eine Angabe und ist keine."*
+   Gedacht für „zwanzig Prozent vom Kaufpreis" ohne bekannten Kaufpreis.
+   Getroffen hat sie **„keine Sanierungskosten"** — dort **ist** 0 die
+   Angabe.
+2. Die Gegenregel *„Verneinungen sind Angaben"* traf dann **„keine Straße
+   bekannt"** — und trug den Satz als Straßennamen ein. Bei einem Betrag
+   ist die Verneinung eine 0, bei einem **Textfeld** ist sie gar nichts.
+
+**Die Regel:** jede Prompt-Regel bekommt ihre **Grenze in denselben Satz**
+— am billigsten als Gegenbeispiel: „In DIESEM Fall 0, in JENEM nicht."
+Eine Regel ohne Grenze wächst sich zur allgemeinen Wahrheit aus, und die
+nächste Regel, die sie einfängt, macht denselben Fehler in die andere
+Richtung.
+
+## Ein Modell überliest, ein `if` nicht
+
+Gegen „keine Straße bekannt" als Straßenname wurde zuerst eine Prompt-Regel
+geschrieben — ausführlich, mit Beispiel, an der richtigen Stelle.
+
+**Gemessen nach dem Rebuild: unverändert.** Das Modell hielt sich nicht
+daran. Erst ein Riegel im Code hat es behoben.
+
+**Die Regel:** ein Prompt ist eine **Bitte**, kein Vertrag. Wo das Ergebnis
+verlässlich sein muss — weil es in ein Formular, einen Export oder ein PDF
+läuft —, gehört die Prüfung in den Code. Der Prompt sagt, was gewollt ist;
+der Code stellt sicher, dass nichts durchkommt, was nicht sein darf.
+
+Und beim Nachmessen: **nach jeder Prompt-Änderung wirklich messen.** Eine
+Prompt-Regel, die man nur schreibt und für wirksam hält, ist eine
+Vermutung — und sie sieht im Diff genauso überzeugend aus wie eine, die
+greift.
+
+## Eine Sperre, die auf eine geteilte ID prüft
+
+Ein Dialog schützte sich davor, zweimal übereinander zu öffnen:
+
+```js
+if ($('oabi-ov')) { onDone(); return; }
+```
+
+Richtig gedacht. Nur gehört `oabi-ov` **nicht nur ihm**: das Import-Fenster
+desselben Moduls benutzt dieselbe ID. Steht dessen Rest noch im DOM, steigt
+der Dialog sofort aus — **und meldet „fertig", ohne gelaufen zu sein.**
+Die aufrufende Kette geht weiter, als wäre alles in Ordnung.
+
+Für den Nutzer sah das aus wie ein Abbruch: er wählte drei Quellen, zwei
+liefen, die dritte erschien nie.
+
+**Warum es lange gutging:** einzeln geöffnet gibt es kein zweites Fenster.
+**Erst die Kombination bringt beide zusammen** — und genau die probiert
+man selten aus.
+
+**Die Regel:** eine Sperre prüft auf das, was sie meint. „Läuft schon EIN
+SOLCHER Dialog" ist etwas anderes als „existiert ein Element mit dieser
+ID". Wo mehrere Fenster sich eine ID teilen (weil sie sich ein Stylesheet
+teilen), unterscheidet die **Klasse**, nicht die ID — und ein fremdes
+Fenster mit derselben ID wird abgeräumt, nicht respektiert.
+
+Und: **ein `onDone()` im Fehlerfall ist eine Lüge an den Aufrufer.** Wer
+nicht gelaufen ist, meldet nicht „fertig" — sonst kann die Kette den
+Unterschied nicht sehen.
+
+## Drei Prüfungen, und keine passt auf gesprochene Sprache
+
+„Ja, hol den Bodenrichtwert ab." fiel durch alles:
+
+| Prüfung | verlangt | warum sie versagt |
+|---|---|---|
+| `RF_JA` | Ja am **Satzende** | sechs Wörter zu viel |
+| `/^(hol\|nimm\|…)/` | Verb am **Anfang** | Satz beginnt mit „Ja" |
+| `_istZustimmung` | nur Zustimmungswörter | enthält Inhalt |
+
+Der Satz landete als **Wert im Feld** — in der Übersicht stand bei
+Grundstück „Ja, hol den Bodenrichtwert ab."
+
+**Die Regel:** gesprochene Sätze haben keine feste Wortstellung. Ein
+Befehl wird daran erkannt, dass **ein Verb und ein Gegenstand** darin
+vorkommen — nicht daran, wo sie stehen. Anker am Satzanfang (`^`) und am
+Satzende (`$`) sind für getippte Kurzantworten gebaut und überleben die
+Umstellung auf Sprache nicht.
+
+Die Gegenprobe gehört dazu: eine **Frage** („was ist der Bodenrichtwert?")
+enthält dieselben Wörter und ist kein Befehl.
+
+## Eine mehrzeilige Ersetzung kann eine Zeile verschlucken
+
+`perl -0pi -e "s/…/…/s"` mit einem Suchmuster über mehrere Zeilen: die
+Ersetzung hat den Anker mitkonsumiert und nicht zurückgeschrieben. Konkret
+fiel `sanKatalog().forEach(...)` aus `buildFullCatalog()` — die acht
+Sanierungs-Gewerke wären damit still aus dem Sprechlauf-Katalog
+verschwunden.
+
+**Nichts wäre rot geworden.** `node --check` prüft Syntax, kein
+Vorhandensein. Der Katalog hätte einfach acht Einträge weniger gehabt, und
+ein diktiertes „Dach fünfzehntausend" wäre ins Leere gelaufen.
+
+Gefunden nur durch `grep -c "sanKatalog()"` danach — die erwartete Zahl war
+3, gezählt wurden 2.
+
+**Regel: nach jeder mehrzeiligen Ersetzung den ANKER gegenzählen, nicht nur
+die neue Zeile suchen.** Dass das Neue drin ist, beweist nicht, dass das
+Alte noch da ist.
+
+## `node --check /dev/stdin` wird nie rot
+
+```
+scp datei server:/tmp/chk.js
+ssh server "docker exec -i container node --check /dev/stdin < /tmp/chk.js"
+```
+
+gibt einen `fs`-Fehler aus (`binding.readFileUtf8`) und trotzdem
+Rückgabewert 0. Vier Dateien meldeten „OK", geprüft war keine einzige.
+
+Der Weg, der misst: `docker cp` in den Container, dann `node --check` auf
+eine echte Datei. **Leere Ausgabe = sauber**, jede Ausgabe = Fehler. Den
+Rückgabewert nach einer Pipe (`| head`) gar nicht erst lesen, der gehört
+dem letzten Glied.
+
+Und die Gegenprobe gehört dazu: einmal mit einer absichtlich kaputten Datei
+laufen lassen. Ein Prüfer, der nicht rot werden kann, ist keiner.
+
+## calc() verschluckt den zweiten Aufruf im selben Tick
+
+Vier Messungen hintereinander — Checkbox an, aus, an, aus, jedes Mal
+`calc()` — zeigten **eingefrorene Werte**. Immer dieselbe Zahl, egal in
+welcher Stellung. Das sah nach einem abgebrochenen `calc()` aus, nach einer
+geschluckten Ausnahme, nach einer doppelten Element-Id. Es war nichts davon.
+
+Alle Aufrufe lagen im **selben JS-Tick**. Die Rechenkette hängt an
+Ereignissen und ist entprellt; der erste Aufruf rechnet, alle folgenden in
+derselben Runde werden verworfen. Mit 350 ms Abstand stimmte auf Anhieb
+alles.
+
+**Wer eine ereignisgetriebene Rechenkette synchron hintereinander anstößt,
+misst seinen eigenen Takt, nicht das Produkt.** Zwischen zwei Zuständen
+immer `await` mit echter Pause — und wenn eine Messreihe konstante Werte
+liefert, wo Veränderung sein müsste, ist der Takt der erste Verdächtige,
+nicht der Code.
+
+## Eine Funktion, die nur aufgerufen wird
+
+`_fireOabiDone()` stand an zwei Stellen in `object-actions.js` — beim
+Schliessen des Import-Fensters und beim Übernehmen der Werte. **Definiert war
+sie nirgends.** Ein `grep` über das ganze Frontend fand genau diese zwei
+Aufrufe und keine Definition.
+
+Was daran fünf Wochen unsichtbar blieb: das Overlay wird **vor** dem Aufruf
+entfernt (`ov.remove(); _fireOabiDone();`). Der Nutzer sieht seinen Import
+sauber schliessen, die Werte stehen im Formular. Dass danach nichts mehr
+passiert, sieht aus wie „fertig", nicht wie ein Absturz. Die Kette
+
+```js
+await new Promise(function (res) { openCombinedImport(res); });
+```
+
+wurde nie aufgelöst und blieb beim ersten Schritt stehen. Wer den Import
+**einzeln** öffnet, merkt es nie — dort wartet niemand auf den Rückruf.
+
+**Regel: Ein Ablauf, der „einfach aufhört", hat als Erstes einen Verdacht —
+ein Rückruf, der nie feuert.** Und `grep -n "name"` zeigt dann in einer Zeile,
+ob es die Funktion überhaupt gibt. Das kostet zehn Sekunden und stand hier
+gegen mehrere Anläufe an der falschen Stelle.
+
+Dazu: **die Konsole lesen, bevor man Code liest.** `window.addEventListener
+('error', ...)` beim Nachstellen im Browser hätte den `ReferenceError` sofort
+gezeigt. Ich hatte vorher zwei Ursachen-Hypothesen aus dem Quelltext gebaut,
+beide plausibel, beide falsch.
+
+## Zwei überlappende Muster ergeben keinen Treffer
+
+Die Sprachauswahl der Abrufe verlangte **genau einen** Treffer:
+
+```js
+var treffer = akt.filter(...);
+if (treffer.length === 1) { ...  }
+```
+
+„Erweiterte Marktpreisindikation" trifft `markt` (wegen „markt") **und**
+`markt2` (wegen „erweitert"). Zwei Treffer sind damit so gut wie keiner — der
+Co-Pilot fragte zurück, welches denn gemeint sei. Bei genau dem Satz, der die
+Antwort schon enthielt.
+
+**Wo sich Muster überlappen, braucht es eine Rangfolge statt einer Menge.**
+Das spezifischere Wort gewinnt: „erweitert" kommt nur in einem der beiden
+Namen vor, „markt" in beiden. Und die Rangfolge prüft nur, was gerade zur
+Wahl steht — sonst löst ein „Bodenrichtwert" eine Aktion aus, die es an
+dieser Stelle nicht gibt.
+
+## Ein Wert, der da ist und nie ankommt
+
+Marcel fragte, warum die erweiterte Marktpreisindikation Bevölkerung, Mikro-
+und Makrolage nicht ausfüllt — „fehlen ihm Werte?". Es fehlte **kein einziger
+Wert**. Destatis liefert `bevoelkerung_trend` (Kreis Herford +0,152 %/Jahr,
+live geprüft), GeoMap die Angebotsdauer. Beides stand im Bericht und blieb
+dort: `mapCard()` las genau drei Felder, alles andere fiel unter den Tisch.
+
+Dieselbe Klasse ein zweites Mal am selben Tag: das Register führt seit Langem
+**15 örtliche Erbbauzinssätze** (2,7 bis 5,1 %, mit Modellvermerk). Aufgefallen
+nur, weil beim Rollout die Logzeile durchlief:
+
+```
+[register] ... erbbauzinssatz=15 ...
+```
+
+Der Unterschied zwischen 2,7 % und 5,1 % macht beim Abschlag 18.760 € gegen
+52.536 € — Faktor 2,8.
+
+**Bevor eine Quelle angebunden wird, erst prüfen, was die vorhandene schon
+liefert.** Und: die Startlogs eines Dienstes einmal wirklich lesen. Dort steht
+oft, was er alles kann.
+
+## `ref` lässt Felder fallen — und der Kommentar daneben sagt es schon
+
+Im `ReportOrchestrator` baut `ref` sich aus `input`. Wer ein neues Feld
+durchreicht, muss es **dort** eintragen; sonst ist es `undefined`, und jeder
+Code, der darauf prüft, ist eine Attrappe, die aussieht wie eine Funktion.
+
+Genau das steht zwei Zeilen darunter schon einmal: *„Diese Felder fehlten hier
+komplett: das Frontend schickte sie, der Orchestrator liess sie fallen."*
+(WREF-1). Ich wäre in dieselbe Grube gefallen, wenn ich die Feldnamen nicht
+gegengeprüft hätte statt sie anzunehmen.
+
+**Eine Falle, die in der Datei schon dokumentiert ist, ist trotzdem eine
+Falle.** Beim Durchreichen eines Feldes gehört die ganze Kette abgelaufen:
+Mapper → `ref` → Nutzung → Payload. Jede Station einzeln nachgezählt.
+
+## Eine Abnahme, die man nicht fährt, ist keine
+
+Der Erbbau-Hinweis für die Marktbewertung war gebaut, syntaktisch geprüft,
+ausgerollt — und stand im **falschen Weg**: in `applyAvm()`, dem Pfad von
+Sprengnetter und PriceHubble. Genau die beiden Anbieter sind abgeschaltet.
+Der Weg, den der Nutzer geht, ist die DealPilot-Karte, und dort fehlte er.
+
+Zwei Runden vorher hatte ich ihn selbst als „gebaut, bei echtem Abruf noch
+nicht gesehen" gemeldet. Genau dieser Satz war die Warnung, und ich bin
+trotzdem weitergegangen.
+
+Aufgefallen erst, als die Abnahme wirklich lief. Dabei fiel gleich noch
+auf, dass `_oabApplyExternal(name)` einen **Namen** nimmt und `_avm[name]`
+holt — ein durchgereichtes Ergebnisobjekt landet nirgends. Der Baustein war
+also nicht nur am falschen Ort, er war auf dem genutzten Weg überhaupt
+nicht erreichbar.
+
+**Regel: „Gebaut, aber nicht gemessen" ist kein Zwischenstand, sondern eine
+offene Aufgabe mit einem Datum.** Und die erste Frage bei einem UI-Baustein
+lautet nicht „funktioniert er", sondern **„liegt er auf dem Weg, den der
+Nutzer geht"** — in einer App mit mehreren Anbieterpfaden ist das die
+teurere Frage.
+
+## Ein Feld im JSON ist noch keine Anweisung
+
+Der Marktbericht schickt den **ganzen** Payload als JSON an das Modell —
+`marktkontext` und `erbbaurecht` waren also längst da. Im Text kamen sie
+trotzdem nicht vor.
+
+Der erste Versuch war zu höflich: *„Nenne mindestens einen dieser Werte."*
+Zwei Läufe an derselben Adresse, einmal mit Marktkontext-Satz, einmal ohne.
+Die Erbbau-Anweisung zwei Zeilen darunter sagte **„DAS MUSS IM TEXT
+VORKOMMEN"** und wurde in jedem Lauf befolgt.
+
+**Wo eine Zahl im Text stehen soll, gehört sie nicht ins JSON, sondern in
+die Anweisung — mit einem Beispiel, wie der Satz aussieht.** Nach der
+Verschärfung nannten beide Läufe die Zahlen samt Stichprobe: „2.750 Euro je
+Quadratmeter bei 135 vermieteten Angeboten".
+
+## `node --check` ohne `package.json` wird nicht rot
+
+Ein einfach-gequoteter String über drei Zeilen ist in JavaScript ein
+Syntaxfehler. `node --check datei.js` in einem Ordner **ohne**
+`{"type":"module"}` gab trotzdem `rc=0` zurück — bei einer Datei, die mit
+`import` beginnt und damit als CommonJS gar nicht parsen dürfte.
+
+Erst die Prüfung in einem Ordner **mit** `package.json` und einer
+**absichtlich kaputten Gegenprobe** zeigte, dass der Prüfer überhaupt rot
+werden kann.
+
+Das ist derselbe Befund wie bei `/dev/stdin` weiter oben, nur mit anderem
+Auslöser. **Regel: die Gegenprobe ist Teil des Prüflaufs, nicht eine
+Kür.** Ein grüner Prüfer ohne bewiesenes Rot sagt nichts.

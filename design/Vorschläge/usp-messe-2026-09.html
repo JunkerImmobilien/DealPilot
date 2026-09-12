@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DealPilot — wo wir uns abheben</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;600;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:ital,wght@1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --obsidian:#050505; --karte:#14130f; --karte2:#1c1a15;
+    --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+    --gruen:#3FA56C; --rot:#B8625C; --creme:#FDFCFA; --grau:#9a948a;
+    --rand:rgba(201,168,76,.26);
+    --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--obsidian);color:var(--creme);
+       font:400 16px/1.6 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .w{max-width:1120px;margin:0 auto;padding:0 22px}
+
+  /* ── Kopf ───────────────────────────────────────────── */
+  header{padding:70px 0 54px;border-bottom:1px solid rgba(255,255,255,.07)}
+  .marke{font:700 12px/1 'JetBrains Mono',monospace;letter-spacing:.28em;
+         color:var(--gold);text-transform:uppercase;margin-bottom:22px}
+  h1{font:700 clamp(34px,5.4vw,58px)/1.08 'Space Grotesk',sans-serif;margin:0 0 20px;letter-spacing:-.02em}
+  h1 span{background:var(--runway);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lead{font:400 clamp(17px,2.2vw,21px)/1.5 Inter,sans-serif;color:#cfc8bb;max-width:760px;margin:0}
+  .stand{margin-top:30px;display:flex;gap:10px;flex-wrap:wrap}
+  .stand a{text-decoration:none;border:1px solid var(--rand);color:var(--gold);border-radius:11px;
+           padding:9px 15px;font:600 11.5px/1 'JetBrains Mono',monospace;letter-spacing:.06em;
+           text-transform:uppercase;transition:background .16s ease}
+  .stand a:hover{background:rgba(201,168,76,.12)}
+
+  section{padding:58px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+  h2{font:700 clamp(23px,3vw,32px)/1.2 'Space Grotesk',sans-serif;margin:0 0 10px;letter-spacing:-.01em}
+  .kicker{font:700 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.2em;color:var(--gold);
+          text-transform:uppercase;margin-bottom:14px}
+  .unter{color:var(--grau);margin:0 0 30px;max-width:780px}
+
+  /* ── Der eine Satz ──────────────────────────────────── */
+  .satz{background:var(--karte);border:1px solid var(--rand);border-radius:20px;
+        padding:clamp(26px,4vw,44px);margin:0;position:relative;overflow:hidden}
+  .satz::before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--runway)}
+  .satz p{margin:0;font:500 clamp(20px,2.8vw,29px)/1.35 'Space Grotesk',sans-serif}
+  .satz p em{font-style:normal;color:var(--gold-hi)}
+  .satz .q{font:italic 500 17px/1.5 'Cormorant Garamond',Georgia,serif;color:var(--grau);
+           margin-top:16px;display:block}
+
+  /* ── Punkte ─────────────────────────────────────────── */
+  .gitter{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:16px}
+  .k{background:var(--karte);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px}
+  .k .nr{font:700 11px/1 'JetBrains Mono',monospace;color:var(--gold);opacity:.65;margin-bottom:10px}
+  .k h3{font:700 17px/1.25 'Space Grotesk',sans-serif;margin:0 0 9px}
+  .k p{margin:0;font-size:14.5px;color:#c9c2b5}
+  .k .beleg{margin-top:12px;padding-top:11px;border-top:1px dashed rgba(255,255,255,.12);
+            font:600 11.5px/1.5 'JetBrains Mono',monospace;color:var(--gruen)}
+
+  /* ── Tabellen ───────────────────────────────────────── */
+  .tab{width:100%;border-collapse:collapse;font-size:14.5px}
+  .tab th{text-align:left;font:700 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;
+          text-transform:uppercase;color:var(--gold);padding:0 12px 11px 0;border-bottom:1px solid var(--rand)}
+  .tab td{padding:12px 12px 12px 0;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:top}
+  .tab tr:last-child td{border-bottom:none}
+  .ja{color:var(--gruen);font-weight:600}
+  .nein{color:var(--rot);font-weight:600}
+  .roll{overflow-x:auto}
+
+  /* ── Preis ──────────────────────────────────────────── */
+  .preise{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+  .p{background:var(--karte);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;text-align:center}
+  .p.hell{border-color:var(--gold);background:linear-gradient(180deg,rgba(201,168,76,.1),transparent)}
+  .p .n{font:700 11px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;
+        color:var(--gold);margin-bottom:12px}
+  .p .z{font:700 34px/1 'Space Grotesk',sans-serif}
+  .p .z small{font-size:15px;opacity:.55;font-weight:500}
+  .p .u{margin-top:9px;font-size:13px;color:var(--grau)}
+  .p.gegner{border-color:rgba(184,98,92,.4)}
+  .p.gegner .n{color:var(--rot)}
+
+  /* ── Sätze fürs Gespräch ────────────────────────────── */
+  .zitate{display:grid;gap:14px}
+  .z{background:var(--karte2);border-left:3px solid var(--gold);border-radius:0 14px 14px 0;padding:18px 22px}
+  .z .rolle{font:700 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;
+            color:var(--gold);opacity:.8;margin-bottom:9px}
+  .z p{margin:0;font:500 17px/1.45 'Space Grotesk',sans-serif}
+
+  /* ── Import-Befund ──────────────────────────────────── */
+  .mess{background:var(--karte);border:1px solid var(--rand);border-radius:16px;padding:22px;margin-top:20px}
+  .mess h4{font:700 11px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;
+           color:var(--gold);margin:0 0 14px}
+  .pill{display:inline-block;padding:3px 9px;border-radius:20px;font:600 11px/1.5 'JetBrains Mono',monospace}
+  .pill.ok{background:rgba(63,165,108,.16);color:var(--gruen)}
+  .pill.no{background:rgba(184,98,92,.16);color:var(--rot)}
+  .pill.tot{background:rgba(255,255,255,.07);color:var(--grau)}
+
+  footer{padding:44px 0 70px;color:var(--grau);font-size:13.5px}
+  @media(max-width:640px){ section{padding:42px 0} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="w">
+    <div class="marke">DealPilot · Junker Immobilien</div>
+    <h1>Andere sagen Ihnen, ob Sie kaufen sollen.<br>
+        <span>Wir sagen Ihnen, was Ihre Bank dazu sagt.</span></h1>
+    <p class="lead">Was DealPilot von Schnellbewertern unterscheidet — elf Punkte,
+      belegt statt behauptet. Vergleich gegen <b>immobewertung.ai</b>, am 09.09.2026 geprüft.</p>
+    <div class="stand">
+      <a href="#unterschied">Der Unterschied</a>
+      <a href="#kette">Die Kette</a>
+      <a href="#punkte">Die elf Punkte</a>
+      <a href="#preis">Preis</a>
+      <a href="#ehrlich">Wo er besser ist</a>
+      <a href="#saetze">Sätze für den Stand</a>
+    </div>
+  </div>
+</header>
+
+<section id="unterschied">
+  <div class="w">
+    <div class="kicker">Der Unterschied</div>
+    <div class="satz">
+      <p><em>immobewertung.ai</em> beantwortet eine Frage: „Kaufen oder nicht?"<br>
+         <em>DealPilot</em> begleitet den ganzen Deal — vom Inserat bis zur Anlage V.
+      <span class="q">Sein Versprechen — „Bewerte jede Immobilie in unter 3 Minuten" — ist scharf
+        und für die Vorauswahl genau richtig. Wer 40 Inserate durchsieht, will 39 schnell
+        aussortieren. Aber danach hört es auf. Und danach fängt die Arbeit an, für die
+        jemand Geld ausgibt.</span></p>
+    </div>
+  </div>
+</section>
+
+
+<section id="kette">
+  <div class="w">
+    <div class="kicker">Die Kette</div>
+    <h2>Nicht eine Funktion — neun, die aufeinander folgen</h2>
+    <p class="unter">Das ist der stärkste Punkt: alle benutzen dieselben Daten. Was im
+      Quick-Check eingetippt wurde, steht in der Steuer wieder da.</p>
+    <div class="roll"><table class="tab">
+      <tr><th>Schritt</th><th>Was DealPilot tut</th><th>Wettbewerber</th></tr>
+      <tr><td><b>1 · Screening</b></td><td>Quick-Check: Eckdaten rein, Score raus</td><td class="ja">hat er auch</td></tr>
+      <tr><td><b>2 · Einordnung</b></td><td>Deal Score 0–100 nach <b>deinem</b> Profil</td><td>teilweise</td></tr>
+      <tr><td><b>3 · Tiefe</b></td><td>Sachwert · Ertragswert · Vergleichswert nach ImmoWertV</td><td class="nein">nein</td></tr>
+      <tr><td><b>4 · Finanzierung</b></td><td>DSCR, Break-Even, IRR, indikative Kondition</td><td class="nein">nein</td></tr>
+      <tr><td><b>5 · Bank</b></td><td>Bankexport zum Einreichen</td><td class="nein">nein</td></tr>
+      <tr><td><b>6 · Steuer</b></td><td>§ 7b, AfA, anteilig nach Übergang, Anlage V</td><td class="nein">nein</td></tr>
+      <tr><td><b>7 · Struktur</b></td><td>Mandanten: privat, GmbH, UG — je eigener Steuersatz</td><td class="nein">nein</td></tr>
+      <tr><td><b>8 · Bestand</b></td><td>Portfolio-Cockpit, Track Record, Aggregation</td><td class="nein">nein</td></tr>
+      <tr><td><b>9 · Weitergeben</b></td><td>Whitelabel, Reseller-Portal, Partnernetzwerk</td><td class="nein">nein</td></tr>
+    </table></div>
+    <div class="satz" style="margin-top:22px">
+      <p>Die ersten drei Minuten kann jeder.<br><em>Wir sind die nächsten drei Monate.</em></p>
+    </div>
+  </div>
+</section>
+<section id="punkte">
+  <div class="w">
+    <div class="kicker">Die elf Punkte</div>
+    <h2>Was wir haben und er nicht</h2>
+    <p class="unter">Jeder Punkt ist im Produkt nachweisbar — nicht auf einer Landingpage.</p>
+    <div class="gitter">
+      <div class="k"><div class="nr">01</div>
+        <h3>Quick-Check — auch wir können 60 Sekunden</h3>
+        <p>Eckdaten rein, sofort ein Ergebnis. Derselbe Einstieg, mit dem der Wettbewerber wirbt —
+           bei uns ist er der <b>Anfang</b> statt das Ganze. Wer will, hört danach auf;
+           wer weitermacht, behält jede Eingabe.</p>
+        <div class="beleg">✓ nichts geht verloren beim Weitermachen</div></div>
+
+      <div class="k"><div class="nr">02</div>
+        <h3>Zwei Bewertungsstufen statt einer Zahl</h3>
+        <p><b>Deal Score</b> für die schnelle Einordnung — TOP ab 85, GUT ab 70, SOLIDE ab 50.
+           <b>Deal Score 2.0</b> für die Tiefe: fünf Hauptkategorien mit Sub-Kennzahlen, jede
+           einzeln aufgeschlüsselt und begründet.</p>
+        <div class="beleg">✓ nicht „72 Punkte“, sondern woraus die 72 entstehen</div></div>
+
+      <div class="k"><div class="nr">03</div>
+        <h3>Nach <em style="font-style:normal;color:var(--gold-hi)">deinem</em> Investorenprofil</h3>
+        <p>Drei Voreinstellungen — Lage, Cashflow, Sicherheit — und wer mag, verschiebt die
+           Gewichte selbst. Derselbe Deal bekommt für den Bestandshalter eine andere Zahl als
+           für den Cashflow-Jäger. Und das ist richtig so.</p>
+        <div class="beleg">✓ eigene Standards für Zins, Tilgung, Bindung, EK-Quote</div></div>
+
+      <div class="k"><div class="nr">04</div>
+        <h3>Gutachterliche Tiefe</h3>
+        <p>Drei normierte Verfahren nach ImmoWertV — Sachwert, Ertragswert, Vergleichswert —
+           mit Modellkonformität nach § 10. Amtliche Bodenrichtwerte mit Stichtag und Zone,
+           Daten der Gutachterausschüsse.</p>
+        <div class="beleg">✓ BORIS: 11 von 11 Bundesländern · DESAG-zertifiziert gebaut</div></div>
+
+      <div class="k"><div class="nr">05</div>
+        <h3>Bankfähigkeit</h3>
+        <p>Eine Bank fragt nicht „lohnt sich das“, sondern nach Kapitaldienstfähigkeit: DSCR,
+           Annuität, Zinsbindung mit Anschlussrisiko, Break-Even-Miete, IRR — plus indikative
+           Kondition aus Pfandbrief-Satz und Marge.</p>
+        <div class="beleg">✓ Bankexport, den man einreichen kann</div></div>
+
+      <div class="k"><div class="nr">06</div>
+        <h3>Steuer ist mitgerechnet</h3>
+        <p>§ 7b Sonder-AfA mit Wohnflächen-Deckel, AfA nach Baujahr, Steuer-Snapshots je Jahr,
+           Zuarbeit zur Anlage V. Und das Kaufjahr <b>anteilig</b> — führend ist der
+           wirtschaftliche Übergang, nicht das Vertragsdatum.</p>
+        <div class="beleg">✓ wir rechnen das Kaufjahr taggenau — die meisten gar nicht</div></div>
+
+      <div class="k"><div class="nr">07</div>
+        <h3>Mandanten — die Trennung für Bestandshalter</h3>
+        <p>Objekte gehören einem Halter: privat, GmbH oder UG. Je Halter das eigene Steuerregime
+           und der eigene effektive Steuersatz, der in die Rechnung einfließt. Im Cockpit nach
+           Halter filtern.</p>
+        <div class="beleg">✓ zwei Nachsteuer-Renditen für dasselbe Objekt — beide gerechnet</div></div>
+
+      <div class="k"><div class="nr">08</div>
+        <h3>Bestand statt Einzelfall</h3>
+        <p>Portfolio-Cockpit, Track Record, Portfolio-Strategie, Aggregation über alle Objekte.
+           Wer zehn Wohnungen hat, braucht die elfte im Zusammenhang mit den zehn.</p>
+        <div class="beleg">✓ ein Screening-Werkzeug kennt nur das Objekt auf dem Tisch</div></div>
+
+      <div class="k"><div class="nr">09</div>
+        <h3>Sprechlauf und Co-Pilot</h3>
+        <p>Objekt einsprechen statt eintippen — oder der Co-Pilot führt Frage für Frage durch,
+           <b>freihändig</b>: Mikrofon bleibt an, er merkt selbst wann du fertig bist, rechnet mit
+           („10 % vom Kaufpreis“), bietet deine Einstellungen an und beantwortet Zwischenfragen.</p>
+        <div class="beleg">✓ die beste Vorführung am Stand — eine Minute, und niemand sonst kann sie</div></div>
+
+      <div class="k"><div class="nr">10</div>
+        <h3>Weitergeben: Whitelabel, Reseller, Partnernetzwerk</h3>
+        <p>Makler und Berater bekommen DealPilot unter eigener Marke — eigenes Logo, eigene Farben,
+           eigene Kunden, eigenes Portal. Dazu das Partnernetzwerk: Pro-Nutzer reichen ihre
+           Partnerkarte ein und erscheinen nach Freigabe.</p>
+        <div class="beleg">✓ er verkauft Abos an Endkunden, sonst nichts</div></div>
+
+      <div class="k"><div class="nr">11</div>
+        <h3>Jede Zahl trägt ihre Herkunft</h3>
+        <p>Stufe A–E, Modellvermerk, Quelle, Stichtag. Wo die Quelle endet, endet die Rechnung:
+           kein Nachbarkreis, kein Landesmittel. Fehlt eine Pflichtangabe, erscheint das Verfahren
+           <b>nicht</b> — statt still mit einer Annahme zu rechnen.</p>
+        <div class="beleg">✓ wir zeigen auch, was wir nicht wissen</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="preis">
+  <div class="w">
+    <div class="kicker">Preis</div>
+    <h2>Der Vollzugang kostet die Hälfte</h2>
+    <p class="unter">Und enthält ein Vielfaches.</p>
+    <div class="preise">
+      <div class="p"><div class="n">Starter</div><div class="z">19,99 <small>€/Mon.</small></div>
+        <div class="u">Einstieg, volle App</div></div>
+      <div class="p"><div class="n">Investor</div><div class="z">34,99 <small>€/Mon.</small></div>
+        <div class="u">für den laufenden Bestand</div></div>
+      <div class="p hell"><div class="n">Pro</div><div class="z">49,99 <small>€/Mon.</small></div>
+        <div class="u">alles, ohne Begrenzung der Objekte</div></div>
+      <div class="p gegner"><div class="n">immobewertung.ai</div><div class="z">99 <small>€/Mon.</small></div>
+        <div class="u">ein Plan · 100 Bewertungen im Monat</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="ehrlich">
+  <div class="w">
+    <div class="kicker">Ehrlich bleiben</div>
+    <h2>Wo er besser ist</h2>
+    <p class="unter">Wer am Stand nur die eigenen Stärken kennt, steht dumm da, sobald jemand
+      den Vergleich zieht. Diese fünf Punkte sollte man kennen — und beantworten können.</p>
+    <div class="roll"><table class="tab">
+      <tr><th>Punkt</th><th>Was er besser macht</th><th>Unsere Antwort</th></tr>
+      <tr><td><b>Versprechen</b></td>
+          <td>„In unter 3 Minuten. Kaufen oder nicht." Ein Satz, jeder versteht ihn.</td>
+          <td>Unsere Tiefe ist erklärungsbedürftig. Am Stand zählt <b>ein</b> Satz, nicht neun Reiter.</td></tr>
+      <tr><td><b>Inserat-Import</b></td>
+          <td>Erste Funktion auf der Startseite: Link rein, fertig.</td>
+          <td>Haben wir — versteckt im Quick-Check, und die großen Portale blocken den Serverabruf.</td></tr>
+      <tr><td><b>Erstes Ergebnis</b></td>
+          <td>Ein farbiges <span class="pill ok">KAUFEN</span>, dann erst die Details.</td>
+          <td>Wir haben den Score — er steht nur nicht so weit vorn.</td></tr>
+      <tr><td><b>Vertrauen</b></td>
+          <td>Gerald Hörhan als Gesicht, 1.133 Trustpilot-Bewertungen.</td>
+          <td>Unser Anker ist die <b>DESAG-Sachverständigen-Qualifikation</b> — fachlich schwerer,
+              öffentlich zu leise. Gehört auf die Startseite.</td></tr>
+      <tr><td><b>Markt</b></td>
+          <td>Deutschland <b>und</b> Österreich (Willhaben).</td>
+          <td>Österreich ist offen — und technisch näher, als es aussieht.</td></tr>
+    </table></div>
+
+    <div class="mess">
+      <h4>Der Inserat-Import — gemessen am 09.09.2026</h4>
+      <div class="roll"><table class="tab">
+        <tr><th>Portal</th><th>Antwort an unseren Server</th><th></th></tr>
+        <tr><td>Kleinanzeigen</td><td>200 · 382 KB · 8 × JSON-LD</td><td><span class="pill ok">funktioniert</span></td></tr>
+        <tr><td>willhaben.at</td><td>200 · 513 KB</td><td><span class="pill ok">funktioniert — nur nicht freigeschaltet</span></td></tr>
+        <tr><td>ImmobilienScout24</td><td>401</td><td><span class="pill no">blockiert</span></td></tr>
+        <tr><td>ImmoWelt</td><td>403</td><td><span class="pill no">blockiert</span></td></tr>
+        <tr><td>Immonet</td><td>301 → ImmoWelt → 403</td><td><span class="pill tot">Portal existiert nicht mehr</span></td></tr>
+        <tr><td>meinestadt</td><td>Zeitüberschreitung</td><td><span class="pill tot">praktisch tot</span></td></tr>
+      </table></div>
+      <p style="margin:16px 0 0;font-size:14px;color:#c9c2b5">
+        <b>Die Ursache ist keine fehlende Funktion, sondern eine IP-Frage.</b> IS24 und ImmoWelt
+        blocken Anfragen aus Rechenzentren — im Browser des Nutzers geht dieselbe Seite auf.
+        Nachgewiesen an einem echten Inserat: im Browser stehen Kaltmiete, Fläche, Adresse und
+        Ausstattung vollständig da. <b>Und darum wirbt der Wettbewerber zuerst mit Willhaben</b> —
+        das lässt Serverabrufe zu. Seine Hürde bei IS24 ist dieselbe wie unsere.</p>
+    </div>
+  </div>
+</section>
+
+<section id="saetze">
+  <div class="w">
+    <div class="kicker">Für den Stand</div>
+    <h2>Sätze, die hängen bleiben</h2>
+    <p class="unter">Kurz, konkret, ohne Superlative — und jeder davon ist belegbar.</p>
+    <div class="zitate">
+      <div class="z"><div class="rolle">Die Einordnung im Gespräch</div>
+        <p>„Die ersten drei Minuten kann jeder. Wir sind die nächsten drei Monate."</p></div>
+      <div class="z"><div class="rolle">Für den Bestandshalter</div>
+        <p>„Ihre GmbH und Ihr Privatbestand haben verschiedene Steuersätze — also auch
+           verschiedene Renditen für dasselbe Objekt. Wir rechnen beide."</p></div>
+      <div class="z"><div class="rolle">Plakat · Roll-up</div>
+        <p>Andere sagen Ihnen, ob Sie kaufen sollen.<br>DealPilot sagt Ihnen, was Ihre Bank dazu sagt.</p></div>
+      <div class="z"><div class="rolle">Einordnung im Gespräch</div>
+        <p>„Für die Vorauswahl gibt es Werkzeuge, die in drei Minuten Ja oder Nein sagen.
+           Gut so. DealPilot fängt da an, wo Sie Ja gesagt haben."</p></div>
+      <div class="z"><div class="rolle">Für Berater, Makler, Steuerberater</div>
+        <p>„Drei normierte Verfahren nach ImmoWertV. Amtliche Bodenrichtwerte mit Stichtag.
+           § 7b Sonder-AfA. DSCR und Bankexport. Von einem DESAG-zertifizierten
+           Sachverständigen gebaut."</p></div>
+      <div class="z"><div class="rolle">Der Satz, der Vertrauen schafft</div>
+        <p>„Fehlt uns eine Pflichtangabe, zeigen wir das Verfahren gar nicht erst.
+           Lieber eine Lücke als eine Zahl, die niemand belegen kann."</p></div>
+      <div class="z"><div class="rolle">Die Vorführung · 60 Sekunden</div>
+        <p>„Erzählen Sie mir Ihr Objekt." — reden lassen, dann die gefüllte Tabelle zeigen.
+           <b>Die stärkste Minute, die wir haben.</b> Niemand sonst kann sie.</p></div>
+      <div class="z"><div class="rolle">Wenn der Preis kommt</div>
+        <p>„Voller Zugang 49,99 € im Monat. Die Ersteinschätzung allein kostet woanders 99 €."</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="w">
+    Quelle und Langfassung: <b>design/Vorschläge/usp-dealpilot-2026-09.md</b> ·
+    Wettbewerbsdaten am 09.09.2026 auf immobewertung.ai erhoben, Import-Antworten vom
+    Staging-Server gemessen. Kein Konto beim Wettbewerber angelegt — die Analysefunktion
+    liegt hinter dem Login und wurde nicht getestet.
+  </div>
+</footer>
+
+</body>
+</html>

@@ -6,6 +6,7 @@ import { median, quantile, iqrFilter, confidence, round, haversineMeters } from 
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
 import { cfg, geomapEnabled } from '../lib/config.js';
 import { cacheGet, cacheSet } from '../lib/cache.js';
+import { segment } from '../lib/marktsegment.js';   /* v1314 */
 
 // Cache-Lebensdauer fuer Markt-Ergebnisse (Reproduzierbarkeit + Credit-Ersparnis).
 // Konfigurierbar via MARKET_CACHE_TTL_MIN, Default 720 Min (12 h).
@@ -15,14 +16,11 @@ const MARKET_CACHE_TTL_MS = (parseInt(process.env.MARKET_CACHE_TTL_MIN, 10) || 7
 const RADII = [500, 1000, 2000, 5000];
 const MIN_SAMPLE = 8;
 
-// DealPilot/interne Objektart -> GeoMap-Objektklasse
-function geomapClasses(pt) {
-  if (!pt) return ['Wohnung', 'Haus'];
-  const p = String(pt).toLowerCase();
-  if (p.includes('wohn') || p === 'etw') return ['Wohnung'];
-  if (p.includes('haus') || ['efh', 'mfh', 'dhh', 'rh', 'zfh'].includes(p)) return ['Haus'];
-  return ['Wohnung', 'Haus'];
-}
+/* v1314 - geomapClasses() ist nach lib/marktsegment.js gewandert.
+ * Sie stand zweimal im Haus (hier und in MarketInsightsService) und machte
+ * in beiden aus mfh pauschal ['Haus']. Gemessen gegen die echte API:
+ * 22 Prozent zu hoch beim Kaufpreis, 7,6 Prozent zu hoch bei der Miete.
+ * Jetzt EINE Quelle, und sie kennt den Unterschied zwischen Kauf und Miete. */
 // Konfidenz aus reiner Treffermenge (KPI liefert kein Werte-Array)
 function countConfidence(n) {
   if (!n) return 0;
@@ -62,7 +60,9 @@ export const MarketAnalysisService = {
   // optional einige Einzelobjekte fuer Karte/Tabelle.
   async _geomapLevel(ref, listingType, opts) {
     const offerType = listingType === 'miete' ? 'Miete' : 'Kauf';
-    const objectClasses = geomapClasses(ref.property_type);
+    /* v1314: das Segment kennt Kauf und Miete getrennt - ein MFH wird
+       gekauft als MFH, aber VERMIETET werden Wohnungen. */
+    const { objectClasses, objectTypes } = segment(ref.property_type, offerType);
     const wfl = ref.living_area && ref.living_area > 0 ? ref.living_area : null;
     const by = ref.build_year && ref.build_year > 1500 ? ref.build_year : null;
     // Hoehere Schwelle = stabilerer Median der engen Gruppe und seltenere Umschaltung
@@ -93,7 +93,7 @@ export const MarketAnalysisService = {
       for (let i = 0; i < SAMPLES; i++) {
         const k = await GeoMapConnector.kpiCollection({   /* WSEG10-2: period mitgeben */
           lat: ref.lat, lon: ref.lon, radiusKm: st.radiusKm,
-          offerType, analyzedField: 'PREISPROQM', objectClasses,
+          offerType, analyzedField: 'PREISPROQM', objectClasses, objectTypes,
           filters: st.filters, period: st.period,
         });
         if (k && !k.error && k.median != null) rs.push(k);
@@ -191,7 +191,7 @@ export const MarketAnalysisService = {
       /* WSEG12-4 · Die Beispielliste bekommt dieselben Filter wie der Median. */
       const mo = await GeoMapConnector.marketOffers({
         lat: ref.lat, lon: ref.lon, radiusKm: used.radiusKm, offerType, maxDetails: want,
-        filters: used.filters, period: used.period, objectClasses,
+        filters: used.filters, period: used.period, objectClasses, objectTypes,
       });
       comparables = (mo.offers || []).map((o) => ({
         property_type: o.property_type, living_area: o.living_area, build_year: o.build_year,

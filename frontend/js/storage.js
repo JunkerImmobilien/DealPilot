@@ -90,9 +90,29 @@ var FIELDS = [
   /* v813-3d: uebernommene Restschuld bei Ueberfuehrung */
   'ueberf_restschuld','ueberf_rest_zins',
   /* v816: Privat-Cut Enddatum + Wizard-Verknuepfung */
-  'ueberf_ende','_ueberf_link'
-].concat(WM_FIELDS);  /* v1136-WMTAB-1 · siehe oben */
+  'ueberf_ende','_ueberf_link',
+  /* ═══ v1311 · Die Herkunft überlebt das Speichern ═══════════════════
+     Marcels Vorgabe vom 11.09.2026: „wäre es super, wenn all das was wir
+     ausgearbeitet haben auch nach dem Speichern im Tab Pilot-Analyse zur
+     Verfügung steht und der Co-Pilot dieses Wissen dann mitnimmt."
 
+     Die Werte selbst standen schon im Objekt — sie kommen aus dem
+     Formular. Was fehlte, war die HERKUNFT: dass 90 €/m² amtlich aus
+     BORIS sind, dass die Makrolage aus der Marktpreisindikation stammt,
+     dass die Bankbewertung eine Näherung ist.
+
+     Der Sprechlauf kennt das je Feld (`_rf.quelle`), gab es aber nur an
+     die Übernahme-Tabelle weiter — mit dem Schließen war es weg. Für die
+     Pilot-Analyse ist es der Unterschied zwischen „der Bodenrichtwert
+     liegt bei 90 €" und „der Bodenrichtwert ist amtlich belegt".
+
+     Ein Feld, JSON darin. Kein zweiter Speicherweg, keine zweite Tabelle:
+     `FIELDS` wird ohnehin gespeichert, geladen und synchronisiert. */
+  '_dp_herkunft',
+  /* v1312 · Erbbaurecht: die Vertragsangaben. Die Checkbox selbst laeuft
+     ueber _erbpacht (Checkboxen gehen nicht ueber FIELDS). */
+  'erbbauzins','erb_restlz','erb_zs_ang','erb_entsch'
+].concat(WM_FIELDS);  /* v1136-WMTAB-1 · siehe oben */
 var _currentObjKey = null;  // Local mode key OR API object id
 
 /* v946-objready
@@ -148,6 +168,11 @@ function collectData() {
   // V23: Mietentwicklungs-Toggle (NKM vs NKM+zE)
   var meIncZe = document.getElementById('me_inc_ze');
   if (meIncZe) d['_me_inc_ze'] = meIncZe.checked;
+  /* v1312: Erbbaurecht-Schalter. Die Zahlen dazu laufen ueber FIELDS. */
+  var erbCb = document.getElementById('erbpacht');
+  if (erbCb) d['_erbpacht'] = erbCb.checked;
+  var erbW = document.getElementById('erb_wert_ist_erb');
+  if (erbW) d['_erb_wert_ist_erb'] = erbW.checked;
   // V63.99: Küche-im-Kaufpreis-Checkbox
   /* V291.1-storage-cleanup: kueche_im_kp-Checkbox entfernt — kein Save mehr nötig */
   // BWK mode
@@ -353,6 +378,18 @@ function loadData(d) {
     var meCb = document.getElementById('me_inc_ze');
     if (meCb) meCb.checked = !!d._me_inc_ze;
   }
+  /* v1312: Erbbaurecht-Schalter zurueckholen. sync() klappt den Koerper
+     auf und rechnet den Abschlag neu - ohne change-Ereignis passiert das
+     sonst nicht, und der Block bliebe trotz gesetzter Checkbox zu. */
+  if (d._erbpacht !== undefined) {
+    var erbCbL = document.getElementById('erbpacht');
+    if (erbCbL) erbCbL.checked = !!d._erbpacht;
+  }
+  if (d._erb_wert_ist_erb !== undefined) {
+    var erbWL = document.getElementById('erb_wert_ist_erb');
+    if (erbWL) erbWL.checked = !!d._erb_wert_ist_erb;
+  }
+  try { if (window.DealPilotErbbau) window.DealPilotErbbau.sync(); } catch (e) {}
   // V63.99: Küche-im-Kaufpreis-Toggle wiederherstellen + Wrap-Sichtbarkeit
 /* V291.1-storage-cleanup: kueche_im_kp-Checkbox-Restore entfernt.
      Stattdessen: One-Way-Migration aus kp_kueche → inv_kueche bei Bestandsobjekten. */

@@ -220,9 +220,15 @@ export const LocationFinderService = {
     if (withRendite) {
       await Promise.all(results.slice(0, topN).map(async (r) => {
         try {
+          /* v1314: MIT Zeitfenster. Ohne onlineDateRange rechnet die Rendite
+             Kaufpreise von heute gegen Mieten von 2015 - der Standort-Finder
+             sortiert dann nach einer Zahl, die es nie gab. */
+          const lfVon = new Date(Date.now() - 365 * 864e5).toISOString().slice(0, 10);
+          const lfBis = new Date().toISOString().slice(0, 10);
+          const lfZeit = { from: lfVon, to: lfBis };
           const [sale, rent] = await Promise.all([
-            GeoMapConnector.kpiCollection({ lat: r.lat, lon: r.lon, offerType: 'Kauf', analyzedField: 'PREISPROQM', objectClasses: ['Wohnung'] }),
-            GeoMapConnector.kpiCollection({ lat: r.lat, lon: r.lon, offerType: 'Miete', analyzedField: 'PREISPROQM', objectClasses: ['Wohnung'] }),
+            GeoMapConnector.kpiCollection({ lat: r.lat, lon: r.lon, offerType: 'Kauf', analyzedField: 'PREISPROQM', objectClasses: ['Wohnung'], period: lfZeit }),
+            GeoMapConnector.kpiCollection({ lat: r.lat, lon: r.lon, offerType: 'Miete', analyzedField: 'PREISPROQM', objectClasses: ['Wohnung'], period: lfZeit }),
           ]);
           geomapCalls += 2;
           const sMed = sale && !sale.error ? sale.median : null;

@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1269"><!-- v1148-spalt-1025px -->
+<link rel="stylesheet" href="css/style.css?v=v1297"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1192">
     <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
@@ -1008,6 +1008,11 @@ label.dp-required.qc-required::after {
        Ueberschrift, wo die Zahl hingehoert, und sagt selbst, was sie ist. -->
   <div class="wert-puffer" id="wert-puffer" style="display:none" title="Verkehrswert minus Kaufpreis. Ist der Verkehrswert hoeher, kaufst du unter Wert — der Puffer ist sofortiges Eigenkapital, ohne dass du etwas dafuer eingezahlt hast. Negativ heisst: du zahlst ueber Marktwert. Der Verkehrswert kommt aus dem Feld weiter unten oder aus einem importierten Gutachten; ohne ihn bleibt die Zeile leer."><span>Sofortiger Wertpuffer / Equity</span><span id="wert-puffer-val" class="c-green fw6"></span></div>
 
+  <!-- v1313: Der Wertpuffer darueber rechnet beim Erbbaurecht auf einem
+       bereits GEKUERZTEN Verkehrswert. Ohne diese Zeile faellt der Puffer
+       kommentarlos kleiner aus oder ganz weg, und niemand weiss warum. -->
+  <div class="wert-puffer" id="erb-abzug-zeile" style="display:none" title="Kein Bewertungspartner nimmt das Erbbaurecht entgegen - jede Marktbewertung ist ein Volleigentumswert. Dieser Abschlag nach § 50 ImmoWertV wird davon abgezogen, bevor Wertpuffer, Wertsteigerung und Deal Score daraus rechnen."><span>davon Erbbaurechts-Abschlag (§ 50 ImmoWertV)</span><span id="erb_abzug_wert" class="fw6"></span></div>
+
   <!-- V53: Top-Reihe — Objektdaten links + Qualität & Zustand rechts (bündig, gleiche Höhe) -->
   <div class="col2 col2-stretch">
     <div class="card card-stretch"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-home"/></svg></span>Objektdaten</div><div class="g2">
@@ -1015,7 +1020,7 @@ label.dp-required.qc-required::after {
       <div class="f"><label class="dp-required" data-v236-required-set="1">Ort</label><input id="ort" type="text" placeholder="z.B. Musterstadt" oninput="calc()" autocomplete="off" data-form-type="other"></div>
       <div class="f"><label class="dp-required" data-v236-required-set="1">Straße</label><input id="str" type="text" placeholder="z.B. Musterstraße" oninput="calc()" autocomplete="off" data-form-type="other"></div>
       <div class="f"><label>Hausnummer</label><input id="hnr" type="text" placeholder="z.B. 12" autocomplete="off" data-form-type="other"></div>
-      <div class="f"><label>Objektart</label><select id="objart"><option value="ETW">Eigentumswohnung (ETW)</option><option value="EFH">Einfamilienhaus (EFH)</option>
+      <div class="f"><label>Objektart</label><select id="objart"><!-- v1315c: Bis zum 11.09.2026 gab es KEINE leere Option - ETW war damit an jedem leeren Objekt vorausgewaehlt, ohne dass es jemand gesagt hatte. Seit v1314 waehlt die Objektart auch das Marktsegment bei GeoMap: eine stillschweigende ETW-Annahme misst ein Haus am Wohnungsmarkt. --><option value="">&#8211; bitte w&auml;hlen &#8211;</option><option value="ETW">Eigentumswohnung (ETW)</option><option value="EFH">Einfamilienhaus (EFH)</option>
               <option value="ZFH">Zweifamilienhaus (ZFH)</option><option value="MFH">Mehrfamilienhaus (MFH)</option><option value="DHH">Doppelhaushälfte (DHH)</option><option value="RH">Reihenhaus (RH)</option><option value="BUERO">Bürogebäude</option><option value="GESCH">Geschäftshaus</option><option value="HOTEL">Hotel</option><option value="GEW">Gewerbe-/Industriegebäude</option><option value="GAR">Garage / Stellplatz</option></select></div>
       <div class="f"><label class="dp-required" data-v236-required-set="1">Wohnfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wfl" tabindex="-1" aria-label="Hilfe zu tab1.wfl"></button></label><div class="iw"><input id="wfl" type="text" inputmode="decimal" placeholder="96" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
       <!-- v445-obj-reorder -->
@@ -1031,7 +1036,7 @@ label.dp-required.qc-required::after {
       <div class="f"><label>Garagenpl&auml;tze</label><input id="garagen" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
       <div class="f"><label>Au&szlig;enstellpl&auml;tze</label><input id="stellpl_aussen" type="text" inputmode="decimal" placeholder="z.B. 0"></div>
       <div class="f"><label>Balkon / Terrasse (m&sup2;)</label><div class="iw"><input id="balkon_flae" type="text" inputmode="decimal" placeholder="z.B. 10" class="tr"><span class="sfx">m&sup2;</span></div></div>
-      <!-- v737-eq-move: Ausstattungsdetails hierher verschoben (aus qz-card) --><!-- v727-ausst-fields A: Ausstattungsdetails (Qualitaet) --><div class="f" style="grid-column:1/-1"><div class="qz-acc-sub" style="font-size:12px;color:var(--muted);margin:4px 0 2px;font-weight:600">Ausstattung im Detail <span style="font-weight:400">(verbessert die Marktbewertung)</span></div></div><div class="f"><label>Heizung <button type="button" class="dp-tip" data-tip-id="tab1.eq_heating" tabindex="-1" aria-label="Hilfe zu Heizung"></button></label><select id="eq_heating"><option value="">– keine Angabe –</option><option value="FUSSBODENHEIZUNG">Fußbodenheizung</option><option value="ZENTRALHEIZUNG">Zentralheizung</option><option value="EINZELOEFEN">Einzelöfen</option><option value="SONSTIGE">Sonstige</option></select></div><div class="f"><label>Verglasung <button type="button" class="dp-tip" data-tip-id="tab1.eq_windows" tabindex="-1" aria-label="Hilfe zu Verglasung"></button></label><select id="eq_windows"><option value="">– keine Angabe –</option><option value="EINFACH">Einfachverglasung</option><option value="ISOLIERVERGLASUNG">Isolierverglasung</option><option value="ZWEIFACHVERGLASUNG">Zweifachverglasung</option><option value="DREIFACHVERGLASUNG">Dreifachverglasung</option><option value="SPEZIALVERGLASUNG">Spezialverglasung</option><option value="RAUMHOHE_VERGLASUNG">Raumhohe Verglasung</option><option value="KASTENFENSTER">Kastenfenster</option><option value="SONSTIGE">Sonstige</option></select></div><div class="f"><label>Bodenbelag <button type="button" class="dp-tip" data-tip-id="tab1.eq_floor" tabindex="-1" aria-label="Hilfe zu Bodenbelag"></button></label><select id="eq_floor"><option value="">– keine Angabe –</option><option value="PARKETT_NATURSTEIN">Parkett / Naturstein</option><option value="FLIESEN">Fliesen</option><option value="TEPPICH_LAMINAT">Teppich / Laminat</option><option value="KUNSTSTOFF_PVC">Kunststoff / PVC</option><option value="SONSTIGE">Sonstige</option></select></div><div class="f"><label>Gäste-WC <button type="button" class="dp-tip" data-tip-id="tab1.eq_guest_wc" tabindex="-1" aria-label="Hilfe zu Gäste-WC"></button></label><select id="eq_guest_wc"><option value="">– keine Angabe –</option><option value="GAESTE_WC">Ja</option><option value="KEIN_GAESTE_WC">Nein</option></select></div><input type="hidden" id="eq_bath"><!-- v727-ausst-fields B: Bauliche Details --><div class="f"><label>Keller / Abstellraum <button type="button" class="dp-tip" data-tip-id="tab1.eq_store_room" tabindex="-1" aria-label="Hilfe zu Keller / Abstellraum"></button></label><select id="eq_store_room"><option value="">– keine Angabe –</option><option value="INNERHALB">Innerhalb</option><option value="AUSSERHALB">Außerhalb</option><option value="INNERHALB_UND_AUSSERHALB">Innen & außen</option><option value="KEINER">Keiner</option></select></div><div class="f"><label>Außenwände <button type="button" class="dp-tip" data-tip-id="tab1.eq_walls" tabindex="-1" aria-label="Hilfe zu Außenwände"></button></label><select id="eq_walls"><option value="">– keine Angabe –</option><option value="AUSSENWAENDE_GEDAEMMT">Gedämmt</option><option value="AUSSENWAENDE_NICHT_GEDAEMMT">Nicht gedämmt</option></select></div><div class="f"><label>Dacheindeckung <button type="button" class="dp-tip" data-tip-id="tab1.eq_roof" tabindex="-1" aria-label="Hilfe zu Dacheindeckung"></button></label><select id="eq_roof"><option value="">– keine Angabe –</option><option value="DACHPFANNEN">Dachpfannen</option><option value="SCHIEFER">Schiefer</option><option value="METALL">Metall</option><option value="DACHPAPPE">Dachpappe</option><option value="SONSTIGE">Sonstige</option></select></div><div class="f"><label>Aufzug <button type="button" class="dp-tip" data-tip-id="tab1.eq_elevator" tabindex="-1" aria-label="Hilfe zu Aufzug"></button></label><select id="eq_elevator"><option value="">– keine Angabe –</option><option value="Ja">Ja</option><option value="Nein">Nein</option></select></div>
+      <!-- v737-eq-move: Ausstattungsdetails hierher verschoben (aus qz-card) --><!-- v727-ausst-fields A: Ausstattungsdetails (Qualitaet) --><div class="f" style="grid-column:1/-1"><div class="qz-acc-sub" style="font-size:12px;color:var(--muted);margin:4px 0 2px;font-weight:600">Ausstattung im Detail <span style="font-weight:400">(verbessert die Marktbewertung)</span></div></div><div class="f"><label>Heizung <button type="button" class="dp-tip" data-tip-id="tab1.eq_heating" tabindex="-1" aria-label="Hilfe zu Heizung"></button></label><select id="eq_heating"><option value="">– keine Angabe –</option><option value="FUSSBODENHEIZUNG">Fußbodenheizung</option><option value="ZENTRALHEIZUNG">Zentralheizung</option><option value="EINZELOEFEN">Einzelöfen</option><option value="SONSTIGE">Sonstige</option></select></div><div class="f"><label>Verglasung <button type="button" class="dp-tip" data-tip-id="tab1.eq_windows" tabindex="-1" aria-label="Hilfe zu Verglasung"></button></label><select id="eq_windows"><option value="">– keine Angabe –</option><option value="EINFACH">Einfachverglasung</option><option value="ISOLIERVERGLASUNG">Isolierverglasung</option><option value="ZWEIFACHVERGLASUNG">Zweifachverglasung</option><option value="DREIFACHVERGLASUNG">Dreifachverglasung</option><option value="SPEZIALVERGLASUNG">Spezialverglasung</option><option value="RAUMHOHE_VERGLASUNG">Raumhohe Verglasung</option><option value="KASTENFENSTER">Kastenfenster</option><option value="SONSTIGE">Sonstige</option></select></div><div class="f"><label>Bodenbelag <button type="button" class="dp-tip" data-tip-id="tab1.eq_floor" tabindex="-1" aria-label="Hilfe zu Bodenbelag"></button></label><select id="eq_floor"><option value="">– keine Angabe –</option><option value="PARKETT_NATURSTEIN">Parkett / Naturstein</option><option value="FLIESEN">Fliesen</option><option value="TEPPICH_LAMINAT">Teppich / Laminat</option><option value="KUNSTSTOFF_PVC">Kunststoff / PVC</option><option value="SONSTIGE">Sonstige</option></select></div><div class="f"><label>Gäste-WC <button type="button" class="dp-tip" data-tip-id="tab1.eq_guest_wc" tabindex="-1" aria-label="Hilfe zu Gäste-WC"></button></label><select id="eq_guest_wc"><option value="">– keine Angabe –</option><option value="GAESTE_WC">Ja</option><option value="KEIN_GAESTE_WC">Nein</option></select></div><input type="hidden" id="eq_bath"><!-- v1311: die Herkunft je Feld, als JSON - siehe storage.js FIELDS --><input type="hidden" id="_dp_herkunft"><!-- v727-ausst-fields B: Bauliche Details --><div class="f"><label>Keller / Abstellraum <button type="button" class="dp-tip" data-tip-id="tab1.eq_store_room" tabindex="-1" aria-label="Hilfe zu Keller / Abstellraum"></button></label><select id="eq_store_room"><option value="">– keine Angabe –</option><option value="INNERHALB">Innerhalb</option><option value="AUSSERHALB">Außerhalb</option><option value="INNERHALB_UND_AUSSERHALB">Innen & außen</option><option value="KEINER">Keiner</option></select></div><div class="f"><label>Außenwände <button type="button" class="dp-tip" data-tip-id="tab1.eq_walls" tabindex="-1" aria-label="Hilfe zu Außenwände"></button></label><select id="eq_walls"><option value="">– keine Angabe –</option><option value="AUSSENWAENDE_GEDAEMMT">Gedämmt</option><option value="AUSSENWAENDE_NICHT_GEDAEMMT">Nicht gedämmt</option></select></div><div class="f"><label>Dacheindeckung <button type="button" class="dp-tip" data-tip-id="tab1.eq_roof" tabindex="-1" aria-label="Hilfe zu Dacheindeckung"></button></label><select id="eq_roof"><option value="">– keine Angabe –</option><option value="DACHPFANNEN">Dachpfannen</option><option value="SCHIEFER">Schiefer</option><option value="METALL">Metall</option><option value="DACHPAPPE">Dachpappe</option><option value="SONSTIGE">Sonstige</option></select></div><div class="f"><label>Aufzug <button type="button" class="dp-tip" data-tip-id="tab1.eq_elevator" tabindex="-1" aria-label="Hilfe zu Aufzug"></button></label><select id="eq_elevator"><option value="">– keine Angabe –</option><option value="Ja">Ja</option><option value="Nein">Nein</option></select></div>
       </div><!-- /obj-extra-wrap -->
       <div class="f s2"><label>Investitionsthese <button type="button" class="dp-tip" data-tip-id="tab1.investitionsthese" tabindex="-1" aria-label="Hilfe zu tab1.investitionsthese"></button></label><textarea id="thesis" placeholder="Was macht dieses Objekt besonders?"></textarea></div>
       <div class="f s2"><label>Bekannte Risiken <button type="button" class="dp-tip" data-tip-id="tab1.bekannte_risiken" tabindex="-1" aria-label="Hilfe zu tab1.bekannte_risiken"></button></label><textarea id="risiken" placeholder="Bekannte Risiken und Maßnahmen..."></textarea></div>
@@ -1270,6 +1275,32 @@ label.dp-required.qc-required::after {
 <div class="f"><label>Grundstücksfläche (m²)</label><div class="iw"><input id="gsfl" type="text" inputmode="decimal" placeholder="1570" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
         <div class="f"><label>Grundstücksanteil (m²)</label><div class="cf" id="gs_ant">—</div></div>
         <div class="f s2"><label>Bodenwert</label><div class="cf" id="bodenwert">—</div></div>
+        <!-- ═══ v1312 · Erbbaurecht (Erbpacht) ═══════════════════════════
+             Steht hier, weil das Erbbaurecht eine Belastung des BODENS ist -
+             der Bodenwert direkt darueber ist die Groesse, an der es haengt.
+             Kein Bewertungspartner nimmt den Parameter entgegen (gemessen
+             11.09.2026 gegen GeoMap: leasehold, heritableBuildingRight,
+             groundLease, erbbaurecht, erbpacht - alle 400 Unrecognized
+             field). Die Marktbewertung liefert also IMMER Volleigentum;
+             den Abschlag rechnen wir selbst, nach § 50 ImmoWertV. -->
+        <div class="f s2" style="border-top:1px solid var(--border);padding-top:10px;margin-top:6px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600">
+            <input type="checkbox" id="erbpacht" onchange="if(window.DealPilotErbbau)DealPilotErbbau.toggle(this.checked);calc()">
+            <span>Erbbaurecht / Erbpacht</span>
+            <button type="button" class="dp-tip" data-tip-id="tab1.erbpacht" tabindex="-1" aria-label="Hilfe zu Erbbaurecht"></button>
+          </label>
+          <div class="dz-sub" style="margin-top:2px">Das Grundstück gehört nicht mit — es wird gegen Erbbauzins überlassen.</div>
+        </div>
+        <div class="f s2" id="erbpacht_body" style="display:none">
+          <div class="g2">
+            <div class="f"><label>Erbbauzins (€ pro Jahr)</label><div class="iw"><span class="pfx">€</span><input id="erbbauzins" type="text" inputmode="decimal" placeholder="1.800" class="trl" oninput="calc()"></div></div>
+            <div class="f"><label>Restlaufzeit (Jahre)</label><div class="iw"><input id="erb_restlz" type="text" inputmode="numeric" placeholder="55" class="tr" oninput="calc()"><span class="sfx">J</span></div></div>
+            <div class="f"><label>Angemessener Erbbauzinssatz (%)</label><div class="iw"><input id="erb_zs_ang" type="text" inputmode="decimal" placeholder="3,5" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+            <div class="f"><label>Entschädigung bei Zeitablauf (%)</label><div class="iw"><input id="erb_entsch" type="text" inputmode="decimal" placeholder="66,7" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+            <div class="f s2"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:12px;color:var(--muted)"><input type="checkbox" id="erb_wert_ist_erb" onchange="calc()"><span>Verkehrswert / Bankbewertung ist bereits der Erbbaurechtswert (dann nicht noch einmal kürzen)</span></label></div>
+          </div>
+          <div id="erb_ergebnis" class="brw-ki-result" style="display:none;margin-top:8px"></div>
+        </div>
       </div></div>
     </div>
   </div>
@@ -2784,6 +2815,10 @@ label.dp-required.qc-required::after {
         <div class="f"><label>Eigene Instandhaltungsrücklage <button type="button" class="dp-tip" data-tip-id="tab6.eigene_irl" tabindex="-1" aria-label="Hilfe zu tab6.eigene_irl"></button></label><div class="iw"><span class="pfx">€</span><input id="eigen_r" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
         <div class="f"><label>Kalkulat. Mietausfall / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.kalkulat_mietausfall" tabindex="-1" aria-label="Hilfe zu tab6.kalkulat_mietausfall"></button></label><div class="iw"><span class="pfx">€</span><input id="mietausfall" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
         <div class="f"><label>Sonderverwaltung / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.sonderverwaltung" tabindex="-1" aria-label="Hilfe zu tab6.sonderverwaltung"></button></label><div class="iw"><span class="pfx">€</span><input id="nul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+        <!-- v1312: der Erbbauzins steckt in der Summe darunter, ist aber kein Feld
+             hier - er kommt aus dem Reiter Objekt. Ohne diese Zeile taucht er in den
+             Kosten auf, ohne dass jemand sagen koennte, woher. -->
+        <div class="f"><label>davon Erbbauzins <span class="info-tag" title="Kommt aus dem Reiter Objekt, Grund &amp; Boden. Nicht umlagefaehig (§ 2 BetrKV kennt ihn nicht), aber steuerlich abziehbar.">ℹ Objekt</span></label><div class="cf" id="erb_zins_j">—</div></div>
         <div class="f"><label>Summe nicht umlagefähig</label><div class="cf" id="nul_sum">—</div></div>
       </div>
     </div>
@@ -2791,6 +2826,7 @@ label.dp-required.qc-required::after {
       <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-file-text"/></svg></span>BWK Zusammenfassung</div>
         <div class="kv"><span>Umlagefähig / Jahr</span><span class="kv-v" id="r-ul">—</span></div>
         <div class="kv"><span>Nicht umlagefähig / Jahr</span><span class="kv-v" id="r-nul">—</span></div>
+        <div class="kv"><span style="padding-left:12px;color:var(--muted)">davon Erbbauzins</span><span class="kv-v" id="r-erb-zins">—</span></div>
         <div class="kv kv-hl"><span><b>BWK Gesamt / Jahr</b></span><span class="kv-v c-gold" id="r-bwk">—</span></div>
         <div class="kv"><span>BWK als % der NKM</span><span class="kv-v" id="r-bwk-pct">—</span></div>
         <div class="kv"><span>Hausgeld gesamt</span><span class="kv-v" id="r-hg-ges">—</span></div>
@@ -3317,6 +3353,9 @@ label.dp-required.qc-required::after {
 <script src="js/deal-kpis.js?v=231"></script>
 <script src="js/afa-engine.js?v=v1260"></script>
 <script src="js/irr-engine.js?v=v1260"></script>
+<!-- v1312: Erbbaurecht - Rechenkern (rein) + DOM-Schicht -->
+<script src="js/erbbau-engine.js?v=v1312"></script>
+<script src="js/erbbau-ui.js?v=v1312"></script>
   <script src="js/afa-ui.js?v=v1260"></script>
   <script src="js/zve-manager.js?v=1"></script>
   <script src="js/tax-periods.js?v=841"></script>
@@ -3330,14 +3369,14 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v1261"></script>
+  <script src="js/calc.js?v=v1313"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v1240"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=v1258b"></script>
-<script src="js/config.js?v=v1257"></script>
+<script src="js/config.js?v=v1296"></script>
   <script src="js/legal-links.js?v=174" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
   <script src="js/autocomplete-debug.js?v=174" defer></script>
@@ -3357,8 +3396,8 @@ label.dp-required.qc-required::after {
   <script src="js/mandanten.js?v=v1236"></script>
   <script src="js/ueberfuehrung-wizard.js?v=v1236"></script>
   <script src="js/apikeys.js?v=811"></script>
-  <script src="js/settings.js?v=v1246c"></script>
-<script src="js/pricing-modal.js?v=v1246"></script>
+  <script src="js/settings.js?v=v1297"></script>
+<script src="js/pricing-modal.js?v=v1297"></script>
   <script src="js/promo-erstflug.js?v=v1246"></script>
 <script src="js/stripe-success.js?v=183"></script>
 <script src="js/demo-paywall.js?v=878"></script>
@@ -3373,9 +3412,9 @@ label.dp-required.qc-required::after {
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
-<script src="js/ui.js?v=v1243"></script>
+<script src="js/ui.js?v=v1323"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v1268"></script>
+<script src="js/storage.js?v=v1313"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=W33"></script>
@@ -3401,10 +3440,10 @@ label.dp-required.qc-required::after {
 <script src="js/import-export-modal.js?v=893u"></script>
 <script src="js/quick-check.js?v=463"></script>
 <script src="js/qc-bridge.js?v=v1233c"></script>
-<script src="js/bodenrichtwert.js?v=v1268"></script>
+<script src="js/bodenrichtwert.js?v=v1288"></script>
 <script src="js/adress-autocomplete.js?v=v1271"></script><!-- v1270: PLZ->Ort, Strassenliste -->
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
-<script src="js/ai-credits.js?v=v1185d"></script>
+<script src="js/ai-credits.js?v=v1296"></script>
 <script src="js/workflow.js?v=v1255"></script>
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=W35"></script>
@@ -3431,7 +3470,7 @@ label.dp-required.qc-required::after {
 <link rel="stylesheet" href="css/marktbewertung-card.css?v=W34">
 <script src="js/marktbewertung-card.js?v=540"></script>
 <script src="js/avm-section.js?v=v1178"></script>
-<script src="js/dealpilot-mb.js?v=v1187"></script>
+<script src="js/dealpilot-mb.js?v=v1323"></script>
   <script src="js/marktbericht-view.js?v=1229c"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
 <script src="js/selbstauskunft.js?v=W40"></script>
@@ -3451,10 +3490,10 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=v1257"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v1259"></script>
+  <script src="js/object-actions.js?v=v1317"></script>
   <script src="js/dpsh-score-hero.js?v=v1116"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v1183"></script>
-  <script src="js/voice-import.js?v=v1272"></script>
+  <script src="js/voice-import.js?v=v1323"></script>
 </div><!-- .main-col --></div><!-- .app-wrap -->
 </form><!-- V32 dp-noform -->
 <!-- V54: Floating Save-Button entfernt — Speichern steht in der Tab-Leiste rechts. -->

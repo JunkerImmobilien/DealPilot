@@ -9670,13 +9670,3581 @@ Aufnahme gestartet, 31 Stichwörter, 8 Plätze. In **32 Sekunden** waren
 Vorher wären es acht geblieben. Gegenprobe: ein verstecktes Stichwort auf
 `on` gesetzt → **sofort sichtbar**, nach dem Nachleuchten wieder weg.
 
-**Commit** — auf Staging, **nicht auf Prod**.
+**Commit** `a21fe9c` — Prod von `d7939d6` auf `a21fe9c`, reine Frontend-Aenderung.
+
+**Auf Prod nachgemessen:** 31 Stichwoerter, 8 Plaetze, alle 31 in **32
+Sekunden** mindestens einmal zu sehen, danach beginnt die Runde von vorn.
+Das Fenster blieb dabei durchgehend offen.
 
 > **Notiz zum Werkzeug:** Ein `cat`-Heredoc mit dem kompletten Modulcode
 > ist zweimal an der Shell gescheitert (`unexpected EOF while looking for
 > matching`), obwohl er in Anführungszeichen stand. Was zuverlässig
 > funktioniert: die Patch-Datei mit dem Write-Werkzeug in den Scratchpad
 > schreiben und mit `awk -v P=...` einsetzen.
+
+### `v1273`–`v1273e` · Der Co-Pilot fragt nach, was fehlt
+
+Marcels Punkt 5, erster Teil. Zuvor entstand — Demo-first, wie CLAUDE.md
+es verlangt — das Paar in `design/Vorschläge/`:
+`sprechlauf-dialog-konzept.md` und `sprechlauf-dialog-demo.html` (drei
+Varianten klickbar, im Markenstil, ohne Backend). **Marcels Entscheidung:
+*„das kann man auswählen ob co pilot oder frei sprechen"*** — also
+Variante C. Die Auswahl kommt mit `v1274`; die Rückfragen sind der Teil,
+der schon für sich nützt.
+
+**Der Bruch lag zwischen Auswertung und Tabelle.** Wer etwas vergisst,
+erfährt es erst dort, als fehlende Zeile. Jetzt liegt dazwischen ein
+Zustand mit **bis zu drei** gezielten Fragen.
+
+**Reihenfolge nach Gewicht für die Rechnung**, nicht nach Formular:
+Kaufpreis, Miete, Wohnfläche, Adresse **als ein Block** (vier Einzelfragen
+nach Straße, Hausnummer, PLZ und Ort wären ein Verhör), Baujahr, Zins,
+Tilgung, Zustand. Die zwölf Pflichtfelder stehen als `label.dp-required`
+im DOM — ausgelesen, nicht angenommen.
+
+**Antworten per Tippen oder per Kurzaufnahme.** Die Kurzaufnahme hat einen
+eigenen Recorder (die Hauptaufnahme ist beendet, das Mikrofon frei) und
+läuft **höchstens 20 Sekunden**: ein Aufnahmeknopf, den man versehentlich
+laufen lässt, kostet Geld.
+
+#### Der neue Endpunkt: `POST /ai/extract-text`
+
+Getippt gibt es kein Audio — also fällt die **Transkription** weg, der
+größte Kostenposten. Übrig bleibt ein Extraktionslauf auf einem Katalog
+von ein bis vier Feldern statt 250.
+
+> **Gemessen auf Staging:** „Der Kaufpreis liegt bei 245.000 Euro und ich
+> finanziere zu 3,8 Prozent" → `kp=245000`, `d1z=3.8` in **2,0 s** für
+> **0,09 Cent**. Das Konzept hatte 0,05–0,1 Cent geschätzt; die Schätzung
+> war richtig und ist jetzt eine Messung.
+
+#### `v1273c` · Der Befund, der das Feature erst richtig macht
+
+Die Lückenprüfung meldete beim ersten Testlauf **nichts offen**, obwohl
+weder Zins noch Tilgung gesagt worden waren. Beide standen als Wert im
+Formular — gesetzt vom Investmentprofil (`V63.76`). Nach der ersten Regel
+(„was im Formular steht, ist keine Lücke") galten sie als beantwortet.
+
+> **Die Rechnung hätte stillschweigend mit einer Vorbelegung gerechnet,
+> die niemand bestätigt hat.** Genau der Fall, den die Demo als Problem
+> zeigt — und er wäre unbemerkt geblieben, hätte die Prüfung nicht
+> zufällig auf diesen Datensatz gezeigt.
+
+`d1z` und `d1t` tragen jetzt den Merker `vorbelegt`: bei ihnen zählt nur,
+was **gesagt** wurde. Gefragt wird trotzdem freundlich — mit dem Vorschlag
+im Text und einem Knopf **„Passt so (3,5 %)"**, der ihn mit einem Klick
+bestätigt und dabei **keinen KI-Aufruf** kostet. Das ist der Unterschied
+zwischen einen Wert *annehmen* und einen Wert *vorschlagen*.
+
+#### Abnahme (Staging)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Lücken erkannt | `d1z`, `d1t` — 9 Angaben gefunden, 2 offen |
+| Getippt: „drei Komma neun Prozent" | **Zinssatz 3,9** in der Tabelle |
+| „Passt so (3,5 %)" | Wert übernommen, kein KI-Aufruf |
+| „Weiß ich nicht" | nächste Frage, **kein** Wert eingetragen |
+| „Fertig — zur Übersicht" | Tabelle mit 9 Zeilen, **ohne** Zins und Tilgung |
+
+**Zwei eigene Fehler in der Abnahme gefunden und behoben:** „Für die
+Rechnung fehlt mir noch 2" (`v1273d`, jetzt „fehlen") und `ae/oe/ue` in
+den **Fragetexten** (`v1273e`) — die Regel gilt für Kommentare, nicht für
+Nutztext.
+
+**Commits.** `820f93f` (`v1273`) · `v1273b` (Prüfhaken) · `v1273c`
+(vorbelegt) · `v1273d` (Zahlwort, Einheit) · `v1273e` (Umlaute).
+Backend auf Staging neu gebaut. **Nicht auf Prod.**
+
+**Offen für `v1274`:** die Auswahl beim Öffnen — „Ich erzähle frei" gegen
+„Frag mich durch" — und der geführte Weg dahinter.
+
+### `v1274`/`v1274b` · Zwei Sekunden Grün und ein Zähler, der wächst
+
+Marcels Vorgaben nach seinem **eigenen Sprechlauf**: *„die sachen die
+gesagt wurden sollen grün werden und nach 2 sekunden dann verschwinden.
+dann kommen dafür neue Schlagwörter bis keine mehr da sind. Dann gibt es
+einen Zähler mit maximal anzahl und wieviel wir schon haben."*
+
+**1 · Das Nachleuchten: 900 ms → 2000 ms**, Abgangs-Animation mit
+(`viAb` von 0,9 s auf 2 s, Haltepunkt von 55 % auf 72 %).
+
+> 900 ms ist die Zeit einer Bestätigung, die man sieht, **wenn man
+> hinsieht**. Sie ist nicht die Zeit einer Bestätigung, die man **bemerkt**,
+> während man spricht und woandershin schaut.
+
+**2 · Der Zähler zeigt jetzt den Stand, nicht den Rest.** Über dem Orbit
+stand „NOCH OFFEN · 30 Angaben" — die Gegenrichtung. Sie sagt nicht, wie
+weit man ist, sondern wie weit man noch nicht ist. Jetzt:
+**„7 VON 31 · Angaben erkannt · noch 24 offen"**, und am Ende
+**„ALLES ERKANNT · 31 von 31"**.
+
+#### `v1274b` · Zwei Zähler, zwei Zahlen
+
+Im Bild der Abnahme stand oben **„10 VON 31"** und darunter
+**„5 / 31 Felder"** — dieselbe Sache, zwei Rechenwege: die Kopfzeile kam
+aus `chipOrbit`, die Leiste aus `updateChipsCount`.
+
+> **Zwei Zähler stimmen nur so lange, wie beide bei jeder Änderung
+> laufen.** Einer davon lief nicht. Jetzt zählt `_zaehlerZeichnen()`, und
+> beide Anzeigen lesen von ihr.
+
+#### Abnahme (Staging, mit Prüfhaken `_text`, ohne echtes Sprechen)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Ein Stichwort erkannt | grün, `vi-weg` nach **2240 ms** (MutationObserver) |
+| Vier gleichzeitig | alle **2,65 s** grün, dann weg |
+| Beide Zähler nach der Erkennung | **4 VON 31** oben, **4 / 31 · 13 %** unten — gleich |
+| Nach dem Verschwinden | wieder **8** Pillen im Kranz, es rückt nach |
+| Alles erkannt | **ALLES ERKANNT · 31 von 31**, Kranz leer, „Alle Felder erkannt" |
+
+Die 2,2 bis 2,65 s statt exakt 2,0 s sind die Uhr des Orbits: sie prüft
+alle 600 ms. Für den Zweck genau richtig — genauer wäre ein Timer je Pille
+und damit ein Timer mehr, der schiefgehen kann.
+
+**Commits.** `v1274` (Nachleuchten, Zähler, Prüfhaken `_text`) · `v1274b`
+(eine Zahl, eine Quelle). Auf Staging, **nicht auf Prod**.
+
+### `v1275`/`v1275b` · Die Wahl beim Öffnen — der Bot ist da
+
+Marcels Frage: *„ist der bot jetzt auch drin? und wenn ja wo?"* — bis
+`v1274` **nein**: drin war nur die Nachfrage-Runde nach der Auswertung.
+Jetzt ist auch der geführte Weg da, und davor steht die Wahl. Das ist
+Variante C aus dem Konzept, die Marcel entschieden hatte: *„das kann man
+auswählen ob co pilot oder frei sprechen."*
+
+**Bis `v1274` startete die Aufnahme sofort beim Öffnen.** Wer nicht weiß,
+was DealPilot hören will, stand damit vor einem laufenden Mikrofon — der
+unfreundlichste Moment der ganzen App. Jetzt steht davor eine Frage mit
+zwei Antworten:
+
+| Weg | was passiert |
+|---|---|
+| **Ich erzähle frei** | alles wie bisher: Aufnahme, Orbit, Auswertung — danach die Rückfragen aus `v1273` |
+| **Frag mich durch** | derselbe Fragen-Ablauf, aber von Anfang an und über **alle** Blöcke statt nur über die Lücken |
+
+> **Der geführte Weg brauchte keine neue Maschinerie.** Er ist der
+> Rückfragen-Zustand aus `v1273` mit `alle = true`. Deshalb gelten dort
+> dieselben Regeln: tippen oder sprechen, „Weiß ich nicht" überspringt,
+> „Fertig" bringt jederzeit zur Tabelle. Der Deckel von drei Fragen gilt
+> dort nicht — wer „Frag mich durch" wählt, hat genau darum gebeten.
+
+**Kein Modus wird gemerkt.** Die Wahl fällt bei jedem Öffnen neu. Ein
+gemerkter Modus wäre genau dann falsch, wenn er am meisten stört: beim
+nächsten Objekt, das anders liegt als das letzte.
+
+#### `v1275b` · Der Satz statt des Werts
+
+**Gemessen im ersten Durchlauf:** auf „490 Euro kalt im Monat" stand in
+der Tabelle **„490 Euro kalt im Monat"** — der ganze Satz als Wert. Bei
+„245.000 Euro" ging es gut.
+
+> **Der Unterschied war Zufall.** Der Prompt ist für **Diktate** gebaut:
+> viel Text, viele Felder, such dir heraus, was passt. Bei einer
+> Kurzantwort mit **einem** Feld im Katalog hat das Modell nur dieses eine
+> Fach — und legt alles hinein, was es bekommt. Im Prompt stand nichts,
+> was diesen Fall benennt.
+
+`buildPrompt` und `extractFields` nehmen jetzt einen optionalen Zusatz;
+`extractFromText` setzt damit eine Antwort-Regel mit Beispielen. Der
+gemeinsame Prompt für Diktate bleibt unverändert.
+
+**Nachgemessen, je 0,09 Cent:**
+
+| Antwort | Ergebnis |
+|---|---|
+| „490 Euro kalt im Monat" | `nkm = 490` |
+| „so um die hundert Quadratmeter" | `wfl = 100` |
+| „Baujahr war 62" | `baujahr = 1962` |
+| „keine Ahnung ehrlich gesagt" | `{}` — nichts erfunden |
+
+Dazu: der Kopftext beschrieb vor der Wahl nur das freie Einsprechen („Bis
+zu 4 Minuten") — eine halbe Auskunft, wenn zwei Wege zur Wahl stehen.
+Jetzt neutral, und nach der Wahl der Text, der zum Weg passt.
+
+#### Abnahme (Staging)
+
+Geführter Weg: „245.000 Euro" → **Kaufpreis 245000**, „490 Euro kalt im
+Monat" → **Kaltmiete 490**, „rund hundert Quadratmeter" → **Wohnfläche
+100**; die Fragen kamen der Reihe nach (Preis → Miete → Fläche →
+Adresse), „Fertig" sprang in die Tabelle.
+
+**Commits.** `v1275` (Wahl + geführter Weg) · `v1275b` (Antwort-Regel im
+Prompt, Kopftext). Backend auf Staging neu gebaut. **Nicht auf Prod.**
+
+### `v1276`–`v1276c` · Freisprechen, Chat-Verlauf, alle 31 Felder
+
+Marcels drei Befunde nach dem ersten eigenen Durchlauf:
+
+> *„Man muss jedes Mal auf Sprechen klicken und dann fragt er wieder nach.
+> Das wäre irgendwie toll, wenn man das einfach bestehen lässt und dann die
+> Frage automatisch weitergeht und wir haben irgendwie auch nur acht Felder
+> drin."* — dazu: *„kannst du variante a umsetzen aus der demo"*
+
+**1 · Das Mikrofon bleibt an.** Ein Gespräch, in dem man vor jeder Antwort
+einen Knopf drückt, ist kein Gespräch — es ist ein Formular mit Umweg. Das
+Ende einer Antwort erkennt jetzt eine Pegelmessung:
+
+| Schritt | Regel | warum so |
+|---|---|---|
+| Grundrauschen | erste **500 ms** messen | eine feste Schwelle taugt nicht — ein Laptoplüfter ist lauter als ein stiller Raum |
+| Schwelle | Rauschen × 2,5, mindestens 0,012 | passt sich dem Raum an |
+| „spricht" | **180 ms** über der Schwelle | kürzer wäre jedes Rascheln |
+| „fertig" | **1400 ms** Stille | kürzer wäre falsch: zwischen „vierhundert" und „neunzig" liegt eine Pause |
+| Notbremse | 25 s je Abschnitt | eine Antwort auf eine gezielte Frage ist kurz |
+
+> **`setInterval`, nicht `requestAnimationFrame`.** rAF steht still, sobald
+> der Tab in den Hintergrund geht — wer beim Sprechen kurz ins Exposé
+> schaut, würde mitten im Satz nicht mehr gehört.
+
+**Ein Stream, ein `MediaRecorder`** für den ganzen Dialog, nicht je Frage
+neu: jede `getUserMedia`-Anfrage ist eine Zäsur — Berechtigung, Anlauf,
+verlorene erste Silbe.
+
+**2 · Der Chat-Verlauf aus der Demo.** Die Umsetzung war eine Fragekarte,
+die sich selbst überschreibt. Jetzt bleibt stehen, was gesagt wurde —
+Blasen für „Co-Pilot" und „Du", grüne Trefferzeile, drei tanzende Punkte
+beim Nachdenken. **Beim Freisprechen ist genau das der Beweis, dass
+richtig verstanden wurde.** `v1276c` zieht deshalb auch das Transkript und
+jeden Fehlversuch in den Verlauf: vorher standen sie in der Lauschzeile,
+die die nächste Runde sofort überschreibt.
+
+**3 · Alle 31 Felder.** Die erste Liste deckte 12 ab. Jetzt **18 Blöcke**
+über den gesamten Katalog, in **Erzähl-Reihenfolge** (was, wo, wie groß,
+was kostet es, was kommt rein, wie finanziert, wie liegt es, was denkst
+du). Zusammengehöriges in einem Block: „Wohnfläche und Zimmer" ist eine
+Frage, nicht zwei.
+
+> **Zwei Ordnungen, ein Grund.** Der geführte Weg fragt in Erzähl-Reihenfolge.
+> Die Rückfragen nach einem freien Diktat sortieren nach `rang` — dort
+> zählt das Gewicht für die Rechnung, weil nur **drei** Fragen gestellt
+> werden und die wichtigsten dabei sein müssen.
+
+#### Abnahme (Staging)
+
+Mit einem **steuerbaren Sprecher** geprüft (Sägezahn über
+`MediaStreamDestination`, an/aus schaltbar): Ton an → „… ich höre";
+Ton aus → nach der Stillepause endet der Abschnitt von selbst, die
+Auswertung läuft (drei Punkte), danach wird wieder gelauscht. **Kein
+Klick.**
+
+Getippt: „Hermannstraße 9 in 32609 Hüllhorst" → **vier Felder aus einem
+Satz** (`Strasse · Hausnummer · PLZ · Ort`), dann von selbst Frage 2 von 17.
+
+#### `v1276b` · Ein eigener Fehler, der teuer hätte werden können
+
+Beim Austausch des ganzen Rückfragen-Blocks lag die **Fragenliste mit
+drin** — sie war zwei Schritte vorher genau dort eingefügt worden.
+`ReferenceError: RFRAGEN is not defined`, das Fenster blieb leer.
+
+> **`node --check` sagte „ok".** Syntaktisch war die Datei einwandfrei —
+> es fehlte nur eine Variable, die erst zur Laufzeit gebraucht wird. **Nach
+> einem Blocktausch gehören die betroffenen Bezeichner gezählt**
+> (`grep -c`), nicht nur die Syntax geprüft. Seitdem läuft die Zählung im
+> selben Befehl wie der Syntaxtest mit.
+
+> **Und noch einer:** die Commit-Message enthielt Backticks in doppelten
+> Anführungszeichen — die Shell hat `rang` als Befehl ausgeführt und ein
+> Loch in den Text gerissen. Repariert per `--amend`; danach musste der
+> Staging-Server einmal auf `origin/staging` zurückgesetzt werden, weil das
+> Ausrollen an der umgeschriebenen Historie scheiterte (Exit 128).
+
+**Commits.** `v1276` · `v1276b` (Fragenliste zurück) · `v1276c` (Verlauf
+statt Lauschzeile). Auf Staging, **nicht auf Prod**.
+
+### `v1277` · Sprechen ist der Hauptweg — und sieht auch so aus
+
+Marcels Frage: *„könnte man das jetzt so machen dass man direkt sprechen
+kann anstatt tippen?"*
+
+**Es ging schon seit `v1276`.** Es sah nur nicht so aus: Bei jeder neuen
+Frage sprang der Cursor ins Tippfeld, und dass das Mikrofon läuft, stand
+als graue Zeile in 12 px darunter.
+
+> **Wer ein blinkendes Textfeld sieht, tippt.** Eine Funktion, die da ist,
+> aber nicht als erstes ins Auge fällt, ist für den Benutzer nicht da. Das
+> ist kein Fehler im Code — es ist einer in der Reihenfolge, in der das
+> Fenster seine Möglichkeiten zeigt.
+
+**Was jetzt anders ist:**
+
+- Eine **Mikrofon-Anzeige groß und mittig** über der Eingabe, mit einem
+  **Pegel, der sich bewegt**. „Hört er mich?" ist die einzige Frage, die
+  ein Sprecher wirklich hat — ein Ausschlag beantwortet sie ohne ein Wort,
+  deutlicher als jeder Hinweistext, den man beim Sprechen ohnehin nicht
+  liest.
+- Der Kasten **pulsiert**, solange gesprochen wird, und sagt „Ich höre
+  dich … — sprich zu Ende, ich warte auf die Pause".
+- **Kein Fokus mehr ins Tippfeld.** Es heißt nur noch „… oder tippen".
+- Ohne Mikrofon wird der Kasten blass und nennt Grund **und** Ausweg.
+
+**Nachgemessen (steuerbarer Sprecher):** Fokus nirgends, Pegel bei Stille
+flach (8 × 3 px), beim Sprechen ausschlagend (8/13/18/23/23/18/13/8 px,
+mittig am höchsten), Kasten trägt `hoert`, Text wechselt auf „Ich höre
+dich …".
+
+**Commit** `v1277`. Auf Staging, **nicht auf Prod**.
+
+### `v1278`/`v1278b` · Inserat einlesen — der Weg, der bei jedem Portal geht
+
+Marcels Frage, mit einer echten IS24-Adresse: *„kriegen wir es hin, dass
+wir diese Seiten auslesen können?"*
+
+#### Erst gemessen, dann gebaut
+
+| von wo | IS24 | ImmoWelt | Immonet | meinestadt | Kleinanzeigen | willhaben |
+|---|---|---|---|---|---|---|
+| **Server** | 401 | 403 | 301 → ImmoWelt → 403 | Timeout | **200** | **200** |
+| **Browser** | **alles da** | — | — | — | — | — |
+
+Dieselbe IS24-Seite, im Browser geöffnet: **6.104 Zeichen** Text,
+`IS24.expose.baseRent = 850`, Fläche, Adresse, Ausstattung, JSON-LD,
+Open-Graph. Kein Block, kein Captcha.
+
+> **Die Portale blocken keine Nutzer, sie blocken Rechenzentren.** Unser
+> Server steht bei Hetzner — genau in den Netzen, die zuerst gesperrt
+> werden. Daran ändert kein Prompt und kein Kniff etwas.
+>
+> **Immonet gibt es nicht mehr:** die Domain leitet auf ImmoWelt um
+> (`x-sunset-redirect=imn`), und die blockt. Unsere Whitelist führte ein
+> totes Portal.
+
+#### Also nicht dagegen anrennen, sondern daneben vorbei
+
+Der Mensch hat die Seite ohnehin offen. **Strg+A, Strg+C, einfügen.** Kein
+Bot-Schutz greift, weil kein Bot abruft.
+
+Neue Kachel **„Inserat einfügen"** in der Pre-Flight-Leiste, zwei Wege im
+selben Fenster:
+
+1. **Text einfügen** — geht **immer**, auch bei IS24 und ImmoWelt.
+2. **Link einfügen** — schneller, wo er geht (Kleinanzeigen, willhaben).
+   Scheitert er, führt die Meldung ausdrücklich zum Text-Weg statt in eine
+   Sackgasse.
+
+Das Ergebnis läuft durch **dieselbe Import-Tabelle** wie Sprache und
+Exposé — gleiche Haken, gleicher Schreibweg, gleiche Warnung vor dem
+Überschreiben (`v1267`).
+
+#### Der Prompt musste den Fall kennen
+
+`extract-text` unterscheidet jetzt zwei Textarten: `antwort` (bis 4.000
+Zeichen, wie `v1273`) und **`inserat`** (bis 40.000) mit eigener
+Zusatzregel — es geht um **genau ein** Objekt, Navigation und „ähnliche
+Angebote" zählen nicht, Warmmiete ist nicht die Kaltmiete, Hausgeld ist
+keine Miete, und was nicht dasteht, wird weggelassen.
+
+> **`v1278b` kam aus der ersten Messung.** Baujahr, Energieklasse, Fläche,
+> Zimmer, PLZ und Ort kamen an — **die Kaltmiete nicht.** Portale stellen
+> den Betrag in eine eigene Zeile über das Wort: „850 €", darunter
+> „Kaltmiete 17 €/m²". Für einen Menschen offensichtlich, für ein Modell
+> ohne Hinweis mehrdeutig. Die Regel nennt den Fall jetzt beim Namen,
+> samt Gegenprobe (der Wert je Quadratmeter ist es nicht).
+
+#### Abnahme am echten Inserat (IS24, München-Feldmoching)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Kaltmiete | **850 €** ✓ |
+| Wohnfläche · Zimmer · Baujahr | **50 m² · 2 · 1972** ✓ |
+| PLZ · Ort · Energieklasse | **80935 · München · D** ✓ |
+| Kaufpreis | **kein Wert** — es ist ein Mietobjekt ✓ |
+| „Ähnliche Objekte" (95 m², 1.850 €, Bj 1998) | **nicht übernommen** ✓ |
+| Dauer · Kosten | **1,8 s · 0,14 Cent** |
+
+**Commits.** `v1278` (Kachel, Dialog, Modus) · `v1278b` (Kaltmiete-Regel).
+Backend auf Staging neu gebaut. **Nicht auf Prod.**
+
+> **Zwei Werkzeugfehler auf dem Weg, beide teuer genug zum Aufschreiben:**
+> Ein `awk`-Ersetzen mit **leerer** Bereichsvariable hat
+> `voiceExtractService.js` von 646 auf **2 Zeilen** eingedampft — `NR>=""`
+> ist wahr. Gerettet mit `git checkout --`, wie es die Regel vorsieht.
+> **Seitdem wird die Bereichsgrenze vor dem Ersetzen geprüft** (`test -gt`)
+> und die Zeilenzahl danach verglichen. Und: `awk` frisst `\u`-Escapes
+> („Inserat einf\ufffdgen") — Zeilen mit Escape-Sequenzen gehören per
+> `printf` erzeugt, nicht durch awk geschleust.
+
+### `v1279`–`v1281` · Der Co-Pilot wird ein Gesprächspartner
+
+#### `v1279` · Der Inserat-Import ist wieder raus
+
+Marcels Entscheidung: *„ich will das man den link eingibt und alles
+automatisch funktioniert. falls das nicht geht nimm es wieder raus."*
+
+**Es geht nicht — jedenfalls nicht ohne Geld.** IS24 antwortet unserem
+Server mit 401, ImmoWelt mit 403. Der Text-Weg funktionierte gemessen
+einwandfrei (1,8 s, 0,14 ct, Kaltmiete und Eckdaten korrekt, fremde
+Objekte auf der Seite ignoriert) — er ist eben nicht „alles automatisch".
+Was bliebe: ein Abrufdienst mit Wohn-IPs, je Abruf bezahlt. **Das ist eine
+Geldentscheidung und gehört Marcel, nicht mir.**
+
+> Der Backend-Teil (`extract-text` mit `modus=inserat`) bleibt stehen: er
+> stört niemanden, kostet nichts und wäre sofort wieder nutzbar.
+
+#### `v1280` · Rechnen, bündeln, anbieten
+
+**Rechnen mit Kontext.** *„wenn ich sage, ich möchte 10 Prozent vom
+Kaufpreis als Kaufnebenkosten ansetzen, das rechnet er dann nicht passend
+aus."* — Konnte er nicht: der Aufruf bekam nur den Satz und den
+Feldkatalog. Was der Kaufpreis **ist**, stand nirgends. Jetzt reist der
+bekannte Stand mit, aus dem Gespräch **und** aus dem Formular.
+
+| Antwort | bekannt | Ergebnis |
+|---|---|---|
+| „20 % vom Kaufpreis als Eigenkapital" | `kp = 200000` | **40.000** ✓ |
+| „so viel wie eine Kaltmiete" | `nkm = 490` | **490** ✓ |
+| dieselbe Antwort | **nichts** | **leer** ✓ |
+
+> **Der letzte Fall kostete drei Anläufe.** Erst kam `0`, nach der ersten
+> Prompt-Regel `20` (die Prozentzahl als Euro), nach der zweiten wieder
+> `20`. **Das Modell will liefern — eine Bitte ist keine Sperre.** Jetzt
+> gibt es eine im Code (`_prozentFalle`): steht im Text ein Bezug
+> „Prozent vom/von" und liefert ein Geldfeld einen Wert ≤ 100, fällt er
+> weg. Eng gefasst, damit nichts Richtiges verloren geht — „Rücklage 30 €"
+> ohne Prozentbezug bleibt stehen, geprüft.
+
+**Bündeln.** Aus 18 Blöcken werden 11–13: Finanzierung ist **eine** Frage
+(Eigenkapital, Zins, Tilgung, Bindung), ebenso Sanierung+Inventar und
+Lage+Zustand.
+
+**Die Einstellungen anbieten.** *„Oder soll ich die Zinskonditionen aus den
+Einstellungen nehmen? … und dass er den passenden Zins zieht aus dieser
+indikativen Konditionsberechnung."* Der Vorschlag steht **in** der Frage:
+
+> *Aus deinen Einstellungen hätte ich: **4,07 % Zins · 1 % Tilgung ·
+> 10 Jahre fest · 20 % Eigenkapital*** — `[Einstellungen übernehmen]`
+
+Die 4,07 % kommen aus `DealPilotInvestmentProfile.getZins()`, also dem
+eigenen Wert **oder** dem indikativen Pfandbrief-Satz zur eingestellten
+Bindung samt Marge. Das Eigenkapital entsteht aus EK-Quote × Kaufpreis und
+erscheint nur, wenn der Kaufpreis steht — eine Quote ohne Kaufpreis ist
+keine Zahl. **Gemessen:** ein Klick → vier Felder, `ek = 40000`.
+
+#### `v1281` · „Was schon steht" und eigene Fragen
+
+**Die Spalte aus der Demo.** Der Chat zeigt den **Verlauf**, nicht den
+**Stand**. Wer mitten im Gespräch überlegt, ob er die Miete schon gesagt
+hat, müsste zurückscrollen. Jetzt steht rechts die Liste aller Blöcke mit
+drei Zuständen — ✓ steht, ▸ dran, · offen — und darunter „4 von 11". Auf
+schmalen Fenstern wandert sie **nach oben**: dort ordnet sie die Frage
+ein, statt sie zu verdecken.
+
+> Gezählt wird über **dieselben** `RFRAGEN`-Blöcke, aus denen auch gefragt
+> wird. Zwei Listen, die dasselbe meinen, laufen irgendwann auseinander.
+
+**Eigene Fragen.** Neuer Endpunkt `POST /ai/copilot-frage`: Frage plus
+bekannter Stand rein, zwei bis vier Sätze raus.
+
+> **Eigener Endpunkt statt eines Schalters an `extract-text`:** dort geht
+> ein Wert **ins Formular**, hier kommt eine Auskunft **an den Menschen**.
+> Zwei Zwecke in einer Route heißt, dass ein Fehler im einen den anderen
+> mitreißt.
+
+Der Prompt verbietet drei Dinge: Zahlen erfinden (was fehlt, wird
+benannt), Anlageberatung (einordnen ja, entscheiden nein) und Länge.
+
+**Erkannt wird vorsichtig** — Fragezeichen oder Fragewort am Anfang. Im
+Zweifel gilt es als Antwort: eine falsch als Frage verstandene Angabe geht
+verloren, eine falsch als Angabe verstandene Frage steht wenigstens in der
+Tabelle und fällt auf. Gilt getippt **und** gesprochen; nach der Auskunft
+wiederholt der Co-Pilot die offene Frage.
+
+**Abnahme (Staging).** „Was bedeutet eigentlich DSCR?" mitten im Dialog:
+
+> *„DSCR bedeutet ‚Debt Service Coverage Ratio' und zeigt, wie oft die
+> laufende Miete den Schuldendienst aus Zins und Tilgung deckt. Mit den
+> bekannten Werten kann ich das noch nicht sauber rechnen, weil mir dafür
+> die Darlehensdaten wie Zinssatz, Tilgung, Darlehensbetrag und die
+> laufenden Bewirtschaftungskosten fehlen."*
+
+**Genau das war das Ziel:** erklären, rechnen wo es geht, und die Lücke
+benennen statt sie zu füllen. Danach: *„Zurück zur Frage: Wie groß ist
+es?"*
+
+**Commits.** `v1279` (Rückbau) · `v1280`–`v1280d` (Kontext, Bündelung,
+Profil-Vorschlag, Prozentfalle) · `v1281` (Spalte, Fragen). Backend
+mehrfach neu gebaut. Auf Staging, **nicht auf Prod**.
+
+### `v1282` · Der Co-Pilot fragt auf Wunsch auch die Feinheiten ab
+
+Marcels Wunsch: *„können wir das auch mit dem Sprechlauf so
+weiterentwickeln, dass er auch alle anderen Felder entgegennimmt, wenn man
+das will? du hast ja alles vorbereitet dafür."*
+
+**Vorbereitet war es.** Die 13 festen Blöcke decken **31** Felder ab;
+`window.FIELDS` führt aber **204**, davon rund **145 frei ausfüllbar** —
+gemessen am 10.09.2026: Objekt 72 · Finanzierung 25 · Bewirtschaftung 17 ·
+Investition 14 · Miete 13 · Steuer 4.
+
+> **145 Fragen sind kein Gespräch, das ist ein Fragebogen.** Die 13 Blöcke
+> bleiben der Weg; die Feinheiten kommen **danach** und nur, wenn jemand
+> sie will.
+
+**Zwei Wege dorthin:**
+
+1. Am Ende der Pflichtstrecke fragt der Co-Pilot **einmal** nach: *„Das
+   Wichtigste steht. Willst du die Feinheiten auch noch durchgehen?"*
+2. Wer es gleich weiß, schaltet oben **„Alle Felder"** ein.
+
+> **Wer selbst „Fertig" drückt, wird nicht gefragt.** Wer abbricht, will
+> abbrechen — die Nachfrage käme dort als Bevormundung an.
+
+#### Gebildet aus dem DOM, nicht aus einer zweiten Liste
+
+Der Abschnitt (`.sec`) gibt das Thema, das Label den Namen, je **vier**
+Felder eine Frage. Nicht gefragt wird, was berechnet (`readonly`),
+gesperrt, versteckt oder **schon gefüllt** ist — und nichts aus der
+Pflichtstrecke: wer geantwortet hat, wird nicht zweimal gefragt. Der
+Feldkatalog wird um die neuen Felder ergänzt, samt Optionen bei Auswahlen;
+ohne Fach kein Wert.
+
+> **Eine gepflegte Zweitliste von 145 Feldern würde beim ersten neuen Feld
+> veralten — und niemand würde es merken.** Deshalb liest sie sich selbst
+> aus dem Formular, das ohnehin die Wahrheit ist.
+
+#### Abnahme (Staging)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Dialog ohne Schalter | **12 Fragen** |
+| „Alle Felder" an | **38 Fragen**, Spalte und Zähler wandern mit |
+| Beispiel-Block | „Kaufpreis & Nebenkosten: Makler, Notar, Grundbuchamt, Grunderwerbsteuer?" |
+| Antwort darauf | „Makler 3,57 Prozent, Notar 1,5 und Grunderwerbsteuer 6,5 in NRW" → **`makler_p 3.57 · notar_p 1.5 · gest_p 6.5`**, 0,12 ct |
+| Unpassende Antwort | „Daraus konnte ich nichts entnehmen" — **richtig**, die Antwort gehörte zu einer anderen Frage |
+
+`v1282b` kürzt die Namen in der Spalte auf den Bereich: „Objekt: Kürzel,
+Bankbewertung, Bevölkerungsentwicklung…" passt nicht in 196 px, „Objekt"
+schon — welche Felder es sind, steht in der Frage selbst.
+
+**Commits.** `v1282` · `v1282b`. Auf Staging, **nicht auf Prod**.
+
+### `v1283`/`v1284` · Schneller, breiter, schlauer
+
+Marcels fünf Befunde nach dem ersten **echten** Sprechlauf — jeder einzeln
+abgearbeitet:
+
+**1 · „Das Modal ist sehr klein."** 740 px waren für **eine** Spalte
+gedacht; seit `v1281` stehen zwei nebeneinander, und der rechten blieben
+196 px — genug für einen Oberbegriff, zu wenig für Werte. Jetzt **1080 px**,
+Spalte 300, Verlauf 340 px hoch. Nur im Sprechlauf-Modus: die anderen
+Dialoge sind schmal richtig.
+
+**2 · „Da steht nur die Oberbegriffe und gar nicht das, was ich gesagt
+habe."** Die Spalte zeigt jetzt die **Werte**, Feld für Feld, grün mit
+Haken:
+
+```
+✓ Adresse        PLZ 32609
+                 Ort Hüllhorst
+                 Straße Hermannstraße
+✓ Finanzierung   Zinssatz 3,5
+                 Tilgung 1
+```
+
+Sie ist damit kein Inhaltsverzeichnis mehr, sondern das **Protokoll**.
+
+**3 · „Bei Sanierung habe ich gesagt: Haben wir nicht. Das hat er nicht
+erkannt."** Verneinungen werden jetzt **vor** dem KI-Aufruf erkannt: *haben
+wir nicht · gibt es nicht · kommt nicht in Frage · brauchen wir nicht ·
+nichts · weiter · überspringen · nein*. Gesprochen wie getippt.
+
+**4 · „Bei den Zinssätzen sollte man sagen können: übernimm die aus den
+Einstellungen."** Ebenfalls vorab erkannt, solange ein Vorschlag offen
+steht — *„ja bitte übernimm die aus den Einstellungen"* trägt Zins,
+Tilgung und Bindung ein.
+
+**5 · „Wir brauchen dazwischen nicht mehr ‚erkannt wurde das und das in
+Grün'."** Die Bestätigungsblase entfällt; die nächste Frage kommt nach
+**120 statt 650 ms**. Auch das Überspringen quittiert nicht mehr doppelt.
+
+> **Alle vier Erkennungen laufen ohne KI.** Das ist der eigentliche
+> Geschwindigkeitsgewinn: eine Verneinung kostete vorher zwei Sekunden und
+> 0,1 Cent — jetzt kostet sie nichts und dauert nichts.
+
+#### `v1283d` · Die Übersicht verschwieg das Eingetippte
+
+Gemessen: Kaufpreis war im Formular gefüllt, wurde also nicht gefragt —
+und **fehlte damit in der Spalte ganz**. Eine Liste, die „Was schon steht"
+heißt und ausgerechnet das Eingetippte verschweigt, ist keine Übersicht.
+Jetzt stehen alle Blöcke da, die vorher gefüllten mit Haken und Wert oben.
+
+**Nachgemessen:** 13 Zeilen, **6 davon schon gefüllt** — Objektart ETW,
+Kaufpreis 200000, Wohnfläche 100, Kaltmiete 490, Zinssatz 3,5, Übergang.
+
+#### Zwei eigene Fehler auf dem Weg
+
+> **Der Cache-Buster stand zwei Stände zurück.** `v1283c` hatte nur die
+> JS-Datei committet, nicht die `index.html` — die nächste Ersetzung suchte
+> dann nach `v1283c`, das dort nie stand. Der Browser lud `v1283b`, während
+> die Datei `v1283d` war. **Das kostet doppelt:** die Messung danach misst
+> die alte Datei, und man sucht den Fehler im Code. Seitdem wird der
+> geladene `?v=` im Browser mitgelesen, bevor ein Befund als Befund gilt.
+
+> **Eine Zeile landete hinter `return`.** `node --check` meldet das nicht —
+> es ist gültiges JavaScript, nur unerreichbar. Beim Nachlesen der
+> eingefügten Stelle gesehen.
+
+#### `v1284` · Umlaute, die jahrelang durchgingen
+
+Seit die Spalte Werte zeigt, stehen die Chip-Labels **sichtbar** im
+Fenster — und die trugen seit jeher `ae/oe/ue`: *Wohnflaeche, Strasse,
+Grundstuecksflaeche, Moeblierung, Kuechenmiete, Bevoelkerung,
+Aussenstellplaetze, Wirtsch. Uebergang*. Im Orbit sind sie durchgegangen,
+in einer Werteliste fallen sie auf. Korrigiert; die **Suchwörter** (`kw`)
+bleiben ohne Umlaut, sie werden gegen entumlauteten Text geprüft.
+
+Dazu: „3.5" ist ein Feldwert, „3,5" eine Angabe — in der Spalte steht
+jetzt das Komma.
+
+**Commits.** `v1283`–`v1283d` · `v1284`/`v1284b`. Auf Staging, **nicht auf
+Prod**.
+
+### `v1285` · HTTP 413 beim Sprechen — die Aufnahme wuchs unbegrenzt
+
+Marcels Fehler: *„ich spreche rein und bekomme einen http413"*.
+
+**Im Caddy-Log gemessen, nicht geraten:**
+
+```
+"uri": "/api/v1/ai/extract-voice",
+"Content-Length": ["238137157"],     ← 238 MB
+"bytes_read": 50000001,               ← Caddy bricht bei 50 MB ab
+"status": 413, "duration": 9.39
+```
+
+**238 MB für die Antwort auf eine Frage.** Neun Sekunden Upload, dann der
+Abbruch. Weder das Backend-Limit (26 MB) noch `express.json` (50 MB) kamen
+überhaupt zum Zug — Caddy war vorher dran.
+
+#### Die Ursache
+
+In der Phase **„warte"** — Mikrofon an, aber noch niemand spricht — lief
+der `MediaRecorder` **ohne Ende**. Die Notbremse von 25 Sekunden greift nur
+in der Phase „spricht" (`FS_MAX_MS`). Wer das Fenster offen liegen lässt
+oder dessen Mikrofon stumm bleibt, sammelt stundenlang Daten, die beim
+ersten Stopp **alle auf einmal** hochgehen.
+
+> **Ein Puffer ohne Obergrenze ist keine Frage des Ob, sondern des Wann.**
+> Die Notbremse stand an der einen Stelle, an der ohnehin gesprochen wurde
+> — nicht an der, an der jemand schweigt.
+
+#### Die Lösung: Zeitscheiben statt eines Blocks
+
+`rec.start(500)` liefert alle 500 ms ein Stück; behalten werden nur die
+letzten **40 Sekunden**. Damit ist jeder Abschnitt nach oben begrenzt, egal
+wie lange das Fenster offen steht — und der **Anfang eines Satzes geht
+trotzdem nicht verloren**, weil der Puffer zurückreicht.
+
+**Zweiter Riegel:** vor dem Senden wird die Größe geprüft; was über 8 MB
+liegt, geht gar nicht erst raus. Ein Fehler, der erst nach neun Sekunden
+Upload sichtbar wird, ist ein schlechter Fehler.
+
+#### Nachweis (im Browser, beide Verfahren nebeneinander)
+
+Zwei `MediaRecorder` auf demselben Stream, 20 Sekunden:
+
+| | nach 20 s | hochgerechnet auf 1 Stunde |
+|---|---|---|
+| **ohne Ring** (bis `v1284`) | 315 KB | **55 MB** |
+| **mit Ring** (ab `v1285`) | **77 KB** | **77 KB** — konstant |
+
+Verhältnis nach 20 Sekunden bereits **4 : 1**, und der Abstand wächst mit
+jeder Minute. Marcels 238 MB entsprechen bei dieser Rate rund **vier
+Stunden** offenem Fenster.
+
+> **Randnotiz zur Prüfung:** Der Pegelweg der App ließ sich mit einem
+> synthetischen Stream nicht messen — ein `MediaStreamDestination` aus
+> einem fremden `AudioContext` erreicht ihren Analyser nicht. Deshalb ist
+> oben die **Mechanik** nachgewiesen, nicht der Durchlauf: zwei Recorder,
+> gleicher Stream, einziger Unterschied der Ring.
+
+**Commit** `v1285`. Auf Staging, **nicht auf Prod**.
+
+### `v1286` · Ein Satz darf zwei Anliegen tragen
+
+Marcels Bild: `design/mockups/sprechlauf.png`. Er sagt in den Dialog:
+
+> *„Ich finanziere über die Sparkasse und du kannst es aus den
+> Einstellungen übernehmen. **Eigenkapital sind 10% vom Kaufpreis.**"*
+
+Antwort: **„Daraus konnte ich nichts entnehmen."** — Zwei Fehler auf
+einmal.
+
+**1 · Das Muster verlangte eine feste Wortstellung.** Es suchte erst
+„übernimm", dann „Einstellungen". Marcel sagt es andersherum („aus den
+Einstellungen übernehmen") — also griff nichts. Jetzt zählt nur, dass
+**beide Teile vorkommen**: eine Übernahme-Absicht und ein Wort für die
+Quelle. In welcher Folge, ist Sache des Sprechers.
+
+> **Ein Muster, das eine Reihenfolge erzwingt, prüft die Grammatik des
+> Programmierers, nicht die Absicht des Sprechers.**
+
+**2 · Der zweite Satzteil wäre trotzdem verloren gewesen.** Die Übernahme
+sprang sofort zur nächsten Frage. Jetzt wird erst das Profil eingetragen
+und **danach derselbe Satz ausgewertet**: was ausdrücklich gesagt wurde,
+gewinnt gegen die Vorbelegung.
+
+**Nachgemessen mit genau Marcels Satz:**
+
+| Feld | Wert | Herkunft |
+|---|---|---|
+| Eigenkapital | **20.000** | gerechnet: 10 % von 200.000 |
+| Zinssatz | 4,09 | Einstellungen |
+| Tilgung | 1 | Einstellungen |
+| Zinsbindung | 10 | Einstellungen |
+
+Beides aus **einem** Satz — und die 10 % schlagen die 20 % aus dem Profil,
+weil sie ausdrücklich genannt wurden.
+
+#### Drei weitere Punkte aus demselben Durchlauf
+
+**„Baujahr und Kaufpreis könnte man zusammen abfragen."** Aus 13 Blöcken
+werden 10. Zusammengelegt wird, was man in **einem** Satz sagt: „Baujahr
+1965, kostet 200.000" ist ein Satz, keine zwei Fragen. Objektart wandert
+zur Größe.
+
+**„Die Daten rechts fluchten nicht miteinander."** Sie standen im
+Fließtext — jede Zeile begann dort, wo die vorige aufhörte. Jetzt ein
+Raster: Name links, Wert rechts, Ziffern in Mono untereinander.
+
+**„Das Modal ist generell ein bisschen klein."** Auch nach `v1283`: jetzt
+**1240 px** breit und bis **94 vh** hoch, Spalte 330, Verlauf 410 px. Damit
+stehen alle elf Blöcke ohne Scrollen im Bild.
+
+**„Es dauert immer noch recht lange."** Die Stillepause von 1,4 s war der
+größte Einzelposten zwischen Satzende und nächster Frage — jetzt **1,1 s**;
+die Rauschmessung von 500 auf 400 ms. Bei elf Fragen sind das über drei
+Sekunden, und die drei entfallenen Fragen sparen noch einmal mehr.
+
+**Commit** `v1286`. Auf Staging, **nicht auf Prod**.
+
+### `v1287` · Die Feinheiten-Frage war eine Sackgasse
+
+**Was:** Nach „Willst du die Feinheiten auch noch durchgehen?" ging es nicht
+weiter. Der Knopf sollte in einen Container mit *Klasse* `vi-rf-neben` — gesucht
+wurde per *id*. Kein Knopf, und weil `_rfTiefeAnbieten()` trotzdem „ja, ich habe
+gefragt" meldete, führte auch kein Weg mehr zur Tabelle.
+
+**Behoben:** id gesetzt, „ja"/„nein" wirken auch gesprochen, und ohne Knopf geht
+es ohne Nachfrage zur Tabelle statt in die Sackgasse.
+
+**Die Lehre:** eine Funktion, die „ich habe gefragt" zurückgibt, ohne dass die
+Frage sichtbar ist, verwandelt einen fehlenden Knopf in einen Stillstand. Wer
+`true` meldet, muss auch geliefert haben.
+
+**Commit** `733f700`. Auf Staging, **nicht auf Prod**.
+
+## Rollout-Journal · 10.09.2026 — der Sprechlauf bekommt Etappen
+
+### `v1288` · Aus einer Fragenliste wird ein geführter Sprechlauf
+
+**Marcels Plan vom 10.09.2026, im Kern:**
+
+> „Im Sprachlauf könnte erst mal sein, dass wir die Standardfelder abfragen,
+> dass wir dann einen Deal-Score bekommen und einen Deal-Score 2, dass wir im
+> Deal-Score schon mal sagen: okay, wohin geht die Reise, lohnt sich das,
+> lohnt sich das nicht."
+
+**Was:** Bis `v1287` war der Dialog **eine flache Liste** — elf Fragen, danach
+die Tabelle. Wer bei Frage 7 stand, wusste nicht, wozu die Fragen 1–6 gut
+waren: es gab kein Zwischenergebnis, nur ein Ende.
+
+**Jetzt sechs Etappen mit einem Halt dazwischen:**
+
+| | Etappe | Fragen | danach |
+|---|---|---|---|
+| 1 | **Basis** | Adresse · Objekt & Größe · Baujahr & Kaufpreis · Mieteinnahmen | Marktpreisindikation startet |
+| 2 | **Geld** | Finanzierung · **Kaufnebenkosten** (neu) | **Deal Score** |
+| 3 | **Lage & Zustand** | Lage · Zustand & Energie · Sanierung · Grundstück | **Deal Score 2.0** |
+| 4 | **Feinschliff** | Hausgeld · Entwicklung · Markt & Potenzial · Kauf & Übergang · Steuer | — |
+| 5 | **Deine Sicht** | These · Risiken · Notizen | **Abschluss** |
+| 6 | **Feinheiten** | alle übrigen Felder, nur auf Wunsch | — |
+
+**Warum diese Reihenfolge:** der Deal Score braucht Kaufpreis, Miete,
+Nebenkosten und Finanzierung — mehr nicht. Das ist genau Etappe 1 + 2. Der
+Deal Score 2 braucht zusätzlich Lage, Zustand und Energie — Etappe 3. Alles
+danach verfeinert, entscheidet aber nichts mehr. **Wer nach Etappe 2 abbricht,
+hat trotzdem eine Antwort auf „lohnt sich das".**
+
+Aus 11 Blöcken über 31 Felder werden **16 Blöcke über 45 Felder**. Neu im
+Dialog: Kaufnebenkosten, Entwicklung (Miet-/Wertsteigerung/Leerstand), Markt &
+Potenzial (die vier DS2-Selects), Steuer (AfA/Gebäudeanteil/Grenzsteuersatz).
+
+#### Gerechnet wird aus dem GESPRÄCH, nicht aus dem Formular
+
+**Das ist die entscheidende Regel des ganzen Umbaus.** `DealScore.compute()` und
+`_buildDeal2FromState()` lesen beide aus dem DOM — sie sind hier unbrauchbar,
+denn im Sprechlauf steht noch nichts im Formular.
+
+Würde man die Werte vorher hineinschreiben, um rechnen zu können, wäre die
+Übernahme-Tabelle am Ende sinnlos **und der Schutz aus `v1267` umgangen** — die
+Warnung, bevor ein gefülltes Objekt überschrieben wird.
+
+Also die **reinen** Rechenkerne: `DealKpis.compute(i)` und
+`DealScore.computeFromKpis(k)` nehmen beide ein einfaches Objekt entgegen und
+fassen kein DOM an. Für den Deal Score 2 gibt es keinen solchen Weg — sein
+Datenmodell ist ein eigenes (`kaufpreis`, `dscr`, `zustand`, `mikrolage` …).
+Das Objekt wird deshalb im Sprechlauf gebaut, aus denselben KPIs plus den Lage-
+und Zustandsfeldern des Gesprächs. **`DealScore2.compute(deal)` selbst bleibt
+unberührt** — Rechenkerne werden nie dupliziert.
+
+#### Was angenommen wird, steht auf der Karte
+
+Jede Score-Karte führt ihre Annahmen mit: welcher Nebenkostensatz und woher er
+kommt, ob Zins und Tilgung aus den Einstellungen stammen, und dass das Darlehen
+als „Gesamtinvestition minus Eigenkapital" gerechnet ist (der Sprechlauf fragt
+nach Eigenkapital, nicht nach der Darlehenshöhe).
+
+**Lässt sich nichts rechnen, fällt der Halt aus.** Ein Halt, der „leider keine
+Daten" sagt, ist ein Umweg.
+
+#### Kaufnebenkosten — drei Quellen, und die Karte sagt welche
+
+> „Also natürlich musst du auch Nebenkosten, natürlich musst du nachfragen. Wir
+> können auch die Standards nehmen, da kann auch erst mal nach den Einstellungen
+> fragen. Ansonsten kann man aber auch sagen 10 Prozent vom Kaufpreis."
+
+1. **gesagt** — der Nutzer nennt die Sätze
+2. **Einstellungen** — Investmentprofil (Makler, Notar & Grundbuch) **plus der
+   amtliche Grunderwerbsteuersatz zur Postleitzahl** über `DealPilotGrest`
+3. **Pauschale** — 10 % vom Kaufpreis, und die Karte sagt ausdrücklich
+   „angenommen, nicht gesagt"
+
+**Die Grunderwerbsteuer kommt nicht aus dem Profil, sondern aus der PLZ** — sie
+ist Landesrecht, kein Geschmack. Die Formular-Vorbelegung von 6,5 % ist in acht
+Bundesländern falsch.
+
+#### Abrufen statt fragen
+
+> „Makro-, Mikrolage. Ich meine, das können wir abdecken und abfragen über
+> unsere Schnittstelle und auch den Bodenrichtwert."
+
+| Angabe | Quelle | Kosten |
+|---|---|---|
+| **Bodenrichtwert** | `DealPilotBrw.borisHolen()` — amtlich, mit Stichtag und Zone | 0 |
+| **Grunderwerbsteuer** | `DealPilotGrest.forPlz()` — ohne Netz | 0 |
+| **Lage, Marktwert, Mietniveau** | `/marktbericht/reports/from-dealpilot` | ein MPI-Kontingent |
+
+Der Knopf steht **in der Frage**, kein Modal, kein zweiter Dialog. **Ein „ja"
+genügt — auch gesprochen.**
+
+Dafür ist der BORIS-Abruf getrennt worden: `borisHolen()` macht die zwei
+Aufrufe **ohne DOM**, `fetchBoris()` bleibt der Bedienweg am Knopf und nutzt
+denselben Abruf. Ein Weg zur Quelle, zwei Bedienungen.
+
+#### Die Marktpreisindikation läuft im Hintergrund
+
+**Marcels beste Idee des Abends, und sie funktioniert:**
+
+- **Gefragt wird früh** — gleich nach der Adresse, mit der Zahl der freien
+  Abrufe („48 frei"). Der Dialog wartet dort auf die Entscheidung.
+- **Gestartet wird am Ende der Basis** — dann kennt der Abruf Fläche, Baujahr
+  und Kaufpreis.
+- **Geliefert wird mitten im Gespräch** — eine Blase im Verlauf, die Werte
+  wandern in die Übersicht.
+- **Ohne Kontingent kein Angebot.** Wer nichts frei hat, bekommt keinen Knopf,
+  der ihn zu einer Bezahlschranke führt — er wird normal gefragt. *Ein Angebot,
+  das man nicht annehmen kann, ist Werbung.*
+- **Der Ablauf wartet nie.** Kommt nichts zurück, merkt es niemand außer im
+  Protokoll.
+
+#### Die Herkunft je Feld
+
+**Das war der ausdrückliche Vorbehalt im Backlog.** Sobald der Co-Pilot selbst
+Daten beschafft, darf in der Übernahme-Tabelle nicht „Sprachaufzeichnung" an
+einer Zahl stehen, die niemand ausgesprochen hat. `_rf.quelle` führt die
+Herkunft je Feld, `showResults` zeigt sie: *BORIS 2026-01-01 · Zone 167*,
+*Marktpreisindikation*, *Deine Einstellungen*.
+
+#### Dazu
+
+- **Skalen in der Frage** (Backlog-Punkt 2): bei einer Auswahl nennt der
+  Co-Pilot die Stufen, gelesen aus dem `<select>` im DOM — nicht aus einer
+  Zweitliste, die beim ersten neuen Eintrag veraltet.
+- **Was von selbst hereinkam, wird nicht noch einmal gefragt.** Füllt die
+  Marktpreisindikation Makro- und Mikrolage, überspringt der Dialog die
+  Lage-Frage.
+- **Der Abschluss** vor der Tabelle: beide Scores, **was der Score nicht weiß**
+  (die fehlenden Kennzahlen werden benannt, nicht weggerechnet), und der
+  Hinweis, falls mit der 10-%-Pauschale gerechnet wurde. Dort ist jede Eingabe
+  eine **Frage** an den Co-Piloten — es steht keine Feldfrage mehr offen.
+
+**Commit** `28ff503`.
+
+### `v1288b` · Sechs Befunde aus dem ersten echten Durchlauf
+
+Gemessen im Browser auf Staging, Objekt `2026-1033`, Hermannstr. 9, 32609
+Hüllhorst.
+
+**1. Die Spalte meldete „6 von 16" bei NULL gesagten Angaben.** Sechs Blöcke
+trugen einen grünen Haken, der ausschließlich aus Formular-Vorbelegungen kam:
+Zins 3,5 · Tilgung 1 · Notar 2,2 · Grunderwerbsteuer 6,5 · Mietsteigerung 3 ·
+AfA 2,0 · Grenzsteuersatz 40,45.
+
+> **Derselbe Denkfehler wie `v1273c`, eine Etage höher.** Dort hielt die
+> Lückenprüfung eine Vorbelegung für eine Antwort, hier tut es die Anzeige.
+> Eine Fortschrittsleiste, die vor dem ersten Wort bei 38 % steht, misst keinen
+> Fortschritt — sie misst das Formular.
+
+Jetzt **drei Zustände** statt zwei: `✓` erledigt (kam aus diesem Gespräch),
+`◦` vorbelegt (steht da, gesagt hat es niemand), `·` offen. Der Zähler zählt
+nur die ersten. **Nachgemessen: „0 von 16 beantwortet".**
+
+**2. Werte aus den Einstellungen standen unter „Sprachaufzeichnung".**
+Zinssatz, Tilgung, Zinsbindung, Eigenkapital und alle vier Nebenkostensätze —
+gesprochen hatte davon niemand ein Wort, es war ein Knopfdruck auf
+„Einstellungen übernehmen". **Derselbe Vorbehalt, nur eine Quelle weiter.**
+Jetzt *Deine Einstellungen* bzw. *Vorbelegung, von dir bestätigt*. Die
+Score-Karte las denselben Fehler und meldete „Kaufnebenkosten 12,27 % — von dir
+genannt"; sie liest jetzt die Herkunft.
+
+**3. Der Co-Pilot kannte seine eigenen Werte nicht wieder.** Auf „Warum ist der
+Cashflow so negativ?" antwortete er:
+
+> „Für eine saubere Erklärung fehlt mir aber noch der Zinssatz, die Tilgung …"
+
+Beides stand seit zwei Fragen im Gespräch (4,09 % und 1 %). **Die Werte WAREN
+im Kontext — aber als `d1z = 4,09` und `d1t = 1`.** Das sind unsere internen
+Feldnamen, keine Sprache.
+
+> **Zwei Kontexte, zwei Zwecke, und der Unterschied ist wichtig.**
+> `_rfKontext()` geht an `/ai/extract-text` und **muss** die Feld-ids führen —
+> der Prompt rechnet mit ihnen („10 Prozent vom Kaufpreis" bei `kp=200000`).
+> `_rfKontextKlar()` geht an `/ai/copilot-frage`; dort spricht jemand mit einem
+> Menschen.
+
+Der Klartext-Kontext trägt zusätzlich die **abgeleiteten Größen, die in keinem
+Feld stehen**: Cashflow vor und nach Steuer, Brutto- und Nettomietrendite,
+Faktor, LTV, DSCR, Kapitaldienst, Bewirtschaftungskosten, beide Scores,
+Marktwert. Erfunden wird nichts — alles kommt aus derselben Rechnung wie die
+Score-Karte.
+
+Backend dazu: Beschriftung `(Bezeichnung = Wert)`, **80 statt 40 Zeilen**,
+**200 statt 60 Zeichen** je Wert, und drei neue Regeln — *was oben steht IST
+bekannt*, die Score-Stufen der Haupt-App (85/70/50/35), und *Quellen
+mitnennen*.
+
+**Dieselbe Frage nach der Änderung, wörtlich:**
+
+> „Der Cashflow ist vor allem deshalb negativ, weil du bei 200.000 Kaufpreis und
+> 490 € Miete nur eine sehr niedrige Bruttomietrendite von 2,94 % hast, während
+> das Darlehen von 184.540 € bei 4,09 % Sollzins und 1 % Anfangstilgung einen
+> hohen Kapitaldienst von 9.393 € pro Jahr erzeugt. […] sodass der Cashflow vor
+> Steuer bei −371 € pro Monat liegt. Nach Steuer verbessert sich das zwar auf
+> −162 € pro Monat …"
+
+Nachgerechnet: Darlehen = 224.540 − 40.000 = **184.540 ✓** · Kapitaldienst =
+184.540 × 5,09 % = **9.393 ✓** · Bruttomietrendite = 5.880 / 200.000 =
+**2,94 % ✓**.
+
+**4. „Nichts zu sanieren, nichts wird mitverkauft" wurde nicht verstanden** —
+ein KI-Aufruf, zwei Sekunden, „daraus konnte ich nichts entnehmen". Auf eine
+**Doppelfrage** ist eine doppelte Verneinung die natürlichste Antwort.
+
+`RF_NEIN` verlangt, dass die Verneinung den ganzen Text ausmacht — das ist die
+richtige Vorsicht aus `v1283` („nichts unter 300.000" darf nicht durchgehen).
+Jetzt **satzweise**: an Komma, „und", „auch" und Punkt trennen und nur
+verneinen, wenn **jeder** Teil für sich eine Verneinung ist. Ein Teil mit
+Inhalt — „nichts zu sanieren, Küche bleibt drin" — und der ganze Satz geht wie
+bisher an die Auswertung. **Acht Proben gemessen, alle richtig, Gegenproben
+eingeschlossen.**
+
+**5. Umlaut-Ersatzschreibung im Nutztext** („fuer", „Einschaetzung", „zaehlt",
+„umlagefaehig"). Kommentare dürfen das, Nutztext nie.
+
+#### Was im Durchlauf funktioniert hat — gemessen, nicht behauptet
+
+- **Etappenband** und beide Halte: Deal Score **8/100 KRITISCH** (Faktor 34,
+  DSCR 0,63), Deal Score 2 **53/100 SOLIDE** mit *17 von 24 Kennzahlen belegt*
+- **Marktpreisindikation im Hintergrund**: Angebot direkt nach der Adresse mit
+  „48 frei", gestartet am Ende der Basis, Ergebnis **mitten im Gespräch** —
+  169.000 €, *dein Preis +18,3 % darüber*, Mietniveau 7,82 €/m². Vier Werte
+  übernommen, jeder mit eigener Herkunft.
+- **BORIS über ein gesprochenes „ja"**: **90 €/m², Stichtag 2026-01-01,
+  Zone 167** — derselbe Wert, den `CLAUDE.md` für Hüllhorst führt
+  (950 × 90 + 828 × 5).
+- **Skalen in der Frage**, Überspringen bereits abgerufener Blöcke, freie Frage
+  am Abschluss, Übernahme-Tabelle mit acht Zeilen *Deine Einstellungen* und elf
+  *Sprachaufzeichnung*.
+
+**Commit** `fdba8aa`. Auf Staging, **nicht auf Prod**. Backend geändert →
+Rebuild gelaufen, `UMGEKEHRT GILT DASSELBE` im laufenden Container gegengeprüft.
+
+### `v1289`/`v1289b` · Die Feinheiten nach Thema statt nach Reihenfolge
+
+**Der letzte offene Punkt aus Marcels Plan vom 10.09.2026.**
+
+Bis `v1288b` entstanden die Feinheiten stumpf: vier Felder je Frage, in der
+Reihenfolge des Formulars, gruppiert nur nach **Abschnitt**. Das ergab Fragen
+wie
+
+> „Objekt: Kürzel, Bankbewertung, Bevölkerungsentwicklung,
+> Nachfrage-Indikatoren?"
+
+Vier Dinge, die man nicht in einem Satz beantworten kann.
+
+**Der Anker ist die Karten-Überschrift**, im Browser gemessen statt angenommen:
+`.ct` sitzt in `.card`, und `.card` trägt die `.f`-Felder. 37 solche
+Überschriften gibt es in den sechs Abschnitten — und sie sind bereits das, was
+gesucht war: Inventar · Sanierung · Mietstruktur · Mietentwicklung · Persönliche
+Steuer · Darlehen I · Umlagefähige Kosten · Nicht umlagefähige Kosten · Grund &
+Boden.
+
+> **Aus dem DOM und nicht aus einer Liste** — das war der Vorbehalt aus `v1282`,
+> und er gilt weiter. Eine gepflegte Zweitliste von 145 Feldern veraltet beim
+> ersten neuen Feld, und **niemand merkt es**. Die Überschrift steht ohnehin da,
+> sie wurde nur nicht gelesen. Wo keine ist, greift wie bisher der
+> Abschnittsname — und *das fällt auf*, weil der Block dann den Bereichsnamen
+> trägt statt eines Themas.
+
+#### Zwei Befunde aus dem ersten Durchlauf — `v1289b`
+
+**1. Der Titel war leer, also griff der Rückfall.** Kind für Kind an der
+Inventar-Karte gemessen:
+
+```
+TEXT ""  ·  SPAN.ct-ico  ·  SPAN (der Titel)  ·  LABEL (ein Schalter)
+```
+
+Die direkten **Textknoten sind leer** — der Titel steckt in einem `<span>`.
+`v1289` las nur direkte Textknoten und fiel deshalb auf den Abschnittsnamen
+zurück: *„Kaufpreis & Nebenkosten — Küche, Möbel, Geräte, PV-Anlage?"* statt
+*„Inventar — …"*.
+
+Jetzt andersherum: **den ganzen Text nehmen und entfernen, was kein Titel ist**
+— Knopf, Schalter, Symbol, Live-Marke, Eingabefeld. Gegengeprüft an allen 21
+Karten mit Feldern; jede trägt danach einen sauberen Namen.
+
+**2. 37 von 93 Feldern waren Gutachterfelder.** Zehn der 29 Fragen kamen allein
+aus der Karte **„Wertermittlung (Marktbericht)"**: *„Außenwände · 23 %"*,
+*„Standardstufe (NHK 2010)"*, *„Modernisierungsgrad (Anlage 2)"*,
+*„Liegenschaftszinssatz"*.
+
+> **Das ist eine eigene Strecke, und sie gehört nicht ins Diktat.** `CLAUDE.md`
+> ist dort eindeutig: jeder Parameter trägt einen Modellvermerk, jede Zahl ihre
+> Herkunft (Stufe A–E, Ausschuss), und *kein Verfahren rechnet halb*. Ein
+> gesprochener Wert käme in der Übernahme-Tabelle als „Sprachaufzeichnung" an —
+> eine Herkunft, die nach § 10 ImmoWertV keine ist. Wer die Wertermittlung
+> füllen will, tut das im Marktbericht, wo die Vermerke mitlaufen.
+
+Dazu die Überführungsfelder (`ueberf_*`, `verkehrswert_ueberf`,
+`gesellschafterdarlehen`): sie gehören zum Überführungs-Wizard einer
+Gesellschaft, nicht zur Aufnahme eines Objekts.
+
+**Ausgeschlossen wird über den Kartentitel, nicht über Feld-ids** — die Karte
+ist die Einheit, die der Nutzer sieht, und eine neue Zeile darin fällt damit
+automatisch mit heraus. Bei den Überführungsfeldern geht es umgekehrt: sie
+stehen mitten in „Objektdaten", also bleibt nur die id.
+
+#### Gemessen, vorher und nachher
+
+| | vorher (`v1288b`) | `v1289` | `v1289b` |
+|---|---|---|---|
+| Blöcke | 24 (nach Abschnitt) | 29 | **18** |
+| Felder | 93 | 93 | **54** |
+| Wertermittlungs-Fragen | — | 10 | **0** |
+| Beispiel | *„Objekt: Kürzel, Bankbewertung, Bevölkerungsentwicklung, Nachfrage-Indikatoren?"* | *„Kaufpreis & Nebenkosten (1 von 2) — Küche, Möbel, Geräte, PV-Anlage?"* | *„**Inventar** (1 von 2) — Küche, Möbel, Geräte, PV-Anlage?"* |
+
+#### Voller Durchlauf zur Abnahme — zweites Testobjekt
+
+Löhner Str. 278, 32120 Hiddenhausen, ZFH 233 m², Bj 1964, 350.000 €,
+1.450 € Kaltmiete + 60 € Stellplatz:
+
+- **Das Formular bleibt leer**, bis übernommen wird — vor dem Lauf und nach dem
+  Abbruch gemessen: `plz=""`, `ort=""`, `kp=""`, `nkm=""`, `brw=""`.
+- **Deal Score 56/100 SOLIDE** (Faktor 19,3 · DSCR 1,10 · LTV 92,3 % ·
+  CF −92 €/Mon), **Deal Score 2 71/100 GUT**.
+- **Marktpreisindikation** 431.000 €, Mikrolage *Gut*, Makrolage
+  *Durchschnittlich* — die Lage-Frage wurde daraufhin übersprungen.
+- **BORIS** 150 €/m², Stichtag 2026-01-01, **Zone 379**.
+- *„nichts zu sanieren, nichts wird mitverkauft"* — als Verneinung erkannt,
+  **ohne KI-Aufruf**.
+- **Übernahme-Tabelle, 27 Zeilen, vier Herkünfte:** Sprachaufzeichnung 14 ·
+  Deine Einstellungen 8 · Marktpreisindikation 4 · BORIS 1.
+- Alle Umlaute im Nutztext korrekt (Einschätzung, umlagefähig, zählt).
+
+**Commits** `224382a`, `99e4308`. Auf Staging, **nicht auf Prod**.
+
+## Rollout-Journal · 10.09.2026, abends — `v1290` bis `v1290e`
+
+Marcels Durchlauf, belegt mit zwei Bildern: `design/mockups/sprechlauf2.png`
+(die Übersicht) und `sprechlauf3.png` (der Fehler).
+
+> „Ich finde, dass es unübersichtlich ist. … Man kann nicht alles sehen direkt.
+> Dann hat er bei der ersten Frage nur die Hälfte aufgenommen. Dann wollte ich
+> es nochmal sagen. Er hat mir aber gar nicht mehr zugehört. Dann hat er schon
+> abgebrochen. Und dann kam jetzt ein Fehler: Transcription fehlgeschlagen."
+
+### `v1290` · Das Freisprechen war kaputt — und der Grund war ein Byte
+
+Drei Befunde in einer Kette, alle mit gemessener Ursache.
+
+#### 1. Der Ringpuffer warf den Container-Header weg
+
+`rec.start(500)` liefert Zeitscheiben. **Das erste Stück ist der WebM-Header**
+(EBML, Segment-Info, Track-Definition); alle weiteren sind Cluster — reine
+Fortsetzungen, die für sich keine Datei ergeben.
+
+`_fsRingBegrenzen()` hielt die Größe mit `chunks.slice(-max)` in Schranken.
+Das schneidet die **ältesten** Stücke ab — also nach 40 Sekunden Lauschen
+genau den Header. Was danach zusammengesetzt wurde, war ein Haufen Cluster
+ohne Container.
+
+**Im Browser nachgemessen, Byte für Byte:**
+
+| | erste vier Bytes | |
+|---|---|---|
+| mit Kopf (`v1290`) | `1a 45 df a3` | EBML-Magic — **gültige WebM-Datei** |
+| ohne Kopf (`v1285`) | `43 c3 81 01` | mitten in einem Cluster — **keine Datei** |
+
+Genau das ging an OpenAI, und genau das antwortete OpenAI: *„Audio file might
+be corrupted or unsupported"*. Der Kopf war 7.890 von 51.439 Bytes — 15 %,
+ohne die der Rest wertlos ist.
+
+> Der Riegel aus `v1285` war richtig gedacht und an genau einer Stelle falsch:
+> **der Kopf ist kein Ballast, er ist die Datei.**
+
+#### 2. `_fsHoeren()` leerte den Puffer mitten im Strom
+
+**14 Stellen** im Code rufen `_fsHoeren()` auf. Jede setzte `chunks = []` und
+startete den Recorder, falls er inaktiv war. Kamen zwei Aufrufe kurz
+hintereinander — nach einer Rückfrage, nach einem Abruf, nach einer
+beantworteten Zwischenfrage —, wurde der Puffer geleert, **während** der
+Recorder lief. Der Header war weg, obwohl der Ring gar nicht gegriffen hatte.
+Zweiter Weg in denselben Fehler.
+
+`_fsHoeren()` ist jetzt idempotent; nur `_fsHoeren(true)` beginnt einen neuen
+Abschnitt.
+
+#### 3. 1,1 Sekunden sind keine Denkpause
+
+`v1286` hatte die Stillepause von 1,4 auf 1,1 s gesenkt, um Zeit zu sparen.
+*„Oh, das Objekt steht in… ähm…"* ging damit weg, bevor der Satz zu Ende war —
+im Bild steht der abgeschnittene Satz. **Jetzt 1,6 s.** Die 0,5 Sekunden, die
+`v1286` gespart hat, kosteten einen halben Satz; das ist der schlechteste
+Tausch von allen.
+
+#### Die neue Mechanik
+
+**Der Recorder läuft durch.** Einmal gestartet, bis der Dialog endet — kein
+stop/start-Zyklus mehr, denn jeder davon ist eine Gelegenheit, den Header zu
+verlieren. Geschnitten wird mit `requestData()`, nicht mit `stop()`. Der Blob
+ist `[kopf].concat(chunks)` — immer eine vollständige Datei.
+
+**Damit kommt der Nachschlag geschenkt.** Weil das Mikrofon nach dem Absenden
+weiterläuft, kann man einfach weiterreden. Genau Marcels Wunsch: *„notfalls
+auch, dass man es einfach nochmal sagen kann, sodass er da direkt mithört."*
+`_rfWeiterGleich()` hält die nächste Frage zurück, solange jemand spricht oder
+eine Auswertung unterwegs ist.
+
+**Ein offen endender Satz wird gemerkt statt ausgewertet.** Endet das
+Transkript auf „… steht in", „… und", „… bei", „… beträgt", sagt der Co-Pilot
+*„Ich höre weiter zu — sag den Rest"* und hängt den nächsten Abschnitt an.
+Zwei Hälften ergeben einen Satz. **Zwölf Proben gemessen, alle richtig** —
+einschließlich der Gegenproben („Hermannstraße 9 in 32609 Hüllhorst" endet
+nicht offen, obwohl „in" darin vorkommt).
+
+**Wurde nur ein Teil eines Blocks verstanden**, wird gezielt nach dem Rest
+gefragt statt weiterzuspringen — *„Das habe ich. Fehlt noch: Hausnummer."*
+
+**Und die rohe API-Antwort landet nicht mehr im Chat.** Im Bild stand wörtlich
+`{ "error": { "message": "Audio file might be corrupted…", "type":
+"invalid_request_error", "param": "file", "code": "invalid_value" } }`. Das ist
+ein Protokolleintrag, keine Auskunft — der Nutzer erfährt daraus nicht, was er
+tun soll. Jetzt: *„Die Aufnahme kam nicht sauber an — sag es einfach nochmal,
+ich höre schon zu."* Die Einzelheiten bleiben in der Konsole.
+
+### `v1290` · Die Übersichtsspalte, neu
+
+Zwei Ursachen für „unübersichtlich", beide gemessen.
+
+**Ein Kaskaden-Konflikt, den nur der Walker zeigt.** `.vi-rf-st` stand
+**zweimal** im selben Stylesheet:
+
+```
+.vi-rf-st { display: block; padding: 6px 0 }     (v1286)
+.vi-rf-st { display: flex;  gap: 7px; ... }      (älter, später notiert)
+```
+
+Bei gleicher Spezifität gewinnt die spätere — also `flex`. Damit standen
+Blockname und Werte **nebeneinander** statt untereinander, die Werte in eine
+64 px schmale Spalte gequetscht, während rechts 250 px leer blieben. Genau das
+Bild. Die `v1286`-Regel „die Werte fluchten" war seit ihrer Einführung
+wirkungslos. `matches()` hätte beide Regeln gefunden und nichts darüber gesagt,
+welche gewinnt.
+
+**Nur 11 von 16 Zeilen waren sichtbar** (Spalte 410 px, Inhalt 644 px).
+
+**Jetzt:** eine Zeile je Block, **gruppiert nach Etappe**, mit Fortschritt je
+Etappe (`1 BASIS 4/4`), Werte kompakt in derselben Zeile, Klick klappt die
+Einzelwerte auf. Höhe nicht mehr fest, sondern was übrig bleibt.
+
+### `v1290b` · Der Dialog scrollte
+
+Gemessen: Bühne 560 + Band 24 + Kopfzeile 33 + Mikro 59 + Eingabe 43 + Knöpfe
+33 = **752 px in einem Body von 699**. Man musste scrollen, um das Mikrofon zu
+sehen — bei einem Dialog, dessen ganzer Sinn das Mikrofon ist.
+
+Jetzt bestimmt der Platz die Höhe des Verlaufs: alles außer der Bühne ist
+`flex:0 0 auto`, die Bühne nimmt den Rest. `min-height:0` ist dabei Pflicht
+(FALLEN.md). Das Flex-Layout hängt an einer eigenen Klasse `vi-dialog`, die nur
+während des Dialogs am Overlay sitzt — ohne sie würde dieselbe Regel die
+Übernahme-Tabelle am Scrollen hindern.
+
+### `v1290c` · Der Dialog war für DUNKEL gebaut und läuft auf WEISS
+
+**Der eigentliche Grund für „muss deutlich professioneller sein".** Im Browser
+gemessen:
+
+| | Wert | auf weißem Grund |
+|---|---|---|
+| `.oabi-body` | `rgb(255,255,255)` | — |
+| Spalte, Fläche | `rgba(255,255,255,.03)` | **unsichtbar** |
+| Spalte, Rand | `rgba(255,255,255,.09)` | **unsichtbar** |
+| Etappenlinie | `rgba(255,255,255,.13)` | **unsichtbar** |
+| Co-Blase | `rgba(255,255,255,.055)` | **unsichtbar** |
+| Eingabefeld | `rgba(0,0,0,.25)` bei `color:#2A2727` | **dunkel auf dunkel** |
+
+Der Boarding-Skin setzt den Body auf `#fff`. Der Sprechlauf-Dialog wurde aber
+von `v1276` an mit weißen Transparenzen gebaut — also für dunklen Grund. Auf
+Weiß ist **alles davon weg**: jede Trennlinie, jede Fläche, jeder Rahmen. Übrig
+blieben graue Texte im Nichts.
+
+> `CLAUDE.md` sagt es wörtlich: *„Token-Überschreibungen reichen nicht —
+> farbtragende Flächen müssen einzeln benannt werden."* Also einzeln: **19
+> Flächen und Ränder** auf schwarzbasierte Transparenzen, die Spalte auf Creme
+> `#FBF8F2`, die Score-Karte auf die Markenkarte `#FBF6E9`, das Eingabefeld auf
+> Weiß. Dazu die Kontraste: auf Weiß trägt grauer Text weniger als auf Schwarz
+> (Spaltenzeilen .5 → .62, Etappengruppen .55 → .68, Band .4 → .52). Und die
+> Stufe SOLIDE bekommt das dunkle Gold `#b8932f` statt des hellen `#C9A84C`.
+
+Gold-Audit danach: **RC=0, genau auf der Basislinie.**
+
+### `v1290` · Die Stufen holen sich zu ihrer Zeit
+
+Marcels Frage: *„funktionieren die Abrufe, je nach Plan die
+Marktpreisindikation oder die erweiterte? Je nachdem wie es abgestuft ist,
+müssen bis dahin ja die richtigen Fragen gestellt worden sein."*
+
+**Im Container gemessen, nicht im Repo gelesen** — der Repo-Stand führte auf
+eine falsche Fährte: dort steht `fast` scheinbar **neben** `overrides`, der
+laufende Code schickt es **darin**, und der Microservice reicht `overrides`
+durch. Beinahe hätte ich einen falschen Befund gemeldet.
+
+| Stufe | Aufruf | Ergebnis |
+|---|---|---|
+| 1 | `fast: true` | `ai_mode=schnell`, 850 ms. Nur Marktwert und Miete samt Spanne. |
+| 2 | `wert_stufe: 2` | Voller Bericht: KI-Text, Preishistorie, amtliche Makrolage. |
+
+**Die Stufen funktionieren.** Marcels Schluss stimmt trotzdem: der volle
+Bericht liest deutlich mehr aus dem Objekt, und das entsteht im Sprechlauf
+erst später.
+
+| Feld im Bericht | im Sprechlauf ab |
+|---|---|
+| `address`, `property_type`, `living_area`, `rooms`, `build_year` | Etappe 1 |
+| `purchase_price`, `monthly_net_rent` | Etappe 1 |
+| **`condition`** (`ds2_zustand`) | **Etappe 3** — sonst still `'gepflegt'` |
+| **`energy_class`** (`ds2_energie`) | **Etappe 3** |
+| **`land_value_manual`** (`brw`) | **Etappe 3** |
+| `mikrolage`, `makrolage`, `ds2_*` (assessment) | Etappe 3 + 4 |
+
+**Deshalb startet jede Stufe dort, wo ihre Angaben stehen:** Stufe 1 am Ende
+von Etappe 1, **Stufe 2 am Ende von Etappe 4**. Das Angebot sagt das
+ausdrücklich („Jetzt" / „Später"). Wer Stufe 1 gezogen hat, wird am Ende von
+Etappe 4 noch einmal gefragt — die Vertiefung kostet nur die Differenz
+(`v1154`). Und bei Stufe 2 wird der **Fließtext auch gezeigt**, sonst ist er
+bezahlte Unsichtbarkeit.
+
+### Ein Fehler, den ich beim Messen übersehen hatte
+
+**Wer den Markt-Knopf klickte statt „ja" zu sagen, blieb ohne nächste Frage
+stehen.** Nur der Sprachweg rief `_rfNachAngebot()`. Mir entgangen, weil ich
+die Zusage beim Prüfen **immer getippt** habe — und der getippte Weg läuft
+durch dieselbe Erkennung wie der gesprochene, der geklickte nicht.
+
+> **Die Lehre:** wenn es zwei Bedienwege gibt, muss die Prüfung beide gehen.
+> Ein Weg, der im Test nie benutzt wird, ist ein Weg, der nicht geprüft ist.
+
+### `v1290d` · Der Sprechlauf fiel an seiner eigenen Schutzschranke aus
+
+Beim Testen kam mitten im Gespräch:
+
+> „Zu viele PDF-Extraktionen — bitte 1h warten"
+
+Zwei Fehler auf einmal. **Die Zahl passt nicht zum Weg:** der Limiter stammt
+aus der Zeit des PDF-Exposé-Imports — 30 Auswertungen je Stunde, *„mehr als
+jeder legitime Workflow braucht"*. Für ein Dokument stimmt das. Der geführte
+Sprechlauf stellt aber **16 Fragen**, und jede Antwort ist ein Aufruf — dazu
+Nachhaken, Zwischenfragen, ein zweiter Anlauf. **Nach einem Durchlauf ist die
+Hälfte weg, nach zweien ist der Nutzer gesperrt.** Und **der Text nennt PDFs,
+während jemand spricht.**
+
+Getrennte Zähler, nicht ein größerer: `dialogLimiter` 150/h für
+`extract-text` / `extract-voice` / `copilot-frage`, `extractLimiter` 30/h
+unverändert für Exposé, Marktdaten, Belege. Wer viele Exposés einliest, soll
+nicht den Sprechlauf blockieren, und umgekehrt. Eine gesprochene Antwort kostet
+gemessen unter 0,1 Cent — 150 Aufrufe bleiben unter 20 Cent je Nutzer und
+Stunde.
+
+### Abnahme
+
+- **Layout:** alle 16 Blöcke im Bild, kein Scrollen im Body, Mikrofon und
+  Eingabe sichtbar. Kopf sagt „CO-PILOT · GEFÜHRTE AUFNAHME / Objekt
+  aufnehmen", Kopfzeile „Etappe 3 von 5 · Lage & Zustand".
+- **Freisprechen:** Recorder läuft durch (`recording`), Kopf bleibt auch
+  nachdem der Ring gegriffen hat (80 Chunks = Obergrenze), Kopf + Cluster
+  ergibt `1a 45 df a3`.
+- **Klick-Weg** des Markt-Angebots führt weiter.
+- **Stufen:** Angebot mit „Jetzt"/„Später" und Kontingentzahl; Stufe 1 lief,
+  Marktwert 169.000 €.
+- Formular vor und nach dem Lauf leer.
+
+**Commits** `8222612`, `e02464e`, `8f90890`, `b51a7b2`, `f6b5f84`. Auf Staging,
+**nicht auf Prod**. Backend geändert → Rebuild gelaufen und im Container
+gegengeprüft.
+
+## Rollout-Journal · 10.09.2026, spät — `v1291` bis `v1292d`
+
+Marcels Auftrag in einem Satz: *„Mach da einfach was richtig Geiles, dass man,
+wenn man da durchgeführt wird, direkt eine Kaufentscheidung treffen kann."*
+
+### `v1291` · Die Aktionsleiste — was jetzt dran ist, steht unten
+
+> „Ab und zu haben wir sowas wie Bodenrichtwert abholen und solche Sachen und
+> erweiterte Marktpreisindikation. Die stehen dann meistens darunter und dann
+> weiß man nicht, dass man jetzt weitermachen soll."
+
+**Die Ursache ist der Ort.** Ein Angebot *in* einer Chatblase wandert mit dem
+Verlauf nach oben und ist zwei Antworten später aus dem Bild. Der Nutzer sieht
+unten das Mikrofon, hört „ich höre zu" — und weiß nicht, dass oben eine
+Entscheidung offen liegt.
+
+Jetzt eine **feste Leiste zwischen Verlauf und Mikrofon**. Sie trägt immer die
+aktuelle Frage und, wenn es welche gibt, die Angebote. Sie scrollt nicht mit:
+was dort steht, ist offen; was verschwindet, ist erledigt.
+
+**Ein Ort für alle Entscheidungen** — Bodenrichtwert, Lage-Recherche,
+Marktpreisindikation, ihre Vertiefung, die Feinheiten-Frage, der Weg zur
+Übersicht. Vorher lagen die an vier verschiedenen Stellen, mal in der Blase,
+mal unter den Nebenknöpfen. Und **ein** Klickweg statt vier eigener — genau
+dort war der Fehler aus `v1290`, wo einer die Fortsetzung vergaß.
+
+### `v1291` · Die Adresse wird bestätigt
+
+> „Die Adresse sollte man nochmal bestätigen und eine Rückfrage stellen."
+
+Marcel trifft den wunden Punkt. Ein **Straßenname** ist das, was eine
+Transkription am häufigsten verfehlt — bei einer Zahl fällt das auf, bei einem
+Namen nicht. Und an der Adresse hängt **alles**, was danach kommt: der amtliche
+Bodenrichtwert (Geokodierung), die Marktpreisindikation, die Lage-Recherche,
+die Grunderwerbsteuer.
+
+> Eine falsch verstandene Straße macht aus vier richtigen Abrufen vier falsche
+> — und **keiner meldet einen Fehler**, denn die Nachbarstadt hat auch
+> Marktdaten.
+
+Der Co-Pilot liest die Adresse zurück, nennt Bundesland und
+Grunderwerbsteuersatz und fragt einmal nach. Gemessen: *„Ich habe verstanden:
+Hermannstraße 9, 32609 Hüllhorst · Nordrhein-Westfalen · Grunderwerbsteuer
+6,5 %"*.
+
+Das ist die **einzige** Rückfrage im ganzen Dialog — überall sonst gilt „lieber
+weiter als nachhaken", hier ist es umgekehrt. Wer korrigiert, sagt einfach die
+Adresse noch einmal; die alten Werte werden gelöscht, damit sich nicht die
+falsche Straße mit der neuen Hausnummer mischt.
+
+### `v1291` · Die Lage wird recherchiert — sechs Dimensionen, eine Anfrage
+
+> „Er soll auch Mikro- und Makrolage einzeln abrufen können … vielleicht auch
+> Bevölkerungsentwicklung. Das kann er über unsere Schnittstelle Marktbewertung
+> machen, aber auch über KI aus dem Netz."
+
+**Beides gab es schon**, und sie ergänzen sich:
+
+| | liefert | kostet |
+|---|---|---|
+| Marktpreisindikation | Makro/Mikro als Score aus Marktdaten | ein Kontingent |
+| `/ai/lage` | **sechs** Dimensionen mit Quelle und Begründung | einen KI-Aufruf |
+
+Im Browser Feld für Feld gegengeprüft: **alle sechs Enum-Sätze stimmen exakt**
+mit unseren Feldern überein.
+
+| KI-Antwort | Feld | Werte |
+|---|---|---|
+| `makro` | `makrolage` | sehr_gut … sehr_schwach |
+| `mikro` | `mikrolage` | sehr_gut … sehr_schwach |
+| `bevoelkerung` | `ds2_bevoelkerung` | stark_wachsend … stark_fallend |
+| `nachfrage` | `ds2_nachfrage` | sehr_stark … sehr_schwach |
+| `wertsteigerung` | `ds2_wertsteigerung` | sehr_hoch … keines |
+| `entwicklung` | `ds2_entwicklung` | mehrere … keine |
+
+**Sechs Deal-Score-2-Felder aus einem Aufruf, mit Quellenangabe.** Was der
+Nutzer selbst gesagt hat, bleibt stehen — die Recherche füllt nur Lücken.
+
+### `v1291b`/`v1291c` · Zwei Befunde aus dem eigenen Umbau
+
+**Eine Aktion ohne Zweig fiel still durch.** Der Klick auf „Ja, stimmt" bei der
+Adress-Rückfrage entfernte den Knopf — und sonst nichts. Der Verteiler kannte
+die `art` `adresse` nicht und fiel unten heraus, ohne ein Wort.
+
+> Ein stiller Ausfall in einem Verteiler ist der teuerste, den es gibt: der
+> Nutzer sieht, dass etwas passiert ist (der Knopf ist weg), und wartet auf
+> etwas, das nie kommt. Jetzt protestiert er, in der Konsole und im Gespräch.
+
+**Der Dialog hält für ein Angebot nicht mehr an.** Gemessen: nach der
+Adress-Bestätigung stand die Leiste auf „Jetzt dran · Objekt & Größe", während
+der Ablauf noch auf die Marktpreis-Entscheidung wartete. Die Leiste sagte das
+eine, der Zustand war das andere. Der Grund für das Warten war der alte — ein
+Angebot in einer Blase verschwindet, also musste der Ablauf stehenbleiben. Mit
+der Leiste fällt der Grund weg. **Damit gibt es keine Stelle mehr, an der man
+feststeckt, weil man eine Entscheidung nicht trifft.**
+
+### `v1292` · Aus Zahlen wird eine Entscheidung
+
+Drei Dinge fehlten, und **alle drei lassen sich rechnen**:
+
+**1. Break-even.** `IrrEngine.breakEven(reihe, ek)` ist ein reiner Rechenkern —
+derselbe, den die Kennzahlen-Kachel nutzt. Die Zahlungsreihe baut der
+Sprechlauf mit Miet- und Kostensteigerung, aber **ohne** Tilgungsverlauf,
+Steuerwirkung und Anschlussfinanzierung; die bräuchten Angaben, die im Gespräch
+nicht alle fallen. **Das steht als Annahme auf der Karte.** Eine Näherung, die
+sich als solche zeigt, ist brauchbar; eine, die sich als Rechnung ausgibt,
+nicht.
+
+Gemessen am guten Testobjekt: *Cashflow ab Jahr 1 · Summe im Plus ab Jahr 1 ·
+Eigenkapital zurück in Jahr 13.* Am schwachen: *bleibt in 20 Jahren negativ* —
+die Reihe läuft von −4.454 auf −219 und dreht nie.
+
+**2. Mietpotenzial.**
+
+> „Mit der Marktpreisindikation holen wir uns ja auch gleich passend die
+> Marktmieten mit rein. Dass wir das einmal abgleichen, dann auch Mietpotenzial
+> angeben und vielleicht auch eine Steigerung."
+
+Gemessen: *„Du liegst bei 11,33 €/m², der Markt bei 12,50 €/m²
+(Marktpreisindikation). Das sind 87 € im Monat oder 1.050 € im Jahr, die noch
+nicht in der Rechnung stehen."*
+
+Liegt die Miete **über** dem Markt, wird daraus kein Potenzial, sondern ein
+benanntes Risiko — bei Mieterwechsel kann sie sinken.
+
+Und dann wird es **Mietrecht statt Rechnen** (Marcels Punkt): bei
+Neuvermietung sofort möglich, im laufenden Vertrag frühestens 15 Monate nach
+der letzten Änderung und gedeckelt durch die **Kappungsgrenze** (20 %, in
+angespannten Märkten 15 %), bei **Index- oder Staffelmiete** gilt die
+Vereinbarung — und bei Indexmiete ist eine Modernisierung **nicht** zusätzlich
+umlegbar. Nach einer Modernisierung 8 % der Kosten jährlich, gedeckelt auf
+3 €/m² in sechs Jahren.
+
+> Ausdrücklich als **Anhaltspunkte** gekennzeichnet, nicht als Rechtsberatung:
+> welcher Weg offensteht, hängt am Vertrag und am Ort, und die Kappungsgrenze
+> steht in einer Landesverordnung, die wir nicht führen.
+
+**3. Die Hebel — gerechnet, nicht behauptet.**
+
+> „Wenn die und die Werte sind nicht so gut, wenn du die steigern könntest,
+> dann wäre es super."
+
+`DealScore2.compute` ist rein. Also wird der Deal mit einer Änderung
+**nachgerechnet** und die Differenz gezeigt. Gemessen am guten Objekt:
+*„Kaufpreis 10 % tiefer: +3 auf 86", „Miete 30 % höher: +2", „Zins 1 Punkt
+tiefer: +2"* — jeweils mit einem Satz, **wie** man dahin kommt.
+
+### `v1292b` · Ein Ratgeber, der beim schlechten Deal schweigt, ist keiner
+
+Gemessen am schwachen Testobjekt (200.000 € bei 490 € Miete, Score 53): ein
+Kaufpreis **5 % tiefer änderte den Score um null Punkte**.
+
+**Kein Fehler** — bei einem so schwachen Objekt liegen die Renditekennzahlen am
+unteren Anschlag, und dort ist die Interpolation flach. Vom Boden fällt man
+nicht tiefer, aber man steigt auch nicht leicht auf. Ergebnis war eine **leere
+Hebel-Liste**, ausgerechnet dort, wo man sie am dringendsten braucht.
+
+Jetzt eine **Staffel** je Hebel (Kaufpreis 5/10/15/20 %, Miete 10/20/30 %,
+Eigenkapital 10/20/30 %, Zins 0,5/1,0 Punkte, Tilgung 1/2 Punkte) und gezeigt
+wird der **kleinste Schritt, der mindestens zwei Punkte bringt**. Danach fand
+sich auch am schwachen Objekt etwas: *„Miete auf Marktniveau (782 €): +3",
+„Kaufpreis 20 % tiefer: +2", „Zins 1 Punkt tiefer: +2"*.
+
+Und die Miete bekommt einen **eigenen Zielwert**: liegt eine Marktmiete vor,
+wird zuerst auf sie gerechnet statt auf einen Prozentsatz. Damit hängen
+Mietpotenzial und Hebel an derselben Zahl.
+
+**Zweiter Befund aus demselben Lauf:** das Mietpotenzial wies die Marktmiete
+als *„deine Angabe"* aus, obwohl sie aus der Marktpreisindikation kam. Die
+Prüfung fragte, ob das **Feld** gefüllt ist — die Indikation füllt es ja gerade.
+Jetzt wird `_rf.quelle` gelesen, wie überall sonst.
+
+### `v1292` · Die Zahl zählt hoch und leuchtet
+
+> „Deal Score und Deal Score zwei muss richtig geil son bisschen animiert
+> werden mit den Zahlen, vielleicht der Deal Score etwas leuchtend oder so."
+
+Die Zahl zählt in 1,1 s hoch (weich auslaufend — die letzten Punkte sollen
+ankommen, nicht durchrauschen), darunter fährt ein Balken aus.
+
+**Über `requestAnimationFrame`, aber nur bei sichtbarem Reiter**: im verborgenen
+Tab feuert rAF nie, und die Zahl bliebe auf 0 stehen (FALLEN.md). Sonst wird
+sofort der Endwert gesetzt.
+
+**Das Leuchten hängt an der Stufe**, nicht am Geschmack: ab 85 (TOP) kräftig
+mit langsamem Pulsieren, ab 70 (GUT) zurückhaltend, darunter gar nicht.
+
+> Ein schwacher Deal, der leuchtet, wäre eine Lüge in Lichtform.
+
+`prefers-reduced-motion` schaltet das Pulsieren ab. Dazu ein **Fazit in einem
+Satz** über den Kennzahlen — das erste, was man liest.
+
+### Abnahme
+
+- **Aktionsleiste** sichtbar unter dem Verlauf, mit Frage und Angeboten;
+  Klick-Weg und Sprach-Weg führen beide weiter.
+- **Adress-Bestätigung** mit Bundesland und Grunderwerbsteuersatz.
+- **Score 83** in Grün mit Leuchten, Balken gefüllt, Fazit, fünf Kategorien,
+  Mietpotenzial mit Mietrecht-Hinweisen, drei gerechnete Hebel.
+- **Break-even** auf beiden Testobjekten plausibel und benannt.
+- Gold-Audit **RC=0**, genau auf der Basislinie.
+
+**Commits** `93ef10a`, `3ba055f`, `9318894`, `2fea6eb`, `843cae8`, `516fab4`,
+`e8ddc96`. Auf Staging, **nicht auf Prod**.
+
+## Rollout-Journal · 10.09.2026, Nacht — `v1293` bis `v1293c`
+
+Marcels Auftrag: *„Wenn da jemand Marktbewertung anklickt, aber auch
+Exposé/Marktbericht und Sprache, dann sollte auf jeden Fall als Erstes die
+Exposé- und Marktberichte eingelesen werden. Dann sollten wir die Daten, die
+wir daraus schon extrahieren, auch im Sprachlauf mit integrieren … und nur noch
+die Sachen nachfragen, die uns fehlen."*
+
+### `v1293` · Die Reihenfolge ist umgedreht
+
+`runSelected()` lief seit `v503` **„voice-first"**: erst reden, dann Dokumente
+nachschieben. Das war richtig, solange der Sprechlauf ein Diktat war. Seit
+`v1288` ist er ein geführter Dialog — und **ein Dialog, der nach dem Kaufpreis
+fragt, während er zwei Klicks später im Exposé steht, ist kein guter Dialog.**
+
+| alt | neu |
+|---|---|
+| `voice` → `import` → `immometrica` → AVM | `import` → `immometrica` → **`voice`** → AVM |
+
+Die Ordnung folgt dem **Aufwand für den Menschen**: was die Maschine lesen kann,
+liest sie zuerst; der Mensch ergänzt danach nur noch, was fehlt; die
+Marktbewertung braucht die Adresse und kommt zuletzt.
+
+### `v1293` · Der Sprechlauf weiß, was vorher lief
+
+**Das Überspringen gab es schon** — `_rfFehlt` prüft neben dem Gespräch auch das
+Formular. Wer ein Exposé eingelesen hat, wurde nach dem Kaufpreis nicht mehr
+gefragt. **Was fehlte, war, dass der Co-Pilot es sagt.** Er begann mit „16
+Fragen in 5 Etappen", obwohl neun davon schon beantwortet waren.
+
+> Wer gerade ein Exposé hochgeladen hat und dann dieselbe Begrüßung bekommt wie
+> beim leeren Objekt, glaubt, der Import sei verpufft.
+
+Gemessen nach dem Umbau: *„Aus **Exposé / Marktbericht** stehen schon **9
+Angaben** — die frage ich nicht noch einmal. Ich führe dich durch — **13**
+Fragen in 5 Etappen."* Etappe 1 schrumpft dabei von vier Fragen auf eine.
+
+### `v1293` · Die Marktbewertung wandert in den Sprechlauf
+
+Sind **beide** angehakt, holt der Sprechlauf sie — dort kann der Nutzer die
+**Stufe** wählen (Plan- und kontingentabhängig), sie läuft im Hintergrund
+weiter, und ihre Werte landen in derselben Übernahme-Tabelle wie alles andere.
+
+Der Co-Pilot sagt dann auch, dass sie schon gewollt war: *„Du hast die
+Marktbewertung mit ausgewählt — ich hole sie hier gleich mit. **Welche
+Stufe?**"* mit den Knöpfen **Einfach** (43 frei) und **Erweitert** (9 frei) in
+der Aktionsleiste — statt sie noch einmal anzubieten.
+
+Danach meldet der Sprechlauf über `done({marktGeholt})` zurück, und die Kette
+überspringt ihren eigenen Abruf. **Zweimal abrufen heißt zweimal bezahlen.**
+
+### `v1293b` · „71 Angaben aus dem Exposé" — es waren neun
+
+Gemessen direkt nach dem Ausrollen. Gezählt wurde, **was im Formular steht** —
+und dort stehen auch die Vorgaben aus `index.html`: Notar 2,20 %,
+Grunderwerbsteuer 6,50 %, Mietsteigerung 3 %, AfA 2,0 %, die acht
+Sanierungsgewerke, die Bauspar-Vorgaben …
+
+> Eine Zahl, die der Nutzer nicht wiedererkennt, ist schlimmer als keine — sie
+> lässt ihn glauben, das Exposé habe etwas gebracht, was es nicht gebracht hat.
+
+Jetzt macht **die Kette** einen Schnappschuss der Formularwerte, bevor sie
+läuft, und übergibt dem Sprechlauf die **Differenz**. Der richtige Ort dafür ist
+die Kette, nicht der Sprechlauf: nur sie weiß, wie es vorher aussah. Fällt der
+Schnappschuss aus (Sprechlauf direkt geöffnet), gilt wie bisher „was im Objekt
+steht" — und die Aussage lautet dann auch so.
+
+Nachgemessen: **9 Angaben**, und die Liste enthält genau `plz, ort, str, hnr,
+wfl, baujahr, kp, nkm, zimmer`.
+
+### `v1293c` · Der zweite Sprechlauf meldete fälschlich „schon geholt"
+
+Beim Prüfen der Rückmeldung aufgefallen: `_mbGeholt` ist eine **Modulvariable**
+und überlebte das Schließen des Dialogs. Der zweite Sprechlauf meldete
+`marktGeholt: true`, obwohl er selbst nichts geholt hatte — **die Kette hätte
+ihren eigenen Abruf übersprungen, und der Nutzer stünde ohne Marktbewertung
+da.**
+
+> Ein Zustand, der einen Dialog überlebt, gehört an dessen Anfang gelöscht.
+> Aufgefallen nur, weil ich den **zweiten** Lauf überhaupt gemessen habe — beim
+> ersten sieht alles richtig aus.
+
+Nachgemessen: zwei Läufe hintereinander, beide `marktGeholt: false`.
+
+### Eine Falle beim Messen selbst
+
+Zwischendurch zeigte der Browser hartnäckig „71 Angaben", obwohl der Server
+längst die neue Fassung auslieferte. Ursache: **`location.reload(true)` holt das
+HTML nicht neu.** Der Cache-Buster stand richtig auf `v1293b`, aber das
+`index.html` mit diesem Buster kam aus dem Cache — geladen wurde weiter
+`voice-import.js?v=v1293`. Erst ein **neuer Tab** zeigte den echten Stand.
+
+Gegenprobe, die das aufgeklärt hat: `curl` auf den Server (liefert `v1293b`)
+gegen `document.querySelector('script[src*="voice-import"]').src` im Browser
+(zeigte `v1293`).
+
+**Commits** `34a31c6`, `1acea49`, `eaa80f6`. Auf Staging, **nicht auf Prod**.
+
+## Rollout-Journal · 11.09.2026 — der Kombinations-Test (`v1293d`–`v1293g`)
+
+Marcels Auftrag: *„Bitte alles durchtesten auf Plausibilität und ganz
+ausführlich auch andere Kombinationen testen. Das muss immer funktionieren, egal
+was man auswählt."*
+
+**Fünf echte Fehler kamen dabei heraus** — vier davon hätte der Hauptweg nie
+gezeigt.
+
+### Was geprüft wurde
+
+| Prüfung | Ergebnis |
+|---|---|
+| **63 Quellen-Kombinationen** (alle Teilmengen der sechs Kacheln) | Reihenfolge in allen korrekt: `import` und `immometrica` immer vor `voice`, `voice` immer vor den Marktbewertungen, nichts geht verloren |
+| **Kennzahlen gegen Handrechnung** | exakt — siehe Tabelle unten |
+| **10 Monotonie-Proben** des Deal Score 2 | alle bestanden: was besser ist, senkt den Score nie; was schlechter ist, hebt ihn nie |
+| **9 Verhaltens-Kombinationen** (leer / Adresse / Marktbewertung / Import / ImmoMetrica / beides / freier Weg / Quick-Check) | nach den Korrekturen alle sauber, kein Laufzeitfehler |
+
+**Die Kennzahlen, Zeile für Zeile nachgerechnet** (200.000 € · 490 € Miete ·
+100 m² · 12,27 % Nebenkosten · 40.000 € EK · 4,09 % / 1 %):
+
+| | Handrechnung | App |
+|---|---|---|
+| Cashflow | 5.880 − 940,80 − 7.547,69 − 1.845,40 = **−4.453,89**/Jahr | −371 €/Mon ✓ |
+| Nettomietrendite | (5.880 − 940,80) / 224.540 = **2,20 %** | 2,2 % ✓ |
+| Faktor | 200.000 / 5.880 = **34,01** | 34 ✓ |
+| LTV | 184.540 / 200.000 = **92,27 %** | 92,3 % ✓ |
+| Break-even Jahr 1 | **−4.453,89** | −4.453,886 ✓ |
+| Break-even Jahr 2 (3 % / 1 %) | 6.056,40 − 950,21 − 9.393,08 = **−4.286,89** | −4.286,894 ✓ |
+
+### `v1293d` · Zwei Befunde aus den Kombinationen
+
+**1. „61 Angaben stehen schon im Objekt" — bei leerem Formular.** Gemessen an
+einem frisch angelegten Objekt ohne Vorlauf. Gezählt wurden die Vorgaben aus
+`index.html`: Notar 2,20 %, Grunderwerbsteuer 6,50 %, die acht
+Sanierungsgewerke, die Bauspar-Sätze. Derselbe Fehler wie `v1293b`, nur im
+anderen Zweig — dort hat ihn die Kette behoben, hier fiel er auf „alles im
+Formular" zurück. **Der Rückfall ist weg: nur wer sagen kann, woher die Werte
+kommen, sagt überhaupt etwas.**
+
+**2. Ein ausgefallener Kontingent-Abruf kostete das Angebot für immer.**
+Gemessen mit abgelaufenem Token (HTTP 401 auf `/ai/credits`): der Abruf
+scheiterte einmal, `marktGefragt` wurde gesetzt, und damit gab es im **ganzen**
+Dialog kein Marktpreis-Angebot mehr — auch nachdem die Anmeldung wieder stand.
+Jetzt wird bei fehlendem Stand einmal nachgeladen und danach erneut angeboten.
+
+### `v1293e` · Das Mikrofon lief nach dem Abbrechen weiter
+
+Mit einem synthetischen Audiostrom gemessen, damit der Recorder echt läuft:
+
+```
+vor  „Abbrechen":  recState recording · phase spricht · chunks 5
+nach „Abbrechen":  recState recording · phase spricht · chunks 8
+```
+
+**Der Recorder lief weiter, die Stücke wuchsen, `_rf` stand noch komplett da.**
+Im Browser bleibt damit das Aufnahme-Symbol an — jemand hat den Dialog beendet,
+und sein Mikrofon horcht weiter.
+
+> Das ist kein Schönheitsfehler. Ein laufendes Mikrofon, von dem der Nutzer
+> glaubt, es sei aus, ist ein Vertrauensbruch.
+
+**Ursache:** der Abbrechen-Knopf rief `stopAll()` — das ist die Aufnahme des
+**freien** Weges — und `done()`. Der Freisprech-Strom des **Dialogs** (`_fs`)
+blieb unberührt. Beim zweiten Weg hinaus, `OA.apply()`, schließt ein anderes
+Modul das Fenster und weiß von `_fs` gar nichts.
+
+**Zwei Riegel, weil einer nicht reicht:** `_viAufraeumen()` an jedem bekannten
+Weg — und ein **Beobachter auf dem Overlay**, der aufräumt, sobald es
+verschwindet, egal wer es entfernt hat.
+
+> Ein Mikrofon darf nicht davon abhängen, dass jemand an eine Codezeile gedacht
+> hat.
+
+Nebenbefund, dadurch mit erledigt: `_rf` überlebte das Schließen und
+verfälschte jede Messung danach — meine eigenen Kombinationstests D bis H
+hatten deshalb den **alten** Zustand gemessen und mussten wiederholt werden.
+
+### `v1293f` · Ein ReferenceError legte den geführten Weg lahm
+
+Der Chat blieb **leer**, der Dialog stand. In der Konsole:
+
+```
+ReferenceError: VORLAUF_NAME is not defined
+  at rueckfragen (voice-import.js:5848)
+```
+
+Die Definition stand in `v1293` über `_rfVorbefuellt` und ist bei der
+`v1293d`-Ersetzung **mit dem umgebenden Kommentarblock mitgelöscht** worden.
+
+> **`node --check` hat es nicht gefunden** — eine nicht definierte Variable ist
+> kein Syntaxfehler. Genau das steht in `CLAUDE.md`: *„node --check prüft nur
+> Syntax. Verträge prüft nur ein echter Lauf."*
+
+Vier Kombinationstests hintereinander meldeten „(keiner)" beim Vorlauf-Satz und
+leere Angebote, und ich habe zuerst den **Beobachter aus `v1293e`** verdächtigt
+— erst die Konsole hat es aufgeklärt. Der Fehler traf **nur** den Weg über die
+Pre-Flight-Kette: wer den Sprechlauf direkt öffnet, hat kein `_vorlauf`, und
+der Zweig lief nie an.
+
+### `v1293g` · Der Quick-Check stellte neun Fragen, die nicht ankommen konnten
+
+Gemessen im Quick-Check-Ziel (`target: 'qc'`): der Katalog führt dort **19**
+Felder, der Dialog stellte aber **13 Fragen — neun davon zu Feldern, die es im
+QC-Katalog gar nicht gibt**: Kaufnebenkosten, Lage, Sanierung, Grundstück,
+Entwicklung, Steuer, These.
+
+Das ist nicht nur unnütz. `_rfKatalog()` filtert die Frage auf die
+Katalogfelder — bei diesen Blöcken bleibt ein **leeres Array**, und das Backend
+antwortet darauf mit **HTTP 400 · „Feld-Katalog fehlt oder ist leer."**
+**Neun Fragen, von denen jede Antwort in einer Fehlermeldung endet.**
+
+Jetzt werden die Blöcke vor dem Start am Katalog gemessen. Nachgemessen:
+**Quick-Check 13 → 7 Fragen, davon 0 ohne Katalogfeld.** Gegenprobe auf dem
+Objekt-Weg: **unverändert 16 Fragen** bei 192 Katalogfeldern — der Filter
+ändert dort nichts.
+
+### Die Lehre aus dieser Runde
+
+Vier der fünf Fehler lagen **außerhalb des Hauptwegs**: im Quick-Check-Ziel, im
+Weg über die Kette, im zweiten Durchlauf, im Fehlerfall des Kontingents. Der
+Hauptweg lief die ganze Zeit sauber — und hätte keinen davon gezeigt.
+
+**Commits** `8fc559d`, `1a0a307`, `987aac9`, `8215c50`. Auf Staging, **nicht auf
+Prod**.
+
+## Rollout-Journal · 11.09.2026, zweiter Teil — `v1294` bis `v1295`
+
+### Vier Kaufknöpfe, die nichts kauften (`v1294`)
+
+Marcels Auftrag war eine Durchsicht: „unter Plan wechseln steht da noch die
+alten Preise für diese Bewertungen … das müsste eigentlich noch raus."
+
+**Gemessen gegen den laufenden Checkout**, nicht gegen den Code:
+
+| Paket-Schlüssel | Antwort |
+|---|---|
+| `paket_kurz` | **HTTP 400 · `invalid_pack`** |
+| `paket_gross` | **HTTP 400 · `invalid_pack`** |
+| `nachkauf_starter` | HTTP 200 |
+| `nachkauf_pro` | HTTP 200 |
+| `mpi` | HTTP 200 |
+
+Die vier Bewertungs-Pakete zu **7,90 / 19,90 / 39,90 / 69,90 €** standen seit
+`v1246` nur noch als Anzeige da — das Backend kennt seither ausschließlich
+`dp_nachkauf_*` und `dp_einzeln_*`. Der Kommentar in `config.js` sagte seit
+`v1246` „das ersetzt BEWERTUNGS_PAKETE"; angekommen war die Ersetzung in
+`settings.js`, **nicht** im Preis-Modal und **nicht** auf der Landing.
+
+Das ist die unangenehmste Sorte Fehler: er trifft genau die Person, die gerade
+Geld ausgeben will, und er sieht bis zum Klick vollkommen in Ordnung aus.
+
+**Jetzt zeigt das Modal, was es wirklich gibt.** `KPACKS` wird nicht mehr
+hartgeschrieben, sondern aus `nachkaufFuer()` erzeugt — **dieselbe Quelle wie
+in den Einstellungen**, damit die beiden nicht wieder auseinanderlaufen können.
+Der eigene Plan steht vorn (`_nkIndex()`): wer nachkauft, kauft seinen eigenen.
+
+### Der Einzelkauf war die ganze Zeit da — nur unsichtbar
+
+Der Einzelkauf (`dp_einzeln_*`, 0,90 bis 9,90 €) **funktioniert seit `v1183`**.
+In `settings.js` hing er hinter `if (creditPacks.length > 0)`, und
+`creditPacks` ist `[]`, seit die Pakete abgeschaltet wurden. **Eine
+funktionierende Kaufmöglichkeit, die niemand sehen konnte** — versteckt hinter
+der Bedingung auf genau das, was sie ersetzen sollte.
+
+Jetzt steht er als eigener Block unter dem Nachkauf, in beiden Oberflächen.
+
+**Nachgemessen im Browser:** das „Plan wechseln"-Modal zeigt **null** alte
+Preise, die drei Nachkauf-Segmente `5 · 0 · 0 → 5,00 €`, `5 · 5 · 0 → 8,75 €`,
+`5 · 5 · 5 → 12,50 €` und alle **fünf** Einzelkauf-Zeilen mit Kaufknopf.
+
+### Die Landing-Karten waren schon vorher tot (`v1294b`)
+
+Beim Nachziehen der Landing fiel auf: `landing/assets/pricing-plugin.js` und die
+zweite Kopie in `leistungsumfang.html` hängen beide an `#pricing-host` — **und
+dieses Element gibt es auf keiner Seite.** Der Code lief nie. Beide Kopien
+tragen die neuen Zahlen und sind zusätzlich als toter Code gekennzeichnet;
+gelöscht wurden sie nicht, weil sie die einzige Fassung der Preistexte sind,
+falls der Host je zurückkommt.
+
+### Wie viel vom Mietpotenzial wirklich erreichbar ist (`v1295`)
+
+Marcels Punkt aus dem Sprechlauf-Auftrag: *„Vielleicht schaut man dann in der
+Region auch, ob's da eine Kappungsgrenze ist und ob man dann schon oben liegt
+und ob man da noch erhöhen könnte."*
+
+Das Mietpotenzial allein beantwortet das nicht. **292 € im Monat klingen nach
+292 €** — im laufenden Vertrag sind es höchstens, was die Kappungsgrenze
+zulässt. Also wird die Lücke geteilt:
+
+```
+im Vertrag erreichbar  = min(Marktmiete, Ist × 1,20) − Ist
+erst bei Neuvermietung = der Rest
+```
+
+**Gerechnet wird mit 20 %, nicht mit 15.** Ob ein Ort als angespannter
+Wohnungsmarkt gilt, steht in einer Verordnung des jeweiligen Landes, die wir
+nicht führen — die 15 % zu unterstellen, wo sie vielleicht nicht gelten, wäre
+eine **erfundene Einschränkung**. Der Hinweis steht daneben, mit der Zahl für
+den Fall, dass sie gelten.
+
+Und: **die Marktmiete ist die Grenze, nicht ein Wunsch.** Liegt die Ist-Miete
+schon nahe am Markt, ist die Kappungsgrenze gar nicht das Hindernis — dann
+steht dort „die Kappungsgrenze bremst hier **nicht**", und das ist die
+ehrlichere Auskunft als eine Prozentzahl.
+
+**Nachgemessen am ausgelieferten Bundle** (`voice-import.js?v=v1295`, die
+Funktion aus dem geladenen Quelltext geschnitten und mit Stubs gefahren):
+
+| Fall | Ist | Markt | im Vertrag | erst neu | bei 15 % |
+|---|---|---|---|---|---|
+| Hüllhorst 100 m² | 490 € | 782 € | **98 €** | **194 €** | 73,50 € |
+| fast am Markt | 700 € | 782 € | 82 € (ganz) | 0 € | — |
+| Ist über Markt | 800 € | 782 € | *keine Karte* | — | — |
+| ohne Wohnfläche | — | — | *`null`* | — | — |
+
+98 + 194 = 292 — **die volle Lücke, nichts geht verloren.** Ohne Wohnfläche
+gibt die Funktion `null` statt einer erfundenen Zahl. Die fünf `.vi-mp-*`-Regeln
+erben ihre Farbe vom Eltern-Element; die Dunkel-auf-Hell-Falle aus `v1292` ist
+hier **nicht** wiederholt.
+
+### Die Falle, in die ich beim Nachmessen selbst gefallen bin
+
+`.vi-mp-teil` gab **0 Treffer**. Der Grund stand in `FALLEN.md`, von mir selbst
+notiert: `location.reload(true)` holt das **HTML** nicht neu, also blieb der
+alte Cache-Buster stehen, also lud der Browser `voice-import.js?v=v1293g`. **Ein
+neuer Tab ist die einzige verlässliche Gegenprobe** — und `script.src`
+auszulesen ist billiger, als einer Null-Messung zu glauben.
+
+**Commits** `39995bf` (v1294), `902c74a` (Demo), `ecffdbb` (v1294b), `cd1e78c`
+(v1295). Auf Staging, **nicht auf Prod**.
+
+**Rest:** Marcels Wahl aus der Einzelkauf-Demo (`design/Vorschläge/einzelkauf-demo.html`,
+Varianten A ruhige Liste · B am Fehlerpunkt · C Kacheln — Empfehlung A + B).
+Und das echte Sprechen am Mikrofon, das nur er abnehmen kann.
+
+## Rollout-Journal · 11.09.2026, dritter Teil — `v1296` bis `v1296f`
+
+Drei Vorgaben von Marcel, ausgelöst durch eine Frage, die er sich selbst
+nicht beantworten konnte: *„Ich werd nicht ganz schlau daraus, was sind die
+anderen beiden Pakete? Also zum Beispiel Marktwertabruf, Bewertungspartner
+und Marktwertabruf zweiter Partner, das versteh ich nicht."*
+
+**Wenn der Betreiber seine eigene Preisliste nicht lesen kann, kann es der
+Kunde erst recht nicht.** Die Antwort war: in der Liste standen zwei
+verschiedene Dinge nebeneinander, ohne dass das irgendwo stand.
+
+| | Posten | Preis | wer rechnet |
+|---|---|---|---|
+| `mpi` | Marktpreisindikation | 0,90 € | **wir selbst** |
+| `mpi_plus` | Erweiterte Marktpreisindikation | 1,90 € | **wir selbst** |
+| `wev` | Wertermittlung nach ImmoWertV | 3,90 € | **wir selbst** |
+| `avm_a` | Marktwert-Abruf · Bewertungspartner | 5,90 € | Sprengnetter |
+| `avm_b` | Marktwert-Abruf · zweiter Partner | 9,90 € | PriceHubble |
+
+Die ersten drei rechnet das Marktbericht-Backend aus amtlichen Daten. Die
+letzten beiden kaufen einen **fremden** Wert zu — daher der Preissprung von
+3,90 auf 5,90. Auf der Landing hieß die Überschrift **„Die drei
+Bewertungsarten"** und darunter standen **fünf**; genau dieser Widerspruch
+stand ungelöst auf der Seite.
+
+### Was uns die Abrufe kosten, wissen wir nicht
+
+**Eine geführte Einkaufspreisliste gibt es nicht.** Die einzigen Kostenzahlen
+im Repo stehen in einem Kommentar, der als *„STILLGELEGT v1183"* markiert ist
+(`avm.js:92`): PriceHubble ≈ 6 €, Sprengnetter ≈ 3 € je Abruf. Aus der
+Kerosin-Zeit, nie gegen einen aktuellen Vertrag nachgeführt. **Das gehört
+geführt** — sonst weiß in drei Monaten wieder niemand, ob 5,90 € Marge macht.
+
+### 1 · Die Partner-Abrufe sind raus (`v1296`)
+
+Raus aus `EINZELKAUF`, aus `LOOKUP_KEYS` (damit unverkäuflich), aus der
+Landing und dem Leistungsumfang. **Die ART bleibt im System**: `avm_a_bank`
+und `avm_b_bank` gibt es weiter, ein Bestand bliebe abrufbar. Gemessen auf
+Staging: beide Bänke **0**, niemand betroffen.
+
+Gemessen gegen den laufenden Checkout: `avm_a` → **HTTP 400 `invalid_pack`**.
+
+### 2 · Der Kunde wählt die Menge (`v1296`)
+
+Mengenwähler an der Nachkauf-Karte und an jeder Einzelkauf-Zeile, in beiden
+Oberflächen. Er wohnt **einmal** in `pricing-modal.js` und wird über
+`window.DealPilotMenge` geliehen — zwei Kopien laufen auseinander, wie die
+Nachkauf-Zahlen es bis `v1294` taten.
+
+Der Checkout nimmt `menge`, **kappt bei 25** statt abzulehnen (wer sich
+vertippt, soll nicht vor einem Fehler stehen) und schreibt Stückzahl und
+Betrag in die Historie. Gemessen:
+
+| gesendet | zurück | Betrag |
+|---|---|---|
+| `mpi` × 3 | 3 | 2,70 € |
+| `mpi` × 999 | **25** | 22,50 € |
+| `mpi` × 0 | **1** | 0,90 € |
+| `nachkauf_pro` × 3 | 3 | 37,50 € |
+
+In `credit_purchases` steht `nachkauf_pro | 45 | 3750` — 15 Bewertungen × 3.
+
+**Nebenbefund, mitgefixt:** der Webhook-Rückfall `_paketAusMetadaten` las nur
+`paket`, **nicht die Menge**. Wäre er je zum Zug gekommen, hätte er bei Menge
+3 **eine** gutgeschrieben — ein stiller Fehlbetrag genau nach dem Bezahlen.
+
+### 3 · Das Monatskontingent verfällt (`v1296`)
+
+Marcels Regel kehrt die von `v1183` um: *„die im Plan integrierten
+Bewertungen verfallen am Ende des Monats. Nur selber nachgekaufte bleiben
+dauerhaft."*
+
+`_carryOver` heißt jetzt `_monatsReset` und überträgt nichts mehr. **Die Bank
+bleibt unangetastet** — darin liegen Gekauftes und ein Rest aus der
+Ansparzeit, die man nicht mehr trennen kann; rückwirkend zu streichen, was
+nach den damals geltenden Regeln angespart wurde, wäre eine Enteignung.
+
+Der Beweis ist das abgesetzte SQL, nicht der gelesene Code — der Monats-
+wechsel setzt ausschließlich `mpi_used`, `mpi_plus_used`, `wev_used` auf
+null und schreibt den Merker `kontingent_carry_at` fort. **`_bank` kommt
+darin nicht vor** — für keinen Plan, weil der Plan gar nicht mehr gelesen
+wird. Gegenprobe: Bänke 7 und 4 vor und nach dem Wechsel unverändert,
+`used` 3/2/1 → 0/0/0. Idempotenz: drei Auskünfte nach dem Wechsel, **null**
+weitere Resets, ein frischer Verbrauch von 2 blieb stehen.
+
+Die Verbrauchsreihenfolge passte schon: **Monat → Testphase → Bank**. Was
+verfällt, geht zuerst; Gekauftes zuletzt. **Sieben Textstellen** sagten das
+Gegenteil („wandert ins Guthaben") und sind nachgezogen.
+
+### Vier Befunde, die beim Bauen herausfielen
+
+**Der Einzelkauf verschwand beim Segmentwechsel.** `_wireKerosinStrip`
+zeichnete `_bwSegsHtml + _bwPassHtml` **ohne** `_einzelHtml()` — ein Klick
+auf ein anderes Segment löschte den kompletten Block. Seit `v1294` drin,
+beim Nachmessen nicht gesehen, weil ich das Segment nie gewechselt habe.
+
+**Die Regeln des Streifens hingen am falschen Anker (`v1296b`).** Sie standen
+unter `P = "#pricing-modal .ppg"` — dem Planraster. Der Streifen liegt aber
+in `#pricing-modal #pricing-plugin-host.dp-wrap`. Der Kaskaden-Walker zeigte
+auf `.pm-menge` **zwei** Treffer, beide Sammelregeln (`*`, `.dp-wrap *`),
+keine einzige eigene. `.pm-einzel-row` stand auf `display:block` und
+`padding:0` — **die Einzelkauf-Liste war seit `v1294` nackte Divs**, der
+Mengenwähler lief auf 1180 px Breite.
+
+**Der Kaufblock stand im toten Zweig (`v1296d`).** `_renderPlanPane()` kehrt
+bei jedem bezahlten Plan nach vier Zeilen zurück; Nachkauf und Einzelkauf
+standen **hinter** diesem Return:
+
+> zahlender Kunde → sieht den Block nie · Free-Kunde → sieht ihn, darf aber
+> nicht kaufen (`upgrade_required`)
+
+**Gezeigt wurde er genau denen, die ihn nicht nutzen dürfen.** Gemessen im
+DOM bei Plan `pro`: `.plan-credits-section` **0 Treffer**. Jetzt in
+`_kaufBlockHtml(planKey)`, gerufen aus beiden Zweigen.
+
+**Vier Farbrunden hintereinander (`v1296b`, `c`, `e`).** Derselbe Wähler
+läuft an drei Orten, und ich habe den Grund dreimal falsch angenommen statt
+gemessen:
+
+| Ort | angenommen | gemessen |
+|---|---|---|
+| Modal, Einzelzeilen | hell | **dunkel** `rgb(26,24,24)` |
+| Modal, `.bw-gate` | dunkel | **weiß** `#fff`, Kontrast **16** |
+| Einstellungen | dunkel | **weiß** `#fff`, Kontrast **16** |
+
+Der letzte Fehlschluss ist der lehrreichste: ich las die Nachbarregel
+`background: rgba(255,255,255,.04)` und folgerte „dunkler Grund". **Eine
+4-%-Weiß-Aufhellung funktioniert auf beiden Gründen und sagt über keinen
+etwas aus.** Aus einer CSS-Zeile auf die Grundfarbe zu schließen ist keine
+Messung — der erste **opake** Vorfahre ist es. Danach überall Kontrast 215.
+
+Dabei ist mir zusätzlich ein Token `--wl-f4efe6` untergekommen, das ich
+selbst erfunden hatte: `whitelabel-override.js` setzt es nicht, der Fallback
+hätte immer gegriffen. **Ein toter Anker mit plausiblem Aussehen**, dieselbe
+Sorte wie die `#app`-Regel aus `v1147`. Wieder entfernt.
+
+### Der Wächter hat gearbeitet (`v1296f`)
+
+`gold-audit` gegen die Basislinie: `style.css` **0 → 1** („Datei war
+sauber!"), `pricing-modal.js` **53 → 55**. Drei harte Gold-Literale, alle
+drei an diesem Tag von mir. Auf `var(--wl-c9a84c, rgba(…))` gezogen, danach
+**RC=0, genau auf der Basislinie**.
+
+### Die Lehre aus dieser Runde
+
+Bei `v1294` habe ich den Einzelkauf als erledigt gemeldet — er war aus der
+Bedingung heraus, die ihn verbarg, und lag danach in einem Zweig, der nie
+läuft, ungestylt, und verschwand beim ersten Segmentwechsel. **Gemessen
+hatte ich, DASS die Zeilen im DOM sind. Nicht, ob sie jemand zu sehen
+bekommt, wie sie aussehen, und ob sie einen Klick überleben.** Eine
+Existenzprüfung ist keine Abnahme.
+
+**Commits** `784ec2d` (v1296), `2bacff6` (v1296b), `883da9a` (v1296c),
+`2905a55` (v1296d), `208b244` (v1296e), `233112c` (v1296f). Auf Staging,
+**nicht auf Prod**.
+
+**Rest:** die Einkaufspreise der beiden Partner (nur Marcel hat die
+Verträge), und die Prod-Bestände an `*_bank` — der Lesezugriff auf die
+Prod-Datenbank ist in dieser Sitzung blockiert, und vor einem Prod-Rollout
+gehört gezählt, wem der Wegfall des Übertrags etwas nimmt.
+
+## Rollout-Journal · 11.09.2026, vierter Teil — `v1297` bis `v1299b`
+
+Marcels Rückmeldung nach einem echten Durchlauf, dazu die Preisfrage aus
+dem Vormittag. Zehn Punkte, alle gemessen statt vermutet.
+
+### Was GeoMap wirklich kostet
+
+Marcels eigentliche Frage: *„Ich wollte eigentlich nur wissen, was GeoMap
+dann dafür nimmt. Also wenn wir so einen Marktbericht erstellen, das sind
+ja unsere eigenen, und da müssen wir ja wissen, was wir kalkulatorisch
+dafür bezahlen."*
+
+Die Zahl steht seit jeher in `marktbericht_cost_log` — sie wurde nur nie
+ausgewertet. **184 echte Läufe auf Staging**, `liters` trägt dort noch den
+alten Litertarif und ist damit die Stufe (2 = MPI, 5 = MPI+, 12 = WEV):
+
+| Stufe | Verkauf | GeoMap je Abruf | Läufe mit Kosten | ohne Kosten |
+|---|---|---|---|---|
+| Marktpreisindikation | 0,90 € | **0,10 €** | 2 | 68 |
+| Erweiterte MPI | 1,90 € | **0,38 €** | 15 | 30 |
+| Wertermittlung | 3,90 € | **0,51 €** | 25 | 13 |
+
+Der Vollbericht streut zwischen 0,20 und 0,55 €, Schwerpunkt bei 0,52–0,55
+(34 von 51). **Viele Läufe kosten gar nichts** — Cache oder Wiederholung
+derselben Adresse. Über alle Vollberichte gerechnet sind es im Schnitt
+**0,2285 €**, über 106 Läufe zusammen 24,22 €.
+
+**`openai_eur` ist in jeder Zeile NULL** — die Spalte existiert, wird aber
+nicht befüllt. Die KI-Kosten eines Berichts sind damit ungemessen; sie
+laufen über `gpt-4.1-mini` und liegen erfahrungsgemäß im Zehntel-Cent.
+
+Die Marge trägt also selbst im teuersten Fall: 3,90 € Verkauf gegen 0,51 €
+Einkauf. Sprengnetter und PriceHubble spielen hier keine Rolle — die sind
+seit `v1296` nicht mehr im Angebot.
+
+### Drei Bewertungspakete mit Namen (`v1297`)
+
+*„Ich finde das Bewertungen nachkaufen nicht schön mit dem 5-5-5. … bietet
+einfach drei Pakete an, aber nennt sie besser."*
+
+Drei Befunde dahinter, alle berechtigt:
+
+1. **`5 · 5 · 5` ist keine Bezeichnung**, sondern eine Notation aus der
+   Cockpit-Matrix. Dort stehen Spaltenköpfe daneben, im Nachkauf nicht.
+2. **„Für Pro" beschrieb den Käufer, nicht die Ware.**
+3. **„Auch wenn man die Menge ändert, ändert sich nicht die Anzahl der
+   Bewertungen."** Das stimmte: `reach` wurde einmal gebaut und blieb
+   stehen, während Preis und Kaufknopf mitwanderten. Bei Menge 3 stand
+   „5 Marktpreisindikationen" über einem Preis für 15.
+
+Jetzt **Kurzstrecke · Mittelstrecke · Langstrecke** — die Namen standen
+schon an den alten Kerosin-Paketen und brauchen keine Erklärung. Die
+Inhalte stehen als lesbare Zeilen mit großer Zahl vorn und **rechnen mit
+der Menge**: bei 3 zeigt die Langstrecke 15/15/15 zu 37,50 €.
+
+**Preise und Inhalte unverändert**, dieselben drei Stripe-Preise. Ein neues
+Paket hieße ein neuer Preis in zwei Stripe-Konten — das ist Marcels
+Entscheidung, nicht meine.
+
+In den Einstellungen stehen jetzt **alle drei** statt nur des eigenen. Die
+Einschränkung war rein optisch: `_checkoutBewertung` prüft nur „nicht
+free", nie den Plan. Ein Starter-Kunde durfte die Langstrecke immer schon
+kaufen, sah sie bloß nirgends. Nach dem ersten Rollout stand die Reihe
+Lang · Kurz · Mittel da (eigenes Paket vorn sortiert) — drei Pakete, deren
+Größe hin und her springt, liest niemand als Staffel. Die Sortierung ist
+wieder raus, hervorgehoben wird über die Pille „Dein Plan".
+
+### Der Sprechlauf: sieben Befunde
+
+**Das Markt-Angebot blieb offen (`v1298`).** *„obwohl ich erweiterte
+Marktpreisindikation angeklickt habe."* Die Ursache stand eine Ebene
+höher: beim Frageübergang werden alle Angebote abgeräumt **außer**
+`markt`/`markt2` (`v1291`) — richtig, solange nichts gewählt ist. Sobald
+eine Stufe steht, ist die Frage beantwortet. **Die Ausnahme galt zu lange,
+nicht zu breit.** Nachgemessen: nach dem Klick beide Knöpfe weg, die Zeile
+„Ich kann das für dich holen" verschwunden.
+
+**„oder kann genauso bleiben" wurde nicht verstanden (`v1298`).** Der Satz
+trägt drei Signale, und keines war vollständig erfasst: die
+Übernahme-Absicht (griff seit `v1286`, **aber nur mit vorliegendem
+Vorschlag** — ohne einen stieg die Funktion in Zeile eins aus), die
+Wendung „kann genauso bleiben" (stand in keinem Muster), und das „oder",
+das beide Wege gleich meint. Jetzt werden alle drei erkannt; gemessen
+gegen sieben Formulierungen, alle `true`, ein echter Wert korrekt `false`.
+
+**Und wenn nichts zu übernehmen da ist, wird das gesagt** — vorher lief
+beides in denselben Satz „Übernommen", auch wenn nichts übernommen wurde.
+
+**Pillen mit den Schlagwörtern (`v1298`/`v1299`).** Sie waren in `v1298`
+schon im DOM — **ohne eine einzige CSS-Regel**. Im Browser stand
+„PLZOrtStraßeHausnummer" als ein Wort. Genau die Falle, die ich am selben
+Tag in `FALLEN.md` geschrieben hatte. Jetzt tragen gefüllte Felder einen
+grünen Haken: bei Frage 2 stand **✓Objektart ✓Wohnfläche · Zimmer** — man
+sieht ohne Lesen, was noch fehlt.
+
+**Mehr Platz für Gespräch und Liste (`v1299`).** Gemessen im laufenden
+Dialog bei 987 px Fensterhöhe:
+
+```
+Modal 929 = Markenleiste 60 + Kopf 101 + Körper 699 + Fußleiste 66
+                                          davon Bühne nur 367
+```
+
+**Es fehlte nicht an Platz — er wurde oben und unten verbraucht.** Der
+Erklärsatz im Kopf (`.oabi-sub`, 38 px) steht bei jedem Durchlauf da und
+sagt dreimal dasselbe: in der ersten Co-Pilot-Blase, auf den Knöpfen
+(„Weiß ich nicht", „Fertig") und dort. Im geführten Dialog fällt er weg.
+
+Beim ersten Anlauf traf meine Regel `.bdg-hero p` **nichts** — der Satz ist
+kein `<p>`, sondern `.oabi-sub`. Der Kopf wuchs dabei von 101 auf 120 px,
+statt zu schrumpfen. Nach der Korrektur: **Kopf 75, Bühne 428** (+17 %).
+
+**Die Liste rechts.** *„dass man die Liste auf einer Seite auf jeden Fall
+komplett sehen kann."* Nachgemessen war sie **nie unerreichbar** —
+`.vi-rf-stand-body` scrollt seit jeher. Der Eindruck entstand anders: die
+Liste endete ohne Kante mitten in „Etappe 4", und eine Liste, die so
+abbricht, sieht aus wie eine, die etwas verschweigt. Jetzt mehr Höhe plus
+ein Verlauf an der Unterkante.
+
+**Die Score-Karten waren eingerückt (`v1299`).** `.vi-rf-blase{max-width:82%}`
+ist richtig für Gesprochenes — eine Karte mit großer Zahl, Balken und
+Kennzahlen ist aber kein Redebeitrag. Sie verlor ein Fünftel Breite, und
+die Zahl saß eingerückt. Blasen mit Karte bekommen jetzt volle Breite, die
+Karte einen Schatten gegen Creme-auf-Creme.
+
+### Der wichtigste Punkt: hören, was gesagt wird (`v1299b`)
+
+*„der sollte das schon verstehen, was ich ihm sage, auch wenn es nicht zu
+der Frage passt. Dann sollte er nicht immer eine Standardfrage nehmen,
+sondern gucken, was kann er damit machen."*
+
+Zwei Engstellen, beide einmal bewusst gesetzt, beide zu eng geworden:
+
+1. **`_rfKatalog` reichte nur die Felder der aktuellen Frage ans Modell.**
+   Wer bei der Miete das Baujahr mitnennt, dessen Angabe konnte gar nicht
+   erkannt werden — sie stand nicht in der Liste der erlaubten Felder.
+2. **`_rfUebernehmen` verwarf alles außerhalb von `e.ids`** („nur was
+   gefragt war").
+
+Jetzt kommen die Felder der **nächsten Blöcke** mit, gedeckelt auf 24.
+Alles zu öffnen (192 Felder) lädt ein Modell zum Raten ein — davor schützte
+die enge Liste zu Recht, deshalb eine Reichweite statt eines Freibriefs.
+
+**Gemessen an einem echten Durchlauf.** Auf die Adressfrage geantwortet:
+*„Hermannstraße 9 in 32609 Hüllhorst, das ist eine Eigentumswohnung mit
+100 Quadratmetern, Baujahr 1962"* — Antwort:
+
+> Das nehme ich gleich mit: **Objektart = ETW · Wohnfläche = 100 ·
+> Baujahr = 1962**
+
+Drei Felder aus späteren Blöcken, vorher alle verworfen. Die Adressfrage
+lief danach normal weiter, und bei Frage 2 trugen zwei der drei Pillen
+schon einen Haken.
+
+**Die Frage gilt weiter erst als beantwortet, wenn IHRE Felder stehen** —
+`teil` prüft unverändert nur `e.ids`. Nebenbei Gesagtes beschleunigt also,
+es überspringt nichts.
+
+**Commits** `3b3fc0c` (v1297), `e45a06a` (v1298), `4525bdb` (v1299),
+`c262a93` (v1299b). Gold-Audit RC=0. Auf Staging, **nicht auf Prod**.
+
+**Rest:** Die Score-Karte im Verlauf ist noch nicht im echten Durchlauf
+nachgemessen — dafür braucht es eine vollständige Etappe 2. Und Marcels
+„Ich höre nichts" habe ich als Layout-Punkt gelesen (alles kleiner, Feld
+größer); falls er damit das Mikrofon meinte, steht das noch offen.
+
+## Rollout-Journal · 11.09.2026, fünfter Teil — `v1300` bis `v1300c`
+
+Marcels Rückmeldung zum Sprechlauf-Layout. Fünf Punkte.
+
+### Der Verlauf scrollte „manchmal" nicht ans Ende (`v1300`)
+
+*„das Feld, wo jetzt die Ausgaben drinne stehen, das muss immer ganz nach
+unten gescrollt werden. Das ist mir aufgefallen, dass das manchmal nicht so
+ist."*
+
+**„Manchmal" war der Hinweis auf die Ursache.** `chat.scrollTop =
+chat.scrollHeight` direkt nach `appendChild` misst die Höhe in **dem**
+Moment — und in dem Moment stimmt sie oft noch nicht:
+
+- die Einblend-Animation startet mit `translateY(7px)`,
+- Schriften laden nach und brechen Zeilen um,
+- eine Score-Karte wächst, während ihre Balken ausfahren,
+- `<details>` und Bilder ändern die Höhe nach dem Einhängen.
+
+Jetzt fährt `_rfAnsEnde()` **dreimal** ans Ende: sofort, im nächsten Bild
+(nach dem Layout) und nach 260 ms — da ist auch die Karten-Animation durch.
+Billiger als ein `ResizeObserver` und deckt alle vier Fälle ab.
+
+**Wer selbst hochgescrollt hat, wird nicht zurückgerissen.** Liest jemand
+im Verlauf nach oben, während eine Antwort eintrifft, bleibt er dort; nur
+eine neue Blase, die er selbst ausgelöst hat, erzwingt den Sprung.
+
+### Der Balken war zu hoch (`v1300`)
+
+*„der Balken für Marktindikation, erweiterte Marktindikation und Lage
+recherchieren ist recht breit. Vielleicht können wir das ein bisschen
+flacher machen."*
+
+In `_rfDranZeichnen` stand `akt.map(...)` über den Erklärtexten — **für
+jede Aktion ein eigener Absatz**. Bei drei Angeboten also drei Textblöcke
+untereinander, dauerhaft sichtbar, zusammen über 70 px. Sie erklären
+etwas, das man einmal liest.
+
+Jetzt **eine** Zeile, die dem Zeiger folgt (`mouseenter` **und** `focus`,
+damit sie nicht nur mit Maus erreichbar ist), auf zwei Zeilen gedeckelt.
+Der volle Text steht im `title` des Knopfes. Knopfreihe und Beschriftung
+(„Ich kann das für dich holen") liegen in derselben Zeile statt
+untereinander.
+
+Gemessen: `vi-rf-dran` bei drei Angeboten **107 px** statt vorher rund 180.
+
+### Flacher unten, größer oben (`v1300`)
+
+*„genauso wie da drunter ‚Ich höre weiter zu‘ und allem und auch, ja, wenn
+man tippen möchte … dass das Visualisierungsfenster, wo der Co-Pilot
+antwortet, dass das größer ist. Oder wir machen das Modal noch ein bisschen
+größer."*
+
+Beides. Mikrofon-Streifen 53 → 49, Tippzeile 43 → 36, Nebenknöpfe 33 → 28.
+**Die Klickflächen bleiben über 36 px** — flacher wäre auf dem Handy nicht
+mehr sicher zu treffen. Das Modal im geführten Dialog von 94 auf **97 vh**
+und von 1240 auf **1360 px** Breite.
+
+Gemessen: Modal **929 → 958 px**.
+
+### „Was schon steht" auch beim freien Erzählen (`v1300b`/`v1300c`)
+
+*„das können wir ja natürlich auch für den normalen Sprachabruf machen.
+Also wenn ich frei erzähle, dass wir dort dann auch einmal, was schon
+steht, dass wir das dort halt auch einmal auflisten."*
+
+Der geführte Weg hat die Spalte seit `v1290`. Der freie hatte nur die Chips
+im Orbit — sie zeigen, was **gerade** erkannt wurde, nicht, was insgesamt
+steht und was fehlt. **Wer vier Minuten frei spricht, wusste am Ende nicht,
+ob er das Baujahr genannt hat.**
+
+Das freie Fenster ist jetzt geteilt: links Mikrofon und Orbit, rechts
+dieselbe Spalte, nach Etappen gegliedert. Sie steht **von Anfang an** da,
+gefüllt aus dem Formular, und wächst mit jeder Auswertung
+(`markChipsFinal` schreibt die erkannten Werte nach `_viFrei`).
+
+**Eigene Funktion statt Aufruf von `_rfStandZeichnen`:** die hängt an `_rf`
+— Blockreihenfolge, aktueller Index, übersprungene Fragen. Nichts davon
+gibt es beim freien Erzählen. Geteilt werden Darstellung und Gliederung,
+nicht die Quelle.
+
+Unter 900 px wandert die Liste **nach unten**, nicht nach oben: beim freien
+Erzählen ist das Mikrofon das Hauptelement — anders als im geführten Weg,
+wo die Liste nach oben rutscht.
+
+### Zwei Fehler beim Bauen, beide gemessen (`v1300c`)
+
+**Die Regeln standen im falschen Style-Block.** Ich hatte
+`.vi-frei-buehne` nach `_rfStil()` geschrieben — und **das Style-Tag
+`vi-rf-stil` existiert im freien Weg gar nicht**, es wird nur für den
+geführten Dialog eingehängt. Gemessen: `grid-template-columns: none`,
+Spaltenbreite 718 px statt 320, Höhe 0.
+
+Dieselbe Sorte wie der falsche Anker in `v1296b`: **eine Regel am Ort, den
+der Code nie erreicht.** Sie gehören nach `vi-style` — der Block wird bei
+jedem Öffnen gesetzt, für beide Wege. Dazu eine eigene Farbfassung: der
+freie Weg läuft auf `--vi-surface` (dunkel), nicht auf dem hellen Grund des
+Dialogs.
+
+**Der Zeichenaufruf lief ins Leere.** `vi-frei-stand` ist zum Zeitpunkt des
+Aufrufs je nach Startweg noch nicht im DOM — und das `try/catch` darum
+verschluckte es lautlos. Jetzt zweimal: sofort und im nächsten Bild.
+
+**Die Funktion selbst war nie das Problem.** Isoliert aus dem
+ausgelieferten Bundle gefahren, erzeugte sie von Anfang an 16 Zeilen in 5
+Gruppen. Ohne diesen Test hätte ich in der Funktion gesucht.
+
+**Nachgemessen im laufenden Fenster:** Grid `375 px | 320 px`, Spalte 320 ×
+512 px, 16 Zeilen, 5 Gruppen, Kopf „Was schon steht 0 / 16", und die Werte
+aus dem Formular stehen drin (ETW, Finanzierung 3,5 · 1 · 10, Nebenkosten
+2,2 · 0,5 · 6,5).
+
+### Die Aufnahme war halb so breit wie der Dialog (`v1301`)
+
+Marcels Nachtrag: „bei der Sprachaufzeichnung darf das Modal schon breiter
+sein, also so breit wie bei dem anderen Sprechlauf auch."
+
+**Dieselbe Ursache noch einmal, an einer anderen Eigenschaft.** Die Regel
+`width:min(1240px,100%)` steht in `_rfStil()` — im Block `vi-rf-stil`, den
+nur der geführte Dialog einhängt. Der freie Weg blieb bei der Basisregel
+aus `vi-style`: **760 px**. Mit der neuen Spalte daneben war das zu eng.
+
+Die Breite hängt jetzt am ZUSTAND, nicht am Fenster: `vi-breit` wird
+gesetzt, sobald die Aufnahme läuft. Die Wahlseite davor bleibt schmal —
+zwei Karten nebeneinander brauchen keine 1360 px, und ein Dialog, der beim
+Klick die Breite wechselt, wirkt unruhig.
+
+Gemessen: Wahlseite **760 px**, Aufnahme **1360 px**, Grid
+`980 px | 320 px`.
+
+**Commits** `f757dee` (v1300), `aeffda1` (v1300b), `9fca4b8` (v1300c). `122360f` (v1301).
+Gold-Audit RC=0. Auf Staging, **nicht auf Prod**.
+
+**Rest:** Marcel hat ein Bild angekündigt („unter Sprechlauf neu ein Bild
+eingefügt"), das nicht im Repo angekommen ist — das neueste bleibt
+`sprechlauf3.png` vom 10.09. Gearbeitet wurde nach seiner Beschreibung und
+eigenen Messungen.
+
+## Rollout-Journal · 11.09.2026, sechster Teil — `v1302` bis `v1303`
+
+Marcels Rückmeldung zum Bild `sprechlauf4` — **das wieder nicht im Repo
+ankam.** Zum zweiten Mal an diesem Tag; das neueste bleibt
+`design/mockups/sprechlauf3.png` vom 10.09. Gearbeitet wurde nach seiner
+Beschreibung, und die traf einen Fehler, der von mir stammt.
+
+### Das schwarze Feld und das verschwundene Fenster (`v1302`)
+
+*„da siehst du ein merkwürdiges Feld rechts in schwarz, und wenn ich
+Eingaben gemacht habe und auf Übernehmen klicke, dann ist das
+Eingabefenster weg."*
+
+**Beides derselbe Fehler, und er ist meiner aus `v1300b`.** Die neue Spalte
+„Was schon steht" hängt in `.vi-frei-buehne`, einem Grid mit zwei Spalten.
+An **drei** Stellen wird `vi-rec` auf `display:none` gesetzt — beim Zeigen
+der Startkarte, beim Aufbau des geführten Dialogs und nach der Auswertung.
+
+Die Spalte blieb dabei stehen: ein leerer Kasten in `--vi-card` (#151412)
+auf `--vi-surface` (#0a0a0a) — **fast schwarz auf schwarz**, genau das
+„merkwürdige Feld". Und weil das Grid weiter zwei Spalten aufspannte, bekam
+der nachfolgende Inhalt nur noch die linke: das „Eingabefenster weg".
+
+`_recAus()` räumt jetzt beides zusammen ab und setzt die Bühne auf eine
+Spalte zurück. Nachgemessen: Spalte `display:none`, Breite 0, Bühne
+`block`, Ergebnisbereich **1318 px** statt der halben Breite.
+
+### Ein Ausblenden ohne Einblenden (`v1302b`)
+
+Beim Nachmessen von `v1302` war nach dem Klick auf „Ich erzähle frei"
+**die ganze Aufnahme unsichtbar.** `_startkarte()` ruft `_recAus()`, und
+der Knopf blendete danach nur `vi-rec` wieder ein — Spalte und Grid blieben
+abgeräumt.
+
+**Eine halbe Lösung ist keine, sondern eine neue Falle.** `_recAn()` setzt
+alle drei auf `''` zurück, damit wieder gilt, was im Stylesheet steht; ein
+hier hartgesetztes `grid` würde die Media-Query für schmale Geräte
+aushebeln.
+
+### Tablet und Handy (`v1303`)
+
+*„wichtig ist auch, dass beide Sprachaufzeichnungen für Tablet und Handy
+funktionieren."*
+
+Gemessen im gleich-Origin-iframe — Fenstergröße allein wirkt nicht, die
+Media-Queries greifen nur in einem echten Rahmen.
+
+| Weg | Breite | vorher | jetzt |
+|---|---|---|---|
+| frei | 767 px | eine Spalte ✓ | eine Spalte |
+| frei | 390 px | eine Spalte ✓ | eine Spalte |
+| geführt | 767 px | **zwei Spalten: Gespräch 330, Liste 340** | eine Spalte |
+| geführt | 390 px | eine Spalte ✓ | eine Spalte |
+
+**Der freie Weg war in Ordnung** (Umbruch bei 900 px, von `v1300b`). **Der
+geführte nicht:** sein Umbruch stand bei 720 px und griff auf einem Tablet
+hochkant nicht — dort war die Nebenspalte breiter als die Hauptsache.
+
+Beide liegen jetzt bei **900 px**. Zwei Wege mit demselben Problem sollen
+auf demselben Gerät gleich reagieren; zwei verschiedene Schwellenwerte
+heißen, dass ein Fenster umbricht und das andere nicht. Zwischen 900 und
+1100 px wird die Liste schmaler (270 px) statt zu verschwinden.
+
+Kein horizontaler Überlauf in keiner der vier Messungen, Stopp-Knopf 44 px
+hoch.
+
+**Commits** `63446bf` (v1302), `de73ebc` (v1302b), `d17c5d3` (v1303).
+Gold-Audit RC=0. Auf Staging, **nicht auf Prod**.
+
+## Rollout-Journal · 11.09.2026, siebter Teil — `v1304`
+
+Marcels Befund, diesmal **mit Bild**: `design/mockups/sp2.png` (13:51) —
+der erste Upload, der ankam.
+
+*„nach Eingabe der Adresse per Sprache kann ich unten nicht auswählen, man
+kann auch nicht runter scrollen."*
+
+Das Bild zeigt es eindeutig: die Aktionsleiste („Stimmt die Adresse?") ist
+am unteren Rand **angeschnitten**, darunter fehlen Mikrofonzeile,
+Eingabefeld und die beiden Knöpfe **ganz**. Sichtbar ist nur noch
+„Abbrechen". Der Verlauf läuft über die volle Höhe, ohne eigenen
+Scrollbalken.
+
+### Die Ursache ist meine aus `v1300b`
+
+In `_rfHost()` stand:
+
+```js
+rec.parentNode.insertBefore(h, rec.nextSibling)
+```
+
+Der geführte Dialog wurde als **Geschwister von `vi-rec`** eingehängt. Bis
+`v1300b` war dessen Elternteil `oabi-body` — seit ich `.vi-frei-buehne` um
+`vi-rec` gelegt habe, ist es die Bühne. **Der ganze geführte Dialog landete
+also im Behälter für den freien Weg.**
+
+Damit riss die Kette, die ihn scrollen lässt:
+
+```css
+.vi-dialog .oabi-body { display:flex; flex-direction:column; overflow:hidden }
+.vi-dialog #vi-frage  { flex:1 1 auto; min-height:0 }
+```
+
+Beide setzen voraus, dass `#vi-frage` ein **direktes Kind** von
+`.oabi-body` ist. Eine Ebene dazwischen, und der Chat bekommt seine Höhe
+nicht mehr vom Körper, sondern wächst mit dem Inhalt. Das Modal wird höher
+als das Fenster, und unten fällt heraus, was nicht mehr hineinpasst — genau
+das, was Marcel nicht mehr anklicken konnte.
+
+**`insertBefore` an einem Geschwister ist bequem, macht die Einhängung aber
+von einer Struktur abhängig, die jemand später ändert.** Jetzt hängt
+`#vi-frage` ausdrücklich am Körper — hinter der Bühne, falls es sie gibt,
+sonst ans Ende.
+
+### Nachgemessen
+
+| | oben | unten |
+|---|---|---|
+| Aktionsleiste | 656 | 763 |
+| Mikrofon | 771 | 820 |
+| Eingabefeld | 826 | 862 |
+| „Weiß ich nicht" · „Fertig" | 868 | 896 |
+| Fußleiste | 916 | 972 |
+
+Fenster 987 px, Modal endet bei 973. `allesImBild: true`,
+`chatScrollt: true`.
+
+**Gegenprobe auf dem Tablet** (767 px, weil ich die DOM-Struktur angefasst
+habe): `#vi-frage` direktes Kind, Modal 994 bei 1024 px Fensterhöhe,
+Knöpfe enden bei 929, Chat scrollt, Bühne einspaltig.
+
+### Die Lehre
+
+Das ist der **dritte** Fehler in Folge aus derselben Änderung — erst die
+Spalte, die stehenblieb (`v1302`), dann das fehlende Gegenstück
+(`v1302b`), jetzt die zerrissene Flex-Kette. Alle drei stammen daher, dass
+`v1300b` einen **neuen Behälter in eine bestehende Hierarchie** geschoben
+hat.
+
+Wer das tut, ändert nicht nur das Aussehen: er ändert `parentNode` für
+jeden, der sich daran orientiert, und die Vorfahrenkette für jede Regel,
+die auf `>` oder auf Flex-Vererbung baut. **Beides gehört vor dem Einbau
+geprüft**, nicht nach dem dritten Bild vom Nutzer.
+
+**Commit** `f632c9b`. Auf Staging, **nicht auf Prod**.
+
+## Rollout-Journal · 11.09.2026, achter Teil — `v1305`
+
+*„Dann hab ich die Adresse diktiert, er fragt ‚Stimmt das so?‘, ich sage
+‚ja stimmt‘ — und er fängt wieder an, nach der Adresse zu fragen. Die
+Bestätigung muss auch so gehen per Sprache."*
+
+### Ein Wort zu viel
+
+`RF_JA` verlangt, dass der Satz **mit dem Ja endet**:
+
+```js
+/^(ja|jo|jup|klar|…)\b[\s.!,]*$/i
+```
+
+„ja stimmt" hat ein Wort zu viel. Das zweite Muster daneben verlangte
+„stimmt" am **Anfang** — „ja stimmt" beginnt aber mit „ja". Der Satz fiel
+durch beide, galt damit als **Korrektur**, ging an die Auswertung, und die
+fand in „ja stimmt" keine Adresse. Also kam die Frage noch einmal.
+
+**Gesprochen sagt niemand nur „ja".** Man sagt „ja stimmt", „ja genau so",
+„passt so", „jo, richtig". Ein Muster, das auf ein einzelnes Wort endet,
+ist für **getippte** Antworten gebaut — es stammt aus einer Zeit, in der
+der Sprechlauf ein Tippfeld mit Mikrofon daneben war.
+
+### Die Lösung und ihre Grenze
+
+`_istZustimmung(t)` prüft, ob der Satz **ausschließlich** aus
+Zustimmungswörtern besteht — in beliebiger Zahl und Folge, bis sechs Wörter.
+
+**Die Grenze ist der eigentliche Punkt.** „ja, aber die Hausnummer ist
+zwölf" darf **keine** Bestätigung sein: der Satz bestätigt und korrigiert
+zugleich, und die Korrektur ist das Wichtigere. Deshalb steigt die Prüfung
+aus bei
+
+- **jeder Ziffer** — wer eine Zahl nennt, liefert Inhalt, keine Zustimmung,
+- **einschränkenden Wörtern** (`aber`, `jedoch`, `allerdings`, `nur`,
+  `außer`, `nicht`, `kein`) — **wer einschränkt, bestätigt nicht**,
+- **jedem Wort, das nicht in der Liste steht.**
+
+`_istAblehnung(t)` ist das Gegenstück mit **eigener** Wortliste — nicht als
+Verneinung der ersten, weil „nein, stimmt nicht" ein „nicht" enthält, das
+die Zustimmung gerade ausschließt.
+
+### Gemessen
+
+| Eingabe | erkannt |
+|---|---|
+| „ja stimmt", „ja genau so", „stimmt so", „passt so", „jo richtig", „ja das stimmt", „korrekt", „einverstanden", „alles richtig" (13 Formen) | **alle als Zustimmung** |
+| „nein", „nein stimmt nicht", „nee falsch", „nein das ist falsch", „quatsch" | **alle als Ablehnung** |
+| „ja aber die Hausnummer ist zwölf", „ja, Hausnummer 12", „nein, Hausnummer zwölf", „Hermannstraße 9", „der Kaufpreis liegt bei 200000", „ja aber nicht ganz", „Münster" | **keines von beiden** ✓ |
+
+**Im echten Durchlauf:** Adresse diktiert → „Stimmt das so?" → „ja stimmt"
+→ **Frage 2 von 16**. Keine Wiederholung.
+
+Dieselbe Erkennung gilt jetzt auch für die **Abruf-Angebote** („ja gerne,
+mach das") und den **Abschluss** — überall dort, wo vorher nur ein
+alleinstehendes „ja" zählte.
+
+**Commit** `696145f`. Auf Staging, **nicht auf Prod**.
+
+## Rollout-Journal · 11.09.2026, neunter Teil — `v1306` bis `v1306d`
+
+Marcels Rückmeldung zu vier Bildern: `fragen.png`, `sanierung.png`,
+`dealscore2.png`, `entwicklung.png`. Kernsatz: *„grundsätzlich gibt es
+manchmal noch Probleme beim Verständnis … da würde ich mir einfach
+wünschen, dass es deutlich schlauer ist."*
+
+### Eine Verneinung IST eine Angabe (`v1306`)
+
+`sanierung.png`: auf *„Wir haben keine Sanierungskosten und auch keine
+Möblierung."* antwortete der Co-Pilot **„nichts gefunden, was hierher
+passt."**
+
+Die Ursache stand im Prompt, und zwar als ausdrückliche Regel:
+
+> Niemals 0 oder einen geschaetzten Wert setzen — eine 0 sieht aus wie eine
+> Angabe und ist keine.
+
+Sie kam aus `v1280c` und zielte auf einen **anderen** Fall: „zwanzig
+Prozent vom Kaufpreis", ohne dass ein Kaufpreis bekannt ist. Dort ist 0
+tatsächlich falsch.
+
+**Bei einer ausdrücklichen Verneinung ist 0 aber genau die Angabe.** „Keine
+Sanierungskosten" heißt nicht „ich weiß es nicht", sondern „der Wert ist
+null". Dieser Unterschied stand nirgends — und er ist der ganze Punkt.
+
+Der Prompt sagt jetzt beides: Verneinungen sind Antworten, „weiß nicht" ist
+eine Lücke. Dazu die Regel, dass **mehrere Aussagen in einem Satz einzeln
+auszuwerten** sind — ein „und" trennt, es verbindet nicht zu einer Aussage.
+
+**Gemessen gegen das laufende Backend:**
+
+| Satz | vorher | jetzt |
+|---|---|---|
+| „Wir haben keine Sanierungskosten und auch keine Möblierung." | nichts | `san_kosten: 0` **und** `moebliert: nein` |
+| „Nein, es muss nicht saniert werden." | nichts | `san_kosten: 0` |
+
+### Zweimal warten ist Geduld, dreimal ist Sturheit (`v1306`)
+
+Dasselbe Bild zeigt darunter zweimal hintereinander nur **„Ich höre weiter
+zu — sag den Rest."** `_fsOffenesEnde` hielt den Satz für angefangen und
+merkte ihn — **ohne Obergrenze**. Jeder Nachschlag verlängerte den Satz und
+endete wieder offen. Wer da hineingerät, kommt allein nicht heraus.
+
+Nach dem zweiten Nachschub wird jetzt ausgewertet, wie der Satz auch endet.
+Im Zweifel versteht das Modell einen Satz zu viel — besser, als den
+Sprecher hängen zu lassen.
+
+### Die Score-Karte muss man sehen (`v1306` → `v1306d`)
+
+`dealscore2.png`: *„der hat jetzt ganz runtergescrollt … man weiß gar nicht
+genau, mache ich jetzt einfach weiter? Man könnte das vielleicht
+überlesen."* Im Bild ist von der Karte nur das Ende zu sehen; die große
+Zahl steht oberhalb des Bildes.
+
+**Drei Anläufe, zwei eigene Fehler:**
+
+1. Scroll auf den Kartenanfang mit 320 ms Verzögerung. Griff nicht: die
+   nächste Frage kommt erst nach dem KI-Aufruf, **Sekunden später**, und
+   ihr `_rfAnsEnde(chat, true)` zog den Blick wieder ans Ende.
+2. Merker `_rf.haltBlase`, solange er gilt erzwingt keine Blase mehr das
+   Ende. Griff immer noch nicht — **gemessen: Karte bei 17 px, Chat beginnt
+   bei 232.**
+3. Der Grund: `b.offsetTop` zählt ab dem nächsten **positionierten**
+   Vorfahren, und der ist hier nicht der Chat. Richtig ist der Abstand
+   zwischen den beiden Rechtecken plus der aktuelle Scrollstand — das ist
+   unabhängig davon, wo `position` gesetzt ist.
+
+**Nachgemessen:** Karte bei 239, Chat bei 232, die Zahl **71** sichtbar.
+Darunter steht „▸ Weiter geht es mit Lage & Zustand".
+
+### Die Frage nach einem Abruf (`v1306`)
+
+`fragen.png`: „Hol den Bodenrichtwert" **hat funktioniert** — 90 €/m² aus
+BORIS. Danach stand aber nur der Wert da; die Frage war nach oben
+weggerutscht. Ein Abruf beantwortet **einen** Teil der Frage; solange andere
+Felder offen sind, gehört sie wieder hin. Steht nichts mehr offen, wird
+nicht wiederholt.
+
+### Die Frage, die gerade gilt (`v1306`)
+
+*„dass man das nochmal visualisiert, was gerade aktuell ist … den Rahmen
+aufscheinen lässt."* Die aktuelle Frage trägt jetzt einen goldenen Rand mit
+**einmaligem** Puls — ein Rahmen, der dauernd pulsiert, ist Unruhe statt
+Hinweis. Genau eine Blase trägt ihn; die vorige verliert ihn.
+
+### „Erweiterte Marktpreisindikation" (`v1306`)
+
+*„so sollte die auch heißen. Du nennst die nur erweiterte."* Die Knöpfe
+hießen `Einfach` und `Erweitert` — Kurzformen aus der Stufenwahl, die neben
+„Lage recherchieren" nichts sagen.
+
+### „nimm die aus den Einstellungen" war ein Abruf-Befehl (`v1306b`)
+
+**Beim Durchlauf herausgefallen:** der Satz landete im Zweig für „nenn die
+Aktion beim Namen" (`/^(hol|nimm|mach|…)/`), und der Co-Pilot fragte, welchen
+Abruf er holen soll. „nimm" ist zweideutig — **wo eine Quelle genannt wird,
+ist es kein Abruf-Befehl.**
+
+**Commits** `0908293`, `a337fbb`, `ecc8fad`, `3a77bd3`. Gold-Audit RC=0.
+Backend neu gebaut (Prompt-Änderung). Auf Staging, **nicht auf Prod**.
+
+### Was aus diesem Auftrag noch offen ist
+
+Marcel hat mehr genannt, als in diesen Zyklus passte. Offen und im Backlog:
+
+- **Den Marktbericht der erweiterten Marktpreisindikation auswerten** und
+  seine Werte (Bevölkerung, Nachfrage, Wertsteigerung, Entwicklung)
+  vorschlagen: „Aus der erweiterten Marktpreisindikation habe ich entnehmen
+  können, dass … sollen wir die so übernehmen?"
+- **Auswahlfelder anklickbar** statt als Fließtext („leicht fallend"), und
+  wenn alle gewählt sind, läuft es weiter. Auch für Qualität und Zustand.
+- **Die Pre-Flight-Kombination**: Marktbewertung + Exposé/Marktbericht +
+  Sprache in einem Lauf, mit Bericht im Objekt und Ausgabe unter der Karte.
+- **ImmoMetrica** genauso, gegen die Testobjekte.
+- **Fehlende Straße** → Ortszentrum vorschlagen.
+
+## Rollout-Journal · 11.09.2026, zehnter Teil — `v1307`
+
+Zwei der fünf offenen Punkte aus Marcels Auftrag.
+
+### Die Stufen sind Knöpfe (`v1307`)
+
+*„Zum Beispiel leicht fallend, dann könnte man es anklicken, und wenn man
+alles angeklickt hat, dann läuft es automatisch weiter. Das könnte man bei
+allen Sachen machen, wo man so Auswahlfelder hat."*
+
+Bis hierher standen die Stufen als Fließtext (`entwicklung.png`):
+„Bevölkerung Stark wachsend · Wachsend · Stabil · Leicht fallend · Stark
+fallend". Wer antworten wollte, musste eine davon **abschreiben oder
+aussprechen** — bei vier Feldern in einer Frage ein Vortrag.
+
+Jetzt ist jede Stufe ein Knopf. **Sprechen bleibt möglich**; das ist kein
+Entweder-oder. Und sind alle Felder der Frage gewählt, geht es von selbst
+weiter — Marcels eigentlicher Punkt.
+
+Zwei Entscheidungen dabei, beide aus dem Verhalten heraus:
+
+- **Knöpfe in alten Blasen sind inaktiv** und sehen auch so aus. Ein Klick
+  weit oben im Verlauf soll keinen Wert ändern, den man längst hinter sich
+  hat.
+- **Was schon steht, ist vorgewählt** — auch wenn es aus dem Exposé oder
+  dem Marktbericht kam. Der Knopf zeigt dann, was gilt.
+
+**Gemessen im Durchlauf:** bei „Zustand & Energieausweis" 24 Knöpfe in
+4 Gruppen; zwei Klicks („Guter Zustand", „A") und der Dialog ging
+selbstständig zur nächsten Frage, mit „Ausgewählt: Zustand, Energieklasse"
+im Verlauf.
+
+### Der Marktbericht wird gelesen (`v1307`)
+
+*„Du kannst den kompletten Marktbericht dann auch auswerten und auch die
+Sachen übernehmen … Aus der erweiterten Marktpreisindikation habe ich
+entnehmen können, dass die und die Werte so und so angenommen sind, sollen
+wir die auch so übernehmen?"*
+
+Bis hierher wurden vier Werte übernommen — Makrolage, Mikrolage,
+Marktmiete, Marktwert. Der **Fließtext** daneben stand nur in einem
+Aufklapper. Darin steht aber genau das, was drei Etappen später gefragt
+wird: wie sich Bevölkerung, Nachfrage und Preise entwickeln. **Wer für die
+erweiterte Stufe bezahlt und dieselbe Frage danach noch einmal beantworten
+muss, hat sie zweimal beantwortet.**
+
+Der Text geht jetzt an dieselbe Auswertung wie eine gesprochene Antwort,
+mit dem Katalog der vier Entwicklungsfelder. Was herauskommt, wird als
+**Vorschlag** gezeigt, nicht still gesetzt: es ist eine Auslegung. Ein
+Bericht sagt „die Einwohnerzahl wächst leicht" — welche der fünf Stufen das
+ist, entscheidet der Leser. Bestätigt wird per Sprache, Text oder Knopf;
+eine Ablehnung führt zur normalen Frage, eine Korrektur gewinnt.
+
+Gefragt wird nur, was **noch offen** ist — was der Nutzer schon gesagt hat,
+schlägt den Bericht.
+
+**Gemessen gegen das laufende Backend**, mit einem Berichtstext im Format
+des echten `report_md`:
+
+| Feld | erkannt |
+|---|---|
+| Bevölkerungsentwicklung | `wachsend` |
+| Nachfrage-Indikatoren | `mittel` |
+| Wertsteigerungs-Erwartung | `mittel` |
+| Entwicklung der Lage | `begrenzt` |
+
+### Ein eigener Messfehler, der fast zu einem falschen Befund geführt hätte
+
+Der erste Lauf derselben Messung gab **Fließtext** zurück:
+`ds2_bevoelkerung: "in den letzten fünf Jahren leicht gewachsen, der Trend
+zeigt weiter nach oben"`. Das sah nach einem echten Fehler aus — ein
+Vorschlag, der Sätze statt Stufen anbietet, wäre unbrauchbar.
+
+Die Ursache lag in **meinem Prüfkatalog**: ich hatte `options` als
+Zeichenketten gebaut, `buildCatalog()` liefert aber
+`{ kind:'select', options:[{v,t}] }`. Ohne die echte Form weiß das Modell
+nicht, dass es aus einer Liste wählen soll.
+
+**Ein Prüfaufbau, der die Wirklichkeit nur nachahmt, misst den Aufbau.**
+Mit dem echten Katalogformat kamen sofort die richtigen Schlüssel.
+
+**Commit** `082deba`. Gold-Audit RC=0. Auf Staging, **nicht auf Prod**.
+
+**Rest aus Marcels Auftrag:** die Pre-Flight-Kombination (Marktbewertung +
+Exposé + Sprache in einem Lauf), ImmoMetrica gegen die Testobjekte, und
+das Ortszentrum bei fehlender Straße. Der Bericht-Vorschlag ist in seiner
+Kernfunktion gemessen, aber noch nicht im vollen Lauf mit einer echten
+erweiterten Marktpreisindikation — das kostet Kontingent und gehört in den
+nächsten Durchgang.
+
+## Rollout-Journal · 11.09.2026, elfter Teil — `v1308` bis `v1308c`
+
+Die letzten drei Punkte aus Marcels Auftrag. Damit ist die Liste
+abgearbeitet.
+
+### Das Ortszentrum, wenn die Straße fehlt (`v1308`)
+
+*„Da fehlt manchmal zum Beispiel die Straße. Und da könnten wir auch den
+Vorschlag machen, ob wir vielleicht einfach das Zentrum dann annehmen. Und
+dann holt sie dir einfach automatisch das Zentrum, wenn du einen Ort
+hast."*
+
+Der Fall kommt aus ImmoMetrica und aus manchen Exposés. Bisher hieß er
+„passt so, weiter" — und damit **kein** Bodenrichtwert, **keine**
+Marktdaten, **keine** Lage: alle drei hängen an einer Adresse.
+
+Jetzt steht ein Angebot daneben, per Klick und per Sprache („nimm die
+Ortsmitte"). Zwei Entscheidungen darin:
+
+- **Die Straße bleibt leer.** Ein erfundener Name stünde im Bankexport und
+  im PDF; „Ortsmitte" wäre eine Behauptung über eine Anschrift, die es so
+  nicht gibt.
+- **Die Herkunft trägt es mit** („Ortszentrum (Näherung)"), und dass die
+  Mikrolage dadurch ungenau wird, steht ausdrücklich dabei — Makrolage und
+  Marktniveau gelten für den Ort und stimmen.
+
+**Gemessen:** „Das Objekt liegt in 32609 Hüllhorst" → Angebot
+„Ortszentrum Hüllhorst nehmen" erscheint, Klick führt zu „Gut — ich rechne
+mit dem Ortszentrum von Hüllhorst (32609)" und weiter zu Frage 2.
+
+### Was aus Exposé und Bericht kam, zum Nachsehen (`v1308`)
+
+*„Dann sagt er: Ich habe schon einige Werte aus dem Marktbericht oder aus
+dem Exposé gelesen, und dann holst du dir nur noch die Bestätigung, ob das
+richtig ist mit der Adresse und ob die Sachen so übernommen werden sollen."*
+
+Bisher stand nur eine Zahl da: „Aus Exposé stehen schon 9 Angaben". **Eine
+Zahl ist keine Grundlage für ein Ja.** Ein Exposé kann die Wohnfläche
+falsch führen, und dann rechnet der ganze Lauf mit einer falschen Zahl
+weiter.
+
+Jetzt stehen die Werte da — die wichtigsten zuerst (Adresse, Fläche,
+Baujahr, Preis, Miete), der Rest im Aufklapper. **Ohne Rückfrage, die den
+Dialog anhält:** wer nichts sagt, hat zugestimmt, und die erste Frage kommt
+ohnehin gleich danach.
+
+### Die Kombination, gemessen (`v1308`)
+
+Marcels Ablauf, mit vorbefülltem Formular und `vorlauf: ['import']`:
+
+```
+„Aus Exposé / Marktbericht stehen schon 8 Angaben — die frage ich nicht
+ noch einmal. Ich führe dich durch — 14 Fragen in 5 Etappen."
+„Das habe ich aus Exposé / Marktbericht übernommen:
+ Straße Hermannstraße · Hausnummer 9 · PLZ 32609 · Ort Hüllhorst ·
+ Wohnfläche 100 · Baujahr 1995 · Kaufpreis 200000 · Kaltmiete 940"
+„Du hast die Marktbewertung mit ausgewählt — welche Stufe?"
+„Was für ein Objekt ist es? ✓Objektart ✓Wohnfläche Zimmer — Frage 1 von 14"
+```
+
+**14 statt 16 Fragen**, zwei Pillen schon abgehakt. Genau das, was Marcel
+beschrieben hat. **ImmoMetrica läuft durch dieselbe Kette** (`order`:
+`import → immometrica → voice → …`) und trägt seine Werte über denselben
+Weg ein — `VORLAUF_NAME` kennt es, die Vorlaufkarte zeigt es.
+
+### Zwei Fehler, die beim Testen herausfielen
+
+**„keine Straße bekannt" war ein Straßenname (`v1308b`/`v1308c`).** Beim
+Prüfen des Ortszentrums gesagt: *„Das Objekt liegt in 32609 Hüllhorst,
+keine Straße bekannt"* — und `str` stand auf `"keine Straße bekannt"`.
+Damit galt die Straße als ausgefüllt, und das Zentrum-Angebot erschien
+nicht.
+
+Ursache war meine eigene Regel aus `v1306`: „Verneinungen sind Angaben".
+Sie stimmt für **Beträge** — dort ist die Verneinung eine 0. Für ein
+**Textfeld** ist sie gar nichts.
+
+Der erste Versuch war eine Prompt-Regel (`v1308b`). **Sie hat nicht
+gegriffen** — gemessen kam der Satz unverändert zurück, das Modell
+überliest sie. Deshalb ein Riegel im Code (`v1308c`): was **als Ganzes**
+eine Verneinung ist, fällt; ein Text, der eine Verneinung **enthält**,
+bleibt.
+
+**Gemessen nach dem Riegel:**
+
+| Eingabe | Ergebnis |
+|---|---|
+| „32609 Hüllhorst, keine Straße bekannt" | `plz`, `ort` — **`str` fällt weg** |
+| „keine Sanierungskosten" | `san_kosten: 0` (Betrag, Verneinung = Angabe) |
+| „Hermannstraße 9 in 32609 Hüllhorst" | alle vier Felder |
+| „Nordstraße in 32609 Hüllhorst, Hausnummer weiß ich nicht" | `str`, `plz`, `ort` — **`hnr` fällt weg** |
+
+**Commits** `c42535e`, `e6613c7`, `aba1138`. Gold-Audit RC=0. Backend neu
+gebaut. Auf Staging, **nicht auf Prod**.
+
+### Die Lehre dieser Runde
+
+Dreimal in Folge hat eine Regel, die aus einem Einzelfall entstand, einen
+Fall getroffen, für den sie nie gedacht war: erst „niemals 0" gegen
+„keine Sanierungskosten", dann „Verneinungen sind Angaben" gegen „keine
+Straße bekannt".
+
+**Eine Regel im Prompt braucht ihre Grenze im selben Satz.** Und wo es auf
+Verlässlichkeit ankommt, gehört sie zusätzlich in den Code — ein Modell
+überliest, ein `if` nicht.
+
+## Rollout-Journal · 11.09.2026, zwölfter Teil — `v1309` bis `v1310d`
+
+Marcels Rückmeldung zum Bild `design/mockups/weiter.png`. Sieben Punkte.
+
+### Feldnamen statt interner Kennungen (`v1309`)
+
+Im Bild zeigten die Pillen `eq_heating`, `eq_windows`, `eq_floor`,
+`eq_guest_wc` — *„das ist etwas kryptisch"*. Die Frage darüber nannte die
+richtigen Namen („Heizung, Verglasung, Bodenbelag, Gäste-WC?"), die Pillen
+nicht.
+
+Ursache: die Feinheiten-Felder stehen nicht in der kuratierten Whitelist,
+also fand der Katalog kein Label — und der Rückfall war die `id`. **Eine
+interne Kennung als Beschriftung ist nie richtig.** Der Name steht im
+Formular, im `<label>` neben dem Feld; `_rfFeldName` liest ihn jetzt, für
+alle Stellen, die einen Feldnamen brauchen.
+
+Gemessen: `eq_heating → Heizung`, `eq_guest_wc → Gäste-WC`,
+`eq_store_room → Keller / Abstellraum`.
+
+### Ein Abruf steht mitten im Satz (`v1309`)
+
+Im Bild steht in der Übersicht bei Grundstück der Wert **„Ja, hol den
+Bodenrichtwert ab."** — der Befehl wurde als Antwort eingetragen.
+
+Drei Prüfungen, und keine passte:
+
+| Prüfung | verlangt | „Ja, hol den Bodenrichtwert ab" |
+|---|---|---|
+| `RF_JA` | Ja am **Satzende** | sechs Wörter zu viel |
+| `/^(hol\|nimm\|…)/` | Verb am **Anfang** | beginnt mit „Ja" |
+| `_istZustimmung` | nur Zustimmungswörter | „hol", „Bodenrichtwert" |
+
+`_istAbrufWunsch` sucht deshalb **Verb und Sache irgendwo** im Satz. Eine
+Frage bleibt eine Frage: „was ist der Bodenrichtwert?" löst nichts aus.
+
+**Gemessen im Durchlauf:** „Ja, hol den Bodenrichtwert ab." →
+**90 €/m², BORIS 2026-01-01, Zone 167** → die Frage kommt mit
+**✓Bodenrichtwert** zurück, und der Knopf ist aus der Leiste verschwunden.
+Genau Marcels Ablauf: *„dann muss natürlich die Anzeige auch weggehen und
+dann sagen: Ja, ich rufe den ab und dann zeigt er den auch an."*
+
+### Navigation per Sprache (`v1309`/`v1309b`)
+
+*„Ich möchte überspringen oder weiter oder ich möchte auch eine Frage
+zurückspringen."* Überspringen gab es, **zurück nicht** — wer sich
+verspricht, musste bis zur Übersicht durchhalten.
+
+Eng gefasst auf kurze Sätze, die aus nichts anderem bestehen: „zurück zur
+Hauptstraße" ist eine Adresse, kein Sprung.
+
+**Der erste Anlauf reichte nicht:** „zurück" meldete „Zurück zu
+Mieteinnahmen." und stellte dann wieder die Finanzierungsfrage — `_rfFrage`
+überspringt Blöcke, deren Felder stehen, und der Mietblock war gefüllt.
+**Wer zurückspringt, will genau das ändern, was dort steht.** Ein Flag für
+eine Frage.
+
+### Die Bankbewertung kennt fast niemand (`v1309`)
+
+*„Die können wir in der Regel nicht angeben."* Stimmt — eine Bankbewertung
+hat man erst nach dem Gespräch mit der Bank. Liegt eine
+Marktpreisindikation vor, steht ihr Marktwert jetzt als Vorschlag daneben,
+mit dem Hinweis, dass Banken vorsichtiger rechnen. „ja" übernimmt ihn mit
+der Herkunft „Marktpreisindikation (als Näherung)".
+
+### Der Abbruch der Kette (`v1310`/`v1310b`)
+
+*„Die Kombination Exposé, Marktbericht und der Sprechlauf funktionieren
+nicht. Er bricht dann ab."*
+
+**Nachgestellt und gefunden.** `openCombinedImport` baut sein Fenster mit
+`id="oabi-ov"` — und der Sprechlauf benutzt **dieselbe ID**. In `open()`
+stand:
+
+```js
+if ($('oabi-ov')) { onDone(); return; }
+```
+
+Gedacht war das gegen zwei übereinanderliegende Sprechläufe. Getroffen hat
+es das **Import-Fenster**: steht dessen Rest noch im DOM, steigt der
+Sprechlauf sofort aus und meldet „fertig", **ohne je gelaufen zu sein**.
+Die Kette geht weiter, als wäre nichts gewesen.
+
+Warum es lange gutging: wer den Sprechlauf einzeln öffnet, hat kein zweites
+Fenster. **Erst die Kette bringt beide zusammen.**
+
+Jetzt hält nur noch ein laufender Sprechlauf (`.vi-mode`) ihn auf; ein
+fremdes Fenster wird abgeräumt. Gemessen: Startkarte erscheint, `onDone`
+feuert nicht mehr vorzeitig.
+
+### Die Vertiefung dort, wo sie Arbeit abnimmt (`v1310c`)
+
+*„Ist mir ganz klar aufgefallen bei Bevölkerungsentwicklungen … dort
+könnte er auch fragen nach einer erweiterten Marktbewertung. Und dort haben
+wir doch die ganzen Felder."*
+
+Das Angebot gab es — aber erst **nach** Etappe 4. Die Entwicklungsfrage
+steht **mitten** in Etappe 4. Wer sie beantwortet, füllt vier Felder von
+Hand, die zwei Fragen später von selbst gekommen wären.
+
+### Wer etwas nennt, das hier nicht ansteht (`v1310d`)
+
+Beim Prüfen herausgefallen: bei offenem Markt-Angebot „Ja, hol den
+Bodenrichtwert ab." gesagt — Antwort: *„Beides kann ich holen:
+Marktpreisindikation oder Erweiterte."* Der Bodenrichtwert stand dort gar
+nicht zur Wahl. Die Antwort ging an der Frage vorbei, und beim nächsten
+Versuch wiederholte sie sich.
+
+Jetzt sagt der Co-Pilot, dass die genannte Sache gerade nicht ansteht —
+und wann sie drankommt.
+
+### Eine eigene Falle: der Cache-Buster, der nie hochging
+
+`v1309` wurde ausgerollt, und der Ersetzungsbefehl suchte `v1308c` — diese
+Version gab es nur im **Backend**, im HTML stand weiter `v1308b`. Ohne die
+Gegenprobe wäre die ganze Version im Browser nicht angekommen, und ich
+hätte an einem Stand gemessen, den es nicht gab.
+
+**Commits** `f58e677`, `31b967a`, `a6db332`, `c055bd4`, `c5c67be`,
+`c1cbf39`, `044001e`. Gold-Audit RC=0. Auf Staging, **nicht auf Prod**.
+
+## v1311–v1313 · Herkunft, Erbbaurecht, Bodenrichtwert — 11.09.2026
+
+### v1311 · Die Herkunft überlebt das Speichern
+
+Marcels Vorgabe: „wäre es super, wenn all das was wir ausgearbeitet haben
+auch nach dem speichern im tab Pilot-Analyse zu verfügung steht und der Co
+Pilot dieses wissen dann mitnimmt."
+
+Die **Werte** standen schon im Objekt — sie kommen aus dem Formular. Was
+fehlte, war die **Herkunft**: dass 90 €/m² amtlich aus BORIS sind, dass die
+Makrolage aus der Marktpreisindikation stammt, dass die Bankbewertung eine
+Näherung ist. Der Sprechlauf kannte das je Feld (`_rf.quelle`), gab es aber
+nur an die Übernahme-Tabelle weiter — mit dem Schließen war es weg.
+
+Ein verstecktes Feld `_dp_herkunft`, JSON darin, über `FIELDS` gespeichert,
+über `ui.js` in die runAI-Nutzlast, in `openaiService.js` als Prompt-Sektion
+„HERKUNFT DER ANGABEN". Kein zweiter Speicherweg, keine zweite Tabelle.
+
+Dazu: im QuickCheck ist der Schalter „auch die erweiterten Felder abfragen"
+ausgeblendet. Marcels Entscheidung: „quickcheck und da der sprechlauf sollte
+sich auf quickcheck begrenzen."
+
+**Commit** `f849e8b`.
+
+### v1312 · Erbbaurecht — es gab schlicht nichts
+
+Marcels Frage: „was ist eigentlich mit erbpacht grundstücken? hast du das in
+der Marktbewertung drin? gibt es abschläge dafür und wenn ja wieviel."
+
+**Gemessen, vorher:**
+
+| Ebene | Ergebnis |
+|---|---|
+| Feld im Formular | 0 |
+| `calc.js` | 0 |
+| an Sprengnetter/PriceHubble gesendet | 0 |
+| im Sprechlauf gefragt | 0 |
+| ImmoMetrica liefert es | ja (`leasehold` → `target:'note'`) |
+
+**Gegen die echte GeoMap-API getestet** (Guthaben 258,00 → 257,90 €, also
+10 Cent):
+
+```
+ohne Zusatzfilter        200 OK, 757 Treffer
+preservationOrder        200 OK,   8 Treffer
+leasehold                400 Unrecognized field 'leasehold'
+heritableBuildingRight   400 Unrecognized field
+groundLease              400 Unrecognized field
+erbbaurecht              400 Unrecognized field
+erbpacht                 400 Unrecognized field
+```
+
+Der Detail-Abruf kennt keins der Wörter. **Kein Bewertungspartner nimmt den
+Parameter entgegen** — jede Marktbewertung ist ein Volleigentumswert. Der
+Abschlag muss aus eigener Kraft kommen.
+
+**Der Standard, nach dem gerechnet wird:** § 50 ImmoWertV 2021. Die
+steuerliche Schwester § 193 BewG rechnet dieselbe Mechanik mit festen
+Zinssätzen aus Anlage 21/26.
+
+```
+Erbbaurechtswert = Wert des fiktiven Volleigentums
+                 − Bodenwert des fiktiv unbelasteten Grundstücks
+                 + Barwert der Erbbauzins-Differenz über die Restlaufzeit
+                 − Barwert des bei Zeitablauf NICHT entschädigten
+                   Gebäudewertanteils
+```
+
+Voreinstellungen, alle überschreibbar: angemessener Erbbauzins **3,5 %**
+(marktüblich 3–5 %, Schnitt 2023 bei 3–4 %; kommunale und kirchliche
+Ausgeber darunter, Berlin 2,25 %). Kapitalisierung nach § 193 Abs. 4 S. 3
+BewG: **2,5 %** EFH/ZFH · **3,5 %** MFH/ETW · **4,5 %** gemischt ·
+**5,0 %** über 50 % gewerblich · **6,0 %** Geschäftsgrundstück.
+Entschädigung bei Zeitablauf **66,67 %** — das gesetzliche Minimum für
+Wohnraum nach § 27 ErbbauRG, von dem der Grundstückseigentümer nicht nach
+unten abweichen darf.
+
+**Die Marktampel daneben** ist kein Rechenweg, sondern eine
+Plausibilitätsprüfung gegen beobachtete Kaufpreisabschläge:
+
+| Restlaufzeit | beobachteter Abschlag |
+|---|---|
+| ab 70 Jahre | 5–15 % |
+| 40–70 Jahre | 15–30 % |
+| 20–40 Jahre | 30–50 % |
+| unter 20 Jahre | ab 50 % |
+
+Banken setzen bei der Beleihung üblicherweise 15–30 % an. Liegt die Rechnung
+mehr als 5 Punkte außerhalb, sagt die Karte das — und nennt den Grund: ein
+sehr günstiger oder sehr teurer Vertragszins wirkt genau so.
+
+**Kein Verfahren rechnet halb.** Fehlt Volleigentumswert, Bodenwert oder
+Restlaufzeit, kommt kein Wert — auch kein vorsichtiger. Stattdessen steht
+da, was fehlt und wo es herkommt.
+
+**Commit** `0405c8d`. Neue Dateien `erbbau-engine.js` (rein) und
+`erbbau-ui.js` (DOM).
+
+### v1313 · Der Abschlag greift überall
+
+Marcel: „bitte arbeite das in allen bewertungen und auch ganz wichtig mit
+unter marktbewertung mit ein."
+
+**Der Abzug sitzt an der Wurzel.** `svw` in `calc.js` wird gekürzt, bevor
+Wertpuffer, `wert_basis`, Exit-Preis und über `K.wp_kpi` der Deal Score
+daraus rechnen. Weiter unten abgezogen wären oben schon drei Zahlen zu hoch
+gewesen, und der Score hätte es nie gemerkt. Die Bankbewertung fällt genauso.
+
+**Gegen doppelte Kürzung** gibt es den Schalter „Verkehrswert /
+Bankbewertung ist bereits der Erbbaurechtswert" — wer ein echtes
+Erbbaurechts-Gutachten eingetragen hat, würde sonst zweimal gekürzt.
+
+**Der Erbbauzins** hängt NACH dem if/else an `nul` und `bwk`, damit er in
+allen drei BWK-Modi greift (Detail, % der NKM, % vom Kaufpreis) — in nur
+einem Zweig wäre er zwei Drittel der Zeit still verschwunden. Nicht
+umlagefähig (§ 2 BetrKV kennt ihn nicht), steuerlich abziehbar — läuft damit
+durch Cashflow, DSCR, IRR und Steuer.
+
+**Im Sprechlauf** fragt die Grundstücksfrage mit; ein Folgeblock über das
+neue Flag `nurWenn: 'erbpacht'` holt Erbbauzins und Restlaufzeit nach — aber
+nur, wenn Erbbaurecht bejaht wurde. `_rfFehlt` liest dafür **beides**: das
+Häkchen im Formular und was im laufenden Gespräch gesagt wurde; ins Formular
+kommt es erst mit der Übernahme am Ende.
+
+**Der Bodenrichtwert wird nicht mehr gefragt, wenn er abrufbar ist.**
+Marcels Vorgabe: „den brauchst du nicht abfragen wenn man den abrufen kann.
+nur wenn man ihn nicht abruft." `_rfZuschnitt()` nimmt `brw` aus Frage und
+Lückenprüfung, sobald `_rfBrwMoeglich()` wahr ist — **zugeschnitten, nicht
+gestrichen**: Fläche und Miteigentumsanteil kann niemand abrufen. Der
+Zuschnitt läuft VOR der Lückenprüfung; danach hätte `_rfFehlt` `brw` schon
+als Lücke gezählt.
+
+**Gemessen auf Staging:**
+
+```
+ohne Erbpacht           Wertpuffer +20.000 €, Abzugszeile aus
+mit Erbpacht, Zins 1200 Wertpuffer weg, Abzug -38.890 € · 12,2 %, nul 1.200 €
+Schalter „schon Erb"    Wertpuffer wieder +20.000 €, Abzugszeile aus
+Sprechlauf ohne Erbpacht        Erbbau-Block erscheint NICHT
+Sprechlauf mit Häkchen          Erbbau-Block erscheint
+Sprechlauf nur gesagt           Erbbau-Block erscheint
+Grundstücksfrage ohne PLZ       „… Bodenrichtwert, Fläche, Miteigentumsanteil?"
+Grundstücksfrage mit PLZ 32120  „… Den Bodenrichtwert hole ich gleich amtlich."
+                                ids: gsfl+mea (brw ist raus)
+```
+
+Der Rechenkern stimmt Ziffer für Ziffer mit der Handrechnung überein:
+BWF 23,4556 · AZF 0,1791 · Zinsvorteil 21.110 € · Heimfall 2.387 €.
+
+**Commits** `195caa9`, `d198646`, `47dc7f9`. Gold-Audit RC=0 (Basislinie
+468/56). Auf Staging, **nicht auf Prod**.
+
+### Drei eigene Fallen in diesem Paket
+
+**Die verschluckte Zeile.** Ein `perl -0pi -e "s/…/…/"` mit mehrzeiligem
+Suchmuster hat `sanKatalog().forEach(...)` mitkonsumiert und nicht
+zurückgeschrieben. Die acht Sanierungs-Gewerke wären damit aus dem
+Sprechlauf-Katalog gefallen — **ohne dass irgendetwas rot geworden wäre**:
+`node --check` prüft Syntax, kein Vorhandensein. Gefunden nur, weil ich
+danach `grep -c "sanKatalog()"` gefahren bin. **Nach jeder mehrzeiligen
+Ersetzung den Anker gegenzählen, nicht nur die neue Zeile suchen.**
+
+**Der Prüfer, der nie rot wird.** `node --check /dev/stdin < datei` gibt
+einen `fs`-Fehler aus und trotzdem Rückgabewert 0. Vier Dateien meldeten
+„OK", geprüft war keine. Erst `docker cp` in den Container und `node --check`
+auf eine echte Datei misst wirklich. Gegenprobe mit einer absichtlich
+kaputten Datei gehört dazu.
+
+**calc() verschluckt den zweiten Aufruf im selben Tick.** Vier Messungen
+hintereinander zeigten eingefrorene Werte — an- und ausgeschaltet, immer
+dieselbe Zahl. Ich habe eine ganze Diagnose-Runde in einen Produktfehler
+investiert, der keiner war: die Aufrufe lagen alle im selben JS-Tick. Mit
+350 ms Abstand stimmte auf Anhieb alles. **Wer eine ereignisgetriebene
+Rechenkette synchron hintereinander anstößt, misst seinen eigenen Takt.**
+
+## v1314–v1320b · GeoMap, die Kette, der Kontext — 11.09.2026 (Abend)
+
+### v1314 · MFH wurde am falschen Markt gemessen
+
+Aus Marcels GeoMap-Papier, Punkte 1 und 2. Beide gegen die echte API
+nachgemessen (Bielefeld, 5 km, 11.09.2026):
+
+| | heute | richtig | |
+|---|---|---|---|
+| MFH Kauf €/m² | 2.553,47 (`Haus`, n=6.684) | 2.093,15 (`Mehrfamilienhaus`, n=1.541) | **+22,0 %** |
+| MFH Miete €/m² | 9,49 (`Haus`, n=1.017) | 8,82 (`Wohnung`, n=55.056) | **+7,6 %** |
+| EFH Kauf €/m² | 2.553,47 | 2.729,15 (`EinZweiFamilienhaus`) | −6,4 % |
+
+Beim MFH wirkten beide Fehler in dieselbe Richtung, und im
+`MarketInsightsService` gingen **dieselben** Klassen an die Kauf- UND die
+Mietreihe — beide zu hoch, beides in derselben Wertentwicklung. Der
+Rohertrag im Ertragswert stand auf einer Miete, gemessen an vermieteten
+HÄUSERN; ein MFH vermietet aber Wohnungen. Dazu die Stichprobe: 1.017
+gegen 55.056.
+
+`geomapClasses()` stand wortgleich in zwei Dateien. Jetzt eine Quelle:
+`lib/marktsegment.js`, und sie kennt den Unterschied zwischen Kauf und
+Miete.
+
+**Welche `objectTypes` es gibt, nennt die API nicht** — ein falscher Wert
+kommt als `400 Unknown objectType` zurück. Aus 14 echten Haus-Angeboten
+gesammelt: `EinZweiFamilienhaus` (9), `Mehrfamilienhaus` (3), `Sonstige`
+(2). Reihenhaus, Doppelhaushälfte, Villa, Bungalow — alle 400.
+
+**Zeitfenster:** TAGEONLINE und die Rendite im Standort-Finder liefen ohne
+`onlineDateRange`, also über alle Angebote seit 2015. „Wie lange steht
+hier etwas im Schaufenster" wurde zur Antwort auf „wie lange stand hier je
+etwas". Beide jetzt auf 12 Monate.
+
+**`market=seed` ist wirklich nur ein Etikett** — gemessen: `MB_DEMO=0`,
+`GEOMAP_TOKEN=gesetzt`. GeoMap läuft.
+
+Messkosten: 257,79 → 257,72 €.
+
+### v1315 · Der Sprechlauf bekommt den Kontext, den er braucht
+
+Marcels Befund: *„das ist kein schlauer Agent … du könntest ihm ja den
+kontext mitgeben, der ist ja da."*
+
+**Gemessen, warum:** an die Auswertung gingen `KONTEXT_IDS` — **sechzehn
+feste Feld-Ids**. Ohne Hausnummer, ohne Objektart, ohne Zinsbindung, ohne
+Lage, und ohne die Information, woher ein Wert kam. Ein Modell mit so
+einem Zettel *kann* „die Adresse passt" nicht auflösen.
+
+Jetzt geht alles mit, was einen Wert hat, mit Herkunft
+(`[amtlich aus BORIS]`, `[steht im Formular]`), sortiert nach Nähe zur
+laufenden Frage. Dazu `_rfBestaetigungUebertragen()` **vor** dem Modell:
+sie bildet einen Begriff auf seine Felder ab (Adresse → str/hnr/plz/ort,
+Finanzierung → ek/d1z/d1t/d1_bindj, dazu sechs weitere Gruppen) und
+übernimmt, was schon dasteht.
+
+**Bewusst im Code, nicht im Prompt:** eine Bestätigung darf nichts
+erfinden. Ein Modell, das „die Adresse stimmt" liest, könnte eine
+plausible Hausnummer ergänzen. Diese Funktion kann das nicht. Steht eine
+Zahl im Satz, ist es keine Bestätigung, sondern eine Korrektur.
+
+**v1315c:** Die Objektart hatte gar keine leere Option — ETW war an jedem
+leeren Objekt vorausgewählt, und der Sprechlauf fragte nicht danach, weil
+`fieldHasValue('objart')` wahr war. Seit v1314 wählt die Objektart auch
+das Marktsegment; der Fehler war damit gerade größer geworden.
+
+### v1316 · Die erweiterte Marktpreisindikation füllt aus, was sie weiss
+
+Marcels Frage: *„warum füllt er das nicht automatisch aus? fehlen ihm
+werte?"* — **Es fehlte kein einziger Wert.** Destatis liefert
+`bevoelkerung_trend` (Kreis Herford +0,152 %/Jahr, live geprüft), GeoMap
+die Angebotsdauer. Beides stand im Bericht und blieb dort: `mapCard()` las
+`micro.score`, `macro.score`, `price_trend_pct` — mehr nicht.
+
+Die Trennung, die jetzt gilt:
+
+- **automatisch** — Makrolage, Mikrolage, Bevölkerung, Nachfrage,
+  Wertsteigerung. Einstufungen ohne Spannen-Wahl.
+- **per Knopf** — Verkehrswert und Marktmiete. Daran hängt die Wahl
+  niedrig/mittel/hoch, und die ist eine Entscheidung des Nutzers.
+
+**Leere Felder nur.** Gemessen: 5 gesetzt, zweiter Lauf 0, eine von Hand
+gewählte Makrolage bleibt stehen.
+
+`ds2_entwicklung` bleibt bewusst aussen vor — das Feld fragt nach
+Entwicklungsmöglichkeiten AM OBJEKT (Ausbau, Aufstockung, Teilung), der
+Bericht liefert eine Markt-Einschätzung. Nicht dasselbe, es sieht nur so
+aus.
+
+### v1317 · Die Funktion, die es nie gab
+
+Marcels grösstes Thema, seit Wochen und in drei Sitzungen wiederholt:
+*„er liest die Daten aus dem Exposé und dem Marktbericht, geht aber diesen
+Sprechlauf nicht."*
+
+Gemessen im Browser:
+
+```
+Uncaught ReferenceError: _fireOabiDone is not defined
+```
+
+`_fireOabiDone()` wurde an zwei Stellen gerufen und war **nirgendwo
+definiert**. Der Import meldete der Kette nie „fertig";
+`await new Promise(res => openCombinedImport(res))` wurde nie aufgelöst.
+Die Kette blieb beim **ersten** Schritt stehen.
+
+Unsichtbar blieb es, weil das Overlay VOR dem Aufruf entfernt wird: der
+Import schliesst sauber, die Werte stehen im Formular. Dass danach nichts
+mehr passiert, sieht aus wie „fertig".
+
+Nachgewiesen, Kette von Hand durchgespielt — vorher:
+
+```
+Import-Fenster da: true
+nach Schliessen weg: true
+IMPORT onDone: NIE GERUFEN
+```
+
+nachher, volle Kette Exposé → Sprechlauf:
+
+```
+Fortschritt: "Sprachaufzeichnung …"
+Overlay: oabi-ov vi-mode oabi-boarding
+Startkarte: da
+```
+
+Der v1310-Fix (zwei Fenster, eine ID) war richtig und hat einen **zweiten**
+Abbruch behoben, der darunter lag. Dieser hier war der erste.
+
+### v1318 · „Erweiterte Marktpreisindikation" traf beide — und damit keins
+
+Die Sprachauswahl verlangte **genau einen** Treffer. Wer „erweiterte
+Marktpreisindikation" sagt, trifft `markt` (wegen „markt") UND `markt2`
+(wegen „erweitert"). Zwei Treffer sind damit so gut wie keiner; der
+Co-Pilot fragte zurück, welches denn — bei dem Satz, der die Antwort schon
+enthielt.
+
+Rangfolge statt Menge (`RF_ABRUF_SPEZ`), und nur geprüft wird, was gerade
+zur Wahl steht. Die Zuordnung ist jetzt eine reine Funktion
+(`_abrufAusText`) — vorher stand sie als Filter zwischen DOM-Ausgaben und
+war nur messbar, indem man einen ganzen Sprechlauf startet.
+
+Gemessen, 10 von 10 Fällen richtig, inklusive der Gegenproben
+(„Bodenrichtwert" bei Markt-Angeboten → null, „ja" → null).
+
+### v1319 · Der Co-Pilot darf auch Allgemeines beantworten
+
+Marcels Wunsch: *„Wie ist denn die Postleitzahl von Herford?"*
+
+Der Weg existiert seit v1281. Was ihn blockierte, war Regel 3 im Prompt:
+„Was nicht im bekannten Stand steht, ERFINDE NICHT." Die Regel ist richtig
+und bleibt — nur trifft sie auch die Postleitzahl von Herford, und darauf
+ist „das steht nicht im Stand" keine Antwort, sondern eine Ausrede.
+
+**Die Grenze:** gehört die Angabe zu DIESEM Objekt oder ist sie allgemein
+nachschlagbar? Die Wohnfläche dieser Wohnung kennt nur der Nutzer. Die
+Postleitzahl von Herford kennt jeder.
+
+Gemessen, beide Seiten:
+
+> „Herford hat mehrere Postleitzahlen, nämlich 32049, 32051, 32052 und
+> 32053."
+
+> „Die Wohnfläche ist mir in den bekannten Objektdaten noch nicht
+> angegeben."
+
+### v1320 / v1320b · Das Erbbaurecht im Marktbericht
+
+Marcels Frage: *„funktioniert die erbpacht jetzt in jedem marktbericht
+unter marktbewertung?"* — bis dahin nicht.
+
+Drei Stellen, jede einzelne nötig: der `DealPilotObjectMapper` gibt
+`leasehold`, `leasehold_rent_year`, `leasehold_years_left`, `plot_area`
+und `mea_pct` weiter · `ref` im Orchestrator nimmt sie auf (ohne das wäre
+der ganze Block eine Attrappe) · der Abschlag wird nach § 50 ImmoWertV
+gerechnet und steht **neben** dem Marktwert, nicht darin.
+
+**Zweite Fassung derselben Formel — Absicht.** `lib/erbbaurecht.js` (ESM,
+Node) trägt dieselbe Rechnung wie `frontend/js/erbbau-engine.js` (ES5,
+Browser). Es gibt keinen Build-Schritt, der sie zusammenführen könnte.
+`pruefwert()` hält sie zusammen:
+
+```
+pruefwert im Betrieb = 41277   (Frontend: Abschlag 41.277 €)
+```
+
+**v1320b:** Beim Rollout fiel im Containerlog auf:
+
+```
+[register] ... erbbauzinssatz=15 ...
+```
+
+Das Register führt seit Langem **15 örtliche Erbbauzinssätze** —
+Gemeindemittel aus ausgewerteten Kauffällen, mit eigenem Modellvermerk.
+Sie lagen da und wurden nie gelesen. § 50 Abs. 3 ImmoWertV verlangt genau
+den örtlich üblichen Satz; 3,5 % bundesweit ist nur der Notnagel.
+
+Die Wirkung ist erheblich:
+
+```
+Vorgabe 3,5 %   Abschlag 41.277 €  · 13,8 %
+amtlich 2,7 %   Abschlag 52.536 €  · 17,5 %
+amtlich 5,1 %   Abschlag 18.760 €  ·  6,3 %
+```
+
+Faktor 2,8 zwischen den Extremen. Der Satz wird **mit seinem Hinweis**
+übernommen — er trägt ausdrücklich „Kein vom Gutachterausschuss
+abgeleiteter Modellparameter, wer damit ein Erbbaurecht bewertet, muss es
+begründen."
+
+**Commits** `0c4d8c8`, `492d9a8`, `025d9af`, `7365a32`, `61cd39f`,
+`210efda`, `73f26a4`, `c3fc331`, `eff9f75`, `85e4832`, `27b5f5c`.
+Gold-Audit RC=0. Auf Staging, **nicht auf Prod**.
+
+## v1321–v1322 · Marktkontext und drei Abnahmen — 11.09.2026 (Nacht)
+
+### Die Abnahmen, die offen waren
+
+Marcel gab die kostenpflichtigen Abrufe frei. Alle drei sind gefahren.
+
+**1 · Marktbericht mit echtem Erbbau-Objekt.** Hermannstr. 9, Hüllhorst,
+100 m², Bj 1968, Grundstück 950 m², MEA 50 %, BRW 90 €/m², Erbbauzins
+1.200 €/Jahr, Restlaufzeit 50 Jahre:
+
+```
+Marktwert (Volleigentum):  175.000 €
+Abschlag:                   35.801 €  ·  20,5 %
+Erbbaurechtswert:          139.199 €
+Bodenwert:                  42.750 €   (950 × 90 × 50 % MEA)
+angemessener Zins:             3,5 %   (Vorgabe — für Hüllhorst kein amtlicher)
+Bevölkerung:               +0,298 %/J   Tage online: 57
+im Verlauf: "Erbbaurecht: Abschlag 35.801 EUR (20.5 %)"
+```
+
+**2 · Erbbau-Hinweis in der Marktbewertung — und dabei ein Fehler.**
+v1313b hat ihn in `applyAvm()` gebaut. Das ist der Weg von Sprengnetter
+und PriceHubble, und genau die bieten wir nicht an. Der Weg, den Marcel
+benutzt, ist die DealPilot-Karte. Dazu kam: `_oabApplyExternal` nimmt
+einen NAMEN und holt `_avm[name]` — ein durchgereichtes Ergebnisobjekt
+landet nirgends. Der Hinweis war nicht nur am falschen Ort, er war auf
+dem genutzten Weg überhaupt nicht erreichbar.
+
+**Aufgefallen nur, weil die Abnahme wirklich gefahren wurde** statt sie
+als „gebaut" abzuhaken. Behoben in v1322, danach gemessen:
+
+```
+ohne Erbpacht        (leer)
+mit Erbpacht         "Der Marktwert oben ist Volleigentum … 38.890 € · 12,2 %"
+ohne Restlaufzeit    "Für den Abschlag fehlen noch Angaben …"
+```
+
+**3 · Bestätigungs-Übertragung im laufenden Sprechlauf.** Genau Marcels
+Beispiel:
+
+```
+"die Adresse passt so"                              -> 4 Felder übernommen
+"die Adresse passt, aber die Hausnummer ist zwölf"  -> false (Einschränkung)
+"ja 450"                                            -> false (Zahl = Korrektur)
+```
+
+### v1321 · Was GeoMap sonst noch hergibt
+
+Marcels Frage zu seinem eigenen Papier: *„was kann das dann mehr? bringt
+uns das was und wo könnten wir das integrieren?"*
+
+Alles gegen die echte API gemessen, Bielefeld 5 km:
+
+| | Median €/m² | n | |
+|---|---|---|---|
+| Basis, Wohnungen Kauf | 2.948,68 | 1.120 | |
+| vermietet (`leased:true`) | 2.769,33 | 140 | **−7,1 %** |
+| frei (`leased:false`) | 2.980,96 | 978 | |
+| Energie A/B/C | 3.227,73 | 77 | |
+| Energie D/E | 2.594,20 | 159 | |
+| Energie F/G/H | 2.549,35 | 38 | **−21,0 %** |
+| Angebotsrendite (`RENDITE`) | 4,26 % | 1.116 | |
+| Erbbaurecht (`searchString`) | 2.012,20 | 9 | **−31,8 %** |
+
+**Das wichtigste Ergebnis: KPI-Abrufe kosten nichts.** Guthaben vor und
+nach acht Abfragen: 257,115 → 257,115. Nur Detail-Abrufe
+(`getDetailsById`) ziehen Geld, rund einen Cent je Angebot. Der ganze
+Block ist gratis — er kostet nur Zeit, und die läuft parallel.
+
+**Was NICHT geht, damit es niemand zweimal versucht** (auch gemessen):
+
+```
+objectClasses ['StellplatzGarage']   n=0 in Bielefeld
+priceChanged / hasPriceChange        400 Unrecognized field
+priceChangeCountRange                400 Unrecognized field
+priceChangeDirection allein          filtert NICHT (n=1.120 = alle)
+energyRatings 'A_PLUS' / 'A+'        400 Unknown energyRating
+```
+
+Der **Verhandlungsspielraum** aus dem Papier ist per KPI also **nicht** zu
+holen — er ginge nur über Detail-Abrufe, und die kosten. Gültige
+Energieklassen sind A bis H, ohne A+.
+
+Im echten Bericht gemessen (Bielefeld, Detmolder Str.):
+
+```
+Basis 2.925,64 €/m² (n=1.130)
+vermietet 2.750 (n=135)  frei 2.957,56 (n=994)   ->  −7,0 %
+Energie gut 3.161,57 | mittel 2.507,34 | schlecht 2.466,58  -> −22,0 %
+Angebotsrendite 4,26 % (q25 3,43 – q75 5,00), n=1.129
+Erbbau am Markt 2.043 €/m², Anteil 4,0 %, Abstand −30,2 %
+```
+
+**Der Erbbau-Marktabstand ist die schönste Bestätigung:** −30,2 % aus
+echten Angeboten gegen 20,5 % aus meiner Rechnung am Hüllhorster Objekt.
+Dieselbe Größenordnung, zwei völlig verschiedene Wege. Die Zahl ist
+allerdings ein **Signal, kein Beleg** — `searchString` ist Volltext ohne
+Ausschlusslogik und trifft auch ein Angebot, das „kein Erbbaurecht"
+schreibt. Steht so auch im Payload.
+
+`MIN_N = 15`: unter fünfzehn Treffern ist der Median Zufall, und eine Zahl
+ohne Grundlage ist schlimmer als keine. Dann fehlt der Block.
+
+**Commits** `bee4ed7`, `abc738d`. Auf Staging, **nicht auf Prod**.
+
+## v1323 · Gewerbe, und der Marktkontext erreicht die Bewertung — 12.09.2026
+
+Marcels Vorgabe: *„ja alles einbauen und auch das gewerbe. wichtig wäre
+auch dass dem co pilot und der analyse diese daten zur bewertung zur
+verfügung stehen. auch im marktbericht integrieren und danach rollout."*
+
+### Gewerbe war gar nicht abfragbar
+
+Der Connector setzte `objectCategories` **hart** auf `['Wohnen']`. Gemessen
+Bielefeld, 5 km, 12 Monate:
+
+```
+Gewerbe Kauf gesamt      1.499,98 €/m²   n=153
+Gewerbe Miete gesamt        10,00 €/m²   n=856
+Einzelhandel Kauf        1.500,21        n= 22
+Gastronomie Kauf         1.395,00        n= 15
+```
+
+**Welche Klassen es gibt, sagt die API nicht** — ein falscher Wert kommt
+als `400 Unknown objectClass`. Aus 16 echten Gewerbe-Angeboten gesammelt:
+
+```
+BüroPraxis (MIT Umlaut)   6
+Sonstige                  5
+HalleLagerProduktion      3
+Einzelhandel              1
+Gastronomie               1
+```
+
+`Buero`, `BueroPraxis` ohne Umlaut, `Halle`, `Lager` → alle 400. **Der
+Umlaut ist Pflicht.**
+
+Der Gewerbe-Zweig fragt bewusst **anderes** als der Wohn-Zweig: „vermietet
+oder frei" ist im Gewerbe der Regelfall gegen den Ausnahmefall, und der
+Brown Discount ist eine Wohnungs-Debatte. Verglichen wird die eigene Klasse
+gegen den gesamten Gewerbemarkt, dazu die Miete — Gewerbe wird über den
+Ertrag gekauft. Gemessen am Büroobjekt:
+
+```
+Kauf : BüroPraxis 1.975,81 €/m² (n=26) gegen Gewerbemarkt 1.431,30 (n=179)  → +38,0 %
+Miete: BüroPraxis     10,00 €/m² (n=456)
+```
+
+**v1323b:** Der erste Lauf gab „Markt null" zurück — ohne `objectClasses`
+setzt der Connector den Default `['Wohnung','Haus']`, und der passt bei
+`objectCategories: ['Gewerbe']` zu nichts. Der Wohn-Default greift jetzt
+nur noch, wenn die Kategorie auch Wohnen ist.
+
+### Der Kontext erreicht jetzt drei Orte
+
+**1 · Pilot-Analyse.** Gemessen, warum sie ihn nicht hatte:
+`dealpilot_marktbewertung` wird vom Frontend **seit v746** geschickt — ein
+`grep` über das ganze Backend findet **keinen Leser**. Dieselbe Falle wie
+beim Orchestrator. Jetzt baut `openaiService.js` zwei Prompt-Sektionen,
+mit der ausdrücklichen Ansage, dass Aggregate echter Angebote schwerer
+wiegen als die Selbsteinschätzung des Investors.
+
+**2 · Co-Pilot im Sprechlauf.** `_rfKontextKlar` liest `_mb_state` und gibt
+vermietet/frei, Energieklassen-Spreizung, Angebotsrendite und den
+Erbbau-Abschlag mit, jeweils mit `[echte Angebote im Umkreis]`.
+
+**3 · Marktbericht.** D3 und D4 im Stub-Text — und für den KI-Weg eine
+eigene Anweisung je Kapitelgruppe.
+
+### v1323c · Die Anweisung war zu höflich
+
+Erster Versuch: *„Nenne mindestens einen dieser Werte."* Zwei Läufe an
+derselben Adresse, einmal mit Marktkontext-Satz, einmal ohne. Die
+Erbbau-Anweisung zwei Zeilen darunter sagt **„DAS MUSS IM TEXT VORKOMMEN"**
+und wurde in jedem Lauf befolgt. Nach der Verschärfung auf dieselbe
+Tonlage, beide Läufe:
+
+```
+Lauf 1: "2.750 Euro je Quadratmeter bei 135 vermieteten Angeboten"
+        "Die Bruttorendite von 3,7 Prozent … korreliert mit dem
+         Marktkontext einer Angebotsrendite von 4,25 Prozent"
+Lauf 2: "2.750 Euro je Quadratmeter bei 135 Angeboten für vermietete
+         Wohnungen im weiteren 5-km-Umkreis"
+```
+
+Das Erbbaurecht steht ebenfalls belegbar im Text: *„ein Abschlag von etwa
+35.801 Euro oder 20,5 Prozent … Erbbaurechtswert auf rund 139.199"*.
+
+### Der Prod-Rollout hängt an einer Freigabe
+
+Vorbereitet und geprüft:
+
+```
+Gold-Audit            RC=0, genau auf der Basislinie (468/56)
+Abstand zu Prod       164 Commits, 48 Dateien
+Migrationen           keine
+SQL-Änderungen        keine
+Sicherung Haupt-DB    /root/backups/haupt-20260912-0739.sql.gz   11 MB
+Sicherung MB-DB       /root/backups/mb-20260912-0739.sql.gz     685 KB
+```
+
+Beide Sicherungen angesehen, nicht nur gelistet — echte
+`PostgreSQL database dump`-Köpfe. Der Merge `staging → main` wird von der
+Schutzsperre für Produktion abgelehnt; er braucht Marcels ausdrückliche
+Freigabe oder eine Bash-Regel in den Einstellungen.
+
+**Commits** `963f1e3`, `aa61c52`, `3052c3d`. Auf Staging, **noch nicht auf
+Prod**.
 
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
