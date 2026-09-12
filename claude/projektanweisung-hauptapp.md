@@ -13385,6 +13385,88 @@ jeder trägt seine Herkunft.
 **Commits** `e7fa674`, `c279467`, `ab9e195`, `c75f577`, `80d782d`,
 `dd5c20a`, `b26faf3`, `884bd78`. Auf Staging.
 
+## v1329–v1330 · Structured Outputs, neues Modell, und die Kette — 12.09.2026
+
+### Die Modell-Recherche und was daraus folgte
+
+Marcels Auftrag: *„ja alles umsetzen."* Vier Punkte aus der Recherche.
+
+**Der wichtigste Befund kam aus dem eigenen Code**, nicht von den
+Anbietern: Structured Outputs wurden **nirgends** genutzt. Das JSON wurde
+als Freitext angefordert und danach von Hand entzäunt — dieselbe Stelle
+**viermal** in `voiceExtractService.js`. Sie ist der Beweis, dass das
+Modell regelmässig etwas anderes liefert als reines JSON; sonst hätte sie
+nie jemand geschrieben. Und sie fängt nur den Fall ab, den jemand gesehen
+hat: einen Markdown-Zaun. Eine Vorrede oder ein abgeschnittenes Objekt
+lässt sie durch, und dann wirft `JSON.parse`.
+
+Jetzt baut `schemaAusKatalog()` aus dem Feldkatalog ein striktes Schema.
+Der grösste Einzelgewinn ist der **Enum für Auswahlfelder**: gemessen
+kommt jetzt `eq_heating: "FUSSBODENHEIZUNG"` zurück — der Formularwert,
+nicht der Anzeigetext. Genau daran ist v1307 gescheitert.
+
+**Modelle**, alle vorher gegen `/v1/models` geprüft: `gpt-5.6-luna` statt
+`gpt-4o-mini` (Quickmatch), `gpt-5.4-mini` (Verify) und `gpt-4.1-mini`
+(Co-Pilot). **0,20 / 1,20 statt 0,75 / 4,50** je Mio Token, dazu 1 Mio
+Kontext. `PREISE_FEST` ergänzt — ohne den Eintrag zählt das Kerosin-Konto
+falsch und der Abruf sieht gratis aus.
+
+**Caching im Marktbericht:** der gemeinsame Teil stand schon vorn, die
+Bedingung war erfüllt. Was fehlte: alle drei Kapitelgruppen starteten im
+selben Augenblick und sahen **alle** einen kalten Cache. Ein Versatz von
+anderthalb Sekunden reicht.
+
+### v1329b · Ein Schema, das am eigenen Testaufbau gebaut wurde
+
+Mein Fehler, und er legte die Extraktion komplett still: das Schema legte
+die Felder unter eine Ebene `fields`, der Code liest sie **flach**. Jede
+Anfrage gab `{}` zurück. Der Einzeltest war grün, weil er dasselbe
+falsche Format erwartete — ein Prüfaufbau, der nachahmt, misst sich
+selbst.
+
+Gefunden, weil ich die Extraktion nach dem Rollout wirklich aufgerufen
+habe. Danach gemessen:
+
+```
+{"objart":"ETW","eq_heating":"FUSSBODENHEIZUNG","kp":300000,"wfl":100}
+```
+
+### v1330 · Die Kette — der eigentliche Grund
+
+Marcels Meldung, **nach** v1317: *„wenn ich oben im Pre-Flight einmal
+Marktbericht/Exposé auswähle und Sprache, dass erst die PDF-Daten
+eingelesen werden und dann weiter mit Sprechlauf gearbeitet wird."*
+
+v1317 hatte `_fireOabiDone` überhaupt erst geschaffen — die Funktion
+wurde gerufen und existierte nicht. Richtig und behoben. Was blieb: sie
+steht am **Ende einer ungeschützten Schreibschleife**.
+
+```js
+ov.querySelectorAll(...).forEach(function (cb) {
+  var _art = _wertSchreiben(id, it);   // kann werfen
+});
+ov.remove(); _fireOabiDone();          // wird dann nie erreicht
+```
+
+**Warum meine Messung grün war und Marcels Alltag nicht:** ohne PDF läuft
+die Schleife **nullmal**. Ich hatte mit leerem Import geprüft. Mit einer
+echten PDF läuft sie über jedes erkannte Feld.
+
+Jetzt liegt der Rumpf in `try/finally`. Gemessen, mit absichtlich
+ausgelöstem Fehler:
+
+```
+fehlerGeworfen: "Uncaught Error: absichtlich gestolpert beim Schreiben"
+fortschritt:    "Sprachaufzeichnung …"
+ketteWeiter:    JA - finally hat gegriffen
+```
+
+Der erste Prüfversuch war zu schwach — ein Feld ohne Eintrag in `_merged`
+erreicht den Schreibweg gar nicht. Erst ein echter Wurf in der ersten
+Zeile des `try`-Blocks bewies etwas.
+
+**Commits** `0e5e634`, `8d7e195`, `d884ca6`. Auf Staging.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

@@ -2801,3 +2801,48 @@ Gefunden über die **Browser-Konsole**, nicht durch Code-Lesen: der
 Funktionskopf ist — nicht der Kommentar darüber.** Und nach jedem Einbau in
 eine Datei mit Export-Block einmal im Browser nachsehen, ob das Modul
 überhaupt noch lädt. Syntaxprüfung beweist das nicht.
+
+## Ein Rückruf, an dem eine Kette hängt, gehört in ein `finally`
+
+Marcels Kette Exposé → Sprechlauf blieb stehen, auch nach v1317. Die
+Funktion `_fireOabiDone` existierte da schon — sie stand nur am **Ende einer
+ungeschützten Schleife**:
+
+```js
+ov.querySelectorAll(...).forEach(function (cb) {
+  var _art = _wertSchreiben(id, it);   // kann werfen
+});
+...
+ov.remove(); _fireOabiDone();          // wird dann nie erreicht
+```
+
+**Warum meine Messung grün war und der Alltag nicht:** ohne PDF läuft die
+Schleife **nullmal**. Ich hatte die Kette mit leerem Import geprüft — dort
+kann nichts werfen. Mit einer echten PDF läuft sie über jedes erkannte Feld,
+und ein einziges, das stolpert, lässt die ganze Kette stehen.
+
+**Regel: Wo ein Rückruf einen Ablauf weiterschiebt, gehört er ins `finally`,
+nicht ans Ende des `try`.** Was beim Arbeiten schiefgeht, darf das eine Feld
+kosten — nicht den Rest des Ablaufs.
+
+Und für die Prüfung: **einen Fehler absichtlich auslösen.** Ein grüner
+Durchlauf ohne Daten beweist nichts über einen Durchlauf mit Daten. Der erste
+Versuch war zu schwach (ein Feld ohne Eintrag in `_merged` erreicht den
+Schreibweg gar nicht) — erst ein echter Wurf in der ersten Zeile des
+`try`-Blocks zeigte, dass das `finally` greift.
+
+## Ein Schema, das am eigenen Testaufbau gebaut wurde
+
+Beim Umbau auf Structured Outputs legte ich die Felder unter eine Ebene
+`fields`. Das Modell lieferte sauber `{"fields":{"kp":300000,…}}` — und der
+Code darunter liest `Object.keys(parsed)` **flach**. Er fand `fields` und
+`_unsicher`, beide keine Feld-Id, und verwarf alles. **Jede Extraktion gab
+`{}` zurück.**
+
+Der Einzeltest gegen die API war grün, weil er dasselbe falsche Format
+erwartete wie das Schema. Ein Prüfaufbau, der nachahmt, misst sich selbst —
+dieselbe Falle wie beim Prüfkatalog in v1307.
+
+**Vor einem Schema-Umbau das Format lesen, das der bestehende Code
+erwartet** — nicht das, das man selbst für richtig hält. Ein Blick auf
+`Object.keys(parsed).forEach` hätte gereicht.
