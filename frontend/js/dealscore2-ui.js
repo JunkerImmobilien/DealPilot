@@ -152,7 +152,119 @@ function _buildDeal2FromState() {
   return deal;
 }
 
+/* === v1356 - DIE PERSOENLICHE SCHMERZGRENZE BEKOMMT EINEN LESER =====
+   Beim Audit gemessen: die drei Felder unter „Persoenliche Mindest-
+   Schwellen" - min_dscr, min_cashflow_vor_st, max_ltv - wurden vom
+   Formular geschrieben, in config.js vorbelegt (1,20 / 0 EUR / 90 %)
+   und von NIEMANDEM gelesen. Gegengeprueft ueber alle Konsumenten des
+   Profils: main.js fragt sieben Schluessel ab, keiner davon ist dabei,
+   und auch sonst kein Treffer im Frontend, im Backend oder in einer
+   Anzeige.
+
+   Marcel trug dort eine Zahl ein, sah sie beim naechsten Oeffnen wieder
+   und durfte annehmen, sie wirke. Ein Feld ohne Leser sieht aus wie ein
+   Feld - in dieser Sitzung zum siebten Mal.
+
+   ER HAT SICH FUERS ANSCHLIESSEN ENTSCHIEDEN, nicht fuers Wegraeumen:
+   die Schwellen stehen jetzt als eigene Ampel neben dem Score.
+
+   WARUM NEBEN DEM SCORE UND NICHT IM SCORE: die Schwellen sind seine
+   persoenliche Kaufgrenze, keine Bewertung. Ein Objekt kann 82 Punkte
+   holen und trotzdem unter seinem Mindest-DSCR liegen. Wuerde die
+   Schwelle in den Score einfliessen, waere sie nicht mehr ablesbar -
+   und der Score haette zwei Bedeutungen.
+
+   DIE ISTWERTE KOMMEN AUS `deal`, nicht aus einer zweiten Rechnung.
+   `_buildDeal2FromState()` traegt dscr, ltv und cashflowMonatlich
+   bereits - dieselben Zahlen, die auch der Score benutzt. Eine eigene
+   KPI-Berechnung daneben waere die naechste Doppelrechnung.
+
+   Statusfarben bleiben Statusfarben: Gruen und Rot werden NICHT
+   tokenisiert, sie bedeuten in jeder Marke dasselbe. */
+function _ds2Schwelle(name, soll, ist, einheit, besserIstGroesser, nachkomma) {
+  /* Number(null) ist 0 und besteht Number.isFinite - deshalb zuerst auf
+     Abwesenheit pruefen, dann rechnen. */
+  var hatSoll = (soll != null && soll !== '' && isFinite(Number(soll)));
+  var hatIst  = (ist  != null && ist  !== '' && isFinite(Number(ist)));
+  if (!hatSoll) return '';
+
+  var sollN = Number(soll);
+  var istN  = hatIst ? Number(ist) : null;
+
+  var zustand = 'unbekannt';
+  if (hatIst) {
+    var erfuellt = besserIstGroesser ? (istN >= sollN) : (istN <= sollN);
+    if (erfuellt) {
+      zustand = 'erfuellt';
+    } else {
+      /* „knapp" ist eine Zehntel-Spanne um die Grenze. Ohne diese Stufe
+         sieht ein DSCR von 1,19 genauso rot aus wie einer von 0,80. */
+      var spanne = Math.abs(sollN) * 0.1 || 0.1;
+      var abstand = Math.abs(istN - sollN);
+      zustand = (abstand <= spanne) ? 'knapp' : 'verfehlt';
+    }
+  }
+
+  var farbe = zustand === 'erfuellt' ? '#2FBE6E'
+            : zustand === 'knapp'    ? '#E5BD53'
+            : zustand === 'verfehlt' ? '#D55B5B'
+            : 'rgba(255,255,255,0.30)';
+  var zeichen = zustand === 'erfuellt' ? '\u2713'
+              : zustand === 'knapp'    ? '\u2248'
+              : zustand === 'verfehlt' ? '\u2717'
+              : '\u2013';
+
+  function zahl(v) {
+    if (v == null) return '\u2013';
+    var n = Number(v);
+    var k = (nachkomma == null) ? 2 : nachkomma;
+    return n.toLocaleString('de-DE', { minimumFractionDigits: k, maximumFractionDigits: k });
+  }
+
+  return '<div class="ds2-grenze-zeile">' +
+    '<span class="ds2-grenze-ampel" style="color:' + farbe + '">' + zeichen + '</span>' +
+    '<span class="ds2-grenze-name">' + name + '</span>' +
+    '<span class="ds2-grenze-ist" style="color:' + farbe + '">' +
+      (hatIst ? zahl(istN) + einheit : 'keine Angabe') + '</span>' +
+    '<span class="ds2-grenze-soll">' + (besserIstGroesser ? 'min. ' : 'max. ') +
+      zahl(sollN) + einheit + '</span>' +
+  '</div>';
+}
+
+function _ds2GrenzenBlock(deal) {
+  var P = window.DealPilotInvestmentProfile;
+  var D = (window.DealPilotConfig && window.DealPilotConfig.investmentProfileDefaults) || {};
+  function soll(k) {
+    var v;
+    try { if (P && typeof P.get === 'function') v = P.get(k); } catch (e) {}
+    if (v == null || v === '' || !isFinite(Number(v))) v = D[k];
+    return (v == null || v === '' || !isFinite(Number(v))) ? null : Number(v);
+  }
+
+  var zeilen =
+    _ds2Schwelle('Kapitaldienstdeckung (DSCR)', soll('min_dscr'),
+                 deal.dscr, '', true, 2) +
+    _ds2Schwelle('Cashflow vor Steuer', soll('min_cashflow_vor_st'),
+                 deal.cashflowMonatlich, '\u00a0\u20ac/Mon', true, 0) +
+    _ds2Schwelle('Beleihungsauslauf (LTV)', soll('max_ltv'),
+                 deal.ltv, '\u00a0%', false, 1);
+
+  if (!zeilen) return '';
+
+  return '<div class="ds2-grenzen">' +
+    '<div class="ds2-grenzen-kopf">' +
+      '<span>Deine Kaufgrenzen</span>' +
+      '<span class="ds2-grenzen-quelle">Einstellungen \u203a Standardwerte</span>' +
+    '</div>' +
+    zeilen +
+    '<div class="ds2-grenzen-fuss">Diese Grenzen sind deine eigenen und flie\u00dfen ' +
+      '<strong>nicht</strong> in den Score ein \u2014 ein Objekt kann gut bewertet sein ' +
+      'und trotzdem unter deiner Grenze liegen.</div>' +
+  '</div>';
+}
+
 function renderDealScore2() {
+
   var box = document.getElementById('dealscore2-box');
   if (!box) return;
   if (!window.DealScore2) return;
@@ -372,7 +484,10 @@ function renderDealScore2() {
         '<div class="ds-metrics ds2-metrics">' + catBars + '</div>' +
       '</div>' +
 
+      _ds2GrenzenBlock(deal) +
+
       '<div class="ds2-pn-grid">' +
+
         '<div class="ds2-pn-col ds2-pn-pos"><h5>Positive Faktoren</h5><ul>' + posHtml + '</ul></div>' +
         '<div class="ds2-pn-col ds2-pn-neg"><h5>Negative Faktoren</h5><ul>' + negHtml + '</ul></div>' +
       '</div>' +

@@ -7086,8 +7086,107 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   font-style: italic;
 }
 
+/* ── v1356 · Die persoenlichen Kaufgrenzen im Deal-Score-Panel ────────
+   Sitzt zwischen dem Donut und den Positiv/Negativ-Spalten. Das Panel
+   ist dunkel, deshalb helle Schrift auf leicht aufgehellter Flaeche -
+   nicht auf einer eigenen Karte, sonst wirkt es wie ein zweiter Score.
+
+   Die Ampelfarben stehen im JS und sind bewusst NICHT tokenisiert:
+   Gruen und Rot bedeuten in jeder Marke dasselbe. */
+.ds2-grenzen {
+  margin: 18px 0 4px;
+  padding: 14px 16px 12px;
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+}
+.ds2-grenzen-kopf {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.72);
+  margin-bottom: 10px;
+}
+.ds2-grenzen-quelle {
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  text-transform: none;
+  font-size: 10.5px;
+  color: rgba(255,255,255,0.38);
+}
+
+/* Vier Spalten: Ampel, Name, Istwert, Sollwert. Der Istwert steht vor
+   dem Sollwert, weil er die Antwort ist - der Sollwert ist nur der
+   Massstab, an dem sie gemessen wird. */
+.ds2-grenze-zeile {
+  display: grid;
+  grid-template-columns: 18px 1fr auto auto;
+  align-items: baseline;
+  gap: 4px 10px;
+  padding: 6px 0;
+  border-top: 1px solid rgba(255,255,255,0.055);
+}
+.ds2-grenze-zeile:first-of-type {
+  border-top: 0;
+}
+.ds2-grenze-ampel {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+}
+.ds2-grenze-name {
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.80);
+}
+.ds2-grenze-ist {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.ds2-grenze-soll {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  color: rgba(255,255,255,0.42);
+  white-space: nowrap;
+  min-width: 76px;
+  text-align: right;
+}
+.ds2-grenzen-fuss {
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid rgba(255,255,255,0.055);
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.44);
+}
+.ds2-grenzen-fuss strong {
+  color: rgba(255,255,255,0.68);
+  font-weight: 700;
+}
+
+/* Schmal: Name und Werte untereinander, damit nichts abgeschnitten wird.
+   Genau der Fehler, der im selben Audit bei den Profilkarten steckte. */
+@media (max-width: 560px) {
+  .ds2-grenze-zeile {
+    grid-template-columns: 18px 1fr auto;
+  }
+  .ds2-grenze-soll {
+    grid-column: 2 / -1;
+    text-align: left;
+    min-width: 0;
+  }
+}
+
 .ds2-pn-grid {
   display: grid;
+
   grid-template-columns: 1fr 1fr;
   gap: 18px;
   padding: 18px 0 14px;
