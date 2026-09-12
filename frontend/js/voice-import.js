@@ -2422,7 +2422,7 @@
        Verfeinert die Rechnung, entscheidet aber nichts mehr. */
     { et: 4, ids: ['hg_ul', 'hg_nul'],              rang: 8, vorbelegt: 1, profil: 'bewirtschaftung',
       frage: 'Wie hoch ist das Hausgeld pro Jahr, und wie viel davon ist nicht umlagefähig?' },
-    { et: 4, ids: ['mietstg', 'wertstg', 'leerstand'], rang: 14, vorbelegt: 1,
+    { et: 4, ids: ['mietstg', 'wertstg', 'leerstand'], rang: 14, vorbelegt: 1, profil: 'langfrist',
       frage: 'Womit rechnest du langfristig — Mietsteigerung, Wertsteigerung und Leerstand in Prozent?' },
     { et: 4, ids: ['ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_wertsteigerung', 'ds2_entwicklung'],
       rang: 15, skalen: 1,
@@ -2632,6 +2632,7 @@
       if (eintrag.profil === 'nebenkosten')     return _pvNebenkosten();
       if (eintrag.profil === 'bewirtschaftung') return _pvBewirtschaftung();
       if (eintrag.profil === 'steuer')          return _pvSteuer();
+      if (eintrag.profil === 'langfrist')      return _pvLangfrist();   /* v1328 */
     } catch (e) { return null; }
     return null;
   }
@@ -2711,6 +2712,24 @@
     if (nul != null) { w.hg_nul = String(Math.round(nkm * 12 * nul / 100)); teile.push(_euroKurz(_rfNum(w.hg_nul)) + ' nicht umlagefähig'); }
     if (!teile.length) return null;
     return { werte: w, text: teile.join(' · ') + ' pro Jahr (' + (ul || 0) + ' / ' + (nul || 0) + ' % der Kaltmiete)' };
+  }
+
+  /* v1328 · Mietsteigerung, Wertsteigerung, Leerstand.
+     Marcel im Durchlauf: "moechte ich aus den Einstellungen uebernehmen
+     oder die Standards uebernehmen" - und der Co-Pilot konnte nicht, weil
+     fuer diese drei Werte gar nichts hinterlegt war. Jetzt stehen sie in
+     investmentProfileDefaults (1,5 / 1,5 / 2 Prozent), bewusst vorsichtig
+     und ausdruecklich als Annahme benannt - keine Prognose. */
+  function _pvLangfrist() {
+    var w = {}, teile = [];
+    var ms = _profilZahl('mietsteigerung_pct');
+    var ws = _profilZahl('wertsteigerung_pct');
+    var ls = _profilZahl('leerstand_pct');
+    if (ms != null) { w.mietstg = String(ms).replace('.', ','); teile.push(w.mietstg + ' % Mietsteigerung'); }
+    if (ws != null) { w.wertstg = String(ws).replace('.', ','); teile.push(w.wertstg + ' % Wertsteigerung'); }
+    if (ls != null) { w.leerstand = String(ls).replace('.', ','); teile.push(w.leerstand + ' % Leerstand'); }
+    if (!teile.length) return null;
+    return { werte: w, text: teile.join(' · ') + ' pro Jahr' };
   }
 
   function _pvSteuer() {
@@ -3889,10 +3908,26 @@
     (e.ids || []).forEach(function (id) {
       var v = _rf && _rf.data && _rf.data.fields ? _rf.data.fields[id] : null;
       var ausFormular = false;
+      var ausVorlauf = false;
       if (v === undefined || v === null || v === '') {
         var el = document.getElementById(id);
         v = el ? String(el.value || '').trim() : '';
         ausFormular = true;
+        /* ═══ v1331 · Ein Wert aus dem Expose ist keine Vorbelegung ══════
+           Marcels Befund: "der hat jetzt daten uebernommen. die sind aber
+           nicht gruen gekennzeichnet in der box was schon steht."
+
+           GEMESSEN: `_echt()` faerbt einen Block nur gruen, wenn ein Wert
+           NICHT aus dem Formular kommt. Das ist fuer VORBELEGUNGEN richtig -
+           ein Zinssatz von 3,5 Prozent aus dem Investmentprofil ist keine
+           Angabe zu diesem Objekt, und wer ihn gruen sieht, haelt eine Frage
+           fuer beantwortet, die niemand gestellt hat (v1273c).
+
+           Ein Wert aus dem EXPOSE ist etwas anderes. Er steht zwar auch im
+           Formular - aber er stammt aus einer Quelle zu genau diesem Objekt,
+           nicht aus einer Voreinstellung. `_vorlaufFelder` fuehrt seit v1293
+           genau diese Liste. */
+        if (_vorlaufFelder && _vorlaufFelder.indexOf(id) >= 0) ausVorlauf = true;
       }
       if (v === '' || v === null || v === undefined) return;
       var kat = (_rf.catalog || []).filter(function (c) { return c.id === id; })[0];
@@ -3900,7 +3935,7 @@
       /* v1284: Zahlen lesbar - "3.5" ist ein Feldwert, "3,5" eine Angabe. */
       var anzeige = String(v);
       if (anzeige.indexOf(",") < 0 && /^-?[0-9]+\.[0-9]+$/.test(anzeige)) anzeige = anzeige.replace(".", ",");
-      out.push({ n: name, v: anzeige, f: ausFormular });
+      out.push({ n: name, v: anzeige, f: ausFormular && !ausVorlauf, vorlauf: ausVorlauf });
     });
     return out;
   }
@@ -5316,6 +5351,26 @@
       return;
     }
     if (art === 'zentrum')  { _rfBlase('ich', 'Nimm das Ortszentrum.'); _rfZentrumNehmen(); return; }
+    /* v1325: der Vorschlag aus der eigenen Auskunft. */
+    if (art === 'auskunft') {
+      var av = _rf.auskunftVorschlag;
+      _rf.auskunftVorschlag = null;
+      _rfAktionWeg('auskunft');
+      if (!av || !av.werte) return;
+      var gesetztA = [];
+      Object.keys(av.werte).forEach(function (id) {
+        if (_rfSetzen(id, av.werte[id], 'aus der Auskunft des Co-Piloten')) gesetztA.push(_rfFeldName(id));
+      });
+      _rfBlase('ich', 'Ja, uebernimm das.');
+      if (gesetztA.length) {
+        _rfBlase('co', '...<b>' + escH(gesetztA.join(', ')) + '</b> steht - mit Herkunft, nicht als deine Angabe.');
+        _rfStandZeichnen();
+      }
+      var eA = _rf.offen[_rf.i];
+      if (eA && !_rfFehlt(eA, _rf.data.fields)) setTimeout(_rfWeiter, 400);
+      else _rfDranZeichnen();
+      return;
+    }
     if (art === 'tabelle')  { _rfZurTabelle(); return; }
     if (art === 'tiefe')    { _rf.tiefeOffen = 0; _rfBlase('ich', 'Ja, lass uns weitermachen.'); _rfTiefeStarten(); return; }
     if (art === 'brw')      { _rfBlase('ich', 'Hol den Bodenrichtwert.'); _rfBrwHolen(); return; }
@@ -5366,11 +5421,59 @@
   function _istAbrufWunsch(text) {
     var t = String(text || '');
     if (!_rf || !(_rf.aktionen || []).length) return false;
-    /* Eine Frage ist kein Befehl: „was ist der Bodenrichtwert?" will eine
-       Auskunft, keinen Abruf. */
-    if (/\?\s*$/.test(t.trim())) return false;
+    /* v1324: Ein Fragezeichen allein macht aus einer Bitte keine Frage.
+       Marcels Befund (Bild "fehler 1"): "Erweiterte
+       Marktpreisindikationen abrufen?" wurde hier ausgeschlossen und ging
+       an den Auskunfts-Weg - der Co-Pilot erklaerte, was er koennte, statt
+       es zu tun.
+
+       Was eine echte Frage von einer hoeflichen Bitte trennt, ist das
+       FRAGEWORT am Anfang, nicht das Zeichen am Ende. "Was ist der
+       Bodenrichtwert?" will Auskunft. "Bodenrichtwert abrufen?" will den
+       Abruf. Die Zeile unten faengt den ersten Fall weiterhin ab. */
     if (/^(was|wie|warum|wieso|wozu|welche|welcher|wann|wo)\b/i.test(t.trim())) return false;
     return RF_ABRUF_VERB.test(t) && RF_ABRUF_SACHE.test(t);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     v1327 · EIN SATZ KANN EINEN BEFEHL UND ANGABEN TRAGEN
+     ═══════════════════════════════════════════════════════════════════
+     Im durchgehenden Lauf zweimal gemessen — und beide Male ging
+     dieselbe Sorte Angabe verloren:
+
+       „Bodenrichtwert 300, Grundstück 1000 m², Miteigentumsanteil 20 %"
+         -> BORIS-Abruf lief, die beiden anderen Zahlen fielen weg
+       „Nimm die erweiterte Marktpreisindikation. Baujahr 1975,
+        Kaufpreis 300.000"
+         -> Indikation vorgemerkt, Baujahr und Kaufpreis fielen weg
+
+     Der Grund ist in beiden Fällen derselbe: eine Aktion wird erkannt,
+     ausgeführt, und der Code steigt mit `return true` aus. Was im selben
+     Satz noch stand, sieht danach niemand mehr.
+
+     Bei der Profil-Übernahme gibt es das richtige Verhalten schon seit
+     v1286: „Ist der Satz damit erschöpft, sind wir fertig. Trägt er noch
+     mehr, wird das Profil eingetragen UND der Satz danach ausgewertet."
+     Genau das fehlte den Abrufen.
+
+     Wer spricht, trennt nicht in Befehle und Angaben. „Nimm die
+     erweiterte, Baujahr 1975" ist EIN Gedanke. */
+  function _rfRestNachAktion(text) {
+    if (!_rf) return;
+    var t = String(text || '');
+    /* Ohne Zahl ist nichts nachzutragen — „nimm die erweiterte" allein
+       ist der ganze Satz. Ein Datum oder ein Prozentwert zählt mit. */
+    if (!/\d/.test(t)) return;
+    /* Der Befehlsteil wird entfernt, damit die Auswertung nicht darüber
+       stolpert. Was übrig bleibt, muss noch eine Zahl tragen. */
+    var rest = t
+      .replace(/\b(nimm|hol|hole|holen|mach|mache|starte|ruf|rufe|abrufen|besorge?|zieh|ziehe)\b/gi, ' ')
+      .replace(/\b(die|den|das|der|mir|mal|bitte|auch|doch)\b/gi, ' ')
+      .replace(/\b(erweiterte|erweiterten|einfache|vertiefte|volle)\b/gi, ' ')
+      .replace(/\b(marktpreisindikation|marktbewertung|marktwert|indikation|bodenrichtwert|boris|lage|makrolage|mikrolage)\w*/gi, ' ')
+      .replace(/\s{2,}/g, ' ').trim();
+    if (!/\d/.test(rest) || rest.length < 4) return;
+    try { _rfAuswerten(rest, false); } catch (e) {}
   }
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -5528,6 +5631,94 @@
      Das Angebot gehört an die Frage, deren Arbeit es abnimmt. Angeboten
      wird nur, wenn Stufe 1 schon lief (sonst wäre es ein anderer Kauf),
      Stufe 2 noch nicht, und Kontingent da ist. */
+  /* ═══════════════════════════════════════════════════════════════════
+     v1324 · DIE ORT-FRAGE WARTET AUF DIE MARKTBEWERTUNG
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Befund (Bilder „fehler 3" und „fehler 4"): er wird nach
+     Bevölkerung, Nachfrage, Wertsteigerung und Entwicklung gefragt, tippt
+     sich durch vier Auswahlreihen — und DANACH kommt die erweiterte
+     Marktpreisindikation und bringt genau diese Werte mit. Auf Bild 4 ist
+     es zu sehen: „Markt & Potenzial  stabil · stark · niedrig · eine…"
+     steht gefüllt da, darunter erscheint die Indikation mit Makrolage
+     „Durchschnittlich", Mikrolage „Sehr gut", Preistrend „+4,3 % p.a.".
+
+     Seine Vorgabe: „Es muss halt so sein, dass die erweiterte
+     Marktpreisindikation alle Werte, die dafür brauchen, am Anfang
+     abgefragt werden, dass man dann erst die erweiterte
+     Marktwertindikation abruft, diese Werte bekommt und dann auf
+     Grundlage dessen diese Werte hier ausfüllt."
+
+     GENAU DAS GEHT JETZT — und es geht ohne neue Abfragen, weil die
+     Reihenfolge schon stimmt: Fläche, Baujahr, Zustand, Energieausweis,
+     Bodenrichtwert und Lagebewertung stehen nach Etappe 3 alle. Die
+     Ort-Frage ist Frage 11 in Etappe 4. Wenn wir sie erreichen, ist die
+     Indikation abrufbereit — sie wurde nur bis zum ENDE der Etappe
+     zurückgestellt, und das ist eine Frage zu spät.
+
+     Ist eine Indikation vorgemerkt, wird sie deshalb HIER gestartet und
+     die Frage so lange zurückgestellt. Kommt sie an, füllt
+     `_rfMarktInsFormular` die vier Felder, und gefragt wird nur noch,
+     was sie nicht beantwortet hat.
+
+     OHNE VORMERKUNG ändert sich nichts: wer keine Indikation will, wird
+     gefragt wie bisher. */
+  function _rfOrtBrauchtMarkt(eintrag) {
+    if (!_rf || !eintrag || !eintrag.ids) return false;
+    if (_rf.ortWartet) return false;              /* laeuft schon */
+    if (_rf.markt2) return false;                 /* Stufe 2 ist schon da */
+    var ENTW = ['ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_wertsteigerung', 'ds2_entwicklung'];
+    if (!eintrag.ids.some(function (id) { return ENTW.indexOf(id) >= 0; })) return false;
+    /* Vorgemerkt heisst: der Nutzer hat die erweiterte gewollt und sie
+       wurde auf spaeter geschoben. Genau dieses Spaeter ist jetzt. */
+    return !!(_rf.marktGewollt && _rf.marktStufe >= 2 && !_rf.marktPlusGetan);
+  }
+
+  /* Die vier Werte aus einer fertigen Marktbewertung ins Gespraech
+     uebernehmen. Gibt die Zahl der gesetzten Felder zurueck.
+
+     ÜBERSCHRIEBEN WIRD NICHTS, was der Nutzer selbst gesagt hat - aber
+     eine blosse Vorbelegung im Formular zaehlt hier nicht als Angabe:
+     die Indikation ist gemessen, die Vorbelegung geraten. */
+  function _rfMarktInsFormular(M) {
+    if (!_rf || !M) return 0;
+    var gesetzt = [];
+    function stufeLage(sc) {
+      if (sc == null) return null;
+      var s = sc > 10 ? sc / 10 : sc;
+      return s >= 8 ? 'sehr_gut' : s >= 6 ? 'gut' : s >= 4 ? 'durchschnittlich' : s >= 2 ? 'schwach' : 'sehr_schwach';
+    }
+    function stufeWert(p) {
+      if (p == null) return null;
+      return p >= 3 ? 'sehr_hoch' : p >= 2 ? 'hoch' : p >= 1 ? 'mittel' : p > 0 ? 'niedrig' : 'keines';
+    }
+    function stufeBev(p) {
+      if (p == null) return null;
+      return p >= 1 ? 'stark_wachsend' : p >= 0.3 ? 'wachsend' : p >= -0.3 ? 'stabil'
+           : p >= -1 ? 'leicht_fallend' : 'stark_fallend';
+    }
+    function stufeNachfrage(tage) {
+      if (tage == null) return null;
+      return tage <= 30 ? 'sehr_stark' : tage <= 60 ? 'stark' : tage <= 120 ? 'mittel'
+           : tage <= 200 ? 'schwach' : 'sehr_schwach';
+    }
+    function setz(id, wert, woher) {
+      if (!wert) return;
+      var da = _rf.data.fields[id];
+      if (da != null && String(da).trim() !== '') return;   /* selbst gesagt gewinnt */
+      _rf.data.fields[id] = wert;
+      if (!_rf.quelle) _rf.quelle = {};
+      _rf.quelle[id] = woher;
+      gesetzt.push(id);
+    }
+    setz('makrolage', stufeLage(M.makroRaw != null ? M.makroRaw : M.makro), 'erweiterte Marktpreisindikation');
+    setz('mikrolage', stufeLage(M.microRaw != null ? M.microRaw : M.mikro), 'erweiterte Marktpreisindikation');
+    setz('ds2_wertsteigerung', stufeWert(M.trendRaw), 'erweiterte Marktpreisindikation');
+    setz('ds2_bevoelkerung', stufeBev(M.bevRaw), 'amtliche Bevoelkerungsstatistik');
+    setz('ds2_nachfrage', stufeNachfrage(M.tageRaw), 'Angebotsdauer im Umkreis');
+    if (gesetzt.length) _rfStandZeichnen();
+    return gesetzt.length;
+  }
+
   function _rfVertiefungHier(eintrag) {
     if (!_rf || !eintrag || !eintrag.ids) return;
     if (_rf.markt2 || _rf.marktPlusGefragt || _rf.marktPlusHier) return;
@@ -6011,9 +6202,28 @@
        mit — bei Stufe 1 wird es ohnehin nicht ausgewertet, und ein Feld,
        das nichts bewirkt, gehoert nicht in den Aufruf. */
     if (stufe >= 2) {
+      /* v1325 · DIE AUSSTATTUNG FEHLTE. Marcels Verdacht: "dort haben wir
+         ja deutlich mehr Moeglichkeiten, weil wir die Qualitaet und alles
+         der Wohnung auch mit uebergeben. Kann das sein, dass du das
+         ueberhaupt gar nicht beruecksichtigt hast?" - er hatte recht.
+
+         GEMESSEN: DealPilotObjectMapper im Marktbericht liest neun
+         eq_*-Felder (heating, windows, floor_covering, bath, guest_wc,
+         store_room, exterior_walls, roof, elevator) und die
+         Qualitaetssterne. Der Sprechlauf schickte KEINES davon - die
+         Gegenseite konnte sie also gar nicht bekommen.
+
+         Damit lieferte die erweiterte Indikation im Sprechlauf dasselbe
+         wie die einfache: ohne Ausstattung rechnet sie am Durchschnitt,
+         obwohl die Daten im Formular stehen. */
       ['ds2_zustand', 'ds2_energie', 'brw', 'etage', 'mikrolage', 'makrolage',
        'ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_entwicklung', 'ds2_wertsteigerung',
-       'ds2_mietausfall', 'ds2_marktmiete', 'ausst', 'vermstand', 'gsfl', 'mea'
+       'ds2_mietausfall', 'ds2_marktmiete', 'ausst', 'vermstand', 'gsfl', 'mea',
+       'eq_heating', 'eq_windows', 'eq_floor', 'eq_bath', 'eq_guest_wc',
+       'eq_store_room', 'eq_walls', 'eq_roof', 'eq_elevator',
+       'rate_kueche', 'rate_bad', 'rate_boden', 'rate_fenster',
+       'qual_kueche', 'qual_bad', 'qual_boden', 'qual_fenster',
+       'modernis', 'einheiten', 'balkon_flae', 'garagen', 'stellpl_aussen'
       ].forEach(function (id) {
         var v = _rfFeld(id);
         if (v !== null && v !== undefined && v !== '') obj[id] = v;
@@ -6090,10 +6300,10 @@
       var el = document.getElementById(id);
       return !(el && String(el.value || '').trim() !== '');
     });
-    if (!offen.length) return;
+    if (!offen.length) return _melde(false);
 
     var kat = (_rf.catalog || []).filter(function (c) { return offen.indexOf(c.id) >= 0; });
-    if (!kat.length) return;
+    if (!kat.length) return _melde(false);
 
     var txt = String(M.text).replace(/[#*_>`]/g, ' ').replace(/\s+/g, ' ').trim();
     if (txt.length < 80) return;
@@ -6201,6 +6411,15 @@
                   ? p.valuation.inputs.market_rent_sqm : null),
       trend: (p.price_trend_pct != null) ? p.price_trend_pct : null,
       konfidenz: mv.confidence_label || null,
+      /* v1324: die beiden Felder aus v1316 kamen im Sprechlauf nicht an -
+         M wurde gebaut, bevor es sie gab. Ohne sie kann
+         _rfMarktInsFormular Bevoelkerung und Nachfrage nicht setzen. */
+      bevRaw: (p.bevoelkerung_trend_pct != null) ? p.bevoelkerung_trend_pct : null,
+      tageRaw: (p.days_on_market != null) ? p.days_on_market
+               : ((p.market_dynamics && p.market_dynamics.days_on_market != null) ? p.market_dynamics.days_on_market : null),
+      marktkontext: p.marktkontext || null,
+      erbbaurecht: p.erbbaurecht || null,
+      trendRaw: (p.price_trend_pct != null) ? p.price_trend_pct : null,
       /* v1290: nur die volle Stufe liefert Fliesstext und Historie. */
       text: (p.report_md && !/Schnell-Modus/.test(String(p.report_md))) ? String(p.report_md) : null
     };
@@ -6258,6 +6477,34 @@
     /* v1307: Der Bericht trägt mehr als Marktwert und Lage — er sagt auch,
        wie sich der Ort entwickelt. Das wird jetzt gelesen. */
     _rfBerichtLesen(M, Q);
+    /* ═══ v1324 · Die wartende Ort-Frage aufloesen ══════════════════════
+       Wenn `_rfFrage` die Frage zurueckgestellt hat, um erst die
+       Indikation zu holen, wird hier weitergemacht: die Werte gehen ins
+       Gespraech, und gefragt wird nur noch, was uebrig bleibt.
+
+       `_rfMarktInsFormular` nimmt auch die Felder mit, die `_rfSetzen`
+       oben nicht kennt - Bevoelkerung aus dem Trend, Nachfrage aus der
+       Angebotsdauer, Wertsteigerung aus dem Preistrend. */
+    if (_rf.ortWartet) {
+      _rf.ortWartet = 0;
+      var _n = 0;
+      try { _n = _rfMarktInsFormular(M); } catch (ex) {}
+      var _e2 = _rf.offen[_rf.i];
+      var _restOffen = _e2 ? _rfFehlt(_e2, _rf.data.fields) : false;
+      if (_n) {
+        var _namen = ['Makrolage', 'Mikrolage', 'Bevoelkerung', 'Nachfrage', 'Wertsteigerung'];
+        _rfBlase('co', '...Daraus habe ich <b>' + _n + ' Angabe' + (_n === 1 ? '' : 'n') +
+          '</b> uebernommen — mit Herkunft, nicht als deine Schaetzung.' +
+          (_restOffen ? ' Was jetzt noch fehlt, frage ich gleich.' : ''));
+      }
+      if (!_restOffen) {
+        _rfBlase('co', '<span style="opacity:.7">Damit ist der Ort beschrieben — weiter.</span>');
+        setTimeout(_rfWeiter, 500);
+      } else {
+        setTimeout(_rfFrage, 500);
+      }
+      return;
+    }
     /* v1288: Steht die Lage-Frage gerade an, ist sie damit beantwortet. */
     try {
       var e = _rf.offen[_rf.i];
@@ -6426,6 +6673,26 @@
   function _rfFrage() {
     if (_rf.i >= _rf.offen.length) return _rfFertig();
     var e = _rf.offen[_rf.i];
+    /* ═══ v1324 · Erst die Indikation, dann die Frage ═══════════════════
+       Steht die erweiterte Marktpreisindikation vorgemerkt und wären wir
+       jetzt bei der Ort-Frage, wird sie HIER geholt statt am Ende der
+       Etappe. Alles, was sie braucht, steht nach Etappe 3 — Fläche,
+       Baujahr, Zustand, Energieausweis, Bodenrichtwert, Lagebewertung.
+
+       Die Frage wartet so lange. Kommt die Indikation an, füllt
+       `_rfMarktInsFormular` die Felder, und gefragt wird nur noch, was
+       offen blieb. Marcels Vorgabe wortwörtlich: erst abrufen, „dann auf
+       Grundlage dessen diese Werte hier ausfüllen". */
+    if (_rfOrtBrauchtMarkt(e)) {
+      _rf.ortWartet = 1;
+      _rf.marktPlusGetan = 1;
+      _rfBlase('co', 'Bevor ich dich raten lasse: die <b>erweiterte Marktpreisindikation</b> '
+        + 'bringt Bevölkerung, Nachfrage, Wertsteigerung und Lage mit. Alles, was sie dafür '
+        + 'braucht, steht jetzt — ich hole sie, dann füllen wir damit auf.');
+      try { _rfMarktStarten(2); } catch (ex) { _rf.ortWartet = 0; }
+      return;   /* die Frage kommt nach dem Abruf */
+    }
+
     /* v1288: Was inzwischen VON SELBST hereingekommen ist — der amtliche
        Bodenrichtwert, die Lagewerte aus der Marktpreisindikation — wird
        nicht noch einmal gefragt. Ein Co-Pilot, der nach etwas fragt, das
@@ -7278,6 +7545,50 @@
 
      „Wie hoch ist die Miete?" waere ein Grenzfall - aber wer im Dialog
      nach seiner eigenen Miete fragt, will tatsaechlich eine Auskunft. */
+  /* ═══════════════════════════════════════════════════════════════════
+     v1324 · EINE HÖFLICHE ANWEISUNG IST KEINE FRAGE
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Befund (Bild „fehler 2"): er sagt „Kannst du auch aus den
+     Einstellungen übernehmen. Keine Maklerprovision." — und der Co-Pilot
+     hält einen Vortrag darüber, dass er das könne, übernimmt aber nichts
+     und kehrt zur Frage zurück.
+
+     GEMESSEN, warum: `_rfIstFrage` steht in der Prüfkette VOR
+     `_rfWillProfil`, und `RF_FRAGEWORT` enthält „kannst du". Der Satz
+     wird damit zur Wissensfrage und geht an `/ai/copilot-frage` — eine
+     Route, die auskunft gibt und nichts eintragen KANN.
+
+     Dasselbe beim Abruf (Bild „fehler 1"): „Erweiterte
+     Marktpreisindikationen abrufen?" endet mit einem Fragezeichen, und
+     `_istAbrufWunsch` schliesst Fragezeichen ausdrücklich aus.
+
+     DIE UNTERSCHEIDUNG, die gefehlt hat: Deutsche Höflichkeit kleidet
+     Anweisungen in Fragen. „Kannst du das übernehmen?" will keine
+     Auskunft über Fähigkeiten, sondern die Handlung. Wer wirklich fragt,
+     fragt nach dem WARUM, WIE VIEL oder OB ES SICH LOHNT — nicht nach
+     dem OB DU KANNST.
+
+     Die Prüfung steht deshalb VOR `_rfIstFrage` und fängt genau die
+     Sätze ab, die eine Handlung verlangen, die wir ausführen können:
+     Einstellungen übernehmen, einen Abruf starten, einen Wert setzen. */
+  function _istHoeflicheAnweisung(text) {
+    var t = String(text || '').trim();
+    if (!t) return false;
+
+    /* Es muss etwas geben, das wir TUN können. Ohne erkennbare Handlung
+       ist es eine normale Frage und gehört zum Co-Piloten. */
+    var handlung = _rfWillProfil(t) || _istAbrufWunsch(t);
+    if (!handlung) return false;
+
+    /* Eine echte Wissensfrage bleibt eine. „Warum sind die
+       Kaufnebenkosten so hoch?" enthält kein „übernimm", fällt also
+       schon oben durch — aber „Was steht in den Einstellungen?" träfe
+       `_rfWillProfil` (Quelle + „steht"), und das wäre falsch. */
+    if (/^(was|warum|wieso|weshalb|wie ?viel|wie hoch|woher|wo steht)\b/i.test(t)) return false;
+
+    return true;
+  }
+
   var RF_FRAGEWORT = /^(was|wie|wieso|warum|weshalb|wer|wo|wann|welche[rsn]?|kannst du|kannst|koenntest|könntest|erklaer|erklär|rechne|zeig|sag mir|ist das|macht das|lohnt|passt das|waere|wäre|soll ich|hab ich|habe ich)\b/i;
 
   function _rfIstFrage(text) {
@@ -7286,6 +7597,75 @@
     if (/\?\s*$/.test(t)) return true;
     if (RF_FRAGEWORT.test(t) && t.split(/\s+/).length >= 3) return true;
     return false;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     v1325 · EINE AUSKUNFT, DIE EINE LÜCKE FÜLLT, WIRD ANGEBOTEN
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Ziel: „dass der Co-Pilot auf andere Fragen eingeht, auch wenn
+     ich Adressen nenne oder nach einer Postleitzahl frage und der Rest
+     schon genannt ist, dass er den anderen Teil schon übernimmt und sagt:
+     Gut, soll ich dann die Postleitzahl dafür übernehmen?"
+
+     Bisher endete jede Auskunft gleich: Antwort, dann „Zurück zur Frage".
+     Wer fragt „Wie ist die Postleitzahl von Herford?", bekommt vier
+     Postleitzahlen und darf sie danach selbst abtippen — obwohl Ort und
+     Straße längst dastehen und der Co-Pilot die Antwort gerade selbst
+     gegeben hat.
+
+     Was hier passiert: nach der Auskunft wird geprüft, ob in der Antwort
+     ein Wert für ein Feld steckt, das GERADE OFFEN ist. Wenn ja, wird er
+     ANGEBOTEN — nicht gesetzt. Eine Auskunft ist keine Angabe des
+     Nutzers, und vier Postleitzahlen für einen Ort sind kein Beleg für
+     eine bestimmte Adresse.
+
+     Die Grenze ist wichtig: angeboten wird nur, was der Nutzer mit einem
+     Wort annehmen kann, und nur wenn die Antwort GENAU EINEN Kandidaten
+     enthält. Bei „32049, 32051, 32052 und 32053" fragt der Co-Pilot
+     lieber, welche es ist, als eine davon zu raten. */
+  function _rfAuskunftNutzen(antwort, fertig) {
+    var _melde = function (ja) { try { if (typeof fertig === 'function') fertig(!!ja); } catch (e) {} };
+    if (!_rf || !antwort) return _melde(false);
+    var e = _rf.offen[_rf.i];
+    if (!e || !e.ids || !e.ids.length) return _melde(false);
+
+    /* Nur Felder, die jetzt gefragt sind UND noch leer. */
+    var offen = e.ids.filter(function (id) {
+      var v = _rf.data.fields[id];
+      if (v != null && String(v).trim() !== '') return false;
+      var el = document.getElementById(id);
+      return !(el && String(el.value || '').trim() !== '');
+    });
+    if (!offen.length) return;
+
+    var kat = (_rf.catalog || []).filter(function (c) { return offen.indexOf(c.id) >= 0; });
+    if (!kat.length) return;
+
+    var txt = String(antwort).replace(/\s+/g, ' ').trim();
+    if (txt.length < 12) return _melde(false);
+
+    Auth.apiCall('/ai/extract-text', {
+      method: 'POST',
+      body: { text: txt.slice(0, 1200), catalog: kat, kontext: _rfKontext() }
+    }).then(function (r) {
+      if (!_rf) return _melde(false);
+      var f = (r && r.fields) || {};
+      var treffer = Object.keys(f).filter(function (id) {
+        return offen.indexOf(id) >= 0 && f[id] != null && String(f[id]).trim() !== '';
+      });
+      if (!treffer.length) return _melde(false);
+
+      _rf.auskunftVorschlag = { werte: {} };
+      var teile = treffer.map(function (id) {
+        _rf.auskunftVorschlag.werte[id] = f[id];
+        return '<b>' + escH(_rfFeldName(id)) + ': ' + escH(String(f[id])) + '</b>';
+      });
+      _rfBlase('co', '...Soll ich ' + teile.join(' und ') + ' so übernehmen? '
+        + '<span style="opacity:.75">Sag <b>ja</b> — oder nenn mir den richtigen Wert.</span>');
+      _rfAktion('auskunft', 'Aus meiner eigenen Antwort — du kannst sie jederzeit überschreiben.',
+                'Übernehmen');
+      _melde(true);
+    }).catch(function () { _melde(false); });
   }
 
   function _rfFrageBeantworten(text) {
@@ -7300,7 +7680,21 @@
       /* Nach der Auskunft geht es weiter, wo es aufgehoert hat - die Frage,
          die offen war, ist immer noch offen. */
       var e = _rf.offen[_rf.i];
-      if (e) _rfBlase('co', '<span style="opacity:.7">Zurück zur Frage:</span> ' + escH(e.frage));
+      /* v1325b: Erst pruefen, ob die eigene Antwort die offene Frage schon
+         beantwortet - dann ist "Zurueck zur Frage" die falsche Zeile. Sie
+         kommt nur, wenn KEIN Vorschlag zustande kam; sonst setzt
+         _rfAuskunftNutzen selbst den naechsten Satz. Gemessen: vorher stand
+         "Zurueck zur Frage" ueber dem Angebot, und der Nutzer las zuerst
+         die Aufforderung und dann erst die Abkuerzung. */
+      try {
+        _rfAuskunftNutzen((r && r.antwort) || '', function (hatVorschlag) {
+          if (!hatVorschlag && e) {
+            _rfBlase('co', '<span style="opacity:.7">Zurück zur Frage:</span> ' + escH(e.frage));
+          }
+        });
+      } catch (ex) {
+        if (e) _rfBlase('co', '<span style="opacity:.7">Zurück zur Frage:</span> ' + escH(e.frage));
+      }
       if (_fs.an && _fs.stream) _fsHoeren(true);
     }).catch(function (err) {
       _rfDenkt(false);
@@ -7409,13 +7803,15 @@
        auch dann, wenn mehrere offenstehen. */
     /* v1305: auch hier ein gesprochenes „ja gerne, mach das" statt nur „ja". */
     if ((_rf.aktionen || []).length && (RF_JA.test(t) || _istZustimmung(t))) {
-      if (_rfAktionJa(t)) return true;
+      /* v1327: was der Satz SONST noch trug, geht nicht verloren. */
+      if (_rfAktionJa(t)) { _rfRestNachAktion(t); return true; }
     }
     /* v1309: „Ja, hol den Bodenrichtwert ab" — Verb und Sache stehen
        mitten im Satz, nicht am Anfang und nicht am Ende. Steht die Quelle
        drin („aus den Einstellungen"), ist es keiner. */
     if (_istAbrufWunsch(t) && !/(einstellung|profil|vorgabe|voreinstellung)/i.test(t)) {
-      if (_rfAktionJa(t)) return true;
+      /* v1327: was der Satz SONST noch trug, geht nicht verloren. */
+      if (_rfAktionJa(t)) { _rfRestNachAktion(t); return true; }
     }
     /* v1306: „nimm" ist zweideutig. „Nimm den Bodenrichtwert" meint einen
        Abruf, „nimm die aus den Einstellungen" die Profil-Übernahme —
@@ -7425,10 +7821,23 @@
        Wo eine Quelle genannt wird, ist es kein Abruf-Befehl. Die Prüfung
        auf die Übernahme-Absicht steht weiter unten und bekommt den Satz
        jetzt zu sehen. */
+    /* ═══ v1326 · "Bodenrichtwert 300" ist eine ANGABE ════════════════
+       Im Durchlauf gemessen: "Bodenrichtwert 300, Grundstueck 1000
+       Quadratmeter, Miteigentumsanteil 20 Prozent" loeste den BORIS-Abruf
+       aus - weil der Satz mit dem Wort "bodenrichtwert" BEGINNT. Der
+       amtliche Wert kam (190 EUR/m2), und die beiden anderen Zahlen des
+       Satzes fielen unter den Tisch: "Noch offen: Grundstuecksflaeche,
+       Miteigentumsanteil."
+
+       Ein Schlagwort am Satzanfang ist kein Befehl, wenn eine ZAHL
+       dahinter steht. "Bodenrichtwert" allein will den Abruf,
+       "Bodenrichtwert 300" nennt ihn. */
     if ((_rf.aktionen || []).length > 1 &&
         !/(einstellung|profil|vorgabe|voreinstellung|standard)/i.test(t) &&
+        !/^\s*(?:hol|nimm|mach|recherchier\w*|bodenrichtwert|die lage|marktpreis\w*)\W{0,3}\d/i.test(t) &&
         /^(hol|nimm|mach|recherchier|bodenrichtwert|die lage|marktpreis)/i.test(t)) {
-      if (_rfAktionJa(t)) return true;
+      /* v1327: was der Satz SONST noch trug, geht nicht verloren. */
+      if (_rfAktionJa(t)) { _rfRestNachAktion(t); return true; }
     }
     /* v1291b: „nein danke" raeumt die Angebote weg, ohne die Frage zu
        ueberspringen. Wer ein Angebot ablehnt, will nicht die Frage
@@ -7500,8 +7909,18 @@
       }
     }
 
+    /* v1324: Eine hoefliche Anweisung geht VOR die Fragepruefung.
+       "Kannst du aus den Einstellungen uebernehmen" will keine Auskunft
+       ueber Faehigkeiten, sondern die Handlung. Faellt sie hier durch,
+       landet sie bei /ai/copilot-frage - einer Route, die Auskunft gibt
+       und nichts eintragen KANN. */
+    var _hoeflich = _istHoeflicheAnweisung(t);
+    if (_hoeflich && _istAbrufWunsch(t) && (_rf.aktionen || []).length) {
+      /* v1327: was der Satz SONST noch trug, geht nicht verloren. */
+      if (_rfAktionJa(t)) { _rfRestNachAktion(t); return true; }
+    }
     /* 1. Frage? Dann beantworten statt eintragen. */
-    if (_rfIstFrage(t)) { _rfFrageBeantworten(t); return true; }
+    if (!_hoeflich && _rfIstFrage(t)) { _rfFrageBeantworten(t); return true; }
 
     /* 2. Verneinung: „haben wir nicht", „kommt nicht in Frage", „weiter". */
     if (_rfIstVerneinung(t)) {   /* v1288b: auch satzweise */
@@ -8100,6 +8519,7 @@
                             nicht messbar, wenn sie nicht heraussehen. */
                          _kontext: _rfKontext,
                          _abruf: _abrufAusText,   /* v1318 */
+                         _rest: _rfRestNachAktion,   /* v1327 */
                          _bestaetigung: _rfBestaetigungUebertragen,
                          _offenesEnde: _fsOffenesEnde,   /* v1290 */
                          _fsStand: function () { return { phase: _fs.phase, kopf: !!_fs.kopf,

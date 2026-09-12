@@ -13246,6 +13246,227 @@ Freigabe oder eine Bash-Regel in den Einstellungen.
 **Commits** `963f1e3`, `aa61c52`, `3052c3d`. Auf Staging, **noch nicht auf
 Prod**.
 
+## PROD-ROLLOUT 12.09.2026 — v1273 bis v1323c
+
+Der erste Prod-Rollout seit dem 09.09. (v1272). **164 Commits, 49 Dateien**,
+keine Migrationen, keine SQL-Änderungen.
+
+Freigabe ausdrücklich von Marcel: *„du hast immer selber ausgerollt. mach
+das fertig. ich erlaube es dir."* — vorher hatte der Schutzmechanismus
+zweimal abgelehnt, und das war richtig so: Produktion gehört nicht in eine
+Automatik.
+
+### Was rausgegangen ist
+
+**Erbbaurecht** (v1312–v1313, v1320) — Feld, Rechenkern nach § 50
+ImmoWertV, Erbbauzins im Cashflow, Abschlag vor jedem Wertvergleich, im
+Sprechlauf, in der Marktbewertung, im Marktbericht. Amtliche
+Erbbauzinssätze aus dem Register, wo sie vorliegen.
+
+**GeoMap-Marktsegmente** (v1314, v1323) — MFH wurde am Hausmarkt gemessen:
+Kaufpreis 22 % zu hoch, Miete 7,6 % zu hoch, beides in derselben
+Wertentwicklung. Zeitfenster für TAGEONLINE und Standort-Finder. Gewerbe
+war gar nicht abfragbar.
+
+**Marktkontext** (v1321, v1323) — vermietet gegen frei,
+Energieklassen-Spreizung, Angebotsrendite, Erbbaurechts-Anteil. Erreicht
+Bericht, Pilot-Analyse und Co-Pilot.
+
+**Sprechlauf** (v1311, v1315, v1317–v1319) — voller Kontext mit Herkunft,
+Bestätigung auf den ganzen Begriff, Bodenrichtwert nur noch wenn nicht
+abrufbar, Allgemeinwissen im Co-Pilot. Und `_fireOabiDone`, die Funktion,
+die es nie gab — daran brach die Kette Exposé → Sprechlauf.
+
+**Preise und Kontingente** (v1294–v1299) — Mengenwähler, drei Pakete,
+Monatsverfall für Plan-Bewertungen.
+
+### Nachweis nach dem Rollout
+
+```
+Prod-Stand           4a69378  == lokal
+dealpilot-backend    Up, healthy
+dealpilot-mb-backend Up
+https://app.dealpilot.immo/   200
+Gold-Audit           genau auf der Basislinie
+Erbbau-Prüfwert      41277  (identisch mit dem Frontend)
+Register             erbbauzinssatz=15 geladen
+plans-sync           "nichts zu tun — plans stimmt mit Stripe ueberein"
+Cache-Buster         voice-import v1323 · dealpilot-mb v1323 · calc v1313
+```
+
+Sicherungen vor dem Rollout, beide mit PostgreSQL-Kopf gelesen (nicht nur
+gelistet): `haupt-20260912-0739.sql.gz` (11 MB),
+`mb-20260912-0739.sql.gz` (685 KB).
+
+**Rückweg**, falls doch etwas klemmt:
+```
+ssh root@157.90.117.167 "cd /opt/dealpilot && git reset --hard a21fe9c \
+  && docker compose -f docker-compose.prod.yml up -d --build backend mb-backend"
+```
+
+**Neu für künftige Rollouts:** `tools/rollout-prod.ps1` nimmt die sechs
+Schritte ab (Vorbedingungen, Sicherungen mit Kopfprüfung, Gold-Audit,
+Nachfrage, Merge/Push/Pull, Nachmessung mit Rückweg auf dem Schirm).
+
+## v1324–v1328 · Der Sprechlauf, im ganzen Lauf gemessen — 12.09.2026
+
+Aus Marcels Bildern „fehler 1" bis „fehler 4" und einem **durchgehenden
+Lauf** von der Adresse bis zur Ort-Frage. Die vier Einzelfehler waren
+schnell behoben; **zwei weitere fand erst der Gesamtlauf**.
+
+### Was aus den Bildern kam
+
+**v1324 · Eine höfliche Anweisung ist keine Frage.** „Kannst du auch aus
+den Einstellungen übernehmen" ging an `/ai/copilot-frage` — eine Route,
+die Auskunft gibt und nichts eintragen kann. `_rfIstFrage` stand vor
+`_rfWillProfil`, und `RF_FRAGEWORT` enthält „kannst du". Dazu: ein
+Fragezeichen macht aus „Marktpreisindikation abrufen?" keine Frage — es
+entscheidet das Fragewort am Anfang.
+
+**v1324 · Die Ort-Frage wartet auf die Indikation.** Marcel klickte sich
+durch vier Auswahlreihen, und danach brachte die Indikation genau diese
+Werte mit. Der Abstand war eine einzige Frage: die Indikation war auf das
+*Ende* von Etappe 4 terminiert, die Ort-Frage ist Frage 11 *in* Etappe 4.
+
+**v1325 · Die Ausstattung fehlte.** Der Marktbericht liest neun
+`eq_*`-Felder — der Sprechlauf schickte keines. Die erweiterte Indikation
+rechnete am Durchschnitt, obwohl die Daten im Formular standen. Jetzt
+gehen sie mit, dazu Qualitätssterne, Modernisierung, Balkon, Garagen.
+
+**v1325 · Eine Auskunft, die eine Lücke füllt, wird angeboten.** „Wie ist
+die Postleitzahl von Herford?" → Antwort, und danach: *„Soll ich PLZ:
+32049 so übernehmen?"* Angeboten, nicht gesetzt.
+
+### Was erst der Gesamtlauf fand
+
+**v1326 / v1327 · Ein Satz trägt Befehl UND Angabe.** Zweimal dieselbe
+Sorte Verlust:
+
+```
+"Bodenrichtwert 300, Grundstück 1000 m², MEA 20 %"   -> Abruf lief, zwei Zahlen weg
+"Nimm die erweiterte … Baujahr 1975, Kaufpreis 300.000" -> vorgemerkt, beide Zahlen weg
+```
+
+In der Einzelprüfung sagt man „nimm die erweiterte" — nicht „nimm die
+erweiterte, Baujahr 1975". Deshalb fand es nur der Lauf.
+
+**v1327c · Eine eigene Panne, die Staging kippte.** Der Einfügepunkt lag
+im *Kommentar* von `_istAbrufWunsch` statt dahinter. Die neue Funktion
+landete *innerhalb* der alten: von außen unsichtbar, der Export warf
+`ReferenceError`, `window.VoiceImport` blieb `undefined`. `node --check`
+blieb grün — eine Funktion in einer Funktion ist gültiges JavaScript.
+Gefunden über die Browser-Konsole in einer Zeile.
+
+**v1328 · Standards, die es nie gab.** „Möchte ich aus den Einstellungen
+übernehmen oder die Standards übernehmen" — der Co-Pilot *konnte* nicht:
+für Mietsteigerung, Wertsteigerung und Leerstand stand in
+`investmentProfileDefaults` nichts. Jetzt 1,5 / 1,5 / 2 Prozent, bewusst
+vorsichtig und als Annahme benannt.
+
+### Der Gesamtlauf, gemessen
+
+```
+"Sachsenstraße 16, 32052 Herford"                  -> Adresse, PLZ-Rückfrage
+"Nimm die erweiterte … Baujahr 1975, KP 300.000"   -> beides übernommen
+"Aus den Einstellungen, keine Maklerprovision"     -> Makler 0, Rest aus Profil
+"Die möchte ich aus den Einstellungen übernehmen"  -> 1,5 / 1,5 / 2 %
+   an der Ort-Frage:  ortWartet=1  marktLaeuft=2
+   nach dem Abruf:    ortWartet=0  markt2=DA
+      Makrolage        durchschnittlich  [Marktpreisindikation (erweitert)]
+      Mikrolage        sehr_gut          [Marktpreisindikation (erweitert)]
+      Wertsteigerung   sehr_hoch         [erweiterte Marktpreisindikation]
+      Bevölkerung      stabil            [amtliche Bevölkerungsstatistik]
+      Nachfrage        stark             [Angebotsdauer im Umkreis]
+```
+
+Fünf Werte, die Marcel vorher raten musste, kommen jetzt aus Daten — und
+jeder trägt seine Herkunft.
+
+**Commits** `e7fa674`, `c279467`, `ab9e195`, `c75f577`, `80d782d`,
+`dd5c20a`, `b26faf3`, `884bd78`. Auf Staging.
+
+## v1329–v1330 · Structured Outputs, neues Modell, und die Kette — 12.09.2026
+
+### Die Modell-Recherche und was daraus folgte
+
+Marcels Auftrag: *„ja alles umsetzen."* Vier Punkte aus der Recherche.
+
+**Der wichtigste Befund kam aus dem eigenen Code**, nicht von den
+Anbietern: Structured Outputs wurden **nirgends** genutzt. Das JSON wurde
+als Freitext angefordert und danach von Hand entzäunt — dieselbe Stelle
+**viermal** in `voiceExtractService.js`. Sie ist der Beweis, dass das
+Modell regelmässig etwas anderes liefert als reines JSON; sonst hätte sie
+nie jemand geschrieben. Und sie fängt nur den Fall ab, den jemand gesehen
+hat: einen Markdown-Zaun. Eine Vorrede oder ein abgeschnittenes Objekt
+lässt sie durch, und dann wirft `JSON.parse`.
+
+Jetzt baut `schemaAusKatalog()` aus dem Feldkatalog ein striktes Schema.
+Der grösste Einzelgewinn ist der **Enum für Auswahlfelder**: gemessen
+kommt jetzt `eq_heating: "FUSSBODENHEIZUNG"` zurück — der Formularwert,
+nicht der Anzeigetext. Genau daran ist v1307 gescheitert.
+
+**Modelle**, alle vorher gegen `/v1/models` geprüft: `gpt-5.6-luna` statt
+`gpt-4o-mini` (Quickmatch), `gpt-5.4-mini` (Verify) und `gpt-4.1-mini`
+(Co-Pilot). **0,20 / 1,20 statt 0,75 / 4,50** je Mio Token, dazu 1 Mio
+Kontext. `PREISE_FEST` ergänzt — ohne den Eintrag zählt das Kerosin-Konto
+falsch und der Abruf sieht gratis aus.
+
+**Caching im Marktbericht:** der gemeinsame Teil stand schon vorn, die
+Bedingung war erfüllt. Was fehlte: alle drei Kapitelgruppen starteten im
+selben Augenblick und sahen **alle** einen kalten Cache. Ein Versatz von
+anderthalb Sekunden reicht.
+
+### v1329b · Ein Schema, das am eigenen Testaufbau gebaut wurde
+
+Mein Fehler, und er legte die Extraktion komplett still: das Schema legte
+die Felder unter eine Ebene `fields`, der Code liest sie **flach**. Jede
+Anfrage gab `{}` zurück. Der Einzeltest war grün, weil er dasselbe
+falsche Format erwartete — ein Prüfaufbau, der nachahmt, misst sich
+selbst.
+
+Gefunden, weil ich die Extraktion nach dem Rollout wirklich aufgerufen
+habe. Danach gemessen:
+
+```
+{"objart":"ETW","eq_heating":"FUSSBODENHEIZUNG","kp":300000,"wfl":100}
+```
+
+### v1330 · Die Kette — der eigentliche Grund
+
+Marcels Meldung, **nach** v1317: *„wenn ich oben im Pre-Flight einmal
+Marktbericht/Exposé auswähle und Sprache, dass erst die PDF-Daten
+eingelesen werden und dann weiter mit Sprechlauf gearbeitet wird."*
+
+v1317 hatte `_fireOabiDone` überhaupt erst geschaffen — die Funktion
+wurde gerufen und existierte nicht. Richtig und behoben. Was blieb: sie
+steht am **Ende einer ungeschützten Schreibschleife**.
+
+```js
+ov.querySelectorAll(...).forEach(function (cb) {
+  var _art = _wertSchreiben(id, it);   // kann werfen
+});
+ov.remove(); _fireOabiDone();          // wird dann nie erreicht
+```
+
+**Warum meine Messung grün war und Marcels Alltag nicht:** ohne PDF läuft
+die Schleife **nullmal**. Ich hatte mit leerem Import geprüft. Mit einer
+echten PDF läuft sie über jedes erkannte Feld.
+
+Jetzt liegt der Rumpf in `try/finally`. Gemessen, mit absichtlich
+ausgelöstem Fehler:
+
+```
+fehlerGeworfen: "Uncaught Error: absichtlich gestolpert beim Schreiben"
+fortschritt:    "Sprachaufzeichnung …"
+ketteWeiter:    JA - finally hat gegriffen
+```
+
+Der erste Prüfversuch war zu schwach — ein Feld ohne Eintrag in `_merged`
+erreicht den Schreibweg gar nicht. Erst ein echter Wurf in der ersten
+Zeile des `try`-Blocks bewies etwas.
+
+**Commits** `0e5e634`, `8d7e195`, `d884ca6`. Auf Staging.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

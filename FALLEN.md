@@ -2720,3 +2720,153 @@ werden kann.
 Das ist derselbe Befund wie bei `/dev/stdin` weiter oben, nur mit anderem
 Auslöser. **Regel: die Gegenprobe ist Teil des Prüflaufs, nicht eine
 Kür.** Ein grüner Prüfer ohne bewiesenes Rot sagt nichts.
+
+## Deutsche Höflichkeit kleidet Anweisungen in Fragen
+
+„Kannst du auch aus den Einstellungen übernehmen." will keine Auskunft über
+Fähigkeiten — es ist ein Befehl mit einem Höflichkeitsmantel. Der Sprechlauf
+prüfte aber `_rfIstFrage` **vor** `_rfWillProfil`, und `RF_FRAGEWORT` enthält
+„kannst du". Der Satz landete bei `/ai/copilot-frage` — einer Route, die
+Auskunft gibt und **nichts eintragen kann**. Der Co-Pilot erklärte also, dass
+er es könne, und tat es nicht.
+
+Dasselbe eine Ebene weiter: „Erweiterte Marktpreisindikation abrufen?" wurde
+ausgeschlossen, weil der Satz mit einem Fragezeichen endet.
+
+**Was eine echte Frage von einer Bitte trennt, ist das Fragewort am ANFANG,
+nicht das Zeichen am Ende.** „Was ist der Bodenrichtwert?" will Auskunft.
+„Bodenrichtwert abrufen?" will den Abruf. Und die Reihenfolge der Prüfkette
+entscheidet mit: wer zuerst greift, gewinnt — eine Prüfung auf „ist das eine
+Frage" gehört **hinter** die Prüfung „gibt es hier etwas zu tun".
+
+## Eine Frage, die auf Daten wartet, die gleich kommen
+
+Der Sprechlauf fragte nach Bevölkerung, Nachfrage, Wertsteigerung und
+Entwicklung — vier Auswahlreihen zum Durchklicken. Direkt danach kam die
+erweiterte Marktpreisindikation und brachte genau diese Werte mit.
+
+Der Grund war eine einzige Frage Abstand: die Indikation war auf das **Ende**
+von Etappe 4 terminiert, die Ort-Frage ist Frage 11 **in** Etappe 4. Alles,
+was die Indikation braucht, stand schon nach Etappe 3.
+
+**Regel: Bevor eine Frage gestellt wird, prüfen, ob eine laufende oder
+vorgemerkte Quelle sie gleich beantwortet.** Der Nutzer soll nicht raten, was
+die Maschine in zehn Sekunden weiß. Und wenn die Quelle kommt, zählt eine
+Vorbelegung im Formular nicht als Angabe — die Indikation ist gemessen, die
+Vorbelegung geraten. Nur was der Nutzer SELBST gesagt hat, gewinnt.
+
+## Ein Satz trägt Befehl und Angabe — und der Code steigt nach dem Befehl aus
+
+Im durchgehenden Lauf zweimal gefunden, beide Male dieselbe Sorte Verlust:
+
+```
+"Bodenrichtwert 300, Grundstück 1000 m², Miteigentumsanteil 20 %"
+  -> BORIS-Abruf lief, die beiden anderen Zahlen fielen weg
+"Nimm die erweiterte Marktpreisindikation. Baujahr 1975, Kaufpreis 300.000"
+  -> Indikation vorgemerkt, Baujahr und Kaufpreis fielen weg
+```
+
+Der Grund ist immer derselbe: eine Aktion wird erkannt, ausgeführt, `return
+true`. Was im selben Satz noch stand, sieht danach niemand.
+
+Bei der Profil-Übernahme gibt es das richtige Verhalten seit v1286 — *„Trägt
+er noch mehr, wird das Profil eingetragen UND der Satz danach ausgewertet."*
+Den Abrufen fehlte es, an **allen vier** Aufrufstellen.
+
+**Wer spricht, trennt nicht in Befehle und Angaben.** Nach jeder erkannten
+Aktion gehört der Restsatz durch die normale Auswertung.
+
+**Und: Einzelprüfungen finden das nicht.** Beide Fälle kamen erst im
+durchgehenden Lauf ans Licht — in der Einzelprüfung sagt man „nimm die
+erweiterte", nicht „nimm die erweiterte, Baujahr 1975".
+
+## Eine Funktion in einer Funktion ist gültiges JavaScript
+
+Ein Einfügepunkt lag im **Kommentar** von `_istAbrufWunsch` statt dahinter.
+Die neue Funktion landete damit *innerhalb* der alten, und zwei Dinge brachen
+gleichzeitig:
+
+1. Sie war von außen unsichtbar — der Export am Dateiende warf
+   `ReferenceError`, `window.VoiceImport` blieb `undefined`, **der ganze
+   Sprechlauf war tot**.
+2. Die umschließende Funktion war entstellt: ihre letzten beiden Zeilen
+   standen hinter der verschachtelten.
+
+**`node --check` blieb grün** — Syntax war einwandfrei, Bedeutung nicht.
+
+Gefunden über die **Browser-Konsole**, nicht durch Code-Lesen: der
+`ReferenceError` nannte Datei, Zeile und Spalte in einer Zeile.
+
+**Regel: Beim Einfügen vor einer Funktion prüfen, ob der Anker der
+Funktionskopf ist — nicht der Kommentar darüber.** Und nach jedem Einbau in
+eine Datei mit Export-Block einmal im Browser nachsehen, ob das Modul
+überhaupt noch lädt. Syntaxprüfung beweist das nicht.
+
+## Ein Rückruf, an dem eine Kette hängt, gehört in ein `finally`
+
+Marcels Kette Exposé → Sprechlauf blieb stehen, auch nach v1317. Die
+Funktion `_fireOabiDone` existierte da schon — sie stand nur am **Ende einer
+ungeschützten Schleife**:
+
+```js
+ov.querySelectorAll(...).forEach(function (cb) {
+  var _art = _wertSchreiben(id, it);   // kann werfen
+});
+...
+ov.remove(); _fireOabiDone();          // wird dann nie erreicht
+```
+
+**Warum meine Messung grün war und der Alltag nicht:** ohne PDF läuft die
+Schleife **nullmal**. Ich hatte die Kette mit leerem Import geprüft — dort
+kann nichts werfen. Mit einer echten PDF läuft sie über jedes erkannte Feld,
+und ein einziges, das stolpert, lässt die ganze Kette stehen.
+
+**Regel: Wo ein Rückruf einen Ablauf weiterschiebt, gehört er ins `finally`,
+nicht ans Ende des `try`.** Was beim Arbeiten schiefgeht, darf das eine Feld
+kosten — nicht den Rest des Ablaufs.
+
+Und für die Prüfung: **einen Fehler absichtlich auslösen.** Ein grüner
+Durchlauf ohne Daten beweist nichts über einen Durchlauf mit Daten. Der erste
+Versuch war zu schwach (ein Feld ohne Eintrag in `_merged` erreicht den
+Schreibweg gar nicht) — erst ein echter Wurf in der ersten Zeile des
+`try`-Blocks zeigte, dass das `finally` greift.
+
+## Ein Schema, das am eigenen Testaufbau gebaut wurde
+
+Beim Umbau auf Structured Outputs legte ich die Felder unter eine Ebene
+`fields`. Das Modell lieferte sauber `{"fields":{"kp":300000,…}}` — und der
+Code darunter liest `Object.keys(parsed)` **flach**. Er fand `fields` und
+`_unsicher`, beide keine Feld-Id, und verwarf alles. **Jede Extraktion gab
+`{}` zurück.**
+
+Der Einzeltest gegen die API war grün, weil er dasselbe falsche Format
+erwartete wie das Schema. Ein Prüfaufbau, der nachahmt, misst sich selbst —
+dieselbe Falle wie beim Prüfkatalog in v1307.
+
+**Vor einem Schema-Umbau das Format lesen, das der bestehende Code
+erwartet** — nicht das, das man selbst für richtig hält. Ein Blick auf
+`Object.keys(parsed).forEach` hätte gereicht.
+
+## „Steht im Formular" ist nicht eine Herkunft, sondern drei
+
+Die Stand-Box färbte einen Block nur grün, wenn ein Wert **nicht** aus dem
+Formular kam. Das war als Schutz gedacht und ist es auch: ein Zinssatz von
+3,5 % aus dem Investmentprofil ist keine Angabe zu *diesem* Objekt, und wer
+ihn grün sieht, hält eine Frage für beantwortet, die niemand gestellt hat
+(v1273c).
+
+Nur trifft dieselbe Regel drei verschiedene Dinge:
+
+| Herkunft | ist es eine Angabe zu diesem Objekt? |
+|---|---|
+| Vorbelegung aus dem Profil | **nein** — grau |
+| Wert aus dem Exposé / Marktbericht | **ja** — grün |
+| vom Nutzer selbst getippt | **ja** — grün |
+
+Alle drei stehen am Ende im selben `<input>`. Die Unterscheidung lag längst
+vor (`_vorlaufFelder`, seit v1293) — sie wurde für die Färbung nur nie
+gelesen.
+
+**Regel: Bevor man „kommt aus dem Formular" als Ausschlusskriterium
+benutzt, prüfen, wie viele verschiedene Wege in dieses Formular führen.**
+Ein Speicherort ist keine Herkunft.

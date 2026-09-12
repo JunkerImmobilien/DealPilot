@@ -48,7 +48,9 @@ const config = {
   // OpenAI (optional - server-side proxy for KI-Analyse with web search)
   openai: {
     apiKey: process.env.OPENAI_API_KEY || '',
-    defaultModel: process.env.OPENAI_DEFAULT_MODEL || 'gpt-4o-mini'
+    /* v1329: war gpt-4o-mini - in ChatGPT abgeschaltet, API-Snapshot
+       abgekuendigt zum 11.12.2026. */
+    defaultModel: process.env.OPENAI_DEFAULT_MODEL || 'gpt-5.6-luna'
   },
 
   // Frontend URL for redirects (Stripe success/cancel, email links)
