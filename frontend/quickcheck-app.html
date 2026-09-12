@@ -4122,10 +4122,50 @@ const QcApp = (function() {
        sich nur, wenn eines der beiden Kern-Skripte nicht laedt - dort,
        wo bisher ein TypeError stand, rechnet jetzt QcEngine. */
     let score = null;
+    let _ausRueckfall = false;
     if (window._dpPilotScore) {
       try { score = window._dpPilotScore(inputs, (_avmResults[0]||null)); } catch (_e) { score = null; }
     }
-    if (!score) score = QcEngine.computeScore(inputs, (_avmResults[0]||null));
+    if (!score) {
+      score = QcEngine.computeScore(inputs, (_avmResults[0]||null));
+      _ausRueckfall = true;
+    }
+
+    /* v1365b · EIN NOTBEHELF DARF NICHT AUSSEHEN WIE DAS ECHTE.
+       Gemessen am 13.09.2026 mit identischen Eingaben (300.000 / 900 /
+       250 / 60.000): der aktive Weg sagt 15, der Rueckfall sagt 30.
+       Doppelt so viel, und ohne Hinweis nicht zu unterscheiden.
+
+       Das sind zwei verschiedene Modelle - DealScore.computeFromKpis
+       gegen QcEngine.computeScore -, und der Unterschied ist kein
+       Fehler, sondern ihre Natur. Ein Score, der bei einer
+       Kaufentscheidung um 100 % danebenliegt, darf aber nicht
+       ununterscheidbar danebenstehen. Genau diese Sorte Widerspruch hat
+       v1203 schon einmal gekostet: derselbe Score, zwei verschiedene
+       Woerter.
+
+       Der Hinweis erscheint NUR im Notfall - wenn eines der Kern-Skripte
+       nicht geladen hat. Im Normalbetrieb sieht ihn niemand. */
+    var _rueckHinweis = document.getElementById('qc-rueckfall-hinweis');
+    if (_ausRueckfall && score && score.score != null) {
+      if (!_rueckHinweis) {
+        var _mega = document.getElementById('sb-mega');
+        if (_mega) {
+          _rueckHinweis = document.createElement('div');
+          _rueckHinweis.id = 'qc-rueckfall-hinweis';
+          _rueckHinweis.style.cssText = 'margin-top:6px;font-size:10.5px;line-height:1.45;' +
+            'color:#B8625C;text-align:center;max-width:210px;margin-left:auto;margin-right:auto';
+          _mega.appendChild(_rueckHinweis);
+        }
+      }
+      if (_rueckHinweis) {
+        _rueckHinweis.textContent = 'Ersatzrechnung \u2014 die Bewertungsmodule sind gerade ' +
+          'nicht erreichbar. Diese Zahl kann deutlich abweichen; bitte neu laden.';
+      }
+    } else if (_rueckHinweis) {
+      _rueckHinweis.textContent = '';
+    }
+
 
     const stage = QcEngine.stage(inputs);
     const comp = QcEngine.completeness(inputs);
