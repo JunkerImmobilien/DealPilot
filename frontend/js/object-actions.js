@@ -1510,7 +1510,12 @@
           '<button type="button" class="oabi-btn primary" id="oabi-apply" disabled><span style="display:inline-flex">' + svg('download', 14, '#fff') + '</span> Ausgewählte übernehmen</button></div>' +
       '</div>';
     document.body.appendChild(ov);
-    function close() { var x = $('oabi-ov'); if (x) x.remove(); _fireOabiDone(); }
+    /* v1330: auch hier darf nichts dazwischenkommen - das Fenster ist
+       schon weg, wenn der Rueckruf faellt. */
+    function close() {
+      try { var x = $('oabi-ov'); if (x) x.remove(); } catch (e) {}
+      _fireOabiDone();
+    }
     $('oabi-cancel').addEventListener('click', close);
     var drop = $('oabi-drop'), input = $('oabi-input');
     drop.addEventListener('click', function () { input.click(); });
@@ -1641,10 +1646,36 @@
     return 'text';
   }
 
+  /* ═══ v1330 · DER RUECKRUF MUSS IMMER FEUERN ════════════════════════
+     Marcels Befund, nach v1317 immer noch: "wenn ich oben im Pre-Flight
+     einmal Marktbericht/Expose auswaehle und Sprache, dass erst die PDF
+     Daten eingelesen werden und dann weiter mit Sprechlauf gearbeitet
+     wird."
+
+     v1317 hat _fireOabiDone ueberhaupt erst geschaffen - der Rueckruf
+     existierte nicht. Gemessen und behoben. Was danach blieb: er steht
+     am ENDE einer ungeschuetzten Schreibschleife.
+
+       ov.querySelectorAll(...).forEach(function (cb) {
+         var _art = _wertSchreiben(id, it);   <- kann werfen
+       });
+       ...
+       ov.remove(); _fireOabiDone();          <- wird dann nie erreicht
+
+     `_wertSchreiben` ruft setSelectSmart, StarRating.setRating und
+     setInput - alles ohne Schutz. OHNE PDF laeuft die Schleife nullmal
+     und alles ist gut; MIT einer PDF laeuft sie ueber jedes erkannte
+     Feld, und ein einziges, das wirft, laesst die Kette stehen. Genau
+     der Unterschied zwischen meiner Messung und Marcels Alltag.
+
+     Jetzt liegt der ganze Rumpf in try/finally: was beim Schreiben
+     schiefgeht, kostet dieses eine Feld - nicht den Rest des Ablaufs.
+     Ein Rueckruf, an dem eine Kette haengt, gehoert in ein finally. */
   function applyMerged() {
     var ov = $('oabi-ov'); if (!ov) return;
     if (_qcMode) { return applyMergedQc(ov); }  /* v418 */
-    var n = 0, _applied = [];
+    var n = 0, _applied = [], _san = '';
+    try {
     ov.querySelectorAll('.oabi-tbl input[type="checkbox"]:checked').forEach(function (cb) {
       var id = cb.getAttribute('data-id'), it = _merged[id]; if (!it) return;
       var _art = _wertSchreiben(id, it);
@@ -1661,10 +1692,14 @@
       }
     } catch (e) {}
     try { if (typeof window._v236MarkQcLoaded === 'function' && _applied.length) window._v236MarkQcLoaded(_applied); } catch (e) {}
-    var _san = _sanNachziehen(_applied);
+    _san = _sanNachziehen(_applied);
     try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
     try { if (typeof window.renderDealScore2 === 'function') window.renderDealScore2(); } catch (e) {}
-    ov.remove(); _fireOabiDone();
+    } finally {
+      /* v1330: kommt IMMER - auch wenn oben ein Feld geworfen hat. */
+      try { ov.remove(); } catch (e) {}
+      _fireOabiDone();
+    }
     toast('✓ ' + n + ' Werte aus Import übernommen' + (_san ? ' · ' + _san : ''));
   }
 
