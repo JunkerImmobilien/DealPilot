@@ -3073,3 +3073,54 @@ meldeten „ersetzt", ohne etwas zu ändern; erst das Nachzählen im Skript
   `JSON.stringify(regex.source)`, nicht mit `String(regex)`.
 - Escape-Sequenzen **nie tippen, immer generieren** — und die Ersetzung
   zählen lassen, statt dem „OK" zu glauben.
+
+## 141 · Die Nachführung muss den ersten Lauf überleben
+
+`start()` in `mb-quellen.js`:
+
+```js
+stil();
+vorhang();                        <- wirft hier etwas,
+holen();
+document.addEventListener(...)    <- werden diese nie gesetzt
+```
+
+Gemessen: der Vorhang entstand beim Klick auf eine Stufe **nie**, ein
+Aufruf von Hand baute ihn **sofort**. Ein gescheiterter erster Lauf hatte
+die ganze Nachführung mitgenommen — und weil die Entprellfunktion ihre
+Ausnahmen selbst schluckt, war danach still.
+
+**Dasselbe Muster wie v1330** (der Rückruf am Ende einer ungeschützten
+Schleife), nur in der Startreihenfolge statt in einer Schleife.
+
+**Regel: Listener, Beobachter und Timer werden VOR dem ersten Lauf
+gesetzt.** Der erste Lauf darf scheitern — der nächste Anlass holt es nach.
+Ein Modul, das nur beim Start funktioniert, ist kein Modul, sondern ein
+Zufall.
+
+**Dazu, aus derselben Fehlersuche:** reines Entprellen (`clearTimeout` bei
+jedem Ereignis) feuert bei einem Dauerstrom von DOM-Änderungen **nie**.
+Eine Obergrenze gehört dazu — spätestens nach X ms wird ausgeführt. Hier
+lag kein Dauerstrom vor (gemessen: 0 Schübe in 3 s), die Hypothese war
+falsch — die Obergrenze bleibt trotzdem drin, weil sie nichts kostet.
+
+## 142 · Ein Proxy mit ausdrücklicher Pfadliste
+
+`backend/src/routes/marktbericht.js` leitet an den Microservice weiter —
+aber **nur die Pfade, die dort einzeln eingetragen sind**. Ein neuer
+Endpunkt im mb-backend ist damit vom Browser aus 404, obwohl er läuft.
+
+Gemessen:
+
+```
+/api/v1/marktbericht/health          -> 200
+/api/v1/marktbericht/quellen         -> 404
+im Container: /quellen               -> antwortet einwandfrei
+```
+
+**Regel: ein neuer Endpunkt im mb-backend ist erst fertig, wenn er in der
+Proxy-Liste steht** — und die Prüfung läuft vom BROWSER aus, nicht aus dem
+Container. Eine Messung im Container prüft den Dienst, nicht die Kette.
+
+Backend-Änderung heißt hier außerdem: `--build backend`, nicht
+`--build mb-backend`.

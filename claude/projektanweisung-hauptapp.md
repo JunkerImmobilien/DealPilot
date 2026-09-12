@@ -14029,6 +14029,89 @@ Konvention wie oben.
 
 `698ebec` v1341 · `49fd37c` v1342 · `eddc19e` v1342b
 
+## v1343–v1344d · Stufen-Vorhang und „wo bekomme ich das her" — 13.09.2026
+
+Zwei Wünsche von Marcel.
+
+### 1 · „Egal was ich auswähle, sind immer noch alle Felder sichtbar"
+
+**GEMESSEN, Felder je Reiter bei gewählter Stufe 1:**
+
+```
+b2 Objekt=9 · b3 Zustand=6 · b4 Ausstattung=7 · b5 Gebäude=10
+b6 Wertermittlung=0 · b7 Zusatzwerte=6
+```
+
+Reiter 6 ist bei Stufe 1 schon leer — dort greift die Stufenlogik von
+`wertermittlung.js`. **Reiter 7 stand mit sechs Feldern voll da**:
+Liegenschaftszins, Sachwertfaktor, Bodenrichtwert, Stichtag, Anpassung,
+Grund. Die gehen ausschließlich in die Wertermittlung ein.
+
+Sie liegen jetzt hinter einem Vorhang: *„Diese Angaben brauchst du für die
+gewählte Tiefe nicht"* mit Knopf **Trotzdem ausfüllen**. Der Reiter selbst
+wird gedimmt und trägt „· ab Stufe 3".
+
+**Verborgen, nicht entfernt** — wer ausgefüllt hat und die Tiefe wechselt,
+behält seine Eingaben.
+
+**Bewusst NICHT ausgeblendet: Zustand, Ausstattung, Gebäude.** Die
+verbessern auch die einfache Marktpreisindikation — der Konfidenz-Balken
+sagt das ausdrücklich. Sie wegzublenden wäre kein Aufräumen, sondern ein
+Rückschritt. Eine allgemeine „alles ab Stufe N verbergen"-Mechanik wäre
+bequemer zu schreiben und fachlich falsch.
+
+### 2 · „Schreib ran, wo man die herbekommt"
+
+Neuer Endpunkt `GET /quellen?plz=` (v1343). Das Register führt zu jedem
+Satz Fundstelle, Quell-URL, Lizenz und Berichtsjahr — **31 amtliche
+Quellen**. Gelesen wurden sie bisher nur, wenn ein Wert tatsächlich
+gerechnet wurde; wer ihn von Hand eintragen sollte, bekam nichts.
+
+**Für Wolfenbüttel zeigt der Kasten jetzt:**
+
+```
+Zuständig für Wolfenbüttel (Niedersachsen):
+Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg
+
+Liegenschaftszinssatz — ezfh 1,9 % · we_v 1,9 %
+  „Grundstücksmarktdaten 2025", Kapitel Liegenschaftszinssätze …, S. 26–29   [Quelle öffnen]
+Erbbaurechtskoeffizient — ezfh 0,81
+  Grundstücksmarktdaten 2025, S. 35                                          [Quelle öffnen]
+
+Diese Werte holt der Bericht sich SELBST — du musst sie nicht eintragen.
+Nicht hinterlegt: Sachwertfaktor, Erbbauzinssatz, Bodenpreisniveau, …
+Bodenrichtwert: BORIS-D (bundesweites Portal)  + Anleitung
+© Gutachterausschuss …, dl-de/by-2-0
+```
+
+**Kein erfundener Link.** Ausgegeben wird nur, was im Registersatz belegt
+ist, plus das bundesweite BORIS-D-Portal — das steht seit v1077 in
+`connectors/boris/registry.js` als geprüft. Länderportale werden NICHT
+geraten.
+
+### Vier eigene Fehler, alle beim Nachmessen gefunden
+
+| | Fehler | Befund |
+|---|---|---|
+| v1343b | Endpunkt las `plzInfo.ags` | `AgsResolver` liefert `gemeinde_ags`/`kreis_ags` — ein Feld `ags` gibt es dort nicht. Jede PLZ kam als „keine_ags" zurück. Dieselbe Sorte wie v1144. |
+| v1344b | `start()` setzte die Listener NACH dem ersten Lauf | Wirft der erste Lauf, gibt es nie wieder eine Nachführung. Der Vorhang entstand beim Klick nie, von Hand aber sofort. Muster aus v1330. |
+| v1344c | `/quellen` fehlte in der Proxy-Pfadliste | `/health` gab 200, `/quellen` 404 — und im Container antwortete `/quellen` einwandfrei. Der Proxy im Haupt-Backend führt eine ausdrückliche Liste. |
+| v1344c | Der Vorhang hätte den Quellen-Kasten mitverborgen | Er sagt gerade dann etwas Nützliches, wenn die Felder zu sind. |
+| v1344d | Fundstelle doppelt betitelt | „Grundstücksmarktdaten **2024**, „Grundstücksmarktdaten **2025**", Kapitel …" — zwei Jahreszahlen, die sich widersprechen. |
+
+### Abnahme
+
+- Stufe 1 → Vorhang zu, 2 Elemente verborgen, Reiter gedimmt
+- Stufe 3 → Vorhang weg, nichts verborgen
+- Quellen-Kasten bleibt in beiden Fällen sichtbar
+- drei Links: 2× amtlicher Marktbericht, 1× BORIS-D
+- keine Konsolen-Warnungen
+
+### Commits
+
+`d9eea6a` v1343 · `bacb766` v1343b · `79a0563` v1344 · `6edf83d` v1344b ·
+`a02d18c` v1344c · `f3d6313` v1344d
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
