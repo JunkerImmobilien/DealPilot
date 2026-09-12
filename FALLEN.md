@@ -3207,3 +3207,185 @@ document.querySelectorAll('.mb-zurueck').forEach(function (el) {
 
 Ein Blick aufs Bild hätte den Unterschied zwischen 8 und 10 Pixeln Radius
 nicht gefunden.
+
+---
+
+## 146 · Was nur auf Existenz prüft, fällt nicht zurück
+
+**Am selben Tag zweimal getroffen** — einmal geerbt, einmal selbst gebaut.
+
+```js
+const score = window._dpPilotScore ? window._dpPilotScore(...)
+                                   : QcEngine.computeScore(...);
+```
+
+Geprüft wird, ob die **Funktion existiert** — nicht, ob sie ein **Ergebnis**
+geliefert hat. `_dpPilotScore` steht am Ende derselben Datei und ist damit
+immer vorhanden; sie gibt aber `null` zurück, wenn ihre Kerne fehlen. **In
+genau dem Fall, für den der Rückfall gedacht ist, wird er übersprungen** —
+und die nächste Zeile liest `score.score` auf `null`.
+
+Richtig ist, das Ergebnis zu prüfen:
+
+```js
+let score = null;
+if (window._dpPilotScore) { try { score = window._dpPilotScore(...); } catch (e) { score = null; } }
+if (!score) score = QcEngine.computeScore(...);
+```
+
+**Die zweite Variante desselben Fehlers:** eine Funktion, die `_rf.catalog`
+liest, tut das im Betrieb gefahrlos — aber ein Prüfhaken ruft sie **ohne
+laufenden Ablauf** auf, und dann ist `_rf` null. *Ein Prüfhaken, der wirft,
+ist keiner.* Er hat das im ersten Aufruf gefunden; genau dafür ist er da.
+
+> **Merksatz:** Ein Rückfall, der nicht greifen kann, ist keiner. Prüfe das
+> Ergebnis, nicht die Zuständigkeit.
+
+`v1359c`, `v1365`
+
+---
+
+## 147 · Zwei gleichnamige Eigenschaften im selben Objektliteral
+
+```js
+const limiter = rateLimit({
+  skip: function (req) { /* eingeloggte Requests nicht limitieren */ … },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.path.startsWith('/health')      // ← diese gewinnt
+});
+```
+
+**JavaScript nimmt die zweite, schweigend.** Kein Fehler, keine Warnung,
+kein Linter-Treffer im Lauf. Die Absicht aus `v395` war damit **über drei
+Monate wirkungslos** (Commit `94e4f6f`, 01.06.2026 → gefunden 13.09.2026),
+und die Datei sagte die ganze Zeit das Gegenteil von dem, was sie tat.
+
+Gefunden wurde es nur beim Lesen — nicht durch ein Symptom. Deshalb: **wenn
+ein Konfigurationsobjekt länger als ein Bildschirm ist, einmal die
+Schlüsselnamen zählen.**
+
+`v1366`
+
+---
+
+## 148 · Ein Testskript, das Muster abtippt, prüft die Abschrift
+
+Ein Prüflauf meldete **drei Fehler**, obwohl die Datei heil war. Ursache:
+das Skript hatte die Regex-Muster in ein Heredoc abgetippt, und **ein
+Heredoc halbiert Backslashes** — aus `'\\s+'` wurde `'s+'`. Geprüft wurde
+also ein kaputtes Muster, nicht das echte.
+
+Das ist besonders tückisch, weil der Testlauf *plausibel* fehlschlägt: man
+sucht den Fehler in der Datei, die keinen hat.
+
+**Richtig ist, das Muster aus der echten Datei zu holen:**
+
+```js
+var quelle = fs.readFileSync(process.argv[2], 'utf8');
+var m = quelle.match(/var RF_NEIN_HINTEN = new RegExp\(([\s\S]*?)\);/);
+var RF_NEIN_HINTEN = eval('new RegExp(' + m[1] + ')');
+```
+
+Dazu zwei Nachbarn derselben Familie:
+- **`q{}` in Perl zählt Klammern.** Eine CSS-Regel mit `{…}` im
+  Ersatztext zerlegt den String und hinterlässt ein `},` mitten im
+  JavaScript.
+- **`\x{fc}` in Perl schreibt ein Latin-1-Byte**, kein UTF-8. Die Datei
+  wird dadurch von „UTF-8 text" zu „Non-ISO extended-ASCII". Entweder
+  `\xc3\xbc` schreiben oder mit `use utf8` + `utf8::encode` arbeiten.
+
+`v1358`, `v1359`
+
+---
+
+## 149 · Eine Fehlermeldung, die immer dasteht, wird nicht gelesen
+
+Nach einem Backend-Rebuild stand im Startlog:
+
+```
+ValidationError: options.validate.keyGeneratorIpFallback is not recognized.
+✓ Server listening on http://localhost:3001
+```
+
+**Der Server lief** — die Meldung war „nur" eine Warnung, und der Schlüssel
+hieß in der installierten Version schlicht `ip`. Genau so entstehen Logs,
+die niemand mehr liest: eine Zeile, die immer da ist, wird zur Tapete.
+
+Dasselbe Prinzip stand schon einmal in `CLAUDE.md`, für den Gold-Audit:
+*„Ein Rot, das immer rot ist, wird nicht gelesen."*
+
+> **Merksatz:** Nach jedem Rebuild einmal ins Startlog sehen und jede
+> Meldung entweder beheben oder begründen. Beides ist billiger als ein Log,
+> dem man nicht mehr traut.
+
+`v1366b`
+
+---
+
+## 150 · Drei Kopien derselben Rechnung laufen auseinander — garantiert
+
+Im Code standen **drei verschiedene Grundfreibeträge** für denselben
+§-32a-Tarif:
+
+| Datei | Wert | |
+|---|---|---|
+| `tax.js` | 11.604 | Kommentar sagte „Tarif 2026" |
+| `dashboard.js` | 11.784 | dazu `Math.round` statt `Math.floor` |
+| `rnd-calc.js` | 12.096 | Zonengrenzen von 2025 |
+
+**Keiner davon war 2026**, und 11.604 war nicht einmal ein gültiger
+Jahrgang — es war der ursprünglich *geplante* Grundfreibetrag 2024, bevor er
+angehoben wurde.
+
+Der Betrag war klein (bis 43 €), der strukturelle Fehler nicht: **wer den
+Tarif aktualisiert, muss es sonst dreimal tun, und die dritte Stelle
+vergisst man.** Genau so ist der Unterschied entstanden.
+
+Zwei Lehren für jede Zahl, die aus einem Gesetz oder einer amtlichen Tabelle
+stammt:
+
+1. **Die Primärquelle gewinnt.** Eine Suchmaschine lieferte für 2026
+   `954,80` und die Zonengrenze `17.005`; das Gesetz sagt `914,51` und
+   `17.799`.
+2. **Ohne amtliches Rechenbeispiel prüft man die Stetigkeit.** Der Tarif
+   muss an jeder Zonengrenze denselben Wert liefern — falsche Koeffizienten
+   erzeugen dort einen Sprung. Bei 12.348 / 17.799 / 69.878 / 277.825 blieb
+   die Stufe bei 0 bis 1 €, also reine Rundung.
+
+Und: **ein Jahrgang, der sich nicht belegen lässt, kommt nicht in die
+Tabelle.** Fehlt er, nimmt die Funktion den nächstälteren und *meldet das* —
+eine halb belegte Zahl ist schlechter als keine.
+
+`v1361`, `v1364`
+
+---
+
+## 151 · Derselbe Wert, achtmal gerechnet — und niemand merkt es
+
+Eine einzige Eingabe im Kaufpreisfeld löste **acht** Score-Berechnungen aus.
+Die Entprellung von zwei Sekunden griff; die Mehrfachrechnung **innerhalb**
+einer Runde nicht.
+
+Die Ursache stand offen im Code:
+
+```js
+updHeaderBadges();                      // rechnet, weil der Cache noch alt ist
+_dpComputeDS2Cached();                  // rechnet
+updHeaderBadges();                      // „Header neu mit gecachtem Wert"
+```
+
+**Der zweite Aufruf war der Beleg, dass der erste zu früh kam** — statt ihn
+zu verschieben, hatte man einen weiteren angehängt. Dazu ein zweiter
+Cache-Name (`_dpLastDs2` neben `_dpLastDS2Result`), der sich nur in einem
+Buchstaben unterscheidet und eigenständig entstand.
+
+Das kostet im Browser nur Rechenzeit — **aber es blockiert jede spätere
+Verlagerung auf den Server**: acht Anfragen je Eingabe scheitern an einem
+Limit von 100 pro Minute, eine nicht.
+
+> **Merksatz:** Wenn ein Aufruf zweimal hintereinander steht und der zweite
+> einen Kommentar trägt wie „jetzt mit dem richtigen Wert", ist der erste am
+> falschen Platz.
+
+`v1362`, `v1363`
