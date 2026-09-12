@@ -8639,6 +8639,9 @@
                          _score2Karte: _rfScore2Karte,
                          _kontingent: _rfKontingent,
                          _verneinung: _rfIstVerneinung,  /* v1288b */
+                         /* v1359: der zweite Weg gehoert auch heraus -
+                            sonst ist er von aussen nicht messbar. */
+                         _themaVerneint: _rfThemaVerneint,
                          _kontextKlar: _rfKontextKlar,
                          /* v1315: Pruefhaken - der Kontext und die
                             Bestaetigungs-Uebertragung sind von aussen
