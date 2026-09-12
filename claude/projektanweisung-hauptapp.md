@@ -13142,6 +13142,110 @@ ohne Grundlage ist schlimmer als keine. Dann fehlt der Block.
 
 **Commits** `bee4ed7`, `abc738d`. Auf Staging, **nicht auf Prod**.
 
+## v1323 · Gewerbe, und der Marktkontext erreicht die Bewertung — 12.09.2026
+
+Marcels Vorgabe: *„ja alles einbauen und auch das gewerbe. wichtig wäre
+auch dass dem co pilot und der analyse diese daten zur bewertung zur
+verfügung stehen. auch im marktbericht integrieren und danach rollout."*
+
+### Gewerbe war gar nicht abfragbar
+
+Der Connector setzte `objectCategories` **hart** auf `['Wohnen']`. Gemessen
+Bielefeld, 5 km, 12 Monate:
+
+```
+Gewerbe Kauf gesamt      1.499,98 €/m²   n=153
+Gewerbe Miete gesamt        10,00 €/m²   n=856
+Einzelhandel Kauf        1.500,21        n= 22
+Gastronomie Kauf         1.395,00        n= 15
+```
+
+**Welche Klassen es gibt, sagt die API nicht** — ein falscher Wert kommt
+als `400 Unknown objectClass`. Aus 16 echten Gewerbe-Angeboten gesammelt:
+
+```
+BüroPraxis (MIT Umlaut)   6
+Sonstige                  5
+HalleLagerProduktion      3
+Einzelhandel              1
+Gastronomie               1
+```
+
+`Buero`, `BueroPraxis` ohne Umlaut, `Halle`, `Lager` → alle 400. **Der
+Umlaut ist Pflicht.**
+
+Der Gewerbe-Zweig fragt bewusst **anderes** als der Wohn-Zweig: „vermietet
+oder frei" ist im Gewerbe der Regelfall gegen den Ausnahmefall, und der
+Brown Discount ist eine Wohnungs-Debatte. Verglichen wird die eigene Klasse
+gegen den gesamten Gewerbemarkt, dazu die Miete — Gewerbe wird über den
+Ertrag gekauft. Gemessen am Büroobjekt:
+
+```
+Kauf : BüroPraxis 1.975,81 €/m² (n=26) gegen Gewerbemarkt 1.431,30 (n=179)  → +38,0 %
+Miete: BüroPraxis     10,00 €/m² (n=456)
+```
+
+**v1323b:** Der erste Lauf gab „Markt null" zurück — ohne `objectClasses`
+setzt der Connector den Default `['Wohnung','Haus']`, und der passt bei
+`objectCategories: ['Gewerbe']` zu nichts. Der Wohn-Default greift jetzt
+nur noch, wenn die Kategorie auch Wohnen ist.
+
+### Der Kontext erreicht jetzt drei Orte
+
+**1 · Pilot-Analyse.** Gemessen, warum sie ihn nicht hatte:
+`dealpilot_marktbewertung` wird vom Frontend **seit v746** geschickt — ein
+`grep` über das ganze Backend findet **keinen Leser**. Dieselbe Falle wie
+beim Orchestrator. Jetzt baut `openaiService.js` zwei Prompt-Sektionen,
+mit der ausdrücklichen Ansage, dass Aggregate echter Angebote schwerer
+wiegen als die Selbsteinschätzung des Investors.
+
+**2 · Co-Pilot im Sprechlauf.** `_rfKontextKlar` liest `_mb_state` und gibt
+vermietet/frei, Energieklassen-Spreizung, Angebotsrendite und den
+Erbbau-Abschlag mit, jeweils mit `[echte Angebote im Umkreis]`.
+
+**3 · Marktbericht.** D3 und D4 im Stub-Text — und für den KI-Weg eine
+eigene Anweisung je Kapitelgruppe.
+
+### v1323c · Die Anweisung war zu höflich
+
+Erster Versuch: *„Nenne mindestens einen dieser Werte."* Zwei Läufe an
+derselben Adresse, einmal mit Marktkontext-Satz, einmal ohne. Die
+Erbbau-Anweisung zwei Zeilen darunter sagt **„DAS MUSS IM TEXT VORKOMMEN"**
+und wurde in jedem Lauf befolgt. Nach der Verschärfung auf dieselbe
+Tonlage, beide Läufe:
+
+```
+Lauf 1: "2.750 Euro je Quadratmeter bei 135 vermieteten Angeboten"
+        "Die Bruttorendite von 3,7 Prozent … korreliert mit dem
+         Marktkontext einer Angebotsrendite von 4,25 Prozent"
+Lauf 2: "2.750 Euro je Quadratmeter bei 135 Angeboten für vermietete
+         Wohnungen im weiteren 5-km-Umkreis"
+```
+
+Das Erbbaurecht steht ebenfalls belegbar im Text: *„ein Abschlag von etwa
+35.801 Euro oder 20,5 Prozent … Erbbaurechtswert auf rund 139.199"*.
+
+### Der Prod-Rollout hängt an einer Freigabe
+
+Vorbereitet und geprüft:
+
+```
+Gold-Audit            RC=0, genau auf der Basislinie (468/56)
+Abstand zu Prod       164 Commits, 48 Dateien
+Migrationen           keine
+SQL-Änderungen        keine
+Sicherung Haupt-DB    /root/backups/haupt-20260912-0739.sql.gz   11 MB
+Sicherung MB-DB       /root/backups/mb-20260912-0739.sql.gz     685 KB
+```
+
+Beide Sicherungen angesehen, nicht nur gelistet — echte
+`PostgreSQL database dump`-Köpfe. Der Merge `staging → main` wird von der
+Schutzsperre für Produktion abgelehnt; er braucht Marcels ausdrückliche
+Freigabe oder eine Bash-Regel in den Einstellungen.
+
+**Commits** `963f1e3`, `aa61c52`, `3052c3d`. Auf Staging, **noch nicht auf
+Prod**.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

@@ -2689,3 +2689,34 @@ offene Aufgabe mit einem Datum.** Und die erste Frage bei einem UI-Baustein
 lautet nicht „funktioniert er", sondern **„liegt er auf dem Weg, den der
 Nutzer geht"** — in einer App mit mehreren Anbieterpfaden ist das die
 teurere Frage.
+
+## Ein Feld im JSON ist noch keine Anweisung
+
+Der Marktbericht schickt den **ganzen** Payload als JSON an das Modell —
+`marktkontext` und `erbbaurecht` waren also längst da. Im Text kamen sie
+trotzdem nicht vor.
+
+Der erste Versuch war zu höflich: *„Nenne mindestens einen dieser Werte."*
+Zwei Läufe an derselben Adresse, einmal mit Marktkontext-Satz, einmal ohne.
+Die Erbbau-Anweisung zwei Zeilen darunter sagte **„DAS MUSS IM TEXT
+VORKOMMEN"** und wurde in jedem Lauf befolgt.
+
+**Wo eine Zahl im Text stehen soll, gehört sie nicht ins JSON, sondern in
+die Anweisung — mit einem Beispiel, wie der Satz aussieht.** Nach der
+Verschärfung nannten beide Läufe die Zahlen samt Stichprobe: „2.750 Euro je
+Quadratmeter bei 135 vermieteten Angeboten".
+
+## `node --check` ohne `package.json` wird nicht rot
+
+Ein einfach-gequoteter String über drei Zeilen ist in JavaScript ein
+Syntaxfehler. `node --check datei.js` in einem Ordner **ohne**
+`{"type":"module"}` gab trotzdem `rc=0` zurück — bei einer Datei, die mit
+`import` beginnt und damit als CommonJS gar nicht parsen dürfte.
+
+Erst die Prüfung in einem Ordner **mit** `package.json` und einer
+**absichtlich kaputten Gegenprobe** zeigte, dass der Prüfer überhaupt rot
+werden kann.
+
+Das ist derselbe Befund wie bei `/dev/stdin` weiter oben, nur mit anderem
+Auslöser. **Regel: die Gegenprobe ist Teil des Prüflaufs, nicht eine
+Kür.** Ein grüner Prüfer ohne bewiesenes Rot sagt nichts.
