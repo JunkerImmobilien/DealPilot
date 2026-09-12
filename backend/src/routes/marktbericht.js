@@ -453,6 +453,13 @@ router.get('/geomap/timeseries', authenticate, readGet('/geomap/timeseries'));
 router.get('/boris', authenticate, readGet('/boris'));
 router.get('/boris/coverage', authenticate, readGet('/boris/coverage'));
 router.get('/geocode', authenticate, readGet('/geocode'));
+/* v1344c: Die Auskunft "wo bekomme ich diese Werte her" (v1343).
+   Dieser Proxy fuehrt eine AUSDRUECKLICHE Pfadliste - wer hier fehlt,
+   bekommt 404, auch wenn der Endpunkt im mb-backend laeuft. Gemessen:
+   /health gab 200, /quellen 404, und im Container antwortete /quellen
+   einwandfrei. Dasselbe Muster wie dealpilot_marktbewertung: die eine
+   Seite schickt, die andere hoert nicht zu. */
+router.get('/quellen', authenticate, readGet('/quellen'));
 router.post('/location-finder', authenticate, async function (req, res) {
   try { const out = await forward('POST', '/location-finder', { body: req.body || {} }); res.status(out.status).json(out.data); }
   catch (e) { res.status(502).json({ error: 'mb_unreachable', message: e.message }); }

@@ -125,7 +125,13 @@
 
       /* Die Inhalte verbergen, NICHT entfernen — Eingaben bleiben. */
       Array.prototype.forEach.call(blatt.children, function (kind) {
-        if (kind.classList && kind.classList.contains('mbq-vorhang')) return;
+        /* v1344c: Vorhang UND Quellen-Kasten bleiben sichtbar. Der
+           Kasten sagt gerade dann etwas Nuetzliches, wenn die Felder
+           zu sind: er nennt den zustaendigen Ausschuss und was dort
+           schon hinterlegt ist. Ihn mitzuverbergen waere genau
+           verkehrt herum. */
+        if (kind.classList && (kind.classList.contains('mbq-vorhang')
+                            || kind.classList.contains('mbq'))) return;
         if (zuViel) kind.classList.add('mbq-weg');
         else kind.classList.remove('mbq-weg');
       });
