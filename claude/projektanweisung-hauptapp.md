@@ -14966,6 +14966,120 @@ Alle drei stehen in `FALLEN.md` beziehungsweise sind jetzt dort.
 `34605ba` v1358 · `aa3b23b` v1359 · `e12feae` v1359b · `8663a4c` v1359c
 
 
+## v1360 · B2 beginnt — der Analyse-Prompt ist aus dem Browser verschwunden
+
+Marcels Wahl für den Startpunkt von B2. Der Befund war besser als
+erwartet: **die Verlagerung war schon passiert, nur das Aufräumen
+fehlte.**
+
+### Was dort stand
+
+78 Zeilen Prompt in `ui.js`: Rollendefinition, die verbindliche
+**„DEALPILOT-BEWERTUNGSSKALA"** mit vorgeschriebenem Wortlaut je LTV- und
+DSCR-Band, die Anti-Halluzinations-Regeln („Ein LTV von 84 % ist SOLIDE …
+bezeichne ihn NIE als hoch") und die Sieben-Block-Ausgabestruktur samt
+Längenvorgaben. `B1` nennt das als **zweitteuerste Auslesestelle** der
+Anwendung.
+
+### Warum er dort nichts mehr tat
+
+`openaiService.js` baut denselben Prompt seit Langem serverseitig — ab
+Zeile 34, die Bewertungsskala ab 86, sogar mit ausführlicheren Regeln.
+Gemessen an der laufenden Maschine:
+
+```
+GET /api/v1/ai/status
+  { available: true, server_key_configured: true,
+    accepts_user_key: true, model: "gpt-4o-mini", web_search: true }
+```
+
+**`available` ist im Backend hart auf `true` gesetzt** (`ai.js:197`), mit
+dem Kommentar „Backend nimmt User-Keys an, auch ohne Server-Key". Damit
+war `serverMode` in `_runAIGuarded()` immer wahr — und der
+Frontend-Prompt seit **V26 unerreichbar.** Er wurde nicht mehr
+ausgeführt, nur noch ausgeliefert.
+
+### Was mitging
+
+`_runAIClient()` rief **`api.openai.com` direkt aus dem Browser** auf.
+Der Weg ist weg, die Funktion nicht: `/ai/analyze` nimmt seit V26 einen
+`userApiKey` im Body entgegen (`ai.js:214`), und `_buildAIPayload()`
+schickt ihn längst mit (`ui.js:866`). Wer einen eigenen Schlüssel pflegt,
+wird weiterhin bedient — **jetzt aber mit Zählung, Limit und einem
+Prompt, der den Server nie verlässt.**
+
+Offen bleibt nur der Fall, dass das Backend gar nicht erreichbar ist.
+Dafür steht jetzt eine klare Meldung statt eines stillen Umwegs — und in
+dem Fall funktioniert ohnehin nichts anderes in der App.
+
+**Unterm Strich 167 Zeilen weniger im ausgelieferten Code.**
+
+### Abnahme
+
+Gegen den **ausgelieferten** Text, nicht gegen die Arbeitskopie:
+
+| geprüft | Ergebnis |
+|---|---|
+| Bewertungsskala, Anti-Halluzination, Ausgabestruktur, Rollendefinition | **alle vier weg** |
+| `fetch('https://api.openai.com` | **weg** |
+| `renderAIResponse` (wird auch von `storage.js:475` gebraucht) | erhalten |
+| `_runAIServer`, `_buildAIPayload`, `payload.userApiKey` | erhalten |
+| `runAI` und `renderAIResponse` als Funktionen geladen | ja |
+
+### Eine eigene Fehldiagnose, zurückgenommen
+
+Ich hatte notiert, `_buildAIPayload()` schicke den Nutzerschlüssel
+**nicht** mit. **Das stimmt nicht** — er steht in `ui.js:866`. Mein
+`grep` hatte `head -5` und `ui.js` lag darunter. Der entsprechende
+Patch-Teil wurde vor dem Anwenden entfernt; er hätte eine zweite,
+konkurrierende Stelle geschaffen — genau die Doppelliste, vor der dieses
+Journal an anderer Stelle warnt.
+
+---
+
+## Der zweite Direktweg — B21, gemessen, nicht angefasst
+
+`quickcheck-app.html` Z. 5290 ff. (`runRealAi`) ruft ebenfalls
+`api.openai.com` direkt auf, mit einem Schlüssel aus einem Eingabefeld.
+
+**Warum das nicht mit v1360 mitging:** Der Quick-Check ist eine eigene
+Seite im iframe und hat **keine Auth-Anbindung** — `Auth.apiCall` kommt
+dort null mal vor. Er spricht mit der Hauptanwendung ausschließlich über
+`postMessage` (qc-bridge). Der Umbau heißt also: Anfrage über die Brücke
+reichen, in der Hauptanwendung authentifiziert weiterleiten, Antwort
+zurückspielen — plus ein Backend-Endpunkt, denn das Payload-Format des
+Quick-Checks passt auf keinen bestehenden. Das ist ein eigenes Paket,
+kein Nebenschritt.
+
+---
+
+## A9 wird größer: die Anbieter-Neutralität betrifft mehr als eine Karte
+
+Beim Lesen des Quick-Check-Prompts fiel auf, dass er **PriceHubble
+namentlich** nennt. Die Suche danach zeigt: das ist kein Einzelfall.
+
+| Ort | was |
+|---|---|
+| PRE-FLIGHT-Karte (Objektansicht) | Logos beider Anbieter, `alt="Sprengnetter"` / `alt="PriceHubble"` |
+| `quickcheck-app.html` | Auswahlkacheln mit Logos, `title="Sprengnetter"` |
+| ebenda | Meldung „🏛 PriceHubble wird angefragt…" |
+| ebenda | `provider: 'PriceHubble'`, `source: 'PriceHubble'` in den Daten |
+| ebenda, Z. 5309 | der KI-Prompt nennt „AVM-Daten (PriceHubble)" |
+| Einstellungen | **behoben in v1354** |
+
+`CLAUDE.md`: *Sprengnetter und PriceHubble nie namentlich nach außen —
+„unabhängige Bewertungspartner". ImmoMetrica darf genannt werden.*
+
+**Nichts davon angefasst.** Es ist ein Thema, nicht sechs Fundstellen,
+und es gehört als ein Vorgang entschieden: entweder die Marken erscheinen
+nach außen oder nicht. Ein Flickenteppich — Prompt geändert, Logos
+stehen gelassen — wäre schlechter als beides. Marcel entscheidet.
+
+### Commits
+
+`051e003` v1360
+
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
