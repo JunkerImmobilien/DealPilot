@@ -931,21 +931,18 @@ export function sachwert(ein, bodenwertErgebnis, param) {
      Reihenhaus mit 145.000 Euro vorlaeufigem Sachwert gut 30.000 Euro.
      Ein Punktwert ohne Streuung behauptet eine Genauigkeit, die die
      Regression nicht hergibt. */
-  const _streu = Number(param.streuung);
-  if (Number.isFinite(_streu) && _streu > 0) {
-    out.sachwertfaktor.streuung = _streu;
-    out.sachwertfaktor.spanne_eur = [
-      Math.round(vorlaeufig * (swf - _streu)),
-      Math.round(vorlaeufig * (swf + _streu)),
-    ];
-    out.hinweise = out.hinweise || [];
-    out.hinweise.push('Der Sachwertfaktor hat eine Standardabweichung von \u00b1'
-      + String(_streu).replace('.', ',') + '. Daraus ergibt sich eine Spanne von '
-      + out.sachwertfaktor.spanne_eur[0].toLocaleString('de-DE') + ' bis '
-      + out.sachwertfaktor.spanne_eur[1].toLocaleString('de-DE')
-      + ' \u20ac. Sie geh\u00f6rt ins Gutachten \u2014 ein Punktwert behauptet eine '
-      + 'Genauigkeit, die die Regression nicht hergibt.');
-  }
+  /* === v1338b - EIGENER FEHLER, IM FUNKTIONSLAUF GEFUNDEN ============
+     Die Streuungsspanne stand VOR dem bOM-Abzug. Gemessen am Reihenhaus:
+
+       = Sachwert                       184.761 EUR
+       Streuung-Spanne     [186.901 ... 264.622] EUR
+
+     Der Endwert lag UNTERHALB der eigenen Spanne. Eine Spanne, die ihr
+     eigenes Ergebnis nicht enthaelt, ist schlimmer als keine - sie sieht
+     nach Sorgfalt aus und widerspricht der Zeile darueber.
+
+     Die Spanne wird jetzt zuletzt gebildet, auf demselben Endwert.
+     Deshalb steht der bOM-Block hier VOR der Streuung. */
 
   /* === v1338 - BESONDERE OBJEKTSPEZIFISCHE GRUNDSTUECKSMERKMALE =======
      Paragraf 8 Abs. 3 ImmoWertV. Sie fehlten im Sachwertverfahren
@@ -956,7 +953,7 @@ export function sachwert(ein, bodenwertErgebnis, param) {
 
      An einem echten Fall gemessen: Schimmel, Wasserschaden, Estrich und
      Setzungen summierten sich auf 41.000 bis 86.000 Euro - bei einem
-     Verkehrswert um 153.000 Euro sind das 27 bis 56 Prozent. Ein
+     Verkehrswert um 185.000 Euro sind das 22 bis 47 Prozent. Ein
      Verfahren, das diesen Schritt nicht kennt, kann fuer so ein Objekt
      keinen Verkehrswert ausweisen.
 
@@ -965,26 +962,28 @@ export function sachwert(ein, bodenwertErgebnis, param) {
      abzieht, laesst den Faktor auf einen Wert wirken, den es in der
      Stichprobe nicht gab.
 
-     DER DOPPELABZUG IST DIE GEFAHR, und er ist leicht zu uebersehen: wer
-     die Restnutzungsdauer wegen derselben Maengel sachverstaendig
-     verkuerzt UND sie hier noch einmal abzieht, rechnet sie zweimal. */
+     DER DOPPELABZUG IST DIE GEFAHR: wer die Restnutzungsdauer wegen
+     derselben Maengel verkuerzt UND sie hier noch einmal abzieht, rechnet
+     sie zweimal. */
+  out.hinweise = out.hinweise || [];
   const _bom = Number(ein.bom_eur);
+  let _bomWert = 0;
   if (Number.isFinite(_bom) && _bom !== 0) {
-    out.bom_eur = Math.round(_bom);
+    _bomWert = Math.round(_bom);
+    out.bom_eur = _bomWert;
     out.bom_grund = ein.bom_grund || null;
     if (Array.isArray(ein.bom_positionen) && ein.bom_positionen.length) {
       out.bom_positionen = ein.bom_positionen;
     }
     out.staffel.push({
-      pos: (_bom < 0 ? '\u2212' : '+') + ' besondere objektspezifische Grundst\u00fccksmerkmale',
+      pos: (_bomWert < 0 ? '\u2212' : '+') + ' besondere objektspezifische Grundst\u00fccksmerkmale',
       detail: (ein.bom_grund ? String(ein.bom_grund) + ' \u2014 ' : '')
         + '\u00a7 8 Abs. 3 ImmoWertV, nach der Marktanpassung angesetzt',
-      wert: Math.round(_bom),
+      wert: _bomWert,
     });
-    out.wert = marktwert + Math.round(_bom);
+    out.wert = marktwert + _bomWert;
     out.staffel.push({ pos: '= Sachwert', wert: out.wert, summe: true });
 
-    out.hinweise = out.hinweise || [];
     if (!ein.bom_grund) {
       out.warnungen.push('Besondere objektspezifische Grundst\u00fccksmerkmale sind ohne '
         + 'Begr\u00fcndung angesetzt. Ohne Begr\u00fcndung sind sie im Dossier nicht verwertbar.');
@@ -998,11 +997,56 @@ export function sachwert(ein, bodenwertErgebnis, param) {
         + 'verk\u00fcrzt UND es sind besondere objektspezifische Grundst\u00fccksmerkmale '
         + 'angesetzt. Beides darf nicht denselben Mangel erfassen.');
     }
+
+    /* v1338b: Das unguenstigste Szenario ist KEIN zweiter Verkehrswert.
+       Es sagt, wohin der Wert laeuft, wenn eine noch offene Position
+       oben herauskommt - typisch Setzungen, die statisch relevant sein
+       koennen. Ein Baugrundgutachten macht daraus eine Zahl; bis dahin
+       ist die Spanne die ehrlichere Aussage. */
+    const _worst = Number(ein.bom_worst_eur);
+    if (Number.isFinite(_worst) && _worst !== 0 && Math.round(_worst) !== _bomWert) {
+      out.bom_worst_eur = Math.round(_worst);
+      out.wert_worst_eur = marktwert + Math.round(_worst);
+      out.hinweise.push('Ung\u00fcnstigstes Szenario: mit '
+        + Math.abs(Math.round(_worst)).toLocaleString('de-DE')
+        + ' \u20ac statt ' + Math.abs(_bomWert).toLocaleString('de-DE') + ' \u20ac ergibt sich '
+        + out.wert_worst_eur.toLocaleString('de-DE') + ' \u20ac. Das ist ein Szenario, '
+        + 'kein zweiter Verkehrswert \u2014 es tritt ein, wenn eine noch offene Position '
+        + 'am oberen Rand herauskommt.');
+    }
   } else {
     out.wert = marktwert;
+  }
+
+  /* === v1338 - DIE STREUUNG DES SACHWERTFAKTORS GEHOERT AN DIE ZAHL ===
+     Sie wird im Register gefuehrt (`satz.streuung`) und war bisher nur
+     beim Liegenschaftszins durchgereicht. Beim Sachwertfaktor schlaegt
+     sie voll durch: eine Standardabweichung von 0,21 sind an einem
+     Reihenhaus mit 185.000 Euro vorlaeufigem Sachwert knapp 39.000 Euro.
+     Ein Punktwert ohne Streuung behauptet eine Genauigkeit, die die
+     Regression nicht hergibt.
+
+     v1338b: Die Spanne steht auf dem ENDWERT, also einschliesslich der
+     besonderen objektspezifischen Merkmale - sonst enthaelt sie ihr
+     eigenes Ergebnis nicht. */
+  const _streu = Number(param.streuung);
+  if (Number.isFinite(_streu) && _streu > 0) {
+    out.sachwertfaktor.streuung = _streu;
+    out.sachwertfaktor.spanne_eur = [
+      Math.round(vorlaeufig * (swf - _streu)) + _bomWert,
+      Math.round(vorlaeufig * (swf + _streu)) + _bomWert,
+    ];
+    out.hinweise.push('Der Sachwertfaktor hat eine Standardabweichung von \u00b1'
+      + String(_streu).replace('.', ',') + '. Daraus ergibt sich eine Spanne von '
+      + out.sachwertfaktor.spanne_eur[0].toLocaleString('de-DE') + ' bis '
+      + out.sachwertfaktor.spanne_eur[1].toLocaleString('de-DE')
+      + ' \u20ac' + (_bomWert ? ' (einschlie\u00dflich der besonderen objektspezifischen Merkmale)' : '')
+      + '. Sie geh\u00f6rt ins Gutachten \u2014 ein Punktwert behauptet eine '
+      + 'Genauigkeit, die die Regression nicht hergibt.');
   }
 
   out.anwendbar = true;
   return out;
 }
+
 
