@@ -3029,3 +3029,47 @@ Modul fragte `offsetParent` und blieb deshalb in jedem geschlossenen
 Reiter leer — also überall dort, wo er helfen sollte. Die richtige Frage
 war, ob das Feld ÜBERHAUPT existiert; was nicht gebraucht wird, baut die
 Wertermittlung gar nicht erst.
+
+## 140 · Unsichtbare Steuerzeichen in einer Regex — und derselbe Fehler beim Beheben
+
+In `ZWEIG_VORZUG` (gutachterausschuss.js) standen an zwanzig Stellen echte
+**Backspace-Zeichen (0x08)**, wo eine Wortgrenze `\b` hingehört. Die Tabelle
+übersetzt die Objektart-Kurzformen der Oberfläche (EFH, ETW, MFH, RH, DHH)
+auf die Zweige der amtlichen Register.
+
+**Der Fehler ist an jeder üblichen Stelle unsichtbar:**
+
+```
+String(regex)              ->  /einfamilien|efh|freistehend/i   sieht richtig aus
+regex.test("Einfamilienhaus") ->  true
+regex.test("EFH")          ->  FALSE
+grep, Editor, Code-Ansicht ->  zeigen nichts Auffälliges
+```
+
+Sichtbar wird er nur über `JSON.stringify` (dort erscheint 0x08 als `\b`)
+und über `file`, das **„with overstriking"** meldet. Diese Meldung stand
+zweimal im Protokoll und wurde beide Male überlesen.
+
+**Wirkung:** jede Kennzahl, die über diese Tabelle geht — Sachwertfaktor,
+Vergleichsfaktor, Durchschnittspreis — fand für Ausschüsse mit abweichendem
+Zweignamen nichts und meldete „nicht abgeleitet". **Eine Fehlanzeige, die wie
+ein Befund aussieht** — niemand prüft nach, ob ein „liegt nicht vor" stimmt.
+
+**Und beim Beheben dieselbe Falle eine Ebene höher:**
+
+```
+perl -pe 's/\x08/\b/g'     ersetzt Backspace durch BACKSPACE
+```
+
+Im Ersatzstring ist `\b` wieder das Steuerzeichen. Erst ein explizit
+gebautes `chr(92) . 'b'` schreibt einen echten Backslash. Zwei Durchläufe
+meldeten „ersetzt", ohne etwas zu ändern; erst das Nachzählen im Skript
+(`my $n = ($s =~ s/.../.../g)`) machte es sichtbar.
+
+**Regeln:**
+- `file` liest man mit. „with overstriking", „with LF, CRLF line
+  terminators", „data" statt „text" sind Befunde, keine Verzierung.
+- Eine Regex, die man nicht selbst getippt hat, prüft man mit
+  `JSON.stringify(regex.source)`, nicht mit `String(regex)`.
+- Escape-Sequenzen **nie tippen, immer generieren** — und die Ersetzung
+  zählen lassen, statt dem „OK" zu glauben.

@@ -13952,6 +13952,83 @@ noch nicht gesehen habe.
 
 `4c6b153` v1340 · `a1d3908` v1340b · `0ad54a0` v1340c · `acd4529` v1340d
 
+## v1341–v1342b · Die zwei offenen Punkte, geschlossen — 12.09.2026 (Nacht)
+
+### v1341 · In `ZWEIG_VORZUG` standen Backspace-Zeichen
+
+Der offene Befund aus v1339b ist aufgeklärt, und er war größer als gedacht.
+**An zwanzig Stellen standen echte Backspace-Zeichen (0x08), wo eine
+Wortgrenze `\b` hingehört.**
+
+Der Unterschied ist im Editor, in `grep` und selbst in `String(regex)`
+**unsichtbar**:
+
+```
+String(Z[7][0])                  ->  /einfamilien|efh|freistehend/i
+Z[7][0].test("Einfamilienhaus")  ->  true
+Z[7][0].test("EFH")              ->  FALSE
+```
+
+Sichtbar wurde es über `JSON.stringify` (dort erscheint 0x08 als `\b`) und
+über `file`, das die Datei die ganze Zeit mit **„with overstriking"**
+gemeldet hat — zweimal überlesen.
+
+**Was das angerichtet hat:** unsere Oberfläche liefert Kurzformen — EFH,
+ETW, MFH, RH, DHH. Genau die erkannte diese Tabelle nie. Nur wenn der
+Registerzweig zufällig gleich hieß wie die Kurzform in Kleinschrift, griff
+der direkte Weg davor.
+
+**Gemessen mit `ptype: 'EFH'`, vorher gegen nachher:**
+
+| Ausschuss | Zweig | vorher | nachher |
+|---|---|---|---|
+| Remscheid | `efh` | 1,08 | 1,08 |
+| Olpe | `efh` | 0,92 | 0,92 |
+| **Potsdam** | `ezfh` | **nichts** | **1,06** |
+| **Uckermark** | `ezfh` | **nichts** | Objektart gefunden |
+
+Der Faktor lag die ganze Zeit im Register, und der Bericht meldete „kein
+Sachwertfaktor abgeleitet" — **eine Fehlanzeige, die wie ein Befund
+aussieht.**
+
+Betroffen war jede Kennzahl, die über `zweigWaehlen()` läuft: Sachwert-
+faktor, Vergleichsfaktor, Durchschnittspreis, Erbbaurechtskoeffizient.
+
+**Beim Beheben dieselbe Falle eine Ebene höher:** `perl -pe 's/\x08/\b/g'`
+ersetzt Backspace durch Backspace — im Ersatzstring ist `\b` wieder das
+Steuerzeichen. Erst `chr(92) . 'b'` schreibt wirklich einen Backslash.
+
+### v1342 · Der Erbbaurechtskoeffizient geht der Formel vor
+
+Liegt für Ort und Objektart ein Koeffizient des Gutachterausschusses vor
+(v1339), wird **er** ausgewiesen. Er stammt aus echten Kauffällen und
+enthält, was § 50 nicht kennt: Vertragsbedingungen, Anpassungsklauseln,
+Heimfallrisiko.
+
+Die Formel wird trotzdem gerechnet und **mit ausgewiesen** — zwei Wege, die
+weit auseinanderliegen, sind ein Befund; einer allein wäre eine Behauptung.
+Ab 10 % Abstand sagt der Bericht, dass das im Gutachten begründet gehört.
+
+**Funktionslauf:**
+
+```
+Prüfwert                41277                          OK
+ohne Koeffizient        § 50, 265.526 €, 11,5 %
+mit Koeffizient 0,81    243.000 € (19 %)
+  § 50 käme auf         265.526 €  ->  9,3 % Abstand, „dicht beieinander"
+  Spanne 0,39–1,05      117.000 – 315.000 €
+Anwendungsbeispiel      500.000 × 0,79 = 395.000 €     ZEICHENGLEICH
+```
+
+**v1342b, eigener Fehler:** mein Abschlag kam als **−19 %**, während die
+Formel denselben Sachverhalt mit **+11,5 %** ausweist. Im Bericht hätte
+„Abschlag −19,0 %" gestanden. Ein Abschlag ist positiv — dieselbe
+Konvention wie oben.
+
+### Commits
+
+`698ebec` v1341 · `49fd37c` v1342 · `eddc19e` v1342b
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

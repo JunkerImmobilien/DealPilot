@@ -70,56 +70,23 @@ Projektanweisung unter **v1332–v1337**.
 
 ---
 
-## Offen aus dem Gutachten-Durchgang
+## Gutachten-Durchgang — alles geschlossen (12.09.2026 nachts)
 
-1. **Ursache in `zweigWaehlen()` finden.** Aus `objektart: 'EFH'` findet sie den
-   Zweig `ezfh` nicht, obwohl `ZWEIG_VORZUG` `['efh','ezfh']` führt und
-   `nachArt(satz,'ezfh')` isoliert genau einen Treffer liefert. In `v1339b` über
-   eine ausdrückliche ptype-Karte umgangen. **Betrifft möglicherweise auch den
-   Sachwertfaktor** — dort läuft derselbe Weg.
+1. **`zweigWaehlen()`: Ursache gefunden und behoben (`v1341`).** In der
+   Uebersetzungstabelle standen an zwanzig Stellen **Backspace-Zeichen**
+   statt Wortgrenzen. Damit erkannte sie KEINE der Kurzformen, die unsere
+   Oberflaeche liefert (EFH, ETW, MFH, RH, DHH). Gemessen: Potsdam lieferte
+   vorher keinen Sachwertfaktor, jetzt 1,06 — der Wert lag die ganze Zeit im
+   Register. Betraf jede Kennzahl, die ueber diese Tabelle laeuft.
+   Lehre in `FALLEN.md` 140.
 
-2. **Erbbaurechtskoeffizient in die Bewertung hängen.** Der Leser steht
-   (`gutachterausschuss.erbbaurechtskoeffizient()`), aber `erbbaurecht.js`
-   rechnet weiter rein finanzmathematisch. Wo ein marktabgeleiteter
-   Koeffizient vorliegt, muss er vorgehen.
+2. **Erbbaurechtskoeffizient haengt in der Bewertung (`v1342`).** Liegt
+   einer vor, wird er ausgewiesen und die Formel nach Paragraf 50 daneben
+   gestellt; ab 10 % Abstand sagt der Bericht, dass das begruendet gehoert.
+   Anwendungsbeispiel des Ausschusses zeichengleich, Pruefwert 41277 haelt.
 
-3. **Optik: erledigt.** Marcel hat **Variante B** gewählt („mach b das ist
-   cool“). Gebaut in `v1340`–`v1340d`: neun Blöcke mit Goldkante, Titel und
-   Zähler. Abgenommen über 390/768/1024 px, Gold-Audit auf der Basislinie.
-   Die Demo bleibt als Vergleichsstand liegen.
-
-## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
-
-**Stand:** `v1273`–`v1310d` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**
-— nichts davon ist live.
-
-> **Nach Marcels erstem echten Sprechlauf am 10.09. abends** (Bilder
-> `design/mockups/sprechlauf2.png` und `sprechlauf3.png`) sind fuenf Befunde
-> behoben: das Freisprechen war kaputt (der Ringpuffer warf den WebM-Header
-> weg — daher „Audio file might be corrupted"), die Uebersichtsspalte riss
-> auseinander (zwei `.vi-rf-st`-Regeln, die spaetere gewann), der Dialog war
-> fuer dunklen Grund gebaut und laeuft auf Weiss, der Klick-Weg des
-> Markt-Angebots blieb haengen, und das Rate-Limit sperrte nach zwei
-> Durchlaeufen mit der Meldung „Zu viele PDF-Extraktionen". Einzelheiten im
-> Rollout-Journal.
-
-**Der Sprechlauf ist jetzt ein geführter Ablauf in sechs Etappen** mit einem
-Ergebnis dazwischen. Was `v1288`–`v1290e` gebracht haben, steht ausführlich im
-Rollout-Journal der Projektanweisung; die Kurzfassung:
-
-| | Etappe | danach |
-|---|---|---|
-| 1 | Basis (Adresse, Objekt, Preis, Miete) | Marktpreisindikation startet |
-| 2 | Geld (Finanzierung, **Kaufnebenkosten**) | **Deal Score** |
-| 3 | Lage & Zustand | **Deal Score 2.0** |
-| 4 | Feinschliff (Hausgeld, Entwicklung, Markt, Steuer) | — |
-| 5 | Deine Sicht | **Abschluss** mit beiden Scores |
-| 6 | Feinheiten (auf Wunsch) | — |
-
-Dazu: Kaufnebenkosten aus drei Quellen mit Herkunftsangabe, amtliche
-Grunderwerbsteuer aus der PLZ, BORIS und Marktpreisindikation auf ein
-gesprochenes „ja", die Herkunft je Feld in der Übernahme-Tabelle, die Skalen in
-der Frage, und ein Co-Pilot, der seine eigenen Kennzahlen kennt.
+3. **Optik: erledigt.** Marcel hat **Variante B** gewaehlt. Gebaut in
+   `v1340`–`v1340d`.
 
 ---
 
