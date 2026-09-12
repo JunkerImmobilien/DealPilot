@@ -3794,7 +3794,62 @@
     '[\\s.!]*$', 'i');
   var RF_ALLES_GUT = /^(alles (in ordnung|gut|ok|okay|klar|frisch|neu|saniert))[\s.!]*$/i;
 
+  /* ═══ v1358 · DIE VERNEINUNG STEHT NICHT IMMER VORNE ═══════════════
+     Marcels Screenshot vom 12.09.2026 (design/mockups/fehler 4.png). Auf
+     die Frage nach Investment-These, Risiken und Notizen die Antwort:
+
+       „Investmentthese habe ich keine."
+
+     Ergebnis: „Ich habe … verstanden, aber nichts gefunden, was hierher
+     passt. Sag es einfach nochmal." Zwei Saetze vorher hatte derselbe
+     Co-Pilot dieselbe Verneinung fuer zwei ANDERE Felder akzeptiert.
+
+     Der Grund: `RF_NEIN` verlangt, dass die Verneinung den GANZEN Text
+     ausmacht, und `RF_NEIN_TEIL` prueft Satzteile, die MIT der Verneinung
+     beginnen. Beides passt nicht auf „Thema zuerst, Verneinung danach" -
+     und genau so spricht man Deutsch: „Balkon haben wir keinen",
+     „Garage gibt es nicht", „Investmentthese habe ich keine."
+
+     WARUM DAS SICHER IST: es genuegt nicht, dass der Satz auf eine
+     Verneinung endet. Er muss ausserdem das GEFRAGTE Thema nennen - die
+     Stichworte stehen ohnehin im Katalog (`kw`) und im Label. „Nichts
+     unter 300.000" bleibt damit weiter keine Verneinung, und ein Satz
+     ueber ein anderes Feld faellt nicht faelschlich in diesen Zweig.
+
+     Der Satz darf auch kurz sein - laenger als zwoelf Woerter wird er
+     nicht geprueft, dieselbe Vorsicht wie bei `_rfIstVerneinung`. */
+  var RF_NEIN_HINTEN = new RegExp(
+    '(hab(e)?\\s+ich|haben\\s+wir|gibt\\s+es|ist|sind|war(en)?|steht|stehen|brauche?\\s+ich|brauchen\\s+wir)' +
+    '\\s+(keine[rsn]?|kein|nichts|nicht(\\s+vorhanden|\\s+bekannt|\\s+n(ö|oe)tig)?)' +
+    '[\\s.!]*$', 'i');
+
+  function _rfThemaVerneint(text, e) {
+    var t = String(text || '').trim();
+    if (!t || !e || !e.ids || !e.ids.length) return false;
+    if (t.split(/\s+/).length > 12) return false;
+    if (!RF_NEIN_HINTEN.test(t)) return false;
+
+    /* Nennt der Satz das, wonach gerade gefragt ist? */
+    var klein = t.toLowerCase().replace(/[^a-zäöüß0-9\s-]/g, ' ');
+    for (var i = 0; i < e.ids.length; i++) {
+      var kat = (_rf.catalog || []).filter(function (c) { return c.id === e.ids[i]; })[0];
+      if (!kat) continue;
+      var woerter = (kat.kw || []).slice();
+      if (kat.label) {
+        String(kat.label).toLowerCase().split(/[^a-zäöüß0-9]+/).forEach(function (w) {
+          if (w && w.length >= 4) woerter.push(w);
+        });
+      }
+      for (var k = 0; k < woerter.length; k++) {
+        var w = String(woerter[k]).toLowerCase();
+        if (w.length >= 4 && klein.indexOf(w) >= 0) return true;
+      }
+    }
+    return false;
+  }
+
   function _rfIstVerneinung(text) {
+
     var t = String(text || '').trim();
     if (!t) return false;
     if (RF_NEIN.test(t)) return true;
@@ -5461,9 +5516,30 @@
   function _rfRestNachAktion(text) {
     if (!_rf) return;
     var t = String(text || '');
-    /* Ohne Zahl ist nichts nachzutragen — „nimm die erweiterte" allein
-       ist der ganze Satz. Ein Datum oder ein Prozentwert zählt mit. */
-    if (!/\d/.test(t)) return;
+    /* v1358 · EINE NULL IST EINE ANGABE.
+       Marcels Screenshot vom 12.09.2026 (design/mockups/fehler 2.png):
+
+         „Kannst du auch aus den Einstellungen übernehmen.
+          Keine Maklerprovision."
+
+       Die Übernahme lief, die Ausnahme fiel weg — und der Co-Pilot fragte
+       zurück, ihm fehle „die genaue Höhe der verbleibenden
+       Kaufnebenkosten". Die standen im selben Atemzug in den
+       Einstellungen, die er gerade übernommen hatte.
+
+       Der Grund stand hier: der Rest wurde nur weitergereicht, wenn er
+       eine ZIFFER trug. „Keine Maklerprovision" trägt keine — und ist
+       trotzdem eine Angabe, nämlich null Prozent. Wer „keine" sagt, hat
+       geantwortet, nicht geschwiegen.
+
+       Durchgelassen wird deshalb jetzt auch ein Rest ohne Ziffer, wenn er
+       eine Verneinung MIT Gegenstand trägt („keine Maklerprovision",
+       „ohne Makler"). Eine blanke Verneinung ohne Gegenstand bleibt
+       draußen — die ist im Zweifel die Antwort auf den Befehl selbst und
+       hat in der Feldauswertung nichts verloren. */
+    var RF_NULLANGABE = /\b(keine?[rsn]?|ohne|null)\s+[a-zäöüß]{4,}/i;
+    if (!/\d/.test(t) && !RF_NULLANGABE.test(t)) return;
+
     /* Der Befehlsteil wird entfernt, damit die Auswertung nicht darüber
        stolpert. Was übrig bleibt, muss noch eine Zahl tragen. */
     var rest = t
@@ -5472,7 +5548,8 @@
       .replace(/\b(erweiterte|erweiterten|einfache|vertiefte|volle)\b/gi, ' ')
       .replace(/\b(marktpreisindikation|marktbewertung|marktwert|indikation|bodenrichtwert|boris|lage|makrolage|mikrolage)\w*/gi, ' ')
       .replace(/\s{2,}/g, ' ').trim();
-    if (!/\d/.test(rest) || rest.length < 4) return;
+    if ((!/\d/.test(rest) && !RF_NULLANGABE.test(rest)) || rest.length < 4) return;
+
     try { _rfAuswerten(rest, false); } catch (e) {}
   }
 
@@ -7922,8 +7999,13 @@
     /* 1. Frage? Dann beantworten statt eintragen. */
     if (!_hoeflich && _rfIstFrage(t)) { _rfFrageBeantworten(t); return true; }
 
-    /* 2. Verneinung: „haben wir nicht", „kommt nicht in Frage", „weiter". */
-    if (_rfIstVerneinung(t)) {   /* v1288b: auch satzweise */
+    /* 2. Verneinung: „haben wir nicht", „kommt nicht in Frage", „weiter".
+          v1358: auch „Investmentthese habe ich keine" - Thema vorne,
+          Verneinung hinten. Das zweite Muster verlangt zusaetzlich, dass
+          der Satz das gefragte Thema nennt. */
+    if (_rfIstVerneinung(t) ||
+        _rfThemaVerneint(t, (_rf.offen || [])[_rf.i])) {   /* v1288b: auch satzweise */
+
       _rfBlase('ich', escH(t));
       _rfUeberspringen(true);
       return true;
