@@ -145,6 +145,13 @@
         'font-size:11px!important;font-weight:500!important;text-transform:none!important;',
         'letter-spacing:normal!important;color:var(--muted,#9a9aa3);',
         'margin:0 0 5px;line-height:1.45}',
+      /* v1346c: Spezifitaet statt Ladereihenfolge. Bei ZWEI !important
+         gewinnt die hoehere Spezifitaet - und der Hell-Skin schreibt
+         `html[data-mb-theme="light"] input` (0,1,2), meine Regel war
+         `.mbk-block input` (0,1,1). Gemessen: 13px kam an, DM Sans
+         nicht. Mit dem Attribut davor sind es (0,2,2). */
+      'html[data-mb-theme] .mbk-block input,html[data-mb-theme] .mbk-block select,',
+        'html[data-mb-theme] .mbk-block textarea,',
       '.mbk-block input,.mbk-block select,.mbk-block textarea{',
         /* v1346b: !important, aus demselben Grund wie bei den Labels -
            der Hell-Skin in index.html setzt font-family fuer jedes input
