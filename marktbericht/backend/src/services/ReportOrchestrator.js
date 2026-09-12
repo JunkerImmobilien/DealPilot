@@ -133,8 +133,22 @@ export const ReportOrchestrator = {
       beitrag_abzug_eur: input.beitrag_abzug_eur ? Number(input.beitrag_abzug_eur) : null,
       stellplatz_miete_monat: input.stellplatz_miete_monat ? Number(input.stellplatz_miete_monat) : null,
       bwk_modus: input.bwk_modus || null,
-      bog_eur: input.bog_eur ? Number(input.bog_eur) : null,
-      bog_grund: input.bog_grund || null,
+      /* === v1338c - EIN FELDPAAR, BEIDE VERFAHREN ======================
+         `bog_eur` und `bog_grund` gibt es hier und im ErtragswertService
+         seit jeher - und im Formular gab es dafuer KEIN Feld. Sie waren
+         also nur ueber einen direkten API-Aufruf erreichbar; ueber die
+         Oberflaeche hat sie nie jemand setzen koennen.
+
+         Besondere objektspezifische Grundstuecksmerkmale nach Paragraf 8
+         Abs. 3 ImmoWertV sind Eigenschaften des GRUNDSTUECKS - sie haengen
+         nicht am Verfahren. Ein Schimmelschaden ist im Ertragswert
+         derselbe wie im Sachwert. Deshalb speist das neue Feldpaar
+         (`bom_eur`/`bom_grund`, v1338) beide; die alten Namen behalten
+         Vorrang, damit ein Aufrufer, der sie schon setzt, nichts merkt. */
+      bog_eur: Number.isFinite(Number(input.bog_eur)) ? Number(input.bog_eur)
+        : (Number.isFinite(Number(input.bom_eur)) ? Number(input.bom_eur) : null),
+      bog_grund: input.bog_grund || input.bom_grund || null,
+
       wert_stufe: input.wert_stufe ? Number(input.wert_stufe) : 1,
       /* WNHK-3 · Sachwertfelder aus dem Formular */
       nhk_typ: input.nhk_typ || null,

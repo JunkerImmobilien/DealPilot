@@ -916,6 +916,19 @@ export function sachwert(ein, bodenwertErgebnis, param) {
     out.warnungen.push('Kein Sachwertfaktor verfügbar. Ausgewiesen ist der vorläufige Sachwert '
       + 'ohne Marktanpassung — das ist eine Herstellungskostenrechnung, kein Marktwert. '
       + 'Abweichungen von 30 % und mehr sind normal.');
+    /* v1338c: Besondere objektspezifische Merkmale werden hier NICHT
+       abgezogen. Sie gehoeren nach die Marktanpassung - ohne Faktor gibt es
+       keine, und ein Abzug auf eine Herstellungskostenrechnung erzeugt eine
+       Zahl, die nach Verkehrswert aussieht und keiner ist. Der Nutzer soll
+       aber nicht raetseln, wo seine Eingabe geblieben ist. */
+    if (Number.isFinite(Number(ein.bom_eur)) && Number(ein.bom_eur) !== 0) {
+      out.bom_eur_erfasst = Math.round(Number(ein.bom_eur));
+      out.warnungen.push('Die besonderen objektspezifischen Grundst\u00fccksmerkmale ('
+        + Math.round(Number(ein.bom_eur)).toLocaleString('de-DE')
+        + ' \u20ac) sind erfasst, wirken hier aber nicht: sie werden nach der '
+        + 'Marktanpassung angesetzt, und ohne Sachwertfaktor gibt es keine. '
+        + 'Im Ertragswertverfahren werden sie ber\u00fccksichtigt.');
+    }
     return out;
   }
   const marktwert = Math.round(vorlaeufig * swf);
