@@ -137,7 +137,21 @@
   .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
     gap:0 12px;align-items:stretch;}
   .row>div{display:flex;flex-direction:column;min-width:0;}
-  .row>div>input,.row>div>select,.row>div>textarea{margin-top:auto;}
+  /* v1336b - EIGENER FEHLER, GEMESSEN UND ZURUECKGENOMMEN.
+     `margin-top:auto` am Eingabefeld sollte es ans Zellenende druecken.
+     Das funktioniert nur, solange das Feld das LETZTE Element der Zelle
+     ist - und das ist es oft nicht: die Stufenleiste haengt eine
+     "fehlt"-Markierung an, die Feldhilfe einen Ankertext. Gemessen hat
+     die Zelle #plot drei Kinder und #cond vier. Dort schob `auto` das
+     Feld nach OBEN, weg von seinen Nachbarn - aus 133 px Versatz wurden
+     33, aber weg war er nicht.
+
+     Das Feld sitzt jetzt wieder direkt unter seinem Label. Damit sie
+     trotzdem fluchten, bekommen die Labels einer Rasterzeile dieselbe
+     Hoehe - das macht `labelsAngleichen()` in mb-wizard.js, weil es sich
+     nach dem tatsaechlichen Umbruch richten muss und keine CSS-Regel das
+     kann. */
+
 
   input[type=number]{padding-right:8px;}
   button.go{margin-top:18px;width:100%;background:var(--gold);color:#1a1500;border:none;
@@ -695,6 +709,6 @@ try{var _u=new URLSearchParams(location.search).get('theme');if(_u==='light'||_u
 <script src="feldhilfe.js?v=1334b"></script>
 <script src="wertermittlung.js?v=1229b"></script>
 <script src="mb-stufen.js?v=1335"></script>
-<script src="mb-wizard.js?v=1196b"></script><!-- v1127: Reiter, nach mb-stufen.js --><!-- v1126: Stufen als Meilensteine, nach wertermittlung.js -->
+<script src="mb-wizard.js?v=1336b"></script><!-- v1127: Reiter, nach mb-stufen.js --><!-- v1126: Stufen als Meilensteine, nach wertermittlung.js -->
 </body>
 </html>

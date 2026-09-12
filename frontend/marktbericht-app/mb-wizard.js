@@ -692,6 +692,76 @@
     document.addEventListener('change', function () { setTimeout(function () { zeige(_aktiv); }, 250); }, true);
   }
 
+  /* === v1336b - GLEICHE LABELHOEHE, DAMIT DIE FELDER FLUCHTEN =========
+     Marcel: "Die Formatierung der Felder passt oft nicht Eingabefelder zu
+     Textfeldern fluchten nicht."
+
+     Gemessen in der Zeile Balkon / Garten / Grundstueck / Wohneinheiten:
+     die ersten beiden Labels sind 19 px hoch, die letzten beiden 58 -
+     ihre Erklaerung braucht drei Zeilen. Damit stehen die Eingabefelder
+     derselben Zeile 133 px versetzt.
+
+     Eine CSS-Regel kann das nicht loesen: welche Felder nebeneinander
+     landen, entscheidet erst der Umbruch, und der haengt an der
+     Fensterbreite. Deshalb wird nach dem Umbruch gemessen - Zellen mit
+     derselben Oberkante bilden eine Rasterzeile, und deren Labels
+     bekommen die groesste vorkommende Hoehe.
+
+     `min-height` statt `height`: ein Label darf wachsen, wenn der Text
+     laenger wird, es soll nur nicht kuerzer sein als seine Nachbarn. */
+  function labelsAngleichen() {
+    var zeilen = document.querySelectorAll('.panel .row');
+    for (var i = 0; i < zeilen.length; i++) {
+      var r = zeilen[i];
+      var zellen = Array.prototype.slice.call(r.children);
+      if (zellen.length < 2) continue;
+      var labs = [];
+      for (var j = 0; j < zellen.length; j++) {
+        var l = null;
+        for (var k = 0; k < zellen[j].children.length; k++) {
+          if (zellen[j].children[k].tagName === 'LABEL') { l = zellen[j].children[k]; break; }
+        }
+        if (l) { l.style.minHeight = ''; labs.push({ zelle: zellen[j], lab: l }); }
+      }
+      if (labs.length < 2) continue;
+      /* Erst nach dem Zuruecksetzen messen - sonst misst man die eigene
+         Vorgabe vom letzten Lauf (dieselbe Falle wie beim Skin). */
+      var gruppen = {};
+      for (var m = 0; m < labs.length; m++) {
+        var oben = Math.round(labs[m].zelle.getBoundingClientRect().top);
+        (gruppen[oben] = gruppen[oben] || []).push(labs[m].lab);
+      }
+      Object.keys(gruppen).forEach(function (oben) {
+        var g = gruppen[oben];
+        if (g.length < 2) return;
+        var hoch = 0;
+        for (var n = 0; n < g.length; n++) hoch = Math.max(hoch, g[n].getBoundingClientRect().height);
+        if (hoch <= 0) return;
+        for (var p = 0; p < g.length; p++) g[p].style.minHeight = hoch + 'px';
+      });
+    }
+  }
+  window.MbLabelsAngleichen = labelsAngleichen;
+
+  var _angZeit = null;
+  function angleichenBald() {
+    if (_angZeit) clearTimeout(_angZeit);
+    _angZeit = setTimeout(function () { _angZeit = null; try { labelsAngleichen(); } catch (e) {} }, 120);
+  }
+  function angleichenStarten() {
+    angleichenBald();
+    window.addEventListener('resize', angleichenBald);
+    /* Reiterwechsel, neue Felder, ein eingehaengter Ankertext - alles
+       aendert die Labelhoehe. Gedrosselt, sonst misst der Beobachter
+       seine eigene Aenderung. */
+    try {
+      new MutationObserver(function () { angleichenBald(); })
+        .observe(document.documentElement, { childList: true, subtree: true });
+    } catch (e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', angleichenStarten);
+  else angleichenStarten();
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 
