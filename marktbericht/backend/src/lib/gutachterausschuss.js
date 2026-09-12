@@ -799,7 +799,105 @@ export function erbbaurechtskoeffizient(arg = {}) {
   return r;
 }
 
+/**
+ * v1343 · WO BEKOMME ICH DIESE WERTE HER?
+ *
+ * Marcels Frage: „wenn die Adresse eingegeben ist, dass du automatisch
+ * dort ranschreibst, wo man die herbekommt. Also die Gutachterausschuesse
+ * oder so, dass du gleich den Link ausgibst."
+ *
+ * Das Register fuehrt zu jedem Satz Fundstelle, Quell-URL, Lizenz und
+ * Berichtsjahr — 31 verschiedene amtliche Quellen. Gelesen hat sie bisher
+ * nur der Bericht, wenn ein Wert TATSAECHLICH gerechnet wurde. Wer den
+ * Wert von Hand eintragen soll, bekam nichts.
+ *
+ * Diese Auskunft dreht das um: sie sagt fuer einen Ort, WAS hinterlegt ist
+ * (dann muss man nichts suchen), und WO es steht, wenn nicht.
+ *
+ * KEIN ERFUNDENER LINK. Ausgegeben wird nur, was im Registersatz belegt
+ * ist, plus das bundesweite BORIS-D-Portal — das steht seit v1077 in
+ * `connectors/boris/registry.js` als geprueft.
+ */
+const KENNZAHL_NAME = {
+  liegenschaftszinssatz: 'Liegenschaftszinssatz',
+  sachwertfaktor: 'Sachwertfaktor',
+  erbbaurechtskoeffizient: 'Erbbaurechtskoeffizient',
+  erbbauzinssatz: 'Erbbauzinssatz',
+  bodenpreisniveau: 'Bodenpreisniveau',
+  durchschnittspreis: 'Durchschnittspreis',
+  preisentwicklung: 'Preisentwicklung',
+  bodenpreisindex: 'Bodenpreisindex',
+};
+
+/* Die Kennzahlen, die ein Sachverstaendiger im Zusatzwerte-Block von Hand
+   eintragen koennte. Reihenfolge = Reihenfolge der Anzeige. */
+
+const QUELLEN_KENNZAHLEN = ['liegenschaftszinssatz', 'sachwertfaktor',
+  'erbbaurechtskoeffizient', 'erbbauzinssatz', 'bodenpreisniveau',
+  'durchschnittspreis', 'preisentwicklung'];
+
+export function quellen({ ags } = {}) {
+  const out = { ags: ags || null, ausschuss: null, gebiet: null,
+                hinterlegt: [], fehlt: [], portale: [] };
+  if (!ags) { out.grund = 'keine_ags'; return out; }
+
+  for (const k of QUELLEN_KENNZAHLEN) {
+    const saetze = finde(k, ags).filter((x) => ebeneErlaubt(k, x));
+    if (!saetze.length) { out.fehlt.push({ kennzahl: k, name: KENNZAHL_NAME[k] || k }); continue; }
+    /* Der juengste Jahrgang steht vorn. */
+
+    const jung = saetze.slice().sort((a, b) => (Number(b.berichtsjahr) || 0) - (Number(a.berichtsjahr) || 0));
+    const s0 = jung[0];
+    if (!out.ausschuss && s0.gaa_name) out.ausschuss = s0.gaa_name;
+    if (!out.gebiet && s0.gebiet_name) out.gebiet = s0.gebiet_name;
+    out.hinterlegt.push({
+      kennzahl: k,
+      name: KENNZAHL_NAME[k] || k,
+      zweige: jung.map((x) => x.zweig).filter(Boolean),
+      werte: jung.map((x) => ({
+        zweig: x.zweig || null,
+        wert: (x.formel && x.formel.form === 'konstante') ? x.formel.wert : null,
+        liefert: (x.formel && x.formel.liefert) || null,
+        spanne: (x.formel && x.formel.spanne) || null,
+        stufe: x.stufe || null,
+        fallzahl: x.fallzahl ?? null,
+      })),
+      berichtsjahr: s0.berichtsjahr ?? null,
+      fundstelle: s0.fundstelle || null,
+      quelle_url: s0.quelle_url || null,
+      quellenvermerk: s0.quellenvermerk || null,
+      lizenz: s0.lizenz || null,
+      gebiet: s0.gebiet_name || null,
+      ausschuss: s0.gaa_name || null,
+    });
+  }
+
+  /* Ein handgeschriebenes Modul ist mehr wert als ein Registersatz — es
+     traegt das ganze Modell, nicht nur eine Zahl. */
+  const modul = zustaendig(ags);
+  if (modul) {
+    out.modul = { name: modul.name, bericht: modul.bericht || null,
+                  berichtsjahr: modul.berichtsjahr ?? null };
+    if (!out.ausschuss) out.ausschuss = modul.name;
+  }
+
+  /* Bodenrichtwerte kommen nicht aus dem Register, sondern aus BORIS.
+     Das bundesweite Portal ist in connectors/boris/registry.js als
+     geprueft gefuehrt; laenderspezifische Portale werden hier NICHT
+     geraten. */
+  out.portale.push({
+    fuer: 'Bodenrichtwert',
+    name: 'BORIS-D (bundesweites Portal der Gutachterausschüsse)',
+    url: 'https://www.bodenrichtwerte-boris.de/',
+    hinweis: 'Adresse suchen, auf das Grundstück klicken, Wert und Stichtag ablesen. '
+      + 'Auf die richtige Nutzungsart achten — für eine Wohnung ist das die Wohnbaufläche.',
+  });
+
+  return out;
+}
+
 export function bodenpreisniveau({ ags, nutzungsart, lage } = {}) {
+
 
   const treffer = finde('bodenpreisniveau', ags);
   if (!treffer.length) {
@@ -1142,6 +1240,7 @@ export function bezugsgroesse(ags) {
 
 export default { AUSSCHUESSE, zustaendig, sachwertfaktor, gartenland,
   erbbaurechtskoeffizient,   /* v1339 */
+  quellen,                   /* v1343 */
   bezugsgroesse, kreisAus, liegenschaftszinssatz, bodenpreisniveau,
   marktdaten, durchschnittspreis, vergleichsfaktor, bodenpreisindex,
   registerStand };
