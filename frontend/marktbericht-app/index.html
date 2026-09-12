@@ -111,7 +111,34 @@
   input,select{width:100%;background:#0f0f12;border:1px solid var(--line);color:var(--txt);
     border-radius:11px;padding:12px 14px;font-family:'Inter';font-size:15px;min-height:44px;box-sizing:border-box;}
   input:focus,select:focus{outline:none;border-color:var(--gold);}
-  .row{display:flex;gap:12px;flex-wrap:wrap;}.row>div{flex:1 1 calc(50% - 6px);min-width:128px;}
+  /* v1336 - DIE EINGABEFELDER FLUCHTEN JETZT.
+     Marcels Befund: "Die Formatierung der Felder passt oft nicht
+     Eingabefelder zu Textfeldern fluchten nicht."
+
+     GEMESSEN im Staging-iframe bei 1240 px Panelbreite:
+       eq_energie/eq_heating/eq_windows  -> drittes Feld 960 statt 474 px,
+                                            Versatz 95 px
+       eq_walls/eq_dachform/eq_roof      -> dasselbe
+       balcony/garden/plot/units         -> Versatz 133 px, weil die
+                                            Labels von plot und units
+                                            zweizeilig sind (39 statt 19 px)
+
+     Zwei Ursachen, eine Zeile CSS. `flex:1 1 calc(50% - 6px)` kann drei
+     Felder nicht tragen: das dritte bricht um und nimmt dann die ganze
+     Breite. Und weil das Eingabefeld direkt unter dem Label sitzt,
+     wandert es mit jeder zweiten Labelzeile nach unten.
+
+     Grid mit auto-fit loest das erste: die Spaltenzahl richtet sich nach
+     dem Platz, nicht nach einer geratenen Prozentzahl - zwei Felder
+     ergeben zwei Spalten, drei ergeben drei, auf dem Handy alle
+     untereinander. Die Zelle als Flex-Spalte mit `margin-top:auto` am
+     Feld loest das zweite: das Label darf wachsen, das Eingabefeld bleibt
+     unten und steht damit auf einer Linie mit seinen Nachbarn. */
+  .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:0 12px;align-items:stretch;}
+  .row>div{display:flex;flex-direction:column;min-width:0;}
+  .row>div>input,.row>div>select,.row>div>textarea{margin-top:auto;}
+
   input[type=number]{padding-right:8px;}
   button.go{margin-top:18px;width:100%;background:var(--gold);color:#1a1500;border:none;
     border-radius:999px;padding:13px;font-family:'Space Grotesk';font-weight:600;font-size:15px;
@@ -286,6 +313,7 @@
     .report h1{font-size:19px !important}
     .report h2{font-size:15px !important}
     canvas,img{max-width:100% !important;height:auto}
+    .row{grid-template-columns:1fr !important}   /* v1336: auf dem Handy untereinander */
     .row>div{min-width:0 !important}
     table{display:block;overflow-x:auto;max-width:100%}
   }
