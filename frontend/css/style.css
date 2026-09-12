@@ -27631,7 +27631,9 @@ aside.sidebar .sb-card.deal-won.active {
   padding: 14px 15px;
 
   background: linear-gradient(135deg, var(--surface, #F8F6F1), #fff);
-  border: 1.5px solid color-mix(in srgb, var(--gold) 20%, transparent);
+  /* v1352b: 2 px bei allen - mit 1.5 px war die Reihe mit der aktiven
+     Karte einen Pixel hoeher als die andere. */
+  border: 2px solid color-mix(in srgb, var(--gold) 20%, transparent);
   border-radius: 12px;
   cursor: pointer;
   text-align: left;
@@ -27646,7 +27648,6 @@ aside.sidebar .sb-card.deal-won.active {
 }
 .ds2-preset-card.ds2-preset-active {
   border-color: var(--gold, #C9A84C);
-  border-width: 2px;
   background: linear-gradient(135deg, rgba(232,201,100,0.10), #fff);
   box-shadow: 0 4px 18px color-mix(in srgb, var(--gold) 30%, transparent), 0 0 0 3px color-mix(in srgb, var(--gold) 10%, transparent);
 }
@@ -27710,21 +27711,27 @@ aside.sidebar .sb-card.deal-won.active {
   display: block;
   min-width: 2px;
 }
+/* v1352b: gemessen wurde, dass genau die zwei Karten mit Schaerfe-Pille
+   ihre Zeile abschnitten - "Rendite 30 % - Finanz. 30 % [strenger]" ist
+   in 208 px nicht unterzubringen. Statt den Text zu kuerzen darf die
+   Zeile jetzt umbrechen und ist dafuer immer zwei Zeilen hoch. Damit
+   bleiben alle Karten gleich hoch, egal wie lang ein Profilname einmal
+   wird, und nichts verschwindet unter einem Deckel. */
 .ds2-preset-zahlen {
   display: flex;
   align-items: baseline;
-  gap: 7px;
-  flex-wrap: nowrap;
+  align-content: flex-start;
+  gap: 4px 7px;
+  flex-wrap: wrap;
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 10.5px;
   font-weight: 600;
   letter-spacing: -0.2px;
   color: var(--ch, #2A2727);
   line-height: 1.3;
-  min-height: 14px;
-  white-space: nowrap;
-  overflow: hidden;
+  min-height: 31px;
 }
+
 .ds2-pw-schaerfe {
   font-size: 9.5px;
   font-weight: 600;
