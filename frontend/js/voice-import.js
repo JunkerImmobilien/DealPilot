@@ -6224,10 +6224,10 @@
       var el = document.getElementById(id);
       return !(el && String(el.value || '').trim() !== '');
     });
-    if (!offen.length) return;
+    if (!offen.length) return _melde(false);
 
     var kat = (_rf.catalog || []).filter(function (c) { return offen.indexOf(c.id) >= 0; });
-    if (!kat.length) return;
+    if (!kat.length) return _melde(false);
 
     var txt = String(M.text).replace(/[#*_>`]/g, ' ').replace(/\s+/g, ' ').trim();
     if (txt.length < 80) return;
@@ -7547,10 +7547,11 @@
      Wort annehmen kann, und nur wenn die Antwort GENAU EINEN Kandidaten
      enthält. Bei „32049, 32051, 32052 und 32053" fragt der Co-Pilot
      lieber, welche es ist, als eine davon zu raten. */
-  function _rfAuskunftNutzen(antwort) {
-    if (!_rf || !antwort) return;
+  function _rfAuskunftNutzen(antwort, fertig) {
+    var _melde = function (ja) { try { if (typeof fertig === 'function') fertig(!!ja); } catch (e) {} };
+    if (!_rf || !antwort) return _melde(false);
     var e = _rf.offen[_rf.i];
-    if (!e || !e.ids || !e.ids.length) return;
+    if (!e || !e.ids || !e.ids.length) return _melde(false);
 
     /* Nur Felder, die jetzt gefragt sind UND noch leer. */
     var offen = e.ids.filter(function (id) {
@@ -7565,18 +7566,18 @@
     if (!kat.length) return;
 
     var txt = String(antwort).replace(/\s+/g, ' ').trim();
-    if (txt.length < 12) return;
+    if (txt.length < 12) return _melde(false);
 
     Auth.apiCall('/ai/extract-text', {
       method: 'POST',
       body: { text: txt.slice(0, 1200), catalog: kat, kontext: _rfKontext() }
     }).then(function (r) {
-      if (!_rf) return;
+      if (!_rf) return _melde(false);
       var f = (r && r.fields) || {};
       var treffer = Object.keys(f).filter(function (id) {
         return offen.indexOf(id) >= 0 && f[id] != null && String(f[id]).trim() !== '';
       });
-      if (!treffer.length) return;
+      if (!treffer.length) return _melde(false);
 
       _rf.auskunftVorschlag = { werte: {} };
       var teile = treffer.map(function (id) {
@@ -7587,7 +7588,8 @@
         + '<span style="opacity:.75">Sag <b>ja</b> — oder nenn mir den richtigen Wert.</span>');
       _rfAktion('auskunft', 'Aus meiner eigenen Antwort — du kannst sie jederzeit überschreiben.',
                 'Übernehmen');
-    }).catch(function () {});
+      _melde(true);
+    }).catch(function () { _melde(false); });
   }
 
   function _rfFrageBeantworten(text) {
@@ -7602,10 +7604,21 @@
       /* Nach der Auskunft geht es weiter, wo es aufgehoert hat - die Frage,
          die offen war, ist immer noch offen. */
       var e = _rf.offen[_rf.i];
-      /* v1325: Steckt in der Antwort ein Wert fuer die offene Frage,
-         wird er ANGEBOTEN statt nur ausgegeben. */
-      try { _rfAuskunftNutzen((r && r.antwort) || ''); } catch (ex) {}
-      if (e) _rfBlase('co', '<span style="opacity:.7">Zurück zur Frage:</span> ' + escH(e.frage));
+      /* v1325b: Erst pruefen, ob die eigene Antwort die offene Frage schon
+         beantwortet - dann ist "Zurueck zur Frage" die falsche Zeile. Sie
+         kommt nur, wenn KEIN Vorschlag zustande kam; sonst setzt
+         _rfAuskunftNutzen selbst den naechsten Satz. Gemessen: vorher stand
+         "Zurueck zur Frage" ueber dem Angebot, und der Nutzer las zuerst
+         die Aufforderung und dann erst die Abkuerzung. */
+      try {
+        _rfAuskunftNutzen((r && r.antwort) || '', function (hatVorschlag) {
+          if (!hatVorschlag && e) {
+            _rfBlase('co', '<span style="opacity:.7">Zurück zur Frage:</span> ' + escH(e.frage));
+          }
+        });
+      } catch (ex) {
+        if (e) _rfBlase('co', '<span style="opacity:.7">Zurück zur Frage:</span> ' + escH(e.frage));
+      }
       if (_fs.an && _fs.stream) _fsHoeren(true);
     }).catch(function (err) {
       _rfDenkt(false);
