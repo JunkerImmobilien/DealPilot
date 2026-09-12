@@ -76,9 +76,9 @@ ungewöhnlichem Umfang auszulesen."*
 
 | # | Punkt | Stand |
 |---|---|---|
-| B1 | **Bestandsaufnahme**: welche Berechnungen, Formeln, Gewichtungen, Schwellen laufen heute im Browser? Was wird an den Client übertragen, das dort nicht hingehört? | offen |
+| B1 | **Bestandsaufnahme**: welche Berechnungen, Formeln, Gewichtungen, Schwellen laufen heute im Browser? | **ERLEDIGT 13.09.2026 — vollständig im Journal.** Kurzfassung: 157 JS-Dateien, 5,3 MB, **kein Bundler, keine Minifizierung**, 158 Script-Tags als Quelltext inklusive aller Kommentare. Die fünf teuersten Stellen: (1) `dealscore2.js` 933 Z. — 5 Hauptgewichte, 24 Sub-Gewichte, 13 Schwellenkurven, LTV×DSCR-Regel, 6 Anlegerprofile; (2) `ui.js` Z. 547–625 — der vollständige Analyse-Prompt mit verbindlicher Bewertungsskala und Anti-Halluzinations-Regeln; (3) `tax.js`+`afa-engine.js`+`calc.js` — § 32a EStG mit Originalkoeffizienten, AfA §7b, 15-%-Grenze, BSV-Mechanik, **serverseitig gar nicht vorhanden**; (4) das Sachverständigen-Paket `bmf-data.js`/`bmf-afa.js`/`rnd-*` ~1.490 Z., darin die aus zwei Gutachten rückwärts abgeleitete RND-Formel; (5) `config.js` — alle Hausannahmen, Bankmargen je Bonitätsstufe, komplette Plan- und Kontingentmatrix. **Querschnittsbefund: drei Score-Engines und drei ESt-Tarife als unabhängige Duplikate** — eine Verlagerung muss alle Kopien erfassen, sonst bleibt das Modell über die übersehene rekonstruierbar. **Positiv: das Geld ist geschützt** (Kontingente in `middleware/planLimits.js` serverseitig), das Wissen nicht. |
 | B2 | Sensible Rechenlogik ins Backend verschieben, soweit technisch möglich | offen |
-| B3 | Anomalie-Erkennung je Account (Frequenz, Regelmäßigkeit, Parametervariation, parallele Sitzungen, Limitüberschreitungen) | offen |
+| B3 | Anomalie-Erkennung je Account (Frequenz, Regelmäßigkeit, Parametervariation, parallele Sitzungen, Limitüberschreitungen) | **Messgrundlage steht (13.09.2026).** Normalnutzung gemessen: 57 API-Anfragen in 24 s über **12 verschiedene Endpunktgruppen**, Variationskoeffizient der Abstände **5,13**. Ein Auslese-Skript trifft ein bis zwei Gruppen bei Streuung nahe null. **Vielfalt und Unregelmäßigkeit unterscheiden besser als reine Frequenz** — und treffen damit B18 (Fehlalarmschutz). Ist-Stand: Limit **100/60 s, IP-basiert** (`printenv`, nicht die 200/900 s aus `config.js`) — zu eng und an der falschen Größe: mehrere Mitarbeiter hinter einem Firmenanschluss teilen sich das Kontingent. |
 | B4 | Risikostufen NORMAL → AUFFÄLLIG → WARNUNG → HOHES RISIKO → EINGESCHRÄNKT → GESPERRT → MANUELL FREIGEGEBEN | offen |
 | B5 | Erste Warnstufe: sichtbare Meldung + serverseitiges Sicherheitsereignis | offen |
 | B6 | Zweite Stufe: schärfere Limits, Cooldown, Teilsperre | offen |
@@ -91,11 +91,12 @@ ungewöhnlichem Umfang auszulesen."*
 | B13 | AGB: Abschnitt gegen Scraping, Bots, LLM-Rekonstruktion, Reverse Engineering | offen |
 | B14 | **Vertragsstrafe 25.000 €** — ausdrücklich als *juristisch zu prüfender Entwurf*, B2C und B2B getrennt, **nie automatisch durch einen Risikoscore ausgelöst** | offen |
 | B15 | Datenschutzerklärung: Zweck, Daten, Aufbewahrung, Rechtsgrundlage, Löschkonzept | offen |
-| B16 | API-Endpunkte: Auth, Autorisierung, serverseitige Validierung, Rate-Limits, Logging | offen |
+| B16 | API-Endpunkte: Auth, Autorisierung, serverseitige Validierung, Rate-Limits, Logging | **Ist-Stand gemessen.** 34 Routen, `helmet` aktiv, HSTS/nosniff/SAMEORIGIN/Referrer-Policy gesetzt, **keine CSP**. Auth-Limiter 20/15 min gegen Brute-Force. **Gefunden: `skip` steht zweimal im selben `rateLimit`-Objektliteral** (`backend/src/index.js`) — die zweite gewinnt, also ist die Ausnahme aus v395 (Commit `94e4f6f`, 01.06.2026) seit über drei Monaten wirkungslos. Für den Schutz ist der Zufallszustand der bessere, aber die Datei sagt das Gegenteil von dem, was sie tut. |
 | B17 | Konfigurationsbereich im Admin für alle Schwellen | offen |
 | B18 | Fehlalarmschutz: Nutzungshistorie und Accounttyp berücksichtigen, Eskalation statt Sofortsperre | offen |
 | B19 | Fallakte zur Beweissicherung, chronologisch | offen |
-| B20 | Tests: Normalnutzung, jede Eskalationsstufe, Adminausnahme, Entsperrung, Audit-Log, Fehlalarm | offen |
+| B20 | Tests: Normalnutzung, jede Eskalationsstufe, Adminausnahme, Entsperrung, Audit-Log, Fehlalarm | offen |
+| B21 | **Direktweg zu OpenAI aus dem Browser** — NEU, aus B1 | `quickcheck-app.html` Z. 5299 ff. ruft **`api.openai.com` direkt aus dem Client** auf, mit einem Schlüssel aus `localStorage` (`ji_ak_oai`). Kein IP-Schutzthema, sondern ein eigenes: ein API-Schlüssel im Browserspeicher, und ein Pfad, der **am Backend und damit an jeder Zählung, jedem Limit und jedem Protokoll vorbeiläuft**. Gehört unabhängig von der Reihenfolge des Schutzsystems geschlossen. |
 
 **Zwei Leitplanken aus Marcels eigenem Auftrag, die beim Bauen gelten:**
 bestehende Funktionen dürfen nicht beschädigt werden, und ein technischer

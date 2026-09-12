@@ -14703,6 +14703,161 @@ Produktentscheidung. Marcel bekommt den Befund vorgelegt.
 `5bee222` v1357b · `be6ef13` v1357c
 
 
+## B1 · Bestandsaufnahme — was heute im Browser liegt
+
+Erster Punkt aus Marcels Schutz-Lastenheft. Die Frage war nicht „wie
+sicher ist die App", sondern: **welches Wissen liegt im Klartext beim
+Nutzer?**
+
+### Der Rahmen
+
+`frontend/` hat **keinen Bundler, keinen Build-Schritt, keine
+Minifizierung.** `index.html` lädt **158 einzelne `<script src=…>`** als
+unveränderten Quelltext. Gemessen auf dem Staging-Server:
+
+```
+157 JS-Dateien · 5,3 MB · unminifiziert
+js/dealscore2.js → 37 KB, 933 Zeilen, alle Kommentare
+```
+
+Ausgeliefert wird damit nicht nur die Logik, sondern die **vollständige
+Kommentierung** — und die ist hier fachlich ergiebig: Herleitungen aus
+Gutachten, Excel-Nachbauten, gemessene Fehlerfälle, Quellen mit
+Abrufdatum. **Ein Nachbauer bekommt Code plus Begründung plus
+Kalibrierungshistorie.**
+
+### Die fünf teuersten Stellen
+
+**1 · `js/dealscore2.js` (933 Zeilen) — der größte Einzelverlust.**
+Kein „eine Formel", sondern ein kalibriertes Modell: 5 Hauptgewichte,
+**24 Sub-Gewichte**, **13 Schwellenkurven** als Stützpunktlisten,
+2 Range-Bucket-Tabellen (LTV, Tilgung), Energieklassen-Mapping,
+7 kategoriale Skalen, die **LTV×DSCR-Interaktionsregel** (+5/−20/−25) und
+**6 fertige Anlegerprofile**. Dazu die Kommentare „war 4 → jetzt 5", die
+verraten, *wie* kalibriert wurde. Wer die Datei kopiert, hat das
+Produktversprechen.
+
+**2 · `js/ui.js` Z. 547–625 — der Analyse-Prompt.**
+Prompt-Engineering im Klartext: Rollendefinition, die verbindliche
+**„DEALPILOT-BEWERTUNGSSKALA"** mit vorgeschriebenem Wortlaut je
+LTV-/DSCR-Band, die Anti-Halluzinations-Regeln (erkennbar aus echten
+Fehlausgaben entstanden) und die 7-Block-Ausgabestruktur mit
+Längenvorgaben. Ein Wettbewerber spart sich die gesamte
+Iterationsschleife — **und bekommt denselben Ton**, also genau das, was
+Kunden als „die KI von DealPilot" wahrnehmen.
+
+**3 · `js/tax.js` (2.106) + `afa-engine.js` (313) + `calc.js` (4.240).**
+Die deutsche Steuer- und Finanzierungsmechanik als lauffähiges Paket:
+§ 32a EStG mit Originalkoeffizienten, AfA linear/degressiv/§ 7b samt
+Wechsel-Optimierung, die 15-%-Grenze für anschaffungsnahe
+Herstellungskosten, Anschlussfinanzierungs-Phasen,
+Bausparvertrags-Zuteilung. **Das Backend hat davon nichts** —
+`taxService.js` ist reine Persistenz, ein SQL-Upsert über 43 Spalten ohne
+eine einzige Steuerformel. Der Aufwand steckt nicht in den Paragrafen,
+die sind frei; er steckt in der Verzahnung mit Cashflow und Restschuld.
+
+**4 · Das Sachverständigen-Paket (~1.490 Zeilen).**
+`bmf-data.js` (69 Bauindex-Jahrgänge, 64 Grundstücksarten × 5
+Kennwerte), `bmf-afa.js` (BMF-Sachwertverfahren komplett nachgebaut),
+`rnd-calc.js` (Punktraster Anlage 2, 9 Gewerke mit Gewichtung),
+`rnd-bte-katalog.js` (~190 Bauteile nach DIN 276-1), `rnd-gnd-table.js`
+(30 GND-Sätze). **Besonders heikel:** die RND-Formel ist laut Kommentar
+aus zwei konkreten Originalgutachten rückwärts abgeleitet und gegen deren
+Ergebnisse validiert. Dieses Reverse Engineering ist schwer wiederholbar
+und steht als Fließtext im Quelltext.
+
+**5 · `js/config.js` (1.374 Zeilen) — unterschätzt.**
+Alle Standardannahmen des Produkts (BWK-Quoten, Mietausfall, Wert- und
+Mietsteigerung, Mindest-DSCR, Grenzsteuersatz, Nebenkostenpauschalen),
+die **Bankmargen je Bonitätsstufe**, die Pfandbrief-Zinsstruktur — plus
+die **vollständige Plan-, Feature- und Kontingentmatrix**. Die
+Annahmen sind die „Hausmeinung", auf der jede Zahl im Produkt ruht; die
+Matrix zeigt einem Wettbewerber Preisarchitektur und Gating auf einen
+Blick.
+
+### Der Querschnittsbefund, der die Reihenfolge bestimmt
+
+**Es gibt drei Score-Engines und drei ESt-Tarife, unabhängig voneinander:**
+
+| | Kopien |
+|---|---|
+| Scoring | `dealscore2.js` · `dealscore.js` · `QcEngine` in `quickcheck-app.html` |
+| ESt-Tarif | `tax.js` · `dashboard.js` (Z. 636) · `rnd-calc.js` (Z. 495) |
+
+**Eine Verlagerung muss alle Kopien erfassen**, sonst bleibt das Modell
+über die übersehene Variante weiter rekonstruierbar. Das ist kein
+Schönheitsfehler, sondern bestimmt den Zuschnitt jedes Pakets.
+
+### Was bereits serverseitig liegt — und gut geschützt ist
+
+Der **gesamte ImmoWertV-Kern des Marktberichts** liegt im Backend:
+`nhk2010.js`, `immowertv.js`, die Sachwertfaktor- und Mietmodelle,
+`gutachterausschuss.js`, `verfahrenswahl.js`, `erbbaurecht.js`, dazu die
+Services und BORIS-Connectoren. Ebenso die serverseitigen KI-Prompts
+(`openaiService.js`, `report_prompt.txt`), die BMF-Pipeline über
+LibreOffice und — **entscheidend** — die Durchsetzung von Plan, Credits
+und Limits.
+
+> **Das Geld ist geschützt, das Wissen nicht.** Objekt-, KI- und
+> PDF-Kontingente werden in `middleware/planLimits.js` serverseitig
+> geprüft. Wer im Browser seinen Plan hochschaltet — `DealPilotConfig`
+> ist global, beschreibbar und konfigurierbar, gemessen —, sieht mehr
+> Knöpfe, bekommt aber keine einzige zusätzliche KI-Analyse.
+
+### Ein eigener Befund: der Direktweg zu OpenAI
+
+`quickcheck-app.html` Z. 5299 ff. ruft **`api.openai.com` direkt aus dem
+Browser** auf, mit einem Schlüssel aus `localStorage` (`ji_ak_oai`). Das
+ist kein IP-Schutzthema, sondern ein eigenes: ein API-Schlüssel im
+Browserspeicher, ein Pfad, der am Backend und damit an jeder Zählung,
+jedem Limit und jedem Protokoll vorbeiläuft.
+
+### Der Ist-Zustand der Abwehr, gemessen
+
+| | Stand |
+|---|---|
+| Rate-Limit | **100 Anfragen / 60 s** (`printenv` im Container — **nicht** die 200/900 s aus `config.js`), **IP-basiert** |
+| Normalnutzung | **57 API-Anfragen in 24 s** für Start + drei Objekte |
+| Rollen | `users`: nur `admin`/`user`. Getrennt `admin_users` mit owner/support/readonly + TOTP |
+| Audit | `admin_audit_log` existiert — nur **Admin**-Aktionen, kein Nutzerverhalten |
+| Kopfzeilen | HSTS, nosniff, SAMEORIGIN, Referrer-Policy gesetzt · **keine CSP** |
+
+**Das Limit ist zu eng und an der falschen Größe.** Bei 57 Anfragen in
+24 Sekunden ist ein zügiger Nutzer nach gut einer halben Minute bei über
+der Hälfte — und weil es an der IP hängt, teilen sich mehrere
+Mitarbeiter hinter einem Firmenanschluss dasselbe Kontingent. Genau das
+löst Marcels eigene Anforderung B3: **je Account statt je IP.**
+
+### Ein toter Schalter seit dem 01.06.2026
+
+```js
+const limiter = rateLimit({
+  skip: function (req) { /* v395: eingeloggte App-Requests nicht limitieren */ … },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.path.startsWith('/health')      // ← diese gewinnt
+});
+```
+
+**`skip` steht zweimal im selben Objektliteral.** In JavaScript gewinnt
+die zweite Eigenschaft; die Ausnahme aus `v395` (Commit `94e4f6f`,
+01.06.2026) ist seit ihrer Einführung wirkungslos. Für das Schutzsystem
+ist der Zufallszustand der bessere — aber **die Datei sagt seit über drei
+Monaten das Gegenteil von dem, was sie tut.**
+
+### Die Erkennungsgrundlage für B3, gemessen statt geschätzt
+
+| Merkmal | Normalnutzung | Auslese-Skript |
+|---|---|---|
+| Endpunktgruppen | **12 verschiedene** | ein bis zwei |
+| Streuung der Abstände | **5,13** (Variationskoeffizient) | nahe null |
+
+**Vielfalt und Unregelmäßigkeit unterscheiden besser als Frequenz.** Ein
+Mensch klickt stoßweise und löst dabei zwölf verschiedene Dinge aus; ein
+Skript zieht gleichmäßig eine Sache ab. Das trifft Marcels Vorgabe aus
+B18 — Fehlalarme vermeiden, statt jeden schnellen Nutzer zu sperren.
+
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
