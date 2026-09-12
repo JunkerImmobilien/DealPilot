@@ -67,49 +67,141 @@ function _v269_getStartYear() {
 }
 
 var Tax = (function() {
-  // Tarif 2026 (§32a EStG)
-  function calcEStG(zvE) {
-    zvE = Math.floor(zvE); // immer abrunden
-    if (zvE <= 11604) return 0;
+  /* ══════════════════════════════════════════════════════════════════════
+     v1364 · DER TARIF STEHT AN EINER STELLE UND KENNT SEIN JAHR
+     ══════════════════════════════════════════════════════════════════════
+     Marcels Vorgabe: „mir waere wichtig, dass wir immer die aktuellen
+     saetze verwenden fuer das entsprechende jahr … das darf ja nicht an 3
+     stellen unterschiedlich sein."
 
-    // Zone 1: 11.605 - 17.005 (Eingangs-Progression)
-    if (zvE <= 17005) {
-      var y = (zvE - 11604) / 10000;
-      return Math.floor((922.98 * y + 1400) * y);
+     Es WAR an drei Stellen unterschiedlich. Gemessen am 13.09.2026:
+
+       tax.js        Grundfreibetrag 11.604   (Kommentar sagte „Tarif 2026")
+       dashboard.js  Grundfreibetrag 11.784   (zusammengefuehrt in v1361)
+       rnd-calc.js   Zonengrenzen 12.096 / 17.443 / 68.480
+
+     KEINER DAVON WAR 2026. Der Wert 11.604 ist nicht einmal ein gueltiger
+     Jahrgang - er war der urspruenglich GEPLANTE Grundfreibetrag 2024,
+     bevor er auf 11.784 angehoben wurde. Er stand hier unter der
+     Ueberschrift „Tarif 2026".
+
+     DIE QUELLE IST DAS GESETZ, NICHT EINE SUCHMASCHINE. Abgerufen am
+     13.09.2026 von gesetze-im-internet.de/estg/__32a.html, der amtlichen
+     Fassung „ab dem Veranlagungszeitraum 2026". Eine Suchmaschine lieferte
+     zuvor abweichende Zahlen (954,80 statt 914,51; Zonengrenze 17.005
+     statt 17.799) - die Primaerquelle gewinnt.
+
+     GEGENGEPRUEFT UEBER DIE STETIGKEIT. Der Tarif muss an jeder
+     Zonengrenze denselben Wert liefern, sonst springt die Steuer:
+
+       bei 17.799 EUR   Zone 2 -> 1.034,87   Zone 3 -> 1.034,87   passt
+       bei 69.878 EUR   Zone 3 -> 18.213     Zone 4 -> 18.213     passt
+       bei 277.825 EUR  Zone 4 -> 105.550,87 Zone 5 -> 105.550,87 passt
+
+     Das ist die beste Probe, die es ohne amtliches Rechenbeispiel gibt:
+     falsche Koeffizienten erzeugen an den Grenzen einen Sprung.
+
+     WARUM NUR EIN JAHRGANG IN DER TABELLE STEHT: fuer 2025 liessen sich
+     die Zonen 4 und 5 in der verfuegbaren Zeit nicht aus einer
+     Primaerquelle belegen. Eine halb belegte Zahl ist schlechter als
+     keine - wer einen Jahrgang braucht, traegt ihn hier ein, und alle
+     drei Stellen bekommen ihn. Fehlt das angefragte Jahr, nimmt die
+     Funktion den naechstaelteren vorhandenen und SAGT das ueber
+     `tarifInfo()`, statt still eine andere Zahl zu rechnen.
+
+     Die App rechnet Prognosen in die Zukunft: ein Objekt, das 2026
+     gekauft und fuenfzehn Jahre projiziert wird, nutzt durchgehend den
+     Tarif 2026, weil kuenftige Tarife niemand kennt. Historische
+     Jahrgaenge braucht nur, wer eine alte Veranlagung nachrechnet.
+     ══════════════════════════════════════════════════════════════════════ */
+  var TARIFE = {
+    2026: {
+      quelle: '\u00a7 32a Abs. 1 EStG, Fassung ab VZ 2026 \u2014 gesetze-im-internet.de, abgerufen 13.09.2026',
+      grundfreibetrag: 12348,
+      /* Zone 2: (a*y + b) * y   mit y = (x - grundfreibetrag) / 10000 */
+      z2bis: 17799, z2a: 914.51, z2b: 1400,
+      /* Zone 3: (a*z + b) * z + c   mit z = (x - z3basis) / 10000 */
+      z3basis: 17799, z3bis: 69878, z3a: 173.10, z3b: 2397, z3c: 1034.87,
+      /* Zone 4: 0,42 * x - c */
+      z4bis: 277825, z4satz: 0.42, z4c: 11135.63,
+      /* Zone 5: 0,45 * x - c */
+      z5satz: 0.45, z5c: 19470.38
     }
+  };
 
-    // Zone 2: 17.006 - 66.760 (Progressions-Bereich)
-    if (zvE <= 66760) {
-      var z = (zvE - 17005) / 10000;
-      return Math.floor((181.19 * z + 2397) * z + 1025.38);
+  var TARIF_JAHRE = Object.keys(TARIFE).map(Number).sort(function (a, b) { return a - b; });
+
+  /* Welcher Jahrgang gilt fuer dieses Jahr? Gibt es ihn nicht, wird der
+     naechstaeltere genommen - und das ist ueber tarifInfo() ablesbar. */
+  function tarifFuer(jahr) {
+    var j = parseInt(jahr, 10);
+    if (!isFinite(j)) j = new Date().getFullYear();
+    if (TARIFE[j]) return { jahr: j, tarif: TARIFE[j], exakt: true };
+    var gewaehlt = TARIF_JAHRE[0];
+    for (var i = 0; i < TARIF_JAHRE.length; i++) {
+      if (TARIF_JAHRE[i] <= j) gewaehlt = TARIF_JAHRE[i];
     }
-
-    // Zone 3: 66.761 - 277.825 (42% linear)
-    if (zvE <= 277825) {
-      return Math.floor(0.42 * zvE - 10602.13);
-    }
-
-    // Zone 4: ab 277.826 (45% Reichensteuer)
-    return Math.floor(0.45 * zvE - 18936.88);
+    return { jahr: gewaehlt, tarif: TARIFE[gewaehlt], exakt: false, angefragt: j };
   }
+
+  /* Fuer Anzeige und Pruefung: welcher Tarif wurde benutzt, und woher
+     stammt er? Ohne das ist von aussen nicht erkennbar, ob gerade der
+     passende Jahrgang gerechnet wird oder ein Ersatz. */
+  function tarifInfo(jahr) {
+    var t = tarifFuer(jahr);
+    return {
+      jahr: t.jahr,
+      exakt: t.exakt,
+      angefragt: t.angefragt || t.jahr,
+      grundfreibetrag: t.tarif.grundfreibetrag,
+      quelle: t.tarif.quelle,
+      verfuegbareJahre: TARIF_JAHRE.slice()
+    };
+  }
+
+  /* § 32a Abs. 1 EStG. `x` ist das auf volle Euro ABGERUNDETE zu
+     versteuernde Einkommen - das schreibt Satz 5 ausdruecklich vor, und
+     genau daran ist die zweite Fassung in dashboard.js gescheitert, die
+     mit Math.round arbeitete (v1361). */
+  function calcEStG(zvE, jahr) {
+    var T = tarifFuer(jahr).tarif;
+    var x = Math.floor(Number(zvE) || 0);
+    if (x <= T.grundfreibetrag) return 0;
+    if (x <= T.z2bis) {
+      var y = (x - T.grundfreibetrag) / 10000;
+      return Math.floor((T.z2a * y + T.z2b) * y);
+    }
+    if (x <= T.z3bis) {
+      var z = (x - T.z3basis) / 10000;
+      return Math.floor((T.z3a * z + T.z3b) * z + T.z3c);
+    }
+    if (x <= T.z4bis) return Math.floor(T.z4satz * x - T.z4c);
+    return Math.floor(T.z5satz * x - T.z5c);
+  }
+
 
   /**
    * Calculates marginal tax rate (Grenzsteuersatz) at a given zvE.
    * Useful to know what the next euro of income will be taxed at.
    */
-  function calcGrenzsteuersatz(zvE) {
-    // Use 1000€ increment for stable result (Math.floor in calcEStG would give 0 for 1€)
-    var t1 = calcEStG(zvE);
-    var t2 = calcEStG(zvE + 1000);
+  /* v1364: das Jahr wird durchgereicht, damit der Grenzsteuersatz aus
+     demselben Tarif stammt wie die Steuer selbst. Der Abstand von 1.000
+     EUR bleibt: calcEStG rundet nach Satz 5 auf volle Euro ab, ein
+     Ein-Euro-Schritt ergaebe deshalb oft 0. */
+  function calcGrenzsteuersatz(zvE, jahr) {
+    var t1 = calcEStG(zvE, jahr);
+    var t2 = calcEStG(zvE + 1000, jahr);
     return (t2 - t1) / 1000;
   }
+
 
   /**
    * Average tax rate (Durchschnittssteuersatz)
    */
-  function calcDurchschnittssteuersatz(zvE) {
+  function calcDurchschnittssteuersatz(zvE, jahr) {
     if (zvE <= 0) return 0;
-    return calcEStG(zvE) / zvE;
+    return calcEStG(zvE, jahr) / zvE;
+
   }
 
   /**
@@ -218,6 +310,7 @@ var Tax = (function() {
 
   return {
     calcEStG: calcEStG,
+    tarifInfo: tarifInfo,   /* v1364: welcher Jahrgang gilt gerade? */
     calcGrenzsteuersatz: calcGrenzsteuersatz,
     calcDurchschnittssteuersatz: calcDurchschnittssteuersatz,
     calcImmoResult: calcImmoResult,

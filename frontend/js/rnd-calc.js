@@ -489,17 +489,37 @@
     };
   }
 
+  /* ═══ v1364 · DIE ZONENGRENZEN KOMMEN AUS DEM TARIF ══════════════════
+     Hier stand eine dritte Steuerstaffel mit eigenen Grenzen (12.096 /
+     17.443 / 68.480) - der Jahrgang 2025. Zusammen mit tax.js (11.604)
+     und dashboard.js (11.784) waren das DREI verschiedene
+     Grundfreibetraege im selben Programm, keiner davon 2026.
+
+     Marcels Vorgabe: „das darf ja nicht an 3 stellen unterschiedlich
+     sein." Der Satz kommt jetzt aus `Tax.calcGrenzsteuersatz()`, also aus
+     demselben Tarif wie jede andere Steuerzahl der App.
+
+     WAS BLEIBT: der Solidaritaetszuschlag ab 96.000 EUR und der Deckel
+     bei 47,5 %. Beides gehoert nicht in den §-32a-Tarif, sondern ist die
+     Naeherung DIESER Stelle - sie zu entfernen waere eine Aenderung am
+     Ergebnis, und genau die soll es nicht geben.
+
+     Der Rueckfall rechnet wie bisher, falls tax.js einmal fehlt. Er
+     traegt bewusst KEINE eigenen Jahreszahlen mehr, sondern die lineare
+     Naeherung - eine zweite Staffel waere wieder eine dritte Wahrheit. */
   function estimateGrenzsteuersatz(zve) {
     const z = Number(zve) || 0;
     let satz;
-    if (z <= 12096) satz = 0;
-    else if (z <= 17443) satz = 0.14 + ((z - 12096) / (17443 - 12096)) * 0.10;
-    else if (z <= 68480) satz = 0.24 + ((z - 17443) / (68480 - 17443)) * 0.18;
-    else if (z <= 277825) satz = 0.42;
-    else satz = 0.45;
+    if (typeof Tax !== 'undefined' && Tax && typeof Tax.calcGrenzsteuersatz === 'function') {
+      satz = Tax.calcGrenzsteuersatz(z);
+    } else {
+      /* grobe Naeherung ohne Jahresbezug - nur, wenn tax.js fehlt */
+      satz = z <= 12000 ? 0 : (z <= 70000 ? 0.14 + (z - 12000) / 58000 * 0.28 : 0.42);
+    }
     const soli = (z > 96000) ? satz * 0.055 : 0;
     return Math.min(0.475, satz + soli);
   }
+
 
   // ============================================================
   // DEALPILOT-OBJEKT IMPORT (NEU V3)
