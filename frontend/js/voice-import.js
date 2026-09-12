@@ -7743,8 +7743,20 @@
        Wo eine Quelle genannt wird, ist es kein Abruf-Befehl. Die Prüfung
        auf die Übernahme-Absicht steht weiter unten und bekommt den Satz
        jetzt zu sehen. */
+    /* ═══ v1326 · "Bodenrichtwert 300" ist eine ANGABE ════════════════
+       Im Durchlauf gemessen: "Bodenrichtwert 300, Grundstueck 1000
+       Quadratmeter, Miteigentumsanteil 20 Prozent" loeste den BORIS-Abruf
+       aus - weil der Satz mit dem Wort "bodenrichtwert" BEGINNT. Der
+       amtliche Wert kam (190 EUR/m2), und die beiden anderen Zahlen des
+       Satzes fielen unter den Tisch: "Noch offen: Grundstuecksflaeche,
+       Miteigentumsanteil."
+
+       Ein Schlagwort am Satzanfang ist kein Befehl, wenn eine ZAHL
+       dahinter steht. "Bodenrichtwert" allein will den Abruf,
+       "Bodenrichtwert 300" nennt ihn. */
     if ((_rf.aktionen || []).length > 1 &&
         !/(einstellung|profil|vorgabe|voreinstellung|standard)/i.test(t) &&
+        !/^\s*(?:hol|nimm|mach|recherchier\w*|bodenrichtwert|die lage|marktpreis\w*)\W{0,3}\d/i.test(t) &&
         /^(hol|nimm|mach|recherchier|bodenrichtwert|die lage|marktpreis)/i.test(t)) {
       if (_rfAktionJa(t)) return true;
     }
