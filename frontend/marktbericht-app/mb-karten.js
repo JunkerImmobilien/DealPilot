@@ -92,10 +92,21 @@
       /* Labels klein und in Mono-Versalien — dieselbe Schriftlogik wie die
          Kennzahlen-Labels der Haupt-App. Nur INNERHALB der Bloecke, damit
          die Wertermittlung unberuehrt bleibt. */
-      '.mbk-block label{font-family:"JetBrains Mono",monospace;font-size:10px;',
-        'letter-spacing:.11em;text-transform:uppercase;color:var(--muted,#7e7e88);',
-        'margin:0 0 6px;line-height:1.5}',
-      '.mbk-block label span{text-transform:none;letter-spacing:0;font-family:"Inter",sans-serif}',
+      /* v1340c - MIT !important, UND ZWAR MESSBAR BEGRUENDET.
+         Gemessen im Hell-Modus: das Label kam als Inter 13px an, nicht als
+         JetBrains Mono 10px. Der Taeter steht in index.html und traegt
+         selbst !important:
+
+           html[data-mb-theme="light"] label,... {font-family:'Inter',...!important}
+
+         Gegen !important hilft keine Spezifitaet, nur !important. Die
+         Regel bleibt trotzdem eng auf .mbk-block begrenzt - die Labels der
+         Wertermittlung sollen unberuehrt bleiben. */
+      '.mbk-block>.row>div>label,.mbk-block>label{font-family:"JetBrains Mono",monospace!important;',
+        'font-size:10px!important;letter-spacing:.11em!important;text-transform:uppercase!important;',
+        'color:var(--muted,#7e7e88);margin:0 0 6px;line-height:1.5}',
+      '.mbk-block label span{text-transform:none!important;letter-spacing:0!important;',
+        'font-family:"Inter",sans-serif!important;font-size:11px!important}',
       '.mbk-block input:focus,.mbk-block select:focus{border-color:var(--wl-c9a84c,#C9A84C);',
         'box-shadow:0 0 0 3px color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 13%, transparent)}',
       '.mbk-block .row{margin:0}',
