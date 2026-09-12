@@ -310,7 +310,33 @@
       woher: 'Grundst\u00fccksmarktbericht des Gutachterausschusses; ohne Angabe gilt ein Bruchteil des Bodenrichtwerts.',
       grund: '\u00a7 40 ImmoWertV'
     },
+    /* === v1338 - Die vier Felder zu den besonderen objektspezifischen
+       Grundstuecksmerkmalen. Sie entscheiden bei einem Objekt mit Maengeln
+       ueber ein Drittel des Werts - und ueber die Frage, ob derselbe
+       Mangel zweimal abgezogen wird. */
+    bomEur: {
+      kurz: 'Eigenschaften, die genau dieses Grundst\u00fcck vom Normalfall unterscheiden \u2014 <b>Abzug negativ</b> eintragen. Bauschäden, Baulasten, Denkmalschutz, Altlasten, dauerhafte Über- oder Untermiete.',
+      woher: 'Eigene Feststellung beim Ortstermin, Handwerkerangebote, Baugrundgutachten, Baulastenverzeichnis.',
+      lang: 'Sie kommen NACH der Marktanpassung, nicht davor: die Sachwertfaktoren werden aus Kauff\u00e4llen OHNE solche Merkmale abgeleitet. Wer sie vorher abzieht, l\u00e4sst den Faktor auf einen Wert wirken, den es in der Stichprobe nicht gab. Nicht zu verwechseln mit \u201eBesondere Bauteile\u201c weiter oben \u2014 das sind Wertzusch\u00e4ge f\u00fcr Bauteile, die im Kostenkennwert fehlen. Was am Baujahr gemessen normal ist (Heizung, B\u00e4der, Fenster eines unmodernisierten Hauses), geh\u00f6rt NICHT hierher: das steckt schon im Sachwertfaktor. Nur \u00fcberdurchschnittliche M\u00e4ngel.',
+      grund: '\u00a7 8 Abs. 3 ImmoWertV'
+    },
+    bomGrund: {
+      kurz: 'Wof\u00fcr der Betrag angesetzt wird. Ohne Begr\u00fcndung ist der Ansatz im Dossier nicht verwertbar \u2014 er f\u00e4llt bei jeder Pr\u00fcfung.',
+      woher: 'Deine eigene Feststellung. Je Position ein Stichwort reicht: Schimmelsanierung, Estrich EG, Setzungen.'
+    },
+    bomWorst: {
+      kurz: 'Optional: derselbe Ansatz im ung\u00fcnstigsten Fall. Der Bericht weist ihn als <b>Szenario</b> aus, nicht als zweiten Verkehrswert.',
+      woher: 'Die obere Kante deiner Kostensch\u00e4tzung \u2014 dort, wo ein Gutachten die Bandbreite noch nicht geschlossen hat.',
+      lang: 'Sinnvoll genau dann, wenn eine Position noch nicht abschlie\u00dfend beurteilt ist: Setzungen, die statisch relevant sein k\u00f6nnten, aber auch mit Rissesanierung erledigt sein k\u00f6nnen. Ein Baugrundgutachten macht daraus eine Zahl \u2014 bis dahin ist die Spanne die ehrlichere Aussage.'
+    },
+    rndVerkuerzt: {
+      kurz: 'Wurde die Restnutzungsdauer wegen der M\u00e4ngel verk\u00fcrzt? Dann warnt der Bericht vor dem <b>Doppelabzug</b>.',
+      woher: 'Dein eigenes Vorgehen \u2014 oder ein Restnutzungsdauergutachten, das du \u00fcbernommen hast.',
+      lang: 'Die Falle: wer die Restnutzungsdauer wegen Bausch\u00e4den k\u00fcrzt UND dieselben Sch\u00e4den als besondere objektspezifische Merkmale abzieht, rechnet sie zweimal. Sauber ist eine von zwei Linien \u2014 entweder modellkonforme Restnutzungsdauer nach Anlage 2 und die Sch\u00e4den vollst\u00e4ndig hier, oder verk\u00fcrzte Restnutzungsdauer und hier nur das, was die Verk\u00fcrzung nicht schon erfasst. Beachte auch: eine Restnutzungsdauer aus einem Gutachten nach \u00a7 7 Abs. 4 S. 2 EStG dient der Abschreibung, nicht der Verkehrswertermittlung. Die beiden Zahlen d\u00fcrfen auseinanderlaufen.',
+      grund: 'Anlage 2 ImmoWertV; \u00a7 4 Abs. 3 ImmoWertV'
+    },
     besBauteile: {
+
       kurz: 'Wert besonderer Bauteile in Euro, die im Kostenkennwert nicht enthalten sind \u2014 Gauben, Balkone, Vordach, Wintergarten.',
       woher: 'Eigene Sch\u00e4tzung; sie unterliegen derselben Alterswertminderung wie das Geb\u00e4ude.',
       grund: '\u00a7 36 Abs. 2 ImmoWertV'
@@ -537,7 +563,8 @@
     'balcony', 'garden', 'plot', 'units', 'garages', 'outdoor', 'elevator',
     'nhkGeschosse', 'nhkDach', 'nhkHaus', 'spMiete', 'sonstEinnahmen',
     'sanierungsjahr', 'brwStichtag', 'brwAnpGrund', 'aussenanlagen',
-    'hinterlandWert', 'besBauteile'
+    'hinterlandWert', 'besBauteile', 'bomEur', 'bomGrund', 'bomWorst',   /* v1338 */
+    'rndVerkuerzt'
   ];
   function zeichenAnhaengen() {
     var n = 0;

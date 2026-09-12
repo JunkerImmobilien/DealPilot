@@ -423,6 +423,40 @@ function ausRegisterRechnen(o, ags) {
   r.lizenz = satz.lizenz || null;
   r.geltungsbereich = satz.geltungsbereich || null;
   r.beleg = (satz.belege || [])[0] || null;
+
+  /* === v1338 - DIE GESAMTNUTZUNGSDAUER DES MODELLS ====================
+     Marcels Frage aus dem Gutachten zu Wolfenbuettel: "Steckst du eine
+     Zahl aus dem 80er-Rahmen in ein 70er-Modell, ist das Ergebnis nicht
+     mehr modellkonform nach Paragraf 21 Abs. 3."
+
+     Er hat recht, und es traf uns selbst. GEMESSEN im Register:
+
+       38 Saetze fuehren gnd_jahre 70
+        4 Saetze fuehren 80
+        5 Saetze fuehren 60
+       73 Saetze fuehren sie ausdruecklich als null (nicht abgedruckt)
+
+     Und `CrossCheckService.js:24` rechnete ausnahmslos mit einer
+     Konstanten: `const GND_JAHRE = 80`. Der Wert stand also seit jeher
+     im Register und wurde von NIEMANDEM abgeholt - dasselbe Muster wie
+     `restnutzungsdauer_herkunft` (v1337) und `dealpilot_marktbewertung`.
+
+     Was das kostet: bei Alter 30 ergibt GND 70 eine Restnutzungsdauer
+     von 40 Jahren, GND 80 eine von 50. An einem Reihenhaus mit rund
+     176.000 Euro Herstellungskosten sind das etwa 25.000 Euro
+     Gebaeudesachwert - lautlos.
+
+     `null` ist hier eine ANTWORT, keine Luecke: der Bericht des
+     Ausschusses druckt dann keine Zahl, und der Wert eines Nachbarkreises
+     darf nicht einspringen. Genau das steht in der Saatdatei fuer
+     Braunschweig-Wolfsburg woertlich. */
+  const _ma = satz.modellansaetze || {};
+  r.modell_gnd_jahre = (_ma.gnd_jahre == null) ? null : Number(_ma.gnd_jahre);
+  r.modell_gnd_hinweis = _ma.gnd_hinweis || _ma.hinweis || null;
+  r.modell_gnd_beleg = _ma.gnd_beleg || null;
+  r.modell_gnd_warnung = _ma.gnd_warnung || null;
+  r.modellansaetze = _ma;
+
   return r;
 }
 

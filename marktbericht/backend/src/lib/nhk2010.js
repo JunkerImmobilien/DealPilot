@@ -919,11 +919,90 @@ export function sachwert(ein, bodenwertErgebnis, param) {
     return out;
   }
   const marktwert = Math.round(vorlaeufig * swf);
-  out.staffel.push({ pos: `× Sachwertfaktor ${String(swf).replace('.', ',')}`, faktor: swf, wert: null });
+  out.staffel.push({ pos: `\u00d7 Sachwertfaktor ${String(swf).replace('.', ',')}`, faktor: swf, wert: null });
   out.staffel.push({ pos: '= marktangepasster Sachwert', wert: marktwert, summe: true });
-  out.wert = marktwert;
   out.marktangepasst = true;
   out.sachwertfaktor = { wert: swf, stufe: param.stufe || null, quelle: param.quelle || null };
+
+  /* === v1338 - DIE STREUUNG DES SACHWERTFAKTORS GEHOERT AN DIE ZAHL ===
+     Sie wird im Register gefuehrt (`satz.streuung`) und war bisher nur
+     beim Liegenschaftszins durchgereicht. Beim Sachwertfaktor schlaegt
+     sie voll durch: eine Standardabweichung von 0,21 sind an einem
+     Reihenhaus mit 145.000 Euro vorlaeufigem Sachwert gut 30.000 Euro.
+     Ein Punktwert ohne Streuung behauptet eine Genauigkeit, die die
+     Regression nicht hergibt. */
+  const _streu = Number(param.streuung);
+  if (Number.isFinite(_streu) && _streu > 0) {
+    out.sachwertfaktor.streuung = _streu;
+    out.sachwertfaktor.spanne_eur = [
+      Math.round(vorlaeufig * (swf - _streu)),
+      Math.round(vorlaeufig * (swf + _streu)),
+    ];
+    out.hinweise = out.hinweise || [];
+    out.hinweise.push('Der Sachwertfaktor hat eine Standardabweichung von \u00b1'
+      + String(_streu).replace('.', ',') + '. Daraus ergibt sich eine Spanne von '
+      + out.sachwertfaktor.spanne_eur[0].toLocaleString('de-DE') + ' bis '
+      + out.sachwertfaktor.spanne_eur[1].toLocaleString('de-DE')
+      + ' \u20ac. Sie geh\u00f6rt ins Gutachten \u2014 ein Punktwert behauptet eine '
+      + 'Genauigkeit, die die Regression nicht hergibt.');
+  }
+
+  /* === v1338 - BESONDERE OBJEKTSPEZIFISCHE GRUNDSTUECKSMERKMALE =======
+     Paragraf 8 Abs. 3 ImmoWertV. Sie fehlten im Sachwertverfahren
+     VOLLSTAENDIG - die Staffel endete beim marktangepassten Sachwert.
+     Der Ertragswert kennt sie seit jeher (`bog` in ErtragswertService),
+     der Sachwert nicht. Zwei Verfahren, zwei Massstaebe, und das teurere
+     Loch im haeufiger genutzten.
+
+     An einem echten Fall gemessen: Schimmel, Wasserschaden, Estrich und
+     Setzungen summierten sich auf 41.000 bis 86.000 Euro - bei einem
+     Verkehrswert um 153.000 Euro sind das 27 bis 56 Prozent. Ein
+     Verfahren, das diesen Schritt nicht kennt, kann fuer so ein Objekt
+     keinen Verkehrswert ausweisen.
+
+     SIE KOMMEN NACH DER MARKTANPASSUNG, nicht davor. Die Sachwertfaktoren
+     werden aus Kauffaellen OHNE solche Merkmale abgeleitet; wer sie vorher
+     abzieht, laesst den Faktor auf einen Wert wirken, den es in der
+     Stichprobe nicht gab.
+
+     DER DOPPELABZUG IST DIE GEFAHR, und er ist leicht zu uebersehen: wer
+     die Restnutzungsdauer wegen derselben Maengel sachverstaendig
+     verkuerzt UND sie hier noch einmal abzieht, rechnet sie zweimal. */
+  const _bom = Number(ein.bom_eur);
+  if (Number.isFinite(_bom) && _bom !== 0) {
+    out.bom_eur = Math.round(_bom);
+    out.bom_grund = ein.bom_grund || null;
+    if (Array.isArray(ein.bom_positionen) && ein.bom_positionen.length) {
+      out.bom_positionen = ein.bom_positionen;
+    }
+    out.staffel.push({
+      pos: (_bom < 0 ? '\u2212' : '+') + ' besondere objektspezifische Grundst\u00fccksmerkmale',
+      detail: (ein.bom_grund ? String(ein.bom_grund) + ' \u2014 ' : '')
+        + '\u00a7 8 Abs. 3 ImmoWertV, nach der Marktanpassung angesetzt',
+      wert: Math.round(_bom),
+    });
+    out.wert = marktwert + Math.round(_bom);
+    out.staffel.push({ pos: '= Sachwert', wert: out.wert, summe: true });
+
+    out.hinweise = out.hinweise || [];
+    if (!ein.bom_grund) {
+      out.warnungen.push('Besondere objektspezifische Grundst\u00fccksmerkmale sind ohne '
+        + 'Begr\u00fcndung angesetzt. Ohne Begr\u00fcndung sind sie im Dossier nicht verwertbar.');
+    }
+    out.hinweise.push('Besondere objektspezifische Grundst\u00fccksmerkmale d\u00fcrfen nicht '
+      + 'zus\u00e4tzlich in der Restnutzungsdauer stecken. Wurde die Restnutzungsdauer wegen '
+      + 'derselben M\u00e4ngel verk\u00fcrzt, wird hier ein zweites Mal abgezogen \u2014 dann geh\u00f6rt '
+      + 'entweder die Verk\u00fcrzung zur\u00fcckgenommen oder der Ansatz hier gek\u00fcrzt.');
+    if (ein.rnd_verkuerzt) {
+      out.warnungen.push('DOPPELABZUG M\u00d6GLICH: die Restnutzungsdauer wurde sachverst\u00e4ndig '
+        + 'verk\u00fcrzt UND es sind besondere objektspezifische Grundst\u00fccksmerkmale '
+        + 'angesetzt. Beides darf nicht denselben Mangel erfassen.');
+    }
+  } else {
+    out.wert = marktwert;
+  }
+
   out.anwendbar = true;
   return out;
 }
+

@@ -152,6 +152,16 @@ export const ReportOrchestrator = {
       regionalfaktor: input.regionalfaktor ? Number(input.regionalfaktor) : null,
       sachwertfaktor: input.sachwertfaktor ? Number(input.sachwertfaktor) : null,
       bes_bauteile: input.bes_bauteile ? Number(input.bes_bauteile) : null,
+      /* v1338: bOM nach Paragraf 8 Abs. 3 ImmoWertV. Die ref-Liste ist
+         ausdruecklich - wer hier fehlt, existiert fuer den Bericht nicht
+         (dieselbe Lehre wie v1055, v1062, v1067, v1074).
+         `? :` auf Wahrheit waere hier falsch: ein Abzug ist negativ und
+         0 ist eine Aussage. */
+      bom_eur: Number.isFinite(Number(input.bom_eur)) ? Number(input.bom_eur) : null,
+      bom_grund: input.bom_grund || null,
+      bom_worst_eur: Number.isFinite(Number(input.bom_worst_eur)) ? Number(input.bom_worst_eur) : null,
+      rnd_verkuerzt: input.rnd_verkuerzt === true || input.rnd_verkuerzt === 'ja',
+
       /* v1071-WHIN-3 · Zusaetzliche Grundstuecksflaeche mit eigenem Ansatz. */
       hinterland_qm: input.hinterland_qm ? Number(input.hinterland_qm) : null,
       hinterland_eur_qm: input.hinterland_eur_qm ? Number(input.hinterland_eur_qm) : null,

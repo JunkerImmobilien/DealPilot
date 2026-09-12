@@ -272,6 +272,31 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
       { id: 'besBauteile', label: 'Besondere Bauteile (\u20ac)', typ: 'number',
         platzhalter: 'z. B. Aufzug \u00b7 ohne Baunebenkosten (in NHK enthalten)' },
 
+      /* === v1338 - BESONDERE OBJEKTSPEZIFISCHE GRUNDSTUECKSMERKMALE ===
+         Paragraf 8 Abs. 3 ImmoWertV. Sie fehlten im Sachwertverfahren
+         vollstaendig - die Staffel endete beim marktangepassten Sachwert.
+         Der Ertragswert kennt sie seit jeher.
+
+         NICHT verwechseln mit "Besondere Bauteile" darueber: das sind
+         WERTZUSCHLAEGE fuer Bauteile, die im Kostenkennwert fehlen (Aufzug).
+         Hier geht es um Eigenschaften, die dieses Objekt vom Normalfall
+         unterscheiden - Bauschaeden, Baulasten, Denkmalschutz, Altlasten.
+
+         Sie kommen NACH der Marktanpassung. Die Sachwertfaktoren werden
+         aus Kauffaellen OHNE solche Merkmale abgeleitet; wer sie vorher
+         abzieht, laesst den Faktor auf einen Wert wirken, den es in der
+         Stichprobe nicht gab. */
+      { id: 'bomEur', label: 'Bes. objektspez. Merkmale (\u20ac)', typ: 'number',
+        platzhalter: 'Abzug negativ, z. B. -41000', hilfe: 'bomEur' },
+      { id: 'bomGrund', label: 'Begr\u00fcndung der Merkmale', typ: 'text',
+        platzhalter: 'z. B. Schimmel, Wasserschaden, Setzungen', hilfe: 'bomGrund' },
+      { id: 'bomWorst', label: 'Ung\u00fcnstigstes Szenario (\u20ac)', typ: 'number',
+        platzhalter: 'optional, z. B. -86000', hilfe: 'bomWorst' },
+      { id: 'rndVerkuerzt', label: 'Restnutzungsdauer sachverst\u00e4ndig verk\u00fcrzt', typ: 'select',
+        opt: [['', '\u2013 nein \u2013'], ['ja', 'ja, wegen M\u00e4ngeln verk\u00fcrzt']],
+        hilfe: 'rndVerkuerzt' },
+
+
       /* v1074-WBTL-6 · Sonstige Bauteile: Herstellungskosten HEUTE,
        * gleiche Alterswertminderung wie das Gebaeude (vor dem Abzug). */
       { id: 'btlGauben', label: 'Dachgauben (\u20ac)', typ: 'number',
@@ -930,6 +955,14 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
        * Bericht nicht — genau wie v1055 es fuer drei andere Felder gelernt hat. */
       aussenanlagen: parseFloat(pWert('aussenanlagen')) || null,
       bes_bauteile: parseFloat(pWert('besBauteile')) || null,
+      /* v1338: bOM nach Paragraf 8 Abs. 3 ImmoWertV. `|| null` waere hier
+         falsch - ein Abzug ist negativ und 0 ist eine Aussage; geprueft
+         wird auf Endlichkeit, nicht auf Wahrheit. */
+      bom_eur: (function () { var v = parseFloat(pWert('bomEur')); return isFinite(v) ? v : null; })(),
+      bom_grund: pWert('bomGrund') || null,
+      bom_worst_eur: (function () { var v = parseFloat(pWert('bomWorst')); return isFinite(v) ? v : null; })(),
+      rnd_verkuerzt: pWert('rndVerkuerzt') === 'ja',
+
       /* v1074-WAUS9-7 · payload() ist die einzige Tuer zum Bericht —
        * dieselbe Lehre wie v1055, v1062, v1067. */
       ausstattung: (function () {

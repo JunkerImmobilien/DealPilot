@@ -141,7 +141,28 @@ export const CrossCheckService = {
     };
     const _SCHAETZUNG = 'Restnutzungsdauer geschätzt (Gesamtnutzungsdauer '
       + 'minus Alter) — Anlage 2 ImmoWertV wurde nicht angewandt.';
-    const _rndEinheitlich = () => {
+    /* === v1338 - DIE GESAMTNUTZUNGSDAUER IST EIN MODELLPARAMETER ======
+       Sie stand hier als Konstante (`GND_JAHRE = 80`) und war damit fuer
+       jeden Ausschuss dieselbe. Das Register fuehrt sie aber je Modell:
+       38 Saetze mit 70, 4 mit 80, 5 mit 60, 73 ausdruecklich ohne Zahl.
+
+       Paragraf 21 Abs. 3 ImmoWertV: der Sachwertfaktor darf nur mit dem
+       Modell verwendet werden, aus dem er abgeleitet wurde. Eine
+       Restnutzungsdauer aus dem 80er-Rahmen in ein 70er-Modell zu stecken
+       ist nicht modellkonform - der Faktor passt dann auf eine Rechnung,
+       die es beim Ausschuss nie gab.
+
+       Deshalb bekommt die Ableitung die GND jetzt mit. Sie leitet die
+       Restnutzungsdauer im RICHTIGEN Rahmen NEU ab (Anlage 2, aus Baujahr
+       und Modernisierungspunkten) - sie rechnet keine fertige Zahl um.
+       Das ist der Unterschied, auf den es ankommt: eine Neuableitung ist
+       eindeutig, eine Umrechnung waere eine Methodenwahl (34/80 auf 70
+       ergibt je nach Weg 30 oder 24 Jahre - 19.000 Euro Unterschied an
+       einem Reihenhaus). Diese Wahl trifft die Software nicht. */
+    const _rndEinheitlich = (gndArg) => {
+      const GND = Number(gndArg) > 0 ? Number(gndArg) : GND_JAHRE;
+      _rndHerkunft.gnd_jahre = GND;
+
       const _mp = _num(ref.mod_punkte);
       if (_mp == null) {
         return _rndMerke('geschaetzt', 'kein_modernisierungsgrad', rnd,
@@ -156,17 +177,26 @@ export const CrossCheckService = {
         return _rndMerke('geschaetzt', 'kein_baujahr', rnd,
           _SCHAETZUNG + ' Es liegt kein verwertbares Baujahr vor.');
       }
-      const _a2 = anlage2Rnd({ gnd: GND_JAHRE, alter: Math.max(0, (new Date().getFullYear()) - _bj),
+      const _a2 = anlage2Rnd({ gnd: GND, alter: Math.max(0, (new Date().getFullYear()) - _bj),
                                punkte: _mp, kernsaniert: _kern });
       if (!(_a2 && _a2.rnd != null)) {
         return _rndMerke('geschaetzt', 'anlage2_ohne_ergebnis', rnd,
           _SCHAETZUNG + ' Die Berechnung nach Anlage 2 lieferte kein Ergebnis.');
       }
       return _rndMerke('anlage2', null, _a2.rnd,
-        'Restnutzungsdauer nach Anlage 2 ImmoWertV, aus ' + _mp
+        'Restnutzungsdauer nach Anlage 2 ImmoWertV bei einer Gesamtnutzungsdauer von '
+        + GND + ' Jahren, aus ' + _mp
         + ' Modernisierungspunkten' + (_kern ? ' (Kernsanierung)' : '') + '.');
     };
+    /* v1338: Die GND, mit der der Sachwert rechnet. Vor dem ersten Lauf
+       kennt niemand das Modell des Ausschusses - der Faktor wird erst
+       geholt, wenn ein vorlaeufiger Sachwert dasteht. Der erste Lauf
+       nimmt deshalb Anlage 1; findet der zweite Lauf ein Modell mit
+       eigener GND, wird sie dort gesetzt und die Rechnung wiederholt. */
+    let _gndSw = GND_JAHRE;
+    let _gndModell = null;
     const _bgfWhg = Number((p && p.bgf_direkt) || ref.bgf || 0);
+
     const _nhkTypWhg = (u) => (u > 20 ? '4.3' : (u > 6 ? '4.2' : '4.1'));
     if (NHK_2010.geprueft && ref.property_type && (!istWohnung || _bgfWhg > 0)) {
       let _sw = nhkSachwert({   /* v1076-WLET-1 · weiter unten steht _sw = _sw2 */
@@ -181,11 +211,20 @@ export const CrossCheckService = {
          * ein Haus sind in keinem Verfahren zu rechtfertigen; der Sachwert
          * lag dadurch rund 50.000 EUR zu niedrig. Liegen
          * Modernisierungspunkte vor, gilt Anlage 2 fuer BEIDE. */
-        gnd_jahre: GND_JAHRE, rnd_jahre: _rndEinheitlich(),
+        gnd_jahre: _gndSw, rnd_jahre: _rndEinheitlich(_gndSw),
         /* v1337: der Hinweis steht NACH rnd_jahre - _rndEinheitlich()
            setzt ihn, und Objektliterale werten in Quelltextreihenfolge
            aus. Umgekehrt waere er null. */
         rnd_hinweis: _rndHerkunft.hinweis,
+        /* v1338: besondere objektspezifische Grundstuecksmerkmale und die
+           Flagge, ob die Restnutzungsdauer sachverstaendig verkuerzt wurde.
+           Beide kommen aus dem Payload; ohne sie kann nhk2010.js den
+           Doppelabzug nicht melden. */
+        bom_eur: (p && p.bom_eur) != null ? p.bom_eur : (ref.bom_eur != null ? ref.bom_eur : null),
+        bom_grund: (p && p.bom_grund) || ref.bom_grund || null,
+        bom_positionen: (p && p.bom_positionen) || ref.bom_positionen || null,
+        rnd_verkuerzt: !!((p && p.rnd_verkuerzt) || ref.rnd_verkuerzt),
+        streuung: null,
         bes_bauteile: (p && p.bes_bauteile) || null, aussenanlagen: (p && p.aussenanlagen) || null,
         /* v1074-WAUS9-5 · Kette. */
         ausstattung: (p && p.ausstattung) || ref.ausstattung || null,
@@ -234,7 +273,16 @@ export const CrossCheckService = {
           bgf_qm: (p && p.bgf_direkt) || ref.bgf || null,
         });
         if (_swfTab && _swfTab.verfuegbar) {
+          /* v1338: Fuehrt das Modell des Ausschusses eine eigene
+             Gesamtnutzungsdauer, gilt SIE - sonst passt der Faktor auf
+             eine Rechnung, die es beim Ausschuss nie gab (Paragraf 21
+             Abs. 3). `null` ist eine Antwort, keine Luecke: dann druckt
+             der Bericht keine Zahl, und die eines Nachbarkreises darf
+             nicht einspringen. */
+          const _mg = Number(_swfTab.modell_gnd_jahre);
+          if (_mg > 0 && _mg !== GND_JAHRE) { _gndSw = _mg; _gndModell = _mg; }
           const _sw2 = nhkSachwert({
+
             nhk_typ: (p && p.nhk_typ) || ref.nhk_typ
               || (istWohnung ? _nhkTypWhg(Number(ref.units || 0)) : null),
             keller_dg: (p && p.keller_dg) || ref.keller_dg,
@@ -242,11 +290,20 @@ export const CrossCheckService = {
             bgf_direkt: (p && p.bgf_direkt) || ref.bgf, wohnflaeche_qm: wfl,
             objektart: ref.property_type, baupreisindex: BAUPREISINDEX,
             regionalfaktor: (p && p.regionalfaktor) || null,
-            gnd_jahre: GND_JAHRE, rnd_jahre: _rndEinheitlich(),
+            gnd_jahre: _gndSw, rnd_jahre: _rndEinheitlich(_gndSw),
         /* v1337: der Hinweis steht NACH rnd_jahre - _rndEinheitlich()
            setzt ihn, und Objektliterale werten in Quelltextreihenfolge
            aus. Umgekehrt waere er null. */
         rnd_hinweis: _rndHerkunft.hinweis,
+        /* v1338: besondere objektspezifische Grundstuecksmerkmale und die
+           Flagge, ob die Restnutzungsdauer sachverstaendig verkuerzt wurde.
+           Beide kommen aus dem Payload; ohne sie kann nhk2010.js den
+           Doppelabzug nicht melden. */
+        bom_eur: (p && p.bom_eur) != null ? p.bom_eur : (ref.bom_eur != null ? ref.bom_eur : null),
+        bom_grund: (p && p.bom_grund) || ref.bom_grund || null,
+        bom_positionen: (p && p.bom_positionen) || ref.bom_positionen || null,
+        rnd_verkuerzt: !!((p && p.rnd_verkuerzt) || ref.rnd_verkuerzt),
+        streuung: null,
             bes_bauteile: (p && p.bes_bauteile) || null,
             aussenanlagen: (p && p.aussenanlagen) || null,
             /* v1074-WFIX-1 · Der zweite Lauf (mit amtlichem Sachwertfaktor)
@@ -263,12 +320,24 @@ export const CrossCheckService = {
           }, (p && p.bodenwert) || null, {
             sachwertfaktor: _swfTab.wert, stufe: _swfTab.stufe,
             quelle: _swfTab.quelle_text,
+            /* v1338: die Streuung des Registersatzes - sie lag seit jeher
+               in `satz.streuung` und war nur beim Liegenschaftszins
+               durchgereicht. */
+            streuung: _swfTab.streuung != null ? _swfTab.streuung : null,
           });
           /* Nur uebernehmen, wenn der zweite Lauf denselben vorlaeufigen
            * Sachwert liefert — sonst haette sich zwischen den Laeufen etwas
            * geaendert, und das waere ein Fehler, kein Ergebnis. */
+          /* v1338: Die Gleichheitspruefung aus v1074 bleibt - sie faengt
+             echte Abweichungen zwischen den Laeufen ab. Hat sich aber die
+             Gesamtnutzungsdauer geaendert, IST der vorlaeufige Sachwert
+             ein anderer, und zwar mit Absicht. Sonst haette die
+             Sicherung ausgerechnet die modellkonforme Rechnung verworfen. */
+          const _erwartetAbweichend = _gndModell != null;
           if (_sw2 && _sw2.wert != null
-              && _sw2.vorlaeufiger_sachwert_eur === _sw.vorlaeufiger_sachwert_eur) {
+              && (_erwartetAbweichend
+                  || _sw2.vorlaeufiger_sachwert_eur === _sw.vorlaeufiger_sachwert_eur)) {
+
             _sw = _sw2;
           } else {
             _swfTab = { verfuegbar: false, grund: 'zweiter_lauf_abweichend' };
@@ -282,6 +351,26 @@ export const CrossCheckService = {
            * nach aussen. `quelle` ist 'anlage2' oder 'geschaetzt'; im zweiten
            * Fall steht in `hinweis`, warum — und der gehoert in den Bericht. */
           restnutzungsdauer_herkunft: _rndHerkunft,
+          /* v1338: Womit gerechnet wurde und warum. Ohne diese drei
+             Felder sieht niemand, ob die Zahl im Modell des Ausschusses
+             steht oder aus Anlage 1 stammt. */
+          gnd_jahre: _gndSw,
+          gnd_quelle: _gndModell != null ? 'modell_gutachterausschuss' : 'anlage1_immowertv',
+          gnd_hinweis: _gndModell != null
+            ? ('Der Gutachterausschuss leitet seine Sachwertfaktoren mit einer '
+               + 'Gesamtnutzungsdauer von ' + _gndModell + ' Jahren ab. Die Rechnung folgt '
+               + 'diesem Modell, nicht Anlage 1 ImmoWertV (' + GND_JAHRE + ' Jahre) '
+               + '\u2014 ein Faktor gilt nur f\u00fcr das Modell, aus dem er stammt (\u00a7 21 Abs. 3 ImmoWertV).')
+            : ((_swfTab && _swfTab.modell_gnd_hinweis)
+               || 'Gesamtnutzungsdauer nach Anlage 1 ImmoWertV. Der Gutachterausschuss '
+                  + 'beziffert in seinem Modell keine eigene \u2014 der Wert eines anderen '
+                  + 'Ausschusses wird nicht ersatzweise \u00fcbernommen.'),
+
+          /* v1338: bOM und die Streuung wandern mit nach aussen. */
+          bom_eur: _sw.bom_eur != null ? _sw.bom_eur : null,
+          bom_grund: _sw.bom_grund || null,
+          bom_positionen: _sw.bom_positionen || null,
+          hinweise_sachwert: _sw.hinweise || null,
           available: true, value_eur: _sw.wert, staffel: _sw.staffel,
           marktangepasst: _sw.marktangepasst, sachwertfaktor: _sw.sachwertfaktor || null,
           /* v1069-WSWF-3 · Bleibt der Sachwert vorlaeufig, soll dastehen
