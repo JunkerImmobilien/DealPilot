@@ -2720,3 +2720,37 @@ werden kann.
 Das ist derselbe Befund wie bei `/dev/stdin` weiter oben, nur mit anderem
 Auslöser. **Regel: die Gegenprobe ist Teil des Prüflaufs, nicht eine
 Kür.** Ein grüner Prüfer ohne bewiesenes Rot sagt nichts.
+
+## Deutsche Höflichkeit kleidet Anweisungen in Fragen
+
+„Kannst du auch aus den Einstellungen übernehmen." will keine Auskunft über
+Fähigkeiten — es ist ein Befehl mit einem Höflichkeitsmantel. Der Sprechlauf
+prüfte aber `_rfIstFrage` **vor** `_rfWillProfil`, und `RF_FRAGEWORT` enthält
+„kannst du". Der Satz landete bei `/ai/copilot-frage` — einer Route, die
+Auskunft gibt und **nichts eintragen kann**. Der Co-Pilot erklärte also, dass
+er es könne, und tat es nicht.
+
+Dasselbe eine Ebene weiter: „Erweiterte Marktpreisindikation abrufen?" wurde
+ausgeschlossen, weil der Satz mit einem Fragezeichen endet.
+
+**Was eine echte Frage von einer Bitte trennt, ist das Fragewort am ANFANG,
+nicht das Zeichen am Ende.** „Was ist der Bodenrichtwert?" will Auskunft.
+„Bodenrichtwert abrufen?" will den Abruf. Und die Reihenfolge der Prüfkette
+entscheidet mit: wer zuerst greift, gewinnt — eine Prüfung auf „ist das eine
+Frage" gehört **hinter** die Prüfung „gibt es hier etwas zu tun".
+
+## Eine Frage, die auf Daten wartet, die gleich kommen
+
+Der Sprechlauf fragte nach Bevölkerung, Nachfrage, Wertsteigerung und
+Entwicklung — vier Auswahlreihen zum Durchklicken. Direkt danach kam die
+erweiterte Marktpreisindikation und brachte genau diese Werte mit.
+
+Der Grund war eine einzige Frage Abstand: die Indikation war auf das **Ende**
+von Etappe 4 terminiert, die Ort-Frage ist Frage 11 **in** Etappe 4. Alles,
+was die Indikation braucht, stand schon nach Etappe 3.
+
+**Regel: Bevor eine Frage gestellt wird, prüfen, ob eine laufende oder
+vorgemerkte Quelle sie gleich beantwortet.** Der Nutzer soll nicht raten, was
+die Maschine in zehn Sekunden weiß. Und wenn die Quelle kommt, zählt eine
+Vorbelegung im Formular nicht als Angabe — die Indikation ist gemessen, die
+Vorbelegung geraten. Nur was der Nutzer SELBST gesagt hat, gewinnt.
