@@ -13467,6 +13467,60 @@ Zeile des `try`-Blocks bewies etwas.
 
 **Commits** `0e5e634`, `8d7e195`, `d884ca6`. Auf Staging.
 
+## PROD-ROLLOUT 12.09.2026 (2) — v1324 bis v1331
+
+Zweiter Rollout desselben Tages. **17 Commits, 10 Dateien**, keine
+Migrationen. Freigabe von Marcel: *„ja roll mal aus."*
+
+### Was rausgegangen ist
+
+**Sprechlauf** (v1324–v1328) — höfliche Anweisungen werden als Befehle
+gelesen, die Ort-Frage wartet auf die erweiterte Indikation, die
+Ausstattung geht endlich mit, eine Auskunft die eine Lücke füllt wird
+angeboten, ein Satz darf Befehl UND Angabe tragen, und es gibt Standards
+für Mietsteigerung, Wertsteigerung und Leerstand.
+
+**KI-Modelle** (v1329) — Structured Outputs statt handgeschriebener
+Entzäunung (die stand **viermal** in der Datei), `gpt-5.6-luna` statt
+drei abgekündigter Modelle, Prompt-Caching im Marktbericht.
+
+**Die Kette** (v1330) — Exposé → Sprechlauf blieb nach v1317 immer noch
+stehen. Der Rückruf lag am Ende einer ungeschützten Schleife: ohne PDF
+läuft die nullmal, mit PDF über jedes Feld.
+
+**Stand-Box** (v1331) — Exposé-Werte zählen grün, Vorbelegungen nicht.
+
+### Nachweis nach dem Rollout
+
+```
+Prod-Stand             47e3673  == lokal
+dealpilot-backend      Up, healthy
+dealpilot-mb-backend   Up
+https://app.dealpilot.immo/   200
+Gold-Audit             genau auf der Basislinie
+plans-sync             "nichts zu tun — plans stimmt mit Stripe überein"
+Cache-Buster           voice-import v1331 · object-actions v1330 · config v1328
+Marker im Container    schemaAusKatalog 2 · gpt-5.6-luna 6 · VERSATZ_MS 2
+```
+
+**Extraktion live auf Prod gefahren**, nicht nur die Datei geprüft:
+
+```
+{"objart":"ETW","eq_heating":"FUSSBODENHEIZUNG","kp":300000,"wfl":100}
+```
+
+Die beiden Enum-Werte sind der Beweis, dass das Schema greift:
+Formularwerte, keine Anzeigetexte.
+
+Sicherungen vor dem Rollout, beide mit PostgreSQL-Kopf gelesen:
+`haupt-20260912-1405.sql.gz`, `mb-20260912-1405.sql.gz`.
+
+**Rückweg:**
+```
+ssh root@157.90.117.167 "cd /opt/dealpilot && git reset --hard 4a69378 \
+  && docker compose -f docker-compose.prod.yml up -d --build backend mb-backend"
+```
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
