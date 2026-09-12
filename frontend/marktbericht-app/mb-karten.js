@@ -110,6 +110,8 @@
       '.mbk-block input:focus,.mbk-block select:focus{border-color:var(--wl-c9a84c,#C9A84C);',
         'box-shadow:0 0 0 3px color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 13%, transparent)}',
       '.mbk-block .row{margin:0}',
+      '.mbk-solo>div{display:flex;flex-direction:column;min-width:0}',
+      '.mbk-solo{grid-template-columns:1fr}',
       '.mbk-block .row + .row{margin-top:13px}',
       '@media (max-width:560px){.mbk-block{padding:13px 14px 15px}}',
       /* Heller Skin: der Verlauf darf dort nicht aufhellen. */
@@ -124,14 +126,72 @@
      auch kein Block — ein leerer Kasten mit Titel waere eine Behauptung. */
   var _sperre = false;
 
-  function zeileVon(id) {
+  /* === v1340d - EIGENER FEHLER, IM SCREENSHOT GESEHEN ================
+     Die erste Fassung fiel fuer Felder ohne `.row` auf `parentElement`
+     zurueck. Beim Adressfeld ist das der ganze Reiter-Container - und
+     der wurde samt allem, was darin steht, in den Block "Wo steht das
+     Objekt" geschoben. Im Bild sass "Eckdaten" INNERHALB von "Wo steht
+     das Objekt".
+
+     Dieselbe Sorte Fehler wie v1334b: ein zu weit gefasster Vorfahre.
+     Dort war es das erste <label> im Panel, hier das erste Elternteil.
+
+     Zwei Sicherungen jetzt:
+
+     1. Ein Feld ohne `.row` bekommt eine EIGENE Huelle, die nur sein
+        Label und das Feld traegt. Damit gibt es immer etwas Passendes zu
+        verschieben, und nie zu viel.
+     2. Eine Zeile wird NIE uebernommen, wenn sie ein Feld einer anderen
+        Gruppe enthaelt. Das faengt jeden weiteren Fall dieser Art ab,
+        auch einen, den ich noch nicht gesehen habe. */
+  var ALLE_FELDER = (function () {
+    var m = {};
+    for (var i = 0; i < GRUPPEN.length; i++) {
+      for (var j = 0; j < GRUPPEN[i].felder.length; j++) m[GRUPPEN[i].felder[j]] = GRUPPEN[i].id;
+    }
+    return m;
+  })();
+
+  /* Traegt der Behaelter ein Feld, das zu einer ANDEREN Gruppe gehoert? */
+
+  function fremdbelegt(el, gruppeId) {
+    var f = el.querySelectorAll ? el.querySelectorAll('input[id], select[id], textarea[id]') : [];
+    for (var i = 0; i < f.length; i++) {
+      var g = ALLE_FELDER[f[i].id];
+      if (g && g !== gruppeId) return true;
+    }
+    return false;
+  }
+
+  function huelleBauen(el) {
+    var vorhanden = el.previousElementSibling;
+    if (el.parentElement && el.parentElement.classList
+        && el.parentElement.classList.contains('mbk-solo')) return el.parentElement;
+    var h = document.createElement('div');
+    h.className = 'row mbk-solo';
+    var d = document.createElement('div');
+    h.appendChild(d);
+    if (el.parentElement) el.parentElement.insertBefore(h, el);
+    /* Das Label steht unmittelbar VOR dem Feld - es wandert mit. */
+    if (vorhanden && vorhanden.tagName === 'LABEL') d.appendChild(vorhanden);
+    d.appendChild(el);
+    return h;
+  }
+
+  function zeileVon(id, gruppeId) {
     var el = $(id);
     if (!el) return null;
     var r = el.closest ? el.closest('.row') : null;
-    /* `#address` und `#elevator` stehen ohne `.row` — dann gilt die
-       unmittelbare Huelle. */
-    return r || (el.parentElement && el.parentElement.classList
-      && el.parentElement.classList.contains('mbk-block') ? null : el.parentElement);
+    if (r) return fremdbelegt(r, gruppeId) ? null : r;
+    /* Kein `.row` - eine eigene Huelle, statt den Vorfahren zu nehmen. */
+    var ck = el.closest ? el.closest('label') : null;
+    if (ck && ck.contains(el)) {
+      /* Kontrollkaestchen im Label (Aufzug): das Label ist die Zelle. */
+      var p = ck.parentElement;
+      if (p && !fremdbelegt(p, gruppeId) && p.children.length === 1) return p;
+      return ck;
+    }
+    return huelleBauen(el);
   }
 
   function bauen() {
@@ -140,7 +200,7 @@
       var g = GRUPPEN[i];
       var zeilen = [];
       for (var j = 0; j < g.felder.length; j++) {
-        var z = zeileVon(g.felder[j]);
+        var z = zeileVon(g.felder[j], g.id);
         if (z && zeilen.indexOf(z) < 0) zeilen.push(z);
       }
       if (!zeilen.length) continue;
