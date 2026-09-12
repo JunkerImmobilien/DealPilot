@@ -940,6 +940,24 @@ window.DealPilotConfig = (function() {
       bwk_ul_pct_default:     17,     // % der NKM (umlagefähig)
       bwk_anteil_default:     16,     // % der NKM (nicht-umlagefähig; war 22, nie wirksam)
       mietausfall_pct:         2,     // % der NKM — kalkulatorischer Mietausfall
+      /* ═══ v1328 · Langfrist-Annahmen ═══════════════════════════════
+         Marcels Befund im Durchlauf: "Dann fragt er mich nach
+         Wertsteigerung, Mietsteigerung und Leerstand. Auch da habe ich
+         gesagt, moechte ich aus den Einstellungen uebernehmen oder die
+         Standards uebernehmen. Das hat er auch nicht genommen."
+
+         GEMESSEN: er konnte nicht. Fuer diese drei Werte stand hier
+         NICHTS - der Co-Pilot antwortete wahrheitsgemaess "Dazu ist in
+         deinen Einstellungen nichts hinterlegt".
+
+         Die Werte sind bewusst VORSICHTIG und keine Prognose:
+         1,5 Prozent liegen unter dem langjaehrigen Mittel der
+         Verbraucherpreise, und 2 Prozent Leerstand entsprechen gut
+         einer Woche Neuvermietung im Jahr. Wer optimistischer rechnen
+         will, sagt es - dafuer ist es eine Einstellung. */
+      mietsteigerung_pct:    1.5,   // % p.a.
+      wertsteigerung_pct:    1.5,   // % p.a.
+      leerstand_pct:           2,   // % der Jahresmiete
       // Kennzahl-Schwellen (persönliche Mindest-Anforderungen)
       min_dscr:               1.20,   // <—— "ab hier kauf ich"
       min_cashflow_vor_st:    0,      // €/Monat

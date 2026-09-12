@@ -2422,7 +2422,7 @@
        Verfeinert die Rechnung, entscheidet aber nichts mehr. */
     { et: 4, ids: ['hg_ul', 'hg_nul'],              rang: 8, vorbelegt: 1, profil: 'bewirtschaftung',
       frage: 'Wie hoch ist das Hausgeld pro Jahr, und wie viel davon ist nicht umlagefähig?' },
-    { et: 4, ids: ['mietstg', 'wertstg', 'leerstand'], rang: 14, vorbelegt: 1,
+    { et: 4, ids: ['mietstg', 'wertstg', 'leerstand'], rang: 14, vorbelegt: 1, profil: 'langfrist',
       frage: 'Womit rechnest du langfristig — Mietsteigerung, Wertsteigerung und Leerstand in Prozent?' },
     { et: 4, ids: ['ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_wertsteigerung', 'ds2_entwicklung'],
       rang: 15, skalen: 1,
@@ -2632,6 +2632,7 @@
       if (eintrag.profil === 'nebenkosten')     return _pvNebenkosten();
       if (eintrag.profil === 'bewirtschaftung') return _pvBewirtschaftung();
       if (eintrag.profil === 'steuer')          return _pvSteuer();
+      if (eintrag.profil === 'langfrist')      return _pvLangfrist();   /* v1328 */
     } catch (e) { return null; }
     return null;
   }
@@ -2711,6 +2712,24 @@
     if (nul != null) { w.hg_nul = String(Math.round(nkm * 12 * nul / 100)); teile.push(_euroKurz(_rfNum(w.hg_nul)) + ' nicht umlagefähig'); }
     if (!teile.length) return null;
     return { werte: w, text: teile.join(' · ') + ' pro Jahr (' + (ul || 0) + ' / ' + (nul || 0) + ' % der Kaltmiete)' };
+  }
+
+  /* v1328 · Mietsteigerung, Wertsteigerung, Leerstand.
+     Marcel im Durchlauf: "moechte ich aus den Einstellungen uebernehmen
+     oder die Standards uebernehmen" - und der Co-Pilot konnte nicht, weil
+     fuer diese drei Werte gar nichts hinterlegt war. Jetzt stehen sie in
+     investmentProfileDefaults (1,5 / 1,5 / 2 Prozent), bewusst vorsichtig
+     und ausdruecklich als Annahme benannt - keine Prognose. */
+  function _pvLangfrist() {
+    var w = {}, teile = [];
+    var ms = _profilZahl('mietsteigerung_pct');
+    var ws = _profilZahl('wertsteigerung_pct');
+    var ls = _profilZahl('leerstand_pct');
+    if (ms != null) { w.mietstg = String(ms).replace('.', ','); teile.push(w.mietstg + ' % Mietsteigerung'); }
+    if (ws != null) { w.wertstg = String(ws).replace('.', ','); teile.push(w.wertstg + ' % Wertsteigerung'); }
+    if (ls != null) { w.leerstand = String(ls).replace('.', ','); teile.push(w.leerstand + ' % Leerstand'); }
+    if (!teile.length) return null;
+    return { werte: w, text: teile.join(' · ') + ' pro Jahr' };
   }
 
   function _pvSteuer() {
