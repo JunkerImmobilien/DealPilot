@@ -89,6 +89,8 @@
         'padding:3px 9px;white-space:nowrap;flex:0 0 auto;transition:.18s}',
       '.mbk-zahl.voll{color:#3FA56C;border-color:rgba(63,165,108,.42)}',
       '.mbk-hinweis{font-size:11px;color:var(--muted,#6d6d76);margin:10px 0 0;line-height:1.45}',
+      /* v1345: was das Feld bewirkt, direkt darunter */
+      '.mbk-wirkt{font-size:10.5px;color:var(--muted,#7a7a84);margin:5px 0 0;line-height:1.4}',
       /* Labels klein und in Mono-Versalien — dieselbe Schriftlogik wie die
          Kennzahlen-Labels der Haupt-App. Nur INNERHALB der Bloecke, damit
          die Wertermittlung unberuehrt bleibt. */
@@ -315,7 +317,7 @@
     _zeit = setTimeout(function () {
       _zeit = null;
       _sperre = true;
-      try { stil(); bauen(); zaehlen(); } catch (e) {
+      try { stil(); bauen(); wirkungZeigen(); zaehlen(); } catch (e) {
         try { console.warn('[v1340] Karten:', e.message); } catch (x) {}
       }
       _sperre = false;
@@ -331,6 +333,7 @@
     }
     stil();
     bauen();
+    wirkungZeigen();
     zaehlen();
     document.addEventListener('input', zaehlen, true);
     document.addEventListener('change', zaehlen, true);
@@ -344,6 +347,49 @@
     document.addEventListener('DOMContentLoaded', function () { setTimeout(start, 400); });
   } else {
     setTimeout(start, 400);
+  }
+
+  /* === v1345 - WAS EIN FELD BEWIRKT, STEHT AM FELD ====================
+     Marcels Frage: "da gebe ich vlt werte an die ich nicht braeuchte und
+     garnicht mit einfliessen". Die Antwort steht jetzt dort, wo sie
+     gebraucht wird - beim Ausfuellen, nicht erst im Bericht.
+
+     Die Zahlen sind GEMESSEN, nicht geschaetzt: sie stehen so in
+     ValuationService.js. Zustand, Qualitaet und Modernisierung bilden dort
+     ein Teilprodukt, das auf 0,82 bis 1,22 gedeckelt wird - deshalb steht
+     der Deckel dran und nicht die Einzelfaktoren, die ihn ueberschreiten
+     koennten. */
+  var WIRKUNG = {
+    cond:    'Zustand, Qualität und Modernisierung wirken zusammen bis ±22 % auf den Marktwert.',
+    quality: 'Zusammen mit Zustand und Modernisierung bis ±22 %.',
+    modern:  'Zusammen mit Zustand und Qualität bis ±22 %. Ein Modernisierungsjahr verfeinert es.',
+    energy:  'Eigener Faktor auf den Marktwert.',
+    floor:   'Eigener Faktor — Erdgeschoss und obere Lagen ohne Aufzug werden anders bewertet.',
+    balcony: '+2 %, wenn vorhanden.',
+    garden:  '+2 %, wenn vorhanden.',
+    elevator:'+2 %, wenn vorhanden.',
+    baths:   'Ab dem zweiten Bad ein Aufschlag.',
+    eq_walls:   'Geht in die Standardstufe ein (Wägungsanteil 23 — der größte).',
+    eq_roof:    'Geht in die Standardstufe ein (Wägungsanteil 15).',
+    eq_windows: 'Geht in die Standardstufe ein (Wägungsanteil 11).',
+    eq_bath:    'Geht in die Standardstufe ein (Wägungsanteil 9).',
+    eq_heating: 'Geht in die Standardstufe ein (Wägungsanteil 9).',
+    eq_floor:   'Geht in die Standardstufe ein (Wägungsanteil 5).',
+    eq_energie: 'Hebt die Heizungsstufe — eine Wärmepumpe rangiert oben.',
+    eq_guest_wc:'Hebt die Sanitärstufe um eins.',
+  };
+
+  function wirkungZeigen() {
+    Object.keys(WIRKUNG).forEach(function (id) {
+      var el = $(id); if (!el) return;
+      var zelle = el.parentElement; if (!zelle) return;
+      if (!zelle.closest || !zelle.closest('.mbk-block')) return;
+      if (zelle.querySelector('.mbk-wirkt')) return;
+      var d = document.createElement('div');
+      d.className = 'mbk-wirkt';
+      d.textContent = WIRKUNG[id];
+      zelle.appendChild(d);
+    });
   }
 
   window.DealPilotMbKarten = {

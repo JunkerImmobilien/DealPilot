@@ -34,6 +34,8 @@ import { vergleichsfaktor as amtlicherVf } from '../lib/vergleichsfaktoren_nrw.j
 import { AgsResolver } from '../connectors/AgsResolver.js';
 import { ZensusConnector } from '../connectors/ZensusConnector.js';
 import * as Erbbaurecht from '../lib/erbbaurecht.js';   /* v1320 */
+import { ableiten as ausstAbleiten, zusammenfuehren as ausstMerge }
+  from '../lib/ausstattung_stufen.js';   /* v1345 */
 import { finde as findeKennzahl } from '../lib/ausschuss_register.js';   /* v1320b */
 import { MarktkontextService } from './MarktkontextService.js';   /* v1321 */
 
@@ -94,6 +96,22 @@ export const ReportOrchestrator = {
       modernization: input.modernization || null,
       modernization_year: input.modernization_year ? Number(input.modernization_year) : null,
       energy_class: input.energy_class || null,
+      /* === v1345 - DIE AUSSTATTUNGSFELDER KAMEN NIE AN =================
+         Gemessen am 13.09.2026: zehn Felder des Formulars standen in KEINER
+         Datenliste dieses Dienstes. Der Nutzer fuellte sie aus, das Frontend
+         schickte sie, und hier fielen sie still weg. Dieselbe Lehre wie
+         v1055, v1062, v1067, v1074: die ref-Liste ist ausdruecklich, wer
+         hier fehlt, existiert fuer den Bericht nicht. */
+      eq_energie: input.eq_energie || null,
+      eq_heating: input.eq_heating || null,
+      eq_windows: input.eq_windows || null,
+      eq_floor: input.eq_floor || null,
+      eq_bath: input.eq_bath || null,
+      eq_guest_wc: input.eq_guest_wc || null,
+      eq_store_room: input.eq_store_room || null,
+      eq_walls: input.eq_walls || null,
+      eq_dachform: input.eq_dachform || null,
+      eq_roof: input.eq_roof || null,
       bathrooms: input.bathrooms ? Number(input.bathrooms) : null,
       balcony_area: input.balcony_area ? Number(input.balcony_area) : null,
       garden_area: input.garden_area ? Number(input.garden_area) : null,
@@ -197,6 +215,37 @@ export const ReportOrchestrator = {
         ?? input.inst ?? input.instandhaltung ?? null,
       leerstand_pct: input.leerstand_pct ?? input.leerstand ?? input.mietausfall ?? null,
     };
+
+    /* === v1345 - AUS DEN AUSSTATTUNGSANGABEN EIN STANDARDSTUFEN-VORSCHLAG
+       Sechs der Felder beschreiben Gewerke der Anlage 4 ImmoWertV:
+       Aussenwaende (Waegung 23), Dach (15), Fenster (11), Sanitaer (9),
+       Heizung (9), Fussboeden (5) = 72 von 100 Waegungsanteilen.
+
+       DIE EIGENE ANGABE GEWINNT IMMER. Wer die Gewerke selbst einschaetzt,
+       dessen Zahl steht; der Vorschlag fuellt nur, was leer ist. Ein
+       Vorschlag, der eine Eingabe ueberschreibt, ist kein Vorschlag.
+
+       Und er ergibt fuer sich KEINE Standardstufe: `standardstufeAusGewerken`
+       verlangt volle 100 Waegungsanteile. Die restlichen drei Gewerke
+       (Innenwaende, Decken/Treppen, sonstige Technik) bleiben eine
+       sachverstaendige Einschaetzung. Aus 72 Anteilen hochzurechnen waere
+       eine Behauptung. */
+    try {
+      const _av = ausstAbleiten(ref);
+      if (_av.anzahl > 0) {
+        const _zus = ausstMerge(ref.ausstattung || {}, _av.gewerke);
+        ref.ausstattung = _zus.gewerke;
+        ref.ausstattung_herkunft = {
+          woher: _zus.woher,
+          abgeleitet: _av.herkunft,
+          hinweise: _av.hinweise,
+          stufe: 'D',
+          vermerk: 'Aus den Ausstattungsangaben abgeleitet, nicht aus Anlage 4 '
+            + 'ImmoWertV zitiert. Eigene Einschaetzungen haben Vorrang.',
+        };
+        step('ausstattung: ' + _av.anzahl + ' Gewerk(e) aus den Angaben abgeleitet');
+      }
+    } catch (e) { step('ausstattung: Ableitung uebersprungen (' + e.message + ')'); }
 
     // 2) Property persistieren
     step('property: insert');
