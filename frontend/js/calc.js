@@ -4054,10 +4054,23 @@ function _dpComputeDS2Cached() {
     var deal = window._buildDeal2FromState();
     var result = window.DealScore2.compute(deal);
     window._dpLastDS2Result = result;
+    /* v1363: Deal und Zeitpunkt kommen mit, damit renderDealScore2()
+       dieselbe Rechnung nicht ein zweites Mal anstellen muss. Und
+       `_dpLastDs2` - der zweite Cache-Name, den ui.js:799 liest - wird
+       hier gleich mitgesetzt, statt in dealscore2-ui.js eigenstaendig
+       zu entstehen. Zwei Namen fuer dieselbe Sache bleiben zwei Namen,
+       aber sie haben jetzt EINE Quelle. */
+    window._dpLastDS2Deal = deal;
+    window._dpLastDS2Zeit = Date.now();
+    try { window._dpLastDs2 = result; } catch (e2) {}
     return result;
   } catch (e) {
+
     console.warn('[V48] DS2 compute fail:', e.message);
     window._dpLastDS2Result = null;
+    window._dpLastDS2Deal = null;
+    window._dpLastDS2Zeit = 0;
+
     return null;
   }
 }

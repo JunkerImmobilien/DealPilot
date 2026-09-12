@@ -334,12 +334,40 @@ function renderDealScore2() {
     return;
   }
 
+  /* ═══ v1363 · DENSELBEN SCORE NICHT ZWEIMAL RECHNEN ══════════════════
+     Gemessen vor v1362: eine Eingabe im Kaufpreisfeld loeste ACHT
+     Score-Berechnungen aus. v1362 hat die Haelfte beseitigt (der Header
+     rechnete, bevor der Cache gefuellt war). Uebrig blieben vier, davon
+     zwei von hier.
+
+     `_dpComputeDS2Cached()` in calc.js rechnet unmittelbar vor dem
+     Rendern genau dasselbe: derselbe `_buildDeal2FromState()`, dieselbe
+     `compute()`. Seit v1363 legt es Ergebnis, Deal UND Zeitpunkt ab.
+
+     WARUM EIN ZEITFENSTER UND KEIN SCHLAUER VERGLEICH: „stammt dieser
+     Cache aus demselben Zustand?" laesst sich nicht zuverlaessig pruefen,
+     ohne den Zustand selbst zu vergleichen - und das waere teurer als
+     die Rechnung. 300 ms sind kurz genug, dass in der Zwischenzeit keine
+     Eingabe passiert sein kann, ohne dass calc() erneut lief und den
+     Cache erneuert haette. Ist der Cache aelter oder fehlt er, wird wie
+     bisher gerechnet.
+
+     KEINE EINSCHRAENKUNG: derselbe Wert, nur nicht doppelt. Wer den
+     Panel ohne vorhergehendes calc() oeffnet, bekommt die eigene
+     Rechnung - genau wie vorher. */
   var deal, result;
   try {
-    deal = _buildDeal2FromState();
-    result = window.DealScore2.compute(deal);
+    var _frisch = (window._dpLastDS2Zeit && (Date.now() - window._dpLastDS2Zeit) < 300);
+    if (_frisch && window._dpLastDS2Result && window._dpLastDS2Deal) {
+      deal = window._dpLastDS2Deal;
+      result = window._dpLastDS2Result;
+    } else {
+      deal = _buildDeal2FromState();
+      result = window.DealScore2.compute(deal);
+    }
     try { window._dpLastDs2 = result; } catch (e) {}
   } catch (err) {
+
     // V43: Defensiv — wenn compute crasht (z.B. wegen ungültiger Energieklasse), Fallback statt Crash
     console.warn('[ds2] compute fehlgeschlagen:', err.message);
     box.innerHTML = '<div style="text-align:center;color:var(--muted);padding:30px">' +
