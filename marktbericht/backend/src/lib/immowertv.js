@@ -232,12 +232,29 @@ export function rnd(gndJahre, baujahr, baustatus = 'bestand', stichtagJahr = nul
     return { jahre: null, alter: null, modell: 'unbekannt', hinweis: 'Ohne Baujahr keine Restnutzungsdauer.' };
   }
   const alter = Math.max(0, jahr - bj);
-  // Untergrenze 30 % der GND, sobald das Gebaeude weiter genutzt wird (uebliche
-  // Konvention bei modernisiertem Bestand). Ohne Modernisierungsnachweis greift
-  // sie erst, wenn die lineare Rechnung darunter faellt.
+  /* ═══ v1332 · Die Untergrenze wird GEPRUEFT, nicht angewandt ═══════
+     Hier stand:
+
+       const jahre = Math.max(linear, linear > 0 ? 0 : 0);
+
+     Das ist Math.max(linear, 0) - und `linear` ist schon mit Math.max(0, …)
+     gebildet. Die Zeile tat also NICHTS. Sie sieht aus wie eine Absicht,
+     die nie zu Ende gedacht wurde: die 30-Prozent-Untergrenze steht daneben
+     und wurde nirgends angewandt.
+
+     DAS VERHALTEN BLEIBT, und zwar bewusst. § 38 Abs. 1 ImmoWertV schreibt
+     die LINEARE Alterswertminderung vor: Restnutzungsdauer zu
+     Gesamtnutzungsdauer. Eine Untergrenze ohne Modernisierungsnachweis
+     waere eine Verlaengerung, die niemand begruenden kann - und genau
+     dafuer gibt es Anlage 2, die oben schon greift, sobald Punkte
+     vorliegen.
+
+     Was bleibt, ist der HINWEIS: faellt die lineare Rechnung unter 30 %
+     der GND, steht im Bericht, dass eine Verlaengerung zu pruefen ist.
+     Pruefen muss sie ein Mensch. */
   const linear = Math.max(0, G - alter);
   const untergrenze = Math.round(G * 0.3);
-  const jahre = Math.max(linear, linear > 0 ? 0 : 0);
+  const jahre = linear;
   return {
     jahre,
     alter,
