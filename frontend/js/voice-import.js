@@ -5316,6 +5316,26 @@
       return;
     }
     if (art === 'zentrum')  { _rfBlase('ich', 'Nimm das Ortszentrum.'); _rfZentrumNehmen(); return; }
+    /* v1325: der Vorschlag aus der eigenen Auskunft. */
+    if (art === 'auskunft') {
+      var av = _rf.auskunftVorschlag;
+      _rf.auskunftVorschlag = null;
+      _rfAktionWeg('auskunft');
+      if (!av || !av.werte) return;
+      var gesetztA = [];
+      Object.keys(av.werte).forEach(function (id) {
+        if (_rfSetzen(id, av.werte[id], 'aus der Auskunft des Co-Piloten')) gesetztA.push(_rfFeldName(id));
+      });
+      _rfBlase('ich', 'Ja, uebernimm das.');
+      if (gesetztA.length) {
+        _rfBlase('co', '...<b>' + escH(gesetztA.join(', ')) + '</b> steht - mit Herkunft, nicht als deine Angabe.');
+        _rfStandZeichnen();
+      }
+      var eA = _rf.offen[_rf.i];
+      if (eA && !_rfFehlt(eA, _rf.data.fields)) setTimeout(_rfWeiter, 400);
+      else _rfDranZeichnen();
+      return;
+    }
     if (art === 'tabelle')  { _rfZurTabelle(); return; }
     if (art === 'tiefe')    { _rf.tiefeOffen = 0; _rfBlase('ich', 'Ja, lass uns weitermachen.'); _rfTiefeStarten(); return; }
     if (art === 'brw')      { _rfBlase('ich', 'Hol den Bodenrichtwert.'); _rfBrwHolen(); return; }
@@ -6106,9 +6126,28 @@
        mit — bei Stufe 1 wird es ohnehin nicht ausgewertet, und ein Feld,
        das nichts bewirkt, gehoert nicht in den Aufruf. */
     if (stufe >= 2) {
+      /* v1325 · DIE AUSSTATTUNG FEHLTE. Marcels Verdacht: "dort haben wir
+         ja deutlich mehr Moeglichkeiten, weil wir die Qualitaet und alles
+         der Wohnung auch mit uebergeben. Kann das sein, dass du das
+         ueberhaupt gar nicht beruecksichtigt hast?" - er hatte recht.
+
+         GEMESSEN: DealPilotObjectMapper im Marktbericht liest neun
+         eq_*-Felder (heating, windows, floor_covering, bath, guest_wc,
+         store_room, exterior_walls, roof, elevator) und die
+         Qualitaetssterne. Der Sprechlauf schickte KEINES davon - die
+         Gegenseite konnte sie also gar nicht bekommen.
+
+         Damit lieferte die erweiterte Indikation im Sprechlauf dasselbe
+         wie die einfache: ohne Ausstattung rechnet sie am Durchschnitt,
+         obwohl die Daten im Formular stehen. */
       ['ds2_zustand', 'ds2_energie', 'brw', 'etage', 'mikrolage', 'makrolage',
        'ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_entwicklung', 'ds2_wertsteigerung',
-       'ds2_mietausfall', 'ds2_marktmiete', 'ausst', 'vermstand', 'gsfl', 'mea'
+       'ds2_mietausfall', 'ds2_marktmiete', 'ausst', 'vermstand', 'gsfl', 'mea',
+       'eq_heating', 'eq_windows', 'eq_floor', 'eq_bath', 'eq_guest_wc',
+       'eq_store_room', 'eq_walls', 'eq_roof', 'eq_elevator',
+       'rate_kueche', 'rate_bad', 'rate_boden', 'rate_fenster',
+       'qual_kueche', 'qual_bad', 'qual_boden', 'qual_fenster',
+       'modernis', 'einheiten', 'balkon_flae', 'garagen', 'stellpl_aussen'
       ].forEach(function (id) {
         var v = _rfFeld(id);
         if (v !== null && v !== undefined && v !== '') obj[id] = v;
@@ -7484,6 +7523,73 @@
     return false;
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1325 · EINE AUSKUNFT, DIE EINE LÜCKE FÜLLT, WIRD ANGEBOTEN
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Ziel: „dass der Co-Pilot auf andere Fragen eingeht, auch wenn
+     ich Adressen nenne oder nach einer Postleitzahl frage und der Rest
+     schon genannt ist, dass er den anderen Teil schon übernimmt und sagt:
+     Gut, soll ich dann die Postleitzahl dafür übernehmen?"
+
+     Bisher endete jede Auskunft gleich: Antwort, dann „Zurück zur Frage".
+     Wer fragt „Wie ist die Postleitzahl von Herford?", bekommt vier
+     Postleitzahlen und darf sie danach selbst abtippen — obwohl Ort und
+     Straße längst dastehen und der Co-Pilot die Antwort gerade selbst
+     gegeben hat.
+
+     Was hier passiert: nach der Auskunft wird geprüft, ob in der Antwort
+     ein Wert für ein Feld steckt, das GERADE OFFEN ist. Wenn ja, wird er
+     ANGEBOTEN — nicht gesetzt. Eine Auskunft ist keine Angabe des
+     Nutzers, und vier Postleitzahlen für einen Ort sind kein Beleg für
+     eine bestimmte Adresse.
+
+     Die Grenze ist wichtig: angeboten wird nur, was der Nutzer mit einem
+     Wort annehmen kann, und nur wenn die Antwort GENAU EINEN Kandidaten
+     enthält. Bei „32049, 32051, 32052 und 32053" fragt der Co-Pilot
+     lieber, welche es ist, als eine davon zu raten. */
+  function _rfAuskunftNutzen(antwort) {
+    if (!_rf || !antwort) return;
+    var e = _rf.offen[_rf.i];
+    if (!e || !e.ids || !e.ids.length) return;
+
+    /* Nur Felder, die jetzt gefragt sind UND noch leer. */
+    var offen = e.ids.filter(function (id) {
+      var v = _rf.data.fields[id];
+      if (v != null && String(v).trim() !== '') return false;
+      var el = document.getElementById(id);
+      return !(el && String(el.value || '').trim() !== '');
+    });
+    if (!offen.length) return;
+
+    var kat = (_rf.catalog || []).filter(function (c) { return offen.indexOf(c.id) >= 0; });
+    if (!kat.length) return;
+
+    var txt = String(antwort).replace(/\s+/g, ' ').trim();
+    if (txt.length < 12) return;
+
+    Auth.apiCall('/ai/extract-text', {
+      method: 'POST',
+      body: { text: txt.slice(0, 1200), catalog: kat, kontext: _rfKontext() }
+    }).then(function (r) {
+      if (!_rf) return;
+      var f = (r && r.fields) || {};
+      var treffer = Object.keys(f).filter(function (id) {
+        return offen.indexOf(id) >= 0 && f[id] != null && String(f[id]).trim() !== '';
+      });
+      if (!treffer.length) return;
+
+      _rf.auskunftVorschlag = { werte: {} };
+      var teile = treffer.map(function (id) {
+        _rf.auskunftVorschlag.werte[id] = f[id];
+        return '<b>' + escH(_rfFeldName(id)) + ': ' + escH(String(f[id])) + '</b>';
+      });
+      _rfBlase('co', '...Soll ich ' + teile.join(' und ') + ' so übernehmen? '
+        + '<span style="opacity:.75">Sag <b>ja</b> — oder nenn mir den richtigen Wert.</span>');
+      _rfAktion('auskunft', 'Aus meiner eigenen Antwort — du kannst sie jederzeit überschreiben.',
+                'Übernehmen');
+    }).catch(function () {});
+  }
+
   function _rfFrageBeantworten(text) {
     _rfBlase('ich', escH(text));
     _rfMelden('', true);
@@ -7496,6 +7602,9 @@
       /* Nach der Auskunft geht es weiter, wo es aufgehoert hat - die Frage,
          die offen war, ist immer noch offen. */
       var e = _rf.offen[_rf.i];
+      /* v1325: Steckt in der Antwort ein Wert fuer die offene Frage,
+         wird er ANGEBOTEN statt nur ausgegeben. */
+      try { _rfAuskunftNutzen((r && r.antwort) || ''); } catch (ex) {}
       if (e) _rfBlase('co', '<span style="opacity:.7">Zurück zur Frage:</span> ' + escH(e.frage));
       if (_fs.an && _fs.stream) _fsHoeren(true);
     }).catch(function (err) {
