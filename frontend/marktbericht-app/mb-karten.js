@@ -50,18 +50,35 @@
      Pflicht ist, weiß mb-stufen.js und niemand sonst — hier steht bewusst
      KEINE zweite Pflichtliste. Das wäre die Doppelliste, an der der
      Marktbericht schon sechsmal gescheitert ist. */
+  /* v1345b - DIE GRUPPEN FOLGEN DEN ZEILEN, NICHT MEINEM WUNSCHBILD.
+     Gemessen: cond, energy und baths landeten in KEINEM Block. Die
+     Sicherung aus v1340d hatte recht - `cond` und `energy` stehen in
+     DERSELBEN `.row` (index.html), ich hatte sie auf zwei Gruppen
+     verteilt. Eine Zeile, die Felder zweier Gruppen traegt, wird von
+     beiden verworfen; die Felder blieben heimatlos.
+
+     Dieselbe Ursache bei baths (steht mit modyear in einer Zeile) und
+     bei elevator (liegt in Reiter 4, garages/outdoor in Reiter 5).
+
+     Die Einteilung folgt jetzt den tatsaechlichen Zeilen UND der
+     Reiter-Zuordnung aus mb-wizard.js. Wer sie aendert, prueft beides. */
   var GRUPPEN = [
     { id: 'ort',    titel: 'Wo steht das Objekt', felder: ['address', 'ptype', 'usage'] },
     { id: 'eck',    titel: 'Eckdaten',            felder: ['area', 'rooms', 'year', 'floor'] },
     { id: 'geld',   titel: 'Geld',                felder: ['rent', 'price'], optional: true,
       hinweis: 'Beide Angaben sind freiwillig. Ohne Kaltmiete rechnet der Bericht mit der Marktmiete.' },
-    { id: 'zust',   titel: 'Zustand',             felder: ['cond', 'quality', 'modern', 'modyear'] },
-    { id: 'energ',  titel: 'Energie und Heizung', felder: ['energy', 'eq_energie', 'eq_heating', 'eq_windows'] },
-    { id: 'innen',  titel: 'Innen',               felder: ['eq_floor', 'eq_bath', 'eq_guest_wc', 'eq_store_room', 'baths'] },
-    { id: 'huelle', titel: 'Dach und Wände',      felder: ['eq_walls', 'eq_dachform', 'eq_roof'] },
-    { id: 'flaech', titel: 'Flächen',             felder: ['balcony', 'garden', 'plot', 'units'],
+    /* Reiter 3: cond+energy, quality+modern, modyear+baths */
+    { id: 'zust',   titel: 'Zustand und Qualität',
+      felder: ['cond', 'energy', 'quality', 'modern', 'modyear', 'baths'] },
+    /* Reiter 4 */
+    { id: 'energ',  titel: 'Energie und Heizung',  felder: ['eq_energie', 'eq_heating', 'eq_windows'] },
+    { id: 'innen',  titel: 'Innen',                felder: ['eq_floor', 'eq_bath', 'eq_guest_wc', 'eq_store_room'] },
+    { id: 'aufzug', titel: 'Aufzug',               felder: ['elevator'] },
+    /* Reiter 5 */
+    { id: 'huelle', titel: 'Dach und Wände',       felder: ['eq_walls', 'eq_dachform', 'eq_roof'] },
+    { id: 'flaech', titel: 'Flächen',              felder: ['balcony', 'garden', 'plot', 'units'],
       hinweis: 'Grundstück bei einer Eigentumswohnung: das Gesamtgrundstück — der Anteil ergibt sich über den Miteigentumsanteil.' },
-    { id: 'stell',  titel: 'Stellplätze und Aufzug', felder: ['garages', 'outdoor', 'elevator'] }
+    { id: 'stell',  titel: 'Stellplätze',          felder: ['garages', 'outdoor'] }
   ];
 
   /* ── Stil ───────────────────────────────────────────────────────────────
