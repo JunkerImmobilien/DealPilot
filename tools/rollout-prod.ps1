@@ -42,6 +42,17 @@
 #  Sicherungen aus Schritt 2 liegen in /root/backups/.
 # =====================================================================
 
+# ---------------------------------------------------------------------
+#  -Freigabe   ueberspringt die Nachfrage in Schritt 4.
+#
+#  NUR benutzen, wenn die Freigabe schon ausgesprochen ist - etwa weil
+#  Marcel den Rollout im Auftrag genannt hat. Die Pruefungen 1 bis 3
+#  laufen trotzdem alle, und jede von ihnen bricht weiter ab: ohne
+#  sauberen Zweig, ohne lesbare Sicherung und ohne gruenen Gold-Audit
+#  geht nichts nach Produktion, mit oder ohne diesen Schalter.
+# ---------------------------------------------------------------------
+param([switch]$Freigabe)
+
 $ErrorActionPreference = 'Continue'
 
 $ZWEIG_QUELLE = 'staging'
@@ -141,7 +152,12 @@ Write-Host ""
 Write-Host "   Das geht jetzt auf PRODUKTION: $PROD_URL" -ForegroundColor White
 Write-Host "   $anzahl Commits, $dateien Dateien. Sicherungen liegen in /root/backups/." -ForegroundColor White
 Write-Host ""
-$antwort = Read-Host "   Rollout starten? Tippe JA"
+if ($Freigabe) {
+  Hinweis "Freigabe liegt vor (-Freigabe) - keine Nachfrage."
+  $antwort = 'JA'
+} else {
+  $antwort = Read-Host "   Rollout starten? Tippe JA"
+}
 if ($antwort -ne 'JA') {
   Hinweis "Abgebrochen - nichts veraendert."
   exit 0
