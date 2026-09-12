@@ -36,6 +36,37 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+## Marktbericht: Marcels Liste vom 12.09.2026 — ERLEDIGT bis auf zwei Reste
+
+Alles auf Staging, `b307c50` bis `343ed2b`. Einzelheiten im Journal der
+Projektanweisung unter **v1332–v1337**.
+
+| Punkt | Stand |
+|---|---|
+| Adresse wurde vom letzten Objekt überschrieben | **fertig** v1333–v1333d — gemessen: eigene Eingabe hielt 476 ms, dann ersetzt. Zwei Netzrunden zwischen Laden und Füllen |
+| Bericht landete unter dem alten Objekt | **fertig** v1333 — `_mbwRef` folgt jetzt der Adresse |
+| Wohneinheiten blockierten den Bericht | **fertig** v1333 — bei ETW/EFH/DHH/RH/GAR sichtbar mit 1 vorbelegt, Label sagte fälschlich „nur MFH“ |
+| Feldbeschreibungen und „wo bekomme ich das her“ | **fertig** v1334 — 33 Texte mit `woher`, ⓘ hängen sich selbst an, Vorschau beim Drüberfahren |
+| Geschosse / Etagen / Vollgeschosse | **fertig** v1334 — Etage = Lage der Wohnung, Vollgeschoss nach LBO, Dachboden ausdrücklich NIE |
+| „1×MPI, 1×MPI+, 1×WEV“ | **fertig** v1335 — dahinter steht jetzt „noch N frei“ aus `/ai/credits` |
+| Eingabefelder fluchten nicht | **fertig** v1336–v1336c — Grid statt Flex-50 %, Labelhöhen je Rasterzeile angeglichen |
+| Tablet und Handy | **geprüft** — 390/600/768/900/1024 px: alle Rasterzeilen fluchten, kein Überlauf |
+| Alterswertminderung „wie kommt die zustande?“ | **fertig** v1332 (nachgerechnet, korrekt) + v1337 (Rechenweg und RND-Herkunft stehen jetzt im Bericht) |
+
+**Zwei Reste:**
+
+1. **Sachwertfaktoren Braunschweig-Wolfsburg nachtragen.** Für Wolfenbüttel
+   (Kreis 03158) führt das Register den Liegenschaftszins (1,9 % EZFH und WE
+   vermietet), aber keinen Sachwertfaktor. Die Quelle steht im Register schon
+   verlinkt (Grundstücksmarktdaten 2025, `gag.niedersachsen.de/download/210957`).
+   Bundesweit sind es erst 52 Sachwertfaktoren gegen 1.078 Liegenschaftszinsätze.
+
+2. **Ein vollständiger Bericht am echten Objekt.** Alle Abnahmen oben sind
+   Einzelmessungen im Formular. Ein durchgehender Lauf bis zum fertigen PDF
+   kostet Kontingent und steht noch aus — und genau dort haben Einzelprüfungen
+   in dieser Sitzung schon dreimal etwas durchgelassen.
+
+---
 ## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
 
 **Stand:** `v1273`–`v1310d` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**

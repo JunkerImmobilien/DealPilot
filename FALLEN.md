@@ -2870,3 +2870,71 @@ gelesen.
 **Regel: Bevor man „kommt aus dem Formular" als Ausschlusskriterium
 benutzt, prüfen, wie viele verschiedene Wege in dieses Formular führen.**
 Ein Speicherort ist keine Herkunft.
+
+## 132 · Eine Sicherung, die nur an Ereignissen hängt, misst sich selbst
+
+`setVal()` im Marktbericht überschrieb Nutzereingaben. Die erste Sicherung
+merkte sich angefasste Felder über `input`/`change` mit `isTrusted`.
+
+**Die Regel war richtig und die Messung trotzdem rot** — der Testaufbau
+setzte `el.value` und feuerte ein synthetisches Ereignis, das Register
+blieb leer. Sie hätte umgekehrt genauso gut grün sein können.
+
+**Regel: eine Sicherung gegen Überschreiben braucht einen Anker, den auch
+ein Prüfwerkzeug auslöst.** Der Wert selbst ist so ein Anker: vergleichen,
+was im Feld steht, mit dem, was zuletzt von dort hineingeschrieben wurde.
+Das Ereignis bleibt als zweite, unabhängige Sicherung daneben.
+
+## 133 · Ein Ausgangsstand, der LAZY erfasst wird, ist immer zu spät
+
+Nachfolgefehler von 132. Der Vergleichswert wurde beim ersten `setVal` für
+ein Feld gesetzt — und der erste `setVal` IST der Aufruf, gegen den die
+Sperre schützen soll. Er trug den bereits getippten Wert als
+„Ausgangsstand" ein, verglich ihn mit sich selbst und winkte sich durch.
+
+Gefunden über einen Setter auf `#address`, der den Stack mitschrieb:
+
+```
+"32120 Hiddenhausen" << setVal (mb-objektwahl.js:151)
+                     << fillFromData << uebernehmen
+```
+
+Die neue Fassung war geladen, die Sperre lief trotzdem ins Leere.
+
+**Regel: ein Referenzzustand wird genommen, BEVOR der erste Schreiber
+laufen kann** — beim Modulstart, und für später entstehende Elemente über
+einen Beobachter beim Entstehen.
+
+## 134 · `margin-top:auto` richtet nur aus, wenn nichts dahinter steht
+
+Zum Ausrichten von Eingabefeldern in Spalten unterschiedlicher Labelhöhe
+lag nahe: Zelle als Flex-Spalte, `margin-top:auto` am Feld. Das funktioniert,
+solange das Feld das LETZTE Element der Zelle ist.
+
+Gemessen war es das oft nicht: die Stufenleiste hängt eine
+„fehlt"-Markierung an (`.mbst-fuer`), die Feldhilfe einen Ankertext
+(`.fh-anker`). `#plot` hatte drei Kinder, `#cond` vier. Dort schob `auto`
+das FELD nach oben, weg von seinen Nachbarn.
+
+**Und dieselbe Regel stand bereits ein zweites Mal in derselben Datei**,
+60 Zeilen weiter oben, aus einem alten Paket („v651-mb-css: Feld-Flucht").
+Der eigene neue Block war nicht der Täter — gemessen wurde
+`getComputedStyle(...).marginTop === 'auto'`, obwohl die eigene Zeile
+schon weg war.
+
+**Regel: vor dem Einfügen einer Layoutregel nach genau dieser Eigenschaft
+in derselben Datei greppen.** Und: Felder fluchten zuverlässig nur über
+gleiche Labelhöhe je Rasterzeile — welche Felder nebeneinander landen,
+entscheidet erst der Umbruch, das kann keine statische CSS-Regel wissen.
+
+## 135 · Ein Perl-Anker in einfachen Anführungszeichen interpretiert kein `\x{...}`
+
+Beim Patchen einer Datei mit Sonderzeichen im Anker (`− Alterswertminderung`)
+schlug `str_replace` mit 0 Treffern fehl. Ursache: `'\x{e2}\x{88}\x{92}'` in
+einem single-quoted Perl-String ist buchstäblich dieser Text, nicht das
+Zeichen. Dazu kommt die CRLF-Falle: ein mit `"\n"` gebauter mehrzeiliger
+Anker trifft in einer CRLF-Datei nie.
+
+**Regel: mehrzeilige Anker über einen Regex aus der geladenen Datei
+HOLEN** (`if ($s =~ /(…)/) { $anker = $1 }`), statt ihn zu tippen. Dann
+stimmen Zeilenenden und Sonderzeichen zwangsläufig.

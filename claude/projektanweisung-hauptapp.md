@@ -13521,6 +13521,218 @@ ssh root@157.90.117.167 "cd /opt/dealpilot && git reset --hard 4a69378 \
   && docker compose -f docker-compose.prod.yml up -d --build backend mb-backend"
 ```
 
+## v1332–v1337 · Der Marktbericht, Punkt für Punkt — 12.09.2026
+
+Marcels Liste aus dem Ziel, in der Reihenfolge, in der sie kam.
+
+### v1332 · Alterswertminderung nachgerechnet
+
+Die Formel in `nhk2010.js:776` ist korrekt nach § 38 Abs. 1 ImmoWertV:
+`minderung = herst × (gnd − rnd) / gnd`. Gegen echte Fälle gemessen
+(Stichtag 2026, GND 80): Bj 1968 → RND 22 → 72,5 % · Neubau → 0 % ·
+Bj 1900 → RND 0 → 100 % · Bj 1975 → RND 29 → 63,7 %.
+
+Dabei fiel toter Code in `immowertv.js` auf:
+`const jahre = Math.max(linear, linear > 0 ? 0 : 0)` — das ist `linear`.
+Verhalten bewusst gelassen (eine Untergrenze ohne Modernisierungsnachweis
+wäre nicht begründbar), Code klargestellt. Commit `b307c50`.
+
+### v1333–v1333d · Nutzereingaben sind unantastbar
+
+**Marcels Befund:** „beim ersten mal habe ich eine andere adresse
+eingegeben und alle werte angegeben und dann hat er einfach das letzte
+objekt genommen … erst beim 2 mal ändern hat er die neue Adresse
+übernommen."
+
+**GEMESSEN im Staging-iframe, Objekt 2026-1033:**
+
+```
+load     @128 ms
+getippt  @129 ms   "Meine Teststrasse 1, 38300 Wolfenbuettel"
+@605 ms  ->        "32120 Hiddenhausen"
+```
+
+Die eigene Eingabe stand 476 ms, dann war sie weg — ohne Meldung.
+
+**Ursache:** zwischen dem Laden des Formulars und `fillFromData()` liegen
+ZWEI Netzrunden (`buildDropdown` holt die Objektliste, `loadDetail` das
+Detail). Der Auto-Select aus `?ref` feuert also eine halbe Sekunde nach
+dem Laden, und `setVal()` schrieb bis dahin bedingungslos. Beim zweiten
+Versuch ist der Fetch durch — genau das hat Marcel beschrieben.
+
+**Zweiter Teil, der teurere:** `window._mbwRef` wird beim Dropdown-Klick
+gesetzt und wurde NIE geläscht. Ein Bericht für eine neue Adresse landete
+unter dem alten Objekt (`external_ref`), trug dessen Label und bekam
+dessen Preis — samt „ist bereits bezahlt" für eine Adresse, für die nie
+jemand gezahlt hat.
+
+**Drei eigene Fehler auf dem Weg, alle beim Nachmessen gefunden:**
+
+| | Fehler | Warum er durchging |
+|---|---|---|
+| v1333b | Sicherung hing allein an `isTrusted` | Der Testaufbau feuert synthetische Ereignisse — die Messung war rot, obwohl die Regel griff. Sie hätte umgekehrt genauso gut grün sein können. |
+| v1333c | Ausgangsstand LAZY beim ersten `setVal` erfasst | Der erste `setVal` IST der Aufruf, gegen den gesperrt werden soll: er trug den getippten Wert als „Ausgangsstand" ein und winkte sich durch. |
+| v1333d | Schlussmeldung sagte immer „Objektdaten übernommen" | Seit v1333 kann die Übernahme Felder auslassen. Eine Erfolgsmeldung, die das verschweigt, erzeugt ungedecktes Vertrauen. |
+
+Die Sicherung hängt jetzt an ZWEI unabhängigen Dingen: am Ereignis
+(`isTrusted`) und am Wert (Vergleich mit dem, was zuletzt von hier
+geschrieben wurde). Der Ausgangsstand wird beim Modulstart genommen, neue
+Felder erfasst ein Beobachter beim Entstehen.
+
+**Wohneinheiten** sperren niemanden mehr aus. Das Label sagte „— nur MFH",
+die Pflichtregel in `mb-stufen.js` verlangte sie bei jeder Objektart. Bei
+ETW, EFH, DHH, RH und GAR beantwortet die Objektart die Zahl selbst (1);
+sie wird SICHTBAR ins leere Feld geschrieben, nicht heimlich in die
+Rechnung geschoben. Bei MFH und Gewerbe bleibt sie Pflicht — der
+Ertragswert braucht sie für die Verwaltungskosten je bewerteter Einheit
+(Anlage 3 ImmoWertV).
+
+**Abnahme:** eigene Adresse hält · `_mbwRef` = null · Hinweis sichtbar ·
+`units` = 1 bei ETW · `area` aus dem Objekt übernommen.
+
+### v1334–v1334b · Feldhilfe für das ganze Grundformular
+
+**Marcels Befund:** „Die beschreibungen fehlen. Was ist mit zum Beispiel
+geschossen gemeint oder Etagen? Vollgeschosse mit oder ohne Dachboden?
+Ich würde mir mehr beschreibung wünschen und vlt zusätzlich wo bekomme ich
+das her."
+
+Er hatte zweimal recht. **Kein einziges Feld des Grundformulars trug ein
+ⓘ** — alle 19 vorhandenen Texte hingen an der Wertermittlung, also am
+tiefsten Teil. Und „wo bekomme ich das her" ist die Frage, die in der
+Praxis wirklich aufhält.
+
+- **33 neue Texte**, jeder mit eigenem Feld `woher`, gerendert als feste
+  Zeile „Wo du das findest:".
+- **Die ⓘ hängen sich selbst an** (`zeichenAnhaengen()` in `feldhilfe.js`)
+  — von Hand wären es 35 Stellen im HTML gewesen, und beim nächsten Feld
+  fängt es von vorn an.
+- **Vorschau beim Drüberfahren** (`.fh-tip`, 260 ms Verzögerung), auf
+  Geräten ohne Maus abgeschaltet (`@media (hover: none)`).
+- **Nebenbefund behoben:** `start()` band den Klick nur an die ⓘ, die es
+  beim Start schon gab. Die Zeichen der Wertermittlung sahen richtig aus
+  und taten nichts. Die Bindung hängt jetzt am `document`.
+
+**Marcels Kernfrage steht jetzt im Text:** `floor` = „In welchem Geschoss
+die Wohnung liegt — **nicht** wie viele Geschosse das Haus hat";
+`nhkGeschosse` = Vollgeschosse, mit der Landesbauordnungs-Definition und
+dem ausdrücklichen Satz, dass ein nicht ausgebauter Dachboden NIE ein
+Vollgeschoss ist.
+
+**v1334b, eigener Fehler:** die Label-Suche nahm das erste `<label>` im
+umgebenden `div`. Beim Adressfeld ist das umgebende `div` das ganze
+`.panel`. Sichtbar wurde es an einem doppelten Zeichen; der Fehler war,
+dass das Zeichen überhaupt am falschen Label hing.
+
+**Abnahme:** 41 Zeichen, keine doppelten, jedes am richtigen Label,
+Tooltip trägt den Text.
+
+### v1335 · „1 × MPI" war ein Preis, kein Kontingent
+
+**Marcels Befund:** „damit kann ich nichts anfangen. Schreib doch dahinter
+wieviele noch zu verfügung stehen."
+
+Doppelt richtig. Das Kürzel sagt niemandem etwas, der es nicht selbst
+erfunden hat — und dort stand ein PREIS, wo man einen BESTAND erwartet.
+Wie viele Bewertungen frei sind, erfuhr man erst NACH dem Klick, wenn der
+Server mit 402 antwortet. Die teure Entscheidung fällt vorher.
+
+Der Bestand kommt aus `/ai/credits` — dieselbe Quelle wie die Pille in der
+Kopfleiste. Ein eigener Zähler wäre eine zweite Wahrheit. Ohne Bestand
+(kein Token, Server stumm) bleibt es beim Preis allein.
+
+**Abnahme:** „1 × MPI · noch 35 frei" / „1 × MPI+ · noch 7 frei" /
+„1 × WEV · noch 8 frei".
+
+### v1336–v1336c · Die Eingabefelder fluchten
+
+**Marcels Befund:** „Die Formatierung der Felder passt oft nicht
+Eingabefelder zu Textfeldern fluchten nicht."
+
+**GEMESSEN bei 1240 px Panelbreite:**
+
+| Zeile | Befund |
+|---|---|
+| `eq_energie / eq_heating / eq_windows` | drittes Feld 960 statt 474 px, Versatz 95 px |
+| `eq_walls / eq_dachform / eq_roof` | dasselbe |
+| `balcony / garden / plot / units` | Versatz 133 px — die Labels von `plot` und `units` sind zweizeilig (58 statt 19 px) |
+
+`flex:1 1 calc(50% - 6px)` kann drei Felder nicht tragen: das dritte
+bricht um und nimmt die ganze Breite. Ersetzt durch Grid mit `auto-fit` —
+die Spaltenzahl richtet sich nach dem Platz, nicht nach einer geratenen
+Prozentzahl.
+
+**v1336b/c, zwei eigene Fehler:**
+
+- `margin-top:auto` am Feld funktioniert nur, solange das Feld das LETZTE
+  Element der Zelle ist. Ist es oft nicht: die Stufenleiste hängt eine
+  „fehlt"-Markierung an, die Feldhilfe einen Ankertext. Gemessen: `#plot`
+  hat drei Kinder, `#cond` vier. Dort schob `auto` das Feld nach OBEN.
+- **Dieselbe Regel stand ein zweites Mal**, 60 Zeilen weiter oben, als
+  `v651-mb-css: Feld-Flucht`. Mein eigener Block war nicht der Täter. Die
+  Flucht macht jetzt `labelsAngleichen()` in `mb-wizard.js`: Zellen mit
+  derselben Oberkante bilden eine Rasterzeile, deren Labels bekommen die
+  größte vorkommende Höhe. Eine CSS-Regel kann das nicht — welche Felder
+  nebeneinander landen, entscheidet erst der Umbruch.
+
+**Abnahme über alle 7 Reiter und 5 Breiten (390 / 600 / 768 / 900 /
+1024 px): alle Rasterzeilen fluchten, kein waagerechter Überlauf.**
+
+### v1337 · Die Alterswertminderung zeigt ihren Rechenweg
+
+Die Zeile sagte „58 von 80 Jahren" — zwei Zahlen, und der Bruch, der
+daraus wird, blieb im Dunkeln. Die Garage direkt darunter führt längst ein
+`detail` mit ihrem Rechenweg. Dieselbe Staffel, zwei Maßstäbe.
+
+`restnutzungsdauer_herkunft.hinweis` lag seit v1052 im Payload und wurde
+von NIEMANDEM gelesen — dasselbe Muster wie `dealpilot_marktbewertung` und
+`ref` im Orchestrator. Er gehört genau dorthin: ob die Restnutzungsdauer
+nach Anlage 2 abgeleitet oder nur geschätzt ist, ändert das Ergebnis um
+Zehntausende.
+
+**Funktionslauf im Container:**
+
+```
+289.428 € × (80 − 22) / 80 = 72,5 % — linear nach § 38 Abs. 1 ImmoWertV.
+Restnutzungsdauer nach Anlage 2 ImmoWertV, aus 12 Modernisierungspunkten.
+```
+
+Neubau: `× (80 − 80) / 80 = 0 %`. Backend neu gebaut, `node --check` im
+Container grün für beide Dateien.
+
+### Nebenbei beantwortet: Sachwertfaktor und Liegenschaftszins
+
+Marcels Zwischenfrage. Das Register (`marktbericht/backend/src/lib/register/`)
+führt beim Start gemessen **2.150 Sätze, 525 Gebiete**:
+
+| Kennzahl | Sätze |
+|---|---|
+| Liegenschaftszinssatz | 1.078 |
+| Bodenpreisniveau | 403 |
+| Durchschnittspreis | 386 |
+| Preisentwicklung | 215 |
+| **Sachwertfaktor** | **52** |
+| Erbbauzinssatz | 15 |
+
+Sachwertfaktoren fast nur NRW (34), dazu BB 5, TH 5, NI 4, BY 2, BE 1,
+ST 1. Dazu zwei handgeschriebene Module: Minden-Lübbecke und Herford.
+
+**Für Wolfenbüttel** (Kreis 03158, GAA Braunschweig-Wolfsburg,
+Grundstücksmarktdaten 2025): Liegenschaftszins JA (1,9 % EZFH, 1,9 % WE
+vermietet, mit Quelle und Lizenz dl-de/by-2-0) — **Sachwertfaktor NEIN.**
+Das Verfahren meldet `kein_ausschuss_hinterlegt` mit dem Hinweis auf § 10
+ImmoWertV statt einen fremden Wert zu übertragen. Manuelle Eingabe steht
+zur Verfügung. **Offen:** die Braunschweig-Wolfsburg-Sachwertfaktoren
+nachtragen — die Quelle ist im Register schon verlinkt.
+
+### Commits
+
+`b307c50` v1332 · `a052c58` v1333 · `f5e2fbc` v1333b · `3512ed5` v1333c ·
+`bdcd12c` v1333d · `d3d08fc` v1334 · `0e9e4c1` v1334b · `177f465` v1335 ·
+`6919ee5` v1336 · `9aeb346` v1336b · `0e4cc5f` v1336c · `343ed2b` v1337
+
+**Alles auf Staging, nichts auf Produktion.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
