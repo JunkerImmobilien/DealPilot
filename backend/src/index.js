@@ -65,15 +65,120 @@ app.use('/api/v1/webhooks/stripe', stripeWebhookRoutes);
 app.use(express.json({ limit: '50mb' }));
 
 // ── Rate limiting (skip health checks) ──────────────
+/* ══════════════════════════════════════════════════════════════════════
+   v1366 · DAS LIMIT HAENGT AM KONTO, NICHT AN DER LEITUNG
+   ══════════════════════════════════════════════════════════════════════
+   B3 aus Marcels Schutz-Lastenheft verlangt Anomalie-Erkennung JE
+   ACCOUNT. Bis hierher zaehlte express-rate-limit nach IP - mit zwei
+   Folgen, beide am 13.09.2026 gemessen:
+
+   1. ZU ENG FUER ECHTE ARBEIT. Ein Seitenstart samt drei geoeffneten
+      Objekten erzeugt 57 API-Anfragen in 24 Sekunden. Das Limit stand
+      bei 100 pro Minute (printenv im Container - NICHT die 200/900 s aus
+      config.js, die dort als Default stehen).
+
+   2. MEHRERE MITARBEITER TEILEN SICH EINEN ZAEHLER. Hinter einem
+      Firmenanschluss laufen alle ueber dieselbe IP. Zwei Kollegen
+      gleichzeitig, und einer bekommt 429 - ohne etwas falsch gemacht zu
+      haben.
+
+   Beides loest derselbe Griff: wer eingeloggt ist, wird unter seiner
+   Nutzerkennung gezaehlt und bekommt ein deutlich groesseres Kontingent.
+   Wer nicht eingeloggt ist, bleibt bei der IP und beim engen Limit -
+   dort ist Vorsicht richtig.
+
+   DER SCHLUESSEL WIRD NICHT VERIFIZIERT, NUR GELESEN. Die Zaehlung
+   laeuft vor jeder Route, also vor `authenticate`. Ein gefaelschter
+   Token traefe damit einen fremden Zaehler-Eimer - schaden kann er
+   nicht, denn die Route selbst prueft ihn weiterhin richtig und lehnt
+   ihn ab. Wer mit fremder Kennung zaehlt, verbraucht nur Anfragen, die
+   er ohnehin nicht beantwortet bekommt.
+
+   HIER STAND EIN TOTER SCHALTER. Das Objekt trug `skip` ZWEIMAL:
+
+     skip: function (req) { ...Authorization vorhanden -> nicht limitieren... }
+     standardHeaders: true,
+     legacyHeaders: false,
+     skip: (req) => req.path.startsWith('/health')
+
+   In JavaScript gewinnt die zweite Eigenschaft. Die Ausnahme aus v395
+   (Commit 94e4f6f, 01.06.2026) war damit seit ueber drei Monaten
+   wirkungslos - die Datei sagte das Gegenteil von dem, was sie tat. Fuer
+   den Schutz war der Zufallszustand der bessere; jetzt steht es
+   ausdruecklich da.
+   ══════════════════════════════════════════════════════════════════════ */
+const jwtUtil = require('./utils/jwt');
+
+/* Wer ist das? Gibt die Nutzerkennung zurueck oder null. */
+function _kontoAusToken(req) {
+  try {
+    const h = req.headers && req.headers.authorization;
+    if (!h) return null;
+    const m = /^Bearer\s+(.+)$/i.exec(h);
+    if (!m) return null;
+    const p = jwtUtil.verify(m[1]);
+    return (p && p.userId) ? String(p.userId) : null;
+  } catch (e) {
+    /* abgelaufen oder gefaelscht - dann zaehlt die IP, und die Route
+       lehnt die Anfrage ohnehin ab. */
+    return null;
+  }
+}
+
+/* Bei IPv6 bekommt ein einzelner Anschluss ein ganzes /64-Netz - wer
+   darin die Adresse wechselt, haette sonst jedes Mal einen frischen
+   Zaehler. Deshalb wird auf die ersten vier Bloecke gekuerzt. IPv4
+   bleibt, wie es ist. */
+function _ipSchluessel(ip) {
+  const roh = String(ip || 'unbekannt');
+  if (roh.indexOf(':') < 0) return roh;              /* IPv4 */
+  const ohneV4 = roh.replace(/^::ffff:/i, '');
+  if (ohneV4.indexOf(':') < 0) return ohneV4;        /* IPv4 in IPv6-Schreibweise */
+  return ohneV4.split(':').slice(0, 4).join(':') + '::/64';
+}
+
+const LIMIT_KONTO = parseInt(process.env.RATE_LIMIT_MAX_ACCOUNT || '600', 10);
+
+
 const limiter = rateLimit({
   windowMs: config.rateLimit.windowMs,
-  max: config.rateLimit.max,
-  skip: function (req) { /* v395-ratelimit-skip: eingeloggte App-Requests nicht limitieren */ return !!(req.headers && req.headers.authorization && /^Bearer /i.test(req.headers.authorization)); },
+  max: (req) => (_kontoAusToken(req) ? LIMIT_KONTO : config.rateLimit.max),
+  keyGenerator: (req) => {
+    const konto = _kontoAusToken(req);
+    if (konto) return 'u:' + konto;
+    return 'ip:' + _ipSchluessel(req.ip);
+  },
+  /* Die eingebaute Pruefung warnt bei einem eigenen keyGenerator, weil
+     man dabei leicht die IPv6-Praefixe vergisst. Genau das erledigt
+     `_ipSchluessel` - deshalb ist die Warnung hier abgestellt und nicht
+     ueberhoert. Die Version im Container (express-rate-limit 7.5)
+     exportiert keinen `ipKeyGenerator`, sonst waere der der Weg. */
+  validate: { keyGeneratorIpFallback: false },
+
   standardHeaders: true,
   legacyHeaders: false,
-  skip: (req) => req.path.startsWith('/health')
+  skip: (req) => req.path.startsWith('/health'),
+  /* B3-Vorarbeit: eine Ueberschreitung ist noch kein Verstoss, aber sie
+     gehoert protokolliert. Mehr passiert hier bewusst NICHT - Marcels
+     Auflage: „Eine technische Auffaelligkeit darf nicht automatisch als
+     rechtlich bewiesener Vertragsverstoss behandelt werden." */
+  handler: (req, res) => {
+    const konto = _kontoAusToken(req);
+    console.warn('[limit] ueberschritten', JSON.stringify({
+      konto: konto || null,
+      ip: konto ? undefined : (req.ip || null),
+      pfad: req.path,
+      methode: req.method,
+      zeit: new Date().toISOString()
+    }));
+    res.status(429).json({
+      error: 'Zu viele Anfragen in kurzer Zeit. Bitte einen Moment warten.',
+      retry_after_s: Math.ceil(config.rateLimit.windowMs / 1000)
+    });
+  }
 });
 app.use(limiter);
+
 
 // Stricter rate limit for auth endpoints (prevent brute-force)
 const authLimiter = rateLimit({
