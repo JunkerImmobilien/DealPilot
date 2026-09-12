@@ -5396,6 +5396,10 @@
        FRAGEWORT am Anfang, nicht das Zeichen am Ende. "Was ist der
        Bodenrichtwert?" will Auskunft. "Bodenrichtwert abrufen?" will den
        Abruf. Die Zeile unten faengt den ersten Fall weiterhin ab. */
+    if (/^(was|wie|warum|wieso|wozu|welche|welcher|wann|wo)\b/i.test(t.trim())) return false;
+    return RF_ABRUF_VERB.test(t) && RF_ABRUF_SACHE.test(t);
+  }
+
   /* ═══════════════════════════════════════════════════════════════════
      v1327 · EIN SATZ KANN EINEN BEFEHL UND ANGABEN TRAGEN
      ═══════════════════════════════════════════════════════════════════
@@ -5435,10 +5439,6 @@
       .replace(/\s{2,}/g, ' ').trim();
     if (!/\d/.test(rest) || rest.length < 4) return;
     try { _rfAuswerten(rest, false); } catch (e) {}
-  }
-
-    if (/^(was|wie|warum|wieso|wozu|welche|welcher|wann|wo)\b/i.test(t.trim())) return false;
-    return RF_ABRUF_VERB.test(t) && RF_ABRUF_SACHE.test(t);
   }
 
   /* ═══════════════════════════════════════════════════════════════════
