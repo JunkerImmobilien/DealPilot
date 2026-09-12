@@ -106,7 +106,47 @@ export function compute(e = {}) {
   if (ent == null || ent < 0) ent = ENTSCHAEDIGUNG_PCT;
   if (ent > 100) ent = 100;
 
+  /* === v1342 - EIN MARKTABGELEITETER KOEFFIZIENT SCHLAEGT DIE FORMEL ==
+     Paragraf 50 ImmoWertV rechnet das Erbbaurecht finanzmathematisch:
+     Volleigentum minus Bodenwert, plus Zinsvorteil, minus Heimfall. Das
+     ist der richtige Weg, SOLANGE nichts Besseres vorliegt.
+
+     Es liegt aber etwas Besseres vor, wo ein Gutachterausschuss den
+     Koeffizienten aus echten Kauffaellen abgeleitet hat. Der Ausschuss
+     Braunschweig-Wolfsburg tut das fuer sieben Gebiete (v1339) und druckt
+     ein Anwendungsbeispiel ab: 500.000 x 0,79 = 395.000.
+
+     Der Koeffizient enthaelt, was die Formel nicht kennt: die Erwartung
+     des Marktes an Vertragsbedingungen, Anpassungsklauseln, Heimfall-
+     risiko. Deshalb geht er vor - aber die Formel wird trotzdem
+     ausgerechnet und mit ausgewiesen. Zwei Wege, die weit auseinander
+     liegen, sind ein Befund; einer allein waere eine Behauptung.
+
+     Der Koeffizient gilt gegen den Wert des BEBAUTEN Grundstuecks im
+     Normaleigentum - also gegen `volleigentum`, nicht gegen den
+     Bodenwert. */
+  const koeff = zahl(e.koeffizient);
+  if (koeff != null && koeff > 0) {
+    out.koeffizient = {
+      wert: koeff,
+      quelle: e.koeffizientQuelle || null,
+      erbbaurechtswert: Math.round(voll * koeff),
+      abschlag: Math.round(voll * koeff) - Math.round(voll),
+      abschlagPct: Math.round((koeff - 1) * 1000) / 10,
+      rechenweg: Math.round(voll).toLocaleString('de-DE') + ' \u20ac \u00d7 '
+        + String(koeff).replace('.', ',') + ' = '
+        + Math.round(voll * koeff).toLocaleString('de-DE') + ' \u20ac',
+    };
+    if (Array.isArray(e.koeffizientSpanne) && e.koeffizientSpanne.length === 2) {
+      out.koeffizient.spanne_eur = [
+        Math.round(voll * Number(e.koeffizientSpanne[0])),
+        Math.round(voll * Number(e.koeffizientSpanne[1])),
+      ];
+    }
+  }
+
   const gebaeudeanteil = Math.max(0, voll - bw);
+
 
   const zinsAngemessenEur = bw * (zsAng / 100);
   let zinsVertragEur = zahl(e.erbbauzins);
@@ -169,8 +209,38 @@ export function compute(e = {}) {
     quelle: '§ 50 ImmoWertV 2021, Zinssätze nach § 193 Abs. 4 BewG, Entschädigung § 27 ErbbauRG',
   };
   out.markt = markt;
+
+  /* v1342: Der Vorrang, sichtbar gemacht. Gerechnet wird beides - nur
+     WELCHER Wert der ausgewiesene ist, entscheidet die Herkunft. */
+  if (out.koeffizient) {
+    out.erbbaurechtswert_formel = out.erbbaurechtswert;
+    out.abschlag_formel = out.abschlag;
+    out.abschlagPct_formel = out.abschlagPct;
+    out.erbbaurechtswert = out.koeffizient.erbbaurechtswert;
+    out.abschlag = out.koeffizient.abschlag;
+    out.abschlagPct = out.koeffizient.abschlagPct;
+    out.weg = 'koeffizient';
+    out.hinweise.push('Ausgewiesen ist der marktabgeleitete Wert: '
+      + out.koeffizient.rechenweg
+      + (out.koeffizient.quelle ? ' (' + out.koeffizient.quelle + ')' : '')
+      + '. Er geht der finanzmathematischen Rechnung nach \u00a7 50 ImmoWertV vor, '
+      + 'weil er aus tats\u00e4chlichen Kauff\u00e4llen stammt.');
+    const _d = out.erbbaurechtswert_formel - out.erbbaurechtswert;
+    const _pct = out.erbbaurechtswert ? Math.abs(_d / out.erbbaurechtswert) * 100 : 0;
+    out.abweichung_formel_eur = _d;
+    out.abweichung_formel_pct = Math.round(_pct * 10) / 10;
+    out.hinweise.push('Die Rechnung nach \u00a7 50 ImmoWertV k\u00e4me auf '
+      + Math.round(out.erbbaurechtswert_formel).toLocaleString('de-DE') + ' \u20ac \u2014 '
+      + (_pct < 10
+         ? 'die beiden Wege liegen dicht beieinander.'
+         : 'das sind ' + String(out.abweichung_formel_pct).replace('.', ',')
+           + ' % Abstand. Eine so gro\u00dfe Abweichung geh\u00f6rt im Gutachten begr\u00fcndet.'));
+  } else {
+    out.weg = 'paragraf50';
+  }
   return out;
 }
+
 
 /**
  * pruefwert() — hält die beiden Fassungen zusammen.

@@ -18,7 +18,8 @@ import { CrossCheckService } from './CrossCheckService.js';
 import { flaechenaufteilung, manuelleAufteilung } from '../lib/umrechnung_nrw.js';
 /* v1073-WGAA-4 · Vorschlag fuer den Gartenland-Wertansatz aus dem
  * zustaendigen Grundstuecksmarktbericht. */
-import { gartenland as gartenlandVorschlag, zustaendig as gaaZustaendig }
+import { gartenland as gartenlandVorschlag, zustaendig as gaaZustaendig,
+         erbbaurechtskoeffizient as erbbauKoeffizient }   /* v1342 */
   from '../lib/gutachterausschuss.js';
 import { ScoringService } from './ScoringService.js';
 import { ReportGenerationService } from './ReportGenerationService.js';
@@ -770,7 +771,32 @@ export const ReportOrchestrator = {
         const _rnd = (_wertParams && _wertParams.restnutzungsdauer != null)
           ? _wertParams.restnutzungsdauer
           : (ref.build_year ? Math.max(20, 80 - (new Date().getFullYear() - ref.build_year)) : null);
+        /* === v1342 - DEN MARKTABGELEITETEN KOEFFIZIENTEN HOLEN =========
+           Liegt fuer diesen Ort und diese Objektart ein Erbbaurechts-
+           koeffizient vor (v1339), geht er der Formel vor. Er stammt aus
+           tatsaechlichen Kauffaellen und enthaelt, was Paragraf 50 nicht
+           kennt: Vertragsbedingungen, Anpassungsklauseln, Heimfallrisiko.
+
+           Kein Treffer heisst kein Wert - dann rechnet die Formel weiter,
+           genau wie bisher. Ein Koeffizient aus einem anderen Kreis wird
+           NICHT ersatzweise genommen (Paragraf 10 ImmoWertV); die Sperre
+           dafuer sitzt im Register-Leser. */
+        let _koeff = null, _koeffQuelle = null, _koeffSpanne = null;
+        try {
+          const _k = erbbauKoeffizient({
+            ags: (p && p.ags) || ref.ags || null,
+            objektart: ref.property_type,
+            baujahr: ref.build_year || null,
+          });
+          if (_k && _k.verfuegbar && Number(_k.wert) > 0) {
+            _koeff = Number(_k.wert);
+            _koeffQuelle = _k.quelle_text || _k.ausschuss || null;
+            _koeffSpanne = _k.spanne || null;
+          }
+        } catch (e) { /* ohne Koeffizient rechnet die Formel weiter */ }
+
         erbbau = Erbbaurecht.compute({
+
           volleigentum: _mv,
           bodenwert: _bwGesamt,
           restlaufzeit: ref.leasehold_years_left,
@@ -778,14 +804,18 @@ export const ReportOrchestrator = {
           objektart: ref.property_type,
           restnutzungsdauer: _rnd,
           zinssatzAngemessen: _zinsAmtlich,
+          koeffizient: _koeff,                /* v1342 */
+          koeffizientQuelle: _koeffQuelle,
+          koeffizientSpanne: _koeffSpanne,
         });
+
         if (erbbau && erbbau.ok && _zinsAmtlich != null) {
           erbbau.annahmen.zinsQuelle = _zinsQuelle;
           erbbau.annahmen.zinsHinweis = _zinsHinweis;
           erbbau.hinweise.push(`Der angemessene Erbbauzins von ${_zinsAmtlich.toFixed(1).replace('.', ',')} % ist oertlich erhoben (${_zinsQuelle}), nicht die bundesweite Marktmitte.`);
         }
         step(erbbau.ok
-          ? `Erbbaurecht: Abschlag ${Math.round(erbbau.abschlag).toLocaleString('de-DE')} EUR (${erbbau.abschlagPct.toFixed(1)} %)`
+          ? `Erbbaurecht (${erbbau.weg === 'koeffizient' ? 'Koeffizient ' + _koeff : '\u00a7 50'}): Abschlag ${Math.round(erbbau.abschlag).toLocaleString('de-DE')} EUR (${erbbau.abschlagPct.toFixed(1)} %)`
           : `Erbbaurecht: erkannt, aber nicht rechenbar (fehlt: ${erbbau.fehlt.join(', ')})`);
       } catch (e) {
         step('erbbaurecht: fehler ' + e.message);
