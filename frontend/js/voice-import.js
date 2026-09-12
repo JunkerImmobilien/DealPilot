@@ -3191,6 +3191,12 @@
       '.vi-rf-treffer{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(42,39,39,.16);',
       '  font:600 11.5px/1.5 "JetBrains Mono",ui-monospace,monospace;color:#3FA56C}',
       '.vi-rf-zaehler{font:600 10.5px/1 "JetBrains Mono",monospace;opacity:.5;margin-top:7px}',
+      /* v1359: der Unterschied zwischen zwei gleich klingenden Feldern.
+         Kein Fehlerton - es ist kein Fehler, sondern eine Klarstellung. */
+      '.vi-rf-unterschied{margin-top:9px;padding:8px 11px;border-radius:8px;' +
+        'background:rgba(201,168,76,0.09);border-left:2px solid var(--wl-c9a84c,#C9A84C);' +
+        'font-size:12px;line-height:1.5;opacity:.9}',
+
 
       /* ═══ v1299 · Die Pillen mit den Schlagwörtern ═══════════════════════
          Marcels Vorgabe: „hinter den Fragen noch Pillen mit den
@@ -5131,7 +5137,45 @@
     return id;
   }
 
+  /* ═══ v1359 · ZWEI DINGE, DIE GLEICH HEISSEN ══════════════════════════
+     Marcels Screenshot vom 12.09.2026 (design/mockups/fehler3.png). Er
+     antwortet „1,5 % Wertsteigerung, 2 % Mietsteigerung und 0 %
+     Leerstand" — und die NAECHSTE Frage fragt wieder nach
+     „Wertsteigerung".
+
+     GEMESSEN: das ist keine Doppelfrage. Es sind zwei verschiedene
+     Felder, die fast gleich heissen:
+
+       wertstg             „Wertsteigerung %"          — die Zahl in der
+                                                          Prognoserechnung
+       ds2_wertsteigerung  „Wertsteigerungs-Erwartung" — sehr hoch … keines,
+                                                          fuer den Score
+
+     Der Code ist also richtig, und trotzdem hat Marcel recht: die zwei
+     Fragen stehen direkt hintereinander (Rang 14 und 15), und die zweite
+     benutzt dasselbe Wort fuer etwas anderes. Wer das liest, denkt, er
+     habe gerade geantwortet.
+
+     Ein Fehler, der keiner ist, bleibt trotzdem ein Fehler — er kostet
+     Vertrauen in jede weitere Frage. Also sagt der Co-Pilot den
+     Unterschied, und zwar NUR dann, wenn die Zahl schon steht. Wer sie
+     nicht genannt hat, braucht die Erklaerung nicht. */
+  function _rfDoppeldeutig(e) {
+    if (!e || !e.ids || e.ids.indexOf('ds2_wertsteigerung') < 0) return '';
+    var zahl = _rf && _rf.data && _rf.data.fields ? _rf.data.fields['wertstg'] : null;
+    if (zahl == null || String(zahl).trim() === '') {
+      var el = document.getElementById('wertstg');
+      zahl = el ? el.value : null;
+    }
+    if (zahl == null || String(zahl).trim() === '') return '';
+    return '<div class="vi-rf-unterschied">Die <b>' +
+      escH(String(zahl).replace('.', ',')) + ' %</b> aus deiner Prognose habe ich. ' +
+      'Hier geht es um etwas anderes: wie du die <b>Lage</b> einsch\u00e4tzt \u2014 ' +
+      'das flie\u00dft in den Score ein, nicht in die Rechnung.</div>';
+  }
+
   function _rfPillen(eintrag) {
+
     if (!eintrag || !eintrag.ids || !eintrag.ids.length) return '';
     var teile = (eintrag.ids).map(function (id) {
       /* Klammerzusätze raus — „Wohnfläche (m²)" wird zu „Wohnfläche".
@@ -6036,7 +6080,7 @@
       return !(el && String(el.value || '').trim() !== '');
     });
     if (!fehlt.length) return;
-    _rfDranBlase(_rfBlase('co', escH(e.frage) + _rfPillen(e) +
+    _rfDranBlase(_rfBlase('co', escH(e.frage) + _rfDoppeldeutig(e) + _rfPillen(e) +
       '<div class="vi-rf-zaehler">Noch offen: ' + escH(_rfFelderNamen(fehlt)) + '</div>'));
     _rfDranZeichnen();
   }
@@ -6806,7 +6850,7 @@
     var pv = _rfProfilVorschlag(e);
     /* v1288: Bei einer Auswahl stehen die STUFEN in der Frage. Wir bewerten
        danach - also soll der Nutzer sie hoeren, statt Freitext zu raten. */
-    _rfDranBlase(_rfBlase('co', escH(e.frage) + _rfPillen(e) + _rfSkalen(e) +
+    _rfDranBlase(_rfBlase('co', escH(e.frage) + _rfDoppeldeutig(e) + _rfPillen(e) + _rfSkalen(e) +
       (pv ? '<div class="vi-rf-vorschlag">Aus deinen Einstellungen hätte ich: <b>' +
             escH(pv.text) + '</b></div>' : '') +
       /* v1309: Die Bankbewertung kennt beim Aufnehmen fast niemand — der
