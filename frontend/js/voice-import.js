@@ -8484,6 +8484,7 @@
                             nicht messbar, wenn sie nicht heraussehen. */
                          _kontext: _rfKontext,
                          _abruf: _abrufAusText,   /* v1318 */
+                         _rest: _rfRestNachAktion,   /* v1327 */
                          _bestaetigung: _rfBestaetigungUebertragen,
                          _offenesEnde: _fsOffenesEnde,   /* v1290 */
                          _fsStand: function () { return { phase: _fs.phase, kopf: !!_fs.kopf,
