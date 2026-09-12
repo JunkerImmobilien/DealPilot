@@ -649,7 +649,58 @@ export function erbbaurechtskoeffizient(arg = {}) {
   }
 
   const gefuehrt = alle.map((x) => String(x.zweig || '').toLowerCase());
-  const satz = zweigWaehlen(alle, gefuehrt, zweig || objektart, arg.baujahr || null);
+
+  /* === v1339b - DIE OBJEKTART DER APP IST NICHT DER ZWEIG DES BERICHTS =
+     GEMESSEN am 12.09.2026 im Container:
+
+       erbbaurechtskoeffizient({ags:"03101", objektart:"ezfh"}) -> 0,79 OK
+       erbbaurechtskoeffizient({ags:"03101", objektart:"EFH"})  -> nichts
+
+     obwohl `ZWEIG_VORZUG` fuer /efh/ ausdruecklich `[efh, ezfh]` fuehrt und
+     `nachArt(satz, "ezfh")` isoliert genau einen Treffer liefert. Die
+     Ursache in `zweigWaehlen` ist NICHT gefunden - nach drei Anlaeufen
+     abgebrochen und hier als offener Befund vermerkt, statt weiter zu raten.
+
+     Diese Karte loest das Problem aber nicht nur pragmatisch, sie ist auch
+     die richtige Stelle: unsere `ptype`-Werte (EFH, DHH, RH, ETW, MFH)
+     sind Oberflaechen-Kuerzel, die Zweige der niedersaechsischen Berichte
+     heissen anders (`ezfh`, `rh_dhh`). Eine ausdrueckliche Zuordnung ist
+     lesbar und pruefbar; eine Regex-Kaskade, die fuer NRW gebaut wurde,
+     ist es nicht.
+
+     DHH und RH gehen BEWUSST nicht auf `ezfh`: der Ausschuss wertet
+     Reihenhaeuser und Doppelhaushaelften getrennt aus und nur fuer die
+     Stadt Wolfsburg. Ein Reihenhaus in Wolfenbuettel bekommt deshalb
+     keinen Koeffizienten - und genau das soll es auch (Paragraf 10). */
+  const PTYPE_ZU_ZWEIG = {
+    efh: ['ezfh', 'efh'],
+    zfh: ['ezfh', 'zfh'],
+    ezfh: ['ezfh'],
+    dhh: ['rh_dhh', 'rhdhh', 'dhh'],
+    rh: ['rh_dhh', 'rhdhh', 'rh'],
+    rmh: ['rh_dhh', 'rhdhh', 'rmh'],
+    etw: ['etw', 'we', 'wohnung'],
+    mfh: ['mfh'],
+  };
+  const _roh = String(zweig || objektart || '').toLowerCase().trim();
+  let satz = null;
+  if (_roh) {
+    const kandidaten = PTYPE_ZU_ZWEIG[_roh] || [_roh];
+    for (const z of kandidaten) {
+      const t = alle.filter((x) => String(x.zweig || '').toLowerCase().trim() === z
+                                || String(x.objektart || '').toLowerCase().trim() === z);
+      if (t.length === 1) { satz = t[0]; break; }
+      if (t.length > 1) {
+        /* Mehrere Jahrgaenge: der juengste gilt, die aelteren sind
+           Dokumentation (dieselbe Regel wie waehleAusGruppe). */
+        const jung = Math.max(...t.map((x) => Number(x.berichtsjahr) || 0));
+        const j = t.filter((x) => (Number(x.berichtsjahr) || 0) === jung);
+        if (j.length === 1) { satz = j[0]; break; }
+      }
+    }
+  }
+  if (!satz) satz = zweigWaehlen(alle, gefuehrt, zweig || objektart, arg.baujahr || null);
+
   if (!satz) {
     return { verfuegbar: false, grund: 'objektart_nicht_abgeleitet',
       hinweis: 'Der Gutachterausschuss hat für diese Objektart keinen '
