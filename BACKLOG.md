@@ -95,7 +95,7 @@ ungewöhnlichem Umfang auszulesen."*
 | B17 | Konfigurationsbereich im Admin für alle Schwellen | offen |
 | B18 | Fehlalarmschutz: Nutzungshistorie und Accounttyp berücksichtigen, Eskalation statt Sofortsperre | offen |
 | B19 | Fallakte zur Beweissicherung, chronologisch | offen |
-| B20 | Tests: Normalnutzung, jede Eskalationsstufe, Adminausnahme, Entsperrung, Audit-Log, Fehlalarm | offen |
+| B20 | Tests: Normalnutzung, jede Eskalationsstufe, Adminausnahme, Entsperrung, Audit-Log, Fehlalarm | offen |
 | B21 | **Direktweg zu OpenAI aus dem Browser** — NEU, aus B1 | `quickcheck-app.html` Z. 5299 ff. ruft **`api.openai.com` direkt aus dem Client** auf, mit einem Schlüssel aus `localStorage` (`ji_ak_oai`). Kein IP-Schutzthema, sondern ein eigenes: ein API-Schlüssel im Browserspeicher, und ein Pfad, der **am Backend und damit an jeder Zählung, jedem Limit und jedem Protokoll vorbeiläuft**. Gehört unabhängig von der Reihenfolge des Schutzsystems geschlossen. |
 
 **Zwei Leitplanken aus Marcels eigenem Auftrag, die beim Bauen gelten:**
