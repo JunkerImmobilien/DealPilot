@@ -101,7 +101,11 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                             'sued-nord.json',        /* v1089 · BY, NI */
                             'nord2.json',            /* v1090 · NI */
                             'laender2.json',         /* v1093 · BB, HE, NI, NRW */
-                            'laender3.json'];        /* v1094 · BB, HE, NI */
+                            'laender3.json',        /* v1094 · BB, HE, NI */
+                            /* v1339: Erbbaurechtskoeffizienten Braunschweig-Wolfsburg.
+                               MARKTABGELEITET - wo sie vorliegen, gehen sie dem
+                               finanzmathematischen Wert nach Paragraf 50 ImmoWertV vor. */
+                            'erbbau-bs-wob.json'];
 
 export function ladeSaat(dateien = SAATDATEIEN) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])

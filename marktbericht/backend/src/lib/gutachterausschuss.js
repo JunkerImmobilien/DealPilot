@@ -342,6 +342,10 @@ function zweigWaehlen(reg, gefuehrt, objektart, baujahr) {
  * ist trotzdem das ganze Land. */
 const EBENE_GESPERRT = {
   sachwertfaktor: new Set(['bezirk', 'land', 'bund']),
+  /* v1339: Ein Erbbaurechtskoeffizient ist das Verhaeltnis zweier
+     oertlicher Kaufpreise. Ein Landes- oder Bundesmittel davon hat keine
+     Bedeutung - dieselbe Sperre wie beim Sachwertfaktor. */
+  erbbaurechtskoeffizient: new Set(['bezirk', 'land', 'bund']),
 };
 
 function ebeneErlaubt(kennzahl, satz) {
@@ -608,7 +612,109 @@ export function liegenschaftszinssatz(arg = {}) {
  * einfach. "einfach" heisst dort nicht "mäßig" — das war eine naheliegende
  * und falsche Lesart.
  */
+/**
+ * v1339 · ERBBAURECHTSKOEFFIZIENT — was der Markt zahlt, nicht was die
+ * Rechnung ergibt.
+ *
+ * Das Erbbaurecht wird bei uns seit v1312 finanzmathematisch nach
+ * Paragraf 50 ImmoWertV gerechnet: Volleigentum minus Bodenwert, plus
+ * Zinsvorteil, minus Heimfall. Das ist der richtige Weg, SOLANGE nichts
+ * Besseres vorliegt.
+ *
+ * Es liegt aber etwas Besseres vor, wo ein Gutachterausschuss den
+ * Koeffizienten aus echten Kauffaellen abgeleitet hat. Der Ausschuss
+ * Braunschweig-Wolfsburg tut das fuer sieben Gebiete aus den Jahren
+ * 2021 bis 2024 und druckt sogar ein Anwendungsbeispiel ab:
+ *
+ *   500.000 Euro Volleigentum x 0,79 = 395.000 Euro Erbbaurecht
+ *
+ * Ein marktabgeleiteter Koeffizient schlaegt eine Modellrechnung -
+ * er enthaelt alles, was die Formel nicht kennt: die Erwartung des
+ * Marktes an Vertragsbedingungen, Anpassungsklauseln, Heimfallrisiko.
+ *
+ * WICHTIG: er gilt gegen den Wert des BEBAUTEN Grundstuecks im
+ * Normaleigentum, nicht gegen den Bodenwert. Und er gilt nur fuer die
+ * Objektart, fuer die er abgeleitet wurde - Braunschweig-Wolfsburg
+ * fuehrt Reihenhaeuser und Doppelhaushaelften NUR fuer die Stadt
+ * Wolfsburg.
+ */
+export function erbbaurechtskoeffizient(arg = {}) {
+  const { ags, zweig, objektart, volleigentum_eur } = arg;
+  const alle = finde('erbbaurechtskoeffizient', ags).filter((x) => ebeneErlaubt('erbbaurechtskoeffizient', x));
+  if (!alle.length) {
+    return { verfuegbar: false, grund: 'kein_koeffizient_hinterlegt',
+      hinweis: 'Für diesen Ort ist kein marktabgeleiteter '
+        + 'Erbbaurechtskoeffizient hinterlegt. Gerechnet wird finanzmathematisch '
+        + 'nach § 50 ImmoWertV.' };
+  }
+
+  const gefuehrt = alle.map((x) => String(x.zweig || '').toLowerCase());
+  const satz = zweigWaehlen(alle, gefuehrt, zweig || objektart, arg.baujahr || null);
+  if (!satz) {
+    return { verfuegbar: false, grund: 'objektart_nicht_abgeleitet',
+      hinweis: 'Der Gutachterausschuss hat für diese Objektart keinen '
+        + 'Erbbaurechtskoeffizienten abgeleitet. Geführt werden: ' + gefuehrt.join(', ')
+        + '. Koeffizienten anderer Objektarten dürfen nicht übertragen werden '
+        + '(§ 10 ImmoWertV).',
+      ausschuss: alle[0].gaa_name || null, gefuehrte_zweige: gefuehrt };
+  }
+
+  const luecke = unvollstaendig(satz);
+  if (luecke) { luecke.zweig = satz.zweig; return luecke; }
+
+  const k = Number((satz.formel || {}).wert);
+  if (!Number.isFinite(k) || !(k > 0)) {
+    return { verfuegbar: false, grund: 'kein_wert', ausschuss: satz.gaa_name || null };
+  }
+
+  const r = {
+    verfuegbar: true,
+    wert: k,
+    einheit: 'faktor',
+    wert_art: (satz.formel || {}).wert_art || null,
+    spanne: (satz.formel || {}).spanne || null,
+    herkunft: 'register',
+    zweig: satz.zweig,
+    ausschuss: satz.gaa_name || null,
+    gebiet: satz.gebiet_name || null,
+    fallzahl: satz.fallzahl ?? null,
+    streuung: satz.streuung ?? null,
+    stichtag: satz.stichtag || null,
+    berichtsjahr: satz.berichtsjahr ?? null,
+    modellversion: satz.modellversion || null,
+    stufe: satz.stufe || null,
+    indikativ: satz.indikativ === true,
+    fundstelle: satz.fundstelle || null,
+    quelle_url: satz.quelle_url || null,
+    quellenvermerk: satz.quellenvermerk || null,
+    lizenz: satz.lizenz || null,
+    modellansaetze: satz.modellansaetze || {},
+    geltungsbereich: satz.geltungsbereich || null,
+    quelle_text: (satz.gaa_name || 'Gutachterausschuss')
+      + (satz.berichtsjahr ? ', Grundstücksmarktdaten ' + satz.berichtsjahr : '')
+      + (satz.fundstelle ? ', ' + satz.fundstelle : ''),
+    hinweis: (satz.formel || {}).hinweis || null,
+  };
+
+  /* Liegt der Wert des Volleigentums vor, wird gleich gerechnet - genau
+     so, wie es das Anwendungsbeispiel des Ausschusses vormacht. */
+  const V = Number(volleigentum_eur);
+  if (Number.isFinite(V) && V > 0) {
+    r.volleigentum_eur = Math.round(V);
+    r.erbbaurecht_eur = Math.round(V * k);
+    r.abschlag_eur = Math.round(V * k) - Math.round(V);
+    r.abschlag_pct = Math.round((k - 1) * 1000) / 10;
+    if (r.spanne && r.spanne.length === 2) {
+      r.erbbaurecht_spanne_eur = [Math.round(V * r.spanne[0]), Math.round(V * r.spanne[1])];
+    }
+    r.rechenweg = Math.round(V).toLocaleString('de-DE') + ' \u20ac \u00d7 '
+      + String(k).replace('.', ',') + ' = ' + Math.round(V * k).toLocaleString('de-DE') + ' \u20ac';
+  }
+  return r;
+}
+
 export function bodenpreisniveau({ ags, nutzungsart, lage } = {}) {
+
   const treffer = finde('bodenpreisniveau', ags);
   if (!treffer.length) {
     return { verfuegbar: false, grund: 'kein_niveau_hinterlegt',
@@ -949,6 +1055,7 @@ export function bezugsgroesse(ags) {
 }
 
 export default { AUSSCHUESSE, zustaendig, sachwertfaktor, gartenland,
+  erbbaurechtskoeffizient,   /* v1339 */
   bezugsgroesse, kreisAus, liegenschaftszinssatz, bodenpreisniveau,
   marktdaten, durchschnittspreis, vergleichsfaktor, bodenpreisindex,
   registerStand };
