@@ -309,7 +309,7 @@ function showSettings(initialTab) {
       (typeof Auth !== 'undefined' && Auth.isApiMode && Auth.isApiMode() ?
         '<hr class="dvd">' +
         '<h3 class="set-section-h">Zwei-Faktor-Authentifizierung (2FA)</h3>' +
-        '<p class="hint">Schuetze deinen Account mit Zwei-Faktor-Authentifizierung. Du brauchst eine Authenticator-App (Google Authenticator, Authy, 1Password, Microsoft Authenticator).</p>' +
+        '<p class="hint">Schütze deinen Account mit Zwei-Faktor-Authentifizierung. Du brauchst eine Authenticator-App (Google Authenticator, Authy, 1Password, Microsoft Authenticator).</p>' +
         '<div id="sec-2fa-host"><div class="sec-2fa-loading" style="padding:14px;color:var(--muted)">Lade 2FA-Status...</div></div>'
       : '') +
 
