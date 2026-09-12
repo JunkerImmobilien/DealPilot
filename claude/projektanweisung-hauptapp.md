@@ -15400,6 +15400,104 @@ Rückfall. Die Zahl „drei" stimmte, die Deutung nicht.
 `2ed6838` v1365 · `f9dd7a3` v1365b
 
 
+## v1366 · Das Limit hängt am Konto, nicht an der Leitung
+
+**B2 ist damit abgeschlossen.** Marcels Entscheidung zur Verlagerung des
+Deal Scores selbst: *„dann lassen wir das raus. ist ja auch nicht hoch
+komplex."* Die Gewichtsmatrix bleibt bewusst im Browser — der Schutz wäre
+nur mit einer Serverrunde je Eingabe zu haben, und der Score ist den
+Preis nicht wert. Das ist eine Abwägung, keine offene Aufgabe.
+
+Weiter mit **B3** (Anomalie-Erkennung je Account) und **B16**
+(API-Endpunkte, Rate-Limits).
+
+### Zwei Befunde, ein Griff
+
+Bis hierher zählte `express-rate-limit` nach **IP**. Beides am
+13.09.2026 gemessen:
+
+**1. Zu eng für echte Arbeit.** Ein Seitenstart samt drei geöffneten
+Objekten erzeugt **57 API-Anfragen in 24 Sekunden**. Das Limit stand bei
+**100 pro Minute** — gemessen per `printenv` im Container, **nicht** die
+200 / 900 s, die in `config.js` als Default stehen.
+
+**2. Mehrere Mitarbeiter teilen sich einen Zähler.** Hinter einem
+Firmenanschluss laufen alle über dieselbe IP. Zwei Kollegen gleichzeitig,
+und einer bekommt 429 — ohne etwas falsch gemacht zu haben.
+
+Beides löst derselbe Griff: **wer eingeloggt ist, wird unter seiner
+Nutzerkennung gezählt** und bekommt 600 statt 100 pro Fenster
+(`RATE_LIMIT_MAX_ACCOUNT`, Standard 600). Wer nicht eingeloggt ist,
+bleibt bei IP und engem Limit — dort ist Vorsicht richtig.
+
+### Der Token wird gelesen, nicht geglaubt
+
+Die Zählung läuft **vor** jeder Route, also vor `authenticate`. Der Token
+wird deshalb nur dekodiert, um den Zähler-Eimer zu bestimmen. **Ein
+gefälschter Token träfe einen fremden Eimer** — schaden kann er nicht,
+denn die Route prüft ihn weiterhin richtig und lehnt ihn ab. Wer mit
+fremder Kennung zählt, verbraucht nur Anfragen, die er ohnehin nicht
+beantwortet bekommt.
+
+### Der tote Schalter ist weg
+
+```js
+skip: function (req) { /* v395: eingeloggte Requests nicht limitieren */ … },
+standardHeaders: true,
+legacyHeaders: false,
+skip: (req) => req.path.startsWith('/health')      // ← diese gewann
+```
+
+**`skip` stand zweimal im selben Objektliteral.** In JavaScript gewinnt
+die zweite Eigenschaft — die Ausnahme aus `v395` (Commit `94e4f6f`,
+01.06.2026) war seit **über drei Monaten wirkungslos.** Die Datei sagte
+das Gegenteil von dem, was sie tat. Für den Schutz war der Zufallszustand
+der bessere; jetzt steht es ausdrücklich da.
+
+### IPv6 bekommt ein Präfix, keine Adresse
+
+Bei IPv6 gehört einem einzelnen Anschluss ein ganzes /64-Netz. Wer darin
+die Adresse wechselt, hätte jedes Mal einen frischen Zähler — deshalb
+wird auf die ersten vier Blöcke gekürzt.
+
+> **`v1366b`, ein eigener Fehler:** Die eingebaute Prüfung dazu heißt in
+> `express-rate-limit` 7.5 schlicht `ip`. Mein erster Versuch hieß
+> `keyGeneratorIpFallback` — den kennt die Version nicht, und beim Start
+> stand deshalb eine `ValidationError`-Zeile im Log. Der Server lief, die
+> Meldung blieb. **Eine Fehlermeldung, die immer dasteht, wird nicht
+> gelesen** — dasselbe Prinzip, das beim Gold-Audit schon einmal galt.
+
+### B3-Vorarbeit: zählen, nicht urteilen
+
+Eine Überschreitung wird jetzt protokolliert — Konto, Pfad, Methode,
+Zeit. **Mehr passiert bewusst nicht.** Marcels Auflage im Lastenheft:
+
+> *„Eine technische Auffälligkeit oder ein automatisch erzeugter
+> Risikoscore darf NICHT automatisch als rechtlich bewiesener
+> Vertragsverstoß behandelt werden."*
+
+Das Protokoll ist die Grundlage, auf der B3 später Muster erkennen kann —
+zusammen mit der Messgrundlage, die schon steht: Normalnutzung trifft
+**12 verschiedene Endpunktgruppen** bei einem Variationskoeffizienten von
+**5,13**; ein Auslese-Skript trifft ein bis zwei Gruppen bei einer
+Streuung nahe null.
+
+### Abnahme an der laufenden Maschine
+
+```
+mit Token (Konto-Eimer)   RateLimit-Limit: 600   Rest: 583
+ohne Token (IP-Eimer)     RateLimit-Limit: 100   Rest:  92
+Startlog                  nur „Server listening" — keine Warnung mehr
+```
+
+Die verschiedenen Reststände zeigen, dass es wirklich **zwei getrennte
+Zähler** sind und nicht einer mit zwei Beschriftungen.
+
+### Commits
+
+`1506a70` v1366 · v1366b im selben Zug
+
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
