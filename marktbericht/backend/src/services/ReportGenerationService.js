@@ -267,10 +267,17 @@ async function callOpenAI(payload, opts = {}) {
         teile.push(`Angebotsrendite am Ort: Median ${mk.rendite.median_pct} % (Q25 ${mk.rendite.q25_pct}, Q75 ${mk.rendite.q75_pct}, ${mk.rendite.n} Angebote)`);
       }
       if (teile.length) {
-        extra += `\n\nNUTZE DEN MARKTKONTEXT aus dem JSON-Feld "marktkontext" — das sind Aggregate `
+        /* v1323c: Die erste Fassung sagte "nenne mindestens einen dieser
+           Werte" - und das Modell tat es mal, mal nicht. Zwei Laeufe an
+           derselben Adresse: einmal mit Marktkontext-Satz, einmal ohne.
+           Die Erbbau-Anweisung daneben sagt "DAS MUSS IM TEXT VORKOMMEN"
+           und wurde in jedem Lauf befolgt. Also dieselbe Tonlage. */
+        extra += '\n\nPFLICHT - MARKTKONTEXT: Das JSON-Feld "marktkontext" enthaelt Aggregate '
           + `ECHTER Angebote im Umkreis von ${mk.radiusKm} km ueber 12 Monate, keine Schaetzung und keine `
           + `Selbsteinschaetzung des Investors. Konkret: ${teile.join('; ')}. `
-          + `Nenne mindestens einen dieser Werte mit seiner Stichprobengroesse und ordne das Objekt dagegen ein. `
+          + `DU MUSST MINDESTENS EINEN DIESER WERTE MIT SEINER STICHPROBENGROESSE IM TEXT NENNEN `
+          + `und das Objekt dagegen einordnen. Schreibe die Zahl aus, etwa "2.750 Euro je `
+          + `Quadratmeter bei 135 Angeboten". `
           + `Erfinde keine Zahl dazu.`;
       }
     }
