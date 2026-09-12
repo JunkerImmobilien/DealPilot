@@ -820,6 +820,16 @@ function _buildAIPayload() {
         if (_ma) _dpmb.makrolage = _ma;
         if (_card.trendRaw != null) _dpmb.wertentwicklung_pct_pa = _card.trendRaw;
         if (_card.mw && _card.mw.med != null) _dpmb.marktwert = _card.mw.med;
+        /* ═══ v1323 · Der Marktkontext gehoert in die Bewertung ═══════
+           Marcels Vorgabe: "wichtig waere auch dass dem Co-Pilot und der
+           Analyse diese Daten zur Bewertung zur Verfuegung stehen."
+
+           Vermietet gegen frei, die Energieklassen-Spreizung am Ort, die
+           Angebotsrendite - das sind genau die Zahlen, gegen die sich ein
+           Deal einordnen laesst. Sie lagen bisher im Bericht und kamen in
+           der Analyse nie an. */
+        if (_card.marktkontext) _dpmb.marktkontext = _card.marktkontext;
+        if (_card.erbbaurecht) _dpmb.erbbaurecht = _card.erbbaurecht;
         if (Object.keys(_dpmb).length) payload.dealpilot_marktbewertung = _dpmb;
       }
     }

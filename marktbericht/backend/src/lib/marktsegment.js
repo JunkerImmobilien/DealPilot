@@ -82,6 +82,54 @@ export function segment(propertyType, offerType) {
   return { objectClasses: ['Wohnung', 'Haus'] };
 }
 
+/* ═══ v1323 · Gewerbe ══════════════════════════════════════════════════
+   Der Connector setzte objectCategories hart auf ['Wohnen'] - damit war
+   Gewerbe gar nicht abfragbar, obwohl die API es kann. Gemessen Bielefeld,
+   5 km, 12 Monate: Kauf 1.499,98 EUR/m2 (n=153), Miete 10,00 EUR/m2 (n=856).
+
+   WELCHE KLASSEN ES GIBT, sagt die API nicht; ein falscher Wert kommt als
+   400 "Unknown objectClass" zurueck. Aus 16 echten Gewerbe-Angeboten
+   gesammelt (getDetailsById -> objectClass):
+
+     BüroPraxis (der Umlaut ist Pflicht)   6
+     Sonstige                                        5
+     HalleLagerProduktion                            3
+     Einzelhandel                                    1
+     Gastronomie                                     1
+
+   'Buero', 'BueroPraxis' ohne Umlaut, 'Halle' und 'Lager' quittiert die
+   API alle mit 400. Der Umlaut ist Pflicht. */
+export const GEWERBE_KLASSEN = {
+  buero:   'BüroPraxis',
+  praxis:  'BüroPraxis',
+  gesch:   'Einzelhandel',
+  laden:   'Einzelhandel',
+  hotel:   'Gastronomie',
+  gastro:  'Gastronomie',
+  gew:     'HalleLagerProduktion',
+  halle:   'HalleLagerProduktion',
+  lager:   'HalleLagerProduktion',
+};
+
+/**
+ * istGewerbe(propertyType) - gehoert die Objektart ins Segment Gewerbe?
+ */
+export function istGewerbe(propertyType) {
+  if (!propertyType) return false;
+  const p = String(propertyType).toLowerCase().replace(/[^a-z]/g, '');
+  return Object.prototype.hasOwnProperty.call(GEWERBE_KLASSEN, p);
+}
+
+/**
+ * gewerbeSegment(propertyType) -> { objectCategories, objectClasses } | null
+ * null heisst: keine Gewerbeart, der normale Weg gilt.
+ */
+export function gewerbeSegment(propertyType) {
+  if (!istGewerbe(propertyType)) return null;
+  const p = String(propertyType).toLowerCase().replace(/[^a-z]/g, '');
+  return { objectCategories: ['Gewerbe'], objectClasses: [GEWERBE_KLASSEN[p]] };
+}
+
 /**
  * Nur die Klassen — fuer Aufrufer, die (noch) keine objectTypes durchreichen
  * koennen. Alte Signatur, damit nichts stumm auf undefined faellt.

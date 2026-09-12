@@ -53,12 +53,15 @@ export const GeoMapConnector = {
   // analyzedField: 'PREISPROQM' | 'PREIS' | 'RENDITE' | 'NUTZFLAECHE' | 'TAGEONLINE'
   // offerType: 'Kauf' | 'Miete'. period: optional {from:'YYYY-MM-DD', to:'YYYY-MM-DD'}.
   // Liefert {count,median,average,min,max,q25,q75} o. null.
-  async kpiCollection({ lat, lon, radiusKm, offerType, analyzedField, objectClasses, objectTypes, period, filters }) {
+  async kpiCollection({ lat, lon, radiusKm, offerType, analyzedField, objectClasses, objectTypes, objectCategories, period, filters }) {
     if (!geomapEnabled()) return null;
     const body = {
       coordinate: { lat, lon },
       radiusInKm: radiusKm || cfg.geomap.radiusKm,
-      objectCategories: ['Wohnen'],
+      /* v1323: die Kategorie war hart auf Wohnen - damit liess sich Gewerbe
+       * gar nicht abfragen, obwohl die API es kann (gemessen Bielefeld:
+       * Kauf 1.499,98 EUR/m2 n=153, Miete 10,00 EUR/m2 n=856). */
+      objectCategories: (objectCategories && objectCategories.length) ? objectCategories : ['Wohnen'],
       objectClasses: objectClasses && objectClasses.length ? objectClasses : ['Wohnung', 'Haus'],
       offerTypes: [offerType],
       analyzedField: analyzedField || 'PREISPROQM',
@@ -168,7 +171,7 @@ export const GeoMapConnector = {
   // Holt echte Vergleichsangebote um einen Punkt.
   // params: { lat, lon, radiusKm, offerType:'Kauf'|'Miete', maxDetails }
   // Gibt { offers:[...], totalResults, fetchedDetails } zurück.
-  async marketOffers({ lat, lon, radiusKm, offerType, maxDetails, filters, period, objectClasses, objectTypes }) {   /* WSEG12-1 */
+  async marketOffers({ lat, lon, radiusKm, offerType, maxDetails, filters, period, objectClasses, objectTypes, objectCategories }) {   /* WSEG12-1 */
     if (!geomapEnabled()) return { offers: [], totalResults: 0, fetchedDetails: 0, reason: 'no_token' };
 
     const radius = radiusKm || cfg.geomap.radiusKm;
@@ -178,7 +181,10 @@ export const GeoMapConnector = {
     const body = {
       coordinate: { lat, lon },
       radiusInKm: radius,
-      objectCategories: ['Wohnen'],
+      /* v1323: die Kategorie war hart auf Wohnen - damit liess sich Gewerbe
+       * gar nicht abfragen, obwohl die API es kann (gemessen Bielefeld:
+       * Kauf 1.499,98 EUR/m2 n=153, Miete 10,00 EUR/m2 n=856). */
+      objectCategories: (objectCategories && objectCategories.length) ? objectCategories : ['Wohnen'],
       /* WSEG12-2 */
       objectClasses: (objectClasses && objectClasses.length) ? objectClasses : ['Wohnung', 'Haus'],
       offerTypes: [offerType], // 'Kauf' | 'Miete'

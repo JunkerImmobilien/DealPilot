@@ -177,6 +177,11 @@ if (!window._wlc) {
     out.bevRaw = (d.bevoelkerung_trend_pct != null) ? d.bevoelkerung_trend_pct : null;
     out.tageRaw = (d.days_on_market != null) ? d.days_on_market
                 : (d.market_dynamics && d.market_dynamics.days_on_market != null) ? d.market_dynamics.days_on_market : null;
+    /* v1323: Marktkontext und Erbbaurecht wandern mit in die Karte -
+       von dort holt ui.js sie fuer die Pilot-Analyse und den Co-Pilot.
+       Ohne diese zwei Zeilen bleibt beides im Bericht liegen. */
+    out.marktkontext = d.marktkontext || null;
+    out.erbbaurecht = d.erbbaurecht || null;
     out.trend = (d.price_trend_pct != null) ? ((d.price_trend_pct >= 0 ? '+' : '') + deNum(d.price_trend_pct, 1) + '%/J') : '–';
     if (mv.estimated != null) {
       out.mw = { low: mv.low != null ? mv.low : Math.round(mv.estimated * 0.9), med: mv.estimated, high: mv.high != null ? mv.high : Math.round(mv.estimated * 1.1), sqm: (mv.basis_median_sqm != null) ? (deNum(mv.basis_median_sqm, 0) + ' €/m²') : (area ? (deNum(Math.round(mv.estimated / area), 0) + ' €/m²') : '') }; /* v892-sqm */

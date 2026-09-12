@@ -2887,6 +2887,54 @@
         k['Marktpreisindikation Marktwert (€)'] = Math.round(_rf.markt.mw);
         if (_rf.markt.sqm) k['Marktpreisindikation (€/m²)'] = Math.round(_rf.markt.sqm);
       }
+      /* ═══ v1323 · Der Marktkontext gehört auch in den Chat ═══════════
+         Marcels Vorgabe: „wichtig wäre auch dass dem Co-Pilot und der
+         Analyse diese Daten zur Bewertung zur Verfügung stehen."
+
+         Wer mitten im Sprechlauf fragt „ist das ein guter Preis?", soll
+         die Antwort gegen echte Marktaggregate bekommen — vermietet gegen
+         frei, Energieklassen-Spreizung, Angebotsrendite —, nicht nur gegen
+         die eigenen Eingaben.
+
+         Gelesen wird aus `_mb_state`: dort liegt der letzte Bericht, auch
+         wenn die Karte gerade nicht offen ist. */
+      try {
+        var _mbRoh = document.getElementById('_mb_state');
+        var _mbSt = _mbRoh && _mbRoh.value ? JSON.parse(_mbRoh.value) : null;
+        var _c = _mbSt && _mbSt.card ? _mbSt.card : null;
+        var _mk = _c && _c.marktkontext;
+        if (_mk) {
+          if (_mk.vermietung) {
+            k['Markt: vermietet vs. frei (€/m²)'] =
+              Math.round(_mk.vermietung.vermietet_median_sqm) + ' gegen ' +
+              Math.round(_mk.vermietung.frei_median_sqm) + ' — ' +
+              _mk.vermietung.abschlag_pct.toFixed(1).replace('.', ',') + ' %  [echte Angebote im Umkreis]';
+          }
+          if (_mk.energie) {
+            k['Markt: Energieklassen-Spreizung'] =
+              'A–C ' + Math.round(_mk.energie.gut_median_sqm) + ' €/m², F–H ' +
+              Math.round(_mk.energie.schlecht_median_sqm) + ' €/m² — ' +
+              _mk.energie.spreizung_pct.toFixed(1).replace('.', ',') + ' %  [echte Angebote im Umkreis]';
+          }
+          if (_mk.rendite) {
+            k['Markt: Angebotsrendite am Ort (%)'] =
+              String(_mk.rendite.median_pct).replace('.', ',') +
+              ' (Q25 ' + String(_mk.rendite.q25_pct).replace('.', ',') +
+              ', Q75 ' + String(_mk.rendite.q75_pct).replace('.', ',') + ')  [echte Angebote im Umkreis]';
+          }
+          if (_mk.segment === 'gewerbe' && _mk.kauf) {
+            k['Markt: Gewerbe ' + (_mk.klasse || '')] =
+              Math.round(_mk.kauf.klasse_median_sqm || 0) + ' €/m² in der eigenen Klasse, ' +
+              Math.round(_mk.kauf.markt_median_sqm || 0) + ' €/m² im Gewerbemarkt  [echte Angebote]';
+          }
+        }
+        var _eb = _c && _c.erbbaurecht;
+        if (_eb && _eb.ok) {
+          k['Erbbaurecht: Abschlag'] =
+            Math.round(_eb.abschlag) + ' € · ' + _eb.abschlagPct.toFixed(1).replace('.', ',') +
+            ' %  [§ 50 ImmoWertV, bereits in Wertpuffer und Score eingerechnet]';
+        }
+      } catch (e) {}
     } catch (e) {}
     return Object.keys(k).length ? k : null;
   }

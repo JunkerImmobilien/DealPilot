@@ -59,6 +59,31 @@ ${[
 ].filter(([, v]) => v != null && v !== '').map(([k, v]) => `- **${k}:** ${v}`).join('\n')}
 ${p.assessment.marktmiete_eur_qm != null ? `\nEingeschätzte Marktmiete: **${p.assessment.marktmiete_eur_qm} €/m²**` : ''}${p.assessment.marktfaktor != null ? `, Marktfaktor: **${p.assessment.marktfaktor}**` : ''}
 ` : ''}
+${p.marktkontext ? `
+## D3) Marktkontext (GeoMap-Aggregate, 12 Monate, Radius ${p.marktkontext.radiusKm} km)
+${p.marktkontext.segment === 'gewerbe' ? [
+  `Segment: **Gewerbe / ${p.marktkontext.klasse}**`,
+  p.marktkontext.kauf ? `- Kauf eigene Klasse: **${fmt(p.marktkontext.kauf.klasse_median_sqm, ' €/m²')}** (n=${p.marktkontext.kauf.klasse_n ?? 0}), gesamter Gewerbemarkt: ${fmt(p.marktkontext.kauf.markt_median_sqm, ' €/m²')} (n=${p.marktkontext.kauf.markt_n ?? 0})${p.marktkontext.kauf.abstand_pct != null ? ` — Abstand ${p.marktkontext.kauf.abstand_pct.toFixed(1)} %` : ''}` : null,
+  p.marktkontext.miete ? `- Miete eigene Klasse: **${fmt(p.marktkontext.miete.klasse_median_sqm, ' €/m²')}** (n=${p.marktkontext.miete.klasse_n ?? 0}), gesamter Gewerbemarkt: ${fmt(p.marktkontext.miete.markt_median_sqm, ' €/m²')} (n=${p.marktkontext.miete.markt_n ?? 0})` : null,
+  p.marktkontext.rendite ? `- Angebotsrendite im Segment: **${p.marktkontext.rendite.median_pct} %** (Q25 ${p.marktkontext.rendite.q25_pct} / Q75 ${p.marktkontext.rendite.q75_pct}, n=${p.marktkontext.rendite.n})` : null,
+].filter(Boolean).join('\n') : [
+  p.marktkontext.basis_median_sqm != null ? `Vergleichsbasis: ${fmt(p.marktkontext.basis_median_sqm, ' €/m²')} (n=${p.marktkontext.basis_n})` : null,
+  p.marktkontext.vermietung ? `- **Vermietet gegen frei:** vermietet ${fmt(p.marktkontext.vermietung.vermietet_median_sqm, ' €/m²')} (n=${p.marktkontext.vermietung.vermietet_n}), frei ${fmt(p.marktkontext.vermietung.frei_median_sqm, ' €/m²')} (n=${p.marktkontext.vermietung.frei_n}) — Unterschied **${p.marktkontext.vermietung.abschlag_pct.toFixed(1)} %**. Für einen Kapitalanleger ist die vermietete Gruppe die passende Vergleichsbasis.` : null,
+  p.marktkontext.energie ? `- **Energieklassen am Ort:** A–C ${fmt(p.marktkontext.energie.gut_median_sqm, ' €/m²')} (n=${p.marktkontext.energie.gut_n})${p.marktkontext.energie.mittel_median_sqm != null ? `, D–E ${fmt(p.marktkontext.energie.mittel_median_sqm, ' €/m²')} (n=${p.marktkontext.energie.mittel_n})` : ''}, F–H ${fmt(p.marktkontext.energie.schlecht_median_sqm, ' €/m²')} (n=${p.marktkontext.energie.schlecht_n}) — Spreizung **${p.marktkontext.energie.spreizung_pct.toFixed(1)} %**. Das ist der lokal gemessene Abschlag für einen schlechten Energieausweis, nicht ein Studienwert.` : null,
+  p.marktkontext.rendite ? `- **Angebotsrendite am Ort:** Median **${p.marktkontext.rendite.median_pct} %** (Q25 ${p.marktkontext.rendite.q25_pct} / Q75 ${p.marktkontext.rendite.q75_pct}, n=${p.marktkontext.rendite.n}). Vergleiche die Bruttorendite des Objekts damit.` : null,
+  p.marktkontext.erbbau_markt ? `- **Erbbaurecht am Markt:** ${fmt(p.marktkontext.erbbau_markt.median_sqm, ' €/m²')} (n=${p.marktkontext.erbbau_markt.n}, Anteil ${p.marktkontext.erbbau_markt.anteil_pct.toFixed(1)} % der Angebote), Abstand zur Basis **${p.marktkontext.erbbau_markt.abstand_pct.toFixed(1)} %**. ACHTUNG: Volltextsuche, kein Filter — ein Angebot mit „kein Erbbaurecht" wird mitgezählt. Signal, kein Beleg.` : null,
+].filter(Boolean).join('\n')}
+` : ''}${p.erbbaurecht && p.erbbaurecht.ok ? `
+## D4) Erbbaurecht (§ 50 ImmoWertV)
+Das Objekt steht auf einem Erbbaurechtsgrundstück. Der Marktwert oben ist ein
+**Volleigentumswert** — kein Bewertungspartner nimmt den Parameter entgegen.
+- Bodenwert (gehört dem Erbbaurechtsgeber): ${fmt(p.erbbaurecht.teile.bodenwert, ' €')}
+- ${p.erbbaurecht.teile.zinsvorteil >= 0 ? 'Vorteil' : 'Nachteil'} aus dem Vertragszins: ${fmt(Math.abs(p.erbbaurecht.teile.zinsvorteil), ' €')} (angemessen ${p.erbbaurecht.annahmen.zinssatzAngemessen} %${p.erbbaurecht.annahmen.zinsQuelle ? `, örtlich erhoben: ${p.erbbaurecht.annahmen.zinsQuelle}` : ''})
+- Nicht entschädigter Gebäudeanteil bei Zeitablauf: ${fmt(p.erbbaurecht.teile.heimfallabschlag, ' €')}
+- **Erbbaurechtswert: ${fmt(p.erbbaurecht.erbbaurechtswert, ' €')} — Abschlag ${fmt(p.erbbaurecht.abschlag, ' €')} · ${p.erbbaurecht.abschlagPct.toFixed(1)} %**
+${p.erbbaurecht.markt ? `Am Markt beobachtet bei ${p.erbbaurecht.markt.text}: ${p.erbbaurecht.markt.von}–${p.erbbaurecht.markt.bis} % — die Rechnung liegt ${p.erbbaurecht.markt.imRahmen ? 'darin' : 'daneben'}.` : ''}
+${(p.erbbaurecht.hinweise || []).map((h) => `- ${h}`).join('\n')}
+` : ''}
 ## E) Kaufpreisanalyse
 Vergleichs-Kaufpreis Median: **${fmt(sale.median_per_sqm, ' €/m²')}**
 (Q25 ${fmt(sale.q25_per_sqm)} / Q75 ${fmt(sale.q75_per_sqm)} €/m²).

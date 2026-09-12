@@ -36,7 +36,7 @@
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
 import { geomapEnabled } from '../lib/config.js';
 import { cacheGet, cacheSet } from '../lib/cache.js';
-import { segment } from '../lib/marktsegment.js';
+import { segment, gewerbeSegment, istGewerbe } from '../lib/marktsegment.js';
 
 /* Marktkontext ändert sich langsam — eine Woche Cache reicht. */
 const TTL_MS = (parseInt(process.env.MARKTKONTEXT_CACHE_TTL_MIN, 10) || 10080) * 60 * 1000;
@@ -52,6 +52,76 @@ const MIN_N = 15;
 function prozentUnterschied(a, b) {
   if (!(a > 0) || !(b > 0)) return null;
   return ((a - b) / b) * 100;
+}
+
+/* ═══ v1323 · Gewerbe-Kontext ══════════════════════════════════════════
+   Gemessen am 12.09.2026, Bielefeld 5 km, 12 Monate:
+
+     Gewerbe Kauf gesamt      1.499,98 EUR/m²   n=153
+     Gewerbe Miete gesamt        10,00 EUR/m²   n=856
+     Einzelhandel Kauf        1.500,21          n= 22
+     Gastronomie Kauf         1.395,00          n= 15
+
+   Was der Wohn-Zweig fragt, passt hier nicht: „vermietet oder frei" ist
+   im Gewerbe der Regelfall gegen den Ausnahmefall, und der Brown Discount
+   der Energieklassen ist eine Wohnungs-Debatte. Was zählt, ist der
+   Vergleich der eigenen Klasse gegen den gesamten Gewerbemarkt am Ort —
+   und die Miete, denn Gewerbe wird über den Ertrag gekauft.
+
+   Die Klasse allein hat oft wenige Treffer (Gastronomie n=15). Deshalb
+   steht das Gesamtniveau daneben: wer seine Klasse nicht belegen kann,
+   hat wenigstens den Markt. */
+async function gewerbeKontext(ref, gewerbe, radiusKm, period, ck) {
+  const gem = {
+    lat: ref.lat, lon: ref.lon, radiusKm, period,
+    objectCategories: gewerbe.objectCategories,
+  };
+  const ruf = (extra) => GeoMapConnector.kpiCollection({ ...gem, analyzedField: 'PREISPROQM', ...extra })
+    .catch(() => null);
+
+  const [kaufKlasse, kaufAlle, mieteKlasse, mieteAlle, rendite] = await Promise.all([
+    ruf({ offerType: 'Kauf', objectClasses: gewerbe.objectClasses }),
+    ruf({ offerType: 'Kauf' }),
+    ruf({ offerType: 'Miete', objectClasses: gewerbe.objectClasses }),
+    ruf({ offerType: 'Miete' }),
+    GeoMapConnector.kpiCollection({
+      ...gem, offerType: 'Kauf', analyzedField: 'RENDITE', objectClasses: gewerbe.objectClasses,
+    }).catch(() => null),
+  ]);
+
+  const gut = (k, min) => (k && !k.error && k.median != null && k.count >= (min || MIN_N)) ? k : null;
+  const out = {
+    radiusKm, zeitraum: period, segment: 'gewerbe',
+    klasse: gewerbe.objectClasses[0],
+  };
+
+  const kk = gut(kaufKlasse, 5), ka = gut(kaufAlle);
+  if (kk || ka) {
+    out.kauf = {
+      klasse_median_sqm: kk ? kk.median : null, klasse_n: kk ? kk.count : null,
+      markt_median_sqm: ka ? ka.median : null, markt_n: ka ? ka.count : null,
+      abstand_pct: (kk && ka) ? prozentUnterschied(kk.median, ka.median) : null,
+    };
+  }
+
+  const mk = gut(mieteKlasse, 5), ma = gut(mieteAlle);
+  if (mk || ma) {
+    out.miete = {
+      klasse_median_sqm: mk ? mk.median : null, klasse_n: mk ? mk.count : null,
+      markt_median_sqm: ma ? ma.median : null, markt_n: ma ? ma.count : null,
+      abstand_pct: (mk && ma) ? prozentUnterschied(mk.median, ma.median) : null,
+    };
+  }
+
+  if (rendite && !rendite.error && rendite.median != null && rendite.count >= 5) {
+    out.rendite = {
+      median_pct: rendite.median, q25_pct: rendite.q25, q75_pct: rendite.q75, n: rendite.count,
+    };
+  }
+
+  if (!out.kauf && !out.miete && !out.rendite) return null;
+  cacheSet(ck, out, TTL_MS);
+  return out;
 }
 
 export const MarktkontextService = {
@@ -73,6 +143,14 @@ export const MarktkontextService = {
     const ck = ['mk', ref.lat.toFixed(3), ref.lon.toFixed(3), ref.property_type || '?', radiusKm].join('|');
     const cached = cacheGet(ck);
     if (cached) return { ...cached, cached: true };
+
+    /* v1323: Gewerbe hat eigene Klassen UND eine eigene Kategorie.
+       Der Wohn-Kontext (vermietet/frei, Energieklassen) ergibt dort
+       keinen Sinn - ein Ladenlokal hat keinen Brown Discount im selben
+       Sinn, und "vermietet" ist im Gewerbe der Regelfall. Deshalb ein
+       eigener, schlanker Zweig statt derselben acht Abfragen. */
+    const gewerbe = gewerbeSegment(ref.property_type);
+    if (gewerbe) return await gewerbeKontext(ref, gewerbe, radiusKm, period, ck);
 
     const seg = segment(ref.property_type, 'Kauf');
     const gem = {
