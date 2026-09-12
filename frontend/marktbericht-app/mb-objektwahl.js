@@ -120,6 +120,14 @@
   } catch (e) {}
   window._mbStand = function (id) { return id ? _stand[id] : _stand; };
 
+  /* v1333d: Was uebersprungen wurde, muss der Nutzer erfahren. Eine
+     Uebernahme, die "fertig" meldet und dabei fuenf Felder ausgelassen
+     hat, ist schlimmer als eine, die nichts tut - sie erzeugt Vertrauen,
+     das nicht gedeckt ist. */
+  var _uebersprungen = [];
+  var _bezugGeloest = false;
+
+
   var _angefasst = Object.create(null);
 
   function _merken(ev) {
@@ -160,6 +168,7 @@
     window._mbwRef = null;
     window._mbwLabel = null;
     _refAdresse = null;
+    _bezugGeloest = true;   /* v1333d */
     var sel = $('mbow-select'); if (sel) { try { sel.selectedIndex = 0; } catch (e) {} }
     var note = $('mbow-note');
     if (note) {
@@ -179,6 +188,7 @@
     /* v1333: Nutzereingabe schlaegt Objektdaten. Siehe Block oben. */
     if (_angefasst[id]) {
       try { console.info('[v1333] ' + id + ' bleibt stehen - vom Nutzer gesetzt.'); } catch (e) {}
+      if (_uebersprungen.indexOf(id) < 0) _uebersprungen.push(id);
       return;
     }
     /* v1333b: dieselbe Regel ohne Ereignis - der Wert selbst verraet es.
@@ -190,6 +200,7 @@
     if (!(id in _stand)) _stand[id] = '';   /* v1333c: nie den aktuellen Wert - siehe oben */
     if (!_auto && String(el.value == null ? '' : el.value) !== _stand[id]) {
       try { console.info('[v1333b] ' + id + ' bleibt stehen - wurde seit dem Laden geaendert.'); } catch (e) {}
+      if (_uebersprungen.indexOf(id) < 0) _uebersprungen.push(id);
       return;
     }
 
@@ -386,8 +397,45 @@
     var offen = fuelleWertermittlung(d);
     if (offen.length) beobachteFormular(d, offen);
 
+    /* === v1333d - Die Schlussmeldung sagt die Wahrheit ================
+       Sie meldete bisher immer dasselbe: "Objektdaten uebernommen". Seit
+       v1333 kann die Uebernahme Felder AUSLASSEN - naemlich die, die der
+       Nutzer selbst gefuellt hat. Eine Erfolgsmeldung, die das
+       verschweigt, ist genau die Sorte Meldung, die man spaeter teuer
+       bezahlt. */
     var note = $('mbow-note');
-    if (note) { note.textContent = '\u2713 Objektdaten \u00fcbernommen \u2014 pr\u00fcfen und \u201eMarktbericht erstellen\u201c klicken.'; note.style.color = '#3FA56C'; }
+    if (note) {
+      var _t = '\u2713 Objektdaten \u00fcbernommen';
+      var _farbe = '#3FA56C';
+      if (_uebersprungen.length) {
+        var _namen = _uebersprungen.map(function (id) {
+          var l = null;
+          try {
+            var el2 = $(id);
+            var lab = el2 && el2.closest ? el2.closest('div') : null;
+            var lb = lab ? lab.querySelector('label') : null;
+            if (lb) l = String(lb.textContent || '').split('\u2014')[0].trim();
+          } catch (e) {}
+          return l || id;
+        });
+        _t += ' \u2014 <b>' + _namen.join(', ') + '</b> '
+            + (_namen.length === 1 ? 'blieb' : 'blieben')
+            + ' stehen, weil du das selbst eingetragen hast.';
+        _farbe = 'var(--wl-c9a84c, #C9A84C)';
+      } else {
+        _t += ' \u2014 pr\u00fcfen und \u201eMarktbericht erstellen\u201c klicken.';
+      }
+      if (_bezugGeloest) {
+        _t += '<br>Die Adresse geh\u00f6rt nicht zu diesem Objekt \u2014 der Bericht wird '
+            + '<b>keinem</b> Bestandsobjekt zugeordnet.';
+        _farbe = 'var(--wl-c9a84c, #C9A84C)';
+      }
+      note.innerHTML = _t;
+      note.style.color = _farbe;
+    }
+    _uebersprungen = [];
+    _bezugGeloest = false;
+
   }
 
   /* Speicherschluessel -> Formular-Id. Die Namen stammen 1:1 aus
