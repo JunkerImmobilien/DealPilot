@@ -4101,9 +4101,32 @@ const QcApp = (function() {
 
   function updateAll() {
     const inputs = QcEngine.getInputs();
-    /* v969n: DealPilot Score (V1) im iframe. DealKpis -> computeFromKpis. Fallback: computeScore. */
-    const score = window._dpPilotScore ? window._dpPilotScore(inputs, (_avmResults[0]||null))
-                                        : QcEngine.computeScore(inputs, (_avmResults[0]||null));
+    /* v969n: DealPilot Score (V1) im iframe. DealKpis -> computeFromKpis.
+       Fallback: QcEngine.computeScore.
+
+       v1365 · DER RUECKFALL KONNTE NICHT GREIFEN.
+       Hier stand `window._dpPilotScore ? ... : QcEngine.computeScore(...)`
+       - geprueft wurde also, ob die FUNKTION existiert, nicht ob sie ein
+       Ergebnis geliefert hat. Sie steht am Ende derselben Datei und ist
+       damit immer vorhanden; sie gibt aber `null` zurueck, wenn
+       `DealKpis` oder `DealScore` fehlen (Zeile 6449). In genau dem Fall
+       - fuer den der Rueckfall gedacht ist - wurde er uebersprungen, und
+       die naechste Zeile las `score.score` auf null.
+
+       Dasselbe Muster wie beim Pruefhaken in v1359c: was nur auf
+       Existenz prueft, faellt nicht zurueck, wenn das Ergebnis fehlt.
+       Ein Rueckfall, der nicht greifen kann, ist keiner.
+
+       KEINE EINSCHRAENKUNG: im Normalfall aendert sich nichts, denn
+       `_dpPilotScore` liefert dann ein Ergebnis. Der Unterschied zeigt
+       sich nur, wenn eines der beiden Kern-Skripte nicht laedt - dort,
+       wo bisher ein TypeError stand, rechnet jetzt QcEngine. */
+    let score = null;
+    if (window._dpPilotScore) {
+      try { score = window._dpPilotScore(inputs, (_avmResults[0]||null)); } catch (_e) { score = null; }
+    }
+    if (!score) score = QcEngine.computeScore(inputs, (_avmResults[0]||null));
+
     const stage = QcEngine.stage(inputs);
     const comp = QcEngine.completeness(inputs);
     const avmReady = QcEngine.isAvmReady(inputs);

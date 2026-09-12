@@ -28,7 +28,11 @@
  *        window.qcImportPdfTrigger() → Werte zurück in die iframe-Felder.
  */
 (function () {
-  var IFRAME_SRC = 'quickcheck-app.html?v=1233c';
+  /* v1365: nur die Versionsziffer hochgezogen, damit die Reparatur in
+     quickcheck-app.html am Browser-Cache vorbeikommt. Das qcpm-Overlay
+     (ab Zeile ~348), auf das sich der Nicht-anfassen-Vermerk in
+     CLAUDE.md bezieht, ist unberuehrt. */
+  var IFRAME_SRC = 'quickcheck-app.html?v=v1365';
   // qb-buffer: Zwischenspeicher-Pass. Score erreichbar -> Snapshot -> EIN Pass (debounced),
   //   ohne echtes Objekt (object_id NULL). 'Als Objekt speichern' legt erst dann ein Portfolio-Objekt an.
   var _bufState = { code:null, timer:0, lastSig:'', busy:false };
