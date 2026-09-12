@@ -545,10 +545,43 @@
       var id = AUTO[i];
       if (!TEXTE[id]) continue;
       var el = $(id); if (!el) continue;
-      var umfeld = el.closest ? el.closest('div') : null;
-      var lab = umfeld ? umfeld.querySelector('label') : null;
+      /* v1334b - EIGENER FEHLER, GEMESSEN UND ZURUECKGENOMMEN.
+         Die erste Fassung nahm das ERSTE <label> im umgebenden div. Beim
+         Adressfeld ist das umgebende div aber das ganze .panel - und
+         dessen erstes Label gehoert zu einem voellig anderen Feld. Sichtbar
+         wurde es an einem doppelten Zeichen: mb-objektwahl.js schiebt
+         spaeter seinen eigenen Kasten samt Label an den Anfang des Panels,
+         danach fand die Doppelpruefung ihr eigenes Zeichen nicht wieder
+         und haengte ein zweites an. Das Doppelte war das Symptom; der
+         Fehler war, dass das Zeichen ueberhaupt am falschen Label hing.
+
+         Jetzt drei Wege, von sicher nach pragmatisch: ein label[for],
+         sonst das Label unmittelbar VOR dem Feld, sonst das letzte Label,
+         das im selben Kasten noch vor dem Feld steht. Findet keiner
+         etwas, bekommt das Feld kein Zeichen - lieber keins als eins am
+         falschen Feld. */
+      var lab = null;
+      try { lab = document.querySelector('label[for="' + id + '"]'); } catch (e) {}
+      if (!lab) {
+        var v = el.previousElementSibling, schritte = 0;
+        while (v && schritte++ < 3) {
+          if (v.tagName === 'LABEL') { lab = v; break; }
+          v = v.previousElementSibling;
+        }
+      }
+      if (!lab) {
+        var kasten = el.closest ? el.closest('div') : null;
+        if (kasten) {
+          var alle = kasten.querySelectorAll('label');
+          for (var k = alle.length - 1; k >= 0; k--) {
+            if (alle[k].compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING) { lab = alle[k]; break; }
+          }
+        }
+      }
       if (!lab) continue;
-      if (lab.querySelector('.fh[data-fh="' + id + '"]')) continue;
+      /* Doppelpruefung am ganzen Dokument, nicht nur im Label - sonst
+         zaehlt ein umgezogenes Zeichen als nicht vorhanden (v1334b). */
+      if (document.querySelector('.fh[data-fh="' + id + '"]')) continue;
       var sp = document.createElement('span');
       sp.className = 'fh';
       sp.setAttribute('data-fh', id);
