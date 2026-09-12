@@ -153,7 +153,11 @@ const limiter = rateLimit({
      `_ipSchluessel` - deshalb ist die Warnung hier abgestellt und nicht
      ueberhoert. Die Version im Container (express-rate-limit 7.5)
      exportiert keinen `ipKeyGenerator`, sonst waere der der Weg. */
-  validate: { keyGeneratorIpFallback: false },
+  /* v1366b: der Schluessel heisst in 7.5 schlicht `ip` - mein erster
+     Versuch (keyGeneratorIpFallback) ist dort unbekannt und erzeugte beim
+     Start eine ValidationError-Zeile im Log. Eine Fehlermeldung, die
+     immer dasteht, wird nicht gelesen. */
+  validate: { ip: false },
 
   standardHeaders: true,
   legacyHeaders: false,
