@@ -14858,6 +14858,114 @@ Skript zieht gleichmäßig eine Sache ab. Das trifft Marcels Vorgabe aus
 B18 — Fehlalarme vermeiden, statt jeden schnellen Nutzer zu sperren.
 
 
+## v1358 / v1359 · Der Sprechlauf hört zu, aber er handelt nicht danach
+
+Marcel hatte am Morgen des 12.09.2026 vier Screenshots in
+`design/mockups/` abgelegt — `fehler1.png` bis `fehler 4.png`. Drei davon
+zeigen denselben Befund aus verschiedenen Winkeln.
+
+**Der gemeinsame Grund: der Sprechlauf erkannte Angaben nur, wenn sie
+Ziffern trugen oder allein standen.**
+
+### v1358 · Die Verneinung steht nicht immer vorne
+
+`fehler 4.png`. Auf die Frage nach Investment-These, Risiken und Notizen:
+
+> **„Investmentthese habe ich keine."**
+> → *„Ich habe … verstanden, aber nichts gefunden, was hierher passt.
+> Sag es einfach nochmal."*
+
+**Zwei Sätze vorher hatte derselbe Co-Pilot dieselbe Verneinung für zwei
+andere Felder akzeptiert.**
+
+`RF_NEIN` verlangt, dass die Verneinung den **ganzen** Text ausmacht;
+`RF_NEIN_TEIL` prüft Satzteile, die **mit** der Verneinung beginnen.
+Beides passt nicht auf „Thema zuerst, Verneinung danach" — und genau so
+spricht man Deutsch: *„Balkon haben wir keinen", „Garage gibt es nicht",
+„Stellplätze sind keine".*
+
+Neu: `RF_NEIN_HINTEN` plus `_rfThemaVerneint()`. **Es genügt nicht, dass
+der Satz auf eine Verneinung endet** — er muss außerdem das *gefragte*
+Thema nennen. Die Stichworte stehen ohnehin im Katalog (`kw`) und im
+Label. „Nichts unter 300.000" bleibt damit weiter keine Verneinung, und
+ein Satz über ein anderes Feld fällt nicht fälschlich in diesen Zweig.
+
+### v1358 · Eine Null ist eine Angabe
+
+`fehler 2.png`:
+
+> **„Kannst du auch aus den Einstellungen übernehmen. Keine
+> Maklerprovision."**
+> → Die Übernahme lief, die Ausnahme fiel weg, und der Co-Pilot fragte
+> zurück, ihm fehle *„die genaue Höhe der verbleibenden
+> Kaufnebenkosten"*.
+
+Die standen im selben Atemzug in den Einstellungen, die er gerade
+übernommen hatte.
+
+Grund: `_rfRestNachAktion` reichte den Rest nur weiter, wenn er eine
+**Ziffer** trug. „Keine Maklerprovision" trägt keine — und ist trotzdem
+eine Angabe, nämlich null Prozent. **Wer „keine" sagt, hat geantwortet,
+nicht geschwiegen.** Eine blanke Verneinung ohne Gegenstand bleibt
+draußen; die ist im Zweifel die Antwort auf den Befehl selbst.
+
+### v1359 · Zwei Dinge, die gleich heißen
+
+`fehler3.png`. Marcel antwortet *„1,5 % Wertsteigerung, 2 %
+Mietsteigerung und 0 % Leerstand"* — und die **nächste** Frage fragt
+wieder nach „Wertsteigerung".
+
+**Gemessen: das ist keine Doppelfrage.** Es sind zwei verschiedene
+Felder, die fast gleich heißen:
+
+| Feld | Label | wofür |
+|---|---|---|
+| `wertstg` | „Wertsteigerung %" | die Zahl in der Prognoserechnung |
+| `ds2_wertsteigerung` | „Wertsteigerungs-Erwartung" | sehr hoch … keines, für den Score |
+
+Der Code ist also richtig, **und trotzdem hat Marcel recht**: die zwei
+Fragen stehen direkt hintereinander (Rang 14 und 15), und die zweite
+benutzt dasselbe Wort für etwas anderes. Wer das liest, denkt, er habe
+gerade geantwortet.
+
+**Ein Fehler, der keiner ist, bleibt trotzdem einer** — er kostet
+Vertrauen in jede weitere Frage. Der Co-Pilot sagt jetzt den Unterschied,
+und zwar nur dann, wenn die Zahl schon steht.
+
+### Abnahme — und was sie zusätzlich gefunden hat
+
+14 Fälle gegen die Muster **aus der Datei**, dann drei Fälle gegen die
+laufende Maschine mit ihrem echten Katalog, dann der Durchstich:
+
+```
+Frage 14 (Investment-These) · getippt: „Investmentthese habe ich keine."
+  Index danach ......................... 15   (übersprungen)
+  „nichts gefunden, was hierher passt" . erscheint nicht
+  „Sag es einfach nochmal" ............. erscheint nicht
+```
+
+**Drei eigene Fehler fielen dabei auf:**
+
+1. **Der erste Prüflauf meldete drei Fehler — die Datei war heil.** Das
+   Testskript hatte die Muster in ein Heredoc abgetippt, und das halbiert
+   Backslashes: aus `\\s` wurde `s`. Der Test prüfte eine kaputte
+   Abschrift. Seitdem liest das Skript die Muster **aus der echten
+   Datei**.
+2. **`q{}` in Perl zählt Klammern.** Eine CSS-Regel mit geschweiften
+   Klammern zerlegte den Ersatztext und hinterließ ein `},` mitten im
+   JavaScript.
+3. **`_rfThemaVerneint` warf, sobald kein Sprechlauf lief** —
+   `_rf.catalog` auf `null`. Im Betrieb kam das nie vor; der Prüfhaken
+   aus `v1359b` fand es **im ersten Aufruf**. Ein Prüfhaken, der wirft,
+   ist keiner (`v1359c`).
+
+Alle drei stehen in `FALLEN.md` beziehungsweise sind jetzt dort.
+
+### Commits
+
+`34605ba` v1358 · `aa3b23b` v1359 · `e12feae` v1359b · `8663a4c` v1359c
+
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

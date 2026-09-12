@@ -114,8 +114,8 @@ Daten und aktuellen Bearbeitungsstand."*
 |---|---|---|
 | C1 | Kontextbezogene Begrüßung: was liegt vor, was wurde erkannt, was rechnet schon, was fehlt | offen |
 | C2 | Zwei Begleitmodi: **Lernmodus** (erklärt wozu) und **Investor-Modus** (kompakt), jederzeit wechselbar | offen |
-| C3 | Sprache als vollwertige Bedienform: Rückfragen, Korrekturen, Exkurse — und danach zurück in den Prozess | offen |
-| C4 | Vor jeder Frage prüfen: **Datenbank → Dokumente → bisherige Angaben → erst dann fragen** | offen |
+| C3 | Sprache als vollwertige Bedienform: Rückfragen, Korrekturen, Exkurse — und danach zurück in den Prozess | **Teilweise erledigt v1358** — Marcels Screenshots `fehler 2/4.png`: „Investmentthese habe ich keine" galt als Nicht-Verstehen, „Keine Maklerprovision" nach einem Befehl fiel weg. Beides behoben: `RF_NEIN_HINTEN` erkennt die Verneinung **hinter** dem Thema (nur wenn der Satz das gefragte Thema nennt), `RF_NULLANGABE` lässt eine Null-Angabe ohne Ziffer durch. Der Rest von C3 (Exkurse, Rückkehr in den Prozess) bleibt offen. |
+| C4 | Vor jeder Frage prüfen: **Datenbank → Dokumente → bisherige Angaben → erst dann fragen** | **Teilweise erledigt v1359** — `fehler3.png`: nach „1,5 % Wertsteigerung" fragte die nächste Frage wieder nach „Wertsteigerung". **Gemessen: keine Doppelfrage**, sondern zwei Felder mit fast gleichem Namen (`wertstg` = Zahl für die Prognose, `ds2_wertsteigerung` = Lageeinschätzung für den Score). Der Co-Pilot sagt den Unterschied jetzt, wenn die Zahl schon steht. Die eigentliche Reihenfolge Datenbank → Dokumente → Angaben bleibt offen. |
 | C5 | Steuersatz / zu versteuerndes Einkommen: vorschlagen, bestätigen lassen, Überspringen erlauben und später zurückkommen | offen |
 | C6 | Permanenter Prozesskontext statt starrem Fragebogen | offen |
 | C7 | Datenherkunft sichtbar (Exposé / Marktbericht / berechnet / abgeleitet / selbst angegeben) + Konflikte nachfragen | offen |
