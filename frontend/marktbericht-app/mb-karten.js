@@ -146,7 +146,11 @@
         'letter-spacing:normal!important;color:var(--muted,#9a9aa3);',
         'margin:0 0 5px;line-height:1.45}',
       '.mbk-block input,.mbk-block select,.mbk-block textarea{',
-        'font-family:"DM Sans",system-ui,sans-serif;font-size:13px;',
+        /* v1346b: !important, aus demselben Grund wie bei den Labels -
+           der Hell-Skin in index.html setzt font-family fuer jedes input
+           selbst mit !important. Gemessen: DM Sans 13px angeordnet,
+           Inter 15px angekommen. */
+        'font-family:"DM Sans",system-ui,sans-serif!important;font-size:13px!important;',
         'border-radius:8px;padding:0 11px;min-height:38px;',
         'border:1px solid var(--line,#26262c)}',
       'html[data-mb-theme="light"] .mbk-block input,',
