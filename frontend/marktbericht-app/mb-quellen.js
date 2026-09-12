@@ -80,9 +80,14 @@
         'border:1px solid var(--wl-c9a84c,#C9A84C)}',
       '.mbq-vorhang-btn:hover{background:color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 14%, transparent)}',
       '.mbq-weg{display:none !important}',
-      /* Reiter, der fuer die gewaehlte Tiefe nicht gebraucht wird */
-      '.mbw-r.mbq-spaeter{opacity:.4}',
-      '.mbw-r.mbq-spaeter .n::after{content:" \\00b7 ab Stufe 3";font-size:9.5px;opacity:.8}'
+      /* v1348: das Ausblenden ganzer Reiter macht jetzt mb-wizard.js
+         (.mbw-spaeter, display:none). Zwei Mechaniken für dieselbe Sache
+         waren genau das, was uneinheitlich aussah — hier stand vorher ein
+         gedimmter Reiter mit Anhängsel „· ab Stufe 3", während der Wizard
+         ihn ganz entfernte. Der Vorhang unten bleibt: er greift, wenn der
+         Reiter trotz niedriger Tiefe sichtbar ist, weil schon etwas darin
+         ausgefüllt wurde. */
+      ''
     ].join('');
     document.head.appendChild(s);
   }
@@ -119,8 +124,9 @@
       var zuViel = stufe < noetig && !_aufgeklappt[bid];
 
       if (reiter) {
-        if (stufe < noetig) reiter.classList.add('mbq-spaeter');
-        else reiter.classList.remove('mbq-spaeter');
+        /* v1348: der Reiter selbst wird nicht mehr von hier angefasst -
+           das macht mb-wizard.js. Zwei Haende an derselben Klasse sind
+           genau die Uneinheitlichkeit, die aufgefallen ist. */
       }
 
       /* Die Inhalte verbergen, NICHT entfernen — Eingaben bleiben. */
@@ -141,7 +147,7 @@
       if (alt) return;
 
       var box = document.createElement('div');
-      box.className = 'mbq-vorhang';
+      box.className = 'mbq-vorhang mb-zurueck';
       var p = document.createElement('div');
       p.innerHTML = '<b>Diese Angaben brauchst du für die gewählte Tiefe nicht.</b><br>'
         + 'Liegenschaftszins, Sachwertfaktor und Bodenrichtwert gehen nur in die '
@@ -149,7 +155,7 @@
         + 'ändern sie nichts — du kannst sie leer lassen.';
       var btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'mbq-vorhang-btn';
+      btn.className = 'mbq-vorhang-btn mb-auf';
       btn.textContent = 'Trotzdem ausfüllen';
       btn.addEventListener('click', function () { _aufgeklappt[bid] = 1; vorhang(); });
       box.appendChild(p);
