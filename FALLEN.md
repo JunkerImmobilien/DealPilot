@@ -2846,3 +2846,27 @@ dieselbe Falle wie beim Prüfkatalog in v1307.
 **Vor einem Schema-Umbau das Format lesen, das der bestehende Code
 erwartet** — nicht das, das man selbst für richtig hält. Ein Blick auf
 `Object.keys(parsed).forEach` hätte gereicht.
+
+## „Steht im Formular" ist nicht eine Herkunft, sondern drei
+
+Die Stand-Box färbte einen Block nur grün, wenn ein Wert **nicht** aus dem
+Formular kam. Das war als Schutz gedacht und ist es auch: ein Zinssatz von
+3,5 % aus dem Investmentprofil ist keine Angabe zu *diesem* Objekt, und wer
+ihn grün sieht, hält eine Frage für beantwortet, die niemand gestellt hat
+(v1273c).
+
+Nur trifft dieselbe Regel drei verschiedene Dinge:
+
+| Herkunft | ist es eine Angabe zu diesem Objekt? |
+|---|---|
+| Vorbelegung aus dem Profil | **nein** — grau |
+| Wert aus dem Exposé / Marktbericht | **ja** — grün |
+| vom Nutzer selbst getippt | **ja** — grün |
+
+Alle drei stehen am Ende im selben `<input>`. Die Unterscheidung lag längst
+vor (`_vorlaufFelder`, seit v1293) — sie wurde für die Färbung nur nie
+gelesen.
+
+**Regel: Bevor man „kommt aus dem Formular" als Ausschlusskriterium
+benutzt, prüfen, wie viele verschiedene Wege in dieses Formular führen.**
+Ein Speicherort ist keine Herkunft.
