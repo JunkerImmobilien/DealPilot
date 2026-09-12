@@ -632,13 +632,35 @@
      ueberall mit „Modellprojektion" gekennzeichnet. */
   var ASSUMP={mietWg:0.015,bwkWg:0.02,wertWg:0.02,afaRate:0.02,gebAnteil:0.8,zinsApprox:0.035};
   var ZVE_BASE=78000;
+  /* ═══ v1361 · EIN TARIF, NICHT ZWEI ═══════════════════════════════════
+     Hier stand eine zweite, eigene Fassung des §-32a-Tarifs. Sie ist
+     nicht nur ueberfluessig - sie war bereits AUSEINANDERGELAUFEN. Beide
+     Fassungen durchgerechnet, Code aus den echten Dateien gelesen:
+
+       Grundfreibetrag   tax.js 11.604   ·   hier 11.784
+       Rundung           tax.js floor    ·   hier round
+
+     Die Folge, gemessen an neunzehn Stuetzstellen: bis zu 43 EUR
+     Abweichung in der Eingangszone und 1 EUR ueberall dort, wo die
+     Rundung kippt. § 32a EStG schreibt ABRUNDUNG vor - `tax.js` macht es
+     richtig, diese Fassung nicht.
+
+     Der Betrag ist klein, der strukturelle Fehler nicht: wer den Tarif
+     aktualisiert, muss es sonst an zwei Stellen tun, und die zweite
+     vergisst man. Genau so ist der Unterschied entstanden.
+
+     CLAUDE.md sagt es unter „Rechenkerne - nie duplizieren". Der Tarif
+     kommt jetzt aus `Tax.calcEStG()`; tax.js laedt 110 Zeilen vor dieser
+     Datei, ist also immer da. Faellt es doch einmal aus, sagt die Konsole
+     es - statt still eine andere Zahl zu rechnen als der Rest der App. */
   function estg2026(zve){
-    zve=Math.floor(zve); if(zve<=11784)return 0;
-    if(zve<=17005){var y=(zve-11784)/10000;return Math.round((922.98*y+1400)*y);}
-    if(zve<=66760){var z=(zve-17005)/10000;return Math.round((181.19*z+2397)*z+1025.38);}
-    if(zve<=277825)return Math.round(0.42*zve-10602.13);
-    return Math.round(0.45*zve-18936.88);
+    if (typeof Tax !== 'undefined' && Tax && typeof Tax.calcEStG === 'function') {
+      return Tax.calcEStG(zve);
+    }
+    console.warn('[v1361] Tax.calcEStG fehlt - Modellprojektion ohne Steuertarif');
+    return 0;
   }
+
   function projectAll(years){
     var arr=detailArr(); var rows=[]; var cumCf=0;
     var vuvY1=arr.reduce(function(s,o){return s+(num(o._kpis_vuv)||0);},0);
