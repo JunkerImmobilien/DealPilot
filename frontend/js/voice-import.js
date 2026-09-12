@@ -3838,7 +3838,11 @@
     /* Nennt der Satz das, wonach gerade gefragt ist? */
     var klein = t.toLowerCase().replace(/[^a-zäöüß0-9\s-]/g, ' ');
     for (var i = 0; i < e.ids.length; i++) {
-      var kat = (_rf.catalog || []).filter(function (c) { return c.id === e.ids[i]; })[0];
+      /* v1359c: (_rf && _rf.catalog) statt _rf.catalog - der Pruefhaken aus
+         v1359b ruft die Funktion OHNE laufenden Sprechlauf auf, und dann
+         ist _rf null. Im Betrieb kam das nie vor, aber ein Pruefhaken,
+         der wirft, ist keiner. */
+      var kat = ((_rf && _rf.catalog) || []).filter(function (c) { return c.id === e.ids[i]; })[0];
       if (!kat) continue;
       var woerter = (kat.kw || []).slice();
       if (kat.label) {
