@@ -15080,6 +15080,119 @@ stehen gelassen — wäre schlechter als beides. Marcel entscheidet.
 `051e003` v1360
 
 
+## v1361 – v1363 · B2 ohne Einschränkungen
+
+Marcels Vorgabe für den weiteren Weg: *„alles muss genauso funktional
+bleiben wie bisher. es darf keine einschränkungen geben."*
+
+Das schließt den naheliegenden nächsten Schritt aus — den Deal Score
+serverseitig zu rechnen, denn das kostet Latenz bei jeder Eingabe. Also
+zuerst das, was Schutz bringt, **ohne irgendetwas zu verändern**: die
+Duplikate.
+
+### v1361 · Ein Steuertarif, nicht zwei
+
+`dashboard.js` trug eine zweite, eigene Fassung des § 32a EStG. Sie war
+nicht nur überflüssig — **sie war bereits auseinandergelaufen.** Beide
+Fassungen durchgerechnet, Code aus den echten Dateien gelesen statt
+abgetippt:
+
+| | `tax.js` | `dashboard.js` |
+|---|---|---|
+| Grundfreibetrag | 11.604 | **11.784** |
+| Rundung | `Math.floor` | **`Math.round`** |
+
+Neunzehn Stützstellen gerechnet: bis zu **43 €** Abweichung in der
+Eingangszone, **1 €** überall dort, wo die Rundung kippt. **§ 32a EStG
+schreibt Abrundung vor** — `tax.js` macht es richtig, die Kopie nicht.
+
+Der Betrag ist klein, der strukturelle Fehler nicht: wer den Tarif
+aktualisiert, muss es sonst zweimal tun, und die zweite Stelle vergisst
+man. **Genau so ist der Unterschied entstanden.** `CLAUDE.md` sagt es
+unter „Rechenkerne — nie duplizieren".
+
+> **Noch offen und für Marcel:** es gibt eine **dritte** Stelle mit
+> Steuerlogik — `rnd-calc.js:492` schätzt den *Grenzsteuersatz* (eine
+> andere Größe, kein Tarif) und benutzt dafür die Zonengrenzen
+> 12.096 / 17.443 / 68.480. Damit stehen im Code **drei verschiedene
+> Grundfreibeträge**: 11.604, 11.784, 12.096. `tax.js` trägt dabei den
+> Kommentar „Tarif 2026". Welcher Jahrgang gelten soll, ist eine
+> Fachfrage — sie gehört Marcel, nicht mir.
+
+### v1362 · Erst rechnen, dann anzeigen
+
+**Gemessen, bevor etwas geändert wurde:** eine einzige Eingabe im
+Kaufpreisfeld löste **acht** Score-Berechnungen aus, über drei Wege:
+
+```
+3x  updHeaderBadges       (calc.js:174)
+2x  _dpComputeDS2Cached   (calc.js:4031)
+2x  renderDealScore2      (dealscore2-ui.js:340)
+1x  weiterer Durchlauf
+```
+
+Die Entprellung von rund zwei Sekunden greift — die Mehrfachrechnung
+**innerhalb** einer Runde nicht.
+
+Die Ursache stand offen da: in `_calcImmediate` kam `updHeaderBadges()`
+**vor** `_dpComputeDS2Cached()` und acht Zeilen später noch einmal, mit
+dem Kommentar „Header neu mit gecachtem Wert". **Der zweite Aufruf war
+der Beleg, dass der erste zu früh kam** — `updHeaderBadges` liest den
+Cache und rechnet nur selbst, wenn er leer ist. Vor dem Cache-Aufruf war
+er das immer.
+
+### v1363 · Denselben Score nicht zweimal rechnen
+
+Übrig blieben vier, zwei davon aus `renderDealScore2`.
+`_dpComputeDS2Cached()` rechnet unmittelbar vorher **exakt dasselbe** —
+derselbe `_buildDeal2FromState()`, dieselbe `compute()`. Es legt jetzt
+Ergebnis, Deal und Zeitpunkt ab; `renderDealScore2` nimmt den frischen
+Cache.
+
+**Warum ein Zeitfenster und kein schlauer Vergleich:** „stammt dieser
+Cache aus demselben Zustand?" lässt sich nicht zuverlässig prüfen, ohne
+den Zustand selbst zu vergleichen — und das wäre teurer als die Rechnung.
+**300 ms** sind kurz genug, dass in der Zwischenzeit keine Eingabe
+passiert sein kann, ohne dass `calc()` erneut lief und den Cache
+erneuert hätte. Ist er älter oder fehlt er, wird wie bisher gerechnet.
+
+Nebenbei die zweite Doppelliste entschärft: **`_dpLastDs2` und
+`_dpLastDS2Result`** — zwei Cache-Namen, die sich nur in einem
+Buchstaben unterscheiden. `_dpLastDs2` (gelesen von `ui.js:799`) entstand
+bisher eigenständig in `dealscore2-ui.js`; es wird jetzt im Cache
+mitgesetzt. Zwei Namen bleiben zwei Namen, aber sie haben **eine
+Quelle**.
+
+### Das Ergebnis, gemessen
+
+```
+8 Berechnungen (Ausgang)  ->  4 (v1362)  ->  2 (v1363)
+```
+
+Gegenprobe am selben Objekt: Kaufpreis von 288.000 auf 265.000 gesenkt,
+Score steigt von **72 auf 79** — die Rechnung reagiert also weiterhin,
+und plausibel. Die Kaufgrenzen aus `v1356/v1357` stehen unverändert.
+
+**Keine Einschränkung an irgendeiner Stelle.** Dieselben Werte, nur
+einmal statt viermal gerechnet.
+
+### Warum das für B2 zählt
+
+Jede dieser Berechnungen wäre bei einer Serververlagerung **eine
+Anfrage**. Das Limit liegt bei 100 pro Minute (gemessen per `printenv`).
+Mit acht Anfragen je Eingabe wäre jede Verlagerung von vornherein
+unmöglich gewesen; mit einer ist sie machbar — **die Serverrunde
+dauert 34 ms**, gemessen gegen `/ai/status`.
+
+Das ist der eigentliche Ertrag dieser drei Pakete: nicht der gesparte
+Rechenaufwand, sondern dass der Weg zum Backend jetzt überhaupt offen
+steht.
+
+### Commits
+
+`7daeae0` v1361 · `5af0379` v1362 · `9a15087` v1363
+
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
