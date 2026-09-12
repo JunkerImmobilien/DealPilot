@@ -383,18 +383,22 @@ function schemaAusKatalog(catalog) {
   }
   if (!required.length) return null;
 
-  /* `_unsicher` trägt die Ids, bei denen sich das Modell nicht sicher war.
-     Der Code liest das seit Langem — es gehört also ins Schema, sonst
-     dürfte es gar nicht mehr kommen. */
-  return {
-    type: 'object',
-    additionalProperties: false,
-    required: ['fields', '_unsicher'],
-    properties: {
-      fields: { type: 'object', additionalProperties: false, required, properties: props },
-      _unsicher: { type: 'array', items: { type: 'string' } },
-    },
-  };
+  /* ═══ DIE FELDER STEHEN FLACH, NICHT UNTER "fields" ═════════════
+     Gemessen und teuer bezahlt: mein erstes Schema legte die Felder
+     unter eine Ebene `fields`. Das Modell lieferte sauber
+     {"fields":{"kp":300000,...}} - und der Code darunter liest
+     Object.keys(parsed) FLACH. Er fand "fields" und "_unsicher", beide
+     keine Feld-Id, und verwarf alles. Ergebnis: {} bei jeder Extraktion.
+
+     Ich hatte das Schema an meinem eigenen Testaufbau gebaut statt am
+     bestehenden Prompt. Genau die Falle aus FALLEN.md: ein Pruefaufbau,
+     der nachahmt, misst sich selbst.
+
+     `_unsicher` traegt die Ids, bei denen sich das Modell nicht sicher
+     war - der Code liest es, also gehoert es ins Schema. */
+  props._unsicher = { type: 'array', items: { type: 'string' } };
+  required.push('_unsicher');
+  return { type: 'object', additionalProperties: false, required, properties: props };
 }
 
 /* Das `text.format`-Feld für die Responses-API. Gibt null zurück, wenn
