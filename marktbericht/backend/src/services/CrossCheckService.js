@@ -666,7 +666,26 @@ export const CrossCheckService = {
         lzs_herabgestuft: !!p.lzs_herabgestuft,
         lzs_streuung_pp: p.lzs_streuung_pp != null ? p.lzs_streuung_pp : null,
         lzs_massstab: p.lzs_massstab || null,
-        bog_eur: _num(p.bog_eur), bog_grund: p.bog_grund || null,
+        /* === v1338d - `_num` VERWIRFT JEDE NEGATIVE ZAHL ===============
+           `const _num = (v) => Number.isFinite(n) && n > 0 ? n : null` - der
+           Helfer heisst 'Zahl' und bedeutet 'Zahl groesser null'. Fuer
+           Flaechen und Mieten ist das richtig. Fuer `bog_eur` ist es toedlich:
+           besondere objektspezifische Grundstuecksmerkmale sind fast immer
+           ein ABZUG, also negativ. `_num(-18000)` gab null.
+
+           GEMESSEN am Bericht 116 (12.09.2026): `bog_eur: -18000` stand im
+           ref, kam durch den ganzen Orchestrator bis hierher - und wurde in
+           dieser einen Zeile stillschweigend zu null. Die Ertragswert-Staffel
+           endete beim vorlaeufigen Ertragswert, ohne ein Wort dazu.
+
+           Das Feld gibt es seit WPDF12; es hat also NIE funktioniert, ausser
+           bei einem Zuschlag. Aufgefallen ist es erst, als v1338 ein
+           Eingabefeld dafuer bekam - vorher konnte es niemand fuellen. */
+        bog_eur: (function () {
+          const n = Number(p.bog_eur);
+          return Number.isFinite(n) && n !== 0 ? n : null;
+        })(),
+        bog_grund: p.bog_grund || null,
       };
       /* v1048-WMOD-3 */
       const _hatModell = ['agvga_nrw_2016'].indexOf(String(p.modellversion || '')) >= 0;
