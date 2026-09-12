@@ -259,7 +259,48 @@
     return null;
   }
 
+  /* === v1335 - "1 x MPI" ist ein PREIS, kein Kontingent ===============
+     Marcels Befund: "Dann gefaellt mir hinter den Bericht
+     auswahlmoeglichkeiten die Anzeige 1xMPI, 1xMPI+ und 1xWEV nicht.
+     damit kann ich nichts anfangen. Schreib doch dahinter wieviele noch
+     zu verfuegung stehen."
+
+     Er hat recht, und zwar doppelt. Erstens sagt das Kuerzel niemandem
+     etwas, der es nicht selbst erfunden hat. Zweitens - und das ist der
+     eigentliche Punkt - stand dort ein PREIS, wo der Nutzer einen
+     BESTAND erwartet. Wie viele Bewertungen noch frei sind, erfuhr er
+     bisher erst NACH dem Klick, wenn der Server mit 402 antwortet
+     (app.js:495 -> _zeigeKaufAngebot). Das ist genau die falsche
+     Reihenfolge: die teure Entscheidung faellt vorher.
+
+     Der Bestand steht in /ai/credits - dieselbe Quelle wie die Pille in
+     der Kopfleiste der Haupt-App (js/ai-credits.js). Der Bericht laeuft
+     im iframe unter demselben Origin und mit demselben Token; ein
+     eigener Zaehler waere eine zweite Wahrheit. */
+  var _rest = null;
+  function restHolen() {
+    var tok = null; try { tok = localStorage.getItem('ji_token'); } catch (e) {}
+    if (!tok) return Promise.resolve(null);
+    return fetch('/api/v1/ai/credits', { headers: { Authorization: 'Bearer ' + tok } })
+      .then(function (x) { return x.ok ? x.json() : null; })
+      .then(function (d) {
+        /* `Number(null)` ist 0 und besteht Number.isFinite - erst auf
+           Abwesenheit pruefen, dann rechnen. */
+        if (!d || !d.arten) { _rest = null; return null; }
+        _rest = d.arten;
+        zeichnen();
+        return d;
+      })
+      .catch(function () { _rest = null; return null; });
+  }
+  function restFuer(art) {
+    if (!_rest || !_rest[art]) return null;
+    var v = _rest[art].rest;
+    return (v == null) ? null : v;
+  }
+
   function preisHolen() {
+
     var r = ref();
     var url = '/api/v1/marktbericht/stufenpreis' + (r ? ('?ref=' + encodeURIComponent(r)) : '');
     var tok = null; try { tok = localStorage.getItem('ji_token'); } catch (e) {}
@@ -297,7 +338,17 @@
      dasselbe lesen. */
   function preisText(k) {
     if (!k || k.anzahl === 0) return 'bezahlt';
-    return k.anzahl + ' × ' + (ART_KURZ[k.art] || k.art);
+    return k.anzahl + ' \u00d7 ' + (ART_KURZ[k.art] || k.art);
+  }
+  /* v1335: Was die Stufe kostet UND was davon noch da ist. Ohne Bestand
+     (kein Token, Server stumm) bleibt es beim Preis allein - eine Zahl
+     zu erfinden waere schlimmer als keine zu zeigen. */
+  function bestandText(k) {
+    if (!k || k.anzahl === 0) return '';
+    var r = restFuer(k.art);
+    if (r == null) return '';
+    if (r <= 0) return '<span class="mbst-leer">keine mehr frei</span>';
+    return '<span class="mbst-frei">noch ' + r + ' frei</span>';
   }
   function preisTextLang(k) {
     if (!k || k.anzahl === 0) return 'ohne Aufpreis';
@@ -331,6 +382,8 @@
       '.mbst-zeile{display:flex;gap:8px;align-items:baseline}',
       '.mbst-name{font-size:12.5px;font-weight:600;opacity:.7}',
       '.mbst-ms.an .mbst-name{opacity:1}',
+      '.mbst-frei{color:#3FA56C;font-size:10.5px;margin-left:6px;white-space:nowrap}' +
+      '.mbst-leer{color:#D8564C;font-size:10.5px;margin-left:6px;white-space:nowrap;font-weight:600}' +
       '.mbst-kero{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:11px;',
         'font-weight:600;color:var(--wl-c9a84c,#C9A84C);white-space:nowrap}',
       '.mbst-was{font-size:10.5px;line-height:1.45;opacity:.6;margin-top:2px}',
@@ -523,7 +576,7 @@
         '<div class="mbst-pkt">' + (dieseWahl ? '●' : (fertig ? '✓' : n)) + '</div>' +
         '<div class="mbst-txt">' +
           '<div class="mbst-zeile"><span class="mbst-name">' + NAMEN[n] + '</span>' +
-            '<span class="mbst-kero">' + preisText(k) + '</span></div>' +
+            '<span class="mbst-kero">' + preisText(k) + bestandText(k) + '</span></div>' +
           unten +
         '</div></div>';
     }).join('');
@@ -623,6 +676,7 @@
     _letzte = 0;
     melden();
     preisHolen();
+    restHolen();   /* v1335 */
     /* Objektwechsel im Dropdown -> neuer Preis. */
     var sel = document.querySelector('#mbow-host select');
     if (sel) sel.addEventListener('change', function () { setTimeout(preisHolen, 300); });
@@ -635,6 +689,7 @@
     erreicht: erreicht, zeichnen: zeichnen, preisHolen: preisHolen,
     gewaehlt: gewaehlt, offenFuer: offenFuer,          /* v1202 */
     einheitenVorbelegen: einheitenVorbelegen,          /* v1333b */
+    restHolen: restHolen,                             /* v1335 */
     _stand: function () { return { erreicht: erreicht(), gewaehlt: gewaehlt(), offen: offenFuer(), bezahlt: _bezahlt, kosten: _kosten, faellig: _faellig }; }
   };
 })();
