@@ -3124,3 +3124,32 @@ Container. Eine Messung im Container prüft den Dienst, nicht die Kette.
 
 Backend-Änderung heißt hier außerdem: `--build backend`, nicht
 `--build mb-backend`.
+
+## 143 · Ein Feld, das niemand liest, sieht aus wie ein Feld
+
+Zehn Eingabefelder des Marktberichts — Energieträger, Heizung, Verglasung,
+Bodenbelag, Bad, Gäste-WC, Keller, Außenwände, Dachform, Dacheindeckung —
+standen in **keiner Datenliste** des `ReportOrchestrator`. Das Formular
+schickte sie, das Backend nahm sie nicht auf, sie bewirkten nichts.
+
+Aufgefallen ist es **dem Nutzer**, nicht uns: *„da gebe ich vlt werte an
+die ich nicht bräuchte und garnicht mit einfließen."*
+
+Sie stammten aus der Zeit eines externen Bewertungsdienstes. Als wir auf
+eigene Rechnung umstellten, blieben die Felder stehen — sichtbar,
+ausfüllbar, wirkungslos.
+
+**Ein Rest zeigte, wohin sie gehört hätten:** eine fertige Zuordnungstabelle
+in `immowertv.js`, ohne einen einzigen Leser. Sie zielte allerdings auf die
+FALSCHE Anlage (Anlage 2, Modernisierungspunkte statt Anlage 4,
+Standardstufe) — eine halbfertige Spur ist nicht dasselbe wie eine richtige.
+
+**Regeln:**
+- **Wird ein externer Dienst abgelöst, gehören seine Eingabefelder auf den
+  Prüfstand** — entweder sie bekommen einen neuen Leser oder sie
+  verschwinden. Ein Feld ohne Wirkung kostet den Nutzer Zeit und Vertrauen.
+- Vor jeder Behauptung „das Feld verbessert das Ergebnis" **den Leser
+  suchen**, nicht den Namen. `grep` nach dem Feldnamen in den
+  Bewertungsdiensten kostet eine Minute.
+- Eine gefundene Zuordnungstabelle ohne Leser ist ein **Hinweis**, keine
+  Lösung: prüfen, ob sie überhaupt auf die richtige Rechtsgrundlage zeigt.

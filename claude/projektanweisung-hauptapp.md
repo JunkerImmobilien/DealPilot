@@ -14112,6 +14112,96 @@ geraten.
 `d9eea6a` v1343 · `bacb766` v1343b · `79a0563` v1344 · `6edf83d` v1344b ·
 `a02d18c` v1344c · `f3d6313` v1344d
 
+## v1345–v1345b · Die Ausstattungsfelder wirken jetzt — 13.09.2026
+
+**Marcels Einwand war richtig, und er saß genauer als meine Antwort darauf.**
+Ich hatte behauptet, Zustand und Ausstattung verbesserten auch die einfache
+Marktpreisindikation. Für den Zustand stimmt das; für zehn andere Felder
+nicht.
+
+### Der Befund
+
+| Feld | fließt ein? | wo |
+|---|---|---|
+| `cond` Zustand | **ja** | `ValuationService:65`, Teilprodukt gedeckelt auf 0,82–1,22 |
+| `quality`, `modern`, `modyear` | ja | derselbe Block |
+| `energy`, `floor` | ja | eigene Faktoren |
+| `balcony`, `garden`, `elevator`, `baths` | ja | Amenity-Faktor |
+| **die zehn `eq_*`-Felder** | **NEIN** | **standen in KEINER Datenliste des Orchestrators** |
+
+Energieträger, Heizung, Verglasung, Bodenbelag, Bad, Gäste-WC, Keller,
+Außenwände, Dachform, Dacheindeckung — das Formular schickte sie, das
+Backend nahm sie nicht auf. Sie stammen aus der Zeit, als ein externer
+Bewertungsdienst sie bekam (v736-mb-eq); seit wir selbst rechnen, liefen
+sie ins Leere.
+
+Ein Rest verriet, wohin sie gehört hätten: `immowertv.js` führt eine
+fertige Tabelle `eq_roof → dach_inkl_daemmung` … **ohne einen einzigen
+Leser.** Sie zielt allerdings auf **Anlage 2** (Modernisierungspunkte) —
+und das ist der falsche Platz. „Dreifachverglasung" sagt etwas über den
+STANDARD, nicht über eine Modernisierung. Der richtige Platz ist
+**Anlage 4** (Standardstufe).
+
+### Was gebaut wurde
+
+Neue `lib/ausstattung_stufen.js`: aus sechs Feldern entsteht ein
+Standardstufen-**Vorschlag** je Gewerk.
+
+```
+aussenwaende 23 · dach 15 · fenster_tueren 11 · sanitaer 9 ·
+heizung 9 · fussboeden 5              = 72 von 100 Wägungsanteilen
+```
+
+**Drei Grenzen, die ausdrücklich eingehalten werden:**
+
+1. **Stufe D, nicht amtlich.** Die Zuordnung „Dreifachverglasung → Stufe 4"
+   ist eine sachverständige Einordnung, kein Abdruck aus Anlage 4. Der
+   Vermerk steht am Ergebnis.
+2. **Die eigene Angabe gewinnt immer** — auch wenn sie niedriger ist. Ein
+   Vorschlag, der eine Eingabe überschreibt, ist kein Vorschlag.
+3. **72 Anteile ergeben KEINE Standardstufe.** `standardstufeAusGewerken()`
+   verlangt volle 100; die restlichen drei Gewerke bleiben eine
+   Einschätzung. Aus 72 hochzurechnen wäre eine Behauptung.
+
+**Gemessener Lauf:**
+
+```
+einfaches Haus   {aussenwaende:2, dach:1, fenster:1, sanitaer:2, heizung:1, boeden:1}
+gehobenes Haus   {aussenwaende:3, dach:4, fenster:4, sanitaer:5, heizung:5, boeden:4}
+  - Gäste-WC hebt die Sanitärstufe von 4 auf 5
+  - Energieträger hebt die Heizungsstufe von 4 auf 5
+Abdeckung        72 von 100  ->  stufe: null, Grund genannt
+mit den drei     stufe 4 (roh 3,95)
+eigene Angabe    Vorschlag 3 -> genommen 2 (eigene_angabe)
+```
+
+### Dazu: was ein Feld bewirkt, steht am Feld
+
+17 Wirkungszeilen unter den Eingabefeldern — „Zustand, Qualität und
+Modernisierung wirken zusammen bis ±22 % auf den Marktwert", „+2 %, wenn
+vorhanden", „Geht in die Standardstufe ein (Wägungsanteil 23 — der größte)".
+Die Zahlen sind aus `ValuationService.js` gemessen, nicht geschätzt.
+
+### v1345b, eigener Fehler
+
+`cond`, `energy` und `baths` landeten in **keinem** Block. Die Sicherung aus
+v1340d hatte recht: `cond` und `energy` stehen in DERSELBEN `.row`, ich
+hatte sie auf zwei Gruppen verteilt — eine Zeile mit Feldern zweier Gruppen
+wird von beiden verworfen. Die Gruppen folgen jetzt den tatsächlichen
+Zeilen UND der Reiter-Zuordnung.
+
+Und noch einmal die Backslash-Falle aus FALLEN 140: `\u00e4` im
+perl-Ersatz wurde zu `00e4`. Diesmal mit echten Umlauten geschrieben.
+
+### Abnahme
+
+17 Wirkungszeilen, keine fehlt · keine doppelten Ids · 10 Blöcke mit
+korrekten Umlauten · Zähler arbeiten.
+
+### Commits
+
+`9b2226b` v1345 · `f1fc6d6` v1345b
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
