@@ -182,6 +182,10 @@ export const CrossCheckService = {
          * lag dadurch rund 50.000 EUR zu niedrig. Liegen
          * Modernisierungspunkte vor, gilt Anlage 2 fuer BEIDE. */
         gnd_jahre: GND_JAHRE, rnd_jahre: _rndEinheitlich(),
+        /* v1337: der Hinweis steht NACH rnd_jahre - _rndEinheitlich()
+           setzt ihn, und Objektliterale werten in Quelltextreihenfolge
+           aus. Umgekehrt waere er null. */
+        rnd_hinweis: _rndHerkunft.hinweis,
         bes_bauteile: (p && p.bes_bauteile) || null, aussenanlagen: (p && p.aussenanlagen) || null,
         /* v1074-WAUS9-5 · Kette. */
         ausstattung: (p && p.ausstattung) || ref.ausstattung || null,
@@ -239,6 +243,10 @@ export const CrossCheckService = {
             objektart: ref.property_type, baupreisindex: BAUPREISINDEX,
             regionalfaktor: (p && p.regionalfaktor) || null,
             gnd_jahre: GND_JAHRE, rnd_jahre: _rndEinheitlich(),
+        /* v1337: der Hinweis steht NACH rnd_jahre - _rndEinheitlich()
+           setzt ihn, und Objektliterale werten in Quelltextreihenfolge
+           aus. Umgekehrt waere er null. */
+        rnd_hinweis: _rndHerkunft.hinweis,
             bes_bauteile: (p && p.bes_bauteile) || null,
             aussenanlagen: (p && p.aussenanlagen) || null,
             /* v1074-WFIX-1 · Der zweite Lauf (mit amtlichem Sachwertfaktor)

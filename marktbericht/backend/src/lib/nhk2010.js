@@ -774,7 +774,36 @@ export function sachwert(ein, bodenwertErgebnis, param) {
   const gnd = Number(ein.gnd_jahre), rnd = Number(ein.rnd_jahre);
   if (!gnd || rnd == null) { out.grund = 'Ohne Rest- und Gesamtnutzungsdauer kein Sachwert.'; return out; }
   const minderung = Math.round(herst * ((gnd - rnd) / gnd));
-  out.staffel.push({ pos: `− Alterswertminderung (${gnd - rnd} von ${gnd} Jahren)`, wert: -minderung, summe: true });
+  /* === v1337 - DIE ALTERSWERTMINDERUNG ZEIGT IHREN RECHENWEG =========
+     Marcels Frage: "Dann sehe ich im Gutachten Alterswertminderung. Wie
+     kommt die zustande? Pruef mal ob das ueberhaupt richtig ist."
+
+     Die Rechnung ist richtig - linear nach Paragraf 38 Abs. 1 ImmoWertV,
+     gegen echte Faelle nachgerechnet (Bj 1968, GND 80, Stichtag 2026:
+     RND 22, Minderung 72,5 %; Neubau 0 %; Bj 1900 100 %). Die Zeile sagte
+     nur nicht, WIE. "22 von 80 Jahren" nennt zwei Zahlen und verschweigt
+     den Bruch, der daraus wird - und die Garage direkt darunter fuehrt
+     laengst ein `detail` mit ihrem Rechenweg. Dieselbe Staffel, zwei
+     Massstaebe.
+
+     Der Hinweis zur Restnutzungsdauer kommt aus dem CrossCheckService
+     (`restnutzungsdauer_herkunft.hinweis`, seit v1052). Er wurde bisher
+     geliefert und NIRGENDS gelesen - dasselbe Muster wie bei
+     dealpilot_marktbewertung und `ref` im Orchestrator. Er gehoert genau
+     hierhin: die Restnutzungsdauer entscheidet ueber die Minderung, und
+     ob sie nach Anlage 2 abgeleitet oder nur geschaetzt ist, aendert das
+     Ergebnis um Zehntausende. */
+  const _awmProzent = Math.round(((gnd - rnd) / gnd) * 1000) / 10;
+  let _awmDetail = herst.toLocaleString('de-DE') + ' \u20ac \u00d7 (' + gnd + ' \u2212 ' + rnd
+    + ') / ' + gnd + ' = ' + String(_awmProzent).replace('.', ',') + ' % '
+    + '\u2014 linear nach \u00a7 38 Abs. 1 ImmoWertV';
+  if (ein.rnd_hinweis) _awmDetail += '. ' + String(ein.rnd_hinweis);
+  out.staffel.push({
+    pos: `\u2212 Alterswertminderung (${gnd - rnd} von ${gnd} Jahren)`,
+    detail: _awmDetail,
+    wert: -minderung, summe: true,
+  });
+
 
   let geb = herst - minderung;
   const bes = Number(ein.bes_bauteile) || 0;
