@@ -222,15 +222,48 @@ function eingabeBruecke(o) {
  * "das Register fuehrt ohnehin nur einen Zweig, dann nimm den" — das waere
  * ein stiller Rueckfall und wuerde einer Eigentumswohnung den Faktor fuer
  * Einfamilienhaeuser geben. */
+/* === v1341 - HIER STANDEN ECHTE BACKSPACE-ZEICHEN ===================
+   In dieser Tabelle standen an zwanzig Stellen BACKSPACE-Zeichen (0x08),
+   wo eine Wortgrenze \\b hingehoert. Der Unterschied ist im Editor,
+   in `grep` und selbst in `String(regex)` UNSICHTBAR:
+
+     String(Z[7][0])  ->  /einfamilien|efh|freistehend/i      sieht richtig aus
+     Z[7][0].test("Einfamilienhaus")  ->  true
+     Z[7][0].test("EFH")              ->  FALSE
+
+   Sichtbar wurde es erst ueber `JSON.stringify` (dort wird 0x08 als \\b
+   ausgegeben) und ueber `file`, das die Datei die ganze Zeit mit
+   "with overstriking" gemeldet hat - zweimal ueberlesen.
+
+   WAS DAS ANGERICHTET HAT: unsere Oberflaeche liefert Kurzformen (EFH,
+   ETW, MFH, RH, DHH). Genau die wurden von dieser Tabelle NIE erkannt.
+   Nur wenn der Registerzweig zufaellig gleich hiess wie die Kurzform in
+   Kleinschrift, griff der direkte Weg davor.
+
+   GEMESSEN am 12.09.2026 mit ptype "EFH":
+
+     Remscheid  (Zweig "efh")   -> 1,08     direkter Weg, ging
+     Olpe       (Zweig "efh")   -> 0,92     direkter Weg, ging
+     Potsdam    (Zweig "ezfh")  -> NICHTS   "objektart_nicht_abgeleitet"
+     Uckermark  (Zweig "ezfh")  -> NICHTS
+
+   Mit `objektart: "ezfh"` liefert Potsdam 1,06. Der Faktor lag also die
+   ganze Zeit im Register und der Bericht meldete "kein Sachwertfaktor
+   abgeleitet" - eine Fehlanzeige, die wie ein Befund aussieht.
+
+   Wer diese Tabelle anfasst: Escape-Sequenzen NIE tippen, immer
+   generieren. Ein Werkzeug, das \\b als Steuerzeichen liest, hinterlaesst
+   genau diesen Schaden, und er ueberlebt jedes Gegenlesen. */
 const ZWEIG_VORZUG = [
-  [/eigentumswohnung|etw|whg|wohnung/i, ['etw', 'we', 'wohnung']],
-  [/mehrfamilien|mfh/i, ['mfh', 'mfh_bis6', 'mfh_ueber6']],
-  [/dreifamilien|dreifh/i, ['dreifh']],
-  [/reihenmittel|rmh/i, ['rmh', 'rh', 'rhdhh']],
-  [/reihenend|doppelhaus|dhh|reh/i, ['rhdhh', 'dhh', 'reh', 'rh']],
-  [/reihenhaus|rh/i, ['rh', 'rhdhh', 'rmh']],
-  [/zweifamilien|zfh/i, ['zfh', 'ezfh']],
-  [/einfamilien|efh|freistehend/i, ['efh', 'ezfh']],
+
+  [/eigentumswohnung|\betw\b|\bwhg\b|wohnung/i, ['etw', 'we', 'wohnung']],
+  [/mehrfamilien|\bmfh\b/i, ['mfh', 'mfh_bis6', 'mfh_ueber6']],
+  [/dreifamilien|\bdreifh\b/i, ['dreifh']],
+  [/reihenmittel|\brmh\b/i, ['rmh', 'rh', 'rhdhh']],
+  [/reihenend|doppelhaus|\bdhh\b|\breh\b/i, ['rhdhh', 'dhh', 'reh', 'rh']],
+  [/reihenhaus|\brh\b/i, ['rh', 'rhdhh', 'rmh']],
+  [/zweifamilien|\bzfh\b/i, ['zfh', 'ezfh']],
+  [/einfamilien|\befh\b|freistehend/i, ['efh', 'ezfh']],
   [/fertighaus/i, ['fertighaus']],
 ];
 
@@ -658,8 +691,10 @@ export function erbbaurechtskoeffizient(arg = {}) {
 
      obwohl `ZWEIG_VORZUG` fuer /efh/ ausdruecklich `[efh, ezfh]` fuehrt und
      `nachArt(satz, "ezfh")` isoliert genau einen Treffer liefert. Die
-     Ursache in `zweigWaehlen` ist NICHT gefunden - nach drei Anlaeufen
-     abgebrochen und hier als offener Befund vermerkt, statt weiter zu raten.
+     Ursache ist INZWISCHEN GEFUNDEN und behoben (v1341): in
+     `ZWEIG_VORZUG` standen Backspace-Zeichen statt Wortgrenzen. Die Karte
+     unten bleibt trotzdem stehen - sie ist lesbarer als die Regex-Kaskade
+     und unabhaengig von ihr.
 
      Diese Karte loest das Problem aber nicht nur pragmatisch, sie ist auch
      die richtige Stelle: unsere `ptype`-Werte (EFH, DHH, RH, ETW, MFH)
