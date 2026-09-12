@@ -170,10 +170,41 @@
      vorliegt. Ein Feld, das die Objektart ausblendet (`display:none`),
      zählt nicht mit: es kann gar nicht gefüllt werden, und ein Zähler, der
      Unerreichbares fordert, ist schlimmer als keiner. */
+  /* v1340b - EIGENER FEHLER, IM ERSTEN LAUF GEMESSEN.
+     Die erste Fassung pruefte `offsetParent` und `getClientRects()`. Das
+     ist die Frage "ist das Feld GERADE auf dem Schirm" - und die ist hier
+     falsch: acht von neun Bloecken liegen in einem GESCHLOSSENEN
+     Wizard-Reiter, ihre Felder haben deshalb keinen offsetParent. Gemessen:
+
+       ort    -> "2 / 2"
+       eck    -> ""     (leer)
+       geld   -> ""     ... und so weiter fuer alle uebrigen
+
+     Ein Zaehler, der nur im offenen Reiter eine Zahl zeigt, ist genau dort
+     nutzlos, wo er helfen soll: beim Blick auf die Reiterleiste.
+
+     Die richtige Frage ist: GIBT es das Feld. Die Wertermittlung baut
+     Felder je Stufe und Objektart ueberhaupt erst - was nicht gebraucht
+     wird, existiert nicht, und `$(id)` gibt dann null. Damit ist die
+     Unterscheidung schon getroffen, bevor sie hier noetig waere.
+
+     Geprueft wird nur noch ein per Stil ausgeblendetes Feld in seiner
+     eigenen Zelle - der zugeklappte Block "Erweiterte Angaben" faellt
+     NICHT darunter, denn der Wizard loest ihn beim Einraeumen auf. */
+  function ausgeblendet(el) {
+    var n = el, tiefe = 0;
+    while (n && tiefe++ < 3) {
+      if (n.style && n.style.display === 'none') return true;
+      if (n.classList && n.classList.contains('row')) break;
+      n = n.parentElement;
+    }
+    return false;
+  }
+
   function sichtbar(el) {
     if (!el) return false;
     if (el.type === 'hidden') return false;
-    return !!(el.offsetParent || el.getClientRects().length);
+    return !ausgeblendet(el);
   }
 
   function gefuellt(el) {
