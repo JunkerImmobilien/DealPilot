@@ -235,6 +235,58 @@ async function callOpenAI(payload, opts = {}) {
           ? `Schliesse die Zusammenfassung mit einer kurzen Empfehlung: Folgende Angaben wuerden die Bewertung weiter praezisieren: ${mvc.input_missing.join(', ')}.`
           : `Alle wertrelevanten Objektangaben liegen vor – betone die hohe Belastbarkeit der Indikation.`);
     }
+    /* ═══ v1323b · Der Marktkontext muss BENANNT werden ══════════════════
+       Der ganze Payload geht ohnehin als JSON an das Modell — `marktkontext`
+       und `erbbaurecht` sind also da. Nur: ein Feld im JSON ist noch keine
+       Anweisung. Gemessen am Bericht vom 12.09.2026 — die Zahlen standen
+       drin und kamen im Text nicht vor.
+
+       Die Gruppen g2 (Objekt, Lage & Markt) und g3 (Bewertung, Rendite &
+       Ausblick) sind die Orte, an denen sie hingehören: g2 ordnet den Ort
+       ein, g3 die Zahlen. */
+    if ((g.id === 'g2' || g.id === 'g3') && payload.marktkontext) {
+      const mk = payload.marktkontext;
+      const teile = [];
+      if (mk.segment === 'gewerbe') {
+        if (mk.kauf && mk.kauf.klasse_median_sqm != null) {
+          teile.push(`Kaufpreisniveau der eigenen Gewerbeklasse (${mk.klasse}): ${fmt(mk.kauf.klasse_median_sqm, ' EUR/m2')} bei ${mk.kauf.klasse_n} Angeboten`
+            + (mk.kauf.markt_median_sqm != null ? `, gesamter Gewerbemarkt ${fmt(mk.kauf.markt_median_sqm, ' EUR/m2')}` : ''));
+        }
+        if (mk.miete && mk.miete.klasse_median_sqm != null) {
+          teile.push(`Mietniveau der eigenen Klasse: ${fmt(mk.miete.klasse_median_sqm, ' EUR/m2')} bei ${mk.miete.klasse_n} Angeboten`);
+        }
+      } else {
+        if (mk.vermietung) {
+          teile.push(`vermietete Wohnungen liegen bei ${fmt(mk.vermietung.vermietet_median_sqm, ' EUR/m2')} (${mk.vermietung.vermietet_n} Angebote), freie bei ${fmt(mk.vermietung.frei_median_sqm, ' EUR/m2')} (${mk.vermietung.frei_n}) — Unterschied ${mk.vermietung.abschlag_pct.toFixed(1)} %`);
+        }
+        if (mk.energie) {
+          teile.push(`Energieklassen A-C ${fmt(mk.energie.gut_median_sqm, ' EUR/m2')} gegen F-H ${fmt(mk.energie.schlecht_median_sqm, ' EUR/m2')} — Spreizung ${mk.energie.spreizung_pct.toFixed(1)} % (oertlich GEMESSEN, kein Studienwert)`);
+        }
+      }
+      if (mk.rendite) {
+        teile.push(`Angebotsrendite am Ort: Median ${mk.rendite.median_pct} % (Q25 ${mk.rendite.q25_pct}, Q75 ${mk.rendite.q75_pct}, ${mk.rendite.n} Angebote)`);
+      }
+      if (teile.length) {
+        extra += `\n\nNUTZE DEN MARKTKONTEXT aus dem JSON-Feld "marktkontext" — das sind Aggregate `
+          + `ECHTER Angebote im Umkreis von ${mk.radiusKm} km ueber 12 Monate, keine Schaetzung und keine `
+          + `Selbsteinschaetzung des Investors. Konkret: ${teile.join('; ')}. `
+          + `Nenne mindestens einen dieser Werte mit seiner Stichprobengroesse und ordne das Objekt dagegen ein. `
+          + `Erfinde keine Zahl dazu.`;
+      }
+    }
+    if (payload.erbbaurecht && payload.erbbaurecht.ok && (g.id === 'g1' || g.id === 'g3')) {
+      const eb = payload.erbbaurecht;
+      extra += `\n\nERBBAURECHT: Das Objekt steht auf einem Erbbaurechtsgrundstueck. Der ermittelte `
+        + `Marktwert ist ein VOLLEIGENTUMSWERT — kein Bewertungspartner nimmt den Parameter entgegen. `
+        + `Nach § 50 ImmoWertV betraegt der Abschlag ${fmt(eb.abschlag, ' EUR')} = ${eb.abschlagPct.toFixed(1)} %, `
+        + `der Erbbaurechtswert also ${fmt(eb.erbbaurechtswert, ' EUR')} `
+        + `(Bodenwert ${fmt(eb.teile.bodenwert, ' EUR')}, Restlaufzeit ${eb.annahmen.restlaufzeit} Jahre, `
+        + `angemessener Erbbauzins ${eb.annahmen.zinssatzAngemessen} %`
+        + `${eb.annahmen.zinsQuelle ? ' (oertlich erhoben)' : ''}). `
+        + `DAS MUSS IM TEXT VORKOMMEN — es ist fuer Finanzierung und Wiederverkauf der wichtigste `
+        + `Einzelfaktor an diesem Objekt.`
+        + (eb.annahmen.restlaufzeit < 30 ? ` Unter 30 Jahren Restlaufzeit finanzieren die meisten Banken nicht mehr voll.` : '');
+    }
     const userMsg =
       userJson +
       '\n\n---\nERZEUGE JETZT AUSSCHLIESSLICH DIESE KAPITEL – in genau dieser Reihenfolge und ' +

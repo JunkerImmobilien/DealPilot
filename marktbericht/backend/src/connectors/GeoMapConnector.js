@@ -62,7 +62,13 @@ export const GeoMapConnector = {
        * gar nicht abfragen, obwohl die API es kann (gemessen Bielefeld:
        * Kauf 1.499,98 EUR/m2 n=153, Miete 10,00 EUR/m2 n=856). */
       objectCategories: (objectCategories && objectCategories.length) ? objectCategories : ['Wohnen'],
-      objectClasses: objectClasses && objectClasses.length ? objectClasses : ['Wohnung', 'Haus'],
+      /* v1323b: der Wohn-Default darf NICHT greifen, wenn die Kategorie
+       * Gewerbe ist - ['Wohnung','Haus'] passt dort zu nichts und liefert
+       * n=0. Gemessen: der Gesamtmarkt-Vergleich kam als null zurueck. */
+      ...(( objectClasses && objectClasses.length )
+        ? { objectClasses }
+        : ((objectCategories && objectCategories.length && objectCategories[0] !== 'Wohnen')
+            ? {} : { objectClasses: ['Wohnung', 'Haus'] })),
       offerTypes: [offerType],
       analyzedField: analyzedField || 'PREISPROQM',
       cutOutlier: 'GEOMAP', // GeoMaps eigene Ausreißerbereinigung
@@ -186,7 +192,11 @@ export const GeoMapConnector = {
        * Kauf 1.499,98 EUR/m2 n=153, Miete 10,00 EUR/m2 n=856). */
       objectCategories: (objectCategories && objectCategories.length) ? objectCategories : ['Wohnen'],
       /* WSEG12-2 */
-      objectClasses: (objectClasses && objectClasses.length) ? objectClasses : ['Wohnung', 'Haus'],
+      /* v1323b: wie oben - kein Wohn-Default im Gewerbe. */
+      ...((objectClasses && objectClasses.length)
+        ? { objectClasses }
+        : ((objectCategories && objectCategories.length && objectCategories[0] !== 'Wohnen')
+            ? {} : { objectClasses: ['Wohnung', 'Haus'] })),
       offerTypes: [offerType], // 'Kauf' | 'Miete'
       size: Math.min(1000, Math.max(cap, 50)),
       sortField: 'DATUM',
