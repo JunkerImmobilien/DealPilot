@@ -53,7 +53,30 @@
      Objekt, ist das eine ausdrueckliche Ansage: dann wird das Register
      geleert und wirklich alles uebernommen. Nur der stille Weg ueber
      `?ref` muss sich zurueckhalten. */
+  /* === v1333b - EIGENER FEHLER, ZURUECKGENOMMEN =====================
+     Die Regel oben haengt allein an `isTrusted`. Das ist richtig gegen
+     die Fuellwege, aber es ist die falsche EINZIGE Sicherung: sie merkt
+     nur, was ueber ein Tastaturereignis kam. Beim Nachmessen des Fixes
+     fiel es auf - der Testaufbau setzte `el.value` und feuerte `input`,
+     das Ereignis war synthetisch, das Register blieb leer, und der Wert
+     wurde wieder ueberschrieben. Die Messung war rot, obwohl die Regel
+     griff; sie haette umgekehrt genauso gut gruen sein koennen.
+
+     Deshalb gibt es eine zweite, ereignisfreie Sicherung: WAS IM FELD
+     STEHT, WIRD MIT DEM VERGLICHEN, WAS ZULETZT VON HIER HINEINGESCHRIEBEN
+     WURDE. Weicht es ab, hat es jemand anderes geaendert - egal wie.
+
+     Der Ausgangsstand wird beim Laden des Moduls genommen; die harten
+     Vorgabewerte aus index.html (Adresse, 80 m2, 3 Zimmer) und das
+     `prefill()` aus der URL stehen zu dem Zeitpunkt schon da und gelten
+     damit als ueberschreibbar - so wie es sein muss.
+
+     Felder, die erst spaeter entstehen (wertermittlung.js baut sie je
+     Stufe), haben keinen Ausgangsstand; fuer sie gilt der Wert beim
+     ersten Zugriff. */
+  var _stand = Object.create(null);
   var _angefasst = Object.create(null);
+
   function _merken(ev) {
     if (!ev || !ev.isTrusted) return;
     var t = ev.target;
@@ -113,8 +136,20 @@
       try { console.info('[v1333] ' + id + ' bleibt stehen - vom Nutzer gesetzt.'); } catch (e) {}
       return;
     }
+    /* v1333b: dieselbe Regel ohne Ereignis - der Wert selbst verraet es.
+       `data-mbst-auto` markiert einen Wert, den die Stufenleiste selbst
+       vorbelegt hat (Wohneinheiten bei ETW/EFH/DHH/RH); der gilt nicht als
+       Nutzereingabe und darf von echten Objektdaten abgeloest werden. */
+    var _auto = false;
+    try { _auto = !!(el.getAttribute && el.getAttribute('data-mbst-auto')); } catch (e) {}
+    if (!(id in _stand)) _stand[id] = String(el.value == null ? '' : el.value);
+    if (!_auto && String(el.value == null ? '' : el.value) !== _stand[id]) {
+      try { console.info('[v1333b] ' + id + ' bleibt stehen - wurde seit dem Laden geaendert.'); } catch (e) {}
+      return;
+    }
 
     el.value = v;
+    _stand[id] = String(el.value == null ? '' : el.value);   /* v1333b */
     /* v1135-WMBACK-2 · Ein Auswahlfeld nimmt einen unbekannten Wert nicht
      * an — es bleibt STILL leer. Beim Messen selbst hereingefallen: die
      * Werte standen im Objekt, das Feld war trotzdem leer, und nichts
@@ -475,7 +510,7 @@
       var id = sel.value;
       /* v1333: Ein Klick des Nutzers ist eine Ansage - dann darf alles
          ueberschrieben werden. Der stille Auto-Select aus ?ref nicht. */
-      if (ev && ev.isTrusted) { _angefasst = Object.create(null); }
+      if (ev && ev.isTrusted) { _angefasst = Object.create(null); _stand = Object.create(null); }
 
       /* v942-publish
          * BUG bis v941: die id wurde nur zum Nachladen der Daten benutzt und
@@ -489,7 +524,19 @@
       if (!id) return;
       var note = $('mbow-note'); if (note) { note.textContent = 'Lade Objektdaten \u2026'; note.style.color = '#8a8a93'; }
       var data = await loadDetail(id);
-      if (data) fillFromData(data);
+      if (data) {
+        fillFromData(data);
+        /* v1333b: Die Objektart kam gerade erst an - erst jetzt kann die
+           Stufenleiste sagen, ob die Wohneinheiten sich von selbst
+           beantworten. Ein setVal() loest kein change aus, sonst haette
+           sie es selbst gemerkt. */
+        try {
+          if (window.DealPilotMbStufen && window.DealPilotMbStufen.einheitenVorbelegen) {
+            window.DealPilotMbStufen.einheitenVorbelegen();
+          }
+        } catch (e) {}
+      }
+
       else if (note) { note.textContent = '\u2717 Konnte Objektdaten nicht laden.'; note.style.color = '#B8625C'; }
     }
   }

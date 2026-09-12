@@ -634,6 +634,7 @@
   window.DealPilotMbStufen = {
     erreicht: erreicht, zeichnen: zeichnen, preisHolen: preisHolen,
     gewaehlt: gewaehlt, offenFuer: offenFuer,          /* v1202 */
+    einheitenVorbelegen: einheitenVorbelegen,          /* v1333b */
     _stand: function () { return { erreicht: erreicht(), gewaehlt: gewaehlt(), offen: offenFuer(), bezahlt: _bezahlt, kosten: _kosten, faellig: _faellig }; }
   };
 })();
