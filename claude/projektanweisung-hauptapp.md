@@ -13246,6 +13246,68 @@ Freigabe oder eine Bash-Regel in den Einstellungen.
 **Commits** `963f1e3`, `aa61c52`, `3052c3d`. Auf Staging, **noch nicht auf
 Prod**.
 
+## PROD-ROLLOUT 12.09.2026 — v1273 bis v1323c
+
+Der erste Prod-Rollout seit dem 09.09. (v1272). **164 Commits, 49 Dateien**,
+keine Migrationen, keine SQL-Änderungen.
+
+Freigabe ausdrücklich von Marcel: *„du hast immer selber ausgerollt. mach
+das fertig. ich erlaube es dir."* — vorher hatte der Schutzmechanismus
+zweimal abgelehnt, und das war richtig so: Produktion gehört nicht in eine
+Automatik.
+
+### Was rausgegangen ist
+
+**Erbbaurecht** (v1312–v1313, v1320) — Feld, Rechenkern nach § 50
+ImmoWertV, Erbbauzins im Cashflow, Abschlag vor jedem Wertvergleich, im
+Sprechlauf, in der Marktbewertung, im Marktbericht. Amtliche
+Erbbauzinssätze aus dem Register, wo sie vorliegen.
+
+**GeoMap-Marktsegmente** (v1314, v1323) — MFH wurde am Hausmarkt gemessen:
+Kaufpreis 22 % zu hoch, Miete 7,6 % zu hoch, beides in derselben
+Wertentwicklung. Zeitfenster für TAGEONLINE und Standort-Finder. Gewerbe
+war gar nicht abfragbar.
+
+**Marktkontext** (v1321, v1323) — vermietet gegen frei,
+Energieklassen-Spreizung, Angebotsrendite, Erbbaurechts-Anteil. Erreicht
+Bericht, Pilot-Analyse und Co-Pilot.
+
+**Sprechlauf** (v1311, v1315, v1317–v1319) — voller Kontext mit Herkunft,
+Bestätigung auf den ganzen Begriff, Bodenrichtwert nur noch wenn nicht
+abrufbar, Allgemeinwissen im Co-Pilot. Und `_fireOabiDone`, die Funktion,
+die es nie gab — daran brach die Kette Exposé → Sprechlauf.
+
+**Preise und Kontingente** (v1294–v1299) — Mengenwähler, drei Pakete,
+Monatsverfall für Plan-Bewertungen.
+
+### Nachweis nach dem Rollout
+
+```
+Prod-Stand           4a69378  == lokal
+dealpilot-backend    Up, healthy
+dealpilot-mb-backend Up
+https://app.dealpilot.immo/   200
+Gold-Audit           genau auf der Basislinie
+Erbbau-Prüfwert      41277  (identisch mit dem Frontend)
+Register             erbbauzinssatz=15 geladen
+plans-sync           "nichts zu tun — plans stimmt mit Stripe ueberein"
+Cache-Buster         voice-import v1323 · dealpilot-mb v1323 · calc v1313
+```
+
+Sicherungen vor dem Rollout, beide mit PostgreSQL-Kopf gelesen (nicht nur
+gelistet): `haupt-20260912-0739.sql.gz` (11 MB),
+`mb-20260912-0739.sql.gz` (685 KB).
+
+**Rückweg**, falls doch etwas klemmt:
+```
+ssh root@157.90.117.167 "cd /opt/dealpilot && git reset --hard a21fe9c \
+  && docker compose -f docker-compose.prod.yml up -d --build backend mb-backend"
+```
+
+**Neu für künftige Rollouts:** `tools/rollout-prod.ps1` nimmt die sechs
+Schritte ab (Vorbedingungen, Sicherungen mit Kopfprüfung, Gold-Audit,
+Nachfrage, Merge/Push/Pull, Nachmessung mit Rückweg auf dem Schirm).
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
