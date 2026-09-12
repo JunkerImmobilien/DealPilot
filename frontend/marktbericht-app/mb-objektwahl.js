@@ -75,6 +75,51 @@
      Stufe), haben keinen Ausgangsstand; fuer sie gilt der Wert beim
      ersten Zugriff. */
   var _stand = Object.create(null);
+  /* === v1333c - DER STAND MUSS VOR DEM NUTZER DA SEIN ===============
+     Zweiter eigener Fehler an derselben Stelle, wieder beim Nachmessen
+     gefunden. Der Stand wurde LAZY erfasst - beim ersten `setVal` fuer
+     ein Feld. Das ist genau zu spaet: der erste `setVal` ist der Aufruf,
+     gegen den die Sperre schuetzen soll. Er hat den bereits getippten
+     Wert als "Ausgangsstand" eingetragen, mit sich selbst verglichen und
+     sich durchgewinkt.
+
+     Gemessen ueber einen Setter auf #address:
+       "32120 Hiddenhausen" << setVal (mb-objektwahl.js:151)
+                            << fillFromData << uebernehmen
+     Die neue Fassung war geladen, die Sperre lief trotzdem ins Leere.
+
+     Jetzt wird der Stand genommen, sobald das Modul laeuft - da steht
+     das Formular (die Skripte haengen am Ende von index.html) und noch
+     keine Nutzereingabe. Felder, die wertermittlung.js erst je Stufe
+     baut, werden beim Entstehen erfasst; ein Beobachter ist hier kein
+     Luxus, sondern die einzige Stelle, an der ihr Ausgangswert ueberhaupt
+     einmal sichtbar ist. */
+  function _standErfassen(wurzel) {
+    var n = 0;
+    try {
+      var els = (wurzel || document).querySelectorAll('input[id], select[id], textarea[id]');
+      for (var i = 0; i < els.length; i++) {
+        var e = els[i];
+        if (e.id in _stand) continue;
+        _stand[e.id] = String(e.value == null ? '' : e.value);
+        n++;
+      }
+    } catch (e) {}
+    return n;
+  }
+  _standErfassen(document);
+  try {
+    new MutationObserver(function (ms) {
+      for (var i = 0; i < ms.length; i++) {
+        var add = ms[i].addedNodes;
+        for (var j = 0; j < add.length; j++) {
+          if (add[j] && add[j].nodeType === 1) _standErfassen(add[j].parentNode || add[j]);
+        }
+      }
+    }).observe(document.documentElement, { childList: true, subtree: true });
+  } catch (e) {}
+  window._mbStand = function (id) { return id ? _stand[id] : _stand; };
+
   var _angefasst = Object.create(null);
 
   function _merken(ev) {
@@ -142,7 +187,7 @@
        Nutzereingabe und darf von echten Objektdaten abgeloest werden. */
     var _auto = false;
     try { _auto = !!(el.getAttribute && el.getAttribute('data-mbst-auto')); } catch (e) {}
-    if (!(id in _stand)) _stand[id] = String(el.value == null ? '' : el.value);
+    if (!(id in _stand)) _stand[id] = '';   /* v1333c: nie den aktuellen Wert - siehe oben */
     if (!_auto && String(el.value == null ? '' : el.value) !== _stand[id]) {
       try { console.info('[v1333b] ' + id + ' bleibt stehen - wurde seit dem Laden geaendert.'); } catch (e) {}
       return;
