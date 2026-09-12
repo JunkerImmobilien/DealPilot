@@ -558,7 +558,17 @@ router.get('/quellen', async (req, res) => {
     let plzInfo = null;
     if (!ags && req.query.plz) {
       plzInfo = await AgsResolver.fromPostcode(req.query.plz);
-      if (plzInfo && plzInfo.ags) ags = String(plzInfo.ags).replace(/\D/g, '');
+      /* v1343b: AgsResolver liefert `gemeinde_ags` und `kreis_ags` -
+         ein Feld `ags` gibt es dort NICHT. Die erste Fassung las genau
+         das und bekam fuer jede PLZ 'keine_ags' zurueck. Dieselbe Sorte
+         Fehler wie v1144 (sachwertfaktor statt wert): der Leser prueft ein
+         Feld, das der Lieferant nie gesetzt hat, und faellt still zurueck.
+
+         Die Gemeindekennziffer hat Vorrang: das Register laeuft die
+         Kaskade 8 -> 5 -> 3 -> 2 und findet mit der feineren Eingabe auch
+         den Kreissatz, umgekehrt aber nicht den Gemeindesatz. */
+      const _ags = plzInfo && (plzInfo.gemeinde_ags || plzInfo.kreis_ags);
+      if (_ags) ags = String(_ags).replace(/[^0-9]/g, '');
     }
     if (!ags) {
       return res.json({ ags: null, grund: 'keine_ags',
@@ -566,7 +576,12 @@ router.get('/quellen', async (req, res) => {
           + 'Gutachterausschuss nicht bestimmen.', hinterlegt: [], fehlt: [], portale: [] });
     }
     const q = GAA.quellen({ ags });
-    if (plzInfo) { q.plz = req.query.plz; q.ort = plzInfo.name || plzInfo.ort || null; }
+    if (plzInfo) {
+      q.plz = req.query.plz;
+      q.ort = plzInfo.kreis_name || null;
+      q.bundesland = plzInfo.bundesland || null;
+      q.gemeinde_ags = plzInfo.gemeinde_ags || null;
+    }
     res.json(q);
   } catch (e) {
     res.json({ ags: null, grund: 'fehler', hinweis: e.message,
