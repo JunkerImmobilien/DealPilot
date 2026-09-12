@@ -3153,3 +3153,28 @@ Standardstufe) — eine halbfertige Spur ist nicht dasselbe wie eine richtige.
   Bewertungsdiensten kostet eine Minute.
 - Eine gefundene Zuordnungstabelle ohne Leser ist ein **Hinweis**, keine
   Lösung: prüfen, ob sie überhaupt auf die richtige Rechtsgrundlage zeigt.
+
+## 144 · Bei zwei `!important` entscheidet die Spezifität
+
+Der Marktbericht sollte die Feldschrift des Objekt-Tabs bekommen. Angeordnet
+war `.mbk-block input{font-family:"DM Sans"!important}` — angekommen ist
+Inter.
+
+Der Grund steht im Hell-Skin von `index.html`:
+
+```
+html[data-mb-theme="light"] input,… {font-family:'Inter',…!important}
+```
+
+**`!important` gegen `!important` ist kein Patt** — dann gilt wieder die
+normale Kaskade, und `html[attr] input` (0,1,2) schlägt `.mbk-block input`
+(0,1,1). Erst `html[data-mb-theme] .mbk-block input` (0,2,2) gewinnt.
+
+Auffällig war es nur, weil **die Schriftgröße ankam und die Schriftart
+nicht** — zwei Eigenschaften derselben Regel, unterschiedlich behandelt,
+weil nur eine davon vom Skin überschrieben wird.
+
+**Regel: `!important` ist kein Trumpf, sondern eine eigene Kaskadenebene.**
+Innerhalb dieser Ebene gelten Spezifität und Reihenfolge weiter. Und: nach
+jeder Stil-Anordnung die Eigenschaften EINZELN nachmessen — eine Regel kann
+teilweise greifen.

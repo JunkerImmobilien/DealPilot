@@ -14202,6 +14202,86 @@ korrekten Umlauten · Zähler arbeiten.
 
 `9b2226b` v1345 · `f1fc6d6` v1345b
 
+## v1346–v1347b · Stil wie der Objekt-Tab, Felder wachsen mit der Tiefe — 13.09.2026
+
+Zwei Wünsche von Marcel, beide umgesetzt.
+
+### v1346 · Der Stil, gemessen statt geraten
+
+Am laufenden Tab Objekt ausgelesen (`#s0 .card.qz-card`) und angeglichen:
+
+| | Tab Objekt (Soll) | Marktbericht (Ist, nachgemessen) |
+|---|---|---|
+| Karte | `#fff` · Goldrand 22 % · r12 · 22/24 · Schatten | ✓ |
+| Kopf | DM Sans **700** · 11,5px · VERSALIEN · ls 1,4 · `rgb(154,127,51)` | ✓ |
+| Label | Inter **500** · 11px · normal | ✓ |
+| Feld | r8 · DM Sans 13px | ✓ (Höhe 42 statt 38 — Polsterung) |
+
+**Mein Mono-Versalien-Label aus v1340c war genau falsch herum:** die App
+setzt Versalien am KARTENKOPF, nicht am Label. Zurückgenommen.
+
+DM Sans wird jetzt auch im iframe geladen — dieselbe Schrift wie die
+Haupt-App.
+
+**Eine Abweichung, bewusst:** unter 768 px bleibt die Feldhöhe bei 44 px und
+die Schrift bei 16 px. 38/13 sind auf dem Handy zu klein, und v1077-mb-touch
+hat das teuer gelernt (iOS zoomt unter 16 px hinein).
+
+**Zwei eigene Fehler beim Angleichen, beide dieselbe Ursache:**
+
+- **v1346b:** `font-size:13px` angeordnet, 15 px angekommen — der Hell-Skin
+  in `index.html` setzt `font-family` für jedes `input` mit `!important`.
+- **v1346c:** auch mit `!important` blieb die Schrift Inter. **Bei ZWEI
+  `!important` gewinnt die höhere Spezifität**, und `html[data-mb-theme]
+  input` (0,1,2) schlägt `.mbk-block input` (0,1,1). Mit dem Attribut davor
+  sind es (0,2,2).
+
+### v1347 · Die Felder wachsen mit der gewählten Tiefe
+
+Marcels Vorgabe: *„Marktpreisindikation klicke ich an. Es werden unten nur
+die Felder angezeigt, die ich brauche. … Wenn ich Wertermittlung anklicke,
+dann werden die anderen auch noch mit angezeigt."*
+
+**Die Zuordnung ist aus `BEDARF` (mb-stufen.js) abgeleitet** — der einzigen
+Stelle, die weiß, was eine Stufe verlangt:
+
+| Stufe | Blöcke |
+|---|---|
+| 1 Marktpreisindikation | Wo steht das Objekt · Eckdaten · Geld |
+| 2 Erweiterte | + Zustand und Qualität · Aufzug · Flächen · Stellplätze |
+| 3 Wertermittlung | + Energie und Heizung · Innen · Dach und Wände |
+
+Die drei Ausstattungsblöcke kommen erst bei Stufe 3, weil sie seit v1345 die
+**Standardstufe nach Anlage 4** speisen — die braucht nur das
+Sachwertverfahren.
+
+**Minimiert, nicht entfernt.** Der Kopf bleibt stehen und sagt „ab
+Wertermittlung · einblenden"; ein Klick öffnet. **Ein Block mit Inhalt
+klappt NIE von selbst zu** — Eingaben verschwinden nicht aus dem Blick. Ein
+Stufenwechsel setzt die Handaufklapper zurück.
+
+**Gemessen:**
+
+```
+geklickt 1 -> gewaehlt=1 | OFFEN(3)  | ZU(7)
+geklickt 2 -> gewaehlt=2 | OFFEN(7)  | ZU(3)
+geklickt 3 -> gewaehlt=3 | OFFEN(10) | ZU(0)
+```
+
+**v1347b:** `stufenFilter` und `gewaehlteStufe` nach außen exportiert. Der
+erste Prüflauf las zu früh und meldete fälschlich „öffnet nicht wieder" —
+eine Funktion, die man nicht aufrufen kann, misst man über Umwege, und
+Umwege messen etwas anderes.
+
+### Abnahme
+
+390 / 768 / 1024 px: kein Überlauf, kein Versatz, Feldhöhe 44 px unter
+768 px · Stil deckungsgleich mit dem Objekt-Tab · Stufenfilter 3 → 7 → 10.
+
+### Commits
+
+`42ce090` v1346+v1347 · `6b71a67` v1347b · `92e7150` v1346b · `34ba2ec` v1346c
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
