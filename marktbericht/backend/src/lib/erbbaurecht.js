@@ -131,8 +131,13 @@ export function compute(e = {}) {
       wert: koeff,
       quelle: e.koeffizientQuelle || null,
       erbbaurechtswert: Math.round(voll * koeff),
-      abschlag: Math.round(voll * koeff) - Math.round(voll),
-      abschlagPct: Math.round((koeff - 1) * 1000) / 10,
+      /* v1342b: DIESELBE Vorzeichen-Konvention wie die Formel oben:
+         ein Abschlag ist POSITIV (voll - wert). Meine erste Fassung
+         rechnete (koeff - 1) und lieferte -19 % fuer denselben
+         Sachverhalt, den die Formel mit +11,5 % ausweist. Im Bericht
+         haette dort 'Abschlag -19,0 %' gestanden. */
+      abschlag: Math.round(voll) - Math.round(voll * koeff),
+      abschlagPct: Math.round((1 - koeff) * 1000) / 10,
       rechenweg: Math.round(voll).toLocaleString('de-DE') + ' \u20ac \u00d7 '
         + String(koeff).replace('.', ',') + ' = '
         + Math.round(voll * koeff).toLocaleString('de-DE') + ' \u20ac',
