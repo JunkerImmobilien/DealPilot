@@ -181,7 +181,7 @@ function _buildDeal2FromState() {
 
    Statusfarben bleiben Statusfarben: Gruen und Rot werden NICHT
    tokenisiert, sie bedeuten in jeder Marke dasselbe. */
-function _ds2Schwelle(name, soll, ist, einheit, besserIstGroesser, nachkomma, spanne) {
+function _ds2Schwelle(name, soll, ist, einheit, besserIstGroesser, nachkomma, spanne, leerText) {
   /* Number(null) ist 0 und besteht Number.isFinite - deshalb zuerst auf
      Abwesenheit pruefen, dann rechnen. */
   var hatSoll = (soll != null && soll !== '' && isFinite(Number(soll)));
@@ -235,7 +235,7 @@ function _ds2Schwelle(name, soll, ist, einheit, besserIstGroesser, nachkomma, sp
     '<span class="ds2-grenze-ampel" style="color:' + farbe + '">' + zeichen + '</span>' +
     '<span class="ds2-grenze-name">' + name + '</span>' +
     '<span class="ds2-grenze-ist" style="color:' + farbe + '">' +
-      (hatIst ? zahl(istN) + einheit : 'keine Angabe') + '</span>' +
+      (hatIst ? zahl(istN) + einheit : (leerText || 'keine Angabe')) + '</span>' +
     '<span class="ds2-grenze-soll">' + (besserIstGroesser ? 'min. ' : 'max. ') +
       zahl(sollN) + einheit + '</span>' +
   '</div>';
@@ -251,17 +251,35 @@ function _ds2GrenzenBlock(deal, aufHell) {
     return (v == null || v === '' || !isFinite(Number(v))) ? null : Number(v);
   }
 
+  /* v1357b - NULL IST KEIN WERT.
+     Gemessen am Objekt d9f56595: ohne eingetragene Finanzierung liefert
+     die KPI-Engine dscr = 0 und ltv = 0. Die Ampel las das als „DSCR
+     null, Grenze 1,20 verfehlt" und zeigte ein rotes Kreuz - obwohl es
+     schlicht kein Darlehen gibt, das gedeckt werden muesste.
+
+     Dieselbe Falle wie in CLAUDE.md: Number(null) ist 0 und besteht
+     Number.isFinite. Erst auf Abwesenheit pruefen, dann rechnen.
+
+     Die Darlehenssumme steht in State.kpis.d_total - dieselbe Quelle,
+     aus der `deal` gebaut wird, also keine zweite Rechnung. Ohne
+     Darlehen tragen beide Zeilen statt einer Ampel den Grund. */
+  var _k = (window.State && State.kpis) ? State.kpis : {};
+  var hatFin = (_k.d_total != null && isFinite(Number(_k.d_total)) && Number(_k.d_total) > 0);
+
+  /* Die letzte Zahl vor dem Text ist die Spanne, ab der es nicht mehr
+     „knapp" heisst. Sie gehoert zur Kennzahl und steht deshalb hier,
+     nicht in einer Formel: 0,10 beim DSCR, 100 Euro beim Monats-Cashflow,
+     zwei Prozentpunkte beim LTV. */
   var zeilen =
-    /* Die letzte Zahl ist die Spanne, ab der es nicht mehr „knapp" heisst.
-       Sie gehoert zur Kennzahl und steht deshalb hier, nicht in einer
-       Formel: 0,10 beim DSCR, 100 Euro beim Monats-Cashflow, zwei
-       Prozentpunkte beim LTV. */
     _ds2Schwelle('Kapitaldienstdeckung (DSCR)', soll('min_dscr'),
-                 deal.dscr, '', true, 2, 0.10) +
+                 hatFin ? deal.dscr : null, '', true, 2, 0.10,
+                 'ohne Finanzierung') +
     _ds2Schwelle('Cashflow vor Steuer', soll('min_cashflow_vor_st'),
                  deal.cashflowMonatlich, '\u00a0\u20ac/Mon', true, 0, 100) +
     _ds2Schwelle('Beleihungsauslauf (LTV)', soll('max_ltv'),
-                 deal.ltv, '\u00a0%', false, 1, 2);
+                 hatFin ? deal.ltv : null, '\u00a0%', false, 1, 2,
+                 'ohne Finanzierung');
+
 
 
   if (!zeilen) return '';
