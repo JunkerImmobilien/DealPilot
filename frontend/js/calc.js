@@ -3059,16 +3059,40 @@ function _calcImmediate(){
     try { MietEntwicklung.refresh(); } catch(e) {}
   }
   // V36: Header-Badges aktualisieren (DSCR/CF/BMR)
-  updHeaderBadges();
+  /* ═══ v1362 · ERST RECHNEN, DANN ANZEIGEN ════════════════════════════
+     Hier stand `updHeaderBadges()` VOR `_dpComputeDS2Cached()` - und acht
+     Zeilen spaeter noch einmal, mit dem Kommentar „Header neu mit
+     gecachtem Wert". Der zweite Aufruf war der Beleg, dass der erste zu
+     frueh kam: `updHeaderBadges` liest `window._dpLastDS2Result` und
+     rechnet nur SELBST, wenn der Cache leer ist. Vor dem Cache-Aufruf war
+     er das immer.
 
+     GEMESSEN, bevor etwas geaendert wurde: eine einzige Eingabe im
+     Kaufpreisfeld loeste ACHT Score-Berechnungen aus, ueber drei Wege:
+
+       3x  updHeaderBadges        (calc.js:174)   <- dieser hier
+       2x  _dpComputeDS2Cached    (calc.js:4031)
+       2x  renderDealScore2       (dealscore2-ui.js:340)
+       1x  weiterer Durchlauf
+
+     Die Entprellung von rund zwei Sekunden greift, die Mehrfachrechnung
+     INNERHALB einer Runde nicht. Das war bisher nur Verschwendung; fuer
+     B2 ist es ein Hindernis: jede dieser Rechnungen waere spaeter eine
+     Serveranfrage, und das Limit liegt bei 100 pro Minute.
+
+     KEINE EINSCHRAENKUNG: derselbe Wert, nur einmal statt zweimal
+     gerechnet. Der Selbstrechnungs-Zweig in `updHeaderBadges` bleibt als
+     Rueckfall stehen - faellt der Cache aus, rechnet der Header wie
+     bisher. */
   // V48: DS2 zentral cachen + alle Anzeigen synchronisieren (verhindert Score-Mismatch)
   if (typeof window._dpComputeDS2Cached === 'function') {
     window._dpComputeDS2Cached();
   }
-  // Header neu mit gecachtem Wert
+  // Header liest den frisch gecachten Wert
   if (typeof updHeaderBadges === 'function') {
     try { updHeaderBadges(); } catch(e) {}
   }
+
   // V48: Aktive Karte links neu rendern damit Score live mit Header übereinstimmt
   // (entkoppelt via setTimeout damit calc() nicht durch DOM-Render verzögert wird)
   if (typeof renderSaved === 'function') {
