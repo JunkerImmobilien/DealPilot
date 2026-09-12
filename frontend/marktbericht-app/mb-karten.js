@@ -570,6 +570,10 @@
 
   window.DealPilotMbKarten = {
     bauen: bauen, zaehlen: zaehlen, GRUPPEN: GRUPPEN,
+    /* v1347b: nach aussen, damit die Stufenlogik PRUEFBAR ist. Eine
+       Funktion, die man nicht aufrufen kann, misst man ueber Umwege -
+       und Umwege messen etwas anderes. */
+    stufenFilter: stufenFilter, gewaehlteStufe: gewaehlteStufe,
     _stand: function () {
       return GRUPPEN.map(function (g) {
         var z = $('mbk-z-' + g.id);
