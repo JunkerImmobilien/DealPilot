@@ -2938,3 +2938,71 @@ Anker trifft in einer CRLF-Datei nie.
 **Regel: mehrzeilige Anker über einen Regex aus der geladenen Datei
 HOLEN** (`if ($s =~ /(…)/) { $anker = $1 }`), statt ihn zu tippen. Dann
 stimmen Zeilenenden und Sonderzeichen zwangsläufig.
+
+## 136 · Ein Helfer namens `_num` bedeutete „Zahl größer null"
+
+```js
+const _num = (v) => { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; };
+```
+
+Für Flächen, Mieten und Baujahre ist das richtig. Für `bog_eur` — besondere
+objektspezifische Grundstücksmerkmale nach § 8 Abs. 3 ImmoWertV — ist es
+tödlich: ein solcher Ansatz ist fast immer ein **Abzug**, also negativ.
+`_num(-18000)` gab null.
+
+**GEMESSEN am Bericht 116:** der Wert stand im `ref`, lief durch den ganzen
+Orchestrator bis `CrossCheckService.js:669` und wurde dort still zu null.
+Die Ertragswert-Staffel endete beim vorläufigen Ertragswert, ohne ein Wort
+dazu. Das Feld gibt es seit WPDF12 — es hat **nie** funktioniert, außer bei
+einem Zuschlag.
+
+**Warum es so lange unentdeckt blieb: es gab kein Eingabefeld dafür.**
+Erreichbar war es nur über einen direkten API-Aufruf. Aufgefallen ist es
+erst, als das Feld gebaut wurde.
+
+**Regel: ein Umwandlungshelfer, dessen Name nur „Zahl" sagt, aber
+zusätzlich ein Vorzeichen erzwingt, gehört umbenannt oder je Feld
+gewählt.** Und: bevor ein Feld ins Formular kommt, prüfen, ob der
+Backend-Pfad dahinter je mit echten Werten gelaufen ist — ein Feld ohne
+Oberfläche ist ein Feld ohne Prüfung.
+
+## 137 · Ein Modellparameter als Konstante macht jede Rechnung unprüfbar
+
+`const GND_JAHRE = 80` in `CrossCheckService.js` galt für jeden
+Gutachterausschuss. Das Register führt die Gesamtnutzungsdauer aber **je
+Modell**: 38 Sätze mit 70, 4 mit 80, 5 mit 60, 73 ausdrücklich ohne Zahl.
+Gelesen hat sie niemand.
+
+§ 21 Abs. 3 ImmoWertV: ein Sachwertfaktor gilt nur für das Modell, aus dem
+er abgeleitet wurde. Bei Alter 30 ergibt GND 70 eine Restnutzungsdauer von
+40 Jahren, GND 80 eine von 50 — an einem Reihenhaus rund 25.000 €.
+
+**Beim Beheben eine zweite Falle:** die Sicherung aus v1074 („der zweite
+Lauf muss denselben vorläufigen Sachwert liefern") hätte ausgerechnet die
+modellkonforme Rechnung verworfen, weil eine andere GND selbstverständlich
+einen anderen Sachwert ergibt.
+
+**Regel: eine Gleichheitsprüfung zwischen zwei Läufen muss wissen, welche
+Abweichungen beabsichtigt sind.** Sonst schützt sie vor dem Falschen.
+
+Und: **eine fertige Zahl aus einem fremden Rahmen wird nicht umgerechnet,
+sondern im richtigen Rahmen neu abgeleitet.** 34 Jahre aus einem
+80er-Modell ergeben im 70er-Modell je nach Methode 30 oder 24 Jahre — das
+ist eine Methodenwahl, keine Rechnung, und sie gehört nicht in Code.
+
+## 138 · Eine Spanne, die ihr eigenes Ergebnis nicht enthält
+
+Die Streuung des Sachwertfaktors (±0,21) wurde auf den marktangepassten
+Sachwert gerechnet, der Abzug für besondere Merkmale kam danach:
+
+```
+= Sachwert                       184.761 EUR
+Streuung-Spanne     [186.901 ... 264.622] EUR
+```
+
+Der Endwert lag **unterhalb** der eigenen Spanne. Das sieht nach Sorgfalt
+aus und widerspricht der Zeile darüber.
+
+**Regel: eine Spanne wird zuletzt gebildet, auf demselben Endwert, den sie
+beschreibt.** Gefunden nur, weil der Funktionslauf beide Zahlen
+nebeneinander ausgab — die Einzelprüfung des Streuungsblocks war grün.

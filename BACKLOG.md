@@ -53,20 +53,40 @@ Projektanweisung unter **v1332–v1337**.
 | Tablet und Handy | **geprüft** — 390/600/768/900/1024 px: alle Rasterzeilen fluchten, kein Überlauf |
 | Alterswertminderung „wie kommt die zustande?“ | **fertig** v1332 (nachgerechnet, korrekt) + v1337 (Rechenweg und RND-Herkunft stehen jetzt im Bericht) |
 
-**Zwei Reste:**
+**Beide Reste erledigt (12.09.2026 abends):**
 
-1. **Sachwertfaktoren Braunschweig-Wolfsburg nachtragen.** Für Wolfenbüttel
-   (Kreis 03158) führt das Register den Liegenschaftszins (1,9 % EZFH und WE
-   vermietet), aber keinen Sachwertfaktor. Die Quelle steht im Register schon
-   verlinkt (Grundstücksmarktdaten 2025, `gag.niedersachsen.de/download/210957`).
-   Bundesweit sind es erst 52 Sachwertfaktoren gegen 1.078 Liegenschaftszinsätze.
+1. **Sachwertfaktoren Braunschweig-Wolfsburg** — **beantwortet, nicht offen.**
+   Der Grundstücksmarktbericht 2025 sagt auf S. 34 wörtlich: „Zu diesem Thema
+   gibt es keine zusätzlichen regionalen Auswertungen des Gutachterausschusses
+   Braunschweig-Wolfsburg.“ Es gibt sie nicht. Der Faktor 1,20–1,22 aus dem
+   Kalkulator stammt aus einem anderen Modell als dem des örtlichen Ausschusses.
+   **Stattdessen nachgetragen:** Erbbaurechtskoeffizienten für sieben Gebiete
+   (`v1339`, Wolfenbüttel 0,81 aus 30 Kauffällen), geprüft gegen das
+   abgedruckte Anwendungsbeispiel — 500.000 × 0,79 = 395.000 €, zeichengleich.
 
-2. **Ein vollständiger Bericht am echten Objekt.** Alle Abnahmen oben sind
-   Einzelmessungen im Formular. Ein durchgehender Lauf bis zum fertigen PDF
-   kostet Kontingent und steht noch aus — und genau dort haben Einzelprüfungen
-   in dieser Sitzung schon dreimal etwas durchgelassen.
+2. **Durchgehender Lauf** — **gefahren**, zweimal (Berichte 116 und 117). Er hat
+   genau das gefunden, wovor die Einzelprüfungen blind waren: `_num` verwarf
+   jede negative Zahl, und `bog_eur` hat deshalb nie funktioniert (`v1338d`).
 
 ---
+
+## Offen aus dem Gutachten-Durchgang
+
+1. **Ursache in `zweigWaehlen()` finden.** Aus `objektart: 'EFH'` findet sie den
+   Zweig `ezfh` nicht, obwohl `ZWEIG_VORZUG` `['efh','ezfh']` führt und
+   `nachArt(satz,'ezfh')` isoliert genau einen Treffer liefert. In `v1339b` über
+   eine ausdrückliche ptype-Karte umgangen. **Betrifft möglicherweise auch den
+   Sachwertfaktor** — dort läuft derselbe Weg.
+
+2. **Erbbaurechtskoeffizient in die Bewertung hängen.** Der Leser steht
+   (`gutachterausschuss.erbbaurechtskoeffizient()`), aber `erbbaurecht.js`
+   rechnet weiter rein finanzmathematisch. Wo ein marktabgeleiteter
+   Koeffizient vorliegt, muss er vorgehen.
+
+3. **Optik: Marcel wählt.** Demo liegt in
+   `design/Vorschläge/marktbericht-eingabe-varianten.html` — Ist-Zustand gegen
+   Variante A (Ruhig) und B (Karten). Nichts gebaut, bevor er gewählt hat.
+
 ## → HIER WEITERMACHEN: Der Sprechlauf, Stand 10.09.2026 abends
 
 **Stand:** `v1273`–`v1310d` liegen auf Staging, durchgetestet über alle Quellen-Kombinationen. **Produktion steht auf `a21fe9c`**

@@ -13733,6 +13733,170 @@ nachtragen — die Quelle ist im Register schon verlinkt.
 
 **Alles auf Staging, nichts auf Produktion.**
 
+## v1338–v1339b · Das Gutachten, nachgeprüft — 12.09.2026 (Abend)
+
+Marcel brachte ein Reihenhaus im Landkreis Wolfenbüttel mit, an dem in einem
+anderen Chat um Restnutzungsdauer, Gesamtnutzungsdauer und Bauschäden
+gerungen wurde. **Die Prüfung fand fünf Löcher — alle in unserer Software,
+nicht in seiner Rechnung.**
+
+### Befund 1 · Die Gesamtnutzungsdauer war eine Konstante
+
+`CrossCheckService.js:24` führte `const GND_JAHRE = 80` und rechnete damit
+für jeden Ausschuss. **Das Register führt sie längst je Modell:**
+
+| gnd_jahre | Sätze |
+|---|---|
+| 70 | 38 |
+| 80 | 4 |
+| 60 | 5 |
+| ausdrücklich null | 73 |
+
+**Und kein Leser holte sie ab.** Dasselbe Muster wie
+`restnutzungsdauer_herkunft` (v1337) und `dealpilot_marktbewertung`.
+
+Was das kostet: bei Alter 30 ergibt GND 70 eine Restnutzungsdauer von 40
+Jahren, GND 80 eine von 50. An einem Reihenhaus mit rund 176.000 € Herstel­
+lungskosten sind das etwa 25.000 € Gebäudesachwert — lautlos.
+
+§ 21 Abs. 3 ImmoWertV: ein Sachwertfaktor gilt nur für das Modell, aus dem
+er abgeleitet wurde.
+
+**Gelöst:** `gutachterausschuss.js` reicht `modellansaetze` durch, der
+zweite Sachwertlauf nimmt die Modell-GND, und die Restnutzungsdauer wird im
+richtigen Rahmen **neu abgeleitet** — nicht umgerechnet. Der Unterschied ist
+entscheidend: eine Neuableitung aus Baujahr und Modernisierungspunkten ist
+eindeutig, eine Umrechnung wäre eine Methodenwahl (34/80 auf 70 ergibt je
+nach Weg 30 oder 24 Jahre — 19.000 € Unterschied). Diese Wahl trifft die
+Software nicht.
+
+Die v1074-Sicherung („zweiter Lauf muss denselben vorläufigen Sachwert
+liefern") hätte die modellkonforme Rechnung sonst verworfen — bei geänderter
+GND ist die Abweichung jetzt ausdrücklich erwartet.
+
+### Befund 2 · Der Sachwert kannte keine bOM
+
+Die Staffel endete beim marktangepassten Sachwert. **Besondere
+objektspezifische Grundstücksmerkmale nach § 8 Abs. 3 ImmoWertV fehlten
+vollständig** — der Ertragswert kennt sie seit jeher, der Sachwert nicht.
+
+An Marcels Fall: Schimmel, Wasserschaden, Estrich, Setzungen summieren sich
+auf 41.000 bis 86.000 €. Bei einem Verkehrswert um 153.000 € sind das 27 bis
+56 %. Ein Verfahren, das diesen Schritt nicht kennt, kann für so ein Objekt
+keinen Verkehrswert ausweisen.
+
+**Sie kommen NACH der Marktanpassung.** Die Faktoren werden aus Kauffällen
+OHNE solche Merkmale abgeleitet; wer vorher abzieht, lässt den Faktor auf
+einen Wert wirken, den es in der Stichprobe nicht gab.
+
+Dazu die **Warnung vor dem Doppelabzug** — wer die Restnutzungsdauer wegen
+derselben Mängel verkürzt UND sie hier abzieht, rechnet sie zweimal.
+
+### Befund 3 · Die Streuung des Sachwertfaktors kam nie an
+
+`satz.streuung` liegt im Register und war nur beim Liegenschaftszins
+durchgereicht. Bei 0,21 sind das an einem Reihenhaus knapp 39.000 €.
+
+**v1338b, eigener Fehler:** die Spanne stand zuerst VOR dem bOM-Abzug —
+gemessen 184.761 € Endwert bei einer Spanne von [186.901 … 264.622]. Eine
+Spanne, die ihr eigenes Ergebnis nicht enthält, ist schlimmer als keine.
+Jetzt steht sie auf dem Endwert.
+
+### Befund 4 · `bog_eur` gab es, ein Feld dafür nie
+
+`bog_eur`/`bog_grund` existieren seit WPDF12 im Orchestrator und im
+ErtragswertService — **und im Formular gab es dafür kein Feld.** Erreichbar
+nur über einen direkten API-Aufruf.
+
+Gelöst: ein Feldpaar (`bomEur`/`bomGrund`) speist beide Verfahren. Ein
+Schimmelschaden ist im Ertragswert derselbe wie im Sachwert.
+
+### Befund 5 · `_num` verwarf jede negative Zahl
+
+```js
+const _num = (v) => { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; };
+```
+
+Der Helfer heißt „Zahl" und bedeutet „Zahl größer null". Für Flächen und
+Mieten richtig. Für `bog_eur` tödlich — ein Abzug ist negativ.
+
+**GEMESSEN am Bericht 116:** `bog_eur: -18000` stand im ref, lief durch den
+ganzen Orchestrator bis `CrossCheckService.js:669` und wurde dort still zu
+null. Das Feld hat also **nie** funktioniert, außer bei einem Zuschlag.
+Aufgefallen erst, als v1338 ein Eingabefeld dafür bekam — vorher konnte es
+niemand füllen.
+
+**Beweis über zwei echte Läufe:**
+
+| Bericht | Zeilen | letzte Zeile | Wert |
+|---|---|---|---|
+| 116 (vorher) | 11 | = vorläufiger Ertragswert | 149.639 € |
+| **117 (nachher)** | **13** | **= Ertragswert** | **131.639 €** |
+
+Differenz exakt 18.000 € — der bOM-Abzug.
+
+### v1339 · Erbbaurechtskoeffizienten Braunschweig-Wolfsburg
+
+Der Backlog-Punkt „Sachwertfaktoren nachtragen" ist **beantwortet, nicht
+offen**. Der Grundstücksmarktbericht 2025 sagt auf Seite 34 wörtlich:
+
+> Sachwertfaktoren — Zu diesem Thema gibt es keine zusätzlichen regionalen
+> Auswertungen des Gutachterausschusses Braunschweig-Wolfsburg.
+
+Es gibt sie nicht. Der Faktor 1,20–1,22, den Marcel im Kalkulator abgelesen
+hat, stammt also aus einem anderen Modell als dem des örtlichen Ausschusses
+— das gehört in sein Gutachten.
+
+**Dafür fand die Quelle etwas Besseres:** Erbbaurechtskoeffizienten für
+sieben Gebiete, Kauffälle 2021–2024, mit abgedrucktem Anwendungsbeispiel.
+
+| Gebiet | AGS | Koeffizient | Spanne | Fälle |
+|---|---|---|---|---|
+| Braunschweig, Stadt | 03101 | 0,79 | 0,47–1,12 | 28 |
+| Wolfsburg, Stadt | 03103 | 0,91 | 0,46–1,39 | 58 |
+| Gifhorn, LK | 03151 | 0,84 | 0,48–1,21 | 42 |
+| Helmstedt, LK | 03154 | 0,73 | 0,34–1,48 | 47 |
+| **Wolfenbüttel, LK** | **03158** | **0,81** | **0,39–1,05** | **30** |
+| Celle, LK | 03351 | 0,77 | 0,32–1,26 | 25 |
+| Peine, LK | 03157 | 0,72 | 0,36–1,06 | 20 |
+| Wolfsburg, Stadt (RH/DHH) | 03103 | 0,92 | 0,36–1,44 | 144 |
+
+Neue Saatdatei `erbbau-bs-wob.json`, neue Kennzahl
+`erbbaurechtskoeffizient`, Ebenen bezirk/land/bund gesperrt. **Ein
+marktabgeleiteter Koeffizient schlägt die Modellrechnung nach § 50
+ImmoWertV** — er enthält, was die Formel nicht kennt: Vertragsbedingungen,
+Anpassungsklauseln, Heimfallrisiko.
+
+**Prüfmaßstab ist das abgedruckte Anwendungsbeispiel:**
+`500.000 € × 0,79 = 395.000 €` — gemessen zeichengleich.
+
+Alle Sperren greifen: ein Reihenhaus in Wolfenbüttel bekommt **keinen**
+Koeffizienten (der Ausschuss hat RH/DHH nur für Wolfsburg abgeleitet, § 10),
+Hüllhorst fällt auf den finanzmathematischen Weg zurück.
+
+**v1339b, offener Befund:** `zweigWaehlen()` findet aus `objektart: 'EFH'`
+den Zweig `ezfh` nicht, obwohl `ZWEIG_VORZUG` ausdrücklich `['efh','ezfh']`
+führt und `nachArt(satz,'ezfh')` isoliert genau einen Treffer liefert. Nach
+drei Anläufen abgebrochen statt weiter zu raten. Gelöst über eine
+ausdrückliche Karte `ptype → Registerzweig` im Leser — das ist ohnehin die
+richtige Stelle, weil unsere `ptype`-Werte Oberflächenkürzel sind und die
+Zweige der niedersächsischen Berichte anders heißen. **Die Ursache in
+`zweigWaehlen` steht noch aus** und betrifft möglicherweise auch den
+Sachwertfaktor.
+
+### Demo
+
+`design/Vorschläge/marktbericht-eingabe-varianten.html` — Ist-Zustand gegen
+zwei Varianten (Ruhig / Karten), mit denselben Feldern, Labels und
+Hilfetexten wie das echte Formular. Nichts gebaut, bevor Marcel gewählt hat.
+
+### Commits
+
+`303d3e9` v1338 · `cdebc95` v1338b · `6e885d2` v1338c · `90baebb` v1338d ·
+`b0c1580` v1339 · `0c9b4d2` v1339b
+
+**Alles auf Staging, nichts auf Produktion.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
