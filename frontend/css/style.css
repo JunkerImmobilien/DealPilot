@@ -3787,7 +3787,12 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 }
 .ds-setting-row {
   display: grid;
-  grid-template-columns: 130px 1fr;
+  /* v1350: 130px waren zu schmal - "Rendite (Nettomietrendite)" und
+     "Potenzial (Bruttofaktor)" brachen um. GEMESSEN: Zeilenhoehe 33px
+     gegen 17px bei den kurzen Labels, dadurch stehen die Regler
+     unruhig untereinander. Marcels Befund "Formatierungen sind nicht
+     so schoen". */
+  grid-template-columns: 172px 1fr;
   align-items: center;
   gap: 12px;
 }
@@ -15459,10 +15464,16 @@ body.hdr-collapsed .hdr-toggle-btn {
   box-shadow: 0 2px 6px color-mix(in srgb, var(--gold) 30%, transparent);
 }
 .ds-pane-icon { font-size: 20px; }
+/* v1350: war Cormorant Garamond 22px - eine Serifenschrift direkt
+   neben der Reiterliste in IBM Plex Sans 12,5px. GEMESSEN und von
+   Marcel gesehen: "Farbe, Form, das passt nicht so richtig". Die
+   Serife bleibt der Hauptansicht (.sec-title, .total-val); im
+   Einstellungsdialog gilt die Schrift der App. */
 .ds-pane-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 22px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 15px;
   font-weight: 600;
+  letter-spacing: .1px;
   color: var(--ch);
   margin: 0 0 2px;
 }
