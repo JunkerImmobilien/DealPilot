@@ -3908,10 +3908,26 @@
     (e.ids || []).forEach(function (id) {
       var v = _rf && _rf.data && _rf.data.fields ? _rf.data.fields[id] : null;
       var ausFormular = false;
+      var ausVorlauf = false;
       if (v === undefined || v === null || v === '') {
         var el = document.getElementById(id);
         v = el ? String(el.value || '').trim() : '';
         ausFormular = true;
+        /* ═══ v1331 · Ein Wert aus dem Expose ist keine Vorbelegung ══════
+           Marcels Befund: "der hat jetzt daten uebernommen. die sind aber
+           nicht gruen gekennzeichnet in der box was schon steht."
+
+           GEMESSEN: `_echt()` faerbt einen Block nur gruen, wenn ein Wert
+           NICHT aus dem Formular kommt. Das ist fuer VORBELEGUNGEN richtig -
+           ein Zinssatz von 3,5 Prozent aus dem Investmentprofil ist keine
+           Angabe zu diesem Objekt, und wer ihn gruen sieht, haelt eine Frage
+           fuer beantwortet, die niemand gestellt hat (v1273c).
+
+           Ein Wert aus dem EXPOSE ist etwas anderes. Er steht zwar auch im
+           Formular - aber er stammt aus einer Quelle zu genau diesem Objekt,
+           nicht aus einer Voreinstellung. `_vorlaufFelder` fuehrt seit v1293
+           genau diese Liste. */
+        if (_vorlaufFelder && _vorlaufFelder.indexOf(id) >= 0) ausVorlauf = true;
       }
       if (v === '' || v === null || v === undefined) return;
       var kat = (_rf.catalog || []).filter(function (c) { return c.id === id; })[0];
@@ -3919,7 +3935,7 @@
       /* v1284: Zahlen lesbar - "3.5" ist ein Feldwert, "3,5" eine Angabe. */
       var anzeige = String(v);
       if (anzeige.indexOf(",") < 0 && /^-?[0-9]+\.[0-9]+$/.test(anzeige)) anzeige = anzeige.replace(".", ",");
-      out.push({ n: name, v: anzeige, f: ausFormular });
+      out.push({ n: name, v: anzeige, f: ausFormular && !ausVorlauf, vorlauf: ausVorlauf });
     });
     return out;
   }
