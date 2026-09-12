@@ -15318,6 +15318,88 @@ welcher Jahrgang gerade rechnet.
 `ed08931` v1364
 
 
+## v1365 · Die dritte Score-Engine — und ein Rückfall, der nicht greifen konnte
+
+`B1` hatte `QcEngine.computeScore` im Quick-Check als dritte,
+eigenständige Scoring-Engine gezählt. **Gemessen ist sie das nicht:**
+aktiv ist `_dpPilotScore`, und das rechnet über `DealKpis.compute()` und
+`DealScore.computeFromKpis()` — also über genau die kanonischen Kerne,
+die `CLAUDE.md` unter „Rechenkerne — nie duplizieren" nennt.
+`QcEngine.computeScore` ist der **Rückfall**.
+
+### Der Rückfall konnte nicht greifen
+
+```js
+const score = window._dpPilotScore ? window._dpPilotScore(...)
+                                   : QcEngine.computeScore(...);
+```
+
+Geprüft wurde, ob die **Funktion existiert** — nicht, ob sie ein Ergebnis
+geliefert hat. Sie steht am Ende derselben Datei und ist damit immer
+vorhanden; sie gibt aber `null` zurück, wenn `DealKpis` oder `DealScore`
+fehlen. **In genau dem Fall, für den der Rückfall gedacht ist, wurde er
+übersprungen** — und die nächste Zeile las `score.score` auf `null`.
+
+> Dasselbe Muster wie beim Prüfhaken in `v1359c`: **was nur auf Existenz
+> prüft, fällt nicht zurück, wenn das Ergebnis fehlt.** Ein Rückfall, der
+> nicht greifen kann, ist keiner.
+
+### v1365b · Und dann fiel auf, wie weit die beiden auseinanderliegen
+
+Nach der Reparatur mit **identischen Eingaben** gemessen
+(300.000 / 900 / 250 / 60.000 €):
+
+| Weg | Score |
+|---|---|
+| aktiv — `DealScore.computeFromKpis` | **15** |
+| Rückfall — `QcEngine.computeScore` | **30** |
+
+**Doppelt so viel, und ohne Hinweis nicht zu unterscheiden.**
+
+Das sind zwei verschiedene Modelle, und der Unterschied ist kein Fehler,
+sondern ihre Natur. Aber ein Score, der bei einer Kaufentscheidung um
+100 % danebenliegt, darf nicht ununterscheidbar danebenstehen — genau
+diese Sorte Widerspruch hat `v1203` schon einmal gekostet: derselbe
+Score, zwei verschiedene Wörter.
+
+Greift der Rückfall, steht unter dem Score jetzt:
+
+> *Ersatzrechnung — die Bewertungsmodule sind gerade nicht erreichbar.
+> Diese Zahl kann deutlich abweichen; bitte neu laden.*
+
+**Im Normalbetrieb sieht das niemand.**
+
+### Abnahme — beide Fälle am laufenden Quick-Check
+
+```
+Normalfall   Score 16 · Hinweis-Element gar nicht vorhanden
+Notfall      Score 31 · Hinweis sichtbar, rot (rgb(184,98,92))
+Erholung     Score 16 · Hinweis wieder leer
+```
+
+Der Notfall wurde erzeugt, indem `DealKpis` im iframe zur Laufzeit
+entfernt wurde — also genau der Zustand, für den der Rückfall existiert.
+**Vor `v1365` stand dort ein TypeError und die Anzeige blieb leer.**
+
+### Zu `qc-bridge.js`
+
+Davon ist nur die Versionsziffer in Zeile 31 hochgezogen, damit die
+Reparatur am Browser-Cache vorbeikommt. **Das `qcpm`-Overlay ab Zeile
+~348, auf das sich der Nicht-anfassen-Vermerk in `CLAUDE.md` bezieht, ist
+unberührt.**
+
+### Was B1 an dieser Stelle korrigiert
+
+Die Bestandsaufnahme nannte drei Score-Engines. Richtig ist: **zwei
+Produkte und ein Notnagel.** DS1 und DS2 sind Marcels zwei Stufen
+(Quick-Check und Investor, ergänzend — siehe `v1351`), `QcEngine` ist der
+Rückfall. Die Zahl „drei" stimmte, die Deutung nicht.
+
+### Commits
+
+`2ed6838` v1365 · `f9dd7a3` v1365b
+
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
