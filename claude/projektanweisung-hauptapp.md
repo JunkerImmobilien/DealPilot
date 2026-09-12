@@ -15193,6 +15193,131 @@ steht.
 `7daeae0` v1361 · `5af0379` v1362 · `9a15087` v1363
 
 
+## v1364 · Der Tarif steht an einer Stelle und kennt sein Jahr
+
+Marcels Auftrag: *„mir wäre wichtig, dass wir immer die aktuellen sätze
+verwenden für das entsprechende jahr. können wir das automatisch holen
+und abgleichen? das darf ja nicht an 3 stellen unterschiedlich sein. hol
+das mal für 2026 und pass es an."*
+
+### Es war an drei Stellen unterschiedlich — und keine davon war 2026
+
+| Datei | Wert |
+|---|---|
+| `tax.js` | Grundfreibetrag **11.604**, Kommentar sagte „Tarif 2026" |
+| `dashboard.js` | Grundfreibetrag **11.784** (zusammengeführt in `v1361`) |
+| `rnd-calc.js` | Zonengrenzen **12.096 / 17.443 / 68.480** |
+
+**Der Wert 11.604 ist nicht einmal ein gültiger Jahrgang.** Er war der
+ursprünglich *geplante* Grundfreibetrag 2024, bevor er auf 11.784
+angehoben wurde — und stand seitdem unter der Überschrift „Tarif 2026".
+
+### Die Quelle ist das Gesetz, nicht eine Suchmaschine
+
+Abgerufen am 13.09.2026 von `gesetze-im-internet.de/estg/__32a.html`,
+amtliche Fassung *„ab dem Veranlagungszeitraum 2026"*:
+
+```
+Grundfreibetrag      12.348
+Zone 2  bis  17.799  (914,51 · y + 1.400) · y      y = (x − 12.348)/10.000
+Zone 3  bis  69.878  (173,10 · z + 2.397) · z + 1.034,87   z = (x − 17.799)/10.000
+Zone 4  bis 277.825  0,42 · x − 11.135,63
+Zone 5   darüber     0,45 · x − 19.470,38
+```
+
+**Eine Suchmaschine lieferte zuvor abweichende Zahlen** — 954,80 statt
+914,51 und eine Zonengrenze von 17.005 statt 17.799. Die Primärquelle
+gewinnt; das ist derselbe Grundsatz, den `CLAUDE.md` für die
+Wertermittlung festhält („Der Prüfmaßstab ist das Anwendungsbeispiel des
+amtlichen Dokuments").
+
+### Gegengeprüft über die Stetigkeit
+
+Es gibt kein amtliches Rechenbeispiel zum Tarif. Die beste verfügbare
+Probe ist die **Stetigkeit an den Zonengrenzen**: falsche Koeffizienten
+erzeugen dort einen Sprung.
+
+```
+bei  12.348 EUR   0        -> 0          Stufe 0 EUR
+bei  17.799 EUR   1.034    -> 1.035      Stufe 1 EUR
+bei  69.878 EUR   18.213   -> 18.213     Stufe 0 EUR
+bei 277.825 EUR   105.550  -> 105.551    Stufe 1 EUR
+```
+
+Alles im Bereich der Rundung. Dazu geprüft: **42 %** Grenzbelastung in
+Zone 4, **45 %** in Zone 5, und die Abrundung auf volle Euro nach Satz 5
+— genau die Regel, an der die zweite Fassung in `dashboard.js` mit
+`Math.round` gescheitert war.
+
+### Der Tarif kennt jetzt sein Jahr
+
+`TARIFE` ist eine Jahrestabelle, `calcEStG(zvE, jahr)` wählt daraus.
+Fehlt ein Jahrgang, nimmt die Funktion den nächstälteren **und meldet das
+über `tarifInfo()`** — statt still eine andere Zahl zu rechnen.
+
+> **Warum nur ein Jahrgang drinsteht:** Für 2025 ließen sich die Zonen 4
+> und 5 nicht aus einer Primärquelle belegen (die Zonen 1–3 schon:
+> 12.096 / 17.443 / 68.480 mit 932,30 und 176,64). **Eine halb belegte
+> Zahl ist schlechter als keine.** Wer einen Jahrgang braucht, trägt ihn
+> dort ein — und alle drei Stellen bekommen ihn.
+>
+> Für die App ist das kein Mangel: sie rechnet Prognosen in die Zukunft.
+> Ein Objekt, das 2026 gekauft und fünfzehn Jahre projiziert wird, nutzt
+> durchgehend den Tarif 2026, weil künftige Tarife niemand kennt.
+
+### Die dritte Stelle
+
+`rnd-calc.js` nutzt jetzt `Tax.calcGrenzsteuersatz()`. **Was bleibt:**
+der Solidaritätszuschlag ab 96.000 € und der Deckel bei 47,5 %. Beides
+gehört nicht in den § 32a-Tarif, sondern ist die Näherung *dieser*
+Stelle — sie zu entfernen wäre eine Änderung am Ergebnis, und genau die
+soll es nicht geben.
+
+Der Rückfall für den Fall, dass `tax.js` fehlt, trägt bewusst **keine
+eigenen Jahreszahlen mehr**, sondern eine lineare Näherung. Eine zweite
+Staffel wäre wieder eine dritte Wahrheit.
+
+### Wirkung
+
+| zvE | vorher | jetzt |
+|---|---|---|
+| 45.000 | 9.155 | **8.835** |
+| 60.000 | 14.680 | **14.233** |
+| 120.000 | 39.797 | **39.264** |
+
+Der alte Tarif war drei Jahre alt — deshalb die Größenordnung.
+
+### Abnahme in der laufenden App
+
+```
+Tax.tarifInfo()  ->  Jahr 2026 · exakt · Grundfreibetrag 12.348
+                     Quelle: § 32a Abs. 1 EStG, Fassung ab VZ 2026
+dashboard.js     ->  nutzt Tax (keine eigene Fassung mehr)
+rnd-calc.js      ->  nutzt Tax, alte Staffel weg, Soli und Deckel bleiben
+Steuer-Tab       ->  keine NaN, keine undefined
+```
+
+### Zwei Beobachtungen am Rand
+
+**Der Grenzsteuersatz im Steuer-Tab ist ein Schalter, kein Automatismus.**
+`grenz_auto` muss angehakt sein; dann füllt `onGrenzAutoToggle()` das Feld
+aus `Tax.calcGrenzsteuersatz(zvE)` — und profitiert damit ab sofort vom
+Tarif 2026. Ist der Schalter aus, gilt der eingetragene Wert (Standard
+40,45 % aus `investmentProfileDefaults`). Das ist richtig so: eine
+Nutzereinstellung ist kein Tarif. Gemessen bei zvE 68.000 sagt der Tarif
+**41,5 %**, das Feld zeigte **40,45 %** — der Schalter war aus.
+
+**Das „automatisch holen" hat eine Grenze.** Es gibt keine amtliche
+Schnittstelle, die die Tarifparameter maschinenlesbar ausliefert. Der
+ehrliche Weg ist der gewählte: eine Jahrestabelle mit Quellenangabe je
+Jahrgang, an einer Stelle, mit einem Prüfhaken (`tarifInfo`), der sagt,
+welcher Jahrgang gerade rechnet.
+
+### Commits
+
+`ed08931` v1364
+
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
