@@ -2754,3 +2754,50 @@ vorgemerkte Quelle sie gleich beantwortet.** Der Nutzer soll nicht raten, was
 die Maschine in zehn Sekunden weiß. Und wenn die Quelle kommt, zählt eine
 Vorbelegung im Formular nicht als Angabe — die Indikation ist gemessen, die
 Vorbelegung geraten. Nur was der Nutzer SELBST gesagt hat, gewinnt.
+
+## Ein Satz trägt Befehl und Angabe — und der Code steigt nach dem Befehl aus
+
+Im durchgehenden Lauf zweimal gefunden, beide Male dieselbe Sorte Verlust:
+
+```
+"Bodenrichtwert 300, Grundstück 1000 m², Miteigentumsanteil 20 %"
+  -> BORIS-Abruf lief, die beiden anderen Zahlen fielen weg
+"Nimm die erweiterte Marktpreisindikation. Baujahr 1975, Kaufpreis 300.000"
+  -> Indikation vorgemerkt, Baujahr und Kaufpreis fielen weg
+```
+
+Der Grund ist immer derselbe: eine Aktion wird erkannt, ausgeführt, `return
+true`. Was im selben Satz noch stand, sieht danach niemand.
+
+Bei der Profil-Übernahme gibt es das richtige Verhalten seit v1286 — *„Trägt
+er noch mehr, wird das Profil eingetragen UND der Satz danach ausgewertet."*
+Den Abrufen fehlte es, an **allen vier** Aufrufstellen.
+
+**Wer spricht, trennt nicht in Befehle und Angaben.** Nach jeder erkannten
+Aktion gehört der Restsatz durch die normale Auswertung.
+
+**Und: Einzelprüfungen finden das nicht.** Beide Fälle kamen erst im
+durchgehenden Lauf ans Licht — in der Einzelprüfung sagt man „nimm die
+erweiterte", nicht „nimm die erweiterte, Baujahr 1975".
+
+## Eine Funktion in einer Funktion ist gültiges JavaScript
+
+Ein Einfügepunkt lag im **Kommentar** von `_istAbrufWunsch` statt dahinter.
+Die neue Funktion landete damit *innerhalb* der alten, und zwei Dinge brachen
+gleichzeitig:
+
+1. Sie war von außen unsichtbar — der Export am Dateiende warf
+   `ReferenceError`, `window.VoiceImport` blieb `undefined`, **der ganze
+   Sprechlauf war tot**.
+2. Die umschließende Funktion war entstellt: ihre letzten beiden Zeilen
+   standen hinter der verschachtelten.
+
+**`node --check` blieb grün** — Syntax war einwandfrei, Bedeutung nicht.
+
+Gefunden über die **Browser-Konsole**, nicht durch Code-Lesen: der
+`ReferenceError` nannte Datei, Zeile und Spalte in einer Zeile.
+
+**Regel: Beim Einfügen vor einer Funktion prüfen, ob der Anker der
+Funktionskopf ist — nicht der Kommentar darüber.** Und nach jedem Einbau in
+eine Datei mit Export-Block einmal im Browser nachsehen, ob das Modul
+überhaupt noch lädt. Syntaxprüfung beweist das nicht.

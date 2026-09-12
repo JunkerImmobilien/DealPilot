@@ -13308,6 +13308,83 @@ ssh root@157.90.117.167 "cd /opt/dealpilot && git reset --hard a21fe9c \
 Schritte ab (Vorbedingungen, Sicherungen mit Kopfprüfung, Gold-Audit,
 Nachfrage, Merge/Push/Pull, Nachmessung mit Rückweg auf dem Schirm).
 
+## v1324–v1328 · Der Sprechlauf, im ganzen Lauf gemessen — 12.09.2026
+
+Aus Marcels Bildern „fehler 1" bis „fehler 4" und einem **durchgehenden
+Lauf** von der Adresse bis zur Ort-Frage. Die vier Einzelfehler waren
+schnell behoben; **zwei weitere fand erst der Gesamtlauf**.
+
+### Was aus den Bildern kam
+
+**v1324 · Eine höfliche Anweisung ist keine Frage.** „Kannst du auch aus
+den Einstellungen übernehmen" ging an `/ai/copilot-frage` — eine Route,
+die Auskunft gibt und nichts eintragen kann. `_rfIstFrage` stand vor
+`_rfWillProfil`, und `RF_FRAGEWORT` enthält „kannst du". Dazu: ein
+Fragezeichen macht aus „Marktpreisindikation abrufen?" keine Frage — es
+entscheidet das Fragewort am Anfang.
+
+**v1324 · Die Ort-Frage wartet auf die Indikation.** Marcel klickte sich
+durch vier Auswahlreihen, und danach brachte die Indikation genau diese
+Werte mit. Der Abstand war eine einzige Frage: die Indikation war auf das
+*Ende* von Etappe 4 terminiert, die Ort-Frage ist Frage 11 *in* Etappe 4.
+
+**v1325 · Die Ausstattung fehlte.** Der Marktbericht liest neun
+`eq_*`-Felder — der Sprechlauf schickte keines. Die erweiterte Indikation
+rechnete am Durchschnitt, obwohl die Daten im Formular standen. Jetzt
+gehen sie mit, dazu Qualitätssterne, Modernisierung, Balkon, Garagen.
+
+**v1325 · Eine Auskunft, die eine Lücke füllt, wird angeboten.** „Wie ist
+die Postleitzahl von Herford?" → Antwort, und danach: *„Soll ich PLZ:
+32049 so übernehmen?"* Angeboten, nicht gesetzt.
+
+### Was erst der Gesamtlauf fand
+
+**v1326 / v1327 · Ein Satz trägt Befehl UND Angabe.** Zweimal dieselbe
+Sorte Verlust:
+
+```
+"Bodenrichtwert 300, Grundstück 1000 m², MEA 20 %"   -> Abruf lief, zwei Zahlen weg
+"Nimm die erweiterte … Baujahr 1975, Kaufpreis 300.000" -> vorgemerkt, beide Zahlen weg
+```
+
+In der Einzelprüfung sagt man „nimm die erweiterte" — nicht „nimm die
+erweiterte, Baujahr 1975". Deshalb fand es nur der Lauf.
+
+**v1327c · Eine eigene Panne, die Staging kippte.** Der Einfügepunkt lag
+im *Kommentar* von `_istAbrufWunsch` statt dahinter. Die neue Funktion
+landete *innerhalb* der alten: von außen unsichtbar, der Export warf
+`ReferenceError`, `window.VoiceImport` blieb `undefined`. `node --check`
+blieb grün — eine Funktion in einer Funktion ist gültiges JavaScript.
+Gefunden über die Browser-Konsole in einer Zeile.
+
+**v1328 · Standards, die es nie gab.** „Möchte ich aus den Einstellungen
+übernehmen oder die Standards übernehmen" — der Co-Pilot *konnte* nicht:
+für Mietsteigerung, Wertsteigerung und Leerstand stand in
+`investmentProfileDefaults` nichts. Jetzt 1,5 / 1,5 / 2 Prozent, bewusst
+vorsichtig und als Annahme benannt.
+
+### Der Gesamtlauf, gemessen
+
+```
+"Sachsenstraße 16, 32052 Herford"                  -> Adresse, PLZ-Rückfrage
+"Nimm die erweiterte … Baujahr 1975, KP 300.000"   -> beides übernommen
+"Aus den Einstellungen, keine Maklerprovision"     -> Makler 0, Rest aus Profil
+"Die möchte ich aus den Einstellungen übernehmen"  -> 1,5 / 1,5 / 2 %
+   an der Ort-Frage:  ortWartet=1  marktLaeuft=2
+   nach dem Abruf:    ortWartet=0  markt2=DA
+      Makrolage        durchschnittlich  [Marktpreisindikation (erweitert)]
+      Mikrolage        sehr_gut          [Marktpreisindikation (erweitert)]
+      Wertsteigerung   sehr_hoch         [erweiterte Marktpreisindikation]
+      Bevölkerung      stabil            [amtliche Bevölkerungsstatistik]
+      Nachfrage        stark             [Angebotsdauer im Umkreis]
+```
+
+Fünf Werte, die Marcel vorher raten musste, kommen jetzt aus Daten — und
+jeder trägt seine Herkunft.
+
+**Commits** `e7fa674`, `c279467`, `ab9e195`, `c75f577`, `80d782d`,
+`dd5c20a`, `b26faf3`, `884bd78`. Auf Staging.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
