@@ -176,7 +176,7 @@ window.DealScore2 = (function() {
     balanced: {
       key: 'balanced',
       label: 'Ausgewogen',
-      description: 'Standard-Bewertung — mittlere Anforderungen, breit einsetzbar für Buy & Hold und Trade-Deals.',
+      description: 'Breit einsetzbar — für Buy & Hold wie für Trade-Deals.',
       icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M5 7h14"/><path d="m5 7-3 6h6z"/><path d="m19 7-3 6h6z"/><path d="M8 21h8"/></svg>',
       // Keine Overrides nötig — nimmt 1:1 die DEFAULTS
       overrides: {}
@@ -190,7 +190,7 @@ window.DealScore2 = (function() {
     conservative: {
       key: 'conservative',
       label: 'Konservativ',
-      description: 'Strengere Bewertung mit Fokus auf Substanz + Cashflow-Sicherheit. Höhere Renditen + niedrigerer LTV nötig für gute Punkte.',
+      description: 'Substanz und Cashflow-Sicherheit vor Renditejagd.',
       icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
       overrides: {
         // Hauptgewichtungen: Risiko + Finanzierung wichtiger, Upside weniger
@@ -237,7 +237,7 @@ window.DealScore2 = (function() {
     optimistic: {
       key: 'optimistic',
       label: 'Optimistisch',
-      description: 'Wachstumsorientierte Bewertung — Rendite + Upside-Potenzial dominieren, höhere LTV-Toleranz.',
+      description: 'Wachstum: Rendite und Upside zählen, LTV wird toleriert.',
       icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
       overrides: {
         // Hauptgewichtungen: Rendite + Upside wichtiger
@@ -278,21 +278,21 @@ window.DealScore2 = (function() {
     lage: {
       key: 'lage',
       label: 'Lage-Fokus',
-      description: 'Fokus auf Lagequalität — die Lage zählt am stärksten, ideal für wertstabile A-/B-Lagen.',
+      description: 'Die Lage entscheidet — für wertstabile A- und B-Lagen.',
       icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
       overrides: { weights: { rendite: 20, finanzierung: 15, risiko: 15, lage: 40, upside: 10 } }
     },
     cashflow: {
       key: 'cashflow',
       label: 'Cashflow-Fokus',
-      description: 'Fokus auf laufenden Cashflow + Rendite — für Anleger, die den monatlichen Überschuss priorisieren.',
+      description: 'Für alle, denen der monatliche Überschuss am wichtigsten ist.',
       icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 21a8 8 0 1 1 0-16"/><path d="M3 11h9"/><path d="M3 15h7"/></svg>',
       overrides: { weights: { rendite: 40, finanzierung: 25, risiko: 20, lage: 8, upside: 7 } }
     },
     sicherheit: {
       key: 'sicherheit',
       label: 'Sicherheit',
-      description: 'Fokus auf Finanzierungssicherheit + geringes Risiko — solide Finanzierung schlägt Renditejagd.',
+      description: 'Solide Finanzierung schlägt Renditejagd.',
       icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
       overrides: { weights: { rendite: 25, finanzierung: 30, risiko: 30, lage: 10, upside: 5 } }
     }
@@ -739,16 +739,59 @@ window.DealScore2 = (function() {
   }
 
   /* V107 — Preset-API */
+  /* === v1352 - EIN PROFIL ZEIGT SEINE ZAHLEN, NICHT SEINE ABSICHT ====
+     Marcel zu den Bewertungsprofilen: „Wie setzen sie sich zusammen?
+     Welchen Einfluss haben sie auf den Score? Das gehoert sichtbar."
+
+     Bisher gab getPresets() nur label, description und icon zurueck - die
+     Karte konnte also nur BESCHREIBEN, was ein Profil tut. „Strengere
+     Bewertung mit Fokus auf Substanz" sagt niemandem, was sich aendert.
+
+     Jetzt kommen zwei gemessene Groessen mit:
+
+       weights   die effektiven Hauptgewichte (DEFAULTS + overrides).
+                 NICHT die overrides allein - ein Profil, das nur drei von
+                 fuenf Gewichten anfasst, wuerde sonst als Luecke erscheinen.
+       schaerfe  +1 strenger / 0 Standard / -1 lockerer, abgelesen an der
+                 Brutto-Renditeschwelle fuer 80 Punkte. Die Gewichte allein
+                 verschweigen diesen zweiten Hebel: Konservativ verlangt 8 %
+                 statt 7 %, Optimistisch gibt sich mit 6 % zufrieden.
+
+     Die Werte werden bei JEDEM Aufruf frisch abgeleitet. Eine zweite Liste
+     mit Prozentzahlen fuer die Anzeige waere genau die Doppelliste, an der
+     schon die Score-Stufen auseinandergelaufen sind. */
+  function _schwelle80(t) {
+    try {
+      var r = (t && t.bruttorendite) || DEFAULTS.thresholds.bruttorendite;
+      for (var i = 0; i < r.length; i++) { if (r[i][1] >= 80) return r[i][0]; }
+    } catch (e) {}
+    return null;
+  }
+
   function getPresets() {
+    var basis = _schwelle80(DEFAULTS.thresholds);
     return Object.keys(PRESETS).map(function(k) {
+      var p = PRESETS[k];
+      var ov = (p.overrides || {});
+      var w = {};
+      ['rendite','finanzierung','risiko','lage','upside'].forEach(function(f) {
+        w[f] = (ov.weights && ov.weights[f] != null) ? ov.weights[f] : DEFAULTS.weights[f];
+      });
+      var eigen = _schwelle80(ov.thresholds);
+      var schaerfe = 0;
+      if (eigen != null && basis != null && eigen !== basis) schaerfe = (eigen > basis) ? 1 : -1;
       return {
         key: k,
-        label: PRESETS[k].label,
-        description: PRESETS[k].description,
-        icon: PRESETS[k].icon
+        label: p.label,
+        description: p.description,
+        icon: p.icon,
+        weights: w,
+        schaerfe: schaerfe,
+        schwelle80: (eigen != null ? eigen : basis)
       };
     });
   }
+
   function getActivePreset() {
     try {
       var p = localStorage.getItem(PRESET_KEY);

@@ -27627,8 +27627,9 @@ aside.sidebar .sb-card.deal-won.active {
 .ds2-preset-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 16px;
+  gap: 7px;                 /* v1352: vier Teile statt drei */
+  padding: 14px 15px;
+
   background: linear-gradient(135deg, var(--surface, #F8F6F1), #fff);
   border: 1.5px solid color-mix(in srgb, var(--gold) 20%, transparent);
   border-radius: 12px;
@@ -27663,21 +27664,97 @@ aside.sidebar .sb-card.deal-won.active {
   border-radius: 8px;
   box-shadow: 0 2px 8px color-mix(in srgb, var(--gold) 40%, transparent);
 }
+/* ---- v1352: Profilkarte - Kopfzeile, Gewichtsbalken, geklemmter Text
+   Gemessen vor dem Umbau: sechs Karten in zwei Reihen von 161 und 143 px.
+   Ausloeser war EIN Beschreibungstext mit 122 Zeichen, der vier statt drei
+   Zeilen brauchte und das ganze Raster mitzog. Deshalb steht hier keine
+   feste Kartenhoehe - die waere nur der naechste Deckel, unter dem Text
+   verschwindet -, sondern jeder Bestandteil bekommt eine feste Zeilenzahl.
+   Die Karte ist dann von selbst ueberall gleich hoch, und was nicht mehr
+   hineinpasst, steht vollstaendig im title-Attribut. */
+.ds2-preset-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 22px;
+}
 .ds2-preset-icon {
   font-size: 22px;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  color: var(--gold, #C9A84C);
+  flex: 0 0 auto;
 }
 .ds2-preset-label {
   font-size: 14px;
   font-weight: 700;
   color: var(--ch, #2A2727);
   letter-spacing: -0.2px;
+  line-height: 1.2;
 }
+
+/* Der Balken ist die Antwort auf Marcels Frage, was ein Profil eigentlich
+   tut: fuenf Segmente im Verhaeltnis der Hauptgewichte. flex-grow traegt
+   den Prozentwert, deshalb stimmt das Bild auch dann, wenn die Summe
+   einmal nicht exakt 100 ergibt. */
+.ds2-pw-bar {
+  display: flex;
+  height: 7px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--gold) 10%, transparent);
+  flex: 0 0 auto;
+}
+.ds2-pw-seg {
+  display: block;
+  min-width: 2px;
+}
+.ds2-preset-zahlen {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  flex-wrap: nowrap;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: var(--ch, #2A2727);
+  line-height: 1.3;
+  min-height: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.ds2-pw-schaerfe {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  padding: 1px 5px;
+  border-radius: 6px;
+  flex: 0 0 auto;
+}
+/* Streng und locker sind kein Gut und Boese - deshalb beide in Gold und
+   nicht in Gruen/Rot. Die Statusfarben gehoeren dem Score, nicht der
+   Einstellung, mit der man ihn misst. */
+.ds2-pw-splus,
+.ds2-pw-sminus {
+  background: color-mix(in srgb, var(--gold) 16%, transparent);
+  color: var(--gold-3, #9a7f33);
+}
+
+/* Zwei Zeilen, danach Ellipse. Der vollstaendige Satz haengt im title. */
 .ds2-preset-desc {
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--muted, #7A7370);
   line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 33px;
+  margin-top: -2px;
 }
+
 
 /* Mobile: Preset-Cards untereinander */
 @media (max-width: 640px) {

@@ -453,7 +453,79 @@ function _ds2BuildSettingsOverlay() {
   return ov;
 }
 
+/* === v1352 - DIE PROFILKARTE ZEIGT IHRE GEWICHTE ======================
+   Zwei Befunde aus dem Audit, beide gemessen im Reiter Deal Score:
+
+   1. GLEICHE HOEHE, WEIL EIN SATZ ZU LANG WAR. Die sechs Karten standen
+      in zwei Reihen von 161 und 143 Pixeln. Ursache war genau EIN Text:
+      "Konservativ" hatte 122 Zeichen und brauchte vier Zeilen statt drei,
+      das Raster streckte die ganze erste Reihe mit. Kein Layoutfehler -
+      ein Textfehler.
+
+   2. PROSA SAGT NICHTS. Marcel woertlich: "Wie setzen sie sich zusammen?
+      Welchen Einfluss haben sie auf den Score? Das gehoert sichtbar."
+      "Strengere Bewertung mit Fokus auf Substanz" beantwortet das nicht.
+      40 % Lage statt 10 % beantwortet es.
+
+   Die Karte traegt deshalb jetzt einen Balken aus den fuenf echten
+   Hauptgewichten (Quelle: getPresets(), v1352 - abgeleitet, nicht
+   getippt) und darunter die zwei staerksten in Worten. Der Balken hat
+   feste Hoehe, die Zeile darunter genau eine - damit sind alle Karten
+   gleich hoch, ohne dass irgendwo etwas abgeschnitten wird.
+
+   Die Schaerfe steht daneben, weil die Gewichte den zweiten Hebel
+   verschweigen: Konservativ verlangt 8 % Bruttorendite fuer dieselben
+   80 Punkte, fuer die Optimistisch 6 % genuegen. Zwei Profile koennen
+   identische Gewichte haben und trotzdem verschieden streng sein. */
+var _DS2_KAT = {
+  rendite:      { kurz: 'Rendite',  farbe: 'var(--wl-c9a84c, #C9A84C)' },
+  finanzierung: { kurz: 'Finanz.',  farbe: 'var(--wl-e8cc7a, #E8CC7A)' },
+  risiko:       { kurz: 'Risiko',   farbe: 'var(--wl-9a7f33, #9a7f33)' },
+  lage:         { kurz: 'Lage',     farbe: 'var(--wl-b8932f, #b8932f)' },
+  upside:       { kurz: 'Upside',   farbe: 'var(--wl-d9c88a, #d9c88a)' }
+};
+var _DS2_REIHE = ['rendite', 'finanzierung', 'risiko', 'lage', 'upside'];
+
+function _ds2GewichtBalken(w) {
+  if (!w) return '';
+  var summe = 0;
+  _DS2_REIHE.forEach(function (k) { summe += (Number(w[k]) || 0); });
+  if (!summe) return '';
+  var seg = _DS2_REIHE.map(function (k) {
+    var v = Number(w[k]) || 0;
+    if (!v) return '';
+    var kat = _DS2_KAT[k];
+    return '<span class="ds2-pw-seg" style="flex:' + v + ';background:' + kat.farbe + '" ' +
+           'title="' + kat.kurz + ' ' + v + ' %"></span>';
+  }).join('');
+  return '<span class="ds2-pw-bar" aria-hidden="true">' + seg + '</span>';
+}
+
+/* Die zwei staerksten Treiber in Worten - bei Gleichstand die Reihenfolge
+   aus _DS2_REIHE, damit dieselbe Konfiguration immer denselben Text ergibt. */
+function _ds2GewichtText(w) {
+  if (!w) return '';
+  var sortiert = _DS2_REIHE.slice().sort(function (a, b) {
+    var d = (Number(w[b]) || 0) - (Number(w[a]) || 0);
+    return d !== 0 ? d : (_DS2_REIHE.indexOf(a) - _DS2_REIHE.indexOf(b));
+  });
+  return sortiert.slice(0, 2).map(function (k) {
+    return _DS2_KAT[k].kurz + ' ' + (Number(w[k]) || 0) + ' %';
+  }).join(' \u00b7 ');
+}
+
+function _ds2Schaerfe(p) {
+  if (!p || !p.schaerfe) return '';
+  var t = (p.schaerfe > 0) ? 'strenger' : 'lockerer';
+  var wie = (p.schwelle80 != null)
+    ? ' \u2014 ' + String(p.schwelle80).replace('.', ',') + ' % Bruttorendite f\u00fcr 80 Punkte'
+    : '';
+  return '<span class="ds2-pw-schaerfe ds2-pw-s' + (p.schaerfe > 0 ? 'plus' : 'minus') + '" ' +
+         'title="Schwellen ' + t + wie + '">' + (p.schaerfe > 0 ? '\u25b2' : '\u25bc') + ' ' + t + '</span>';
+}
+
 function _ds2FillSettingsForm() {
+
   var cfg = window.DealScore2.loadConfig();
   // V63.21: Wenn Inline-Container im Settings-Modal existiert, diesen befüllen.
   // Sonst (Legacy-Path) den ursprünglichen ds2-settings-body im DS2-Modal befüllen.
@@ -474,18 +546,30 @@ function _ds2FillSettingsForm() {
     var isActive = (activePreset === p.key);
     html += '<button type="button" class="ds2-preset-card' + (isActive ? ' ds2-preset-active' : '') + '" ' +
               'onclick="ds2SetPreset(\'' + p.key + '\')" data-preset="' + p.key + '">' +
-              '<div class="ds2-preset-icon">' + p.icon + '</div>' +
-              '<div class="ds2-preset-label">' + p.label + '</div>' +
-              '<div class="ds2-preset-desc">' + p.description + '</div>' +
+              '<div class="ds2-preset-top">' +
+                '<span class="ds2-preset-icon">' + p.icon + '</span>' +
+                '<span class="ds2-preset-label">' + p.label + '</span>' +
+              '</div>' +
+              _ds2GewichtBalken(p.weights) +
+              '<div class="ds2-preset-zahlen">' + _ds2GewichtText(p.weights) +
+                (p.schaerfe ? ' ' + _ds2Schaerfe(p) : '') + '</div>' +
+              '<div class="ds2-preset-desc" title="' + String(p.description || '').replace(/"/g, '&quot;') + '">' +
+                (p.description || '') + '</div>' +
             '</button>';
+
   });
   // Custom-Karte (nur sichtbar wenn der User manuell editiert hat)
   if (activePreset === 'custom') {
     html += '<button type="button" class="ds2-preset-card ds2-preset-active" data-preset="custom">' +
-              '<div class="ds2-preset-icon">✎</div>' +
-              '<div class="ds2-preset-label">Benutzerdefiniert</div>' +
+              '<div class="ds2-preset-top">' +
+                '<span class="ds2-preset-icon">✎</span>' +
+                '<span class="ds2-preset-label">Benutzerdefiniert</span>' +
+              '</div>' +
+              _ds2GewichtBalken(cfg.weights) +
+              '<div class="ds2-preset-zahlen">' + _ds2GewichtText(cfg.weights) + '</div>' +
               '<div class="ds2-preset-desc">Manuell angepasste Werte. Klick auf eines der Profile oben, um es zu überschreiben.</div>' +
             '</button>';
+
   }
   html += '</div></div>';
 

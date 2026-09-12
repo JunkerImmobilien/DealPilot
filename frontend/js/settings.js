@@ -561,7 +561,26 @@ function showSettings(initialTab) {
       // Tab 4: DealScore
       '<div class="st-pane" data-pane="dealscore" style="display:none">' +
 
-        // V111: DS1 + DS2 schließen sich gegenseitig aus — Plan-Konfig steuert was sichtbar ist
+        /* v1351 - DER KOMMENTAR HIER WAR FALSCH, UND ZWAR SEIT V112.
+           Er sagte: "DS1 + DS2 schliessen sich gegenseitig aus". Das
+           stimmt seit V112 nicht mehr - und der Code tat auch damals
+           schon etwas anderes. Marcel am 13.09.2026, woertlich:
+
+             "der dealscore ist ja aus dem Quickcheck oder der einfachen
+              Bewertung wenn du den Starter-Plan hast. Sobald du den
+              Investor-Plan hast und die passenden Felder ausgefuellt hast,
+              kannst du den DS2 also Investor Deal Score ZUSAETZLICH sehen."
+
+           GEMESSEN in config.js, und es passt zu Marcels Beschreibung:
+             Free     deal_score_basic true · deal_score_v2 'demo'
+             Starter  deal_score_basic true · deal_score_v2 false
+             Investor beide true
+             Pro      beide true
+
+           Es ist also eine ERGAENZUNG, kein Ausschluss. Ein Kommentar,
+           der das Gegenteil dessen behauptet, was der Code tut, ist
+           schlimmer als keiner: wer ihn liest, baut auf einer falschen
+           Annahme weiter. */
         // ───── DEALPILOT SCORE (klassisch) — nur wenn deal_score_basic aktiv ─────
         ((window.DealPilotConfig && DealPilotConfig.pricing &&
           DealPilotConfig.pricing.hasFeature('deal_score_basic'))
