@@ -5366,9 +5366,16 @@
   function _istAbrufWunsch(text) {
     var t = String(text || '');
     if (!_rf || !(_rf.aktionen || []).length) return false;
-    /* Eine Frage ist kein Befehl: „was ist der Bodenrichtwert?" will eine
-       Auskunft, keinen Abruf. */
-    if (/\?\s*$/.test(t.trim())) return false;
+    /* v1324: Ein Fragezeichen allein macht aus einer Bitte keine Frage.
+       Marcels Befund (Bild "fehler 1"): "Erweiterte
+       Marktpreisindikationen abrufen?" wurde hier ausgeschlossen und ging
+       an den Auskunfts-Weg - der Co-Pilot erklaerte, was er koennte, statt
+       es zu tun.
+
+       Was eine echte Frage von einer hoeflichen Bitte trennt, ist das
+       FRAGEWORT am Anfang, nicht das Zeichen am Ende. "Was ist der
+       Bodenrichtwert?" will Auskunft. "Bodenrichtwert abrufen?" will den
+       Abruf. Die Zeile unten faengt den ersten Fall weiterhin ab. */
     if (/^(was|wie|warum|wieso|wozu|welche|welcher|wann|wo)\b/i.test(t.trim())) return false;
     return RF_ABRUF_VERB.test(t) && RF_ABRUF_SACHE.test(t);
   }
@@ -5528,6 +5535,94 @@
      Das Angebot gehört an die Frage, deren Arbeit es abnimmt. Angeboten
      wird nur, wenn Stufe 1 schon lief (sonst wäre es ein anderer Kauf),
      Stufe 2 noch nicht, und Kontingent da ist. */
+  /* ═══════════════════════════════════════════════════════════════════
+     v1324 · DIE ORT-FRAGE WARTET AUF DIE MARKTBEWERTUNG
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Befund (Bilder „fehler 3" und „fehler 4"): er wird nach
+     Bevölkerung, Nachfrage, Wertsteigerung und Entwicklung gefragt, tippt
+     sich durch vier Auswahlreihen — und DANACH kommt die erweiterte
+     Marktpreisindikation und bringt genau diese Werte mit. Auf Bild 4 ist
+     es zu sehen: „Markt & Potenzial  stabil · stark · niedrig · eine…"
+     steht gefüllt da, darunter erscheint die Indikation mit Makrolage
+     „Durchschnittlich", Mikrolage „Sehr gut", Preistrend „+4,3 % p.a.".
+
+     Seine Vorgabe: „Es muss halt so sein, dass die erweiterte
+     Marktpreisindikation alle Werte, die dafür brauchen, am Anfang
+     abgefragt werden, dass man dann erst die erweiterte
+     Marktwertindikation abruft, diese Werte bekommt und dann auf
+     Grundlage dessen diese Werte hier ausfüllt."
+
+     GENAU DAS GEHT JETZT — und es geht ohne neue Abfragen, weil die
+     Reihenfolge schon stimmt: Fläche, Baujahr, Zustand, Energieausweis,
+     Bodenrichtwert und Lagebewertung stehen nach Etappe 3 alle. Die
+     Ort-Frage ist Frage 11 in Etappe 4. Wenn wir sie erreichen, ist die
+     Indikation abrufbereit — sie wurde nur bis zum ENDE der Etappe
+     zurückgestellt, und das ist eine Frage zu spät.
+
+     Ist eine Indikation vorgemerkt, wird sie deshalb HIER gestartet und
+     die Frage so lange zurückgestellt. Kommt sie an, füllt
+     `_rfMarktInsFormular` die vier Felder, und gefragt wird nur noch,
+     was sie nicht beantwortet hat.
+
+     OHNE VORMERKUNG ändert sich nichts: wer keine Indikation will, wird
+     gefragt wie bisher. */
+  function _rfOrtBrauchtMarkt(eintrag) {
+    if (!_rf || !eintrag || !eintrag.ids) return false;
+    if (_rf.ortWartet) return false;              /* laeuft schon */
+    if (_rf.markt2) return false;                 /* Stufe 2 ist schon da */
+    var ENTW = ['ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_wertsteigerung', 'ds2_entwicklung'];
+    if (!eintrag.ids.some(function (id) { return ENTW.indexOf(id) >= 0; })) return false;
+    /* Vorgemerkt heisst: der Nutzer hat die erweiterte gewollt und sie
+       wurde auf spaeter geschoben. Genau dieses Spaeter ist jetzt. */
+    return !!(_rf.marktGewollt && _rf.marktStufe >= 2 && !_rf.marktPlusGetan);
+  }
+
+  /* Die vier Werte aus einer fertigen Marktbewertung ins Gespraech
+     uebernehmen. Gibt die Zahl der gesetzten Felder zurueck.
+
+     ÜBERSCHRIEBEN WIRD NICHTS, was der Nutzer selbst gesagt hat - aber
+     eine blosse Vorbelegung im Formular zaehlt hier nicht als Angabe:
+     die Indikation ist gemessen, die Vorbelegung geraten. */
+  function _rfMarktInsFormular(M) {
+    if (!_rf || !M) return 0;
+    var gesetzt = [];
+    function stufeLage(sc) {
+      if (sc == null) return null;
+      var s = sc > 10 ? sc / 10 : sc;
+      return s >= 8 ? 'sehr_gut' : s >= 6 ? 'gut' : s >= 4 ? 'durchschnittlich' : s >= 2 ? 'schwach' : 'sehr_schwach';
+    }
+    function stufeWert(p) {
+      if (p == null) return null;
+      return p >= 3 ? 'sehr_hoch' : p >= 2 ? 'hoch' : p >= 1 ? 'mittel' : p > 0 ? 'niedrig' : 'keines';
+    }
+    function stufeBev(p) {
+      if (p == null) return null;
+      return p >= 1 ? 'stark_wachsend' : p >= 0.3 ? 'wachsend' : p >= -0.3 ? 'stabil'
+           : p >= -1 ? 'leicht_fallend' : 'stark_fallend';
+    }
+    function stufeNachfrage(tage) {
+      if (tage == null) return null;
+      return tage <= 30 ? 'sehr_stark' : tage <= 60 ? 'stark' : tage <= 120 ? 'mittel'
+           : tage <= 200 ? 'schwach' : 'sehr_schwach';
+    }
+    function setz(id, wert, woher) {
+      if (!wert) return;
+      var da = _rf.data.fields[id];
+      if (da != null && String(da).trim() !== '') return;   /* selbst gesagt gewinnt */
+      _rf.data.fields[id] = wert;
+      if (!_rf.quelle) _rf.quelle = {};
+      _rf.quelle[id] = woher;
+      gesetzt.push(id);
+    }
+    setz('makrolage', stufeLage(M.makroRaw != null ? M.makroRaw : M.makro), 'erweiterte Marktpreisindikation');
+    setz('mikrolage', stufeLage(M.microRaw != null ? M.microRaw : M.mikro), 'erweiterte Marktpreisindikation');
+    setz('ds2_wertsteigerung', stufeWert(M.trendRaw), 'erweiterte Marktpreisindikation');
+    setz('ds2_bevoelkerung', stufeBev(M.bevRaw), 'amtliche Bevoelkerungsstatistik');
+    setz('ds2_nachfrage', stufeNachfrage(M.tageRaw), 'Angebotsdauer im Umkreis');
+    if (gesetzt.length) _rfStandZeichnen();
+    return gesetzt.length;
+  }
+
   function _rfVertiefungHier(eintrag) {
     if (!_rf || !eintrag || !eintrag.ids) return;
     if (_rf.markt2 || _rf.marktPlusGefragt || _rf.marktPlusHier) return;
@@ -6201,6 +6296,15 @@
                   ? p.valuation.inputs.market_rent_sqm : null),
       trend: (p.price_trend_pct != null) ? p.price_trend_pct : null,
       konfidenz: mv.confidence_label || null,
+      /* v1324: die beiden Felder aus v1316 kamen im Sprechlauf nicht an -
+         M wurde gebaut, bevor es sie gab. Ohne sie kann
+         _rfMarktInsFormular Bevoelkerung und Nachfrage nicht setzen. */
+      bevRaw: (p.bevoelkerung_trend_pct != null) ? p.bevoelkerung_trend_pct : null,
+      tageRaw: (p.days_on_market != null) ? p.days_on_market
+               : ((p.market_dynamics && p.market_dynamics.days_on_market != null) ? p.market_dynamics.days_on_market : null),
+      marktkontext: p.marktkontext || null,
+      erbbaurecht: p.erbbaurecht || null,
+      trendRaw: (p.price_trend_pct != null) ? p.price_trend_pct : null,
       /* v1290: nur die volle Stufe liefert Fliesstext und Historie. */
       text: (p.report_md && !/Schnell-Modus/.test(String(p.report_md))) ? String(p.report_md) : null
     };
@@ -6258,6 +6362,34 @@
     /* v1307: Der Bericht trägt mehr als Marktwert und Lage — er sagt auch,
        wie sich der Ort entwickelt. Das wird jetzt gelesen. */
     _rfBerichtLesen(M, Q);
+    /* ═══ v1324 · Die wartende Ort-Frage aufloesen ══════════════════════
+       Wenn `_rfFrage` die Frage zurueckgestellt hat, um erst die
+       Indikation zu holen, wird hier weitergemacht: die Werte gehen ins
+       Gespraech, und gefragt wird nur noch, was uebrig bleibt.
+
+       `_rfMarktInsFormular` nimmt auch die Felder mit, die `_rfSetzen`
+       oben nicht kennt - Bevoelkerung aus dem Trend, Nachfrage aus der
+       Angebotsdauer, Wertsteigerung aus dem Preistrend. */
+    if (_rf.ortWartet) {
+      _rf.ortWartet = 0;
+      var _n = 0;
+      try { _n = _rfMarktInsFormular(M); } catch (ex) {}
+      var _e2 = _rf.offen[_rf.i];
+      var _restOffen = _e2 ? _rfFehlt(_e2, _rf.data.fields) : false;
+      if (_n) {
+        var _namen = ['Makrolage', 'Mikrolage', 'Bevoelkerung', 'Nachfrage', 'Wertsteigerung'];
+        _rfBlase('co', '...Daraus habe ich <b>' + _n + ' Angabe' + (_n === 1 ? '' : 'n') +
+          '</b> uebernommen — mit Herkunft, nicht als deine Schaetzung.' +
+          (_restOffen ? ' Was jetzt noch fehlt, frage ich gleich.' : ''));
+      }
+      if (!_restOffen) {
+        _rfBlase('co', '<span style="opacity:.7">Damit ist der Ort beschrieben — weiter.</span>');
+        setTimeout(_rfWeiter, 500);
+      } else {
+        setTimeout(_rfFrage, 500);
+      }
+      return;
+    }
     /* v1288: Steht die Lage-Frage gerade an, ist sie damit beantwortet. */
     try {
       var e = _rf.offen[_rf.i];
@@ -6426,6 +6558,26 @@
   function _rfFrage() {
     if (_rf.i >= _rf.offen.length) return _rfFertig();
     var e = _rf.offen[_rf.i];
+    /* ═══ v1324 · Erst die Indikation, dann die Frage ═══════════════════
+       Steht die erweiterte Marktpreisindikation vorgemerkt und wären wir
+       jetzt bei der Ort-Frage, wird sie HIER geholt statt am Ende der
+       Etappe. Alles, was sie braucht, steht nach Etappe 3 — Fläche,
+       Baujahr, Zustand, Energieausweis, Bodenrichtwert, Lagebewertung.
+
+       Die Frage wartet so lange. Kommt die Indikation an, füllt
+       `_rfMarktInsFormular` die Felder, und gefragt wird nur noch, was
+       offen blieb. Marcels Vorgabe wortwörtlich: erst abrufen, „dann auf
+       Grundlage dessen diese Werte hier ausfüllen". */
+    if (_rfOrtBrauchtMarkt(e)) {
+      _rf.ortWartet = 1;
+      _rf.marktPlusGetan = 1;
+      _rfBlase('co', 'Bevor ich dich raten lasse: die <b>erweiterte Marktpreisindikation</b> '
+        + 'bringt Bevölkerung, Nachfrage, Wertsteigerung und Lage mit. Alles, was sie dafür '
+        + 'braucht, steht jetzt — ich hole sie, dann füllen wir damit auf.');
+      try { _rfMarktStarten(2); } catch (ex) { _rf.ortWartet = 0; }
+      return;   /* die Frage kommt nach dem Abruf */
+    }
+
     /* v1288: Was inzwischen VON SELBST hereingekommen ist — der amtliche
        Bodenrichtwert, die Lagewerte aus der Marktpreisindikation — wird
        nicht noch einmal gefragt. Ein Co-Pilot, der nach etwas fragt, das
@@ -7278,6 +7430,50 @@
 
      „Wie hoch ist die Miete?" waere ein Grenzfall - aber wer im Dialog
      nach seiner eigenen Miete fragt, will tatsaechlich eine Auskunft. */
+  /* ═══════════════════════════════════════════════════════════════════
+     v1324 · EINE HÖFLICHE ANWEISUNG IST KEINE FRAGE
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Befund (Bild „fehler 2"): er sagt „Kannst du auch aus den
+     Einstellungen übernehmen. Keine Maklerprovision." — und der Co-Pilot
+     hält einen Vortrag darüber, dass er das könne, übernimmt aber nichts
+     und kehrt zur Frage zurück.
+
+     GEMESSEN, warum: `_rfIstFrage` steht in der Prüfkette VOR
+     `_rfWillProfil`, und `RF_FRAGEWORT` enthält „kannst du". Der Satz
+     wird damit zur Wissensfrage und geht an `/ai/copilot-frage` — eine
+     Route, die auskunft gibt und nichts eintragen KANN.
+
+     Dasselbe beim Abruf (Bild „fehler 1"): „Erweiterte
+     Marktpreisindikationen abrufen?" endet mit einem Fragezeichen, und
+     `_istAbrufWunsch` schliesst Fragezeichen ausdrücklich aus.
+
+     DIE UNTERSCHEIDUNG, die gefehlt hat: Deutsche Höflichkeit kleidet
+     Anweisungen in Fragen. „Kannst du das übernehmen?" will keine
+     Auskunft über Fähigkeiten, sondern die Handlung. Wer wirklich fragt,
+     fragt nach dem WARUM, WIE VIEL oder OB ES SICH LOHNT — nicht nach
+     dem OB DU KANNST.
+
+     Die Prüfung steht deshalb VOR `_rfIstFrage` und fängt genau die
+     Sätze ab, die eine Handlung verlangen, die wir ausführen können:
+     Einstellungen übernehmen, einen Abruf starten, einen Wert setzen. */
+  function _istHoeflicheAnweisung(text) {
+    var t = String(text || '').trim();
+    if (!t) return false;
+
+    /* Es muss etwas geben, das wir TUN können. Ohne erkennbare Handlung
+       ist es eine normale Frage und gehört zum Co-Piloten. */
+    var handlung = _rfWillProfil(t) || _istAbrufWunsch(t);
+    if (!handlung) return false;
+
+    /* Eine echte Wissensfrage bleibt eine. „Warum sind die
+       Kaufnebenkosten so hoch?" enthält kein „übernimm", fällt also
+       schon oben durch — aber „Was steht in den Einstellungen?" träfe
+       `_rfWillProfil` (Quelle + „steht"), und das wäre falsch. */
+    if (/^(was|warum|wieso|weshalb|wie ?viel|wie hoch|woher|wo steht)\b/i.test(t)) return false;
+
+    return true;
+  }
+
   var RF_FRAGEWORT = /^(was|wie|wieso|warum|weshalb|wer|wo|wann|welche[rsn]?|kannst du|kannst|koenntest|könntest|erklaer|erklär|rechne|zeig|sag mir|ist das|macht das|lohnt|passt das|waere|wäre|soll ich|hab ich|habe ich)\b/i;
 
   function _rfIstFrage(text) {
@@ -7500,8 +7696,17 @@
       }
     }
 
+    /* v1324: Eine hoefliche Anweisung geht VOR die Fragepruefung.
+       "Kannst du aus den Einstellungen uebernehmen" will keine Auskunft
+       ueber Faehigkeiten, sondern die Handlung. Faellt sie hier durch,
+       landet sie bei /ai/copilot-frage - einer Route, die Auskunft gibt
+       und nichts eintragen KANN. */
+    var _hoeflich = _istHoeflicheAnweisung(t);
+    if (_hoeflich && _istAbrufWunsch(t) && (_rf.aktionen || []).length) {
+      if (_rfAktionJa(t)) return true;
+    }
     /* 1. Frage? Dann beantworten statt eintragen. */
-    if (_rfIstFrage(t)) { _rfFrageBeantworten(t); return true; }
+    if (!_hoeflich && _rfIstFrage(t)) { _rfFrageBeantworten(t); return true; }
 
     /* 2. Verneinung: „haben wir nicht", „kommt nicht in Frage", „weiter". */
     if (_rfIstVerneinung(t)) {   /* v1288b: auch satzweise */
