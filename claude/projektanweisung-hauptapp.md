@@ -14282,6 +14282,78 @@ Umwege messen etwas anderes.
 
 `42ce090` v1346+v1347 · `6b71a67` v1347b · `92e7150` v1346b · `34ba2ec` v1346c
 
+## v1348–v1348c · Ganze Schritte fallen weg, alles Zurückgestellte sieht gleich aus — 13.09.2026
+
+### 1 · Weniger Reiter statt minimierter Blöcke
+
+Marcel: *„ich würde aber vlt die bereiche dann oder den gesamten schritt
+ausblenden. die folge hat dann halt weniger tabs."*
+
+Die Stufe steht seit v1129 in `SCHRITTE[].stufe` — **hier wird keine zweite
+Liste geführt.**
+
+| Stufe | sichtbare Reiter | weg |
+|---|---|---|
+| 1 | Übersicht · Objekt | 5 |
+| 2 | + Zustand · Ausstattung · Gebäude & Außen | 2 |
+| 3 | alle sieben | 0 |
+
+Dazu eine Fußzeile: *„5 weitere Schritte erscheinen, wenn du eine größere
+Tiefe wählst."* — sonst wirkt es wie ein Verlust statt wie eine Verkürzung.
+
+**Drei Dinge müssen zusammenpassen, sonst entsteht eine Sackgasse:**
+
+1. der Reiter verschwindet,
+2. „Weiter" **überspringt** ihn (`nachbar()` statt `_aktiv ± 1`, und die
+   Knöpfe sperren gegen die sichtbaren Schritte statt gegen
+   `SCHRITTE.length`),
+3. fällt der **gerade offene** Schritt weg, wandert die Ansicht mit.
+
+Ohne das dritte stünde man vor einem leeren Blatt.
+
+**Ein Schritt mit Inhalt bleibt immer stehen** — dieselbe Regel wie bei den
+Blöcken (v1347).
+
+**Gemessen:**
+
+```
+Start        1Übersicht · weiter=frei    zurück=gesperrt
+nach Weiter  2Objekt    · weiter=gesperrt zurück=frei
+nochmal      2Objekt    · unverändert (kein Sprung ins Leere)
+nach Zurück  1Übersicht · wie am Anfang
+```
+
+### 2 · Ein Aussehen für alles Zurückgestellte
+
+Marcel: *„achte darauf das alles gleich aussieht alle ausgeblendeten sachen
+werte felder. das sieht irgendwie manchmal nicht einheitlich aus."*
+
+Er hatte recht — **vier Muster waren nebeneinander gewachsen**: der
+Reiter-Hinweis (v1196), der Stufen-Vorhang (v1344), die minimierten Blöcke
+(v1347) und die Fehlt-Markierung.
+
+Jetzt zwei Klassen zentral in `mb-wizard.js`, die anderen Dateien greifen
+darauf zu: `.mb-zurueck` (Kasten) und `.mb-auf` (Knopf).
+
+**v1348c, der eigentliche Fehler dabei:** die alten Einzelregeln haben die
+gemeinsamen ÜBERSCHRIEBEN. Gemessen:
+
+```
+vorher   Kästen: 3 · zwei Stile (Radius 8 und 10, graue Ränder)
+         Knöpfe: 3 · gefüllter Goldknopf gegen Umriss
+nachher  Kästen: 3 · EIN Stil (Inter 12,5px, Radius 10, Goldrand 26 %)
+         Knöpfe: 3 · EIN Stil
+```
+
+Die Lösung war **wegnehmen, nicht überschreiben**: eine dritte Regel hätte
+das Problem verdoppelt. Ebenso raus: der doppelte Reiter-Zugriff aus
+`mb-quellen.js` — zwei Hände an derselben Klasse waren genau die
+Uneinheitlichkeit.
+
+### Commits
+
+`1329f0d` v1348 · `15d6e58` v1348b · `e3b6d1b` v1348c
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

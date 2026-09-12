@@ -3178,3 +3178,32 @@ weil nur eine davon vom Skin überschrieben wird.
 Innerhalb dieser Ebene gelten Spezifität und Reihenfolge weiter. Und: nach
 jeder Stil-Anordnung die Eigenschaften EINZELN nachmessen — eine Regel kann
 teilweise greifen.
+
+## 145 · Eine gemeinsame Regel hilft nur, wenn die alten weichen
+
+Vier Hinweiskästen im Marktbericht sahen unterschiedlich aus — sie waren
+über Monate einzeln gewachsen. Die Zusammenführung bekam zwei gemeinsame
+Klassen (`.mb-zurueck`, `.mb-auf`), und alle vier Stellen trugen sie
+zusätzlich zu ihrer alten.
+
+**Gemessen war danach: immer noch zwei Stile.** Die alten Einzelregeln
+standen in anderen `<style>`-Blöcken, hatten dieselbe Spezifität und
+gewannen über die Reihenfolge — Radius 8 gegen 10, graue Ränder gegen
+goldene, gefüllter Knopf gegen Umriss.
+
+**Regel: beim Vereinheitlichen wird die alte Regel ENTFERNT, nicht
+überschrieben.** Ein `!important` obendrauf hätte eine dritte Regel ergeben
+und das Problem verdoppelt. Und: **nach dem Zusammenführen zählen**, wie
+viele verschiedene Stile tatsächlich übrig sind —
+
+```js
+var m = new Set();
+document.querySelectorAll('.mb-zurueck').forEach(function (el) {
+  var cs = getComputedStyle(el);
+  m.add(cs.fontFamily + cs.fontSize + cs.borderRadius + cs.borderColor);
+});
+// m.size === 1  ->  wirklich einheitlich
+```
+
+Ein Blick aufs Bild hätte den Unterschied zwischen 8 und 10 Pixeln Radius
+nicht gefunden.
