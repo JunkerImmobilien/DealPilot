@@ -14354,6 +14354,174 @@ Uneinheitlichkeit.
 
 `1329f0d` v1348 · `15d6e58` v1348b · `e3b6d1b` v1348c
 
+### v1349–v1350b · Der Weg vor dem Audit
+
+`v1349` zog die gemeinsamen Klassen `.mb-zurueck` / `.mb-auf` durch,
+nachdem `v1348c` gezeigt hatte, dass gemeinsame Klassen nichts nützen,
+solange die alten Einzelregeln daneben stehen bleiben. **Beim
+Vereinheitlichen wird die alte Regel entfernt, nicht überschrieben.**
+
+`v1350` war der erste Griff in die Einstellungen: `.ds-pane-title` stand
+in Cormorant Garamond 22 px — eine Serifenschrift mitten in einem
+Formular, in dem alles andere DM Sans 15 px ist. Dazu `.ds-setting-row`
+von 130 px auf 172 px Labelspalte, weil die Beschriftungen umbrachen.
+
+`v1350b` war eine eigene Nachlässigkeit: der Gold-Audit meldete neues
+Hartgold in `mb-karten.js` (0 → 2) und `mb-wizard.js` (1 → 3) — meine
+eigenen Werte aus der Objekt-Tab-Messung, hart eingetippt statt als
+`var(--wl-…)`. Danach stand die Basislinie bei **467 Fundstellen in 55
+Dateien**, einen Eintrag niedriger als vorher. Der Deckel darf sinken.
+
+### Commits
+
+`ca4e4c1` v1349 · `73f4fd1` v1350 · `439800c` v1350b
+
+---
+
+## Audit „Aktionen / Einstellungen" — v1351 bis v1354
+
+Marcels Auftrag: *„geh das einmal komplett durch, mach da mal einen
+Audit… können wir es besser sortieren, können wir es übersichtlicher
+machen?"* Mit der ausdrücklichen Auflage: *„Sachen, die überflüssig
+sind, könnten wir rausschmeißen. Müsstest du aber vorher einmal
+sagen."*
+
+### v1351 · Ein Kommentar, der seit V112 falsch war
+
+In `settings.js` stand:
+
+```
+// V111: DS1 + DS2 schließen sich gegenseitig aus — Plan-Konfig steuert
+```
+
+**Das stimmt nicht, und es stimmte nie.** Gemessen in `config.js`:
+
+| Plan | `deal_score_basic` | `deal_score_v2` |
+|---|---|---|
+| Free | `true` | `'demo'` |
+| Starter | `true` | `false` |
+| Investor | `true` | `true` |
+| Pro | `true` | `true` |
+
+Marcel dazu wörtlich: *„der dealscore ist ja aus dem Quickcheck oder der
+einfachen Bewertung wenn du den Starter Plan hast. Sobald du den Investor
+Plan hast und die passenden Felder ausgefüllt hast kannst du den DS2 also
+Investor Deal Score ZUSÄTZLICH sehen."*
+
+**Der Code war immer richtig, nur seine Beschreibung war falsch.** Das
+ist die gefährlichere Sorte Fehler: wer den Kommentar liest, baut den
+nächsten Griff auf einer Annahme auf, die der Code nicht teilt.
+
+### v1352 · Ein Profil zeigt seine Zahlen, nicht seine Absicht
+
+Zwei Befunde im Reiter Deal Score, beide gemessen:
+
+**1. Gleiche Höhe, weil ein Satz zu lang war.** Die sechs Profilkarten
+standen in zwei Reihen von **161 und 143 px**. Ursache war genau *ein*
+Text: „Konservativ" hatte 122 Zeichen und brauchte eine vierte Zeile,
+die das ganze Raster mitzog. **Kein Layoutfehler — ein Textfehler.**
+
+**2. Prosa beantwortet die Frage nicht.** Marcel: *„Wie setzen sie sich
+zusammen? Welchen Einfluss haben sie auf den Score? Das gehört
+sichtbar."* „Strengere Bewertung mit Fokus auf Substanz" sagt nichts.
+**40 % Lage statt 10 % sagt alles.**
+
+`getPresets()` gibt seitdem zwei abgeleitete Größen mit:
+
+- `weights` — die effektiven Hauptgewichte, `DEFAULTS` überschrieben mit
+  `overrides`. Nicht die Overrides allein: ein Profil, das nur drei von
+  fünf Gewichten anfasst, sähe sonst löchrig aus.
+- `schaerfe` — `+1` strenger, `0` Standard, `−1` lockerer, abgelesen an
+  der Bruttorendite-Schwelle für 80 Punkte.
+
+**Warum die Schärfe überhaupt mitkommt:** die Gewichte verschweigen den
+zweiten Hebel. Konservativ verlangt **8 %** Bruttorendite für dieselben
+80 Punkte, für die Optimistisch **6 %** genügen. Zwei Profile können
+identische Gewichte tragen und trotzdem verschieden streng sein.
+
+Beides wird bei jedem Aufruf frisch abgeleitet. **Eine zweite Liste mit
+Anzeigewerten wäre genau die Doppelliste**, an der die Score-Stufen
+schon einmal auseinandergelaufen sind.
+
+### v1352b · Der Deckel, der gerade entfernt wurde, war fast wieder da
+
+Nachgemessen: Karten jetzt gleich hoch (125/126 px), aber genau die zwei
+Karten *mit* Schärfe-Pille schnitten ihre Zahlenzeile ab — „Rendite 30 %
+· Finanz. 30 % ▲ strenger" passt nicht in 208 px.
+
+**Die Zeile zu kürzen wäre derselbe Fehler in klein gewesen.** Sie darf
+jetzt umbrechen und ist dafür fest zwei Zeilen hoch. Dazu der eine Pixel:
+mit 1,5 px Rand und 2 px bei der aktiven Karte war die Reihe mit der
+Aktiven einen Pixel höher als die andere.
+
+### v1353 · Der Kasten im Kasten
+
+`.ds2-settings-body-inline` war auf **480 px** gedeckelt und scrollte —
+sein Inhalt ist **2019 px** hoch. Darüber scrollt `.pane-wrap` ohnehin
+schon. Man sah also nicht einmal ein Viertel des Reiters.
+
+**Zwei Rollbalken übereinander lesen sich nicht als „hier geht es
+weiter", sondern als „hier ist etwas abgeschnitten"** — und genau so
+hatte Marcel es auch beschrieben.
+
+Dazu der Gewichtsbalken: fünf Goldtöne nebeneinander ergaben im
+Screenshot **eine Fläche, keinen Balken.** Die Töne wechseln jetzt
+zwischen hell und dunkel statt durchzulaufen, und zwischen den Segmenten
+steht eine Fuge. **Die Fuge trägt die Lesbarkeit, nicht die Farbe** —
+damit funktioniert der Balken auch beim Mandanten, dessen Goldtöne enger
+beieinanderliegen können. Alle fünf Werte stehen als `var(--wl-<hex>)`
+und in `WL_TINTS`.
+
+### v1354 · Umlaute im Nutztext, ein Anbietername zu viel
+
+**Gesucht wurde nicht im Code, sondern im sichtbaren Text aller elf
+Reiter** — dort steht, was der Kunde wirklich liest. Genau zwei Stellen:
+
+- Reiter „Externe Anbieter": „Meta-Suche **fuer** Off-Market-Deals",
+  „**Zugaenge**", „**Loeschen**", „**Verschluesselt**"
+- Reiter „Account & Sicherheit": „**Schuetze** deinen Account"
+
+Mehr gibt es nicht. `ae/oe/ue` gehören in Kommentare, nie in Nutztext.
+
+Dazu ein Verstoß gegen die Anbieter-Neutralität: unter den API-Keys stand
+*„Weitere Anbieter (PriceHubble) folgen."* CLAUDE.md ist da eindeutig —
+Sprengnetter und PriceHubble werden nach außen nie namentlich genannt,
+ImmoMetrica darf. Jetzt: *„Weitere Bewertungspartner folgen."*
+
+### Der Befund, der noch keine Änderung ist
+
+**„Profil & Anzeige" ist zwei Reiter in einem.** Gemessen: 3.933 Zeichen,
+**14 Blöcke**, 3.038 px — der mit Abstand größte Einstellungsreiter.
+Die Blöcke zerfallen sauber in zwei Hälften:
+
+| Hälfte | Blöcke | Was sie tun |
+|---|---|---|
+| Rechenvorgaben | Finanzierung · Bewirtschaftung · Mindest-Schwellen · Steuer · Standort & Nebenkosten | fließen in **jede** Kalkulation ein |
+| Darstellung | Anzeige-Optionen · Aussehen · Markt-Daten · Investor Deal Score beim Öffnen · Quickboarding · Bilder · Tooltip-Hilfe · Marktbericht-Design · Darstellung | ändern **keine** Zahl |
+
+Der Name sagt es selbst: „Profil **und** Anzeige". **Hier wird nichts
+angefasst, bevor Marcel entschieden hat** — er hat ausdrücklich verlangt,
+vor dem Aufräumen gefragt zu werden.
+
+Dazu drei kleinere Befunde aus demselben Durchgang:
+
+- **Der Datenraum lebt nur im Browser.** `dp_datenraum_v141` liegt
+  ausschließlich im `localStorage`; ein Gerätewechsel kostet alle
+  Verknüpfungen. Bei einem Bereich, aus dem Bank-Anfragen verschickt
+  werden, ist das ein Ausfallrisiko — und es gehört zu Block B, wo
+  ohnehin Logik vom Browser ins Backend wandern soll.
+- **„Externe Anbieter" ist ein ganzer Reiter für einen Anbieter** —
+  380 Zeichen, 238 px, vier Bedienelemente.
+- **„Rechtliches" ist reiner Lesetext** — 7.722 Zeichen, 25
+  Überschriften, **null Bedienelemente** — in einem Dialog, der sonst
+  zum Einstellen da ist.
+
+### Commits
+
+`0c0e73c` v1351/v1352 · `7307f90` v1352b · `28cbbdf` v1353 ·
+`882fb86` v1354
+
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
