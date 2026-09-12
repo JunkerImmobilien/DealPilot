@@ -131,7 +131,7 @@
       '.mbk-titel{font-family:"DM Sans",system-ui,sans-serif;font-size:11.5px;',
         'font-weight:700;text-transform:uppercase;letter-spacing:1.4px;',
         'color:var(--wl-b8932f,#b8932f);line-height:1.3}',
-      'html[data-mb-theme="light"] .mbk-titel{color:#9a7f33}',
+      'html[data-mb-theme="light"] .mbk-titel{color:var(--wl-9a7f33, #9a7f33)}',
       '.mbk-zahl{font-family:"DM Sans",system-ui,sans-serif;font-size:10.5px;',
         'font-weight:500;color:var(--muted,#8a8a93);',
         'border:1px solid color-mix(in srgb, var(--muted,#8a8a93) 35%, transparent);',
@@ -186,7 +186,7 @@
         'color:var(--wl-c9a84c,#C9A84C);padding:2px 0;letter-spacing:.2px;',
         'text-decoration:underline;text-underline-offset:2px;white-space:nowrap}',
       '.mbk-spaeter:hover{color:var(--wl-e8cc7a,#E8CC7A)}',
-      'html[data-mb-theme="light"] .mbk-spaeter{color:#9a7f33}',
+      'html[data-mb-theme="light"] .mbk-spaeter{color:var(--wl-9a7f33, #9a7f33)}',
 
 
       /* ── Handy: die Touch-Hoehe gilt weiter (v1077-mb-touch) ────────── */
