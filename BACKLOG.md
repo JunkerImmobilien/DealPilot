@@ -56,8 +56,8 @@ könnten wir rausschmeißen. Müsstest du aber vorher einmal sagen."*
 | # | Punkt | Stand |
 |---|---|---|
 | A1 | Alle Reiter unter Aktionen/Einstellungen durchgehen: Formatierung, Anordnung, Doppeltes | offen |
-| A2 | **Co-Pilot-Bereich**: greift das überhaupt? Brauchen wir das? | offen |
-| A3 | **Bewertungsprofile unter Deal Score** (Ausgewogen, Konservativ, Optimistisch, Lagefokus): Wie setzen sie sich zusammen? Welchen Einfluss haben sie auf den Score? Das gehört sichtbar | offen |
+| A2 | **Co-Pilot-Bereich**: greift das überhaupt? | **BEANTWORTET: ja, durchgehend.** Detailgrad, Tonalität, Fokusbereiche und eigene Anweisung werden gelesen (ds2-ai, ki-lage, ki-miete, ui) und landen im Prompt (openaiService:749-753 und 805-826). Nichts davon ist überflüssig. |
+| A3 | **Bewertungsprofile Deal Score** | **GEMESSEN: die Profile sind vollständig und wirken.** `dealscore2.js:168` PRESETS mit Gewichten und Schwellen. Konservativ z. B. Rendite 30 statt 35, Finanzierung 30 statt 25, Risiko 25 statt 20, Upside 5 statt 10 — dazu strengere Schwellen (Bruttorendite gute Punkte erst ab 6 % statt 5 %, DSCR 1,2 nur 60 statt 80 Punkte). **Vorschlag: statt das zu beschreiben, den Einfluss ZEIGEN** — für das offene Objekt den Score unter allen vier Profilen nebeneinander. |
 | A4 | **Deal Score Quick Check**: Farbe, Form, Formatierung stimmen nicht | offen |
 | A5 | **Datenraum** und **externe Anbieter**: passt das noch? | offen |
 | A6 | Vorschlag: bessere Sortierung, weniger Reiter, was raus kann — **erst fragen, dann löschen** | offen |
