@@ -77,7 +77,14 @@
   /* v651-mb-css: Feld-Flucht + Hell-Lesbarkeit + Letzte-Ausgabe raus */
   .row{align-items:stretch;}
   .row>div{display:flex;flex-direction:column;}
-  .row>div>input:not([type=checkbox]),.row>div>select{margin-top:auto;}
+  /* v1336c - die v651-Regel ist HIER, nicht nur in meinem eigenen Block.
+     Sie loest dieselbe Aufgabe auf dem Weg, der bei zwei Kindern je Zelle
+     aufgeht und bei dreien kippt: haengt hinter dem Feld noch eine
+     "fehlt"-Markierung oder ein Ankertext, schiebt `auto` das FELD nach
+     oben statt den Rest nach unten. Gemessen in der Zeile
+     Balkon/Garten/Grundstueck/Wohneinheiten: 34 px Versatz, obwohl alle
+     vier Labels exakt gleich hoch waren. Die Flucht macht jetzt
+     labelsAngleichen() in mb-wizard.js. */
   html[data-mb-theme="light"] input,html[data-mb-theme="light"] select,html[data-mb-theme="light"] textarea,html[data-mb-theme="light"] option{color:#161616 !important;}
   html[data-mb-theme="light"] select option{background:#ffffff !important;color:#161616 !important;}
   html[data-mb-theme="light"] #saveFileBtn,html[data-mb-theme="light"] #loadFileBtn{color:#161616 !important;border-color:var(--wl-c9a84c, #C9A84C) !important;background:#ffffff !important;}
@@ -709,6 +716,6 @@ try{var _u=new URLSearchParams(location.search).get('theme');if(_u==='light'||_u
 <script src="feldhilfe.js?v=1334b"></script>
 <script src="wertermittlung.js?v=1229b"></script>
 <script src="mb-stufen.js?v=1335"></script>
-<script src="mb-wizard.js?v=1336b"></script><!-- v1127: Reiter, nach mb-stufen.js --><!-- v1126: Stufen als Meilensteine, nach wertermittlung.js -->
+<script src="mb-wizard.js?v=1336c"></script><!-- v1127: Reiter, nach mb-stufen.js --><!-- v1126: Stufen als Meilensteine, nach wertermittlung.js -->
 </body>
 </html>
