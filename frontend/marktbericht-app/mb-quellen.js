@@ -70,15 +70,12 @@
         'font-size:11.5px;color:var(--muted,#8a8a93)}',
       '.mbq .mbq-lz{font-size:10.5px;color:var(--muted,#6d6d76);margin-top:7px}',
       /* Der Stufen-Vorhang */
-      '.mbq-vorhang{margin:10px 0;padding:14px 16px;border-radius:10px;font-size:12.5px;',
-        'line-height:1.55;border:1px solid rgba(128,128,128,.28);',
-        'background:color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 6%, transparent)}',
-      '.mbq-vorhang b{color:var(--wl-b8932f,#b8932f)}',
-      '.mbq-vorhang-btn{display:inline-block;margin-top:10px;appearance:none;border:0;',
-        'border-radius:999px;padding:8px 15px;font:inherit;font-size:12.5px;font-weight:600;',
-        'cursor:pointer;background:transparent;color:inherit;',
-        'border:1px solid var(--wl-c9a84c,#C9A84C)}',
-      '.mbq-vorhang-btn:hover{background:color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 14%, transparent)}',
+      /* v1348c: Aussehen und Knopf kommen aus .mb-zurueck / .mb-auf
+         (mb-wizard.js). Hier standen eigene Werte fuer Radius, Rahmen
+         und Schrift - GEMESSEN: zwei Radien (8 und 10 px), graue
+         Raender statt goldener, Knopf in Space Grotesk statt Inter.
+         Ueberschreiben haette eine dritte Regel ergeben; hier wird
+         die doppelte weggenommen. */
       '.mbq-weg{display:none !important}',
       /* v1348: das Ausblenden ganzer Reiter macht jetzt mb-wizard.js
          (.mbw-spaeter, display:none). Zwei Mechaniken für dieselbe Sache

@@ -146,13 +146,11 @@
       '@keyframes mbwRein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}',
       '.mbw-kurz{font-size:11px;opacity:.6;margin:-6px 0 12px}',
       /* v1196 · Hinweis in einem Reiter, dessen Angaben noch nicht dran sind. */
-      '.mbw-leer{margin:10px 0;padding:13px 15px;border-radius:8px;font-size:12.5px;line-height:1.55;',
-        'border:1px solid rgba(128,128,128,.28);background:rgba(201,168,76,.07)}',
-      '.mbw-leer b{color:var(--wl-b8932f,#b8932f)}',
-      '.mbw-leer-btn{display:inline-block;margin-top:10px;appearance:none;border:0;border-radius:999px;',
-        'padding:8px 15px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;',
-        'background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));',
-        'color:#221a06}',
+      /* v1348c: der Leer-Hinweis traegt .mb-zurueck / .mb-auf und
+         bekommt sein Aussehen von dort. Die eigenen Werte hier
+         standen im Widerspruch dazu (Radius 8 statt 10, grauer
+         Rahmen, gefuellter Goldknopf statt Umriss) - GEMESSEN als
+         zwei verschiedene Kasten-Stile nebeneinander. */
       '.mbw-nav{display:flex;gap:8px;align-items:center;margin:14px 0 10px;flex-wrap:wrap}',
       '.mbw-nav button{appearance:none;border:1px solid rgba(128,128,128,.35);background:transparent;',
         'color:inherit;border-radius:999px;padding:8px 15px;font:inherit;font-size:12.5px;cursor:pointer}',
