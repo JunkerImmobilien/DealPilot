@@ -26,7 +26,10 @@
    braucht (Aufnahme einer Besichtigung zu zweit), setzt sie dort. */
 const TRANSCRIBE_MODEL = process.env.OPENAI_TRANSCRIBE_MODEL || 'gpt-4o-mini-transcribe';
 const EXTRACT_MODEL = process.env.OPENAI_VOICE_EXTRACT_MODEL || process.env.OPENAI_MODEL || 'gpt-5.5';
-const QUICKMATCH_MODEL = process.env.OPENAI_QUICKMATCH_MODEL || 'gpt-4o-mini';  /* v513: Live-Zwischenauswertung, klein/guenstig */
+/* v1329: war gpt-4o-mini - in ChatGPT abgeschaltet, der API-Snapshot steht
+   auf der Abkuendigungsliste zum 11.12.2026. gpt-5.6-luna kostet 0,20/1,20
+   je Mio Token statt 0,75/4,50 bei gpt-5.4-mini und traegt 1 Mio Kontext. */
+const QUICKMATCH_MODEL = process.env.OPENAI_QUICKMATCH_MODEL || 'gpt-5.6-luna';
 
 const MAX_CATALOG = 250;       /* Eintraege */
 const MAX_OPTIONS = 40;        /* Optionen je Select */
@@ -77,6 +80,12 @@ const MAX_OPTIONS = 40;        /* Optionen je Select */
    fuer wiederverwendete Prompt-Praefixe.
    Recherchiert am 08.09.2026, jeder Wert aus zwei unabhaengigen Quellen. */
 const PREISE_FEST = {
+  /* v1329: gpt-5.6-luna ist das neue Arbeitspferd - 0,20 / 1,20 statt
+     0,75 / 4,50 je Mio Token, also 3,75-fach guenstiger, dazu 1 Mio
+     Kontext. Ohne diesen Eintrag zaehlt das Kerosin-Konto falsch: es
+     faellt auf null zurueck und der Abruf sieht gratis aus. */
+  'gpt-5.6-luna':            { ein: 0.20, einCached: 0.02, aus: 1.20 },
+  'gpt-5.6-terra':           { ein: 2.00, einCached: 0.20, aus: 12.00 },
   'gpt-5.4-mini':           { ein: 0.75, einCached: 0.075, aus: 4.50 },
   'gpt-4o-mini':            { ein: 0.15, aus: 0.60 },
   'gpt-4o-transcribe':      { ein: 2.50, einAudio: 6.00, aus: 10.00 },
@@ -305,8 +314,104 @@ function buildPrompt(transcript, catalog, zusatz) {
     'TRANSKRIPT:\n"""\n' + transcript + '\n"""';
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   v1329 · STRUCTURED OUTPUTS — das JSON wird erzwungen, nicht erbeten
+   ═══════════════════════════════════════════════════════════════════════
+
+   Bisher wurde das JSON als Freitext angefordert und danach von Hand
+   entzäunt:
+
+     if (text.startsWith('```')) {
+       text = text.replace(/^```+/, '').replace(/```+$/, '').trim();
+       if (text.toLowerCase().startsWith('json')) text = text.slice(4).trim();
+     }
+
+   Diese Stelle gibt es DREIMAL in dieser Datei. Sie ist der Beweis, dass
+   das Modell regelmässig etwas anderes liefert als reines JSON — sonst
+   hätte sie nie jemand geschrieben. Und sie fängt nur den Fall ab, den
+   jemand gesehen hat: einen Markdown-Zaun. Eine Vorrede („Hier sind die
+   Felder:"), ein abgeschnittenes Objekt oder ein nachgestelltes „Hoffe,
+   das hilft!" lässt sie durch, und dann wirft `JSON.parse` — für den
+   Nutzer heisst das „Das hat gerade nicht geklappt".
+
+   MIT `strict: true` UND EINEM SCHEMA kann das Modell gar nichts anderes
+   mehr erzeugen. Constrained Decoding heisst: die Token, die das Schema
+   verletzen würden, stehen beim Erzeugen nicht zur Wahl. Gegen die echte
+   API geprüft am 12.09.2026 (gpt-5.6-luna):
+
+     {"fields":{"kp":300000,"wfl":100,"objart":null}}
+     Zaun? nein
+
+   WAS DAS SCHEMA DARF UND WAS NICHT — teuer erkauftes Wissen:
+   - `additionalProperties: false` ist bei OpenAI PFLICHT, sonst 400.
+   - Jede Eigenschaft muss in `required` stehen. Optional gibt es nicht;
+     "darf fehlen" wird über `["typ","null"]` ausgedrückt.
+   - KEINE Wertebereiche (`minimum`, `maximum`) — die Bereichsprüfung
+     bleibt im Code, wo sie schon steht.
+   - Feld-Ids können alles Mögliche sein; als Schlüssel eines
+     JSON-Schema-Objekts sind sie unbedenklich, aber die Zahl der
+     Eigenschaften ist gedeckelt. Über der Grenze fällt der Aufruf auf
+     den alten Weg zurück, statt zu scheitern.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* OpenAI deckelt Schemas. Der Wert ist bewusst konservativ: lieber der
+   alte Weg als ein 400 mitten in der Aufnahme. */
+const SCHEMA_MAX_FELDER = 90;
+
+function schemaAusKatalog(catalog) {
+  if (!Array.isArray(catalog) || !catalog.length) return null;
+  if (catalog.length > SCHEMA_MAX_FELDER) return null;
+
+  const props = {};
+  const required = [];
+
+  for (const e of catalog) {
+    if (!e || !e.id) continue;
+    let typ;
+    if (e.kind === 'num') typ = { type: ['number', 'null'] };
+    else if (e.kind === 'bool') typ = { type: ['boolean', 'null'] };
+    else if (e.kind === 'select' && Array.isArray(e.options) && e.options.length) {
+      /* Der Enum bindet das Modell an genau die Werte, die das Formular
+         kennt. Das ist der grösste Einzelgewinn: ein Select, das
+         "Fussbodenheizung" statt "FUSSBODENHEIZUNG" zurückgibt, kommt im
+         Feld nie an — und genau das ist v1307 passiert. */
+      const werte = e.options.map((o) => String(o && o.v != null ? o.v : o)).slice(0, 60);
+      typ = { type: ['string', 'null'], enum: werte.concat([null]) };
+    } else typ = { type: ['string', 'null'] };
+    props[e.id] = typ;
+    required.push(e.id);
+  }
+  if (!required.length) return null;
+
+  /* `_unsicher` trägt die Ids, bei denen sich das Modell nicht sicher war.
+     Der Code liest das seit Langem — es gehört also ins Schema, sonst
+     dürfte es gar nicht mehr kommen. */
+  return {
+    type: 'object',
+    additionalProperties: false,
+    required: ['fields', '_unsicher'],
+    properties: {
+      fields: { type: 'object', additionalProperties: false, required, properties: props },
+      _unsicher: { type: 'array', items: { type: 'string' } },
+    },
+  };
+}
+
+/* Das `text.format`-Feld für die Responses-API. Gibt null zurück, wenn
+   der Katalog zu gross ist — der Aufrufer fällt dann auf den alten Weg
+   zurück, und der funktioniert weiter. */
+function formatAusKatalog(catalog) {
+  const schema = schemaAusKatalog(catalog);
+  if (!schema) return null;
+  return { format: { type: 'json_schema', name: 'dealpilot_felder', strict: true, schema } };
+}
+
 async function extractFields(transcript, catalog, apiKey, sammler, zusatz) {
   transcript = stripTermDump(transcript);  /* v515 */
+  /* v1329: Das Schema erzwingt das JSON. Faellt es aus (zu grosser
+     Katalog), laeuft der alte Weg weiter - der funktioniert, er ist
+     nur weniger zuverlaessig. */
+  const _fmt = formatAusKatalog(catalog);
   let r;
   try {
     r = await fetch('https://api.openai.com/v1/responses', {
@@ -315,7 +420,8 @@ async function extractFields(transcript, catalog, apiKey, sammler, zusatz) {
       body: JSON.stringify({
         model: EXTRACT_MODEL,
         input: [{ role: 'user', content: buildPrompt(transcript, catalog, zusatz) }],
-        max_output_tokens: 5000
+        max_output_tokens: 5000,
+        ...(_fmt ? { text: _fmt } : {})
       })
     });
   } catch (e) {
@@ -477,7 +583,13 @@ async function quickMatch(transcript, catalog, apiKey) {
       body: JSON.stringify({
         model: QUICKMATCH_MODEL,
         input: [{ role: 'user', content: buildQuickPrompt(transcript, cat) }],
-        max_output_tokens: 400
+        max_output_tokens: 400,
+        /* v1329: der Quickmatch liefert nur Ids - ein eigenes, winziges
+           Schema. Ohne es kam hier gelegentlich ein Satz statt einer
+           Liste, und die Zaun-Entfernung darunter half dagegen nicht. */
+        text: { format: { type: 'json_schema', name: 'dealpilot_ids', strict: true,
+          schema: { type: 'object', additionalProperties: false, required: ['ids'],
+            properties: { ids: { type: 'array', items: { type: 'string' } } } } } }
       })
     });
   } catch (e) { return { ids: [] }; }
@@ -525,7 +637,7 @@ async function quickMatch(transcript, catalog, apiKey) {
    das Erstergebnis. Abschalten aendert also nichts am Verhalten im Fehlerfall,
    nur an der Regel. */
 const VERIFY_ON = String(process.env.OPENAI_VOICE_VERIFY || '0') !== '0';
-const VERIFY_MODEL = process.env.OPENAI_VOICE_VERIFY_MODEL || 'gpt-5.4-mini';
+const VERIFY_MODEL = process.env.OPENAI_VOICE_VERIFY_MODEL || 'gpt-5.6-luna';   /* v1329 */
 
 function buildVerifyPrompt(transcript, fields, catalog) {
   const cat = catalog.map(function (e) {
@@ -566,7 +678,10 @@ async function verifyFields(transcript, prev, catalog, apiKey, sammler) {
       body: JSON.stringify({
         model: VERIFY_MODEL,
         input: [{ role: 'user', content: buildVerifyPrompt(transcript, seed, catalog) }],
-        max_output_tokens: 5000
+        max_output_tokens: 5000,
+        /* v1329: die Gegenpruefung liefert dasselbe Format wie die
+           Extraktion - also dasselbe Schema. */
+        ...(formatAusKatalog(catalog) ? { text: formatAusKatalog(catalog) } : {})
       })
     });
   } catch (e) { return prev; }

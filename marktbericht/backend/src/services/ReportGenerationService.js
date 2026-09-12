@@ -219,7 +219,23 @@ async function callOpenAI(payload, opts = {}) {
   onStep(`report: ${CHAPTER_GROUPS.length} Kapitelgruppen werden parallel geschrieben…`);
   const tStart = Date.now();
 
-  const settled = await Promise.allSettled(CHAPTER_GROUPS.map(async (g) => {
+  /* ═══ v1329 · Prompt-Caching: ein kurzer Versatz statt Gleichstart ═══
+     Der grosse, GEMEINSAME Teil (userJson) steht schon vorn und der
+     variable Kapitelauftrag hinten - das ist die Bedingung fuers
+     Caching, und sie war erfuellt. Was fehlte: alle drei Gruppen
+     starteten im selben Augenblick und sahen deshalb ALLE einen kalten
+     Cache. Drei volle Eingaben statt einer vollen und zwei zu 10 Prozent.
+
+     Ein Versatz von anderthalb Sekunden reicht: der Cache-Eintrag
+     entsteht beim Verarbeiten des Prompts, nicht erst bei der Antwort.
+     Bei einem Bericht, der 40 Sekunden laeuft, ist das nicht spuerbar.
+
+     ZU MESSEN BLEIBT, wie viel davon wirklich ankommt - OpenAI nennt
+     cached_tokens in der usage. Wer das prueft, sieht es dort, nicht an
+     der Rechnung. */
+  const VERSATZ_MS = Number(process.env.REPORT_CACHE_VERSATZ_MS || 1500);
+  const settled = await Promise.allSettled(CHAPTER_GROUPS.map(async (g, gi) => {
+    if (gi > 0 && VERSATZ_MS > 0) await new Promise((res) => setTimeout(res, VERSATZ_MS));
     const headings = g.kapitel.map((k) => '# ' + k).join('\n');
     // Der Zusammenfassungs-Gruppe (Kapitel A) gezielt die Aussagekraft/Konfidenz mitgeben,
     // damit der Bericht damit eroeffnet und fehlende Angaben als Empfehlung nennt.

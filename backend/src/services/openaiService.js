@@ -1785,7 +1785,8 @@ async function copilotChat(payload, opts) {
   convo += 'Nutzer: ' + message + '\nCo-Pilot:';
 
   const prompt = sys + '\n\n' + ctxBlock + '\n\n--- Gespraech ---\n' + convo;
-  const model = opts.model || process.env.COPILOT_MODEL || 'gpt-4.1-mini';
+  /* v1329: war gpt-4.1-mini - abgekuendigt zum 11.12.2026. */
+  const model = opts.model || process.env.COPILOT_MODEL || 'gpt-5.6-luna';
 
   const res = await callOpenAI(prompt, {
     userApiKey: opts.userApiKey,
