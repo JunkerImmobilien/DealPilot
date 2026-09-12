@@ -569,7 +569,7 @@
     if (alt && alt.parentNode) alt.parentNode.removeChild(alt);
 
     var box = document.createElement('div');
-    box.className = 'mbw-leer';
+    box.className = 'mbw-leer mb-zurueck';
     box.setAttribute('data-fuer', name + '|' + fehlt);
     var p = document.createElement('div');
     p.innerHTML = '<b>Diese Angaben gehören zu: ' + name + '.</b><br>' +
@@ -577,7 +577,7 @@
       (fehlt ? ' Dafür ' + fehlt.replace(/^fehlt:/, 'fehlt noch:') + '.' : '');
     var btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'mbw-leer-btn';
+    btn.className = 'mbw-leer-btn mb-auf';
     btn.textContent = 'Angaben einblenden';
     /* ── v1196b · Die Ampel-Zeile NICHT festhalten, sondern frisch suchen ──
        Der erste Anlauf schrieb `zeile.click()` mit der Referenz, die beim
