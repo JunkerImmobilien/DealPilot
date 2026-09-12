@@ -268,22 +268,56 @@
   }
 
   /* ── Nachführung ──────────────────────────────────────────────────────── */
-  var _zeit = null;
+  /* === v1344b - DIE LISTENER ZUERST, DER ERSTE LAUF DANACH ===========
+     Gemessen: der Vorhang entstand beim Klick auf eine Stufe NIE, obwohl
+     ein Aufruf von Hand ihn sofort baute. Ursache war die Reihenfolge in
+     `start()`:
+
+       stil();
+       vorhang();      <- wirft hier etwas,
+       holen();
+       document.addEventListener(...)   <- kommt das nie
+
+     Ein erster Lauf, der scheitert, nahm die ganze Nachfuehrung mit. Und
+     weil `bald()` seine Ausnahmen selbst schluckt, war danach still.
+     Dasselbe Muster wie v1330: der Rueckruf am Ende einer ungeschuetzten
+     Schleife.
+
+     Jetzt haengen die Listener ZUERST. Danach darf der erste Lauf ruhig
+     scheitern - der naechste Klick holt es nach.
+
+     Dazu eine OBERGRENZE fuer die Entprellung: bei einem Dauerstrom von
+     DOM-Aenderungen setzt reines Entprellen den Timer endlos zurueck und
+     feuert nie. Spaetestens nach 900 ms wird ausgefuehrt. */
+  var _zeit = null, _erstesMal = 0;
   function bald() {
+    var jetzt = Date.now();
+    if (!_erstesMal) _erstesMal = jetzt;
+    if (jetzt - _erstesMal > 900) {   /* Obergrenze erreicht: sofort */
+      if (_zeit) { clearTimeout(_zeit); _zeit = null; }
+      _erstesMal = 0;
+      lauf();
+      return;
+    }
     if (_zeit) clearTimeout(_zeit);
-    _zeit = setTimeout(function () {
-      _zeit = null;
-      try { vorhang(); holen(); } catch (e) {
-        try { console.warn('[v1344] Quellen:', e.message); } catch (x) {}
-      }
-    }, 220);
+    _zeit = setTimeout(function () { _zeit = null; _erstesMal = 0; lauf(); }, 220);
+  }
+
+  function lauf() {
+    try { vorhang(); } catch (e) {
+      try { console.warn('[v1344] Vorhang:', e.message); } catch (x) {}
+    }
+    try { holen(); } catch (e) {
+      try { console.warn('[v1344] Quellen:', e.message); } catch (x) {}
+    }
   }
 
   function start() {
     if (!$('mbw-b7')) { setTimeout(start, 400); return; }
-    stil();
-    vorhang();
-    holen();
+    if (window.__mbqGestartet) return;
+    window.__mbqGestartet = 1;
+
+    /* ZUERST die Nachfuehrung. Sie ueberlebt jeden Fehler im ersten Lauf. */
     document.addEventListener('input', function (ev) {
       if (ev.target && ev.target.id === 'address') bald();
     }, true);
@@ -295,6 +329,9 @@
       new MutationObserver(bald).observe(document.documentElement,
         { childList: true, subtree: true });
     } catch (e) {}
+
+    try { stil(); } catch (e) {}
+    lauf();
   }
 
   if (document.readyState === 'loading') {
