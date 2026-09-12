@@ -477,13 +477,18 @@ function _ds2BuildSettingsOverlay() {
    verschweigen: Konservativ verlangt 8 % Bruttorendite fuer dieselben
    80 Punkte, fuer die Optimistisch 6 % genuegen. Zwei Profile koennen
    identische Gewichte haben und trotzdem verschieden streng sein. */
+/* v1353: die Reihenfolge der Toene wechselt bewusst zwischen hell und
+   dunkel. Vorher liefen sie von hell nach dunkel durch und ergaben im
+   Screenshot eine einzige goldene Flaeche. Nebeneinander stehen jetzt nie
+   zwei benachbarte Helligkeiten. */
 var _DS2_KAT = {
-  rendite:      { kurz: 'Rendite',  farbe: 'var(--wl-c9a84c, #C9A84C)' },
-  finanzierung: { kurz: 'Finanz.',  farbe: 'var(--wl-e8cc7a, #E8CC7A)' },
-  risiko:       { kurz: 'Risiko',   farbe: 'var(--wl-9a7f33, #9a7f33)' },
-  lage:         { kurz: 'Lage',     farbe: 'var(--wl-b8932f, #b8932f)' },
-  upside:       { kurz: 'Upside',   farbe: 'var(--wl-d9c88a, #d9c88a)' }
+  rendite:      { kurz: 'Rendite',  farbe: 'var(--wl-c9a84c, #C9A84C)' },  /* mittel  */
+  finanzierung: { kurz: 'Finanz.',  farbe: 'var(--wl-f0d98a, #F0D98A)' },  /* hell    */
+  risiko:       { kurz: 'Risiko',   farbe: 'var(--wl-7a5d18, #7a5d18)' },  /* dunkel  */
+  lage:         { kurz: 'Lage',     farbe: 'var(--wl-e8cc7a, #E8CC7A)' },  /* hell    */
+  upside:       { kurz: 'Upside',   farbe: 'var(--wl-b8932f, #b8932f)' }   /* dunkler */
 };
+
 var _DS2_REIHE = ['rendite', 'finanzierung', 'risiko', 'lage', 'upside'];
 
 function _ds2GewichtBalken(w) {

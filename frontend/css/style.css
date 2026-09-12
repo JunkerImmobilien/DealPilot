@@ -16571,15 +16571,24 @@ body:not(.hdr-collapsed) .hdr-toggle-btn-chevron {
    V63.21 — DS2 Inline-Konfiguration im Settings-DealScore-Tab
    (User-Wunsch: kein Modal-über-Modal mehr)
    ═══════════════════════════════════════════════════════════════ */
+/* v1353: DER KASTEN IM KASTEN IST WEG.
+   Gemessen im Reiter Deal Score: dieser Kasten war auf 480 px gedeckelt
+   und scrollte, sein Inhalt ist aber 2019 px hoch - man sah also nicht
+   einmal ein Viertel. Darueber scrollt .pane-wrap ohnehin schon. Zwei
+   Rollbalken uebereinander lesen sich nicht als „hier geht es weiter",
+   sondern als „hier ist etwas abgeschnitten", und genau so hat Marcel es
+   auch beschrieben.
+
+   Der Reiter scrollt jetzt als Ganzes. Rahmen und Fuellung bleiben - sie
+   halten den Bereich optisch zusammen, ohne ihn zu beschneiden. */
 .ds2-settings-body-inline {
   background: rgba(0,0,0,0.02);
   border: 1px solid rgba(0,0,0,0.08);
   border-radius: 8px;
   padding: 12px;
   margin-top: 8px;
-  max-height: 480px;
-  overflow-y: auto;
 }
+
 .ds2-settings-body-inline .ds2-set-section {
   margin-bottom: 14px;
   padding-bottom: 10px;
@@ -27707,10 +27716,21 @@ aside.sidebar .sb-card.deal-won.active {
   background: color-mix(in srgb, var(--gold) 10%, transparent);
   flex: 0 0 auto;
 }
+/* v1353: die fuenf Segmente waren im Screenshot nicht auseinanderzuhalten
+   - fuenf Goldtoene nebeneinander ergeben eine Flaeche, keinen Balken.
+   Zwei Aenderungen: die Toene wechseln jetzt hell und dunkel ab statt
+   durchzulaufen, und zwischen ihnen steht eine Fuge. Die Fuge traegt die
+   Lesbarkeit, nicht die Farbe - damit funktioniert der Balken auch beim
+   Mandanten, dessen Goldtoene enger beieinander liegen koennen. */
 .ds2-pw-seg {
   display: block;
-  min-width: 2px;
+  min-width: 3px;
+  border-right: 1.5px solid var(--surface, #F8F6F1);
 }
+.ds2-pw-seg:last-child {
+  border-right: 0;
+}
+
 /* v1352b: gemessen wurde, dass genau die zwei Karten mit Schaerfe-Pille
    ihre Zeile abschnitten - "Rendite 30 % - Finanz. 30 % [strenger]" ist
    in 208 px nicht unterzubringen. Statt den Text zu kuerzen darf die
