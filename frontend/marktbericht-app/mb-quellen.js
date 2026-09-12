@@ -215,8 +215,21 @@
                  return esc(w.zweig) + ' ' + wertText(w);
                }).join(' · ')
              : '<span class="w">liegt vor</span>');
-        if (x.berichtsjahr) h += '<br><span class="off">Grundstücksmarktdaten '
-          + esc(x.berichtsjahr) + (x.fundstelle ? ', ' + esc(x.fundstelle) : '') + '</span>';
+        /* v1344d: Nicht doppelt betiteln. Manche Fundstellen tragen den
+           Berichtsnamen schon - dann stand da "Grundstuecksmarktdaten
+           2024, 'Grundstuecksmarktdaten 2025', Kapitel ...", zwei
+           Jahreszahlen, die sich widersprechen. Die Fundstelle gewinnt:
+           sie ist genauer. */
+        var _q = String(x.fundstelle || '');
+        var _hatTitel = /Grundst.{0,3}cksmarkt|Immobilienmarkt|Marktbericht/i.test(_q);
+        if (_q || x.berichtsjahr) {
+          h += '<br><span class="off">'
+            + (_hatTitel
+               ? esc(_q)
+               : (x.berichtsjahr ? 'Grundstücksmarktdaten ' + esc(x.berichtsjahr) : '')
+                 + (_q ? (x.berichtsjahr ? ', ' : '') + esc(_q) : ''))
+            + '</span>';
+        }
         if (x.quelle_url) h += ' <a href="' + esc(x.quelle_url)
           + '" target="_blank" rel="noopener">Quelle öffnen</a>';
         h += '</li>';
