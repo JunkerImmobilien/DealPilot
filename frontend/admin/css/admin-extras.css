@@ -56,3 +56,76 @@
 }
 .dpx-row-del:hover{ background:var(--danger,#b94f3a); color:#fff; }
 .dpx-row-del:disabled{ opacity:.5; cursor:not-allowed; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   v1368 (B9) · Sicherheit / Missbrauchserkennung
+
+   Der Hinweiskasten oben steht bewusst VOR den Zahlen. Wer zuerst eine
+   Liste mit roten Zahlen sieht und dann liest, dass es Beobachtungen
+   sind, hat sich sein Urteil längst gebildet.
+   ══════════════════════════════════════════════════════════════════════ */
+.sec-hinweis {
+  margin: 0 0 18px;
+  padding: 12px 15px;
+  background: rgba(201,168,76,0.08);
+  border-left: 3px solid var(--wl-c9a84c, #C9A84C);
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.sec-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.sec-filter select,
+.sec-filter input {
+  padding: 7px 10px;
+  border: 1px solid var(--border, #e2ded4);
+  border-radius: 7px;
+  font: inherit;
+  font-size: 13px;
+}
+.sec-filter input { min-width: 240px; flex: 1 1 240px; }
+
+.sec-zahlen { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.sec-kachel {
+  min-width: 108px;
+  padding: 13px 16px;
+  border: 1px solid var(--border, #e2ded4);
+  border-radius: 10px;
+  text-align: center;
+}
+.sec-kachel-n { display: block; font-size: 24px; font-weight: 700; line-height: 1.1; }
+.sec-kachel-l { display: block; font-size: 11.5px; opacity: .7; margin-top: 3px; }
+.sec-leer {
+  padding: 14px 16px;
+  border: 1px dashed var(--border, #e2ded4);
+  border-radius: 10px;
+  font-size: 13px;
+  color: #7a7468;
+}
+.sec-h3 { margin: 22px 0 10px; font-size: 14px; letter-spacing: .3px; }
+
+/* Die Fallakte: Zahl und Maßstab stehen zusammen in einem Kasten, nie
+   getrennt. Eine Kennzahl ohne Vergleichswert lädt zum Raten ein. */
+.sec-mess { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+.sec-mess-box {
+  flex: 1 1 190px;
+  padding: 14px 16px;
+  border: 1px solid var(--border, #e2ded4);
+  border-radius: 10px;
+}
+.sec-mess-n { font-size: 22px; font-weight: 700; line-height: 1.15; }
+.sec-mess-l { font-size: 12px; opacity: .8; margin-top: 2px; }
+.sec-mess-v { font-size: 11px; opacity: .55; margin-top: 6px; }
+.sec-mess-hinweis { font-size: 12px; opacity: .7; margin: 8px 0 0; line-height: 1.5; }
+.sec-fall-fuss {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border, #e2ded4);
+  font-size: 12px;
+  opacity: .7;
+}

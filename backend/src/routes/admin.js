@@ -510,7 +510,155 @@ router.get('/users.csv', requireAdmin, async (req, res) => {
   }
 });
 
+/* ══════════════════════════════════════════════════════════════════════
+   v1368 · B9 — SICHERHEIT / MISSBRAUCHSERKENNUNG
+   ══════════════════════════════════════════════════════════════════════
+   Marcels Punkt B9: „Admin-Bereich ‚Sicherheit / Missbrauchserkennung'
+   mit Filtern und Fallakte."
+
+   Seit v1367 sammelt `security_events` Beobachtungen. Ohne einen Ort,
+   an dem man sie ansieht, liegen sie in einer Tabelle, die niemand
+   oeffnet - und ein Protokoll, das keiner liest, ist so gut wie keins.
+
+   DREI ENDPUNKTE, DREI FRAGEN:
+     /security/events    was ist passiert?      (Liste mit Filtern)
+     /security/auffaellig wer faellt auf?       (verdichtet je Konto)
+     /security/fall/:id  was war bei diesem?    (Fallakte, B19)
+
+   WAS DIESE ENDPUNKTE NICHT TUN: sperren, bewerten, einen Score bilden.
+   Marcels Auflage steht ueber allem: „Eine technische Auffaelligkeit
+   oder ein automatisch erzeugter Risikoscore darf NICHT automatisch als
+   rechtlich bewiesener Vertragsverstoss behandelt werden." Hier wird
+   gezeigt, nicht entschieden.
+
+   ZUGRIFF: `requireAdmin` genuegt zum Lesen - wer den Adminbereich
+   betreten darf, darf auch sehen, was dort protokolliert ist. Eine
+   engere Rolle waere hier falsch: Support muss einen Fehlalarm
+   nachvollziehen koennen, sonst landet jede Rueckfrage beim Inhaber.
+   ══════════════════════════════════════════════════════════════════════ */
+router.get('/security/events', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  const { stufe = '', art = '', suche = '', tage = 7, limit = 200 } = req.query;
+  try {
+    const params = [];
+    let where = '1=1';
+
+    params.push(Math.min(Math.max(parseInt(tage, 10) || 7, 1), 365));
+    where += ` AND e.created_at >= NOW() - ($${params.length} || ' days')::interval`;
+
+    if (stufe) { params.push(stufe); where += ` AND e.stufe = $${params.length}`; }
+    if (art)   { params.push(art);   where += ` AND e.art = $${params.length}`; }
+    if (suche) {
+      params.push(`%${suche}%`);
+      where += ` AND (u.email ILIKE $${params.length} OR e.ip_key ILIKE $${params.length}`
+             + ` OR e.pfad ILIKE $${params.length})`;
+    }
+
+    params.push(Math.min(parseInt(limit, 10) || 200, 1000));
+
+    const r = await db.query(`
+      SELECT e.id, e.art, e.stufe, e.pfad, e.methode, e.detail, e.created_at,
+             e.user_id, e.ip_key, u.email AS user_email
+        FROM security_events e
+        LEFT JOIN users u ON u.id = e.user_id
+       WHERE ${where}
+       ORDER BY e.created_at DESC
+       LIMIT $${params.length}`, params);
+
+    /* Die Zaehlung je Stufe gehoert dazu - eine Liste von 200 Zeilen sagt
+       nicht, ob das viel ist. */
+    const summe = await db.query(`
+      SELECT stufe, COUNT(*)::int AS n
+        FROM security_events
+       WHERE created_at >= NOW() - ($1 || ' days')::interval
+       GROUP BY stufe`, [params[0]]);
+
+    res.json({
+      events: r.rows,
+      je_stufe: summe.rows.reduce((a, z) => (a[z.stufe] = z.n, a), {}),
+      hinweis: 'Beobachtungen, keine Urteile. Eine Auffaelligkeit ist kein bewiesener Verstoss.'
+    });
+  } catch (e) {
+    console.error('[admin] security/events:', e.message);
+    res.status(500).json({ error: 'security_events_failed' });
+  }
+});
+
+/* Wer faellt auf? Verdichtet je Konto, sortiert nach Gewicht - aber das
+   Gewicht ist eine ZAEHLUNG, kein Score: wie viele Ereignisse, wie
+   schwer die schwerste Stufe, wann zuletzt. Mehr steht hier bewusst
+   nicht, damit niemand eine Rangliste fuer eine Schuldfeststellung
+   haelt. */
+router.get('/security/auffaellig', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  const tage = Math.min(Math.max(parseInt(req.query.tage, 10) || 7, 1), 365);
+  try {
+    const r = await db.query(`
+      SELECT e.user_id, e.ip_key, u.email AS user_email,
+             COUNT(*)::int AS ereignisse,
+             COUNT(DISTINCT e.pfad)::int AS pfade,
+             MAX(CASE e.stufe WHEN 'ernst' THEN 3 WHEN 'auffaellig' THEN 2 ELSE 1 END) AS hoechste,
+             MIN(e.created_at) AS erstes,
+             MAX(e.created_at) AS letztes
+        FROM security_events e
+        LEFT JOIN users u ON u.id = e.user_id
+       WHERE e.created_at >= NOW() - ($1 || ' days')::interval
+       GROUP BY e.user_id, e.ip_key, u.email
+       ORDER BY hoechste DESC, ereignisse DESC
+       LIMIT 100`, [String(tage)]);
+
+    const STUFE = { 1: 'hinweis', 2: 'auffaellig', 3: 'ernst' };
+    res.json({
+      konten: r.rows.map((z) => ({
+        user_id: z.user_id,
+        user_email: z.user_email,
+        ip_key: z.user_id ? null : z.ip_key,
+        ereignisse: z.ereignisse,
+        verschiedene_pfade: z.pfade,
+        hoechste_stufe: STUFE[z.hoechste] || 'hinweis',
+        erstes: z.erstes,
+        letztes: z.letztes
+      })),
+      tage
+    });
+  } catch (e) {
+    console.error('[admin] security/auffaellig:', e.message);
+    res.status(500).json({ error: 'security_auffaellig_failed' });
+  }
+});
+
+/* Die Fallakte (B19): alles zu einem Konto, chronologisch, plus die zwei
+   Kennzahlen aus v1367 samt ihrem Massstab. Wer hier eine Entscheidung
+   trifft, soll sehen, woran er sie misst. */
+router.get('/security/fall/:userId', requireAdmin, async (req, res) => {
+  try {
+    const sec = require('../services/securityEventService');
+    const db = req.app.get('db');
+    const uid = req.params.userId;
+
+    const nutzer = await db.query(
+      'SELECT id, email, name, role, is_active, created_at FROM users WHERE id = $1', [uid]);
+    if (!nutzer.rowCount) return res.status(404).json({ error: 'user_not_found' });
+
+    const [chronik, muster24] = await Promise.all([
+      sec.chronik(uid, { limit: 500 }),
+      sec.muster(uid, { fensterMinuten: 1440 })
+    ]);
+
+    res.json({
+      nutzer: nutzer.rows[0],
+      chronik,
+      muster_24h: muster24,
+      hinweis: 'Diese Akte sammelt Beobachtungen. Die Bewertung trifft ein Mensch.'
+    });
+  } catch (e) {
+    console.error('[admin] security/fall:', e.message);
+    res.status(500).json({ error: 'security_fall_failed' });
+  }
+});
+
 router.get('/audit-log.csv', requireAdmin, async (req, res) => {
+
   const db = req.app.get('db');
   const { action = '', limit = 5000 } = req.query;
   try {
