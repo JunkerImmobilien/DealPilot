@@ -293,3 +293,109 @@ laufen nur dann exakt auf 1 zusammen, wenn beide richtig abgelesen sind.
 
 Die Gegenproben gehen alle in die fachlich richtige Richtung — das schließt
 Vorzeichenfehler in den Exponenten aus.
+
+---
+
+# Nachtrag: Kassel, Hessen landesweit und Wolfenbüttel (13.09.2026)
+
+Nach Hamburg in derselben Sitzung geerntet. **Alle Zahlen aus den Dokumenten
+bzw. dem amtlichen Kalkulator, nichts ergänzt, nichts interpoliert.**
+
+## Kassel (Hessen) — Immobilienmarktbericht 2024
+
+**Lizenz `dl-de/zero-2-0` im Wortlaut:** *„Jede Nutzung des
+Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung
+oder Bedingung erlaubt … für kommerzielle und nicht kommerzielle Nutzung."*
+
+Zwei Matrizen (Kap. 7.4, Tab. 29 und 30), Bodenrichtwertbereich ×
+vorläufiger Sachwert, 144 Zellen. Modellvermerk vollständig: Sachwertmodell
+Hessen, NHK 2010, **GND 80**, lineare Alterswertminderung, Garagen
+3.000–12.000 €, Außenanlagen 5–8 % des Gebäudezeitwerts.
+
+**Ein Befund, der ins Modell gehört:** der Bericht stellt ausdrücklich fest,
+dass die **Restnutzungsdauer keinen signifikanten Einfluss** auf den
+Sachwertfaktor hatte — deshalb untergliedert Kassel nach Bodenrichtwert.
+**Das ist das Gegenteil von Hamburg**, wo die RND einen eigenen Faktor trägt.
+Beide Modelle sind richtig; sie beschreiben verschiedene Märkte.
+
+**Stufe B**, und der Grund gehört dazu: der Bericht markiert Zellen mit
+einzelnen Kauffällen rot („obwohl ein Vergleich nicht möglich ist"). **Welche
+Zellen rot sind, gibt die Textfassung nicht her** — Farbe geht bei der
+Extraktion verloren. Statt zu raten ist die Fallzahl je Bodenrichtwertbereich
+vollständig mitgeführt (1 bis 25).
+
+**Gemessen:** EFH 400.000 €/BRW 250 → 1,09 · EFH 300.000 €/BRW 120 → 0,96 ·
+RH 250.000 €/BRW 350 → 1,59 · RH 100.000 €/BRW 250 → 2,06. Vier Treffer
+zeichengleich.
+
+## Hessen landesweit — Immobilienmarktbericht des Landes 2025
+
+Zwei Matrizen (Tab. 8.4.1.1 und 8.4.2.1): freistehende Ein-/Zweifamilienhäuser
+(9 Bodenrichtwertbereiche × 18 Sachwertstufen, **850 Kauffälle**) und
+Reihenhäuser/Doppelhaushälften (7 × 15, **497 Kauffälle**), je mit
+Bestimmtheitsmaß R² und vollständiger Datengrundlage.
+
+**Stufe C — und das ist der Punkt.** Es ist ein Landeswert. Wo ein örtlicher
+Ausschuss eigene Faktoren abgeleitet hat, gehen die vor (§ 10 ImmoWertV). Der
+Satz steht auf `ebene: land` und wird vom Auflöser **ausgefiltert** (Regel aus
+v1085). Er ist trotzdem erfasst, damit die Daten belegt vorliegen, wenn die
+Ersatzebene C (Backlog C5) bewusst gebaut wird.
+
+Kein Mittel über Ausschusswerte, sondern eine eigene Regression über alle
+hessischen Kauffälle 2024. **R² zwischen 0,18 und 0,58** — die Streuung ist
+erheblich.
+
+## Landkreis Wolfenbüttel (Niedersachsen) — Kalkulator 2026
+
+**Nicht aus einem PDF, sondern aus dem amtlichen Tableau-Kalkulator.**
+30 Stützpunkte einzeln abgefragt, dazu die 23 Stützpunkte der drei
+Umrechnungskoeffizienten-Kurven.
+
+**Der Weg, der trug:** frische URL mit Parametern plus **sieben Sekunden
+warten**. Die Messreihe im selben Tab war dreimal am Renderer-Timeout
+gescheitert; mit vollständigem Neuaufbau je Punkt laufen vier Messungen in
+einem Durchgang.
+
+> **`bswf` ist nicht Braunschweig-Wolfsburg, sondern der Landkreis
+> Wolfenbüttel.** Der Titel steht erst im gerenderten Dashboard — aus dem
+> Kürzel allein war es nicht zu erschließen, und ich hatte es zuerst falsch
+> eingeordnet.
+
+**Drei Messungen entschieden die Modellform:**
+
+| Messung | Kalkulator | unsere Interpolation | Folge |
+|---|---|---|---|
+| BRW 280, 275.000 € | 1,10 | 1,10 | in Sachwert-Richtung **zeichengleich** |
+| BRW 240, 250.000 € | 1,05 | 1,06 | in BRW-Richtung **nicht** → Stufe B |
+| BRW 310, 250.000 € | 1,26 | — | der Kalkulator **extrapoliert**, wir nicht |
+
+Der Kalkulator rechnet eine geschlossene Regression; die vier Bänder sind nur
+ihre Darstellung. 0,01 Abweichung bei einer Standardabweichung von ±0,21 ist
+unerheblich für die Aussage — aber nicht identisch mit der amtlichen Quelle.
+
+**Kontrollpunkt reproduziert:** BRW 40 / 100.000 € gab beim ersten Mal (über
+die Eingabefelder) und beim letzten Mal (über die URL) 1,33.
+
+## Was dabei am Auswerter repariert wurde
+
+**v1098h — ein exakter Treffer braucht keine Nachbarn.** `matrixInterp` holt
+immer vier Zellen. Bei Wolfenbüttel war die Nachbarkurve an den Rändern leer,
+also gab der Auswerter `zelle_leer` — für Werte, die im Bericht **abgedruckt
+dastehen**. Das traf alle vier Ecken der Matrix.
+
+Liegt die Anfrage genau auf beiden Stützstellen, ist nichts zu interpolieren.
+Die Regel bleibt: eine *leere* Zelle wird weiterhin nicht durch einen
+Nachbarwert ersetzt.
+
+```
+vorher unerreichbar, jetzt zeichengleich
+  BRW 280 / 200.000 -> 1,27     BRW 40 / 100.000 -> 1,33
+  BRW  40 / 350.000 -> 0,72     BRW 280 / 550.000 -> 0,74
+
+unverändert
+  BRW 130 / 250.000 -> 0,90     BRW 240 / 250.000 -> 1,06 (interpoliert)
+
+beide Sperren halten
+  BRW 400 (außerhalb) -> ausserhalb_der_tabelle
+  BRW 40 / 400.000 (Zelle wirklich leer) -> zelle_leer
+```
