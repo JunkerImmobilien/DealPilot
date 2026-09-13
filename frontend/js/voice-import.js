@@ -8874,5 +8874,14 @@
                          _fsStand: function () { return { phase: _fs.phase, kopf: !!_fs.kopf,
                              chunks: _fs.chunks.length, rest: _fs.rest, laeuft: _fs.laeuft,
                              recState: _fs.rec ? _fs.rec.state : null }; },
+                         /* v1376 (C7): Der Widerspruch ist von aussen nicht
+                            messbar, wenn er nicht heraussieht. Wer pruefen
+                            will, ob eine abweichende Zahl wirklich gefragt
+                            wird, braucht genau diese drei. */
+                         _setzen: _rfSetzen,
+                         _konfliktZeigen: _rfKonfliktZeigen,
+                         _gleicherWert: _rfGleicherWert,
+                         _zahl: _rfZahl,
                          _stand: function () { return _rf; } };
+
 })();
