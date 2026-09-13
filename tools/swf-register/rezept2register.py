@@ -89,7 +89,67 @@ EINHEITEN = {'faktor', 'prozent', 'zuschlag_prozent', 'wert_eur'}
 fehler = []
 
 
+# v1098-WKORR · Korrekturen liefen bis hierher UNGEPRUEFT durch.
+#
+# Der Auswerter kennt fuenf Arten. Steht in `art` etwas anderes - ein
+# Tippfehler genuegt -, faellt er in den `stufen`-Zweig, findet dort keine
+# Stufen und gibt `null` zurueck: KEINE Korrektur. Still. Das Ergebnis
+# bleibt plausibel, es ist nur falsch.
+#
+# Darum dieselbe Regel wie bei den Formeln: bekannte Schluessel je Art,
+# alles andere bricht ab.
+# Erlaubt in JEDER Art: "hinweis" erklaert die Korrektur im Bericht und
+# rechnet nicht mit. Er stand in den vorhandenen Rezepten und haette sie beim
+# ersten Lauf abbrechen lassen - gefunden vom Gegentest gegen die 14 NRW-Rezepte.
+KORREKTUR_DOKU = {'hinweis', 'fundstelle', 'quelle_hinweis', 'vorbehalt'}
+
+KORREKTUR_ARTEN = {
+    'stufen':     {'art','feld','bez','stufen','wirkung','rundung_stellen'},
+    'band':       {'art','feld','bez','baender','wirkung','rundung_stellen'},
+    'potenz':     {'art','feld','bez','basis','exponent','wirkung',
+                   'rundung_stellen','deckel_ab','deckel_wert','boden_ab','boden_wert'},
+    'linear':     {'art','feld','bez','a','b','wirkung',
+                   'rundung_stellen','deckel_ab','deckel_wert','boden_ab','boden_wert'},
+    'kategorial': {'art','feld','bez','werte','wirkung','rundung_stellen'},
+}
+
+
+def pruefe_korrekturen(datei, korrekturen):
+    for i, k in enumerate(korrekturen):
+        if not isinstance(k, dict):
+            meckern(datei, f'Korrektur {i}: kein Objekt')
+            continue
+        # Fehlt `art`, galt bisher `stufen` - das bleibt so, weil die
+        # vierzehn vorhandenen Rezepte es so schreiben.
+        art = k.get('art') or 'stufen'
+        if art not in KORREKTUR_ARTEN:
+            meckern(datei, f"Korrektur {i} ('{k.get('bez') or k.get('feld')}'): "
+                           f"unbekannte Art '{art}' - bekannt sind "
+                           + ', '.join(sorted(KORREKTUR_ARTEN)))
+            continue
+        fremd = set(k) - KORREKTUR_ARTEN[art] - DOKU - KORREKTUR_DOKU
+        if fremd:
+            meckern(datei, f"Korrektur {i} ('{k.get('bez') or k.get('feld')}', "
+                           f"Art '{art}'): unbekannte Schluessel "
+                           + ', '.join(sorted(fremd)))
+        if not k.get('feld'):
+            meckern(datei, f'Korrektur {i}: kein `feld`')
+        if k.get('wirkung') not in (None, 'additiv', 'multiplikativ'):
+            meckern(datei, f"Korrektur {i}: `wirkung` ist "
+                           f"'{k.get('wirkung')}' - erlaubt sind additiv und multiplikativ")
+        # Eine multiplikative Korrektur mit Wert 0 setzt das Ergebnis auf
+        # null. Das ist fast nie gemeint und immer eine Meldung wert.
+        if art == 'kategorial':
+            for name, wert in (k.get('werte') or {}).items():
+                if not isinstance(wert, (int, float)):
+                    meckern(datei, f"Korrektur {i}: '{name}' traegt keinen Zahlwert")
+                elif k.get('wirkung') == 'multiplikativ' and wert == 0:
+                    meckern(datei, f"Korrektur {i}: '{name}' ist multiplikativ 0")
+    return korrekturen
+
+
 def meckern(datei, text):
+
     fehler.append(f'{datei}: {text}')
 
 
@@ -227,7 +287,15 @@ def bauen():
 
             for ags in ags_liste:
                 saetze.append({
-                    'land_code': 'NW',
+                    # v1098-WLAND: Das Landeskuerzel stand hier HART auf 'NW'.
+                    # Vierzehn Rezepte kamen aus NRW, und solange das so war, fiel
+                    # es nicht auf. Das erste Hamburger Rezept waere damit als
+                    # nordrhein-westfaelisch ins Register gegangen - und die
+                    # Kaskade haette es ueber einen NRW-Gemeindeschluessel gesucht,
+                    # den es nicht gibt. Fallback bleibt 'NW', damit die
+                    # vorhandenen Rezepte ohne Aenderung weiterlaufen.
+                    'land_code': d.get('land_code') or 'NW',
+
                     'ags': str(ags),
                     'ebene': ebene,
                     'gebiet_name': d.get('gebiet_name') or d.get('gaa_name'),
@@ -235,7 +303,8 @@ def bauen():
                     'kennzahl': 'sachwertfaktor',
                     'zweig': m.get('zweig'),
                     'formel': formel,
-                    'korrekturen': m.get('korrekturen') or [],
+                    'korrekturen': pruefe_korrekturen(datei, m.get('korrekturen') or []),
+
                     'modellansaetze': m.get('modellansaetze') or d.get('modellansaetze') or {},
                     'geltungsbereich': m.get('geltungsbereich') or {},
                     'belege': [beleg],

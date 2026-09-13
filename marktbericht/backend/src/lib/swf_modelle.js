@@ -481,8 +481,84 @@ const AUSWERTER = {
  * (Herford 0,89 + 0,02 - 0,03 = 0,88; Hoexter 0,70 + 0,06 + 0,01 = 0,77).
  */
 function korrekturAnwenden(k, e) {
+  /* ═══ v1098-WPOT · DREI KORREKTURARTEN, DIE KEINE TABELLE SIND ═══════
+     Bis hierher kannte diese Funktion zwei Arten: `stufen` (interpoliert)
+     und `band` (nicht). Beide sind Tabellen ueber eine ZAHL.
+
+     Hamburg druckt seinen Sachwertfaktor als PRODUKT aus 19 Faktoren ab,
+     und die wenigsten davon sind Tabellen:
+
+       Lagefaktor              (NormBRW20 / 630) ^ 0,1902
+       Bodenwertanteilsfaktor  0,67318 + 0,5447 × Bodenwertanteil
+       Stadtteilfaktor         rund 100 Namen, je ein Wert
+
+     Eine Potenz als Stufentabelle nachzubilden hiesse, eine geschlossene
+     Funktion durch Stuetzstellen zu ersetzen und zwischen ihnen LINEAR zu
+     interpolieren — an einer gekruemmten Kurve ist das ein Fehler, den
+     niemand sieht, weil das Ergebnis plausibel bleibt.
+
+     WARUM KEINE NEUE MODELLFORM: die Multiplikation gibt es hier seit
+     v1093 (`wirkung: multiplikativ`), samt Waechter und Rechenweg. Hamburg
+     ist damit `konstante` 0,788 plus 19 multiplikative Korrekturen — die
+     vorhandene Mechanik traegt es, sobald sie diese drei Arten kennt.
+
+     `kategorial` liest ausdruecklich den ROHWERT, keine Zahl: ein
+     Stadtteil heisst "Blankenese". */
+  if (k.art === 'kategorial') {
+    const roh = e[k.feld];
+    if (roh === undefined || roh === null || roh === '') return null;
+    const schluessel = String(roh).trim();
+    const tab = k.werte || {};
+    /* Ohne Beachtung von Gross-/Kleinschreibung, aber NICHT unscharf: wer
+       einen Namen falsch schreibt, bekommt keine Korrektur statt einer
+       falschen. */
+    let v = tab[schluessel];
+    if (v === undefined) {
+      const treffer = Object.keys(tab).find(
+        (n) => n.toLowerCase() === schluessel.toLowerCase());
+      if (treffer !== undefined) v = tab[treffer];
+    }
+    if (!istZahl(v)) return null;
+    return { merkmal: k.bez, wert: v,
+             wirkung: k.wirkung === 'multiplikativ' ? 'multiplikativ' : 'additiv',
+             ausprägung: schluessel };
+  }
+
   const x = zahl(e[k.feld]);
   if (x === null) return null;                  // nicht erfasst = keine Korrektur
+
+  if (k.art === 'potenz' || k.art === 'linear') {
+    const wirkungP = k.wirkung === 'multiplikativ' ? 'multiplikativ' : 'additiv';
+    let v;
+    if (k.art === 'potenz') {
+      /* (x / basis) ^ exponent — `basis` ist die Normstelle, an der die
+         Korrektur 1 ergibt. Sie steht in jedem Bericht ausdruecklich
+         daneben ("bei 120 m² Wohnflaeche: 1"). */
+      const basis = zahl(k.basis);
+      const exp = zahl(k.exponent);
+      if (basis === null || exp === null || !(basis > 0) || !(x > 0)) return null;
+      v = Math.pow(x / basis, exp);
+    } else {
+      const a = zahl(k.a), b = zahl(k.b);
+      if (a === null || b === null) return null;
+      v = a + b * x;
+    }
+    /* Deckelung: Hamburg kappt zwei Faktoren ausdruecklich ("wenn
+       Wohnflaeche >= 300 m²: 1,427"). Ohne die Kappung rechnet die Potenz
+       weiter und laeuft aus dem Gueltigkeitsbereich der Stichprobe heraus. */
+    if (k.deckel_ab != null && x >= zahl(k.deckel_ab) && istZahl(zahl(k.deckel_wert))) {
+      v = zahl(k.deckel_wert);
+    }
+    if (k.boden_ab != null && x <= zahl(k.boden_ab) && istZahl(zahl(k.boden_wert))) {
+      v = zahl(k.boden_wert);
+    }
+    if (!istZahl(v)) return null;
+    const stP = k.rundung_stellen ?? 5;
+    const qP = Math.pow(10, stP);
+    return { merkmal: k.bez, wert: Math.round(v * qP) / qP, wirkung: wirkungP,
+             ausprägung: String(x) };
+  }
+
 
   /* v1093-WMUL · `wirkung` sagt, WIE die Korrektur wirkt; `art` sagt, welche
    * FORM ihre Tabelle hat. Zwei verschiedene Dinge — die Rezepte hatten
