@@ -3,7 +3,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
   "gaa_kennz": "02000",
   "ags": ["02000000"],
-  "ebene": "land",
+  "ebene": "gemeinde",
   "berichtsjahr": 2026,
   "stichtag": "2026-01-01",
   "auswertezeitraum": "2013 bis 2020",
