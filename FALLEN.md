@@ -3389,3 +3389,52 @@ Limit von 100 pro Minute, eine nicht.
 > falschen Platz.
 
 `v1362`, `v1363`
+
+---
+
+## 152 · `node --check` prueft keine `require`-Pfade
+
+Ein neuer Dienst, ein Import mit falschem Pfad (`../db` statt
+`../db/pool`) — und das Backend lief nach dem Rebuild in eine
+**Neustartschleife**. `Cannot find module`, Status `Restarting`,
+`/health` tot.
+
+Vorher hatte `node --check` **SYNTAX-OK** gemeldet. Das ist kein Fehler
+des Werkzeugs: es prueft die Grammatik, nicht die Aufloesung von
+Modulen. `CLAUDE.md` sagt es woertlich — *„`node --check` prueft nur
+Syntax. Vertraege prueft nur ein echter Lauf.“*
+
+> **Merksatz:** Bei einer neuen Datei mit `require` genuegt `--check`
+> nicht. Ein `node -e "require(...)"` im Container kostet eine Sekunde
+> und faengt genau das ab.
+
+`v1367b`
+
+---
+
+## 153 · Eine Kennzahl, die immer dasselbe sagt, sieht aus wie eine Kennzahl
+
+Die Auswertung sollte zaehlen, wie viele verschiedene Endpunktgruppen
+ein Konto trifft. Sie gruppierte nach dem ersten Pfadsegment:
+
+```js
+const g = String(pfad).replace(/^/+/, ).split(/)[0];   // -> immer api
+```
+
+**Alle Pfade beginnen mit `/api/v1/`.** Die Vielfalt war damit konstant
+`1` — bei einem Menschen wie bei einem Skript.
+
+Gefunden nur, weil der Probelauf **fuenf verschiedene Pfade** schrieb und
+die Antwort `1` sagte. Ohne diese Erwartung waere die Zahl nie
+aufgefallen: sie sah plausibel aus, sie kam aus einer Rechnung, und sie
+war immer falsch.
+
+> **Merksatz:** Jede neue Kennzahl einmal gegen einen Fall halten, bei
+> dem man das Ergebnis vorher kennt. Eine Zahl, die nie schwankt, ist
+> verdaechtig — auch wenn sie richtig aussieht.
+
+Verwandt mit Falle 143 (*ein Feld, das niemand liest, sieht aus wie ein
+Feld*) und mit dem Leser, der ins Leere greift: dieselbe Familie — etwas
+sieht funktionsfaehig aus, weil nichts widerspricht.
+
+`v1367c`

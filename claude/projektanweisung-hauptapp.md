@@ -15498,6 +15498,101 @@ Zähler** sind und nicht einer mit zwei Beschriftungen.
 `1506a70` v1366 · v1366b im selben Zug
 
 
+## v1367 · Sicherheitsereignisse bekommen eine Ablage
+
+**B3** (Anomalie-Erkennung je Account) und **B10** (Audit Trail,
+append-only).
+
+Seit `v1366` wird jede Limit-Überschreitung protokolliert — aber nur mit
+`console.warn` ins Container-Log. **Das ist flüchtig** (weg beim nächsten
+Rebuild), nicht durchsuchbar, nicht auswertbar. Ein Muster über Tage
+erkennt man darin nicht.
+
+### Was die Tabelle bewusst nicht enthält
+
+`security_events` (Migration 071) sammelt **Beobachtungen, keine Urteile.**
+Drei Dinge fehlen mit Absicht, alle drei aus Marcels Lastenheft:
+
+| fehlt | warum |
+|---|---|
+| **Risikoscore** | *„Eine technische Auffälligkeit oder ein automatisch erzeugter Risikoscore darf NICHT automatisch als rechtlich bewiesener Vertragsverstoß behandelt werden."* Die Bewertung ist ein zweiter Schritt und gehört einem Menschen. |
+| **Inhalte** | Gespeichert wird, *welcher* Endpunkt getroffen wurde — nicht, *was* übertragen wurde. Der Pfad wird vor dem `?` abgeschnitten. |
+| **User-Agent, Geräte-Merkmale** | *„Keine unnötige Überwachung des Endgeräts und keine heimliche Ausspähung."* |
+
+**Append-only ist ernst gemeint:** keine `updated_at`-Spalte, kein Weg im
+Code, eine Zeile zu ändern. Wer einen Fall bearbeitet, schreibt ein
+**neues** Ereignis dagegen — die Bearbeitungsspuren stehen damit in
+derselben Chronologie wie das, was sie bewerten.
+
+### Die zwei Kennzahlen
+
+Die Auswertung gibt **Zahlen zurück, kein Urteil**:
+
+- **Vielfalt** — wie viele verschiedene Endpunktgruppen getroffen wurden
+- **Streuung** — Variationskoeffizient der Abstände
+
+Beide kommen mit dem gemessenen Vergleichswert in derselben Antwort:
+Normalnutzung trifft **12 Gruppen bei Streuung 5,13**, ein Skript ein bis
+zwei bei nahe null. **Der Maßstab gehört zur Zahl** — sonst liest jemand
+„3" und weiß nicht, ob das viel ist.
+
+Unter fünf Ereignissen bleibt die Streuung `null`: bei drei Abständen ist
+ein Variationskoeffizient Rauschen. Und **`null` heißt „weiß ich nicht",
+nicht „unauffällig"**.
+
+### Abnahme an der laufenden Maschine
+
+108 anonyme Anfragen gegen ein Limit von 100:
+
+```
+99 × 200,  9 × 429        das Limit greift exakt bei 100
+9 Ereignisse geschrieben  ip_key gesetzt, user_id leer (anonym)
+Stufe 1–4: hinweis        ab 5: auffaellig — die Eskalation greift
+detail: { limit, fenster_s, ueberschreitungen_1h }  nur Zahlen
+pfad: /api/v1/plans       ohne Parameter
+```
+
+Dann die Auswertung mit fünf verschiedenen Pfaden:
+
+```
+Vielfalt 5 · Streuung 0,65     gegen Normalnutzung 12 / 5,13
+```
+
+Die Testdaten sehen aus wie ein Skript — **sie waren eins.** Genau das
+sollen die Kennzahlen zeigen.
+
+### Zwei eigene Fehler auf dem Weg
+
+**`v1367b` — das Backend lief in eine Neustartschleife.** Mein Import
+hieß `require('../db')`, das Modul heißt `../db/pool`. Ergebnis: *Cannot
+find module*, Status `Restarting`, `/health` tot.
+
+> **`node --check` prüft nur Syntax, keine Auflösung von `require`.** Das
+> steht wörtlich in `CLAUDE.md` — *„Verträge prüft nur ein echter Lauf"* —
+> und ich habe trotzdem nur geprüft statt aufgerufen. Der Fehler wäre in
+> einer Sekunde sichtbar gewesen.
+
+**`v1367c` — eine Kennzahl, die immer dasselbe sagt.** Die Vielfalt
+gruppierte nach dem ersten Pfadsegment — und das ist bei **jedem**
+Endpunkt `api`, weil alle mit `/api/v1/` beginnen. Gemeldet wurde immer
+`vielfalt: 1`.
+
+Gefunden nur, weil der Probelauf fünf verschiedene Pfade schrieb und die
+Antwort `1` sagte. **Dieselbe Sorte Fehler wie ein Leser, der ins Leere
+greift** — sie fällt nur auf, wenn man das Ergebnis gegen eine bekannte
+Erwartung hält.
+
+### Vor dem Eingriff gesichert
+
+`/root/backups/vor-071-20260913-0731.sql.gz`, 46 MB, Anfang gegengelesen
+(`zcat … | head -3`). Die Regel aus `CLAUDE.md`: *„Eine Sicherung, die man
+nicht ansieht, ist keine."*
+
+### Commits
+
+`6047716` v1367 · v1367b und v1367c im selben Zug
+
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
