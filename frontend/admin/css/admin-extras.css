@@ -234,3 +234,13 @@
 .sec-entsch-btns { display: flex; gap: 9px; margin-top: 10px; flex-wrap: wrap; }
 .sec-entsch-btns .btn[disabled] { opacity: .45; cursor: not-allowed; }
 .sec-entsch-hinweis { margin-top: 10px; font-size: 11.5px; opacity: .65; line-height: 1.5; }
+
+/* v1369b: eine Entscheidung ist keine Beobachtung. Die Zeile bekommt
+   einen goldenen Balken links — beim Durchsehen der Chronik sieht man
+   dadurch sofort, wo ein Mensch eingegriffen hat. */
+.sec-zeile-entsch td:first-child {
+  box-shadow: inset 3px 0 0 var(--wl-c9a84c, #C9A84C);
+}
+.sec-zeile-entsch {
+  background: rgba(201,168,76,0.045);
+}

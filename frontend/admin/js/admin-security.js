@@ -52,7 +52,50 @@
 
   const STUFE_TEXT  = { hinweis: 'Hinweis', auffaellig: 'Auffällig', ernst: 'Ernst' };
 
+  /* v1369b: das Detail darf nicht „[object Object]" sagen.
+
+     Gesehen im Screenshot: eine Entscheidungszeile zeigte
+     `grund_bei_entscheidung: [object Object]`. Der alte Renderer setzte
+     jeden Wert unbesehen in einen String - bei einem verschachtelten
+     Objekt kommt dabei genau das heraus.
+
+     Zwei Regeln machen es lesbar: verschachtelte Objekte werden flach
+     ausgeschrieben, und die Schlüssel bekommen deutsche Namen. Was ein
+     Mensch lesen soll, soll auch auf Deutsch dastehen. */
+  const DETAIL_NAME = {
+    limit: 'Limit', fenster_s: 'Fenster (s)',
+    ueberschreitungen_1h: 'Überschreitungen in 1 h',
+    admin: 'entschieden von', notiz: 'Begründung',
+    stand_bei_entscheidung: 'berechneter Stand',
+    grund_bei_entscheidung: 'Grundlage',
+    ueberschreitungen: 'Überschreitungen', schwelle: 'Schwelle',
+    vielfalt: 'Endpunktgruppen', streuung: 'Streuung',
+    fenster_minuten: 'Fenster (min)', probe: 'Probe'
+  };
+
+  function detailText(detail) {
+    if (!detail || typeof detail !== 'object') return '';
+    const teile = [];
+    Object.keys(detail).forEach((k) => {
+      const v = detail[k];
+      if (v == null) return;
+      const name = DETAIL_NAME[k] || k;
+      if (typeof v === 'object') {
+        /* flach ausschreiben statt „[object Object]" */
+        const innen = Object.keys(v)
+          .filter((ik) => v[ik] != null)
+          .map((ik) => (DETAIL_NAME[ik] || ik) + ' ' + v[ik])
+          .join(', ');
+        if (innen) teile.push(name + ': ' + innen);
+      } else {
+        teile.push(name + ': ' + v);
+      }
+    });
+    return esc(teile.join(' · '));
+  }
+
   function zeit(w) {
+
     if (!w) return '—';
     const d = new Date(w);
     return d.toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit',
@@ -176,9 +219,7 @@
             : '<span style="opacity:.65">' + esc(e.ip_key || 'anonym') + '</span>';
           /* Das Detail trägt nur Zahlen - es gibt nichts zu verbergen und
              nichts, was ein Nutzer geschrieben hat. */
-          const d = e.detail && typeof e.detail === 'object'
-            ? Object.keys(e.detail).map((k) => esc(k) + ': ' + esc(e.detail[k])).join(' · ')
-            : '';
+          const d = detailText(e.detail);
           return '<tr><td style="white-space:nowrap">' + zeit(e.created_at) + '</td>'
             + '<td>' + wer + '</td>'
             + '<td>' + esc(e.art) + '</td>'
@@ -228,9 +269,7 @@
         ? '<table class="data-table"><thead><tr><th>Zeit</th><th>Art</th><th>Stufe</th>'
           + '<th>Pfad</th><th>Detail</th></tr></thead><tbody>'
           + a.chronik.map((e) => {
-              const d = e.detail && typeof e.detail === 'object'
-                ? Object.keys(e.detail).map((k) => esc(k) + ': ' + esc(e.detail[k])).join(' · ')
-                : '';
+              const d = detailText(e.detail);
               return '<tr><td style="white-space:nowrap">' + zeit(e.created_at) + '</td>'
                 + '<td>' + esc(e.art) + '</td>'
                 + '<td><span style="color:' + STUFE_FARBE[e.stufe] + '">'
