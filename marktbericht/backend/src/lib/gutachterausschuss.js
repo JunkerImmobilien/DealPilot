@@ -155,6 +155,17 @@ const FELDBRUECKE = {
   lagewert: ['lagewert', 'brw_eur_qm', 'brw_sqm'],
   /* v1088 */
   gebaeudestandard: ['gebaeudestandard', 'standardstufe'],
+  /* v1101-WSTD - GEMESSEN, nicht vermutet: `gebaeudestandard` stand seit
+     v1088 in dieser Bruecke und wurde von KEINEM Rezept benutzt. Die
+     Rezepte nennen die Achse `standardstufe` - Wolfenbuettel als
+     Korrektur (bis 0,81 bis 1,21, also bis 21 Prozent!), Teltow-Flaeming
+     als Kategorieachse. Beide liefen damit ins Leere: Wolfenbuettel
+     rechnete still OHNE die Standardstufenkorrektur, Teltow-Flaeming
+     haette `kategorie_fehlt` gemeldet.
+
+     Der Eintrag darueber bleibt stehen - er kostet nichts und faengt ein
+     Rezept ab, das den anderen Namen waehlt. */
+  standardstufe: ['standardstufe', 'gebaeudestandard'],
   ort: ['ort', 'gemeinde_name', 'gemeinde'],
 };
 

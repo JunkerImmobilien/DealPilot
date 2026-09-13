@@ -282,6 +282,13 @@ export const CrossCheckService = {
           brw_eur_qm: (p && p.bodenwert && p.bodenwert.quelle && p.bodenwert.quelle.brw_sqm)
             || (p && p.brw_sqm) || ref.brw_sqm || null,
           bgf_qm: (p && p.bgf_direkt) || ref.bgf || null,
+          /* v1101-WSTD - die Standardstufe wird zwei Zeilen weiter unten an
+             nhkSachwert uebergeben, kam aber HIER nie an. Wolfenbuettel
+             korrigiert den Faktor nach ihr um bis zu 21 Prozent,
+             Teltow-Flaeming fuehrt je Stufe eigene Bodenrichtwertbaender.
+             Ohne diese Zeile rechnete das eine still ohne Korrektur, das
+             andere gar nicht - und beides saehe im Bericht gleich aus. */
+          standardstufe: (p && p.standardstufe) || ref.standardstufe || null,
         });
         if (_swfTab && _swfTab.verfuegbar) {
           /* v1338: Fuehrt das Modell des Ausschusses eine eigene
