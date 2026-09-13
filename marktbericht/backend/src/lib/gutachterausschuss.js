@@ -152,6 +152,12 @@ const FELDBRUECKE = {
      keiner Bruecke; das Modell haette 'achse_y_fehlt' gemeldet, obwohl
      die Zahl im Formular seit jeher erhoben wird. */
   wohnflaeche: ['wohnflaeche_qm', 'wohnflaeche', 'living_area', 'wfl'],
+  /* v1105-WMOD - Cottbus unterscheidet seine Sachwertfaktoren nach dem
+     MODERNISIERUNGSGRAD nach Anlage 2 ImmoWertV: 0 bis 6 Punkte gelten
+     als unsaniert, ab 7 als teilsaniert bis saniert. Zwischen beiden
+     liegen bei gleichem Baujahr bis zu acht Prozent. */
+  mod_punkte: ['mod_punkte', 'modernisierungsgrad', 'modg'],
+
 
   baujahr: ['baujahr', 'build_year'],
   flaeche: ['grundstuecksflaeche_qm', 'flaeche_qm', 'gsfl', 'flaeche'],

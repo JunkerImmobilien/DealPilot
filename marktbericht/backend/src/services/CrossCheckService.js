@@ -299,6 +299,11 @@ export const CrossCheckService = {
              Wohnflaeche. Ohne diese Zeile bliebe die halbe Tabelle leer. */
           wohnflaeche_qm: ref.living_area || null,
           grundstuecksflaeche_qm: ref.plot_area || null,
+          /* v1105-WMOD - Cottbus trennt unsaniert (MODG 0-6) von
+             teilsaniert/saniert (ab 7). */
+          mod_punkte: (p && p.mod_punkte) != null ? p.mod_punkte
+            : (ref.mod_punkte != null ? ref.mod_punkte : null),
+
 
 
         });

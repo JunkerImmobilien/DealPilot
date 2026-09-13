@@ -1,0 +1,68 @@
+{
+  "land_code": "BB",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Brandenburg an der Havel",
+  "gaa_kennz": "12051",
+  "ags": ["12051000"],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2025,
+  "stichtag": "2025-01-01",
+  "auswertezeitraum": "2024 bis 2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06-25",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_BRB.pdf",
+  "quelle_datei": "BB-brandenburg-havel-gmb-2025.pdf",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, S. 68 ff. Abbildungen 81 bis 84. Modellansätze Punkt 8.1.3.",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "typische Ein- und Zweifamilienhäuser",
+      "form": "stufen_1d",
+      "formel": {
+        "form": "stufen_1d",
+        "achse_feld": "sachwert",
+        "achse_bez": "vorläufiger Sachwert in Euro",
+        "stufen": {
+          "150000": 1.23, "200000": 1.13, "250000": 1.05, "300000": 0.99,
+          "350000": 0.94, "400000": 0.91, "450000": 0.90, "500000": 0.91,
+          "550000": 0.93, "600000": 0.96
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "DIE KURVE HAT EIN MINIMUM: sie fällt von 1,23 bei 150.000 € auf 0,90 bei 450.000 € und STEIGT danach wieder auf 0,96 bei 600.000 €. Das ist im Bericht so abgedruckt und keine Ablesefehler — die Regression ist keine reine Potenzfunktion. Wer nur die fallende Flanke kennt, extrapoliert falsch.",
+        "normobjekt": "Typische Ein- und Zweifamilienhäuser im Stadtgebiet Brandenburg an der Havel, Stichtag 01.01.2025, Modellansätze nach Punkt 8.1.3 des Berichts."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV § 21 und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
+        "ermittlung": "einfache Regression, R² = 0,140",
+        "stichtag": "01.01.2025",
+        "kauffaelle_gesamt": 65
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Stadtgebiet Brandenburg an der Havel",
+        "sachlich": "typische Ein- und Zweifamilienhäuser",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwert_eur": { "min": 150000, "max": 600000 },
+          "brw_eur_qm":   { "min": 45, "max": 240 },
+          "flaeche_qm":   { "min": 374, "max": 1489 }
+        },
+        "vorbehalt": "DER BERICHT NENNT SEINE EIGENE GRENZE: „Ab einem Bestimmtheitsmaß von 0,3 beginnt, laut mathematischer Statistik, sich eine Abhängigkeit zu entwickeln.\" Sein R² liegt bei 0,140 — also unterhalb dieser selbst benannten Schwelle. Die Kurve ist eine Orientierung.\n\nDIE MODELLKONFORMITÄT IST AUSDRÜCKLICH EINGEFORDERT: der Sachwertfaktor darf nur auf solche Wertanteile angewandt werden, die auch seiner Ermittlung zu Grunde lagen; alles andere gehört als besonderes objektspezifisches Grundstücksmerkmal NACH die Marktanpassung.\n\nDIE STICHPROBE IST KLEIN: 65 Kauffälle, Bodenrichtwert 45 bis 240 €/m², Grundstücke 374 bis 1.489 m².",
+        "hinweis": "Der Bericht führt zusätzlich eine Auswertung nach STANDARDSTUFEN (Abbildung 84): Stufe 2 = 0,83 (3 Kauffälle, 0,69 bis 1,05), Stufe 3 = 0,99 (54 Kauffälle, 0,64 bis 1,88), Stufe 4 = 1,05 (7 Kauffälle, 0,86 bis 1,44), Stufe 5 = 0,94 (1 Kauffall). Sie ist NICHT als Korrektur übernommen: es sind eigenständige Mittelwerte derselben Stichprobe, keine Anpassungsfaktoren zur Kurve. Beides miteinander zu multiplizieren würde denselben Effekt zweimal zählen. Ebenfalls im Bericht: Sachwertfaktoren für Doppelhaushälften, Reihenend- und Reihenmittelhäuser (Kap. 8.3.2)."
+      },
+
+      "stufe": "C",
+      "stufe_grund": "Amtliche Kurve mit abgedruckten Stützstellen und vollständiger Stichprobenbeschreibung. Stufe C, weil das Bestimmtheitsmaß mit 0,140 unter der Schwelle liegt, die der Bericht selbst als Beginn einer Abhängigkeit nennt, und die Stichprobe nur 65 Kauffälle umfasst.",
+      "fallzahl": 65,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 der Stadt Brandenburg an der Havel, Kap. 8.2.2, Abbildungen 81 bis 83: Sachwertfaktorenkurve für typische Ein- und Zweifamilienhäuser aus 65 Kauffällen der Jahre 2024 und 2025, zehn abgedruckte Stützstellen von 150.000 bis 600.000 € vorläufigem Sachwert, Stichtag 01.01.2025, R² = 0,140."
+    }
+  ]
+}

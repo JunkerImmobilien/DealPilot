@@ -270,26 +270,46 @@ def normalisiere(datei, m):
     # v1103-WVERZ - jede Kategorie braucht ihr Modell, und jedes Modell eine
     # Form, die der Auswerter kennt. Sonst stuende eine Kategorie im Rezept,
     # fuer die spaeter still nichts herauskommt.
-    if form == 'verzweigt':
-        mjk = formel.get('modell_je_kategorie') or {}
-        fehlen = [k for k in (formel.get('kategorien') or []) if str(k) not in mjk]
+    # v1105-WTIEFE - ZWEI EBENEN, NICHT MEHR.
+    #
+    # Potsdam-Mittelmark verzweigt zuerst nach der Region (Berliner Umland
+    # oder weiterer Metropolenraum) und INNERHALB jeder Region noch einmal
+    # nach dem Bodenrichtwertbereich - und die Bereiche ueberschneiden sich
+    # zwischen den Regionen (110 bis 500 hier, 110 bis 290 dort). Eine
+    # Ebene reicht dafuer nicht.
+    #
+    # Tiefer als zwei geht nicht: kein bisher gelesener Bericht braucht es,
+    # und eine unbegrenzte Schachtelung waere im Rezept nicht mehr
+    # nachvollziehbar.
+    def pruefe_verzweigt(f, tiefe, pfad):
+        mjk = f.get('modell_je_kategorie') or {}
+        fehlen = [k for k in (f.get('kategorien') or []) if str(k) not in mjk]
         if fehlen:
-            meckern(datei, f'ohne Modell: {fehlen}')
-            return None
+            meckern(datei, f'{pfad}ohne Modell: {fehlen}')
+            return False
         for k, um in mjk.items():
+            wo = f"{pfad}Untermodell '{k}': "
             if not isinstance(um, dict) or um.get('form') not in ERLAUBT:
-                meckern(datei, f"Untermodell '{k}': Form "
-                        f"'{(um or {}).get('form')}' kennt der Auswerter nicht")
-                return None
-            if um.get('form') == 'verzweigt':
-                meckern(datei, f"Untermodell '{k}': verzweigt in verzweigt")
-                return None
+                meckern(datei, wo + f"Form '{(um or {}).get('form')}' "
+                        'kennt der Auswerter nicht')
+                return False
+            if um['form'] == 'verzweigt':
+                if tiefe >= 2:
+                    meckern(datei, wo + 'dritte Verzweigungsebene')
+                    return False
+                if not pruefe_verzweigt(um, tiefe + 1, wo):
+                    return False
+                continue
             fremd_u = set(um) - ERLAUBT[um['form']] - DOKU - {'korrekturen'}
             if fremd_u:
-                meckern(datei, f"Untermodell '{k}': unbekannte Schluessel "
-                        f'{sorted(fremd_u)}')
-                return None
+                meckern(datei, wo + f'unbekannte Schluessel {sorted(fremd_u)}')
+                return False
             pruefe_korrekturen(datei, um.get('korrekturen') or [])
+        return True
+
+    if form == 'verzweigt':
+        if not pruefe_verzweigt(formel, 1, ''):
+            return None
 
     einheit = formel.get('liefert', 'faktor')
     if einheit not in EINHEITEN:
