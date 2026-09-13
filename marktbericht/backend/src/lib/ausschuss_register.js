@@ -126,7 +126,12 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                                Rheinland-Pfalz. Der Bericht druckt die Funktion
                                ab UND ein Anwendungsbeispiel — beides
                                nachgerechnet, beides zeichengleich. */
-                            'swf-rp.json'];
+                            'swf-rp.json',
+                            /* v1098j: Ludwigslust-Parchim. verwendung: gutachten -
+                               auszugsweise Wiedergabe ist gestattet, verlangt aber
+                               Quellenangabe UND ein Belegexemplar. Im Kundenbericht
+                               steht bis zur Klaerung nur der Link. */
+                            'swf-mv.json'];
 
 export function ladeSaat(dateien = SAATDATEIEN) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])

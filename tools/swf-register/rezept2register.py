@@ -339,6 +339,25 @@ def bauen():
                     'quelle_parser': 'v1084-WREZ',
                     'quellenvermerk': d.get('quellenvermerk'),
                     'lizenz': d.get('lizenz'),
+                    # v1098j · ZWEI VERSCHIEDENE FRAGEN, die bis hierher
+                    # vermengt waren:
+                    #
+                    #   1. Darf Marcel als Sachverstaendiger mit dem Wert
+                    #      arbeiten? Amtliche Marktdaten in einem
+                    #      Verkehrswertgutachten zu verwenden ist der
+                    #      vorgesehene Zweck dieser Berichte.
+                    #   2. Darf der Wert in einem DealPilot-Bericht an einen
+                    #      KUNDEN gehen? Das entscheidet die Lizenz.
+                    #
+                    # `verwendung` trennt beides:
+                    #   'produkt'    darf ausgeliefert werden
+                    #   'gutachten'  Marcel arbeitet damit; im Kundenbericht
+                    #                steht nur der Link zur Quelle
+                    #
+                    # Fehlt das Feld, gilt 'produkt' - so sind die vierzehn
+                    # NRW-Rezepte geschrieben, deren Lizenz zero-2-0 ist.
+                    'verwendung': d.get('verwendung') or 'produkt',
+                    'auflagen': d.get('auflagen'),
                     'fundstelle': d.get('fundstelle'),
                 })
 
