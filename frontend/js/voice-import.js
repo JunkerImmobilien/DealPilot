@@ -2445,7 +2445,91 @@
       frage: 'Warum lohnt sich das Objekt für dich, was könnte schiefgehen, und was ist sonst wichtig?' }
   ];
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1378 (C2) · WOZU DIE ANGABE GEBRAUCHT WIRD
+     ═══════════════════════════════════════════════════════════════════
+     Der Lernmodus zeigt diesen Satz unter jeder Frage. Er beantwortet
+     nicht "was soll ich eintragen" - das steht in der Frage -, sondern
+     "warum will er das wissen".
+
+     DER UNTERSCHIED ZU EINEM HILFETEXT: hier steht, was die Angabe in
+     DIESER Software bewirkt - welche Kennzahl sie traegt, welche Rechnung
+     ohne sie nicht laeuft. Eine Lexikondefinition kann jeder nachschlagen;
+     dass ohne das nicht umlagefaehige Hausgeld der Cashflow zu gut
+     aussieht, steht nirgends sonst.
+
+     Der Schluessel ist die ERSTE Feld-Id des Blocks. Bloecke ohne Eintrag
+     zeigen im Lernmodus einfach nichts - besser als ein Fuellsatz. */
+  var RF_WOZU = {
+    plz: 'Die Adresse ist der Schlüssel zu allem Amtlichen: Bodenrichtwert aus BORIS, ' +
+         'Grunderwerbsteuersatz des Landes, Miet- und Kaufpreisniveau der Lage. ' +
+         'Ohne Hausnummer trifft der Bodenrichtwert nur das Ortszentrum.',
+    objart: 'Die Wohnfläche ist der Nenner fast jeder Vergleichszahl — Preis je m², ' +
+            'Miete je m², Sachwert. Die Objektart entscheidet, welche Verfahren ' +
+            'überhaupt rechnen: eine Eigentumswohnung ohne Miteigentumsanteil ' +
+            'bekommt keinen eigenen Bodenwert.',
+    baujahr: 'Das Baujahr steuert die AfA (2 oder 2,5 Prozent), die Restnutzungsdauer ' +
+             'im Sachwert und die Erwartung an Zustand und Energie. Der Kaufpreis ist ' +
+             'die Basis der Kaufnebenkosten und der Nenner jeder Rendite.',
+    nkm: 'Die Kaltmiete trägt die Mietrendite, den Cashflow und über den DSCR die ' +
+         'Frage, ob sich das Objekt selbst trägt. Zusatzeinnahmen wie Stellplätze ' +
+         'zählen mit — sie gehören zum Rohertrag, auch wenn sie klein wirken.',
+    ek: 'Eigenkapital und Zins entscheiden über den Hebel: dieselbe Wohnung ist mit ' +
+        '20 Prozent Eigenkapital eine andere Investition als mit 40. Die Zinsbindung ' +
+        'sagt, wie lange die Rechnung sicher ist — danach beginnt das ' +
+        'Zinsänderungsrisiko.',
+    makler_p: 'Die Kaufnebenkosten sind echtes Geld, das nie in der Immobilie landet. ' +
+              'Sie erhöhen die Investition, nicht den Wert — deshalb drücken sie jede ' +
+              'Rendite. Die Grunderwerbsteuer ist Landesrecht und liegt zwischen ' +
+              '3,5 und 6,5 Prozent.',
+    makrolage: 'Die Lage geht in den Investor Deal Score ein und ist das, was sich ' +
+               'später NICHT ändern lässt. Region und Straße getrennt, weil beides ' +
+               'auseinanderfallen kann: gute Stadt, laute Straße.',
+    ds2_zustand: 'Zustand und Energieausweis sagen, was an Investitionen noch kommt. ' +
+                 'Eine Heizung von 1995 ist keine Sanierung von heute, aber eine von ' +
+                 'übermorgen — und die Energieklasse wirkt auf Mieterwartung und ' +
+                 'Wiederverkauf.',
+    san: 'Geplante Sanierungen gehören in die Investitionssumme, nicht in die ' +
+         'laufenden Kosten — sonst sieht der Cashflow im ersten Jahr zu schlecht und ' +
+         'die Rendite zu gut aus. Mitverkauftes Inventar kann die ' +
+         'Bemessungsgrundlage der Grunderwerbsteuer senken.',
+    brw: 'Der Bodenrichtwert trennt Grund und Gebäude. Das ist zweimal wichtig: für ' +
+         'den Sachwert und für den Gebäudeanteil, denn nur der Gebäudeteil wird ' +
+         'abgeschrieben. Den Wert hole ich amtlich aus BORIS, wenn du willst.',
+    erbbauzins: 'Beim Erbbaurecht kaufst du das Gebäude, nicht den Boden. Der ' +
+                'Erbbauzins läuft wie eine zweite Miete mit, und die Restlaufzeit ' +
+                'entscheidet, ob eine Bank überhaupt finanziert.',
+    hg_ul: 'Nur der NICHT umlagefähige Teil des Hausgelds trifft dich — der Rest geht ' +
+           'an den Mieter weiter. Wer das Hausgeld komplett als Kosten rechnet, macht ' +
+           'sein Objekt schlechter, als es ist; wer es ganz weglässt, besser.',
+    mietstg: 'Diese drei Prozentsätze bestimmen die Prognose über die Haltedauer. Sie ' +
+             'sind Annahmen, keine Tatsachen — deshalb siehst du in der Übersicht, ' +
+             'mit welchen gerechnet wurde. Leerstand ist der ehrlichste Posten: er ' +
+             'kommt, die Frage ist nur wann.',
+    ds2_bevoelkerung: 'Das ist die Zukunft des Ortes, nicht des Objekts: zieht die ' +
+                      'Bevölkerung hin oder weg, ist die Nachfrage da, kommt ' +
+                      'Entwicklung. Vier Einschätzungen für den Investor Deal Score, ' +
+                      'die ich dir auch aus einer Marktpreisindikation holen kann.',
+    kaufdat: 'Das Kaufdatum startet die AfA und die Spekulationsfrist von zehn Jahren. ' +
+             'Der wirtschaftliche Übergang ist der Tag, ab dem dir Mieten und Kosten ' +
+             'gehören — er liegt oft Wochen nach der Beurkundung.',
+    afa_satz: 'Die Steuer entscheidet über den Cashflow nach Steuern, und der ist der, ' +
+              'der auf deinem Konto ankommt. Der Gebäudeanteil ist die ' +
+              'Bemessungsgrundlage der AfA — Grund und Boden wird nicht abgeschrieben. ' +
+              'Der Grenzsteuersatz sagt, was der nächste Euro kostet, nicht der ' +
+              'Durchschnitt.',
+    thesis: 'Das rechnet nichts — und ist trotzdem das Wichtigste. In zwei Jahren ' +
+            'weißt du nicht mehr, warum dieses Objekt und kein anderes. Die Risiken ' +
+            'aufzuschreiben schützt außerdem davor, sie später wegzurechnen.'
+  };
+
+  function _rfWozu(e) {
+    if (!e || !e.ids || !e.ids.length) return '';
+    return RF_WOZU[e.ids[0]] || '';
+  }
+
   var RF_MAX = 3;
+
   var _rf = null;   /* { offen:[], i:0, data:{}, catalog:[], OA:{}, alle:bool } */
 
   function _rfFehlt(eintrag, fields) {
@@ -3551,6 +3635,20 @@
       '  font:400 11px/1.5 Inter,system-ui,sans-serif;opacity:.72}',
       '.vi-sc-annahmen b{opacity:.9}',
       '.vi-sc-weiter{margin-top:10px;font:400 12.5px/1.45 Inter,system-ui,sans-serif;opacity:.8}',
+      /* v1378 (C2): Der Wozu-Satz ist Erklaerung, kein Inhalt - er steht
+         abgesetzt und leiser als die Frage, damit er sie nicht ueberlagert. */
+      '.vi-rf-wozu{margin:9px 0 2px;padding:8px 11px;border-radius:8px;',
+      '  border-left:3px solid var(--wl-C9A84C,#C9A84C);',
+      '  background:rgba(201,168,76,.07);',
+      '  font:400 12px/1.5 Inter,system-ui,sans-serif;opacity:.88}',
+      '.vi-rf-wozu b{font:600 9.5px/1 "JetBrains Mono",ui-monospace,monospace;',
+      '  text-transform:uppercase;letter-spacing:.05em;opacity:.6;margin-right:6px}',
+      /* Der Tonknopf traegt den Zustand als Farbe mit - ein Schalter, dem
+         man nicht ansieht, wo er steht, wird zweimal gedrueckt. */
+      '#vi-rf-ton[data-ton="lernen"]{border-color:var(--wl-C9A84C,#C9A84C);',
+      '  color:var(--wl-C9A84C,#C9A84C)}',
+      '#vi-rf-ton[data-ton="profi"]{border-color:#3FA56C;color:#3FA56C}',
+
       /* v1376 (C7): zwei Werte nebeneinander. Beide gleich gross, beide mit
          ihrer Herkunft - keiner sieht wichtiger aus als der andere, denn
          welcher stimmt, weiss nur der Nutzer. Gold fuer den abgerufenen
@@ -6996,6 +7094,11 @@
       '</div>' +
       '<div class="vi-rf-neben" id="vi-rf-neben">' +
         '<button type="button" id="vi-rf-nix">Weiß ich nicht</button>' +
+        /* v1378 (C2): Der Ton steht bei den Nebenknoepfen, nicht in der
+           Aktionsleiste. Dort stehen ENTSCHEIDUNGEN, die verschwinden,
+           wenn sie getroffen sind - der Ton ist eine Dauereinstellung. */
+        '<button type="button" id="vi-rf-ton" title="Ton umschalten: Lernmodus · Normal · Investor-Modus"></button>' +
+
         '<button type="button" id="vi-rf-passt" style="display:none"></button>' +
         '<button type="button" id="vi-rf-ende">Fertig — zur Übersicht</button>' +
       '</div>' +
@@ -7011,6 +7114,10 @@
     inp.addEventListener('input', function () { if (inp.value.trim()) _fsStopHoeren(); });
     $('vi-rf-ok').addEventListener('click', _rfSenden);
     $('vi-rf-nix').addEventListener('click', function () { _rfUeberspringen(); });
+    /* v1378 (C2) */
+    $('vi-rf-ton').addEventListener('click', function () { _rfModusWeiter(); });
+    _rfTonKnopf();
+
     $('vi-rf-ende').addEventListener('click', function () { _rfFertig(true); });   /* v1282: ausdruecklich beendet - nicht nach den Feinheiten fragen */
     $('vi-rf-passt').addEventListener('click', function () {
       var e = _rf.offen[_rf.i];
@@ -7138,7 +7245,17 @@
     var pv = _rfProfilVorschlag(e);
     /* v1288: Bei einer Auswahl stehen die STUFEN in der Frage. Wir bewerten
        danach - also soll der Nutzer sie hoeren, statt Freitext zu raten. */
-    _rfDranBlase(_rfBlase('co', escH(e.frage) + _rfDoppeldeutig(e) + _rfPillen(e) + _rfSkalen(e) +
+    _rfDranBlase(_rfBlase('co', escH(e.frage) + _rfDoppeldeutig(e) +
+      /* v1378 (C2): Im Lernmodus steht unter der Frage, WOZU die Angabe
+         gebraucht wird. Vor den Pillen, damit der Grund vor der Auswahl
+         kommt - wer weiss, worum es geht, waehlt anders. */
+      (function () {
+        if (_rfModus() !== 'lernen') return '';
+        var w = _rfWozu(e);
+        return w ? '<div class="vi-rf-wozu"><b>Wozu?</b> ' + escH(w) + '</div>' : '';
+      })() +
+      _rfPillen(e) + _rfSkalen(e) +
+
       (pv ? '<div class="vi-rf-vorschlag">Aus deinen Einstellungen hätte ich: <b>' +
             escH(pv.text) + '</b></div>' : '') +
       /* v1309: Die Bankbewertung kennt beim Aufnehmen fast niemand — der
@@ -8192,12 +8309,77 @@
     }).catch(function () { _melde(false); });
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1378 (C2) · ZWEI BEGLEITTOENE
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Anforderung: ein LERNMODUS, der erklaert, wozu eine Angabe
+     gebraucht wird, und ein INVESTOR-MODUS, der knapp bleibt - jederzeit
+     umschaltbar.
+
+     Der Ton aendert ZWEI Dinge und sonst nichts:
+       1. die Laenge und Tiefe der KI-Auskunft (Parameter `modus`),
+       2. ob unter einer Frage steht, WOZU sie gestellt wird (`wozu`).
+
+     WAS ER NICHT AENDERT: welche Fragen kommen, welche Werte gelten, was
+     gerechnet wird. Ein Modus, der den Inhalt aendert, waere kein Ton
+     mehr, sondern eine zweite Anwendung.
+
+     Er wird GEMERKT - wer einmal auf knapp gestellt hat, will nicht bei
+     jedem Objekt neu umschalten. Der Aufnahmeweg ("frei erzaehlen" gegen
+     "frag mich durch") wird bewusst nicht gemerkt (v1275); das ist eine
+     Entscheidung fuer DIESES Objekt. Der Ton ist eine ueber die Person. */
+  var MODUS_KEY = 'dp_rf_modus';
+  var MODUS_NAME = { lernen: 'Lernmodus', normal: 'Normal', profi: 'Investor-Modus' };
+  var MODUS_FOLGE = ['lernen', 'normal', 'profi'];
+
+  function _rfModus() {
+    if (_rf && _rf.modus) return _rf.modus;
+    var m = null;
+    try { m = localStorage.getItem(MODUS_KEY); } catch (e) {}
+    return (m === 'lernen' || m === 'profi') ? m : 'normal';
+  }
+
+  function _rfModusSetzen(m, stumm) {
+    if (MODUS_FOLGE.indexOf(m) < 0) m = 'normal';
+    if (_rf) _rf.modus = m;
+    try { localStorage.setItem(MODUS_KEY, m); } catch (e) {}
+    if (!stumm) {
+      _rfBlase('co', '<span style="opacity:.8">Ton: <b>' + escH(MODUS_NAME[m]) + '</b> — ' +
+        escH(m === 'lernen'
+          ? 'ich sage jetzt bei jeder Frage dazu, wozu die Angabe gebraucht wird, und erkläre ausführlicher.'
+          : m === 'profi'
+          ? 'ich halte mich kurz: Zahl und Folge, ohne Begriffserklärung.'
+          : 'normale Länge, ohne Zusatzerklärungen.') + '</span>');
+    }
+    _rfTonKnopf();
+    _rfDranZeichnen();
+    if (_rf && !_rf.abschlussOffen && !_rf.nachfassOffen) _rfFrageNochmal();
+  }
+
+
+  /* Der Knopf sagt, was gerade gilt - nicht, was er tut. Ein Schalter, der
+     "Lernmodus" heisst, waehrend der Lernmodus laeuft, ist mehrdeutig; einer,
+     der den Zustand zeigt, ist es nicht. Was der Klick tut, steht im title. */
+  function _rfTonKnopf() {
+    var b = $('vi-rf-ton'); if (!b) return;
+    var m = _rfModus();
+    b.textContent = (m === 'lernen' ? '🎓 ' : m === 'profi' ? '⚡ ' : '○ ') + MODUS_NAME[m];
+    b.setAttribute('data-ton', m);
+  }
+
+  function _rfModusWeiter() {
+
+    var i = MODUS_FOLGE.indexOf(_rfModus());
+    _rfModusSetzen(MODUS_FOLGE[(i + 1) % MODUS_FOLGE.length]);
+  }
+
   function _rfFrageBeantworten(text) {
+
     _rfBlase('ich', escH(text));
     _rfMelden('', true);
     return Auth.apiCall('/ai/copilot-frage', {
       method: 'POST',
-      body: { frage: text, kontext: _rfKontextKlar() || _rfKontext() }
+      body: { frage: text, kontext: _rfKontextKlar() || _rfKontext(), modus: _rfModus() }
     }).then(function (r) {
       _rfDenkt(false);
       _rfBlase('co', escH((r && r.antwort) || 'Dazu weiß ich gerade nichts.'));
@@ -8446,7 +8628,25 @@
       }
     }
 
+    /* ═══ v1378 (C2) · Den Ton sagt man, statt ihn zu suchen ═══════════
+       "Erklär mir das genauer" ist die natuerlichere Bitte als ein Knopf
+       in der Nebenleiste. Eng gefasst: nur kurze Saetze, die aus nichts
+       anderem bestehen - "erklaer mir den Zustand der Wohnung" ist eine
+       Frage zum Objekt, kein Moduswechsel. */
+    if (t.split(/\s+/).length <= 6) {
+      if (/^(?:kannst du |bitte |jetzt )?(?:etwas |mehr |bitte )?(?:ausf(ü|ue)hrlicher|genauer erkl(ä|ae)ren|mehr erkl(ä|ae)ren|lernmodus|lern-?modus|erkl(ä|ae)rmodus)\b[\s.!,]*$/i.test(t)) {
+        _rfBlase('ich', escH(t)); _rfModusSetzen('lernen'); return true;
+      }
+      if (/^(?:bitte |jetzt )?(?:k(ü|ue)rzer|kurz fassen|knapper|knapp halten|investor-?modus|profi-?modus|schneller durch)\b[\s.!,]*$/i.test(t)) {
+        _rfBlase('ich', escH(t)); _rfModusSetzen('profi'); return true;
+      }
+      if (/^(?:bitte |wieder )?(?:normal|normaler ton|standard|wie vorher)\b[\s.!,]*$/i.test(t)) {
+        _rfBlase('ich', escH(t)); _rfModusSetzen('normal'); return true;
+      }
+    }
+
     /* ═══ v1309 · Navigation per Sprache ══════════════════════════════════
+
        Marcels Wunsch: „Ich möchte überspringen oder weiter oder ich möchte
        auch eine Frage zurückspringen."
 
@@ -9100,6 +9300,11 @@
                          _setzen: _rfSetzen,
                          /* v1377 (C5) */
                          _nachfassListe: _rfNachfassListe,
+                         /* v1378 (C2) */
+                         _modus: _rfModus,
+                         _modusSetzen: _rfModusSetzen,
+                         _wozu: _rfWozu,
+
                          _nachfassAnbieten: _rfNachfassAnbieten,
                          _ueberspringen: _rfUeberspringen,
 

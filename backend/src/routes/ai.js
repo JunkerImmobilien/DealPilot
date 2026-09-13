@@ -693,7 +693,12 @@ router.post('/extract-voice', authenticate, dialogLimiter, async (req, res, next
  */
 router.post('/copilot-frage', authenticate, dialogLimiter, async (req, res, next) => {
   try {
-    const { frage, kontext } = req.body || {};
+    /* v1378 (C2): Der Begleitton kommt aus dem Frontend. Zwei Werte sind
+       erlaubt, alles andere faellt auf "normal" zurueck - ein unbekannter
+       Wert darf nie dazu fuehren, dass gar keine Tonregel im Prompt steht. */
+    const { frage, kontext, modus } = req.body || {};
+    const TON = (modus === 'lernen' || modus === 'profi') ? modus : 'normal';
+
     if (!config.openai.apiKey) return res.status(503).json({ error: 'Kein OpenAI-API-Key verfuegbar.' });
     if (!frage || typeof frage !== 'string' || frage.trim().length < 2) {
       return res.status(400).json({ error: 'Body muss "frage" enthalten.' });
@@ -720,8 +725,34 @@ router.post('/copilot-frage', authenticate, dialogLimiter, async (req, res, next
       zeilen.join('\n'),
       '',
       'REGELN:',
-      '1. Antworte auf DEUTSCH, im Du, in zwei bis vier Saetzen. Kein Markdown,',
-      '   keine Aufzaehlung, keine Ueberschrift.',
+      /* ═══ v1378 (C2) · DER BEGLEITTON ═══════════════════════════════════
+         Marcels Anforderung: zwei Modi, jederzeit umschaltbar - Lernmodus,
+         der erklaert WOZU eine Angabe gebraucht wird, und Investor-Modus,
+         der knapp bleibt.
+
+         Hier stand nur die eine harte Regel "zwei bis vier Saetze". Sie ist
+         ein guter Standard und bleibt es - aber sie war der Grund, warum
+         das Frontend keinen Ton anfordern konnte: es gab keinen Parameter,
+         nur einen festgeschriebenen Satz.
+
+         Was sich NICHT aendert: alle anderen Regeln. Der Lernmodus darf
+         mehr erklaeren, aber nichts erfinden; der Investor-Modus darf
+         kuerzen, aber keine Quelle weglassen. Der Ton bestimmt die Laenge
+         und die Tiefe der Erklaerung, nie den Inhalt. */
+      TON === 'lernen'
+        ? '1. Antworte auf DEUTSCH, im Du, in drei bis sechs Saetzen. LERNMODUS: ' +
+          'erklaere zusaetzlich, WOZU die Groesse dient und wie sie sich auf die ' +
+          'Rechnung auswirkt - eine Kennzahl ohne ihren Zweck ist eine Zahl zum ' +
+          'Abschreiben. Ein Beispiel mit den bekannten Werten hilft mehr als eine ' +
+          'Definition. Kein Markdown, keine Aufzaehlung, keine Ueberschrift.'
+        : TON === 'profi'
+        ? '1. Antworte auf DEUTSCH, im Du, in EINEM bis ZWEI Saetzen. ' +
+          'INVESTOR-MODUS: der Nutzer kennt die Begriffe. Nenne die Zahl und die ' +
+          'Folge, ohne den Begriff zu erklaeren. Keine Einleitung, kein ' +
+          '"gute Frage", kein Markdown.'
+        : '1. Antworte auf DEUTSCH, im Du, in zwei bis vier Saetzen. Kein Markdown, ' +
+          'keine Aufzaehlung, keine Ueberschrift.',
+
       '2. Rechne gern mit den bekannten Werten und nenne dabei, WORAUS du',
       '   rechnest ("bei 200.000 Kaufpreis und 490 Miete sind das ...").',
       '3. Was nicht im bekannten Stand steht, ERFINDE NICHT. Sag stattdessen,',
