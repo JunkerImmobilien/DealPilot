@@ -3627,3 +3627,194 @@ done
 ```
 
 `v1377b`
+
+---
+
+> **Uebernommen am 13.09.2026** aus der Cowork-Sitzung des Marktbericht-
+> Strangs (`Dateien/integration-marktbericht.zip`, Block 03). Sie stehen
+> hier als EIN nummerierter Eintrag mit Unterabschnitten, weil sie
+> zusammen einen Arbeitsbereich beschreiben und nicht einzeln entstanden
+> sind wie die Nummern davor.
+
+## 160 · Marktbericht und Ernte - gesammelte Fallen aus dem Parallel-Strang
+
+### Prüfungen, die sich selbst betrügen
+
+**Eine Prüfung darf ihre Vorbedingung nicht selbst herstellen.**
+Die Kettenprüfung von v1083 rief `ladeSaat()` selbst auf — und deckte damit zu,
+dass es im Serverbetrieb **niemand** tat. Das Register blieb leer, jede Adresse
+bekam „kein Ausschuss hinterlegt", und die Prüfung war grün. Seit v1083b wird
+**am Ausgabeobjekt UND an seinem Leser** gemessen: für jedes Feld wird geprüft,
+dass es **gesetzt und gelesen** wird.
+
+**Eine Auskunft, die einen anderen Weg nimmt als der Rechenweg, misst sich
+selbst.** `swf-abfrage --stand` und `registerStand()` starten je einen eigenen
+Node-Prozess, lesen nur die Saatdatei und rufen `ladeAusDb()` nie auf — beide
+meldeten **2150**, während der Server **1565** führte. Die ehrliche Zahl steht
+im Startlog oder kommt aus dem Endpunkt.
+
+**Ein Prüfwerkzeug mit einer Abhängigkeit, die der geprüften Maschine fehlt,
+prüft die Maschine nicht.** `abnahme.sh` wertete mit `node -e` auf dem **Host**
+aus. Staging hat Node 18, **Prod hat kein node auf dem Host** → dreizehn Zeilen
+„FEHL … ist (leer)", während das Serverlog daneben sauber 2150 meldete.
+**Prüfwerkzeuge laufen im Container.**
+
+**Die dumme Prüfung fängt mehr als die kluge.** Beim fehlerhaften Suchmuster
+vom 11.08. fand der Parser 54 statt 56 Zeilen — Monotonie, Wertebereich und
+Anwendungsbeispiel gingen **alle** durch. Nur das Nachzählen fand es.
+Dieselbe Klasse: „428 Zeilen, 428 verschiedene `gaa_kennz`" entlarvte eine
+Verknüpfung, die inhaltlich plausibel aussah.
+
+**Ein Prüfstand, der nur bestätigt, ist keiner.** Der LZS-Prüfstand fing am
+12.08. den Autor selbst: das GND-Band „nur 40/60/80" war erfunden, der Bestand
+führt 40 bis 82.
+
+---
+
+### Cache-Buster (Marktbericht-Kette, vier Glieder)
+
+**Die vier Glieder stehen in ZWEI Schreibweisen.** Ein attributgebundenes
+Muster trifft nur die eine:
+
+```
+frontend/index.html        src="js/marktbericht-view.js?v=1172"      HTML-Attribut
+frontend/js/marktbericht-view.js
+                           '/marktbericht-app/index.html?v=1172&theme=' + …   JS-String
+```
+
+**„Höchster Buster" kann ein Zeitstempel sein.** Ein blanker Scan auf
+`\?v=(\d+)` sammelte **20260612081556** ein und hätte den Buster darauf gesetzt.
+*Eine Zahl messen heißt nicht, die richtige Zahl zu messen.*
+
+**Eine Datei, zwei Stellen.** `wertermittlung.js` und `mb-stufen.js` hängen
+**beide** in `marktbericht-app/index.html`. Eine Buster-Schleife, die je Glied
+frisch von der Platte liest, überschreibt mit dem zweiten Schreibvorgang den
+ersten. Gefangen hat es die Prüfung „alle vier Glieder tragen **denselben**
+Wert" — nicht „jedes Glied hat einen Buster".
+
+**Nicht die Liste prüfen, sondern die Zuordnung.** In
+`marktbericht-app/index.html` hängen mehr als vier Skripte mit eigenem Buster;
+`grep -o "v=1[01][0-9][0-9]"` liefert deshalb mehrere verschiedene Werte.
+
+---
+
+### Patch-Disziplin
+
+**Ein Prüfmuster darf nicht an einem String hängen, den der eigene
+Erklärkommentar zitiert.** Die Prüfung „Text ‚bei Eigentumswohnung nicht
+anwendbar' ist WEG" schlug fehl, weil der neue Kommentar den Satz erklärte.
+Lehre 18 (Marker-Kollision), nur mit Prosa statt Marker.
+
+**Ein Prüfstand muss die eigene Implementierung kennen.**
+`v.empfohlenZusatz` kommt durch Wache **und** Aufruf zweimal vor — `=== 1` war
+falsch. *Ein Wächter, der Unfug meldet, wird überlesen.*
+
+**In `app.js` stehen echte UTF-8-Zeichen, in `wertermittlung.js` stehen
+`\u`-Escapes literal im Quelltext.** Die Ausnahme gilt nur dort. Wer sie auf
+die falsche Datei anwendet, trifft null Mal — `apply.sh` bricht dann korrekt
+ab, ohne etwas zu schreiben.
+
+---
+
+### Register und Datenbank
+
+**Die Zusammenführung von Tabelle und Saatdatei läuft je DATENSATZ, nicht je
+Kennzahl** (`v1095-WMRG2`). v1084a führte sie je Kennzahl zusammen — und weil
+in `mb.param_modell` 493 Liegenschaftszinssätze vom 12.08. lagen, gewann die
+Tabelle für die **ganze** Kennzahl. 585 neuere Sätze fielen still heraus:
+`2150 − 1078 + 493 = 1565`, die Rechnung ging exakt auf.
+**Die Annahme darunter war falsch:** dass die Tabelle mindestens so aktuell ist
+wie die Datei. Die Datei ist versioniert und fährt mit dem Code mit, die
+Tabelle wird von Hand nachgezogen.
+
+**Ein CHECK-Constraint sagt nicht, was er erlaubt — er sagt nur nein.**
+`param_modell_ebene_check` verwarf 24 Sätze mit `ebene='gemeinde_verbund'`.
+**Vor dem ersten Schreiben `pg_get_constraintdef` lesen.**
+
+**Ein In-Memory-Register braucht nach jeder Datenänderung einen Neustart.**
+Der Saatlauf schrieb 493 Sätze, das Log meldete weiter 469 — der Boot-Hook
+hatte vor dem Saatlauf gelesen. `docker restart dealpilot-mb-backend`.
+
+**`gaa_kennz` ist NICHT der Ausschussschlüssel.** `schluessel.csv` hat 428
+Zeilen mit **428 verschiedenen** `gaa_kennz` — es ist ein Schlüssel je
+**Gemeinde**. Wer stumpf darüber verknüpft, findet nichts oder greift den
+Nachbarn. Die richtige Auflösung ist die Kaskade **8 → 5 → 3 → 2**.
+
+**`m.ags` im param-repository ist ein SKALAR, keine Liste.** Eine Gemeindeliste
+je Ausschuss hätte `schreibeModelle()` klaglos geschrieben, und `holeModelle()`
+hätte nie etwas gefunden — dort vergleicht `ags = $2` exakt.
+
+**Zwei Modelle mit demselben `zweig` unter demselben AGS und Berichtsjahr
+kollidieren** im Eindeutigkeitsschlüssel; eines wird still überschrieben.
+Trennen sie sich nach **Gebiet** → verschiedene AGS. Trennen sie sich nach
+einem **Merkmal** innerhalb desselben Gebiets → EIN Modell mit Kategorienachse.
+
+**Ein multiplikativer Faktor 0 verschwindet still**, weil `0` falsy ist und
+`if (t && t.wert)` ihn überspringt. Für einen **additiven** Zuschlag ist 0 ein
+Nichts (Herford druckt so eine Zeile ab), für einen **Faktor** eine
+Katastrophe.
+
+**`land_code` war fest verdrahtet** (`'NW'`), seit das Register nur NRW führte
+— 86 Sätze aus vier Ländern trugen es. Funktional unkritisch, aber die Spalte
+lügt und steht im Eindeutigkeitsschlüssel. **Wo ein Fehler ausgeliefert wurde,
+braucht es einen Schritt, der den SCHADEN sucht** — nicht nur einen, der die
+Quelle schließt.
+
+**Eine Sicherung, die man nicht ansieht, ist keine.** Datenbank `marktbericht`,
+Nutzer `mb` — nicht `postgres`. Ein `pg_dump -U postgres postgres` erzeugte
+eine **20 Byte große Datei**, die wie eine Sicherung aussah, ohne Fehler
+zurückzugeben.
+
+---
+
+### Ernte und Quellen
+
+**Die WebFetch-Grenze ist eine Textmenge, keine Seitenzahl.** Gemessen über
+zehn Läufe: Abbruch zwischen Seite **21 und 55**, unabhängig davon, ob das
+Dokument 56 oder 157 Seiten hat. `pdftotext -layout` schafft **458 Seiten am
+Stück** — die Grenze war nie eine des PDF, sondern des Weges.
+
+**„Ältere Jahrgänge sind kürzer" ist widerlegt.** Der NRW-Landesbericht 2016
+bricht früher ab als 2025. Abbruchseite und Kapitelseite bewegen sich
+unabhängig.
+
+**Die Lizenz ist jahrgangsgebunden.** Derselbe NRW-Landesbericht trägt 2016
+`by-2-0` und 2025 `zero-2-0`. Brandenburg trägt `by-2-0` erst ab Berichtsjahr
+2018. **Einzelne Berichte sind in sich widersprüchlich** — der Märkische Kreis
+führt Lizenztext Zero 2.0 **und** Quellenvermerk by-2-0.
+
+**Die Lizenzprüfung gehört VOR die Datenprüfung.** Kiels Daten wären lesbar
+gewesen — geerntet, was man nicht verwenden darf.
+
+**Ein Extraktionsmodell erfindet Tabellen.** Bei Bochum kam eine perfekt
+gestaffelte Sachwertfaktor-Matrix zurück, die es im Dokument **nicht gibt**,
+dazu eine verdrehte Fallzahl (847 statt 747).
+
+**Ein Schlüssel ist kein Name.** GAA 10400 sah nach der Ruhrgebietsreihe aus
+und ist die **Bundesstadt Bonn**. Der Fehler stand fett in einem
+Projektdokument, bevor die Kettenprüfung ihn fand. **Amtliche Kennziffern
+werden nachgeschlagen.**
+*(Steht so noch falsch in `claude/v1083-ernte-lzs-nrw-alle-73.md`, Befund 4 —
+bei der Konsolidierung mitziehen.)*
+
+**Die Rundung ist Dokumentverhalten.** Herford druckt seine Zu-/Abschläge
+**zweistellig** ab und summiert erst danach: 0,899 + (−0,01) + 0,00 = **0,889**.
+Wer erst summiert und dann rundet, kommt auf 0,89 — eine andere Zahl.
+
+**Chrome blockt mehrere automatische Downloads je Seitenaufruf stumm.**
+Zwei je Aufruf gehen zuverlässig durch. Steht die Domain einmal in
+`chrome://settings/content/automaticDownloads`, hilft nur das Entfernen des
+Eintrags.
+
+---
+
+### Bash
+
+**`grep … | cat || echo` kann nie anschlagen.** Der Rückgabewert einer Pipeline
+ist der des letzten Glieds. Erst in eine Datei, dann `grep -c … || true`.
+
+**`python3 patch.py | grep -q SKIP` tötet den Doppellauf.** `grep -q` beendet
+sich beim ersten Treffer, schließt die Pipe, Python stirbt an SIGPIPE — die
+Prüfung meldet „kein SKIP", obwohl eines kam.
+
+**Auf Prod gibt es kein node auf dem Host.** Nur im Container.
