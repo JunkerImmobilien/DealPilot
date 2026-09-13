@@ -4341,6 +4341,78 @@ System oben deckt beide Kennzahlen über alle Ausschüsse. Kein anderes
 Bundesland bietet so viel hinter einer einzigen, freien Lizenz — Hamburg
 eingeschlossen.
  . 
+ . 
+##### Das Modell ist entschlüsselt — gemessen am Dashboard
+
+**Die Bauform steht fest:**
+
+```
+Sachwertfaktor = Grundwert(vorläufiger Sachwert, Bodenrichtwert-Band)
+                 × k_Wohnfläche × k_Restnutzungsdauer × k_Standardstufe
+```
+
+Das Dashboard sagt es selbst: *„Die Diagramme beziehen sich auf ein
+**Normobjekt**. Vom Normobjekt abweichende Merkmale bewirken folgende
+Änderungen der Sachwertfaktoren."*
+
+**Das Normobjekt (BSWF/Reihenhaus):** Wohnfläche **120 m²** ·
+Restnutzungsdauer **40 Jahre** · Standardstufe **2,5** — genau die Werte, bei
+denen alle drei Korrekturkurven auf 1,00 stehen.
+
+**Die drei Korrekturkurven, vollständig abgelesen (23 Stützpunkte):**
+
+| Wohnfläche | 60 | 80 | 100 | 120 | 140 | 160 | 180 | 190 | 200 m² |
+|---|---|---|---|---|---|---|---|---|---|
+| Koeffizient | 0,95 | 0,97 | 0,98 | **1,00** | 1,02 | 1,03 | 1,05 | 1,06 | 1,07 |
+
+| Restnutzungsdauer | 15 | 25 | 35 | 45 | 55 | 65 | 75 J. |
+|---|---|---|---|---|---|---|---|
+| Koeffizient | 0,72 | 0,87 | 0,96 | 1,03 | 1,08 | 1,12 | 1,16 |
+
+| Standardstufe | 1,5 | 2,0 | 2,5 | 3,0 | 3,5 | 4,0 | 4,5 |
+|---|---|---|---|---|---|---|---|
+| Koeffizient | 0,81 | 0,92 | **1,00** | 1,07 | 1,12 | 1,17 | 1,21 |
+
+**Die Grundwert-Kurve** hat vier Bänder (Bodenrichtwert 40 · 130 · 200 ·
+280 €/m²) über den vorläufigen Sachwert von 100.000 bis 550.000 €. Sie ist
+fallend und konvex; die Stützpunkte liegen in 50.000er-Schritten. **Diese
+Werte fehlen noch** — sie sind der einzige Rest.
+
+##### Zwei Abrufwege funktionieren, beide gemessen
+
+| Weg | Bedienung | Beleg |
+|---|---|---|
+| **Kalkulator** | fünf Eingabefelder befüllen, Faktor ablesen | BRW 130 · 250.000 € · Normobjekt → **0,90 ± 0,21** |
+| **Tooltip** | auf einen Kurvenpunkt zeigen | BRW 200 · 250.000 € → **0,97** |
+
+Der Tooltip nennt alle drei Größen im Klartext und ist damit die genauere
+Quelle — er liest den Stützpunkt, statt ihn aus der Grafik zu schätzen.
+
+**Der Prüfstand für Niedersachsen steht damit fest:** eine Eingabe in den
+Kalkulator, eine Antwort aus unserem Register — beide müssen zeichengleich
+sein. Das ersetzt das fehlende Anwendungsbeispiel vollwertig, weil beide
+Seiten dieselbe amtliche Quelle befragen.
+
+##### Was der nächste Durchgang braucht
+
+**Vierzig Messungen** (4 Bänder × 10 Stützpunkte) für einen Teilmarkt eines
+Ausschusses — per Tooltip, je Punkt ein Zeigen und ein Ablesen. Das ist für
+einen Einzelfall vertretbar und für die Fläche zu viel. **Vorher lohnt ein
+Versuch am Herunterladen-Knopf** (Tableau bietet „Daten" als Kreuztabelle);
+trägt er, fällt die Handarbeit weg.
+
+**Die Reihenfolge, wenn es losgeht:**
+1. Ein Teilmarkt eines Ausschusses vollständig — Braunschweig-Wolfsburg,
+   Reihenhaus/DHH, weil Marcel dort gerade arbeitet
+2. Rezept schreiben (Form: Grundkurve je Band + drei Korrekturkurven —
+   dieselbe Bauform wie Höxter, `matrix_interp` plus Stufenkorrekturen)
+3. Gegen den Kalkulator prüfen, mindestens an fünf Punkten, darunter zwei
+   außerhalb der Stützstellen (die Interpolation ist der fehleranfällige Teil)
+4. Erst dann der nächste Ausschuss
+
+**Nicht vergessen:** der Quellenvermerk gehört in denselben Arbeitsgang
+(A2). Ohne ihn darf keine dieser Zahlen in einen Kundenbericht.
+ . 
  . #### E3 — Die Regeln, die bei jeder Ernte gelten
 
 - **Lizenz und Inhaltsverzeichnis im ERSTEN Abruf zusammen lesen.** *Kiels
