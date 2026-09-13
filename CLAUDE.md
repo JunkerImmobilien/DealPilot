@@ -47,6 +47,23 @@ zum Zusammenführen steht dort in Abschnitt 6.
 Abschluss selbst nach "Fertig" verschieben, mit Datum und Commit-Hash,
 und committen.
 
+**Der Marktbericht-Strang hat ein eigenes Ziel, das über die Wertermittlung
+hinausgeht: die Ernte.** Für jedes der 16 Bundesländer sollen zwei amtliche
+Kennzahlen im Register liegen — Liegenschaftszinssatz (§ 21 Abs. 2) und
+Sachwertfaktor (§ 21 Abs. 3) — und für jeden Ausschuss soll **in der Datenbank
+stehen, woher die Zahl kommt**: Link, Jahrgang, Lizenz, Stichtag, Seite. Ohne
+diese Liste fängt die jährliche Nachernte jedes Mal bei der Recherche an.
+Stand: **6 von 16 Ländern**, rund 40 % der Einwohner beim Zins, 25 % beim
+Faktor. Ablauf, Datenbankstruktur und Quellenregister stehen in
+`claude/projektanweisung-marktbericht-20260812-abend.md`; die offenen Punkte im
+Backlog unter „MARKTBERICHT / ERNTE — Workstream (D)".
+
+**Wo kein Wert vorliegt, bekommt der Kunde den Weg dorthin** — den zuständigen
+Ausschuss und den Link auf seine Quelle, bei kostenpflichtigen Berichten mit
+dem Hinweis darauf. Das ist kein Eingeständnis, sondern das Gegenstück zur
+Doktrin: wir erfinden keine Zahl, also müssen wir umso genauer sagen können, wo
+die echte steht.
+
 **Vorlagen:** `design/mockups/` zeigt den Zielzustand. Bei Layoutfragen dort
 nachsehen statt raten. `design/logo/` enthaelt die Logo-Varianten.
 Uebernommen wird die Gestaltung, nicht der Code — die Mockups sind Neubauten.
@@ -374,6 +391,29 @@ eine selbst ausgerechnete Zahl.
 > 242.274 €, der Bodenwert 950 × 90 + 828 × 5, −10 % Lärm, × 50 % MEA
 > = 40.338 €. Die BWK-Quote steht auf dem **gesamten** Rohertrag inklusive
 > Stellplätzen, wie es sein muss.
+
+**Drei Dinge, die im Rechenkern still falsch rechnen** (am 13.09.2026 auf
+Staging nachgemessen, alle drei offen, im Backlog unter B1):
+
+- **`GND_JAHRE = 80` ist hart verdrahtet** (`CrossCheckService.js` Z. 24) —
+  Bonn rechnet MFH mit **GND 60**, Hameln-Hannover 70/60/50, Otterndorf 70.
+  Die richtige Zahl steht im Registerdatensatz unter `modellansaetze` und wird
+  **nicht gelesen**. § 10 ImmoWertV, Modellkonformität. Der schwerste stille
+  Fehler im System — und er wächst mit jeder Ernte.
+- **`BAUPREISINDEX = 2.02` hat keinen Stichtagsbezug** (Z. 22) — der GMB
+  Dortmund 2026 rechnet mit **1,906** zum 01.01.2026, rund 6 % Abweichung. Bei
+  einem Stichtag in der Vergangenheit rechnet eine Konstante zwangsläufig
+  falsch.
+- **Die NRW-Bewirtschaftungskosten sind stichtagsabhängig** — das AGVGA-Modell
+  schreibt die Ausgangswerte von 2002 über den VPI fort. Das hinterlegte Paar
+  gilt nur für den 01.01.2015.
+
+**Und eine rechtliche Sperre:** Aurich (41 Kreisschlüssel) und
+Potsdam/Uckermark (5) stehen unter `dl-de/by-2-0`, **Namensnennung ist
+Pflicht**. Der Vermerk hängt an jedem Registerdatensatz im Feld
+`quellenvermerk` und **fehlt im Bericht**. Solange das so ist, dürfen diese
+Zahlen in keinen Kundenbericht. (OWL und NRW sind `zero-2-0` und nicht
+betroffen — der Deckel wird aber mit jeder Ernte teurer.)
 
 ---
 
