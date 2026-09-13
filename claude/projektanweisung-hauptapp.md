@@ -15897,6 +15897,154 @@ Messung.*
 `v1370` — B5 und B8 in einem Zug
 
 
+## v1371 – v1373 · Die Pipeline abgearbeitet: B11, B17, B20, B13–B15
+
+Marcels Auftrag: *„arbeite alle punkte ab die du kannst die noch in der
+pipeline sind."*
+
+### v1371 (B11) · Ausnahmen — befreit vom Limit, nicht vom Protokoll
+
+Marcels Auflage: *„Administratoren, Entwickler und ausdrücklich
+freigeschaltete Testkonten müssen weiterarbeiten können … Ausnahmen
+müssen rollenbasiert umgesetzt und **trotzdem protokolliert** werden."*
+
+**Der zweite Halbsatz ist der wichtige.** Eine Ausnahme ohne Protokoll
+wäre ein blinder Fleck: ausgerechnet die Konten mit den weitesten Rechten
+wären die, über die niemand etwas weiß. Entfernt wird deshalb nur der
+Bremsklotz, nicht die Beobachtung — das Ereignis trägt einen Vermerk.
+
+Rollen jetzt `owner` / `admin` / `developer` / `support` / `user`.
+**`admin` und `user` bleiben gültig**, damit der Bestand unverändert
+weiterläuft. Die Ausnahme ist eine eigene Spalte und keine weitere Rolle:
+**ein Testkonto kann ein ganz normaler `user` sein und trotzdem befreit.**
+
+> Die zwei Rollensysteme bleiben absichtlich getrennt: `users.role` sagt,
+> wer das in der *Anwendung* ist, `admin_users.role`, wer was im
+> *Adminbereich* darf. Ein Entwickler braucht Ausnahmen im Betrieb, aber
+> nicht zwingend Zugriff auf Kundendaten.
+
+### v1371 (B17) · Die Schwellen gehören dem Betreiber
+
+Bis hierher standen sie als Konstante im Code. **Das war für den Anfang
+richtig — man kann nichts einstellen, was man noch nicht gemessen hat.**
+Jetzt gibt es Messwerte.
+
+**Eine Zeile, keine Tabelle mit Zeilen je Schwelle.** Die Schwellen sind
+ein zusammenhängendes Modell: wer die Warnstufe verschiebt, muss die
+Stufe darüber mitdenken. Der `CHECK` in Migration 073 erzwingt das —
+gemessen an der laufenden Datenbank:
+
+```
+UPDATE security_config SET warnung_ab = 90;
+  ERROR: violates check constraint "security_config_reihenfolge"
+  Werte danach unverändert: 20 / 50
+```
+
+Ohne diese Prüfung stünde WARNUNG über HOHES RISIKO und **die höchste
+Stufe wäre unerreichbar**.
+
+Lesen darf jeder Admin, ändern nur `owner`: wer an den Schwellen dreht,
+verschiebt, wann überhaupt jemand auffällt. Fällt die Tabelle aus, gelten
+die eingebauten Werte — **ein Schutzsystem, das ohne Konfiguration
+stehenbleibt, schützt nicht.**
+
+### v1372 (B20) · Tests — vierzehn, alle grün
+
+Der `tests/`-Ordner fehlte bisher ganz; `package.json` zeigte mit
+`node --test tests/` auf ein Verzeichnis, das es nicht gab.
+
+**Der Fehlalarm-Test ist der wichtigste.** Ein Schutzsystem, das zu viel
+greift, wird abgeschaltet — und dann schützt es gar nicht mehr:
+
+```
+60 Überschreitungen · 12 Endpunktgruppen · unregelmäßige Abstände
+  → darf NICHT „hohes Risiko" sein, obwohl die Menge weit über der
+    Schwelle liegt                                        ✓ bestanden
+```
+
+**Genau daran scheitern Systeme, die nur zählen.**
+
+Dazu geprüft: jede Eskalationsstufe einzeln, dass zu wenig Daten keine
+höhere Stufe rechtfertigen, dass eine Entscheidung die Berechnung
+schlägt, dass die Freigabe sie wieder freigibt, dass eine Entscheidung
+ohne Begründung abgelehnt wird, dass die Ausnahme vom Limit befreit aber
+nicht vom Protokoll — und zwei Eigenschaften direkt am **Schema** statt am
+Verhalten: `security_events` hat keine Spalte zum Ändern. **Append-only
+ist damit nicht Absicht, sondern Struktur.**
+
+### v1373 (B13/B14) · Die AGB-Klausel — als Entwurf gekennzeichnet
+
+Eingefügt als **Unterpunkte von VII**, damit die Nummerierung der
+Hauptabschnitte unverändert bleibt. Marcels Auflage: *„Bestehende AGB
+dürfen nicht kommentarlos überschrieben werden."* Gemessen nach dem
+Einbau: `I II III IV V VI VII VIII IX X XI XII XIII` — unverändert.
+
+**Der Entwurf ist als Entwurf sichtbar**, nicht nur im Kommentar: rote
+Marke neben der Überschrift, farbiger Kasten mit dem Hinweis. *Ein
+Entwurf, den man nicht als solchen erkennt, wird irgendwann wie geltendes
+Recht gelesen.*
+
+**B2C und B2B getrennt, wie verlangt:**
+
+| | |
+|---|---|
+| Unternehmer | Ermessensklausel nach § 315 BGB, **25.000 € als Obergrenze der Bemessung** statt als Festbetrag |
+| Verbraucher | **keine Vertragsstrafe** — § 309 Nr. 6 BGB verbietet sie in AGB |
+
+**Kein Automatismus, ausdrücklich im Text:** eine Vertragsstrafe wird
+niemals allein aufgrund technischer Messwerte oder eines maschinell
+erzeugten Risikowerts ausgelöst. Vorher Gelegenheit zur Stellungnahme,
+Darlegungs- und Beweislast beim Anbieter.
+
+Für die anwaltliche Prüfung sind die bekannten Streitpunkte **im Text
+aufgelistet**: § 309 Nr. 6 BGB, die Inhaltskontrolle nach § 307 BGB auch
+gegenüber Unternehmern, die Angemessenheit der Höhe,
+Individualvereinbarung statt AGB, und das Verhältnis zu § 4 Nr. 3 UWG
+und zum GeschGehG.
+
+### v1373 (B15) · Datenschutz — und das Löschkonzept läuft auch
+
+Neuer Abschnitt **13a** mit Zweck, Daten, Auswertung, Rechtsgrundlage,
+Aufbewahrung, Empfängern und Betroffenenrechten. Nummerierung geprüft:
+`11 12 13 13a 14 15`.
+
+Er beschreibt genau das, was Migration 071 wirklich speichert — **und
+ebenso ausdrücklich, was nicht**: keine Inhalte, keine Suchbegriffe,
+keine Browserkennung, keine Gerätemerkmale. *Eine Datenschutzerklärung,
+die mehr oder weniger beschreibt als der Code tut, ist schlechter als
+keine.*
+
+Art. 22 DSGVO ist ausdrücklich adressiert: **es findet keine
+automatisierte Entscheidung mit rechtlicher Wirkung statt.**
+
+> **Und die Löschfristen laufen wirklich.** Eine Frist, die nur im Text
+> steht, ist eine Zusage, die man nicht hält. Der tägliche Lauf entfernt
+> Beobachtungen nach 90 Tagen und Entscheidungen nach drei Jahren — die
+> drei Jahre orientieren sich an der regelmäßigen Verjährung (§ 195 BGB),
+> damit eine Einschränkung im Streitfall nachvollziehbar bleibt.
+>
+> ```
+> ✓ Sicherheits-Loeschlauf aktiv (90 Tage / 3 Jahre)
+> ```
+
+### Zwei eigene Fehler
+
+**`\x{2713}` ist Perl-Syntax, kein JavaScript.** Mein Patch schrieb es in
+eine `console.log`-Zeile — und beschädigte dabei eine **bestehende**
+Zeile, die vorher ein echtes Häkchen trug. `node --check` fand es
+(*Invalid hexadecimal escape sequence*), behoben, beide Zeilen tragen
+wieder ein ✓.
+
+**Die Reparatur selbst scheiterte zweimal**, weil das Ersetzungsmuster
+durch die Shell lief und dort die Backslashes verlor. Gelöst mit dem
+Edit-Werkzeug statt über die Kommandozeile — dieselbe Familie wie Falle
+148.
+
+### Commits
+
+`v1371` B11/B17 · `v1372` B20 · `v1373` B13/B14/B15
+
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
