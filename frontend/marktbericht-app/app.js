@@ -839,7 +839,23 @@ function _renderWertverfahren(d) {
           : (sw.grund || 'nicht ausgewiesen'),
         'sach', sw.staffel,
         (sw.available && !sw.marktangepasst) ? (sw.sachwertfaktor_hinweis || null) : null)
-    + '</div>';
+    + '</div>'
+    /* v1106-WQLS - derselbe Weg wie beim Liegenschaftszins, nur fuer den
+       Sachwertfaktor. Er steht UNTER den drei Karten, weil er sich auf die
+       Sachwertkarte bezieht und nicht auf den Bodenwert darueber. */
+    + ((sw.sachwertfaktor_quelle_link && sw.sachwertfaktor_quelle_link.satz)
+        ? '<div class="wv-quelle">'
+          + esc(sw.sachwertfaktor_quelle_link.satz.text)
+          + (sw.sachwertfaktor_quelle_link.satz.kosten
+              ? ' ' + esc(sw.sachwertfaktor_quelle_link.satz.kosten) : '')
+          + ' <a href="' + esc(sw.sachwertfaktor_quelle_link.url) + '" target="_blank"'
+          + ' rel="noopener">zur Quelle</a>'
+          + (sw.sachwertfaktor_quelle_link.satz.hinweis
+              ? '<br><span class="wv-quelle-hw">'
+                + esc(sw.sachwertfaktor_quelle_link.satz.hinweis) + '</span>' : '')
+          + '</div>'
+        : '');
+
 
   if (!document.getElementById('wv-css')) {
     var st = document.createElement('style'); st.id = 'wv-css';
@@ -4004,10 +4020,41 @@ async function exportPdf(out) {
         need(_hz.length * 3.2 + 3); doc.text(_hz, M, y); y += _hz.length * 3.2 + 2;
       });
     }
+
+    /* === v1106-WQLS - DER WEG ZUR QUELLE, AUCH BEIM SACHWERTFAKTOR ====
+       Marcels Vorgabe vom 13.09.2026 nannte BEIDE Kennzahlen: "gib im
+       Marktbericht bei den Liegenschaftszinsen und Sachwertfaktoren den
+       Link an". Der Zins bekam ihn in v1099, der Sachwertfaktor nicht -
+       das Backend liefert `sachwertfaktor_quelle_link` seither, es las nur
+       niemand.
+
+       Gerade hier ist der Link haeufig die EINZIGE Auskunft: wo kein Faktor
+       im Register steht, ist die Adresse des zustaendigen Ausschusses alles,
+       was wir ehrlich sagen koennen. Deshalb steht er auch dann, wenn der
+       Sachwert unangepasst bleibt. */
+    var _sql = _swx.sachwertfaktor_quelle_link;
+    if (_sql && _sql.satz) {
+      y += 1;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5);
+      doc.setTextColor(140, 132, 118);
+      var _sqt = doc.splitTextToSize(String(_sql.satz.text)
+        + (_sql.satz.kosten ? ' ' + _sql.satz.kosten : ''), blockW);
+      need(_sqt.length * 3.2 + 8); doc.text(_sqt, M, y); y += _sqt.length * 3.2 + 1;
+      doc.setTextColor(120, 110, 140);
+      var _squ = doc.splitTextToSize(String(_sql.url), blockW);
+      doc.text(_squ, M, y); y += _squ.length * 3.2 + 1;
+      if (_sql.satz.hinweis) {
+        doc.setTextColor(140, 132, 118);
+        var _sqh = doc.splitTextToSize(String(_sql.satz.hinweis), blockW);
+        need(_sqh.length * 3.2 + 3); doc.text(_sqh, M, y); y += _sqh.length * 3.2 + 1;
+      }
+      doc.setTextColor(...MUT);
+    }
     y += 4;
   }
 
-  /* WPDF-1 · Rechenweg Ertragswertverfahren.
+  /* WPDF-1 
+· Rechenweg Ertragswertverfahren.
    * Bisher zeigte das PDF nur das Ergebnis. Fuer ein Dossier, das vor einer Bank
    * besteht, muss der Weg dastehen — Zeile fuer Zeile, mit der Herkunft des
    * Liegenschaftszinses. Eine Zahl ohne Herleitung ist im Dossier wertlos. */
