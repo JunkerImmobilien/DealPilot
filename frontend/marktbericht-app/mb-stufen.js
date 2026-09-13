@@ -107,7 +107,14 @@
      Jetzt aus VERFAHREN in wertermittlung.js abgeschrieben:
        markt   pflicht ptype, area, year, baustatus · empfohlen cond, quality
        ertrag  pflicht plot, units
-       sach    pflicht plot, year (bei ETW nicht anwendbar)
+       sach    pflicht plot, year - empfohlen quality
+               bei Wohnungen zusaetzlich empfohlen bgf, standardstufe
+               (v1097-WETW). Die frueher hier notierte Sperre fuer
+               Eigentumswohnungen war ueberholt: der Rechenkern rechnet
+               Wohnungen seit v1047.
+               BEDARF unten bleibt bewusst UNVERAENDERT - es steuert
+               erreicht(), und eine Wohnung ohne BGF wuerde sonst Stufe 3
+               nicht mehr erreichen.
 
      Eine Leiste, die mehr behauptet als da ist, ist schlimmer als keine. */
   /* ── v1229 · `baustatus` steht bei Stufe 1, nicht bei Stufe 2 ────────────

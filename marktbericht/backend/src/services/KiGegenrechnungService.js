@@ -68,7 +68,14 @@ export const KiGegenrechnungService = {
       '  Einheit; die Zahl der Wohneinheiten beschreibt das Gebaeude, nicht den',
       '  Bewertungsgegenstand. Verwaltungskosten gelten je bewerteter Einheit.',
       '- Rohertrag ist die marktueblich erzielbare Miete, nicht die Ist-Miete.',
-      '- Das Sachwertverfahren ist fuer Eigentumswohnungen nicht anwendbar.',
+      /* v1097-WKIP-1 · Der Satz stand seit v955 im Prompt und war
+       * ueberholt - die Zweitmeinung hat damit die alte Sperre in den
+       * Bericht geschrieben, waehrend der Rechenkern danebenstand und
+       * rechnete. */
+      '- Beim Wohnungseigentum fuehrt in der Regel das Vergleichswertverfahren.',
+      '  Der Sachwert ist dort Kontrollrechnung und braucht die',
+      '  Bruttogrundflaeche der Wohnung sowie die Standardstufe; fehlt eines',
+      '  von beiden, weise ihn nicht aus statt ihn zu schaetzen.',
       '- Bodenwert = Flaeche x Bodenrichtwert, bei Wohnungen anteilig ueber den',
       '  Miteigentumsanteil.',
       '',

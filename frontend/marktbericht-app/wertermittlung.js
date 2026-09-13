@@ -128,7 +128,9 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
        * eine Wohnung bewertete, fand das Feld nicht und konnte nicht wissen,
        * dass es es gibt. Die Hilfe erklaert, wofuer es gilt. */
       { id: 'bgf', label: 'Bruttogrundfl\u00e4che (m\u00b2)', typ: 'number', hilfe: 'bgf',
-        platzhalter: 'nur f\u00fcr den Sachwert bei H\u00e4usern' },
+        /* v1097-WETW-3 · Der Platzhalter leitete vom Feld weg, das der
+         * Sachwert bei einer Wohnung zwingend braucht. */
+        platzhalter: 'f\u00fcr den Sachwert \u2014 auch bei Eigentumswohnungen' },
       { id: 'spMiete', label: 'Stellplatzmiete (\u20ac/Monat)', typ: 'number',
         wenn: function () { return (parseFloat(wert('garages')) || 0) + (parseFloat(wert('outdoor')) || 0) > 0; } },
 
@@ -370,8 +372,25 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
       pflicht: ['plot', 'units'], empfohlen: ['lzs', 'baustatus'] },
     { key: 'sach', name: 'Sachwert', ab: 1, genauerAb: 3,
       pflicht: ['plot', 'year'], empfohlen: ['quality'],
-      nichtWenn: function () { return istWohnung(); },
-      nichtGrund: 'bei Eigentumswohnung nicht anwendbar' },
+      /* v1097-WETW-1 · DIE SPERRE WAR UEBERHOLT, DER RECHENKERN NICHT.
+       * Seit v1047-WSWE-1 rechnet CrossCheckService den Sachwert fuer eine
+       * Eigentumswohnung, sobald BGF und Standardstufe vorliegen; die
+       * NHK-Zeilen 4.1 bis 4.3 (825/985/1190 · 765/915/1105 · 755/900/1090)
+       * stehen seit v1068 in nhk2010.js. Hier stand weiter die Regel aus
+       * v955 - ein rotes Kreuz mit der Begruendung, das Verfahren gelte
+       * fuer Wohnungen nicht.
+       *
+       * Schlimmer als der falsche Text war die zweite Wirkung: nichtWenn
+       * uebersprang auch die Feldsammlung weiter unten. Die Ampel hat die
+       * beiden Felder, die der Rechenkern braucht, also nie eingefordert -
+       * und der Nutzer bekam danach vom Backend "die Standardstufe fehlt".
+       *
+       * BEWUSST empfohlen und NICHT pflicht: Pflichtfelder sperren den
+       * Erzeugen-Knopf. Eine Wohnung ohne BGF soll weiter einen Bericht
+       * bekommen - nur eben ohne Sachwert, und die Ampel sagt warum. */
+      empfohlenZusatz: function () {
+        return istWohnung() ? ['bgf', 'standardstufe'] : [];
+      } },
   ];
 
   /* ── v1119-WBED · Bedingungen gegen zerstoerte Felder ────────────────────
@@ -775,7 +794,12 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
       return { zeichen: '\u26a0', klasse: 'wm-warn', fehlt: fehlt,
         text: 'fehlt: ' + fehlt.map(bez).join(', ') };
     }
-    var offen = (v.empfohlen || []).filter(function (id) { return !wert(id); });
+    /* v1097-WETW-2 · Der Leser zu A1. Ohne diese Zeile waere
+     * empfohlenZusatz gesetzt und nie gelesen - genau die Fehlerklasse
+     * "gebaut, nie verdrahtet". Die Kettenpruefung misst beide Stellen. */
+    var _zus = (v.empfohlenZusatz && v.empfohlenZusatz()) || [];
+    var offen = (v.empfohlen || []).concat(_zus)
+      .filter(function (id) { return !wert(id); });
     if (offen.length) {
       return { zeichen: '\u2713', klasse: 'wm-ok', fehlt: offen,
         text: 'rechnet — genauer mit: ' + offen.map(bez).join(', ') };
