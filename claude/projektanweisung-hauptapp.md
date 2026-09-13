@@ -15593,6 +15593,96 @@ nicht ansieht, ist keine."*
 `6047716` v1367 · v1367b und v1367c im selben Zug
 
 
+## v1368 · B9 — Sicherheit / Missbrauchserkennung im Admin
+
+Seit `v1367` sammelt `security_events` Beobachtungen. **Ohne einen Ort,
+an dem man sie ansieht, liegen sie in einer Tabelle, die niemand
+öffnet** — und ein Protokoll, das keiner liest, ist so gut wie keins.
+
+### Drei Endpunkte, drei Fragen
+
+| | |
+|---|---|
+| `/security/events` | *Was ist passiert?* — Liste mit Filtern (Stufe, Art, Zeitraum, Suche über E-Mail, IP und Pfad) |
+| `/security/auffaellig` | *Wer fällt auf?* — verdichtet je Konto |
+| `/security/fall/:id` | *Was war bei diesem?* — die Fallakte aus B19 |
+
+### Kein Sperrknopf — und zwar mit Absicht
+
+**Nicht, weil er schwer zu bauen wäre.** Sondern weil ein Knopf neben
+einer Zahl dazu verführt, die Zahl für ein Urteil zu halten. Marcels
+Auflage steht über der ganzen Ansicht:
+
+> *„Eine technische Auffälligkeit oder ein automatisch erzeugter
+> Risikoscore darf NICHT automatisch als rechtlich bewiesener
+> Vertragsverstoß behandelt werden."*
+
+Wer sperren will, tut das in der Nutzerverwaltung — mit dem Fall vor
+Augen. Und die Rangliste sortiert nach **Zählung**, nicht nach einem
+Score: wie viele Ereignisse, wie schwer die schwerste Stufe, wann
+zuletzt. Mehr steht bewusst nicht da.
+
+### Drei Entscheidungen, die man sehen soll
+
+**Der Hinweiskasten steht VOR den Zahlen.** Wer zuerst rote Zahlen sieht
+und dann liest, dass es Beobachtungen sind, hat sich sein Urteil längst
+gebildet.
+
+**Die Fallakte zeigt jede Kennzahl mit ihrem Maßstab im selben Kasten** —
+Vielfalt gegen 12, Streuung gegen 5,13 aus der Messung echter Nutzung.
+Eine Kennzahl ohne Vergleichswert lädt zum Raten ein.
+
+**Gold ist die mittlere Stufe, nicht Rot.** „Auffällig" ist keine
+Anklage. Rot bleibt „ernst" vorbehalten.
+
+### Eigene Datei statt elfte Ansicht in `admin-app.js`
+
+Die hat 1.700 Zeilen und trägt zehn Ansichten; eine weitere
+hineinzuschreiben macht sie nicht besser. `admin-security.js` hängt sich
+über `data-view="security"` **selbst** ein — `admin-app.js` bleibt
+unangetastet.
+
+### Abnahme
+
+Die Oberfläche ist vollständig geladen:
+
+```
+Menüeintrag „Sicherheit"   vorhanden
+view-security              vorhanden
+view-security-fall         vorhanden
+AdminSecurity              geladen
+CSS (.sec-kachel)          greift (min-width 108px)
+```
+
+Die Kernabfrage direkt gegen die Datenbank, mit den Daten aus dem
+`v1367`-Test:
+
+| Zugriff | Ereignisse | versch. Pfade | höchste Stufe |
+|---|---|---|---|
+| anonym (IP) | 9 | **1** | auffällig |
+| Konto `info@junker-immobilien.io` | 6 | **5** | Hinweis |
+
+**Genau die Unterscheidung, für die die Kennzahl gebaut ist:** der
+anonyme Zugriff traf neunmal denselben Pfad — das ist das Muster eines
+Skripts. Das Konto traf fünf verschiedene.
+
+> **Was ich nicht prüfen konnte:** Der Adminbereich hat eine eigene
+> Anmeldung. Passwörter einzugeben ist mir verwehrt, also habe ich die
+> Endpunkte über ihre SQL-Abfragen an der echten Datenbank geprüft statt
+> über HTTP. Die Ansicht selbst muss Marcel einmal öffnen — sie ist
+> geladen und die Daten liegen bereit.
+
+### Zugriff
+
+`requireAdmin` genügt zum Lesen. Eine engere Rolle wäre hier falsch:
+**Support muss einen Fehlalarm nachvollziehen können**, sonst landet jede
+Rückfrage beim Inhaber.
+
+### Commits
+
+`8639165` v1368
+
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
