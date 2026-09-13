@@ -3438,3 +3438,34 @@ Feld*) und mit dem Leser, der ins Leere greift: dieselbe Familie — etwas
 sieht funktionsfaehig aus, weil nichts widerspricht.
 
 `v1367c`
+
+---
+
+## 154 · Eine Klasse abschreiben heisst nicht, dass es sie gibt
+
+Fuer eine neue Admin-Ansicht habe ich `class="tbl"` aus den bestehenden
+Tabellen uebernommen. Das Ergebnis sah aus wie eine Tabelle — und war
+unformatiert:
+
+```
+Zell-Innenabstand   1 px   (Browser-Standard)
+Tabellenbreite      710 px statt 1.400
+Spaltenabstand      1 px
+```
+
+**`.tbl` ist in keiner der beiden Admin-CSS-Dateien definiert.** Die
+echte Klasse heisst `.data-table` (`admin.css:146`) und bringt alles mit:
+100 % Breite, 12 px Innenabstand, Zeilentrennung, Hover.
+
+Schlimmer: der erste Reparaturversuch setzte `padding-right` auf
+`#view-security .tbl th` — also **auf dieselbe nicht existierende
+Klasse**. Die Regel war syntaktisch fehlerfrei, stand im ausgelieferten
+CSS und tat nichts.
+
+> Dieselbe Falle, die `CLAUDE.md` fuer den Anker `#app` festhaelt: *eine
+> Regel mit diesem Anker greift nirgends und sieht dabei plausibel aus.*
+
+**Merksatz:** Bevor eine Klasse benutzt wird, einmal `grep` im CSS. Zwei
+Sekunden gegen eine Ansicht, die niemand formatiert.
+
+`v1368e`
