@@ -4215,7 +4215,7 @@ robots-gesperrten selbst — siehe F):
 
 | # | Land / Quelle | Wirkung | Zustand |
 |---|---|---|---|
-| 1 | **Hamburg** | 1,9 Mio. Einwohner, **ein** Ausschuss, Lizenz `by-2-0` frei und doppelt belegt | reine Zugriffsfrage — `hamburg.de` gibt 403 |
+| 1 | **Hamburg** | 1,9 Mio. Einwohner, **ein** Ausschuss | ✅ **GEERNTET 13.09.2026** — Daten vollständig in `claude/ernte-hamburg-20260913.md`, Normproben gerechnet. ~~403~~ **war überholt: die URLs geben 404, die Adressen hatten sich nur geändert.** Der Immobilienmarktbericht 2026 ist frei abrufbar, die Lizenz steht wörtlich im Impressum („Verwendung und Weiterverbreitung … unter Angabe der Quelle gestattet"). **Zum Registereintrag fehlt nur die Modellform `produkt_faktoren`.** |
 | 2 | **NRW-Sachwertfaktoren vervollständigen** | 39 von 73 Gebieten fehlen, darunter Münster, Bonn, Wuppertal, Mönchengladbach, Gelsenkirchen, Aachen | teils robots-gesperrt → Mail an den Oberen GAA |
 | 3 | **Brandenburg** | 16 Kreisberichte, seitengenau kartiert; Modellvermerk landesweit über die **VV EW-SW** geklärt (HTML, keine Abbruchseite) | Jahrgangsentscheidung offen (F1) |
 | 4 | **Hessen ausbauen** | Lizenz bedingungsfrei, 20 von 22 Ausschüssen offen | Kassel/Darmstadt liegen bereit |
