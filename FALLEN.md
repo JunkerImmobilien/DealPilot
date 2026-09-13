@@ -3878,3 +3878,69 @@ gegen eine rechnende Oberflaeche braucht Wartezeit zwischen den Punkten —
 oder einen anderen Weg.
 
 `v1097`
+
+---
+
+## 163 · Ein Interpolator, der vier Zellen holt, obwohl er eine braucht
+
+**Gefunden bei der Wolfenbuettel-Ernte (v1098h), 13.09.2026.**
+
+`matrixInterp` holt zur Interpolation immer die vier umgebenden Zellen und
+bricht ab, wenn eine davon leer ist:
+
+```js
+const c = [zelle(..., ny[0], i0), zelle(..., ny[0], i1),
+           zelle(..., ny[1], i0), zelle(..., ny[1], i1)];
+if (c.some((v) => v === null)) return nichts('zelle_leer', ...);
+```
+
+Die Regel dahinter ist richtig — **eine leere Zelle wird nicht durch einen
+Nachbarwert ersetzt.** Nur traf sie auch den Fall, in dem gar nicht
+interpoliert werden muss: liegt die Anfrage GENAU auf beiden Stuetzstellen,
+ist die Zelle die Antwort.
+
+Bei Wolfenbuettel sind die Kurven verschieden lang (Band 40 endet bei
+350.000 Euro, Band 280 reicht bis 550.000). An allen vier Ecken der Matrix
+fehlte deshalb ein Nachbar — und **vier im Bericht abgedruckte Werte waren
+unerreichbar**, obwohl sie dastanden.
+
+**Merksatz:** Bevor ein Verfahren seine Umgebung braucht, pruefen, ob es sie
+ueberhaupt braucht. Ein exakter Treffer ist kein Sonderfall der
+Interpolation, sondern ihr Gegenteil.
+
+Und zum Finden: aufgefallen ist es nur, weil der Prueflauf **die Randwerte
+mitgemessen hat**. Die drei Werte aus der Mitte gingen alle durch.
+
+`v1098h`
+
+---
+
+## 164 · Ein Dashboard, das nur beim Neuaufbau antwortet
+
+**Gefunden bei der Niedersachsen-Ernte (v1098g), 13.09.2026.**
+
+Die Sachwertfaktoren Niedersachsens liegen in Tableau-Kalkulatoren. Der
+Versuch, sie in einer Messreihe abzufragen — Feld setzen, Enter, Screenshot,
+naechster Wert — scheiterte dreimal:
+
+```
+Error capturing screenshot: CDP sendCommand "Page.captureScreenshot"
+timed out after 30000ms. The renderer may be frozen or unresponsive.
+```
+
+Tableau rechnet nach jeder Eingabe neu; waehrenddessen antwortet der Renderer
+nicht. Das Fenster liess sich nicht vergroessern, und der Ergebniswert steht
+NICHT im Accessibility-Baum — er ist ins Canvas gezeichnet.
+
+**Was traegt:** je Messpunkt eine FRISCHE URL mit Parametern
+(`?Brw=40&Sach=150000`), **sieben Sekunden warten**, dann nur den
+Ergebnisbereich zoomen. So laufen vier Messungen in einem Durchgang, ohne
+einen einzigen Timeout.
+
+**Merksatz:** Wenn eine Oberflaeche auf Eingaben rechnet, ist der vollstaendige
+Neuaufbau billiger als die Zustandsaenderung — und zuverlaessiger. Und: ein
+`zoom` auf einen kleinen Bereich kostet weniger als ein voller Screenshot,
+schlaegt aber genauso fehl, wenn der Renderer blockiert. Die Wartezeit ist
+nicht verhandelbar.
+
+`v1098g`
