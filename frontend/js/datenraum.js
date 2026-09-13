@@ -87,10 +87,85 @@ window.DealPilotDatenraum = (function() {
     }
   }
 
+  /* ====================================================================
+     v1375 (A5) - DER DATENRAUM UEBERLEBT DEN GERAETEWECHSEL
+     ====================================================================
+     Befund aus dem Audit: die Ordner-Links lagen ausschliesslich im
+     localStorage. Wer den Browser wechselt, das Profil loescht oder am
+     Laptop statt am Rechner arbeitet, hatte ALLE Links verloren.
+
+     Bei einem Bereich, aus dem Bank-Anfragen rausgehen, ist das kein
+     Schoenheitsfehler: der Link im Anschreiben ist genau das, was die
+     Bank anklickt.
+
+     DIE REGEL: SERVER GEWINNT, ABER NIE GEGEN LEERE.
+     Beim Oeffnen wird geladen; kommt nichts zurueck - neues Konto, keine
+     Verbindung -, bleibt der lokale Stand stehen. Ein leerer Server darf
+     niemals einen gefuellten Browser ueberschreiben. Das waere
+     Datenverlust durch Synchronisierung, und den merkt man erst, wenn es
+     zu spaet ist.
+
+     Der localStorage bleibt ausserdem die Sofortanzeige: die Oberflaeche
+     wartet nicht auf das Netz, sie zeigt sofort und zieht dann nach. */
+  var _syncLaeuft = false;
+
   function _write(state) {
     state.updated_at = new Date().toISOString();
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    _zumServer(state);
   }
+
+  function _zumServer(state) {
+    if (_syncLaeuft) return;
+    if (!window.Auth || !Auth.isApiMode || !Auth.isApiMode()) return;
+    _syncLaeuft = true;
+    Auth.apiCall('/user-settings/datenraum', { method: 'PUT', body: { wert: state } })
+      .catch(function (e) {
+        /* Kein Alarm: der lokale Stand steht, und beim naechsten Schreiben
+           wird es erneut versucht. Eine Fehlermeldung fuer etwas, das der
+           Nutzer nicht beheben kann, hilft ihm nicht. */
+        console.warn('[datenraum] nicht gesichert:', e.message);
+      })
+      .then(function () { _syncLaeuft = false; },
+            function () { _syncLaeuft = false; });
+  }
+
+  function _vomServer() {
+    if (!window.Auth || !Auth.isApiMode || !Auth.isApiMode()) return Promise.resolve(false);
+    return Auth.apiCall('/user-settings/datenraum', { method: 'GET' })
+      .then(function (r) {
+        var fern = r && r.wert;
+        if (!fern) return false;                  /* nichts da - lokal bleibt */
+
+        var fernLeer = !(fern.persoenlich && fern.persoenlich.url) &&
+                       !Object.keys(fern.objekte || {}).length;
+        if (fernLeer) return false;               /* nie gegen Leere */
+
+        /* Der juengere Stand gewinnt. Hat der lokale keinen Zeitstempel,
+           gewinnt der Server - er ist geraeteuebergreifend die
+           verlaesslichere Quelle. */
+        var lokal = _read();
+        var lz = lokal.updated_at ? Date.parse(lokal.updated_at) : 0;
+        var fz = fern.updated_at ? Date.parse(fern.updated_at) : 1;
+        if (lz > fz) { _zumServer(lokal); return false; }
+
+        if (!fern.objekte) fern.objekte = {};
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(fern)); } catch (e) {}
+        return true;
+      })
+      .catch(function () { return false; });
+  }
+
+  /* Einmal je Sitzung nachziehen, beim ersten Zeichnen des Reiters. */
+  var _fernGeladen = false;
+  function _einmalVomServer(neuZeichnen) {
+    if (_fernGeladen) return;
+    _fernGeladen = true;
+    _vomServer().then(function (geaendert) {
+      if (geaendert && typeof neuZeichnen === 'function') neuZeichnen();
+    });
+  }
+
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
@@ -368,7 +443,16 @@ window.DealPilotDatenraum = (function() {
 
   // ───────────────────── Settings-Tab ──────────────────────
   function renderSettingsTab() {
+    /* v1375: beim ersten Zeichnen den Kontostand nachziehen. Gezeigt wird
+       sofort der lokale Stand; bringt der Server etwas Neueres, wird neu
+       gezeichnet. */
+    _einmalVomServer(function () {
+      var host = document.getElementById('dr-settings-host');
+      if (host) host.innerHTML = renderSettingsTab();
+    });
+
     var state = _read();
+
     var objekteList = _getObjekteList();
     var currentObjId = _getCurrentObjId() || (objekteList[0] && objekteList[0].id) || null;
     var loadedAsync = (_cachedObjekteList !== null);
@@ -390,7 +474,7 @@ window.DealPilotDatenraum = (function() {
     html.push('      Verknüpfe deinen <strong>persönlichen Cloud-Ordner</strong> (für SCHUFA, Steuerbescheide, Gehaltsabrechnungen etc.) und für jedes Objekt einen <strong>eigenen Cloud-Ordner</strong>. DealPilot speichert nur die URLs — keine Datei-Inhalte werden gelesen oder hochgeladen.');
     html.push('    </p>');
     html.push('    <div class="dr-privacy">');
-    html.push('      <strong>Hinweis zur Datensicherheit:</strong> Links liegen nur in deinem Browser (localStorage). Bei Bank-Anfragen wird der entsprechende Link in die E-Mail eingefügt — der Empfänger sieht den Ordner mit deinen Freigabe-Einstellungen.');
+    html.push('      <strong>Hinweis zur Datensicherheit:</strong> Gespeichert werden nur die Links, nicht die Dateien. Sie liegen in deinem Browser und zusätzlich in deinem DealPilot-Konto, damit sie einen Gerätewechsel überstehen. Bei Bank-Anfragen wird der entsprechende Link in die E-Mail eingefügt — der Empfänger sieht den Ordner mit deinen Freigabe-Einstellungen.');
     html.push('    </div>');
     html.push('  </div>');
 

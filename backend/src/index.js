@@ -354,6 +354,10 @@ app.use('/api/v1/bmf', require('./routes/bmf'));  /* V288-bmf-route-applied */
 app.use('/api/v1/tax-snapshots', require('./routes/taxSnapshots'));  // V278-tax-snapshots
 app.use('/api/v1/objects', objectRoutes);
 app.use('/api/v1/users', userRoutes);
+/* v1375 (A5): Einstellungen, die den Geraetewechsel ueberleben muessen -
+   erster Nutzer ist der Datenraum, dessen Links bisher nur im
+   localStorage lagen. */
+app.use('/api/v1/user-settings', require('./routes/userSettings'));
 app.use('/api/v1/plans', planRoutes);
 app.use('/api/v1/subscription', subscriptionRoutes);
 app.use('/api/v1/tax-records', taxRecordsRoutes);
