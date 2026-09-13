@@ -854,7 +854,28 @@ function _renderWertverfahren(d) {
               ? '<br><span class="wv-quelle-hw">'
                 + esc(sw.sachwertfaktor_quelle_link.satz.hinweis) + '</span>' : '')
           + '</div>'
-        : '');
+        : '')
+    /* === v1107-WNACH - DIE NAMENSNENNUNG IST EINE AUFLAGE ==============
+       Wo eine Zahl unter dl-de/by-2-0 steht, gehoert ihr Quellenvermerk
+       sichtbar dazu. Bis hierher hing er an jedem Registersatz und
+       erschien nirgends - und damit durfte keine dieser Zahlen zum Kunden.
+       Genannt wird nur, was in diesem Bericht wirklich steckt. */
+    + (function () {
+        var qn = (cc && cc.quellen_nachweis) || [];
+        if (!qn.length) return '';
+        return '<div class="wv-nachweis"><b>Quellennachweis</b>'
+          + qn.map(function (q) {
+              return '<div class="wv-nw-z">' + esc(q.vermerk)
+                + ((q.kennzahlen && q.kennzahlen.length)
+                    ? ' <span class="wv-nw-kz">(' + esc(q.kennzahlen.join(' und ')) + ')</span>'
+                    : '')
+                + (q.url ? '<br><a href="' + esc(q.url) + '" target="_blank"'
+                           + ' rel="noopener">' + esc(q.url) + '</a>' : '')
+                + '</div>';
+            }).join('')
+          + '</div>';
+      })();
+
 
 
   if (!document.getElementById('wv-css')) {
@@ -881,6 +902,17 @@ function _renderWertverfahren(d) {
       + '#wv-box .wv-quelle a{color:var(--wl-c9a84c,#c9a84c);text-decoration:underline;'
       + '  white-space:nowrap}'
       + '#wv-box .wv-quelle-hw{display:block;margin-top:3px;font-size:10.5px;opacity:.7}'
+      /* v1107-WNACH - leiser als der Quellenhinweis, aber lesbar: eine
+         Namensnennung, die niemand liest, erfuellt die Lizenz nicht. */
+      + '#wv-box .wv-nachweis{margin-top:18px;padding:10px 12px;border-radius:8px;'
+      + '  border:1px solid rgba(128,128,128,.2);font-size:11px;line-height:1.5;opacity:.85}'
+      + '#wv-box .wv-nachweis b{display:block;margin-bottom:5px;font-size:11px;'
+      + '  letter-spacing:.04em;text-transform:uppercase;opacity:.7}'
+      + '#wv-box .wv-nw-z{margin-top:4px}'
+      + '#wv-box .wv-nw-kz{opacity:.65}'
+      + '#wv-box .wv-nachweis a{color:var(--wl-c9a84c,#c9a84c);text-decoration:underline;'
+      + '  word-break:break-all}'
+
       /* v1198b · Der Grund, warum kein Bodenwert dasteht. */
       + '#wv-box .wv-bwgrund{margin-top:9px;padding:9px 11px;border-radius:8px;font-size:11.5px;line-height:1.55;border:1px solid rgba(201,168,76,.32);background:rgba(201,168,76,.09)}'
       + '#wv-box .wv-g{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}'
@@ -4339,6 +4371,43 @@ async function exportPdf(out) {
       + 'Ohne Ortsbesichtigung, Bauakten- und Grundbucheinsicht. Grundlage sind die erfassten Angaben.', blockW);
     doc.text(_hr, M, y + 3);
     y += 5 + _hr.length * 3;
+
+    /* === v1107-WNACH - DER QUELLENNACHWEIS, UND WARUM ER PFLICHT IST ===
+       Die amtlichen Daten stehen teils unter dl-de/by-2-0. Diese Lizenz
+       erlaubt jede Verwendung, auch die gewerbliche - unter EINER
+       Bedingung: der Quellenvermerk muss genannt werden. Ohne ihn duerfen
+       die Zahlen nicht in einen Kundenbericht.
+
+       Er steht hier, nicht in der Fussnote: v1150b kuerzt Quellenangaben
+       dort auf 26 Zeichen, und ein by-2-0-Vermerk ist ein Vielfaches
+       davon. Eine abgeschnittene Namensnennung ist keine.
+
+       Genannt wird nur, was in DIESEM Bericht wirklich steckt - die Liste
+       baut das Backend aus den tatsaechlich verwendeten Registersaetzen. */
+    var _qn = (d.cross_check && d.cross_check.quellen_nachweis) || [];
+    if (_qn.length) {
+      need(14 + _qn.length * 8);
+      y += 3;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+      doc.setTextColor(...TXT);
+      doc.text('Quellennachweis', M, y); y += 4;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.3);
+      _qn.forEach(function (q) {
+        doc.setTextColor(...MUT);
+        var _kz = (q.kennzahlen || []).join(' und ');
+        var _zl = doc.splitTextToSize(q.vermerk + (_kz ? '  (' + _kz + ')' : ''), blockW);
+        need(_zl.length * 3 + 4);
+        doc.text(_zl, M, y); y += _zl.length * 3 + 0.5;
+        if (q.url) {
+          doc.setTextColor(120, 110, 140);
+          var _ul = doc.splitTextToSize(String(q.url), blockW);
+          doc.text(_ul, M, y); y += _ul.length * 3;
+        }
+        y += 1.5;
+      });
+      doc.setTextColor(...MUT);
+      y += 2;
+    }
   }
 
   /* v1208-lage · VIER BLOECKE, EINE SEKTION.

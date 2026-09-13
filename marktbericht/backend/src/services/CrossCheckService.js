@@ -428,6 +428,15 @@ export const CrossCheckService = {
            * wir noch gar keinen. Ein Link ist dort mehr wert als ein
            * Grund-Code. */
           sachwertfaktor_quelle_link: (_swfQuelle && _swfQuelle.quelle_link) || null,
+          /* v1107-WNACH - DER QUELLENVERMERK IST EINE RECHTLICHE AUFLAGE,
+             keine Fussnote. Die Brandenburger Saetze stehen unter
+             dl-de/by-2-0: Namensnennung ist PFLICHT, und ohne sie darf die
+             Zahl in keinen Kundenbericht. Sie lag an jedem Registersatz und
+             kam im Bericht nie an. */
+          sachwertfaktor_quellenvermerk: (_swfTab && _swfTab.quellenvermerk) || null,
+          sachwertfaktor_lizenz: (_swfTab && _swfTab.lizenz) || null,
+          sachwertfaktor_quelle_url: (_swfTab && _swfTab.quelle_url) || null,
+
           sachwertfaktor_tabellenwert: (_swfTab && _swfTab.tabellenwert) || null,
           sachwertfaktor_korrekturen: (_swfTab && _swfTab.verfuegbar
             && (_swfTab.korrektur_rnd != null || _swfTab.korrektur_bgf != null))
@@ -815,6 +824,11 @@ export const CrossCheckService = {
            * WertParameterService haengt das Feld an jede Antwort; hier geht
            * es nur weiter. */
           liegenschaftszins_quelle_link: kern.lzs ? (kern.lzs.quelle_link || null) : null,
+          /* v1107-WNACH - derselbe Grund wie beim Sachwertfaktor. */
+          liegenschaftszins_quellenvermerk: kern.lzs ? (kern.lzs.quellenvermerk || kern.lzs.quelle || null) : null,
+          liegenschaftszins_lizenz: kern.lzs ? (kern.lzs.lizenz || null) : null,
+          liegenschaftszins_quelle_url: kern.lzs ? (kern.lzs.quelle_url || null) : null,
+
           /* v1071-WMIE-1 · mieteQuelle wird seit v1059 bestimmt und war
            * nirgends sichtbar. Bei Loehner Strasse 278 war KEINE Miete
            * erfasst — der Rohertrag von 27.065 EUR stammt vollstaendig aus
@@ -962,6 +976,43 @@ export const CrossCheckService = {
           ? round((Math.max(...nums) / Math.min(...nums) - 1) * 100, 1) : null,
       };
     }
+
+    /* === v1107-WNACH - DER QUELLENNACHWEIS =============================
+       Wer eine Zahl unter dl-de/by-2-0 verwendet, MUSS ihre Herkunft
+       nennen. Bis hierher hing der Vermerk an jedem Registersatz und
+       erschien in keinem Bericht - damit durfte keine dieser Zahlen zum
+       Kunden. Betroffen waren zuletzt alle sechzehn Brandenburger Saetze
+       und Aurich mit einundvierzig Kreisschluesseln.
+
+       GENANNT WIRD NUR, WAS IN DIESEM BERICHT WIRKLICH STECKT. Eine
+       Namensnennung fuer einen Ausschuss, der hier gar nicht vorkommt,
+       ist genauso falsch wie eine fehlende - sie behauptet eine Herkunft.
+
+       Entdoppelt wird ueber den Vermerkstext: fuehrt derselbe Ausschuss
+       Zins UND Sachwertfaktor, steht er einmal da, mit beiden Kennzahlen. */
+    const _nachweis = new Map();
+    const _merke = (vermerk, kennzahl, url, lizenz) => {
+      const t = String(vermerk || '').trim();
+      if (!t) return;
+      const e = _nachweis.get(t) || { vermerk: t, kennzahlen: [], url: url || null,
+                                      lizenz: lizenz || null };
+      if (e.kennzahlen.indexOf(kennzahl) < 0) e.kennzahlen.push(kennzahl);
+      if (!e.url && url) e.url = url;
+      if (!e.lizenz && lizenz) e.lizenz = lizenz;
+      _nachweis.set(t, e);
+    };
+    if (out.sachwert && out.sachwert.marktangepasst) {
+      _merke(out.sachwert.sachwertfaktor_quellenvermerk, 'Sachwertfaktor',
+             out.sachwert.sachwertfaktor_quelle_url, out.sachwert.sachwertfaktor_lizenz);
+    }
+    if (out.ertragswert && out.ertragswert.available
+        && out.ertragswert.liegenschaftszins_pct != null) {
+      _merke(out.ertragswert.liegenschaftszins_quellenvermerk, 'Liegenschaftszinssatz',
+             out.ertragswert.liegenschaftszins_quelle_url, out.ertragswert.liegenschaftszins_lizenz);
+    }
+    out.quellen_nachweis = Array.from(_nachweis.values());
+
     return out;
+
   },
 };
