@@ -15683,6 +15683,122 @@ Rückfrage beim Inhaber.
 `8639165` v1368
 
 
+## v1369 · B4 — Risikostufen: wo die Maschine aufhört und der Mensch anfängt
+
+Marcels Stufenleiter aus dem Lastenheft:
+
+```
+NORMAL → AUFFÄLLIG → WARNUNG → HOHES RISIKO
+       → EINGESCHRÄNKT → GESPERRT → MANUELL FREIGEGEBEN
+```
+
+### Seine Entscheidung zieht die Trennlinie mitten hinein
+
+Gefragt war, **ab wann das System selbst eingreift**. Seine Antwort:
+*gar nicht.*
+
+| Stufen | wie |
+|---|---|
+| NORMAL · AUFFÄLLIG · WARNUNG · HOHES RISIKO | **berechnet** — Messwerte |
+| EINGESCHRÄNKT · GESPERRT · FREIGEGEBEN | **gesetzt** — Entscheidungen |
+
+Das System stuft ein und meldet; jede Einschränkung und jede Sperre setzt
+ein Mensch. **Das ist die strengste Auslegung seiner eigenen Auflage** —
+und die einzige, bei der ein Fehlalarm keinen zahlenden Kunden aussperrt.
+
+### Muster **und** Menge — die zweite Entscheidung
+
+Eine Stufe steigt nur, wenn **beides** zutrifft: viele Überschreitungen
+*und* ein skript-typisches Muster.
+
+```
+hohes_risiko   ab 50 Überschreitungen · Vielfalt ≤ 2 · Streuung ≤ 1,0
+warnung        ab 20 Überschreitungen · Vielfalt ≤ 3 · Streuung ≤ 1,5
+auffaellig     ab  5 Überschreitungen
+```
+
+**Warum das nötig ist, zeigt die Messung:** echte Nutzung trifft 12
+Endpunktgruppen bei einer Streuung von 5,13. Ein Nutzer mit großem
+Portfolio erzeugt viel Verkehr — aber *ungleichmäßig* und über viele
+Endpunkte. **Wer nur die Menge zählt, trifft zuerst den fleißigsten
+Kunden.** Das ist B18 wörtlich genommen.
+
+`streuung === null` heißt „zu wenig Daten" — **und zu wenig Daten dürfen
+nie eine höhere Stufe rechtfertigen.**
+
+### Kein eigenes Statusfeld
+
+Der Zustand ergibt sich aus der **jüngsten Entscheidung in der
+append-only-Chronik**. Ein zweiter Speicher daneben könnte auseinander-
+laufen, und dann hätte man zwei Wahrheiten darüber, ob jemand gesperrt
+ist.
+
+### Der Endpunkt verlangt drei Dinge
+
+1. **Eine Rolle** — lesen darf jeder Admin, entscheiden nur `owner` und
+   `support`. Wer einen Fall nur nachvollziehen soll, soll ihn nicht aus
+   Versehen schließen können.
+2. **Eine Begründung** — ohne Notiz kein Eintrag. Sonst steht in der Akte
+   später eine Sperre, die niemand prüfen kann. Der Knopf bleibt gesperrt,
+   solange das Feld leer ist.
+3. **Den berechneten Stand im Moment der Entscheidung** — mitgeschrieben,
+   damit später nachvollziehbar ist, worauf sie sich stützte.
+
+### Die Knöpfe stehen in der Fallakte, nicht in der Liste
+
+Wer entscheidet, soll die Chronik über sich haben und die Kennzahlen
+daneben. **Ein Knopf in einer Übersichtstabelle lädt dazu ein, nach der
+Zahl zu urteilen statt nach dem Fall.**
+
+Und: berechnete Stufen erscheinen in Grün und Gold, nur die von einem
+Menschen gesetzten in Rot. **Eine Maschine soll nicht rot leuchten.**
+
+### Abnahme — der vollständige Kreislauf
+
+```
+1. berechnet      Auffällig
+                  „6 Limit-Überschreitungen (Schwelle 5) · 5 Endpunkt-
+                   gruppen · Streuung 0,65 in 60 Minuten"
+2. Knöpfe         alle drei gesperrt (Notizfeld leer)
+   bei 2 Zeichen  weiterhin gesperrt
+   bei Begründung alle drei frei
+3. eingeschränkt  „Gesetzt von … · berechnet wäre: Auffällig"
+                  Notiz steht dabei, Eintrag oben in der Chronik
+4. freigegeben    wieder Auffällig, mit Vermerk wer und wann
+```
+
+Die Entscheidung schlägt die Berechnung — **und beide bleiben sichtbar.**
+
+### Drei eigene Fehler auf dem Weg
+
+**Die schließende Klammer verschluckt.** Mein Patch ersetzte das
+`ARTEN`-Objekt und ließ `};` weg. `node --check` hätte es gefunden — ich
+habe es gefunden, weil der Bash-Tool-Hinweis die geänderte Datei zeigte
+und die Zeile ins Auge sprang.
+
+**`[object Object]` in der Detail-Spalte.** Der Renderer setzte jeden Wert
+unbesehen in einen String; bei einem verschachtelten Objekt kommt genau
+das heraus. Jetzt werden Objekte flach ausgeschrieben und die Schlüssel
+tragen deutsche Namen — *was ein Mensch lesen soll, soll auf Deutsch
+dastehen.*
+
+**Ein Patch, der still nichts tat.** Der Teil, der Entscheidungszeilen
+markieren sollte, stand in einem `if (index(…) >= 0)` statt in der
+prüfenden `rep()`-Funktion. Der Anker traf nicht, das `if` übersprang den
+Block, **der Patch meldete Erfolg und die Datei war unverändert.**
+Gefunden nur, weil die Nachmessung `markierteEntscheidungen: 0` sagte.
+
+> Beim Nachziehen die nächste Falle derselben Familie: die beiden
+> Zeilenbauer sehen gleich aus und unterscheiden sich nur in der
+> Einrückung — **ein Anker mit zehn Leerzeichen trifft als Teilstring
+> auch die Zeile mit vierzehn.** Gelöst über Zeilennummern, von hinten
+> nach vorn, damit die Nummern stabil bleiben.
+
+### Commits
+
+`974cadf` v1369 · v1369b und v1369c im selben Zug
+
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
