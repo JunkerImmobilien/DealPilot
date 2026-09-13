@@ -36,7 +36,7 @@
    nach Tempo geht, sperrt den fleißigsten Kunden zuerst.
    ══════════════════════════════════════════════════════════════════════ */
 
-const { query } = require('../db');
+const { query } = require('../db/pool');
 
 /* Nur diese Arten werden geschrieben. Eine feste Liste, damit nicht mit
    der Zeit vierzig Sorten entstehen, die niemand mehr auswerten kann. */
