@@ -90,9 +90,36 @@ function matrixInterp(m, e) {
   }
   const ax = [...m.achse_x].sort((p, q) => p - q);
   const i0 = ax.indexOf(nx[0]); const i1 = ax.indexOf(nx[1]);
+  /* ═══ v1098g-WEXA · EIN EXAKTER TREFFER BRAUCHT KEINE NACHBARN ═══════
+     GEMESSEN an Wolfenbuettel: der Bericht druckt fuer Bodenrichtwert 40
+     und 100.000 Euro Sachwert den Wert 1,33 ab. Der Auswerter gab
+     `zelle_leer` — weil er VIER Zellen holt und die Nachbarkurve (Band
+     130) bei 100.000 Euro leer ist. Der abgedruckte Wert war damit
+     unerreichbar, obwohl er dasteht.
+
+     Liegt die Anfrage GENAU auf beiden Stuetzstellen, ist nichts zu
+     interpolieren: die Zelle IST die Antwort. Das aendert an keinem
+     bestehenden Fall etwas — bei einem exakten Treffer liefert die
+     Interpolation denselben Wert, sie scheitert nur, wenn ein Nachbar
+     fehlt, den sie gar nicht braucht.
+
+     Die Regel bleibt unangetastet: eine LEERE Zelle wird weiterhin nicht
+     durch einen Nachbarwert ersetzt. Hier ist die Zelle nicht leer. */
+  const exaktX = ax.includes(x);
+  const exaktY = (m.achse_y || []).includes(y);
+  if (exaktX && exaktY) {
+    const direkt = zelle(m.zellen, y, ax.indexOf(x));
+    if (direkt !== null) {
+      return { verfuegbar: true, wert: Math.round(direkt * 1000) / 1000,
+               tabellenwert: Math.round(direkt * 1000) / 1000, korrekturen: [],
+               stuetzstellen: { x: [x, x], y: [y, y] } };
+    }
+  }
+
   const c = [zelle(m.zellen, ny[0], i0), zelle(m.zellen, ny[0], i1),
              zelle(m.zellen, ny[1], i0), zelle(m.zellen, ny[1], i1)];
   if (c.some((v) => v === null)) {
+
     return nichts('zelle_leer',
       'Fuer diese Kombination fuehrt der Bericht keinen Wert. '
       + 'Eine leere Zelle wird nicht durch einen Nachbarwert ersetzt.');
