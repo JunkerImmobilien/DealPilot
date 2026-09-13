@@ -3939,7 +3939,21 @@ Saatdatei und meldet Zahlen, die es im Betrieb nicht gibt.
 
 ### A · SOFORT
 
-#### A1 — v1097 einspielen (Paket liegt fertig)
+#### A1 — v1097 einspielen — **ERLEDIGT 13.09.2026** (`d8d8247`)
+
+> **Eingespielt, ins Repo zurückgeholt, `mb-backend` gebaut.** Der Klicktest
+> ist gefahren: bei ETW fordert die Ampel jetzt Bruttogrundfläche und
+> Standardstufe ein, bei EFH nicht — beide Kettenglieder belegt.
+> **Test 2 (Bericht mit Sachwert) bleibt offen**, er braucht einen echten
+> Berichtslauf. Einzelheiten im Marktbericht-Journal unter v1097.
+>
+> Die Prüfstrecke fiel zuerst an einem Punkt durch, der **kein Fehler des
+> Pakets** war: sie prüfte den `app.js`-Buster gegen den Wert vom 30.08.
+> (`1154b`), während dort heute `1229c` steht. Gemessen: der Patch fasst
+> `app.js` nicht an. Die Prüfung vergleicht jetzt gegen das Original statt
+> gegen eine Konstante.
+
+**Der ursprüngliche Auftrag, zur Nachvollziehbarkeit:**
 
 **Sachwert für Eigentumswohnungen und Mehrfamilienhäuser freigeben.**
 ZIP liegt unter `Dateien/uebergabe-claude-code-20260908.zip` → Ordner `v1097/`.
