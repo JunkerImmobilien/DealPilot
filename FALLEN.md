@@ -3818,3 +3818,63 @@ sich beim ersten Treffer, schließt die Pipe, Python stirbt an SIGPIPE — die
 Prüfung meldet „kein SKIP", obwohl eines kam.
 
 **Auf Prod gibt es kein node auf dem Host.** Nur im Container.
+
+---
+
+## 161 · Eine Zugangsdiagnose altert — 403 wurde zu 404
+
+**Gefunden bei der Hamburg-Ernte (13.09.2026).**
+
+Im Backlog stand seit Wochen: *„Hamburg — reine Zugriffsfrage, `hamburg.de`
+gibt 403."* Hamburg war damit Platz 1 der Ernte-Reihenfolge **und** blockiert,
+weil 403 „gesperrt" heisst.
+
+Nachgemessen gaben dieselben Pfade **404**. Der Unterschied ist alles:
+
+```
+403  der Server kennt die Seite und verweigert sie   -> gesperrt
+404  der Server kennt die Seite nicht                -> Adresse veraltet
+```
+
+Die Adressen von `hamburg.de` waren umgebaut worden. Eine Suche fand die neue
+Seite in einem Anlauf, das PDF war frei abrufbar, und die Lizenz stand woertlich
+im Impressum. **Ein Bundesland lag wochenlang still wegen einer Statuszeile,
+die einmal gestimmt hatte.**
+
+**Merksatz:** Ein Zugangsbefund gehoert mit **Datum und Statuscode** notiert,
+und vor jeder Planung, die darauf aufbaut, einmal nachgemessen. Eine Sperre
+ist ein Zustand, kein Merkmal. Das gilt in beide Richtungen — Niedersachsen
+brauchte am selben Tag die umgekehrte Ruecknahme (die Lizenz erlaubte laengst,
+was als „Anfrage noetig" notiert war).
+
+`v1097`
+
+---
+
+## 162 · Werte, die nur gezeichnet sind, findet kein Textleser
+
+**Gefunden bei der Niedersachsen-Ernte (13.09.2026).**
+
+Das Tableau-Dashboard zeigt Sachwertfaktoren, Stichprobenwerte und
+Korrekturkurven. `get_page_text` und der Accessibility-Baum liefern davon
+**nur die Achsenbeschriftungen** — die Zahlen selbst sind ins Canvas
+gezeichnet und existieren als Text nirgends.
+
+Drei Folgerungen, alle teuer gelernt:
+
+1. **Ein leeres Textergebnis ist kein Beweis, dass nichts da ist.** Der erste
+   Abruf sah aus, als traege die Seite keine Daten. Der Screenshot zeigte
+   dreiundzwanzig Stuetzpunkte.
+2. **Screenshots sind hier die Messung**, nicht die Illustration. Der
+   Tooltip eines Kurvenpunkts nennt alle Groessen im Klartext und ist die
+   genauere Quelle als das Ablesen aus der Grafik.
+3. **Serien scheitern am Renderer.** Drei Anlaeufe endeten in
+   `Page.captureScreenshot timed out after 30000ms`, waehrend Tableau neu
+   rechnete. Einzelabrufe gehen zuverlaessig, Messreihen nicht.
+
+**Merksatz:** Bei Canvas-Oberflaechen zuerst einen Screenshot machen, dann
+entscheiden, ob der Textweg ueberhaupt in Frage kommt. Und eine Messreihe
+gegen eine rechnende Oberflaeche braucht Wartezeit zwischen den Punkten —
+oder einen anderen Weg.
+
+`v1097`
