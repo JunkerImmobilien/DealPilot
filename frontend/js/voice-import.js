@@ -6454,8 +6454,20 @@
       return !(el && String(el.value || '').trim() !== '');
     });
     if (!fehlt.length) return;
-    _rfDranBlase(_rfBlase('co', escH(e.frage) + _rfDoppeldeutig(e) + _rfPillen(e) +
+    /* v1378 (C2): GEMESSEN beim Umschalten - hier fehlte der Wozu-Satz.
+       Der Schalter wirkte, der Knopf zeigte "Lernmodus", die KI-Antworten
+       waren laenger - nur an der offenen FRAGE sah man nichts davon. Eine
+       Einstellung, deren Wirkung man an der Stelle nicht sieht, an der man
+       sie erwartet, gilt als kaputt, auch wenn sie greift. */
+    _rfDranBlase(_rfBlase('co', escH(e.frage) + _rfDoppeldeutig(e) +
+      (function () {
+        if (_rfModus() !== 'lernen') return '';
+        var w = _rfWozu(e);
+        return w ? '<div class="vi-rf-wozu"><b>Wozu?</b> ' + escH(w) + '</div>' : '';
+      })() +
+      _rfPillen(e) +
       '<div class="vi-rf-zaehler">Noch offen: ' + escH(_rfFelderNamen(fehlt)) + '</div>'));
+
     _rfDranZeichnen();
   }
 
@@ -8353,7 +8365,10 @@
     }
     _rfTonKnopf();
     _rfDranZeichnen();
+    /* Die offene Frage kommt mit dem neuen Ton wieder - sonst wirkt der
+       Wechsel erst bei der naechsten Frage, und das sieht nach nichts aus. */
     if (_rf && !_rf.abschlussOffen && !_rf.nachfassOffen) _rfFrageNochmal();
+
   }
 
 
