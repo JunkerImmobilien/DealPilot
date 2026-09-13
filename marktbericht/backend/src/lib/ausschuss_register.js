@@ -105,7 +105,13 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                             /* v1339: Erbbaurechtskoeffizienten Braunschweig-Wolfsburg.
                                MARKTABGELEITET - wo sie vorliegen, gehen sie dem
                                finanzmathematischen Wert nach Paragraf 50 ImmoWertV vor. */
-                            'erbbau-bs-wob.json'];
+                            'erbbau-bs-wob.json',
+                            /* v1098: Sachwertfaktoren Hamburg. EIGENE Datei, weil
+                               `swf-nrw.json` sonst ein zweites Bundesland unter
+                               falschem Namen truege. `rezept2register.py` schreibt
+                               seit v1098 je Land eine Datei und nennt sie am Ende
+                               seines Laufs - jede davon gehoert hierher. */
+                            'swf-hh.json'];
 
 export function ladeSaat(dateien = SAATDATEIEN) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])

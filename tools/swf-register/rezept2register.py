@@ -339,8 +339,28 @@ def bauen():
         gesehen[k] = True
 
     os.makedirs(os.path.dirname(ZIEL) or '.', exist_ok=True)
-    with open(ZIEL, 'w', encoding='utf-8') as f:
-        json.dump(saetze, f, ensure_ascii=False, indent=1)
+
+    # v1098-WLAND2 · JE LAND EINE DATEI.
+    #
+    # Bis hierher ging alles in `out/swf-nrw.json` — richtig, solange nur NRW
+    # drin war. Mit Hamburg waere ein Bundesland in einer Datei namens "nrw"
+    # gelandet, und beim naechsten Land das dritte. Der Name haette gelogen,
+    # und `SAATDATEIEN` im Backend haette nicht gesagt, was wo liegt.
+    #
+    # NW behaelt seinen Dateinamen: er steht in `ausschuss_register.js` und
+    # in jedem bisherigen Nachweis. Alle anderen bekommen `swf-<land>.json`.
+    NW_ZIEL = ZIEL
+    nach_land = {}
+    for s in saetze:
+        nach_land.setdefault(s['land_code'], []).append(s)
+
+    geschrieben = []
+    for land, teil in sorted(nach_land.items()):
+        pfad = NW_ZIEL if land == 'NW' else os.path.join(
+            os.path.dirname(NW_ZIEL) or '.', f'swf-{land.lower()}.json')
+        with open(pfad, 'w', encoding='utf-8') as f:
+            json.dump(teil, f, ensure_ascii=False, indent=1)
+        geschrieben.append((land, pfad, len(teil)))
 
     gebiete = len({s['ags'] for s in saetze})
     aus = len({s['gaa_name'] for s in saetze})
@@ -349,7 +369,13 @@ def bauen():
           f'{gebiete} Zustaendigkeitsschluessel · {zellen} Tabellenzellen')
     for e in sorted({s['ebene'] for s in saetze}):
         print(f'  ebene={e}: {sum(1 for s in saetze if s["ebene"] == e)}')
-    print(f'-> {ZIEL}')
+    for land, pfad, n in geschrieben:
+        print(f'-> {pfad}  ({land}: {n})')
+    if len(geschrieben) > 1:
+        namen = [os.path.basename(p) for _, p, _ in geschrieben]
+        print('   Jede Datei muss in SAATDATEIEN stehen '
+              '(marktbericht/backend/src/lib/ausschuss_register.js): '
+              + ', '.join(namen))
     return 0
 
 
