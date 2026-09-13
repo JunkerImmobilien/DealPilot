@@ -4031,7 +4031,30 @@ diagnostizieren, nicht nachpatchen.**
 
 ---
 
-#### A2 — v1099 · Quellenblock im PDF (rechtlich blockierend)
+#### A2 — Quellenblock im Bericht — **ERLEDIGT 13.09.2026** (`609dc9c`, v1107)
+
+> **Der Quellennachweis steht jetzt im Bericht** — am Ende der
+> Wertermittlung, im PDF und auf dem Bildschirm. Das Backend sammelt die
+> Vermerke der **tatsaechlich verwendeten** Registersaetze in
+> `cross_check.quellen_nachweis`, entdoppelt ueber den Vermerkstext: fuehrt
+> derselbe Ausschuss Zins UND Sachwertfaktor, steht er einmal da, mit
+> beiden Kennzahlen.
+>
+> **Nicht in der Fussnote**, weil v1150b dort auf 26 Zeichen kuerzt — eine
+> abgeschnittene Namensnennung ist keine.
+>
+> Gemessen an einem echten CrossCheck-Lauf (Prignitz, EFH Bj 1975, Faktor
+> 0,9043 Stufe A): der Nachweis traegt Vermerk, Lizenz `dl-de/by-2-0`,
+> Kennzahl und Link auf den Bericht.
+>
+> **Dazu v1106:** der Quellenlink steht jetzt auch beim SACHWERTFAKTOR, wie
+> Marcel es am 13.09. verlangt hatte („bei den Liegenschaftszinsen und
+> Sachwertfaktoren"). Der Zins hatte ihn seit v1099, der Faktor nicht —
+> das Backend lieferte ihn seither, es las nur niemand.
+
+**Der urspruengliche Auftrag, zur Nachvollziehbarkeit:**
+
+
 
 **Aurich (41 Kreisschlüssel) und Potsdam/Uckermark (5) stehen unter
 `dl-de/by-2-0` — Namensnennung ist Pflicht.** Der Vermerk hängt an jedem
