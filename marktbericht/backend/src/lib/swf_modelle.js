@@ -531,7 +531,58 @@ function korrekturAnwenden(k, e) {
 
      `kategorial` liest ausdruecklich den ROHWERT, keine Zahl: ein
      Stadtteil heisst "Blankenese". */
+  /* ═══ v1100-WK2D · EINE KORREKTUR, DIE VON ZWEI GROESSEN ABHAENGT ═════
+     Der Landkreis Oberhavel druckt zwei Tabellen ab und schreibt dazu:
+     „Bei modellkonformer Verkehrswertermittlung sind beide Faktoren
+     gleichzeitig anzuwenden." Die erste gibt den Sachwertfaktor nach Region
+     und vorlaeufigem Sachwert, die zweite eine Korrektur nach
+     Bruttogrundflaeche — und die Korrekturkurve ist JE REGION eine andere.
+
+     Die bisherigen Arten koennen das nicht: `stufen` liest eine Zahl,
+     `kategorial` einen Text. Hier braucht es beides — die Zahl sagt WO auf
+     der Kurve, die Kategorie sagt WELCHE Kurve.
+
+     Ohne diese Art bliebe nur, die zweite Tabelle wegzulassen. Dann
+     rechnete das Modell halb, und das Ergebnis saehe trotzdem plausibel
+     aus — genau die Fehlerklasse, die dieses Register vermeiden soll.
+
+     WICHTIG: faellt die Kategorie nicht in die Tabelle, gibt es KEINE
+     Korrektur — nicht die einer Nachbarregion. */
+  if (k.art === 'stufen_kategorial') {
+    const kat = String(e[k.kategorie_feld] ?? '').trim();
+    if (!kat) return null;
+    const tab = k.stufen || {};
+    let reihe = tab[kat];
+    if (reihe === undefined) {
+      const treffer = Object.keys(tab).find(
+        (n) => n.toLowerCase() === kat.toLowerCase());
+      if (treffer !== undefined) reihe = tab[treffer];
+    }
+    if (!reihe || typeof reihe !== 'object') return null;
+
+    const xk = zahl(e[k.feld]);
+    if (xk === null) return null;
+    const st = Object.keys(reihe).map(Number).filter((n) => Number.isFinite(n))
+                     .sort((p, q) => p - q);
+    if (!st.length) return null;
+    /* Ausserhalb der Reihe gilt der Randwert — der Bericht druckt sie als
+       vollstaendig ab, ohne Fortsetzung nach aussen. Dieselbe Regel wie bei
+       `stufen`. */
+    const v2 = xk <= st[0] ? reihe[String(st[0])]
+             : xk >= st[st.length - 1] ? reihe[String(st[st.length - 1])]
+             : (() => { const n2 = nachbarn(st, xk);
+                        return zwischen(xk, n2[0], n2[1],
+                                        reihe[String(n2[0])], reihe[String(n2[1])]); })();
+    if (!istZahl(v2)) return null;
+    const st2 = k.rundung_stellen ?? 3;
+    const q2 = Math.pow(10, st2);
+    return { merkmal: k.bez, wert: Math.round(v2 * q2) / q2,
+             wirkung: k.wirkung === 'multiplikativ' ? 'multiplikativ' : 'additiv',
+             ausprägung: `${xk} (${kat})` };
+  }
+
   if (k.art === 'kategorial') {
+
     const roh = e[k.feld];
     if (roh === undefined || roh === null || roh === '') return null;
     const schluessel = String(roh).trim();
@@ -733,6 +784,25 @@ export function auswerten(modell, eingabe) {
 
   const einheit = modell.liefert || FORM_EINHEIT[modell.form] || 'faktor';
 
+  /* ═══ v1100b-WK2D · DIE ERMITTELTE KATEGORIE GEHT AN DIE KORREKTUREN ══
+     GEMESSEN an Oberhavel: die BGF-Korrektur greift je Region anders, und
+     die Region leitet die FORMEL aus dem Bodenrichtwert ab. Sie stand
+     danach in `r.kategorie` — aber nicht im Eingabeobjekt, das die
+     Korrekturen lesen. Die Korrektur fand ihre Kategorie nie und lieferte
+     still nichts: 0,97 statt 0,97 x 1,01.
+
+     Der Aufrufer kann sie auch nicht selbst setzen — er kennt die
+     Zuordnungsregel des Berichts nicht, sonst braeuchte es sie im Rezept
+     nicht. Also reicht der Auswerter sie durch.
+
+     Eine ausdrueckliche Angabe des Aufrufers gewinnt: wer die Region
+     kennt, soll sie setzen koennen. */
+  const _eingabeK = (r && r.kategorie && modell.achse_k_feld
+                     && (eingabe || {})[modell.achse_k_feld] == null)
+    ? { ...(eingabe || {}), [modell.achse_k_feld]: r.kategorie }
+    : (eingabe || {});
+
+
   /* v1094-WEUR · EIN EURO-BETRAG BEKOMMT SEINE KORREKTUREN.
    *
    * Bis v1093 kehrte diese Stelle sofort zurueck — mit der Begruendung,
@@ -754,7 +824,7 @@ export function auswerten(modell, eingabe) {
     const kE = [];
     const offenE = [];
     for (const k of (modell.korrekturen || [])) {
-      const t = korrekturAnwenden(k, eingabe || {});
+      const t = korrekturAnwenden(k, _eingabeK);
       if (t && (t.wert || t.wirkung === 'multiplikativ')) kE.push(t);
       else if (t == null) offenE.push(k.bez || k.feld);
     }
@@ -794,7 +864,7 @@ export function auswerten(modell, eingabe) {
   const korr = [];
   const offen = [];
   for (const k of (modell.korrekturen || [])) {
-    const t = korrekturAnwenden(k, eingabe || {});
+    const t = korrekturAnwenden(k, _eingabeK);
     /* v1093-WMUL · Ein additiver Zuschlag von 0,00 ist ein Nichts — so
      * druckt Herford ihn ab (kBgf 0,00), und so wird er seit v1083
      * uebersprungen. Ein MULTIPLIKATIVER Faktor 0 ist kein Nichts: er

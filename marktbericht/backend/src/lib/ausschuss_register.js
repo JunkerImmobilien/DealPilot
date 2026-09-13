@@ -131,7 +131,11 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                                auszugsweise Wiedergabe ist gestattet, verlangt aber
                                Quellenangabe UND ein Belegexemplar. Im Kundenbericht
                                steht bis zur Klaerung nur der Link. */
-                            'swf-mv.json'];
+                            'swf-mv.json',
+                            /* v1100: Brandenburg - Potsdam (zwei Konstanten) und
+                               Oberhavel (Matrix nach Region PLUS BGF-Korrektur je
+                               Region, beide laut Bericht gleichzeitig anzuwenden). */
+                            'swf-bb.json'];
 
 export function ladeSaat(dateien = SAATDATEIEN) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])

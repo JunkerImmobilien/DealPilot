@@ -1,0 +1,128 @@
+{
+  "land_code": "BB",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Oberhavel",
+  "gaa_kennz": "12065",
+  "ags": ["12065"],
+  "ebene": "kreis",
+  "berichtsjahr": 2025,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06-25",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_OHV.pdf",
+  "quelle_datei": "BB-oberhavel-gmb-2025.pdf",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, Tabellen 12a und 12b, S. 73–75. Modellgrundlage: VV EW-SW Land Brandenburg",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000,
+                    500000, 550000, 600000, 650000, 700000, 750000, 800000, 850000,
+                    900000, 950000, 1000000, 1050000, 1100000, 1150000],
+        "achse_k_feld": "region",
+        "zuordnung_feld": "brw",
+        "kategorie_baender": [
+          { "von": 14,  "bis": 37,  "kategorie": "weiterer Metropolenraum" },
+          { "von": 38,  "bis": 179, "kategorie": "Berliner Umland ländlicher Bereich" },
+          { "von": 180, "bis": 460, "kategorie": "Berliner Umland städtischer Bereich" }
+        ],
+        "achse_k_bez": "Region (über das Bodenrichtwertniveau zugeordnet)",
+        "kategorien": ["Berliner Umland städtischer Bereich",
+                       "Berliner Umland ländlicher Bereich",
+                       "weiterer Metropolenraum"],
+        "zellen": {
+          "Berliner Umland städtischer Bereich":
+            [null, null, null, null, 0.91, 0.93, 0.95, 0.96, 0.97, 0.98, 0.99, 0.99,
+             0.99, 0.99, 0.99, 0.99, 0.99, 0.98, 0.96, 0.97, 0.95, 0.93],
+          "Berliner Umland ländlicher Bereich":
+            [null, null, 1.13, 1.08, 1.04, 1.01, 0.98, 0.95, 0.93, 0.91, 0.89, 0.87,
+             null, null, null, null, null, null, null, null, null, null],
+          "weiterer Metropolenraum":
+            [1.22, 1.10, 1.02, 0.95, 0.90, 0.86, 0.82, 0.79, 0.76, 0.73, 0.71, 0.68,
+             null, null, null, null, null, null, null, null, null, null]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "ACHTUNG BEI DER ZUORDNUNG ÜBER DEN BODENRICHTWERT. Der Bericht nennt je Region ein Bodenrichtwertniveau (städtisch 180–460, ländlich 38–300, weiterer Metropolenraum 14–240 €/m²) — diese Spannen ÜBERLAPPEN SICH. Die hier gesetzten Bänder schneiden sie überschneidungsfrei (14–37 / 38–179 / 180–460), damit ein Bodenrichtwert eindeutig eine Region trifft. Das ist eine ZUORDNUNGSREGEL VON DEALPILOT, nicht des Ausschusses: er ordnet über die Lage zu, nicht über den Bodenrichtwert. Wer die Region kennt, sollte sie direkt im Feld `region` setzen — dann greift die Zuordnung gar nicht erst.",
+        "normobjekt": "Modellansätze nach VV EW-SW Land Brandenburg. Ausreißer bezüglich Fläche, Bruttogrundfläche und Sachwertfaktor wurden aussortiert."
+      },
+
+      "korrekturen": [
+        {
+          "bez": "Abweichende Bruttogrundfläche",
+          "feld": "bgf",
+          "art": "stufen_kategorial",
+          "kategorie_feld": "region",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "Berliner Umland städtischer Bereich": {
+              "75": 1.13, "100": 1.10, "125": 1.08, "150": 1.06, "175": 1.03,
+              "200": 1.01, "225": 0.99, "250": 0.97, "275": 0.96, "300": 0.94,
+              "325": 0.92, "350": 0.91, "375": 0.89, "400": 0.88, "425": 0.86,
+              "450": 0.85, "475": 0.84
+            },
+            "Berliner Umland ländlicher Bereich": {
+              "125": 1.07, "150": 1.05, "175": 1.03, "200": 1.02, "225": 1.00,
+              "250": 0.99, "275": 0.98, "300": 0.97, "325": 0.96, "350": 0.96,
+              "375": 0.95, "400": 0.94, "425": 0.94, "450": 0.93, "475": 0.92
+            },
+            "weiterer Metropolenraum": {
+              "150": 1.08, "175": 1.04, "200": 1.01, "225": 0.98, "250": 0.96,
+              "275": 0.94, "300": 0.92, "325": 0.90, "350": 0.88, "375": 0.87,
+              "400": 0.86, "425": 0.84, "450": 0.83, "475": 0.82
+            }
+          },
+          "rundung_stellen": 2,
+          "hinweis": "Der Bericht schreibt ausdrücklich: „Bei modellkonformer Verkehrswertermittlung sind beide Faktoren (Tabelle 12 a und Tabelle 12 b) gleichzeitig anzuwenden.\" Die BGF-Korrektur ist erst nach der Regionsanpassung anwendbar — genau so rechnet der Auswerter: Tabellenwert aus 12a, danach multiplikativ die Korrektur aus 12b. Die Kurve ist JE REGION eine andere, deshalb die Art `stufen_kategorial`."
+        }
+      ],
+
+      "modellansaetze": {
+        "modellgrundlage": "Verwaltungsvorschrift über die Ermittlung von Bodenrichtwerten sowie Sachwerten und Sachwertfaktoren im Land Brandenburg (VV EW-SW)",
+        "verfahren": "Sachwertverfahren nach ImmoWertV 2021",
+        "ausreisser": "Ausreißer bezüglich Fläche, Bruttogrundfläche und Sachwertfaktor wurden aussortiert",
+        "einflussgroessen": "Die größte Abhängigkeit zeigte sich — um den Einflussfaktor Region bereinigt — bei der Bruttogrundfläche. Alle anderen Parameter wiesen keine signifikanten Abhängigkeiten auf.",
+        "funktionen_tabelle_12a": {
+          "Berliner Umland städtischer Bereich": "Y = -4E-13 x² + 6E-07 x + 0,769   (R² = 0,0056)",
+          "Berliner Umland ländlicher Bereich":  "Y = -0,213 ln(x) + 3,7259          (R² = 0,126)",
+          "weiterer Metropolenraum":             "Y = -0,285 ln(x) + 4,4971          (R² = 0,2541)"
+        },
+        "funktionen_tabelle_12b": {
+          "Berliner Umland städtischer Bereich": "Y = 7E-07 x² - 0,0011 x + 1,2046   (R² = 0,1005)",
+          "Berliner Umland ländlicher Bereich":  "Y = -0,108 ln(x) + 1,5896          (R² = 0,0462)",
+          "weiterer Metropolenraum":             "Y = 3,502 x^-0,235                 (R² = 0,0617)"
+        }
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Oberhavel, gegliedert in drei Regionen",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "gsflaeche_qm": { "min": 205, "max": 2248 },
+          "bgf_qm":       { "min": 96,  "max": 480 },
+          "baujahr":      { "min": 1900, "max": 2021 },
+          "rnd_jahre":    { "min": 21, "max": 76 }
+        },
+        "vorbehalt": "SEHR GERINGE STATISTISCHE SICHERHEIT, UND DER BERICHT SAGT ES SELBST: „Die ermittelten Sachwertfaktoren weisen zum Teil nur eine sehr geringe statistische Sicherheit auf. Ergänzend wird deshalb empfohlen, im konkreten Bewertungsfall eine Auskunft zu Vergleichskaufpreisen zu beantragen, um auf dieser Grundlage bezogen auf den konkreten Bewertungsfall Sachwertfaktoren zu ermitteln. Gleiches gilt für vorläufige Sachwerte außerhalb der untersuchten Spannen.\"\n\nDie Bestimmtheitsmaße reichen von 0,0056 bis 0,2541 — im städtischen Bereich erklärt das Modell weniger als ein Prozent der Streuung. Das ist kein Rechenfehler, sondern die Aussage des Ausschusses über seinen eigenen Markt: der Sachwertfaktor hängt dort kaum vom vorläufigen Sachwert ab.\n\nDESHALB STUFE C, obwohl die Quelle amtlich und die Tabelle vollständig ist.",
+        "hinweis": "Die Sachwertfaktoren haben sich innerhalb des Untersuchungszeitraums nicht signifikant geändert."
+      },
+
+      "stufe": "C",
+      "stufe_grund": "Amtliche Tabelle mit vollständigem Modellvermerk, aber der Bericht bescheinigt den Faktoren selbst „zum Teil nur eine sehr geringe statistische Sicherheit\" und empfiehlt, im Einzelfall eine Auskunft zu Vergleichskaufpreisen zu beantragen. Bestimmtheitsmaße 0,0056 bis 0,2541.",
+      "fallzahl": null,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 Landkreis Oberhavel, Tabelle 12a (S. 74) und Tabelle 12b (S. 75): Sachwertfaktoren nach Region und vorläufigem Sachwert, dazu die BGF-Korrektur je Region. Beide sind laut Bericht gleichzeitig anzuwenden."
+    }
+  ]
+}

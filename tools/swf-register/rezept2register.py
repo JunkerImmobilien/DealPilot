@@ -131,6 +131,10 @@ KORREKTUR_ARTEN = {
     'linear':     {'art','feld','bez','a','b','wirkung',
                    'rundung_stellen','deckel_ab','deckel_wert','boden_ab','boden_wert'},
     'kategorial': {'art','feld','bez','werte','wirkung','rundung_stellen'},
+    # v1100-WK2D: eine Korrektur, die von einer ZAHL und einer KATEGORIE
+    # abhaengt - Oberhavel druckt die BGF-Korrektur je Region anders ab.
+    'stufen_kategorial': {'art','feld','bez','kategorie_feld','stufen',
+                           'wirkung','rundung_stellen'},
 }
 
 
