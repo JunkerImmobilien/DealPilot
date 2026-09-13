@@ -4393,7 +4393,37 @@ Kalkulator, eine Antwort aus unserem Register — beide müssen zeichengleich
 sein. Das ersetzt das fehlende Anwendungsbeispiel vollwertig, weil beide
 Seiten dieselbe amtliche Quelle befragen.
 
+##### Was schon gemessen ist
+
+**Stichprobe: 213 Kauffälle** (erscheint erst, wenn beide Pflichtfelder
+gesetzt sind — vorher steht die Zahl nirgends).
+
+Drei Stützpunkte der Grundkurve, aus dem Kalkulator bzw. dem Tooltip:
+
+| Bodenrichtwert | vorläufiger Sachwert | Sachwertfaktor | Weg |
+|---|---|---|---|
+| 40 €/m² | 100.000 € | **1,33** ± 0,21 | Kalkulator |
+| 130 €/m² | 250.000 € | **0,90** ± 0,21 | Kalkulator |
+| 200 €/m² | 250.000 € | **0,97** | Tooltip |
+
+Alle drei am Normobjekt (120 m² · 40 J. · Stufe 2,5). Die Standardabweichung
+ist **±0,21 und konstant** — die Modellbeschreibung sagt genau das: sie wird
+aus den Residuen ermittelt und hat je Funktion einen festen Wert.
+
+> **Warum hier Schluss war (13.09.2026):** Der Versuch, die Kurve in einer
+> Serie abzufragen, ist dreimal an einem Renderer-Timeout gescheitert —
+> `Page.captureScreenshot` bricht nach 30 s ab, während Tableau neu rechnet.
+> Das Fenster ließ sich auch nicht vergrößern (869 × 258 px sichtbar), und
+> der Ergebniswert steht **nicht** im Accessibility-Baum, sondern ist ins
+> Canvas gezeichnet — er ist nur über ein Bild lesbar.
+>
+> **Der Einzelabruf funktioniert zuverlässig, die Serie nicht.** Für einen
+> konkreten Gutachtenfall ist der Weg also brauchbar (Marcel hat ihn gestern
+> genau so benutzt); für die Ernte von 40 Stützpunkten × 12 Teilmärkten ×
+> n Ausschüssen ist er es nicht.
+
 ##### Was der nächste Durchgang braucht
+
 
 **Vierzig Messungen** (4 Bänder × 10 Stützpunkte) für einen Teilmarkt eines
 Ausschusses — per Tooltip, je Punkt ein Zeigen und ein Ablesen. Das ist für
