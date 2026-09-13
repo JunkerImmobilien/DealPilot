@@ -1,0 +1,126 @@
+{
+  "land_code": "BB",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Dahme-Spreewald",
+  "gaa_kennz": "12061",
+  "ags": ["12061"],
+  "ebene": "kreis",
+  "berichtsjahr": 2025,
+  "stichtag": "2025-01-01",
+  "auswertezeitraum": "2024 und 2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06-25",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_LDS.pdf",
+  "quelle_datei": "BB-dahme-spreewald-gmb-2025.pdf",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.3, Tabellen 8-9 und 8-10, S. 80 f. Regionsabgrenzung S. 73.",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhausgrundstücke",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "region",
+        "achse_k_bez": "Region im Landkreis Dahme-Spreewald",
+        "kategorien": ["bu_s", "bu_os", "wm"],
+        "zuordnung_feld": "ort",
+        "kategorie_sonst": "wm",
+        "kategorie_mehrdeutig": ["Königs Wusterhausen", "Schönefeld"],
+        "kategorie_zuordnung": {
+          "hinweis": "Der Bericht teilt GEMARKUNGSSCHARF (S. 73): zur S-Bahn-Region gehören Eichwalde, Schulzendorf, Wildau, Zeuthen sowie die Gemarkungen Königs Wusterhausen, Deutsch Wusterhausen, Schönefeld und Waßmannsdorf; die ÜBRIGEN Gemarkungen von Königs Wusterhausen und Schönefeld gehören zum Berliner Umland ohne S-Bahn, ebenso ganz Mittenwalde. Weil der Gemeindename „Königs Wusterhausen\" und „Schönefeld\" beide Regionen treffen kann, stehen sie unter kategorie_mehrdeutig und ergeben KEINEN Wert. Ihre Ortsteile sind einzeln zugeordnet.",
+          "bu_s": ["Eichwalde", "Schulzendorf", "Wildau", "Zeuthen",
+                   "Deutsch Wusterhausen", "Neue Mühle", "Waßmannsdorf"],
+          "bu_os": ["Mittenwalde", "Diepensee", "Kablow", "Kablow-Ziegelei",
+                    "Niederlehme", "Ziegenhals", "Senzig", "Wernsdorf", "Zeesen",
+                    "Körbiskrug", "Zernsdorf", "Uckley",
+                    "Großziethen", "Kiekebusch", "Selchow", "Waltersdorf",
+                    "Brusendorf", "Gallun", "Motzen", "Ragow", "Schenkendorf",
+                    "Telz"],
+          "wm": ["Lübben", "Lübbenau", "Luckau", "Golßen", "Baruth", "Baruth/Mark",
+                 "Zossen", "Wildau-Wentdorf", "Märkisch Buchholz", "Teupitz",
+                 "Bestensee", "Heidesee", "Halbe", "Münchehofe", "Schönwald",
+                 "Groß Köris", "Klasdorf", "Massow", "Krausnick-Groß Wasserburg",
+                 "Schlepzig", "Straupitz", "Alt Zauche-Wußwerk", "Byhleguhre-Byhlen",
+                 "Neu Zauche", "Schwielochsee", "Rietzneuendorf-Staakow",
+                 "Drahnsdorf", "Bersteland", "Steinreich", "Kasel-Golzig",
+                 "Unterspreewald", "Heideblick", "Jamlitz", "Lieberose", "Spreewaldheide"]
+        },
+        "modell_je_kategorie": {
+          "bu_s": {
+            "form": "baender_1d",
+            "achse_feld": "baujahr",
+            "achse_bez": "Baujahr",
+            "baender": [
+              { "von": null, "bis": 1948, "wert": 0.85, "bez": "bis 1948", "fallzahl": 52, "min": 0.57, "max": 1.28 },
+              { "von": 1949, "bis": 1989, "wert": 0.82, "bez": "1949 bis 1989", "fallzahl": 19, "min": 0.62, "max": 1.10 },
+              { "von": 1990, "bis": null, "wert": 0.95, "bez": "ab 1990", "fallzahl": 78, "min": 0.56, "max": 1.36 }
+            ],
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "Berliner Umland S-Bahn-Region, 149 Kauffälle. Die Sachwertfaktoren sind aus der Regressionsfunktion „Sachwertfaktor und Zeitverlauf\" auf den Stichtag 01.01.2025 abgeleitet."
+          },
+          "bu_os": {
+            "form": "baender_1d",
+            "achse_feld": "baujahr",
+            "achse_bez": "Baujahr",
+            "baender": [
+              { "von": null, "bis": 1948, "wert": 0.92, "bez": "bis 1948", "fallzahl": 27, "min": 0.63, "max": 1.39 },
+              { "von": 1949, "bis": 1989, "wert": 0.87, "bez": "1949 bis 1989", "fallzahl": 19, "min": 0.48, "max": 1.81 },
+              { "von": 1990, "bis": null, "wert": 1.03, "bez": "ab 1990", "fallzahl": 85, "min": 0.64, "max": 1.45 }
+            ],
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "Berliner Umland ohne S-Bahn-Region, 131 Kauffälle. Die Baujahresklasse 1949 bis 1989 streut von 0,48 bis 1,81 bei nur 19 Fällen."
+          },
+          "wm": {
+            "form": "baender_1d",
+            "achse_feld": "baujahr",
+            "achse_bez": "Baujahr",
+            "baender": [
+              { "von": null, "bis": 1948, "wert": 0.97, "bez": "bis 1948", "fallzahl": 47, "min": 0.31, "max": 1.47 },
+              { "von": 1949, "bis": 1989, "wert": 0.91, "bez": "1949 bis 1989", "fallzahl": 42, "min": 0.41, "max": 1.50 },
+              { "von": 1990, "bis": null, "wert": 1.01, "bez": "ab 1990", "fallzahl": 69, "min": 0.58, "max": 1.54 }
+            ],
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "Weiterer Metropolenraum, 158 Kauffälle. Der Bericht warnt für diesen Raum ausdrücklich: typische Einfamilienhausgrundstücke umfassen dort auch ältere Bebauungen, die „die dörfliche Bebauungsstruktur früherer Jahre mit landwirtschaftlicher Nebenerwerbsnutzung wiedergeben\" — die Spanne bei Baujahr bis 1948 reicht von 0,31 bis 1,47."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "DREI REGIONEN MAL DREI BAUJAHRESKLASSEN, neun abgedruckte Faktoren aus 438 Kauffällen. Die Klassen sind BÄNDER, keine Stützstellen: zwischen ihnen wird nicht interpoliert, weil der Bericht sie als Klassen abdruckt. Auffällig und im Bericht so gewollt: die mittlere Baujahresklasse (1949 bis 1989) trägt in allen drei Regionen den NIEDRIGSTEN Faktor.",
+        "normobjekt": "Sachwertfaktor abgeleitet aus der Regressionsfunktion „Sachwertfaktor und Zeitverlauf\" zum Stichtag 01.01.2025, Kauffälle der Jahre 2024 und 2025, nach ImmoWertV und VV EW-SW vom 03.05.2023."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
+        "stichtag": "01.01.2025",
+        "kauffaelle_gesamt": 438,
+        "ermittlung": "Ableitung über die Regressionsfunktion „Sachwertfaktor und Zeitverlauf\", getrennt nach Region und Baujahresklasse"
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Dahme-Spreewald, drei Regionen",
+        "sachlich": "freistehende Ein- und Zweifamilienhausgrundstücke",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "flaeche_qm_bu_s":  { "min": 313, "max": 1450, "hinweis": "rentierliche Grundstücksfläche" },
+          "flaeche_qm_bu_os": { "min": 222, "max": 1914 },
+          "flaeche_qm_wm":    { "min": 265, "max": 2119 },
+          "wohnflaeche_qm":   { "min": 44, "max": 257 },
+          "modernisierungsgrad": { "min": 0, "max": 18, "hinweis": "nach Anlage 2 ImmoWertV, 0 bis 20 möglich" }
+        },
+        "vorbehalt": "DER BERICHT SAGT ES SELBST: „Die abgeleiteten Sachwertfaktoren stellen einen Durchschnittswert dar und müssen auf die Eignung für die individuellen Grundstücksmerkmale des Bewertungsobjekts sachverständig geprüft und ggf. angepasst werden (vgl. § 39 ImmoWertV).\"\n\nDIE SPANNEN SIND SEHR WEIT: im weiteren Metropolenraum reicht die Baujahresklasse bis 1948 von 0,31 bis 1,47, im Berliner Umland ohne S-Bahn die Klasse 1949 bis 1989 von 0,48 bis 1,81 — bei 19 Kauffällen.\n\nDIE ZUORDNUNG ERFOLGT IM BERICHT ÜBER GEMARKUNGEN, hier über den Ortsnamen. Für Königs Wusterhausen und Schönefeld ist der Gemeindename deshalb gesperrt (kategorie_mehrdeutig): beide Gemeinden liegen mit einem Teil ihrer Gemarkungen in der S-Bahn-Region und mit dem anderen außerhalb. Wer für ein Objekt dort rechnet, muss die Region selbst benennen.",
+        "hinweis": "Der Bericht führt zusätzlich Sachwertfaktoren für Doppelhaushälften und Reihenendhäuser (8.3.3.1) sowie für Reihenmittelhäuser (8.3.3.2) — hier noch nicht erfasst. Der Anteil der Kauffälle mit werthaltigem Nebengebäude liegt je Klasse zwischen 0 und 42 Prozent; Nebengebäude sind im Modell also teilweise enthalten."
+      },
+
+      "stufe": "B",
+      "stufe_grund": "Amtliche Tabelle mit Fallzahlen, Spannen und beschreibenden Merkmalen je Klasse, aus 438 Kauffällen. Stufe B, weil kein Anwendungsbeispiel vorliegt und die Spannen je Klasse sehr weit sind.",
+      "fallzahl": 438,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 Landkreis Dahme-Spreewald, Tabelle 8-9, S. 80: neun Sachwertfaktoren für freistehende Ein- und Zweifamilienhausgrundstücke nach Region (BU S, BU oS, WM) und Baujahresklasse (bis 1948, 1949-1989, ab 1990) aus 438 Kauffällen der Jahre 2024 und 2025, Stichtag 01.01.2025."
+    }
+  ]
+}

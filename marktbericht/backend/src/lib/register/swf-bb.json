@@ -391,6 +391,276 @@
  },
  {
   "land_code": "BB",
+  "ags": "12061",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Dahme-Spreewald",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Dahme-Spreewald",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "verzweigt",
+   "achse_k_feld": "region",
+   "achse_k_bez": "Region im Landkreis Dahme-Spreewald",
+   "kategorien": [
+    "bu_s",
+    "bu_os",
+    "wm"
+   ],
+   "zuordnung_feld": "ort",
+   "kategorie_sonst": "wm",
+   "kategorie_mehrdeutig": [
+    "Königs Wusterhausen",
+    "Schönefeld"
+   ],
+   "kategorie_zuordnung": {
+    "hinweis": "Der Bericht teilt GEMARKUNGSSCHARF (S. 73): zur S-Bahn-Region gehören Eichwalde, Schulzendorf, Wildau, Zeuthen sowie die Gemarkungen Königs Wusterhausen, Deutsch Wusterhausen, Schönefeld und Waßmannsdorf; die ÜBRIGEN Gemarkungen von Königs Wusterhausen und Schönefeld gehören zum Berliner Umland ohne S-Bahn, ebenso ganz Mittenwalde. Weil der Gemeindename „Königs Wusterhausen\" und „Schönefeld\" beide Regionen treffen kann, stehen sie unter kategorie_mehrdeutig und ergeben KEINEN Wert. Ihre Ortsteile sind einzeln zugeordnet.",
+    "bu_s": [
+     "Eichwalde",
+     "Schulzendorf",
+     "Wildau",
+     "Zeuthen",
+     "Deutsch Wusterhausen",
+     "Neue Mühle",
+     "Waßmannsdorf"
+    ],
+    "bu_os": [
+     "Mittenwalde",
+     "Diepensee",
+     "Kablow",
+     "Kablow-Ziegelei",
+     "Niederlehme",
+     "Ziegenhals",
+     "Senzig",
+     "Wernsdorf",
+     "Zeesen",
+     "Körbiskrug",
+     "Zernsdorf",
+     "Uckley",
+     "Großziethen",
+     "Kiekebusch",
+     "Selchow",
+     "Waltersdorf",
+     "Brusendorf",
+     "Gallun",
+     "Motzen",
+     "Ragow",
+     "Schenkendorf",
+     "Telz"
+    ],
+    "wm": [
+     "Lübben",
+     "Lübbenau",
+     "Luckau",
+     "Golßen",
+     "Baruth",
+     "Baruth/Mark",
+     "Zossen",
+     "Wildau-Wentdorf",
+     "Märkisch Buchholz",
+     "Teupitz",
+     "Bestensee",
+     "Heidesee",
+     "Halbe",
+     "Münchehofe",
+     "Schönwald",
+     "Groß Köris",
+     "Klasdorf",
+     "Massow",
+     "Krausnick-Groß Wasserburg",
+     "Schlepzig",
+     "Straupitz",
+     "Alt Zauche-Wußwerk",
+     "Byhleguhre-Byhlen",
+     "Neu Zauche",
+     "Schwielochsee",
+     "Rietzneuendorf-Staakow",
+     "Drahnsdorf",
+     "Bersteland",
+     "Steinreich",
+     "Kasel-Golzig",
+     "Unterspreewald",
+     "Heideblick",
+     "Jamlitz",
+     "Lieberose",
+     "Spreewaldheide"
+    ]
+   },
+   "modell_je_kategorie": {
+    "bu_s": {
+     "form": "baender_1d",
+     "achse_feld": "baujahr",
+     "achse_bez": "Baujahr",
+     "baender": [
+      {
+       "von": null,
+       "bis": 1948,
+       "wert": 0.85,
+       "bez": "bis 1948",
+       "fallzahl": 52,
+       "min": 0.57,
+       "max": 1.28
+      },
+      {
+       "von": 1949,
+       "bis": 1989,
+       "wert": 0.82,
+       "bez": "1949 bis 1989",
+       "fallzahl": 19,
+       "min": 0.62,
+       "max": 1.1
+      },
+      {
+       "von": 1990,
+       "bis": null,
+       "wert": 0.95,
+       "bez": "ab 1990",
+       "fallzahl": 78,
+       "min": 0.56,
+       "max": 1.36
+      }
+     ],
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "Berliner Umland S-Bahn-Region, 149 Kauffälle. Die Sachwertfaktoren sind aus der Regressionsfunktion „Sachwertfaktor und Zeitverlauf\" auf den Stichtag 01.01.2025 abgeleitet."
+    },
+    "bu_os": {
+     "form": "baender_1d",
+     "achse_feld": "baujahr",
+     "achse_bez": "Baujahr",
+     "baender": [
+      {
+       "von": null,
+       "bis": 1948,
+       "wert": 0.92,
+       "bez": "bis 1948",
+       "fallzahl": 27,
+       "min": 0.63,
+       "max": 1.39
+      },
+      {
+       "von": 1949,
+       "bis": 1989,
+       "wert": 0.87,
+       "bez": "1949 bis 1989",
+       "fallzahl": 19,
+       "min": 0.48,
+       "max": 1.81
+      },
+      {
+       "von": 1990,
+       "bis": null,
+       "wert": 1.03,
+       "bez": "ab 1990",
+       "fallzahl": 85,
+       "min": 0.64,
+       "max": 1.45
+      }
+     ],
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "Berliner Umland ohne S-Bahn-Region, 131 Kauffälle. Die Baujahresklasse 1949 bis 1989 streut von 0,48 bis 1,81 bei nur 19 Fällen."
+    },
+    "wm": {
+     "form": "baender_1d",
+     "achse_feld": "baujahr",
+     "achse_bez": "Baujahr",
+     "baender": [
+      {
+       "von": null,
+       "bis": 1948,
+       "wert": 0.97,
+       "bez": "bis 1948",
+       "fallzahl": 47,
+       "min": 0.31,
+       "max": 1.47
+      },
+      {
+       "von": 1949,
+       "bis": 1989,
+       "wert": 0.91,
+       "bez": "1949 bis 1989",
+       "fallzahl": 42,
+       "min": 0.41,
+       "max": 1.5
+      },
+      {
+       "von": 1990,
+       "bis": null,
+       "wert": 1.01,
+       "bez": "ab 1990",
+       "fallzahl": 69,
+       "min": 0.58,
+       "max": 1.54
+      }
+     ],
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "Weiterer Metropolenraum, 158 Kauffälle. Der Bericht warnt für diesen Raum ausdrücklich: typische Einfamilienhausgrundstücke umfassen dort auch ältere Bebauungen, die „die dörfliche Bebauungsstruktur früherer Jahre mit landwirtschaftlicher Nebenerwerbsnutzung wiedergeben\" — die Spanne bei Baujahr bis 1948 reicht von 0,31 bis 1,47."
+    }
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "DREI REGIONEN MAL DREI BAUJAHRESKLASSEN, neun abgedruckte Faktoren aus 438 Kauffällen. Die Klassen sind BÄNDER, keine Stützstellen: zwischen ihnen wird nicht interpoliert, weil der Bericht sie als Klassen abdruckt. Auffällig und im Bericht so gewollt: die mittlere Baujahresklasse (1949 bis 1989) trägt in allen drei Regionen den NIEDRIGSTEN Faktor.",
+   "normobjekt": "Sachwertfaktor abgeleitet aus der Regressionsfunktion „Sachwertfaktor und Zeitverlauf\" zum Stichtag 01.01.2025, Kauffälle der Jahre 2024 und 2025, nach ImmoWertV und VV EW-SW vom 03.05.2023."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
+   "stichtag": "01.01.2025",
+   "kauffaelle_gesamt": 438,
+   "ermittlung": "Ableitung über die Regressionsfunktion „Sachwertfaktor und Zeitverlauf\", getrennt nach Region und Baujahresklasse"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Dahme-Spreewald, drei Regionen",
+   "sachlich": "freistehende Ein- und Zweifamilienhausgrundstücke",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "flaeche_qm_bu_s": {
+     "min": 313,
+     "max": 1450,
+     "hinweis": "rentierliche Grundstücksfläche"
+    },
+    "flaeche_qm_bu_os": {
+     "min": 222,
+     "max": 1914
+    },
+    "flaeche_qm_wm": {
+     "min": 265,
+     "max": 2119
+    },
+    "wohnflaeche_qm": {
+     "min": 44,
+     "max": 257
+    },
+    "modernisierungsgrad": {
+     "min": 0,
+     "max": 18,
+     "hinweis": "nach Anlage 2 ImmoWertV, 0 bis 20 möglich"
+    }
+   },
+   "vorbehalt": "DER BERICHT SAGT ES SELBST: „Die abgeleiteten Sachwertfaktoren stellen einen Durchschnittswert dar und müssen auf die Eignung für die individuellen Grundstücksmerkmale des Bewertungsobjekts sachverständig geprüft und ggf. angepasst werden (vgl. § 39 ImmoWertV).\"\n\nDIE SPANNEN SIND SEHR WEIT: im weiteren Metropolenraum reicht die Baujahresklasse bis 1948 von 0,31 bis 1,47, im Berliner Umland ohne S-Bahn die Klasse 1949 bis 1989 von 0,48 bis 1,81 — bei 19 Kauffällen.\n\nDIE ZUORDNUNG ERFOLGT IM BERICHT ÜBER GEMARKUNGEN, hier über den Ortsnamen. Für Königs Wusterhausen und Schönefeld ist der Gemeindename deshalb gesperrt (kategorie_mehrdeutig): beide Gemeinden liegen mit einem Teil ihrer Gemarkungen in der S-Bahn-Region und mit dem anderen außerhalb. Wer für ein Objekt dort rechnet, muss die Region selbst benennen.",
+   "hinweis": "Der Bericht führt zusätzlich Sachwertfaktoren für Doppelhaushälften und Reihenendhäuser (8.3.3.1) sowie für Reihenmittelhäuser (8.3.3.2) — hier noch nicht erfasst. Der Anteil der Kauffälle mit werthaltigem Nebengebäude liegt je Klasse zwischen 0 und 42 Prozent; Nebengebäude sind im Modell also teilweise enthalten."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 Landkreis Dahme-Spreewald, Tabelle 8-9, S. 80: neun Sachwertfaktoren für freistehende Ein- und Zweifamilienhausgrundstücke nach Region (BU S, BU oS, WM) und Baujahresklasse (bis 1948, 1949-1989, ab 1990) aus 438 Kauffällen der Jahre 2024 und 2025, Stichtag 01.01.2025."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtliche Tabelle mit Fallzahlen, Spannen und beschreibenden Merkmalen je Klasse, aus 438 Kauffällen. Stufe B, weil kein Anwendungsbeispiel vorliegt und die Spannen je Klasse sehr weit sind.",
+  "fallzahl": 438,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_LDS.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.3, Tabellen 8-9 und 8-10, S. 80 f. Regionsabgrenzung S. 73."
+ },
+ {
+  "land_code": "BB",
   "ags": "12062",
   "ebene": "kreis",
   "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Elbe-Elster",
@@ -1521,6 +1791,270 @@
   "verwendung": "produkt",
   "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
   "fundstelle": "Kap. 8.2.2, S. 58. Zuordnung der Gemarkungen zu den Regionstypen S. 12 f. Modellansatz im Anhang."
+ },
+ {
+  "land_code": "BB",
+  "ags": "12068",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Ostprignitz-Ruppin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Ostprignitz-Ruppin",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "verzweigt",
+   "achse_k_feld": "lagetyp",
+   "achse_k_bez": "Lagetyp im Landkreis Ostprignitz-Ruppin",
+   "kategorien": [
+    "neuruppin",
+    "staedte",
+    "doerfer"
+   ],
+   "zuordnung_feld": "ort",
+   "kategorie_sonst": "doerfer",
+   "kategorie_zuordnung": {
+    "hinweis": "Der Bericht wertet getrennt nach Neuruppin/Alt Ruppin, den übrigen Städten und den Dörfern aus. Amtsfreie Städte sind Neuruppin, Kyritz, Wittstock/Dosse und Rheinsberg; dazu kommen die Städte Neustadt (Dosse) und Lindow (Mark) in den Ämtern. Alles Übrige sind Dörfer.",
+    "neuruppin": [
+     "Neuruppin",
+     "Alt Ruppin"
+    ],
+    "staedte": [
+     "Kyritz",
+     "Wittstock",
+     "Wittstock/Dosse",
+     "Rheinsberg",
+     "Neustadt",
+     "Neustadt (Dosse)",
+     "Lindow",
+     "Lindow (Mark)"
+    ],
+    "doerfer": [
+     "Fehrbellin",
+     "Heiligengrabe",
+     "Wusterhausen",
+     "Wusterhausen/Dosse",
+     "Temnitzquell",
+     "Temnitztal",
+     "Walsleben",
+     "Storbeck-Frankendorf",
+     "Märkisch Linden",
+     "Dabergotz",
+     "Sieversdorf-Hohenofen",
+     "Breddin",
+     "Dreetz",
+     "Stüdenitz-Schönermark",
+     "Zernitz-Lohm",
+     "Gumtow",
+     "Rüthnick",
+     "Vielitzsee",
+     "Herzberg (Mark)",
+     "Kränzlin"
+    ]
+   },
+   "modell_je_kategorie": {
+    "neuruppin": {
+     "form": "konstante",
+     "wert": 1.09,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "20 Kauffälle 2025, Spanne 0,90 bis 1,25. Stichprobe: Grundstücke 330 bis 1.887 m² (Ø 798), Restnutzungsdauer 21 bis 75 Jahre (Ø 44), Baujahre 1908 bis 2020 (Ø 1975), BGF 122 bis 801 m² (Ø 296), Wohnfläche 69 bis 278 m² (Ø 147), Standardstufe 2 bis 4 (Ø 3)."
+    },
+    "staedte": {
+     "form": "konstante",
+     "wert": 1.07,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "39 Kauffälle 2025, Spanne 0,69 bis 1,37. Stichprobe: Grundstücke 166 bis 3.354 m² (Ø 1.175), Restnutzungsdauer 21 bis 64 Jahre (Ø 40), Baujahre 1837 bis 2009 (Ø 1967), BGF 96 bis 426 m² (Ø 255), Wohnfläche 67 bis 215 m² (Ø 130)."
+    },
+    "doerfer": {
+     "form": "konstante",
+     "wert": 1.0,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "95 Kauffälle 2025 — die mit Abstand größte der drei Stichproben."
+    }
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "DREI LAGETYPEN, DREI MITTELWERTE. Der Bericht führt die Reihe seit 2020/2021 fort und zeigt für alle drei Lagen denselben Verlauf: Höhepunkt 2022, danach Rückgang (Neuruppin 1,22 auf 1,09, Städte 1,13 auf 1,07, Dörfer 1,13 auf 1,00). Hier stehen die Werte des Zeitraums 2025.",
+   "normobjekt": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert. Modellansätze nach ImmoWertV 2021 (Anlage 13.3 des Berichts) und VV EW-SW vom 03.05.2023. Verkaufsobjekte besichtigt, fotografisch erfasst und mit dem Liegenschaftskataster abgeglichen."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV 2021 und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) vom 03.05.2023",
+   "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
+   "ermittlung": "arithmetisches Mittel je Lagetyp und Jahrgang aus Verträgen, die nicht älter als drei Jahre sind",
+   "kauffaelle_gesamt": 154
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Ostprignitz-Ruppin, drei Lagetypen",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "flaeche_qm": {
+     "min": 166,
+     "max": 3354
+    },
+    "rnd_jahre": {
+     "min": 21,
+     "max": 75
+    },
+    "baujahr": {
+     "min": 1837,
+     "max": 2020
+    },
+    "bgf_qm": {
+     "min": 96,
+     "max": 801
+    },
+    "wohnflaeche_qm": {
+     "min": 67,
+     "max": 278
+    },
+    "standardstufe": {
+     "min": 2,
+     "max": 4
+    }
+   },
+   "vorbehalt": "DIE ZUORDNUNG IST HIER UNSCHÄRFER ALS ANDERSWO. Der Bericht unterscheidet Städte und Dörfer, aber die Stadtgemeinden des Landkreises sind flächenmäßig riesig — fünf von ihnen gehören zu den hundert flächengrößten Gemeinden Deutschlands — und umfassen zahlreiche Dörfer. Eine Adresse in einem Ortsteil von Rheinsberg oder Wittstock ist der Sache nach ein Dorf, trägt aber oft den Stadtnamen. Der Unterschied beträgt sieben Prozent (1,07 gegen 1,00). WER DIE LAGE GENAU KENNT, sollte den Lagetyp selbst setzen.\n\nDIE MITTELWERTE SIND KONSTANTEN. Abhängigkeiten vom vorläufigen Sachwert, vom Baujahr oder von der Standardstufe führt der Bericht für 2025 nicht auf; die Spannen reichen von 0,69 bis 1,37.",
+   "hinweis": "Der Bericht führt die Zeitreihe seit 2020/2021 mit Fallzahlen fort. Ältere Jahrgänge stehen für Wertermittlungen auf zurückliegende Stichtage zur Verfügung: Neuruppin 1,13 / 1,16 / 1,22 / 1,10 / 1,10 · Städte 1,10 / 1,14 / 1,13 / 1,04 / 1,08 · Dörfer 1,12 / 1,14 / 1,13 / 1,01 / 1,01."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 Landkreis Ostprignitz-Ruppin, Kap. 8.2.3, S. 36 f.: Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser im Zeitraum 2025 nach Lagetyp — Neuruppin/Alt Ruppin 1,09 (20 Kauffälle), Städte ohne Neuruppin 1,07 (39), Dörfer 1,00 (95)."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtliche Mittelwerte mit Fallzahlen und Stichprobenbeschreibung. Stufe C, weil es Konstanten ohne Abhängigkeit sind, die Spannen weit reichen (0,69 bis 1,37) und die Zuordnung Stadt/Dorf über den Ortsnamen bei den flächengroßen Stadtgemeinden des Landkreises unscharf bleibt.",
+  "fallzahl": 154,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_OPR.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.3, S. 36 ff. Modellansätze Anlage 13.3. Verwaltungsgliederung S. 12."
+ },
+ {
+  "land_code": "BB",
+  "ags": "12070",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Prignitz",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Prignitz",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "50000": 1.69,
+    "75000": 1.36,
+    "100000": 1.17,
+    "125000": 1.05,
+    "150000": 0.95,
+    "175000": 0.88,
+    "200000": 0.83,
+    "225000": 0.78,
+    "250000": 0.74,
+    "275000": 0.71,
+    "300000": 0.68,
+    "325000": 0.66,
+    "350000": 0.63,
+    "375000": 0.61,
+    "400000": 0.6
+   },
+   "rundung_stellen": 4,
+   "liefert": "faktor",
+   "hinweis": "NORMOBJEKT IST STANDARDSTUFE 2,5. Abweichungen werden über die Anpassungsfaktoren der Tabelle 49 berücksichtigt (0,66 bei Stufe 1,5 bis 1,32 bei Stufe 3,9) — das ist ein Drittel Unterschied und die stärkste Einzelwirkung dieses Modells. Der Bericht hat mit multipler Regression geprüft, ob Restnutzungsdauer, Bodenrichtwertniveau, Baujahr oder Grundstücksgröße wirken: alle vier wurden im Lauf der Regression AUSGESCHLOSSEN. Es bleiben vorläufiger Sachwert und Standardstufe.",
+   "normobjekt": "Freistehendes Ein- oder Zweifamilienhaus mit Standardstufe 2,5, gebraucht, kein Neubau, nicht im Außenbereich, Grundstück nicht übergroß."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "1.5": 0.66,
+     "1.7": 0.74,
+     "1.9": 0.81,
+     "2.1": 0.88,
+     "2.3": 0.94,
+     "2.5": 1.0,
+     "2.7": 1.05,
+     "2.9": 1.1,
+     "3.1": 1.15,
+     "3.3": 1.2,
+     "3.5": 1.24,
+     "3.7": 1.28,
+     "3.9": 1.32
+    },
+    "rundung_stellen": 2,
+    "hinweis": "Tabelle 49. Normstelle 2,5. Das Anwendungsbeispiel des Berichts rechnet 150.000 × 0,95 × 0,81 = 115.425 € für ein Objekt der Standardstufe 1,9."
+   }
+  ],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV in Verbindung mit der Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
+   "berechnungsmodell": "Sachwertfaktor = geeigneter Kaufpreis / vorläufiger Sachwert",
+   "ermittlung": "multiple Regressionsanalyse; geprüft und ausgeschlossen wurden Restnutzungsdauer, Bodenrichtwertniveau, Baujahr und Grundstücksgröße",
+   "bestimmtheitsmass": 0.29,
+   "kauffaelle_gesamt": 218,
+   "kauffaelle_bereinigt": 210,
+   "hinweis": "Die Modellansätze stehen in Anhang 13.5 und sind laut Bericht bei der Verkehrswertermittlung ZWINGEND anzusetzen (Modellkonformität). Keine Innenbesichtigung; Angaben der Käufer über Fragebogen nach § 197 BauGB, Gebäude von außen fotografiert."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Prignitz",
+   "sachlich": "gebrauchte freistehende Ein- und Zweifamilienhäuser; keine Neubauten, keine übergroßen Grundstücke, keine Außenbereichslagen",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwert_eur": {
+     "min": 50000,
+     "max": 400000
+    },
+    "brw_eur_qm": {
+     "min": 5,
+     "max": 80
+    },
+    "flaeche_qm": {
+     "min": 106,
+     "max": 3000,
+     "hinweis": "marktübliche Grundstücksgröße"
+    },
+    "baujahr": {
+     "min": 1780,
+     "max": 2023
+    },
+    "rnd_jahre": {
+     "min": 12,
+     "max": 79
+    },
+    "standardstufe": {
+     "min": 1.5,
+     "max": 3.9
+    }
+   },
+   "vorbehalt": "AUSSERHALB DES DEFINITIONSBEREICHS SAGT DER BERICHT ES SELBST: „Für vorläufige Sachwerte, die außerhalb des Definitionsbereiches in Abbildung 31 liegen, verfügt der Gutachterausschuss über kein ausreichendes Datenmaterial. Hier empfehlen wir im Bewertungsfall einen Abgleich mit tatsächlich gezahlten Kaufpreisen oder andere geeignete Plausibilitätsprüfungen.\" Unter 50.000 und über 400.000 Euro gibt es hier deshalb keinen Wert.\n\nDIE KURVE IST STEIL: von 1,69 bei 50.000 Euro auf 0,60 bei 400.000. Der Faktor fällt über die Spanne um zwei Drittel — in keinem anderen Kreis dieses Registers ist die Abhängigkeit vom vorläufigen Sachwert so stark ausgeprägt. Das Bestimmtheitsmaß liegt bei 0,29.\n\nDER BODENRICHTWERTBEREICH IST NIEDRIG: 5 bis 80 Euro je Quadratmeter.",
+   "hinweis": "Der Bericht führt zusätzlich Gebäudefaktoren je m² Wohnfläche (Kap. 8.2.3, § 20 ImmoWertV) — hier noch nicht erfasst."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 Landkreis Prignitz, Kap. 8.2.2, S. 56 f.: Abbildung 31 mit 15 Stützstellen von 50.000 bis 400.000 € vorläufigem Sachwert (1,69 bis 0,60) aus 210 ausreißerbereinigten Kauffällen der Jahre 2024 und 2025, Tabelle 49 mit 13 Anpassungsfaktoren für die Standardstufe, Tabelle 50 mit dem Anwendungsbeispiel."
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtliche Tabelle MIT ANWENDUNGSBEISPIEL (Tabelle 50): 150.000 € × 0,95 × 0,81 = 115.425 € für Standardstufe 1,9. Beide Schritte sind im Register nachgerechnet und zeichengleich. Damit ist der Prüfmaßstab des Dokuments erfüllt, nicht nur eine eigene Nachrechnung.",
+  "fallzahl": 210,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_PR.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, S. 56 f. Abbildung 31, Tabelle 49, Anwendungsbeispiel Tabelle 50. Modellansätze Anhang 13.5."
  },
  {
   "land_code": "BB",

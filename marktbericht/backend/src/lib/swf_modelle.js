@@ -891,7 +891,33 @@ function kategorieAus(m, e) {
     return { wert: String(treffer.kategorie).toLowerCase(), ueber: feldZ };
   }
 
+  /* v1104-WMEHRD - NAMEN, DIE AUSDRUECKLICH KEINEN WERT ERGEBEN.
+
+     Dahme-Spreewald teilt zwei Gemeinden GEMARKUNGSSCHARF: die
+     Gemarkungen Koenigs Wusterhausen und Deutsch Wusterhausen gehoeren
+     zur S-Bahn-Region, die uebrigen Gemarkungen derselben Stadt nicht;
+     bei Schoenefeld ebenso. Der Gemeindename allein sagt also nichts.
+
+     Ohne diese Liste faenden solche Namen den Weg in die Restkategorie
+     und bekaemen den Faktor des weiteren Metropolenraums - fuer ein
+     Grundstueck im Berliner Umland. Die Restkategorie ist fuer das
+     gedacht, was der Bericht NICHT aufzaehlt, nicht fuer das, was er
+     feiner aufteilt, als die Anfrage es hergibt.
+
+     Diese Pruefung steht VOR der Zuordnung: ein mehrdeutiger Name
+     gewinnt gegen jede Liste. */
+  const mehrdeutig = m.kategorie_mehrdeutig;
+  if (Array.isArray(mehrdeutig) && mehrdeutig.length) {
+    const feldM = m.zuordnung_feld || 'altbezirk';
+    const vM = String(e[feldM] ?? '').toLowerCase().trim();
+    if (vM && mehrdeutig.some((x) => String(x).toLowerCase().trim() === vM)) {
+      return { wert: '', ueber: feldM, bekannt_aber_ohne_wert: true,
+               mehrdeutig: true };
+    }
+  }
+
   const zu = m.kategorie_zuordnung;
+
   if (!zu) return { wert: '', ueber: null };
   const feld = m.zuordnung_feld || 'altbezirk';
   const v = String(e[feld] ?? '').toLowerCase().trim();

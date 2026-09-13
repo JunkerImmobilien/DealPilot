@@ -1,0 +1,89 @@
+{
+  "land_code": "BB",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Prignitz",
+  "gaa_kennz": "12070",
+  "ags": ["12070"],
+  "ebene": "kreis",
+  "berichtsjahr": 2025,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "01.01.2024 bis 31.12.2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06-25",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_PR.pdf",
+  "quelle_datei": "BB-prignitz-gmb-2025.pdf",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, S. 56 f. Abbildung 31, Tabelle 49, Anwendungsbeispiel Tabelle 50. Modellansätze Anhang 13.5.",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser",
+      "form": "stufen_1d",
+      "formel": {
+        "form": "stufen_1d",
+        "achse_feld": "sachwert",
+        "achse_bez": "vorläufiger Sachwert in Euro",
+        "stufen": {
+          "50000": 1.69, "75000": 1.36, "100000": 1.17, "125000": 1.05,
+          "150000": 0.95, "175000": 0.88, "200000": 0.83, "225000": 0.78,
+          "250000": 0.74, "275000": 0.71, "300000": 0.68, "325000": 0.66,
+          "350000": 0.63, "375000": 0.61, "400000": 0.60
+        },
+        "rundung_stellen": 4,
+        "liefert": "faktor",
+        "hinweis": "NORMOBJEKT IST STANDARDSTUFE 2,5. Abweichungen werden über die Anpassungsfaktoren der Tabelle 49 berücksichtigt (0,66 bei Stufe 1,5 bis 1,32 bei Stufe 3,9) — das ist ein Drittel Unterschied und die stärkste Einzelwirkung dieses Modells. Der Bericht hat mit multipler Regression geprüft, ob Restnutzungsdauer, Bodenrichtwertniveau, Baujahr oder Grundstücksgröße wirken: alle vier wurden im Lauf der Regression AUSGESCHLOSSEN. Es bleiben vorläufiger Sachwert und Standardstufe.",
+        "normobjekt": "Freistehendes Ein- oder Zweifamilienhaus mit Standardstufe 2,5, gebraucht, kein Neubau, nicht im Außenbereich, Grundstück nicht übergroß."
+      },
+      "korrekturen": [
+        {
+          "bez": "Abweichende Standardstufe",
+          "feld": "standardstufe",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "1.5": 0.66, "1.7": 0.74, "1.9": 0.81, "2.1": 0.88, "2.3": 0.94,
+            "2.5": 1.00, "2.7": 1.05, "2.9": 1.10, "3.1": 1.15, "3.3": 1.20,
+            "3.5": 1.24, "3.7": 1.28, "3.9": 1.32
+          },
+          "rundung_stellen": 2,
+          "hinweis": "Tabelle 49. Normstelle 2,5. Das Anwendungsbeispiel des Berichts rechnet 150.000 × 0,95 × 0,81 = 115.425 € für ein Objekt der Standardstufe 1,9."
+        }
+      ],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV in Verbindung mit der Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
+        "berechnungsmodell": "Sachwertfaktor = geeigneter Kaufpreis / vorläufiger Sachwert",
+        "ermittlung": "multiple Regressionsanalyse; geprüft und ausgeschlossen wurden Restnutzungsdauer, Bodenrichtwertniveau, Baujahr und Grundstücksgröße",
+        "bestimmtheitsmass": 0.29,
+        "kauffaelle_gesamt": 218,
+        "kauffaelle_bereinigt": 210,
+        "hinweis": "Die Modellansätze stehen in Anhang 13.5 und sind laut Bericht bei der Verkehrswertermittlung ZWINGEND anzusetzen (Modellkonformität). Keine Innenbesichtigung; Angaben der Käufer über Fragebogen nach § 197 BauGB, Gebäude von außen fotografiert."
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Prignitz",
+        "sachlich": "gebrauchte freistehende Ein- und Zweifamilienhäuser; keine Neubauten, keine übergroßen Grundstücke, keine Außenbereichslagen",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwert_eur":   { "min": 50000, "max": 400000 },
+          "brw_eur_qm":     { "min": 5, "max": 80 },
+          "flaeche_qm":     { "min": 106, "max": 3000, "hinweis": "marktübliche Grundstücksgröße" },
+          "baujahr":        { "min": 1780, "max": 2023 },
+          "rnd_jahre":      { "min": 12, "max": 79 },
+          "standardstufe":  { "min": 1.5, "max": 3.9 }
+        },
+        "vorbehalt": "AUSSERHALB DES DEFINITIONSBEREICHS SAGT DER BERICHT ES SELBST: „Für vorläufige Sachwerte, die außerhalb des Definitionsbereiches in Abbildung 31 liegen, verfügt der Gutachterausschuss über kein ausreichendes Datenmaterial. Hier empfehlen wir im Bewertungsfall einen Abgleich mit tatsächlich gezahlten Kaufpreisen oder andere geeignete Plausibilitätsprüfungen.\" Unter 50.000 und über 400.000 Euro gibt es hier deshalb keinen Wert.\n\nDIE KURVE IST STEIL: von 1,69 bei 50.000 Euro auf 0,60 bei 400.000. Der Faktor fällt über die Spanne um zwei Drittel — in keinem anderen Kreis dieses Registers ist die Abhängigkeit vom vorläufigen Sachwert so stark ausgeprägt. Das Bestimmtheitsmaß liegt bei 0,29.\n\nDER BODENRICHTWERTBEREICH IST NIEDRIG: 5 bis 80 Euro je Quadratmeter.",
+        "hinweis": "Der Bericht führt zusätzlich Gebäudefaktoren je m² Wohnfläche (Kap. 8.2.3, § 20 ImmoWertV) — hier noch nicht erfasst."
+      },
+
+      "stufe": "A",
+      "stufe_grund": "Amtliche Tabelle MIT ANWENDUNGSBEISPIEL (Tabelle 50): 150.000 € × 0,95 × 0,81 = 115.425 € für Standardstufe 1,9. Beide Schritte sind im Register nachgerechnet und zeichengleich. Damit ist der Prüfmaßstab des Dokuments erfüllt, nicht nur eine eigene Nachrechnung.",
+      "fallzahl": 210,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 Landkreis Prignitz, Kap. 8.2.2, S. 56 f.: Abbildung 31 mit 15 Stützstellen von 50.000 bis 400.000 € vorläufigem Sachwert (1,69 bis 0,60) aus 210 ausreißerbereinigten Kauffällen der Jahre 2024 und 2025, Tabelle 49 mit 13 Anpassungsfaktoren für die Standardstufe, Tabelle 50 mit dem Anwendungsbeispiel."
+    }
+  ]
+}
