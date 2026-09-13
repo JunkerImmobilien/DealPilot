@@ -15799,6 +15799,104 @@ Gefunden nur, weil die Nachmessung `markierteEntscheidungen: 0` sagte.
 `974cadf` v1369 · v1369b und v1369c im selben Zug
 
 
+## v1370 · B5 und B8 — die Meldung an den Nutzer und die an den Admin
+
+### B5 · Wenn das Kontingent voll ist, soll man es erfahren
+
+Das Sicherheitsereignis schreibt das Backend seit `v1367`. Was fehlte,
+war die **sichtbare** Meldung: bei HTTP 429 warf `Auth.apiCall` einen
+Fehler, und ob der ankam, hing vom Aufrufer ab. Meist passierte schlicht
+nichts — ein Knopf tat nichts, eine Liste blieb leer, und niemand wusste
+warum.
+
+**Der Ton ist dabei die eigentliche Arbeit.** Das System sperrt niemanden
+von selbst (`v1369`) — also darf die Meldung auch nicht so klingen, als
+stünde etwas bevor:
+
+> **Kurz durchatmen**
+> Du hast gerade sehr viele Anfragen in kurzer Zeit gestellt. DealPilot
+> bremst das automatisch ab, damit der Dienst für alle schnell bleibt.
+> *In etwa 45 Sekunden geht es normal weiter. Es passiert nichts weiter —
+> deinem Konto entsteht kein Nachteil.*
+
+Kein Vorwurf, keine Drohung, kein Hinweis auf Folgen, die es nicht gibt.
+**Wer diese Meldung sieht, hat in aller Regel einfach zügig gearbeitet.**
+
+Und sie erscheint **einmal**, nicht zehnmal: bei vollem Kontingent laufen
+oft zehn Anfragen gleichzeitig ins Limit. Zehn Meldungen übereinander
+wären eine Bestrafung für etwas, das keine ist.
+
+Der Handler legt sich um `Auth.apiCall` — **dasselbe Muster wie der
+401-Handler** (V156), damit es nur einen Ort gibt, an dem solche Antworten
+behandelt werden.
+
+### B8 · Adminbenachrichtigung
+
+Beobachtungen zu sammeln setzt voraus, dass jemand hinsieht. **Wer nachts
+um drei ausgelesen wird, erfährt es sonst am Montag.**
+
+Zwei Anlässe lösen eine Mail aus:
+
+| | |
+|---|---|
+| berechnete Stufe erreicht **WARNUNG** oder **HOHES RISIKO** | mit Ruhefenster (6 h je Konto) |
+| ein Mensch hat **eingeschränkt oder gesperrt** | ohne Ruhefenster |
+
+**„Auffällig" ausdrücklich nicht.** Diese Stufe erreicht jeder, der einmal
+zu schnell klickt — eine Mail dafür wäre nach drei Tagen Tapete, und dann
+liest auch die wichtige niemand mehr.
+
+**Geprüft wird nur an den Schwellen** (bei der 20. und 50.
+Überschreitung). Bei jeder Überschreitung nachzurechnen würde zwei
+Datenbankabfragen kosten — bei tausend Anfragen also zweitausend. Die
+Benachrichtigung wäre teurer als der Vorgang, den sie meldet, und würde
+das Problem verschlimmern.
+
+Der Mailtext berichtet **Zahlen und nennt den Maßstab daneben**. Er
+fordert nichts und schlägt nichts vor, und er sagt ausdrücklich:
+
+> *Das System hat NICHTS gesperrt und wird auch nichts sperren; jede
+> Einschränkung setzt ein Mensch.*
+
+Spam-Schutz über `app_alerts` — dieselbe Tabelle und dasselbe Muster wie
+`creditAlert.js` (v554).
+
+### Abnahme
+
+```
+B5  Handler geladen, Auth.apiCall umschlossen
+    Meldung erscheint, Text und Ton geprüft
+    drei Aufrufe hintereinander -> genau EINE Meldung
+    schließbar, verschwindet von selbst
+
+B8  'auffaellig' -> gesendet: false     (die Kernregel)
+    'normal'     -> gesendet: false
+    Empfänger info@dealpilot.immo · Ruhefenster 360 Minuten
+```
+
+> **Was ich bewusst nicht getestet habe:** den tatsächlichen Mailversand
+> bei WARNUNG oder HOHES RISIKO. Das hätte eine echte Mail ausgelöst, und
+> Nachrichten verschicke ich nicht ungefragt — auch nicht an die eigene
+> Betreiberadresse. Der Versandweg ist derselbe wie bei `creditAlert.js`
+> und dort seit v554 in Betrieb. Marcel kann eine Probemail auslösen
+> lassen, wenn er sie sehen will.
+
+### Ein Test, der schlecht gestellt war
+
+Der erste Entprellungstest meldete **null Meldungen statt einer**. Grund:
+die vorherige Meldung lief noch in ihrer Ruhephase, und die drei neuen
+Aufrufe fielen genau hinein. **Das war korrektes Verhalten** — mein Test
+hat den Zustand aus dem vorigen Prüflauf nicht berücksichtigt.
+
+Nach dem Neuladen stimmte es. Die Falle steht seit Langem in der
+Werkzeugnotiz: *Zustand aus dem vorigen Prüflauf verfälscht die nächste
+Messung.*
+
+### Commits
+
+`v1370` — B5 und B8 in einem Zug
+
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
