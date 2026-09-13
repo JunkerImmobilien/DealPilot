@@ -115,7 +115,13 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                             /* v1098d: Sachwertfaktoren Kassel (Hessen), Jahrgang 2024.
                                dl-de/zero-2-0 - der Bericht sagt woertlich "ohne
                                Einschraenkung oder Bedingung". */
-                            'swf-he.json'];
+                            'swf-he.json',
+                            /* v1098g: Sachwertfaktoren Landkreis Wolfenbüttel.
+                               Niedersachsen fuehrt seine Faktoren als Tableau-
+                               Kalkulator, nicht als Tabelle im PDF — die Werte
+                               sind einzeln am Kalkulator abgefragt. dl-de/by-2-0,
+                               Quellenvermerk ist Pflicht. */
+                            'swf-ni.json'];
 
 export function ladeSaat(dateien = SAATDATEIEN) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])
