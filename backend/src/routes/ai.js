@@ -360,7 +360,97 @@ router.post('/lage', authenticate, plzValidator.middleware, /* V229: PLZ-Halluzi
  *
  * Response: { suggestions: { fieldId: { value, reasoning } } }
  */
-router.post('/ds2-suggest', authenticate, /* V186: kein requireUnderLimit, AI-Credits ist Wahrheit */ async (req, res, next) => {
+/* ══════════════════════════════════════════════════════════════════════
+   v1374 (B21) · DIE QUICK-CHECK-ANALYSE LAEUFT UEBER DEN SERVER
+   ══════════════════════════════════════════════════════════════════════
+   Punkt B21: `quickcheck-app.html` rief `api.openai.com` DIREKT aus dem
+   Browser auf - mit einem Schluessel, den der Nutzer in ein Feld tippt.
+   Drei Dinge waren daran falsch:
+
+     1. der Prompt stand im Klartext im ausgelieferten HTML
+     2. der Weg lief am Backend vorbei - an jeder Zaehlung, jedem Limit
+        und jedem Protokoll
+     3. ein API-Schluessel lag im Browserspeicher
+
+   Der Prompt steht jetzt hier. Er ist derselbe wie vorher - bewusst:
+   dieser Umbau soll den WEG aendern, nicht das ERGEBNIS. Wer ihn
+   spaeter verbessert, tut das an einer Stelle.
+
+   WARUM EIN EIGENER ENDPUNKT UND NICHT /analyze: der Quick-Check hat ein
+   anderes Datenformat (flache Eingaben statt Objektstruktur) und
+   erwartet eine andere Antwort (verdict/negotiate/pros/cons/opinion
+   statt der sieben Textbloecke). Beides in einen Endpunkt zu zwingen
+   haette eine Weiche gebraucht, die mit der Zeit zur zweiten Logik wird.
+   ══════════════════════════════════════════════════════════════════════ */
+router.post('/quickcheck-analyse', authenticate, dialogLimiter, async (req, res, next) => {
+  try {
+    const p = req.body || {};
+    const userApiKey = typeof p.userApiKey === 'string' && p.userApiKey.startsWith('sk-')
+      ? p.userApiKey : null;
+
+    const z = (v) => (v == null || v === '' ? null : Number(String(v).replace(',', '.')));
+    const eur = (v) => (v == null ? '?' : Math.round(v).toLocaleString('de-DE'));
+
+    const i = p.inputs || {};
+    const k = p.kpi || {};
+    const avm = p.avm || null;
+
+    if (!z(i.kp) || !z(i.nkm)) {
+      return res.status(400).json({ error: 'kp_oder_nkm_fehlt' });
+    }
+
+    /* Der Prompt. Frueher stand er in quickcheck-app.html ab Zeile 5299. */
+    const prompt = [
+      'Du bist ein Immobilien-Investment-Experte. Analysiere diesen Deal auf Deutsch.',
+      '',
+      'Eingaben:',
+      '- Objekt: ' + (i.objektart || '?') + ' in ' + (i.plz || '?') + ' ' + (i.ort || '')
+        + ', ' + (i.wfl || '?') + ' m2, Bj. ' + (i.bj || '?'),
+      '- Kaufpreis: ' + eur(z(i.kp)) + ' EUR',
+      '- Nettokaltmiete: ' + (i.nkm || '?') + ' EUR/Mon',
+      '- Hausgeld: ' + (i.hg || '?') + ' EUR/Mon',
+      '- Eigenkapital: ' + eur(z(i.ek)) + ' EUR, Zins: ' + (i.zins || '?')
+        + ' %, Tilgung: ' + (i.tilg || '?') + ' %',
+      '',
+      'Berechnete Kennzahlen: Bruttomietrendite ' + (k.bmr != null ? k.bmr : '?')
+        + ' %, Nettomietrendite ' + (k.nmr != null ? k.nmr : '?')
+        + ' %, Eigenkapitalrendite ' + (k.ekr != null ? k.ekr : '?')
+        + ' %, Cashflow ' + (k.cfMon != null ? k.cfMon : '?') + ' EUR/Mon',
+      'Score: ' + (p.score != null ? p.score : '?') + '/100'
+        + (p.label ? ' (' + p.label + ')' : ''),
+      avm && avm.marktwert
+        ? '\nMarktdaten eines unabhaengigen Bewertungspartners: Marktwert '
+          + eur(z(avm.marktwert)) + ' EUR'
+          + (avm.scoreLocation != null ? ', Lage ' + avm.scoreLocation + '/10' : '')
+        : '',
+      '',
+      'Antworte ALS JSON (keine Markdown-Codebloecke, nur reines JSON):',
+      '{',
+      '  "verdict": "Starker Kauf / Kauf moeglich / Vorsicht",',
+      '  "negotiate": "konkrete Verhandlungsempfehlung mit Prozent",',
+      '  "pros": ["Punkt 1", "Punkt 2", "Punkt 3", "Punkt 4"],',
+      '  "cons": ["Punkt 1", "Punkt 2", "Punkt 3"],',
+      '  "opinion": "Sachliche Experten-Meinung in 3-4 Saetzen"',
+      '}'
+    ].filter(Boolean).join('\n');
+
+    const roh = await openaiService.callOpenAI(prompt, {
+      userApiKey,
+      maxTokens: 900,
+      temperature: 0.5
+    });
+
+    const ergebnis = openaiService.extractJson(roh && roh.text ? roh.text : roh);
+    if (!ergebnis) return res.status(502).json({ error: 'antwort_nicht_lesbar' });
+
+    res.json({ analyse: ergebnis });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.post('/ds2-suggest', authenticate,
+ /* V186: kein requireUnderLimit, AI-Credits ist Wahrheit */ async (req, res, next) => {
   try {
     const payload = req.body || {};
     const userApiKey = typeof payload.userApiKey === 'string' && payload.userApiKey.startsWith('sk-')
