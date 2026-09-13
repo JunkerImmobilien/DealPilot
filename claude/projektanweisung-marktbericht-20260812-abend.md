@@ -3076,3 +3076,93 @@ gefahren.
 > **Eigenschaft**, fällt mit jedem fremden Rollout durch. Sie vergleicht jetzt
 > die `app.js`-Zeile der gepatchten Datei gegen die des Originals und bekommt
 > dafür den Originalpfad als zweites Argument.
+
+---
+
+## v1098 — Drei Korrekturarten, und die Ernte läuft wieder (13.09.2026)
+
+**Marcels Auftrag:** den Rechenkern erweitern, wenn es sinnvoll ist, dann so
+viel ernten wie möglich — alle Bundesländer, auch Vorjahre.
+
+### Der Rechenkern brauchte weniger als gedacht
+
+**Keine neue Modellform.** Der Auswerter kennt die Multiplikation seit v1093
+(`wirkung: multiplikativ`), samt Wächter und Rechenweg. Gefehlt haben nur drei
+**Korrekturarten** — bis dahin gab es zwei, beide Tabellen über eine Zahl:
+
+```
+potenz      (x / basis) ^ exponent, mit Deckel und Boden
+linear      a + b * x
+kategorial  Textschlüssel -> Wert (Stadtteil, Dachform, Stellung)
+```
+
+Damit ist Hamburg `konstante` 0,788 plus 18 multiplikative Korrekturen.
+
+> **Warum keine Stufentabelle:** eine Potenz als Stützstellen nachzubilden und
+> zwischen ihnen linear zu interpolieren ist an einer gekrümmten Kurve ein
+> Fehler, den niemand sieht — das Ergebnis bleibt plausibel.
+
+### Zwei Blocker im Werkzeug, beide gefunden statt vermutet
+
+1. **`land_code` stand hart auf `'NW'`.** Vierzehn Rezepte kamen aus NRW,
+   solange fiel es nicht auf. Das Hamburger Rezept wäre als
+   nordrhein-westfälisch ins Register gegangen.
+2. **Korrekturen liefen ungeprüft durch.** Ein Tippfehler in `art` hätte den
+   Auswerter in den `stufen`-Zweig fallen lassen — dort findet er keine Stufen
+   und liefert still keine Korrektur. Der Gegentest gegen die 14 NRW-Rezepte
+   zeigte sofort, dass `hinweis` in jeder Art erlaubt sein muss.
+
+Dazu: `rezept2register.py` schreibt jetzt **je Land eine Datei** und nennt sie
+am Ende seines Laufs — jede gehört in `SAATDATEIEN`.
+
+### Geerntet
+
+| Land | Stand |
+|---|---|
+| **Hamburg** | ✅ vollständig · `0,788 × 18 Faktoren` · rechnet im Register mit 0,7667 am Normobjekt |
+| **Kassel (HE)** | ✅ vollständig · zwei Matrizen, 144 Zellen · vier Tabellenwerte zeichengleich getroffen |
+| **Hessen landesweit** | ✅ erfasst, **Stufe C** · zwei Matrizen, 850 + 497 Kauffälle · wird bewusst ausgefiltert (Landeswert) |
+| **Niedersachsen** | Modell entschlüsselt, Lizenz frei, Grundkurve fehlt noch |
+| Mecklenburg-Vorpommern | ⛔ „Vervielfältigungen nur mit Genehmigung des Herausgebers" |
+| Frankfurt | ⛔ HTTP 403 plus Content-Signals in `robots.txt` |
+| Darmstadt | ⛔ Marktanpassungsfaktoren nur als **Streudiagramm**, keine Tabelle, keine Gleichung |
+
+**Registerstand:** 2163 Sätze, **57 Sachwertfaktoren** (vorher 52),
+1892 Tabellenzellen, 17 Ausschüsse.
+
+### Drei Dinge, die nur der echte Lauf gezeigt hat
+
+> **① Hamburg ist eine Gemeinde, kein Land.** Im Rezept stand `ebene: land` —
+> Hamburg *ist* ein Bundesland. Der Auflöser gab trotzdem
+> `kein_ausschuss_hinterlegt`. Ursache ist die Schutzregel aus v1085: ein Satz
+> auf Landesebene zählt beim Sachwertfaktor als kein Satz. Bei einem
+> Flächenland wäre das ein Mittel über viele Ausschüsse. Beim Stadtstaat ist
+> es der Wert des **einen** zuständigen Ausschusses — Berlin steht deshalb
+> seit v1085 als `gemeinde` mit AGS 11000000 im Register. Nachgesehen statt
+> geraten. **Nicht der Schutz war falsch, sondern meine Einordnung.**
+
+> **② Die Register-Dateien sind ins Image gebacken.** Ein `docker restart` lädt
+> die alte Fassung; es braucht `up -d --build`. Das kostete einen Prüflauf, bei
+> dem die Zahl schon richtig im Rezept stand.
+
+> **③ Zahlenbänder gab es im Auswerter längst.** Kassels Rezept trug den
+> Bodenrichtwertbereich als Kategorie und das Feld `brw` — der Auswerter las
+> die Zahl 250 als Kategorienamen. `kategorie_baender` existiert seit v1094
+> (gebaut für Wiesbaden), fehlte aber in der erlaubten Schlüsselliste des
+> Werkzeugs. Ein Rezept damit wäre am Werkzeug gescheitert, obwohl der
+> Auswerter es kann.
+
+### Was die Lizenzprüfung ergab
+
+**Die Lizenz ist der Flaschenhals, nicht die Technik.** Drei Muster:
+
+- **`dl-de/zero-2-0` im Wortlaut** (Kassel, Hessen): *„Jede Nutzung … ist ohne
+  Einschränkung oder Bedingung erlaubt … für kommerzielle und nicht
+  kommerzielle Nutzung."* Sofort verwertbar.
+- **Frei mit Quellenangabe** (Hamburg): *„Verwendung und Weiterverbreitung …
+  unter Angabe der Quelle gestattet."* Verwertbar, Quellenblock Pflicht (A2).
+- **Gesperrt** (Ludwigslust-Parchim): *„Vervielfältigungen sind nur mit
+  Genehmigung des Herausgebers gestattet."* Nicht übernehmen.
+
+**Commits.** `c713b68` · `ae0f494` · `26ec989` · `f83a1a7` · `945116d` ·
+`935a0d3`
