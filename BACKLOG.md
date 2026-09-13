@@ -252,7 +252,7 @@ Projektanweisung unter **v1332–v1337**.
 
 **Beide Reste erledigt (12.09.2026 abends):**
 
-1. **Sachwertfaktoren Braunschweig-Wolfsburg** — **beantwortet, nicht offen.**
+1. **Sachwertfaktoren Braunschweig-Wolfsburg** — **beantwortet, nicht offen.** **[ZURUECKGENOMMEN am 13.09.2026: das galt fuer den Jahrgang 2025. Fuer 2026 gibt es sie — Kalkulator `2026_sw_rh_bswf`, Datenbasis 01.01.2026. Siehe E2-NI im Workstream D.]**
    Der Grundstücksmarktbericht 2025 sagt auf S. 34 wörtlich: „Zu diesem Thema
    gibt es keine zusätzlichen regionalen Auswertungen des Gutachterausschusses
    Braunschweig-Wolfsburg.“ Es gibt sie nicht. Der Faktor 1,20–1,22 aus dem
@@ -4208,7 +4208,7 @@ robots-gesperrten selbst — siehe F):
 | 5 | **Rheinland-Pfalz** | nur Mainz frei (Vollbericht, SWF S. 49, LZS S. 64–94) | der Landesbericht trägt „Vervielfältigung nur mit Erlaubnis" — **Lizenzfrage vor Kaufentscheidung** |
 | 6 | **Mecklenburg-Vorpommern** | Ludwigslust-Parchim ist der einzige verwendbare Ausschuss | S. 63/65 |
 | 7 | **Schleswig-Holstein** | eine Anfrage öffnet **alle 15** Ausschüsse | F2 |
-| 8 | **Niedersachsen-Sachwertfaktoren** | liegen hinter Tableau-Dashboards, nicht im PDF | F2 (LGLN) |
+| 8 | **Niedersachsen-Sachwertfaktoren** | liegen hinter Tableau-Dashboards, nicht im PDF | ~~F2 (LGLN)~~ **ueberholt 13.09.2026 — die Lizenz erlaubt es bereits, siehe E2-NI unten** |
 
 **Gesperrt und nur über eine Anfrage erreichbar:** Sachsen (sechs Vermerke
 einzeln am Dokument gelesen, alle sperren die kommerzielle Verwertung) ·
@@ -4216,7 +4216,132 @@ Bremen · Saarland · Baden-Württemberg (dort zusätzlich **Darstellungsform** 
 Sachwertfaktoren als Streudiagramm **ohne Zahlentabelle und ohne Gleichung**,
 an sieben Ausschüssen belegt).
 
-#### E3 — Die Regeln, die bei jeder Ernte gelten
+
+### E2-NI · NIEDERSACHSEN — der Zugang ist offen, die Lizenz trägt
+
+**Gemessen am 13.09.2026**, ausgelöst durch Marcels Link auf
+`gag.niedersachsen.de` (er hat dort tags zuvor Werte für ein Gutachten geholt).
+
+#### Zwei Rücknahmen
+
+> **① Hier stand: „Niedersachsen-Sachwertfaktoren liegen hinter
+> Tableau-Dashboards, nicht im PDF → F2 (LGLN-Anfrage)".**
+> Das erste stimmt, das zweite nicht: **eine Anfrage ist nicht nötig.** Die
+> Grundstücksmarktdaten stehen unter **`dl-de/by-2-0`** — kommerzielle
+> Verwertung ausdrücklich erlaubt, Namensnennung Pflicht. Gemessen an der
+> eigenen Nutzungsbedingungsseite des Landes (`nutzungsbedingungen-197313`).
+>
+> Der geforderte Quellenvermerk lautet wörtlich:
+> ```
+> © Oberer Gutachterausschuss für Grundstückswerte Niedersachsen <Jahr>,
+> dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0),
+> https://immobilienmarkt.niedersachsen.de
+> ```
+> Zusätzlich zur Quellenangabe **ist die Internetadresse anzugeben** — das ist
+> eine eigene Auflage neben der Namensnennung. Gleiche Klasse wie Aurich und
+> Potsdam/Uckermark, also **A2 gilt auch hier**: ohne Quellenblock im Bericht
+> darf keine dieser Zahlen zum Kunden.
+
+> **② Hier stand (Liste vom 12.09.): „Sachwertfaktoren Braunschweig-Wolfsburg
+> — beantwortet, nicht offen. Es gibt sie nicht."**
+> Belegt war das mit dem Grundstücksmarktbericht **2025**, S. 34: „Zu diesem
+> Thema gibt es keine zusätzlichen regionalen Auswertungen." **Für den
+> Jahrgang 2026 gibt es sie.** Der Kalkulator `2026_sw_rh_bswf` ist genau
+> das: Sachwertfaktoren Braunschweig-Wolfsburg, Reihenhaus/Doppelhaushälfte,
+> Datenbasis 01.01.2026, veröffentlicht 02.03.2026.
+>
+> Der alte Satz war zum Zeitpunkt seiner Prüfung richtig. **Eine Aussage über
+> einen Jahrgang ist keine Aussage über die Zahl.** Das gehört als Regel in
+> jede Quellenzeile: nicht „gibt es nicht", sondern „gibt es im Jahrgang X
+> nicht".
+
+#### Was Niedersachsen anbietet (Jahrgang 2026, gemessen)
+
+**Beide Zielkennzahlen der Ernte, landesweit, in einem einheitlichen System:**
+
+| Kennzahl | Teilmärkte |
+|---|---|
+| **Liegenschaftszinssätze** | Büro · Eigentumswohnungen · Ein-/Zweifamilienhäuser · Mehrfamilienhaus · regional · Reihenhaus/DHH · Wohn-Geschäft · weitere — **8** |
+| **Sachwertfaktoren** | Ein-/Zweifamilienhäuser · Höfe · Reihenhaus/DHH · Wochenendhäuser — **4** |
+
+Dazu im selben System: Umrechnungskoeffizienten, Vergleichsfaktoren,
+Bodenwerte, Erbbaurecht, Indexreihen, mittlere Preise, Transaktionen.
+
+**Namenssystematik der Dashboards:** `<jahr>_<kennzahl>_<objektart>_<gebiet>`
+— `2026_sw_rh_bswf` (Sachwert · Reihenhaus · Braunschweig-Wolfsburg),
+`2026_lizi_mfh_nds` (Liegenschaftszins · Mehrfamilienhaus · **landesweit**).
+Die Ausschusswahl läuft über Navigations-Dashboards (`2026_sw_navi_*`).
+
+#### Was ein Dashboard liefert
+
+Kein statischer Wert, sondern ein **Kalkulator** mit fünf Eingängen und drei
+Korrekturkurven:
+
+```
+Eingang    Wertermittlungsstichtag · Bodenrichtwert [€/m²] ·
+           vorläufiger Sachwert [€] · Wohnfläche [m²] ·
+           Restnutzungsdauer [Jahre] · Standardstufe
+Ausgabe    Sachwertfaktor + Standardabweichung
+Kurven     Umrechnungskoeffizienten für abweichende Wohnfläche (0,95–1,10),
+           Restnutzungsdauer (0,80–1,00) und Standardstufe (0,80–1,20)
+Rahmen     Stichprobenübersicht mit Min/Max/Median je Merkmal
+```
+
+Für BSWF/Reihenhaus gemessen: BRW 20–310 €/m² · Wohnfläche 53–200 m² ·
+Standardstufe 1,4–4,5 · RND 12–80 J. · vorläufiger Sachwert 36.482–589.913 € ·
+Kaufzeitpunkte 11/2022 bis 11/2025.
+
+**Das ist dieselbe Bauform wie Höxter** (`matrix_interp` plus
+Stufenkorrekturen) — das Rezeptformat trägt es also bereits.
+
+#### Der Modellvermerk liegt bei, als PDF
+
+Je Ausschuss verlinkt das Dashboard eine Modellbeschreibung, z. B.
+`gag.niedersachsen.de/download/225530/bs_2026_sw_modellbeschreibung.pdf`.
+Mit `pdftotext -layout` vollständig lesbar. Sie nennt alles, was § 10
+ImmoWertV verlangt:
+
+```
+Verfahren          multiple Regression aus Kauffalluntersuchungen
+Gesamtnutzungsdauer  80 Jahre
+Alterswertminderung  linear (§ 38 ImmoWertV)
+Herstellungskosten   NHK 2010, Anlage 4 ImmoWertV, BPI Basis 2021=100
+Modernisierungsgrad  Nds. Erlass vom 16.01.2024, abweichend von ImmoWertA
+Bodenwert            BRW × Fläche × Umrechnungskoeffizient, nur rentierlich
+Außenanlagen         pauschal 5.000–20.000 €, Garagen 3.000–12.000 €
+Genauigkeitsmaß      Standardabweichung aus den Residuen, je Funktion konstant
+Selektion            ohne überdurchschnittliche Baumängel
+```
+
+**Kein Anwendungsbeispiel mit Zahlen.** Der Prüfmaßstab ist deshalb hier
+**der Kalkulator selbst**: eine Eingabe, die wir ihm geben, muss unser
+Register zeichengleich zurückgeben. Das ist ein anderer, aber gleichwertiger
+Prüfstand — und er gehört so dokumentiert, damit niemand ihn später für eine
+selbst gerechnete Zahl hält.
+
+#### Woran es hängt: der Datenabruf
+
+Drei Wege geprüft, keiner trägt allein:
+
+| Weg | Ergebnis |
+|---|---|
+| `…/dash.csv` und Varianten | HTTP 302 ins Leere |
+| Profil-API (`ogagmd2026`) | 404 — die alten Public-Endpunkte sind zu |
+| URL-Parameter (`?Sach=…&Brw=…`) | Werte **kommen an** (BRW, Sachwert, Standardstufe), aber Ergebnis und Diagramme bleiben leer — es fehlt die Teilmarkt-/Gebietsauswahl, die das Navigations-Dashboard setzt |
+| `tsConfigContainer` im HTML | leer, die Session wird per JS erzeugt — Bootstrap müsste nachgebaut werden |
+
+**Was bleibt:** der **Herunterladen**-Knopf im Dashboard selbst (Tableau
+bietet Daten als Crosstab an) — offiziell vorgesehen und von der Lizenz
+gedeckt. Er ist der nächste Schritt, gehört aber **einmal sauber gebaut**
+statt nebenbei: wenn er trägt, sind beide Kennzahlen für ein ganzes
+Bundesland erreichbar.
+
+**Aufwand-Einschätzung:** Niedersachsen führt heute **48 Registersätze**. Das
+System oben deckt beide Kennzahlen über alle Ausschüsse. Kein anderes
+Bundesland bietet so viel hinter einer einzigen, freien Lizenz — Hamburg
+eingeschlossen.
+ . 
+ . #### E3 — Die Regeln, die bei jeder Ernte gelten
 
 - **Lizenz und Inhaltsverzeichnis im ERSTEN Abruf zusammen lesen.** *Kiels
   Daten wären lesbar gewesen; die Lizenzprüfung kam zu spät.*
