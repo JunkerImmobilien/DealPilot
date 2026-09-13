@@ -100,8 +100,15 @@ ERLAUBT = {
 # der Art "alles mit _bez ist Doku" wuerde einen Tippfehler in einem
 # rechnenden Schluessel mit durchlassen, und der waere ein stiller Rueckfall
 # auf den Standardwert des Auswerters.
+# v1100c-WBED: `bedingungen` beschreibt den Anwendungsbereich, den der
+# Bericht selbst nennt (Uckermark: nur Bodenrichtwert ueber 30 EUR/qm).
+# Sie gilt formunabhaengig und wird VOR der Rechnung geprueft.
 DOKU = {'zellen_schluessel', 'jahrgang', 'ci', 'umrechnung', 'vorbehalt',
-        'kategorien_bez', 'normierung', 'quelle_hinweis', 'fundstelle'}
+        'kategorien_bez', 'normierung', 'quelle_hinweis', 'fundstelle',
+        # `bedingungen` RECHNET nicht, aber es SPERRT - und das ist kein
+        # Dokumentationsschluessel im eigentlichen Sinn. Es steht hier, weil
+        # es in jeder Form vorkommen darf; geprueft wird es im Auswerter.
+        'bedingungen'}
 
 EBENEN = {'gemeinde', 'kreis', 'bezirk', 'gaa', 'land', 'bund'}
 EINHEITEN = {'faktor', 'prozent', 'zuschlag_prozent', 'wert_eur'}

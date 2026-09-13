@@ -774,8 +774,61 @@ function kategorieAus(m, e) {
  * @returns {{verfuegbar:boolean, wert:number|null, tabellenwert?:number,
  *            korrekturen:Array, grund?:string, hinweis?:string, rechenweg?:string}}
  */
+/* ═══ v1100c-WBED · EINE BEDINGUNG AUF EINEM ZWEITEN FELD ═══════════════
+   GEFUNDEN an der Uckermark: der Bericht wertet Ein- und
+   Zweifamilienhaeuser nur fuer Bodenrichtwerte UEBER 30 EUR/qm aus. Die
+   Modellform `potenz` kennt genau eine Achse (den vorlaeufigen Sachwert)
+   und konnte das nicht pruefen.
+
+   Folge waere: wer fuer ein Objekt mit 20 EUR/qm rechnet, bekommt einen
+   Faktor — aus einer Auswertung, die fuer sein Objekt gar nicht gilt. Das
+   Ergebnis saehe plausibel aus. Genau die Fehlerklasse, gegen die dieses
+   Register gebaut ist.
+
+   `bedingungen` gilt fuer JEDE Modellform und wird VOR der Rechnung
+   geprueft. Sie beschreibt, was der Bericht ueber seinen
+   Anwendungsbereich sagt — nicht, was DealPilot fuer sinnvoll haelt.
+
+   Fehlt das Feld beim Objekt, wird NICHT gerechnet: eine Bedingung, die
+   man nicht pruefen kann, ist nicht erfuellt. Der Bericht hat seinen
+   Anwendungsbereich benannt; ihn zu ignorieren, weil eine Angabe fehlt,
+   waere die Umkehrung seiner Aussage. */
+function bedingungPruefen(modell, eingabe) {
+  const bed = modell.bedingungen;
+  if (!Array.isArray(bed) || !bed.length) return null;
+  for (const b of bed) {
+    if (!b || !b.feld) continue;
+    const v = zahl(eingabe[b.feld]);
+    if (v === null) {
+      return nichts('bedingung_nicht_pruefbar',
+        `${b.bez || b.feld} ist nicht erfasst. Der Bericht wertet nur aus, `
+        + `wenn ${b.bez || b.feld} ${b.text || 'im Anwendungsbereich liegt'} — `
+        + 'ohne die Angabe laesst sich das nicht pruefen, und ohne Pruefung '
+        + 'wird nicht gerechnet.');
+    }
+    const zuKlein = b.groesser_als != null && !(v > b.groesser_als);
+    const zuGross = b.kleiner_als  != null && !(v < b.kleiner_als);
+    const unter   = b.mindestens   != null && v < b.mindestens;
+    const ueber   = b.hoechstens   != null && v > b.hoechstens;
+    if (zuKlein || zuGross || unter || ueber) {
+      return nichts('ausserhalb_des_anwendungsbereichs',
+        `${b.bez || b.feld} = ${v}. Der Bericht wertet nur aus, wenn `
+        + `${b.bez || b.feld} ${b.text || 'im Anwendungsbereich liegt'}. `
+        + 'Fuer dieses Objekt hat der Gutachterausschuss keinen Faktor '
+        + 'abgeleitet; ein Faktor aus einem anderen Segment gilt hier nicht '
+        + '(§ 10 ImmoWertV).');
+    }
+  }
+  return null;
+}
+
 export function auswerten(modell, eingabe) {
   if (!modell || !modell.form) return nichts('kein_modell', 'Kein Modell hinterlegt.');
+
+  /* v1100c-WBED: der Anwendungsbereich wird geprueft, BEVOR gerechnet wird. */
+  const _bed = bedingungPruefen(modell, eingabe || {});
+  if (_bed) return _bed;
+
   const fn = AUSWERTER[modell.form];
   if (!fn) return nichts('form_unbekannt', `Modellform '${modell.form}' kennt der Auswerter nicht.`);
 

@@ -30,6 +30,10 @@
         "b": -0.249,
         "gueltig_von": 75000,
         "gueltig_bis": 450000,
+        "bedingungen": [
+          { "feld": "brw", "groesser_als": 30, "bez": "Bodenrichtwert",
+            "text": "über 30 €/m² liegt" }
+        ],
         "rundung_stellen": 2,
         "liefert": "faktor",
         "hinweis": "DIE FUNKTION IST ABGEDRUCKT, die Tabelle ist ihr Ergebnis. y = 21,252 · x^-0,249 (R² = 0,1987). Acht Stützstellen nachgerechnet, alle zeichengleich mit Tabelle 28 — deshalb ist hier die Funktion geführt und nicht die Tabelle: sie rechnet auch zwischen den abgedruckten Stützstellen richtig, statt linear zu interpolieren.",
