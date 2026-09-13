@@ -16103,3 +16103,58 @@ Escape-Reste     0
 Die Eskalation ist in der Chronik direkt ablesbar: das Detail zaehlt
 `ueberschreitungen_1h` von 1 bis 9 hoch, und ab der fuenften springt die
 Stufe von `Hinweis` auf `Auffaellig`.
+
+### v1374 (B21) · Der letzte Direktweg ist zu
+
+`quickcheck-app.html` rief `api.openai.com` **direkt aus dem Browser**
+auf — mit einem Schlüssel, den der Nutzer in ein Feld tippt. Drei Dinge
+waren daran falsch: der Prompt stand im Klartext im ausgelieferten HTML,
+der Weg lief am Backend vorbei (an jeder Zählung, jedem Limit, jedem
+Protokoll), und ein API-Schlüssel lag im Browserspeicher.
+
+Der Prompt steht jetzt im Backend. **Er ist derselbe wie vorher —
+bewusst:** dieser Umbau soll den *Weg* ändern, nicht das *Ergebnis*.
+
+**Eigener Endpunkt statt `/analyze`:** der Quick-Check hat ein anderes
+Datenformat und erwartet eine andere Antwort. Beides in einen Endpunkt
+zu zwingen hätte eine Weiche gebraucht, die mit der Zeit zur zweiten
+Logik wird.
+
+**Eigene Brückendatei statt `qc-bridge.js`:** die steht unter „Nicht
+anfassen“. Der neue Vermittler hört auf eine eigene Nachrichtenart. Das
+ist auch sonst die sauberere Trennung: die Brücke überträgt
+Objektdaten, dieser Vermittler eine KI-Anfrage.
+
+Er prüft, dass die Nachricht **wirklich aus dem eigenen iframe** kommt —
+ohne diese Prüfung könnte jede eingebettete Seite Analysen auf Kosten
+des Kontos auslösen.
+
+Der Nutzerschlüssel geht bewusst **nicht** durch die Brücke: wer einen
+hat, pflegt ihn in den Einstellungen, und von dort holt ihn der Server.
+*Ein Schlüssel, der durch zwei Fenster gereicht wird, ist einer zu viel
+unterwegs.*
+
+#### Abnahme
+
+```
+iframe-Version        v1374
+fetch an api.openai   0 Treffer im ausgelieferten HTML
+Prompt im HTML        weg
+neuer Weg             vorhanden
+```
+
+Und die Kette selbst, **ohne KI-Credits zu verbrauchen**: eine
+absichtlich unvollständige Anfrage aus dem iframe —
+
+```
+iframe -> Vermittler -> Backend -> zurück ins iframe
+Antwort: { ok:false, fehler:kp_oder_nkm_fehlt, status:400 }
+```
+
+Der Endpunkt lehnt sauber ab, bevor die KI gefragt wird. **Die Kette
+trägt an jeder Stelle.**
+
+> **Ein Test, der falsch gestellt war:** mein erster Versuch schickte die
+> Nachricht *an* das iframe statt *aus* ihm. Der Vermittler prüft die
+> Herkunft — also kam keine Antwort, und es sah aus wie eine
+> unterbrochene Kette. **Die Prüfung hat genau getan, was sie soll.**
