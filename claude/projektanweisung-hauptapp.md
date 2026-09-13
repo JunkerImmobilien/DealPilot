@@ -16243,3 +16243,67 @@ Fragewechsel dazwischen   ->  Knöpfe stehen noch, Vorspann passt
 **Rest.** Gefragt wird nur bei Abrufen (BORIS, Marktpreisindikation,
 Lage-Recherche). Wählt oder bestätigt der Nutzer selbst, ist das keine fremde
 Quelle, die widerspricht, sondern seine Hand.
+
+---
+
+## v1377 / v1377b — Übersprungenes kommt zurück, zvE wird gefragt (C5)
+
+**Was (v1377).** Das Überspringen gab es längst — `_rf.weg[i] = 1`. Das
+Zurückkommen nicht: der Eintrag wurde ausschließlich als „–" in der
+Standspalte gezeichnet und danach nie wieder gelesen.
+
+Eine übersprungene Frage ist aber keine beantwortete. Wer mitten im Gespräch
+„weiß ich nicht" sagt, meint meistens „jetzt nicht" — er hat die
+Nebenkostenabrechnung im anderen Fenster, den Steuerbescheid im Ordner. Am
+Ende weiß er es oft.
+
+Vor dem Abschluss wird deshalb **einmal** angeboten, die offenen Fragen
+nachzutragen. Danach ist der Weg zur Tabelle offen, und niemand kehrt
+freiwillig um.
+
+Drei Regeln: es ist ein **Angebot**, keine zweite Pflichtrunde — wer wieder
+überspringt, überspringt endgültig. Was inzwischen doch einen Wert hat, wird
+nicht nochmal gefragt. Und „nein" führt zum Abschluss; ohne den Nein-Weg
+hätte der Nutzer an einem Angebot gehangen, das nur einen Knopf hat.
+
+**Was (v1377b).** Das zu versteuernde Einkommen stand in der
+Feldbeschreibung, aber in **keinem Fragenblock** — es wurde nie gefragt. Der
+Grenzsteuersatz schon, aber den hat kaum jemand im Kopf.
+
+Neu ist `eins: ['grenz','zve']` am Block: **eines von beiden genügt.** Wer
+sein Einkommen nennt, bekommt den Satz ausgerechnet — über
+`Tax.calcGrenzsteuersatz`, dieselbe Quelle wie Formular und Prognose.
+
+**Commits.** `9c25f79` · `8b88263`
+
+**Nachweis.** Im laufenden Sprechlauf auf Staging:
+
+```
+3 Fragen übersprungen        ->  Liste: 3
+eine davon nachträglich voll ->  Liste: 2 (die gefüllte fällt raus)
+"ja, die trage ich nach"     ->  zweite Runde, offen=2, i=0, weg leer
+zweites Überspringen         ->  endgültig, kein drittes Angebot
+"nein, lass gut sein"        ->  Abschluss, Tabelle sichtbar
+
+Tarif 2026: 40k->31,8 %  60k->38,7 %  80k->42,0 %  300k->45,0 %
+Block leer          ->  offen
+nur Grenzsteuersatz ->  erfüllt
+nur zvE             ->  erfüllt
+zvE ohne AfA-Satz   ->  weiter offen (andere Felder gelten normal)
+
+Echter Satz durch die KI-Extraktion:
+"Mein zu versteuerndes Einkommen liegt bei 80.000 Euro, AfA 2 %, Gebäude 80 %"
+  -> zve 80000 · grenz 42 · Quelle "aus deinem zvE berechnet"
+  -> Blase: "Bei 80.000 € ... Grenzsteuersatz bei 42 % — damit rechne ich."
+```
+
+> **Eine Falle beim Bauen:** die erste Fassung rief `_fmtEuro` — die Funktion
+> gibt es in dieser Datei nicht. Der umgebende `try/catch` hätte den
+> ReferenceError geschluckt, und die Blase wäre **einfach nie erschienen**.
+> Richtig ist `_euroKurz`. Ein `try/catch` um neuen Code herum macht jeden
+> Tippfehler zu stiller Abwesenheit.
+
+> **Und ein Test, der nichts maß:** die „eins"-Regel schien zu greifen, weil
+> alle drei Fälle `false` ergaben — auch der, der `true` hätte sein müssen.
+> `_luecken` liefert nur die obersten drei Blöcke, der Steuerblock war nie
+> dabei. Siehe FALLEN 156.

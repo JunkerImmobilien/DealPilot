@@ -3591,3 +3591,39 @@ Anfuehrungszeichen oder escaped. Und nach jedem generierten CSS-Block einmal
 hinsehen, ob jede Zeile mit `',` endet.
 
 `v1376`
+
+---
+
+## 159 · Ein `try/catch` um neuen Code macht jeden Tippfehler zu stiller Abwesenheit
+
+**Gefunden bei C5 (v1377b), 13.09.2026.**
+
+Der neue Block war defensiv gebaut:
+
+```js
+try {
+  var _zv = _rfNum(_rf.data.fields.zve);
+  if (_zv != null && ...) {
+    _rfBlase('co', 'Bei <b>' + escH(_fmtEuro(_zv)) + '</b> ...');
+  }
+} catch (_e) {}
+```
+
+`_fmtEuro` gibt es in dieser Datei **nicht** — sie heisst `_euroKurz`. Der
+ReferenceError waere im leeren `catch` gelandet, und die Blase waere einfach
+nie erschienen. Kein Fehler in der Konsole, kein falscher Wert, nichts.
+
+Aufgefallen ist es nur, weil nach dem Patch einmal `grep -n "_fmtEuro"` lief
+und **zwei** Treffer meldete — beide meine eigenen.
+
+**Merksatz:** `try/catch` schuetzt vor fremden Fehlern, nicht vor eigenen.
+Nach jedem neuen Block: **jeden aufgerufenen Namen einmal greppen.** Ein
+leeres `catch` ist ein Ort, an dem Tippfehler unsichtbar werden.
+
+```
+for f in _euroKurz _rfNum _rfSetzen; do
+  echo "$f: $(grep -c "function $f(" datei.js)"
+done
+```
+
+`v1377b`
