@@ -224,12 +224,61 @@ const RISIKO = {
   FREIGEGEBEN:    'freigegeben'
 };
 
-/* Die berechenbaren Stufen. Jede verlangt Menge UND Muster. */
-const SCHWELLEN = [
+/* ══════════════════════════════════════════════════════════════════════
+   v1371 (B17) · DIE SCHWELLEN GEHÖREN DEM BETREIBER
+
+   Bis hierher standen sie als Konstante im Code. Das war für den Anfang
+   richtig — man kann nichts einstellen, was man noch nicht gemessen hat.
+   Jetzt gibt es Messwerte, und damit gehört die Entscheidung in die
+   Datenbank (Migration 073).
+
+   DER CACHE IST HIER PFLICHT, NICHT KOMFORT: `stufeBerechnen` läuft an
+   den Limit-Schwellen und in jeder Fallakte. Eine Abfrage je Aufruf
+   wäre genau die Sorte Kosten, die dieses System vermeiden soll.
+
+   Und wenn die Tabelle nicht antwortet, gelten die eingebauten Werte —
+   ein Schutzsystem, das ohne Konfiguration stehenbleibt, schützt nicht.
+   ══════════════════════════════════════════════════════════════════════ */
+const SCHWELLEN_VORGABE = [
   { stufe: RISIKO.HOHES_RISIKO, ueberschreitungen: 50, maxVielfalt: 2, maxStreuung: 1.0 },
   { stufe: RISIKO.WARNUNG,      ueberschreitungen: 20, maxVielfalt: 3, maxStreuung: 1.5 },
   { stufe: RISIKO.AUFFAELLIG,   ueberschreitungen: 5,  maxVielfalt: 99, maxStreuung: 99 }
 ];
+
+let _cfgCache = null;
+let _cfgBis = 0;
+const CFG_TTL = 60 * 1000;
+
+async function konfiguration() {
+  if (_cfgCache && _cfgBis > Date.now()) return _cfgCache;
+  try {
+    const r = await query('SELECT * FROM security_config WHERE id = 1');
+    if (!r.rowCount) throw new Error('keine Zeile');
+    const c = r.rows[0];
+    _cfgCache = {
+      schwellen: [
+        { stufe: RISIKO.HOHES_RISIKO, ueberschreitungen: c.hoch_ab,
+          maxVielfalt: c.hoch_vielfalt, maxStreuung: Number(c.hoch_streuung) },
+        { stufe: RISIKO.WARNUNG, ueberschreitungen: c.warnung_ab,
+          maxVielfalt: c.warnung_vielfalt, maxStreuung: Number(c.warnung_streuung) },
+        { stufe: RISIKO.AUFFAELLIG, ueberschreitungen: c.auffaellig_ab,
+          maxVielfalt: 99, maxStreuung: 99 }
+      ],
+      roh: c,
+      aus_datenbank: true
+    };
+  } catch (e) {
+    /* Vorgabewerte statt Stillstand. */
+    _cfgCache = { schwellen: SCHWELLEN_VORGABE, roh: null, aus_datenbank: false };
+  }
+  _cfgBis = Date.now() + CFG_TTL;
+  return _cfgCache;
+}
+
+/* Nach einer Änderung im Admin sofort wirksam machen, statt bis zu einer
+   Minute auf den Cache zu warten. */
+function konfigurationVergessen() { _cfgCache = null; _cfgBis = 0; }
+
 
 /* ──────────────────────────────────────────────────────────────────────
    Die berechnete Stufe. Gibt IMMER auch die Begründung zurück - eine
@@ -249,7 +298,9 @@ async function stufeBerechnen(userId, { fensterMinuten } = {}) {
   );
   const n = (r.rows[0] && r.rows[0].n) || 0;
 
-  for (const s of SCHWELLEN) {
+  const cfg = await konfiguration();
+  for (const s of cfg.schwellen) {
+
     if (n < s.ueberschreitungen) continue;
 
     /* Die Muster-Bedingung. `streuung === null` heißt „zu wenig Daten" -
@@ -368,5 +419,6 @@ async function entscheiden({ userId, art, adminEmail, notiz }) {
 }
 
 module.exports = { schreibe, chronik, muster, stufeBerechnen, zustand, entscheiden,
-                   ARTEN, STUFEN, RISIKO, SCHWELLEN };
+                   konfiguration, konfigurationVergessen, SCHWELLEN_VORGABE,
+                   ARTEN, STUFEN, RISIKO };
 

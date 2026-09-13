@@ -154,6 +154,52 @@ function _ipSchluessel(ip) {
 
 const LIMIT_KONTO = parseInt(process.env.RATE_LIMIT_MAX_ACCOUNT || '600', 10);
 
+/* ══════════════════════════════════════════════════════════════════════
+   v1371 (B11) · AUSNAHMEN — befreit vom Limit, NICHT vom Protokoll
+
+   Marcels Auflage: „Administratoren, Entwickler und ausdruecklich
+   freigeschaltete Testkonten muessen weiterarbeiten koennen ... Ausnahmen
+   muessen rollenbasiert umgesetzt und trotzdem protokolliert werden."
+
+   Der zweite Halbsatz ist der wichtige. Eine Ausnahme ohne Protokoll
+   waere ein blinder Fleck: genau die Konten mit den weitesten Rechten
+   waeren die, ueber die niemand etwas weiss. Hier wird deshalb nur der
+   BREMSKLOTZ entfernt, nicht die Beobachtung.
+
+   WARUM EIN CACHE: die Ausnahme steht in der Datenbank, der Limiter
+   laeuft vor JEDER Anfrage. Eine Abfrage je Anfrage waere genau die
+   Sorte Kosten, die das Schutzsystem vermeiden soll. Fuenf Minuten
+   Gueltigkeit sind ein vertretbarer Kompromiss - wer eine Ausnahme
+   setzt, wartet hoechstens fuenf Minuten auf ihre Wirkung.
+   ══════════════════════════════════════════════════════════════════════ */
+const _ausnahmen = new Map();      /* userId -> { frei: bool, bis: ms } */
+const AUSNAHME_TTL = 5 * 60 * 1000;
+
+function _ausnahmeBekannt(konto) {
+  const e = _ausnahmen.get(konto);
+  return (e && e.bis > Date.now()) ? e.frei : null;
+}
+
+async function _ausnahmeLaden(konto) {
+  try {
+    const r = await require('./db/pool').query(
+      'SELECT security_exempt, role FROM users WHERE id = $1', [konto]);
+    /* Rollen, die von Haus aus befreit sind - sie muessen arbeiten
+       koennen, auch wenn gerade jemand das Limit ausreizt. */
+    const rolle = r.rows[0] && r.rows[0].role;
+    const frei = !!(r.rows[0] && (r.rows[0].security_exempt ||
+                    rolle === 'owner' || rolle === 'admin' || rolle === 'developer'));
+    _ausnahmen.set(konto, { frei, bis: Date.now() + AUSNAHME_TTL });
+    return frei;
+  } catch (e) {
+    /* Im Zweifel NICHT befreien - eine Ausnahme, die aus einem Fehler
+       entsteht, ist keine. */
+    _ausnahmen.set(konto, { frei: false, bis: Date.now() + 30 * 1000 });
+    return false;
+  }
+}
+
+
 
 const limiter = rateLimit({
   windowMs: config.rateLimit.windowMs,
@@ -176,7 +222,23 @@ const limiter = rateLimit({
 
   standardHeaders: true,
   legacyHeaders: false,
-  skip: (req) => req.path.startsWith('/health'),
+  skip: (req) => {
+    if (req.path.startsWith('/health')) return true;
+
+    /* v1371: Ausnahmen ueberspringen das Limit - aber nur, wenn die
+       Antwort schon im Cache liegt. `skip` ist synchron; eine Abfrage
+       ist hier nicht moeglich. Beim ersten Mal wird deshalb normal
+       limitiert und die Ausnahme im Hintergrund nachgeladen; ab der
+       zweiten Anfrage greift sie. Fuer ein Konto, das dauernd arbeitet,
+       ist das eine Anfrage Unterschied. */
+    const konto = _kontoAusToken(req);
+    if (!konto) return false;
+
+    const bekannt = _ausnahmeBekannt(konto);
+    if (bekannt === null) { _ausnahmeLaden(konto); return false; }
+    return bekannt;
+  },
+
   /* B3-Vorarbeit: eine Ueberschreitung ist noch kein Verstoss, aber sie
      gehoert protokolliert. Mehr passiert hier bewusst NICHT - Marcels
      Auflage: „Eine technische Auffaelligkeit darf nicht automatisch als
@@ -249,7 +311,12 @@ const limiter = rateLimit({
         pfad: req.path,
         methode: req.method,
         detail: {
+          /* v1371: war das ein befreites Konto? Steht im Protokoll, auch
+             wenn es hier nur selten vorkommt - beim allerersten Aufruf,
+             bevor der Cache gefuellt ist. */
+          ausnahme: _ausnahmeBekannt(konto) === true,
           limit: konto ? LIMIT_KONTO : config.rateLimit.max,
+
           fenster_s: Math.ceil(config.rateLimit.windowMs / 1000),
           ueberschreitungen_1h: zuvor.n
         }

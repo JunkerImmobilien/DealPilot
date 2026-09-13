@@ -739,7 +739,154 @@ router.post('/security/entscheidung', requireAdmin, requireRole('owner', 'suppor
     }
   });
 
+/* ══════════════════════════════════════════════════════════════════════
+   v1371 (B17) · DIE SCHWELLEN LESEN UND SETZEN
+   ══════════════════════════════════════════════════════════════════════
+   Marcels Punkt B17: "Konfigurationsbereich im Admin fuer alle
+   Schwellen."
+
+   Lesen darf jeder Admin, aendern nur `owner` - wer an den Schwellen
+   dreht, verschiebt, wann ueberhaupt jemand auffaellt. Das ist eine
+   Betreiberentscheidung, keine Supportaufgabe.
+
+   Jede Aenderung wird mit Name und Zeit festgehalten. Die Datenbank
+   erzwingt zusaetzlich, dass die Stufen aufeinander aufbauen (CHECK in
+   Migration 073) - sonst koennte jemand "warnung" ueber "hohes Risiko"
+   setzen und die hoechste Stufe waere unerreichbar.
+   ══════════════════════════════════════════════════════════════════════ */
+router.get('/security/config', requireAdmin, async (req, res) => {
+  try {
+    const sec = require('../services/securityEventService');
+    const cfg = await sec.konfiguration();
+    res.json({
+      config: cfg.roh,
+      aus_datenbank: cfg.aus_datenbank,
+      vorgabe: sec.SCHWELLEN_VORGABE,
+      hinweis: cfg.aus_datenbank ? null
+        : 'Die Tabelle antwortet nicht - es gelten die eingebauten Vorgabewerte.'
+    });
+  } catch (e) {
+    console.error('[admin] security/config:', e.message);
+    res.status(500).json({ error: 'config_failed' });
+  }
+});
+
+router.post('/security/config', requireAdmin, requireRole('owner'), async (req, res) => {
+  const db = req.app.get('db');
+  try {
+    const f = ['warnung_ab','warnung_vielfalt','warnung_streuung',
+               'hoch_ab','hoch_vielfalt','hoch_streuung','auffaellig_ab',
+               'limit_konto','limit_anonym','alert_ruhe_minuten'];
+    const setz = [], werte = [];
+    f.forEach((k) => {
+      if (req.body[k] == null || req.body[k] === '') return;
+      const n = Number(req.body[k]);
+      if (!isFinite(n) || n < 0) throw new Error(k + ' ist keine gueltige Zahl');
+      werte.push(n); setz.push(k + ' = $' + werte.length);
+    });
+    if (!setz.length) return res.status(400).json({ error: 'nichts_zu_aendern' });
+
+    werte.push(req.adminUser && req.adminUser.email);
+    setz.push('geaendert_von = $' + werte.length);
+    werte.push(String(req.body.notiz || '').slice(0, 500));
+    setz.push('notiz = $' + werte.length);
+    setz.push('geaendert_am = NOW()');
+
+    const r = await db.query(
+      'UPDATE security_config SET ' + setz.join(', ') + ' WHERE id = 1 RETURNING *', werte);
+
+    /* Sofort wirksam machen, statt bis zu einer Minute auf den Cache zu
+       warten - wer eine Schwelle setzt, will sie gelten sehen. */
+    require('../services/securityEventService').konfigurationVergessen();
+
+    res.json({ ok: true, config: r.rows[0] });
+  } catch (e) {
+    /* Der CHECK aus Migration 073 meldet sich hier, wenn jemand die
+       Reihenfolge der Stufen verdreht. Die Meldung sagt das auch. */
+    const reihenfolge = /security_config_reihenfolge/.test(e.message || '');
+    console.error('[admin] security/config POST:', e.message);
+    res.status(400).json({
+      error: reihenfolge ? 'reihenfolge_verletzt' : e.message,
+      hinweis: reihenfolge
+        ? 'Die Stufen muessen aufeinander aufbauen: auffaellig <= warnung <= hohes Risiko, '
+          + 'und die Muster-Grenzen muessen nach oben strenger werden.'
+        : undefined
+    });
+  }
+});
+
+/* ══════════════════════════════════════════════════════════════════════
+   v1371 (B11) · AUSNAHMEN — setzen und auflisten
+
+   Marcels Auflage: "Ausnahmen muessen rollenbasiert umgesetzt und
+   trotzdem protokolliert werden."
+
+   Deshalb: eine Begruendung ist Pflicht, das Setzen schreibt ein
+   Sicherheitsereignis, und es gibt eine Liste aller Befreiten. Eine
+   Ausnahme, die man suchen muss, wird vergessen.
+   ══════════════════════════════════════════════════════════════════════ */
+router.get('/security/ausnahmen', requireAdmin, async (req, res) => {
+  try {
+    const r = await req.app.get('db').query(
+      `SELECT id, email, name, role, security_exempt, security_exempt_grund,
+              security_exempt_seit
+         FROM users
+        WHERE security_exempt = TRUE OR role IN ('owner','admin','developer')
+        ORDER BY security_exempt DESC, role, email`);
+    res.json({
+      konten: r.rows,
+      hinweis: 'Rollen owner/admin/developer sind von Haus aus befreit. '
+             + 'Die Ereignisse werden trotzdem protokolliert.'
+    });
+  } catch (e) {
+    res.status(500).json({ error: 'ausnahmen_failed' });
+  }
+});
+
+router.post('/security/ausnahme', requireAdmin, requireRole('owner'), async (req, res) => {
+  try {
+    const { user_id, frei, grund } = req.body || {};
+    if (!user_id) return res.status(400).json({ error: 'user_id fehlt' });
+    if (frei && (!grund || String(grund).trim().length < 3)) {
+      return res.status(400).json({
+        error: 'begruendung_fehlt',
+        hinweis: 'Ohne Begruendung ist eine Ausnahme in einem halben Jahr nicht '
+               + 'mehr erklaerbar, und niemand traut sich, sie zu entfernen.'
+      });
+    }
+
+    const r = await req.app.get('db').query(
+      `UPDATE users SET security_exempt = $2,
+              security_exempt_grund = $3,
+              security_exempt_seit = CASE WHEN $2 THEN NOW() ELSE NULL END
+        WHERE id = $1 RETURNING id, email, security_exempt, security_exempt_grund`,
+      [user_id, !!frei, frei ? String(grund).trim().slice(0, 500) : null]);
+
+    if (!r.rowCount) return res.status(404).json({ error: 'user_not_found' });
+
+    /* Die Ausnahme selbst ist ein Ereignis - sonst waere ausgerechnet
+       diese Entscheidung die einzige ohne Spur. */
+    const sec = require('../services/securityEventService');
+    await sec.schreibe({
+      userId: user_id,
+      art: sec.ARTEN.MUSTER,
+      stufe: sec.STUFEN.HINWEIS,
+      detail: {
+        vorgang: frei ? 'ausnahme_gesetzt' : 'ausnahme_aufgehoben',
+        admin: req.adminUser && req.adminUser.email,
+        notiz: frei ? String(grund).trim().slice(0, 500) : 'aufgehoben'
+      }
+    });
+
+    res.json({ ok: true, konto: r.rows[0] });
+  } catch (e) {
+    console.error('[admin] security/ausnahme:', e.message);
+    res.status(400).json({ error: e.message });
+  }
+});
+
 router.get('/audit-log.csv', requireAdmin, async (req, res) => {
+
 
 
   const db = req.app.get('db');
