@@ -4086,7 +4086,28 @@ Spezifikation (Felder, Statuswerte, Jahresablauf): Block 04, Abschnitt
 Landkarte liegt in `claude/abdeckung-laender-kreise-20260814.md` und
 `claude/laender-lizenzlage-20260813.md`, nur im falschen Format.
 
-#### C2 — Kunden-Verlinkung bei fehlender oder kostenpflichtiger Quelle
+#### C2 — Kunden-Verlinkung — **GRUNDLAGE STEHT (v1099, 13.09.2026)**
+
+> **Gebaut auf Marcels Vorgabe:** *„gib im Marktbericht bei den
+> Liegenschaftszinsen und Sachwertfaktoren den Link an, wenn der Kunde die
+> Adresse eingegeben hat. Dann kann er selber die Werte holen oder kaufen."*
+>
+> `marktbericht/backend/src/lib/quellen_links.js` führt **alle sechzehn
+> Bundesländer** — Stelle, Portal-URL, Zugang (kostenfrei / teils
+> kostenpflichtig). Ein Registersatz gewinnt gegen die Landestabelle, weil er
+> den zuständigen Ausschuss namentlich kennt.
+>
+> **Der Link hängt an jeder Antwort, nicht nur an der leeren:** wo kein Wert
+> ist, *ist* er die Auskunft; wo einer ist, belegt er ihn. Gemessen an vier
+> Orten, davon drei ohne eigenen Wert (München, Dresden, Hamburg).
+>
+> **Was noch fehlt:** (1) die Anzeige auf dem **Bildschirm** — im PDF steht
+> sie, in der Web-Ansicht noch nicht. (2) Der Link je **Ausschuss** statt je
+> Land, wo wir keinen Registersatz haben — das ist C1, das Quellenregister in
+> der Datenbank. (3) Die drei Texte für die drei Fälle (kein Wert /
+> kostenpflichtig / vorhanden) sind erst in einer Fassung formuliert.
+
+**Der ursprüngliche Auftrag:**
 
 Baut auf C1 auf, wird mit **A2** zusammen ausgeliefert (derselbe Quellenblock
 am Berichtsende). Drei Fälle, drei Texte — Wortlaut in Block 04.
