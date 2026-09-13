@@ -3528,6 +3528,21 @@
       '  font:400 11px/1.5 Inter,system-ui,sans-serif;opacity:.72}',
       '.vi-sc-annahmen b{opacity:.9}',
       '.vi-sc-weiter{margin-top:10px;font:400 12.5px/1.45 Inter,system-ui,sans-serif;opacity:.8}',
+      /* v1376 (C7): zwei Werte nebeneinander. Beide gleich gross, beide mit
+         ihrer Herkunft - keiner sieht wichtiger aus als der andere, denn
+         welcher stimmt, weiss nur der Nutzer. Gold fuer den abgerufenen
+         Wert waere schon eine Empfehlung. */
+      '.vi-rf-knf{margin-top:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}',
+      '@media(max-width:560px){.vi-rf-knf{grid-template-columns:1fr}}',
+      '.vi-rf-knf-z{padding:8px 10px;border:1px solid rgba(42,39,39,.16);border-radius:8px;',
+      '  background:rgba(42,39,39,.03)}',
+      '.vi-rf-knf-z span{display:block;opacity:.55;text-transform:uppercase;letter-spacing:.04em;',
+      '  font:600 9.5px/1.3 "JetBrains Mono",ui-monospace,monospace}',
+      '.vi-rf-knf-z b{display:block;margin-top:3px;',
+      '  font:700 16px/1.2 "JetBrains Mono",ui-monospace,monospace}',
+      '.vi-rf-knf-z i{display:block;margin-top:3px;font-style:normal;opacity:.6;',
+      '  font:400 10.5px/1.35 Inter,system-ui,sans-serif}',
+
       /* v1290: der Fliesstext der vollen Stufe — eingeklappt, damit er die
          Karte nicht sprengt, aber vorhanden. Wer dafuer bezahlt, soll ihn
          auch sehen koennen. */
@@ -5367,8 +5382,10 @@
 
   var AKT_ICON = {
     brw: '📍', lage: '🌍', markt: '📊', markt2: '📈',
-    tiefe: '＋', tabelle: '✓', adresse: '📮'
+    tiefe: '＋', tabelle: '✓', adresse: '📮',
+    knf_neu: '⇄', knf_alt: '✓'   /* v1376 (C7) */
   };
+
 
   function _rfDranZeichnen() {
     var host = $('vi-rf-dran'); if (!host || !_rf) return;
@@ -5391,7 +5408,13 @@
       (frage ? '<div class="vi-dran-f"><i>▸</i><span>' + frage + '</span></div>' : '') +
       (akt.length
         ? '<div class="vi-dran-a">' +
-          '<span class="vi-dran-lbl">Ich kann das für dich holen:</span>' +
+          /* v1376 (C7): Bei einem Widerspruch wird nicht geholt, sondern
+             entschieden. Der alte Vorspann haette in die Irre gefuehrt. */
+          '<span class="vi-dran-lbl">' +
+            (akt.filter(function (a) { return a.art.indexOf('knf_') === 0; }).length
+              ? 'Zwei Werte widersprechen sich — welcher gilt?'
+              : 'Ich kann das für dich holen:') + '</span>' +
+
           /* ═══ v1300 · EINE Erklärzeile statt einer je Knopf ══════════════
              Marcels Befund vom 11.09.2026: „der Balken für Marktindikation,
              erweiterte Marktindikation und Lage recherchieren ist recht
@@ -5474,7 +5497,34 @@
       else _rfDranZeichnen();
       return;
     }
+    /* ═══ v1376 (C7) · der Widerspruch wird entschieden ═══════════════ */
+    if (art === 'knf_neu' || art === 'knf_alt') {
+      var kf = _rf.konfliktOffen;
+      _rf.konfliktOffen = null;
+      _rfAktionWeg('knf_neu'); _rfAktionWeg('knf_alt');
+      if (!kf) return;
+      if (art === 'knf_neu') {
+        _rf.data.fields[kf.id] = kf.neu;
+        if (!_rf.quelle) _rf.quelle = {};
+        _rf.quelle[kf.id] = kf.quelleNeu;
+        _rfBlase('ich', 'Nimm den abgerufenen Wert.');
+        _rfBlase('co', 'Übernommen: <b>' + escH(_rfKonfliktWert(kf.id, kf.neu)) + '</b>. ' +
+          'In der Übersicht steht dazu <span style="opacity:.7">' + escH(kf.quelleNeu) + '</span> — ' +
+          'nicht deine Angabe.');
+      } else {
+        _rfBlase('ich', 'Meine Angabe gilt.');
+        _rfBlase('co', 'Gut — es bleibt bei <b>' + escH(_rfKonfliktWert(kf.id, kf.alt)) + '</b>. ' +
+          'Der abgerufene Wert (' + escH(_rfKonfliktWert(kf.id, kf.neu)) + ') wird nicht verwendet.');
+      }
+      _rfStandZeichnen();
+      /* Der naechste Widerspruch, falls einer wartet - sonst zurueck zur
+         Frage, die vor dem Abruf offen war. */
+      if (!_rfKonfliktZeigen()) { _rfFrageNochmal(); }
+      if (_fs.an && _fs.stream) _fsHoeren(true);
+      return;
+    }
     if (art === 'tabelle')  { _rfZurTabelle(); return; }
+
     if (art === 'tiefe')    { _rf.tiefeOffen = 0; _rfBlase('ich', 'Ja, lass uns weitermachen.'); _rfTiefeStarten(); return; }
     if (art === 'brw')      { _rfBlase('ich', 'Hol den Bodenrichtwert.'); _rfBrwHolen(); return; }
     if (art === 'lage')     { _rfBlase('ich', 'Recherchier die Lage.'); _rfLageRecherche(); return; }
@@ -5640,6 +5690,35 @@
   function _rfAktionJa(text) {
     var akt = (_rf && _rf.aktionen) || [];
     if (!akt.length) return false;
+
+    /* ═══ v1376 (C7) · Der Widerspruch wird zuerst beantwortet ══════════
+       Bei einem offenen Widerspruch stehen zwei Knoepfe zur Wahl, die
+       beide dasselbe Feld betreffen. Ein blankes "ja" waere hier
+       mehrdeutig - deshalb gilt es nur, wenn der Satz sagt, WELCHER Wert
+       gemeint ist. Erkannt wird beides: die Quelle ("amtlich", "BORIS")
+       und die Richtung ("bleib dabei", "meine Angabe"). */
+    if (_rf.konfliktOffen) {
+      var tk = _de(text);
+      var kf = _rf.konfliktOffen;
+      var zahlNeu = _rfZahl(kf.neu), zahlAlt = _rfZahl(kf.alt);
+      /* Wer die Zahl selbst ausspricht, meint sie auch. */
+      var gesagteZahl = _rfZahl((String(text).match(/-?[\d.]+(?:,\d+)?/) || [])[0]);
+      var willNeu = /amtlich|boris|abgerufen|abruf|offiziell|neuen?\b|uebernimm|ubernimm|ubernehmen|indikation|gutachter/.test(tk) ||
+                    (gesagteZahl != null && zahlNeu != null && Math.abs(gesagteZahl - zahlNeu) < 0.005);
+      var willAlt = /meine|meiner|bleib|behalt|behalte|dabei|eigenen?\b|gesagt|stimmt so|richtig so/.test(tk) ||
+                    (gesagteZahl != null && zahlAlt != null && Math.abs(gesagteZahl - zahlAlt) < 0.005);
+      if (willNeu && !willAlt) { _rfBlase('ich', escH(text)); _rfAktionKlick('knf_neu'); return true; }
+      if (willAlt && !willNeu) { _rfBlase('ich', escH(text)); _rfAktionKlick('knf_alt'); return true; }
+      /* Unklar - nachfragen statt raten. Eine falsch uebernommene Zahl
+         rechnet still weiter; eine Rueckfrage kostet einen Satz. */
+      _rfBlase('ich', escH(text));
+      _rfBlase('co', 'Welcher Wert soll gelten — <b>' + escH(_rfKonfliktWert(kf.id, kf.alt)) +
+        '</b> (deine Angabe) oder <b>' + escH(_rfKonfliktWert(kf.id, kf.neu)) +
+        '</b> (' + escH(kf.quelleNeu) + ')? Sag die Zahl oder tipp auf einen der Knöpfe.');
+      if (_fs.an && _fs.stream) _fsHoeren(true);
+      return true;
+    }
+
     if (akt.length > 1) {
       /* „hol den bodenrichtwert" / „die lage" — wer die Aktion NENNT,
          bekommt sie; sonst fragt der Co-Pilot einmal nach. */
@@ -5698,20 +5777,131 @@
     return true;
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1376 (C7) · EIN WIDERSPRUCH WIRD GEFRAGT, NICHT WEGGEWORFEN
+     ═══════════════════════════════════════════════════════════════════
+     Hier stand nur `return false`. Wer den Bodenrichtwert selbst genannt
+     hatte, behielt seinen — richtig so, eine Nutzerangabe wird nicht
+     ueberschrieben.
+
+     Falsch war, was danach geschah: NICHTS. Der amtliche Abruf lief, die
+     Blase darunter zeigte "340 €/m² — amtlicher Bodenrichtwert", und der
+     Wert ging in kein Feld. Der Nutzer sah eine Zahl und durfte annehmen,
+     sie gelte. Gerechnet wurde mit seinen 300.
+
+     Das ist die teuerste Art von Fehler: nichts widerspricht. Kein Rot,
+     keine Meldung, nur eine Zahl, die nirgends ankam.
+
+     JETZT: Weicht der abgerufene Wert von der Angabe ab, wird gefragt.
+     Beide Zahlen stehen nebeneinander, beide Herkuenfte sind benannt,
+     und der Nutzer entscheidet. Stimmen sie ueberein, passiert weiterhin
+     nichts — eine Bestaetigung ist keine Frage wert.
+
+     GEFRAGT WIRD NUR BEI ABRUFEN (`opt.konflikt`). Wenn der Nutzer selbst
+     etwas auswaehlt oder bestaetigt, ist das keine fremde Quelle, die
+     widerspricht, sondern seine eigene Hand. */
+
+  /* Zwei Werte sind derselbe, wenn sie dieselbe Zahl meinen: "300" und
+     "300,00" sind kein Widerspruch. Was keine Zahl ist, wird als Text
+     verglichen, ohne Rand und ohne Gross-/Kleinschreibung. */
+  /* Deutsche Schreibweise: Punkt trennt Tausender, Komma die Nachkomma-
+     stellen. "1.200,50" ist eintausendzweihundert Komma fuenfzig - nicht
+     1,2. Wer das verwechselt, vergleicht 1200 mit 1,2 und sieht einen
+     Widerspruch, wo keiner ist. */
+  function _rfZahl(v) {
+    if (v === null || v === undefined) return null;
+    var t = String(v).trim().replace(/[^\d.,\-]/g, '');
+    if (!t) return null;
+    if (/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(t)) t = t.replace(/\./g, '');
+    t = t.replace(',', '.');
+    var n = parseFloat(t);
+    return isFinite(n) ? n : null;
+  }
+
+  function _rfGleicherWert(a, b) {
+    var za = _rfZahl(a), zb = _rfZahl(b);
+
+    if (za != null && zb != null) return Math.abs(za - zb) < 0.005;
+    return String(a).trim().toLowerCase() === String(b).trim().toLowerCase();
+  }
+
   /* Ein Wert plus seine Herkunft. Ueberschreibt NICHT, was gesagt wurde:
      wer den Bodenrichtwert selbst genannt hat, behaelt seinen. */
-  function _rfSetzen(id, wert, quelle) {
+  function _rfSetzen(id, wert, quelle, opt) {
     if (!_rf || wert === null || wert === undefined || wert === '') return false;
     if (!_rf.data.fields) _rf.data.fields = {};
     var alt = _rf.data.fields[id];
-    if (alt !== undefined && alt !== null && alt !== '') return false;
+    if (alt !== undefined && alt !== null && alt !== '') {
+      if (opt && opt.konflikt && !_rfGleicherWert(alt, wert)) {
+        if (!_rf.konflikte) _rf.konflikte = [];
+        /* Zu einem Feld nur EIN offener Widerspruch. Ein zweiter Abruf
+           derselben Zahl soll nicht zweimal dieselbe Frage stellen. */
+        var schonDa = _rf.konflikte.filter(function (k) { return k.id === id; })[0];
+        if (!schonDa) {
+          _rf.konflikte.push({
+            id: id, alt: alt, neu: wert,
+            quelleAlt: (_rf.quelle && _rf.quelle[id]) || 'deine Angabe',
+            quelleNeu: quelle || 'Abruf'
+          });
+        }
+      }
+      return false;
+    }
+
     _rf.data.fields[id] = wert;
     if (!_rf.quelle) _rf.quelle = {};
     if (quelle) _rf.quelle[id] = quelle;
     return true;
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1376 (C7) · DIE WIDERSPRUCHSFRAGE
+     ═══════════════════════════════════════════════════════════════════
+     Sie stellt IMMER nur einen Widerspruch auf einmal. Zwei Fragen mit je
+     zwei Knoepfen nebeneinander waeren vier Knoepfe, von denen zwei zur
+     falschen Zahl gehoeren — und "ja" waere nicht mehr eindeutig.
+
+     Gefragt wird, nachdem der Abruf seine Blase geschrieben hat: der
+     Nutzer sieht erst, was gefunden wurde, dann die Frage dazu. */
+
+  /* Fuer die Anzeige: Lagen sind Zahlen im Feld, aber Woerter im Text. */
+  function _rfKonfliktWert(id, wert) {
+    if (id === 'makrolage' || id === 'mikrolage') {
+      var w = _lageWort(wert);
+      if (w && w !== '–') return w;
+    }
+    return String(wert);
+  }
+
+  function _rfKonfliktZeigen() {
+    if (!_rf || !_rf.konflikte || !_rf.konflikte.length) return false;
+    if (_rf.konfliktOffen) return true;          /* einer reicht */
+    var k = _rf.konflikte.shift();
+    _rf.konfliktOffen = k;
+
+    var name = _rfFeldName(k.id) || k.id;
+    _rfBlase('co',
+      '<b>Da widersprechen sich zwei Angaben.</b>' +
+      '<div class="vi-rf-knf">' +
+        '<div class="vi-rf-knf-z"><span>' + escH(name) + ' — von dir</span>' +
+          '<b>' + escH(_rfKonfliktWert(k.id, k.alt)) + '</b>' +
+          '<i>' + escH(k.quelleAlt) + '</i></div>' +
+        '<div class="vi-rf-knf-z"><span>' + escH(name) + ' — abgerufen</span>' +
+          '<b>' + escH(_rfKonfliktWert(k.id, k.neu)) + '</b>' +
+          '<i>' + escH(k.quelleNeu) + '</i></div>' +
+      '</div>' +
+      '<div class="vi-rf-zaehler">Ich rechne mit dem, den du waehlst — und die Herkunft ' +
+        'steht danach in der Übersicht.</div>');
+
+    _rfAktion('knf_neu', 'Der abgerufene Wert ersetzt deine Angabe. Die Herkunft wird mitgefuehrt.',
+              _rfKonfliktWert(k.id, k.neu) + ' übernehmen');
+    _rfAktion('knf_alt', 'Deine Angabe bleibt stehen. Der abgerufene Wert wird verworfen.',
+              'Bei ' + _rfKonfliktWert(k.id, k.alt) + ' bleiben');
+    return true;
+  }
+
   /* ── Die Angebote zu einer Frage ──────────────────────────────────
+
      v1291: Sie erscheinen nicht mehr IN der Frageblase, sondern in der
      Aktionsleiste unten. Was hier passiert, ist deshalb nur noch
      anmelden — das Zeichnen macht `_rfDranZeichnen`. */
@@ -5955,7 +6145,7 @@
         var wort = _optionText(feld, d.value) || d.label || d.value;
         zeilen.push(_zeile(LAGE_NAME[k], wort,
                     (d.score != null && d.score >= 70) ? 'gut' : ((d.score != null && d.score < 40) ? 'schlecht' : '')));
-        if (_rfSetzen(feld, d.value, Q + (d.source && d.source.label ? ' · ' + d.source.label : ''))) gesetzt.push(LAGE_NAME[k]);
+        if (_rfSetzen(feld, d.value, Q + (d.source && d.source.label ? ' · ' + d.source.label : ''), { konflikt: true })) gesetzt.push(LAGE_NAME[k]);
         if (d.source && d.source.label && quellen.indexOf(d.source.label) < 0) quellen.push(d.source.label);
       });
       if (!zeilen.length) throw new Error('Die Recherche kam ohne verwertbare Angaben zurück');
@@ -5977,7 +6167,12 @@
           : '<div class="vi-sc-annahmen">Deine eigenen Angaben bleiben stehen — ich habe nur ergänzt, was fehlte.</div>') +
         '</div>');
       _rfStandZeichnen();
+      /* v1376 (C7): Die Zeile darueber sagt "Deine eigenen Angaben bleiben
+         stehen". Das stimmt - aber es verschweigt, WO sie der Recherche
+         widersprechen. Genau das wird jetzt gefragt. */
+      _rfKonfliktZeigen();
       _rfLageWeiter();
+
     }).catch(function (err) {
       _rfDenkt(false);
       var m = (err && err.data && err.data.error) || (err && err.message) || '';
@@ -6030,13 +6225,16 @@
          genauen Anschrift. */
       var herkunft = 'BORIS' + (r.stichtag ? ' ' + r.stichtag : '') + (r.zone ? ' · Zone ' + r.zone : '') +
                      ((_rf && _rf.zentrum) ? ' · Ortszentrum (Näherung)' : '');
-      _rfSetzen('brw', String(r.wert).replace('.', ','), herkunft);
+      _rfSetzen('brw', String(r.wert).replace('.', ','), herkunft, { konflikt: true });
       _rfBlase('co', '<b>' + escH(String(r.wert).replace('.', ',')) + ' €/m²</b> — amtlicher Bodenrichtwert. ' +
         '<span style="opacity:.7">' + escH(herkunft) + '</span>' +
         '<div class="vi-rf-zaehler">Herkunft steht in der Übersicht — nicht „Sprachaufzeichnung".</div>');
       _rfStandZeichnen();
-      _rfFrageNochmal();     /* v1306 */
+      /* v1376 (C7): Widerspricht der amtliche Wert dem gesagten, wird
+         gefragt - und die Frage tritt an die Stelle der Rueckkehr. */
+      if (!_rfKonfliktZeigen()) _rfFrageNochmal();     /* v1306 */
       if (_fs.an && _fs.stream) _fsHoeren(true);
+
     }).catch(function (e) {
       _rfDenkt(false);
       _rfBlase('co', 'Der Abruf ist fehlgeschlagen — sag mir den Bodenrichtwert einfach selbst.');
@@ -6574,10 +6772,12 @@
 
     var Q = (stufe >= 2) ? 'Marktpreisindikation (erweitert)' : 'Marktpreisindikation';
     var eingetragen = [];
-    if (M.makro && _rfSetzen('makrolage', M.makro, Q)) eingetragen.push('Makrolage');
-    if (M.mikro && _rfSetzen('mikrolage', M.mikro, Q)) eingetragen.push('Mikrolage');
-    if (M.mietSqm != null && _rfSetzen('ds2_marktmiete', String(Math.round(M.mietSqm * 100) / 100).replace('.', ','), Q)) eingetragen.push('Marktmiete');
-    if (M.mw != null && _rfSetzen('svwert', String(Math.round(M.mw)), Q)) eingetragen.push('Marktwert');
+    var KNF = { konflikt: true };   /* v1376 (C7) */
+    if (M.makro && _rfSetzen('makrolage', M.makro, Q, KNF)) eingetragen.push('Makrolage');
+    if (M.mikro && _rfSetzen('mikrolage', M.mikro, Q, KNF)) eingetragen.push('Mikrolage');
+    if (M.mietSqm != null && _rfSetzen('ds2_marktmiete', String(Math.round(M.mietSqm * 100) / 100).replace('.', ','), Q, KNF)) eingetragen.push('Marktmiete');
+    if (M.mw != null && _rfSetzen('svwert', String(Math.round(M.mw)), Q, KNF)) eingetragen.push('Marktwert');
+
 
     /* v1290: Wer fuer die volle Stufe bezahlt, bekommt auch zu sehen, was
        sie mehr kann. Ein Fliesstext, der nur in der Antwort steht und
@@ -6599,7 +6799,13 @@
         : '') +
       '</div>');
     _rfStandZeichnen();
+    /* v1376 (C7): Widerspricht ein abgerufener Wert dem, was gesagt wurde,
+       steht die Frage jetzt in der Leiste. Sie ueberlebt den Fragewechsel
+       (siehe _rfWeiter), der Dialog laeuft also normal weiter - nur die
+       Entscheidung bleibt sichtbar offen, statt still zu verschwinden. */
+    _rfKonfliktZeigen();
     /* v1307: Der Bericht trägt mehr als Marktwert und Lage — er sagt auch,
+
        wie sich der Ort entwickelt. Das wird jetzt gelesen. */
     _rfBerichtLesen(M, Q);
     /* ═══ v1324 · Die wartende Ort-Frage aufloesen ══════════════════════
@@ -6845,9 +7051,13 @@
     _rf.nachgehakt = 0;   /* v1290: Nachhaken gilt nur fuer die Frage, in der es passiert ist */
     /* v1291: Angebote gelten fuer IHRE Frage. Was bleibt, ist der
        Marktabruf — der laeuft ueber den ganzen Dialog. */
+    /* v1376 (C7): Ein Widerspruch gehoert zum FELD, nicht zur Frage. Wuerde
+       er hier mit weggeraeumt, waere er genau das, was er nicht mehr sein
+       soll: still verschwunden. Er bleibt stehen, bis jemand entscheidet. */
     (_rf.aktionen || []).slice().forEach(function (a) {
-      if (a.art !== 'markt' && a.art !== 'markt2') _rfAktionWeg(a.art);
+      if (a.art !== 'markt' && a.art !== 'markt2' && a.art.indexOf('knf_') !== 0) _rfAktionWeg(a.art);
     });
+
     /* v1280: Der Vorschlag aus den Einstellungen steht IN der Frage - nicht
        als stiller Knopf daneben. Wer gefragt wird, soll sehen, was der
        Co-Pilot vorhat, bevor er ja sagt. */
@@ -7968,8 +8178,14 @@
        ueberspringen. Wer ein Angebot ablehnt, will nicht die Frage
        ueberspringen — er will nur den Abruf nicht. */
     if ((_rf.aktionen || []).length && (RF_NEIN_ANGEBOT.test(t) || _istAblehnung(t))) {
+      /* v1376 (C7): Steht ein Widerspruch offen, ist "nein" keine Absage an
+         ein Angebot, sondern eine Entscheidung: es bleibt bei der eigenen
+         Angabe. Alles stumm wegzuraeumen waere hier das Schlimmste - der
+         Nutzer haette nie erfahren, wie es ausging. */
+      if (_rf.konfliktOffen) { _rfBlase('ich', escH(t)); _rfAktionKlick('knf_alt'); return true; }
       _rf.abrufOffen = null;
       (_rf.aktionen || []).slice().forEach(function (a) { _rfAktionWeg(a.art); });
+
       _rfBlase('ich', escH(t));
       _rfBlase('co', '<span style="opacity:.7">Alles klar — dann frage ich die Werte ganz normal ab.</span>');
       if (ausSprache && _fs.an) _fsHoeren(true);
