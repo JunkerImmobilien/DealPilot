@@ -75,6 +75,21 @@ ERLAUBT = {
                           'feld_2','bez_2','gueltig_2','rundung_stellen','liefert',
                           'hinweis','normobjekt'},
     'konstante':         {'form','wert','rundung_stellen','liefert','hinweis','normobjekt'},
+    # v1098i: Die Formen unten kennt der Auswerter seit v1088 bis v1093,
+    # im Werkzeug fehlten sie. Ein Rezept damit waere hier gescheitert,
+    # obwohl swf_modelle.js sie rechnet - dieselbe Luecke wie bei
+    # kategorie_baender (v1098d).
+    'baender_1d':        {'form','achse_feld','achse_bez','baender','rundung_stellen',
+                          'liefert','hinweis','normobjekt'},
+    'stufen_kategorial': {'form','achse_feld','achse_bez','kategorie_feld','kategorie_bez',
+                          'kategorien','stufen','rundung_stellen','liefert','hinweis',
+                          'normobjekt'},
+    'log_1d':            {'form','achse_feld','achse_bez','a','b','gueltig_von',
+                          'gueltig_bis','rundung_stellen','liefert','hinweis','normobjekt'},
+    'spanne_kategorial': {'form','achse_feld','achse_bez','kategorien','spannen',
+                          'rundung_stellen','liefert','hinweis','normobjekt'},
+    'regression_additiv': {'form','basis','glieder','rundung_stellen','liefert',
+                           'hinweis','normobjekt'},
 }
 
 # Schluessel, die NICHTS berechnen, sondern erklaeren. Sie duerfen in jeder

@@ -121,7 +121,12 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                                Kalkulator, nicht als Tabelle im PDF — die Werte
                                sind einzeln am Kalkulator abgefragt. dl-de/by-2-0,
                                Quellenvermerk ist Pflicht. */
-                            'swf-ni.json'];
+                            'swf-ni.json',
+                            /* v1098i: Sachwertfaktoren Mainz. Erster Satz aus
+                               Rheinland-Pfalz. Der Bericht druckt die Funktion
+                               ab UND ein Anwendungsbeispiel — beides
+                               nachgerechnet, beides zeichengleich. */
+                            'swf-rp.json'];
 
 export function ladeSaat(dateien = SAATDATEIEN) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])
