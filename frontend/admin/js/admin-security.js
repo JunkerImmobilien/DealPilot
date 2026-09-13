@@ -220,7 +220,9 @@
           /* Das Detail trägt nur Zahlen - es gibt nichts zu verbergen und
              nichts, was ein Nutzer geschrieben hat. */
           const d = detailText(e.detail);
-          return '<tr><td style="white-space:nowrap">' + zeit(e.created_at) + '</td>'
+          const istEntsch = ['eingeschraenkt','gesperrt','freigegeben'].indexOf(e.art) >= 0;
+          return '<tr' + (istEntsch ? ' class="sec-zeile-entsch"' : '')
+            + '><td style="white-space:nowrap">' + zeit(e.created_at) + '</td>'
             + '<td>' + wer + '</td>'
             + '<td>' + esc(e.art) + '</td>'
             + '<td><span style="color:' + STUFE_FARBE[e.stufe] + '">'
@@ -270,7 +272,9 @@
           + '<th>Pfad</th><th>Detail</th></tr></thead><tbody>'
           + a.chronik.map((e) => {
               const d = detailText(e.detail);
-              return '<tr><td style="white-space:nowrap">' + zeit(e.created_at) + '</td>'
+              const istEntsch2 = ['eingeschraenkt','gesperrt','freigegeben'].indexOf(e.art) >= 0;
+              return '<tr' + (istEntsch2 ? ' class="sec-zeile-entsch"' : '')
+                + '><td style="white-space:nowrap">' + zeit(e.created_at) + '</td>'
                 + '<td>' + esc(e.art) + '</td>'
                 + '<td><span style="color:' + STUFE_FARBE[e.stufe] + '">'
                   + (STUFE_TEXT[e.stufe] || esc(e.stufe)) + '</span></td>'
