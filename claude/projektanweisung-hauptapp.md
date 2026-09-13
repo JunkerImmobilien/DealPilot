@@ -15700,3 +15700,44 @@ einzige Grund, warum das gutging.
 **Konsequenz:** die Marktbericht-Fassung heißt jetzt
 `claude/projektanweisung-marktbericht-20260812-abend.md`. **Nie wieder zwei
 Projektanweisungen mit gleichem Dateinamen.** Und: nach einem `cat >>` auf eine
+
+### v1368b–d · Drei Nachbesserungen, sichtbar erst mit Anmeldung
+
+Marcel hat mich im Adminbereich angemeldet — und damit wurde pruefbar,
+was vorher nur „geladen“ war.
+
+**`v1368b` — HTTP 401 trotz gueltiger Anmeldung.** Mein Abruf setzte
+`Authorization: Bearer`. Der Adminbereich schickt seinen Token als
+**`X-Admin-Token`** (`admin-api.js:14`). Der Schluesselname im
+`localStorage` stimmte sogar — nur das Tuerschild war ein anderes.
+
+> Dieselbe Familie wie die Leser, die ins Leere greifen: der Code sah
+> richtig aus, und nichts widersprach, bis jemand angemeldet war.
+
+**`v1368c` — `\uXXXX` ist im HTML kein Escape, sondern Text.** Der
+Zurueck-Knopf zeigte woertlich `zur\u00fcck`. Neun solche Sequenzen
+standen im Markup, aus dem Perl-Patch uebernommen, wo sie fuer
+JavaScript-Strings richtig gewesen waeren.
+
+**Eine Messung haette das nie gezeigt:** die Elemente waren da, die
+Klassen stimmten, das Skript lud. Nur der Text war falsch. Gefunden beim
+ersten Blick auf den Screenshot.
+
+**`v1368d` — lange Pfade liefen in die Detail-Spalte.**
+`/api/v1/subscription` ueberlappte `probe: true`. Nachgemessen:
+**0 Ueberlappungen** bei 15 Zeilen, breitester Pfad 166 px.
+
+### Abnahme mit Anmeldung
+
+```
+Kacheln          0 Ernst · 5 Auffaellig · 10 Hinweis
+Konten           2 Zeilen — anonym (9 Ereignisse, 1 Pfad, auffaellig)
+                           Konto (6 Ereignisse, 5 Pfade, Hinweis)
+Chronik          15 Zeilen
+Fallakte         5 Gruppen gegen 12 · Streuung 0,65 gegen 5,13
+Escape-Reste     0
+```
+
+Die Eskalation ist in der Chronik direkt ablesbar: das Detail zaehlt
+`ueberschreitungen_1h` von 1 bis 9 hoch, und ab der fuenften springt die
+Stufe von `Hinweis` auf `Auffaellig`.
