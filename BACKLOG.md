@@ -3893,6 +3893,42 @@ entfällt — nicht raten.
 
 ## MARKTBERICHT / ERNTE — Workstream (D)  ·  eingebaut 13.09.2026
 
+> **STAND 13.09.2026 ABEND — BRANDENBURG IST FERTIG GEERNTET** (v1101-v1105,
+> Commit `6bffa25`). Register auf Staging: **2.182 Saetze · 55
+> Sachwertfaktoren**, davon Brandenburg **16 aus 15 Ausschuessen**. Alle 15
+> Brandenburger Zustaendigkeitsschluessel tragen einen Faktor. Nicht
+> erreichbar: Oberspreewald-Lausitz und Spree-Neisse (404), Frankfurt (Oder)
+> (gemeinsamer Ausschuss mit Oder-Spree, eigene Auswertung fehlt).
+>
+> **Prignitz ist der erste Satz der Stufe A** im ganzen Register: der Bericht
+> druckt ein Anwendungsbeispiel ab (150.000 x 0,95 x 0,81 = 115.425 EUR), und
+> das Register rechnet es auf den Euro nach.
+>
+> **Vier Angaben waren gebaut und kamen nie an** — Standardstufe, Ortsname,
+> Wohnflaeche, Modernisierungsgrad. Alle vier sind jetzt verdrahtet. Die
+> Standardstufe traf Wolfenbuettel: dessen Korrektur (0,81 bis 1,21) lief seit
+> ihrer Aufnahme ins Leere.
+>
+> **Eine Rundung lag falsch und ist korrigiert** (v1103): fuenf Modellformen
+> rundeten hart auf drei Stellen, der Registerweg danach auf zwei. Die
+> Uckermark gab bei 350.000 EUR 0,89 statt der abgedruckten 0,88. Ein
+> Regressionslauf ueber 70 Modelle und 11.340 Rechnungen zeigt vier bewegte
+> Stellen, alle vier doppelt gerundet.
+>
+> **Neue Modellformen:** `verzweigt` (je Kategorie ein vollstaendiges Modell,
+> zwei Ebenen tief), `baender_kategorial`, dazu `kategorie_sonst` und
+> `kategorie_mehrdeutig`. Vollstaendig in `claude/ernte-20260913.md`.
+>
+> **Was als naechstes ohne eine einzige neue Datei geht:** Reihenhaeuser und
+> Doppelhaushaelften stehen in JEDEM Brandenburger Bericht als eigenes Kapitel
+> 8.3.2 — dieselben 18 PDFs liegen unter `/opt/dealpilot-quellen/`.
+>
+> **Der Olpe-Punkt unter E1 ist technisch geloest:** `verzweigt` rechnet
+> mehrere Regressionen nach Bodenrichtwertbereich. Das Rezept liegt noch im
+> ZIP von v1094 und ist noch nicht eingelesen.
+
+
+
 **Wo dieser Strang steht (Stand 30.08.2026, am laufenden Prod gemessen):**
 
 ```
