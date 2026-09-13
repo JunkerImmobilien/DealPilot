@@ -3026,3 +3026,53 @@ Extraktor** ist es dagegen stärker als angenommen — Dokumente finden,
 Seitenzahlen liefern, PDF lesen. **Nicht als Quelle:** ohne Fundstelle kein
 Beleg, ohne Beleg kein Registerdatensatz (`CHECK (jsonb_array_length(belege) >
 0)`).
+
+---
+
+## v1097 — Sachwert für Eigentumswohnungen und Mehrfamilienhäuser (13.09.2026)
+
+**Was.** Der Rechenkern rechnet ETW/MFH seit v1047, die NHK-Zeilen 4.1–4.3
+stehen seit v1068 in `nhk2010.js`. Die Oberfläche sperrte es trotzdem — mit
+der Regel aus v955, einem roten Kreuz und der Begründung, das Verfahren gelte
+für Wohnungen nicht.
+
+Schlimmer als der falsche Text war die zweite Wirkung: `nichtWenn` übersprang
+auch die **Feldsammlung**. Die Ampel hat BGF und Standardstufe — genau die
+beiden Felder, die der Rechenkern braucht — nie eingefordert, und der Nutzer
+bekam danach vom Backend „die Standardstufe fehlt". Dieselbe alte Regel stand
+im Prompt der KI-Zweitmeinung.
+
+**Commit.** `d8d8247` · Paket aus `Dateien/uebergabe-claude-code-20260908.zip`,
+eingespielt mit `apply.sh`, danach ins Repo zurückgeholt und `mb-backend`
+gebaut.
+
+**Nachweis — der Klicktest aus A1, im Browser gefahren:**
+
+```
+ETW · Stufe 3 · BGF und Standardstufe leer
+  ✓ Sachwert rechnet — genauer mit: Ausstattungsqualität,
+                                    Bruttogrundfläche (m²), Standardstufe (NHK 2010)
+
+EFH (Gegenprobe)
+  ✓ Sachwert rechnet — genauer mit: Ausstattungsqualität
+```
+
+Kein rotes Kreuz, kein „bei Eigentumswohnung nicht anwendbar", und die
+Zusatzfelder erscheinen **nur** bei Wohnungen. Damit sind beide Kettenglieder
+belegt: `empfohlenZusatz` wird gesetzt *und* gelesen.
+
+**Offen (ehrlich als Abnahmepunkt):** Test 2 aus A1 — eine ETW mit gefüllter
+BGF und Standardstufe durchrechnen und prüfen, dass im **Bericht** ein
+Sachwert erscheint. Der braucht einen echten Berichtslauf; er wurde nicht
+gefahren.
+
+> **Ein Punkt der Prüfstrecke fiel zuerst durch, und das war kein Fehler des
+> Pakets:** `app.js-Buster unangetastet gelassen` prüfte auf
+> `/app\.js\?v=1154b/` — den Wert vom 30.08. Der Parallel-Strang läuft weiter,
+> heute steht dort `1229c`. **Gemessen: der Patch fasst `app.js` überhaupt
+> nicht an** (1229c vorher, 1229c nachher).
+>
+> Eine Prüfung, die einen konkreten **Wert** erwartet statt einer
+> **Eigenschaft**, fällt mit jedem fremden Rollout durch. Sie vergleicht jetzt
+> die `app.js`-Zeile der gepatchten Datei gegen die des Originals und bekommt
+> dafür den Originalpfad als zweites Argument.
