@@ -1,0 +1,63 @@
+{
+  "land_code": "BB",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Uckermark",
+  "gaa_kennz": "12073",
+  "ags": ["12073"],
+  "ebene": "kreis",
+  "berichtsjahr": 2025,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06-25",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_UM.pdf",
+  "quelle_datei": "BB-uckermark-gmb-2025.pdf",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Abbildung 42 und Tabelle 28, S. 59. Modellgrundlage: VV EW-SW Land Brandenburg",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "Ein- und Zweifamilienhäuser bei einem Bodenrichtwert über 30 €/m²",
+      "form": "potenz",
+      "formel": {
+        "form": "potenz",
+        "achse_feld": "sachwert",
+        "achse_bez": "vorläufiger Sachwert in Euro",
+        "a": 21.252,
+        "b": -0.249,
+        "gueltig_von": 75000,
+        "gueltig_bis": 450000,
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "DIE FUNKTION IST ABGEDRUCKT, die Tabelle ist ihr Ergebnis. y = 21,252 · x^-0,249 (R² = 0,1987). Acht Stützstellen nachgerechnet, alle zeichengleich mit Tabelle 28 — deshalb ist hier die Funktion geführt und nicht die Tabelle: sie rechnet auch zwischen den abgedruckten Stützstellen richtig, statt linear zu interpolieren.",
+        "normobjekt": "Modellansätze nach VV EW-SW Land Brandenburg."
+      },
+      "korrekturen": [],
+      "modellansaetze": {
+        "modellgrundlage": "Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
+        "verfahren": "Sachwertverfahren nach ImmoWertV 2021, § 21 Abs. 1 f.",
+        "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
+        "funktion": "y = 21,252 · x^-0,249, R² = 0,1987"
+      },
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Uckermark",
+        "sachlich": "Ein- und Zweifamilienhäuser, NUR bei einem Bodenrichtwert über 30 €/m²",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwert_eur": { "min": 75000, "max": 450000 },
+          "brw_eur_qm":   { "min": 31, "max": null }
+        },
+        "vorbehalt": "ZWEI GRENZEN, DIE BEIDE GELTEN.\n\n(1) DER BODENRICHTWERT MUSS ÜBER 30 €/m² LIEGEN. Der Bericht führt diese Auswertung ausdrücklich nur für dieses Segment; für Grundstücke mit 30 €/m² oder darunter gilt sie NICHT. Der Auswerter prüft das nicht — die Form `potenz` kennt nur eine Achse. Wer für ein Objekt mit niedrigerem Bodenrichtwert rechnet, verlässt den Anwendungsbereich, ohne dass es auffällt. DAS IST DIE WICHTIGSTE OFFENE STELLE DIESES REZEPTS.\n\n(2) Die Stichprobe reicht von 75.000 bis 450.000 € vorläufigem Sachwert; darüber und darunter ist die Extrapolation gesperrt.\n\nDas Bestimmtheitsmaß liegt bei 0,1987 — das Modell erklärt rund ein Fünftel der Streuung. Der Faktor ist eine Orientierung, keine Punktlandung.",
+        "hinweis": "Der Bericht führt zusätzlich eine Tabelle 29 „Ein- und Zweifamilienhäuser nach Baujahr und Standardstufe\" (S. 60) — sie ist hier nicht ausgewertet und könnte eine Verfeinerung tragen."
+      },
+      "stufe": "C",
+      "stufe_grund": "Amtliche Funktion, an acht Stützstellen gegen die abgedruckte Tabelle geprüft und zeichengleich. Stufe C, weil das Bestimmtheitsmaß bei 0,1987 liegt und die Bodenrichtwert-Grenze (über 30 €/m²) vom Auswerter nicht geprüft werden kann.",
+      "fallzahl": null,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 Landkreis Uckermark, Abbildung 42 (Funktion y = 21,252x^-0,249, R² = 0,1987) und Tabelle 28, S. 59: 13 Stützstellen von 75.000 bis 450.000 € vorläufigem Sachwert."
+    }
+  ]
+}
