@@ -640,15 +640,20 @@ router.get('/security/fall/:userId', requireAdmin, async (req, res) => {
       'SELECT id, email, name, role, is_active, created_at FROM users WHERE id = $1', [uid]);
     if (!nutzer.rowCount) return res.status(404).json({ error: 'user_not_found' });
 
-    const [chronik, muster24] = await Promise.all([
+    const [chronik, muster24, zustand] = await Promise.all([
       sec.chronik(uid, { limit: 500 }),
-      sec.muster(uid, { fensterMinuten: 1440 })
+      sec.muster(uid, { fensterMinuten: 1440 }),
+      /* v1369: der geltende Zustand gehoert in die Akte - sonst sieht man
+         Beobachtungen, ohne zu wissen, ob schon jemand entschieden hat. */
+      sec.zustand(uid)
     ]);
+
 
     res.json({
       nutzer: nutzer.rows[0],
       chronik,
       muster_24h: muster24,
+      zustand,
       hinweis: 'Diese Akte sammelt Beobachtungen. Die Bewertung trifft ein Mensch.'
     });
   } catch (e) {
@@ -657,7 +662,62 @@ router.get('/security/fall/:userId', requireAdmin, async (req, res) => {
   }
 });
 
+/* ══════════════════════════════════════════════════════════════════════
+   v1369 (B4) · DIE ENTSCHEIDUNG — und wer sie treffen darf
+   ══════════════════════════════════════════════════════════════════════
+   Marcels Entscheidung vom 13.09.2026 auf die Frage, ab wann das System
+   selbst eingreift: GAR NICHT. Es stuft ein und meldet; jede
+   Einschraenkung und jede Sperre setzt ein Mensch.
+
+   Deshalb gibt es genau diesen einen Endpunkt, der einen Zustand setzt -
+   und er verlangt drei Dinge:
+
+     1. eine ROLLE. Lesen darf jeder Admin, entscheiden nur owner und
+        support. Wer einen Fall nur nachvollziehen soll, soll ihn nicht
+        aus Versehen schliessen koennen.
+     2. eine BEGRUENDUNG. Ohne Notiz kein Eintrag - sonst steht in der
+        Akte spaeter eine Sperre, die niemand pruefen kann.
+     3. den BERECHNETEN STAND im Moment der Entscheidung. Er wird
+        mitgeschrieben, damit spaeter nachvollziehbar ist, worauf sie
+        sich stuetzte.
+
+   Aufgehoben wird eine Sperre durch `freigegeben` - nicht durch Loeschen.
+   Die Tabelle ist append-only (B10): eine Korrektur ist eine neue Zeile,
+   kein Radiergummi.
+   ══════════════════════════════════════════════════════════════════════ */
+router.post('/security/entscheidung', requireAdmin, requireRole('owner', 'support'),
+  async (req, res) => {
+    try {
+      const sec = require('../services/securityEventService');
+      const { user_id, art, notiz } = req.body || {};
+
+      if (!user_id) return res.status(400).json({ error: 'user_id fehlt' });
+      if (!notiz || String(notiz).trim().length < 3) {
+        return res.status(400).json({
+          error: 'begruendung_fehlt',
+          hinweis: 'Wer einschraenkt, soll sagen warum - und zwar bevor er es tut.'
+        });
+      }
+
+      const eintrag = await sec.entscheiden({
+        userId: user_id,
+        art,
+        adminEmail: req.adminUser && req.adminUser.email,
+        notiz
+      });
+
+      if (!eintrag) return res.status(500).json({ error: 'nicht_gespeichert' });
+
+      const zustand = await sec.zustand(user_id);
+      res.json({ ok: true, eintrag, zustand });
+    } catch (e) {
+      console.error('[admin] security/entscheidung:', e.message);
+      res.status(400).json({ error: e.message });
+    }
+  });
+
 router.get('/audit-log.csv', requireAdmin, async (req, res) => {
+
 
   const db = req.app.get('db');
   const { action = '', limit = 5000 } = req.query;

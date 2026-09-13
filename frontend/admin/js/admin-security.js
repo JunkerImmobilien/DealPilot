@@ -30,6 +30,26 @@
      Grün und Rot bedeuten überall dasselbe. Gold ist hier bewusst die
      mittlere Stufe — nicht Rot, denn „auffällig" ist keine Anklage. */
   const STUFE_FARBE = { hinweis: '#7a7468', auffaellig: '#C9A84C', ernst: '#B8625C' };
+
+  /* v1369 (B4): die Risikostufen. Die ersten vier sind Messwerte, die
+     letzten drei Entscheidungen - das soll man auch sehen. Deshalb sind
+     die berechneten Stufen in Grautönen und Gold, und nur die von einem
+     Menschen gesetzten in Rot. Eine Maschine soll nicht rot leuchten. */
+  const RISIKO_FARBE = {
+    normal:         '#3FA56C',
+    auffaellig:     '#C9A84C',
+    warnung:        '#b8932f',
+    hohes_risiko:   '#a8761f',
+    eingeschraenkt: '#B8625C',
+    gesperrt:       '#D8564C',
+    freigegeben:    '#3FA56C'
+  };
+  const RISIKO_TEXT = {
+    normal: 'Normal', auffaellig: 'Auffällig', warnung: 'Warnung',
+    hohes_risiko: 'Hohes Risiko', eingeschraenkt: 'Eingeschränkt',
+    gesperrt: 'Gesperrt', freigegeben: 'Manuell freigegeben'
+  };
+
   const STUFE_TEXT  = { hinweis: 'Hinweis', auffaellig: 'Auffällig', ernst: 'Ernst' };
 
   function zeit(w) {
@@ -223,15 +243,123 @@
 
       $('#sec-fall-body').innerHTML = kennzahlen
         + '<h3 class="sec-h3">Chronik</h3>' + chronik
+        + zustandsBlock(a.zustand, a.nutzer)
         + '<p class="sec-fall-fuss">' + esc(a.hinweis || '') + '</p>';
+
     } catch (e) {
       $('#sec-fall-body').innerHTML = '<p style="color:#B8625C">Konnte nicht geladen werden: '
         + esc(e.message) + '</p>';
     }
   }
 
+  /* ══════════════════════════════════════════════════════════════════
+     v1369 (B4) · DER ZUSTAND UND DIE ENTSCHEIDUNG
+     ══════════════════════════════════════════════════════════════════
+     Marcels Entscheidung: das System sperrt nie selbst. Es stuft ein und
+     meldet; die Einschränkung setzt ein Mensch.
+
+     Die Knöpfe stehen deshalb HIER, in der Fallakte - nicht in der Liste.
+     Wer entscheidet, soll die Chronik über sich haben und die Kennzahlen
+     daneben. Ein Knopf in einer Übersichtstabelle lädt dazu ein, nach der
+     Zahl zu urteilen statt nach dem Fall.
+
+     Und jede Entscheidung verlangt eine Begründung, bevor sie möglich
+     ist - der Knopf bleibt gesperrt, solange das Feld leer ist. Nicht,
+     um zu gängeln, sondern weil in der Akte sonst später eine Sperre
+     steht, die niemand prüfen kann. */
+  function zustandsBlock(z, nutzer) {
+    if (!z) return '';
+    const geltend = z.geltend || 'normal';
+    const farbe = RISIKO_FARBE[geltend] || '#7a7468';
+    const b = z.berechnet || {};
+    const g = b.grund || {};
+
+    /* Die Begründung der BERECHNUNG - damit sichtbar ist, warum die
+       Maschine zu dieser Stufe kommt, und nicht nur, dass sie es tut. */
+    let warum = '';
+    if (g.ueberschreitungen != null) {
+      const teile = [g.ueberschreitungen + ' Limit-Überschreitungen'
+                     + (g.schwelle ? ' (Schwelle ' + g.schwelle + ')' : '')];
+      if (g.vielfalt != null) {
+        teile.push(g.vielfalt + ' Endpunktgruppen'
+          + (g.vielfalt_grenze ? ' (Grenze ' + g.vielfalt_grenze + ')' : ''));
+      }
+      if (g.streuung != null) {
+        teile.push('Streuung ' + String(g.streuung).replace('.', ',')
+          + (g.streuung_grenze ? ' (Grenze ' + String(g.streuung_grenze).replace('.', ',') + ')' : ''));
+      }
+      warum = '<div class="sec-zust-warum">' + esc(teile.join(' · '))
+            + ' in ' + (g.fenster_minuten || 60) + ' Minuten</div>';
+    }
+
+    let herkunft;
+    if (z.durch === 'entscheidung') {
+      herkunft = '<div class="sec-zust-quelle">Gesetzt von <b>' + esc(z.von || 'unbekannt')
+        + '</b> am ' + zeit(z.seit) + '\u2003·\u2003berechnet wäre: <b>'
+        + esc(RISIKO_TEXT[b.stufe] || b.stufe || '?') + '</b>'
+        + (z.notiz ? '<div class="sec-zust-notiz">„' + esc(z.notiz) + '"</div>' : '')
+        + '</div>';
+    } else if (z.durch === 'freigabe') {
+      herkunft = '<div class="sec-zust-quelle">Manuell freigegeben von <b>'
+        + esc(z.freigegeben_von || 'unbekannt') + '</b> am ' + zeit(z.freigegeben_am)
+        + (z.notiz ? '<div class="sec-zust-notiz">„' + esc(z.notiz) + '"</div>' : '')
+        + '</div>';
+    } else {
+      herkunft = '<div class="sec-zust-quelle">Berechnet \u2014 niemand hat hier entschieden.</div>';
+    }
+
+    const uid = nutzer && nutzer.id ? nutzer.id : '';
+    const knoepfe = uid
+      ? '<div class="sec-entsch">'
+        + '<label class="sec-entsch-l" for="sec-notiz">Begründung '
+        + '<span style="opacity:.6">(Pflicht, steht später in der Akte)</span></label>'
+        + '<textarea id="sec-notiz" rows="2" placeholder="Warum diese Entscheidung?"></textarea>'
+        + '<div class="sec-entsch-btns">'
+          + '<button class="btn" data-entsch="eingeschraenkt" data-uid="' + esc(uid)
+            + '" disabled>Einschränken</button>'
+          + '<button class="btn" data-entsch="gesperrt" data-uid="' + esc(uid)
+            + '" disabled>Sperren</button>'
+          + '<button class="btn btn-ghost" data-entsch="freigegeben" data-uid="' + esc(uid)
+            + '" disabled>Freigeben</button>'
+        + '</div>'
+        + '<div class="sec-entsch-hinweis">Das System sperrt nie von selbst. '
+        + 'Was hier gesetzt wird, gilt bis es jemand aufhebt \u2014 und bleibt '
+        + 'als Eintrag in der Chronik stehen.</div>'
+        + '</div>'
+      : '';
+
+    return '<div class="sec-zustand">'
+      + '<div class="sec-zust-kopf">Geltender Zustand'
+        + '<span class="sec-zust-wert" style="color:' + farbe + '">'
+        + esc(RISIKO_TEXT[geltend] || geltend) + '</span></div>'
+      + herkunft + warum + knoepfe
+      + '</div>';
+  }
+
+  async function entscheiden(art, uid) {
+    const feld = document.getElementById('sec-notiz');
+    const notiz = feld ? feld.value.trim() : '';
+    if (notiz.length < 3) return;
+
+    const t = adminToken();
+    try {
+      const r = await fetch('/api/v1/admin/security/entscheidung', {
+        method: 'POST',
+        headers: Object.assign({ 'Content-Type': 'application/json' },
+                               t ? { 'X-Admin-Token': t } : {}),
+        body: JSON.stringify({ user_id: uid, art, notiz })
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+      fallakte(uid);   /* neu zeichnen - der Eintrag steht jetzt in der Chronik */
+    } catch (e) {
+      alert('Nicht gespeichert: ' + e.message);
+    }
+  }
+
   /* ──────────────────────────────────────────────────────────────────
      Einhängen. Über Delegation, damit admin-app.js unverändert bleibt.
+
      ────────────────────────────────────────────────────────────────── */
   document.addEventListener('click', (ev) => {
     const nav = ev.target.closest && ev.target.closest('[data-view="security"]');
@@ -242,7 +370,15 @@
 
     if (ev.target.id === 'sec-laden') { ev.preventDefault(); laden(); return; }
 
+    const entschBtn = ev.target.closest && ev.target.closest('[data-entsch]');
+    if (entschBtn && !entschBtn.disabled) {
+      ev.preventDefault();
+      entscheiden(entschBtn.getAttribute('data-entsch'), entschBtn.getAttribute('data-uid'));
+      return;
+    }
+
     if (ev.target.id === 'sec-fall-zurueck') {
+
       ev.preventDefault();
       document.querySelectorAll('.view').forEach((v) => { v.style.display = 'none'; });
       $('#view-security').style.display = 'block';
@@ -250,7 +386,16 @@
     }
   });
 
+  /* Ohne Begründung keine Entscheidung - und das sieht man, statt es
+     erst beim Klick zu erfahren. */
+  document.addEventListener('input', (ev) => {
+    if (!ev.target || ev.target.id !== 'sec-notiz') return;
+    const reicht = ev.target.value.trim().length >= 3;
+    document.querySelectorAll('[data-entsch]').forEach((b) => { b.disabled = !reicht; });
+  });
+
   document.addEventListener('keydown', (ev) => {
+
     if (ev.key === 'Enter' && ev.target && ev.target.id === 'sec-suche') { ev.preventDefault(); laden(); }
   });
 
