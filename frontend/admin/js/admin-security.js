@@ -39,13 +39,26 @@
                                        hour: '2-digit', minute: '2-digit' });
   }
 
+  /* v1368b: der Adminbereich schickt seinen Token als `X-Admin-Token`,
+     NICHT als `Authorization: Bearer`. Mein erster Anlauf nahm Bearer -
+     Ergebnis: HTTP 401, obwohl die Anmeldung stand.
+
+     Gefunden nur, weil Marcel sich angemeldet hat und die Ansicht trotzdem
+     leer blieb. Dieselbe Familie wie die Leser, die ins Leere greifen:
+     der Code sah richtig aus, der Schlüssel stimmte sogar - nur das
+     Türschild war ein anderes.
+
+     Der Schlüsselname `dp_admin_token` und der Header stehen in
+     `admin-api.js:8/14`. Hier wird nichts nachgebaut, sondern dasselbe
+     gelesen. */
+  function adminToken() {
+    try { return localStorage.getItem('dp_admin_token') || ''; } catch (e) { return ''; }
+  }
+
   async function hole(pfad) {
-    /* Denselben Weg nehmen wie der Rest des Admins - ein eigener fetch
-       würde den 401-Handler umgehen. */
-    if (window.API && typeof window.API.raw === 'function') return window.API.raw(pfad);
-    const t = localStorage.getItem('dp_admin_token') || localStorage.getItem('admin_token') || '';
+    const t = adminToken();
     const r = await fetch('/api/v1/admin' + pfad, {
-      headers: t ? { Authorization: 'Bearer ' + t } : {}
+      headers: t ? { 'X-Admin-Token': t } : {}
     });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
