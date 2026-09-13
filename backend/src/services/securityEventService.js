@@ -120,10 +120,21 @@ async function muster(userId, { fensterMinuten } = {}) {
   );
   const zeilen = r.rows || [];
 
+  /* v1367c: das gemeinsame Präfix muss weg, bevor gruppiert wird.
+     Erst stand hier `pfad.replace(/^\/+/,'').split('/')[0]` - das ergibt
+     bei JEDEM Pfad `api`, weil alle mit /api/v1/ beginnen. Die Vielfalt
+     war damit immer 1, und eine Kennzahl, die immer dasselbe sagt, sieht
+     aus wie eine Kennzahl.
+
+     Gefunden beim Probelauf mit fünf verschiedenen Pfaden: gemeldet wurde
+     `vielfalt: 1`. Dieselbe Sorte Fehler wie die Leser, die ins Leere
+     greifen - sie fällt nur auf, wenn man das Ergebnis gegen eine
+     bekannte Erwartung hält. */
   const gruppen = new Set();
   zeilen.forEach((z) => {
     if (!z.pfad) return;
-    const g = String(z.pfad).replace(/^\/+/, '').split('/')[0];
+    const ohnePraefix = String(z.pfad).replace(/^\/?api\/v\d+\//i, '').replace(/^\/+/, '');
+    const g = ohnePraefix.split('/')[0];
     if (g) gruppen.add(g);
   });
 
