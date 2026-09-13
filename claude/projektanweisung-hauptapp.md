@@ -16307,3 +16307,50 @@ Echter Satz durch die KI-Extraktion:
 > alle drei Fälle `false` ergaben — auch der, der `true` hätte sein müssen.
 > `_luecken` liefert nur die obersten drei Blöcke, der Steuerblock war nie
 > dabei. Siehe FALLEN 156.
+
+---
+
+## v1378 / v1378b — Zwei Begleittöne (C2)
+
+**Was.** Ein **Lernmodus**, der erklärt, wozu eine Angabe gebraucht wird, und
+ein **Investor-Modus**, der knapp bleibt — jederzeit umschaltbar. Bisher gab
+es nichts davon: der Ton war im Backend festgeschrieben („zwei bis vier
+Sätze", Regel 1), das Frontend hatte keinen Parameter, über den es etwas
+anderes hätte anfordern können.
+
+Der Ton ändert **zwei** Dinge und sonst nichts: Länge und Tiefe der
+KI-Auskunft, und ob unter der Frage steht, **wozu** sie gestellt wird. Er
+ändert nicht, welche Fragen kommen, welche Werte gelten, was gerechnet wird.
+Ein Modus, der den Inhalt ändert, wäre kein Ton mehr, sondern eine zweite
+Anwendung.
+
+Die 16 Wozu-Sätze sind kein Lexikon. Sie sagen, was die Angabe **in dieser
+Software** bewirkt: dass nur der nicht umlagefähige Teil des Hausgelds den
+Cashflow trifft, dass der Bodenrichtwert zweimal zählt (Sachwert **und**
+Gebäudeanteil für die AfA), dass der wirtschaftliche Übergang oft Wochen nach
+der Beurkundung liegt.
+
+Gemerkt wird er (`dp_rf_modus`) — im Unterschied zum Aufnahmeweg „frei
+erzählen" gegen „frag mich durch", der bewusst **nicht** gemerkt wird
+(v1275). Der Aufnahmeweg ist eine Entscheidung für dieses Objekt, der Ton
+eine über die Person.
+
+**Commits.** `4f034a6` · `567fe96` · Backend-Rebuild
+
+**Nachweis.** Dieselbe Frage („Was ist der DSCR?"), derselbe Kontext:
+
+```
+Lernmodus       666 Zeichen · 5 Sätze · erklärt Begriff und Zweck
+Investor-Modus  206 Zeichen · 1 Satz  · Zahl und Folge, ohne Definition
+```
+
+Beide nennen die bekannten Werte, beide erfinden nichts. Umschalten per Knopf
+und per Sprache („ausführlicher" / „kürzer" / „normal") gemessen; der
+Wozu-Satz erscheint mit Gold-Rand unter der Frage.
+
+> **Ein Fehler, den nur das Nachmessen zeigte:** nach dem Umschalten wirkte
+> der Schalter, der Knopf zeigte „Lernmodus", die KI-Antworten waren länger —
+> **nur an der offenen Frage sah man nichts davon.** `_rfFrageNochmal` baute
+> die Blase ohne den Wozu-Satz neu. Eine Einstellung, deren Wirkung man an
+> der Stelle nicht sieht, an der man sie erwartet, gilt als kaputt, auch wenn
+> sie greift.
