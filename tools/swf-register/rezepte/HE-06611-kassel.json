@@ -26,7 +26,16 @@
         "achse_x_bez": "vorläufiger Sachwert in Euro",
         "achse_x": [150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000,
                     550000, 600000, 650000, 700000, 750000, 800000],
-        "achse_k_feld": "brw",
+        "achse_k_feld": "brw_bereich",
+        "zuordnung_feld": "brw",
+        "kategorie_baender": [
+          { "von": 100, "bis": 149,  "kategorie": "100-149" },
+          { "von": 150, "bis": 199,  "kategorie": "150-199" },
+          { "von": 200, "bis": 299,  "kategorie": "200-299" },
+          { "von": 300, "bis": 399,  "kategorie": "300-399" },
+          { "von": 400, "bis": 499,  "kategorie": "400-499" },
+          { "von": 500, "bis": 1000, "kategorie": "500-1000" }
+        ],
         "achse_k_bez": "Bodenrichtwertbereich in €/m²",
         "kategorien": ["100-149", "150-199", "200-299", "300-399", "400-499", "500-1000"],
         "zellen": {
@@ -89,7 +98,15 @@
         "achse_x_bez": "vorläufiger Sachwert in Euro",
         "achse_x": [100000, 150000, 200000, 250000, 300000, 350000, 400000,
                     450000, 500000, 550000, 600000, 650000],
-        "achse_k_feld": "brw",
+        "achse_k_feld": "brw_bereich",
+        "zuordnung_feld": "brw",
+        "kategorie_baender": [
+          { "von": 100, "bis": 149, "kategorie": "100-149" },
+          { "von": 150, "bis": 199, "kategorie": "150-199" },
+          { "von": 200, "bis": 299, "kategorie": "200-299" },
+          { "von": 300, "bis": 399, "kategorie": "300-399" },
+          { "von": 400, "bis": 499, "kategorie": "400-499" }
+        ],
         "achse_k_bez": "Bodenrichtwertbereich in €/m²",
         "kategorien": ["100-149", "150-199", "200-299", "300-399", "400-499"],
         "zellen": {

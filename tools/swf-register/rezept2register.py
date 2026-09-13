@@ -54,6 +54,11 @@ ERLAUBT = {
                           'achse_y_feld','achse_y_bez','zellen','rundung_stellen',
                           'liefert','hinweis','normobjekt'},
     'matrix_kategorial': {'form','achse_x','achse_x_feld','achse_x_bez','achse_k_feld',
+                          # v1098d: Die Zuordnung ueber ein ZAHLENBAND gibt es im
+                          # Auswerter seit v1094 (kategorieAus, fuer Wiesbaden) -
+                          # hier fehlte sie. Ein Rezept mit kategorie_baender waere
+                          # am Werkzeug gescheitert, obwohl der Auswerter es kann.
+                          'kategorie_baender','zuordnung_feld','kategorie_zuordnung',
                           'achse_k_bez','kategorien','zellen','rundung_stellen',
                           'liefert','hinweis','normobjekt'},
     'matrix_band':       {'form','achse_x_feld','achse_x_bez','achse_y_feld','achse_y_bez',
