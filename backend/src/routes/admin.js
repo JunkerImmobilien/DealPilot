@@ -709,7 +709,30 @@ router.post('/security/entscheidung', requireAdmin, requireRole('owner', 'suppor
       if (!eintrag) return res.status(500).json({ error: 'nicht_gespeichert' });
 
       const zustand = await sec.zustand(user_id);
+
+      /* v1370 (B8): eine Entscheidung wird IMMER gemeldet - ohne
+         Ruhefenster. Wer sperrt, tut das selten; jede dieser
+         Entscheidungen gehoert dokumentiert und gemeldet. Der Versand
+         laeuft nebenher, damit die Antwort nicht darauf wartet. */
+      setImmediate(async () => {
+        try {
+          const alert = require('../services/securityAlert');
+          const u = await req.app.get('db').query(
+            'SELECT email FROM users WHERE id = $1', [user_id]);
+          await alert.entscheidungMelden({
+            email: u.rows[0] && u.rows[0].email,
+            adminEmail: req.adminUser && req.adminUser.email,
+            art,
+            notiz,
+            standVorher: zustand.berechnet && zustand.berechnet.stufe
+          });
+        } catch (e) {
+          console.warn('[admin] Entscheidungsmeldung fehlgeschlagen:', e.message);
+        }
+      });
+
       res.json({ ok: true, eintrag, zustand });
+
     } catch (e) {
       console.error('[admin] security/entscheidung:', e.message);
       res.status(400).json({ error: e.message });

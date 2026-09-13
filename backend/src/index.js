@@ -207,6 +207,40 @@ const limiter = rateLimit({
 
       const stufe = zuvor.n >= 20 ? 'ernst' : (zuvor.n >= 5 ? 'auffaellig' : 'hinweis');
 
+      /* v1370 (B8): NUR an den Schwellen nachrechnen und melden.
+
+         Bei jeder Ueberschreitung `stufeBerechnen()` aufzurufen wuerde
+         zwei Datenbankabfragen kosten - bei einem Skript mit tausend
+         Anfragen also zweitausend. Die Benachrichtigung wuerde teurer
+         als der Vorgang, den sie meldet, und das Problem verschlimmern.
+
+         Die Stufe kann sich nur an den Schwellen aendern (20 und 50, aus
+         SCHWELLEN in securityEventService). Genau dort wird geprueft -
+         zweimal je Konto und Stunde statt tausendmal. */
+      if (konto && (zuvor.n === 20 || zuvor.n === 50)) {
+        setImmediate(async () => {
+          try {
+            const sec = require('./services/securityEventService');
+            const alert = require('./services/securityAlert');
+            const bewertung = await sec.stufeBerechnen(konto);
+            if (bewertung.stufe === 'warnung' || bewertung.stufe === 'hohes_risiko') {
+              const u = await require('./db/pool').query(
+                'SELECT email FROM users WHERE id = $1', [konto]);
+              await alert.stufeMelden({
+                userId: konto,
+                email: u.rows[0] && u.rows[0].email,
+                stufe: bewertung.stufe,
+                grund: bewertung.grund,
+                vergleich: bewertung.vergleich
+              });
+            }
+          } catch (e) {
+            console.warn('[limit] Stufenmeldung fehlgeschlagen:', e.message);
+          }
+        });
+      }
+
+
       securityEvents.schreibe({
         userId: konto,
         ipKey: konto ? null : _ipSchluessel(req.ip),
