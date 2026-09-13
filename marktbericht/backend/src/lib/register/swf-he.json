@@ -1,0 +1,1299 @@
+[
+ {
+  "land_code": "HE",
+  "ags": "06611000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für den Bereich der documenta Stadt Kassel",
+  "gaa_name": "Gutachterausschuss für den Bereich der documenta Stadt Kassel",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000,
+    750000,
+    800000
+   ],
+   "achse_k_feld": "brw_bereich",
+   "zuordnung_feld": "brw",
+   "kategorie_baender": [
+    {
+     "von": 100,
+     "bis": 149,
+     "kategorie": "100-149"
+    },
+    {
+     "von": 150,
+     "bis": 199,
+     "kategorie": "150-199"
+    },
+    {
+     "von": 200,
+     "bis": 299,
+     "kategorie": "200-299"
+    },
+    {
+     "von": 300,
+     "bis": 399,
+     "kategorie": "300-399"
+    },
+    {
+     "von": 400,
+     "bis": 499,
+     "kategorie": "400-499"
+    },
+    {
+     "von": 500,
+     "bis": 1000,
+     "kategorie": "500-1000"
+    }
+   ],
+   "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+   "kategorien": [
+    "100-149",
+    "150-199",
+    "200-299",
+    "300-399",
+    "400-499",
+    "500-1000"
+   ],
+   "zellen": {
+    "150000": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "200000": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "250000": [
+     null,
+     0.67,
+     0.9,
+     0.78,
+     null,
+     null
+    ],
+    "300000": [
+     0.96,
+     0.94,
+     0.98,
+     null,
+     null,
+     null
+    ],
+    "350000": [
+     null,
+     1.0,
+     1.18,
+     0.65,
+     null,
+     null
+    ],
+    "400000": [
+     null,
+     1.29,
+     1.09,
+     0.96,
+     null,
+     null
+    ],
+    "450000": [
+     null,
+     0.9,
+     0.84,
+     0.9,
+     null,
+     null
+    ],
+    "500000": [
+     null,
+     1.02,
+     1.0,
+     0.95,
+     null,
+     null
+    ],
+    "550000": [
+     null,
+     null,
+     0.92,
+     null,
+     0.81,
+     null
+    ],
+    "600000": [
+     null,
+     null,
+     null,
+     null,
+     1.07,
+     null
+    ],
+    "650000": [
+     null,
+     null,
+     0.9,
+     null,
+     null,
+     null
+    ],
+    "700000": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "750000": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     0.91
+    ],
+    "800000": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Sachwertmodell Hessen, NHK 2010. Die Achse ist in 50.000er-Schritten abgedruckt; der Bericht rechnet mit Kaufpreisspannen von 40.000 € um den Stützwert (240.000 € meint 220.000 bis 260.000 €). Leere Zellen sind im Bericht leer — dort liegt kein Kauffall.",
+   "normobjekt": "Kein Normobjekt im Sinne eines Korrekturmodells. Der Bericht stellt ausdrücklich fest, dass die Restnutzungsdauer KEINEN signifikanten Einfluss auf den Sachwertfaktor hatte; untergliedert wird deshalb nach Bodenrichtwertbereich.",
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modell": "Sachwertmodell Hessen",
+   "gesamtnutzungsdauer_jahre": 80,
+   "alterswertminderung": "linear",
+   "herstellungskosten": "NHK 2010, Anlage 4 ImmoWertV 2021",
+   "bezugsmassstab": "Bruttogrundfläche gemäß Anlage 4 ImmoWertV 2021",
+   "bauart": "massiv",
+   "baupreisindex": "zum Vertragsabschluss aktueller bundesdurchschnittlicher Index für den Neubau konventionell gefertigter Wohngebäude (Destatis)",
+   "besondere_bauteile": "in üblichem Umfang; erhebliche Abweichungen als boG",
+   "nebengebaeude": "in üblichem Umfang (Eigenheim + Garage/Carport); Garagen 3.000 bis 12.000 € je nach Alter und Ausstattung",
+   "aussenanlagen": "in der Regel 5 bis 8 % des Gebäudezeitwerts",
+   "drempel_hinweis": "Ein fehlender Drempel in ausgebauten Dachgeschossen ist durch einen Abschlag am Kostenkennwert zu berücksichtigen — je nach Objektart 2 bis 6 %",
+   "boG": "Objekte mit gravierenden boG, unsicherer Restnutzungsdauer oder grober Mietabweichung zu MIKA wurden NICHT zur Auswertung herangezogen"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Kassel",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser, Kaufverträge des Geschäftsjahres 2023, Baujahre 1950 bis einschließlich 2019",
+   "extrapolation": "nicht_geregelt",
+   "spannen_je_brw_bereich": {
+    "100-149": {
+     "kauffaelle": 1,
+     "brw_mittel": 145,
+     "rnd_mittel": 36,
+     "standardstufe": 2.7,
+     "bgf_mittel": 261,
+     "wohnflaeche_mittel": 125,
+     "bodenwertanteil": 0.36
+    },
+    "150-199": {
+     "kauffaelle": 12,
+     "brw_mittel": 166,
+     "rnd_mittel": 37,
+     "standardstufe": 2.8,
+     "bgf_mittel": 337,
+     "wohnflaeche_mittel": 169,
+     "bodenwertanteil": 0.37
+    },
+    "200-299": {
+     "kauffaelle": 22,
+     "brw_mittel": 236,
+     "rnd_mittel": 39,
+     "standardstufe": 2.7,
+     "bgf_mittel": 338,
+     "wohnflaeche_mittel": 155,
+     "bodenwertanteil": 0.4
+    },
+    "300-399": {
+     "kauffaelle": 9,
+     "brw_mittel": 318,
+     "rnd_mittel": 34,
+     "standardstufe": 2.7,
+     "bgf_mittel": 297,
+     "wohnflaeche_mittel": 135,
+     "bodenwertanteil": 0.59
+    },
+    "400-499": {
+     "kauffaelle": 3,
+     "brw_mittel": 407,
+     "rnd_mittel": 42,
+     "standardstufe": 2.5,
+     "bgf_mittel": 373,
+     "wohnflaeche_mittel": 183,
+     "bodenwertanteil": 0.59
+    },
+    "500-1000": {
+     "kauffaelle": 1,
+     "brw_mittel": 575,
+     "rnd_mittel": 35,
+     "standardstufe": 2.7,
+     "bgf_mittel": 325,
+     "wohnflaeche_mittel": 122,
+     "bodenwertanteil": 0.84
+    }
+   },
+   "vorbehalt": "DÜNNE DATENLAGE IN DEN RANDBEREICHEN. Der Bericht markiert Zellen mit einzelnen Kauffällen rot und schreibt dazu: 'obwohl ein Vergleich nicht möglich ist'. Die Bereiche 100-149 und 500-1000 tragen je EINEN Kauffall, 400-499 drei. Welche EINZELNEN Zellen rot gedruckt sind, gibt die Textfassung nicht her — die Farbe geht bei der Textextraktion verloren. Deshalb ist die Fallzahl je Bodenrichtwertbereich hier vollständig mitgeführt: wer eine Zelle aus einem Bereich mit wenigen Fällen benutzt, muss das begründen.",
+   "hinweis": "Wörtlich aus dem Bericht: 'Die Sachwertfaktoren sind im Einzelfall sachverständig zu werten. Die in den folgenden Tabellen abgebildeten Faktoren dienen der Markttransparenz und sind bei Anwendung im Einzelfall zu begründen.'"
+  },
+  "belege": [
+   "Immobilienmarktbericht Stadt Kassel 2024, Tabelle 29, S. 61: 'Sachwertfaktor für freistehende Ein- und Zweifamilienhäuser (Sachwertmodell Hessen, NHK 2010)', Matrix Bodenrichtwertbereich × vorläufiger Sachwert."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtliche Tabelle, aber ohne Anwendungsbeispiel und mit teils sehr dünner Datenlage je Zelle (1 bis 22 Kauffälle je Bodenrichtwertbereich). Die rot markierten Einzelfälle sind aus der Textfassung nicht zellgenau rekonstruierbar.",
+  "fallzahl": 48,
+  "streuung": null,
+  "stichtag": "2024-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.kassel.de/service/media/Dateien_und_Verzeichnisse/immobilienmarktberichte/Immobilienmarktbericht-Stadt-Kassel-2024.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Immobilienmarktbericht 2024, Gutachterausschuss für den Bereich der documenta Stadt Kassel",
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": null,
+  "fundstelle": "Kap. 7.4, S. 58–63, Tabellen 29 und 30"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06611000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für den Bereich der documenta Stadt Kassel",
+  "gaa_name": "Gutachterausschuss für den Bereich der documenta Stadt Kassel",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    100000,
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000
+   ],
+   "achse_k_feld": "brw_bereich",
+   "zuordnung_feld": "brw",
+   "kategorie_baender": [
+    {
+     "von": 100,
+     "bis": 149,
+     "kategorie": "100-149"
+    },
+    {
+     "von": 150,
+     "bis": 199,
+     "kategorie": "150-199"
+    },
+    {
+     "von": 200,
+     "bis": 299,
+     "kategorie": "200-299"
+    },
+    {
+     "von": 300,
+     "bis": 399,
+     "kategorie": "300-399"
+    },
+    {
+     "von": 400,
+     "bis": 499,
+     "kategorie": "400-499"
+    }
+   ],
+   "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+   "kategorien": [
+    "100-149",
+    "150-199",
+    "200-299",
+    "300-399",
+    "400-499"
+   ],
+   "zellen": {
+    "100000": [
+     null,
+     1.32,
+     2.06,
+     null,
+     null
+    ],
+    "150000": [
+     null,
+     1.09,
+     1.41,
+     null,
+     null
+    ],
+    "200000": [
+     1.1,
+     1.22,
+     1.36,
+     1.77,
+     null
+    ],
+    "250000": [
+     null,
+     1.21,
+     1.35,
+     1.59,
+     1.7
+    ],
+    "300000": [
+     null,
+     1.17,
+     1.54,
+     1.13,
+     null
+    ],
+    "350000": [
+     null,
+     0.94,
+     1.08,
+     1.25,
+     1.17
+    ],
+    "400000": [
+     null,
+     1.01,
+     null,
+     null,
+     1.05
+    ],
+    "450000": [
+     0.91,
+     null,
+     null,
+     null,
+     null
+    ],
+    "500000": [
+     null,
+     1.04,
+     null,
+     0.79,
+     null
+    ],
+    "550000": [
+     null,
+     null,
+     1.03,
+     null,
+     null
+    ],
+    "600000": [
+     null,
+     null,
+     null,
+     0.99,
+     1.04
+    ],
+    "650000": [
+     null,
+     null,
+     null,
+     0.75,
+     null
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Sachwertmodell Hessen, NHK 2010. Achse in 50.000er-Schritten; der Bericht rechnet mit Spannen von 40.000 € um den Stützwert.",
+   "normobjekt": "Wie bei den freistehenden Häusern: kein Korrekturmodell. Der Bericht stellt auch hier fest, dass die Restnutzungsdauer keinen signifikanten Einfluss hatte.",
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modell": "Sachwertmodell Hessen",
+   "gesamtnutzungsdauer_jahre": 80,
+   "alterswertminderung": "linear",
+   "herstellungskosten": "NHK 2010, Anlage 4 ImmoWertV 2021",
+   "bezugsmassstab": "Bruttogrundfläche gemäß Anlage 4 ImmoWertV 2021",
+   "bauart": "massiv"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Kassel",
+   "sachlich": "Reihenhäuser und Doppelhaushälften, Kaufverträge des Geschäftsjahres 2023, Baujahre 1950 bis einschließlich 2019",
+   "extrapolation": "nicht_geregelt",
+   "spannen_je_brw_bereich": {
+    "100-149": {
+     "kauffaelle": 2,
+     "brw_mittel": 133,
+     "rnd_mittel": 46,
+     "standardstufe": 2.8,
+     "bgf_mittel": 295,
+     "wohnflaeche_mittel": 142,
+     "bodenwertanteil": 0.2
+    },
+    "150-199": {
+     "kauffaelle": 25,
+     "brw_mittel": 171,
+     "rnd_mittel": 40,
+     "standardstufe": 2.7,
+     "bgf_mittel": 235,
+     "wohnflaeche_mittel": 121,
+     "bodenwertanteil": 0.26
+    },
+    "200-299": {
+     "kauffaelle": 14,
+     "brw_mittel": 233,
+     "rnd_mittel": 40,
+     "standardstufe": 2.8,
+     "bgf_mittel": 220,
+     "wohnflaeche_mittel": 114,
+     "bodenwertanteil": 0.22
+    },
+    "300-399": {
+     "kauffaelle": 12,
+     "brw_mittel": 323,
+     "rnd_mittel": 46,
+     "standardstufe": 2.9,
+     "bgf_mittel": 262,
+     "wohnflaeche_mittel": 152,
+     "bodenwertanteil": 0.31
+    },
+    "400-499": {
+     "kauffaelle": 5,
+     "brw_mittel": 430,
+     "rnd_mittel": 37,
+     "standardstufe": 2.8,
+     "bgf_mittel": 256,
+     "wohnflaeche_mittel": 136,
+     "bodenwertanteil": 0.43
+    }
+   },
+   "vorbehalt": "Wie bei den freistehenden Häusern: der Bereich 100-149 trägt zwei Kauffälle, 400-499 fünf. Die zellgenaue Rot-Markierung des Berichts ist aus der Textfassung nicht rekonstruierbar."
+  },
+  "belege": [
+   "Immobilienmarktbericht Stadt Kassel 2024, Tabelle 30, S. 62: 'Sachwertfaktor für Reihenhäuser und Doppelhaushälften (Sachwertmodell Hessen, NHK 2010)', Matrix Bodenrichtwertbereich × vorläufiger Sachwert."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtliche Tabelle ohne Anwendungsbeispiel, Datenlage je Bodenrichtwertbereich zwischen 2 und 25 Kauffällen.",
+  "fallzahl": 58,
+  "streuung": null,
+  "stichtag": "2024-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.kassel.de/service/media/Dateien_und_Verzeichnisse/immobilienmarktberichte/Immobilienmarktbericht-Stadt-Kassel-2024.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Immobilienmarktbericht 2024, Gutachterausschuss für den Bereich der documenta Stadt Kassel",
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": null,
+  "fundstelle": "Kap. 7.4, S. 58–63, Tabellen 29 und 30"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06",
+  "ebene": "land",
+  "gebiet_name": "Zentrale Geschäftsstelle der Gutachterausschüsse für Immobilienwerte des Landes Hessen",
+  "gaa_name": "Zentrale Geschäftsstelle der Gutachterausschüsse für Immobilienwerte des Landes Hessen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    100000,
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000,
+    750000,
+    800000,
+    850000,
+    900000,
+    950000
+   ],
+   "achse_k_feld": "brw_bereich",
+   "zuordnung_feld": "brw",
+   "kategorie_baender": [
+    {
+     "von": 0,
+     "bis": 49,
+     "kategorie": "bis 49"
+    },
+    {
+     "von": 50,
+     "bis": 99,
+     "kategorie": "50-99"
+    },
+    {
+     "von": 100,
+     "bis": 149,
+     "kategorie": "100-149"
+    },
+    {
+     "von": 150,
+     "bis": 199,
+     "kategorie": "150-199"
+    },
+    {
+     "von": 200,
+     "bis": 299,
+     "kategorie": "200-299"
+    },
+    {
+     "von": 300,
+     "bis": 399,
+     "kategorie": "300-399"
+    },
+    {
+     "von": 400,
+     "bis": 699,
+     "kategorie": "400-699"
+    },
+    {
+     "von": 700,
+     "bis": 1000,
+     "kategorie": "700-1000"
+    },
+    {
+     "von": 1001,
+     "bis": null,
+     "kategorie": "ueber 1000"
+    }
+   ],
+   "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+   "kategorien": [
+    "bis 49",
+    "50-99",
+    "100-149",
+    "150-199",
+    "200-299",
+    "300-399",
+    "400-699",
+    "700-1000",
+    "ueber 1000"
+   ],
+   "zellen": {
+    "100000": [
+     1.2,
+     1.53,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "150000": [
+     1.05,
+     1.3,
+     1.37,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "200000": [
+     0.96,
+     1.15,
+     1.23,
+     1.3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "250000": [
+     0.89,
+     1.05,
+     1.14,
+     1.21,
+     1.27,
+     1.41,
+     null,
+     null,
+     null
+    ],
+    "300000": [
+     0.84,
+     0.98,
+     1.06,
+     1.14,
+     1.19,
+     1.31,
+     1.33,
+     null,
+     null
+    ],
+    "350000": [
+     0.8,
+     0.92,
+     1.01,
+     1.08,
+     1.13,
+     1.22,
+     1.24,
+     1.28,
+     null
+    ],
+    "400000": [
+     0.76,
+     0.87,
+     0.96,
+     1.04,
+     1.07,
+     1.16,
+     1.17,
+     1.2,
+     null
+    ],
+    "450000": [
+     null,
+     0.83,
+     0.92,
+     1.0,
+     1.03,
+     1.1,
+     1.12,
+     1.14,
+     null
+    ],
+    "500000": [
+     null,
+     0.79,
+     0.89,
+     0.96,
+     0.99,
+     1.05,
+     1.07,
+     1.09,
+     1.12
+    ],
+    "550000": [
+     null,
+     null,
+     0.86,
+     0.93,
+     0.96,
+     1.01,
+     1.02,
+     1.04,
+     1.1
+    ],
+    "600000": [
+     null,
+     null,
+     0.83,
+     0.91,
+     0.93,
+     0.97,
+     0.99,
+     1.0,
+     1.09
+    ],
+    "650000": [
+     null,
+     null,
+     null,
+     null,
+     0.9,
+     0.94,
+     0.95,
+     0.97,
+     1.07
+    ],
+    "700000": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     0.91,
+     0.92,
+     0.94,
+     1.06
+    ],
+    "750000": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     0.9,
+     0.91,
+     1.05
+    ],
+    "800000": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     0.87,
+     0.88,
+     1.03
+    ],
+    "850000": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     0.85,
+     0.86,
+     1.02
+    ],
+    "900000": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     0.84,
+     1.01
+    ],
+    "950000": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     1.0
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Sachwertmodell Hessen, NHK 2010. Landesweite Auswertung aus 850 Kauffällen des Jahres 2024 — KEIN Mittel über Ausschusswerte, sondern eine eigene Regression über alle hessischen Kauffälle. Der Sachwertfaktor gilt laut Bericht für Eigenheime mit Nebengebäuden und Außenanlagen.",
+   "normobjekt": "Kein Korrekturmodell. Der Bericht stellt fest, dass kein signifikanter Einfluss der Restnutzungsdauer auf den Sachwertfaktor nachweisbar war; der Bodenwert hat den größeren Einfluss, deshalb die Untergliederung nach Bodenrichtwertbereich.",
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modell": "Sachwertmodell Hessen",
+   "herstellungskosten": "NHK 2010",
+   "geltung": "Eigenheime mit Nebengebäuden und Außenanlagen"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Land Hessen",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser, Kauffälle 2024",
+   "extrapolation": "nicht_geregelt",
+   "spannen_je_brw_bereich": {
+    "bis 49": {
+     "kauffaelle": 103,
+     "r2": 0.18,
+     "sachwert_mittel": 252900,
+     "gsflaeche_mittel": 850,
+     "brw_mittel": 36,
+     "rnd_mittel": 31,
+     "standardstufe": 2.6,
+     "bgf_mittel": 341,
+     "wohnflaeche_mittel": 151,
+     "bodenwertanteil": 0.14
+    },
+    "50-99": {
+     "kauffaelle": 188,
+     "r2": 0.31,
+     "sachwert_mittel": 304350,
+     "gsflaeche_mittel": 800,
+     "brw_mittel": 72,
+     "rnd_mittel": 34,
+     "standardstufe": 2.6,
+     "bgf_mittel": 351,
+     "wohnflaeche_mittel": 158,
+     "bodenwertanteil": 0.2
+    },
+    "100-149": {
+     "kauffaelle": 110,
+     "r2": 0.37,
+     "sachwert_mittel": 347250,
+     "gsflaeche_mittel": 750,
+     "brw_mittel": 120,
+     "rnd_mittel": 35,
+     "standardstufe": 2.8,
+     "bgf_mittel": 342,
+     "wohnflaeche_mittel": 154,
+     "bodenwertanteil": 0.27
+    },
+    "150-199": {
+     "kauffaelle": 87,
+     "r2": 0.2,
+     "sachwert_mittel": 374600,
+     "gsflaeche_mittel": 710,
+     "brw_mittel": 172,
+     "rnd_mittel": 32,
+     "standardstufe": 2.7,
+     "bgf_mittel": 369,
+     "wohnflaeche_mittel": 159,
+     "bodenwertanteil": 0.32
+    },
+    "200-299": {
+     "kauffaelle": 70,
+     "r2": 0.22,
+     "sachwert_mittel": 417800,
+     "gsflaeche_mittel": 690,
+     "brw_mittel": 240,
+     "rnd_mittel": 33,
+     "standardstufe": 2.7,
+     "bgf_mittel": 355,
+     "wohnflaeche_mittel": 160,
+     "bodenwertanteil": 0.39
+    },
+    "300-399": {
+     "kauffaelle": 63,
+     "r2": 0.3,
+     "sachwert_mittel": 427300,
+     "gsflaeche_mittel": 620,
+     "brw_mittel": 336,
+     "rnd_mittel": 30,
+     "standardstufe": 2.6,
+     "bgf_mittel": 330,
+     "wohnflaeche_mittel": 155,
+     "bodenwertanteil": 0.44
+    },
+    "400-699": {
+     "kauffaelle": 91,
+     "r2": 0.34,
+     "sachwert_mittel": 542050,
+     "gsflaeche_mittel": 590,
+     "brw_mittel": 518,
+     "rnd_mittel": 32,
+     "standardstufe": 2.7,
+     "bgf_mittel": 367,
+     "wohnflaeche_mittel": 162,
+     "bodenwertanteil": 0.55
+    },
+    "700-1000": {
+     "kauffaelle": 90,
+     "r2": 0.33,
+     "sachwert_mittel": 589100,
+     "gsflaeche_mittel": 490,
+     "brw_mittel": 843,
+     "rnd_mittel": 28,
+     "standardstufe": 2.4,
+     "bgf_mittel": 332,
+     "wohnflaeche_mittel": 157,
+     "bodenwertanteil": 0.68
+    },
+    "ueber 1000": {
+     "kauffaelle": 48,
+     "r2": 0.28,
+     "sachwert_mittel": 1001800,
+     "gsflaeche_mittel": 580,
+     "brw_mittel": 1376,
+     "rnd_mittel": 29,
+     "standardstufe": 2.6,
+     "bgf_mittel": 357,
+     "wohnflaeche_mittel": 173,
+     "bodenwertanteil": 0.79
+    }
+   },
+   "vorbehalt": "LANDESWERT, KEIN ORTSWERT. Wo ein örtlicher Gutachterausschuss eigene Sachwertfaktoren abgeleitet hat, gehen diese vor (§ 10 ImmoWertV, Modellkonformität). Dieser Satz steht auf `ebene: land` und wird vom Auswerter beim Sachwertfaktor deshalb AUSGEFILTERT — das ist die Regel aus v1085 und sie ist richtig. Er ist hier erfasst, damit die Daten belegt vorliegen, wenn die Ersatzebene C (Backlog C5) bewusst gebaut wird. Das Bestimmtheitsmaß R² liegt zwischen 0,18 und 0,58 — die Streuung ist erheblich, und der Bericht sagt selbst: 'Bei der Nutzung der folgenden Sachwertfaktoren ist ausdrücklich zu beachten, dass eine kritische sachverständige Würdigung erforderlich ist.'"
+  },
+  "belege": [
+   "Immobilienmarktbericht des Landes Hessen 2025, Tab. 8.4.1.1, S. 84: 'Sachwertfaktor k für freistehende Ein- und Zweifamilienhäuser 2024 (Sachwertmodell Hessen, NHK 2010)'. Matrix aus 9 Bodenrichtwertbereichen × 18 Sachwertstufen, Fallzahlen und Bestimmtheitsmaß je Bereich abgedruckt."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Landesweite Auswertung, kein örtlich abgeleiteter Faktor. Stufe C nach der Systematik der Ersatzebenen — nie A, auch wenn die Quelle amtlich ist.",
+  "fallzahl": 850,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://hvbg.hessen.de/immobilienwertermittlung/immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Immobilienmarktbericht des Landes Hessen 2025, Zentrale Geschäftsstelle der Gutachterausschüsse für Immobilienwerte des Landes Hessen",
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": null,
+  "fundstelle": "Kap. 8.4, Tab. 8.4.1.1 (S. 84) und Tab. 8.4.2.1 (S. 89)"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06",
+  "ebene": "land",
+  "gebiet_name": "Zentrale Geschäftsstelle der Gutachterausschüsse für Immobilienwerte des Landes Hessen",
+  "gaa_name": "Zentrale Geschäftsstelle der Gutachterausschüsse für Immobilienwerte des Landes Hessen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    100000,
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000,
+    750000,
+    800000
+   ],
+   "achse_k_feld": "brw_bereich",
+   "zuordnung_feld": "brw",
+   "kategorie_baender": [
+    {
+     "von": 0,
+     "bis": 99,
+     "kategorie": "bis 99"
+    },
+    {
+     "von": 100,
+     "bis": 199,
+     "kategorie": "100-199"
+    },
+    {
+     "von": 200,
+     "bis": 299,
+     "kategorie": "200-299"
+    },
+    {
+     "von": 300,
+     "bis": 499,
+     "kategorie": "300-499"
+    },
+    {
+     "von": 500,
+     "bis": 699,
+     "kategorie": "500-699"
+    },
+    {
+     "von": 700,
+     "bis": 1000,
+     "kategorie": "700-1000"
+    },
+    {
+     "von": 1001,
+     "bis": null,
+     "kategorie": "ueber 1000"
+    }
+   ],
+   "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+   "kategorien": [
+    "bis 99",
+    "100-199",
+    "200-299",
+    "300-499",
+    "500-699",
+    "700-1000",
+    "ueber 1000"
+   ],
+   "zellen": {
+    "100000": [
+     1.51,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "150000": [
+     1.23,
+     1.53,
+     1.68,
+     null,
+     null,
+     null,
+     null
+    ],
+    "200000": [
+     1.07,
+     1.37,
+     1.51,
+     1.59,
+     null,
+     null,
+     null
+    ],
+    "250000": [
+     0.96,
+     1.26,
+     1.38,
+     1.42,
+     1.58,
+     null,
+     null
+    ],
+    "300000": [
+     0.87,
+     1.18,
+     1.29,
+     1.29,
+     1.43,
+     1.44,
+     null
+    ],
+    "350000": [
+     null,
+     1.11,
+     1.22,
+     1.18,
+     1.31,
+     1.36,
+     null
+    ],
+    "400000": [
+     null,
+     1.06,
+     1.16,
+     1.1,
+     1.22,
+     1.29,
+     1.36
+    ],
+    "450000": [
+     null,
+     null,
+     null,
+     1.04,
+     1.14,
+     1.24,
+     1.29
+    ],
+    "500000": [
+     null,
+     null,
+     null,
+     0.98,
+     1.08,
+     1.19,
+     1.23
+    ],
+    "550000": [
+     null,
+     null,
+     null,
+     null,
+     1.03,
+     1.15,
+     1.18
+    ],
+    "600000": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     1.11,
+     1.14
+    ],
+    "650000": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     1.08,
+     1.1
+    ],
+    "700000": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     1.05,
+     1.06
+    ],
+    "750000": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     1.02,
+     1.03
+    ],
+    "800000": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     1.01
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Sachwertmodell Hessen, NHK 2010. Landesweite Auswertung aus 497 Kauffällen des Jahres 2024.",
+   "normobjekt": "Wie bei den freistehenden Häusern: kein Korrekturmodell, Untergliederung nach Bodenrichtwertbereich.",
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modell": "Sachwertmodell Hessen",
+   "herstellungskosten": "NHK 2010"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Land Hessen",
+   "sachlich": "Reihenhäuser und Doppelhaushälften, Kauffälle 2024",
+   "extrapolation": "nicht_geregelt",
+   "spannen_je_brw_bereich": {
+    "bis 99": {
+     "kauffaelle": 26,
+     "r2": 0.46,
+     "sachwert_mittel": 171650,
+     "gsflaeche_mittel": 410,
+     "brw_mittel": 63,
+     "rnd_mittel": 30,
+     "standardstufe": 2.4,
+     "bgf_mittel": 250,
+     "wohnflaeche_mittel": 123,
+     "bodenwertanteil": 0.13
+    },
+    "100-199": {
+     "kauffaelle": 24,
+     "r2": 0.58,
+     "sachwert_mittel": 250300,
+     "gsflaeche_mittel": 400,
+     "brw_mittel": 153,
+     "rnd_mittel": 34,
+     "standardstufe": 2.7,
+     "bgf_mittel": 267,
+     "wohnflaeche_mittel": 133,
+     "bodenwertanteil": 0.2
+    },
+    "200-299": {
+     "kauffaelle": 36,
+     "r2": 0.3,
+     "sachwert_mittel": 258850,
+     "gsflaeche_mittel": 390,
+     "brw_mittel": 241,
+     "rnd_mittel": 31,
+     "standardstufe": 2.6,
+     "bgf_mittel": 257,
+     "wohnflaeche_mittel": 133,
+     "bodenwertanteil": 0.28
+    },
+    "300-499": {
+     "kauffaelle": 42,
+     "r2": 0.54,
+     "sachwert_mittel": 301450,
+     "gsflaeche_mittel": 320,
+     "brw_mittel": 391,
+     "rnd_mittel": 32,
+     "standardstufe": 2.5,
+     "bgf_mittel": 264,
+     "wohnflaeche_mittel": 135,
+     "bodenwertanteil": 0.33
+    },
+    "500-699": {
+     "kauffaelle": 69,
+     "r2": 0.48,
+     "sachwert_mittel": 354650,
+     "gsflaeche_mittel": 310,
+     "brw_mittel": 591,
+     "rnd_mittel": 34,
+     "standardstufe": 2.6,
+     "bgf_mittel": 257,
+     "wohnflaeche_mittel": 130,
+     "bodenwertanteil": 0.4
+    },
+    "700-1000": {
+     "kauffaelle": 211,
+     "r2": 0.21,
+     "sachwert_mittel": 416350,
+     "gsflaeche_mittel": 280,
+     "brw_mittel": 875,
+     "rnd_mittel": 33,
+     "standardstufe": 2.5,
+     "bgf_mittel": 258,
+     "wohnflaeche_mittel": 132,
+     "bodenwertanteil": 0.47
+    },
+    "ueber 1000": {
+     "kauffaelle": 89,
+     "r2": 0.26,
+     "sachwert_mittel": 477500,
+     "gsflaeche_mittel": 260,
+     "brw_mittel": 1214,
+     "rnd_mittel": 32,
+     "standardstufe": 2.4,
+     "bgf_mittel": 249,
+     "wohnflaeche_mittel": 130,
+     "bodenwertanteil": 0.54
+    }
+   },
+   "vorbehalt": "Landeswert wie beim Zweig ezfh — örtliche Faktoren gehen vor, der Satz wird auf Landesebene ausgefiltert. Bestimmtheitsmaß zwischen 0,21 und 0,58."
+  },
+  "belege": [
+   "Immobilienmarktbericht des Landes Hessen 2025, Tab. 8.4.2.1, S. 89: 'Sachwertfaktor k für Reihenhäuser und Doppelhaushälften 2024 (Sachwertmodell Hessen, NHK 2010)'. Matrix aus 7 Bodenrichtwertbereichen × 15 Sachwertstufen."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Landesweite Auswertung, kein örtlich abgeleiteter Faktor.",
+  "fallzahl": 497,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://hvbg.hessen.de/immobilienwertermittlung/immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Immobilienmarktbericht des Landes Hessen 2025, Zentrale Geschäftsstelle der Gutachterausschüsse für Immobilienwerte des Landes Hessen",
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": null,
+  "fundstelle": "Kap. 8.4, Tab. 8.4.1.1 (S. 84) und Tab. 8.4.2.1 (S. 89)"
+ }
+]

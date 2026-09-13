@@ -1,0 +1,94 @@
+{
+  "land_code": "BB",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Teltow-Fläming",
+  "gaa_kennz": "12072",
+  "ags": ["12072"],
+  "ebene": "kreis",
+  "berichtsjahr": 2025,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "01.01.2025 bis 31.12.2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06-25",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_TF.pdf",
+  "quelle_datei": "BB-teltow-flaeming-gmb-2025.pdf",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, Tabelle 36, S. 55 ff. Modellansatz im Anhang A1.5. Grundlage: VV EW-SW Land Brandenburg",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser",
+      "form": "baender_kategorial",
+      "formel": {
+        "form": "baender_kategorial",
+        "achse_feld": "brw",
+        "achse_bez": "Bodenrichtwert in €/m²",
+        "achse_k_feld": "standardstufe",
+        "achse_k_bez": "Standardstufe",
+        "kategorien": ["2", "3", "4"],
+        "kategorie_baender": [
+          { "von": 1.5, "bis": 2.49, "kategorie": "2" },
+          { "von": 2.5, "bis": 3.49, "kategorie": "3" },
+          { "von": 3.5, "bis": 5.0,  "kategorie": "4" }
+        ],
+        "zuordnung_feld": "standardstufe",
+        "baender_je_kategorie": {
+          "2": [
+            { "von": null, "bis": 20,   "wert": 0.92, "bez": "bis 20 €/m²",    "fallzahl": 3,  "min": 0.77, "max": 1.06 },
+            { "von": 21,   "bis": 100,  "wert": 1.00, "bez": "21–100 €/m²",    "fallzahl": 5,  "min": 0.82, "max": 1.12 },
+            { "von": 101,  "bis": 250,  "wert": 1.13, "bez": "101–250 €/m²",   "fallzahl": 10, "min": 0.80, "max": 1.42 },
+            { "von": 251,  "bis": null, "wert": 1.13, "bez": "ab 251 €/m²",    "fallzahl": 12, "min": 0.92, "max": 1.30 }
+          ],
+          "3": [
+            { "von": null, "bis": 100,  "wert": 0.94, "bez": "bis 100 €/m²",   "fallzahl": 15, "min": 0.66, "max": 1.30 },
+            { "von": 101,  "bis": 200,  "wert": 1.05, "bez": "101–200 €/m²",   "fallzahl": 15, "min": 0.74, "max": 1.38 },
+            { "von": 201,  "bis": 300,  "wert": 0.97, "bez": "201–300 €/m²",   "fallzahl": 24, "min": 0.68, "max": 1.42 },
+            { "von": 301,  "bis": null, "wert": 0.92, "bez": "ab 301 €/m²",    "fallzahl": 9,  "min": 0.74, "max": 1.16 }
+          ],
+          "4": [
+            { "von": null, "bis": 100,  "wert": 1.05, "bez": "bis 100 €/m²",   "fallzahl": 5,  "min": 0.84, "max": 1.39 },
+            { "von": 101,  "bis": 200,  "wert": 0.99, "bez": "101–200 €/m²",   "fallzahl": 17, "min": 0.71, "max": 1.47 },
+            { "von": 201,  "bis": 350,  "wert": 0.99, "bez": "201–350 €/m²",   "fallzahl": 32, "min": 0.56, "max": 1.42 },
+            { "von": 351,  "bis": null, "wert": 1.06, "bez": "ab 351 €/m²",    "fallzahl": 15, "min": null, "max": null }
+          ]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "JE STANDARDSTUFE ANDERE BODENRICHTWERTBÄNDER. Stufe 2 staffelt bei 20/100/250 €/m², Stufe 3 bei 100/200/300, Stufe 4 bei 100/200/350. Eine gemeinsame Bandliste zu bilden hieße, Grenzen zu erfinden, die im Bericht nicht stehen — und genau an diesen erfundenen Grenzen läge der Faktor dann falsch, ohne dass es auffiele. Deshalb trägt jede Standardstufe ihre eigenen Bänder.",
+        "normobjekt": "Modellansatz nach VV EW-SW Land Brandenburg, beschrieben im Anhang A1.5 des Berichts."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
+        "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert",
+        "geltung": "typische Eigenheimgrundstücke: freistehende Einfamilienhäuser, Doppelhaushälften und Reihenhäuser",
+        "bgf": "Brutto-Grundfläche in Anlehnung an DIN 277 (1987), alle Grundrissebenen"
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Teltow-Fläming",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "brw_eur_qm":   { "min": 10, "max": 500, "mittel": 224 },
+          "gsflaeche_qm": { "min": 341, "max": 3788, "mittel": 838, "hinweis": "rentierliche Fläche" },
+          "bgf_qm":       { "min": 70, "max": 550, "mittel": 250 },
+          "rnd_jahre":    { "min": 10, "max": 79, "mittel": 52 },
+          "sachwert_eur": { "min": 61538, "max": 1049014, "mittel": 462629 }
+        },
+        "vorbehalt": "DIE SPANNEN JE KLASSE SIND WEIT. Bei Standardstufe 4 und 201–350 €/m² steht der Faktor 0,99 einer Stichprobenspanne von 0,56 bis 1,42 gegenüber — bei 32 Kauffällen. Die Spanne ist je Klasse mitgeführt (`min`/`max`) und gehört in jede Anwendung.\n\nDER BERICHT MAHNT AUSDRÜCKLICH ZUR MODELLKONFORMITÄT: „Dabei darf der Sachwertfaktor nur auf solche Wertanteile des Wertermittlungsobjekts angewandt werden, die auch der Ermittlung des Sachwertfaktors zu Grunde lagen. Die nicht von den angewandten Sachwertfaktoren erfassten Wertanteile sind als besondere objektspezifische Grundstücksmerkmale (boG) nach der Marktanpassung zu berücksichtigen, soweit dies marktüblich ist.\" Und: „Die Sachverständigen sind gefordert, die Ergebnisse kritisch zu prüfen.\"",
+        "hinweis": "Der Bericht führt zusätzlich eigene Tabellen für Reihenmittelhäuser (Tab. 42) und für Doppelhaushälften/Reihenendhäuser (Tab. 43, 66 Kauffälle). Sie sind hier noch nicht erfasst."
+      },
+
+      "stufe": "B",
+      "stufe_grund": "Amtliche Tabelle mit Modellvermerk und Fallzahlen je Klasse. Stufe B, weil kein Anwendungsbeispiel vorliegt und die Spannen je Klasse sehr weit sind (bis 0,56 bis 1,42).",
+      "fallzahl": 162,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 Landkreis Teltow-Fläming, Tabelle 36, S. 55 ff.: Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser aus 162 Vertragsvorgängen des Jahres 2025, gestaffelt nach Standardstufe (2, 3, 4) und Bodenrichtwertniveau, mit Fallzahl und Spanne je Klasse."
+    }
+  ]
+}

@@ -88,6 +88,11 @@ ERLAUBT = {
                           'gueltig_bis','rundung_stellen','liefert','hinweis','normobjekt'},
     'spanne_kategorial': {'form','achse_feld','achse_bez','kategorien','spannen',
                           'rundung_stellen','liefert','hinweis','normobjekt'},
+    # v1101-WBKAT: Baender, die JE KATEGORIE anders laufen.
+    'baender_kategorial': {'form','achse_feld','achse_bez','achse_k_feld',
+                           'achse_k_bez','kategorien','kategorie_baender',
+                           'zuordnung_feld','kategorie_zuordnung','baender_je_kategorie',
+                           'rundung_stellen','liefert','hinweis','normobjekt'},
     'regression_additiv': {'form','basis','glieder','rundung_stellen','liefert',
                            'hinweis','normobjekt'},
 }

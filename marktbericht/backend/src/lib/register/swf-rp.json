@@ -1,0 +1,234 @@
+[
+ {
+  "land_code": "RP",
+  "ags": "07315000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte der Landeshauptstadt Mainz",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte der Landeshauptstadt Mainz",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "baender_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "baender": [
+    {
+     "von": 99999,
+     "bis": 124999,
+     "wert": 2.02,
+     "schluessel": "100.000"
+    },
+    {
+     "von": 124999,
+     "bis": 149999,
+     "wert": 1.95,
+     "schluessel": "125.000"
+    },
+    {
+     "von": 149999,
+     "bis": 174999,
+     "wert": 1.88,
+     "schluessel": "150.000"
+    },
+    {
+     "von": 174999,
+     "bis": 199999,
+     "wert": 1.81,
+     "schluessel": "175.000"
+    },
+    {
+     "von": 199999,
+     "bis": 224999,
+     "wert": 1.75,
+     "schluessel": "200.000"
+    },
+    {
+     "von": 224999,
+     "bis": 249999,
+     "wert": 1.69,
+     "schluessel": "225.000"
+    },
+    {
+     "von": 249999,
+     "bis": 274999,
+     "wert": 1.64,
+     "schluessel": "250.000"
+    },
+    {
+     "von": 274999,
+     "bis": 299999,
+     "wert": 1.59,
+     "schluessel": "275.000"
+    },
+    {
+     "von": 299999,
+     "bis": 324999,
+     "wert": 1.54,
+     "schluessel": "300.000"
+    },
+    {
+     "von": 324999,
+     "bis": 349999,
+     "wert": 1.49,
+     "schluessel": "325.000"
+    },
+    {
+     "von": 349999,
+     "bis": 374999,
+     "wert": 1.44,
+     "schluessel": "350.000"
+    },
+    {
+     "von": 374999,
+     "bis": 399999,
+     "wert": 1.4,
+     "schluessel": "375.000"
+    },
+    {
+     "von": 399999,
+     "bis": 424999,
+     "wert": 1.36,
+     "schluessel": "400.000"
+    },
+    {
+     "von": 424999,
+     "bis": 449999,
+     "wert": 1.33,
+     "schluessel": "425.000"
+    },
+    {
+     "von": 449999,
+     "bis": 474999,
+     "wert": 1.29,
+     "schluessel": "450.000"
+    },
+    {
+     "von": 474999,
+     "bis": 499999,
+     "wert": 1.26,
+     "schluessel": "475.000"
+    },
+    {
+     "von": 499999,
+     "bis": 524999,
+     "wert": 1.23,
+     "schluessel": "500.000"
+    },
+    {
+     "von": 524999,
+     "bis": 549999,
+     "wert": 1.2,
+     "schluessel": "525.000"
+    },
+    {
+     "von": 549999,
+     "bis": 574999,
+     "wert": 1.18,
+     "schluessel": "550.000"
+    },
+    {
+     "von": 574999,
+     "bis": 599999,
+     "wert": 1.15,
+     "schluessel": "575.000"
+    },
+    {
+     "von": 599999,
+     "bis": 699999,
+     "wert": 1.13,
+     "schluessel": "600.000"
+    },
+    {
+     "von": 699999,
+     "bis": 799999,
+     "wert": 1.06,
+     "schluessel": "700.000"
+    },
+    {
+     "von": 799999,
+     "bis": 899999,
+     "wert": 1.01,
+     "schluessel": "800.000"
+    },
+    {
+     "von": 899999,
+     "bis": 999999,
+     "wert": 0.98,
+     "schluessel": "900.000"
+    }
+   ],
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "BÄNDER, NICHT STÜTZSTELLEN. Der Bericht schreibt es ausdrücklich: „Der ausgewiesene Faktor kommt zur Anwendung in den jeweiligen Spannen (vorl. Sachwert beispielsweise 200.000 € bis 224.999 € und Faktor 1,75).\" Zwischen den Spannen wird NICHT interpoliert. Die Spannen sind bis 600.000 € rund 25.000 € breit, darüber 100.000 €, ab 1.000.000 € führt der Bericht keinen Wert mehr. DIE SPANNE BEGINNT AM STÜTZWERT und reicht 24.999 € darüber — nicht um ihn herum. Der erste Anlauf hatte die Bänder zentriert (187.499–212.499); dann gab 224.999 € den Faktor 1,69 statt 1,75. Gefunden vom Prüflauf mit genau der Zahl, die im Bericht steht. Die `von`-Grenzen liegen je um eins unter dem Spannenanfang, weil der Auswerter `von` exklusiv prüft (x > von).",
+   "normobjekt": "Kein Normobjekt. Die Faktoren gelten stadtweit und ohne Gliederung nach Bodenrichtwertspannen; der Regionalfaktor wurde vom Gutachterausschuss mit 1,0 beschlossen."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modell": "ImmoWertV21, abgeleitet mit Sprengnetter-AKuK",
+   "bezugsmassstab": "Bruttogrundfläche",
+   "aussenanlagen": "im Allgemeinen 5 % des Gebäudesachwerts",
+   "bodenwert": "keine Flächenanpassung (Ausnahme: übergroße Grundstücke); keine Bodenwertsteigerung vom 01.01.2024 bis 01.01.2025",
+   "gliederung_nach_bodenrichtwert": "keine — der Bericht gliedert ausdrücklich NICHT nach Bodenrichtwertspannen",
+   "regionalfaktor": 1.0,
+   "schadenfreiheit": "für die Ableitung unterstellt; Aufwendungen zur Herstellung der Schadenfreiheit als boG, ggf. Korrektur von Ausstattungsstandard und Restnutzungsdauer",
+   "instandhaltungsstau": "pauschal in vier Kategorien je m² Wohnfläche — einfach −500 €, mittel −750 €, erheblich −1.000 €, sehr erheblich −1.500 € — und bei den boG berücksichtigt",
+   "funktion": "y = −(0,8918 × 10⁻¹⁸ × S³) + (3,0049 × 10⁻¹² × S²) − (3,4917 × 10⁻⁶ × S) + 2,3366, mit S = vorläufiger Sachwert. Die abgedruckte Tabelle ist das Ergebnis dieser Funktion; sechs Stützstellen nachgerechnet, alle zeichengleich."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Mainz",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser, Reihenhäuser, Reihenendhäuser und Doppelhaushälften — der Bericht stellt fest, dass sich die Trendlinien der Objekttypen weitestgehend überlagern und die Faktoren deshalb für alle Typen anwendbar sind",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "bruttogrundflaeche_qm": {
+     "mittel": 284,
+     "gekappt": 271,
+     "min": 216,
+     "max": 342
+    },
+    "wohnflaeche_qm": {
+     "mittel": 147,
+     "gekappt": 138,
+     "min": 111,
+     "max": 172
+    },
+    "rnd_jahre": {
+     "mittel": 47,
+     "gekappt": 44,
+     "min": 40,
+     "max": 50
+    },
+    "gsflaeche_qm": {
+     "mittel": 390,
+     "gekappt": 351,
+     "min": 212,
+     "max": 570
+    },
+    "standardstufe": {
+     "mittel": 2.8,
+     "gekappt": 2.7,
+     "min": 2.6,
+     "max": 3.0
+    }
+   },
+   "vorbehalt": "LAGE IST NICHT ABGEBILDET. Der Bericht prüft selbst, ob die Faktoren für unterschiedliche Wohnlagen taugen, und stellt fest: „der Sachwertfaktor für einfache Lagen verläuft leicht unterhalb der Trendlinie für die Gesamtheit. Insofern bleibt bei der individuell erstellten Wertermittlung zu prüfen, ob der angewendete mittlere Sachwertfaktor entsprechend anzupassen ist.\" Diese Anpassung ist im Bericht NICHT beziffert und deshalb hier nicht geführt — sie bleibt Sache des Sachverständigen. Dasselbe gilt für die Innenstadt und einzelne Stadtteile, wo laut Bericht Kaufpreise erzielt werden, die teils erheblich abweichen.",
+   "hinweis": "Ab einem vorläufigen Sachwert von 1.000.000 € fasst der Bericht alle Kauffälle zu einer Klasse zusammen und weist keinen Faktor mehr aus. Die Bänder enden deshalb bei 999.999 €."
+  },
+  "belege": [
+   "Grundstücksmarktbericht Mainz 2025, S. 52, Tabelle „SACHWERTFAKTOREN 2024\", 24 Spannen von 100.000 bis 900.000 €. Grundlage sind 213 Kauffälle des Jahres 2024, ausgewertet mit Sprengnetter-AKuK nach ImmoWertV21. Abgedruckte Funktion S. 51, Anwendungsbeispiel S. 52."
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtliche Tabelle MIT abgedruckter Funktion und MIT Anwendungsbeispiel. Die Funktion wurde an sechs Stützstellen nachgerechnet und trifft die Tabelle zeichengleich; das Anwendungsbeispiel des Berichts (350.000 × 1,44 = 504.000 € und 600.000 × 1,13 = 678.000 €) ist ebenfalls getroffen.",
+  "fallzahl": 213,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://www.mainz.de/medien/internet/downloads/gutachterausschuss/Grundstuecksmarktbericht-2025.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gutachterausschuss für Grundstückswerte der Landeshauptstadt Mainz",
+  "lizenz": "frei mit Quellenangabe",
+  "verwendung": "produkt",
+  "auflagen": null,
+  "fundstelle": "Kap. Sachwertfaktoren für Ein- und Zweifamilienhäuser, S. 49–52, Abschnitt A (stadtweite Sachwertfaktoren)"
+ }
+]

@@ -484,7 +484,63 @@ function konstante(m) {
   return { verfuegbar: true, wert: m.wert, tabellenwert: m.wert, korrekturen: [] };
 }
 
+/* ═══ v1101-WBKAT · BAENDER, DIE JE KATEGORIE ANDERS LAUFEN ════════════
+   Teltow-Flaeming staffelt seine Sachwertfaktoren nach Standardstufe UND
+   Bodenrichtwertniveau — und die Bodenrichtwertbaender sind je
+   Standardstufe andere:
+
+     Stufe 2:  bis 20 · 21-100 · 101-250 · ab 251
+     Stufe 3:  bis 100 · 101-200 · 201-300 · ab 301
+     Stufe 4:  bis 100 · 101-200 · 201-350 · ab 351
+
+   `matrix_band` kann das nicht: sie hat EINE Bandliste je Achse. Eine
+   gemeinsame Liste zu bilden hiesse, Grenzen zu erfinden, die im Bericht
+   nicht stehen — und an genau diesen erfundenen Grenzen laege der Faktor
+   dann falsch, ohne dass es auffiele.
+
+   Hier traegt jede Kategorie ihre EIGENEN Baender. Was der Bericht
+   abdruckt, steht so im Rezept. */
+function baenderKategorial(m, e) {
+  const kat = kategorieAus(m, e);
+  if (!kat.wert) {
+    return nichts(kat.bekannt_aber_ohne_wert ? 'kategorie_ohne_wert' : 'kategorie_fehlt',
+      `${m.achse_k_bez || 'Die Kategorie'} ist nicht bestimmbar`
+      + (kat.ueber ? ` (gelesen aus "${kat.ueber}")` : '') + '.');
+  }
+  /* Die Kategorien stehen im Rezept in ihrer Schreibweise; verglichen wird
+     ohne Gross-/Kleinschreibung, aber nicht unscharf. */
+  const schluessel = Object.keys(m.baender_je_kategorie || {})
+    .find((k) => k.toLowerCase() === String(kat.wert).toLowerCase());
+  if (schluessel === undefined) {
+    return nichts('kategorie_unbekannt',
+      `Fuer "${kat.wert}" fuehrt der Bericht keine Reihe.`);
+  }
+  const reihe = m.baender_je_kategorie[schluessel] || [];
+  const x = zahl(e[m.achse_feld]);
+  if (x === null) return nichts('achse_fehlt', `${m.achse_bez} nicht erfasst.`);
+
+  const b = reihe.find((r) => (r.von == null || x >= r.von)
+                           && (r.bis == null || x <= r.bis));
+  if (!b) {
+    return nichts('ausserhalb_der_klassen',
+      `${m.achse_bez} = ${x} faellt in keine der ${reihe.length} Klassen, `
+      + `die der Bericht fuer "${schluessel}" fuehrt.`);
+  }
+  if (!istZahl(b.wert)) {
+    return nichts('klasse_ohne_wert',
+      `Fuer "${schluessel}" und ${b.bez || 'diese Klasse'} fuehrt der Bericht keinen Wert.`);
+  }
+  const st = m.rundung_stellen ?? 2;
+  const q = Math.pow(10, st);
+  return { verfuegbar: true, wert: Math.round(b.wert * q) / q,
+           tabellenwert: Math.round(b.wert * q) / q, korrekturen: [],
+           kategorie: schluessel, klasse: b.bez || null,
+           klasse_fallzahl: b.fallzahl ?? null,
+           klasse_spanne: (b.min != null && b.max != null) ? [b.min, b.max] : null };
+}
+
 const AUSWERTER = {
+
   matrix_interp: matrixInterp,
   matrix_kategorial: matrixKategorial,
   matrix_band: matrixBand,
@@ -498,6 +554,7 @@ const AUSWERTER = {
   baender_1d: baender1d,                 /* v1089-WBND1 */
   log_1d: log1d,                         /* v1093-WLOG */
   spanne_kategorial: spanneKategorial,   /* v1093-WSPN */
+  baender_kategorial: baenderKategorial, /* v1101-WBKAT */
 };
 
 /* ── Additive Korrekturen ──────────────────────────────────────────────── */

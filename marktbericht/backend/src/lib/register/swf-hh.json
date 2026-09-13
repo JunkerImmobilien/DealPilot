@@ -1,0 +1,462 @@
+[
+ {
+  "land_code": "HH",
+  "ags": "02000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "wert": 0.788,
+   "rundung_stellen": 4,
+   "liefert": "faktor",
+   "hinweis": "Grundwert des Produktmodells. Der Bericht druckt die Formel als 0,788 mal neunzehn Faktoren ab; jeder Faktor nennt seine Normstelle, an der er 1 ergibt.",
+   "normobjekt": "Mittlere Lage (Median der normierten EFH-Bodenrichtwerte) · Grundstück 750 m², freistehend in Frontlage · 1-geschossig mit voll ausgebautem Dachgeschoss, ohne Keller · BGF (A+B) 225 m² · Standardstufe 3,0 · NHK 2010 1.005 €/m² BGF · Regionalfaktor 1,75 · Restnutzungsdauer 50 Jahre"
+  },
+  "korrekturen": [
+   {
+    "bez": "Lage",
+    "feld": "normbrw20",
+    "art": "potenz",
+    "wirkung": "multiplikativ",
+    "basis": 630,
+    "exponent": 0.1902,
+    "rundung_stellen": 5,
+    "hinweis": "NormBRW20 = auf 1.000 m² normierter Bodenrichtwert für Ein- und Zweifamilienhäuser. Mittlere Lage = Median dieser Werte zum 31.12.2020 = 630 €/m², dort ergibt der Faktor 1."
+   },
+   {
+    "bez": "Sachwerthöhe",
+    "feld": "sachwertverhaeltnis",
+    "art": "potenz",
+    "wirkung": "multiplikativ",
+    "basis": 1,
+    "exponent": -0.3558,
+    "deckel_ab": 1.87,
+    "deckel_wert": 0.8,
+    "rundung_stellen": 5,
+    "hinweis": "Verhältnis vorläufiger Sachwert zu Normsachwert. Der Normsachwert steht stichtagsweise in der Aktualisierungstabelle (01.01.2026: 939.645 €). Ab Verhältnis 1,87 kappt der Bericht auf 0,8."
+   },
+   {
+    "bez": "Bodenwertanteil",
+    "feld": "bodenwertanteil",
+    "art": "linear",
+    "wirkung": "multiplikativ",
+    "a": 0.67318,
+    "b": 0.5447,
+    "rundung_stellen": 5,
+    "hinweis": "Bodenwertanteil als Anteil (0,60 = 60 %). Bei 60 % ergibt der Faktor 1,00000 — die beiden Konstanten laufen dort exakt zusammen."
+   },
+   {
+    "bez": "Grundstücksgröße",
+    "feld": "gsflaeche",
+    "art": "potenz",
+    "wirkung": "multiplikativ",
+    "basis": 600,
+    "exponent": -0.1138,
+    "rundung_stellen": 5,
+    "hinweis": "Bei 600 m² ergibt der Faktor 1. Achtung: das Normobjekt hat 750 m², die Normstelle dieses Faktors liegt bei 600 m² — beides steht so im Bericht."
+   },
+   {
+    "bez": "Wohnfläche",
+    "feld": "wohnflaeche",
+    "art": "potenz",
+    "wirkung": "multiplikativ",
+    "basis": 120,
+    "exponent": 0.3881,
+    "deckel_ab": 300,
+    "deckel_wert": 1.427,
+    "rundung_stellen": 5,
+    "hinweis": "Bei 120 m² ergibt der Faktor 1; ab 300 m² kappt der Bericht auf 1,427."
+   },
+   {
+    "bez": "Restnutzungsdauer",
+    "feld": "rnd_jahre",
+    "art": "linear",
+    "wirkung": "multiplikativ",
+    "a": 1.065,
+    "b": -0.0013,
+    "boden_ab": 15,
+    "boden_wert": 1.016,
+    "rundung_stellen": 5,
+    "hinweis": "16 bis 50 Jahre: -0,0013 × RND + 1,065. Bis 15 Jahre fest 1,016. Über 50 Jahre fest 1,000 — DIESE Obergrenze kann die Form noch nicht, siehe geltungsbereich.offen."
+   },
+   {
+    "bez": "Baujahr",
+    "feld": "baujahr",
+    "art": "band",
+    "wirkung": "multiplikativ",
+    "baender": [
+     {
+      "von": 0,
+      "bis": 1919,
+      "zuschlag": 1.007,
+      "bez": "bis 1919"
+     },
+     {
+      "von": 1920,
+      "bis": 1939,
+      "zuschlag": 0.997,
+      "bez": "1920 bis 1939"
+     },
+     {
+      "von": 1940,
+      "bis": 1959,
+      "zuschlag": 0.934,
+      "bez": "1940 bis 1959"
+     },
+     {
+      "von": 1960,
+      "bis": 1979,
+      "zuschlag": 0.961,
+      "bez": "1960 bis 1979"
+     },
+     {
+      "von": 1980,
+      "bis": 1989,
+      "zuschlag": 1.0,
+      "bez": "1980 bis 1989"
+     },
+     {
+      "von": 1990,
+      "bis": 9999,
+      "zuschlag": 1.018,
+      "bez": "ab 1990"
+     }
+    ],
+    "rundung_stellen": 3,
+    "hinweis": "Normfall 1980 bis 1989."
+   },
+   {
+    "bez": "Keller",
+    "feld": "keller",
+    "art": "kategorial",
+    "wirkung": "multiplikativ",
+    "werte": {
+     "ohne": 1.0,
+     "mit": 1.054
+    },
+    "rundung_stellen": 3,
+    "hinweis": "Normfall ist OHNE Keller — das Normobjekt hat keinen. Ein Keller wirkt mit 1,054."
+   },
+   {
+    "bez": "Ecklage",
+    "feld": "ecklage",
+    "art": "kategorial",
+    "wirkung": "multiplikativ",
+    "werte": {
+     "nein": 1.0,
+     "ja": 0.976
+    },
+    "rundung_stellen": 3
+   },
+   {
+    "bez": "Wohnungszahl",
+    "feld": "wohnungszahl",
+    "art": "band",
+    "wirkung": "multiplikativ",
+    "baender": [
+     {
+      "von": 1,
+      "bis": 1,
+      "zuschlag": 1.0,
+      "bez": "1 Wohnung"
+     },
+     {
+      "von": 2,
+      "bis": 2,
+      "zuschlag": 0.895,
+      "bez": "2 Wohnungen"
+     }
+    ],
+    "rundung_stellen": 3
+   },
+   {
+    "bez": "Einbauküche",
+    "feld": "einbaukueche",
+    "art": "kategorial",
+    "wirkung": "multiplikativ",
+    "werte": {
+     "nein": 1.0,
+     "ja": 1.049
+    },
+    "rundung_stellen": 3
+   },
+   {
+    "bez": "Dach",
+    "feld": "dachform",
+    "art": "kategorial",
+    "wirkung": "multiplikativ",
+    "werte": {
+     "1-geschossig mit Dachgeschossausbau": 1.0,
+     "Bungalow": 0.985,
+     "1-geschossig mit Flachdach-Staffelgeschoss": 0.985,
+     "1-geschossig mit nicht ausgebautem Dachgeschoss": 0.942,
+     "2-geschossig mit Flachdach": 1.02,
+     "2-geschossig mit Flachdach-Staffelgeschoss": 1.02,
+     "2-geschossig mit nicht ausgebautem Dachgeschoss": 0.99,
+     "2-geschossig mit ausgebautem Dachgeschoss": 1.015
+    },
+    "rundung_stellen": 3,
+    "hinweis": "Alles andere: 1,000 — im Bericht ausdrücklich als 'sonst' geführt. Ein unbekannter Schlüssel liefert hier keine Korrektur und wird als offen gemeldet; das ist dasselbe Ergebnis, aber sichtbar."
+   },
+   {
+    "bez": "Fußbodenheizung",
+    "feld": "fussbodenheizung",
+    "art": "kategorial",
+    "wirkung": "multiplikativ",
+    "werte": {
+     "nein": 1.0,
+     "ja": 1.068
+    },
+    "rundung_stellen": 3
+   },
+   {
+    "bez": "Solarenergie",
+    "feld": "solarenergie",
+    "art": "kategorial",
+    "wirkung": "multiplikativ",
+    "werte": {
+     "nein": 1.0,
+     "ja": 1.043
+    },
+    "rundung_stellen": 3,
+    "hinweis": "Fotovoltaik ODER Solarthermie."
+   },
+   {
+    "bez": "Wärmepumpe",
+    "feld": "waermepumpe",
+    "art": "kategorial",
+    "wirkung": "multiplikativ",
+    "werte": {
+     "nein": 1.0,
+     "ja_ohne_solar": 1.02,
+     "ja_mit_solar": 1.0
+    },
+    "rundung_stellen": 3,
+    "hinweis": "Fußnote im Bericht: keine Doppelberücksichtigung von Wärmepumpe und Fotovoltaik. Deshalb wirkt die Wärmepumpe nur, wenn keine Solarenergie vorliegt."
+   },
+   {
+    "bez": "Stellung",
+    "feld": "stellung",
+    "art": "kategorial",
+    "wirkung": "multiplikativ",
+    "werte": {
+     "freistehend": 1.0,
+     "Doppelhaushälfte": 0.977,
+     "Mittelreihenhaus": 0.998,
+     "Endreihenhaus": 0.981
+    },
+    "rundung_stellen": 3
+   },
+   {
+    "bez": "Stadtteil",
+    "feld": "stadtteil",
+    "art": "kategorial",
+    "wirkung": "multiplikativ",
+    "werte": {
+     "Allermöhe": 1.035,
+     "Alsterdorf": 1.193,
+     "Altengamme": 1.035,
+     "Altenwerder": 0.915,
+     "Altona-Altstadt": 1.0,
+     "Altona-Nord": 1.0,
+     "Bahrenfeld": 1.063,
+     "Barmbek-Nord": 1.0,
+     "Barmbek-Süd": 1.0,
+     "Bergedorf": 1.053,
+     "Bergstedt": 1.002,
+     "Billbrook": 0.914,
+     "Billstedt": 0.914,
+     "Billwerder": 1.035,
+     "Blankenese": 1.063,
+     "Borgfelde": 0.952,
+     "Bramfeld": 0.956,
+     "Cranz": 0.915,
+     "Curslack": 1.035,
+     "Dulsberg": 1.0,
+     "Duvenstedt": 1.002,
+     "Eidelstedt": 1.018,
+     "Eilbek": 1.0,
+     "Eimsbüttel": 1.0,
+     "Eißendorf": 0.915,
+     "Eppendorf": 1.0,
+     "Farmsen-Berne": 0.956,
+     "Finkenwerder": 1.147,
+     "Francop": 0.915,
+     "Fuhlsbüttel": 0.978,
+     "Groß Borstel": 1.193,
+     "Groß Flottbek": 1.063,
+     "Gut Moor": 0.915,
+     "HafenCity": 1.0,
+     "Hamburg-Altstadt": 1.0,
+     "Hamm": 0.952,
+     "Hammerbrook": 0.952,
+     "Harburg": 0.915,
+     "Harvestehude": 1.0,
+     "Hausbruch": 0.915,
+     "Heimfeld": 0.915,
+     "Hoheluft-Ost": 1.0,
+     "Hoheluft-West": 1.0,
+     "Hohenfelde": 1.0,
+     "Horn": 0.952,
+     "Hummelsbüttel": 0.978,
+     "Iserbrook": 1.063,
+     "Jenfeld": 0.956,
+     "Kirchwerder": 1.035,
+     "Kleiner Grasbrook": 1.0,
+     "Langenbek": 0.915,
+     "Langenhorn": 0.978,
+     "Lemsahl-Mellingstedt": 1.002,
+     "Lohbrügge": 0.951,
+     "Lokstedt": 1.018,
+     "Lurup": 1.018,
+     "Marienthal": 0.956,
+     "Marmstorf": 0.915,
+     "Moorburg": 0.915,
+     "Moorfleet": 1.035,
+     "Neuallermöhe": 1.035,
+     "Neuenfelde": 0.915,
+     "Neuengamme": 1.035,
+     "Neugraben-Fischbek": 0.915,
+     "Neuland": 0.915,
+     "Neustadt": 1.0,
+     "Niendorf": 1.018,
+     "Nienstedten": 1.063,
+     "Ochsenwerder": 1.035,
+     "Ohlsdorf": 1.193,
+     "Osdorf": 1.063,
+     "Othmarschen": 1.063,
+     "Ottensen": 1.0,
+     "Poppenbüttel": 0.978,
+     "Rahlstedt": 0.948,
+     "Reitbrook": 1.035,
+     "Rissen": 1.063,
+     "Rönneburg": 0.915,
+     "Rothenburgsort": 0.952,
+     "Rotherbaum": 1.0,
+     "St. Georg": 1.0,
+     "St. Pauli": 1.0,
+     "Sasel": 1.002,
+     "Schnelsen": 1.018,
+     "Sinstorf": 0.915,
+     "Spadenland": 1.035,
+     "Steilshoop": 0.956,
+     "Steinwerder": 1.0,
+     "Stellingen": 1.018,
+     "Sternschanze": 1.0,
+     "Sülldorf": 1.063,
+     "Tatenberg": 1.035,
+     "Tonndorf": 0.956,
+     "Uhlenhorst": 1.0,
+     "Veddel": 1.0,
+     "Volksdorf": 1.002,
+     "Waltershof": 1.0,
+     "Wandsbek": 0.956,
+     "Wellingsbüttel": 0.978,
+     "Wilhelmsburg": 1.093,
+     "Wilstorf": 0.915,
+     "Winterhude": 1.0,
+     "Wohldorf-Ohlstedt": 1.002
+    },
+    "rundung_stellen": 3,
+    "hinweis": "104 Stadtteile. Neuwerk trägt im Bericht KEINEN Wert — konsistent zum räumlichen Geltungsbereich 'ganz Hamburg ohne Neuwerk' und deshalb hier ebenfalls nicht geführt."
+   },
+   {
+    "bez": "Aktualisierung",
+    "feld": "aktualisierungsfaktor",
+    "art": "linear",
+    "wirkung": "multiplikativ",
+    "a": 0,
+    "b": 1,
+    "rundung_stellen": 3,
+    "hinweis": "Durchreichung: der Aufrufer setzt den Faktor zum Wertermittlungsstichtag. 01.01.2026: 0,973 · 01.07.2025: 0,957 · 01.01.2025: 0,933 · 01.07.2024: 0,939 · 01.01.2024: 0,971 · 01.07.2023: 0,947 · 01.01.2023: 0,932 · 01.07.2022: 0,993 · 01.01.2022: 1,000"
+   }
+  ],
+  "modellansaetze": {
+   "gesamtnutzungsdauer_jahre": 80,
+   "alterswertminderung": "linear",
+   "herstellungskosten": "NHK 2010, Anlage 4 ImmoWertV",
+   "regionalfaktor": 1.75,
+   "baupreisindex_stichtag": {
+    "01.01.2026": 1.911,
+    "basis": "Mai 2010 = 1"
+   },
+   "garagen_eur_stueck_2010": 9000,
+   "carports_eur_stueck_2010": 3000,
+   "besondere_bauteile": "kein gesonderter Ansatz — im üblichen Umfang enthalten",
+   "aussenanlagen": "kein gesonderter Ansatz — im üblichen Umfang enthalten",
+   "baujahr": "ursprüngliches Baujahr",
+   "restnutzungsdauer": "GND abzüglich Alter bzw. modifiziert nach ImmoWertV entsprechend der Modernisierungspunktzahl",
+   "bodenwert": "objektspezifischer Bodenwert zum Modellstichtag",
+   "standardstufe": "gemäß Anlage 4 ImmoWertV"
+  },
+  "geltungsbereich": {
+   "raeumlich": "ganz Hamburg ohne Neuwerk",
+   "sachlich": "Einfamilienhäuser ohne gewerblichen Anteil; Verkäufe 2013 bis 2020; keine Erbbaurechte, keine ungewöhnlichen Verhältnisse, kein sozialer Wohnungsbau",
+   "extrapolation": "nicht_geregelt",
+   "spannen": {
+    "normbrw20_eur_qm": {
+     "min": 250,
+     "max": 7000,
+     "mittel": 699
+    },
+    "sachwerthoehe_eur": {
+     "min": 54000,
+     "max": 5300000,
+     "mittel": 590000
+    },
+    "bodenwertanteil": {
+     "min": 0.14,
+     "max": 0.97,
+     "mittel": 0.53
+    },
+    "gsflaeche_qm": {
+     "min": 60,
+     "max": 8740,
+     "mittel": 620
+    },
+    "baujahr": {
+     "min": 1645,
+     "max": 2022,
+     "mittel": 1970
+    },
+    "rnd_jahre": {
+     "min": 12,
+     "max": 80,
+     "mittel": 44
+    },
+    "wohnflaeche_qm": {
+     "min": 50,
+     "max": 940,
+     "mittel": 142
+    },
+    "modernisierungspunkte": {
+     "min": 0.0,
+     "max": 20.0,
+     "mittel": 3.98
+    }
+   },
+   "ohne_einfluss": "Alter (Stichtagsjahr minus Baujahr), Standardstufe, Wohnfläche/BGF, Garage, Carport, Stellplatz, Pfeifenstiel, Wegerecht, Endenergiebedarf, Rechtsform — der Bericht nennt sie ausdrücklich als einflusslos",
+   "offen": "ZWEI Dinge kann die Formelform noch nicht: (1) der Restnutzungsdauerfaktor ist über 50 Jahren fest 1,000 — die lineare Form rechnet dort weiter und liefert ab RND 50 Werte unter 1. Bis das abgebildet ist, gilt das Modell nur bis RND 50. (2) Der Modernisierungsfaktor (1 + 0,0076 × (Punktzahl − baujahrstypisches Mittel)) braucht ZWEI Eingänge und eine Nachschlagetabelle nach Baujahrsklasse; er ist hier nicht geführt und wirkt damit als 1."
+  },
+  "belege": [
+   "Immobilienmarktbericht Hamburg 2026, Kap. 7.2.3, S. 117–123. Formel: Sachwertfaktor = 0,788 × Lagefaktor × Sachwerthöhenfaktor × Bodenwertanteilsfaktor × Grundstücksgrößenfaktor × Baujahrsfaktor × Restnutzungsdauerfaktor × Kellerfaktor × Wohnflächenfaktor × Modernisierungsfaktor × Ecklagefaktor × Wohnungszahlfaktor × Einbauküchenfaktor × Dachfaktor × Fußbodenheizungsfaktor × Solarenergiefaktor × Wärmepumpenfaktor × Stellungsfaktor × Stadtteilfaktor × Aktualisierungsfaktor"
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtliche Formel mit allen Koeffizienten aus dem Bericht, Normproben gerechnet und getroffen.",
+  "fallzahl": 3556,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://dokumente.hamburg.de/resource/blob/1166868/d21cbc3d6d1c7767bfb82752a3c4cb3d/d-immobilienmarktbericht-2026-data.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Immobilienmarktbericht Hamburg 2026, Gutachterausschuss für Grundstückswerte in Hamburg, © 2026",
+  "lizenz": "frei mit Quellenangabe",
+  "verwendung": "produkt",
+  "auflagen": null,
+  "fundstelle": "Kap. 7.2.3, S. 117–123"
+ }
+]

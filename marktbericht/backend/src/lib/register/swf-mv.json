@@ -1,0 +1,92 @@
+[
+ {
+  "land_code": "MV",
+  "ags": "13076",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "baender_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "baender": [
+    {
+     "von": null,
+     "bis": 90000,
+     "wert": 1.1,
+     "schluessel": "bis 90.000",
+     "streuung": 0.13
+    },
+    {
+     "von": 90000,
+     "bis": 150000,
+     "wert": 1.07,
+     "schluessel": "90.000–150.000",
+     "streuung": 0.17
+    },
+    {
+     "von": 150000,
+     "bis": 190000,
+     "wert": 1.02,
+     "schluessel": "150.000–190.000",
+     "streuung": 0.13
+    },
+    {
+     "von": 190000,
+     "bis": null,
+     "wert": 1.01,
+     "schluessel": "über 190.000",
+     "streuung": 0.1
+    }
+   ],
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Der Bericht nennt sie Marktanpassungsfaktoren (§ 14 Abs. 2 Nr. 1 ImmoWertV). Vier Bänder mit Ø-Faktor und Spanne (± Standardabweichung). Für drei Bänder druckt er zusätzlich eine quadratische Funktion ab — sie steht unter modellansaetze.funktionen und ist hier NICHT als Rechenweg geführt: innerhalb eines Bandes schwankt sie erheblich, während der Bericht den Ø-Faktor als anwendbaren Wert ausweist.",
+   "normobjekt": "Kein Normobjekt. Der Bericht stellt ausdrücklich fest, dass WEDER eine Abhängigkeit vom Bodenwertniveau NOCH vom fiktiven Baujahr signifikant abgeleitet werden konnte."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "herstellungskosten": "NHK 2010",
+   "bezugsmassstab": "Bruttogrundfläche nach DIN 277 Ausgabe 2005 und Sachwertrichtlinie Punkt 4.1.1.4",
+   "baupreisindex": "Statistisches Bundesamt",
+   "baujahresklasse": "ohne Berücksichtigung",
+   "alterswertminderung": "linear",
+   "bodenwert": "aktueller Bodenwert",
+   "aussenanlagen": "pauschal 2 bis 4 %",
+   "selektion": "nur schadensfreie Objekte mit lagetypischen Grundstücksgrößen; Baujahre 1900 bis 2014; üblicher Bau- und Unterhaltungszustand",
+   "funktionen": {
+    "bis 90.000": "y = 5×10⁻¹⁰ x² − 8×10⁻⁵ x + 4,0522   (R² = 0,40)",
+    "90.000–150.000": "y = 1×10⁻¹⁰ x² − 3×10⁻⁵ x + 3,1056   (R² = 0,34)",
+    "150.000–190.000": "keine Funktion abgeleitet — der Bericht schreibt: „konnte kein abhängiges Einflussmerkmal signifikant abgeleitet werden\"",
+    "über 190.000": "y = 2×10⁻¹¹ x² − 1×10⁻⁵ x + 2,7738   (R² = 0,35)"
+   },
+   "nhk2000_verhaeltnis": "Sachwertfaktoren auf Basis NHK 2000 liegen im Mittel 12,5 % UNTER denen auf Basis NHK 2010 — wichtig beim Vergleich mit älteren Gutachten."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Ludwigslust-Parchim",
+   "sachlich": "individueller Wohnungsbau, Baujahre 1900 bis 2014",
+   "extrapolation": "gesperrt",
+   "vorbehalt": "SCHWACHE DATENLAGE, UND DER BERICHT SAGT ES SELBST. Wörtlich: „Auch in diesem Jahr haben die Auswertungen gezeigt, dass sich das Marktgeschehen zum Teil immer noch sehr ungeordnet darstellt. Dabei konnte weder eine Abhängigkeit vom Bodenwertniveau noch vom fiktiven Baujahr signifikant abgeleitet werden. … ist die Streubreite der Kaufpreise immer noch sehr groß. Insbesondere im Bereich der vorläufigen Sachwerte zwischen 150.000 und 190.000 € konnte kein abhängiges Einflussmerkmal signifikant abgeleitet werden.\" Die Bestimmtheitsmaße liegen bei 0,34 bis 0,40 — drei Fünftel der Streuung erklärt das Modell NICHT. Die Spannen (± Standardabweichung) sind deshalb mitgeführt und gehören in jede Anwendung.",
+   "hinweis": "JAHRGANG 2018. Das ist der neueste frei abrufbare Bericht dieses Ausschusses; auf der Seite stehen sonst 2012 bis 2017. Ein Jahrgang 2023 wird verlinkt, die Datei trägt aber denselben Inhalt (Titel im PDF: GMB_LWL_2018.indd). Vor einer Anwendung auf einen heutigen Stichtag ist zu prüfen, ob inzwischen ein neuerer Bericht vorliegt."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2018 Landkreis Ludwigslust-Parchim, Tabelle 27, S. 58: vier Bänder des vorläufigen Sachwerts mit Ø-Faktor, Spanne (± Standardabweichung), Funktion und Bestimmtheitsmaß."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtliche Tabelle, aber ohne Anwendungsbeispiel, mit ausdrücklich benannter schwacher Erklärkraft (R² 0,34 bis 0,40) und aus dem Jahrgang 2018. Der Bericht selbst nennt das Marktgeschehen „sehr ungeordnet\".",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2018-01-01",
+  "berichtsjahr": 2018,
+  "modellversion": "GMB 2018",
+  "quelle_url": "https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Grundstücksmarktbericht 2018 für den Bereich des Landkreises Ludwigslust-Parchim, Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim",
+  "lizenz": "auszugsweise Wiedergabe mit Quellenangabe und Belegexemplar",
+  "verwendung": "gutachten",
+  "auflagen": "Auszugsweise Wiedergabe ist ohne Genehmigung gestattet, verlangt aber (1) eindeutige Quellenangaben und (2) die Zusendung eines Belegexemplars an den Herausgeber. Vollständige Vervielfältigung braucht die Genehmigung des Herausgebers. Vor einer Auslieferung im Kundenbericht ist das Belegexemplar zu klären — bis dahin steht dort nur der Link.",
+  "fundstelle": "Kap. 5.2 Sachwertfaktoren, Tabelle 27, S. 58"
+ }
+]
