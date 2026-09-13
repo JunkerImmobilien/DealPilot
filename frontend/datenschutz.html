@@ -348,6 +348,88 @@
       <li>Server-Standort ausschließlich in Deutschland</li>
     </ul>
 
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         v1373 (B15) · Sicherheitsprotokollierung
+         ══════════════════════════════════════════════════════════════════
+         Marcels Punkt B15: "Datenschutzerklärung: Zweck, Daten,
+         Aufbewahrung, Rechtsgrundlage, Löschkonzept."
+
+         Eingefügt als eigener Abschnitt 13a, damit die bestehende
+         Nummerierung (14, 15) unverändert bleibt. Was hier steht, muss
+         mit dem übereinstimmen, was Migration 071 tatsächlich speichert —
+         eine Datenschutzerklärung, die mehr oder weniger beschreibt als
+         der Code tut, ist schlechter als keine.
+         ══════════════════════════════════════════════════════════════ -->
+
+    <h2>13a. Sicherheitsprotokollierung und Missbrauchserkennung</h2>
+
+    <p><strong>Zweck.</strong> Um den Dienst für alle Nutzer verfügbar zu
+    halten und um zu erkennen, ob ein Zugang automatisiert oder in
+    ungewöhnlichem Umfang ausgelesen wird, begrenzen wir die Zahl der
+    Anfragen je Konto und protokollieren Überschreitungen dieser Grenze.</p>
+
+    <p><strong>Welche Daten dabei anfallen.</strong> Gespeichert wird
+    ausschließlich:</p>
+    <ul>
+      <li>die Kennung Ihres Kontos (bei angemeldeten Zugriffen) oder –
+      wenn kein Konto bekannt ist – ein gekürzter Netzkennwert der
+      IP-Adresse;</li>
+      <li>der aufgerufene Pfad <em>ohne Parameter</em> (z.&nbsp;B.
+      <code>/api/v1/objects</code>) und die Anfrageart (GET, POST);</li>
+      <li>Zeitpunkt, eine grobe Einstufung (Hinweis / Auffällig / Ernst)
+      sowie Zählwerte wie die Zahl der Überschreitungen im Zeitfenster;</li>
+      <li>bei einer Entscheidung durch unsere Mitarbeiter: wer sie getroffen
+      hat und die dazugehörige Begründung.</li>
+    </ul>
+
+    <p><strong>Was ausdrücklich nicht gespeichert wird.</strong> Wir
+    protokollieren <em>keine</em> Inhalte Ihrer Anfragen, keine
+    Objektdaten, keine Eingaben, keine Suchbegriffe. Wir werten
+    <em>nicht</em> aus, welche Software Sie verwenden – es werden weder
+    Browserkennung noch Gerätemerkmale gespeichert, und es findet keine
+    Auswertung anderer Inhalte Ihres Geräts oder Browsers statt.</p>
+
+    <p><strong>Wie ausgewertet wird.</strong> Aus den protokollierten
+    Ereignissen werden zwei Kennzahlen gebildet: wie viele verschiedene
+    Funktionsbereiche aufgerufen wurden und wie gleichmäßig die zeitlichen
+    Abstände sind. Beides dient dazu, gewöhnliche – auch intensive –
+    Nutzung von automatisierten Zugriffen zu unterscheiden. <strong>Es
+    findet keine automatisierte Entscheidung mit rechtlicher Wirkung
+    statt</strong> (Art. 22 DSGVO): Einstufungen sind ausschließlich
+    Anlass für eine Prüfung durch einen Menschen. Eine Einschränkung oder
+    Sperrung Ihres Zugangs erfolgt niemals automatisch.</p>
+
+    <p><strong>Rechtsgrundlage.</strong> Art. 6 Abs. 1 lit. f DSGVO
+    (berechtigtes Interesse). Unser Interesse liegt in der Verfügbarkeit
+    und Sicherheit des Dienstes sowie im Schutz unserer
+    Entwicklungsleistung vor systematischer Übernahme. Ihr
+    gegenläufiges Interesse an möglichst geringer Protokollierung haben
+    wir dadurch berücksichtigt, dass keine Inhalte und keine
+    Gerätemerkmale erfasst werden und die Aufbewahrung eng befristet ist.
+    Soweit die Verarbeitung zugleich der Erfüllung des Nutzungsvertrags
+    dient, stützen wir sie ergänzend auf Art. 6 Abs. 1 lit. b DSGVO.</p>
+
+    <p><strong>Aufbewahrung und Löschung.</strong> Sicherheitsereignisse
+    werden nach <strong>90 Tagen</strong> gelöscht. Ereignisse, die zu
+    einer Einschränkung oder Sperrung geführt haben, bewahren wir bis zu
+    <strong>drei Jahre</strong> auf, weil sie im Streitfall der
+    Nachvollziehbarkeit dieser Entscheidung dienen; die Frist orientiert
+    sich an der regelmäßigen Verjährung (§ 195 BGB). Löschen Sie Ihr
+    Konto, werden die Ereignisse von Ihrer Kontokennung getrennt
+    (anonymisiert) oder gelöscht.</p>
+
+    <p><strong>Empfänger.</strong> Die Protokolle werden ausschließlich auf
+    unseren Servern in Deutschland gespeichert und nicht an Dritte
+    übermittelt. Zugriff haben nur Mitarbeiter des Anbieters mit
+    Administratorrechten.</p>
+
+    <p><strong>Ihre Rechte.</strong> Sie können Auskunft über die zu Ihrem
+    Konto protokollierten Ereignisse verlangen und der Verarbeitung nach
+    Art. 21 DSGVO widersprechen. Da die Protokollierung der Sicherheit des
+    Dienstes dient, prüfen wir im Einzelfall, ob zwingende schutzwürdige
+    Gründe überwiegen; das Ergebnis teilen wir Ihnen begründet mit.</p>
+
     <h2>14. Datenverarbeitung Dritter durch den Nutzer</h2>
     <p>Soweit der Nutzer in DealPilot personenbezogene Daten Dritter (z.B. potenzielle Mieter, Verkäufer, Berater) eingibt, ist der Nutzer selbst <strong>Verantwortlicher</strong> im Sinne der DSGVO. Junker Immobilien fungiert insofern als <strong>Auftragsverarbeiter</strong>.</p>
     <p>Der Nutzer ist verpflichtet, sicherzustellen, dass er zur Eingabe und Verarbeitung dieser Drittdaten berechtigt ist (z.B. durch Einwilligung der Betroffenen oder gesetzliche Erlaubnis).</p>

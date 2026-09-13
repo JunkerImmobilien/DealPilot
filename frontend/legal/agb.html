@@ -48,6 +48,16 @@
     }
     a { color: #C9A84C; text-decoration: none; }
     a:hover { text-decoration: underline; }
+    /* v1373: Entwurfs-Kennzeichnung. Ein Entwurf, den man nicht als
+       solchen erkennt, wird irgendwann wie geltendes Recht gelesen. */
+    .entwurf-marke { display:inline-block; margin-left:8px; padding:2px 8px;
+      border-radius:10px; background:#B8625C; color:#fff; font-size:11px;
+      font-weight:600; letter-spacing:.3px; vertical-align:middle; }
+    .entwurf-kasten { margin:14px 0; padding:13px 16px; border-radius:8px;
+      background:rgba(184,98,92,.07); border-left:3px solid #B8625C;
+      font-size:14px; line-height:1.6; }
+    .entwurf-kasten ul { margin:8px 0 0; padding-left:20px; }
+    .entwurf-kasten li { margin-bottom:7px; }
     .back { display: inline-block; margin-bottom: 24px; color: #888; font-size: 13px; }
     footer { text-align: center; margin-top: 40px; color: #888; font-size: 12px; }
     @media print {
@@ -256,6 +266,143 @@
     <p>Der Nutzer sichert mit jedem Upload ausdrücklich zu, dass er zur Nutzung, Vervielfältigung und Verarbeitung der hochgeladenen Dokumente zu den vorgenannten Zwecken uneingeschränkt berechtigt ist und hierdurch keine Rechte Dritter verletzt werden. Dies umfasst insbesondere Urheber- und Leistungsschutzrechte, Eigentums- und Besitzrechte, Geschäfts- und Betriebsgeheimnisse sowie datenschutz- und persönlichkeitsrechtliche Belange. Enthalten die Dokumente personenbezogene Daten Dritter (etwa von Mietern), sichert der Nutzer zu, über die erforderliche Rechtsgrundlage bzw. Einwilligung für deren Übermittlung und Verarbeitung zu verfügen.</p>
     <p>Der Nutzer ist allein dafür verantwortlich, vor dem Upload die Berechtigung zu prüfen und – soweit erforderlich – Schwärzungen oder Anonymisierungen vorzunehmen. Der Anbieter ist nicht verpflichtet, hochgeladene Dokumente auf Rechtmäßigkeit, Echtheit oder Berechtigung zu prüfen, und übernimmt keine Gewähr für die Richtigkeit der automatisiert ausgelesenen Werte.</p>
     <p>Der Nutzer stellt den Anbieter von sämtlichen Ansprüchen Dritter frei, die wegen einer vom Nutzer zu vertretenden Verletzung der vorstehenden Zusicherungen gegen den Anbieter geltend gemacht werden, einschließlich angemessener Kosten der erforderlichen Rechtsverteidigung.</p>
+
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         v1373 (B13/B14) · ENTWURF — NOCH NICHT ANWALTLICH GEPRÜFT
+         ══════════════════════════════════════════════════════════════════
+         Marcels Auftrag: Abschnitt gegen Scraping, Bots, LLM-Rekonstruktion
+         und Reverse Engineering, dazu eine Vertragsstrafe von 25.000 EUR —
+         ausdrücklich als "juristisch zu prüfender Entwurf", B2C und B2B
+         getrennt, und NIE automatisch durch einen Risikoscore ausgelöst.
+
+         Eingefügt als Unterpunkte von VII, damit die Nummerierung der
+         Hauptabschnitte (VIII bis XIII) unverändert bleibt. Marcels
+         Auflage: "Bestehende AGB dürfen nicht kommentarlos überschrieben
+         werden." Hier wurde nichts ersetzt, nur ergänzt.
+         ══════════════════════════════════════════════════════════════ -->
+
+    <h3>(6) Keine automatisierte Auswertung, kein Nachbau</h3>
+
+    <p>Die Plattform, ihre Berechnungsmodelle, Bewertungslogiken,
+    Gewichtungen, Schwellenwerte und Datenaufbereitungen sind das Ergebnis
+    erheblicher eigener Entwicklungsarbeit des Anbieters. Der Nutzer erhält
+    ein Recht zur bestimmungsgemäßen Nutzung – nicht zur Übernahme.</p>
+
+    <p>Untersagt ist insbesondere:</p>
+    <ul>
+      <li>der Einsatz von Skripten, Bots, Crawlern, Scrapern oder
+      vergleichbaren automatisierten Verfahren, um Inhalte, Berechnungen
+      oder Ergebnisse der Plattform systematisch abzurufen, zu speichern
+      oder auszulesen;</li>
+
+      <li>das systematische, über den eigenen Bedarf hinausgehende
+      Abrufen von Ergebnissen mit dem Ziel, das zugrunde liegende
+      Bewertungs- oder Berechnungsmodell nachzubilden – auch dann, wenn
+      dies durch manuelle Wiederholung erfolgt;</li>
+
+      <li>die Nutzung der Plattform oder ihrer Ausgaben als Trainings-,
+      Abgleichs- oder Eingabematerial für maschinelles Lernen, große
+      Sprachmodelle oder vergleichbare Systeme, soweit dies der
+      Rekonstruktion der Funktionsweise dient;</li>
+
+      <li>das Zurückentwickeln (Reverse Engineering), Dekompilieren oder
+      Disassemblieren der Software über den gesetzlich zwingend
+      zulässigen Umfang hinaus – insbesondere bleibt § 69e UrhG
+      (Dekompilierung zur Herstellung von Interoperabilität) unberührt;</li>
+
+      <li>die Weitergabe von Zugangsdaten oder die Bereitstellung des
+      eigenen Zugangs für Dritte zu den vorgenannten Zwecken.</li>
+    </ul>
+
+    <p><strong>Ausdrücklich erlaubt bleibt</strong> die normale, auch
+    intensive Nutzung im Rahmen der eigenen Tätigkeit: das Anlegen und
+    Auswerten beliebig vieler eigener Objekte im Rahmen des gebuchten
+    Tarifs, der Export eigener Ergebnisse, deren Weitergabe an Banken,
+    Steuerberater oder Mandanten sowie die Nutzung der bereitgestellten
+    Programmierschnittstelle im vorgesehenen Umfang.</p>
+
+    <p><strong>Technische Schutzmaßnahmen.</strong> Der Anbieter setzt
+    Maßnahmen zur Begrenzung der Abrufhäufigkeit und zur Erkennung
+    ungewöhnlicher Nutzungsmuster ein und protokolliert sicherheitsrelevante
+    Ereignisse. Näheres regelt die Datenschutzerklärung. Eine technische
+    Auffälligkeit begründet für sich genommen <em>keinen</em> Vorwurf eines
+    Vertragsverstoßes; sie ist Anlass zur Prüfung durch den Anbieter.</p>
+
+    <h3>(7) Vertragsstrafe bei vorsätzlichem Verstoß
+        <span class="entwurf-marke">Entwurf – anwaltlich zu prüfen</span></h3>
+
+    <div class="entwurf-kasten">
+      <p><strong>Hinweis zum Stand dieser Klausel:</strong> Dieser Absatz ist
+      ein <strong>Entwurf und noch nicht anwaltlich geprüft</strong>. Er ist
+      als Grundlage für die rechtliche Prüfung gedacht und sollte vor
+      Inkrafttreten von einer Rechtsanwältin oder einem Rechtsanwalt geprüft
+      und freigegeben werden. Die nachfolgend genannten Punkte sind dabei
+      besonders zu würdigen.</p>
+    </div>
+
+    <p><strong>a) Gegenüber Unternehmern</strong> (§ 14 BGB): Verstößt der
+    Nutzer vorsätzlich gegen die Verbote nach Absatz (6), so wird für jeden
+    Fall der Zuwiderhandlung eine Vertragsstrafe in angemessener Höhe fällig,
+    die der Anbieter nach billigem Ermessen bestimmt und die im Streitfall
+    vom zuständigen Gericht auf ihre Angemessenheit überprüft werden kann
+    (§ 315 BGB). Als Ausgangswert für die Bemessung zieht der Anbieter einen
+    Betrag von bis zu 25.000 EUR je Fall heran. Bei fortgesetzten Verstößen
+    gilt jede abgeschlossene Handlung als eigener Fall; mehrere Handlungen,
+    die auf einem einheitlichen Entschluss beruhen, gelten als ein Fall.
+    Die Geltendmachung eines darüber hinausgehenden Schadens bleibt
+    unberührt; eine gezahlte Vertragsstrafe wird auf einen Schadensersatz
+    angerechnet.</p>
+
+    <p><strong>b) Gegenüber Verbrauchern</strong> (§ 13 BGB): Eine
+    Vertragsstrafe wird <strong>nicht</strong> vereinbart. Es gelten die
+    gesetzlichen Bestimmungen; der Anbieter kann den ihm tatsächlich
+    entstandenen Schaden nach den allgemeinen Vorschriften geltend machen.</p>
+
+    <p><strong>c) Kein Automatismus.</strong> Eine Vertragsstrafe wird
+    <strong>niemals</strong> allein aufgrund technischer Messwerte,
+    automatischer Einstufungen oder eines maschinell erzeugten Risikowerts
+    ausgelöst. Solche Werte sind ausschließlich Anlass für eine Prüfung
+    durch den Anbieter. Vor der Geltendmachung erhält der Nutzer Gelegenheit
+    zur Stellungnahme; der Anbieter legt die tragenden Tatsachen offen,
+    soweit dadurch die Wirksamkeit der Schutzmaßnahmen nicht vereitelt wird.
+    Die Darlegungs- und Beweislast für Vorsatz und Verstoß trägt der
+    Anbieter.</p>
+
+    <div class="entwurf-kasten">
+      <p><strong>Für die anwaltliche Prüfung – bekannte Streitpunkte:</strong></p>
+      <ul>
+        <li><strong>§ 309 Nr. 6 BGB</strong> verbietet Vertragsstrafen in
+        Allgemeinen Geschäftsbedingungen gegenüber Verbrauchern. Buchstabe b)
+        trägt dem Rechnung, indem er gegenüber Verbrauchern ausdrücklich auf
+        eine Vertragsstrafe verzichtet.</li>
+
+        <li><strong>Auch gegenüber Unternehmern</strong> ist eine
+        formularmäßige Vertragsstrafe an § 307 BGB zu messen. Eine starre
+        Pauschale ohne Rücksicht auf Schwere und Verschulden gilt
+        überwiegend als unangemessen. Buchstabe a) ist deshalb als
+        Ermessensklausel nach § 315 BGB formuliert, mit 25.000 EUR als
+        Obergrenze der Bemessung statt als Festbetrag – ob das trägt, ist
+        zu prüfen.</li>
+
+        <li><strong>Die Höhe selbst</strong> muss in einem angemessenen
+        Verhältnis zum wirtschaftlichen Wert der geschützten Leistung und
+        zum typischen Schaden stehen. Hierzu sollte der Anbieter darlegen
+        können, welcher Entwicklungsaufwand in den geschützten Modellen
+        steckt.</li>
+
+        <li><strong>Individualvereinbarung statt AGB:</strong> Für
+        Geschäftskunden mit besonderem Zugriff (etwa API-Nutzung in größerem
+        Umfang) ist zu erwägen, die Klausel individuell zu vereinbaren
+        statt formularmäßig zu stellen – dann greift die
+        AGB-Inhaltskontrolle nicht in gleicher Weise.</li>
+
+        <li><strong>Verhältnis zum UWG und zum Geschäftsgeheimnisgesetz:</strong>
+        Ansprüche aus § 4 Nr. 3 UWG (unlautere Nachahmung) und dem GeschGehG
+        bestehen unabhängig von dieser Klausel und sollten in der Prüfung
+        mitgedacht werden.</li>
+      </ul>
+    </div>
 
     <h2>VIII. Sperrung von Inhalten oder Zugang</h2>
     <p>Bei schuldhaftem Verstoß gegen wesentliche Vertragspflichten ist der Anbieter berechtigt, das Konto des Nutzers oder einzelne Inhalte vorübergehend oder endgültig zu sperren.</p>

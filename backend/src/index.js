@@ -458,6 +458,47 @@ async function start() {
     setTimeout(_runRetention, 60 * 1000);          // erster Lauf 60s nach Start
     setInterval(_runRetention, _RET_INTERVAL_MS);  // danach taeglich
     console.log('✓ Retention-Scheduler aktiv (taeglich)');
+
+    /* ══════════════════════════════════════════════════════════════════
+       v1373 (B15) · DAS LOESCHKONZEPT MUSS AUCH LAUFEN
+       ══════════════════════════════════════════════════════════════════
+       Die Datenschutzerklaerung sagt seit v1373 zu: Sicherheitsereignisse
+       nach 90 Tagen geloescht, Ereignisse mit Entscheidung nach drei
+       Jahren.
+
+       Eine Loeschfrist, die nur im Text steht, ist keine Loeschfrist -
+       sie ist eine Zusage, die man nicht haelt. Deshalb laeuft sie hier
+       mit, im selben taeglichen Takt wie die Kundenbindung.
+
+       DIE DREI JAHRE FUER ENTSCHEIDUNGEN sind kein Selbstzweck: wer
+       eingeschraenkt wurde, soll das im Streitfall nachvollziehen
+       koennen, und die regelmaessige Verjaehrung betraegt drei Jahre
+       (§ 195 BGB). Ein Protokoll, das vorher verschwindet, schuetzt
+       weder den Anbieter noch den Nutzer.
+       ══════════════════════════════════════════════════════════════════ */
+    const _SEC_LOESCH_MS = 24 * 60 * 60 * 1000;
+    const _secAufraeumen = async () => {
+      try {
+        const db = require('./db/pool');
+        const r1 = await db.query(
+          `DELETE FROM security_events
+            WHERE created_at < NOW() - INTERVAL '90 days'
+              AND art NOT IN ('eingeschraenkt','gesperrt','freigegeben')`);
+        const r2 = await db.query(
+          `DELETE FROM security_events
+            WHERE created_at < NOW() - INTERVAL '3 years'`);
+        if (r1.rowCount || r2.rowCount) {
+          console.log('[sec-retention] geloescht:', r1.rowCount, 'Beobachtungen (>90 Tage),',
+                      r2.rowCount, 'Entscheidungen (>3 Jahre)');
+        }
+      } catch (e) {
+        console.error('[sec-retention] Lauf-Fehler:', e.message);
+      }
+    };
+    setTimeout(_secAufraeumen, 90 * 1000);
+    setInterval(_secAufraeumen, _SEC_LOESCH_MS);
+    console.log('✓ Sicherheits-Loeschlauf aktiv (90 Tage / 3 Jahre)');
+
   } catch (e) {
     console.error('✗ Retention-Scheduler konnte nicht starten:', e.message);
   }
