@@ -5390,7 +5390,14 @@
   function _rfDranZeichnen() {
     var host = $('vi-rf-dran'); if (!host || !_rf) return;
     var e = _rf.offen[_rf.i];
-    var akt = (_rf.aktionen || []);
+    /* v1376d (C7): Ein Widerspruch steht VORNE. GEMESSEN im Durchlauf:
+       nach einem Fragewechsel standen die Markt-Knoepfe zuerst und der
+       Vorspann "Zwei Werte widersprechen sich" davor - er sagte damit
+       etwas Falsches ueber die Knoepfe, die daneben lagen. */
+    var akt = (_rf.aktionen || []).slice().sort(function (a, b) {
+      return (b.art.indexOf('knf_') === 0 ? 1 : 0) - (a.art.indexOf('knf_') === 0 ? 1 : 0);
+    });
+
     /* Die Frage steht immer da — auch ohne Angebot. Wer nach einer langen
        Auskunft wieder hinsieht, muss nicht nach oben scrollen, um zu
        wissen, was gerade gefragt war. */
@@ -5410,10 +5417,15 @@
         ? '<div class="vi-dran-a">' +
           /* v1376 (C7): Bei einem Widerspruch wird nicht geholt, sondern
              entschieden. Der alte Vorspann haette in die Irre gefuehrt. */
-          '<span class="vi-dran-lbl">' +
-            (akt.filter(function (a) { return a.art.indexOf('knf_') === 0; }).length
-              ? 'Zwei Werte widersprechen sich — welcher gilt?'
-              : 'Ich kann das für dich holen:') + '</span>' +
+          (function () {
+            var knf = akt.filter(function (a) { return a.art.indexOf('knf_') === 0; }).length;
+            var rest = akt.length - knf;
+            return '<span class="vi-dran-lbl">' +
+              (knf && rest ? 'Eine Entscheidung steht offen — und ich kann etwas holen:'
+               : knf       ? 'Zwei Werte widersprechen sich — welcher gilt?'
+                           : 'Ich kann das für dich holen:') + '</span>';
+          })() +
+
 
           /* ═══ v1300 · EINE Erklärzeile statt einer je Knopf ══════════════
              Marcels Befund vom 11.09.2026: „der Balken für Marktindikation,
