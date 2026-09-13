@@ -3469,3 +3469,125 @@ CSS und tat nichts.
 Sekunden gegen eine Ansicht, die niemand formatiert.
 
 `v1368e`
+
+---
+
+## 155 · Ein Abruf, der still nichts tut, waehrend die Anzeige das Gegenteil sagt
+
+**Gefunden bei C7 (v1376), 13.09.2026.**
+
+`_rfSetzen` brach bei einem bereits belegten Feld mit `return false` ab. Das
+ist richtig: eine Nutzerangabe wird nicht ueberschrieben. Der Aufrufer las den
+Rueckgabewert aber nie:
+
+```js
+_rfSetzen('brw', String(r.wert).replace('.', ','), herkunft);
+_rfBlase('co', '<b>' + wert + ' €/m²</b> — amtlicher Bodenrichtwert. ...');
+```
+
+Die Blase erschien **immer**. Wer den Bodenrichtwert vorher selbst genannt
+hatte, sah eine amtliche Zahl, die in kein Feld ging — und rechnete
+weiter mit seiner eigenen.
+
+Bei der Lage-Recherche stand es sogar ausdruecklich da: „Deine eigenen
+Angaben bleiben stehen — ich habe nur ergaenzt, was fehlte." Wahr, und
+trotzdem irrefuehrend: es verschwieg, WO sich etwas widersprach.
+
+**Merksatz:** Ein Rueckgabewert, den niemand liest, ist kein Rueckgabewert.
+Wo eine Funktion `false` liefern kann, gehoert an die Aufrufstelle die Frage:
+**was zeigt die Oberflaeche in genau diesem Fall?**
+
+`v1376`
+
+---
+
+## 156 · Eine Reparatur, die richtig aussieht, weil sich nichts geaendert hat
+
+**Gefunden beim Nachmessen von C7 (v1376c), 13.09.2026.**
+
+Die Konfliktantwort war eingebaut und syntaktisch in Ordnung. Der Prueflauf
+sagte:
+
+```
+"nein, bleib bei meiner angabe"  ->  Feld: 3, Quelle: Sprachaufzeichnung
+```
+
+Genau das Gewuenschte — nur dass **nichts passiert war**. Der Satz erreichte
+die Konfliktlogik gar nicht; er wurde vorher als Antwort auf die laufende
+Frage gedeutet. Das Feld stand auf 3, weil es vorher schon auf 3 stand.
+
+Aufgefallen ist es nur an einem Nebenwert: `konfliktOffen` war weiterhin
+`true`. Ohne diese eine Zeile im Prueflauf waere die Reparatur als
+funktionierend durchgegangen.
+
+**Merksatz:** Wenn die Antwort eines Tests gleich dem Ausgangszustand ist,
+misst der Test nichts. Immer **zusaetzlich** pruefen, ob der Mechanismus
+gelaufen ist — nicht nur, ob das Ergebnis stimmt. Am besten mit einem Fall,
+in dem sich der Wert AENDERN muss.
+
+`v1376c`
+
+---
+
+## 157 · Der Pruefer las die Datei auf dem Server, nicht die eigene
+
+**Gefunden bei v1376, 13.09.2026.**
+
+Lokal gibt es kein node. Der Syntaxtest lief deshalb so:
+
+```
+ssh SERVER "docker run --rm -v /opt/dealpilot/frontend:/f:ro node:22 \
+            node --check /f/js/voice-import.js && echo SYNTAX-OK"
+```
+
+Es kam `SYNTAX-OK` — fuer die **alte, noch nicht ausgerollte** Datei. Die
+gerade geaenderte lag unveraendert auf dem Entwicklungsrechner und enthielt
+zwei echte Fehler (ein ueber zwei Zeilen offener String und ein
+verschwundenes `@media`).
+
+**Merksatz:** Erst `scp` in eine eigene Datei, dann pruefen:
+
+```
+scp frontend/js/datei.js SERVER:/tmp/pruef.js
+ssh SERVER "docker run --rm -v /tmp/pruef.js:/p.js:ro node:22 node --check /p.js"
+```
+
+Verwandt mit 152 (`node --check` prueft keine require-Pfade) und dem
+Grundmuster: **ein Pruefer, der nicht dieselbe Datei liest wie die Maschine,
+misst sich selbst.**
+
+`v1376`
+
+---
+
+## 158 · Perl frisst `@media` in doppelten Anfuehrungszeichen
+
+**Gefunden bei v1376, 13.09.2026.**
+
+Beim Patchen eines CSS-Blocks, der als JS-String vorliegt:
+
+```perl
+"      '\@media(max-width:560px){...}',"     # richtig
+"      '@media(max-width:560px){...}',"      # @media wird als Array gelesen
+```
+
+Mit `use strict` bricht es ab („Global symbol @media requires explicit
+package name") — das ist der gute Fall. Ohne `use strict` waere `@media`
+still zu einem leeren Array interpoliert und die Regel haette
+`'(max-width:560px){...}'` gelautet: **gueltiges CSS ohne jede Wirkung.**
+
+Dazu im selben Patch: eine CSS-Regel ueber zwei Zeilen zu schreiben ist in
+dieser Datei nur als **zwei abgeschlossene Strings mit Komma** erlaubt —
+
+```js
+'.x{padding:8px;',
+'  background:red}',
+```
+
+Ein ueber den Zeilenumbruch offener String ist ein Syntaxfehler.
+
+**Merksatz:** In Perl-Patches gehoeren `@` und `$` in einfache
+Anfuehrungszeichen oder escaped. Und nach jedem generierten CSS-Block einmal
+hinsehen, ob jede Zeile mit `',` endet.
+
+`v1376`

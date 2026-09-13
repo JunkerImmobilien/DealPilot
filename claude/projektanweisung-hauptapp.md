@@ -16158,3 +16158,88 @@ trägt an jeder Stelle.**
 > Nachricht *an* das iframe statt *aus* ihm. Der Vermittler prüft die
 > Herkunft — also kam keine Antwort, und es sah aus wie eine
 > unterbrochene Kette. **Die Prüfung hat genau getan, was sie soll.**
+
+---
+
+## v1375 — Der Datenraum überlebt den Gerätewechsel (A5)
+
+**Was.** Die Datenraum-Verknüpfungen lagen ausschließlich im localStorage
+unter `dp_datenraum_v141`. Wer den Browser wechselt, das Profil löscht oder
+am Laptop statt am Rechner arbeitet, hatte **alle** Ordner-Links verloren —
+in einem Bereich, aus dem Bank-Anfragen rausgehen. Der Link im Anschreiben
+ist genau das, was die Bank anklickt.
+
+Neu: Tabelle `user_settings (user_id, schluessel, wert JSONB)` als allgemeine
+Ablage für Client-Einstellungen, die einen Gerätewechsel überstehen müssen.
+Eine feste Liste `ERLAUBT` hält sie davon ab, mit der Zeit zum Abstellraum zu
+werden; Grenze 200 KB, damit hier keine Dokumente landen.
+
+**Die Regel im Client: Server gewinnt, aber nie gegen Leere.** Kommt vom
+Server nichts zurück — neues Konto, keine Verbindung —, bleibt der lokale
+Stand stehen. Ein leerer Server darf niemals einen gefüllten Browser
+überschreiben; das wäre Datenverlust durch Synchronisierung, und den merkt
+man erst, wenn es zu spät ist.
+
+**Commit.** `c82fd1b` · Migration 074 · Backend-Rebuild (Sicherung
+`vor-074-20260913-1033.sql.gz`, 46 MB, Kopf geprüft)
+
+**Nachweis.** Beide Richtungen im Browser gemessen:
+
+```
+localStorage geleert, Reiter gezeichnet  ->  Link ist zurück
+Server leer, Browser gefüllt, neu geladen ->  lokaler Stand bleibt
+gleicher Link zweimal geschrieben        ->  ein Eintrag, ein Zeitstempel
+```
+
+**Rest.** Nur der Datenraum nutzt die Tabelle. Wer die nächste Einstellung
+verlagert, trägt den Schlüssel in `ERLAUBT` ein und braucht keine Migration.
+
+---
+
+## v1376–v1376d — Ein Widerspruch wird gefragt, nicht weggeworfen (C7)
+
+**Was.** `_rfSetzen` brach bei einem bereits belegten Feld still ab
+(`return false`). Dass eine Nutzerangabe nicht überschrieben wird, ist
+richtig. Falsch war, was danach geschah: **nichts.** Der amtliche Abruf lief,
+die Blase darunter zeigte „340 €/m² — amtlicher Bodenrichtwert", und der Wert
+ging in kein Feld. Der Nutzer sah eine Zahl und durfte annehmen, sie gelte.
+Gerechnet wurde mit seinen 300.
+
+Bei der Lage-Recherche stand sogar ausdrücklich „Deine eigenen Angaben
+bleiben stehen — ich habe nur ergänzt, was fehlte." Wahr. Aber es verschwieg,
+**wo** sie sich widersprachen.
+
+**Drei Dinge, die erst der echte Lauf zeigte:**
+
+1. **Der Widerspruch gehört zum Feld, nicht zur Frage.** Der Fragewechsel
+   räumt alle Aktionen ab außer `markt`/`markt2` — ein Konflikt wäre dort
+   genau das geworden, was er nicht mehr sein soll: still verschwunden.
+2. **Mein erster Einbau saß zu tief.** „Nein, bleib bei meiner Angabe"
+   erreichte ihn nie — der Satz wurde vorher als Antwort auf die laufende
+   Frage gedeutet. Der Konflikt blieb offen und **sah trotzdem richtig aus**,
+   weil der Wert ohnehin der alte war. Die Prüfung steht jetzt ganz vorn in
+   `_rfVorabErkennen`, gleich hinter der Adress-Rückfrage — aber nur für
+   eindeutige Sätze; alles andere fällt durch.
+3. **Eine nackte Zahl entscheidet nicht.** Wer auf die Frage nach dem
+   Kaufpreis „215000" sagt, beantwortet die Frage. Erst „215000 stimmt"
+   oder „nimm 215000" ist eine Entscheidung.
+
+**Commits.** `8e893a9` · `0575898` (Prüfhaken) · `dd0732d` · `c6bad7c`
+
+**Nachweis.** Sieben Fälle im laufenden Sprechlauf auf Staging gemessen:
+
+```
+300 vs 300,00 abgerufen   ->  kein Widerspruch (Zahl, nicht Zeichen)
+300 vs 340 abgerufen      ->  Widerspruch, beide Werte sichtbar
+zweimal derselbe Abruf    ->  nicht zweimal dieselbe Frage
+ohne konflikt-Flag        ->  still wie bisher (Nutzerhand)
+"340"  (nackte Zahl)      ->  entscheidet NICHT
+"ja"   (blank)            ->  Rückfrage, nichts übernommen
+"nimm den amtlichen"      ->  340 übernommen, Herkunft BORIS
+"nein, bleib bei meiner"  ->  3 bleibt, Quelle Sprachaufzeichnung
+Fragewechsel dazwischen   ->  Knöpfe stehen noch, Vorspann passt
+```
+
+**Rest.** Gefragt wird nur bei Abrufen (BORIS, Marktpreisindikation,
+Lage-Recherche). Wählt oder bestätigt der Nutzer selbst, ist das keine fremde
+Quelle, die widerspricht, sondern seine Hand.
