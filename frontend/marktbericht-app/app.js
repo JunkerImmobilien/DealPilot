@@ -4096,6 +4096,27 @@ async function exportPdf(out) {
     }
     doc.text(doc.splitTextToSize('Herkunft: ' + _q, blockW - 40), M + 30, y + 11.5);
 
+    /* ═══ v1099-WQL · WO DER LESER DEN WERT SELBST HOLT ═══════════════════
+       Marcels Vorgabe vom 13.09.2026: „gib im Marktbericht bei den
+       Liegenschaftszinsen und Sachwertfaktoren den Link an, wenn der Kunde
+       die Adresse eingegeben hat."
+
+       Der Link steht IMMER da, nicht nur wenn ein Wert fehlt: er belegt
+       die Zahl und laesst sie nachpruefen. Wo keine Zahl steht, ist er die
+       einzige Auskunft, die wir geben koennen - und damit die wichtigste.
+
+       Was er NICHT sagt: dass DealPilot den Wert liefert. Der Satz nennt
+       den Ausschuss, der ihn fuehrt. */
+    var _ql = _ew.liegenschaftszins_quelle_link;
+    if (_ql && _ql.satz) {
+      doc.setFontSize(6.5); doc.setTextColor(140, 132, 118);
+      var _zl = _ql.satz.text + (_ql.satz.kosten ? ' ' + _ql.satz.kosten : '');
+      doc.text(doc.splitTextToSize(_zl, blockW - 10), M + 5, y + 15.5);
+      doc.setTextColor(120, 110, 140);
+      doc.text(doc.splitTextToSize(_ql.url, blockW - 10), M + 5, y + 18.5);
+      doc.setTextColor(110, 110, 118);
+    }
+
     /* Die Spanne. Ein Mittelwert, dessen Standardabweichung die Haelfte
      * seines Betrags ausmacht, ist ohne sie eine Behauptung. */
     if (_hatStreuung) {

@@ -3,6 +3,9 @@
 // (indikativ, KEIN Gutachten): alle Annahmen als Konstanten dokumentiert und im
 // Output unter assumptions ausgewiesen. Reine Rechnung — keine API-Kosten.
 import { round } from '../lib/stats.js';
+/* v1099-WQL · Der Weg zur Quelle - fuer den Fall, dass wir keinen Wert
+   haben. Dann ist der Link die einzige Auskunft, die wir geben koennen. */
+import { quelleFuer, quellenSatz } from '../lib/quellen_links.js';
 /* WKERN-1 · Ertragswert wird nicht mehr hier gerechnet, sondern im gemeinsamen
  * Kern. Zwei Ertragswerte im selben Bericht waeren zwei Wahrheiten. */
 import { ErtragswertService } from './ErtragswertService.js';
@@ -246,6 +249,14 @@ export const CrossCheckService = {
        * Ein gepflegter Wert aus der Parametertabelle hat Vorrang: die
        * Tabelle ist kuratiert, die Matrix gilt fuer genau einen Kreis. */
       let _swfTab = null;
+      /* v1099-WQL: der Weg zur Quelle, unabhaengig davon, ob ein Wert
+         gefunden wird. Genau dann zaehlt er am meisten. */
+      let _swfQuelle = null;
+      try {
+        const _qa = (p && p.ags) || ref.ags || null;
+        const _q = _qa ? quelleFuer(_qa) : null;
+        if (_q) _swfQuelle = { quelle_link: { ..._q, satz: quellenSatz(_q, 'sachwertfaktor') } };
+      } catch { _swfQuelle = null; }
       /* v1144-SWFELD · Dieselbe Feldverwechslung wie in nhk2010.js:868.
        * Geprüft wurde `.sachwertfaktor`, geliefert wird `.wert` — die Weiche
        * stand deshalb IMMER auf Tabellenweg, auch wenn ein eigener Wert
@@ -387,6 +398,12 @@ export const CrossCheckService = {
            * gehoert an die Zahl — sonst sieht ein Leser nicht, ob sie
            * ueberhaupt fuer seinen Ort gilt. */
           sachwertfaktor_ausschuss: (_swfTab && _swfTab.ausschuss) || null,
+          /* v1099-WQL · Und der Weg dorthin, wo er steht. Gerade beim
+           * Sachwertfaktor ist das haeufig die einzige Auskunft: 39 von 73
+           * NRW-Gebieten haben keinen, und in den meisten Laendern fuehren
+           * wir noch gar keinen. Ein Link ist dort mehr wert als ein
+           * Grund-Code. */
+          sachwertfaktor_quelle_link: (_swfQuelle && _swfQuelle.quelle_link) || null,
           sachwertfaktor_tabellenwert: (_swfTab && _swfTab.tabellenwert) || null,
           sachwertfaktor_korrekturen: (_swfTab && _swfTab.verfuegbar
             && (_swfTab.korrektur_rnd != null || _swfTab.korrektur_bgf != null))
@@ -763,6 +780,17 @@ export const CrossCheckService = {
           liegenschaftszins_max: _num(p.lzs_max),
           liegenschaftszins_herabgestuft: !!p.lzs_herabgestuft,
           liegenschaftszins_quelle: kern.lzs ? kern.lzs.quelle : null,
+          /* v1099-WQL · DER WEG ZUR QUELLE GEHOERT AN DEN WERT.
+           *
+           * Marcels Vorgabe: der Kunde soll sehen, wer die Zahl fuehrt und
+           * wo er sie selbst holen kann - auch und GERADE dann, wenn wir
+           * keine liefern. Ein Bericht, der "kein Wert hinterlegt" sagt und
+           * den Nutzer damit allein laesst, ist schlechter als einer, der
+           * den zustaendigen Ausschuss beim Namen nennt.
+           *
+           * WertParameterService haengt das Feld an jede Antwort; hier geht
+           * es nur weiter. */
+          liegenschaftszins_quelle_link: kern.lzs ? (kern.lzs.quelle_link || null) : null,
           /* v1071-WMIE-1 · mieteQuelle wird seit v1059 bestimmt und war
            * nirgends sichtbar. Bei Loehner Strasse 278 war KEINE Miete
            * erfasst — der Rohertrag von 27.065 EUR stammt vollstaendig aus

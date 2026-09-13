@@ -20,6 +20,9 @@ import { stufeNachStreuung } from '../lib/nrw_modell.js';   /* v1048-WSTR-1 */
 import { machRepository } from '../connectors/opendata/param-repository.js';
 import { kennzahlFuerTyp, objektartFuerOd, einheitPasst, wertPlausibel }
   from '../connectors/opendata/kennzahlen.js';
+/* v1099-WQL · Der Weg zur Quelle. Marcels Vorgabe: wo wir keinen Wert
+   liefern, soll der Nutzer sehen, WER ihn fuehrt und WO er steht. */
+import { quelleFuer, quellenSatz } from '../lib/quellen_links.js';
 
 const RANG = { A: 1, B: 2, C: 3, D: 4 };
 const MIN_FALLZAHL_C = 10;   // Konzept Kap. 5.3 — darunter kein Wert aus eigener Ableitung
@@ -373,7 +376,12 @@ export const WertParameterService = {
         hinweis: 'Liegenschaftszinssatz manuell gesetzt. Für das Dossier bitte die Herkunft angeben (Grundstücksmarktbericht, Jahr).',
       };
     }
-    return this.hole({ typ: 'lzs', ags, objektart, anzahlWe, stichtag, brwSqm });
+    /* v1099-WQL: Der Weg zur Quelle haengt an JEDER Antwort - auch an der
+       leeren. Gerade dann ist er die einzige Auskunft, die wir geben. */
+    return this.mitQuelle(
+      await this.hole({ typ: 'lzs', ags, objektart, anzahlWe, stichtag, brwSqm }),
+      ags, 'liegenschaftszinssatz');
+
   },
 
   /* ═══════════════════════════════════════════════════════════════════════
@@ -483,10 +491,48 @@ export const WertParameterService = {
       }
       return { wert: eigen, stufe: 'E', quelle: 'eigene Angabe', parameter_id: null, hinweis: '' };
     }
-    return this.hole({ typ: 'sachwertfaktor', ags, objektart, anzahlWe, stichtag });
+    return this.mitQuelle(
+      await this.hole({ typ: 'sachwertfaktor', ags, objektart, anzahlWe, stichtag }),
+      ags, 'sachwertfaktor');
+
+  },
+
+  /* ═══ v1099-WQL · WO DER KUNDE DEN WERT SELBST HOLT ═══════════════════
+     Marcels Vorgabe vom 13.09.2026: „gib im Marktbericht bei den
+     Liegenschaftszinsen und Sachwertfaktoren den Link an, wenn der Kunde
+     die Adresse eingegeben hat. Dann kann er selber die Werte holen oder
+     kaufen, wenn diese nicht umsonst zur Verfuegung stehen."
+
+     Das ist das Gegenstueck zur Doktrin. Wir erfinden keine Zahl — also
+     muessen wir umso genauer sagen koennen, wo die echte steht.
+
+     DREI FAELLE, und alle drei bekommen den Link:
+       1. kein Wert gefunden  -> der Link IST die Auskunft
+       2. Wert gefunden       -> der Link belegt ihn und laesst nachpruefen
+       3. Auffangwert (D)     -> der Link zeigt, wo der echte stuende
+
+     Die Antwort wird dabei NICHT veraendert: `wert`, `stufe` und `grund`
+     bleiben, wie sie sind. Es kommt nur etwas dazu. Ein Aufrufer, der
+     `quelle_link` nicht kennt, merkt von dieser Aenderung nichts. */
+  mitQuelle(antwort, ags, kennzahl) {
+    let q = null;
+    try { q = quelleFuer(ags); } catch { q = null; }
+    if (!q) return antwort;
+
+    const link = { ...q, satz: quellenSatz(q, kennzahl) };
+
+    /* Auch wenn gar nichts kam, geht eine Auskunft nach oben. Vorher
+       stand hier `null` — und der Bericht sagte „kein Wert hinterlegt",
+       ohne zu sagen, wo einer steht. */
+    if (!antwort) {
+      return { wert: null, stufe: null, quelle: null, parameter_id: null,
+               grund: 'kein_wert_hinterlegt', quelle_link: link };
+    }
+    return { ...antwort, quelle_link: link };
   },
 
   /** Abdeckungsuebersicht fuer das Admin — wie viele Kreise auf welcher Stufe. */
+
   async abdeckung(typ = 'lzs') {
     try {
       const r = await q(
