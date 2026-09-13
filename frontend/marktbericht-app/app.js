@@ -751,6 +751,26 @@ function _renderWertverfahren(d) {
     + (hk.kurz ? '<div class="wv-hk">Liegenschaftszinssatz: '
         + (hk.liegenschaftszins_pct != null ? String(hk.liegenschaftszins_pct).replace('.', ',') + ' % \u00b7 ' : '')
         + hk.kurz + (hk.indikativ ? ' (indikativ)' : '') + '</div>' : '')
+    /* ═══ v1099b-WQL · DER WEG ZUR QUELLE, AUF DEM BILDSCHIRM ═══════════
+       Marcels Vorgabe: "gib im Marktbericht bei den Liegenschaftszinsen
+       und Sachwertfaktoren den Link an, wenn der Kunde die Adresse
+       eingegeben hat. Dann kann er selber die Werte holen oder kaufen."
+
+       Er steht IMMER da, nicht nur wenn eine Zahl fehlt: wo eine steht,
+       belegt er sie; wo keine steht, ist er die einzige Auskunft, die wir
+       geben koennen.
+
+       `rel="noopener"` und `target="_blank"`, weil der Nutzer seinen
+       Bericht nicht verlieren soll, wenn er nachschaut. */
+    + ((hk.quelle_link && hk.quelle_link.satz)
+        ? '<div class="wv-quelle">'
+          + esc(hk.quelle_link.satz.text)
+          + (hk.quelle_link.satz.kosten ? ' ' + esc(hk.quelle_link.satz.kosten) : '')
+          + ' <a href="' + esc(hk.quelle_link.url) + '" target="_blank" rel="noopener">'
+          + 'zur Quelle</a>'
+          + (hk.quelle_link.satz.hinweis ? '<br><span class="wv-quelle-hw">' + esc(hk.quelle_link.satz.hinweis) + '</span>' : '')
+          + '</div>'
+        : '')
     /* v1141-RW \u00b7 Der Bodenwert geht in BEIDE anderen Verfahren ein, deshalb
      * gehoert sein Weg direkt unter seine Zahl \u2014 nicht in eine der Karten.
      * Seine Schritte heissen `schritte` (ErtragswertService.bodenwert), die
@@ -835,6 +855,16 @@ function _renderWertverfahren(d) {
       + '#wv-box .wv-boden b{font-size:22px;white-space:nowrap}'
       + '#wv-box .wv-boden span{font-size:12px;opacity:.7}'
       + '#wv-box .wv-hk{margin-top:6px;font-size:12px;opacity:.75}'
+      /* v1099b-WQL · Der Quellenhinweis steht leiser als die Zahl, aber
+         nicht versteckt: er ist eine Auskunft, keine Fussnote. Der Link
+         traegt die Markenfarbe ueber das Whitelabel-Token - ein hartes
+         Gold waere beim Mandanten falsch. */
+      + '#wv-box .wv-quelle{margin-top:8px;padding:7px 10px;border-radius:7px;'
+      + '  background:rgba(201,168,76,.06);border-left:3px solid var(--wl-c9a84c,#c9a84c);'
+      + '  font-size:11.5px;line-height:1.5;opacity:.9}'
+      + '#wv-box .wv-quelle a{color:var(--wl-c9a84c,#c9a84c);text-decoration:underline;'
+      + '  white-space:nowrap}'
+      + '#wv-box .wv-quelle-hw{display:block;margin-top:3px;font-size:10.5px;opacity:.7}'
       /* v1198b · Der Grund, warum kein Bodenwert dasteht. */
       + '#wv-box .wv-bwgrund{margin-top:9px;padding:9px 11px;border-radius:8px;font-size:11.5px;line-height:1.55;border:1px solid rgba(201,168,76,.32);background:rgba(201,168,76,.09)}'
       + '#wv-box .wv-g{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}'

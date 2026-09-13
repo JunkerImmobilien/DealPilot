@@ -1,6 +1,7 @@
 // v564-neutralized: Anbieternamen aus provenance + steps entfernt
 // ReportOrchestrator.js — orchestriert die gesamte Bericht-Pipeline.
 import { q, q1 } from '../lib/db.js';
+import { quelleFuer, quellenSatz } from '../lib/quellen_links.js';   /* v1099b-WQL */
 import { cfg, geomapEnabled, geoEnabled } from '../lib/config.js';
 import { GeocodingService } from './GeocodingService.js';
 import { MarketAnalysisService } from './MarketAnalysisService.js';
@@ -974,9 +975,24 @@ export const ReportOrchestrator = {
                   D: ['indikativ, gesetzlicher Auffangwert', 'nach § 256 BewG, nicht marktabgeleitet', true],
                   E: ['eigene Angabe', 'vom Nutzer gesetzt', true] }[st]
                 || ['indikativ', 'Herkunft nicht bestimmbar', true];
+        /* v1099b-WQL · Der Weg zur Quelle geht auch an den BILDSCHIRM.
+         * Im PDF steht er seit v1099; die Web-Ansicht las `wertermittlung_
+         * herkunft` und hatte das Feld nicht. Ein Link, den nur das PDF
+         * zeigt, erreicht den halben Weg. */
+        var _qlnk = null;
+        try {
+          var _qa = (_wertParams && _wertParams.lzs_quelle_link) || null;
+          if (!_qa) {
+            var _q2 = quelleFuer((ref && ref.ags) || null);
+            if (_q2) _qa = Object.assign({}, _q2, { satz: quellenSatz(_q2, 'liegenschaftszinssatz') });
+          }
+          _qlnk = _qa;
+        } catch (e) { _qlnk = null; }
         return { stufe: st, kurz: e[0], lang: e[1], indikativ: e[2],
                  liegenschaftszins_pct: _wertParams ? _wertParams.lzs_pct : null,
-                 quelle: _wertParams ? _wertParams.lzs_quelle : null };
+                 quelle: _wertParams ? _wertParams.lzs_quelle : null,
+                 quelle_link: _qlnk };
+
       })(),
     /* WKIGEG-2 · Zweitmeinung im Bericht, klar getrennt vom Ergebnis. */
       ki_gegenrechnung: _kiGegen,
