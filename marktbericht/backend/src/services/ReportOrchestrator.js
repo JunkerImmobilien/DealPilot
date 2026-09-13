@@ -378,7 +378,24 @@ export const ReportOrchestrator = {
         _agsWert = String((_ai && (_ai.gemeinde_ags || _ai.kreis_ags)) || '').replace(/\D/g, '');
       } catch (e) { /* ohne Schluessel bleibt es beim Auffangwert */ }
     }
+    /* v1102-WORT - DER ORTSNAME IST EIN WERTMERKMAL, kein Beiwerk.
+       Barnim druckt VIER Sachwertfaktor-Funktionen ab, eine je Region,
+       und die Regionen sind ueber Gemeinden und Ortsteile definiert
+       (1,25 gegen 0,96 - der Unterschied ist groesser als jede
+       Alterskorrektur). Der Name lag zweimal vor, in BORIS und in der
+       Geokodierung, wurde aber nur fuer die amtliche Miete benutzt.
+       Ab hier haengt er am ref und steht damit JEDEM Baustein offen. */
+    try {
+      const _bpO = (landValue && landValue.properties_raw) || {};
+      ref.gemeinde = ref.gemeinde || _bpO.Gemeinde || _bpO.GENA
+        || (geo && geo.components && (geo.components.city || geo.components.town)) || null;
+      ref.ortsteil = ref.ortsteil
+        || (geo && geo.components && geo.components.district) || null;
+    } catch (e) { /* ohne Ortsnamen laeuft alles weiter wie bisher */ }
+    step('ort: ' + (ref.gemeinde || 'KEINER')
+      + (ref.ortsteil ? ' / ' + ref.ortsteil : ''));
     step('wertparameter: ags=' + (_agsWert || 'KEINER'));
+
     /* v1075-WAGS-1 · ref.ags war NIE gesetzt (kein Formularfeld, keine
      * Zuweisung) — alle 'ags: ref.ags'-Stellen dahinter (Hinterland, UK,
      * IRW, Vergleichsfaktoren, Sachwertfaktor im CrossCheck) liefen mit

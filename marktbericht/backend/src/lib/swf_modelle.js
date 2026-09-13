@@ -539,7 +539,69 @@ function baenderKategorial(m, e) {
            klasse_spanne: (b.min != null && b.max != null) ? [b.min, b.max] : null };
 }
 
+/* === v1102-WPKAT - JE KATEGORIE EINE EIGENE FUNKTION ===================
+   Barnim teilt den Landkreis in vier Regionen und druckt fuer jede eine
+   EIGENE Regressionsfunktion ab:
+
+     berlinangrenzend   566,13 * vSW^-0,485   (300.000 bis 725.000 EUR)
+     Suedbarnim           7,2134 * vSW^-0,151 (150.000 bis 700.000 EUR)
+     Mittelbarnim         7,5625 * vSW^-0,158 (175.000 bis 700.000 EUR)
+
+   Die vorhandene Form `potenz` traegt genau EINE Funktion. Vier Register-
+   saetze fuer denselben Kreis anzulegen ginge nicht: der Auswerter waehlt
+   ueber den Zweig (Objektart), nicht ueber die Lage.
+
+   Die Kategorie kommt ueber `kategorie_zuordnung` aus dem Ortsnamen - der
+   Weg, den Berlin seit v1090 fuer seine Altbezirke nimmt. Trifft kein
+   Name, gibt es KEINEN Wert: eine Region zu raten hiesse, zwischen 1,25
+   und 0,96 zu wuerfeln. */
+function potenzKategorial(m, e) {
+  const kat = kategorieAus(m, e);
+  if (!kat.wert) {
+    return nichts(kat.bekannt_aber_ohne_wert ? 'kategorie_ohne_wert' : 'kategorie_fehlt',
+      `${m.achse_k_bez || 'Die Kategorie'} ist nicht bestimmbar`
+      + (kat.ueber ? ` (gelesen aus "${kat.ueber}")` : '') + '.');
+  }
+  const schluessel = Object.keys(m.funktion_je_kategorie || {})
+    .find((k) => k.toLowerCase() === String(kat.wert).toLowerCase());
+  if (schluessel === undefined) {
+    return nichts('kategorie_unbekannt',
+      `Fuer "${kat.wert}" fuehrt der Bericht keine Funktion.`);
+  }
+  const fn = m.funktion_je_kategorie[schluessel] || {};
+  const x = zahl(e[m.achse_feld]);
+  if (x === null) return nichts('achse_fehlt', `${m.achse_bez} nicht erfasst.`);
+
+  /* Die Stichprobengrenzen stehen JE KATEGORIE - Barnims Regionen enden
+     bei verschiedenen Betraegen. Eine gemeinsame Grenze waere fuer drei
+     der vier Regionen falsch. */
+  if (fn.gueltig_von != null && x < fn.gueltig_von) {
+    return nichts('ausserhalb_der_stichprobe',
+      `${m.achse_bez} = ${x} liegt unterhalb der Stichprobe, die der Bericht `
+      + `fuer "${schluessel}" auswertet (ab ${fn.gueltig_von}).`);
+  }
+  if (fn.gueltig_bis != null && x > fn.gueltig_bis) {
+    return nichts('ausserhalb_der_stichprobe',
+      `${m.achse_bez} = ${x} liegt oberhalb der Stichprobe, die der Bericht `
+      + `fuer "${schluessel}" auswertet (bis ${fn.gueltig_bis}).`);
+  }
+  if (!istZahl(fn.a) || !istZahl(fn.b)) {
+    return nichts('funktion_unvollstaendig',
+      `Fuer "${schluessel}" fehlt ein Glied der Funktion.`);
+  }
+  const st = m.rundung_stellen ?? 2;
+  const q = Math.pow(10, st);
+  const wert = fn.a * Math.pow(x * (fn.x_faktor ?? 1), fn.b);
+  const ger = Math.round(wert * q) / q;
+  return { verfuegbar: true, wert: ger, tabellenwert: ger, korrekturen: [],
+           kategorie: schluessel,
+           klasse_fallzahl: fn.fallzahl ?? null,
+           klasse_spanne: (fn.min != null && fn.max != null) ? [fn.min, fn.max] : null,
+           formel: `${fn.a} * (${m.achse_bez})^${fn.b}` };
+}
+
 const AUSWERTER = {
+
 
   matrix_interp: matrixInterp,
   matrix_kategorial: matrixKategorial,
@@ -555,6 +617,7 @@ const AUSWERTER = {
   log_1d: log1d,                         /* v1093-WLOG */
   spanne_kategorial: spanneKategorial,   /* v1093-WSPN */
   baender_kategorial: baenderKategorial, /* v1101-WBKAT */
+  potenz_kategorial: potenzKategorial,   /* v1102-WPKAT */
 };
 
 /* ── Additive Korrekturen ──────────────────────────────────────────────── */

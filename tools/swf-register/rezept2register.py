@@ -93,6 +93,11 @@ ERLAUBT = {
                            'achse_k_bez','kategorien','kategorie_baender',
                            'zuordnung_feld','kategorie_zuordnung','baender_je_kategorie',
                            'rundung_stellen','liefert','hinweis','normobjekt'},
+    # v1102-WPKAT: je Kategorie eine eigene Funktion (Barnims vier Regionen).
+    'potenz_kategorial': {'form','achse_feld','achse_bez','achse_k_feld',
+                          'achse_k_bez','kategorien','kategorie_baender',
+                          'zuordnung_feld','kategorie_zuordnung','funktion_je_kategorie',
+                          'rundung_stellen','liefert','hinweis','normobjekt'},
     'regression_additiv': {'form','basis','glieder','rundung_stellen','liefert',
                            'hinweis','normobjekt'},
 }
@@ -234,6 +239,43 @@ def normalisiere(datei, m):
     if fremd:
         meckern(datei, f"unbekannte Schluessel in formel: {sorted(fremd)}")
         return None
+
+    # v1102-WEIND - EIN NAME DARF NUR IN EINER KATEGORIE STEHEN.
+    #
+    # GEFUNDEN an Barnim: `Stolzenhagen` ist dort ein Ortsteil von Wandlitz
+    # (Region Suedbarnim, Faktor rund 1,07) UND ein Ortsteil von
+    # Lunow-Stolzenhagen (Region Nordbarnim, Faktor 0,96). kategorieAus()
+    # nimmt den ERSTEN Treffer in der Reihenfolge der Kategorien - fuer die
+    # Haelfte der Faelle waere das die falsche Region, und niemand saehe es.
+    #
+    # Ein mehrdeutiger Name gehoert in KEINE Liste: dann meldet der
+    # Auswerter 'kategorie_ohne_wert' und der Bericht sagt, dass er die
+    # Lage nicht zuordnen kann. Kein Treffer heisst kein Wert.
+    zu = formel.get('kategorie_zuordnung') or {}
+    if isinstance(zu, dict):
+        gesehen = {}
+        for kat, liste in zu.items():
+            if not isinstance(liste, list):
+                continue
+            for name in liste:
+                schl = str(name).strip().lower()
+                if schl in gesehen and gesehen[schl] != kat:
+                    meckern(datei, f"'{name}' steht in zwei Kategorien "
+                            f"({gesehen[schl]} und {kat}) - mehrdeutig")
+                    return None
+                gesehen[schl] = kat
+
+    # v1102-WPKAT - jede Kategorie braucht ihre Funktion, sonst rechnet sie nicht.
+    if form == 'potenz_kategorial':
+        fjk = formel.get('funktion_je_kategorie') or {}
+        fehlen = [k for k in (formel.get('kategorien') or []) if str(k) not in fjk]
+        if fehlen:
+            meckern(datei, f'ohne Funktion: {fehlen}')
+            return None
+        for k, f in fjk.items():
+            if not isinstance(f, dict) or f.get('a') is None or f.get('b') is None:
+                meckern(datei, f"Funktion '{k}': a oder b fehlt")
+                return None
 
     einheit = formel.get('liefert', 'faktor')
     if einheit not in EINHEITEN:

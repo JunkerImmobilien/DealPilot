@@ -289,6 +289,13 @@ export const CrossCheckService = {
              Ohne diese Zeile rechnete das eine still ohne Korrektur, das
              andere gar nicht - und beides saehe im Bericht gleich aus. */
           standardstufe: (p && p.standardstufe) || ref.standardstufe || null,
+          /* v1102-WORT - ueber den Ortsnamen findet Barnim seine Region.
+             Trifft kein Name, meldet der Auswerter 'kategorie_ohne_wert'
+             und der Bericht sagt, dass er die Lage nicht zuordnen kann -
+             eine von vier Funktionen zu raten waere schlimmer als nichts. */
+          ort: (p && p.gemeinde) || ref.gemeinde || null,
+          ortsteil: (p && p.ortsteil) || ref.ortsteil || null,
+
         });
         if (_swfTab && _swfTab.verfuegbar) {
           /* v1338: Fuehrt das Modell des Ausschusses eine eigene

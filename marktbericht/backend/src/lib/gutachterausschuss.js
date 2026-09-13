@@ -166,7 +166,13 @@ const FELDBRUECKE = {
      Der Eintrag darueber bleibt stehen - er kostet nichts und faengt ein
      Rezept ab, das den anderen Namen waehlt. */
   standardstufe: ['standardstufe', 'gebaeudestandard'],
-  ort: ['ort', 'gemeinde_name', 'gemeinde'],
+  ort: ['ort', 'gemeinde_name', 'gemeinde', 'stadt'],
+  /* v1102-WORT - der Ortsteil ist EIGENSTAENDIG und faellt NICHT auf den
+     Gemeindenamen zurueck: wer nach einem Ortsteil zuordnet, meint den
+     Ortsteil. Ein stiller Rueckfall auf die Gemeinde koennte in eine
+     andere Region zeigen. */
+  ortsteil: ['ortsteil', 'stadtteil', 'district'],
+
 };
 
 /* v1096a-WVOK · EIN VOKABULAR, NICHT ZWEI.

@@ -1,0 +1,107 @@
+{
+  "land_code": "BB",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Barnim",
+  "gaa_kennz": "12060",
+  "ags": ["12060"],
+  "ebene": "kreis",
+  "berichtsjahr": 2025,
+  "stichtag": "2025-07-01",
+  "auswertezeitraum": "01.01.2025 bis 31.12.2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06-25",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_BAR.pdf",
+  "quelle_datei": "BB-barnim-gmb-2025.pdf",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, Abbildungen 87 bis 91, S. 77 ff. Modellbeschreibung Anhang 13.5, S. 160. Gemeindegliederung Anhang 13.4, S. 158 f.",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser",
+      "form": "potenz_kategorial",
+      "formel": {
+        "form": "potenz_kategorial",
+        "achse_feld": "sachwert",
+        "achse_bez": "vorläufiger Sachwert in Euro",
+        "achse_k_feld": "region",
+        "achse_k_bez": "Region des Landkreises Barnim",
+        "kategorien": ["berlinangrenzend", "suedbarnim", "mittelbarnim", "nordbarnim"],
+        "zuordnung_feld": "ort",
+        "kategorie_zuordnung": {
+          "hinweis": "Die Regionen sind im Bericht zweimal ausgeschrieben (S. 32 f. und Anhang 13.5, räumlicher Anwendungsbereich). Die Ortsteile stehen in Anhang 13.4. STOLZENHAGEN fehlt mit Absicht in beiden Listen: es ist Ortsteil von Wandlitz (Südbarnim) UND von Lunow-Stolzenhagen (Nordbarnim). Ein mehrdeutiger Name gehört in keine Liste — sonst entschiede die Reihenfolge über 1,07 oder 0,96.",
+          "berlinangrenzend": ["Ahrensfelde", "Blumberg", "Eiche", "Lindenberg", "Mehrow",
+                               "Panketal", "Schwanebeck", "Zepernick"],
+          "suedbarnim": ["Wandlitz", "Basdorf", "Klosterfelde", "Lanke", "Prenden",
+                         "Schönerlinde", "Schönwalde", "Zerpenschleuse",
+                         "Bernau bei Berlin", "Bernau", "Birkholz", "Börnicke", "Ladeburg",
+                         "Lobetal", "Schönow",
+                         "Werneuchen", "Hirschfelde", "Krummensee", "Löhme", "Schönfeld",
+                         "Seefeld", "Tiefensee", "Weesow"],
+          "mittelbarnim": ["Biesenthal", "Danewitz", "Breydin", "Trampe", "Tuchen-Klobbicke",
+                           "Marienwerder", "Ruhlsdorf", "Sophienstädt", "Melchow",
+                           "Schönholz", "Rüdnitz", "Sydower Fließ", "Grüntal", "Tempelfelde",
+                           "Eberswalde", "Finow", "Sommerfelde", "Spechthausen", "Tornow",
+                           "Schorfheide", "Altenhof", "Eichhorst", "Finowfurt",
+                           "Groß Schönebeck", "Klandorf", "Lichterfelde", "Schluft",
+                           "Werbellin"],
+          "nordbarnim": ["Althüttendorf", "Neugrimnitz", "Friedrichswalde",
+                         "Parlow-Glambeck", "Joachimsthal", "Ziethen", "Groß Ziethen",
+                         "Klein Ziethen", "Britz", "Chorin", "Brodowin", "Golzow",
+                         "Neuehütte", "Sandkrug", "Senftenhütte", "Serwest", "Hohenfinow",
+                         "Niederfinow", "Liepe", "Lunow-Stolzenhagen", "Lunow", "Oderberg",
+                         "Parsteinsee", "Lüdersdorf", "Parstein"]
+        },
+        "funktion_je_kategorie": {
+          "berlinangrenzend": { "a": 566.13, "b": -0.485, "gueltig_von": 300000, "gueltig_bis": 725000,
+                                "fallzahl": 39, "min": 0.7, "max": 1.3 },
+          "suedbarnim":       { "a": 7.2134, "b": -0.151, "gueltig_von": 150000, "gueltig_bis": 700000,
+                                "fallzahl": 59, "min": 0.7, "max": 1.4 },
+          "mittelbarnim":     { "a": 7.5625, "b": -0.158, "gueltig_von": 175000, "gueltig_bis": 700000,
+                                "fallzahl": 36, "min": 0.8, "max": 1.4 },
+          "nordbarnim":       { "a": 0.96,   "b": 0,      "gueltig_von": 150000, "gueltig_bis": 450000,
+                                "fallzahl": 14, "min": 0.5, "max": 1.3 }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "VIER REGIONEN, VIER FUNKTIONEN. Der Bericht druckt sie auf S. 81 aus und auf S. 82 als Tabelle; die Tabellenwerte sind an sechs Stützstellen nachgerechnet und zeichengleich. NORDBARNIM IST EINE AUSNAHME: dort steht im Bericht nur EIN Tabellenwert (0,96 bei rund 275.000 Euro), und er ist zugleich der Mittelwert aus Abbildung 87. Die abgedruckte Funktion 8,2718 mal vSW hoch -0,176 ergibt an dieser Stelle 0,91 — sie widerspricht dem einzigen abgedruckten Wert um fünf Prozent. Der Prüfmaßstab ist das abgedruckte Dokument, deshalb steht Nordbarnim hier als Konstante 0,96 (b=0). Der Bericht selbst nennt für Nordbarnim keine Signifikanz (Korrelationskoeffizient -0,2 mit Sternchen).",
+        "normobjekt": "Sachwertfaktor = (Kaufpreis plus/minus boG) / vorläufiger Sachwert. NHK 2010 nach Anlage 4 ImmoWertV, Bezugsmaßstab BGF, Regionalfaktor 1,0, GND 80 Jahre, lineare Alterswertminderung, Stichtag 01.07.2025."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
+        "berechnungsmodell": "Sachwertfaktor = (Kaufpreis plus/minus boG) / vorläufiger Sachwert",
+        "gnd_jahre": 80,
+        "nhk": "NHK 2010 gem. Anlage 4 ImmoWertV, Bezugsmaßstab Brutto-Grundfläche",
+        "regionalfaktor": 1.0,
+        "baunebenkosten": "keine, in den NHK 2010 enthalten",
+        "alterswertminderung": "linear",
+        "kauffaelle_gesamt": 232,
+        "ermittlung": "Regression und arithmetischer Mittelwert, Ausreißer über 2,5facher Standardabweichung eliminiert",
+        "besonderheit": "Konjunkturelle Anpassung des Bodenwertes auf den Kaufzeitpunkt bei unterstellter unterjährig linearer Wertentwicklung."
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Barnim, vier Regionen",
+        "sachlich": "gebrauchte, freistehende Ein- und Zweifamilienhäuser",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "rnd_jahre": { "min": 20, "max": 78, "hinweis": "Selektionsparameter: nur Objekte mit RND ab 20 Jahren" },
+          "standardstufe": { "min": 1, "max": 4 },
+          "bodenwertanteil_pct": { "min": 5, "max": 80, "hinweis": "Bodenwertanteil über 80 Prozent vom Kaufpreis war Ausschlussgrund" }
+        },
+        "vorbehalt": "DER BERICHT SCHRÄNKT SELBST EIN: Die abgeleiteten Sachwertfaktoren dienen teilweise lediglich zur Orientierung, da aufgrund der geringen verwendeten Datenmenge je Kategorie derzeit keine aussagekräftigeren Ergebnisse zu erzielen sind. Die Korrelationskoeffizienten liegen zwischen -0,2 (Nordbarnim, ohne Signifikanz) und -0,5.\n\nNICHT BERÜCKSICHTIGTE OBJEKTE (Selektionsparameter): Kleinhäuser und Lauben, mehrere Wohnhäuser auf einem Grundstück, Außenbereichslagen, Sanierungsgebiete, Bodenwertanteil über 80 Prozent, vermietete Objekte, Erstverkauf, Erbbaurechte. Für solche Objekte gilt der Faktor nicht.\n\nDIE MODERNISIERUNGSTABELLE DES BERICHTS WEICHT VON DEN IMMOWERTA-ANGABEN AB (Bepunktung und Modernisierungszeiten, Anhang 13.5). Wer die RND nach ImmoWertA ermittelt, rechnet mit einer anderen Grundlage als der Ausschuss.",
+        "hinweis": "Der Bericht führt zusätzlich Sachwertfaktoren für Doppelhaushälften und Reihenhäuser (Kap. 8.3.2, S. 96) sowie Vergleichsfaktoren (Kap. 8.2.3) — beides hier noch nicht erfasst. Ebenfalls abgedruckt: durchschnittliche Sachwertfaktoren je Gemeinde/Amt (Abbildung 91), die als Gegenprobe dienen können (Ahrensfelde 1,03 · Panketal 1,04 · Bernau 1,00 · Wandlitz 1,06 · Werneuchen 1,09 · Biesenthal-Barnim 1,01 · Eberswalde 1,04 · Schorfheide 1,00 · Britz-Chorin-Oderberg 0,97 · Joachimsthal 0,92)."
+      },
+
+      "stufe": "B",
+      "stufe_grund": "Amtliche Funktionen mit Modellbeschreibung, an sechs abgedruckten Stützstellen nachgerechnet und zeichengleich. Stufe B statt A, weil der Bericht seine eigenen Ergebnisse ausdrücklich als teilweise orientierend bezeichnet und für Nordbarnim keine Signifikanz ausweist.",
+      "fallzahl": 148,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht Landkreis Barnim 2025, Abbildungen 87 bis 91, S. 77 ff.: vier regionale Regressionsfunktionen aus 148 Kauffällen freistehender Ein- und Zweifamilienhäuser (berlinangrenzend 39, Südbarnim 59, Mittelbarnim 36, Nordbarnim 14), tabellarisch von 150.000 bis 725.000 Euro vorläufigem Sachwert."
+    }
+  ]
+}
