@@ -114,7 +114,7 @@ Daten und aktuellen Bearbeitungsstand."*
 | # | Punkt | Stand |
 |---|---|---|
 | C1 | Kontextbezogene Begrüßung: was liegt vor, was wurde erkannt, was rechnet schon, was fehlt | offen |
-| C2 | Zwei Begleitmodi: **Lernmodus** (erklärt wozu) und **Investor-Modus** (kompakt), jederzeit wechselbar | offen |
+| C2 | Zwei Begleitmodi: **Lernmodus** (erklärt wozu) und **Investor-Modus** (kompakt), jederzeit wechselbar | **ERLEDIGT v1378 / v1378b.** Der Ton war im Backend festgeschrieben („zwei bis vier Sätze"); es gab keinen Parameter, über den das Frontend etwas anderes hätte anfordern können. Jetzt drei Stufen (Lernmodus · Normal · Investor-Modus), umschaltbar per Knopf in der Nebenleiste und per Sprache („ausführlicher" / „kürzer" / „normal"), gemerkt in `dp_rf_modus`. Der Ton ändert **nur** Länge und Tiefe der Auskunft sowie den Wozu-Satz unter der Frage — nie, welche Fragen kommen oder was gerechnet wird. **Gemessen:** dieselbe DSCR-Frage ergibt 666 Zeichen / 5 Sätze im Lernmodus gegen 206 / 1 im Investor-Modus. Die 16 Wozu-Sätze sind kein Lexikon: sie sagen, was die Angabe *in dieser Software* bewirkt. |
 | C3 | Sprache als vollwertige Bedienform: Rückfragen, Korrekturen, Exkurse — und danach zurück in den Prozess | **Teilweise erledigt v1358** — Marcels Screenshots `fehler 2/4.png`: „Investmentthese habe ich keine" galt als Nicht-Verstehen, „Keine Maklerprovision" nach einem Befehl fiel weg. Beides behoben: `RF_NEIN_HINTEN` erkennt die Verneinung **hinter** dem Thema (nur wenn der Satz das gefragte Thema nennt), `RF_NULLANGABE` lässt eine Null-Angabe ohne Ziffer durch. Der Rest von C3 (Exkurse, Rückkehr in den Prozess) bleibt offen. |
 | C4 | Vor jeder Frage prüfen: **Datenbank → Dokumente → bisherige Angaben → erst dann fragen** | **Teilweise erledigt v1359** — `fehler3.png`: nach „1,5 % Wertsteigerung" fragte die nächste Frage wieder nach „Wertsteigerung". **Gemessen: keine Doppelfrage**, sondern zwei Felder mit fast gleichem Namen (`wertstg` = Zahl für die Prognose, `ds2_wertsteigerung` = Lageeinschätzung für den Score). Der Co-Pilot sagt den Unterschied jetzt, wenn die Zahl schon steht. Die eigentliche Reihenfolge Datenbank → Dokumente → Angaben bleibt offen. |
 | C5 | Steuersatz / zu versteuerndes Einkommen: vorschlagen, bestätigen lassen, Überspringen erlauben und später zurückkommen | **ERLEDIGT v1377 / v1377b.** Vorschlagen und Bestätigen gab es schon (`_pvSteuer`). Neu sind die zwei fehlenden Hälften: **Zurückkommen** — was übersprungen wurde, wird vor dem Abschluss einmal angeboten (`_rf.weg` wurde bis dahin nur als „–" gezeichnet und nie wieder gelesen). Ein Angebot, keine zweite Pflichtrunde; wer wieder überspringt, überspringt endgültig; was inzwischen einen Wert hat, fällt raus. Und **zvE** — stand in der Feldbeschreibung, aber in keinem Block. Jetzt `eins: ['grenz','zve']`: eines von beiden genügt, und wer sein Einkommen nennt, bekommt den Satz über `Tax.calcGrenzsteuersatz` ausgerechnet (80.000 € → 42 %, Tarif 2026), mit der Herkunft „aus deinem zvE berechnet". |
@@ -132,6 +132,71 @@ den ersten gebaut.
 
 ---
 
+---
+
+## → NEU: Marcels Auftrag vom 13.09.2026, nachmittags — Restnutzungsdauer und Verkehrswert
+
+Zwei Aufträge aus derselben Ansage. Der erste ist neu, der zweite ist die
+Übernahme eines Pakets, das in einer anderen Sitzung entstanden ist.
+
+### R · RESTNUTZUNGSDAUER UND VERKEHRSWERTRECHNER
+
+Marcel hat in `Dateien/` einen **Verkehrswertrechner** und einen
+**Restnutzungsdauerrechner** abgelegt (ZIP „VW Reporting").
+
+> **Stand 13.09.2026: die ZIP liegt noch nicht im Ordner.** Enthalten sind
+> derzeit nur die fünf Marktbericht-Dateien (siehe D unten). Ohne die ZIP kann
+> R1 nicht beginnen — die anderen Punkte hängen fachlich daran, lassen sich
+> aber getrennt entscheiden.
+
+| | Punkt | Was zu tun ist |
+|---|---|---|
+| **R1** | **Sichten, was übernehmbar ist** | Rechenweg, Parameter und Quellen der beiden Rechner gegen unseren Marktbericht halten. **Erst lesen, dann entscheiden** — nicht übernehmen, was wir schon haben, und nichts übernehmen, dessen Herkunft unklar ist. Ergebnis ist eine Liste: was ersetzt unseren Weg, was ergänzt ihn, was bleibt draußen. |
+| **R2** | **Sachwert und Ertragswert gegebenenfalls über dieses Modul rechnen** | Nur, wenn R1 das trägt. **Der Prüfmaßstab bleibt das Anwendungsbeispiel des amtlichen Dokuments** — ein zweiter Rechenweg, der andere Zahlen liefert, ist kein Fortschritt, sondern eine zweite Wahrheit (siehe `CLAUDE.md`, „Rechenkerne nie duplizieren"). Die Testobjekte Hüllhorst und Löhner Straße müssen unverändert durchlaufen. |
+| **R3** | **RND-Gutachten aus dem Sprechlauf anbieten** — Marcels Hauptwunsch | Am Ende des Sprechlaufs, wenn alle Angaben stehen: die Restnutzungsdauer rechnen, das Ergebnis zeigen und sagen, ob sich ein Gutachten lohnt. Dann „jetzt anfragen". **Automatisch rechnen, nicht fragen, ob gerechnet werden soll** — der Vorschlag kommt mit einer Zahl, nicht mit einer Frage. Passt an den vorhandenen Abschluss (`_rfAbschluss`, v1377-Nachfassrunde davor). |
+| **R4** | **Die Anfrage erzeugt eine Datei mit dem Gesamtobjekt** | Marcel liest sie in seinem RND-Programm ein. Format: wie der vorhandene Objekt-Export (`.dpk`), **erweitert um das, was der Sprechlauf ausgegeben hat** — die Werte samt Herkunft (`_rf.quelle`, seit v1311 im Objekt), die Scores und die RND-Rechnung. Ziel: Marcel kann den Fall ohne Rückfragen weiterbearbeiten. |
+| **R5** | **Zweiter Weg: Deal-Aktion → Netzwerk → Junker Immobilien** | Dieselbe Anfrage aus der Partnerkarte heraus. **Nachrangig** — Marcel: „überwiegend würde ich mir das jetzt erst mal im Sprechlauf wünschen." |
+
+**Zwei Dinge, die vor dem Bauen entschieden sein müssen:**
+
+- **Wohin geht die Anfrage?** Eine Mail an Marcel mit Anhang ist der einfache
+  Weg. Ein Versand geht nie ungefragt raus — der Nutzer sieht, was verschickt
+  wird, bevor es verschickt wird.
+- **Was ist der Auslöser für „lohnt sich"?** Eine RND, die deutlich unter der
+  Modell-RND liegt, ist ein Grund; eine, die darüber liegt, nicht. Die Schwelle
+  gehört Marcel (Sachverständiger), nicht dem Code.
+
+### D · MARKTBERICHT UND ERNTE — Übernahme aus der Cowork-Sitzung
+
+Marcel: *„Da habe ich das letzte Paket, das hatte ich noch ganz normal in
+Claude entwickelt und nicht hier im Terminal. Ich möchte gerne, dass wir das
+übernehmen und ins Backlog die Sachen schreiben, die hier offen sind."*
+
+Die Übergabe liegt in `Dateien/` (`00-EINBAU.md`, `01-backlog-block.md`,
+`integration-marktbericht.zip` mit fünf Blöcken,
+`uebergabe-claude-code-20260908.zip` mit dem Paket v1097 und dem C2-Prüfstand).
+
+**Der ganze Block steht unten unter „Marktbericht / Ernte (Workstream D)"** —
+eingebaut am 13.09.2026, Format an diese Datei angepasst.
+
+**Am laufenden Staging nachgemessen, bevor eingetragen wurde** (der Block war
+gegen den Stand vom 30.08. geschrieben):
+
+```
+v1097 eingespielt?      NEIN — beide ETW-Sperren stehen noch
+                        (wertermittlung.js + KiGegenrechnungService.js)
+GND_JAHRE = 80          steht noch (CrossCheckService.js Z. 24)
+BAUPREISINDEX = 2.02    steht noch (Z. 22)
+Register                2158 Sätze, 8 Länder
+                        {"NW":1109,"BE":2,"ST":2,"TH":2,"NI":48,"BY":1,"HE":2,"BB":2}
+```
+
+Also: **fast alles davon ist wirklich noch offen.** Der Haupt-App-Strang hat
+seit dem 30.08. am Marktbericht gearbeitet (v1332–v1341, Marcels Liste vom
+12.09.), aber an anderen Stellen — Oberfläche, Feldbeschreibungen,
+Erbbaurechtskoeffizienten. Der Rechenkern und die Ernte sind unberührt.
+
+---
 ## Marktbericht: Marcels Liste vom 12.09.2026 — ERLEDIGT bis auf zwei Reste
 
 Alles auf Staging, `b307c50` bis `343ed2b`. Einzelheiten im Journal der
@@ -3790,7 +3855,418 @@ entfällt — nicht raten.
 
 ---
 
-## Fertig
+## MARKTBERICHT / ERNTE — Workstream (D)  ·  eingebaut 13.09.2026
+
+**Wo dieser Strang steht (Stand 30.08.2026, am laufenden Prod gemessen):**
+
+```
+Prod-Commit  74ae2e3   Tags rollout-20260814 · marktbericht-v1096a-20260814
+Prod-Anker   2165738
+Register     2150 Saetze · 525 Gebiete · Herkunft param_modell+saatdatei
+             {"NW":1109,"BE":2,"ST":2,"TH":2,"NI":41,"BY":1,"HE":2,"BB":2}
+Kennzahlen   liegenschaftszinssatz 1078 · bodenpreisniveau 403
+             durchschnittspreis 386 · preisentwicklung 215
+             sachwertfaktor 52 · erbbauzinssatz 15 · bodenpreisindex 1
+```
+
+**Zwei Nummernkreise laufen parallel.** Dieser Strang vergibt `v1084`–`v1097`,
+der Haupt-App-Strang `v1148`–`v12xx`. **Nur ein Chat fasst git an** — vor jedem
+Rollout absprechen, wessen Release es ist.
+
+**Vor der ersten Codeänderung neu messen** — die Zahlen oben sind vom 30.08.,
+der Parallel-Strang lief weiter (zuletzt gesehen v1173b):
+
+```
+docker exec dealpilot-mb-backend node -e "fetch('http://localhost:4000/api/v1/marktbericht/register/stand').then(r=>r.json()).then(d=>console.log(d.saetze,d.herkunft,JSON.stringify(d.laender)))"
+```
+
+**Nicht über einen frisch gestarteten Node-Prozess prüfen** — der liest nur die
+Saatdatei und meldet Zahlen, die es im Betrieb nicht gibt.
+
+> **Beim Einbau am 13.09.2026 nachgemessen** (Staging), damit niemand mit den
+> Zahlen vom 30.08. weiterarbeitet:
+>
+> ```
+> v1097 eingespielt?     NEIN — beide ETW-Sperren stehen noch
+> GND_JAHRE = 80         steht noch  (CrossCheckService.js Z. 24)
+> BAUPREISINDEX = 2.02   steht noch  (Z. 22)
+> Register               2158 Sätze (war 2150), weiter 8 Länder
+>                        NW 1109 · NI 48 · BE/ST/TH/HE/BB je 2 · BY 1
+> ```
+>
+> **A1, A2 und B1 sind also unverändert offen.** Der Haupt-App-Strang hat seit
+> dem 30.08. am Marktbericht gearbeitet (v1332–v1341), aber an der Oberfläche,
+> den Feldbeschreibungen und den Erbbaurechtskoeffizienten — **Rechenkern und
+> Ernte sind unberührt.**
+
+---
+
+### A · SOFORT
+
+#### A1 — v1097 einspielen (Paket liegt fertig)
+
+**Sachwert für Eigentumswohnungen und Mehrfamilienhäuser freigeben.**
+ZIP liegt unter `Dateien/uebergabe-claude-code-20260908.zip` → Ordner `v1097/`.
+
+Der Rechenkern rechnet ETW/MFH **seit v1047**, die NHK-Zeilen 4.1–4.3 stehen
+**seit v1068** in `lib/nhk2010.js`. Die Oberfläche sperrte es trotzdem
+(`wertermittlung.js`, `nichtWenn: istWohnung()` — Regel aus v955). `nichtWenn`
+übersprang zusätzlich die **Pflichtfeldsammlung**, deshalb hat die Ampel BGF
+und Standardstufe nie eingefordert. Dieselbe alte Regel stand auch im
+**Prompt der KI-Zweitmeinung**.
+
+**Vorprüfung — die Anker müssen noch da sein** (Paket ist gegen `370545f`
+gebaut, `wertermittlung.js` gehört dem Parallel-Strang):
+
+```
+cd /opt/dealpilot
+grep -n "nichtGrund: 'bei Eigentumswohnung nicht anwendbar'" frontend/marktbericht-app/wertermittlung.js || echo "ANKER WEG - Paket neu bauen"
+grep -n "Das Sachwertverfahren ist fuer Eigentumswohnungen nicht anwendbar" marktbericht/backend/src/services/KiGegenrechnungService.js || echo "ANKER WEG - Paket neu bauen"
+```
+
+Fehlt ein Anker: **nicht zurechtbiegen, neu bauen.** `apply.sh` bricht selbst
+ab, ohne eine Zieldatei anzufassen.
+
+**Einspielen:** `bash /tmp/v1097/apply.sh`, dann `mb-backend` rebuilden
+(`KiGegenrechnungService.js` ist Backend). **`backend` braucht keinen Rebuild**,
+keine Migration. Danach **Strg+F5**.
+
+**Abnahme — hier steht oder fällt der Befund:**
+
+| Test | erwartet |
+|---|---|
+| ETW Stufe 3, BGF + Standardstufe **leer** | „✓ rechnet — genauer mit: Bruttogrundfläche, Standardstufe". Kein rotes Kreuz, Knopf aktiv |
+| dieselbe ETW, **beide gefüllt** | im Bericht **erscheint ein Sachwert** |
+| Hüllhorst (ETW, 2 WE) | 305.937 / 348.687 € · 2,56 % · RND 49,6 J. — unverändert |
+| Löhner Str. 278 (ZFH) | SWF 0,889 Stufe A · 290.391 € — unverändert |
+
+**Kommt im zweiten Test kein Sachwert: Befund ausdrücklich zurücknehmen, neu
+diagnostizieren, nicht nachpatchen.**
+
+---
+
+#### A2 — v1099 · Quellenblock im PDF (rechtlich blockierend)
+
+**Aurich (41 Kreisschlüssel) und Potsdam/Uckermark (5) stehen unter
+`dl-de/by-2-0` — Namensnennung ist Pflicht.** Der Vermerk hängt an jedem
+Registerdatensatz im Feld `quellenvermerk` und **fehlt im Bericht**. Solange
+das so ist, dürfen diese Zahlen in keinen Kundenbericht.
+
+Entschärfend: Marcels eigener Markt ist OWL und NRW, dort gilt `zero-2-0`.
+**Der Deckel wird mit jeder Ernte teurer.**
+
+**Zusammen bauen mit der Kunden-Verlinkung** (derselbe Bauplatz, Block 04,
+Abschnitt „Das Quellenregister"): wo kein Wert vorliegt, nennt der Bericht den
+zuständigen Ausschuss und verlinkt seine Quelle; ist sie kostenpflichtig, sagt
+er das und verlinkt den Bezugsweg.
+
+Drei Dinge, die dabei schiefgehen können:
+
+- **`app.js` gehört dem Parallel-Strang** — vor dem Patch frisch ziehen
+- **v1150b kürzt Quellenangaben in der Fußnote auf 26 Zeichen.** Der
+  `by-2-0`-Vermerk ist deutlich länger → **eigener Quellenblock am
+  Berichtsende**, nicht die Fußnote
+- **Nur die Ausschüsse nennen, deren Zahl wirklich in DIESEM Bericht steckt.**
+  Eine Namensnennung für einen Ausschuss, der nicht vorkommt, ist genauso
+  falsch wie eine fehlende
+
+---
+
+### B · RECHENKERN
+
+#### B1 — v1098 · Modellvermerk-Leser
+
+Drei Stellen, an denen heute **still gegen ein anderes Modell** gerechnet wird.
+Ein Paket, weil sie dieselbe Prüfstrecke teilen.
+
+**① `GND_JAHRE = 80` ist hart verdrahtet** (`CrossCheckService.js` Z. 24).
+**Bonn** rechnet Drei- und Mehrfamilienhäuser mit **GND 60**,
+Hameln-Hannover 70/60/50 je Gebäudeart, Otterndorf 70. Wer diesen Zinssatz mit
+GND 80 kapitalisiert, verletzt **§ 10 ImmoWertV**. *Die richtige Zahl steht
+längst im Registerdatensatz unter `modellansaetze` — sie wird nur nicht
+gelesen.* **Der schwerste stille Fehler im System, und er wächst mit jeder
+Ernte.**
+
+**② `BAUPREISINDEX = 2.02` hat keinen Stichtagsbezug** (Z. 22). Das
+Berechnungsbeispiel des **GMB Dortmund 2026** rechnet mit **1,906** zum
+01.01.2026 — rund **6 % Abweichung**. Bei einem Stichtag in der Vergangenheit
+rechnet eine Konstante zwangsläufig falsch.
+
+**③ NRW-Bewirtschaftungskosten sind stichtagsabhängig.** Das AGVGA-Modell
+druckt Ausgangswerte zum 01.01.2002 ab und schreibt sie über den VPI fort:
+230 × 106,7/87,5 = **280** · 275 × 106,7/87,5 = **335** — beide abgedruckten
+Werte treffen. Das hinterlegte Paar gilt nur für den 01.01.2015.
+
+**Achtung, gleiche Klasse wie v1075:** Punkt ① schaltet einen Zweig frei, der
+heute nie läuft. Der gehört im `apply.sh` **echt ausgeführt**.
+**Und die Regressionswerte Hüllhorst und Löhner Straße ändern sich** — sie
+müssen **gegen das Gutachten** neu abgenommen werden, nicht gegen die alten
+Sollwerte.
+
+#### B2 — `mb.valuation_inputs` wird nicht beschrieben
+
+Die Berichte sind **nicht reproduzierbar** — man kann zwei Jahre später nicht
+zeigen, mit welchen Eingangsgrößen gerechnet wurde. Für alles Richtung
+Gutachten der schwerste formale Mangel. Braucht eine mb-Migration.
+
+**Vor dem Schreiben die Tabelle lesen** — die Spalten sind nicht dokumentiert:
+`docker exec dealpilot-mb-db psql -U mb -d marktbericht -c "\d mb.valuation_inputs"`
+
+---
+
+### C · REGISTER UND QUELLENREGISTER
+
+#### C1 — Quellenregister in der Datenbank *(Marcels Vorgabe vom 13.09.)*
+
+**Ziel:** Für jeden Ausschuss steht in der Datenbank, **woher** die Zahl kommt —
+Link, Jahrgang, Lizenz, Stichtag, Seite, Kosten. Nicht als Notiz in Markdown,
+sondern als Zeile, die man abfragen und **jährlich abarbeiten** kann.
+
+**Es gibt den Anfang schon:** `mb.gaa_sources` → `mb.gaa_documents`,
+**67 Dokumente, alle `status = neu`, nie extrahiert.** Der `sha256` darin ist
+der eigentliche Wert: ändert ein Ausschuss seinen Bericht, ändert sich der
+Hash, und das Dokument fällt automatisch zurück in die Warteschlange.
+**Erst diese Tabellen lesen, bevor etwas Neues gebaut wird** —
+*bevor ein zweites Werkzeug gebaut wird, nachsehen, ob es das erste schon gibt.*
+
+Spezifikation (Felder, Statuswerte, Jahresablauf): Block 04, Abschnitt
+„Das Quellenregister".
+
+**Erstbefüllung ist eine Übertragung, keine neue Recherche** — die vollständige
+Landkarte liegt in `claude/abdeckung-laender-kreise-20260814.md` und
+`claude/laender-lizenzlage-20260813.md`, nur im falschen Format.
+
+#### C2 — Kunden-Verlinkung bei fehlender oder kostenpflichtiger Quelle
+
+Baut auf C1 auf, wird mit **A2** zusammen ausgeliefert (derselbe Quellenblock
+am Berichtsende). Drei Fälle, drei Texte — Wortlaut in Block 04.
+
+Vier Regeln, nicht verhandelbar:
+- Der Link darf **nicht suggerieren**, dass DealPilot den Wert liefert
+- **Kein Betrag ohne Beleg** (RLP: 150 € gegen 28 € — unbestätigt, also nur
+  „kostenpflichtig")
+- **Nur die Landingseite verlinken, nie das Jahrgangs-PDF** — Deep-Links
+  brechen jährlich, ein toter Link im Kundenbericht ist schlimmer als keiner
+- **Der Link kommt aus der Datenbank**, nicht aus einer Frontend-Konstante —
+  sonst gibt es eine zweite Wahrheit neben C1
+
+#### C3 — Admin-View „Ausschuss-Register"
+
+**Heute gibt es dafür im Admin nichts.** Kein View, keine Route. Der einzige
+Weg an den Bestand führt über `docker exec … psql` oder den
+`register/stand`-Endpunkt im Container.
+
+Zwei Reiter, **beide zuerst read-only** (ein Schreibzugriff wäre ein zweiter
+Weg neben dem Erntewerkzeug):
+
+- **Bestand** — was im Register liegt, filterbar nach Land / Kennzahl /
+  Ausschuss / Berichtsjahr
+- **Quellen** — die Landkarte aus C1, mit Filtern „nächste Prüfung fällig" und
+  „Jahrgang verfügbar > Jahrgang im Register". **Das ist die Arbeitsansicht für
+  die jährliche Nachernte**
+
+Drei Fallen (alle schon einmal bezahlt): der Admin-API-Wrapper exportiert
+**kein `call()`** · Admin-Charts sind ein eigener SVG-Helfer, nicht Chart.js ·
+`var(--text)` löst im Admin **dunkel** auf → feste helle Töne.
+Und: **die Daten liegen in der mb-DB, der Admin hängt am Haupt-Backend** — der
+Weg führt über den Proxy, und `qstrUser()` ist dort der falsche Pfad.
+**Das gehört bewusst entschieden, nicht nebenbei.** Details in Block 04.
+
+#### C4 — Sachwertfaktoren ins Register
+
+`swf_modelle.js` rechnet 36 Prüfungen richtig, aber `gutachterausschuss.js`
+nutzt für Sachwertfaktoren weiter die zwei **handgeschriebenen Module**
+(Minden-Lübbecke, Herford — sie tragen Umrechnungskoeffizienten und Gartenland,
+die das Register noch nicht abbildet).
+
+Reihenfolge: **Lüdenscheid zuerst** (`potenz`) — und dabei die Kaskade nutzen,
+sonst kollidiert es mit dem Märkischen Kreis unter `05962`. Dann Höxter und
+Märkischer Kreis (Rohdaten in `out/swf_roh.json`). Zuletzt
+`gutachterausschuss.sachwertfaktor()` auf das Register umstellen, Rückgabeform
+unverändert, die zwei Module als Rückfall stehen lassen.
+
+#### C5 — Ersatzebenen C1 + C2 *(Marcels Entscheidung vom 30.08.)*
+
+**C1 — fremder amtlicher Wert bei nachgewiesener Modellgleichheit**
+(ImmoWertA Nr. 9 Abs. 3). Der Nachweis ist **maschinell führbar**, weil jeder
+Registerdatensatz seinen Modellvermerk mitführt (GND, RND, BWK-Quote,
+Marktmiete). Nur innerhalb desselben Bundeslandes · der Spender muss
+lizenzrechtlich sauber sein · der Bericht nennt Spender, Stichtag und den
+Modellvergleich Feld für Feld · **Stufe C, nie A**.
+
+**C2 — eigenes Schätzmodell, nur für den Liegenschaftszins, nur nach
+bestandener Validierung.** Prüfstand liegt fertig bei:
+`c2_validierung.py` (im ZIP von 08.09.). Abnahmekriterien stehen **vor** der
+Messung fest: Kreuzvalidierung über die 73 NRW-Ausschüsse ≤ **0,4 Pp** bei
+Wohnen, Fremdprobe gegen Niedersachsen ≤ **0,6 Pp**.
+
+**Ehrliche Erwartung: C2 fällt durch.** Grund ist ein Leckage-Befund — Miete
+und Kaufpreis stehen in derselben CSV-Zeile wie der Zinssatz, und der Zinssatz
+*ist* näherungsweise Reinertrag durch Kaufpreis. Übrig bleiben Objektart und
+Bodenrichtwertniveau. **Ein Durchfallen ist ein gültiges Ergebnis**, kein
+Fehlschlag.
+
+**Der Sachwertfaktor bekommt C2 nicht** — 52 Datensätze sind keine Basis, und
+der Faktor ist konstruktionsbedingt die lokale Eigenheit, die man nicht
+fortschreiben kann.
+
+Zurückgestellt: **Anlage 25 BewG** — steuerliche Größe im Verkehrswertkontext,
+Bewertungsfrage, gehört Marcel.
+
+---
+
+### D · ZU MESSEN, BEVOR GEBAUT WIRD
+
+Jeder Punkt ist ein Befehl, kein Projekt.
+
+| | Befehl / Frage |
+|---|---|
+| **`param_modell_ebene_check`** — der erlaubte Wertebereich ist unbekannt. `gemeinde` und `kreis` sind belegt, `gemeinde_verbund` fiel durch und kostete 24 Sätze; **`gaa` und `land` (49 Sätze) liegen im Bestand und sind ungemessen** | `docker exec dealpilot-mb-db psql -U mb -d marktbericht -c "select pg_get_constraintdef(oid) from pg_constraint where conname = 'param_modell_ebene_check';"` |
+| **Die DDL von fünf Tabellen** — Rollen bekannt, Spalten nicht: `gaa_sources`, `gaa_documents`, `param_probe`, `param_lauf`, `valuation_inputs`. **Nichts hineinschreiben, was nicht vorher gelesen wurde** | `docker exec dealpilot-mb-db psql -U mb -d marktbericht -c "\d mb.gaa_sources"` (usw.) |
+| **`market=seed`** — der alte offene Punkt „Kunden sehen Seed-Daten" ist **nicht belegt**. `MARKET_SOURCE: seed` wird nur geloggt; ob GeoMap läuft, entscheiden `GEOMAP_TOKEN` und `MB_DEMO` | `docker exec dealpilot-mb-backend sh -c 'echo MB_DEMO=[$MB_DEMO]; [ -n "$GEOMAP_TOKEN" ] && echo GEOMAP_TOKEN=gesetzt \|\| echo GEOMAP_TOKEN=LEER'` |
+| **NRW-Landesbericht S. 141–142** — enthält er verwertbare Modelle oder nur Spannen? Eine Landesübersicht ohne Korrekturen und Modellvermerk liefert **keinen** Registerdatensatz. **Seite 182 ist sicher wertvoll**: die amtliche Zuständigkeitsliste der 73 Ausschüsse, auf die sich die Kaskade heute nicht stützen kann | erst messen, dann planen |
+| **Handel 5,5 % gegen 5,6 %** — Medianliste und Streuungstabelle widersprechen sich, in Projektanweisung *und* Erntedokument. Vermutlich harmlos (Median über alle Sätze gegen die 471 mit Streuungsangabe) | an `lzs.csv` nachmessen, in einem Halbsatz erklären |
+
+---
+
+### E · DER ERNTE-DAUERAUFTRAG
+
+> **Das ist der Punkt, an dem permanent weitergearbeitet wird, wenn sonst
+> nichts drängt.**
+
+**Ziel:** für jedes der 16 Bundesländer beide Kennzahlen im Register —
+Liegenschaftszinssatz und Sachwertfaktor — plus die Quelle in der Datenbank
+(C1). **Stand: 6 von 16 Ländern**, rund 40 % der Einwohner beim Zins, 25 % beim
+Faktor.
+
+**Die realistische Obergrenze ist nicht 16.** In fünf Ländern sperrt die Lizenz
+die kommerzielle Verwertung. Dort ist das Ziel **der Link plus die ehrliche
+Aussage, warum wir nichts führen** — und, wo möglich, eine Anfrage.
+
+#### E1 — Was ohne neue Recherche geht
+
+**Elf Rezepte liegen fertig geprüft** in `v1094/rezepte/` und warten je auf
+**eine** Voraussetzung. Die drei teuersten:
+
+| Rezept | fehlt | Aufwand |
+|---|---|---|
+| **Wiesbaden Vergleichsfaktoren** | zweidimensionale Korrekturtabelle — der Auswerter kann nur 1D | eine Modellform; Sollwert steht bereit: 5.171 − 855 = **4.316** bei 500 m², Bj. 1980 |
+| **Hameln-Hannover** | Schlüsselkollision zweier Lagen unter demselben AGS | eine Messung am Dokument, **kein geratener Gemeindeschlüssel** |
+| **Northeim** | achtstelliger Gemeindeschlüssel unbestätigt | ein Abruf im Gemeindeverzeichnis |
+
+**Eine fehlende Modellform:** Regression nach Band ausgewählt. Kreis Olpe führt
+drei efh-Regressionen nach Bodenrichtwertbereich; zwei stehen heute als
+`verfeinerungen:` **ausgewiesen statt gerechnet**.
+
+#### E2 — Die Länder, nach Aufwand pro Einwohner
+
+Abzuarbeiten, sobald das jeweilige Dokument vorliegt (Marcel lädt die
+robots-gesperrten selbst — siehe F):
+
+| # | Land / Quelle | Wirkung | Zustand |
+|---|---|---|---|
+| 1 | **Hamburg** | 1,9 Mio. Einwohner, **ein** Ausschuss, Lizenz `by-2-0` frei und doppelt belegt | reine Zugriffsfrage — `hamburg.de` gibt 403 |
+| 2 | **NRW-Sachwertfaktoren vervollständigen** | 39 von 73 Gebieten fehlen, darunter Münster, Bonn, Wuppertal, Mönchengladbach, Gelsenkirchen, Aachen | teils robots-gesperrt → Mail an den Oberen GAA |
+| 3 | **Brandenburg** | 16 Kreisberichte, seitengenau kartiert; Modellvermerk landesweit über die **VV EW-SW** geklärt (HTML, keine Abbruchseite) | Jahrgangsentscheidung offen (F1) |
+| 4 | **Hessen ausbauen** | Lizenz bedingungsfrei, 20 von 22 Ausschüssen offen | Kassel/Darmstadt liegen bereit |
+| 5 | **Rheinland-Pfalz** | nur Mainz frei (Vollbericht, SWF S. 49, LZS S. 64–94) | der Landesbericht trägt „Vervielfältigung nur mit Erlaubnis" — **Lizenzfrage vor Kaufentscheidung** |
+| 6 | **Mecklenburg-Vorpommern** | Ludwigslust-Parchim ist der einzige verwendbare Ausschuss | S. 63/65 |
+| 7 | **Schleswig-Holstein** | eine Anfrage öffnet **alle 15** Ausschüsse | F2 |
+| 8 | **Niedersachsen-Sachwertfaktoren** | liegen hinter Tableau-Dashboards, nicht im PDF | F2 (LGLN) |
+
+**Gesperrt und nur über eine Anfrage erreichbar:** Sachsen (sechs Vermerke
+einzeln am Dokument gelesen, alle sperren die kommerzielle Verwertung) ·
+Bremen · Saarland · Baden-Württemberg (dort zusätzlich **Darstellungsform** —
+Sachwertfaktoren als Streudiagramm **ohne Zahlentabelle und ohne Gleichung**,
+an sieben Ausschüssen belegt).
+
+#### E3 — Die Regeln, die bei jeder Ernte gelten
+
+- **Lizenz und Inhaltsverzeichnis im ERSTEN Abruf zusammen lesen.** *Kiels
+  Daten wären lesbar gewesen; die Lizenzprüfung kam zu spät.*
+- **Die Lizenz ist jahrgangsgebunden.** Derselbe NRW-Landesbericht trägt 2016
+  `by-2-0` und 2025 `zero-2-0`.
+- **robots-Sperre und Captcha sind Ansagen, keine Hürden** — auch nicht über
+  einen ferngesteuerten Browser. **Kostenpflichtige Berichte NIE abrufen.**
+- **`pdftotext -layout` statt WebFetch.** Die WebFetch-Grenze ist eine
+  Textmenge, keine Seitenzahl — Abbruch zwischen Seite 21 und 55, über zehn
+  Läufe gemessen. `pdftotext` schafft 458 Seiten am Stück.
+- **Kein Registerdatensatz ohne bestandenen Prüfstand.** Der Prüfmaßstab ist
+  das **Anwendungsbeispiel des Dokuments**, nie eine selbst gerechnete Zahl —
+  einschließlich der Rundung.
+- **Die Zählprüfung ist nicht verhandelbar.** Beim fehlerhaften Suchmuster vom
+  11.08. gingen Monotonie, Wertebereich und Anwendungsbeispiel **alle** durch —
+  nur das Nachzählen fand die Lücke.
+- **Nach jedem Saatlauf `docker restart dealpilot-mb-backend`** — das Register
+  liegt im Speicher.
+- **Quellenregister-Zeile mitpflegen** (C1): Status, Jahrgang, nächste Prüfung.
+
+Vollständiger Ablauf: Block 04, Abschnitt „Wie die Ernte abläuft".
+
+---
+
+### F · HÄNGT AN MARCEL, NICHT AM CODE
+
+**Nicht selbst versuchen — hier ist eine Entscheidung oder ein Browser nötig.**
+
+| | | Gewinn |
+|---|---|---|
+| **F1** | **Entscheidung: Brandenburg-Liegenschaftszins auf Jahrgang 2023 freigeben** (Lizenz belegt) statt auf 2025 zu warten (ungeklärt) | **+10 Gebietskörperschaften** für eine Antwort |
+| **F2** | **Vier bis sechs Mails.** Oberer GAA NRW (Text liegt seit 11.08. fertig im Projekt — die Berichte sind kostenfrei und Zero 2.0, **gesperrt ist nur der Verteilweg**) · LGLN Niedersachsen `oga@lgln.niedersachsen.de` · LVermGeoSH · LVermGeo Sachsen-Anhalt · Vogtlandkreis oder Tübingen · München | LGLN öffnet 9 Ausschüsse, LVermGeoSH **alle 15** |
+| **F3** | **Sechs PDF im Browser laden und anhängen** | siehe Tabelle unten |
+| **F4** | **Drei einzelne Seiten:** Hamm (S. 64/65), Krefeld (S. 66), Kreis Unna (Kap. 8.1) | drei NRW-Sachwertfaktoren, Tabellen sind geerntet und geprüft |
+| **F5** | **Entscheidung: RLP-Landesbericht kaufen?** Erst **nach** der Lizenzklärung — der Bericht trägt „Vervielfältigung nur mit Erlaubnis". Preis unbestätigt (150 € gegen 28 €) | ein Bundesland |
+
+**Die sechs PDF (F3), alle frei, Lizenz geprüft, Seitenzahl gemessen:**
+
+| # | Dokument | Inhalt | Seite |
+|---|---|---|---|
+| 1 | **NRW-Landesbericht 2025** | SWF-Übersicht aller 73 Ausschüsse · **amtliche Zuständigkeitsliste** | 141–142 · **182** |
+| 2 | **Hamburg** Immobilienmarktbericht | Sachwertfaktor · Liegenschaftszins | 117 · 116 ff. |
+| 3 | **Brandenburg**, 16 Kreisberichte | seitengenau kartiert | `_fehlend.md` |
+| 4 | **Mainz** GMB | Sachwertfaktoren · Liegenschaftszins | 49 · 64–94 |
+| 5 | **Kassel / Darmstadt** | Bodenpreisindex · Vergleichsfaktoren **mit Anwendungsbeispiel** | 24 · 35–40 |
+| 6 | **Ludwigslust-Parchim** | beide Kennzahlen | 63 · 65 |
+
+---
+
+### G · BETRIEB UND AUFRÄUMEN
+
+- **`tools/abnahme.sh` im Repo ist die kaputte Host-Fassung.** Sie wertete mit
+  `node -e` auf dem **Host** aus — Staging hat Node 18, **Prod hat kein node
+  auf dem Host**. Ergebnis: dreizehn Fehlalarme, während das Serverlog sauber
+  meldete. Die richtige Fassung liegt auf Prod unter `/tmp/abnahme.mjs` und ist
+  **nicht committet** — `/tmp` überlebt keinen Neustart.
+  **Im nächsten Paket an ihren Platz committen.**
+- **Reste auf Staging:** `*.pre-v1094`, `*.pre-v1095`, `*.pre-v1096*`,
+  `patchesold/` und eine Datei namens **`tname`** (zerschossener
+  `hostname`-Aufruf).
+- **Konsolidierung der beiden Marktbericht-Projektanweisungen** zu einer
+  Fassung. Rezept steht im Nachtrag, Abschnitt 6. Gehört an den **Anfang** einer
+  Sitzung, mit dem Originaltext im Zugriff — nicht aus dem Gedächtnis.
+- **Aus einem anderen Workstream, ebenfalls uneingespielt:**
+  `kpa-standalone.zip` (Kaufpreisaufteilung, Workstream **(A)**), seit 04.09.
+  Kollidiert nicht mit v1097 — aber **nur ein Chat fasst git an**.
+
+---
+
+### H · WAS NICHT VERIFIZIERT IST
+
+Damit es niemand für gemessen hält:
+
+- **Der Klicktest zu v1097** (A1) — die eigentliche Bestätigung des Befunds
+- **Der geänderte KI-Prompt** — braucht einen Lauf mit `KI_GEGENRECHNUNG=1`
+- **Der Serverstand seit dem 30.08.** — vor der ersten Codeänderung neu messen
+- **Die DDL der fünf Tabellen** und der Wertebereich von
+  `param_modell_ebene_check` (D)
+- **Die C2-Validierung** — Prüfstand getestet (Selbsttest **und** Gegenprobe auf
+  Rauschdaten), aber nie gegen echte Daten gelaufen
+- **`market=seed`** — ein Etikett, kein Befund (D)
+- **Der Preis des RLP-Landesberichts**
+ . 
+ . '---' . 
+ . 
+ . ## Fertig
 
 ### Alle Anlage-V-Zeilen zugeordnet, Halterangaben aufs PDF — `v1220`/`v1221`, 03.09.2026
 
