@@ -108,6 +108,21 @@ app.use(express.json({ limit: '50mb' }));
    ausdruecklich da.
    ══════════════════════════════════════════════════════════════════════ */
 const jwtUtil = require('./utils/jwt');
+const securityEvents = require('./services/securityEventService');
+
+/* Wie oft ist dieser Schluessel in der letzten Stunde angelaufen? Nur im
+   Arbeitsspeicher - beim Neustart faengt die Zaehlung von vorn an, und das
+   ist richtig so: die dauerhafte Wahrheit steht in security_events, hier
+   liegt nur, was fuer die Einstufung des naechsten Ereignisses gebraucht
+   wird. Ein Eintrag je Konto, aufgeraeumt sobald er eine Stunde alt ist. */
+const _limitGedaechtnis = new Map();
+setInterval(() => {
+  const grenze = Date.now() - 60 * 60 * 1000;
+  for (const [k, v] of _limitGedaechtnis) {
+    if (v.seit < grenze) _limitGedaechtnis.delete(k);
+  }
+}, 15 * 60 * 1000).unref();
+
 
 /* Wer ist das? Gibt die Nutzerkennung zurueck oder null. */
 function _kontoAusToken(req) {
@@ -168,17 +183,52 @@ const limiter = rateLimit({
      rechtlich bewiesener Vertragsverstoss behandelt werden." */
   handler: (req, res) => {
     const konto = _kontoAusToken(req);
-    console.warn('[limit] ueberschritten', JSON.stringify({
-      konto: konto || null,
-      ip: konto ? undefined : (req.ip || null),
-      pfad: req.path,
-      methode: req.method,
-      zeit: new Date().toISOString()
-    }));
+
+    /* v1367: das Ereignis geht in die Ablage, nicht nur ins Log. Bis
+       hierher stand es in console.warn - fluechtig, beim naechsten
+       Rebuild weg, nicht durchsuchbar. Ein Muster ueber Tage erkennt
+       man darin nicht.
+
+       Die Stufe steigt mit der Haeufigkeit, NICHT mit der Schwere des
+       Pfades: wer einmal ueber das Limit kommt, hat zu schnell
+       geklickt; wer es dauernd tut, arbeitet anders. Mehr sagt die
+       Stufe nicht - sie ist kein Score und loest nichts aus.
+
+       `await` gibt es hier nicht: der Handler muss antworten, nicht
+       warten. Faellt das Schreiben aus, steht es im Log und der Nutzer
+       merkt nichts - ein Protokoll darf die Anwendung nicht aufhalten. */
+    try {
+      const jetzt = Date.now();
+      const schluessel = konto ? ('u:' + konto) : ('ip:' + _ipSchluessel(req.ip));
+      const zuvor = _limitGedaechtnis.get(schluessel) || { n: 0, seit: jetzt };
+      if (jetzt - zuvor.seit > 60 * 60 * 1000) { zuvor.n = 0; zuvor.seit = jetzt; }
+      zuvor.n += 1;
+      _limitGedaechtnis.set(schluessel, zuvor);
+
+      const stufe = zuvor.n >= 20 ? 'ernst' : (zuvor.n >= 5 ? 'auffaellig' : 'hinweis');
+
+      securityEvents.schreibe({
+        userId: konto,
+        ipKey: konto ? null : _ipSchluessel(req.ip),
+        art: securityEvents.ARTEN.RATE_LIMIT,
+        stufe,
+        pfad: req.path,
+        methode: req.method,
+        detail: {
+          limit: konto ? LIMIT_KONTO : config.rateLimit.max,
+          fenster_s: Math.ceil(config.rateLimit.windowMs / 1000),
+          ueberschreitungen_1h: zuvor.n
+        }
+      });
+    } catch (e) {
+      console.warn('[limit] Ereignis nicht protokolliert:', e.message);
+    }
+
     res.status(429).json({
       error: 'Zu viele Anfragen in kurzer Zeit. Bitte einen Moment warten.',
       retry_after_s: Math.ceil(config.rateLimit.windowMs / 1000)
     });
+
   }
 });
 app.use(limiter);
