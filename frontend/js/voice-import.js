@@ -2429,8 +2429,16 @@
       frage: 'Wie entwickelt sich der Ort — Bevölkerung, Nachfrage, Wertsteigerung, Entwicklungsmöglichkeiten?' },
     { et: 4, ids: ['kaufdat', 'wirtschaftlicher_uebergang'], rang: 10,
       frage: 'Wann wird gekauft, und ab wann gehören dir Mieten und Kosten?' },
-    { et: 4, ids: ['afa_satz', 'geb_ant', 'grenz'], rang: 16, vorbelegt: 1, profil: 'steuer',
-      frage: 'Zur Steuer — AfA-Satz, Gebäudeanteil und dein Grenzsteuersatz.' },
+    /* v1377b (C5): Das zu versteuernde Einkommen stand zwar in der
+       Feldbeschreibung fuer das Extraktionsmodell, aber in keinem Block -
+       es wurde nie gefragt. Jetzt ist es der zweite Weg zum Steuersatz:
+       eines von beiden genuegt (`eins`). */
+    { et: 4, ids: ['afa_satz', 'geb_ant', 'grenz', 'zve'], eins: ['grenz', 'zve'],
+      rang: 16, vorbelegt: 1, profil: 'steuer',
+      frage: 'Zur Steuer — AfA-Satz, Gebäudeanteil und dein Grenzsteuersatz. ' +
+             'Wenn du den Satz nicht im Kopf hast: sag mir dein zu versteuerndes ' +
+             'Einkommen, dann rechne ich ihn aus.' },
+
 
     /* ── Etappe 5 · Deine Sicht ───────────────────────────────────── */
     { et: 5, ids: ['thesis', 'risiken', 'notizen'], rang: 13,
@@ -2468,7 +2476,22 @@
          galten sie als beantwortet, und die Rechnung haette stillschweigend
          mit einer Vorbelegung gerechnet, die niemand bestaetigt hat. */
       var da = eintrag.vorbelegt ? gesagt : (gesagt || fieldHasValue(id));
+      /* ═══ v1377b (C5) · Zwei Wege zur selben Zahl ══════════════════════
+         `eins` nennt Felder, von denen EINES genuegt. Gebraucht wird das
+         beim Steuersatz: wer seinen Grenzsteuersatz kennt, nennt ihn; wer
+         ihn nicht kennt, nennt sein zu versteuerndes Einkommen, und der
+         Co-Pilot rechnet. Beides zu verlangen waere, nach derselben Zahl
+         zweimal zu fragen. */
+      if (!da && eintrag.eins && eintrag.eins.indexOf(id) >= 0) {
+        for (var j = 0; j < eintrag.eins.length; j++) {
+          var aid = eintrag.eins[j];
+          if (aid === id) continue;
+          var ag = !!(fields && (aid in fields) && fields[aid] !== '' && fields[aid] != null);
+          if (eintrag.vorbelegt ? ag : (ag || fieldHasValue(aid))) { da = true; break; }
+        }
+      }
       if (!da) return true;   /* eine Luecke im Block genuegt */
+
     }
     return false;
   }
@@ -7754,9 +7777,41 @@
       var name = (kat ? kat.label : id) + ' = ' + v;
       if (gefragt) namen.push(name); else extra.push(name);
     });
+    /* ═══ v1377b (C5) · Aus dem Einkommen wird der Steuersatz ══════════
+       Wer sein zu versteuerndes Einkommen nennt, hat den Grenzsteuersatz
+       damit gesagt - er weiss es nur nicht. Ihn danach noch einmal zu
+       fragen waere, nach derselben Zahl zweimal zu fragen.
+
+       Gerechnet wird ueber `Tax.calcGrenzsteuersatz` - dieselbe Quelle wie
+       im Formular und in der Prognose. Eine zweite Rechnung hier waere die
+       vierte Kopie desselben Tarifs (siehe FALLEN 150).
+
+       Der Satz wird NICHT ueberschrieben, wenn er schon steht: wer beides
+       nennt, meint seinen eigenen Satz. */
+    try {
+      var _zv = _rfNum(_rf.data.fields.zve);
+      if (_zv != null && _zv > 0 && window.Tax && Tax.calcGrenzsteuersatz &&
+          !_rf.zveGerechnet) {
+        var _gs = Tax.calcGrenzsteuersatz(_zv, new Date().getFullYear());
+        if (_gs != null && isFinite(_gs) && _gs > 0) {
+          _rf.zveGerechnet = 1;
+          var _gsTxt = String(Math.round(_gs * 1000) / 10).replace('.', ',');
+          var _neu = _rfSetzen('grenz', _gsTxt, 'aus deinem zu versteuernden Einkommen berechnet');
+          _rfBlase('co', 'Bei <b>' + escH(_euroKurz(_zv)) +
+            '</b> zu versteuerndem Einkommen liegt dein Grenzsteuersatz bei ' +
+            '<b>' + escH(_gsTxt) + ' %</b>' +
+            (_neu ? ' — damit rechne ich.' : ' — du hast aber einen eigenen Satz genannt, der gilt.') +
+            '<div class="vi-rf-zaehler">§ 32a EStG, Tarif ' + new Date().getFullYear() +
+            '. Ohne Soli und Kirchensteuer.</div>');
+          _rfStandZeichnen();
+        }
+      }
+    } catch (_e) {}
+
     /* Nebenbei Gesagtes allein traegt die Frage nicht — aber es soll auch
        nicht stillschweigend verschwinden. Wer es sagt, sieht, dass es
        angekommen ist. */
+
     if (extra.length) {
       _rfBlase('co', '<span style="opacity:.85">Das nehme ich gleich mit: <b>' +
         escH(extra.join(' · ')) + '</b></span>');
