@@ -111,7 +111,11 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                                falschem Namen truege. `rezept2register.py` schreibt
                                seit v1098 je Land eine Datei und nennt sie am Ende
                                seines Laufs - jede davon gehoert hierher. */
-                            'swf-hh.json'];
+                            'swf-hh.json',
+                            /* v1098d: Sachwertfaktoren Kassel (Hessen), Jahrgang 2024.
+                               dl-de/zero-2-0 - der Bericht sagt woertlich "ohne
+                               Einschraenkung oder Bedingung". */
+                            'swf-he.json'];
 
 export function ladeSaat(dateien = SAATDATEIEN) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])
