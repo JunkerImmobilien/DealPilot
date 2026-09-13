@@ -5691,33 +5691,10 @@
     var akt = (_rf && _rf.aktionen) || [];
     if (!akt.length) return false;
 
-    /* ═══ v1376 (C7) · Der Widerspruch wird zuerst beantwortet ══════════
-       Bei einem offenen Widerspruch stehen zwei Knoepfe zur Wahl, die
-       beide dasselbe Feld betreffen. Ein blankes "ja" waere hier
-       mehrdeutig - deshalb gilt es nur, wenn der Satz sagt, WELCHER Wert
-       gemeint ist. Erkannt wird beides: die Quelle ("amtlich", "BORIS")
-       und die Richtung ("bleib dabei", "meine Angabe"). */
-    if (_rf.konfliktOffen) {
-      var tk = _de(text);
-      var kf = _rf.konfliktOffen;
-      var zahlNeu = _rfZahl(kf.neu), zahlAlt = _rfZahl(kf.alt);
-      /* Wer die Zahl selbst ausspricht, meint sie auch. */
-      var gesagteZahl = _rfZahl((String(text).match(/-?[\d.]+(?:,\d+)?/) || [])[0]);
-      var willNeu = /amtlich|boris|abgerufen|abruf|offiziell|neuen?\b|uebernimm|ubernimm|ubernehmen|indikation|gutachter/.test(tk) ||
-                    (gesagteZahl != null && zahlNeu != null && Math.abs(gesagteZahl - zahlNeu) < 0.005);
-      var willAlt = /meine|meiner|bleib|behalt|behalte|dabei|eigenen?\b|gesagt|stimmt so|richtig so/.test(tk) ||
-                    (gesagteZahl != null && zahlAlt != null && Math.abs(gesagteZahl - zahlAlt) < 0.005);
-      if (willNeu && !willAlt) { _rfBlase('ich', escH(text)); _rfAktionKlick('knf_neu'); return true; }
-      if (willAlt && !willNeu) { _rfBlase('ich', escH(text)); _rfAktionKlick('knf_alt'); return true; }
-      /* Unklar - nachfragen statt raten. Eine falsch uebernommene Zahl
-         rechnet still weiter; eine Rueckfrage kostet einen Satz. */
-      _rfBlase('ich', escH(text));
-      _rfBlase('co', 'Welcher Wert soll gelten — <b>' + escH(_rfKonfliktWert(kf.id, kf.alt)) +
-        '</b> (deine Angabe) oder <b>' + escH(_rfKonfliktWert(kf.id, kf.neu)) +
-        '</b> (' + escH(kf.quelleNeu) + ')? Sag die Zahl oder tipp auf einen der Knöpfe.');
-      if (_fs.an && _fs.stream) _fsHoeren(true);
-      return true;
-    }
+    /* v1376b (C7): Die Entscheidung selbst steht in `_rfKonfliktAntwort` -
+       sie wird an ZWEI Stellen gebraucht. Hier gilt sie auch bei einem
+       blanken "ja": wer zustimmt, ohne zu sagen wozu, wird gefragt. */
+    if (_rf.konfliktOffen) return _rfKonfliktAntwort(text, true);
 
     if (akt.length > 1) {
       /* „hol den bodenrichtwert" / „die lage" — wer die Aktion NENNT,
@@ -5873,7 +5850,56 @@
     return String(wert);
   }
 
+  /* ═══ v1376b (C7) · Die Antwort auf einen Widerspruch ════════════════
+     GEMESSEN am ersten Anlauf: der Einbau sass zu tief. "Nein, bleib bei
+     meiner Angabe" erreichte ihn nie - der Satz wurde vorher schon als
+     Antwort auf die laufende Frage gedeutet, und der Widerspruch blieb
+     offen stehen. Er SAH richtig aus, weil der Wert ohnehin der alte war.
+
+     Deshalb steht die Pruefung jetzt ganz vorn, gleich hinter der
+     Adress-Rueckfrage. Aber nur fuer EINDEUTIGE Saetze:
+
+     `auchUnklar = false` (frueher Weg): nur wenn der Satz sagt, WELCHER
+     Wert gilt. Sonst faellt er durch und bleibt eine normale Antwort.
+     `auchUnklar = true` (nach einem "ja"): dann wird nachgefragt, statt
+     zu raten.
+
+     EINE NACKTE ZAHL ENTSCHEIDET NICHT. Wer auf die Frage nach dem
+     Kaufpreis "215000" sagt, beantwortet die Frage - nicht den
+     Widerspruch. Erst "215000 stimmt" oder "nimm 215000" ist eine
+     Entscheidung. */
+  function _rfKonfliktAntwort(text, auchUnklar) {
+    if (!_rf || !_rf.konfliktOffen) return false;
+    var kf = _rf.konfliktOffen;
+    var tk = _de(text);
+    var zahlNeu = _rfZahl(kf.neu), zahlAlt = _rfZahl(kf.alt);
+
+    /* Nur mit einem Wort, das die Zahl als Entscheidung ausweist. */
+    var mitWort = /stimmt|gilt|nimm|nehmen|passt|richtig|genau|bleibt|es sind|sind es/.test(tk);
+    var gz = mitWort ? _rfZahl((String(text).match(/-?[\d.]+(?:,\d+)?/) || [])[0]) : null;
+
+    var willNeu = /amtlich|boris|abgerufen|abruf|offiziell|neuen? wert|uebernimm|ubernimm|indikation|recherche|gutachter/.test(tk) ||
+                  (gz != null && zahlNeu != null && Math.abs(gz - zahlNeu) < 0.005);
+    var willAlt = /meine|meiner|bleib|behalt|behalte|dabei bleiben|eigenen? wert|hab ich gesagt|stimmt so|richtig so/.test(tk) ||
+                  (gz != null && zahlAlt != null && Math.abs(gz - zahlAlt) < 0.005);
+
+    if (willNeu && !willAlt) { _rfBlase('ich', escH(text)); _rfAktionKlick('knf_neu'); return true; }
+    if (willAlt && !willNeu) { _rfBlase('ich', escH(text)); _rfAktionKlick('knf_alt'); return true; }
+    if (!auchUnklar) return false;   /* kein Konfliktsatz - normal weiter */
+
+    /* Unklar: nachfragen statt raten. Eine falsch uebernommene Zahl
+       rechnet still weiter; eine Rueckfrage kostet einen Satz. */
+    _rfBlase('ich', escH(text));
+    _rfBlase('co', 'Welcher Wert soll gelten — <b>' + escH(_rfKonfliktWert(kf.id, kf.alt)) +
+      '</b> (deine Angabe) oder <b>' + escH(_rfKonfliktWert(kf.id, kf.neu)) +
+      '</b> (' + escH(kf.quelleNeu) + ')? Sag die Zahl mit einem "stimmt" dahinter ' +
+      'oder tipp auf einen der Knöpfe.');
+    if (_fs.an && _fs.stream) _fsHoeren(true);
+    return true;
+  }
+
   function _rfKonfliktZeigen() {
+
     if (!_rf || !_rf.konflikte || !_rf.konflikte.length) return false;
     if (_rf.konfliktOffen) return true;          /* einer reicht */
     var k = _rf.konflikte.shift();
@@ -8117,8 +8143,13 @@
 
     /* v1291: Die Adress-Rueckfrage hat Vorrang vor allem anderen. */
     if (_rf.adresseFrage && _rfAdresseAntwort(t, ausSprache)) return true;
+    /* v1376b (C7): Ein offener Widerspruch steht VOR der Feldauswertung -
+       aber nur fuer Saetze, die ihn eindeutig beantworten. Alles andere
+       faellt durch und bleibt eine normale Antwort auf die Frage. */
+    if (_rf.konfliktOffen && _rfKonfliktAntwort(t, false)) return true;
     /* v1307: Der Bericht-Vorschlag ebenso - "ja" heisst dort etwas
        anderes als bei einer Feldfrage. */
+
     if (_rf.berichtOffen && _rfBerichtAntwort(t, ausSprache)) return true;
     /* v1309: "ja" auf den Marktwert-Vorschlag zur Bankbewertung. */
     if (_rf.mwVorschlag && (RF_JA.test(t) || _istZustimmung(t))) {
