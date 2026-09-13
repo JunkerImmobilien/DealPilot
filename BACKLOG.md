@@ -144,17 +144,53 @@ Zwei Aufträge aus derselben Ansage. Der erste ist neu, der zweite ist die
 Marcel hat in `Dateien/` einen **Verkehrswertrechner** und einen
 **Restnutzungsdauerrechner** abgelegt (ZIP „VW Reporting").
 
-> **Stand 13.09.2026: die ZIP liegt noch nicht im Ordner.** Enthalten sind
-> derzeit nur die fünf Marktbericht-Dateien (siehe D unten). Ohne die ZIP kann
-> R1 nicht beginnen — die anderen Punkte hängen fachlich daran, lassen sich
-> aber getrennt entscheiden.
+> **Die ZIP kam am 13.09.2026 nach** (`Dateien/vw-reporting-v17-0.zip`, 13 MB,
+> 46 Dateien). **Gesichtet — und der wichtigste Befund stellt R1 und R2 auf
+> den Kopf:**
+>
+> **Es ist kein fremder Rechner. Es ist unser Rechner mit einem
+> DOCX-Erzeuger dahinter.**
+>
+> ```
+> src/reporting/calculator_adapter.py, Kopfkommentar:
+>   „Adapter zwischen dem bestehenden calc-engine (JS) und dem
+>    ReportData-Modell. Der Rechner ist die Single Source of Truth.
+>    Werte werden 1:1 übernommen — keine Neuberechnung."
+>
+> models.py Z. 275:  „Ein einzelnes RND-Verfahren-Ergebnis
+>                     (aus rnd-calc.js methods.*)"
+> ```
+>
+> `rnd-calc.js` ist **unsere** Datei (`frontend/js/rnd-calc.js`), und ihr
+> `calcAll()` liefert genau das erwartete `methods`-Objekt — sechs Verfahren
+> (linear, Vogels, Ross, Parabel, Punktraster, technisch) plus
+> Schadensbewertung. Auch die eigene `CLAUDE.md` des Pakets sagt es als
+> ersten Grundsatz: *„Das Reporting liest nur, es rechnet nicht neu."*
+>
+> **Was daraus folgt:**
+> - **R1 ist im Kern beantwortet.** Zu übernehmen ist nichts am Rechenweg —
+>   der ist schon unserer. Zu prüfen bleibt, ob das Paket im RND-Teil
+>   Verfahren oder Parameter kennt, die `rnd-calc.js` noch nicht hat.
+> - **R2 entfällt weitgehend.** Sachwert und Ertragswert über „dieses Modul"
+>   zu rechnen hieße, sie über unseren eigenen Rechner zu rechnen. Genau das
+>   passiert schon.
+> - **R4 hat damit ein festes Format.** Der Adapter erwartet einen Dump mit
+>   Top-Level `{state, r, nhkTyp, stuBeschreibungen, wortlaut}`. Das ist die
+>   Datei, die DealPilot erzeugen muss — kein neues Format erfinden, sondern
+>   **das bedienen, was Marcels Reporting schon liest.** Beispiel liegt bei:
+>   `data/example_report.json` (Löhner Str. 278 — unser Testobjekt).
+>
+> Zwei Vorlagen liegen im Paket: `verkehrswertgutachten_master.docx` (10 MB)
+> und `rnd_only_master.docx` (2,6 MB), dazu Logo und DESAG-Siegel. Der
+> Absender steht getrennt in `ReportConfig` — **Corporate-Daten gehören nie
+> in `objekt.*`**, das ist eine ausdrückliche Leitplanke des Pakets.
 
 | | Punkt | Was zu tun ist |
 |---|---|---|
-| **R1** | **Sichten, was übernehmbar ist** | Rechenweg, Parameter und Quellen der beiden Rechner gegen unseren Marktbericht halten. **Erst lesen, dann entscheiden** — nicht übernehmen, was wir schon haben, und nichts übernehmen, dessen Herkunft unklar ist. Ergebnis ist eine Liste: was ersetzt unseren Weg, was ergänzt ihn, was bleibt draußen. |
-| **R2** | **Sachwert und Ertragswert gegebenenfalls über dieses Modul rechnen** | Nur, wenn R1 das trägt. **Der Prüfmaßstab bleibt das Anwendungsbeispiel des amtlichen Dokuments** — ein zweiter Rechenweg, der andere Zahlen liefert, ist kein Fortschritt, sondern eine zweite Wahrheit (siehe `CLAUDE.md`, „Rechenkerne nie duplizieren"). Die Testobjekte Hüllhorst und Löhner Straße müssen unverändert durchlaufen. |
+| **R1** | ~~Sichten, was übernehmbar ist~~ — **erledigt 13.09.2026** | Siehe Kasten oben. Der Rechner ist unserer; das Paket ist der DOCX-Erzeuger dahinter. **Rest von R1:** einen Abgleich der RND-Verfahren — kennt `build_rnd_only_master.py` / `models.py` ein Verfahren oder einen Parameter, den `rnd-calc.js` nicht hat? |
+| **R2** | ~~Sachwert/Ertragswert über dieses Modul rechnen~~ — **hinfällig** | Das Modul rechnet nicht. Es liest unseren `calc-engine`. Ein zweiter Rechenweg wäre genau die zweite Wahrheit, vor der `CLAUDE.md` warnt („Rechenkerne nie duplizieren"). |
 | **R3** | **RND-Gutachten aus dem Sprechlauf anbieten** — Marcels Hauptwunsch | Am Ende des Sprechlaufs, wenn alle Angaben stehen: die Restnutzungsdauer rechnen, das Ergebnis zeigen und sagen, ob sich ein Gutachten lohnt. Dann „jetzt anfragen". **Automatisch rechnen, nicht fragen, ob gerechnet werden soll** — der Vorschlag kommt mit einer Zahl, nicht mit einer Frage. Passt an den vorhandenen Abschluss (`_rfAbschluss`, v1377-Nachfassrunde davor). |
-| **R4** | **Die Anfrage erzeugt eine Datei mit dem Gesamtobjekt** | Marcel liest sie in seinem RND-Programm ein. Format: wie der vorhandene Objekt-Export (`.dpk`), **erweitert um das, was der Sprechlauf ausgegeben hat** — die Werte samt Herkunft (`_rf.quelle`, seit v1311 im Objekt), die Scores und die RND-Rechnung. Ziel: Marcel kann den Fall ohne Rückfragen weiterbearbeiten. |
+| **R4** | **Die Anfrage erzeugt eine Datei mit dem Gesamtobjekt** | **Das Format ist nicht frei — es steht fest.** `calculator_adapter.from_calc_engine()` erwartet Top-Level `{state, r, nhkTyp, stuBeschreibungen, wortlaut}`; die RND-Verfahren liest es unter `r.sachwert.koerper[i].rnd` und aus `methods.*`. Also **kein eigenes Format erfinden, sondern genau diesen Dump erzeugen** — dann liest Marcels Reporting ihn ohne Anpassung. Dazu kommt, was der Sprechlauf beisteuert und das Reporting noch nicht kennt: die Herkunft je Feld (`_rf.quelle`, seit v1311 im Objekt) und die beiden Scores. Beides gehört in einen **eigenen Zweig**, nicht in `objekt.*` — das Paket trennt Corporate, Objekt und Gutachten strikt. Vorlage für den Aufbau: `data/example_report.json`. |
 | **R5** | **Zweiter Weg: Deal-Aktion → Netzwerk → Junker Immobilien** | Dieselbe Anfrage aus der Partnerkarte heraus. **Nachrangig** — Marcel: „überwiegend würde ich mir das jetzt erst mal im Sprechlauf wünschen." |
 
 **Zwei Dinge, die vor dem Bauen entschieden sein müssen:**
