@@ -130,22 +130,46 @@
   opacity: .7;
 }
 
-/* v1368d: lange Pfade liefen in die Detail-Spalte. `code` bricht nicht um,
-   also braucht die Spalte Platz und die Nachbarin Abstand. Gemessen am
-   Screenshot: /api/v1/subscription ueberlappte "probe: true". */
-#view-security .tbl td code,
-#view-security-fall .tbl td code {
+
+/* v1368e: die Tabellen nutzen jetzt `.data-table` — die Klasse, die es im
+   Admin WIRKLICH gibt (admin.css:146). Vorher stand hier `.tbl`, aus den
+   bestehenden Ansichten abgeschrieben, ohne zu pruefen, ob sie definiert
+   ist. Sie ist es nicht: die Zellen hatten den Browser-Standard von 1 px
+   Innenabstand, und die Tabelle war 710 statt 1.400 px breit.
+
+   Dieselbe Falle, die in CLAUDE.md fuer den Anker `#app` steht: eine
+   Regel, die nirgends greift und dabei voellig plausibel aussieht.
+
+   Hier bleibt nur, was `.data-table` NICHT schon regelt. */
+#view-security .data-table td code,
+#view-security-fall .data-table td code {
   display: inline-block;
-  padding-right: 14px;
   font-size: 11.5px;
   white-space: nowrap;
 }
-#view-security .tbl th,
-#view-security-fall .tbl th {
+#view-security .data-table th,
+#view-security-fall .data-table th {
   white-space: nowrap;
-  padding-right: 14px;
 }
-#view-security .tbl td:last-child,
-#view-security-fall .tbl td:last-child {
-  padding-left: 6px;
+/* Zahlenspalten rechtsbuendig — so liest man Groessenordnungen, ohne zu
+   vergleichen. Betrifft nur die verdichtete Konten-Tabelle. */
+#sec-konten .data-table td:nth-child(2),
+#sec-konten .data-table td:nth-child(3),
+#sec-konten .data-table th:nth-child(2),
+#sec-konten .data-table th:nth-child(3) {
+  text-align: right;
+  width: 1%;
+  white-space: nowrap;
+}
+/* Die Detail-Spalte traegt den laengsten Text und darf den Rest nicht
+   zusammendruecken. */
+#sec-body .data-table td:last-child {
+  width: 34%;
+  line-height: 1.45;
+}
+#sec-body .data-table td:nth-child(1),
+#sec-body .data-table td:nth-child(3),
+#sec-body .data-table td:nth-child(4) {
+  white-space: nowrap;
+  width: 1%;
 }

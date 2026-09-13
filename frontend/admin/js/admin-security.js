@@ -116,7 +116,7 @@
 
     el.innerHTML =
       '<h3 class="sec-h3">Wem ist etwas aufgefallen</h3>'
-      + '<table class="tbl"><thead><tr>'
+      + '<table class="data-table"><thead><tr>'
       + '<th>Konto</th><th>Ereignisse</th><th>versch. Pfade</th>'
       + '<th>höchste Stufe</th><th>zuletzt</th><th></th>'
       + '</tr></thead><tbody>'
@@ -147,7 +147,7 @@
     }
     el.innerHTML =
       '<h3 class="sec-h3">Chronik</h3>'
-      + '<table class="tbl"><thead><tr>'
+      + '<table class="data-table"><thead><tr>'
       + '<th>Zeit</th><th>Wer</th><th>Art</th><th>Stufe</th><th>Pfad</th><th>Detail</th>'
       + '</tr></thead><tbody>'
       + events.map((e) => {
@@ -205,7 +205,7 @@
         + '<p class="sec-mess-hinweis">' + esc(v.hinweis || '') + '</p>';
 
       const chronik = (a.chronik || []).length
-        ? '<table class="tbl"><thead><tr><th>Zeit</th><th>Art</th><th>Stufe</th>'
+        ? '<table class="data-table"><thead><tr><th>Zeit</th><th>Art</th><th>Stufe</th>'
           + '<th>Pfad</th><th>Detail</th></tr></thead><tbody>'
           + a.chronik.map((e) => {
               const d = e.detail && typeof e.detail === 'object'
