@@ -147,6 +147,12 @@ const FELDBRUECKE = {
   brw: ['brw_eur_qm', 'brw_sqm', 'brw'],
   rnd: ['rnd_jahre', 'restnutzungsdauer_jahre', 'rnd'],
   bgf: ['bgf_qm', 'bgf_direkt', 'bgf'],
+  /* v1103-WWFL - Havelland staffelt seine Sachwertfaktoren im Berliner
+     Umland nach Grundstuecks- UND WOHNflaeche. Die Wohnflaeche stand in
+     keiner Bruecke; das Modell haette 'achse_y_fehlt' gemeldet, obwohl
+     die Zahl im Formular seit jeher erhoben wird. */
+  wohnflaeche: ['wohnflaeche_qm', 'wohnflaeche', 'living_area', 'wfl'],
+
   baujahr: ['baujahr', 'build_year'],
   flaeche: ['grundstuecksflaeche_qm', 'flaeche_qm', 'gsfl', 'flaeche'],
   baugrundstuecksflaeche: ['baugrundstuecksflaeche_qm',

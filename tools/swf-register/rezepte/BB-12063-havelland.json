@@ -1,0 +1,151 @@
+{
+  "land_code": "BB",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Havelland",
+  "gaa_kennz": "12063",
+  "ags": ["12063"],
+  "ebene": "kreis",
+  "berichtsjahr": 2025,
+  "stichtag": "2025-07-01",
+  "auswertezeitraum": "01.01.2024 bis 31.12.2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06-25",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_HVL.pdf",
+  "quelle_datei": "BB-havelland-gmb-2025.pdf",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, S. 60 ff. Regionsdefinition S. 11 (R2/R4/R5). Verwaltungsgliederung S. 12.",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser (auch Villen, Land-, Bauern- und Siedlungshäuser)",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "region",
+        "achse_k_bez": "landesplanerischer Raum im Landkreis Havelland",
+        "kategorien": ["berliner_umland", "weiterer_metropolenraum"],
+        "zuordnung_feld": "ort",
+        "kategorie_zuordnung": {
+          "hinweis": "Die Regionen sind landeseinheitlich vorgegeben und im Bericht auf S. 11 ausgeschrieben: R2 Berliner Umland ohne Potsdam (Falkensee, Brieselang, Dallgow-Döberitz, Schönwalde-Glien, Wustermark), R4 und R5 zusammen als weiterer Metropolenraum. Die amtsangehörigen Gemeinden der Ämter Friesack, Nennhausen und Rhinow sind ergänzt, weil der Bericht nur die Amtsnamen führt und eine Adresse in Paulinenaue sonst unauffindbar bliebe.",
+          "berliner_umland": ["Falkensee", "Falkenhagen", "Seegefeld", "Finkenkrug",
+                              "Brieselang", "Bredow", "Zeestow",
+                              "Dallgow-Döberitz", "Seeburg", "Rohrbeck",
+                              "Schönwalde-Glien", "Schönwalde-Dorf", "Schönwalde-Siedlung",
+                              "Paaren im Glien", "Perwenitz", "Pausin", "Wansdorf", "Grünefeld",
+                              "Wustermark", "Elstal", "Buchow-Karpzow", "Hoppenrade",
+                              "Priort", "Wernitz"],
+          "weiterer_metropolenraum": ["Nauen", "Rathenow", "Premnitz", "Ketzin", "Ketzin/Havel",
+                                      "Milower Land", "Milow",
+                                      "Friesack", "Mühlenberge", "Paulinenaue", "Pessin",
+                                      "Retzow", "Wiesenaue",
+                                      "Nennhausen", "Kotzen", "Märkisch Luch", "Stechow-Ferchesar",
+                                      "Rhinow", "Gollenberg", "Großderschau", "Havelaue",
+                                      "Kleßen-Görne", "Seeblick"]
+        },
+        "modell_je_kategorie": {
+          "berliner_umland": {
+            "form": "matrix_interp",
+            "achse_y_feld": "flaeche",
+            "achse_y_bez": "Grundstücksfläche in m²",
+            "achse_y": [400, 600, 800, 1000, 1200, 1400, 1600],
+            "achse_x_feld": "wohnflaeche",
+            "achse_x_bez": "Wohnfläche in m²",
+            "achse_x": [50, 75, 100, 125, 150, 175, 200, 250],
+            "zellen": {
+              "400":  [0.98, 1.01, 1.03, 1.05, 1.06, 1.08, 1.09, 1.10],
+              "600":  [0.90, 0.93, 0.95, 0.97, 0.98, 0.99, 1.01, 1.02],
+              "800":  [0.84, 0.87, 0.89, 0.91, 0.92, 0.94, 0.95, 0.96],
+              "1000": [0.80, 0.83, 0.85, 0.86, 0.88, 0.89, 0.90, 0.91],
+              "1200": [0.76, 0.79, 0.81, 0.83, 0.84, 0.85, 0.86, 0.87],
+              "1400": [0.73, 0.76, 0.78, 0.79, 0.81, 0.82, 0.83, 0.84],
+              "1600": [0.71, 0.73, 0.75, 0.77, 0.78, 0.79, 0.80, 0.81]
+            },
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "330 Kauffälle (307 Einfamilien-, 23 Zweifamilienhäuser), davon 157 in Falkensee. Bezugsobjekt: Baujahr 2000. Multiples Bestimmtheitsmaß R² = 0,24 — der Bericht sagt dazu ausdrücklich, eine entscheidende Abhängigkeit der Sachwertfaktoren von den Einflussgrößen sei nicht zu erkennen. Sachwertfaktor der Stichprobe: Mittel 0,93, Median 0,91, Spanne 0,60 bis 1,32.",
+            "korrekturen": [
+              {
+                "bez": "Abweichendes Baujahr",
+                "feld": "baujahr",
+                "art": "stufen",
+                "wirkung": "multiplikativ",
+                "stufen": { "1900": 1.16, "1920": 1.13, "1940": 1.10, "1960": 1.06,
+                            "1980": 1.03, "2000": 1.00, "2020": 0.97 },
+                "rundung_stellen": 3,
+                "hinweis": "Bezugsbaujahr des Berliner Umlands ist 2000. Der Bericht erlaubt lineare Interpolation zwischen den Tabellenwerten."
+              }
+            ]
+          },
+          "weiterer_metropolenraum": {
+            "form": "matrix_interp",
+            "achse_y_feld": "flaeche",
+            "achse_y_bez": "Grundstücksfläche in m²",
+            "achse_y": [250, 500, 750, 1000, 1250, 1500, 2000, 2500],
+            "achse_x_feld": "bgf",
+            "achse_x_bez": "Bruttogrundfläche in m²",
+            "achse_x": [100, 150, 200, 250, 300, 350, 400, 500, 600],
+            "zellen": {
+              "250":  [0.96, 0.90, 0.86, 0.83, 0.80, 0.78, 0.76, 0.73, 0.71],
+              "500":  [1.00, 0.94, 0.90, 0.86, 0.83, 0.81, 0.79, 0.76, 0.73],
+              "750":  [1.03, 0.96, 0.92, 0.88, 0.86, 0.83, 0.81, 0.78, 0.75],
+              "1000": [1.05, 0.98, 0.94, 0.90, 0.87, 0.85, 0.83, 0.79, 0.77],
+              "1250": [1.06, 1.00, 0.95, 0.92, 0.89, 0.86, 0.84, 0.81, 0.78],
+              "1500": [1.08, 1.01, 0.96, 0.93, 0.90, 0.87, 0.85, 0.82, 0.79],
+              "2000": [1.10, 1.03, 0.99, 0.95, 0.92, 0.89, 0.87, 0.83, 0.80],
+              "2500": [1.12, 1.05, 1.00, 0.96, 0.93, 0.91, 0.88, 0.85, 0.82]
+            },
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "252 Kauffälle (240 Einfamilien-, 12 Zweifamilienhäuser). Bezugsobjekt: Baujahr 1960. Multiples Bestimmtheitsmaß R² = 0,16. Sachwertfaktor der Stichprobe: Mittel 0,94, Median 0,91, Spanne 0,61 bis 1,61. ANDERE ACHSE ALS IM BERLINER UMLAND: hier Bruttogrundfläche, dort Wohnfläche.",
+            "korrekturen": [
+              {
+                "bez": "Abweichendes Baujahr",
+                "feld": "baujahr",
+                "art": "stufen",
+                "wirkung": "multiplikativ",
+                "stufen": { "1900": 1.08, "1920": 1.05, "1940": 1.03, "1960": 1.00,
+                            "1980": 0.97, "2000": 0.95, "2020": 0.92 },
+                "rundung_stellen": 3,
+                "hinweis": "Bezugsbaujahr des weiteren Metropolenraums ist 1960 — nicht 2000 wie im Berliner Umland. Wer die Tabelle des einen Raums mit der Baujahrskorrektur des anderen kombiniert, rechnet doppelt daneben."
+              }
+            ]
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "ZWEI REGIONEN MIT VERSCHIEDENEN ACHSEN. Das Berliner Umland staffelt nach Grundstücks- und WOHNfläche mit Bezugsbaujahr 2000, der weitere Metropolenraum nach Grundstücksfläche und BRUTTOGRUNDFLÄCHE mit Bezugsbaujahr 1960. Auch die Baujahrskorrekturen unterscheiden sich (1,16 bis 0,97 gegen 1,08 bis 0,92). Deshalb trägt hier jede Region ein eigenes, vollständiges Modell.",
+        "normobjekt": "Ermittlung nach ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW). Stichtag 01.07.2025. Weiterverkäufe freistehender Ein- und Zweifamilienhäuser, keine Erstverkäufe mit schlüsselfertiger Errichtung durch den Verkäufer, keine vermieteten Objekte."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV, Brandenburgische Gutachterausschussverordnung (BbgGAV), Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW), Erfassungsrichtlinie (KPSErf-RL)",
+        "berechnungsmodell": "Sachwertfaktor aus normiertem Kaufpreis und vorläufigem Sachwert, Einflüsse besonderer objektspezifischer Grundstücksmerkmale eliminiert",
+        "ermittlung": "multiple Regressionsanalysen je Region, Ausreißerbereinigung mit mathematisch-statistischen Methoden",
+        "kauffaelle_gesamt": 608,
+        "besonderheit": "Keine Innenbesichtigung der Objekte. Gebäude mit Teilen verschiedener Gebäudetypen oder Standardstufen werden im Gebäudemix gerechnet; Gesamt- und Restnutzungsdauer richten sich nach dem größten Gebäudeteil."
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Havelland, zwei landesplanerische Räume",
+        "sachlich": "Weiterverkäufe freistehender Ein- und Zweifamilienhäuser zur Eigennutzung",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwertfaktor_umland": { "min": 0.6, "max": 1.32, "mittel": 0.93 },
+          "sachwertfaktor_metropolenraum": { "min": 0.61, "max": 1.61, "mittel": 0.94 }
+        },
+        "vorbehalt": "DER BERICHT WIDERSPRICHT SEINER EIGENEN TABELLE HALB: Bei R² = 0,24 (Umland) und R² = 0,16 (Metropolenraum) sei „eine entscheidende Abhängigkeit der Sachwertfaktoren von den Einflussgrößen nicht zu erkennen\". Die Tabellen stehen trotzdem da, weil der Anwender eine Marktanpassung braucht — aber sie sind eine Orientierung, keine Ableitung. Die Stichprobenspanne reicht im Metropolenraum von 0,61 bis 1,61.\n\nDIE MODELLKONFORMITÄT IST AUSDRÜCKLICH EINGEFORDERT: Sachwertfaktoren dürfen nur auf Merkmalsausprägungen angewandt werden, die ihrer Ermittlungsgrundlage hinreichend entsprechen; alles andere gehört als besonderes objektspezifisches Grundstücksmerkmal NACH die Marktanpassung.\n\nNICHT ÜBERNOMMEN: die Anpassungsfaktoren für ein abweichendes VERTRAGSDATUM im weiteren Metropolenraum (1,08 am 01.01.2024 bis 0,97 am 31.12.2025). Sie beziehen sich auf den Kaufzeitpunkt innerhalb des Auswertezeitraums, nicht auf den Wertermittlungsstichtag; wer sie ohne diesen Bezug anwendet, verschiebt den Faktor um bis zu elf Prozent in die falsche Richtung.",
+        "hinweis": "Der Bericht führt zusätzlich Sachwertfaktoren für Doppelhaushälften und Reihenhäuser (Kap. 8.3.2) sowie einen eigenen Auswerteraum „Westliches Havelland\" (Rathenow, Premnitz, Ämter Rhinow, Nennhausen, Friesack, Gemeinde Milower Land) — beides hier noch nicht erfasst."
+      },
+
+      "stufe": "B",
+      "stufe_grund": "Amtliche Tabellen mit Modellbeschreibung und Stichprobenangaben, aus 608 Kauffällen zweier Jahre. Stufe B statt A, weil kein Anwendungsbeispiel vorliegt und der Bericht die statistische Aussagekraft selbst einschränkt (R² = 0,24 und 0,16).",
+      "fallzahl": 582,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht Landkreis Havelland 2025, Kap. 8.2.2, S. 62 und S. 64: zwei Sachwertfaktor-Tabellen (Berliner Umland 7 mal 8 Zellen aus 330 bereinigten Kauffällen, weiterer Metropolenraum 8 mal 9 Zellen aus 252 bereinigten Kauffällen) nebst Anpassungsfaktoren für abweichendes Baujahr."
+    }
+  ]
+}

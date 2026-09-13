@@ -180,9 +180,7 @@
   "kennzahl": "sachwertfaktor",
   "zweig": "ezfh",
   "formel": {
-   "form": "potenz_kategorial",
-   "achse_feld": "sachwert",
-   "achse_bez": "vorläufiger Sachwert in Euro",
+   "form": "verzweigt",
    "achse_k_feld": "region",
    "achse_k_bez": "Region des Landkreises Barnim",
    "kategorien": [
@@ -287,42 +285,49 @@
      "Parstein"
     ]
    },
-   "funktion_je_kategorie": {
+   "modell_je_kategorie": {
     "berlinangrenzend": {
+     "form": "potenz",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
      "a": 566.13,
      "b": -0.485,
      "gueltig_von": 300000,
      "gueltig_bis": 725000,
-     "fallzahl": 39,
-     "min": 0.7,
-     "max": 1.3
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "39 Kauffälle, Stichprobenspanne des Sachwertfaktors 0,7 bis 1,3, Korrelationskoeffizient -0,5."
     },
     "suedbarnim": {
+     "form": "potenz",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
      "a": 7.2134,
      "b": -0.151,
      "gueltig_von": 150000,
      "gueltig_bis": 700000,
-     "fallzahl": 59,
-     "min": 0.7,
-     "max": 1.4
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "59 Kauffälle, Stichprobenspanne 0,7 bis 1,4, Korrelationskoeffizient -0,3."
     },
     "mittelbarnim": {
+     "form": "potenz",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
      "a": 7.5625,
      "b": -0.158,
      "gueltig_von": 175000,
      "gueltig_bis": 700000,
-     "fallzahl": 36,
-     "min": 0.8,
-     "max": 1.4
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "36 Kauffälle, Stichprobenspanne 0,8 bis 1,4, Korrelationskoeffizient -0,4."
     },
     "nordbarnim": {
-     "a": 0.96,
-     "b": 0,
-     "gueltig_von": 150000,
-     "gueltig_bis": 450000,
-     "fallzahl": 14,
-     "min": 0.5,
-     "max": 1.3
+     "form": "konstante",
+     "wert": 0.96,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "14 Kauffälle, Stichprobenspanne 0,5 bis 1,3, Korrelationskoeffizient -0,2 OHNE SIGNIFIKANZ. Der Bericht druckt für Nordbarnim nur einen einzigen Tabellenwert ab (0,96 bei rund 275.000 Euro), und er ist zugleich der Mittelwert aus Abbildung 87. Deshalb steht hier eine Konstante und keine Funktion."
     }
    },
    "rundung_stellen": 2,
@@ -383,6 +388,676 @@
   "verwendung": "produkt",
   "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
   "fundstelle": "Kap. 8.2.2, Abbildungen 87 bis 91, S. 77 ff. Modellbeschreibung Anhang 13.5, S. 160. Gemeindegliederung Anhang 13.4, S. 158 f."
+ },
+ {
+  "land_code": "BB",
+  "ags": "12062",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Elbe-Elster",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Elbe-Elster",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "verzweigt",
+   "achse_k_feld": "lagetyp",
+   "achse_k_bez": "räumlicher Anwendungsbereich",
+   "kategorien": [
+    "stadtlage",
+    "laendliches_gebiet"
+   ],
+   "zuordnung_feld": "ort",
+   "kategorie_sonst": "laendliches_gebiet",
+   "kategorie_zuordnung": {
+    "hinweis": "Der Bericht bestimmt die Stadtlagen abschließend über die Gemarkungen der sechs größten Städte und schreibt für die ländlichen Gebiete, sie erstreckten sich über ALLE Dörfer und die fünf übrigen Kleinstädte. Deshalb steht hier eine Restkategorie: was in Elbe-Elster keine Stadtlage ist, ist ländliches Gebiet — das ist die Aussage des Berichts.",
+    "stadtlage": [
+     "Finsterwalde",
+     "Herzberg",
+     "Herzberg (Elster)",
+     "Elsterwerda",
+     "Bad Liebenwerda",
+     "Falkenberg",
+     "Falkenberg/Elster",
+     "Doberlug-Kirchhain"
+    ],
+    "laendliches_gebiet": [
+     "Mühlberg",
+     "Mühlberg/Elbe",
+     "Uebigau-Wahrenbrück",
+     "Schlieben",
+     "Schönewalde",
+     "Sonnewalde",
+     "Crinitz",
+     "Massen-Niederlausitz",
+     "Rückersdorf",
+     "Sallgast",
+     "Tröbitz",
+     "Lichterfeld-Schacksdorf",
+     "Heideland",
+     "Hohenleipisch",
+     "Plessa",
+     "Schraden",
+     "Röderland",
+     "Gröden",
+     "Merzdorf",
+     "Fichtwald",
+     "Kremitzaue",
+     "Lebusa",
+     "Hohenbucko",
+     "Gorden-Staupitz"
+    ]
+   },
+   "modell_je_kategorie": {
+    "stadtlage": {
+     "form": "konstante",
+     "wert": 1.0,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "68 Kauffälle nach Ausreißerbereinigung, Stichprobenspanne des Sachwertfaktors 0,62 bis 1,38. Bodenrichtwert 9 bis 55 €/m², Restnutzungsdauer 10 bis 78 Jahre, Baujahre 1880 bis 2022, Standardstufe 1,3 bis 3,6."
+    },
+    "laendliches_gebiet": {
+     "form": "konstante",
+     "wert": 0.92,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "90 Kauffälle nach Ausreißerbereinigung, Stichprobenspanne 0,63 bis 1,25. Bodenrichtwert 3 bis 26 €/m², Restnutzungsdauer 7 bis 76 Jahre, Baujahre 1800 bis 2021, Standardstufe 1,3 bis 3,9."
+    }
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "KONSTANTEN, UND DAS MIT ANSAGE. Der Bericht schreibt: „Abhängigkeiten des Sachwertfaktors von vielfältigen Modellparametern konnten nicht ermittelt werden. Die Analyse unterschiedlicher Einflussgrößen, wie beispielsweise Baujahr, Modernisierungsgrad oder Wohnfläche, ergab keine Wechselbeziehung zum ermittelten Sachwertfaktor.\" Es gibt hier also keine Kurve, die zu übernehmen wäre — nur zwei Mittelwerte und ihre Spannen. Für den gesamten Landkreis nennt der Bericht 0,95; dieser Wert steht hier NICHT, weil die räumliche Differenzierung die genauere Aussage ist und beide Lagetypen abgedeckt sind.",
+   "normobjekt": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert nach ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) vom 03.05.2023. Ausreißer über der 2,5fachen Standardabweichung eliminiert."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV in Verbindung mit der Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
+   "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
+   "ermittlung": "arithmetischer Mittelwert je Stichprobe, Ausreißer über 2,5facher Standardabweichung separat je Stichprobe eliminiert",
+   "kauffaelle_gesamt": 154,
+   "hinweis": "Die Modellansätze nach § 12 Abs. 6 ImmoWertV stehen in Anlage 1 des Berichts."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Elbe-Elster, unterschieden nach Stadtlage und ländlichem Gebiet",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "brw_stadt": {
+     "min": 9,
+     "max": 55,
+     "mittel": 27
+    },
+    "brw_land": {
+     "min": 3,
+     "max": 26,
+     "mittel": 14
+    },
+    "rnd_jahre": {
+     "min": 7,
+     "max": 78
+    },
+    "baujahr": {
+     "min": 1800,
+     "max": 2022
+    },
+    "wohnflaeche_qm": {
+     "min": 50,
+     "max": 377
+    },
+    "bgf_qm": {
+     "min": 74,
+     "max": 846
+    },
+    "kaufpreis_eur": {
+     "min": 30000,
+     "max": 465000
+    }
+   },
+   "vorbehalt": "EIN MITTELWERT IST KEINE KURVE. Die Stichprobenspanne reicht in der Stadtlage von 0,62 bis 1,38 — der Mittelwert 1,00 liegt in ihrer Mitte, sagt aber über den Einzelfall wenig. Der Bericht hat ausdrücklich KEINE Abhängigkeit von Baujahr, Modernisierungsgrad oder Wohnfläche gefunden; wer einen dieser Einflüsse selbst hineinrechnet, verlässt das Modell.\n\nDER BODENRICHTWERTBEREICH IST SEHR NIEDRIG: 3 bis 55 €/m². Elbe-Elster ist der Landkreis mit den niedrigsten Bodenwerten dieses Registers. Für ein Objekt mit deutlich höherem Bodenrichtwert gibt es hier keine Stichprobe.\n\nDIE DATENBASIS UMFASST DREI JAHRGÄNGE (2023 bis 2025) und ist mit den Vorjahreswerten NICHT vergleichbar, weil die Modellansätze der VV EW-SW 2023 gewechselt haben. Der Bericht sagt das selbst.",
+   "hinweis": "Der Bericht nennt zusätzlich einen Sachwertfaktor für den gesamten Landkreis (0,95 aus 154 Kauffällen, Spanne 0,62 bis 1,31). Reihenhäuser und Doppelhaushälften stehen unter 8.3 — hier noch nicht erfasst."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 Landkreis Elbe-Elster, Kap. 8.2.2, S. 55 ff.: Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser aus 154 ausreißerbereinigten Kauffällen der Jahre 2023 bis 2025, differenziert nach Stadtlage (68 Fälle, 1,00) und ländlichem Gebiet (90 Fälle, 0,92)."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtliche Mittelwerte mit vollständiger Stichprobenbeschreibung. Stufe C, weil der Faktor eine Konstante ohne jede Abhängigkeit ist und die Stichprobenspannen (0,62 bis 1,38) sehr weit sind.",
+  "fallzahl": 158,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_EE.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, S. 55 ff. Abgrenzung Stadtlage/ländliches Gebiet S. 20. Modellansätze in Anlage 1."
+ },
+ {
+  "land_code": "BB",
+  "ags": "12063",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Havelland",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Havelland",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "verzweigt",
+   "achse_k_feld": "region",
+   "achse_k_bez": "landesplanerischer Raum im Landkreis Havelland",
+   "kategorien": [
+    "berliner_umland",
+    "weiterer_metropolenraum"
+   ],
+   "zuordnung_feld": "ort",
+   "kategorie_zuordnung": {
+    "hinweis": "Die Regionen sind landeseinheitlich vorgegeben und im Bericht auf S. 11 ausgeschrieben: R2 Berliner Umland ohne Potsdam (Falkensee, Brieselang, Dallgow-Döberitz, Schönwalde-Glien, Wustermark), R4 und R5 zusammen als weiterer Metropolenraum. Die amtsangehörigen Gemeinden der Ämter Friesack, Nennhausen und Rhinow sind ergänzt, weil der Bericht nur die Amtsnamen führt und eine Adresse in Paulinenaue sonst unauffindbar bliebe.",
+    "berliner_umland": [
+     "Falkensee",
+     "Falkenhagen",
+     "Seegefeld",
+     "Finkenkrug",
+     "Brieselang",
+     "Bredow",
+     "Zeestow",
+     "Dallgow-Döberitz",
+     "Seeburg",
+     "Rohrbeck",
+     "Schönwalde-Glien",
+     "Schönwalde-Dorf",
+     "Schönwalde-Siedlung",
+     "Paaren im Glien",
+     "Perwenitz",
+     "Pausin",
+     "Wansdorf",
+     "Grünefeld",
+     "Wustermark",
+     "Elstal",
+     "Buchow-Karpzow",
+     "Hoppenrade",
+     "Priort",
+     "Wernitz"
+    ],
+    "weiterer_metropolenraum": [
+     "Nauen",
+     "Rathenow",
+     "Premnitz",
+     "Ketzin",
+     "Ketzin/Havel",
+     "Milower Land",
+     "Milow",
+     "Friesack",
+     "Mühlenberge",
+     "Paulinenaue",
+     "Pessin",
+     "Retzow",
+     "Wiesenaue",
+     "Nennhausen",
+     "Kotzen",
+     "Märkisch Luch",
+     "Stechow-Ferchesar",
+     "Rhinow",
+     "Gollenberg",
+     "Großderschau",
+     "Havelaue",
+     "Kleßen-Görne",
+     "Seeblick"
+    ]
+   },
+   "modell_je_kategorie": {
+    "berliner_umland": {
+     "form": "matrix_interp",
+     "achse_y_feld": "flaeche",
+     "achse_y_bez": "Grundstücksfläche in m²",
+     "achse_y": [
+      400,
+      600,
+      800,
+      1000,
+      1200,
+      1400,
+      1600
+     ],
+     "achse_x_feld": "wohnflaeche",
+     "achse_x_bez": "Wohnfläche in m²",
+     "achse_x": [
+      50,
+      75,
+      100,
+      125,
+      150,
+      175,
+      200,
+      250
+     ],
+     "zellen": {
+      "400": [
+       0.98,
+       1.01,
+       1.03,
+       1.05,
+       1.06,
+       1.08,
+       1.09,
+       1.1
+      ],
+      "600": [
+       0.9,
+       0.93,
+       0.95,
+       0.97,
+       0.98,
+       0.99,
+       1.01,
+       1.02
+      ],
+      "800": [
+       0.84,
+       0.87,
+       0.89,
+       0.91,
+       0.92,
+       0.94,
+       0.95,
+       0.96
+      ],
+      "1000": [
+       0.8,
+       0.83,
+       0.85,
+       0.86,
+       0.88,
+       0.89,
+       0.9,
+       0.91
+      ],
+      "1200": [
+       0.76,
+       0.79,
+       0.81,
+       0.83,
+       0.84,
+       0.85,
+       0.86,
+       0.87
+      ],
+      "1400": [
+       0.73,
+       0.76,
+       0.78,
+       0.79,
+       0.81,
+       0.82,
+       0.83,
+       0.84
+      ],
+      "1600": [
+       0.71,
+       0.73,
+       0.75,
+       0.77,
+       0.78,
+       0.79,
+       0.8,
+       0.81
+      ]
+     },
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "330 Kauffälle (307 Einfamilien-, 23 Zweifamilienhäuser), davon 157 in Falkensee. Bezugsobjekt: Baujahr 2000. Multiples Bestimmtheitsmaß R² = 0,24 — der Bericht sagt dazu ausdrücklich, eine entscheidende Abhängigkeit der Sachwertfaktoren von den Einflussgrößen sei nicht zu erkennen. Sachwertfaktor der Stichprobe: Mittel 0,93, Median 0,91, Spanne 0,60 bis 1,32.",
+     "korrekturen": [
+      {
+       "bez": "Abweichendes Baujahr",
+       "feld": "baujahr",
+       "art": "stufen",
+       "wirkung": "multiplikativ",
+       "stufen": {
+        "1900": 1.16,
+        "1920": 1.13,
+        "1940": 1.1,
+        "1960": 1.06,
+        "1980": 1.03,
+        "2000": 1.0,
+        "2020": 0.97
+       },
+       "rundung_stellen": 3,
+       "hinweis": "Bezugsbaujahr des Berliner Umlands ist 2000. Der Bericht erlaubt lineare Interpolation zwischen den Tabellenwerten."
+      }
+     ]
+    },
+    "weiterer_metropolenraum": {
+     "form": "matrix_interp",
+     "achse_y_feld": "flaeche",
+     "achse_y_bez": "Grundstücksfläche in m²",
+     "achse_y": [
+      250,
+      500,
+      750,
+      1000,
+      1250,
+      1500,
+      2000,
+      2500
+     ],
+     "achse_x_feld": "bgf",
+     "achse_x_bez": "Bruttogrundfläche in m²",
+     "achse_x": [
+      100,
+      150,
+      200,
+      250,
+      300,
+      350,
+      400,
+      500,
+      600
+     ],
+     "zellen": {
+      "250": [
+       0.96,
+       0.9,
+       0.86,
+       0.83,
+       0.8,
+       0.78,
+       0.76,
+       0.73,
+       0.71
+      ],
+      "500": [
+       1.0,
+       0.94,
+       0.9,
+       0.86,
+       0.83,
+       0.81,
+       0.79,
+       0.76,
+       0.73
+      ],
+      "750": [
+       1.03,
+       0.96,
+       0.92,
+       0.88,
+       0.86,
+       0.83,
+       0.81,
+       0.78,
+       0.75
+      ],
+      "1000": [
+       1.05,
+       0.98,
+       0.94,
+       0.9,
+       0.87,
+       0.85,
+       0.83,
+       0.79,
+       0.77
+      ],
+      "1250": [
+       1.06,
+       1.0,
+       0.95,
+       0.92,
+       0.89,
+       0.86,
+       0.84,
+       0.81,
+       0.78
+      ],
+      "1500": [
+       1.08,
+       1.01,
+       0.96,
+       0.93,
+       0.9,
+       0.87,
+       0.85,
+       0.82,
+       0.79
+      ],
+      "2000": [
+       1.1,
+       1.03,
+       0.99,
+       0.95,
+       0.92,
+       0.89,
+       0.87,
+       0.83,
+       0.8
+      ],
+      "2500": [
+       1.12,
+       1.05,
+       1.0,
+       0.96,
+       0.93,
+       0.91,
+       0.88,
+       0.85,
+       0.82
+      ]
+     },
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "252 Kauffälle (240 Einfamilien-, 12 Zweifamilienhäuser). Bezugsobjekt: Baujahr 1960. Multiples Bestimmtheitsmaß R² = 0,16. Sachwertfaktor der Stichprobe: Mittel 0,94, Median 0,91, Spanne 0,61 bis 1,61. ANDERE ACHSE ALS IM BERLINER UMLAND: hier Bruttogrundfläche, dort Wohnfläche.",
+     "korrekturen": [
+      {
+       "bez": "Abweichendes Baujahr",
+       "feld": "baujahr",
+       "art": "stufen",
+       "wirkung": "multiplikativ",
+       "stufen": {
+        "1900": 1.08,
+        "1920": 1.05,
+        "1940": 1.03,
+        "1960": 1.0,
+        "1980": 0.97,
+        "2000": 0.95,
+        "2020": 0.92
+       },
+       "rundung_stellen": 3,
+       "hinweis": "Bezugsbaujahr des weiteren Metropolenraums ist 1960 — nicht 2000 wie im Berliner Umland. Wer die Tabelle des einen Raums mit der Baujahrskorrektur des anderen kombiniert, rechnet doppelt daneben."
+      }
+     ]
+    }
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "ZWEI REGIONEN MIT VERSCHIEDENEN ACHSEN. Das Berliner Umland staffelt nach Grundstücks- und WOHNfläche mit Bezugsbaujahr 2000, der weitere Metropolenraum nach Grundstücksfläche und BRUTTOGRUNDFLÄCHE mit Bezugsbaujahr 1960. Auch die Baujahrskorrekturen unterscheiden sich (1,16 bis 0,97 gegen 1,08 bis 0,92). Deshalb trägt hier jede Region ein eigenes, vollständiges Modell.",
+   "normobjekt": "Ermittlung nach ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW). Stichtag 01.07.2025. Weiterverkäufe freistehender Ein- und Zweifamilienhäuser, keine Erstverkäufe mit schlüsselfertiger Errichtung durch den Verkäufer, keine vermieteten Objekte."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV, Brandenburgische Gutachterausschussverordnung (BbgGAV), Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW), Erfassungsrichtlinie (KPSErf-RL)",
+   "berechnungsmodell": "Sachwertfaktor aus normiertem Kaufpreis und vorläufigem Sachwert, Einflüsse besonderer objektspezifischer Grundstücksmerkmale eliminiert",
+   "ermittlung": "multiple Regressionsanalysen je Region, Ausreißerbereinigung mit mathematisch-statistischen Methoden",
+   "kauffaelle_gesamt": 608,
+   "besonderheit": "Keine Innenbesichtigung der Objekte. Gebäude mit Teilen verschiedener Gebäudetypen oder Standardstufen werden im Gebäudemix gerechnet; Gesamt- und Restnutzungsdauer richten sich nach dem größten Gebäudeteil."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Havelland, zwei landesplanerische Räume",
+   "sachlich": "Weiterverkäufe freistehender Ein- und Zweifamilienhäuser zur Eigennutzung",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwertfaktor_umland": {
+     "min": 0.6,
+     "max": 1.32,
+     "mittel": 0.93
+    },
+    "sachwertfaktor_metropolenraum": {
+     "min": 0.61,
+     "max": 1.61,
+     "mittel": 0.94
+    }
+   },
+   "vorbehalt": "DER BERICHT WIDERSPRICHT SEINER EIGENEN TABELLE HALB: Bei R² = 0,24 (Umland) und R² = 0,16 (Metropolenraum) sei „eine entscheidende Abhängigkeit der Sachwertfaktoren von den Einflussgrößen nicht zu erkennen\". Die Tabellen stehen trotzdem da, weil der Anwender eine Marktanpassung braucht — aber sie sind eine Orientierung, keine Ableitung. Die Stichprobenspanne reicht im Metropolenraum von 0,61 bis 1,61.\n\nDIE MODELLKONFORMITÄT IST AUSDRÜCKLICH EINGEFORDERT: Sachwertfaktoren dürfen nur auf Merkmalsausprägungen angewandt werden, die ihrer Ermittlungsgrundlage hinreichend entsprechen; alles andere gehört als besonderes objektspezifisches Grundstücksmerkmal NACH die Marktanpassung.\n\nNICHT ÜBERNOMMEN: die Anpassungsfaktoren für ein abweichendes VERTRAGSDATUM im weiteren Metropolenraum (1,08 am 01.01.2024 bis 0,97 am 31.12.2025). Sie beziehen sich auf den Kaufzeitpunkt innerhalb des Auswertezeitraums, nicht auf den Wertermittlungsstichtag; wer sie ohne diesen Bezug anwendet, verschiebt den Faktor um bis zu elf Prozent in die falsche Richtung.",
+   "hinweis": "Der Bericht führt zusätzlich Sachwertfaktoren für Doppelhaushälften und Reihenhäuser (Kap. 8.3.2) sowie einen eigenen Auswerteraum „Westliches Havelland\" (Rathenow, Premnitz, Ämter Rhinow, Nennhausen, Friesack, Gemeinde Milower Land) — beides hier noch nicht erfasst."
+  },
+  "belege": [
+   "Grundstücksmarktbericht Landkreis Havelland 2025, Kap. 8.2.2, S. 62 und S. 64: zwei Sachwertfaktor-Tabellen (Berliner Umland 7 mal 8 Zellen aus 330 bereinigten Kauffällen, weiterer Metropolenraum 8 mal 9 Zellen aus 252 bereinigten Kauffällen) nebst Anpassungsfaktoren für abweichendes Baujahr."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtliche Tabellen mit Modellbeschreibung und Stichprobenangaben, aus 608 Kauffällen zweier Jahre. Stufe B statt A, weil kein Anwendungsbeispiel vorliegt und der Bericht die statistische Aussagekraft selbst einschränkt (R² = 0,24 und 0,16).",
+  "fallzahl": 582,
+  "streuung": null,
+  "stichtag": "2025-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_HVL.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, S. 60 ff. Regionsdefinition S. 11 (R2/R4/R5). Verwaltungsgliederung S. 12."
+ },
+ {
+  "land_code": "BB",
+  "ags": "12064",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Märkisch-Oderland",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Märkisch-Oderland",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "verzweigt",
+   "achse_k_feld": "brw_kategorie",
+   "achse_k_bez": "Bodenrichtwert-Kategorie",
+   "kategorien": [
+    "bis_50",
+    "51_bis_200",
+    "201_bis_350",
+    "ueber_350"
+   ],
+   "zuordnung_feld": "brw",
+   "kategorie_baender": [
+    {
+     "von": null,
+     "bis": 50,
+     "kategorie": "bis_50"
+    },
+    {
+     "von": 50,
+     "bis": 200,
+     "kategorie": "51_bis_200"
+    },
+    {
+     "von": 200,
+     "bis": 350,
+     "kategorie": "201_bis_350"
+    },
+    {
+     "von": 350,
+     "bis": null,
+     "kategorie": "ueber_350"
+    }
+   ],
+   "modell_je_kategorie": {
+    "bis_50": {
+     "form": "potenz",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
+     "a": 2.5471,
+     "b": -0.084,
+     "gueltig_von": 50000,
+     "gueltig_bis": 450000,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "39 Kauffälle, Bodenrichtwert im Mittel 29 €/m². Bestimmtheitsmaß 0,04, Korrelationskoeffizient -0,20 — die Kurve ist flach, der Faktor liegt über die ganze Spanne zwischen 1,03 und 0,85."
+    },
+    "51_bis_200": {
+     "form": "potenz",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
+     "a": 5.7486,
+     "b": -0.141,
+     "gueltig_von": 150000,
+     "gueltig_bis": 600000,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "32 Kauffälle, Bodenrichtwert im Mittel 114 €/m². Bestimmtheitsmaß 0,02, Korrelationskoeffizient -0,16."
+    },
+    "201_bis_350": {
+     "form": "potenz",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
+     "a": 9.4583,
+     "b": -0.179,
+     "gueltig_von": 175000,
+     "gueltig_bis": 850000,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "86 Kauffälle, Bodenrichtwert im Mittel 279 €/m². Bestimmtheitsmaß 0,08, Korrelationskoeffizient -0,28."
+    },
+    "ueber_350": {
+     "form": "potenz",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
+     "a": 19.769,
+     "b": -0.231,
+     "gueltig_von": 250000,
+     "gueltig_bis": 900000,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "56 Kauffälle, Bodenrichtwert im Mittel 389 €/m². Bestimmtheitsmaß 0,21, Korrelationskoeffizient -0,46 — die belastbarste der vier Reihen."
+    }
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "VIER BODENRICHTWERT-KATEGORIEN, VIER FUNKTIONEN. Der Bericht druckt alle vier Formeln ab und daneben die Tabelle, die sie erzeugen; die Tabellenwerte sind an acht Stützstellen nachgerechnet und zeichengleich. Jede Kategorie hat ihren eigenen Gültigkeitsbereich — die Tabelle beginnt bei 50.000 € (bis 50 €/m²) und bei 250.000 € (über 350 €/m²), weil dort die Stichproben liegen. DIE UNTERSCHEIDUNG BERLINER UMLAND / WEITERER METROPOLENRAUM MACHT DER BERICHT AUSDRÜCKLICH NICHT: „Die Ergebnisse der Auswertung gelten gleichermaßen für das Berliner Umland und den Weiteren Metropolenraum. Die Unterscheidung erfolgt über das jeweils unterschiedliche Bodenrichtwertniveau.\"",
+   "normobjekt": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert. NHK 2010 nach Anlage 4 ImmoWertV inklusive Baunebenkosten, Bundesbaupreisindex Wohngebäude (2010 = 100), lineare Alterswertminderung nach § 38 ImmoWertV, GND nach Anlage 1 ImmoWertV, Bodenwert ohne Größenanpassung, sonstige bauliche Anlagen und Außenanlagen pauschal 4 % vom Gebäudesachwert nach Alterswertminderung. Bodenrichtwerte zum 01.01.2025."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV §§ 35-39 und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
+   "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert",
+   "nhk": "NHK 2010 nach Anlage 4 ImmoWertV, Baunebenkosten enthalten",
+   "aussenanlagen": "pauschal 4 % vom Gebäudesachwert nach Alterswertminderung",
+   "bodenwert": "marktübliche Grundstücksfläche mal Bodenrichtwert zum Kaufzeitpunkt, OHNE Größenanpassung",
+   "garagen": "pauschalisierter Ansatz nach 5.3.4 VV EW-SW oder Berechnung nach NHK 2010; Carports und weitere Nebengebäude als Zeitwert NACH der Marktanpassung",
+   "alterswertminderung": "linear",
+   "kauffaelle_gesamt": 213
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Märkisch-Oderland, gestaffelt nach Bodenrichtwertniveau",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser, keine Villen, keine Kleinhäuser, keine gemischt genutzten Objekte",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "flaeche_qm": {
+     "min": 200,
+     "max": 1300,
+     "mittel": 800,
+     "hinweis": "objekttypische Grundstücksgröße"
+    },
+    "gebaeudewert_eur": {
+     "min": 20000,
+     "max": null
+    }
+   },
+   "vorbehalt": "DIE BESTIMMTHEITSMASSE SIND SEHR NIEDRIG: 0,04 · 0,02 · 0,08 · 0,21. Die Kurven erklären zwischen zwei und einundzwanzig Prozent der Streuung; drei der vier Reihen sind faktisch waagerecht. Der Faktor ist eine Marktanpassung auf breiter Basis, keine Ableitung aus dem Einzelfall — der Bericht sagt das selbst, indem er die Werte ausdrücklich auf eine breite Basis stellt, weil Merkmalserfassungen ohne Innenbesichtigung nur ungefähr sein können.\n\nAUSGESCHLOSSEN: Außenbereichslagen, vermietete Objekte (eigener Teilmarkt), Erstverkäufe, Kauffälle mit wertrelevanten Baumängeln oder Bauschäden, Gebäudewerte unter 20.000 €.\n\nGRUNDSTÜCKSGRÖSSE: Die Auswertung umfasst 200 bis 1.300 m². Der Bodenwert ist OHNE Größenanpassung angesetzt — wer mit einer Größenanpassung rechnet, verlässt das Modell.",
+   "hinweis": "Der Bericht führt zusätzlich Sachwertfaktoren für Doppelhaushälften und Reihenhäuser (Kap. 8.3.2, S. 82) — hier noch nicht erfasst."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 Landkreis Märkisch-Oderland, Kap. 8.2.2, Tabelle S. 75: vier Regressionsfunktionen nach Bodenrichtwert-Kategorien aus 213 Kauffällen des Jahres 2025 (39 / 32 / 86 / 56), tabellarisch von 50.000 bis 900.000 € vorläufigem Sachwert."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtliche Funktionen mit vollständiger Modellbeschreibung, an acht abgedruckten Stützstellen nachgerechnet und zeichengleich. Stufe B statt A, weil kein Anwendungsbeispiel vorliegt und die Bestimmtheitsmaße zwischen 0,02 und 0,21 liegen.",
+  "fallzahl": 213,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_MOL.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, S. 70 ff., Tabelle S. 75 mit den vier Regressionsfunktionen."
  },
  {
   "land_code": "BB",
@@ -689,6 +1364,166 @@
  },
  {
   "land_code": "BB",
+  "ags": "12067",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Oder-Spree und in der Stadt Frankfurt (Oder)",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Oder-Spree und in der Stadt Frankfurt (Oder)",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "verzweigt",
+   "achse_k_feld": "regionstyp",
+   "achse_k_bez": "Regionstyp im Landkreis Oder-Spree",
+   "kategorien": [
+    "berliner_umland",
+    "weiterer_metropolenraum"
+   ],
+   "zuordnung_feld": "ort",
+   "kategorie_sonst": "weiterer_metropolenraum",
+   "kategorie_zuordnung": {
+    "hinweis": "Der Bericht listet auf S. 12 die Gemarkungen des Berliner Umlands abschließend auf und ordnet den weiteren Metropolenraum in vier Untergruppen, deren letzte ausdrücklich „Dörfer: alle übrigen\" heißt. Deshalb steht hier eine Restkategorie: was im Landkreis Oder-Spree nicht zum Berliner Umland gehört, gehört zum weiteren Metropolenraum — das ist die Aussage des Berichts, keine Annahme.",
+    "berliner_umland": [
+     "Erkner",
+     "Gosen",
+     "Grünheide",
+     "Hangelsberg",
+     "Kagel",
+     "Kienbaum",
+     "Mönchwinkel",
+     "Neu Zittau",
+     "Schöneiche bei Berlin",
+     "Schöneiche",
+     "Spreeau",
+     "Woltersdorf",
+     "Gosen-Neu Zittau",
+     "Grünheide (Mark)"
+    ],
+    "weiterer_metropolenraum": [
+     "Beeskow",
+     "Fürstenwalde",
+     "Fürstenwalde/Spree",
+     "Eisenhüttenstadt",
+     "Bad Saarow",
+     "Bad Saarow-Pieskow",
+     "Storkow",
+     "Storkow (Mark)",
+     "Müllrose",
+     "Wendisch Rietz",
+     "Friedland",
+     "Neuzelle",
+     "Steinhöfel",
+     "Tauche",
+     "Spreenhagen",
+     "Briesen",
+     "Briesen (Mark)",
+     "Brieskow-Finkenheerd",
+     "Groß Lindow",
+     "Diensdorf",
+     "Diensdorf-Radlow",
+     "Rietz-Neuendorf",
+     "Berkenbrück",
+     "Langewahl",
+     "Rauen",
+     "Petersdorf",
+     "Schlaubetal",
+     "Siehdichum",
+     "Vogelsang",
+     "Ragow-Merz",
+     "Mixdorf",
+     "Grunow-Dammendorf",
+     "Wiesenau",
+     "Ziltendorf",
+     "Vogelsang (Oder-Spree)",
+     "Bomsdorf"
+    ]
+   },
+   "modell_je_kategorie": {
+    "berliner_umland": {
+     "form": "potenz",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
+     "a": 130.8,
+     "b": -0.377,
+     "gueltig_von": 250000,
+     "gueltig_bis": 725000,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "29 Kauffälle aus 01/2023 bis 07/2025, Bodenrichtwertbereich 170 bis 440 €/m², Grundstücke 369 bis 1.199 m², Baujahre 1904 bis 2021. Bestimmtheitsmaß 0,33, Korrelationskoeffizient -0,59."
+    },
+    "weiterer_metropolenraum": {
+     "form": "potenz",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
+     "a": 4.2967,
+     "b": -0.119,
+     "gueltig_von": 200000,
+     "gueltig_bis": 525000,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "35 Kauffälle aus 01/2023 bis 12/2025, Bodenrichtwertbereich 20 bis 210 €/m², Grundstücke 479 bis 1.325 m², Baujahre 1922 bis 2022. Bestimmtheitsmaß 0,03, Korrelationskoeffizient -0,14 — die Kurve ist nahezu waagerecht."
+    }
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "ZWEI REGIONSTYPEN, ZWEI FUNKTIONEN, ZWEI GÜLTIGKEITSBEREICHE. Das Berliner Umland ist erst ab 250.000 € vorläufigem Sachwert ausgewertet, der weitere Metropolenraum nur bis 525.000 € — der Bericht druckt außerhalb dieser Bereiche ausdrücklich Striche statt Zahlen. Beide Tabellen sind an je vier Stützstellen nachgerechnet und zeichengleich.",
+   "normobjekt": "Sachwertfaktoren SW23 nach ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) vom 03.05.2023. Stichtag 01.07.2024."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
+   "bezeichnung": "SW23",
+   "stichtag": "01.07.2024",
+   "hinweis": "Der vollständige Modellansatz steht im Anhang des Berichts (Abschnitt IV, S. 140)."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Oder-Spree. Die Stadt Frankfurt (Oder) gehört zum selben Gutachterausschuss, ist hier aber NICHT erfasst: der Bericht weist die Stichprobe ausdrücklich für den Landkreis aus.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "brw_umland": {
+     "min": 170,
+     "max": 440
+    },
+    "brw_metropole": {
+     "min": 20,
+     "max": 210
+    },
+    "flaeche_umland": {
+     "min": 369,
+     "max": 1199
+    },
+    "flaeche_metropole": {
+     "min": 479,
+     "max": 1325
+    },
+    "baujahr": {
+     "min": 1904,
+     "max": 2022
+    }
+   },
+   "vorbehalt": "DIE STICHPROBEN SIND KLEIN: 29 und 35 Kauffälle über drei Jahrgänge. Im weiteren Metropolenraum liegt das Bestimmtheitsmaß bei 0,03 — die Funktion erklärt drei Prozent der Streuung und ist praktisch eine Konstante um 0,95.\n\nDER STICHTAG IST DER 01.07.2024, nicht der Berichtsstichtag. Wer auf einen späteren Stichtag bewertet, muss die zeitliche Entwicklung gesondert berücksichtigen; der Bericht führt dafür keine Anpassung.\n\nDIE BODENRICHTWERTBEREICHE DER BEIDEN STICHPROBEN ÜBERSCHNEIDEN SICH NICHT (170-440 gegen 20-210 €/m²). Ein Objekt im Berliner Umland mit sehr niedrigem oder im Metropolenraum mit sehr hohem Bodenrichtwert liegt außerhalb der jeweiligen Stichprobe, auch wenn der Sachwert passt.",
+   "hinweis": "Der Bericht führt Reihenhäuser und Doppelhaushälften getrennt unter 8.3.2 — hier noch nicht erfasst. Die Zuordnung erfolgt über die GEMARKUNG; das Register liest den Ortsnamen. Bei Gemeinden, die aus mehreren Gemarkungen bestehen, kann das abweichen."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 des Gutachterausschusses im Landkreis Oder-Spree und in der Stadt Frankfurt (Oder), Kap. 8.2.2, S. 58: zwei Regressionsfunktionen (Berliner Umland y = 130,8x^-0,377, R² = 0,33, 29 Kauffälle; weiterer Metropolenraum y = 4,2967x^-0,119, R² = 0,03, 35 Kauffälle) nebst Tabelle von 200.000 bis 725.000 € vorläufigem Sachwert."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtliche Funktionen mit Stichprobenbeschreibung, an acht abgedruckten Stützstellen nachgerechnet und zeichengleich. Stufe C statt B, weil die Stichproben mit 29 und 35 Kauffällen klein sind, das Bestimmtheitsmaß im Metropolenraum bei 0,03 liegt und der Stichtag über ein Jahr vor dem Berichtsstichtag liegt.",
+  "fallzahl": 64,
+  "streuung": null,
+  "stichtag": "2024-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_LOS.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, S. 58. Zuordnung der Gemarkungen zu den Regionstypen S. 12 f. Modellansatz im Anhang."
+ },
+ {
+  "land_code": "BB",
   "ags": "12072",
   "ebene": "kreis",
   "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Teltow-Fläming",
@@ -920,7 +1755,7 @@
    "a": 21.252,
    "b": -0.249,
    "gueltig_von": 75000,
-   "gueltig_bis": 450000,
+   "gueltig_bis": 650000,
    "bedingungen": [
     {
      "feld": "brw",
@@ -931,7 +1766,7 @@
    ],
    "rundung_stellen": 2,
    "liefert": "faktor",
-   "hinweis": "DIE FUNKTION IST ABGEDRUCKT, die Tabelle ist ihr Ergebnis. y = 21,252 · x^-0,249 (R² = 0,1987). Acht Stützstellen nachgerechnet, alle zeichengleich mit Tabelle 28 — deshalb ist hier die Funktion geführt und nicht die Tabelle: sie rechnet auch zwischen den abgedruckten Stützstellen richtig, statt linear zu interpolieren.",
+   "hinweis": "DIE FUNKTION IST ABGEDRUCKT, die Tabelle ist ihr Ergebnis. y = 21,252 · x^-0,249 (R² = 0,1987). Alle 16 Stützstellen der Tabelle 28 nachgerechnet und zeichengleich (nach der Rundungskorrektur v1103-WRND: davor lag die Maschine bei 350.000 € auf 0,89 statt der abgedruckten 0,88, weil zweimal gerundet wurde) — deshalb ist hier die Funktion geführt und nicht die Tabelle: sie rechnet auch zwischen den abgedruckten Stützstellen richtig, statt linear zu interpolieren.",
    "normobjekt": "Modellansätze nach VV EW-SW Land Brandenburg."
   },
   "korrekturen": [],
@@ -948,18 +1783,18 @@
    "spannen": {
     "sachwert_eur": {
      "min": 75000,
-     "max": 450000
+     "max": 650000
     },
     "brw_eur_qm": {
      "min": 31,
      "max": null
     }
    },
-   "vorbehalt": "ZWEI GRENZEN, DIE BEIDE GELTEN.\n\n(1) DER BODENRICHTWERT MUSS ÜBER 30 €/m² LIEGEN. Der Bericht führt diese Auswertung ausdrücklich nur für dieses Segment; für Grundstücke mit 30 €/m² oder darunter gilt sie NICHT. Der Auswerter prüft das nicht — die Form `potenz` kennt nur eine Achse. Wer für ein Objekt mit niedrigerem Bodenrichtwert rechnet, verlässt den Anwendungsbereich, ohne dass es auffällt. DAS IST DIE WICHTIGSTE OFFENE STELLE DIESES REZEPTS.\n\n(2) Die Stichprobe reicht von 75.000 bis 450.000 € vorläufigem Sachwert; darüber und darunter ist die Extrapolation gesperrt.\n\nDas Bestimmtheitsmaß liegt bei 0,1987 — das Modell erklärt rund ein Fünftel der Streuung. Der Faktor ist eine Orientierung, keine Punktlandung.",
+   "vorbehalt": "ZWEI GRENZEN, DIE BEIDE GELTEN.\n\n(1) DER BODENRICHTWERT MUSS ÜBER 30 €/m² LIEGEN. Der Bericht führt diese Auswertung ausdrücklich nur für dieses Segment; für Grundstücke mit 30 €/m² oder darunter gilt sie NICHT. Der Auswerter prüft das nicht — die Form `potenz` kennt nur eine Achse. Wer für ein Objekt mit niedrigerem Bodenrichtwert rechnet, verlässt den Anwendungsbereich, ohne dass es auffällt. DAS IST DIE WICHTIGSTE OFFENE STELLE DIESES REZEPTS.\n\n(2) Die Stichprobe reicht von 75.000 bis 650.000 € vorläufigem Sachwert; darüber und darunter ist die Extrapolation gesperrt.\n\nDas Bestimmtheitsmaß liegt bei 0,1987 — das Modell erklärt rund ein Fünftel der Streuung. Der Faktor ist eine Orientierung, keine Punktlandung.",
    "hinweis": "Der Bericht führt zusätzlich eine Tabelle 29 „Ein- und Zweifamilienhäuser nach Baujahr und Standardstufe\" (S. 60) — sie ist hier nicht ausgewertet und könnte eine Verfeinerung tragen."
   },
   "belege": [
-   "Grundstücksmarktbericht 2025 Landkreis Uckermark, Abbildung 42 (Funktion y = 21,252x^-0,249, R² = 0,1987) und Tabelle 28, S. 59: 13 Stützstellen von 75.000 bis 450.000 € vorläufigem Sachwert."
+   "Grundstücksmarktbericht 2025 Landkreis Uckermark, Abbildung 42 (Funktion y = 21,252x^-0,249, R² = 0,1987) und Tabelle 28, S. 59: 16 Stützstellen von 75.000 bis 650.000 € vorläufigem Sachwert, alle 16 gegen den Auswerter geprüft."
   ],
   "stufe": "C",
   "stufe_grund": "Amtliche Funktion, an acht Stützstellen gegen die abgedruckte Tabelle geprüft und zeichengleich. Stufe C, weil das Bestimmtheitsmaß bei 0,1987 liegt und die Bodenrichtwert-Grenze (über 30 €/m²) vom Auswerter nicht geprüft werden kann.",

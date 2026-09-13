@@ -41,7 +41,27 @@ function zahl(v) {
   return Number.isFinite(n) ? n : null;
 }
 
+/* === v1103-WRND - ZWEIMAL RUNDEN VERSCHIEBT DAS ERGEBNIS ==============
+   GEMESSEN an Barnim: 566,13 * 500.000^-0,485 ergibt 0,97479. Die Form
+   `potenz` rundete hart auf DREI Stellen (0,975), der Registerweg danach
+   auf die zwei des Rezepts - und aus 0,975 wird 0,98. Der Bericht druckt
+   an dieser Stelle 0,97 ab.
+
+   Ein Cent auf hunderttausend Euro ist wenig; eine Zahl, die dem
+   abgedruckten Wert widerspricht, ist viel. Sie laesst den Anwender
+   zweifeln, ob die Maschine das Modell ueberhaupt richtig anwendet -
+   und dieses Register lebt davon, dass sie es beweisbar tut.
+
+   Deshalb rundet jede Form auf die Stelle, die das REZEPT nennt. Drei
+   Stellen bleiben der Rueckfall fuer Rezepte, die nichts sagen. */
+function gerundet(m, wert) {
+  const st = (m && m.rundung_stellen != null) ? m.rundung_stellen : 3;
+  const q = Math.pow(10, st);
+  return Math.round(wert * q) / q;
+}
+
 function nichts(grund, hinweis) {
+
   return { verfuegbar: false, wert: null, grund, hinweis, korrekturen: [] };
 }
 
@@ -110,8 +130,8 @@ function matrixInterp(m, e) {
   if (exaktX && exaktY) {
     const direkt = zelle(m.zellen, y, ax.indexOf(x));
     if (direkt !== null) {
-      return { verfuegbar: true, wert: Math.round(direkt * 1000) / 1000,
-               tabellenwert: Math.round(direkt * 1000) / 1000, korrekturen: [],
+      return { verfuegbar: true, wert: gerundet(m, direkt),
+               tabellenwert: gerundet(m, direkt), korrekturen: [],
                stuetzstellen: { x: [x, x], y: [y, y] } };
     }
   }
@@ -127,8 +147,8 @@ function matrixInterp(m, e) {
   const oben  = zwischen(x, nx[0], nx[1], c[0], c[1]);
   const unten = zwischen(x, nx[0], nx[1], c[2], c[3]);
   const wert  = zwischen(y, ny[0], ny[1], oben, unten);
-  return { verfuegbar: true, wert: Math.round(wert * 1000) / 1000,
-           tabellenwert: Math.round(wert * 1000) / 1000, korrekturen: [],
+  return { verfuegbar: true, wert: gerundet(m, wert),
+           tabellenwert: gerundet(m, wert), korrekturen: [],
            stuetzstellen: { x: nx, y: ny } };
 }
 
@@ -160,8 +180,8 @@ function matrixKategorial(m, e) {
   }
   const wert = zwischen(x, n[0], n[1],
                         zelle(m.zellen, n[0], idx), zelle(m.zellen, n[1], idx));
-  return { verfuegbar: true, wert: Math.round(wert * 1000) / 1000,
-           tabellenwert: Math.round(wert * 1000) / 1000, korrekturen: [],
+  return { verfuegbar: true, wert: gerundet(m, wert),
+           tabellenwert: gerundet(m, wert), korrekturen: [],
            kategorie: m.kategorien[idx] };
 }
 
@@ -202,8 +222,8 @@ function stufen1d(m, e) {
       + `${stufen[stufen.length - 1]}; extrapoliert wird nicht.`);
   }
   const wert = zwischen(x, n[0], n[1], m.stufen[String(n[0])], m.stufen[String(n[1])]);
-  return { verfuegbar: true, wert: Math.round(wert * 1000) / 1000,
-           tabellenwert: Math.round(wert * 1000) / 1000, korrekturen: [] };
+  return { verfuegbar: true, wert: gerundet(m, wert),
+           tabellenwert: gerundet(m, wert), korrekturen: [] };
 }
 
 /** potenz — Y = a * X^b. Der Geltungsbereich ist Pflicht. */
@@ -215,8 +235,8 @@ function potenz(m, e) {
   if (m.gueltig_bis != null && x > m.gueltig_bis)
     return nichts('ausserhalb_der_stichprobe', `Oberhalb der Stichprobe (${m.gueltig_bis}).`);
   const wert = m.a * Math.pow(x * (m.x_faktor ?? 1), m.b);
-  return { verfuegbar: true, wert: Math.round(wert * 1000) / 1000,
-           tabellenwert: Math.round(wert * 1000) / 1000, korrekturen: [],
+  return { verfuegbar: true, wert: gerundet(m, wert),
+           tabellenwert: gerundet(m, wert), korrekturen: [],
            formel: `${m.a} * (${m.achse_bez}${m.x_faktor ? ' * ' + m.x_faktor : ''})^${m.b}` };
 }
 
@@ -539,68 +559,72 @@ function baenderKategorial(m, e) {
            klasse_spanne: (b.min != null && b.max != null) ? [b.min, b.max] : null };
 }
 
-/* === v1102-WPKAT - JE KATEGORIE EINE EIGENE FUNKTION ===================
-   Barnim teilt den Landkreis in vier Regionen und druckt fuer jede eine
-   EIGENE Regressionsfunktion ab:
+/* === v1103-WVERZ - JE KATEGORIE EIN VOLLSTAENDIGES MODELL =============
+   GEFUNDEN an Havelland: der Landkreis druckt fuer seine zwei Regionen
+   zwei Tabellen ab, die nicht einmal dieselben ACHSEN haben -
 
-     berlinangrenzend   566,13 * vSW^-0,485   (300.000 bis 725.000 EUR)
-     Suedbarnim           7,2134 * vSW^-0,151 (150.000 bis 700.000 EUR)
-     Mittelbarnim         7,5625 * vSW^-0,158 (175.000 bis 700.000 EUR)
+     Berliner Umland        Grundstuecksflaeche x WOHNflaeche, Bezugsbaujahr 2000
+     weiterer Metropolenraum Grundstuecksflaeche x BGF,        Bezugsbaujahr 1960
 
-   Die vorhandene Form `potenz` traegt genau EINE Funktion. Vier Register-
-   saetze fuer denselben Kreis anzulegen ginge nicht: der Auswerter waehlt
-   ueber den Zweig (Objektart), nicht ueber die Lage.
+   und dazu je Region eine eigene Baujahrskorrektur (1,16 bis 0,97 gegen
+   1,08 bis 0,92). Barnim hatte je Region eine eigene Potenzfunktion.
 
-   Die Kategorie kommt ueber `kategorie_zuordnung` aus dem Ortsnamen - der
-   Weg, den Berlin seit v1090 fuer seine Altbezirke nimmt. Trifft kein
-   Name, gibt es KEINEN Wert: eine Region zu raten hiesse, zwischen 1,25
-   und 0,96 zu wuerfeln. */
-function potenzKategorial(m, e) {
+   Statt fuer jede dieser Kombinationen eine eigene Form zu bauen -
+   `potenz_kategorial`, `matrix_kategorial_2`, und so weiter - traegt
+   diese hier je Kategorie ein GANZES Modell und wertet es ueber
+   auswerten() aus. Damit gilt fuer das Untermodell alles, was sonst
+   auch gilt: seine Bedingungen, seine Korrekturen, sein Einheitenwaechter.
+
+   v1102 hatte dafuer `potenz_kategorial` gebaut. Diese Form ist damit
+   ueberfluessig und WEG - zwei Wege zum selben Ziel laufen frueher oder
+   spaeter auseinander. Barnim steht jetzt als `verzweigt` mit vier
+   `potenz`-Untermodellen im Register; seine dreizehn Pruefungen sind
+   dieselben geblieben.
+
+   Die Korrekturen der AEUSSEREN Ebene wirken zusaetzlich - was fuer alle
+   Kategorien gilt, steht aussen, was je Kategorie verschieden ist, innen. */
+function verzweigt(m, e) {
   const kat = kategorieAus(m, e);
   if (!kat.wert) {
     return nichts(kat.bekannt_aber_ohne_wert ? 'kategorie_ohne_wert' : 'kategorie_fehlt',
       `${m.achse_k_bez || 'Die Kategorie'} ist nicht bestimmbar`
       + (kat.ueber ? ` (gelesen aus "${kat.ueber}")` : '') + '.');
   }
-  const schluessel = Object.keys(m.funktion_je_kategorie || {})
+  const tab = m.modell_je_kategorie || {};
+  const schluessel = Object.keys(tab)
     .find((k) => k.toLowerCase() === String(kat.wert).toLowerCase());
   if (schluessel === undefined) {
     return nichts('kategorie_unbekannt',
-      `Fuer "${kat.wert}" fuehrt der Bericht keine Funktion.`);
+      `Fuer "${kat.wert}" fuehrt der Bericht kein Modell.`);
   }
-  const fn = m.funktion_je_kategorie[schluessel] || {};
-  const x = zahl(e[m.achse_feld]);
-  if (x === null) return nichts('achse_fehlt', `${m.achse_bez} nicht erfasst.`);
+  const unter = tab[schluessel];
+  if (!unter || !unter.form) {
+    return nichts('form_unbekannt',
+      `Das Modell fuer "${schluessel}" traegt keine Form.`);
+  }
+  /* Die Einheit der aeusseren Ebene gilt, wenn das Untermodell keine
+     eigene nennt - sonst koennte ein Untermodell still eine andere
+     Einheit liefern als der Registersatz verspricht. */
+  const r = auswerten({ ...unter, liefert: unter.liefert || m.liefert }, e);
+  if (!r.verfuegbar) return { ...r, kategorie: schluessel };
 
-  /* Die Stichprobengrenzen stehen JE KATEGORIE - Barnims Regionen enden
-     bei verschiedenen Betraegen. Eine gemeinsame Grenze waere fuer drei
-     der vier Regionen falsch. */
-  if (fn.gueltig_von != null && x < fn.gueltig_von) {
-    return nichts('ausserhalb_der_stichprobe',
-      `${m.achse_bez} = ${x} liegt unterhalb der Stichprobe, die der Bericht `
-      + `fuer "${schluessel}" auswertet (ab ${fn.gueltig_von}).`);
-  }
-  if (fn.gueltig_bis != null && x > fn.gueltig_bis) {
-    return nichts('ausserhalb_der_stichprobe',
-      `${m.achse_bez} = ${x} liegt oberhalb der Stichprobe, die der Bericht `
-      + `fuer "${schluessel}" auswertet (bis ${fn.gueltig_bis}).`);
-  }
-  if (!istZahl(fn.a) || !istZahl(fn.b)) {
-    return nichts('funktion_unvollstaendig',
-      `Fuer "${schluessel}" fehlt ein Glied der Funktion.`);
-  }
-  const st = m.rundung_stellen ?? 2;
-  const q = Math.pow(10, st);
-  const wert = fn.a * Math.pow(x * (fn.x_faktor ?? 1), fn.b);
-  const ger = Math.round(wert * q) / q;
-  return { verfuegbar: true, wert: ger, tabellenwert: ger, korrekturen: [],
-           kategorie: schluessel,
-           klasse_fallzahl: fn.fallzahl ?? null,
-           klasse_spanne: (fn.min != null && fn.max != null) ? [fn.min, fn.max] : null,
-           formel: `${fn.a} * (${m.achse_bez})^${fn.b}` };
+  /* GEMESSEN an Havelland: das Untermodell hatte richtig gerechnet -
+     0,92 aus der Tabelle mal 1,16 fuer Baujahr 1900 = 1,07 -, und die
+     aeussere Ebene warf es weg. Sie rechnet naemlich ab `tabellenwert`
+     weiter, und der stand noch auf den nackten 0,92.
+
+     Der Endwert des Untermodells IST der Tabellenwert dieser Ebene: was
+     unten passiert ist, ist von hier aus die Tabelle. Die Korrekturen
+     des Untermodells wandern nach `korrekturen_kategorie`, damit sie im
+     Rechenweg sichtbar bleiben statt still ueberschrieben zu werden. */
+  return { ...r, kategorie: schluessel, tabellenwert: r.wert,
+           korrekturen_kategorie: r.korrekturen || [],
+           rechenweg_kategorie: r.rechenweg || null,
+           korrekturen: [] };
 }
 
 const AUSWERTER = {
+
 
 
   matrix_interp: matrixInterp,
@@ -617,7 +641,7 @@ const AUSWERTER = {
   log_1d: log1d,                         /* v1093-WLOG */
   spanne_kategorial: spanneKategorial,   /* v1093-WSPN */
   baender_kategorial: baenderKategorial, /* v1101-WBKAT */
-  potenz_kategorial: potenzKategorial,   /* v1102-WPKAT */
+  verzweigt: verzweigt,                 /* v1103-WVERZ */
 };
 
 /* ── Additive Korrekturen ──────────────────────────────────────────────── */
@@ -880,8 +904,28 @@ function kategorieAus(m, e) {
       return { wert: String(kat).toLowerCase(), ueber: feld };
     }
   }
+  /* v1103-WSONST - EINE RESTKATEGORIE, ABER NUR WENN DER BERICHT SIE NENNT.
+
+     Oder-Spree zaehlt elf Gemarkungen als Berliner Umland auf und
+     schreibt fuer den weiteren Metropolenraum ausdruecklich `Doerfer:
+     alle uebrigen`. Ohne Restkategorie bekaeme der groesste Teil des
+     Landkreises keinen Faktor, obwohl der Bericht ihn eindeutig zuordnet.
+
+     Sie greift NUR, wenn ein Zuordnungswert vorliegt und in keiner Liste
+     steht. Fehlt der Wert ganz, bleibt es bei 'kategorie_fehlt': wer
+     nicht weiss, wo das Objekt liegt, darf es nicht in den Rest sortieren.
+
+     `kategorie_sonst` gehoert ins Rezept und ist dort zu belegen. Wo ein
+     Bericht seine Kategorien NICHT erschoepfend teilt - Barnims vier
+     Regionen etwa -, steht das Feld nicht, und ein unbekannter Ort bleibt
+     ohne Wert. */
+  if (m.kategorie_sonst) {
+    return { wert: String(m.kategorie_sonst).toLowerCase(), ueber: feld,
+             ueber_rest: true };
+  }
   return { wert: '', ueber: feld, bekannt_aber_ohne_wert: true };
 }
+
 
 /* ── Der Vertrag nach aussen ───────────────────────────────────────────── */
 

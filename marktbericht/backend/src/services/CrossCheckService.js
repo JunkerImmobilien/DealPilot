@@ -295,6 +295,11 @@ export const CrossCheckService = {
              eine von vier Funktionen zu raten waere schlimmer als nichts. */
           ort: (p && p.gemeinde) || ref.gemeinde || null,
           ortsteil: (p && p.ortsteil) || ref.ortsteil || null,
+          /* v1103-WWFL - Havelland, Berliner Umland: Grundstuecks- mal
+             Wohnflaeche. Ohne diese Zeile bliebe die halbe Tabelle leer. */
+          wohnflaeche_qm: ref.living_area || null,
+          grundstuecksflaeche_qm: ref.plot_area || null,
+
 
         });
         if (_swfTab && _swfTab.verfuegbar) {

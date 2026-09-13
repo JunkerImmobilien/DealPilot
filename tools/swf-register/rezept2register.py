@@ -93,11 +93,13 @@ ERLAUBT = {
                            'achse_k_bez','kategorien','kategorie_baender',
                            'zuordnung_feld','kategorie_zuordnung','baender_je_kategorie',
                            'rundung_stellen','liefert','hinweis','normobjekt'},
-    # v1102-WPKAT: je Kategorie eine eigene Funktion (Barnims vier Regionen).
-    'potenz_kategorial': {'form','achse_feld','achse_bez','achse_k_feld',
-                          'achse_k_bez','kategorien','kategorie_baender',
-                          'zuordnung_feld','kategorie_zuordnung','funktion_je_kategorie',
-                          'rundung_stellen','liefert','hinweis','normobjekt'},
+    # v1103-WVERZ: je Kategorie ein VOLLSTAENDIGES Modell. Ersetzt das
+    # potenz_kategorial aus v1102 - Havelland braucht je Region andere
+    # ACHSEN, nicht nur andere Parameter.
+    'verzweigt': {'form','achse_k_feld','achse_k_bez','kategorien',
+                  'kategorie_baender','zuordnung_feld','kategorie_zuordnung','kategorie_sonst',
+                  'modell_je_kategorie','rundung_stellen','liefert','hinweis',
+                  'normobjekt'},
     'regression_additiv': {'form','basis','glieder','rundung_stellen','liefert',
                            'hinweis','normobjekt'},
 }
@@ -265,17 +267,29 @@ def normalisiere(datei, m):
                     return None
                 gesehen[schl] = kat
 
-    # v1102-WPKAT - jede Kategorie braucht ihre Funktion, sonst rechnet sie nicht.
-    if form == 'potenz_kategorial':
-        fjk = formel.get('funktion_je_kategorie') or {}
-        fehlen = [k for k in (formel.get('kategorien') or []) if str(k) not in fjk]
+    # v1103-WVERZ - jede Kategorie braucht ihr Modell, und jedes Modell eine
+    # Form, die der Auswerter kennt. Sonst stuende eine Kategorie im Rezept,
+    # fuer die spaeter still nichts herauskommt.
+    if form == 'verzweigt':
+        mjk = formel.get('modell_je_kategorie') or {}
+        fehlen = [k for k in (formel.get('kategorien') or []) if str(k) not in mjk]
         if fehlen:
-            meckern(datei, f'ohne Funktion: {fehlen}')
+            meckern(datei, f'ohne Modell: {fehlen}')
             return None
-        for k, f in fjk.items():
-            if not isinstance(f, dict) or f.get('a') is None or f.get('b') is None:
-                meckern(datei, f"Funktion '{k}': a oder b fehlt")
+        for k, um in mjk.items():
+            if not isinstance(um, dict) or um.get('form') not in ERLAUBT:
+                meckern(datei, f"Untermodell '{k}': Form "
+                        f"'{(um or {}).get('form')}' kennt der Auswerter nicht")
                 return None
+            if um.get('form') == 'verzweigt':
+                meckern(datei, f"Untermodell '{k}': verzweigt in verzweigt")
+                return None
+            fremd_u = set(um) - ERLAUBT[um['form']] - DOKU - {'korrekturen'}
+            if fremd_u:
+                meckern(datei, f"Untermodell '{k}': unbekannte Schluessel "
+                        f'{sorted(fremd_u)}')
+                return None
+            pruefe_korrekturen(datei, um.get('korrekturen') or [])
 
     einheit = formel.get('liefert', 'faktor')
     if einheit not in EINHEITEN:

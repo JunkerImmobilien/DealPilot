@@ -1,0 +1,102 @@
+{
+  "land_code": "BB",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Oder-Spree und in der Stadt Frankfurt (Oder)",
+  "gaa_kennz": "12067",
+  "ags": ["12067"],
+  "ebene": "kreis",
+  "berichtsjahr": 2025,
+  "stichtag": "2024-07-01",
+  "auswertezeitraum": "01/2023 bis 12/2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06-25",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_LOS.pdf",
+  "quelle_datei": "BB-oder-spree-gmb-2025.pdf",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, S. 58. Zuordnung der Gemarkungen zu den Regionstypen S. 12 f. Modellansatz im Anhang.",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "regionstyp",
+        "achse_k_bez": "Regionstyp im Landkreis Oder-Spree",
+        "kategorien": ["berliner_umland", "weiterer_metropolenraum"],
+        "zuordnung_feld": "ort",
+        "kategorie_sonst": "weiterer_metropolenraum",
+        "kategorie_zuordnung": {
+          "hinweis": "Der Bericht listet auf S. 12 die Gemarkungen des Berliner Umlands abschließend auf und ordnet den weiteren Metropolenraum in vier Untergruppen, deren letzte ausdrücklich „Dörfer: alle übrigen\" heißt. Deshalb steht hier eine Restkategorie: was im Landkreis Oder-Spree nicht zum Berliner Umland gehört, gehört zum weiteren Metropolenraum — das ist die Aussage des Berichts, keine Annahme.",
+          "berliner_umland": ["Erkner", "Gosen", "Grünheide", "Hangelsberg", "Kagel",
+                              "Kienbaum", "Mönchwinkel", "Neu Zittau",
+                              "Schöneiche bei Berlin", "Schöneiche", "Spreeau", "Woltersdorf",
+                              "Gosen-Neu Zittau", "Grünheide (Mark)"],
+          "weiterer_metropolenraum": ["Beeskow", "Fürstenwalde", "Fürstenwalde/Spree",
+                                      "Eisenhüttenstadt", "Bad Saarow", "Bad Saarow-Pieskow",
+                                      "Storkow", "Storkow (Mark)", "Müllrose", "Wendisch Rietz",
+                                      "Friedland", "Neuzelle", "Steinhöfel", "Tauche",
+                                      "Spreenhagen", "Briesen", "Briesen (Mark)",
+                                      "Brieskow-Finkenheerd", "Groß Lindow", "Diensdorf",
+                                      "Diensdorf-Radlow", "Rietz-Neuendorf", "Berkenbrück",
+                                      "Langewahl", "Rauen", "Petersdorf", "Schlaubetal",
+                                      "Siehdichum", "Vogelsang", "Ragow-Merz", "Mixdorf",
+                                      "Grunow-Dammendorf", "Wiesenau", "Ziltendorf",
+                                      "Vogelsang (Oder-Spree)", "Bomsdorf"]
+        },
+        "modell_je_kategorie": {
+          "berliner_umland": {
+            "form": "potenz", "achse_feld": "sachwert",
+            "achse_bez": "vorläufiger Sachwert in Euro",
+            "a": 130.8, "b": -0.377, "gueltig_von": 250000, "gueltig_bis": 725000,
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "29 Kauffälle aus 01/2023 bis 07/2025, Bodenrichtwertbereich 170 bis 440 €/m², Grundstücke 369 bis 1.199 m², Baujahre 1904 bis 2021. Bestimmtheitsmaß 0,33, Korrelationskoeffizient -0,59."
+          },
+          "weiterer_metropolenraum": {
+            "form": "potenz", "achse_feld": "sachwert",
+            "achse_bez": "vorläufiger Sachwert in Euro",
+            "a": 4.2967, "b": -0.119, "gueltig_von": 200000, "gueltig_bis": 525000,
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "35 Kauffälle aus 01/2023 bis 12/2025, Bodenrichtwertbereich 20 bis 210 €/m², Grundstücke 479 bis 1.325 m², Baujahre 1922 bis 2022. Bestimmtheitsmaß 0,03, Korrelationskoeffizient -0,14 — die Kurve ist nahezu waagerecht."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "ZWEI REGIONSTYPEN, ZWEI FUNKTIONEN, ZWEI GÜLTIGKEITSBEREICHE. Das Berliner Umland ist erst ab 250.000 € vorläufigem Sachwert ausgewertet, der weitere Metropolenraum nur bis 525.000 € — der Bericht druckt außerhalb dieser Bereiche ausdrücklich Striche statt Zahlen. Beide Tabellen sind an je vier Stützstellen nachgerechnet und zeichengleich.",
+        "normobjekt": "Sachwertfaktoren SW23 nach ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) vom 03.05.2023. Stichtag 01.07.2024."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
+        "bezeichnung": "SW23",
+        "stichtag": "01.07.2024",
+        "hinweis": "Der vollständige Modellansatz steht im Anhang des Berichts (Abschnitt IV, S. 140)."
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Oder-Spree. Die Stadt Frankfurt (Oder) gehört zum selben Gutachterausschuss, ist hier aber NICHT erfasst: der Bericht weist die Stichprobe ausdrücklich für den Landkreis aus.",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "brw_umland":      { "min": 170, "max": 440 },
+          "brw_metropole":   { "min": 20,  "max": 210 },
+          "flaeche_umland":  { "min": 369, "max": 1199 },
+          "flaeche_metropole": { "min": 479, "max": 1325 },
+          "baujahr":         { "min": 1904, "max": 2022 }
+        },
+        "vorbehalt": "DIE STICHPROBEN SIND KLEIN: 29 und 35 Kauffälle über drei Jahrgänge. Im weiteren Metropolenraum liegt das Bestimmtheitsmaß bei 0,03 — die Funktion erklärt drei Prozent der Streuung und ist praktisch eine Konstante um 0,95.\n\nDER STICHTAG IST DER 01.07.2024, nicht der Berichtsstichtag. Wer auf einen späteren Stichtag bewertet, muss die zeitliche Entwicklung gesondert berücksichtigen; der Bericht führt dafür keine Anpassung.\n\nDIE BODENRICHTWERTBEREICHE DER BEIDEN STICHPROBEN ÜBERSCHNEIDEN SICH NICHT (170-440 gegen 20-210 €/m²). Ein Objekt im Berliner Umland mit sehr niedrigem oder im Metropolenraum mit sehr hohem Bodenrichtwert liegt außerhalb der jeweiligen Stichprobe, auch wenn der Sachwert passt.",
+        "hinweis": "Der Bericht führt Reihenhäuser und Doppelhaushälften getrennt unter 8.3.2 — hier noch nicht erfasst. Die Zuordnung erfolgt über die GEMARKUNG; das Register liest den Ortsnamen. Bei Gemeinden, die aus mehreren Gemarkungen bestehen, kann das abweichen."
+      },
+
+      "stufe": "C",
+      "stufe_grund": "Amtliche Funktionen mit Stichprobenbeschreibung, an acht abgedruckten Stützstellen nachgerechnet und zeichengleich. Stufe C statt B, weil die Stichproben mit 29 und 35 Kauffällen klein sind, das Bestimmtheitsmaß im Metropolenraum bei 0,03 liegt und der Stichtag über ein Jahr vor dem Berichtsstichtag liegt.",
+      "fallzahl": 64,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 des Gutachterausschusses im Landkreis Oder-Spree und in der Stadt Frankfurt (Oder), Kap. 8.2.2, S. 58: zwei Regressionsfunktionen (Berliner Umland y = 130,8x^-0,377, R² = 0,33, 29 Kauffälle; weiterer Metropolenraum y = 4,2967x^-0,119, R² = 0,03, 35 Kauffälle) nebst Tabelle von 200.000 bis 725.000 € vorläufigem Sachwert."
+    }
+  ]
+}

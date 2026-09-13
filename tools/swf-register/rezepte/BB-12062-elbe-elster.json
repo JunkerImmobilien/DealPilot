@@ -1,0 +1,96 @@
+{
+  "land_code": "BB",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Elbe-Elster",
+  "gaa_kennz": "12062",
+  "ags": ["12062"],
+  "ebene": "kreis",
+  "berichtsjahr": 2025,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "01.01.2023 bis 31.12.2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06-25",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_EE.pdf",
+  "quelle_datei": "BB-elbe-elster-gmb-2025.pdf",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, S. 55 ff. Abgrenzung Stadtlage/ländliches Gebiet S. 20. Modellansätze in Anlage 1.",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "lagetyp",
+        "achse_k_bez": "räumlicher Anwendungsbereich",
+        "kategorien": ["stadtlage", "laendliches_gebiet"],
+        "zuordnung_feld": "ort",
+        "kategorie_sonst": "laendliches_gebiet",
+        "kategorie_zuordnung": {
+          "hinweis": "Der Bericht bestimmt die Stadtlagen abschließend über die Gemarkungen der sechs größten Städte und schreibt für die ländlichen Gebiete, sie erstreckten sich über ALLE Dörfer und die fünf übrigen Kleinstädte. Deshalb steht hier eine Restkategorie: was in Elbe-Elster keine Stadtlage ist, ist ländliches Gebiet — das ist die Aussage des Berichts.",
+          "stadtlage": ["Finsterwalde", "Herzberg", "Herzberg (Elster)", "Elsterwerda",
+                        "Bad Liebenwerda", "Falkenberg", "Falkenberg/Elster",
+                        "Doberlug-Kirchhain"],
+          "laendliches_gebiet": ["Mühlberg", "Mühlberg/Elbe", "Uebigau-Wahrenbrück",
+                                 "Schlieben", "Schönewalde", "Sonnewalde", "Crinitz",
+                                 "Massen-Niederlausitz", "Rückersdorf", "Sallgast",
+                                 "Tröbitz", "Lichterfeld-Schacksdorf", "Heideland",
+                                 "Hohenleipisch", "Plessa", "Schraden", "Röderland",
+                                 "Gröden", "Merzdorf", "Fichtwald", "Kremitzaue",
+                                 "Lebusa", "Hohenbucko", "Gorden-Staupitz"]
+        },
+        "modell_je_kategorie": {
+          "stadtlage": {
+            "form": "konstante", "wert": 1.00,
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "68 Kauffälle nach Ausreißerbereinigung, Stichprobenspanne des Sachwertfaktors 0,62 bis 1,38. Bodenrichtwert 9 bis 55 €/m², Restnutzungsdauer 10 bis 78 Jahre, Baujahre 1880 bis 2022, Standardstufe 1,3 bis 3,6."
+          },
+          "laendliches_gebiet": {
+            "form": "konstante", "wert": 0.92,
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "90 Kauffälle nach Ausreißerbereinigung, Stichprobenspanne 0,63 bis 1,25. Bodenrichtwert 3 bis 26 €/m², Restnutzungsdauer 7 bis 76 Jahre, Baujahre 1800 bis 2021, Standardstufe 1,3 bis 3,9."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "KONSTANTEN, UND DAS MIT ANSAGE. Der Bericht schreibt: „Abhängigkeiten des Sachwertfaktors von vielfältigen Modellparametern konnten nicht ermittelt werden. Die Analyse unterschiedlicher Einflussgrößen, wie beispielsweise Baujahr, Modernisierungsgrad oder Wohnfläche, ergab keine Wechselbeziehung zum ermittelten Sachwertfaktor.\" Es gibt hier also keine Kurve, die zu übernehmen wäre — nur zwei Mittelwerte und ihre Spannen. Für den gesamten Landkreis nennt der Bericht 0,95; dieser Wert steht hier NICHT, weil die räumliche Differenzierung die genauere Aussage ist und beide Lagetypen abgedeckt sind.",
+        "normobjekt": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert nach ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) vom 03.05.2023. Ausreißer über der 2,5fachen Standardabweichung eliminiert."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV in Verbindung mit der Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
+        "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
+        "ermittlung": "arithmetischer Mittelwert je Stichprobe, Ausreißer über 2,5facher Standardabweichung separat je Stichprobe eliminiert",
+        "kauffaelle_gesamt": 154,
+        "hinweis": "Die Modellansätze nach § 12 Abs. 6 ImmoWertV stehen in Anlage 1 des Berichts."
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Elbe-Elster, unterschieden nach Stadtlage und ländlichem Gebiet",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "brw_stadt":      { "min": 9, "max": 55, "mittel": 27 },
+          "brw_land":       { "min": 3, "max": 26, "mittel": 14 },
+          "rnd_jahre":      { "min": 7, "max": 78 },
+          "baujahr":        { "min": 1800, "max": 2022 },
+          "wohnflaeche_qm": { "min": 50, "max": 377 },
+          "bgf_qm":         { "min": 74, "max": 846 },
+          "kaufpreis_eur":  { "min": 30000, "max": 465000 }
+        },
+        "vorbehalt": "EIN MITTELWERT IST KEINE KURVE. Die Stichprobenspanne reicht in der Stadtlage von 0,62 bis 1,38 — der Mittelwert 1,00 liegt in ihrer Mitte, sagt aber über den Einzelfall wenig. Der Bericht hat ausdrücklich KEINE Abhängigkeit von Baujahr, Modernisierungsgrad oder Wohnfläche gefunden; wer einen dieser Einflüsse selbst hineinrechnet, verlässt das Modell.\n\nDER BODENRICHTWERTBEREICH IST SEHR NIEDRIG: 3 bis 55 €/m². Elbe-Elster ist der Landkreis mit den niedrigsten Bodenwerten dieses Registers. Für ein Objekt mit deutlich höherem Bodenrichtwert gibt es hier keine Stichprobe.\n\nDIE DATENBASIS UMFASST DREI JAHRGÄNGE (2023 bis 2025) und ist mit den Vorjahreswerten NICHT vergleichbar, weil die Modellansätze der VV EW-SW 2023 gewechselt haben. Der Bericht sagt das selbst.",
+        "hinweis": "Der Bericht nennt zusätzlich einen Sachwertfaktor für den gesamten Landkreis (0,95 aus 154 Kauffällen, Spanne 0,62 bis 1,31). Reihenhäuser und Doppelhaushälften stehen unter 8.3 — hier noch nicht erfasst."
+      },
+
+      "stufe": "C",
+      "stufe_grund": "Amtliche Mittelwerte mit vollständiger Stichprobenbeschreibung. Stufe C, weil der Faktor eine Konstante ohne jede Abhängigkeit ist und die Stichprobenspannen (0,62 bis 1,38) sehr weit sind.",
+      "fallzahl": 158,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 Landkreis Elbe-Elster, Kap. 8.2.2, S. 55 ff.: Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser aus 154 ausreißerbereinigten Kauffällen der Jahre 2023 bis 2025, differenziert nach Stadtlage (68 Fälle, 1,00) und ländlichem Gebiet (90 Fälle, 0,92)."
+    }
+  ]
+}

@@ -21,12 +21,10 @@
     {
       "zweig": "ezfh",
       "zweig_bez": "freistehende Ein- und Zweifamilienhäuser",
-      "form": "potenz_kategorial",
+      "form": "verzweigt",
       "formel": {
-        "form": "potenz_kategorial",
-        "achse_feld": "sachwert",
-        "achse_bez": "vorläufiger Sachwert in Euro",
-        "achse_k_feld": "region",
+        "form": "verzweigt",
+                "achse_k_feld": "region",
         "achse_k_bez": "Region des Landkreises Barnim",
         "kategorien": ["berlinangrenzend", "suedbarnim", "mittelbarnim", "nordbarnim"],
         "zuordnung_feld": "ort",
@@ -54,15 +52,33 @@
                          "Niederfinow", "Liepe", "Lunow-Stolzenhagen", "Lunow", "Oderberg",
                          "Parsteinsee", "Lüdersdorf", "Parstein"]
         },
-        "funktion_je_kategorie": {
-          "berlinangrenzend": { "a": 566.13, "b": -0.485, "gueltig_von": 300000, "gueltig_bis": 725000,
-                                "fallzahl": 39, "min": 0.7, "max": 1.3 },
-          "suedbarnim":       { "a": 7.2134, "b": -0.151, "gueltig_von": 150000, "gueltig_bis": 700000,
-                                "fallzahl": 59, "min": 0.7, "max": 1.4 },
-          "mittelbarnim":     { "a": 7.5625, "b": -0.158, "gueltig_von": 175000, "gueltig_bis": 700000,
-                                "fallzahl": 36, "min": 0.8, "max": 1.4 },
-          "nordbarnim":       { "a": 0.96,   "b": 0,      "gueltig_von": 150000, "gueltig_bis": 450000,
-                                "fallzahl": 14, "min": 0.5, "max": 1.3 }
+        "modell_je_kategorie": {
+          "berlinangrenzend": {
+            "form": "potenz", "achse_feld": "sachwert",
+            "achse_bez": "vorläufiger Sachwert in Euro",
+            "a": 566.13, "b": -0.485, "gueltig_von": 300000, "gueltig_bis": 725000,
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "39 Kauffälle, Stichprobenspanne des Sachwertfaktors 0,7 bis 1,3, Korrelationskoeffizient -0,5."
+          },
+          "suedbarnim": {
+            "form": "potenz", "achse_feld": "sachwert",
+            "achse_bez": "vorläufiger Sachwert in Euro",
+            "a": 7.2134, "b": -0.151, "gueltig_von": 150000, "gueltig_bis": 700000,
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "59 Kauffälle, Stichprobenspanne 0,7 bis 1,4, Korrelationskoeffizient -0,3."
+          },
+          "mittelbarnim": {
+            "form": "potenz", "achse_feld": "sachwert",
+            "achse_bez": "vorläufiger Sachwert in Euro",
+            "a": 7.5625, "b": -0.158, "gueltig_von": 175000, "gueltig_bis": 700000,
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "36 Kauffälle, Stichprobenspanne 0,8 bis 1,4, Korrelationskoeffizient -0,4."
+          },
+          "nordbarnim": {
+            "form": "konstante", "wert": 0.96,
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "14 Kauffälle, Stichprobenspanne 0,5 bis 1,3, Korrelationskoeffizient -0,2 OHNE SIGNIFIKANZ. Der Bericht druckt für Nordbarnim nur einen einzigen Tabellenwert ab (0,96 bei rund 275.000 Euro), und er ist zugleich der Mittelwert aus Abbildung 87. Deshalb steht hier eine Konstante und keine Funktion."
+          }
         },
         "rundung_stellen": 2,
         "liefert": "faktor",
