@@ -5383,7 +5383,8 @@
   var AKT_ICON = {
     brw: '📍', lage: '🌍', markt: '📊', markt2: '📈',
     tiefe: '＋', tabelle: '✓', adresse: '📮',
-    knf_neu: '⇄', knf_alt: '✓'   /* v1376 (C7) */
+    knf_neu: '⇄', knf_alt: '✓',  /* v1376 (C7) */
+    nachfass: '↻'                 /* v1377 (C5) */
   };
 
 
@@ -5402,8 +5403,13 @@
        Auskunft wieder hinsieht, muss nicht nach oben scrollen, um zu
        wissen, was gerade gefragt war. */
     var frage = '';
-    if (_rf.abschlussOffen) {
+    if (_rf.nachfassOffen) {
+      /* v1377: Hier steht keine Feldfrage an - die Leiste wuerde sonst die
+         letzte beantwortete Frage zeigen, als waere sie noch offen. */
+      frage = '<b>Übersprungen</b> — willst du die offenen Fragen noch nachtragen?';
+    } else if (_rf.abschlussOffen) {
       frage = '<b>Fertig</b> — deine Werte warten in der Übersicht. Fragen darfst du mich weiter.';
+
     } else if (_rf.adresseFrage) {
       frage = '<b>Stimmt die Adresse?</b> Sag „ja" — oder nenn sie mir noch einmal.';
     } else if (e) {
@@ -5418,13 +5424,17 @@
           /* v1376 (C7): Bei einem Widerspruch wird nicht geholt, sondern
              entschieden. Der alte Vorspann haette in die Irre gefuehrt. */
           (function () {
-            var knf = akt.filter(function (a) { return a.art.indexOf('knf_') === 0; }).length;
-            var rest = akt.length - knf;
+            var knf  = akt.filter(function (a) { return a.art.indexOf('knf_') === 0; }).length;
+            /* v1377: "holen" waere beim Nachtragen falsch - das tut der Nutzer. */
+            var nf   = akt.filter(function (a) { return a.art === 'nachfass'; }).length;
+            var rest = akt.length - knf - nf;
             return '<span class="vi-dran-lbl">' +
               (knf && rest ? 'Eine Entscheidung steht offen — und ich kann etwas holen:'
                : knf       ? 'Zwei Werte widersprechen sich — welcher gilt?'
+               : nf        ? 'Offen geblieben:'
                            : 'Ich kann das für dich holen:') + '</span>';
           })() +
+
 
 
           /* ═══ v1300 · EINE Erklärzeile statt einer je Knopf ══════════════
@@ -5535,7 +5545,10 @@
       if (_fs.an && _fs.stream) _fsHoeren(true);
       return;
     }
+    /* v1377 (C5) */
+    if (art === 'nachfass') { _rfBlase('ich', 'Ja, die trage ich nach.'); _rfNachfassStarten(); return; }
     if (art === 'tabelle')  { _rfZurTabelle(); return; }
+
 
     if (art === 'tiefe')    { _rf.tiefeOffen = 0; _rfBlase('ich', 'Ja, lass uns weitermachen.'); _rfTiefeStarten(); return; }
     if (art === 'brw')      { _rfBlase('ich', 'Hol den Bodenrichtwert.'); _rfBrwHolen(); return; }
@@ -7532,10 +7545,18 @@
       _rf.tiefeGefragt = 1;
       if (_rfTiefeAnbieten()) return;   /* v1287: nur wenn der Knopf wirklich steht */
     }
+    /* v1377 (C5): Was uebersprungen wurde, wird EINMAL angeboten - vor
+       dem Abschluss, denn danach ist der Weg zur Tabelle offen und
+       niemand kehrt freiwillig um. Nicht bei "Fertig" gedrueckt: wer
+       abbricht, will abbrechen. */
+    if (!erzwungen && _rf && !_rf.nachfassGefragt && !_rf.nachfassLauf) {
+      if (_rfNachfassAnbieten()) return;
+    }
     if (_rf && !_rf.abschlussGezeigt) {
       _rf.abschlussGezeigt = 1;
       if (_rfAbschluss()) return;       /* wartet auf „Zur Übersicht" */
     }
+
     _rfZurTabelle();
   }
 
@@ -7586,7 +7607,82 @@
     try { console.log('[voice-import] Herkunft gemerkt:', n, 'Felder'); } catch (e) {}
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1377 (C5) · WAS UEBERSPRUNGEN WURDE, KOMMT NOCH EINMAL
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Anforderung: ueberspringen erlauben UND spaeter darauf
+     zurueckkommen. Das Ueberspringen gab es laengst - `_rf.weg[i] = 1`.
+     Das Zurueckkommen nicht: der Eintrag wurde ausschliesslich als "–" in
+     der Standspalte gezeichnet und danach nie wieder gelesen.
+
+     Eine uebersprungene Frage ist aber keine beantwortete. Wer mitten im
+     Gespraech "weiss ich nicht" sagt, meint meistens "jetzt nicht" - er
+     hat die Nebenkostenabrechnung im anderen Fenster, den Steuerbescheid
+     im Ordner. Am Ende weiss er es oft.
+
+     WICHTIG: es ist ein ANGEBOT, keine zweite Pflichtrunde. Wer wieder
+     ueberspringt, ueberspringt endgueltig - dieselbe Frage ein drittes
+     Mal zu stellen waere Schikane.
+
+     WAS NICHT NOCHMAL GEFRAGT WIRD: was inzwischen doch einen Wert hat.
+     Ein Abruf kann die Luecke laengst geschlossen haben; dann ist die
+     Frage erledigt, auch wenn sie damals uebersprungen wurde. */
+  function _rfNachfassListe() {
+    if (!_rf || !_rf.weg) return [];
+    var raus = [];
+    Object.keys(_rf.weg).forEach(function (k) {
+      var i = parseInt(k, 10);
+      var e = _rf.offen[i];
+      if (!e) return;
+      if (!_rfFehlt(e, _rf.data.fields)) return;   /* inzwischen gefuellt */
+      raus.push(e);
+    });
+    return raus;
+  }
+
+  function _rfNachfassAnbieten() {
+    var liste = _rfNachfassListe();
+    if (!liste.length) return false;
+    _rf.nachfassGefragt = 1;
+    _rf.nachfassListe = liste;
+
+    var namen = liste.slice(0, 4).map(function (e) { return _rfKurzname(e); });
+    _rfBlase('co',
+      '<b>' + liste.length + ' Frage' + (liste.length === 1 ? '' : 'n') + ' ' +
+      (liste.length === 1 ? 'ist' : 'sind') + ' offen geblieben.</b> ' +
+      escH(namen.join(', ')) + (liste.length > 4 ? ' und ' + (liste.length - 4) + ' weitere' : '') +
+      '.<div class="vi-rf-zaehler">Sag „ja", wenn du sie jetzt nachtragen willst — ' +
+      'sonst geht es zur Übersicht. Was offen bleibt, zählt im Score weder ' +
+      'für dich noch gegen dich.</div>');
+    _rf.nachfassOffen = 1;
+    _rfAktion('nachfass', 'Nur die übersprungenen Fragen, keine neuen.',
+              liste.length + (liste.length === 1 ? ' Frage' : ' Fragen') + ' nachtragen');
+    var inpN = $('vi-rf-in'); if (inpN) inpN.disabled = false;
+    if (_fs.an && _fs.stream) _fsHoeren(true);
+    return true;
+  }
+
+  /* Die zweite Runde nutzt dieselbe Mechanik wie die erste - `offen` wird
+     neu gesetzt, `i` auf null. Eine eigene Schleife danebenzubauen hiesse,
+     jede spaetere Aenderung an zwei Stellen zu pflegen. */
+  function _rfNachfassStarten() {
+    var liste = _rf.nachfassListe || _rfNachfassListe();
+    _rf.nachfassOffen = 0;
+    _rfAktionWeg('nachfass');
+    if (!liste.length) { _rfFertig(true); return; }
+    _rf.nachfassLauf = 1;
+    _rf.offen = liste;
+    _rf.i = 0;
+    _rf.weg = {};              /* der zweite Strich ist endgueltig */
+    _rfBlase('co', '<span style="opacity:.75">Gut — die ' + liste.length +
+      (liste.length === 1 ? ' Frage' : ' Fragen') + ' noch einmal. Überspringen ' +
+      'gilt diesmal endgültig.</span>');
+    _rfStandZeichnen();
+    setTimeout(_rfFrage, 500);
+  }
+
   function _rfAbschluss() {
+
     var k1 = null, k2 = null;
     try { k1 = _rfScore1Karte(); } catch (e) {}
     try { k2 = _rfScore2Karte(); } catch (e) {}
@@ -8252,8 +8348,33 @@
 
 
 
+    /* ═══ v1377 (C5) · Das Nachfass-Angebot ═══════════════════════════
+       "Ja" fuehrt in die zweite Runde, "nein" zum Abschluss. Ohne den
+       Nein-Weg haette der Nutzer an einem Angebot gehangen, das nur einen
+       Knopf hat - und "nein danke" haette die Knoepfe geraeumt, ohne
+       irgendwohin zu fuehren. */
+    if (_rf.nachfassOffen) {
+      if (RF_JA.test(t) || _istZustimmung(t) ||
+          /^(ja|klar|gerne|gern|okay|ok|mach|los|nachtragen|weiter)\b/i.test(t)) {
+        _rfBlase('ich', escH(t));
+        _rfNachfassStarten();
+        return true;
+      }
+      if (RF_NEIN.test(t) || _istAblehnung(t) ||
+          /^(nein|nee|reicht|fertig|passt so|das reicht|(ü|ue)bersicht|lass)\b/i.test(t)) {
+        _rf.nachfassOffen = 0;
+        _rfAktionWeg('nachfass');
+        _rfBlase('ich', escH(t));
+        _rfBlase('co', '<span style="opacity:.7">Alles klar — was offen bleibt, zählt im ' +
+          'Score weder für dich noch gegen dich.</span>');
+        _rfFertig(true);
+        return true;
+      }
+    }
+
     /* v1287: Steht die Feinheiten-Frage offen, ist „ja" die Antwort darauf -
        nicht eine Angabe zu einem Feld. Auch gesprochen. */
+
     if (_rf.tiefeOffen) {
       if (/^(ja|jo|klar|gerne|gern|okay|ok|mach|weiter ins detail|los)\b/i.test(t)) {
         _rf.tiefeOffen = 0;
@@ -8922,6 +9043,11 @@
                             will, ob eine abweichende Zahl wirklich gefragt
                             wird, braucht genau diese drei. */
                          _setzen: _rfSetzen,
+                         /* v1377 (C5) */
+                         _nachfassListe: _rfNachfassListe,
+                         _nachfassAnbieten: _rfNachfassAnbieten,
+                         _ueberspringen: _rfUeberspringen,
+
                          _konfliktZeigen: _rfKonfliktZeigen,
                          _gleicherWert: _rfGleicherWert,
                          _zahl: _rfZahl,
