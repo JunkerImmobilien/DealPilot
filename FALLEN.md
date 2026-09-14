@@ -4000,3 +4000,82 @@ ein `\r` steht. Entweder `\r?$` schreiben oder über die Zeilennummer
 gehen.
 
 `v1121`
+
+---
+
+## Die Tabelle ist da, die Achsen fehlen
+
+Im Immobilienmarktbericht 2026 des AfB Homberg (Efze) steht die
+Sachwertfaktor-Matrix im Textstrom so:
+
+```
+ . €     0,99    1,39    1,60
+ . €     0,88    1,12    1,26
+ . €     0,81    0,99    1,10    1,16
+```
+
+Die Faktoren kommen durch, die Zeilen- und Spaltenköpfe nicht. Gemeint
+sind 75.000 € bis 475.000 € und Bodenrichtwerte von 25 bis 100 €/m² —
+**neun Zeilen und vier Spalten, die man ohne die Achsen raten müsste.**
+
+Die Ziffern der Köpfe stecken in einer eingebetteten Schrift ohne
+`ToUnicode`-Zuordnung. **Kein Modus von `pdftotext` gibt sie aus** —
+weder `-layout` noch `-raw` noch der Standardmodus; alle drei wurden
+probiert. Die Zahlen sind auch kein Bild: sie sind Text, nur ohne
+Übersetzung.
+
+**Der Ausweg ist, die Seite zu rendern und anzusehen:**
+
+```bash
+pdftoppm -f 98 -l 98 -r 150 -png bericht.pdf seite
+```
+
+Dann das PNG lesen. Bei 150 dpi ist eine Tabellenseite gut lesbar und
+rund 350 KB groß.
+
+> **Die Falle ist nicht das fehlende Werkzeug, sondern die Plausibilität
+> des Rests.** Neun Zeilen mit vier sauberen Faktoren sehen nach einer
+> vollständigen Tabelle aus. Wer die Stützstellen aus dem Zusammenhang
+> erschließt — „wird schon bei 100.000 anfangen und in 50.000er Schritten
+> gehen" —, baut ein Register, das an jeder Stelle einen Wert liefert und
+> an keiner den richtigen. **Bei einer Tabelle ohne sichtbare Achsen wird
+> gerendert, nicht geschlossen.**
+
+`v1137`
+
+---
+
+## Ein Zweig, den das Rezept nicht führt, liefert keinen Wert
+
+Homberg schreibt ausdrücklich, seine Sachwertfaktoren gälten für
+Ein- und Zweifamilienhäuser **einschließlich Doppelhaushälften und
+Reihenhäuser** — eine Tabelle für alle drei. Das Rezept trug die Matrix
+deshalb nur einmal, als `zweig: "ezfh"`.
+
+Der Rechner ordnet ein Reihenhaus aber dem Zweig `rhdhh` zu und
+antwortete:
+
+```
+RH = derselbe Satz    objektart_nicht_abgeleitet
+```
+
+**Der Bericht gab einen Wert her, das Register nicht.** Gefunden nur,
+weil die Prüfstrecke ein Reihenhaus und eine Doppelhaushälfte abfragte,
+obwohl die Tabelle „für alle gilt".
+
+**Fasst ein Ausschuss Haustypen zusammen, muss dieselbe Tabelle unter
+JEDEM betroffenen Zweig stehen.** Das ist keine Verdopplung, sondern die
+einzige Art, die Aussage der Quelle abzubilden. Betroffen sind bisher
+Homberg, Marburg-Stadt und Bad Homburg.
+
+**Die Gegenprobe gehört in jede Prüfstrecke:** nicht nur
+`Einfamilienhaus` abfragen, sondern auch `Reihenmittelhaus` und
+`Doppelhaushaelfte` — und zwar gegen denselben Sollwert, wenn der
+Bericht sie zusammenfasst.
+
+Das Gegenstück ist genauso wichtig: Der AfB Marburg druckt für
+Reihenhäuser **nur den hessenweiten Wert** ab, keinen regionalen. Dort
+darf `rhdhh` gerade nicht angelegt werden — eine Lücke der Quelle ist
+kein Erntefehler.
+
+`v1137`
