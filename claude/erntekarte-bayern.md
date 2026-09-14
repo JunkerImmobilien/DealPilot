@@ -121,18 +121,77 @@ Fichtelgebirge LK
 
 ---
 
+## Der Bezugsweg: BORIS-Bayern — und was er kostet
+
+**Nachgetragen am 14.09.2026.** Die Übersicht des Oberen Gutachterausschusses
+sagt, *dass* Daten vorhanden sind. Sie sagt nicht, ob man ohne Rechnung an sie
+herankommt. Das ist eine eigene Frage, und die Antwort fällt anders aus als
+in Hessen.
+
+**Ein zentrales Downloadportal wie `gds.hessen.de` gibt es in Bayern nicht.**
+Geprüft:
+
+| Seite | Ergebnis |
+|---|---|
+| `gutachterausschuesse-bayern.de/marktberichte/` | dieselbe Seite wie `/marktberichte-bayern/`, führt **nur die Landesberichte** |
+| `boris-bayern.de` | Portal mit einer Seite je Ausschuss — aber als **Verkaufsstelle** |
+
+**`boris-bayern.de/gutachterausschuss/<name>` führt 43 Ausschüsse** mit
+Anschrift, Telefon und dem Weg zum Bericht. Die Produkte und Preise lädt die
+Seite per JavaScript nach; ein maschinenlesbarer Endpunkt war in `boris.js`
+nicht zu finden (drei Anläufe, dann abgebrochen).
+
+### Zwei Stichproben aus Gruppe A
+
+**Nürnberg** — der Grundstücksmarktbericht steht online nur als *Leseprobe*.
+Die Tabelle der Basissachwertfaktoren trägt dort wörtlich die Überschrift
+**„Leseprobe ohne Daten"**. Die Modellbeschreibung ist vollständig, die Zahlen
+fehlen.
+
+**Augsburg (Stadt)** — der Bericht hat 135 Seiten und wird über BORIS-Bayern
+für **50 Euro** abgegeben. Ein freies PDF gibt es nicht; die
+Bodenrichtwertkarte liegt kostenfrei im Kundenbereich des Geodatenamts aus.
+
+> **Damit ist Gruppe A neu zu lesen.** „Sachwertfaktoren und Marktbericht
+> vorhanden" heißt in Bayern: *es gibt einen Bericht* — nicht, dass er frei
+> abrufbar ist. Für die Ernte bedeutet das einen dritten Zustand neben „Wert
+> geholt" und „kein Wert vorhanden": **Wert vorhanden, Zugang kostenpflichtig.**
+>
+> Das ist kein Grund, nichts zu liefern. Nürnberg zeigt, was auch aus einer
+> Leseprobe zu holen ist: die vollständige Modellbeschreibung, die Stichprobe
+> (1.204 Fälle 2018–2024), das Mittel (1,12 ± 0,14) und die Standardabweichung
+> der errechneten Sachwerte (15 %). Wer den Vollbericht kauft, weiß vorher,
+> was er bekommt.
+
 ## Was als nächstes zu tun ist
 
-1. **Gruppe A abarbeiten**, nach Einwohnerzahl sortiert: Nürnberg, Augsburg,
-   Regensburg, Würzburg, Erlangen, Fürth. Jeder Bericht einzeln beschaffen —
-   ein zentrales Portal wie `gds.hessen.de` gibt es in Bayern nicht.
-2. **Gruppe C in `AUSSCHUSS_QUELLEN` eintragen** mit `warum_kein_wert`:
-   „Der Gutachterausschuss hat nach der Übersicht des Oberen
-   Gutachterausschusses (Immobilienmarktbericht Bayern 2026, Stand 2025)
-   keine Sachwertfaktoren abgeleitet." Damit bekommt der Kunde dort sofort
-   die richtige Auskunft statt einer leeren Antwort.
+**Erledigt (v1144):** Gruppe C liegt vollständig in `AUSSCHUSS_QUELLEN` mit
+`warum_kein_wert` — 35 Einträge, Kreisschlüssel aus dem Gemeindeverzeichnis
+des Statistischen Bundesamtes. Ein Kunde in Starnberg oder Grünwald bekommt
+dort jetzt den zuständigen Ausschuss samt Begründung statt einer leeren
+Antwort.
+
+**Erledigt (v1154):** Nürnberg als erste Stichprobe aus Gruppe A — Leseprobe
+ohne Daten, Modellbeschreibung im Quelleneintrag festgehalten.
+
+**Offen, und die Reihenfolge hat sich geändert:**
+
+1. **Gruppe A ist keine Ernteliste, sondern eine Kaufliste.** Beide
+   geprüften Ausschüsse geben ihren Bericht nicht frei ab. Bevor hier
+   weitergearbeitet wird, gehört die Frage an Marcel: **lohnt ein
+   Berichtskauf?** Augsburg kostet 50 Euro für 135 Seiten; Nürnberg deckt
+   540.000 Einwohner ab. Das ist eine Geldentscheidung und damit seine.
+2. **Solange das offen ist, ist der Quelleneintrag die Lieferung.** Nürnberg
+   zeigt das Muster: Ausschuss benennen, Zugangsart nennen, das Modell aus
+   der Leseprobe festhalten. Der Kunde weiß dann, was ihn erwartet und was
+   es kostet.
 3. **Gruppe B zurückstellen** — Anfragen beim Ausschuss sind Marcels
    Entscheidung, nicht meine.
+
+> **Bayern ist damit der Gegenentwurf zu Hessen.** Dort lagen dreizehn
+> Berichte kostenfrei in einem Downloadcenter, und fünfzehn
+> Zuständigkeitsbereiche waren an einem Tag geerntet. Hier gibt es eine
+> amtliche Landkarte, aber hinter jedem Eintrag eine eigene Kasse.
 
 ## Vorbehalt
 
