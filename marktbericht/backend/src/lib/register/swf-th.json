@@ -875,6 +875,231 @@
  },
  {
   "land_code": "TH",
+  "ags": "16052",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "regression_additiv",
+   "intercept": 5.08399853,
+   "terme": [
+    {
+     "feld": "brw",
+     "bez": "Bodenrichtwert in Euro/m²",
+     "koeffizient": 0.08900278,
+     "transform": "ln",
+     "gueltig": [
+      9,
+      157
+     ]
+    },
+    {
+     "feld": "rnd",
+     "bez": "Restnutzungsdauer in Jahren",
+     "koeffizient": 0.00442544,
+     "exponent": 1,
+     "gueltig": [
+      12,
+      79
+     ]
+    },
+    {
+     "feld": "sachwert",
+     "bez": "vorläufiger Sachwert in Euro",
+     "koeffizient": -0.37516446,
+     "transform": "ln",
+     "gueltig": [
+      39768,
+      939969
+     ]
+    }
+   ],
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "MULTIPLE REGRESSION MIT DREI EINGANGSGRÖSSEN — Bodenrichtwert, RESTNUTZUNGSDAUER und vorläufiger Sachwert. Die Restnutzungsdauer als Eingangsgröße hat sonst kein Satz im Register; fehlt sie, gibt es hier keinen Wert, denn die Gleichung ist als Ganzes abgeleitet worden. Der Bericht druckt eine einzige Gleichung für alle drei Gebiete ab und unterscheidet sie über Dummyvariablen: k = 5,08399853 + 0,08900278 × ln(BRW) + 0,00442544 × RND − 0,19415168 × ln(vSW) − 2,32083266 × G_Greiz − 2,33589581 × G_Altenburg − 0,18101278 × (ln(vSW) × G_Gera). Für dieses Gebiet ist genau eine Dummyvariable 1 und die übrigen sind 0; die Gleichung ist deshalb hier zu einer gewöhnlichen Summe aufgelöst — Absolutglied 5.08399853, Koeffizient von ln(vSW) -0.37516446. Nachgerechnet gegen die beiden Anwendungsbeispiele des Berichts (Kapitel 2.6): Gera ergibt 0,80, Greiz 0,79 — beide zeichengleich. Bestimmtheitsmaß rund 32 Prozent, Korrelationskoeffizient 0,56.",
+   "normobjekt": "Stichprobe: vorläufiger Sachwert 39.768 bis 939.969 Euro (5. bis 95. Perzentil 85.100 bis 410.081), Bodenrichtwert 9 bis 157 Euro/qm (13 bis 90), Restnutzungsdauer 12 bis 79 Jahre (18 bis 62), Baujahre 1747 bis 2024, Wohnfläche 58 bis 379 qm. Der Ausschuss rät ausdrücklich, die Anwendung an den Rändern der Stichprobe sachverständig zu plausibilisieren."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "aussenanlagen": "kein gesonderter Ansatz, im Sachwertfaktor enthalten"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5, Seite 10."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene Regressionsgleichung samt Koeffizienten, Standardfehlern und P-Werten, gegen beide Anwendungsbeispiele des Berichts nachgerechnet. KEINE Stufe A: das Bestimmtheitsmass liegt bei rund 32 Prozent, und der Ausschuss verlangt selbst eine sachverstaendige Plausibilisierung an den Raendern.",
+  "fallzahl": 462,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren und Vergleichspreise 2026 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Regionalfaktor 1, Gesamtnutzungsdauer 80 Jahre nach Anlage 1 zu § 12 Abs. 5 ImmoWertV, lineare Alterswertminderung. Bauliche Außenanlagen bekommen KEINEN gesonderten Wertansatz — sie sind im üblichen Umfang im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in EURO einzusetzen, nicht in Millionen.",
+  "fundstelle": "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5 (Regressionskoeffizienten) und 2.6 (Anwendung der Regressionsformel), Seiten 10 f.; Stichprobe Kapitel 2.3, Seite 7."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16052",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "regression_additiv",
+   "intercept": 5.08399853,
+   "terme": [
+    {
+     "feld": "brw",
+     "bez": "Bodenrichtwert in Euro/m²",
+     "koeffizient": 0.08900278,
+     "transform": "ln",
+     "gueltig": [
+      9,
+      157
+     ]
+    },
+    {
+     "feld": "rnd",
+     "bez": "Restnutzungsdauer in Jahren",
+     "koeffizient": 0.00442544,
+     "exponent": 1,
+     "gueltig": [
+      12,
+      79
+     ]
+    },
+    {
+     "feld": "sachwert",
+     "bez": "vorläufiger Sachwert in Euro",
+     "koeffizient": -0.37516446,
+     "transform": "ln",
+     "gueltig": [
+      39768,
+      939969
+     ]
+    }
+   ],
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "MULTIPLE REGRESSION MIT DREI EINGANGSGRÖSSEN — Bodenrichtwert, RESTNUTZUNGSDAUER und vorläufiger Sachwert. Die Restnutzungsdauer als Eingangsgröße hat sonst kein Satz im Register; fehlt sie, gibt es hier keinen Wert, denn die Gleichung ist als Ganzes abgeleitet worden. Der Bericht druckt eine einzige Gleichung für alle drei Gebiete ab und unterscheidet sie über Dummyvariablen: k = 5,08399853 + 0,08900278 × ln(BRW) + 0,00442544 × RND − 0,19415168 × ln(vSW) − 2,32083266 × G_Greiz − 2,33589581 × G_Altenburg − 0,18101278 × (ln(vSW) × G_Gera). Für dieses Gebiet ist genau eine Dummyvariable 1 und die übrigen sind 0; die Gleichung ist deshalb hier zu einer gewöhnlichen Summe aufgelöst — Absolutglied 5.08399853, Koeffizient von ln(vSW) -0.37516446. Nachgerechnet gegen die beiden Anwendungsbeispiele des Berichts (Kapitel 2.6): Gera ergibt 0,80, Greiz 0,79 — beide zeichengleich. Bestimmtheitsmaß rund 32 Prozent, Korrelationskoeffizient 0,56.",
+   "normobjekt": "Stichprobe: vorläufiger Sachwert 39.768 bis 939.969 Euro (5. bis 95. Perzentil 85.100 bis 410.081), Bodenrichtwert 9 bis 157 Euro/qm (13 bis 90), Restnutzungsdauer 12 bis 79 Jahre (18 bis 62), Baujahre 1747 bis 2024, Wohnfläche 58 bis 379 qm. Der Ausschuss rät ausdrücklich, die Anwendung an den Rändern der Stichprobe sachverständig zu plausibilisieren."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "aussenanlagen": "kein gesonderter Ansatz, im Sachwertfaktor enthalten"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5, Seite 10."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene Regressionsgleichung samt Koeffizienten, Standardfehlern und P-Werten, gegen beide Anwendungsbeispiele des Berichts nachgerechnet. KEINE Stufe A: das Bestimmtheitsmass liegt bei rund 32 Prozent, und der Ausschuss verlangt selbst eine sachverstaendige Plausibilisierung an den Raendern.",
+  "fallzahl": 462,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren und Vergleichspreise 2026 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Regionalfaktor 1, Gesamtnutzungsdauer 80 Jahre nach Anlage 1 zu § 12 Abs. 5 ImmoWertV, lineare Alterswertminderung. Bauliche Außenanlagen bekommen KEINEN gesonderten Wertansatz — sie sind im üblichen Umfang im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in EURO einzusetzen, nicht in Millionen.",
+  "fundstelle": "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5 (Regressionskoeffizienten) und 2.6 (Anwendung der Regressionsformel), Seiten 10 f.; Stichprobe Kapitel 2.3, Seite 7."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16052",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh",
+  "formel": {
+   "form": "regression_additiv",
+   "intercept": 5.08399853,
+   "terme": [
+    {
+     "feld": "brw",
+     "bez": "Bodenrichtwert in Euro/m²",
+     "koeffizient": 0.08900278,
+     "transform": "ln",
+     "gueltig": [
+      9,
+      157
+     ]
+    },
+    {
+     "feld": "rnd",
+     "bez": "Restnutzungsdauer in Jahren",
+     "koeffizient": 0.00442544,
+     "exponent": 1,
+     "gueltig": [
+      12,
+      79
+     ]
+    },
+    {
+     "feld": "sachwert",
+     "bez": "vorläufiger Sachwert in Euro",
+     "koeffizient": -0.37516446,
+     "transform": "ln",
+     "gueltig": [
+      39768,
+      939969
+     ]
+    }
+   ],
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "MULTIPLE REGRESSION MIT DREI EINGANGSGRÖSSEN — Bodenrichtwert, RESTNUTZUNGSDAUER und vorläufiger Sachwert. Die Restnutzungsdauer als Eingangsgröße hat sonst kein Satz im Register; fehlt sie, gibt es hier keinen Wert, denn die Gleichung ist als Ganzes abgeleitet worden. Der Bericht druckt eine einzige Gleichung für alle drei Gebiete ab und unterscheidet sie über Dummyvariablen: k = 5,08399853 + 0,08900278 × ln(BRW) + 0,00442544 × RND − 0,19415168 × ln(vSW) − 2,32083266 × G_Greiz − 2,33589581 × G_Altenburg − 0,18101278 × (ln(vSW) × G_Gera). Für dieses Gebiet ist genau eine Dummyvariable 1 und die übrigen sind 0; die Gleichung ist deshalb hier zu einer gewöhnlichen Summe aufgelöst — Absolutglied 5.08399853, Koeffizient von ln(vSW) -0.37516446. Nachgerechnet gegen die beiden Anwendungsbeispiele des Berichts (Kapitel 2.6): Gera ergibt 0,80, Greiz 0,79 — beide zeichengleich. Bestimmtheitsmaß rund 32 Prozent, Korrelationskoeffizient 0,56.",
+   "normobjekt": "Stichprobe: vorläufiger Sachwert 39.768 bis 939.969 Euro (5. bis 95. Perzentil 85.100 bis 410.081), Bodenrichtwert 9 bis 157 Euro/qm (13 bis 90), Restnutzungsdauer 12 bis 79 Jahre (18 bis 62), Baujahre 1747 bis 2024, Wohnfläche 58 bis 379 qm. Der Ausschuss rät ausdrücklich, die Anwendung an den Rändern der Stichprobe sachverständig zu plausibilisieren."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "aussenanlagen": "kein gesonderter Ansatz, im Sachwertfaktor enthalten"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5, Seite 10."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene Regressionsgleichung samt Koeffizienten, Standardfehlern und P-Werten, gegen beide Anwendungsbeispiele des Berichts nachgerechnet. KEINE Stufe A: das Bestimmtheitsmass liegt bei rund 32 Prozent, und der Ausschuss verlangt selbst eine sachverstaendige Plausibilisierung an den Raendern.",
+  "fallzahl": 462,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren und Vergleichspreise 2026 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Regionalfaktor 1, Gesamtnutzungsdauer 80 Jahre nach Anlage 1 zu § 12 Abs. 5 ImmoWertV, lineare Alterswertminderung. Bauliche Außenanlagen bekommen KEINEN gesonderten Wertansatz — sie sind im üblichen Umfang im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in EURO einzusetzen, nicht in Millionen.",
+  "fundstelle": "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5 (Regressionskoeffizienten) und 2.6 (Anwendung der Regressionsformel), Seiten 10 f.; Stichprobe Kapitel 2.3, Seite 7."
+ },
+ {
+  "land_code": "TH",
   "ags": "16053",
   "ebene": "kreis",
   "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
@@ -15536,5 +15761,455 @@
   "verwendung": "produkt",
   "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung. Kein gesonderter Wertansatz für Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche, Vordächer in üblichem Umfang und übliche Außentreppen — diese sind im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in die Schätzfunktion in MIO EURO einzusetzen.",
   "fundstelle": "Sachwertfaktoren 2025, Kapitel 3.2, Tabelle 7, Seite 14."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16076",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "regression_additiv",
+   "intercept": 2.76316587,
+   "terme": [
+    {
+     "feld": "brw",
+     "bez": "Bodenrichtwert in Euro/m²",
+     "koeffizient": 0.08900278,
+     "transform": "ln",
+     "gueltig": [
+      9,
+      157
+     ]
+    },
+    {
+     "feld": "rnd",
+     "bez": "Restnutzungsdauer in Jahren",
+     "koeffizient": 0.00442544,
+     "exponent": 1,
+     "gueltig": [
+      12,
+      79
+     ]
+    },
+    {
+     "feld": "sachwert",
+     "bez": "vorläufiger Sachwert in Euro",
+     "koeffizient": -0.19415168,
+     "transform": "ln",
+     "gueltig": [
+      39768,
+      939969
+     ]
+    }
+   ],
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "MULTIPLE REGRESSION MIT DREI EINGANGSGRÖSSEN — Bodenrichtwert, RESTNUTZUNGSDAUER und vorläufiger Sachwert. Die Restnutzungsdauer als Eingangsgröße hat sonst kein Satz im Register; fehlt sie, gibt es hier keinen Wert, denn die Gleichung ist als Ganzes abgeleitet worden. Der Bericht druckt eine einzige Gleichung für alle drei Gebiete ab und unterscheidet sie über Dummyvariablen: k = 5,08399853 + 0,08900278 × ln(BRW) + 0,00442544 × RND − 0,19415168 × ln(vSW) − 2,32083266 × G_Greiz − 2,33589581 × G_Altenburg − 0,18101278 × (ln(vSW) × G_Gera). Für dieses Gebiet ist genau eine Dummyvariable 1 und die übrigen sind 0; die Gleichung ist deshalb hier zu einer gewöhnlichen Summe aufgelöst — Absolutglied 2.76316587, Koeffizient von ln(vSW) -0.19415168. Nachgerechnet gegen die beiden Anwendungsbeispiele des Berichts (Kapitel 2.6): Gera ergibt 0,80, Greiz 0,79 — beide zeichengleich. Bestimmtheitsmaß rund 32 Prozent, Korrelationskoeffizient 0,56.",
+   "normobjekt": "Stichprobe: vorläufiger Sachwert 39.768 bis 939.969 Euro (5. bis 95. Perzentil 85.100 bis 410.081), Bodenrichtwert 9 bis 157 Euro/qm (13 bis 90), Restnutzungsdauer 12 bis 79 Jahre (18 bis 62), Baujahre 1747 bis 2024, Wohnfläche 58 bis 379 qm. Der Ausschuss rät ausdrücklich, die Anwendung an den Rändern der Stichprobe sachverständig zu plausibilisieren."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "aussenanlagen": "kein gesonderter Ansatz, im Sachwertfaktor enthalten"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5, Seite 10."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene Regressionsgleichung samt Koeffizienten, Standardfehlern und P-Werten, gegen beide Anwendungsbeispiele des Berichts nachgerechnet. KEINE Stufe A: das Bestimmtheitsmass liegt bei rund 32 Prozent, und der Ausschuss verlangt selbst eine sachverstaendige Plausibilisierung an den Raendern.",
+  "fallzahl": 462,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren und Vergleichspreise 2026 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Regionalfaktor 1, Gesamtnutzungsdauer 80 Jahre nach Anlage 1 zu § 12 Abs. 5 ImmoWertV, lineare Alterswertminderung. Bauliche Außenanlagen bekommen KEINEN gesonderten Wertansatz — sie sind im üblichen Umfang im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in EURO einzusetzen, nicht in Millionen.",
+  "fundstelle": "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5 (Regressionskoeffizienten) und 2.6 (Anwendung der Regressionsformel), Seiten 10 f.; Stichprobe Kapitel 2.3, Seite 7."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16076",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "regression_additiv",
+   "intercept": 2.76316587,
+   "terme": [
+    {
+     "feld": "brw",
+     "bez": "Bodenrichtwert in Euro/m²",
+     "koeffizient": 0.08900278,
+     "transform": "ln",
+     "gueltig": [
+      9,
+      157
+     ]
+    },
+    {
+     "feld": "rnd",
+     "bez": "Restnutzungsdauer in Jahren",
+     "koeffizient": 0.00442544,
+     "exponent": 1,
+     "gueltig": [
+      12,
+      79
+     ]
+    },
+    {
+     "feld": "sachwert",
+     "bez": "vorläufiger Sachwert in Euro",
+     "koeffizient": -0.19415168,
+     "transform": "ln",
+     "gueltig": [
+      39768,
+      939969
+     ]
+    }
+   ],
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "MULTIPLE REGRESSION MIT DREI EINGANGSGRÖSSEN — Bodenrichtwert, RESTNUTZUNGSDAUER und vorläufiger Sachwert. Die Restnutzungsdauer als Eingangsgröße hat sonst kein Satz im Register; fehlt sie, gibt es hier keinen Wert, denn die Gleichung ist als Ganzes abgeleitet worden. Der Bericht druckt eine einzige Gleichung für alle drei Gebiete ab und unterscheidet sie über Dummyvariablen: k = 5,08399853 + 0,08900278 × ln(BRW) + 0,00442544 × RND − 0,19415168 × ln(vSW) − 2,32083266 × G_Greiz − 2,33589581 × G_Altenburg − 0,18101278 × (ln(vSW) × G_Gera). Für dieses Gebiet ist genau eine Dummyvariable 1 und die übrigen sind 0; die Gleichung ist deshalb hier zu einer gewöhnlichen Summe aufgelöst — Absolutglied 2.76316587, Koeffizient von ln(vSW) -0.19415168. Nachgerechnet gegen die beiden Anwendungsbeispiele des Berichts (Kapitel 2.6): Gera ergibt 0,80, Greiz 0,79 — beide zeichengleich. Bestimmtheitsmaß rund 32 Prozent, Korrelationskoeffizient 0,56.",
+   "normobjekt": "Stichprobe: vorläufiger Sachwert 39.768 bis 939.969 Euro (5. bis 95. Perzentil 85.100 bis 410.081), Bodenrichtwert 9 bis 157 Euro/qm (13 bis 90), Restnutzungsdauer 12 bis 79 Jahre (18 bis 62), Baujahre 1747 bis 2024, Wohnfläche 58 bis 379 qm. Der Ausschuss rät ausdrücklich, die Anwendung an den Rändern der Stichprobe sachverständig zu plausibilisieren."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "aussenanlagen": "kein gesonderter Ansatz, im Sachwertfaktor enthalten"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5, Seite 10."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene Regressionsgleichung samt Koeffizienten, Standardfehlern und P-Werten, gegen beide Anwendungsbeispiele des Berichts nachgerechnet. KEINE Stufe A: das Bestimmtheitsmass liegt bei rund 32 Prozent, und der Ausschuss verlangt selbst eine sachverstaendige Plausibilisierung an den Raendern.",
+  "fallzahl": 462,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren und Vergleichspreise 2026 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Regionalfaktor 1, Gesamtnutzungsdauer 80 Jahre nach Anlage 1 zu § 12 Abs. 5 ImmoWertV, lineare Alterswertminderung. Bauliche Außenanlagen bekommen KEINEN gesonderten Wertansatz — sie sind im üblichen Umfang im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in EURO einzusetzen, nicht in Millionen.",
+  "fundstelle": "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5 (Regressionskoeffizienten) und 2.6 (Anwendung der Regressionsformel), Seiten 10 f.; Stichprobe Kapitel 2.3, Seite 7."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16076",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh",
+  "formel": {
+   "form": "regression_additiv",
+   "intercept": 2.76316587,
+   "terme": [
+    {
+     "feld": "brw",
+     "bez": "Bodenrichtwert in Euro/m²",
+     "koeffizient": 0.08900278,
+     "transform": "ln",
+     "gueltig": [
+      9,
+      157
+     ]
+    },
+    {
+     "feld": "rnd",
+     "bez": "Restnutzungsdauer in Jahren",
+     "koeffizient": 0.00442544,
+     "exponent": 1,
+     "gueltig": [
+      12,
+      79
+     ]
+    },
+    {
+     "feld": "sachwert",
+     "bez": "vorläufiger Sachwert in Euro",
+     "koeffizient": -0.19415168,
+     "transform": "ln",
+     "gueltig": [
+      39768,
+      939969
+     ]
+    }
+   ],
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "MULTIPLE REGRESSION MIT DREI EINGANGSGRÖSSEN — Bodenrichtwert, RESTNUTZUNGSDAUER und vorläufiger Sachwert. Die Restnutzungsdauer als Eingangsgröße hat sonst kein Satz im Register; fehlt sie, gibt es hier keinen Wert, denn die Gleichung ist als Ganzes abgeleitet worden. Der Bericht druckt eine einzige Gleichung für alle drei Gebiete ab und unterscheidet sie über Dummyvariablen: k = 5,08399853 + 0,08900278 × ln(BRW) + 0,00442544 × RND − 0,19415168 × ln(vSW) − 2,32083266 × G_Greiz − 2,33589581 × G_Altenburg − 0,18101278 × (ln(vSW) × G_Gera). Für dieses Gebiet ist genau eine Dummyvariable 1 und die übrigen sind 0; die Gleichung ist deshalb hier zu einer gewöhnlichen Summe aufgelöst — Absolutglied 2.76316587, Koeffizient von ln(vSW) -0.19415168. Nachgerechnet gegen die beiden Anwendungsbeispiele des Berichts (Kapitel 2.6): Gera ergibt 0,80, Greiz 0,79 — beide zeichengleich. Bestimmtheitsmaß rund 32 Prozent, Korrelationskoeffizient 0,56.",
+   "normobjekt": "Stichprobe: vorläufiger Sachwert 39.768 bis 939.969 Euro (5. bis 95. Perzentil 85.100 bis 410.081), Bodenrichtwert 9 bis 157 Euro/qm (13 bis 90), Restnutzungsdauer 12 bis 79 Jahre (18 bis 62), Baujahre 1747 bis 2024, Wohnfläche 58 bis 379 qm. Der Ausschuss rät ausdrücklich, die Anwendung an den Rändern der Stichprobe sachverständig zu plausibilisieren."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "aussenanlagen": "kein gesonderter Ansatz, im Sachwertfaktor enthalten"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5, Seite 10."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene Regressionsgleichung samt Koeffizienten, Standardfehlern und P-Werten, gegen beide Anwendungsbeispiele des Berichts nachgerechnet. KEINE Stufe A: das Bestimmtheitsmass liegt bei rund 32 Prozent, und der Ausschuss verlangt selbst eine sachverstaendige Plausibilisierung an den Raendern.",
+  "fallzahl": 462,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren und Vergleichspreise 2026 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Regionalfaktor 1, Gesamtnutzungsdauer 80 Jahre nach Anlage 1 zu § 12 Abs. 5 ImmoWertV, lineare Alterswertminderung. Bauliche Außenanlagen bekommen KEINEN gesonderten Wertansatz — sie sind im üblichen Umfang im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in EURO einzusetzen, nicht in Millionen.",
+  "fundstelle": "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5 (Regressionskoeffizienten) und 2.6 (Anwendung der Regressionsformel), Seiten 10 f.; Stichprobe Kapitel 2.3, Seite 7."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16077",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "regression_additiv",
+   "intercept": 2.74810272,
+   "terme": [
+    {
+     "feld": "brw",
+     "bez": "Bodenrichtwert in Euro/m²",
+     "koeffizient": 0.08900278,
+     "transform": "ln",
+     "gueltig": [
+      9,
+      157
+     ]
+    },
+    {
+     "feld": "rnd",
+     "bez": "Restnutzungsdauer in Jahren",
+     "koeffizient": 0.00442544,
+     "exponent": 1,
+     "gueltig": [
+      12,
+      79
+     ]
+    },
+    {
+     "feld": "sachwert",
+     "bez": "vorläufiger Sachwert in Euro",
+     "koeffizient": -0.19415168,
+     "transform": "ln",
+     "gueltig": [
+      39768,
+      939969
+     ]
+    }
+   ],
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "MULTIPLE REGRESSION MIT DREI EINGANGSGRÖSSEN — Bodenrichtwert, RESTNUTZUNGSDAUER und vorläufiger Sachwert. Die Restnutzungsdauer als Eingangsgröße hat sonst kein Satz im Register; fehlt sie, gibt es hier keinen Wert, denn die Gleichung ist als Ganzes abgeleitet worden. Der Bericht druckt eine einzige Gleichung für alle drei Gebiete ab und unterscheidet sie über Dummyvariablen: k = 5,08399853 + 0,08900278 × ln(BRW) + 0,00442544 × RND − 0,19415168 × ln(vSW) − 2,32083266 × G_Greiz − 2,33589581 × G_Altenburg − 0,18101278 × (ln(vSW) × G_Gera). Für dieses Gebiet ist genau eine Dummyvariable 1 und die übrigen sind 0; die Gleichung ist deshalb hier zu einer gewöhnlichen Summe aufgelöst — Absolutglied 2.74810272, Koeffizient von ln(vSW) -0.19415168. Nachgerechnet gegen die beiden Anwendungsbeispiele des Berichts (Kapitel 2.6): Gera ergibt 0,80, Greiz 0,79 — beide zeichengleich. Bestimmtheitsmaß rund 32 Prozent, Korrelationskoeffizient 0,56.",
+   "normobjekt": "Stichprobe: vorläufiger Sachwert 39.768 bis 939.969 Euro (5. bis 95. Perzentil 85.100 bis 410.081), Bodenrichtwert 9 bis 157 Euro/qm (13 bis 90), Restnutzungsdauer 12 bis 79 Jahre (18 bis 62), Baujahre 1747 bis 2024, Wohnfläche 58 bis 379 qm. Der Ausschuss rät ausdrücklich, die Anwendung an den Rändern der Stichprobe sachverständig zu plausibilisieren."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "aussenanlagen": "kein gesonderter Ansatz, im Sachwertfaktor enthalten"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5, Seite 10."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene Regressionsgleichung samt Koeffizienten, Standardfehlern und P-Werten, gegen beide Anwendungsbeispiele des Berichts nachgerechnet. KEINE Stufe A: das Bestimmtheitsmass liegt bei rund 32 Prozent, und der Ausschuss verlangt selbst eine sachverstaendige Plausibilisierung an den Raendern.",
+  "fallzahl": 462,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren und Vergleichspreise 2026 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Regionalfaktor 1, Gesamtnutzungsdauer 80 Jahre nach Anlage 1 zu § 12 Abs. 5 ImmoWertV, lineare Alterswertminderung. Bauliche Außenanlagen bekommen KEINEN gesonderten Wertansatz — sie sind im üblichen Umfang im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in EURO einzusetzen, nicht in Millionen.",
+  "fundstelle": "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5 (Regressionskoeffizienten) und 2.6 (Anwendung der Regressionsformel), Seiten 10 f.; Stichprobe Kapitel 2.3, Seite 7."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16077",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "regression_additiv",
+   "intercept": 2.74810272,
+   "terme": [
+    {
+     "feld": "brw",
+     "bez": "Bodenrichtwert in Euro/m²",
+     "koeffizient": 0.08900278,
+     "transform": "ln",
+     "gueltig": [
+      9,
+      157
+     ]
+    },
+    {
+     "feld": "rnd",
+     "bez": "Restnutzungsdauer in Jahren",
+     "koeffizient": 0.00442544,
+     "exponent": 1,
+     "gueltig": [
+      12,
+      79
+     ]
+    },
+    {
+     "feld": "sachwert",
+     "bez": "vorläufiger Sachwert in Euro",
+     "koeffizient": -0.19415168,
+     "transform": "ln",
+     "gueltig": [
+      39768,
+      939969
+     ]
+    }
+   ],
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "MULTIPLE REGRESSION MIT DREI EINGANGSGRÖSSEN — Bodenrichtwert, RESTNUTZUNGSDAUER und vorläufiger Sachwert. Die Restnutzungsdauer als Eingangsgröße hat sonst kein Satz im Register; fehlt sie, gibt es hier keinen Wert, denn die Gleichung ist als Ganzes abgeleitet worden. Der Bericht druckt eine einzige Gleichung für alle drei Gebiete ab und unterscheidet sie über Dummyvariablen: k = 5,08399853 + 0,08900278 × ln(BRW) + 0,00442544 × RND − 0,19415168 × ln(vSW) − 2,32083266 × G_Greiz − 2,33589581 × G_Altenburg − 0,18101278 × (ln(vSW) × G_Gera). Für dieses Gebiet ist genau eine Dummyvariable 1 und die übrigen sind 0; die Gleichung ist deshalb hier zu einer gewöhnlichen Summe aufgelöst — Absolutglied 2.74810272, Koeffizient von ln(vSW) -0.19415168. Nachgerechnet gegen die beiden Anwendungsbeispiele des Berichts (Kapitel 2.6): Gera ergibt 0,80, Greiz 0,79 — beide zeichengleich. Bestimmtheitsmaß rund 32 Prozent, Korrelationskoeffizient 0,56.",
+   "normobjekt": "Stichprobe: vorläufiger Sachwert 39.768 bis 939.969 Euro (5. bis 95. Perzentil 85.100 bis 410.081), Bodenrichtwert 9 bis 157 Euro/qm (13 bis 90), Restnutzungsdauer 12 bis 79 Jahre (18 bis 62), Baujahre 1747 bis 2024, Wohnfläche 58 bis 379 qm. Der Ausschuss rät ausdrücklich, die Anwendung an den Rändern der Stichprobe sachverständig zu plausibilisieren."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "aussenanlagen": "kein gesonderter Ansatz, im Sachwertfaktor enthalten"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5, Seite 10."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene Regressionsgleichung samt Koeffizienten, Standardfehlern und P-Werten, gegen beide Anwendungsbeispiele des Berichts nachgerechnet. KEINE Stufe A: das Bestimmtheitsmass liegt bei rund 32 Prozent, und der Ausschuss verlangt selbst eine sachverstaendige Plausibilisierung an den Raendern.",
+  "fallzahl": 462,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren und Vergleichspreise 2026 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Regionalfaktor 1, Gesamtnutzungsdauer 80 Jahre nach Anlage 1 zu § 12 Abs. 5 ImmoWertV, lineare Alterswertminderung. Bauliche Außenanlagen bekommen KEINEN gesonderten Wertansatz — sie sind im üblichen Umfang im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in EURO einzusetzen, nicht in Millionen.",
+  "fundstelle": "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5 (Regressionskoeffizienten) und 2.6 (Anwendung der Regressionsformel), Seiten 10 f.; Stichprobe Kapitel 2.3, Seite 7."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16077",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh",
+  "formel": {
+   "form": "regression_additiv",
+   "intercept": 2.74810272,
+   "terme": [
+    {
+     "feld": "brw",
+     "bez": "Bodenrichtwert in Euro/m²",
+     "koeffizient": 0.08900278,
+     "transform": "ln",
+     "gueltig": [
+      9,
+      157
+     ]
+    },
+    {
+     "feld": "rnd",
+     "bez": "Restnutzungsdauer in Jahren",
+     "koeffizient": 0.00442544,
+     "exponent": 1,
+     "gueltig": [
+      12,
+      79
+     ]
+    },
+    {
+     "feld": "sachwert",
+     "bez": "vorläufiger Sachwert in Euro",
+     "koeffizient": -0.19415168,
+     "transform": "ln",
+     "gueltig": [
+      39768,
+      939969
+     ]
+    }
+   ],
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "MULTIPLE REGRESSION MIT DREI EINGANGSGRÖSSEN — Bodenrichtwert, RESTNUTZUNGSDAUER und vorläufiger Sachwert. Die Restnutzungsdauer als Eingangsgröße hat sonst kein Satz im Register; fehlt sie, gibt es hier keinen Wert, denn die Gleichung ist als Ganzes abgeleitet worden. Der Bericht druckt eine einzige Gleichung für alle drei Gebiete ab und unterscheidet sie über Dummyvariablen: k = 5,08399853 + 0,08900278 × ln(BRW) + 0,00442544 × RND − 0,19415168 × ln(vSW) − 2,32083266 × G_Greiz − 2,33589581 × G_Altenburg − 0,18101278 × (ln(vSW) × G_Gera). Für dieses Gebiet ist genau eine Dummyvariable 1 und die übrigen sind 0; die Gleichung ist deshalb hier zu einer gewöhnlichen Summe aufgelöst — Absolutglied 2.74810272, Koeffizient von ln(vSW) -0.19415168. Nachgerechnet gegen die beiden Anwendungsbeispiele des Berichts (Kapitel 2.6): Gera ergibt 0,80, Greiz 0,79 — beide zeichengleich. Bestimmtheitsmaß rund 32 Prozent, Korrelationskoeffizient 0,56.",
+   "normobjekt": "Stichprobe: vorläufiger Sachwert 39.768 bis 939.969 Euro (5. bis 95. Perzentil 85.100 bis 410.081), Bodenrichtwert 9 bis 157 Euro/qm (13 bis 90), Restnutzungsdauer 12 bis 79 Jahre (18 bis 62), Baujahre 1747 bis 2024, Wohnfläche 58 bis 379 qm. Der Ausschuss rät ausdrücklich, die Anwendung an den Rändern der Stichprobe sachverständig zu plausibilisieren."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "aussenanlagen": "kein gesonderter Ansatz, im Sachwertfaktor enthalten"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5, Seite 10."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene Regressionsgleichung samt Koeffizienten, Standardfehlern und P-Werten, gegen beide Anwendungsbeispiele des Berichts nachgerechnet. KEINE Stufe A: das Bestimmtheitsmass liegt bei rund 32 Prozent, und der Ausschuss verlangt selbst eine sachverstaendige Plausibilisierung an den Raendern.",
+  "fallzahl": 462,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren und Vergleichspreise 2026 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Regionalfaktor 1, Gesamtnutzungsdauer 80 Jahre nach Anlage 1 zu § 12 Abs. 5 ImmoWertV, lineare Alterswertminderung. Bauliche Außenanlagen bekommen KEINEN gesonderten Wertansatz — sie sind im üblichen Umfang im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in EURO einzusetzen, nicht in Millionen.",
+  "fundstelle": "Sachwertfaktoren und Vergleichspreise 2026, Kapitel 2.5 (Regressionskoeffizienten) und 2.6 (Anwendung der Regressionsformel), Seiten 10 f.; Stichprobe Kapitel 2.3, Seite 7."
  }
 ]
