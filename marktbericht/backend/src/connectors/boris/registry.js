@@ -151,8 +151,34 @@ const ADAPTERS = [
     crs: 'EPSG:4326', axis: 'latlon', format: 'gml', time: null,
   },
   {
-    code: 'he', name: 'BORIS-Hessen', license: 'open data (HVBG)', enabled: true, verified: false,
-    base: 'https://www.gds.hessen.de/wss/service/INSPIRE-HE-Bodenrichtwerte/guest', // verifizieren
+    /* ═══ v1395 · HESSEN ABGESCHALTET — der Endpunkt ist tot ═════════════
+     *
+     * GEMESSEN am 14.09.2026 an Wiesbaden, Frankfurt und Kassel: HTTP 404
+     * an allen dreien. Drei gesuchte Nachfolger (gds.hessen.de mit und
+     * ohne /INSPIRE/, geodaten.hessen.de) antworten ebenso.
+     *
+     * ABGESCHALTET UND NICHT NUR STEHENGELASSEN, weil ein toter Adapter
+     * an ERSTER Stelle zwei Dinge anrichtet:
+     *   1. Jeder hessische Abruf kostet einen Fehlversuch, bevor der
+     *      Catch-all drankommt.
+     *   2. Schlimmer: seine Fehlermeldung faerbt auf die NACHBARN ab.
+     *      Aschaffenburg liegt im Hessen-Rechteck, gehoert aber zu
+     *      Bayern - und meldete "HTTP 404 gds.hessen.de" fuer ein
+     *      bayerisches Objekt. Wer das liest, sucht den Fehler in Hessen.
+     *
+     * HESSEN FUNKTIONIERT WEITER, ueber BORIS-D. Gemessen mit dem
+     * abgeschalteten Adapter: Wiesbaden 2250, Frankfurt 6800, Kassel 450
+     * EUR/m2. Es geht also nichts verloren - es wird nur ein Umweg
+     * weniger gegangen.
+     *
+     * ZU TUN: aktuellen INSPIRE-Endpunkt beim HVBG erfragen; sobald er
+     * vorliegt, `enabled` zurueck auf true. */
+    code: 'he', name: 'BORIS-Hessen', license: 'open data (HVBG)',
+    enabled: false, verified: false,
+    note: 'Der hessische INSPIRE-Dienst antwortet seit 14.09.2026 mit HTTP 404. '
+      + 'Die Bodenrichtwerte kommen stattdessen über BORIS-D — geprüft an '
+      + 'Wiesbaden, Frankfurt und Kassel.',
+    base: 'https://www.gds.hessen.de/wss/service/INSPIRE-HE-Bodenrichtwerte/guest', // tot, s. o.
     bbox: { minLon: 7.77, maxLon: 10.24, minLat: 49.39, maxLat: 51.66 },
     layer: () => 'brw', crs: 'EPSG:4326', axis: 'latlon', format: 'gml', time: null,
   },
@@ -588,7 +614,7 @@ export const BorisRegistry = {
                note: 'Kein automatischer Bodenrichtwert und kein manueller Wert vorhanden.' };
     };
 
-    const claimed = this.claim(lat, lon);
+    let claimed = this.claim(lat, lon);   /* v1395: kann auf einen Ersatz wechseln */
     if (!claimed) return fallback('land_nicht_unterstuetzt');
     if (claimed.restricted) {
       const fb = fallback('land_kostenpflichtig_oder_gesperrt');
@@ -596,10 +622,36 @@ export const BorisRegistry = {
       fb.note = claimed.note || fb.note;
       return fb;
     }
+    /* ═══ v1395 · EIN ABGESCHALTETER DIENST BEENDET NICHTS ═══════════════
+     *
+     * Hier stand ein `return` — und das machte aus jedem abgeschalteten
+     * Landesadapter eine Sackgasse fuer sein ganzes Rechteck.
+     *
+     * BEIM ABSCHALTEN VON HESSEN SOFORT AUFGEFALLEN, in der Gegenprobe:
+     * Wiesbaden und Frankfurt lieferten vorher 2250 und 6800 EUR/m2 ueber
+     * BORIS-D — nach dem Abschalten gar nichts mehr, mit der Begruendung
+     * "land_vorbereitet_nicht_aktiv". Der Catch-all, der die Werte die
+     * ganze Zeit geliefert hatte, kam nicht mehr an die Reihe.
+     *
+     * Derselbe Gedanke wie v1389: ein Dienst, der NICHTS SAGT, ist kein
+     * Befund. Ein abgeschalteter sagt erst recht nichts. Also wird er
+     * uebersprungen statt zum Abbruch erklaert — und die Kette laeuft mit
+     * den uebrigen passenden Adaptern weiter, Catch-alls eingeschlossen.
+     *
+     * Nur wenn es gar keinen anderen gibt, bleibt es bei der alten
+     * Auskunft. */
     if (!claimed.enabled) {
-      const fb = fallback('land_vorbereitet_nicht_aktiv');
-      fb.claimed_land = claimed.name;
-      return fb;
+      const ersatz = ADAPTERS.filter((c) => c !== claimed && c.enabled && !c.restricted
+                                            && inBox(lat, lon, c.bbox));
+      if (!ersatz.length) {
+        const fb = fallback('land_vorbereitet_nicht_aktiv');
+        fb.claimed_land = claimed.name;
+        if (claimed.note) fb.note = claimed.note;
+        return fb;
+      }
+      /* Der erste Ersatz uebernimmt die Rolle des zustaendigen Adapters;
+         die uebrigen haengen ueber die normale Kettenlogik daran. */
+      claimed = ersatz[0];
     }
     /* v1077-WFBK-1 · Adapterkette statt Einzeladapter. Ein UNVERIFIZIERTER
      * Landesadapter (be/he/mv) darf bei kein_wert/request_failed auf die
@@ -686,10 +738,27 @@ export const BorisRegistry = {
      * deckt es nicht ab, gemessen an Muenchen, Nuernberg und Augsburg) —
      * fuer jedes andere Land ist es der Unterschied zwischen einem
      * voruebergehenden Ausfall und einem Totalausfall bei uns. */
-    let hit = null, first = null, ausfall = false;
+    /* ═══ v1395 · DER GRUND KOMMT VOM AUSSAGEKRAEFTIGSTEN ADAPTER ════════
+     *
+     * Bisher stand in der Meldung immer der Befund des ERSTEN Adapters.
+     * Gemessen an Aschaffenburg (Bayern, liegt im Hessen-Rechteck):
+     * Hessen wurde zuerst gefragt, gab HTTP 404 - und genau das las der
+     * Nutzer, obwohl danach noch Bayern, BORIS-D und der BORIS-D-WMS
+     * sauber geantwortet hatten ("hier gibt es keine Zone").
+     *
+     * "Kein Wert am Punkt" ist eine AUSKUNFT, ein HTTP-Fehler ein
+     * AUSFALL. Wenn irgendein Adapter sauber geantwortet hat, ist seine
+     * Auskunft die bessere - auch wenn ein anderer vorher gescheitert
+     * ist. Deshalb wird der erste SAUBERE Befund gemerkt und bevorzugt.
+     *
+     * Dasselbe gilt fuer die Gebuehrenauskunft aus v1393: sie ist die
+     * aussagekraeftigste Antwort ueberhaupt und schlaegt beide. */
+    let hit = null, first = null, sauber = null, gebuehr = null, ausfall = false;
     for (const a of chain) {
       const r = await this._queryAdapter(a, lat, lon, year);
       if (first == null) first = r;
+      if (r.gebuehr && gebuehr == null) gebuehr = r;
+      if (!r.lastErr && sauber == null) sauber = r;
       if (r.value != null) { hit = { a, r }; break; }
       if (r.lastErr) ausfall = true;
     }
@@ -703,7 +772,9 @@ export const BorisRegistry = {
     }
 
     if (!hit) {
-      const r0 = first || {};
+      /* v1395: Gebuehrenauskunft schlaegt saubere Fehlanzeige schlaegt
+         Ausfall - in dieser Reihenfolge, nicht nach Aufrufreihenfolge. */
+      const r0 = gebuehr || sauber || first || {};
       const fb = fallback(r0.lastErr ? 'request_failed:' + r0.lastErr : 'kein_wert_am_punkt');
       fb.tried_source = chain.map((c) => c.name).join(' -> ');   /* v1077-WFBK-3 */
       fb.tried_layers = r0.layers || null;
