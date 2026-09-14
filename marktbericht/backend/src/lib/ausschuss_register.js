@@ -167,7 +167,17 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                                klaglos, der Auswerter laedt aber nur, was in
                                dieser Liste steht - genau daran scheiterte
                                Berlin in v1085 mit fuenfzehn Fehltreffern. */
-                            'swf-th.json'];
+                            'swf-th.json',
+                            /* v1160: Baden-Wuerttemberg, Heilbronn. ERSTER Satz
+                               aus BW - und die Datei gehoert von Anfang an hier
+                               herein, nicht erst wenn jemand merkt, dass nichts
+                               rechnet. Das ist die Berlin-Falle aus v1085: der
+                               Registerbau schreibt swf-<land>.json fuer JEDES
+                               Land, das ein Rezept hat, aber geladen wird nur,
+                               was in dieser Liste steht. Eine fehlende Zeile
+                               sieht aus wie "kein Ausschuss hinterlegt" und ist
+                               keine. */
+                            'swf-bw.json'];
 
 export function ladeSaat(dateien = SAATDATEIEN) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])
