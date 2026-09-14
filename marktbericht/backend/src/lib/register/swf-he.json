@@ -556,6 +556,198 @@
  },
  {
   "land_code": "HE",
+  "ags": "06434003",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Bad Homburg v. d. Höhe",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Bad Homburg v. d. Höhe",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    500000,
+    600000,
+    700000,
+    800000,
+    900000,
+    1000000,
+    1100000,
+    1200000,
+    1300000,
+    1400000,
+    1500000
+   ],
+   "achse_k_feld": "brw_bereich",
+   "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+   "zuordnung_feld": "brw",
+   "kategorien": [
+    "800-2000"
+   ],
+   "kategorie_baender": [
+    {
+     "von": 800,
+     "bis": 2000,
+     "kategorie": "800-2000"
+    }
+   ],
+   "zellen": {
+    "500000": [
+     1.265
+    ],
+    "600000": [
+     1.204
+    ],
+    "700000": [
+     1.156
+    ],
+    "800000": [
+     1.115
+    ],
+    "900000": [
+     1.08
+    ],
+    "1000000": [
+     1.05
+    ],
+    "1100000": [
+     1.024
+    ],
+    "1200000": [
+     1.0
+    ],
+    "1300000": [
+     0.979
+    ],
+    "1400000": [
+     0.96
+    ],
+    "1500000": [
+     0.942
+    ]
+   },
+   "rundung_stellen": 3,
+   "liefert": "faktor",
+   "hinweis": "20 Kauffälle, Bestimmtheitsmaß 0,3857. Der Bericht druckt zusätzlich die Regressionsformel k = 42,589 · vSW^-0,268 ab; hinterlegt ist BEWUSST die Tabelle, nicht die Formel — nachgerechnet weicht die Formel bei 500.000 Euro um ein Promille von der abgedruckten Tabelle ab (1,2638 gegen 1,265), weil die Koeffizienten gerundet abgedruckt sind. Bei 1.200.000 und 1.500.000 Euro stimmen beide zeichengleich überein. Der Prüfmaßstab ist die Tabelle des amtlichen Dokuments. Der Ausschuss weist ausdrücklich darauf hin, dass die Sachwertfaktoren KEINE signifikante Abhängigkeit vom Bodenrichtwert zeigten — deshalb nur eine einzige Bodenrichtwertklasse.",
+   "normobjekt": "Nur Baujahre 1950 bis 2020. Median des bereinigten Kaufpreises 1.090.000 Euro bei einem Bodenrichtwert von 1.250 Euro/qm, Mittelwert 1.077.065 Euro bei 1.375 Euro/qm. Garagen, Außenanlagen und Nebengebäude sind wertmäßig im Sachwert berücksichtigt, Außenanlagen mit 2 bis 8 Prozent des vorläufigen Sachwerts.",
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 70,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Immobilienmarktbericht 2026 des Gutachterausschusses für den Bereich der Stadt Bad Homburg v. d. Höhe, Kapitel 11.1, Tabelle 11.1, Seite 71."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Tabelle samt Regressionsformel und Bestimmtheitsmass. KEINE Stufe A: nur ZWANZIG Kauffaelle, Bestimmtheitsmass 0,3857, und der ausgewertete Bereich beginnt erst bei 500.000 Euro vorlaeufigem Sachwert.",
+  "fallzahl": 20,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Gutachterausschuss für den Bereich der Stadt Bad Homburg v. d. Höhe, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 (Anlage 4 ImmoWertV), Baunebenkosten darin enthalten, kein Korrekturfaktor, Bezugsmaßstab Bruttogrundfläche, Baupreisindex quartalsweise zum Beurkundungsdatum, GESAMTNUTZUNGSDAUER 70 JAHRE nach Leitfaden I der ZGGH, wirtschaftliche Restnutzungsdauer mindestens 20 Jahre, lineare Alterswertminderung, Außenanlagen 2 bis 8 Prozent des vorläufigen Sachwerts, Bodenwert zum 01.01.2024, nur Baujahre 1950 bis 2020.",
+  "fundstelle": "Kapitel 11 Sachwertfaktoren, Tabelle 11.1 (Sachwertmodell) sowie Tabellen 11.1 und 11.2 (Faktoren), Seiten 69 bis 72."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06434003",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Bad Homburg v. d. Höhe",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Bad Homburg v. d. Höhe",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    200000,
+    300000,
+    400000,
+    500000,
+    600000,
+    700000
+   ],
+   "achse_k_feld": "brw_bereich",
+   "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+   "zuordnung_feld": "brw",
+   "kategorien": [
+    "800-1900"
+   ],
+   "kategorie_baender": [
+    {
+     "von": 800,
+     "bis": 1900,
+     "kategorie": "800-1900"
+    }
+   ],
+   "zellen": {
+    "200000": [
+     1.587
+    ],
+    "300000": [
+     1.448
+    ],
+    "400000": [
+     1.356
+    ],
+    "500000": [
+     1.289
+    ],
+    "600000": [
+     1.237
+    ],
+    "700000": [
+     1.194
+    ]
+   },
+   "rundung_stellen": 3,
+   "liefert": "faktor",
+   "hinweis": "21 Kauffälle. Der Ausschuss stellt ausdrücklich fest, dass zwischen Reihenmittelhäusern, Reihenendhäusern und Doppelhaushälften KEINE signifikante Unterscheidung ermittelbar war — dieser eine Satz gilt für alle drei. Der Bodenrichtwertbereich reicht hier bis 1.900 Euro/qm, bei den freistehenden Häusern bis 2.000.",
+   "normobjekt": "Nur Baujahre 1950 bis 2020. Median des bereinigten Kaufpreises 650.000 Euro bei einem Bodenrichtwert von 1.100 Euro/qm, Mittelwert 649.626 Euro bei 1.074 Euro/qm.",
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 70,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Immobilienmarktbericht 2026 des Gutachterausschusses für den Bereich der Stadt Bad Homburg v. d. Höhe, Kapitel 11.2, Tabelle 11.2, Seite 72."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Tabelle. KEINE Stufe A: nur EINUNDZWANZIG Kauffaelle, und der Bericht weist fuer diesen Zweig kein eigenes Bestimmtheitsmass aus.",
+  "fallzahl": 21,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Gutachterausschuss für den Bereich der Stadt Bad Homburg v. d. Höhe, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 (Anlage 4 ImmoWertV), Baunebenkosten darin enthalten, kein Korrekturfaktor, Bezugsmaßstab Bruttogrundfläche, Baupreisindex quartalsweise zum Beurkundungsdatum, GESAMTNUTZUNGSDAUER 70 JAHRE nach Leitfaden I der ZGGH, wirtschaftliche Restnutzungsdauer mindestens 20 Jahre, lineare Alterswertminderung, Außenanlagen 2 bis 8 Prozent des vorläufigen Sachwerts, Bodenwert zum 01.01.2024, nur Baujahre 1950 bis 2020.",
+  "fundstelle": "Kapitel 11 Sachwertfaktoren, Tabelle 11.1 (Sachwertmodell) sowie Tabellen 11.1 und 11.2 (Faktoren), Seiten 69 bis 72."
+ },
+ {
+  "land_code": "HE",
   "ags": "06434011",
   "ebene": "gemeinde",
   "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Oberursel (Taunus)",
