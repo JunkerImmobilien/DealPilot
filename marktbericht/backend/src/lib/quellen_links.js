@@ -156,6 +156,20 @@ export const AUSSCHUSS_QUELLEN = {
     warum_kein_wert: 'Der Immobilienmarktbericht 2026 druckt zwar zwei umfangreiche Sachwertfaktor-Tabellen ab, diese sind aber hessenweit von der Zentralen Geschäftsstelle ermittelt und nicht vom Gutachterausschuss beschlossen. Damit sind es keine sonstigen zur Wertermittlung erforderlichen Daten nach § 193 Abs. 5 BauGB. Ein örtlich abgeleiteter Sachwertfaktor liegt für diesen Bereich nicht vor.',
     hinweis: 'Der Bericht ist im Downloadcenter der Hessischen Verwaltung für Bodenmanagement kostenfrei abrufbar (Datei 2026_IMB_AFB_Büdingen.pdf). Kapitel 8.3 nennt das vollständige Sachwertmodell — Gesamtnutzungsdauer 80 Jahre, NHK 2010, kein Regionalfaktor, Außenanlagen 1 bis 10 Prozent je nach Standardstufe —, sodass eine modellkonforme Rechnung mit dem hessenweiten Faktor bewusst möglich bleibt.',
   },
+  /* v1154 · Nuernberg. Groesste bayerische Stadt nach Muenchen und in der
+   * Erntekarte Gruppe A ("Sachwertfaktoren UND Marktbericht vorhanden").
+   * Der Marktbericht steht online aber nur als LESEPROBE - die Tabelle der
+   * Basissachwertfaktoren traegt dort woertlich die Ueberschrift
+   * "Leseprobe ohne Daten". Die Modellbeschreibung ist vollstaendig, die
+   * Zahlen fehlen. Gemessen am 14.09.2026 an der Datei
+   * 24v400_gmb_nuernberg_2024_leseprobe.pdf. */
+  '09564': {
+    stelle: 'Gutachterausschuss für Grundstückswerte im Bereich der Stadt Nürnberg',
+    url: 'https://www.nuernberg.de/internet/geoinformation_bodenordnung/gutachterausschuss.html',
+    zugang: 'kostenpflichtig',
+    warum_kein_wert: 'Der Nürnberger Grundstücksmarktbericht steht online nur als Leseprobe zur Verfügung. Die Tabelle der Basissachwertfaktoren trägt dort die Überschrift „Leseprobe ohne Daten" — die Modellbeschreibung ist vollständig abgedruckt, die Zahlen selbst stehen nur im kostenpflichtigen Vollbericht.',
+    hinweis: 'Das Modell ist ungewöhnlich und weicht von allen anderen Ausschüssen im Register ab: der Sachwertfaktor ergibt sich aus einem BASISSACHWERTFAKTOR, der nach dem prozentualen Bodenanteil am vorläufigen Sachwert (25 bis 80 Prozent) und dem Sachwert der baulichen Anlagen ohne Bodenwert gestaffelt ist; daran sind weitere Korrekturen anzubringen. Grundlage sind 1.204 Verkaufsfälle der Jahre 2018 bis 2024, bezogen auf 2024. Die korrigierten Faktoren liegen im Mittel bei 1,12 mit einer Streuung von 0,14; die damit errechneten Sachwerte haben eine Standardabweichung von 15 Prozent. Wer den Vollbericht bezieht, kann das Modell damit einordnen, bevor er zahlt.',
+  },
   /* v1143 · Stadt Fulda. Eigener Gutachterausschuss, eigener Bericht — und
    * die Sachwertfaktoren stehen darin NUR als Diagramm. Keine Tabelle, keine
    * Regressionsformel, keine Stuetzstellen an den Kurven; die beigestellten
