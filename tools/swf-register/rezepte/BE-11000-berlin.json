@@ -1,0 +1,1239 @@
+{
+  "land_code": "BE",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "gaa_kennz": "11000",
+  "ags": [
+    "11000000"
+  ],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2024,
+  "stichtag": "2024-12-31",
+  "auswertezeitraum": "01.01.2022 bis 31.12.2024",
+  "beschlossen": null,
+  "veroeffentlicht": "2025-07-11",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-03-010-2500.pdf",
+  "quelle_datei": "BE-swf-2025.pdf, BE-altbezirke.pdf",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Berlin, Sachwertfaktoren 2025 zum Stichtag 31.12.2024, veröffentlicht im Amtsblatt für Berlin Nr. 29 vom 11.07.2025 S. 1852 ff.",
+  "lizenz": "amtliche Veröffentlichung im Amtsblatt, frei zugänglich",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität ist nach dem Blatt ZWINGEND einzuhalten.",
+  "fundstelle": "Sachwertfaktoren 2025, Tabellen 1 und 4 bis 6 nebst Korrekturen; Ortsteil-Zuordnung aus „Die Berliner Bezirke, Altbezirke und Ortsteile\" (Stand 10.07.2025).",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "gebietsgruppe",
+        "achse_k_bez": "Gebietsgruppe der Altbezirke",
+        "kategorien": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "zuordnung_feld": "ortsteil",
+        "kategorie_zuordnung": {
+          "hinweis": "Die drei Gruppen ergeben sich aus der Baumanalyse des Ausschusses (Tabelle 1 des Blattes) und sind über ALTBEZIRKE definiert — den Stand vor 2001. Die Zuordnung der heutigen Ortsteile zu den Altbezirken steht in „Die Berliner Bezirke, Altbezirke und Ortsteile\" derselben Geschäftsstelle (Stand 10.07.2025); sie ist hier Ortsteil für Ortsteil übernommen. Wer nur den heutigen Bezirk kennt, kommt nicht weiter: „Mitte\" umfasst die Altbezirke Mitte, Tiergarten und Wedding, und für keinen von ihnen führt das Blatt einen Faktor.",
+          "g1": [
+            "Treptow",
+            "Alt-Treptow",
+            "Plänterwald",
+            "Baumschulenweg",
+            "Johannisthal",
+            "Niederschöneweide",
+            "Altglienicke",
+            "Adlershof",
+            "Bohnsdorf",
+            "Lichtenberg",
+            "Friedrichsfelde",
+            "Karlshorst",
+            "Fennpfuhl",
+            "Rummelsburg",
+            "Charlottenburg",
+            "Westend",
+            "Charlottenburg-Nord",
+            "Spandau",
+            "Haselhorst",
+            "Siemensstadt",
+            "Staaken",
+            "Gatow",
+            "Kladow",
+            "Hakenfelde",
+            "Falkenhagener Feld",
+            "Wilhelmstadt",
+            "Wilmersdorf",
+            "Schmargendorf",
+            "Grunewald",
+            "Halensee",
+            "Zehlendorf",
+            "Dahlem",
+            "Nikolassee",
+            "Wannsee",
+            "Schlachtensee",
+            "Steglitz",
+            "Lichterfelde",
+            "Lankwitz",
+            "Pankow",
+            "Blankenfelde",
+            "Buch",
+            "Französisch Buchholz",
+            "Niederschönhausen",
+            "Rosenthal",
+            "Wilhelmsruh"
+          ],
+          "g2": [
+            "Tempelhof",
+            "Mariendorf",
+            "Marienfelde",
+            "Lichtenrade",
+            "Neukölln",
+            "Britz",
+            "Buckow",
+            "Rudow",
+            "Gropiusstadt",
+            "Hohenschönhausen",
+            "Falkenberg",
+            "Malchow",
+            "Wartenberg",
+            "Neu-Hohenschönhausen",
+            "Alt-Hohenschönhausen"
+          ],
+          "g3": [
+            "Köpenick",
+            "Oberschöneweide",
+            "Friedrichshagen",
+            "Rahnsdorf",
+            "Grünau",
+            "Müggelheim",
+            "Schmöckwitz",
+            "Weißensee",
+            "Blankenburg",
+            "Heinersdorf",
+            "Karow",
+            "Stadtrandsiedlung Malchow",
+            "Reinickendorf",
+            "Tegel",
+            "Konradshöhe",
+            "Heiligensee",
+            "Frohnau",
+            "Hermsdorf",
+            "Waidmannslust",
+            "Lübars",
+            "Wittenau",
+            "Märkisches Viertel",
+            "Borsigwalde",
+            "Marzahn",
+            "Biesdorf",
+            "Hellersdorf",
+            "Kaulsdorf",
+            "Mahlsdorf"
+          ]
+        },
+        "modell_je_kategorie": {
+          "g1": {
+            "form": "regression_additiv",
+            "intercept": 1.095614,
+            "terme": [
+              {
+                "feld": "sachwert",
+                "bez": "vorläufiger Sachwert des Grundstücks",
+                "koeffizient": -2.8e-7,
+                "exponent": 1,
+                "gueltig": [
+                  150000,
+                  1500000
+                ]
+              }
+            ],
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "Der Bericht druckt ab: SWF = 1,398 − 0,000000280 × Sachwert − 0,0002759 × Anzahl der Tage vom 31.12.2021 bis zum Stichtag. Zum Stichtag 31.12.2024 sind das 1.096 Tage; Zeitterm sind ins Absolutglied eingerechnet: 1,398 − 0,0002759 × 1.096 = 1,095614. Gruppe 1: Treptow, Lichtenberg, Charlottenburg, Spandau, Wilmersdorf, Zehlendorf, Steglitz, Pankow.",
+            "normobjekt": "Ein- und Zweifamilienhäuser, Einfamilienhäuser mit Einliegerwohnung, Massiv- und Fertighaus. Erst- und Weiterverkäufe. Nicht anwendbar für Villen und Landhäuser — für sie konnte der Ausschuss keine Sachwertfaktoren ableiten."
+          },
+          "g2": {
+            "form": "regression_additiv",
+            "intercept": 1.033614,
+            "terme": [
+              {
+                "feld": "sachwert",
+                "bez": "vorläufiger Sachwert des Grundstücks",
+                "koeffizient": -2.8e-7,
+                "exponent": 1,
+                "gueltig": [
+                  150000,
+                  1500000
+                ]
+              }
+            ],
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "Der Bericht druckt ab: SWF = 1,398 − 0,000000280 × Sachwert − 0,0002759 × Anzahl der Tage vom 31.12.2021 bis zum Stichtag − 0,062. Zum Stichtag 31.12.2024 sind das 1.096 Tage; Zeitterm und Gruppenzuschlag sind ins Absolutglied eingerechnet: 1,398 − 0,0002759 × 1.096 − 0,062 = 1,033614. Gruppe 2: Tempelhof, Neukölln, Hohenschönhausen.",
+            "normobjekt": "Ein- und Zweifamilienhäuser, Einfamilienhäuser mit Einliegerwohnung, Massiv- und Fertighaus. Erst- und Weiterverkäufe. Nicht anwendbar für Villen und Landhäuser — für sie konnte der Ausschuss keine Sachwertfaktoren ableiten."
+          },
+          "g3": {
+            "form": "regression_additiv",
+            "intercept": 0.990614,
+            "terme": [
+              {
+                "feld": "sachwert",
+                "bez": "vorläufiger Sachwert des Grundstücks",
+                "koeffizient": -2.8e-7,
+                "exponent": 1,
+                "gueltig": [
+                  150000,
+                  1500000
+                ]
+              }
+            ],
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "Der Bericht druckt ab: SWF = 1,398 − 0,000000280 × Sachwert − 0,0002759 × Anzahl der Tage vom 31.12.2021 bis zum Stichtag − 0,105. Zum Stichtag 31.12.2024 sind das 1.096 Tage; Zeitterm und Gruppenzuschlag sind ins Absolutglied eingerechnet: 1,398 − 0,0002759 × 1.096 − 0,105 = 0,990614. Gruppe 3: Köpenick, Weißensee, Reinickendorf, Marzahn, Hellersdorf.",
+            "normobjekt": "Ein- und Zweifamilienhäuser, Einfamilienhäuser mit Einliegerwohnung, Massiv- und Fertighaus. Erst- und Weiterverkäufe. Nicht anwendbar für Villen und Landhäuser — für sie konnte der Ausschuss keine Sachwertfaktoren ableiten."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "DREI GEBIETSGRUPPEN, ÜBER ALTBEZIRKE DEFINIERT. Die Unterschiede sind erheblich: bei 300.000 € vorläufigem Sachwert ergibt Gruppe 1 den Faktor 1,01, Gruppe 2 0,95 und Gruppe 3 0,91. Über den heutigen Bezirk ist das nicht auflösbar — die Zuordnung läuft über den Ortsteil.",
+        "normobjekt": "Siehe Untermodelle."
+      },
+      "korrekturen": [
+        {
+          "bez": "Baujahresgruppe",
+          "feld": "baujahr",
+          "art": "band",
+          "wirkung": "additiv",
+          "baender": [
+            {
+              "von": 0,
+              "bis": 1919,
+              "zuschlag": 0,
+              "bez": "bis 1919"
+            },
+            {
+              "von": 1920,
+              "bis": 1948,
+              "zuschlag": -0.061,
+              "bez": "1920 bis 1948"
+            },
+            {
+              "von": 1949,
+              "bis": 1970,
+              "zuschlag": -0.123,
+              "bez": "1949 bis 1970"
+            },
+            {
+              "von": 1971,
+              "bis": 1990,
+              "zuschlag": 0,
+              "bez": "1971 bis 1990"
+            },
+            {
+              "von": 1991,
+              "bis": 2009,
+              "zuschlag": 0.106,
+              "bez": "1991 bis 2009"
+            },
+            {
+              "von": 2010,
+              "bis": 2019,
+              "zuschlag": 0,
+              "bez": "2010 bis 2019"
+            },
+            {
+              "von": 2020,
+              "bis": 2100,
+              "zuschlag": 0,
+              "bez": "ab 2020"
+            }
+          ],
+          "hinweis": "Die Baujahresgruppen sind BÄNDER, keine Stützstellen — zwischen ihnen wird nicht interpoliert. Auffällig und so abgedruckt: die Gruppe 1949 bis 1970 trägt mit −0,123 den größten Abschlag, die Gruppe 1991 bis 2009 mit +0,106 den größten Zuschlag; bis 1919 und ab 1971 liegt der Zuschlag bei null."
+        },
+        {
+          "bez": "Bauzustand",
+          "feld": "bauzustand",
+          "art": "kategorial",
+          "wirkung": "additiv",
+          "werte": {
+            "gut": 0.179,
+            "normal": 0,
+            "mittel": 0,
+            "schlecht": -0.141,
+            "sehr gut": 0.179,
+            "neuwertig": 0.179,
+            "saniert": 0.179,
+            "renovierungsbedürftig": -0.141,
+            "unsaniert": -0.141
+          },
+          "hinweis": "Guter Bauzustand +0,179, normaler ±0, schlechter −0,141. Fehlt die Angabe, gilt kein Zuschlag — das ist der normale Bauzustand und damit der ausdrückliche Standardfall des Blattes."
+        },
+        {
+          "bez": "Gebäudekonstruktion",
+          "feld": "konstruktion",
+          "art": "kategorial",
+          "wirkung": "additiv",
+          "werte": {
+            "massiv": 0,
+            "massivhaus": 0,
+            "fertighaus-massiv": 0,
+            "fertighaus massiv": 0,
+            "fertighaus-holz": -0.072,
+            "fertighaus holz": -0.072,
+            "holz": -0.072,
+            "fertighaus": -0.072
+          },
+          "hinweis": "Nur die Holz-Fertigbauweise trägt einen Abschlag (−0,072); Massivhaus und Massiv-Fertighaus liegen bei null. Steht nur „Fertighaus\" ohne Bauweise, gilt der Holz-Abschlag — das ist der häufigere Fall und der vorsichtigere Ansatz."
+        },
+        {
+          "bez": "stadträumliche Wohnlage",
+          "feld": "wohnlage",
+          "art": "kategorial",
+          "wirkung": "additiv",
+          "werte": {
+            "einfach": -0.043,
+            "mittel": 0,
+            "normal": 0,
+            "gut": 0.075,
+            "sehr gut": 0.075
+          },
+          "hinweis": "Einfache Wohnlage −0,043, mittlere ±0, gute +0,075. Das ist die stadträumliche Wohnlage des Berliner Ausschusses, nicht die Lagebewertung eines Portals."
+        }
+      ],
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV §§ 35 bis 39, § 193 Abs. 5 Nr. 2 BauGB in Verbindung mit § 13 DVO BauGB",
+        "berechnungsmodell": "Sachwertfaktor = geeigneter Kaufpreis / Sachwert",
+        "ermittlung": "Baumanalyse für die Altbezirke, danach Regressionsanalyse mit Sachwert, Zeit und Dummyvariablen (Baujahresgruppe, Bauzustand, Wohnlage, Stadtlage, Gebäudeart, Gebäudekonstruktion, Bauerrichtungsvertrag, Endknoten der Altbezirke)",
+        "kauffaelle_gesamt": 3297,
+        "kauffaelle_ausgewertet": 2952,
+        "stichtag": "31.12.2024",
+        "veroeffentlicht": "Amtsblatt für Berlin Nr. 29 vom 11.07.2025, Seite 1852 ff.",
+        "besonderheit": "Ausgeschlossen wurden unter anderem vermietete Objekte, Nießbrauch, Wohnungsrechte, Mischbaujahre, Mietkauf, Sachenrechtsbereinigung sowie Grundstücke mit Wasserlage oder Denkmalschutz. Extremwerteliminierung: Sachwert über 5.000.000 €, Grundstücksfläche bis 120 m², tatsächliche GFZ über 1,2."
+      },
+      "geltungsbereich": {
+        "raeumlich": "Berlin, drei Gebietsgruppen aus Altbezirken",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser, Massiv- und Fertighäuser, Erst- und Weiterverkäufe",
+        "extrapolation": "gesperrt",
+        "spannen": {},
+        "vorbehalt": "FÜR VILLEN UND LANDHÄUSER GILT DIESER FAKTOR NICHT. Der Bericht sagt es ausdrücklich: „Nach der statistischen Analyse können für den Gebäudetyp Villen/Landhäuser keine Sachwertfaktoren abgeleitet werden.\"\n\nDER ZEITTERM ENDET AM 31.12.2024. Der Bericht rechnet „Anzahl der Tage vom 31.12.2021 bis zum 31.12.2024\" und weist seine Faktoren ausdrücklich „zum Stichtag 31.12.2024\" aus. Dieses Register rechnet mit genau diesem Stichtag. Für einen späteren Bewertungsstichtag schreibt der Ausschuss: „Eine Marktanpassung kann vor allem dann erforderlich werden, wenn nach dem Stichtag eine deutliche Entwicklung der Kaufpreise von Sachwertgrundstücken stattgefunden hat.\"\n\nSIEBEN ALTBEZIRKE HABEN KEINEN FAKTOR: Mitte, Tiergarten, Wedding, Friedrichshain, Kreuzberg, Prenzlauer Berg und Schöneberg kommen in keiner der drei Gruppen vor — dort gibt es zu wenige Eigenheimverkäufe. Für Objekte in deren Ortsteilen gibt dieser Satz nichts aus.\n\nDIE MODELLKONFORMITÄT IST ZWINGEND: „Bei der Anwendung der Sachwertfaktoren ist zwingend Modellkonformität einzuhalten.\"",
+        "hinweis": "Die Korrekturen für Baujahresgruppe, Bauzustand, Gebäudekonstruktion und stadträumliche Wohnlage sind ADDITIV und im Blatt einzeln abgedruckt. Die Gebäudeart steckt im Absolutglied dieses Zweigs (+0,084 Doppelhaushälfte, +0,201 Reihenendhaus, +0,341 Reihenmittelhaus gegenüber dem freistehenden Haus). Nicht übernommen: der Zuschlag für einen mit Kaufvertrag beurkundeten Bauerrichtungsvertrag (−0,081) — diese Angabe erhebt das Formular nicht."
+      },
+      "stufe": "A",
+      "stufe_grund": "Amtliche Formel mit abgedruckter Wertetabelle, veröffentlicht im Amtsblatt für Berlin. Geprüft an allen fünfzehn abgedruckten Stützstellen (drei Gruppen mal fünf Sachwerte von 300.000 bis 1.100.000 €) — alle zeichengleich.",
+      "fallzahl": 2952,
+      "streuung": null,
+      "beleg": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin, „Sachwertfaktoren 2025\" zum Stichtag 31.12.2024, veröffentlicht im Amtsblatt für Berlin Nr. 29 vom 11.07.2025, S. 1852 ff.: Tabellen 4 bis 6 mit den Faktoren je Gebietsgruppe und den Korrekturen für Baujahresgruppe, Gebäudeart, Bauzustand, Gebäudekonstruktion und stadträumliche Wohnlage. 3.297 Kauffälle des Zeitraums 01.01.2022 bis 31.12.2024, davon 2.952 in der Auswertung."
+    },
+    {
+      "zweig": "dhh",
+      "zweig_bez": "Doppelhaushälften",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "gebietsgruppe",
+        "achse_k_bez": "Gebietsgruppe der Altbezirke",
+        "kategorien": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "zuordnung_feld": "ortsteil",
+        "kategorie_zuordnung": {
+          "hinweis": "Die drei Gruppen ergeben sich aus der Baumanalyse des Ausschusses (Tabelle 1 des Blattes) und sind über ALTBEZIRKE definiert — den Stand vor 2001. Die Zuordnung der heutigen Ortsteile zu den Altbezirken steht in „Die Berliner Bezirke, Altbezirke und Ortsteile\" derselben Geschäftsstelle (Stand 10.07.2025); sie ist hier Ortsteil für Ortsteil übernommen. Wer nur den heutigen Bezirk kennt, kommt nicht weiter: „Mitte\" umfasst die Altbezirke Mitte, Tiergarten und Wedding, und für keinen von ihnen führt das Blatt einen Faktor.",
+          "g1": [
+            "Treptow",
+            "Alt-Treptow",
+            "Plänterwald",
+            "Baumschulenweg",
+            "Johannisthal",
+            "Niederschöneweide",
+            "Altglienicke",
+            "Adlershof",
+            "Bohnsdorf",
+            "Lichtenberg",
+            "Friedrichsfelde",
+            "Karlshorst",
+            "Fennpfuhl",
+            "Rummelsburg",
+            "Charlottenburg",
+            "Westend",
+            "Charlottenburg-Nord",
+            "Spandau",
+            "Haselhorst",
+            "Siemensstadt",
+            "Staaken",
+            "Gatow",
+            "Kladow",
+            "Hakenfelde",
+            "Falkenhagener Feld",
+            "Wilhelmstadt",
+            "Wilmersdorf",
+            "Schmargendorf",
+            "Grunewald",
+            "Halensee",
+            "Zehlendorf",
+            "Dahlem",
+            "Nikolassee",
+            "Wannsee",
+            "Schlachtensee",
+            "Steglitz",
+            "Lichterfelde",
+            "Lankwitz",
+            "Pankow",
+            "Blankenfelde",
+            "Buch",
+            "Französisch Buchholz",
+            "Niederschönhausen",
+            "Rosenthal",
+            "Wilhelmsruh"
+          ],
+          "g2": [
+            "Tempelhof",
+            "Mariendorf",
+            "Marienfelde",
+            "Lichtenrade",
+            "Neukölln",
+            "Britz",
+            "Buckow",
+            "Rudow",
+            "Gropiusstadt",
+            "Hohenschönhausen",
+            "Falkenberg",
+            "Malchow",
+            "Wartenberg",
+            "Neu-Hohenschönhausen",
+            "Alt-Hohenschönhausen"
+          ],
+          "g3": [
+            "Köpenick",
+            "Oberschöneweide",
+            "Friedrichshagen",
+            "Rahnsdorf",
+            "Grünau",
+            "Müggelheim",
+            "Schmöckwitz",
+            "Weißensee",
+            "Blankenburg",
+            "Heinersdorf",
+            "Karow",
+            "Stadtrandsiedlung Malchow",
+            "Reinickendorf",
+            "Tegel",
+            "Konradshöhe",
+            "Heiligensee",
+            "Frohnau",
+            "Hermsdorf",
+            "Waidmannslust",
+            "Lübars",
+            "Wittenau",
+            "Märkisches Viertel",
+            "Borsigwalde",
+            "Marzahn",
+            "Biesdorf",
+            "Hellersdorf",
+            "Kaulsdorf",
+            "Mahlsdorf"
+          ]
+        },
+        "modell_je_kategorie": {
+          "g1": {
+            "form": "regression_additiv",
+            "intercept": 1.179614,
+            "terme": [
+              {
+                "feld": "sachwert",
+                "bez": "vorläufiger Sachwert des Grundstücks",
+                "koeffizient": -2.8e-7,
+                "exponent": 1,
+                "gueltig": [
+                  150000,
+                  1500000
+                ]
+              }
+            ],
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "Der Bericht druckt ab: SWF = 1,398 − 0,000000280 × Sachwert − 0,0002759 × Anzahl der Tage vom 31.12.2021 bis zum Stichtag. Zum Stichtag 31.12.2024 sind das 1.096 Tage; Zeitterm und Gebäudeart-Zuschlag (+0,084) sind ins Absolutglied eingerechnet: 1,398 − 0,0002759 × 1.096 + 0,084 = 1,179614. Gruppe 1: Treptow, Lichtenberg, Charlottenburg, Spandau, Wilmersdorf, Zehlendorf, Steglitz, Pankow.",
+            "normobjekt": "Ein- und Zweifamilienhäuser, Einfamilienhäuser mit Einliegerwohnung, Massiv- und Fertighaus. Erst- und Weiterverkäufe. Nicht anwendbar für Villen und Landhäuser — für sie konnte der Ausschuss keine Sachwertfaktoren ableiten."
+          },
+          "g2": {
+            "form": "regression_additiv",
+            "intercept": 1.117614,
+            "terme": [
+              {
+                "feld": "sachwert",
+                "bez": "vorläufiger Sachwert des Grundstücks",
+                "koeffizient": -2.8e-7,
+                "exponent": 1,
+                "gueltig": [
+                  150000,
+                  1500000
+                ]
+              }
+            ],
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "Der Bericht druckt ab: SWF = 1,398 − 0,000000280 × Sachwert − 0,0002759 × Anzahl der Tage vom 31.12.2021 bis zum Stichtag − 0,062. Zum Stichtag 31.12.2024 sind das 1.096 Tage; Zeitterm und Gruppenzuschlag und Gebäudeart-Zuschlag (+0,084) sind ins Absolutglied eingerechnet: 1,398 − 0,0002759 × 1.096 − 0,062 + 0,084 = 1,117614. Gruppe 2: Tempelhof, Neukölln, Hohenschönhausen.",
+            "normobjekt": "Ein- und Zweifamilienhäuser, Einfamilienhäuser mit Einliegerwohnung, Massiv- und Fertighaus. Erst- und Weiterverkäufe. Nicht anwendbar für Villen und Landhäuser — für sie konnte der Ausschuss keine Sachwertfaktoren ableiten."
+          },
+          "g3": {
+            "form": "regression_additiv",
+            "intercept": 1.074614,
+            "terme": [
+              {
+                "feld": "sachwert",
+                "bez": "vorläufiger Sachwert des Grundstücks",
+                "koeffizient": -2.8e-7,
+                "exponent": 1,
+                "gueltig": [
+                  150000,
+                  1500000
+                ]
+              }
+            ],
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "Der Bericht druckt ab: SWF = 1,398 − 0,000000280 × Sachwert − 0,0002759 × Anzahl der Tage vom 31.12.2021 bis zum Stichtag − 0,105. Zum Stichtag 31.12.2024 sind das 1.096 Tage; Zeitterm und Gruppenzuschlag und Gebäudeart-Zuschlag (+0,084) sind ins Absolutglied eingerechnet: 1,398 − 0,0002759 × 1.096 − 0,105 + 0,084 = 1,074614. Gruppe 3: Köpenick, Weißensee, Reinickendorf, Marzahn, Hellersdorf.",
+            "normobjekt": "Ein- und Zweifamilienhäuser, Einfamilienhäuser mit Einliegerwohnung, Massiv- und Fertighaus. Erst- und Weiterverkäufe. Nicht anwendbar für Villen und Landhäuser — für sie konnte der Ausschuss keine Sachwertfaktoren ableiten."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "DREI GEBIETSGRUPPEN, ÜBER ALTBEZIRKE DEFINIERT. Die Unterschiede sind erheblich: bei 300.000 € vorläufigem Sachwert ergibt Gruppe 1 den Faktor 1,01, Gruppe 2 0,95 und Gruppe 3 0,91. Über den heutigen Bezirk ist das nicht auflösbar — die Zuordnung läuft über den Ortsteil.",
+        "normobjekt": "Siehe Untermodelle."
+      },
+      "korrekturen": [
+        {
+          "bez": "Baujahresgruppe",
+          "feld": "baujahr",
+          "art": "band",
+          "wirkung": "additiv",
+          "baender": [
+            {
+              "von": 0,
+              "bis": 1919,
+              "zuschlag": 0,
+              "bez": "bis 1919"
+            },
+            {
+              "von": 1920,
+              "bis": 1948,
+              "zuschlag": -0.061,
+              "bez": "1920 bis 1948"
+            },
+            {
+              "von": 1949,
+              "bis": 1970,
+              "zuschlag": -0.123,
+              "bez": "1949 bis 1970"
+            },
+            {
+              "von": 1971,
+              "bis": 1990,
+              "zuschlag": 0,
+              "bez": "1971 bis 1990"
+            },
+            {
+              "von": 1991,
+              "bis": 2009,
+              "zuschlag": 0.106,
+              "bez": "1991 bis 2009"
+            },
+            {
+              "von": 2010,
+              "bis": 2019,
+              "zuschlag": 0,
+              "bez": "2010 bis 2019"
+            },
+            {
+              "von": 2020,
+              "bis": 2100,
+              "zuschlag": 0,
+              "bez": "ab 2020"
+            }
+          ],
+          "hinweis": "Die Baujahresgruppen sind BÄNDER, keine Stützstellen — zwischen ihnen wird nicht interpoliert. Auffällig und so abgedruckt: die Gruppe 1949 bis 1970 trägt mit −0,123 den größten Abschlag, die Gruppe 1991 bis 2009 mit +0,106 den größten Zuschlag; bis 1919 und ab 1971 liegt der Zuschlag bei null."
+        },
+        {
+          "bez": "Bauzustand",
+          "feld": "bauzustand",
+          "art": "kategorial",
+          "wirkung": "additiv",
+          "werte": {
+            "gut": 0.179,
+            "normal": 0,
+            "mittel": 0,
+            "schlecht": -0.141,
+            "sehr gut": 0.179,
+            "neuwertig": 0.179,
+            "saniert": 0.179,
+            "renovierungsbedürftig": -0.141,
+            "unsaniert": -0.141
+          },
+          "hinweis": "Guter Bauzustand +0,179, normaler ±0, schlechter −0,141. Fehlt die Angabe, gilt kein Zuschlag — das ist der normale Bauzustand und damit der ausdrückliche Standardfall des Blattes."
+        },
+        {
+          "bez": "Gebäudekonstruktion",
+          "feld": "konstruktion",
+          "art": "kategorial",
+          "wirkung": "additiv",
+          "werte": {
+            "massiv": 0,
+            "massivhaus": 0,
+            "fertighaus-massiv": 0,
+            "fertighaus massiv": 0,
+            "fertighaus-holz": -0.072,
+            "fertighaus holz": -0.072,
+            "holz": -0.072,
+            "fertighaus": -0.072
+          },
+          "hinweis": "Nur die Holz-Fertigbauweise trägt einen Abschlag (−0,072); Massivhaus und Massiv-Fertighaus liegen bei null. Steht nur „Fertighaus\" ohne Bauweise, gilt der Holz-Abschlag — das ist der häufigere Fall und der vorsichtigere Ansatz."
+        },
+        {
+          "bez": "stadträumliche Wohnlage",
+          "feld": "wohnlage",
+          "art": "kategorial",
+          "wirkung": "additiv",
+          "werte": {
+            "einfach": -0.043,
+            "mittel": 0,
+            "normal": 0,
+            "gut": 0.075,
+            "sehr gut": 0.075
+          },
+          "hinweis": "Einfache Wohnlage −0,043, mittlere ±0, gute +0,075. Das ist die stadträumliche Wohnlage des Berliner Ausschusses, nicht die Lagebewertung eines Portals."
+        }
+      ],
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV §§ 35 bis 39, § 193 Abs. 5 Nr. 2 BauGB in Verbindung mit § 13 DVO BauGB",
+        "berechnungsmodell": "Sachwertfaktor = geeigneter Kaufpreis / Sachwert",
+        "ermittlung": "Baumanalyse für die Altbezirke, danach Regressionsanalyse mit Sachwert, Zeit und Dummyvariablen (Baujahresgruppe, Bauzustand, Wohnlage, Stadtlage, Gebäudeart, Gebäudekonstruktion, Bauerrichtungsvertrag, Endknoten der Altbezirke)",
+        "kauffaelle_gesamt": 3297,
+        "kauffaelle_ausgewertet": 2952,
+        "stichtag": "31.12.2024",
+        "veroeffentlicht": "Amtsblatt für Berlin Nr. 29 vom 11.07.2025, Seite 1852 ff.",
+        "besonderheit": "Ausgeschlossen wurden unter anderem vermietete Objekte, Nießbrauch, Wohnungsrechte, Mischbaujahre, Mietkauf, Sachenrechtsbereinigung sowie Grundstücke mit Wasserlage oder Denkmalschutz. Extremwerteliminierung: Sachwert über 5.000.000 €, Grundstücksfläche bis 120 m², tatsächliche GFZ über 1,2."
+      },
+      "geltungsbereich": {
+        "raeumlich": "Berlin, drei Gebietsgruppen aus Altbezirken",
+        "sachlich": "Doppelhaushälften, Massiv- und Fertighäuser, Erst- und Weiterverkäufe",
+        "extrapolation": "gesperrt",
+        "spannen": {},
+        "vorbehalt": "FÜR VILLEN UND LANDHÄUSER GILT DIESER FAKTOR NICHT. Der Bericht sagt es ausdrücklich: „Nach der statistischen Analyse können für den Gebäudetyp Villen/Landhäuser keine Sachwertfaktoren abgeleitet werden.\"\n\nDER ZEITTERM ENDET AM 31.12.2024. Der Bericht rechnet „Anzahl der Tage vom 31.12.2021 bis zum 31.12.2024\" und weist seine Faktoren ausdrücklich „zum Stichtag 31.12.2024\" aus. Dieses Register rechnet mit genau diesem Stichtag. Für einen späteren Bewertungsstichtag schreibt der Ausschuss: „Eine Marktanpassung kann vor allem dann erforderlich werden, wenn nach dem Stichtag eine deutliche Entwicklung der Kaufpreise von Sachwertgrundstücken stattgefunden hat.\"\n\nSIEBEN ALTBEZIRKE HABEN KEINEN FAKTOR: Mitte, Tiergarten, Wedding, Friedrichshain, Kreuzberg, Prenzlauer Berg und Schöneberg kommen in keiner der drei Gruppen vor — dort gibt es zu wenige Eigenheimverkäufe. Für Objekte in deren Ortsteilen gibt dieser Satz nichts aus.\n\nDIE MODELLKONFORMITÄT IST ZWINGEND: „Bei der Anwendung der Sachwertfaktoren ist zwingend Modellkonformität einzuhalten.\"",
+        "hinweis": "Die Korrekturen für Baujahresgruppe, Bauzustand, Gebäudekonstruktion und stadträumliche Wohnlage sind ADDITIV und im Blatt einzeln abgedruckt. Die Gebäudeart steckt im Absolutglied dieses Zweigs (+0,084 Doppelhaushälfte, +0,201 Reihenendhaus, +0,341 Reihenmittelhaus gegenüber dem freistehenden Haus). Nicht übernommen: der Zuschlag für einen mit Kaufvertrag beurkundeten Bauerrichtungsvertrag (−0,081) — diese Angabe erhebt das Formular nicht."
+      },
+      "stufe": "A",
+      "stufe_grund": "Amtliche Formel mit abgedruckter Wertetabelle, veröffentlicht im Amtsblatt für Berlin. Geprüft an allen fünfzehn abgedruckten Stützstellen (drei Gruppen mal fünf Sachwerte von 300.000 bis 1.100.000 €) — alle zeichengleich.",
+      "fallzahl": 2952,
+      "streuung": null,
+      "beleg": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin, „Sachwertfaktoren 2025\" zum Stichtag 31.12.2024, veröffentlicht im Amtsblatt für Berlin Nr. 29 vom 11.07.2025, S. 1852 ff.: Tabellen 4 bis 6 mit den Faktoren je Gebietsgruppe und den Korrekturen für Baujahresgruppe, Gebäudeart, Bauzustand, Gebäudekonstruktion und stadträumliche Wohnlage. 3.297 Kauffälle des Zeitraums 01.01.2022 bis 31.12.2024, davon 2.952 in der Auswertung."
+    },
+    {
+      "zweig": "reh",
+      "zweig_bez": "Reihenendhäuser",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "gebietsgruppe",
+        "achse_k_bez": "Gebietsgruppe der Altbezirke",
+        "kategorien": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "zuordnung_feld": "ortsteil",
+        "kategorie_zuordnung": {
+          "hinweis": "Die drei Gruppen ergeben sich aus der Baumanalyse des Ausschusses (Tabelle 1 des Blattes) und sind über ALTBEZIRKE definiert — den Stand vor 2001. Die Zuordnung der heutigen Ortsteile zu den Altbezirken steht in „Die Berliner Bezirke, Altbezirke und Ortsteile\" derselben Geschäftsstelle (Stand 10.07.2025); sie ist hier Ortsteil für Ortsteil übernommen. Wer nur den heutigen Bezirk kennt, kommt nicht weiter: „Mitte\" umfasst die Altbezirke Mitte, Tiergarten und Wedding, und für keinen von ihnen führt das Blatt einen Faktor.",
+          "g1": [
+            "Treptow",
+            "Alt-Treptow",
+            "Plänterwald",
+            "Baumschulenweg",
+            "Johannisthal",
+            "Niederschöneweide",
+            "Altglienicke",
+            "Adlershof",
+            "Bohnsdorf",
+            "Lichtenberg",
+            "Friedrichsfelde",
+            "Karlshorst",
+            "Fennpfuhl",
+            "Rummelsburg",
+            "Charlottenburg",
+            "Westend",
+            "Charlottenburg-Nord",
+            "Spandau",
+            "Haselhorst",
+            "Siemensstadt",
+            "Staaken",
+            "Gatow",
+            "Kladow",
+            "Hakenfelde",
+            "Falkenhagener Feld",
+            "Wilhelmstadt",
+            "Wilmersdorf",
+            "Schmargendorf",
+            "Grunewald",
+            "Halensee",
+            "Zehlendorf",
+            "Dahlem",
+            "Nikolassee",
+            "Wannsee",
+            "Schlachtensee",
+            "Steglitz",
+            "Lichterfelde",
+            "Lankwitz",
+            "Pankow",
+            "Blankenfelde",
+            "Buch",
+            "Französisch Buchholz",
+            "Niederschönhausen",
+            "Rosenthal",
+            "Wilhelmsruh"
+          ],
+          "g2": [
+            "Tempelhof",
+            "Mariendorf",
+            "Marienfelde",
+            "Lichtenrade",
+            "Neukölln",
+            "Britz",
+            "Buckow",
+            "Rudow",
+            "Gropiusstadt",
+            "Hohenschönhausen",
+            "Falkenberg",
+            "Malchow",
+            "Wartenberg",
+            "Neu-Hohenschönhausen",
+            "Alt-Hohenschönhausen"
+          ],
+          "g3": [
+            "Köpenick",
+            "Oberschöneweide",
+            "Friedrichshagen",
+            "Rahnsdorf",
+            "Grünau",
+            "Müggelheim",
+            "Schmöckwitz",
+            "Weißensee",
+            "Blankenburg",
+            "Heinersdorf",
+            "Karow",
+            "Stadtrandsiedlung Malchow",
+            "Reinickendorf",
+            "Tegel",
+            "Konradshöhe",
+            "Heiligensee",
+            "Frohnau",
+            "Hermsdorf",
+            "Waidmannslust",
+            "Lübars",
+            "Wittenau",
+            "Märkisches Viertel",
+            "Borsigwalde",
+            "Marzahn",
+            "Biesdorf",
+            "Hellersdorf",
+            "Kaulsdorf",
+            "Mahlsdorf"
+          ]
+        },
+        "modell_je_kategorie": {
+          "g1": {
+            "form": "regression_additiv",
+            "intercept": 1.296614,
+            "terme": [
+              {
+                "feld": "sachwert",
+                "bez": "vorläufiger Sachwert des Grundstücks",
+                "koeffizient": -2.8e-7,
+                "exponent": 1,
+                "gueltig": [
+                  150000,
+                  1500000
+                ]
+              }
+            ],
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "Der Bericht druckt ab: SWF = 1,398 − 0,000000280 × Sachwert − 0,0002759 × Anzahl der Tage vom 31.12.2021 bis zum Stichtag. Zum Stichtag 31.12.2024 sind das 1.096 Tage; Zeitterm und Gebäudeart-Zuschlag (+0,201) sind ins Absolutglied eingerechnet: 1,398 − 0,0002759 × 1.096 + 0,201 = 1,296614. Gruppe 1: Treptow, Lichtenberg, Charlottenburg, Spandau, Wilmersdorf, Zehlendorf, Steglitz, Pankow.",
+            "normobjekt": "Ein- und Zweifamilienhäuser, Einfamilienhäuser mit Einliegerwohnung, Massiv- und Fertighaus. Erst- und Weiterverkäufe. Nicht anwendbar für Villen und Landhäuser — für sie konnte der Ausschuss keine Sachwertfaktoren ableiten."
+          },
+          "g2": {
+            "form": "regression_additiv",
+            "intercept": 1.234614,
+            "terme": [
+              {
+                "feld": "sachwert",
+                "bez": "vorläufiger Sachwert des Grundstücks",
+                "koeffizient": -2.8e-7,
+                "exponent": 1,
+                "gueltig": [
+                  150000,
+                  1500000
+                ]
+              }
+            ],
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "Der Bericht druckt ab: SWF = 1,398 − 0,000000280 × Sachwert − 0,0002759 × Anzahl der Tage vom 31.12.2021 bis zum Stichtag − 0,062. Zum Stichtag 31.12.2024 sind das 1.096 Tage; Zeitterm und Gruppenzuschlag und Gebäudeart-Zuschlag (+0,201) sind ins Absolutglied eingerechnet: 1,398 − 0,0002759 × 1.096 − 0,062 + 0,201 = 1,234614. Gruppe 2: Tempelhof, Neukölln, Hohenschönhausen.",
+            "normobjekt": "Ein- und Zweifamilienhäuser, Einfamilienhäuser mit Einliegerwohnung, Massiv- und Fertighaus. Erst- und Weiterverkäufe. Nicht anwendbar für Villen und Landhäuser — für sie konnte der Ausschuss keine Sachwertfaktoren ableiten."
+          },
+          "g3": {
+            "form": "regression_additiv",
+            "intercept": 1.191614,
+            "terme": [
+              {
+                "feld": "sachwert",
+                "bez": "vorläufiger Sachwert des Grundstücks",
+                "koeffizient": -2.8e-7,
+                "exponent": 1,
+                "gueltig": [
+                  150000,
+                  1500000
+                ]
+              }
+            ],
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "Der Bericht druckt ab: SWF = 1,398 − 0,000000280 × Sachwert − 0,0002759 × Anzahl der Tage vom 31.12.2021 bis zum Stichtag − 0,105. Zum Stichtag 31.12.2024 sind das 1.096 Tage; Zeitterm und Gruppenzuschlag und Gebäudeart-Zuschlag (+0,201) sind ins Absolutglied eingerechnet: 1,398 − 0,0002759 × 1.096 − 0,105 + 0,201 = 1,191614. Gruppe 3: Köpenick, Weißensee, Reinickendorf, Marzahn, Hellersdorf.",
+            "normobjekt": "Ein- und Zweifamilienhäuser, Einfamilienhäuser mit Einliegerwohnung, Massiv- und Fertighaus. Erst- und Weiterverkäufe. Nicht anwendbar für Villen und Landhäuser — für sie konnte der Ausschuss keine Sachwertfaktoren ableiten."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "DREI GEBIETSGRUPPEN, ÜBER ALTBEZIRKE DEFINIERT. Die Unterschiede sind erheblich: bei 300.000 € vorläufigem Sachwert ergibt Gruppe 1 den Faktor 1,01, Gruppe 2 0,95 und Gruppe 3 0,91. Über den heutigen Bezirk ist das nicht auflösbar — die Zuordnung läuft über den Ortsteil.",
+        "normobjekt": "Siehe Untermodelle."
+      },
+      "korrekturen": [
+        {
+          "bez": "Baujahresgruppe",
+          "feld": "baujahr",
+          "art": "band",
+          "wirkung": "additiv",
+          "baender": [
+            {
+              "von": 0,
+              "bis": 1919,
+              "zuschlag": 0,
+              "bez": "bis 1919"
+            },
+            {
+              "von": 1920,
+              "bis": 1948,
+              "zuschlag": -0.061,
+              "bez": "1920 bis 1948"
+            },
+            {
+              "von": 1949,
+              "bis": 1970,
+              "zuschlag": -0.123,
+              "bez": "1949 bis 1970"
+            },
+            {
+              "von": 1971,
+              "bis": 1990,
+              "zuschlag": 0,
+              "bez": "1971 bis 1990"
+            },
+            {
+              "von": 1991,
+              "bis": 2009,
+              "zuschlag": 0.106,
+              "bez": "1991 bis 2009"
+            },
+            {
+              "von": 2010,
+              "bis": 2019,
+              "zuschlag": 0,
+              "bez": "2010 bis 2019"
+            },
+            {
+              "von": 2020,
+              "bis": 2100,
+              "zuschlag": 0,
+              "bez": "ab 2020"
+            }
+          ],
+          "hinweis": "Die Baujahresgruppen sind BÄNDER, keine Stützstellen — zwischen ihnen wird nicht interpoliert. Auffällig und so abgedruckt: die Gruppe 1949 bis 1970 trägt mit −0,123 den größten Abschlag, die Gruppe 1991 bis 2009 mit +0,106 den größten Zuschlag; bis 1919 und ab 1971 liegt der Zuschlag bei null."
+        },
+        {
+          "bez": "Bauzustand",
+          "feld": "bauzustand",
+          "art": "kategorial",
+          "wirkung": "additiv",
+          "werte": {
+            "gut": 0.179,
+            "normal": 0,
+            "mittel": 0,
+            "schlecht": -0.141,
+            "sehr gut": 0.179,
+            "neuwertig": 0.179,
+            "saniert": 0.179,
+            "renovierungsbedürftig": -0.141,
+            "unsaniert": -0.141
+          },
+          "hinweis": "Guter Bauzustand +0,179, normaler ±0, schlechter −0,141. Fehlt die Angabe, gilt kein Zuschlag — das ist der normale Bauzustand und damit der ausdrückliche Standardfall des Blattes."
+        },
+        {
+          "bez": "Gebäudekonstruktion",
+          "feld": "konstruktion",
+          "art": "kategorial",
+          "wirkung": "additiv",
+          "werte": {
+            "massiv": 0,
+            "massivhaus": 0,
+            "fertighaus-massiv": 0,
+            "fertighaus massiv": 0,
+            "fertighaus-holz": -0.072,
+            "fertighaus holz": -0.072,
+            "holz": -0.072,
+            "fertighaus": -0.072
+          },
+          "hinweis": "Nur die Holz-Fertigbauweise trägt einen Abschlag (−0,072); Massivhaus und Massiv-Fertighaus liegen bei null. Steht nur „Fertighaus\" ohne Bauweise, gilt der Holz-Abschlag — das ist der häufigere Fall und der vorsichtigere Ansatz."
+        },
+        {
+          "bez": "stadträumliche Wohnlage",
+          "feld": "wohnlage",
+          "art": "kategorial",
+          "wirkung": "additiv",
+          "werte": {
+            "einfach": -0.043,
+            "mittel": 0,
+            "normal": 0,
+            "gut": 0.075,
+            "sehr gut": 0.075
+          },
+          "hinweis": "Einfache Wohnlage −0,043, mittlere ±0, gute +0,075. Das ist die stadträumliche Wohnlage des Berliner Ausschusses, nicht die Lagebewertung eines Portals."
+        }
+      ],
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV §§ 35 bis 39, § 193 Abs. 5 Nr. 2 BauGB in Verbindung mit § 13 DVO BauGB",
+        "berechnungsmodell": "Sachwertfaktor = geeigneter Kaufpreis / Sachwert",
+        "ermittlung": "Baumanalyse für die Altbezirke, danach Regressionsanalyse mit Sachwert, Zeit und Dummyvariablen (Baujahresgruppe, Bauzustand, Wohnlage, Stadtlage, Gebäudeart, Gebäudekonstruktion, Bauerrichtungsvertrag, Endknoten der Altbezirke)",
+        "kauffaelle_gesamt": 3297,
+        "kauffaelle_ausgewertet": 2952,
+        "stichtag": "31.12.2024",
+        "veroeffentlicht": "Amtsblatt für Berlin Nr. 29 vom 11.07.2025, Seite 1852 ff.",
+        "besonderheit": "Ausgeschlossen wurden unter anderem vermietete Objekte, Nießbrauch, Wohnungsrechte, Mischbaujahre, Mietkauf, Sachenrechtsbereinigung sowie Grundstücke mit Wasserlage oder Denkmalschutz. Extremwerteliminierung: Sachwert über 5.000.000 €, Grundstücksfläche bis 120 m², tatsächliche GFZ über 1,2."
+      },
+      "geltungsbereich": {
+        "raeumlich": "Berlin, drei Gebietsgruppen aus Altbezirken",
+        "sachlich": "Reihenendhäuser, Massiv- und Fertighäuser, Erst- und Weiterverkäufe",
+        "extrapolation": "gesperrt",
+        "spannen": {},
+        "vorbehalt": "FÜR VILLEN UND LANDHÄUSER GILT DIESER FAKTOR NICHT. Der Bericht sagt es ausdrücklich: „Nach der statistischen Analyse können für den Gebäudetyp Villen/Landhäuser keine Sachwertfaktoren abgeleitet werden.\"\n\nDER ZEITTERM ENDET AM 31.12.2024. Der Bericht rechnet „Anzahl der Tage vom 31.12.2021 bis zum 31.12.2024\" und weist seine Faktoren ausdrücklich „zum Stichtag 31.12.2024\" aus. Dieses Register rechnet mit genau diesem Stichtag. Für einen späteren Bewertungsstichtag schreibt der Ausschuss: „Eine Marktanpassung kann vor allem dann erforderlich werden, wenn nach dem Stichtag eine deutliche Entwicklung der Kaufpreise von Sachwertgrundstücken stattgefunden hat.\"\n\nSIEBEN ALTBEZIRKE HABEN KEINEN FAKTOR: Mitte, Tiergarten, Wedding, Friedrichshain, Kreuzberg, Prenzlauer Berg und Schöneberg kommen in keiner der drei Gruppen vor — dort gibt es zu wenige Eigenheimverkäufe. Für Objekte in deren Ortsteilen gibt dieser Satz nichts aus.\n\nDIE MODELLKONFORMITÄT IST ZWINGEND: „Bei der Anwendung der Sachwertfaktoren ist zwingend Modellkonformität einzuhalten.\"",
+        "hinweis": "Die Korrekturen für Baujahresgruppe, Bauzustand, Gebäudekonstruktion und stadträumliche Wohnlage sind ADDITIV und im Blatt einzeln abgedruckt. Die Gebäudeart steckt im Absolutglied dieses Zweigs (+0,084 Doppelhaushälfte, +0,201 Reihenendhaus, +0,341 Reihenmittelhaus gegenüber dem freistehenden Haus). Nicht übernommen: der Zuschlag für einen mit Kaufvertrag beurkundeten Bauerrichtungsvertrag (−0,081) — diese Angabe erhebt das Formular nicht."
+      },
+      "stufe": "A",
+      "stufe_grund": "Amtliche Formel mit abgedruckter Wertetabelle, veröffentlicht im Amtsblatt für Berlin. Geprüft an allen fünfzehn abgedruckten Stützstellen (drei Gruppen mal fünf Sachwerte von 300.000 bis 1.100.000 €) — alle zeichengleich.",
+      "fallzahl": 2952,
+      "streuung": null,
+      "beleg": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin, „Sachwertfaktoren 2025\" zum Stichtag 31.12.2024, veröffentlicht im Amtsblatt für Berlin Nr. 29 vom 11.07.2025, S. 1852 ff.: Tabellen 4 bis 6 mit den Faktoren je Gebietsgruppe und den Korrekturen für Baujahresgruppe, Gebäudeart, Bauzustand, Gebäudekonstruktion und stadträumliche Wohnlage. 3.297 Kauffälle des Zeitraums 01.01.2022 bis 31.12.2024, davon 2.952 in der Auswertung."
+    },
+    {
+      "zweig": "rmh",
+      "zweig_bez": "Reihenmittelhäuser",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "gebietsgruppe",
+        "achse_k_bez": "Gebietsgruppe der Altbezirke",
+        "kategorien": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "zuordnung_feld": "ortsteil",
+        "kategorie_zuordnung": {
+          "hinweis": "Die drei Gruppen ergeben sich aus der Baumanalyse des Ausschusses (Tabelle 1 des Blattes) und sind über ALTBEZIRKE definiert — den Stand vor 2001. Die Zuordnung der heutigen Ortsteile zu den Altbezirken steht in „Die Berliner Bezirke, Altbezirke und Ortsteile\" derselben Geschäftsstelle (Stand 10.07.2025); sie ist hier Ortsteil für Ortsteil übernommen. Wer nur den heutigen Bezirk kennt, kommt nicht weiter: „Mitte\" umfasst die Altbezirke Mitte, Tiergarten und Wedding, und für keinen von ihnen führt das Blatt einen Faktor.",
+          "g1": [
+            "Treptow",
+            "Alt-Treptow",
+            "Plänterwald",
+            "Baumschulenweg",
+            "Johannisthal",
+            "Niederschöneweide",
+            "Altglienicke",
+            "Adlershof",
+            "Bohnsdorf",
+            "Lichtenberg",
+            "Friedrichsfelde",
+            "Karlshorst",
+            "Fennpfuhl",
+            "Rummelsburg",
+            "Charlottenburg",
+            "Westend",
+            "Charlottenburg-Nord",
+            "Spandau",
+            "Haselhorst",
+            "Siemensstadt",
+            "Staaken",
+            "Gatow",
+            "Kladow",
+            "Hakenfelde",
+            "Falkenhagener Feld",
+            "Wilhelmstadt",
+            "Wilmersdorf",
+            "Schmargendorf",
+            "Grunewald",
+            "Halensee",
+            "Zehlendorf",
+            "Dahlem",
+            "Nikolassee",
+            "Wannsee",
+            "Schlachtensee",
+            "Steglitz",
+            "Lichterfelde",
+            "Lankwitz",
+            "Pankow",
+            "Blankenfelde",
+            "Buch",
+            "Französisch Buchholz",
+            "Niederschönhausen",
+            "Rosenthal",
+            "Wilhelmsruh"
+          ],
+          "g2": [
+            "Tempelhof",
+            "Mariendorf",
+            "Marienfelde",
+            "Lichtenrade",
+            "Neukölln",
+            "Britz",
+            "Buckow",
+            "Rudow",
+            "Gropiusstadt",
+            "Hohenschönhausen",
+            "Falkenberg",
+            "Malchow",
+            "Wartenberg",
+            "Neu-Hohenschönhausen",
+            "Alt-Hohenschönhausen"
+          ],
+          "g3": [
+            "Köpenick",
+            "Oberschöneweide",
+            "Friedrichshagen",
+            "Rahnsdorf",
+            "Grünau",
+            "Müggelheim",
+            "Schmöckwitz",
+            "Weißensee",
+            "Blankenburg",
+            "Heinersdorf",
+            "Karow",
+            "Stadtrandsiedlung Malchow",
+            "Reinickendorf",
+            "Tegel",
+            "Konradshöhe",
+            "Heiligensee",
+            "Frohnau",
+            "Hermsdorf",
+            "Waidmannslust",
+            "Lübars",
+            "Wittenau",
+            "Märkisches Viertel",
+            "Borsigwalde",
+            "Marzahn",
+            "Biesdorf",
+            "Hellersdorf",
+            "Kaulsdorf",
+            "Mahlsdorf"
+          ]
+        },
+        "modell_je_kategorie": {
+          "g1": {
+            "form": "regression_additiv",
+            "intercept": 1.436614,
+            "terme": [
+              {
+                "feld": "sachwert",
+                "bez": "vorläufiger Sachwert des Grundstücks",
+                "koeffizient": -2.8e-7,
+                "exponent": 1,
+                "gueltig": [
+                  150000,
+                  1500000
+                ]
+              }
+            ],
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "Der Bericht druckt ab: SWF = 1,398 − 0,000000280 × Sachwert − 0,0002759 × Anzahl der Tage vom 31.12.2021 bis zum Stichtag. Zum Stichtag 31.12.2024 sind das 1.096 Tage; Zeitterm und Gebäudeart-Zuschlag (+0,341) sind ins Absolutglied eingerechnet: 1,398 − 0,0002759 × 1.096 + 0,341 = 1,436614. Gruppe 1: Treptow, Lichtenberg, Charlottenburg, Spandau, Wilmersdorf, Zehlendorf, Steglitz, Pankow.",
+            "normobjekt": "Ein- und Zweifamilienhäuser, Einfamilienhäuser mit Einliegerwohnung, Massiv- und Fertighaus. Erst- und Weiterverkäufe. Nicht anwendbar für Villen und Landhäuser — für sie konnte der Ausschuss keine Sachwertfaktoren ableiten."
+          },
+          "g2": {
+            "form": "regression_additiv",
+            "intercept": 1.374614,
+            "terme": [
+              {
+                "feld": "sachwert",
+                "bez": "vorläufiger Sachwert des Grundstücks",
+                "koeffizient": -2.8e-7,
+                "exponent": 1,
+                "gueltig": [
+                  150000,
+                  1500000
+                ]
+              }
+            ],
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "Der Bericht druckt ab: SWF = 1,398 − 0,000000280 × Sachwert − 0,0002759 × Anzahl der Tage vom 31.12.2021 bis zum Stichtag − 0,062. Zum Stichtag 31.12.2024 sind das 1.096 Tage; Zeitterm und Gruppenzuschlag und Gebäudeart-Zuschlag (+0,341) sind ins Absolutglied eingerechnet: 1,398 − 0,0002759 × 1.096 − 0,062 + 0,341 = 1,374614. Gruppe 2: Tempelhof, Neukölln, Hohenschönhausen.",
+            "normobjekt": "Ein- und Zweifamilienhäuser, Einfamilienhäuser mit Einliegerwohnung, Massiv- und Fertighaus. Erst- und Weiterverkäufe. Nicht anwendbar für Villen und Landhäuser — für sie konnte der Ausschuss keine Sachwertfaktoren ableiten."
+          },
+          "g3": {
+            "form": "regression_additiv",
+            "intercept": 1.331614,
+            "terme": [
+              {
+                "feld": "sachwert",
+                "bez": "vorläufiger Sachwert des Grundstücks",
+                "koeffizient": -2.8e-7,
+                "exponent": 1,
+                "gueltig": [
+                  150000,
+                  1500000
+                ]
+              }
+            ],
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "Der Bericht druckt ab: SWF = 1,398 − 0,000000280 × Sachwert − 0,0002759 × Anzahl der Tage vom 31.12.2021 bis zum Stichtag − 0,105. Zum Stichtag 31.12.2024 sind das 1.096 Tage; Zeitterm und Gruppenzuschlag und Gebäudeart-Zuschlag (+0,341) sind ins Absolutglied eingerechnet: 1,398 − 0,0002759 × 1.096 − 0,105 + 0,341 = 1,331614. Gruppe 3: Köpenick, Weißensee, Reinickendorf, Marzahn, Hellersdorf.",
+            "normobjekt": "Ein- und Zweifamilienhäuser, Einfamilienhäuser mit Einliegerwohnung, Massiv- und Fertighaus. Erst- und Weiterverkäufe. Nicht anwendbar für Villen und Landhäuser — für sie konnte der Ausschuss keine Sachwertfaktoren ableiten."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "DREI GEBIETSGRUPPEN, ÜBER ALTBEZIRKE DEFINIERT. Die Unterschiede sind erheblich: bei 300.000 € vorläufigem Sachwert ergibt Gruppe 1 den Faktor 1,01, Gruppe 2 0,95 und Gruppe 3 0,91. Über den heutigen Bezirk ist das nicht auflösbar — die Zuordnung läuft über den Ortsteil.",
+        "normobjekt": "Siehe Untermodelle."
+      },
+      "korrekturen": [
+        {
+          "bez": "Baujahresgruppe",
+          "feld": "baujahr",
+          "art": "band",
+          "wirkung": "additiv",
+          "baender": [
+            {
+              "von": 0,
+              "bis": 1919,
+              "zuschlag": 0,
+              "bez": "bis 1919"
+            },
+            {
+              "von": 1920,
+              "bis": 1948,
+              "zuschlag": -0.061,
+              "bez": "1920 bis 1948"
+            },
+            {
+              "von": 1949,
+              "bis": 1970,
+              "zuschlag": -0.123,
+              "bez": "1949 bis 1970"
+            },
+            {
+              "von": 1971,
+              "bis": 1990,
+              "zuschlag": 0,
+              "bez": "1971 bis 1990"
+            },
+            {
+              "von": 1991,
+              "bis": 2009,
+              "zuschlag": 0.106,
+              "bez": "1991 bis 2009"
+            },
+            {
+              "von": 2010,
+              "bis": 2019,
+              "zuschlag": 0,
+              "bez": "2010 bis 2019"
+            },
+            {
+              "von": 2020,
+              "bis": 2100,
+              "zuschlag": 0,
+              "bez": "ab 2020"
+            }
+          ],
+          "hinweis": "Die Baujahresgruppen sind BÄNDER, keine Stützstellen — zwischen ihnen wird nicht interpoliert. Auffällig und so abgedruckt: die Gruppe 1949 bis 1970 trägt mit −0,123 den größten Abschlag, die Gruppe 1991 bis 2009 mit +0,106 den größten Zuschlag; bis 1919 und ab 1971 liegt der Zuschlag bei null."
+        },
+        {
+          "bez": "Bauzustand",
+          "feld": "bauzustand",
+          "art": "kategorial",
+          "wirkung": "additiv",
+          "werte": {
+            "gut": 0.179,
+            "normal": 0,
+            "mittel": 0,
+            "schlecht": -0.141,
+            "sehr gut": 0.179,
+            "neuwertig": 0.179,
+            "saniert": 0.179,
+            "renovierungsbedürftig": -0.141,
+            "unsaniert": -0.141
+          },
+          "hinweis": "Guter Bauzustand +0,179, normaler ±0, schlechter −0,141. Fehlt die Angabe, gilt kein Zuschlag — das ist der normale Bauzustand und damit der ausdrückliche Standardfall des Blattes."
+        },
+        {
+          "bez": "Gebäudekonstruktion",
+          "feld": "konstruktion",
+          "art": "kategorial",
+          "wirkung": "additiv",
+          "werte": {
+            "massiv": 0,
+            "massivhaus": 0,
+            "fertighaus-massiv": 0,
+            "fertighaus massiv": 0,
+            "fertighaus-holz": -0.072,
+            "fertighaus holz": -0.072,
+            "holz": -0.072,
+            "fertighaus": -0.072
+          },
+          "hinweis": "Nur die Holz-Fertigbauweise trägt einen Abschlag (−0,072); Massivhaus und Massiv-Fertighaus liegen bei null. Steht nur „Fertighaus\" ohne Bauweise, gilt der Holz-Abschlag — das ist der häufigere Fall und der vorsichtigere Ansatz."
+        },
+        {
+          "bez": "stadträumliche Wohnlage",
+          "feld": "wohnlage",
+          "art": "kategorial",
+          "wirkung": "additiv",
+          "werte": {
+            "einfach": -0.043,
+            "mittel": 0,
+            "normal": 0,
+            "gut": 0.075,
+            "sehr gut": 0.075
+          },
+          "hinweis": "Einfache Wohnlage −0,043, mittlere ±0, gute +0,075. Das ist die stadträumliche Wohnlage des Berliner Ausschusses, nicht die Lagebewertung eines Portals."
+        }
+      ],
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV §§ 35 bis 39, § 193 Abs. 5 Nr. 2 BauGB in Verbindung mit § 13 DVO BauGB",
+        "berechnungsmodell": "Sachwertfaktor = geeigneter Kaufpreis / Sachwert",
+        "ermittlung": "Baumanalyse für die Altbezirke, danach Regressionsanalyse mit Sachwert, Zeit und Dummyvariablen (Baujahresgruppe, Bauzustand, Wohnlage, Stadtlage, Gebäudeart, Gebäudekonstruktion, Bauerrichtungsvertrag, Endknoten der Altbezirke)",
+        "kauffaelle_gesamt": 3297,
+        "kauffaelle_ausgewertet": 2952,
+        "stichtag": "31.12.2024",
+        "veroeffentlicht": "Amtsblatt für Berlin Nr. 29 vom 11.07.2025, Seite 1852 ff.",
+        "besonderheit": "Ausgeschlossen wurden unter anderem vermietete Objekte, Nießbrauch, Wohnungsrechte, Mischbaujahre, Mietkauf, Sachenrechtsbereinigung sowie Grundstücke mit Wasserlage oder Denkmalschutz. Extremwerteliminierung: Sachwert über 5.000.000 €, Grundstücksfläche bis 120 m², tatsächliche GFZ über 1,2."
+      },
+      "geltungsbereich": {
+        "raeumlich": "Berlin, drei Gebietsgruppen aus Altbezirken",
+        "sachlich": "Reihenmittelhäuser, Massiv- und Fertighäuser, Erst- und Weiterverkäufe",
+        "extrapolation": "gesperrt",
+        "spannen": {},
+        "vorbehalt": "FÜR VILLEN UND LANDHÄUSER GILT DIESER FAKTOR NICHT. Der Bericht sagt es ausdrücklich: „Nach der statistischen Analyse können für den Gebäudetyp Villen/Landhäuser keine Sachwertfaktoren abgeleitet werden.\"\n\nDER ZEITTERM ENDET AM 31.12.2024. Der Bericht rechnet „Anzahl der Tage vom 31.12.2021 bis zum 31.12.2024\" und weist seine Faktoren ausdrücklich „zum Stichtag 31.12.2024\" aus. Dieses Register rechnet mit genau diesem Stichtag. Für einen späteren Bewertungsstichtag schreibt der Ausschuss: „Eine Marktanpassung kann vor allem dann erforderlich werden, wenn nach dem Stichtag eine deutliche Entwicklung der Kaufpreise von Sachwertgrundstücken stattgefunden hat.\"\n\nSIEBEN ALTBEZIRKE HABEN KEINEN FAKTOR: Mitte, Tiergarten, Wedding, Friedrichshain, Kreuzberg, Prenzlauer Berg und Schöneberg kommen in keiner der drei Gruppen vor — dort gibt es zu wenige Eigenheimverkäufe. Für Objekte in deren Ortsteilen gibt dieser Satz nichts aus.\n\nDIE MODELLKONFORMITÄT IST ZWINGEND: „Bei der Anwendung der Sachwertfaktoren ist zwingend Modellkonformität einzuhalten.\"",
+        "hinweis": "Die Korrekturen für Baujahresgruppe, Bauzustand, Gebäudekonstruktion und stadträumliche Wohnlage sind ADDITIV und im Blatt einzeln abgedruckt. Die Gebäudeart steckt im Absolutglied dieses Zweigs (+0,084 Doppelhaushälfte, +0,201 Reihenendhaus, +0,341 Reihenmittelhaus gegenüber dem freistehenden Haus). Nicht übernommen: der Zuschlag für einen mit Kaufvertrag beurkundeten Bauerrichtungsvertrag (−0,081) — diese Angabe erhebt das Formular nicht."
+      },
+      "stufe": "A",
+      "stufe_grund": "Amtliche Formel mit abgedruckter Wertetabelle, veröffentlicht im Amtsblatt für Berlin. Geprüft an allen fünfzehn abgedruckten Stützstellen (drei Gruppen mal fünf Sachwerte von 300.000 bis 1.100.000 €) — alle zeichengleich.",
+      "fallzahl": 2952,
+      "streuung": null,
+      "beleg": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin, „Sachwertfaktoren 2025\" zum Stichtag 31.12.2024, veröffentlicht im Amtsblatt für Berlin Nr. 29 vom 11.07.2025, S. 1852 ff.: Tabellen 4 bis 6 mit den Faktoren je Gebietsgruppe und den Korrekturen für Baujahresgruppe, Gebäudeart, Bauzustand, Gebäudekonstruktion und stadträumliche Wohnlage. 3.297 Kauffälle des Zeitraums 01.01.2022 bis 31.12.2024, davon 2.952 in der Auswertung."
+    }
+  ]
+}

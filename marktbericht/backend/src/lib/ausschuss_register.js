@@ -144,7 +144,12 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                             /* v1114: Sachsen. Leipzig fuehrt VIER Gebaeudetypen
                                getrennt - freistehend, Doppelhaushaelfte,
                                Reihenend- und Reihenmittelhaus. */
-                            'swf-sn.json'];
+                            'swf-sn.json',
+                            /* v1117: Berlin. Der Satz aus v1085 ordnete ueber
+                               ALTBEZIRKE zu und fand sein Feld nie - jetzt
+                               laeuft die Zuordnung ueber den Ortsteil, mit der
+                               amtlichen Tabelle des Ausschusses. */
+                            'swf-be.json'];
 
 export function ladeSaat(dateien = SAATDATEIEN) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])
