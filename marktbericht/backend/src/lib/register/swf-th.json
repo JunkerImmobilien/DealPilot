@@ -3666,6 +3666,1582 @@
  },
  {
   "land_code": "TH",
+  "ags": "16067",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    20,
+    40,
+    80,
+    160
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenwertniveau in Euro/m²",
+   "achse_y": [
+    100000,
+    120000,
+    140000,
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000,
+    400000,
+    420000,
+    440000,
+    460000,
+    480000,
+    500000,
+    520000,
+    540000,
+    560000,
+    580000,
+    600000,
+    620000,
+    640000,
+    660000,
+    680000,
+    700000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "100000": [
+     null,
+     1.3,
+     null,
+     null
+    ],
+    "120000": [
+     null,
+     1.21,
+     null,
+     null
+    ],
+    "140000": [
+     0.94,
+     1.15,
+     null,
+     null
+    ],
+    "160000": [
+     0.9,
+     1.09,
+     1.28,
+     null
+    ],
+    "180000": [
+     0.86,
+     1.04,
+     1.23,
+     null
+    ],
+    "200000": [
+     0.82,
+     1.0,
+     1.18,
+     1.36
+    ],
+    "220000": [
+     0.79,
+     0.97,
+     1.14,
+     1.31
+    ],
+    "240000": [
+     0.77,
+     0.93,
+     1.1,
+     1.27
+    ],
+    "260000": [
+     0.75,
+     0.91,
+     1.07,
+     1.23
+    ],
+    "280000": [
+     0.73,
+     0.88,
+     1.04,
+     1.19
+    ],
+    "300000": [
+     0.71,
+     0.86,
+     1.01,
+     1.16
+    ],
+    "320000": [
+     0.69,
+     0.84,
+     0.99,
+     1.13
+    ],
+    "340000": [
+     0.67,
+     0.82,
+     0.96,
+     1.11
+    ],
+    "360000": [
+     0.66,
+     0.8,
+     0.94,
+     1.09
+    ],
+    "380000": [
+     0.65,
+     0.79,
+     0.92,
+     1.06
+    ],
+    "400000": [
+     0.63,
+     0.77,
+     0.91,
+     1.04
+    ],
+    "420000": [
+     0.62,
+     0.76,
+     0.89,
+     1.02
+    ],
+    "440000": [
+     0.61,
+     0.74,
+     0.87,
+     1.01
+    ],
+    "460000": [
+     0.6,
+     0.73,
+     0.86,
+     0.99
+    ],
+    "480000": [
+     0.59,
+     0.72,
+     0.85,
+     0.97
+    ],
+    "500000": [
+     0.58,
+     0.71,
+     0.83,
+     0.96
+    ],
+    "520000": [
+     0.57,
+     0.7,
+     0.82,
+     0.94
+    ],
+    "540000": [
+     null,
+     null,
+     0.81,
+     0.93
+    ],
+    "560000": [
+     null,
+     null,
+     0.8,
+     0.92
+    ],
+    "580000": [
+     null,
+     null,
+     0.79,
+     0.91
+    ],
+    "600000": [
+     null,
+     null,
+     0.78,
+     0.89
+    ],
+    "620000": [
+     null,
+     null,
+     null,
+     0.88
+    ],
+    "640000": [
+     null,
+     null,
+     null,
+     0.87
+    ],
+    "660000": [
+     null,
+     null,
+     null,
+     0.86
+    ],
+    "680000": [
+     null,
+     null,
+     null,
+     0.85
+    ],
+    "700000": [
+     null,
+     null,
+     null,
+     0.84
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "JEDE SPALTE HAT EINEN EIGENEN GÜLTIGKEITSBEREICH: 20 €/qm von 140.000 bis 520.000 € · 40 €/qm von 100.000 bis 520.000 € · 80 €/qm von 160.000 bis 600.000 € · 160 €/qm von 200.000 bis 700.000 €. Außerhalb davon druckt der Bericht nichts ab, und hier steht nichts — die leeren Zellen sind so belegt wie die gefüllten. Die Werte sind aus der abgedruckten Schätzfunktion k = a × (vSW / 1 Mio)^b berechnet (20 €/qm: a=0.44763 b=-0.37899 · 40 €/qm: a=0.54422 b=-0.37875 · 80 €/qm: a=0.64077 b=-0.37864 · 160 €/qm: a=0.73731 b=-0.37855) und gegen jeden abgedruckten Tabellenwert geprüft. Die Ränder wurden aus der gerenderten Seite abgelesen, nicht aus dem Textstrom geschlossen.",
+   "normobjekt": "Bauliche Außenanlagen sind im üblichen Umfang mit 2 bis 8 Prozent vom vorläufigen Sachwert bereits im Faktor enthalten; ebenso nicht in der BGF erfasste Bauteile (Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche)."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": null,
+   "gnd_je_standardstufe": {
+    "1": 60,
+    "2": 65,
+    "3": 70,
+    "4": 75,
+    "5": 80
+   },
+   "gnd_grundlage": "Anlage 3 SW-RL (außer Kraft seit 01.01.2022) i. V. m. § 53 Abs. 2 ImmoWertV",
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF",
+   "aussenanlagen": "kein gesonderter Ansatz, 2 bis 8 Prozent vom vorläufigen Sachwert im Sachwertfaktor enthalten"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2024, Kapitel 3.1, Abb. 4, Seite 9."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: der Stichtag 01.01.2023 liegt zurueck, und die Gesamtnutzungsdauer haengt hier von der Standardstufe ab, was der Registersatz nicht als eine Zahl abbilden kann.",
+  "fallzahl": 438,
+  "streuung": null,
+  "stichtag": "2023-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2024 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Baupreisindex des Statistischen Bundesamtes, ursprüngliches Baujahr, lineare Alterswertminderung, objektspezifisch angepasster Bodenrichtwert, Grundstücksfläche nach § 41 ImmoWertV. ACHTUNG GESAMTNUTZUNGSDAUER: sie richtet sich hier nach der STANDARDSTUFE — 60 Jahre bei Stufe 1, 65 bei Stufe 2, 70 bei Stufe 3, 75 bei Stufe 4, 80 bei Stufe 5 (nach Anlage 3 SW-RL in Verbindung mit § 53 Abs. 2 ImmoWertV). Es gibt hier KEINE einheitliche Gesamtnutzungsdauer. Bauliche Außenanlagen und nicht in der BGF erfasste Bauteile bekommen keinen gesonderten Wertansatz; sie sind mit 2 bis 8 Prozent vom vorläufigen Sachwert bereits im Faktor enthalten.",
+  "fundstelle": "Sachwertfaktoren 2024, Kapitel 3.1 (Abb. 4, Seite 9), 3.2 (Abb. 9, Seite 13) und 3.3 (Abb. 14, Seite 17); Modellbeschreibung Abb. 2."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16063",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    20,
+    40,
+    80,
+    160
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenwertniveau in Euro/m²",
+   "achse_y": [
+    100000,
+    120000,
+    140000,
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000,
+    400000,
+    420000,
+    440000,
+    460000,
+    480000,
+    500000,
+    520000,
+    540000,
+    560000,
+    580000,
+    600000,
+    620000,
+    640000,
+    660000,
+    680000,
+    700000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "100000": [
+     null,
+     1.3,
+     null,
+     null
+    ],
+    "120000": [
+     null,
+     1.21,
+     null,
+     null
+    ],
+    "140000": [
+     0.94,
+     1.15,
+     null,
+     null
+    ],
+    "160000": [
+     0.9,
+     1.09,
+     1.28,
+     null
+    ],
+    "180000": [
+     0.86,
+     1.04,
+     1.23,
+     null
+    ],
+    "200000": [
+     0.82,
+     1.0,
+     1.18,
+     1.36
+    ],
+    "220000": [
+     0.79,
+     0.97,
+     1.14,
+     1.31
+    ],
+    "240000": [
+     0.77,
+     0.93,
+     1.1,
+     1.27
+    ],
+    "260000": [
+     0.75,
+     0.91,
+     1.07,
+     1.23
+    ],
+    "280000": [
+     0.73,
+     0.88,
+     1.04,
+     1.19
+    ],
+    "300000": [
+     0.71,
+     0.86,
+     1.01,
+     1.16
+    ],
+    "320000": [
+     0.69,
+     0.84,
+     0.99,
+     1.13
+    ],
+    "340000": [
+     0.67,
+     0.82,
+     0.96,
+     1.11
+    ],
+    "360000": [
+     0.66,
+     0.8,
+     0.94,
+     1.09
+    ],
+    "380000": [
+     0.65,
+     0.79,
+     0.92,
+     1.06
+    ],
+    "400000": [
+     0.63,
+     0.77,
+     0.91,
+     1.04
+    ],
+    "420000": [
+     0.62,
+     0.76,
+     0.89,
+     1.02
+    ],
+    "440000": [
+     0.61,
+     0.74,
+     0.87,
+     1.01
+    ],
+    "460000": [
+     0.6,
+     0.73,
+     0.86,
+     0.99
+    ],
+    "480000": [
+     0.59,
+     0.72,
+     0.85,
+     0.97
+    ],
+    "500000": [
+     0.58,
+     0.71,
+     0.83,
+     0.96
+    ],
+    "520000": [
+     0.57,
+     0.7,
+     0.82,
+     0.94
+    ],
+    "540000": [
+     null,
+     null,
+     0.81,
+     0.93
+    ],
+    "560000": [
+     null,
+     null,
+     0.8,
+     0.92
+    ],
+    "580000": [
+     null,
+     null,
+     0.79,
+     0.91
+    ],
+    "600000": [
+     null,
+     null,
+     0.78,
+     0.89
+    ],
+    "620000": [
+     null,
+     null,
+     null,
+     0.88
+    ],
+    "640000": [
+     null,
+     null,
+     null,
+     0.87
+    ],
+    "660000": [
+     null,
+     null,
+     null,
+     0.86
+    ],
+    "680000": [
+     null,
+     null,
+     null,
+     0.85
+    ],
+    "700000": [
+     null,
+     null,
+     null,
+     0.84
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "JEDE SPALTE HAT EINEN EIGENEN GÜLTIGKEITSBEREICH: 20 €/qm von 140.000 bis 520.000 € · 40 €/qm von 100.000 bis 520.000 € · 80 €/qm von 160.000 bis 600.000 € · 160 €/qm von 200.000 bis 700.000 €. Außerhalb davon druckt der Bericht nichts ab, und hier steht nichts — die leeren Zellen sind so belegt wie die gefüllten. Die Werte sind aus der abgedruckten Schätzfunktion k = a × (vSW / 1 Mio)^b berechnet (20 €/qm: a=0.44763 b=-0.37899 · 40 €/qm: a=0.54422 b=-0.37875 · 80 €/qm: a=0.64077 b=-0.37864 · 160 €/qm: a=0.73731 b=-0.37855) und gegen jeden abgedruckten Tabellenwert geprüft. Die Ränder wurden aus der gerenderten Seite abgelesen, nicht aus dem Textstrom geschlossen.",
+   "normobjekt": "Bauliche Außenanlagen sind im üblichen Umfang mit 2 bis 8 Prozent vom vorläufigen Sachwert bereits im Faktor enthalten; ebenso nicht in der BGF erfasste Bauteile (Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche)."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": null,
+   "gnd_je_standardstufe": {
+    "1": 60,
+    "2": 65,
+    "3": 70,
+    "4": 75,
+    "5": 80
+   },
+   "gnd_grundlage": "Anlage 3 SW-RL (außer Kraft seit 01.01.2022) i. V. m. § 53 Abs. 2 ImmoWertV",
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF",
+   "aussenanlagen": "kein gesonderter Ansatz, 2 bis 8 Prozent vom vorläufigen Sachwert im Sachwertfaktor enthalten"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2024, Kapitel 3.1, Abb. 4, Seite 9."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: der Stichtag 01.01.2023 liegt zurueck, und die Gesamtnutzungsdauer haengt hier von der Standardstufe ab, was der Registersatz nicht als eine Zahl abbilden kann.",
+  "fallzahl": 438,
+  "streuung": null,
+  "stichtag": "2023-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2024 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Baupreisindex des Statistischen Bundesamtes, ursprüngliches Baujahr, lineare Alterswertminderung, objektspezifisch angepasster Bodenrichtwert, Grundstücksfläche nach § 41 ImmoWertV. ACHTUNG GESAMTNUTZUNGSDAUER: sie richtet sich hier nach der STANDARDSTUFE — 60 Jahre bei Stufe 1, 65 bei Stufe 2, 70 bei Stufe 3, 75 bei Stufe 4, 80 bei Stufe 5 (nach Anlage 3 SW-RL in Verbindung mit § 53 Abs. 2 ImmoWertV). Es gibt hier KEINE einheitliche Gesamtnutzungsdauer. Bauliche Außenanlagen und nicht in der BGF erfasste Bauteile bekommen keinen gesonderten Wertansatz; sie sind mit 2 bis 8 Prozent vom vorläufigen Sachwert bereits im Faktor enthalten.",
+  "fundstelle": "Sachwertfaktoren 2024, Kapitel 3.1 (Abb. 4, Seite 9), 3.2 (Abb. 9, Seite 13) und 3.3 (Abb. 14, Seite 17); Modellbeschreibung Abb. 2."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16067",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    20,
+    40,
+    80,
+    160
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenwertniveau in Euro/m²",
+   "achse_y": [
+    120000,
+    140000,
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000,
+    400000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "120000": [
+     null,
+     1.16,
+     null,
+     null
+    ],
+    "140000": [
+     0.93,
+     1.08,
+     1.24,
+     1.39
+    ],
+    "160000": [
+     0.87,
+     1.02,
+     1.17,
+     1.31
+    ],
+    "180000": [
+     0.82,
+     0.96,
+     1.11,
+     1.25
+    ],
+    "200000": [
+     0.78,
+     0.92,
+     1.06,
+     1.2
+    ],
+    "220000": [
+     0.74,
+     0.88,
+     1.02,
+     1.15
+    ],
+    "240000": [
+     0.71,
+     0.84,
+     0.98,
+     1.11
+    ],
+    "260000": [
+     0.68,
+     0.81,
+     0.94,
+     1.08
+    ],
+    "280000": [
+     0.66,
+     0.79,
+     0.91,
+     1.04
+    ],
+    "300000": [
+     0.64,
+     0.76,
+     0.89,
+     1.01
+    ],
+    "320000": [
+     0.62,
+     0.74,
+     0.86,
+     0.99
+    ],
+    "340000": [
+     0.6,
+     0.72,
+     null,
+     0.96
+    ],
+    "360000": [
+     0.58,
+     null,
+     null,
+     0.94
+    ],
+    "380000": [
+     0.56,
+     null,
+     null,
+     null
+    ],
+    "400000": [
+     0.55,
+     null,
+     null,
+     null
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "JEDE SPALTE HAT EINEN EIGENEN GÜLTIGKEITSBEREICH: 20 €/qm von 140.000 bis 400.000 € · 40 €/qm von 120.000 bis 340.000 € · 80 €/qm von 140.000 bis 320.000 € · 160 €/qm von 140.000 bis 360.000 €. Außerhalb davon druckt der Bericht nichts ab, und hier steht nichts — die leeren Zellen sind so belegt wie die gefüllten. Die Werte sind aus der abgedruckten Schätzfunktion k = a × (vSW / 1 Mio)^b berechnet (20 €/qm: a=0.34795 b=-0.49995 · 40 €/qm: a=0.43644 b=-0.46228 · 80 €/qm: a=0.52563 b=-0.43495 · 160 €/qm: a=0.61524 b=-0.41429) und gegen jeden abgedruckten Tabellenwert geprüft. Die Ränder wurden aus der gerenderten Seite abgelesen, nicht aus dem Textstrom geschlossen. Der Ausschuss schreibt ausdrücklich, eine getrennte Ermittlung für Reihenend-, Reihenmittelhäuser und Doppelhaushälften sei wegen zu geringer Fallzahlen nicht sinnvoll möglich gewesen.",
+   "normobjekt": "Bauliche Außenanlagen sind im üblichen Umfang mit 2 bis 8 Prozent vom vorläufigen Sachwert bereits im Faktor enthalten; ebenso nicht in der BGF erfasste Bauteile (Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche)."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": null,
+   "gnd_je_standardstufe": {
+    "1": 60,
+    "2": 65,
+    "3": 70,
+    "4": 75,
+    "5": 80
+   },
+   "gnd_grundlage": "Anlage 3 SW-RL (außer Kraft seit 01.01.2022) i. V. m. § 53 Abs. 2 ImmoWertV",
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF",
+   "aussenanlagen": "kein gesonderter Ansatz, 2 bis 8 Prozent vom vorläufigen Sachwert im Sachwertfaktor enthalten"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2024, Kapitel 3.2, Abb. 9, Seite 13."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: der Stichtag 01.01.2023 liegt zurueck, und die Gesamtnutzungsdauer haengt hier von der Standardstufe ab, was der Registersatz nicht als eine Zahl abbilden kann.",
+  "fallzahl": 176,
+  "streuung": null,
+  "stichtag": "2023-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2024 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Baupreisindex des Statistischen Bundesamtes, ursprüngliches Baujahr, lineare Alterswertminderung, objektspezifisch angepasster Bodenrichtwert, Grundstücksfläche nach § 41 ImmoWertV. ACHTUNG GESAMTNUTZUNGSDAUER: sie richtet sich hier nach der STANDARDSTUFE — 60 Jahre bei Stufe 1, 65 bei Stufe 2, 70 bei Stufe 3, 75 bei Stufe 4, 80 bei Stufe 5 (nach Anlage 3 SW-RL in Verbindung mit § 53 Abs. 2 ImmoWertV). Es gibt hier KEINE einheitliche Gesamtnutzungsdauer. Bauliche Außenanlagen und nicht in der BGF erfasste Bauteile bekommen keinen gesonderten Wertansatz; sie sind mit 2 bis 8 Prozent vom vorläufigen Sachwert bereits im Faktor enthalten.",
+  "fundstelle": "Sachwertfaktoren 2024, Kapitel 3.1 (Abb. 4, Seite 9), 3.2 (Abb. 9, Seite 13) und 3.3 (Abb. 14, Seite 17); Modellbeschreibung Abb. 2."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16063",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    20,
+    40,
+    80,
+    160
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenwertniveau in Euro/m²",
+   "achse_y": [
+    120000,
+    140000,
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000,
+    400000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "120000": [
+     null,
+     1.16,
+     null,
+     null
+    ],
+    "140000": [
+     0.93,
+     1.08,
+     1.24,
+     1.39
+    ],
+    "160000": [
+     0.87,
+     1.02,
+     1.17,
+     1.31
+    ],
+    "180000": [
+     0.82,
+     0.96,
+     1.11,
+     1.25
+    ],
+    "200000": [
+     0.78,
+     0.92,
+     1.06,
+     1.2
+    ],
+    "220000": [
+     0.74,
+     0.88,
+     1.02,
+     1.15
+    ],
+    "240000": [
+     0.71,
+     0.84,
+     0.98,
+     1.11
+    ],
+    "260000": [
+     0.68,
+     0.81,
+     0.94,
+     1.08
+    ],
+    "280000": [
+     0.66,
+     0.79,
+     0.91,
+     1.04
+    ],
+    "300000": [
+     0.64,
+     0.76,
+     0.89,
+     1.01
+    ],
+    "320000": [
+     0.62,
+     0.74,
+     0.86,
+     0.99
+    ],
+    "340000": [
+     0.6,
+     0.72,
+     null,
+     0.96
+    ],
+    "360000": [
+     0.58,
+     null,
+     null,
+     0.94
+    ],
+    "380000": [
+     0.56,
+     null,
+     null,
+     null
+    ],
+    "400000": [
+     0.55,
+     null,
+     null,
+     null
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "JEDE SPALTE HAT EINEN EIGENEN GÜLTIGKEITSBEREICH: 20 €/qm von 140.000 bis 400.000 € · 40 €/qm von 120.000 bis 340.000 € · 80 €/qm von 140.000 bis 320.000 € · 160 €/qm von 140.000 bis 360.000 €. Außerhalb davon druckt der Bericht nichts ab, und hier steht nichts — die leeren Zellen sind so belegt wie die gefüllten. Die Werte sind aus der abgedruckten Schätzfunktion k = a × (vSW / 1 Mio)^b berechnet (20 €/qm: a=0.34795 b=-0.49995 · 40 €/qm: a=0.43644 b=-0.46228 · 80 €/qm: a=0.52563 b=-0.43495 · 160 €/qm: a=0.61524 b=-0.41429) und gegen jeden abgedruckten Tabellenwert geprüft. Die Ränder wurden aus der gerenderten Seite abgelesen, nicht aus dem Textstrom geschlossen. Der Ausschuss schreibt ausdrücklich, eine getrennte Ermittlung für Reihenend-, Reihenmittelhäuser und Doppelhaushälften sei wegen zu geringer Fallzahlen nicht sinnvoll möglich gewesen.",
+   "normobjekt": "Bauliche Außenanlagen sind im üblichen Umfang mit 2 bis 8 Prozent vom vorläufigen Sachwert bereits im Faktor enthalten; ebenso nicht in der BGF erfasste Bauteile (Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche)."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": null,
+   "gnd_je_standardstufe": {
+    "1": 60,
+    "2": 65,
+    "3": 70,
+    "4": 75,
+    "5": 80
+   },
+   "gnd_grundlage": "Anlage 3 SW-RL (außer Kraft seit 01.01.2022) i. V. m. § 53 Abs. 2 ImmoWertV",
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF",
+   "aussenanlagen": "kein gesonderter Ansatz, 2 bis 8 Prozent vom vorläufigen Sachwert im Sachwertfaktor enthalten"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2024, Kapitel 3.2, Abb. 9, Seite 13."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: der Stichtag 01.01.2023 liegt zurueck, und die Gesamtnutzungsdauer haengt hier von der Standardstufe ab, was der Registersatz nicht als eine Zahl abbilden kann.",
+  "fallzahl": 176,
+  "streuung": null,
+  "stichtag": "2023-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2024 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Baupreisindex des Statistischen Bundesamtes, ursprüngliches Baujahr, lineare Alterswertminderung, objektspezifisch angepasster Bodenrichtwert, Grundstücksfläche nach § 41 ImmoWertV. ACHTUNG GESAMTNUTZUNGSDAUER: sie richtet sich hier nach der STANDARDSTUFE — 60 Jahre bei Stufe 1, 65 bei Stufe 2, 70 bei Stufe 3, 75 bei Stufe 4, 80 bei Stufe 5 (nach Anlage 3 SW-RL in Verbindung mit § 53 Abs. 2 ImmoWertV). Es gibt hier KEINE einheitliche Gesamtnutzungsdauer. Bauliche Außenanlagen und nicht in der BGF erfasste Bauteile bekommen keinen gesonderten Wertansatz; sie sind mit 2 bis 8 Prozent vom vorläufigen Sachwert bereits im Faktor enthalten.",
+  "fundstelle": "Sachwertfaktoren 2024, Kapitel 3.1 (Abb. 4, Seite 9), 3.2 (Abb. 9, Seite 13) und 3.3 (Abb. 14, Seite 17); Modellbeschreibung Abb. 2."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16067",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    20,
+    40,
+    80,
+    160
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenwertniveau in Euro/m²",
+   "achse_y": [
+    120000,
+    140000,
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000,
+    400000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "120000": [
+     null,
+     1.16,
+     null,
+     null
+    ],
+    "140000": [
+     0.93,
+     1.08,
+     1.24,
+     1.39
+    ],
+    "160000": [
+     0.87,
+     1.02,
+     1.17,
+     1.31
+    ],
+    "180000": [
+     0.82,
+     0.96,
+     1.11,
+     1.25
+    ],
+    "200000": [
+     0.78,
+     0.92,
+     1.06,
+     1.2
+    ],
+    "220000": [
+     0.74,
+     0.88,
+     1.02,
+     1.15
+    ],
+    "240000": [
+     0.71,
+     0.84,
+     0.98,
+     1.11
+    ],
+    "260000": [
+     0.68,
+     0.81,
+     0.94,
+     1.08
+    ],
+    "280000": [
+     0.66,
+     0.79,
+     0.91,
+     1.04
+    ],
+    "300000": [
+     0.64,
+     0.76,
+     0.89,
+     1.01
+    ],
+    "320000": [
+     0.62,
+     0.74,
+     0.86,
+     0.99
+    ],
+    "340000": [
+     0.6,
+     0.72,
+     null,
+     0.96
+    ],
+    "360000": [
+     0.58,
+     null,
+     null,
+     0.94
+    ],
+    "380000": [
+     0.56,
+     null,
+     null,
+     null
+    ],
+    "400000": [
+     0.55,
+     null,
+     null,
+     null
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "JEDE SPALTE HAT EINEN EIGENEN GÜLTIGKEITSBEREICH: 20 €/qm von 140.000 bis 400.000 € · 40 €/qm von 120.000 bis 340.000 € · 80 €/qm von 140.000 bis 320.000 € · 160 €/qm von 140.000 bis 360.000 €. Außerhalb davon druckt der Bericht nichts ab, und hier steht nichts — die leeren Zellen sind so belegt wie die gefüllten. Die Werte sind aus der abgedruckten Schätzfunktion k = a × (vSW / 1 Mio)^b berechnet (20 €/qm: a=0.34795 b=-0.49995 · 40 €/qm: a=0.43644 b=-0.46228 · 80 €/qm: a=0.52563 b=-0.43495 · 160 €/qm: a=0.61524 b=-0.41429) und gegen jeden abgedruckten Tabellenwert geprüft. Die Ränder wurden aus der gerenderten Seite abgelesen, nicht aus dem Textstrom geschlossen. DIESELBE Matrix wie bei rhdhh — der Ausschuss fasst Doppelhaushälften, Reihenend- und Reihenmittelhäuser ausdrücklich zusammen, weil die Fallzahlen für eine getrennte Auswertung nicht reichten. Der Eintrag steht hier, damit ein Reihenmittelhaus nicht über den Rückfall des Auswerters, sondern über die Aussage des Berichts zu seinem Wert kommt.",
+   "normobjekt": "Bauliche Außenanlagen sind im üblichen Umfang mit 2 bis 8 Prozent vom vorläufigen Sachwert bereits im Faktor enthalten; ebenso nicht in der BGF erfasste Bauteile (Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche)."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": null,
+   "gnd_je_standardstufe": {
+    "1": 60,
+    "2": 65,
+    "3": 70,
+    "4": 75,
+    "5": 80
+   },
+   "gnd_grundlage": "Anlage 3 SW-RL (außer Kraft seit 01.01.2022) i. V. m. § 53 Abs. 2 ImmoWertV",
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF",
+   "aussenanlagen": "kein gesonderter Ansatz, 2 bis 8 Prozent vom vorläufigen Sachwert im Sachwertfaktor enthalten"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2024, Kapitel 3.2, Abb. 9, Seite 13."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: der Stichtag 01.01.2023 liegt zurueck, und die Gesamtnutzungsdauer haengt hier von der Standardstufe ab, was der Registersatz nicht als eine Zahl abbilden kann.",
+  "fallzahl": 176,
+  "streuung": null,
+  "stichtag": "2023-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2024 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Baupreisindex des Statistischen Bundesamtes, ursprüngliches Baujahr, lineare Alterswertminderung, objektspezifisch angepasster Bodenrichtwert, Grundstücksfläche nach § 41 ImmoWertV. ACHTUNG GESAMTNUTZUNGSDAUER: sie richtet sich hier nach der STANDARDSTUFE — 60 Jahre bei Stufe 1, 65 bei Stufe 2, 70 bei Stufe 3, 75 bei Stufe 4, 80 bei Stufe 5 (nach Anlage 3 SW-RL in Verbindung mit § 53 Abs. 2 ImmoWertV). Es gibt hier KEINE einheitliche Gesamtnutzungsdauer. Bauliche Außenanlagen und nicht in der BGF erfasste Bauteile bekommen keinen gesonderten Wertansatz; sie sind mit 2 bis 8 Prozent vom vorläufigen Sachwert bereits im Faktor enthalten.",
+  "fundstelle": "Sachwertfaktoren 2024, Kapitel 3.1 (Abb. 4, Seite 9), 3.2 (Abb. 9, Seite 13) und 3.3 (Abb. 14, Seite 17); Modellbeschreibung Abb. 2."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16063",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    20,
+    40,
+    80,
+    160
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenwertniveau in Euro/m²",
+   "achse_y": [
+    120000,
+    140000,
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000,
+    400000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "120000": [
+     null,
+     1.16,
+     null,
+     null
+    ],
+    "140000": [
+     0.93,
+     1.08,
+     1.24,
+     1.39
+    ],
+    "160000": [
+     0.87,
+     1.02,
+     1.17,
+     1.31
+    ],
+    "180000": [
+     0.82,
+     0.96,
+     1.11,
+     1.25
+    ],
+    "200000": [
+     0.78,
+     0.92,
+     1.06,
+     1.2
+    ],
+    "220000": [
+     0.74,
+     0.88,
+     1.02,
+     1.15
+    ],
+    "240000": [
+     0.71,
+     0.84,
+     0.98,
+     1.11
+    ],
+    "260000": [
+     0.68,
+     0.81,
+     0.94,
+     1.08
+    ],
+    "280000": [
+     0.66,
+     0.79,
+     0.91,
+     1.04
+    ],
+    "300000": [
+     0.64,
+     0.76,
+     0.89,
+     1.01
+    ],
+    "320000": [
+     0.62,
+     0.74,
+     0.86,
+     0.99
+    ],
+    "340000": [
+     0.6,
+     0.72,
+     null,
+     0.96
+    ],
+    "360000": [
+     0.58,
+     null,
+     null,
+     0.94
+    ],
+    "380000": [
+     0.56,
+     null,
+     null,
+     null
+    ],
+    "400000": [
+     0.55,
+     null,
+     null,
+     null
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "JEDE SPALTE HAT EINEN EIGENEN GÜLTIGKEITSBEREICH: 20 €/qm von 140.000 bis 400.000 € · 40 €/qm von 120.000 bis 340.000 € · 80 €/qm von 140.000 bis 320.000 € · 160 €/qm von 140.000 bis 360.000 €. Außerhalb davon druckt der Bericht nichts ab, und hier steht nichts — die leeren Zellen sind so belegt wie die gefüllten. Die Werte sind aus der abgedruckten Schätzfunktion k = a × (vSW / 1 Mio)^b berechnet (20 €/qm: a=0.34795 b=-0.49995 · 40 €/qm: a=0.43644 b=-0.46228 · 80 €/qm: a=0.52563 b=-0.43495 · 160 €/qm: a=0.61524 b=-0.41429) und gegen jeden abgedruckten Tabellenwert geprüft. Die Ränder wurden aus der gerenderten Seite abgelesen, nicht aus dem Textstrom geschlossen. DIESELBE Matrix wie bei rhdhh — der Ausschuss fasst Doppelhaushälften, Reihenend- und Reihenmittelhäuser ausdrücklich zusammen, weil die Fallzahlen für eine getrennte Auswertung nicht reichten. Der Eintrag steht hier, damit ein Reihenmittelhaus nicht über den Rückfall des Auswerters, sondern über die Aussage des Berichts zu seinem Wert kommt.",
+   "normobjekt": "Bauliche Außenanlagen sind im üblichen Umfang mit 2 bis 8 Prozent vom vorläufigen Sachwert bereits im Faktor enthalten; ebenso nicht in der BGF erfasste Bauteile (Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche)."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": null,
+   "gnd_je_standardstufe": {
+    "1": 60,
+    "2": 65,
+    "3": 70,
+    "4": 75,
+    "5": 80
+   },
+   "gnd_grundlage": "Anlage 3 SW-RL (außer Kraft seit 01.01.2022) i. V. m. § 53 Abs. 2 ImmoWertV",
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF",
+   "aussenanlagen": "kein gesonderter Ansatz, 2 bis 8 Prozent vom vorläufigen Sachwert im Sachwertfaktor enthalten"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2024, Kapitel 3.2, Abb. 9, Seite 13."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: der Stichtag 01.01.2023 liegt zurueck, und die Gesamtnutzungsdauer haengt hier von der Standardstufe ab, was der Registersatz nicht als eine Zahl abbilden kann.",
+  "fallzahl": 176,
+  "streuung": null,
+  "stichtag": "2023-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2024 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Baupreisindex des Statistischen Bundesamtes, ursprüngliches Baujahr, lineare Alterswertminderung, objektspezifisch angepasster Bodenrichtwert, Grundstücksfläche nach § 41 ImmoWertV. ACHTUNG GESAMTNUTZUNGSDAUER: sie richtet sich hier nach der STANDARDSTUFE — 60 Jahre bei Stufe 1, 65 bei Stufe 2, 70 bei Stufe 3, 75 bei Stufe 4, 80 bei Stufe 5 (nach Anlage 3 SW-RL in Verbindung mit § 53 Abs. 2 ImmoWertV). Es gibt hier KEINE einheitliche Gesamtnutzungsdauer. Bauliche Außenanlagen und nicht in der BGF erfasste Bauteile bekommen keinen gesonderten Wertansatz; sie sind mit 2 bis 8 Prozent vom vorläufigen Sachwert bereits im Faktor enthalten.",
+  "fundstelle": "Sachwertfaktoren 2024, Kapitel 3.1 (Abb. 4, Seite 9), 3.2 (Abb. 9, Seite 13) und 3.3 (Abb. 14, Seite 17); Modellbeschreibung Abb. 2."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16067",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    30,
+    60,
+    120
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenwertniveau in Euro/m²",
+   "achse_y": [
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000,
+    750000,
+    800000,
+    850000,
+    900000,
+    950000,
+    1000000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "200000": [
+     0.77,
+     null,
+     null
+    ],
+    "250000": [
+     0.72,
+     0.89,
+     null
+    ],
+    "300000": [
+     0.68,
+     0.84,
+     null
+    ],
+    "350000": [
+     0.65,
+     0.8,
+     0.94
+    ],
+    "400000": [
+     0.63,
+     0.76,
+     0.9
+    ],
+    "450000": [
+     0.6,
+     0.74,
+     0.87
+    ],
+    "500000": [
+     0.59,
+     0.71,
+     0.84
+    ],
+    "550000": [
+     0.57,
+     0.69,
+     0.81
+    ],
+    "600000": [
+     0.55,
+     0.67,
+     0.79
+    ],
+    "650000": [
+     0.54,
+     0.65,
+     0.77
+    ],
+    "700000": [
+     0.53,
+     0.64,
+     0.75
+    ],
+    "750000": [
+     0.52,
+     0.63,
+     0.73
+    ],
+    "800000": [
+     0.51,
+     0.61,
+     0.72
+    ],
+    "850000": [
+     0.5,
+     0.6,
+     0.7
+    ],
+    "900000": [
+     0.49,
+     0.59,
+     0.69
+    ],
+    "950000": [
+     0.48,
+     0.58,
+     0.68
+    ],
+    "1000000": [
+     null,
+     0.57,
+     null
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "JEDE SPALTE HAT EINEN EIGENEN GÜLTIGKEITSBEREICH: 30 €/qm von 200.000 bis 950.000 € · 60 €/qm von 250.000 bis 1.000.000 € · 120 €/qm von 350.000 bis 950.000 €. Außerhalb davon druckt der Bericht nichts ab, und hier steht nichts — die leeren Zellen sind so belegt wie die gefüllten. Die Werte sind aus der abgedruckten Schätzfunktion k = a × (vSW / 1 Mio)^b berechnet (30 €/qm: a=0.47633 b=-0.29695 · 60 €/qm: a=0.57097 b=-0.31681 · 120 €/qm: a=0.66562 b=-0.33074) und gegen jeden abgedruckten Tabellenwert geprüft. Die Ränder wurden aus der gerenderten Seite abgelesen, nicht aus dem Textstrom geschlossen. Der Ausschuss weist ausdrücklich auf die DEUTLICH KLEINERE STICHPROBE hin und nennt als Zweck, dass das Sachwertverfahren stützend zu anderen Verfahren herangezogen werden kann.",
+   "normobjekt": "Bauliche Außenanlagen sind im üblichen Umfang mit 2 bis 8 Prozent vom vorläufigen Sachwert bereits im Faktor enthalten; ebenso nicht in der BGF erfasste Bauteile (Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche)."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": null,
+   "gnd_je_standardstufe": {
+    "1": 60,
+    "2": 65,
+    "3": 70,
+    "4": 75,
+    "5": 80
+   },
+   "gnd_grundlage": "Anlage 3 SW-RL (außer Kraft seit 01.01.2022) i. V. m. § 53 Abs. 2 ImmoWertV",
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF",
+   "aussenanlagen": "kein gesonderter Ansatz, 2 bis 8 Prozent vom vorläufigen Sachwert im Sachwertfaktor enthalten"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2024, Kapitel 3.3, Abb. 14, Seite 17."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: der Stichtag 01.01.2023 liegt zurueck, und die Gesamtnutzungsdauer haengt hier von der Standardstufe ab, was der Registersatz nicht als eine Zahl abbilden kann.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2023-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2024 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Baupreisindex des Statistischen Bundesamtes, ursprüngliches Baujahr, lineare Alterswertminderung, objektspezifisch angepasster Bodenrichtwert, Grundstücksfläche nach § 41 ImmoWertV. ACHTUNG GESAMTNUTZUNGSDAUER: sie richtet sich hier nach der STANDARDSTUFE — 60 Jahre bei Stufe 1, 65 bei Stufe 2, 70 bei Stufe 3, 75 bei Stufe 4, 80 bei Stufe 5 (nach Anlage 3 SW-RL in Verbindung mit § 53 Abs. 2 ImmoWertV). Es gibt hier KEINE einheitliche Gesamtnutzungsdauer. Bauliche Außenanlagen und nicht in der BGF erfasste Bauteile bekommen keinen gesonderten Wertansatz; sie sind mit 2 bis 8 Prozent vom vorläufigen Sachwert bereits im Faktor enthalten.",
+  "fundstelle": "Sachwertfaktoren 2024, Kapitel 3.1 (Abb. 4, Seite 9), 3.2 (Abb. 9, Seite 13) und 3.3 (Abb. 14, Seite 17); Modellbeschreibung Abb. 2."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16063",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    30,
+    60,
+    120
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenwertniveau in Euro/m²",
+   "achse_y": [
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000,
+    750000,
+    800000,
+    850000,
+    900000,
+    950000,
+    1000000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "200000": [
+     0.77,
+     null,
+     null
+    ],
+    "250000": [
+     0.72,
+     0.89,
+     null
+    ],
+    "300000": [
+     0.68,
+     0.84,
+     null
+    ],
+    "350000": [
+     0.65,
+     0.8,
+     0.94
+    ],
+    "400000": [
+     0.63,
+     0.76,
+     0.9
+    ],
+    "450000": [
+     0.6,
+     0.74,
+     0.87
+    ],
+    "500000": [
+     0.59,
+     0.71,
+     0.84
+    ],
+    "550000": [
+     0.57,
+     0.69,
+     0.81
+    ],
+    "600000": [
+     0.55,
+     0.67,
+     0.79
+    ],
+    "650000": [
+     0.54,
+     0.65,
+     0.77
+    ],
+    "700000": [
+     0.53,
+     0.64,
+     0.75
+    ],
+    "750000": [
+     0.52,
+     0.63,
+     0.73
+    ],
+    "800000": [
+     0.51,
+     0.61,
+     0.72
+    ],
+    "850000": [
+     0.5,
+     0.6,
+     0.7
+    ],
+    "900000": [
+     0.49,
+     0.59,
+     0.69
+    ],
+    "950000": [
+     0.48,
+     0.58,
+     0.68
+    ],
+    "1000000": [
+     null,
+     0.57,
+     null
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "JEDE SPALTE HAT EINEN EIGENEN GÜLTIGKEITSBEREICH: 30 €/qm von 200.000 bis 950.000 € · 60 €/qm von 250.000 bis 1.000.000 € · 120 €/qm von 350.000 bis 950.000 €. Außerhalb davon druckt der Bericht nichts ab, und hier steht nichts — die leeren Zellen sind so belegt wie die gefüllten. Die Werte sind aus der abgedruckten Schätzfunktion k = a × (vSW / 1 Mio)^b berechnet (30 €/qm: a=0.47633 b=-0.29695 · 60 €/qm: a=0.57097 b=-0.31681 · 120 €/qm: a=0.66562 b=-0.33074) und gegen jeden abgedruckten Tabellenwert geprüft. Die Ränder wurden aus der gerenderten Seite abgelesen, nicht aus dem Textstrom geschlossen. Der Ausschuss weist ausdrücklich auf die DEUTLICH KLEINERE STICHPROBE hin und nennt als Zweck, dass das Sachwertverfahren stützend zu anderen Verfahren herangezogen werden kann.",
+   "normobjekt": "Bauliche Außenanlagen sind im üblichen Umfang mit 2 bis 8 Prozent vom vorläufigen Sachwert bereits im Faktor enthalten; ebenso nicht in der BGF erfasste Bauteile (Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche)."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": null,
+   "gnd_je_standardstufe": {
+    "1": 60,
+    "2": 65,
+    "3": 70,
+    "4": 75,
+    "5": 80
+   },
+   "gnd_grundlage": "Anlage 3 SW-RL (außer Kraft seit 01.01.2022) i. V. m. § 53 Abs. 2 ImmoWertV",
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF",
+   "aussenanlagen": "kein gesonderter Ansatz, 2 bis 8 Prozent vom vorläufigen Sachwert im Sachwertfaktor enthalten"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2024, Kapitel 3.3, Abb. 14, Seite 17."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: der Stichtag 01.01.2023 liegt zurueck, und die Gesamtnutzungsdauer haengt hier von der Standardstufe ab, was der Registersatz nicht als eine Zahl abbilden kann.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2023-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2024 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Baupreisindex des Statistischen Bundesamtes, ursprüngliches Baujahr, lineare Alterswertminderung, objektspezifisch angepasster Bodenrichtwert, Grundstücksfläche nach § 41 ImmoWertV. ACHTUNG GESAMTNUTZUNGSDAUER: sie richtet sich hier nach der STANDARDSTUFE — 60 Jahre bei Stufe 1, 65 bei Stufe 2, 70 bei Stufe 3, 75 bei Stufe 4, 80 bei Stufe 5 (nach Anlage 3 SW-RL in Verbindung mit § 53 Abs. 2 ImmoWertV). Es gibt hier KEINE einheitliche Gesamtnutzungsdauer. Bauliche Außenanlagen und nicht in der BGF erfasste Bauteile bekommen keinen gesonderten Wertansatz; sie sind mit 2 bis 8 Prozent vom vorläufigen Sachwert bereits im Faktor enthalten.",
+  "fundstelle": "Sachwertfaktoren 2024, Kapitel 3.1 (Abb. 4, Seite 9), 3.2 (Abb. 9, Seite 13) und 3.3 (Abb. 14, Seite 17); Modellbeschreibung Abb. 2."
+ },
+ {
+  "land_code": "TH",
   "ags": "16068",
   "ebene": "kreis",
   "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar",
