@@ -1874,23 +1874,30 @@ label.dp-required.qc-required::after {
        eine Progression ueber mehrere Objekte gibt es nicht. Der WK-Aggregator
        holt die Werbungskosten der anderen Objekte, aber calc.js:2174 sagt
        selbst „Eigentliche Steuerberechnung weiterhin auf K.zve_immo basiert". -->
+  <!-- v1365-PROG · Erscheint nur, wenn der effektive Satz vom eingegebenen
+       Grenzsteuersatz abweicht. Gefuellt von _progHinweisZeichnen() in calc.js. -->
+  <div class="card" id="prog-hinweis" style="margin-top:14px" hidden></div>
+
   <div class="card" id="tax-flow-hint" style="margin-top:14px">
     <div class="ct"><span class="ct-ico"><svg width="22" height="22"><use href="#i-info"/></svg></span>Was mit diesen Werten passiert</div>
     <p class="hint" style="margin-bottom:0">
-      Dein Grenzsteuersatz wirkt auf das steuerliche Ergebnis <b>dieses</b> Objekts —
-      Miete abzüglich Kosten und AfA. Daraus entsteht die Steuer und daraus der
-      <b>Cashflow nach Steuer</b>. Im Portfolio-Cockpit werden die Cashflows nach
-      Steuer deiner Bestandsobjekte addiert.
+      Das steuerliche Ergebnis <b>dieses</b> Objekts — Miete abzüglich Kosten und AfA —
+      wird auf dein zu versteuerndes Einkommen gerechnet. Die Steuerwirkung ist die
+      <b>Differenz zweier Tarifberechnungen nach § 32a EStG</b>, einmal mit und einmal
+      ohne dieses Objekt. Damit folgt sie der Progression: bei einem Verlust wirkt der
+      letzte Euro weniger als der erste. Daraus entsteht der <b>Cashflow nach Steuer</b>.
+      Im Portfolio-Cockpit werden die Cashflows nach Steuer deiner Bestandsobjekte addiert.
     </p>
     <details class="dp-erkl" style="margin-top:10px">
       <summary style="cursor:pointer;font-size:12.5px;font-weight:600">Und was DealPilot dabei <u>nicht</u> tut</summary>
       <div style="font-size:12.5px;line-height:1.6;margin-top:8px">
         <p style="margin:0 0 8px">
           <b>Die Objekte verschieben sich gegenseitig nicht die Progression.</b>
-          Jedes rechnet mit demselben Grenzsteuersatz aus deinem zvE. Ein Verlust
-          aus Objekt A senkt in dieser Rechnung <b>nicht</b> den Steuersatz von
-          Objekt B — in deiner echten Steuererklärung tut er das sehr wohl, weil
-          dort alle Einkünfte aus Vermietung und Verpachtung zusammenfließen.
+          Jedes rechnet die Progression von <b>demselben</b> zvE aus — so, als wäre es
+          dein einziges Objekt. Ein Verlust aus Objekt A senkt in dieser Rechnung
+          <b>nicht</b> die Ausgangsbasis von Objekt B — in deiner echten
+          Steuererklärung tut er das sehr wohl, weil dort alle Einkünfte aus
+          Vermietung und Verpachtung zusammenfließen.
         </p>
         <p style="margin:0 0 8px">
           <b>Was das heißt:</b> je Objekt ist die Zahl eine saubere Einzelbetrachtung.
@@ -3369,7 +3376,7 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v1363"></script>
+  <script src="js/calc.js?v=v1365"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>

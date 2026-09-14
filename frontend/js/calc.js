@@ -651,6 +651,67 @@ function _computeBsvLifecycle() {
   };
 }
 
+/* ═══ v1365-PROG · DER HINWEIS ZUM ANGEPASSTEN STEUERSATZ ══════════════════
+ *
+ * Marcels Vorgabe: „wenn der satz angepasst ist sollte man ein hinweis setzen
+ * und das erklaeren."
+ *
+ * Der Nutzer gibt 42 Prozent ein und sieht eine Ersparnis, die 38 Prozent
+ * entspricht. Ohne Erklaerung sieht das nach einem Rechenfehler aus. Der
+ * Hinweis nennt deshalb BEIDE Zahlen und den Grund: das steuerliche Ergebnis
+ * traegt ihn aus seiner Tarifzone, und der letzte Euro Verlust wirkt weniger
+ * als der erste.
+ *
+ * Der Hinweis erscheint NUR, wenn er etwas zu sagen hat - also wenn die
+ * Progression wirklich gerechnet wurde UND der effektive Satz spuerbar
+ * abweicht (ab einem halben Prozentpunkt). Wer in der Proportionalzone
+ * bleibt, sieht nichts; bei ihm stimmen beide Zahlen ueberein. */
+function _progHinweisZeichnen(zveImmo, steuer, grenzSatz, effSatz, zveBasis) {
+  var el = document.getElementById('prog-hinweis');
+  if (!el) return;
+  var _zeigen = (effSatz != null) && isFinite(effSatz) && (grenzSatz > 0)
+                && Math.abs(effSatz - grenzSatz) >= 0.005;
+  if (!_zeigen) { el.hidden = true; el.innerHTML = ''; return; }
+
+  var _pz = function (x) { return (x * 100).toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %'; };
+  var _eu = function (x) { return Math.round(Math.abs(x)).toLocaleString('de-DE') + ' €'; };
+  var _verlust  = zveImmo < 0;
+  var _wirkung  = _verlust ? 'Ersparnis' : 'Belastung';
+  var _richtung = _verlust ? 'niedriger' : 'höher';
+  var _linear   = zveImmo * grenzSatz;
+  var _diff     = Math.abs(steuer) - Math.abs(_linear);
+
+  el.hidden = false;
+  el.innerHTML =
+      '<div class="ct"><span class="ct-ico"><svg width="22" height="22"><use href="#i-info"/></svg></span>'
+    + 'Dein Steuersatz wurde angepasst</div>'
+    + '<p class="hint" style="margin-bottom:8px">'
+    + 'Du hast <b>' + _pz(grenzSatz) + '</b> Grenzsteuersatz angegeben. Auf dieses Objekt wirken '
+    + 'tatsächlich <b>' + _pz(effSatz) + '</b> — die ' + _wirkung + ' fällt damit um '
+    + '<b>' + _eu(_diff) + '</b> ' + _richtung + ' aus als bei einer Rechnung mit dem festen Satz.'
+    + '</p>'
+    + '<details class="dp-erkl">'
+    + '<summary>Warum ist das so?</summary>'
+    + '<p class="hint" style="margin-top:8px">'
+    + 'Der Grenzsteuersatz gilt für den <b>nächsten</b> Euro deines Einkommens — nicht für jeden. '
+    + 'Das steuerliche Ergebnis dieses Objekts von <b>' + _eu(zveImmo) + '</b> '
+    + (_verlust
+        ? 'senkt dein zu versteuerndes Einkommen von ' + _eu(zveBasis) + ' auf ' + _eu(zveBasis + zveImmo) + '. '
+          + 'Dabei läufst du die Progression hinab: die ersten Euro des Verlusts sparen noch ' + _pz(grenzSatz)
+          + ', die letzten deutlich weniger. Der Durchschnitt über den ganzen Verlust sind die ' + _pz(effSatz) + '.'
+        : 'hebt dein zu versteuerndes Einkommen von ' + _eu(zveBasis) + ' auf ' + _eu(zveBasis + zveImmo) + '. '
+          + 'Dabei läufst du die Progression hinauf: die letzten Euro werden höher besteuert als die ersten. '
+          + 'Der Durchschnitt über den ganzen Gewinn sind die ' + _pz(effSatz) + '.')
+    + '</p>'
+    + '<p class="hint" style="margin-top:8px;margin-bottom:0">'
+    + 'Gerechnet wird die Steuer deshalb nicht mit einem festen Satz, sondern als Differenz zweier '
+    + 'Tarifberechnungen nach <b>§ 32a EStG</b>: einmal mit und einmal ohne das Ergebnis dieses Objekts. '
+    + 'Ab rund 90.000 € zu versteuerndem Einkommen liegst du in der Proportionalzone — dort sind beide '
+    + 'Zahlen gleich und dieser Hinweis erscheint nicht.'
+    + '</p>'
+    + '</details>';
+}
+
 // 30 calc-Läufe hintereinander stattfinden. Bei wirklich erstem Aufruf
 // (z.B. nach dem Laden eines Objekts) sofort ausführen.
 var _calcDebounceTimer = null;
@@ -1446,9 +1507,58 @@ function _calcImmediate(){
     st('d2_zaer_m', '\u2014');
   }
   var grenz=v('grenz')/100;
-  /* mand v804: Halter-Regime — Privat/GbR = grenz (1:1 wie heute), GmbH/UG = KSt(+GewSt), KEINE Erstattung bei Verlust */
+
+  /* ═══ v1365-PROG · DIE STEUERWIRKUNG FOLGT DER PROGRESSION ═══════════════
+   *
+   * Bis hierher stand ueberall `base * grenz`: ein LINEARER Satz auf das
+   * steuerliche Ergebnis der Immobilie. Das ist nur dann richtig, wenn das
+   * Ergebnis den Steuerpflichtigen NICHT aus seiner Tarifzone traegt.
+   *
+   * Bei einem Verlust laeuft man die Progression aber HINAB. Gemessen am
+   * Tarif 2026 (§ 32a EStG):
+   *
+   *   zvE 45.000, Verlust 30.000 -> linear 10.080 EUR, echt  8.400 EUR  (-17 %)
+   *   zvE 60.000, Verlust 20.000 -> linear  7.740 EUR, echt  7.024 EUR  (-9 %)
+   *   zvE 75.000, Verlust 30.000 -> linear 12.600 EUR, echt 11.529 EUR  (-9 %)
+   *   zvE 90.000, Verlust 20.000 -> linear  8.400 EUR, echt  8.400 EUR  (0 %)
+   *
+   * Der Fehler ging IMMER in dieselbe Richtung: die Ersparnis wurde zu hoch
+   * ausgewiesen, der Deal also zu gut gerechnet. Und er traf genau die
+   * mittleren Einkommen - ab rund 90.000 EUR zvE bleibt man in der
+   * Proportionalzone, dort stimmte die lineare Rechnung.
+   *
+   * Richtig ist die Differenz zweier Tarifberechnungen:
+   *     Steuerwirkung = ESt(zvE + Ergebnis) - ESt(zvE)
+   *
+   * Die Progression wird hier NICHT nachgebaut - das waere ein zweiter
+   * Rechenkern. Gerechnet wird mit Tax.calcEStG() aus tax.js, wo der Tarif
+   * samt Jahrgang und Stetigkeitspruefung steht.
+   *
+   * ZWEI RUECKFAELLE, die das alte Verhalten erhalten:
+   *   - kein zvE eingegeben  -> ohne Basis ist keine Progression rechenbar
+   *   - tax.js nicht geladen -> index.html laedt tax.js NACH calc.js
+   * In beiden Faellen gilt weiter `base * grenz`, und `_progAktiv` bleibt
+   * false. Der Hinweis im Tab Steuern liest genau dieses Merkmal. */
+  var _zveBasis = (function(){ try { var _z = v('zve'); return (_z > 0) ? _z : 0; } catch(_e){ return 0; } })();
+  var _progAktiv = false;
+  var _progEff   = null;   /* effektiver Satz der Immobilienwirkung, fuer die Anzeige */
+  function _estDelta(base, jahr) {
+    var _lin = base * grenz;
+    if (!(_zveBasis > 0)) return _lin;
+    if (typeof Tax === 'undefined' || !Tax || typeof Tax.calcEStG !== 'function') return _lin;
+    try {
+      var _vor  = Tax.calcEStG(_zveBasis, jahr);
+      var _nach = Tax.calcEStG(_zveBasis + base, jahr);
+      var _d = _nach - _vor;
+      if (!isFinite(_d)) return _lin;
+      _progAktiv = true;
+      return _d;
+    } catch (_e) { return _lin; }
+  }
+
+  /* mand v804: Halter-Regime — Privat/GbR = ESt nach Progression, GmbH/UG = KSt(+GewSt), KEINE Erstattung bei Verlust */
   var _mandRate = (function(){ try{ if(window.DealPilotMandanten && DealPilotMandanten.effRate){ var _r=DealPilotMandanten.effRate(); return (_r!=null && isFinite(_r)) ? _r : null; } }catch(_e){} return null; })();
-  function _mtx(base){ return (_mandRate!=null) ? (Math.max(0, base) * _mandRate) : (base * grenz); }
+  function _mtx(base, jahr){ return (_mandRate!=null) ? (Math.max(0, base) * _mandRate) : _estDelta(base, jahr); }
   /* v813-3b: Stichtag-Schnitt im Ueberfuehrungsjahr. Faellt fuer JEDEN anderen Fall
      (Neukauf, kein Stichtag, Privat-Halter) exakt auf _mtx zurueck -> kein Verhaltenswechsel. */
   function _mtxYear(base, calYear){
@@ -1458,18 +1568,18 @@ function _calcImmediate(){
         if (_hs && /^\d{4}-\d{2}-\d{2}$/.test(_hs) && typeof calYear === 'number') {
           var _hy = parseInt(_hs.slice(0,4), 10);
           var _hm = parseInt(_hs.slice(5,7), 10);
-          if (calYear < _hy) return base * grenz;       /* noch privat: ESt */
-          if (calYear > _hy) return _mtx(base);          /* GmbH: KSt */
+          if (calYear < _hy) return _estDelta(base, calYear);   /* noch privat: ESt nach Progression */
+          if (calYear > _hy) return _mtx(base, calYear);         /* GmbH: KSt */
           /* Stichtagsjahr: anteilig Privat (vor Stichtag) + GmbH (ab Stichtag) */
           var _gf = (_hm >= 1 && _hm <= 12) ? (13 - _hm) / 12 : 1;  /* GmbH-Anteil ab Stichtagsmonat */
           var _pf = 1 - _gf;                                        /* Privat-Anteil davor */
-          var _taxPrivat = (base * _pf) * grenz;                    /* ESt-Seite (Erstattung moeglich) */
+          var _taxPrivat = _estDelta(base * _pf, calYear);          /* ESt-Seite (Erstattung moeglich) */
           var _taxGmbh   = Math.max(0, base * _gf) * _mandRate;     /* KSt-Seite (kein Negativwert) */
           return _taxPrivat + _taxGmbh;
         }
       }
     } catch (_e) {}
-    return _mtx(base);
+    return _mtx(base, calYear);
   }
   var _calYearBase = (function(){ try { if (window.DealPilotAnteilig && DealPilotAnteilig.getBaseYear){ var _y = DealPilotAnteilig.getBaseYear(); if (_y) return _y; } } catch(_e){} return (new Date()).getFullYear(); })();
   var zins_j=(d1_zm+d2_zm)*12, tilg_j=(d1_tm+d2_tm)*12;
@@ -1486,6 +1596,15 @@ function _calcImmediate(){
   var cf_operativ = nkm_j - bwk_cf - zins_j;          // intern: vor Tilg, für Steuer
   var zve_immo = cf_operativ - afa;
   var steuer   = _mtxYear(zve_immo, _calYearBase);
+
+  /* v1365-PROG · DER EFFEKTIVE SATZ, den dieses Objekt tatsaechlich traegt.
+     Er weicht vom eingegebenen Grenzsteuersatz ab, sobald das Ergebnis den
+     Steuerpflichtigen aus seiner Tarifzone traegt. Genau diese Zahl erklaert
+     dem Nutzer, warum seine Ersparnis kleiner ist als sein Grenzsteuersatz -
+     ohne sie sieht es nach einem Rechenfehler aus. */
+  _progEff = (_progAktiv && Math.abs(zve_immo) > 0.5) ? (steuer / zve_immo) : null;
+  try { _progHinweisZeichnen(zve_immo, steuer, grenz, _progEff, _zveBasis); } catch (_e) {}
+
   // Öffentliche Werte: alle nach Tilgung (Banker) und nach BSV-Sparrate
   var cf_op = cf_operativ - tilg_j - bspar_y;          // CF v.St. NACH Tilgung & BSV
   var cf_ns = cf_op - steuer;                          // CF n.St. NACH Tilgung & BSV
@@ -1854,7 +1973,7 @@ function _calcImmediate(){
   var bspar_y_ezb = _d1IsAussetzung ? bspar_y : 0;
   // V63.40: CF v.St. = nach Tilgung (Banker-Sicht)
   var cf_op_ezb_operativ = nkm_ezb - bwk_cf_ezb - zins_ezb;     // intern für Steuer
-  var ster_ezb = _mtx(cf_op_ezb_operativ - afa);
+  var ster_ezb = _mtx(cf_op_ezb_operativ - afa, _calYearBase);
   var cf_op_ezb = cf_op_ezb_operativ - tilg_ezb - bspar_y_ezb;  // V63.52: nach Tilg & BSV
   var cf_ns_ezb = cf_op_ezb - ster_ezb;                          // Banker-CF n.St.
   var cf_ezb = cf_ns_ezb;
@@ -1964,7 +2083,7 @@ function _calcImmediate(){
     }
   }
   var cf_op_an_operativ = nkm_an - bwk_cf_an - zins_an;          // intern für Steuer
-  var ster_an = _mtx(cf_op_an_operativ - afa);
+  var ster_an = _mtx(cf_op_an_operativ - afa, _calYearBase);
   var cf_op_an = cf_op_an_operativ - tilg_an - bspar_y_an;       // V63.52
   var cf_ns_an = cf_op_an - ster_an;                             // Banker-CF n.St.
   // KPI color coding
