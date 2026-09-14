@@ -16519,3 +16519,55 @@ tatsächlich umschaltet, habe ich nicht selbst gesehen.
 > **Die Nummer dieses Pakets war zuerst `v1288` — ebenfalls vergeben**
 > (`bodenrichtwert.js`). Zwei falsche Nummern in einer Sitzung: die Sitzung
 > ist lang, und der Nummernvorrat steht in `git log`, nicht im Journal.
+
+### `v1381` · Den Sprechlauf anhalten
+
+**Marcels Wunsch:**
+
+> „beim micro irgendwo die möglichkeit geben die auto tracking ob man was sagt
+> auszuschalten oder zu halten? warum? es kann ja sein das ich kurz gestört
+> werde dann möchte ich vlt den prozess unterbrechen und in ein paar minuten
+> wieder was sagen"
+
+**Warum der vorhandene Schalter das nicht konnte.** Die Checkbox
+„Freisprechen" oben in der Kopfzeile ruft `_fsAus()` — und das **reißt alles
+ab**: Stream gestoppt, AudioContext geschlossen, Recorder weg, `_fs.kopf` auf
+`null` und `_fs.rest` (der gemerkte Satzanfang aus `v1290`) ebenfalls. Wieder
+einschalten heißt ein neues `getUserMedia`. Das ist ein Ausschalter, keine
+Pause.
+
+> **Und der eigentliche Schaden ist nicht die Zeit.** Wer gestört wird und
+> nichts drücken kann, dessen Mikrofon läuft weiter — was der Störer sagt,
+> landet im Transkript und wird als Antwort auf die offene Frage ausgewertet.
+> **Eine falsche Zahl im Objekt ist teurer als eine verlorene Minute.**
+
+**Die Mechanik — zwei Riegel, weil einer nicht reicht:**
+
+| | |
+|---|---|
+| `rec.pause()` | schneidet nichts mehr mit **und behält den Container-Header**. Genau darauf baut `v1290` (`_fs.kopf`); nach `resume()` ist der Blob weiter eine vollständige Datei. |
+| `track.enabled = false` | schaltet das Signal stumm. Ohne das liefe die Pegelmessung weiter — der Ausschlag würde anzeigen, dass zugehört wird. |
+
+Strom, Dialogzustand und `_fs.rest` bleiben. Nach „Weiter" geht es an derselben
+Frage weiter.
+
+**Drei Stellen mussten mit, sonst hebt sich die Pause von selbst auf:**
+`_fsHoeren` (30 Aufrufstellen im Ablauf), die Uhr darin, und vor allem **der
+Wiederanlauf-Wächter aus `v1121`** — der hätte nach spätestens drei Sekunden
+wieder angeworfen, und der Knopf hätte ausgesehen, als hätte er gewirkt.
+
+**Der Knopf steht im Mikrofonkasten, nicht oben bei den Schaltern.** Wer
+spricht, schaut auf den Pegel und den Satz „Ich höre zu"; ein Knopf in der
+Kopfzeile wäre da, wo gerade niemand hinsieht. Angehalten sieht anders aus als
+taub — gestrichelter Rahmen, stehender Puls, gefüllter Weiter-Knopf statt
+Abblendung: „taub" heißt *Freisprechen ist aus*, „halt" heißt *ich warte auf
+dich*.
+
+**Nachweis:** `node --check` RC=0; die acht Glieder der Kette einzeln
+gegengezählt (Riegel in `_fsHoeren`, Uhr, Wächter, `_fsSprichtGerade`,
+Rücksetzer in `_fsAus`, Knopf, Bindung, CSS). Ausgeliefert geprüft.
+**Offener Staging-Abnahmepunkt:** dass `rec.pause()/resume()` auf Marcels
+Browser den Header hält, ist die Zusicherung der MediaRecorder-Spezifikation —
+gemessen habe ich es nicht.
+
+**Commit** `v1381`. Auf Staging, **nicht auf Prod**.
