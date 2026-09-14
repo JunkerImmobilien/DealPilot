@@ -103,6 +103,7 @@ ERLAUBT = {
     # v1110: die Schluessel hier stimmten NIE mit dem Auswerter ueberein
     # (basis/glieder gegen intercept/terme) - die Form war nie benutzt worden.
     'regression_additiv': {'form','intercept','terme','diskret','aussen_exponent',
+                           'aussen_funktion',
                            'rundung_stellen','liefert',
                            'hinweis','normobjekt'},
 }

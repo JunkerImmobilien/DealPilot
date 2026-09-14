@@ -458,8 +458,29 @@ function regressionAdditiv(m, e) {
      den aeusseren Exponenten kaeme statt 1,05 ein negativer Wert heraus.
      Ein Modell halb zu rechnen ist schlimmer, als es gar nicht zu fuehren. */
   let ergebnis = summe;
+
+  /* v1116-WEXP - DER LOGARITHMUS STEHT LINKS.
+     Dresden druckt ab:
+       ln(SWF) = -0,3450*ln(vSW) - 0,0001*BRW + 0,1754*ln(RND) + 3,9573
+     Die Summe ist nicht der Faktor, sondern sein Logarithmus - der Faktor
+     ist e hoch dieser Summe. Sein Anwendungsbeispiel rechnet es vor:
+     0,0942 ergibt 1,0988, und 1,0988 x 440.000 sind 483.472 Euro.
+
+     Ohne diesen Zweig kaeme 0,09 heraus statt 1,10 - eine Zahl, die der
+     Einheitenwaechter zu Recht verwerfen wuerde. Schlimmer waere ein
+     Modell, das man deshalb weglaesst: Dresden ist die zweitgroesste
+     Stadt Sachsens. */
+  if (m.aussen_funktion === 'exp') {
+    ergebnis = Math.exp(summe);
+    teile.push(`= e^(${summe.toFixed(4)}) = ${ergebnis.toFixed(4)}`);
+    if (!Number.isFinite(ergebnis)) {
+      return nichts('term_unbestimmt',
+        'Die Gleichung ergibt fuer dieses Objekt keinen endlichen Wert.');
+    }
+  }
+
   const aexp = zahl(m.aussen_exponent);
-  if (aexp !== null && aexp !== 1) {
+  if (aexp !== null && aexp !== 1 && m.aussen_funktion !== 'exp') {
     if (summe <= 0 && !Number.isInteger(aexp)) {
       return nichts('term_unbestimmt',
         `Die Klammersumme ist ${summe.toFixed(4)}; mit dem Exponenten `

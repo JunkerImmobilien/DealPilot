@@ -1,0 +1,317 @@
+{
+  "land_code": "SN",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
+  "gaa_kennz": "14612",
+  "ags": [
+    "14612000"
+  ],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2025,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "Geschäftsjahr 2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-02-01",
+  "quelle_url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
+  "quelle_datei": "SN-dresden-gmb-2026.pdf",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden, Grundstücksmarktbericht 2026, Amt für Geodaten und Kataster",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Modellparameter des Berichts sind einzuhalten (Modellkonformität).",
+  "fundstelle": "Kap. 7.3 Sachwertfaktor, S. 76 ff., mit Modellparametern, Regressionsformel, Vertrauensintervallen und Anwendungsbeispiel (S. 79).",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser, Doppelhaushälften und Reihenhäuser",
+      "form": "regression_additiv",
+      "formel": {
+        "form": "regression_additiv",
+        "intercept": 3.9573,
+        "terme": [
+          {
+            "feld": "sachwert",
+            "bez": "vorläufiger Sachwert",
+            "koeffizient": -0.345,
+            "transform": "ln",
+            "gueltig": [
+              151000,
+              915000
+            ]
+          },
+          {
+            "feld": "brw",
+            "bez": "Bodenrichtwert",
+            "koeffizient": -0.0001,
+            "exponent": 1,
+            "gueltig": [
+              70,
+              690
+            ]
+          },
+          {
+            "feld": "rnd",
+            "bez": "Restnutzungsdauer",
+            "koeffizient": 0.1754,
+            "transform": "ln",
+            "gueltig": [
+              5,
+              75
+            ]
+          }
+        ],
+        "aussen_funktion": "exp",
+        "rundung_stellen": 4,
+        "liefert": "faktor",
+        "hinweis": "DER LOGARITHMUS STEHT LINKS: der Bericht druckt „ln(SWF) = −0,3450·ln(vSW) − 0,0001·BRW + 0,1754·ln(RND) + 3,9573\" ab. Die Summe ist nicht der Faktor, sondern sein Logarithmus — der Faktor ist e hoch dieser Summe.\n\nDAS ANWENDUNGSBEISPIEL DES BERICHTS (S. 79) rechnet es vor: freistehendes Einfamilienhaus, 440.000 € vorläufiger Sachwert, Bodenrichtwert 270 €/m², Restnutzungsdauer 40 Jahre → ln(SWF) = −4,4831 − 0,027 + 0,6470 + 3,9573 = 0,0942, Sachwertfaktor = e^0,0942 = 1,0988, marktangepasster Sachwert = 483.472 €. Dieses Register rechnet dieselben Zahlen.\n\nDESHALB VIER NACHKOMMASTELLEN: der Bericht weist den Faktor selbst mit vier aus (1,0988), und sein Beispiel rechnet damit weiter.\n\n263 Kauffälle nach Ausreißerbereinigung (Cook-Distanz über 4/n), Bestimmtheitsmaß 0,28. Sachwertfaktor der Stichprobe: 0,62 bis 1,82, Median 1,08, Mittel 1,12, Standardabweichung 0,22.",
+        "normobjekt": "NHK 2010, Bruttogrundfläche aus den Außenmaßen auf Basis amtlicher Geobasisdaten, lineare Alterswertminderung nach § 38 ImmoWertV, Gesamtnutzungsdauer 80 Jahre nach Anlage 1 ImmoWertV, Außenanlagen in der Regel 3 bis 5 % der alterswertgeminderten Gebäudeherstellungskosten, Bodenwert = objektspezifisch angepasster Bodenrichtwert (Umrechnungskoeffizienten) zum Stand 01.01.2024."
+      },
+      "korrekturen": [],
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV §§ 35 bis 38",
+        "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert",
+        "nhk": "Normalherstellungskosten 2010",
+        "gnd_jahre": 80,
+        "alterswertminderung": "linear nach § 38 ImmoWertV",
+        "aussenanlagen": "in der Regel 3 bis 5 % der alterswertgeminderten Gebäudeherstellungskosten; Stellplätze, Carports und Terrassen sind darin enthalten",
+        "baupreisindex": "quartalsweise Indexreihen für die Bauwirtschaft des Statistischen Bundesamts 2021, Preisindex für den Neubau von Wohngebäuden",
+        "bodenwert": "objektspezifisch angepasster Bodenrichtwert mittels Umrechnungskoeffizienten, Stand 01.01.2024",
+        "kauffaelle_gesamt": 263,
+        "bestimmtheitsmass": 0.28,
+        "besonderheit": "Die Kaufpreise sind um Garagengebäude, Carports und weitere Nebengebäude bereinigt (mit NHK ermittelt); im Wohngebäude integrierte Garagen tragen den Wertansatz des Wohngebäudes. Nicht überdachte Stellplätze stecken im Ansatz der Außenanlagen."
+      },
+      "geltungsbereich": {
+        "raeumlich": "Landeshauptstadt Dresden",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser, Doppelhaushälften und Reihenhäuser — der Ausschuss wertet sie GEMEINSAM aus",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwert_eur": {
+            "min": 151000,
+            "max": 915000,
+            "median": 369000,
+            "mittel": 388520
+          },
+          "brw_eur_qm": {
+            "min": 70,
+            "max": 690,
+            "median": 310,
+            "mittel": 315
+          },
+          "rnd_jahre": {
+            "min": 5,
+            "max": 75,
+            "median": 29,
+            "mittel": 34
+          },
+          "sachwertfaktor": {
+            "min": 0.62,
+            "max": 1.82,
+            "median": 1.08,
+            "mittel": 1.12
+          }
+        },
+        "vorbehalt": "DIE VERTRAUENSINTERVALLE DER KOEFFIZIENTEN SIND WEIT, und der Bericht druckt sie ab: k1 von −0,4177 bis −0,2724, k2 von −0,0003 bis +0,0001 (der Bodenrichtwert-Koeffizient schließt die NULL ein — sein Einfluss ist statistisch nicht gesichert), k3 von 0,1277 bis 0,2231, die Verschiebungskonstante von 3,1157 bis 4,7988.\n\nDAS BESTIMMTHEITSMASS LIEGT BEI 0,28 bei 263 Kauffällen, die beobachteten Faktoren reichen von 0,62 bis 1,82.\n\nDER BODENWERT IST OBJEKTSPEZIFISCH ANGEPASST (Umrechnungskoeffizienten), nicht der rohe Bodenrichtwert mal Fläche. Wer ohne diese Anpassung rechnet, füttert die Gleichung mit einem anderen vorläufigen Sachwert, als ihr zugrunde lag.\n\nDER BODENRICHTWERT-STAND IST DER 01.01.2024, der Bericht selbst der Jahrgang 2026.",
+        "hinweis": "Anders als Leipzig trennt Dresden die Gebäudetypen NICHT — freistehende Häuser, Doppelhaushälften und Reihenhäuser stehen in einer gemeinsamen Regression. Die Verteilung der Kauffälle ist im Bericht nach Typ eingefärbt, die Formel gilt für alle."
+      },
+      "stufe": "A",
+      "stufe_grund": "Amtliche Regressionsfunktion MIT ANWENDUNGSBEISPIEL: 440.000 € / 270 €/m² / 40 Jahre → ln(SWF) = 0,0942 → Faktor 1,0988 → marktangepasster Sachwert 483.472 €. Das Register rechnet dieselben Zahlen, Glied für Glied.",
+      "fallzahl": 263,
+      "streuung": 0.22,
+      "beleg": "Grundstücksmarktbericht 2026 der Landeshauptstadt Dresden, Kap. 7.3, S. 76 ff.: Sachwertfaktor aus 263 ausreißerbereinigten Kauffällen des Geschäftsjahres 2025, Regressionsformel ln(SWF) = −0,3450·ln(vSW) − 0,0001·BRW + 0,1754·ln(RND) + 3,9573, Bestimmtheitsmaß 0,28, mit Vertrauensintervallen und Anwendungsbeispiel."
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Doppelhaushälften und Reihenhäuser",
+      "form": "regression_additiv",
+      "formel": {
+        "form": "regression_additiv",
+        "intercept": 3.9573,
+        "terme": [
+          {
+            "feld": "sachwert",
+            "bez": "vorläufiger Sachwert",
+            "koeffizient": -0.345,
+            "transform": "ln",
+            "gueltig": [
+              151000,
+              915000
+            ]
+          },
+          {
+            "feld": "brw",
+            "bez": "Bodenrichtwert",
+            "koeffizient": -0.0001,
+            "exponent": 1,
+            "gueltig": [
+              70,
+              690
+            ]
+          },
+          {
+            "feld": "rnd",
+            "bez": "Restnutzungsdauer",
+            "koeffizient": 0.1754,
+            "transform": "ln",
+            "gueltig": [
+              5,
+              75
+            ]
+          }
+        ],
+        "aussen_funktion": "exp",
+        "rundung_stellen": 4,
+        "liefert": "faktor",
+        "hinweis": "DIESELBE GLEICHUNG WIE FÜR FREISTEHENDE HÄUSER — der Dresdner Ausschuss wertet freistehende Ein- und Zweifamilienhäuser, Doppelhaushälften und Reihenhäuser in EINER gemeinsamen Regression aus und weist keine Unterscheidung nach Gebäudetyp aus. DER LOGARITHMUS STEHT LINKS: der Bericht druckt „ln(SWF) = −0,3450·ln(vSW) − 0,0001·BRW + 0,1754·ln(RND) + 3,9573\" ab. Die Summe ist nicht der Faktor, sondern sein Logarithmus — der Faktor ist e hoch dieser Summe.\n\nDAS ANWENDUNGSBEISPIEL DES BERICHTS (S. 79) rechnet es vor: freistehendes Einfamilienhaus, 440.000 € vorläufiger Sachwert, Bodenrichtwert 270 €/m², Restnutzungsdauer 40 Jahre → ln(SWF) = −4,4831 − 0,027 + 0,6470 + 3,9573 = 0,0942, Sachwertfaktor = e^0,0942 = 1,0988, marktangepasster Sachwert = 483.472 €. Dieses Register rechnet dieselben Zahlen.\n\nDESHALB VIER NACHKOMMASTELLEN: der Bericht weist den Faktor selbst mit vier aus (1,0988), und sein Beispiel rechnet damit weiter.\n\n263 Kauffälle nach Ausreißerbereinigung (Cook-Distanz über 4/n), Bestimmtheitsmaß 0,28. Sachwertfaktor der Stichprobe: 0,62 bis 1,82, Median 1,08, Mittel 1,12, Standardabweichung 0,22.",
+        "normobjekt": "NHK 2010, Bruttogrundfläche aus den Außenmaßen auf Basis amtlicher Geobasisdaten, lineare Alterswertminderung nach § 38 ImmoWertV, Gesamtnutzungsdauer 80 Jahre nach Anlage 1 ImmoWertV, Außenanlagen in der Regel 3 bis 5 % der alterswertgeminderten Gebäudeherstellungskosten, Bodenwert = objektspezifisch angepasster Bodenrichtwert (Umrechnungskoeffizienten) zum Stand 01.01.2024."
+      },
+      "korrekturen": [],
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV §§ 35 bis 38",
+        "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert",
+        "nhk": "Normalherstellungskosten 2010",
+        "gnd_jahre": 80,
+        "alterswertminderung": "linear nach § 38 ImmoWertV",
+        "aussenanlagen": "in der Regel 3 bis 5 % der alterswertgeminderten Gebäudeherstellungskosten; Stellplätze, Carports und Terrassen sind darin enthalten",
+        "baupreisindex": "quartalsweise Indexreihen für die Bauwirtschaft des Statistischen Bundesamts 2021, Preisindex für den Neubau von Wohngebäuden",
+        "bodenwert": "objektspezifisch angepasster Bodenrichtwert mittels Umrechnungskoeffizienten, Stand 01.01.2024",
+        "kauffaelle_gesamt": 263,
+        "bestimmtheitsmass": 0.28,
+        "besonderheit": "Die Kaufpreise sind um Garagengebäude, Carports und weitere Nebengebäude bereinigt (mit NHK ermittelt); im Wohngebäude integrierte Garagen tragen den Wertansatz des Wohngebäudes. Nicht überdachte Stellplätze stecken im Ansatz der Außenanlagen."
+      },
+      "geltungsbereich": {
+        "raeumlich": "Landeshauptstadt Dresden",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser, Doppelhaushälften und Reihenhäuser — der Ausschuss wertet sie GEMEINSAM aus",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwert_eur": {
+            "min": 151000,
+            "max": 915000,
+            "median": 369000,
+            "mittel": 388520
+          },
+          "brw_eur_qm": {
+            "min": 70,
+            "max": 690,
+            "median": 310,
+            "mittel": 315
+          },
+          "rnd_jahre": {
+            "min": 5,
+            "max": 75,
+            "median": 29,
+            "mittel": 34
+          },
+          "sachwertfaktor": {
+            "min": 0.62,
+            "max": 1.82,
+            "median": 1.08,
+            "mittel": 1.12
+          }
+        },
+        "vorbehalt": "DIE VERTRAUENSINTERVALLE DER KOEFFIZIENTEN SIND WEIT, und der Bericht druckt sie ab: k1 von −0,4177 bis −0,2724, k2 von −0,0003 bis +0,0001 (der Bodenrichtwert-Koeffizient schließt die NULL ein — sein Einfluss ist statistisch nicht gesichert), k3 von 0,1277 bis 0,2231, die Verschiebungskonstante von 3,1157 bis 4,7988.\n\nDAS BESTIMMTHEITSMASS LIEGT BEI 0,28 bei 263 Kauffällen, die beobachteten Faktoren reichen von 0,62 bis 1,82.\n\nDER BODENWERT IST OBJEKTSPEZIFISCH ANGEPASST (Umrechnungskoeffizienten), nicht der rohe Bodenrichtwert mal Fläche. Wer ohne diese Anpassung rechnet, füttert die Gleichung mit einem anderen vorläufigen Sachwert, als ihr zugrunde lag.\n\nDER BODENRICHTWERT-STAND IST DER 01.01.2024, der Bericht selbst der Jahrgang 2026.",
+        "hinweis": "DIESELBE GLEICHUNG WIE FÜR FREISTEHENDE HÄUSER — der Dresdner Ausschuss wertet freistehende Ein- und Zweifamilienhäuser, Doppelhaushälften und Reihenhäuser in EINER gemeinsamen Regression aus und weist keine Unterscheidung nach Gebäudetyp aus. Anders als Leipzig trennt Dresden die Gebäudetypen NICHT — freistehende Häuser, Doppelhaushälften und Reihenhäuser stehen in einer gemeinsamen Regression. Die Verteilung der Kauffälle ist im Bericht nach Typ eingefärbt, die Formel gilt für alle."
+      },
+      "stufe": "A",
+      "stufe_grund": "Amtliche Regressionsfunktion MIT ANWENDUNGSBEISPIEL: 440.000 € / 270 €/m² / 40 Jahre → ln(SWF) = 0,0942 → Faktor 1,0988 → marktangepasster Sachwert 483.472 €. Das Register rechnet dieselben Zahlen, Glied für Glied.",
+      "fallzahl": 263,
+      "streuung": 0.22,
+      "beleg": "Grundstücksmarktbericht 2026 der Landeshauptstadt Dresden, Kap. 7.3, S. 76 ff.: Sachwertfaktor aus 263 ausreißerbereinigten Kauffällen des Geschäftsjahres 2025, Regressionsformel ln(SWF) = −0,3450·ln(vSW) − 0,0001·BRW + 0,1754·ln(RND) + 3,9573, Bestimmtheitsmaß 0,28, mit Vertrauensintervallen und Anwendungsbeispiel."
+    },
+    {
+      "zweig": "rmh",
+      "zweig_bez": "Reihenmittelhäuser",
+      "form": "regression_additiv",
+      "formel": {
+        "form": "regression_additiv",
+        "intercept": 3.9573,
+        "terme": [
+          {
+            "feld": "sachwert",
+            "bez": "vorläufiger Sachwert",
+            "koeffizient": -0.345,
+            "transform": "ln",
+            "gueltig": [
+              151000,
+              915000
+            ]
+          },
+          {
+            "feld": "brw",
+            "bez": "Bodenrichtwert",
+            "koeffizient": -0.0001,
+            "exponent": 1,
+            "gueltig": [
+              70,
+              690
+            ]
+          },
+          {
+            "feld": "rnd",
+            "bez": "Restnutzungsdauer",
+            "koeffizient": 0.1754,
+            "transform": "ln",
+            "gueltig": [
+              5,
+              75
+            ]
+          }
+        ],
+        "aussen_funktion": "exp",
+        "rundung_stellen": 4,
+        "liefert": "faktor",
+        "hinweis": "DIESELBE GLEICHUNG WIE FÜR FREISTEHENDE HÄUSER — Dresden trennt die Gebäudetypen nicht. DER LOGARITHMUS STEHT LINKS: der Bericht druckt „ln(SWF) = −0,3450·ln(vSW) − 0,0001·BRW + 0,1754·ln(RND) + 3,9573\" ab. Die Summe ist nicht der Faktor, sondern sein Logarithmus — der Faktor ist e hoch dieser Summe.\n\nDAS ANWENDUNGSBEISPIEL DES BERICHTS (S. 79) rechnet es vor: freistehendes Einfamilienhaus, 440.000 € vorläufiger Sachwert, Bodenrichtwert 270 €/m², Restnutzungsdauer 40 Jahre → ln(SWF) = −4,4831 − 0,027 + 0,6470 + 3,9573 = 0,0942, Sachwertfaktor = e^0,0942 = 1,0988, marktangepasster Sachwert = 483.472 €. Dieses Register rechnet dieselben Zahlen.\n\nDESHALB VIER NACHKOMMASTELLEN: der Bericht weist den Faktor selbst mit vier aus (1,0988), und sein Beispiel rechnet damit weiter.\n\n263 Kauffälle nach Ausreißerbereinigung (Cook-Distanz über 4/n), Bestimmtheitsmaß 0,28. Sachwertfaktor der Stichprobe: 0,62 bis 1,82, Median 1,08, Mittel 1,12, Standardabweichung 0,22.",
+        "normobjekt": "NHK 2010, Bruttogrundfläche aus den Außenmaßen auf Basis amtlicher Geobasisdaten, lineare Alterswertminderung nach § 38 ImmoWertV, Gesamtnutzungsdauer 80 Jahre nach Anlage 1 ImmoWertV, Außenanlagen in der Regel 3 bis 5 % der alterswertgeminderten Gebäudeherstellungskosten, Bodenwert = objektspezifisch angepasster Bodenrichtwert (Umrechnungskoeffizienten) zum Stand 01.01.2024."
+      },
+      "korrekturen": [],
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV §§ 35 bis 38",
+        "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert",
+        "nhk": "Normalherstellungskosten 2010",
+        "gnd_jahre": 80,
+        "alterswertminderung": "linear nach § 38 ImmoWertV",
+        "aussenanlagen": "in der Regel 3 bis 5 % der alterswertgeminderten Gebäudeherstellungskosten; Stellplätze, Carports und Terrassen sind darin enthalten",
+        "baupreisindex": "quartalsweise Indexreihen für die Bauwirtschaft des Statistischen Bundesamts 2021, Preisindex für den Neubau von Wohngebäuden",
+        "bodenwert": "objektspezifisch angepasster Bodenrichtwert mittels Umrechnungskoeffizienten, Stand 01.01.2024",
+        "kauffaelle_gesamt": 263,
+        "bestimmtheitsmass": 0.28,
+        "besonderheit": "Die Kaufpreise sind um Garagengebäude, Carports und weitere Nebengebäude bereinigt (mit NHK ermittelt); im Wohngebäude integrierte Garagen tragen den Wertansatz des Wohngebäudes. Nicht überdachte Stellplätze stecken im Ansatz der Außenanlagen."
+      },
+      "geltungsbereich": {
+        "raeumlich": "Landeshauptstadt Dresden",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser, Doppelhaushälften und Reihenhäuser — der Ausschuss wertet sie GEMEINSAM aus",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwert_eur": {
+            "min": 151000,
+            "max": 915000,
+            "median": 369000,
+            "mittel": 388520
+          },
+          "brw_eur_qm": {
+            "min": 70,
+            "max": 690,
+            "median": 310,
+            "mittel": 315
+          },
+          "rnd_jahre": {
+            "min": 5,
+            "max": 75,
+            "median": 29,
+            "mittel": 34
+          },
+          "sachwertfaktor": {
+            "min": 0.62,
+            "max": 1.82,
+            "median": 1.08,
+            "mittel": 1.12
+          }
+        },
+        "vorbehalt": "DIE VERTRAUENSINTERVALLE DER KOEFFIZIENTEN SIND WEIT, und der Bericht druckt sie ab: k1 von −0,4177 bis −0,2724, k2 von −0,0003 bis +0,0001 (der Bodenrichtwert-Koeffizient schließt die NULL ein — sein Einfluss ist statistisch nicht gesichert), k3 von 0,1277 bis 0,2231, die Verschiebungskonstante von 3,1157 bis 4,7988.\n\nDAS BESTIMMTHEITSMASS LIEGT BEI 0,28 bei 263 Kauffällen, die beobachteten Faktoren reichen von 0,62 bis 1,82.\n\nDER BODENWERT IST OBJEKTSPEZIFISCH ANGEPASST (Umrechnungskoeffizienten), nicht der rohe Bodenrichtwert mal Fläche. Wer ohne diese Anpassung rechnet, füttert die Gleichung mit einem anderen vorläufigen Sachwert, als ihr zugrunde lag.\n\nDER BODENRICHTWERT-STAND IST DER 01.01.2024, der Bericht selbst der Jahrgang 2026.",
+        "hinweis": "DIESELBE GLEICHUNG WIE FÜR FREISTEHENDE HÄUSER — Dresden trennt die Gebäudetypen nicht. Anders als Leipzig trennt Dresden die Gebäudetypen NICHT — freistehende Häuser, Doppelhaushälften und Reihenhäuser stehen in einer gemeinsamen Regression. Die Verteilung der Kauffälle ist im Bericht nach Typ eingefärbt, die Formel gilt für alle."
+      },
+      "stufe": "A",
+      "stufe_grund": "Amtliche Regressionsfunktion MIT ANWENDUNGSBEISPIEL: 440.000 € / 270 €/m² / 40 Jahre → ln(SWF) = 0,0942 → Faktor 1,0988 → marktangepasster Sachwert 483.472 €. Das Register rechnet dieselben Zahlen, Glied für Glied.",
+      "fallzahl": 263,
+      "streuung": 0.22,
+      "beleg": "Grundstücksmarktbericht 2026 der Landeshauptstadt Dresden, Kap. 7.3, S. 76 ff.: Sachwertfaktor aus 263 ausreißerbereinigten Kauffällen des Geschäftsjahres 2025, Regressionsformel ln(SWF) = −0,3450·ln(vSW) − 0,0001·BRW + 0,1754·ln(RND) + 3,9573, Bestimmtheitsmaß 0,28, mit Vertrauensintervallen und Anwendungsbeispiel."
+    }
+  ]
+}
