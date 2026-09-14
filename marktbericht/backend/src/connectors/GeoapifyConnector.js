@@ -100,13 +100,62 @@ export const GeoapifyConnector = {
       `&apiKey=${cfg.geoapify.key}`;
     const data = await httpJson(url, { timeoutMs: 8000 });
     const feats = (data && data.features) || [];
-    return feats
+    const auf = (fs) => fs
       .map((f) => {
         const p = f.properties || {};
         return { formatted: p.formatted, lat: p.lat, lon: p.lon, postcode: p.postcode || null,
                  city: p.city || p.town || p.village || null, street: p.street || null };
       })
       .filter((x) => x.formatted);
+
+    const treffer = auf(feats);
+    if (treffer.length || type !== 'street') return treffer;
+
+    /* ═══ v1390-WPLATZ · EIN PLATZ IST KEINE STRASSE ═════════════════════
+     *
+     * Marcels Befund: „die verifizierung der adresse passt nicht. das muss
+     * fuer ganz deutschland nach plz sein. ist mir im tab objekt und auch
+     * beim marktbericht bei der adresseingabe aufgefallen."
+     *
+     * GEMESSEN ueber alle 16 Bundeslaender, je eine echte Adresse:
+     *   PLZ -> Ort      17 von 17 richtig
+     *   Strassensuche   15 von 17
+     *
+     * Und die zwei Ausfaelle sind kein Zufall:
+     *   80331 Muenchen Marienplatz  -> kein Treffer
+     *   99084 Erfurt Anger          -> kein Treffer
+     *
+     * Beides sind PLAETZE. `type=street` schliesst sie bei Geoapify aus.
+     * Ohne den Filter findet derselbe Aufruf den Marienplatz sofort.
+     * In Deutschland liegen genug Wohnadressen an Plaetzen, als dass man
+     * das auf sich beruhen lassen koennte.
+     *
+     * DER NACHSCHLAG LAEUFT NUR, WENN DER FILTER LEER AUSGEHT - im
+     * Normalfall kostet er keine Anfrage. Und er nimmt NICHT alles, was
+     * dann kommt: ohne Typfilter antwortet Geoapify auch mit Orten und
+     * Regionen ("Erfurt, TH, Deutschland" fuer die Suche nach "Anger").
+     * Ein Ort in der Strassenliste waere schlechter als eine leere Liste,
+     * deshalb bleiben nur Ergebnisse mit einer eigenen Strassen- oder
+     * Platzangabe. */
+    const url2 = url.replace('&type=street', '');
+    let data2 = null;
+    try { data2 = await httpJson(url2, { timeoutMs: 8000 }); } catch (e) { return treffer; }
+    const roh2 = (data2 && data2.features) || [];
+    const brauchbar = roh2.filter((f) => {
+      const p = f.properties || {};
+      if (p.street) return true;
+      /* Ein Platz traegt seinen Namen in `name`, nicht in `street`. Er gilt
+         nur, wenn er auch eine Postleitzahl hat - sonst ist es ein Ort. */
+      return !!(p.name && p.postcode);
+    });
+    return auf(brauchbar).map((x) => {
+      if (x.street) return x;
+      /* Damit die Vorschlagsliste im Formular etwas anzuzeigen hat: der
+         Platzname wandert ins `street`-Feld, wo der Aufrufer ihn erwartet. */
+      const f = roh2.find((g) => (g.properties || {}).formatted === x.formatted);
+      const nm = f && f.properties && f.properties.name;
+      return nm ? Object.assign({}, x, { street: nm }) : x;
+    });
   },
 
   // Places: POI einer Kategorie im Radius. Gibt Array {name,lat,lon}
