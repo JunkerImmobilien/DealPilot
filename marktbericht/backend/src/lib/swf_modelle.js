@@ -372,8 +372,30 @@ function regressionAdditiv(m, e) {
         `${t.bez || t.feld} liegt ausserhalb der Datenspanne `
         + `${t.gueltig[0]} bis ${t.gueltig[1]}.`);
     }
+    /* v1110b-WLN - EIN LOGARITHMUS IST KEINE POTENZ.
+       Magdeburg druckt fuer Baujahre ab 1991 ab:
+         - 0,18684634 x ln vorlaeufiger Sachwert
+       Ohne diesen Zweig muesste man den Term weglassen oder als Potenz
+       missdeuten - beides ergaebe eine andere Gleichung, und beide
+       Ergebnisse blieben im plausiblen Band. */
     const exp = zahl(t.exponent);
-    const basis = (exp === null || exp === 1) ? x : Math.pow(x, exp);
+    let basis;
+    if (t.transform === 'ln') {
+      if (!(x > 0)) {
+        return nichts('term_unbestimmt',
+          `${t.bez || t.feld} = ${x}; der natuerliche Logarithmus ist dort `
+          + 'nicht erklaert.');
+      }
+      basis = Math.log(x);
+    } else if (t.transform === 'log10') {
+      if (!(x > 0)) {
+        return nichts('term_unbestimmt',
+          `${t.bez || t.feld} = ${x}; der Zehnerlogarithmus ist dort nicht erklaert.`);
+      }
+      basis = Math.log10(x);
+    } else {
+      basis = (exp === null || exp === 1) ? x : Math.pow(x, exp);
+    }
     if (!Number.isFinite(basis)) {
       return nichts('term_unbestimmt',
         `${t.bez || t.feld} = ${x} ergibt in diesem Term keinen endlichen `
