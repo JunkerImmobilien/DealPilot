@@ -1,6 +1,880 @@
 [
  {
   "land_code": "TH",
+  "ags": "16051000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "efh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    50000,
+    60000,
+    70000,
+    80000,
+    90000,
+    100000,
+    110000,
+    120000,
+    130000,
+    140000,
+    150000,
+    160000,
+    170000,
+    180000,
+    190000,
+    200000,
+    210000,
+    220000,
+    230000,
+    240000,
+    250000,
+    260000,
+    270000,
+    280000,
+    290000,
+    300000,
+    310000,
+    320000,
+    330000,
+    340000,
+    350000,
+    360000,
+    370000,
+    380000,
+    390000,
+    400000,
+    410000,
+    420000,
+    430000,
+    440000,
+    450000,
+    460000,
+    470000,
+    480000,
+    490000,
+    500000,
+    510000,
+    520000,
+    530000,
+    540000,
+    550000,
+    560000,
+    570000,
+    580000,
+    590000,
+    600000,
+    610000,
+    620000,
+    630000,
+    640000,
+    650000,
+    660000,
+    670000,
+    680000,
+    690000,
+    700000,
+    710000,
+    720000,
+    730000,
+    740000,
+    750000,
+    760000,
+    770000,
+    780000,
+    790000,
+    800000,
+    810000,
+    820000,
+    830000,
+    840000,
+    850000,
+    860000,
+    870000,
+    880000,
+    890000,
+    900000,
+    910000,
+    920000,
+    930000,
+    940000,
+    950000,
+    960000,
+    970000
+   ],
+   "achse_k_feld": "brw_bereich",
+   "achse_k_bez": "kein Bodenwertbezug — die Schätzfunktion wurde für diese Objektart ohne Lageglied gebildet",
+   "zuordnung_feld": "brw",
+   "kategorien": [
+    "alle"
+   ],
+   "kategorie_baender": [
+    {
+     "von": 0,
+     "bis": null,
+     "kategorie": "alle"
+    }
+   ],
+   "zellen": {
+    "50000": [
+     2.69
+    ],
+    "60000": [
+     2.5
+    ],
+    "70000": [
+     2.35
+    ],
+    "80000": [
+     2.22
+    ],
+    "90000": [
+     2.12
+    ],
+    "100000": [
+     2.03
+    ],
+    "110000": [
+     1.95
+    ],
+    "120000": [
+     1.89
+    ],
+    "130000": [
+     1.83
+    ],
+    "140000": [
+     1.77
+    ],
+    "150000": [
+     1.72
+    ],
+    "160000": [
+     1.68
+    ],
+    "170000": [
+     1.64
+    ],
+    "180000": [
+     1.6
+    ],
+    "190000": [
+     1.56
+    ],
+    "200000": [
+     1.53
+    ],
+    "210000": [
+     1.5
+    ],
+    "220000": [
+     1.47
+    ],
+    "230000": [
+     1.44
+    ],
+    "240000": [
+     1.42
+    ],
+    "250000": [
+     1.4
+    ],
+    "260000": [
+     1.38
+    ],
+    "270000": [
+     1.36
+    ],
+    "280000": [
+     1.34
+    ],
+    "290000": [
+     1.32
+    ],
+    "300000": [
+     1.3
+    ],
+    "310000": [
+     1.28
+    ],
+    "320000": [
+     1.27
+    ],
+    "330000": [
+     1.25
+    ],
+    "340000": [
+     1.24
+    ],
+    "350000": [
+     1.22
+    ],
+    "360000": [
+     1.21
+    ],
+    "370000": [
+     1.19
+    ],
+    "380000": [
+     1.18
+    ],
+    "390000": [
+     1.17
+    ],
+    "400000": [
+     1.16
+    ],
+    "410000": [
+     1.15
+    ],
+    "420000": [
+     1.13
+    ],
+    "430000": [
+     1.12
+    ],
+    "440000": [
+     1.11
+    ],
+    "450000": [
+     1.1
+    ],
+    "460000": [
+     1.09
+    ],
+    "470000": [
+     1.08
+    ],
+    "480000": [
+     1.07
+    ],
+    "490000": [
+     1.07
+    ],
+    "500000": [
+     1.06
+    ],
+    "510000": [
+     1.05
+    ],
+    "520000": [
+     1.04
+    ],
+    "530000": [
+     1.03
+    ],
+    "540000": [
+     1.02
+    ],
+    "550000": [
+     1.02
+    ],
+    "560000": [
+     1.01
+    ],
+    "570000": [
+     1.0
+    ],
+    "580000": [
+     1.0
+    ],
+    "590000": [
+     0.99
+    ],
+    "600000": [
+     0.98
+    ],
+    "610000": [
+     0.97
+    ],
+    "620000": [
+     0.97
+    ],
+    "630000": [
+     0.96
+    ],
+    "640000": [
+     0.96
+    ],
+    "650000": [
+     0.95
+    ],
+    "660000": [
+     0.94
+    ],
+    "670000": [
+     0.94
+    ],
+    "680000": [
+     0.93
+    ],
+    "690000": [
+     0.93
+    ],
+    "700000": [
+     0.92
+    ],
+    "710000": [
+     0.92
+    ],
+    "720000": [
+     0.91
+    ],
+    "730000": [
+     0.91
+    ],
+    "740000": [
+     0.9
+    ],
+    "750000": [
+     0.9
+    ],
+    "760000": [
+     0.89
+    ],
+    "770000": [
+     0.89
+    ],
+    "780000": [
+     0.88
+    ],
+    "790000": [
+     0.88
+    ],
+    "800000": [
+     0.87
+    ],
+    "810000": [
+     0.87
+    ],
+    "820000": [
+     0.86
+    ],
+    "830000": [
+     0.86
+    ],
+    "840000": [
+     0.86
+    ],
+    "850000": [
+     0.85
+    ],
+    "860000": [
+     0.85
+    ],
+    "870000": [
+     0.84
+    ],
+    "880000": [
+     0.84
+    ],
+    "890000": [
+     0.84
+    ],
+    "900000": [
+     0.83
+    ],
+    "910000": [
+     0.83
+    ],
+    "920000": [
+     0.83
+    ],
+    "930000": [
+     0.82
+    ],
+    "940000": [
+     0.82
+    ],
+    "950000": [
+     0.81
+    ],
+    "960000": [
+     0.81
+    ],
+    "970000": [
+     0.81
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "KEIN BODENWERTBEZUG. Der Ausschuss hat die Schätzfunktion für freistehende Ein- und Zweifamilienhäuser ausdrücklich OHNE das Glied zur Beschreibung des Lageeinflusses gebildet; der Faktor hängt allein vom vorläufigen Sachwert ab und gilt für jedes Bodenwertniveau gleich. k = 0,7978 × (vSW / 1 Mio)^-0,4056, gegen alle 93 abgedruckten Tabellenwerte geprüft. EINE STELLE WEICHT AB: bei 230.000 Euro vorläufigem Sachwert ergibt die abgedruckte Schätzfunktion 1,448 — also gerundet 1,45 —, die Tabelle druckt aber 1,44. Hinterlegt ist der TABELLENWERT, denn der Prüfmaßstab ist das amtliche Dokument, nicht die Nachrechnung. Alle übrigen 284 Werte stimmen mit der Formel überein. Die Spanne ist die größte im Register: von 2,69 bei 50.000 Euro bis 0,81 bei 970.000 Euro.",
+   "normobjekt": "100 Kauffälle der Jahre 2022 und 2023.",
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": null,
+   "gnd_grundlage": "standardstufenabhängig, beginnend bei 60 Jahren für Standardstufe 1",
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2024, Abbildung 3, Seite 9."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: 100 Kauffaelle, und die Gesamtnutzungsdauer haengt von der Standardstufe ab, was der Registersatz nicht als eine Zahl abbilden kann.",
+  "fallzahl": 100,
+  "streuung": null,
+  "stichtag": "2023-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2024 © Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Bezugsmaßstab Bruttogrundfläche, ursprüngliches Baujahr, lineare Alterswertminderung. ACHTUNG GESAMTNUTZUNGSDAUER: sie richtet sich nach der STANDARDSTUFE und beginnt bei 60 Jahren für Standardstufe 1. Es gibt hier keine einheitliche Gesamtnutzungsdauer. Der vorläufige Sachwert ist in die Schätzfunktion in MIO EURO einzusetzen.",
+  "fundstelle": "Sachwertfaktoren 2024, Abbildung 3 (EFH/ZFH, Seite 9) und Abbildung 9 (DHH/REH, Seite 14); Modellbeschreibung Abbildung 2, Seite 8."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16051000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    150,
+    300,
+    600
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenwertniveau in Euro/m²",
+   "achse_y": [
+    100000,
+    110000,
+    120000,
+    130000,
+    140000,
+    150000,
+    160000,
+    170000,
+    180000,
+    190000,
+    200000,
+    210000,
+    220000,
+    230000,
+    240000,
+    250000,
+    260000,
+    270000,
+    280000,
+    290000,
+    300000,
+    310000,
+    320000,
+    330000,
+    340000,
+    350000,
+    360000,
+    370000,
+    380000,
+    390000,
+    400000,
+    410000,
+    420000,
+    430000,
+    440000,
+    450000,
+    460000,
+    470000,
+    480000,
+    490000,
+    500000,
+    510000,
+    520000,
+    530000,
+    540000,
+    550000,
+    560000,
+    570000,
+    580000,
+    590000,
+    600000,
+    610000,
+    620000,
+    630000,
+    640000,
+    650000,
+    660000,
+    670000,
+    680000,
+    690000,
+    700000,
+    710000,
+    720000,
+    730000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "100000": [
+     1.94,
+     2.2,
+     2.5
+    ],
+    "110000": [
+     1.87,
+     2.12,
+     2.41
+    ],
+    "120000": [
+     1.81,
+     2.05,
+     2.32
+    ],
+    "130000": [
+     1.75,
+     1.99,
+     2.25
+    ],
+    "140000": [
+     1.7,
+     1.93,
+     2.19
+    ],
+    "150000": [
+     1.65,
+     1.87,
+     2.13
+    ],
+    "160000": [
+     1.61,
+     1.83,
+     2.07
+    ],
+    "170000": [
+     1.57,
+     1.78,
+     2.02
+    ],
+    "180000": [
+     1.54,
+     1.74,
+     1.98
+    ],
+    "190000": [
+     1.5,
+     1.71,
+     1.93
+    ],
+    "200000": [
+     1.47,
+     1.67,
+     1.9
+    ],
+    "210000": [
+     1.44,
+     1.64,
+     1.86
+    ],
+    "220000": [
+     1.42,
+     1.61,
+     1.82
+    ],
+    "230000": [
+     1.39,
+     1.58,
+     1.79
+    ],
+    "240000": [
+     1.37,
+     1.55,
+     1.76
+    ],
+    "250000": [
+     1.35,
+     1.53,
+     1.73
+    ],
+    "260000": [
+     1.33,
+     1.5,
+     1.71
+    ],
+    "270000": [
+     1.31,
+     1.48,
+     1.68
+    ],
+    "280000": [
+     1.29,
+     1.46,
+     1.66
+    ],
+    "290000": [
+     1.27,
+     1.44,
+     1.63
+    ],
+    "300000": [
+     1.25,
+     1.42,
+     1.61
+    ],
+    "310000": [
+     1.24,
+     1.4,
+     1.59
+    ],
+    "320000": [
+     1.22,
+     1.38,
+     1.57
+    ],
+    "330000": [
+     1.21,
+     1.37,
+     1.55
+    ],
+    "340000": [
+     1.19,
+     1.35,
+     1.53
+    ],
+    "350000": [
+     1.18,
+     1.34,
+     1.52
+    ],
+    "360000": [
+     1.16,
+     1.32,
+     1.5
+    ],
+    "370000": [
+     1.15,
+     1.31,
+     1.48
+    ],
+    "380000": [
+     1.14,
+     1.29,
+     1.47
+    ],
+    "390000": [
+     1.13,
+     1.28,
+     1.45
+    ],
+    "400000": [
+     1.12,
+     1.27,
+     1.44
+    ],
+    "410000": [
+     1.11,
+     1.25,
+     1.42
+    ],
+    "420000": [
+     1.1,
+     1.24,
+     1.41
+    ],
+    "430000": [
+     1.08,
+     1.23,
+     1.4
+    ],
+    "440000": [
+     1.07,
+     1.22,
+     1.38
+    ],
+    "450000": [
+     1.07,
+     1.21,
+     1.37
+    ],
+    "460000": [
+     1.06,
+     1.2,
+     1.36
+    ],
+    "470000": [
+     1.05,
+     1.19,
+     1.35
+    ],
+    "480000": [
+     1.04,
+     1.18,
+     1.34
+    ],
+    "490000": [
+     1.03,
+     1.17,
+     1.32
+    ],
+    "500000": [
+     1.02,
+     1.16,
+     1.31
+    ],
+    "510000": [
+     1.01,
+     1.15,
+     1.3
+    ],
+    "520000": [
+     1.01,
+     1.14,
+     1.29
+    ],
+    "530000": [
+     1.0,
+     1.13,
+     1.28
+    ],
+    "540000": [
+     0.99,
+     1.12,
+     1.27
+    ],
+    "550000": [
+     0.98,
+     1.12,
+     1.26
+    ],
+    "560000": [
+     0.98,
+     1.11,
+     1.26
+    ],
+    "570000": [
+     0.97,
+     1.1,
+     1.25
+    ],
+    "580000": [
+     0.96,
+     1.09,
+     1.24
+    ],
+    "590000": [
+     0.96,
+     1.08,
+     1.23
+    ],
+    "600000": [
+     0.95,
+     1.08,
+     1.22
+    ],
+    "610000": [
+     0.94,
+     1.07,
+     1.21
+    ],
+    "620000": [
+     0.94,
+     1.06,
+     1.21
+    ],
+    "630000": [
+     0.93,
+     1.06,
+     1.2
+    ],
+    "640000": [
+     0.93,
+     1.05,
+     1.19
+    ],
+    "650000": [
+     0.92,
+     1.04,
+     1.18
+    ],
+    "660000": [
+     0.91,
+     1.04,
+     1.18
+    ],
+    "670000": [
+     0.91,
+     1.03,
+     1.17
+    ],
+    "680000": [
+     0.9,
+     1.02,
+     1.16
+    ],
+    "690000": [
+     0.9,
+     1.02,
+     1.16
+    ],
+    "700000": [
+     0.89,
+     1.01,
+     1.15
+    ],
+    "710000": [
+     0.89,
+     1.01,
+     1.14
+    ],
+    "720000": [
+     0.88,
+     1.0,
+     1.14
+    ],
+    "730000": [
+     0.88,
+     1.0,
+     1.13
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Drei Bodenwertniveaus als Stützstellen (150, 300, 600 Euro/qm), zwischen denen interpoliert wird — anders als bei den freistehenden Häusern, für die der Ausschuss keinen Lageeinfluss angesetzt hat. k = a × (vSW / 1 Mio)^-0,3998 mit a = 0,7742 · 0,8781 · 0,9959, gegen alle abgedruckten Tabellenwerte geprüft.",
+   "normobjekt": "71 Kauffälle der Jahre 2022 und 2023."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": null,
+   "gnd_grundlage": "standardstufenabhängig, beginnend bei 60 Jahren für Standardstufe 1",
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2024, Abbildung 9, Seite 14."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion. KEINE Stufe A: 71 Kauffaelle, und die Gesamtnutzungsdauer haengt von der Standardstufe ab.",
+  "fallzahl": 71,
+  "streuung": null,
+  "stichtag": "2023-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2024 © Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Bezugsmaßstab Bruttogrundfläche, ursprüngliches Baujahr, lineare Alterswertminderung. ACHTUNG GESAMTNUTZUNGSDAUER: sie richtet sich nach der STANDARDSTUFE und beginnt bei 60 Jahren für Standardstufe 1. Es gibt hier keine einheitliche Gesamtnutzungsdauer. Der vorläufige Sachwert ist in die Schätzfunktion in MIO EURO einzusetzen.",
+  "fundstelle": "Sachwertfaktoren 2024, Abbildung 3 (EFH/ZFH, Seite 9) und Abbildung 9 (DHH/REH, Seite 14); Modellbeschreibung Abbildung 2, Seite 8."
+ },
+ {
+  "land_code": "TH",
   "ags": "16053",
   "ebene": "kreis",
   "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",

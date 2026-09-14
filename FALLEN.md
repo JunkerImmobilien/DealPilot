@@ -4135,3 +4135,51 @@ git checkout -- tools/swf-register/        # tracked zurueckholen
 > dabei zerstört hat.**
 
 `v1141`
+
+---
+
+## Ein neuer Jahrgang, der nie zum Zug kommt
+
+Erfurt stand seit Langem mit dem Jahrgang **2021** im Register. Der neue
+Bericht von 2024 wurde eingespielt, gegen 285 Tabellenwerte geprüft, das
+Register gebaut — und der Rechner antwortete weiter mit **2021**.
+
+Zwei Ursachen, beide unsichtbar:
+
+**1. Die Kaskade hört beim feineren Schlüssel auf.** Der Altsatz lag auf
+`16051000` (achtstellig), das neue Rezept auf `16051` (fünfstellig). Die
+Kaskade prüft 8 → 5 → 3 → 2 und **nimmt den ersten Treffer.** Der neue Satz
+wurde nie erreicht. Sichtbar wurde es erst, als die Abfrage den Jahrgang
+mit ausgab.
+
+**2. `objektart` schlägt `zweig`.** Der Auswerter filtert mit
+
+```js
+return z === code || a === code;      // z = zweig, a = objektart
+```
+
+Der Altsatz heißt im Zweig `efh_bis1990`, trägt aber zusätzlich
+`objektart: "efh"` — und `ZWEIG_VORZUG` prüft für ein Einfamilienhaus die
+Codes **in dieser Reihenfolge**: `['efh', 'ezfh']`. Ein neuer Satz mit
+`zweig: "ezfh"` kommt damit nie an die Reihe; der Altsatz trifft schon beim
+ersten Code, und der Jahrgangsvergleich findet **innerhalb** dieser Gruppe
+statt — also gar nicht.
+
+**Bei Doppelhaushälften trat das Problem nicht auf**, weil beide Jahrgänge
+dort denselben Zweignamen `rhdhh` tragen. Dort gewann der neuere Jahrgang
+von allein. Genau das machte den Fehler so tückisch: **die Hälfte
+funktionierte.**
+
+> **Die Lehre: Wer einen Jahrgang ablöst, muss auf demselben Schlüssel und
+> unter demselben Code landen wie der Altsatz.** Nicht auf einem gröberen,
+> nicht unter einem anderen Zweignamen. Sonst liegen beide im Register, der
+> Registerbau meldet Erfolg — und der Kunde bekommt den alten Wert.
+>
+> **Die Prüfung, die es zeigt, ist eine Zeile:** nicht nur den Wert
+> abfragen, sondern `berichtsjahr` und `stichtag` mit ausgeben. Ein Wert
+> allein sieht immer richtig aus.
+
+`rezept2register.py` überträgt das Feld `objektart` übrigens nicht — ein
+Rezept kann es also gar nicht setzen. Der einzige Weg ist der Zweigname.
+
+`v1151`
