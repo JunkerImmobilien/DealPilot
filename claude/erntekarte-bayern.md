@@ -202,3 +202,99 @@ Ausschüsse, **die ihm gemeldet haben**; wer nichts gemeldet hat, steht mit
 leeren Feldern da, ohne dass das ein Beweis für das Fehlen wäre. Ein leeres
 Feld in Gruppe C heißt deshalb genauer: *dem Oberen Gutachterausschuss wurde
 für 2023 bis 2025 nichts gemeldet.*
+
+---
+
+# Was der bayerische Bericht kostet — die Kaufliste, 14.09.2026
+
+**Marcels Frage: „was kostet der bayrische bericht?"** Es gibt nicht einen
+Preis, sondern siebzehn — und die wichtigere Zahl ist nicht der Preis,
+sondern was man dafür bekommt.
+
+## Wie die Preise doch lesbar wurden
+
+**Hier stand: „Die Produkte und Preise lädt die Seite per JavaScript nach;
+ein maschinenlesbarer Endpunkt war in `boris.js` nicht zu finden (drei
+Anläufe, dann abgebrochen)." Das war die falsche Suche.** Die Preise liegen
+gar nicht hinter einem Endpunkt — sie stehen als `data`-Attribute im HTML:
+
+```html
+<tr class="form-check-include" data-preis="50"
+    data-beschreibung="Marktbericht 2025" data-versionid="…">
+```
+
+Das JavaScript liest sie nur aus, um das Bestellformular zu füllen. Wer nach
+`fetch(` sucht, findet nichts und hält die Seite für dynamisch.
+
+> **Zweiter Fehler desselben Anlaufs:** Die Ausschussnamen in der URL hatte
+> ich aus den Kreisnamen gebildet — 48 von 60 ergaben HTTP 404. Die echte
+> Liste steht auf der **Startseite** von `boris-bayern.de`: 43 Ausschüsse.
+> `/gutachterausschuss` selbst ist 404.
+
+> **Und eine Falle, die schon bei Vorpommern-Rügen zuschlug:** Auf denselben
+> Seiten steht mehrfach „(kostenfrei)". Das gilt den
+> **Bodenrichtwertauskünften**, nicht den Marktberichten. Gefiltert wird
+> deshalb ausschließlich auf `data-beschreibung="Marktbericht …"`.
+
+## Die Liste
+
+**17 der 43 BORIS-Ausschüsse verkaufen überhaupt einen Marktbericht.**
+Spanne **20 bis 110 €**, alle neuesten zusammen 1.030 €. Entscheidend ist
+aber die Kreuzung mit der Erntekarte:
+
+### A · Bringt einen Sachwertfaktor — 13 Berichte, zusammen 800 €
+
+| Preis | Jahrgang | Ausschuss |
+|---:|---|---|
+| 25 € | 2025 | Coburg kreisfreie Stadt |
+| 45 € | 2025 | Garmisch-Partenkirchen LK |
+| 50 € | 2024/25 | Amberg kreisfreie Stadt |
+| 50 € | 2025 | **Augsburg kreisfreie Stadt** |
+| 50 € | 2024 | Kempten kreisfreie Stadt *(Gruppe B)* |
+| 50 € | **2026** | Weiden i.d.OPf. kreisfreie Stadt |
+| 60 € | 2025 | Bayreuth kreisfreie Stadt |
+| 60 € | 2024 | Rosenheim kreisfreie **Stadt** |
+| 60 € | **2026** | Straubing kreisfreie Stadt *(Gruppe B)* |
+| 75 € | 2023 | Regen LK |
+| 75 € | 2025 | Weilheim-Schongau LK |
+| 100 € | 2025 | Deggendorf LK |
+| 100 € | 2024 | Ostallgäu LK |
+
+### B · Bringt keinen — 210 €, die hinausgeworfen wären
+
+| Preis | Ausschuss | |
+|---:|---|---|
+| 110 € | Ebersberg LK | **teuerster Bericht Bayerns — und amtlich ohne Sachwertfaktoren** |
+| 60 € | Rosenheim **LK** | nicht zu verwechseln mit der kreisfreien Stadt (60 €, Gruppe A) |
+| 40 € | Schweinfurt | Stadt und Landkreis stehen beide in Gruppe C |
+
+> **Wer nach Preis sortiert kauft, greift zuerst daneben.** Die beiden
+> teuersten Berichte sind Ebersberg (110 €) und Deggendorf (100 €) — und
+> Ebersberg führt laut Oberem Gutachterausschuss **keine Sachwertfaktoren**.
+> Das passt zum auffälligsten Befund der Erntekarte: der Münchner
+> Speckgürtel leitet durchweg keine ab.
+
+### C · Nicht eindeutig — 1
+
+**Ansbach, 20 €.** Die kreisfreie **Stadt** führt keine Faktoren (Gruppe C),
+der **Landkreis** schon (Gruppe A). Welcher von beiden hier verkauft, sagt
+der BORIS-Name nicht. Vor einem Kauf zu klären — es ist der billigste
+Bericht der ganzen Liste.
+
+## Was das für die Ernte heißt
+
+**Gruppe A umfasst 48 Ausschüsse, aber nur 13 davon verkaufen ihren Bericht
+über BORIS-Bayern.** Für die übrigen 35 ist BORIS keine Verkaufsstelle —
+sie sind damit **keine Kaufliste, sondern eine Anfrageliste**: der Bericht
+existiert, ist aber weder frei abrufbar noch dort zu bestellen. Darunter
+sind Nürnberg (Leseprobe ohne Daten, `v1154`), Regensburg und Würzburg.
+
+**Die Empfehlung, wenn gekauft wird:** nicht alles auf einmal. Ein einzelner
+Bericht für 25 bis 50 € zeigt zuerst, wie viel Arbeit ein bayerisches Rezept
+macht und ob das Modell überhaupt zu unserem Register passt. **Augsburg für
+50 €** ist dafür der beste Kandidat — größte Stadt der Liste, aktueller
+Jahrgang 2025, und das Modell ist über die Leseprobe schon halb bekannt.
+**Coburg für 25 €** wäre der billigste Versuch.
+
+> Das bleibt eine Geldentscheidung und damit Marcels. Gekauft wird nichts
+> ohne seine Zusage — auch nichts für 20 €.
