@@ -947,14 +947,6 @@
       '<b>Moin, ich bin dein Co-Pilot.</b> Ich nehme das Objekt mit dir zusammen auf — ' +
       'du sprichst oder tippst, ich rechne unterwegs mit und hole, was ich selbst holen kann: ' +
       'Bodenrichtwert, Lage, Marktpreisindikation.' +
-      /* v1119-WFORT: die Zahl gehoert IN die Vorstellung. Marcel:
-         „stehen dort als erstes: Ich fuehre dich durch mit 16 Fragen und
-         allem, und danach: Wo stehst du gerade? Das kann man irgendwie
-         verbinden.“ Oben im Kopf laeuft dazu der Balken mit. */
-      (_rf && _rf.offen && _rf.offen.length
-        ? ' Es sind <b>' + _rf.offen.length + ' Fragen</b> — oben siehst du jederzeit, ' +
-          'wo wir gerade stehen.'
-        : '') +
       '<div class="vi-rf-wozu" style="margin-top:8px"><b>Damit ich den richtigen Ton treffe:</b> ' +
       'wie viel Erfahrung hast du mit Immobilien-Investments?</div>');
     _rfAktion('erf_neu',
@@ -5783,7 +5775,13 @@
        entscheiden ist, gehoert die Aufmerksamkeit hin. Das Attribut wird
        nur GESETZT, wenn es sich aendert — sonst startet die Animation bei
        jedem Neuzeichnen von vorn und blinkt endlos. */
-    _rfZustandSetzen(akt.length ? 'angebot' : (frage ? 'frage' : ''));
+    /* v1119b: Ein blosser Erklaer-Knopf ist KEINE offene Entscheidung -
+       er steht an jeder Frage. Wuerde er pulsen, pulste die Leiste
+       dauernd, und der Puls saegte genau das nicht mehr, wofuer er da
+       ist. GEMESSEN im Browser: bei Frage 1 stand nur der Erklaer-Knopf an, und
+       der Rahmen pulsierte trotzdem. */
+    var _zuEnt = akt.filter(function (a) { return a.art !== 'erklaer'; }).length;
+    _rfZustandSetzen(_zuEnt ? 'angebot' : (frage || akt.length ? 'frage' : ''));
     host.innerHTML =
       (frage ? '<div class="vi-dran-f"><i>▸</i><span>' + frage + '</span></div>' : '') +
       (akt.length
@@ -5791,25 +5789,45 @@
           /* v1376 (C7): Bei einem Widerspruch wird nicht geholt, sondern
              entschieden. Der alte Vorspann haette in die Irre gefuehrt. */
           (function () {
+          (function () {
             var knf  = akt.filter(function (a) { return a.art.indexOf('knf_') === 0; }).length;
             /* v1377: "holen" waere beim Nachtragen falsch - das tut der Nutzer. */
             var nf   = akt.filter(function (a) { return a.art === 'nachfass'; }).length;
+            /* ═══ v1119b-WLBL · DIE ZEILE MUSS ZU DEN KNOEPFEN PASSEN ══════
+               GEMESSEN im Browser, gleich nach v1119: ueber dem Knopf
+               „Erklaer mir das" stand „Soll ich das jetzt fuer dich
+               abrufen?" — und ueber den drei Erfahrungsstufen des Einstiegs
+               ebenfalls. Beides ist kein Abruf.
+
+               Der alte Text („Ich kann das fuer dich holen:") war dort
+               genauso falsch, nur unauffaelliger. Eine Frage faellt auf,
+               wenn sie nicht passt — das ist besser, aber nur, wenn sie
+               dann auch passt.
+
+               Gezaehlt wird deshalb, was WIRKLICH geholt wird. */
+            var hol  = akt.filter(function (a) {
+              return a.art === 'markt' || a.art === 'markt2'
+                  || a.art === 'brw' || a.art === 'lage';
+            }).length;
+            var erf  = akt.filter(function (a) { return a.art.indexOf('erf_') === 0; }).length;
             var rest = akt.length - knf - nf;
             return '<span class="vi-dran-lbl">' +
               (knf && rest ? 'Eine Entscheidung steht offen — und ich kann etwas holen:'
                : knf       ? 'Zwei Werte widersprechen sich — welcher gilt?'
                : nf        ? 'Offen geblieben:'
+               : erf       ? 'Damit ich den richtigen Ton treffe:'
                /* v1119-WEIN2 · EINE Zeile statt zweier. Marcels Befund vom
                   14.09.2026: „für mich stehen dort zu viele Doppelinformationen.
-                  Es steht da einmal: Wo geht’s jetzt weiter? und er fragt
-                  gleichzeitig: Das kann ich für dich holen.“ Die Frage steht
+                  Es steht da einmal: Wo geht's jetzt weiter? und er fragt
+                  gleichzeitig: Das kann ich für dich holen." Die Frage steht
                   schon in der Zeile darüber — hier gehört hin, was ENTSCHIEDEN
                   werden soll, und zwar als Frage, die man mit Ja oder
                   Überspringen beantwortet. */
-                           : 'Soll ich das jetzt für dich abrufen?') + '</span>';
+               : hol       ? 'Soll ich das jetzt für dich abrufen?'
+               /* Alles Uebrige ist ein Angebot, kein Abruf: die Erklaerung,
+                  die Adressbestaetigung, der Vorschlag aus einer Auskunft. */
+                           : 'Auf Wunsch:') + '</span>';
           })() +
-
-
 
           /* ═══ v1300 · EINE Erklärzeile statt einer je Knopf ══════════════
              Marcels Befund vom 11.09.2026: „der Balken für Marktindikation,
