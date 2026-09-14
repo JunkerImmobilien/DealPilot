@@ -16394,6 +16394,3028 @@
  },
  {
   "land_code": "HE",
+  "ags": "06631001",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.08,
+     1.18,
+     1.28,
+     1.38
+    ],
+    "200000": [
+     0.94,
+     1.02,
+     1.09,
+     1.17
+    ],
+    "250000": [
+     0.86,
+     0.92,
+     0.98,
+     1.04
+    ],
+    "300000": [
+     0.81,
+     0.86,
+     0.91,
+     0.96
+    ],
+    "350000": [
+     0.77,
+     0.81,
+     0.85,
+     0.9
+    ],
+    "400000": [
+     0.74,
+     0.78,
+     0.81,
+     0.85
+    ],
+    "450000": [
+     null,
+     0.75,
+     0.78,
+     0.82
+    ],
+    "500000": [
+     null,
+     0.73,
+     0.76,
+     0.79
+    ],
+    "550000": [
+     null,
+     0.71,
+     0.74,
+     0.77
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 2 des Landkreises Fulda — der ländliche Teil mit der Rhön. Zweiachsige Matrix mit Bodenrichtwert-STÜTZSTELLEN (25, 50, 75, 100 Euro/qm), zwischen denen interpoliert wird. 61 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,73.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 347.837 Euro, mittlere Grundstücksgröße 813 qm, mittlerer Bodenrichtwert 67 Euro/qm, mittlere Restnutzungsdauer 41 Jahre, mittlere Standardstufe 2,7, mittlere BGF 364 qm, mittlere Wohnfläche 160 qm, mittlerer Wert der Außenanlagen 12.207 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechzehn Gemeinden des Landkreises Fulda im Marktbereich 2: Bad Salzschlirf, Burghaun, Dipperz, Ebersburg, Ehrenberg (Rhön), Eiterfeld, Gersfeld (Rhön), Großenlüder, Hilders, Hofbieber, Hosenfeld, Kalbach, Nüsttal, Poppenhausen (Wasserkuppe), Rasdorf, Tann (Rhön). Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 61,
+   "korrelationskoeffizient": 0.73
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.1, Tabelle 10-13, Seite 118."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 61 Kauffaellen und multiplem Korrelationskoeffizienten 0,73. KEINE Stufe A, weil die Stichprobe klein ist und der Bericht die Fallzahl nicht je Zelle ausweist.",
+  "fallzahl": 61,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.1 Regionale Auswertung Landkreis Fulda 2023-2025 MB 2, Tabelle 10-13, Seite 118."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631002",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.08,
+     1.18,
+     1.28,
+     1.38
+    ],
+    "200000": [
+     0.94,
+     1.02,
+     1.09,
+     1.17
+    ],
+    "250000": [
+     0.86,
+     0.92,
+     0.98,
+     1.04
+    ],
+    "300000": [
+     0.81,
+     0.86,
+     0.91,
+     0.96
+    ],
+    "350000": [
+     0.77,
+     0.81,
+     0.85,
+     0.9
+    ],
+    "400000": [
+     0.74,
+     0.78,
+     0.81,
+     0.85
+    ],
+    "450000": [
+     null,
+     0.75,
+     0.78,
+     0.82
+    ],
+    "500000": [
+     null,
+     0.73,
+     0.76,
+     0.79
+    ],
+    "550000": [
+     null,
+     0.71,
+     0.74,
+     0.77
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 2 des Landkreises Fulda — der ländliche Teil mit der Rhön. Zweiachsige Matrix mit Bodenrichtwert-STÜTZSTELLEN (25, 50, 75, 100 Euro/qm), zwischen denen interpoliert wird. 61 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,73.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 347.837 Euro, mittlere Grundstücksgröße 813 qm, mittlerer Bodenrichtwert 67 Euro/qm, mittlere Restnutzungsdauer 41 Jahre, mittlere Standardstufe 2,7, mittlere BGF 364 qm, mittlere Wohnfläche 160 qm, mittlerer Wert der Außenanlagen 12.207 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechzehn Gemeinden des Landkreises Fulda im Marktbereich 2: Bad Salzschlirf, Burghaun, Dipperz, Ebersburg, Ehrenberg (Rhön), Eiterfeld, Gersfeld (Rhön), Großenlüder, Hilders, Hofbieber, Hosenfeld, Kalbach, Nüsttal, Poppenhausen (Wasserkuppe), Rasdorf, Tann (Rhön). Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 61,
+   "korrelationskoeffizient": 0.73
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.1, Tabelle 10-13, Seite 118."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 61 Kauffaellen und multiplem Korrelationskoeffizienten 0,73. KEINE Stufe A, weil die Stichprobe klein ist und der Bericht die Fallzahl nicht je Zelle ausweist.",
+  "fallzahl": 61,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.1 Regionale Auswertung Landkreis Fulda 2023-2025 MB 2, Tabelle 10-13, Seite 118."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631003",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.08,
+     1.18,
+     1.28,
+     1.38
+    ],
+    "200000": [
+     0.94,
+     1.02,
+     1.09,
+     1.17
+    ],
+    "250000": [
+     0.86,
+     0.92,
+     0.98,
+     1.04
+    ],
+    "300000": [
+     0.81,
+     0.86,
+     0.91,
+     0.96
+    ],
+    "350000": [
+     0.77,
+     0.81,
+     0.85,
+     0.9
+    ],
+    "400000": [
+     0.74,
+     0.78,
+     0.81,
+     0.85
+    ],
+    "450000": [
+     null,
+     0.75,
+     0.78,
+     0.82
+    ],
+    "500000": [
+     null,
+     0.73,
+     0.76,
+     0.79
+    ],
+    "550000": [
+     null,
+     0.71,
+     0.74,
+     0.77
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 2 des Landkreises Fulda — der ländliche Teil mit der Rhön. Zweiachsige Matrix mit Bodenrichtwert-STÜTZSTELLEN (25, 50, 75, 100 Euro/qm), zwischen denen interpoliert wird. 61 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,73.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 347.837 Euro, mittlere Grundstücksgröße 813 qm, mittlerer Bodenrichtwert 67 Euro/qm, mittlere Restnutzungsdauer 41 Jahre, mittlere Standardstufe 2,7, mittlere BGF 364 qm, mittlere Wohnfläche 160 qm, mittlerer Wert der Außenanlagen 12.207 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechzehn Gemeinden des Landkreises Fulda im Marktbereich 2: Bad Salzschlirf, Burghaun, Dipperz, Ebersburg, Ehrenberg (Rhön), Eiterfeld, Gersfeld (Rhön), Großenlüder, Hilders, Hofbieber, Hosenfeld, Kalbach, Nüsttal, Poppenhausen (Wasserkuppe), Rasdorf, Tann (Rhön). Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 61,
+   "korrelationskoeffizient": 0.73
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.1, Tabelle 10-13, Seite 118."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 61 Kauffaellen und multiplem Korrelationskoeffizienten 0,73. KEINE Stufe A, weil die Stichprobe klein ist und der Bericht die Fallzahl nicht je Zelle ausweist.",
+  "fallzahl": 61,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.1 Regionale Auswertung Landkreis Fulda 2023-2025 MB 2, Tabelle 10-13, Seite 118."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631004",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.08,
+     1.18,
+     1.28,
+     1.38
+    ],
+    "200000": [
+     0.94,
+     1.02,
+     1.09,
+     1.17
+    ],
+    "250000": [
+     0.86,
+     0.92,
+     0.98,
+     1.04
+    ],
+    "300000": [
+     0.81,
+     0.86,
+     0.91,
+     0.96
+    ],
+    "350000": [
+     0.77,
+     0.81,
+     0.85,
+     0.9
+    ],
+    "400000": [
+     0.74,
+     0.78,
+     0.81,
+     0.85
+    ],
+    "450000": [
+     null,
+     0.75,
+     0.78,
+     0.82
+    ],
+    "500000": [
+     null,
+     0.73,
+     0.76,
+     0.79
+    ],
+    "550000": [
+     null,
+     0.71,
+     0.74,
+     0.77
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 2 des Landkreises Fulda — der ländliche Teil mit der Rhön. Zweiachsige Matrix mit Bodenrichtwert-STÜTZSTELLEN (25, 50, 75, 100 Euro/qm), zwischen denen interpoliert wird. 61 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,73.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 347.837 Euro, mittlere Grundstücksgröße 813 qm, mittlerer Bodenrichtwert 67 Euro/qm, mittlere Restnutzungsdauer 41 Jahre, mittlere Standardstufe 2,7, mittlere BGF 364 qm, mittlere Wohnfläche 160 qm, mittlerer Wert der Außenanlagen 12.207 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechzehn Gemeinden des Landkreises Fulda im Marktbereich 2: Bad Salzschlirf, Burghaun, Dipperz, Ebersburg, Ehrenberg (Rhön), Eiterfeld, Gersfeld (Rhön), Großenlüder, Hilders, Hofbieber, Hosenfeld, Kalbach, Nüsttal, Poppenhausen (Wasserkuppe), Rasdorf, Tann (Rhön). Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 61,
+   "korrelationskoeffizient": 0.73
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.1, Tabelle 10-13, Seite 118."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 61 Kauffaellen und multiplem Korrelationskoeffizienten 0,73. KEINE Stufe A, weil die Stichprobe klein ist und der Bericht die Fallzahl nicht je Zelle ausweist.",
+  "fallzahl": 61,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.1 Regionale Auswertung Landkreis Fulda 2023-2025 MB 2, Tabelle 10-13, Seite 118."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631005",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.08,
+     1.18,
+     1.28,
+     1.38
+    ],
+    "200000": [
+     0.94,
+     1.02,
+     1.09,
+     1.17
+    ],
+    "250000": [
+     0.86,
+     0.92,
+     0.98,
+     1.04
+    ],
+    "300000": [
+     0.81,
+     0.86,
+     0.91,
+     0.96
+    ],
+    "350000": [
+     0.77,
+     0.81,
+     0.85,
+     0.9
+    ],
+    "400000": [
+     0.74,
+     0.78,
+     0.81,
+     0.85
+    ],
+    "450000": [
+     null,
+     0.75,
+     0.78,
+     0.82
+    ],
+    "500000": [
+     null,
+     0.73,
+     0.76,
+     0.79
+    ],
+    "550000": [
+     null,
+     0.71,
+     0.74,
+     0.77
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 2 des Landkreises Fulda — der ländliche Teil mit der Rhön. Zweiachsige Matrix mit Bodenrichtwert-STÜTZSTELLEN (25, 50, 75, 100 Euro/qm), zwischen denen interpoliert wird. 61 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,73.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 347.837 Euro, mittlere Grundstücksgröße 813 qm, mittlerer Bodenrichtwert 67 Euro/qm, mittlere Restnutzungsdauer 41 Jahre, mittlere Standardstufe 2,7, mittlere BGF 364 qm, mittlere Wohnfläche 160 qm, mittlerer Wert der Außenanlagen 12.207 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechzehn Gemeinden des Landkreises Fulda im Marktbereich 2: Bad Salzschlirf, Burghaun, Dipperz, Ebersburg, Ehrenberg (Rhön), Eiterfeld, Gersfeld (Rhön), Großenlüder, Hilders, Hofbieber, Hosenfeld, Kalbach, Nüsttal, Poppenhausen (Wasserkuppe), Rasdorf, Tann (Rhön). Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 61,
+   "korrelationskoeffizient": 0.73
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.1, Tabelle 10-13, Seite 118."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 61 Kauffaellen und multiplem Korrelationskoeffizienten 0,73. KEINE Stufe A, weil die Stichprobe klein ist und der Bericht die Fallzahl nicht je Zelle ausweist.",
+  "fallzahl": 61,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.1 Regionale Auswertung Landkreis Fulda 2023-2025 MB 2, Tabelle 10-13, Seite 118."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631007",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.08,
+     1.18,
+     1.28,
+     1.38
+    ],
+    "200000": [
+     0.94,
+     1.02,
+     1.09,
+     1.17
+    ],
+    "250000": [
+     0.86,
+     0.92,
+     0.98,
+     1.04
+    ],
+    "300000": [
+     0.81,
+     0.86,
+     0.91,
+     0.96
+    ],
+    "350000": [
+     0.77,
+     0.81,
+     0.85,
+     0.9
+    ],
+    "400000": [
+     0.74,
+     0.78,
+     0.81,
+     0.85
+    ],
+    "450000": [
+     null,
+     0.75,
+     0.78,
+     0.82
+    ],
+    "500000": [
+     null,
+     0.73,
+     0.76,
+     0.79
+    ],
+    "550000": [
+     null,
+     0.71,
+     0.74,
+     0.77
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 2 des Landkreises Fulda — der ländliche Teil mit der Rhön. Zweiachsige Matrix mit Bodenrichtwert-STÜTZSTELLEN (25, 50, 75, 100 Euro/qm), zwischen denen interpoliert wird. 61 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,73.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 347.837 Euro, mittlere Grundstücksgröße 813 qm, mittlerer Bodenrichtwert 67 Euro/qm, mittlere Restnutzungsdauer 41 Jahre, mittlere Standardstufe 2,7, mittlere BGF 364 qm, mittlere Wohnfläche 160 qm, mittlerer Wert der Außenanlagen 12.207 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechzehn Gemeinden des Landkreises Fulda im Marktbereich 2: Bad Salzschlirf, Burghaun, Dipperz, Ebersburg, Ehrenberg (Rhön), Eiterfeld, Gersfeld (Rhön), Großenlüder, Hilders, Hofbieber, Hosenfeld, Kalbach, Nüsttal, Poppenhausen (Wasserkuppe), Rasdorf, Tann (Rhön). Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 61,
+   "korrelationskoeffizient": 0.73
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.1, Tabelle 10-13, Seite 118."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 61 Kauffaellen und multiplem Korrelationskoeffizienten 0,73. KEINE Stufe A, weil die Stichprobe klein ist und der Bericht die Fallzahl nicht je Zelle ausweist.",
+  "fallzahl": 61,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.1 Regionale Auswertung Landkreis Fulda 2023-2025 MB 2, Tabelle 10-13, Seite 118."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631010",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.08,
+     1.18,
+     1.28,
+     1.38
+    ],
+    "200000": [
+     0.94,
+     1.02,
+     1.09,
+     1.17
+    ],
+    "250000": [
+     0.86,
+     0.92,
+     0.98,
+     1.04
+    ],
+    "300000": [
+     0.81,
+     0.86,
+     0.91,
+     0.96
+    ],
+    "350000": [
+     0.77,
+     0.81,
+     0.85,
+     0.9
+    ],
+    "400000": [
+     0.74,
+     0.78,
+     0.81,
+     0.85
+    ],
+    "450000": [
+     null,
+     0.75,
+     0.78,
+     0.82
+    ],
+    "500000": [
+     null,
+     0.73,
+     0.76,
+     0.79
+    ],
+    "550000": [
+     null,
+     0.71,
+     0.74,
+     0.77
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 2 des Landkreises Fulda — der ländliche Teil mit der Rhön. Zweiachsige Matrix mit Bodenrichtwert-STÜTZSTELLEN (25, 50, 75, 100 Euro/qm), zwischen denen interpoliert wird. 61 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,73.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 347.837 Euro, mittlere Grundstücksgröße 813 qm, mittlerer Bodenrichtwert 67 Euro/qm, mittlere Restnutzungsdauer 41 Jahre, mittlere Standardstufe 2,7, mittlere BGF 364 qm, mittlere Wohnfläche 160 qm, mittlerer Wert der Außenanlagen 12.207 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechzehn Gemeinden des Landkreises Fulda im Marktbereich 2: Bad Salzschlirf, Burghaun, Dipperz, Ebersburg, Ehrenberg (Rhön), Eiterfeld, Gersfeld (Rhön), Großenlüder, Hilders, Hofbieber, Hosenfeld, Kalbach, Nüsttal, Poppenhausen (Wasserkuppe), Rasdorf, Tann (Rhön). Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 61,
+   "korrelationskoeffizient": 0.73
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.1, Tabelle 10-13, Seite 118."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 61 Kauffaellen und multiplem Korrelationskoeffizienten 0,73. KEINE Stufe A, weil die Stichprobe klein ist und der Bericht die Fallzahl nicht je Zelle ausweist.",
+  "fallzahl": 61,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.1 Regionale Auswertung Landkreis Fulda 2023-2025 MB 2, Tabelle 10-13, Seite 118."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631011",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.08,
+     1.18,
+     1.28,
+     1.38
+    ],
+    "200000": [
+     0.94,
+     1.02,
+     1.09,
+     1.17
+    ],
+    "250000": [
+     0.86,
+     0.92,
+     0.98,
+     1.04
+    ],
+    "300000": [
+     0.81,
+     0.86,
+     0.91,
+     0.96
+    ],
+    "350000": [
+     0.77,
+     0.81,
+     0.85,
+     0.9
+    ],
+    "400000": [
+     0.74,
+     0.78,
+     0.81,
+     0.85
+    ],
+    "450000": [
+     null,
+     0.75,
+     0.78,
+     0.82
+    ],
+    "500000": [
+     null,
+     0.73,
+     0.76,
+     0.79
+    ],
+    "550000": [
+     null,
+     0.71,
+     0.74,
+     0.77
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 2 des Landkreises Fulda — der ländliche Teil mit der Rhön. Zweiachsige Matrix mit Bodenrichtwert-STÜTZSTELLEN (25, 50, 75, 100 Euro/qm), zwischen denen interpoliert wird. 61 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,73.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 347.837 Euro, mittlere Grundstücksgröße 813 qm, mittlerer Bodenrichtwert 67 Euro/qm, mittlere Restnutzungsdauer 41 Jahre, mittlere Standardstufe 2,7, mittlere BGF 364 qm, mittlere Wohnfläche 160 qm, mittlerer Wert der Außenanlagen 12.207 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechzehn Gemeinden des Landkreises Fulda im Marktbereich 2: Bad Salzschlirf, Burghaun, Dipperz, Ebersburg, Ehrenberg (Rhön), Eiterfeld, Gersfeld (Rhön), Großenlüder, Hilders, Hofbieber, Hosenfeld, Kalbach, Nüsttal, Poppenhausen (Wasserkuppe), Rasdorf, Tann (Rhön). Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 61,
+   "korrelationskoeffizient": 0.73
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.1, Tabelle 10-13, Seite 118."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 61 Kauffaellen und multiplem Korrelationskoeffizienten 0,73. KEINE Stufe A, weil die Stichprobe klein ist und der Bericht die Fallzahl nicht je Zelle ausweist.",
+  "fallzahl": 61,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.1 Regionale Auswertung Landkreis Fulda 2023-2025 MB 2, Tabelle 10-13, Seite 118."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631012",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.08,
+     1.18,
+     1.28,
+     1.38
+    ],
+    "200000": [
+     0.94,
+     1.02,
+     1.09,
+     1.17
+    ],
+    "250000": [
+     0.86,
+     0.92,
+     0.98,
+     1.04
+    ],
+    "300000": [
+     0.81,
+     0.86,
+     0.91,
+     0.96
+    ],
+    "350000": [
+     0.77,
+     0.81,
+     0.85,
+     0.9
+    ],
+    "400000": [
+     0.74,
+     0.78,
+     0.81,
+     0.85
+    ],
+    "450000": [
+     null,
+     0.75,
+     0.78,
+     0.82
+    ],
+    "500000": [
+     null,
+     0.73,
+     0.76,
+     0.79
+    ],
+    "550000": [
+     null,
+     0.71,
+     0.74,
+     0.77
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 2 des Landkreises Fulda — der ländliche Teil mit der Rhön. Zweiachsige Matrix mit Bodenrichtwert-STÜTZSTELLEN (25, 50, 75, 100 Euro/qm), zwischen denen interpoliert wird. 61 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,73.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 347.837 Euro, mittlere Grundstücksgröße 813 qm, mittlerer Bodenrichtwert 67 Euro/qm, mittlere Restnutzungsdauer 41 Jahre, mittlere Standardstufe 2,7, mittlere BGF 364 qm, mittlere Wohnfläche 160 qm, mittlerer Wert der Außenanlagen 12.207 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechzehn Gemeinden des Landkreises Fulda im Marktbereich 2: Bad Salzschlirf, Burghaun, Dipperz, Ebersburg, Ehrenberg (Rhön), Eiterfeld, Gersfeld (Rhön), Großenlüder, Hilders, Hofbieber, Hosenfeld, Kalbach, Nüsttal, Poppenhausen (Wasserkuppe), Rasdorf, Tann (Rhön). Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 61,
+   "korrelationskoeffizient": 0.73
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.1, Tabelle 10-13, Seite 118."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 61 Kauffaellen und multiplem Korrelationskoeffizienten 0,73. KEINE Stufe A, weil die Stichprobe klein ist und der Bericht die Fallzahl nicht je Zelle ausweist.",
+  "fallzahl": 61,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.1 Regionale Auswertung Landkreis Fulda 2023-2025 MB 2, Tabelle 10-13, Seite 118."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631013",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.08,
+     1.18,
+     1.28,
+     1.38
+    ],
+    "200000": [
+     0.94,
+     1.02,
+     1.09,
+     1.17
+    ],
+    "250000": [
+     0.86,
+     0.92,
+     0.98,
+     1.04
+    ],
+    "300000": [
+     0.81,
+     0.86,
+     0.91,
+     0.96
+    ],
+    "350000": [
+     0.77,
+     0.81,
+     0.85,
+     0.9
+    ],
+    "400000": [
+     0.74,
+     0.78,
+     0.81,
+     0.85
+    ],
+    "450000": [
+     null,
+     0.75,
+     0.78,
+     0.82
+    ],
+    "500000": [
+     null,
+     0.73,
+     0.76,
+     0.79
+    ],
+    "550000": [
+     null,
+     0.71,
+     0.74,
+     0.77
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 2 des Landkreises Fulda — der ländliche Teil mit der Rhön. Zweiachsige Matrix mit Bodenrichtwert-STÜTZSTELLEN (25, 50, 75, 100 Euro/qm), zwischen denen interpoliert wird. 61 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,73.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 347.837 Euro, mittlere Grundstücksgröße 813 qm, mittlerer Bodenrichtwert 67 Euro/qm, mittlere Restnutzungsdauer 41 Jahre, mittlere Standardstufe 2,7, mittlere BGF 364 qm, mittlere Wohnfläche 160 qm, mittlerer Wert der Außenanlagen 12.207 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechzehn Gemeinden des Landkreises Fulda im Marktbereich 2: Bad Salzschlirf, Burghaun, Dipperz, Ebersburg, Ehrenberg (Rhön), Eiterfeld, Gersfeld (Rhön), Großenlüder, Hilders, Hofbieber, Hosenfeld, Kalbach, Nüsttal, Poppenhausen (Wasserkuppe), Rasdorf, Tann (Rhön). Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 61,
+   "korrelationskoeffizient": 0.73
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.1, Tabelle 10-13, Seite 118."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 61 Kauffaellen und multiplem Korrelationskoeffizienten 0,73. KEINE Stufe A, weil die Stichprobe klein ist und der Bericht die Fallzahl nicht je Zelle ausweist.",
+  "fallzahl": 61,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.1 Regionale Auswertung Landkreis Fulda 2023-2025 MB 2, Tabelle 10-13, Seite 118."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631014",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.08,
+     1.18,
+     1.28,
+     1.38
+    ],
+    "200000": [
+     0.94,
+     1.02,
+     1.09,
+     1.17
+    ],
+    "250000": [
+     0.86,
+     0.92,
+     0.98,
+     1.04
+    ],
+    "300000": [
+     0.81,
+     0.86,
+     0.91,
+     0.96
+    ],
+    "350000": [
+     0.77,
+     0.81,
+     0.85,
+     0.9
+    ],
+    "400000": [
+     0.74,
+     0.78,
+     0.81,
+     0.85
+    ],
+    "450000": [
+     null,
+     0.75,
+     0.78,
+     0.82
+    ],
+    "500000": [
+     null,
+     0.73,
+     0.76,
+     0.79
+    ],
+    "550000": [
+     null,
+     0.71,
+     0.74,
+     0.77
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 2 des Landkreises Fulda — der ländliche Teil mit der Rhön. Zweiachsige Matrix mit Bodenrichtwert-STÜTZSTELLEN (25, 50, 75, 100 Euro/qm), zwischen denen interpoliert wird. 61 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,73.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 347.837 Euro, mittlere Grundstücksgröße 813 qm, mittlerer Bodenrichtwert 67 Euro/qm, mittlere Restnutzungsdauer 41 Jahre, mittlere Standardstufe 2,7, mittlere BGF 364 qm, mittlere Wohnfläche 160 qm, mittlerer Wert der Außenanlagen 12.207 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechzehn Gemeinden des Landkreises Fulda im Marktbereich 2: Bad Salzschlirf, Burghaun, Dipperz, Ebersburg, Ehrenberg (Rhön), Eiterfeld, Gersfeld (Rhön), Großenlüder, Hilders, Hofbieber, Hosenfeld, Kalbach, Nüsttal, Poppenhausen (Wasserkuppe), Rasdorf, Tann (Rhön). Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 61,
+   "korrelationskoeffizient": 0.73
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.1, Tabelle 10-13, Seite 118."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 61 Kauffaellen und multiplem Korrelationskoeffizienten 0,73. KEINE Stufe A, weil die Stichprobe klein ist und der Bericht die Fallzahl nicht je Zelle ausweist.",
+  "fallzahl": 61,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.1 Regionale Auswertung Landkreis Fulda 2023-2025 MB 2, Tabelle 10-13, Seite 118."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631016",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.08,
+     1.18,
+     1.28,
+     1.38
+    ],
+    "200000": [
+     0.94,
+     1.02,
+     1.09,
+     1.17
+    ],
+    "250000": [
+     0.86,
+     0.92,
+     0.98,
+     1.04
+    ],
+    "300000": [
+     0.81,
+     0.86,
+     0.91,
+     0.96
+    ],
+    "350000": [
+     0.77,
+     0.81,
+     0.85,
+     0.9
+    ],
+    "400000": [
+     0.74,
+     0.78,
+     0.81,
+     0.85
+    ],
+    "450000": [
+     null,
+     0.75,
+     0.78,
+     0.82
+    ],
+    "500000": [
+     null,
+     0.73,
+     0.76,
+     0.79
+    ],
+    "550000": [
+     null,
+     0.71,
+     0.74,
+     0.77
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 2 des Landkreises Fulda — der ländliche Teil mit der Rhön. Zweiachsige Matrix mit Bodenrichtwert-STÜTZSTELLEN (25, 50, 75, 100 Euro/qm), zwischen denen interpoliert wird. 61 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,73.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 347.837 Euro, mittlere Grundstücksgröße 813 qm, mittlerer Bodenrichtwert 67 Euro/qm, mittlere Restnutzungsdauer 41 Jahre, mittlere Standardstufe 2,7, mittlere BGF 364 qm, mittlere Wohnfläche 160 qm, mittlerer Wert der Außenanlagen 12.207 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechzehn Gemeinden des Landkreises Fulda im Marktbereich 2: Bad Salzschlirf, Burghaun, Dipperz, Ebersburg, Ehrenberg (Rhön), Eiterfeld, Gersfeld (Rhön), Großenlüder, Hilders, Hofbieber, Hosenfeld, Kalbach, Nüsttal, Poppenhausen (Wasserkuppe), Rasdorf, Tann (Rhön). Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 61,
+   "korrelationskoeffizient": 0.73
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.1, Tabelle 10-13, Seite 118."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 61 Kauffaellen und multiplem Korrelationskoeffizienten 0,73. KEINE Stufe A, weil die Stichprobe klein ist und der Bericht die Fallzahl nicht je Zelle ausweist.",
+  "fallzahl": 61,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.1 Regionale Auswertung Landkreis Fulda 2023-2025 MB 2, Tabelle 10-13, Seite 118."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631019",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.08,
+     1.18,
+     1.28,
+     1.38
+    ],
+    "200000": [
+     0.94,
+     1.02,
+     1.09,
+     1.17
+    ],
+    "250000": [
+     0.86,
+     0.92,
+     0.98,
+     1.04
+    ],
+    "300000": [
+     0.81,
+     0.86,
+     0.91,
+     0.96
+    ],
+    "350000": [
+     0.77,
+     0.81,
+     0.85,
+     0.9
+    ],
+    "400000": [
+     0.74,
+     0.78,
+     0.81,
+     0.85
+    ],
+    "450000": [
+     null,
+     0.75,
+     0.78,
+     0.82
+    ],
+    "500000": [
+     null,
+     0.73,
+     0.76,
+     0.79
+    ],
+    "550000": [
+     null,
+     0.71,
+     0.74,
+     0.77
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 2 des Landkreises Fulda — der ländliche Teil mit der Rhön. Zweiachsige Matrix mit Bodenrichtwert-STÜTZSTELLEN (25, 50, 75, 100 Euro/qm), zwischen denen interpoliert wird. 61 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,73.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 347.837 Euro, mittlere Grundstücksgröße 813 qm, mittlerer Bodenrichtwert 67 Euro/qm, mittlere Restnutzungsdauer 41 Jahre, mittlere Standardstufe 2,7, mittlere BGF 364 qm, mittlere Wohnfläche 160 qm, mittlerer Wert der Außenanlagen 12.207 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechzehn Gemeinden des Landkreises Fulda im Marktbereich 2: Bad Salzschlirf, Burghaun, Dipperz, Ebersburg, Ehrenberg (Rhön), Eiterfeld, Gersfeld (Rhön), Großenlüder, Hilders, Hofbieber, Hosenfeld, Kalbach, Nüsttal, Poppenhausen (Wasserkuppe), Rasdorf, Tann (Rhön). Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 61,
+   "korrelationskoeffizient": 0.73
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.1, Tabelle 10-13, Seite 118."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 61 Kauffaellen und multiplem Korrelationskoeffizienten 0,73. KEINE Stufe A, weil die Stichprobe klein ist und der Bericht die Fallzahl nicht je Zelle ausweist.",
+  "fallzahl": 61,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.1 Regionale Auswertung Landkreis Fulda 2023-2025 MB 2, Tabelle 10-13, Seite 118."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631021",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.08,
+     1.18,
+     1.28,
+     1.38
+    ],
+    "200000": [
+     0.94,
+     1.02,
+     1.09,
+     1.17
+    ],
+    "250000": [
+     0.86,
+     0.92,
+     0.98,
+     1.04
+    ],
+    "300000": [
+     0.81,
+     0.86,
+     0.91,
+     0.96
+    ],
+    "350000": [
+     0.77,
+     0.81,
+     0.85,
+     0.9
+    ],
+    "400000": [
+     0.74,
+     0.78,
+     0.81,
+     0.85
+    ],
+    "450000": [
+     null,
+     0.75,
+     0.78,
+     0.82
+    ],
+    "500000": [
+     null,
+     0.73,
+     0.76,
+     0.79
+    ],
+    "550000": [
+     null,
+     0.71,
+     0.74,
+     0.77
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 2 des Landkreises Fulda — der ländliche Teil mit der Rhön. Zweiachsige Matrix mit Bodenrichtwert-STÜTZSTELLEN (25, 50, 75, 100 Euro/qm), zwischen denen interpoliert wird. 61 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,73.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 347.837 Euro, mittlere Grundstücksgröße 813 qm, mittlerer Bodenrichtwert 67 Euro/qm, mittlere Restnutzungsdauer 41 Jahre, mittlere Standardstufe 2,7, mittlere BGF 364 qm, mittlere Wohnfläche 160 qm, mittlerer Wert der Außenanlagen 12.207 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechzehn Gemeinden des Landkreises Fulda im Marktbereich 2: Bad Salzschlirf, Burghaun, Dipperz, Ebersburg, Ehrenberg (Rhön), Eiterfeld, Gersfeld (Rhön), Großenlüder, Hilders, Hofbieber, Hosenfeld, Kalbach, Nüsttal, Poppenhausen (Wasserkuppe), Rasdorf, Tann (Rhön). Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 61,
+   "korrelationskoeffizient": 0.73
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.1, Tabelle 10-13, Seite 118."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 61 Kauffaellen und multiplem Korrelationskoeffizienten 0,73. KEINE Stufe A, weil die Stichprobe klein ist und der Bericht die Fallzahl nicht je Zelle ausweist.",
+  "fallzahl": 61,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.1 Regionale Auswertung Landkreis Fulda 2023-2025 MB 2, Tabelle 10-13, Seite 118."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631022",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.08,
+     1.18,
+     1.28,
+     1.38
+    ],
+    "200000": [
+     0.94,
+     1.02,
+     1.09,
+     1.17
+    ],
+    "250000": [
+     0.86,
+     0.92,
+     0.98,
+     1.04
+    ],
+    "300000": [
+     0.81,
+     0.86,
+     0.91,
+     0.96
+    ],
+    "350000": [
+     0.77,
+     0.81,
+     0.85,
+     0.9
+    ],
+    "400000": [
+     0.74,
+     0.78,
+     0.81,
+     0.85
+    ],
+    "450000": [
+     null,
+     0.75,
+     0.78,
+     0.82
+    ],
+    "500000": [
+     null,
+     0.73,
+     0.76,
+     0.79
+    ],
+    "550000": [
+     null,
+     0.71,
+     0.74,
+     0.77
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 2 des Landkreises Fulda — der ländliche Teil mit der Rhön. Zweiachsige Matrix mit Bodenrichtwert-STÜTZSTELLEN (25, 50, 75, 100 Euro/qm), zwischen denen interpoliert wird. 61 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,73.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 347.837 Euro, mittlere Grundstücksgröße 813 qm, mittlerer Bodenrichtwert 67 Euro/qm, mittlere Restnutzungsdauer 41 Jahre, mittlere Standardstufe 2,7, mittlere BGF 364 qm, mittlere Wohnfläche 160 qm, mittlerer Wert der Außenanlagen 12.207 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechzehn Gemeinden des Landkreises Fulda im Marktbereich 2: Bad Salzschlirf, Burghaun, Dipperz, Ebersburg, Ehrenberg (Rhön), Eiterfeld, Gersfeld (Rhön), Großenlüder, Hilders, Hofbieber, Hosenfeld, Kalbach, Nüsttal, Poppenhausen (Wasserkuppe), Rasdorf, Tann (Rhön). Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 61,
+   "korrelationskoeffizient": 0.73
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.1, Tabelle 10-13, Seite 118."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 61 Kauffaellen und multiplem Korrelationskoeffizienten 0,73. KEINE Stufe A, weil die Stichprobe klein ist und der Bericht die Fallzahl nicht je Zelle ausweist.",
+  "fallzahl": 61,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.1 Regionale Auswertung Landkreis Fulda 2023-2025 MB 2, Tabelle 10-13, Seite 118."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631023",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.08,
+     1.18,
+     1.28,
+     1.38
+    ],
+    "200000": [
+     0.94,
+     1.02,
+     1.09,
+     1.17
+    ],
+    "250000": [
+     0.86,
+     0.92,
+     0.98,
+     1.04
+    ],
+    "300000": [
+     0.81,
+     0.86,
+     0.91,
+     0.96
+    ],
+    "350000": [
+     0.77,
+     0.81,
+     0.85,
+     0.9
+    ],
+    "400000": [
+     0.74,
+     0.78,
+     0.81,
+     0.85
+    ],
+    "450000": [
+     null,
+     0.75,
+     0.78,
+     0.82
+    ],
+    "500000": [
+     null,
+     0.73,
+     0.76,
+     0.79
+    ],
+    "550000": [
+     null,
+     0.71,
+     0.74,
+     0.77
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 2 des Landkreises Fulda — der ländliche Teil mit der Rhön. Zweiachsige Matrix mit Bodenrichtwert-STÜTZSTELLEN (25, 50, 75, 100 Euro/qm), zwischen denen interpoliert wird. 61 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,73.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 347.837 Euro, mittlere Grundstücksgröße 813 qm, mittlerer Bodenrichtwert 67 Euro/qm, mittlere Restnutzungsdauer 41 Jahre, mittlere Standardstufe 2,7, mittlere BGF 364 qm, mittlere Wohnfläche 160 qm, mittlerer Wert der Außenanlagen 12.207 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechzehn Gemeinden des Landkreises Fulda im Marktbereich 2: Bad Salzschlirf, Burghaun, Dipperz, Ebersburg, Ehrenberg (Rhön), Eiterfeld, Gersfeld (Rhön), Großenlüder, Hilders, Hofbieber, Hosenfeld, Kalbach, Nüsttal, Poppenhausen (Wasserkuppe), Rasdorf, Tann (Rhön). Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 61,
+   "korrelationskoeffizient": 0.73
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.1, Tabelle 10-13, Seite 118."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 61 Kauffaellen und multiplem Korrelationskoeffizienten 0,73. KEINE Stufe A, weil die Stichprobe klein ist und der Bericht die Fallzahl nicht je Zelle ausweist.",
+  "fallzahl": 61,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.1 Regionale Auswertung Landkreis Fulda 2023-2025 MB 2, Tabelle 10-13, Seite 118."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631006",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    50,
+    75,
+    100,
+    150,
+    200,
+    250
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "200000": [
+     1.16,
+     1.21,
+     1.26,
+     null,
+     null,
+     null
+    ],
+    "250000": [
+     1.05,
+     1.1,
+     1.14,
+     1.22,
+     1.3,
+     null
+    ],
+    "300000": [
+     0.99,
+     1.02,
+     1.06,
+     1.12,
+     1.19,
+     null
+    ],
+    "350000": [
+     0.94,
+     0.97,
+     1.0,
+     1.06,
+     1.11,
+     1.17
+    ],
+    "400000": [
+     0.9,
+     0.93,
+     0.95,
+     1.0,
+     1.06,
+     1.11
+    ],
+    "450000": [
+     0.88,
+     0.9,
+     0.92,
+     0.97,
+     1.01,
+     1.06
+    ],
+    "500000": [
+     0.85,
+     0.87,
+     0.89,
+     0.93,
+     0.97,
+     1.01
+    ],
+    "550000": [
+     0.84,
+     0.85,
+     0.87,
+     0.91,
+     0.95,
+     0.98
+    ],
+    "600000": [
+     0.82,
+     0.84,
+     0.85,
+     0.89,
+     0.92,
+     null
+    ],
+    "650000": [
+     null,
+     null,
+     0.84,
+     null,
+     null,
+     null
+    ],
+    "700000": [
+     null,
+     null,
+     0.82,
+     null,
+     null,
+     null
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 3 des Landkreises Fulda — die Stadtregion. Zweiachsige Matrix mit sechs Bodenrichtwert-Stützstellen (50 bis 250 Euro/qm), zwischen denen interpoliert wird. 113 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,83 — der höchste Wert aller hessischen Ausschüsse im Register. Die beiden untersten Zeilen (650.000 und 700.000 Euro) sind NUR in der Spalte 100 Euro/qm besetzt; das war im Textstrom des PDF nicht eindeutig und wurde an der gerenderten Seite 119 abgelesen.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 373.740 Euro, mittlere Grundstücksgröße 808 qm, mittlerer Bodenrichtwert 121 Euro/qm, mittlere Restnutzungsdauer 39 Jahre, mittlere Standardstufe 2,6, mittlere BGF 353 qm, mittlere Wohnfläche 168 qm, mittlerer Wert der Außenanlagen 11.255 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechs Gemeinden des Landkreises Fulda im Marktbereich 3: Eichenzell, Flieden, Hünfeld, Künzell, Neuhof, Petersberg. Die Stadt Fulda liegt ebenfalls im Marktbereich 3, ist hier aber AUSGENOMMEN, weil sie einen eigenen Gutachterausschuss führt. Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 113,
+   "korrelationskoeffizient": 0.83
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.2, Tabelle 10-14, Seite 119."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 113 Kauffaellen und multiplem Korrelationskoeffizienten 0,83. KEINE Stufe A, weil der Bericht die Fallzahl nicht je Zelle ausweist und die Randzellen erkennbar duenn besetzt sind - die beiden untersten Zeilen tragen nur noch je einen Wert.",
+  "fallzahl": 113,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.2 Regionale Auswertung Landkreis Fulda 2023-2025 MB 3, Tabelle 10-14, Seite 119."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631008",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    50,
+    75,
+    100,
+    150,
+    200,
+    250
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "200000": [
+     1.16,
+     1.21,
+     1.26,
+     null,
+     null,
+     null
+    ],
+    "250000": [
+     1.05,
+     1.1,
+     1.14,
+     1.22,
+     1.3,
+     null
+    ],
+    "300000": [
+     0.99,
+     1.02,
+     1.06,
+     1.12,
+     1.19,
+     null
+    ],
+    "350000": [
+     0.94,
+     0.97,
+     1.0,
+     1.06,
+     1.11,
+     1.17
+    ],
+    "400000": [
+     0.9,
+     0.93,
+     0.95,
+     1.0,
+     1.06,
+     1.11
+    ],
+    "450000": [
+     0.88,
+     0.9,
+     0.92,
+     0.97,
+     1.01,
+     1.06
+    ],
+    "500000": [
+     0.85,
+     0.87,
+     0.89,
+     0.93,
+     0.97,
+     1.01
+    ],
+    "550000": [
+     0.84,
+     0.85,
+     0.87,
+     0.91,
+     0.95,
+     0.98
+    ],
+    "600000": [
+     0.82,
+     0.84,
+     0.85,
+     0.89,
+     0.92,
+     null
+    ],
+    "650000": [
+     null,
+     null,
+     0.84,
+     null,
+     null,
+     null
+    ],
+    "700000": [
+     null,
+     null,
+     0.82,
+     null,
+     null,
+     null
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 3 des Landkreises Fulda — die Stadtregion. Zweiachsige Matrix mit sechs Bodenrichtwert-Stützstellen (50 bis 250 Euro/qm), zwischen denen interpoliert wird. 113 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,83 — der höchste Wert aller hessischen Ausschüsse im Register. Die beiden untersten Zeilen (650.000 und 700.000 Euro) sind NUR in der Spalte 100 Euro/qm besetzt; das war im Textstrom des PDF nicht eindeutig und wurde an der gerenderten Seite 119 abgelesen.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 373.740 Euro, mittlere Grundstücksgröße 808 qm, mittlerer Bodenrichtwert 121 Euro/qm, mittlere Restnutzungsdauer 39 Jahre, mittlere Standardstufe 2,6, mittlere BGF 353 qm, mittlere Wohnfläche 168 qm, mittlerer Wert der Außenanlagen 11.255 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechs Gemeinden des Landkreises Fulda im Marktbereich 3: Eichenzell, Flieden, Hünfeld, Künzell, Neuhof, Petersberg. Die Stadt Fulda liegt ebenfalls im Marktbereich 3, ist hier aber AUSGENOMMEN, weil sie einen eigenen Gutachterausschuss führt. Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 113,
+   "korrelationskoeffizient": 0.83
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.2, Tabelle 10-14, Seite 119."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 113 Kauffaellen und multiplem Korrelationskoeffizienten 0,83. KEINE Stufe A, weil der Bericht die Fallzahl nicht je Zelle ausweist und die Randzellen erkennbar duenn besetzt sind - die beiden untersten Zeilen tragen nur noch je einen Wert.",
+  "fallzahl": 113,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.2 Regionale Auswertung Landkreis Fulda 2023-2025 MB 3, Tabelle 10-14, Seite 119."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631015",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    50,
+    75,
+    100,
+    150,
+    200,
+    250
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "200000": [
+     1.16,
+     1.21,
+     1.26,
+     null,
+     null,
+     null
+    ],
+    "250000": [
+     1.05,
+     1.1,
+     1.14,
+     1.22,
+     1.3,
+     null
+    ],
+    "300000": [
+     0.99,
+     1.02,
+     1.06,
+     1.12,
+     1.19,
+     null
+    ],
+    "350000": [
+     0.94,
+     0.97,
+     1.0,
+     1.06,
+     1.11,
+     1.17
+    ],
+    "400000": [
+     0.9,
+     0.93,
+     0.95,
+     1.0,
+     1.06,
+     1.11
+    ],
+    "450000": [
+     0.88,
+     0.9,
+     0.92,
+     0.97,
+     1.01,
+     1.06
+    ],
+    "500000": [
+     0.85,
+     0.87,
+     0.89,
+     0.93,
+     0.97,
+     1.01
+    ],
+    "550000": [
+     0.84,
+     0.85,
+     0.87,
+     0.91,
+     0.95,
+     0.98
+    ],
+    "600000": [
+     0.82,
+     0.84,
+     0.85,
+     0.89,
+     0.92,
+     null
+    ],
+    "650000": [
+     null,
+     null,
+     0.84,
+     null,
+     null,
+     null
+    ],
+    "700000": [
+     null,
+     null,
+     0.82,
+     null,
+     null,
+     null
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 3 des Landkreises Fulda — die Stadtregion. Zweiachsige Matrix mit sechs Bodenrichtwert-Stützstellen (50 bis 250 Euro/qm), zwischen denen interpoliert wird. 113 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,83 — der höchste Wert aller hessischen Ausschüsse im Register. Die beiden untersten Zeilen (650.000 und 700.000 Euro) sind NUR in der Spalte 100 Euro/qm besetzt; das war im Textstrom des PDF nicht eindeutig und wurde an der gerenderten Seite 119 abgelesen.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 373.740 Euro, mittlere Grundstücksgröße 808 qm, mittlerer Bodenrichtwert 121 Euro/qm, mittlere Restnutzungsdauer 39 Jahre, mittlere Standardstufe 2,6, mittlere BGF 353 qm, mittlere Wohnfläche 168 qm, mittlerer Wert der Außenanlagen 11.255 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechs Gemeinden des Landkreises Fulda im Marktbereich 3: Eichenzell, Flieden, Hünfeld, Künzell, Neuhof, Petersberg. Die Stadt Fulda liegt ebenfalls im Marktbereich 3, ist hier aber AUSGENOMMEN, weil sie einen eigenen Gutachterausschuss führt. Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 113,
+   "korrelationskoeffizient": 0.83
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.2, Tabelle 10-14, Seite 119."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 113 Kauffaellen und multiplem Korrelationskoeffizienten 0,83. KEINE Stufe A, weil der Bericht die Fallzahl nicht je Zelle ausweist und die Randzellen erkennbar duenn besetzt sind - die beiden untersten Zeilen tragen nur noch je einen Wert.",
+  "fallzahl": 113,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.2 Regionale Auswertung Landkreis Fulda 2023-2025 MB 3, Tabelle 10-14, Seite 119."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631017",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    50,
+    75,
+    100,
+    150,
+    200,
+    250
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "200000": [
+     1.16,
+     1.21,
+     1.26,
+     null,
+     null,
+     null
+    ],
+    "250000": [
+     1.05,
+     1.1,
+     1.14,
+     1.22,
+     1.3,
+     null
+    ],
+    "300000": [
+     0.99,
+     1.02,
+     1.06,
+     1.12,
+     1.19,
+     null
+    ],
+    "350000": [
+     0.94,
+     0.97,
+     1.0,
+     1.06,
+     1.11,
+     1.17
+    ],
+    "400000": [
+     0.9,
+     0.93,
+     0.95,
+     1.0,
+     1.06,
+     1.11
+    ],
+    "450000": [
+     0.88,
+     0.9,
+     0.92,
+     0.97,
+     1.01,
+     1.06
+    ],
+    "500000": [
+     0.85,
+     0.87,
+     0.89,
+     0.93,
+     0.97,
+     1.01
+    ],
+    "550000": [
+     0.84,
+     0.85,
+     0.87,
+     0.91,
+     0.95,
+     0.98
+    ],
+    "600000": [
+     0.82,
+     0.84,
+     0.85,
+     0.89,
+     0.92,
+     null
+    ],
+    "650000": [
+     null,
+     null,
+     0.84,
+     null,
+     null,
+     null
+    ],
+    "700000": [
+     null,
+     null,
+     0.82,
+     null,
+     null,
+     null
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 3 des Landkreises Fulda — die Stadtregion. Zweiachsige Matrix mit sechs Bodenrichtwert-Stützstellen (50 bis 250 Euro/qm), zwischen denen interpoliert wird. 113 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,83 — der höchste Wert aller hessischen Ausschüsse im Register. Die beiden untersten Zeilen (650.000 und 700.000 Euro) sind NUR in der Spalte 100 Euro/qm besetzt; das war im Textstrom des PDF nicht eindeutig und wurde an der gerenderten Seite 119 abgelesen.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 373.740 Euro, mittlere Grundstücksgröße 808 qm, mittlerer Bodenrichtwert 121 Euro/qm, mittlere Restnutzungsdauer 39 Jahre, mittlere Standardstufe 2,6, mittlere BGF 353 qm, mittlere Wohnfläche 168 qm, mittlerer Wert der Außenanlagen 11.255 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechs Gemeinden des Landkreises Fulda im Marktbereich 3: Eichenzell, Flieden, Hünfeld, Künzell, Neuhof, Petersberg. Die Stadt Fulda liegt ebenfalls im Marktbereich 3, ist hier aber AUSGENOMMEN, weil sie einen eigenen Gutachterausschuss führt. Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 113,
+   "korrelationskoeffizient": 0.83
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.2, Tabelle 10-14, Seite 119."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 113 Kauffaellen und multiplem Korrelationskoeffizienten 0,83. KEINE Stufe A, weil der Bericht die Fallzahl nicht je Zelle ausweist und die Randzellen erkennbar duenn besetzt sind - die beiden untersten Zeilen tragen nur noch je einen Wert.",
+  "fallzahl": 113,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.2 Regionale Auswertung Landkreis Fulda 2023-2025 MB 3, Tabelle 10-14, Seite 119."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631018",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    50,
+    75,
+    100,
+    150,
+    200,
+    250
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "200000": [
+     1.16,
+     1.21,
+     1.26,
+     null,
+     null,
+     null
+    ],
+    "250000": [
+     1.05,
+     1.1,
+     1.14,
+     1.22,
+     1.3,
+     null
+    ],
+    "300000": [
+     0.99,
+     1.02,
+     1.06,
+     1.12,
+     1.19,
+     null
+    ],
+    "350000": [
+     0.94,
+     0.97,
+     1.0,
+     1.06,
+     1.11,
+     1.17
+    ],
+    "400000": [
+     0.9,
+     0.93,
+     0.95,
+     1.0,
+     1.06,
+     1.11
+    ],
+    "450000": [
+     0.88,
+     0.9,
+     0.92,
+     0.97,
+     1.01,
+     1.06
+    ],
+    "500000": [
+     0.85,
+     0.87,
+     0.89,
+     0.93,
+     0.97,
+     1.01
+    ],
+    "550000": [
+     0.84,
+     0.85,
+     0.87,
+     0.91,
+     0.95,
+     0.98
+    ],
+    "600000": [
+     0.82,
+     0.84,
+     0.85,
+     0.89,
+     0.92,
+     null
+    ],
+    "650000": [
+     null,
+     null,
+     0.84,
+     null,
+     null,
+     null
+    ],
+    "700000": [
+     null,
+     null,
+     0.82,
+     null,
+     null,
+     null
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 3 des Landkreises Fulda — die Stadtregion. Zweiachsige Matrix mit sechs Bodenrichtwert-Stützstellen (50 bis 250 Euro/qm), zwischen denen interpoliert wird. 113 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,83 — der höchste Wert aller hessischen Ausschüsse im Register. Die beiden untersten Zeilen (650.000 und 700.000 Euro) sind NUR in der Spalte 100 Euro/qm besetzt; das war im Textstrom des PDF nicht eindeutig und wurde an der gerenderten Seite 119 abgelesen.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 373.740 Euro, mittlere Grundstücksgröße 808 qm, mittlerer Bodenrichtwert 121 Euro/qm, mittlere Restnutzungsdauer 39 Jahre, mittlere Standardstufe 2,6, mittlere BGF 353 qm, mittlere Wohnfläche 168 qm, mittlerer Wert der Außenanlagen 11.255 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechs Gemeinden des Landkreises Fulda im Marktbereich 3: Eichenzell, Flieden, Hünfeld, Künzell, Neuhof, Petersberg. Die Stadt Fulda liegt ebenfalls im Marktbereich 3, ist hier aber AUSGENOMMEN, weil sie einen eigenen Gutachterausschuss führt. Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 113,
+   "korrelationskoeffizient": 0.83
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.2, Tabelle 10-14, Seite 119."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 113 Kauffaellen und multiplem Korrelationskoeffizienten 0,83. KEINE Stufe A, weil der Bericht die Fallzahl nicht je Zelle ausweist und die Randzellen erkennbar duenn besetzt sind - die beiden untersten Zeilen tragen nur noch je einen Wert.",
+  "fallzahl": 113,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.2 Regionale Auswertung Landkreis Fulda 2023-2025 MB 3, Tabelle 10-14, Seite 119."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631020",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    50,
+    75,
+    100,
+    150,
+    200,
+    250
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "200000": [
+     1.16,
+     1.21,
+     1.26,
+     null,
+     null,
+     null
+    ],
+    "250000": [
+     1.05,
+     1.1,
+     1.14,
+     1.22,
+     1.3,
+     null
+    ],
+    "300000": [
+     0.99,
+     1.02,
+     1.06,
+     1.12,
+     1.19,
+     null
+    ],
+    "350000": [
+     0.94,
+     0.97,
+     1.0,
+     1.06,
+     1.11,
+     1.17
+    ],
+    "400000": [
+     0.9,
+     0.93,
+     0.95,
+     1.0,
+     1.06,
+     1.11
+    ],
+    "450000": [
+     0.88,
+     0.9,
+     0.92,
+     0.97,
+     1.01,
+     1.06
+    ],
+    "500000": [
+     0.85,
+     0.87,
+     0.89,
+     0.93,
+     0.97,
+     1.01
+    ],
+    "550000": [
+     0.84,
+     0.85,
+     0.87,
+     0.91,
+     0.95,
+     0.98
+    ],
+    "600000": [
+     0.82,
+     0.84,
+     0.85,
+     0.89,
+     0.92,
+     null
+    ],
+    "650000": [
+     null,
+     null,
+     0.84,
+     null,
+     null,
+     null
+    ],
+    "700000": [
+     null,
+     null,
+     0.82,
+     null,
+     null,
+     null
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Marktbereich 3 des Landkreises Fulda — die Stadtregion. Zweiachsige Matrix mit sechs Bodenrichtwert-Stützstellen (50 bis 250 Euro/qm), zwischen denen interpoliert wird. 113 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,83 — der höchste Wert aller hessischen Ausschüsse im Register. Die beiden untersten Zeilen (650.000 und 700.000 Euro) sind NUR in der Spalte 100 Euro/qm besetzt; das war im Textstrom des PDF nicht eindeutig und wurde an der gerenderten Seite 119 abgelesen.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 373.740 Euro, mittlere Grundstücksgröße 808 qm, mittlerer Bodenrichtwert 121 Euro/qm, mittlere Restnutzungsdauer 39 Jahre, mittlere Standardstufe 2,6, mittlere BGF 353 qm, mittlere Wohnfläche 168 qm, mittlerer Wert der Außenanlagen 11.255 Euro."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Sechs Gemeinden des Landkreises Fulda im Marktbereich 3: Eichenzell, Flieden, Hünfeld, Künzell, Neuhof, Petersberg. Die Stadt Fulda liegt ebenfalls im Marktbereich 3, ist hier aber AUSGENOMMEN, weil sie einen eigenen Gutachterausschuss führt. Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "kauffaelle": 113,
+   "korrelationskoeffizient": 0.83
+  },
+  "belege": [
+   "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.2, Tabelle 10-14, Seite 119."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Matrix mit 113 Kauffaellen und multiplem Korrelationskoeffizienten 0,83. KEINE Stufe A, weil der Bericht die Fallzahl nicht je Zelle ausweist und die Randzellen erkennbar duenn besetzt sind - die beiden untersten Zeilen tragen nur noch je einen Wert.",
+  "fallzahl": 113,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.2 Regionale Auswertung Landkreis Fulda 2023-2025 MB 3, Tabelle 10-14, Seite 119."
+ },
+ {
+  "land_code": "HE",
   "ags": "06633",
   "ebene": "kreis",
   "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Kassel und Waldeck-Frankenberg",

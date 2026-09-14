@@ -156,6 +156,19 @@ export const AUSSCHUSS_QUELLEN = {
     warum_kein_wert: 'Der Immobilienmarktbericht 2026 druckt zwar zwei umfangreiche Sachwertfaktor-Tabellen ab, diese sind aber hessenweit von der Zentralen Geschäftsstelle ermittelt und nicht vom Gutachterausschuss beschlossen. Damit sind es keine sonstigen zur Wertermittlung erforderlichen Daten nach § 193 Abs. 5 BauGB. Ein örtlich abgeleiteter Sachwertfaktor liegt für diesen Bereich nicht vor.',
     hinweis: 'Der Bericht ist im Downloadcenter der Hessischen Verwaltung für Bodenmanagement kostenfrei abrufbar (Datei 2026_IMB_AFB_Büdingen.pdf). Kapitel 8.3 nennt das vollständige Sachwertmodell — Gesamtnutzungsdauer 80 Jahre, NHK 2010, kein Regionalfaktor, Außenanlagen 1 bis 10 Prozent je nach Standardstufe —, sodass eine modellkonforme Rechnung mit dem hessenweiten Faktor bewusst möglich bleibt.',
   },
+  /* v1143 · Stadt Fulda. Eigener Gutachterausschuss, eigener Bericht — und
+   * die Sachwertfaktoren stehen darin NUR als Diagramm. Keine Tabelle, keine
+   * Regressionsformel, keine Stuetzstellen an den Kurven; die beigestellten
+   * Kaesten nennen ausschliesslich Fallzahl, Bestimmtheitsmass und Mittelwerte.
+   * Ablesen waere Schaetzen. Der Kreisausschuss (AfB Fulda) fuehrt fuer den
+   * Marktbereich 3 zwar Werte, ist fuer das Stadtgebiet aber nicht zustaendig. */
+  '06631009': {
+    stelle: 'Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Fulda',
+    url: 'https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte',
+    zugang: 'kostenfrei',
+    warum_kein_wert: 'Der Immobilienmarktbericht 2026 der Stadt Fulda stellt die Sachwertfaktoren ausschließlich als Diagramm dar (Abbildungen 46 und 47) — ohne Wertetabelle und ohne Regressionsformel. Die Kurven lassen sich nicht ablesen, ohne zu schätzen, und geschätzte Werte gehören nicht in eine Wertermittlung. Der Gutachterausschuss gibt die Zahlen auf Anfrage heraus.',
+    hinweis: 'Der Bericht ist im Downloadcenter der Hessischen Verwaltung für Bodenmanagement kostenfrei abrufbar (Datei 2026_IMB_Stadt_Fulda.pdf). Das Bewertungsmodell nennt er vollständig (Kapitel 9.2): Gesamtnutzungsdauer 80 Jahre, NHK 2010, Regionalfaktor 1,0, Bezugsmaßstab BGF nach DIN 277, Bodenrichtwertbereich 90 bis 655 Euro/m², Kauffälle 2024 bis 2025, Stichtag 01.01.2026. Für freistehende Ein- und Zweifamilienhäuser 115 Kauffälle bei einem Bestimmtheitsmaß von 0,67, für Doppel- und Reihenhäuser 52 Kauffälle bei 0,74.',
+  },
   '08111': {
     stelle: 'Gutachterausschuss für die Ermittlung von Grundstückswerten in Stuttgart',
     url: 'https://www.stuttgart.de/leben/bauen/grundstueckswerte/',
