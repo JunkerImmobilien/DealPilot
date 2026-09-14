@@ -64,11 +64,16 @@ export const LAND_QUELLEN = {
           url: 'https://hvbg.hessen.de/immobilienwertermittlung/immobilienmarktberichte',
           zugang: 'kostenfrei',
           hinweis: 'Die regionalen Immobilienmarktberichte der letzten zehn Jahre stehen im Downloadcenter unter gds.hessen.de.' },
+  /* v1128-WRP · Hier stand „der Landesbericht ist kostenpflichtig". GEMESSEN
+     am 14.09.2026: er ist es nicht — der Landesgrundstücksmarktbericht 2025
+     steht als PDF frei zum Abruf. Wichtiger noch ist die zweite Zeile: der
+     Herausgeber hat seine eigenen Sachwertfaktoren nachträglich
+     eingeschränkt, und wer nur die Haupttabelle liest, erfährt es nicht. */
   '07': { land: 'Rheinland-Pfalz',
           stelle: 'Oberer Gutachterausschuss für Grundstückswerte Rheinland-Pfalz',
-          url: 'https://gutachterausschuesse.rlp.de/marktdaten',
-          zugang: 'teils kostenpflichtig',
-          hinweis: 'Die örtlichen Grundstücksmarktberichte liegen bei den Städten und Kreisen; der Landesbericht ist kostenpflichtig.' },
+          url: 'https://gutachterausschuesse.rlp.de/marktdaten/landesgrundstuecksmarktbericht-rheinland-pfalz-lgmb',
+          zugang: 'kostenfrei',
+          hinweis: 'Der Landesgrundstücksmarktbericht führt Sachwertfaktoren und Liegenschaftszinssätze; daneben erscheinen eigene Berichte für Kaiserslautern, Koblenz, Ludwigshafen, Mainz, Trier und Worms. WICHTIG: der Ausschuss hat am 30.04.2025 selbst nachgeschoben, dass die für MARKTSEGMENT 1 veröffentlichten Sachwertfaktoren für Ein- und Zweifamilienhäuser „als etwas zu hoch anzusehen sind und in der praktischen Anwendung niedriger angesetzt werden sollten" — der Hinweis steht als eigenes Blatt neben dem Bericht.' },
   '08': { land: 'Baden-Württemberg',
           stelle: 'Gutachterausschüsse in Baden-Württemberg',
           url: 'https://www.gutachterausschuesse-bw.de/',
