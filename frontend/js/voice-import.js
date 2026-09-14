@@ -387,7 +387,7 @@
     /* QC-Einzelposten (virtuell) zusaetzlich */
     if (_qcTarget) {
       WL_VIRT.forEach(function (w) {
-        cat.push({ id: w.id, kind: 'num', label: w.label, g: w.g, hint: 'Nur den Einzelposten; Summe gehoert zusaetzlich in ze' });
+        cat.push({ id: w.id, kind: 'num', label: w.label, g: w.g, hint: 'Nur den Einzelposten; Summe gehört zusätzlich in ze' });
       });
     }
     return cat;
@@ -424,7 +424,7 @@
                  hint: 'true, wenn ' + g[1] + ' saniert werden muss' });
       out.push({ id: 'fesh_' + g[0] + '_cost', kind: 'num',
                  label: 'Sanierungskosten ' + g[1] + ' (€)',
-                 hint: 'geschaetzte Kosten fuer ' + g[1] + ', nur wenn eine Zahl genannt wird' });
+                 hint: 'geschätzte Kosten für ' + g[1] + ', nur wenn eine Zahl genannt wird' });
     });
     return out;
   }
@@ -950,13 +950,13 @@
       '<div class="vi-rf-wozu" style="margin-top:8px"><b>Damit ich den richtigen Ton treffe:</b> ' +
       'wie viel Erfahrung hast du mit Immobilien-Investments?</div>');
     _rfAktion('erf_neu',
-      'Ich erklaere bei jeder Frage, wozu die Angabe dient — und was sie am Ende bewirkt.',
+      'Ich erkläre bei jeder Frage, wozu die Angabe dient — und was sie am Ende bewirkt.',
       'Erste Immobilie');
     _rfAktion('erf_mittel',
-      'Kurze Fragen, Erklaerung auf Zuruf: sag jederzeit "erklaer mir das".',
+      'Kurze Fragen, Erklärung auf Zuruf: sag jederzeit "erklär mir das".',
       'Schon ein paar gemacht');
     _rfAktion('erf_profi',
-      'Knapp und ohne Beiwerk. Die Erklaerungen bleiben auf Abruf verfuegbar.',
+      'Knapp und ohne Beiwerk. Die Erklärungen bleiben auf Abruf verfügbar.',
       'Profi');
   }
 
@@ -982,7 +982,7 @@
     if (!e) return;
     var w = _rfWozu(e);
     var name = _rfFeldName((e.ids && e.ids[0]) || '') || e.frage;
-    _rfBlase('ich', 'Erklaer mir das.');
+    _rfBlase('ich', 'Erklär mir das.');
     if (w) {
       _rfBlase('co', '<b>' + escH(name) + '</b>' +
         '<div class="vi-rf-wozu" style="margin-top:6px">' + escH(w) + '</div>' +
@@ -1016,23 +1016,23 @@
       _rfBlase('co',
         'Alles klar — dann gehen wir es in Ruhe an. <b>So laeuft es ab:</b>' +
         '<div class="vi-rf-wozu" style="margin-top:6px">' +
-        '<b>1.</b> Ich frage der Reihe nach — Adresse, Groesse, Preis, Miete, Finanzierung. ' +
+        '<b>1.</b> Ich frage der Reihe nach — Adresse, Größe, Preis, Miete, Finanzierung. ' +
         'Unter jeder Frage steht, wozu die Angabe dient.<br>' +
         '<b>2.</b> Was ich selbst holen kann, hole ich: Bodenrichtwert, Lage, ' +
         'Marktpreisindikation. Du sagst nur, ob ich soll.<br>' +
-        '<b>3.</b> Weisst du etwas nicht, sag <b>"weiss ich nicht"</b> — ich frage spaeter noch einmal ' +
+        '<b>3.</b> Weisst du etwas nicht, sag <b>"weiß ich nicht"</b> — ich frage spaeter noch einmal ' +
         'oder rechne ohne.<br>' +
-        '<b>4.</b> Am Ende siehst du eine Uebersicht, und das Objekt wird angelegt.</div>' +
+        '<b>4.</b> Am Ende siehst du eine Übersicht, und das Objekt wird angelegt.</div>' +
         '<div style="margin-top:8px">Du kannst mich jederzeit unterbrechen: ' +
-        '<b>"erklaer mir das"</b>, <b>"warum fragst du das"</b> oder eine eigene Frage — ' +
+        '<b>"erklär mir das"</b>, <b>"warum fragst du das"</b> oder eine eigene Frage — ' +
         'danach machen wir weiter, wo wir waren.</div>');
     } else if (art === 'erf_profi') {
       _rfBlase('co', 'Verstanden — kurz und knapp. ' +
-        '<b>"weiss ich nicht"</b> ueberspringt, <b>"fertig"</b> bringt dich zur Uebersicht, ' +
-        'und <b>"erklaer mir das"</b> gibt es trotzdem, wenn du es brauchst.');
+        '<b>"weiß ich nicht"</b> überspringt, <b>"fertig"</b> bringt dich zur Übersicht, ' +
+        'und <b>"erklär mir das"</b> gibt es trotzdem, wenn du es brauchst.');
     } else {
-      _rfBlase('co', 'Gut. Ich halte es kurz und erklaere, wenn du fragst — ' +
-        'sag einfach <b>"erklaer mir das"</b>. <b>"weiss ich nicht"</b> ueberspringt.');
+      _rfBlase('co', 'Gut. Ich halte es kurz und erkläre, wenn du fragst — ' +
+        'sag einfach <b>"erklär mir das"</b>. <b>"weiß ich nicht"</b> überspringt.');
     }
 
     var w = _rfEinstiegWeiter; _rfEinstiegWeiter = null;
@@ -1330,7 +1330,7 @@
     ze_sonst:'Sonstige Zusatzeinnahmen pro Monat',
     /* v1259 — bei den Frage-Pillen erklaert der Tooltip, WAS gemeint ist */
     thesis:'Warum lohnt sich dieses Objekt? Deine Investment-These in einem Satz',
-    risiken:'Was koennte schiefgehen? Sanierungsstau, Mieter, Lage, Recht …',
+    risiken:'Was könnte schiefgehen? Sanierungsstau, Mieter, Lage, Recht …',
     notizen:'Alles, was sonst noch wichtig ist und kein eigenes Feld hat'
   };
   /* QC-Einzelposten (virtuell) — Gruppe Miete */
@@ -3257,9 +3257,9 @@
          Etappe, Frage x von y und einen Balken. Er bleibt EINE Zeile: der
          Balken sitzt in der Grundlinie, nicht darunter. */
       '.vi-rf-kopf{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;min-width:0}',
-      '.vi-kopf-txt{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.vi-kopf-txt{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
       '.vi-kopf-zahl{flex:0 0 auto;font-weight:600;opacity:.62;letter-spacing:.06em}',
-      '.vi-kopf-bar{flex:1 1 46px;min-width:34px;max-width:120px;height:4px;border-radius:99px;',
+      '.vi-kopf-bar{flex:0 0 60px;height:4px;border-radius:99px;',
       '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);overflow:hidden}',
       '.vi-kopf-bar i{display:block;height:100%;border-radius:99px;',
       '  background:linear-gradient(90deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C));',
@@ -5809,7 +5809,7 @@
             var nf   = akt.filter(function (a) { return a.art === 'nachfass'; }).length;
             /* ═══ v1119b-WLBL · DIE ZEILE MUSS ZU DEN KNOEPFEN PASSEN ══════
                GEMESSEN im Browser, gleich nach v1119: ueber dem Knopf
-               „Erklaer mir das" stand „Soll ich das jetzt fuer dich
+               „Erklär mir das" stand „Soll ich das jetzt fuer dich
                abrufen?" — und ueber den drei Erfahrungsstufen des Einstiegs
                ebenfalls. Beides ist kein Abruf.
 
@@ -7616,7 +7616,7 @@
         if (!_rfWozu(e)) return '';
         try { _rfAktion('erklaer',
           'Was die Angabe bedeutet und wozu DealPilot sie braucht.',
-          'Erklaer mir das'); } catch (x) {}
+          'Erklär mir das'); } catch (x) {}
         return '';
       })() +
       _rfAbrufAngebot(e) +
