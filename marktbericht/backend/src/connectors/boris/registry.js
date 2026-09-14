@@ -204,9 +204,27 @@ const ADAPTERS = [
      * Wuerzburg) lag ausserhalb und fiel faelschlich an den Catch-all.
      * Freigabe der zustaendigen Stelle liegt vor (Aktennotiz Junker
      * Solution; Az. bei M. Junker — bei Vorlage wortgleich nachtragen). */
+    /* v1389-WAUSFALL · DER ENDPUNKT IST TOT. Gemessen am 14.09.2026 fuer
+     * Muenchen, Nuernberg und Augsburg: HTTP 404 auf
+     * gdi.bayern.de/services/bodenrichtwerte/<jahr>/vboris, und zwar fuer
+     * jeden Jahrgang 2026 bis 2023. Drei gesuchte Nachfolger antworten
+     * ebenfalls mit 404 (geoservices.bayern.de/wms/v1 und /v2 sowie die
+     * im TUM-Katalog genannte Adresse). BORIS-D deckt Bayern nicht ab -
+     * es gibt also derzeit keinen Weg zum bayerischen Bodenrichtwert.
+     *
+     * `enabled` bleibt ABSICHTLICH true: der Adapter soll weiter versucht
+     * werden, damit ein wiederhergestellter Dienst von selbst greift. Der
+     * Hinweis unten sagt dem Nutzer, woran es liegt - `note` erscheint in
+     * der Antwort und damit in der Oberflaeche.
+     * ZU TUN: aktuellen Endpunkt bei den Gutachterausschuessen Bayern
+     * erfragen; der Viewer auf bodenrichtwerte.bayern.de laedt seine
+     * Kacheln ueber einen Weg, den ein GetCapabilities nicht hergibt. */
     code: 'by', name: 'BORIS-Bayern',
     license: 'Freigabe (Aktennotiz Junker Solution)',
     enabled: true, verified: true,
+    note: 'Der bayerische Bodenrichtwert-Dienst antwortet seit 14.09.2026 mit '
+      + 'HTTP 404 (alle Jahrgänge). Bitte den Wert im BORIS-Bayern-Viewer '
+      + 'nachschlagen und im Feld „Bodenrichtwert" eintragen.',
     quellenvermerk: 'Gutachterausschüsse in Bayern, BayernAtlas / GDI Bayern '
       + '(www.bodenrichtwerte.bayern.de)',
     base: 'https://gdi.bayern.de/services/bodenrichtwerte',
@@ -610,11 +628,47 @@ export const BorisRegistry = {
       }
     }
 
-    let hit = null, first = null;
+    /* ═══ v1389-WAUSFALL · EIN TOTER DIENST IST KEIN BEFUND ══════════════
+     *
+     * Marcels Ziel: "dass wir fuer jedes Bundesland die Bodenrichtwerte
+     * abrufen koennen. eigentlich haben wir dafuer alles das muss aber
+     * jetzt funktionieren."
+     *
+     * GEMESSEN ueber alle 16 Laender (Landeshauptstaedte): 15 liefern,
+     * Bayern nicht. Grund ist NICHT "kein Wert an dieser Stelle", sondern
+     *
+     *   HTTP 404  https://gdi.bayern.de/services/bodenrichtwerte/2023/vboris
+     *
+     * fuer JEDEN Jahrgang (2026 bis 2023). Der Endpunkt existiert nicht
+     * mehr; drei gesuchte Nachfolger (geoservices.bayern.de/wms/v1 und /v2,
+     * die im TUM-Katalog genannte Adresse) antworten ebenfalls mit 404.
+     *
+     * DIE UNTERSCHEIDUNG, DIE BISHER FEHLTE: "kein Wert am Punkt" ist eine
+     * AUSSAGE des Dienstes — dort gibt es wirklich keine Zone, und ein
+     * anderer Dienst zu fragen waere Shopping. "HTTP 404" oder ein
+     * Zeitueberlauf ist ein AUSFALL — der Dienst hat gar nichts gesagt.
+     * Die Regel "ein leeres NRW bleibt ein Befund" trifft den ersten Fall
+     * und darf nicht auf den zweiten angewandt werden.
+     *
+     * Deshalb: faellt ein verifizierter Landesdienst mit einem FEHLER aus,
+     * duerfen die Catch-alls ran. Fuer Bayern hilft das nicht (BORIS-D
+     * deckt es nicht ab, gemessen an Muenchen, Nuernberg und Augsburg) —
+     * fuer jedes andere Land ist es der Unterschied zwischen einem
+     * voruebergehenden Ausfall und einem Totalausfall bei uns. */
+    let hit = null, first = null, ausfall = false;
     for (const a of chain) {
       const r = await this._queryAdapter(a, lat, lon, year);
       if (first == null) first = r;
       if (r.value != null) { hit = { a, r }; break; }
+      if (r.lastErr) ausfall = true;
+    }
+    if (!hit && ausfall) {
+      for (const c of ADAPTERS) {
+        if (chain.indexOf(c) >= 0 || !c.catchAll || !c.enabled) continue;
+        if (!inBox(lat, lon, c.bbox)) continue;
+        const r = await this._queryAdapter(c, lat, lon, year);
+        if (r.value != null) { hit = { a: c, r }; break; }
+      }
     }
 
     if (!hit) {
@@ -624,6 +678,13 @@ export const BorisRegistry = {
       fb.tried_layers = r0.layers || null;
       fb.tried_years = r0.years || null;
       fb.properties_raw = r0.raw != null ? r0.raw : null; // damit das Mapping bei Bedarf justiert werden kann
+      /* v1389-WAUSFALL: Traegt der zustaendige Adapter eine Notiz zu einem
+         bekannten Ausfall, gehoert sie in die Antwort. Bisher erschien sie
+         NUR bei gesperrten Laendern (Z. 565) - ausgerechnet im Ausfall,
+         wo der Nutzer am ehesten wissen will, woran es liegt, kam die
+         Standardfloskel "kein automatischer Bodenrichtwert vorhanden". */
+      if (claimed.note) fb.note = claimed.note;
+      fb.claimed_land = claimed.name;
       return fb;
     }
 
