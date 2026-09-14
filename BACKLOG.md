@@ -141,6 +141,126 @@ den ersten gebaut.
 
 ---
 
+
+### D · SPRECHLAUF — Modelle und Kosten **[NEU 14.09.2026, gemessen]**
+
+Marcels Fragen: welche Modelle laufen, wohin geht es, was kommt zurück, wären
+Realtime-Modelle schlauer, was kostet es, sollten wir begrenzen.
+
+**Gemessen an 44 echten Aufrufen** aus dem Staging-Log (`[voice/kosten]`), an
+`printenv` in beiden Containern und am Code — nicht geschätzt.
+
+#### Was heute läuft
+
+| Schritt | Modell (ENV, Prod **und** Staging) | Weg |
+|---|---|---|
+| Transkription | `gpt-4o-mini-transcribe` | `/v1/audio/transcriptions` |
+| Auswertung | `gpt-5.4-mini` | `/v1/responses` |
+| Live-Hilfe (QuickMatch) | `gpt-5.6-luna` | `/v1/responses` |
+| Realtime-WS | `gpt-4o-mini-transcribe` | **gebaut, aber nicht im Einsatz** |
+
+Beide Schritte stecken in **einem** Aufruf: `POST /api/v1/ai/extract-voice`
+bekommt Audio (Base64), den auf 24 Felder zugeschnittenen Katalog und den
+Kontext; zurück kommen `transcript`, `fields`, `unsicher` und `kosten`.
+
+#### Die Kosten, gemessen
+
+| | |
+|---|---|
+| je Antwort, Mittel | **0,236 ct** |
+| Median | 0,280 ct |
+| Spanne | 0,10 bis 0,41 ct |
+| voller Sprechlauf (21 Blöcke) | **rund 5 ct** |
+
+**Rund 90 % davon ist die Auswertung, nicht die Transkription.** Typischer
+Posten: `Transkription 55/8 | Auswertung 2860/147`. Das Audio ist billig, der
+Feldkatalog im Prompt ist der Treiber.
+
+> **Rücknahme:** Im Kommentar zu `dialogLimiter` (v1290d) steht *„Eine
+> gesprochene Antwort kostet gemessen unter 0,1 Cent"*. Gemessen sind es
+> **0,236 ct im Mittel** — mehr als das Doppelte. Damit stimmt auch die
+> Folgerung nicht mehr: 150 Aufrufe je Stunde sind **rund 35 ct** je Nutzer und
+> Stunde, nicht „deutlich unter 20 Cent". Vermutlich vor der Katalog-Erweiterung
+> gemessen.
+
+#### ① Das Auswertungsmodell ist der Hebel — nicht die Transkription
+
+`gpt-5.4-mini` kostet **0,75 / 4,50** USD je Mio Token. `gpt-5.6-luna` kostet
+**0,20 / 1,20** — und läuft in dieser App bereits als QuickMatch-Modell.
+
+Gerechnet am gemessenen Durchschnittsposten (2.900 ein / 140 aus):
+
+| Modell | je Antwort | je Sprechlauf |
+|---|---:|---:|
+| `gpt-5.4-mini` (heute) | 0,26 ct | ~5,0 ct |
+| `gpt-5.6-luna` | **0,07 ct** | **~1,5 ct** |
+
+**Rund 70 % Ersparnis, ein ENV-Wert.** Was zu prüfen ist: ob luna die
+Feldzuordnung genauso sicher trifft. Das ist ein Qualitätsvergleich an
+denselben Audiodateien, kein Umbau — und er gehört gemacht, bevor die ENV
+umgestellt wird.
+
+#### ② Prompt-Caching greift nicht — und der Grund ist gewollt
+
+Der Code erfasst `cached_tokens` seit v1259f. **Gemessen greift es nicht:** die
+Kosten gehen ohne Cache exakt auf (0,28 ct = 2860 × 0,75 + 147 × 4,50 + Audio,
+mal 0,92).
+
+Der Grund steht in `_rfKatalog`: der Katalog wird **je Frage zugeschnitten**
+(24 Felder, gefragte zuerst). Damit ist der Prompt-Präfix bei jedem Aufruf ein
+anderer — und OpenAI cached nur identische Präfixe ab 1.024 Token.
+
+**Das ist ein echter Zielkonflikt, kein Fehler.** Der Zuschnitt schützt die
+Qualität (der Code: *„mit 192 Feldern fängt ein Modell an zu raten"*). Ein
+stabiler Präfix wäre bei `einCached` 0,075 statt 0,75 rund **zehnmal
+billiger** — kostete aber vermutlich Trefferquote.
+
+**Möglicher Mittelweg, ungeprüft:** den unveränderlichen Teil (Systemanweisung,
+Regeln, Ausgabeformat) nach vorn und den wechselnden Katalog nach hinten. Dann
+cached wenigstens der stabile Kopf. Ob er die 1.024-Token-Schwelle erreicht,
+wäre zu messen.
+
+#### ③ Realtime bringt hier wenig — aus einem benennbaren Grund
+
+Der Realtime-Weg ist **gebaut** (`backend/src/ws/voiceStream.js`,
+`wss://api.openai.com/v1/realtime?intent=transcription`) und seit **v536
+abgeschaltet**: Web-Audio lieferte auf manchen Geräten Stille (peak = 0).
+
+Er würde auch wenig bringen, weil er am **falschen Posten** spart:
+
+- Die Transkription ist bereits der kleine Teil (~10 % der Kosten).
+- Realtime hält eine Sitzung **durchgehend** offen — auch beim Nachdenken.
+  Der heutige Weg schickt nur die tatsächlich gesprochenen Abschnitte
+  (Ring-Puffer, 40 s, je Antwort geleert). Bei einem Dialog mit Pausen ist das
+  **billiger**, nicht teurer.
+- Der Auswertungsschritt bliebe unverändert — und dort liegen die 90 %.
+
+**Wofür Realtime wirklich etwas brächte:** ein *sprechender* Co-Pilot (Audio
+rein, Audio raus, Unterbrechen mitten im Satz). Das ist eine Produktfrage, kein
+Sparvorschlag — Audio-Ausgabe kostet zusätzlich.
+
+> **Nebenbefund:** Der ALTE Sprach-Import (`st`/`sx`, das Modal aus v504) schickt
+> alle 5 s den **gesamten bisherigen** Mitschnitt an `/transcribe-chunk` —
+> `st.chunks` wird während der Aufnahme nie geleert. Bei 4 Minuten sind das 48
+> Aufrufe über zusammen ~98 Minuten Audio. Der **Sprechlauf** (`_fs`) macht das
+> richtig (Kopf + Ring, je Abschnitt geleert). Zu prüfen, ob der alte Weg
+> überhaupt noch erreichbar ist; wenn ja, ist er der teuerste Posten im ganzen
+> Sprachbereich.
+
+#### ④ Begrenzen? Ist bereits getrennt geregelt — die Zahl ist zu prüfen
+
+Seit v1290d gibt es **getrennte Zähler**: Dialog 150/h, Dokument 30/h. Das war
+die richtige Antwort auf *„nach zwei Durchläufen kam: zu viele PDF-Extraktionen"*.
+
+Bei 21 Blöcken je Lauf sind 150 Aufrufe rund **fünf bis sieben Durchläufe je
+Stunde** — großzügig bemessen. Eine Begrenzung der *Sprechlauf-Anzahl* im Sinne
+eines Produktkontingents gibt es **nicht**; der Schutz ist ein Ratenlimit gegen
+Missbrauch des Server-Schlüssels, kein Tarifmerkmal.
+
+**Empfehlung:** nicht enger begrenzen, sondern ① umsetzen. Eine Begrenzung
+kostet den Hauptweg der Objektaufnahme; das Modell zu wechseln kostet nichts
+und spart mehr.
+
 ## → NEU: Marcels Auftrag vom 13.09.2026, nachmittags — Restnutzungsdauer und Verkehrswert
 
 Zwei Aufträge aus derselben Ansage. Der erste ist neu, der zweite ist die
