@@ -212,5 +212,143 @@
   "verwendung": "produkt",
   "auflagen": null,
   "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Reihenhaus/Doppelhaushälfte, Kalkulator 2026_sw_rh_bswf"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03357",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Otterndorf, Bereich Landkreis Rotenburg (Wümme)",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Otterndorf, Bereich Landkreis Rotenburg (Wümme)",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    100000,
+    125000,
+    150000,
+    175000,
+    200000,
+    225000,
+    250000,
+    275000,
+    300000
+   ],
+   "achse_y_feld": "brw",
+   "achse_y_bez": "Bodenrichtwert in €/m²",
+   "achse_y": [
+    70,
+    110,
+    150,
+    190
+   ],
+   "zellen": {
+    "70": [
+     1.36,
+     1.3,
+     1.25,
+     1.2,
+     1.15,
+     1.11,
+     1.07,
+     1.03,
+     1.0
+    ],
+    "110": [
+     1.33,
+     1.27,
+     1.21,
+     1.17,
+     1.12,
+     1.08,
+     1.04,
+     1.0,
+     0.97
+    ],
+    "150": [
+     1.3,
+     1.24,
+     1.18,
+     1.14,
+     1.09,
+     1.05,
+     1.01,
+     0.98,
+     0.94
+    ],
+    "190": [
+     1.27,
+     1.21,
+     1.15,
+     1.11,
+     1.06,
+     1.02,
+     0.99,
+     0.95,
+     0.92
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "92 Kauffälle. Die Werte sind am amtlichen Kalkulator des Ausschusses ABGEFRAGT, nicht aus dem Diagramm abgelesen — Punkt für Punkt über die vier abgedruckten Bodenrichtwertkurven (70, 110, 150, 190 €/m²) und den abgedruckten Sachwertbereich 100.000 bis 300.000 €. Standardabweichung durchgehend ±0,25. Der Kalkulator rechnet auch ausserhalb dieses Rahmens weiter; übernommen ist nur, was das Diagramm abdeckt.",
+   "normobjekt": "Lage 1 (Lagefaktor 1,00) — die Vorgabe des Kalkulators. Stichprobe: Baujahr 1950 bis 2021 (Median 1968), modifiziertes Baujahr 1960 bis 2021, Bodenrichtwert 37 bis 205 €/m² (Median 125), Wohnfläche 69 bis 186 m² (Median 104), Bruttogrundfläche 118 bis 316 m², Grundstücksfläche 158 bis 1009 m², Restnutzungsdauer 15 bis 76 Jahre (Median 31), Standardstufe 1,3 bis 4,0 (Median 2), Modernisierungspunktzahl 0 bis 12 (Median 4), vorläufiger Sachwert 70.330 bis 406.060 €."
+  },
+  "korrekturen": [
+   {
+    "bez": "Lage im Landkreis",
+    "feld": "ort",
+    "art": "kategorial",
+    "wirkung": "multiplikativ",
+    "werte": {
+     "sg bothel": 1.0,
+     "bothel": 1.0,
+     "bremervörde": 1.0,
+     "gnarrenburg": 1.0,
+     "sg fintel": 1.0,
+     "fintel": 1.0,
+     "sg selsingen": 1.0,
+     "selsingen": 1.0,
+     "sg geestequelle": 1.0,
+     "geestequelle": 1.0,
+     "visselhövede": 1.0,
+     "sg tarmstedt": 1.0,
+     "tarmstedt": 1.0,
+     "rotenburg (wümme)": 1.22,
+     "rotenburg": 1.22,
+     "rotenburg wümme": 1.22,
+     "scheeßel": 1.22,
+     "scheessel": 1.22,
+     "sg sittensen": 1.22,
+     "sittensen": 1.22,
+     "sg sottrum": 1.22,
+     "sottrum": 1.22,
+     "sg zeven": 1.22,
+     "zeven": 1.22
+    },
+    "rundung_stellen": 2,
+    "hinweis": "Der Ausschuss teilt den Landkreis in ZWEI Lagen, und der Unterschied ist erheblich: 22 Prozent. Lage 1 (Faktor 1,00) sind SG Bothel, Bremervörde Stadt, Gnarrenburg, SG Fintel, SG Selsingen, SG Geestequelle, Visselhövede Stadt und SG Tarmstedt; Lage 2 (1,22) sind Rotenburg (Wümme) Stadt, Scheeßel, SG Sittensen, SG Sottrum und SG Zeven. Der Kalkulator führt Lage 1 als Vorgabe — die Tabelle oben ist deshalb die Lage-1-Kurve. Ist der Ort nicht zuzuordnen, gibt es KEINEN Zuschlag und keinen Wert aus der anderen Lage: wer nicht zuzuordnen ist, bekommt die Lage-1-Kurve, und das ist die Vorgabe des Kalkulators selbst und zugleich die vorsichtigere Zahl. Geraten wird nichts: die andere Lage liegt 22 Prozent höher."
+   }
+  ],
+  "modellansaetze": {},
+  "geltungsbereich": {},
+  "belege": [
+   "Kalkulator 2026_sw_rh_ott_row des Gutachterausschusses Otterndorf fuer den Landkreis Rotenburg (Wuemme), Wertermittlungsstichtag 01.01.2026, 92 Kauffaelle. 36 Stuetzstellen am Kalkulator abgefragt (vier Bodenrichtwertkurven mal neun Sachwerte), dazu die abgedruckte Tabelle der Lagefaktoren."
+  ],
+  "stufe": "A",
+  "stufe_grund": "Die Werte stammen aus dem amtlichen Kalkulator des Ausschusses selbst — nicht aus einer abgelesenen Kurve. Jede Zelle ist eine einzelne Auskunft desselben Rechners, den der Ausschuss der Öffentlichkeit zur Verfügung stellt; zwischen den Stützstellen interpoliert der Auswerter linear, so wie das Diagramm seine Kurve zeichnet.",
+  "fallzahl": 92,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_ott_row",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis 01.01.2026, Tag der Veröffentlichung 02.03.2026",
+  "lizenz": "frei zugänglich, kostenfreier Abruf",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Anwendung setzt eine modellkonforme Wertermittlung nach der Modellbeschreibung Sachwertfaktoren des Ausschusses voraus (NHK 2010, Regionalfaktor 1,0, GND 80 Jahre, lineare Alterswertminderung, RND nach Anlage 2 ImmoWertV, Außenanlagen pauschal).",
+  "fundstelle": "Kalkulator „Sachwertfaktoren für ein Reihenhaus oder Doppelhaushälfte — Landkreis Rotenburg (Wümme)“ nebst Diagramm „Sachwertfaktor für abweichende vorläufige Sachwerte und Bodenrichtwerte“ und Tabelle „Umrechnungskoeffizienten für abweichende Lagen“."
  }
 ]
