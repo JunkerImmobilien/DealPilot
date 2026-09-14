@@ -134,6 +134,28 @@ export const LAND_QUELLEN = {
  * NICHT hier hinein gehoert ein Ausschuss, dessen Zahlen im Register
  * stehen. Dort gewinnt ohnehin der Registersatz. */
 export const AUSSCHUSS_QUELLEN = {
+  /* v1139 · Main-Kinzig-Kreis, Wetteraukreis und Stadt Hanau.
+   * Der Bericht sieht aus wie eine reiche Quelle — zwei grosse Matrizen,
+   * 1.526 Kauffaelle, Fallzahl und Bestimmtheitsmass je Klasse. Sie sind
+   * aber NICHT oertlich abgeleitet: "Nach diesem Modell hat die ZGGH die
+   * Kaufvertragsdaten der hessischen Gutachterausschuesse einheitlich
+   * ausgewertet" (Kap. 8.3, S. 78), raeumlicher Anwendungsbereich
+   * "Ueberregionale Auswertung (hessenweit)". Ein Landeswert im Gewand
+   * eines Regionalberichts. */
+  '06435': {
+    stelle: 'Gutachterausschuss für Immobilienwerte für den Bereich des Main-Kinzig-Kreises, des Wetteraukreises und der Stadt Hanau',
+    url: 'https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte',
+    zugang: 'kostenfrei',
+    warum_kein_wert: 'Der Immobilienmarktbericht 2026 druckt zwar zwei umfangreiche Sachwertfaktor-Tabellen ab, diese sind aber hessenweit von der Zentralen Geschäftsstelle ermittelt und nicht vom Gutachterausschuss beschlossen. Damit sind es keine sonstigen zur Wertermittlung erforderlichen Daten nach § 193 Abs. 5 BauGB. Ein örtlich abgeleiteter Sachwertfaktor liegt für diesen Bereich nicht vor.',
+    hinweis: 'Der Bericht ist im Downloadcenter der Hessischen Verwaltung für Bodenmanagement kostenfrei abrufbar (Datei 2026_IMB_AFB_Büdingen.pdf). Kapitel 8.3 nennt das vollständige Sachwertmodell — Gesamtnutzungsdauer 80 Jahre, NHK 2010, kein Regionalfaktor, Außenanlagen 1 bis 10 Prozent je nach Standardstufe —, sodass eine modellkonforme Rechnung mit dem hessenweiten Faktor bewusst möglich bleibt.',
+  },
+  '06440': {
+    stelle: 'Gutachterausschuss für Immobilienwerte für den Bereich des Main-Kinzig-Kreises, des Wetteraukreises und der Stadt Hanau',
+    url: 'https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte',
+    zugang: 'kostenfrei',
+    warum_kein_wert: 'Der Immobilienmarktbericht 2026 druckt zwar zwei umfangreiche Sachwertfaktor-Tabellen ab, diese sind aber hessenweit von der Zentralen Geschäftsstelle ermittelt und nicht vom Gutachterausschuss beschlossen. Damit sind es keine sonstigen zur Wertermittlung erforderlichen Daten nach § 193 Abs. 5 BauGB. Ein örtlich abgeleiteter Sachwertfaktor liegt für diesen Bereich nicht vor.',
+    hinweis: 'Der Bericht ist im Downloadcenter der Hessischen Verwaltung für Bodenmanagement kostenfrei abrufbar (Datei 2026_IMB_AFB_Büdingen.pdf). Kapitel 8.3 nennt das vollständige Sachwertmodell — Gesamtnutzungsdauer 80 Jahre, NHK 2010, kein Regionalfaktor, Außenanlagen 1 bis 10 Prozent je nach Standardstufe —, sodass eine modellkonforme Rechnung mit dem hessenweiten Faktor bewusst möglich bleibt.',
+  },
   '08111': {
     stelle: 'Gutachterausschuss für die Ermittlung von Grundstückswerten in Stuttgart',
     url: 'https://www.stuttgart.de/leben/bauen/grundstueckswerte/',
