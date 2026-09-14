@@ -1740,8 +1740,33 @@ function _grenzAutoNachziehen(mitToast) {
       grenzInput.value = neu;
       grenzInput.disabled = true;
       grenzInput.style.background = 'rgba(201,168,76,0.12)';
+      /* ═══ v1398 · DAS FELD ZEIGT DEN PERSOENLICHEN SATZ, NICHT DEN WIRKSAMEN
+         Seit v1397 rechnet das Objekt gegen eine Basis, die um die Ergebnisse
+         frueher gekaufter Objekte verschoben ist. Der hier angezeigte Satz
+         bleibt bewusst der auf das VOLLE zvE — das ist der persoenliche
+         Grenzsteuersatz, und danach fragt das Feld.
+         Gemessen an drei Objekten (zvE 80.000): das Feld zeigt dreimal
+         42,00 %, waehrend die wirksame Basis 80.000 / 55.000 / 35.000 betraegt
+         und dort 42,00 / 37,00 / 30,10 % gelten. Ohne diesen Zusatz stuende
+         die Abweichung unerklaert da. */
+      var _salT = 0;
+      try {
+        if (typeof window._dpBestandSaldo === 'function') {
+          _salT = window._dpBestandSaldo(
+            (State && State._taxDisplayYear) || new Date().getFullYear()) || 0;
+        }
+      } catch (_eT) { _salT = 0; }
       grenzInput.title = 'Wird aus deinem zu versteuernden Einkommen berechnet '
-        + '(§ 32a EStG). Zum Ändern den Haken darunter entfernen.';
+        + '(§ 32a EStG). Zum Ändern den Haken darunter entfernen.'
+        + (Math.abs(_salT) >= 1
+            ? ' — Achtung: das ist dein persönlicher Satz auf das volle zvE. '
+              + 'Dieses Objekt rechnet auf einer um '
+              + Math.round(Math.abs(_salT)).toLocaleString('de-DE') + ' € '
+              + (_salT < 0 ? 'gesenkten' : 'erhöhten')
+              + ' Basis, weil früher gekaufte Bestandsobjekte einfließen. Der '
+              + 'tatsächlich wirkende Satz steht im Hinweis „Dein Steuersatz '
+              + 'wurde angepasst".'
+            : '');
       if (mitToast && typeof toast === 'function') {
         toast('✓ Grenzsteuersatz aus zvE berechnet: ' + neu + ' %');
       }

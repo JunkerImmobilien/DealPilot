@@ -1620,12 +1620,52 @@ function _calcImmediate(){
    * schlimmer als eine, die bekannt konservativ ist. */
   var _bestandSaldo_w = 0;     /* der tatsaechlich angewandte Saldo */
   var _bestandAnz_w   = 0;     /* wie viele Objekte darin stecken */
+  /* ═══ v1398 · EIN SALDO, DER ZU SPAET KOMMT, IST EIN FALSCHER ══════════
+   *
+   * GEMESSEN als Folge von v1397: `_dpBestandSaldo` liest NUR den Cache des
+   * WK-Aggregators. Laeuft calc() bevor der geladen ist — und beim ersten
+   * Oeffnen eines Objekts ist das der Regelfall — kommt 0 zurueck, und der
+   * Cashflow nach Steuer faellt ZU GUT aus. An drei Objekten gerechnet:
+   * 24.607 statt 20.894 Euro, also 17,77 Prozent.
+   *
+   * Schlimmer als der Betrag ist, dass nichts nachzieht: `tax.js` hat dafuer
+   * `_ensureBestandDataAndRerender`, `calc.js` hatte nichts. Die zu gute
+   * Zahl waere stehengeblieben, bis der Nutzer irgendetwas anfasst.
+   *
+   * WARUM KEIN `.then(calcNow)` AM VORHANDENEN loadAll: dort steht seit
+   * v730 eine ausdrueckliche Warnung vor der Render-Schleife
+   * POST steuer-snapshot -> loadAll -> GET -> Re-Render -> POST. Ein
+   * Neurechnen an dieser Stelle wuerde sie wieder schliessen.
+   *
+   * DESHALB DER MERKER, UND ZWAR VOR DEM LADEN GESETZT: es gibt genau
+   * EINEN Nachlauf je Sitzung. Schlaegt das Laden fehl, wird es nicht
+   * wiederholt — lieber einmal ohne Saldo rechnen als in einer Schleife
+   * haengen. */
+  function _bestandEinmalNachladen() {
+    try {
+      if (window._dpBestandNachgeladen) return;
+      if (!window.DealPilotWKAggregator
+          || typeof window.DealPilotWKAggregator.loadAll !== 'function') return;
+      var _c = (typeof window.DealPilotWKAggregator.getAllObjectsWithWK === 'function')
+        ? window.DealPilotWKAggregator.getAllObjectsWithWK() : null;
+      /* Cache ist da: nichts nachzuladen, und kuenftig auch nicht pruefen. */
+      if (Array.isArray(_c) && _c.length > 0) { window._dpBestandNachgeladen = true; return; }
+      window._dpBestandNachgeladen = true;   /* VOR dem Laden — genau ein Anlauf */
+      window.DealPilotWKAggregator.loadAll(false).then(function () {
+        if (typeof calcNow === 'function') setTimeout(calcNow, 120);
+      }).catch(function () {});
+    } catch (_e) {}
+  }
+
   function _bestandSaldo(jahr) {
     try {
       if (typeof window._dpBestandSaldo !== 'function') return 0;
       var _j = (typeof jahr === 'number' && jahr > 1900)
         ? jahr : new Date().getFullYear();
       var _s = window._dpBestandSaldo(_j);
+      /* Kein Saldo kann zweierlei heissen: es gibt keine Vorobjekte, oder
+         die Daten sind noch nicht da. Nur im zweiten Fall wird nachgeladen. */
+      if (!_s) _bestandEinmalNachladen();
       return (typeof _s === 'number' && isFinite(_s)) ? _s : 0;
     } catch (_e) { return 0; }
   }

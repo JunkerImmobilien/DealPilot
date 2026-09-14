@@ -93,8 +93,10 @@
           "b": -0.0013,
           "boden_ab": 15,
           "boden_wert": 1.016,
+          "deckel_ab": 50,
+          "deckel_wert": 1.0,
           "rundung_stellen": 5,
-          "hinweis": "16 bis 50 Jahre: -0,0013 × RND + 1,065. Bis 15 Jahre fest 1,016. Über 50 Jahre fest 1,000 — DIESE Obergrenze kann die Form noch nicht, siehe geltungsbereich.offen."
+          "hinweis": "16 bis 50 Jahre: -0,0013 × RND + 1,065. Bis 15 Jahre fest 1,016 (boden_ab). Über 50 Jahre fest 1,000 (deckel_ab). v1398: hier stand, die Form könne diese Obergrenze nicht — das war falsch. `deckel_ab` gilt im Auswerter für `potenz` UND `linear`, derselbe Code. Gemessen ohne Deckel: RND 60 ergab 0,987, RND 80 sogar 0,961 statt 1,000 — bis zu 3,90 Prozent zu niedrig, und zwar bei jedem Neubau."
         },
         {
           "bez": "Baujahr",
@@ -286,7 +288,7 @@
           "modernisierungspunkte": { "min": 0.0, "max": 20.0, "mittel": 3.98 }
         },
         "ohne_einfluss": "Alter (Stichtagsjahr minus Baujahr), Standardstufe, Wohnfläche/BGF, Garage, Carport, Stellplatz, Pfeifenstiel, Wegerecht, Endenergiebedarf, Rechtsform — der Bericht nennt sie ausdrücklich als einflusslos",
-        "offen": "ZWEI Dinge kann die Formelform noch nicht: (1) der Restnutzungsdauerfaktor ist über 50 Jahren fest 1,000 — die lineare Form rechnet dort weiter und liefert ab RND 50 Werte unter 1. Bis das abgebildet ist, gilt das Modell nur bis RND 50. (2) Der Modernisierungsfaktor (1 + 0,0076 × (Punktzahl − baujahrstypisches Mittel)) braucht ZWEI Eingänge und eine Nachschlagetabelle nach Baujahrsklasse; er ist hier nicht geführt und wirkt damit als 1."
+        "offen": "EIN Faktor von neunzehn fehlt noch: der Modernisierungsfaktor (1 + 0,0076 × (Punktzahl − baujahrstypisches Mittel)). Er braucht ZWEI Eingänge — die Modernisierungspunktzahl UND die Baujahrsklasse, aus der sich das Vergleichsmittel ergibt (bis 1919: 5,74 · 1920–39: 5,25 · 1940–59: 5,23 · 1960–69: 4,70 · 1970–79: 4,10 · 1980–89: 3,53 · 1990–99: 2,32 · 2000–09: 1,79 · ab 2010: kein Abschlag). Er ist hier nicht geführt und wirkt damit als 1,000. Die Spanne, die dadurch fehlt: bei 20 Punkten gegen ein Mittel von 5,74 wären es +10,8 Prozent, bei 0 Punkten −4,4 Prozent. Abbildbar wäre er als `stufen_kategorial` (Kategorie Baujahrsklasse, Achse Punktzahl, zwei Stützstellen je Klasse — die Funktion ist linear, die Interpolation also exakt); es fehlt die Ableitung der Baujahrsklasse aus dem Baujahr im Eingabeweg. v1398: die frühere Aussage, auch die RND-Obergrenze sei nicht abbildbar, ist ZURÜCKGENOMMEN — sie war falsch und ist seit v1398 als `deckel_ab` gesetzt."
       },
 
       "stufe": "A",
