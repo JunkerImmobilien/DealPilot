@@ -694,7 +694,8 @@ function _progHinweisZeichnen(zveImmo, steuer, grenzSatz, effSatz, zveBasis) {
     + '<summary>Warum ist das so?</summary>'
     + '<p class="hint" style="margin-top:8px">'
     + 'Der Grenzsteuersatz gilt für den <b>nächsten</b> Euro deines Einkommens — nicht für jeden. '
-    + 'Das steuerliche Ergebnis dieses Objekts von <b>' + _eu(zveImmo) + '</b> '
+    + (_verlust ? 'Der steuerliche Verlust dieses Objekts von <b>' + _eu(zveImmo) + '</b> '
+                : 'Der steuerliche Gewinn dieses Objekts von <b>' + _eu(zveImmo) + '</b> ')
     + (_verlust
         ? 'senkt dein zu versteuerndes Einkommen von ' + _eu(zveBasis) + ' auf ' + _eu(zveBasis + zveImmo) + '. '
           + 'Dabei läufst du die Progression hinab: die ersten Euro des Verlusts sparen noch ' + _pz(grenzSatz)
