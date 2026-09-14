@@ -651,7 +651,7 @@ function _computeBsvLifecycle() {
   };
 }
 
-/* ═══ v1365-PROG · DER HINWEIS ZUM ANGEPASSTEN STEUERSATZ ══════════════════
+/* ═══ v1379-PROG · DER HINWEIS ZUM ANGEPASSTEN STEUERSATZ ══════════════════
  *
  * Marcels Vorgabe: „wenn der satz angepasst ist sollte man ein hinweis setzen
  * und das erklaeren."
@@ -1509,7 +1509,7 @@ function _calcImmediate(){
   }
   var grenz=v('grenz')/100;
 
-  /* ═══ v1365-PROG · DIE STEUERWIRKUNG FOLGT DER PROGRESSION ═══════════════
+  /* ═══ v1379-PROG · DIE STEUERWIRKUNG FOLGT DER PROGRESSION ═══════════════
    *
    * Bis hierher stand ueberall `base * grenz`: ein LINEARER Satz auf das
    * steuerliche Ergebnis der Immobilie. Das ist nur dann richtig, wenn das
@@ -1598,7 +1598,7 @@ function _calcImmediate(){
   var zve_immo = cf_operativ - afa;
   var steuer   = _mtxYear(zve_immo, _calYearBase);
 
-  /* v1365-PROG · DER EFFEKTIVE SATZ, den dieses Objekt tatsaechlich traegt.
+  /* v1379-PROG · DER EFFEKTIVE SATZ, den dieses Objekt tatsaechlich traegt.
      Er weicht vom eingegebenen Grenzsteuersatz ab, sobald das Ergebnis den
      Steuerpflichtigen aus seiner Tarifzone traegt. Genau diese Zahl erklaert
      dem Nutzer, warum seine Ersparnis kleiner ist als sein Grenzsteuersatz -

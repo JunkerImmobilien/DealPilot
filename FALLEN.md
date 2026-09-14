@@ -4183,3 +4183,45 @@ funktionierte.**
 Rezept kann es also gar nicht setzen. Der einzige Weg ist der Zweigname.
 
 `v1151`
+
+## Eine Versionsnummer, die schon vergeben war
+
+**14.09.2026.** Die Steuerprogression bekam in der Sitzung die Nummer
+`v1365`, das Darstellungs-Paket die Nummer `v1288`. **Beide waren längst
+vergeben** — `v1365`/`v1365b` für den Quickcheck-Rückfall (`quickcheck-app.html`,
+`qc-bridge.js`), `v1288` für `bodenrichtwert.js`. Die Reihe der Haupt-App stand
+zu dem Zeitpunkt bei **v1378b**; beide neuen Pakete lagen also rund hundert
+Nummern zu tief.
+
+**Warum es passiert ist:** Ich habe die nächste Nummer aus dem gelesen, was
+gerade vor mir lag — dem Journal der Haupt-App, dessen letzter Eintrag bei
+`v1293` endet. Das Journal ist aber nicht der Nummernvorrat. **Den führt
+`git log`.** Und weil zwei Stränge parallel laufen (`v11xx` Marktbericht,
+`v13xx` Haupt-App), sieht eine Nummer aus dem falschen Kreis völlig plausibel
+aus: `v1156` und `v1365` standen in derselben Woche nebeneinander im Log.
+
+**Was das anrichtet:** CLAUDE.md, Regel 5 sagt es vorweg — „nie geänderten
+Inhalt unter altem Namen ausliefern, sonst halten Marker und Cache-Buster den
+neuen Stand für den alten." Konkret:
+
+* `grep -n v1365` findet jetzt zwei verschiedene Arbeiten in vier Dateien.
+* Ein Cache-Buster `?v=v1365b`, den es schon gab, ist für einen Browser, der
+  ihn einmal gesehen hat, **kein neuer Wert** — die Datei kommt aus dem Cache.
+* Wer später den Fehler sucht, liest den Marker und landet im falschen Paket.
+
+**Die Regel:** Die nächste Nummer kommt aus
+
+```
+git log --oneline -800 | grep -oE "^[0-9a-f]+ v13[0-9]{2}" | awk '{print $2}' | sort -u | tail -3
+```
+
+— nicht aus dem Journal, nicht aus dem Gedächtnis, nicht aus dem letzten
+Commit der eigenen Sitzung. Für den Marktbericht dasselbe mit `v11[0-9]{2}`.
+
+**Und eine zweite Falle beim Aufräumen:** `sed -i 's/v1288/v1380/g' index.html`
+zog auch `bodenrichtwert.js?v=v1288` mit hoch — einen **fremden**
+Cache-Buster, der mit dem Paket nichts zu tun hatte. Eine hochgezogene
+Versionsnummer ist keine harmlose Textänderung: sie lädt beim Kunden eine
+Datei neu, für die es keinen Grund gibt. **Beim Umbenennen von Nummern immer
+zeilengenau arbeiten** (`sed -i '<zeile>s|…|…|'`) und danach jede geänderte
+Zeile einzeln ansehen.

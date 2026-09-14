@@ -16461,3 +16461,61 @@ weiterhin benannt.
 > sieht heute andere Werte. Der Hinweis ist auch dafür da.
 
 `v1365` · `v1365b`
+
+> **Nachtrag 14.09.2026 — die Nummer war falsch.** Dieses Paket trug zuerst
+> `v1365`/`v1365b`. Die Nummern waren längst vergeben (Quickcheck-Rückfall,
+> `quickcheck-app.html:4107`), die Reihe stand bereits bei **v1378b**. Marker
+> und Cache-Buster stehen jetzt auf **`v1379`**. Der Fehler entstand, weil ich
+> die nächste Nummer aus diesem Journal gelesen habe statt aus `git log` —
+> steht mit Gegenmittel in `FALLEN.md`.
+
+## Rollout-Journal · 14.09.2026 — Darstellung
+
+### `v1380` · Das fehlende Icon und der fehlende Hell-Schalter
+
+**Marcels Befund:**
+
+> „unter einstellungen, darstellung ist erstmal kein Icon und dann kann man
+> nicht in den Hell Modus schalten."
+
+Beides gemessen, beides stimmt — und es sind zwei verschiedene Ursachen.
+
+**1 · Das Icon.** Der Reiter „Darstellung" (`settings.js:235`) zeigt auf
+`#i-eye`. Dieses Symbol **gibt es im Sprite von `index.html` nicht** — einmal
+verwendet, nirgends definiert; die übrigen zehn Reiter haben ihres.
+Entstanden mit `v1355`, als aus einem Reiter zwei wurden.
+
+> Ein `<use href="#…">` auf eine leere id **wirft keinen Fehler**. Es rendert
+> nichts, und zwar still. In der Konsole steht nichts, im DOM steht ein
+> vollständig aussehendes `<svg>`. Der einzige Weg, das zu finden, ist die
+> Gegenprobe: jede benutzte id gegen die Liste der definierten halten.
+
+**2 · Der Hell-Modus.** Schwerer wiegt der zweite Teil. Das Darstellungs-Panel
+(`ui-varianten.js`) hatte **nie** einen Modus-Schalter. Den alten trug das
+abgelöste Panel (`settings.js:3556`). Seit `v1085` Skin und Vorlage koppelt,
+führte der einzige Weg nach Hell über die Wahl einer hellen Vorlage — und
+welche der sechs hell ist, **steht nirgends**: „Rein weiß", „Kühl", „Serife",
+„Creme" sind Namen, keine Ansage. Wer Hell wollte, musste raten.
+
+**Behoben, ohne einen zweiten Mechanismus einzuführen.** Der neue Schalter
+geht genau den Weg der Vorlagen-Kacheln: `save({ui_theme})` → `anwenden()` →
+`skinNachziehen()`. Die Vorlage bleibt die Flächenentscheidung (`v1156-GRUND`);
+der Schalter wählt nur eine passende — und lässt eine schon passende stehen.
+Wer auf „Hell" drückt und auf „Panel" steht, behält Panel.
+
+Beide Richtungen sind gebunden: der Schalter setzt die Vorlage, jede
+Vorlagenwahl setzt den Schalter, und `vorlageNachziehen()` markiert ihn auch
+dann mit, wenn der Anstoß von außen kam — `darstellung-reseller.js` und
+`mandant-branding.js` rufen `_dpDispSkin` direkt.
+
+**Nachweis:** `node --check` auf dem Server, RC=0. Ausgeliefert geprüft:
+`#i-eye` steht im Sprite der ausgelieferten Seite, `dpuv-modus` viermal in der
+ausgelieferten `ui-varianten.js`, Cache-Buster `v1380` angekommen.
+**Offener Staging-Abnahmepunkt:** dass der Klick im angemeldeten Browser
+tatsächlich umschaltet, habe ich nicht selbst gesehen.
+
+**Commit** `v1380`. Auf Staging, **nicht auf Prod**.
+
+> **Die Nummer dieses Pakets war zuerst `v1288` — ebenfalls vergeben**
+> (`bodenrichtwert.js`). Zwei falsche Nummern in einer Sitzung: die Sitzung
+> ist lang, und der Nummernvorrat steht in `git log`, nicht im Journal.

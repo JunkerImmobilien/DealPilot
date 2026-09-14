@@ -482,7 +482,7 @@
         '<p>Jede Änderung wirkt sofort — dahinter siehst du das Ergebnis.</p></div>' +
         '<button type="button" id="dpuv-x" aria-label="Schließen">✕</button></div>' +
       '<div id="dpuv-b">' +
-        /* ── v1288 · Hell und Dunkel, wieder bedienbar ────────────────────
+        /* ── v1380 · Hell und Dunkel, wieder bedienbar ────────────────────
            Marcels Befund: „dann kann man nicht in den Hell Modus schalten."
            GEMESSEN, und er hat recht: dieses Panel hatte nie einen
            Modus-Schalter. Den alten trug das abgeloeste Panel
@@ -640,7 +640,7 @@
         if (nachher) nachher();
       });
     }
-    /* ── v1288 · Modus-Schalter ───────────────────────────────────────────
+    /* ── v1380 · Modus-Schalter ───────────────────────────────────────────
        Zwei Richtungen, eine Wahrheit: der Schalter setzt die Vorlage, und
        jede Vorlagenwahl setzt den Schalter. Sonst zeigt er eine Helligkeit
        an, die nicht mehr gilt — genau das Auseinanderlaufen, das v1085
@@ -1228,7 +1228,7 @@
           x.classList.toggle('on', (x.getAttribute('data-v') || '') === jetzt);
         });
       }
-      /* v1288: der Modus-Schalter haengt an derselben Wahrheit und muss
+      /* v1380: der Modus-Schalter haengt an derselben Wahrheit und muss
          mitgehen — auch wenn der Anstoss von aussen kam (Reseller,
          Mandanten-Branding rufen _dpDispSkin direkt). */
       var mh = document.getElementById('dpuv-modus');
