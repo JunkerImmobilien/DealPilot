@@ -277,6 +277,32 @@ export const AUSSCHUSS_QUELLEN = {
     warum_kein_wert: 'Der Geoshop des Landkreises führt keinen kostenfreien Grundstücksmarktbericht. Der Landes-Grundstücksmarktbericht 2025 weist für Ludwigslust-Parchim zum 01.01.2025 Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser sowie für Reihenhäuser und Doppelhaushälften aus.',
     hinweis: 'Im Register liegt für diesen Ausschuss bereits ein Satz aus einem früheren Jahrgang. Geschäftsstelle: Putlitzer Straße 25, 19370 Parchim, Telefon 03871 722-6100, Sitz Garnisonsstraße 1, 19288 Ludwigslust.',
   },
+  /* ═══ v1387 · BADEN-WUERTTEMBERG — die drei, die nicht rechnen ═════════
+   * Von den fuenf frei abrufbaren BW-Berichten mit Sachwertfaktoren sind
+   * zwei geerntet (Heilbronn v1160, Horb v1387). Diese drei nicht, und
+   * jeder aus einem anderen Grund. Genau die gehoeren in dieses Register:
+   * der Kunde soll nicht raten, warum nichts kommt.                      */
+  '08212': {
+    stelle: 'Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Karlsruhe',
+    url: 'https://www.karlsruhe.de/mobilitaet-stadtbild/bauen-und-immobilien/gutachterausschuss',
+    zugang: 'kostenpflichtig',
+    warum_kein_wert: 'Die frei abrufbare Fassung des Immobilienmarktberichts 2025 ist eine gekürzte Internetversion. Sie führt die Sachwertfaktoren im Inhaltsverzeichnis (Kapitel 5.8.1 bis 5.8.3, Seiten 72 bis 76), enthält die Seiten aber nicht: die Datei hat 70 Seiten, der Bericht selbst 113. Die Zahlen stehen nur im kostenpflichtigen Vollbericht.',
+    hinweis: 'Der Ausschuss leitet Sachwertfaktoren getrennt für Ein-/Zweifamilienhäuser, Doppel-/Reihenendhäuser und Reihenmittelhäuser ab und führt zusätzlich Sachwertfaktoren nach § 191 Abs. 1 BewG (Kapitel 7.5). Die Internetfassung nennt als Beispiel, dass die Faktoren im unteren Preissegment besonders hoch liegen — bei Reihenmittelhäusern bis 2,1.',
+  },
+  '08221': {
+    stelle: 'Gutachterausschuss für Grundstückswerte in der Stadt Heidelberg',
+    url: 'https://www.heidelberg.de/',
+    zugang: 'kostenfrei',
+    warum_kein_wert: 'Der Grundstücksmarktbericht 2025 ist frei abrufbar und druckt die Marktanpassungsfaktoren vollständig ab — aber gestaffelt nach LAGEKLASSEN, und die sind über Bodenrichtwertzonen definiert (Kapitel 6.2, eine Tabelle über alle Stadtteile mit Zonennummern). Welche Zone für ein Objekt gilt, sagt uns seine Anschrift nicht. Eine geratene Lageklasse wäre teurer als kein Wert: bei Reihenhäusern reicht die Spanne von 1,1 in Lage 3 bis 1,4 in Lage 2.',
+    hinweis: 'Der Bericht führt Kapitel 9.2 „Marktanpassungs-/Sachwertfaktoren (für NHK 2010)" mit den Auswertungen 2024 und 2025, je Lageklasse 1 bis 4 und Gebäudeart (Drei-/Vierfamilienhaus, EFH/ZFH freistehend, EFH/ZFH geschlossene Bauweise, Villa, Doppelhaushälfte, Reihenendhaus, Reihenhaus), jeweils mit Standardabweichung und Kauffallzahl. Kapitel 6.2 nennt für jeden Stadtteil und jede Bodenrichtwertzone die Lageklasse — wer seine Zone kennt, findet seinen Faktor dort sofort.',
+  },
+  '08317096': {
+    stelle: 'Gemeinsamer Gutachterausschuss Offenburg-Kinzigtal',
+    url: 'https://www.offenburg.de/',
+    zugang: 'kostenfrei',
+    warum_kein_wert: 'Der Immobilienmarktbericht 2021/2022 stellt die Sachwertfaktoren AUSSCHLIESSLICH als Diagramme dar — Potenzfunktions-Trendlinien über die Einzelfälle, ohne abgedruckte Konstanten und ohne Tabelle. Aus einer Kurve ohne Gleichung lässt sich kein Wert ablesen, der die Prüfung überstünde. Hinzu kommt: die im Diagramm ausgewiesenen Bestimmtheitsmaße liegen zwischen 0,0485 und 0,1616 — die Trendlinien erklären damit unter 17 Prozent der Streuung.',
+    hinweis: 'Das Modell ist vollständig abgedruckt (Abbildung 44): Bodenrichtwert zum 31.12.2022, maximal 800 m² Grundstücksfläche, NHK 2010 nach ImmoWertV, Bruttogrundfläche modellkonform, Baupreisindex des Statistischen Bundesamtes, Gesamtnutzungsdauer 80 Jahre, wirtschaftliche Restnutzungsdauer mindestens 15 Jahre, lineare Alterswertminderung, Außenanlagen 3 bis 5 Prozent vom Gebäudezeitwert, Hausanschlüsse 2.500 bis 5.000 Euro. Die Auswertung ist in drei Bodenpreisklassen und nach Gebäudeart getrennt (Einfamilienhäuser, Doppel-/Reihenendhäuser, Reihenmittelhäuser). Der Jahrgang 2021/2022 ist zudem nicht mehr aktuell.',
+  },
 };
 
 /**
