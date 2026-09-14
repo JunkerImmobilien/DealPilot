@@ -153,7 +153,21 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                             /* v1118: Schleswig-Holstein. Drei Ausschuesse mit
                                Bodenrichtwertklassen als Kurvenschar - Luebeck,
                                Herzogtum Lauenburg, Ostholstein. */
-                            'swf-sh.json'];
+                            'swf-sh.json',
+                            /* v1145: THUERINGEN - die erste neue Saatdatei seit
+                               v1118. Das TLBG veroeffentlicht die Faktoren als
+                               eigene PDF-Blaetter je Ausschuss, nicht im
+                               Marktbericht. Eichsfeld/Unstrut-Hainich fuehrt
+                               VIER Objektarten getrennt, darunter
+                               Reihenmittelhaeuser mit einer viel steileren
+                               Kurve als Doppelhaushaelften.
+
+                               WER HIER EINE DATEI ERGAENZT, MUSS SIE AUCH HIER
+                               EINTRAGEN. Der Registerbau erzeugt out/swf-th.json
+                               klaglos, der Auswerter laedt aber nur, was in
+                               dieser Liste steht - genau daran scheiterte
+                               Berlin in v1085 mit fuenfzehn Fehltreffern. */
+                            'swf-th.json'];
 
 export function ladeSaat(dateien = SAATDATEIEN) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])
