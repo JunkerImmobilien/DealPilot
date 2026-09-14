@@ -115,7 +115,8 @@ Daten und aktuellen Bearbeitungsstand."*
 |---|---|---|
 | C1 | Kontextbezogene Begrüßung: was liegt vor, was wurde erkannt, was rechnet schon, was fehlt | **ERLEDIGT v1115.** Marcels Ansage vom 14.09.: „Hey, ich bin dein Co-Pilot … bist du das erste Mal hier? Soll ich dir das kurz erklären? … Was ist man für ein Investor? Einsteiger? Profi?" **Drei Teile gab es schon** — den Ton in drei Stufen (v1378), die Marktpreisindikation per Sprache (v1318), die grüne Kennzeichnung bekannter Angaben samt Adressbestätigung (v1293/v1308). **Es fehlte der Weg dorthin:** der Ton stand als Knopf in der Nebenleiste, wer ihn nicht fand, bekam ein Leben lang Normal. Jetzt stellt sich der Co-Pilot beim ersten Mal vor und fragt EINMAL nach der Erfahrung (Erste Immobilie / Schon ein paar / Profi); die Antwort setzt den vorhandenen Ton und steht in `dp_rf_erfahrung`. Für Einsteiger folgt eine Ablauferklärung in vier Schritten. |
 | C11 | **Erklärung auf Abruf an jeder Frage** *(Marcels Ansage vom 14.09.)* | **ERLEDIGT v1115.** Knopf „Erklär mir das" an jeder Frage zeigt denselben Wozu-Satz, den der Lernmodus von selbst zeigt — ohne den Ton umzustellen. Wo kein Satz hinterlegt ist, antwortet der Co-Pilot über denselben Weg wie bei jeder freien Frage (`/ai/copilot-frage`), statt eine zweite Erklärquelle aufzumachen. Im Lernmodus erscheint der Knopf nicht: dort wäre er eine Dopplung. |
-| C12 | **Abnahme im Browser** *(offen, braucht Marcels Klicktest)* | Drei Dinge sind gebaut, aber noch nicht am laufenden Objekt gemessen: (1) erscheint die Erfahrungsfrage beim ersten Öffnen und danach nie wieder; (2) zeigt ein BESTEHENDES Objekt seine bekannten Angaben grün und fragt trotzdem die Adresse ab; (3) löst „ruf mal die erweiterte Marktpreisindikation ab" sie wirklich aus und läuft sie im Hintergrund weiter. Punkt 2 und 3 sind alter Bestand — die Frage ist, ob sie im Zusammenspiel mit dem neuen Einstieg noch greifen. |
+| C12 | **Abnahme im Browser** *(Punkt 1 und 3 erledigt 14.09.2026, v1119e)* | Im Browser gemessen (stummer MediaStream statt Mikrofon): (1) die Erfahrungsfrage erscheint beim ersten Öffnen und danach nie wieder — ERLEDIGT; (3) „Bitte mach die erweiterte Marktpreisindikation" löst aus, wird gemerkt, die Knöpfe verschwinden — ERLEDIGT. **Offen bleibt (2):** zeigt ein BESTEHENDES Objekt seine bekannten Angaben grün und fragt trotzdem die Adresse ab? Die Adressprüfung greift (gemessen an einem neuen Objekt), die Grün-Kennzeichnung ist an einem bestehenden Objekt noch nicht nachgemessen. |
+| C13 | **Der Sprechlauf zeigt, wo er steht** *(erledigt 14.09.2026, v1119–v1119e)* | Marcels Paket vom 14.09.: Kodierungsleichen im Nutztext behoben (vier verlorene `\u`-Escapes, dazu vierzehn Umschriften „Erklaer"/„Groesse"/„Uebersicht"); Fortschritt im Kopf (Etappe, Frage x von y, Balken); zwei getrennte Signale am Rahmen — `data-zustand` pulst gold bei einer offenen Entscheidung, `data-hoert` leuchtet grün, solange aufgenommen wird; die Doppelzeile über den Knöpfen zusammengelegt („Soll ich das jetzt für dich abrufen?", passend zur Art der Knöpfe); „Nein, überspringen" als Knopf und als Satz; der Marktbericht wird angekündigt; **„Hol mir die Postleitzahl von Herford" wird verstanden** (Imperativ am Satzanfang zählt als Frage). |
 
 | C2 | Zwei Begleitmodi: **Lernmodus** (erklärt wozu) und **Investor-Modus** (kompakt), jederzeit wechselbar | **ERLEDIGT v1378 / v1378b.** Der Ton war im Backend festgeschrieben („zwei bis vier Sätze"); es gab keinen Parameter, über den das Frontend etwas anderes hätte anfordern können. Jetzt drei Stufen (Lernmodus · Normal · Investor-Modus), umschaltbar per Knopf in der Nebenleiste und per Sprache („ausführlicher" / „kürzer" / „normal"), gemerkt in `dp_rf_modus`. Der Ton ändert **nur** Länge und Tiefe der Auskunft sowie den Wozu-Satz unter der Frage — nie, welche Fragen kommen oder was gerechnet wird. **Gemessen:** dieselbe DSCR-Frage ergibt 666 Zeichen / 5 Sätze im Lernmodus gegen 206 / 1 im Investor-Modus. Die 16 Wozu-Sätze sind kein Lexikon: sie sagen, was die Angabe *in dieser Software* bewirkt. |
 | C3 | Sprache als vollwertige Bedienform: Rückfragen, Korrekturen, Exkurse — und danach zurück in den Prozess | **Teilweise erledigt v1358** — Marcels Screenshots `fehler 2/4.png`: „Investmentthese habe ich keine" galt als Nicht-Verstehen, „Keine Maklerprovision" nach einem Befehl fiel weg. Beides behoben: `RF_NEIN_HINTEN` erkennt die Verneinung **hinter** dem Thema (nur wenn der Satz das gefragte Thema nennt), `RF_NULLANGABE` lässt eine Null-Angabe ohne Ziffer durch. Der Rest von C3 (Exkurse, Rückkehr in den Prozess) bleibt offen. |
@@ -3895,6 +3896,34 @@ entfällt — nicht raten.
 ---
 
 ## MARKTBERICHT / ERNTE — Workstream (D)  ·  eingebaut 13.09.2026
+
+> **STAND 14.09.2026 SPÄT — DREIZEHN LÄNDER, 134 SACHWERTFAKTOREN**
+> (bis v1118b, Commit `d661b21`). Neu: **Schleswig-Holstein** (Lübeck,
+> Herzogtum Lauenburg, Ostholstein — 255 Tabellenzellen zeichengleich,
+> Stufe A).
+>
+> **Neu im Quellenregister: die AUSSCHUSS-EBENE** (v1118b). Wo ein
+> Ausschuss geprüft und VERWORFEN wurde, steht jetzt warum — Stuttgart
+> (Faktoren nur im kostenpflichtigen Vollbericht), Pinneberg (nur als
+> Diagramm), Kiel (Modell von 2013–2015), Stormarn (Einzelwerte gegen
+> Gebühr), Segeberg. `AUSSCHUSS_QUELLEN` in `quellen_links.js`, Pflichtfeld
+> `warum_kein_wert`, längster AGS-Präfix gewinnt.
+>
+> **NÄCHSTER BLOCK, klar umrissen: NIEDERSACHSEN.** Die Faktoren stehen
+> dort in einem Tableau-Kalkulator, der sich als PDF mit URL-Parametern
+> abfragen lässt — Werkzeug liegt als
+> `tools/swf-register/ni-kalkulator-abtasten.sh` im Repo und ist am
+> vorhandenen Wolfenbüttel-Satz zellengleich gegengeprüft. Niedersachsen
+> führt bisher EINEN Satz bei zwölf regionalen Ausschüssen und zwei
+> Teilmärkten. Was fehlt, ist die Liste der Dashboard-Kürzel; das
+> Navi-Dashboard ist eine Karte, die Kürzel tauchen aber in den Dateinamen
+> der Modellbeschreibungen auf. Vollständig in `claude/ernte-20260913.md`.
+>
+> **Baden-Württemberg ist der große Brocken und bleibt liegen:** rund 900
+> Gutachterausschüsse, kein Landesbericht mit Faktoren, und die geprüften
+> Berichte (Stuttgart, Östlicher Bodenseekreis, Schwarzwald-Baar) drucken
+> die Faktoren als Excel-Diagramm oder gar nicht. Ohne Zahlen im Textstrom
+> ist dort nichts zu holen.
 
 > **STAND 14.09.2026 ABEND — ZWOELF BUNDESLAENDER, 128 SACHWERTFAKTOREN**
 > (bis v1117, Commit `1061bb2`). Neu dazu: **Berlin**, **Sachsen** (Leipzig
