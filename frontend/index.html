@@ -1904,11 +1904,31 @@ label.dp-required.qc-required::after {
           Steuererklärung tut er das sehr wohl, weil dort alle Einkünfte aus
           Vermietung und Verpachtung zusammenfließen.
         </p>
+        <!-- v1383: Hier stand bis zum 14.09.2026 "liegt die tatsaechliche
+             Entlastung eher HOEHER". Das war falsch, und zwar in der
+             gefaehrlichen Richtung - es rechnet das Portfolio zu gut.
+             Nachgemessen am Tarif 2026: zvE 80.000 mit zwei
+             Verlustobjekten (-25.000 und -20.000) ergibt als Summe der
+             Einzelbetrachtungen 18.348 EUR, tatsaechlich sind es
+             16.794 EUR. Die echte Entlastung ist NIEDRIGER, weil das
+             zweite Objekt auf ein bereits gesenktes Einkommen trifft und
+             dort weniger spart. -->
         <p style="margin:0 0 8px">
           <b>Was das heißt:</b> je Objekt ist die Zahl eine saubere Einzelbetrachtung.
           Die Summe im Cockpit ist die Summe dieser Einzelbetrachtungen — nicht die
           Steuer, die am Ende auf deinem Bescheid steht. Bei mehreren Objekten mit
-          Anfangsverlusten liegt die tatsächliche Entlastung eher höher.
+          Anfangsverlusten liegt die tatsächliche Entlastung <b>niedriger</b> als diese
+          Summe: der Verlust aus Objekt A senkt dein Einkommen, und Objekt B spart dann
+          nur noch, was in der niedrigeren Tarifzone zu sparen ist.
+        </p>
+        <p style="margin:0 0 8px">
+          <b>Wie groß ist der Unterschied?</b> Gemessen am Tarif 2026: bei
+          80.000 € zvE und zwei Objekten mit −25.000 € und −20.000 € steuerlichem
+          Verlust weist die Summe <b>18.348 €</b> aus, tatsächlich entlastet werden
+          <b>16.794 €</b> — rund <b>9 %</b> zu viel. Bei drei Objekten sind es etwa 12 %.
+          Ab rund 120.000 € zvE sinkt der Unterschied unter ein Prozent, ab 150.000 €
+          auf null: dort liegst du auch nach allen Verlusten noch in der
+          Proportionalzone, und dort ist jeder Euro gleich viel wert.
         </p>
         <p style="margin:0;color:var(--muted)">
           Ein Sonderfall ist bereits abgebildet: gehört das Objekt einer

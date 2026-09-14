@@ -710,25 +710,17 @@ function _progHinweisZeichnen(zveImmo, steuer, grenzSatz, effSatz, zveBasis) {
     + 'Ab rund 90.000 € zu versteuerndem Einkommen liegst du in der Proportionalzone — dort sind beide '
     + 'Zahlen gleich und dieser Hinweis erscheint nicht.'
     + '</p>'
-    /* ═══ v1383 · ZWEI DINGE, DIE MARCEL AUSDRUECKLICH GEFRAGT HAT ═══════
-       "Rechnet er das automatisch runter, wenn neue Objekte dazukommen?"
-       und "was ist, wenn wir den aendern?" — beides stand bisher NICHT im
-       Hinweis, und beides muss dort stehen. Gemessen am Tarif 2026:
-       bei 80.000 EUR zvE und zwei Verlustobjekten (-25T/-20T) weist die
-       Summe 18.348 EUR aus, richtig waeren 16.794 EUR — 9,25 % zu viel.
-       Bei drei Objekten sind es 11,8 %. Ab rund 120.000 EUR zvE faellt
-       der Unterschied unter ein Prozent, ab 150.000 auf null. */
-    + '<p class="hint" style="margin-top:10px;padding-top:8px;'
-    + 'border-top:1px dashed color-mix(in srgb, currentColor 22%, transparent)">'
-    + '<b>Jedes Objekt wird für sich gerechnet.</b> Diese Zahl vergleicht dein zu '
-    + 'versteuerndes Einkommen mit und ohne <i>dieses</i> Objekt — sie weiß nichts von '
-    + 'deinen anderen. Hast du mehrere Objekte mit steuerlichem Verlust, ist die Summe '
-    + 'ihrer Ersparnisse <b>höher als die tatsächliche Gesamtersparnis</b>: das zweite '
-    + 'Objekt würde in Wahrheit auf ein bereits gesenktes Einkommen treffen und dort '
-    + 'weniger sparen. Bei zwei Objekten sind das je nach Einkommen rund 10 Prozent, '
-    + 'bei dreien etwa 12. In der Proportionalzone (ab rund 90.000 € nach allen '
-    + 'Verlusten) entfällt der Effekt.'
-    + '</p>'
+    /* ═══ v1383 · WAS HIER STEHT UND WAS NICHT ══════════════════════════
+       Marcel hat zwei Dinge gefragt: "rechnet er runter, wenn neue Objekte
+       dazukommen?" und "was ist, wenn wir den aendern?".
+       Die ERSTE Frage gehoert NICHT hierher. Dieser Kasten steht direkt
+       ueber `#tax-flow-hint`, und der erklaert seit jeher das Modell —
+       dort steht die Mehrobjekt-Frage jetzt ausfuehrlich mit Zahlen.
+       Beides hier zu wiederholen hiesse, dieselbe Aussage an zwei Stellen
+       zu pflegen; genau daraus werden Widersprueche.
+       Dieser Kasten erklaert die EINE konkrete Zahl dieses Objekts. Die
+       zweite Frage haengt unmittelbar am eingegebenen Satz und gehoert
+       deshalb hierher. */
     + '<p class="hint" style="margin-top:8px;margin-bottom:0">'
     + '<b>Und was ändert sich, wenn du den Satz oben selbst setzt?</b> Für dieses Objekt '
     + 'nichts: solange ein zu versteuerndes Einkommen erfasst ist, rechnet DealPilot über '
