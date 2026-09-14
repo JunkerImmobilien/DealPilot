@@ -17,6 +17,19 @@
   "auflagen": "Quellenangabe. Die Anwendung setzt eine modellkonforme Wertermittlung nach der Modellbeschreibung Sachwertfaktoren des Ausschusses voraus.",
   "fundstelle": "Kalkulator „Sachwertfaktoren für ein Reihenhaus oder Doppelhaushälfte — Übriger Landkreis Diepholz“ nebst den beiden Diagrammen der Umrechnungskoeffizienten.",
 
+  "modellansaetze": {
+    "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+    "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+    "gnd_jahre": 80,
+    "regionalfaktor": 1.0,
+    "alterswertminderung": "linear (§ 38 ImmoWertV)",
+    "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+    "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+    "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+    "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+    "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de"
+  },
+
   "modelle": [
     {
       "zweig": "rhdhh",

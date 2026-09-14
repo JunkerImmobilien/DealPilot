@@ -266,7 +266,18 @@
     "hinweis": "Umrechnungskoeffizient aus dem zweiten Diagramm, Normstelle 2,0. Die Spanne ist klein — zwischen 1,2 und 2,8 liegen zehn Prozent. ACHTUNG: das Feld `bgf_wfl` ist ein VERHÄLTNIS und wird nirgends erhoben; die Korrektur liegt hier bereit und greift erst, wenn Bruttogrundfläche und Wohnfläche beide vorliegen und der Aufrufer den Quotienten mitgibt. Ohne die Angabe rechnet das Modell am Normobjekt — so, wie es der Kalkulator selbst vorgibt."
    }
   ],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1.0,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de"
+  },
   "geltungsbereich": {},
   "belege": [
    "Kalkulator 2026_sw_rh_sulverdhostsywe des Gutachterausschusses Sulingen-Verden fuer den uebrigen Landkreis Diepholz, Wertermittlungsstichtag 01.01.2026, 186 Kauffaelle. Dreizehn Stuetzstellen am Kalkulator abgefragt, dazu die abgedruckte Kurve der BGF/Wohnflaechen-Umrechnungskoeffizienten."
@@ -404,7 +415,18 @@
     "hinweis": "Der Ausschuss teilt den Landkreis in ZWEI Lagen, und der Unterschied ist erheblich: 22 Prozent. Lage 1 (Faktor 1,00) sind SG Bothel, Bremervörde Stadt, Gnarrenburg, SG Fintel, SG Selsingen, SG Geestequelle, Visselhövede Stadt und SG Tarmstedt; Lage 2 (1,22) sind Rotenburg (Wümme) Stadt, Scheeßel, SG Sittensen, SG Sottrum und SG Zeven. Der Kalkulator führt Lage 1 als Vorgabe — die Tabelle oben ist deshalb die Lage-1-Kurve. Ist der Ort nicht zuzuordnen, gibt es KEINEN Zuschlag und keinen Wert aus der anderen Lage: wer nicht zuzuordnen ist, bekommt die Lage-1-Kurve, und das ist die Vorgabe des Kalkulators selbst und zugleich die vorsichtigere Zahl. Geraten wird nichts: die andere Lage liegt 22 Prozent höher."
    }
   ],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1.0,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de"
+  },
   "geltungsbereich": {},
   "belege": [
    "Kalkulator 2026_sw_rh_ott_row des Gutachterausschusses Otterndorf fuer den Landkreis Rotenburg (Wuemme), Wertermittlungsstichtag 01.01.2026, 92 Kauffaelle. 36 Stuetzstellen am Kalkulator abgefragt (vier Bodenrichtwertkurven mal neun Sachwerte), dazu die abgedruckte Tabelle der Lagefaktoren."
@@ -614,7 +636,18 @@
     "hinweis": "Der Ausschuss unterscheidet Nordkreis (Altkreis Soltau, Faktor 1,00) und Südkreis (Altkreis Fallingbostel, 0,97). Die Zuordnung der Gemeinden zu den beiden ALTKREISEN steht nicht im Dashboard — sie ist hier nach dem historischen Gebietsstand des Landkreises Soltau-Fallingbostel eingetragen. Ist der Ort nicht zuzuordnen, gilt der Nordkreis; das ist die Vorgabe des Kalkulators und mit drei Prozent der kleinere der beiden Werte nicht der springende Punkt dieses Modells."
    }
   ],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1.0,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de"
+  },
   "geltungsbereich": {},
   "belege": [
    "Kalkulator 2026_sw_efh_sulverhk des Gutachterausschusses Sulingen-Verden fuer den Landkreis Heidekreis, Wertermittlungsstichtag 01.01.2026, 667 Kauffaelle. 65 Stuetzstellen am Kalkulator abgefragt (fuenf Bodenrichtwertkurven mal dreizehn Sachwerte), dazu die drei abgedruckten Korrekturdiagramme."
@@ -759,7 +792,18 @@
     "hinweis": "Umrechnungskoeffizient aus dem zweiten Diagramm des Kalkulators, Normstelle 1990. Zwischen den abgedruckten Jahrzehnten wird interpoliert, wie die Kurve es zeichnet. WICHTIG: gemeint ist das MODIFIZIERTE Baujahr nach Anlage 2 ImmoWertV, nicht das tatsächliche — bei einem modernisierten Gebäude liegt es höher. Zwischen 1960 und 2020 liegen 29 Prozent."
    }
   ],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1.0,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de"
+  },
   "geltungsbereich": {},
   "belege": [
    "Kalkulator 2026_sw_rh_osmep_osmepel des Gutachterausschusses Osnabrueck-Meppen fuer den Landkreis Emsland, Wertermittlungsstichtag 01.01.2026, 98 Kauffaelle. 55 Stuetzstellen am Kalkulator abgefragt (fuenf Bodenrichtwertkurven mal elf Sachwerte), dazu die abgedruckte Kurve der Baujahres-Umrechnungskoeffizienten."
