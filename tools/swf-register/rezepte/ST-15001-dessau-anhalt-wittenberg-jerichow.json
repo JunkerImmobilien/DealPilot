@@ -1,0 +1,222 @@
+{
+  "land_code": "ST",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "gaa_kennz": "15001",
+  "ags": ["15001000", "15082", "15091", "15086"],
+  "ebene": "kreis",
+  "berichtsjahr": 2024,
+  "stichtag": "2024-03-01",
+  "auswertezeitraum": "07/2022 bis 06/2024",
+  "beschlossen": null,
+  "veroeffentlicht": "2025-02-13",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_datei": "ST-ezh_de_abi_wb_jl_vor1991.pdf, ST-ezh_de_abi_wb_jl_ab1991.pdf, ST-drh_de_abi_wb_jl_vor1991.pdf, ST-drh_de_abi_wb_jl_ab1991.pdf",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren veröffentlicht am 13.02.2025, Landesamt für Vermessung und Geoinformation Sachsen-Anhalt",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Modellparameter der landesweiten Modellbeschreibung sind einzuhalten (Modellkonformität).",
+  "fundstelle": "Sachwertfaktoren Stadt Dessau-Roßlau sowie die Landkreise Anhalt-Bitterfeld, Wittenberg und Jerichower Land OHNE Großstadtrandlage, Baujahre vor 1991 und ab 1991, je für freistehende Ein- und Zweifamilienhäuser sowie Reihenhäuser und Doppelhaushälften.",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "lagetyp",
+        "achse_k_bez": "Lage im Zuständigkeitsbereich",
+        "kategorien": ["ohne_grl"],
+        "zuordnung_feld": "ort",
+        "kategorie_sonst": "ohne_grl",
+        "sonst_auch_ohne_wert": true,
+        "kategorie_mehrdeutig": ["Biederitz", "Detershagen", "Gerwisch", "Hohenwarthe",
+                                 "Lostau", "Möser", "Niegripp", "Schermen"],
+        "kategorie_zuordnung": {
+          "hinweis": "DIE GROSSSTADTRANDLAGE IST AUSGENOMMEN — das steht schon im Titel des Blattes. Im Jerichower Land gehören Biederitz, Detershagen, Gerwisch, Hohenwarthe, Lostau, Möser, Niegripp und Schermen zur Großstadtrandlage von Magdeburg; für sie gilt das Magdeburger Blatt, nicht dieses. Über den Kreisschlüssel allein ist das nicht zu trennen, deshalb sperren diese acht Namen den Satz: lieber kein Wert als der falsche. Der richtige steht unter dem Gemeindeschlüssel von Magdeburg.",
+          "ohne_grl": []
+        },
+        "modell_je_kategorie": {
+          "ohne_grl": {
+            "form": "verzweigt",
+            "achse_k_feld": "baujahrklasse",
+            "achse_k_bez": "Baujahresklasse",
+            "kategorien": ["vor_1991", "ab_1991"],
+            "zuordnung_feld": "baujahr",
+            "kategorie_baender": [
+              { "von": null, "bis": 1990, "kategorie": "vor_1991" },
+              { "von": 1991, "bis": null, "kategorie": "ab_1991" }
+            ],
+            "modell_je_kategorie": {
+              "vor_1991": {
+                "form": "regression_additiv",
+                "intercept": 0.4573,
+                "terme": [
+                  { "feld": "sachwert",      "bez": "vorläufiger Sachwert",  "koeffizient": -0.0012, "exponent": 0.5,  "gueltig": [24790, 323875] },
+                  { "feld": "brw",           "bez": "Bodenrichtwert",        "koeffizient": 0.3028,  "exponent": 0.15, "gueltig": [7, 75] },
+                  { "feld": "standardstufe", "bez": "Gebäudestandard",       "koeffizient": 0.0524,  "exponent": 1,    "gueltig": [1.10, 3.90] },
+                  { "feld": "wohnflaeche",   "bez": "Wohnfläche",            "koeffizient": 0.0227,  "exponent": 0.5,  "gueltig": [60, 187] },
+                  { "feld": "mod_punkte",    "bez": "Modernisierungspunktzahl", "koeffizient": 0.0237, "exponent": 0.8, "gueltig": [0, 13] }
+                ],
+                "aussen_exponent": 2,
+                "rundung_stellen": 2,
+                "liefert": "faktor",
+                "hinweis": "411 Kauffälle aus 07/2022 bis 06/2024, zeitlicher Bezug 03/2024. Multiples Bestimmtheitsmaß 0,22, Variationskoeffizient 0,28. DIE MODERNISIERUNGSPUNKTZAHL IST EINE EIGENE EINFLUSSGRÖSSE (0 bis 13 Punkte, Umrechnungskoeffizient 0,82 bis 1,22) — sie geht damit ZWEIMAL in die Rechnung ein: einmal über die Restnutzungsdauer in den vorläufigen Sachwert, und einmal hier. Das ist die Modellentscheidung des Ausschusses, nicht ein Fehler. Normobjekt: 150.000 €, BRW 30 €/m², Gebäudestandard 2,20, Wohnfläche 110 m², Modernisierungspunktzahl 5.",
+                "normobjekt": "NHK 2010 gemäß Anlage 4 ImmoWertV, BGF aus amtlichen Geobasisdaten, Regionalfaktor 1, Eigennutzung, kein Neubau oder Erstverkauf."
+              },
+              "ab_1991": {
+                "form": "regression_additiv",
+                "intercept": 4.5945,
+                "terme": [
+                  { "feld": "sachwert",      "bez": "vorläufiger Sachwert", "koeffizient": -0.0035, "exponent": 0.5,   "gueltig": [89009, 490240] },
+                  { "feld": "brw",           "bez": "Bodenrichtwert",       "koeffizient": 0.8002,  "exponent": 0.15,  "gueltig": [9, 130] },
+                  { "feld": "standardstufe", "bez": "Gebäudestandard",      "koeffizient": 0.0944,  "exponent": 1,     "gueltig": [1.30, 4.50] },
+                  { "feld": "wohnflaeche",   "bez": "Wohnfläche",           "koeffizient": -6.6594, "exponent": -0.27, "gueltig": [72, 216] },
+                  { "feld": "flaeche",       "bez": "Grundstücksfläche",    "koeffizient": -4.3703, "exponent": -0.15, "gueltig": [257, 1700] }
+                ],
+                "rundung_stellen": 2,
+                "liefert": "faktor",
+                "hinweis": "140 Kauffälle, zeitlicher Bezug 03/2024. Multiples Bestimmtheitsmaß 0,42, Variationskoeffizient 0,21. KEIN ÄUSSERER EXPONENT — anders als bei den älteren Baujahren ist diese Gleichung eine reine Summe. Fünf Einflussgrößen, darunter Wohn- UND Grundstücksfläche mit negativen Exponenten."
+              }
+            },
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "Zwei Gleichungen mit ganz verschiedenem Bau: vor 1991 eine quadrierte Summe mit Modernisierungspunktzahl, ab 1991 eine reine Summe mit Wohn- und Grundstücksfläche."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "ZWEI EBENEN: erst die Lage (die Großstadtrandlage von Magdeburg ist ausgenommen), dann das Baujahr.",
+        "normobjekt": "NHK 2010, BGF aus amtlichen Geobasisdaten, Regionalfaktor 1, Eigennutzung, kein Erstverkauf."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
+        "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
+        "regionalfaktor": 1.0,
+        "kauffaelle_gesamt": 551
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Stadt Dessau-Roßlau, Landkreise Anhalt-Bitterfeld, Wittenberg und Jerichower Land, OHNE die Großstadtrandlage von Magdeburg",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwert_vor_1991": { "min": 24790, "max": 323875 },
+          "sachwert_ab_1991":  { "min": 89009, "max": 490240 },
+          "brw_vor_1991":      { "min": 7, "max": 75 },
+          "brw_ab_1991":       { "min": 9, "max": 130 },
+          "wohnflaeche_vor_1991": { "min": 60, "max": 187 },
+          "wohnflaeche_ab_1991":  { "min": 72, "max": 216 },
+          "flaeche_ab_1991":   { "min": 257, "max": 1700 },
+          "mod_punkte_vor_1991": { "min": 0, "max": 13 }
+        },
+        "vorbehalt": "DAS BESTIMMTHEITSMASS FÜR BAUJAHRE VOR 1991 LIEGT BEI 0,22 bei einem Variationskoeffizienten von 0,28 — und das bei 411 Kauffällen. Die Gleichung beschreibt den Markt also nur in groben Zügen; sie ist eine Marktanpassung, keine Einzelfallaussage.\n\nDIE MODERNISIERUNGSPUNKTZAHL WIRKT ZWEIMAL: über die wirtschaftliche Restnutzungsdauer im vorläufigen Sachwert und noch einmal als eigenes Glied. Wer die Punkte anders vergibt als die Modellbeschreibung des Landes (eigene Tabelle, Abwertung zurückliegender Maßnahmen nach Alter), verschiebt beides gleichzeitig.\n\nDIE GROSSSTADTRANDLAGE VON MAGDEBURG IST AUSGENOMMEN. Für Biederitz, Detershagen, Gerwisch, Hohenwarthe, Lostau, Möser, Niegripp und Schermen im Jerichower Land gilt das Magdeburger Blatt. Dieser Satz gibt dort keinen Wert.",
+        "hinweis": "Der Zuständigkeitsbereich umfasst vier Gebietskörperschaften mit einem gemeinsamen Modell. Die Stichprobe reicht bis zu einem Bodenrichtwert von 75 €/m² (vor 1991) beziehungsweise 130 €/m² (ab 1991)."
+      },
+
+      "stufe": "A",
+      "stufe_grund": "Amtliche Regressionsfunktionen, Glied für Glied aus dem gerenderten Blatt übernommen (die Datei trägt ihren Text nicht im PDF-Textstrom), und an der ABGEDRUCKTEN NORMOBJEKT-KURVE geprüft: 15 von 15 Stützstellen von 40.000 bis 320.000 Euro zeichengleich. Das Dokument sagt, was herauskommen muss, und es kommt heraus."",
+      "fallzahl": 551,
+      "streuung": null,
+      "beleg": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser, Stadt Dessau-Roßlau sowie Landkreise Anhalt-Bitterfeld, Wittenberg und Jerichower Land ohne Großstadtrandlage, veröffentlicht am 13.02.2025: Baujahre vor 1991 aus 411 Kauffällen (R² = 0,22), ab 1991 aus 140 Kauffällen (R² = 0,42)."
+    },
+
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser und Doppelhaushälften",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "lagetyp",
+        "achse_k_bez": "Lage im Zuständigkeitsbereich",
+        "kategorien": ["ohne_grl"],
+        "zuordnung_feld": "ort",
+        "kategorie_sonst": "ohne_grl",
+        "sonst_auch_ohne_wert": true,
+        "kategorie_mehrdeutig": ["Biederitz", "Detershagen", "Gerwisch", "Hohenwarthe",
+                                 "Lostau", "Möser", "Niegripp", "Schermen"],
+        "kategorie_zuordnung": {
+          "hinweis": "Wie beim freistehenden Haus: die Großstadtrandlage von Magdeburg ist ausgenommen.",
+          "ohne_grl": []
+        },
+        "modell_je_kategorie": {
+          "ohne_grl": {
+            "form": "verzweigt",
+            "achse_k_feld": "baujahrklasse",
+            "achse_k_bez": "Baujahresklasse",
+            "kategorien": ["vor_1991", "ab_1991"],
+            "zuordnung_feld": "baujahr",
+            "kategorie_baender": [
+              { "von": null, "bis": 1990, "kategorie": "vor_1991" },
+              { "von": 1991, "bis": null, "kategorie": "ab_1991" }
+            ],
+            "modell_je_kategorie": {
+              "vor_1991": {
+                "form": "regression_additiv",
+                "intercept": 1.2385,
+                "terme": [
+                  { "feld": "sachwert",      "bez": "vorläufiger Sachwert", "koeffizient": -0.0906, "exponent": 0.18, "gueltig": [41920, 348577] },
+                  { "feld": "brw",           "bez": "Bodenrichtwert",       "koeffizient": 0.2259,  "exponent": 0.15, "gueltig": [8, 85] },
+                  { "feld": "standardstufe", "bez": "Gebäudestandard",      "koeffizient": 0.0269,  "exponent": 1.5,  "gueltig": [1.10, 3.90] }
+                ],
+                "aussen_exponent": 2,
+                "rundung_stellen": 2,
+                "liefert": "faktor",
+                "hinweis": "410 Kauffälle, zeitlicher Bezug 03/2024. MULTIPLES BESTIMMTHEITSMASS 0,13 — der niedrigste Wert dieses Ausschusses bei einer der größten Stichproben. Drei Einflussgrößen, quadrierte Summe. Der Variationskoeffizient liegt bei 0,28."
+              },
+              "ab_1991": {
+                "form": "regression_additiv",
+                "intercept": 1.6305,
+                "terme": [
+                  { "feld": "sachwert",   "bez": "vorläufiger Sachwert",     "koeffizient": -0.0008, "exponent": 0.5,   "gueltig": [111326, 315080] },
+                  { "feld": "flaeche",    "bez": "Grundstücksfläche",        "koeffizient": -5.1482, "exponent": -0.4,  "gueltig": [123, 848] },
+                  { "feld": "mod_punkte", "bez": "Modernisierungspunktzahl", "koeffizient": 0.0680,  "exponent": 0.69,  "gueltig": [0, 13] }
+                ],
+                "rundung_stellen": 2,
+                "liefert": "faktor",
+                "hinweis": "68 Kauffälle, zeitlicher Bezug 01/2024, Bestimmtheitsmaß 0,17. DER AUSSCHUSS HAT DEN UNTERSUCHUNGSZEITRAUM AUSGEWEITET und sagt warum: „Aufgrund der geringen Anzahl von Kauffällen wurde die Untersuchung von ursprünglich 2 auf 3 Jahre ausgeweitet.\" Weder Bodenrichtwert noch Gebäudestandard kommen in dieser Gleichung vor — dafür die Grundstücksfläche mit negativem Exponenten und die Modernisierungspunktzahl."
+              }
+            },
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "Zwei Gleichungen mit VERSCHIEDENEN Einflussgrößen: vor 1991 Sachwert, Bodenrichtwert und Gebäudestandard; ab 1991 Sachwert, Grundstücksfläche und Modernisierungspunktzahl."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Zwei Ebenen wie beim freistehenden Haus: erst die Lage, dann das Baujahr.",
+        "normobjekt": "NHK 2010, BGF aus amtlichen Geobasisdaten, Regionalfaktor 1, Eigennutzung, kein Erstverkauf."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
+        "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
+        "kauffaelle_gesamt": 478
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Stadt Dessau-Roßlau, Landkreise Anhalt-Bitterfeld, Wittenberg und Jerichower Land, OHNE die Großstadtrandlage von Magdeburg",
+        "sachlich": "Reihenhäuser und Doppelhaushälften",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwert_vor_1991": { "min": 41920, "max": 348577 },
+          "sachwert_ab_1991":  { "min": 111326, "max": 315080 },
+          "brw_vor_1991":      { "min": 8, "max": 85 },
+          "flaeche_ab_1991":   { "min": 123, "max": 848 },
+          "mod_punkte_ab_1991": { "min": 0, "max": 13 }
+        },
+        "vorbehalt": "BESTIMMTHEITSMASS 0,13 FÜR DIE ÄLTEREN BAUJAHRE. Die Gleichung erklärt dreizehn Prozent der Streuung — bei 410 Kauffällen. Das ist der schwächste Zusammenhang, den dieses Register führt; der Faktor ist dort eine Orientierung am Mittel, mehr nicht.\n\nFÜR BAUJAHRE AB 1991 hat der Ausschuss den Untersuchungszeitraum von zwei auf drei Jahre ausgeweitet, um überhaupt 68 Fälle zu bekommen.\n\nDIE GROSSSTADTRANDLAGE VON MAGDEBURG IST AUSGENOMMEN (acht Orte im Jerichower Land).",
+        "hinweis": "Die beiden Gleichungen teilen keine einzige Einflussgröße außer dem vorläufigen Sachwert — die ältere rechnet mit Bodenrichtwert und Gebäudestandard, die jüngere mit Grundstücksfläche und Modernisierungspunktzahl."
+      },
+
+      "stufe": "C",
+      "stufe_grund": "Amtliche Regressionsfunktionen, Glied für Glied aus dem gerenderten Blatt übernommen. Stufe C statt B, weil das Bestimmtheitsmaß für die ältere Baujahresklasse bei 0,13 liegt und die jüngere auf 68 Kauffällen aus drei Jahrgängen beruht.",
+      "fallzahl": 478,
+      "streuung": null,
+      "beleg": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für Reihenhäuser und Doppelhaushälften, Stadt Dessau-Roßlau sowie Landkreise Anhalt-Bitterfeld, Wittenberg und Jerichower Land ohne Großstadtrandlage, veröffentlicht am 13.02.2025: Baujahre vor 1991 aus 410 Kauffällen (R² = 0,13), ab 1991 aus 68 Kauffällen (R² = 0,17)."
+    }
+  ]
+}

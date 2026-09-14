@@ -97,7 +97,7 @@ ERLAUBT = {
     # potenz_kategorial aus v1102 - Havelland braucht je Region andere
     # ACHSEN, nicht nur andere Parameter.
     'verzweigt': {'form','achse_k_feld','achse_k_bez','kategorien',
-                  'kategorie_baender','zuordnung_feld','kategorie_zuordnung','kategorie_sonst','kategorie_mehrdeutig',
+                  'kategorie_baender','zuordnung_feld','kategorie_zuordnung','kategorie_sonst','kategorie_mehrdeutig','sonst_auch_ohne_wert',
                   'modell_je_kategorie','rundung_stellen','liefert','hinweis',
                   'normobjekt'},
     # v1110: die Schluessel hier stimmten NIE mit dem Auswerter ueberein

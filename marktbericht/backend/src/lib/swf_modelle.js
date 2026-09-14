@@ -1020,7 +1020,26 @@ function kategorieAus(m, e) {
   if (!zu) return { wert: '', ueber: null };
   const feld = m.zuordnung_feld || 'altbezirk';
   const v = String(e[feld] ?? '').toLowerCase().trim();
-  if (!v) return { wert: '', ueber: null };
+  if (!v) {
+    /* v1112-WOHNE - ZWEI ARTEN VON RESTKATEGORIE.
+
+       Bei Barnim BESTIMMT der Ort die Region: ohne ihn ist nicht zu sagen,
+       ob 1,25 oder 0,96 gilt, und dann gibt es keinen Wert.
+
+       Bei Dessau-Rosslau und den drei Landkreisen SCHLIESST der Ort nur
+       AUS: das Blatt gilt fuer den ganzen Bereich `ohne
+       Grossstadtrandlage`, und die Randlage sind acht benannte Orte im
+       Jerichower Land. Fehlt der Name, ist die Restkategorie die richtige
+       Antwort - die Ausnahme bleibt die Ausnahme.
+
+       Welcher Fall vorliegt, entscheidet das REZEPT. Ohne
+       `sonst_auch_ohne_wert` bleibt es beim strengen Verhalten. */
+    if (m.kategorie_sonst && m.sonst_auch_ohne_wert) {
+      return { wert: String(m.kategorie_sonst).toLowerCase(), ueber: null,
+               ueber_rest: true };
+    }
+    return { wert: '', ueber: null };
+  }
 
   for (const kat of (m.kategorien || [])) {
     const liste = zu[String(kat)];
