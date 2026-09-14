@@ -914,7 +914,129 @@
       'Ich frage der Reihe nach und rechne unterwegs mit. Antworten kannst du sprechen oder tippen — ' +
       '„Weiß ich nicht" überspringt, „Fertig" bringt dich jederzeit zur Übersicht.');
     var catalog = _qcTarget ? buildCatalog() : buildFullCatalog();
-    rueckfragen(OA, { transcript: '', fields: {}, unsicher: [] }, catalog, true);
+    rueckfragen(OA, { transcript: '', fields: {}, unsicher: [] }, catalog, true);  }
+
+  /* === v1115-WEIN - DER CO-PILOT STELLT SICH VOR =======================
+     Marcels Ansage vom 14.09.2026: "wenn wir den Sprechlauf starten, dann
+     sollten wir einmal kurz sagen: Hey, ich bin dein Co-Pilot, irgendwie
+     eine coole Einleitung machen, ich leite dich hier heute durch, dann
+     kurz erklaeren, fragen: bist du das erste Mal hier? Soll ich dir das
+     kurz erklaeren? ... Man soll einfach auswaehlen koennen: Was ist man
+     fuer ein Investor? Ist man Einsteiger? Ist man Profi? Braucht man
+     Hilfestellungen?"
+
+     DIE ERFAHRUNGSFRAGE IST KEINE NEUE EINSTELLUNG. Sie setzt den Ton,
+     den es seit v1378 gibt (Lernmodus / Normal / Investor-Modus) - nur
+     dass ihn bisher niemand gefragt hat: er stand als Knopf in der
+     Nebenleiste, und wer ihn nicht fand, bekam immer Normal.
+
+     Sie kommt EINMAL. Wer schon gewaehlt hat, faengt sofort an - die
+     Antwort steht in `dp_rf_erfahrung`, und wer sie aendern will, sagt
+     es unterwegs oder nimmt den Knopf. */
+  var RF_ERF_SPEICHER = 'dp_rf_erfahrung';
+
+  function _rfErfahrung() {
+    try { return localStorage.getItem(RF_ERF_SPEICHER) || ''; } catch (e) { return ''; }
+  }
+
+  function _rfEinstieg(weiter) {
+    _rfEinstiegWeiter = weiter;
+    /* Wer schon einmal gewaehlt hat, wird nicht wieder gefragt. */
+    if (_rfErfahrung()) { weiter(); return; }
+    _rfBlase('co',
+      '<b>Moin, ich bin dein Co-Pilot.</b> Ich nehme das Objekt mit dir zusammen auf — ' +
+      'du sprichst oder tippst, ich rechne unterwegs mit und hole, was ich selbst holen kann: ' +
+      'Bodenrichtwert, Lage, Marktpreisindikation.' +
+      '<div class="vi-rf-wozu" style="margin-top:8px"><b>Damit ich den richtigen Ton treffe:</b> ' +
+      'wie viel Erfahrung hast du mit Immobilien-Investments?</div>');
+    _rfAktion('erf_neu',
+      'Ich erklaere bei jeder Frage, wozu die Angabe dient — und was sie am Ende bewirkt.',
+      'Erste Immobilie');
+    _rfAktion('erf_mittel',
+      'Kurze Fragen, Erklaerung auf Zuruf: sag jederzeit "erklaer mir das".',
+      'Schon ein paar gemacht');
+    _rfAktion('erf_profi',
+      'Knapp und ohne Beiwerk. Die Erklaerungen bleiben auf Abruf verfuegbar.',
+      'Profi');
+  }
+
+  var _rfEinstiegWeiter = null;
+
+  /* === v1115-WERK - ERKLAERUNG AUF ABRUF, AN JEDER FRAGE ==============
+     Marcels Ansage: "Bei jedem Punkt kann man dann auch sagen: Erklaere
+     mir das oder Erklaerung abgeben, oder man hat so ein Infofenster, wo
+     dann eine Erklaerung kommt, wenn man die anklickt - also so ein
+     bisschen interaktiver wird und auch fuer Leute, die keine Ahnung
+     haben, dass es erklaert wird."
+
+     Der Lernmodus zeigt den Wozu-Satz seit v1378 von selbst. Was fehlte,
+     war der Weg dorthin fuer alle anderen: ein Knopf an der Frage, der
+     dieselbe Erklaerung auf Verlangen zeigt - ohne den Ton umzustellen.
+
+     Was hier NICHT passiert: eine neue Erklaerung erfinden. Es ist
+     derselbe Text, den der Lernmodus zeigt, plus die Auskunft des
+     Co-Piloten, wenn jemand mehr wissen will. */
+  function _rfErklaerZeigen() {
+    if (!_rf) return;
+    var e = _rf.offen && _rf.offen[_rf.i];
+    if (!e) return;
+    var w = _rfWozu(e);
+    var name = _rfFeldName((e.ids && e.ids[0]) || '') || e.frage;
+    _rfBlase('ich', 'Erklaer mir das.');
+    if (w) {
+      _rfBlase('co', '<b>' + escH(name) + '</b>' +
+        '<div class="vi-rf-wozu" style="margin-top:6px">' + escH(w) + '</div>' +
+        '<div style="margin-top:8px;opacity:.8">Reicht dir das nicht, frag einfach weiter — ' +
+        'zum Beispiel <b>"wie wirkt sich das auf den Score aus"</b>.</div>');
+    } else {
+      /* Kein hinterlegter Satz: dann antwortet der Co-Pilot selbst, über
+         denselben Weg wie bei jeder freien Frage — statt zu schweigen oder
+         hier eine zweite Erklärquelle aufzumachen. */
+      try {
+        _rfFrageBeantworten('Was bedeutet "' + name + '" bei einer Immobilien-Investition, '
+          + 'und wozu brauchst du die Angabe? Kurz und in einfachen Worten.');
+        return;   /* die Antwort zeichnet selbst weiter */
+      } catch (ex) {
+        _rfBlase('co', 'Dazu habe ich gerade keine Erklärung — frag mich ruhig direkt.');
+      }
+    }
+    _rfDranZeichnen();
+  }
+
+
+  function _rfErfahrungGewaehlt(art) {
+    var modus = art === 'erf_neu' ? 'lernen' : (art === 'erf_profi' ? 'profi' : 'normal');
+    try { localStorage.setItem(RF_ERF_SPEICHER, art); } catch (e) {}
+    _rfAktionWeg('erf_neu'); _rfAktionWeg('erf_mittel'); _rfAktionWeg('erf_profi');
+    _rfModusSetzen(modus, true);
+    _rfBlase('ich', art === 'erf_neu' ? 'Erste Immobilie.'
+      : (art === 'erf_profi' ? 'Profi.' : 'Schon ein paar gemacht.'));
+
+    if (art === 'erf_neu') {
+      _rfBlase('co',
+        'Alles klar — dann gehen wir es in Ruhe an. <b>So laeuft es ab:</b>' +
+        '<div class="vi-rf-wozu" style="margin-top:6px">' +
+        '<b>1.</b> Ich frage der Reihe nach — Adresse, Groesse, Preis, Miete, Finanzierung. ' +
+        'Unter jeder Frage steht, wozu die Angabe dient.<br>' +
+        '<b>2.</b> Was ich selbst holen kann, hole ich: Bodenrichtwert, Lage, ' +
+        'Marktpreisindikation. Du sagst nur, ob ich soll.<br>' +
+        '<b>3.</b> Weisst du etwas nicht, sag <b>"weiss ich nicht"</b> — ich frage spaeter noch einmal ' +
+        'oder rechne ohne.<br>' +
+        '<b>4.</b> Am Ende siehst du eine Uebersicht, und das Objekt wird angelegt.</div>' +
+        '<div style="margin-top:8px">Du kannst mich jederzeit unterbrechen: ' +
+        '<b>"erklaer mir das"</b>, <b>"warum fragst du das"</b> oder eine eigene Frage — ' +
+        'danach machen wir weiter, wo wir waren.</div>');
+    } else if (art === 'erf_profi') {
+      _rfBlase('co', 'Verstanden — kurz und knapp. ' +
+        '<b>"weiss ich nicht"</b> ueberspringt, <b>"fertig"</b> bringt dich zur Uebersicht, ' +
+        'und <b>"erklaer mir das"</b> gibt es trotzdem, wenn du es brauchst.');
+    } else {
+      _rfBlase('co', 'Gut. Ich halte es kurz und erklaere, wenn du fragst — ' +
+        'sag einfach <b>"erklaer mir das"</b>. <b>"weiss ich nicht"</b> ueberspringt.');
+    }
+
+    var w = _rfEinstiegWeiter; _rfEinstiegWeiter = null;
+    if (w) setTimeout(w, 300);
   }
 
   /* ── Aufnahme + Live-Vorschau ─────────────────────────────────────── */
@@ -5503,6 +5625,7 @@
 
   var AKT_ICON = {
     brw: '📍', lage: '🌍', markt: '📊', markt2: '📈',
+    erklaer: '💡', erf_neu: '🌱', erf_mittel: '○', erf_profi: '⚡',   /* v1115 */
     tiefe: '＋', tabelle: '✓', adresse: '📮',
     knf_neu: '⇄', knf_alt: '✓',  /* v1376 (C7) */
     nachfass: '↻'                 /* v1377 (C5) */
@@ -5613,6 +5736,12 @@
     if (knopf) { knopf.disabled = true; knopf.classList.add('laeuft'); }
     var a = (_rf.aktionen || []).filter(function (x) { return x.art === art; })[0] || {};
     _rfAktionWeg(art);
+    /* v1115-WEIN: die Erfahrungsfrage aus dem Einstieg. */
+    if (art === 'erf_neu' || art === 'erf_mittel' || art === 'erf_profi') {
+      _rfErfahrungGewaehlt(art); return;
+    }
+    /* v1115-WERK: die Erklaerung auf Abruf. */
+    if (art === 'erklaer') { _rfErklaerZeigen(); return; }
     if (art === 'adresse') {
       _rf.adresseFrage = 0;
       _rfBlase('ich', 'Ja, stimmt.');
@@ -7283,6 +7412,17 @@
           'sag einfach <b>ja</b>, oder nenn mir deine Zahl.</span></div>';
       })() +
       (function(){ try { _rfVertiefungHier(e); } catch(x){} return ''; })() +
+      /* v1115-WERK: der Weg zur Erklaerung steht AN der Frage, nicht nur
+         im Ton. Im Lernmodus steht sie ohnehin schon darunter - dort
+         waere der Knopf eine Dopplung. */
+      (function () {
+        if (_rfModus() === 'lernen') return '';
+        if (!_rfWozu(e)) return '';
+        try { _rfAktion('erklaer',
+          'Was die Angabe bedeutet und wozu DealPilot sie braucht.',
+          'Erklaer mir das'); } catch (x) {}
+        return '';
+      })() +
       _rfAbrufAngebot(e) +
       '<div class="vi-rf-zaehler">Frage ' + (_rf.i + 1) + ' von ' + _rf.offen.length +
         (e.et ? ' · Etappe ' + e.et + ' · ' + escH(_etName(e.et)) : '') + '</div>'));
@@ -9138,7 +9278,11 @@
         try { _rfMarktAnbieten(); } catch (ex) { try { console.warn('[voice] Marktangebot', ex); } catch (e2) {} }
         _rfBandZeichnen();   /* v1291b: kein Anhalten mehr — das Angebot steht in der Leiste */
       }
-      _rfFrage();
+      /* v1115-WEIN: Der Co-Pilot stellt sich vor und fragt EINMAL nach der
+         Erfahrung - erst danach beginnt der Fragenlauf. Wer schon gewaehlt
+         hat, merkt davon nichts. */
+      if (alle && !_rfErfahrung()) _rfEinstieg(_rfFrage);
+      else _rfFrage();
     });
   }
 
