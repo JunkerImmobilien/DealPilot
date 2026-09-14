@@ -285,3 +285,70 @@ export function quellenSatz(q, kennzahl = 'Wert') {
     warum_kein_wert: q.warum_kein_wert || null,
   };
 }
+
+/* ── Bayern: wo der Ausschuss amtlich KEINE Sachwertfaktoren fuehrt ──────
+ *
+ * v1144 · Der Obere Gutachterausschuss fuer Grundstueckswerte im Freistaat
+ * Bayern druckt im Immobilienmarktbericht 2026 (Kap. 11, S. 198 f.) eine
+ * Uebersicht aller gemeldeten Ausschuesse ab: welche wertermittlungs-
+ * relevanten Daten in den Jahren 2023 bis 2025 abgeleitet wurden und ob ein
+ * Grundstuecksmarktbericht vorliegt.
+ *
+ * Fuer die hier gelisteten 35 Zustaendigkeitsbereiche steht in der Spalte
+ * "Sachwertfaktoren" NICHTS. Das ist eine amtliche Aussage und keine Luecke
+ * unserer Ernte - der Kunde soll sie erfahren, statt eine leere Antwort zu
+ * bekommen.
+ *
+ * Darunter sind Muenchen LK, Starnberg, Ebersberg, Freising, Erding und
+ * Miesbach: der gesamte Speckguertel um Muenchen mit den hoechsten
+ * Bodenwerten Deutschlands. Wer dort im Sachwertverfahren bewertet, findet
+ * beim oertlich zustaendigen Ausschuss keinen Marktanpassungsfaktor.
+ *
+ * Die Kreisschluessel stammen aus dem Gemeindeverzeichnis des Statistischen
+ * Bundesamtes (Gebietsstand 30.09.2026), nicht aus dem Gedaechtnis.
+ * Die vollstaendige Auswertung steht in claude/erntekarte-bayern.md. */
+const BY_OHNE_SACHWERTFAKTOR = {
+  '09161': 'Ingolstadt',            '09175': 'Ebersberg',
+  '09177': 'Erding',                '09178': 'Freising',
+  '09181': 'Landsberg am Lech',     '09182': 'Miesbach',
+  '09184': 'München',               '09187': 'Rosenheim',
+  '09188': 'Starnberg',             '09262': 'Passau',
+  '09273': 'Kelheim',               '09274': 'Landshut',
+  '09277': 'Rottal-Inn',            '09279': 'Dingolfing-Landau',
+  '09373': 'Neumarkt i. d. Oberpfalz', '09461': 'Bamberg',
+  '09472': 'Bayreuth',              '09473': 'Coburg',
+  '09475': 'Hof',                   '09478': 'Lichtenfels',
+  '09479': 'Wunsiedel i. Fichtelgebirge', '09561': 'Ansbach',
+  '09565': 'Schwabach',             '09661': 'Aschaffenburg',
+  '09662': 'Schweinfurt',           '09671': 'Aschaffenburg',
+  '09672': 'Bad Kissingen',         '09674': 'Haßberge',
+  '09675': 'Kitzingen',             '09676': 'Miltenberg',
+  '09677': 'Main-Spessart',         '09678': 'Schweinfurt',
+  '09762': 'Kaufbeuren',            '09764': 'Memmingen',
+  '09780': 'Oberallgäu',
+};
+
+for (const [ags, name] of Object.entries(BY_OHNE_SACHWERTFAKTOR)) {
+  /* Dritte Stelle 6 kennzeichnet in Bayern die kreisfreien Staedte. */
+  const kreisfrei = ags[3] === '6';
+  AUSSCHUSS_QUELLEN[ags] = {
+    stelle: kreisfrei
+      ? `Gutachterausschuss für Grundstückswerte im Bereich der Stadt ${name}`
+      : `Gutachterausschuss für Grundstückswerte im Bereich des Landkreises ${name}`,
+    url: 'https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/',
+    zugang: 'kostenfrei',
+    warum_kein_wert:
+      'Der zuständige Gutachterausschuss hat für die Jahre 2023 bis 2025 keine '
+      + 'Sachwertfaktoren abgeleitet. Das steht so in der Übersicht des Oberen '
+      + 'Gutachterausschusses für Grundstückswerte im Freistaat Bayern '
+      + '(Immobilienmarktbericht 2026, Kapitel 11, Stand 2025). Ein amtlicher '
+      + 'Marktanpassungsfaktor für das Sachwertverfahren liegt hier also nicht vor.',
+    hinweis:
+      'Die Übersicht sagt nur, OB Daten vorliegen — nicht für welche Objektart '
+      + 'oder welchen Stichtag; sie führt außerdem nur, was dem Oberen '
+      + 'Gutachterausschuss gemeldet wurde. Eine Nachfrage beim örtlich '
+      + 'zuständigen Ausschuss kann sich deshalb lohnen. Bayern hat kein '
+      + 'zentrales Downloadportal für Marktberichte; der Einstieg über die '
+      + 'Landesseite führt zu den einzelnen Geschäftsstellen.',
+  };
+}
