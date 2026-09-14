@@ -1709,25 +1709,63 @@ renderTaxTimeline = function() {
 // ═══════════════════════════════════════════════════
 // Grenzsteuersatz automatisch aus zvE (Punkt 2)
 // ═══════════════════════════════════════════════════
-function onGrenzAutoToggle() {
+/* ═══ v1383-GRENZAUTO · EINE AUTOMATIK, DIE ANGEHAKT WAR UND NICHT LIEF ══
+ *
+ * Marcels Frage: „Grauen wir den aus?"
+ *
+ * GEMESSEN: Die Checkbox steht in index.html:1940 auf `checked` — sie ist
+ * also ab Werk an. Gerufen wurde `onGrenzAutoToggle()` aber NUR an zwei
+ * Stellen: beim Klick auf die Checkbox selbst und beim Tippen ins
+ * zvE-Feld. Beim LADEN eines Objekts feuert weder das eine noch das
+ * andere (kein dispatchEvent in storage.js oder main.js).
+ *
+ * Folge: Wer ein Objekt oeffnet, sieht eine angehakte Automatik und ein
+ * FREI EDITIERBARES Feld mit dem gespeicherten alten Wert. Beides
+ * zusammen ist eine Luege — der Haken sagt „wird berechnet", und
+ * berechnet wird nichts.
+ *
+ * Die Nachfuehrung steht deshalb jetzt in einer eigenen Funktion, die
+ * auch STILL laufen kann: `calc()` ruft sie bei jedem Lauf, und ein
+ * Toast bei jedem Rechenlauf waere unbrauchbar. */
+function _grenzAutoNachziehen(mitToast) {
   var auto = document.getElementById('grenz_auto');
   var grenzInput = document.getElementById('grenz');
-  if (!auto || !grenzInput) return;
+  if (!auto || !grenzInput) return false;
   if (auto.checked) {
     var zve = parseDe((document.getElementById('zve') || {}).value) || 0;
     if (zve > 0) {
       var gss = Tax.calcGrenzsteuersatz(zve) * 100;
-      grenzInput.value = gss.toFixed(2);
+      var neu = gss.toFixed(2);
+      var geaendert = (String(grenzInput.value).replace(',', '.') !== neu);
+      grenzInput.value = neu;
       grenzInput.disabled = true;
       grenzInput.style.background = 'rgba(201,168,76,0.12)';
-      if (typeof toast === 'function') toast('✓ Grenzsteuersatz aus zvE berechnet: ' + gss.toFixed(2) + ' %');
+      grenzInput.title = 'Wird aus deinem zu versteuernden Einkommen berechnet '
+        + '(§ 32a EStG). Zum Ändern den Haken darunter entfernen.';
+      if (mitToast && typeof toast === 'function') {
+        toast('✓ Grenzsteuersatz aus zvE berechnet: ' + neu + ' %');
+      }
+      return geaendert;
     }
-  } else {
+    /* Haken an, aber kein zvE: dann kann nichts berechnet werden. Das
+       Feld bleibt frei — sonst waere es gesperrt UND leer. */
     grenzInput.disabled = false;
     grenzInput.style.background = '';
+    grenzInput.title = 'Kein zu versteuerndes Einkommen erfasst — der Satz '
+      + 'lässt sich nicht berechnen. Trage ihn selbst ein oder ergänze das zvE.';
+    return false;
   }
+  grenzInput.disabled = false;
+  grenzInput.style.background = '';
+  grenzInput.title = '';
+  return false;
+}
+
+function onGrenzAutoToggle() {
+  _grenzAutoNachziehen(true);
   if (typeof calcNow === 'function') calcNow();
 }
+window._grenzAutoNachziehen = _grenzAutoNachziehen;
 
 // Hook zvE input to update Grenz when auto is on
 document.addEventListener('DOMContentLoaded', function() {

@@ -1520,7 +1520,15 @@ async function _exportPDFInner() {
     ['Anschlusszinssatz (Annahme)',   pP(v('anschl_z'), 1)],
     ['Anschluss-Tilgung (Annahme)',   pP(v('anschl_t'), 1)],
     ['Restschuld am Ende Zinsbindung',pE(State.rs)],
-    ['Pers\u00f6nlicher Grenzsteuersatz', pP(v('grenz'), 2)]
+    /* v1383: Seit v1379 rechnet die App die Steuerwirkung als Differenz
+       zweier Tarifberechnungen nach \u00a7 32a EStG, nicht mehr mit diesem
+       Satz. Ihn im PDF weiter unkommentiert als Annahme zu fuehren, hiesse
+       eine Rechengrundlage auszuweisen, die gar nicht mehr greift \u2014 und
+       ein PDF ist das, was beim Kunden und beim Finanzamt landet. */
+    ['Pers\u00f6nlicher Grenzsteuersatz',
+     pP(v('grenz'), 2) + (v('zve') > 0
+       ? ' \u2014 Vergleichsgr\u00f6\u00dfe; gerechnet wird nach \u00a7 32a EStG'
+       : '')]
   ];
 
   // V63.66: Wert-Anker für Wertsteigerung (svw > bankval > kp) explizit ausweisen
@@ -3280,7 +3288,11 @@ async function _exportPDFInner() {
     ['Grunderwerbsteuer NRW',           '6,50 %',              'Gesetz',   'GrEStG \u00a7 11 NRW'],
     ['AfA-Satz Geb\u00e4ude',          '2,00 % p.a.',         'Gesetz',   '\u00a7 7 EStG (ab Baujahr 1925)'],
     ['Geb\u00e4udeanteil am KP',       pP(v('geb_ant'), 0),   'Sch\u00e4tzwert', 'steuerliche Grundlage \u00a7 7 EStG'],
-    ['Pers\u00f6nl. Grenzsteuersatz',   pP(v('grenz'), 2),    'Eingabe',  'Aus Steuer-Modul']
+    /* v1383: Herkunft und Fundstelle sagen jetzt, was wirklich rechnet. */
+    ['Pers\u00f6nl. Grenzsteuersatz',   pP(v('grenz'), 2),
+     v('zve') > 0 ? 'Vergleich' : 'Eingabe',
+     v('zve') > 0 ? 'Steuerwirkung nach \u00a7 32a EStG aus dem zvE'
+                  : 'Aus Steuer-Modul']
   ];
   if (g('d1_type') === 'tilgungsaussetzung') {
     _baseAnnahmen.push(['Darlehenstyp D1',     'Tilgungsaussetzung',  'Vertrag', 'Hauptdarlehen ohne laufende Tilgung']);

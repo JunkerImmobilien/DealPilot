@@ -704,11 +704,37 @@ function _progHinweisZeichnen(zveImmo, steuer, grenzSatz, effSatz, zveBasis) {
           + 'Dabei läufst du die Progression hinauf: die letzten Euro werden höher besteuert als die ersten. '
           + 'Der Durchschnitt über den ganzen Gewinn sind die ' + _pz(effSatz) + '.')
     + '</p>'
-    + '<p class="hint" style="margin-top:8px;margin-bottom:0">'
+    + '<p class="hint" style="margin-top:8px">'
     + 'Gerechnet wird die Steuer deshalb nicht mit einem festen Satz, sondern als Differenz zweier '
     + 'Tarifberechnungen nach <b>§ 32a EStG</b>: einmal mit und einmal ohne das Ergebnis dieses Objekts. '
     + 'Ab rund 90.000 € zu versteuerndem Einkommen liegst du in der Proportionalzone — dort sind beide '
     + 'Zahlen gleich und dieser Hinweis erscheint nicht.'
+    + '</p>'
+    /* ═══ v1383 · ZWEI DINGE, DIE MARCEL AUSDRUECKLICH GEFRAGT HAT ═══════
+       "Rechnet er das automatisch runter, wenn neue Objekte dazukommen?"
+       und "was ist, wenn wir den aendern?" — beides stand bisher NICHT im
+       Hinweis, und beides muss dort stehen. Gemessen am Tarif 2026:
+       bei 80.000 EUR zvE und zwei Verlustobjekten (-25T/-20T) weist die
+       Summe 18.348 EUR aus, richtig waeren 16.794 EUR — 9,25 % zu viel.
+       Bei drei Objekten sind es 11,8 %. Ab rund 120.000 EUR zvE faellt
+       der Unterschied unter ein Prozent, ab 150.000 auf null. */
+    + '<p class="hint" style="margin-top:10px;padding-top:8px;'
+    + 'border-top:1px dashed color-mix(in srgb, currentColor 22%, transparent)">'
+    + '<b>Jedes Objekt wird für sich gerechnet.</b> Diese Zahl vergleicht dein zu '
+    + 'versteuerndes Einkommen mit und ohne <i>dieses</i> Objekt — sie weiß nichts von '
+    + 'deinen anderen. Hast du mehrere Objekte mit steuerlichem Verlust, ist die Summe '
+    + 'ihrer Ersparnisse <b>höher als die tatsächliche Gesamtersparnis</b>: das zweite '
+    + 'Objekt würde in Wahrheit auf ein bereits gesenktes Einkommen treffen und dort '
+    + 'weniger sparen. Bei zwei Objekten sind das je nach Einkommen rund 10 Prozent, '
+    + 'bei dreien etwa 12. In der Proportionalzone (ab rund 90.000 € nach allen '
+    + 'Verlusten) entfällt der Effekt.'
+    + '</p>'
+    + '<p class="hint" style="margin-top:8px;margin-bottom:0">'
+    + '<b>Und was ändert sich, wenn du den Satz oben selbst setzt?</b> Für dieses Objekt '
+    + 'nichts: solange ein zu versteuerndes Einkommen erfasst ist, rechnet DealPilot über '
+    + 'den Tarif, nicht über den eingetragenen Satz. Der Satz bleibt als Vergleichsgröße '
+    + 'stehen und erscheint so auch im PDF. Willst du bewusst mit einem festen Satz rechnen, '
+    + 'lösche das zu versteuernde Einkommen — dann greift wieder die einfache Multiplikation.'
     + '</p>'
     + '</details>';
 }
@@ -1507,6 +1533,11 @@ function _calcImmediate(){
     if (_d2zd0) _d2zd0.textContent = '\u2014';
     st('d2_zaer_m', '\u2014');
   }
+  /* v1383-GRENZAUTO: Die Automatik VOR dem Lesen nachziehen, sonst rechnet
+     dieser Lauf noch mit dem alten gespeicherten Satz. Still — ein Toast
+     bei jedem Rechenlauf waere unbrauchbar. tax.js laedt NACH calc.js,
+     deshalb der Funktionstest statt eines direkten Aufrufs. */
+  try { if (typeof window._grenzAutoNachziehen === 'function') window._grenzAutoNachziehen(false); } catch (_e) {}
   var grenz=v('grenz')/100;
 
   /* ═══ v1379-PROG · DIE STEUERWIRKUNG FOLGT DER PROGRESSION ═══════════════
