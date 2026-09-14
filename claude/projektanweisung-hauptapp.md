@@ -16354,3 +16354,110 @@ Wozu-Satz erscheint mit Gold-Rand unter der Frage.
 > die Blase ohne den Wozu-Satz neu. Eine Einstellung, deren Wirkung man an
 > der Stelle nicht sieht, an der man sie erwartet, gilt als kaputt, auch wenn
 > sie greift.
+
+---
+
+## v1365 / v1365b — Die Steuerwirkung folgt der Progression
+
+**Marcels Frage:** „wir geben das hier textuell an im tab Steuern. Wäre es für
+uns möglich die progression passend zu berechnen und den Steuersatz
+anzupassen?" — und nach dem Befund die Freigabe: „ja bitte setz das genau so
+um das es fachlich richtig ist. wenn der satz angepasst ist sollte man ein
+hinweis setzen und das erklären."
+
+### Was falsch war
+
+`calc.js` rechnete die Steuer eines Objekts als **`base * grenz`** — ein
+linearer Satz auf das steuerliche Ergebnis. Das stimmt nur, solange das
+Ergebnis den Steuerpflichtigen nicht aus seiner Tarifzone trägt. Bei einem
+Verlust läuft man die Progression aber **hinab**.
+
+Gemessen am Tarif 2026 (§ 32a EStG):
+
+| zvE | Verlust | ausgewiesen | tatsächlich | Abweichung |
+|---|---|---|---|---|
+| 45.000 | 30.000 | 10.080 € | 8.400 € | **−1.680 €** (−17 %) |
+| 60.000 | 20.000 | 7.740 € | 7.024 € | **−716 €** (−9 %) |
+| 75.000 | 30.000 | 12.600 € | 11.529 € | **−1.071 €** (−9 %) |
+| 90.000 | 20.000 | 8.400 € | 8.400 € | 0 € |
+
+> **Der Fehler ging immer in dieselbe Richtung.** Die Ersparnis wurde zu hoch
+> ausgewiesen, der Deal also zu gut gerechnet — und er traf genau die
+> mittleren Einkommen. Ab rund 90.000 € zvE bleibt man in der
+> Proportionalzone, dort stimmte die lineare Rechnung.
+
+### Das Werkzeug lag fertig da und war nicht verdrahtet
+
+`tax.js` enthält seit Langem `calcImmoTaxImpact()` — mit `taxBefore`,
+`taxAfter`, `taxDelta`, Grenz- und Durchschnittssatz vor und nach der
+Immobilie. Dazu `calculateForObject()`. **Beide wurden nirgends aufgerufen.**
+Ein `grep` über das ganze Frontend findet keinen einzigen Nutzer.
+
+Der Tarif selbst ist gepflegt: Jahrgang 2026, Quelle im Kommentar, Rückfall
+auf den nächstälteren Jahrgang über `tarifFuer()`, Stetigkeitsprüfung an den
+Zonengrenzen. Er war nie das Problem.
+
+### Was jetzt gilt
+
+Die Steuerwirkung ist die **Differenz zweier Tarifberechnungen**:
+
+```
+Steuerwirkung = ESt(zvE + Ergebnis) − ESt(zvE)
+```
+
+Gerechnet wird mit `Tax.calcEStG()` — die Progression wird **nicht**
+nachgebaut, das wäre ein zweiter Rechenkern. Der globale Name ist übrigens
+`Tax`, nicht `DealPilotTax`; das war eine Annahme, die das Nachsehen
+widerlegt hat.
+
+**Zwei Rückfälle erhalten das alte Verhalten:**
+
+- **kein zvE eingegeben** — ohne Basis ist keine Progression rechenbar
+- **`tax.js` nicht geladen** — `index.html` lädt es **nach** `calc.js`
+
+In beiden Fällen gilt weiter `base * grenz`, und `_progAktiv` bleibt `false`.
+Genau dieses Merkmal liest der Hinweis.
+
+### Der Hinweis
+
+Ein neuer Block `#prog-hinweis` im Tab Steuern, gefüllt von
+`_progHinweisZeichnen()`. Er erscheint **nur**, wenn die Progression wirklich
+gerechnet wurde und der effektive Satz um mindestens einen halben
+Prozentpunkt abweicht. Er nennt beide Zahlen, den Euro-Unterschied und
+erklärt aufklappbar, warum der letzte Euro Verlust weniger wirkt als der
+erste.
+
+Effektive Sätze bei 42 % Grenzsteuersatz:
+
+```
+zvE  45.000, Verlust 30.000  ->  28,0 %   Hinweis erscheint
+zvE  60.000, Verlust 20.000  ->  35,1 %   Hinweis erscheint
+zvE  75.000, Verlust 30.000  ->  38,4 %   Hinweis erscheint
+zvE 120.000, Verlust 20.000  ->  42,0 %   Hinweis bleibt aus
+```
+
+### Zwei Texte, die nicht mehr stimmten
+
+Der Block „Was mit diesen Werten passiert" sagte, der Grenzsteuersatz wirke
+auf das Ergebnis — jetzt steht dort die Tarifdifferenz. Und der Absatz über
+mehrere Objekte sagte, jedes rechne „mit demselben Grenzsteuersatz"; richtig
+ist: jedes rechnet die Progression **von derselben Basis aus**, ohne die
+anderen Objekte zu kennen. Diese Einschränkung bleibt bestehen und ist dort
+weiterhin benannt.
+
+### Nachweis
+
+- **Rechenlogik isoliert:** fünf von fünf — Vorzeichen bei Verlust und
+  Gewinn, Proportionalzone, Rückfall ohne zvE
+- **Hinweisfunktion im Browser:** vier Fälle — Verlust, Gewinn,
+  Proportionalzone (bleibt aus), ohne zvE (bleibt aus)
+- **Kette in der laufenden App:** Felder gefüllt, `calc()` gelaufen, der
+  Hinweis erschien mit den Werten aus der echten Rechnung (39,4 % statt 42 %)
+
+> **Was das für Bestandsobjekte heißt:** jede angezeigte Steuerzahl ändert
+> sich — Cashflow nach Steuern, Rendite, Deal-Score, PDF —, und zwar nach
+> unten bei allen Kunden unter rund 90.000 € zvE. Das ist die fachlich
+> richtige Zahl, aber es ist kein stiller Bugfix: wer gestern gerechnet hat,
+> sieht heute andere Werte. Der Hinweis ist auch dafür da.
+
+`v1365` · `v1365b`
