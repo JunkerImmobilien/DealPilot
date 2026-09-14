@@ -1,0 +1,80 @@
+{
+  "land_code": "HE",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_kennz": "06AFBFD-VB",
+  "ags": ["06535"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "Kaufverträge 2023 bis 2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-08",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_datei": "2026_IMB_AfB_Fulda.pdf, Immobilienmarktbericht 2026, Kapitel 10.6.2.4, Tabelle 10-15, Seite 121",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.4 Regionale Auswertung Vogelsbergkreis 2023-2025 MB 2, Tabelle 10-15, Seite 121.",
+
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 80,
+    "alterswertminderung": "linear",
+    "regionalfaktor": 1.0,
+    "bezugsmassstab": "BGF",
+    "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser im Vogelsbergkreis",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x": [25, 50, 75, 100, 125],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenrichtwert in Euro/m²",
+        "achse_y": [100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000, 550000],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "100000": [1.20, null, null, null, null],
+          "150000": [1.00, 1.10, 1.21, null, null],
+          "200000": [0.89, 0.98, 1.06, 1.14, null],
+          "250000": [0.83, 0.90, 0.96, 1.03, 1.09],
+          "300000": [0.79, 0.85, 0.90, 0.95, 1.01],
+          "350000": [0.76, 0.81, 0.86, 0.90, 0.95],
+          "400000": [0.74, 0.78, 0.82, 0.86, 0.90],
+          "450000": [0.72, 0.76, 0.80, 0.83, 0.87],
+          "500000": [0.71, 0.74, 0.78, 0.81, 0.84],
+          "550000": [0.70, 0.73, 0.76, 0.79, null]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Zweiachsige Matrix mit STÜTZSTELLEN für den Bodenrichtwert (25, 50, 75, 100, 125 Euro/qm), zwischen denen interpoliert wird. 148 Kauffälle der Jahre 2023 bis 2025, multipler Korrelationskoeffizient 0,77. Der Vogelsbergkreis liegt vollständig im Marktbereich 2 — der Bericht führt für ihn genau eine Tabelle.",
+        "normobjekt": "Mittlerer vorläufiger Sachwert 299.711 Euro, mittlere Grundstücksgröße 818 qm, mittlerer Bodenrichtwert 55 Euro/qm, mittlere Restnutzungsdauer 39 Jahre, mittlere Standardstufe 2,6, mittlere BGF 341 qm, mittlere Wohnfläche 156 qm, mittlerer Wert der Außenanlagen 10.546 Euro. Der Faktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Vogelsbergkreis, vollständig im Marktbereich 2 (Übersichtskarte Abb. 1-1 des Berichts, Seite 10)",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+        "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+        "kauffaelle": 148,
+        "korrelationskoeffizient": 0.77
+      },
+      "beleg": "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.4, Tabelle 10-15, Seite 121.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Matrix mit 148 Kauffaellen und multiplem Korrelationskoeffizienten 0,77. KEINE Stufe A, weil die Randzellen der Matrix duenn besetzt sind und der Bericht die Fallzahl nicht je Zelle ausweist.",
+      "fallzahl": 148
+    }
+  ],
+
+  "anmerkungen": [
+    "Für Reihenendhäuser und Doppelhaushälften druckt der Bericht in Kapitel 10.6.2.5 NUR die Merkmale der Datengrundlage und zwei Grafiken ab, KEINE Faktortabelle. Im Vogelsbergkreis liegen dafür elf Kauffälle mit einem Bestimmtheitsmaß von 0,13 vor. Ein Zweig rhdhh ist deshalb nicht hinterlegt — es gibt keine ablesbaren Werte, und aus elf Fällen mit R² 0,13 einen Faktor zu bilden wäre eine Erfindung.",
+    "Der Landkreis Fulda desselben Ausschusses ist in ZWEI Marktbereiche geteilt (MB 2 und MB 3) mit getrennten Tabellen. Die Zuordnung der Gemeinden steht nur als farbige Übersichtskarte im Bericht; sie ist deshalb hier noch nicht erfasst. Der Vogelsbergkreis war erntbar, weil er als Ganzes in Marktbereich 2 liegt.",
+    "Die Marktbereiche sind eine hessenweite Systematik (Bereich 1 bis 6); im Amtsbezirk Fulda kommen nur 2 und 3 vor."
+  ]
+}
