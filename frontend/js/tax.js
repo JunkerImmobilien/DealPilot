@@ -603,9 +603,28 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
         var escHtml = function(s) {
           return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         };
-        /* Fall 1: keine anderen Bestandsobjekte */
-        if (!_bestandInfo || !_bestandInfo.list || _bestandInfo.list.length === 0) {
-          return '<div class="tax-item"><div class="tax-label">Überschuss/Verlust V+V (aktueller Bestand) <span class="tax-info" title="Keine anderen Bestandsobjekte mit Kaufdatum vor diesem Objekt">ⓘ</span></div><div class="tax-val" style="color:var(--muted)">—</div></div>';
+        /* ═══ v1399 · "KEINE" UND "NOCH NICHT GELADEN" SIND ZWEIERLEI ══════
+           Hier stand EINE Antwort fuer zwei voellig verschiedene Zustaende:
+           die Liste ist leer, WEIL es keine frueheren Objekte gibt — oder
+           weil der Aggregator nichts geliefert hat (kein Token, Backend
+           stumm, Netz weg). Der Text behauptete in beiden Faellen "Keine
+           anderen Bestandsobjekte".
+
+           Das ist die gefaehrliche Richtung: faellt der Abruf aus, rechnet
+           das Objekt ohne Saldierung — also mit einer ZU HOHEN Ersparnis —
+           und die Oberflaeche bestaetigt dem Nutzer, dass das richtig sei.
+           `_bestandInfo.loaded` unterscheidet die beiden Faelle und lag
+           ungenutzt daneben. */
+        if (!_bestandInfo || !_bestandInfo.loaded) {
+          return '<div class="tax-item"><div class="tax-label">Überschuss/Verlust V+V (aktueller Bestand) '
+               + '<span class="tax-info" title="Die Daten deiner übrigen Objekte werden gerade geladen. '
+               + 'Solange rechnet dieses Objekt für sich allein — die ausgewiesene Ersparnis kann dadurch zu hoch sein. '
+               + 'Bleibt die Anzeige stehen, lade die Seite neu.">ⓘ</span></div>'
+               + '<div class="tax-val" style="color:var(--muted)">wird geladen …</div></div>';
+        }
+        /* Fall 1: geladen, und es gibt wirklich keine frueheren Objekte */
+        if (!_bestandInfo.list || _bestandInfo.list.length === 0) {
+          return '<div class="tax-item"><div class="tax-label">Überschuss/Verlust V+V (aktueller Bestand) <span class="tax-info" title="Geprüft: es gibt kein weiteres gespeichertes Objekt mit einem Kaufdatum vor diesem. Dieses Objekt rechnet deshalb auf deinem vollen zvE.">ⓘ</span></div><div class="tax-val" style="color:var(--muted)">—</div></div>';
         }
         var sumColor = _bestandInfo.sum < 0 ? 'c-red' : (_bestandInfo.sum > 0 ? 'c-green' : '');
         var count = _bestandInfo.list.length;
