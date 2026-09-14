@@ -84,6 +84,67 @@
       "fallzahl": 210,
       "streuung": null,
       "beleg": "Grundstücksmarktbericht 2025 Landkreis Prignitz, Kap. 8.2.2, S. 56 f.: Abbildung 31 mit 15 Stützstellen von 50.000 bis 400.000 € vorläufigem Sachwert (1,69 bis 0,60) aus 210 ausreißerbereinigten Kauffällen der Jahre 2024 und 2025, Tabelle 49 mit 13 Anpassungsfaktoren für die Standardstufe, Tabelle 50 mit dem Anwendungsbeispiel."
+    },
+
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser und Doppelhaushälften",
+      "form": "stufen_1d",
+      "formel": {
+        "form": "stufen_1d",
+        "achse_feld": "sachwert",
+        "achse_bez": "vorläufiger Sachwert in Euro",
+        "stufen": {
+          "50000": 1.25, "75000": 1.14, "100000": 1.05, "125000": 0.97,
+          "150000": 0.89, "175000": 0.83, "200000": 0.77, "225000": 0.71,
+          "250000": 0.65, "275000": 0.60
+        },
+        "rundung_stellen": 4,
+        "liefert": "faktor",
+        "hinweis": "NORMOBJEKT IST STANDARDSTUFE 2,4 — nicht 2,5 wie beim freistehenden Haus. Abweichungen werden über die Anpassungsfaktoren der Tabelle 62 berücksichtigt (0,67 bei Stufe 1,4 bis 1,17 bei Stufe 3,2). Der Bericht hat auch hier mit multipler Regression geprüft, ob Restnutzungsdauer, Bodenrichtwertniveau oder Baujahr wirken: alle wurden ausgeschlossen. Es bleiben vorläufiger Sachwert und Standardstufe.",
+        "normobjekt": "Reihenhaus oder Doppelhaushälfte mit Standardstufe 2,4, gebraucht."
+      },
+      "korrekturen": [
+        {
+          "bez": "Abweichende Standardstufe",
+          "feld": "standardstufe",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "1.4": 0.67, "1.6": 0.75, "1.8": 0.83, "2.0": 0.89, "2.2": 0.95,
+            "2.4": 1.00, "2.6": 1.05, "2.8": 1.09, "3.0": 1.13, "3.2": 1.17
+          },
+          "rundung_stellen": 2,
+          "hinweis": "Tabelle 62. Normstelle 2,4. Das Anwendungsbeispiel des Berichts rechnet 150.000 × 0,89 × 0,95 = 126.825 € für ein Reihenhaus der Standardstufe 2,2."
+        }
+      ],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV in Verbindung mit der Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
+        "berechnungsmodell": "Sachwertfaktor = geeigneter Kaufpreis / vorläufiger Sachwert",
+        "ermittlung": "multiple Regressionsanalyse; Restnutzungsdauer, Bodenrichtwertniveau und Baujahr wurden geprüft und ausgeschlossen",
+        "bestimmtheitsmass": 0.23,
+        "kauffaelle_bereinigt": 134
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Prignitz",
+        "sachlich": "gebrauchte Reihenhäuser und Doppelhaushälften",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwert_eur":  { "min": 50000, "max": 275000 },
+          "brw_eur_qm":    { "min": 5, "max": 80 },
+          "standardstufe": { "min": 1.4, "max": 3.2 }
+        },
+        "vorbehalt": "AUSSERHALB DES DEFINITIONSBEREICHS SAGT DER BERICHT ES SELBST: außerhalb der Abbildung 33 verfügt der Gutachterausschuss über kein ausreichendes Datenmaterial und empfiehlt den Abgleich mit tatsächlich gezahlten Kaufpreisen. Unter 50.000 und über 275.000 Euro gibt es hier deshalb keinen Wert.\n\nDIE KURVE IST STEIL: von 1,25 auf 0,60 über eine Spanne von nur 225.000 Euro — das ist ein Rückgang um mehr als die Hälfte. Das Bestimmtheitsmaß liegt bei 0,23.\n\nDAS NORMOBJEKT IST STANDARDSTUFE 2,4, beim freistehenden Haus 2,5. Wer die Anpassungstabellen verwechselt, rechnet systematisch daneben.",
+        "hinweis": "Der Bericht führt zusätzlich Gebäudefaktoren für diesen Teilmarkt (§ 20 ImmoWertV) — hier noch nicht erfasst."
+      },
+
+      "stufe": "A",
+      "stufe_grund": "Amtliche Tabelle MIT ANWENDUNGSBEISPIEL: 150.000 € × 0,89 × 0,95 = 126.825 € für ein Reihenhaus der Standardstufe 2,2. Beide Schritte sind im Register nachgerechnet und zeichengleich.",
+      "fallzahl": 134,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 Landkreis Prignitz, Kap. 8.3.2, S. 60 ff.: Abbildung 33 mit zehn Stützstellen von 50.000 bis 275.000 € vorläufigem Sachwert (1,25 bis 0,60) aus 134 ausreißerbereinigten Kauffällen, Tabelle 62 mit zehn Anpassungsfaktoren für die Standardstufe, dazu das Anwendungsbeispiel."
     }
   ]
 }

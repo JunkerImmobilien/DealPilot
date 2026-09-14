@@ -60,7 +60,31 @@ function gerundet(m, wert) {
   return Math.round(wert * q) / q;
 }
 
+/* === v1109-WSCHL - EIN SCHLUESSEL, DER NUMERISCH GEMEINT IST =========
+   GEFUNDEN an Prignitz: seine Anpassungstabelle fuer Reihenhaeuser fuehrt
+   die Standardstufen als "1.4", "1.6", "1.8", "2.0", "2.2" ... Der
+   Auswerter sortiert sie ueber Number() und greift danach mit
+   String(2) zu - und "2" ist nicht "2.0". Der abgedruckte Wert lag da
+   und war unerreichbar; heraus kam `korrektur_unplausibel`.
+
+   Beim Einfamilienhaus-Satz desselben Berichts fiel es nicht auf, weil
+   dort "2" steht. Ein Rezept ist aber keine Programmiersprache: wer eine
+   Stufe 2,0 abdruckt, schreibt sie auch so hin.
+
+   Dieser Zugriff sucht ueber den ZAHLENWERT, nicht ueber die
+   Schreibweise. "2", "2.0" und "2.00" sind damit derselbe Schluessel. */
+function beiZahl(tabelle, zahlwert) {
+  if (!tabelle || zahlwert == null) return undefined;
+  const direkt = tabelle[String(zahlwert)];
+  if (direkt !== undefined) return direkt;
+  for (const k of Object.keys(tabelle)) {
+    if (Number(k) === Number(zahlwert)) return tabelle[k];
+  }
+  return undefined;
+}
+
 function nichts(grund, hinweis) {
+
 
   return { verfuegbar: false, wert: null, grund, hinweis, korrekturen: [] };
 }
@@ -221,7 +245,7 @@ function stufen1d(m, e) {
       `Der Bericht fuehrt ${m.achse_bez} von ${stufen[0]} bis `
       + `${stufen[stufen.length - 1]}; extrapoliert wird nicht.`);
   }
-  const wert = zwischen(x, n[0], n[1], m.stufen[String(n[0])], m.stufen[String(n[1])]);
+  const wert = zwischen(x, n[0], n[1], beiZahl(m.stufen, n[0]), beiZahl(m.stufen, n[1]));
   return { verfuegbar: true, wert: gerundet(m, wert),
            tabellenwert: gerundet(m, wert), korrekturen: [] };
 }
@@ -712,11 +736,11 @@ function korrekturAnwenden(k, e) {
     /* Ausserhalb der Reihe gilt der Randwert — der Bericht druckt sie als
        vollstaendig ab, ohne Fortsetzung nach aussen. Dieselbe Regel wie bei
        `stufen`. */
-    const v2 = xk <= st[0] ? reihe[String(st[0])]
-             : xk >= st[st.length - 1] ? reihe[String(st[st.length - 1])]
+    const v2 = xk <= st[0] ? beiZahl(reihe, st[0])
+             : xk >= st[st.length - 1] ? beiZahl(reihe, st[st.length - 1])
              : (() => { const n2 = nachbarn(st, xk);
                         return zwischen(xk, n2[0], n2[1],
-                                        reihe[String(n2[0])], reihe[String(n2[1])]); })();
+                                        beiZahl(reihe, n2[0]), beiZahl(reihe, n2[1])); })();
     if (!istZahl(v2)) return null;
     const st2 = k.rundung_stellen ?? 3;
     const q2 = Math.pow(10, st2);
@@ -798,11 +822,11 @@ function korrekturAnwenden(k, e) {
   if (!stufen.length) return null;
   // Ausserhalb der Korrekturtabelle gilt der Randwert - der Bericht druckt
   // die Reihe als vollstaendig ab, ohne Fortsetzung nach aussen.
-  const v = x <= stufen[0] ? k.stufen[String(stufen[0])]
-          : x >= stufen[stufen.length - 1] ? k.stufen[String(stufen[stufen.length - 1])]
+  const v = x <= stufen[0] ? beiZahl(k.stufen, stufen[0])
+          : x >= stufen[stufen.length - 1] ? beiZahl(k.stufen, stufen[stufen.length - 1])
           : (() => { const n = nachbarn(stufen, x);
                      return zwischen(x, n[0], n[1],
-                                     k.stufen[String(n[0])], k.stufen[String(n[1])]); })();
+                                     beiZahl(k.stufen, n[0]), beiZahl(k.stufen, n[1])); })();
   // Auch die Rundung ist Dokumentverhalten. Herford druckt seine Zu-/Abschlaege
   // ZWEISTELLIG ab und summiert erst danach: 0,899 + (-0,01) + 0,00 = 0,889.
   // Wer erst summiert und dann rundet, kommt auf 0,89 - eine andere Zahl.

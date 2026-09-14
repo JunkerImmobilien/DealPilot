@@ -89,6 +89,140 @@
       "fallzahl": 162,
       "streuung": null,
       "beleg": "Grundstücksmarktbericht 2025 Landkreis Teltow-Fläming, Tabelle 36, S. 55 ff.: Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser aus 162 Vertragsvorgängen des Jahres 2025, gestaffelt nach Standardstufe (2, 3, 4) und Bodenrichtwertniveau, mit Fallzahl und Spanne je Klasse."
+    },
+
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Doppelhaushälften und Reihenendhäuser",
+      "form": "baender_kategorial",
+      "formel": {
+        "form": "baender_kategorial",
+        "achse_feld": "brw",
+        "achse_bez": "Bodenrichtwert in €/m²",
+        "achse_k_feld": "standardstufe",
+        "achse_k_bez": "Standardstufe",
+        "kategorien": ["2", "3", "4"],
+        "kategorie_baender": [
+          { "von": 1.5, "bis": 2.49, "kategorie": "2" },
+          { "von": 2.5, "bis": 3.49, "kategorie": "3" },
+          { "von": 3.5, "bis": 5.0,  "kategorie": "4" }
+        ],
+        "zuordnung_feld": "standardstufe",
+        "baender_je_kategorie": {
+          "2": [
+            { "von": null, "bis": 100,  "wert": 1.78, "bez": "bis 100 €/m²",  "fallzahl": 3,  "min": 1.64, "max": 1.87 },
+            { "von": 101,  "bis": 300,  "wert": 1.46, "bez": "101–300 €/m²",  "fallzahl": 6,  "min": 1.10, "max": 2.02 },
+            { "von": 301,  "bis": null, "wert": 1.30, "bez": "ab 301 €/m²",   "fallzahl": 7,  "min": 1.04, "max": 1.53 }
+          ],
+          "3": [
+            { "von": null, "bis": 100,  "wert": 1.02, "bez": "bis 100 €/m²",  "fallzahl": 4,  "min": 0.88, "max": 1.37 },
+            { "von": 101,  "bis": 200,  "wert": 1.18, "bez": "101–200 €/m²",  "fallzahl": 9,  "min": 0.88, "max": 1.71 },
+            { "von": 201,  "bis": 300,  "wert": 1.27, "bez": "201–300 €/m²",  "fallzahl": 18, "min": 0.96, "max": 1.85 },
+            { "von": 301,  "bis": null, "wert": 1.40, "bez": "ab 301 €/m²",   "fallzahl": 15, "min": 0.93, "max": 1.74 }
+          ],
+          "4": [
+            { "von": 201,  "bis": 400,  "wert": 1.23, "bez": "201–400 €/m²",  "fallzahl": 4,  "min": 1.09, "max": 1.37 }
+          ]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "JE STANDARDSTUFE ANDERE BODENRICHTWERTBÄNDER, wie beim Einfamilienhaus-Satz — und für Standardstufe 4 führt der Bericht NUR das Band 201 bis 400 €/m². Außerhalb davon gibt es für Stufe 4 keinen Wert; eine Grenze zu erfinden, die der Bericht nicht zieht, wäre schlimmer als keine Antwort. BEMERKENSWERT: bei Standardstufe 2 fällt der Faktor mit steigendem Bodenrichtwert (1,78 → 1,30), bei Standardstufe 3 steigt er (1,02 → 1,40). Beides steht so in Tabelle 43.",
+        "normobjekt": "Modellansatz nach VV EW-SW Land Brandenburg, beschrieben im Anhang A1.5 des Berichts. BGF in Anlehnung an DIN 277 (1987), alle Grundrissebenen."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
+        "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert",
+        "bgf": "Brutto-Grundfläche in Anlehnung an DIN 277 (1987), alle Grundrissebenen",
+        "kauffaelle_gesamt": 66
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Teltow-Fläming",
+        "sachlich": "Doppelhaushälften und Reihenendhäuser",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "brw_eur_qm":   { "min": 10, "max": 400, "mittel": 244 },
+          "gsflaeche_qm": { "min": 178, "max": 1469, "mittel": 471, "hinweis": "rentierliche Fläche" },
+          "bgf_qm":       { "min": 110, "max": 305, "mittel": 201 },
+          "rnd_jahre":    { "min": 10, "max": 79, "mittel": 43 },
+          "sachwert_eur": { "min": 91721, "max": 527111, "mittel": 285194 }
+        },
+        "vorbehalt": "DIE FALLZAHLEN JE KLASSE SIND KLEIN: drei bis achtzehn. Bei Standardstufe 2 und Bodenrichtwert bis 100 €/m² steht der Faktor 1,78 auf drei Kauffällen; bei Standardstufe 4 steht 1,23 auf vier. Die Spannen sind entsprechend weit — bis 1,10 bis 2,02 in einer einzigen Klasse. Jede Klasse führt ihre Fallzahl und ihre Spanne mit; beides gehört in jede Anwendung.\n\nDER BERICHT MAHNT AUSDRÜCKLICH ZUR MODELLKONFORMITÄT (§ 10 ImmoWertV) und zur kritischen Prüfung der Ergebnisse durch den Sachverständigen.",
+        "hinweis": "Reihenmittelhäuser führt der Bericht getrennt (Tabelle 42) — sie stehen als eigener Registersatz unter dem Zweig `rmh`."
+      },
+
+      "stufe": "C",
+      "stufe_grund": "Amtliche Tabelle mit Fallzahlen und Spannen je Klasse. Stufe C statt B, weil die Klassen mit drei bis achtzehn Kauffällen deutlich dünner besetzt sind als beim Einfamilienhaus-Satz und für Standardstufe 4 nur ein einziges Bodenrichtwertband vorliegt.",
+      "fallzahl": 66,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 Landkreis Teltow-Fläming, Tabelle 43, S. 65 f.: Sachwertfaktoren für Doppelhaushälften und Reihenendhäuser aus 66 Vertragsvorgängen des Jahres 2025, gestaffelt nach Standardstufe und Bodenrichtwertniveau, mit Fallzahl und Spanne je Klasse."
+    },
+
+    {
+      "zweig": "rmh",
+      "zweig_bez": "Reihenmittelhäuser",
+      "form": "baender_kategorial",
+      "formel": {
+        "form": "baender_kategorial",
+        "achse_feld": "brw",
+        "achse_bez": "Bodenrichtwert in €/m²",
+        "achse_k_feld": "standardstufe",
+        "achse_k_bez": "Standardstufe",
+        "kategorien": ["2", "3", "4"],
+        "kategorie_baender": [
+          { "von": 1.5, "bis": 2.49, "kategorie": "2" },
+          { "von": 2.5, "bis": 3.49, "kategorie": "3" },
+          { "von": 3.5, "bis": 5.0,  "kategorie": "4" }
+        ],
+        "zuordnung_feld": "standardstufe",
+        "baender_je_kategorie": {
+          "2": [
+            { "von": null, "bis": 100,  "wert": 0.91, "bez": "bis 100 €/m²",  "fallzahl": 1, "min": 0.91, "max": 0.91 }
+          ],
+          "3": [
+            { "von": null, "bis": 200,  "wert": 1.17, "bez": "bis 200 €/m²",  "fallzahl": 5, "min": 0.99, "max": 1.42 },
+            { "von": 201,  "bis": 300,  "wert": 1.48, "bez": "201–300 €/m²",  "fallzahl": 7, "min": 1.14, "max": 1.74 },
+            { "von": 301,  "bis": null, "wert": 1.51, "bez": "ab 301 €/m²",   "fallzahl": 9, "min": 1.16, "max": 1.89 }
+          ],
+          "4": [
+            { "von": 101,  "bis": 400,  "wert": 1.48, "bez": "101–400 €/m²",  "fallzahl": 2, "min": 1.20, "max": 1.75 }
+          ]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "VIERUNDZWANZIG KAUFFÄLLE AUF FÜNF KLASSEN. Die dünnste Tabelle dieses Registers: Standardstufe 2 steht auf EINEM Kauffall (Spanne 0,91 bis 0,91 — das ist ein einzelner Kaufpreis, keine Streuung), Standardstufe 4 auf zweien. Der Bericht druckt sie ab, deshalb stehen sie hier — aber jede Klasse führt ihre Fallzahl mit, und wer sie anwendet, muss sie lesen.",
+        "normobjekt": "Modellansatz nach VV EW-SW Land Brandenburg. BGF in Anlehnung an DIN 277 (1987)."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
+        "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert",
+        "kauffaelle_gesamt": 24
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Teltow-Fläming",
+        "sachlich": "Reihenmittelhäuser",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "brw_eur_qm":   { "min": 50, "max": 400, "mittel": 265 },
+          "gsflaeche_qm": { "min": 130, "max": 509, "mittel": 204, "hinweis": "rentierliche Fläche" },
+          "bgf_qm":       { "min": 140, "max": 275, "mittel": 198 },
+          "rnd_jahre":    { "min": 18, "max": 57, "mittel": 48 },
+          "sachwert_eur": { "min": 87829, "max": 376519, "mittel": 234792 }
+        },
+        "vorbehalt": "EIN KAUFFALL IST KEINE STICHPROBE. Die Klasse Standardstufe 2 / bis 100 €/m² beruht auf einem einzigen Vertrag des Jahres 2025; die Klasse Standardstufe 4 auf zwei. Diese Werte sind im Bericht abgedruckt und stehen deshalb hier — als Orientierung, nicht als abgeleiteter Faktor. Wer sie anwendet, sollte den Vergleich mit tatsächlich gezahlten Kaufpreisen suchen.\n\nDIE BESSER BESETZTEN KLASSEN (Standardstufe 3 mit 5, 7 und 9 Kauffällen) zeigen einen klaren Verlauf: 1,17 · 1,48 · 1,51 mit steigendem Bodenrichtwert.",
+        "hinweis": "Doppelhaushälften und Reihenendhäuser führt der Bericht getrennt (Tabelle 43) — sie stehen als eigener Registersatz unter dem Zweig `rhdhh`."
+      },
+
+      "stufe": "C",
+      "stufe_grund": "Amtliche Tabelle mit Fallzahlen und Spannen. Stufe C, weil zwei der fünf Klassen auf einem beziehungsweise zwei Kauffällen beruhen.",
+      "fallzahl": 24,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 Landkreis Teltow-Fläming, Tabelle 42, S. 64: Sachwertfaktoren für Reihenmittelhäuser aus 24 Vertragsvorgängen des Jahres 2025, gestaffelt nach Standardstufe und Bodenrichtwertniveau, mit Fallzahl und Spanne je Klasse."
     }
   ]
 }

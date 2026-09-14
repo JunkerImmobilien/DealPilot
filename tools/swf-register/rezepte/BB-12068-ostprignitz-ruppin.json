@@ -92,6 +92,74 @@
       "fallzahl": 154,
       "streuung": null,
       "beleg": "Grundstücksmarktbericht 2025 Landkreis Ostprignitz-Ruppin, Kap. 8.2.3, S. 36 f.: Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser im Zeitraum 2025 nach Lagetyp — Neuruppin/Alt Ruppin 1,09 (20 Kauffälle), Städte ohne Neuruppin 1,07 (39), Dörfer 1,00 (95)."
+    },
+
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser und Doppelhaushälften",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "lagetyp",
+        "achse_k_bez": "Lagetyp im Landkreis Ostprignitz-Ruppin",
+        "kategorien": ["neuruppin", "staedte", "doerfer"],
+        "zuordnung_feld": "ort",
+        "kategorie_sonst": "doerfer",
+        "kategorie_zuordnung": {
+          "hinweis": "Dieselbe Einteilung wie beim Einfamilienhaus-Satz.",
+          "neuruppin": ["Neuruppin", "Alt Ruppin"],
+          "staedte": ["Kyritz", "Wittstock", "Wittstock/Dosse", "Rheinsberg",
+                      "Neustadt", "Neustadt (Dosse)", "Lindow", "Lindow (Mark)"],
+          "doerfer": ["Fehrbellin", "Heiligengrabe", "Wusterhausen", "Wusterhausen/Dosse",
+                      "Temnitzquell", "Temnitztal", "Walsleben", "Storbeck-Frankendorf",
+                      "Märkisch Linden", "Dabergotz", "Sieversdorf-Hohenofen",
+                      "Breddin", "Dreetz", "Stüdenitz-Schönermark", "Zernitz-Lohm",
+                      "Gumtow", "Rüthnick", "Vielitzsee", "Herzberg (Mark)", "Kränzlin"]
+        },
+        "modell_je_kategorie": {
+          "neuruppin": {
+            "form": "konstante", "wert": 1.21,
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "14 Kauffälle 2025. Die Reihe steigt seit 2023 durchgehend (1,19 · 1,23 · 1,21) — anders als bei den freistehenden Häusern, die dort fallen."
+          },
+          "staedte": {
+            "form": "konstante", "wert": 1.18,
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "25 Kauffälle 2025."
+          },
+          "doerfer": {
+            "form": "konstante", "wert": 1.01,
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "34 Kauffälle 2025. Die Reihe fällt seit 2020/2021 durchgehend: 1,14 · 1,14 · 1,13 · 1,08 · 1,03 · 1,01."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "DREI LAGETYPEN, DREI MITTELWERTE — und ein anderes Bild als beim freistehenden Haus: Reihenhäuser und Doppelhaushälften liegen in allen drei Lagen HÖHER (1,21 · 1,18 · 1,01 gegen 1,09 · 1,07 · 1,00), und in Neuruppin steigt die Reihe, während sie beim Einfamilienhaus fällt.",
+        "normobjekt": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert. Normierter Kaufpreis = Kaufpreis + Wertminderung − Wertverbesserung − sonstiger Bodenwertanteil. Modellansätze nach ImmoWertV 2021 (Anlage 13.3 des Berichts)."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV 2021 und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) vom 03.05.2023",
+        "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
+        "kauffaelle_gesamt": 73
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Ostprignitz-Ruppin, drei Lagetypen",
+        "sachlich": "Reihenhäuser und Doppelhaushälften",
+        "extrapolation": "gesperrt",
+        "spannen": {},
+        "vorbehalt": "MITTELWERTE OHNE ABHÄNGIGKEIT. Wie beim Einfamilienhaus-Satz führt der Bericht für 2025 keine Kurve, sondern je Lagetyp einen Mittelwert aus 14 bis 34 Kauffällen.\n\nDIESELBE ZUORDNUNGSUNSCHÄRFE WIE DORT: die Stadtgemeinden des Landkreises sind flächenmäßig riesig und umfassen zahlreiche Dörfer. Der Unterschied zwischen Stadt und Dorf beträgt hier 17 Prozent (1,18 gegen 1,01) — mehr als beim Einfamilienhaus. Wer die Lage genau kennt, sollte den Lagetyp selbst setzen.",
+        "hinweis": "Der Bericht führt die Zeitreihe seit 2020/2021 mit Fallzahlen fort: Neuruppin 1,16 / 1,12 / 1,15 / 1,19 / 1,23 · Städte 1,14 / 1,19 / 1,16 / 1,11 / 1,09 · Dörfer 1,14 / 1,14 / 1,13 / 1,08 / 1,03."
+      },
+
+      "stufe": "C",
+      "stufe_grund": "Amtliche Mittelwerte mit Fallzahlen. Stufe C wie beim Einfamilienhaus-Satz: Konstanten ohne Abhängigkeit, und die Zuordnung Stadt/Dorf über den Ortsnamen bleibt bei den flächengroßen Stadtgemeinden unscharf.",
+      "fallzahl": 73,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 Landkreis Ostprignitz-Ruppin, Kap. 8.3.3, S. 44 f.: Sachwertfaktoren für Reihenhäuser und Doppelhaushälften im Zeitraum 2025 nach Lagetyp — Neuruppin/Alt Ruppin 1,21 (14 Kauffälle), Städte ohne Neuruppin 1,18 (25), Dörfer 1,01 (34)."
     }
   ]
 }

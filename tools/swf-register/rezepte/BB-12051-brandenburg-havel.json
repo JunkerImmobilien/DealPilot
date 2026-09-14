@@ -63,6 +63,99 @@
       "fallzahl": 65,
       "streuung": null,
       "beleg": "Grundstücksmarktbericht 2025 der Stadt Brandenburg an der Havel, Kap. 8.2.2, Abbildungen 81 bis 83: Sachwertfaktorenkurve für typische Ein- und Zweifamilienhäuser aus 65 Kauffällen der Jahre 2024 und 2025, zehn abgedruckte Stützstellen von 150.000 bis 600.000 € vorläufigem Sachwert, Stichtag 01.01.2025, R² = 0,140."
+    },
+
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "typische Doppelhaushälften und Reihenendhäuser",
+      "form": "stufen_1d",
+      "formel": {
+        "form": "stufen_1d",
+        "achse_feld": "sachwert",
+        "achse_bez": "vorläufiger Sachwert in Euro",
+        "stufen": {
+          "125000": 1.37, "150000": 1.29, "175000": 1.21, "200000": 1.15,
+          "225000": 1.10, "250000": 1.07, "275000": 1.05, "300000": 1.03,
+          "325000": 1.01, "350000": 1.02
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "AUCH DIESE KURVE HAT EIN MINIMUM: sie fällt von 1,37 auf 1,01 bei 325.000 € und steigt bei 350.000 € wieder leicht auf 1,02. So ist sie im Bericht abgedruckt. 42 Kauffälle, einfache Regression, R² = 0,145.",
+        "normobjekt": "Typische Doppelhaushälften und Reihenendhäuser im Stadtgebiet Brandenburg an der Havel, Stichtag 01.01.2025."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV § 21 und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
+        "ermittlung": "einfache Regression, R² = 0,145",
+        "stichtag": "01.01.2025",
+        "kauffaelle_gesamt": 42
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Stadtgebiet Brandenburg an der Havel",
+        "sachlich": "typische Doppelhaushälften und Reihenendhäuser",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwert_eur": { "min": 125000, "max": 350000 },
+          "brw_eur_qm":   { "min": 30, "max": 350 },
+          "flaeche_qm":   { "min": 115, "max": 1451 }
+        },
+        "vorbehalt": "R² = 0,145 LIEGT UNTER DER SCHWELLE, die der Bericht selbst nennt („Ab einem Bestimmtheitsmaß von 0,3 beginnt, laut mathematischer Statistik, sich eine Abhängigkeit zu entwickeln\").\n\nDIE STANDARDSTUFEN-AUSWERTUNG DES BERICHTS ZEIGT, WIE WEIT DIE STREUUNG REICHT: Standardstufe 2 ergibt 0,91 aus fünf Kauffällen (0,60 bis 1,24), Standardstufe 3 ergibt 1,25 aus 37 Kauffällen (0,76 bis 2,15), Standardstufe 4 gar keinen. Diese Mittelwerte sind hier NICHT als Korrektur übernommen — es sind eigenständige Auswertungen derselben Stichprobe, keine Anpassungsfaktoren zur Kurve.",
+        "hinweis": "Reihenmittelhäuser führt der Bericht getrennt (Abbildungen 97 bis 99) — sie stehen als eigener Registersatz unter dem Zweig `rmh`."
+      },
+
+      "stufe": "C",
+      "stufe_grund": "Amtliche Kurve mit abgedruckten Stützstellen und Stichprobenbeschreibung. Stufe C, weil das Bestimmtheitsmaß mit 0,145 unter der vom Bericht selbst genannten Schwelle liegt und die Stichprobe 42 Kauffälle umfasst.",
+      "fallzahl": 42,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 der Stadt Brandenburg an der Havel, Kap. 8.3.2.1, Abbildungen 93 bis 95, S. 75: Sachwertfaktorenkurve für typische Doppelhaushälften und Reihenendhäuser aus 42 Kauffällen der Jahre 2024 und 2025, zehn abgedruckte Stützstellen von 125.000 bis 350.000 € vorläufigem Sachwert, R² = 0,145."
+    },
+
+    {
+      "zweig": "rmh",
+      "zweig_bez": "typische Reihenmittelhäuser",
+      "form": "stufen_1d",
+      "formel": {
+        "form": "stufen_1d",
+        "achse_feld": "sachwert",
+        "achse_bez": "vorläufiger Sachwert in Euro",
+        "stufen": {
+          "75000": 1.88, "100000": 1.70, "125000": 1.54, "150000": 1.43,
+          "175000": 1.33, "200000": 1.24
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "DIE HÖCHSTEN FAKTOREN DES GANZEN REGISTERS: 1,88 bei 75.000 € vorläufigem Sachwert. Das ist kein Fehler, sondern die Folge kleiner Grundstücke (90 bis 417 m²) bei niedrigem vorläufigem Sachwert — der Markt zahlt für ein Reihenmittelhaus deutlich mehr, als die Herstellungskostenrechnung ergibt. 20 Kauffälle, R² = 0,236.",
+        "normobjekt": "Typische Reihenmittelhäuser im Stadtgebiet Brandenburg an der Havel, Stichtag 01.01.2025."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV § 21 und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
+        "ermittlung": "einfache Regression, R² = 0,236",
+        "stichtag": "01.01.2025",
+        "kauffaelle_gesamt": 20
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Stadtgebiet Brandenburg an der Havel",
+        "sachlich": "typische Reihenmittelhäuser",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwert_eur": { "min": 75000, "max": 200000 },
+          "brw_eur_qm":   { "min": 55, "max": 240 },
+          "flaeche_qm":   { "min": 90, "max": 417 }
+        },
+        "vorbehalt": "ZWANZIG KAUFFÄLLE UND EIN SEHR ENGER GÜLTIGKEITSBEREICH: 75.000 bis 200.000 € vorläufiger Sachwert. Darüber gibt es keinen Wert — und gerade bei Faktoren um 1,5 bis 1,9 wäre eine Extrapolation besonders teuer.\n\nR² = 0,236 liegt unter der Schwelle von 0,3, die der Bericht selbst als Beginn einer Abhängigkeit nennt.",
+        "hinweis": "Der Bericht führt auch für diesen Teilmarkt eine Auswertung nach Standardstufen — hier nicht als Korrektur übernommen, aus demselben Grund wie bei den anderen beiden Sätzen dieses Ausschusses."
+      },
+
+      "stufe": "C",
+      "stufe_grund": "Amtliche Kurve mit abgedruckten Stützstellen und Stichprobenbeschreibung. Stufe C wegen der Stichprobengröße von 20 Kauffällen und des Bestimmtheitsmaßes von 0,236.",
+      "fallzahl": 20,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 der Stadt Brandenburg an der Havel, Kap. 8.3.2.2, Abbildungen 97 bis 99, S. 76 f.: Sachwertfaktorenkurve für typische Reihenmittelhäuser aus 20 Kauffällen der Jahre 2024 und 2025, sechs abgedruckte Stützstellen von 75.000 bis 200.000 € vorläufigem Sachwert, R² = 0,236."
     }
   ]
 }

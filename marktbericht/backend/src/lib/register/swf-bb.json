@@ -76,6 +76,152 @@
  },
  {
   "land_code": "BB",
+  "ags": "12051000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Brandenburg an der Havel",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Brandenburg an der Havel",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "125000": 1.37,
+    "150000": 1.29,
+    "175000": 1.21,
+    "200000": 1.15,
+    "225000": 1.1,
+    "250000": 1.07,
+    "275000": 1.05,
+    "300000": 1.03,
+    "325000": 1.01,
+    "350000": 1.02
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "AUCH DIESE KURVE HAT EIN MINIMUM: sie fällt von 1,37 auf 1,01 bei 325.000 € und steigt bei 350.000 € wieder leicht auf 1,02. So ist sie im Bericht abgedruckt. 42 Kauffälle, einfache Regression, R² = 0,145.",
+   "normobjekt": "Typische Doppelhaushälften und Reihenendhäuser im Stadtgebiet Brandenburg an der Havel, Stichtag 01.01.2025."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV § 21 und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
+   "ermittlung": "einfache Regression, R² = 0,145",
+   "stichtag": "01.01.2025",
+   "kauffaelle_gesamt": 42
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Brandenburg an der Havel",
+   "sachlich": "typische Doppelhaushälften und Reihenendhäuser",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwert_eur": {
+     "min": 125000,
+     "max": 350000
+    },
+    "brw_eur_qm": {
+     "min": 30,
+     "max": 350
+    },
+    "flaeche_qm": {
+     "min": 115,
+     "max": 1451
+    }
+   },
+   "vorbehalt": "R² = 0,145 LIEGT UNTER DER SCHWELLE, die der Bericht selbst nennt („Ab einem Bestimmtheitsmaß von 0,3 beginnt, laut mathematischer Statistik, sich eine Abhängigkeit zu entwickeln\").\n\nDIE STANDARDSTUFEN-AUSWERTUNG DES BERICHTS ZEIGT, WIE WEIT DIE STREUUNG REICHT: Standardstufe 2 ergibt 0,91 aus fünf Kauffällen (0,60 bis 1,24), Standardstufe 3 ergibt 1,25 aus 37 Kauffällen (0,76 bis 2,15), Standardstufe 4 gar keinen. Diese Mittelwerte sind hier NICHT als Korrektur übernommen — es sind eigenständige Auswertungen derselben Stichprobe, keine Anpassungsfaktoren zur Kurve.",
+   "hinweis": "Reihenmittelhäuser führt der Bericht getrennt (Abbildungen 97 bis 99) — sie stehen als eigener Registersatz unter dem Zweig `rmh`."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 der Stadt Brandenburg an der Havel, Kap. 8.3.2.1, Abbildungen 93 bis 95, S. 75: Sachwertfaktorenkurve für typische Doppelhaushälften und Reihenendhäuser aus 42 Kauffällen der Jahre 2024 und 2025, zehn abgedruckte Stützstellen von 125.000 bis 350.000 € vorläufigem Sachwert, R² = 0,145."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtliche Kurve mit abgedruckten Stützstellen und Stichprobenbeschreibung. Stufe C, weil das Bestimmtheitsmaß mit 0,145 unter der vom Bericht selbst genannten Schwelle liegt und die Stichprobe 42 Kauffälle umfasst.",
+  "fallzahl": 42,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_BRB.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, S. 68 ff. Abbildungen 81 bis 84. Modellansätze Punkt 8.1.3."
+ },
+ {
+  "land_code": "BB",
+  "ags": "12051000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Brandenburg an der Havel",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Brandenburg an der Havel",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "75000": 1.88,
+    "100000": 1.7,
+    "125000": 1.54,
+    "150000": 1.43,
+    "175000": 1.33,
+    "200000": 1.24
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "DIE HÖCHSTEN FAKTOREN DES GANZEN REGISTERS: 1,88 bei 75.000 € vorläufigem Sachwert. Das ist kein Fehler, sondern die Folge kleiner Grundstücke (90 bis 417 m²) bei niedrigem vorläufigem Sachwert — der Markt zahlt für ein Reihenmittelhaus deutlich mehr, als die Herstellungskostenrechnung ergibt. 20 Kauffälle, R² = 0,236.",
+   "normobjekt": "Typische Reihenmittelhäuser im Stadtgebiet Brandenburg an der Havel, Stichtag 01.01.2025."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV § 21 und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
+   "ermittlung": "einfache Regression, R² = 0,236",
+   "stichtag": "01.01.2025",
+   "kauffaelle_gesamt": 20
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Brandenburg an der Havel",
+   "sachlich": "typische Reihenmittelhäuser",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwert_eur": {
+     "min": 75000,
+     "max": 200000
+    },
+    "brw_eur_qm": {
+     "min": 55,
+     "max": 240
+    },
+    "flaeche_qm": {
+     "min": 90,
+     "max": 417
+    }
+   },
+   "vorbehalt": "ZWANZIG KAUFFÄLLE UND EIN SEHR ENGER GÜLTIGKEITSBEREICH: 75.000 bis 200.000 € vorläufiger Sachwert. Darüber gibt es keinen Wert — und gerade bei Faktoren um 1,5 bis 1,9 wäre eine Extrapolation besonders teuer.\n\nR² = 0,236 liegt unter der Schwelle von 0,3, die der Bericht selbst als Beginn einer Abhängigkeit nennt.",
+   "hinweis": "Der Bericht führt auch für diesen Teilmarkt eine Auswertung nach Standardstufen — hier nicht als Korrektur übernommen, aus demselben Grund wie bei den anderen beiden Sätzen dieses Ausschusses."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 der Stadt Brandenburg an der Havel, Kap. 8.3.2.2, Abbildungen 97 bis 99, S. 76 f.: Sachwertfaktorenkurve für typische Reihenmittelhäuser aus 20 Kauffällen der Jahre 2024 und 2025, sechs abgedruckte Stützstellen von 75.000 bis 200.000 € vorläufigem Sachwert, R² = 0,236."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtliche Kurve mit abgedruckten Stützstellen und Stichprobenbeschreibung. Stufe C wegen der Stichprobengröße von 20 Kauffällen und des Bestimmtheitsmaßes von 0,236.",
+  "fallzahl": 20,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_BRB.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, S. 68 ff. Abbildungen 81 bis 84. Modellansätze Punkt 8.1.3."
+ },
+ {
+  "land_code": "BB",
   "ags": "12052000",
   "ebene": "gemeinde",
   "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Cottbus/Chóśebuz",
@@ -235,6 +381,102 @@
   "stufe": "B",
   "stufe_grund": "Amtliche Tabelle mit Fallzahlen, Spannen und vollständiger Stichprobenbeschreibung je Klasse. Stufe B, weil kein Anwendungsbeispiel vorliegt, die Klassen mit 10 bis 31 Kauffällen klein sind und der Bericht seine Werte selbst als Orientierungswerte bezeichnet.",
   "fallzahl": 142,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_CB.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, Übersicht der Sachwertfaktoren S. 60 (Stichtag 01.01.2026). Modellkonformität nach § 10 ImmoWertV, Tabelle S. 117 bis 119."
+ },
+ {
+  "land_code": "BB",
+  "ags": "12052000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Cottbus/Chóśebuz",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Cottbus/Chóśebuz",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "baender_1d",
+   "achse_feld": "baujahr",
+   "achse_bez": "Baujahr",
+   "baender": [
+    {
+     "von": null,
+     "bis": 1948,
+     "wert": 1.17,
+     "bez": "vor 1948",
+     "fallzahl": 14,
+     "min": 0.71,
+     "max": 1.79
+    },
+    {
+     "von": 1949,
+     "bis": 1989,
+     "wert": 1.3,
+     "bez": "1949 bis 1989",
+     "fallzahl": 7,
+     "min": 0.77,
+     "max": 1.78
+    },
+    {
+     "von": 1990,
+     "bis": null,
+     "wert": 1.03,
+     "bez": "ab 1990",
+     "fallzahl": 27,
+     "min": 0.67,
+     "max": 1.46
+    }
+   ],
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "NUR NACH BAUJAHR, OHNE SANIERUNGSSTAND. Anders als bei den freistehenden Ein- und Zweifamilienhäusern trennt der Bericht diesen Teilmarkt nicht nach Modernisierungsgrad — die Stichproben wären zu klein. Stichtag 01.01.2026 aus den Auswertungszeiträumen 2024/2025 (vor 1948 und ab 1990) beziehungsweise 2022 bis 2025 (1949 bis 1989).",
+   "normobjekt": "Reihenhäuser und Doppelhaushälften des Cottbuser Marktes. Modellkonformität nach § 10 ImmoWertV über die Tabelle S. 117 bis 119 des Berichts."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
+   "stichtag": "01.01.2026",
+   "kauffaelle_gesamt": 48,
+   "hinweis": "Die Modellansätze stehen im Bericht auf den Seiten 117 bis 119."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Cottbus/Chóśebuz",
+   "sachlich": "Reihenhäuser und Doppelhaushälften",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "brw_eur_qm": {
+     "min": 40,
+     "max": 170
+    },
+    "flaeche_qm": {
+     "min": 163,
+     "max": 1050
+    },
+    "sachwert_eur": {
+     "min": 104000,
+     "max": 388000
+    },
+    "standardstufe": {
+     "min": 1.9,
+     "max": 3.5
+    }
+   },
+   "vorbehalt": "DER BERICHT NENNT SIE ORIENTIERUNGSWERTE und verlangt ausdrücklich die sachverständige Prüfung am Bewertungsobjekt.\n\nDIE MITTLERE KLASSE BERUHT AUF SIEBEN KAUFFÄLLEN, verteilt über vier Jahrgänge (2022 bis 2025), bei einer Spanne von 0,77 bis 1,78. Sie trägt zugleich den HÖCHSTEN Faktor der drei Klassen (1,30) — bei den freistehenden Häusern ist es umgekehrt die niedrigste. Das ist im Bericht so abgedruckt; die Stichprobe ist zu klein, um daraus mehr zu lesen als eine Orientierung.\n\nALLE DREI KLASSEN STREUEN WEIT: 0,67 bis 1,79 über die ganze Tabelle.",
+   "hinweis": "Der Bericht führt zusätzlich eine Tabelle zum Stichtag 01.01.2025 (Auswertungszeiträume 2021 bis 2024): 1,21 · 1,36 · 1,15. Sie steht für Wertermittlungen auf zurückliegende Stichtage zur Verfügung."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 der Stadt Cottbus/Chóśebuz, Kap. 8.3.2, S. 74: Übersicht der Sachwertfaktoren für Reihenhäuser und Doppelhaushälften zum Stichtag 01.01.2026 — drei Baujahresklassen aus 48 Kauffällen (14 / 7 / 27)."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtliche Tabelle mit Fallzahlen, Spannen und Stichprobenbeschreibung. Stufe C, weil die Klassen mit 7 bis 27 Kauffällen klein sind, die Spannen sehr weit reichen und der Bericht seine Werte selbst als Orientierungswerte bezeichnet.",
+  "fallzahl": 48,
   "streuung": null,
   "stichtag": "2026-01-01",
   "berichtsjahr": 2025,
@@ -1171,6 +1413,226 @@
   "stufe": "B",
   "stufe_grund": "Amtliche Tabelle mit Fallzahlen, Spannen und beschreibenden Merkmalen je Klasse, aus 438 Kauffällen. Stufe B, weil kein Anwendungsbeispiel vorliegt und die Spannen je Klasse sehr weit sind.",
   "fallzahl": 438,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_LDS.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.3, Tabellen 8-9 und 8-10, S. 80 f. Regionsabgrenzung S. 73."
+ },
+ {
+  "land_code": "BB",
+  "ags": "12061",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Dahme-Spreewald",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Dahme-Spreewald",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "verzweigt",
+   "achse_k_feld": "region",
+   "achse_k_bez": "Region im Landkreis Dahme-Spreewald",
+   "kategorien": [
+    "bu_s",
+    "bu_os",
+    "wm"
+   ],
+   "zuordnung_feld": "ort",
+   "kategorie_sonst": "wm",
+   "kategorie_mehrdeutig": [
+    "Königs Wusterhausen",
+    "Schönefeld"
+   ],
+   "kategorie_zuordnung": {
+    "hinweis": "Dieselbe gemarkungsscharfe Abgrenzung wie beim Einfamilienhaus-Satz (Bericht S. 73).",
+    "bu_s": [
+     "Eichwalde",
+     "Schulzendorf",
+     "Wildau",
+     "Zeuthen",
+     "Deutsch Wusterhausen",
+     "Neue Mühle",
+     "Waßmannsdorf"
+    ],
+    "bu_os": [
+     "Mittenwalde",
+     "Diepensee",
+     "Kablow",
+     "Kablow-Ziegelei",
+     "Niederlehme",
+     "Ziegenhals",
+     "Senzig",
+     "Wernsdorf",
+     "Zeesen",
+     "Körbiskrug",
+     "Zernsdorf",
+     "Uckley",
+     "Großziethen",
+     "Kiekebusch",
+     "Selchow",
+     "Waltersdorf",
+     "Brusendorf",
+     "Gallun",
+     "Motzen",
+     "Ragow",
+     "Schenkendorf",
+     "Telz"
+    ],
+    "wm": [
+     "Lübben",
+     "Lübbenau",
+     "Luckau",
+     "Golßen",
+     "Baruth",
+     "Baruth/Mark",
+     "Zossen",
+     "Wildau-Wentdorf",
+     "Märkisch Buchholz",
+     "Teupitz",
+     "Bestensee",
+     "Heidesee",
+     "Halbe",
+     "Münchehofe",
+     "Schönwald",
+     "Groß Köris",
+     "Klasdorf",
+     "Massow",
+     "Krausnick-Groß Wasserburg",
+     "Schlepzig",
+     "Straupitz",
+     "Alt Zauche-Wußwerk",
+     "Byhleguhre-Byhlen",
+     "Neu Zauche",
+     "Schwielochsee",
+     "Rietzneuendorf-Staakow",
+     "Drahnsdorf",
+     "Bersteland",
+     "Steinreich",
+     "Kasel-Golzig",
+     "Unterspreewald",
+     "Heideblick",
+     "Jamlitz",
+     "Lieberose",
+     "Spreewaldheide"
+    ]
+   },
+   "modell_je_kategorie": {
+    "bu_s": {
+     "form": "baender_1d",
+     "achse_feld": "baujahr",
+     "achse_bez": "Baujahr",
+     "baender": [
+      {
+       "von": null,
+       "bis": 1948,
+       "wert": 1.02,
+       "bez": "bis 1948",
+       "fallzahl": 6,
+       "min": 0.74,
+       "max": 1.18
+      },
+      {
+       "von": 1990,
+       "bis": null,
+       "wert": 1.15,
+       "bez": "ab 1990",
+       "fallzahl": 15,
+       "min": 0.87,
+       "max": 1.41
+      }
+     ],
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "DIE MITTLERE BAUJAHRESKLASSE (1949 bis 1989) FEHLT HIER MIT ABSICHT: der Bericht führt dort EINEN Kauffall und weist ausdrücklich auf die eingeschränkte Aussagefähigkeit hin — die Spalte „Sachwertfaktor\" bleibt leer, nur der Einzelwert 0,89 steht in Klammern. Ein Einzelwert ist kein abgeleiteter Faktor. Für ein Objekt dieser Baujahre gibt es hier deshalb keinen Wert."
+    },
+    "bu_os": {
+     "form": "baender_1d",
+     "achse_feld": "baujahr",
+     "achse_bez": "Baujahr",
+     "baender": [
+      {
+       "von": 1990,
+       "bis": null,
+       "wert": 1.25,
+       "bez": "ab 1990",
+       "fallzahl": 23,
+       "min": 0.85,
+       "max": 1.49
+      }
+     ],
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "NUR EINE KLASSE. Für Baujahre bis 1948 führt der Bericht einen einzigen Kauffall (Einzelwert 0,93 in Klammern), für 1949 bis 1989 GAR KEINEN. Beide ergeben hier keinen Wert."
+    },
+    "wm": {
+     "form": "baender_1d",
+     "achse_feld": "baujahr",
+     "achse_bez": "Baujahr",
+     "baender": [
+      {
+       "von": null,
+       "bis": 1948,
+       "wert": 0.96,
+       "bez": "bis 1948",
+       "fallzahl": 5,
+       "min": 0.56,
+       "max": 1.11
+      },
+      {
+       "von": 1949,
+       "bis": 1989,
+       "wert": 0.6,
+       "bez": "1949 bis 1989",
+       "fallzahl": 3,
+       "min": 0.62,
+       "max": 1.17
+      },
+      {
+       "von": 1990,
+       "bis": null,
+       "wert": 1.03,
+       "bez": "ab 1990",
+       "fallzahl": 12,
+       "min": 0.47,
+       "max": 1.56
+      }
+     ],
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "DIE KLASSE 1949 BIS 1989 IST AUFFÄLLIG: der Stichtagswert 0,60 liegt UNTERHALB der beobachteten Spanne (0,62 bis 1,17) und deutlich unter dem arithmetischen Mittel von 0,82 und dem Median von 0,67. Grund ist die Ableitung über die Regressionsfunktion „Sachwertfaktor und Zeitverlauf\" bei nur drei Kauffällen. Der Wert steht hier, weil der Bericht ihn als Stichtagswert abdruckt — aber er ist mit äußerster Vorsicht zu verwenden."
+    }
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "NEUN KLASSEN IM BERICHT, SECHS MIT WERT. Drei Klassen führen keinen oder höchstens einen Kauffall; der Bericht markiert sie mit „() = Eingeschränkte Aussagefähigkeit, da maximal zwei Kauffälle vorhanden sind\" und lässt die Faktorspalte leer. Sie fehlen deshalb auch hier — und eine Anfrage für solche Baujahre bekommt keinen Wert statt eines Einzelkaufpreises.",
+   "normobjekt": "Sachwertfaktor abgeleitet aus der Regressionsfunktion „Sachwertfaktor und Zeitverlauf\" zum Stichtag 01.01.2025, Kauffälle der Jahre 2024 und 2025."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
+   "stichtag": "01.01.2025",
+   "kauffaelle_gesamt": 66,
+   "ermittlung": "Ableitung über die Regressionsfunktion „Sachwertfaktor und Zeitverlauf\", getrennt nach Region und Baujahresklasse"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Dahme-Spreewald, drei Regionen",
+   "sachlich": "Doppelhaushälften und Reihenendhäuser",
+   "extrapolation": "gesperrt",
+   "spannen": {},
+   "vorbehalt": "SECHSUNDSECHZIG KAUFFÄLLE AUF NEUN KLASSEN, von denen drei praktisch leer sind. Die besetzten Klassen tragen zwischen drei und dreiundzwanzig Fälle. Die Spannen reichen von 0,47 bis 1,56.\n\nDIE KLASSE WM / 1949 BIS 1989 TRÄGT EINEN STICHTAGSWERT UNTERHALB IHRER EIGENEN STICHPROBENSPANNE (0,60 gegenüber 0,62 bis 1,17). Das ist kein Lesefehler, sondern die Folge der Zeitverlauf-Regression bei drei Fällen.\n\nWIE BEIM EINFAMILIENHAUS-SATZ gilt: der Bericht bezeichnet die Faktoren als Durchschnittswerte, die sachverständig auf Eignung zu prüfen sind (§ 39 ImmoWertV).",
+   "hinweis": "Reihenmittelhäuser führt der Bericht getrennt (Kap. 8.3.3.2) — hier noch nicht erfasst."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 Landkreis Dahme-Spreewald, Tabelle 8-19, S. 90: Sachwertfaktoren für Grundstücke mit Doppelhaushälften und Reihenendhäusern nach Region und Baujahresklasse aus 66 Kauffällen der Jahre 2024 und 2025, Stichtag 01.01.2025."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtliche Tabelle mit Fallzahlen und Spannen je Klasse. Stufe C statt B, weil drei der neun Klassen wegen zu weniger Kauffälle keinen Faktor tragen und eine weitere einen Stichtagswert unterhalb ihrer Stichprobenspanne ausweist.",
+  "fallzahl": 64,
   "streuung": null,
   "stichtag": "2025-01-01",
   "berichtsjahr": 2025,
@@ -3169,6 +3631,124 @@
  },
  {
   "land_code": "BB",
+  "ags": "12068",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Ostprignitz-Ruppin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Ostprignitz-Ruppin",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "verzweigt",
+   "achse_k_feld": "lagetyp",
+   "achse_k_bez": "Lagetyp im Landkreis Ostprignitz-Ruppin",
+   "kategorien": [
+    "neuruppin",
+    "staedte",
+    "doerfer"
+   ],
+   "zuordnung_feld": "ort",
+   "kategorie_sonst": "doerfer",
+   "kategorie_zuordnung": {
+    "hinweis": "Dieselbe Einteilung wie beim Einfamilienhaus-Satz.",
+    "neuruppin": [
+     "Neuruppin",
+     "Alt Ruppin"
+    ],
+    "staedte": [
+     "Kyritz",
+     "Wittstock",
+     "Wittstock/Dosse",
+     "Rheinsberg",
+     "Neustadt",
+     "Neustadt (Dosse)",
+     "Lindow",
+     "Lindow (Mark)"
+    ],
+    "doerfer": [
+     "Fehrbellin",
+     "Heiligengrabe",
+     "Wusterhausen",
+     "Wusterhausen/Dosse",
+     "Temnitzquell",
+     "Temnitztal",
+     "Walsleben",
+     "Storbeck-Frankendorf",
+     "Märkisch Linden",
+     "Dabergotz",
+     "Sieversdorf-Hohenofen",
+     "Breddin",
+     "Dreetz",
+     "Stüdenitz-Schönermark",
+     "Zernitz-Lohm",
+     "Gumtow",
+     "Rüthnick",
+     "Vielitzsee",
+     "Herzberg (Mark)",
+     "Kränzlin"
+    ]
+   },
+   "modell_je_kategorie": {
+    "neuruppin": {
+     "form": "konstante",
+     "wert": 1.21,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "14 Kauffälle 2025. Die Reihe steigt seit 2023 durchgehend (1,19 · 1,23 · 1,21) — anders als bei den freistehenden Häusern, die dort fallen."
+    },
+    "staedte": {
+     "form": "konstante",
+     "wert": 1.18,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "25 Kauffälle 2025."
+    },
+    "doerfer": {
+     "form": "konstante",
+     "wert": 1.01,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "34 Kauffälle 2025. Die Reihe fällt seit 2020/2021 durchgehend: 1,14 · 1,14 · 1,13 · 1,08 · 1,03 · 1,01."
+    }
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "DREI LAGETYPEN, DREI MITTELWERTE — und ein anderes Bild als beim freistehenden Haus: Reihenhäuser und Doppelhaushälften liegen in allen drei Lagen HÖHER (1,21 · 1,18 · 1,01 gegen 1,09 · 1,07 · 1,00), und in Neuruppin steigt die Reihe, während sie beim Einfamilienhaus fällt.",
+   "normobjekt": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert. Normierter Kaufpreis = Kaufpreis + Wertminderung − Wertverbesserung − sonstiger Bodenwertanteil. Modellansätze nach ImmoWertV 2021 (Anlage 13.3 des Berichts)."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV 2021 und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) vom 03.05.2023",
+   "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
+   "kauffaelle_gesamt": 73
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Ostprignitz-Ruppin, drei Lagetypen",
+   "sachlich": "Reihenhäuser und Doppelhaushälften",
+   "extrapolation": "gesperrt",
+   "spannen": {},
+   "vorbehalt": "MITTELWERTE OHNE ABHÄNGIGKEIT. Wie beim Einfamilienhaus-Satz führt der Bericht für 2025 keine Kurve, sondern je Lagetyp einen Mittelwert aus 14 bis 34 Kauffällen.\n\nDIESELBE ZUORDNUNGSUNSCHÄRFE WIE DORT: die Stadtgemeinden des Landkreises sind flächenmäßig riesig und umfassen zahlreiche Dörfer. Der Unterschied zwischen Stadt und Dorf beträgt hier 17 Prozent (1,18 gegen 1,01) — mehr als beim Einfamilienhaus. Wer die Lage genau kennt, sollte den Lagetyp selbst setzen.",
+   "hinweis": "Der Bericht führt die Zeitreihe seit 2020/2021 mit Fallzahlen fort: Neuruppin 1,16 / 1,12 / 1,15 / 1,19 / 1,23 · Städte 1,14 / 1,19 / 1,16 / 1,11 / 1,09 · Dörfer 1,14 / 1,14 / 1,13 / 1,08 / 1,03."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 Landkreis Ostprignitz-Ruppin, Kap. 8.3.3, S. 44 f.: Sachwertfaktoren für Reihenhäuser und Doppelhaushälften im Zeitraum 2025 nach Lagetyp — Neuruppin/Alt Ruppin 1,21 (14 Kauffälle), Städte ohne Neuruppin 1,18 (25), Dörfer 1,01 (34)."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtliche Mittelwerte mit Fallzahlen. Stufe C wie beim Einfamilienhaus-Satz: Konstanten ohne Abhängigkeit, und die Zuordnung Stadt/Dorf über den Ortsnamen bleibt bei den flächengroßen Stadtgemeinden unscharf.",
+  "fallzahl": 73,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_OPR.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.3, S. 36 ff. Modellansätze Anlage 13.3. Verwaltungsgliederung S. 12."
+ },
+ {
+  "land_code": "BB",
   "ags": "12069",
   "ebene": "kreis",
   "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Potsdam-Mittelmark",
@@ -3467,6 +4047,244 @@
  },
  {
   "land_code": "BB",
+  "ags": "12069",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Potsdam-Mittelmark",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Potsdam-Mittelmark",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "verzweigt",
+   "achse_k_feld": "region",
+   "achse_k_bez": "Region im Landkreis Potsdam-Mittelmark",
+   "kategorien": [
+    "berliner_umland",
+    "weiterer_metropolenraum"
+   ],
+   "zuordnung_feld": "ort",
+   "kategorie_zuordnung": {
+    "hinweis": "Der Bericht nennt für diesen Teilmarkt in den Tabellenköpfen andere Gemeinden als beim Einfamilienhaus: Nuthetal, Seddiner See, Stahnsdorf und Teltow im Bereich 220 bis 500 €/m², Kleinmachnow, Stahnsdorf und Teltow im Bereich 550 bis 950 €/m². Die Listen hier folgen der Regionszuordnung des Berichts; die Feinunterscheidung innerhalb des Berliner Umlands übernimmt der Bodenrichtwert.",
+    "berliner_umland": [
+     "Michendorf",
+     "Nuthetal",
+     "Schwielowsee",
+     "Seddiner See",
+     "Stahnsdorf",
+     "Werder",
+     "Werder (Havel)",
+     "Kleinmachnow",
+     "Teltow",
+     "Bergholz-Rehbrücke",
+     "Caputh",
+     "Ferch",
+     "Geltow",
+     "Wilhelmshorst",
+     "Langerwisch",
+     "Neuseddin",
+     "Seddin"
+    ],
+    "weiterer_metropolenraum": [
+     "Bad Belzig",
+     "Belzig",
+     "Beelitz",
+     "Beetzsee",
+     "Brück",
+     "Groß Kreutz",
+     "Groß Kreutz (Havel)",
+     "Kloster Lehnin",
+     "Lehnin",
+     "Niemegk",
+     "Treuenbrietzen",
+     "Wiesenburg",
+     "Wiesenburg/Mark",
+     "Wusterwitz",
+     "Ziesar",
+     "Görzke",
+     "Planebruch",
+     "Mühlenfließ",
+     "Rabenstein/Fläming",
+     "Golzow",
+     "Päwesin",
+     "Roskow",
+     "Bensdorf",
+     "Rosenau",
+     "Havelsee",
+     "Beetzseeheide",
+     "Wollin",
+     "Wenzlow",
+     "Borkheide",
+     "Borkwalde",
+     "Linthe",
+     "Planetal"
+    ]
+   },
+   "modell_je_kategorie": {
+    "berliner_umland": {
+     "form": "verzweigt",
+     "achse_k_feld": "brw_bereich",
+     "achse_k_bez": "Bodenrichtwertbereich",
+     "kategorien": [
+      "bis_500",
+      "ab_550"
+     ],
+     "zuordnung_feld": "brw",
+     "kategorie_baender": [
+      {
+       "von": 220,
+       "bis": 500,
+       "kategorie": "bis_500"
+      },
+      {
+       "von": 550,
+       "bis": 950,
+       "kategorie": "ab_550"
+      }
+     ],
+     "modell_je_kategorie": {
+      "bis_500": {
+       "form": "stufen_1d",
+       "achse_feld": "sachwert",
+       "achse_bez": "vorläufiger Sachwert in Euro",
+       "stufen": {
+        "172000": 1.4,
+        "200000": 1.4,
+        "230000": 1.4,
+        "250000": 1.39,
+        "300000": 1.37,
+        "350000": 1.33,
+        "400000": 1.29,
+        "417000": 1.27
+       },
+       "rundung_stellen": 2,
+       "liefert": "faktor",
+       "hinweis": "29 Kauffälle 2025, Bodenrichtwert 220 bis 500 €/m² (Ø 393), Sachwertfaktoren 1,07 bis 1,70 (Ø 1,38), Baujahre 1900 bis 2009, Restnutzungsdauer 41 bis 64 Jahre. Bestimmtheitsmaß 0,0494 — die Kurve ist über den ganzen Bereich fast waagerecht zwischen 1,40 und 1,27."
+      },
+      "ab_550": {
+       "form": "stufen_1d",
+       "achse_feld": "sachwert",
+       "achse_bez": "vorläufiger Sachwert in Euro",
+       "stufen": {
+        "230000": 1.96,
+        "250000": 1.93,
+        "300000": 1.76,
+        "350000": 1.62,
+        "400000": 1.48,
+        "417000": 1.4,
+        "450000": 1.36,
+        "500000": 1.26,
+        "550000": 1.16,
+        "600000": 1.08,
+        "650000": 1.02,
+        "700000": 0.97,
+        "750000": 0.93,
+        "800000": 0.91,
+        "850000": 0.9,
+        "915000": 0.9
+       },
+       "rundung_stellen": 2,
+       "liefert": "faktor",
+       "hinweis": "26 Kauffälle 2025, Bodenrichtwert 550 bis 950 €/m². BESTIMMTHEITSMASS 0,844 — mit Abstand der höchste Wert dieses Registers. Der Faktor fällt von 1,96 auf 0,90 und ist hier tatsächlich stark vom vorläufigen Sachwert abhängig."
+      }
+     },
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "ZWISCHEN 500 UND 550 €/m² FÜHRT DER BERICHT NICHTS, wie beim Einfamilienhaus-Satz."
+    },
+    "weiterer_metropolenraum": {
+     "form": "stufen_1d",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
+     "stufen": {
+      "76000": 0.81,
+      "100000": 0.86,
+      "125000": 0.9,
+      "150000": 0.93,
+      "175000": 0.95,
+      "200000": 0.96,
+      "225000": 0.96,
+      "250000": 0.95,
+      "275000": 0.93,
+      "300000": 0.91,
+      "325000": 0.87,
+      "350000": 0.83,
+      "375000": 0.77,
+      "400000": 0.71,
+      "425000": 0.64,
+      "440000": 0.59
+     },
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "NUR DOPPELHAUSHÄLFTEN. Der Bericht schreibt ausdrücklich: „Die folgenden Faktoren sind ausschließlich für Doppelhaushälften abgeleitet worden. Für Reihenhäuser wurden zwei Kauffälle im Raum Beelitz untersucht. Hier ergeben sich Faktoren von 1,84 und 1,92 für Reihenhäuser der Baujahre 1996 und 2001.\" Diese zwei Einzelwerte sind NICHT übernommen — zwei Kauffälle sind keine Ableitung, und sie liegen doppelt so hoch wie die Doppelhaushälften-Kurve. 12 Kauffälle, Bodenrichtwert 25 bis 220 €/m², Sachwertfaktoren 0,57 bis 1,31 (Ø 0,89), Bestimmtheitsmaß 0,277. DIE KURVE HAT EIN MAXIMUM bei rund 210.000 € (0,96) und fällt danach steil auf 0,59."
+    }
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "DREI TABELLEN, ZWEI EBENEN. Im Berliner Umland trennt der Bericht nach Bodenrichtwert (220 bis 500 gegen 550 bis 950 €/m²), im weiteren Metropolenraum führt er eine einzige Reihe — und die gilt ausdrücklich NUR für Doppelhaushälften. Die Bestimmtheitsmaße gehen weit auseinander: 0,0494 · 0,844 · 0,277.",
+   "normobjekt": "Gebrauchte Reihenhäuser und Doppelhaushälften. Bodenrichtwerte zum Stichtag 01.01.2025."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
+   "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
+   "kauffaelle_gesamt": 67
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Potsdam-Mittelmark, Berliner Umland mit zwei Bodenrichtwertbereichen, weiterer Metropolenraum",
+   "sachlich": "Reihenhäuser und Doppelhaushälften; im weiteren Metropolenraum NUR Doppelhaushälften",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "brw_bu": {
+     "min": 220,
+     "max": 950
+    },
+    "brw_wmr": {
+     "min": 25,
+     "max": 220
+    },
+    "baujahr_bu": {
+     "min": 1900,
+     "max": 2009
+    },
+    "baujahr_wmr": {
+     "min": 1905,
+     "max": 2009
+    },
+    "rnd_bu": {
+     "min": 41,
+     "max": 64
+    },
+    "rnd_wmr": {
+     "min": 21,
+     "max": 64
+    },
+    "standardstufe": {
+     "min": 1.7,
+     "max": 3.4
+    }
+   },
+   "vorbehalt": "IM WEITEREN METROPOLENRAUM GILT DIE REIHE NUR FÜR DOPPELHAUSHÄLFTEN. Für Reihenhäuser liegen dort zwei Kauffälle vor (1,84 und 1,92) — sie sind hier nicht übernommen, weil zwei Fälle keine Ableitung sind. Wer dort ein Reihenhaus bewertet, bekommt den Doppelhaushälften-Faktor; der Bericht selbst führt die Tabelle unter „Reihenhäuser und Doppelhaushälften\" und die Untertabelle unter „Doppelhaushälften\". Das ist eine bewusste Näherung und im Zweifel zu prüfen.\n\nDIE STICHPROBEN SIND KLEIN: 29, 26 und 12 Kauffälle.\n\nDAS BESTIMMTHEITSMASS IM BEREICH 220 BIS 500 €/m² LIEGT BEI 0,0494 — dort erklärt die Kurve praktisch nichts, und der Faktor ist faktisch eine Konstante um 1,35.",
+   "hinweis": "Der Bericht führt zusätzlich Wohnflächenpreise für Reihenhäuser (Kap. 8.3.3.1) — hier nicht erfasst."
+  },
+  "belege": [
+   "Grundstücksmarktbericht Potsdam-Mittelmark 2025, Kap. 8.3.2, Tabellen 45 und 47, S. 52 ff.: Sachwertfaktoren für Reihenhäuser und Doppelhaushälften — Berliner Umland 220 bis 500 €/m² (29 Kauffälle) und 550 bis 950 €/m² (26), weiterer Metropolenraum nur Doppelhaushälften 25 bis 220 €/m² (12)."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtliche Tabellen mit vollständigen Merkmalsübersichten. Stufe C statt B, weil zwei der drei Reihen Bestimmtheitsmaße unter 0,3 haben, die Stichproben klein sind und im weiteren Metropolenraum Reihenhäuser gar nicht abgeleitet wurden.",
+  "fallzahl": 67,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_PM.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, S. 42 ff. Tabellen 34 bis 39 (Merkmalsübersichten und Übersichten der Sachwertfaktoren)."
+ },
+ {
+  "land_code": "BB",
   "ags": "12070",
   "ebene": "kreis",
   "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Prignitz",
@@ -3573,6 +4391,103 @@
   "stufe": "A",
   "stufe_grund": "Amtliche Tabelle MIT ANWENDUNGSBEISPIEL (Tabelle 50): 150.000 € × 0,95 × 0,81 = 115.425 € für Standardstufe 1,9. Beide Schritte sind im Register nachgerechnet und zeichengleich. Damit ist der Prüfmaßstab des Dokuments erfüllt, nicht nur eine eigene Nachrechnung.",
   "fallzahl": 210,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_PR.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, S. 56 f. Abbildung 31, Tabelle 49, Anwendungsbeispiel Tabelle 50. Modellansätze Anhang 13.5."
+ },
+ {
+  "land_code": "BB",
+  "ags": "12070",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Prignitz",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Prignitz",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "50000": 1.25,
+    "75000": 1.14,
+    "100000": 1.05,
+    "125000": 0.97,
+    "150000": 0.89,
+    "175000": 0.83,
+    "200000": 0.77,
+    "225000": 0.71,
+    "250000": 0.65,
+    "275000": 0.6
+   },
+   "rundung_stellen": 4,
+   "liefert": "faktor",
+   "hinweis": "NORMOBJEKT IST STANDARDSTUFE 2,4 — nicht 2,5 wie beim freistehenden Haus. Abweichungen werden über die Anpassungsfaktoren der Tabelle 62 berücksichtigt (0,67 bei Stufe 1,4 bis 1,17 bei Stufe 3,2). Der Bericht hat auch hier mit multipler Regression geprüft, ob Restnutzungsdauer, Bodenrichtwertniveau oder Baujahr wirken: alle wurden ausgeschlossen. Es bleiben vorläufiger Sachwert und Standardstufe.",
+   "normobjekt": "Reihenhaus oder Doppelhaushälfte mit Standardstufe 2,4, gebraucht."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "1.4": 0.67,
+     "1.6": 0.75,
+     "1.8": 0.83,
+     "2.0": 0.89,
+     "2.2": 0.95,
+     "2.4": 1.0,
+     "2.6": 1.05,
+     "2.8": 1.09,
+     "3.0": 1.13,
+     "3.2": 1.17
+    },
+    "rundung_stellen": 2,
+    "hinweis": "Tabelle 62. Normstelle 2,4. Das Anwendungsbeispiel des Berichts rechnet 150.000 × 0,89 × 0,95 = 126.825 € für ein Reihenhaus der Standardstufe 2,2."
+   }
+  ],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV in Verbindung mit der Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
+   "berechnungsmodell": "Sachwertfaktor = geeigneter Kaufpreis / vorläufiger Sachwert",
+   "ermittlung": "multiple Regressionsanalyse; Restnutzungsdauer, Bodenrichtwertniveau und Baujahr wurden geprüft und ausgeschlossen",
+   "bestimmtheitsmass": 0.23,
+   "kauffaelle_bereinigt": 134
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Prignitz",
+   "sachlich": "gebrauchte Reihenhäuser und Doppelhaushälften",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwert_eur": {
+     "min": 50000,
+     "max": 275000
+    },
+    "brw_eur_qm": {
+     "min": 5,
+     "max": 80
+    },
+    "standardstufe": {
+     "min": 1.4,
+     "max": 3.2
+    }
+   },
+   "vorbehalt": "AUSSERHALB DES DEFINITIONSBEREICHS SAGT DER BERICHT ES SELBST: außerhalb der Abbildung 33 verfügt der Gutachterausschuss über kein ausreichendes Datenmaterial und empfiehlt den Abgleich mit tatsächlich gezahlten Kaufpreisen. Unter 50.000 und über 275.000 Euro gibt es hier deshalb keinen Wert.\n\nDIE KURVE IST STEIL: von 1,25 auf 0,60 über eine Spanne von nur 225.000 Euro — das ist ein Rückgang um mehr als die Hälfte. Das Bestimmtheitsmaß liegt bei 0,23.\n\nDAS NORMOBJEKT IST STANDARDSTUFE 2,4, beim freistehenden Haus 2,5. Wer die Anpassungstabellen verwechselt, rechnet systematisch daneben.",
+   "hinweis": "Der Bericht führt zusätzlich Gebäudefaktoren für diesen Teilmarkt (§ 20 ImmoWertV) — hier noch nicht erfasst."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 Landkreis Prignitz, Kap. 8.3.2, S. 60 ff.: Abbildung 33 mit zehn Stützstellen von 50.000 bis 275.000 € vorläufigem Sachwert (1,25 bis 0,60) aus 134 ausreißerbereinigten Kauffällen, Tabelle 62 mit zehn Anpassungsfaktoren für die Standardstufe, dazu das Anwendungsbeispiel."
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtliche Tabelle MIT ANWENDUNGSBEISPIEL: 150.000 € × 0,89 × 0,95 = 126.825 € für ein Reihenhaus der Standardstufe 2,2. Beide Schritte sind im Register nachgerechnet und zeichengleich.",
+  "fallzahl": 134,
   "streuung": null,
   "stichtag": "2026-01-01",
   "berichtsjahr": 2025,
@@ -3791,6 +4706,342 @@
   "stufe": "B",
   "stufe_grund": "Amtliche Tabelle mit Modellvermerk und Fallzahlen je Klasse. Stufe B, weil kein Anwendungsbeispiel vorliegt und die Spannen je Klasse sehr weit sind (bis 0,56 bis 1,42).",
   "fallzahl": 162,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_TF.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, Tabelle 36, S. 55 ff. Modellansatz im Anhang A1.5. Grundlage: VV EW-SW Land Brandenburg"
+ },
+ {
+  "land_code": "BB",
+  "ags": "12072",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Teltow-Fläming",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Teltow-Fläming",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "baender_kategorial",
+   "achse_feld": "brw",
+   "achse_bez": "Bodenrichtwert in €/m²",
+   "achse_k_feld": "standardstufe",
+   "achse_k_bez": "Standardstufe",
+   "kategorien": [
+    "2",
+    "3",
+    "4"
+   ],
+   "kategorie_baender": [
+    {
+     "von": 1.5,
+     "bis": 2.49,
+     "kategorie": "2"
+    },
+    {
+     "von": 2.5,
+     "bis": 3.49,
+     "kategorie": "3"
+    },
+    {
+     "von": 3.5,
+     "bis": 5.0,
+     "kategorie": "4"
+    }
+   ],
+   "zuordnung_feld": "standardstufe",
+   "baender_je_kategorie": {
+    "2": [
+     {
+      "von": null,
+      "bis": 100,
+      "wert": 1.78,
+      "bez": "bis 100 €/m²",
+      "fallzahl": 3,
+      "min": 1.64,
+      "max": 1.87
+     },
+     {
+      "von": 101,
+      "bis": 300,
+      "wert": 1.46,
+      "bez": "101–300 €/m²",
+      "fallzahl": 6,
+      "min": 1.1,
+      "max": 2.02
+     },
+     {
+      "von": 301,
+      "bis": null,
+      "wert": 1.3,
+      "bez": "ab 301 €/m²",
+      "fallzahl": 7,
+      "min": 1.04,
+      "max": 1.53
+     }
+    ],
+    "3": [
+     {
+      "von": null,
+      "bis": 100,
+      "wert": 1.02,
+      "bez": "bis 100 €/m²",
+      "fallzahl": 4,
+      "min": 0.88,
+      "max": 1.37
+     },
+     {
+      "von": 101,
+      "bis": 200,
+      "wert": 1.18,
+      "bez": "101–200 €/m²",
+      "fallzahl": 9,
+      "min": 0.88,
+      "max": 1.71
+     },
+     {
+      "von": 201,
+      "bis": 300,
+      "wert": 1.27,
+      "bez": "201–300 €/m²",
+      "fallzahl": 18,
+      "min": 0.96,
+      "max": 1.85
+     },
+     {
+      "von": 301,
+      "bis": null,
+      "wert": 1.4,
+      "bez": "ab 301 €/m²",
+      "fallzahl": 15,
+      "min": 0.93,
+      "max": 1.74
+     }
+    ],
+    "4": [
+     {
+      "von": 201,
+      "bis": 400,
+      "wert": 1.23,
+      "bez": "201–400 €/m²",
+      "fallzahl": 4,
+      "min": 1.09,
+      "max": 1.37
+     }
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "JE STANDARDSTUFE ANDERE BODENRICHTWERTBÄNDER, wie beim Einfamilienhaus-Satz — und für Standardstufe 4 führt der Bericht NUR das Band 201 bis 400 €/m². Außerhalb davon gibt es für Stufe 4 keinen Wert; eine Grenze zu erfinden, die der Bericht nicht zieht, wäre schlimmer als keine Antwort. BEMERKENSWERT: bei Standardstufe 2 fällt der Faktor mit steigendem Bodenrichtwert (1,78 → 1,30), bei Standardstufe 3 steigt er (1,02 → 1,40). Beides steht so in Tabelle 43.",
+   "normobjekt": "Modellansatz nach VV EW-SW Land Brandenburg, beschrieben im Anhang A1.5 des Berichts. BGF in Anlehnung an DIN 277 (1987), alle Grundrissebenen."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
+   "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert",
+   "bgf": "Brutto-Grundfläche in Anlehnung an DIN 277 (1987), alle Grundrissebenen",
+   "kauffaelle_gesamt": 66
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Teltow-Fläming",
+   "sachlich": "Doppelhaushälften und Reihenendhäuser",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "brw_eur_qm": {
+     "min": 10,
+     "max": 400,
+     "mittel": 244
+    },
+    "gsflaeche_qm": {
+     "min": 178,
+     "max": 1469,
+     "mittel": 471,
+     "hinweis": "rentierliche Fläche"
+    },
+    "bgf_qm": {
+     "min": 110,
+     "max": 305,
+     "mittel": 201
+    },
+    "rnd_jahre": {
+     "min": 10,
+     "max": 79,
+     "mittel": 43
+    },
+    "sachwert_eur": {
+     "min": 91721,
+     "max": 527111,
+     "mittel": 285194
+    }
+   },
+   "vorbehalt": "DIE FALLZAHLEN JE KLASSE SIND KLEIN: drei bis achtzehn. Bei Standardstufe 2 und Bodenrichtwert bis 100 €/m² steht der Faktor 1,78 auf drei Kauffällen; bei Standardstufe 4 steht 1,23 auf vier. Die Spannen sind entsprechend weit — bis 1,10 bis 2,02 in einer einzigen Klasse. Jede Klasse führt ihre Fallzahl und ihre Spanne mit; beides gehört in jede Anwendung.\n\nDER BERICHT MAHNT AUSDRÜCKLICH ZUR MODELLKONFORMITÄT (§ 10 ImmoWertV) und zur kritischen Prüfung der Ergebnisse durch den Sachverständigen.",
+   "hinweis": "Reihenmittelhäuser führt der Bericht getrennt (Tabelle 42) — sie stehen als eigener Registersatz unter dem Zweig `rmh`."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 Landkreis Teltow-Fläming, Tabelle 43, S. 65 f.: Sachwertfaktoren für Doppelhaushälften und Reihenendhäuser aus 66 Vertragsvorgängen des Jahres 2025, gestaffelt nach Standardstufe und Bodenrichtwertniveau, mit Fallzahl und Spanne je Klasse."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtliche Tabelle mit Fallzahlen und Spannen je Klasse. Stufe C statt B, weil die Klassen mit drei bis achtzehn Kauffällen deutlich dünner besetzt sind als beim Einfamilienhaus-Satz und für Standardstufe 4 nur ein einziges Bodenrichtwertband vorliegt.",
+  "fallzahl": 66,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_TF.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, Tabelle 36, S. 55 ff. Modellansatz im Anhang A1.5. Grundlage: VV EW-SW Land Brandenburg"
+ },
+ {
+  "land_code": "BB",
+  "ags": "12072",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Teltow-Fläming",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Teltow-Fläming",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh",
+  "formel": {
+   "form": "baender_kategorial",
+   "achse_feld": "brw",
+   "achse_bez": "Bodenrichtwert in €/m²",
+   "achse_k_feld": "standardstufe",
+   "achse_k_bez": "Standardstufe",
+   "kategorien": [
+    "2",
+    "3",
+    "4"
+   ],
+   "kategorie_baender": [
+    {
+     "von": 1.5,
+     "bis": 2.49,
+     "kategorie": "2"
+    },
+    {
+     "von": 2.5,
+     "bis": 3.49,
+     "kategorie": "3"
+    },
+    {
+     "von": 3.5,
+     "bis": 5.0,
+     "kategorie": "4"
+    }
+   ],
+   "zuordnung_feld": "standardstufe",
+   "baender_je_kategorie": {
+    "2": [
+     {
+      "von": null,
+      "bis": 100,
+      "wert": 0.91,
+      "bez": "bis 100 €/m²",
+      "fallzahl": 1,
+      "min": 0.91,
+      "max": 0.91
+     }
+    ],
+    "3": [
+     {
+      "von": null,
+      "bis": 200,
+      "wert": 1.17,
+      "bez": "bis 200 €/m²",
+      "fallzahl": 5,
+      "min": 0.99,
+      "max": 1.42
+     },
+     {
+      "von": 201,
+      "bis": 300,
+      "wert": 1.48,
+      "bez": "201–300 €/m²",
+      "fallzahl": 7,
+      "min": 1.14,
+      "max": 1.74
+     },
+     {
+      "von": 301,
+      "bis": null,
+      "wert": 1.51,
+      "bez": "ab 301 €/m²",
+      "fallzahl": 9,
+      "min": 1.16,
+      "max": 1.89
+     }
+    ],
+    "4": [
+     {
+      "von": 101,
+      "bis": 400,
+      "wert": 1.48,
+      "bez": "101–400 €/m²",
+      "fallzahl": 2,
+      "min": 1.2,
+      "max": 1.75
+     }
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "VIERUNDZWANZIG KAUFFÄLLE AUF FÜNF KLASSEN. Die dünnste Tabelle dieses Registers: Standardstufe 2 steht auf EINEM Kauffall (Spanne 0,91 bis 0,91 — das ist ein einzelner Kaufpreis, keine Streuung), Standardstufe 4 auf zweien. Der Bericht druckt sie ab, deshalb stehen sie hier — aber jede Klasse führt ihre Fallzahl mit, und wer sie anwendet, muss sie lesen.",
+   "normobjekt": "Modellansatz nach VV EW-SW Land Brandenburg. BGF in Anlehnung an DIN 277 (1987)."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
+   "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert",
+   "kauffaelle_gesamt": 24
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Teltow-Fläming",
+   "sachlich": "Reihenmittelhäuser",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "brw_eur_qm": {
+     "min": 50,
+     "max": 400,
+     "mittel": 265
+    },
+    "gsflaeche_qm": {
+     "min": 130,
+     "max": 509,
+     "mittel": 204,
+     "hinweis": "rentierliche Fläche"
+    },
+    "bgf_qm": {
+     "min": 140,
+     "max": 275,
+     "mittel": 198
+    },
+    "rnd_jahre": {
+     "min": 18,
+     "max": 57,
+     "mittel": 48
+    },
+    "sachwert_eur": {
+     "min": 87829,
+     "max": 376519,
+     "mittel": 234792
+    }
+   },
+   "vorbehalt": "EIN KAUFFALL IST KEINE STICHPROBE. Die Klasse Standardstufe 2 / bis 100 €/m² beruht auf einem einzigen Vertrag des Jahres 2025; die Klasse Standardstufe 4 auf zwei. Diese Werte sind im Bericht abgedruckt und stehen deshalb hier — als Orientierung, nicht als abgeleiteter Faktor. Wer sie anwendet, sollte den Vergleich mit tatsächlich gezahlten Kaufpreisen suchen.\n\nDIE BESSER BESETZTEN KLASSEN (Standardstufe 3 mit 5, 7 und 9 Kauffällen) zeigen einen klaren Verlauf: 1,17 · 1,48 · 1,51 mit steigendem Bodenrichtwert.",
+   "hinweis": "Doppelhaushälften und Reihenendhäuser führt der Bericht getrennt (Tabelle 43) — sie stehen als eigener Registersatz unter dem Zweig `rhdhh`."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 Landkreis Teltow-Fläming, Tabelle 42, S. 64: Sachwertfaktoren für Reihenmittelhäuser aus 24 Vertragsvorgängen des Jahres 2025, gestaffelt nach Standardstufe und Bodenrichtwertniveau, mit Fallzahl und Spanne je Klasse."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtliche Tabelle mit Fallzahlen und Spannen. Stufe C, weil zwei der fünf Klassen auf einem beziehungsweise zwei Kauffällen beruhen.",
+  "fallzahl": 24,
   "streuung": null,
   "stichtag": "2026-01-01",
   "berichtsjahr": 2025,
