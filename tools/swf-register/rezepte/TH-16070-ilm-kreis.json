@@ -1,0 +1,1391 @@
+{
+  "land_code": "TH",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg",
+  "ebene": "kreis",
+  "berichtsjahr": 2025,
+  "stichtag": "2023-01-01",
+  "auswertezeitraum": "Kauffälle der Jahre 2022 und 2023",
+  "beschlossen": null,
+  "veroeffentlicht": "2025",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_datei": "2025_SWF_R267.pdf, Sachwertfaktoren 2025",
+  "quellenvermerk": "Sachwertfaktoren 2025 © Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Bezugsmaßstab Bruttogrundfläche, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre. Der vorläufige Sachwert ist in die Schätzfunktion in MIO EURO einzusetzen.",
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 80,
+    "alterswertminderung": "linear",
+    "bezugsmassstab": "BGF"
+  },
+  "gaa_kennz": "16070",
+  "ags": [
+    "16070"
+  ],
+  "fundstelle": "Sachwertfaktoren 2025, Tabelle der Sachwertfaktoren für Ilm-Kreis und die zugehörige Tabelle der Regressionskoeffizienten.",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "Grundstücke mit Ein- und Zweifamilienhäusern im Ilm-Kreis",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x": [
+          15,
+          30,
+          60,
+          120
+        ],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenwertniveau in Euro/m²",
+        "achse_y": [
+          40000,
+          50000,
+          60000,
+          70000,
+          80000,
+          90000,
+          100000,
+          110000,
+          120000,
+          130000,
+          140000,
+          150000,
+          160000,
+          170000,
+          180000,
+          190000,
+          200000,
+          210000,
+          220000,
+          230000,
+          240000,
+          250000,
+          260000,
+          270000,
+          280000,
+          290000,
+          300000,
+          310000,
+          320000,
+          330000,
+          340000,
+          350000,
+          360000,
+          370000,
+          380000,
+          390000,
+          400000,
+          410000,
+          420000,
+          430000,
+          440000,
+          450000,
+          460000,
+          470000,
+          480000,
+          490000,
+          500000,
+          510000,
+          520000,
+          530000,
+          540000,
+          550000,
+          560000,
+          570000,
+          580000,
+          590000,
+          600000,
+          610000,
+          620000,
+          630000
+        ],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "40000": [
+            1.12,
+            1.28,
+            1.46,
+            1.68
+          ],
+          "50000": [
+            1.08,
+            1.24,
+            1.42,
+            1.62
+          ],
+          "60000": [
+            1.05,
+            1.2,
+            1.38,
+            1.57
+          ],
+          "70000": [
+            1.03,
+            1.18,
+            1.35,
+            1.54
+          ],
+          "80000": [
+            1.01,
+            1.15,
+            1.32,
+            1.51
+          ],
+          "90000": [
+            0.99,
+            1.13,
+            1.29,
+            1.48
+          ],
+          "100000": [
+            0.97,
+            1.11,
+            1.27,
+            1.46
+          ],
+          "110000": [
+            0.96,
+            1.1,
+            1.26,
+            1.44
+          ],
+          "120000": [
+            0.95,
+            1.08,
+            1.24,
+            1.42
+          ],
+          "130000": [
+            0.94,
+            1.07,
+            1.22,
+            1.4
+          ],
+          "140000": [
+            0.93,
+            1.06,
+            1.21,
+            1.38
+          ],
+          "150000": [
+            0.92,
+            1.05,
+            1.2,
+            1.37
+          ],
+          "160000": [
+            0.91,
+            1.04,
+            1.19,
+            1.36
+          ],
+          "170000": [
+            0.9,
+            1.03,
+            1.17,
+            1.34
+          ],
+          "180000": [
+            0.89,
+            1.02,
+            1.16,
+            1.33
+          ],
+          "190000": [
+            0.88,
+            1.01,
+            1.16,
+            1.32
+          ],
+          "200000": [
+            0.88,
+            1.0,
+            1.15,
+            1.31
+          ],
+          "210000": [
+            0.87,
+            0.99,
+            1.14,
+            1.3
+          ],
+          "220000": [
+            0.86,
+            0.99,
+            1.13,
+            1.29
+          ],
+          "230000": [
+            0.86,
+            0.98,
+            1.12,
+            1.28
+          ],
+          "240000": [
+            0.85,
+            0.97,
+            1.11,
+            1.27
+          ],
+          "250000": [
+            0.85,
+            0.97,
+            1.11,
+            1.27
+          ],
+          "260000": [
+            0.84,
+            0.96,
+            1.1,
+            1.26
+          ],
+          "270000": [
+            0.84,
+            0.96,
+            1.09,
+            1.25
+          ],
+          "280000": [
+            0.83,
+            0.95,
+            1.09,
+            1.24
+          ],
+          "290000": [
+            0.83,
+            0.95,
+            1.08,
+            1.24
+          ],
+          "300000": [
+            0.82,
+            0.94,
+            1.08,
+            1.23
+          ],
+          "310000": [
+            0.82,
+            0.94,
+            1.07,
+            1.23
+          ],
+          "320000": [
+            0.82,
+            0.93,
+            1.07,
+            1.22
+          ],
+          "330000": [
+            0.81,
+            0.93,
+            1.06,
+            1.21
+          ],
+          "340000": [
+            0.81,
+            0.92,
+            1.06,
+            1.21
+          ],
+          "350000": [
+            0.8,
+            0.92,
+            1.05,
+            1.2
+          ],
+          "360000": [
+            0.8,
+            0.92,
+            1.05,
+            1.2
+          ],
+          "370000": [
+            0.8,
+            0.91,
+            1.04,
+            1.19
+          ],
+          "380000": [
+            0.79,
+            0.91,
+            1.04,
+            1.19
+          ],
+          "390000": [
+            0.79,
+            0.91,
+            1.04,
+            1.18
+          ],
+          "400000": [
+            0.79,
+            0.9,
+            1.03,
+            1.18
+          ],
+          "410000": [
+            0.79,
+            0.9,
+            1.03,
+            1.17
+          ],
+          "420000": [
+            0.78,
+            0.9,
+            1.02,
+            1.17
+          ],
+          "430000": [
+            0.78,
+            0.89,
+            1.02,
+            1.17
+          ],
+          "440000": [
+            0.78,
+            0.89,
+            1.02,
+            1.16
+          ],
+          "450000": [
+            0.77,
+            0.89,
+            1.01,
+            1.16
+          ],
+          "460000": [
+            0.77,
+            0.88,
+            1.01,
+            1.15
+          ],
+          "470000": [
+            0.77,
+            0.88,
+            1.01,
+            1.15
+          ],
+          "480000": [
+            0.77,
+            0.88,
+            1.0,
+            1.15
+          ],
+          "490000": [
+            0.76,
+            0.87,
+            1.0,
+            1.14
+          ],
+          "500000": [
+            0.76,
+            0.87,
+            1.0,
+            1.14
+          ],
+          "510000": [
+            0.76,
+            0.87,
+            0.99,
+            1.14
+          ],
+          "520000": [
+            0.76,
+            0.87,
+            0.99,
+            1.13
+          ],
+          "530000": [
+            0.76,
+            0.86,
+            0.99,
+            1.13
+          ],
+          "540000": [
+            0.75,
+            0.86,
+            0.98,
+            1.13
+          ],
+          "550000": [
+            0.75,
+            0.86,
+            0.98,
+            1.12
+          ],
+          "560000": [
+            0.75,
+            0.86,
+            0.98,
+            1.12
+          ],
+          "570000": [
+            0.75,
+            0.85,
+            0.98,
+            1.12
+          ],
+          "580000": [
+            0.75,
+            0.85,
+            0.97,
+            1.11
+          ],
+          "590000": [
+            0.74,
+            0.85,
+            0.97,
+            1.11
+          ],
+          "600000": [
+            0.74,
+            0.85,
+            0.97,
+            1.11
+          ],
+          "610000": [
+            0.74,
+            0.85,
+            0.97,
+            1.11
+          ],
+          "620000": [
+            0.74,
+            0.84,
+            0.96,
+            1.1
+          ],
+          "630000": [
+            0.74,
+            0.84,
+            0.96,
+            1.1
+          ]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Der Ausschuss leitet für jedes seiner drei Gebiete eine EIGENE Regression ab: ln(k) = ln(a1) + b × ln(vSW) + c × ln(BRW). Für dieses Gebiet ist ln(a1) = -0.9012, b = -0.1525, c = 0.1935, adjustiertes Bestimmtheitsmaß 0.501. Für feste Bodenwertniveaus löst der Bericht das zu a = a1 × BRW^c auf und druckt Tabellen ab; hinterlegt sind diese Tabellen (15 €/qm: a=0.6857 · 30 €/qm: a=0.7841 · 60 €/qm: a=0.8966 · 120 €/qm: a=1.0253, b = -0.1525), gegen jeden abgedruckten Wert geprüft. 4 Bodenwertniveaus als Stützstellen, zwischen denen interpoliert wird.",
+        "normobjekt": "Tabellenbereich 40.000 bis 630.000 Euro vorläufiger Sachwert."
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren 2025, Tabelle der Sachwertfaktoren für Ilm-Kreis und die zugehörige Tabelle der Regressionskoeffizienten.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle samt Schaetzfunktion und Koeffizienten, gegeneinander nachgerechnet. KEINE Stufe A: das adjustierte Bestimmtheitsmass liegt bei 0.501, und der Stichtag 01.01.2023 liegt zurueck.",
+      "fallzahl": null
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Grundstücke mit Doppelhaushälften und Reihenendhäusern im Ilm-Kreis",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x": [
+          15,
+          30,
+          60,
+          120
+        ],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenwertniveau in Euro/m²",
+        "achse_y": [
+          40000,
+          50000,
+          60000,
+          70000,
+          80000,
+          90000,
+          100000,
+          110000,
+          120000,
+          130000,
+          140000,
+          150000,
+          160000,
+          170000,
+          180000,
+          190000,
+          200000,
+          210000,
+          220000,
+          230000,
+          240000,
+          250000,
+          260000,
+          270000,
+          280000,
+          290000,
+          300000,
+          310000,
+          320000,
+          330000,
+          340000,
+          350000,
+          360000,
+          370000,
+          380000,
+          390000,
+          400000,
+          410000,
+          420000,
+          430000,
+          440000,
+          450000,
+          460000,
+          470000,
+          480000,
+          490000,
+          500000,
+          510000,
+          520000,
+          530000,
+          540000,
+          550000,
+          560000,
+          570000,
+          580000,
+          590000,
+          600000,
+          610000,
+          620000,
+          630000
+        ],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "40000": [
+            1.12,
+            1.28,
+            1.46,
+            1.68
+          ],
+          "50000": [
+            1.08,
+            1.24,
+            1.42,
+            1.62
+          ],
+          "60000": [
+            1.05,
+            1.2,
+            1.38,
+            1.57
+          ],
+          "70000": [
+            1.03,
+            1.18,
+            1.35,
+            1.54
+          ],
+          "80000": [
+            1.01,
+            1.15,
+            1.32,
+            1.51
+          ],
+          "90000": [
+            0.99,
+            1.13,
+            1.29,
+            1.48
+          ],
+          "100000": [
+            0.97,
+            1.11,
+            1.27,
+            1.46
+          ],
+          "110000": [
+            0.96,
+            1.1,
+            1.26,
+            1.44
+          ],
+          "120000": [
+            0.95,
+            1.08,
+            1.24,
+            1.42
+          ],
+          "130000": [
+            0.94,
+            1.07,
+            1.22,
+            1.4
+          ],
+          "140000": [
+            0.93,
+            1.06,
+            1.21,
+            1.38
+          ],
+          "150000": [
+            0.92,
+            1.05,
+            1.2,
+            1.37
+          ],
+          "160000": [
+            0.91,
+            1.04,
+            1.19,
+            1.36
+          ],
+          "170000": [
+            0.9,
+            1.03,
+            1.17,
+            1.34
+          ],
+          "180000": [
+            0.89,
+            1.02,
+            1.16,
+            1.33
+          ],
+          "190000": [
+            0.88,
+            1.01,
+            1.16,
+            1.32
+          ],
+          "200000": [
+            0.88,
+            1.0,
+            1.15,
+            1.31
+          ],
+          "210000": [
+            0.87,
+            0.99,
+            1.14,
+            1.3
+          ],
+          "220000": [
+            0.86,
+            0.99,
+            1.13,
+            1.29
+          ],
+          "230000": [
+            0.86,
+            0.98,
+            1.12,
+            1.28
+          ],
+          "240000": [
+            0.85,
+            0.97,
+            1.11,
+            1.27
+          ],
+          "250000": [
+            0.85,
+            0.97,
+            1.11,
+            1.27
+          ],
+          "260000": [
+            0.84,
+            0.96,
+            1.1,
+            1.26
+          ],
+          "270000": [
+            0.84,
+            0.96,
+            1.09,
+            1.25
+          ],
+          "280000": [
+            0.83,
+            0.95,
+            1.09,
+            1.24
+          ],
+          "290000": [
+            0.83,
+            0.95,
+            1.08,
+            1.24
+          ],
+          "300000": [
+            0.82,
+            0.94,
+            1.08,
+            1.23
+          ],
+          "310000": [
+            0.82,
+            0.94,
+            1.07,
+            1.23
+          ],
+          "320000": [
+            0.82,
+            0.93,
+            1.07,
+            1.22
+          ],
+          "330000": [
+            0.81,
+            0.93,
+            1.06,
+            1.21
+          ],
+          "340000": [
+            0.81,
+            0.92,
+            1.06,
+            1.21
+          ],
+          "350000": [
+            0.8,
+            0.92,
+            1.05,
+            1.2
+          ],
+          "360000": [
+            0.8,
+            0.92,
+            1.05,
+            1.2
+          ],
+          "370000": [
+            0.8,
+            0.91,
+            1.04,
+            1.19
+          ],
+          "380000": [
+            0.79,
+            0.91,
+            1.04,
+            1.19
+          ],
+          "390000": [
+            0.79,
+            0.91,
+            1.04,
+            1.18
+          ],
+          "400000": [
+            0.79,
+            0.9,
+            1.03,
+            1.18
+          ],
+          "410000": [
+            0.79,
+            0.9,
+            1.03,
+            1.17
+          ],
+          "420000": [
+            0.78,
+            0.9,
+            1.02,
+            1.17
+          ],
+          "430000": [
+            0.78,
+            0.89,
+            1.02,
+            1.17
+          ],
+          "440000": [
+            0.78,
+            0.89,
+            1.02,
+            1.16
+          ],
+          "450000": [
+            0.77,
+            0.89,
+            1.01,
+            1.16
+          ],
+          "460000": [
+            0.77,
+            0.88,
+            1.01,
+            1.15
+          ],
+          "470000": [
+            0.77,
+            0.88,
+            1.01,
+            1.15
+          ],
+          "480000": [
+            0.77,
+            0.88,
+            1.0,
+            1.15
+          ],
+          "490000": [
+            0.76,
+            0.87,
+            1.0,
+            1.14
+          ],
+          "500000": [
+            0.76,
+            0.87,
+            1.0,
+            1.14
+          ],
+          "510000": [
+            0.76,
+            0.87,
+            0.99,
+            1.14
+          ],
+          "520000": [
+            0.76,
+            0.87,
+            0.99,
+            1.13
+          ],
+          "530000": [
+            0.76,
+            0.86,
+            0.99,
+            1.13
+          ],
+          "540000": [
+            0.75,
+            0.86,
+            0.98,
+            1.13
+          ],
+          "550000": [
+            0.75,
+            0.86,
+            0.98,
+            1.12
+          ],
+          "560000": [
+            0.75,
+            0.86,
+            0.98,
+            1.12
+          ],
+          "570000": [
+            0.75,
+            0.85,
+            0.98,
+            1.12
+          ],
+          "580000": [
+            0.75,
+            0.85,
+            0.97,
+            1.11
+          ],
+          "590000": [
+            0.74,
+            0.85,
+            0.97,
+            1.11
+          ],
+          "600000": [
+            0.74,
+            0.85,
+            0.97,
+            1.11
+          ],
+          "610000": [
+            0.74,
+            0.85,
+            0.97,
+            1.11
+          ],
+          "620000": [
+            0.74,
+            0.84,
+            0.96,
+            1.1
+          ],
+          "630000": [
+            0.74,
+            0.84,
+            0.96,
+            1.1
+          ]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Der Ausschuss leitet für jedes seiner drei Gebiete eine EIGENE Regression ab: ln(k) = ln(a1) + b × ln(vSW) + c × ln(BRW). Für dieses Gebiet ist ln(a1) = -0.9012, b = -0.1525, c = 0.1935, adjustiertes Bestimmtheitsmaß 0.501. Für feste Bodenwertniveaus löst der Bericht das zu a = a1 × BRW^c auf und druckt Tabellen ab; hinterlegt sind diese Tabellen (15 €/qm: a=0.6857 · 30 €/qm: a=0.7841 · 60 €/qm: a=0.8966 · 120 €/qm: a=1.0253, b = -0.1525), gegen jeden abgedruckten Wert geprüft. 4 Bodenwertniveaus als Stützstellen, zwischen denen interpoliert wird.",
+        "normobjekt": "Tabellenbereich 40.000 bis 630.000 Euro vorläufiger Sachwert."
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren 2025, Tabelle der Sachwertfaktoren für Ilm-Kreis und die zugehörige Tabelle der Regressionskoeffizienten.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle samt Schaetzfunktion und Koeffizienten, gegeneinander nachgerechnet. KEINE Stufe A: das adjustierte Bestimmtheitsmass liegt bei 0.501, und der Stichtag 01.01.2023 liegt zurueck.",
+      "fallzahl": null
+    },
+    {
+      "zweig": "rmh",
+      "zweig_bez": "Grundstücke mit Reihenmittelhäusern im Ilm-Kreis",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x": [
+          15,
+          30,
+          60,
+          120
+        ],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenwertniveau in Euro/m²",
+        "achse_y": [
+          40000,
+          50000,
+          60000,
+          70000,
+          80000,
+          90000,
+          100000,
+          110000,
+          120000,
+          130000,
+          140000,
+          150000,
+          160000,
+          170000,
+          180000,
+          190000,
+          200000,
+          210000,
+          220000,
+          230000,
+          240000,
+          250000,
+          260000,
+          270000,
+          280000,
+          290000,
+          300000,
+          310000,
+          320000,
+          330000,
+          340000,
+          350000,
+          360000,
+          370000,
+          380000,
+          390000,
+          400000,
+          410000,
+          420000,
+          430000,
+          440000,
+          450000,
+          460000,
+          470000,
+          480000,
+          490000,
+          500000,
+          510000,
+          520000,
+          530000,
+          540000,
+          550000,
+          560000,
+          570000,
+          580000,
+          590000,
+          600000,
+          610000,
+          620000,
+          630000
+        ],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "40000": [
+            1.12,
+            1.28,
+            1.46,
+            1.68
+          ],
+          "50000": [
+            1.08,
+            1.24,
+            1.42,
+            1.62
+          ],
+          "60000": [
+            1.05,
+            1.2,
+            1.38,
+            1.57
+          ],
+          "70000": [
+            1.03,
+            1.18,
+            1.35,
+            1.54
+          ],
+          "80000": [
+            1.01,
+            1.15,
+            1.32,
+            1.51
+          ],
+          "90000": [
+            0.99,
+            1.13,
+            1.29,
+            1.48
+          ],
+          "100000": [
+            0.97,
+            1.11,
+            1.27,
+            1.46
+          ],
+          "110000": [
+            0.96,
+            1.1,
+            1.26,
+            1.44
+          ],
+          "120000": [
+            0.95,
+            1.08,
+            1.24,
+            1.42
+          ],
+          "130000": [
+            0.94,
+            1.07,
+            1.22,
+            1.4
+          ],
+          "140000": [
+            0.93,
+            1.06,
+            1.21,
+            1.38
+          ],
+          "150000": [
+            0.92,
+            1.05,
+            1.2,
+            1.37
+          ],
+          "160000": [
+            0.91,
+            1.04,
+            1.19,
+            1.36
+          ],
+          "170000": [
+            0.9,
+            1.03,
+            1.17,
+            1.34
+          ],
+          "180000": [
+            0.89,
+            1.02,
+            1.16,
+            1.33
+          ],
+          "190000": [
+            0.88,
+            1.01,
+            1.16,
+            1.32
+          ],
+          "200000": [
+            0.88,
+            1.0,
+            1.15,
+            1.31
+          ],
+          "210000": [
+            0.87,
+            0.99,
+            1.14,
+            1.3
+          ],
+          "220000": [
+            0.86,
+            0.99,
+            1.13,
+            1.29
+          ],
+          "230000": [
+            0.86,
+            0.98,
+            1.12,
+            1.28
+          ],
+          "240000": [
+            0.85,
+            0.97,
+            1.11,
+            1.27
+          ],
+          "250000": [
+            0.85,
+            0.97,
+            1.11,
+            1.27
+          ],
+          "260000": [
+            0.84,
+            0.96,
+            1.1,
+            1.26
+          ],
+          "270000": [
+            0.84,
+            0.96,
+            1.09,
+            1.25
+          ],
+          "280000": [
+            0.83,
+            0.95,
+            1.09,
+            1.24
+          ],
+          "290000": [
+            0.83,
+            0.95,
+            1.08,
+            1.24
+          ],
+          "300000": [
+            0.82,
+            0.94,
+            1.08,
+            1.23
+          ],
+          "310000": [
+            0.82,
+            0.94,
+            1.07,
+            1.23
+          ],
+          "320000": [
+            0.82,
+            0.93,
+            1.07,
+            1.22
+          ],
+          "330000": [
+            0.81,
+            0.93,
+            1.06,
+            1.21
+          ],
+          "340000": [
+            0.81,
+            0.92,
+            1.06,
+            1.21
+          ],
+          "350000": [
+            0.8,
+            0.92,
+            1.05,
+            1.2
+          ],
+          "360000": [
+            0.8,
+            0.92,
+            1.05,
+            1.2
+          ],
+          "370000": [
+            0.8,
+            0.91,
+            1.04,
+            1.19
+          ],
+          "380000": [
+            0.79,
+            0.91,
+            1.04,
+            1.19
+          ],
+          "390000": [
+            0.79,
+            0.91,
+            1.04,
+            1.18
+          ],
+          "400000": [
+            0.79,
+            0.9,
+            1.03,
+            1.18
+          ],
+          "410000": [
+            0.79,
+            0.9,
+            1.03,
+            1.17
+          ],
+          "420000": [
+            0.78,
+            0.9,
+            1.02,
+            1.17
+          ],
+          "430000": [
+            0.78,
+            0.89,
+            1.02,
+            1.17
+          ],
+          "440000": [
+            0.78,
+            0.89,
+            1.02,
+            1.16
+          ],
+          "450000": [
+            0.77,
+            0.89,
+            1.01,
+            1.16
+          ],
+          "460000": [
+            0.77,
+            0.88,
+            1.01,
+            1.15
+          ],
+          "470000": [
+            0.77,
+            0.88,
+            1.01,
+            1.15
+          ],
+          "480000": [
+            0.77,
+            0.88,
+            1.0,
+            1.15
+          ],
+          "490000": [
+            0.76,
+            0.87,
+            1.0,
+            1.14
+          ],
+          "500000": [
+            0.76,
+            0.87,
+            1.0,
+            1.14
+          ],
+          "510000": [
+            0.76,
+            0.87,
+            0.99,
+            1.14
+          ],
+          "520000": [
+            0.76,
+            0.87,
+            0.99,
+            1.13
+          ],
+          "530000": [
+            0.76,
+            0.86,
+            0.99,
+            1.13
+          ],
+          "540000": [
+            0.75,
+            0.86,
+            0.98,
+            1.13
+          ],
+          "550000": [
+            0.75,
+            0.86,
+            0.98,
+            1.12
+          ],
+          "560000": [
+            0.75,
+            0.86,
+            0.98,
+            1.12
+          ],
+          "570000": [
+            0.75,
+            0.85,
+            0.98,
+            1.12
+          ],
+          "580000": [
+            0.75,
+            0.85,
+            0.97,
+            1.11
+          ],
+          "590000": [
+            0.74,
+            0.85,
+            0.97,
+            1.11
+          ],
+          "600000": [
+            0.74,
+            0.85,
+            0.97,
+            1.11
+          ],
+          "610000": [
+            0.74,
+            0.85,
+            0.97,
+            1.11
+          ],
+          "620000": [
+            0.74,
+            0.84,
+            0.96,
+            1.1
+          ],
+          "630000": [
+            0.74,
+            0.84,
+            0.96,
+            1.1
+          ]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Der Ausschuss leitet für jedes seiner drei Gebiete eine EIGENE Regression ab: ln(k) = ln(a1) + b × ln(vSW) + c × ln(BRW). Für dieses Gebiet ist ln(a1) = -0.9012, b = -0.1525, c = 0.1935, adjustiertes Bestimmtheitsmaß 0.501. Für feste Bodenwertniveaus löst der Bericht das zu a = a1 × BRW^c auf und druckt Tabellen ab; hinterlegt sind diese Tabellen (15 €/qm: a=0.6857 · 30 €/qm: a=0.7841 · 60 €/qm: a=0.8966 · 120 €/qm: a=1.0253, b = -0.1525), gegen jeden abgedruckten Wert geprüft. 4 Bodenwertniveaus als Stützstellen, zwischen denen interpoliert wird.",
+        "normobjekt": "Tabellenbereich 40.000 bis 630.000 Euro vorläufiger Sachwert."
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren 2025, Tabelle der Sachwertfaktoren für Ilm-Kreis und die zugehörige Tabelle der Regressionskoeffizienten.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle samt Schaetzfunktion und Koeffizienten, gegeneinander nachgerechnet. KEINE Stufe A: das adjustierte Bestimmtheitsmass liegt bei 0.501, und der Stichtag 01.01.2023 liegt zurueck.",
+      "fallzahl": null
+    }
+  ],
+  "anmerkungen": [
+    "Der Ausschuss ist für DREI Gebiete zuständig und leitet für jedes eine EIGENE Regression ab — nicht eine gemeinsame mit Gebietsvariablen, wie es der Nachbarausschuss Altenburg/Greiz/Gera tut. Alle drei liegen als eigene Rezepte im Register.",
+    "SONNEBERG HAT NUR DREI BODENWERTNIVEAUS (15, 30, 60 Euro/qm), der Ilm-Kreis und Saalfeld-Rudolstadt haben vier (bis 120). Über 60 Euro/qm gibt es in Sonneberg keinen Wert.",
+    "Die Bestimmtheitsmaße unterscheiden sich deutlich: Ilm-Kreis 0,501, Saalfeld-Rudolstadt 0,471, Sonneberg 0,353. Der Sonneberger Satz trägt am wenigsten.",
+    "Die Objektarten Ein- und Zweifamilienhäuser, Doppelhaushälften, Reihenend- und Reihenmittelhäuser sind gemeinsam ausgewertet; dieselbe Matrix steht deshalb unter allen drei Zweigen."
+  ]
+}
