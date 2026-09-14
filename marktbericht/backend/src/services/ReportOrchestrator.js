@@ -325,10 +325,31 @@ export const ReportOrchestrator = {
       return z;
     })().catch((e) => { step('zensus: fehler ' + e.message); return { available: false, source: 'zensus2022', reason: e.message }; });
 
-    // Bodenrichtwert (BORIS-NRW, echt; nur NRW) als eigener paralleler Strang:
+    /* ═══ v1392 · DERSELBE WEG WIE IM TAB OBJEKT ═════════════════════════
+     *
+     * Marcels Frage: „hast du die verknuepft mit der abfrage des
+     * bodenrichtwertes im tab objekt und im marktbericht und auch beim
+     * sprechlauf? falls wir dort noch einen alten weg haben sollten wir
+     * den dann rausnehmen."
+     *
+     * GEMESSEN: Es gab zwei Aufrufer, und nur einer war auf dem neuen
+     * Stand. Der Tab Objekt gibt seit v1388 das Bundesland mit; HIER stand
+     * der Aufruf ohne — der Kommentar sagte es sogar noch selbst:
+     * „BORIS-NRW, echt; nur NRW". Damit lief der Marktbericht (und der
+     * Sprechlauf, der ueber /reports/from-dealpilot geht) weiter in die
+     * Rechteck-Falle aus v1388: fuer Rinteln kam kein Bodenrichtwert,
+     * obwohl der Tab Objekt daneben 80 EUR/m2 zeigte.
+     *
+     * Das Land kommt hier aus dem AMTLICHEN GEMEINDESCHLUESSEL, nicht aus
+     * der Postleitzahl — die ersten zwei Ziffern sind das Bundesland, und
+     * das ist eindeutig. Der AGS-Strang laeuft ohnehin (agsP, Z. 295);
+     * hier wird nur auf ihn gewartet. */
     const borisP = (async () => {
-      const lv = await BorisConnector.landValue({ lat, lon, manualBrw: ref.land_value_manual });
-      step(`Bodenrichtwert: ${lv && lv.available ? lv.value_sqm + ' EUR/m²' : 'keine Daten'}`);
+      let land = null;
+      try { land = (await agsP)?.land_code || null; } catch (e) { land = null; }
+      const lv = await BorisConnector.landValue({ lat, lon, land, manualBrw: ref.land_value_manual });
+      step(`Bodenrichtwert: ${lv && lv.available ? lv.value_sqm + ' EUR/m²' : 'keine Daten'}`
+           + (land ? ` (${land})` : ''));
       return lv;
     })().catch((e) => { step('boris: fehler ' + e.message); return null; });
 

@@ -222,9 +222,15 @@ const ADAPTERS = [
     code: 'by', name: 'BORIS-Bayern',
     license: 'Freigabe (Aktennotiz Junker Solution)',
     enabled: true, verified: true,
-    note: 'Der bayerische Bodenrichtwert-Dienst antwortet seit 14.09.2026 mit '
-      + 'HTTP 404 (alle Jahrgänge). Bitte den Wert im BORIS-Bayern-Viewer '
-      + 'nachschlagen und im Feld „Bodenrichtwert" eintragen.',
+    /* v1393 · DIE NOTIZ AUS v1389 WAR FALSCH und wird hier zurueckgenommen.
+     * Sie sagte, der Dienst antworte mit HTTP 404. Das stimmte nur, weil
+     * ihm der Referer fehlte; mit ihm antwortet er vollstaendig. Der
+     * eigentliche Grund ist ein anderer und steht seit jeher im Kopf
+     * dieser Datei: Bayern gibt den WERT nicht kostenfrei heraus. Alles
+     * uebrige - Zone, Gemarkung, Stichtag, Ausschuss - schon. */
+    note: 'Bayern gibt den Bodenrichtwert nur gegen Gebühr heraus. Zone, '
+      + 'Gemarkung und zuständiger Gutachterausschuss werden trotzdem '
+      + 'ermittelt — damit findest du den Wert im BORIS-Bayern-Viewer sofort.',
     quellenvermerk: 'Gutachterausschüsse in Bayern, BayernAtlas / GDI Bayern '
       + '(www.bodenrichtwerte.bayern.de)',
     base: 'https://gdi.bayern.de/services/bodenrichtwerte',
@@ -233,7 +239,27 @@ const ADAPTERS = [
     bbox: { minLon: 8.95, maxLon: 13.90, minLat: 47.20, maxLat: 50.60 },
     layer: (y) => 'bodenrichtwerte_' + (y || CURRENT_BRW_YEAR),
     crs: 'EPSG:4326', axis: 'latlon', format: 'gml', infoFormat: 'text/xml',
-    featureCount: '5', headers: browserHeaders, time: null,
+    featureCount: '5',
+    /* v1393 · ZWEI FEHLER AUF EINMAL, beide am 14.09.2026 gemessen.
+     *
+     * 1. DER REFERER FEHLTE. Bayern war der einzige Adapter mit blossem
+     *    `browserHeaders` — Schleswig-Holstein (Z. 189) und BW (Z. 260)
+     *    setzen laengst einen. Ohne ihn antwortet gdi.bayern.de mit
+     *    HTTP 404, MIT ihm mit HTTP 200. Das sah vier Jahrgaenge lang
+     *    wie ein toter Dienst aus und war eine fehlende Kopfzeile.
+     *
+     * 2. BAYERN ERMITTELT NUR ALLE ZWEI JAHRE. Es gibt 2024 und 2026,
+     *    KEIN 2025 und kein 2023. Die Jahreskaskade lief auf 2023 aus,
+     *    und genau dieser letzte Fehlversuch stand dann in der Meldung —
+     *    ein 404 auf einen Jahrgang, den es nie gab. */
+    headers: () => Object.assign(browserHeaders(), { 'Referer': 'https://atlas.bayern.de/' }),
+    /* Nur gerade Jahrgaenge, absteigend. */
+    years: (y) => {
+      const jetzt = y || CURRENT_BRW_YEAR;
+      const start = jetzt % 2 === 0 ? jetzt : jetzt - 1;
+      return [start, start - 2, start - 4];
+    },
+    time: null,
   },
   {
     /* v1082-WBW-1 · BW LIVE: BORIS-BW-Viewer nutzt gis.nrw.de als
@@ -685,6 +711,24 @@ export const BorisRegistry = {
          Standardfloskel "kein automatischer Bodenrichtwert vorhanden". */
       if (claimed.note) fb.note = claimed.note;
       fb.claimed_land = claimed.name;
+      /* ═══ v1393 · DER WEG ZUM WERT, WENN ER GELD KOSTET ════════════════
+       * Bayern antwortet vollstaendig und setzt an die Stelle des Wertes
+       * „Information gebuehrenpflichtig". Zone, Gemarkung, Stichtag und
+       * der zustaendige Gutachterausschuss stehen aber in derselben
+       * Antwort. Die gehoeren weitergereicht: „wo kein Wert vorliegt,
+       * bekommt der Kunde den Weg dorthin" (CLAUDE.md). Mit Zone und
+       * Ausschuss findet er ihn in einer Minute. */
+      if (r0.gebuehr) {
+        fb.reason = 'wert_gebuehrenpflichtig';
+        fb.gebuehr = r0.gebuehr;
+        const g = r0.gebuehr;
+        fb.note = 'Der Bodenrichtwert liegt vor, wird von diesem Bundesland aber '
+          + 'nur gegen Gebühr herausgegeben.'
+          + (g.zone ? ' Bodenrichtwertzone: „' + g.zone + '".' : '')
+          + (g.gemarkung ? ' Gemarkung ' + g.gemarkung + '.' : '')
+          + (g.stichtag ? ' Stichtag ' + g.stichtag + '.' : '')
+          + (g.ausschuss ? ' Zuständig: ' + g.ausschuss + '.' : '');
+      }
       return fb;
     }
 
@@ -728,9 +772,15 @@ export const BorisRegistry = {
      * jahresabhaengigen Layer) stellen fuer jedes Kandidatenjahr dieselbe
      * Anfrage — ein Durchlauf genuegt. Schont den Behoerdenserver
      * (ein Abruf je Sekunde gilt unveraendert). */
+    /* v1393: Ein Adapter darf seine eigene Jahresliste mitbringen. Bayern
+       ermittelt nur alle ZWEI Jahre (2024, 2026) - die Standardkaskade
+       lief dort auf 2023 aus und meldete am Ende einen 404 auf einen
+       Jahrgang, den es nie gab. Das sah aus wie ein toter Dienst. */
     const yearCandidates = year ? [year]
-      : (a.yearIndependent ? [nowY] : [nowY, nowY - 1, nowY - 2, nowY - 3]);
+      : (typeof a.years === 'function' ? a.years(nowY)
+      : (a.yearIndependent ? [nowY] : [nowY, nowY - 1, nowY - 2, nowY - 3]));
     let value = null, stichtag = null, nutzung = null, zone = null, raw = null, usedLayer = null, usedYear = null, lastErr = null;
+    let gebuehr = null;   /* v1393: gesperrter Wert samt Zone und Ausschuss */
     outer:
     for (const yr of yearCandidates) {
       /* v1080-WJR-1 · Layer je KANDIDATENJAHR aufloesen — erst damit greift
@@ -788,16 +838,38 @@ export const BorisRegistry = {
           const vRoh = parseGmlField(text, F.value);
           /* v1081-WBY-2 · Sperrtexte ("Information gebuehrenpflichtig",
            * auch als &#252;-Entitaet mit Ziffern) sind KEIN Wert. */
-          v = (vRoh && /geb(ührenpflichtig|uehrenpflichtig|&#252;hrenpflichtig)/i.test(String(vRoh)))
-            ? null : num(vRoh);
+          const gesperrt = !!(vRoh && /geb(ührenpflichtig|uehrenpflichtig|&#252;hrenpflichtig)/i.test(String(vRoh)));
+          v = gesperrt ? null : num(vRoh);
           st = parseGmlField(text, F.stichtag);
           nu = parseGmlField(text, F.nutzung); zo = parseGmlField(text, F.zone);
+          /* ═══ v1393 · EIN GESPERRTER WERT IST KEIN LEERES ERGEBNIS ══════
+           *
+           * Gemessen am Marienplatz, 14.09.2026: Bayern antwortet
+           * vollstaendig — Gutachterausschuss, Gemarkung,
+           * Bodenrichtwertzone („Marienplatz"), Stichtag 01.01.2024 — und
+           * setzt an die Stelle des Wertes den Satz „Information
+           * gebuehrenpflichtig". Der Sperrtext wurde seit v1081 richtig
+           * als Nicht-Wert erkannt, aber ALLES UEBRIGE fiel mit ihm weg.
+           *
+           * Das ist der Unterschied zwischen „wir wissen nichts" und „der
+           * Wert existiert, die Zone heisst so, und er kostet Geld". Nach
+           * CLAUDE.md bekommt der Kunde genau dann den WEG zum Wert. */
+          if (gesperrt) {
+            gebuehr = {
+              zone: zo || null,
+              stichtag: st || null,
+              gemarkung: parseGmlField(text, ['gemarkung']) || null,
+              ausschuss: parseGmlField(text, ['gutachterausschuss_name']) || null,
+              gemeinde: parseGmlField(text, ['gemeinde_name']) || null,
+            };
+          }
         }
         if (v != null) { value = v; stichtag = st; nutzung = nu; zone = zo; raw = rw; usedLayer = ln; usedYear = yr; break outer; }
         if (rw && raw == null) raw = rw; // letzten Roh-Response fuer Diagnose behalten
       }
     }
-    return { value, stichtag, nutzung, zone, raw, usedLayer, usedYear, lastErr, layers: layersInfo, years: yearCandidates };
+    return { value, stichtag, nutzung, zone, raw, usedLayer, usedYear, lastErr, gebuehr,
+             layers: layersInfo, years: yearCandidates };
   },
 
   // Ein-Klick-Verifikation: testet jedes hinterlegte Land mit Dienst an einem Beispielpunkt

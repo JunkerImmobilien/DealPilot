@@ -7,6 +7,15 @@ import { cacheGet, cacheSet } from '../lib/cache.js';
 
 const TTL_MS = 30 * 24 * 60 * 60 * 1000; // AGS aendert sich praktisch nie -> 30 Tage cachen
 
+/* v1392 · Die ersten zwei Ziffern des Amtlichen Gemeindeschluessels sind
+   das Bundesland. Amtlich, eindeutig und ohne Grenzfaelle - im Gegensatz
+   zur Postleitzahl, die ueber Landesgrenzen reichen kann. */
+const LAND_AUS_AGS = {
+  '01': 'SH', '02': 'HH', '03': 'NI', '04': 'HB', '05': 'NW', '06': 'HE',
+  '07': 'RP', '08': 'BW', '09': 'BY', '10': 'SL', '11': 'BE', '12': 'BB',
+  '13': 'MV', '14': 'SN', '15': 'ST', '16': 'TH',
+};
+
 export const AgsResolver = {
   // postcode -> { kreis_ags, kreis_name, bundesland, gemeinde_ags } | null
   async fromPostcode(postcode) {
@@ -30,6 +39,12 @@ export const AgsResolver = {
             kreis_ags: krsAgs.slice(0, 5),
             kreis_name: (loc.district && loc.district.name) || (loc.municipality && loc.municipality.name) || null,
             bundesland: loc.federalState && loc.federalState.name ? loc.federalState.name : null,
+            /* v1392: Das Kuerzel aus den ersten zwei Ziffern des AGS. Das
+               ist die amtliche Zuordnung und eindeutig - anders als eine
+               Postleitzahl, die ueber Landesgrenzen reichen kann, und
+               anders als der Landesname, den man erst uebersetzen muesste.
+               Der Bodenrichtwert-Abruf braucht genau das (v1388). */
+            land_code: LAND_AUS_AGS[krsAgs.slice(0, 2)] || null,
             gemeinde_ags: gemAgs,
           };
         }
