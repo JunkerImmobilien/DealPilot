@@ -303,6 +303,26 @@ export const AUSSCHUSS_QUELLEN = {
     warum_kein_wert: 'Der Immobilienmarktbericht 2021/2022 stellt die Sachwertfaktoren AUSSCHLIESSLICH als Diagramme dar — Potenzfunktions-Trendlinien über die Einzelfälle, ohne abgedruckte Konstanten und ohne Tabelle. Aus einer Kurve ohne Gleichung lässt sich kein Wert ablesen, der die Prüfung überstünde. Hinzu kommt: die im Diagramm ausgewiesenen Bestimmtheitsmaße liegen zwischen 0,0485 und 0,1616 — die Trendlinien erklären damit unter 17 Prozent der Streuung.',
     hinweis: 'Das Modell ist vollständig abgedruckt (Abbildung 44): Bodenrichtwert zum 31.12.2022, maximal 800 m² Grundstücksfläche, NHK 2010 nach ImmoWertV, Bruttogrundfläche modellkonform, Baupreisindex des Statistischen Bundesamtes, Gesamtnutzungsdauer 80 Jahre, wirtschaftliche Restnutzungsdauer mindestens 15 Jahre, lineare Alterswertminderung, Außenanlagen 3 bis 5 Prozent vom Gebäudezeitwert, Hausanschlüsse 2.500 bis 5.000 Euro. Die Auswertung ist in drei Bodenpreisklassen und nach Gebäudeart getrennt (Einfamilienhäuser, Doppel-/Reihenendhäuser, Reihenmittelhäuser). Der Jahrgang 2021/2022 ist zudem nicht mehr aktuell.',
   },
+
+  /* ═══ v1396 · BREMEN UND BREMERHAVEN — zwei Stadtstaat-Ausschuesse ══════
+   * Bremen ist der lehrreichste Eintrag des ganzen Registers: der Ausschuss
+   * sagt SELBST, dass er keine Sachwertfaktoren ableitet. Das ist kein
+   * fehlender Fund, sondern ein amtlich begruendetes Nichtvorhandensein —
+   * und es erspart einen sinnlosen Berichtskauf.                          */
+  '04011': {
+    stelle: 'Gutachterausschuss für Grundstückswerte in Bremen',
+    url: 'https://www.bauumwelt.bremen.de/bauen/gutachterausschuss-fuer-grundstueckswerte-3489',
+    zugang: 'kostenpflichtig',
+    warum_kein_wert: 'Der Gutachterausschuss Bremen leitet keine Sachwertfaktoren ab und sagt das in seinem Grundstücksmarktbericht 2026 selbst (Kapitel 8.4): „Aufgrund unzureichender Personalausstattung seiner Geschäftsstelle sieht sich der Gutachterausschuss Bremen derzeit nicht in der Lage, dieser zusätzlichen Aufgabe nachzukommen." Es liegt hier also kein amtlicher Marktanpassungsfaktor vor — nicht, weil wir ihn nicht fänden, sondern weil keiner abgeleitet wurde.',
+    hinweis: 'Den Ersatzweg nennt der Ausschuss im selben Absatz: „Sachverständigen wird daher empfohlen, für Verkehrswertableitungen einzelfallbezogene Vergleichskaufpreise (Auskünfte aus der Kaufpreissammlung) einzuholen." Die Auskunft aus der Kaufpreissammlung ist bei der Geschäftsstelle zu beantragen. Wichtig für die Kostenfrage: der vollständige Grundstücksmarktbericht ist kostenpflichtig und enthält die Sachwertfaktoren EBENFALLS NICHT — der frei abrufbare Auszug ist in diesem Punkt vollständig. Bodenrichtwerte und Liegenschaftszinssätze führt der Bericht dagegen.',
+  },
+  '04012': {
+    stelle: 'Gutachterausschuss für Grundstückswerte in Bremerhaven',
+    url: 'https://www.bremerhaven.de/de/wirtschaft-bauen/bauen-wohnen/gutachterausschuss-fuer-grundstueckswerte.44584.html',
+    zugang: 'kostenpflichtig',
+    warum_kein_wert: 'Der Grundstücksmarktbericht 2026 führt Sachwertfaktoren laut seinem eigenen Inhaltsverzeichnis ab Seite 31 — die frei abrufbare Fassung hat aber nur 18 Seiten und endet vorher. Die Zahlen stehen nur in der kostenpflichtigen Vollfassung über die Geschäftsstelle.',
+    hinweis: 'Bremerhaven führt seine Kaufpreissammlung in der Automatisierten Kaufpreissammlung (AKS) der NIEDERSÄCHSISCHEN Vermessungs- und Katasterverwaltung und folgt deren Modellbeschreibungen und Begriffen ausdrücklich. Wer den Faktor dringend braucht, findet unter dem niedersächsischen Sachwertfaktor-Rechner ein methodisch gleich aufgebautes Modell — das ersetzt den Bremerhavener Wert NICHT (fremder Ausschuss, fremdes Gebiet), erklärt aber, welche Eingangsgrößen der Bericht erwartet. Erbbaurechtsfaktoren konnte der Ausschuss wegen zu geringer Fallzahl nicht ableiten.',
+  },
 };
 
 /**
@@ -453,5 +473,46 @@ for (const [ags, name] of Object.entries(BY_OHNE_SACHWERTFAKTOR)) {
       + 'zuständigen Ausschuss kann sich deshalb lohnen. Bayern hat kein '
       + 'zentrales Downloadportal für Marktberichte; der Einstieg über die '
       + 'Landesseite führt zu den einzelnen Geschäftsstellen.',
+  };
+}
+
+/* ═══ v1396 · SAARLAND — ein Bericht fuer sechs Kreise ════════════════════
+ * Im Saarland veroeffentlicht NICHT der oertliche Ausschuss die
+ * Sachwertfaktoren, sondern die Zentrale Geschaeftsstelle — einheitlich im
+ * Grundstuecksmarktbericht Saarland. Der Saarbruecker Immobilienmarktbericht
+ * 2026 sagt das in Kapitel 7.3 selbst. Deshalb traegt jeder der sechs
+ * saarlaendischen Kreise denselben Weg: er fuehrt an dieselbe Stelle.
+ *
+ * Die Kreisschluessel stammen aus dem Gemeindeverzeichnis des Statistischen
+ * Bundesamtes, nicht aus dem Gedaechtnis.                                 */
+const SL_KREISE = {
+  '10041': 'Regionalverband Saarbrücken',
+  '10042': 'Landkreis Merzig-Wadern',
+  '10043': 'Landkreis Neunkirchen',
+  '10044': 'Landkreis Saarlouis',
+  '10045': 'Saarpfalz-Kreis',
+  '10046': 'Landkreis St. Wendel',
+};
+
+for (const [ags, name] of Object.entries(SL_KREISE)) {
+  AUSSCHUSS_QUELLEN[ags] = {
+    stelle: 'Zentrale Geschäftsstelle der Gutachterausschüsse des Saarlandes',
+    url: 'https://www.saarland.de/lvgl/DE/portalthemen/immobilienmarkt/immobilienmarkt_node.html',
+    zugang: 'kostenpflichtig',
+    warum_kein_wert:
+      `Für das Gebiet ${name} leitet der örtliche Gutachterausschuss keine eigenen `
+      + 'Sachwertfaktoren ab. Sie werden landesweit von der Zentralen Geschäftsstelle '
+      + 'der Gutachterausschüsse gesammelt, aufbereitet und im Grundstücksmarktbericht '
+      + 'Saarland veröffentlicht — so steht es im Immobilienmarktbericht 2026 des '
+      + 'Regionalverbands Saarbrücken (Kapitel 7.3). Dieser Landesbericht erscheint '
+      + 'zweijährlich und ist kostenpflichtig; die Zahlen liegen uns deshalb nicht vor.',
+    hinweis:
+      'Der Grundstücksmarktbericht Saarland führt Sachwertfaktoren für Ein- und '
+      + 'Zweifamilienhäuser sowie Liegenschaftszinssätze, einheitlich für alle '
+      + 'Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt. '
+      + 'Kostenfrei abrufbar ist dagegen der Immobilienmarktbericht des '
+      + 'Regionalverbands Saarbrücken: er enthält Liegenschaftszinssätze, '
+      + 'Bodenrichtwerte und — allerdings nur für den Saarpfalz-Kreis — '
+      + 'Vergleichsfaktoren. Sachwertfaktoren enthält er nicht.',
   };
 }
