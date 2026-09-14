@@ -3640,10 +3640,13 @@
       '.vi-rf-dran[data-zustand="angebot"] .vi-dran-a{',
       '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 17%, transparent)}',
       '.vi-rf-dran[data-zustand="angebot"] .vi-dran-lbl{color:var(--wl-b8932f, #b8932f);font-size:10px}',
-      /* Hoert zu: gruen, und zwar am RAHMEN - nicht nur an der Schriftzeile
-         unten, die beim Sprechen niemand ansieht. */
-      '.vi-rf-dran[data-zustand="hoert"]{border-color:#3FA56C;animation:viHoert 1.9s ease-out infinite}',
-      '.vi-rf-dran[data-zustand="hoert"] .vi-dran-f i{color:#3FA56C}',
+      /* v1119c-WZWEI: die Aufnahme laeuft ueber OUTLINE, der Puls ueber
+         box-shadow — so koennen beide gleichzeitig zu sehen sein. Vorher
+         gewann das Zuhoeren immer, und weil das Mikrofon im
+         Freisprechmodus dauernd laeuft, sah man den Puls nie. */
+      '.vi-rf-dran[data-hoert="1"]{outline:2px solid #3FA56C;outline-offset:2px}',
+      '.vi-rf-dran[data-hoert="1"] .vi-dran-f i{color:#3FA56C;animation:viHoert 1.9s ease-out infinite;',
+      '  border-radius:50%}',
       /* Der Nein-Knopf steht neben den Abrufen, sieht aber nicht aus wie
          einer: ein Angebot und seine Ablehnung duerfen nicht gleich
          aussehen, sonst klickt man daneben. */
@@ -3653,7 +3656,7 @@
       '  box-shadow:none;color:#2A2727}',
       '.vi-dran-btn.nein b{font-size:13px;opacity:.7}',
       '@media (prefers-reduced-motion:reduce){',
-      '  .vi-rf-dran[data-zustand="angebot"],.vi-rf-dran[data-zustand="hoert"]{animation:none}',
+      '  .vi-rf-dran[data-zustand="angebot"],.vi-rf-dran[data-hoert="1"] .vi-dran-f i{animation:none}',
       '  .vi-kopf-bar i{transition:none}}',
       /* v1300: flacher. Die Zeile mit der Frage trug 9 px oben und unten
          und eine Zeilenhöhe von 1.45 — zusammen fast 40 px für einen Satz. */
@@ -5734,11 +5737,23 @@
   function _rfZustandSetzen(grund) {
     if (grund != null) _rfGrundZustand = grund;
     var host = $('vi-rf-dran'); if (!host) return;
+    /* v1119c-WZWEI · ZWEI SIGNALE, NICHT EINES.
+
+       GEMESSEN im Browser: der Zustand "hoert" ueberschrieb "angebot",
+       und weil im Freisprechmodus das Mikrofon DAUERND laeuft, war der
+       Angebots-Puls nie zu sehen. Zwei verschiedene Auskuenfte in einem
+       Attribut — eine davon gewinnt immer, und es war die falsche.
+
+       Jetzt trennen sie sich: data-zustand sagt, was ANSTEHT (Frage oder
+       Entscheidung), data-hoert sagt, ob gerade AUFGENOMMEN wird. Sie
+       nutzen verschiedene CSS-Eigenschaften — Puls ueber box-shadow,
+       Aufnahme ueber outline — und stoeren sich deshalb nicht. */
     var z = _rfGrundZustand;
-    /* Waehrend der Nutzer spricht oder der Co-Pilot zuhoert, gilt gruen -
-       das ist die Antwort auf "nimmt er mich gerade auf?". */
-    if (_fs && _fs.an && /^(rauschen|warte|spricht)$/.test(_fs.phase || '')) z = 'hoert';
     if (host.getAttribute('data-zustand') !== z) host.setAttribute('data-zustand', z);
+    var h = (_fs && _fs.an && /^(rauschen|warte|spricht)$/.test(_fs.phase || '')) ? '1' : '';
+    if (host.getAttribute('data-hoert') !== h) {
+      if (h) host.setAttribute('data-hoert', h); else host.removeAttribute('data-hoert');
+    }
   }
 
   function _rfDranZeichnen() {
