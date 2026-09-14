@@ -837,6 +837,416 @@
     ]},options:{plugins:{legend:{display:true}}}});
   }
 
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     v1400 · DIE STEUERKETTE ÜBER ALLE OBJEKTE
+     ═══════════════════════════════════════════════════════════════════════
+     Marcels Auftrag: „ich möchte das du im portfolio cockpit auch die
+     gesamt steuer über alle objekte prüfst und auf unser jetziges modell
+     anpasst … eine grafik über die progression zu haben und zu sehen
+     welches objekt einen um wieviel weiter den steuersatz gesenkt hat."
+
+     WAS DAS VON DER MODELLPROJEKTION UNTERSCHEIDET: `projectAll()` rechnet
+     mit pauschalen Annahmen (ASSUMP: Miete +1,5 %, AfA 2 %, Zins 3,5 %).
+     DIESE Rechnung nimmt die ECHTEN steuerlichen Ergebnisse, die jedes
+     Objekt beim Rechnen selbst hinterlegt hat (`wk_per_year` über den
+     WK-Aggregator) — dieselbe Quelle, aus der auch der Tab Steuern seinen
+     Bestandssaldo zieht. Deshalb steht sie in einem eigenen Abschnitt und
+     NICHT unter „Modellprojektion (vereinfacht)".
+
+     DIE TRENNUNG DER STEUERSPHÄREN (v1400, Marcels Frage „können wir
+     sauber trennen?"):
+
+       privat                  Einkommensteuer, § 32a — Progression
+       GbR, Einzelunternehmen  ebenfalls Einkommensteuer (transparent),
+                               aber als EIGENER Topf geführt
+       GmbH, UG                Körperschaftsteuer — PROPORTIONAL, keine
+                               Progression, eigene Sphäre
+
+     Eine Kapitalgesellschaft bekommt deshalb keine Treppe, sondern einen
+     festen Satz. Ihr Verlust senkt NICHT das private Einkommen — erst eine
+     Ausschüttung verbände die beiden, und die steht hier nirgends.        */
+
+  function _kettenJahr() { return new Date().getFullYear(); }
+
+  /** Der Steuersatz eines Halters, oder null wenn er der Einkommensteuer
+   *  unterliegt (privat, GbR, Einzelunternehmen). */
+  function _halterSatz(id) {
+    try {
+      if (window.DealPilotMandanten && DealPilotMandanten.effRate) {
+        var r = DealPilotMandanten.effRate(id);
+        return (r != null && isFinite(r)) ? r : null;
+      }
+    } catch (e) {}
+    return null;
+  }
+  function _halterName(id) {
+    try {
+      if (window.DealPilotMandanten && DealPilotMandanten.get) {
+        var m = DealPilotMandanten.get(id);
+        if (m && m.name) return m.name;
+      }
+    } catch (e) {}
+    return id === 'privat' ? 'Privat' : id;
+  }
+
+  /**
+   * Die Kette je Halter.
+   * @returns {{toepfe:Array, geladen:boolean}}
+   *   toepfe[] = { halter, name, estPflichtig, satz, zve, schritte[], summe }
+   *   schritte[] = { id, name, datum, erg, basisVor, basisNach,
+   *                  wirkung, satzVor, satzNach }
+   */
+  function steuerKette(jahr) {
+    var erg = { toepfe: [], geladen: false };
+    if (!window.DealPilotWKAggregator) return erg;
+    var alle;
+    try { alle = DealPilotWKAggregator.getAllObjectsWithWK(); } catch (e) { return erg; }
+    if (!Array.isArray(alle)) return erg;
+    erg.geladen = true;
+    if (!alle.length) return erg;
+
+    var y = (typeof jahr === 'number' && jahr > 1900) ? jahr : _kettenJahr();
+    var yk = String(y);
+
+    /* Nach Halter gruppieren. Fehlt die Angabe, gilt `privat` — so liefert
+       es auch das Backend. */
+    var gruppen = {};
+    alle.forEach(function (o) {
+      if (!o || !o.id) return;
+      var h = String(o.halter || 'privat');
+      (gruppen[h] = gruppen[h] || []).push(o);
+    });
+
+    Object.keys(gruppen).forEach(function (h) {
+      var satz = _halterSatz(h);
+      var estPflichtig = (satz == null);   /* null = Einkommensteuer */
+      var liste = gruppen[h].slice().sort(function (a, b) {
+        return String(a.purchase_date || '9999').localeCompare(String(b.purchase_date || '9999'));
+      });
+
+      var topf = { halter: h, name: _halterName(h), estPflichtig: estPflichtig,
+                   satz: satz, zve: 0, schritte: [], summe: 0 };
+
+      if (estPflichtig) {
+        topf.zve = zveFuer(y);
+        var basis = topf.zve;
+        liste.forEach(function (o) {
+          var v = (o.wk_per_year && Number(o.wk_per_year[yk])) || 0;
+          if (!v) return;                       /* kein Ergebnis in diesem Jahr */
+          var vor = Math.max(0, basis);
+          var nach = Math.max(0, basis + v);
+          var wirkung = estg2026(vor) - estg2026(nach);
+          topf.schritte.push({
+            id: o.id, name: o.address || 'Objekt',
+            datum: (o.purchase_date || '').substring(0, 10),
+            erg: v, basisVor: vor, basisNach: nach, wirkung: wirkung,
+            satzVor: _grenzsatz(vor), satzNach: _grenzsatz(nach)
+          });
+          topf.summe += wirkung;
+          basis = basis + v;
+        });
+      } else {
+        /* Kapitalgesellschaft: proportional, keine Treppe. Und KEINE
+           Erstattung bei Verlust — dieselbe Regel wie in calc.js (_mtx). */
+        var basisK = 0;
+        liste.forEach(function (o) {
+          var v = (o.wk_per_year && Number(o.wk_per_year[yk])) || 0;
+          if (!v) return;
+          basisK += v;
+          topf.schritte.push({
+            id: o.id, name: o.address || 'Objekt',
+            datum: (o.purchase_date || '').substring(0, 10),
+            /* ═══ v1400b · KEINE STEUERWIRKUNG JE OBJEKT IN EINER GESELLSCHAFT
+               Beim Prueflauf aufgefallen, und es war mein eigener Denkfehler:
+               ich hatte hier `-(v * satz)` stehen, also eine Wirkung je Objekt.
+               Das geht nur auf, solange das Gesamtergebnis positiv ist. Macht
+               die Gesellschaft insgesamt Verlust, zeigte jede Zeile eine
+               "Ersparnis" — die Summe darunter aber 0. Zwei Zahlen, die sich
+               widersprechen, und die falsche sieht plausibler aus.
+               Fachlich ist es eindeutig: die Koerperschaftsteuer steht auf dem
+               ERGEBNIS DER GESELLSCHAFT, nicht auf einem einzelnen Objekt. Ein
+               Objekt hat dort kein eigenes zvE, das man verschieben koennte.
+               Deshalb `null` — die Tabelle zeigt dann einen Strich. */
+            erg: v, basisVor: null, basisNach: null,
+            wirkung: null, satzVor: satz, satzNach: satz
+          });
+        });
+        /* Die Steuer der Gesellschaft steht auf dem GESAMTergebnis, nicht
+           je Objekt — nur ein Gewinn wird besteuert. */
+        topf.summe = (basisK > 0) ? -(basisK * satz) : 0;
+        topf.gesamtergebnis = basisK;
+      }
+      if (topf.schritte.length) erg.toepfe.push(topf);
+    });
+
+    /* Privat zuerst, dann nach Zahl der Objekte. */
+    erg.toepfe.sort(function (a, b) {
+      if (a.halter === 'privat') return -1;
+      if (b.halter === 'privat') return 1;
+      return b.schritte.length - a.schritte.length;
+    });
+    return erg;
+  }
+
+  /* Der Grenzsteuersatz aus tax.js — EIN Tarif, nicht zwei (v1361). */
+  function _grenzsatz(zve) {
+    try {
+      if (typeof Tax !== 'undefined' && Tax && typeof Tax.calcGrenzsteuersatz === 'function') {
+        var r = Tax.calcGrenzsteuersatz(Math.max(0, zve));
+        return (isFinite(r) ? r : 0) * 100;
+      }
+    } catch (e) {}
+    return 0;
+  }
+
+  /* Einmal nachladen, wenn der Aggregator noch nichts hat — derselbe
+     Merker-Gedanke wie in calc.js v1398: genau ein Anlauf, keine Schleife. */
+  var _ketteNachgeladen = false;
+  function _ketteNachladen() {
+    if (_ketteNachgeladen) return;
+    if (!window.DealPilotWKAggregator || typeof DealPilotWKAggregator.loadAll !== 'function') return;
+    _ketteNachgeladen = true;
+    DealPilotWKAggregator.loadAll(false).then(function () {
+      setTimeout(function () { try { renderSteuerKette(); } catch (e) {} }, 120);
+    }).catch(function () {});
+  }
+
+  /* ═══ v1400 · Die Steuerkette zeichnen ═══════════════════════════════════
+     Zwei Darstellungen, weil sie zwei Fragen beantworten:
+       die GRAFIK  — wie weit sinkt der Satz, Objekt für Objekt
+       die TABELLE — welches Objekt genau, mit welchem Ergebnis
+     Beide aus derselben Rechnung; keine Zahl wird zweimal ermittelt.    */
+  var _ketteCharts = [];
+  function _ketteChartsWeg() {
+    _ketteCharts.forEach(function (c) { try { c.destroy(); } catch (e) {} });
+    _ketteCharts = [];
+  }
+
+
+  /* ═══ v1400 · Eigener Stilblock statt Eingriff in style.css ═══════════════
+     style.css hat 36.929 Zeilen und 4.198 !important; eine neue Regel dort
+     unterzubringen heisst, gegen die Kaskade zu arbeiten. Dieser Block haengt
+     sich einmal ein und trifft nur `.sk-`-Klassen, die es sonst nirgends gibt.
+     Gold als var(--wl-…) — Whitelabel-Pflicht. Gruen und Rot hart: eine
+     Statusfarbe bleibt in jeder Marke dieselbe.                            */
+  function _ketteStil() {
+    if ($('dp-sk-stil')) return;
+    var s = document.createElement('style');
+    s.id = 'dp-sk-stil';
+    s.textContent = [
+      '.sk-wrap{display:flex;flex-direction:column;gap:16px;margin:0 0 20px}',
+      '.sk-topf{border:1px solid rgba(122,115,112,.18);border-radius:12px;padding:16px 16px 14px;',
+      '  background:var(--dp-card,rgba(255,255,255,.02))}',
+      '.sk-kopf{display:flex;align-items:baseline;justify-content:space-between;gap:12px;',
+      '  flex-wrap:wrap;margin-bottom:13px}',
+      '.sk-titel{font:600 15px/1.2 "Space Grotesk",Inter,sans-serif;color:var(--dp-text,inherit)}',
+      '.sk-art{font:600 10px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.09em;',
+      '  text-transform:uppercase;color:var(--wl-c9a84c,#C9A84C);border:1px solid rgba(201,168,76,.32);',
+      '  border-radius:999px;padding:5px 10px;white-space:nowrap}',
+      '.sk-art-kst{color:#7A9CC6;border-color:rgba(122,156,198,.34)}',
+      /* Kacheln: gleiche Breite, gleiche Grundlinie — eine Reihe, kein Flickenteppich */
+      '.sk-zahlen{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}',
+      '.sk-k{border:1px solid rgba(122,115,112,.14);border-radius:9px;padding:9px 11px}',
+      '.sk-k-l{font:500 10.5px/1.3 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;',
+      '  text-transform:uppercase;color:var(--dp-muted,#7A7370);margin-bottom:4px}',
+      '.sk-k-v{font:600 15px/1.2 Inter,sans-serif;font-variant-numeric:tabular-nums;color:var(--dp-text,inherit)}',
+      '.sk-k-akzent .sk-k-v{color:var(--wl-c9a84c,#C9A84C)}',
+      '.sk-k-gut .sk-k-v{color:#3FA56C}',
+      '.sk-k-schlecht .sk-k-v{color:#B8625C}',
+      '.sk-box{height:260px;margin-bottom:14px}',
+      /* Die Tabelle scrollt in ihrem eigenen Kasten — die Seite nie quer */
+      '.sk-tabwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}',
+      '.sk-tab{width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px}',
+      '.sk-tab th{font:600 10px/1.3 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.07em;',
+      '  text-transform:uppercase;color:var(--dp-muted,#7A7370);text-align:left;padding:0 10px 7px;',
+      '  border-bottom:1px solid rgba(122,115,112,.20);white-space:nowrap}',
+      '.sk-tab th.r,.sk-tab td.r{text-align:right}',
+      '.sk-tab td{padding:8px 10px;border-bottom:1px solid rgba(122,115,112,.10);',
+      '  font-variant-numeric:tabular-nums;vertical-align:baseline}',
+      '.sk-tab tr:last-child td{border-bottom:none}',
+      '.sk-name{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}',
+      '.sk-dat{color:var(--dp-muted,#7A7370);white-space:nowrap}',
+      '.sk-grau{color:var(--dp-muted,#7A7370)}',
+      '.sk-gruen{color:#3FA56C}',
+      '.sk-rot{color:#B8625C}',
+      '.sk-satz{white-space:nowrap;color:var(--dp-muted,#7A7370)}',
+      '.sk-satz b{color:var(--wl-c9a84c,#C9A84C);font-weight:600}',
+      '.sk-pfeil{color:#3FA56C;font-weight:700;margin-left:5px}',
+      '.sk-fuss{margin-top:11px;padding-top:10px;border-top:1px solid rgba(122,115,112,.12);',
+      '  font-size:11.5px;line-height:1.55;color:var(--dp-muted,#7A7370)}',
+      '.sk-leer{border:1px dashed rgba(122,115,112,.26);border-radius:11px;padding:20px;',
+      '  font-size:12.5px;line-height:1.55;color:var(--dp-muted,#7A7370);text-align:center}',
+      '@media(max-width:640px){.sk-box{height:220px}.sk-topf{padding:13px 12px 12px}}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+  function renderSteuerKette() {
+    _ketteStil();
+    var host = $('dp-steuerkette');
+    if (!host) return;
+    _ketteChartsWeg();
+
+    var k = steuerKette(_kettenJahr());
+    if (!k.geladen) {
+      _ketteNachladen();
+      host.innerHTML = '<div class="dp-chart-loading"><span class="dp-spin"></span>Steuerdaten deiner Objekte werden geladen…</div>';
+      return;
+    }
+    if (!k.toepfe.length) {
+      host.innerHTML = '<div class="sk-leer">Noch keine gespeicherten Bestandsobjekte mit steuerlichem Ergebnis für '
+        + _kettenJahr() + '. Sobald ein Objekt im Tab Steuern gerechnet und gespeichert ist, erscheint es hier.</div>';
+      return;
+    }
+
+    var eur = function (n) {
+      return (n < 0 ? '−' : '') + Math.abs(Math.round(n)).toLocaleString('de-DE') + ' €';
+    };
+    var pz = function (n) { return n.toFixed(2).replace('.', ',') + ' %'; };
+
+    var html = '';
+    k.toepfe.forEach(function (t, idx) {
+      var cid = 'dpc-kette-' + idx;
+      var istEst = t.estPflichtig;
+      html += '<div class="sk-topf">'
+        + '<div class="sk-kopf">'
+        +   '<div class="sk-titel">' + _esc(t.name) + '</div>'
+        +   '<span class="sk-art' + (istEst ? '' : ' sk-art-kst') + '">'
+        +     (istEst ? 'Einkommensteuer · § 32a · mit Progression'
+                      : 'Körperschaftsteuer · ' + pz(t.satz * 100) + ' · proportional')
+        +   '</span>'
+        + '</div>';
+
+      if (istEst) {
+        var letzter = t.schritte[t.schritte.length - 1];
+        html += '<div class="sk-zahlen">'
+          + _kachel('Ausgangs-zvE', eur(t.zve), '')
+          + _kachel('nach allen Objekten', eur(letzter.basisNach), 'sk-k-akzent')
+          + _kachel('Grenzsatz', pz(_grenzsatz(t.zve)) + ' → ' + pz(letzter.satzNach), 'sk-k-akzent')
+          + _kachel('Steuerwirkung gesamt', eur(t.summe), t.summe > 0 ? 'sk-k-gut' : 'sk-k-schlecht')
+          + '</div>'
+          + '<div class="chart-box sk-box"><canvas id="' + cid + '"></canvas></div>';
+      } else {
+        html += '<div class="sk-zahlen">'
+          + _kachel('Ergebnis der Gesellschaft', eur(t.gesamtergebnis || 0), '')
+          + _kachel('Steuersatz', pz(t.satz * 100), 'sk-k-akzent')
+          + _kachel('Körperschaftsteuer', eur(t.summe), t.summe > 0 ? 'sk-k-gut' : 'sk-k-schlecht')
+          + '</div>';
+      }
+
+      /* Die Tabelle — je Objekt eine Zeile. */
+      html += '<div class="sk-tabwrap"><table class="sk-tab"><thead><tr>'
+        + '<th>Objekt</th><th>gekauft</th><th class="r">Ergebnis V+V</th>'
+        + (istEst ? '<th class="r">Basis vorher</th><th class="r">Basis nachher</th>' : '')
+        + '<th class="r">Steuerwirkung</th>'
+        + (istEst ? '<th class="r">Grenzsatz</th>' : '')
+        + '</tr></thead><tbody>';
+      t.schritte.forEach(function (s) {
+        var gefallen = istEst && (s.satzNach < s.satzVor - 0.005);
+        html += '<tr>'
+          + '<td class="sk-name" title="' + _esc(s.name) + '">' + _esc(s.name) + '</td>'
+          + '<td class="sk-dat">' + (s.datum ? _datDe(s.datum) : '—') + '</td>'
+          + '<td class="r ' + (s.erg < 0 ? 'sk-rot' : 'sk-gruen') + '">' + eur(s.erg) + '</td>'
+          + (istEst ? '<td class="r sk-grau">' + eur(s.basisVor) + '</td>'
+                    + '<td class="r sk-grau">' + eur(s.basisNach) + '</td>' : '')
+          /* v1400b: `null` heisst "in dieser Sphaere gibt es keine Wirkung
+             je Objekt" — nicht "null Euro". Der Strich sagt das. */
+          + (s.wirkung == null
+              ? '<td class="r sk-grau" title="Die Körperschaftsteuer steht auf dem Ergebnis der Gesellschaft, nicht auf dem einzelnen Objekt.">—</td>'
+              : '<td class="r ' + (s.wirkung > 0 ? 'sk-gruen' : 'sk-rot') + '">' + eur(s.wirkung) + '</td>')
+          + (istEst ? '<td class="r sk-satz">' + pz(s.satzVor) + ' → <b>' + pz(s.satzNach) + '</b>'
+                    + (gefallen ? '<span class="sk-pfeil" title="Dieses Objekt hat deinen Grenzsteuersatz gesenkt">↓</span>' : '')
+                    + '</td>' : '')
+          + '</tr>';
+      });
+      html += '</tbody></table></div>';
+
+      if (istEst) {
+        html += '<div class="sk-fuss">Die Objekte stehen in der Reihenfolge ihres Kaufs. '
+          + 'Jedes trifft auf das Einkommen, das die vorherigen bereits verschoben haben — '
+          + 'so, wie sie in der Steuererklärung zusammenfließen. '
+          + '<b>Die Summe ist die echte Gesamtwirkung</b>; die Aufteilung auf die einzelnen '
+          + 'Objekte folgt dem Kaufzeitpunkt.</div>';
+      } else {
+        html += '<div class="sk-fuss">Die Gesellschaft rechnet <b>getrennt von deinem privaten Einkommen</b>. '
+          + 'Ihr Satz ist proportional — es gibt keine Progression und keinen Verlustrücktrag auf dein zvE. '
+          + 'Ein Verlust mindert hier nur das Ergebnis der Gesellschaft.</div>';
+      }
+      html += '</div>';
+    });
+
+    host.innerHTML = html;
+
+    /* Die Grafiken erst nach dem Einhängen — Canvas braucht seinen Platz. */
+    if (typeof Chart === 'undefined') return;
+    var SER = chartPalette();
+    var GRUEN = '#3FA56C', ROT = '#B8625C';
+    var axisCol = isDark() ? 'rgba(232,226,212,.55)' : '#7A7370';
+    var gridCol = isDark() ? _wlrgba(.10) : 'rgba(122,115,112,.12)';
+
+    k.toepfe.forEach(function (t, idx) {
+      if (!t.estPflichtig) return;
+      var cv = $('dpc-kette-' + idx);
+      if (!cv) return;
+      var labels = ['ohne Objekte'].concat(t.schritte.map(function (s) { return _kurz(s.name); }));
+      var satzReihe = [_grenzsatz(t.zve)].concat(t.schritte.map(function (s) { return s.satzNach; }));
+      var wirkReihe = [0].concat(t.schritte.map(function (s) { return Math.round(s.wirkung); }));
+
+      _ketteCharts.push(new Chart(cv, {
+        type: 'bar',
+        data: { labels: labels, datasets: [
+          { type: 'bar', label: 'Steuerwirkung', data: wirkReihe, yAxisID: 'y',
+            backgroundColor: wirkReihe.map(function (v) { return v > 0 ? GRUEN + 'cc' : (v < 0 ? ROT + 'cc' : 'rgba(0,0,0,0)'); }),
+            borderRadius: 4, borderSkipped: false, maxBarThickness: 46, order: 2 },
+          { type: 'line', label: 'Grenzsteuersatz', data: satzReihe, yAxisID: 'y1',
+            borderColor: SER[0], backgroundColor: SER[0] + '1a', borderWidth: 2.4,
+            tension: .25, fill: false, pointRadius: 4, pointBackgroundColor: SER[0],
+            pointBorderColor: isDark() ? '#0a0805' : '#fff', pointBorderWidth: 1.6, order: 1 }
+        ]},
+        options: {
+          responsive: true, maintainAspectRatio: false, devicePixelRatio: 2,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: true },
+            tooltip: { callbacks: { label: function (ctx) {
+              if (ctx.datasetIndex === 1) return ' Grenzsteuersatz: ' + ctx.parsed.y.toFixed(2).replace('.', ',') + ' %';
+              var s = t.schritte[ctx.dataIndex - 1];
+              if (!s) return ' Ausgangslage';
+              return [' Ergebnis V+V: ' + eur(s.erg),
+                      ' Steuerwirkung: ' + eur(s.wirkung),
+                      ' Basis: ' + eur(s.basisVor) + ' → ' + eur(s.basisNach)];
+            } } }
+          },
+          scales: {
+            x: { grid: { color: gridCol, drawBorder: false }, ticks: { color: axisCol, maxRotation: 0, autoSkip: false } },
+            y: { position: 'left', grid: { color: gridCol, drawBorder: false },
+                 ticks: { color: axisCol, callback: function (v) { return Math.round(v / 1000) + 'k €'; } },
+                 title: { display: true, text: 'Steuerwirkung', color: axisCol } },
+            y1: { position: 'right', grid: { display: false },
+                  ticks: { color: SER[0], callback: function (v) { return Math.round(v) + ' %'; } },
+                  title: { display: true, text: 'Grenzsteuersatz', color: SER[0] } }
+          }
+        }
+      }));
+    });
+  }
+
+  function _kachel(label, wert, cls) {
+    return '<div class="sk-k ' + (cls || '') + '"><div class="sk-k-l">' + label + '</div>'
+         + '<div class="sk-k-v">' + wert + '</div></div>';
+  }
+  function _esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function _kurz(s) {
+    s = String(s || '');
+    return s.length > 22 ? s.substring(0, 20) + '…' : s;
+  }
+  function _datDe(iso) {
+    var p = String(iso).substring(0, 10).split('-');
+    return p.length === 3 ? p[2] + '.' + p[1] + '.' + p[0] : iso;
+  }
   /* ════ PROJEKTIONSTABELLE ════ */
   function renderProjTable(){
     var host=$('dp-proj-table'); if(!host) return;
@@ -1050,7 +1460,7 @@
       _summaries=_summaries.filter(function(o){return (o.id||o.key)!==key;});
       delete _details[key]; _detailsLoaded=false;
       renderAll();
-      loadDetails().then(function(){ renderHealth(); renderOverview(); renderKpiCards(); renderScoreHero(); buildCharts(); renderProjTable(); });
+      loadDetails().then(function(){ renderHealth(); renderOverview(); renderKpiCards(); renderScoreHero(); buildCharts(); renderProjTable(); try{renderSteuerKette();}catch(e){} });
       if(typeof window.refreshSavedList==='function') window.refreshSavedList();
       if(typeof window.toast==='function') window.toast('Objekt geloescht');
     }).catch(function(e){ if(typeof window.toast==='function') window.toast('Loeschen fehlgeschlagen'); });
@@ -1064,7 +1474,7 @@
   function setTheme(th){
     localStorage.setItem('dp_theme', th==='dark'?'dark':'light');
     applyTheme();
-    if($(MOUNT_ID) && $(MOUNT_ID).style.display!=='none'){ destroyCharts(); buildCharts(); renderScoreHero(); renderKpiCards(); }
+    if($(MOUNT_ID) && $(MOUNT_ID).style.display!=='none'){ destroyCharts(); buildCharts(); renderScoreHero(); renderKpiCards(); try{renderSteuerKette();}catch(e){} }
     var sw=document.querySelector('.dp-theme-switch');
     if(sw){ sw.querySelectorAll('button').forEach(function(b){b.classList.toggle('active',b.dataset.th===(th||'light'));}); }
   }
@@ -1135,7 +1545,7 @@
 
   /* ════ RENDER-ORCHESTRIERUNG ════ */
   function renderAll(){
-    renderScoreHero(); renderKpiCards(); renderStatus(); renderBoardOrCards();
+    renderScoreHero(); renderKpiCards(); renderStatus(); renderBoardOrCards(); try{renderSteuerKette();}catch(e){}
     renderHealth(); renderOverview(); renderProjTable(); loadPasses(); if(window._dashLoadSharedPasses)window._dashLoadSharedPasses(); try{ if(window.DealPilotMandanten) DealPilotMandanten.renderHalterChips(); }catch(e){} /* mand-chips-init v803 */
   }
 
@@ -1161,7 +1571,15 @@
       + '<div class="gates" id="dp-board"></div>'
       + '<div class="sl"><span class="e">04</span><h2>Geteilte Objekte</h2><span class="tag">Quick Boarding</span><span class="rule"></span></div>'
       + '<div id="dp-shared-passes" style="margin:0 0 4px"></div>'
-      + '<details id="dp-charts-sec" open><summary class="sl dp-charts-summary"><span class="e">05</span><h2>Projektion &amp; Verlauf</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="yrs sl-yrs" id="dp-proj-years"><button data-y="10" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(10)">10 J.</button><button data-y="20" class="active" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(20)">20 J.</button><button data-y="30" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(30)">30 J.</button></span><span class="dp-charts-hint">ein-/ausblenden</span></summary>'
+      /* v1400 · Abschnitt 05 — die ECHTEN Zahlen, nicht die Modellprojektion.
+         Deshalb steht er VOR „Projektion & Verlauf" und traegt kein
+         „vereinfacht": er rechnet mit den steuerlichen Ergebnissen, die
+         jedes Objekt selbst hinterlegt hat. */
+      + '<div class="sl"><span class="e">05</span><h2>Steuer \u00fcber alle Objekte</h2>'
+      +   '<span class="tag" title="Rechnet mit den ECHTEN steuerlichen Ergebnissen deiner Objekte (Tab Steuern), nicht mit den pauschalen Annahmen der Modellprojektion.\n\nDie Objekte stehen in der Reihenfolge ihres Kaufs \u2014 jedes trifft auf das Einkommen, das die vorherigen bereits verschoben haben.\n\nGesellschaften werden getrennt gef\u00fchrt: K\u00f6rperschaftsteuer ist proportional und wirkt nicht auf dein privates Einkommen.">Echte Objektdaten \u00b7 \u00a7 32a / \u00a7 8 KStG</span>'
+      +   '<span class="rule"></span></div>'
+      + '<div id="dp-steuerkette" class="sk-wrap"></div>'
+      + '<details id="dp-charts-sec" open><summary class="sl dp-charts-summary"><span class="e">06</span><h2>Projektion &amp; Verlauf</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="yrs sl-yrs" id="dp-proj-years"><button data-y="10" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(10)">10 J.</button><button data-y="20" class="active" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(20)">20 J.</button><button data-y="30" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(30)">30 J.</button></span><span class="dp-charts-hint">ein-/ausblenden</span></summary>'
       + '<div class="charts">'
       + chartCard('dpc-cashflow','M3 17l6-6 4 4 8-8','Cashflow-Verlauf','vor / nach Steuer','\u20ac/Jahr')
       + chartCard('dpc-vermoegen','M3 3v18h18M7 14l4-4 3 3 5-6','Verm\u00f6gens-Schere','Wert vs. Restschuld','Mio \u20ac')
@@ -1170,7 +1588,7 @@
       + chartCard('dpc-klumpen','M12 2a10 10 0 1 0 10 10H12z','Klumpenrisiko','Volumen nach Lage','Diversifikation')
       + chartCard('dpc-steuer','M9 14l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z','Steuer-Verlauf','Steuereffekt','10 Jahre',true)
       + '</div></details>'
-      + '<div class="sl"><span class="e">06</span><h2>Gesamt-Projektion</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="rule"></span></div>'
+      + '<div class="sl"><span class="e">07</span><h2>Gesamt-Projektion</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="rule"></span></div>'
       + '<div class="proj"><div class="ph"><span class="t">Cashflow &amp; Verm\u00f6gensaufbau</span><span class="tag">Modellprojektion</span></div>'
       + '<div class="pw"><table class="pt" id="dp-proj-table"></table></div></div>'
       /* v1215-mappe · Abschnitt 07 — der erste Export-Knopf im Cockpit.
@@ -1179,7 +1597,7 @@
          dem Jahr. Die Objektauswahl kann der Export bereits (opts.objectIds),
          die Oberflaeche dafuer fehlt noch — deshalb steht hier, dass ALLE
          Objekte des Jahres genommen werden, statt es offenzulassen. */
-      + '<div class="sl"><span class="e">07</span><h2>Steuer-Mappe</h2><span class="tag">Anlage V · § 21 EStG</span><span class="rule"></span></div>'
+      + '<div class="sl"><span class="e">08</span><h2>Steuer-Mappe</h2><span class="tag">Anlage V · § 21 EStG</span><span class="rule"></span></div>'
       + '<div class="dp-mappe">'
       +   '<div class="dp-mappe-t">Ein PDF über <b>alle</b> Objekte mit erfassten Steuerdaten — je Objekt eine Aufstellung der Werbungskosten, am Ende eine Zusammenfassung mit Summe.</div>'
       +   '<div class="dp-mappe-r">'
@@ -1200,7 +1618,7 @@
          KStG), sondern Bilanz und GuV. Deshalb ein EIGENER Abschnitt und
          kein Haken an der Mappe: es sind zwei verschiedene Dokumente fuer
          zwei verschiedene Steuerarten, nicht zwei Fassungen desselben. */
-      + '<div class="sl"><span class="e">08</span><h2>Jahresabschluss</h2><span class="tag">Bilanz · GuV · § 8 Abs. 2 KStG</span><span class="rule"></span></div>'
+      + '<div class="sl"><span class="e">09</span><h2>Jahresabschluss</h2><span class="tag">Bilanz · GuV · § 8 Abs. 2 KStG</span><span class="rule"></span></div>'
       + '<div class="dp-mappe" id="dp-abschluss-box">'
       +   '<div class="dp-mappe-t">Für Objekte, die einer <b>GmbH oder UG</b> gehören: Bilanz und Gewinn- und Verlustrechnung über alle Objekte dieser Gesellschaft, dazu ein Anlagenspiegel je Objekt.</div>'
       +   '<div class="dp-mappe-r" id="dp-abschluss-r">'
@@ -1304,7 +1722,7 @@
       // Hintergrund: Details nachladen -> Health/KPIs/Charts/Tabelle
       return loadDetails();
     }).then(function(){
-      renderScoreHero(); renderKpiCards(); renderHealth(); renderOverview(); renderProjTable(); buildCharts();
+      renderScoreHero(); renderKpiCards(); renderHealth(); renderOverview(); renderProjTable(); buildCharts(); try{renderSteuerKette();}catch(e){}
     }).catch(function(e){
       var _dpErrHost=$('dp-health-strip'); if(_dpErrHost) _dpErrHost.innerHTML='<div class="gempty">Daten konnten nicht geladen werden: '+esc(e.message)+'</div>';
     });
@@ -1610,6 +2028,10 @@
     openObject: function(k){ try{ if(typeof window.loadSaved==='function') window.loadSaved(k); }catch(e){} },
     toggleZins: function(){ window._dpZinsMode=(window._dpZinsMode==='risiko')?'zins':'risiko'; try{ renderHealth(); }catch(e){} },
     selectObject: selectObject,
+    /* v1400: nach aussen, damit die Kette pruefbar ist — der Prueflauf im
+       Container ruft genau diese Funktion, nicht eine Nachbildung. */
+    steuerKette: function(jahr){ return steuerKette(jahr); },
+    renderSteuerKette: function(){ try{ renderSteuerKette(); }catch(e){} },
     applyHalterFilter: function(id){ try{ window._dpHalterFilter=id; }catch(e){} try{ renderScoreHero(); }catch(e){} try{ renderOverview(); }catch(e){} try{ renderHealth(); }catch(e){} try{ renderKpiCards(); }catch(e){} try{ buildCharts(); }catch(e){} try{ renderProjTable(); }catch(e){} try{ if(window.DealPilotMandanten) DealPilotMandanten.renderHalterChips(); }catch(e){} },  /* mand-export v803 */
     _debug: function(){ return { summaries:_summaries, details:_details, loaded:_detailsLoaded }; }
   };

@@ -406,11 +406,51 @@ function _getBestandLossesForYear(displayYear) {
       var raw = (kdEl && kdEl.value) || (wuEl && wuEl.value) || '';
       if (raw && raw.length >= 10) currentObjKaufdat = raw.substring(0, 10);
     } catch(_) {}
+    /* v1400: der Halter DIESES Objekts — Bezugspunkt der Trennung unten. */
+    var _curHalterId = 'privat';
+    try {
+      var _hEl = document.getElementById('halter');
+      _curHalterId = String((_hEl && _hEl.value) || 'privat');
+    } catch (_) { _curHalterId = 'privat'; }
     // Year-Key als String
     var yearKey = String(displayYear);
     all.forEach(function(obj) {
       if (!obj || !obj.id) return;
       if (currentId && obj.id === currentId) return;  // sich selbst ueberspringen
+      /* ═══ v1400 · EINKOMMENSTEUER UND KÖRPERSCHAFTSTEUER SIND ZWEI WELTEN
+       *
+       * MARCELS FRAGE: „geht das dann auch für angelegte Unternehmen also
+       * alles was nicht privat ist? … können wir sauber trennen?"
+       *
+       * GEMESSEN: bis v1399 wurde hier NICHT nach Halter gefiltert. Die
+       * Filter waren: sich selbst überspringen, Kaufdatum davor, Kaufjahr
+       * erreicht. Sonst nichts.
+       *
+       * Was das anrichtete: **ein Objekt in der GmbH senkte das PRIVATE zu
+       * versteuernde Einkommen.** Das ist fachlich falsch — ein Verlust der
+       * Gesellschaft mindert das Einkommen der Gesellschaft, nicht deines.
+       * Die Gesellschaft zahlt Körperschaftsteuer auf ihr Ergebnis; du
+       * zahlst Einkommensteuer auf deins. Erst eine Ausschüttung verbindet
+       * die beiden, und die steht hier nirgends.
+       *
+       * Und es wurde durch v1397 SCHLIMMER, nicht besser: vorher wirkte die
+       * Saldierung nur im Tab Steuern, seither auch im Cashflow und damit
+       * in jeder Objektzahl und im Cockpit.
+       *
+       * DAS FELD LAG DIE GANZE ZEIT DA. Das Backend liefert `halter` seit
+       * v813-3c-be, der WK-Aggregator reicht ihn seit v813-3c durch. Er
+       * wurde nur nie gelesen — dasselbe Muster wie `_kpis_vuv` und
+       * `restnutzungsdauer_herkunft`.
+       *
+       * DIE REGEL: saldiert wird ausschliesslich INNERHALB desselben
+       * Halters. Ein privates Objekt sieht nur private Vorobjekte; ein
+       * Objekt der „Junker Immobilien GmbH" nur deren eigene.
+       *
+       * Fehlt die Angabe, gilt `privat` — so liefert es auch das Backend
+       * (`row.halter || 'privat'`). Altbestand ohne Halter bleibt damit im
+       * privaten Topf, wo er bisher schon war. */
+      var _objHalter = String(obj.halter || 'privat');
+      if (_objHalter !== _curHalterId) return;
       // V280-correct-filter: Anderes Objekt nur wenn dessen Kaufdatum
       //   1) VOR meinem eigenen Kaufdatum liegt UND
       //   2) Bis zum Card-Year (displayYear) bereits existierte
