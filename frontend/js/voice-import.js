@@ -2082,7 +2082,8 @@
     rausch: 0, schwelle: 0.012, t0: 0, tSprach: 0, tStill: 0, aufnahme: false,
     sprechMs: 0,     /* v1290: wie lange wirklich gesprochen wurde */
     rest: '',        /* v1290: ein angefangener Satz, der auf seine Fortsetzung wartet */
-    laeuft: 0        /* v1290: eine Auswertung ist unterwegs */
+    laeuft: 0,       /* v1290: eine Auswertung ist unterwegs */
+    pause: false     /* v1381: angehalten - das Mikrofon hoert NICHT mit */
   };
 
   /* v1290: 1,6 s statt 1,1 s. Marcels „Oh, das Objekt steht in… ähm…" ist
@@ -2146,6 +2147,10 @@
     _fs.waechter = setInterval(function () {
       try {
         if (!_rf || !_fs.an || !_fs.stream) return;
+        /* v1381: WICHTIG. Ohne diese Zeile hebt der Waechter jede Pause
+           nach spaetestens drei Sekunden wieder auf — und zwar still.
+           Der Knopf saehe aus, als haette er gewirkt. */
+        if (_fs.pause) return;
         if (_fs.laeuft > 0) return;                      /* Auswertung unterwegs */
         if (_fs.phase === 'rauschen' || _fs.phase === 'warte'
             || _fs.phase === 'spricht') return;          /* alles in Ordnung */
@@ -2167,6 +2172,12 @@
     _fs.stream = null; _fs.ctx = null; _fs.analyser = null; _fs.rec = null;
     _fs.kopf = null; _fs.chunks = []; _fs.rest = ''; _fs.laeuft = 0;
     _fs.phase = 'aus'; _fs.aufnahme = false;
+    /* v1381: Ein abgerissener Strom ist nicht angehalten, sondern aus.
+       Bliebe die Pause stehen, waere das Freisprechen nach dem naechsten
+       Einschalten taub — mit einem Knopf, der „Weiter" anbietet und auf
+       einen Recorder zeigt, den es nicht mehr gibt. */
+    _fs.pause = false;
+    try { _fsPauseKnopf(); } catch (e) {}
     _fsWaechterAus();   /* v1121-WWACH */
   }
 
@@ -2215,6 +2226,7 @@
      mitten im Satz der Puffer verloren. */
   function _fsHoeren(neu) {
     if (!_fs.an || !_fs.stream || !_fs.rec) return;
+    if (_fs.pause) return;   /* v1381: angehalten heisst angehalten */
     if (!neu && (_fs.phase === 'warte' || _fs.phase === 'spricht' || _fs.phase === 'rauschen')) return;
     if (_fs.uhr) { clearInterval(_fs.uhr); _fs.uhr = null; }
     _fs.chunks = [];                 /* der KOPF bleibt */
@@ -2231,7 +2243,7 @@
       _fs.rest ? 'Deinen Satzanfang habe ich mir gemerkt.' : 'Ich merke selbst, wenn du fertig bist.');
 
     _fs.uhr = setInterval(function () {
-      if (!_rf || !_fs.an) { return; }
+      if (!_rf || !_fs.an || _fs.pause) { return; }   /* v1381 */
       var p = _fsPegel(), jetzt = Date.now(), seit = jetzt - _fs.t0;
       _fsPegelZeigen(p);   /* v1277: der Ausschlag beantwortet "hoert er mich?" */
       /* v1119-WPULS: der Rahmen der Leiste faerbt sich gruen, solange
@@ -2286,8 +2298,95 @@
     try { _rfZustandSetzen(null); } catch (xz) {}
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1381 · ANHALTEN — das Mikrofon wartet, der Dialog bleibt stehen
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Wunsch: „beim micro irgendwo die möglichkeit geben die auto
+     tracking ob man was sagt auszuschalten oder zu halten? … es kann ja
+     sein das ich kurz gestört werde dann möchte ich vlt den prozess
+     unterbrechen und in ein paar minuten wieder was sagen."
+
+     WARUM DER VORHANDENE SCHALTER DAS NICHT KONNTE: die Checkbox
+     „Freisprechen" oben in der Kopfzeile ruft `_fsAus()` — und das
+     REISST ALLES AB: Stream gestoppt, AudioContext geschlossen,
+     Recorder weg, `_fs.kopf` auf null, und `_fs.rest` (der gemerkte
+     Satzanfang) ebenfalls. Wer sie wieder einschaltet, beginnt mit einem
+     neuen `getUserMedia`. Das ist ein Ausschalter, keine Pause.
+
+     UND DER EIGENTLICHE SCHADEN IST NICHT DIE ZEIT. Wer gestört wird und
+     nichts drückt, dessen Mikrofon läuft weiter — was der Störer sagt,
+     landet im Transkript und wird als Antwort auf die offene Frage
+     ausgewertet. Eine falsche Zahl im Objekt ist teurer als eine
+     verlorene Minute.
+
+     DIE MECHANIK. Zwei Riegel, weil einer nicht reicht:
+
+       `rec.pause()`        schneidet nichts mehr mit — und behält dabei
+                            den Container-Header. Genau darauf baut die
+                            v1290-Mechanik (`_fs.kopf`): nach `resume()`
+                            ist der Blob weiter eine vollständige Datei.
+       `track.enabled=false` schaltet das Signal selbst stumm. Ohne das
+                            liefe die Pegelmessung weiter und der Ausschlag
+                            würde anzeigen, dass zugehört wird.
+
+     Der Strom bleibt offen, der Dialogzustand bleibt, `_fs.rest` bleibt.
+     Nach dem Weiter geht es an derselben Frage weiter — kein neuer
+     Berechtigungsdialog, kein verlorener Satzanfang.
+
+     DREI STELLEN MUSSTEN MIT, sonst hebt sich die Pause von selbst auf:
+     `_fsHoeren` (30 Aufrufstellen im Ablauf), die Uhr darin, und vor
+     allem der Wiederanlauf-Wächter aus v1121 — der hätte nach drei
+     Sekunden wieder angeworfen, und der Knopf hätte ausgesehen, als
+     hätte er gewirkt. */
+  function _fsAngehalten() { return !!_fs.pause; }
+
+  function _fsPause() {
+    if (_fs.pause) return;
+    _fs.pause = true;
+    _fsStopHoeren();
+    try { if (_fs.rec && _fs.rec.state === 'recording') _fs.rec.pause(); } catch (e) {}
+    try { (_fs.stream ? _fs.stream.getAudioTracks() : []).forEach(function (t) { t.enabled = false; }); } catch (e) {}
+    try { _fsPegelZeigen(0); } catch (e) {}
+    _fsMikroKasten(false, 'Angehalten — ich höre gerade nicht zu.',
+      _fs.rest ? 'Dein Satzanfang ist gemerkt. Nimm dir Zeit.'
+               : 'Nimm dir Zeit. Mit „Weiter" geht es an derselben Frage weiter.');
+    _fsPauseKnopf();
+  }
+
+  function _fsWeiter() {
+    if (!_fs.pause) return;
+    _fs.pause = false;
+    try { (_fs.stream ? _fs.stream.getAudioTracks() : []).forEach(function (t) { t.enabled = true; }); } catch (e) {}
+    try { if (_fs.rec && _fs.rec.state === 'paused') _fs.rec.resume(); } catch (e) {}
+    _fsPauseKnopf();
+    /* Der Recorder hat waehrend der Pause nichts geschrieben; der laufende
+       Abschnitt beginnt deshalb hier neu — der Kopf gilt weiter. */
+    _fsHoeren(true);
+  }
+
+  function _fsPauseUm() { if (_fs.pause) _fsWeiter(); else _fsPause(); }
+
+  /* Der Knopf sagt, was er TUT, nicht wo er steht. */
+  function _fsPauseKnopf() {
+    var b = $('vi-rf-halt');
+    if (!b) return;
+    var p = !!_fs.pause;
+    b.textContent = p ? '▶  Weiter' : '❚❚  Anhalten';
+    b.setAttribute('title', p ? 'Wieder zuhören' : 'Mikrofon anhalten — der Dialog bleibt stehen');
+    b.classList.toggle('an', p);
+    var k = $('vi-rf-mikro');
+    if (k) {
+      k.classList.toggle('halt', p);
+      /* „taub" heisst „Freisprechen ist aus" und blendet den Kasten ab.
+         Angehalten ist etwas anderes — der Kasten wartet, er ist nicht
+         weg. _fsMikroKasten(false, …) setzt taub; hier wird es fuer den
+         Pausenfall wieder abgenommen. */
+      if (p) k.classList.remove('taub');
+    }
+  }
+
   /* Spricht der Nutzer gerade? Dann darf die naechste Frage warten. */
-  function _fsSprichtGerade() { return _fs.an && (_fs.phase === 'spricht'); }
+  function _fsSprichtGerade() { return _fs.an && !_fs.pause && (_fs.phase === 'spricht'); }
 
   /* v1290 · Endet der Satz offen, ist er nicht zu Ende.
      „Oh, das Objekt steht in" — da kommt noch was. Ein Co-Pilot, der
@@ -3614,6 +3713,27 @@
       '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent);transition:border-color .2s ease}',
       '.vi-rf-mikro.hoert{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 70%, transparent)}',
       '.vi-rf-mikro.taub{opacity:.55}',
+      /* ═══ v1381 · Anhalten ═══════════════════════════════════════════
+         Der angehaltene Kasten muss sich vom tauben unterscheiden: „taub"
+         heisst „Freisprechen ist aus", „halt" heisst „ich warte auf dich".
+         Deshalb keine weitere Abblendung, sondern ein ruhiger, neutraler
+         Rahmen — und der Puls des Mikrofonsymbols steht still.
+         Der Knopf traegt Gold nur im Ruhezustand; angehalten wird er
+         gefuellt, damit „Weiter" der naechste sichtbare Schritt ist. */
+      '.vi-rf-mikro.halt{border-style:dashed;',
+      '  border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent);',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 3%, transparent)}',
+      '.vi-rf-mikro.halt .vi-rf-mikro-icon{animation:none;filter:grayscale(.75);opacity:.7}',
+      '.vi-rf-halt{flex:0 0 auto;cursor:pointer;white-space:nowrap;',
+      '  font:600 12px/1 var(--font-mono, ui-monospace, monospace);letter-spacing:.02em;',
+      '  padding:7px 11px;border-radius:9px;transition:background .15s ease,border-color .15s ease;',
+      '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 42%, transparent);',
+      '  background:transparent;color:var(--wl-c9a84c, #C9A84C)}',
+      '.vi-rf-halt:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);',
+      '  border-color:var(--wl-c9a84c, #C9A84C)}',
+      '.vi-rf-halt.an{background:var(--wl-c9a84c, #C9A84C);border-color:var(--wl-c9a84c, #C9A84C);color:#100e08}',
+      '.vi-rf-halt.an:hover{background:var(--wl-e8cc7a, #E8CC7A)}',
+      '.vi-rf-halt:focus-visible{outline:2px solid var(--wl-e8cc7a, #E8CC7A);outline-offset:2px}',
       '.vi-rf-mikro-icon{width:30px;height:30px;border-radius:50%;flex:0 0 30px;display:flex;',
       '  align-items:center;justify-content:center;font-size:15px;',
       '  background:linear-gradient(160deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C));color:#100e08}',
@@ -7560,6 +7680,11 @@
           '<small id="vi-rf-mikro-sub">Ich merke selbst, wenn du fertig bist.</small></span>' +
         '<span class="vi-rf-pegel" id="vi-rf-pegel">' +
           '<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>' +
+        /* v1381: Der Halt-Knopf steht IM Mikrofonkasten, nicht oben bei
+           den Schaltern. Wer spricht, schaut hierher — auf den Pegel und
+           den Satz „Ich höre zu". Ein Knopf in der Kopfzeile wäre da, wo
+           gerade niemand hinsieht. */
+        '<button type="button" class="vi-rf-halt" id="vi-rf-halt">❚❚  Anhalten</button>' +
       '</div>' +
       '<div class="vi-rf-zeile">' +
         '<input id="vi-rf-in" placeholder="… oder tippen — du darfst mich auch etwas fragen" autocomplete="off">' +
@@ -7586,6 +7711,9 @@
     /* Wer tippt, will nicht gleichzeitig belauscht werden. */
     inp.addEventListener('input', function () { if (inp.value.trim()) _fsStopHoeren(); });
     $('vi-rf-ok').addEventListener('click', _rfSenden);
+    /* v1381 · Anhalten und Weiter. */
+    $('vi-rf-halt').addEventListener('click', function () { _fsPauseUm(); });
+    _fsPauseKnopf();
     $('vi-rf-nix').addEventListener('click', function () { _rfUeberspringen(); });
     /* v1378 (C2) */
     $('vi-rf-ton').addEventListener('click', function () { _rfModusWeiter(); });
@@ -7649,6 +7777,11 @@
     });
     $('vi-rf-fs').addEventListener('change', function () {
       _fs.an = this.checked;
+      /* v1381: Ein Halt-Knopf ohne Freisprechen hat nichts anzuhalten.
+         _fsAus() setzt die Pause selbst zurueck; hier geht nur die
+         Sichtbarkeit mit. */
+      var hb = $('vi-rf-halt');
+      if (hb) hb.style.display = _fs.an ? '' : 'none';
       if (_fs.an) { _fsStart().then(function (ok) { if (ok) _fsHoeren(true); else _fsMikroKasten(false, 'Mikrofon nicht verfügbar', 'Bitte tippen.'); }); }
       else { _fsStopHoeren(); _fsAus(); _fsMikroKasten(false, 'Freisprechen ist aus', 'Tippe deine Antworten.'); }
     });
