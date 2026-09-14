@@ -91,6 +91,81 @@
       "fallzahl": 158,
       "streuung": null,
       "beleg": "Grundstücksmarktbericht 2025 Landkreis Elbe-Elster, Kap. 8.2.2, S. 55 ff.: Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser aus 154 ausreißerbereinigten Kauffällen der Jahre 2023 bis 2025, differenziert nach Stadtlage (68 Fälle, 1,00) und ländlichem Gebiet (90 Fälle, 0,92)."
+    },
+
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser und Doppelhaushälften",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "lagetyp",
+        "achse_k_bez": "räumlicher Anwendungsbereich",
+        "kategorien": ["stadtlage", "laendliches_gebiet"],
+        "zuordnung_feld": "ort",
+        "kategorie_sonst": "laendliches_gebiet",
+        "kategorie_zuordnung": {
+          "hinweis": "Dieselbe Abgrenzung wie beim Einfamilienhaus-Satz (Bericht S. 20).",
+          "stadtlage": ["Finsterwalde", "Herzberg", "Herzberg (Elster)", "Elsterwerda",
+                        "Bad Liebenwerda", "Falkenberg", "Falkenberg/Elster",
+                        "Doberlug-Kirchhain"],
+          "laendliches_gebiet": ["Mühlberg", "Mühlberg/Elbe", "Uebigau-Wahrenbrück",
+                                 "Schlieben", "Schönewalde", "Sonnewalde", "Crinitz",
+                                 "Massen-Niederlausitz", "Rückersdorf", "Sallgast",
+                                 "Tröbitz", "Lichterfeld-Schacksdorf", "Heideland",
+                                 "Hohenleipisch", "Plessa", "Schraden", "Röderland",
+                                 "Gröden", "Merzdorf", "Fichtwald", "Kremitzaue",
+                                 "Lebusa", "Hohenbucko", "Gorden-Staupitz"]
+        },
+        "modell_je_kategorie": {
+          "stadtlage": {
+            "form": "konstante", "wert": 0.94,
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "22 Kauffälle nach Ausreißerbereinigung, Spanne 0,71 bis 1,18."
+          },
+          "laendliches_gebiet": {
+            "form": "konstante", "wert": 1.02,
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "10 Kauffälle nach Ausreißerbereinigung, Spanne 0,67 bis 1,37. Bodenrichtwert 7 bis 21 €/m², Baujahre 1900 bis 1969."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "HIER DREHT SICH DAS VERHÄLTNIS UM: bei den freistehenden Einfamilienhäusern trägt die Stadtlage den höheren Faktor (1,00 gegen 0,92), bei Reihenhäusern und Doppelhaushälften das ländliche Gebiet (1,02 gegen 0,94). Der Bericht druckt beides so ab. Für den gesamten Landkreis nennt er 0,97 aus 32 Kauffällen.",
+        "normobjekt": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert nach ImmoWertV und VV EW-SW vom 03.05.2023. Ausreißer über der 2,5fachen Standardabweichung eliminiert, je Stichprobe getrennt."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV in Verbindung mit der Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) vom 03.05.2023",
+        "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
+        "ermittlung": "arithmetischer Mittelwert je Stichprobe",
+        "kauffaelle_gesamt": 32,
+        "hinweis": "Modellansätze in Anlage 1 des Berichts."
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Elbe-Elster, unterschieden nach Stadtlage und ländlichem Gebiet",
+        "sachlich": "Reihenhäuser und Doppelhaushälften",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "brw_eur_qm":     { "min": 7, "max": 50, "mittel": 19 },
+          "rnd_jahre":      { "min": 7, "max": 51 },
+          "baujahr":        { "min": 1900, "max": 1996 },
+          "wohnflaeche_qm": { "min": 56, "max": 221 },
+          "bgf_qm":         { "min": 114, "max": 492 },
+          "kaufpreis_eur":  { "min": 40000, "max": 238000 },
+          "standardstufe":  { "min": 1.2, "max": 3.1 }
+        },
+        "vorbehalt": "SEHR KLEINE STICHPROBEN: 22 Kauffälle in den Stadtlagen, ZEHN im ländlichen Gebiet — und dort reicht die Spanne von 0,67 bis 1,37. Der Bericht hat die Auswertung ausdrücklich über drei Jahrgänge gezogen, „um ein Mindestmaß an statistischer Sicherheit herzustellen\".\n\nDIE STICHPROBE IST ALT UND EINFACH: Baujahre 1900 bis 1996, Restnutzungsdauer im Mittel 23 Jahre, Standardstufe im Mittel 2,1, normierte Kaufpreise 40.000 bis 238.000 €. Für ein neueres Reihenhaus gibt es hier keine Grundlage.",
+        "hinweis": "Für den gesamten Landkreis nennt der Bericht 0,97 (32 Kauffälle, Spanne 0,85 bis 1,08). Dieser Wert steht hier nicht, weil beide Lagetypen abgedeckt sind und die räumliche Differenzierung die genauere Aussage ist."
+      },
+
+      "stufe": "C",
+      "stufe_grund": "Amtliche Mittelwerte mit vollständiger Stichprobenbeschreibung. Stufe C, weil es Konstanten ohne Abhängigkeit sind und die Stichproben mit 22 und 10 Kauffällen sehr klein ausfallen.",
+      "fallzahl": 32,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 Landkreis Elbe-Elster, Kap. 8.3.2, S. 61 f.: Sachwertfaktoren für Reihenhäuser und Doppelhaushälften aus 32 ausreißerbereinigten Kauffällen der Jahre 2023 bis 2025 — Stadtlagen 0,94 (22 Fälle), ländliche Gebiete 1,02 (10 Fälle), gesamter Landkreis 0,97."
     }
   ]
 }

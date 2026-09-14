@@ -146,6 +146,101 @@
       "fallzahl": 582,
       "streuung": null,
       "beleg": "Grundstücksmarktbericht Landkreis Havelland 2025, Kap. 8.2.2, S. 62 und S. 64: zwei Sachwertfaktor-Tabellen (Berliner Umland 7 mal 8 Zellen aus 330 bereinigten Kauffällen, weiterer Metropolenraum 8 mal 9 Zellen aus 252 bereinigten Kauffällen) nebst Anpassungsfaktoren für abweichendes Baujahr."
+    },
+
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser und Doppelhaushälften im Weiterverkauf",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "region",
+        "achse_k_bez": "landesplanerischer Raum im Landkreis Havelland",
+        "kategorien": ["berliner_umland", "weiterer_metropolenraum"],
+        "zuordnung_feld": "ort",
+        "kategorie_zuordnung": {
+          "hinweis": "Dieselbe Abgrenzung wie beim Einfamilienhaus-Satz (Bericht S. 11, R2 gegen R4/R5).",
+          "berliner_umland": ["Falkensee", "Falkenhagen", "Seegefeld", "Finkenkrug",
+                              "Brieselang", "Bredow", "Zeestow",
+                              "Dallgow-Döberitz", "Seeburg", "Rohrbeck",
+                              "Schönwalde-Glien", "Schönwalde-Dorf", "Schönwalde-Siedlung",
+                              "Paaren im Glien", "Perwenitz", "Pausin", "Wansdorf", "Grünefeld",
+                              "Wustermark", "Elstal", "Buchow-Karpzow", "Hoppenrade",
+                              "Priort", "Wernitz"],
+          "weiterer_metropolenraum": ["Nauen", "Rathenow", "Premnitz", "Ketzin", "Ketzin/Havel",
+                                      "Milower Land", "Milow",
+                                      "Friesack", "Mühlenberge", "Paulinenaue", "Pessin",
+                                      "Retzow", "Wiesenaue",
+                                      "Nennhausen", "Kotzen", "Märkisch Luch", "Stechow-Ferchesar",
+                                      "Rhinow", "Gollenberg", "Großderschau", "Havelaue",
+                                      "Kleßen-Görne", "Seeblick"]
+        },
+        "modell_je_kategorie": {
+          "berliner_umland": {
+            "form": "matrix_interp",
+            "achse_y_feld": "bgf",
+            "achse_y_bez": "Bruttogrundfläche in m²",
+            "achse_y": [125, 150, 175, 200, 225, 250, 275],
+            "achse_x_feld": "flaeche",
+            "achse_x_bez": "Grundstücksfläche in m²",
+            "achse_x": [150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800],
+            "zellen": {
+              "125": [1.76, 1.59, 1.48, 1.40, 1.33, 1.28, 1.23, 1.20, 1.14, 1.09, 1.05],
+              "150": [1.70, 1.54, 1.42, 1.34, 1.27, 1.22, 1.18, 1.14, 1.08, 1.03, 1.00],
+              "175": [1.65, 1.49, 1.37, 1.29, 1.22, 1.17, 1.13, 1.09, 1.03, 0.98, 0.94],
+              "200": [1.60, 1.44, 1.32, 1.24, 1.17, 1.12, 1.08, 1.04, 0.98, 0.93, 0.90],
+              "225": [1.56, 1.39, 1.28, 1.19, 1.13, 1.07, 1.03, 0.99, 0.93, 0.89, 0.85],
+              "250": [1.51, 1.35, 1.23, 1.15, 1.08, 1.03, 0.99, 0.95, 0.89, 0.84, 0.81],
+              "275": [1.47, 1.31, 1.19, 1.11, 1.04, 0.99, 0.95, 0.91, 0.85, 0.80, 0.76]
+            },
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "100 bereinigte Kauffälle (41 Doppelhaushälften, 59 Reihenhäuser), davon 38 in Falkensee. Sachwertfaktor der Stichprobe: Mittel 1,30, Median 1,29, Spanne 0,75 bis 1,99, Standardabweichung 0,28. Bodenrichtwert 140 bis 550 €/m². ANDERE ACHSEN ALS BEIM EINFAMILIENHAUS: hier Bruttogrundfläche mal Grundstücksfläche, dort Grundstücks- mal Wohnfläche. Der Bericht erlaubt lineare Interpolation zwischen den Tabellenwerten."
+          },
+          "weiterer_metropolenraum": {
+            "form": "konstante",
+            "wert": 1.04,
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "EINE KONSTANTE, WEIL DER BERICHT KEINE FUNKTION ABLEITEN KONNTE: „Aufgrund der großen Streuungsbreite und der erheblichen statistischen Unsicherheit ist eine entscheidende Abhängigkeit der Sachwertfaktoren von den Einflussgrößen nicht zu erkennen. Eine Regressionsfunktion konnte nicht abgeleitet werden.\" 89 bereinigte Kauffälle (72 Doppelhaushälften, 17 Reihenhäuser), Mittel 1,04, Median 1,03, Spanne 0,57 bis 1,53, Standardabweichung 0,20. Vorläufiger Sachwert der Stichprobe 56.838 bis 445.075 €, Bodenrichtwert 7 bis 280 €/m², Baujahre 1800 bis 1997, Restnutzungsdauer 12 bis 56 Jahre."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "ZWEI REGIONEN, ZWEI GANZ VERSCHIEDENE ANTWORTEN: im Berliner Umland eine Tabelle über Bruttogrundfläche und Grundstücksfläche, im weiteren Metropolenraum ein einzelner Mittelwert — dort hat der Gutachterausschuss ausdrücklich KEINE Regressionsfunktion ableiten können. Der Unterschied ist erheblich: 1,30 gegen 1,04 im Mittel.",
+        "normobjekt": "Weiterverkäufe von Reihenhäusern und Doppelhaushälften, keine Erstverkäufe mit schlüsselfertiger Errichtung durch den Verkäufer. Stichtag 01.07.2025, Ermittlung nach ImmoWertV und VV EW-SW."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV, Brandenburgische Gutachterausschussverordnung (BbgGAV), Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW), Erfassungsrichtlinie (KPSErf-RL)",
+        "ermittlung": "multiple Regressionsanalysen je Region mit Ausreißerbereinigung; im weiteren Metropolenraum arithmetischer Mittelwert, weil keine Funktion ableitbar war",
+        "kauffaelle_gesamt": 197,
+        "stichtag": "01.07.2025"
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Havelland, zwei landesplanerische Räume",
+        "sachlich": "Reihenhäuser und Doppelhaushälften im Weiterverkauf",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwertfaktor_umland":       { "min": 0.75, "max": 1.99, "mittel": 1.30 },
+          "sachwertfaktor_metropolenraum": { "min": 0.57, "max": 1.53, "mittel": 1.04 },
+          "brw_umland":    { "min": 140, "max": 550, "mittel": 370 },
+          "brw_metropole": { "min": 7, "max": 280, "mittel": 99 },
+          "bgf_metropole": { "min": 87, "max": 362 },
+          "baujahr_metropole": { "min": 1800, "max": 1997 },
+          "rnd_metropole": { "min": 12, "max": 56 }
+        },
+        "vorbehalt": "IM WEITEREN METROPOLENRAUM GIBT ES NUR EINEN MITTELWERT, und der Bericht sagt ausdrücklich warum: die Streuung ist zu groß, eine Abhängigkeit von den Einflussgrößen nicht erkennbar. Die beobachteten Faktoren reichen von 0,57 bis 1,53. Der Mittelwert 1,04 ist eine Orientierung, keine Ableitung für den Einzelfall.\n\nDIE STICHPROBE DES METROPOLENRAUMS IST ALT: Baujahre 1800 bis 1997, Restnutzungsdauer im Mittel 28 Jahre, Standardstufe im Mittel 2. Ein neueres oder besser ausgestattetes Reihenhaus liegt außerhalb dessen, was hier ausgewertet wurde.\n\nAUCH IM UMLAND IST DIE SPANNE WEIT: 0,75 bis 1,99 bei einer Standardabweichung von 0,28.",
+        "hinweis": "Der Bericht führt zusätzlich Gebäudefaktoren je m² BGF für diesen Teilmarkt (Kap. 8.3.3, § 20 ImmoWertV, 291 Kauffälle aus drei Jahrgängen) — hier noch nicht erfasst."
+      },
+
+      "stufe": "B",
+      "stufe_grund": "Amtliche Tabelle mit vollständiger Stichprobenbeschreibung für das Berliner Umland; für den weiteren Metropolenraum ein amtlicher Mittelwert mit Begründung, warum keine Funktion vorliegt. Stufe B, weil kein Anwendungsbeispiel vorliegt und die Spannen weit sind.",
+      "fallzahl": 189,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht Landkreis Havelland 2025, Kap. 8.3.2, S. 75 ff.: Sachwertfaktoren für Reihenhäuser und Doppelhaushälften aus 197 Kauffällen der Jahre 2024 und 2025 — Berliner Umland als 7 mal 11 Zellen große Tabelle (100 bereinigte Fälle), weiterer Metropolenraum als arithmetischer Mittelwert 1,04 (89 bereinigte Fälle)."
     }
   ]
 }

@@ -97,6 +97,88 @@
       "fallzahl": 64,
       "streuung": null,
       "beleg": "Grundstücksmarktbericht 2025 des Gutachterausschusses im Landkreis Oder-Spree und in der Stadt Frankfurt (Oder), Kap. 8.2.2, S. 58: zwei Regressionsfunktionen (Berliner Umland y = 130,8x^-0,377, R² = 0,33, 29 Kauffälle; weiterer Metropolenraum y = 4,2967x^-0,119, R² = 0,03, 35 Kauffälle) nebst Tabelle von 200.000 bis 725.000 € vorläufigem Sachwert."
+    },
+
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser und Doppelhaushälften",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "regionstyp",
+        "achse_k_bez": "Regionstyp im Landkreis Oder-Spree",
+        "kategorien": ["berliner_umland", "weiterer_metropolenraum"],
+        "zuordnung_feld": "ort",
+        "kategorie_sonst": "weiterer_metropolenraum",
+        "kategorie_zuordnung": {
+          "hinweis": "Dieselbe Zuordnung wie beim Einfamilienhaus-Satz (Bericht S. 12 f.).",
+          "berliner_umland": ["Erkner", "Gosen", "Grünheide", "Hangelsberg", "Kagel",
+                              "Kienbaum", "Mönchwinkel", "Neu Zittau",
+                              "Schöneiche bei Berlin", "Schöneiche", "Spreeau", "Woltersdorf",
+                              "Gosen-Neu Zittau", "Grünheide (Mark)"],
+          "weiterer_metropolenraum": ["Beeskow", "Fürstenwalde", "Fürstenwalde/Spree",
+                                      "Eisenhüttenstadt", "Bad Saarow", "Bad Saarow-Pieskow",
+                                      "Storkow", "Storkow (Mark)", "Müllrose", "Wendisch Rietz",
+                                      "Friedland", "Neuzelle", "Steinhöfel", "Tauche",
+                                      "Spreenhagen", "Briesen", "Briesen (Mark)",
+                                      "Brieskow-Finkenheerd", "Groß Lindow", "Diensdorf",
+                                      "Diensdorf-Radlow", "Rietz-Neuendorf", "Berkenbrück",
+                                      "Langewahl", "Rauen", "Petersdorf", "Schlaubetal",
+                                      "Siehdichum", "Vogelsang", "Ragow-Merz", "Mixdorf",
+                                      "Grunow-Dammendorf", "Wiesenau", "Ziltendorf",
+                                      "Vogelsang (Oder-Spree)", "Bomsdorf"]
+        },
+        "modell_je_kategorie": {
+          "berliner_umland": {
+            "form": "potenz", "achse_feld": "sachwert",
+            "achse_bez": "vorläufiger Sachwert in Euro",
+            "a": 195.48, "b": -0.409, "gueltig_von": 200000, "gueltig_bis": 400000,
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "26 Kauffälle aus 01/2023 bis 09/2025, Bodenrichtwert 165 bis 550 €/m², Grundstücke 149 bis 553 m², Baujahre 1923 bis 2013. Bestimmtheitsmaß 0,26, Korrelationskoeffizient -0,54."
+          },
+          "weiterer_metropolenraum": {
+            "form": "potenz", "achse_feld": "sachwert",
+            "achse_bez": "vorläufiger Sachwert in Euro",
+            "a": 5714.7, "b": -0.694, "gueltig_von": 150000, "gueltig_bis": 350000,
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "17 Kauffälle aus 04/2023 bis 12/2025, Bodenrichtwert 30 bis 260 €/m², Grundstücke 139 bis 707 m², Baujahre 1984 bis 2014. Bestimmtheitsmaß 0,30, Korrelationskoeffizient -0,56. SEHR STEILE KURVE: von 1,46 bei 150.000 € auf 0,81 bei 350.000 €."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "ZWEI REGIONSTYPEN, ZWEI FUNKTIONEN. Die Gültigkeitsbereiche überschneiden sich nur zwischen 200.000 und 350.000 Euro. Beide Kurven sind an je vier abgedruckten Stützstellen nachgerechnet und zeichengleich. Stichtag 01.07.2024.",
+        "normobjekt": "Sachwertfaktoren SW23 nach ImmoWertV und VV EW-SW vom 03.05.2023."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) vom 03.05.2023",
+        "bezeichnung": "SW23",
+        "stichtag": "01.07.2024",
+        "kauffaelle_gesamt": 43
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Oder-Spree",
+        "sachlich": "Reihenhäuser und Doppelhaushälften",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "brw_umland":      { "min": 165, "max": 550 },
+          "brw_metropole":   { "min": 30, "max": 260 },
+          "flaeche_umland":  { "min": 149, "max": 553 },
+          "flaeche_metropole": { "min": 139, "max": 707 },
+          "baujahr_umland":  { "min": 1923, "max": 2013 },
+          "baujahr_metropole": { "min": 1984, "max": 2014 }
+        },
+        "vorbehalt": "DIE STICHPROBEN SIND SEHR KLEIN: 26 und 17 Kauffälle über fast drei Jahrgänge.\n\nDIE BAUJAHRE UNTERSCHEIDEN SICH STARK: im weiteren Metropolenraum umfasst die Stichprobe nur Baujahre ab 1984 — für ein älteres Reihenhaus dort gibt es keine Grundlage, auch wenn der Sachwert in der Spanne liegt.\n\nDER STICHTAG IST DER 01.07.2024, über ein Jahr vor dem Berichtsstichtag.",
+        "hinweis": "Der Bericht führt für die Stadt Frankfurt (Oder) eine EIGENE Auswertung dieses Teilmarkts (S. 118) — sie steht als eigener Registersatz unter dem Gemeindeschlüssel 12053000."
+      },
+
+      "stufe": "C",
+      "stufe_grund": "Amtliche Funktionen mit Stichprobenbeschreibung, an acht abgedruckten Stützstellen nachgerechnet und zeichengleich. Stufe C wegen der kleinen Stichproben (26 und 17), der Bestimmtheitsmaße von 0,26 und 0,30 und des zurückliegenden Stichtags.",
+      "fallzahl": 43,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 des Gutachterausschusses im Landkreis Oder-Spree und in der Stadt Frankfurt (Oder), Kap. 8.3.2, S. 65: zwei Regressionsfunktionen für Reihenhäuser und Doppelhaushälften (Berliner Umland y = 195,48x^-0,409, 26 Kauffälle; weiterer Metropolenraum y = 5714,7x^-0,694, 17 Kauffälle), tabellarisch von 150.000 bis 400.000 € vorläufigem Sachwert."
     }
   ]
 }

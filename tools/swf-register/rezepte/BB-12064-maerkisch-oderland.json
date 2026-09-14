@@ -99,6 +99,82 @@
       "fallzahl": 213,
       "streuung": null,
       "beleg": "Grundstücksmarktbericht 2025 Landkreis Märkisch-Oderland, Kap. 8.2.2, Tabelle S. 75: vier Regressionsfunktionen nach Bodenrichtwert-Kategorien aus 213 Kauffällen des Jahres 2025 (39 / 32 / 86 / 56), tabellarisch von 50.000 bis 900.000 € vorläufigem Sachwert."
+    },
+
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Doppelhaushälften, Reihenmittel- und Reihenendhäuser",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "brw_kategorie",
+        "achse_k_bez": "Bodenrichtwert-Kategorie",
+        "kategorien": ["ab_200", "unter_200"],
+        "zuordnung_feld": "brw",
+        "kategorie_baender": [
+          { "von": 200, "bis": null, "kategorie": "ab_200" },
+          { "von": null, "bis": 200, "kategorie": "unter_200" }
+        ],
+        "modell_je_kategorie": {
+          "unter_200": {
+            "form": "stufen_1d",
+            "achse_feld": "sachwert",
+            "achse_bez": "vorläufiger Sachwert in Euro",
+            "stufen": {
+              "75000": 1.09, "100000": 1.07, "125000": 1.05, "150000": 1.04,
+              "175000": 1.02, "200000": 1.01, "225000": 1.00, "250000": 1.00,
+              "275000": 0.99
+            },
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "20 Kauffälle, Bodenrichtwert im Mittel 48 €/m². Die Kurve ist über die ganze Spanne fast waagerecht: von 1,09 auf 0,99."
+          },
+          "ab_200": {
+            "form": "stufen_1d",
+            "achse_feld": "sachwert",
+            "achse_bez": "vorläufiger Sachwert in Euro",
+            "stufen": {
+              "200000": 1.36, "225000": 1.30, "250000": 1.25, "275000": 1.21,
+              "300000": 1.17, "325000": 1.13, "350000": 1.10, "375000": 1.07,
+              "400000": 1.04, "425000": 1.02, "450000": 1.00, "475000": 0.98,
+              "500000": 0.96
+            },
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "22 Kauffälle, Bodenrichtwert im Mittel 322 €/m². Deutlich steiler als die Reihe darunter: von 1,36 auf 0,96."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "ZWEI BODENRICHTWERT-KATEGORIEN, ZWEI TABELLEN, und sie überschneiden sich nur zwischen 200.000 und 275.000 Euro vorläufigem Sachwert. Die Grenze liegt bei 200 €/m²: der Bericht schreibt „< 200\" und „≥ 200\", deshalb steht die obere Kategorie hier zuerst — bei genau 200 €/m² gilt sie. DIE UNTERSCHEIDUNG BERLINER UMLAND / WEITERER METROPOLENRAUM MACHT DER BERICHT AUCH HIER NICHT: „Die Ergebnisse der Auswertung gelten gleichermaßen für das Berliner Umland und den weiteren Metropolenraum.\" Stichtag der Faktoren ist der 01.01.2026.",
+        "normobjekt": "Modellansätze und Parameter wie beim Einfamilienhaus-Satz (Kap. 8.2.2): NHK 2010 nach Anlage 4 ImmoWertV, Bundesbaupreisindex, lineare Alterswertminderung, Bodenwert ohne Größenanpassung, Außenanlagen pauschal 4 % vom Gebäudesachwert."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV §§ 35-39 und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
+        "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert",
+        "stichtag": "01.01.2026",
+        "kauffaelle_gesamt": 42,
+        "hinweis": "Stichprobenbeschreibung nach 6.2 VV EW-SW: 42 Kauffälle, Bodenrichtwert 11 bis 390 €/m², Grundstücksgröße 200 bis 1.293 m², Wohnfläche 58 bis 202 m²."
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Märkisch-Oderland, gestaffelt nach Bodenrichtwertniveau",
+        "sachlich": "Doppelhaushälften, Reihenmittel- und Reihenendhäuser",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "brw_eur_qm":     { "min": 11, "max": 390 },
+          "flaeche_qm":     { "min": 200, "max": 1293 },
+          "wohnflaeche_qm": { "min": 58, "max": 202 }
+        },
+        "vorbehalt": "DIE STICHPROBE IST KLEIN: 42 Kauffälle für beide Kategorien zusammen, 20 und 22 je Reihe. Für einen ganzen Landkreis ist das wenig; der Bericht führt für diesen Teilmarkt entsprechend nur zwei Kategorien statt vier wie beim Einfamilienhaus.\n\nDIE GÜLTIGKEITSBEREICHE SIND ENG UND VERSCHIEDEN: unter 200 €/m² reicht die Tabelle von 75.000 bis 275.000 €, ab 200 €/m² von 200.000 bis 500.000 €. Außerhalb gibt es keinen Wert.",
+        "hinweis": "Der Bericht führt zusätzlich Wohnflächenpreise für diesen Teilmarkt (Kap. 8.3.3) — dort ausdrücklich OHNE unsanierte Objekte (0 bis 1 Modernisierungspunkte)."
+      },
+
+      "stufe": "C",
+      "stufe_grund": "Amtliche Tabelle mit Stichprobenbeschreibung nach 6.2 VV EW-SW. Stufe C statt B, weil die Stichprobe mit 42 Kauffällen für einen ganzen Landkreis klein ist und der Bericht für diesen Teilmarkt keine Funktionen abdruckt.",
+      "fallzahl": 42,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 Landkreis Märkisch-Oderland, Kap. 8.3.2, S. 82 f.: Sachwertfaktoren für Doppelhaushälften und Reihenhäuser nach zwei Bodenrichtwert-Kategorien aus 42 Kauffällen, tabellarisch von 75.000 bis 500.000 € vorläufigem Sachwert, Stichtag 01.01.2026."
     }
   ]
 }
