@@ -2114,6 +2114,51 @@
     return Math.sqrt(summe / _fs.daten.length);
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1121-WWACH · DER WIEDERANLAUF-WÄCHTER
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Befund vom 14.09.2026: „dass er manchmal einfach abgebrochen
+     hat und hat nicht mehr aufgenommen. Ich musste dann händisch
+     eingreifen und das eingeben."
+
+     GEMESSEN, warum das passieren MUSS: `_fsHoeren(true)` steht an
+     dreissig Stellen im Ablauf — hinter jeder Antwort, jeder Auskunft,
+     jedem Abruf, jedem Fehlerzweig. Jede dieser Stellen ist eine
+     Gelegenheit, es zu vergessen, und `_rfVorabErkennen` allein hat ein
+     Dutzend Zweige, die mit `return true` enden. Vergisst einer den
+     Wiederanlauf, hört der Co-Pilot still auf zuzuhören. Nichts
+     widerspricht: das Mikrofon-Symbol bleibt, der Dialog steht, nur es
+     passiert nichts mehr.
+
+     EIN WÄCHTER STATT DREISSIG EINZELSTELLEN. Alle drei Sekunden wird
+     geprüft: Freisprechen an, Strom da, Dialog offen, keine Auswertung
+     unterwegs — und trotzdem keine Phase aktiv? Dann hat jemand den
+     Wiederanlauf vergessen, und der Wächter holt ihn nach.
+
+     Er ERSETZT die bestehenden Aufrufe nicht, er sichert sie ab: wo
+     `_fsHoeren` schon läuft, tut der Wächter nichts (die Funktion prüft
+     die Phase selbst). `aus` heisst „bewusst beendet" und bleibt
+     unangetastet — sonst würde er das Schliessen des Dialogs bekämpfen. */
+  var FS_WAECHTER_MS = 3000;
+
+  function _fsWaechterAn() {
+    if (_fs.waechter) return;
+    _fs.waechter = setInterval(function () {
+      try {
+        if (!_rf || !_fs.an || !_fs.stream) return;
+        if (_fs.laeuft > 0) return;                      /* Auswertung unterwegs */
+        if (_fs.phase === 'rauschen' || _fs.phase === 'warte'
+            || _fs.phase === 'spricht') return;          /* alles in Ordnung */
+        if (_fs.phase === 'aus') return;                 /* bewusst beendet */
+        _fsHoeren(true);
+      } catch (e) { /* ein Waechter, der wirft, waere schlimmer als keiner */ }
+    }, FS_WAECHTER_MS);
+  }
+
+  function _fsWaechterAus() {
+    if (_fs.waechter) { clearInterval(_fs.waechter); _fs.waechter = null; }
+  }
+
   function _fsAus() {
     try { if (_fs.uhr) { clearInterval(_fs.uhr); _fs.uhr = null; } } catch (e) {}
     try { if (_fs.rec && _fs.rec.state === 'recording') { _fs.rec.onstop = null; _fs.rec.stop(); } } catch (e) {}
@@ -2122,6 +2167,7 @@
     _fs.stream = null; _fs.ctx = null; _fs.analyser = null; _fs.rec = null;
     _fs.kopf = null; _fs.chunks = []; _fs.rest = ''; _fs.laeuft = 0;
     _fs.phase = 'aus'; _fs.aufnahme = false;
+    _fsWaechterAus();   /* v1121-WWACH */
   }
 
   /* Einmal öffnen, für den ganzen Dialog — und einmal starten. */
@@ -2157,6 +2203,7 @@
         _fsRingBegrenzen();
       };
       try { _fs.rec.start(FS_SCHEIBE_MS); _fs.aufnahme = true; } catch (e) { return false; }
+      _fsWaechterAn();   /* v1121-WWACH: ab jetzt passt jemand auf. */
       return true;
     }).catch(function () { return false; });
   }
@@ -5193,12 +5240,50 @@
     var R = r.R, Z = r.Z, st = _stufe(R.score);
     var cats = R.categories || {};
     var namen = { rendite: 'Rendite', finanzierung: 'Finanzierung', risiko: 'Risiko', lage: 'Lage', upside: 'Upside' };
+    /* ═══ v1121-WKPI · SO WIE IM TAB BEWERTUNGEN ═══════════════════════
+       Marcels Befund vom 14.09.2026: „da wäre es ja auch irgendwie cool,
+       wenn wir tatsächlich den Investor-Deal-Score und den
+       Investor-Deal-Score 2 anzeigen, auch mit den KPIs, die dahinter
+       stehen. Also ungefähr so, wie wir ihn im Tab Bewertungen haben."
+
+       GEMESSEN, was der Tab zeigt und der Sprechlauf nicht: das GEWICHT
+       der Kategorie, die Zahl der belegten KENNZAHLEN je Kategorie und
+       die Listen der Stärken und Schwächen. Der Sprechlauf zeigte nur
+       „Rendite 72 / 100" — eine Zahl ohne das, woraus sie entsteht.
+
+       Das Gewicht steht in `configUsed.weights`, die Kennzahlen je
+       Kategorie in `availableKpis`/`totalKpis`, Stärken und Schwächen in
+       `positives`/`negatives`. Alles liegt schon im Ergebnis; es wurde
+       nur nicht gelesen. */
+    var gew = (R.configUsed && R.configUsed.weights) || {};
     var gitter = Object.keys(namen).map(function (k) {
       var c = cats[k];
       if (!c) return '';
       var s = Math.round(c.score || 0);
-      return _zeile(namen[k], s + ' / 100', s >= 70 ? 'gut' : (s < 50 ? 'schlecht' : ''));
+      var zusatz = [];
+      if (gew[k]) zusatz.push(gew[k] + ' %');
+      if (c.totalKpis) zusatz.push(c.availableKpis + '/' + c.totalKpis + ' Kennz.');
+      var bez = namen[k] + (zusatz.length ? ' (' + zusatz.join(' · ') + ')' : '');
+      return _zeile(bez, s + ' / 100', s >= 70 ? 'gut' : (s < 50 ? 'schlecht' : ''));
     }).join('');
+
+    /* Stärken und Schwächen — im Tab stehen sie als Listen, hier in je
+       einer Zeile. Was der Score gut findet und was nicht, ist die
+       eigentliche Auskunft; die Zahl allein sagt nur, wie es ausging. */
+    var stTxt = '';
+    try {
+      var pos = (R.positives || []).slice(0, 4).map(function (p) {
+        return escH(p.name) + ' <span style="opacity:.6">' + Math.round(p.points) + '</span>'; });
+      var neg = (R.negatives || []).slice(0, 4).map(function (p) {
+        return escH(p.name) + ' <span style="opacity:.6">' + Math.round(p.points) + '</span>'; });
+      if (pos.length || neg.length) {
+        stTxt = '<div class="vi-sc-annahmen" style="margin-top:8px">'
+          + (pos.length ? '<b>Stark:</b> ' + pos.join(' · ') : '')
+          + (pos.length && neg.length ? '<br>' : '')
+          + (neg.length ? '<b>Schwach:</b> ' + neg.join(' · ') : '')
+          + '</div>';
+      }
+    } catch (e) {}
     var vollst = '';
     try {
       var av = 0, ge = 0;
@@ -5248,7 +5333,7 @@
     return '<div class="vi-sc">' +
       _scoreKopf('Investor Deal Score 2.0', R.score, st, st.kamel) +
       fazit +
-      '<div class="vi-sc-gitter">' + gitter + '</div>' + mp + hb +
+      '<div class="vi-sc-gitter">' + gitter + '</div>' + stTxt + mp + hb +
       (R.explanation ? '<div class="vi-sc-text">' + escH(String(R.explanation).replace(/\s+/g, ' ').slice(0, 420)) + '</div>' : '') +
       (vollst ? '<div class="vi-sc-annahmen"><b>Datenlage:</b> ' + escH(vollst) +
                 ' — was fehlt, zählt nicht gegen dich, es zählt gar nicht.</div>' : '') +
@@ -6294,6 +6379,9 @@
     _rf.data.fields[id] = wert;
     if (!_rf.quelle) _rf.quelle = {};
     if (quelle) _rf.quelle[id] = quelle;
+    /* v1121-WFRUEH: steht damit alles fuer die erweiterte Indikation?
+       Dann laeuft sie ab jetzt nebenher statt erst am Ende. */
+    try { _rfMarkt2Pruefen(); } catch (e) {}
     return true;
   }
 
@@ -6989,6 +7077,54 @@
 
   function _rfMarktBereit() {
     return !!(_rfFeld('plz') || _rfFeld('ort')) && _rfNum(_rfFeld('wfl')) != null;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     v1121-WFRUEH · DIE ERWEITERTE LÄUFT, SOBALD SIE KANN
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Befund vom 14.09.2026: „ich frage am Anfang die erweiterte
+     Marktpreisindikation ab, und dann könnte er den Bericht ja schon
+     automatisch nebenbei beziehen. Das macht er dann erst irgendwie am
+     Schluss, dass er sagt: ach ja, das dauert jetzt länger. Das kann ja
+     schon parallel laufen."
+
+     Er hat recht, und die Ursache ist ein FESTER Zeitpunkt statt einer
+     Bedingung: bisher startete Stufe 2 am Ende von Etappe 4, weil dort
+     erfahrungsgemäss alles beisammen ist. Wer die Angaben früher nennt —
+     im Freitext, aus dem Profil, aus einem gelesenen Marktbericht —,
+     wartet trotzdem bis zum Etappenende.
+
+     WARUM NICHT EINFACH SOFORT: die erweiterte Indikation liest Zustand,
+     Energieausweis, Bodenrichtwert und die Lagebewertung. Ohne sie
+     rechnet sie am Durchschnitt und liefert dasselbe wie die einfache.
+     Früher starten heisst deshalb nicht „sofort", sondern „in dem
+     Moment, in dem die letzte nötige Angabe steht".
+
+     Geprüft wird nach jeder Übernahme. Fehlt etwas, bleibt es beim
+     bisherigen Weg: Ende Etappe 4, dann mit dem, was da ist. */
+  function _rfMarkt2Bereit() {
+    if (!_rf) return false;
+    if (!(_rfFeld('plz') || _rfFeld('ort'))) return false;
+    if (_rfNum(_rfFeld('wfl')) == null) return false;
+    if (_rfNum(_rfFeld('baujahr')) == null) return false;
+    /* Die beiden, die den Unterschied zur einfachen Stufe ausmachen. */
+    if (!_rfFeld('ds2_zustand')) return false;
+    if (_rfNum(_rfFeld('brw')) == null) return false;
+    return true;
+  }
+
+  /* Nach jeder Übernahme aufgerufen. Tut nichts, solange etwas fehlt —
+     und genau einmal etwas, wenn alles steht. */
+  function _rfMarkt2Pruefen() {
+    if (!_rf) return;
+    if (!_rf.marktGewollt || (_rf.marktStufe || 0) < 2) return;
+    if (_rf.markt2 || _rf.marktLaeuft || _rf.marktPlusGetan) return;
+    if (!_rfMarkt2Bereit()) return;
+    _rf.marktPlusGetan = 1;
+    _rfBlase('co', '<span style="opacity:.85">Alles beisammen, was die <b>erweiterte '
+      + 'Marktpreisindikation</b> braucht — ich starte sie <b>jetzt</b> statt erst am Ende. '
+      + 'Sie rechnet neben deinen Antworten weiter; wenn wir unten ankommen, liegt sie da.</span>');
+    _rfMarktStarten(2);
   }
 
   /* Nach Etappe 4: alles da, was der volle Bericht liest. Wer Stufe 1
@@ -8192,9 +8328,39 @@
     var nk = null;
     try { nk = _rfNkAnnahme(); } catch (e) {}
 
+    /* ═══ v1121-WMBEIN · WAS AUS DEM MARKTBERICHT KAM, STEHT HIER ══════
+       Marcels Befund vom 14.09.2026: „wenn wir dann unten angekommen
+       sind, haben wir das schon. Dann kann man sagen: Hier, der
+       Marktbericht ist da, wir lassen die und die Sachen jetzt alle mit
+       einfliessen."
+
+       Die Herkunft steht je Feld im Zustand des Laufs — hier wird sie
+       einmal zusammengefasst, damit am Ende sichtbar ist, WAS der Bericht
+       beigesteuert hat. Ohne diese Zeile sieht der Nutzer nur Zahlen und
+       weiss nicht, welche davon er selbst gesagt hat und welche der
+       Co-Pilot geholt hat. */
+    var ausBericht = [];
+    try {
+      Object.keys(_rf.quelle || {}).forEach(function (id) {
+        var q = String(_rf.quelle[id] || '');
+        if (/markt|indikation|bericht/i.test(q)) {
+          var n = _rfFeldName(id);
+          if (n && ausBericht.indexOf(n) < 0) ausBericht.push(n);
+        }
+      });
+    } catch (e) {}
+    var berichtZeile = ausBericht.length
+      ? '<div class="vi-sc-annahmen" style="margin-top:10px">'
+        + '<b>Aus der Marktpreisindikation ist eingeflossen:</b> '
+        + escH(ausBericht.slice(0, 10).join(', '))
+        + (ausBericht.length > 10 ? ' und ' + (ausBericht.length - 10) + ' weitere' : '')
+        + '. In der Übersicht steht an jeder Zeile, woher sie kommt.</div>'
+      : '';
+
     _rfBlase('co',
       '<b>Das ist der Stand.</b> Beide Scores rechnen mit dem, was du gesagt hast — ' +
       'nichts davon steht schon im Objekt; das entscheidest du gleich in der Übersicht.' +
+      berichtZeile +
       (k1 || '') + (k2 || '') +
       (fehlt.length
         ? '<div class="vi-sc-annahmen" style="margin-top:12px"><b>Was ich nicht weiß:</b> ' +
