@@ -152,6 +152,9 @@ const FELDBRUECKE = {
      keiner Bruecke; das Modell haette 'achse_y_fehlt' gemeldet, obwohl
      die Zahl im Formular seit jeher erhoben wird. */
   wohnflaeche: ['wohnflaeche_qm', 'wohnflaeche', 'living_area', 'wfl'],
+  /* v1113-WKEL - die Altmark fuehrt die Unterkellerung als eigenes Glied
+     ihrer Gleichung; vierzehn Prozentpunkte haengen daran. */
+  unterkellerung: ['unterkellerung', 'keller_dg', 'keller'],
   /* v1105-WMOD - Cottbus unterscheidet seine Sachwertfaktoren nach dem
      MODERNISIERUNGSGRAD nach Anlage 2 ImmoWertV: 0 bis 6 Punkte gelten
      als unsaniert, ab 7 als teilsaniert bis saniert. Zwischen beiden

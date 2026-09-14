@@ -2393,98 +2393,226 @@
   "kennzahl": "sachwertfaktor",
   "zweig": "ezfh",
   "formel": {
-   "form": "regression_additiv",
-   "intercept": 0.88928,
-   "terme": [
-    {
-     "feld": "sachwert",
-     "bez": "vorläufiger Sachwert",
-     "koeffizient": -0.01515,
-     "exponent": 0.33,
-     "gueltig": [
-      49000,
-      405000
-     ]
-    },
-    {
-     "feld": "rnd",
-     "bez": "Restnutzungsdauer",
-     "koeffizient": 0.0796,
-     "exponent": 1,
-     "gueltig": [
-      15,
-      73
-     ]
-    },
-    {
-     "feld": "rnd",
-     "bez": "Restnutzungsdauer (quadratisch)",
-     "koeffizient": -0.001757,
-     "exponent": 2,
-     "gueltig": [
-      15,
-      73
-     ]
-    },
-    {
-     "feld": "rnd",
-     "bez": "Restnutzungsdauer (kubisch)",
-     "koeffizient": 1.242e-05,
-     "exponent": 3,
-     "gueltig": [
-      15,
-      73
-     ]
-    },
-    {
-     "feld": "brw",
-     "bez": "Bodenrichtwert",
-     "koeffizient": -1.072,
-     "exponent": -0.5,
-     "gueltig": [
-      5,
-      60
-     ]
-    }
+   "form": "verzweigt",
+   "achse_k_feld": "regionstyp",
+   "achse_k_bez": "Regionstyp",
+   "kategorien": [
+    "zentrum",
+    "dorf"
    ],
+   "zuordnung_feld": "ort",
+   "kategorie_sonst": "dorf",
+   "kategorie_zuordnung": {
+    "hinweis": "Die Zuordnung steht im Blatt „Regionstypen — Zuordnung der Gemarkungen\" des Ausschusses und endet mit dem Satz, der die Restkategorie trägt: „Alle nicht genannten Gemeinden, Ortsteile oder Gemarkungen wurden dem Regionstyp Dörfer zugeordnet.\" Genannt sind für den Altmarkkreis Salzwedel das Mittelzentrum Salzwedel und die Grundzentren Arendsee, Beetzendorf, Dähre, Diesdorf, Gardelegen, Kalbe, Klötze und Mieste; für den Landkreis Stendal das Mittelzentrum Stendal und die Grundzentren Arneburg, Bismark, Osterburg, Schönhausen, Seehausen, Tangerhütte, Tangermünde und Havelberg.",
+    "zentrum": [
+     "Salzwedel",
+     "Arendsee",
+     "Beetzendorf",
+     "Dähre",
+     "Diesdorf",
+     "Gardelegen",
+     "Kalbe",
+     "Kalbe (Milde)",
+     "Klötze",
+     "Mieste",
+     "Stendal",
+     "Arneburg",
+     "Bismark",
+     "Bismark (Altmark)",
+     "Osterburg",
+     "Osterburg (Altmark)",
+     "Schönhausen",
+     "Schönhausen (Elbe)",
+     "Seehausen",
+     "Seehausen (Altmark)",
+     "Tangerhütte",
+     "Tangermünde",
+     "Havelberg"
+    ],
+    "dorf": []
+   },
+   "modell_je_kategorie": {
+    "zentrum": {
+     "form": "regression_additiv",
+     "intercept": 1.15438,
+     "terme": [
+      {
+       "feld": "sachwert",
+       "bez": "vorläufiger Sachwert",
+       "koeffizient": -3.69e-06,
+       "exponent": 1,
+       "gueltig": [
+        62000,
+        376000
+       ]
+      },
+      {
+       "feld": "sachwert",
+       "bez": "vorläufiger Sachwert (quadratisch)",
+       "koeffizient": 4.719e-12,
+       "exponent": 2,
+       "gueltig": [
+        62000,
+        376000
+       ]
+      },
+      {
+       "feld": "brw",
+       "bez": "Bodenrichtwert",
+       "koeffizient": 0.1718,
+       "exponent": 0.3333,
+       "gueltig": [
+        6,
+        70
+       ]
+      },
+      {
+       "feld": "rnd",
+       "bez": "Restnutzungsdauer",
+       "koeffizient": -0.003936,
+       "exponent": 1,
+       "gueltig": [
+        15,
+        73
+       ]
+      }
+     ],
+     "diskret": [
+      {
+       "feld": "unterkellerung",
+       "bez": "Unterkellerung ab 75 Prozent",
+       "pflicht": true,
+       "werte": {
+        "ja": -0.1418,
+        "vollkeller": -0.1418,
+        "voll unterkellert": -0.1418,
+        "unterkellert": -0.1418,
+        "voll": -0.1418,
+        "vollunterkellert": -0.1418,
+        "nein": 0,
+        "kein keller": 0,
+        "nicht unterkellert": 0,
+        "ohne keller": 0,
+        "teilkeller": 0,
+        "teilweise unterkellert": 0,
+        "teilunterkellert": 0
+       },
+       "hinweis": "Der Bericht führt „− 0,1418 × Unterkellerung (ab 75 %)\" mit den Basiswerten ja = 1,00 und nein = 0,00; der abgedruckte Umrechnungskoeffizient ist 0,86. VIERZEHN PROZENTPUNKTE hängen an dieser einen Angabe — deshalb ist sie Pflicht. Ein Teilkeller unter 75 Prozent zählt nach dem Wortlaut als „nein\"."
+      }
+     ],
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "MITTEL- UND GRUNDZENTREN. Der vorläufige Sachwert geht LINEAR UND QUADRATISCH ein (−0,00000369·vSW + 4,719·10⁻¹²·vSW²) — daher der abflachende Verlauf der abgedruckten Kurve von 1,34 bei 75.000 € auf 0,87 bei 375.000 €.\n\nBESTIMMTHEITSMASS 0,66, Variationskoeffizient 0,09, mittlerer absoluter prozentualer Fehler ± 8 % — der beste Wert im ganzen Register, ausgerechnet auf der kleinsten Stichprobe dieses Ausschusses (71 Kauffälle).\n\nZEITTERM EINGERECHNET: 1,297 − 0,0002225 × 641 = 1,15438, auf die ausdrückliche Empfehlung des Berichts für das erste Halbjahr 2024. Normobjekt: 220.000 €, Bodenrichtwert 35 €/m², Restnutzungsdauer 45 Jahre, keine Unterkellerung.",
+     "normobjekt": "NHK 2010 gemäß Anlage 4 ImmoWertV, BGF aus amtlichen Geobasisdaten, Regionalfaktor 1, Eigennutzung, kein Neubau oder Erstverkauf."
+    },
+    "dorf": {
+     "form": "regression_additiv",
+     "intercept": 0.88928,
+     "terme": [
+      {
+       "feld": "sachwert",
+       "bez": "vorläufiger Sachwert",
+       "koeffizient": -0.01515,
+       "exponent": 0.33,
+       "gueltig": [
+        49000,
+        405000
+       ]
+      },
+      {
+       "feld": "rnd",
+       "bez": "Restnutzungsdauer",
+       "koeffizient": 0.0796,
+       "exponent": 1,
+       "gueltig": [
+        15,
+        73
+       ]
+      },
+      {
+       "feld": "rnd",
+       "bez": "Restnutzungsdauer (quadratisch)",
+       "koeffizient": -0.001757,
+       "exponent": 2,
+       "gueltig": [
+        15,
+        73
+       ]
+      },
+      {
+       "feld": "rnd",
+       "bez": "Restnutzungsdauer (kubisch)",
+       "koeffizient": 1.242e-05,
+       "exponent": 3,
+       "gueltig": [
+        15,
+        73
+       ]
+      },
+      {
+       "feld": "brw",
+       "bez": "Bodenrichtwert",
+       "koeffizient": -1.072,
+       "exponent": -0.5,
+       "gueltig": [
+        5,
+        60
+       ]
+      }
+     ],
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "DÖRFER. DIE RESTNUTZUNGSDAUER GEHT DREIMAL EIN — linear, quadratisch und kubisch. Zusammen bilden die drei Glieder eine Kurve mit Maximum bei rund 37 Jahren, die zu beiden Seiten abfällt (Umrechnungskoeffizienten: 15 Jahre 0,68, 35 bis 40 Jahre 1,00, 50 Jahre 0,97). Die Unterkellerung kommt hier NICHT vor, dafür der Bodenrichtwert mit negativem Exponenten.\n\nZEITTERM EINGERECHNET: 1,0780 − 0,0002944 × 641 = 0,88928, dieselbe Empfehlung wie bei den Zentren.\n\nBestimmtheitsmaß 0,38, Variationskoeffizient 0,18, MAPE ± 15 %. Normobjekt: 190.000 €, Restnutzungsdauer 40 Jahre, Bodenrichtwert 15 €/m². GEPRÜFT: mit dem Tagwert des Normobjekts (384) ergibt die Gleichung dort 1,02 und bei Restnutzungsdauer 15 Jahren 0,69 — das Verhältnis 0,6792 ist zeichengleich mit dem abgedruckten Umrechnungskoeffizienten 0,68.",
+     "normobjekt": "NHK 2010 gemäß Anlage 4 ImmoWertV, BGF aus amtlichen Geobasisdaten, Regionalfaktor 1, Eigennutzung, kein Neubau oder Erstverkauf."
+    }
+   },
    "rundung_stellen": 2,
    "liefert": "faktor",
-   "hinweis": "DIE RESTNUTZUNGSDAUER GEHT DREIMAL EIN — linear, quadratisch und kubisch. Der Bericht druckt drei getrennte Glieder ab; zusammen bilden sie eine Kurve, die bei rund 37 Jahren ihr Maximum hat und zu beiden Seiten abfällt (Umrechnungskoeffizienten: 15 Jahre 0,68, 35 bis 40 Jahre 1,00, 50 Jahre 0,97).\n\nDER ZEITTERM IST EINGERECHNET, und zwar auf die Empfehlung des Berichts: „Zur Ermittlung eines Sachwertfaktors im ersten Halbjahr 2024 wird für die Zeitmodellierung der 01.01.2024 (641. Tag) empfohlen.\" Rechnung: 1,0780 − 0,0002944 × 641 = 0,88928. Der Gutachterausschuss hat die Anwendbarkeit des Modells bis zum 01.07.2024 beschlossen.\n\nMultiples Bestimmtheitsmaß 0,38, Variationskoeffizient 0,18, mittlerer absoluter prozentualer Fehler ± 15 %. Normobjekt: 190.000 €, Restnutzungsdauer 40 Jahre, Bodenrichtwert 15 €/m².",
-   "normobjekt": "NHK 2010 gemäß Anlage 4 ImmoWertV, BGF aus amtlichen Geobasisdaten, Regionalfaktor 1, Eigennutzung, kein Neubau oder Erstverkauf."
+   "hinweis": "ZWEI GANZ VERSCHIEDENE GLEICHUNGEN FÜR DENSELBEN LANDKREIS. Die Zentren rechnen mit dem Quadrat des Sachwerts und der Unterkellerung, die Dörfer mit der Restnutzungsdauer in drei Potenzen. Sie teilen keine einzige Struktur — und genau deshalb steht die Zuordnung über den Ortsnamen am Anfang, nicht als Korrektur am Ende.",
+   "normobjekt": "Siehe Untermodelle."
   },
   "korrekturen": [],
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
    "regionalfaktor": 1.0,
-   "zeitanpassung": "Zeitmodellierung mit dem 641. Tag (01.01.2024) für das erste Halbjahr 2024, auf Empfehlung des Gutachterausschusses; Anwendbarkeit bis 01.07.2024 beschlossen."
+   "zeitanpassung": "Zeitmodellierung mit dem 641. Tag (01.01.2024) für das erste Halbjahr 2024, auf Empfehlung des Gutachterausschusses; Anwendbarkeit bis 01.07.2024 beschlossen.",
+   "kauffaelle_zentren": 71
   },
   "geltungsbereich": {
-   "raeumlich": "Altmarkkreis Salzwedel und Landkreis Stendal, NUR Regionstyp Dorf",
+   "raeumlich": "Altmarkkreis Salzwedel und Landkreis Stendal",
    "sachlich": "freistehende Ein- und Zweifamilienhäuser",
    "extrapolation": "gesperrt",
    "spannen": {
-    "sachwert_eur": {
+    "sachwert_zentrum": {
+     "min": 62000,
+     "max": 376000
+    },
+    "sachwert_dorf": {
      "min": 49000,
      "max": 405000
+    },
+    "brw_zentrum": {
+     "min": 6,
+     "max": 70
+    },
+    "brw_dorf": {
+     "min": 5,
+     "max": 60
     },
     "rnd_jahre": {
      "min": 15,
      "max": 73
-    },
-    "brw_eur_qm": {
-     "min": 5,
-     "max": 60
     }
    },
-   "vorbehalt": "NUR FÜR DÖRFER. Für Mittelzentren und Grundzentren derselben beiden Landkreise führt der Ausschuss ein eigenes Blatt mit eigener Gleichung; es ist hier noch nicht erfasst (seine Regressionsfunktion steht nicht im Textstrom des PDF). Wer in Salzwedel, Gardelegen, Klötze, Stendal, Osterburg oder Tangermünde bewertet, bekommt aus diesem Satz KEINEN Wert — die Regionstyp-Zuordnung des Ausschusses entscheidet.\n\nDER BODENRICHTWERT ENDET BEI 60 €/m². Das ist die niedrigste Obergrenze dieses Registers und zeigt, wovon die Altmark spricht.\n\nMITTLERER ABSOLUTER PROZENTUALER FEHLER ± 15 %.\n\nDER ZEITBEZUG IST AUF DAS ERSTE HALBJAHR 2024 GESETZT. Für einen späteren Stichtag hat der Ausschuss keine Empfehlung gegeben — die Anwendbarkeit ist ausdrücklich bis zum 01.07.2024 beschlossen.",
-   "hinweis": "Die Regionstyp-Zuordnung des Ausschusses ist gemeindescharf veröffentlicht; für die Altmark nennt sie als Mittelzentrum Salzwedel und als Grundzentren Arendsee, Beetzendorf, Dähre, Diesdorf, Gardelegen, Kalbe, Klötze und Mieste, für Stendal das Mittelzentrum Stendal und die Grundzentren Arneburg, Bismark, Osterburg, Schönhausen, Seehausen, Tangerhütte, Tangermünde und Havelberg. Alles Übrige ist Dorf — und nur dafür gilt dieser Satz."
+   "vorbehalt": "IN DEN ZENTREN IST DIE UNTERKELLERUNG PFLICHT. Sie ist ein eigenes Glied der Gleichung und bewegt den Faktor um vierzehn Prozentpunkte. Ohne die Angabe wird dort nicht gerechnet — sie zu raten hieße, ein Siebtel des Ergebnisses zu erfinden. In den Dörfern kommt sie nicht vor.\n\nDER BODENRICHTWERT ENDET BEI 60 BEZIEHUNGSWEISE 70 €/m². Das ist die niedrigste Obergrenze dieses Registers und zeigt, wovon die Altmark spricht.\n\nDER ZEITBEZUG IST AUF DAS ERSTE HALBJAHR 2024 GESETZT; für einen späteren Stichtag hat der Ausschuss keine Empfehlung gegeben. Die Anwendbarkeit ist ausdrücklich bis zum 01.07.2024 beschlossen.\n\nMITTLERER ABSOLUTER PROZENTUALER FEHLER: ± 8 % in den Zentren, ± 15 % in den Dörfern.",
+   "hinweis": "Der Ausschuss veröffentlicht für diese beiden Landkreise ZWEI Blätter. Sie stehen hier als ein Registersatz mit zwei Untermodellen, weil sie denselben Zuständigkeitsschlüssel, dieselbe Kennzahl und denselben Zweig tragen — zwei getrennte Sätze würden im Register kollidieren, und der Auswerter nähme den ersten."
   },
   "belege": [
-   "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser, Altmarkkreis Salzwedel und Landkreis Stendal, Regionstyp Dorf, veröffentlicht am 22.01.2025, R² = 0,38. GEPRÜFT: mit dem Tagwert des Normobjekts (384) ergibt die Gleichung am Normobjekt 1,02 und bei Restnutzungsdauer 15 Jahren 0,69 — der Umrechnungskoeffizient 0,6792 ist zeichengleich mit den abgedruckten 0,68. Dieser Registersatz rechnet mit dem für 2024 empfohlenen Tagwert 641 und liegt deshalb durchgehend niedriger; der Zeitterm ist additiv, verschiebt also auch die Verhältnisse."
+   "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser, Altmarkkreis Salzwedel und Landkreis Stendal, veröffentlicht am 22.01.2025: Regionstypen Mittelzentrum und Grundzentrum aus 71 Kauffällen (R² = 0,66, MAPE ± 8 %) und Regionstyp Dorf (R² = 0,38, MAPE ± 15 %)."
   ],
   "stufe": "B",
-  "stufe_grund": "Amtliche Regressionsfunktion mit vollständiger Modellbeschreibung, Glied für Glied übernommen, mit der vom Bericht selbst empfohlenen Zeitmodellierung. Stufe B, weil der Bericht einen mittleren Fehler von ± 15 % ausweist und die Anwendbarkeit zeitlich begrenzt hat.",
+  "stufe_grund": "Zwei amtliche Regressionsfunktionen, Glied für Glied übernommen — die Zentren-Gleichung aus dem gerenderten Blatt (die Datei trägt ihren Text nicht im PDF-Textstrom), die Dörfer-Gleichung aus dem Textstrom und an einem Umrechnungskoeffizienten geprüft. Stufe B aus zwei Gründen: beide Sätze rechnen mit dem empfohlenen Tagwert 641, während die abgedruckten Kurven für den jeweiligen Normobjekt-Tag gelten — UND die Zentren-Gleichung liegt, mit dem Normobjekt-Datum gerechnet, systematisch ein Hundertstel ÜBER der abgedruckten Kurve (1,35 statt 1,34 bei 75.000 €, 1,28 statt 1,27 bei 100.000 €). Der Verlauf stimmt Punkt für Punkt, die Höhe um 0,01. Welcher Tagwert dem Diagramm zugrunde liegt, sagt das Blatt nicht; mit Tag 410 träfen neun von dreizehn Stützstellen. Die Abweichung ist benannt, nicht wegerklärt.",
   "fallzahl": null,
   "streuung": null,
   "stichtag": "2024-01-01",
@@ -2496,7 +2624,7 @@
   "lizenz": "frei zugänglich, kostenfreier Download",
   "verwendung": "produkt",
   "auflagen": "Quellenangabe. Die Modellparameter der landesweiten Modellbeschreibung sind einzuhalten (Modellkonformität).",
-  "fundstelle": "Sachwertfaktoren Altmarkkreis Salzwedel und Landkreis Stendal, Regionstyp Dorf."
+  "fundstelle": "Sachwertfaktoren Altmarkkreis Salzwedel und Landkreis Stendal — zwei Blätter: Regionstypen Mittelzentrum und Grundzentrum, sowie Regionstyp Dorf."
  },
  {
   "land_code": "ST",
@@ -2507,98 +2635,226 @@
   "kennzahl": "sachwertfaktor",
   "zweig": "ezfh",
   "formel": {
-   "form": "regression_additiv",
-   "intercept": 0.88928,
-   "terme": [
-    {
-     "feld": "sachwert",
-     "bez": "vorläufiger Sachwert",
-     "koeffizient": -0.01515,
-     "exponent": 0.33,
-     "gueltig": [
-      49000,
-      405000
-     ]
-    },
-    {
-     "feld": "rnd",
-     "bez": "Restnutzungsdauer",
-     "koeffizient": 0.0796,
-     "exponent": 1,
-     "gueltig": [
-      15,
-      73
-     ]
-    },
-    {
-     "feld": "rnd",
-     "bez": "Restnutzungsdauer (quadratisch)",
-     "koeffizient": -0.001757,
-     "exponent": 2,
-     "gueltig": [
-      15,
-      73
-     ]
-    },
-    {
-     "feld": "rnd",
-     "bez": "Restnutzungsdauer (kubisch)",
-     "koeffizient": 1.242e-05,
-     "exponent": 3,
-     "gueltig": [
-      15,
-      73
-     ]
-    },
-    {
-     "feld": "brw",
-     "bez": "Bodenrichtwert",
-     "koeffizient": -1.072,
-     "exponent": -0.5,
-     "gueltig": [
-      5,
-      60
-     ]
-    }
+   "form": "verzweigt",
+   "achse_k_feld": "regionstyp",
+   "achse_k_bez": "Regionstyp",
+   "kategorien": [
+    "zentrum",
+    "dorf"
    ],
+   "zuordnung_feld": "ort",
+   "kategorie_sonst": "dorf",
+   "kategorie_zuordnung": {
+    "hinweis": "Die Zuordnung steht im Blatt „Regionstypen — Zuordnung der Gemarkungen\" des Ausschusses und endet mit dem Satz, der die Restkategorie trägt: „Alle nicht genannten Gemeinden, Ortsteile oder Gemarkungen wurden dem Regionstyp Dörfer zugeordnet.\" Genannt sind für den Altmarkkreis Salzwedel das Mittelzentrum Salzwedel und die Grundzentren Arendsee, Beetzendorf, Dähre, Diesdorf, Gardelegen, Kalbe, Klötze und Mieste; für den Landkreis Stendal das Mittelzentrum Stendal und die Grundzentren Arneburg, Bismark, Osterburg, Schönhausen, Seehausen, Tangerhütte, Tangermünde und Havelberg.",
+    "zentrum": [
+     "Salzwedel",
+     "Arendsee",
+     "Beetzendorf",
+     "Dähre",
+     "Diesdorf",
+     "Gardelegen",
+     "Kalbe",
+     "Kalbe (Milde)",
+     "Klötze",
+     "Mieste",
+     "Stendal",
+     "Arneburg",
+     "Bismark",
+     "Bismark (Altmark)",
+     "Osterburg",
+     "Osterburg (Altmark)",
+     "Schönhausen",
+     "Schönhausen (Elbe)",
+     "Seehausen",
+     "Seehausen (Altmark)",
+     "Tangerhütte",
+     "Tangermünde",
+     "Havelberg"
+    ],
+    "dorf": []
+   },
+   "modell_je_kategorie": {
+    "zentrum": {
+     "form": "regression_additiv",
+     "intercept": 1.15438,
+     "terme": [
+      {
+       "feld": "sachwert",
+       "bez": "vorläufiger Sachwert",
+       "koeffizient": -3.69e-06,
+       "exponent": 1,
+       "gueltig": [
+        62000,
+        376000
+       ]
+      },
+      {
+       "feld": "sachwert",
+       "bez": "vorläufiger Sachwert (quadratisch)",
+       "koeffizient": 4.719e-12,
+       "exponent": 2,
+       "gueltig": [
+        62000,
+        376000
+       ]
+      },
+      {
+       "feld": "brw",
+       "bez": "Bodenrichtwert",
+       "koeffizient": 0.1718,
+       "exponent": 0.3333,
+       "gueltig": [
+        6,
+        70
+       ]
+      },
+      {
+       "feld": "rnd",
+       "bez": "Restnutzungsdauer",
+       "koeffizient": -0.003936,
+       "exponent": 1,
+       "gueltig": [
+        15,
+        73
+       ]
+      }
+     ],
+     "diskret": [
+      {
+       "feld": "unterkellerung",
+       "bez": "Unterkellerung ab 75 Prozent",
+       "pflicht": true,
+       "werte": {
+        "ja": -0.1418,
+        "vollkeller": -0.1418,
+        "voll unterkellert": -0.1418,
+        "unterkellert": -0.1418,
+        "voll": -0.1418,
+        "vollunterkellert": -0.1418,
+        "nein": 0,
+        "kein keller": 0,
+        "nicht unterkellert": 0,
+        "ohne keller": 0,
+        "teilkeller": 0,
+        "teilweise unterkellert": 0,
+        "teilunterkellert": 0
+       },
+       "hinweis": "Der Bericht führt „− 0,1418 × Unterkellerung (ab 75 %)\" mit den Basiswerten ja = 1,00 und nein = 0,00; der abgedruckte Umrechnungskoeffizient ist 0,86. VIERZEHN PROZENTPUNKTE hängen an dieser einen Angabe — deshalb ist sie Pflicht. Ein Teilkeller unter 75 Prozent zählt nach dem Wortlaut als „nein\"."
+      }
+     ],
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "MITTEL- UND GRUNDZENTREN. Der vorläufige Sachwert geht LINEAR UND QUADRATISCH ein (−0,00000369·vSW + 4,719·10⁻¹²·vSW²) — daher der abflachende Verlauf der abgedruckten Kurve von 1,34 bei 75.000 € auf 0,87 bei 375.000 €.\n\nBESTIMMTHEITSMASS 0,66, Variationskoeffizient 0,09, mittlerer absoluter prozentualer Fehler ± 8 % — der beste Wert im ganzen Register, ausgerechnet auf der kleinsten Stichprobe dieses Ausschusses (71 Kauffälle).\n\nZEITTERM EINGERECHNET: 1,297 − 0,0002225 × 641 = 1,15438, auf die ausdrückliche Empfehlung des Berichts für das erste Halbjahr 2024. Normobjekt: 220.000 €, Bodenrichtwert 35 €/m², Restnutzungsdauer 45 Jahre, keine Unterkellerung.",
+     "normobjekt": "NHK 2010 gemäß Anlage 4 ImmoWertV, BGF aus amtlichen Geobasisdaten, Regionalfaktor 1, Eigennutzung, kein Neubau oder Erstverkauf."
+    },
+    "dorf": {
+     "form": "regression_additiv",
+     "intercept": 0.88928,
+     "terme": [
+      {
+       "feld": "sachwert",
+       "bez": "vorläufiger Sachwert",
+       "koeffizient": -0.01515,
+       "exponent": 0.33,
+       "gueltig": [
+        49000,
+        405000
+       ]
+      },
+      {
+       "feld": "rnd",
+       "bez": "Restnutzungsdauer",
+       "koeffizient": 0.0796,
+       "exponent": 1,
+       "gueltig": [
+        15,
+        73
+       ]
+      },
+      {
+       "feld": "rnd",
+       "bez": "Restnutzungsdauer (quadratisch)",
+       "koeffizient": -0.001757,
+       "exponent": 2,
+       "gueltig": [
+        15,
+        73
+       ]
+      },
+      {
+       "feld": "rnd",
+       "bez": "Restnutzungsdauer (kubisch)",
+       "koeffizient": 1.242e-05,
+       "exponent": 3,
+       "gueltig": [
+        15,
+        73
+       ]
+      },
+      {
+       "feld": "brw",
+       "bez": "Bodenrichtwert",
+       "koeffizient": -1.072,
+       "exponent": -0.5,
+       "gueltig": [
+        5,
+        60
+       ]
+      }
+     ],
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "DÖRFER. DIE RESTNUTZUNGSDAUER GEHT DREIMAL EIN — linear, quadratisch und kubisch. Zusammen bilden die drei Glieder eine Kurve mit Maximum bei rund 37 Jahren, die zu beiden Seiten abfällt (Umrechnungskoeffizienten: 15 Jahre 0,68, 35 bis 40 Jahre 1,00, 50 Jahre 0,97). Die Unterkellerung kommt hier NICHT vor, dafür der Bodenrichtwert mit negativem Exponenten.\n\nZEITTERM EINGERECHNET: 1,0780 − 0,0002944 × 641 = 0,88928, dieselbe Empfehlung wie bei den Zentren.\n\nBestimmtheitsmaß 0,38, Variationskoeffizient 0,18, MAPE ± 15 %. Normobjekt: 190.000 €, Restnutzungsdauer 40 Jahre, Bodenrichtwert 15 €/m². GEPRÜFT: mit dem Tagwert des Normobjekts (384) ergibt die Gleichung dort 1,02 und bei Restnutzungsdauer 15 Jahren 0,69 — das Verhältnis 0,6792 ist zeichengleich mit dem abgedruckten Umrechnungskoeffizienten 0,68.",
+     "normobjekt": "NHK 2010 gemäß Anlage 4 ImmoWertV, BGF aus amtlichen Geobasisdaten, Regionalfaktor 1, Eigennutzung, kein Neubau oder Erstverkauf."
+    }
+   },
    "rundung_stellen": 2,
    "liefert": "faktor",
-   "hinweis": "DIE RESTNUTZUNGSDAUER GEHT DREIMAL EIN — linear, quadratisch und kubisch. Der Bericht druckt drei getrennte Glieder ab; zusammen bilden sie eine Kurve, die bei rund 37 Jahren ihr Maximum hat und zu beiden Seiten abfällt (Umrechnungskoeffizienten: 15 Jahre 0,68, 35 bis 40 Jahre 1,00, 50 Jahre 0,97).\n\nDER ZEITTERM IST EINGERECHNET, und zwar auf die Empfehlung des Berichts: „Zur Ermittlung eines Sachwertfaktors im ersten Halbjahr 2024 wird für die Zeitmodellierung der 01.01.2024 (641. Tag) empfohlen.\" Rechnung: 1,0780 − 0,0002944 × 641 = 0,88928. Der Gutachterausschuss hat die Anwendbarkeit des Modells bis zum 01.07.2024 beschlossen.\n\nMultiples Bestimmtheitsmaß 0,38, Variationskoeffizient 0,18, mittlerer absoluter prozentualer Fehler ± 15 %. Normobjekt: 190.000 €, Restnutzungsdauer 40 Jahre, Bodenrichtwert 15 €/m².",
-   "normobjekt": "NHK 2010 gemäß Anlage 4 ImmoWertV, BGF aus amtlichen Geobasisdaten, Regionalfaktor 1, Eigennutzung, kein Neubau oder Erstverkauf."
+   "hinweis": "ZWEI GANZ VERSCHIEDENE GLEICHUNGEN FÜR DENSELBEN LANDKREIS. Die Zentren rechnen mit dem Quadrat des Sachwerts und der Unterkellerung, die Dörfer mit der Restnutzungsdauer in drei Potenzen. Sie teilen keine einzige Struktur — und genau deshalb steht die Zuordnung über den Ortsnamen am Anfang, nicht als Korrektur am Ende.",
+   "normobjekt": "Siehe Untermodelle."
   },
   "korrekturen": [],
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
    "regionalfaktor": 1.0,
-   "zeitanpassung": "Zeitmodellierung mit dem 641. Tag (01.01.2024) für das erste Halbjahr 2024, auf Empfehlung des Gutachterausschusses; Anwendbarkeit bis 01.07.2024 beschlossen."
+   "zeitanpassung": "Zeitmodellierung mit dem 641. Tag (01.01.2024) für das erste Halbjahr 2024, auf Empfehlung des Gutachterausschusses; Anwendbarkeit bis 01.07.2024 beschlossen.",
+   "kauffaelle_zentren": 71
   },
   "geltungsbereich": {
-   "raeumlich": "Altmarkkreis Salzwedel und Landkreis Stendal, NUR Regionstyp Dorf",
+   "raeumlich": "Altmarkkreis Salzwedel und Landkreis Stendal",
    "sachlich": "freistehende Ein- und Zweifamilienhäuser",
    "extrapolation": "gesperrt",
    "spannen": {
-    "sachwert_eur": {
+    "sachwert_zentrum": {
+     "min": 62000,
+     "max": 376000
+    },
+    "sachwert_dorf": {
      "min": 49000,
      "max": 405000
+    },
+    "brw_zentrum": {
+     "min": 6,
+     "max": 70
+    },
+    "brw_dorf": {
+     "min": 5,
+     "max": 60
     },
     "rnd_jahre": {
      "min": 15,
      "max": 73
-    },
-    "brw_eur_qm": {
-     "min": 5,
-     "max": 60
     }
    },
-   "vorbehalt": "NUR FÜR DÖRFER. Für Mittelzentren und Grundzentren derselben beiden Landkreise führt der Ausschuss ein eigenes Blatt mit eigener Gleichung; es ist hier noch nicht erfasst (seine Regressionsfunktion steht nicht im Textstrom des PDF). Wer in Salzwedel, Gardelegen, Klötze, Stendal, Osterburg oder Tangermünde bewertet, bekommt aus diesem Satz KEINEN Wert — die Regionstyp-Zuordnung des Ausschusses entscheidet.\n\nDER BODENRICHTWERT ENDET BEI 60 €/m². Das ist die niedrigste Obergrenze dieses Registers und zeigt, wovon die Altmark spricht.\n\nMITTLERER ABSOLUTER PROZENTUALER FEHLER ± 15 %.\n\nDER ZEITBEZUG IST AUF DAS ERSTE HALBJAHR 2024 GESETZT. Für einen späteren Stichtag hat der Ausschuss keine Empfehlung gegeben — die Anwendbarkeit ist ausdrücklich bis zum 01.07.2024 beschlossen.",
-   "hinweis": "Die Regionstyp-Zuordnung des Ausschusses ist gemeindescharf veröffentlicht; für die Altmark nennt sie als Mittelzentrum Salzwedel und als Grundzentren Arendsee, Beetzendorf, Dähre, Diesdorf, Gardelegen, Kalbe, Klötze und Mieste, für Stendal das Mittelzentrum Stendal und die Grundzentren Arneburg, Bismark, Osterburg, Schönhausen, Seehausen, Tangerhütte, Tangermünde und Havelberg. Alles Übrige ist Dorf — und nur dafür gilt dieser Satz."
+   "vorbehalt": "IN DEN ZENTREN IST DIE UNTERKELLERUNG PFLICHT. Sie ist ein eigenes Glied der Gleichung und bewegt den Faktor um vierzehn Prozentpunkte. Ohne die Angabe wird dort nicht gerechnet — sie zu raten hieße, ein Siebtel des Ergebnisses zu erfinden. In den Dörfern kommt sie nicht vor.\n\nDER BODENRICHTWERT ENDET BEI 60 BEZIEHUNGSWEISE 70 €/m². Das ist die niedrigste Obergrenze dieses Registers und zeigt, wovon die Altmark spricht.\n\nDER ZEITBEZUG IST AUF DAS ERSTE HALBJAHR 2024 GESETZT; für einen späteren Stichtag hat der Ausschuss keine Empfehlung gegeben. Die Anwendbarkeit ist ausdrücklich bis zum 01.07.2024 beschlossen.\n\nMITTLERER ABSOLUTER PROZENTUALER FEHLER: ± 8 % in den Zentren, ± 15 % in den Dörfern.",
+   "hinweis": "Der Ausschuss veröffentlicht für diese beiden Landkreise ZWEI Blätter. Sie stehen hier als ein Registersatz mit zwei Untermodellen, weil sie denselben Zuständigkeitsschlüssel, dieselbe Kennzahl und denselben Zweig tragen — zwei getrennte Sätze würden im Register kollidieren, und der Auswerter nähme den ersten."
   },
   "belege": [
-   "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser, Altmarkkreis Salzwedel und Landkreis Stendal, Regionstyp Dorf, veröffentlicht am 22.01.2025, R² = 0,38. GEPRÜFT: mit dem Tagwert des Normobjekts (384) ergibt die Gleichung am Normobjekt 1,02 und bei Restnutzungsdauer 15 Jahren 0,69 — der Umrechnungskoeffizient 0,6792 ist zeichengleich mit den abgedruckten 0,68. Dieser Registersatz rechnet mit dem für 2024 empfohlenen Tagwert 641 und liegt deshalb durchgehend niedriger; der Zeitterm ist additiv, verschiebt also auch die Verhältnisse."
+   "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser, Altmarkkreis Salzwedel und Landkreis Stendal, veröffentlicht am 22.01.2025: Regionstypen Mittelzentrum und Grundzentrum aus 71 Kauffällen (R² = 0,66, MAPE ± 8 %) und Regionstyp Dorf (R² = 0,38, MAPE ± 15 %)."
   ],
   "stufe": "B",
-  "stufe_grund": "Amtliche Regressionsfunktion mit vollständiger Modellbeschreibung, Glied für Glied übernommen, mit der vom Bericht selbst empfohlenen Zeitmodellierung. Stufe B, weil der Bericht einen mittleren Fehler von ± 15 % ausweist und die Anwendbarkeit zeitlich begrenzt hat.",
+  "stufe_grund": "Zwei amtliche Regressionsfunktionen, Glied für Glied übernommen — die Zentren-Gleichung aus dem gerenderten Blatt (die Datei trägt ihren Text nicht im PDF-Textstrom), die Dörfer-Gleichung aus dem Textstrom und an einem Umrechnungskoeffizienten geprüft. Stufe B aus zwei Gründen: beide Sätze rechnen mit dem empfohlenen Tagwert 641, während die abgedruckten Kurven für den jeweiligen Normobjekt-Tag gelten — UND die Zentren-Gleichung liegt, mit dem Normobjekt-Datum gerechnet, systematisch ein Hundertstel ÜBER der abgedruckten Kurve (1,35 statt 1,34 bei 75.000 €, 1,28 statt 1,27 bei 100.000 €). Der Verlauf stimmt Punkt für Punkt, die Höhe um 0,01. Welcher Tagwert dem Diagramm zugrunde liegt, sagt das Blatt nicht; mit Tag 410 träfen neun von dreizehn Stützstellen. Die Abweichung ist benannt, nicht wegerklärt.",
   "fallzahl": null,
   "streuung": null,
   "stichtag": "2024-01-01",
@@ -2610,7 +2866,7 @@
   "lizenz": "frei zugänglich, kostenfreier Download",
   "verwendung": "produkt",
   "auflagen": "Quellenangabe. Die Modellparameter der landesweiten Modellbeschreibung sind einzuhalten (Modellkonformität).",
-  "fundstelle": "Sachwertfaktoren Altmarkkreis Salzwedel und Landkreis Stendal, Regionstyp Dorf."
+  "fundstelle": "Sachwertfaktoren Altmarkkreis Salzwedel und Landkreis Stendal — zwei Blätter: Regionstypen Mittelzentrum und Grundzentrum, sowie Regionstyp Dorf."
  },
  {
   "land_code": "ST",
