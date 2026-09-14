@@ -4227,75 +4227,107 @@ heute nie läuft. Der gehört im `apply.sh` **echt ausgeführt**.
 müssen **gegen das Gutachten** neu abgenommen werden, nicht gegen die alten
 Sollwerte.
 
-#### B1b — Steuerliche Portfolio- und Forward-Betrachtung **[NEU 14.09.2026]**
+#### B1b — Steuerliche Portfolio-Betrachtung ✅ **GEBAUT 14.09.2026 (v1397)**
 
-**Marcels Frage:** „wir wollten das doch ändern. ist der text noch aktuell?
-eigentlich wollten wir für jedes objekt die progression runterrechnen und eine
-steuerliche forward betrachtung machen oder? was fehlt denn noch oder passt nur
-der text nicht?"
+**Marcels Frage, zum zweiten Mal gestellt:** „warum steht das noch drin?
+wollten wir das nicht ändern?"
 
-**Der Text passt. Die Funktion fehlt.** `v1379` hat die Progression *innerhalb*
-eines Objekts richtig gemacht — die Steuerwirkung ist seither die Differenz
-zweier Tarifberechnungen nach § 32a EStG statt eines festen Satzes. Was **nicht**
-gebaut ist: dass die Objekte sich gegenseitig die Basis verschieben.
+**Er hatte recht — und die Messung hat mehr gefunden als die Frage vermutete.**
 
-**Gemessen am Tarif 2026** (`v1383`, Prüfstand gegen den echten `tax.js`-Kern):
+##### Der eigentliche Befund: zwei Stellen, zwei Antworten
 
-| zvE | Objekte | Summe einzeln | tatsächlich | zu viel |
-|---|---|---|---|---|
-| 80.000 € | −25.000 / −20.000 | 18.348 € | 16.794 € | **9,25 %** |
-| 80.000 € | 3 × −15.000 | 18.777 € | 16.794 € | **11,81 %** |
-| 60.000 € | 2 × −20.000 | 14.048 € | 12.663 € | 10,94 % |
-| 120.000 € | 2 × −30.000 | 25.200 € | 25.031 € | 0,68 % |
-| 150.000 € | 2 × −40.000 | 33.600 € | 33.600 € | — |
+Der Hinweistext behauptete, die Objekte verschöben sich gegenseitig nicht die
+Progression. **Das stimmte seit V276 nur noch zur Hälfte:**
 
-Der Fehler geht **immer in dieselbe Richtung**: die Ersparnis wird zu hoch
-ausgewiesen, das Portfolio also zu gut gerechnet.
+| Stelle | rechnete | Beleg |
+|---|---|---|
+| `tax.js` (Tab Steuern) | **saldiert** — `baseIncome + _bestandInfo.sum`, dann `calcImmoTaxImpact` | `tax.js:541` |
+| `calc.js` (Cashflow, KPI, Cockpit) | **nicht saldiert** — `_estDelta` gegen das rohe zvE-Feld | `calc.js`, Kommentar V258-07 |
 
-##### Was zu bauen ist
+In `calc.js` stand der Grund wörtlich im Code: *„Effektives zvE ohne Immobilie
++ WK anderer Objekte **(nur Display)** … Eigentliche Steuerberechnung weiterhin
+auf K.zve_immo basiert."* Die Zahl wurde ermittelt, angezeigt — und nicht
+gerechnet.
 
-1. **Die Portfoliosumme ist eindeutig — die Aufteilung nicht.**
-   `ESt(zvE + Σ Ergebnisse) − ESt(zvE)` hängt **nicht** von der Reihenfolge ab.
-   Welcher Anteil davon *welchem Objekt* zugerechnet wird, hängt sehr wohl
-   davon ab. Das ist die eigentliche Produktentscheidung, und sie gehört
-   Marcel:
-   - **Weg A — Stapel nach Erwerbsdatum.** Das ältere Objekt rechnet gegen das
-     volle zvE, das jüngere gegen das bereits gesenkte. Nah an der Anschauung
-     („mein erstes Objekt"), aber das jüngere sieht künstlich schlechter aus.
-   - **Weg B — anteilig nach Ergebnisgröße.** Jedes Objekt bekommt den Anteil
-     an der Gesamtwirkung, der seinem Ergebnisanteil entspricht. Fair über
-     alle Objekte, entspricht aber keiner Einzelrechnung.
-   - **Weg C — beides zeigen:** je Objekt weiter die Einzelbetrachtung
-     (unverändert, vergleichbar), und im Cockpit **zusätzlich** die echte
-     Portfoliozahl. Dann stimmt jede Zahl für sich, und die Differenz ist
-     benannt statt versteckt.
-   > **Empfehlung: Weg C.** Er ändert keine bestehende Objektzahl — wer
-   > gestern gerechnet hat, sieht heute dasselbe — und macht trotzdem die
-   > Wahrheit sichtbar. A und B ändern beide rückwirkend jede Objektseite.
+**Damit wies dieselbe App für dasselbe Objekt zwei verschiedene
+Steuerwirkungen aus**, und die Summe im Portfolio-Cockpit hing an der
+ungenaueren von beiden.
 
-2. **Die Forward-Betrachtung ist eine Jahresrechnung, keine Objektrechnung.**
-   Objekte starten in verschiedenen Jahren, und das zvE ändert sich über die
-   Zeit. Richtig wäre **je Kalenderjahr**: alle in diesem Jahr laufenden
-   Objekte zusammenzählen, einmal gegen das zvE dieses Jahres rechnen.
-   Dafür fehlt heute eine Zeitachse über alle Objekte — `calc.js` kennt immer
-   nur das geladene.
+##### Was gebaut wurde
 
-3. **Woher kommt das zvE der Folgejahre?** Heute ist `zve` ein fester Wert.
-   Für eine Forward-Betrachtung braucht es mindestens eine Fortschreibungs-
-   annahme (Steigerung p. a.) — sonst rechnet Jahr 15 mit dem Einkommen von
-   heute.
+`window._dpBestandSaldo(jahr)` in `tax.js` ist jetzt **der eine Weg**. Er liegt
+dort, weil dort der Kaufdatums-Filter sitzt (V280: nur Objekte, die vor dem
+eigenen gekauft wurden und im Bezugsjahr bestanden). `calc.js` ruft ihn in
+`_estDelta` auf und rechnet die Tarifdifferenz gegen die **gesenkte** Basis.
 
-##### Abgrenzung — was NICHT dazugehört
+> **Warum nicht `getWKForOtherObjects`:** die zweite Aggregator-Funktion
+> filtert **nicht** nach Kaufdatum. Mit ihr käme im Cashflow eine andere Zahl
+> heraus als im Tab Steuern — die nächste stille Dublette.
 
-Die Verlustverrechnungsbeschränkungen (§ 15a, § 15b, § 10d EStG) sind eine
-eigene Baustelle. Wer sie mitbauen will, braucht die Steuerbescheide der
-Vorjahre; das ist Steuerberatung, nicht Kalkulation.
+**Rückfall 0, wenn der Aggregator-Cache noch nicht geladen ist.** Lieber
+unverändert als halb saldiert: eine Zahl, die je nach Ladezustand springt, ist
+schlimmer als eine bekannt konservative.
 
-##### Wo es heute sichtbar ist
+##### Nachgemessen gegen den echten `tax.js`-Tarif (8 Fälle, alle treffen)
 
-`frontend/index.html`, Karte `#tax-flow-hint`, Abschnitt „Und was DealPilot
-dabei **nicht** tut" — dort steht der Sachverhalt seit `v1383b` mit Zahlen.
-**Der Text ist die ehrliche Zwischenlösung, nicht die Lösung.**
+Die Summe der Einzelbetrachtungen ist jetzt **cent-genau** die echte
+Portfoliozahl — die Teleskopsumme geht auf:
+
+| zvE | Objekte | alt (getrennt) | neu (saldiert) | wahr | alt war |
+|---|---|---:|---:|---:|---:|
+| 80.000 € | −25.000 / −20.000 | 18.348 € | 16.794 € | 16.794 € | +9,25 % |
+| 80.000 € | 3 × −15.000 | 18.777 € | 16.794 € | 16.794 € | +11,81 % |
+| 60.000 € | 2 × −20.000 | 14.048 € | 12.663 € | 12.663 € | +10,94 % |
+| 120.000 € | 2 × −30.000 | 25.200 € | 25.031 € | 25.031 € | +0,68 % |
+| 150.000 € | 2 × −40.000 | 33.600 € | 33.600 € | 33.600 € | — |
+| **45.000 €** | **−30.000 / −25.000** | **15.665 €** | **8.835 €** | **8.835 €** | **+77,31 %** |
+| 80.000 € | +12.000 / −20.000 | 3.191 € | 3.360 € | 3.360 € | −5,03 % |
+| 80.000 € | ein Objekt −25.000 | 10.117 € | 10.117 € | 10.117 € | — |
+
+> **Zwei Fälle, die der alte Befund nicht kannte.** Übersteigen die Verluste
+> das zvE, lag die alte Rechnung **77 % zu hoch** — weit jenseits der
+> 9 bis 12 %, die bis dahin als Spanne galten. Und bei **gemischten**
+> Ergebnissen (ein Überschuss, ein Verlust) ging der Fehler in die **andere**
+> Richtung: −5 %. Die Aussage „der Fehler geht immer in dieselbe Richtung"
+> galt nur für reine Verlustportfolios.
+>
+> **Ein einzelnes Objekt ändert sich nicht** — der Normalfall bleibt, wie er
+> war.
+
+##### Zwei Nebenfunde im Cockpit, im selben Zug behoben
+
+- **`var ZVE_BASE=78000`** war im Cockpit hart verdrahtet: die Modellprojektion
+  rechnete ihre gesamte Steuerwirkung für **jeden** Nutzer gegen 78.000 €,
+  unabhängig vom Profil. Jetzt `DealPilotZvE.getForYear(jahr)` — das kennt
+  sogar die **Historie**, also verschiedene Einkommen in verschiedenen Jahren.
+  Genau das braucht eine Projektion über fünfzehn Jahre. 78.000 bleibt letzter
+  Rückfall.
+- **`vuvY1`** summierte `_kpis_vuv` — ein Feld, das **nirgends im Frontend
+  gesetzt wird**. Die Summe war immer 0, verwendet wurde sie nie. Entfernt.
+
+##### Was offen bleibt
+
+1. **Die Aufteilung ist eine Konvention, die Summe ist es nicht.** Gewählt ist
+   **Weg A** (Stapel nach Kaufzeitpunkt) — weil `tax.js` ihn seit V276 bereits
+   fuhr und der Tab Steuern damit maßgeblich war. Das früher gekaufte Objekt
+   bekommt die erste, wirksamere Stufe. Das steht jetzt so im Hinweistext.
+2. **Die Forward-Betrachtung über Jahre** ist damit *nicht* erledigt. Der
+   Saldo wird je Bezugsjahr geholt (`wk_per_year` trägt die Zeitachse), aber
+   eine durchgerechnete Jahresreihe über alle Objekte gibt es nur in der
+   Modellprojektion des Cockpits — und die rechnet mit Näherungen
+   (`ASSUMP`), nicht mit der echten `calc.js`-Pipeline.
+3. **Verlustverrechnungsbeschränkungen** (§ 15a, § 15b, § 10d EStG) bleiben
+   ausdrücklich außen vor. Dafür braucht es die Steuerbescheide der Vorjahre;
+   das ist Steuerberatung, nicht Kalkulation.
+
+##### Wo es sichtbar ist
+
+`frontend/index.html`, Karte `#tax-flow-hint` — der Abschnitt heißt jetzt
+„Wie die Objekte zusammen gerechnet werden" statt „Und was DealPilot dabei
+nicht tut". Dazu im Progressionshinweis (`#prog-hinweis`) ein Satz, der die
+verschobene Ausgangsbasis beziffert, sobald sie verschoben ist — sonst stünde
+dort eine Zahl, die im Tab Steuern nirgends auftaucht.
+
 
 #### B1c — Der Löhner-Sollwert und die Software gehen auseinander **[NEU 14.09.2026]**
 

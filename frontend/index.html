@@ -1883,6 +1883,12 @@ label.dp-required.qc-required::after {
        Grenzsteuersatz abweicht. Gefuellt von _progHinweisZeichnen() in calc.js. -->
   <div class="card" id="prog-hinweis" style="margin-top:14px" hidden></div>
 
+  <!-- ═══ v1397 · DIESER TEXT SAGTE, WAS DIE APP NICHT TUT — SIE TUT ES JETZT ══
+       Marcel am 14.09.2026: "warum steht das noch drin? wollten wir das nicht
+       aendern?" Er hatte recht, und die Messung hat noch mehr gefunden:
+       tax.js SALDIERTE seit V276 bereits (baseIncome + Bestandssaldo), calc.js
+       nicht ("nur Display", V258-07). Zwei Stellen, zwei Antworten auf
+       dieselbe Frage. Seit v1397 gehen beide durch window._dpBestandSaldo. -->
   <div class="card" id="tax-flow-hint" style="margin-top:14px">
     <div class="ct"><span class="ct-ico"><svg width="22" height="22"><use href="#i-info"/></svg></span>Was mit diesen Werten passiert</div>
     <p class="hint" style="margin-bottom:0">
@@ -1891,47 +1897,41 @@ label.dp-required.qc-required::after {
       <b>Differenz zweier Tarifberechnungen nach § 32a EStG</b>, einmal mit und einmal
       ohne dieses Objekt. Damit folgt sie der Progression: bei einem Verlust wirkt der
       letzte Euro weniger als der erste. Daraus entsteht der <b>Cashflow nach Steuer</b>.
-      Im Portfolio-Cockpit werden die Cashflows nach Steuer deiner Bestandsobjekte addiert.
+      <b>Deine übrigen Bestandsobjekte rechnen dabei mit</b> — ihr Ergebnis senkt
+      oder hebt die Basis, bevor dieses Objekt seine Wirkung entfaltet.
     </p>
     <details class="dp-erkl" style="margin-top:10px">
-      <summary style="cursor:pointer;font-size:12.5px;font-weight:600">Und was DealPilot dabei <u>nicht</u> tut</summary>
+      <summary style="cursor:pointer;font-size:12.5px;font-weight:600">Wie die Objekte zusammen gerechnet werden</summary>
       <div style="font-size:12.5px;line-height:1.6;margin-top:8px">
         <p style="margin:0 0 8px">
-          <b>Die Objekte verschieben sich gegenseitig nicht die Progression.</b>
-          Jedes rechnet die Progression von <b>demselben</b> zvE aus — so, als wäre es
-          dein einziges Objekt. Ein Verlust aus Objekt A senkt in dieser Rechnung
-          <b>nicht</b> die Ausgangsbasis von Objekt B — in deiner echten
-          Steuererklärung tut er das sehr wohl, weil dort alle Einkünfte aus
-          Vermietung und Verpachtung zusammenfließen.
-        </p>
-        <!-- v1383: Hier stand bis zum 14.09.2026 "liegt die tatsaechliche
-             Entlastung eher HOEHER". Das war falsch, und zwar in der
-             gefaehrlichen Richtung - es rechnet das Portfolio zu gut.
-             Nachgemessen am Tarif 2026: zvE 80.000 mit zwei
-             Verlustobjekten (-25.000 und -20.000) ergibt als Summe der
-             Einzelbetrachtungen 18.348 EUR, tatsaechlich sind es
-             16.794 EUR. Die echte Entlastung ist NIEDRIGER, weil das
-             zweite Objekt auf ein bereits gesenktes Einkommen trifft und
-             dort weniger spart. -->
-        <p style="margin:0 0 8px">
-          <b>Was das heißt:</b> je Objekt ist die Zahl eine saubere Einzelbetrachtung.
-          Die Summe im Cockpit ist die Summe dieser Einzelbetrachtungen — nicht die
-          Steuer, die am Ende auf deinem Bescheid steht. Bei mehreren Objekten mit
-          Anfangsverlusten liegt die tatsächliche Entlastung <b>niedriger</b> als diese
-          Summe: der Verlust aus Objekt A senkt dein Einkommen, und Objekt B spart dann
-          nur noch, was in der niedrigeren Tarifzone zu sparen ist.
+          <b>Die Reihenfolge ist der Kaufzeitpunkt.</b> Dieses Objekt trifft auf ein
+          Einkommen, das um die Ergebnisse aller <b>früher gekauften</b> Objekte bereits
+          verschoben ist — so, wie sie in deiner Steuererklärung zusammenfließen. Ein
+          Verlust aus dem älteren Objekt senkt also die Basis, auf der dieses hier
+          spart, und die Ersparnis fällt entsprechend geringer aus.
         </p>
         <p style="margin:0 0 8px">
-          <b>Wie groß ist der Unterschied?</b> Gemessen am Tarif 2026: bei
-          80.000 € zvE und zwei Objekten mit −25.000 € und −20.000 € steuerlichem
-          Verlust weist die Summe <b>18.348 €</b> aus, tatsächlich entlastet werden
-          <b>16.794 €</b> — rund <b>9 %</b> zu viel. Bei drei Objekten sind es etwa 12 %.
-          Ab rund 120.000 € zvE sinkt der Unterschied unter ein Prozent, ab 150.000 €
-          auf null: dort liegst du auch nach allen Verlusten noch in der
-          Proportionalzone, und dort ist jeder Euro gleich viel wert.
+          <b>Warum das wichtig ist.</b> Ohne diese Verrechnung wird die Entlastung
+          <b>zu hoch</b> ausgewiesen — immer in dieselbe Richtung. Gemessen am Tarif
+          2026: bei 80.000 € zvE und zwei Objekten mit −25.000 € und −20.000 €
+          steuerlichem Verlust ergäbe die getrennte Rechnung <b>18.348 €</b>,
+          tatsächlich entlastet werden <b>16.794 €</b> — rund <b>9 %</b> Unterschied.
+          Bei drei Objekten etwa 12 %. Ab rund 120.000 € zvE sinkt er unter ein
+          Prozent, ab 150.000 € auf null: dort liegst du auch nach allen Verlusten
+          noch in der Proportionalzone, und dort ist jeder Euro gleich viel wert.
+        </p>
+        <p style="margin:0 0 8px">
+          <b>Was das nicht leistet.</b> Die <b>Summe</b> über dein Portfolio ist damit
+          richtig — welcher Anteil davon <b>welchem</b> Objekt zugerechnet wird, ist
+          eine Konvention: hier der Kaufzeitpunkt. Das früher gekaufte Objekt bekommt
+          die erste, wirksamere Stufe der Progression. Verlustverrechnungs&shy;beschränkungen
+          (§ 15a, § 15b, § 10d EStG) bleiben außen vor — dafür braucht es deine
+          Steuerbescheide, und das ist Steuerberatung, keine Kalkulation.
         </p>
         <p style="margin:0;color:var(--muted)">
-          Ein Sonderfall ist bereits abgebildet: gehört das Objekt einer
+          Die Verrechnung greift für gespeicherte Bestandsobjekte. Ist ein Objekt noch
+          nicht gespeichert, rechnet es für sich allein — dann steht oben kein
+          Bestandssaldo. Ein Sonderfall ist außerdem abgebildet: gehört das Objekt einer
           Gesellschaft, rechnet DealPilot ab dem Übergabestichtag mit dem
           Körperschaftsteuersatz statt mit deinem Grenzsteuersatz — im Stichtagsjahr
           monatsgenau geteilt.
@@ -3401,13 +3401,13 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v1383"></script>
+  <script src="js/calc.js?v=v1397"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v1240"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v1383"></script>
+<script src="js/tax.js?v=v1397"></script>
 <script src="js/config.js?v=v1328"></script>
   <script src="js/legal-links.js?v=174" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
@@ -3524,7 +3524,7 @@ label.dp-required.qc-required::after {
 <script src="js/free-lock.js?v=495"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
 <script src="js/investment-profile.js?v=v1257"></script>
-<script src="js/dashboard.js?v=v1361"></script>
+<script src="js/dashboard.js?v=v1397"></script>
 <script src="js/score-fx.js?v=464"></script>
 <script src="js/main.js?v=v1257"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->

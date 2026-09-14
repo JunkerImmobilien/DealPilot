@@ -4315,3 +4315,59 @@ eingeht, wird er **ausgelesen, nicht gebildet** — aus der Übersichtsseite,
 dem Menü, der Produktliste. Und wo gefiltert wird, gehört die Gegenprobe
 dazu: *wie viele hat die Seite insgesamt, und wie viele bleiben übrig?* Eine
 Filterquote von 0 % oder 100 % ist fast immer ein Filterfehler, kein Befund.
+
+## Eine Zahl, die ermittelt, angezeigt und nicht gerechnet wird
+
+**v1397, 14.09.2026.** In `calc.js` stand seit V258-07 wörtlich im Code:
+
+```js
+// Effektives zvE ohne Immobilie + WK anderer Objekte (nur Display)
+// Note: Eigentliche Steuerberechnung weiterhin auf K.zve_immo basiert
+```
+
+Der WK-Aggregator wurde also **gefragt**, die Zahl **ermittelt**, als Tooltip
+**angezeigt** — und dann nicht verwendet. `tax.js` rechnete dieselbe Sache
+zwei Türen weiter **sehr wohl** mit (`baseIncome + _bestandInfo.sum`).
+
+**Damit wies dieselbe App für dasselbe Objekt zwei verschiedene
+Steuerwirkungen aus.** Aufgefallen ist es nicht durch einen Fehler, sondern
+durch Marcels Frage nach einem *Text*: „warum steht das noch drin?"
+
+**Die Lehre:** Ein `// nur Display` neben einem Rechenwert ist eine offene
+Aufgabe, keine Entwurfsentscheidung. Wer eine Größe ermittelt und nur zeigt,
+hat die halbe Arbeit getan — und die andere Hälfte sieht aus, als wäre sie
+erledigt. Dasselbe Muster wie „bleibt stehen, bis der letzte alte Aufrufer weg
+ist".
+
+**Und die Gegenprobe dazu:** die Frage nach einem Text ist oft eine Frage nach
+der Funktion. Der Text war fachlich korrekt — er beschrieb nur einen Zustand,
+den die App zur Hälfte nicht mehr hatte.
+
+## Zwei Aggregator-Funktionen, zwei Filter
+
+Derselbe `DealPilotWKAggregator` bietet `getWKForOtherObjects(id, jahr)` und
+wird in `tax.js` von `_getBestandLossesForYear(jahr)` ergänzt. **Sie liefern
+verschiedene Zahlen:** die erste summiert *alle* anderen Objekte, die zweite
+nur die **vor dem eigenen gekauften**, die im Bezugsjahr schon bestanden
+(V280).
+
+Wer für eine neue Rechenstelle die erstbeste greift, baut einen stillen
+Widerspruch zum Tab Steuern. **Vor dem Aufruf den Filter lesen, nicht den
+Namen.**
+
+## Eine feste Zahl mitten in einer Nutzerrechnung
+
+`var ZVE_BASE=78000;` stand in `dashboard.js` und war die Basis für die
+**gesamte** Steuerwirkung der Cockpit-Projektion — für jeden Nutzer dieselbe.
+Das Profil-zvE lag die ganze Zeit daneben (`DealPilotZvE.getForYear`), samt
+Historie.
+
+Der Fehler war unsichtbar, weil 78.000 € für einen mittleren Fall **plausibel
+aussieht**. Er trifft die Ränder: wer 45.000 € verdient, bekam die Entlastung
+eines Gutverdieners vorgerechnet.
+
+**Eine Konstante, die einen Nutzerwert vertritt, ist immer ein Platzhalter** —
+auch wenn sie seit Jahren dort steht und nie gemeldet wurde. Im selben Zug
+gefunden: `vuvY1` summierte `_kpis_vuv`, ein Feld, das **nirgends gesetzt
+wird**. Ergebnis immer 0, verwendet nie. Ein grep nach dem Feldnamen hätte es
+jederzeit gezeigt.

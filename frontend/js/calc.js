@@ -666,7 +666,7 @@ function _computeBsvLifecycle() {
  * Progression wirklich gerechnet wurde UND der effektive Satz spuerbar
  * abweicht (ab einem halben Prozentpunkt). Wer in der Proportionalzone
  * bleibt, sieht nichts; bei ihm stimmen beide Zahlen ueberein. */
-function _progHinweisZeichnen(zveImmo, steuer, grenzSatz, effSatz, zveBasis) {
+function _progHinweisZeichnen(zveImmo, steuer, grenzSatz, effSatz, zveBasis, _saldo, _anz) {
   var el = document.getElementById('prog-hinweis');
   if (!el) return;
   var _zeigen = (effSatz != null) && isFinite(effSatz) && (grenzSatz > 0)
@@ -690,6 +690,24 @@ function _progHinweisZeichnen(zveImmo, steuer, grenzSatz, effSatz, zveBasis) {
     + 'tatsächlich <b>' + _pz(effSatz) + '</b> — die ' + _wirkung + ' fällt damit um '
     + '<b>' + _eu(_diff) + '</b> ' + _richtung + ' aus als bei einer Rechnung mit dem festen Satz.'
     + '</p>'
+    /* ═══ v1397 · WENN ANDERE OBJEKTE DIE BASIS SCHON VERSCHOBEN HABEN ══
+       Der Absatz darueber nennt die Ausgangsbasis. Seit v1397 ist das nicht
+       mehr zwangslaeufig das eingetragene zvE: hat der Nutzer frueher
+       gekaufte Bestandsobjekte, steht dieses Objekt auf einer bereits
+       gesenkten (oder gehobenen) Basis. Ohne diesen Satz stuende dort eine
+       Zahl, die im Tab Steuern nirgends auftaucht — und der Nutzer suchte
+       den Fehler bei sich. */
+    + (_saldo && Math.abs(_saldo) >= 1
+        ? '<p class="hint" style="margin-bottom:8px">'
+          + 'Darin sind <b>' + _anz + ' weitere ' + (_anz === 1 ? 'Bestandsobjekt' : 'Bestandsobjekte') + '</b> '
+          + 'bereits berücksichtigt: ' + (_saldo < 0 ? 'ihr Verlust senkt' : 'ihr Überschuss hebt')
+          + ' deine Ausgangsbasis um <b>' + _eu(_saldo) + '</b> auf <b>' + _eu(zveBasis) + '</b>, '
+          + 'bevor dieses Objekt wirkt. '
+          + (_saldo < 0
+              ? 'Dieses Objekt spart deshalb weniger, als es allein sparen würde — genau so, wie es in deiner Steuererklärung zusammenläuft.'
+              : 'Dieses Objekt wirkt deshalb auf ein höheres Einkommen als allein.')
+          + '</p>'
+        : '')
     + '<details class="dp-erkl">'
     + '<summary>Warum ist das so?</summary>'
     + '<p class="hint" style="margin-top:8px">'
@@ -1566,18 +1584,78 @@ function _calcImmediate(){
   var _zveBasis = (function(){ try { var _z = v('zve'); return (_z > 0) ? _z : 0; } catch(_e){ return 0; } })();
   var _progAktiv = false;
   var _progEff   = null;   /* effektiver Satz der Immobilienwirkung, fuer die Anzeige */
+
+  /* ═══ v1397 · DIE ANDEREN OBJEKTE SENKEN DIE BASIS — HIER AUCH ════════
+   *
+   * MARCELS FRAGE: "warum steht das noch drin? wollten wir das nicht
+   * aendern?" — zum Hinweistext im Tab Steuern, der sagt, die Objekte
+   * verschoeben sich gegenseitig nicht die Progression.
+   *
+   * GEMESSEN: der Satz stimmte seit V276 nur noch zur HAELFTE. `tax.js`
+   * rechnet im Tab Steuern laengst saldiert (baseIncome + Bestandssaldo,
+   * DANN calcImmoTaxImpact). HIER stand die Saldierung ausdruecklich als
+   * "nur Display" — der Aggregator wurde gefragt, die Zahl angezeigt und
+   * dann NICHT gerechnet (Kommentar bei der WK-Anzeige, V258-07).
+   *
+   * Zwei Stellen, zwei Antworten auf dieselbe Frage: der Tab Steuern wies
+   * eine andere Steuerwirkung aus als der Cashflow desselben Objekts, und
+   * das Portfolio-Cockpit summierte die ungenauere von beiden.
+   *
+   * WELCHE ZAHL IST DIE RICHTIGE: die saldierte. In der Steuererklaerung
+   * fliessen alle Einkuenfte aus V+V zusammen; ein Verlust aus dem frueher
+   * gekauften Objekt senkt die Basis, auf der das spaetere seine Ersparnis
+   * erzielt. Wer das ignoriert, weist die Ersparnis ZU HOCH aus — immer in
+   * dieselbe Richtung, und genau in den mittleren Einkommen am staerksten.
+   *
+   * GERECHNET WIRD NICHT HIER. `window._dpBestandSaldo` liegt in tax.js,
+   * weil dort der Kaufdatums-Filter sitzt (V280: nur Objekte, die vor dem
+   * eigenen gekauft wurden und im Bezugsjahr schon bestanden). Die zweite
+   * Aggregator-Funktion, `getWKForOtherObjects`, filtert das NICHT — mit
+   * ihr kaeme hier eine andere Zahl heraus als im Tab Steuern. Genau diese
+   * Dublette waere der naechste stille Widerspruch.
+   *
+   * RUECKFALL 0: ist der Aggregator-Cache noch nicht geladen, wird nicht
+   * saldiert und es gilt das bisherige Verhalten. Lieber unveraendert als
+   * halb saldiert — eine Zahl, die je nach Ladezustand springt, ist
+   * schlimmer als eine, die bekannt konservativ ist. */
+  var _bestandSaldo_w = 0;     /* der tatsaechlich angewandte Saldo */
+  var _bestandAnz_w   = 0;     /* wie viele Objekte darin stecken */
+  function _bestandSaldo(jahr) {
+    try {
+      if (typeof window._dpBestandSaldo !== 'function') return 0;
+      var _j = (typeof jahr === 'number' && jahr > 1900)
+        ? jahr : new Date().getFullYear();
+      var _s = window._dpBestandSaldo(_j);
+      return (typeof _s === 'number' && isFinite(_s)) ? _s : 0;
+    } catch (_e) { return 0; }
+  }
   function _estDelta(base, jahr) {
     var _lin = base * grenz;
     if (!(_zveBasis > 0)) return _lin;
     if (typeof Tax === 'undefined' || !Tax || typeof Tax.calcEStG !== 'function') return _lin;
     try {
-      var _vor  = Tax.calcEStG(_zveBasis, jahr);
-      var _nach = Tax.calcEStG(_zveBasis + base, jahr);
+      var _sal = _bestandSaldo(jahr);
+      /* Uebersteigt der Verlust der Vorobjekte das zvE, ist die Basis null —
+         nicht negativ. Ein negatives zvE gibt es im Tarif nicht. */
+      var _bas = _zveBasis + _sal;
+      if (!(_bas > 0)) _bas = 0;
+      var _vor  = Tax.calcEStG(_bas, jahr);
+      var _nach = Tax.calcEStG(_bas + base, jahr);
       var _d = _nach - _vor;
       if (!isFinite(_d)) return _lin;
       _progAktiv = true;
+      if (_sal !== 0) {
+        _bestandSaldo_w = _sal;
+        try {
+          _bestandAnz_w = (typeof window._dpBestandAnzahl === 'function')
+            ? (window._dpBestandAnzahl(_j2(jahr)) || 0) : 0;
+        } catch (_e2) { _bestandAnz_w = 0; }
+      }
       return _d;
     } catch (_e) { return _lin; }
+  }
+  function _j2(jahr) {
+    return (typeof jahr === 'number' && jahr > 1900) ? jahr : new Date().getFullYear();
   }
 
   /* mand v804: Halter-Regime — Privat/GbR = ESt nach Progression, GmbH/UG = KSt(+GewSt), KEINE Erstattung bei Verlust */
@@ -1627,7 +1705,7 @@ function _calcImmediate(){
      dem Nutzer, warum seine Ersparnis kleiner ist als sein Grenzsteuersatz -
      ohne sie sieht es nach einem Rechenfehler aus. */
   _progEff = (_progAktiv && Math.abs(zve_immo) > 0.5) ? (steuer / zve_immo) : null;
-  try { _progHinweisZeichnen(zve_immo, steuer, grenz, _progEff, _zveBasis); } catch (_e) {}
+  try { _progHinweisZeichnen(zve_immo, steuer, grenz, _progEff, _zveBasis + _bestandSaldo_w, _bestandSaldo_w, _bestandAnz_w); } catch (_e) {}
 
   // Öffentliche Werte: alle nach Tilgung (Banker) und nach BSV-Sparrate
   var cf_op = cf_operativ - tilg_j - bspar_y;          // CF v.St. NACH Tilgung & BSV

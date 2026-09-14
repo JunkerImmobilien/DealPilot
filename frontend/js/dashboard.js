@@ -631,7 +631,41 @@
      Annahmen wie Mockup. NICHT die echte calc.js-Pipeline — daher
      ueberall mit „Modellprojektion" gekennzeichnet. */
   var ASSUMP={mietWg:0.015,bwkWg:0.02,wertWg:0.02,afaRate:0.02,gebAnteil:0.8,zinsApprox:0.035};
-  var ZVE_BASE=78000;
+  /* ═══ v1397 · DAS zvE DES NUTZERS, NICHT 78.000 ═══════════════════════
+   *
+   * Hier stand `var ZVE_BASE=78000;` — eine feste Zahl, gegen die die
+   * Modellprojektion des Cockpits ihre komplette Steuerwirkung rechnete.
+   * Fuer JEDEN Nutzer dieselbe, unabhaengig davon, was im Tab Steuern
+   * eingetragen ist.
+   *
+   * Was das anrichtet: die Steuerwirkung ist die Differenz zweier
+   * Tarifberechnungen, und die haengt am Einkommen. Wer 45.000 EUR zvE hat,
+   * bekam die Entlastung eines Gutverdieners vorgerechnet; wer 200.000 hat,
+   * eine zu niedrige. Der Fehler war unsichtbar, weil die Zahl fuer einen
+   * mittleren Fall plausibel aussieht.
+   *
+   * Das zvE liegt seit jeher im Profil — `DealPilotZvE.getForYear(jahr)`
+   * kennt sogar die HISTORIE, also verschiedene Einkommen in verschiedenen
+   * Jahren. Genau das braucht eine Projektion ueber fuenfzehn Jahre.
+   *
+   * Die 78.000 bleiben als letzter Rueckfall, damit die Projektion nicht
+   * verschwindet, wenn kein Profil geladen ist. */
+  var ZVE_FALLBACK=78000;
+  function zveFuer(jahr){
+    try{
+      if(window.DealPilotZvE){
+        if(typeof jahr==='number' && jahr>1900 && typeof DealPilotZvE.getForYear==='function'){
+          var a=DealPilotZvE.getForYear(jahr);
+          if(typeof a==='number' && a>0) return a;
+        }
+        if(typeof DealPilotZvE.getCurrent==='function'){
+          var b=DealPilotZvE.getCurrent();
+          if(typeof b==='number' && b>0) return b;
+        }
+      }
+    }catch(_e){}
+    return ZVE_FALLBACK;
+  }
   /* ═══ v1361 · EIN TARIF, NICHT ZWEI ═══════════════════════════════════
      Hier stand eine zweite, eigene Fassung des §-32a-Tarifs. Sie ist
      nicht nur ueberfluessig - sie war bereits AUSEINANDERGELAUFEN. Beide
@@ -663,8 +697,10 @@
 
   function projectAll(years){
     var arr=detailArr(); var rows=[]; var cumCf=0;
-    var vuvY1=arr.reduce(function(s,o){return s+(num(o._kpis_vuv)||0);},0);
-    var estgOhne=estg2026(ZVE_BASE);
+    /* v1397: `vuvY1` stand hier und las `_kpis_vuv` — ein Feld, das NIRGENDS
+       im Frontend gesetzt wird. Die Summe war damit immer 0, und verwendet
+       wurde sie ohnehin nie. Ersatzlos entfernt: toter Code, der aussieht,
+       als werde hier das steuerliche Ergebnis aggregiert. */
     for(var i=0;i<years;i++){
       var yr=2026+i, miete=0,bwk=0,zins=0,tilg=0,afa=0,rest=0,wert=0;
       arr.forEach(function(o){
@@ -685,11 +721,14 @@
       });
       var cfVor=miete-bwk-zins-tilg;
       var vuv=miete-bwk-zins-afa;
-      var estgMit=estg2026(ZVE_BASE+vuv);
+      /* v1397: zvE des JEWEILIGEN Jahres, nicht ein fester Wert fuers Cockpit. */
+      var _zveJ=zveFuer(yr);
+      var estgOhne=estg2026(_zveJ);
+      var estgMit=estg2026(_zveJ+vuv);
       var steuereffekt=estgOhne-estgMit;
       var cfNach=cfVor+steuereffekt; cumCf+=cfNach;
       rows.push({yr:yr,miete:miete,bwk:bwk,zins:zins,tilg:tilg,afa:afa,cfVor:cfVor,vuv:vuv,
-        zve:ZVE_BASE+vuv,estg:estgMit,steuereffekt:steuereffekt,cfNach:cfNach,cumCf:cumCf,rest:rest,wert:wert,eq:wert-rest});
+        zve:_zveJ+vuv,estg:estgMit,steuereffekt:steuereffekt,cfNach:cfNach,cumCf:cumCf,rest:rest,wert:wert,eq:wert-rest});
     }
     return rows;
   }

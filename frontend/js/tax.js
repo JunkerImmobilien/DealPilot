@@ -1767,6 +1767,56 @@ function onGrenzAutoToggle() {
 }
 window._grenzAutoNachziehen = _grenzAutoNachziehen;
 
+/* ═══ v1397 · EIN WEG ZUR BESTANDSSALDIERUNG, NICHT ZWEI ═══════════════════
+ *
+ * GEMESSEN am 14.09.2026, ausgeloest durch Marcels Frage "warum steht das
+ * noch drin?" zum Hinweistext im Tab Steuern.
+ *
+ * Der Text behauptet: "Die Objekte verschieben sich gegenseitig nicht die
+ * Progression." Das stimmt seit V276 nur noch zur HAELFTE:
+ *
+ *   tax.js  (Tab Steuern)   rechnet baseIncome + _bestandInfo.sum und
+ *                           DANN erst calcImmoTaxImpact  -> saldiert
+ *   calc.js (Cashflow/KPI)  rechnet _estDelta gegen das rohe zvE-Feld
+ *                           -> saldiert NICHT
+ *
+ * In calc.js steht der Grund woertlich im Kommentar: "Effektives zvE ohne
+ * Immobilie + WK anderer Objekte (nur Display)". Die Zahl wurde also
+ * ermittelt, angezeigt - und nicht gerechnet.
+ *
+ * Damit weist dieselbe App fuer dasselbe Objekt zwei verschiedene
+ * Steuerwirkungen aus, und die Summe im Portfolio-Cockpit haengt an der
+ * ungenaueren von beiden.
+ *
+ * DIESE FUNKTION IST DER EINE WEG. Sie liegt hier, weil hier auch der
+ * Kaufdatums-Filter liegt (V280: nur Objekte, die VOR dem eigenen gekauft
+ * wurden und im Bezugsjahr schon existierten). `getWKForOtherObjects` des
+ * Aggregators filtert das NICHT - wer sie nimmt, bekommt eine andere Zahl
+ * als der Tab Steuern. Genau diese Dublette soll hier nicht entstehen.
+ *
+ * Rueckgabe 0 heisst: kein Saldo anzuwenden. Das ist der richtige
+ * Rueckfall, wenn der Aggregator-Cache noch nicht geladen ist - dann
+ * rechnet calc.js wie bisher, statt mit einer halben Wahrheit.
+ */
+window._dpBestandSaldo = function (jahr) {
+  try {
+    if (typeof _getBestandLossesForYear !== 'function') return 0;
+    var r = _getBestandLossesForYear(jahr);
+    if (!r || !r.loaded) return 0;
+    return (typeof r.sum === 'number' && isFinite(r.sum)) ? r.sum : 0;
+  } catch (_e) { return 0; }
+};
+
+/* Wie viele andere Bestandsobjekte in den Saldo eingegangen sind — fuer die
+ * Anzeige, damit eine gesenkte Basis nicht unerklaert dasteht. */
+window._dpBestandAnzahl = function (jahr) {
+  try {
+    if (typeof _getBestandLossesForYear !== 'function') return 0;
+    var r = _getBestandLossesForYear(jahr);
+    return (r && r.loaded && Array.isArray(r.list)) ? r.list.length : 0;
+  } catch (_e) { return 0; }
+};
+
 // Hook zvE input to update Grenz when auto is on
 document.addEventListener('DOMContentLoaded', function() {
   var zveInp = document.getElementById('zve');
