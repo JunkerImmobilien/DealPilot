@@ -253,11 +253,16 @@ const ADAPTERS = [
      *    und genau dieser letzte Fehlversuch stand dann in der Meldung —
      *    ein 404 auf einen Jahrgang, den es nie gab. */
     headers: () => Object.assign(browserHeaders(), { 'Referer': 'https://atlas.bayern.de/' }),
-    /* Nur gerade Jahrgaenge, absteigend. */
+    /* Nur gerade Jahrgaenge, absteigend - und nur die, die es GIBT.
+     * v1394: Der erste Entwurf nahm drei (2026, 2024, 2022). 2022 liefert
+     * HTTP 404: der Dienst fuehrt nur die beiden aktuellen Stichtage.
+     * Ein 404 auf einen Jahrgang, den es nie gab, ist genau der Fehler,
+     * den v1393 bei 2023 behoben hat - hier waere er gleich wieder
+     * eingebaut worden, nur eine Stelle weiter. */
     years: (y) => {
       const jetzt = y || CURRENT_BRW_YEAR;
       const start = jetzt % 2 === 0 ? jetzt : jetzt - 1;
-      return [start, start - 2, start - 4];
+      return [start, start - 2];
     },
     time: null,
   },
