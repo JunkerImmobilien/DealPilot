@@ -1,0 +1,234 @@
+[
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "wert": 1.1,
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "110 Kauffälle ohne Ausreißer, Median 1,07, Standardabweichung 0,23, Spanne 0,70 bis 1,70. Mittelwerte der Stichprobe: Grundstück 693 m², Wohnfläche 137 m², Bodenwert 200.000 €, Kaufpreis 460.000 € beziehungsweise 3.363 €/m² Wohnfläche, Restnutzungsdauer 44 Jahre. LEIPZIG FÜHRT VIER GEBÄUDETYPEN GETRENNT, und die Unterschiede sind erheblich: freistehend 1,10, Doppelhaushälfte 1,18, Reihenendhaus 1,21, Reihenmittelhaus 1,32.",
+   "normobjekt": "NHK 2010 nach Anlage 1 SW-RL, Gebäudestandard nach Anlage 2 SW-RL, Bezugsmaßstab Brutto-Grundfläche nach SW-RL, Baunebenkosten in den NHK enthalten, Baupreisindex des Statistischen Bundesamtes auf Basis 2010, Gesamtnutzungsdauer nach Anlage 3 SW-RL, lineare Alterswertminderung, Bodenwert = zutreffender Bodenrichtwert mal Grundstücksfläche, Garageneinstellplatz pauschal 5.000 €, Carport 2.000 €."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV in Verbindung mit der Sachwertrichtlinie (SW-RL)",
+   "berechnungsmodell": "Sachwertfaktor = Kaufpreis / vorläufiger Sachwert",
+   "nhk": "NHK 2010 nach Anlage 1 SW-RL",
+   "alterswertminderung": "linear",
+   "kauffaelle_gesamt": 276,
+   "besonderheit": "Das BAUJAHR ist das ursprüngliche Baujahr; die Restnutzungsdauer folgt bei Modernisierungen dem Modell der Anlage 4 SW-RL. Bauliche Außenanlagen sind geschätzt, nicht pauschaliert."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Leipzig",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser im individuellen, eigengenutzten Wohnungsbau",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwertfaktor": {
+     "min": 0.7,
+     "max": 1.7,
+     "mittel": 1.1,
+     "median": 1.07
+    },
+    "flaeche_qm": {
+     "max": 1500,
+     "hinweis": "Grundstücke über 1.500 m² sind ausgeschlossen"
+    },
+    "rnd_jahre": {
+     "min": 20,
+     "hinweis": "Restnutzungsdauer unter 20 Jahren ist ausgeschlossen"
+    },
+    "wohnflaeche_qm": {
+     "min": 80,
+     "hinweis": "Wohnflächen unter 80 m² sind ausgeschlossen"
+    }
+   },
+   "vorbehalt": "EIN MITTELWERT MIT EINER STANDARDABWEICHUNG VON 0,23 bei einer Spanne von 0,70 bis 1,70. Der Bericht führt für diesen Teilmarkt keine Abhängigkeit von Sachwert, Lage oder Baujahr — nur den Mittelwert je Gebäudetyp.\n\nDIE FILTERKRITERIEN SIND TEIL DES MODELLS: ausgeschlossen sind Grundstücke über 1.500 m², Objekte mit selbständig nutzbarer Baulandreserve, Restnutzungsdauern unter 20 Jahren und Wohnflächen unter 80 m². Für solche Objekte gilt der Faktor nicht.\n\nDER BODENWERT IST OHNE GRÖSSENANPASSUNG angesetzt (Bodenrichtwert mal Fläche), und Garagen sind pauschal mit 5.000 € je Stellplatz im Sachwert enthalten. Wer anders rechnet, verlässt das Modell.",
+   "hinweis": "Leipzig ist die größte Stadt Sachsens und der erste sächsische Ausschuss in diesem Register."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 der Stadt Leipzig, Tabelle 122, S. 84: Sachwertfaktor für freistehende Ein- und Zweifamilienhausgrundstücke, 110 Kauffälle des Jahres 2024 ohne Ausreißer, Mittel 1,10, Median 1,07, Spanne 0,70 bis 1,70."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtlicher Mittelwert mit vollständiger Modellbeschreibung, Fallzahl, Median und Standardabweichung. Stufe C, weil es eine Konstante ohne jede Abhängigkeit ist und die Standardabweichung mit 0,23 rund ein Fünftel des Werts ausmacht.",
+  "fallzahl": 110,
+  "streuung": 0.23,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Grundstucksmarktbericht-2025-Leipzig.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2025, Stadt Leipzig, Amt für Geoinformationen und Bodenordnung",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Modellparameter des Berichts sind einzuhalten (Modellkonformität nach § 10 ImmoWertV).",
+  "fundstelle": "Kap. 7.4.2 Sachwertfaktor, Tabelle 122, S. 84 f., nebst Modellparametern."
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "dhh",
+  "formel": {
+   "form": "konstante",
+   "wert": 1.18,
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "88 Kauffälle ohne Ausreißer, Median 1,18, Standardabweichung 0,21, Spanne 0,71 bis 1,74. Mittelwerte: Grundstück 499 m², Wohnfläche 123 m², Bodenwert 165.000 €, Kaufpreis 374.000 €, Restnutzungsdauer 35 Jahre.",
+   "normobjekt": "Wie beim freistehenden Haus: NHK 2010 nach Anlage 1 SW-RL, BGF nach SW-RL, lineare Alterswertminderung, Bodenwert ohne Größenanpassung."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV in Verbindung mit der Sachwertrichtlinie (SW-RL)",
+   "berechnungsmodell": "Sachwertfaktor = Kaufpreis / vorläufiger Sachwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Leipzig",
+   "sachlich": "Doppelhaushälften",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwertfaktor": {
+     "min": 0.71,
+     "max": 1.74,
+     "mittel": 1.18,
+     "median": 1.18
+    }
+   },
+   "vorbehalt": "Dieselben Filterkriterien wie beim freistehenden Haus (Grundstück bis 1.500 m², Restnutzungsdauer ab 20 Jahren, Wohnfläche ab 80 m², keine selbständig nutzbare Baulandreserve). Standardabweichung 0,21.",
+   "hinweis": "Reihenendhäuser führt der Bericht GETRENNT mit 1,21 — drei Prozent über der Doppelhaushälfte."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 der Stadt Leipzig, Tabelle 122, S. 84: Sachwertfaktor für Doppelhaushälften, 88 Kauffälle des Jahres 2024, Mittel 1,18, Median 1,18, Spanne 0,71 bis 1,74."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtlicher Mittelwert mit Fallzahl, Median und Standardabweichung. Stufe C wie beim freistehenden Haus.",
+  "fallzahl": 88,
+  "streuung": 0.21,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Grundstucksmarktbericht-2025-Leipzig.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2025, Stadt Leipzig, Amt für Geoinformationen und Bodenordnung",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Modellparameter des Berichts sind einzuhalten (Modellkonformität nach § 10 ImmoWertV).",
+  "fundstelle": "Kap. 7.4.2 Sachwertfaktor, Tabelle 122, S. 84 f., nebst Modellparametern."
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "reh",
+  "formel": {
+   "form": "konstante",
+   "wert": 1.21,
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "27 Kauffälle ohne Ausreißer, Median 1,25, Standardabweichung 0,21, Spanne 0,79 bis 1,58. Mittelwerte: Grundstück 337 m², Wohnfläche 121 m², Bodenwert 136.000 €, Kaufpreis 408.000 €, Restnutzungsdauer 49 Jahre. DER MEDIAN LIEGT ÜBER DEM MITTELWERT (1,25 gegen 1,21) — die Verteilung ist nach unten verzerrt.",
+   "normobjekt": "Wie beim freistehenden Haus."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV in Verbindung mit der Sachwertrichtlinie (SW-RL)",
+   "berechnungsmodell": "Sachwertfaktor = Kaufpreis / vorläufiger Sachwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Leipzig",
+   "sachlich": "Reihenendhäuser",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwertfaktor": {
+     "min": 0.79,
+     "max": 1.58,
+     "mittel": 1.21,
+     "median": 1.25
+    }
+   },
+   "vorbehalt": "SIEBENUNDZWANZIG KAUFFÄLLE — die kleinste der vier Leipziger Reihen. Standardabweichung 0,21 bei einer Spanne von 0,79 bis 1,58.\n\nDieselben Filterkriterien wie beim freistehenden Haus.",
+   "hinweis": "Der Bericht trennt Reihenendhäuser von Reihenmittelhäusern (1,32) und von Doppelhaushälften (1,18)."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 der Stadt Leipzig, Tabelle 122, S. 84: Sachwertfaktor für Reihenendhäuser, 27 Kauffälle des Jahres 2024, Mittel 1,21, Median 1,25, Spanne 0,79 bis 1,58."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtlicher Mittelwert mit Fallzahl, Median und Standardabweichung. Stufe C, dazu die kleine Stichprobe von 27 Fällen.",
+  "fallzahl": 27,
+  "streuung": 0.21,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Grundstucksmarktbericht-2025-Leipzig.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2025, Stadt Leipzig, Amt für Geoinformationen und Bodenordnung",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Modellparameter des Berichts sind einzuhalten (Modellkonformität nach § 10 ImmoWertV).",
+  "fundstelle": "Kap. 7.4.2 Sachwertfaktor, Tabelle 122, S. 84 f., nebst Modellparametern."
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh",
+  "formel": {
+   "form": "konstante",
+   "wert": 1.32,
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "38 Kauffälle ohne Ausreißer, Median 1,30, Standardabweichung 0,22, Spanne 0,90 bis 1,72. Mittelwerte: Grundstück 212 m², Wohnfläche 124 m², Bodenwert 106.000 €, Kaufpreis 377.000 €, Restnutzungsdauer 47 Jahre. DER HÖCHSTE LEIPZIGER FAKTOR — bei den kleinsten Grundstücken (212 m² im Mittel). Der Markt zahlt für ein Reihenmittelhaus deutlich mehr, als die Herstellungskostenrechnung ergibt.",
+   "normobjekt": "Wie beim freistehenden Haus."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "ImmoWertV in Verbindung mit der Sachwertrichtlinie (SW-RL)",
+   "berechnungsmodell": "Sachwertfaktor = Kaufpreis / vorläufiger Sachwert"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Leipzig",
+   "sachlich": "Reihenmittelhäuser",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwertfaktor": {
+     "min": 0.9,
+     "max": 1.72,
+     "mittel": 1.32,
+     "median": 1.3
+    }
+   },
+   "vorbehalt": "38 Kauffälle, Standardabweichung 0,22. Dieselben Filterkriterien wie beim freistehenden Haus — insbesondere die Untergrenze von 80 m² Wohnfläche, die bei Reihenmittelhäusern schnell erreicht ist.",
+   "hinweis": "Zwischen Reihenmittelhaus (1,32) und freistehendem Haus (1,10) liegen zwanzig Prozent. Wer die Gebäudestellung falsch einordnet, verfehlt den Faktor um diesen Betrag."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2025 der Stadt Leipzig, Tabelle 122, S. 84: Sachwertfaktor für Reihenmittelhäuser, 38 Kauffälle des Jahres 2024, Mittel 1,32, Median 1,30, Spanne 0,90 bis 1,72."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtlicher Mittelwert mit Fallzahl, Median und Standardabweichung. Stufe C wie die übrigen drei Reihen dieses Ausschusses.",
+  "fallzahl": 38,
+  "streuung": 0.22,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Grundstucksmarktbericht-2025-Leipzig.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2025, Stadt Leipzig, Amt für Geoinformationen und Bodenordnung",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Modellparameter des Berichts sind einzuhalten (Modellkonformität nach § 10 ImmoWertV).",
+  "fundstelle": "Kap. 7.4.2 Sachwertfaktor, Tabelle 122, S. 84 f., nebst Modellparametern."
+ }
+]

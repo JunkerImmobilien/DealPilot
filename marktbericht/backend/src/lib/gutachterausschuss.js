@@ -292,7 +292,14 @@ const ZWEIG_VORZUG = [
   [/mehrfamilien|\bmfh\b/i, ['mfh', 'mfh_bis6', 'mfh_ueber6']],
   [/dreifamilien|\bdreifh\b/i, ['dreifh']],
   [/reihenmittel|\brmh\b/i, ['rmh', 'rh', 'rhdhh']],
-  [/reihenend|doppelhaus|\bdhh\b|\breh\b/i, ['rhdhh', 'dhh', 'reh', 'rh']],
+  /* v1114-WREH - REIHENENDHAUS UND DOPPELHAUSHAELFTE GETRENNT.
+     Beide trafen bisher DIESELBE Zeile und suchten in derselben
+     Reihenfolge - ein Reihenendhaus bekam damit den Satz der
+     Doppelhaushaelfte, sobald ein Ausschuss beide getrennt fuehrt.
+     Leipzig tut genau das: 1,21 fuer Reihenendhaeuser, 1,18 fuer
+     Doppelhaushaelften. Drei Prozent, still. */
+  [/reihenend|\breh\b/i, ['reh', 'rhdhh', 'rh', 'dhh']],
+  [/doppelhaus|\bdhh\b/i, ['dhh', 'rhdhh', 'rh']],
   [/reihenhaus|\brh\b/i, ['rh', 'rhdhh', 'rmh']],
   [/zweifamilien|\bzfh\b/i, ['zfh', 'ezfh']],
   [/einfamilien|\befh\b|freistehend/i, ['efh', 'ezfh']],

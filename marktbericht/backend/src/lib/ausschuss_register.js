@@ -140,7 +140,11 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                                fuehrt keine Tabellen, sondern multiple
                                Regressionsfunktionen - je Region und
                                Baujahresklasse eine eigene. */
-                            'swf-st.json'];
+                            'swf-st.json',
+                            /* v1114: Sachsen. Leipzig fuehrt VIER Gebaeudetypen
+                               getrennt - freistehend, Doppelhaushaelfte,
+                               Reihenend- und Reihenmittelhaus. */
+                            'swf-sn.json'];
 
 export function ladeSaat(dateien = SAATDATEIEN) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])
