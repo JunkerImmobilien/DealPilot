@@ -1,0 +1,99 @@
+{
+  "land_code": "HE",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Marburg",
+  "gaa_kennz": "06534014",
+  "ags": ["06534014"],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "Kaufverträge 2025, wegen zu geringer Jahresmenge als Stichprobe aus zwei Jahren",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06",
+  "quelle_url": "https://www.marburg.de/buergerservice/dienstleistungen/immobilienmarktbericht-900000478-0.html",
+  "quelle_datei": "immobilienmarktbericht_2026.pdf, Immobilienmarktbericht 2026, Kapitel 9.2 und 9.2.1, Seiten 34 bis 37",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Marburg, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über marburg.de",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 (Anlage 4 ImmoWertV 2021), Baunebenkosten darin enthalten, kein Korrekturfaktor, Bezugsmaßstab Bruttogrundfläche nach DIN 277 (Fassung 2005-02) aus den Außenmaßen der amtlichen Geobasisdaten, besondere Bauteile OHNE gesonderten Ansatz, Gesamtnutzungsdauer 80 Jahre, Restnutzungsdauer mindestens 20 Jahre, lineare Alterswertminderung, Außenanlagen 5 bis 8 Prozent der alterswertgeminderten Gebäudeherstellungskosten einschließlich nicht überdachter Stellplätze.",
+  "fundstelle": "Kapitel 9.2 Sachwertmodell und Sachwertfaktoren, Kapitel 9.2.1 Sachwertfaktoren für den Bereich der Stadt Marburg, Seiten 34 bis 37.",
+
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 80,
+    "alterswertminderung": "linear",
+    "regionalfaktor": 1.0,
+    "bezugsmassstab": "BGF nach DIN 277 (2005-02)",
+    "ermittlungsmethodik": "Regressionsanalyse"
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [200000, 250000, 300000, 350000, 400000, 450000,
+                    500000, 550000, 600000, 650000, 700000, 750000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["110-575"],
+        "kategorie_baender": [
+          { "von": 110, "bis": 575, "kategorie": "110-575" }
+        ],
+        "zellen": {
+          "110-575": [1.42, 1.29, 1.20, 1.12, 1.06, 1.01, 0.97, 0.93, 0.90, 0.87, 0.84, 0.82]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Marburg wertet freistehende Ein- und Zweifamilienhäuser, Doppel- und Reihenhäuser GEMEINSAM aus und druckt eine einzige Tabelle für alle drei Haustypen ab. 37 Kauffälle insgesamt (32 freistehend, 5 Doppel- und Reihenhäuser), Bestimmtheitsmaß 0,40. Der Bodenrichtwertbereich 110 bis 575 Euro/qm ist die ausgewiesene Spanne der Auswertung; darunter und darüber gibt es keinen Wert.",
+        "normobjekt": "Nur Gebäude ab Baujahr 1950 und älter als fünf Jahre. Mittlere Grundstücksgröße 800 qm (empfohlener Anwendungsbereich 300 bis 1.500 qm), mittlere Wohnfläche 180 qm (empfohlen 90 bis 300 qm), mittlere BGF 350 qm, mittlerer Bodenrichtwert 310 Euro/qm, mittlere Restnutzungsdauer 30 Jahre, mittlere Standardstufe 2,3. Besondere Bauteile bleiben ohne gesonderten Ansatz."
+      },
+      "korrekturen": [],
+      "beleg": "Immobilienmarktbericht 2026 des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Marburg, Kapitel 9.2.1, Seite 37.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle mit Fallzahl und Bestimmtheitsmass. KEINE Stufe A: 37 Kauffaelle sind wenig, das Bestimmtheitsmass liegt bei 0,40, und der Ausschuss schreibt selbst, bei Nutzung dieser Daten sei eine besondere kritische sachverstaendige Wuerdigung erforderlich.",
+      "fallzahl": 32
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Doppelhaushälften und Reihenhäuser",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [200000, 250000, 300000, 350000, 400000, 450000,
+                    500000, 550000, 600000, 650000, 700000, 750000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["110-575"],
+        "kategorie_baender": [
+          { "von": 110, "bis": 575, "kategorie": "110-575" }
+        ],
+        "zellen": {
+          "110-575": [1.42, 1.29, 1.20, 1.12, 1.06, 1.01, 0.97, 0.93, 0.90, 0.87, 0.84, 0.82]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "DIESELBE Tabelle wie bei den freistehenden Häusern — das ist keine Verdopplung, sondern die Aussage des Berichts: Marburg wertet alle drei Haustypen gemeinsam aus. ACHTUNG: In die gemeinsame Regression gingen nur FÜNF Doppel- und Reihenhäuser ein. Der Faktor trägt hier erkennbar weniger als bei den freistehenden Häusern und verlangt eine eigene sachverständige Würdigung.",
+        "normobjekt": "Mittlerer vorläufiger Sachwert 330.000 Euro, mittlere Grundstücksgröße 500 qm (empfohlener Anwendungsbereich 300 bis 800 qm), mittlere Wohnfläche 150 qm (empfohlen 100 bis 230 qm), mittlere BGF 280 qm, mittlerer Bodenrichtwert 320 Euro/qm, mittlere Restnutzungsdauer 32 Jahre."
+      },
+      "korrekturen": [],
+      "beleg": "Immobilienmarktbericht 2026 des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Marburg, Kapitel 9.2.1, Seite 37.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle, die der Ausschuss ausdruecklich auch fuer Doppel- und Reihenhaeuser aufstellt. KEINE Stufe A, und der Grund ist hier schaerfer als beim freistehenden Zweig: nur FUENF Kauffaelle dieses Typs sind eingeflossen.",
+      "fallzahl": 5
+    }
+  ],
+
+  "anmerkungen": [
+    "Der Ausschuss hat die Gesamtnutzungsdauer erhöht; der Bericht vermerkt, das habe bei den Sachwertfaktoren zu etwas niedrigeren und bei den Liegenschaftszinssätzen zu etwas höheren Werten geführt. Werte aus älteren Jahrgängen dürfen deshalb nicht mit diesen gemischt werden.",
+    "Kapitel 9.2.2 druckt zusätzlich die hessenweiten Sachwertfaktoren der Zentralen Geschäftsstelle ab (Auszug). Diese sind hier NICHT als Ortswert hinterlegt — sie stehen bereits als Landeswert im Register und werden beim Sachwertfaktor bewusst ausgefiltert.",
+    "Die Stadt Marburg liegt im Zuständigkeitsbereich des Amtes für Bodenmanagement Marburg, ist von dessen regionaler Auswertung aber ausdrücklich AUSGENOMMEN. Im Register gewinnt dieser Gemeindesatz (06534014) über den Kreissatz (06534), weil die Kaskade den achtstelligen Schlüssel zuerst prüft."
+  ]
+}

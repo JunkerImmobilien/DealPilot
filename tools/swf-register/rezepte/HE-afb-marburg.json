@@ -1,0 +1,86 @@
+{
+  "land_code": "HE",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Gießen, Lahn-Dill und Marburg-Biedenkopf",
+  "gaa_kennz": "06AFBMR",
+  "ags": ["06531", "06532", "06534"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "Kaufverträge 01.01.2024 bis 31.12.2025 (regionale Auswertung)",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-08",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_datei": "2026_IMB_AfB Marburg.pdf, Immobilienmarktbericht 2026, Kapitel 9.2 und 9.2.1, Seiten 91 bis 92",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Gießen, Lahn-Dill und Marburg-Biedenkopf, Immobilienmarktbericht 2026, Amt für Bodenmanagement Marburg",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 (Anlage 4 ImmoWertV), Baunebenkosten darin enthalten, kein Regionalfaktor (1,0), Bezugsmaßstab Bruttogrundfläche, Baupreisindex im Quartal des Beurkundungsdatums, Gesamtnutzungsdauer 80 Jahre, Restnutzungsdauer mindestens 20 Jahre, lineare Alterswertminderung, Nebengebäude 5.000 Euro je Garagenstellplatz und 2.000 Euro je Carport, Außenanlagen 5 Prozent der Gebäudesachwerte.",
+  "fundstelle": "Kapitel 9.2 Bewertungsmodell, Kapitel 9.2.1 Sachwertfaktoren Ein- und Zweifamilienhäuser (regionale Auswertung), Seiten 91 f.",
+
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 80,
+    "alterswertminderung": "linear",
+    "regionalfaktor": 1.0,
+    "bezugsmassstab": "BGF",
+    "ermittlungsmethodik": "Regressionsanalyse"
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "Ein- und Zweifamilienhäuser, regionale Auswertung",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [150000, 200000, 250000, 300000, 350000, 400000, 450000,
+                    500000, 550000, 600000, 650000, 700000, 750000, 800000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["bis 49", "50-99", "100-149", "150-350"],
+        "kategorie_baender": [
+          { "von": 0,   "bis": 49,  "kategorie": "bis 49" },
+          { "von": 50,  "bis": 99,  "kategorie": "50-99" },
+          { "von": 100, "bis": 149, "kategorie": "100-149" },
+          { "von": 150, "bis": 350, "kategorie": "150-350" }
+        ],
+        "zellen": {
+          "bis 49":   [0.94, 0.84, 0.77, 0.72, 0.67, 0.64, 0.61, 0.59, null, null, null, null, null, null],
+          "50-99":    [1.03, 0.96, 0.90, 0.86, 0.83, 0.80, 0.78, 0.76, 0.74, 0.72, 0.71, null, null, null],
+          "100-149":  [1.23, 1.12, 1.05, 0.99, 0.94, 0.90, 0.87, 0.84, 0.81, 0.79, 0.77, 0.75, 0.74, 0.72],
+          "150-350":  [1.29, 1.18, 1.11, 1.05, 1.00, 0.96, 0.93, 0.90, 0.87, 0.85, 0.83, 0.81, 0.79, 0.78]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Vier Bodenrichtwertbereiche, 318 Kauffälle der Jahre 2024 und 2025. Bestimmtheitsmaß 0,38 · 0,26 · 0,36 · 0,36. Die Zuständigkeit endet bei 350 Euro/qm Bodenrichtwert — darüber druckt der Ausschuss keine Werte ab, dort gibt es deshalb keinen Wert.",
+        "normobjekt": "Mittlere Grundstücksgröße 680 bis 810 qm, mittlere Wohnfläche 156 bis 164 qm, mittlere BGF 349 bis 412 qm, mittlere Restnutzungsdauer 39 bis 42 Jahre bezogen auf GND 80, mittlere Standardstufe 2,6 bis 2,7. Außenanlagen 5 Prozent der Gebäudesachwerte, Garagenstellplatz 5.000 Euro, Carport 2.000 Euro."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Landkreise Gießen, Lahn-Dill und Marburg-Biedenkopf, OHNE die Städte Gießen und Marburg — beide haben eigene Gutachterausschüsse und eigene Sätze im Register (06531005 und 06534014). Die Kaskade greift dort auf den feineren Gemeindeschlüssel zu, bevor sie den Kreisschlüssel erreicht.",
+        "sachlich": "Ein- und Zweifamilienhäuser",
+        "extrapolation": "im Bericht gekennzeichnet, hier nicht unterscheidbar",
+        "spannen_je_brw_bereich": {
+          "bis 49":   { "kauffaelle": 12,  "r2": 0.38, "sachwert_mittel": 328527, "gsflaeche_mittel": 784, "brw_mittel": 41,  "rnd_mittel": 39, "standardstufe": 2.6, "bgf_mittel": 412, "wohnflaeche_mittel": 164, "bodenwertanteil": 0.15 },
+          "50-99":    { "kauffaelle": 110, "r2": 0.26, "sachwert_mittel": 337437, "gsflaeche_mittel": 810, "brw_mittel": 74,  "rnd_mittel": 41, "standardstufe": 2.7, "bgf_mittel": 361, "wohnflaeche_mittel": 156, "bodenwertanteil": 0.23 },
+          "100-149":  { "kauffaelle": 112, "r2": 0.36, "sachwert_mittel": 379297, "gsflaeche_mittel": 713, "brw_mittel": 122, "rnd_mittel": 42, "standardstufe": 2.7, "bgf_mittel": 349, "wohnflaeche_mittel": 159, "bodenwertanteil": 0.27 },
+          "150-350":  { "kauffaelle": 84,  "r2": 0.36, "sachwert_mittel": 433076, "gsflaeche_mittel": 680, "brw_mittel": 201, "rnd_mittel": 41, "standardstufe": 2.7, "bgf_mittel": 367, "wohnflaeche_mittel": 164, "bodenwertanteil": 0.35 }
+        },
+        "vorbehalt": "Der Bericht kennzeichnet extrapolierte Tabellenwerte KURSIV. Diese Auszeichnung geht beim Auslesen des PDF verloren und ist hier deshalb nicht je Zelle nachvollziehbar. Besonders betroffen ist der Bereich bis 49 Euro/qm mit nur ZWÖLF Kauffällen — dort ist der abgedruckte Bereich breiter als die Stichprobe tragen kann."
+      },
+      "beleg": "Immobilienmarktbericht 2026 des Gutachterausschusses für Immobilienwerte für den Bereich der Landkreise Gießen, Lahn-Dill und Marburg-Biedenkopf, Kapitel 9.2.1, Seite 92.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Matrix mit Fallzahlen und Bestimmtheitsmass je Bereich. KEINE Stufe A, weil das Bestimmtheitsmass zwischen 0,26 und 0,38 liegt, der Bereich bis 49 Euro/qm nur zwoelf Kauffaelle hat und die Kennzeichnung der extrapolierten Werte beim Auslesen verlorengeht.",
+      "fallzahl": 318
+    }
+  ],
+
+  "anmerkungen": [
+    "Der Ausschuss deckt DREI Landkreise ab, aber NICHT die Städte Gießen und Marburg. Beide sind mit eigenen Sätzen im Register (HE-06531005-giessen, HE-06534014-marburg-stadt); die Kaskade prüft den achtstelligen Gemeindeschlüssel vor dem fünfstelligen Kreisschlüssel, deshalb greift dort der Stadtwert.",
+    "Kapitel 9.2.2 des Berichts druckt Sachwertfaktoren für Reihenhäuser und Doppelhaushälften ab, die aber HESSENWEIT von der Zentralen Geschäftsstelle ermittelt wurden, nicht regional. Sie sind hier deshalb NICHT als Ortswert hinterlegt — der hessenweite Satz steht bereits als Landeswert (HE-land-hessen) im Register und wird beim Sachwertfaktor bewusst ausgefiltert.",
+    "Für die Reihenhäuser und Doppelhaushälften gibt es in diesem Zuständigkeitsbereich damit KEINEN örtlich abgeleiteten Sachwertfaktor. Das ist eine Lücke der Quelle, kein Erntefehler."
+  ]
+}
