@@ -331,7 +331,7 @@
 
   /* Checkbox-Label im qc7-src-Format (von object-actions render() eingebunden) */
   function srcLabel() {
-    return '<label class="qc7-src" data-src="voice" title="Objekt frei einsprechen 2014 im Plan enthalten">' +
+    return '<label class="qc7-src" data-src="voice" title="Objekt frei einsprechen — im Plan enthalten">' +
       '<input type="checkbox" value="voice">' +
       '<span class="qc7-box">' + checkSvg() + '</span>' +
       '<span class="qc7-ic">' + micSvg(14) + '</span> Sprachaufzeichnung</label>';
@@ -947,6 +947,14 @@
       '<b>Moin, ich bin dein Co-Pilot.</b> Ich nehme das Objekt mit dir zusammen auf — ' +
       'du sprichst oder tippst, ich rechne unterwegs mit und hole, was ich selbst holen kann: ' +
       'Bodenrichtwert, Lage, Marktpreisindikation.' +
+      /* v1119-WFORT: die Zahl gehoert IN die Vorstellung. Marcel:
+         „stehen dort als erstes: Ich fuehre dich durch mit 16 Fragen und
+         allem, und danach: Wo stehst du gerade? Das kann man irgendwie
+         verbinden.“ Oben im Kopf laeuft dazu der Balken mit. */
+      (_rf && _rf.offen && _rf.offen.length
+        ? ' Es sind <b>' + _rf.offen.length + ' Fragen</b> — oben siehst du jederzeit, ' +
+          'wo wir gerade stehen.'
+        : '') +
       '<div class="vi-rf-wozu" style="margin-top:8px"><b>Damit ich den richtigen Ton treffe:</b> ' +
       'wie viel Erfahrung hast du mit Immobilien-Investments?</div>');
     _rfAktion('erf_neu',
@@ -1938,7 +1946,7 @@
         });
     }).catch(function (err) {
       if (err && err.needs_credits) {
-        toast('Spracheingabe gerade nicht verf00fcgbar');
+        toast('Spracheingabe gerade nicht verfügbar');
         try { if (typeof window.showSettings === 'function') window.showSettings('plan'); } catch (e) {}
       } else {
         toast('Sprachauswertung fehlgeschlagen: ' + ((err && err.message) || err));
@@ -2187,6 +2195,10 @@
       if (!_rf || !_fs.an) { return; }
       var p = _fsPegel(), jetzt = Date.now(), seit = jetzt - _fs.t0;
       _fsPegelZeigen(p);   /* v1277: der Ausschlag beantwortet "hoert er mich?" */
+      /* v1119-WPULS: der Rahmen der Leiste faerbt sich gruen, solange
+         aufgenommen wird. Marcels Befund: "ob er gerade am Aufnehmen ist,
+         das kommt nicht richtig hervor." */
+      try { _rfZustandSetzen(null); } catch (xz) {}
 
       if (_fs.phase === 'rauschen') {
         summe += p; proben++;
@@ -2230,6 +2242,9 @@
     /* v1290: Der Recorder wird NICHT gestoppt — er laeuft durch, und der
        Kopf bleibt gueltig. Nur der laufende Abschnitt wird verworfen. */
     _fs.chunks = [];
+    /* v1119-WPULS: das Gruen geht mit dem Zuhoeren aus. Ohne diese Zeile
+       bliebe der Rahmen gruen, weil das Intervall nicht mehr laeuft. */
+    try { _rfZustandSetzen(null); } catch (xz) {}
   }
 
   /* Spricht der Nutzer gerade? Dann darf die naechste Frage warten. */
@@ -3246,6 +3261,17 @@
       '.vi-rf-kopfzeile{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}',
       '.vi-rf-kopf{font:700 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;',
       '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C)}',
+      /* ═══ v1119-WFORT · Der Kopf traegt jetzt drei Dinge ════════════════
+         Etappe, Frage x von y und einen Balken. Er bleibt EINE Zeile: der
+         Balken sitzt in der Grundlinie, nicht darunter. */
+      '.vi-rf-kopf{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;min-width:0}',
+      '.vi-kopf-txt{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.vi-kopf-zahl{flex:0 0 auto;font-weight:600;opacity:.62;letter-spacing:.06em}',
+      '.vi-kopf-bar{flex:1 1 46px;min-width:34px;max-width:120px;height:4px;border-radius:99px;',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);overflow:hidden}',
+      '.vi-kopf-bar i{display:block;height:100%;border-radius:99px;',
+      '  background:linear-gradient(90deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C));',
+      '  transition:width .45s cubic-bezier(.22,.8,.3,1)}',
       '.vi-rf-schalter{display:flex;align-items:center;gap:14px;flex-wrap:wrap}',
       '.vi-rf-fs{display:flex;align-items:center;gap:7px;cursor:pointer;',
       '  font:600 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;opacity:.75}',
@@ -3593,6 +3619,50 @@
       '.vi-rf-dran{margin:12px 2px 2px;border-radius:12px;overflow:hidden;',
       '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent);',
       '  background:var(--wl-fffdf7, #FFFDF7)}',
+      /* ═══ v1119-WPULS · WO ER GERADE STEHT, LEUCHTET ════════════════════
+         Marcels Befund vom 14.09.2026: „vielleicht dass der Rahmen um den
+         Co-Pilot einmal so blinkt, wo er gerade steht … vielleicht auch
+         einfach die Box, den Rahmen, dass der ein bisschen leuchtet oder
+         ein bisschen blinkt, wo er ist, und die Box dahinter vielleicht
+         auch eine andere Farbe."
+
+         Die Leiste sagt seit v1291, WAS offen ist. Sie sagte nicht, DASS
+         etwas offen ist — ein ruhiger goldener Rahmen sieht aus wie jeder
+         andere Kasten auf der Seite.
+
+         DREI ZUSTÄNDE, drei Bilder:
+           data-zustand="frage"   ruhig gold, eine Frage wartet
+           data-zustand="angebot" pulsierender Rahmen, eine Entscheidung
+           data-zustand="hoert"   grüner Schein, das Mikrofon nimmt auf
+
+         Der Puls läuft drei Runden und hält dann an — ein Rahmen, der
+         ewig blinkt, wird nach einer Minute übersehen und nervt bis
+         dahin. `prefers-reduced-motion` schaltet ihn ganz ab. */
+      '@keyframes viPuls{0%{box-shadow:0 0 0 0 color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent)}',
+      '  70%{box-shadow:0 0 0 7px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 0%, transparent)}',
+      '  100%{box-shadow:0 0 0 0 color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 0%, transparent)}}',
+      '@keyframes viHoert{0%,100%{box-shadow:0 0 0 0 rgba(63,165,108,.5)}',
+      '  60%{box-shadow:0 0 0 6px rgba(63,165,108,0)}}',
+      '.vi-rf-dran[data-zustand="angebot"]{animation:viPuls 1.6s ease-out 3;',
+      '  border-color:var(--wl-c9a84c, #C9A84C)}',
+      '.vi-rf-dran[data-zustand="angebot"] .vi-dran-a{',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 17%, transparent)}',
+      '.vi-rf-dran[data-zustand="angebot"] .vi-dran-lbl{color:var(--wl-b8932f, #b8932f);font-size:10px}',
+      /* Hoert zu: gruen, und zwar am RAHMEN - nicht nur an der Schriftzeile
+         unten, die beim Sprechen niemand ansieht. */
+      '.vi-rf-dran[data-zustand="hoert"]{border-color:#3FA56C;animation:viHoert 1.9s ease-out infinite}',
+      '.vi-rf-dran[data-zustand="hoert"] .vi-dran-f i{color:#3FA56C}',
+      /* Der Nein-Knopf steht neben den Abrufen, sieht aber nicht aus wie
+         einer: ein Angebot und seine Ablehnung duerfen nicht gleich
+         aussehen, sonst klickt man daneben. */
+      '.vi-dran-btn.nein{background:transparent;color:var(--vi-muted, #6b6257);',
+      '  border:1px dashed rgba(42,39,39,.26);box-shadow:none;font-weight:600}',
+      '.vi-dran-btn.nein:hover:not(:disabled){background:rgba(42,39,39,.05);transform:none;',
+      '  box-shadow:none;color:#2A2727}',
+      '.vi-dran-btn.nein b{font-size:13px;opacity:.7}',
+      '@media (prefers-reduced-motion:reduce){',
+      '  .vi-rf-dran[data-zustand="angebot"],.vi-rf-dran[data-zustand="hoert"]{animation:none}',
+      '  .vi-kopf-bar i{transition:none}}',
       /* v1300: flacher. Die Zeile mit der Frage trug 9 px oben und unten
          und eine Zeilenhöhe von 1.45 — zusammen fast 40 px für einen Satz. */
       '.vi-dran-f{display:flex;gap:8px;align-items:baseline;padding:6px 13px;',
@@ -5319,7 +5389,10 @@
     });
     var akt = (_rf.offen[_rf.i] && _rf.offen[_rf.i].et) || 0;
     var liste = ETAPPEN.filter(function (E) { return da[E.nr]; });
-    if (liste.length < 2) { host.innerHTML = ''; host.style.display = 'none'; return; }
+    if (liste.length < 2) { host.innerHTML = ''; host.style.display = 'none';
+      /* v1119-WFORT: der Kopf traegt den Fortschritt auch OHNE Etappenband -
+         sonst haette ein kurzer Lauf gar keine Standanzeige. */
+      _rfKopfZeichnen(akt, liste); return; }
     host.style.display = '';
     var eigen = 0;
     liste.forEach(function (E) { if (E.nr === akt) eigen = 1; });
@@ -5336,16 +5409,41 @@
           '<small>' + f + ' / ' + g + '</small></span>' +
           '</span>';
       }).join('') + '</div>';
-    /* Die Kopfzeile links nennt die Etappe samt Ziel — „DER CO-PILOT
-       FRAGT" sagt nur, dass jemand fragt, nicht worueber. */
+    /* ═══ v1119-WFORT · WO STEHST DU GERADE — in einer Zeile ════════════
+       Marcels Befund vom 14.09.2026: „stehen dort als erstes: Ich führe
+       dich durch mit 16 Fragen und allem, und danach: Wo stehst du
+       gerade? Das kann man irgendwie verbinden und halt auch immer
+       visualisieren."
+
+       Die Zahl stand bisher NUR klein unter der Frage („Frage 4 von 16")
+       und war damit dort, wo man sie erst findet, wenn man schon
+       weitergelesen hat. Die Etappe stand oben, die Zahl unten — zwei
+       Auskünfte über dieselbe Sache an zwei Orten.
+
+       Jetzt trägt der Kopf beides und einen Balken dazu: Etappe, Frage x
+       von y, und wie weit der Lauf ist. Der Balken ist die eigentliche
+       Antwort — eine Zahl muss man lesen, eine Länge sieht man. */
+    _rfKopfZeichnen(akt, liste);
+  }
+
+  function _rfKopfZeichnen(akt, liste) {
+    if (!_rf) return;
+    liste = liste || [];
     var kopf = document.querySelector('.oabi-ov.vi-mode .vi-rf-kopf');
     if (kopf) {
-      kopf.textContent = akt
-        ? 'Etappe ' + akt + ' von ' + liste.length + ' · ' + _etName(akt)
-        : (_rf.alle ? 'Der Co-Pilot fragt' : 'Noch offen');
+      var _ges = _rf.offen.length || 0;
+      var _nr  = Math.min(_rf.i + 1, _ges);
+      var _pct = _ges ? Math.round((_rf.i / _ges) * 100) : 0;
+      kopf.innerHTML =
+        '<span class="vi-kopf-txt">' + escH(akt
+          ? 'Etappe ' + akt + ' von ' + liste.length + ' · ' + _etName(akt)
+          : (_rf.alle ? 'Der Co-Pilot fragt' : 'Noch offen')) + '</span>' +
+        (_ges ? '<span class="vi-kopf-zahl">Frage ' + _nr + ' / ' + _ges + '</span>' +
+                '<span class="vi-kopf-bar"><i style="width:' + _pct + '%"></i></span>' : '');
       kopf.title = akt ? _etZiel(akt) : '';
     }
   }
+
 
   /* ── Die Skalen in der Frage nennen (Backlog-Punkt 2) ───────────────
      Wir bewerten nach diesen Stufen — also soll der Nutzer sie hoeren,
@@ -5632,6 +5730,25 @@
   };
 
 
+  /* ═══ v1119-WPULS · Der Zustand der Leiste, an EINER Stelle ═══════════
+     Aufgerufen aus `_rfDranZeichnen` (wenn sich der Inhalt aendert) UND
+     aus dem Pegel-Intervall (wenn sich die Phase aendert). Der zuletzt
+     gewuenschte Grundzustand wird gemerkt, damit das Intervall ihn nach
+     dem Zuhoeren wiederherstellen kann, ohne die Leiste neu zu bauen.
+
+     Das Attribut wird nur GESETZT, wenn es sich aendert - sonst startet
+     die Animation bei jedem Durchlauf von vorn und blinkt endlos. */
+  var _rfGrundZustand = '';
+  function _rfZustandSetzen(grund) {
+    if (grund != null) _rfGrundZustand = grund;
+    var host = $('vi-rf-dran'); if (!host) return;
+    var z = _rfGrundZustand;
+    /* Waehrend der Nutzer spricht oder der Co-Pilot zuhoert, gilt gruen -
+       das ist die Antwort auf "nimmt er mich gerade auf?". */
+    if (_fs && _fs.an && /^(rauschen|warte|spricht)$/.test(_fs.phase || '')) z = 'hoert';
+    if (host.getAttribute('data-zustand') !== z) host.setAttribute('data-zustand', z);
+  }
+
   function _rfDranZeichnen() {
     var host = $('vi-rf-dran'); if (!host || !_rf) return;
     var e = _rf.offen[_rf.i];
@@ -5661,6 +5778,12 @@
     }
     if (!frage && !akt.length) { host.style.display = 'none'; host.innerHTML = ''; return; }
     host.style.display = '';
+    /* ═══ v1119-WPULS · Der Zustand steht am Rahmen ══════════════════════
+       Drei Lagen, drei Bilder. „angebot" schlaegt „frage": wo etwas zu
+       entscheiden ist, gehoert die Aufmerksamkeit hin. Das Attribut wird
+       nur GESETZT, wenn es sich aendert — sonst startet die Animation bei
+       jedem Neuzeichnen von vorn und blinkt endlos. */
+    _rfZustandSetzen(akt.length ? 'angebot' : (frage ? 'frage' : ''));
     host.innerHTML =
       (frage ? '<div class="vi-dran-f"><i>▸</i><span>' + frage + '</span></div>' : '') +
       (akt.length
@@ -5676,7 +5799,14 @@
               (knf && rest ? 'Eine Entscheidung steht offen — und ich kann etwas holen:'
                : knf       ? 'Zwei Werte widersprechen sich — welcher gilt?'
                : nf        ? 'Offen geblieben:'
-                           : 'Ich kann das für dich holen:') + '</span>';
+               /* v1119-WEIN2 · EINE Zeile statt zweier. Marcels Befund vom
+                  14.09.2026: „für mich stehen dort zu viele Doppelinformationen.
+                  Es steht da einmal: Wo geht’s jetzt weiter? und er fragt
+                  gleichzeitig: Das kann ich für dich holen.“ Die Frage steht
+                  schon in der Zeile darüber — hier gehört hin, was ENTSCHIEDEN
+                  werden soll, und zwar als Frage, die man mit Ja oder
+                  Überspringen beantwortet. */
+                           : 'Soll ich das jetzt für dich abrufen?') + '</span>';
           })() +
 
 
@@ -5704,6 +5834,22 @@
                    (a.frei != null ? '<i>' + escH(String(a.frei)) + ' frei</i>' : '') +
                    '</button>';
           }).join('') +
+          /* ═══ v1119-WSKIP · „Nein, überspringen" gehört daneben ══════════
+             Marcels Befund: „man kann's anklicken, man kann auch sagen:
+             Nee, überspringen." Bisher gab es nur den Weg durch das
+             Angebot — wer nichts abrufen wollte, musste weiterreden und
+             das Angebot blieb stehen. Ein Angebot ohne sichtbares Nein
+             ist eine Aufforderung. */
+          (function () {
+            var holbar = akt.filter(function (a) {
+              return a.art === 'markt' || a.art === 'markt2'
+                  || a.art === 'brw' || a.art === 'lage';
+            }).length;
+            if (!holbar) return '';
+            return '<button type="button" class="vi-dran-btn nein" data-akt="ueberspringen"' +
+                   ' title="Ich frage im Lauf nicht noch einmal danach — holen kannst du es später jederzeit.">' +
+                   '<b>×</b>Nein, überspringen</button>';
+          })() +
           '</div>' +
           (function () {
             var mit = akt.filter(function (a) { return a.txt; });
@@ -5736,6 +5882,19 @@
     if (knopf) { knopf.disabled = true; knopf.classList.add('laeuft'); }
     var a = (_rf.aktionen || []).filter(function (x) { return x.art === art; })[0] || {};
     _rfAktionWeg(art);
+    /* ═══ v1119-WSKIP · Überspringen räumt ALLE Abrufe weg ═══════════════
+       Nicht nur den einen, auf den geklickt wurde: wer „nein" sagt, meint
+       das Angebot, nicht eine Zeile davon. Die Frage darunter bleibt
+       offen — übersprungen ist der ABRUF, nicht die Angabe. */
+    if (art === 'ueberspringen') {
+      ['markt', 'markt2', 'brw', 'lage'].forEach(_rfAktionWeg);
+      _rfBlase('ich', 'Nein, überspringen.');
+      _rfBlase('co', 'Alles klar — ich hole nichts. '
+        + 'Du kannst es später jederzeit im Objekt nachholen.');
+      _rfDranZeichnen();
+      if (_fs.an && _fs.stream) _fsHoeren(true);
+      return;
+    }
     /* v1115-WEIN: die Erfahrungsfrage aus dem Einstieg. */
     if (art === 'erf_neu' || art === 'erf_mittel' || art === 'erf_profi') {
       _rfErfahrungGewaehlt(art); return;
@@ -6781,7 +6940,12 @@
     if (stufe >= 2) {
       _rfBlase('co', '<span style="opacity:.8">Gemerkt. Die erweiterte hole ich am Ende von ' +
         '<b>Etappe 4</b> — dann kennt sie Zustand, Energieausweis, Bodenrichtwert und deine ' +
-        'Lagebewertung. Vorher gerechnet wäre sie schlechter, als sie sein kann.</span>');
+        'Lagebewertung. Vorher gerechnet wäre sie schlechter, als sie sein kann.<br>' +
+        /* v1119-WMB: Marcel — „Es wird ja ein Marktbericht erzeugt. Dann kann
+           man noch sagen: Den Marktbericht hänge ich dir hinten später im
+           Objekt an.“ Wer das vorher weiss, sucht ihn nachher nicht. */
+        'Den <b>Marktbericht</b> dazu hänge ich dir am Objekt an — du findest ihn ' +
+        'später unter den Berichten, auch ohne dass du jetzt etwas tun musst.</span>');
       return;
     }
     /* Stehen Flaeche, Baujahr und Kaufpreis schon, geht es sofort los —
@@ -8384,10 +8548,33 @@
 
   var RF_FRAGEWORT = /^(was|wie|wieso|warum|weshalb|wer|wo|wann|welche[rsn]?|kannst du|kannst|koenntest|könntest|erklaer|erklär|rechne|zeig|sag mir|ist das|macht das|lohnt|passt das|waere|wäre|soll ich|hab ich|habe ich)\b/i;
 
+  /* ═══ v1119-WBIT · EIN BEFEHL IST AUCH EINE FRAGE ═══════════════════
+     Marcels Befund vom 14.09.2026: „ich hab die Postleitzahl vergessen
+     und hab dann gesagt: Hol mir die Postleitzahl. Das hat er nicht
+     verstanden. Erst wo ich gesagt hab: Kannst du mir einmal die
+     Postleitzahl von Herford besorgen? Dann hat er's gemacht."
+
+     GEMESSEN, warum: „Hol mir die Postleitzahl" hat kein Fragezeichen und
+     kein Fragewort — also keine Frage. „hol" ist zwar ein Abrufverb, aber
+     „Postleitzahl" steht nicht in RF_ABRUF_SACHE (dort stehen nur die
+     Dinge, die DealPilot selbst abruft). Der Satz fiel durch beide Netze
+     und wurde als ANTWORT auf die offene Frage gelesen.
+
+     Ein Imperativ am Satzanfang ist im Deutschen dasselbe wie eine Frage
+     mit „kannst du" — nur kürzer. Er wird hier genauso behandelt.
+
+     WARUM DAS SICHER IST: geprüft wird nur der SATZANFANG. Eine Angabe
+     fängt nie mit „hol" oder „such" an; „300 Euro" und „Baujahr 1975"
+     bleiben Antworten. Und die Abrufpfade laufen VORHER — „hol die
+     erweiterte Marktpreisindikation" bleibt ein Abruf, kein Gespräch. */
+  var RF_BITTE = /^(bitte\s+)?(hol|hole|besorg|besorge|such|suche|finde|find|nenn|nenne|gib\s+mir|sag\s+mir|zeig\s+mir|ermittle|recherchier\w*|prüf|pruef|schau\s+(mal\s+)?nach)\b/i;
+
   function _rfIstFrage(text) {
     var t = String(text || '').trim();
     if (!t) return false;
     if (/\?\s*$/.test(t)) return true;
+    /* v1119-WBIT: „Hol mir die Postleitzahl von Herford" */
+    if (RF_BITTE.test(t) && t.split(/\s+/).length >= 3) return true;
     if (RF_FRAGEWORT.test(t) && t.split(/\s+/).length >= 3) return true;
     return false;
   }
@@ -8668,6 +8855,24 @@
        Aktion beim Namen nennt („hol den Bodenrichtwert"), bekommt sie
        auch dann, wenn mehrere offenstehen. */
     /* v1305: auch hier ein gesprochenes „ja gerne, mach das" statt nur „ja". */
+    /* ═══ v1119-WSKIP · „Nee, überspringen" ist die zweite Antwort ══════
+       Zum Angebot gehören zwei Antworten, nicht eine. Bisher gab es nur
+       den Ja-Weg; ein „nein danke" fiel durch und wurde als Antwort auf
+       die Feldfrage gelesen — bei „Bodenrichtwert?" hätte das beinahe
+       „kein Bodenrichtwert" bedeutet.
+
+       Die Prüfung steht VOR dem Ja-Weg und greift nur, wenn ein ABRUF
+       offensteht: bei einem Widerspruch (knf_) ist „nein" keine Antwort,
+       und beim Nachtragen auch nicht. */
+    if ((_rf.aktionen || []).some(function (a) {
+          return a.art === 'markt' || a.art === 'markt2'
+              || a.art === 'brw' || a.art === 'lage';
+        })
+        && !_rf.konfliktOffen
+        && /^(nein|nee|ne|nö|noe|nicht n(ö|oe)tig|lass (das|es)|brauch(e)? ich nicht|(ü|ue)berspring\w*|sp(ä|ae)ter)\b/i.test(t)) {
+      _rfAktionKlick('ueberspringen');
+      return true;
+    }
     if ((_rf.aktionen || []).length && (RF_JA.test(t) || _istZustimmung(t))) {
       /* v1327: was der Satz SONST noch trug, geht nicht verloren. */
       if (_rfAktionJa(t)) { _rfRestNachAktion(t); return true; }
