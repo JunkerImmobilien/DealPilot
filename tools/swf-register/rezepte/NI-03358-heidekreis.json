@@ -1,0 +1,111 @@
+{
+  "land_code": "NI",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Bereich Landkreis Heidekreis",
+  "gaa_kennz": "03358",
+  "ags": ["03358"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "09.01.2023 bis 17.11.2025",
+  "beschlossen": "2026-01",
+  "veroeffentlicht": "2026-03-02",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/einundzweifamilienhaeuser/2026_sw_efh_sulverhk",
+  "quelle_datei": "Tableau-Dashboard 2026_sw_efh_sulverhk/dash, abgetastet am 14.09.2026",
+  "quellenvermerk": "Gutachterausschüsse für Grundstückswerte in Niedersachsen, Datenbasis 01.01.2026, Tag der Veröffentlichung 02.03.2026",
+  "lizenz": "frei zugänglich, kostenfreier Abruf",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Anwendung setzt eine modellkonforme Wertermittlung nach der Modellbeschreibung Sachwertfaktoren des Ausschusses voraus.",
+  "fundstelle": "Kalkulator „Sachwertfaktoren für ein freistehendes Ein- und Zweifamilienhaus — Landkreis Heidekreis“ nebst vier Diagrammen: Sachwert/Bodenrichtwert, Standardstufe, Verhältnis Bruttogrundfläche zu Wohnfläche, weitere wertbeeinflussende Merkmale (Lage).",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehendes Ein- und Zweifamilienhaus",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000, 550000, 600000, 650000, 700000],
+        "achse_y_feld": "brw",
+        "achse_y_bez": "Bodenrichtwert in €/m²",
+        "achse_y": [20, 60, 100, 140, 180],
+        "zellen": {
+          "20":  [1.23, 1.11, 1.02, 0.95, 0.89, 0.84, 0.80, 0.76, 0.72, 0.69, 0.66, 0.64, 0.61],
+          "60":  [1.25, 1.13, 1.04, 0.97, 0.91, 0.86, 0.82, 0.78, 0.74, 0.71, 0.68, 0.65, 0.63],
+          "100": [1.27, 1.14, 1.05, 0.98, 0.92, 0.87, 0.83, 0.79, 0.75, 0.72, 0.69, 0.67, 0.64],
+          "140": [1.28, 1.16, 1.07, 0.99, 0.94, 0.88, 0.84, 0.80, 0.76, 0.73, 0.70, 0.67, 0.65],
+          "180": [1.29, 1.17, 1.08, 1.00, 0.94, 0.89, 0.85, 0.81, 0.77, 0.74, 0.71, 0.68, 0.66]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "667 Kauffälle, Standardabweichung durchgehend ±0,13. 65 Stützstellen am amtlichen Kalkulator abgefragt — fünf Bodenrichtwertkurven (20, 60, 100, 140, 180 €/m²) über den abgedruckten Sachwertbereich 100.000 bis 700.000 €. Das reichhaltigste Modell der bisherigen Ernte: der Ausschuss korrigiert über DREI Merkmale.",
+        "normobjekt": "Standardstufe 2,5 · Verhältnis Bruttogrundfläche zu Wohnfläche 2,0 · Lage Nordkreis (Altkreis Soltau) — die Vorgaben des Kalkulators; dort stehen alle drei Umrechnungskurven auf 1,00. Stichprobe: vorläufiger Sachwert 101.000 bis 756.000 € (Median 279.000), Bodenrichtwert 15 bis 190 €/m² (Median 80), Standardstufe 1,5 bis 4,1 (Median 2,3), BGF/Wohnfläche 1,05 bis 4,0 (Median 2,15), Baujahr 1779 bis 2021 (Median 1971), Wohnfläche 59 bis 300 m², Grundstücksfläche 223 bis 16.660 m²."
+      },
+      "korrekturen": [
+        {
+          "bez": "Abweichende Standardstufe",
+          "feld": "standardstufe",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "1.5": 0.76,
+            "2.0": 0.90,
+            "2.5": 1.0,
+            "3.0": 1.09,
+            "3.5": 1.15,
+            "4.0": 1.20
+          },
+          "rundung_stellen": 2,
+          "hinweis": "Die stärkste Korrektur dieses Modells: zwischen Standardstufe 1,5 und 4,0 liegen 58 Prozent. Normstelle 2,5."
+        },
+        {
+          "bez": "Abweichendes Verhältnis Bruttogrundfläche zu Wohnfläche",
+          "feld": "bgf_wfl",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "1.2": 1.05, "1.4": 1.03, "1.6": 1.02, "1.8": 1.01, "2.0": 1.0,
+            "2.2": 0.99, "2.4": 0.99, "2.6": 0.98, "2.8": 0.97, "3.0": 0.97,
+            "3.2": 0.96, "3.4": 0.95, "3.6": 0.95, "3.8": 0.94, "4.0": 0.94
+          },
+          "rundung_stellen": 2,
+          "hinweis": "Normstelle 2,0, Spanne elf Prozent. Das Feld `bgf_wfl` ist ein VERHÄLTNIS und wird nirgends erhoben; die Korrektur greift erst, wenn der Aufrufer den Quotienten aus Bruttogrundfläche und Wohnfläche mitgibt. Ohne die Angabe rechnet das Modell am Normobjekt — so, wie es der Kalkulator selbst vorgibt."
+        },
+        {
+          "bez": "Lage im Landkreis",
+          "feld": "ort",
+          "art": "kategorial",
+          "wirkung": "multiplikativ",
+          "werte": {
+            "soltau": 1.0,
+            "schneverdingen": 1.0,
+            "munster": 1.0,
+            "neuenkirchen": 1.0,
+            "wietzendorf": 1.0,
+            "bispingen": 1.0,
+            "fallingbostel": 0.97,
+            "bad fallingbostel": 0.97,
+            "walsrode": 0.97,
+            "bomlitz": 0.97,
+            "rethem": 0.97,
+            "rethem (aller)": 0.97,
+            "ahlden": 0.97,
+            "hodenhagen": 0.97,
+            "schwarmstedt": 0.97,
+            "buchholz (aller)": 0.97,
+            "essel": 0.97,
+            "gilten": 0.97,
+            "lindwedel": 0.97
+          },
+          "rundung_stellen": 2,
+          "hinweis": "Der Ausschuss unterscheidet Nordkreis (Altkreis Soltau, Faktor 1,00) und Südkreis (Altkreis Fallingbostel, 0,97). Die Zuordnung der Gemeinden zu den beiden ALTKREISEN steht nicht im Dashboard — sie ist hier nach dem historischen Gebietsstand des Landkreises Soltau-Fallingbostel eingetragen. Ist der Ort nicht zuzuordnen, gilt der Nordkreis; das ist die Vorgabe des Kalkulators und mit drei Prozent der kleinere der beiden Werte nicht der springende Punkt dieses Modells."
+        }
+      ],
+      "beleg": "Kalkulator 2026_sw_efh_sulverhk des Gutachterausschusses Sulingen-Verden fuer den Landkreis Heidekreis, Wertermittlungsstichtag 01.01.2026, 667 Kauffaelle. 65 Stuetzstellen am Kalkulator abgefragt (fuenf Bodenrichtwertkurven mal dreizehn Sachwerte), dazu die drei abgedruckten Korrekturdiagramme.",
+      "stufe": "A",
+      "stufe_grund": "Die Hauptwerte stammen aus dem amtlichen Kalkulator des Ausschusses selbst; die drei Korrekturkurven sind im Dashboard mit Zahlen beschriftet und zeichengleich uebernommen.",
+      "fallzahl": 667
+    }
+  ]
+}
