@@ -3893,7 +3893,23 @@ entfällt — nicht raten.
 
 ## MARKTBERICHT / ERNTE — Workstream (D)  ·  eingebaut 13.09.2026
 
+> **STAND 14.09.2026 — ACHT BUNDESLAENDER, 73 SACHWERTFAKTOREN** (bis v1110b,
+> Commit `a9ae48f`). Brandenburg vollstaendig (31 Saetze, 16 Ausschuesse,
+> beide Teilmaerkte), Sachsen-Anhalt begonnen (Halle **Stufe A**, Magdeburg).
+>
+> **Der Quellennachweis steht im Bericht** (A2 erledigt) und der Quellenlink
+> jetzt auch beim Sachwertfaktor.
+>
+> **Naechster Block, klar umrissen:** die vier restlichen Regionen
+> Sachsen-Anhalts. Die Regionstypen-Zuordnung liegt gemeindescharf vor und
+> endet mit dem Satz, der die Restkategorie rechtfertigt: „Alle nicht
+> genannten Gemeinden, Ortsteile oder Gemarkungen wurden dem Regionstyp
+> Doerfer zugeordnet." Ein Teil der Blaetter ist mit „Print To PDF" erzeugt
+> und traegt die Gleichung nicht im Textstrom - dort fuehrt der Weg ueber
+> Normobjekt und Umrechnungskoeffizienten.
+
 > **STAND 13.09.2026 ABEND — BRANDENBURG IST FERTIG GEERNTET** (v1101-v1105,
+
 > Commit `6bffa25`). Register auf Staging: **2.182 Saetze · 55
 > Sachwertfaktoren**, davon Brandenburg **16 aus 15 Ausschuessen**. Alle 15
 > Brandenburger Zustaendigkeitsschluessel tragen einen Faktor. Nicht
