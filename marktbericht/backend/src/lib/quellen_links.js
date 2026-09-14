@@ -69,11 +69,18 @@ export const LAND_QUELLEN = {
      steht als PDF frei zum Abruf. Wichtiger noch ist die zweite Zeile: der
      Herausgeber hat seine eigenen Sachwertfaktoren nachträglich
      eingeschränkt, und wer nur die Haupttabelle liest, erfährt es nicht. */
+  /* v1401 · Hier stand `zugang: 'kostenfrei'`. Gemessen am 14.09.2026 ist
+     das falsch: der Landesgrundstücksmarktbericht kostet 150 Euro als PDF
+     (200 gedruckt, 300 kombiniert). Kostenfrei ist NUR ein Auszug der
+     Kapitel 1 bis 3 — und der endet auf Seite 105, während die
+     Sachwertfaktoren in Kapitel 4.2 ab Seite 114 stehen. Ein Zugang, der
+     als kostenfrei geführt wird und es nicht ist, schickt den Nutzer
+     zweimal los. */
   '07': { land: 'Rheinland-Pfalz',
           stelle: 'Oberer Gutachterausschuss für Grundstückswerte Rheinland-Pfalz',
           url: 'https://gutachterausschuesse.rlp.de/marktdaten/landesgrundstuecksmarktbericht-rheinland-pfalz-lgmb',
-          zugang: 'kostenfrei',
-          hinweis: 'Der Landesgrundstücksmarktbericht führt Sachwertfaktoren und Liegenschaftszinssätze; daneben erscheinen eigene Berichte für Kaiserslautern, Koblenz, Ludwigshafen, Mainz, Trier und Worms. WICHTIG: der Ausschuss hat am 30.04.2025 selbst nachgeschoben, dass die für MARKTSEGMENT 1 veröffentlichten Sachwertfaktoren für Ein- und Zweifamilienhäuser „als etwas zu hoch anzusehen sind und in der praktischen Anwendung niedriger angesetzt werden sollten" — der Hinweis steht als eigenes Blatt neben dem Bericht.' },
+          zugang: 'kostenpflichtig',
+          hinweis: 'Rheinland-Pfalz führt seine Sachwertfaktoren ZENTRAL im Landesgrundstücksmarktbericht (LGMB), nicht bei den örtlichen Ausschüssen — Koblenz etwa veröffentlicht gar keinen eigenen Bericht mehr und verweist ausdrücklich auf den Landesbericht. Der LGMB 2025 kostet 150 Euro als PDF, 200 gedruckt, 300 kombiniert (LVermGeo-GeoShop); Käufer erhalten zusätzlich einen webgestützten Immobilienrechner und Vergleichsfaktorenlisten. Kostenfrei abrufbar ist nur ein Auszug der Kapitel 1 bis 3: er hat 105 Seiten, die Sachwertfaktoren beginnen in Kapitel 4.2 auf Seite 114. Der Auszug ist trotzdem wertvoll — er enthält das vollständige Inhaltsverzeichnis. Danach führt der Bericht Sachwertfaktoren getrennt für Ein-/Zweifamilienhäuser (4.2.2, S. 116), Wohnungseigentum (4.2.3, S. 127), Mehrfamilienhäuser (4.2.4, S. 136), Wohn- und Geschäftshäuser (4.2.5, S. 143) und Wirtschaftsimmobilien (4.2.6, S. 148), dazu Liegenschaftszinssätze ab Kapitel 4.3 (S. 156). EIGENE Berichte gibt es nur für Kaiserslautern, Koblenz, Ludwigshafen, Mainz, Trier und Worms, und sie sind bei den Städten selbst zu beziehen — allein der Mainzer Bericht ist kostenfrei von der Stadtseite zu laden (und im Register, Stufe A). WICHTIG ZUR ANWENDUNG: der Ausschuss hat am 30.04.2025 selbst nachgeschoben, dass die für MARKTSEGMENT 1 veröffentlichten Sachwertfaktoren für Ein- und Zweifamilienhäuser „als etwas zu hoch anzusehen sind und in der praktischen Anwendung niedriger angesetzt werden sollten" — der Hinweis steht als eigenes Blatt neben dem Bericht. ZUR LIZENZ: das Impressum sagt wörtlich „Vervielfältigung dieses Marktberichtes ist nur mit Erlaubnis des Herausgebers gestattet … Eine Wiedergabe von Daten jedweder Art ist nur mit Quellenangabe gestattet." Der zweite Satz geht weniger weit als der erste; ob einzelne Zahlen mit Quellenvermerk übernommen werden dürfen, ist deshalb zu klären, bevor sie in einen Kundenbericht gehen.' },
   '08': { land: 'Baden-Württemberg',
           stelle: 'Gutachterausschüsse in Baden-Württemberg',
           url: 'https://www.gutachterausschuesse-bw.de/',

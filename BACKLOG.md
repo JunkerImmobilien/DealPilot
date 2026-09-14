@@ -4990,7 +4990,86 @@ Vollständiger Ablauf: Block 04, Abschnitt „Wie die Ernte abläuft".
 | **F2** | **Vier bis sechs Mails.** Oberer GAA NRW (Text liegt seit 11.08. fertig im Projekt — die Berichte sind kostenfrei und Zero 2.0, **gesperrt ist nur der Verteilweg**) · LGLN Niedersachsen `oga@lgln.niedersachsen.de` · LVermGeoSH · LVermGeo Sachsen-Anhalt · Vogtlandkreis oder Tübingen · München | LGLN öffnet 9 Ausschüsse, LVermGeoSH **alle 15** |
 | **F3** | **Sechs PDF im Browser laden und anhängen** | siehe Tabelle unten |
 | **F4** | **Drei einzelne Seiten:** Hamm (S. 64/65), Krefeld (S. 66), Kreis Unna (Kap. 8.1) | drei NRW-Sachwertfaktoren, Tabellen sind geerntet und geprüft |
-| **F5** | **Entscheidung: RLP-Landesbericht kaufen?** Erst **nach** der Lizenzklärung — der Bericht trägt „Vervielfältigung nur mit Erlaubnis". Preis unbestätigt (150 € gegen 28 €) | ein Bundesland |
+| **F5** | **Entscheidung: RLP-Landesbericht kaufen?** ✅ **Preis bestätigt 14.09.2026: 150 € PDF** (200 Druck, 300 kombiniert, LVermGeo-GeoShop) — die frühere Spanne „150 gegen 28" ist damit erledigt. Inhalt am Verzeichnis belegt: **fünf** Objektarten-Gruppen Sachwertfaktoren (4.2.2 bis 4.2.6) **plus** Liegenschaftszinssätze (4.3). Offen bleibt **nur** die Lizenz: „Vervielfältigung nur mit Erlaubnis", aber „Wiedergabe von Daten jedweder Art … mit Quellenangabe gestattet" — zwei Sätze, die verschieden weit gehen. Einzelheiten unter **F5** weiter unten | **ein Bundesland, 4,1 Mio Einwohner, beide Kennzahlen** |
+
+#### F5 · KAUFENTSCHEIDUNG: Landesgrundstücksmarktbericht RLP, 150 € **[NEU 14.09.2026]**
+
+**Das ist die klarste Kaufvorlage, die die Ernte bisher hervorgebracht hat** —
+und das Gegenstück zur Bayern-Empfehlung („nicht kaufen").
+
+##### Was drinsteht, gemessen am Inhaltsverzeichnis
+
+Der kostenfreie Auszug (Kapitel 1–3, 105 Seiten) **enthält das vollständige
+Inhaltsverzeichnis** — damit ist belegbar, was der Vollbericht führt, ohne ihn
+zu haben:
+
+| Kapitel | Inhalt | Seite |
+|---|---|---:|
+| 4.2.2 | Sachwertfaktoren Ein-/Zweifamilienhäuser | 116 |
+| 4.2.3 | Sachwertfaktoren Wohnungseigentum | 127 |
+| 4.2.4 | Sachwertfaktoren Mehrfamilienhäuser | 136 |
+| 4.2.5 | Sachwertfaktoren Wohn-/Geschäftshäuser | 143 |
+| 4.2.6 | Sachwertfaktoren Wirtschaftsimmobilien | 148 |
+| 4.3 | Liegenschaftszinssätze (ab 4.3.2 EFH/ZFH S. 158) | 156 |
+
+**Fünf Objektarten-Gruppen plus Liegenschaftszinssätze, landesweit** — beide
+Kennzahlen der Ernte in einem Dokument.
+
+##### Warum das anders liegt als Bayern
+
+| | Bayern | Rheinland-Pfalz |
+|---|---|---|
+| Preis | ~800 € für 13 Einzelberichte | **150 €**, ein Dokument |
+| Struktur | dezentral, je Ausschuss | **zentral**, Land führt selbst |
+| Einwohner | 13,2 Mio (Teilabdeckung) | **4,1 Mio, vollständig** |
+| Zusatz | — | webgestützter Immobilienrechner + Vergleichsfaktorenlisten |
+| Empfehlung | **nicht kaufen** | **kaufen — nach Lizenzklärung** |
+
+Bezug: LVermGeo-GeoShop, 150 € als PDF (200 gedruckt, 300 kombiniert),
+umsatzsteuerfrei, Versand per E-Mail.
+
+##### Die Lizenz — und warum sie zu klären ist, nicht zu vermuten
+
+Das Impressum sagt **wörtlich**:
+
+> „Vervielfältigung dieses Marktberichtes ist nur mit Erlaubnis des
+> Herausgebers gestattet. Als Vervielfältigungen gelten z. B. Nachdruck,
+> Fotokopien, Mikroverfilmung, Digitalisieren, Scannen sowie Speicherung auf
+> Datenträgern. **Eine Wiedergabe von Daten jedweder Art ist nur mit
+> Quellenangabe gestattet.**"
+
+**Zwei Sätze, die verschieden weit gehen.** Der erste verbietet die
+Vervielfältigung des *Berichtes* — der zweite erlaubt die Wiedergabe von
+*Daten* mit Quellenangabe. Unser Register führt den Quellenvermerk ohnehin je
+Datensatz (`quellenvermerk`).
+
+**Das ist eine Rechtsfrage, keine technische.** Sie gehört vor dem Kauf
+geklärt, am besten durch eine kurze Anfrage beim Oberen Gutachterausschuss —
+dieselbe Mail, die ohnehin für NRW, LGLN und LVermGeoSH offen ist (F2). Eine
+Antwort deckt dann Kauf und Verwendung.
+
+##### Was ohne Kauf gilt
+
+Der kostenfreie Weg in Rheinland-Pfalz **endet bei Mainz** (im Register,
+Stufe A). Gemessen:
+
+- **Koblenz veröffentlicht keinen eigenen Bericht mehr** und verweist
+  ausdrücklich auf den Landesbericht.
+- Die sechs Bereichsausschüsse (Osteifel-Hunsrück, Rheinhessen-Nahe,
+  Rheinpfalz, Westeifel-Mosel, Westerwald-Taunus, Westpfalz) stellen auf der
+  Landesseite **nichts** bereit — dort steht „Zur Zeit liegen keine weiteren
+  Informationen vor".
+- Eigene Berichte gibt es nur für Kaiserslautern, Koblenz, Ludwigshafen,
+  Mainz, Trier und Worms, zu beziehen **bei den Städten selbst**; über den
+  GeoShop laufen sie nicht.
+
+##### Nebenbefund: ein Zugang, der falsch ausgewiesen war
+
+`LAND_QUELLEN['07']` führte `zugang: 'kostenfrei'`. Das stimmte nicht — und
+ein Zugang, der als kostenfrei geführt wird und es nicht ist, schickt den
+Nutzer zweimal los. Korrigiert auf `kostenpflichtig`, mit dem vollständigen
+Weg im Hinweis.
+
 
 **Die sechs PDF (F3), alle frei, Lizenz geprüft, Seitenzahl gemessen:**
 
