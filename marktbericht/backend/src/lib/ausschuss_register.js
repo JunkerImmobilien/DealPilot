@@ -135,7 +135,12 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                             /* v1100: Brandenburg - Potsdam (zwei Konstanten) und
                                Oberhavel (Matrix nach Region PLUS BGF-Korrektur je
                                Region, beide laut Bericht gleichzeitig anzuwenden). */
-                            'swf-bb.json'];
+                            'swf-bb.json',
+                            /* v1110: Sachsen-Anhalt. Der Gutachterausschuss dort
+                               fuehrt keine Tabellen, sondern multiple
+                               Regressionsfunktionen - je Region und
+                               Baujahresklasse eine eigene. */
+                            'swf-st.json'];
 
 export function ladeSaat(dateien = SAATDATEIEN) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])

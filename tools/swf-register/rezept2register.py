@@ -100,7 +100,10 @@ ERLAUBT = {
                   'kategorie_baender','zuordnung_feld','kategorie_zuordnung','kategorie_sonst','kategorie_mehrdeutig',
                   'modell_je_kategorie','rundung_stellen','liefert','hinweis',
                   'normobjekt'},
-    'regression_additiv': {'form','basis','glieder','rundung_stellen','liefert',
+    # v1110: die Schluessel hier stimmten NIE mit dem Auswerter ueberein
+    # (basis/glieder gegen intercept/terme) - die Form war nie benutzt worden.
+    'regression_additiv': {'form','intercept','terme','diskret','aussen_exponent',
+                           'rundung_stellen','liefert',
                            'hinweis','normobjekt'},
 }
 

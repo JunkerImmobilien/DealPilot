@@ -16,27 +16,27 @@
    "interpolation": "keine — kategoriale Nachschlagetabelle",
    "stufen_hinweis": "Ergebnis in PROZENT (3,0 bedeutet 3,0 %), nicht als Dezimalbruch. Das Dokument rundet die Zinssätze ausdrücklich auf halbe Prozentpunkte und ermittelt sie sachverständig — Wortlaut: „Auf halbe Prozentpunkte gerundet, sachverständig ermittelt“. Zwischenwerte gibt es damit nicht; eine Interpolation wäre Dokumentbruch.",
    "stufen": {
-    "Stendal": 3.0,
-    "Wernigerode": 3.0,
+    "Stendal": 3,
+    "Wernigerode": 3,
     "Merseburg": 3.5,
     "Quedlinburg": 3.5,
     "Naumburg": 3.5,
     "Wittenberg": 3.5,
     "Schönbeck": 3.5,
-    "Dessau": 4.0,
-    "Weißenfels": 4.0,
-    "Salzwedel": 4.0,
-    "Haldensleben": 4.0,
-    "Eisleben": 4.0,
+    "Dessau": 4,
+    "Weißenfels": 4,
+    "Salzwedel": 4,
+    "Haldensleben": 4,
+    "Eisleben": 4,
     "Bernburg": 4.5,
     "Halberstadt": 4.5,
     "Burg": 4.5,
     "Aschersleben": 4.5,
-    "Zeitz": 5.0,
-    "Oschersleben": 5.0,
+    "Zeitz": 5,
+    "Oschersleben": 5,
     "Bitterfeld-Wolfen": 5.5,
     "Köthen": 5.5,
-    "Zerbst": 6.0,
+    "Zerbst": 6,
     "Staßfurt": 6.5
    },
    "stufen_fallzahl": {
@@ -68,7 +68,7 @@
    },
    "strittig": {
     "Sangerhausen": {
-     "wert": 4.0,
+     "wert": 4,
      "fallzahl": 0,
      "grund": "Lesedurchgang 1 führt Sangerhausen als eigene Zeile im 4,0-%-Block, mit „–“ in allen Datenspalten und der Fußnote „Sangerhausen wurde sachverständig zugeordnet“. Lesedurchgang 2 zählt 22 Ortszeilen und führt Sangerhausen NICHT. Die beiden Läufe widersprechen sich. Sangerhausen ist deshalb NICHT in stufen aufgenommen — kein Treffer heißt kein Wert.",
      "aufloesung": "Am Dokument nachzusehen. Träfe Lesedurchgang 1 zu, wäre der Wert ohnehin sachverständig zugeordnet und nicht aus Kauffällen abgeleitet — also von schwächerer Qualität als die übrigen 22."
@@ -127,7 +127,7 @@
     "mittelzentren": {
      "liegenschaftszinssatz_prozent": [
       0.5,
-      9.0
+      9
      ],
      "baujahr": [
       1750,
@@ -188,7 +188,7 @@
       6.92
      ],
      "bewirtschaftungskosten_prozent": [
-      8.0,
+      8,
       59.4
      ]
     },
@@ -236,12 +236,12 @@
      "wohneinheiten": 6,
      "bodenrichtwert_eur_m2": 60,
      "nettokaltmiete_eur_m2_monat": 5.53,
-     "bewirtschaftungskosten_prozent": 31.0,
+     "bewirtschaftungskosten_prozent": 31,
      "denkmalschutz_anteil_prozent": 14,
      "lzs_prozent": 4.1,
      "lzs_standardabweichung_pp": 1.6,
      "lzs_median": 3.9,
-     "lzs_q1": 3.0,
+     "lzs_q1": 3,
      "lzs_q3": 4.9,
      "rohertragsfaktor": 12.8,
      "rohertragsfaktor_standardabweichung": 3.1,
@@ -261,7 +261,7 @@
      "lzs_standardabweichung_pp": 1.6,
      "lzs_median": 4.9,
      "lzs_q1": 3.6,
-     "lzs_q3": 6.0,
+     "lzs_q3": 6,
      "rohertragsfaktor": 11.1,
      "rohertragsfaktor_standardabweichung": 2.7,
      "rohertragsfaktor_median": 10.9
@@ -307,7 +307,7 @@
     "soll_eckwerte": [
      {
       "ort": "Stendal",
-      "wert": 3.0,
+      "wert": 3,
       "fallzahl": 22
      },
      {
@@ -317,7 +317,7 @@
      },
      {
       "ort": "Dessau",
-      "wert": 4.0,
+      "wert": 4,
       "fallzahl": 9
      }
     ],
@@ -344,215 +344,6 @@
   "quellenvermerk": null,
   "lizenz": null,
   "fundstelle": "Datenblatt „Liegenschaftszinssätze und Rohertragsfaktoren“, Abschnitte I Mittelzentren und Oberzentrum Dessau, II Grundzentren, III Dörfer"
- },
- {
-  "land_code": "ST",
-  "ags": "15002000",
-  "ebene": "gemeinde",
-  "gebiet_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
-  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
-  "kennzahl": "sachwertfaktor",
-  "zweig": "efh",
-  "formel": {
-   "form": "regression_additiv",
-   "liefert": "faktor",
-   "wortlaut": "Sachwertfaktor = + 0,79821318 + 10.800,16031602 x vorläufiger Sachwert ^ -0,81 € + 0,00096848 x Bodenrichtwert €/m² - 1,63874939 x Gebäudestandard ^ -1,88 - 0,06348555 x Gemarkung diskret",
-   "wortlaut_hinweis": "Dieser Formeltext wurde in ZWEI voneinander unabhängigen Leseläufen zeichengleich erhoben — identische Vorzeichen, identische Nachkommastellen, identische Exponenten. Das ist genau die Prüfung, die beim Berliner Sachwertfaktor einen abgeschnittenen Term gefangen hat.",
-   "intercept": 0.79821318,
-   "terme": [
-    {
-     "feld": "sachwert",
-     "bez": "vorläufiger Sachwert des Grundstücks in Euro",
-     "art": "potenz",
-     "koeffizient": 10800.16031602,
-     "exponent": -0.81
-    },
-    {
-     "feld": "brw",
-     "bez": "Bodenrichtwert in Euro/m²",
-     "art": "linear",
-     "koeffizient": 0.00096848
-    },
-    {
-     "feld": "gebaeudestandard",
-     "bez": "gewogener Gebäudestandard (Standardstufe, Zwischenwerte zulässig)",
-     "art": "potenz",
-     "koeffizient": -1.63874939,
-     "exponent": -1.88
-    },
-    {
-     "feld": "gemarkung",
-     "bez": "Gemarkungsgruppe als diskrete Kennziffer",
-     "art": "linear_diskret",
-     "koeffizient": -0.06348555,
-     "auspraegungen": {
-      "HAL West": 1.0,
-      "HAL Ost": 2.0
-     },
-     "auspraegungen_hinweis": "Die Gemarkungsgruppe geht als ZAHL in die Formel ein (1 oder 2), nicht als Dummy. Welche Gemarkungen Halles zu „HAL West“ und welche zu „HAL Ost“ gehören, sagt das Dokument in den gelesenen Abschnitten NICHT — siehe _fehlend.md. Ohne diese Zuordnung ist das Modell nicht anwendbar."
-    }
-   ],
-   "rundung_stellen": 2
-  },
-  "korrekturen": [],
-  "modellansaetze": {
-   "hinweis": "Das Dokument benennt Kaufpreisbereinigungen, aber KEINE NHK-Fassung, KEINE Gesamtnutzungsdauer, KEIN Alterswertminderungsmodell, KEINEN Außenanlagenansatz und KEINEN Regionalfaktor (drei Leseläufe). Für die Modelltreue nach § 10 ImmoWertV ist das eine offene Stelle — siehe _fehlend.md.",
-   "nhk": null,
-   "gnd_jahre": null,
-   "alterswertminderung": null,
-   "aussenanlagen": null,
-   "regionalfaktor": null,
-   "kaufpreisbereinigungen": "Kamin 2.000 € · Wintergarten 1.000 €/m² · Photovoltaikanlage 150 €/m² · ab der 3. Garage pauschal 2.000 € · Einbauküchen. Diese Beträge wurden aus den Kaufpreisen herausgerechnet — wer mit diesem Sachwertfaktor rechnet, muss dieselben Bestandteile im vorläufigen Sachwert gleich behandeln.",
-   "verfahren": "multiple nichtlineare Regression auf dem Kaufpreismaterial der Stadt Halle (Saale)"
-  },
-  "geltungsbereich": {
-   "extrapolation": "verboten",
-   "hinweis": "Der Anwendungsbereich ist durch die Spannen der Stichprobe begrenzt. Außerhalb wird ausgewiesen, nicht gerechnet. Der Datensatz gilt ausschließlich für freistehende Ein- und Zweifamilienhäuser der Stadt Halle (Saale) mit Baujahr ab 1991.",
-   "spannen": {
-    "vorlaeufiger_sachwert_eur": [
-     292000,
-     660000
-    ],
-    "bodenrichtwert_eur_m2": [
-     105,
-     320
-    ],
-    "gebaeudestandard": [
-     2.6,
-     4.0
-    ]
-   },
-   "spannen_hinweis": "Die Koeffiziententabelle des Bodenrichtwerts beginnt bei 110 €/m², die Anwendungsspanne bei 105 €/m² — die Differenz ist abgedruckt und wurde nicht geglättet.",
-   "umrechnungskoeffizienten_dokumentation": {
-    "hinweis": "Der Bericht druckt neben der Schaetzfunktion eine Tabelle der Umrechnungskoeffizienten ab. Sie BESCHREIBT die Wirkung der Terme derselben Gleichung — sie ist kein zusaetzlicher Zuschlag. Additiv angewandt haette sie den Faktor verdoppelt (1,10 wurde zu 2,02). Sie dient der Gegenrechnung, nicht der Rechnung.",
-    "tabellen": [
-     {
-      "bez": "Umrechnungskoeffizient Bodenrichtwert",
-      "feld": "brw",
-      "art": "stufen",
-      "einheit": "faktor_multiplikativ",
-      "stufen": {
-       "110": 0.92,
-       "120": 0.92,
-       "130": 0.93,
-       "140": 0.94,
-       "150": 0.95,
-       "160": 0.96,
-       "170": 0.97,
-       "180": 0.98,
-       "190": 0.99,
-       "200": 1.0,
-       "210": 1.0,
-       "220": 1.01,
-       "230": 1.02,
-       "240": 1.03,
-       "250": 1.04,
-       "260": 1.05,
-       "270": 1.06,
-       "280": 1.07,
-       "290": 1.08,
-       "300": 1.08,
-       "310": 1.09,
-       "320": 1.1
-      },
-      "rundung_stellen": 2,
-      "hinweis": "NUR DOKUMENTATION UND BELEG, NICHT das Rechenwerkzeug. Gerechnet wird über die Formel. Diese Tabelle ist der Gegenbeweis: sie wird von der Formel Zelle für Zelle reproduziert (22 von 22). Bezug ist das Normobjekt (Bodenrichtwert 205 €/m² = Koeffizient 1,00 — im Raster der Tabelle liegen 200 und 210 beide auf 1,00)."
-     },
-     {
-      "bez": "Umrechnungskoeffizient Gebäudestandard",
-      "feld": "gebaeudestandard",
-      "art": "stufen",
-      "einheit": "faktor_multiplikativ",
-      "stufen": {
-       "2.6": 0.91,
-       "2.7": 0.93,
-       "2.8": 0.94,
-       "2.9": 0.96,
-       "3.0": 0.97,
-       "3.1": 0.98,
-       "3.2": 0.99,
-       "3.3": 1.0,
-       "3.4": 1.01,
-       "3.5": 1.02,
-       "3.6": 1.02,
-       "3.7": 1.03,
-       "3.8": 1.04,
-       "3.9": 1.04,
-       "4.0": 1.05
-      },
-      "rundung_stellen": 2,
-      "hinweis": "NUR DOKUMENTATION UND BELEG. 15 von 15 Zellen von der Formel reproduziert. Bezug Gebäudestandard 3,3 = 1,00."
-     },
-     {
-      "bez": "Umrechnungskoeffizient Gemarkung",
-      "feld": "gemarkung",
-      "art": "stufen_kategorial",
-      "einheit": "faktor_multiplikativ",
-      "stufen": {
-       "HAL West": 1.0,
-       "HAL Ost": 0.94
-      },
-      "rundung_stellen": 2,
-      "hinweis": "NUR DOKUMENTATION UND BELEG. 2 von 2 Zellen von der Formel reproduziert."
-     }
-    ]
-   }
-  },
-  "belege": [
-   {
-    "art": "formel_gegen_tabelle",
-    "fundstelle": "Schätzfunktion nebst Tabelle „Umrechnungskoeffizienten zur Berücksichtigung der vom Normobjekt abweichenden Grundstücksmerkmale“",
-    "soll_zellen": 39,
-    "soll_eckwerte": [
-     {
-      "merkmal": "brw",
-      "wert": 110,
-      "koeffizient": 0.92
-     },
-     {
-      "merkmal": "brw",
-      "wert": 320,
-      "koeffizient": 1.1
-     },
-     {
-      "merkmal": "gebaeudestandard",
-      "wert": 2.6,
-      "koeffizient": 0.91
-     },
-     {
-      "merkmal": "gebaeudestandard",
-      "wert": 4.0,
-      "koeffizient": 1.05
-     },
-     {
-      "merkmal": "gemarkung",
-      "wert": "HAL Ost",
-      "koeffizient": 0.94
-     }
-    ],
-    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab (dritter Leselauf ausdrücklich darauf gerichtet). An seine Stelle tritt derselbe, stärkere Beleg wie in Berlin: das Dokument nennt neben den Koeffiziententabellen die vollständige Regressionsformel. Formel und Tabellen wurden in GETRENNTEN Leseläufen erhoben und gegeneinander gerechnet.",
-    "pruefprotokoll": "Am 13.08.2026 gerechnet. Basiswert am Normobjekt (Sachwert 380.000 €, BRW 205 €/m², Standard 3,3, Gemarkung HAL West = 1) aus der Formel: 1,08605. Jeder Tabellenkoeffizient wurde als Quotient Formelwert(Merkmal) / Basiswert gerechnet und auf zwei Stellen gerundet. ZÄHLPRÖBE: 22 + 15 + 2 = 39 Zellen, keine leere Zelle, Schrittweite BRW durchgehend 10 €/m², Gebäudestandard durchgehend 0,1. ZELLPRÜFUNG: 39 von 39 Zellen getroffen, NULL Abweichungen — Bodenrichtwert 22/22, Gebäudestandard 15/15, Gemarkung 2/2. MONOTONIE: der Bodenrichtwert-Koeffizient steigt über die ganze Tabelle monoton von 0,92 auf 1,10, der Standard-Koeffizient monoton von 0,91 auf 1,05; die beiden Plateaus (120/110 und 210/200 bzw. 3,5/3,6 und 3,8/3,9) sind Rundungsplateaus und werden von der Formel exakt so erzeugt. WERTEBEREICH: Sachwertfaktor an den Enden der Sachwertspanne 1,1637 (292.000 €) bis 0,9683 (660.000 €), fallend — richtungsgleich mit allen übrigen uns bekannten Sachwertfaktormodellen.",
-    "negativtest": "Der Maßstab war die Berliner Lehre: eine Formel, die die abgedruckte Tabelle nicht reproduziert, ist unvollständig gelesen. Hier reproduziert sie alle 39 Zellen exakt — hätte ein Term gefehlt oder wäre ein Exponent falsch gelesen worden, wäre die Quotientenprobe sofort auseinandergelaufen, weil die vier Terme unterschiedlich stark auf den Basiswert wirken. Zugleich zeigt derselbe Test, was die Tabelle NICHT belegt: der vorläufige Sachwert hat KEINE Koeffiziententabelle, seine Wirkung ist also nur über die Formel und nicht über ein abgedrucktes Raster geprüft."
-   }
-  ],
-  "vollstaendig": true,
-  "unvollstaendig_grund": null,
-  "objektart": "efh",
-  "baujahr_von": 1991,
-  "baujahr_bis": null,
-  "auswerter_vorhanden": true,
-  "stufe": "A",
-  "stufe_grund": null,
-  "fallzahl": 31,
-  "streuung": null,
-  "stichtag": "2024-01-01",
-  "berichtsjahr": 2024,
-  "modellversion": "GMB 2024",
-  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/455443,501/sachwertfaktor_ezh_hal_ab_1991.pdf",
-  "quelle_parser": "v1084-WREZ",
-  "quellenvermerk": null,
-  "lizenz": null,
-  "fundstelle": "„Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser“, Schätzfunktion nebst Normobjekt und den drei Umrechnungskoeffiziententabellen"
  },
  {
   "land_code": "TH",
@@ -605,7 +396,7 @@
      },
      {
       "kennzahl": "rohertragsfaktor",
-      "wert": 23.0
+      "wert": 23
      },
      {
       "kennzahl": "rohertragsfaktor_standardabweichung",
@@ -1522,7 +1313,7 @@
     "150000": 2.13,
     "160000": 2.08,
     "170000": 2.04,
-    "180000": 2.0,
+    "180000": 2,
     "190000": 1.97,
     "200000": 1.94,
     "210000": 1.91,

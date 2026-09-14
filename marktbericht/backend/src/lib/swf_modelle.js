@@ -392,16 +392,69 @@ function regressionAdditiv(m, e) {
    * Standardfall der Gleichung, nicht ein uebersehener Term. */
   for (const dz of (m.diskret || [])) {
     const v = String(e[dz.feld] ?? '').toLowerCase().trim();
-    if (!v) continue;
+    /* v1110-WPFL - MANCHE DISKRETEN MERKMALE SIND PFLICHT.
+       Halle (Saale) fuehrt fuer Baujahre ab 1991 den Term
+       "- 0,06348555 x Gemarkung" MITTEN in der Regressionsgleichung; die
+       Gemarkung ist dort in zwei Gruppen eingeteilt (West = 1, Ost = 2).
+       Ihn zu ueberspringen hiesse, mit einer anderen Gleichung zu rechnen
+       als der Ausschuss - und das faellt niemandem auf, weil das Ergebnis
+       im Band bleibt.
+
+       Ein diskreter Zuschlag OHNE `pflicht` bleibt dagegen, was er war:
+       fehlt die Auspraegung, gilt kein Zuschlag. Das ist bei einem
+       Zuschlag der ausdrueckliche Standardfall, bei einem Glied der
+       Gleichung nicht. */
+    if (!v) {
+      if (dz.pflicht) {
+        return nichts('feld_fehlt',
+          `${dz.bez || dz.feld} ist nicht erfasst. Die Gleichung fuehrt `
+          + 'dieses Merkmal als eigenes Glied; ohne den Wert waere es eine '
+          + 'andere Gleichung.');
+      }
+      continue;
+    }
     const w = zahl((dz.werte || {})[v]);
-    if (w === null) continue;
+    if (w === null) {
+      if (dz.pflicht) {
+        return nichts('auspraegung_unbekannt',
+          `Fuer "${v}" fuehrt der Bericht keinen Wert des Merkmals `
+          + `${dz.bez || dz.feld}.`);
+      }
+      continue;
+    }
     summe += w;
     teile.push(`${w >= 0 ? '+' : '−'} ${Math.abs(w).toFixed(4)} (${dz.bez || dz.feld})`);
   }
 
+  /* v1110-WAEXP - EIN EXPONENT AUF DER GANZEN SUMME.
+     Halle (Saale) druckt fuer Baujahre vor 1991 ab:
+
+       SWF = ( 4,1081 - 27,7358 * vSW^-0,29 - 0,0139 * BRW^0,5
+               + 1,4482 * WF^-0,29 - 2,2382 * GStd^0,15 ) ^ -1,32
+
+     Die Klammer ist keine Schreibweise, sondern Teil des Modells: ohne
+     den aeusseren Exponenten kaeme statt 1,05 ein negativer Wert heraus.
+     Ein Modell halb zu rechnen ist schlimmer, als es gar nicht zu fuehren. */
+  let ergebnis = summe;
+  const aexp = zahl(m.aussen_exponent);
+  if (aexp !== null && aexp !== 1) {
+    if (summe <= 0 && !Number.isInteger(aexp)) {
+      return nichts('term_unbestimmt',
+        `Die Klammersumme ist ${summe.toFixed(4)}; mit dem Exponenten `
+        + `${aexp} ergibt das keinen reellen Wert. Das Objekt liegt damit `
+        + 'ausserhalb dessen, was die Gleichung abbildet.');
+    }
+    ergebnis = Math.pow(summe, aexp);
+    teile.push(`= (${summe.toFixed(4)}) ^${aexp}`);
+    if (!Number.isFinite(ergebnis)) {
+      return nichts('term_unbestimmt',
+        'Die Gleichung ergibt fuer dieses Objekt keinen endlichen Wert.');
+    }
+  }
+
   const st = m.rundung_stellen ?? 2;
   const p = Math.pow(10, st);
-  const wert = Math.round(summe * p) / p;
+  const wert = Math.round(ergebnis * p) / p;
   return { verfuegbar: true, wert, tabellenwert: wert, korrekturen: [],
            rechenweg_terme: teile };
 }
