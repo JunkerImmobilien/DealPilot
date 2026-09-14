@@ -127,11 +127,14 @@ router.get('/boris', async (req, res) => {
   const lon = parseFloat(req.query.lon);
   const year = req.query.year ? parseInt(req.query.year, 10) : undefined;
   const manualBrw = req.query.brw != null ? req.query.brw : undefined;
+  /* v1388-WLAND: optionales Bundeslandkuerzel. Ohne Angabe verhaelt sich
+     der Endpunkt exakt wie bisher - der Marktbericht schickt es nicht. */
+  const land = req.query.land ? String(req.query.land).toUpperCase() : undefined;
   if (isNaN(lat) || isNaN(lon)) {
     return res.status(400).json({ error: 'lat und lon erforderlich, z.B. /boris?lat=52.3186&lon=8.671' });
   }
   try {
-    const result = await BorisConnector.landValue({ lat, lon, year, manualBrw });
+    const result = await BorisConnector.landValue({ lat, lon, year, manualBrw, land });
     res.json(result);
   } catch (e) {
     res.status(500).json({ error: e.message });

@@ -94,6 +94,20 @@ const F = {
 // ---- Laender-Konfiguration ----------------------------------------------
 // VERIFIZIERT (Capabilities gefetcht): nrw, bb
 // VORBEREITET (Endpunkt bekannt, GetFeatureInfo-Felder beim 1. echten Call zu pruefen): be, he
+/* v1388-WLAND · Welcher Adapter gehoert zu welchem Bundesland.
+ *
+ * Die Codes sind schon die Laenderkuerzel - bis auf `nrw`, das im Rest des
+ * Systems `NW` heisst (so steht es in den Registerdatensaetzen und in
+ * grest-plz-lookup.js). Diese eine Abweichung ist der Grund, warum hier
+ * eine Tabelle steht und kein `code.toUpperCase()`.
+ *
+ * Die Catch-alls stehen BEWUSST NICHT darin: sie gehoeren zu keinem Land,
+ * und genau das unterscheidet sie. */
+const LAND_VON_CODE = {
+  nrw: 'NW', be: 'BE', bb: 'BB', he: 'HE', mv: 'MV',
+  sh: 'SH', by: 'BY', bw: 'BW', sl: 'SL',
+};
+
 const ADAPTERS = [
   {
     /* v1071-WLIZ-1 · BORIS-NRW stellt die Bodenrichtwerte unter
@@ -514,7 +528,7 @@ export const BorisRegistry = {
 
   // Hauptfunktion: { lat, lon, year, manualBrw } -> einheitliches Ergebnis.
   // manualBrw = in DealPilot eingegebener Bodenrichtwert (Feld "brw") als Fallback.
-  async landValue({ lat, lon, year, manualBrw }) {
+  async landValue({ lat, lon, year, manualBrw, land }) {
     const fallback = (reason) => {
       const mv = num(manualBrw);
       if (mv != null) {
@@ -557,14 +571,42 @@ export const BorisRegistry = {
         if (c !== claimed && c.enabled && !c.restricted && inBox(lat, lon, c.bbox)) chain.push(c);
       }
     } else if (!claimed.catchAll) {
-      /* v1082-WFBK-8 · GRENZKORREKTUR unter verifizierten Landesdiensten:
-       * die Rechteck-Boxen koennen schraege Landesgrenzen nicht abbilden
-       * (Stuttgart liegt im erweiterten Bayern-Rechteck). Liefert der
-       * verifizierte Erstadapter nichts, duerfen ANDERE verifizierte
-       * LANDESdienste mit passender Box antworten — NIE die
-       * Bundes-Catch-alls: ein leeres NRW bleibt ein Befund. */
+      /* v1388-WLAND · DAS RECHTECK IST KEINE LANDESGRENZE ════════════════
+       *
+       * Marcels Befund vom 14.09.2026: "wir haben eigentlich alle 16
+       * Bundeslaender abgedeckt und koennen ueberall die Bodenrichtwerte
+       * aufrufen. Vielleicht hast du den falschen genommen."
+       *
+       * GEMESSEN an Rinteln (Niedersachsen), lat 52.2057 / lon 9.0882:
+       *
+       *   claim()     -> BORIS-NRW      (verifiziert)
+       *   BORIS-NRW   -> nichts          richtig, es IST nicht NRW
+       *   Kette bricht ab, weil "verifiziert" keine Catch-alls zulaesst
+       *   BORIS-D     -> 80 EUR/m2       der Wert war die ganze Zeit da
+       *
+       * Die NRW-Box reicht bis maxLon 9.52 / maxLat 52.60 und verschluckt
+       * damit einen breiten Streifen Niedersachsen entlang der Weser. Fuer
+       * Niedersachsen gibt es keinen eigenen Landesdienst - es laeuft ueber
+       * BORIS-D, also ueber einen CATCH-ALL. Genau den schloss die Regel
+       * aus.
+       *
+       * DIE REGEL BLEIBT RICHTIG, nur ihre Voraussetzung fehlte: "ein
+       * leeres NRW ist ein Befund" gilt, WENN der Punkt in NRW liegt. Sagt
+       * der Aufrufer das Land (`land`), laesst sich das pruefen. Sagt er
+       * nichts, bleibt alles wie bisher - der Marktbericht schickt das Feld
+       * nicht und sieht deshalb keinen Unterschied. */
+      const claimLand = LAND_VON_CODE[claimed.code] || null;
+      const fremd = !!(land && claimLand && String(land).toUpperCase() !== claimLand);
       for (const c of ADAPTERS) {
-        if (c !== claimed && !c.catchAll && c.enabled && c.verified && inBox(lat, lon, c.bbox)) chain.push(c);
+        if (c === claimed || !c.enabled || !inBox(lat, lon, c.bbox)) continue;
+        /* Der zustaendige Landesdienst des GENANNTEN Landes zuerst. */
+        if (land && LAND_VON_CODE[c.code] === String(land).toUpperCase()) {
+          chain.push(c); continue;
+        }
+        if (!c.catchAll && c.verified) { chain.push(c); continue; }
+        /* Catch-alls nur, wenn der Punkt nachweislich AUSSERHALB des
+         * beanspruchten Landes liegt. Ohne Landesangabe nie. */
+        if (c.catchAll && fremd) chain.push(c);
       }
     }
 
