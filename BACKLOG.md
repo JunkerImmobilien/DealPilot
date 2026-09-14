@@ -4198,6 +4198,29 @@ druckt Ausgangswerte zum 01.01.2002 ab und schreibt sie über den VPI fort:
 230 × 106,7/87,5 = **280** · 275 × 106,7/87,5 = **335** — beide abgedruckten
 Werte treffen. Das hinterlegte Paar gilt nur für den 01.01.2015.
 
+**④ Ein Sachwertfaktor kennt seine Baujahrsschranke nicht.**
+*Neu am 14.09.2026, bei der MV-Ernte gemessen.* **Vorpommern-Rügen** leitet
+seine Faktoren ausdrücklich **nur aus Baujahren ab 1990** ab — ein großer Teil
+des vorpommerschen Bestands ist älter. **Brandenburg** hat denselben Fall
+(„Baujahre ab 1984"). Das Register kennt `gueltig`/`geltungsbereich` nur **je
+Achse oder Term**; eine Vorbedingung auf einem Feld, das gar keine Achse ist
+(Baujahr, Restnutzungsdauer, Modernisierungsgrad), gibt es nicht.
+
+Der Bestand löst das heute im **Hinweistext** — der Faktor wird geliefert, die
+Warnung steht daneben. Das ist dieselbe Klasse wie ① bis ③: gerechnet wird
+gegen ein Modell, für das der Wert nicht abgeleitet wurde, und niemand muss es
+merken. Zu bauen wäre eine Vorbedingungsliste im Modell, etwa
+
+```json
+"vorbedingungen": [{ "feld": "baujahr", "von": 1990,
+                     "grund": "Die Stichprobe umfasst nur Baujahre ab 1990." }]
+```
+
+die vor der Auswertung greift und `ausserhalb_der_stichprobe` meldet, statt
+stumm zu rechnen. **Betrifft mindestens MV-13073 und die Brandenburger Sätze**
+— vor dem Bau zu messen, welche Rezepte eine solche Schranke im Hinweistext
+tragen, statt sie zu schätzen.
+
 **Achtung, gleiche Klasse wie v1075:** Punkt ① schaltet einen Zweig frei, der
 heute nie läuft. Der gehört im `apply.sh` **echt ausgeführt**.
 **Und die Regressionswerte Hüllhorst und Löhner Straße ändern sich** — sie

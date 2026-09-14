@@ -4225,3 +4225,71 @@ Versionsnummer ist keine harmlose Textänderung: sie lädt beim Kunden eine
 Datei neu, für die es keinen Grund gibt. **Beim Umbenennen von Nummern immer
 zeilengenau arbeiten** (`sed -i '<zeile>s|…|…|'`) und danach jede geänderte
 Zeile einzeln ansehen.
+
+## Ein PDF, das aussieht wie der Bericht und die Beschreibung ist
+
+**14.09.2026, MV-Ernte.** Die Geoshops der `geocms.com`-Plattform galten als
+„laden dynamisch, kein Zugang". Der Grund war ein Link, der zu gut funktioniert:
+
+```
+mod/media/ajax/1/GetMedia/?con=<id>     ->  HTTP 200, echtes PDF, 153 KB
+```
+
+Das ist **nicht** der Bericht, sondern die **Produktbeschreibung**. Sie trägt
+das vollständige Inhaltsverzeichnis samt der Kapitelüberschrift
+„Sachwertfaktoren für Ein- und Zweifamilienhäuser" — vier Seiten, die wie der
+Anfang eines Berichts aussehen, dem die Tabellen fehlen.
+
+**Nichts daran ist ein Fehler**, den ein Prüfschritt abfangen würde: der
+Statuscode stimmt, der Dateityp stimmt, `pdftotext` liefert lesbaren Text, und
+der Text passt zum Thema. Aufgefallen ist es nur an einer Zahl auf der
+HTML-Seite daneben: „Dateigröße: 1,9 MB".
+
+**Der echte Download steht auf der Produktseite**, nicht auf der Übersicht:
+
+```
+<shop>/de/<produktliste>/<id>,<mandant>.html
+   -> href=".../GetProduct/con=<id>,<m>&method=store/<name>.pdf"
+```
+
+Man kommt also nur an ihn, wenn man **jede Produktseite einzeln lädt**. Die
+Übersichtsseite führt ihn nirgends.
+
+**Die Lehre, allgemein:** Ein Download, der plausibel antwortet, ist noch kein
+Beleg dafür, dass man das Richtige geholt hat. Wo die Quelle eine Größe, eine
+Seitenzahl oder eine Kapitelzahl nennt, gehört sie gegen das Geholte geprüft —
+`pdfinfo | grep Pages` kostet nichts. Ein Bericht mit vier Seiten ist keiner.
+
+**Zweiter Teil derselben Falle:** Die Seite heißt nicht überall gleich. Rostock
+führt sie als `grundstuecksmarktberichte.html`, Schwerin als
+`grundstuecksmarkt.html`. Ein fest verdrahteter Pfad liefert dort HTTP 200 und
+**null Produkte** — ein Befund, der wie „nichts vorhanden" aussieht und keiner
+ist. Den Menüpunkt suchen, nicht raten.
+
+## Das zweite Argument ist der NW-Pfad, nicht das Ziel
+
+**14.09.2026.** `rezept2register.py rezepte <pfad>` sieht aus, als nähme es ein
+Ausgabeziel. Es nimmt aber den **NW-Pfad** (Z. 487: `NW_ZIEL = ZIEL`); alle
+übrigen Länder werden als `swf-<land>.json` daneben abgelegt.
+
+Mit `…/register/swf-mv.json` als Argument passiert deshalb Folgendes: MV wird
+nach `swf-mv.json` geschrieben — und NW überschreibt dieselbe Datei
+alphabetisch danach. Am Ende steht in `swf-mv.json` **Nordrhein-Westfalen**,
+und die Ausgabe sagt es sogar, wenn man sie liest:
+
+```
+-> …/register/swf-mv.json  (MV: 4)
+-> …/register/swf-mv.json  (NW: 31)      <- zweimal derselbe Pfad
+```
+
+**Der Aufruf nennt immer `swf-nrw.json`.** Und nach jedem Bau gehört
+`git status` auf das Registerverzeichnis: geändert werden darf nur, was sich
+ändern sollte.
+
+> **Dabei ein Fehlalarm, den eine falsche Zahl von mir ausgelöst hat.** Der Bau
+> meldete 348 Sätze, während im Erntetagebuch 364 standen — es sah aus, als
+> verlöre der Generator Datensätze (die v1141-Falle). Gemessen im Repo waren es
+> aber 345, und 345 + 3 neue = 348. Der Generator war vollständig, meine Zahl
+> war zu hoch. **Eine Zahl aus dem Gedächtnis ist kein Messwert**, und ein
+> Vergleich gegen sie erzeugt Fehlalarme, die Zeit kosten — hier
+> `cat swf-*.json | grep -c '"kennzahl"'`.
