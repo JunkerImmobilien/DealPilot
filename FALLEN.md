@@ -3944,3 +3944,59 @@ schlaegt aber genauso fehl, wenn der Renderer blockiert. Die Wartezeit ist
 nicht verhandelbar.
 
 `v1098g`
+
+---
+
+## `perl -pi` mit Umlauten im Ersatz zerstört die ganze Datei
+
+**Gemessen am 14.09.2026 in `voice-import.js`, zweimal hintereinander.**
+
+```bash
+perl -pi -e "s/Erklaer mir das/Erklär mir das/g" datei.js    # FALSCH
+```
+
+Ergebnis: **959 Stellen Mojibake** — `Erklär` wird zu `ErklÃ¤r`, und zwar
+nicht nur an den ersetzten Stellen, sondern **in der ganzen Datei**. Der
+Ersatzstring kommt als UTF-8-Bytes aus der Shell; Perl liest die Datei
+byteweise, hält die Bytes für Latin-1 und kodiert beim Schreiben noch
+einmal.
+
+**`-CSD` hilft nicht, es verschiebt den Schaden nur**: dann ist die Datei
+richtig dekodiert, aber der Ersatz aus der Shell wird doppelt kodiert.
+
+### Was stattdessen gilt
+
+| Fall | Werkzeug |
+|---|---|
+| Ersetzung **rein ASCII** | `perl -pi` ist in Ordnung |
+| Ersatz enthält **Umlaute, Anführungszeichen, Gedankenstriche** | `head`/`tail` + `cat <<'EOF'` (Heredoc, in Anführungszeichen) |
+| Eine ganze Zeile austauschen | `sed -i '<nr>s|.*|neu|'` oder head/tail |
+
+**Nach jedem Schreibschritt prüfen:**
+
+```bash
+grep -c 'Ã' datei.js       # muss 0 sein
+```
+
+Das kostet eine Sekunde. Der Rückbau kostete zweimal eine Viertelstunde —
+und beim zweiten Mal waren zwei fertige, ungetestete Umbauten mit weg,
+weil `git checkout --` sie zurücknahm.
+
+### Zwei Geschwister derselben Falle
+
+**Backticks in einem doppelt gequoteten Perl-Skript** führt die Shell aus:
+
+```bash
+perl -0pi -e "s/…/… `data-zustand` …/"     # die Shell sucht ein Programm
+```
+
+Der Text landet dann ohne den Teil in Backticks in der Datei — im obigen
+Fall stand im Kommentar nur noch „Die Herkunft steht je Feld in , hier".
+**Auch dafür: Heredoc.**
+
+**Und `$` am Zeilenende trifft bei CRLF nicht.** Das Frontend ist
+durchgehend CRLF; `s/^…;$/…/` findet nichts, weil vor dem Zeilenende noch
+ein `\r` steht. Entweder `\r?$` schreiben oder über die Zeilennummer
+gehen.
+
+`v1121`
