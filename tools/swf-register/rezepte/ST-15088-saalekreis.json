@@ -183,7 +183,7 @@
         "hinweis": "Die Ausprägung „SK\" umfasst 120 Kauffälle für Baujahre vor 1991 und 78 ab 1991."
       },
       "stufe": "A",
-      "stufe_grund": "Amtliche Regressionsfunktionen, Glied für Glied übernommen, und an der ABGEDRUCKTEN NORMOBJEKT-KURVE geprüft: 16 von 16 Stützstellen von 60.000 bis 360.000 Euro zeichengleich (Normobjekt ist der Burgenlandkreis). Damit ist auch der ins Absolutglied gezogene Landkreis-Basiswert belegt — dieselbe Gleichung trifft für alle drei Ausprägungen. Der Bericht schränkt die Unabhängigkeit der Einflussgrößen ein; das steht als Vorbehalt im Satz."",
+      "stufe_grund": "Amtliche Regressionsfunktionen, Glied für Glied übernommen, und an der ABGEDRUCKTEN NORMOBJEKT-KURVE geprüft: 16 von 16 Stützstellen von 60.000 bis 360.000 Euro zeichengleich (Normobjekt ist der Burgenlandkreis). Damit ist auch der ins Absolutglied gezogene Landkreis-Basiswert belegt — dieselbe Gleichung trifft für alle drei Ausprägungen. Der Bericht schränkt die Unabhängigkeit der Einflussgrößen ein; das steht als Vorbehalt im Satz.",
       "fallzahl": 198,
       "streuung": null,
       "beleg": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser, Landkreise Saalekreis, Burgenlandkreis und Mansfeld-Südharz, veröffentlicht am 22.01.2025: Baujahre vor 1991 (R² = 0,37) und ab 1991 (R² = 0,51), Ausprägung „SK\" mit 120 und 78 Kauffällen."

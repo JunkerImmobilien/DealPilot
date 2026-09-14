@@ -87,8 +87,7 @@
           "standardstufe_vor_1991": { "min": 1.1, "max": 3.2 },
           "standardstufe_ab_1991":  { "min": 2.1, "max": 4.0 }
         },
-        "vorbehalt": "DER MITTLERE ABSOLUTE PROZENTUALE FEHLER BETRÄGT FÜR BAUJAHRE VOR 1991 ± 23 PROZENT. Das ist die höchste Unsicherheit, die ein Blatt dieses Ausschusses ausweist — und sie steht dort ausdrücklich. Ein Faktor von 0,86 kann demnach zwischen rund 0,66 und 1,06 liegen.\n\nDIE GLEICHUNG IST NICHT AUF DEN BERLINER-UMLAND-TYP EINES EINFAMILIENHAUSES GEMÜNZT: die Stichprobe beginnt bei 32.000 € vorläufigem Sachwert und einem Bodenrichtwert von 10 €/m². Für höherwertige Objekte endet sie bei 333.000 €.\n\nDIE EINFLUSSGRÖSSEN SIND NICHT UNABHÄNGIG. Wer eine davon verändert und die anderen festhält, verlässt das Modell.",
-        
+        "vorbehalt": "DER MITTLERE ABSOLUTE PROZENTUALE FEHLER BETRÄGT FÜR BAUJAHRE VOR 1991 ± 23 PROZENT. Das ist die höchste Unsicherheit, die ein Blatt dieses Ausschusses ausweist — und sie steht dort ausdrücklich. Ein Faktor von 0,86 kann demnach zwischen rund 0,66 und 1,06 liegen.\n\nDIE GLEICHUNG IST NICHT AUF DEN BERLINER-UMLAND-TYP EINES EINFAMILIENHAUSES GEMÜNZT: die Stichprobe beginnt bei 32.000 € vorläufigem Sachwert und einem Bodenrichtwert von 10 €/m². Für höherwertige Objekte endet sie bei 333.000 €.\n\nDIE EINFLUSSGRÖSSEN SIND NICHT UNABHÄNGIG. Wer eine davon verändert und die anderen festhält, verlässt das Modell."
       },
 
       "stufe": "B",

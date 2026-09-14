@@ -762,14 +762,13 @@
      "max": 4.0
     }
    },
-   "vorbehalt": "DER MITTLERE ABSOLUTE PROZENTUALE FEHLER BETRÄGT FÜR BAUJAHRE VOR 1991 ± 23 PROZENT. Das ist die höchste Unsicherheit, die ein Blatt dieses Ausschusses ausweist — und sie steht dort ausdrücklich. Ein Faktor von 0,86 kann demnach zwischen rund 0,66 und 1,06 liegen.\n\nDIE GLEICHUNG IST NICHT AUF DEN BERLINER-UMLAND-TYP EINES EINFAMILIENHAUSES GEMÜNZT: die Stichprobe beginnt bei 32.000 € vorläufigem Sachwert und einem Bodenrichtwert von 10 €/m². Für höherwertige Objekte endet sie bei 333.000 €.\n\nDIE EINFLUSSGRÖSSEN SIND NICHT UNABHÄNGIG. Wer eine davon verändert und die anderen festhält, verlässt das Modell.",
-   "hinweis": "Der Landkreis Harz teilt die Gleichung für Baujahre vor 1991, hat aber ab 1991 ein eigenes Absolutglied. Er steht deshalb als eigener Registersatz."
+   "vorbehalt": "DER MITTLERE ABSOLUTE PROZENTUALE FEHLER BETRÄGT FÜR BAUJAHRE VOR 1991 ± 23 PROZENT. Das ist die höchste Unsicherheit, die ein Blatt dieses Ausschusses ausweist — und sie steht dort ausdrücklich. Ein Faktor von 0,86 kann demnach zwischen rund 0,66 und 1,06 liegen.\n\nDIE GLEICHUNG IST NICHT AUF DEN BERLINER-UMLAND-TYP EINES EINFAMILIENHAUSES GEMÜNZT: die Stichprobe beginnt bei 32.000 € vorläufigem Sachwert und einem Bodenrichtwert von 10 €/m². Für höherwertige Objekte endet sie bei 333.000 €.\n\nDIE EINFLUSSGRÖSSEN SIND NICHT UNABHÄNGIG. Wer eine davon verändert und die anderen festhält, verlässt das Modell."
   },
   "belege": [
    "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser, Landkreise Börde, Harz und Salzlandkreis, Regionstypen Mittelzentrum, Grundzentrum, Dorf, veröffentlicht am 22.01.2025."
   ],
   "stufe": "B",
-  "stufe_grund": "Amtliche Regressionsfunktionen mit vollständiger Modellbeschreibung, Glied für Glied übernommen und am abgedruckten Normobjekt nachgerechnet. Stufe B, weil der Bericht für Baujahre vor 1991 selbst einen mittleren Fehler von ± 23 % ausweist.",
+  "stufe_grund": "Amtliche Regressionsfunktionen mit vollständiger Modellbeschreibung, Glied für Glied übernommen und am abgedruckten Normobjekt nachgerechnet. Stufe B: die abgedruckte Normobjekt-Kurve ist an 13 von 14 Stützstellen zeichengleich — bei 240.000 Euro ergibt die Gleichung 0,62, das Diagramm zeigt 0,63. Dazu weist der Bericht für Baujahre vor 1991 selbst einen mittleren Fehler von ± 23 % aus.",
   "fallzahl": null,
   "streuung": null,
   "stichtag": "2023-12-31",
@@ -961,14 +960,13 @@
      "max": 4.0
     }
    },
-   "vorbehalt": "DER MITTLERE ABSOLUTE PROZENTUALE FEHLER BETRÄGT FÜR BAUJAHRE VOR 1991 ± 23 PROZENT. Das ist die höchste Unsicherheit, die ein Blatt dieses Ausschusses ausweist — und sie steht dort ausdrücklich. Ein Faktor von 0,86 kann demnach zwischen rund 0,66 und 1,06 liegen.\n\nDIE GLEICHUNG IST NICHT AUF DEN BERLINER-UMLAND-TYP EINES EINFAMILIENHAUSES GEMÜNZT: die Stichprobe beginnt bei 32.000 € vorläufigem Sachwert und einem Bodenrichtwert von 10 €/m². Für höherwertige Objekte endet sie bei 333.000 €.\n\nDIE EINFLUSSGRÖSSEN SIND NICHT UNABHÄNGIG. Wer eine davon verändert und die anderen festhält, verlässt das Modell.",
-   "hinweis": "Der Landkreis Harz teilt die Gleichung für Baujahre vor 1991, hat aber ab 1991 ein eigenes Absolutglied. Er steht deshalb als eigener Registersatz."
+   "vorbehalt": "DER MITTLERE ABSOLUTE PROZENTUALE FEHLER BETRÄGT FÜR BAUJAHRE VOR 1991 ± 23 PROZENT. Das ist die höchste Unsicherheit, die ein Blatt dieses Ausschusses ausweist — und sie steht dort ausdrücklich. Ein Faktor von 0,86 kann demnach zwischen rund 0,66 und 1,06 liegen.\n\nDIE GLEICHUNG IST NICHT AUF DEN BERLINER-UMLAND-TYP EINES EINFAMILIENHAUSES GEMÜNZT: die Stichprobe beginnt bei 32.000 € vorläufigem Sachwert und einem Bodenrichtwert von 10 €/m². Für höherwertige Objekte endet sie bei 333.000 €.\n\nDIE EINFLUSSGRÖSSEN SIND NICHT UNABHÄNGIG. Wer eine davon verändert und die anderen festhält, verlässt das Modell."
   },
   "belege": [
    "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser, Landkreise Börde, Harz und Salzlandkreis, Regionstypen Mittelzentrum, Grundzentrum, Dorf, veröffentlicht am 22.01.2025."
   ],
   "stufe": "B",
-  "stufe_grund": "Amtliche Regressionsfunktionen mit vollständiger Modellbeschreibung, Glied für Glied übernommen und am abgedruckten Normobjekt nachgerechnet. Stufe B, weil der Bericht für Baujahre vor 1991 selbst einen mittleren Fehler von ± 23 % ausweist.",
+  "stufe_grund": "Amtliche Regressionsfunktionen mit vollständiger Modellbeschreibung, Glied für Glied übernommen und am abgedruckten Normobjekt nachgerechnet. Stufe B: die abgedruckte Normobjekt-Kurve ist an 13 von 14 Stützstellen zeichengleich — bei 240.000 Euro ergibt die Gleichung 0,62, das Diagramm zeigt 0,63. Dazu weist der Bericht für Baujahre vor 1991 selbst einen mittleren Fehler von ± 23 % aus.",
   "fallzahl": null,
   "streuung": null,
   "stichtag": "2023-12-31",
@@ -1636,8 +1634,8 @@
   "belege": [
    "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser, Landkreise Saalekreis, Burgenlandkreis und Mansfeld-Südharz, veröffentlicht am 22.01.2025: Baujahre vor 1991 (R² = 0,37) und ab 1991 (R² = 0,51), Ausprägung „BLK\" mit 125 und 47 Kauffällen."
   ],
-  "stufe": "B",
-  "stufe_grund": "Amtliche Regressionsfunktionen mit vollständiger Modellbeschreibung, Glied für Glied übernommen; der Landkreis-Basiswert ist mit der Rechnung im Hinweis ins Absolutglied gezogen. Stufe B, weil der Bericht die Abhängigkeit der Einflussgrößen untereinander ausdrücklich einschränkt.",
+  "stufe": "A",
+  "stufe_grund": "Amtliche Regressionsfunktionen, Glied für Glied übernommen, und an der ABGEDRUCKTEN NORMOBJEKT-KURVE geprüft: 16 von 16 Stützstellen von 60.000 bis 360.000 Euro zeichengleich (Normobjekt ist der Burgenlandkreis). Damit ist auch der ins Absolutglied gezogene Landkreis-Basiswert belegt — dieselbe Gleichung trifft für alle drei Ausprägungen. Der Bericht schränkt die Unabhängigkeit der Einflussgrößen ein; das steht als Vorbehalt im Satz.",
   "fallzahl": 172,
   "streuung": null,
   "stichtag": "2024-07-01",
@@ -1736,7 +1734,7 @@
   "belege": [
    "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für Reihenhäuser und Doppelhaushälften, Landkreise Saalekreis, Burgenlandkreis und Mansfeld-Südharz, Baujahre ab 1991, veröffentlicht am 22.01.2025, R² = 0,51."
   ],
-  "stufe": "B",
+  "stufe": "A",
   "stufe_grund": "Amtliche Regressionsfunktion, Glied für Glied übernommen, mit eingerechnetem Landkreis-Basiswert.",
   "fallzahl": null,
   "streuung": null,
@@ -1936,7 +1934,7 @@
    "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser, Landkreise Börde, Harz und Salzlandkreis, Regionstypen Mittelzentrum, Grundzentrum, Dorf, veröffentlicht am 22.01.2025."
   ],
   "stufe": "B",
-  "stufe_grund": "Amtliche Regressionsfunktionen mit vollständiger Modellbeschreibung, Glied für Glied übernommen und am abgedruckten Normobjekt nachgerechnet. Stufe B, weil der Bericht für Baujahre vor 1991 selbst einen mittleren Fehler von ± 23 % ausweist.",
+  "stufe_grund": "Amtliche Regressionsfunktionen mit vollständiger Modellbeschreibung, Glied für Glied übernommen und am abgedruckten Normobjekt nachgerechnet. Stufe B: die abgedruckte Normobjekt-Kurve ist an 13 von 14 Stützstellen zeichengleich — bei 240.000 Euro ergibt die Gleichung 0,62, das Diagramm zeigt 0,63. Dazu weist der Bericht für Baujahre vor 1991 selbst einen mittleren Fehler von ± 23 % aus.",
   "fallzahl": null,
   "streuung": null,
   "stichtag": "2023-12-31",
@@ -2362,8 +2360,8 @@
   "belege": [
    "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser, Landkreise Saalekreis, Burgenlandkreis und Mansfeld-Südharz, veröffentlicht am 22.01.2025: Baujahre vor 1991 (R² = 0,37) und ab 1991 (R² = 0,51), Ausprägung „MSH + QFT\" mit 126 und 21 Kauffällen."
   ],
-  "stufe": "B",
-  "stufe_grund": "Amtliche Regressionsfunktionen mit vollständiger Modellbeschreibung, Glied für Glied übernommen; der Landkreis-Basiswert ist mit der Rechnung im Hinweis ins Absolutglied gezogen. Stufe B, weil der Bericht die Abhängigkeit der Einflussgrößen untereinander ausdrücklich einschränkt.",
+  "stufe": "A",
+  "stufe_grund": "Amtliche Regressionsfunktionen, Glied für Glied übernommen, und an der ABGEDRUCKTEN NORMOBJEKT-KURVE geprüft: 16 von 16 Stützstellen von 60.000 bis 360.000 Euro zeichengleich (Normobjekt ist der Burgenlandkreis). Damit ist auch der ins Absolutglied gezogene Landkreis-Basiswert belegt — dieselbe Gleichung trifft für alle drei Ausprägungen. Der Bericht schränkt die Unabhängigkeit der Einflussgrößen ein; das steht als Vorbehalt im Satz.",
   "fallzahl": 147,
   "streuung": null,
   "stichtag": "2024-07-01",
@@ -2462,7 +2460,7 @@
   "belege": [
    "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für Reihenhäuser und Doppelhaushälften, Landkreise Saalekreis, Burgenlandkreis und Mansfeld-Südharz, Baujahre ab 1991, veröffentlicht am 22.01.2025, R² = 0,51."
   ],
-  "stufe": "B",
+  "stufe": "A",
   "stufe_grund": "Amtliche Regressionsfunktion, Glied für Glied übernommen, mit eingerechnetem Landkreis-Basiswert.",
   "fallzahl": null,
   "streuung": null,
@@ -2647,8 +2645,8 @@
   "belege": [
    "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser, Landkreise Saalekreis, Burgenlandkreis und Mansfeld-Südharz, veröffentlicht am 22.01.2025: Baujahre vor 1991 (R² = 0,37) und ab 1991 (R² = 0,51), Ausprägung „SK\" mit 120 und 78 Kauffällen."
   ],
-  "stufe": "B",
-  "stufe_grund": "Amtliche Regressionsfunktionen mit vollständiger Modellbeschreibung, Glied für Glied übernommen; der Landkreis-Basiswert ist mit der Rechnung im Hinweis ins Absolutglied gezogen. Stufe B, weil der Bericht die Abhängigkeit der Einflussgrößen untereinander ausdrücklich einschränkt.",
+  "stufe": "A",
+  "stufe_grund": "Amtliche Regressionsfunktionen, Glied für Glied übernommen, und an der ABGEDRUCKTEN NORMOBJEKT-KURVE geprüft: 16 von 16 Stützstellen von 60.000 bis 360.000 Euro zeichengleich (Normobjekt ist der Burgenlandkreis). Damit ist auch der ins Absolutglied gezogene Landkreis-Basiswert belegt — dieselbe Gleichung trifft für alle drei Ausprägungen. Der Bericht schränkt die Unabhängigkeit der Einflussgrößen ein; das steht als Vorbehalt im Satz.",
   "fallzahl": 198,
   "streuung": null,
   "stichtag": "2024-07-01",
@@ -2747,7 +2745,7 @@
   "belege": [
    "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für Reihenhäuser und Doppelhaushälften, Landkreise Saalekreis, Burgenlandkreis und Mansfeld-Südharz, Baujahre ab 1991, veröffentlicht am 22.01.2025, R² = 0,51."
   ],
-  "stufe": "B",
+  "stufe": "A",
   "stufe_grund": "Amtliche Regressionsfunktion, Glied für Glied übernommen, mit eingerechnetem Landkreis-Basiswert.",
   "fallzahl": null,
   "streuung": null,
