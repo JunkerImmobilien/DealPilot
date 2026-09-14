@@ -3896,6 +3896,27 @@ entfällt — nicht raten.
 
 ## MARKTBERICHT / ERNTE — Workstream (D)  ·  eingebaut 13.09.2026
 
+> **STAND 14.09.2026 ABEND — ZWOELF BUNDESLAENDER, 128 SACHWERTFAKTOREN**
+> (bis v1117, Commit `1061bb2`). Neu dazu: **Berlin**, **Sachsen** (Leipzig
+> und Dresden, beide Stufe A). DREI LAENDER VOLLSTAENDIG: Brandenburg 36
+> Saetze, Sachsen-Anhalt 28 aus allen 14 Gebietskoerperschaften, Berlin 4.
+>
+> **Berlin ist geloest** — die Ortsteil-zu-Altbezirk-Tabelle lag in einer
+> Glossardatei derselben Geschaeftsstelle (Stand 10.07.2025). 88 Ortsteile,
+> drei Gebietsgruppen, geprueft an allen fuenfzehn abgedruckten Stuetzstellen:
+> 15 von 15 zeichengleich. Der ALTE Berliner Satz ist entfernt — er ordnete
+> ueber ein Feld zu, das niemand je gefuellt hat, und lieferte seit v1084
+> nichts.
+>
+> **Noch ohne Sachwertfaktor: Baden-Wuerttemberg, Schleswig-Holstein,
+> Saarland, Bremen.** Baden-Wuerttemberg ist mit 11,3 Mio Einwohnern der
+> groesste offene Hebel. Bayern ist genehmigungspflichtig.
+>
+> **Ausbau, der noch aussteht:** Sachsen (Chemnitz und die Landkreise),
+> Sachsen-Anhalt (Reihenhaus-Gleichung vor 1991 der Saalekreis-Gruppe,
+> braucht die Regionstyp-Zuordnung), Brandenburg (Vergleichsfaktoren,
+> aeltere Stichtage).
+
 > **STAND 14.09.2026 — ACHT BUNDESLAENDER, 98 SACHWERTFAKTOREN** (bis v1113,
 > Commit `847ed53`). ZWEI LAENDER VOLLSTAENDIG: Brandenburg 31 Saetze aus 16
 > Ausschuessen (beide Teilmaerkte), Sachsen-Anhalt 28 Saetze aus allen 14
