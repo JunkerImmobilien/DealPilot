@@ -527,7 +527,36 @@ function ausRegisterRechnen(o, ags) {
      darf nicht einspringen. Genau das steht in der Saatdatei fuer
      Braunschweig-Wolfsburg woertlich. */
   const _ma = satz.modellansaetze || {};
-  r.modell_gnd_jahre = (_ma.gnd_jahre == null) ? null : Number(_ma.gnd_jahre);
+  /* ═══ v1130-WGND3 · DREI SCHREIBWEISEN, EIN FELD ═══════════════════════
+     GEMESSEN am 14.09.2026, und es ist die dritte Stufe derselben Falle.
+
+     Hier stand nur `_ma.gnd_jahre`. Die Rezepte schreiben die
+     Gesamtnutzungsdauer aber unter DREI Namen:
+
+       gnd_jahre                 Brandenburg (wird gelesen)
+       gesamtnutzungsdauer_jahre Wolfenbuettel (wurde NICHT gelesen)
+       gnd                       Koeln, Duesseldorf, Hessen (NICHT gelesen)
+
+     Die Folge: Oberursel rechnet mit GND 70, schrieb sie ordentlich ins
+     Rezept — und der Auswerter nahm weiter 80. Zwischen beiden liegen an
+     einem Reihenhaus rund 25.000 Euro Gebaeudesachwert.
+
+     Der Fehler war zweimal derselbe und zweimal unsichtbar: erst stand
+     die Zahl nur im Fliesstext (v1129), dann im falschen Feld. Beide Male
+     sah der Datensatz vollstaendig aus.
+
+     ALLE DREI NAMEN werden jetzt gelesen. Das ist robuster, als 150
+     Rezepte zu vereinheitlichen — und es kostet nichts: wo mehrere
+     stehen, gewinnt der spezifischste zuerst. Ein Text statt einer Zahl
+     ("gemaess Anlage 1 ImmoWertV") ergibt weiterhin `null`, und null ist
+     eine Antwort: dann druckt der Bericht keine Zahl. */
+  const _gndRoh = (_ma.gnd_jahre != null) ? _ma.gnd_jahre
+                : (_ma.gesamtnutzungsdauer_jahre != null) ? _ma.gesamtnutzungsdauer_jahre
+                : (_ma.gnd != null) ? _ma.gnd
+                : null;
+  const _gndZahl = Number(_gndRoh);
+  r.modell_gnd_jahre = (_gndRoh == null || !Number.isFinite(_gndZahl) || _gndZahl <= 0)
+                         ? null : _gndZahl;
   r.modell_gnd_hinweis = _ma.gnd_hinweis || _ma.hinweis || null;
   r.modell_gnd_beleg = _ma.gnd_beleg || null;
   r.modell_gnd_warnung = _ma.gnd_warnung || null;

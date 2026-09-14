@@ -151,7 +151,18 @@
    "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "wortlaut": "Bewertungsmodell des Blattes: NHK 2010 (Sachwertrichtlinie) ohne Regionalisierung; Baunebenkosten in den NHK enthalten; BGF in Anlehnung an DIN 277-1:2005-02 aus den Aussenmassen der amtlichen Geobasisdaten unter Einbeziehung der Rueckmeldung ueber Ausbau DG und Unterkellerung; Standardstufe nach Anlage 4 ImmoWertV; Baupreisindex Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010; GND 80 Jahre; RND modifiziert nach Anlage 2 ImmoWertV; lineare Alterswertminderung.",
+   "nhk": "NHK 2010 ohne Regionalisierung, Baunebenkosten enthalten",
+   "gnd": 80,
+   "alterswertminderung": "linear",
+   "rnd": "modifiziert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche in Anlehnung an DIN 277-1:2005-02",
+   "baupreisindex": "Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010",
+   "aussenanlagen": "pauschal nach Standardstufe: 1,0 bis unter 2,0 = 5.000 EUR; 2,0 bis unter 3,5 = 8.000 EUR; 3,5 bis unter 4,5 = 12.000 EUR; ab 4,5 = 15.000 EUR - kein separater Ansatz fuer Carport oder Garage",
+   "bodenwert": "lagebezogenes Bodenwertniveau, an die Groesse angepasst, beitrags- und abgabenfrei",
+   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale"
+  },
   "geltungsbereich": {},
   "belege": [
    "Sachwertfaktoren in der Hansestadt Luebeck 2025, Tabelle 1 (Sachwertfaktoren EFH/ZFH, ohne Innere Stadt), 63 Kauffaelle, nebst abgedrucktem Bewertungsmodell und Grafik 1 mit dem Kurvenverlauf."
@@ -308,7 +319,18 @@
    "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "wortlaut": "Bewertungsmodell des Blattes: NHK 2010 (Sachwertrichtlinie) ohne Regionalisierung; Baunebenkosten in den NHK enthalten; BGF in Anlehnung an DIN 277-1:2005-02 aus den Aussenmassen der amtlichen Geobasisdaten unter Einbeziehung der Rueckmeldung ueber Ausbau DG und Unterkellerung; Standardstufe nach Anlage 4 ImmoWertV; Baupreisindex Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010; GND 80 Jahre; RND modifiziert nach Anlage 2 ImmoWertV; lineare Alterswertminderung.",
+   "nhk": "NHK 2010 ohne Regionalisierung, Baunebenkosten enthalten",
+   "gnd": 80,
+   "alterswertminderung": "linear",
+   "rnd": "modifiziert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche in Anlehnung an DIN 277-1:2005-02",
+   "baupreisindex": "Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010",
+   "aussenanlagen": "pauschal nach Standardstufe: 1,0 bis unter 2,0 = 5.000 EUR; 2,0 bis unter 3,5 = 8.000 EUR; 3,5 bis unter 4,5 = 12.000 EUR; ab 4,5 = 15.000 EUR - kein separater Ansatz fuer Carport oder Garage",
+   "bodenwert": "lagebezogenes Bodenwertniveau, an die Groesse angepasst, beitrags- und abgabenfrei",
+   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale"
+  },
   "geltungsbereich": {},
   "belege": [
    "Sachwertfaktoren in der Hansestadt Luebeck 2025, Tabelle 2 (Sachwertfaktoren DH/RH, ohne Innere Stadt), 52 Kauffaelle, nebst abgedrucktem Bewertungsmodell und Grafik 2."
@@ -544,7 +566,18 @@
    "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "wortlaut": "Bewertungsmodell des Blattes: NHK 2010 (Sachwertrichtlinie) ohne Regionalisierung; Baunebenkosten in den NHK enthalten; BGF in Anlehnung an DIN 277-1:2005-02 aus den Aussenmassen der amtlichen Geobasisdaten unter Einbeziehung der Rueckmeldung ueber Ausbau DG und Unterkellerung; Standardstufe nach Anlage 4 ImmoWertV; Baupreisindex Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010; GND 80 Jahre; RND modifiziert nach Anlage 2 ImmoWertV; lineare Alterswertminderung.",
+   "nhk": "NHK 2010 ohne Regionalisierung, Baunebenkosten enthalten",
+   "gnd": 80,
+   "alterswertminderung": "linear",
+   "rnd": "modifiziert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche in Anlehnung an DIN 277-1:2005-02",
+   "baupreisindex": "Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010",
+   "aussenanlagen": "pauschal nach Standardstufe: 1,0 bis unter 2,0 = 5.000 EUR; 2,0 bis unter 3,5 = 8.000 EUR; 3,5 bis unter 4,5 = 12.000 EUR; ab 4,5 = 15.000 EUR - kein separater Ansatz fuer Carport oder Garage",
+   "bodenwert": "lagebezogenes Bodenwertniveau, an die Groesse angepasst, beitrags- und abgabenfrei",
+   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale"
+  },
   "geltungsbereich": {},
   "belege": [
    "Sachwertfaktoren im Kreis Herzogtum Lauenburg 2025, Tabelle 1 (Sachwertfaktoren EFH/ZFH), 169 Kauffaelle, nebst abgedrucktem Bewertungsmodell und Grafik 1 mit dem Kurvenverlauf."
@@ -696,7 +729,18 @@
    "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "wortlaut": "Bewertungsmodell des Blattes: NHK 2010 (Sachwertrichtlinie) ohne Regionalisierung; Baunebenkosten in den NHK enthalten; BGF in Anlehnung an DIN 277-1:2005-02 aus den Aussenmassen der amtlichen Geobasisdaten unter Einbeziehung der Rueckmeldung ueber Ausbau DG und Unterkellerung; Standardstufe nach Anlage 4 ImmoWertV; Baupreisindex Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010; GND 80 Jahre; RND modifiziert nach Anlage 2 ImmoWertV; lineare Alterswertminderung.",
+   "nhk": "NHK 2010 ohne Regionalisierung, Baunebenkosten enthalten",
+   "gnd": 80,
+   "alterswertminderung": "linear",
+   "rnd": "modifiziert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche in Anlehnung an DIN 277-1:2005-02",
+   "baupreisindex": "Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010",
+   "aussenanlagen": "pauschal nach Standardstufe: 1,0 bis unter 2,0 = 5.000 EUR; 2,0 bis unter 3,5 = 8.000 EUR; 3,5 bis unter 4,5 = 12.000 EUR; ab 4,5 = 15.000 EUR - kein separater Ansatz fuer Carport oder Garage",
+   "bodenwert": "lagebezogenes Bodenwertniveau, an die Groesse angepasst, beitrags- und abgabenfrei",
+   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale"
+  },
   "geltungsbereich": {},
   "belege": [
    "Sachwertfaktoren im Kreis Herzogtum Lauenburg 2025, Tabelle 2 (Sachwertfaktoren DH/RH), 83 Kauffaelle, nebst abgedrucktem Bewertungsmodell und Grafik 2."
@@ -938,7 +982,18 @@
    "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "wortlaut": "Bewertungsmodell des Blattes: NHK 2010 (Sachwertrichtlinie) ohne Regionalisierung; Baunebenkosten in den NHK enthalten; BGF in Anlehnung an DIN 277-1:2005-02 aus den Aussenmassen der amtlichen Geobasisdaten unter Einbeziehung der Rueckmeldung ueber Ausbau DG und Unterkellerung; Standardstufe nach Anlage 4 ImmoWertV; Baupreisindex Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010; GND 80 Jahre; RND modifiziert nach Anlage 2 ImmoWertV; lineare Alterswertminderung.",
+   "nhk": "NHK 2010 ohne Regionalisierung, Baunebenkosten enthalten",
+   "gnd": 80,
+   "alterswertminderung": "linear",
+   "rnd": "modifiziert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche in Anlehnung an DIN 277-1:2005-02",
+   "baupreisindex": "Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010",
+   "aussenanlagen": "pauschal nach Standardstufe: 1,0 bis unter 2,0 = 5.000 EUR; 2,0 bis unter 3,5 = 8.000 EUR; 3,5 bis unter 4,5 = 12.000 EUR; ab 4,5 = 15.000 EUR - kein separater Ansatz fuer Carport oder Garage",
+   "bodenwert": "lagebezogenes Bodenwertniveau, an die Groesse angepasst, beitrags- und abgabenfrei",
+   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale"
+  },
   "geltungsbereich": {},
   "belege": [
    "Sachwertfaktoren im Kreis Ostholstein 2025, Tabelle 1 (Sachwertfaktoren EFH/ZFH), 224 Kauffaelle, nebst abgedrucktem Bewertungsmodell und Grafik 1 mit dem Kurvenverlauf."
@@ -1132,7 +1187,18 @@
    "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "wortlaut": "Bewertungsmodell des Blattes: NHK 2010 (Sachwertrichtlinie) ohne Regionalisierung; Baunebenkosten in den NHK enthalten; BGF in Anlehnung an DIN 277-1:2005-02 aus den Aussenmassen der amtlichen Geobasisdaten unter Einbeziehung der Rueckmeldung ueber Ausbau DG und Unterkellerung; Standardstufe nach Anlage 4 ImmoWertV; Baupreisindex Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010; GND 80 Jahre; RND modifiziert nach Anlage 2 ImmoWertV; lineare Alterswertminderung.",
+   "nhk": "NHK 2010 ohne Regionalisierung, Baunebenkosten enthalten",
+   "gnd": 80,
+   "alterswertminderung": "linear",
+   "rnd": "modifiziert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche in Anlehnung an DIN 277-1:2005-02",
+   "baupreisindex": "Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010",
+   "aussenanlagen": "pauschal nach Standardstufe: 1,0 bis unter 2,0 = 5.000 EUR; 2,0 bis unter 3,5 = 8.000 EUR; 3,5 bis unter 4,5 = 12.000 EUR; ab 4,5 = 15.000 EUR - kein separater Ansatz fuer Carport oder Garage",
+   "bodenwert": "lagebezogenes Bodenwertniveau, an die Groesse angepasst, beitrags- und abgabenfrei",
+   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale"
+  },
   "geltungsbereich": {},
   "belege": [
    "Sachwertfaktoren im Kreis Ostholstein 2025, Tabelle 2 (Sachwertfaktoren DH/RH), 138 Kauffaelle, nebst abgedrucktem Bewertungsmodell und Grafik 2."
