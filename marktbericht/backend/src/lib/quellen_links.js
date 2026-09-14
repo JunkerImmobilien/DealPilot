@@ -103,6 +103,60 @@ export const LAND_QUELLEN = {
           zugang: 'kostenfrei' },
 };
 
+/* ═══ v1118-WAQ · DIE AUSSCHUSS-EBENE ═══════════════════════════════════
+ *
+ * Die Landestabelle darueber schickt jeden Nutzer auf dasselbe Portal.
+ * Das ist besser als nichts, aber es ist nicht das, was wir wissen.
+ *
+ * Bei der Ernte wird JEDER Ausschuss einzeln geprueft, und bei vielen
+ * endet die Pruefung mit „geht nicht" — der Bericht ist kostenpflichtig,
+ * die Zahlen stehen nur als Diagramm, das Modell ist zehn Jahre alt. Diese
+ * Erkenntnis war Arbeit und ist fuer den Nutzer mehr wert als das
+ * Landesportal: sie sagt ihm, WO genau die Zahl liegt und WAS ihn
+ * erwartet, wenn er sie holt.
+ *
+ * Ohne diese Tabelle faellt sie nach jeder Ernte auf den Boden.
+ *
+ * Schluessel ist der AGS-PRAEFIX (Kreis- oder Gemeindeschluessel); der
+ * laengste Treffer gewinnt. `warum_kein_wert` ist Pflicht — wer hier einen
+ * Eintrag anlegt, hat nachgesehen und schreibt auf, was er gefunden hat.
+ *
+ * NICHT hier hinein gehoert ein Ausschuss, dessen Zahlen im Register
+ * stehen. Dort gewinnt ohnehin der Registersatz. */
+export const AUSSCHUSS_QUELLEN = {
+  '08111': {
+    stelle: 'Gutachterausschuss für die Ermittlung von Grundstückswerten in Stuttgart',
+    url: 'https://www.stuttgart.de/leben/bauen/grundstueckswerte/',
+    zugang: 'kostenpflichtig',
+    warum_kein_wert: 'Der Internet-Auszug des Grundstücksmarktberichts ist kostenfrei, führt die Sachwertfaktoren aber nicht. Sie stehen in Kapitel 6.5.3 des Vollberichts, den das Kundenzentrum des Stadtmessungsamts abgibt.',
+    hinweis: 'Die Modellbeschreibung zu den Sachwertfaktoren ist frei abrufbar (Stand 20.05.2025) — sie nennt alle Ansätze, die eine modellkonforme Rechnung braucht, nur nicht die Faktoren selbst.',
+  },
+  '01002': {
+    stelle: 'Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Kiel',
+    url: 'https://www.gutachterausschuss-kiel.de/dienstleistungen/sachwertfaktoren/',
+    zugang: 'kostenfrei',
+    warum_kein_wert: 'Das veröffentlichte Sachwertfaktorenmodell wertet die Jahre 2013 bis 2015 aus (Stand Februar 2017). Ein Faktor mit zehn Jahre altem Stichtag gehört nicht ungefragt in eine heutige Wertermittlung — wer ihn anwenden will, soll das bewusst tun.',
+  },
+  '01056': {
+    stelle: 'Gutachterausschuss für Grundstückswerte im Kreis Pinneberg',
+    url: 'https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaPinneberg',
+    zugang: 'kostenfrei',
+    warum_kein_wert: 'Die Immobilienmarktinformation 2025 beschreibt vier Bodenrichtwertklassen (100–275, 300–425, rund 500, 600–850 €/m²), druckt die Sachwertfaktoren aber nur als Diagramm ab. Eine Kurve abzulesen wäre geraten.',
+  },
+  '01060': {
+    stelle: 'Gutachterausschuss für Grundstückswerte im Kreis Segeberg',
+    url: 'https://www.segeberg.de/Für-Segeberger/Umwelt-Planen-Bauen/Gutachterausschuss/',
+    zugang: 'kostenfrei',
+    warum_kein_wert: 'Der Grundstücksmarktbericht liegt beim Kreis selbst und nicht auf dem Landesportal; ein Sachwertfaktorenblatt im Format der übrigen Ausschüsse gibt es dort nicht.',
+  },
+  '01062': {
+    stelle: 'Gutachterausschuss für Grundstückswerte im Kreis Stormarn',
+    url: 'https://www.kreis-stormarn.de/kreis/sonderbereiche/gutachterausschuss-fuer-grundstueckswerte-im-kreis-stormarn/index.html',
+    zugang: 'kostenpflichtig',
+    warum_kein_wert: 'Der Grundstücksmarktbericht erscheint alle zwei bis drei Jahre und führt Sachwertfaktoren; die Einzelwerte gibt der Ausschuss kostenpflichtig über bodenrichtwerte.com heraus.',
+  },
+};
+
 /**
  * Den Weg zur Quelle fuer einen AGS bestimmen.
  *
@@ -131,6 +185,23 @@ export function quelleFuer(ags, satz = null) {
     };
   }
 
+  /* v1118-WAQ - der zustaendige Ausschuss gewinnt gegen das Landesportal.
+     Laengster Praefix zuerst: ein Gemeindeeintrag (08111) schlaegt einen
+     Kreiseintrag, ein Kreiseintrag schlaegt das Land. */
+  const ziffern = String(ags || '').replace(/\D/g, '');
+  if (ziffern) {
+    const treffer = Object.keys(AUSSCHUSS_QUELLEN)
+      .filter((p) => ziffern.startsWith(p))
+      .sort((a, b) => b.length - a.length)[0];
+    if (treffer) {
+      const a = AUSSCHUSS_QUELLEN[treffer];
+      const land = LAND_QUELLEN[ziffern.slice(0, 2)];
+      return { stelle: a.stelle, url: a.url, land: land ? land.land : null,
+               zugang: a.zugang, hinweis: a.hinweis,
+               warum_kein_wert: a.warum_kein_wert, herkunft: 'ausschusstabelle' };
+    }
+  }
+
   const l = LAND_QUELLEN[String(ags || '').replace(/\D/g, '').slice(0, 2)];
   if (!l) return null;
   return { stelle: l.stelle, url: l.url, land: l.land, zugang: l.zugang,
@@ -153,11 +224,19 @@ export function quellenSatz(q, kennzahl = 'Wert') {
       ? 'Der Bericht steht dort kostenfrei zum Abruf.'
     : q.zugang === 'teils kostenpflichtig'
       ? 'Je nach Ausschuss ist der Bericht kostenfrei oder kostenpflichtig.'
+    : q.zugang === 'kostenpflichtig'
+      /* v1118-WAQ - hier ist es nicht "vielleicht": der zustaendige
+         Ausschuss gibt die Zahl gegen Gebuehr heraus. Das gehoert
+         gesagt, bevor jemand vergeblich sucht. */
+      ? 'Der Ausschuss gibt diese Werte gegen Gebuehr heraus.'
       : '';
   return {
     text: `${was} für dieses Gebiet führt ${q.stelle}.`,
     kosten,
     url: q.url,
     hinweis: q.hinweis || null,
+    /* v1118-WAQ - warum hier keine Zahl steht. Nur die Ausschusstabelle
+       fuehrt das; bei Land und Registersatz bleibt es leer. */
+    warum_kein_wert: q.warum_kein_wert || null,
   };
 }

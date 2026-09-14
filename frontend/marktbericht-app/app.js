@@ -765,6 +765,9 @@ function _renderWertverfahren(d) {
     + ((hk.quelle_link && hk.quelle_link.satz)
         ? '<div class="wv-quelle">'
           + esc(hk.quelle_link.satz.text)
+          /* v1118-WAQ - warum hier keine Zahl steht. */
+          + (hk.quelle_link.satz.warum_kein_wert
+              ? ' ' + esc(hk.quelle_link.satz.warum_kein_wert) : '')
           + (hk.quelle_link.satz.kosten ? ' ' + esc(hk.quelle_link.satz.kosten) : '')
           + ' <a href="' + esc(hk.quelle_link.url) + '" target="_blank" rel="noopener">'
           + 'zur Quelle</a>'
@@ -846,6 +849,9 @@ function _renderWertverfahren(d) {
     + ((sw.sachwertfaktor_quelle_link && sw.sachwertfaktor_quelle_link.satz)
         ? '<div class="wv-quelle">'
           + esc(sw.sachwertfaktor_quelle_link.satz.text)
+          /* v1118-WAQ - warum hier keine Zahl steht. */
+          + (sw.sachwertfaktor_quelle_link.satz.warum_kein_wert
+              ? ' ' + esc(sw.sachwertfaktor_quelle_link.satz.warum_kein_wert) : '')
           + (sw.sachwertfaktor_quelle_link.satz.kosten
               ? ' ' + esc(sw.sachwertfaktor_quelle_link.satz.kosten) : '')
           + ' <a href="' + esc(sw.sachwertfaktor_quelle_link.url) + '" target="_blank"'
@@ -4070,6 +4076,7 @@ async function exportPdf(out) {
       doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5);
       doc.setTextColor(140, 132, 118);
       var _sqt = doc.splitTextToSize(String(_sql.satz.text)
+        + (_sql.satz.warum_kein_wert ? ' ' + _sql.satz.warum_kein_wert : '')
         + (_sql.satz.kosten ? ' ' + _sql.satz.kosten : ''), blockW);
       need(_sqt.length * 3.2 + 8); doc.text(_sqt, M, y); y += _sqt.length * 3.2 + 1;
       doc.setTextColor(120, 110, 140);
