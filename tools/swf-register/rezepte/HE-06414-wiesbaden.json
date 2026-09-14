@@ -1,0 +1,106 @@
+{
+  "land_code": "HE",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landeshauptstadt Wiesbaden",
+  "gaa_kennz": "06414",
+  "ags": ["06414000"],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "Kaufverträge bis 2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026",
+  "quelle_url": "https://www.wiesbaden.de/vv/produkte/66/wissenswertes",
+  "quelle_datei": "Immobilienmarktbericht-2026.pdf, Kapitel 7.3, Seite 31 f.",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Landeshauptstadt Wiesbaden, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Bewertung im Sachwertverfahren ist nach demselben Modell durchzuführen wie die Auswertung der Kaufverträge: NHK 2010, Regionalfaktor 1,0, lineare Alterswertminderung bei einer Gesamtnutzungsdauer von 80 Jahren, Außenanlagen und Nebengebäude SEPARAT angesetzt, Bodenwert aus dem Richtwert zum 01.01.2024 mit Lage- und Grundstücksgrößenanpassung bei Bodenwerten unter 800 Euro/qm.",
+  "fundstelle": "Kapitel 7.3 Sachwertfaktoren für Ein- und Zweifamilienhäuser, Seite 31 f., nebst der Datengrundlage 2025.",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "Ein- und Zweifamilienhaus, freistehend",
+      "form": "stufen_1d",
+      "formel": {
+        "form": "stufen_1d",
+        "achse_feld": "sachwert",
+        "achse_bez": "vorläufiger Sachwert in Euro",
+        "stufen": {
+          "260000": 1.44, "280000": 1.40, "300000": 1.37, "320000": 1.34,
+          "340000": 1.31, "360000": 1.28, "380000": 1.25, "400000": 1.23,
+          "450000": 1.17, "500000": 1.12, "550000": 1.07, "600000": 1.03,
+          "650000": 0.99, "700000": 0.95, "800000": 0.89, "850000": 0.86
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "30 Kauffälle, Bestimmtheitsmaß 0,69. Der Ausschuss veröffentlicht die Faktoren ausdrücklich NUR in dem Spannenbereich, in dem sie anwendbar sind: eine Extrapolation sei nicht sachgerecht. Zwischen 700.000 und 800.000 Euro liegt keine Stützstelle — dort interpoliert der Auswerter linear, wie es die abgedruckte Reihe nahelegt.",
+        "normobjekt": "Durchschnitt der Stichprobe: vorläufiger Sachwert 678.221 Euro (Median 661.283), Grundstücksgröße 461 qm, Restnutzungsdauer 31 Jahre, Wohnfläche 164 qm, Bruttogrundfläche 356 qm, Standardstufe 2,3, fiktives Baujahr 1959 / modifiziertes 1972, Bodenrichtwert 987 Euro/qm, Zeitwert Außenanlagen 13.000 Euro, Nebengebäude 5.300 Euro.",
+        "bedingungen": [
+          { "feld": "baujahr", "mindestens": 1965, "hoechstens": 2020,
+            "bez": "Baujahr", "text": "zwischen 1965 und 2020 liegt (oder das modifizierte Baujahr ab 1965)" }
+        ]
+      },
+      "korrekturen": [],
+      "beleg": "Immobilienmarktbericht 2026 der Landeshauptstadt Wiesbaden, Kapitel 7.3, Seite 32: Tabelle der Sachwertfaktoren nebst Datengrundlage (30 Kauffaelle, Bestimmtheitsmass 0,69).",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Wertetabelle mit vollstaendiger Modellbeschreibung und ausgewiesener Datengrundlage. Kein Anwendungsbeispiel zum Nachrechnen, deshalb B statt A.",
+      "fallzahl": 30
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenendhaus und Doppelhaus",
+      "form": "stufen_1d",
+      "formel": {
+        "form": "stufen_1d",
+        "achse_feld": "sachwert",
+        "achse_bez": "vorläufiger Sachwert in Euro",
+        "stufen": {
+          "380000": 1.34, "400000": 1.30, "450000": 1.22,
+          "500000": 1.17, "550000": 1.11
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "32 Kauffälle, Bestimmtheitsmaß 0,66. Der veröffentlichte Spannenbereich ist eng — 380.000 bis 550.000 Euro; darunter und darüber gibt es keinen Wert, weil der Ausschuss dort keine Daten hat und von Extrapolation ausdrücklich abrät.",
+        "normobjekt": "Durchschnitt der Stichprobe: vorläufiger Sachwert 547.945 Euro (Median 486.761), Grundstücksgröße 316 qm, Restnutzungsdauer 39 Jahre, Wohnfläche 127 qm, Bruttogrundfläche 258 qm, Standardstufe 2,5, fiktives Baujahr 1976 / modifiziertes 1984, Bodenrichtwert 1.128 Euro/qm.",
+        "bedingungen": [
+          { "feld": "baujahr", "mindestens": 1965, "hoechstens": 2020,
+            "bez": "Baujahr", "text": "zwischen 1965 und 2020 liegt (oder das modifizierte Baujahr ab 1965)" }
+        ]
+      },
+      "korrekturen": [],
+      "beleg": "Immobilienmarktbericht 2026 der Landeshauptstadt Wiesbaden, Kapitel 7.3, Seite 32: Spalte Reihenendhaus und Doppelhaus (32 Kauffaelle, Bestimmtheitsmass 0,66).",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Wertetabelle mit vollstaendiger Modellbeschreibung und ausgewiesener Datengrundlage.",
+      "fallzahl": 32
+    },
+    {
+      "zweig": "rmh",
+      "zweig_bez": "Reihenmittelhaus",
+      "form": "stufen_1d",
+      "formel": {
+        "form": "stufen_1d",
+        "achse_feld": "sachwert",
+        "achse_bez": "vorläufiger Sachwert in Euro",
+        "stufen": {
+          "260000": 1.72, "280000": 1.66, "300000": 1.60, "320000": 1.54,
+          "340000": 1.49, "360000": 1.44, "380000": 1.39, "400000": 1.35,
+          "450000": 1.25, "500000": 1.16, "550000": 1.08
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "35 Kauffälle, Bestimmtheitsmaß 0,70 — der beste Wert der drei Wiesbadener Teilmärkte. Die Kurve fällt steil: von 1,72 bei 260.000 Euro auf 1,08 bei 550.000 Euro.",
+        "normobjekt": "Durchschnitt der Stichprobe: vorläufiger Sachwert 392.243 Euro (Median 395.747), Grundstücksgröße 226 qm, Restnutzungsdauer 35 Jahre, Wohnfläche 121 qm, Bruttogrundfläche 232 qm, Standardstufe 2,4, fiktives Baujahr 1976 / modifiziertes 1980, Bodenrichtwert 1.096 Euro/qm.",
+        "bedingungen": [
+          { "feld": "baujahr", "mindestens": 1965, "hoechstens": 2020,
+            "bez": "Baujahr", "text": "zwischen 1965 und 2020 liegt (oder das modifizierte Baujahr ab 1965)" }
+        ]
+      },
+      "korrekturen": [],
+      "beleg": "Immobilienmarktbericht 2026 der Landeshauptstadt Wiesbaden, Kapitel 7.3, Seite 32: Spalte Reihenmittelhaus (35 Kauffaelle, Bestimmtheitsmass 0,70).",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Wertetabelle mit vollstaendiger Modellbeschreibung und ausgewiesener Datengrundlage.",
+      "fallzahl": 35
+    }
+  ]
+}
