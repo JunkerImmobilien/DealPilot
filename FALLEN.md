@@ -4293,3 +4293,25 @@ und die Ausgabe sagt es sogar, wenn man sie liest:
 > war zu hoch. **Eine Zahl aus dem Gedächtnis ist kein Messwert**, und ein
 > Vergleich gegen sie erzeugt Fehlalarme, die Zeit kosten — hier
 > `cat swf-*.json | grep -c '"kennzahl"'`.
+
+## Ein 404 auf einen geratenen Namen ist kein Befund
+
+**14.09.2026, viermal in einer Sitzung — immer dieselbe Klasse: angenommen
+statt gemessen, und jedes Mal sah das Ergebnis aus wie ein Ergebnis.**
+
+| was angenommen wurde | was stimmt | wie es aussah |
+|---|---|---|
+| Geoshop heißt `geoshop-lk-seenplatte` | `geoshop-lk-mecklenburgische-seenplatte` | HTTP 404 → „hat keinen Shop" |
+| Bayerische Ausschuss-URLs aus Kreisnamen gebildet | echte Liste steht auf der **Startseite**; `/gutachterausschuss` selbst ist 404 | 48 von 60 → 404 |
+| Kostenlos steht als Wort „kostenfrei" da | die Seenplatte schreibt **„0,00 €"** | 17 kostenfreie Berichte → „0 kostenfrei" |
+| Der neueste Jahrgang ist der gesuchte Bericht | „Bericht LuF 2026" ist der **Land- und Forstwirtschaftsbericht** | hätte still das falsche Dokument geerntet |
+
+**Das Gemeinsame:** Keiner dieser Fälle wirft einen Fehler. Ein 404 ist eine
+gültige Antwort, „0 Produkte" ist eine Zahl, und ein PDF mit dem richtigen
+Jahr ist ein PDF. Alle vier Befunde waren plausibel und falsch.
+
+**Die Regel:** Wo ein Name, ein Pfad oder eine Formulierung in die Abfrage
+eingeht, wird er **ausgelesen, nicht gebildet** — aus der Übersichtsseite,
+dem Menü, der Produktliste. Und wo gefiltert wird, gehört die Gegenprobe
+dazu: *wie viele hat die Seite insgesamt, und wie viele bleiben übrig?* Eine
+Filterquote von 0 % oder 100 % ist fast immer ein Filterfehler, kein Befund.
