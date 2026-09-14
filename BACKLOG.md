@@ -4297,6 +4297,68 @@ Vorjahre; das ist Steuerberatung, nicht Kalkulation.
 dabei **nicht** tut" — dort steht der Sachverhalt seit `v1383b` mit Zahlen.
 **Der Text ist die ehrliche Zwischenlösung, nicht die Lösung.**
 
+#### B1c — Der Löhner-Sollwert und die Software gehen auseinander **[NEU 14.09.2026]**
+
+**Beim Regressionslauf aufgefallen, ALTBEFUND — nicht durch die Arbeit vom
+14.09. entstanden.** Der Beweis steht weiter unten.
+
+`CLAUDE.md` nennt als Prüfmaßstab für die **Löhner Straße 278** (Kreis
+Herford, `05758016`):
+
+> vorläufiger Sachwert 326.649 € × **SWF 0,889 Stufe A**
+> (Tabelle 0,899, kRnd −0,01, kBgf 0) = **290.391 €** marktangepasst
+
+**Gemessen liefert die Software 0,841** — und `korrekturen` ist **leer**.
+Die in CLAUDE.md genannte Restnutzungsdauer-Korrektur von −0,01 wird nicht
+angewandt, weil sie im Registerdatensatz nicht steht.
+
+##### Der Faktor hängt am Bodenrichtwert
+
+| BRW €/m² | Faktor |
+|---:|---:|
+| 80 | 0,833 |
+| 90 | 0,841 |
+| 100 | 0,849 |
+| 120 | 0,865 |
+
+Kein Bodenrichtwert im plausiblen Bereich führt auf 0,899. Der Sollwert
+liegt **außerhalb** dessen, was der hinterlegte Satz hergibt.
+
+##### Warum das kein Schaden vom 14.09. ist
+
+Gemessen gegen den Registerstand **vor** allen Änderungen dieses Tages
+(`git show 7b11e27`):
+
+- `"korrekturen": []` steht **31 mal** — im alten wie im neuen Stand
+- **31 von 31 NRW-Sätzen rechnerisch identisch** (verglichen wurden `ags`,
+  `gebiet_name`, `zweig`, `formel`, `korrekturen`, `stufe`, `kennzahl`)
+- Geändert haben sich nur zwei Formatfelder: `vollstaendig` /
+  `unvollstaendig_grund` entfallen, `verwendung` / `auflagen` neu — genau
+  die verhaltensneutrale Umstellung aus `v1157b`
+
+##### Was zu klären ist — und das ist eine Bewertungsfrage
+
+`CLAUDE.md` kennzeichnet die Löhner-Sollwerte selbst als vorläufig:
+
+> „Sie sind unter der Restnutzungsdauer 18 entstanden — also ohne erfassten
+> Modernisierungsgrad. Sobald der Klicktest mit Modernisierungspunkten
+> läuft, ändern sich beide Regressionswerte und müssen neu festgelegt und
+> **gegen das Gutachten** abgenommen werden."
+
+Drei Möglichkeiten, und nur Marcel kann sie auseinanderhalten:
+
+1. **Der Sollwert ist überholt** — dann gehört er in CLAUDE.md ersetzt,
+   nachdem er am Gutachten nachgerechnet wurde.
+2. **Die kRnd-Korrektur fehlt im Registerdatensatz** — dann muss sie ins
+   Herforder Rezept, und der Bericht ist die Fundstelle.
+3. **Der Bodenrichtwert im Testfall ist ein anderer** — 0,899 entspräche
+   einem BRW deutlich über 120 €/m². Welcher am Objekt gilt, steht im
+   Gutachten.
+
+**Bis das geklärt ist, taugt die Löhner Straße nicht als Prüfmaßstab** —
+ein Sollwert, den die Software nie erreicht, macht jede Prüfstrecke rot,
+ohne etwas zu zeigen.
+
 #### B2 — `mb.valuation_inputs` wird nicht beschrieben
 
 Die Berichte sind **nicht reproduzierbar** — man kann zwei Jahre später nicht
