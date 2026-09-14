@@ -3893,6 +3893,26 @@ entfällt — nicht raten.
 
 ## MARKTBERICHT / ERNTE — Workstream (D)  ·  eingebaut 13.09.2026
 
+> **STAND 14.09.2026 — ACHT BUNDESLAENDER, 98 SACHWERTFAKTOREN** (bis v1113,
+> Commit `847ed53`). ZWEI LAENDER VOLLSTAENDIG: Brandenburg 31 Saetze aus 16
+> Ausschuessen (beide Teilmaerkte), Sachsen-Anhalt 28 Saetze aus allen 14
+> Gebietskoerperschaften.
+>
+> **Der Quellennachweis steht im Bericht** (A2 erledigt) und der Quellenlink
+> jetzt auch beim Sachwertfaktor.
+>
+> **Naechster Block:** ein weiteres Land. Frei zugaenglich und noch offen:
+> Sachsen (boris.sachsen.de antwortet), Thueringen, Schleswig-Holstein,
+> Bremen, Saarland. Berlin braucht eine Ortsteil-zu-Altbezirk-Tabelle (96
+> Ortsteile), Bayern ist genehmigungspflichtig.
+>
+> **Werkzeugkasten, der dabei entstanden ist:** `verzweigt` (zwei Ebenen
+> tief), `regression_additiv` mit aeusserem Exponenten, Logarithmus,
+> Pflicht-Diskretmerkmalen und mehrfach belegten Feldern,
+> `baender_kategorial`, `kategorie_sonst`, `kategorie_mehrdeutig`,
+> `sonst_auch_ohne_wert`. Damit liess sich bisher JEDE gelesene
+> Berichtsform abbilden.
+
 > **STAND 14.09.2026 — ACHT BUNDESLAENDER, 73 SACHWERTFAKTOREN** (bis v1110b,
 > Commit `a9ae48f`). Brandenburg vollstaendig (31 Saetze, 16 Ausschuesse,
 > beide Teilmaerkte), Sachsen-Anhalt begonnen (Halle **Stufe A**, Magdeburg).
