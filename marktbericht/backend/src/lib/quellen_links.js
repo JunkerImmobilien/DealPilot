@@ -156,6 +156,24 @@ export const AUSSCHUSS_QUELLEN = {
     warum_kein_wert: 'Der Immobilienmarktbericht 2026 druckt zwar zwei umfangreiche Sachwertfaktor-Tabellen ab, diese sind aber hessenweit von der Zentralen Geschäftsstelle ermittelt und nicht vom Gutachterausschuss beschlossen. Damit sind es keine sonstigen zur Wertermittlung erforderlichen Daten nach § 193 Abs. 5 BauGB. Ein örtlich abgeleiteter Sachwertfaktor liegt für diesen Bereich nicht vor.',
     hinweis: 'Der Bericht ist im Downloadcenter der Hessischen Verwaltung für Bodenmanagement kostenfrei abrufbar (Datei 2026_IMB_AFB_Büdingen.pdf). Kapitel 8.3 nennt das vollständige Sachwertmodell — Gesamtnutzungsdauer 80 Jahre, NHK 2010, kein Regionalfaktor, Außenanlagen 1 bis 10 Prozent je nach Standardstufe —, sodass eine modellkonforme Rechnung mit dem hessenweiten Faktor bewusst möglich bleibt.',
   },
+  /* v1155 · Landkreis Rostock. Der Bericht ist frei abrufbar und fachlich
+   * reich - 675 Kauffaelle, vollstaendige Modellbeschreibung, Tabelle 12 mit
+   * Regressionskonstanten je Teilmarkt. Woran es scheitert: die fuenf
+   * regionalen Teilmaerkte sind RAUMORDNERISCH benannt ("Direktes +
+   * entferntes Rostocker Umland", "Laendliche Zentren + Raum Nord und
+   * staedtische Grundzentren auf der Siedlungsachse"), nicht mit Gemeinden.
+   * Der Bericht fuehrt keine Zuordnungsliste; gesucht wurde danach in allen
+   * 5.393 Textzeilen.
+   *
+   * DER KUNDE KANN ES TROTZDEM: er kennt seine Gemeinde, wir nicht. Deshalb
+   * steht hier der Weg samt Fundstelle statt einer geratenen Zuordnung. */
+  '13072': {
+    stelle: 'Gutachterausschuss für Grundstückswerte im Landkreis Rostock',
+    url: 'https://www.geocms.com/geoshop-lk-rostock/de/grundstuecksmarktbericht.html',
+    zugang: 'kostenfrei',
+    warum_kein_wert: 'Der Gutachterausschuss unterscheidet FÜNF regionale Teilmärkte mit erheblich verschiedenen Sachwertfaktoren — bei 100.000 Euro vorläufigem Sachwert reichen sie von 1,88 bis 1,02, bei 700.000 Euro von 0,78 bis 0,98. Welche Gemeinde zu welchem Teilmarkt gehört, führt der Bericht aber nicht als Liste; die Bereiche sind raumordnerisch benannt. Eine Zuordnung ohne diese Angabe wäre geraten, und bei einer Spannweite von mehr als Faktor zwei wäre ein falscher Teilmarkt teurer als gar kein Wert.',
+    hinweis: 'Der Grundstücksmarktbericht 2025 ist kostenfrei als PDF abrufbar und enthält alles Nötige: Tabelle 12 auf Seite 43 führt für freistehende Ein- und Zweifamilienhäuser je Teilmarkt die Regressionskonstanten der Formel k = a × vSW^b (vorläufiger Sachwert in Mio. Euro), dazu Fallzahl, mittleres Bodenrichtwertniveau, Wohnfläche und Baujahr. Die fünf Teilmärkte heißen: Direktes und entferntes Rostocker Umland · Ostseebäder samt Umfeld und Mittelzentrum Bad Doberan · Mittelzentrum Güstrow · Ländliche Zentren Raum Süd mit Mittelzentrum Teterow · Ländliche Zentren Raum Nord. Wer weiß, wo sein Objekt liegt, findet seinen Faktor dort in einer Minute. Modell: NHK 2010, kein Regionalfaktor, Bruttogrundfläche, Zuschläge für ausgebauten Spitzboden (1,05), Zweifamilienhaus (1,05) und zum Wohnen ausgebauten Keller (1,10).',
+  },
   /* v1154 · Nuernberg. Groesste bayerische Stadt nach Muenchen und in der
    * Erntekarte Gruppe A ("Sachwertfaktoren UND Marktbericht vorhanden").
    * Der Marktbericht steht online aber nur als LESEPROBE - die Tabelle der
