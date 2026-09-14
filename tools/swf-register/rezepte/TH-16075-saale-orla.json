@@ -1,0 +1,257 @@
+{
+  "land_code": "TH",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "ebene": "kreis",
+  "berichtsjahr": 2025,
+  "beschlossen": "2025-03-18",
+  "veroeffentlicht": "2025",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_datei": "2025_SWF_R266.pdf, Sachwertfaktoren 2025, Kapitel 3",
+  "quellenvermerk": "Sachwertfaktoren 2025 © Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung. Kein gesonderter Wertansatz für Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche, Vordächer in üblichem Umfang und übliche Außentreppen — diese sind im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in die Schätzfunktion in MIO EURO einzusetzen.",
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 80,
+    "alterswertminderung": "linear",
+    "bezugsmassstab": "BGF"
+  },
+  "gaa_kennz": "16075",
+  "ags": [
+    "16075"
+  ],
+  "stichtag": "2022-12-31",
+  "auswertezeitraum": "Kauffälle des Jahres 2022",
+  "fundstelle": "Sachwertfaktoren 2025, Kapitel 3.2, Tabelle 7, Seite 14.",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser im Saale-Orla-Kreis",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "KEIN BODENWERTBEZUG. Für den Saale-Orla-Kreis konnte in der Stichprobe kein Einfluss der Lage nachgewiesen werden; der Sachwertfaktor hängt hier allein vom vorläufigen Sachwert ab. Deshalb steht hier eine einzige Spalte, die für jeden Bodenrichtwert gilt. k = 1,27996 × (vSW / 1 Mio)^0,17536, gegen jeden abgedruckten Wert geprüft.",
+        "normobjekt": "Stichprobe im Gebiet: 38 freistehende Ein- und Zweifamilienhäuser, 17 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [
+          40000,
+          60000,
+          80000,
+          100000,
+          120000,
+          140000,
+          160000,
+          180000,
+          200000,
+          220000,
+          240000,
+          260000,
+          280000,
+          300000,
+          320000,
+          340000,
+          360000,
+          380000
+        ],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "kein Bodenwertbezug — im Saale-Orla-Kreis war kein Lageeinfluss nachweisbar",
+        "zuordnung_feld": "brw",
+        "kategorien": [
+          "alle"
+        ],
+        "kategorie_baender": [
+          {
+            "von": 0,
+            "bis": null,
+            "kategorie": "alle"
+          }
+        ],
+        "zellen": {
+          "alle": [
+            0.73,
+            0.78,
+            0.82,
+            0.85,
+            0.88,
+            0.91,
+            0.93,
+            0.95,
+            0.97,
+            0.98,
+            1.0,
+            1.01,
+            1.02,
+            1.04,
+            1.05,
+            1.06,
+            1.07,
+            1.08
+          ]
+        }
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren 2025, Kapitel 3.2, Tabelle 7, Seite 14.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (38 und 17 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+      "fallzahl": null
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Doppelhaushälften und Reihenendhäuser im Saale-Orla-Kreis",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "KEIN BODENWERTBEZUG. Für den Saale-Orla-Kreis konnte in der Stichprobe kein Einfluss der Lage nachgewiesen werden; der Sachwertfaktor hängt hier allein vom vorläufigen Sachwert ab. Deshalb steht hier eine einzige Spalte, die für jeden Bodenrichtwert gilt. k = 1,27996 × (vSW / 1 Mio)^0,17536, gegen jeden abgedruckten Wert geprüft.",
+        "normobjekt": "Stichprobe im Gebiet: 38 freistehende Ein- und Zweifamilienhäuser, 17 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [
+          40000,
+          60000,
+          80000,
+          100000,
+          120000,
+          140000,
+          160000,
+          180000,
+          200000,
+          220000,
+          240000,
+          260000,
+          280000,
+          300000,
+          320000,
+          340000,
+          360000,
+          380000
+        ],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "kein Bodenwertbezug — im Saale-Orla-Kreis war kein Lageeinfluss nachweisbar",
+        "zuordnung_feld": "brw",
+        "kategorien": [
+          "alle"
+        ],
+        "kategorie_baender": [
+          {
+            "von": 0,
+            "bis": null,
+            "kategorie": "alle"
+          }
+        ],
+        "zellen": {
+          "alle": [
+            0.73,
+            0.78,
+            0.82,
+            0.85,
+            0.88,
+            0.91,
+            0.93,
+            0.95,
+            0.97,
+            0.98,
+            1.0,
+            1.01,
+            1.02,
+            1.04,
+            1.05,
+            1.06,
+            1.07,
+            1.08
+          ]
+        }
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren 2025, Kapitel 3.2, Tabelle 7, Seite 14.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (38 und 17 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+      "fallzahl": null
+    },
+    {
+      "zweig": "rmh",
+      "zweig_bez": "Reihenmittelhäuser im Saale-Orla-Kreis",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "KEIN BODENWERTBEZUG. Für den Saale-Orla-Kreis konnte in der Stichprobe kein Einfluss der Lage nachgewiesen werden; der Sachwertfaktor hängt hier allein vom vorläufigen Sachwert ab. Deshalb steht hier eine einzige Spalte, die für jeden Bodenrichtwert gilt. k = 1,27996 × (vSW / 1 Mio)^0,17536, gegen jeden abgedruckten Wert geprüft.",
+        "normobjekt": "Stichprobe im Gebiet: 38 freistehende Ein- und Zweifamilienhäuser, 17 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [
+          40000,
+          60000,
+          80000,
+          100000,
+          120000,
+          140000,
+          160000,
+          180000,
+          200000,
+          220000,
+          240000,
+          260000,
+          280000,
+          300000,
+          320000,
+          340000,
+          360000,
+          380000
+        ],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "kein Bodenwertbezug — im Saale-Orla-Kreis war kein Lageeinfluss nachweisbar",
+        "zuordnung_feld": "brw",
+        "kategorien": [
+          "alle"
+        ],
+        "kategorie_baender": [
+          {
+            "von": 0,
+            "bis": null,
+            "kategorie": "alle"
+          }
+        ],
+        "zellen": {
+          "alle": [
+            0.73,
+            0.78,
+            0.82,
+            0.85,
+            0.88,
+            0.91,
+            0.93,
+            0.95,
+            0.97,
+            0.98,
+            1.0,
+            1.01,
+            1.02,
+            1.04,
+            1.05,
+            1.06,
+            1.07,
+            1.08
+          ]
+        }
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren 2025, Kapitel 3.2, Tabelle 7, Seite 14.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (38 und 17 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+      "fallzahl": null
+    }
+  ],
+  "anmerkungen": [
+    "Der Ausschuss ist für DREI Gebiete zuständig und wertet sie GETRENNT aus: Saale-Holzland-Kreis, Saale-Orla-Kreis und die kreisfreie Stadt Jena. Alle drei liegen als eigene Rezepte im Register. Die Objektarten freistehende Ein- und Zweifamilienhäuser, Doppelhaushälften, Reihenend- und Reihenmittelhäuser sind gemeinsam ausgewertet; dieselbe Matrix steht deshalb unter allen drei Zweigen.",
+    "ZWEI BESONDERHEITEN AUF EINMAL. Erstens: kein Lageeinfluss — der Ausschuss schreibt ausdrücklich, für dieses Gebiet sei in der vorliegenden Stichprobe kein Einfluss des Bodenrichtwerts nachweisbar gewesen. Der Faktor gilt deshalb für jedes Bodenwertniveau gleich.",
+    "Zweitens: der Exponent b ist POSITIV (+0,17536). Der Sachwertfaktor STEIGT hier mit dem vorläufigen Sachwert — von 0,73 bei 40.000 Euro auf 1,08 bei 380.000. Das ist die Umkehrung dessen, was alle anderen Ausschüsse im Register zeigen. Wer Plausibilität am 'muss fallen' misst, hält diese richtige Tabelle für falsch.",
+    "Der Auswertung liegen Kauffälle des Jahres 2022 zugrunde."
+  ]
+}

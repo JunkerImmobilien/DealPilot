@@ -1,0 +1,685 @@
+{
+  "land_code": "TH",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "ebene": "kreis",
+  "berichtsjahr": 2025,
+  "beschlossen": "2025-03-18",
+  "veroeffentlicht": "2025",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_datei": "2025_SWF_R266.pdf, Sachwertfaktoren 2025, Kapitel 3",
+  "quellenvermerk": "Sachwertfaktoren 2025 © Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung. Kein gesonderter Wertansatz für Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche, Vordächer in üblichem Umfang und übliche Außentreppen — diese sind im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in die Schätzfunktion in MIO EURO einzusetzen.",
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 80,
+    "alterswertminderung": "linear",
+    "bezugsmassstab": "BGF"
+  },
+  "gaa_kennz": "16074",
+  "ags": [
+    "16074"
+  ],
+  "stichtag": "2022-12-31",
+  "auswertezeitraum": "Kauffälle des Jahres 2022",
+  "fundstelle": "Sachwertfaktoren 2025, Kapitel 3.1, Tabelle 4, Seite 10.",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser im Saale-Holzland-Kreis",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Fünf Bodenrichtwertniveaus als Stützstellen (30 bis 150 Euro/qm), zwischen denen interpoliert wird. Die Werte sind aus der abgedruckten Schätzfunktion k = a × (vSW / 1 Mio)^b berechnet (a = 0,54165 · 0,70051 · 0,81424 · 0,90597 · 0,98417, b = -0,28449 für alle Spalten) und gegen jeden abgedruckten Tabellenwert geprüft.",
+        "normobjekt": "Stichprobe im Gebiet: 59 freistehende Ein- und Zweifamilienhäuser, 16 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+        "achse_x": [
+          30,
+          60,
+          90,
+          120,
+          150
+        ],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenrichtwertniveau in Euro/m²",
+        "achse_y": [
+          60000,
+          80000,
+          100000,
+          120000,
+          140000,
+          160000,
+          180000,
+          200000,
+          220000,
+          240000,
+          260000,
+          280000,
+          300000,
+          320000,
+          340000,
+          360000,
+          380000,
+          400000,
+          420000,
+          440000,
+          460000,
+          480000,
+          500000
+        ],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "60000": [
+            1.21,
+            1.56,
+            1.81,
+            2.02,
+            2.19
+          ],
+          "80000": [
+            1.11,
+            1.44,
+            1.67,
+            1.86,
+            2.02
+          ],
+          "100000": [
+            1.04,
+            1.35,
+            1.57,
+            1.74,
+            1.89
+          ],
+          "120000": [
+            0.99,
+            1.28,
+            1.49,
+            1.66,
+            1.8
+          ],
+          "140000": [
+            0.95,
+            1.23,
+            1.42,
+            1.59,
+            1.72
+          ],
+          "160000": [
+            0.91,
+            1.18,
+            1.37,
+            1.53,
+            1.66
+          ],
+          "180000": [
+            0.88,
+            1.14,
+            1.33,
+            1.48,
+            1.6
+          ],
+          "200000": [
+            0.86,
+            1.11,
+            1.29,
+            1.43,
+            1.56
+          ],
+          "220000": [
+            0.83,
+            1.08,
+            1.25,
+            1.39,
+            1.51
+          ],
+          "240000": [
+            0.81,
+            1.05,
+            1.22,
+            1.36,
+            1.48
+          ],
+          "260000": [
+            0.79,
+            1.03,
+            1.19,
+            1.33,
+            1.44
+          ],
+          "280000": [
+            0.78,
+            1.01,
+            1.17,
+            1.3,
+            1.41
+          ],
+          "300000": [
+            0.76,
+            0.99,
+            1.15,
+            1.28,
+            1.39
+          ],
+          "320000": [
+            0.75,
+            0.97,
+            1.13,
+            1.25,
+            1.36
+          ],
+          "340000": [
+            0.74,
+            0.95,
+            1.11,
+            1.23,
+            1.34
+          ],
+          "360000": [
+            0.72,
+            0.94,
+            1.09,
+            1.21,
+            1.32
+          ],
+          "380000": [
+            0.71,
+            0.92,
+            1.07,
+            1.19,
+            1.3
+          ],
+          "400000": [
+            0.7,
+            0.91,
+            1.06,
+            1.18,
+            1.28
+          ],
+          "420000": [
+            0.69,
+            0.9,
+            1.04,
+            1.16,
+            1.26
+          ],
+          "440000": [
+            0.68,
+            0.88,
+            1.03,
+            1.14,
+            1.24
+          ],
+          "460000": [
+            0.68,
+            0.87,
+            1.02,
+            1.13,
+            1.23
+          ],
+          "480000": [
+            0.67,
+            0.86,
+            1.0,
+            1.12,
+            1.21
+          ],
+          "500000": [
+            0.66,
+            0.85,
+            0.99,
+            1.1,
+            1.2
+          ]
+        }
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren 2025, Kapitel 3.1, Tabelle 4, Seite 10.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (59 und 16 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+      "fallzahl": null
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Doppelhaushälften und Reihenendhäuser im Saale-Holzland-Kreis",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Fünf Bodenrichtwertniveaus als Stützstellen (30 bis 150 Euro/qm), zwischen denen interpoliert wird. Die Werte sind aus der abgedruckten Schätzfunktion k = a × (vSW / 1 Mio)^b berechnet (a = 0,54165 · 0,70051 · 0,81424 · 0,90597 · 0,98417, b = -0,28449 für alle Spalten) und gegen jeden abgedruckten Tabellenwert geprüft.",
+        "normobjekt": "Stichprobe im Gebiet: 59 freistehende Ein- und Zweifamilienhäuser, 16 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+        "achse_x": [
+          30,
+          60,
+          90,
+          120,
+          150
+        ],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenrichtwertniveau in Euro/m²",
+        "achse_y": [
+          60000,
+          80000,
+          100000,
+          120000,
+          140000,
+          160000,
+          180000,
+          200000,
+          220000,
+          240000,
+          260000,
+          280000,
+          300000,
+          320000,
+          340000,
+          360000,
+          380000,
+          400000,
+          420000,
+          440000,
+          460000,
+          480000,
+          500000
+        ],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "60000": [
+            1.21,
+            1.56,
+            1.81,
+            2.02,
+            2.19
+          ],
+          "80000": [
+            1.11,
+            1.44,
+            1.67,
+            1.86,
+            2.02
+          ],
+          "100000": [
+            1.04,
+            1.35,
+            1.57,
+            1.74,
+            1.89
+          ],
+          "120000": [
+            0.99,
+            1.28,
+            1.49,
+            1.66,
+            1.8
+          ],
+          "140000": [
+            0.95,
+            1.23,
+            1.42,
+            1.59,
+            1.72
+          ],
+          "160000": [
+            0.91,
+            1.18,
+            1.37,
+            1.53,
+            1.66
+          ],
+          "180000": [
+            0.88,
+            1.14,
+            1.33,
+            1.48,
+            1.6
+          ],
+          "200000": [
+            0.86,
+            1.11,
+            1.29,
+            1.43,
+            1.56
+          ],
+          "220000": [
+            0.83,
+            1.08,
+            1.25,
+            1.39,
+            1.51
+          ],
+          "240000": [
+            0.81,
+            1.05,
+            1.22,
+            1.36,
+            1.48
+          ],
+          "260000": [
+            0.79,
+            1.03,
+            1.19,
+            1.33,
+            1.44
+          ],
+          "280000": [
+            0.78,
+            1.01,
+            1.17,
+            1.3,
+            1.41
+          ],
+          "300000": [
+            0.76,
+            0.99,
+            1.15,
+            1.28,
+            1.39
+          ],
+          "320000": [
+            0.75,
+            0.97,
+            1.13,
+            1.25,
+            1.36
+          ],
+          "340000": [
+            0.74,
+            0.95,
+            1.11,
+            1.23,
+            1.34
+          ],
+          "360000": [
+            0.72,
+            0.94,
+            1.09,
+            1.21,
+            1.32
+          ],
+          "380000": [
+            0.71,
+            0.92,
+            1.07,
+            1.19,
+            1.3
+          ],
+          "400000": [
+            0.7,
+            0.91,
+            1.06,
+            1.18,
+            1.28
+          ],
+          "420000": [
+            0.69,
+            0.9,
+            1.04,
+            1.16,
+            1.26
+          ],
+          "440000": [
+            0.68,
+            0.88,
+            1.03,
+            1.14,
+            1.24
+          ],
+          "460000": [
+            0.68,
+            0.87,
+            1.02,
+            1.13,
+            1.23
+          ],
+          "480000": [
+            0.67,
+            0.86,
+            1.0,
+            1.12,
+            1.21
+          ],
+          "500000": [
+            0.66,
+            0.85,
+            0.99,
+            1.1,
+            1.2
+          ]
+        }
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren 2025, Kapitel 3.1, Tabelle 4, Seite 10.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (59 und 16 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+      "fallzahl": null
+    },
+    {
+      "zweig": "rmh",
+      "zweig_bez": "Reihenmittelhäuser im Saale-Holzland-Kreis",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Fünf Bodenrichtwertniveaus als Stützstellen (30 bis 150 Euro/qm), zwischen denen interpoliert wird. Die Werte sind aus der abgedruckten Schätzfunktion k = a × (vSW / 1 Mio)^b berechnet (a = 0,54165 · 0,70051 · 0,81424 · 0,90597 · 0,98417, b = -0,28449 für alle Spalten) und gegen jeden abgedruckten Tabellenwert geprüft.",
+        "normobjekt": "Stichprobe im Gebiet: 59 freistehende Ein- und Zweifamilienhäuser, 16 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+        "achse_x": [
+          30,
+          60,
+          90,
+          120,
+          150
+        ],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenrichtwertniveau in Euro/m²",
+        "achse_y": [
+          60000,
+          80000,
+          100000,
+          120000,
+          140000,
+          160000,
+          180000,
+          200000,
+          220000,
+          240000,
+          260000,
+          280000,
+          300000,
+          320000,
+          340000,
+          360000,
+          380000,
+          400000,
+          420000,
+          440000,
+          460000,
+          480000,
+          500000
+        ],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "60000": [
+            1.21,
+            1.56,
+            1.81,
+            2.02,
+            2.19
+          ],
+          "80000": [
+            1.11,
+            1.44,
+            1.67,
+            1.86,
+            2.02
+          ],
+          "100000": [
+            1.04,
+            1.35,
+            1.57,
+            1.74,
+            1.89
+          ],
+          "120000": [
+            0.99,
+            1.28,
+            1.49,
+            1.66,
+            1.8
+          ],
+          "140000": [
+            0.95,
+            1.23,
+            1.42,
+            1.59,
+            1.72
+          ],
+          "160000": [
+            0.91,
+            1.18,
+            1.37,
+            1.53,
+            1.66
+          ],
+          "180000": [
+            0.88,
+            1.14,
+            1.33,
+            1.48,
+            1.6
+          ],
+          "200000": [
+            0.86,
+            1.11,
+            1.29,
+            1.43,
+            1.56
+          ],
+          "220000": [
+            0.83,
+            1.08,
+            1.25,
+            1.39,
+            1.51
+          ],
+          "240000": [
+            0.81,
+            1.05,
+            1.22,
+            1.36,
+            1.48
+          ],
+          "260000": [
+            0.79,
+            1.03,
+            1.19,
+            1.33,
+            1.44
+          ],
+          "280000": [
+            0.78,
+            1.01,
+            1.17,
+            1.3,
+            1.41
+          ],
+          "300000": [
+            0.76,
+            0.99,
+            1.15,
+            1.28,
+            1.39
+          ],
+          "320000": [
+            0.75,
+            0.97,
+            1.13,
+            1.25,
+            1.36
+          ],
+          "340000": [
+            0.74,
+            0.95,
+            1.11,
+            1.23,
+            1.34
+          ],
+          "360000": [
+            0.72,
+            0.94,
+            1.09,
+            1.21,
+            1.32
+          ],
+          "380000": [
+            0.71,
+            0.92,
+            1.07,
+            1.19,
+            1.3
+          ],
+          "400000": [
+            0.7,
+            0.91,
+            1.06,
+            1.18,
+            1.28
+          ],
+          "420000": [
+            0.69,
+            0.9,
+            1.04,
+            1.16,
+            1.26
+          ],
+          "440000": [
+            0.68,
+            0.88,
+            1.03,
+            1.14,
+            1.24
+          ],
+          "460000": [
+            0.68,
+            0.87,
+            1.02,
+            1.13,
+            1.23
+          ],
+          "480000": [
+            0.67,
+            0.86,
+            1.0,
+            1.12,
+            1.21
+          ],
+          "500000": [
+            0.66,
+            0.85,
+            0.99,
+            1.1,
+            1.2
+          ]
+        }
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren 2025, Kapitel 3.1, Tabelle 4, Seite 10.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (59 und 16 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+      "fallzahl": null
+    }
+  ],
+  "anmerkungen": [
+    "Der Ausschuss ist für DREI Gebiete zuständig und wertet sie GETRENNT aus: Saale-Holzland-Kreis, Saale-Orla-Kreis und die kreisfreie Stadt Jena. Alle drei liegen als eigene Rezepte im Register. Die Objektarten freistehende Ein- und Zweifamilienhäuser, Doppelhaushälften, Reihenend- und Reihenmittelhäuser sind gemeinsam ausgewertet; dieselbe Matrix steht deshalb unter allen drei Zweigen.",
+    "Die Spreizung über das Bodenwertniveau ist hier die größte der drei Gebiete: bei 60.000 Euro vorläufigem Sachwert reicht der Faktor von 1,21 bei 30 Euro/qm bis 2,19 bei 150 Euro/qm.",
+    "Der Auswertung liegen Kauffälle des Jahres 2022 zugrunde; beschlossen wurde am 18.03.2025."
+  ]
+}

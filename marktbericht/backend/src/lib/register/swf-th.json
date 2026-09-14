@@ -1,6 +1,657 @@
 [
  {
   "land_code": "TH",
+  "ags": "16053",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Vier Bodenrichtwertniveaus als Stützstellen (100 bis 800 Euro/qm) — die höchsten der drei Gebiete. Hinterlegt ist der JAHRGANG 2023: k = a × (vSW / 1 Mio)^-0,19303 mit a = 0,93224 · 0,99438 · 1,06065 · 1,13135, gegen jeden abgedruckten Wert geprüft.",
+   "normobjekt": "Stichprobe im Gebiet: 18 freistehende Ein- und Zweifamilienhäuser, 17 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+   "achse_x": [
+    100,
+    200,
+    400,
+    800
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwertniveau in Euro/m²",
+   "achse_y": [
+    80000,
+    120000,
+    160000,
+    200000,
+    240000,
+    280000,
+    320000,
+    360000,
+    400000,
+    440000,
+    480000,
+    520000,
+    560000,
+    600000,
+    640000,
+    680000,
+    720000,
+    760000,
+    800000,
+    840000,
+    880000,
+    920000,
+    960000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "80000": [
+     1.52,
+     1.62,
+     1.73,
+     1.84
+    ],
+    "120000": [
+     1.4,
+     1.5,
+     1.6,
+     1.7
+    ],
+    "160000": [
+     1.33,
+     1.42,
+     1.51,
+     1.61
+    ],
+    "200000": [
+     1.27,
+     1.36,
+     1.45,
+     1.54
+    ],
+    "240000": [
+     1.23,
+     1.31,
+     1.4,
+     1.49
+    ],
+    "280000": [
+     1.19,
+     1.27,
+     1.36,
+     1.45
+    ],
+    "320000": [
+     1.16,
+     1.24,
+     1.32,
+     1.41
+    ],
+    "360000": [
+     1.14,
+     1.21,
+     1.29,
+     1.38
+    ],
+    "400000": [
+     1.11,
+     1.19,
+     1.27,
+     1.35
+    ],
+    "440000": [
+     1.09,
+     1.17,
+     1.24,
+     1.33
+    ],
+    "480000": [
+     1.07,
+     1.15,
+     1.22,
+     1.3
+    ],
+    "520000": [
+     1.06,
+     1.13,
+     1.2,
+     1.28
+    ],
+    "560000": [
+     1.04,
+     1.11,
+     1.19,
+     1.27
+    ],
+    "600000": [
+     1.03,
+     1.1,
+     1.17,
+     1.25
+    ],
+    "640000": [
+     1.02,
+     1.08,
+     1.16,
+     1.23
+    ],
+    "680000": [
+     1.0,
+     1.07,
+     1.14,
+     1.22
+    ],
+    "720000": [
+     0.99,
+     1.06,
+     1.13,
+     1.21
+    ],
+    "760000": [
+     0.98,
+     1.05,
+     1.12,
+     1.19
+    ],
+    "800000": [
+     0.97,
+     1.04,
+     1.11,
+     1.18
+    ],
+    "840000": [
+     0.96,
+     1.03,
+     1.1,
+     1.17
+    ],
+    "880000": [
+     0.96,
+     1.02,
+     1.09,
+     1.16
+    ],
+    "920000": [
+     0.95,
+     1.01,
+     1.08,
+     1.15
+    ],
+    "960000": [
+     0.94,
+     1.0,
+     1.07,
+     1.14
+    ]
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2025, Kapitel 3.4, Tabelle 13, Seite 21."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (18 und 17 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2023-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2025 © Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung. Kein gesonderter Wertansatz für Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche, Vordächer in üblichem Umfang und übliche Außentreppen — diese sind im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in die Schätzfunktion in MIO EURO einzusetzen.",
+  "fundstelle": "Sachwertfaktoren 2025, Kapitel 3.4, Tabelle 13, Seite 21."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16053",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "matrix_interp",
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Vier Bodenrichtwertniveaus als Stützstellen (100 bis 800 Euro/qm) — die höchsten der drei Gebiete. Hinterlegt ist der JAHRGANG 2023: k = a × (vSW / 1 Mio)^-0,19303 mit a = 0,93224 · 0,99438 · 1,06065 · 1,13135, gegen jeden abgedruckten Wert geprüft.",
+   "normobjekt": "Stichprobe im Gebiet: 18 freistehende Ein- und Zweifamilienhäuser, 17 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+   "achse_x": [
+    100,
+    200,
+    400,
+    800
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwertniveau in Euro/m²",
+   "achse_y": [
+    80000,
+    120000,
+    160000,
+    200000,
+    240000,
+    280000,
+    320000,
+    360000,
+    400000,
+    440000,
+    480000,
+    520000,
+    560000,
+    600000,
+    640000,
+    680000,
+    720000,
+    760000,
+    800000,
+    840000,
+    880000,
+    920000,
+    960000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "80000": [
+     1.52,
+     1.62,
+     1.73,
+     1.84
+    ],
+    "120000": [
+     1.4,
+     1.5,
+     1.6,
+     1.7
+    ],
+    "160000": [
+     1.33,
+     1.42,
+     1.51,
+     1.61
+    ],
+    "200000": [
+     1.27,
+     1.36,
+     1.45,
+     1.54
+    ],
+    "240000": [
+     1.23,
+     1.31,
+     1.4,
+     1.49
+    ],
+    "280000": [
+     1.19,
+     1.27,
+     1.36,
+     1.45
+    ],
+    "320000": [
+     1.16,
+     1.24,
+     1.32,
+     1.41
+    ],
+    "360000": [
+     1.14,
+     1.21,
+     1.29,
+     1.38
+    ],
+    "400000": [
+     1.11,
+     1.19,
+     1.27,
+     1.35
+    ],
+    "440000": [
+     1.09,
+     1.17,
+     1.24,
+     1.33
+    ],
+    "480000": [
+     1.07,
+     1.15,
+     1.22,
+     1.3
+    ],
+    "520000": [
+     1.06,
+     1.13,
+     1.2,
+     1.28
+    ],
+    "560000": [
+     1.04,
+     1.11,
+     1.19,
+     1.27
+    ],
+    "600000": [
+     1.03,
+     1.1,
+     1.17,
+     1.25
+    ],
+    "640000": [
+     1.02,
+     1.08,
+     1.16,
+     1.23
+    ],
+    "680000": [
+     1.0,
+     1.07,
+     1.14,
+     1.22
+    ],
+    "720000": [
+     0.99,
+     1.06,
+     1.13,
+     1.21
+    ],
+    "760000": [
+     0.98,
+     1.05,
+     1.12,
+     1.19
+    ],
+    "800000": [
+     0.97,
+     1.04,
+     1.11,
+     1.18
+    ],
+    "840000": [
+     0.96,
+     1.03,
+     1.1,
+     1.17
+    ],
+    "880000": [
+     0.96,
+     1.02,
+     1.09,
+     1.16
+    ],
+    "920000": [
+     0.95,
+     1.01,
+     1.08,
+     1.15
+    ],
+    "960000": [
+     0.94,
+     1.0,
+     1.07,
+     1.14
+    ]
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2025, Kapitel 3.4, Tabelle 13, Seite 21."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (18 und 17 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2023-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2025 © Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung. Kein gesonderter Wertansatz für Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche, Vordächer in üblichem Umfang und übliche Außentreppen — diese sind im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in die Schätzfunktion in MIO EURO einzusetzen.",
+  "fundstelle": "Sachwertfaktoren 2025, Kapitel 3.4, Tabelle 13, Seite 21."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16053",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh",
+  "formel": {
+   "form": "matrix_interp",
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Vier Bodenrichtwertniveaus als Stützstellen (100 bis 800 Euro/qm) — die höchsten der drei Gebiete. Hinterlegt ist der JAHRGANG 2023: k = a × (vSW / 1 Mio)^-0,19303 mit a = 0,93224 · 0,99438 · 1,06065 · 1,13135, gegen jeden abgedruckten Wert geprüft.",
+   "normobjekt": "Stichprobe im Gebiet: 18 freistehende Ein- und Zweifamilienhäuser, 17 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+   "achse_x": [
+    100,
+    200,
+    400,
+    800
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwertniveau in Euro/m²",
+   "achse_y": [
+    80000,
+    120000,
+    160000,
+    200000,
+    240000,
+    280000,
+    320000,
+    360000,
+    400000,
+    440000,
+    480000,
+    520000,
+    560000,
+    600000,
+    640000,
+    680000,
+    720000,
+    760000,
+    800000,
+    840000,
+    880000,
+    920000,
+    960000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "80000": [
+     1.52,
+     1.62,
+     1.73,
+     1.84
+    ],
+    "120000": [
+     1.4,
+     1.5,
+     1.6,
+     1.7
+    ],
+    "160000": [
+     1.33,
+     1.42,
+     1.51,
+     1.61
+    ],
+    "200000": [
+     1.27,
+     1.36,
+     1.45,
+     1.54
+    ],
+    "240000": [
+     1.23,
+     1.31,
+     1.4,
+     1.49
+    ],
+    "280000": [
+     1.19,
+     1.27,
+     1.36,
+     1.45
+    ],
+    "320000": [
+     1.16,
+     1.24,
+     1.32,
+     1.41
+    ],
+    "360000": [
+     1.14,
+     1.21,
+     1.29,
+     1.38
+    ],
+    "400000": [
+     1.11,
+     1.19,
+     1.27,
+     1.35
+    ],
+    "440000": [
+     1.09,
+     1.17,
+     1.24,
+     1.33
+    ],
+    "480000": [
+     1.07,
+     1.15,
+     1.22,
+     1.3
+    ],
+    "520000": [
+     1.06,
+     1.13,
+     1.2,
+     1.28
+    ],
+    "560000": [
+     1.04,
+     1.11,
+     1.19,
+     1.27
+    ],
+    "600000": [
+     1.03,
+     1.1,
+     1.17,
+     1.25
+    ],
+    "640000": [
+     1.02,
+     1.08,
+     1.16,
+     1.23
+    ],
+    "680000": [
+     1.0,
+     1.07,
+     1.14,
+     1.22
+    ],
+    "720000": [
+     0.99,
+     1.06,
+     1.13,
+     1.21
+    ],
+    "760000": [
+     0.98,
+     1.05,
+     1.12,
+     1.19
+    ],
+    "800000": [
+     0.97,
+     1.04,
+     1.11,
+     1.18
+    ],
+    "840000": [
+     0.96,
+     1.03,
+     1.1,
+     1.17
+    ],
+    "880000": [
+     0.96,
+     1.02,
+     1.09,
+     1.16
+    ],
+    "920000": [
+     0.95,
+     1.01,
+     1.08,
+     1.15
+    ],
+    "960000": [
+     0.94,
+     1.0,
+     1.07,
+     1.14
+    ]
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2025, Kapitel 3.4, Tabelle 13, Seite 21."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (18 und 17 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2023-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2025 © Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung. Kein gesonderter Wertansatz für Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche, Vordächer in üblichem Umfang und übliche Außentreppen — diese sind im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in die Schätzfunktion in MIO EURO einzusetzen.",
+  "fundstelle": "Sachwertfaktoren 2025, Kapitel 3.4, Tabelle 13, Seite 21."
+ },
+ {
+  "land_code": "TH",
   "ags": "16055",
   "ebene": "kreis",
   "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar",
@@ -12889,5 +13540,1127 @@
   "verwendung": "produkt",
   "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010 einschließlich Baunebenkosten, Regionalfaktor 1, Bezugsmaßstab Bruttogrundfläche nach Anlage 4 Nr. I ImmoWertV, Baupreisindex des Statistischen Bundesamtes zum Kaufdatum, Gesamtnutzungsdauer 80 Jahre nach Anlage 1 zu § 12 Abs. 5 ImmoWertV, Restnutzungsdauer gegebenenfalls nach Anlage 2 verlängert, lineare Alterswertminderung, Bodenwert erschließungsbeitragsfrei. WICHTIG: bauliche Außenanlagen, sonstige Anlagen und bei der BGF-Berechnung nicht erfasste Bauteile bekommen KEINEN gesonderten Wertansatz — sie sind im üblichen Umfang bereits im Sachwertfaktor enthalten.",
   "fundstelle": "Sachwertfaktoren 2025, Kapitel 3, Abbildung 13, Seite 17; Modellbeschreibung Abbildung 2, Seite 9."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16074",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Fünf Bodenrichtwertniveaus als Stützstellen (30 bis 150 Euro/qm), zwischen denen interpoliert wird. Die Werte sind aus der abgedruckten Schätzfunktion k = a × (vSW / 1 Mio)^b berechnet (a = 0,54165 · 0,70051 · 0,81424 · 0,90597 · 0,98417, b = -0,28449 für alle Spalten) und gegen jeden abgedruckten Tabellenwert geprüft.",
+   "normobjekt": "Stichprobe im Gebiet: 59 freistehende Ein- und Zweifamilienhäuser, 16 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+   "achse_x": [
+    30,
+    60,
+    90,
+    120,
+    150
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwertniveau in Euro/m²",
+   "achse_y": [
+    60000,
+    80000,
+    100000,
+    120000,
+    140000,
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000,
+    400000,
+    420000,
+    440000,
+    460000,
+    480000,
+    500000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "60000": [
+     1.21,
+     1.56,
+     1.81,
+     2.02,
+     2.19
+    ],
+    "80000": [
+     1.11,
+     1.44,
+     1.67,
+     1.86,
+     2.02
+    ],
+    "100000": [
+     1.04,
+     1.35,
+     1.57,
+     1.74,
+     1.89
+    ],
+    "120000": [
+     0.99,
+     1.28,
+     1.49,
+     1.66,
+     1.8
+    ],
+    "140000": [
+     0.95,
+     1.23,
+     1.42,
+     1.59,
+     1.72
+    ],
+    "160000": [
+     0.91,
+     1.18,
+     1.37,
+     1.53,
+     1.66
+    ],
+    "180000": [
+     0.88,
+     1.14,
+     1.33,
+     1.48,
+     1.6
+    ],
+    "200000": [
+     0.86,
+     1.11,
+     1.29,
+     1.43,
+     1.56
+    ],
+    "220000": [
+     0.83,
+     1.08,
+     1.25,
+     1.39,
+     1.51
+    ],
+    "240000": [
+     0.81,
+     1.05,
+     1.22,
+     1.36,
+     1.48
+    ],
+    "260000": [
+     0.79,
+     1.03,
+     1.19,
+     1.33,
+     1.44
+    ],
+    "280000": [
+     0.78,
+     1.01,
+     1.17,
+     1.3,
+     1.41
+    ],
+    "300000": [
+     0.76,
+     0.99,
+     1.15,
+     1.28,
+     1.39
+    ],
+    "320000": [
+     0.75,
+     0.97,
+     1.13,
+     1.25,
+     1.36
+    ],
+    "340000": [
+     0.74,
+     0.95,
+     1.11,
+     1.23,
+     1.34
+    ],
+    "360000": [
+     0.72,
+     0.94,
+     1.09,
+     1.21,
+     1.32
+    ],
+    "380000": [
+     0.71,
+     0.92,
+     1.07,
+     1.19,
+     1.3
+    ],
+    "400000": [
+     0.7,
+     0.91,
+     1.06,
+     1.18,
+     1.28
+    ],
+    "420000": [
+     0.69,
+     0.9,
+     1.04,
+     1.16,
+     1.26
+    ],
+    "440000": [
+     0.68,
+     0.88,
+     1.03,
+     1.14,
+     1.24
+    ],
+    "460000": [
+     0.68,
+     0.87,
+     1.02,
+     1.13,
+     1.23
+    ],
+    "480000": [
+     0.67,
+     0.86,
+     1.0,
+     1.12,
+     1.21
+    ],
+    "500000": [
+     0.66,
+     0.85,
+     0.99,
+     1.1,
+     1.2
+    ]
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2025, Kapitel 3.1, Tabelle 4, Seite 10."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (59 und 16 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2022-12-31",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2025 © Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung. Kein gesonderter Wertansatz für Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche, Vordächer in üblichem Umfang und übliche Außentreppen — diese sind im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in die Schätzfunktion in MIO EURO einzusetzen.",
+  "fundstelle": "Sachwertfaktoren 2025, Kapitel 3.1, Tabelle 4, Seite 10."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16074",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "matrix_interp",
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Fünf Bodenrichtwertniveaus als Stützstellen (30 bis 150 Euro/qm), zwischen denen interpoliert wird. Die Werte sind aus der abgedruckten Schätzfunktion k = a × (vSW / 1 Mio)^b berechnet (a = 0,54165 · 0,70051 · 0,81424 · 0,90597 · 0,98417, b = -0,28449 für alle Spalten) und gegen jeden abgedruckten Tabellenwert geprüft.",
+   "normobjekt": "Stichprobe im Gebiet: 59 freistehende Ein- und Zweifamilienhäuser, 16 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+   "achse_x": [
+    30,
+    60,
+    90,
+    120,
+    150
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwertniveau in Euro/m²",
+   "achse_y": [
+    60000,
+    80000,
+    100000,
+    120000,
+    140000,
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000,
+    400000,
+    420000,
+    440000,
+    460000,
+    480000,
+    500000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "60000": [
+     1.21,
+     1.56,
+     1.81,
+     2.02,
+     2.19
+    ],
+    "80000": [
+     1.11,
+     1.44,
+     1.67,
+     1.86,
+     2.02
+    ],
+    "100000": [
+     1.04,
+     1.35,
+     1.57,
+     1.74,
+     1.89
+    ],
+    "120000": [
+     0.99,
+     1.28,
+     1.49,
+     1.66,
+     1.8
+    ],
+    "140000": [
+     0.95,
+     1.23,
+     1.42,
+     1.59,
+     1.72
+    ],
+    "160000": [
+     0.91,
+     1.18,
+     1.37,
+     1.53,
+     1.66
+    ],
+    "180000": [
+     0.88,
+     1.14,
+     1.33,
+     1.48,
+     1.6
+    ],
+    "200000": [
+     0.86,
+     1.11,
+     1.29,
+     1.43,
+     1.56
+    ],
+    "220000": [
+     0.83,
+     1.08,
+     1.25,
+     1.39,
+     1.51
+    ],
+    "240000": [
+     0.81,
+     1.05,
+     1.22,
+     1.36,
+     1.48
+    ],
+    "260000": [
+     0.79,
+     1.03,
+     1.19,
+     1.33,
+     1.44
+    ],
+    "280000": [
+     0.78,
+     1.01,
+     1.17,
+     1.3,
+     1.41
+    ],
+    "300000": [
+     0.76,
+     0.99,
+     1.15,
+     1.28,
+     1.39
+    ],
+    "320000": [
+     0.75,
+     0.97,
+     1.13,
+     1.25,
+     1.36
+    ],
+    "340000": [
+     0.74,
+     0.95,
+     1.11,
+     1.23,
+     1.34
+    ],
+    "360000": [
+     0.72,
+     0.94,
+     1.09,
+     1.21,
+     1.32
+    ],
+    "380000": [
+     0.71,
+     0.92,
+     1.07,
+     1.19,
+     1.3
+    ],
+    "400000": [
+     0.7,
+     0.91,
+     1.06,
+     1.18,
+     1.28
+    ],
+    "420000": [
+     0.69,
+     0.9,
+     1.04,
+     1.16,
+     1.26
+    ],
+    "440000": [
+     0.68,
+     0.88,
+     1.03,
+     1.14,
+     1.24
+    ],
+    "460000": [
+     0.68,
+     0.87,
+     1.02,
+     1.13,
+     1.23
+    ],
+    "480000": [
+     0.67,
+     0.86,
+     1.0,
+     1.12,
+     1.21
+    ],
+    "500000": [
+     0.66,
+     0.85,
+     0.99,
+     1.1,
+     1.2
+    ]
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2025, Kapitel 3.1, Tabelle 4, Seite 10."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (59 und 16 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2022-12-31",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2025 © Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung. Kein gesonderter Wertansatz für Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche, Vordächer in üblichem Umfang und übliche Außentreppen — diese sind im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in die Schätzfunktion in MIO EURO einzusetzen.",
+  "fundstelle": "Sachwertfaktoren 2025, Kapitel 3.1, Tabelle 4, Seite 10."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16074",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh",
+  "formel": {
+   "form": "matrix_interp",
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Fünf Bodenrichtwertniveaus als Stützstellen (30 bis 150 Euro/qm), zwischen denen interpoliert wird. Die Werte sind aus der abgedruckten Schätzfunktion k = a × (vSW / 1 Mio)^b berechnet (a = 0,54165 · 0,70051 · 0,81424 · 0,90597 · 0,98417, b = -0,28449 für alle Spalten) und gegen jeden abgedruckten Tabellenwert geprüft.",
+   "normobjekt": "Stichprobe im Gebiet: 59 freistehende Ein- und Zweifamilienhäuser, 16 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+   "achse_x": [
+    30,
+    60,
+    90,
+    120,
+    150
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwertniveau in Euro/m²",
+   "achse_y": [
+    60000,
+    80000,
+    100000,
+    120000,
+    140000,
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000,
+    400000,
+    420000,
+    440000,
+    460000,
+    480000,
+    500000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "60000": [
+     1.21,
+     1.56,
+     1.81,
+     2.02,
+     2.19
+    ],
+    "80000": [
+     1.11,
+     1.44,
+     1.67,
+     1.86,
+     2.02
+    ],
+    "100000": [
+     1.04,
+     1.35,
+     1.57,
+     1.74,
+     1.89
+    ],
+    "120000": [
+     0.99,
+     1.28,
+     1.49,
+     1.66,
+     1.8
+    ],
+    "140000": [
+     0.95,
+     1.23,
+     1.42,
+     1.59,
+     1.72
+    ],
+    "160000": [
+     0.91,
+     1.18,
+     1.37,
+     1.53,
+     1.66
+    ],
+    "180000": [
+     0.88,
+     1.14,
+     1.33,
+     1.48,
+     1.6
+    ],
+    "200000": [
+     0.86,
+     1.11,
+     1.29,
+     1.43,
+     1.56
+    ],
+    "220000": [
+     0.83,
+     1.08,
+     1.25,
+     1.39,
+     1.51
+    ],
+    "240000": [
+     0.81,
+     1.05,
+     1.22,
+     1.36,
+     1.48
+    ],
+    "260000": [
+     0.79,
+     1.03,
+     1.19,
+     1.33,
+     1.44
+    ],
+    "280000": [
+     0.78,
+     1.01,
+     1.17,
+     1.3,
+     1.41
+    ],
+    "300000": [
+     0.76,
+     0.99,
+     1.15,
+     1.28,
+     1.39
+    ],
+    "320000": [
+     0.75,
+     0.97,
+     1.13,
+     1.25,
+     1.36
+    ],
+    "340000": [
+     0.74,
+     0.95,
+     1.11,
+     1.23,
+     1.34
+    ],
+    "360000": [
+     0.72,
+     0.94,
+     1.09,
+     1.21,
+     1.32
+    ],
+    "380000": [
+     0.71,
+     0.92,
+     1.07,
+     1.19,
+     1.3
+    ],
+    "400000": [
+     0.7,
+     0.91,
+     1.06,
+     1.18,
+     1.28
+    ],
+    "420000": [
+     0.69,
+     0.9,
+     1.04,
+     1.16,
+     1.26
+    ],
+    "440000": [
+     0.68,
+     0.88,
+     1.03,
+     1.14,
+     1.24
+    ],
+    "460000": [
+     0.68,
+     0.87,
+     1.02,
+     1.13,
+     1.23
+    ],
+    "480000": [
+     0.67,
+     0.86,
+     1.0,
+     1.12,
+     1.21
+    ],
+    "500000": [
+     0.66,
+     0.85,
+     0.99,
+     1.1,
+     1.2
+    ]
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2025, Kapitel 3.1, Tabelle 4, Seite 10."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (59 und 16 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2022-12-31",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2025 © Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung. Kein gesonderter Wertansatz für Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche, Vordächer in üblichem Umfang und übliche Außentreppen — diese sind im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in die Schätzfunktion in MIO EURO einzusetzen.",
+  "fundstelle": "Sachwertfaktoren 2025, Kapitel 3.1, Tabelle 4, Seite 10."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16075",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "KEIN BODENWERTBEZUG. Für den Saale-Orla-Kreis konnte in der Stichprobe kein Einfluss der Lage nachgewiesen werden; der Sachwertfaktor hängt hier allein vom vorläufigen Sachwert ab. Deshalb steht hier eine einzige Spalte, die für jeden Bodenrichtwert gilt. k = 1,27996 × (vSW / 1 Mio)^0,17536, gegen jeden abgedruckten Wert geprüft.",
+   "normobjekt": "Stichprobe im Gebiet: 38 freistehende Ein- und Zweifamilienhäuser, 17 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    40000,
+    60000,
+    80000,
+    100000,
+    120000,
+    140000,
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000
+   ],
+   "achse_k_feld": "brw_bereich",
+   "achse_k_bez": "kein Bodenwertbezug — im Saale-Orla-Kreis war kein Lageeinfluss nachweisbar",
+   "zuordnung_feld": "brw",
+   "kategorien": [
+    "alle"
+   ],
+   "kategorie_baender": [
+    {
+     "von": 0,
+     "bis": null,
+     "kategorie": "alle"
+    }
+   ],
+   "zellen": {
+    "40000": [
+     0.73
+    ],
+    "60000": [
+     0.78
+    ],
+    "80000": [
+     0.82
+    ],
+    "100000": [
+     0.85
+    ],
+    "120000": [
+     0.88
+    ],
+    "140000": [
+     0.91
+    ],
+    "160000": [
+     0.93
+    ],
+    "180000": [
+     0.95
+    ],
+    "200000": [
+     0.97
+    ],
+    "220000": [
+     0.98
+    ],
+    "240000": [
+     1.0
+    ],
+    "260000": [
+     1.01
+    ],
+    "280000": [
+     1.02
+    ],
+    "300000": [
+     1.04
+    ],
+    "320000": [
+     1.05
+    ],
+    "340000": [
+     1.06
+    ],
+    "360000": [
+     1.07
+    ],
+    "380000": [
+     1.08
+    ]
+   },
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2025, Kapitel 3.2, Tabelle 7, Seite 14."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (38 und 17 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2022-12-31",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2025 © Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung. Kein gesonderter Wertansatz für Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche, Vordächer in üblichem Umfang und übliche Außentreppen — diese sind im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in die Schätzfunktion in MIO EURO einzusetzen.",
+  "fundstelle": "Sachwertfaktoren 2025, Kapitel 3.2, Tabelle 7, Seite 14."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16075",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "KEIN BODENWERTBEZUG. Für den Saale-Orla-Kreis konnte in der Stichprobe kein Einfluss der Lage nachgewiesen werden; der Sachwertfaktor hängt hier allein vom vorläufigen Sachwert ab. Deshalb steht hier eine einzige Spalte, die für jeden Bodenrichtwert gilt. k = 1,27996 × (vSW / 1 Mio)^0,17536, gegen jeden abgedruckten Wert geprüft.",
+   "normobjekt": "Stichprobe im Gebiet: 38 freistehende Ein- und Zweifamilienhäuser, 17 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    40000,
+    60000,
+    80000,
+    100000,
+    120000,
+    140000,
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000
+   ],
+   "achse_k_feld": "brw_bereich",
+   "achse_k_bez": "kein Bodenwertbezug — im Saale-Orla-Kreis war kein Lageeinfluss nachweisbar",
+   "zuordnung_feld": "brw",
+   "kategorien": [
+    "alle"
+   ],
+   "kategorie_baender": [
+    {
+     "von": 0,
+     "bis": null,
+     "kategorie": "alle"
+    }
+   ],
+   "zellen": {
+    "40000": [
+     0.73
+    ],
+    "60000": [
+     0.78
+    ],
+    "80000": [
+     0.82
+    ],
+    "100000": [
+     0.85
+    ],
+    "120000": [
+     0.88
+    ],
+    "140000": [
+     0.91
+    ],
+    "160000": [
+     0.93
+    ],
+    "180000": [
+     0.95
+    ],
+    "200000": [
+     0.97
+    ],
+    "220000": [
+     0.98
+    ],
+    "240000": [
+     1.0
+    ],
+    "260000": [
+     1.01
+    ],
+    "280000": [
+     1.02
+    ],
+    "300000": [
+     1.04
+    ],
+    "320000": [
+     1.05
+    ],
+    "340000": [
+     1.06
+    ],
+    "360000": [
+     1.07
+    ],
+    "380000": [
+     1.08
+    ]
+   },
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2025, Kapitel 3.2, Tabelle 7, Seite 14."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (38 und 17 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2022-12-31",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2025 © Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung. Kein gesonderter Wertansatz für Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche, Vordächer in üblichem Umfang und übliche Außentreppen — diese sind im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in die Schätzfunktion in MIO EURO einzusetzen.",
+  "fundstelle": "Sachwertfaktoren 2025, Kapitel 3.2, Tabelle 7, Seite 14."
+ },
+ {
+  "land_code": "TH",
+  "ags": "16075",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "KEIN BODENWERTBEZUG. Für den Saale-Orla-Kreis konnte in der Stichprobe kein Einfluss der Lage nachgewiesen werden; der Sachwertfaktor hängt hier allein vom vorläufigen Sachwert ab. Deshalb steht hier eine einzige Spalte, die für jeden Bodenrichtwert gilt. k = 1,27996 × (vSW / 1 Mio)^0,17536, gegen jeden abgedruckten Wert geprüft.",
+   "normobjekt": "Stichprobe im Gebiet: 38 freistehende Ein- und Zweifamilienhäuser, 17 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    40000,
+    60000,
+    80000,
+    100000,
+    120000,
+    140000,
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000
+   ],
+   "achse_k_feld": "brw_bereich",
+   "achse_k_bez": "kein Bodenwertbezug — im Saale-Orla-Kreis war kein Lageeinfluss nachweisbar",
+   "zuordnung_feld": "brw",
+   "kategorien": [
+    "alle"
+   ],
+   "kategorie_baender": [
+    {
+     "von": 0,
+     "bis": null,
+     "kategorie": "alle"
+    }
+   ],
+   "zellen": {
+    "40000": [
+     0.73
+    ],
+    "60000": [
+     0.78
+    ],
+    "80000": [
+     0.82
+    ],
+    "100000": [
+     0.85
+    ],
+    "120000": [
+     0.88
+    ],
+    "140000": [
+     0.91
+    ],
+    "160000": [
+     0.93
+    ],
+    "180000": [
+     0.95
+    ],
+    "200000": [
+     0.97
+    ],
+    "220000": [
+     0.98
+    ],
+    "240000": [
+     1.0
+    ],
+    "260000": [
+     1.01
+    ],
+    "280000": [
+     1.02
+    ],
+    "300000": [
+     1.04
+    ],
+    "320000": [
+     1.05
+    ],
+    "340000": [
+     1.06
+    ],
+    "360000": [
+     1.07
+    ],
+    "380000": [
+     1.08
+    ]
+   },
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Sachwertfaktoren 2025, Kapitel 3.2, Tabelle 7, Seite 14."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (38 und 17 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2022-12-31",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2025 © Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung. Kein gesonderter Wertansatz für Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche, Vordächer in üblichem Umfang und übliche Außentreppen — diese sind im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in die Schätzfunktion in MIO EURO einzusetzen.",
+  "fundstelle": "Sachwertfaktoren 2025, Kapitel 3.2, Tabelle 7, Seite 14."
  }
 ]
