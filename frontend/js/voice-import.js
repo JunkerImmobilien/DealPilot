@@ -5789,7 +5789,6 @@
           /* v1376 (C7): Bei einem Widerspruch wird nicht geholt, sondern
              entschieden. Der alte Vorspann haette in die Irre gefuehrt. */
           (function () {
-          (function () {
             var knf  = akt.filter(function (a) { return a.art.indexOf('knf_') === 0; }).length;
             /* v1377: "holen" waere beim Nachtragen falsch - das tut der Nutzer. */
             var nf   = akt.filter(function (a) { return a.art === 'nachfass'; }).length;
