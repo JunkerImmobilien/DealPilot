@@ -4553,9 +4553,28 @@ robots-gesperrten selbst — siehe F):
 
 **Gesperrt und nur über eine Anfrage erreichbar:** Sachsen (sechs Vermerke
 einzeln am Dokument gelesen, alle sperren die kommerzielle Verwertung) ·
-Bremen · Saarland · Baden-Württemberg (dort zusätzlich **Darstellungsform** —
+Baden-Württemberg (dort zusätzlich **Darstellungsform** —
 Sachwertfaktoren als Streudiagramm **ohne Zahlentabelle und ohne Gleichung**,
 an sieben Ausschüssen belegt).
+
+> **Bremen und Saarland standen hier bis zum 14.09.2026 — beide zu Unrecht in
+> demselben Topf.** Gemessen und mit v1396 ins Quellenregister geschrieben:
+>
+> - **Bremen ist nicht gesperrt, sondern leer.** Der Ausschuss leitet keine
+>   Sachwertfaktoren ab und schreibt das in Kapitel 8.4 seines Berichts selbst
+>   (unzureichende Personalausstattung). **Der 50-€-Vollbericht enthält sie
+>   ebenfalls nicht** — eine Anfrage wie eine Zahlung wären hier vergeblich.
+>   Bremerhaven dagegen hat sie, ab Seite 31, hinter der Kasse.
+> - **Das Saarland ist weder gesperrt noch leer, sondern zentral.** Nicht der
+>   örtliche Ausschuss veröffentlicht, sondern die Zentrale Geschäftsstelle im
+>   Grundstücksmarktbericht Saarland (so der Saarbrücker Bericht selbst,
+>   Kapitel 7.3). Das Hindernis ist technisch: **`saarland.de` gibt unserer
+>   Server-IP durchgehend HTTP 403**, auch auf der Startseite — der
+>   Thüringen-Fall. **Marcel kann den Bericht von seinem Rechner holen**, dann
+>   ist das Saarland erntbar.
+>
+> Beides steht mit Fundstelle in `claude/ernte-20260913.md` und als Eintrag in
+> `quellen_links.js`; der Kunde bekommt dort den Weg statt einer Leerstelle.
 
 
 ### E2-NI · NIEDERSACHSEN — der Zugang ist offen, die Lizenz trägt
