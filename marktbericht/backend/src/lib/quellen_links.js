@@ -156,6 +156,18 @@ export const AUSSCHUSS_QUELLEN = {
     warum_kein_wert: 'Der Immobilienmarktbericht 2026 druckt zwar zwei umfangreiche Sachwertfaktor-Tabellen ab, diese sind aber hessenweit von der Zentralen Geschäftsstelle ermittelt und nicht vom Gutachterausschuss beschlossen. Damit sind es keine sonstigen zur Wertermittlung erforderlichen Daten nach § 193 Abs. 5 BauGB. Ein örtlich abgeleiteter Sachwertfaktor liegt für diesen Bereich nicht vor.',
     hinweis: 'Der Bericht ist im Downloadcenter der Hessischen Verwaltung für Bodenmanagement kostenfrei abrufbar (Datei 2026_IMB_AFB_Büdingen.pdf). Kapitel 8.3 nennt das vollständige Sachwertmodell — Gesamtnutzungsdauer 80 Jahre, NHK 2010, kein Regionalfaktor, Außenanlagen 1 bis 10 Prozent je nach Standardstufe —, sodass eine modellkonforme Rechnung mit dem hessenweiten Faktor bewusst möglich bleibt.',
   },
+  /* v1156 · Vorpommern-Greifswald. Der Bericht 2024 ist frei abrufbar und
+   * fuehrt das Kapitel 6.1.1 - aber es ist LEER. Woertlich: "Dieses Kapitel
+   * ist zum Zeitpunkt der Veroeffentlichung noch nicht vollstaendig
+   * abgeschlossen." Ein dritter Zustand neben "kostenpflichtig" und "nicht
+   * zuzuordnen": der Ausschuss ist noch nicht fertig. */
+  '13075': {
+    stelle: 'Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Greifswald',
+    url: 'https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/grundstuecksmarktberichte.html',
+    zugang: 'kostenfrei',
+    warum_kein_wert: 'Der Grundstücksmarktbericht 2024 führt das Kapitel „Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser" zwar auf, lässt es aber leer. Der Ausschuss schreibt dort: „Dieses Kapitel ist zum Zeitpunkt der Veröffentlichung noch nicht vollständig abgeschlossen. Die fehlenden Inhalte werden nach Fertigstellung im Wege einer Ergänzung bzw. Fortschreibung des Grundstücksmarktberichts veröffentlicht." Es gibt hier also derzeit keinen veröffentlichten Sachwertfaktor — weder kostenfrei noch gegen Gebühr.',
+    hinweis: 'Das Bewertungsmodell ist dagegen vollständig abgedruckt (Tabelle 76): NHK 2010, Bezugsmaßstab Bruttogrundfläche aus der ALK, Baupreisindex nach § 36 ImmoWertV, ursprüngliches Baujahr, Gesamtnutzungsdauer nach Anlage 1 ImmoWertV, Restnutzungsdauer über 25 Jahre, lineare Alterswertminderung, bauliche Außenanlagen mit 2 bis 4 Prozent vom Zeitwert des Gebäudes. Sobald die Fortschreibung erscheint, ist der Faktor damit sofort modellkonform anwendbar — es lohnt, den Bericht im nächsten Jahrgang erneut zu prüfen. Der Liegenschaftszinssatz (Kapitel 6.2) ist im selben Bericht vollständig enthalten.',
+  },
   /* v1155 · Landkreis Rostock. Der Bericht ist frei abrufbar und fachlich
    * reich - 675 Kauffaelle, vollstaendige Modellbeschreibung, Tabelle 12 mit
    * Regressionskonstanten je Teilmarkt. Woran es scheitert: die fuenf
