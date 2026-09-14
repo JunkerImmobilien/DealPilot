@@ -1,0 +1,119 @@
+{
+  "land_code": "HE",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "gaa_kennz": "06AFBHP-DA-O",
+  "ags": ["06432002", "06432004", "06432007", "06432009", "06432010", "06432011",
+          "06432013", "06432015", "06432016", "06432017", "06432019", "06432021"],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "Kaufverträge 2024 bis 2025, Kaufpreise unter 900.000 Euro",
+  "beschlossen": "2026-01-01",
+  "veroeffentlicht": "2026-08",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_datei": "2026_IMB_SÜDHESSEN_ AFB_HEPPENHEIM_GESAMTAUSGABE.pdf, Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.1 und 8.3.1.2, Gemeindezuordnung Seite 108",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises, Immobilienmarktbericht Südhessen 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 einschließlich Baunebenkosten, Bezugsparameter Bruttogrundfläche, Baupreisindex quartalsweise zum Beurkundungsdatum, Gesamtnutzungsdauer 80 Jahre, modifizierte wirtschaftliche Restnutzungsdauer 20 bis 80 Jahre nach der Punktetabelle der Anlage 2 ImmoWertV, lineare Alterswertminderung, Standardstufe mindestens 2,0, Nebengebäude pauschaler Zeitwert, Außenanlagen pauschal 5 Prozent vom Zeitwert der baulichen Anlagen, Regionalfaktor mit Beschluss zum 01.01.2026 auf 1,0 festgesetzt. Nur Kaufpreise unter 900.000 Euro.",
+  "fundstelle": "Kapitel 8.3.1.1 (Seite 109) und 8.3.1.2 (Seite 112), Gemeindezuordnung Ost/West auf Seite 108.",
+
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 80,
+    "alterswertminderung": "linear",
+    "regionalfaktor": 1.0,
+    "bezugsmassstab": "BGF"
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser im Ostbereich des Landkreises Darmstadt-Dieburg",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000, 550000,
+                    600000, 650000, 700000, 750000, 800000, 850000, 900000, 950000, 1000000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["bis 399", "ab 400"],
+        "kategorie_baender": [
+          { "von": 0,   "bis": 399,  "kategorie": "bis 399" },
+          { "von": 400, "bis": null, "kategorie": "ab 400" }
+        ],
+        "zellen": {
+          "bis 399": [null, null, null, 1.06, 1.03, 1.00, 0.98, 0.96, 0.94, 0.92, 0.91, 0.89, null, null, null, null, null, null],
+          "ab 400":  [null, null, null, null, 1.18, 1.13, 1.09, 1.05, 1.01, 0.99, 0.96, 0.94, 0.91, 0.89, 0.88, 0.86, 0.84, null]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Ostbereich des Landkreises Darmstadt-Dieburg — der Odenwaldrand. 53 Kauffälle (21 und 32), Bestimmtheitsmaß 0,11 und 0,20. ACHTUNG: Das Bestimmtheitsmaß der unteren Klasse ist mit 0,11 das niedrigste der ganzen Südhessen-Auswertung; die Faktoren dieser Spalte bewegen sich über den gesamten Bereich nur zwischen 1,06 und 0,89 und beschreiben den Markt erkennbar schwach. Standardabweichung ±0,13 und ±0,18.",
+        "normobjekt": "Bis 399 Euro/qm: mittlerer vorläufiger Sachwert 509.000 Euro, Grundstücksgröße 740 qm, Bodenrichtwert 290 Euro/qm, Restnutzungsdauer 43 Jahre, Standardstufe 2,9, Wohnfläche 175 qm. Ab 400 Euro/qm: 592.000 Euro, 570 qm, 500 Euro/qm, 45 Jahre, Standardstufe 2,9, Wohnfläche 170 qm."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Ostbereich des Landkreises Darmstadt-Dieburg: Babenhausen, Dieburg, Fischbachtal, Groß-Bieberau, Groß-Umstadt, Groß-Zimmern, Modautal, Münster (Hessen), Ober-Ramstadt, Otzberg, Reinheim, Schaafheim. Die Zuordnung steht als Gemeindeliste auf Seite 108 des Berichts; die Gemeindeschlüssel stammen aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser in konventioneller Bauweise",
+        "extrapolation": "laut Bericht nur in geringem Umfang marktgerecht, hier ausgeschlossen",
+        "spannen_je_brw_bereich": {
+          "bis 399": { "kauffaelle": 21, "r2": 0.11, "streuung": 0.13, "sachwert_mittel": 509000, "gsflaeche_mittel": 740, "brw_mittel": 290, "rnd_mittel": 43, "standardstufe": 2.9 },
+          "ab 400":  { "kauffaelle": 32, "r2": 0.20, "streuung": 0.18, "sachwert_mittel": 592000, "gsflaeche_mittel": 570, "brw_mittel": 500, "rnd_mittel": 45, "standardstufe": 2.9 }
+        },
+        "vorbehalt": "Das Bestimmtheitsmaß von 0,11 in der Klasse bis 399 Euro/qm ist der schwächste Wert der ganzen Südhessen-Auswertung. Der Ausschuss veröffentlicht die Spalte, weist aber im Fließtext ausdrücklich auf die hohe Schwankungsbreite hin und verlangt objektbezogene Zu- und Abschläge im Einzelfall."
+      },
+      "beleg": "Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.1, Tabelle Durchschnittlicher Sachwertfaktor, Seite 109.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle mit Fallzahl, Bestimmtheitsmass und Standardabweichung je Klasse. KEINE Stufe A, und hier faellt die Begruendung besonders deutlich aus: das Bestimmtheitsmass von 0,11 in der unteren Klasse ist der schwaechste Wert des gesamten Berichts.",
+      "fallzahl": 53,
+      "streuung": 0.18
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser und Doppelhaushälften im Ostbereich des Landkreises Darmstadt-Dieburg",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [150000, 200000, 250000, 300000, 350000, 400000,
+                    450000, 500000, 550000, 600000, 650000, 700000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["alle"],
+        "kategorie_baender": [
+          { "von": 0, "bis": null, "kategorie": "alle" }
+        ],
+        "zellen": {
+          "alle": [null, null, 1.47, 1.32, 1.21, 1.12, 1.05, 0.99, 0.94, 0.89, 0.85, null]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Bei den Reihenhäusern trennt der Ausschuss den Ostbereich NICHT nach Bodenrichtwertbereichen. 35 Kauffälle, Bestimmtheitsmaß 0,52 — deutlich belastbarer als der Zweig der freistehenden Häuser im selben Gebiet. Standardabweichung ±0,19.",
+        "normobjekt": "Mittlerer vorläufiger Sachwert 405.000 Euro, mittlere Grundstücksgröße 325 qm, mittlerer Bodenrichtwert 470 Euro/qm."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Ostbereich des Landkreises Darmstadt-Dieburg, zwölf Gemeinden nach der Liste auf Seite 108",
+        "sachlich": "Reihenhäuser und Doppelhaushälften in konventioneller Bauweise",
+        "extrapolation": "laut Bericht nur in geringem Umfang marktgerecht, hier ausgeschlossen"
+      },
+      "beleg": "Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.2, Tabelle Durchschnittlicher Sachwertfaktor, Seite 112.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle mit Fallzahl, Bestimmtheitsmass 0,52 und Standardabweichung. KEINE Stufe A wegen der Stichprobe von 35 Kauffaellen und des ausdruecklichen Hinweises des Ausschusses auf die hohe Schwankungsbreite.",
+      "fallzahl": 35,
+      "streuung": 0.19
+    }
+  ],
+
+  "anmerkungen": [
+    "Der Landkreis Darmstadt-Dieburg ist im Bericht in Ost- und Westbereich getrennt; der Westbereich liegt als eigenes Rezept im Register (HE-06432-darmstadt-dieburg-west) und hat andere Bodenrichtwertklassen (bis 699 und ab 700 statt bis 399 und ab 400) sowie deutlich höhere Faktoren.",
+    "Die Stadt Darmstadt ist vom Zuständigkeitsbereich AUSGENOMMEN. Sie ist kreisfreie Stadt mit eigenem Kreisschlüssel (06411) und von diesem Satz nicht berührt.",
+    "Der Ausschuss hat zum Bericht 2026 ERSTMALS getrennt nach den fünf südhessischen Landkreisen ausgewertet, weil der Markt zu heterogen für einen gemeinsamen Satz ist.",
+    "Der Auswertung liegen die Bodenrichtwerte zum Stichtag 01.01.2024 zugrunde; auf eine konjunkturelle Anpassung wurde wegen der stagnierenden Preisentwicklung verzichtet. Für aktuelle Bewertungsfälle sind laut Bericht die Bodenrichtwerte zum 01.01.2026 zu verwenden."
+  ]
+}

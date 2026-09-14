@@ -1,0 +1,118 @@
+{
+  "land_code": "HE",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "gaa_kennz": "06AFBHP-BS-O",
+  "ags": ["06431001", "06431004", "06431007", "06431008", "06431009", "06431012",
+          "06431014", "06431015", "06431017", "06431018", "06431019", "06431021"],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "Kaufverträge 2024 bis 2025, Kaufpreise unter 900.000 Euro",
+  "beschlossen": "2026-01-01",
+  "veroeffentlicht": "2026-08",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_datei": "2026_IMB_SÜDHESSEN_ AFB_HEPPENHEIM_GESAMTAUSGABE.pdf, Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.1 und 8.3.1.2, Gemeindezuordnung Seite 108",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises, Immobilienmarktbericht Südhessen 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 einschließlich Baunebenkosten, Bezugsparameter Bruttogrundfläche, Baupreisindex quartalsweise zum Beurkundungsdatum, Gesamtnutzungsdauer 80 Jahre, modifizierte wirtschaftliche Restnutzungsdauer 20 bis 80 Jahre nach der Punktetabelle der Anlage 2 ImmoWertV, lineare Alterswertminderung, Standardstufe mindestens 2,0, Nebengebäude pauschaler Zeitwert, Außenanlagen pauschal 5 Prozent vom Zeitwert der baulichen Anlagen, Regionalfaktor mit Beschluss zum 01.01.2026 auf 1,0 festgesetzt. Nur Kaufpreise unter 900.000 Euro.",
+  "fundstelle": "Kapitel 8.3.1.1 (Seite 109) und 8.3.1.2 (Seite 112), Gemeindezuordnung Ost/West auf Seite 108.",
+
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 80,
+    "alterswertminderung": "linear",
+    "regionalfaktor": 1.0,
+    "bezugsmassstab": "BGF"
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser im Ostbereich des Kreises Bergstraße",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000, 550000,
+                    600000, 650000, 700000, 750000, 800000, 850000, 900000, 950000, 1000000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["bis 199", "ab 200"],
+        "kategorie_baender": [
+          { "von": 0,   "bis": 199,  "kategorie": "bis 199" },
+          { "von": 200, "bis": null, "kategorie": "ab 200" }
+        ],
+        "zellen": {
+          "bis 199": [null, 1.36, 1.26, 1.19, 1.13, 1.08, 1.04, 1.00, 0.97, 0.95, 0.92, 0.90, 0.88, 0.86, 0.84, null, null, null],
+          "ab 200":  [null, 1.52, 1.37, 1.25, 1.16, 1.09, 1.03, 0.98, 0.94, 0.90, 0.86, 0.83, 0.81, 0.78, 0.76, 0.74, null, null]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Ostbereich des Kreises Bergstraße — der Odenwaldteil. 46 Kauffälle (18 und 28), Bestimmtheitsmaß 0,45 und 0,49, Standardabweichung ±0,20 und ±0,18. Der Bericht sagt: Zwischenwerte sind zu interpolieren, Extrapolationen über die angegebene Spanne hinaus können nur in geringem Umfang marktgerecht durchgeführt werden.",
+        "normobjekt": "Bis 199 Euro/qm: mittlerer vorläufiger Sachwert 425.000 Euro, Grundstücksgröße 830 qm, Bodenrichtwert 150 Euro/qm, Restnutzungsdauer 43 Jahre, Standardstufe 2,8, Wohnfläche 180 qm. Ab 200 Euro/qm: 482.000 Euro, 625 qm, 260 Euro/qm, 49 Jahre, Standardstufe 2,9, Wohnfläche 170 qm."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Ostbereich des Kreises Bergstraße: Abtsteinach, Birkenau, Fürth (Odenwald), Gorxheimertal, Grasellenbach, Hirschhorn (Neckar), Lautertal (Odenwald), Lindenfels, Mörlenbach, Neckarsteinach, Rimbach, Wald-Michelbach. Die Zuordnung steht als Gemeindeliste auf Seite 108 des Berichts; die Gemeindeschlüssel stammen aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser in konventioneller Bauweise",
+        "extrapolation": "laut Bericht nur in geringem Umfang marktgerecht, hier ausgeschlossen",
+        "spannen_je_brw_bereich": {
+          "bis 199": { "kauffaelle": 18, "r2": 0.45, "streuung": 0.20, "sachwert_mittel": 425000, "gsflaeche_mittel": 830, "brw_mittel": 150, "rnd_mittel": 43, "standardstufe": 2.8 },
+          "ab 200":  { "kauffaelle": 28, "r2": 0.49, "streuung": 0.18, "sachwert_mittel": 482000, "gsflaeche_mittel": 625, "brw_mittel": 260, "rnd_mittel": 49, "standardstufe": 2.9 }
+        }
+      },
+      "beleg": "Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.1, Tabelle Durchschnittlicher Sachwertfaktor, Seite 109.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle mit Fallzahl, Bestimmtheitsmass und Standardabweichung je Klasse. KEINE Stufe A: 18 und 28 Kauffaelle sind kleine Stichproben, die Standardabweichung von 0,20 in der unteren Klasse ist die groesste im Kreis.",
+      "fallzahl": 46,
+      "streuung": 0.20
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser und Doppelhaushälften im Ostbereich des Kreises Bergstraße",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [150000, 200000, 250000, 300000, 350000, 400000,
+                    450000, 500000, 550000, 600000, 650000, 700000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["alle"],
+        "kategorie_baender": [
+          { "von": 0, "bis": null, "kategorie": "alle" }
+        ],
+        "zellen": {
+          "alle": [1.62, 1.43, 1.30, 1.20, 1.13, 1.06, 1.01, 0.97, 0.93, null, null, null]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Anders als bei den freistehenden Häusern wird der Ostbereich hier NICHT nach Bodenrichtwertbereichen getrennt — die Stichprobe ist zu klein. Nur ELF Kauffälle, Bestimmtheitsmaß 0,41, Standardabweichung ±0,21. Das ist die dünnste Auswertung des ganzen Südhessen-Berichts und verlangt eine eigene sachverständige Würdigung.",
+        "normobjekt": "Mittlerer vorläufiger Sachwert 325.000 Euro, mittlere Grundstücksgröße 285 qm, mittlerer Bodenrichtwert 280 Euro/qm."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Ostbereich des Kreises Bergstraße, zwölf Gemeinden nach der Liste auf Seite 108",
+        "sachlich": "Reihenhäuser und Doppelhaushälften in konventioneller Bauweise",
+        "extrapolation": "laut Bericht nur in geringem Umfang marktgerecht, hier ausgeschlossen"
+      },
+      "beleg": "Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.2, Tabelle Durchschnittlicher Sachwertfaktor, Seite 112.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle. KEINE Stufe A: nur ELF Kauffaelle bei einer Standardabweichung von 0,21 - die duennste Auswertung des Berichts.",
+      "fallzahl": 11,
+      "streuung": 0.21
+    }
+  ],
+
+  "anmerkungen": [
+    "Der Kreis Bergstraße ist im Bericht in Ost- und Westbereich getrennt; der Westbereich liegt als eigenes Rezept im Register (HE-06431-bergstrasse-west) und hat deutlich andere Werte. Die Zuordnung der Gemeinden steht als LISTE auf Seite 108 — anders als beim Landkreis Fulda desselben Landes, wo sie nur als Karte vorliegt.",
+    "Das gemeindefreie Gebiet Michelbuch (06431200) ist in der Liste des Berichts nicht enthalten und deshalb hier nicht erfasst. Es ist unbewohntes Waldgebiet.",
+    "Der Ausschuss hat zum Bericht 2026 ERSTMALS getrennt nach den fünf südhessischen Landkreisen ausgewertet, weil der Markt zu heterogen für einen gemeinsamen Satz ist.",
+    "Der Auswertung liegen die Bodenrichtwerte zum Stichtag 01.01.2024 zugrunde; auf eine konjunkturelle Anpassung wurde wegen der stagnierenden Preisentwicklung verzichtet. Für aktuelle Bewertungsfälle sind laut Bericht die Bodenrichtwerte zum 01.01.2026 zu verwenden."
+  ]
+}
