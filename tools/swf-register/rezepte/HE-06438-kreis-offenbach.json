@@ -1,0 +1,122 @@
+{
+  "land_code": "HE",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "gaa_kennz": "06AFBHP-OF",
+  "ags": ["06438"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "Kaufverträge 2024 bis 2025, Kaufpreise unter 900.000 Euro",
+  "beschlossen": "2026-01-01",
+  "veroeffentlicht": "2026-08",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_datei": "2026_IMB_SÜDHESSEN_ AFB_HEPPENHEIM_GESAMTAUSGABE.pdf, Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.1 und 8.3.1.2, Seiten 110 und 113",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises, Immobilienmarktbericht Südhessen 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 einschließlich Baunebenkosten, Bezugsparameter Bruttogrundfläche, Baupreisindex quartalsweise zum Beurkundungsdatum, Gesamtnutzungsdauer 80 Jahre, modifizierte wirtschaftliche Restnutzungsdauer 20 bis 80 Jahre nach der Punktetabelle der Anlage 2 ImmoWertV, lineare Alterswertminderung, Standardstufe mindestens 2,0, Nebengebäude pauschaler Zeitwert, Außenanlagen pauschal 5 Prozent vom Zeitwert der baulichen Anlagen, Regionalfaktor mit Beschluss zum 01.01.2026 auf 1,0 festgesetzt. Nur Kaufpreise unter 900.000 Euro.",
+  "fundstelle": "Kapitel 8.3.1.1 und 8.3.1.2, Tabellen Durchschnittlicher Sachwertfaktor, Seiten 110 und 113.",
+
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 80,
+    "alterswertminderung": "linear",
+    "regionalfaktor": 1.0,
+    "bezugsmassstab": "BGF"
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser im Kreis Offenbach",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [450000, 500000, 550000, 600000, 650000, 700000, 750000,
+                    800000, 850000, 900000, 950000, 1000000, 1100000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["bis 799", "ab 800"],
+        "kategorie_baender": [
+          { "von": 0,   "bis": 799,  "kategorie": "bis 799" },
+          { "von": 800, "bis": null, "kategorie": "ab 800" }
+        ],
+        "zellen": {
+          "bis 799": [1.10, 1.05, 1.01, 0.97, 0.93, 0.90, 0.87, 0.85, 0.83, 0.80, 0.78, null, null],
+          "ab 800":  [1.21, 1.15, 1.10, 1.06, 1.03, 0.99, 0.96, 0.93, 0.91, 0.89, 0.87, 0.85, 0.81]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Zwei Bodenrichtwertklassen, 48 Kauffälle 2024/2025 (30 und 18), Bestimmtheitsmaß 0,38 und 0,50, Standardabweichung jeweils ±0,12. Die Tabelle beginnt erst bei 450.000 Euro vorläufigem Sachwert — darunter liegen im Kreis Offenbach keine auswertbaren Fälle. Der Bericht sagt: Zwischenwerte sind zu interpolieren, Extrapolationen über die angegebene Spanne hinaus können nur in geringem Umfang marktgerecht durchgeführt werden.",
+        "normobjekt": "Bis 799 Euro/qm: mittlerer vorläufiger Sachwert 637.000 Euro, Grundstücksgröße 525 qm, Bodenrichtwert 640 Euro/qm, Restnutzungsdauer 42 Jahre, Standardstufe 2,7. Ab 800 Euro/qm: 717.000 Euro, 510 qm, 955 Euro/qm, 40 Jahre, Standardstufe 2,7."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Kreis Offenbach OHNE die kreisfreie Stadt Offenbach am Main, die einen eigenen Gutachterausschuss führt und unter einem eigenen Kreisschlüssel liegt (06413)",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser in konventioneller Bauweise",
+        "extrapolation": "laut Bericht nur in geringem Umfang marktgerecht, hier ausgeschlossen",
+        "spannen_je_brw_bereich": {
+          "bis 799": { "kauffaelle": 30, "r2": 0.38, "streuung": 0.12, "sachwert_mittel": 637000, "gsflaeche_mittel": 525, "brw_mittel": 640, "rnd_mittel": 42, "standardstufe": 2.7 },
+          "ab 800":  { "kauffaelle": 18, "r2": 0.50, "streuung": 0.12, "sachwert_mittel": 717000, "gsflaeche_mittel": 510, "brw_mittel": 955, "rnd_mittel": 40, "standardstufe": 2.7 }
+        }
+      },
+      "beleg": "Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.1, Tabelle Durchschnittlicher Sachwertfaktor, Seite 110.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle mit Fallzahl, Bestimmtheitsmass und Standardabweichung je Klasse. KEINE Stufe A: 30 und 18 Kauffaelle sind wenig, und der Ausschuss weist selbst auf die hohe Schwankungsbreite der ausgewerteten Objekte hin.",
+      "fallzahl": 48,
+      "streuung": 0.12
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser und Doppelhaushälften im Kreis Offenbach",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [250000, 300000, 350000, 400000, 450000, 500000,
+                    550000, 600000, 650000, 700000, 750000, 800000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["bis 799", "ab 800"],
+        "kategorie_baender": [
+          { "von": 0,   "bis": 799,  "kategorie": "bis 799" },
+          { "von": 800, "bis": null, "kategorie": "ab 800" }
+        ],
+        "zellen": {
+          "bis 799": [1.54, 1.40, 1.28, 1.19, 1.12, 1.06, 1.00, 0.96, 0.92, 0.88, 0.85, 0.82],
+          "ab 800":  [null, 1.35, 1.29, 1.23, 1.18, 1.14, 1.11, 1.08, 1.05, 1.02, 1.00, 0.98]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "111 Kauffälle (60 und 51) — die größte Stichprobe der südhessischen Reihenhausauswertungen. Bestimmtheitsmaß 0,63 und 0,33, Standardabweichung ±0,16 und ±0,15. Anders als bei den freistehenden Häusern beginnt die Tabelle schon bei 250.000 Euro.",
+        "normobjekt": "Bis 799 Euro/qm: mittlerer vorläufiger Sachwert 429.000 Euro, Grundstücksgröße 310 qm, Bodenrichtwert 650 Euro/qm. Ab 800 Euro/qm: 502.000 Euro, 285 qm, 1.035 Euro/qm."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Kreis Offenbach ohne die kreisfreie Stadt Offenbach am Main",
+        "sachlich": "Reihenhäuser und Doppelhaushälften in konventioneller Bauweise",
+        "extrapolation": "laut Bericht nur in geringem Umfang marktgerecht, hier ausgeschlossen",
+        "spannen_je_brw_bereich": {
+          "bis 799": { "kauffaelle": 60, "r2": 0.63, "streuung": 0.16, "sachwert_mittel": 429000, "gsflaeche_mittel": 310, "brw_mittel": 650 },
+          "ab 800":  { "kauffaelle": 51, "r2": 0.33, "streuung": 0.15, "sachwert_mittel": 502000, "gsflaeche_mittel": 285, "brw_mittel": 1035 }
+        }
+      },
+      "beleg": "Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.2, Tabelle Durchschnittlicher Sachwertfaktor, Seite 113.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle mit Fallzahl, Bestimmtheitsmass und Standardabweichung je Klasse. KEINE Stufe A, weil das Bestimmtheitsmass in der oberen Klasse nur 0,33 betraegt und der Ausschuss selbst eine sachgerechte Zu- und Abschlagsbildung im Einzelfall verlangt.",
+      "fallzahl": 111,
+      "streuung": 0.16
+    }
+  ],
+
+  "anmerkungen": [
+    "NICHT ZU VERWECHSELN: Dieser Satz gilt für den KREIS Offenbach (06438). Die kreisfreie STADT Offenbach am Main (06413) hat einen eigenen Gutachterausschuss, einen eigenen Bericht und einen eigenen Satz im Register — und dort gelten Potenzformeln statt Tabellen. Die beiden Schlüssel sind verschieden, die Kaskade kann sie deshalb nicht verwechseln.",
+    "Der Ausschuss hat zum Bericht 2026 ERSTMALS getrennt nach den fünf südhessischen Landkreisen ausgewertet. Kreis Groß-Gerau und Odenwaldkreis liegen als eigene Rezepte im Register; Kreis Bergstraße und Landkreis Darmstadt-Dieburg sind zusätzlich in Ost- und Westbereich getrennt und noch nicht erfasst.",
+    "Der Auswertung liegen die Bodenrichtwerte zum Stichtag 01.01.2024 zugrunde; auf eine konjunkturelle Anpassung wurde wegen der stagnierenden Preisentwicklung verzichtet. Für aktuelle Bewertungsfälle sind laut Bericht die Bodenrichtwerte zum 01.01.2026 zu verwenden."
+  ]
+}

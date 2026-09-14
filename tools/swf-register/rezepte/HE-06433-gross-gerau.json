@@ -1,0 +1,110 @@
+{
+  "land_code": "HE",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "gaa_kennz": "06AFBHP-GG",
+  "ags": ["06433"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "Kaufverträge 2024 bis 2025, Kaufpreise unter 900.000 Euro",
+  "beschlossen": "2026-01-01",
+  "veroeffentlicht": "2026-08",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_datei": "2026_IMB_SÜDHESSEN_ AFB_HEPPENHEIM_GESAMTAUSGABE.pdf, Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.1 und 8.3.1.2, Seiten 106 bis 113",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises, Immobilienmarktbericht Südhessen 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 einschließlich Baunebenkosten, Bezugsparameter Bruttogrundfläche, Baupreisindex quartalsweise zum Beurkundungsdatum, Gesamtnutzungsdauer 80 Jahre, modifizierte wirtschaftliche Restnutzungsdauer 20 bis 80 Jahre nach der Punktetabelle der Anlage 2 ImmoWertV, lineare Alterswertminderung, Standardstufe mindestens 2,0, Nebengebäude pauschaler Zeitwert, Außenanlagen pauschal 5 Prozent vom Zeitwert der baulichen Anlagen, Regionalfaktor nach § 36 Abs. 3 ImmoWertV mit Beschluss zum 01.01.2026 auf 1,0 festgesetzt. Nur Kaufpreise unter 900.000 Euro.",
+  "fundstelle": "Kapitel 8.3.1 Regionale Sachwertfaktoren, Unterkapitel 8.3.1.1 und 8.3.1.2, Seiten 106 bis 113.",
+
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 80,
+    "alterswertminderung": "linear",
+    "regionalfaktor": 1.0,
+    "bezugsmassstab": "BGF"
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser im Kreis Groß-Gerau",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [300000, 350000, 400000, 450000, 500000, 550000, 600000,
+                    650000, 700000, 750000, 800000, 850000, 900000, 950000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["alle"],
+        "kategorie_baender": [
+          { "von": 0, "bis": null, "kategorie": "alle" }
+        ],
+        "zellen": {
+          "alle": [1.19, 1.12, 1.07, 1.02, 0.98, 0.95, 0.92, 0.89, 0.86, 0.84, 0.82, 0.80, 0.78, 0.77]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Der Kreis Groß-Gerau wird NICHT nach Bodenrichtwertbereichen untergliedert — anders als die Nachbarkreise Bergstraße, Darmstadt-Dieburg und Offenbach. Deshalb steht hier eine einzige Spalte für den ganzen Kreis. 57 Kauffälle 2024/2025, Bestimmtheitsmaß 0,35, Standardabweichung des Sachwertfaktors ±0,13. Der Bericht sagt: Zwischenwerte sind zu interpolieren, Extrapolationen über die angegebene Spanne hinaus können nur in geringem Umfang marktgerecht durchgeführt werden — hier gibt es außerhalb deshalb keinen Wert.",
+        "normobjekt": "Mittlerer vorläufiger Sachwert 575.000 Euro, mittlere Grundstücksgröße 560 qm, mittlerer Bodenrichtwert 555 Euro/qm, mittlere wirtschaftliche Restnutzungsdauer 39 Jahre, mittlere Standardstufe 2,7, mittlere BGF 350 qm, mittlere Wohnfläche 165 qm. Mittlerer Kaufpreis 3.310 Euro je qm Wohnfläche (1.900 bis 5.110). Nur Objekte ohne besondere objektspezifische Grundstücksmerkmale, Standardstufe mindestens 2,0."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Kreis Groß-Gerau, ungeteilt",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser in konventioneller Bauweise",
+        "extrapolation": "laut Bericht nur in geringem Umfang marktgerecht, hier ausgeschlossen"
+      },
+      "beleg": "Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.1, Tabelle Durchschnittlicher Sachwertfaktor, Seite 110.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle mit Fallzahl, Bestimmtheitsmass und Standardabweichung. KEINE Stufe A: 57 Kauffaelle bei einem Bestimmtheitsmass von 0,35, und der Ausschuss weist selbst auf die hohe Schwankungsbreite der ausgewerteten Objekte hin.",
+      "fallzahl": 57,
+      "streuung": 0.13
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser und Doppelhaushälften im Kreis Groß-Gerau",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [250000, 300000, 350000, 400000, 450000, 500000, 550000, 600000, 650000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["alle"],
+        "kategorie_baender": [
+          { "von": 0, "bis": null, "kategorie": "alle" }
+        ],
+        "zellen": {
+          "alle": [1.51, 1.39, 1.29, 1.22, 1.15, 1.10, 1.05, 1.01, 0.98]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Eigene Auswertung für Reihenhäuser und Doppelhaushälften, 38 Kauffälle, Bestimmtheitsmaß 0,62 — deutlich belastbarer als der Zweig der freistehenden Häuser. Standardabweichung ±0,12. Die Faktoren liegen durchweg über denen der freistehenden Häuser.",
+        "normobjekt": "Mittlerer vorläufiger Sachwert 417.000 Euro, mittlere Grundstücksgröße 330 qm, mittlerer Bodenrichtwert 575 Euro/qm."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Kreis Groß-Gerau, ungeteilt",
+        "sachlich": "Reihenhäuser und Doppelhaushälften in konventioneller Bauweise",
+        "extrapolation": "laut Bericht nur in geringem Umfang marktgerecht, hier ausgeschlossen"
+      },
+      "beleg": "Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.2, Tabelle Durchschnittlicher Sachwertfaktor, Seite 113.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle mit Fallzahl, Bestimmtheitsmass 0,62 und Standardabweichung. KEINE Stufe A wegen der Stichprobe von 38 Kauffaellen und des ausdruecklichen Hinweises des Ausschusses auf die hohe Schwankungsbreite.",
+      "fallzahl": 38,
+      "streuung": 0.12
+    }
+  ],
+
+  "anmerkungen": [
+    "Der Ausschuss hat zum Bericht 2026 ERSTMALS getrennt nach den fünf südhessischen Landkreisen ausgewertet, weil der Markt zu heterogen für einen gemeinsamen Satz ist. Kreis Groß-Gerau, Odenwaldkreis und Kreis Offenbach liegen als eigene Rezepte im Register.",
+    "Kreis Bergstraße und Landkreis Darmstadt-Dieburg sind zusätzlich in Ost- und Westbereich getrennt; die Zuordnung der Gemeinden steht als Liste auf Seite 108 des Berichts. Beide sind noch nicht erfasst, weil dafür die amtlichen Gemeindeschlüssel gebraucht werden.",
+    "Der Auswertung liegen die Bodenrichtwerte zum Stichtag 01.01.2024 zugrunde; der Ausschuss hat wegen der stagnierenden Preisentwicklung auf eine konjunkturelle Anpassung verzichtet. Für aktuelle Bewertungsfälle sind laut Bericht die Bodenrichtwerte zum 01.01.2026 zu verwenden — der Sachwertfaktor selbst gilt ab dem Stichtag 01.01.2026.",
+    "Die Stadt Darmstadt und die Stadt Offenbach sind vom Zuständigkeitsbereich AUSGENOMMEN. Beide sind kreisfreie Städte mit eigenem Kreisschlüssel (06411 und 06413) und deshalb von diesem Satz nicht berührt; Offenbach hat einen eigenen Satz im Register."
+  ]
+}

@@ -4079,3 +4079,59 @@ darf `rhdhh` gerade nicht angelegt werden — eine Lücke der Quelle ist
 kein Erntefehler.
 
 `v1137`
+
+---
+
+## `rm -f` vor dem Pull löscht auch, was committet ist
+
+Beim Ausrollen der hessischen Ernte brach `git pull` zweimal ab, weil
+noch nicht committete Rezepte im Weg lagen:
+
+```
+error: The following untracked working tree files would be
+overwritten by merge: tools/swf-register/rezepte/HE-06413-offenbach.json
+```
+
+Der Einzeiler dagegen war:
+
+```bash
+rm -f tools/swf-register/rezepte/HE-*.json && git pull -q origin staging
+```
+
+Gemeint waren die **untracked** Dateien. Getroffen wurden **alle** — auch
+die sechs, die längst im Zweig standen: Frankfurt, Offenbach, Wiesbaden,
+Oberursel, Kassel und der Landessatz.
+
+**Und `git pull` holt sie nicht zurück.** Bei einem Fast-Forward, der
+diese Dateien nicht anfasst, bleibt die Löschung im Arbeitsbaum stehen.
+Der Pull meldet Erfolg, der Zweig ist auf dem richtigen Stand — und
+sechs Dateien fehlen trotzdem.
+
+Der Registerbau lief danach ohne Fehler durch und meldete:
+
+```
+-> out/swf-he.json  (HE: 33)
+```
+
+**33 statt 43 — und das ist die einzige Stelle, an der es sichtbar war.**
+Hätte diese Saatdatei den Weg in einen Commit gefunden, wären fünf
+Ausschüsse aus dem Register verschwunden, ohne dass irgendetwas
+fehlschlägt: kein Fehler, kein Abbruch, nur ein Kunde in Frankfurt, der
+plötzlich keinen Sachwertfaktor mehr bekommt.
+
+**Richtig ist, gezielt nur Unversioniertes zu entfernen:**
+
+```bash
+git clean -f tools/swf-register/rezepte/   # nur untracked
+git checkout -- tools/swf-register/        # tracked zurueckholen
+```
+
+> **Die Lehre ist nicht „rm ist gefährlich", sondern: eine Zahl, die
+> sinken kann, muss vor jedem Commit gelesen werden.** Der Registerbau
+> nennt sie bei jedem Lauf. Aufgefallen ist der Verlust nur, weil die
+> Prüfstrecke neben den neuen Kreisen auch die *Stadt* Offenbach abfragte
+> — ein Nachbarschlüssel, der mit der neuen Ernte gar nichts zu tun
+> hatte. **Wer nur prüft, was er gerade gebaut hat, sieht nie, was er
+> dabei zerstört hat.**
+
+`v1141`

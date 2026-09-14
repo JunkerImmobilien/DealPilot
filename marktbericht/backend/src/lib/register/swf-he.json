@@ -556,6 +556,230 @@
  },
  {
   "land_code": "HE",
+  "ags": "06433",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000,
+    750000,
+    800000,
+    850000,
+    900000,
+    950000
+   ],
+   "achse_k_feld": "brw_bereich",
+   "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+   "zuordnung_feld": "brw",
+   "kategorien": [
+    "alle"
+   ],
+   "kategorie_baender": [
+    {
+     "von": 0,
+     "bis": null,
+     "kategorie": "alle"
+    }
+   ],
+   "zellen": {
+    "300000": [
+     1.19
+    ],
+    "350000": [
+     1.12
+    ],
+    "400000": [
+     1.07
+    ],
+    "450000": [
+     1.02
+    ],
+    "500000": [
+     0.98
+    ],
+    "550000": [
+     0.95
+    ],
+    "600000": [
+     0.92
+    ],
+    "650000": [
+     0.89
+    ],
+    "700000": [
+     0.86
+    ],
+    "750000": [
+     0.84
+    ],
+    "800000": [
+     0.82
+    ],
+    "850000": [
+     0.8
+    ],
+    "900000": [
+     0.78
+    ],
+    "950000": [
+     0.77
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Der Kreis Groß-Gerau wird NICHT nach Bodenrichtwertbereichen untergliedert — anders als die Nachbarkreise Bergstraße, Darmstadt-Dieburg und Offenbach. Deshalb steht hier eine einzige Spalte für den ganzen Kreis. 57 Kauffälle 2024/2025, Bestimmtheitsmaß 0,35, Standardabweichung des Sachwertfaktors ±0,13. Der Bericht sagt: Zwischenwerte sind zu interpolieren, Extrapolationen über die angegebene Spanne hinaus können nur in geringem Umfang marktgerecht durchgeführt werden — hier gibt es außerhalb deshalb keinen Wert.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 575.000 Euro, mittlere Grundstücksgröße 560 qm, mittlerer Bodenrichtwert 555 Euro/qm, mittlere wirtschaftliche Restnutzungsdauer 39 Jahre, mittlere Standardstufe 2,7, mittlere BGF 350 qm, mittlere Wohnfläche 165 qm. Mittlerer Kaufpreis 3.310 Euro je qm Wohnfläche (1.900 bis 5.110). Nur Objekte ohne besondere objektspezifische Grundstücksmerkmale, Standardstufe mindestens 2,0.",
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Kreis Groß-Gerau, ungeteilt",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser in konventioneller Bauweise",
+   "extrapolation": "laut Bericht nur in geringem Umfang marktgerecht, hier ausgeschlossen"
+  },
+  "belege": [
+   "Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.1, Tabelle Durchschnittlicher Sachwertfaktor, Seite 110."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Tabelle mit Fallzahl, Bestimmtheitsmass und Standardabweichung. KEINE Stufe A: 57 Kauffaelle bei einem Bestimmtheitsmass von 0,35, und der Ausschuss weist selbst auf die hohe Schwankungsbreite der ausgewerteten Objekte hin.",
+  "fallzahl": 57,
+  "streuung": 0.13,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises, Immobilienmarktbericht Südhessen 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 einschließlich Baunebenkosten, Bezugsparameter Bruttogrundfläche, Baupreisindex quartalsweise zum Beurkundungsdatum, Gesamtnutzungsdauer 80 Jahre, modifizierte wirtschaftliche Restnutzungsdauer 20 bis 80 Jahre nach der Punktetabelle der Anlage 2 ImmoWertV, lineare Alterswertminderung, Standardstufe mindestens 2,0, Nebengebäude pauschaler Zeitwert, Außenanlagen pauschal 5 Prozent vom Zeitwert der baulichen Anlagen, Regionalfaktor nach § 36 Abs. 3 ImmoWertV mit Beschluss zum 01.01.2026 auf 1,0 festgesetzt. Nur Kaufpreise unter 900.000 Euro.",
+  "fundstelle": "Kapitel 8.3.1 Regionale Sachwertfaktoren, Unterkapitel 8.3.1.1 und 8.3.1.2, Seiten 106 bis 113."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06433",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000
+   ],
+   "achse_k_feld": "brw_bereich",
+   "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+   "zuordnung_feld": "brw",
+   "kategorien": [
+    "alle"
+   ],
+   "kategorie_baender": [
+    {
+     "von": 0,
+     "bis": null,
+     "kategorie": "alle"
+    }
+   ],
+   "zellen": {
+    "250000": [
+     1.51
+    ],
+    "300000": [
+     1.39
+    ],
+    "350000": [
+     1.29
+    ],
+    "400000": [
+     1.22
+    ],
+    "450000": [
+     1.15
+    ],
+    "500000": [
+     1.1
+    ],
+    "550000": [
+     1.05
+    ],
+    "600000": [
+     1.01
+    ],
+    "650000": [
+     0.98
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Eigene Auswertung für Reihenhäuser und Doppelhaushälften, 38 Kauffälle, Bestimmtheitsmaß 0,62 — deutlich belastbarer als der Zweig der freistehenden Häuser. Standardabweichung ±0,12. Die Faktoren liegen durchweg über denen der freistehenden Häuser.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 417.000 Euro, mittlere Grundstücksgröße 330 qm, mittlerer Bodenrichtwert 575 Euro/qm.",
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Kreis Groß-Gerau, ungeteilt",
+   "sachlich": "Reihenhäuser und Doppelhaushälften in konventioneller Bauweise",
+   "extrapolation": "laut Bericht nur in geringem Umfang marktgerecht, hier ausgeschlossen"
+  },
+  "belege": [
+   "Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.2, Tabelle Durchschnittlicher Sachwertfaktor, Seite 113."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Tabelle mit Fallzahl, Bestimmtheitsmass 0,62 und Standardabweichung. KEINE Stufe A wegen der Stichprobe von 38 Kauffaellen und des ausdruecklichen Hinweises des Ausschusses auf die hohe Schwankungsbreite.",
+  "fallzahl": 38,
+  "streuung": 0.12,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises, Immobilienmarktbericht Südhessen 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 einschließlich Baunebenkosten, Bezugsparameter Bruttogrundfläche, Baupreisindex quartalsweise zum Beurkundungsdatum, Gesamtnutzungsdauer 80 Jahre, modifizierte wirtschaftliche Restnutzungsdauer 20 bis 80 Jahre nach der Punktetabelle der Anlage 2 ImmoWertV, lineare Alterswertminderung, Standardstufe mindestens 2,0, Nebengebäude pauschaler Zeitwert, Außenanlagen pauschal 5 Prozent vom Zeitwert der baulichen Anlagen, Regionalfaktor nach § 36 Abs. 3 ImmoWertV mit Beschluss zum 01.01.2026 auf 1,0 festgesetzt. Nur Kaufpreise unter 900.000 Euro.",
+  "fundstelle": "Kapitel 8.3.1 Regionale Sachwertfaktoren, Unterkapitel 8.3.1.1 und 8.3.1.2, Seiten 106 bis 113."
+ },
+ {
+  "land_code": "HE",
   "ags": "06434003",
   "ebene": "gemeinde",
   "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Bad Homburg v. d. Höhe",
@@ -934,6 +1158,433 @@
   "verwendung": "produkt",
   "auflagen": "Quellenangabe. ACHTUNG ABWEICHENDER MODELLANSATZ: die Faktoren gelten nur zusammen mit einer Sachwertermittlung nach ImmoWertV mit NHK 2010, linearer Alterswertminderung, Regionalfaktor 1,0 und einer GESAMTNUTZUNGSDAUER VON 70 JAHREN — nicht 80, wie sie andere hessische Ausschüsse anhalten. Bodenrichtwerte zum Stichtag 01.01.2024.",
   "fundstelle": "Kapitel 10 Sachwertfaktoren (Marktanpassungsfaktoren), Übersicht in Tabelle 25, Seite 53."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06437",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000,
+    750000
+   ],
+   "achse_k_feld": "brw_bereich",
+   "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+   "zuordnung_feld": "brw",
+   "kategorien": [
+    "alle"
+   ],
+   "kategorie_baender": [
+    {
+     "von": 0,
+     "bis": null,
+     "kategorie": "alle"
+    }
+   ],
+   "zellen": {
+    "150000": [
+     1.59
+    ],
+    "200000": [
+     1.36
+    ],
+    "250000": [
+     1.2
+    ],
+    "300000": [
+     1.09
+    ],
+    "350000": [
+     1.0
+    ],
+    "400000": [
+     0.93
+    ],
+    "450000": [
+     0.88
+    ],
+    "500000": [
+     0.83
+    ],
+    "550000": [
+     0.79
+    ],
+    "600000": [
+     0.75
+    ],
+    "650000": [
+     0.72
+    ],
+    "700000": [
+     0.69
+    ],
+    "750000": [
+     0.66
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "43 Kauffälle 2024/2025, Bestimmtheitsmaß 0,61 — der belastbarste Wert der fünf südhessischen Kreise. Standardabweichung ±0,20. Keine Untergliederung nach Bodenrichtwertbereichen; der Odenwaldkreis ist der ländlichste der fünf Kreise mit einem mittleren Bodenrichtwert von 135 Euro/qm. Der Bericht sagt: Zwischenwerte sind zu interpolieren, Extrapolationen über die angegebene Spanne hinaus können nur in geringem Umfang marktgerecht durchgeführt werden.",
+   "normobjekt": "Mittlerer vorläufiger Sachwert 394.000 Euro, mittlere Grundstücksgröße 750 qm, mittlerer Bodenrichtwert 135 Euro/qm, mittlere wirtschaftliche Restnutzungsdauer 42 Jahre, mittlere Standardstufe 2,8, mittlere BGF 350 qm, mittlere Wohnfläche 170 qm. Mittlerer Kaufpreis 2.240 Euro je qm Wohnfläche (1.230 bis 3.620) — der niedrigste der fünf Kreise.",
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Odenwaldkreis, ungeteilt",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser in konventioneller Bauweise",
+   "extrapolation": "laut Bericht nur in geringem Umfang marktgerecht, hier ausgeschlossen"
+  },
+  "belege": [
+   "Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.1, Tabelle Durchschnittlicher Sachwertfaktor, Seite 110."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Tabelle mit Fallzahl, Bestimmtheitsmass 0,61 und Standardabweichung. KEINE Stufe A: 43 Kauffaelle, Standardabweichung 0,20 - die groesste der fuenf Kreise -, und der Ausschuss weist selbst auf die hohe Schwankungsbreite hin.",
+  "fallzahl": 43,
+  "streuung": 0.2,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises, Immobilienmarktbericht Südhessen 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 einschließlich Baunebenkosten, Bezugsparameter Bruttogrundfläche, Baupreisindex quartalsweise zum Beurkundungsdatum, Gesamtnutzungsdauer 80 Jahre, modifizierte wirtschaftliche Restnutzungsdauer 20 bis 80 Jahre nach der Punktetabelle der Anlage 2 ImmoWertV, lineare Alterswertminderung, Standardstufe mindestens 2,0, Nebengebäude pauschaler Zeitwert, Außenanlagen pauschal 5 Prozent vom Zeitwert der baulichen Anlagen, Regionalfaktor mit Beschluss zum 01.01.2026 auf 1,0 festgesetzt. Nur Kaufpreise unter 900.000 Euro.",
+  "fundstelle": "Kapitel 8.3.1.1, Tabelle Durchschnittlicher Sachwertfaktor, Seite 110."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06438",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000,
+    750000,
+    800000,
+    850000,
+    900000,
+    950000,
+    1000000,
+    1100000
+   ],
+   "achse_k_feld": "brw_bereich",
+   "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+   "zuordnung_feld": "brw",
+   "kategorien": [
+    "bis 799",
+    "ab 800"
+   ],
+   "kategorie_baender": [
+    {
+     "von": 0,
+     "bis": 799,
+     "kategorie": "bis 799"
+    },
+    {
+     "von": 800,
+     "bis": null,
+     "kategorie": "ab 800"
+    }
+   ],
+   "zellen": {
+    "450000": [
+     1.1,
+     1.21
+    ],
+    "500000": [
+     1.05,
+     1.15
+    ],
+    "550000": [
+     1.01,
+     1.1
+    ],
+    "600000": [
+     0.97,
+     1.06
+    ],
+    "650000": [
+     0.93,
+     1.03
+    ],
+    "700000": [
+     0.9,
+     0.99
+    ],
+    "750000": [
+     0.87,
+     0.96
+    ],
+    "800000": [
+     0.85,
+     0.93
+    ],
+    "850000": [
+     0.83,
+     0.91
+    ],
+    "900000": [
+     0.8,
+     0.89
+    ],
+    "950000": [
+     0.78,
+     0.87
+    ],
+    "1000000": [
+     null,
+     0.85
+    ],
+    "1100000": [
+     null,
+     0.81
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Zwei Bodenrichtwertklassen, 48 Kauffälle 2024/2025 (30 und 18), Bestimmtheitsmaß 0,38 und 0,50, Standardabweichung jeweils ±0,12. Die Tabelle beginnt erst bei 450.000 Euro vorläufigem Sachwert — darunter liegen im Kreis Offenbach keine auswertbaren Fälle. Der Bericht sagt: Zwischenwerte sind zu interpolieren, Extrapolationen über die angegebene Spanne hinaus können nur in geringem Umfang marktgerecht durchgeführt werden.",
+   "normobjekt": "Bis 799 Euro/qm: mittlerer vorläufiger Sachwert 637.000 Euro, Grundstücksgröße 525 qm, Bodenrichtwert 640 Euro/qm, Restnutzungsdauer 42 Jahre, Standardstufe 2,7. Ab 800 Euro/qm: 717.000 Euro, 510 qm, 955 Euro/qm, 40 Jahre, Standardstufe 2,7.",
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Kreis Offenbach OHNE die kreisfreie Stadt Offenbach am Main, die einen eigenen Gutachterausschuss führt und unter einem eigenen Kreisschlüssel liegt (06413)",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser in konventioneller Bauweise",
+   "extrapolation": "laut Bericht nur in geringem Umfang marktgerecht, hier ausgeschlossen",
+   "spannen_je_brw_bereich": {
+    "bis 799": {
+     "kauffaelle": 30,
+     "r2": 0.38,
+     "streuung": 0.12,
+     "sachwert_mittel": 637000,
+     "gsflaeche_mittel": 525,
+     "brw_mittel": 640,
+     "rnd_mittel": 42,
+     "standardstufe": 2.7
+    },
+    "ab 800": {
+     "kauffaelle": 18,
+     "r2": 0.5,
+     "streuung": 0.12,
+     "sachwert_mittel": 717000,
+     "gsflaeche_mittel": 510,
+     "brw_mittel": 955,
+     "rnd_mittel": 40,
+     "standardstufe": 2.7
+    }
+   }
+  },
+  "belege": [
+   "Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.1, Tabelle Durchschnittlicher Sachwertfaktor, Seite 110."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Tabelle mit Fallzahl, Bestimmtheitsmass und Standardabweichung je Klasse. KEINE Stufe A: 30 und 18 Kauffaelle sind wenig, und der Ausschuss weist selbst auf die hohe Schwankungsbreite der ausgewerteten Objekte hin.",
+  "fallzahl": 48,
+  "streuung": 0.12,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises, Immobilienmarktbericht Südhessen 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 einschließlich Baunebenkosten, Bezugsparameter Bruttogrundfläche, Baupreisindex quartalsweise zum Beurkundungsdatum, Gesamtnutzungsdauer 80 Jahre, modifizierte wirtschaftliche Restnutzungsdauer 20 bis 80 Jahre nach der Punktetabelle der Anlage 2 ImmoWertV, lineare Alterswertminderung, Standardstufe mindestens 2,0, Nebengebäude pauschaler Zeitwert, Außenanlagen pauschal 5 Prozent vom Zeitwert der baulichen Anlagen, Regionalfaktor mit Beschluss zum 01.01.2026 auf 1,0 festgesetzt. Nur Kaufpreise unter 900.000 Euro.",
+  "fundstelle": "Kapitel 8.3.1.1 und 8.3.1.2, Tabellen Durchschnittlicher Sachwertfaktor, Seiten 110 und 113."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06438",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000,
+    750000,
+    800000
+   ],
+   "achse_k_feld": "brw_bereich",
+   "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+   "zuordnung_feld": "brw",
+   "kategorien": [
+    "bis 799",
+    "ab 800"
+   ],
+   "kategorie_baender": [
+    {
+     "von": 0,
+     "bis": 799,
+     "kategorie": "bis 799"
+    },
+    {
+     "von": 800,
+     "bis": null,
+     "kategorie": "ab 800"
+    }
+   ],
+   "zellen": {
+    "250000": [
+     1.54,
+     null
+    ],
+    "300000": [
+     1.4,
+     1.35
+    ],
+    "350000": [
+     1.28,
+     1.29
+    ],
+    "400000": [
+     1.19,
+     1.23
+    ],
+    "450000": [
+     1.12,
+     1.18
+    ],
+    "500000": [
+     1.06,
+     1.14
+    ],
+    "550000": [
+     1.0,
+     1.11
+    ],
+    "600000": [
+     0.96,
+     1.08
+    ],
+    "650000": [
+     0.92,
+     1.05
+    ],
+    "700000": [
+     0.88,
+     1.02
+    ],
+    "750000": [
+     0.85,
+     1.0
+    ],
+    "800000": [
+     0.82,
+     0.98
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "111 Kauffälle (60 und 51) — die größte Stichprobe der südhessischen Reihenhausauswertungen. Bestimmtheitsmaß 0,63 und 0,33, Standardabweichung ±0,16 und ±0,15. Anders als bei den freistehenden Häusern beginnt die Tabelle schon bei 250.000 Euro.",
+   "normobjekt": "Bis 799 Euro/qm: mittlerer vorläufiger Sachwert 429.000 Euro, Grundstücksgröße 310 qm, Bodenrichtwert 650 Euro/qm. Ab 800 Euro/qm: 502.000 Euro, 285 qm, 1.035 Euro/qm.",
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Kreis Offenbach ohne die kreisfreie Stadt Offenbach am Main",
+   "sachlich": "Reihenhäuser und Doppelhaushälften in konventioneller Bauweise",
+   "extrapolation": "laut Bericht nur in geringem Umfang marktgerecht, hier ausgeschlossen",
+   "spannen_je_brw_bereich": {
+    "bis 799": {
+     "kauffaelle": 60,
+     "r2": 0.63,
+     "streuung": 0.16,
+     "sachwert_mittel": 429000,
+     "gsflaeche_mittel": 310,
+     "brw_mittel": 650
+    },
+    "ab 800": {
+     "kauffaelle": 51,
+     "r2": 0.33,
+     "streuung": 0.15,
+     "sachwert_mittel": 502000,
+     "gsflaeche_mittel": 285,
+     "brw_mittel": 1035
+    }
+   }
+  },
+  "belege": [
+   "Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.2, Tabelle Durchschnittlicher Sachwertfaktor, Seite 113."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Tabelle mit Fallzahl, Bestimmtheitsmass und Standardabweichung je Klasse. KEINE Stufe A, weil das Bestimmtheitsmass in der oberen Klasse nur 0,33 betraegt und der Ausschuss selbst eine sachgerechte Zu- und Abschlagsbildung im Einzelfall verlangt.",
+  "fallzahl": 111,
+  "streuung": 0.16,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises, Immobilienmarktbericht Südhessen 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 einschließlich Baunebenkosten, Bezugsparameter Bruttogrundfläche, Baupreisindex quartalsweise zum Beurkundungsdatum, Gesamtnutzungsdauer 80 Jahre, modifizierte wirtschaftliche Restnutzungsdauer 20 bis 80 Jahre nach der Punktetabelle der Anlage 2 ImmoWertV, lineare Alterswertminderung, Standardstufe mindestens 2,0, Nebengebäude pauschaler Zeitwert, Außenanlagen pauschal 5 Prozent vom Zeitwert der baulichen Anlagen, Regionalfaktor mit Beschluss zum 01.01.2026 auf 1,0 festgesetzt. Nur Kaufpreise unter 900.000 Euro.",
+  "fundstelle": "Kapitel 8.3.1.1 und 8.3.1.2, Tabellen Durchschnittlicher Sachwertfaktor, Seiten 110 und 113."
  },
  {
   "land_code": "HE",
