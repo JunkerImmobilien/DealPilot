@@ -244,6 +244,39 @@ export const AUSSCHUSS_QUELLEN = {
     zugang: 'kostenpflichtig',
     warum_kein_wert: 'Der Grundstücksmarktbericht erscheint alle zwei bis drei Jahre und führt Sachwertfaktoren; die Einzelwerte gibt der Ausschuss kostenpflichtig über bodenrichtwerte.com heraus.',
   },
+  /* ═══ v1159 · DIE VIER MV-AUSSCHUESSE OHNE REGISTERSATZ ═════════════════
+   * Der Landes-Grundstuecksmarktbericht 2025 (Abb. 5.1/5.2) weist fuer ALLE
+   * ACHT Ausschuesse des Landes Sachwertfaktoren aus. In MV heisst "kein
+   * Wert" deshalb NIE "gibt es nicht" - es heisst immer, dass wir ihn nicht
+   * zuordnen oder nicht beziehen koennen. Genau das steht hier.            */
+  '13003': {
+    stelle: 'Gutachterausschuss für Grundstückswerte in der Hanse- und Universitätsstadt Rostock',
+    url: 'https://www.geocms.com/geoshop-rostock/de/grundstuecksmarktberichte.html',
+    zugang: 'kostenfrei',
+    warum_kein_wert: 'Der Ausschuss unterscheidet einen küstennahen und einen innerstädtischen Bereich, und im küstennahen nochmals Warnemünde/Markgrafenheide gegen Diedrichshagen. Die Spannweite ist erheblich: bei 100.000 Euro vorläufigem Sachwert steht 2,68 (Warnemünde) gegen 1,77 (innerstädtisch über 400 €/m²). Welcher Bereich gilt, ist eine Frage des ORTSTEILS — und die Anschrift eines Objekts sagt uns das nicht. Eine Zuordnung wäre geraten, und bei diesem Abstand wäre ein falscher Bereich teurer als gar kein Wert.',
+    hinweis: 'Der Grundstücksmarktbericht 2026 ist kostenfrei abrufbar und enthält alles Nötige: Tabelle 42 auf Seite 61 führt für Ein- und Zweifamilienhäuser je Teilmarkt die Konstanten der Formel k = a × vSW^b (vorläufiger Sachwert in EURO), dazu Fallzahl und die fertig gerechnete Tabelle von 100.000 bis 800.000 Euro. Die sieben Spalten sind: küstennah gesamt (a = 35,26 · b = −0,267) · Warnemünde (1.033,94 · −0,517) · Diedrichshagen (28,70 · −0,252) · innerstädtisch gesamt (198,93 · −0,409) · innerstädtisch unter 300 €/m² (3.750,31 · −0,638) · 300 bis 400 €/m² (108,22 · −0,363) · über 400 €/m² (126,76 · −0,371). Wer weiß, wo sein Objekt liegt, findet seinen Faktor dort sofort. Modell: NHK 2010, kein Regionalfaktor, Bruttogrundfläche, Außenanlagen 2 % (Reihenmittelhaus), 3 % (REH/DHH), 4 % (freistehendes EFH), Gesamtnutzungsdauer nach Anlage 1 ImmoWertV, vorläufiger Sachwert unter 1.000.000 Euro. Der Bericht nennt im Fließtext die Grenzen 250/400 €/m², in der Tabellenüberschrift aber 300/400 — es gilt die Tabelle.',
+  },
+  '13004': {
+    stelle: 'Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin',
+    url: 'https://www.geocms.com/geoshop-schwerin/de/grundstuecksmarkt.html',
+    zugang: 'kostenpflichtig',
+    warum_kein_wert: 'Der Geoshop der Landeshauptstadt führt keinen kostenfreien Grundstücksmarktbericht. Der Landes-Grundstücksmarktbericht 2025 weist für Schwerin zum 01.01.2025 ausdrücklich Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser sowie für Reihenhäuser und Doppelhaushälften aus — sie liegen also vor, sind aber nicht frei abrufbar.',
+    hinweis: 'Geschäftsstelle: Grunthalplatz 3b, 19053 Schwerin, Telefon 0385 545-2751. Die Sachwertfaktoren sind dort zu erfragen oder über den Geoshop zu beziehen.',
+  },
+  '13074': {
+    stelle: 'Gutachterausschuss für Grundstückswerte im Landkreis Nordwestmecklenburg',
+    url: 'https://shop.geoport-nwm.de/de/grundstuecksmarktberichte-geoshop-nwm.html',
+    zugang: 'kostenfrei',
+    warum_kein_wert: 'Zwei Gründe, und jeder allein würde genügen. ERSTENS teilt der Ausschuss sein Gebiet in „Landkreis allgemein und ländliche Zentralorte", „Ostseeregion" und die Hansestadt Wismar — welche Gemeinde zur Ostseeregion zählt, führt der Bericht nicht als Liste. ZWEITENS ist das Bestimmtheitsmaß der Regression für den Landkreis allgemein R² = 0,0371, für die Ostseeregion R² = 0,131. Eine Funktion, die 3,7 Prozent der Streuung erklärt, ist kaum mehr als der Mittelwert; einen so abgeleiteten Faktor als amtlichen Wert auszuweisen, würde eine Genauigkeit vortäuschen, die er nicht hat.',
+    hinweis: 'Der Grundstücksmarktbericht 2026 ist kostenfrei abrufbar und druckt die Funktionen vollständig ab (Kapitel 3.2.7, Seiten 49 ff.): Landkreis allgemein und ländliche Zentralorte, Bodenrichtwerte 18 bis 225 €/m², k = −0,145 × ln(vorl. SW) + 2,8702 (R² = 0,0371); Ostseeregion k = −0,24 × ln(vorl. SW) + 4,1639 (R² = 0,131); die Hansestadt Wismar führt der Bericht gesondert in Kapitel 3.2.7.3. Abgeleitet nach dem Modell der ImmoWertV 2021. Wer sein Gebiet kennt, kann damit selbst rechnen — und sollte das schwache Bestimmtheitsmaß bei der Würdigung berücksichtigen.',
+  },
+  '13076': {
+    stelle: 'Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim',
+    url: 'https://www.geocms.com/geoshop-lk-ludwigslust-parchim/de/grundstuecksmarkt.html',
+    zugang: 'kostenpflichtig',
+    warum_kein_wert: 'Der Geoshop des Landkreises führt keinen kostenfreien Grundstücksmarktbericht. Der Landes-Grundstücksmarktbericht 2025 weist für Ludwigslust-Parchim zum 01.01.2025 Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser sowie für Reihenhäuser und Doppelhaushälften aus.',
+    hinweis: 'Im Register liegt für diesen Ausschuss bereits ein Satz aus einem früheren Jahrgang. Geschäftsstelle: Putlitzer Straße 25, 19370 Parchim, Telefon 03871 722-6100, Sitz Garnisonsstraße 1, 19288 Ludwigslust.',
+  },
 };
 
 /**
