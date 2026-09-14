@@ -395,11 +395,20 @@ eine selbst ausgerechnete Zahl.
 **Drei Dinge, die im Rechenkern still falsch rechnen** (am 13.09.2026 auf
 Staging nachgemessen, alle drei offen, im Backlog unter B1):
 
-- **`GND_JAHRE = 80` ist hart verdrahtet** (`CrossCheckService.js` Z. 24) —
-  Bonn rechnet MFH mit **GND 60**, Hameln-Hannover 70/60/50, Otterndorf 70.
-  Die richtige Zahl steht im Registerdatensatz unter `modellansaetze` und wird
-  **nicht gelesen**. § 10 ImmoWertV, Modellkonformität. Der schwerste stille
-  Fehler im System — und er wächst mit jeder Ernte.
+- **`GND_JAHRE = 80` ist die Rückfallzahl, nicht mehr die einzige** —
+  seit v1338 liest `CrossCheckService` die Gesamtnutzungsdauer aus dem
+  Registerdatensatz (`modellansaetze.gnd`) und leitet die
+  Restnutzungsdauer im richtigen Rahmen **neu** ab (Anlage 2, aus Baujahr
+  und Modernisierungspunkten) — statt eine fertige Zahl umzurechnen. Das
+  ist der Unterschied, auf den es ankommt: 34/80 auf 70 ergibt je nach Weg
+  30 oder 24 Jahre, an einem Reihenhaus rund 19.000 €.
+  > **Der Fehler ist damit verlagert, nicht verschwunden:** er sitzt jetzt
+  > im REZEPT. Führt ein Ausschuss eine abweichende GND und steht sie nur
+  > im Fließtext der `auflagen` statt als Zahl in `modellansaetze.gnd`,
+  > rechnet das System weiter mit 80 — und nichts widerspricht. Gemessen
+  > am 14.09.2026 an Oberursel (GND **70**): `modellansaetze` war leer,
+  > die 70 stand nur im Text. **Beim Anlegen eines Rezepts gehört jede
+  > abweichende GND als ZAHL ins Feld**, und danach wird sie nachgemessen.
 - **`BAUPREISINDEX = 2.02` hat keinen Stichtagsbezug** (Z. 22) — der GMB
   Dortmund 2026 rechnet mit **1,906** zum 01.01.2026, rund 6 % Abweichung. Bei
   einem Stichtag in der Vergangenheit rechnet eine Konstante zwangsläufig

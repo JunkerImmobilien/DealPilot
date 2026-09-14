@@ -17,6 +17,13 @@
   "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: Gebäudesachwert nach NHK 2010 ohne Regionalfaktor, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre bei allen Wohngebäudetypen, Außenanlagen je Gebäudetyp 3 bis 5 Prozent der Gebäudeherstellungskosten inklusive Garage.",
   "fundstelle": "Kapitel 3.8.6 Sachwertfaktoren, Unterkapitel 3.8.6.1 bis 3.8.6.3, Seiten 70 bis 73.",
 
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd": 80,
+    "alterswertminderung": "linear",
+    "regionalfaktor": 1.0
+  },
+
   "modelle": [
     {
       "zweig": "ezfh",

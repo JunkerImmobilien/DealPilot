@@ -17,6 +17,15 @@
   "auflagen": "Quellenangabe. ACHTUNG ABWEICHENDER MODELLANSATZ: die Faktoren gelten nur zusammen mit einer Sachwertermittlung nach ImmoWertV mit NHK 2010, linearer Alterswertminderung, Regionalfaktor 1,0 und einer GESAMTNUTZUNGSDAUER VON 70 JAHREN — nicht 80, wie sie andere hessische Ausschüsse anhalten. Bodenrichtwerte zum Stichtag 01.01.2024.",
   "fundstelle": "Kapitel 10 Sachwertfaktoren (Marktanpassungsfaktoren), Übersicht in Tabelle 25, Seite 53.",
 
+  "modellansaetze": {
+    "wortlaut": "Die Faktoren koennen jedoch nur im Zusammenhang mit der Sachwertermittlung nach dem Sachwertmodell (ImmoWertV, NHK 2010, GND 70 Jahre, lineare Alterswertminderung, Regionalfaktor=1) fuer die Verkehrswertermittlung (Marktwert) angewendet werden.",
+    "nhk": "NHK 2010",
+    "gnd": 70,
+    "alterswertminderung": "linear",
+    "regionalfaktor": 1.0,
+    "bodenrichtwert_stichtag": "2024-01-01"
+  },
+
   "modelle": [
     {
       "zweig": "ezfh",

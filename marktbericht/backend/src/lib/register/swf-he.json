@@ -55,7 +55,12 @@
    "normobjekt": "Grundstücksfläche 250 bis 1.000 qm; bis 550 qm (bei villenartiger Bebauung bis 1.000 qm) voller Bodenrichtwert, darüber ein Drittel. Nur Kaufverträge unter 1,0 Mio. Euro. Außenanlagen 5 Prozent der Gebäudeherstellungskosten inklusive Garage."
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0
+  },
   "geltungsbereich": {},
   "belege": [
    "Immobilienmarktbericht 2026 des Gutachterausschusses Frankfurt am Main, Kapitel 3.8.6.1, Seite 70 f."
@@ -136,7 +141,12 @@
    "normobjekt": "Grundstücksfläche 100 bis 550 qm, bis 400 qm voller Bodenrichtwert, darüber ein Drittel. Außenanlagen 4 Prozent der Gebäudeherstellungskosten inklusive Garage."
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0
+  },
   "geltungsbereich": {},
   "belege": [
    "Immobilienmarktbericht 2026 des Gutachterausschusses Frankfurt am Main, Kapitel 3.8.6.2, Seite 72."
@@ -217,7 +227,12 @@
    "normobjekt": "Grundstücksfläche 100 bis 550 qm, bis 250 qm voller Bodenrichtwert, darüber ein Drittel. Außenanlagen 3 Prozent der Gebäudeherstellungskosten inklusive Garage."
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0
+  },
   "geltungsbereich": {},
   "belege": [
    "Immobilienmarktbericht 2026 des Gutachterausschusses Frankfurt am Main, Kapitel 3.8.6.3, Seite 73."
@@ -282,7 +297,12 @@
    ]
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0
+  },
   "geltungsbereich": {},
   "belege": [
    "Immobilienmarktbericht 2026 der Landeshauptstadt Wiesbaden, Kapitel 7.3, Seite 32: Tabelle der Sachwertfaktoren nebst Datengrundlage (30 Kauffaelle, Bestimmtheitsmass 0,69)."
@@ -336,7 +356,12 @@
    ]
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0
+  },
   "geltungsbereich": {},
   "belege": [
    "Immobilienmarktbericht 2026 der Landeshauptstadt Wiesbaden, Kapitel 7.3, Seite 32: Spalte Reihenendhaus und Doppelhaus (32 Kauffaelle, Bestimmtheitsmass 0,66)."
@@ -396,7 +421,12 @@
    ]
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0
+  },
   "geltungsbereich": {},
   "belege": [
    "Immobilienmarktbericht 2026 der Landeshauptstadt Wiesbaden, Kapitel 7.3, Seite 32: Spalte Reihenmittelhaus (35 Kauffaelle, Bestimmtheitsmass 0,70)."
@@ -453,7 +483,14 @@
    "normobjekt": "Auf eine Unterscheidung in gute und mäßige Lagen hat der Ausschuss VERZICHTET — die überschaubare Anzahl an Vergleichspreisen lasse dort keine statistische Aussage zu. Der Bodenrichtwertbereich der eingeflossenen Fälle ist deshalb die einzige Lageangabe."
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "wortlaut": "Die Faktoren koennen jedoch nur im Zusammenhang mit der Sachwertermittlung nach dem Sachwertmodell (ImmoWertV, NHK 2010, GND 70 Jahre, lineare Alterswertminderung, Regionalfaktor=1) fuer die Verkehrswertermittlung (Marktwert) angewendet werden.",
+   "nhk": "NHK 2010",
+   "gnd": 70,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bodenrichtwert_stichtag": "2024-01-01"
+  },
   "geltungsbereich": {},
   "belege": [
    "Immobilienmarktbericht 2025 des Gutachterausschusses Oberursel (Taunus), Tabelle 25 auf Seite 53: Sachwertfaktoren fuer freistehende Einfamilienhaeuser, 26 Vergleichspreise, Bodenrichtwertbereich 800 bis 1.850 Euro/qm."
@@ -509,7 +546,14 @@
    "normobjekt": "Keine Unterscheidung nach Lagen; der Bodenrichtwertbereich der eingeflossenen Fälle ist die einzige Lageangabe."
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "wortlaut": "Die Faktoren koennen jedoch nur im Zusammenhang mit der Sachwertermittlung nach dem Sachwertmodell (ImmoWertV, NHK 2010, GND 70 Jahre, lineare Alterswertminderung, Regionalfaktor=1) fuer die Verkehrswertermittlung (Marktwert) angewendet werden.",
+   "nhk": "NHK 2010",
+   "gnd": 70,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bodenrichtwert_stichtag": "2024-01-01"
+  },
   "geltungsbereich": {},
   "belege": [
    "Immobilienmarktbericht 2025 des Gutachterausschusses Oberursel (Taunus), Tabelle 25 auf Seite 53: Sachwertfaktoren fuer Reihenendhaeuser und Doppelhaushaelften, 39 Vergleichspreise, Bodenrichtwertbereich 900 bis 1.850 Euro/qm."
@@ -564,7 +608,14 @@
    "normobjekt": "Keine Unterscheidung nach Lagen; der Bodenrichtwertbereich der eingeflossenen Fälle ist die einzige Lageangabe."
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "wortlaut": "Die Faktoren koennen jedoch nur im Zusammenhang mit der Sachwertermittlung nach dem Sachwertmodell (ImmoWertV, NHK 2010, GND 70 Jahre, lineare Alterswertminderung, Regionalfaktor=1) fuer die Verkehrswertermittlung (Marktwert) angewendet werden.",
+   "nhk": "NHK 2010",
+   "gnd": 70,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bodenrichtwert_stichtag": "2024-01-01"
+  },
   "geltungsbereich": {},
   "belege": [
    "Immobilienmarktbericht 2025 des Gutachterausschusses Oberursel (Taunus), Tabelle 25 auf Seite 53: Sachwertfaktoren fuer Reihenmittelhaeuser, 25 Vergleichspreise, Bodenrichtwertbereich 1.050 bis 1.500 Euro/qm."

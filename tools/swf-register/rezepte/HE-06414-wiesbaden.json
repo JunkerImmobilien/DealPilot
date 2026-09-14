@@ -17,6 +17,13 @@
   "auflagen": "Quellenangabe. Die Bewertung im Sachwertverfahren ist nach demselben Modell durchzuführen wie die Auswertung der Kaufverträge: NHK 2010, Regionalfaktor 1,0, lineare Alterswertminderung bei einer Gesamtnutzungsdauer von 80 Jahren, Außenanlagen und Nebengebäude SEPARAT angesetzt, Bodenwert aus dem Richtwert zum 01.01.2024 mit Lage- und Grundstücksgrößenanpassung bei Bodenwerten unter 800 Euro/qm.",
   "fundstelle": "Kapitel 7.3 Sachwertfaktoren für Ein- und Zweifamilienhäuser, Seite 31 f., nebst der Datengrundlage 2025.",
 
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd": 80,
+    "alterswertminderung": "linear",
+    "regionalfaktor": 1.0
+  },
+
   "modelle": [
     {
       "zweig": "ezfh",
