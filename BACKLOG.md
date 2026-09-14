@@ -4227,6 +4227,76 @@ heute nie läuft. Der gehört im `apply.sh` **echt ausgeführt**.
 müssen **gegen das Gutachten** neu abgenommen werden, nicht gegen die alten
 Sollwerte.
 
+#### B1b — Steuerliche Portfolio- und Forward-Betrachtung **[NEU 14.09.2026]**
+
+**Marcels Frage:** „wir wollten das doch ändern. ist der text noch aktuell?
+eigentlich wollten wir für jedes objekt die progression runterrechnen und eine
+steuerliche forward betrachtung machen oder? was fehlt denn noch oder passt nur
+der text nicht?"
+
+**Der Text passt. Die Funktion fehlt.** `v1379` hat die Progression *innerhalb*
+eines Objekts richtig gemacht — die Steuerwirkung ist seither die Differenz
+zweier Tarifberechnungen nach § 32a EStG statt eines festen Satzes. Was **nicht**
+gebaut ist: dass die Objekte sich gegenseitig die Basis verschieben.
+
+**Gemessen am Tarif 2026** (`v1383`, Prüfstand gegen den echten `tax.js`-Kern):
+
+| zvE | Objekte | Summe einzeln | tatsächlich | zu viel |
+|---|---|---|---|---|
+| 80.000 € | −25.000 / −20.000 | 18.348 € | 16.794 € | **9,25 %** |
+| 80.000 € | 3 × −15.000 | 18.777 € | 16.794 € | **11,81 %** |
+| 60.000 € | 2 × −20.000 | 14.048 € | 12.663 € | 10,94 % |
+| 120.000 € | 2 × −30.000 | 25.200 € | 25.031 € | 0,68 % |
+| 150.000 € | 2 × −40.000 | 33.600 € | 33.600 € | — |
+
+Der Fehler geht **immer in dieselbe Richtung**: die Ersparnis wird zu hoch
+ausgewiesen, das Portfolio also zu gut gerechnet.
+
+##### Was zu bauen ist
+
+1. **Die Portfoliosumme ist eindeutig — die Aufteilung nicht.**
+   `ESt(zvE + Σ Ergebnisse) − ESt(zvE)` hängt **nicht** von der Reihenfolge ab.
+   Welcher Anteil davon *welchem Objekt* zugerechnet wird, hängt sehr wohl
+   davon ab. Das ist die eigentliche Produktentscheidung, und sie gehört
+   Marcel:
+   - **Weg A — Stapel nach Erwerbsdatum.** Das ältere Objekt rechnet gegen das
+     volle zvE, das jüngere gegen das bereits gesenkte. Nah an der Anschauung
+     („mein erstes Objekt"), aber das jüngere sieht künstlich schlechter aus.
+   - **Weg B — anteilig nach Ergebnisgröße.** Jedes Objekt bekommt den Anteil
+     an der Gesamtwirkung, der seinem Ergebnisanteil entspricht. Fair über
+     alle Objekte, entspricht aber keiner Einzelrechnung.
+   - **Weg C — beides zeigen:** je Objekt weiter die Einzelbetrachtung
+     (unverändert, vergleichbar), und im Cockpit **zusätzlich** die echte
+     Portfoliozahl. Dann stimmt jede Zahl für sich, und die Differenz ist
+     benannt statt versteckt.
+   > **Empfehlung: Weg C.** Er ändert keine bestehende Objektzahl — wer
+   > gestern gerechnet hat, sieht heute dasselbe — und macht trotzdem die
+   > Wahrheit sichtbar. A und B ändern beide rückwirkend jede Objektseite.
+
+2. **Die Forward-Betrachtung ist eine Jahresrechnung, keine Objektrechnung.**
+   Objekte starten in verschiedenen Jahren, und das zvE ändert sich über die
+   Zeit. Richtig wäre **je Kalenderjahr**: alle in diesem Jahr laufenden
+   Objekte zusammenzählen, einmal gegen das zvE dieses Jahres rechnen.
+   Dafür fehlt heute eine Zeitachse über alle Objekte — `calc.js` kennt immer
+   nur das geladene.
+
+3. **Woher kommt das zvE der Folgejahre?** Heute ist `zve` ein fester Wert.
+   Für eine Forward-Betrachtung braucht es mindestens eine Fortschreibungs-
+   annahme (Steigerung p. a.) — sonst rechnet Jahr 15 mit dem Einkommen von
+   heute.
+
+##### Abgrenzung — was NICHT dazugehört
+
+Die Verlustverrechnungsbeschränkungen (§ 15a, § 15b, § 10d EStG) sind eine
+eigene Baustelle. Wer sie mitbauen will, braucht die Steuerbescheide der
+Vorjahre; das ist Steuerberatung, nicht Kalkulation.
+
+##### Wo es heute sichtbar ist
+
+`frontend/index.html`, Karte `#tax-flow-hint`, Abschnitt „Und was DealPilot
+dabei **nicht** tut" — dort steht der Sachverhalt seit `v1383b` mit Zahlen.
+**Der Text ist die ehrliche Zwischenlösung, nicht die Lösung.**
+
 #### B2 — `mb.valuation_inputs` wird nicht beschrieben
 
 Die Berichte sind **nicht reproduzierbar** — man kann zwei Jahre später nicht
