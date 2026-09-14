@@ -1,6 +1,591 @@
 [
  {
   "land_code": "ST",
+  "ags": "15002000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "verzweigt",
+   "achse_k_feld": "baujahrklasse",
+   "achse_k_bez": "Baujahresklasse",
+   "kategorien": [
+    "vor_1991",
+    "ab_1991"
+   ],
+   "zuordnung_feld": "baujahr",
+   "kategorie_baender": [
+    {
+     "von": null,
+     "bis": 1990,
+     "kategorie": "vor_1991"
+    },
+    {
+     "von": 1991,
+     "bis": null,
+     "kategorie": "ab_1991"
+    }
+   ],
+   "modell_je_kategorie": {
+    "vor_1991": {
+     "form": "regression_additiv",
+     "intercept": 4.1081,
+     "terme": [
+      {
+       "feld": "sachwert",
+       "bez": "vorläufiger Sachwert",
+       "koeffizient": -27.7358,
+       "exponent": -0.29,
+       "gueltig": [
+        102000,
+        623000
+       ]
+      },
+      {
+       "feld": "brw",
+       "bez": "Bodenrichtwert",
+       "koeffizient": -0.0139,
+       "exponent": 0.5,
+       "gueltig": [
+        35,
+        330
+       ]
+      },
+      {
+       "feld": "wohnflaeche",
+       "bez": "Wohnfläche",
+       "koeffizient": 1.4482,
+       "exponent": -0.29,
+       "gueltig": [
+        56,
+        250
+       ]
+      },
+      {
+       "feld": "standardstufe",
+       "bez": "Gebäudestandard",
+       "koeffizient": -2.2382,
+       "exponent": 0.15,
+       "gueltig": [
+        1.6,
+        3.8
+       ]
+      }
+     ],
+     "aussen_exponent": -1.32,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "54 Kauffälle aus 02/2022 bis 06/2024, zeitlicher Bezug 06/2024. Multiples Bestimmtheitsmaß 0,51, Variationskoeffizient 0,10. DIE KLAMMER IST TEIL DES MODELLS: die vier Glieder werden summiert und die Summe mit -1,32 potenziert. Zwischen vorläufigem Sachwert und Wohnfläche besteht ein mittlerer Korrelationskoeffizient von 0,60 — der Bericht weist ausdrücklich darauf hin, dass diese Größen nicht unabhängig voneinander anwendbar sind."
+    },
+    "ab_1991": {
+     "form": "regression_additiv",
+     "intercept": 0.79821318,
+     "terme": [
+      {
+       "feld": "sachwert",
+       "bez": "vorläufiger Sachwert",
+       "koeffizient": 10800.16031602,
+       "exponent": -0.81,
+       "gueltig": [
+        292000,
+        660000
+       ]
+      },
+      {
+       "feld": "brw",
+       "bez": "Bodenrichtwert",
+       "koeffizient": 0.00096848,
+       "exponent": 1,
+       "gueltig": [
+        105,
+        320
+       ]
+      },
+      {
+       "feld": "standardstufe",
+       "bez": "Gebäudestandard",
+       "koeffizient": -1.63874939,
+       "exponent": -1.88,
+       "gueltig": [
+        2.6,
+        4.0
+       ]
+      }
+     ],
+     "diskret": [
+      {
+       "feld": "ortsteil",
+       "bez": "Gemarkung (Halle West oder Halle Ost)",
+       "pflicht": true,
+       "werte": {
+        "dölau": -0.06348555,
+        "dölauer heide": -0.06348555,
+        "giebichenstein": -0.06348555,
+        "gimritz": -0.06348555,
+        "kröllwitz": -0.06348555,
+        "lettin": -0.06348555,
+        "nietleben": -0.06348555,
+        "passendorf": -0.06348555,
+        "trotha": -0.06348555,
+        "halle": -0.06348555,
+        "halle-neustadt": -0.06348555,
+        "neustadt": -0.06348555,
+        "ammendorf": -0.1269711,
+        "bruckdorf": -0.1269711,
+        "büschdorf": -0.1269711,
+        "diemitz": -0.1269711,
+        "kanena": -0.1269711,
+        "mötzlich": -0.1269711,
+        "reideburg": -0.1269711,
+        "seeben": -0.1269711,
+        "tornau": -0.1269711,
+        "wörmlitz": -0.1269711
+       },
+       "hinweis": "Der Bericht führt den Term „− 0,06348555 × Gemarkung\" mit den Basiswerten Halle West = 1,00 und Halle Ost = 2,00. Hier stehen die fertigen Produkte je Gemarkung. Die Zuordnung ist im Bericht mit Gemarkungsschlüsseln abgedruckt (2231 bis 2251)."
+      }
+     ],
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "31 Kauffälle aus 01/2022 bis 06/2024, zeitlicher Bezug 01/2024. Multiples Bestimmtheitsmaß 0,46, Variationskoeffizient 0,09. DIE GEMARKUNG IST PFLICHT: sie ist ein eigenes Glied der Gleichung, kein Zuschlag. Ohne sie wird nicht gerechnet. Zwischen vorläufigem Sachwert und Gebäudestandard besteht ein mittlerer Korrelationskoeffizient von 0,63."
+    }
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "ZWEI GANZ VERSCHIEDENE GLEICHUNGEN, getrennt nach Baujahr vor und ab 1991. Die ältere ist eine Potenz einer Summe, die jüngere eine reine Summe mit einem diskreten Gemarkungsglied. Sachsen-Anhalt führt keine Tabellen, sondern die Regressionsfunktionen selbst — sie sind hier Glied für Glied übernommen.",
+   "normobjekt": "NHK 2010 gemäß Anlage 4 ImmoWertV, Bezugsgröße Brutto-Grundfläche aus amtlichen Geobasisdaten, Baupreisindex Basisjahr 2010=100 (Deutschland insgesamt), Regionalfaktor 1, GND nach Anlage 1 ImmoWertV, wirtschaftliche RND nach § 4 und Anlage 2 ImmoWertV. Eigennutzung, kein Neubau, kein Erstverkauf."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "Landesweite Modellbeschreibung „Modellparameter für die Ableitung von Sachwertfaktoren\" des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
+   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
+   "nhk": "NHK 2010 gemäß Anlage 4 ImmoWertV",
+   "bgf": "Brutto-Grundfläche gemäß Anlage 4 ImmoWertV, aus den Außenmaßen der Gebäude auf Basis amtlicher Geobasisdaten",
+   "regionalfaktor": 1.0,
+   "baupreisindex": "Baupreisindex der jeweiligen Gebäudeart, Basisjahr 2010=100, Deutschland insgesamt",
+   "besonderheit": "Die Modernisierungspunkte sind nach einer eigenen Tabelle vergeben, und zurückliegende Maßnahmen werden im Verhältnis Alter der Maßnahme zu Wirkungsdauer abgewertet (Dach 40 Jahre, Fenster 30, Leitungen 35, Heizung 20, Wärmedämmung 30, Bäder 20, Innenausbau 25). Wer die RND nach der reinen Anlage 2 ermittelt, rechnet mit einer anderen Grundlage."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Halle (Saale)",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser, Eigennutzung, kein Neubau oder Erstverkauf",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwert_vor_1991": {
+     "min": 102000,
+     "max": 623000
+    },
+    "sachwert_ab_1991": {
+     "min": 292000,
+     "max": 660000
+    },
+    "brw_vor_1991": {
+     "min": 35,
+     "max": 330
+    },
+    "brw_ab_1991": {
+     "min": 105,
+     "max": 320
+    },
+    "wohnflaeche_vor_1991": {
+     "min": 56,
+     "max": 250
+    },
+    "standardstufe_vor_1991": {
+     "min": 1.6,
+     "max": 3.8
+    },
+    "standardstufe_ab_1991": {
+     "min": 2.6,
+     "max": 4.0
+    }
+   },
+   "vorbehalt": "DIE EINFLUSSGRÖSSEN SIND NICHT UNABHÄNGIG. Der Bericht sagt es für beide Gleichungen ausdrücklich: vorläufiger Sachwert und Wohnfläche korrelieren mit 0,60 (vor 1991), vorläufiger Sachwert und Gebäudestandard mit 0,63 (ab 1991). Eine Größe zu verändern und die anderen festzuhalten, führt aus dem Modell heraus.\n\nDIE GLEICHUNG GILT NUR INNERHALB IHRER SPANNEN. Jedes Glied führt sein Minimum und Maximum mit; liegt ein Merkmal außerhalb, wird nicht gerechnet. Das ist strenger als eine Tabelle mit Randwerten — bei einer Regression mit negativen Exponenten wächst der Fehler außerhalb der Stichprobe schnell.\n\nDER MITTLERE ABSOLUTE PROZENTUALE FEHLER wird in den Berichten je Region angegeben; er liegt im Bereich von zehn Prozent.\n\nEINE KAUFPREISBEREINIGUNG hat der Ausschuss nur für Kamin (2.000 €), Wintergarten (1.000 €/m²), Photovoltaik (150 €/m² Anlagenfläche), ab der dritten Garage (2.000 €) und ausgewiesene Einbauküchen vorgenommen. Wer andere besondere objektspezifische Merkmale im vorläufigen Sachwert lässt, rechnet modellfremd.",
+   "hinweis": "Der Ausschuss hat freistehende Häuser und Reihenhäuser/Doppelhaushälften vor 1991 in EINER gemeinsamen Regression ausgewertet — die Gebäudeart ist ohne Einfluss. Die Gleichung ist deshalb für beide Zweige dieselbe; nur die Stichprobenspannen unterscheiden sich."
+  },
+  "belege": [
+   "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser, Stadt Halle (Saale), veröffentlicht am 22.01.2025: Baujahre vor 1991 aus 54 Kauffällen (R² = 0,51) und ab 1991 aus 31 Kauffällen (R² = 0,46)."
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtliche Regressionsfunktionen, Glied für Glied übernommen und an den ABGEDRUCKTEN KURVEN DER NORMOBJEKTE geprüft: 26 von 26 Stützstellen für Baujahre vor 1991 (Normobjekt 290.000 €, BRW 170 €/m², Wohnfläche 140 m², Gebäudestandard 2,5) und 19 von 19 für ab 1991 (380.000 €, 205 €/m², Standard 3,3, HAL West) sind zeichengleich. Das ist derselbe Prüfmaßstab wie ein Anwendungsbeispiel - das Dokument sagt, was herauskommen muss, und es kommt heraus.",
+  "fallzahl": 85,
+  "streuung": null,
+  "stichtag": "2024-06-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren veröffentlicht am 22.01.2025, Landesamt für Vermessung und Geoinformation Sachsen-Anhalt",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Modellparameter der landesweiten Modellbeschreibung sind einzuhalten (Modellkonformität).",
+  "fundstelle": "Sachwertfaktoren Stadt Halle (Saale), Baujahre vor 1991 und ab 1991, je für freistehende Ein- und Zweifamilienhäuser sowie Reihenhäuser und Doppelhaushälften. Landesweite Modellbeschreibung „Modellparameter für die Ableitung von Sachwertfaktoren\"."
+ },
+ {
+  "land_code": "ST",
+  "ags": "15002000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "verzweigt",
+   "achse_k_feld": "baujahrklasse",
+   "achse_k_bez": "Baujahresklasse",
+   "kategorien": [
+    "vor_1991",
+    "ab_1991"
+   ],
+   "zuordnung_feld": "baujahr",
+   "kategorie_baender": [
+    {
+     "von": null,
+     "bis": 1990,
+     "kategorie": "vor_1991"
+    },
+    {
+     "von": 1991,
+     "bis": null,
+     "kategorie": "ab_1991"
+    }
+   ],
+   "modell_je_kategorie": {
+    "vor_1991": {
+     "form": "regression_additiv",
+     "intercept": 4.1081,
+     "terme": [
+      {
+       "feld": "sachwert",
+       "bez": "vorläufiger Sachwert",
+       "koeffizient": -27.7358,
+       "exponent": -0.29,
+       "gueltig": [
+        114000,
+        518000
+       ]
+      },
+      {
+       "feld": "brw",
+       "bez": "Bodenrichtwert",
+       "koeffizient": -0.0139,
+       "exponent": 0.5,
+       "gueltig": [
+        90,
+        500
+       ]
+      },
+      {
+       "feld": "wohnflaeche",
+       "bez": "Wohnfläche",
+       "koeffizient": 1.4482,
+       "exponent": -0.29,
+       "gueltig": [
+        60,
+        240
+       ]
+      },
+      {
+       "feld": "standardstufe",
+       "bez": "Gebäudestandard",
+       "koeffizient": -2.2382,
+       "exponent": 0.15,
+       "gueltig": [
+        1.5,
+        3.8
+       ]
+      }
+     ],
+     "aussen_exponent": -1.32,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "93 Kauffälle aus 01/2022 bis 07/2024, zeitlicher Bezug 06/2024, R² = 0,51, Variationskoeffizient 0,10. DIESELBE GLEICHUNG WIE BEIM FREISTEHENDEN HAUS: der Ausschuss hat beide Objektarten in einer gemeinsamen Regression ausgewertet und festgestellt, dass die Gebäudeart ohne Einfluss ist. Verschieden sind nur die Stichprobenspannen — hier reicht der Bodenrichtwert bis 500 €/m², dort nur bis 330."
+    },
+    "ab_1991": {
+     "form": "regression_additiv",
+     "intercept": 0.79821318,
+     "terme": [
+      {
+       "feld": "sachwert",
+       "bez": "vorläufiger Sachwert",
+       "koeffizient": 10800.16031602,
+       "exponent": -0.81,
+       "gueltig": [
+        292000,
+        660000
+       ]
+      },
+      {
+       "feld": "brw",
+       "bez": "Bodenrichtwert",
+       "koeffizient": 0.00096848,
+       "exponent": 1,
+       "gueltig": [
+        105,
+        320
+       ]
+      },
+      {
+       "feld": "standardstufe",
+       "bez": "Gebäudestandard",
+       "koeffizient": -1.63874939,
+       "exponent": -1.88,
+       "gueltig": [
+        2.6,
+        4.0
+       ]
+      }
+     ],
+     "diskret": [
+      {
+       "feld": "ortsteil",
+       "bez": "Gemarkung (Halle West oder Halle Ost)",
+       "pflicht": true,
+       "werte": {
+        "dölau": -0.06348555,
+        "dölauer heide": -0.06348555,
+        "giebichenstein": -0.06348555,
+        "gimritz": -0.06348555,
+        "kröllwitz": -0.06348555,
+        "lettin": -0.06348555,
+        "nietleben": -0.06348555,
+        "passendorf": -0.06348555,
+        "trotha": -0.06348555,
+        "halle": -0.06348555,
+        "halle-neustadt": -0.06348555,
+        "neustadt": -0.06348555,
+        "ammendorf": -0.1269711,
+        "bruckdorf": -0.1269711,
+        "büschdorf": -0.1269711,
+        "diemitz": -0.1269711,
+        "kanena": -0.1269711,
+        "mötzlich": -0.1269711,
+        "reideburg": -0.1269711,
+        "seeben": -0.1269711,
+        "tornau": -0.1269711,
+        "wörmlitz": -0.1269711
+       }
+      }
+     ],
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "Dieselbe Gleichung wie beim freistehenden Haus ab 1991; der Ausschuss hat beide Objektarten gemeinsam ausgewertet."
+    }
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Der Gutachterausschuss wertet freistehende Häuser und Reihenhäuser/Doppelhaushälften in EINER Regression aus und stellt fest, dass die Gebäudeart ohne Einfluss ist. Deshalb tragen beide Zweige dieselben Gleichungen — getrennt sind nur die Stichprobenspannen, die der Bericht je Objektart ausweist.",
+   "normobjekt": "Wie beim freistehenden Haus: NHK 2010, BGF aus amtlichen Geobasisdaten, Regionalfaktor 1, Eigennutzung, kein Erstverkauf."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
+   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
+   "besonderheit": "Gemeinsame Regressionsanalyse mit den freistehenden Ein- und Zweifamilienhäusern; die Gebäudeart ist ohne Einfluss."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Halle (Saale)",
+   "sachlich": "Reihenhäuser und Doppelhaushälften, darunter Reihenend- und Reihenmittelhäuser",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwert_vor_1991": {
+     "min": 114000,
+     "max": 518000
+    },
+    "brw_vor_1991": {
+     "min": 90,
+     "max": 500
+    },
+    "wohnflaeche_vor_1991": {
+     "min": 60,
+     "max": 240
+    },
+    "standardstufe_vor_1991": {
+     "min": 1.5,
+     "max": 3.8
+    }
+   },
+   "vorbehalt": "Dieselben Vorbehalte wie beim freistehenden Haus: die Einflussgrößen sind nicht unabhängig voneinander, die Gleichung gilt nur innerhalb ihrer Spannen, und die Kaufpreisbereinigung des Ausschusses ist Teil des Modells.",
+   "hinweis": "Die Stichprobe für Baujahre vor 1991 ist mit 93 Kauffällen die größte dieses Ausschusses."
+  },
+  "belege": [
+   "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für Reihenhäuser und Doppelhaushälften, Stadt Halle (Saale), veröffentlicht am 22.01.2025: Baujahre vor 1991 aus 93 Kauffällen (R² = 0,51)."
+  ],
+  "stufe": "A",
+  "stufe_grund": "Dieselbe Gleichung wie beim freistehenden Haus, dort an 26 abgedruckten Stützstellen der Normobjekt-Kurve geprüft und zeichengleich.",
+  "fallzahl": 93,
+  "streuung": null,
+  "stichtag": "2024-06-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren veröffentlicht am 22.01.2025, Landesamt für Vermessung und Geoinformation Sachsen-Anhalt",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Modellparameter der landesweiten Modellbeschreibung sind einzuhalten (Modellkonformität).",
+  "fundstelle": "Sachwertfaktoren Stadt Halle (Saale), Baujahre vor 1991 und ab 1991, je für freistehende Ein- und Zweifamilienhäuser sowie Reihenhäuser und Doppelhaushälften. Landesweite Modellbeschreibung „Modellparameter für die Ableitung von Sachwertfaktoren\"."
+ },
+ {
+  "land_code": "ST",
+  "ags": "15003000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "verzweigt",
+   "achse_k_feld": "baujahrklasse",
+   "achse_k_bez": "Baujahresklasse",
+   "kategorien": [
+    "vor_1991",
+    "ab_1991"
+   ],
+   "zuordnung_feld": "baujahr",
+   "kategorie_baender": [
+    {
+     "von": null,
+     "bis": 1990,
+     "kategorie": "vor_1991"
+    },
+    {
+     "von": 1991,
+     "bis": null,
+     "kategorie": "ab_1991"
+    }
+   ],
+   "modell_je_kategorie": {
+    "vor_1991": {
+     "form": "regression_additiv",
+     "intercept": 1.14648492,
+     "terme": [
+      {
+       "feld": "sachwert",
+       "bez": "vorläufiger Sachwert",
+       "koeffizient": -0.0017933,
+       "exponent": 0.5,
+       "gueltig": [
+        96000,
+        350000
+       ]
+      },
+      {
+       "feld": "brw",
+       "bez": "Bodenrichtwert",
+       "koeffizient": 0.00125946,
+       "exponent": 1,
+       "gueltig": [
+        30,
+        320
+       ]
+      },
+      {
+       "feld": "standardstufe",
+       "bez": "Gebäudestandard",
+       "koeffizient": 0.23577914,
+       "exponent": 1,
+       "gueltig": [
+        1.4,
+        2.9
+       ]
+      }
+     ],
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "DER ZEITTERM STECKT IM ABSOLUTGLIED. Der Bericht druckt ab: + 1,24514732 − 0,00179330·√vSW + 0,00125946·BRW + 0,23577914·GStd − 0,00024064·Tag, mit dem zeitlichen Bezug 22.08.2023 (Tag 279). Und er schreibt dazu: „Die Funktion ist über den zeitlichen Bezug hinaus nur bis zum 31.12.2023 (410. Tag) anwendbar. Danach sind keine weiteren Abschläge aufgrund eines späteren Stichtages vorzunehmen.\" Für jeden Stichtag ab dem 01.01.2024 gilt also Tag = 410, und das ist hier fest eingerechnet: 1,24514732 − 0,00024064 × 410 = 1,14648492. Wer auf einen FRÜHEREN Stichtag bewertet, muss den Tagwert selbst einsetzen — dieses Register rechnet auf die Gegenwart.\n\n70 Kauffälle aus 11/2022 bis 07/2024, multiples Bestimmtheitsmaß 0,37, Variationskoeffizient 0,13, mittlerer absoluter prozentualer Fehler ± 10 %."
+    },
+    "ab_1991": {
+     "form": "regression_additiv",
+     "intercept": 2.77345702,
+     "terme": [
+      {
+       "feld": "sachwert",
+       "bez": "vorläufiger Sachwert",
+       "koeffizient": -0.18684634,
+       "transform": "ln",
+       "gueltig": [
+        195000,
+        589000
+       ]
+      },
+      {
+       "feld": "standardstufe",
+       "bez": "Gebäudestandard",
+       "koeffizient": 0.17518263,
+       "exponent": 1,
+       "gueltig": [
+        2.2,
+        3.9
+       ]
+      }
+     ],
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "EIN LOGARITHMUS, KEINE POTENZ. Der Bericht druckt ab: + 2,96122190 − 0,18684634·ln(vSW) + 0,17518263·GStd − 0,00045574·Tag, zeitlicher Bezug 27.08.2023 (Tag 286), anwendbar bis Tag 412 (31.12.2023). Der Zeitterm ist wie oben fest eingerechnet: 2,96122190 − 0,00045574 × 412 = 2,77345702.\n\n75 Kauffälle, multiples Bestimmtheitsmaß 0,41, Variationskoeffizient 0,12. Der Bodenrichtwert kommt in dieser Gleichung NICHT vor — für Baujahre ab 1991 hat der Ausschuss keinen signifikanten Einfluss gefunden."
+    }
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "ZWEI GLEICHUNGEN MIT VERSCHIEDENEN EINFLUSSGRÖSSEN: vor 1991 Wurzel des Sachwerts, Bodenrichtwert und Gebäudestandard; ab 1991 Logarithmus des Sachwerts und Gebäudestandard, ohne Bodenrichtwert. Beide tragen im Bericht einen Zeitterm, der ab dem 01.01.2024 eingefroren ist.",
+   "normobjekt": "NHK 2010 gemäß Anlage 4 ImmoWertV, Bezugsgröße BGF aus amtlichen Geobasisdaten, Regionalfaktor 1, GND nach Anlage 1, wirtschaftliche RND nach § 4 und Anlage 2 ImmoWertV. Eigennutzung, kein Neubau oder Erstverkauf."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "Landesweite Modellbeschreibung „Modellparameter für die Ableitung von Sachwertfaktoren\" des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
+   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
+   "regionalfaktor": 1.0,
+   "besonderheit": "Die Auswertung umfasst den Regionstyp Großstadt (Magdeburg) UND die Großstadtrandlage, einschließlich der Großstadtrandlage von Wolfsburg in Niedersachsen. Hier ist nur die Stadt Magdeburg hinterlegt; die Randlagen brauchen die Gemarkungszuordnung aus dem Blatt „Regionstypen\"."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landeshauptstadt Magdeburg",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser, Eigennutzung, kein Neubau oder Erstverkauf",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwert_vor_1991": {
+     "min": 96000,
+     "max": 350000
+    },
+    "sachwert_ab_1991": {
+     "min": 195000,
+     "max": 589000
+    },
+    "brw_vor_1991": {
+     "min": 30,
+     "max": 320
+    },
+    "standardstufe_vor_1991": {
+     "min": 1.4,
+     "max": 2.9
+    },
+    "standardstufe_ab_1991": {
+     "min": 2.2,
+     "max": 3.9
+    }
+   },
+   "vorbehalt": "DER ZEITBEZUG IST EINGEFROREN. Beide Gleichungen führen einen Tagwert, der bis zum 31.12.2023 läuft; danach schreibt der Bericht vor, keinen weiteren Abschlag vorzunehmen. Dieses Register rechnet deshalb mit dem Endwert. Für einen Stichtag VOR dem 01.01.2024 ist der Faktor dieser Sätze zu niedrig — dort gehört der tagesgenaue Wert eingesetzt.\n\nDER MITTLERE ABSOLUTE PROZENTUALE FEHLER BETRÄGT ± 10 %. Das steht so im Bericht und ist die ehrlichste Angabe zur Genauigkeit, die ein Sachwertfaktor überhaupt tragen kann.\n\nDIE BESTIMMTHEITSMASSE LIEGEN BEI 0,37 UND 0,41.\n\nDIE GLEICHUNG FÜR BAUJAHRE AB 1991 KENNT KEINEN BODENRICHTWERT. Wer dort eine Lagekorrektur vermisst: der Ausschuss hat sie geprüft und nicht gefunden.",
+   "hinweis": "Die Kurve des Normobjekts (210.000 €, BRW 140 €/m², Gebäudestandard 2,2, 3. Quartal 2023) ist an dreizehn Stützstellen nachgerechnet; zwölf sind zeichengleich. Bei 280.000 € ergibt die Gleichung 0,93, das Diagramm zeigt 0,92 — die Umrechnungskoeffizienten des Berichts (Bodenrichtwert 40 → 0,88 und 240 → 1,12, Gebäudestandard 1,4 → 0,82 und 2,4 → 1,05) bestätigen die Gleichung dagegen an allen vier geprüften Punkten. Die Abweichung liegt an der Datenbeschriftung des Diagramms, nicht am Modell."
+  },
+  "belege": [
+   "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser, Regionstypen Großstadt und Großstadtrandlage Magdeburg, veröffentlicht am 22.01.2025: Baujahre vor 1991 aus 70 Kauffällen (R² = 0,37), ab 1991 aus 75 Kauffällen (R² = 0,41)."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtliche Regressionsfunktionen mit vollständiger Modellbeschreibung, Glied für Glied übernommen und gegen die abgedruckte Normobjekt-Kurve (12 von 13 Stützstellen) sowie gegen vier Umrechnungskoeffizienten geprüft. Stufe B statt A, weil eine Stützstelle des Diagramms um 0,01 abweicht und der Zeitterm eine Festlegung dieses Registers erfordert.",
+  "fallzahl": 145,
+  "streuung": null,
+  "stichtag": "2023-12-31",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren veröffentlicht am 22.01.2025, Landesamt für Vermessung und Geoinformation Sachsen-Anhalt",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Modellparameter der landesweiten Modellbeschreibung sind einzuhalten (Modellkonformität).",
+  "fundstelle": "Sachwertfaktoren Regionstypen Großstadt (Magdeburg) und Großstadtrandlage, Baujahre vor 1991 und ab 1991."
+ },
+ {
+  "land_code": "ST",
   "ags": "15081",
   "ebene": "kreis",
   "gebiet_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
