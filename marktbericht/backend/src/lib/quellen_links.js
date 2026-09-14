@@ -40,11 +40,16 @@ export const LAND_QUELLEN = {
           stelle: 'Gutachterausschuss für Grundstückswerte in Hamburg',
           url: 'https://www.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-stadtentwicklung-und-wohnen/aemter-und-landesbetrieb/landesbetrieb-geoinformation-und-vermessung/produkte-und-dienstleistungen/infos-ueber-grundstuecke/gutachterausschuss-fuer-grundstueckswerte',
           zugang: 'kostenfrei' },
+  /* v1122-WNI · Niedersachsen führt seine Sachwertfaktoren in KALKULATOREN,
+     einen je Ausschuss und Teilmarkt, erreichbar über eine Karte. Der Weg
+     dorthin ist zwei Klicks lang und lohnt die genauere Auskunft: die
+     Landesseite darüber führt alle Marktdaten, die Karte führt GENAU den
+     Rechner für das Gebiet des Nutzers. */
   '03': { land: 'Niedersachsen',
           stelle: 'Gutachterausschüsse für Grundstückswerte in Niedersachsen',
-          url: 'https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/grundstucksmarktdaten-197115.html',
+          url: 'https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/sachwertfaktor/',
           zugang: 'kostenfrei',
-          hinweis: 'Die Werte stehen als interaktive Kalkulatoren bereit — Bodenrichtwert und vorläufigen Sachwert eingeben, der Faktor wird berechnet.' },
+          hinweis: 'Der Sachwertfaktor steht dort in einem Rechner, nicht in einer Tabelle: Teilmarkt wählen (Ein-/Zweifamilienhaus, Reihenhaus/Doppelhaushälfte, Hof, Wochenendhaus), auf der Karte die Region anklicken, dann Bodenrichtwert und vorläufigen Sachwert eingeben. Der Rechner nennt auch die Standardabweichung und die Stichprobe.' },
   '04': { land: 'Bremen',
           stelle: 'Gutachterausschuss für Grundstückswerte in Bremen',
           url: 'https://www.bauumwelt.bremen.de/bauen/gutachterausschuss-fuer-grundstueckswerte-3489',
