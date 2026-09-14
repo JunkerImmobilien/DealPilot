@@ -2636,7 +2636,28 @@
     { nr: 3, name: 'Lage & Zustand', ziel: 'wo es steht und wie es dasteht' },
     { nr: 4, name: 'Feinschliff',    ziel: 'Bewirtschaftung, Entwicklung, Steuer' },
     { nr: 5, name: 'Deine Sicht',    ziel: 'These und Risiken' },
-    { nr: 6, name: 'Feinheiten',     ziel: 'alle übrigen Felder' }
+    { nr: 6, name: 'Feinheiten',     ziel: 'alle übrigen Felder' },
+    /* ═══ v1386 · DIE WERTERMITTLUNGS-SCHLEIFE ═══════════════════════════
+       Marcels Wunsch: „wenn wir die Pro-Version haben, koennten wir auch
+       nachfragen: Moechtest du vielleicht auch eine Wertermittlung haben?
+       … eine Wertermittlung nach ImmoWertV und dann koennen wir uns die
+       Daten dann auch holen, fragen dann auch in unseren Tabellen die
+       Gutachterausschuesse ab … das waere dann nochmal ein Extra, also
+       eine extra Schleife."
+
+       GEMESSEN, warum es eine EIGENE Etappe braucht und kein Anhaengsel:
+       Das Sachwertverfahren nach ImmoWertV braucht zwei Angaben, die im
+       Formular stehen und die der Sprechlauf NIE gefragt hat —
+       `standardstufe` (Gebaeudestandard nach Anlage 4) und
+       `garagen_bgf_qm`. CrossCheckService liest beide (Z. 208 f., 239).
+       Ohne sie rechnet das Verfahren am Standard vorbei oder gar nicht.
+
+       Sie stehen deshalb NICHT in den Feinheiten: wer keine Wertermittlung
+       will, soll nicht nach dem Gebaeudestandard nach Anlage 4 gefragt
+       werden. Wer sie will, bekommt dafuer eine eigene, angekuendigte
+       Runde — und am Ende den amtlichen Sachwertfaktor seines
+       Gutachterausschusses aus unserem Register. */
+    { nr: 7, name: 'Wertermittlung', ziel: 'Sachwertverfahren nach ImmoWertV', extra: true }
   ];
 
   var RFRAGEN = [
@@ -2718,6 +2739,32 @@
     /* ── Etappe 5 · Deine Sicht ───────────────────────────────────── */
     { et: 5, ids: ['thesis', 'risiken', 'notizen'], rang: 13,
       frage: 'Warum lohnt sich das Objekt für dich, was könnte schiefgehen, und was ist sonst wichtig?' }
+  ];
+
+  /* ═══ v1386 · DIE FRAGEN DER WERTERMITTLUNGS-SCHLEIFE ══════════════════
+     Sie stehen BEWUSST NICHT in RFRAGEN. Dort wuerde `_rfLuecken` sie als
+     gewoehnliche Luecken zaehlen und jedem stellen — auch dem, der nur
+     wissen will, ob sich der Kauf rechnet. Der Gebaeudestandard nach
+     Anlage 4 ImmoWertV ist keine Frage fuer den schnellen Weg.
+
+     Angehaengt werden sie erst, wenn jemand die Schleife ausdruecklich
+     will (`_rfWertStarten`) — dieselbe Technik wie bei den Feinheiten
+     (`_rfTiefeStarten`, v1282). */
+  var RFRAGEN_WERT = [
+    { et: 7, ids: ['standardstufe'], rang: 4, wert: 1,
+      frage: 'Wie ist das Gebäude ausgestattet? Die Normalherstellungskosten 2010 kennen '
+           + 'fünf Standardstufen: 1 sehr einfach, 2 einfach, 3 Standard, 4 gehoben, '
+           + '5 stark gehoben. Es geht um die Qualität der Ausstattung — nicht um den '
+           + 'Zustand, der steckt im Modernisierungsgrad.' },
+    { et: 7, ids: ['gsfl', 'brw'], rang: 3, wert: 1,
+      frage: 'Wie groß ist das Grundstück, und welcher Bodenrichtwert gilt? '
+           + 'Den Bodenrichtwert hole ich dir auch ab.' },
+    { et: 7, ids: ['garagen', 'stellpl_aussen', 'garagen_bgf_qm'], rang: 8, wert: 1,
+      frage: 'Wie viele Garagen und Stellplätze gehören dazu? Wenn du die Grundfläche '
+           + 'der Garagen kennst, nimm sie mit — sie geht in den Sachwert ein.' },
+    { et: 7, ids: ['modernis'], rang: 5, wert: 1,
+      frage: 'Was wurde am Gebäude modernisiert? Daraus ergibt sich die Restnutzungsdauer '
+           + 'nach Anlage 2 ImmoWertV.' }
   ];
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -3487,8 +3534,41 @@
       '.vi-rf-st.ok{opacity:1} .vi-rf-st.ok .z{color:#3FA56C}',
       '.vi-rf-st.vor{opacity:.78} .vi-rf-st.vor .z{color:#8A837F}',
       '.vi-rf-st.weg{opacity:.4} .vi-rf-st.weg .z{color:#B8625C}',
-      '.vi-rf-st.dran{opacity:1;font-weight:600} .vi-rf-st.dran .z{color:var(--wl-c9a84c, #C9A84C)}',
+      /* ═══ v1384 · DAS GEFRAGTE FELD MUSS MAN SEHEN ══════════════════
+         Marcels Wunsch: „mehr animation immer das feld was gefragt ist
+         nach unten und farblich gekennzeichnet. das muss schlau sein und
+         interaktiv."
+
+         Bisher trug die aktive Zeile NUR Textfarbe und Fettschrift — in
+         einer Spalte mit zwanzig Zeilen, von denen die erledigten
+         ebenfalls voll deckend sind (`.ok{opacity:1}`), ist das zu wenig
+         Unterschied. Jetzt bekommt sie eine FLAECHE mit goldenem Balken
+         links, und beim Wechsel laeuft ein kurzes Aufleuchten, damit das
+         Auge dem Sprung folgen kann. */
+      '.vi-rf-st.dran{opacity:1;font-weight:600}',
+      '.vi-rf-st.dran .vi-rf-st-k{position:relative;padding:5px 8px 5px 10px;',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 13%, transparent);',
+      '  box-shadow:inset 3px 0 0 0 var(--wl-c9a84c, #C9A84C);',
+      '  transition:background .18s ease}',
+      '.vi-rf-st.dran .z{color:var(--wl-c9a84c, #C9A84C)}',
       '.vi-rf-st.dran .n{color:var(--wl-e8cc7a, #E8CC7A)}',
+      /* Das Aufleuchten haengt an einer Klasse, die JS kurz setzt — nicht
+         an `.dran` selbst. Sonst liefe es bei jedem Neuzeichnen der
+         Spalte erneut, und die passiert bei jeder Antwort mehrfach. */
+      '.vi-rf-st.dran.frisch .vi-rf-st-k{animation:viRfDran .9s ease-out}',
+      '@keyframes viRfDran{',
+      '  0%{background:color-mix(in srgb, var(--wl-e8cc7a, #E8CC7A) 52%, transparent);',
+      '     box-shadow:inset 3px 0 0 0 var(--wl-e8cc7a, #E8CC7A), 0 0 0 4px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent)}',
+      '  100%{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 13%, transparent);',
+      '     box-shadow:inset 3px 0 0 0 var(--wl-c9a84c, #C9A84C), 0 0 0 0 transparent}}',
+      /* Wer die Reihenfolge selbst bestimmen will, klickt eine offene
+         Zeile an. Das ist der „interaktiv"-Teil des Wunsches. */
+      '.vi-rf-st.springbar .vi-rf-st-k{cursor:pointer}',
+      '.vi-rf-st.springbar:hover .vi-rf-st-k{',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 9%, transparent);',
+      '  box-shadow:inset 3px 0 0 0 color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent)}',
+      '@media (prefers-reduced-motion: reduce){',
+      '  .vi-rf-st.dran.frisch .vi-rf-st-k{animation:none}}',
       /* Die Einzelwerte: erst beim Klick, dann sauber im Raster. */
       '.vi-rf-st-w{display:none}',
       '.vi-rf-st.auf .vi-rf-st-w{display:grid;grid-template-columns:minmax(0,1fr) auto;',
@@ -4690,8 +4770,15 @@
                      escH(w.v) + '</b></span>';
             }).join('') + '</div>'
           : '';
-        return '<div class="vi-rf-st ' + klasse + (werte.length ? ' hatwerte' : '') + '"' +
-               (werte.length ? ' title="' + escH(kurz) + '"' : '') + '>' +
+        /* v1384: anspringbar ist nur, was NOCH offen ist und nicht gerade
+           dran. `i` ist der Index in _rf.offen; die Bloecke vor der Liste
+           (bereits gefuellt, aus dem Formular) tragen negative Indizes und
+           sind damit von selbst ausgeschlossen. */
+        var springbar = (i >= 0) && !z.erledigt && !dran && !uebersprungen;
+        return '<div class="vi-rf-st ' + klasse + (werte.length ? ' hatwerte' : '') +
+               (springbar ? ' springbar' : '') + '" data-i="' + i + '"' +
+               (springbar ? ' title="Diesen Block jetzt beantworten"'
+                          : (werte.length ? ' title="' + escH(kurz) + '"' : '')) + '>' +
                '<div class="vi-rf-st-k">' +
                  '<span class="z">' + zeichen + '</span>' +
                  '<span class="n">' + escH(_rfKurzname(e)) + '</span>' +
@@ -4710,10 +4797,64 @@
     [].slice.call(host.querySelectorAll('.vi-rf-st.hatwerte')).forEach(function (z) {
       z.addEventListener('click', function () { z.classList.toggle('auf'); });
     });
+    /* ═══ v1384 · DEM SPRUNG FOLGEN KOENNEN ════════════════════════════
+       Zwei Dinge, die vorher fehlten:
+
+       1. `block:'nearest'` scrollt so wenig wie moeglich — die Zeile
+          landet am Rand des sichtbaren Bereichs und ist formal sichtbar.
+          `block:'center'` stellt sie in die Mitte, dorthin, wo das Auge
+          ohnehin hinsieht. Und `behavior:'smooth'` macht den Weg
+          nachvollziehbar: ein Sprung ohne Bewegung sieht aus wie ein
+          Neuaufbau der Liste.
+       2. Das Aufleuchten. Es haengt an einer eigenen Klasse, die nur
+          gesetzt wird, wenn sich das GEFRAGTE FELD wirklich geaendert
+          hat — `_rfStandZeichnen()` laeuft bei jeder Antwort mehrfach,
+          und eine Animation, die dabei jedes Mal neu startet, flackert
+          statt zu fuehren. */
     try {
       var dranEl = host.querySelector('.vi-rf-st.dran');
-      if (dranEl) dranEl.scrollIntoView({ block: 'nearest' });
+      if (dranEl) {
+        var _schl = (_rf.offen[_rf.i] && _rf.offen[_rf.i].ids)
+                    ? _rf.offen[_rf.i].ids.join(',') : String(_rf.i);
+        if (_rf._dranZuletzt !== _schl) {
+          _rf._dranZuletzt = _schl;
+          dranEl.classList.add('frisch');
+          setTimeout(function () {
+            try { dranEl.classList.remove('frisch'); } catch (e) {}
+          }, 950);
+        }
+        var _sanft = true;
+        try {
+          _sanft = !window.matchMedia
+                 || !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        } catch (e) {}
+        dranEl.scrollIntoView({ block: 'center',
+                                behavior: _sanft ? 'smooth' : 'auto' });
+      }
     } catch (ex) {}
+
+    /* ═══ v1384 · „das muss schlau sein und interaktiv" ═════════════════
+       Wer eine noch offene Zeile anklickt, springt dorthin. Bisher
+       bestimmte allein der Co-Pilot die Reihenfolge; wer die Zahl zu
+       Block 7 gerade zur Hand hatte, musste trotzdem 4, 5 und 6 abwarten
+       oder ueberspringen.
+
+       NUR NACH VORN UND NUR AUF OFFENES: ein erledigter Block wuerde beim
+       Anspringen seine eigene Frage noch einmal stellen, und der laufende
+       ist schon dran. Beides waere Verwirrung statt Abkuerzung. */
+    [].slice.call(host.querySelectorAll('.vi-rf-st.springbar')).forEach(function (z) {
+      z.addEventListener('click', function (ev) {
+        /* Der Auf-/Zuklapp-Klick der Werte hat Vorrang — sonst koennte man
+           die Einzelwerte eines Blocks gar nicht mehr ansehen. */
+        if (z.classList.contains('hatwerte') && ev.target.closest('.vi-rf-st-w')) return;
+        var ziel = parseInt(z.getAttribute('data-i'), 10);
+        if (!isFinite(ziel) || ziel < 0 || ziel === _rf.i) return;
+        try { _fsStopHoeren(); } catch (e) {}
+        _rf.i = ziel;
+        _rfStandZeichnen();
+        try { _rfFrage(); } catch (e) {}
+      });
+    });
   }
 
   /* Aus „Wie finanzierst du? Eigenkapital, Zinssatz, …" wird „Finanzierung".
@@ -5926,6 +6067,7 @@
     erklaer: '💡', erf_neu: '🌱', erf_mittel: '○', erf_profi: '⚡',   /* v1115 */
     tiefe: '＋', tabelle: '✓', adresse: '📮',
     knf_neu: '⇄', knf_alt: '✓',  /* v1376 (C7) */
+    wert: '⚖️',                   /* v1386: Wertermittlung nach ImmoWertV */
     nachfass: '↻'                 /* v1377 (C5) */
   };
 
@@ -6194,6 +6336,8 @@
     /* v1377 (C5) */
     if (art === 'nachfass') { _rfBlase('ich', 'Ja, die trage ich nach.'); _rfNachfassStarten(); return; }
     if (art === 'tabelle')  { _rfZurTabelle(); return; }
+    /* v1386 */
+    if (art === 'wert')     { _rfBlase('ich', 'Ja, mach die Wertermittlung.'); _rfWertStarten(); return; }
 
 
     if (art === 'tiefe')    { _rf.tiefeOffen = 0; _rfBlase('ich', 'Ja, lass uns weitermachen.'); _rfTiefeStarten(); return; }
@@ -7546,12 +7690,66 @@
 
     /* v1290: Wer fuer die volle Stufe bezahlt, bekommt auch zu sehen, was
        sie mehr kann. Ein Fliesstext, der nur in der Antwort steht und
-       nirgends erscheint, ist bezahlte Unsichtbarkeit. */
+       nirgends erscheint, ist bezahlte Unsichtbarkeit.
+
+       ═══ v1385 · UND DER GANZE BERICHT, NICHT NUR 1400 ZEICHEN ═════════
+       Marcels Wunsch: „wenn ich die erweiterte Marktpreisindikation haben
+       moechte, dann moechte ich gerne das Gleiche haben wie unter
+       Marktbericht … das komplette PDF, was da rauskommt."
+
+       GEMESSEN: Der Sprechlauf ruft laengst DENSELBEN Endpunkt wie der
+       Marktbericht-Tab (`/marktbericht/reports/from-dealpilot`,
+       `wert_stufe: 2`) und bekommt DIESELBE Antwort — mit Fliesstext,
+       Zensus, Bevoelkerungsentwicklung, allem. Er zeigte davon sechs
+       Kennzahlen und 1400 Zeichen Text.
+
+       Der Rest war nicht weg, nur unsichtbar. Jetzt:
+         · der Fliesstext vollstaendig (aufklappbar, mit Absaetzen)
+         · die Zusatzwerte, die der Bericht sonst noch fuehrt
+         · und ein Knopf, der den vollen Marktbericht oeffnet — dort
+           liegt auch das PDF. */
     var text = '';
     if (M.text) {
-      var kurz = M.text.replace(/[#*_>`]/g, '').replace(/\s+/g, ' ').trim();
-      text = '<details class="vi-sc-mehr"><summary>Einordnung im Fließtext</summary>' +
-             '<p>' + escH(kurz.slice(0, 1400)) + (kurz.length > 1400 ? ' …' : '') + '</p></details>';
+      var roh = String(M.text);
+      /* Markdown-Ueberschriften und Listenzeichen weg, Absaetze behalten:
+         ein Fliesstext ohne Absaetze ist eine Wand. */
+      var abs = roh.replace(/^[#>\s]*#+\s*/gm, '')
+                   .replace(/[*_`]/g, '')
+                   .split(/\n{2,}/)
+                   .map(function (p) { return p.replace(/\s+/g, ' ').trim(); })
+                   .filter(function (p) { return p.length > 1; });
+      if (abs.length) {
+        text = '<details class="vi-sc-mehr"><summary>Einordnung im Fließtext</summary>'
+             + abs.map(function (p) { return '<p>' + escH(p) + '</p>'; }).join('')
+             + '</details>';
+      }
+    }
+
+    /* Die Zusatzwerte des Berichts — sie standen schon in M, wurden aber
+       nirgends gezeigt. */
+    var extra = [];
+    if (M.bevRaw != null) {
+      extra.push(_zeile('Bevölkerung', (M.bevRaw >= 0 ? '+' : '') + _pctTxt(M.bevRaw, 1) + ' Trend'));
+    }
+    if (M.tageRaw != null) extra.push(_zeile('Vermarktungsdauer', Math.round(M.tageRaw) + ' Tage'));
+    if (M.marktkontext) {
+      var mk = String(M.marktkontext).replace(/\s+/g, ' ').trim();
+      if (mk) extra.push(_zeile('Marktkontext', mk.slice(0, 90)));
+    }
+    if (extra.length) zeilen = zeilen.concat(extra);
+
+    /* Der Weg zum vollen Bericht. Nur bei Stufe 2 — die einfache
+       Indikation erzeugt keinen. */
+    var zumBericht = '';
+    if (stufe >= 2) {
+      zumBericht =
+        '<div class="vi-sc-annahmen" style="margin-top:8px">'
+      + '<b>Der vollständige Marktbericht ist erstellt.</b> Er führt zusätzlich '
+      + 'Zensusdaten, Bevölkerungs- und Preisentwicklung, Vergleichsobjekte und die '
+      + 'ausformulierte Einordnung — und dort liegt auch das PDF. '
+      + '<button type="button" class="vi-rf-abruf-btn" id="vi-rf-zum-mb" '
+      + 'style="margin-top:6px">Marktbericht öffnen</button>'
+      + '</div>';
     }
 
     _rfBlase('co', '<b>Die ' + escH(was) + ' ist da.</b>' +
@@ -7562,7 +7760,40 @@
         ? '<div class="vi-sc-annahmen"><b>Übernommen:</b> ' + escH(eingetragen.join(', ')) +
           ' — in der Übersicht mit Herkunft „' + escH(Q) + '", nicht als etwas, das du gesagt hast.</div>'
         : '') +
+      zumBericht +
       '</div>');
+
+    /* v1385: Der Knopf oeffnet den Marktbericht. Er wird NACH _rfBlase
+       gebunden, weil die Blase das Markup erst dort einhaengt.
+       Der Dialog wird dabei geschlossen — zwei Vollbildansichten
+       uebereinander waeren ein Ratespiel, welche gerade gilt. */
+    try {
+      var _zmb = $('vi-rf-zum-mb');
+      if (_zmb) _zmb.addEventListener('click', function () {
+        /* DIE NAMEN SIND GEMESSEN, NICHT GERATEN. Der erste Entwurf rief
+           `closeVoiceImport()` und `openMarktbericht()` — beide gibt es
+           nicht. Richtig heissen sie `openMarktberichtView` (global aus
+           marktbericht-view.js:214), und zum Schliessen gibt es keine
+           Funktion: der Abbrechen-Knopf macht es inline (Z. 680 ff.).
+           Ein Knopf, der auf einen falschen Namen zeigt, wirft im
+           try/catch nicht einmal einen sichtbaren Fehler — er tut
+           einfach nichts. */
+        try { _fsStopHoeren(); } catch (e) {}
+        try { _fsAus(); } catch (e) {}
+        /* Vorher speichern: der Bericht liest die Objektfelder, und was
+           im Sprechlauf gerade erfragt wurde, soll darin stehen. */
+        try { if (typeof window.dpTabSwitchSave === 'function') window.dpTabSwitchSave(); } catch (e) {}
+        try { _viAufraeumen('Marktbericht'); } catch (e) {}
+        try { var _ovx = $('oabi-ov'); if (_ovx) _ovx.remove(); } catch (e) {}
+        try { if (window.OA && typeof OA.setMode === 'function') OA.setMode(false, null); } catch (e) {}
+        setTimeout(function () {
+          try {
+            if (typeof window.openMarktberichtView === 'function') window.openMarktberichtView();
+            else if (typeof toast === 'function') toast('Marktbericht-Ansicht nicht verfügbar.');
+          } catch (e) {}
+        }, 160);
+      });
+    } catch (e) {}
     _rfStandZeichnen();
     /* v1376 (C7): Widerspricht ein abgerufener Wert dem, was gesagt wurde,
        steht die Frage jetzt in der Leiste. Sie ueberlebt den Fragewechsel
@@ -8280,6 +8511,187 @@
     _rfFrage();
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1386 · DIE WERTERMITTLUNG NACH ImmoWertV — eine eigene Schleife
+     ═══════════════════════════════════════════════════════════════════
+     Marcel: „Moechtest du vielleicht auch eine Wertermittlung haben? …
+     dann koennen wir uns die Daten dann auch holen, fragen dann auch in
+     unseren Tabellen die Gutachterausschuesse ab."
+
+     Das schliesst zwei Dinge zusammen, die bisher nebeneinander lagen:
+     den Sprechlauf und das Sachwertfaktor-Register (355 Saetze, 71
+     Ausschuesse, 13 Laender). Der Kunde sagt vier Antworten, und am Ende
+     steht der amtliche Faktor SEINES Gutachterausschusses — mit Stufe,
+     Ausschussnamen und Modellvermerk.
+
+     WARUM PRO: Der Abruf geht gegen den Marktbericht-Dienst und rechnet
+     ein vollstaendiges Sachwertverfahren. Das ist dieselbe Leistung wie
+     die erweiterte Marktpreisindikation, nicht der schnelle Ueberschlag.
+
+     WO DIE GRENZE LIEGT, und sie wird ausgesprochen: Ohne Treffer im
+     Register gibt es keinen Faktor — und dann auch keinen erfundenen.
+     Der Kunde bekommt den zustaendigen Ausschuss und den Weg zu seiner
+     Quelle (CLAUDE.md: „Wo kein Wert vorliegt, bekommt der Kunde den Weg
+     dorthin"). */
+  /* DER SCHLUESSEL IST GEMESSEN, NICHT GERATEN. Der erste Entwurf fragte
+     `Plan.has('marktbericht_voll')` — den Schluessel gibt es nicht, und
+     CLAUDE.md sagt, was dann passiert: „Unbekannter Feature-Schluessel =
+     fuer jeden false, auch fuer Pro." Das Angebot waere niemandem je
+     erschienen, und zwar lautlos.
+
+     Der Sprechlauf prueft die erweiterte Indikation ueber das KONTINGENT
+     (`_rfKontingent`, Z. 7211) — `mpi_plus` ist der Topf, aus dem der
+     volle Bericht bezahlt wird. Die Wertermittlung rechnet dasselbe
+     Verfahren und nimmt denselben Topf. */
+  function _rfWertVerfuegbar() {
+    var kg = _rfKontingent();
+    /* Kein Kontingentstand heisst NICHT „kein Pro" — es heisst, dass die
+       Auskunft gerade nicht zu haben ist (v1293d). Dann lieber nichts
+       anbieten als etwas Falsches behaupten. */
+    if (!kg) return false;
+    return (kg.mpi_plus > 0);
+  }
+
+  /* Das Angebot — einmal, am Ende, und nur wenn es etwas zu holen gibt. */
+  function _rfWertAnbieten() {
+    if (!_rf || _rf.wertAn || _rf.wertGefragt) return false;
+    if (!_rf.alle) return false;                 /* nur im gefuehrten Weg */
+    if (!_rfFeld('plz') || !_rfFeld('wfl')) return false;
+    _rf.wertGefragt = 1;
+    if (!_rfWertVerfuegbar()) {
+      /* Kein Pro: das Angebot trotzdem NENNEN, aber als das, was es ist.
+         Eine Funktion, die es gibt und die niemand erwaehnt, ist fuer den
+         Kunden keine. */
+      _rfBlase('co',
+        '<span style="opacity:.8">Mit <b>Pro</b> könnte ich hier noch eine '
+      + '<b>Wertermittlung nach ImmoWertV</b> anschließen: vier weitere Fragen, '
+      + 'dann hole ich den amtlichen <b>Sachwertfaktor deines Gutachterausschusses</b> '
+      + 'und rechne das Sachwertverfahren durch.</span>');
+      return false;
+    }
+    _rfAktion('wert',
+      'Soll ich noch eine Wertermittlung nach ImmoWertV anschließen?',
+      'Ja, Wertermittlung');
+    return true;
+  }
+
+  function _rfWertStarten() {
+    if (!_rf || _rf.wertAn) return;
+    _rf.wertAn = 1;
+    _rfAktionWeg('wert');
+    var neu = RFRAGEN_WERT.filter(function (e) { return _rfFehlt(e); });
+    _rfBlase('co',
+      '<b>Wertermittlung nach ImmoWertV.</b><br>'
+    + '<span style="opacity:.8">' + (neu.length
+        ? 'Ich brauche noch ' + neu.length + (neu.length === 1 ? ' Angabe' : ' Angaben') + '. '
+        : 'Alles Nötige steht schon. ')
+    + 'Danach frage ich unser Register nach dem Sachwertfaktor, den dein '
+    + 'Gutachterausschuss abgeleitet hat — kein Durchschnitt, kein Nachbarkreis.</span>');
+    if (!neu.length) return _rfWertAbrufen();
+    _rfKatalogErgaenzen(neu);
+    _rf.offen = _rf.offen.concat(_rfAufKatalog(neu, _rf.catalog));
+    _rfStandZeichnen();
+    _rfFrage();
+  }
+
+  /* Der Abruf. Derselbe Endpunkt wie die erweiterte Indikation — er
+     traegt das Sachwertverfahren bereits in sich (CrossCheckService);
+     was ihm bisher fehlte, waren Standardstufe und Garagenflaeche. */
+  function _rfWertAbrufen() {
+    if (!_rf || _rf.wertLaeuft) return;
+    _rf.wertLaeuft = 1;
+    var obj = {};
+    ['plz', 'ort', 'str', 'hnr', 'objart', 'wfl', 'zimmer', 'baujahr', 'kp',
+     'gsfl', 'brw', 'mea', 'etage', 'standardstufe', 'modernis', 'garagen',
+     'stellpl_aussen', 'garagen_bgf_qm', 'ds2_zustand', 'ds2_energie'
+    ].forEach(function (id) {
+      var v = _rfFeld(id);
+      if (v !== null && v !== undefined && v !== '') obj[id] = v;
+    });
+    _rfBlase('co', '<span style="opacity:.75">Die Wertermittlung läuft — ich frage den '
+      + 'Gutachterausschuss deines Gebiets ab und rechne das Sachwertverfahren.</span>');
+    Auth.apiCall('/marktbericht/reports/from-dealpilot',
+                 { method: 'POST',
+                   body: { wert_stufe: 2, wertermittlung: true, object: obj,
+                           external_ref: (window._currentObjKey || null) },
+                   timeout: 180000 })
+      .then(function (d) { if (_rf) _rfWertFertig(d); })
+      .catch(function (err) { if (_rf) _rfWertFehler(err); });
+  }
+
+  function _rfWertFehler(err) {
+    _rf.wertLaeuft = 0;
+    var m = (err && err.data && err.data.error) || (err && err.message) || '';
+    _rfBlase('co', '<span style="opacity:.6">Die Wertermittlung hat nicht geklappt'
+      + (m ? ': ' + escH(String(m).slice(0, 120)) : '') + '. Es wurde nichts abgebucht.</span>');
+    if (_fs.an && _fs.stream) _fsHoeren(true);
+  }
+
+  function _rfWertFertig(d) {
+    _rf.wertLaeuft = 0;
+    var p = (d && (d.data || d)) || {};
+    var cc = p.crosscheck || p.cross_check || p.sachwert || {};
+    var gaa = p.gutachterausschuss || cc.gutachterausschuss || {};
+    var zeilen = [];
+
+    var swf = (gaa.wert != null) ? gaa.wert
+            : (cc.sachwertfaktor != null ? cc.sachwertfaktor : null);
+    var sw  = (cc.sachwert != null) ? cc.sachwert
+            : (cc.marktangepasster_sachwert != null ? cc.marktangepasster_sachwert : null);
+
+    if (cc.vorlaeufiger_sachwert != null) {
+      zeilen.push(_zeile('Vorläufiger Sachwert', _euroKurz(cc.vorlaeufiger_sachwert)));
+    }
+    if (swf != null) {
+      zeilen.push(_zeile('Sachwertfaktor', String(swf).replace('.', ',')
+        + (gaa.stufe ? ' · Stufe ' + escH(gaa.stufe) : '')));
+    }
+    if (sw != null) zeilen.push(_zeile('Sachwert (marktangepasst)', _euroKurz(sw)));
+    if (cc.bodenwert != null) zeilen.push(_zeile('Bodenwert', _euroKurz(cc.bodenwert)));
+    if (cc.rnd_jahre != null) zeilen.push(_zeile('Restnutzungsdauer', Math.round(cc.rnd_jahre) + ' Jahre'));
+
+    /* DER AUSSCHUSS GEHOERT DAZU. Eine amtliche Zahl ohne ihre Herkunft
+       ist im Gutachten wertlos — und der Modellvermerk ist Pflicht
+       (§ 10 ImmoWertV). */
+    var herkunft = '';
+    if (gaa.ausschuss || gaa.gaa_name) {
+      herkunft = '<div class="vi-sc-annahmen"><b>Herkunft:</b> '
+        + escH(String(gaa.ausschuss || gaa.gaa_name))
+        + (gaa.stichtag ? ' · Stichtag ' + escH(gaa.stichtag) : '')
+        + (gaa.fundstelle ? '<br><span style="opacity:.75">' + escH(String(gaa.fundstelle).slice(0, 220)) + '</span>' : '')
+        + '</div>';
+    }
+
+    if (!zeilen.length) {
+      /* KEIN WERT IST AUCH EINE ANTWORT — aber nur mit dem Weg dorthin. */
+      var grund = gaa.grund || cc.grund || null;
+      _rfBlase('co', '<b>Für dieses Gebiet liegt kein Sachwertfaktor vor.</b>'
+        + '<div class="vi-sc"><div class="vi-sc-annahmen">'
+        + (grund ? 'Grund: ' + escH(String(grund)) + '. ' : '')
+        + (gaa.ausschuss || gaa.stelle
+            ? 'Zuständig ist <b>' + escH(String(gaa.ausschuss || gaa.stelle)) + '</b>. '
+            : '')
+        + (gaa.url ? 'Die Quelle liegt hier: ' + escH(String(gaa.url)) + ' '
+                   : '')
+        + 'Erfunden wird hier nichts — ohne abgeleiteten Faktor rechnet das '
+        + 'Sachwertverfahren nicht zu Ende.'
+        + '</div></div>');
+      _rf.wertAn = 2;
+      if (_fs.an && _fs.stream) _fsHoeren(true);
+      return;
+    }
+
+    _rfBlase('co', '<b>Die Wertermittlung ist da.</b>'
+      + '<div class="vi-sc"><div class="vi-sc-kopf"><span class="vi-sc-titel">'
+      + 'Sachwertverfahren nach ImmoWertV</span></div>'
+      + '<div class="vi-sc-gitter">' + zeilen.join('') + '</div>'
+      + herkunft
+      + '</div>');
+    _rf.wertAn = 2;
+    _rfStandZeichnen();
+    if (_fs.an && _fs.stream) _fsHoeren(true);
+  }
+
   /* ═══ v1288 · Der Abschluss ═══════════════════════════════════════════
      Vor der Tabelle steht die Antwort auf die Frage, mit der Marcel den
      ganzen Umbau begonnen hat: „wohin geht die Reise, lohnt sich das,
@@ -8295,6 +8707,14 @@
      Abschluss aus und es geht direkt zur Tabelle. Ein Fazit, das „keine
      Daten" sagt, ist ein Umweg. */
   function _rfFertig(erzwungen) {
+    /* v1386: Laeuft die Wertermittlungs-Schleife und sind ihre Fragen
+       beantwortet, wird JETZT abgerufen — vor allem anderen. Sie ist der
+       Grund, warum der Nutzer noch hier ist. `wertAn === 1` heisst
+       „gestartet, noch kein Ergebnis"; 2 heisst fertig. */
+    if (_rf && _rf.wertAn === 1 && !_rf.wertLaeuft) {
+      var nochOffen = RFRAGEN_WERT.some(function (e) { return _rfFehlt(e); });
+      if (!nochOffen) { _rfWertAbrufen(); return; }
+    }
     /* v1282: Ist die Pflichtstrecke durch, wird EINMAL nach den Feinheiten
        gefragt - aber nur im gefuehrten Weg und nur, wenn der Nutzer nicht
        selbst „Fertig" gedrueckt hat. Wer abbricht, will abbrechen. */
@@ -8308,6 +8728,16 @@
        abbricht, will abbrechen. */
     if (!erzwungen && _rf && !_rf.nachfassGefragt && !_rf.nachfassLauf) {
       if (_rfNachfassAnbieten()) return;
+    }
+    /* v1386: Die Wertermittlung ist das LETZTE Angebot vor dem Abschluss.
+       Sie steht hinter dem Nachfassen, weil sie auf vollstaendige Angaben
+       aufbaut — ein Sachwert aus halb gefuellten Feldern waere genau die
+       Zahl, die man nicht liefern darf. Und sie haelt den Dialog NICHT
+       an: `_rfWertAnbieten` legt das Angebot in die Leiste, wo es offen
+       stehen bleibt, waehrend der Abschluss laeuft. Wer es nicht will,
+       merkt nichts davon. */
+    if (!erzwungen && _rf && !_rf.wertGefragt) {
+      try { _rfWertAnbieten(); } catch (e) {}
     }
     if (_rf && !_rf.abschlussGezeigt) {
       _rf.abschlussGezeigt = 1;
