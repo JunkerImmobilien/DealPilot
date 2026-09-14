@@ -1,0 +1,86 @@
+{
+  "land_code": "SH",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Hansestadt Lübeck",
+  "gaa_kennz": "01003",
+  "ags": ["01003000"],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2025,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "Januar 2025 bis Dezember 2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06-30",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Luebeck/gaSW2025Luebeck.pdf?__blob=publicationFile&v=2",
+  "quelle_datei": "SH-luebeck-sachwertfaktoren-2025.pdf",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Hansestadt Lübeck, Sachwertfaktoren 2025, veröffentlicht am 30.06.2026",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Anwendung setzt eine modellkonforme Wertermittlung nach dem abgedruckten Bewertungsmodell voraus (NHK 2010 ohne Regionalisierung, GND 80 Jahre, lineare Alterswertminderung, Außenanlagen pauschal nach Standardstufe).",
+  "fundstelle": "Tabelle 1 „Sachwertfaktoren EFH/ZFH — ohne Innere Stadt\" und Tabelle 2 „Sachwertfaktoren DH/RH — ohne Innere Stadt\". Tabelle 3 (Ganghäuser, Innere Stadt) ist BEWUSST NICHT übernommen — siehe Hinweis am Modell.",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "1- bis 2-Familienhäuser (EFH, ZFH), freistehend — ohne Innere Stadt",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [175000, 200000, 225000, 250000, 275000, 300000, 325000, 350000, 375000, 400000, 425000, 450000, 475000, 500000, 525000, 550000, 575000, 600000, 625000, 650000, 675000, 700000],
+        "achse_k_feld": "brw_klasse",
+        "achse_k_bez": "Bodenrichtwertniveau (beitrags- und abgabenfrei)",
+        "kategorien": ["brw220", "brw480"],
+        "zuordnung_feld": "brw",
+        "kategorie_baender": [
+          { "von": 150, "bis": 300, "kategorie": "brw220" },
+          { "von": 310, "bis": 800, "kategorie": "brw480" }
+        ],
+        "zellen": {
+          "brw220": [1.35, 1.31, 1.27, 1.24, 1.21, 1.19, 1.17, 1.16, 1.14, 1.13, 1.12, 1.11, 1.11, null, null, null, null, null, null, null, null, null],
+          "brw480": [null, null, null, null, 1.28, 1.26, 1.25, 1.24, 1.23, 1.22, 1.21, 1.20, 1.20, 1.19, 1.18, 1.18, 1.18, 1.17, 1.17, 1.16, 1.16, 1.16]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "63 Kauffälle. Kurven für 220 und 480 €/m², ausgewertet innerhalb der Spannen 150–300 und 310–800 €/m². WICHTIG: die Auswertung schließt die INNERE STADT ausdrücklich AUS. Für die Innere Stadt führt der Bericht eine eigene Tabelle für Ganghäuser mit Faktoren um 3,4 — sie ist hier bewusst nicht hinterlegt, weil weder der Gebäudetyp „Ganghaus\" noch die Lage „Innere Stadt\" aus den erhobenen Objektdaten sicher abzuleiten ist. Eine Fehlzuordnung würde den Wert verdreifachen.",
+        "normobjekt": "NHK 2010 (Sachwertrichtlinie) ohne Regionalisierung, Baunebenkosten in den NHK enthalten. BGF nach DIN 277-1:2005-02 aus den Außenmaßen der amtlichen Geobasisdaten. Standardstufe nach Anlage 4 ImmoWertV. Baupreisindex Statistisches Bundesamt, Neubau Wohngebäude, Basisjahr 2010. GND 80 Jahre, RND modifiziert nach Anlage 2 ImmoWertV, lineare Alterswertminderung. Außenanlagen und Hausanschlüsse pauschal nach Standardstufe. Bodenwert lagebezogen, beitrags- und abgabenfrei. Nur Kaufpreise OHNE besondere objektspezifische Grundstücksmerkmale."
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren in der Hansestadt Luebeck 2025, Tabelle 1 (Sachwertfaktoren EFH/ZFH, ohne Innere Stadt), 63 Kauffaelle, nebst abgedrucktem Bewertungsmodell und Grafik 1 mit dem Kurvenverlauf.",
+      "stufe": "A",
+      "stufe_grund": "Amtlich veröffentlichte Wertetabelle mit vollständigem Bewertungsmodell, zeichengleich übernommen.",
+      "fallzahl": 63
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Doppelhäuser (DH), Reihenhäuser (RH) — ohne Innere Stadt",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [125000, 150000, 175000, 200000, 225000, 250000, 275000, 300000, 325000, 350000, 375000, 400000, 425000, 450000, 475000, 500000, 525000, 550000, 575000],
+        "achse_k_feld": "brw_klasse",
+        "achse_k_bez": "Bodenrichtwertniveau (beitrags- und abgabenfrei)",
+        "kategorien": ["brw210", "brw370"],
+        "zuordnung_feld": "brw",
+        "kategorie_baender": [
+          { "von": 170, "bis": 260, "kategorie": "brw210" },
+          { "von": 280, "bis": 550, "kategorie": "brw370" }
+        ],
+        "zellen": {
+          "brw210": [1.48, 1.41, 1.37, 1.34, 1.31, 1.29, 1.27, 1.26, 1.24, 1.23, 1.23, 1.22, 1.21, 1.20, null, null, null, null, null],
+          "brw370": [null, null, 1.60, 1.52, 1.46, 1.41, 1.37, 1.34, 1.31, 1.29, 1.27, 1.25, 1.23, 1.22, 1.21, 1.19, 1.18, 1.17, 1.17]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "52 Kauffälle. Kurven für 210 und 370 €/m², ausgewertet innerhalb der Spannen 170–260 und 280–550 €/m². Zwischen 260 und 280 €/m² liegt eine LÜCKE — dort hat der Ausschuss nichts ausgewertet, und dort gibt es keinen Wert. Auch hier gilt: ohne Innere Stadt.",
+        "normobjekt": "Wie EFH/ZFH: NHK 2010 ohne Regionalisierung, GND 80 Jahre, RND nach Anlage 2 ImmoWertV, lineare Alterswertminderung, Außenanlagen pauschal nach Standardstufe, nur Kaufpreise ohne boG."
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren in der Hansestadt Luebeck 2025, Tabelle 2 (Sachwertfaktoren DH/RH, ohne Innere Stadt), 52 Kauffaelle, nebst abgedrucktem Bewertungsmodell und Grafik 2.",
+      "stufe": "A",
+      "stufe_grund": "Amtlich veröffentlichte Wertetabelle mit vollständigem Bewertungsmodell, zeichengleich übernommen.",
+      "fallzahl": 52
+    }
+  ]
+}

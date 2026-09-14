@@ -149,7 +149,11 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                                ALTBEZIRKE zu und fand sein Feld nie - jetzt
                                laeuft die Zuordnung ueber den Ortsteil, mit der
                                amtlichen Tabelle des Ausschusses. */
-                            'swf-be.json'];
+                            'swf-be.json',
+                            /* v1118: Schleswig-Holstein. Drei Ausschuesse mit
+                               Bodenrichtwertklassen als Kurvenschar - Luebeck,
+                               Herzogtum Lauenburg, Ostholstein. */
+                            'swf-sh.json'];
 
 export function ladeSaat(dateien = SAATDATEIEN) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])

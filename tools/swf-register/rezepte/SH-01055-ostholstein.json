@@ -1,0 +1,90 @@
+{
+  "land_code": "SH",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Ostholstein",
+  "gaa_kennz": "01055",
+  "ags": ["01055"],
+  "ebene": "kreis",
+  "berichtsjahr": 2025,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "Januar 2025 bis Dezember 2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06-30",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ostholstein/gaSW2025Ostholstein.pdf?__blob=publicationFile&v=2",
+  "quelle_datei": "SH-ostholstein-sachwertfaktoren-2025.pdf",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Kreis Ostholstein, Sachwertfaktoren 2025, veröffentlicht am 30.06.2026",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Anwendung setzt eine modellkonforme Wertermittlung nach dem abgedruckten Bewertungsmodell voraus (NHK 2010 ohne Regionalisierung, GND 80 Jahre, lineare Alterswertminderung, Außenanlagen pauschal nach Standardstufe).",
+  "fundstelle": "Tabelle 1 „Sachwertfaktoren EFH/ZFH\" und Tabelle 2 „Sachwertfaktoren DH/RH\", jeweils mit Bewertungsmodell und Kurvenverlauf.",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "1- bis 2-Familienhäuser (EFH, ZFH), freistehend",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [125000, 150000, 175000, 200000, 225000, 250000, 275000, 300000, 325000, 350000, 375000, 400000, 425000, 450000, 475000, 500000, 525000, 550000, 575000, 600000, 625000, 650000, 675000, 700000, 725000, 750000, 775000, 800000, 825000],
+        "achse_k_feld": "brw_klasse",
+        "achse_k_bez": "Bodenrichtwertniveau (beitrags- und abgabenfrei)",
+        "kategorien": ["brw140", "brw260", "brw530"],
+        "zuordnung_feld": "brw",
+        "kategorie_baender": [
+          { "von": 100, "bis": 190, "kategorie": "brw140" },
+          { "von": 200, "bis": 300, "kategorie": "brw260" },
+          { "von": 310, "bis": 1000, "kategorie": "brw530" }
+        ],
+        "zellen": {
+          "brw140": [1.50, 1.40, 1.33, 1.27, 1.23, 1.20, 1.17, 1.15, 1.13, 1.11, 1.10, 1.09, 1.08, 1.07, 1.06, 1.05, null, null, null, null, null, null, null, null, null, null, null, null, null],
+          "brw260": [null, null, null, null, 1.19, 1.16, 1.13, 1.11, 1.09, 1.07, 1.06, 1.04, 1.03, 1.02, 1.02, 1.01, 1.00, 0.99, 0.99, 0.98, null, null, null, null, null, null, null, null, null],
+          "brw530": [null, null, null, null, null, 1.36, 1.32, 1.28, 1.25, 1.22, 1.20, 1.17, 1.16, 1.14, 1.13, 1.11, 1.10, 1.09, 1.08, 1.07, 1.06, 1.05, 1.05, 1.04, 1.03, 1.03, 1.02, 1.02, 1.01]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "224 Kauffälle. Die drei Kurven sind mit ihrem mittleren Bodenrichtwert beschriftet (140, 260, 530 €/m²), ausgewertet wurde jeweils INNERHALB der angegebenen Spanne (100–190, 200–300, 310–1000 €/m²). Zwischen den Kurven wird deshalb NICHT interpoliert — der Bericht druckt Klassen, keine Stützstellen. Ein Bodenrichtwert von 195 €/m² fällt in keine Klasse und bekommt keinen Wert.",
+        "normobjekt": "NHK 2010 (Sachwertrichtlinie) ohne Regionalisierung, Baunebenkosten in den NHK enthalten. BGF nach DIN 277-1:2005-02 aus den Außenmaßen der amtlichen Geobasisdaten. Standardstufe nach Anlage 4 ImmoWertV. Baupreisindex Statistisches Bundesamt, Neubau Wohngebäude, Basisjahr 2010. GND 80 Jahre, RND modifiziert nach Anlage 2 ImmoWertV, lineare Alterswertminderung. Außenanlagen und Hausanschlüsse pauschal nach Standardstufe: 1,0 bis unter 2,0 = 5.000 €, 2,0 bis unter 3,5 = 8.000 €, 3,5 bis unter 4,5 = 12.000 €, ab 4,5 = 15.000 € — KEIN separater Ansatz für Carport oder Garage. Bodenwert lagebezogen, an die Größe angepasst, beitrags- und abgabenfrei. Nur Kaufpreise OHNE besondere objektspezifische Grundstücksmerkmale."
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren im Kreis Ostholstein 2025, Tabelle 1 (Sachwertfaktoren EFH/ZFH), 224 Kauffaelle, nebst abgedrucktem Bewertungsmodell und Grafik 1 mit dem Kurvenverlauf.",
+      "stufe": "A",
+      "stufe_grund": "Amtlich veröffentlichte Wertetabelle mit vollständigem Bewertungsmodell. Alle Tabellenwerte sind zeichengleich übernommen; die Stützstellen liegen im 25.000-Euro-Raster, zwischen ihnen interpoliert der Auswerter linear — so, wie der Bericht seine Kurve zeichnet.",
+      "fallzahl": 224
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Doppelhäuser (DH), Reihenhäuser (RH)",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [125000, 150000, 175000, 200000, 225000, 250000, 275000, 300000, 325000, 350000, 375000, 400000, 425000, 450000, 475000, 500000, 525000, 550000, 575000, 600000, 625000],
+        "achse_k_feld": "brw_klasse",
+        "achse_k_bez": "Bodenrichtwertniveau (beitrags- und abgabenfrei)",
+        "kategorien": ["brw190", "brw320", "brw580"],
+        "zuordnung_feld": "brw",
+        "kategorie_baender": [
+          { "von": 100, "bis": 280, "kategorie": "brw190" },
+          { "von": 290, "bis": 390, "kategorie": "brw320" },
+          { "von": 400, "bis": 1000, "kategorie": "brw580" }
+        ],
+        "zellen": {
+          "brw190": [1.64, 1.47, 1.35, 1.26, 1.19, 1.14, 1.09, 1.05, 1.02, 0.99, 0.97, 0.95, 0.93, 0.91, null, null, null, null, null, null, null],
+          "brw320": [null, null, 1.49, 1.40, 1.33, 1.28, 1.23, 1.19, 1.16, 1.13, 1.11, 1.09, 1.07, 1.05, 1.04, 1.03, 1.01, 1.00, 0.99, null, null],
+          "brw580": [null, null, 1.65, 1.55, 1.47, 1.41, 1.36, 1.31, 1.28, 1.24, 1.22, 1.19, 1.17, 1.15, 1.14, 1.12, 1.11, 1.10, 1.09, 1.08, 1.07]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "138 Kauffälle. Kurven für 190, 320 und 580 €/m², ausgewertet innerhalb der Spannen 100–280, 290–390 und 400–1000 €/m². Auffällig und so abgedruckt: in der niedrigsten Bodenrichtwertklasse fällt der Faktor ab 350.000 € unter 1,00 — Doppel- und Reihenhäuser tragen dort ihre Herstellungskosten nicht.",
+        "normobjekt": "Wie EFH/ZFH: NHK 2010 ohne Regionalisierung, GND 80 Jahre, RND nach Anlage 2 ImmoWertV, lineare Alterswertminderung, Außenanlagen pauschal nach Standardstufe, kein separater Ansatz für Carport oder Garage, nur Kaufpreise ohne boG."
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren im Kreis Ostholstein 2025, Tabelle 2 (Sachwertfaktoren DH/RH), 138 Kauffaelle, nebst abgedrucktem Bewertungsmodell und Grafik 2.",
+      "stufe": "A",
+      "stufe_grund": "Amtlich veröffentlichte Wertetabelle mit vollständigem Bewertungsmodell, zeichengleich übernommen.",
+      "fallzahl": 138
+    }
+  ]
+}

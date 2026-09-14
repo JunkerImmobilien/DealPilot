@@ -1,0 +1,88 @@
+{
+  "land_code": "SH",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Herzogtum Lauenburg",
+  "gaa_kennz": "01053",
+  "ags": ["01053"],
+  "ebene": "kreis",
+  "berichtsjahr": 2025,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "Januar 2025 bis Dezember 2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06-30",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_HzgtLauenburg/gaSW2025HzgtLauenburg.pdf?__blob=publicationFile&v=2",
+  "quelle_datei": "SH-herzogtum-lauenburg-sachwertfaktoren-2025.pdf",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Kreis Herzogtum Lauenburg, Sachwertfaktoren 2025, veröffentlicht am 30.06.2026",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Anwendung setzt eine modellkonforme Wertermittlung nach dem abgedruckten Bewertungsmodell voraus (NHK 2010 ohne Regionalisierung, GND 80 Jahre, lineare Alterswertminderung, Außenanlagen pauschal nach Standardstufe).",
+  "fundstelle": "Tabelle 1 „Sachwertfaktoren EFH/ZFH\" und Tabelle 2 „Sachwertfaktoren DH/RH\", jeweils mit Bewertungsmodell und Kurvenverlauf.",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "1- bis 2-Familienhäuser (EFH, ZFH), freistehend",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [125000, 150000, 175000, 200000, 225000, 250000, 275000, 300000, 325000, 350000, 375000, 400000, 425000, 450000, 475000, 500000, 525000, 550000, 575000, 600000, 625000, 650000, 675000, 700000, 725000, 750000, 775000, 800000],
+        "achse_k_feld": "brw_klasse",
+        "achse_k_bez": "Bodenrichtwertniveau (beitrags- und abgabenfrei)",
+        "kategorien": ["brw140", "brw240", "brw400"],
+        "zuordnung_feld": "brw",
+        "kategorie_baender": [
+          { "von": 90, "bis": 170, "kategorie": "brw140" },
+          { "von": 180, "bis": 290, "kategorie": "brw240" },
+          { "von": 300, "bis": 800, "kategorie": "brw400" }
+        ],
+        "zellen": {
+          "brw140": [1.41, 1.34, 1.29, 1.25, 1.22, 1.19, 1.17, 1.16, 1.14, 1.13, 1.12, 1.11, 1.10, 1.09, 1.09, 1.08, null, null, null, null, null, null, null, null, null, null, null, null],
+          "brw240": [null, null, 1.11, 1.10, 1.09, 1.08, 1.07, 1.07, 1.06, 1.06, 1.05, 1.05, 1.05, 1.05, 1.04, 1.04, 1.04, 1.04, 1.04, 1.04, null, null, null, null, null, null, null, null],
+          "brw400": [null, null, null, null, null, 1.10, 1.09, 1.08, 1.08, 1.07, 1.07, 1.06, 1.06, 1.06, 1.05, 1.05, 1.05, 1.05, 1.04, 1.04, 1.04, 1.04, 1.04, 1.04, 1.04, 1.04, 1.03, 1.03]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "169 Kauffälle. Kurven für 140, 240 und 400 €/m², ausgewertet innerhalb der Spannen 90–170, 180–290 und 300–800 €/m². Auffällig und so abgedruckt: die Kurve der mittleren Lage liegt UNTER der oberen und verläuft ab 400.000 € fast flach bei 1,04 bis 1,05. Zwischen den Kurven wird nicht interpoliert.",
+        "normobjekt": "NHK 2010 (Sachwertrichtlinie) ohne Regionalisierung, Baunebenkosten in den NHK enthalten. BGF nach DIN 277-1:2005-02 aus den Außenmaßen der amtlichen Geobasisdaten. Standardstufe nach Anlage 4 ImmoWertV. Baupreisindex Statistisches Bundesamt, Neubau Wohngebäude, Basisjahr 2010. GND 80 Jahre, RND modifiziert nach Anlage 2 ImmoWertV, lineare Alterswertminderung. Außenanlagen und Hausanschlüsse pauschal nach Standardstufe: 1,0 bis unter 2,0 = 5.000 €, 2,0 bis unter 3,5 = 8.000 €, 3,5 bis unter 4,5 = 12.000 €, ab 4,5 = 15.000 € — KEIN separater Ansatz für Carport oder Garage. Bodenwert lagebezogen, an die Größe angepasst, beitrags- und abgabenfrei. Nur Kaufpreise OHNE besondere objektspezifische Grundstücksmerkmale."
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren im Kreis Herzogtum Lauenburg 2025, Tabelle 1 (Sachwertfaktoren EFH/ZFH), 169 Kauffaelle, nebst abgedrucktem Bewertungsmodell und Grafik 1 mit dem Kurvenverlauf.",
+      "stufe": "A",
+      "stufe_grund": "Amtlich veröffentlichte Wertetabelle mit vollständigem Bewertungsmodell, zeichengleich übernommen.",
+      "fallzahl": 169
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Doppelhäuser (DH), Reihenhäuser (RH)",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [125000, 150000, 175000, 200000, 225000, 250000, 275000, 300000, 325000, 350000, 375000, 400000, 425000, 450000, 475000, 500000, 525000, 550000],
+        "achse_k_feld": "brw_klasse",
+        "achse_k_bez": "Bodenrichtwertniveau (beitrags- und abgabenfrei)",
+        "kategorien": ["brw190", "brw370"],
+        "zuordnung_feld": "brw",
+        "kategorie_baender": [
+          { "von": 120, "bis": 280, "kategorie": "brw190" },
+          { "von": 290, "bis": 500, "kategorie": "brw370" }
+        ],
+        "zellen": {
+          "brw190": [1.30, 1.23, 1.18, 1.15, 1.12, 1.10, 1.08, 1.06, 1.05, 1.04, 1.03, 1.02, 1.01, 1.00, null, null, null, null],
+          "brw370": [null, null, 1.40, 1.36, 1.33, 1.30, 1.28, 1.27, 1.25, 1.24, 1.23, 1.22, 1.21, 1.20, 1.20, 1.19, 1.18, 1.18]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "83 Kauffälle. Zwei Kurven, 190 und 370 €/m², ausgewertet innerhalb der Spannen 120–280 und 290–500 €/m². Der Bericht führt für Doppel- und Reihenhäuser KEINE dritte Lageklasse.",
+        "normobjekt": "Wie EFH/ZFH: NHK 2010 ohne Regionalisierung, GND 80 Jahre, RND nach Anlage 2 ImmoWertV, lineare Alterswertminderung, Außenanlagen pauschal nach Standardstufe, kein separater Ansatz für Carport oder Garage, nur Kaufpreise ohne boG."
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren im Kreis Herzogtum Lauenburg 2025, Tabelle 2 (Sachwertfaktoren DH/RH), 83 Kauffaelle, nebst abgedrucktem Bewertungsmodell und Grafik 2.",
+      "stufe": "A",
+      "stufe_grund": "Amtlich veröffentlichte Wertetabelle mit vollständigem Bewertungsmodell, zeichengleich übernommen.",
+      "fallzahl": 83
+    }
+  ]
+}
