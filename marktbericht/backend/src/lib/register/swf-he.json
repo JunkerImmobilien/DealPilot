@@ -745,6 +745,141 @@
  },
  {
   "land_code": "HE",
+  "ags": "06531005",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Universitätsstadt Gießen",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Universitätsstadt Gießen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "verzweigt",
+   "achse_k_feld": "brw_klasse",
+   "achse_k_bez": "Bodenrichtwertniveau",
+   "kategorien": [
+    "unter_400",
+    "ab_400"
+   ],
+   "zuordnung_feld": "brw",
+   "kategorie_baender": [
+    {
+     "von": 210,
+     "bis": 399.99,
+     "kategorie": "unter_400"
+    },
+    {
+     "von": 400,
+     "bis": 750,
+     "kategorie": "ab_400"
+    }
+   ],
+   "modell_je_kategorie": {
+    "unter_400": {
+     "form": "potenz",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
+     "a": 47.613,
+     "b": -0.303,
+     "gueltig_von": 200000,
+     "gueltig_bis": 750000,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "Bodenrichtwertniveau unter 400 Euro/qm, 33 Kauffälle, Bestimmtheitsmaß 0,34. Nachgerechnet gegen die abgedruckte Tabelle 30: 200.000 Euro ergibt 1,18, 250.000 Euro 1,10, 400.000 Euro 0,96, 750.000 Euro 0,79 — alle vier zeichengleich. Mittlerer vorläufiger Sachwert der Stichprobe 481.000 Euro (205.000 bis 772.000), mittlerer Bodenrichtwert 310 Euro/qm (210 bis 390), mittlere Grundstücksgröße 702 qm, mittlere Restnutzungsdauer 36 Jahre bezogen auf GND 80."
+    },
+    "ab_400": {
+     "form": "potenz",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
+     "a": 187.71,
+     "b": -0.403,
+     "gueltig_von": 250000,
+     "gueltig_bis": 800000,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "Bodenrichtwertniveau ab 400 Euro/qm, 40 Kauffälle, Bestimmtheitsmaß 0,58 — der belastbarste der drei Zweige. Nachgerechnet: 250.000 Euro ergibt 1,25, 400.000 Euro 1,04, 800.000 Euro 0,78 — zeichengleich mit der Tabelle. Mittlerer vorläufiger Sachwert 554.000 Euro (246.000 bis 859.000), mittlerer Bodenrichtwert 513 Euro/qm (400 bis 750)."
+    }
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Gießen trennt die freistehenden Ein- und Zweifamilienhäuser nach dem Bodenrichtwertniveau in zwei Klassen: unter 400 Euro/qm und ab 400 Euro/qm. Die Bänder sind hier auf die Spannen der eingeflossenen Kauffälle begrenzt (210 bis 390 beziehungsweise 400 bis 750 Euro/qm) — der Ausschuss schreibt ausdrücklich, die Faktoren würden nur für Bereiche angegeben, in denen auch tatsächlich Daten vorlagen, und rät von einer Extrapolation ab. Außerhalb dieser Bodenrichtwertspannen gibt es deshalb keinen Wert.",
+   "normobjekt": "Nur Gebäude mit Baujahr ab 1950 und mindestens 20 Jahren Restnutzungsdauer. Besondere Bauteile in üblichem Umfang, bei Ein- und Zweifamilienhäusern im Schnitt 3.000 bis 6.000 Euro. Spitzböden ab 1,25 m Höhe werden abweichend von Anlage 4 ImmoWertV über Zuschläge berücksichtigt; ein fehlender Drempel im ausgebauten Dachgeschoss über einen Abschlag am Kostenkennwert von 2,5 bis 5 Prozent."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Immobilienmarktbericht 2026 des Gutachterausschusses für den Bereich der Universitätsstadt Gießen, Kapitel 9.4, Tabelle 30, Seite 54."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Regressionsformel und Tabelle, gegeneinander nachgerechnet, sieben Stuetzstellen zeichengleich. KEINE Stufe A, weil die Stichproben klein sind (33 und 40 Kauffaelle) und der Ausschuss selbst auf heterogenes Datenmaterial und unsichere Bereiche hinweist.",
+  "fallzahl": 73,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Universitätsstadt Gießen, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: Gebäudesachwert nach NHK 2010 (Anlage 4 ImmoWertV 2021), Regionalfaktor 1,0, Bezugsmaßstab Bruttogrundfläche, lineare Alterswertminderung nach § 38 ImmoWertV, Gesamtnutzungsdauer 80 Jahre, Außenanlagen in der Regel 5 Prozent der alterswertgeminderten Gebäudeherstellungskosten, Nebengebäude in üblichem Umfang (Garage 5.000 bis 12.000 Euro).",
+  "fundstelle": "Kapitel 9.4 Sachwertfaktoren, Tabelle 30, Seiten 52 bis 54."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06531005",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Universitätsstadt Gießen",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Universitätsstadt Gießen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "potenz",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "a": 124.49,
+   "b": -0.37,
+   "gueltig_von": 200000,
+   "gueltig_bis": 550000,
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "31 Kauffälle, Bestimmtheitsmaß 0,52. Nachgerechnet gegen Tabelle 30: 200.000 Euro ergibt 1,36, 300.000 Euro 1,17, 550.000 Euro 0,94 — zeichengleich. Anders als bei den freistehenden Häusern trennt Gießen hier NICHT nach Bodenrichtwertniveau; der mittlere Bodenrichtwert der Stichprobe liegt bei 498 Euro/qm (340 bis 630), die mittlere Grundstücksgröße bei 339 qm, die mittlere Restnutzungsdauer bei 40 Jahren bezogen auf GND 80.",
+   "normobjekt": "Nur Gebäude mit Baujahr ab 1950 und mindestens 20 Jahren Restnutzungsdauer. Mittlere Wohnfläche 124 qm (89 bis 190), mittlere BGF 240 qm."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010",
+   "gnd_jahre": 80,
+   "alterswertminderung": "linear",
+   "regionalfaktor": 1.0,
+   "bezugsmassstab": "BGF"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Immobilienmarktbericht 2026 des Gutachterausschusses für den Bereich der Universitätsstadt Gießen, Kapitel 9.4, Tabelle 30, Seite 54."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Regressionsformel und Tabelle, drei Stuetzstellen nachgerechnet und zeichengleich. KEINE Stufe A wegen der kleinen Stichprobe von 31 Kauffaellen.",
+  "fallzahl": 31,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Universitätsstadt Gießen, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: Gebäudesachwert nach NHK 2010 (Anlage 4 ImmoWertV 2021), Regionalfaktor 1,0, Bezugsmaßstab Bruttogrundfläche, lineare Alterswertminderung nach § 38 ImmoWertV, Gesamtnutzungsdauer 80 Jahre, Außenanlagen in der Regel 5 Prozent der alterswertgeminderten Gebäudeherstellungskosten, Nebengebäude in üblichem Umfang (Garage 5.000 bis 12.000 Euro).",
+  "fundstelle": "Kapitel 9.4 Sachwertfaktoren, Tabelle 30, Seiten 52 bis 54."
+ },
+ {
+  "land_code": "HE",
   "ags": "06611000",
   "ebene": "gemeinde",
   "gebiet_name": "Gutachterausschuss für den Bereich der documenta Stadt Kassel",
