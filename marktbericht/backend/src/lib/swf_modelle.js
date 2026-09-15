@@ -939,6 +939,23 @@ function korrekturAnwenden(k, e) {
    * hat der Auswerter seit v1083 gerechnet. */
   const wirkung = k.wirkung === 'multiplikativ' ? 'multiplikativ' : 'additiv';
 
+  /* ═══ v1412-WOFN · EINE KORREKTUR, DEREN WERTE WIR NICHT HABEN ════════
+     Der Landkreis Verden fuehrt eine Kurve fuer abweichenden
+     Energiebedarf. Im Dashboard steht ihre Beschriftung, im PDF-Export
+     aber KEINE Stuetzstelle — sie erscheint erst bei einer Auswahl.
+
+     Bisher gab es dafuer zwei Wege, und beide sind falsch: die Korrektur
+     weglassen (dann rechnet das Modell halb, und das Ergebnis sieht
+     trotzdem plausibel aus) oder Werte schaetzen (dann erfinden wir eine
+     Zahl). Das ist der dritte Weg — die Korrektur steht im Satz, traegt
+     ihren Grund und wird als OFFEN ausgewiesen.
+
+     TECHNISCH kam das bisher schon heraus: ohne `stufen` faellt die
+     Funktion unten auf `return null`, und null bedeutet offen. Aber
+     zufaellig richtig ist nicht richtig — wer `art: "offen"` liest, soll
+     die Stelle finden, die es behandelt. */
+  if (k.art === 'offen') return null;
+
   if (k.art === 'band') {
     const b = (k.baender || []).find((r) => x >= r.von && x <= r.bis);
     return b ? { merkmal: k.bez, wert: b.zuschlag, wirkung,

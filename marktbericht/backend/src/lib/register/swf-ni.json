@@ -669,6 +669,212 @@
  },
  {
   "land_code": "NI",
+  "ags": "03361",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Bereich Landkreis Verden",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Bereich Landkreis Verden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    600000,
+    700000,
+    800000
+   ],
+   "achse_y_feld": "brw",
+   "achse_y_bez": "Bodenrichtwert in €/m²",
+   "achse_y": [
+    30,
+    60,
+    100,
+    150,
+    250,
+    350,
+    450
+   ],
+   "zellen": {
+    "30": [
+     1.13,
+     1.03,
+     0.95,
+     0.89,
+     0.83,
+     0.79,
+     0.74,
+     0.71,
+     0.64,
+     0.59,
+     0.54
+    ],
+    "60": [
+     1.16,
+     1.06,
+     0.98,
+     0.92,
+     0.86,
+     0.81,
+     0.77,
+     0.73,
+     0.67,
+     0.61,
+     0.57
+    ],
+    "100": [
+     1.2,
+     1.09,
+     1.01,
+     0.95,
+     0.89,
+     0.84,
+     0.8,
+     0.76,
+     0.69,
+     0.64,
+     0.59
+    ],
+    "150": [
+     1.23,
+     1.13,
+     1.05,
+     0.98,
+     0.92,
+     0.87,
+     0.83,
+     0.79,
+     0.72,
+     0.66,
+     0.62
+    ],
+    "250": [
+     1.29,
+     1.18,
+     1.1,
+     1.03,
+     0.97,
+     0.92,
+     0.87,
+     0.83,
+     0.76,
+     0.71,
+     0.66
+    ],
+    "350": [
+     1.33,
+     1.23,
+     1.14,
+     1.07,
+     1.01,
+     0.96,
+     0.91,
+     0.87,
+     0.8,
+     0.74,
+     0.69
+    ],
+    "450": [
+     1.38,
+     1.26,
+     1.18,
+     1.1,
+     1.04,
+     0.99,
+     0.94,
+     0.9,
+     0.83,
+     0.77,
+     0.72
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Standardstufe 2,5 · Verhältnis Brutto-Grundfläche zu Wohnfläche 2,0",
+   "hinweis": "Alle 77 Zellen sind am NORMOBJEKT abgetastet — dort stehen beide Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen. GEGENPROBE: das Dashboard weist als Anwendungsbeispiel Bodenrichtwert 250 €/m² und vorläufigen Sachwert 400.000 € mit dem Faktor 0,92 aus; die Zelle [250][400000] trägt genau diese 0,92. Das Gitter ist in beide Richtungen monoton — mit steigendem Sachwert fallend, mit steigendem Bodenrichtwert steigend."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "1.5": 0.7,
+     "2.0": 0.88,
+     "2.5": 1.0,
+     "3.0": 1.1,
+     "3.5": 1.18,
+     "4.0": 1.24
+    },
+    "rundung_stellen": 2,
+    "hinweis": "Umrechnungskoeffizienten aus dem Diagramm des Dashboards, an ihren abgedruckten Stützstellen. Bei der Normstufe 2,5 ist der Koeffizient 1,000 — das ist die Probe. Die Stichprobe reicht von 1,6 bis 3,8; ausserhalb von 1,5 bis 4,0 gibt es keinen Koeffizienten, und dann greift diese Korrektur nicht."
+   },
+   {
+    "bez": "Abweichendes Verhältnis Brutto-Grundfläche zu Wohnfläche",
+    "feld": "bgf_zu_wohnflaeche",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "1.6": 1.02,
+     "1.8": 1.01,
+     "2.0": 1.0,
+     "2.2": 0.99,
+     "2.4": 0.98,
+     "2.6": 0.97,
+     "2.8": 0.96,
+     "3.0": 0.95,
+     "3.2": 0.93,
+     "3.4": 0.93,
+     "3.6": 0.92,
+     "3.8": 0.91
+    },
+    "rundung_stellen": 2,
+    "hinweis": "Zwölf abgedruckte Stützstellen, den x-Positionen im PDF zugeordnet — NICHT der Lesereihenfolge des Textstroms, denn die Beschriftungen eines Diagramms stehen auf verschiedenen Höhen und kämen sonst durcheinander. Probe: beim Normverhältnis 2,0 ist der Koeffizient 1,00. Die Kurve fällt monoton; dass 3,2 und 3,4 beide 0,93 tragen, steht so im Bericht."
+   },
+   {
+    "bez": "Abweichender Energiebedarf",
+    "feld": "energiebedarf",
+    "art": "offen",
+    "wirkung": "multiplikativ",
+    "hinweis": "OFFEN UND AUSDRÜCKLICH NICHT GERATEN. Das Dashboard führt die Zeile 'Umrechnungskoeffizienten bei abweichendem Energiebedarf:', der PDF-Export enthält dazu aber nur die Beschriftung und KEINE Stützstellen — die Kurve erscheint erst bei einer Auswahl im Dashboard. Sie gehört nachgetragen, sobald die Werte vorliegen; bis dahin wird diese Korrektur als offen ausgewiesen, statt sie stillschweigend wegzulassen."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+   "nhk": "NHK 2010",
+   "bezugsmassstab": "Brutto-Grundflaeche",
+   "alterswertminderung": "linear"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Kalkulator 2026_sw_efh_sulverver (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, veroeffentlicht 02.03.2026, Stichprobe 549 Kauffaelle. 77 Stuetzpunkte des Gitters am Normobjekt abgefragt (Bodenrichtwert 30 bis 450 EUR/qm x vorlaeufiger Sachwert 150.000 bis 800.000 EUR), dazu 18 abgedruckte Stuetzstellen der beiden Umrechnungskoeffizienten-Kurven aus dem PDF-Export. GEGENPROBE am Anwendungsbeispiel des Dashboards: Bodenrichtwert 250 EUR/qm, vorlaeufiger Sachwert 400.000 EUR, Standardstufe 2,5, BGF/Wohnflaeche 2,0 ergibt 0,92 - die Zelle traegt genau diese Zahl. Beide Korrekturkurven stehen an ihrer Normstelle auf 1,00."
+  ],
+  "stufe": "B",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://public.tableau.com/views/2026_sw_efh_sulverver/dash",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": null,
+  "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Ein- und Zweifamilienhäuser, Kalkulator 2026_sw_efh_sulverver; Quellenzeile im Dashboard: Datenbasis 01.01.2026, Tag der Veröffentlichung 02.03.2026"
+ },
+ {
+  "land_code": "NI",
   "ags": "03454",
   "ebene": "kreis",
   "gebiet_name": "Gutachterausschuss für Grundstückswerte Osnabrück-Meppen, Bereich Landkreis Emsland",

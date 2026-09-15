@@ -163,6 +163,17 @@ KORREKTUR_ARTEN = {
     'stufen_kategorial': {'art','feld','bez','kategorie_feld','stufen',
                            'kategorie_baender',
                            'wirkung','rundung_stellen'},
+    # v1412: EINE KORREKTUR, DEREN WERTE WIR NICHT HABEN.
+    # Der Landkreis Verden fuehrt eine Kurve fuer abweichenden
+    # Energiebedarf - im Dashboard steht ihre Beschriftung, im PDF-Export
+    # aber KEINE Stuetzstelle; sie erscheint erst bei einer Auswahl.
+    #
+    # Bisher gab es dafuer nur zwei Wege, und beide sind falsch: die
+    # Korrektur weglassen (dann rechnet das Modell halb und niemand sieht
+    # es) oder Werte schaetzen (dann erfinden wir eine Zahl). Diese Art ist
+    # der dritte Weg - sie steht im Satz, traegt ihren Grund, und der
+    # Auswerter weist sie als OFFEN aus, statt sie anzuwenden.
+    'offen':      {'art','feld','bez','wirkung'},
 }
 
 
