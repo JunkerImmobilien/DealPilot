@@ -93,9 +93,24 @@ def kurve(W, achsmuster):
           and oben < (w[1] + w[3]) / 2 < y - 4
           and w[0] > xlinks]
 
+    # DIE EINHEIT GEHÖRT ZUM LABEL. Die Achse heisst "15 Jahre", "80 m²",
+    # "100.000 €" — pdftotext gibt Zahl und Einheit als zwei Wörter, und
+    # die Kurvenzahl steht über der Mitte des GANZEN Labels. Wer nur die
+    # Zahl misst, sucht zu weit links: bei Salzgitter fiel damit die
+    # letzte Stützstelle der Restnutzungsdauer heraus (75 Jahre = 1,25),
+    # und die Kurve hätte an ihrem Ende aufgehört, ohne dass etwas fehlte.
+    einheiten = {'Jahre', 'm²', '€', 'm2', 'EUR'}
+    def mitte(a):
+        rechts = [w for w in W
+                  if w[4] in einheiten
+                  and abs((w[1] + w[3]) / 2 - (a[1] + a[3]) / 2) < 4
+                  and 0 < w[0] - a[2] < 12]
+        ende = rechts[0][2] if rechts else a[2]
+        return (a[0] + ende) / 2
+
     aus = []
     for a in achse:
-        amitte = (a[0] + a[2]) / 2
+        amitte = mitte(a)
         nah = [w for w in ko if abs((w[0] + w[2]) / 2 - amitte) < 18]
         if not nah:
             aus.append((a[4], None))

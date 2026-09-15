@@ -205,6 +205,375 @@
  },
  {
   "land_code": "NI",
+  "ags": "03102",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Stadt Salzgitter",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Stadt Salzgitter",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    75000,
+    100000,
+    150000,
+    200000,
+    250000,
+    300000,
+    400000,
+    500000,
+    600000
+   ],
+   "achse_y_feld": "brw",
+   "achse_y_bez": "Bodenrichtwert in €/m²",
+   "achse_y": [
+    20,
+    50,
+    100,
+    150,
+    200,
+    250,
+    300
+   ],
+   "zellen": {
+    "20": [
+     1.88,
+     1.58,
+     1.21,
+     0.99,
+     0.84,
+     0.73,
+     0.58,
+     0.48,
+     0.4
+    ],
+    "50": [
+     1.98,
+     1.67,
+     1.29,
+     1.06,
+     0.91,
+     0.79,
+     0.63,
+     0.53,
+     0.45
+    ],
+    "100": [
+     2.07,
+     1.75,
+     1.36,
+     1.13,
+     0.97,
+     0.85,
+     0.68,
+     0.57,
+     0.49
+    ],
+    "150": [
+     2.12,
+     1.8,
+     1.4,
+     1.17,
+     1.0,
+     0.88,
+     0.71,
+     0.6,
+     0.52
+    ],
+    "200": [
+     2.17,
+     1.84,
+     1.44,
+     1.2,
+     1.03,
+     0.91,
+     0.74,
+     0.62,
+     0.54
+    ],
+    "250": [
+     2.2,
+     1.87,
+     1.47,
+     1.22,
+     1.06,
+     0.93,
+     0.76,
+     0.64,
+     0.56
+    ],
+    "300": [
+     2.23,
+     1.9,
+     1.49,
+     1.25,
+     1.08,
+     0.95,
+     0.78,
+     0.66,
+     0.57
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Wohnfläche 150 m² · Restnutzungsdauer 30 Jahre · Standardstufe 2,5",
+   "hinweis": "Alle 63 Zellen sind am NORMOBJEKT abgetastet. GEGENPROBE: das Dashboard weist als Anwendungsbeispiel Bodenrichtwert 150 €/m² und vorläufigen Sachwert 250.000 € mit dem Faktor 1,00 aus; die Zelle [150][250000] trägt genau diese 1,00. Die Spanne ist hier BESONDERS WEIT (0,40 bis 2,23) — Salzgitter hat einen sehr niedrigen Bodenrichtwert (Median 100 €/m²) bei gleichzeitig weiter Sachwertspanne, und beides zusammen spreizt den Faktor."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Wohnfläche",
+    "feld": "wohnflaeche",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "80": 0.88,
+     "100": 0.92,
+     "120": 0.95,
+     "140": 0.98,
+     "160": 1.02,
+     "180": 1.05,
+     "200": 1.07
+    },
+    "rundung_stellen": 2,
+    "hinweis": "Sieben abgedruckte Stützstellen. Die Normwohnfläche 150 m² liegt zwischen 140 (0,98) und 160 (1,02); interpoliert ergibt das 1,00 — die Probe stimmt."
+   },
+   {
+    "bez": "Abweichende Restnutzungsdauer",
+    "feld": "rnd_jahre",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "15": 0.7,
+     "25": 0.93,
+     "30": 1.0,
+     "35": 1.05,
+     "45": 1.13,
+     "55": 1.18,
+     "65": 1.22,
+     "75": 1.25
+    },
+    "rundung_stellen": 2,
+    "hinweis": "SIEBEN ABGEDRUCKTE STÜTZSTELLEN (15 · 25 · 35 · 45 · 55 · 65 · 75) PLUS DIE NORMSTELLE 30 — und die ist belegt, nicht geraten: das Dashboard führt sein Normobjekt bei Restnutzungsdauer 30 Jahren und weist dort den Faktor 1,00 aus, also ist der Koeffizient dort 1,000. WARUM DAS NÖTIG IST: die Kurve ist stark konkav (0,70 bis 1,25), und zwischen 25 und 35 linear interpoliert ergäbe 30 den Wert 0,99. Ein Nutzer, der genau das Normobjekt beschreibt, bekäme damit ein Prozent zu wenig — ein Fehler, den niemand bemerkt, weil das Ergebnis plausibel bleibt. Bei den anderen Korrekturen dieses Ausschusses stellt sich die Frage nicht: dort ist die Normstelle selbst eine abgedruckte Stützstelle (Standardstufe 2,5) oder liegt zwischen zwei symmetrischen (Wohnfläche 150 zwischen 0,98 und 1,02)."
+   },
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "1.5": 0.74,
+     "2.0": 0.89,
+     "2.5": 1.0,
+     "3.0": 1.08,
+     "3.5": 1.14,
+     "4.0": 1.2
+    },
+    "rundung_stellen": 2,
+    "hinweis": "Sechs abgedruckte Stützstellen. Probe: bei der Normstufe 2,5 ist der Koeffizient 1,00."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung.",
+   "nhk": "NHK 2010",
+   "bezugsmassstab": "Brutto-Grundflaeche",
+   "alterswertminderung": "linear"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Kalkulator 2026_sw_efh_bssz (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, veroeffentlicht 02.03.2026, Stichprobe 287 Kauffaelle. 63 Stuetzpunkte des Gitters am Normobjekt abgefragt (Bodenrichtwert 20 bis 300 EUR/qm x vorlaeufiger Sachwert 75.000 bis 600.000 EUR), dazu 20 abgedruckte Stuetzstellen der drei Umrechnungskurven und die Normstelle der Restnutzungsdauer (30 Jahre = 1,000, aus dem Normobjekt des Dashboards). GEGENPROBE am Anwendungsbeispiel: Bodenrichtwert 150, vorlaeufiger Sachwert 250.000, Wohnflaeche 150, Restnutzungsdauer 30, Standardstufe 2,5 ergibt 1,00 - die Zelle traegt genau diese Zahl."
+  ],
+  "stufe": "B",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bssz/dash",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": null,
+  "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Ein- und Zweifamilienhäuser, Kalkulator 2026_sw_efh_bssz"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03103",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Stadt Wolfsburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Stadt Wolfsburg",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    175000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    500000,
+    600000,
+    700000,
+    800000
+   ],
+   "achse_y_feld": "brw",
+   "achse_y_bez": "Bodenrichtwert in €/m²",
+   "achse_y": [
+    145,
+    175,
+    200,
+    225,
+    250,
+    275
+   ],
+   "zellen": {
+    "145": [
+     1.06,
+     1.0,
+     0.92,
+     0.85,
+     0.8,
+     0.76,
+     0.69,
+     0.64,
+     0.6,
+     0.57
+    ],
+    "175": [
+     1.1,
+     1.04,
+     0.96,
+     0.89,
+     0.84,
+     0.79,
+     0.73,
+     0.67,
+     0.63,
+     0.6
+    ],
+    "200": [
+     1.13,
+     1.07,
+     0.98,
+     0.92,
+     0.86,
+     0.82,
+     0.75,
+     0.7,
+     0.65,
+     0.62
+    ],
+    "225": [
+     1.16,
+     1.1,
+     1.01,
+     0.94,
+     0.89,
+     0.84,
+     0.77,
+     0.72,
+     0.68,
+     0.64
+    ],
+    "250": [
+     1.18,
+     1.12,
+     1.03,
+     0.96,
+     0.91,
+     0.86,
+     0.79,
+     0.74,
+     0.69,
+     0.66
+    ],
+    "275": [
+     1.2,
+     1.14,
+     1.05,
+     0.98,
+     0.93,
+     0.88,
+     0.81,
+     0.75,
+     0.71,
+     0.67
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Wohnfläche 150 m² · Standardstufe 2,5",
+   "hinweis": "Alle 60 Zellen sind am NORMOBJEKT abgetastet — dort stehen beide Umrechnungskurven auf 1,00. GEGENPROBE: das Dashboard weist als Anwendungsbeispiel Bodenrichtwert 200 €/m² und vorläufigen Sachwert 300.000 € mit dem Faktor 0,92 aus; die Zelle [200][300000] trägt genau diese 0,92."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Wohnfläche",
+    "feld": "wohnflaeche",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "80": 0.98,
+     "100": 0.99,
+     "120": 0.99,
+     "140": 1.0,
+     "160": 1.0,
+     "180": 1.01,
+     "200": 1.01,
+     "220": 1.01
+    },
+    "rundung_stellen": 2,
+    "hinweis": "Acht abgedruckte Stützstellen. Die Normwohnfläche 150 m² liegt zwischen 140 und 160, beide 1,00 — die Probe stimmt. Wolfsburg reagiert auf die Wohnfläche fast gar nicht (0,98 bis 1,01 über die ganze Spanne), anders als Braunschweig (0,89 bis 1,09) oder Salzgitter (0,88 bis 1,07). Das ist ein Marktbefund des Ausschusses, kein Lesefehler."
+   },
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "2.0": 0.87,
+     "2.5": 1.0,
+     "3.0": 1.09,
+     "3.5": 1.16,
+     "4.0": 1.21
+    },
+    "rundung_stellen": 2,
+    "hinweis": "Fünf abgedruckte Stützstellen. Probe: bei der Normstufe 2,5 ist der Koeffizient 1,00. Die Stichprobe reicht von 1,5 bis 4,0; unterhalb von 2,0 druckt der Ausschuss keinen Koeffizienten ab, dort greift die Korrektur mit dem Randwert."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung.",
+   "nhk": "NHK 2010",
+   "bezugsmassstab": "Brutto-Grundflaeche",
+   "alterswertminderung": "linear"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Kalkulator 2026_sw_efh_bswob (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, veroeffentlicht 02.03.2026, Stichprobe 245 Kauffaelle. 60 Stuetzpunkte des Gitters am Normobjekt abgefragt (Bodenrichtwert 145 bis 275 EUR/qm x vorlaeufiger Sachwert 175.000 bis 800.000 EUR), dazu 13 abgedruckte Stuetzstellen der beiden Umrechnungskurven. GEGENPROBE am Anwendungsbeispiel: Bodenrichtwert 200, vorlaeufiger Sachwert 300.000, Wohnflaeche 150, Standardstufe 2,5 ergibt 0,92 - die Zelle traegt genau diese Zahl."
+  ],
+  "stufe": "B",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bswob/dash",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": null,
+  "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Ein- und Zweifamilienhäuser, Kalkulator 2026_sw_efh_bswob"
+ },
+ {
+  "land_code": "NI",
   "ags": "03158",
   "ebene": "kreis",
   "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Wolfenbüttel",
