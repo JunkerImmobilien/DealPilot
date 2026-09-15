@@ -40,6 +40,7 @@
 set -u
 LISTE="${1:-$(dirname "$0")/ni-workbooks.txt}"
 UA="Mozilla/5.0 (DealPilot Registerpflege; amtliche Kennzahlen nach ImmoWertV)"
+LESER="${LESER:-$(dirname "$0")/ni-wert-lesen.py}"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 
 [ -r "$LISTE" ] || { echo "Liste nicht lesbar: $LISTE" >&2; exit 1; }
@@ -96,40 +97,22 @@ while read -r WB; do
   # liegen acht Zeilen zwischen "Sachwer aktor:" und der 0,87; `grep -A1`
   # holte dort eine fremde 0,15. Also: ab der Beschriftung vorwaerts die
   # ERSTE Zahl nehmen, die als Faktor ueberhaupt in Frage kommt.
-  # ═══ DER AUSLESER DARF NICHT RATEN ═════════════════════════════════════
-  # GEMESSEN an Nienburg: zwischen "Sachwer aktor:" und seinem Wert 0,87
-  # liegen acht Zeilen mit fremden Zahlen. Wer "die naechste Zahl im
-  # Faktorband" nimmt, bekommt dort 1,30 — eine Zahl, die plausibel
-  # aussieht, durch jede Bandpruefung geht und FALSCH ist.
+  # ═══ DER WERT WIRD UEBER SEINE LAGE GEHOLT, NICHT UEBER DIE ZEILE ═════
+  # Drei Layoutregeln haben nicht gereicht — 81 Dashboards haben nicht ein
+  # Layout, sondern viele, und jede weitere Regel traf das naechste nicht:
   #
-  # Deshalb gilt hier dieselbe Regel wie im Register: WO DIE QUELLE NICHT
-  # EINDEUTIG IST, GIBT ES KEINEN WERT. Uebernommen wird nur, was in
-  # DERSELBEN Zeile wie seine Beschriftung steht oder in der direkt
-  # folgenden. Alles andere wird als `?` gemeldet und beim Rezeptbau von
-  # Hand am PDF abgelesen — einmal je Ausschuss, das ist ohnehin noetig,
-  # weil das Normobjekt der Pruefmassstab ist.
+  #   Nienburg    Wert ACHT Zeilen unter der Beschriftung  -> las 1,30
+  #   Osnabrueck  Wert von -layout in eine andere Zeile     -> las die 0,21
+  #               geschoben                                    der Streuung
+  #   Northeim    Stichprobe "1.737"                        -> las 1
   #
-  # 21 offene Felder sind kein Mangel dieses Laufs. Eine still falsche
-  # Zahl waere einer.
-  zahl_ab() {                       # $1 Muster  $2 Untergrenze  $3 Obergrenze
-    echo "$T" | grep -A1 "$1"       | { if [ "$FMT" = en ]; then grep -oE '[0-9]+\.[0-9]{2}'
-          else grep -oE '[0-9]+,[0-9]{2}'; fi; }       | tr ',' '.'       | awk -v u="$2" -v o="$3" '$1+0 >= u && $1+0 <= o { print; exit }'
-  }
-  FAK=$(zahl_ab 'Sachwer aktor:'      0.20 4.00)
-  ABW=$(zahl_ab 'Standardabweichung:' 0.01 1.00)
-
-  # ═══ WENN BEIDE ZAHLEN GLEICH SIND, IST EINE DAVON GELIEHEN ═══════════
-  # Nach drei Layoutregeln hielt sich die Stadt Osnabrueck weiter: Faktor
-  # 0,21 UND Streuung 0,21. Statt eine vierte Regel zu bauen, greift hier
-  # eine Eigenschaft der Sache selbst — ein Sachwertfaktor und seine
-  # Standardabweichung sind zwei verschiedene Groessen, und dass sie auf
-  # zwei Nachkommastellen genau uebereinstimmen, ist kein Zufall, sondern
-  # derselbe Fund zweimal gelesen.
-  #
-  # Das ist die allgemeinere Pruefung: nicht "wo steht die Zahl", sondern
-  # "kann das ueberhaupt stimmen". Sie faengt auch Layouts, die ich nie
-  # gesehen habe. Im Zweifel bleibt das Feld offen.
-  if [ -n "$FAK" ] && [ "$FAK" = "$ABW" ]; then FAK=""; fi
+  # ni-wert-lesen.py stellt die Frage gar nicht: es sucht die Zahl, die auf
+  # DERSELBEN HOEHE steht wie ihre Beschriftung, rechts davon. Findet sich
+  # keine, gibt es keinen Wert — die Erntedoktrin auf einen Textstrom
+  # angewandt.
+  pdftotext -bbox-layout "$TMP/k.pdf" "$TMP/k.xml" 2>/dev/null
+  FA=$(python3 "$LESER" "$TMP/k.xml" 2>/dev/null)
+  FAK="${FA%%;*}"; ABW="${FA##*;}"
 
   TM=$(echo "$WB" | sed 's/^2026_sw_//;s/_.*//')
 
