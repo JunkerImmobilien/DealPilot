@@ -134,63 +134,66 @@ Das war die teuerste Erkenntnis, und sie hat **drei Anläufe** gekostet:
 
 ---
 
-## Geerntet: zwei Sätze, und der Weg steht
+## Geerntet: neun Sätze — und einer wieder zurückgezogen
 
-| AGS | Gebiet | Faktor am Normobjekt | Gitter | Version |
+| AGS | Gebiet | Faktor am Normobjekt | Stichprobe | Version |
 |---|---|---:|---:|---|
-| **03361** | Landkreis Verden | 0,92 ± 0,13 | 77 Punkte | v1412 |
-| **03256** | Stadt Nienburg | 0,87 | 60 Punkte | v1414 |
+| 03101 | Stadt Braunschweig | 1,25 | 304 | v1416 |
+| 03103 | Stadt Wolfsburg | 0,92 | 245 | v1417 |
+| 03151 | Landkreis Gifhorn | 0,89 | **854** | v1419 |
+| 03351 | Landkreis Celle | 0,97 | 415 | v1419 |
+| 03241 | **Region Hannover** | 1,00 | **1.005** | v1420 |
+| 03254 | Landkreis Hildesheim | 0,73 | 370 | v1420 |
+| 03257 | Landkreis Schaumburg | 1,02 | 474 | v1420 |
+| 03256 | Stadt Nienburg | 0,87 | 249 | v1414 |
+| 03361 | Landkreis Verden | 0,92 | 549 | v1412 |
 
-Beide **treffen ihr Anwendungsbeispiel zeichengleich** — das ist der
-Prüfmaßstab nach der Erntedoktrin, und jedes Dashboard bringt ihn mit.
-Niedersachsen steht damit bei **7 Registersätzen**, die Regressionsstrecke
-bei 385 Sätzen ohne technischen Fehler.
+**Jeder Satz trifft sein Anwendungsbeispiel zeichengleich**, und jede
+Korrektur ist einzeln nachgerechnet. Niedersachsen steht bei **14
+Registersätzen** (vorher 5), die Regressionsstrecke bei 392 Sätzen ohne
+technischen Fehler.
 
-### Warum gerade diese beiden
-
-Sie gehören zum **GAG Sulingen-Verden**, dem einzigen der neun Ausschüsse,
-der **keine Lage-Achse** führt. Die anderen — Northeim, Braunschweig,
-Lüneburg, Otterndorf … — wählen über eine Lagegruppe zwischen mehreren
-Sachwertkurven aus, und der dafür nötige URL-Parameter ist nicht bekannt:
-`Brw` und `Sach` greifen, `Lage` nicht.
-
-> **Ohne diesen Parameter wäre ein Satz halb**, und die Doktrin sagt:
-> kein Verfahren rechnet halb. Also zuerst die Gebiete, die vollständig
-> erfassbar sind — und für die übrigen erst den Parameter klären.
-
-### Drei Werkzeuge, die dabei entstanden sind
-
-| Werkzeug | wofür |
-|---|---|
-| `ni-kopfdaten.sh` | Klarname, Stichtag, Stichprobe, Normobjekt je Gebiet |
-| `ni-wert-lesen.py` | **eine Zahl über ihre LAGE holen**, nicht über die Zeile |
-| `ni-kurven-lesen.py` | die Umrechnungskurven über die **x-Position** zuordnen |
-
-**Beide Leser lösen dasselbe Problem:** in einem Dashboard steht eine Zahl
-nicht dort, wo der Textstrom sie hinschreibt. Der Faktor kann acht Zeilen
-unter seiner Beschriftung liegen (Nienburg), und die Zahlen einer
-Diagrammkurve stehen auf verschiedenen Höhen, folgen also der Kurve statt
-der x-Achse. Zeilenbasiert gelesen ergibt das plausible, falsche Werte —
-bei Verden las sich die BGF-Kurve als 1,02 · 1,00 · 1,01 · 0,99 · 0,98,
-weder monoton noch zu den Achsenwerten passend.
-
-> `ni-kurven-lesen.py` ist **an Verden verifiziert**: es liefert dieselben
-> 18 Stützstellen, die dort von Hand abgelesen wurden — beide Kurven
-> zeichengleich. Ein Leser, der nur an seinem eigenen Fall geprüft ist,
-> beweist nichts.
-
-### Die Korrekturart `offen` (v1412)
-
-Beide Ausschüsse führen eine Kurve für **abweichenden Energiebedarf**. Im
-Dashboard steht ihre Beschriftung, im PDF-Export aber keine einzige
-Stützstelle — sie erscheint erst bei einer Auswahl.
-
-Bisher gab es dafür zwei Wege, und beide sind falsch: die Korrektur
-weglassen (dann rechnet das Modell halb und sieht trotzdem plausibel aus)
-oder Werte schätzen (dann erfinden wir eine Zahl). Jetzt steht sie im
-Satz, trägt ihren Grund, und der Auswerter weist sie als **offen** aus.
+> ### Die Rücknahme: Stadt Salzgitter (v1417 → v1418)
+>
+> Der Satz war gebaut, geprüft, ausgerollt — und gehörte nicht ins
+> Register. Das Dashboard führt ein eigenes Eingabefeld **„Lage im
+> Landkreis: Bruchmachtersen, Engelns.."**; mein Gitter galt damit für eine
+> unbenannte Teillage, nicht für die Stadt.
+>
+> Durchgekommen ist er, weil `ni-lageachse.sh` nach `Lage:` mit direktem
+> Doppelpunkt suchte. **Von 71 vermeintlich erntbaren Gebieten sind es
+> tatsächlich 55.** Ausführlich in `FALLEN.md`.
 
 ---
+
+## Was der Weg inzwischen kann
+
+```
+ni-steckbrief.sh   Normobjekt, Kurven, Spannen, Parameterprobe  (2 Abrufe)
+ni-lageachse.sh    ist das Gebiet ueberhaupt vollstaendig erfassbar?
+gitter2.sh         das Gitter abtasten                         (~70 Abrufe)
+ni-kurven-lesen.py die Korrekturkurven ueber die x-Position
+ni-wert-lesen.py   eine Zahl ueber ihre LAGE statt ueber die Zeile
+```
+
+Rund zehn Minuten je Gebiet, davon die Hälfte Wartezeit.
+
+**Vier Regeln, die sich beim Ernten herausgestellt haben:**
+
+1. **Das Normobjekt muss auf einer Gitterachse liegen.** Sonst ist die
+   Gegenprobe interpoliert — und eine Rechnung mit sich selbst ist kein
+   Beweis. Bei Gifhorn wurde die Zeile Brw 120 eigens nachgetastet.
+2. **Die Freigaben des Filters von Hand gegenlesen**, nicht nur die
+   Sperrungen. Die Sperrungen erklären sich selbst.
+3. **Das Modell hängt am GEBIET, nicht am Ausschuss.** Wolfsburg führt
+   keine RND-Korrektur, Braunschweig und Salzgitter schon — derselbe
+   Ausschuss. Schaumburg keine, Region Hannover und Hildesheim schon —
+   derselbe Ausschuss. Und die Teilmärkte eines Gebiets unterscheiden sich
+   auch: Verden EFH ohne Lage-Achse, Verden Reihenhaus mit.
+4. **Stichtag und Baujahrsgrenze je Ausschuss prüfen.** Braunschweig-
+   Wolfsburg rechnet zum 01.01.2026, Hameln-Hannover zum **01.10.2025**
+   und **nur für Baujahre ab 1950** — für ältere Gebäude gibt es dort
+   eigene Kalkulatoren, die noch nicht erfasst sind.
 
 ## Was als Nächstes ansteht
 
