@@ -1,20 +1,20 @@
 workbook;gebiet;lageachse;erntbar
 2026_sw_efh_aurbork;- Borkum -;nein;JA
-2026_sw_efh_aurfest;- Friesland und Os riesland -;nein;JA
+2026_sw_efh_aurfest;- Friesland und Os riesland -;ja;nein - Lage-Parameter fehlt
 2026_sw_efh_bsbs;Stadt Braunschweig;nein;JA
 2026_sw_efh_bsce;Landkreis Celle;nein;JA
 2026_sw_efh_bsgf;Landkreis Gi orn;nein;JA
-2026_sw_efh_bshe;Landkreis Helmstedt;nein;JA
-2026_sw_efh_bspe;Landkreis Peine;nein;JA
-2026_sw_efh_bssz;Stadt Salzgi er;nein;JA
+2026_sw_efh_bshe;Landkreis Helmstedt;ja;nein - Lage-Parameter fehlt
+2026_sw_efh_bspe;Landkreis Peine;ja;nein - Lage-Parameter fehlt
+2026_sw_efh_bssz;Stadt Salzgi er;ja;nein - Lage-Parameter fehlt
 2026_sw_efh_bswfmorte;Stadt Wolfenbü el mit Ortslagen Cremlingen, Hötzum, Sickte und Weddel;nein;JA
 2026_sw_efh_bswfrest;Übriger Landkreis Wolfenbü el;nein;JA
 2026_sw_efh_bswob;Stadt Wolfsburg;nein;JA
 2026_sw_efh_hmhh;- Reg. Hannover -;nein;JA
 2026_sw_efh_hmhhi;- Landkreis Hildesheim -;nein;JA
-2026_sw_efh_hmhhm;- Landkreis Hameln-Pyrmont -;nein;JA
+2026_sw_efh_hmhhm;- Landkreis Hameln-Pyrmont -;ja;nein - Lage-Parameter fehlt
 2026_sw_efh_hmhhsg;- Landkreis Schaumburg -;nein;JA
-2026_sw_efh_lgdan;Landkreis Lüchow-Dannenberg;nein;JA
+2026_sw_efh_lgdan;Landkreis Lüchow-Dannenberg;ja;nein - Lage-Parameter fehlt
 2026_sw_efh_lglg;?;nein;JA
 2026_sw_efh_lgue;Landkreis Uelzen;nein;JA
 2026_sw_efh_lgwl;Landkreis Harburg;nein;JA
@@ -33,25 +33,25 @@ workbook;gebiet;lageachse;erntbar
 2026_sw_efh_osmep_osmeposst;Stadt Osnabrück;nein;JA
 2026_sw_efh_ott_cux;Landkreis Cuxhaven;nein;JA
 2026_sw_efh_ott_ohz;- Landkreis Osterholz -;nein;JA
-2026_sw_efh_ott_row;- Landkreis Rotenburg (Wümme) -;nein;JA
+2026_sw_efh_ott_row;- Landkreis Rotenburg (Wümme) -;ja;nein - Lage-Parameter fehlt
 2026_sw_efh_ott_std;- Landkreis Stade -;nein;JA
 2026_sw_efh_sulverdhostsywe;Übriger Landkreis Diepholz;nein;JA
-2026_sw_efh_sulverdhstsywe;Stuhr, Syke, Weyhe;nein;JA
-2026_sw_efh_sulverhk;Landkreis Heidekreis;nein;JA
-2026_sw_efh_sulverniostni;Landkreis Nienburg - ohne Stadt Nienburg -;nein;JA
+2026_sw_efh_sulverdhstsywe;Stuhr, Syke, Weyhe;ja;nein - Lage-Parameter fehlt
+2026_sw_efh_sulverhk;Landkreis Heidekreis;ja;nein - Lage-Parameter fehlt
+2026_sw_efh_sulverniostni;Landkreis Nienburg - ohne Stadt Nienburg -;ja;nein - Lage-Parameter fehlt
 2026_sw_efh_sulvernistni;Stadt Nienburg;nein;JA
 2026_sw_efh_sulverver;Landkreis Verden;nein;JA
 2026_sw_efhrh_hmhhihmshg;- Landkreise Hildesheim, Hameln, Schaumburg -;nein;JA
 2026_sw_hof_aurfest;- Friesland und Os riesland -;nein;JA
 2026_sw_hof_osmep_osmeposmep;Grafscha Bentheim, Landkreis Osnabrück und Landkreis Emsland;nein;JA
-2026_sw_hof_sulverdhhkniver;Landkreise Diepholz, Heidekreis, Nienburg und Verden;nein;JA
-2026_sw_rh_aurfest;- Friesland und Os riesland -;nein;JA
+2026_sw_hof_sulverdhhkniver;Landkreise Diepholz, Heidekreis, Nienburg und Verden;ja;nein - Lage-Parameter fehlt
+2026_sw_rh_aurfest;- Friesland und Os riesland -;ja;nein - Lage-Parameter fehlt
 2026_sw_rh_bsbs;Stadt Braunschweig;nein;JA
 2026_sw_rh_bsce;Landkreis Celle;nein;JA
 2026_sw_rh_bsgf;Landkreis Gi orn;nein;JA
-2026_sw_rh_bshe;Landkreis Helmstedt;nein;JA
-2026_sw_rh_bspe;Landkreis Peine;nein;JA
-2026_sw_rh_bssz;Stadt Salzgi er;nein;JA
+2026_sw_rh_bshe;Landkreis Helmstedt;ja;nein - Lage-Parameter fehlt
+2026_sw_rh_bspe;Landkreis Peine;ja;nein - Lage-Parameter fehlt
+2026_sw_rh_bssz;Stadt Salzgi er;ja;nein - Lage-Parameter fehlt
 2026_sw_rh_bswf;Landkreis Wolfenbü el;nein;JA
 2026_sw_rh_bswob;Stadt Wolfsburg;nein;JA
 2026_sw_rh_hmhh;- Reg. Hannover -;nein;JA
@@ -79,4 +79,4 @@ workbook;gebiet;lageachse;erntbar
 2026_sw_rh_sulverdhstsywe;Stuhr, Syke, Weyhe;nein;JA
 2026_sw_rh_sulverhk;Landkreis Heidekreis;nein;JA
 2026_sw_rh_sulverni;Landkreis Nienburg;nein;JA
-2026_sw_rh_sulverver;Landkreis Verden;nein;JA
+2026_sw_rh_sulverver;Landkreis Verden;ja;nein - Lage-Parameter fehlt

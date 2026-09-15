@@ -37,12 +37,26 @@ while read -r WB; do
 
   NAME=$(echo "$T" | sed -n '2p' | sed 's/^ *//;s/ *$//;s/;/,/g')
 
-  # Zwei Merkmale, und BEIDE müssen stimmen: ein Eingabefeld "Lage:" und
-  # eine Sachwertkurve, die ausdrücklich "und Regionen" führt. Nur eines
-  # von beiden käme auch bei einem blossen Hinweistext vor.
-  L1=$(echo "$T" | grep -c '^Lage:\|Lage:' || true)
-  L2=$(echo "$T" | grep -c 'Sachwerte und Regionen' || true)
-  if [ "$L1" -gt 0 ] && [ "$L2" -gt 0 ]; then
+  # ═══ GESUCHT IST DAS EINGABEFELD, NICHT DER GRAFIKTITEL ════════════════
+  # Erster Versuch war: Feld "Lage:" UND Kurve "Sachwerte und Regionen".
+  # Beides zu eng, und der Fehler ging in BEIDE Richtungen:
+  #
+  #   Peine      "Lage im Kreis [Umrechnungskoef.]: Gemeinde Edemissen"
+  #   Salzgitter "Lage im Landkreis: Bruchmachtersen, Engelns.."
+  #     -> kein "Lage:" mit direktem Doppelpunkt, keine Kurve "und
+  #        Regionen" — beide galten als erntbar und sind es NICHT.
+  #        Der Salzgitter-Satz war deshalb schon gebaut und ausgerollt,
+  #        bevor es auffiel: er galt nur fuer eine unbenannte Teillage.
+  #
+  #   Braunschweig / Wolfsburg  Grafiktitel "in Abhaengigkeit von Lage und
+  #     Sachwert", aber KEIN Eingabefeld — "Lage" meint dort den
+  #     Bodenrichtwert. Wer auf den Titel filtert, sperrt sie zu Unrecht.
+  #
+  # Das eine verlaessliche Merkmal ist eine ZEILE AM ANFANG (die
+  # Eingabemaske), die mit "Lage" beginnt. Grafiktitel stehen weiter
+  # unten und beginnen mit "Sachwer aktoren".
+  L1=$(echo "$T" | sed -n '1,26p' | grep -c '^Lage' || true)
+  if [ "$L1" -gt 0 ]; then
     echo "$WB;${NAME:-?};ja;nein - Lage-Parameter fehlt"
   else
     echo "$WB;${NAME:-?};nein;JA"
