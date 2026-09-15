@@ -376,7 +376,20 @@ eine selbst ausgerechnete Zahl.
 - **Löhner Str. 278**, 32120 Hiddenhausen, ZFH 233 m², Bj 1964 —
   Verkehrswert 350.094,36 €, BGF 346,62 m², Bodenwert 144.840 €
 
-> **Der Prüfmaßstab ist der DATENSATZ, nicht die Adresse.** Das Objekt
+> **⚠ Diese Sachwerte sind mit dem alten Baupreisindex 2,02 entstanden und
+> liegen seit v1407 rund 5,8 Prozent zu hoch.** Am echten Rechenkern
+> (`nhk2010.js`) gemessen:
+>
+> | | mit 2,02 | mit 1,91 | Unterschied |
+> |---|---:|---:|---:|
+> | EFH 233 m², RND 18/80 | 137.002 € | 129.542 € | −7.460 € |
+> | EFH 150 m², RND 40/80 | 196.500 € | 185.800 € | −10.700 € |
+> | MFH 100 m², RND 24/70 | 89.636 € | 84.755 € | −4.881 € |
+>
+> **Wer gegen die Zahlen oben prüft, findet eine Abweichung, die keine ist.**
+> Die Sollwerte gehören am Gutachten neu abgenommen — bis dahin ist die
+> RICHTUNG der Prüfmaßstab: der Sachwert muss jetzt niedriger liegen als
+> dort notiert, und zwar um rund 5,8 Prozent des Gebäudeanteils.> **Der Prüfmaßstab ist der DATENSATZ, nicht die Adresse.** Das Objekt
 > `2026-001` in der App trägt dieselbe Anschrift wie das Testobjekt Hüllhorst,
 > aber **andere Werte**: ETW **100 m²**, Bj **1962**, Grundstück 950 m² plus
 > 828 m² Hinterland, MEA 50 %. Gemessen am 03.09.2026 rechnet es Sachwert
@@ -409,10 +422,22 @@ Staging nachgemessen, alle drei offen, im Backlog unter B1):
   > am 14.09.2026 an Oberursel (GND **70**): `modellansaetze` war leer,
   > die 70 stand nur im Text. **Beim Anlegen eines Rezepts gehört jede
   > abweichende GND als ZAHL ins Feld**, und danach wird sie nachgemessen.
-- **`BAUPREISINDEX = 2.02` hat keinen Stichtagsbezug** (Z. 22) — der GMB
-  Dortmund 2026 rechnet mit **1,906** zum 01.01.2026, rund 6 % Abweichung. Bei
-  einem Stichtag in der Vergangenheit rechnet eine Konstante zwangsläufig
-  falsch.
+- **Der Baupreisindex ist korrigiert, aber immer noch eine Konstante.**
+  Bis v1406 stand dort `2.02`; gemessen sagen **zwei** unabhängige amtliche
+  Quellen zum 01.01.2026 etwas anderes — Hamburg **1,911**, Dortmund
+  **1,906**. Seit **v1407** steht dort `1.91`, und der Sachwert fällt rund
+  **5,8 %** niedriger aus (am echten `nhk2010.js` gemessen: bei 150 m² und
+  RND 40/80 sind das 10.700 €).
+  > **Der Rest des Befundes bleibt:** eine Konstante hat keinen
+  > Stichtagsbezug und rechnet für einen Stichtag in der Vergangenheit
+  > zwangsläufig falsch. Der richtige Weg ist der Registerdatensatz — und
+  > dort liegt dasselbe Problem wie vor v1338 bei der Gesamtnutzungsdauer:
+  > **33 Sätze führen den Index bereits, aber als Fließtext**
+  > („Preisindizes des Statistischen Bundesamtes für den Neubau von
+  > Wohngebäuden") statt als Zahl. **Nur Hamburg hat ihn beziffert**
+  > (`modellansaetze.baupreisindex_stichtag`). Beim Anlegen eines Rezepts
+  > gehört der Index als ZAHL ins Feld, sonst rechnet das System weiter mit
+  > der Konstanten — und nichts widerspricht.
 - **Die NRW-Bewirtschaftungskosten sind stichtagsabhängig** — das AGVGA-Modell
   schreibt die Ausgangswerte von 2002 über den VPI fort. Das hinterlegte Paar
   gilt nur für den 01.01.2015.

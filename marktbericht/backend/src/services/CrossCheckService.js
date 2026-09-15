@@ -22,7 +22,43 @@ import { sachwertfaktor as swfNachTabelle } from '../lib/gutachterausschuss.js';
 
 // ---- Annahmen (dokumentiert, anpassbar) ----
 const NHK_EFH_BGF = 835;          // NHK 2010, EFH Standardstufe 3, €/m² BGF
-const BAUPREISINDEX = 2.02;       // Baupreisindex Wohngebäude 2010 -> 2026 (Destatis, gerundet)
+/* ═══ v1407 · DER BAUPREISINDEX WAR 5,7 PROZENT ZU HOCH ═══════════════════
+   Hier stand `2.02` mit dem Vermerk „Destatis, gerundet". Gemessen am
+   15.09.2026 sagen ZWEI unabhaengige amtliche Quellen etwas anderes — beide
+   zum selben Stichtag 01.01.2026:
+
+     Immobilienmarktbericht Hamburg 2026   1,911   (Basis Mai 2010 = 1)
+     Grundstuecksmarktbericht Dortmund 2026 1,906
+
+   Die beiden sind sich auf zwei Nachkommastellen einig; unsere Konstante lag
+   5,7 Prozent darueber. Was das kostet, am Gebaeudesachwert gerechnet
+   (NHK 835 EUR/m2 BGF, BGF = Wohnflaeche x 1,35):
+
+     120 m2, RND 40/80    136.623 statt 129.250 EUR    +7.373
+     150 m2, RND 60/80    256.168 statt 242.345 EUR   +13.823
+     200 m2, RND 50/80    284.631 statt 269.272 EUR   +15.359
+
+   Durchgehend 5,7 Prozent zu hoch — und zwar in die gefaehrliche Richtung:
+   der Sachwert faellt zu gross aus, das Objekt sieht zu gut aus.
+
+   WARUM 1,91 UND NICHT EINER DER BEIDEN WERTE: sie unterscheiden sich um
+   0,26 Prozent, und ihre Basis ist minimal verschieden (Hamburg nennt
+   ausdruecklich „Mai 2010", Dortmund keinen Monat). Auf zwei Stellen sind
+   sie identisch. Eine dritte Stelle vorzutaeuschen, die die Quellen nicht
+   hergeben, waere Scheingenauigkeit.
+
+   UND DAS BLEIBT FALSCH, auch mit der besseren Zahl: eine KONSTANTE hat
+   keinen Stichtagsbezug. Fuer einen Wertermittlungsstichtag in der
+   Vergangenheit rechnet sie zwangslaeufig daneben. Der richtige Weg ist der
+   Registerdatensatz — 33 Saetze fuehren den Index bereits, aber als
+   FLIESSTEXT („Preisindizes des Statistischen Bundesamtes fuer den Neubau
+   von Wohngebaeuden") statt als Zahl. Nur Hamburg hat ihn beziffert. Das
+   ist dasselbe Muster wie bei der Gesamtnutzungsdauer vor v1338: der Wert
+   steht da, aber nicht in einem Feld, das jemand abholen kann.
+   Siehe Backlog B1 (2). */
+const BAUPREISINDEX = 1.91;       // Neubau Wohngebaeude, 2010 -> 01.01.2026
+                                  // Quellen: IMB Hamburg 2026 (1,911),
+                                  // GMB Dortmund 2026 (1,906)
 const BGF_FAKTOR = 1.35;          // BGF ≈ Wohnfläche × 1,35 (EFH-Faustwert)
 const GND_JAHRE = 80;             // Gesamtnutzungsdauer Wohngebäude
 const RND_MIN = 10;               // Mindest-Restnutzungsdauer
