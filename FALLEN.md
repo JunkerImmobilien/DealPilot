@@ -4402,3 +4402,53 @@ einer zweiten Stelle derselben Datei gearbeitet wird.
   einer leeren Variablen sichtbar fehl, statt still alles zu treffen.
 - **Nach jedem Einsetzen zählen**, wie oft der neue Text vorkommt. `grep -c`
   auf einen Marker aus dem Block ist eine Zeile und fängt genau diesen Fall.
+
+---
+
+## `einheit` sagt, wie der Bericht druckt — nicht, was in `wert` steht
+
+Gemessen am 15.09.2026 beim Aufbau der Regressionsstrecke über alle 383
+Sachwertfaktor-Sätze (`tools/swf-register/regression-swf.mjs`).
+
+Ein Ergebnis aus `swf_modelle.js` trägt drei Felder, und zwei davon werden
+leicht verwechselt:
+
+| Feld | was drinsteht |
+|---|---|
+| `dokumentwert` | die Zahl, **wie der Bericht sie druckt** — 90,86 · 26 · 1,02 |
+| `einheit` | in welcher Einheit **diese Zahl** steht |
+| `wert` | **immer der Faktor** — außer bei `eur` |
+
+Der Auswerter rechnet in `IN_FAKTOR` um (`swf_modelle.js:982`):
+`prozent → v/100`, `zuschlag_prozent → 1 + v/100`, `faktor → v`.
+
+**Wer `einheit` für die Einheit von `wert` hält, prüft gegen das falsche
+Band.** Drei Sätze zeigen alle drei Ausgänge dieses Irrtums:
+
+- **Stadt Paderborn** (`linear_sachwert`, `eur`) — 308.942. Der **einzige**
+  Fall, in dem `wert` wirklich kein Faktor ist. Sah nach einem entgleisten
+  Faktor aus und war korrekt.
+- **Kreis Lippe/Detmold** (`doppel_log`, `prozent`) — der Bericht druckt
+  90,86 %, `wert` ist längst 0,9086. Gegen ein Prozentband geprüft, fiel die
+  **richtige** Zahl durch.
+- **Stadt Dortmund** (`stufen_1d`, `zuschlag_prozent`) — der Bericht druckt
+  +26 Prozentpunkte, `wert` ist 1,26. Dieser Satz lief **still durch**, weil
+  1,26 zufällig im Faktorband liegt.
+
+> **Der dritte ist der gefährliche.** Ein falsch gelesenes Feld, das rot
+> wird, kostet zehn Minuten. Eines, das grün wird, weil die Zahl zufällig
+> ins falsche Band passt, kostet nichts — und schützt auch nichts. Das ist
+> dieselbe Klasse wie der `gold-audit`, der 6 statt 181 Dateien las und
+> „sauber" meldete.
+
+### Die Regel
+
+**Ein Prüfstand, der eine Umrechnung prüfen soll, darf die zu prüfende
+Umrechnung nicht aufrufen.** `regression-swf.mjs` führt die Tabelle
+absichtlich ein zweites Mal (`KETTE`) und rechnet `dokumentwert` selbst auf
+`wert` nach. Läuft der Auswerter künftig auseinander, meldet der Lauf einen
+Kettenbruch — statt beiden Seiten gleichzeitig zu glauben.
+
+Und: **eine Einheit, die der Prüfstand nicht kennt, ist ein Befund, kein
+Durchlauf.** Vorher fiel jede unbekannte Einheit stillschweigend auf das
+Faktorband zurück. Genau so kam Dortmund durch.
