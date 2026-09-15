@@ -1750,6 +1750,76 @@ function updateTaxOverride(input) {
   if (typeof calc === 'function') setTimeout(calc, 50);
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1406 · BELEGE IN DIE JAHRESFELDER ÜBERNEHMEN
+   ═══════════════════════════════════════════════════════════════════════
+   Marcel: „da wäre schon cool, wenn wir … eine Nebenkostenabrechnung oder
+   Hausgeld … da reingeben könnten und der teilt das passend auf."
+
+   Der Beleg-Import liest und teilt auf; HIER landet das Ergebnis. Bewusst
+   eine eigene Funktion statt `updateTaxOverride()`: die erwartet ein
+   DOM-Element mit `dataset`, und ein Beleg hat keins.
+
+   DAS JAHR IST NICHT VERHANDELBAR. Eine Hausgeldabrechnung für 2025, die
+   im Mai 2026 kommt, gehört ins Veranlagungsjahr 2025 — deshalb nimmt diese
+   Funktion das Jahr als Pflichtangabe und schreibt niemals „ins aktuelle".
+   Der Beleg-Import liest es aus der Abrechnung; findet er keins, fragt er.
+
+   ADDIEREN IST DER VORGABEFALL. Ein Jahr hat mehrere Handwerkerrechnungen,
+   und die zweite darf die erste nicht löschen. Ersetzen nur, wenn der
+   Aufrufer es ausdrücklich sagt.                                          */
+function dpWkUebernehmen(jahr, posten, modus) {
+  var j = parseInt(jahr, 10);
+  if (!j || j < 1990 || j > 2200) return { ok: false, grund: 'kein gültiges Jahr' };
+  if (!posten || typeof posten !== 'object') return { ok: false, grund: 'keine Posten' };
+  var ersetzen = (modus === 'replace');
+  var n = 0, felder = [];
+  Object.keys(posten).forEach(function (feld) {
+    var betrag = Number(posten[feld]);
+    if (!isFinite(betrag) || betrag === 0) return;
+    var alt = _getYearOverride(j, feld);
+    var neu;
+    if (ersetzen || alt === undefined || alt === null || !isFinite(Number(alt))) {
+      /* Kein Override vorhanden: der Beleg SETZT den Wert. Der Auto-Vorschlag
+         der App wird damit überschrieben — genau das ist gewollt, ein Beleg
+         ist die bessere Auskunft als eine Schätzung. */
+      neu = betrag;
+    } else {
+      neu = Number(alt) + betrag;
+    }
+    _setYearOverride(j, feld, neu);
+    felder.push(feld);
+    n++;
+  });
+  if (!n) return { ok: false, grund: 'keine übernehmbaren Beträge' };
+  try { if (typeof renderYearlyTaxForm === 'function') renderYearlyTaxForm(); } catch (e) {}
+  try { if (typeof renderTaxTimeline === 'function') renderTaxTimeline(); } catch (e) {}
+  try { if (typeof renderTaxModule === 'function') renderTaxModule(); } catch (e) {}
+  try { if (typeof calc === 'function') setTimeout(calc, 60); } catch (e) {}
+  return { ok: true, anzahl: n, jahr: j, felder: felder, modus: ersetzen ? 'replace' : 'add' };
+}
+window.dpWkUebernehmen = dpWkUebernehmen;
+
+/** Welche Jahre der Tab Steuern gerade führt — damit der Beleg-Import
+ *  merkt, wenn ein Beleg in ein Jahr fällt, das es hier gar nicht gibt. */
+function dpWkJahre() {
+  try {
+    if (!State || !State.cfRows || !State.cfRows.length) return [];
+    var basis = (typeof _taxBaseYear === 'function') ? _taxBaseYear() : null;
+    if (!basis) {
+      var k = document.getElementById('kaufdat');
+      var w = document.getElementById('wirtschaftlicher_uebergang');
+      var raw = (k && k.value) || (w && w.value) || '';
+      basis = raw.length >= 4 ? parseInt(raw.substring(0, 4), 10) : new Date().getFullYear();
+    }
+    var out = [];
+    for (var i = 0; i < State.cfRows.length; i++) out.push(basis + i);
+    return out;
+  } catch (e) { return []; }
+}
+window.dpWkJahre = dpWkJahre;
+
 function resetTaxOverride(year, field) {
   _setYearOverride(parseInt(year), field, undefined);
   renderYearlyTaxForm();

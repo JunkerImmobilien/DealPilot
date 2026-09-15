@@ -1871,8 +1871,86 @@ const _BELEG_PROMPT =
   '- Kategorie exakt eine aus: ' + _BELEG_KATEGORIEN.join(', ') + '.\n' +
   '- Nicht sicher lesbar -> null und konfidenz "niedrig". Erfinde nichts.';
 
+/* ═══════════════════════════════════════════════════════════════════════
+   v1406 · ZWEITER MODUS: LAUFENDE WERBUNGSKOSTEN
+   ═══════════════════════════════════════════════════════════════════════
+   Marcel: „da waere schon cool, wenn wir jetzt, ich sage jetzt mal, eine
+   Nebenkostenabrechnung oder Hausgeld oder keine Ahnung, Belege da reingeben
+   koennten und der teilt das passend auf."
+
+   Der Beleg-Import von v1008 zielt auf ANSCHAFFUNGSKOSTEN — Notar, Makler,
+   Grunderwerbsteuer. Das ist der Kauf. Was hier dazukommt, ist das LAUFENDE
+   Jahr: Hausgeld, Nebenkostenabrechnung, Verwaltergebuehr, Grundsteuer.
+
+   DER UNTERSCHIED IST NICHT NUR DIE LISTE, SONDERN DIE AUFTEILUNG. Eine
+   Hausgeldabrechnung ist EIN Beleg mit DREI verschiedenen Sorten Kosten:
+
+     umlagefaehig      Heizung, Wasser, Muell, Hausmeister, Versicherung.
+                       Sie sind Werbungskosten UND Einnahme (durchlaufend).
+     nicht umlagefaehig Verwaltergebuehr, Bankgebuehren, nicht umlegbare
+                       Instandhaltung. Nur Werbungskosten.
+     Erhaltungsruecklage  Die ZUFUEHRUNG ist KEINE Werbungskost. Abziehbar
+                       wird sie erst, wenn die Gemeinschaft das Geld
+                       tatsaechlich fuer Erhaltung ausgibt (BFH IX R 19/24).
+                       Das ist der Punkt, an dem die meisten Selbstrechner
+                       zu viel ansetzen — deshalb gibt es dafuer eine eigene
+                       Kategorie, die ausdruecklich NICHT in ein Feld fliesst.
+
+   Genau diese drei auseinanderzuhalten ist die Arbeit, die der Nutzer sonst
+   von Hand macht.                                                          */
+const _WK_KATEGORIEN = [
+  'Nebenkosten umlagefähig', 'Nebenkosten nicht umlagefähig',
+  'Erhaltungsrücklage (nicht absetzbar)', 'Hausverwaltung',
+  'Erhaltungsaufwand / Reparatur', 'Grundsteuer', 'Versicherung',
+  'Schuldzinsen', 'Kontoführung', 'Steuerberatung',
+  'Fahrtkosten', 'Inserat / Vermietung', 'Porto & Telefon',
+  'Gericht & Rechtsanwalt', 'Sonstiges',
+];
+
+const _WK_PROMPT =
+  'Du liest EIN Bild einer Seite mit deutschen Belegen zur VERMIETUNG einer Immobilie: ' +
+  'Hausgeldabrechnung, Wohngeldabrechnung, Nebenkostenabrechnung, Verwalterabrechnung, ' +
+  'Grundsteuerbescheid, Versicherungsrechnung, Handwerkerrechnung, Zinsbescheinigung. ' +
+  'Das Bild kann gedreht sein - lies es trotzdem. ' +
+  'Gib AUSSCHLIESSLICH ein JSON-Objekt zurueck, ohne Vorrede, ohne Markdown:\n' +
+  '{"positionen":[{"datum":"TT.MM.JJJJ oder null","jahr":JJJJ oder null,"aussteller":"string oder null",' +
+  '"betrag_netto":Zahl oder null,"ust_betrag":Zahl oder null,"ust_satz":19 oder 7 oder 0 oder null,' +
+  '"betrag_brutto":Zahl oder null,"kategorie":"eine aus der Liste",' +
+  '"konfidenz":"hoch oder mittel oder niedrig","beschreibung":"kurzer Hinweis"}]}\n' +
+  'Regeln:\n' +
+  '- HAUSGELD- ODER NEBENKOSTENABRECHNUNG? Dann NICHT eine Summe zurueckgeben, sondern AUFTEILEN. ' +
+  'Solche Abrechnungen weisen die Aufteilung fast immer selbst aus - such nach Spalten oder Abschnitten ' +
+  'wie "umlagefaehig"/"umlegbar"/"auf Mieter umlagefaehig" gegen "nicht umlagefaehig"/"nicht umlegbar" ' +
+  'und nach "Instandhaltungsruecklage"/"Erhaltungsruecklage"/"Ruecklagenzufuehrung". ' +
+  'Gib dann GETRENNTE Positionen zurueck: eine fuer die Summe der umlagefaehigen Kosten ' +
+  '(kategorie "Nebenkosten umlagefähig"), eine fuer die nicht umlagefaehigen ' +
+  '(kategorie "Nebenkosten nicht umlagefähig"), eine fuer die Verwaltergebuehr, wenn sie einzeln ausgewiesen ist ' +
+  '(kategorie "Hausverwaltung"), und eine fuer die Ruecklagenzufuehrung ' +
+  '(kategorie "Erhaltungsrücklage (nicht absetzbar)").\n' +
+  '- WICHTIG: Die Zufuehrung zur Erhaltungs-/Instandhaltungsruecklage IMMER als eigene Position mit genau ' +
+  'dieser Kategorie ausweisen, auch wenn sie in der Abrechnung unter den Kosten steht. Sie ist beim ' +
+  'Eigentuemer NICHT sofort abziehbar. Niemals in die Nebenkosten einrechnen.\n' +
+  '- Steht die Aufteilung NICHT in der Abrechnung, gib die Gesamtsumme als EINE Position mit der Kategorie ' +
+  '"Nebenkosten nicht umlagefähig" und konfidenz "niedrig" zurueck, und schreibe in die beschreibung, ' +
+  'dass die Abrechnung keine Aufteilung ausweist. Rate die Aufteilung NICHT.\n' +
+  '- Betrifft die Abrechnung eine EINZELNE Wohnung innerhalb einer Gemeinschaft, nimm den Betrag DIESER ' +
+  'Wohnung (Spalte "Ihr Anteil"/"Anteil Einheit"), nicht die Summe der ganzen Gemeinschaft. ' +
+  'Steht beides da, nimm den Anteil und vermerke es in der beschreibung.\n' +
+  '- "jahr" ist das ABRECHNUNGSJAHR, auf das sich der Beleg bezieht - bei einer Hausgeldabrechnung ' +
+  'also das abgerechnete Wirtschaftsjahr, NICHT das Datum der Erstellung. Steht kein Jahr da, null.\n' +
+  '- Normale Einzelrechnungen (Handwerker, Versicherung, Grundsteuer): je eine Position, ' +
+  'betrag_brutto = Gesamt-/Endbetrag.\n' +
+  '- Eine Handwerkerrechnung ist "Erhaltungsaufwand / Reparatur" - es sei denn, sie schafft etwas NEUES ' +
+  '(Anbau, Ausbau, Erweiterung), dann "Sonstiges" mit einem Hinweis in der beschreibung.\n' +
+  '- Betraege als Dezimalzahl mit Punkt (1234.56), ohne Waehrungszeichen.\n' +
+  '- Kategorie exakt eine aus: ' + _WK_KATEGORIEN.join(', ') + '.\n' +
+  '- Nicht sicher lesbar -> null und konfidenz "niedrig". Erfinde nichts.';
+
 async function _extractBelegPage(image, opts) {
-  const content = [{ type: 'input_text', text: _BELEG_PROMPT }, { type: 'input_image', image_url: image }];
+  /* v1406: zwei Prompts, eine Mechanik. `modus` entscheidet, ob der Beleg
+     als Anschaffungskost oder als laufende Werbungskost gelesen wird. */
+  const _prompt = (opts.modus === "wk") ? _WK_PROMPT : _BELEG_PROMPT;
+  const content = [{ type: "input_text", text: _prompt }, { type: "input_image", image_url: image }];
   const r = await _callOpenAIVision(content, { userApiKey: opts.userApiKey, model: opts.model, maxTokens: 4000 });
   const parsed = extractJson(r.text);
   if (parsed == null) { throw new Error('JSON-Parse (Antwort evtl. zu dicht/abgeschnitten)'); }

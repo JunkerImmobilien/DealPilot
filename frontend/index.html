@@ -2168,6 +2168,24 @@ label.dp-required.qc-required::after {
     <p class="hint" style="margin-bottom:10px">
       Hier kannst du pro Jahr Verluste/Werbungskosten manuell überschreiben. Der App-Vorschlag basiert auf deinen Eingaben (Mietsteigerung, Tilgungsplan, AfA). Manuelle Änderungen fließen in die Cashflow-Projektion und in den Steuerverlauf oben ein.
     </p>
+    <!-- v1406 · Belege einlesen, hier im Tab Steuern. Der Knopf oeffnet
+         DASSELBE Modal wie im BMF-Dialog, nur im WK-Modus: andere
+         Kategorien, andere Zielfelder, und das Jahr zaehlt. -->
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px">
+      <button type="button" class="btn btn-sm"
+              onclick="if(window.DealPilotBelegImport)DealPilotBelegImport.open('wk')"
+              title="Hausgeld- und Nebenkostenabrechnungen, Grundsteuer, Handwerker- und Versicherungsrechnungen als PDF oder Foto einlesen. Die KI teilt eine Hausgeldabrechnung in umlagefaehige und nicht umlagefaehige Kosten auf und erkennt die Ruecklagenzufuehrung."
+              style="background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#2c2410;border:1px solid var(--wl-b8932f, #b8932f);padding:8px 15px;border-radius:7px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">
+        📎 Belege &amp; Abrechnungen einlesen (KI)
+      </button>
+      <span class="hint" style="margin:0;flex:1 1 260px;min-width:220px;font-size:11.5px;line-height:1.45">
+        Hausgeld, Nebenkostenabrechnung, Grundsteuer, Handwerker. Eine Hausgeldabrechnung wird
+        <b>aufgeteilt</b> — umlagefähig, nicht umlagefähig, Verwaltergebühr. Die
+        <b>Zuführung zur Erhaltungsrücklage</b> wird erkannt und <b>bewusst nicht übernommen</b>:
+        sie ist erst absetzbar, wenn die Gemeinschaft das Geld für Erhaltung ausgibt.
+        Jede Zeile wird dir vor der Übernahme zur Bestätigung vorgelegt.
+      </span>
+    </div>
     <div id="yearly-tax-form-box">
       <div style="text-align:center;color:var(--muted);padding:20px">Wird automatisch befüllt sobald Daten eingegeben sind</div>
     </div>
@@ -3407,7 +3425,7 @@ label.dp-required.qc-required::after {
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v1240"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v1405"></script>
+<script src="js/tax.js?v=v1406"></script>
 <script src="js/config.js?v=v1328"></script>
   <script src="js/legal-links.js?v=174" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
@@ -3470,7 +3488,7 @@ label.dp-required.qc-required::after {
 <script src="js/ki-miete.js?v=v1242c"></script>
 <script src="js/star-rating.js?v=364"></script>
 <script src="js/pdf-import.js?v=v1252"></script>
-<script src="js/beleg-import.js?v=v1188"></script>
+<script src="js/beleg-import.js?v=v1406"></script>
 <script src="js/financing.js?v=v1244c"></script>
 <script src="js/financing-pdf.js?v=20260611105943"></script>
 <script src="js/immokalk-import.js?v=v1260"></script>

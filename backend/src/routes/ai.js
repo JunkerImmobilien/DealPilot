@@ -1493,6 +1493,11 @@ router.post('/extract-beleg', authenticate, extractLimiter, async (req, res, nex
       return res.status(403).json({ error: 'Der KI-Beleg-Import ist ab dem Investor-Plan verfuegbar.' });
     }
     const belege = (req.body && Array.isArray(req.body.belege)) ? req.body.belege : [];
+    /* v1406: 'wk' liest laufende Werbungskosten (Hausgeld, Nebenkosten-
+       abrechnung, Grundsteuer) statt Anschaffungskosten. Alles andere
+       faellt auf den bisherigen Modus zurueck - ein unbekannter Wert darf
+       nicht dazu fuehren, dass gar nichts gelesen wird. */
+    const _modus = (req.body && req.body.modus === 'wk') ? 'wk' : 'ak';
     if (!belege.length) return res.status(400).json({ error: 'Keine Belege uebergeben.' });
     if (belege.length > 40) return res.status(400).json({ error: 'Zu viele Belege pro Lauf (max. 40).' });
 
@@ -1509,7 +1514,7 @@ router.post('/extract-beleg', authenticate, extractLimiter, async (req, res, nex
       const nm = b.name || ('Beleg ' + (i + 1));
       if (!imgs.length) { results.push({ name: nm, ok: false, error: 'keine Bilddaten' }); continue; }
       try {
-        const out = await openaiService.extractBeleg(imgs, { userApiKey });
+        const out = await openaiService.extractBeleg(imgs, { userApiKey, modus: _modus });
         const positionen = (out && Array.isArray(out.positionen)) ? out.positionen : [];
         results.push({ name: nm, ok: positionen.length > 0, positionen: positionen, pages: (out && out.pages) || imgs.length, diag: (out && out.diag) || '' });
         if (positionen.length > 0) okCount++;
