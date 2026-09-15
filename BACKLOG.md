@@ -4175,6 +4175,43 @@ entfällt — nicht raten.
 
 ## MARKTBERICHT / ERNTE — Workstream (D)  ·  eingebaut 13.09.2026
 
+> **STAND 15.09.2026 — REGRESSIONSSTRECKE STEHT, 383 SÄTZE, 0 FEHLER**
+> (v1410, Commit `7892d26`). `tools/swf-register/regression-swf.mjs` fährt
+> jeden Sachwertfaktor-Satz gegen das echte Register: 202 liefern, 181
+> geben eine begründete Auskunft, **kein technischer Fehler**, und jede
+> gedruckte Zahl führt über ihre Einheit auf den richtigen Faktor.
+>
+> **Zwei Nachmessungen zum offenen Punkt B1 — eine Entwarnung, ein echter
+> Befund:**
+>
+> **GND: ENTWARNUNG.** Die Sorge in CLAUDE.md, eine abweichende
+> Gesamtnutzungsdauer stehe nur im Fließtext und rechne nicht mit, trifft
+> für die drei hessischen Ausschüsse mit GND 70 **nicht mehr zu**.
+> Gemessen an `modell_gnd_jahre`: Offenbach 70, Bad Homburg 70, Oberursel
+> 70, Frankfurt 80 — alle richtig. `gutachterausschuss.js:553` liest seit
+> v1129 **alle drei** Feldnamen (`gnd_jahre` · `gesamtnutzungsdauer_jahre`
+> · `gnd`), und genau das rettet die Sätze: 44 Rezepte schreiben
+> `gnd_jahre`, nur 9 schreiben `gnd`.
+> > Der Absatz in CLAUDE.md beschreibt damit einen behobenen Zustand und
+> > gehört beim nächsten Durchgang nachgezogen.
+>
+> **BAUPREISINDEX: der Befund hält, und er ist größer als notiert.**
+> Nicht 33, sondern **118 Sätze** führen ihn nur im Fließtext. Anders als
+> bei der GND gibt es hier **gar keinen Registerweg**: kein Lesefeld im
+> Auswerter, keine Entsprechung zu `modell_gnd_jahre`. `CrossCheckService`
+> nimmt ausnahmslos die Konstante `BAUPREISINDEX = 1.91` (Z. 59).
+> >
+> > **Und es ist nicht dieselbe Aufgabe wie bei der GND.** Was die
+> > Ausschüsse im Text festlegen, ist kein Zahlenwert, sondern ein
+> > **Stichtagsverfahren**: „quartalsweise zum Verkaufszeitpunkt"
+> > (Offenbach) gegen „quartalsweise zum Beurkundungsdatum" (Bad Homburg)
+> > gegen jahresdurchschnittlich. Eine Zahl ins Rezept zu schreiben wäre
+> > also falsch — gebraucht wird der Index des Statistischen Bundesamts
+> > **zum jeweiligen Stichtag**, plus je Satz der Vermerk, welchen
+> > Stichtag der Ausschuss meint. Das ist ein eigener Bau und eine
+> > Entscheidung, keine Nachbesserung. Solange er fehlt, rechnet jeder
+> > Stichtag in der Vergangenheit zwangsläufig falsch.
+
 > **STAND 14.09.2026 SPÄT — DREIZEHN LÄNDER, 134 SACHWERTFAKTOREN**
 > (bis v1118b, Commit `d661b21`). Neu: **Schleswig-Holstein** (Lübeck,
 > Herzogtum Lauenburg, Ostholstein — 255 Tabellenzellen zeichengleich,
