@@ -203,7 +203,7 @@ erzählen.*
 - **◎ · Investor-Profile** — Ausgewogen, Konservativ, Optimistisch, Lage-Fokus, Cashflow-Fokus, Sicherheit.
 - **◈ · Eigene Gewichtung** — Score nach deinen Regeln — frei justierbar.
 - **▤ · Finanzierung & Cashflow** — DSCR, Break-Even, IRR — heute, nach Zinsbindung, zum Anschluss.
-- **◷ · Unterjährige Berechnung** — Kaufjahr taggenau ab wirtschaftlichem Übergang, nicht 12 Monate pauschal.
+- **◷ · Unterjährige Berechnung** — Kaufjahr **monatsgenau** ab wirtschaftlichem Übergang, nicht 12 Monate pauschal.
 - **▦ · Alle Darlehensmodelle** — Hauptdarlehen, Zusatz, KfW, Bausparvertrag als Tilgungsersatz.
 - **↗ · Anschlussfinanzierung** — Zinsbindung mit Anschlussrisiko und Break-Even-Miete.
 - **↗ · Live-Marktzinsen** — Aktuelle Pfandbrief-Sätze für die Konditionsberechnung.
@@ -251,7 +251,7 @@ Unterscheidungsmerkmal sind.*
 - **⌂ · Amtlich statt geschätzt** — 2.489 Kennzahlen aus 140 Gutachterausschüssen, Bodenrichtwerte aus 11 Quellen — jede Zahl mit Herkunft.
 - **◉ · Sprechlauf & Co-Pilot** — Objekt einsprechen, Belege fotografieren — die KI führt durch und rechnet mit.
 - **◎ · Score & Investor-Profile** — 24 KPIs in 5 Kategorien — ausgewogen, konservativ, cashflow- oder lagefokussiert.
-- **▤ · Finanzierung & Cashflow** — DSCR, Break-Even, IRR, Anschluss — Kaufjahr taggenau, alle Darlehensmodelle.
+- **▤ · Finanzierung & Cashflow** — DSCR, Break-Even, IRR, Anschluss — Kaufjahr monatsgenau, alle Darlehensmodelle.
 - **▦ · Steuer komplett** — § 32a mit echter Progression, § 7b, Kaufpreisaufteilung, Anlage V — getrennt nach Privat, GbR, GmbH, UG.
 - **◐ · Mandanten & Portfolio** — Jede Gesellschaft nach ihrem eigenen Steuerrecht, Vermögensbilanz, Kanban-Pipeline.
 - **▢ · Bank & Weitergeben** — Bankexport, Investment-PDF, Track Record, Objekt per QR teilen.
@@ -291,6 +291,33 @@ Unterscheidungsmerkmal sind.*
   auf dem Plakat schützt und wirkt seriös.
 - **Die Zahlen in diesem Dokument sind vom 15.09.2026.** Das Register wächst;
   vor dem Druck kurz nachmessen lassen.
+
+### ⚠ „Taggenau" darf nicht auf das Plakat
+
+**Im Ursprungsentwurf stand zweimal „Kaufjahr taggenau". Das stimmt nicht** —
+gemessen am 15.09.2026 im Rechenkern:
+
+| | |
+|---|---|
+| Kaufjahr-Anteil | `startFactorMonths()` rechnet `(13 − Monat) / 12` — **der Tag wird nicht gelesen**. Übergang am 1. April und am 30. April ergeben denselben Faktor 9/12. |
+| Zinsen | `d1 × Zinssatz / 12` — **monatlich**, nicht act/360 oder 30/360 |
+| Überführung in die Gesellschaft | im Stichtagsjahr **monatsgenau** geteilt |
+
+Nirgends im Rechenkern wird mit Tagen gerechnet. Beide Stellen sind in diesem
+Dokument auf **„monatsgenau"** korrigiert.
+
+> **Das ist kein Mangel, sondern bei der AfA sogar das Richtige:** § 7 Abs. 1
+> Satz 4 EStG schreibt für das Anschaffungsjahr die zeitanteilige Kürzung nach
+> **vollen Monaten** vor. Wer hier taggenau rechnet, rechnet falsch.
+>
+> **Bei den Zinsen ist es eine Vereinfachung.** Banken rechnen meist act/360
+> oder 30/360; bei einem Übergang mitten im Monat weicht die erste Rate ab. Für
+> eine Investitionsrechnung ist das ohne Belang — für ein Werbeversprechen
+> wäre „taggenau" trotzdem falsch.
+>
+> **„Monatsgenau ab wirtschaftlichem Übergang" ist ohnehin das stärkere
+> Argument**, weil es den Vergleich benennt: die meisten rechnen das Kaufjahr
+> als volle zwölf Monate.
 
 ### Woher die Zahlen auf diesem Blatt stammen
 
