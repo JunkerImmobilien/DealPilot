@@ -72,9 +72,35 @@ Am Gebiet `bsbs` durchprobiert, welche Teilmarkt-Kürzel es gibt:
 | vorhanden | `efh` · `rh` |
 | **nicht** vorhanden | `dhh` · `reh` · `mfh` · `whs` · `wh` · `zfh` · `etw` |
 
-Die amtliche Beschreibung nennt **vier** Teilmärkte (5.1 bis 5.4) — die beiden
-übrigen heißen also anders. **Nicht weiter raten:** ihre Namen stehen im
-Dropdown „Teilmarkt auswählen" auf der Navigationsseite.
+### Die vier Teilmärkte — aus dem Dropdown gelesen
+
+| Teilmarkt | Kürzel |
+|---|---|
+| Ein- und Zweifamilienhäuser | `efh` |
+| Reihenhäuser und Doppelhaushälften | `rh` |
+| **Bauernhäuser und Resthofstellen** | **offen** |
+| **Wochenendhäuser** | **offen** |
+
+Die Namen stammen aus der Parametersteuerung der Navigationsseite — sie liegt
+als DOM-Element vor (`.tabComboBox`), nicht im Canvas, und lässt sich per
+JavaScript öffnen und auslesen.
+
+**Die beiden fehlenden Kürzel sind nicht erraten worden** — an zwei Gebieten
+durchprobiert (`bh`, `brh`, `bauh`, `rhf`, `bhrh`, `weh`, `woh`, `wehs`,
+`bhr`, `wo`), kein Treffer. Sie ergeben sich aus der Ziel-URL, sobald im
+Dropdown ein anderer Teilmarkt gewählt und dann auf die Karte geklickt wird.
+
+> **Warum das offen blieb:** Das Dropdown schließt sich zwischen zwei
+> Werkzeugaufrufen wieder; Öffnen und Auswählen müssen in *einem* Schritt
+> passieren. Drei Anläufe, dann abgebrochen — die Regel gilt auch hier.
+
+### Eine Messfalle, die Zeit gekostet hat
+
+Das Kombifeld liegt bei **(763, 194)** in CSS-Pixeln — geklickt hatte ich nach
+Screenshot-Koordinaten bei (748, 166). **Screenshot-Pixel sind nicht
+CSS-Pixel**, und der Versatz ist nicht einmal ein einheitlicher Faktor. Wer
+ein Tableau-Bedienelement treffen will, liest seine Lage vorher per
+`getBoundingClientRect()` aus, statt sie aus dem Bild zu schätzen.
 
 ---
 
