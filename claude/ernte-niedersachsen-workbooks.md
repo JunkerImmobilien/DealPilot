@@ -12,39 +12,69 @@ reine Messarbeit.
 https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/
   Sachwertfaktor/<teilmarktseite>/<workbook>
 
-workbook = 2026_sw_<teilmarkt>_<gebiet>[_<region>]
+workbook = 2026_sw_<teilmarkt>_<gag><region>
 ```
 
-| Teil | Werte |
-|---|---|
-| `<teilmarkt>` | `efh` (Ein-/Zweifamilienhäuser) · `rh` (Reihenhäuser) · zwei weitere (5.1 bis 5.4 laut amtlicher Beschreibung) |
-| `<gebiet>` | **Kfz-Kennzeichen der beteiligten Landkreise, aneinandergehängt** |
-| `_<region>` | nur wo ein Ausschuss seinen Bereich weiter unterteilt |
+**Die Kürzel sind Kfz-Kennzeichen** — und zwar **zwei hintereinander**: erst
+der Gutachterausschuss, dann die Region innerhalb seines Bereichs.
 
-> **Die Kürzel sind Kfz-Kennzeichen.** `osmepnoh` = **OS** (Osnabrück) +
-> **MEP** (Emsland/Meppen) + **NOH** (Grafschaft Bentheim/Nordhorn). `bswf` =
-> **BS** (Braunschweig) + **WF** (Wolfenbüttel).
+| Workbook | GAG | Region |
+|---|---|---|
+| `…_bsbs` | **BS** Braunschweig | **BS** Braunschweig |
+| `…_bswf` | **BS** Braunschweig | **WF** Wolfenbüttel |
+| `…_nomnom` | **NOM** Northeim | **NOM** Northeim |
+| `…_lgdan` | **LG** Lüneburg | **DAN** Lüchow-Dannenberg |
+
+> ### Zwei Rücknahmen, beide aus dieser Sitzung
 >
-> **Damit sind es weit weniger als 40 Ausschüsse** — die niedersächsischen GAG
-> sind Zusammenschlüsse mehrerer Landkreise. Die frühere Schätzung „30 bis 45
-> Browser-Sitzungen" war deutlich zu hoch.
+> **① „`bswf` ist der Landkreis Wolfenbüttel"** — so stand es seit dem 13.09.
+> in der Erntekarte. Genauer ist: **GAG Braunschweig, Region Wolfenbüttel.**
+> Der Ausschuss ist Braunschweig, Wolfenbüttel nur eine seiner Regionen.
+>
+> **② „`2026_sw_efh_bswf` gibt es nicht, also führt Braunschweig kein EFH"** —
+> die erste Hälfte stimmt, die Schlussfolgerung war falsch. Es gibt
+> **`2026_sw_efh_bsbs`**: Braunschweig führt Ein- und Zweifamilienhäuser sehr
+> wohl, nur für die Region Braunschweig statt Wolfenbüttel. Aus einer
+> fehlenden URL auf ein fehlendes Angebot zu schließen, war zu schnell.
 
 ---
 
 ## Gefunden und an der Workbook-API bestätigt
 
-| Workbook | Gebiet (Kennzeichen) | zuletzt aktualisiert | Aufrufe | Registerstand |
+| Workbook | GAG + Region | aktualisiert | Aufrufe | Stand |
 |---|---|---|---:|---|
-| `2026_sw_rh_bswf` | BS + WF | 19.02.2026 | 231 | **geerntet** (13.09., Stufe B) |
-| `2026_sw_efh_osmep_osmepnoh` | OS + MEP + NOH | 20.03.2026 | 799 | offen |
-| `2026_sw_efh_hmhhsg` | HM + H? + HI? + SG? | 10.02.2026 | 725 | offen |
-| `2026_sw_efh_sulverniostni` | SUL? + VER + NI + … | 12.05.2026 | 411 | offen |
+| `2026_sw_rh_bswf` | BS · Wolfenbüttel | 19.02.2026 | 231 | **geerntet** (13.09., Stufe B) |
+| `2026_sw_efh_bsbs` | BS · Braunschweig | 19.02.2026 | 674 | offen |
+| `2026_sw_rh_bsbs` | BS · Braunschweig | 19.02.2026 | 219 | offen |
+| `2026_sw_efh_osmep_osmepnoh` | OS+MEP · OS+MEP+NOH | 20.03.2026 | 799 | offen |
+| `2026_sw_efh_hmhhsg` | HM… · … | 10.02.2026 | 725 | offen |
+| `2026_sw_efh_sulverniostni` | … · … | 12.05.2026 | 411 | offen |
+| `2026_sw_efh_nomnom` | NOM · Northeim | 24.03.2026 | 446 | offen |
+| `2026_sw_rh_nomnom` | NOM · Northeim | 07.04.2026 | 135 | offen |
+| `2026_sw_efh_lgdan` | LG · Lüchow-Dannenberg | 05.02.2026 | 264 | offen |
 
-> **`2026_sw_efh_bswf` gibt es NICHT** — geprüft, die API antwortet nicht.
-> Braunschweig/Wolfenbüttel führt ein Reihenhaus-Workbook, aber kein
-> gleichnamiges für Ein-/Zweifamilienhäuser. **Nicht jeder Ausschuss führt
-> jeden Teilmarkt**, und genau dafür lohnt die API-Vorprüfung: sie kostet
-> einen HTTP-Aufruf statt einer Browser-Sitzung.
+**Sieben Gebiete, neun Workbooks.** Die Auflösung der längeren Kürzel
+(`hmhhsg`, `sulverniostni`) steht noch aus — sie ergibt sich aus dem Titelblatt
+des jeweiligen Dashboards (`<pfx>_titel`).
+
+---
+
+## Der Hebel: Teilmärkte sind ableitbar
+
+**Ein Klick liefert das Gebiet, die API die übrigen Teilmärkte.** Geprüft an
+zwei Gebieten: zu jedem gefundenen `efh_<gebiet>` existiert auch
+`rh_<gebiet>` — ohne einen zweiten Klick.
+
+Am Gebiet `bsbs` durchprobiert, welche Teilmarkt-Kürzel es gibt:
+
+| | |
+|---|---|
+| vorhanden | `efh` · `rh` |
+| **nicht** vorhanden | `dhh` · `reh` · `mfh` · `whs` · `wh` · `zfh` · `etw` |
+
+Die amtliche Beschreibung nennt **vier** Teilmärkte (5.1 bis 5.4) — die beiden
+übrigen heißen also anders. **Nicht weiter raten:** ihre Namen stehen im
+Dropdown „Teilmarkt auswählen" auf der Navigationsseite.
 
 ---
 
@@ -52,14 +82,17 @@ workbook = 2026_sw_<teilmarkt>_<gebiet>[_<region>]
 
 1. Navigationskarte öffnen:
    `public.tableau.com/views/2026_sw_navi_EFH/Story?Typ=EFH&:showVizHome=no&:embed=true&:language=de-DE`
-2. **Acht Sekunden warten**, bis die Karte steht.
+2. **Neun Sekunden warten**, bis die Karte steht.
 3. Auf eine Region klicken → es öffnet sich **ein** Zieltab, dessen URL das
    Workbook nennt. **Tableau verwendet denselben Zieltab wieder** — mehrere
-   Klicks in einem Rutsch liefern deshalb nur das letzte Ergebnis. Ein Klick
-   je Aufruf, dann die URL ablesen.
-4. Nach etwa fünf Klicks friert der Renderer ein (`Page.captureScreenshot`
-   läuft in den Timeout). **Das ist der bekannte Befund aus der
-   Wolfenbüttel-Ernte** — dann die Karte neu laden und weitermachen.
+   Klicks in einem Rutsch liefern deshalb nur das letzte Ergebnis. **Ein Klick
+   je Aufruf**, dann die URL im Tab-Kontext ablesen.
+4. **Nach etwa vier bis fünf Klicks friert der Renderer ein**
+   (`Page.captureScreenshot` läuft in den Timeout). Dann die Karte neu laden
+   und weitermachen. Das ist derselbe Befund wie bei den Messreihen — er gilt
+   auch fürs Navigieren.
+5. Jedes gefundene Gebiet gegen die API prüfen und gleich die anderen
+   Teilmärkte mitnehmen.
 
 ### Prüfen, ohne zu rendern
 
@@ -80,10 +113,11 @@ HTTP-Aufruf spart eine ganze Messsitzung.
 <pfx>_tab · <pfx>_tooltipp
 ```
 
-`_berech` ist der Kalkulator, `_dia_brw` / `_dia_bgwf` / `_dia_stst` sind die
-drei Stützpunkt-Diagramme (Bodenrichtwert, Bodenwertanteil, Standardstufe).
-Der Präfix trägt eine laufende Regionsnummer (`ni2_`), die sich **nicht** aus
-dem Workbook-Namen ableiten lässt.
+`_titel` trägt den Klarnamen des Ausschusses, `_berech` ist der Kalkulator,
+`_dia_brw` / `_dia_bgwf` / `_dia_stst` sind die drei Stützpunkt-Diagramme
+(Bodenrichtwert, Bodenwertanteil, Standardstufe). Der Präfix trägt eine
+laufende Regionsnummer (`ni2_`), die sich **nicht** aus dem Workbook-Namen
+ableiten lässt.
 
 ---
 
