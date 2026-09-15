@@ -154,6 +154,10 @@ var Tax = (function() {
       exakt: t.exakt,
       angefragt: t.angefragt || t.jahr,
       grundfreibetrag: t.tarif.grundfreibetrag,
+      /* v1405: die Zonengrenzen gehoeren dorthin, wo der Tarif steht. Die
+         Progressionskurve im Cockpit braucht sie, um an den richtigen
+         Stellen zu knicken — sie soll sie nicht selbst kennen muessen. */
+      zonen: { z2bis: t.tarif.z2bis, z3bis: t.tarif.z3bis, z4bis: t.tarif.z4bis },
       quelle: t.tarif.quelle,
       verfuegbareJahre: TARIF_JAHRE.slice()
     };

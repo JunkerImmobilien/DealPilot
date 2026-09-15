@@ -1091,6 +1091,132 @@
        die GRAFIK  — wie weit sinkt der Satz, Objekt für Objekt
        die TABELLE — welches Objekt genau, mit welchem Ergebnis
      Beide aus derselben Rechnung; keine Zahl wird zweimal ermittelt.    */
+  /* ═══ v1405 · DIE PROGRESSIONSKURVE ══════════════════════════════════════
+     Marcels Bild: „die Progressionskurve, das sind ja mehrere lineare
+     Gleichungen, die aneinandergesetzt sind, wo du dann den Grenzsteuersatz
+     auf der linken Seite hast und dann könnte man dort die Punkte setzen,
+     wie weit das runtergegangen ist."
+
+     Genau das. Die X-Achse ist das zu versteuernde Einkommen, die Y-Achse der
+     Grenzsteuersatz, und auf der Kurve sitzt je ein Punkt für jedes Objekt —
+     dort, wo es dich hingeschoben hat. Die Balkenansicht bleibt daneben; die
+     eine zeigt den BETRAG je Objekt, die andere den WEG auf der Kurve.
+
+     GERECHNET WIRD NICHT HIER. Jeder Punkt der Kurve kommt aus
+     `Tax.calcGrenzsteuersatz()` — derselbe Kern, der auch die Steuerwirkung
+     rechnet. Ein zweiter Tarif in dieser Datei wäre genau der Fehler, den
+     v1361 aufgeräumt hat.
+
+     DIE KNICKE STEHEN IM TARIF, nicht in der Zeichnung: Grundfreibetrag,
+     Ende der ersten und zweiten Progressionszone, Beginn der
+     „Reichensteuer". Sie werden als Stützstellen ausdrücklich mitgenommen,
+     damit die Kurve dort wirklich knickt und nicht rundgeschliffen wird. */
+  var _ketteAnsicht = 'stufen';   /* 'stufen' | 'kurve' */
+
+  /* Die Eckwerte des Tarifs — aus tax.js, nicht aus dem Gedächtnis. */
+  function _tarifEcken(jahr) {
+    try {
+      if (typeof Tax !== 'undefined' && Tax && typeof Tax.tarifInfo === 'function') {
+        var t = Tax.tarifInfo(jahr);
+        if (t && t.grundfreibetrag) {
+          var z = t.zonen || {};
+          return [t.grundfreibetrag, z.z2bis, z.z3bis, z.z4bis]
+            .filter(function (v) { return typeof v === 'number' && v > 0; });
+        }
+      }
+    } catch (e) {}
+    /* Rückfall: die Zonengrenzen 2026. Sie stehen hier NUR, damit die Kurve
+       auch dann knickt, wenn tarifInfo() fehlt — gerechnet wird weiterhin
+       ausschliesslich mit Tax.calcGrenzsteuersatz(). */
+    return [12348, 17799, 69878, 277825];
+  }
+
+  /** Stützstellen für die Kurve: gleichmäßig plus die Knicke, sortiert. */
+  function _kurvenStuetzen(maxX, jahr) {
+    var ecken = _tarifEcken(jahr);
+    var pts = [];
+    var n = 90;
+    for (var i = 0; i <= n; i++) pts.push(Math.round(maxX * i / n));
+    ecken.forEach(function (e) {
+      if (e <= maxX) { pts.push(e - 1); pts.push(e); pts.push(e + 1); }
+    });
+    pts = pts.filter(function (v) { return v >= 0 && v <= maxX; });
+    pts.sort(function (a, b) { return a - b; });
+    /* Dubletten raus — sonst zeichnet Chart.js Punkte doppelt. */
+    var out = [];
+    for (var j = 0; j < pts.length; j++) if (j === 0 || pts[j] !== pts[j - 1]) out.push(pts[j]);
+    return out;
+  }
+
+  function _kurveBauen(cv, t, SER, axisCol, gridCol, eur, pz) {
+    var jahr = _kettenJahr();
+    var letzter = t.schritte[t.schritte.length - 1];
+    /* Die Kurve reicht ein Stück über das Ausgangs-zvE hinaus, damit der
+       Startpunkt nicht am rechten Rand klebt. */
+    var maxX = Math.max(t.zve * 1.25, (letzter ? letzter.basisNach : 0) * 1.25, 30000);
+    var stuetzen = _kurvenStuetzen(maxX, jahr);
+    var kurve = stuetzen.map(function (x) { return { x: x, y: _grenzsatz(x) }; });
+
+    /* Je Objekt ein Punkt — dort, wo es dich hingeschoben hat. Dazu der
+       Ausgangspunkt, damit die Strecke sichtbar wird. */
+    var GRUEN = '#3FA56C', ROT = '#B8625C';
+    var punkte = [{ x: t.zve, y: _grenzsatz(t.zve), _lab: 'Ausgangslage', _erg: null }];
+    t.schritte.forEach(function (s) {
+      punkte.push({ x: s.basisNach, y: s.satzNach, _lab: s.name, _erg: s.erg });
+    });
+
+    _ketteCharts.push(new Chart(cv, {
+      type: 'line',
+      data: { datasets: [
+        { label: 'Tarif § 32a EStG', data: kurve, parsing: false,
+          borderColor: SER[0], borderWidth: 2, pointRadius: 0, tension: 0,
+          fill: false, order: 3 },
+        { label: 'Weg deiner Objekte', data: punkte, parsing: false,
+          showLine: true, borderColor: isDark() ? 'rgba(232,226,212,.45)' : 'rgba(42,39,39,.35)',
+          borderWidth: 1.4, borderDash: [4, 3],
+          pointRadius: 6, pointHoverRadius: 8,
+          pointBackgroundColor: punkte.map(function (p, i) {
+            if (i === 0) return isDark() ? '#E8E2D4' : '#2A2727';
+            return (p._erg < 0) ? GRUEN : ROT;
+          }),
+          pointBorderColor: isDark() ? '#0a0805' : '#fff', pointBorderWidth: 2,
+          order: 1 }
+      ]},
+      options: {
+        responsive: true, maintainAspectRatio: false, devicePixelRatio: 2,
+        interaction: { mode: 'nearest', intersect: true },
+        plugins: {
+          legend: { display: true },
+          tooltip: { callbacks: {
+            title: function (ctx) {
+              var p = ctx[0] && ctx[0].raw;
+              return p && p._lab ? p._lab : '';
+            },
+            label: function (ctx) {
+              var p = ctx.raw;
+              if (ctx.datasetIndex === 0) {
+                return ' bei ' + eur(p.x) + ' zvE: Grenzsatz ' + pz(p.y);
+              }
+              var z = [' zvE danach: ' + eur(p.x), ' Grenzsteuersatz: ' + pz(p.y)];
+              if (p._erg != null) z.unshift(' Ergebnis V+V: ' + eur(p._erg));
+              return z;
+            }
+          } }
+        },
+        scales: {
+          x: { type: 'linear', min: 0, max: maxX,
+               grid: { color: gridCol, drawBorder: false },
+               ticks: { color: axisCol, maxTicksLimit: 7,
+                        callback: function (v) { return Math.round(v / 1000) + 'k €'; } },
+               title: { display: true, text: 'zu versteuerndes Einkommen', color: axisCol } },
+          y: { min: 0, suggestedMax: 48,
+               grid: { color: gridCol, drawBorder: false },
+               ticks: { color: SER[0], callback: function (v) { return Math.round(v) + ' %'; } },
+               title: { display: true, text: 'Grenzsteuersatz', color: SER[0] } }
+        }
+      }
+    }));
+  }
   var _ketteCharts = [];
   function _ketteChartsWeg() {
     _ketteCharts.forEach(function (c) { try { c.destroy(); } catch (e) {} });
@@ -1129,6 +1255,17 @@
       '.sk-k-gut .sk-k-v{color:#3FA56C}',
       '.sk-k-schlecht .sk-k-v{color:#B8625C}',
       '.sk-box{height:260px;margin-bottom:14px}',
+      /* v1405 · Umschalter ueber der Grafik */
+      '.sk-umsch{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:10px}',
+      '.sk-u-btn{font:600 11.5px/1 Inter,sans-serif;padding:7px 12px;border-radius:7px;cursor:pointer;',
+      '  border:1px solid rgba(122,115,112,.24);background:transparent;color:var(--dp-muted,#7A7370);',
+      '  transition:background .15s,color .15s,border-color .15s}',
+      '.sk-u-btn:hover{border-color:rgba(201,168,76,.45);color:var(--wl-c9a84c,#C9A84C)}',
+      '.sk-u-an{background:var(--wl-c9a84c,#C9A84C);border-color:var(--wl-c9a84c,#C9A84C);color:#2c2410}',
+      '.sk-u-an:hover{color:#2c2410}',
+      '.sk-u-btn:focus-visible{outline:2px solid var(--wl-c9a84c,#C9A84C);outline-offset:2px}',
+      '.sk-u-hint{flex:1 1 220px;min-width:180px;font-size:11.5px;line-height:1.45;',
+      '  color:var(--dp-muted,#7A7370)}',
       /* Die Tabelle scrollt in ihrem eigenen Kasten — die Seite nie quer */
       '.sk-tabwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}',
       '.sk-tab{width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px}',
@@ -1204,6 +1341,22 @@
           + _kachel('Grenzsatz', pz(_grenzsatz(t.zve)) + ' → ' + pz(letzter.satzNach), 'sk-k-akzent')
           + _kachel('Steuerwirkung gesamt', eur(t.summe), t.summe > 0 ? 'sk-k-gut' : 'sk-k-schlecht')
           + '</div>'
+          /* v1405 · Umschalter zwischen den beiden Ansichten. Er steht direkt
+             ueber der Grafik, weil er nur sie betrifft — und er sagt in einem
+             Satz, was die jeweils andere zeigt. */
+          + '<div class="sk-umsch">'
+          +   '<button type="button" class="sk-u-btn' + (_ketteAnsicht === 'stufen' ? ' sk-u-an' : '') + '"'
+          +     ' onclick="DealPilotDashboard.ketteAnsicht(\'stufen\')"'
+          +     ' title="Wie viel Steuer jedes Objekt spart oder kostet — als Betrag.">Wirkung je Objekt</button>'
+          +   '<button type="button" class="sk-u-btn' + (_ketteAnsicht === 'kurve' ? ' sk-u-an' : '') + '"'
+          +     ' onclick="DealPilotDashboard.ketteAnsicht(\'kurve\')"'
+          +     ' title="Der Tarif des § 32a EStG als Kurve — und wo deine Objekte dich darauf hinschieben.">Progressionskurve</button>'
+          +   '<span class="sk-u-hint">'
+          +     (_ketteAnsicht === 'kurve'
+                  ? 'Die Kurve ist der Steuertarif selbst. Jeder Punkt ist ein Objekt — er sitzt dort, wo dein Einkommen nach diesem Objekt liegt.'
+                  : 'Grün spart, Rot kostet. Die Linie zeigt den Grenzsteuersatz nach jedem Objekt.')
+          +   '</span>'
+          + '</div>'
           + '<div class="chart-box sk-box"><canvas id="' + cid + '"></canvas></div>';
       } else {
         html += '<div class="sk-zahlen">'
@@ -1276,6 +1429,13 @@
       if (!t.estPflichtig) return;
       var cv = $('dpc-kette-' + idx);
       if (!cv) return;
+      /* v1405: zwei Ansichten auf dieselbe Rechnung. Die Balken zeigen den
+         BETRAG je Objekt, die Kurve den WEG auf dem Tarif. Umgeschaltet wird
+         oben im Kopf des Topfes. */
+      if (_ketteAnsicht === "kurve") {
+        _kurveBauen(cv, t, SER, axisCol, gridCol, eur, pz);
+        return;
+      }
       var labels = ['ohne Objekte'].concat(t.schritte.map(function (s) { return _kurz(s.name); }));
       var satzReihe = [_grenzsatz(t.zve)].concat(t.schritte.map(function (s) { return s.satzNach; }));
       var wirkReihe = [0].concat(t.schritte.map(function (s) { return Math.round(s.wirkung); }));
@@ -2120,6 +2280,8 @@
        Container ruft genau diese Funktion, nicht eine Nachbildung. */
     steuerKette: function(jahr){ return steuerKette(jahr); },
     renderSteuerKette: function(){ try{ renderSteuerKette(); }catch(e){} },
+    /* v1405: Ansicht der Steuerkette umschalten — 'stufen' oder 'kurve'. */
+    ketteAnsicht: function(v){ _ketteAnsicht = (v === 'kurve') ? 'kurve' : 'stufen'; try{ renderSteuerKette(); }catch(e){} },
     applyHalterFilter: function(id){ try{ window._dpHalterFilter=id; }catch(e){} try{ renderScoreHero(); }catch(e){} try{ renderOverview(); }catch(e){} try{ renderHealth(); }catch(e){} try{ renderKpiCards(); }catch(e){} try{ buildCharts(); }catch(e){} try{ renderProjTable(); }catch(e){} try{ if(window.DealPilotMandanten) DealPilotMandanten.renderHalterChips(); }catch(e){} },  /* mand-export v803 */
     _debug: function(){ return { summaries:_summaries, details:_details, loaded:_detailsLoaded }; }
   };
