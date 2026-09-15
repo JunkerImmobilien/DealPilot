@@ -1,0 +1,122 @@
+{
+  "land_code": "NI",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Bereich Stadt Nienburg",
+  "gaa_kennz": "03256",
+  "ags": ["03256"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "01/2022 bis 11/2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-03-02",
+  "quelle_url": "https://public.tableau.com/views/2026_sw_efh_sulvernistni/dash",
+  "quelle_datei": "Tableau-Kalkulator 2026_sw_efh_sulvernistni (Grundstücksmarktinformationen Niedersachsen 2026)",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Ein- und Zweifamilienhäuser, Kalkulator 2026_sw_efh_sulvernistni",
+  "stufe": "B",
+
+  "modellansaetze": {
+    "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+    "nhk": "NHK 2010",
+    "bezugsmassstab": "Brutto-Grundflaeche",
+    "alterswertminderung": "linear"
+  },
+
+  "stichprobe": {
+    "faelle": 249,
+    "kaufzeitpunkt": "06.01.2022 bis 26.11.2025",
+    "spannen": {
+      "vorlaeufiger_sachwert_eur": [87000, 675000],
+      "standardstufe": [1.8, 4.0],
+      "bgf_zu_wohnflaeche": [1.18, 3.35],
+      "baujahr": [1500, 2021],
+      "bodenrichtwert_eur_qm": [30, 280],
+      "grundstuecksflaeche_qm": [145, 1893],
+      "wohnflaeche_qm": [67, 290]
+    }
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehendes Ein- und Zweifamilienhaus",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [100000, 150000, 200000, 250000, 300000, 350000, 400000, 500000, 600000, 700000],
+        "achse_y_feld": "brw",
+        "achse_y_bez": "Bodenrichtwert in €/m²",
+        "achse_y": [30, 60, 100, 150, 200, 280],
+        "zellen": {
+          "30": [1.06, 0.97, 0.90, 0.85, 0.80, 0.77, 0.74, 0.68, 0.64, 0.60],
+          "60": [1.11, 1.01, 0.94, 0.89, 0.84, 0.81, 0.77, 0.72, 0.68, 0.64],
+          "100": [1.15, 1.05, 0.98, 0.92, 0.88, 0.84, 0.81, 0.75, 0.71, 0.67],
+          "150": [1.18, 1.08, 1.01, 0.95, 0.91, 0.87, 0.83, 0.78, 0.73, 0.69],
+          "200": [1.20, 1.10, 1.03, 0.97, 0.93, 0.89, 0.85, 0.80, 0.75, 0.71],
+          "280": [1.23, 1.13, 1.06, 1.00, 0.95, 0.91, 0.88, 0.82, 0.77, 0.73]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "normobjekt": "Standardstufe 2,5 · Verhältnis Brutto-Grundfläche zu Wohnfläche 2,0",
+        "hinweis": "Alle 60 Zellen sind am NORMOBJEKT abgetastet — dort stehen beide Umrechnungskurven auf 1,00. GEGENPROBE: das Dashboard weist als Anwendungsbeispiel Bodenrichtwert 150 €/m² und vorläufigen Sachwert 350.000 € mit dem Faktor 0,87 aus; die Zelle [150][350000] trägt genau diese 0,87. Das Gitter ist in beide Richtungen monoton."
+      },
+
+      "korrekturen": [
+        {
+          "bez": "Abweichende Standardstufe",
+          "feld": "standardstufe",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "1.5": 0.79,
+            "2.0": 0.91,
+            "2.5": 1.00,
+            "3.0": 1.07,
+            "3.5": 1.12,
+            "4.0": 1.15
+          },
+          "rundung_stellen": 2,
+          "hinweis": "Sechs abgedruckte Stützstellen aus dem Diagramm des Dashboards, über ihre x-Position zugeordnet. Probe: bei der Normstufe 2,5 ist der Koeffizient 1,00. Die Stichprobe reicht von 1,8 bis 4,0. Nienburg reagiert deutlich schwächer auf die Ausstattung als der Landkreis Verden (dort 0,70 bis 1,24 gegen hier 0,79 bis 1,15) — das ist ein Marktbefund des Ausschusses, kein Lesefehler."
+        },
+        {
+          "bez": "Abweichendes Verhältnis Brutto-Grundfläche zu Wohnfläche",
+          "feld": "bgf_zu_wohnflaeche",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "1.2": 1.04,
+            "1.4": 1.03,
+            "1.6": 1.02,
+            "1.8": 1.01,
+            "2.0": 1.00,
+            "2.2": 0.99,
+            "2.4": 0.98,
+            "2.6": 0.97,
+            "2.8": 0.96,
+            "3.0": 0.95,
+            "3.2": 0.93,
+            "3.4": 0.92
+          },
+          "rundung_stellen": 2,
+          "hinweis": "Zwölf abgedruckte Stützstellen, über ihre x-Position im PDF zugeordnet — NICHT über die Lesereihenfolge des Textstroms: die Zahlen eines Diagramms folgen der Kurve und stehen deshalb auf verschiedenen Höhen. Probe: beim Normverhältnis 2,0 ist der Koeffizient 1,00."
+        },
+        {
+          "bez": "Abweichender Energiebedarf",
+          "feld": "energiebedarf",
+          "art": "offen",
+          "wirkung": "multiplikativ",
+          "hinweis": "OFFEN UND AUSDRÜCKLICH NICHT GERATEN — wie beim Landkreis Verden. Das Dashboard führt die Zeile 'Umrechnungskoeffizienten bei abweichendem Energiebedarf:', der PDF-Export enthält dazu aber nur die Beschriftung und keine einzige Stützstelle; die Kurve erscheint erst bei einer Auswahl im Dashboard. Sie gehört nachgetragen, sobald die Werte vorliegen."
+        }
+      ],
+
+      "beleg": "Kalkulator 2026_sw_efh_sulvernistni (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, veroeffentlicht 02.03.2026, Stichprobe 249 Kauffaelle. 60 Stuetzpunkte des Gitters am Normobjekt abgefragt (Bodenrichtwert 30 bis 280 EUR/qm x vorlaeufiger Sachwert 100.000 bis 700.000 EUR), dazu 18 abgedruckte Stuetzstellen der beiden Umrechnungskurven, ueber ihre x-Position im PDF zugeordnet. GEGENPROBE am Anwendungsbeispiel des Dashboards: Bodenrichtwert 150 EUR/qm, vorlaeufiger Sachwert 350.000 EUR, Standardstufe 2,5, BGF/Wohnflaeche 2,0 ergibt 0,87 - die Zelle traegt genau diese Zahl. Beide Korrekturkurven stehen an ihrer Normstelle auf 1,00.",
+
+      "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert, der nach dem Modell der niedersächsischen Gutachterausschüsse ermittelt wurde (NHK 2010, Bezugsmaßstab Brutto-Grundfläche, lineare Alterswertminderung). WO DIE QUELLE ENDET, ENDET DIE RECHNUNG: das Gitter deckt vorläufige Sachwerte von 100.000 bis 700.000 € und Bodenrichtwerte von 30 bis 280 €/m² ab — das ist der Bereich, den die Stichprobe (87.000 bis 675.000 € bzw. 30 bis 280 €/m²) trägt. Der Kalkulator gibt auch ausserhalb noch Zahlen aus; die gehören nicht ins Register. DIESER SATZ GILT NUR FÜR DIE STADT NIENBURG — der übrige Landkreis Nienburg wird vom selben Ausschuss in einem eigenen Kalkulator geführt und hat andere Faktoren.",
+      "stufe": "B",
+      "stufe_begruendung": "Stufe B statt A: die Werte sind nicht aus einer abgedruckten Tabelle übernommen, sondern am amtlichen Kalkulator abgetastet. Der Kalkulator IST die amtliche Auskunft, aber die Stützstellen des Gitters sind von uns gewählt, nicht vom Ausschuss abgedruckt. Die beiden Korrekturkurven dagegen sind abgedruckt und damit Stufe A."
+    }
+  ]
+}
