@@ -156,7 +156,12 @@ KORREKTUR_ARTEN = {
     'kategorial': {'art','feld','bez','werte','wirkung','rundung_stellen'},
     # v1100-WK2D: eine Korrektur, die von einer ZAHL und einer KATEGORIE
     # abhaengt - Oberhavel druckt die BGF-Korrektur je Region anders ab.
+    # v1408: 'kategorie_baender' leitet die Kategorie aus einer ZAHL ab -
+    # Hamburgs Modernisierungsfaktor braucht die Baujahrsklasse, und die
+    # steht in keinem Eingabefeld. Fuer die Modellachse gibt es den Weg
+    # seit v1094; hier fehlte er.
     'stufen_kategorial': {'art','feld','bez','kategorie_feld','stufen',
+                           'kategorie_baender',
                            'wirkung','rundung_stellen'},
 }
 

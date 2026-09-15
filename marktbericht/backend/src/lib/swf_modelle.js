@@ -813,7 +813,37 @@ function korrekturAnwenden(k, e) {
      WICHTIG: faellt die Kategorie nicht in die Tabelle, gibt es KEINE
      Korrektur — nicht die einer Nachbarregion. */
   if (k.art === 'stufen_kategorial') {
-    const kat = String(e[k.kategorie_feld] ?? '').trim();
+    /* ═══ v1408 · DIE KATEGORIE KANN AUS EINER ZAHL KOMMEN ════════════════
+       Bisher las dieser Zweig die Kategorie ausschliesslich als TEXT aus
+       `e[k.kategorie_feld]` — der Aufrufer musste sie also kennen.
+
+       Hamburgs Modernisierungsfaktor braucht etwas anderes: seine Kategorie
+       ist die BAUJAHRSKLASSE, und die steht in keinem Eingabefeld. Sie
+       ergibt sich aus dem Baujahr, und die Klassengrenzen kennt nur der
+       Bericht:
+
+         bis 1919 · 1920-39 · 1940-59 · 1960-69 · 1970-79
+         1980-89 · 1990-99 · 2000-09 · ab 2010
+
+       Der Aufrufer kann sie nicht liefern, ohne den Bericht zu kennen —
+       dann stuende die Zuordnung an zwei Stellen. Fuer die MODELLachse gibt
+       es diesen Weg seit v1094 (`kategorie_baender` in `kategorieAus`);
+       hier fehlte er. Dieselbe Mechanik, dasselbe Rezeptwort.
+
+       KEINE INTERPOLATION ZWISCHEN DEN KLASSEN: ein Baujahr faellt in genau
+       eine. Faellt es in keine, gibt es keine Korrektur — nicht die der
+       Nachbarklasse. */
+    let kat = '';
+    if (Array.isArray(k.kategorie_baender) && k.kategorie_baender.length) {
+      const zv = zahl(e[k.kategorie_feld]);
+      if (zv === null) return null;
+      const tr = k.kategorie_baender.find((b) => (b.von == null || zv >= b.von)
+                                              && (b.bis == null || zv <= b.bis));
+      if (!tr) return null;                      /* ausserhalb aller Klassen */
+      kat = String(tr.kategorie);
+    } else {
+      kat = String(e[k.kategorie_feld] ?? '').trim();
+    }
     if (!kat) return null;
     const tab = k.stufen || {};
     let reihe = tab[kat];
