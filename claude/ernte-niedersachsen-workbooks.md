@@ -134,19 +134,99 @@ Das war die teuerste Erkenntnis, und sie hat **drei Anläufe** gekostet:
 
 ---
 
+## Geerntet: zwei Sätze, und der Weg steht
+
+| AGS | Gebiet | Faktor am Normobjekt | Gitter | Version |
+|---|---|---:|---:|---|
+| **03361** | Landkreis Verden | 0,92 ± 0,13 | 77 Punkte | v1412 |
+| **03256** | Stadt Nienburg | 0,87 | 60 Punkte | v1414 |
+
+Beide **treffen ihr Anwendungsbeispiel zeichengleich** — das ist der
+Prüfmaßstab nach der Erntedoktrin, und jedes Dashboard bringt ihn mit.
+Niedersachsen steht damit bei **7 Registersätzen**, die Regressionsstrecke
+bei 385 Sätzen ohne technischen Fehler.
+
+### Warum gerade diese beiden
+
+Sie gehören zum **GAG Sulingen-Verden**, dem einzigen der neun Ausschüsse,
+der **keine Lage-Achse** führt. Die anderen — Northeim, Braunschweig,
+Lüneburg, Otterndorf … — wählen über eine Lagegruppe zwischen mehreren
+Sachwertkurven aus, und der dafür nötige URL-Parameter ist nicht bekannt:
+`Brw` und `Sach` greifen, `Lage` nicht.
+
+> **Ohne diesen Parameter wäre ein Satz halb**, und die Doktrin sagt:
+> kein Verfahren rechnet halb. Also zuerst die Gebiete, die vollständig
+> erfassbar sind — und für die übrigen erst den Parameter klären.
+
+### Drei Werkzeuge, die dabei entstanden sind
+
+| Werkzeug | wofür |
+|---|---|
+| `ni-kopfdaten.sh` | Klarname, Stichtag, Stichprobe, Normobjekt je Gebiet |
+| `ni-wert-lesen.py` | **eine Zahl über ihre LAGE holen**, nicht über die Zeile |
+| `ni-kurven-lesen.py` | die Umrechnungskurven über die **x-Position** zuordnen |
+
+**Beide Leser lösen dasselbe Problem:** in einem Dashboard steht eine Zahl
+nicht dort, wo der Textstrom sie hinschreibt. Der Faktor kann acht Zeilen
+unter seiner Beschriftung liegen (Nienburg), und die Zahlen einer
+Diagrammkurve stehen auf verschiedenen Höhen, folgen also der Kurve statt
+der x-Achse. Zeilenbasiert gelesen ergibt das plausible, falsche Werte —
+bei Verden las sich die BGF-Kurve als 1,02 · 1,00 · 1,01 · 0,99 · 0,98,
+weder monoton noch zu den Achsenwerten passend.
+
+> `ni-kurven-lesen.py` ist **an Verden verifiziert**: es liefert dieselben
+> 18 Stützstellen, die dort von Hand abgelesen wurden — beide Kurven
+> zeichengleich. Ein Leser, der nur an seinem eigenen Fall geprüft ist,
+> beweist nichts.
+
+### Die Korrekturart `offen` (v1412)
+
+Beide Ausschüsse führen eine Kurve für **abweichenden Energiebedarf**. Im
+Dashboard steht ihre Beschriftung, im PDF-Export aber keine einzige
+Stützstelle — sie erscheint erst bei einer Auswahl.
+
+Bisher gab es dafür zwei Wege, und beide sind falsch: die Korrektur
+weglassen (dann rechnet das Modell halb und sieht trotzdem plausibel aus)
+oder Werte schätzen (dann erfinden wir eine Zahl). Jetzt steht sie im
+Satz, trägt ihren Grund, und der Auswerter weist sie als **offen** aus.
+
+---
+
 ## Was als Nächstes ansteht
 
-1. **Die Kürzel gegen die amtliche Kreisliste auflösen** — die Präfixe sind
-   Kfz-Kennzeichen in zwei Lagen (GAG, dann Region): `bs*` Braunschweig,
-   `lg*` Lüneburg, `nom*`/`nomak*` Northeim, `olclp*` Oldenburg-Cloppenburg,
-   `osmep*` Osnabrück-Meppen, `ott_*` Otterndorf, `sulver*` Sulingen-Verden,
-   `aur*` Aurich, `hmhh*` Hameln-Holzminden. Rund **neun Ausschüsse**.
-2. **Je Ausschuss eine Messsitzung** mit `ni-kalkulator-abtasten.sh` — das
-   Gitter kostet rund vierzig Abrufe, der Kopf nur zwei. Die Trennung ist
-   Absicht.
-3. **Die fünf offenen Normfaktoren** beim Rezeptbau am PDF ablesen.
-4. Lizenz `dl-de/by-2-0`: kommerzielle Verwertung erlaubt, **Namensnennung
-   Pflicht** — sie steht seit v1402 im Bericht.
+**Der eine Blocker: der Lage-Parameter.** Sieben der neun Ausschüsse wählen
+über eine Lagegruppe zwischen mehreren Sachwertkurven aus. `Brw` und `Sach`
+greifen in der URL, ein Parameter für die Lage ist nicht bekannt — vier
+Namen durchprobiert, keiner wirkt, und Raten hilft hier so wenig wie beim
+Suchendpunkt. Der Name steht in der Workbook-Definition; der Weg dorthin
+führt über die Tableau-Session (`bootstrapSession`), nicht über die URL.
+
+**Solange er fehlt, sind erfassbar:** die Gebiete ohne Lage-Achse. Geprüft
+ist das für den GAG Sulingen-Verden; bei den übrigen sagt ein Blick in den
+Kopf des Dashboards, ob eine Zeile `Lage:` vorkommt — das kostet zwei
+Abrufe je Gebiet, nicht vierzig.
+
+**Erledigt und hier nur noch zur Kenntnis:**
+
+- ~~Die Kürzel gegen die amtliche Kreisliste auflösen~~ — **bestätigt aus
+  dem eigenen Register**, nicht aus einer getippten Liste: die 39
+  niedersächsischen AGS dort führen ihren Ausschuss im Klartext, und die
+  Zuordnung deckt sich mit den Präfixen (`bs*` Braunschweig-Wolfsburg,
+  `lg*` Lüneburg, `nom*`/`nomak*` Northeim, `olclp*` Oldenburg-Cloppenburg,
+  `osmep*` Osnabrück-Meppen, `ott_*` Otterndorf, `sulver*` Sulingen-Verden,
+  `aur*` Aurich, `hmhh*` Hameln-Hannover).
+- ~~Die fünf offenen Normfaktoren am PDF ablesen~~ — mit dem
+  positionsbasierten Leser sind es **81 von 81** (v1413).
+
+**Sieben Landkreise fehlen im Register, obwohl es Faktoren gibt:**
+Göttingen (03152), Goslar (03153), Northeim (03155), Osterode (03156),
+Holzminden (03255), ~~Nienburg (03256)~~ ✓, ~~Verden (03361)~~ ✓. Die
+verbleibenden fünf gehören alle zum GAG Northeim — und der führt eine
+Lage-Achse. Sie hängen damit am Blocker oben.
+
+**Lizenz** `dl-de/by-2-0`: kommerzielle Verwertung erlaubt, **Namensnennung
+Pflicht** — sie steht seit v1402 im Bericht und in jedem Rezept unter
+`quellenvermerk`.
 
 ---
 ## Was beim Messen gilt (aus der Wolfenbüttel-Ernte)
