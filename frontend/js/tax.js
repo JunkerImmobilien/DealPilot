@@ -406,51 +406,55 @@ function _getBestandLossesForYear(displayYear) {
       var raw = (kdEl && kdEl.value) || (wuEl && wuEl.value) || '';
       if (raw && raw.length >= 10) currentObjKaufdat = raw.substring(0, 10);
     } catch(_) {}
-    /* v1400: der Halter DIESES Objekts — Bezugspunkt der Trennung unten. */
+    /* v1400/v1404: die Steuersphaere DIESES Objekts — Bezugspunkt der
+       Trennung unten. `privat` und `gbr` teilen sich die Sphaere 'est',
+       jede Kapitalgesellschaft hat ihre eigene. Faellt mandanten.js aus,
+       gilt der Halter selbst als Sphaere: dann wird eher zu fein getrennt
+       als vermischt. */
+    function _sphVon(h) {
+      try {
+        if (window.DealPilotMandanten && DealPilotMandanten.sphaere) {
+          return DealPilotMandanten.sphaere(h || 'privat');
+        }
+      } catch (_e) {}
+      return String(h || 'privat');
+    }
+    /* Anteil am Ergebnis (1 = 100 %). Nur die GbR fuehrt eine Quote. */
+    function _antVon(h) {
+      try {
+        if (window.DealPilotMandanten && DealPilotMandanten.anteil) {
+          var a = DealPilotMandanten.anteil(h || 'privat');
+          return (typeof a === 'number' && isFinite(a) && a > 0) ? a : 1;
+        }
+      } catch (_e) {}
+      return 1;
+    }
     var _curHalterId = 'privat';
     try {
       var _hEl = document.getElementById('halter');
       _curHalterId = String((_hEl && _hEl.value) || 'privat');
     } catch (_) { _curHalterId = 'privat'; }
+    var _curSphaere = _sphVon(_curHalterId);
     // Year-Key als String
     var yearKey = String(displayYear);
     all.forEach(function(obj) {
       if (!obj || !obj.id) return;
       if (currentId && obj.id === currentId) return;  // sich selbst ueberspringen
-      /* ═══ v1400 · EINKOMMENSTEUER UND KÖRPERSCHAFTSTEUER SIND ZWEI WELTEN
-       *
-       * MARCELS FRAGE: „geht das dann auch für angelegte Unternehmen also
-       * alles was nicht privat ist? … können wir sauber trennen?"
-       *
-       * GEMESSEN: bis v1399 wurde hier NICHT nach Halter gefiltert. Die
-       * Filter waren: sich selbst überspringen, Kaufdatum davor, Kaufjahr
-       * erreicht. Sonst nichts.
-       *
-       * Was das anrichtete: **ein Objekt in der GmbH senkte das PRIVATE zu
-       * versteuernde Einkommen.** Das ist fachlich falsch — ein Verlust der
-       * Gesellschaft mindert das Einkommen der Gesellschaft, nicht deines.
-       * Die Gesellschaft zahlt Körperschaftsteuer auf ihr Ergebnis; du
-       * zahlst Einkommensteuer auf deins. Erst eine Ausschüttung verbindet
-       * die beiden, und die steht hier nirgends.
-       *
-       * Und es wurde durch v1397 SCHLIMMER, nicht besser: vorher wirkte die
-       * Saldierung nur im Tab Steuern, seither auch im Cashflow und damit
-       * in jeder Objektzahl und im Cockpit.
-       *
-       * DAS FELD LAG DIE GANZE ZEIT DA. Das Backend liefert `halter` seit
-       * v813-3c-be, der WK-Aggregator reicht ihn seit v813-3c durch. Er
-       * wurde nur nie gelesen — dasselbe Muster wie `_kpis_vuv` und
-       * `restnutzungsdauer_herkunft`.
-       *
-       * DIE REGEL: saldiert wird ausschliesslich INNERHALB desselben
-       * Halters. Ein privates Objekt sieht nur private Vorobjekte; ein
-       * Objekt der „Junker Immobilien GmbH" nur deren eigene.
-       *
-       * Fehlt die Angabe, gilt `privat` — so liefert es auch das Backend
-       * (`row.halter || 'privat'`). Altbestand ohne Halter bleibt damit im
-       * privaten Topf, wo er bisher schon war. */
-      var _objHalter = String(obj.halter || 'privat');
-      if (_objHalter !== _curHalterId) return;
+      /* ═══ v1404 · GLEICHE SPHAERE STATT GLEICHER HALTER ══════════════════
+         Bis v1403 stand hier `_objHalter !== _curHalterId` — also: nur
+         Objekte DESSELBEN Halters. Das trennte GmbH und UG richtig ab, aber
+         es trennte auch die GbR vom Privatvermoegen, und das ist falsch: eine
+         GbR zahlt keine Einkommensteuer, ihr Ergebnis fliesst beim
+         Gesellschafter in DASSELBE zvE.
+
+         Gemessen an drei privaten und zwei GbR-Objekten: 9,6 Prozent zu viel
+         ausgewiesene Entlastung, weil beide Toepfe die Progression von vorn
+         durchliefen.
+
+         `sphaere()` liegt in mandanten.js, wo auch die Rechtsformen stehen —
+         eine zweite Fassung hier liefe frueher oder spaeter auseinander. */
+      var _objSph = _sphVon(obj.halter);
+      if (_objSph !== _curSphaere) return;
       // V280-correct-filter: Anderes Objekt nur wenn dessen Kaufdatum
       //   1) VOR meinem eigenen Kaufdatum liegt UND
       //   2) Bis zum Card-Year (displayYear) bereits existierte
@@ -463,7 +467,12 @@ function _getBestandLossesForYear(displayYear) {
       var refYear = parseInt(refDateStr.substring(0, 4), 10);
       if (!refYear || refYear > displayYear) return;
       // Wert holen
+      /* v1404: nur DEIN Anteil geht in deine Steuerrechnung ein. Bei einer
+         GbR mit 50 Prozent zaehlt ein Verlust von 20.000 bei dir mit 10.000.
+         Privat und Kapitalgesellschaft liefern immer 1. */
+      var _ant = _antVon(obj.halter);
       var val = obj.wk_per_year && obj.wk_per_year[yearKey];
+      if (typeof val === 'number' && _ant !== 1) val = val * _ant;
       if (typeof val !== 'number' || val === 0) {
         // Falls nichts da: trotzdem Objekt mit 0 anzeigen
         result.list.push({

@@ -247,6 +247,78 @@
    * GmbH / UG    -> Dezimalsatz = KSt(+Soli)/100 + GewSt-Effekt.
    *   GewSt-Effekt = 0 bei erweiterter Kuerzung, sonst Messzahl 3,5 % x (Hebesatz/100).
    * id optional; ohne id wird das aktuelle #halter-Feld gelesen. */
+  /* ═══════════════════════════════════════════════════════════════════════
+     v1404 · STEUERSPHAERE UND BETEILIGUNGSQUOTE — EINE QUELLE, NICHT DREI
+     ═══════════════════════════════════════════════════════════════════════
+     Marcels Freigabe vom 15.09.2026, nachdem die Pruefstrecke den Befund
+     gezeigt hatte: die GbR bekam einen EIGENEN Topf und rechnete gegen das
+     volle zvE — an einem Beispiel mit drei privaten und zwei GbR-Objekten
+     9,6 Prozent zu viel ausgewiesene Entlastung.
+
+     WARUM DAS FALSCH WAR: eine GbR zahlt selbst keine Einkommensteuer. Ihr
+     Ergebnis wird den Gesellschaftern zugerechnet und fliesst in DEREN
+     Erklaerung — beim Nutzer also in DASSELBE zvE wie seine privaten
+     Objekte. Zwei Toepfe bedeuten zweimal dieselbe Progression von vorn.
+
+     DREI SPHAEREN, und die Funktion unten ist ihr einziger Schiedsrichter:
+
+       'est'        privat und GbR — Einkommensteuer des Nutzers, EIN Topf
+       '<halterId>' GmbH und UG — eigene Koerperschaftsteuer, je Halter
+                    ein eigener Topf
+
+     Sie liegt HIER, weil hier auch die Rechtsformen und die Quote liegen.
+     `tax.js` und `dashboard.js` fragen beide diese Funktion; eine zweite
+     Fassung in einer der beiden Dateien liefe frueher oder spaeter
+     auseinander — genau das Muster, das v1397 aufgeraeumt hat.          */
+  /** Den Mandanten NUR liefern, wenn es ihn wirklich gibt.
+   *  `get()` faellt auf den ERSTEN Eintrag zurueck (also auf „Privat"), und
+   *  das ist hier gefaehrlich: ein unbekannter Halter wuerde damit still zur
+   *  privaten Sphaere — genau die Vermischung, die v1404 verhindern soll.
+   *  Gefunden am 15.09.2026 von der Pruefstrecke, nicht beim Bauen. */
+  function _getStreng(id) {
+    for (var i = 0; i < _state.list.length; i++) {
+      if (_state.list[i].id === id) return _state.list[i];
+    }
+    return null;
+  }
+
+  function sphaere(halterId) {
+    var id = String(halterId || 'privat');
+    if (id === 'privat') return 'est';
+    var m = _getStreng(id);
+    /* Unbekannter Halter: als EIGENE Sphaere fuehren. Lieber ein Topf zu
+       viel als eine Vermischung, die niemand sieht. */
+    if (!m || !m.rechtsform) return id;
+    return isCorp(m.rechtsform) ? id : 'est';
+  }
+
+  /** Gehoert dieser Halter der Koerperschaftsteuer? Die RECHTSFORM entscheidet
+   *  das, NICHT der Tarif: `effRate()` liefert ohne Pro-Abo `null`, und wer
+   *  daraus „also Einkommensteuer" schliesst, steckt eine GmbH in die
+   *  Progression des Nutzers. Auch das hat die Pruefstrecke gefunden. */
+  function istKoerperschaft(halterId) {
+    var id = String(halterId || 'privat');
+    if (id === 'privat') return false;
+    var m = _getStreng(id);
+    return !!(m && isCorp(m.rechtsform));
+  }
+
+  /** Anteil am Ergebnis, als Faktor (1 = 100 %).
+   *  Privat ist immer 1. Eine Kapitalgesellschaft hat kein durchgereichtes
+   *  Ergebnis — dort ist die Quote bedeutungslos und bleibt 1, damit eine
+   *  versehentliche Multiplikation nichts anrichtet. */
+  function anteil(halterId) {
+    var id = String(halterId || 'privat');
+    if (id === 'privat') return 1;
+    var m = null;
+    try { m = get(id); } catch (e) { m = null; }
+    if (!m || m.rechtsform !== 'gbr') return 1;
+    var q = Number(m.quote);
+    if (!isFinite(q) || q <= 0) return 1;      /* nicht gepflegt = voll */
+    if (q > 100) q = 100;
+    return q / 100;
+  }
+
   function effRate(id) {
     if (!_isPro()) return null; /* v806: ohne Pro keine GmbH-Rechnung */
     if (id == null) { var sel = document.getElementById('halter'); id = sel ? sel.value : 'privat'; }
@@ -848,9 +920,37 @@
     var transHint =
         '<div id="mand-transparent-hint" style="display:' + (corp ? 'none' : 'block') + '">'
       +   '<div style="margin-top:16px;padding:13px 15px;background:#FAF9F4;border:1px solid rgba(201,168,76,.25);border-radius:10px;font-size:12.5px;color:#2A2727;line-height:1.5;margin-bottom:14px">'
-      +     '<b>Privatverm\u00f6gen</b> wird \u00fcber dein <b>zu versteuerndes Einkommen (zvE)</b> besteuert \u2014 gilt f\u00fcr alle privaten Objekte. Pflege die Zeitr\u00e4ume hier:'
+      +     '<b>Privatvermögen</b> wird über dein <b>zu versteuerndes Einkommen (zvE)</b> besteuert — gilt für alle privaten Objekte. Pflege die Zeiträume hier:'
       +   '</div>'
       +   '<div id="mand-tax-periods-host"></div>'
+      + '</div>'
+      /* ═══ v1404 · DIE BETEILIGUNGSQUOTE ═══════════════════════════════════
+         Nur fuer die GbR. Privat ist immer 100 Prozent, und eine
+         Kapitalgesellschaft hat gar kein durchgereichtes Ergebnis - ihre
+         Steuer steht auf Gesellschaftsebene.
+         GEMESSEN als Anlass (15.09.2026): ohne dieses Feld rechnete
+         DealPilot die GbR als EIGENEN Topf gegen das volle zvE. An einem
+         Beispiel mit drei privaten und zwei GbR-Objekten waren das 9,6
+         Prozent zu viel ausgewiesene Entlastung. */
+      + '<div id="mand-gbr-only" style="display:' + (rf === 'gbr' ? 'block' : 'none') + '">'
+      +   '<div style="margin-top:16px;padding:13px 15px;background:#FAF9F4;border:1px solid rgba(201,168,76,.25);border-radius:10px;font-size:12.5px;color:#2A2727;line-height:1.55;margin-bottom:12px">'
+      +     '<b>Warum diese Angabe nötig ist:</b> Eine GbR zahlt selbst keine Einkommensteuer. '
+      +     'Ihr Ergebnis wird den Gesellschaftern zugerechnet und fließt in <b>deren</b> '
+      +     'Steuererklärung — bei dir also in <b>dasselbe zvE</b> wie deine privaten Objekte. '
+      +     'DealPilot rechnet die GbR-Objekte deshalb <b>zusammen mit dem Privatvermögen</b> '
+      +     'in einer Progression, nicht getrennt daneben.'
+      +   '</div>'
+      +   fldH('Dein Anteil am Ergebnis (%)',
+             '<input id="mand-f-quote" type="text" inputmode="decimal" class="tr" value="'
+             + esc(m.quote != null ? String(m.quote).replace('.', ',') : '100') + '" placeholder="100">',
+             'Dein <b>Anteil am Gewinn und Verlust</b> dieser Gesellschaft, nicht zwingend der '
+             + 'Kapitalanteil — maßgeblich ist der Gewinnverteilungsschlüssel aus dem '
+             + 'Gesellschaftsvertrag. Nur dieser Anteil geht in deine Steuerrechnung ein: bei '
+             + '50 % zählt ein Verlust von 20.000 € bei dir mit 10.000 €. '
+             + 'Bist du alleiniger Gesellschafter, bleibt es bei 100 %. '
+             + '<b>Was hier nicht abgebildet ist:</b> Sonderbetriebsausgaben und '
+             + 'Ergänzungsbilanzen — die kennt nur die einheitliche und gesonderte '
+             + 'Feststellung deines Steuerberaters.')
       + '</div>';
 
     return ''
@@ -875,6 +975,9 @@
     var corp = isCorp(sel.value);
     var c = document.getElementById('mand-corp-only'); if (c) c.style.display = corp ? 'block' : 'none';
     var h = document.getElementById('mand-transparent-hint'); if (h) h.style.display = corp ? 'none' : 'block';
+    /* v1404: das Quotenfeld gilt NUR der GbR — privat ist immer 100 %. */
+    var q = document.getElementById('mand-gbr-only');
+    if (q) q.style.display = (sel.value === 'gbr') ? 'block' : 'none';
   }
 
   function uiNew() { _editing = 'NEW'; _rerender(); }
@@ -904,6 +1007,16 @@
       if (v) _id[t[0]] = v;
     });
     if (Object.keys(_id).length) m.ident = _id;
+    /* ═══ v1404 · DIE BETEILIGUNGSQUOTE DER GbR ══════════════════════════
+       Nur bei der GbR gespeichert. Fehlt oder ist sie unsinnig, gilt 100 % —
+       derselbe Rueckfall wie in der Anzeige. Ueber 100 kann ein Anteil nicht
+       liegen, unter 0 auch nicht; beides wird gekappt statt uebernommen. */
+    if (rf === "gbr") {
+      var _q = _toN(_val("mand-f-quote"));
+      if (!isFinite(_q) || _q <= 0) _q = 100;
+      if (_q > 100) _q = 100;
+      m.quote = _q;
+    }
     if (isCorp(rf)) {
       m.regime = { kst: _toN(_val('mand-f-kst')), gewst: _toN(_val('mand-f-gewst')), erw_kuerzung: _chk('mand-f-kuerz') };
       m.bh = {
@@ -1048,7 +1161,7 @@
     openUeberfuehrung: openUeberfuehrung, _uewPick: _uewPick,  /* v856-uew */
     getList: getList, get: get, upsert: upsert, remove: remove, rfLabel: rfLabel, isCorp: isCorp,
     renderHalterOptions: renderHalterOptions, renderHalterChips: renderHalterChips,
-    setFilter: setFilter, filterByHalter: filterByHalter, effRate: effRate, wireObjectFields: wireObjectFields,
+    setFilter: setFilter, filterByHalter: filterByHalter, effRate: effRate, sphaere: sphaere, anteil: anteil, istKoerperschaft: istKoerperschaft, wireObjectFields: wireObjectFields,
     renderSidebarChips: renderSidebarChips, _toggleMandMenu: _toggleMandMenu, onUeberfToggle: onUeberfToggle, undoUeberfuehrung: undoUeberfuehrung, undoUeberfuehrungFromPrivat: undoUeberfuehrungFromPrivat,  syncAfterLoad: syncAfterLoad,  /* v816d-export */
     renderSettingsTab: renderSettingsTab,
     uiSaveIfOpen: uiSaveIfOpen,   /* v826 (dedup) */

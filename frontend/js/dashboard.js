@@ -881,6 +881,12 @@
     return null;
   }
   function _halterName(id) {
+    /* v1404: 'est' ist kein Halter, sondern eine Sphaere — der Topf, in dem
+       das Privatvermoegen und alle transparenten Gesellschaften gemeinsam
+       durch die Progression laufen. Der Name wird unten aus den tatsaechlich
+       enthaltenen Haltern gebildet, damit dort nicht "Privat" steht, wenn
+       eine GbR mit drinsteckt. */
+    if (id === 'est') return 'Einkommensteuer';
     try {
       if (window.DealPilotMandanten && DealPilotMandanten.get) {
         var m = DealPilotMandanten.get(id);
@@ -888,6 +894,51 @@
       }
     } catch (e) {}
     return id === 'privat' ? 'Privat' : id;
+  }
+
+  /* v1404 · Sphaere und Anteil — beide aus mandanten.js, nicht nachgebaut.
+     Faellt das Modul aus, gilt der Halter selbst als Sphaere und der Anteil
+     als voll: dann wird eher zu fein getrennt als vermischt. */
+  function _sphaereVon(h) {
+    try {
+      if (window.DealPilotMandanten && DealPilotMandanten.sphaere) {
+        return DealPilotMandanten.sphaere(h || 'privat');
+      }
+    } catch (e) {}
+    return String(h || 'privat');
+  }
+  function _anteilVon(h) {
+    try {
+      if (window.DealPilotMandanten && DealPilotMandanten.anteil) {
+        var a = DealPilotMandanten.anteil(h || 'privat');
+        return (typeof a === 'number' && isFinite(a) && a > 0) ? a : 1;
+      }
+    } catch (e) {}
+    return 1;
+  }
+
+  function _istKoerperschaft(h) {
+    try {
+      if (window.DealPilotMandanten && DealPilotMandanten.istKoerperschaft) {
+        return !!DealPilotMandanten.istKoerperschaft(h);
+      }
+    } catch (e) {}
+    return false;
+  }
+
+  /** Wie der ESt-Topf heisst. „Privat" steht nur davor, wenn wirklich
+   *  privates Vermoegen darin liegt — sonst hiess der Topf einer reinen
+   *  GbR faelschlich „Privat + …". Auch das kam aus der Pruefstrecke. */
+  function _estTopfName(liste) {
+    var privatDrin = false, namen = [];
+    (liste || []).forEach(function (o) {
+      var h = String((o && o.halter) || 'privat');
+      if (h === 'privat') { privatDrin = true; return; }
+      var n = _halterName(h);
+      if (namen.indexOf(n) < 0) namen.push(n);
+    });
+    if (!namen.length) return 'Privat';
+    return (privatDrin ? 'Privat + ' : '') + namen.join(' + ');
   }
 
   /**
@@ -911,28 +962,51 @@
 
     /* Nach Halter gruppieren. Fehlt die Angabe, gilt `privat` — so liefert
        es auch das Backend. */
+    /* ═══ v1404 · GRUPPIERT WIRD NACH SPHAERE, NICHT NACH HALTER ══════════
+       Bis v1403 bekam jeder Halter einen eigenen Topf. Fuer GmbH und UG ist
+       das richtig — fuer die GbR nicht: sie zahlt keine Einkommensteuer, ihr
+       Ergebnis fliesst beim Gesellschafter in DASSELBE zvE wie das
+       Privatvermoegen. Zwei Toepfe hiessen zweimal dieselbe Progression von
+       vorn, und das waren an einem Beispiel 9,6 Prozent zu viel.
+
+       `sphaere()` und `anteil()` liegen in mandanten.js — dort, wo die
+       Rechtsformen stehen. Hier wird nur gefragt. */
     var gruppen = {};
     alle.forEach(function (o) {
       if (!o || !o.id) return;
-      var h = String(o.halter || 'privat');
-      (gruppen[h] = gruppen[h] || []).push(o);
+      var sp = _sphaereVon(o.halter);
+      (gruppen[sp] = gruppen[sp] || []).push(o);
     });
 
     Object.keys(gruppen).forEach(function (h) {
-      var satz = _halterSatz(h);
-      var estPflichtig = (satz == null);   /* null = Einkommensteuer */
+      /* Bei 'est' steht kein Halter hinter dem Schluessel — der Satz kommt
+         dann aus keinem Mandanten, und genau das ist gemeint: Progression. */
+      /* ═══ v1404b · DIE RECHTSFORM ENTSCHEIDET DAS REGIME, NICHT DER TARIF
+         Hier stand `estPflichtig = (satz == null)`. Das ging solange gut, wie
+         `effRate()` immer einen Satz lieferte — sie liefert aber `null`, wenn
+         KEIN PRO-ABO vorliegt (v806). Damit rutschte eine GmbH in die
+         Einkommensteuer-Progression des Nutzers, und der Topf hiess auch noch
+         "Privat + GmbH". Gefunden von der Pruefstrecke, nicht beim Bauen.
+         Jetzt: die Rechtsform sagt, WELCHE Steuer gilt; der Tarif sagt nur,
+         ob wir ihn beziffern koennen. Fehlt er, steht der Topf trotzdem als
+         Koerperschaft da — nur ohne Betrag. */
+      var istKoerp = (h !== 'est') && _istKoerperschaft(h);
+      var satz = istKoerp ? _halterSatz(h) : null;
+      var estPflichtig = !istKoerp;
       var liste = gruppen[h].slice().sort(function (a, b) {
         return String(a.purchase_date || '9999').localeCompare(String(b.purchase_date || '9999'));
       });
 
-      var topf = { halter: h, name: _halterName(h), estPflichtig: estPflichtig,
+      var topf = { halter: h, name: estPflichtig ? _estTopfName(liste) : _halterName(h), estPflichtig: estPflichtig,
                    satz: satz, zve: 0, schritte: [], summe: 0 };
 
       if (estPflichtig) {
         topf.zve = zveFuer(y);
         var basis = topf.zve;
         liste.forEach(function (o) {
-          var v = (o.wk_per_year && Number(o.wk_per_year[yk])) || 0;
+          /* v1404: nur DEIN Anteil. Bei einer GbR mit 50 Prozent zaehlt ein
+             Verlust von 20.000 bei dir mit 10.000. Privat liefert immer 1. */
+          var v = ((o.wk_per_year && Number(o.wk_per_year[yk])) || 0) * _anteilVon(o.halter);
           if (!v) return;                       /* kein Ergebnis in diesem Jahr */
           var vor = Math.max(0, basis);
           var nach = Math.max(0, basis + v);
@@ -1112,8 +1186,13 @@
         + '<div class="sk-kopf">'
         +   '<div class="sk-titel">' + _esc(t.name) + '</div>'
         +   '<span class="sk-art' + (istEst ? '' : ' sk-art-kst') + '">'
+        /* v1404b: ein UNBEKANNTER Satz ist nicht null Prozent. `effRate()`
+           liefert ohne Pro-Abo nichts — dann steht hier der Hinweis, nicht
+           eine Zahl, die eine Steuerfreiheit behauptet. */
         +     (istEst ? 'Einkommensteuer · § 32a · mit Progression'
-                      : 'Körperschaftsteuer · ' + pz(t.satz * 100) + ' · proportional')
+                      : (t.satz != null
+                          ? 'Körperschaftsteuer · ' + pz(t.satz * 100) + ' · proportional'
+                          : 'Körperschaftsteuer · Satz nicht hinterlegt'))
         +   '</span>'
         + '</div>';
 
@@ -1129,9 +1208,18 @@
       } else {
         html += '<div class="sk-zahlen">'
           + _kachel('Ergebnis der Gesellschaft', eur(t.gesamtergebnis || 0), '')
-          + _kachel('Steuersatz', pz(t.satz * 100), 'sk-k-akzent')
-          + _kachel('Körperschaftsteuer', eur(t.summe), t.summe > 0 ? 'sk-k-gut' : 'sk-k-schlecht')
-          + '</div>';
+          + _kachel('Steuersatz', t.satz != null ? pz(t.satz * 100) : 'nicht hinterlegt',
+                    t.satz != null ? 'sk-k-akzent' : '')
+          + _kachel('Körperschaftsteuer',
+                    t.satz != null ? eur(t.summe) : '—',
+                    t.satz != null ? (t.summe > 0 ? 'sk-k-gut' : 'sk-k-schlecht') : '')
+          + '</div>'
+          + (t.satz == null
+              ? '<div class="sk-fuss">Für diese Gesellschaft ist <b>kein Steuersatz hinterlegt</b> — '
+                + 'Körperschaftsteuer und Gewerbesteuer-Hebesatz stehen unter '
+                + '<b>Einstellungen / Mandanten</b>. Das Ergebnis der Objekte ist oben trotzdem '
+                + 'richtig; nur die Steuer darauf lässt sich ohne Satz nicht beziffern.</div>'
+              : '');
       }
 
       /* Die Tabelle — je Objekt eine Zeile. */
