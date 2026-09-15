@@ -4371,3 +4371,34 @@ auch wenn sie seit Jahren dort steht und nie gemeldet wurde. Im selben Zug
 gefunden: `vuvY1` summierte `_kpis_vuv`, ein Feld, das **nirgends gesetzt
 wird**. Ergebnis immer 0, verwendet nie. Ein grep nach dem Feldnamen hätte es
 jederzeit gezeigt.
+
+## `sed -i "${L}a\…"` mit leerem $L schreibt in JEDE Zeile
+
+**15.09.2026, an `app.js` (5.286 Zeilen) passiert.** Der Befehl war
+
+```bash
+L=$(grep -n "…" datei | cut -d: -f1) && sed -i "${L}a\…" datei
+```
+
+Der `grep` fand **nichts**, also war `L` leer. Aus `sed -i "${L}a\…"` wurde
+damit `sed -i "a\…"` — und **ein `a` ohne Zeilenadresse gilt für jede Zeile**.
+Ergebnis: **5.298 Einfügungen** statt einer. Die Datei war unbrauchbar.
+
+**Bemerkt hat es erst ein `grep -c`** zwei Schritte später, das statt `1` eine
+vierstellige Zahl meldete. Der `sed` selbst lief ohne Fehler durch; die
+Fehlermeldung, die im selben Aufruf erschien, kam von einem *anderen* Teil der
+Befehlskette und lenkte den Blick auf die falsche Stelle.
+
+**Behoben mit `git checkout -- datei`** — deshalb wird committet, bevor an
+einer zweiten Stelle derselben Datei gearbeitet wird.
+
+### Die Regel
+
+- **Zeilennummern vor dem Einsetzen prüfen.** `[ -n "$L" ] || exit 1` kostet
+  nichts. Eine leere Adresse ist bei `sed` kein Fehler, sondern eine
+  *Erweiterung* des Geltungsbereichs auf alles.
+- **Besser gar kein `sed a/i` für mehrzeilige Blöcke**, sondern der Splice:
+  `{ head -N datei; cat block; tail -n +M datei; } > neu`. Der schlägt bei
+  einer leeren Variablen sichtbar fehl, statt still alles zu treffen.
+- **Nach jedem Einsetzen zählen**, wie oft der neue Text vorkommt. `grep -c`
+  auf einen Marker aus dem Block ist eine Zeile und fängt genau diesen Fall.

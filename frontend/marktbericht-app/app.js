@@ -895,6 +895,17 @@ function _renderWertverfahren(d) {
                           : '')
                       + '</span>'
                     : '')
+                /* v1409 · DIE LIZENZ GEHOERT SICHTBAR DAZU.
+                   Sie wird seit v1107 im Nachweis gesammelt und wurde
+                   nirgends ausgegeben — dabei entscheidet gerade sie, was
+                   der Kunde mit der Zahl tun darf. Gemessen am 15.09.2026:
+                   18 Sachwertfaktor-Saetze tragen GAR KEINE Lizenzangabe,
+                   die meisten davon auch keine Quell-URL. Wer sie verwendet,
+                   weiss nicht, unter welchen Bedingungen. Ein Strich sagt
+                   mehr als ein Weglassen. */
+                + ' <span class="wv-nw-liz' + (q.lizenz ? '' : ' wv-nw-liz-offen') + '">'
+                +   (q.lizenz ? esc(q.lizenz) : 'Lizenz nicht hinterlegt')
+                + '</span>'
                 + (q.url ? '<br><a href="' + esc(q.url) + '" target="_blank"'
                            + ' rel="noopener">' + esc(q.url) + '</a>' : '')
                 + '</div>';
@@ -941,6 +952,9 @@ function _renderWertverfahren(d) {
          Statusfarbe und bleibt in jeder Marke dieselbe. */
       + '#wv-box .wv-nw-jg{opacity:.65;white-space:nowrap}'
       + '#wv-box .wv-nw-alt{opacity:1;color:#B8625C;white-space:normal}'
+      /* v1409: die Lizenz als eigene Marke — fehlt sie, faellt es auf. */
+      + '#wv-box .wv-nw-liz{opacity:.6;white-space:nowrap}'
+      + '#wv-box .wv-nw-liz-offen{opacity:1;color:#B8625C;white-space:normal}'
       + '#wv-box .wv-nachweis a{color:var(--wl-c9a84c,#c9a84c);text-decoration:underline;'
       + '  word-break:break-all}'
 
@@ -4437,7 +4451,10 @@ async function exportPdf(out) {
                 ? ' (' + _alt + ' Jahre alt \u2014 zum heutigen Stichtag nur eingeschr\u00e4nkt modellkonform)'
                 : '')
           : '';
-        var _zl = doc.splitTextToSize(q.vermerk + (_kz ? '  (' + _kz + ')' : '') + _jg, blockW);
+        /* v1409: die Lizenz gehoert auch ins PDF — das ist das Blatt, das
+           zur Bank geht. Fehlt sie, steht das ausdruecklich da. */
+        var _lz = '  ' + (q.lizenz ? q.lizenz : 'Lizenz nicht hinterlegt');
+        var _zl = doc.splitTextToSize(q.vermerk + (_kz ? '  (' + _kz + ')' : '') + _jg + _lz, blockW);
         need(_zl.length * 3 + 4);
         doc.text(_zl, M, y); y += _zl.length * 3 + 0.5;
         if (q.url) {
