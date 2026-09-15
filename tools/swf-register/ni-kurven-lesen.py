@@ -64,10 +64,33 @@ def kurve(W, achsmuster):
     # Koeffizienten: Zahlen der Form 0,xx / 1,xx OBERHALB der Achse, aber
     # nicht weiter als bis zur vorigen Grafik. Die y-Achsenbeschriftung
     # steht ganz links und fällt über ihre x-Lage heraus.
+    #
+    # WIE WEIT NACH OBEN? Nicht nach einem festen Abstand — das war der
+    # erste Versuch und er scheiterte in beide Richtungen: mit 105
+    # Einheiten fehlten bei Braunschweig die obersten zwei Stützstellen
+    # (die Wohnflächenkurve steigt bis 1,09, die Beschriftungen stehen
+    # über dem Rahmen), mit 145 fing Nienburg dafür die 0,79 aus der
+    # GRAFIK DARÜBER ein und schrieb sie an die erste Stelle der
+    # BGF-Kurve. Beides sah plausibel aus.
+    #
+    # Die Grenze ist keine Zahl, sondern eine Struktur: ein Diagramm
+    # reicht von SEINEM TITEL bis zu seiner Achse. Der Titel des nächsten
+    # Diagramms darüber ist die Obergrenze.
+    #
+    # ACHTUNG, ZWEITE FALLE an derselben Stelle: das Wort
+    # "Umrechnungskoeff." steht auch als y-ACHSENBESCHRIFTUNG, gedreht am
+    # linken Rand auf halber Diagrammhöhe. Als Titel gezählt, schnitt es
+    # das Fenster mitten durch die eigene Kurve — bei Verden fehlten
+    # danach sieben von zwölf Stützstellen. Ein Titel steht im
+    # Textbereich, die Achsenbeschriftung links davon.
     xlinks = achse[0][0] - 25
+    titel = [w for w in W if 'Umrechnungskoe' in w[4]
+             and (w[1] + w[3]) / 2 < y - 4
+             and w[0] > xlinks]
+    oben = max((w[1] + w[3]) / 2 for w in titel) if titel else y - 145
     ko = [w for w in W
           if re.fullmatch(r'[01][,.]\d\d', w[4])
-          and y - 105 < (w[1] + w[3]) / 2 < y - 4
+          and oben < (w[1] + w[3]) / 2 < y - 4
           and w[0] > xlinks]
 
     aus = []
