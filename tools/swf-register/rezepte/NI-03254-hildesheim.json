@@ -1,0 +1,99 @@
+{
+  "land_code": "NI",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hildesheim",
+  "gaa_kennz": "03254",
+  "ags": ["03254"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2025-10-01",
+  "auswertezeitraum": "01/2023 bis 12/2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-03-02",
+  "quelle_url": "https://public.tableau.com/views/2026_sw_efh_hmhhi/dash",
+  "quelle_datei": "Tableau-Kalkulator 2026_sw_efh_hmhhi (Grundstücksmarktinformationen Niedersachsen 2026)",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Ein- und Zweifamilienhäuser, Kalkulator 2026_sw_efh_hmhhi",
+  "stufe": "B",
+
+  "modellansaetze": {
+    "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung.",
+    "nhk": "NHK 2010",
+    "bezugsmassstab": "Brutto-Grundflaeche",
+    "alterswertminderung": "linear"
+  },
+
+  "stichprobe": {
+    "faelle": 370,
+    "kaufzeitpunkt": "03.01.2023 bis 10.12.2025",
+    "spannen": {
+      "vorlaeufiger_sachwert_eur": [79002, 860039],
+      "bodenrichtwert_eur_qm": [28, 400],
+      "grundstuecksflaeche_qm": [155, 2374],
+      "wohnflaeche_qm": [60, 318],
+      "modifiziertes_baujahr": [1963, 2022],
+      "rnd_jahre": [19, 78]
+    }
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehendes Ein- und Zweifamilienhaus",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [80000, 150000, 250000, 350000, 400000, 500000, 650000, 850000],
+        "achse_y_feld": "brw",
+        "achse_y_bez": "Bodenrichtwert in €/m²",
+        "achse_y": [28, 60, 110, 160, 220, 300, 400],
+        "zellen": {
+          "28":  [1.04, 0.87, 0.70, 0.57, 0.52, 0.43, 0.33, 0.22],
+          "60":  [1.19, 1.00, 0.82, 0.68, 0.63, 0.53, 0.42, 0.30],
+          "110": [1.33, 1.13, 0.94, 0.79, 0.73, 0.63, 0.50, 0.37],
+          "160": [1.43, 1.23, 1.02, 0.87, 0.81, 0.70, 0.56, 0.42],
+          "220": [1.52, 1.31, 1.10, 0.94, 0.87, 0.76, 0.62, 0.47],
+          "300": [1.62, 1.40, 1.18, 1.02, 0.95, 0.83, 0.68, 0.53],
+          "400": [1.71, 1.49, 1.26, 1.09, 1.02, 0.90, 0.74, 0.58]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "normobjekt": "Standardstufe 2,5 · Restnutzungsdauer 40 Jahre",
+        "hinweis": "Alle 56 Zellen sind am NORMOBJEKT abgetastet. GEGENPROBE: das Dashboard weist als Anwendungsbeispiel Bodenrichtwert 110 €/m² und vorläufigen Sachwert 400.000 € mit dem Faktor 0,73 aus; die Zelle [110][400000] trägt genau diese 0,73. Das Gitter reicht bis 0,22 hinunter — bei niedrigem Bodenrichtwert und hohem Sachwert liegt der Kaufpreis im Landkreis Hildesheim weit unter dem Sachwert."
+      },
+
+      "korrekturen": [
+        {
+          "bez": "Abweichende Standardstufe",
+          "feld": "standardstufe",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": { "1.5": 0.86, "2.5": 1.00, "3.5": 1.15 },
+          "rundung_stellen": 2,
+          "hinweis": "NUR DREI abgedruckte Stützstellen — die gröbste Kurve aller bisher erfassten Gebiete. Probe: bei der Normstufe 2,5 ist der Koeffizient 1,00. Die Stichprobe selbst weist keine Standardstufenspanne aus; ausserhalb von 1,5 bis 3,5 greift der Randwert."
+        },
+        {
+          "bez": "Abweichende Restnutzungsdauer",
+          "feld": "rnd_jahre",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "20": 0.77, "25": 0.85, "30": 0.92, "35": 0.96, "40": 1.00,
+            "45": 1.03, "50": 1.06, "55": 1.08, "60": 1.10, "65": 1.11,
+            "70": 1.13, "75": 1.14, "80": 1.15
+          },
+          "rundung_stellen": 2,
+          "hinweis": "Dreizehn abgedruckte Stützstellen in Fünfjahresschritten. Probe: bei der Norm-Restnutzungsdauer 40 Jahre ist der Koeffizient 1,00. Hildesheim spreizt nach unten deutlich weiter als die Region Hannover (0,77 gegen 0,83 bei 20 Jahren)."
+        }
+      ],
+
+      "beleg": "Kalkulator 2026_sw_efh_hmhhi (Tableau Public, Profil ogagmd2026), Datenbasis 01.10.2025, veroeffentlicht 02.03.2026, Stichprobe 370 Kauffaelle. 56 Stuetzpunkte des Gitters am Normobjekt abgefragt (Bodenrichtwert 28 bis 400 EUR/qm x vorlaeufiger Sachwert 80.000 bis 850.000 EUR), dazu 16 abgedruckte Stuetzstellen der beiden Umrechnungskurven. GEGENPROBE am Anwendungsbeispiel: Bodenrichtwert 110, vorlaeufiger Sachwert 400.000, Standardstufe 2,5, Restnutzungsdauer 40 ergibt 0,73 - die Zelle traegt genau diese Zahl. KEIN LAGE-EINGABEFELD, von Hand gegengelesen.",
+
+      "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung). NUR BAUJAHRE AB 1950. Für Baujahre 1800 bis 1945 führt der Ausschuss einen EIGENEN Kalkulator, der hier nicht erfasst ist — wer ein Altbaugebäude bewertet, darf diesen Satz nicht verwenden. ABWEICHENDER STICHTAG: 01.10.2025. WO DIE QUELLE ENDET, ENDET DIE RECHNUNG: das Gitter deckt 80.000 bis 850.000 € und 28 bis 400 €/m² ab.",
+      "stufe": "B",
+      "stufe_begruendung": "Stufe B statt A: die Gitterwerte sind am amtlichen Kalkulator abgetastet, die Stützstellen von uns gewählt. Die beiden Korrekturkurven sind vom Ausschuss abgedruckt und damit Stufe A."
+    }
+  ]
+}

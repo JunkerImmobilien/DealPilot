@@ -784,6 +784,199 @@
  },
  {
   "land_code": "NI",
+  "ags": "03241",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Region Hannover",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Region Hannover",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    100000,
+    200000,
+    300000,
+    400000,
+    450000,
+    550000,
+    700000,
+    850000,
+    1000000
+   ],
+   "achse_y_feld": "brw",
+   "achse_y_bez": "Bodenrichtwert in €/m²",
+   "achse_y": [
+    45,
+    100,
+    200,
+    300,
+    400,
+    500,
+    650,
+    850
+   ],
+   "zellen": {
+    "45": [
+     1.24,
+     0.97,
+     0.81,
+     0.7,
+     0.66,
+     0.58,
+     0.5,
+     0.43,
+     0.38
+    ],
+    "100": [
+     1.35,
+     1.06,
+     0.9,
+     0.78,
+     0.73,
+     0.66,
+     0.57,
+     0.5,
+     0.44
+    ],
+    "200": [
+     1.51,
+     1.2,
+     1.02,
+     0.9,
+     0.85,
+     0.77,
+     0.67,
+     0.59,
+     0.53
+    ],
+    "300": [
+     1.61,
+     1.29,
+     1.11,
+     0.98,
+     0.93,
+     0.84,
+     0.74,
+     0.66,
+     0.59
+    ],
+    "400": [
+     1.67,
+     1.35,
+     1.16,
+     1.03,
+     0.97,
+     0.88,
+     0.78,
+     0.7,
+     0.63
+    ],
+    "500": [
+     1.7,
+     1.37,
+     1.18,
+     1.05,
+     1.0,
+     0.91,
+     0.8,
+     0.72,
+     0.65
+    ],
+    "650": [
+     1.73,
+     1.4,
+     1.21,
+     1.07,
+     1.02,
+     0.93,
+     0.82,
+     0.74,
+     0.67
+    ],
+    "850": [
+     1.81,
+     1.47,
+     1.28,
+     1.14,
+     1.08,
+     0.99,
+     0.88,
+     0.79,
+     0.72
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Standardstufe 2,5 · Restnutzungsdauer 40 Jahre",
+   "hinweis": "Alle 72 Zellen sind am NORMOBJEKT abgetastet. GEGENPROBE: das Dashboard weist als Anwendungsbeispiel Bodenrichtwert 500 €/m² und vorläufigen Sachwert 450.000 € mit dem Faktor 1,00 aus; die Zelle [500][450000] trägt genau diese 1,00. Beide Normwerte sind absichtlich Gitterachsen — eine nur interpolierte Gegenprobe wäre kein Beweis. Mit 1.005 Kauffällen ist dies die grösste bisher erfasste Stichprobe Niedersachsens."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "1.5": 0.88,
+     "2.5": 1.0,
+     "3.5": 1.13,
+     "4.5": 1.26
+    },
+    "rundung_stellen": 2,
+    "hinweis": "Vier abgedruckte Stützstellen im Abstand von einer ganzen Stufe — gröber als bei den Braunschweiger Gebieten, die halbe Stufen abdrucken. Probe: bei der Normstufe 2,5 ist der Koeffizient 1,00."
+   },
+   {
+    "bez": "Abweichende Restnutzungsdauer",
+    "feld": "rnd_jahre",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "20": 0.83,
+     "25": 0.89,
+     "30": 0.94,
+     "35": 0.97,
+     "40": 1.0,
+     "45": 1.02,
+     "50": 1.04,
+     "55": 1.06,
+     "60": 1.08,
+     "65": 1.09,
+     "70": 1.1,
+     "75": 1.11
+    },
+    "rundung_stellen": 2,
+    "hinweis": "Zwölf abgedruckte Stützstellen in Fünfjahresschritten — die dichteste Kurve aller bisher erfassten Gebiete, und damit die einzige, bei der die Krümmung kaum ins Gewicht fällt. Probe: bei der Norm-Restnutzungsdauer 40 Jahre ist der Koeffizient 1,00. Die Kurve flacht nach oben stark ab: von 20 auf 40 Jahre sind es 17 Prozentpunkte, von 55 auf 75 nur noch 5."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung.",
+   "nhk": "NHK 2010",
+   "bezugsmassstab": "Brutto-Grundflaeche",
+   "alterswertminderung": "linear"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Kalkulator 2026_sw_efh_hmhh (Tableau Public, Profil ogagmd2026), Datenbasis 01.10.2025, veroeffentlicht 02.03.2026, Stichprobe 1.005 Kauffaelle. 72 Stuetzpunkte des Gitters am Normobjekt abgefragt (Bodenrichtwert 45 bis 850 EUR/qm x vorlaeufiger Sachwert 100.000 bis 1.000.000 EUR), dazu 16 abgedruckte Stuetzstellen der beiden Umrechnungskurven. GEGENPROBE am Anwendungsbeispiel: Bodenrichtwert 500, vorlaeufiger Sachwert 450.000, Standardstufe 2,5, Restnutzungsdauer 40 ergibt 1,00 - die Zelle traegt genau diese Zahl. KEIN LAGE-EINGABEFELD: die Maske fuehrt nur Sachwert, Bodenrichtwert, Standardstufe und Restnutzungsdauer, von Hand gegengelesen."
+  ],
+  "stufe": "B",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2025-10-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://public.tableau.com/views/2026_sw_efh_hmhh/dash",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": null,
+  "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Ein- und Zweifamilienhäuser, Kalkulator 2026_sw_efh_hmhh"
+ },
+ {
+  "land_code": "NI",
   "ags": "03251",
   "ebene": "kreis",
   "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Bereich übriger Landkreis Diepholz",
@@ -865,6 +1058,179 @@
   "verwendung": "produkt",
   "auflagen": "Quellenangabe. Die Anwendung setzt eine modellkonforme Wertermittlung nach der Modellbeschreibung Sachwertfaktoren des Ausschusses voraus.",
   "fundstelle": "Kalkulator „Sachwertfaktoren für ein Reihenhaus oder Doppelhaushälfte — Übriger Landkreis Diepholz“ nebst den beiden Diagrammen der Umrechnungskoeffizienten."
+ },
+ {
+  "land_code": "NI",
+  "ags": "03254",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hildesheim",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hildesheim",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    80000,
+    150000,
+    250000,
+    350000,
+    400000,
+    500000,
+    650000,
+    850000
+   ],
+   "achse_y_feld": "brw",
+   "achse_y_bez": "Bodenrichtwert in €/m²",
+   "achse_y": [
+    28,
+    60,
+    110,
+    160,
+    220,
+    300,
+    400
+   ],
+   "zellen": {
+    "28": [
+     1.04,
+     0.87,
+     0.7,
+     0.57,
+     0.52,
+     0.43,
+     0.33,
+     0.22
+    ],
+    "60": [
+     1.19,
+     1.0,
+     0.82,
+     0.68,
+     0.63,
+     0.53,
+     0.42,
+     0.3
+    ],
+    "110": [
+     1.33,
+     1.13,
+     0.94,
+     0.79,
+     0.73,
+     0.63,
+     0.5,
+     0.37
+    ],
+    "160": [
+     1.43,
+     1.23,
+     1.02,
+     0.87,
+     0.81,
+     0.7,
+     0.56,
+     0.42
+    ],
+    "220": [
+     1.52,
+     1.31,
+     1.1,
+     0.94,
+     0.87,
+     0.76,
+     0.62,
+     0.47
+    ],
+    "300": [
+     1.62,
+     1.4,
+     1.18,
+     1.02,
+     0.95,
+     0.83,
+     0.68,
+     0.53
+    ],
+    "400": [
+     1.71,
+     1.49,
+     1.26,
+     1.09,
+     1.02,
+     0.9,
+     0.74,
+     0.58
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Standardstufe 2,5 · Restnutzungsdauer 40 Jahre",
+   "hinweis": "Alle 56 Zellen sind am NORMOBJEKT abgetastet. GEGENPROBE: das Dashboard weist als Anwendungsbeispiel Bodenrichtwert 110 €/m² und vorläufigen Sachwert 400.000 € mit dem Faktor 0,73 aus; die Zelle [110][400000] trägt genau diese 0,73. Das Gitter reicht bis 0,22 hinunter — bei niedrigem Bodenrichtwert und hohem Sachwert liegt der Kaufpreis im Landkreis Hildesheim weit unter dem Sachwert."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "1.5": 0.86,
+     "2.5": 1.0,
+     "3.5": 1.15
+    },
+    "rundung_stellen": 2,
+    "hinweis": "NUR DREI abgedruckte Stützstellen — die gröbste Kurve aller bisher erfassten Gebiete. Probe: bei der Normstufe 2,5 ist der Koeffizient 1,00. Die Stichprobe selbst weist keine Standardstufenspanne aus; ausserhalb von 1,5 bis 3,5 greift der Randwert."
+   },
+   {
+    "bez": "Abweichende Restnutzungsdauer",
+    "feld": "rnd_jahre",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "20": 0.77,
+     "25": 0.85,
+     "30": 0.92,
+     "35": 0.96,
+     "40": 1.0,
+     "45": 1.03,
+     "50": 1.06,
+     "55": 1.08,
+     "60": 1.1,
+     "65": 1.11,
+     "70": 1.13,
+     "75": 1.14,
+     "80": 1.15
+    },
+    "rundung_stellen": 2,
+    "hinweis": "Dreizehn abgedruckte Stützstellen in Fünfjahresschritten. Probe: bei der Norm-Restnutzungsdauer 40 Jahre ist der Koeffizient 1,00. Hildesheim spreizt nach unten deutlich weiter als die Region Hannover (0,77 gegen 0,83 bei 20 Jahren)."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung.",
+   "nhk": "NHK 2010",
+   "bezugsmassstab": "Brutto-Grundflaeche",
+   "alterswertminderung": "linear"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Kalkulator 2026_sw_efh_hmhhi (Tableau Public, Profil ogagmd2026), Datenbasis 01.10.2025, veroeffentlicht 02.03.2026, Stichprobe 370 Kauffaelle. 56 Stuetzpunkte des Gitters am Normobjekt abgefragt (Bodenrichtwert 28 bis 400 EUR/qm x vorlaeufiger Sachwert 80.000 bis 850.000 EUR), dazu 16 abgedruckte Stuetzstellen der beiden Umrechnungskurven. GEGENPROBE am Anwendungsbeispiel: Bodenrichtwert 110, vorlaeufiger Sachwert 400.000, Standardstufe 2,5, Restnutzungsdauer 40 ergibt 0,73 - die Zelle traegt genau diese Zahl. KEIN LAGE-EINGABEFELD, von Hand gegengelesen."
+  ],
+  "stufe": "B",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2025-10-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://public.tableau.com/views/2026_sw_efh_hmhhi/dash",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": null,
+  "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Ein- und Zweifamilienhäuser, Kalkulator 2026_sw_efh_hmhhi"
  },
  {
   "land_code": "NI",
@@ -1050,6 +1416,164 @@
   "verwendung": "produkt",
   "auflagen": null,
   "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Ein- und Zweifamilienhäuser, Kalkulator 2026_sw_efh_sulvernistni"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03257",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Schaumburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Schaumburg",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    125000,
+    175000,
+    200000,
+    250000,
+    300000,
+    400000,
+    550000,
+    700000,
+    830000
+   ],
+   "achse_y_feld": "brw",
+   "achse_y_bez": "Bodenrichtwert in €/m²",
+   "achse_y": [
+    17,
+    40,
+    60,
+    80,
+    120,
+    170,
+    230
+   ],
+   "zellen": {
+    "17": [
+     0.95,
+     0.82,
+     0.78,
+     0.7,
+     0.65,
+     0.57,
+     0.49,
+     0.43,
+     0.4
+    ],
+    "40": [
+     1.12,
+     0.97,
+     0.91,
+     0.82,
+     0.76,
+     0.66,
+     0.57,
+     0.5,
+     0.46
+    ],
+    "60": [
+     1.2,
+     1.03,
+     0.97,
+     0.88,
+     0.81,
+     0.7,
+     0.6,
+     0.53,
+     0.49
+    ],
+    "80": [
+     1.26,
+     1.08,
+     1.02,
+     0.92,
+     0.84,
+     0.73,
+     0.63,
+     0.56,
+     0.51
+    ],
+    "120": [
+     1.34,
+     1.15,
+     1.08,
+     0.97,
+     0.89,
+     0.78,
+     0.66,
+     0.59,
+     0.54
+    ],
+    "170": [
+     1.4,
+     1.2,
+     1.13,
+     1.02,
+     0.93,
+     0.81,
+     0.69,
+     0.61,
+     0.56
+    ],
+    "230": [
+     1.46,
+     1.25,
+     1.18,
+     1.06,
+     0.97,
+     0.84,
+     0.72,
+     0.63,
+     0.58
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Standardstufe 2,5",
+   "hinweis": "Alle 63 Zellen sind am NORMOBJEKT abgetastet. GEGENPROBE: das Dashboard weist als Anwendungsbeispiel Bodenrichtwert 80 €/m² und vorläufigen Sachwert 200.000 € mit dem Faktor 1,02 aus; die Zelle [80][200000] trägt genau diese 1,02."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "1.5": 0.8,
+     "2.5": 1.0,
+     "3.5": 1.26
+    },
+    "rundung_stellen": 2,
+    "hinweis": "Drei abgedruckte Stützstellen. Probe: bei der Normstufe 2,5 ist der Koeffizient 1,00. Schaumburg spreizt nach oben am weitesten aller bisher erfassten Gebiete (1,26 bei Stufe 3,5) — in einem Landkreis mit niedrigen Bodenrichtwerten (Median 78 €/m²) wiegt die Ausstattung schwerer."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung.",
+   "nhk": "NHK 2010",
+   "bezugsmassstab": "Brutto-Grundflaeche",
+   "alterswertminderung": "linear"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Kalkulator 2026_sw_efh_hmhhsg (Tableau Public, Profil ogagmd2026), Datenbasis 01.10.2025, veroeffentlicht 02.03.2026, Stichprobe 474 Kauffaelle. 63 Stuetzpunkte des Gitters am Normobjekt abgefragt (Bodenrichtwert 17 bis 230 EUR/qm x vorlaeufiger Sachwert 125.000 bis 830.000 EUR), dazu 3 abgedruckte Stuetzstellen der Standardstufenkurve. GEGENPROBE am Anwendungsbeispiel: Bodenrichtwert 80, vorlaeufiger Sachwert 200.000, Standardstufe 2,5 ergibt 1,02 - die Zelle traegt genau diese Zahl. KEIN LAGE-EINGABEFELD, von Hand gegengelesen."
+  ],
+  "stufe": "B",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2025-10-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://public.tableau.com/views/2026_sw_efh_hmhhsg/dash",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": null,
+  "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Ein- und Zweifamilienhäuser, Kalkulator 2026_sw_efh_hmhhsg"
  },
  {
   "land_code": "NI",

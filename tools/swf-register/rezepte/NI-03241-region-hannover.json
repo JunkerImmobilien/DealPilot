@@ -1,0 +1,100 @@
+{
+  "land_code": "NI",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Region Hannover",
+  "gaa_kennz": "03241",
+  "ags": ["03241"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2025-10-01",
+  "auswertezeitraum": "11/2022 bis 10/2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-03-02",
+  "quelle_url": "https://public.tableau.com/views/2026_sw_efh_hmhh/dash",
+  "quelle_datei": "Tableau-Kalkulator 2026_sw_efh_hmhh (Grundstücksmarktinformationen Niedersachsen 2026)",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Ein- und Zweifamilienhäuser, Kalkulator 2026_sw_efh_hmhh",
+  "stufe": "B",
+
+  "modellansaetze": {
+    "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung.",
+    "nhk": "NHK 2010",
+    "bezugsmassstab": "Brutto-Grundflaeche",
+    "alterswertminderung": "linear"
+  },
+
+  "stichprobe": {
+    "faelle": 1005,
+    "kaufzeitpunkt": "01.11.2022 bis 28.10.2025",
+    "spannen": {
+      "vorlaeufiger_sachwert_eur": [100059, 1026704],
+      "bodenrichtwert_eur_qm": [45, 850],
+      "grundstuecksflaeche_qm": [205, 1500],
+      "wohnflaeche_qm": [49, 305],
+      "modifiziertes_baujahr": [1962, 2022],
+      "rnd_jahre": [19, 77]
+    }
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehendes Ein- und Zweifamilienhaus",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [100000, 200000, 300000, 400000, 450000, 550000, 700000, 850000, 1000000],
+        "achse_y_feld": "brw",
+        "achse_y_bez": "Bodenrichtwert in €/m²",
+        "achse_y": [45, 100, 200, 300, 400, 500, 650, 850],
+        "zellen": {
+          "45":  [1.24, 0.97, 0.81, 0.70, 0.66, 0.58, 0.50, 0.43, 0.38],
+          "100": [1.35, 1.06, 0.90, 0.78, 0.73, 0.66, 0.57, 0.50, 0.44],
+          "200": [1.51, 1.20, 1.02, 0.90, 0.85, 0.77, 0.67, 0.59, 0.53],
+          "300": [1.61, 1.29, 1.11, 0.98, 0.93, 0.84, 0.74, 0.66, 0.59],
+          "400": [1.67, 1.35, 1.16, 1.03, 0.97, 0.88, 0.78, 0.70, 0.63],
+          "500": [1.70, 1.37, 1.18, 1.05, 1.00, 0.91, 0.80, 0.72, 0.65],
+          "650": [1.73, 1.40, 1.21, 1.07, 1.02, 0.93, 0.82, 0.74, 0.67],
+          "850": [1.81, 1.47, 1.28, 1.14, 1.08, 0.99, 0.88, 0.79, 0.72]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "normobjekt": "Standardstufe 2,5 · Restnutzungsdauer 40 Jahre",
+        "hinweis": "Alle 72 Zellen sind am NORMOBJEKT abgetastet. GEGENPROBE: das Dashboard weist als Anwendungsbeispiel Bodenrichtwert 500 €/m² und vorläufigen Sachwert 450.000 € mit dem Faktor 1,00 aus; die Zelle [500][450000] trägt genau diese 1,00. Beide Normwerte sind absichtlich Gitterachsen — eine nur interpolierte Gegenprobe wäre kein Beweis. Mit 1.005 Kauffällen ist dies die grösste bisher erfasste Stichprobe Niedersachsens."
+      },
+
+      "korrekturen": [
+        {
+          "bez": "Abweichende Standardstufe",
+          "feld": "standardstufe",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": { "1.5": 0.88, "2.5": 1.00, "3.5": 1.13, "4.5": 1.26 },
+          "rundung_stellen": 2,
+          "hinweis": "Vier abgedruckte Stützstellen im Abstand von einer ganzen Stufe — gröber als bei den Braunschweiger Gebieten, die halbe Stufen abdrucken. Probe: bei der Normstufe 2,5 ist der Koeffizient 1,00."
+        },
+        {
+          "bez": "Abweichende Restnutzungsdauer",
+          "feld": "rnd_jahre",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "20": 0.83, "25": 0.89, "30": 0.94, "35": 0.97, "40": 1.00,
+            "45": 1.02, "50": 1.04, "55": 1.06, "60": 1.08, "65": 1.09,
+            "70": 1.10, "75": 1.11
+          },
+          "rundung_stellen": 2,
+          "hinweis": "Zwölf abgedruckte Stützstellen in Fünfjahresschritten — die dichteste Kurve aller bisher erfassten Gebiete, und damit die einzige, bei der die Krümmung kaum ins Gewicht fällt. Probe: bei der Norm-Restnutzungsdauer 40 Jahre ist der Koeffizient 1,00. Die Kurve flacht nach oben stark ab: von 20 auf 40 Jahre sind es 17 Prozentpunkte, von 55 auf 75 nur noch 5."
+        }
+      ],
+
+      "beleg": "Kalkulator 2026_sw_efh_hmhh (Tableau Public, Profil ogagmd2026), Datenbasis 01.10.2025, veroeffentlicht 02.03.2026, Stichprobe 1.005 Kauffaelle. 72 Stuetzpunkte des Gitters am Normobjekt abgefragt (Bodenrichtwert 45 bis 850 EUR/qm x vorlaeufiger Sachwert 100.000 bis 1.000.000 EUR), dazu 16 abgedruckte Stuetzstellen der beiden Umrechnungskurven. GEGENPROBE am Anwendungsbeispiel: Bodenrichtwert 500, vorlaeufiger Sachwert 450.000, Standardstufe 2,5, Restnutzungsdauer 40 ergibt 1,00 - die Zelle traegt genau diese Zahl. KEIN LAGE-EINGABEFELD: die Maske fuehrt nur Sachwert, Bodenrichtwert, Standardstufe und Restnutzungsdauer, von Hand gegengelesen.",
+
+      "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung). NUR BAUJAHRE AB 1950 — das Dashboard führt diese Beschränkung ausdrücklich im Titel; für ältere Gebäude gilt dieser Satz nicht. ABWEICHENDER STICHTAG: 01.10.2025, nicht 01.01.2026 wie bei den Braunschweiger Gebieten. WO DIE QUELLE ENDET, ENDET DIE RECHNUNG: das Gitter deckt 100.000 bis 1.000.000 € und 45 bis 850 €/m² ab — das ist der Bereich der Stichprobe.",
+      "stufe": "B",
+      "stufe_begruendung": "Stufe B statt A: die Gitterwerte sind am amtlichen Kalkulator abgetastet, die Stützstellen von uns gewählt. Die beiden Korrekturkurven sind vom Ausschuss abgedruckt und damit Stufe A."
+    }
+  ]
+}
