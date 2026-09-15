@@ -142,6 +142,161 @@ den ersten gebaut.
 ---
 
 
+### S · STEUERTHEMATIK — Prüfung, Belege, DATEV **[NEU 15.09.2026]**
+
+Marcels Auftrag: OCR für Belege im Tab Steuern, DATEV-Import und -Export,
+Rechenwege prüfen, Trennung privat/Gesellschaft gegenprüfen.
+
+---
+
+#### S1 · Die Prüfung — bestanden, mit EINEM Befund
+
+**Gefahren am 15.09.2026 im Container, mit dem echten `tax.js` und dem echten
+`dashboard.js`** (kein Nachbau): 8 Objekte, 4 Halter, 3 Steuerregime, zvE
+90.000 €.
+
+| Topf | Regime | Objekte | Summe | Gegenprobe |
+|---|---|---:|---:|---|
+| Privat | ESt § 32a | 3 (ETW/EFH/MFH) | 24.592 € | = echte Portfoliowirkung |
+| Junker GbR | ESt, transparent | 2 | 4.620 € | = echte Portfoliowirkung |
+| GmbH | KSt 29,83 % | 2 | −4.474 € | auf +15.000 € Gewinn |
+| UG | KSt 29,83 % | 1 | 0 € | Verlust → **keine Erstattung** |
+
+**Alle Prüfungen bestanden:** vier getrennte Töpfe, kein Objekt im falschen,
+Basis nie negativ, Kapitalgesellschaften ohne Wirkung je Objekt, Sortierung
+nach Kaufdatum, Summe je ESt-Topf cent-genau gleich der echten
+Portfoliowirkung.
+
+**Die Trennung ist durchgängig gebaut** — an fünf Stellen gegengelesen:
+
+| Stelle | Trennung |
+|---|---|
+| Tab Steuern | Halter-Regime, KSt statt ESt (v805) |
+| Bestandssaldierung | nach Halter (v1400) |
+| Cockpit Abschnitt 05 | ein Topf je Halter (v1400) |
+| Steuer-Mappe | `_steuerRegime()`, Anlage V nur für privat |
+| Jahresabschluss | eigener Abschnitt 09, nur GmbH/UG |
+
+> Marcels Frage „bei dem einen Jahresabschluss machen, bei dem anderen nicht" —
+> **ja.** Abschnitt 08 ist Anlage V (§ 21 EStG, Privatvermögen), Abschnitt 09
+> Bilanz und GuV (§ 8 Abs. 2 KStG, Kapitalgesellschaft). Zwei Dokumente für
+> zwei Steuerarten, nicht zwei Fassungen desselben.
+
+---
+
+#### S2 · **BEFUND: Die GbR bekommt einen eigenen Topf — das ist zu viel**
+
+**Gemessen: 9,6 % zu hohe Entlastung**, sobald GbR-Objekte neben privaten
+stehen.
+
+Eine **GbR ist transparent** — ihre Einkünfte fließen beim Gesellschafter in
+**dasselbe** zu versteuernde Einkommen wie die privaten. Die App weiß das
+sogar und schreibt es im Mandanten-Panel hin: *„Personengesellschaft ·
+transparent (ESt der Gesellschafter)"*. Gerechnet wird trotzdem in **zwei**
+Töpfen, jeder gegen das **volle** zvE.
+
+| | |
+|---|---:|
+| Privat (3 Objekte) | 24.592 € |
+| GbR (2 Objekte) | 4.620 € |
+| **zusammen** | **29.212 €** |
+| ein Topf, transparent gerechnet | **26.664 €** |
+| **Differenz** | **2.548 € = 9,6 % zu hoch** |
+
+**Das ist dieselbe Fehlerklasse wie v1397 — nur eine Ebene höher:** dort
+rechneten die *Objekte* jeder von vorn, hier die *Halter*.
+
+##### Warum das nicht einfach zusammengelegt wird
+
+**Es fehlt die Beteiligungsquote.** Das Datenmodell kennt vier Rechtsformen
+(`privat`, `gmbh`, `ug`, `gbr`) und **keinen Anteil**. Bei einer GbR mit
+Partnern zählt aber nur der eigene Anteil am Ergebnis — eine Zusammenlegung
+mit 100 % wäre dann genauso falsch wie die heutige Trennung, nur in die andere
+Richtung.
+
+**Empfehlung (Marcels Entscheidung, Bewertungsfrage):**
+1. Feld **Beteiligungsquote** je Mandant der Rechtsform `gbr`, Vorgabe 100 %.
+2. Transparente Halter (GbR, später Einzelunternehmen) **mit dem privaten Topf
+   zusammenführen**, das Ergebnis je Objekt mit der Quote gewichtet.
+3. Kapitalgesellschaften bleiben getrennt — dort ist die Trennung richtig.
+
+Solange das offen ist: **die heutige Rechnung ist konservativ falsch** — sie
+weist zu viel Entlastung aus, wie jeder Fehler dieser Klasse.
+
+---
+
+#### S3 · Belege lesen im Tab Steuern — die Mechanik steht schon
+
+**Nicht neu bauen, erweitern.** `beleg-import.js` (v1008) kann bereits alles:
+
+- Ordner oder Einzeldateien wählen
+- **PDF → JPEG** über pdf.js (bis 30 Seiten je PDF)
+- Fotos direkt
+- Vision-Batch an `POST /api/v1/ai/extract-beleg` (bis 40 Belege je Lauf)
+- **Review-Liste, in der der Nutzer JEDE Zeile bestätigt** — richtig so, es ist
+  Steuer
+- Übernahme in die Zielfelder, CSV-Auswertung
+
+**Was fehlt: das Ziel.** Die `FIELD_MAP` zeigt ausschließlich auf die
+**BMF-Anschaffungskosten** (`ak_notar`, `ak_makler`, `ak_grest`, `bmf_hk` …),
+und der einzige Einstieg ist der Knopf „📎 Belege scannen (KI)" **im
+BMF-Modal**.
+
+Der Tab Steuern führt dagegen die **laufenden Werbungskosten** als
+Anlage-V-Felder mit Jahres-Overrides (`_taxYearlyOverrides`):
+
+```
+schuldzinsen · kontofuehrung · bereitstellung · notar_grundschuld
+vermittlung · finanz_sonst · nk_umlf · nk_n_umlf · betr_sonst
+hausverwaltung · steuerber · porto · verw_sonst · fahrtkosten
+verpflegung · hotel · inserat · gericht · telefon · sonst_kosten
+afa · sonst_bewegl_wg
+```
+
+**Zu bauen:**
+1. Zweiter Modus im Beleg-Import: **„laufende Werbungskosten"** statt
+   Anschaffungskosten, mit eigener Kategorienliste und `FIELD_MAP` auf die
+   Anlage-V-Felder.
+2. **Das Jahr** gehört dazu: ein Beleg trägt ein Datum, und die Übernahme muss
+   in `_taxYearlyOverrides[jahr]` landen, nicht in ein jahrloses Feld.
+3. Einstiegsknopf im Tab Steuern und im Detailmodus.
+4. Abgrenzung im Prompt: **Anschaffungsnaher Aufwand** (§ 6 Abs. 1 Nr. 1a
+   EStG, 15-%-Grenze in drei Jahren) ist keine Werbungskost, sondern
+   Herstellungskost. Die Ampel dafür gibt es in `beleg-import.js` bereits.
+
+---
+
+#### S4 · DATEV — vorbereitet, nicht gebaut
+
+Der **Kontenrahmen** wird je Mandant erfasst (`SKR04`/`SKR03`), und der
+Hinweistext sagt es selbst: *„… später Basis für GuV-/Bilanz- und
+DATEV-Export."* Mehr gibt es nicht.
+
+**Was ein DATEV-Export wirklich verlangt** (Umfang ehrlich benannt, bevor
+jemand „ein CSV" sagt):
+
+| | |
+|---|---|
+| Format | DATEV-Format (CSV, Semikolon, **Windows-1252**), Kopfzeile mit Berater-, Mandanten- und Beraternummer, Wirtschaftsjahresbeginn, Sachkontenlänge |
+| Inhalt | **Buchungsstapel** (EXTF): Umsatz, Soll/Haben-Kennzeichen, Konto, Gegenkonto, BU-Schlüssel, Belegdatum, Belegfeld, Buchungstext |
+| Kontierung | jede Position braucht ein **Sachkonto** — SKR04 und SKR03 sind verschieden nummeriert, und die Zuordnung ist fachlich, nicht technisch |
+| Steuerart | für eine **GmbH** sinnvoll (doppelte Buchführung). Für **Privatvermögen** gibt es keinen Buchungsstapel — dort ist die **Anlage V** das richtige Ziel, und die ist gebaut |
+
+> **Damit beantwortet sich Marcels Frage nach der Trennung von selbst:**
+> DATEV ist ein Thema der **Gesellschaften**, nicht des Privatvermögens. Ein
+> DATEV-Export „für alle Objekte" wäre fachlich schief — die privaten gehören
+> in die Anlage V, die der GmbH in den Buchungsstapel.
+
+**Der Import** ist der schwierigere Teil: ein fremder Buchungsstapel müsste auf
+unsere Felder **zurück**gemappt werden, und dafür braucht es dieselbe
+Kontenzuordnung in umgekehrter Richtung. Realistisch ist als erster Schritt
+ein **Export** für Kapitalgesellschaften, aufbauend auf `gesellschaft-abschluss.js`
+(dort liegen GuV und Bilanz bereits in HGB-Gliederung).
+
+**Vorschlag zur Reihenfolge:** S2 (Befund, klein) → S3 (Belege, mittel) →
+S4-Export (groß) → S4-Import (größer, erst wenn der Export im Einsatz steht).
+
+
 ### D · SPRECHLAUF — Modelle und Kosten **[NEU 14.09.2026, gemessen]**
 
 Marcels Fragen: welche Modelle laufen, wohin geht es, was kommt zurück, wären
