@@ -1,152 +1,154 @@
 # Niedersachsen — Arbeitsliste der Sachwertfaktor-Workbooks
 
-**Stand 15.09.2026.** Diese Datei ist eine **Arbeitsliste**, keine Chronik: sie
-wächst mit jeder Sitzung, bis alle Gebiete erfasst sind. Danach ist die Ernte
-reine Messarbeit.
+**Stand 15.09.2026, nachmittags.** Diese Datei ist eine **Arbeitsliste**, keine
+Chronik: sie wächst mit jeder Sitzung, bis alle Gebiete erfasst sind.
 
 ---
 
-## Das Namensmuster
+## ERLEDIGT: die Gebietsliste ist vollständig — 81 Datensätze, ohne einen Klick
+
+> **Hier stand: „Sieben Gebiete, neun Workbooks. Was fehlt, ist die Liste der
+> Dashboard-Kürzel."** Das war der Blocker des ganzen Landes, und er hing an
+> der Annahme, die Kürzel seien nur über die Navigationskarte im Browser zu
+> bekommen — vier bis fünf Klicks, dann friert der Renderer ein.
+>
+> **Die Annahme war falsch.** Tableau Public hat eine Profilsuche, und sie
+> liefert alle Workbooks eines Autors auf einmal:
+>
+> ```
+> GET /public/apis/bff/v2/search/query-workbooks
+>     ?count=100&query=2026_sw&start=<n>&type=vizzes
+> ```
+>
+> **Der Endpunkt ist GELESEN, nicht geraten.** Fünf geratene Namen hatten
+> vorher fünf 404 ergeben — und ein 404 auf einen geratenen Namen ist kein
+> Befund, er sagt nur, dass man den Namen nicht kennt. Also die Profilseite
+> geholt, ihr Bundle `assets/search-*.js` gelesen und dort sowohl den Pfad
+> als auch die Parameterreihenfolge abgeschrieben.
+
+**Ergebnis: 86 Workbooks, davon 81 mit Daten** (fünf sind Navigationskarten).
+Stabil über fünf verschiedene Suchbegriffe — die Liste ist vollständig.
+
+| Teilmarkt | Kürzel | Gebiete |
+|---|---|---:|
+| Ein- und Zweifamilienhäuser | `efh` | 42 |
+| Reihenhäuser und Doppelhaushälften | `rh` | 35 |
+| **Bauernhäuser und Resthofstellen** | **`hof`** | 3 |
+| beide zusammen in einem Workbook | `efhrh` | 1 |
+
+> **Das Kürzel `hof` war eine der beiden offenen Fragen** und ist damit
+> beantwortet — nicht erraten (zehn Versuche wie `bh`, `brh`, `rhf` waren
+> vorher erfolglos), sondern in der Liste vorgefunden. Für **Wochenendhäuser**
+> gibt es eine Navigationskarte (`2026_sw_navi_WEH`), aber **kein einziges
+> Daten-Workbook** — der Teilmarkt wird 2026 offenbar nicht geführt.
+
+Die Liste liegt als `tools/swf-register/ni-workbooks.txt` im Repo.
+
+---
+
+## ERLEDIGT: die Landesseite wird gar nicht mehr gebraucht
+
+`ni-kalkulator-abtasten.sh` rief bisher zuerst `gag.niedersachsen.de` auf —
+**einzig, um den View-Namen zu erfahren**, der je Region mal `Dash` und mal
+`dash` heißt. Genau den nennt aber die Workbook-API selbst als
+`defaultViewName`. Damit fällt der Abruf bei der Landesseite weg, die nach
+rund zwanzig Abrufen für Minuten mit 503 drosselt.
 
 ```
-https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/
-  Sachwertfaktor/<teilmarktseite>/<workbook>
-
-workbook = 2026_sw_<teilmarkt>_<gag><region>
+1. GET public.tableau.com/profile/api/workbook/<wb>   -> defaultViewName
+2. GET public.tableau.com/views/<wb>/<view>.pdf       -> der Kopf
 ```
 
-**Die Kürzel sind Kfz-Kennzeichen** — und zwar **zwei hintereinander**: erst
-der Gutachterausschuss, dann die Region innerhalb seines Bereichs.
-
-| Workbook | GAG | Region |
-|---|---|---|
-| `…_bsbs` | **BS** Braunschweig | **BS** Braunschweig |
-| `…_bswf` | **BS** Braunschweig | **WF** Wolfenbüttel |
-| `…_nomnom` | **NOM** Northeim | **NOM** Northeim |
-| `…_lgdan` | **LG** Lüneburg | **DAN** Lüchow-Dannenberg |
-
-> ### Zwei Rücknahmen, beide aus dieser Sitzung
->
-> **① „`bswf` ist der Landkreis Wolfenbüttel"** — so stand es seit dem 13.09.
-> in der Erntekarte. Genauer ist: **GAG Braunschweig, Region Wolfenbüttel.**
-> Der Ausschuss ist Braunschweig, Wolfenbüttel nur eine seiner Regionen.
->
-> **② „`2026_sw_efh_bswf` gibt es nicht, also führt Braunschweig kein EFH"** —
-> die erste Hälfte stimmt, die Schlussfolgerung war falsch. Es gibt
-> **`2026_sw_efh_bsbs`**: Braunschweig führt Ein- und Zweifamilienhäuser sehr
-> wohl, nur für die Region Braunschweig statt Wolfenbüttel. Aus einer
-> fehlenden URL auf ein fehlendes Angebot zu schließen, war zu schnell.
+**Die Ernte läuft damit vollständig ohne Browser.**
 
 ---
 
-## Gefunden und an der Workbook-API bestätigt
+## Die Kopfdaten aller 81 Gebiete
 
-| Workbook | GAG + Region | aktualisiert | Aufrufe | Stand |
-|---|---|---|---:|---|
-| `2026_sw_rh_bswf` | BS · Wolfenbüttel | 19.02.2026 | 231 | **geerntet** (13.09., Stufe B) |
-| `2026_sw_efh_bsbs` | BS · Braunschweig | 19.02.2026 | 674 | offen |
-| `2026_sw_rh_bsbs` | BS · Braunschweig | 19.02.2026 | 219 | offen |
-| `2026_sw_efh_osmep_osmepnoh` | OS+MEP · OS+MEP+NOH | 20.03.2026 | 799 | offen |
-| `2026_sw_efh_hmhhsg` | HM… · … | 10.02.2026 | 725 | offen |
-| `2026_sw_efh_sulverniostni` | … · … | 12.05.2026 | 411 | offen |
-| `2026_sw_efh_nomnom` | NOM · Northeim | 24.03.2026 | 446 | offen |
-| `2026_sw_rh_nomnom` | NOM · Northeim | 07.04.2026 | 135 | offen |
-| `2026_sw_efh_lgdan` | LG · Lüchow-Dannenberg | 05.02.2026 | 264 | offen |
-
-**Sieben Gebiete, neun Workbooks.** Die Auflösung der längeren Kürzel
-(`hmhhsg`, `sulverniostni`) steht noch aus — sie ergibt sich aus dem Titelblatt
-des jeweiligen Dashboards (`<pfx>_titel`).
-
----
-
-## Der Hebel: Teilmärkte sind ableitbar
-
-**Ein Klick liefert das Gebiet, die API die übrigen Teilmärkte.** Geprüft an
-zwei Gebieten: zu jedem gefundenen `efh_<gebiet>` existiert auch
-`rh_<gebiet>` — ohne einen zweiten Klick.
-
-Am Gebiet `bsbs` durchprobiert, welche Teilmarkt-Kürzel es gibt:
+`tools/swf-register/ni-kopfdaten.sh` → `ni-kopfdaten.csv`. Ein Lauf, zwei
+Abrufe je Gebiet, rund vier Minuten.
 
 | | |
-|---|---|
-| vorhanden | `efh` · `rh` |
-| **nicht** vorhanden | `dhh` · `reh` · `mfh` · `whs` · `wh` · `zfh` · `etw` |
+|---|---:|
+| Gebiete | **81** |
+| mit Klarname des Ausschusses | 80 |
+| mit Stichprobengröße | **81** |
+| mit Normobjekt-Faktor | 76 |
+| mit Standardabweichung | 78 |
+| Kauffälle insgesamt | **44.593** |
+| Normfaktoren | 0,72 bis 2,25 · **Median 0,99** |
 
-### Die vier Teilmärkte — aus dem Dropdown gelesen
-
-| Teilmarkt | Kürzel |
-|---|---|
-| Ein- und Zweifamilienhäuser | `efh` |
-| Reihenhäuser und Doppelhaushälften | `rh` |
-| **Bauernhäuser und Resthofstellen** | **offen** |
-| **Wochenendhäuser** | **offen** |
-
-Die Namen stammen aus der Parametersteuerung der Navigationsseite — sie liegt
-als DOM-Element vor (`.tabComboBox`), nicht im Canvas, und lässt sich per
-JavaScript öffnen und auslesen.
-
-**Die beiden fehlenden Kürzel sind nicht erraten worden** — an zwei Gebieten
-durchprobiert (`bh`, `brh`, `bauh`, `rhf`, `bhrh`, `weh`, `woh`, `wehs`,
-`bhr`, `wo`), kein Treffer. Sie ergeben sich aus der Ziel-URL, sobald im
-Dropdown ein anderer Teilmarkt gewählt und dann auf die Karte geklickt wird.
-
-> **Warum das offen blieb:** Das Dropdown schließt sich zwischen zwei
-> Werkzeugaufrufen wieder; Öffnen und Auswählen müssen in *einem* Schritt
-> passieren. Drei Anläufe, dann abgebrochen — die Regel gilt auch hier.
-
-### Eine Messfalle, die Zeit gekostet hat
-
-Das Kombifeld liegt bei **(763, 194)** in CSS-Pixeln — geklickt hatte ich nach
-Screenshot-Koordinaten bei (748, 166). **Screenshot-Pixel sind nicht
-CSS-Pixel**, und der Versatz ist nicht einmal ein einheitlicher Faktor. Wer
-ein Tableau-Bedienelement treffen will, liest seine Lage vorher per
-`getBoundingClientRect()` aus, statt sie aus dem Bild zu schätzen.
+**Die fünf offenen Faktoren sind bewusst offen.** Sie stehen in Dashboards,
+deren Layout der Ausleser nicht eindeutig lesen kann, und werden beim
+Rezeptbau von Hand am PDF abgelesen — einmal je Ausschuss, was ohnehin nötig
+ist, weil das Normobjekt der Prüfmaßstab ist.
 
 ---
 
-## Das Verfahren zum Weitersammeln
+## Drei Fallen, die dieser Lauf aufgedeckt hat
 
-1. Navigationskarte öffnen:
-   `public.tableau.com/views/2026_sw_navi_EFH/Story?Typ=EFH&:showVizHome=no&:embed=true&:language=de-DE`
-2. **Neun Sekunden warten**, bis die Karte steht.
-3. Auf eine Region klicken → es öffnet sich **ein** Zieltab, dessen URL das
-   Workbook nennt. **Tableau verwendet denselben Zieltab wieder** — mehrere
-   Klicks in einem Rutsch liefern deshalb nur das letzte Ergebnis. **Ein Klick
-   je Aufruf**, dann die URL im Tab-Kontext ablesen.
-4. **Nach etwa vier bis fünf Klicks friert der Renderer ein**
-   (`Page.captureScreenshot` läuft in den Timeout). Dann die Karte neu laden
-   und weitermachen. Das ist derselbe Befund wie bei den Messreihen — er gilt
-   auch fürs Navigieren.
-5. Jedes gefundene Gebiet gegen die API prüfen und gleich die anderen
-   Teilmärkte mitnehmen.
+### ① Ein Workbook rechnet auf Englisch
 
-### Prüfen, ohne zu rendern
+**Landkreis Uelzen** liefert `1/1/2026`, `170,000` und `± 0.29` — Punkt und
+Komma vertauscht. **`:language=de-DE` in der URL ändert daran nichts**, das
+Format steckt im Workbook.
 
-```
-GET https://public.tableau.com/profile/api/workbook/<workbook>
-→ lastUpdateDate · viewCount · viewInfos[]
-```
+> Unbemerkt hätte der Gitterlauf dort entweder nichts gefunden oder `170,000`
+> als 170,00 gelesen — eine Zahl, die niemand nachrechnet, weil sie plausibel
+> aussieht. Erkannt wird es jetzt am **Stichtag**: `1/1/2026` gegen
+> `01.01.2026`. Der Tausendertrenner taugt als Merkmal nicht — Uelzen hat 657
+> Kauffälle und damit gar keinen.
 
-Antwortet die API nicht, gibt es das Workbook nicht. **Vor jeder Nachernte
-`lastUpdateDate` gegen das `berichtsjahr` des Registersatzes halten** — ein
-HTTP-Aufruf spart eine ganze Messsitzung.
+**Genau eines von 81.** Beim nächsten Jahrgang neu prüfen, nicht annehmen.
 
-### Die Blattstruktur eines Ziel-Workbooks
+### ② Ligaturen fehlen im Textstrom
 
-```
-<pfx>_titel · <pfx>_berech · <pfx>_stanzahl · <pfx>_stübersicht
-<pfx>_diavortext · <pfx>_dia_brw · <pfx>_dia_bgwf · <pfx>_dia_stst
-<pfx>_tab · <pfx>_tooltipp
-```
+`ft` `tf` `fh` `ti` `tt` haben kein ToUnicode-Mapping; pdftotext setzt ein
+**Leerzeichen**, in jedem Modus gleich. „Landkreis Gi orn" ist Gifhorn,
+„Os riesland" ist Ostfriesland, „Sachwer aktor" ist der Sachwertfaktor.
 
-`_titel` trägt den Klarnamen des Ausschusses, `_berech` ist der Kalkulator,
-`_dia_brw` / `_dia_bgwf` / `_dia_stst` sind die drei Stützpunkt-Diagramme
-(Bodenrichtwert, Bodenwertanteil, Standardstufe). Der Präfix trägt eine
-laufende Regionsnummer (`ni2_`), die sich **nicht** aus dem Workbook-Namen
-ableiten lässt.
+Die Namen werden deshalb **roh** ausgegeben und beim Rezeptbau gegen die
+amtliche Kreisliste aufgelöst. Die Lücke zu raten wäre genau die Sorte Zahl,
+die wir nicht erfinden.
+
+### ③ Der Wert steht nicht dort, wo seine Beschriftung steht
+
+Das war die teuerste Erkenntnis, und sie hat **drei Anläufe** gekostet:
+
+| Gebiet | was der Ausleser las | was dort steht |
+|---|---|---|
+| **Stadt Nienburg** | 1,30 | **0,87** — acht Zeilen unter der Beschriftung |
+| **Stadt Osnabrück** | 0,21 | **kein Wert** — 0,21 war die Standardabweichung der Folgezeile |
+| **Landkreis Northeim** | Stichprobe 1 | **1.737** — der Tausenderpunkt |
+
+> **81 Dashboards haben nicht ein Layout, sondern viele.** Nach der dritten
+> Layoutregel habe ich aufgehört, eine vierte zu bauen, und stattdessen eine
+> Eigenschaft der Sache selbst geprüft: **ein Sachwertfaktor und seine
+> Standardabweichung sind zwei verschiedene Größen.** Stimmen sie auf zwei
+> Nachkommastellen überein, ist es derselbe Fund zweimal gelesen — dann
+> bleibt das Feld offen. Das fängt auch Layouts, die ich nie gesehen habe.
+>
+> **Die Regel dahinter ist die Erntedoktrin selbst:** wo die Quelle nicht
+> eindeutig ist, gibt es keinen Wert. Fünf offene Felder sind kein Mangel
+> dieses Laufs — eine still falsche Zahl wäre einer.
 
 ---
 
+## Was als Nächstes ansteht
+
+1. **Die Kürzel gegen die amtliche Kreisliste auflösen** — die Präfixe sind
+   Kfz-Kennzeichen in zwei Lagen (GAG, dann Region): `bs*` Braunschweig,
+   `lg*` Lüneburg, `nom*`/`nomak*` Northeim, `olclp*` Oldenburg-Cloppenburg,
+   `osmep*` Osnabrück-Meppen, `ott_*` Otterndorf, `sulver*` Sulingen-Verden,
+   `aur*` Aurich, `hmhh*` Hameln-Holzminden. Rund **neun Ausschüsse**.
+2. **Je Ausschuss eine Messsitzung** mit `ni-kalkulator-abtasten.sh` — das
+   Gitter kostet rund vierzig Abrufe, der Kopf nur zwei. Die Trennung ist
+   Absicht.
+3. **Die fünf offenen Normfaktoren** beim Rezeptbau am PDF ablesen.
+4. Lizenz `dl-de/by-2-0`: kommerzielle Verwertung erlaubt, **Namensnennung
+   Pflicht** — sie steht seit v1402 im Bericht.
+
+---
 ## Was beim Messen gilt (aus der Wolfenbüttel-Ernte)
 
 - Frische URL mit `?Brw=…&Sach=…`, **sieben Sekunden warten**, dann den

@@ -1,0 +1,82 @@
+workbook;ausschuss;stichtag;stichprobe;norm_faktor;norm_stdabw;teilmarkt;format
+2026_sw_efh_aurbork;- Borkum -;01.01.2026;79;1.48;0.25;efh;de
+2026_sw_efh_aurfest;- Friesland und Os riesland -;01.01.2026;5815;0.99;0.12;efh;de
+2026_sw_efh_bsbs;Stadt Braunschweig;01.01.2026;304;1.25;0.12;efh;de
+2026_sw_efh_bsce;Landkreis Celle;?;415;0.97;0.20;efh;de
+2026_sw_efh_bsgf;Landkreis Gi orn;?;854;0.89;0.17;efh;de
+2026_sw_efh_bshe;Landkreis Helmstedt;01.01.2026;262;0.96;0.19;efh;de
+2026_sw_efh_bspe;Landkreis Peine;01.01.2026;557;1.14;0.19;efh;de
+2026_sw_efh_bssz;Stadt Salzgi er;01.01.2026;287;1.00;0.19;efh;de
+2026_sw_efh_bswfmorte;Stadt Wolfenbü el mit Ortslagen Cremlingen, Hötzum, Sickte und Weddel;01.01.2026;199;0.99;0.13;efh;de
+2026_sw_efh_bswfrest;Übriger Landkreis Wolfenbü el;?;294;1.04;0.16;efh;de
+2026_sw_efh_bswob;Stadt Wolfsburg;01.01.2026;245;0.92;0.11;efh;de
+2026_sw_efh_hmhh;- Reg. Hannover -;?;1005;1.00;0.15;efh;de
+2026_sw_efh_hmhhi;- Landkreis Hildesheim -;01.10.2025;370;0.73;0.17;efh;de
+2026_sw_efh_hmhhm;- Landkreis Hameln-Pyrmont -;01.10.2025;387;1.21;0.18;efh;de
+2026_sw_efh_hmhhsg;- Landkreis Schaumburg -;01.10.2025;474;1.02;0.16;efh;de
+2026_sw_efh_lgdan;Landkreis Lüchow-Dannenberg;01.01.2026;390;1.36;0.33;efh;de
+2026_sw_efh_lglg;?;?;736;1.58;0.20;efh;de
+2026_sw_efh_lgue;Landkreis Uelzen;1/1/2026;657;1.45;0.29;efh;en
+2026_sw_efh_lgwl;Landkreis Harburg;01.01.2026;1001;1.55;0.18;efh;de
+2026_sw_efh_nomakgoemorte;- Gö ngen u. Orte: Bovenden, Eddigehausen, Rosdorf -;01.07.2025;426;1.51;0.19;efh;de
+2026_sw_efh_nomakgoeoorte;- Altkreis Gö ngen ohne Orte: Bovenden, Eddigehausen, Rosdorf -;01.07.2025;908;1.03;0.21;efh;de
+2026_sw_efh_nomakoha;- Altkreis Osterode am Harz -;01.07.2025;1737;0.87;0.18;efh;de
+2026_sw_efh_nomgs;- Landkreis Goslar -;01.07.2025;1737;1.03;0.18;efh;de
+2026_sw_efh_nomhol;- Landkreis Holzminden -;01.07.2025;1737;0.72;0.18;efh;de
+2026_sw_efh_nomnom;- Landkreis Northeim -;01.07.2025;1737;1.03;0.18;efh;de
+2026_sw_efh_olclpclpvec;- Landkreise Cloppenburg und Vechta -;?;385;0.86;0.12;efh;de
+2026_sw_efh_olclpdelollabra;- Stadt Delmenhorst und Lk Oldenburg und Wesermarsch -;01.01.2026;687;?;0.17;efh;de
+2026_sw_efh_olclpolstwst;- Stadt Oldenburg und Westerstede -;01.01.2026;526;0.93;?;efh;de
+2026_sw_efh_osmep_osmepel;Landkreis Emsland;?;741;0.87;0.12;efh;de
+2026_sw_efh_osmep_osmepnoh;Grafscha Bentheim;?;788;0.98;0.14;efh;de
+2026_sw_efh_osmep_osmeposla;Landkreis Osnabrück;?;958;0.82;0.13;efh;de
+2026_sw_efh_osmep_osmeposst;Stadt Osnabrück;01.01.2026;235;1.10;0.33;efh;de
+2026_sw_efh_ott_cux;Landkreis Cuxhaven;?;942;0.94;0.13;efh;de
+2026_sw_efh_ott_ohz;- Landkreis Osterholz -;?;345;0.97;0.11;efh;de
+2026_sw_efh_ott_row;- Landkreis Rotenburg (Wümme) -;01.01.2026;456;1.01;0.17;efh;de
+2026_sw_efh_ott_std;- Landkreis Stade -;01.01.2026;807;0.95;0.07;efh;de
+2026_sw_efh_sulverdhostsywe;Übriger Landkreis Diepholz;?;663;0.80;0.13;efh;de
+2026_sw_efh_sulverdhstsywe;Stuhr, Syke, Weyhe;?;368;0.83;0.13;efh;de
+2026_sw_efh_sulverhk;Landkreis Heidekreis;01.01.2026;667;0.83;0.13;efh;de
+2026_sw_efh_sulverniostni;Landkreis Nienburg - ohne Stadt Nienburg -;?;574;1.00;0.14;efh;de
+2026_sw_efh_sulvernistni;Stadt Nienburg;?;249;?;?;efh;de
+2026_sw_efh_sulverver;Landkreis Verden;?;549;0.92;0.13;efh;de
+2026_sw_efhrh_hmhhihmshg;- Landkreise Hildesheim, Hameln, Schaumburg -;01.10.2025;333;0.94;0.23;efhrh;de
+2026_sw_hof_aurfest;- Friesland und Os riesland -;?;301;0.93;0.21;hof;de
+2026_sw_hof_osmep_osmeposmep;Grafscha Bentheim, Landkreis Osnabrück und Landkreis Emsland;01.01.2026;140;0.86;0.14;hof;de
+2026_sw_hof_sulverdhhkniver;Landkreise Diepholz, Heidekreis, Nienburg und Verden;?;143;0.79;?;hof;de
+2026_sw_rh_aurfest;- Friesland und Os riesland -;01.01.2026;1148;0.98;0.15;rh;de
+2026_sw_rh_bsbs;Stadt Braunschweig;?;354;1.38;0.15;rh;de
+2026_sw_rh_bsce;Landkreis Celle;?;278;0.91;0.26;rh;de
+2026_sw_rh_bsgf;Landkreis Gi orn;?;227;1.09;0.18;rh;de
+2026_sw_rh_bshe;Landkreis Helmstedt;01.01.2026;133;0.94;0.30;rh;de
+2026_sw_rh_bspe;Landkreis Peine;01.01.2026;233;1.10;0.29;rh;de
+2026_sw_rh_bssz;Stadt Salzgi er;01.01.2026;417;0.97;0.27;rh;de
+2026_sw_rh_bswf;Landkreis Wolfenbü el;?;213;0.90;0.21;rh;de
+2026_sw_rh_bswob;Stadt Wolfsburg;?;126;0.89;0.34;rh;de
+2026_sw_rh_hmhh;- Reg. Hannover -;01.10.2025;994;1.22;0.18;rh;de
+2026_sw_rh_hmhhi;- Landkreis Hildesheim -;01.10.2025;130;1.00;0.22;rh;de
+2026_sw_rh_hmhhm;- Landkreis Hameln-Pyrmont -;?;277;1.12;0.24;rh;de
+2026_sw_rh_hmhshg;- Landkreis Schaumburg -;?;134;1.03;0.20;rh;de
+2026_sw_rh_lglg;Landkreis Lüneburg;01.01.2026;160;2.25;0.27;rh;de
+2026_sw_rh_lguedan;Landkreise Uelzen und Lüchow-Dannenberg;?;224;1.70;0.36;rh;de
+2026_sw_rh_lgwl;Landkreis Harburg;?;435;1.84;0.24;rh;de
+2026_sw_rh_nomakgoemorte;- Gö ngen u. Orte: Bovenden, Eddigehausen, Rosdorf -;01.07.2025;459;1.62;0.26;rh;de
+2026_sw_rh_nomakgoeoorte;- Altkreis Gö ngen ohne Orte: Bovenden, Eddigehausen, Rosdorf -;01.07.2025;603;1.20;0.21;rh;de
+2026_sw_rh_nomakoha;- Altkreis Osterode am Harz -;01.07.2025;603;1.00;0.21;rh;de
+2026_sw_rh_nomgs;- Landkreis Goslar -;01.07.2025;603;1.20;0.21;rh;de
+2026_sw_rh_nomhol;- Landkreis Holzminden -;01.07.2025;603;0.82;0.21;rh;de
+2026_sw_rh_nomnom;- Landkreis Northeim -;01.07.2025;603;1.20;0.21;rh;de
+2026_sw_rh_osmep_osmepel;Landkreis Emsland;?;98;0.93;0.12;rh;de
+2026_sw_rh_osmep_osmepnoh;Grafscha Bentheim;01.01.2026;181;1.04;0.14;rh;de
+2026_sw_rh_osmep_osmeposla;Landkreis Osnabrück;01.01.2026;213;0.96;0.14;rh;de
+2026_sw_rh_osmep_osmeposst;Stadt Osnabrück;01.01.2026;155;?;0.21;rh;de
+2026_sw_rh_ott_cux;- Landkreis Cuxhaven -;01.01.2026;127;?;0.15;rh;de
+2026_sw_rh_ott_ohz;- Landkreis Osterholz -;01.01.2026;130;0.93;0.13;rh;de
+2026_sw_rh_ott_row;- Landkreis Rotenburg (Wümme) -;01.01.2026;92;1.12;0.25;rh;de
+2026_sw_rh_ott_std;- Landkreis Stade -;?;274;1.02;0.11;rh;de
+2026_sw_rh_sulverdhostsywe;Übriger Landkreis Diepholz;?;186;0.98;0.14;rh;de
+2026_sw_rh_sulverdhstsywe;Stuhr, Syke, Weyhe;?;165;1.06;0.17;rh;de
+2026_sw_rh_sulverhk;Landkreis Heidekreis;?;170;?;0.18;rh;de
+2026_sw_rh_sulverni;Landkreis Nienburg;?;149;0.95;0.17;rh;de
+2026_sw_rh_sulverver;Landkreis Verden;?;226;0.99;0.18;rh;de
