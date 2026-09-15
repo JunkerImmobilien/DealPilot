@@ -1,0 +1,96 @@
+{
+  "land_code": "NI",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Gifhorn",
+  "gaa_kennz": "03151",
+  "ags": ["03151"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "11/2022 bis 2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-03-02",
+  "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bsgf/dash",
+  "quelle_datei": "Tableau-Kalkulator 2026_sw_efh_bsgf (Grundstücksmarktinformationen Niedersachsen 2026)",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Ein- und Zweifamilienhäuser, Kalkulator 2026_sw_efh_bsgf",
+  "stufe": "B",
+
+  "modellansaetze": {
+    "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung.",
+    "nhk": "NHK 2010",
+    "bezugsmassstab": "Brutto-Grundflaeche",
+    "alterswertminderung": "linear"
+  },
+
+  "stichprobe": {
+    "faelle": 854,
+    "spannen": {
+      "vorlaeufiger_sachwert_eur": [88426, 943335],
+      "bodenrichtwert_eur_qm": [16, 320],
+      "standardstufe": [1.3, 4.5],
+      "rnd_jahre": [13, 80]
+    }
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehendes Ein- und Zweifamilienhaus",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [100000, 150000, 200000, 250000, 300000, 400000, 500000, 700000, 900000],
+        "achse_y_feld": "brw",
+        "achse_y_bez": "Bodenrichtwert in €/m²",
+        "achse_y": [20, 50, 100, 120, 150, 200, 260, 320],
+        "zellen": {
+          "20":  [1.11, 1.02, 0.94, 0.88, 0.81, 0.71, 0.61, 0.45, 0.30],
+          "50":  [1.13, 1.04, 0.97, 0.90, 0.84, 0.73, 0.63, 0.47, 0.32],
+          "100": [1.17, 1.08, 1.00, 0.94, 0.87, 0.77, 0.67, 0.51, 0.36],
+          "120": [1.19, 1.09, 1.02, 0.95, 0.89, 0.78, 0.69, 0.52, 0.38],
+          "150": [1.21, 1.12, 1.04, 0.97, 0.91, 0.80, 0.71, 0.54, 0.40],
+          "200": [1.25, 1.15, 1.08, 1.01, 0.95, 0.84, 0.75, 0.58, 0.44],
+          "260": [1.29, 1.20, 1.12, 1.05, 0.99, 0.89, 0.79, 0.62, 0.48],
+          "320": [1.33, 1.24, 1.17, 1.10, 1.04, 0.93, 0.83, 0.67, 0.53]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "normobjekt": "Wohnfläche 150 m² · Standardstufe 2,5",
+        "hinweis": "Alle 72 Zellen sind am NORMOBJEKT abgetastet. GEGENPROBE: das Dashboard weist als Anwendungsbeispiel Bodenrichtwert 120 €/m² und vorläufigen Sachwert 300.000 € mit dem Faktor 0,89 aus; die Zelle [120][300000] trägt genau diese 0,89. DIE ZEILE 120 WURDE EIGENS NACHGETASTET: sie lag zunächst zwischen den gewählten Achsen 100 und 150, und eine nur interpolierte Gegenprobe ist kein Beweis — das Anwendungsbeispiel muss auf einer echten Stützstelle liegen."
+      },
+
+      "korrekturen": [
+        {
+          "bez": "Abweichende Wohnfläche",
+          "feld": "wohnflaeche",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "80": 0.92, "100": 0.95, "120": 0.97, "140": 0.99, "160": 1.01,
+            "180": 1.03, "200": 1.04, "220": 1.06, "240": 1.07
+          },
+          "rundung_stellen": 2,
+          "hinweis": "Neun abgedruckte Stützstellen. Die Normwohnfläche 150 m² liegt zwischen 140 (0,99) und 160 (1,01); interpoliert ergibt das 1,00 — die Probe stimmt."
+        },
+        {
+          "bez": "Abweichende Standardstufe",
+          "feld": "standardstufe",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": { "1.5": 0.72, "2.0": 0.88, "2.5": 1.00, "3.0": 1.09, "3.5": 1.16, "4.0": 1.23 },
+          "rundung_stellen": 2,
+          "hinweis": "Sechs abgedruckte Stützstellen. Probe: bei der Normstufe 2,5 ist der Koeffizient 1,00. Die Stichprobe reicht von 1,3 bis 4,5, also über beide Enden der abgedruckten Kurve hinaus; dort greift die Korrektur mit dem jeweiligen Randwert."
+        }
+      ],
+
+      "beleg": "Kalkulator 2026_sw_efh_bsgf (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, veroeffentlicht 02.03.2026, Stichprobe 854 Kauffaelle — die groesste der bisher erfassten niedersaechsischen Gebiete. 72 Stuetzpunkte des Gitters am Normobjekt abgefragt (Bodenrichtwert 20 bis 320 EUR/qm x vorlaeufiger Sachwert 100.000 bis 900.000 EUR), davon die Zeile 120 eigens nachgetastet, damit das Anwendungsbeispiel auf einer echten Stuetzstelle liegt. Dazu 15 abgedruckte Stuetzstellen der beiden Umrechnungskurven. GEGENPROBE: Bodenrichtwert 120, vorlaeufiger Sachwert 300.000, Wohnflaeche 150, Standardstufe 2,5 ergibt 0,89 - die Zelle traegt genau diese Zahl. KEIN LAGE-EINGABEFELD, von Hand gegengelesen.",
+
+      "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung). WO DIE QUELLE ENDET, ENDET DIE RECHNUNG: das Gitter deckt 100.000 bis 900.000 € und 20 bis 320 €/m² ab. GIFHORN FÜHRT KEINE KORREKTUR FÜR DIE RESTNUTZUNGSDAUER, obwohl die Stichprobe sie von 13 bis 80 Jahren ausweist — das ist das Modell des Ausschusses.",
+      "stufe": "B",
+      "stufe_begruendung": "Stufe B statt A: die Gitterwerte sind am amtlichen Kalkulator abgetastet, die Stützstellen von uns gewählt. Die beiden Korrekturkurven sind vom Ausschuss abgedruckt und damit Stufe A."
+    }
+  ]
+}
