@@ -438,6 +438,46 @@ export const CrossCheckService = {
           sachwertfaktor_lizenz: (_swfTab && _swfTab.lizenz) || null,
           sachwertfaktor_quelle_url: (_swfTab && _swfTab.quelle_url) || null,
 
+          /* ═══ v1402 · AUS WELCHEM JAHRGANG DIE ZAHL STAMMT ══════════════
+             MARCELS ANSTOSS: „für bayern und rheinland-pfalz gibt es vlt
+             alte berichte die umsonst sind aus 2025 oder 2024? dann könnte
+             man diese verwenden und einen vermerk daran setzen."
+
+             Der Vermerk fehlte. Der Registersatz trägt `stichtag`,
+             `berichtsjahr` und `modellversion` seit jeher, und
+             `gutachterausschuss.js` reicht sie auch heraus (Z. 492–494) —
+             HIER endete der Weg. Der Kunde sah einen Sachwertfaktor, ohne
+             zu erfahren, aus welchem Berichtsjahr er stammt.
+
+             OHNE DIESE ANGABE IST EIN ÄLTERER JAHRGANG NICHT VERWENDBAR.
+             § 10 ImmoWertV verlangt Modellkonformität zum
+             Wertermittlungsstichtag; ein Faktor von 2014 an einem Stichtag
+             2026 ist es nicht. Mit der Angabe wird er zu etwas anderem:
+             einer belegten, datierten Auskunft, die der Anwender selbst
+             einordnen kann. Genau das ist der Unterschied, den Marcels
+             Vorschlag braucht.
+
+             GEMESSEN am 15.09.2026 als Anlass: Bayern verkauft ältere
+             Jahrgänge deutlich billiger (Straubing 2024 für 20 € gegen
+             2026 für 60 €), Coburg gibt die Jahrgänge 2014 und 2016 sogar
+             gebührenfrei ab. Über die 13 Berichte mit Sachwertfaktor
+             gerechnet: 610 statt 725 €, wenn man auf den jeweils
+             günstigsten Jahrgang ab 2022 geht. */
+          sachwertfaktor_berichtsjahr: (_swfTab && _swfTab.berichtsjahr != null)
+            ? _swfTab.berichtsjahr : null,
+          sachwertfaktor_stichtag: (_swfTab && _swfTab.stichtag) || null,
+          sachwertfaktor_modellversion: (_swfTab && _swfTab.modellversion) || null,
+          /* Wie alt die Zahl im laufenden Jahr ist, in JAHREN. Nur die
+             Messung, keine Bewertung — wer sie liest, entscheidet selbst.
+             Bezug ist bewusst das laufende Jahr: `ref` trägt keinen
+             Wertermittlungsstichtag, und eine ehrliche Näherung ist besser
+             als ein Feld, das es nicht gibt. */
+          sachwertfaktor_alter_jahre: (function () {
+            const bj = Number(_swfTab && _swfTab.berichtsjahr);
+            if (!Number.isFinite(bj) || bj < 1990) return null;
+            return new Date().getFullYear() - bj;
+          })(),
+
           sachwertfaktor_tabellenwert: (_swfTab && _swfTab.tabellenwert) || null,
           sachwertfaktor_korrekturen: (_swfTab && _swfTab.verfuegbar
             && (_swfTab.korrektur_rnd != null || _swfTab.korrektur_bgf != null))
@@ -992,24 +1032,35 @@ export const CrossCheckService = {
        Entdoppelt wird ueber den Vermerkstext: fuehrt derselbe Ausschuss
        Zins UND Sachwertfaktor, steht er einmal da, mit beiden Kennzahlen. */
     const _nachweis = new Map();
-    const _merke = (vermerk, kennzahl, url, lizenz) => {
+    /* v1402: `jahrgang` kommt dazu — eine Namensnennung ohne Datum sagt
+       zwar, WER die Zahl erhoben hat, aber nicht WANN. Bei einem älteren
+       Bericht ist genau das die entscheidende Auskunft. */
+    const _merke = (vermerk, kennzahl, url, lizenz, jahrgang) => {
       const t = String(vermerk || '').trim();
       if (!t) return;
       const e = _nachweis.get(t) || { vermerk: t, kennzahlen: [], url: url || null,
-                                      lizenz: lizenz || null };
+                                      lizenz: lizenz || null, jahrgang: jahrgang || null };
       if (e.kennzahlen.indexOf(kennzahl) < 0) e.kennzahlen.push(kennzahl);
       if (!e.url && url) e.url = url;
       if (!e.lizenz && lizenz) e.lizenz = lizenz;
+      /* Führt derselbe Ausschuss zwei Kennzahlen aus verschiedenen
+         Jahrgängen, gewinnt der ÄLTERE — er begrenzt die Aussagekraft des
+         Eintrags, und das ist die Zahl, die der Leser wissen muss. */
+      if (jahrgang && (!e.jahrgang || Number(jahrgang) < Number(e.jahrgang))) {
+        e.jahrgang = jahrgang;
+      }
       _nachweis.set(t, e);
     };
     if (out.sachwert && out.sachwert.marktangepasst) {
       _merke(out.sachwert.sachwertfaktor_quellenvermerk, 'Sachwertfaktor',
-             out.sachwert.sachwertfaktor_quelle_url, out.sachwert.sachwertfaktor_lizenz);
+             out.sachwert.sachwertfaktor_quelle_url, out.sachwert.sachwertfaktor_lizenz,
+             out.sachwert.sachwertfaktor_berichtsjahr);
     }
     if (out.ertragswert && out.ertragswert.available
         && out.ertragswert.liegenschaftszins_pct != null) {
       _merke(out.ertragswert.liegenschaftszins_quellenvermerk, 'Liegenschaftszinssatz',
-             out.ertragswert.liegenschaftszins_quelle_url, out.ertragswert.liegenschaftszins_lizenz);
+             out.ertragswert.liegenschaftszins_quelle_url, out.ertragswert.liegenschaftszins_lizenz,
+             out.ertragswert.liegenschaftszins_berichtsjahr || null);
     }
     out.quellen_nachweis = Array.from(_nachweis.values());
 

@@ -417,12 +417,32 @@ Staging nachgemessen, alle drei offen, im Backlog unter B1):
   schreibt die Ausgangswerte von 2002 über den VPI fort. Das hinterlegte Paar
   gilt nur für den 01.01.2015.
 
-**Und eine rechtliche Sperre:** Aurich (41 Kreisschlüssel) und
-Potsdam/Uckermark (5) stehen unter `dl-de/by-2-0`, **Namensnennung ist
-Pflicht**. Der Vermerk hängt an jedem Registerdatensatz im Feld
-`quellenvermerk` und **fehlt im Bericht**. Solange das so ist, dürfen diese
-Zahlen in keinen Kundenbericht. (OWL und NRW sind `zero-2-0` und nicht
-betroffen — der Deckel wird aber mit jeder Ernte teurer.)
+**Die Namensnennung ist erfüllt — die frühere Sperre gilt nicht mehr.**
+Sätze unter `dl-de/by-2-0` verlangen eine Namensnennung, und die steht jetzt
+im Bericht: `CrossCheckService` sammelt die Vermerke der **tatsächlich
+verwendeten** Registersätze entdoppelt in `quellen_nachweis`, die Web-Ansicht
+zeigt sie als Block „Quellennachweis", das PDF druckt sie mit Kennzahl und URL.
+
+> **Hier stand bis zum 15.09.2026:** „Der Vermerk hängt an jedem
+> Registerdatensatz im Feld `quellenvermerk` und **fehlt im Bericht**. Solange
+> das so ist, dürfen diese Zahlen in keinen Kundenbericht."
+>
+> **Gemessen am 15.09.2026 stimmt das nicht mehr:** von 383
+> Sachwertfaktor-Sätzen tragen **355 einen Quellenvermerk**, und von den
+> **47 Sätzen unter `by-2-0` fehlt er bei keinem einzigen**. Beide
+> Ausgabewege sind gebaut. Eine Sperre, die nicht mehr gilt, hält Arbeit auf,
+> die längst erlaubt ist — deshalb steht sie hier nicht mehr.
+
+**Die Regel dahinter bleibt:** genannt wird nur, was in *diesem* Bericht
+wirklich steckt. Eine Namensnennung für einen Ausschuss, der gar nicht
+vorkommt, ist genauso falsch wie eine fehlende — sie behauptet eine Herkunft.
+
+**Offen ist nur noch eine Kleinigkeit:** 28 Sätze führen keinen Vermerk. 17
+davon stehen unter `zero-2-0`, wo keine Namensnennung verlangt ist — das ist
+richtig so. Bei **elf** (Dortmund 3, Duisburg 4, Essen 2, München 2) fehlt
+dagegen die **Lizenzangabe selbst**. Ohne sie lässt sich nicht entscheiden, ob
+ein Vermerk nötig wäre. Nachzutragen, wenn diese Sätze ohnehin angefasst
+werden.
 
 ---
 

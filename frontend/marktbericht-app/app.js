@@ -869,11 +869,31 @@ function _renderWertverfahren(d) {
     + (function () {
         var qn = (cc && cc.quellen_nachweis) || [];
         if (!qn.length) return '';
+        /* v1402 · DER JAHRGANG GEHOERT ZUR NAMENSNENNUNG.
+           Marcels Anstoss: aeltere Berichte sind guenstiger oder sogar
+           gebuehrenfrei — „dann koennte man diese verwenden und einen
+           vermerk daran setzen". Genau der Vermerk stand hier nicht. Eine
+           Quellenangabe ohne Datum sagt, WER die Zahl erhoben hat, aber
+           nicht WANN; bei einem Bericht von 2016 ist das die wichtigere
+           Haelfte. Ab vier Jahren wird es ausdruecklich benannt — nicht
+           als Warnung, sondern als Tatsache, die der Leser einordnen
+           koennen muss (Paragraf 10 ImmoWertV, Modellkonformitaet zum
+           Wertermittlungsstichtag). */
+        var jetzt = new Date().getFullYear();
         return '<div class="wv-nachweis"><b>Quellennachweis</b>'
           + qn.map(function (q) {
+              var alt = q.jahrgang ? (jetzt - Number(q.jahrgang)) : null;
               return '<div class="wv-nw-z">' + esc(q.vermerk)
                 + ((q.kennzahlen && q.kennzahlen.length)
                     ? ' <span class="wv-nw-kz">(' + esc(q.kennzahlen.join(' und ')) + ')</span>'
+                    : '')
+                + (q.jahrgang
+                    ? ' <span class="wv-nw-jg' + (alt != null && alt >= 4 ? ' wv-nw-alt' : '') + '">'
+                      + 'Berichtsjahr ' + esc(String(q.jahrgang))
+                      + (alt != null && alt >= 4
+                          ? ' · ' + alt + ' Jahre alt — zum heutigen Stichtag nur eingeschränkt modellkonform'
+                          : '')
+                      + '</span>'
                     : '')
                 + (q.url ? '<br><a href="' + esc(q.url) + '" target="_blank"'
                            + ' rel="noopener">' + esc(q.url) + '</a>' : '')
@@ -916,6 +936,11 @@ function _renderWertverfahren(d) {
       + '  letter-spacing:.04em;text-transform:uppercase;opacity:.7}'
       + '#wv-box .wv-nw-z{margin-top:4px}'
       + '#wv-box .wv-nw-kz{opacity:.65}'
+      /* v1402: der Jahrgang steht als eigene Marke — ab vier Jahren in Rot,
+         weil er dann die Aussagekraft der Zahl begrenzt. Rot ist hier eine
+         Statusfarbe und bleibt in jeder Marke dieselbe. */
+      + '#wv-box .wv-nw-jg{opacity:.65;white-space:nowrap}'
+      + '#wv-box .wv-nw-alt{opacity:1;color:#B8625C;white-space:normal}'
       + '#wv-box .wv-nachweis a{color:var(--wl-c9a84c,#c9a84c);text-decoration:underline;'
       + '  word-break:break-all}'
 
@@ -4402,7 +4427,17 @@ async function exportPdf(out) {
       _qn.forEach(function (q) {
         doc.setTextColor(...MUT);
         var _kz = (q.kennzahlen || []).join(' und ');
-        var _zl = doc.splitTextToSize(q.vermerk + (_kz ? '  (' + _kz + ')' : ''), blockW);
+        /* v1402: Berichtsjahr in dieselbe Zeile. Ab vier Jahren mit dem
+           ausdruecklichen Zusatz — ein Datum, das der Leser selbst suchen
+           muesste, ist im PDF kein Datum. */
+        var _alt = q.jahrgang ? (new Date().getFullYear() - Number(q.jahrgang)) : null;
+        var _jg = q.jahrgang
+          ? '  Berichtsjahr ' + q.jahrgang
+            + (_alt != null && _alt >= 4
+                ? ' (' + _alt + ' Jahre alt \u2014 zum heutigen Stichtag nur eingeschr\u00e4nkt modellkonform)'
+                : '')
+          : '';
+        var _zl = doc.splitTextToSize(q.vermerk + (_kz ? '  (' + _kz + ')' : '') + _jg, blockW);
         need(_zl.length * 3 + 4);
         doc.text(_zl, M, y); y += _zl.length * 3 + 0.5;
         if (q.url) {
