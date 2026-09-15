@@ -4452,3 +4452,64 @@ Kettenbruch — statt beiden Seiten gleichzeitig zu glauben.
 Und: **eine Einheit, die der Prüfstand nicht kennt, ist ein Befund, kein
 Durchlauf.** Vorher fiel jede unbekannte Einheit stillschweigend auf das
 Faktorband zurück. Genau so kam Dortmund durch.
+
+---
+
+## Ein Filter, der zu eng sucht, gibt frei statt zu sperren
+
+Gemessen am 15.09.2026 bei der Niedersachsen-Ernte. Ein Registersatz wurde
+deshalb **gebaut, geprüft, ausgerollt — und musste zurückgezogen werden**
+(v1417 → v1418).
+
+Die niedersächsischen Sachwertfaktor-Kalkulatoren wählen teils über eine
+**Lagegruppe** zwischen mehreren Kurven aus. Ohne den zugehörigen
+URL-Parameter ist ein abgetastetes Gitter nur für die Vorgabe-Lage gültig,
+und im Satz stünde nicht, für welche. `ni-lageachse.sh` sollte genau diese
+Gebiete sperren.
+
+**Das Kriterium war: ein Feld `Lage:` UND eine Kurve „Sachwerte und
+Regionen".** Beides zu eng, und der Fehler ging in beide Richtungen:
+
+| Dashboard | steht dort | alter Filter | richtig |
+|---|---|---|---|
+| Salzgitter | `Lage im Landkreis: Bruchmachtersen…` | erntbar | **gesperrt** |
+| Peine | `Lage im Kreis [Umrechnungskoef.]: …` | erntbar | **gesperrt** |
+| Braunschweig | nur Grafiktitel „…von Lage und Sachwert" | erntbar | erntbar ✓ |
+
+Kein `Lage:` mit direktem Doppelpunkt, keine Kurve „und Regionen" — also
+freigegeben. **71 von 81 galten als erntbar; richtig sind 55.** Sechzehn
+Gebiete waren falsch freigegeben.
+
+> ### Warum das schlimmer ist als ein Filter, der zu viel sperrt
+>
+> Ein zu strenger Filter kostet Arbeit: man sieht nach und gibt frei. Ein
+> zu lascher Filter **erzeugt einen Datensatz, der richtig aussieht** — mit
+> Gegenprobe am Anwendungsbeispiel, mit Belegen, mit Stufe und Modell-
+> vermerk. Der Salzgitter-Satz hat jede Prüfung bestanden, die ich ihm
+> gestellt habe. Er war trotzdem falsch, weil die Frage nie gestellt wurde.
+>
+> Dieselbe Klasse wie der `gold-audit`, der 6 statt 181 Dateien las und
+> „sauber" meldete, und wie der Einheiten-Prüfstand, der Dortmunds
+> `zuschlag_prozent` still durchwinkte, weil 1,26 zufällig im Faktorband
+> lag.
+
+### Zwei Regeln daraus
+
+**① Ein Merkmal, das ein Filter sucht, muss an der Stelle gesucht werden,
+wo es strukturell steht** — nicht dort, wo es zufällig auch vorkommt. Das
+Lage-Feld gehört zur EINGABEMASKE (die ersten Zeilen des Dokuments);
+Grafiktitel stehen weiter unten. Danach wird jetzt gefiltert, und
+Braunschweig fällt nicht mehr fälschlich mit hinein.
+
+**② Gefunden wurde es nicht durch eine Prüfung, sondern weil im Steckbrief
+eines anderen Gebiets die Zeile `Gemeinde Edemissen [1,00]` auffiel.** Wer
+einen Filter baut, sollte seine Freigaben stichprobenweise von Hand
+gegenlesen — gerade die, die er freigibt. Die Sperrungen erklären sich
+selbst, die Freigaben nicht.
+
+### Und ein Nebenbefund, der dieselbe Form hat
+
+**Die Teilmärkte EINES Gebiets können sich unterscheiden.** Beim Landkreis
+Verden führt der EFH-Kalkulator keine Lage-Achse, der Reihenhaus-
+Kalkulator sehr wohl. „Gebiet X ist erntbar" ist deshalb keine gültige
+Aussage — es gilt je Teilmarkt.
