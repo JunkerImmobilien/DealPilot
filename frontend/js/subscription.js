@@ -199,6 +199,11 @@ var Sub = (function() {
       body: {
         planId: planId,
         billingInterval: billingInterval,
+        /* v1421 · Flyer-Code. Kommt aus flyer-code.js — Cookie auf
+           .dealpilot.immo, gesetzt beim Aufruf von dealpilot.immo/erstflug.
+           undefined statt null: das zod-Schema im Backend ist .optional(),
+           das weist null ab; JSON.stringify laesst undefined einfach weg. */
+        promo: (window.DealPilotFlyerCode && window.DealPilotFlyerCode.get()) || undefined,
         successUrl: location.origin + location.pathname + '?subscription=success&session_id={CHECKOUT_SESSION_ID}',
         cancelUrl:  location.origin + location.pathname + '?subscription=cancel'
       }

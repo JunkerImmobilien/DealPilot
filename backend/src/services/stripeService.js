@@ -78,11 +78,51 @@ async function getOrCreateCustomer({ userId, email, name }) {
  * @param {string} params.priceId - Stripe price id (from plans table)
  * @param {string} params.successUrl
  * @param {string} params.cancelUrl
+ * @param {string} [params.promoCode] - Flyer-Code (v1421), z. B. ERSTFLUG
  * @returns {Promise<{url: string, sessionId: string}>}
  */
-async function createCheckoutSession({ userId, email, name, priceId, successUrl, cancelUrl }) {
+
+/* ════════════════════════════════════════════════════════════════════════
+   v1421 · Flyer-Code aufloesen
+
+   Stripe kennt zwei Wege, einen Rabatt in einen Checkout zu bekommen, und
+   sie SCHLIESSEN EINANDER AUS:
+     allow_promotion_codes: true   -> der Kunde tippt ihn selbst ein
+     discounts: [{promotion_code}] -> er ist schon drin
+   Beides zusammen weist Stripe mit einem Fehler ab. Deshalb entscheidet
+   diese Funktion, und der Aufrufer setzt genau EINES von beidem.
+
+   FAIL-OPEN ist Absicht. Ein Code vom Flyer, den es nicht (mehr) gibt —
+   abgelaufen, aufgebraucht, Tippfehler in der Druckerei — darf den Kauf
+   NICHT verhindern. Dann greift wieder das Eingabefeld, und der Kunde
+   kommt trotzdem zur Kasse. Ein verlorener Rabatt ist aergerlich, ein
+   verlorener Kunde teurer.
+
+   Der Code kommt vom Client und wird bewusst nicht vertraut: Stripe
+   selbst prueft Gueltigkeit, Restplaetze und Produktbindung.
+   ════════════════════════════════════════════════════════════════════ */
+async function promoCodeAufloesen(stripe, code) {
+  if (!code) return null;
+  try {
+    const res = await stripe.promotionCodes.list({
+      code: String(code).trim(),
+      active: true,
+      limit: 1
+    });
+    const pc = res.data[0];
+    if (!pc) return null;
+    if (pc.coupon && pc.coupon.valid === false) return null;
+    return pc.id;
+  } catch (err) {
+    return null;   /* stumm: siehe FAIL-OPEN oben */
+  }
+}
+
+async function createCheckoutSession({ userId, email, name, priceId, successUrl, cancelUrl, promoCode }) {
   const stripe = getStripe();
   const customer = await getOrCreateCustomer({ userId, email, name });
+
+  const promoId = await promoCodeAufloesen(stripe, promoCode);
 
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
@@ -90,13 +130,16 @@ async function createCheckoutSession({ userId, email, name, priceId, successUrl,
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: successUrl,
     cancel_url: cancelUrl,
-    allow_promotion_codes: true,
+    /* genau EINES von beidem — siehe Kommentar oben */
+    ...(promoId
+      ? { discounts: [{ promotion_code: promoId }] }
+      : { allow_promotion_codes: true }),
     billing_address_collection: 'required',
     automatic_tax: { enabled: false }, // Enable when Stripe Tax is configured
     subscription_data: {
       metadata: { userId }
     },
-    metadata: { userId }
+    metadata: { userId, ...(promoId ? { flyer_promo: String(promoCode) } : {}) }
   });
 
   return { url: session.url, sessionId: session.id };

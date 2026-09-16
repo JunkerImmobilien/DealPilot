@@ -2,7 +2,7 @@
    Der Rabatt lebt seit ERSTFLUG in promo-erstflug.js (Landing UND App, eine Wahrheit).
    Additiv: kein Eingriff ins bestehende Markup, alles zur Laufzeit. */
 (function(){'use strict';
- var V='assets/video/', ONCE=true;      /* Intro einmal pro Session */
+ var V='assets/video/', ONCE=true;      /* Intro einmal pro Session */  var INTRO_AKTIV=false;  /* v1421 · Marcel 16.09.2026: „das intro Video auf der Landingpage erstmal rausnehmen, kann aber auf dem Server bleiben." Also ein SCHALTER, kein Rueckbau: intro() bleibt vollstaendig stehen, dp-intro-cockpit.mp4 bleibt unter assets/video/ liegen. Wiedereinschalten: true. Das Hero-Hintergrundvideo (dp-hero-flug.mp4) ist NICHT das Intro und laeuft weiter. */
 
  document.body.classList.add('dpm-on');            /* legt Licht-Intro stumm */
  document.body.classList.remove('intro-lock');
@@ -229,6 +229,6 @@
    run(true);   /* v6: Standard MIT Ton, Fallback in run() */
  }
 
- function boot(){ hero(); dealscoreWait(); intro(); }
+ function boot(){ hero(); dealscoreWait(); if(INTRO_AKTIV) intro(); }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot); else boot();
 })();
