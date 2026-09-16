@@ -537,6 +537,17 @@
         if (!ST.percent) ST.percent = promo.percent;
         if (!ST.percent) return;
 
+        /* v1421b · Der Empfangsbalken oben (flyer-code.js) startet bewusst
+           ohne Zahl — er kennt nur den Code, nicht seinen Wert. Hier ist
+           der Prozentsatz zum ersten Mal aus STRIPE bestaetigt, also wird
+           er jetzt nachgetragen. Schlaegt es fehl (kein Balken, weil kein
+           Flyer-Code oder weggeklickt), ist das kein Fehler. */
+        try {
+          if (global.DealPilotFlyerCode && global.DealPilotFlyerCode.prozentNachtragen) {
+            global.DealPilotFlyerCode.prozentNachtragen(ST.percent);
+          }
+        } catch (e) {}
+
         css();
         if (isApp) { watchModal(); waitForApp(); }
         else { if (!wireLanding()) setTimeout(wireLanding, 400); }

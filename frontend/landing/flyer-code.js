@@ -162,6 +162,110 @@
     return n;
   }
 
+  /* ═══════════════════════════════════════════════════════════════
+     EMPFANGSBALKEN
+
+     v1421b · Marcels Befund: „Wenn ich über den Link Erstflug reingehe,
+     komme ich einfach nur auf die Startseite."
+
+     Das Banner aus promo-erstflug.js gibt es zwar, aber es steht bei der
+     Preistabelle — auf der Staging-Landing gemessen **5544 px** unter der
+     Oberkante. Wer oben ankommt, sieht es nie. Deshalb hier ein zweiter,
+     schlanker Balken ganz oben: er sagt in einem Satz, dass der Rabatt
+     angekommen ist, und bietet den Weg weiter an.
+
+     BEWUSST OHNE ANIMATION. Er steht sofort da, statt sich einzublenden.
+     Eine Einblendung haengt an requestAnimationFrame bzw. einer
+     CSS-Transition — und beide laufen nicht, solange der Tab verborgen
+     ist. Ein Willkommensgruss, der erst beim Hinsehen erscheint, ist
+     genau das, was hier gefehlt hat.
+
+     Der Prozentsatz wird NICHT hier bestimmt. flyer-code.js kennt nur den
+     Code, nicht seinen Wert — die Wahrheit steht in Stripe. Deshalb
+     startet der Balken ohne Zahl und promo-erstflug.js traegt sie nach
+     (prozentNachtragen). Lieber kurz keine Zahl als eine erfundene.
+     ═══════════════════════════════════════════════════════════════ */
+
+  var BALKEN_ID = 'dp-flyer-balken';
+  var ZUGEKLAPPT = 'dp_flyer_balken_zu';
+
+  function appAdresse(code) {
+    /* Bevorzugt einen echten Link aus der Seite — der kennt die richtige
+       Adresse sicher. Nur wenn keiner da ist, wird sie abgeleitet. */
+    var links = document.querySelectorAll('a[href]');
+    for (var i = 0; i < links.length; i++) {
+      var u; try { u = new URL(links[i].href, location.href); } catch (e) { continue; }
+      if (u.hostname !== location.hostname && /(^|\.)dealpilot\.immo$/i.test(u.hostname)) {
+        u.searchParams.set('register', '1');
+        u.searchParams.set('code', code);
+        return u.toString();
+      }
+    }
+    var host = location.hostname.indexOf('app.') === 0 ? location.hostname : 'app.' + location.hostname;
+    return location.protocol + '//' + host + '/?register=1&code=' + encodeURIComponent(code);
+  }
+
+  function balkenStil() {
+    if (document.getElementById(BALKEN_ID + '-stil')) return;
+    var s = document.createElement('style');
+    s.id = BALKEN_ID + '-stil';
+    s.textContent = [
+      '#' + BALKEN_ID + '{display:flex;align-items:center;gap:14px;flex-wrap:wrap;',
+      ' padding:11px 20px;background:#0E0D0B;color:#EFEAE0;',
+      ' border-bottom:1px solid var(--wl-c9a84c, #C9A84C);',
+      " font-family:Inter,system-ui,sans-serif;font-size:13.5px;line-height:1.45}",
+      '#' + BALKEN_ID + ' .m{font-family:"JetBrains Mono",monospace;font-size:9.5px;',
+      ' letter-spacing:.2em;font-weight:700;color:#050505;flex:none;padding:4px 9px;border-radius:2px;',
+      ' background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f))}',
+      '#' + BALKEN_ID + ' .t b{color:var(--wl-e8cc7a, #E8CC7A);font-weight:700}',
+      '#' + BALKEN_ID + ' .f{color:#9A9384;font-size:12px}',
+      '#' + BALKEN_ID + ' .c{margin-left:auto;flex:none;text-decoration:none;font-weight:600;font-size:13px;',
+      ' padding:8px 16px;border-radius:3px;color:#050505;',
+      ' background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f))}',
+      '#' + BALKEN_ID + ' .c:focus-visible{outline:2px solid #fff;outline-offset:2px}',
+      '#' + BALKEN_ID + ' .z{flex:none;background:none;border:0;color:#6F6858;font-size:19px;',
+      ' line-height:1;cursor:pointer;padding:4px 6px}',
+      '#' + BALKEN_ID + ' .z:hover{color:#EFEAE0}',
+      '@media(max-width:640px){#' + BALKEN_ID + '{padding:10px 16px;font-size:12.5px}',
+      ' #' + BALKEN_ID + ' .c{margin-left:0;width:100%;text-align:center}}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+
+  function balkenZeigen(code) {
+    if (!code || !document.body) return null;
+    if (document.getElementById(BALKEN_ID)) return document.getElementById(BALKEN_ID);
+    try { if (sessionStorage.getItem(ZUGEKLAPPT) === '1') return null; } catch (e) {}
+
+    balkenStil();
+    var d = document.createElement('div');
+    d.id = BALKEN_ID;
+    d.setAttribute('role', 'status');
+    d.innerHTML =
+      '<span class="m">ERSTFLUG</span>' +
+      '<span class="t">Dein Rabatt ist aktiviert<b data-prozent></b></span>' +
+      '<span class="f">Der Code ist hinterlegt — du musst nichts eingeben.</span>' +
+      '<a class="c" href="' + appAdresse(code) + '">Kostenlos starten →</a>' +
+      '<button class="z" type="button" aria-label="Hinweis schließen">×</button>';
+    document.body.insertBefore(d, document.body.firstChild);
+    d.querySelector('.z').addEventListener('click', function () {
+      try { sessionStorage.setItem(ZUGEKLAPPT, '1'); } catch (e) {}
+      if (d.parentNode) d.parentNode.removeChild(d);
+    });
+    return d;
+  }
+
+  /** Von promo-erstflug.js aufgerufen, sobald Stripe den Prozentsatz nennt. */
+  function prozentNachtragen(prozent) {
+    var p = Number(prozent);
+    if (!isFinite(p) || p <= 0) return false;
+    var ziel = document.querySelector('#' + BALKEN_ID + ' [data-prozent]');
+    if (!ziel) return false;
+    var text = String(p).replace('.', ',');
+    ziel.textContent = ' · ' + text + ' % dauerhaft';
+    return true;
+  }
+
   /** Adresszeile aufraeumen: /erstflug -> / , ohne Neuladen. */
   function adresseAufraeumen() {
     try {
@@ -184,6 +288,9 @@
     if (code) {
       try { document.documentElement.setAttribute('data-flyer-code', code); } catch (e) {}
       linkeAnreichern(code);
+      /* Der Balken nur auf der LANDING. In der App sitzt der Nutzer schon
+         im Cockpit; dort fuehrt die Preisansicht den Rabatt selbst. */
+      if (!global.Auth) balkenZeigen(code);
       /* Nachzuegler: die Landing baut Teile ihrer Navigation per JS. */
       setTimeout(function () { linkeAnreichern(code); }, 1200);
     }
@@ -194,6 +301,7 @@
     get:     holen,
     set:     merken,
     clear:   loeschen,
+    prozentNachtragen: prozentNachtragen,
     /* fuer Tests / Diagnose */
     _ausPfad:  ausPfad,
     _ausQuery: ausQuery
