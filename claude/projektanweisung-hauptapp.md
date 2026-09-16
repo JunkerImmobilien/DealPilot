@@ -16571,3 +16571,89 @@ Browser den Header hält, ist die Zusicherung der MediaRecorder-Spezifikation �
 gemessen habe ich es nicht.
 
 **Commit** `v1381`. Auf Staging, **nicht auf Prod**.
+
+---
+
+## Rollout-Journal · 16.09.2026 — v1421: Preise geprueft, Flyer-Code, Intro aus
+
+**Was.** Vier Dinge in einem Paket: eine vollstaendige Preispruefung gegen
+BEIDE Stripe-Konten, der Weg vom gedruckten Flyer bis in den Checkout, das
+Abschalten des Intro-Videos auf der Landing, und ein Entwurfssatz fuer die
+Pre-Flight-Karte.
+
+**Wie gemessen wurde — und warum nicht ueber das Stripe-MCP.** Das MCP war
+nicht angemeldet; wichtiger aber: es haette nur EIN Konto gesehen. Staging
+rechnet gegen die Sandbox (`acct_1TWXFqKEjyPDo0wo`), Produktion gegen das
+Live-Konto (`acct_1TWXFdGefFev8arz`). Gepruefte wurde deshalb IM Container
+jeder Umgebung, wo der jeweils richtige Schluessel schon in `process.env`
+liegt. Der Schluessel selbst wurde nie ausgelesen — nur Ergebnisse.
+
+**Befund Abopreise: sauber, in beiden Umgebungen.** Starter 19,99 / 219 ·
+Investor 34,99 / 384 · Pro 49,99 / 549 · Partner 49 / 539. Alle acht
+hinterlegten Preis-IDs zeigen auf aktive Stripe-Preise mit genau diesen
+Betraegen, und `config.js`, die Tabelle `plans` und Stripe stimmen ueberein.
+Die Bewertungspakete loesen ueber `lookup_key` auf und sind in beiden Konten
+vollstaendig (`dp_nachkauf_*`, `dp_einzeln_*`).
+
+**Befund Mandanten-Seat: in BEIDEN Umgebungen falsch, auf je eigene Weise.**
+- Produktion bucht nach der ALTEN Staffel **35 / 29 / 24 EUR** je Seat
+  (`price_1TtM0D…`). Der aktuelle Preis in Stripe ist `dp_seat_monthly` mit
+  **19 / 15 / 12 EUR** — Prod ist damit fast doppelt so teuer wie gewollt.
+- Staging zeigt auf einen **archivierten** Seat-Preis. Ein Seat-Checkout
+  kann dort nicht funktionieren, Stripe nimmt archivierte Preise nicht an.
+- Migration 065 nennt im Kommentar eine DRITTE Staffel (24 / 19 / 15).
+  Drei Staende, keine Entscheidung. Das ist Geld und gehoert Marcel.
+Der Seat steht in der `.env`, nicht in `plans` — deshalb faellt er bei jeder
+Pruefung der Plantabelle durch das Raster. Kuenftig mitpruefen.
+
+**Befund Portal:** Staging rechnet Wechsel mit `proration_behavior=none` ab,
+Produktion mit `always_invoice`. Staging testet damit nicht, was Prod tut.
+
+**Befund ERSTFLUG: es gibt ihn, und er gibt 16 %, nicht 15 %.**
+In beiden Konten: Promotion-Code `ERSTFLUG`, aktiv, `forever`, gilt fuer alle
+Produkte, **0 von 100** eingeloest, kein Ablaufdatum. Daneben liegt ein
+zweiter Coupon `ERSTFLUG15` mit 15 % — **ohne jeden Promotion-Code**, also
+fuer Kunden nicht einloesbar. Genau die Luecke, die `promo-erstflug.js` im
+Kopf beschreibt: dort steht seit v1246 `ERSTFLUG_PROZENT = 15`, waehrend
+Stripe 16 % ausgibt. Ein Stripe-Coupon laesst seinen Prozentsatz nicht
+aendern; fuer 15 % muesste der Code umgehaengt werden (alten deaktivieren,
+neuen mit demselben Namen auf `ERSTFLUG15`).
+
+**Flyer -> Checkout (neu).** Auf den Flyer kommt `dealpilot.immo/erstflug`.
+Gemessen: beide Domains antworten dort bereits mit 200, weil Caddys
+`try_files` auf die Landing faellt — **kein Eingriff am Caddyfile noetig**.
+`flyer-code.js` (liegt zweimal, wie `promo-erstflug.js`) liest das
+Pfadsegment, merkt den Code und raeumt die Adresszeile auf.
+> **Die Falle war die Domaingrenze.** Landing und App liegen auf
+> verschiedenen Rechnernamen, `localStorage` traegt dort nicht hinueber.
+> Gemerkt wird deshalb als **Cookie auf `.dealpilot.immo`**. Im Browser
+> nachgemessen: auf der App-Domain ist `localStorage` leer und der Code
+> trotzdem da.
+Das Backend loest den Code bei Stripe auf und setzt `discounts[]`.
+`allow_promotion_codes` und `discounts` schliessen einander aus — eine
+Stelle entscheidet, welches von beiden gesetzt wird. **Fail-open:** ein Code,
+den es nicht gibt, faellt auf das Eingabefeld zurueck statt den Kauf zu
+verhindern.
+
+**Intro-Video.** `landing-motion.js` bekommt `INTRO_AKTIV=false`. Die
+Funktion bleibt stehen, `dp-intro-cockpit.mp4` bleibt auf dem Server. Das
+alte Licht-Intro kommt NICHT zurueck — es haengt an der harten CSS-Regel
+`#intro{display:none!important}`, nicht an `body.dpm-on`. Das
+Hero-Hintergrundvideo ist nicht das Intro und laeuft weiter.
+
+**Nachweis.** 6 Dateien `node --check` ohne Befund; 12 von 12
+Logikpruefungen der Code-Erkennung gruen; **echter Lauf gegen die Sandbox**:
+Investor 34,99 -> **29,39 EUR** mit ERSTFLUG (Rabatt 5,60), unbekannter Code
+-> voller Preis MIT Eingabefeld, kein Code -> wie bisher. Testkunde wieder
+geloescht. Im Browser auf Staging nachgemessen: Intro weg, Code gemerkt,
+Cookie traegt ueber die Domaingrenze.
+
+**Rest.**
+1. Seat-Preis Prod (35/29/24 gegen 19/15/12) — **Entscheidung Marcel.**
+2. Seat-Preis Staging zeigt auf archiviert — Checkout dort kaputt.
+3. ERSTFLUG 16 % gegen die 15 % in `promo-erstflug.js` — **Entscheidung.**
+4. `proration_behavior` Staging gegen Prod angleichen.
+5. Elf Registersaetze ohne Lizenzangabe (unveraendert offen).
+6. Pre-Flight-Entwuerfe: Auswahl steht aus, dann Einbau.
+
+**Commit** `v1421`. Auf Staging, **nicht auf Prod**.
