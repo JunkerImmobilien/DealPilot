@@ -407,6 +407,249 @@ h1{font-family:var(--disp);font-weight:700;font-size:clamp(34px,5.4vw,54px);
 .pf.v-kante .pf-qr .scan{color:#4E4940}
 .pf.v-kante .pf-marke i{color:var(--gold)}
 
+/* ═══════════════════════════════════════════════════════════════════════
+   HELLE FASSUNGEN
+
+   Die App hat ZWEI Skins — `body.dp-chrome-hell` und Obsidian
+   (`window._dpDispSkin`). Eine Karte, die nur dunkel funktioniert, ist
+   deshalb keine fertige Entscheidung: im hellen Skin säße sie als
+   schwarzer Block in einer cremefarbenen Oberfläche.
+
+   Die Farben sind nicht erfunden, sondern aus `style.css:35545` gemessen:
+     Chrome-Fläche  #EAE4D6   (warmes Creme, KEIN kaltes Weiß)
+     Tinte          #141310
+     Pillen         #F6F2E9 auf Rand #D3CBB6
+   Dazu aus CLAUDE.md: Karte #FBF6E9, Creme #FDFCFA.
+
+   Jede Variante behält ihre IDEE und wechselt nur das Material — Glas
+   bleibt Glas, Metall bleibt Metall. Zwei Entwürfe tun sich schwer und
+   sagen das auch: HUD und Radar leben vom Leuchten. Hell werden sie
+   deshalb zur gezeichneten Fassung — Tinte auf Creme statt Phosphor auf
+   Schwarz. Das ist ehrlicher als ein helles Leuchten, das es nicht gibt.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+body.hell{--grund:#E4DDCC;--flaeche:#FBF6E9;--linie:#D3CBB6;
+  --text:#141310;--leise:#6B6454;--sehr-leise:#8E8676}
+body.hell .leiste{background:rgba(228,221,204,.92)}
+body.hell .leiste a{background:#FBF6E9}
+body.hell .zurueck{background:#F6EFE2}
+body.hell .einstellung{background:#FBF6E9}
+body.hell code{background:rgba(184,147,47,.14);color:#6B5416}
+body.hell .augenbraue,body.hell .nr{color:#9A7C22}
+
+/* 01 · Bordkarte — bleibt wie sie ist, sie IST schon eine helle Fläche */
+body.hell .buehne.b-ist{background:#DED7C4}
+
+/* 02 · Glas hell — Milchglas auf hellem Licht statt auf Tiefe */
+body.hell .buehne.b-glas{background:
+  radial-gradient(90% 150% at 15% 0%, rgba(201,168,76,.4), transparent 58%),
+  radial-gradient(70% 130% at 85% 100%, rgba(63,165,108,.16), transparent 62%),
+  #E8E1CF}
+body.hell .pf.v-glas{background:rgba(255,255,255,.58);border-color:rgba(255,255,255,.9);
+  box-shadow:0 14px 38px rgba(90,76,40,.16), inset 0 1px 0 rgba(255,255,255,.95)}
+body.hell .pf.v-glas::before{background:linear-gradient(90deg,transparent,#fff,transparent)}
+body.hell .pf.v-glas .pf-bp{color:rgba(20,19,16,.42)}
+body.hell .pf.v-glas .pf-k{color:#141310}
+body.hell .pf.v-glas .pf-s{color:rgba(20,19,16,.6)}
+body.hell .pf.v-glas .pf-lead::after{background:rgba(20,19,16,.13)}
+body.hell .pf.v-glas .pf-grouplbl{color:rgba(20,19,16,.5)}
+body.hell .pf.v-glas .pf-tile{background:rgba(255,255,255,.72);
+  border-color:rgba(255,255,255,.95);color:#24211A}
+body.hell .pf.v-glas .pf-tile.an{background:rgba(255,255,255,.95);
+  border-color:rgba(184,147,47,.5);color:#141310}
+body.hell .pf.v-glas .pf-led{background:rgba(20,19,16,.14)}
+body.hell .pf.v-glas .pf-tile.an .pf-led{background:var(--gold-lo);
+  box-shadow:0 0 10px 2px rgba(184,147,47,.55)}
+body.hell .pf.v-glas .pf-qr .scan{color:rgba(20,19,16,.45)}
+body.hell .pf.v-glas .pf-marke i{color:#9A7C22}
+
+/* 03 · Triebwerk hell — gedrehtes Aluminium, warmer Schimmer */
+body.hell .buehne.b-triebwerk{background:#DFD8C6}
+body.hell .pf.v-triebwerk{background:
+  radial-gradient(circle at 92px 50%, rgba(201,168,76,.26), transparent 36%),
+  linear-gradient(180deg,#FBF6E9,#EFE8D8);border-color:#D3CBB6;
+  box-shadow:0 10px 26px rgba(90,76,40,.14)}
+body.hell .pf.v-triebwerk .pf-lead::before{border-color:rgba(184,147,47,.32);
+  box-shadow:0 0 0 12px rgba(184,147,47,.07), 0 0 0 26px rgba(184,147,47,.04),
+             inset 0 0 26px rgba(184,147,47,.12)}
+body.hell .pf.v-triebwerk .pf-bp{color:#8E8676}
+body.hell .pf.v-triebwerk .pf-k{color:#141310}
+body.hell .pf.v-triebwerk .pf-s{color:#6B6454}
+body.hell .pf.v-triebwerk .pf-grouplbl{color:#8E8676}
+body.hell .pf.v-triebwerk .pf-tile{background:#FFFDF7;border-color:#D3CBB6;color:#3A3428}
+body.hell .pf.v-triebwerk .pf-tile.an{border-color:rgba(184,147,47,.7);color:#141310;
+  box-shadow:0 0 14px rgba(201,168,76,.22), inset 0 0 12px rgba(201,168,76,.1)}
+body.hell .pf.v-triebwerk .pf-led{background:#D8D0BC}
+body.hell .pf.v-triebwerk .pf-tile.an .pf-led{background:var(--gold-lo);
+  box-shadow:0 0 8px rgba(184,147,47,.8)}
+body.hell .pf.v-triebwerk .pf-qr .scan{color:#8E8676}
+body.hell .pf.v-triebwerk .pf-marke i{color:#9A7C22}
+
+/* 04 · HUD hell — gezeichnet statt geleuchtet: Tinte auf Creme */
+body.hell .buehne.b-hud{background:#DFE3D8}
+body.hell .pf.v-hud{background:linear-gradient(180deg,#FBFCF7,#F2F5EC);
+  border-color:rgba(45,95,66,.42)}
+body.hell .pf.v-hud::before,body.hell .pf.v-hud::after{border-color:#2D5F42}
+body.hell .pf.v-hud .pf-bp{color:rgba(45,95,66,.6)}
+body.hell .pf.v-hud .pf-k{color:#1C4430;text-shadow:none}
+body.hell .pf.v-hud .pf-s{color:rgba(45,95,66,.7)}
+body.hell .pf.v-hud .pf-lead::after{background:rgba(45,95,66,.25)}
+body.hell .pf.v-hud .pf-grouplbl{color:rgba(45,95,66,.6)}
+body.hell .pf.v-hud .pf-tile{border-color:rgba(45,95,66,.25);color:#2A4A38}
+body.hell .pf.v-hud .pf-tile.an{border-color:#2D5F42;color:#12331F;
+  background:rgba(45,95,66,.1);box-shadow:none}
+body.hell .pf.v-hud .pf-led{background:rgba(45,95,66,.3)}
+body.hell .pf.v-hud .pf-tile.an .pf-led{background:#2D5F42;box-shadow:none}
+body.hell .pf.v-hud .pf-qr .code{filter:none}
+body.hell .pf.v-hud .pf-qr .scan{color:rgba(45,95,66,.6)}
+body.hell .pf.v-hud .pf-marke i{color:#2D5F42}
+
+/* 05 · Carbon hell — feines Gewebe statt Faser */
+body.hell .buehne.b-carbon{background:#E0DACA}
+body.hell .pf.v-carbon{border-color:#D3CBB6;
+  background:
+    repeating-linear-gradient(45deg, rgba(120,105,70,.05) 0 2px, transparent 2px 4px),
+    repeating-linear-gradient(-45deg, rgba(120,105,70,.05) 0 2px, transparent 2px 4px),
+    linear-gradient(180deg,#FBF6E9,#F0E9D9);
+  box-shadow:0 10px 28px rgba(90,76,40,.14)}
+body.hell .pf.v-carbon .pf-bp{color:#8E8676}
+body.hell .pf.v-carbon .pf-k{color:#141310}
+body.hell .pf.v-carbon .pf-s{color:#6B6454}
+body.hell .pf.v-carbon .pf-lead::after{background:#DCD4C0}
+body.hell .pf.v-carbon .pf-grouplbl{color:#8E8676}
+body.hell .pf.v-carbon .pf-tile{background:rgba(255,255,255,.66);border-color:#D8D0BC;color:#3A3428}
+body.hell .pf.v-carbon .pf-tile.an{border-color:rgba(184,147,47,.65);color:#141310;
+  background:rgba(201,168,76,.12)}
+body.hell .pf.v-carbon .pf-led{background:#D8D0BC}
+body.hell .pf.v-carbon .pf-tile.an .pf-led{background:var(--gold-lo);
+  box-shadow:0 0 8px rgba(184,147,47,.6)}
+body.hell .pf.v-carbon .pf-qr .scan{color:#8E8676}
+body.hell .pf.v-carbon .pf-marke i{color:#9A7C22}
+
+/* 06 · Rack hell — helle Schiene, versenkte Einschübe */
+body.hell .buehne.b-rack{background:#DFD8C6}
+body.hell .pf.v-rack{background:#F2EBDA;border-color:#D3CBB6;
+  box-shadow:inset 0 2px 5px rgba(90,76,40,.13)}
+body.hell .pf.v-rack .pf-lead{background:#EAE2CF;border-right-color:#D3CBB6}
+body.hell .pf.v-rack .pf-bp{color:#8E8676}
+body.hell .pf.v-rack .pf-k{color:#141310}
+body.hell .pf.v-rack .pf-s{color:#6B6454}
+body.hell .pf.v-rack .pf-grouplbl{color:#8E8676}
+body.hell .pf.v-rack .pf-tile{background:#FDFAF1;border-color:#D8D0BC;color:#3A3428}
+body.hell .pf.v-rack .pf-tile.an{background:#FFFDF6;color:#141310;
+  box-shadow:inset 0 0 0 1px rgba(184,147,47,.6)}
+body.hell .pf.v-rack .pf-led{background:#D8D0BC}
+body.hell .pf.v-rack .pf-tile.an .pf-led{background:var(--gruen);
+  box-shadow:0 0 6px rgba(63,165,108,.6)}
+body.hell .pf.v-rack .pf-qr .scan{color:#8E8676}
+body.hell .pf.v-rack .pf-marke i{color:#9A7C22}
+
+/* 07 · Monolith hell — Elfenbein, nur Typografie */
+body.hell .buehne.b-monolith{background:#E8E1CF}
+body.hell .pf.v-monolith{background:#FDFBF4;
+  box-shadow:0 0 0 1px #E4DCC8, 0 14px 36px rgba(90,76,40,.13)}
+body.hell .pf.v-monolith .pf-k{color:#141310}
+body.hell .pf.v-monolith .pf-s{color:#9A9282}
+body.hell .pf.v-monolith .pf-grouplbl{color:#BFB6A0}
+body.hell .pf.v-monolith .pf-tile{color:#9A9282}
+body.hell .pf.v-monolith .pf-tile.an{color:#141310}
+body.hell .pf.v-monolith .pf-led{background:#E0D8C4}
+body.hell .pf.v-monolith .pf-tile.an .pf-led{background:var(--gold-lo);
+  box-shadow:0 0 12px 3px rgba(184,147,47,.35)}
+body.hell .pf.v-monolith .pf-qr .code{opacity:.5}
+body.hell .pf.v-monolith .pf-qr .scan{color:#BFB6A0}
+body.hell .pf.v-monolith .pf-marke i{color:#9A7C22}
+
+/* 08 · Runway hell — helle Bahn, Mittellinie in Gold */
+body.hell .buehne.b-runway{background:#DDE0D4}
+body.hell .pf.v-runway{background:linear-gradient(180deg,#FBFAF2,#F1F0E4);
+  border-color:#D2D3C2}
+body.hell .pf.v-runway::before{background:repeating-linear-gradient(90deg,
+  rgba(184,147,47,.75) 0 26px, transparent 26px 52px);opacity:.5}
+body.hell .pf.v-runway .pf-bp{color:#8A907E}
+body.hell .pf.v-runway .pf-k{color:#141310}
+body.hell .pf.v-runway .pf-s{color:#6B7064}
+body.hell .pf.v-runway .pf-lead::after{background:#D2D3C2}
+body.hell .pf.v-runway .pf-grouplbl{color:#8A907E}
+body.hell .pf.v-runway .pf-tile{background:rgba(255,255,255,.88);border-color:#D2D3C2;color:#333629}
+body.hell .pf.v-runway .pf-tile.an{border-color:rgba(184,147,47,.7);color:#141310}
+body.hell .pf.v-runway .pf-led{background:#DCDDD0;box-shadow:0 0 0 3px rgba(220,221,208,.55)}
+body.hell .pf.v-runway .pf-tile.an .pf-led{background:var(--gold-lo);
+  box-shadow:0 0 9px 2px rgba(184,147,47,.6), 0 0 0 3px rgba(184,147,47,.16)}
+body.hell .pf.v-runway .pf-qr .scan{color:#8A907E}
+body.hell .pf.v-runway .pf-marke i{color:#9A7C22}
+
+/* 09 · Titan hell — gebürstetes Aluminium */
+body.hell .buehne.b-titan{background:#DCDCDE}
+body.hell .pf.v-titan{border-color:#C2C2C6;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.7) 0 1px, transparent 1px 3px),
+    linear-gradient(176deg,#F4F4F6,#DEDEE1 42%,#EAEAED);
+  box-shadow:0 10px 28px rgba(60,60,70,.16), inset 0 1px 0 rgba(255,255,255,.95)}
+body.hell .pf.v-titan .pf-bp{color:#82828A}
+body.hell .pf.v-titan .pf-k{color:#1C1C20;text-shadow:0 1px 0 rgba(255,255,255,.7)}
+body.hell .pf.v-titan .pf-s{color:#6E6E77}
+body.hell .pf.v-titan .pf-lead::after{background:linear-gradient(180deg,transparent,rgba(0,0,0,.16),transparent);
+  box-shadow:1px 0 0 rgba(255,255,255,.85)}
+body.hell .pf.v-titan .pf-grouplbl{color:#82828A;text-shadow:0 1px 0 rgba(255,255,255,.6)}
+body.hell .pf.v-titan .pf-tile{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.55));
+  border-color:rgba(0,0,0,.14);color:#24242A;box-shadow:inset 0 1px 0 rgba(255,255,255,.95)}
+body.hell .pf.v-titan .pf-tile.an{background:linear-gradient(180deg,rgba(201,168,76,.3),rgba(201,168,76,.14));
+  border-color:rgba(184,147,47,.6);color:#141310}
+body.hell .pf.v-titan .pf-led{background:#C8C8CE;box-shadow:inset 0 1px 2px rgba(0,0,0,.3)}
+body.hell .pf.v-titan .pf-tile.an .pf-led{background:var(--gold-lo);
+  box-shadow:0 0 7px rgba(184,147,47,.7), inset 0 1px 1px rgba(255,255,255,.6)}
+body.hell .pf.v-titan .pf-qr .scan{color:#82828A}
+body.hell .pf.v-titan .pf-marke i{color:#9A7C22}
+
+/* 10 · Radar hell — gezeichneter Schirm, Tinte statt Leuchten */
+body.hell .buehne.b-radar{background:#DBE2DC}
+body.hell .pf.v-radar{background:
+  radial-gradient(circle at 86px 50%, rgba(45,95,66,.13), transparent 44%),
+  #F7FBF7;border-color:#CBD8CE}
+body.hell .pf.v-radar .pf-lead::before{border-color:rgba(45,95,66,.3);
+  box-shadow:inset 0 0 0 16px rgba(45,95,66,.05), inset 0 0 0 32px rgba(45,95,66,.03)}
+body.hell .pf.v-radar .pf-lead::after{background:linear-gradient(90deg,#2D5F42,transparent)}
+body.hell .pf.v-radar .pf-bp{color:#7C9186}
+body.hell .pf.v-radar .pf-k{color:#173A27}
+body.hell .pf.v-radar .pf-s{color:#5E7568}
+body.hell .pf.v-radar .pf-grouplbl{color:#7C9186}
+body.hell .pf.v-radar .pf-tile{background:rgba(255,255,255,.8);border-color:#CBD8CE;color:#2C4536}
+body.hell .pf.v-radar .pf-tile.an{border-color:rgba(45,95,66,.55);color:#12331F;
+  background:rgba(45,95,66,.09)}
+body.hell .pf.v-radar .pf-led{background:#CBD8CE}
+body.hell .pf.v-radar .pf-tile.an .pf-led{background:#2D5F42;box-shadow:none}
+body.hell .pf.v-radar .pf-qr .code{filter:none}
+body.hell .pf.v-radar .pf-qr .scan{color:#7C9186}
+body.hell .pf.v-radar .pf-marke i{color:#2D5F42}
+
+/* 11 · Kante hell — Goldkante auf Creme */
+body.hell .buehne.b-kante{background:#E8E1CF}
+body.hell .pf.v-kante{background:#FBF6E9;border-left-color:var(--gold-lo);
+  box-shadow:-10px 0 30px -14px rgba(184,147,47,.5)}
+body.hell .pf.v-kante .pf-bp{color:#A79E8A}
+body.hell .pf.v-kante .pf-k{color:#141310}
+body.hell .pf.v-kante .pf-s{color:#8E8676}
+body.hell .pf.v-kante .pf-grouplbl{color:#A79E8A}
+body.hell .pf.v-kante .pf-seg{border-left-color:#E2DAC6}
+body.hell .pf.v-kante .pf-tile{border-bottom-color:#E2DAC6;color:#7A7365}
+body.hell .pf.v-kante .pf-tile.an{color:#141310;border-bottom-color:rgba(184,147,47,.6)}
+body.hell .pf.v-kante .pf-led{background:#DED6C2}
+body.hell .pf.v-kante .pf-tile.an .pf-led{background:var(--gold-lo);
+  box-shadow:0 0 8px 2px rgba(184,147,47,.5)}
+body.hell .pf.v-kante .pf-qr .code{opacity:.6}
+body.hell .pf.v-kante .pf-qr .scan{color:#A79E8A}
+body.hell .pf.v-kante .pf-marke i{color:#9A7C22}
+
+/* ── Skin-Umschalter ──────────────────────────────────────────── */
+.skinschalter{display:flex;gap:0;align-items:center;margin-left:auto;
+  border:1px solid var(--linie);border-radius:3px;overflow:hidden;flex:none}
+.skinschalter button{font-family:var(--mono);font-size:11px;letter-spacing:.09em;
+  padding:6px 13px;border:0;cursor:pointer;background:var(--flaeche);
+  color:var(--leise);transition:.14s}
+.skinschalter button.an{background:var(--gold);color:#141310;font-weight:700}
+.skinschalter button:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+
 /* ── Einstellungs-Mockup ──────────────────────────────────────── */
 .einstellung{margin-top:56px;background:var(--flaeche);border:1px solid var(--linie);
   border-radius:5px;padding:28px}
@@ -435,9 +678,9 @@ code{font-family:var(--mono);font-size:.88em;background:rgba(201,168,76,.1);
 <header class="kopf">
   <p class="augenbraue">DealPilot · Entwurf v1424 · zweiter Anlauf</p>
   <h1>Pre-Flight Entwürfe</h1>
-  <p class="vorspann">Zehn Hüllen für dieselbe Leiste — im Tab Objekt und im QuickCheck.
-  <b>Der Inhalt ist in jeder Variante identisch</b>; verändert wird nur, woraus die Karte
-  gemacht ist.</p>
+  <p class="vorspann">Zehn Hüllen für dieselbe Leiste — im Tab Objekt und im QuickCheck,
+  jede in <b>hell und dunkel</b>. Der Inhalt ist überall identisch; verändert wird nur,
+  woraus die Karte gemacht ist. Der Schalter oben rechts wechselt den Skin.</p>
 </header>
 
 <section class="zurueck">
@@ -448,6 +691,12 @@ code{font-family:var(--mono);font-size:.88em;background:rgba(201,168,76,.1);
   <p><b>Und die Karten waren zu klein.</b> Sie hatten 660 px Mindestbreite bei 9-px-Schrift und
   wirkten wie geschrumpfte Bildchen. Jetzt sind sie in echter Größe gebaut und werden
   als Ganzes proportional auf die Bühne gerechnet — gleiche Wirkung auf jedem Schirm.</p>
+  <p><b>Sie waren außerdem alle dunkel.</b> Die App führt zwei Skins, und eine Karte, die nur
+  im Obsidian-Skin funktioniert, ist keine fertige Entscheidung — im hellen Skin säße sie als
+  schwarzer Block in einer cremefarbenen Oberfläche. Jede Variante gibt es jetzt in
+  <b>beiden</b> Fassungen; der Schalter oben rechts wechselt. Die hellen Töne sind aus dem
+  echten Skin gemessen (<code>style.css:35545</code>): Fläche <code>#EAE4D6</code>, Tinte
+  <code>#141310</code> — warmes Creme, kein kaltes Weiß.</p>
 </section>
 
 <nav class="leiste" aria-label="Zu einem Entwurf springen">
@@ -464,6 +713,10 @@ code{font-family:var(--mono);font-size:.88em;background:rgba(201,168,76,.1);
     <a href="#e09">09 Titan</a>
     <a href="#e10">10 Radar</a>
     <a href="#e11">11 Kante</a>
+    <span class="skinschalter" role="group" aria-label="Skin wechseln">
+      <button type="button" id="skin-obsidian" class="an">OBSIDIAN</button>
+      <button type="button" id="skin-hell">HELL</button>
+    </span>
   </div>
 </nav>
 
@@ -473,7 +726,9 @@ code{font-family:var(--mono);font-size:.88em;background:rgba(201,168,76,.1);
   <h2>So sähe die Umstellung aus</h2>
   <p>Einstellungen · Darstellung · <b>Pre-Flight-Karte</b>. Technisch ist es eine Klasse am
   Behälter — dasselbe Muster wie der vorhandene helle Skin
-  (<code>body.dp-chrome-hell</code>). Markup, Schalter und Logik bleiben unberührt.</p>
+  (<code>body.dp-chrome-hell</code>). Markup, Schalter und Logik bleiben unberührt.
+  <b>Hell oder dunkel wird hier nicht noch einmal gewählt</b>: die Karte folgt dem Skin, den
+  die App ohnehin führt. Eine zweite Stelle für dieselbe Entscheidung würde nur auseinanderlaufen.</p>
   <div class="opt-liste">
     <div class="opt gewaehlt">
       <span class="radio"></span>
@@ -658,6 +913,42 @@ function skalieren(){
     }
   });
 }
+/* Skin-Umschalter. Die App führt zwei Skins (body.dp-chrome-hell und
+   Obsidian) — eine Variante ist erst entschieden, wenn sie in BEIDEN
+   funktioniert. Deshalb schaltet dieser Knopf die ganze Seite um, samt
+   Bühnen: nur so sieht man, ob eine Karte im hellen Skin noch trägt.
+   Nach dem Wechsel wird neu skaliert — helle Fassungen können durch
+   andere Ränder minimal andere Maße haben. */
+(function(){
+  const bO = document.getElementById('skin-obsidian');
+  const bH = document.getElementById('skin-hell');
+  const MERKER = 'dp_entwurf_skin';
+
+  function setze(hell, merken){
+    document.body.classList.toggle('hell', hell);
+    bH.classList.toggle('an', hell);
+    bO.classList.toggle('an', !hell);
+    if (merken) { try { localStorage.setItem(MERKER, hell ? 'hell' : 'obsidian'); } catch(e) {} }
+    requestAnimationFrame(skalieren);
+  }
+  bH.addEventListener('click', () => setze(true, true));
+  bO.addEventListener('click', () => setze(false, true));
+
+  /* Startzustand: die Adresse schlägt den Merker, der Merker schlägt den
+     Standard. So führt .../#hell direkt in die helle Ansicht — praktisch,
+     um jemandem genau eine Fassung zu zeigen — und wer einmal umschaltet,
+     findet seine Wahl beim nächsten Öffnen wieder.
+     localStorage kann in einem privaten Fenster werfen, deshalb try/catch;
+     schlägt es fehl, startet die Seite eben im Standard. */
+  let start = null;
+  if (/hell/i.test(location.hash)) start = true;
+  else if (/obsidian|dunkel/i.test(location.hash)) start = false;
+  if (start === null) {
+    try { const m = localStorage.getItem(MERKER); if (m) start = (m === 'hell'); } catch(e) {}
+  }
+  if (start !== null) setze(start, false);
+})();
+
 if (window.ResizeObserver) {
   const ro = new ResizeObserver(skalieren);
   document.querySelectorAll('.buehne').forEach(b => ro.observe(b));
