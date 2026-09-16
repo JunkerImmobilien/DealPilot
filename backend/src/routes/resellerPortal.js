@@ -23,10 +23,57 @@ function inviteBase(req) {
 }
 
 const stripe = process.env.STRIPE_SECRET_KEY ? Stripe(process.env.STRIPE_SECRET_KEY) : null;
+
+/* ════════════════════════════════════════════════════════════════════════
+   v1423 · Der Seat-Preis kommt aus dem lookup_key, nicht mehr aus der .env
+
+   WAS AM 16.09.2026 GEMESSEN WURDE — in beiden Umgebungen falsch, auf je
+   eigene Weise:
+     Produktion zeigte auf price_1TtM0D… und buchte damit die ALTE Staffel
+       35 / 29 / 24 EUR je Seat. Der gueltige Preis fuehrt 19 / 15 / 12.
+       Die Landing verspricht seit Langem „ab 12 EUR je Mandant" — Prod
+       hat also fast das Doppelte des beworbenen Preises abgerechnet.
+     Staging zeigte auf einen ARCHIVIERTEN Preis. Stripe nimmt archivierte
+       Preise im Checkout nicht an; ein Seat-Kauf konnte dort gar nicht
+       gelingen.
+
+   WARUM ES BEIDE MALE UNBEMERKT BLIEB: der Seat steht als einziger Preis
+   NICHT in der Tabelle `plans`, sondern in der `.env`. Wer config.js,
+   `plans` und die Portal-Konfiguration prueft, haelt alles fuer sauber und
+   sieht ihn nie. Eine ID in einer Umgebungsvariablen altert still.
+
+   DIE LOESUNG IST DIESELBE WIE BEI DEN BEWERTUNGSPAKETEN: der lookup_key
+   ist umgebungsblind. Derselbe Name liefert mit dem Sandbox-Schluessel den
+   Sandbox-Preis und mit dem Live-Schluessel den Live-Preis — und immer den
+   AKTIVEN. Wird ein Preis geaendert, legt Stripe einen neuen an und der
+   Name wandert mit; hier muss dann nichts nachgezogen werden.
+
+   Die .env bleibt als Rueckfall stehen, damit ein Ausfall der Aufloesung
+   nicht den ganzen Seat-Kauf blockiert. Sie ist ab jetzt aber die zweite
+   Wahrheit, nicht die erste.
+   ════════════════════════════════════════════════════════════════════ */
 const SEAT_PRICE = {
   monthly: process.env.STRIPE_PRICE_MANDANT_SEAT_MONTHLY,
   yearly:  process.env.STRIPE_PRICE_MANDANT_SEAT_YEARLY
 };
+const SEAT_LOOKUP = { monthly: 'dp_seat_monthly', yearly: 'dp_seat_yearly' };
+const seatCache = { monthly: null, yearly: null, bis: 0 };
+
+async function seatPreisId(interval) {
+  const jetzt = Date.now();
+  if (seatCache[interval] && seatCache.bis > jetzt) return seatCache[interval];
+  try {
+    const r = await stripe.prices.list({
+      lookup_keys: [SEAT_LOOKUP[interval]], active: true, limit: 1
+    });
+    if (r.data[0]) {
+      seatCache[interval] = r.data[0].id;
+      seatCache.bis = jetzt + 10 * 60 * 1000;   /* 10 Minuten */
+      return r.data[0].id;
+    }
+  } catch (e) { /* Rueckfall unten */ }
+  return SEAT_PRICE[interval] || null;
+}
 
 router.use(authenticate);
 router.use(requireFeature('reseller'));
@@ -76,8 +123,8 @@ router.post('/seats/checkout', async (req, res, next) => {
     if (!stripe) return res.status(503).json({ error: 'stripe_not_configured' });
     const quantity = Math.max(1, parseInt(req.body && req.body.quantity, 10) || 0);
     const interval = (req.body && req.body.interval) === 'yearly' ? 'yearly' : 'monthly';
-    const price = SEAT_PRICE[interval];
-    if (!price) return res.status(503).json({ error: 'seat_price_not_configured', message: 'STRIPE_PRICE_MANDANT_SEAT_* fehlt in der .env' });
+    const price = await seatPreisId(interval);
+    if (!price) return res.status(503).json({ error: 'seat_price_not_configured', message: 'Kein Seat-Preis gefunden — weder unter dem lookup_key dp_seat_* noch in der .env' });
 
     const base = appBase(req);
     const meta = { kind: 'partner_seats', reseller_id: req.reseller.id, userId: req.user.id };
