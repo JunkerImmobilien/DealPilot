@@ -49,6 +49,7 @@
         <a href="#" data-view="users" class="nav-link">Nutzer</a>
         <a href="#" data-view="credits" class="nav-link">Guthaben &amp; Kosten</a>
         <a href="#" data-view="invoices" class="nav-link">Rechnungen</a>
+        <a href="#" data-view="rabatte" class="nav-link">Rabattcodes</a>
         <a href="#" data-view="audit" class="nav-link">Audit-Log</a>
         <!-- v1368 (B9): Sicherheit steht bewusst NEBEN dem Audit-Log.
              Das Audit-Log protokolliert, was ADMINS getan haben; hier
@@ -375,6 +376,11 @@
       <div id="lp-body"><div class="lp-empty">…</div></div>
     </section>
     <!-- WADM-7 -->
+    <section id="view-rabatte" class="view" style="display:none;">
+      <div class="view-header"><h2>Rabattcodes</h2></div>
+      <div id="rb-body"><p style="color:#7a7468">…</p></div>
+    </section>
+
     <section id="view-marktzinsen" class="view" style="display:none;">
       <div class="view-header"><h2>Marktzinsen &amp; Gutachterausschuss-Daten</h2></div>
       <div id="mz-body"><p style="color:#7a7468">…</p></div>
@@ -503,6 +509,7 @@
     <script src="js/admin-reseller.js"></script>
   <script src="js/admin-landing.js?v=973b"></script>
   <!-- WADM-8 -->
+  <script src="js/admin-rabatte.js?v=v1423"></script>
   <script src="js/admin-marktzinsen.js?v=1024"></script>
   <script src="js/admin-security.js?v=v1369c"></script>
 </body>

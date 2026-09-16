@@ -1085,8 +1085,8 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
               <div class="dp-plead">Ihre Mandanten rechnen unter Ihrer Marke. Sie pr&uuml;fen, geben frei und behalten den &Uuml;berblick &mdash; ohne E-Mail-Ping-Pong.</div>
             </div>
             <div class="dp-pbody">
-              <div class="dp-pprice"><b id="dp-pnum">99</b><span class="cur">&euro;</span><span class="per" id="dp-pper">/ Monat</span></div>
-              <div class="dp-pnote" id="dp-pnote">oder 1.490 &euro;/Jahr &mdash; 2 Monate geschenkt</div>
+              <div class="dp-pprice"><b id="dp-pnum">49</b><span class="cur">&euro;</span><span class="per" id="dp-pper">/ Monat</span></div>
+              <div class="dp-pnote" id="dp-pnote">oder 539 &euro;/Jahr &mdash; 1 Monat geschenkt</div>
               <ul class="dp-pinc">
                 <li>Mandanten-Konsole &mdash; einladen, Seats vergeben, Status sehen</li>
                 <li>Whitelabel: Ihr Logo, Ihre Farben, Ihr Name</li>
@@ -4140,10 +4140,10 @@ html{scroll-behavior:smooth}
     var on=pt.querySelector('button.on');
     var y = on && on.getAttribute('data-p')==='yearly';
     var n=$('dp-pnum'), pr=$('dp-pper'), no=$('dp-pnote');
-    if(n)  n.textContent  = y ? '1.490' : '149';
+    if(n)  n.textContent  = y ? '539' : '49';
     if(pr) pr.textContent = y ? '/ Jahr' : '/ Monat';
-    if(no) no.innerHTML   = y ? 'entspricht 124 €/Monat — 2 Monate geschenkt'
-                              : 'oder 1.490 €/Jahr — 2 Monate geschenkt';
+    if(no) no.innerHTML   = y ? 'entspricht rund 45 €/Monat — 1 Monat geschenkt'
+                              : 'oder 539 €/Jahr — 1 Monat geschenkt';
   }
   function seg(i){
     var b1=$('dp-seg-1'), b2=$('dp-seg-2');

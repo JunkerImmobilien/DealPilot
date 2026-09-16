@@ -386,6 +386,11 @@ app.use('/api/v1', resellerRoutes);  // V200
 app.use('/api/v1/reseller', require('./routes/resellerPortal'));  // reseller-portal-p3
 app.use('/api/v1/reseller-invite', require('./routes/resellerInvite'));  // reseller-invite-p5
 app.use('/api/v1/admin-reseller', require('./routes/resellerAdminPanel'));  // reseller-admin-panel-p7
+/* v1423: Rabattcodes im Admin. Eigener Pfad statt Unterpfad von
+   /api/v1/admin — dort haengt bereits admin.js mit eigenen :id-Routen,
+   und ein spaeter ergaenztes /admin/:etwas koennte /admin/rabatte
+   verschlucken. Dasselbe Muster wie admin-reseller. */
+app.use('/api/v1/admin-rabatte', require('./routes/adminRabatte'));  // v1423
 app.set('db', pool);
 
 // API root info
