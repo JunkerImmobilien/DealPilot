@@ -67,7 +67,13 @@ const checkoutSchema = z.object({
   planId: z.string().min(1),
   billingInterval: z.enum(['monthly', 'yearly']),
   successUrl: z.string().url().optional(),
-  cancelUrl: z.string().url().optional()
+  cancelUrl: z.string().url().optional(),
+  /* v1421 · Flyer-Code. Der Kunde tippt ihn nie ab: er kommt ueber
+     dealpilot.immo/erstflug herein, wird als Cookie auf .dealpilot.immo
+     gemerkt und hier mitgeschickt. Bewusst NICHT streng validiert ausser
+     in Form und Laenge — die Wahrheit ist Stripe, nicht dieses Schema.
+     Ein unbekannter Code darf den Checkout NIE scheitern lassen. */
+  promo: z.string().regex(/^[A-Za-z0-9_-]{2,50}$/).optional()
 });
 
 const portalSchema = z.object({
@@ -149,7 +155,8 @@ router.post('/checkout', validate({ body: checkoutSchema }), async (req, res, ne
       name: req.user.name,
       priceId,
       successUrl,
-      cancelUrl
+      cancelUrl,
+      promoCode: req.body.promo || null
     });
 
     res.json({ url: session.url, sessionId: session.sessionId });
