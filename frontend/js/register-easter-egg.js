@@ -114,16 +114,33 @@
           // v428: B2C/B2B-Auswahl entfernt – Verbraucher-/Unternehmer-Status ergibt
           // sich aus dem Gesetz (§ 13/14 BGB, AGB Ziffer V); Erhebung erst beim Kauf.
           '<label id="dp-reg-consent-label" style="display:flex;align-items:flex-start;gap:8px;margin:10px 0 6px;cursor:pointer;font-size:12px;line-height:1.5;color:rgba(250,246,232,0.85)">' +
-            '<input type="checkbox" id="dp-reg-consent" style="margin-top:3px;accent-color:#C9A84C;flex-shrink:0">' +
-            '<span>Ich habe die <a href="/agb.html" target="_blank" style="color:#C9A84C">AGB</a>, die ' +
-            '<a href="/datenschutz.html" target="_blank" style="color:#C9A84C">Datenschutzerklaerung</a> und ' +
-            'die <a href="#" onclick="if(window.DealPilotLegal){DealPilotLegal.showInfo();return false;}" style="color:#C9A84C">Nutzungshinweise</a> ' +
+            /* v1421b · Groesse HIER am Element, nicht in style.css.
+               Die globale Regel v1147-CB33 setzt jedes Ankreuzfeld auf
+               33x33 px — Marcels eigene Entscheidung vom 12.08.2026, weil
+               die Felder vorher 13x13 px massen und damit unter jeder
+               Trefferflaeche lagen. In einer Formularzeile mit kurzem
+               Label passt das. NEBEN ZWEI ZEILEN FLIESSTEXT nicht: bei
+               12px-Schrift steht dort ein Quadrat von fast dreifacher
+               Zeilenhoehe. Marcel am 16.09.2026: „die Checkboxen sind
+               riesig".
+               Der Inline-Stil schlaegt die globale Regel (hoehere
+               Spezifitaet, ohne dass irgendwo ein !important noetig wird)
+               und aendert dabei NUR diese zwei Felder — die 33 px gelten
+               ueberall sonst weiter. Die Trefferflaeche bleibt trotzdem
+               gross: das <label> umschliesst den ganzen Text und ist
+               klickbar.
+               Gold zugleich auf die --wl-Ebene gehoben (Whitelabel-Pflicht,
+               die Datei wurde ohnehin angefasst). */
+            '<input type="checkbox" id="dp-reg-consent" style="width:17px;height:17px;margin-top:1px;accent-color:var(--wl-c9a84c, #C9A84C);flex-shrink:0">' +
+            '<span>Ich habe die <a href="/agb.html" target="_blank" style="color:var(--wl-c9a84c, #C9A84C)">AGB</a>, die ' +
+            '<a href="/datenschutz.html" target="_blank" style="color:var(--wl-c9a84c, #C9A84C)">Datenschutzerklaerung</a> und ' +
+            'die <a href="#" onclick="if(window.DealPilotLegal){DealPilotLegal.showInfo();return false;}" style="color:var(--wl-c9a84c, #C9A84C)">Nutzungshinweise</a> ' +
             'gelesen und akzeptiere sie. Mir ist bewusst, dass DealPilot <strong>keine Beratung</strong> ist.</span>' +
           '</label>' +
 
           // v428: Newsletter-Opt-in (freiwillig, default AUS)
           '<label style="display:flex;align-items:flex-start;gap:8px;margin:4px 0 6px;cursor:pointer;font-size:12px;line-height:1.5;color:rgba(250,246,232,0.70)">' +
-            '<input type="checkbox" id="dp-reg-newsletter" style="margin-top:3px;accent-color:#C9A84C;flex-shrink:0">' +
+            '<input type="checkbox" id="dp-reg-newsletter" style="width:17px;height:17px;margin-top:1px;accent-color:var(--wl-c9a84c, #C9A84C);flex-shrink:0">' +
             '<span>Ich möchte gelegentlich Produkt-News, Tipps und Angebote zu DealPilot per E-Mail erhalten. <em style="opacity:.8">(Freiwillig, jederzeit abbestellbar.)</em></span>' +
           '</label>' +
 

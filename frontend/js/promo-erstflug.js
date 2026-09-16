@@ -280,14 +280,30 @@
         '\u00a0% dauerhaft</b>.</span>' +
         '<span class="fine">Der Rabatt bleibt auf deinem Abo, solange es l\u00e4uft \u2014 monatlich wie j\u00e4hrlich.</span>';
     }
-    var rest = (ST.left != null && ST.max != null)
-      ? ('<span class="cnt">Noch ' + ST.left + ' von ' + ST.max + ' Pl\u00e4tzen</span>')
-      : '<span class="cnt">Begrenzte Anzahl Pl\u00e4tze</span>';
-    return '<span class="tag">FOUNDING MEMBER</span>' +
+    /* v1421b \u00b7 Zwei Saetze, die nicht mehr stimmen, sind hier weggefallen:
+
+       1. \u201eNoch X von Y Plaetzen" / \u201eBegrenzte Anzahl Plaetze".
+          Marcels Entscheidung vom 16.09.2026: ERSTFLUG ist ein
+          MESSERABATT und hat kein Kontingent mehr \u2014 \u201edas bekommen alle".
+          Eine Verknappung zu behaupten, die es nicht gibt, ist eine Luege
+          im Schaufenster. `ST.left`/`ST.max` werden weiter gefuellt, nur
+          nicht mehr angezeigt: kommt das Limit je zurueck, steht die Zahl
+          bereit.
+
+       2. \u201eCode im Bezahlvorgang eingeben".
+          Wer ueber dealpilot.immo/erstflug hereinkommt, hat den Code
+          bereits im Gepaeck (flyer-code.js). Ihn zur Eingabe aufzufordern
+          laesst ihn glauben, er muesse noch etwas tun \u2014 und wer nichts
+          findet, bricht ab. Deshalb sagt der Satz jetzt, was wahr ist. */
+    var schonDabei = !!(global.DealPilotFlyerCode && global.DealPilotFlyerCode.get());
+    var hinweis = schonDabei
+      ? 'Der Code ist bereits hinterlegt \u2014 du musst nichts eingeben'
+      : 'Code im Bezahlvorgang eingeben';
+    return '<span class="tag">ERSTFLUG</span>' +
       '<span class="txt"><b>' + fmtNum(ST.percent) + '\u00a0% dauerhaft</b> mit Code ' +
       '<span class="code">' + esc(ST.code) + '</span></span>' +
-      '<span class="fine">' + rest + ' \u00b7 gilt monatlich und j\u00e4hrlich, solange dein Abo l\u00e4uft \u00b7 ' +
-      'Code im Bezahlvorgang eingeben</span>';
+      '<span class="fine">Gilt monatlich und j\u00e4hrlich, solange dein Abo l\u00e4uft \u00b7 ' +
+      hinweis + '</span>';
   }
 
   function esc(s) {
@@ -471,9 +487,29 @@
   /* ═══════════════════════════════════════════════════════════════
      BOOT
      ═══════════════════════════════════════════════════════════════ */
+  /* v1421b · Der Flyer-Gast ist der Grund, warum die Anzeige wieder angeht.
+
+     Marcels Befund vom 16.09.2026: „Wenn ich über den Link Erstflug
+     reingehe, komme ich einfach nur auf die Startseite." Genau so war es —
+     flyer-code.js merkte den Code lautlos im Cookie, und nichts auf der
+     Seite sagte dem Gast, dass er jetzt 15 % bekommt. Ein Rabatt, den
+     niemand sieht, ist ein Rabatt, den niemand einloest.
+
+     Die Anzeige bleibt fuer den normalen Besucher AUS (v1246 gilt
+     unveraendert: „bitte nicht auf der Seite mehr angeben") und geht nur
+     fuer den an, der einen Flyer-Code mitbringt. Das ist zugleich genau
+     das Versprechen des Flyers: der Rabatt gehoert dem, der ihn in der
+     Hand hatte, nicht jedem Vorbeisurfer. */
+  function flyerGast() {
+    try {
+      return !!(global.DealPilotFlyerCode && global.DealPilotFlyerCode.get());
+    } catch (e) { return false; }
+  }
+
   function boot() {
-    /* v1246: Anzeige aus — siehe Schalter oben. */
-    if (!ANZEIGE_AKTIV) return;
+    /* v1246: Anzeige aus — siehe Schalter oben.
+       v1421b: ausser fuer Flyer-Gaeste. */
+    if (!ANZEIGE_AKTIV && !flyerGast()) return;
     var isApp = !!(global.Auth && typeof Auth.getApiBase === 'function');
 
     loadPromo().then(function (promo) {
@@ -500,6 +536,17 @@
         ST.max = (promo.max == null ? null : promo.max);
         if (!ST.percent) ST.percent = promo.percent;
         if (!ST.percent) return;
+
+        /* v1421b · Der Empfangsbalken oben (flyer-code.js) startet bewusst
+           ohne Zahl — er kennt nur den Code, nicht seinen Wert. Hier ist
+           der Prozentsatz zum ersten Mal aus STRIPE bestaetigt, also wird
+           er jetzt nachgetragen. Schlaegt es fehl (kein Balken, weil kein
+           Flyer-Code oder weggeklickt), ist das kein Fehler. */
+        try {
+          if (global.DealPilotFlyerCode && global.DealPilotFlyerCode.prozentNachtragen) {
+            global.DealPilotFlyerCode.prozentNachtragen(ST.percent);
+          }
+        } catch (e) {}
 
         css();
         if (isApp) { watchModal(); waitForApp(); }
