@@ -132,18 +132,31 @@
      DOM
      ═══════════════════════════════════════════════════════════════ */
 
-  /** Haengt den Code an Links, die auf eine ANDERE dealpilot-Subdomain zeigen. */
+  /* Haengt den Code an Links, die auf eine ANDERE dealpilot-Subdomain zeigen.
+
+     v1421b · HIER STAND EIN FEHLER, und er war unsichtbar:
+     verglichen wurde mit `href.indexOf(location.hostname) !== -1`. Auf der
+     Landing ist `location.hostname` = staging.dealpilot.immo — und das ist
+     eine TEILZEICHENKETTE von app.staging.dealpilot.immo. Jeder Link in die
+     App galt damit als "dieselbe Domain" und wurde uebersprungen. Gemessen
+     am 16.09.2026 im Browser: fuenf Links auf ?register=1, kein einziger
+     mit code=. Dass der Flyer-Code trotzdem ankam, lag allein am Cookie —
+     der Guertel hat gehalten, waehrend der Hosentraeger riss.
+
+     Jetzt wird der Host GEPARST und exakt verglichen. `a.href` (nicht
+     getAttribute) liefert die bereits aufgeloeste absolute Adresse. */
   function linkeAnreichern(code) {
     if (!code) return 0;
     var n = 0;
     var links = document.querySelectorAll('a[href]');
     for (var i = 0; i < links.length; i++) {
-      var a = links[i], href = a.getAttribute('href') || '';
-      if (href.indexOf('//') === -1) continue;               /* relativ: gleiche Domain */
-      if (href.indexOf('dealpilot.immo') === -1) continue;   /* fremd: nichts anhaengen */
-      if (href.indexOf('code=') !== -1) continue;            /* schon dran */
-      if (href.indexOf(location.hostname) !== -1) continue;  /* dieselbe Domain */
-      a.setAttribute('href', href + (href.indexOf('?') === -1 ? '?' : '&') + 'code=' + encodeURIComponent(code));
+      var a = links[i], u;
+      try { u = new URL(a.href, location.href); } catch (e) { continue; }
+      if (u.hostname === location.hostname) continue;             /* dieselbe Domain */
+      if (!/(^|\.)dealpilot\.immo$/i.test(u.hostname)) continue;  /* fremd: nichts anhaengen */
+      if (u.searchParams.has('code')) continue;                   /* schon dran */
+      u.searchParams.set('code', code);
+      a.setAttribute('href', u.toString());
       n++;
     }
     return n;
