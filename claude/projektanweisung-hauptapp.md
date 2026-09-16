@@ -16731,3 +16731,59 @@ App-Domain leer, Cookie da), Stripe-Probe 34,99 -> 29,74 EUR.
 4. Gold-Wächter ist rot, aus v1384–v1405, nicht aus diesem Paket.
 
 **Commits** `v1421b` `06e9adc`, `v1421c` `e798754`. Staging, nicht Prod.
+
+---
+
+## Rollout-Journal · 16.09.2026 (3) — PROD: v1421 bis v1421c
+
+**Was.** Erster Prod-Rollout seit dem 12.09. Marcels Freigabe. Auf Prod
+sind jetzt: Intro-Video aus, Flyer-Code bis in den Checkout,
+Empfangsbalken, Rabatt-Anzeige fuer Flyer-Gaeste, Registrierungs-
+Checkboxen 17 px. Dazu Stripe LIVE auf **15 % dauerhaft ohne Kontingent**.
+
+> **NICHT gemerged, sondern per Cherry-Pick geloest — und das war noetig.**
+> Zwischen `main` und `staging` lagen **346 Commits, 217 Dateien, 118.897
+> Zeilen und vier offene Migrationen**. Ein Merge haette den kompletten
+> **Marktbericht-Strang** und jede Migration seit dem 12.09. mit
+> ausgerollt. Gewollt waren drei Commits. Vorher gemessen, ob es sauber
+> geht: von elf betroffenen Dateien wich auf `main` nur
+> `frontend/index.html` ab.
+
+**Die Konfliktstelle war ein echter Fund, kein Formalie.** `v1421` brachte
+in `index.html` die Script-Tags von `rate-limit-handler.js` (v1370) und
+`qc-ai-bridge.js` (v1374) mit — **beide Dateien gibt es auf `main`
+nicht**. Waeren sie mitgekommen, haette die Prod-Seite zwei Skripte
+geladen, die ins Leere zeigen. Uebernommen wurde nur der Cache-Buster von
+`subscription.js`; danach **jeder** Skriptverweis der Seite gegen das
+Dateisystem geprueft, keiner zeigt ins Leere.
+
+**Vorher gesichert** (Regel): Haupt-DB 11 MB, Marktbericht-DB 698 KB,
+beide mit `ls -lh` und `zcat | head -2` angesehen. Keine Attrappe.
+
+**Nachweis auf PROD im Browser gemessen:**
+- Intro-Video: kein `#dp-intro` im DOM
+- `dealpilot.immo/erstflug` -> Empfangsbalken „15 % dauerhaft", Adresszeile
+  auf `/` aufgeraeumt
+- **12 von 12** Links in die App tragen `code=ERSTFLUG`
+- Preise **16,99 / 29,74 / 42,49** aus 19,99 / 34,99 / 49,99 (exakt 15 %)
+- Code traegt ueber die Domaingrenze nach `app.dealpilot.immo`
+- Registrierungs-Checkboxen 17x17, Label 72 bzw. 54 px, klickbar
+- Backend gesund, keine Fehler im Log
+- Stripe LIVE: `promo_1UGDXLGefFev8arzRmd71cq6`, 15 %, `forever`,
+  ohne `max_redemptions`; am echten Checkout 34,99 -> 29,74 EUR
+
+**Der alte 16-%-Code ist abgeschaltet, nicht geloescht** — bei 0
+Einloesungen verliert niemand etwas, und laufende Abos haetten ihren
+Rabatt ohnehin behalten.
+
+**Rest — unveraendert offen:**
+1. **Seat-Preis Prod bucht 35/29/24 statt 19/15/12** (steht in der `.env`,
+   nicht in `plans`). Geldentscheidung.
+2. Seat-Preis Staging zeigt auf einen archivierten Preis.
+3. `proration_behavior` Staging (`none`) gegen Prod (`always_invoice`).
+4. Gold-Waechter rot aus v1384–v1405 (nicht aus diesem Paket).
+5. Pre-Flight-Entwuerfe: Marcels Auswahl steht aus.
+6. **Staging und Prod liegen jetzt wieder 343 Commits auseinander** —
+   der Marktbericht-Strang ist weiterhin nicht auf Prod.
+
+**Commit** `7a8ee2c` auf `main`. Prod laeuft darauf.
