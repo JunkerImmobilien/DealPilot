@@ -16657,3 +16657,77 @@ Cookie traegt ueber die Domaingrenze.
 6. Pre-Flight-Entwuerfe: Auswahl steht aus, dann Einbau.
 
 **Commit** `v1421`. Auf Staging, **nicht auf Prod**.
+
+---
+
+## Rollout-Journal · 16.09.2026 (2) — v1421b/c: ERSTFLUG auf 15 %, Empfang, Checkboxen
+
+**Was.** Marcels drei Befunde nach v1421, alle am Original nachgemessen,
+plus die Rabatt-Entscheidung.
+
+**1 · „Komme einfach nur auf die Startseite" — der Befund stimmte.**
+`flyer-code.js` merkte den Code lautlos im Cookie; nichts sagte dem Gast,
+dass er 15 % bekommt. `promo-erstflug.js` ist die fertige Maschine dafuer
+und war nur abgeschaltet — sie geht jetzt fuer FLYER-GAESTE an und bleibt
+fuer alle anderen aus (v1246 gilt unveraendert). Das ist zugleich das
+Versprechen des Flyers: der Rabatt gehoert dem, der ihn in der Hand hatte.
+> **Das reichte nicht.** Gemessen: das Banner sitzt bei der Preistabelle,
+> **5544 px** unter der Oberkante. Deshalb in v1421c ein zweiter, schlanker
+> **Empfangsbalken ganz oben** — eine Zeile plus „Kostenlos starten",
+> wegklickbar. **Bewusst ohne Einblendung**, siehe Messfalle unten.
+> Der Prozentsatz wird dort NICHT bestimmt: der Balken startet ohne Zahl,
+> `promo-erstflug.js` traegt sie nach, sobald Stripe sie bestaetigt hat.
+
+**2 · Ein eigener Fehler aus v1421, unsichtbar geblieben.**
+`linkeAnreichern()` verglich mit `href.indexOf(location.hostname)`. Auf der
+Landing ist das `staging.dealpilot.immo` — eine **Teilzeichenkette** von
+`app.staging.dealpilot.immo`. Jeder Link in die App galt als „dieselbe
+Domain" und wurde uebersprungen: fuenf Links auf `?register=1`, kein
+einziger mit `code=`. Dass der Code trotzdem ankam, lag allein am Cookie —
+**der Guertel hielt, waehrend der Hosentraeger riss.** Jetzt wird der Host
+geparst und exakt verglichen; nachgemessen: 11 von 11 Links tragen den Code.
+
+**3 · „Checkboxen sind riesig" — 33x33 px, und das ist KEIN Bug.**
+v1147-CB33, Marcels eigene Entscheidung vom 12.08.2026, weil die Felder
+vorher 13x13 px massen. In einer Formularzeile passt das; neben zwei Zeilen
+Fliesstext bei 12px-Schrift steht dort ein Quadrat von fast dreifacher
+Zeilenhoehe. Geaendert wurden deshalb **nur die beiden Registrierungsfelder**
+per Inline-Stil (hoehere Spezifitaet, kein `!important` noetig). Gemessen:
+17x17 px, Label weiterhin 72 bzw. 54 px hoch und klickbar — die
+Trefferflaeche bleibt gross. `#erbpacht` steht unveraendert auf 33 px.
+
+**ERSTFLUG: 15 %, kein Kontingent, dauerhaft.** Marcels Entscheidung:
+„genau 15 Prozent … nicht auf die ersten 100 User, das ist ein Messerabatt,
+den bekommen alle." Ein Stripe-Coupon aendert seinen Prozentsatz nie —
+der Weg war: alten Code deaktivieren (macht den Namen frei), neuen Code
+`ERSTFLUG` auf den bereits vorhandenen 15-%-Coupon `ERSTFLUG15`, **ohne
+`max_redemptions`**. Die Banner-Texte „Noch X von Y Plaetzen" und „Code im
+Bezahlvorgang eingeben" sind entfallen — beide waren nicht mehr wahr.
+**Auf Staging erledigt, auf PROD nicht** (siehe Rest).
+
+> **MESSFALLE, zweimal hineingelaufen.** Ich meldete zwischendurch „die
+> Preise sind kaputt" und „der Banner bleibt unsichtbar". **Beides war
+> falsch.** Ursache jeweils `document.visibilityState === "hidden"` im
+> ferngesteuerten Tab: dann feuert `requestAnimationFrame` nie und
+> CSS-Transitions laufen nicht — und genau daran haengen sowohl die
+> rollende Preiszahl als auch die Einblendung des Banners. Die Regel stand
+> in meinen Notizen. **Vor jeder Messung an etwas Animiertem zuerst
+> `visibilityState` lesen**, sonst misst man den eigenen Messaufbau.
+
+**Nachweis.** node --check ohne Befund, 12 von 12 Logikpruefungen gruen.
+Im sichtbaren Browser gemessen: Balken oben bei 0 px mit „15 % dauerhaft",
+Banner opacity 1, Preise **16,99 / 29,74 / 42,49** aus 19,99 / 34,99 / 49,99
+(exakt 15 %), Code traegt ueber die Domaingrenze (localStorage auf der
+App-Domain leer, Cookie da), Stripe-Probe 34,99 -> 29,74 EUR.
+
+**Rest — beides braucht Marcels Freigabe:**
+1. **Stripe PROD steht noch auf 16 % mit 100 Plaetzen.** Der schreibende
+   Zugriff wurde abgewiesen (Geld-Eingriff auf Produktion). Skript liegt
+   bereit, Trockenlauf auf Prod gelaufen und sauber.
+2. **Prod hat das ganze Paket nicht** (Stand 12.09., `47e3673`). Dort
+   laeuft das Intro-Video noch und `/erstflug` kann nichts tun. Ein
+   Prod-Rollout braucht einen Backend-Neubau (Flyer-Code im Checkout).
+3. Seat-Preis Prod (35/29/24 gegen 19/15/12) — unveraendert offen.
+4. Gold-Wächter ist rot, aus v1384–v1405, nicht aus diesem Paket.
+
+**Commits** `v1421b` `06e9adc`, `v1421c` `e798754`. Staging, nicht Prod.
