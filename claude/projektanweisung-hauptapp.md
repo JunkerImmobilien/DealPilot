@@ -16787,3 +16787,72 @@ Rabatt ohnehin behalten.
    der Marktbericht-Strang ist weiterhin nicht auf Prod.
 
 **Commit** `7a8ee2c` auf `main`. Prod laeuft darauf.
+
+---
+
+## Rollout-Journal · 16.09.2026 (4) — v1423: Seat, Partnerpreis, Rabatte im Admin
+
+**Auf Staging UND Prod ausgerollt** (`9d9c306` / Prod `a64a46b`).
+
+**1 · Der Seat-Preis war in beiden Umgebungen falsch — und die Landing hat
+die ganze Zeit den richtigen versprochen.**
+Prod buchte die alte Staffel **35 / 29 / 24 EUR** je Seat, Staging zeigte
+auf einen **archivierten** Preis (24 / 19 / 15 — der dritte Stand, den
+Migration 065 im Kommentar nennt). Gueltig sind **19 / 15 / 12**, und genau
+das steht seit Langem auf der Landing: „Mandanten-Seats ab 12 EUR je
+Mandant". Prod hat also fast das Doppelte des beworbenen Preises
+abgerechnet — kein reiner Preisfehler, sondern eine falsche Zusage.
+
+> **Warum es durch jedes Raster fiel:** der Seat ist der einzige Preis,
+> der **nicht in `plans`** steht, sondern in der `.env`. Wer `config.js`,
+> `plans` und die Portal-Konfiguration prueft, haelt alles fuer sauber.
+> **Eine ID in einer Umgebungsvariablen altert still.**
+
+**Die Loesung ist nicht „neue IDs in die .env", sondern der `lookup_key`.**
+`resellerPortal.js` loest den Seat jetzt ueber `dp_seat_monthly` /
+`dp_seat_yearly` auf — umgebungsblind und immer der AKTIVE Preis, dasselbe
+Muster wie bei den Bewertungspaketen. Die `.env` bleibt als Rueckfall.
+> **Der Rueckfall wurde mitgezogen, und das war noetig:** er zeigte auf
+> Prod weiter auf 35/29/24. Ein Rueckfall auf einen FALSCHEN Preis ist
+> schlimmer als gar keiner — bei einem Aussetzer haette er still das
+> Doppelte gebucht. Beide `.env` tragen jetzt die neuen IDs,
+> `--force-recreate`, und **im Container mit `printenv` nachgemessen**.
+> Danach liefern beide Wege dasselbe: 19/15/12 bzw. 209/165/132.
+> Sicherung: `.env.pre-v1423` auf beiden Servern.
+
+**2 · Der Partnerpreis auf der Landing stand in DREI Staenden auf einer
+Seite:** `99` als Startwert im HTML (Zeile 1088), `149` sobald das JS lief
+(Zeile 4143) — und in Wahrheit **49**. Dazu „oder 1.490 EUR/Jahr — 2 Monate
+geschenkt", waehrend der Jahrespreis 539 EUR betraegt und elf
+Monatsbeitraegen entspricht, also **einem** Freimonat. Alle fuenf Stellen
+korrigiert (539/12 = 44,92, deshalb „rund 45 EUR/Monat").
+
+**3 · Rabattcodes im Admin** (neuer Reiter zwischen Rechnungen und
+Audit-Log). Counter je Code, Abschalten per Knopf, neuen Code anlegen mit
+eigenem Namen, Prozentsatz, Dauer und optionaler Begrenzung.
+Die Wahrheit bleibt **Stripe** — keine zweite Tabelle, die auseinanderlaeuft.
+Die Oberflaeche spricht drei Dinge aus, die sonst teuer werden:
+- Abschalten nimmt niemandem seinen Rabatt weg (nur `active:false`, kein
+  Loeschen — ein geloeschter Code waere aus der Historie verschwunden, die
+  Rabatte aber weiter in den Abos)
+- ein Prozentsatz laesst sich **nie** aendern, nur neu anlegen
+- ein Coupon **ohne** Code ist fuer Kunden unerreichbar; solche Leichen
+  werden angezeigt statt verschwiegen — genau so lag `ERSTFLUG15`
+  monatelang herum
+Nur Rolle `owner`. Eigener Pfad `/api/v1/admin-rabatte`, nicht als
+Unterpfad von `/api/v1/admin` (dort fuehrt `admin.js` eigene `:id`-Routen).
+
+**Nachweis.** Vier Dateien `node --check` ohne Befund. Vor dem Prod-Merge
+**jeder** Skriptverweis der Admin-Seite und **jedes**
+`require('./routes/…')` gegen das Dateisystem geprueft — die Lehre aus dem
+Vormittag, als v1421 zwei Script-Tags mitbringen wollte, deren Dateien es
+auf `main` nicht gibt. Auf Prod gemessen: Route antwortet 401 (da),
+Partnerpreis 49, Seat 19/15/12 auf beiden Wegen, Backend gesund, keine
+Fehler im Log.
+
+**Rest:**
+1. `proration_behavior` Staging (`none`) gegen Prod (`always_invoice`).
+2. Gold-Waechter rot aus v1384–v1405.
+3. Pre-Flight-Entwuerfe: Marcels Auswahl steht aus.
+4. Staging und Prod liegen weiterhin ~340 Commits auseinander — der
+   Marktbericht-Strang ist nicht auf Prod.
