@@ -1,0 +1,669 @@
+<title>Pre-Flight Entwürfe</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   Pre-Flight Entwürfe — zweiter Anlauf.
+
+   Was beim ersten falsch war, und warum:
+   1 · „Seriös" habe ich als „amtlich" gelesen — Aktendeckel, Prüfprotokoll,
+       Urkunde. Das ist Behörde, nicht wertig. Diesmal: Material, Licht und
+       Präzision. Die Karte soll aussehen wie ein Instrument, das etwas
+       kostet, nicht wie ein Formular.
+   2 · Die Karte hatte min-width:660px bei 9-px-Schrift und wirkte wie ein
+       geschrumpftes Bildchen. Jetzt wird sie in ECHTER Größe
+       gebaut und als Ganzes proportional auf die Bühne skaliert — sie
+       sieht auf jedem Schirm gleich aus, nur größer oder kleiner.
+
+   Marken-Token aus CLAUDE.md: Obsidian #050505 · Gold #C9A84C
+   (hell #E8CC7A, dunkel #b8932f) · Grün #3FA56C · Rot #B8625C
+   Schriften: Space Grotesk · JetBrains Mono · Inter
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root{
+  --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+  --obsidian:#050505; --gruen:#3FA56C; --rot:#B8625C;
+
+  --grund:#0C0B0A; --flaeche:#141210; --linie:#2A2622;
+  --text:#F0EBE1; --leise:#9B9184; --sehr-leise:#6E665B;
+
+  --disp:'Space Grotesk', system-ui, sans-serif;
+  --mono:'JetBrains Mono', ui-monospace, monospace;
+  --body:'Inter', system-ui, sans-serif;
+}
+/* Diese Seite committet sich bewusst auf EINEN Look: die Entwürfe sind
+   Instrumente auf dunklem Grund, ein heller Seitenhintergrund würde jede
+   Beurteilung verfälschen. Deshalb kein Theme-Wechsel — aber alles
+   explizit gesetzt, nichts vom Wirtsgrund geerbt. */
+
+*{box-sizing:border-box}
+body{background:var(--grund);color:var(--text);font-family:var(--body);
+  margin:0;line-height:1.6;-webkit-font-smoothing:antialiased;font-size:15px}
+.huelle{max-width:1240px;margin:0 auto;padding-inline:24px;padding-block:0 80px}
+
+/* ── Kopf ─────────────────────────────────────────────────────── */
+header.kopf{padding-block:56px 30px}
+.augenbraue{font-family:var(--mono);font-size:11px;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--gold);margin:0 0 16px}
+h1{font-family:var(--disp);font-weight:700;font-size:clamp(34px,5.4vw,54px);
+  letter-spacing:-.025em;margin:0 0 16px;text-wrap:balance;line-height:1.05}
+.vorspann{font-size:17px;color:var(--leise);max-width:60ch;margin:0}
+.vorspann b{color:var(--text);font-weight:600}
+
+.zurueck{margin-block:30px 0;padding:18px 22px;border:1px solid var(--linie);
+  border-left:3px solid var(--rot);border-radius:4px;background:#17130F}
+.zurueck h2{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--rot);margin:0 0 10px;font-weight:700}
+.zurueck p{margin:0;font-size:14.5px;color:var(--leise)}
+.zurueck p + p{margin-top:9px}
+.zurueck b{color:var(--text)}
+
+/* ── Sprungleiste ─────────────────────────────────────────────── */
+.leiste{position:sticky;top:0;z-index:50;background:rgba(12,11,10,.92);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--linie);
+  padding-block:13px;margin-top:34px}
+.leiste-innen{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.leiste b{font-family:var(--mono);font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--sehr-leise);margin-right:5px}
+.leiste a{font-family:var(--mono);font-size:11.5px;text-decoration:none;
+  color:var(--leise);border:1px solid var(--linie);border-radius:3px;
+  padding:6px 10px;background:var(--flaeche);transition:.14s}
+.leiste a:hover,.leiste a:focus-visible{border-color:var(--gold);color:var(--text);outline:none}
+
+/* ── Ein Entwurf ──────────────────────────────────────────────── */
+.entwurf{padding-block:52px;border-bottom:1px solid var(--linie);scroll-margin-top:68px}
+.entwurf-kopf{display:flex;gap:16px;align-items:baseline;margin-bottom:8px;flex-wrap:wrap}
+.nr{font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--gold);
+  letter-spacing:.1em;flex:none}
+.entwurf h3{font-family:var(--disp);font-size:27px;font-weight:700;margin:0;
+  letter-spacing:-.018em}
+.marke{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;
+  padding:4px 9px;border-radius:2px;border:1px solid;flex:none}
+.marke.ist{color:var(--rot);border-color:rgba(184,98,92,.42);background:rgba(184,98,92,.08)}
+.marke.tipp{color:var(--gruen);border-color:rgba(63,165,108,.42);background:rgba(63,165,108,.09)}
+.idee{color:var(--leise);font-size:15.5px;max-width:68ch;margin:0 0 26px}
+
+/* Bühne: misst sich selbst, die Karte wird proportional hineingerechnet */
+.buehne{border-radius:6px;border:1px solid var(--linie);overflow:hidden;position:relative}
+.skalierer{transform-origin:top left;width:max-content}
+
+.notiz{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:22px;margin-top:24px;padding-top:18px;border-top:1px solid var(--linie)}
+.notiz dt{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--sehr-leise);margin-bottom:6px}
+.notiz dd{margin:0;font-size:14px;color:var(--leise);line-height:1.55}
+
+/* ═══════════════════════════════════════════════════════════════
+   DIE KARTE — ein Markup, elf Hüllen, natürliche Breite.
+   Alle Maße in px, weil die ganze Karte als Block skaliert wird (siehe JS).
+   ═══════════════════════════════════════════════════════════════ */
+/* max-content statt fester Breite: die Karte nimmt genau die Breite, die ihr
+   Inhalt braucht. Eine feste Breite plus overflow:hidden hat im ersten Anlauf
+   die rechte Hälfte abgeschnitten — der Inhalt passte nie in 880 px. Die
+   Skalierung auf die Bühne macht danach das JS, mit der GEMESSENEN Breite. */
+.pf{width:max-content;display:flex;align-items:stretch;gap:0;position:relative;
+  font-family:var(--body);overflow:hidden}
+.pf-lead{display:flex;flex-direction:column;justify-content:center;flex:none;
+  padding:20px 22px;position:relative;min-width:172px}
+.pf-bp{font-family:var(--mono);font-size:8.5px;letter-spacing:.24em;
+  text-transform:uppercase;display:block;margin-bottom:5px}
+.pf-k{font-family:var(--mono);font-size:13px;letter-spacing:.2em;font-weight:700;display:block}
+.pf-s{font-size:10.5px;display:block;margin-top:5px}
+.pf-mitte{display:flex;flex:1;min-width:0}
+.pf-seg{display:flex;flex-direction:column;justify-content:center;gap:9px;
+  padding:20px 22px;flex:none}
+.pf-grouplbl{font-family:var(--mono);font-size:9px;letter-spacing:.17em;text-transform:uppercase}
+.pf-row{display:flex;gap:8px}
+.pf-tile{display:flex;align-items:center;gap:9px;padding:9px 13px;
+  font-size:13px;font-weight:500;white-space:nowrap;position:relative}
+.pf-led{width:9px;height:9px;border-radius:50%;flex:none}
+.pf-qr{margin-left:auto;display:flex;flex-direction:column;align-items:center;
+  gap:5px;flex:none;align-self:center;padding:20px 22px}
+.pf-qr .code{width:46px;height:46px;border-radius:3px;background:
+  repeating-conic-gradient(#0A0A08 0% 25%, #E6E0D2 0% 50%) 0 0/9.2px 9.2px}
+.pf-qr .scan{font-family:var(--mono);font-size:8px;letter-spacing:.14em}
+.pf-marke i{font-style:normal}
+
+/* ─────────────────────────────────────────────────────────────────
+   01 · IST — Bordkarte in Gold (unverändert, zum Vergleich)
+   ───────────────────────────────────────────────────────────────── */
+.buehne.b-ist{background:#100E0C;padding:26px}
+.pf.v-ist{background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));
+  border-radius:16px}
+.pf.v-ist .pf-bp{color:rgba(5,5,5,.5)}
+.pf.v-ist .pf-k{color:#050505}
+.pf.v-ist .pf-s{color:#4a3c10}
+.pf.v-ist .pf-lead::after{content:"";position:absolute;top:16px;bottom:16px;right:0;
+  width:1px;background:rgba(5,5,5,.22)}
+.pf.v-ist .pf-grouplbl{color:rgba(5,5,5,.62)}
+.pf.v-ist .pf-tile{background:#fff;border:1px solid rgba(0,0,0,.12);border-radius:9px;color:#221F1A}
+.pf.v-ist .pf-tile.werkzeug{background:rgba(8,7,4,.86);color:#e9e3d2}
+.pf.v-ist .pf-led{background:#cfc3a0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.16)}
+.pf.v-ist .pf-tile.an .pf-led{background:var(--gruen);box-shadow:0 0 7px rgba(63,165,108,.85)}
+.pf.v-ist .pf-qr .scan{color:rgba(5,5,5,.6)}
+.pf.v-ist .pf-marke i{color:var(--gold-lo)}
+
+/* ─────────────────────────────────────────────────────────────────
+   02 · GLAS — Milchglas über Tiefe, Lichtkante oben
+   ───────────────────────────────────────────────────────────────── */
+.buehne.b-glas{background:
+  radial-gradient(90% 150% at 15% 0%, rgba(201,168,76,.22), transparent 55%),
+  radial-gradient(70% 130% at 85% 100%, rgba(63,165,108,.12), transparent 60%),
+  #070706;padding:34px}
+.pf.v-glas{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);
+  border-radius:15px;backdrop-filter:blur(22px);
+  box-shadow:0 18px 50px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14)}
+.pf.v-glas::before{content:"";position:absolute;left:14%;right:14%;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent)}
+.pf.v-glas .pf-bp{color:rgba(240,235,225,.4)}
+.pf.v-glas .pf-k{color:#fff}
+.pf.v-glas .pf-s{color:rgba(240,235,225,.55)}
+.pf.v-glas .pf-lead::after{content:"";position:absolute;top:18px;bottom:18px;right:0;
+  width:1px;background:rgba(255,255,255,.1)}
+.pf.v-glas .pf-grouplbl{color:rgba(240,235,225,.42)}
+.pf.v-glas .pf-tile{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:9px;color:rgba(240,235,225,.9)}
+.pf.v-glas .pf-tile.an{background:rgba(232,204,122,.14);border-color:rgba(232,204,122,.4);color:#fff}
+.pf.v-glas .pf-led{background:rgba(255,255,255,.16)}
+.pf.v-glas .pf-tile.an .pf-led{background:var(--gold-hi);box-shadow:0 0 12px 2px rgba(232,204,122,.75)}
+.pf.v-glas .pf-qr .scan{color:rgba(240,235,225,.45)}
+.pf.v-glas .pf-marke i{color:var(--gold-hi)}
+
+/* ─────────────────────────────────────────────────────────────────
+   03 · TRIEBWERK — konzentrische Ringe, das aktive Modul glüht
+   ───────────────────────────────────────────────────────────────── */
+.buehne.b-triebwerk{background:#060605;padding:30px}
+.pf.v-triebwerk{background:
+  radial-gradient(circle at 92px 50%, rgba(232,204,122,.13), transparent 34%),
+  linear-gradient(180deg,#1A1815,#0E0D0B);
+  border:1px solid #2B2721;border-radius:4px;
+  box-shadow:0 14px 40px rgba(0,0,0,.6)}
+.pf.v-triebwerk .pf-lead{align-items:flex-start}
+.pf.v-triebwerk .pf-lead::before{content:"";position:absolute;left:14px;top:50%;
+  width:112px;height:112px;margin-top:-56px;border-radius:50%;
+  border:1px solid rgba(232,204,122,.18);
+  box-shadow:0 0 0 12px rgba(232,204,122,.045), 0 0 0 26px rgba(232,204,122,.025),
+             inset 0 0 26px rgba(232,204,122,.09)}
+.pf.v-triebwerk .pf-bp{color:#6E6555;position:relative}
+.pf.v-triebwerk .pf-k{color:#F2ECDE;position:relative}
+.pf.v-triebwerk .pf-s{color:#8C8372;position:relative}
+.pf.v-triebwerk .pf-grouplbl{color:#6E6555}
+.pf.v-triebwerk .pf-tile{background:#0A0908;border:1px solid #2B2721;border-radius:3px;
+  color:#CFC7B6;font-family:var(--mono);font-size:11.5px}
+.pf.v-triebwerk .pf-tile.an{border-color:rgba(232,204,122,.55);color:#FFF8E6;
+  box-shadow:0 0 18px rgba(232,204,122,.18), inset 0 0 14px rgba(232,204,122,.09)}
+.pf.v-triebwerk .pf-led{width:6px;height:6px;background:#2E2A23}
+.pf.v-triebwerk .pf-tile.an .pf-led{background:var(--gold-hi);
+  box-shadow:0 0 10px 2px rgba(232,204,122,.9)}
+.pf.v-triebwerk .pf-qr .scan{color:#6E6555}
+.pf.v-triebwerk .pf-marke i{color:var(--gold-hi)}
+
+/* ─────────────────────────────────────────────────────────────────
+   04 · HUD — Head-up-Display, Fadenkreuz-Ecken
+   ───────────────────────────────────────────────────────────────── */
+.buehne.b-hud{background:#030504;padding:30px}
+.pf.v-hud{background:linear-gradient(180deg,rgba(63,165,108,.05),rgba(3,5,4,.9));
+  border:1px solid rgba(63,165,108,.3);border-radius:2px;font-family:var(--mono)}
+.pf.v-hud::before,.pf.v-hud::after{content:"";position:absolute;width:16px;height:16px;
+  border:1px solid rgba(111,215,156,.8)}
+.pf.v-hud::before{left:7px;top:7px;border-right:0;border-bottom:0}
+.pf.v-hud::after{right:7px;bottom:7px;border-left:0;border-top:0}
+.pf.v-hud .pf-bp{color:rgba(111,215,156,.5)}
+.pf.v-hud .pf-k{color:#8FF0BC;text-shadow:0 0 12px rgba(111,215,156,.55)}
+.pf.v-hud .pf-s{color:rgba(111,215,156,.55);font-family:var(--mono);font-size:9px;letter-spacing:.1em}
+.pf.v-hud .pf-lead::after{content:"";position:absolute;top:20px;bottom:20px;right:0;
+  width:1px;background:rgba(63,165,108,.25)}
+.pf.v-hud .pf-grouplbl{color:rgba(111,215,156,.45)}
+.pf.v-hud .pf-tile{background:transparent;border:1px solid rgba(63,165,108,.22);
+  border-radius:1px;color:rgba(200,240,218,.75);font-size:11px;letter-spacing:.06em}
+.pf.v-hud .pf-tile.an{border-color:rgba(111,215,156,.75);color:#CFFFE6;
+  background:rgba(63,165,108,.1);box-shadow:0 0 16px rgba(63,165,108,.25)}
+.pf.v-hud .pf-led{width:5px;height:5px;border-radius:0;background:rgba(63,165,108,.28);
+  transform:rotate(45deg)}
+.pf.v-hud .pf-tile.an .pf-led{background:#8FF0BC;box-shadow:0 0 9px 2px rgba(143,240,188,.9)}
+.pf.v-hud .pf-qr .code{filter:hue-rotate(96deg) saturate(.5) brightness(.85)}
+.pf.v-hud .pf-qr .scan{color:rgba(111,215,156,.5)}
+.pf.v-hud .pf-marke i{color:#8FF0BC}
+
+/* ─────────────────────────────────────────────────────────────────
+   05 · CARBON — Faserstruktur, eine Goldkante
+   ───────────────────────────────────────────────────────────────── */
+.buehne.b-carbon{background:#050505;padding:30px}
+.pf.v-carbon{border-radius:6px;border:1px solid #232323;
+  background:
+    repeating-linear-gradient(45deg, rgba(255,255,255,.022) 0 2px, transparent 2px 4px),
+    repeating-linear-gradient(-45deg, rgba(0,0,0,.35) 0 2px, transparent 2px 4px),
+    linear-gradient(180deg,#1C1C1C,#111);
+  box-shadow:0 16px 44px rgba(0,0,0,.6)}
+.pf.v-carbon::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;
+  background:linear-gradient(90deg,var(--gold-lo),var(--gold-hi) 42%,var(--gold-lo) 78%,transparent)}
+.pf.v-carbon .pf-bp{color:#70695E}
+.pf.v-carbon .pf-k{color:#EFEAE0}
+.pf.v-carbon .pf-s{color:#8B8377}
+.pf.v-carbon .pf-lead::after{content:"";position:absolute;top:18px;bottom:18px;right:0;
+  width:1px;background:#262626}
+.pf.v-carbon .pf-grouplbl{color:#70695E}
+.pf.v-carbon .pf-tile{background:rgba(0,0,0,.42);border:1px solid #2A2A2A;border-radius:4px;
+  color:#D5CFC4}
+.pf.v-carbon .pf-tile.an{border-color:rgba(201,168,76,.6);color:#fff;
+  background:rgba(201,168,76,.1)}
+.pf.v-carbon .pf-led{width:7px;height:7px;background:#302F2D}
+.pf.v-carbon .pf-tile.an .pf-led{background:var(--gold);box-shadow:0 0 9px rgba(201,168,76,.8)}
+.pf.v-carbon .pf-qr .scan{color:#70695E}
+.pf.v-carbon .pf-marke i{color:var(--gold-hi)}
+
+/* ─────────────────────────────────────────────────────────────────
+   06 · RACK — Instrumente im Einschub
+   ───────────────────────────────────────────────────────────────── */
+.buehne.b-rack{background:#0A0A09;padding:30px}
+.pf.v-rack{background:#151412;border:1px solid #2E2A24;border-radius:3px;
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.6)}
+.pf.v-rack .pf-lead{background:#0E0D0C;border-right:1px solid #2E2A24}
+.pf.v-rack .pf-lead::after{content:"";position:absolute;right:-1px;top:16px;bottom:16px;
+  width:3px;background:linear-gradient(180deg,transparent,var(--gold-lo),transparent)}
+.pf.v-rack .pf-bp{color:#6B6458}
+.pf.v-rack .pf-k{color:#EFEAE0}
+.pf.v-rack .pf-s{color:#8A8275}
+.pf.v-rack .pf-grouplbl{color:#6B6458}
+.pf.v-rack .pf-row{gap:0}
+.pf.v-rack .pf-tile{background:#100F0D;border:1px solid #2E2A24;border-left-width:0;
+  color:#CEC7B9;font-family:var(--mono);font-size:11.5px;border-radius:0}
+.pf.v-rack .pf-tile:first-child{border-left-width:1px;border-radius:3px 0 0 3px}
+.pf.v-rack .pf-tile:last-child{border-radius:0 3px 3px 0}
+.pf.v-rack .pf-tile.an{background:#1B1A16;color:#FFF6E2;
+  box-shadow:inset 0 0 0 1px rgba(201,168,76,.45)}
+.pf.v-rack .pf-led{width:14px;height:4px;border-radius:1px;background:#2A2722}
+.pf.v-rack .pf-tile.an .pf-led{background:var(--gruen);box-shadow:0 0 8px rgba(63,165,108,.85)}
+.pf.v-rack .pf-qr .scan{color:#6B6458}
+.pf.v-rack .pf-marke i{color:var(--gold-hi)}
+
+/* ─────────────────────────────────────────────────────────────────
+   07 · MONOLITH — eine Fläche, nur Typografie, ein Goldpunkt
+   ───────────────────────────────────────────────────────────────── */
+.buehne.b-monolith{background:#000;padding:30px}
+.pf.v-monolith{background:var(--obsidian);border:0;border-radius:0;
+  box-shadow:0 0 0 1px #16150F, 0 20px 60px rgba(0,0,0,.8)}
+.pf.v-monolith .pf-lead{min-width:210px}
+.pf.v-monolith .pf-bp{display:none}
+.pf.v-monolith .pf-k{font-family:var(--disp);font-size:21px;letter-spacing:-.01em;
+  text-transform:none;color:#F5F1E8;font-weight:700}
+.pf.v-monolith .pf-s{color:#5F594E;font-size:11.5px;margin-top:7px}
+.pf.v-monolith .pf-grouplbl{color:#413C34}
+.pf.v-monolith .pf-seg{gap:11px}
+.pf.v-monolith .pf-row{flex-direction:column;gap:7px}
+.pf.v-monolith .pf-tile{background:transparent;border:0;padding:0;color:#6F6859;font-size:13.5px}
+.pf.v-monolith .pf-tile.an{color:#F5F1E8}
+.pf.v-monolith .pf-led{width:5px;height:5px;background:#24211B}
+.pf.v-monolith .pf-tile.an .pf-led{background:var(--gold-hi);
+  box-shadow:0 0 14px 3px rgba(232,204,122,.55)}
+.pf.v-monolith .pf-qr .code{opacity:.3}
+.pf.v-monolith .pf-qr .scan{color:#413C34}
+.pf.v-monolith .pf-marke i{color:var(--gold)}
+
+/* ─────────────────────────────────────────────────────────────────
+   08 · RUNWAY — Befeuerung statt Lämpchen
+   ───────────────────────────────────────────────────────────────── */
+.buehne.b-runway{background:#040604;padding:30px}
+.pf.v-runway{background:linear-gradient(180deg,#0D0F0D,#070806);
+  border:1px solid #1E231E;border-radius:5px;overflow:hidden}
+.pf.v-runway::before{content:"";position:absolute;left:0;right:0;top:50%;height:2px;
+  margin-top:-1px;
+  background:repeating-linear-gradient(90deg,
+    rgba(232,204,122,.5) 0 26px, transparent 26px 52px);
+  opacity:.32}
+.pf.v-runway .pf-bp{color:#5D6A5D}
+.pf.v-runway .pf-k{color:#EAF0E8}
+.pf.v-runway .pf-s{color:#7D897C}
+.pf.v-runway .pf-lead::after{content:"";position:absolute;top:14px;bottom:14px;right:0;
+  width:1px;background:#1E231E}
+.pf.v-runway .pf-grouplbl{color:#5D6A5D}
+.pf.v-runway .pf-tile{background:rgba(7,8,6,.88);border:1px solid #1E231E;border-radius:3px;
+  color:#C6CFC3}
+.pf.v-runway .pf-tile.an{border-color:rgba(232,204,122,.5);color:#FFF9E8}
+.pf.v-runway .pf-led{width:8px;height:8px;background:#1C211C;
+  box-shadow:0 0 0 3px rgba(28,33,28,.55)}
+.pf.v-runway .pf-tile.an .pf-led{background:var(--gold-hi);
+  box-shadow:0 0 12px 3px rgba(232,204,122,.85), 0 0 0 3px rgba(232,204,122,.14)}
+.pf.v-runway .pf-qr .scan{color:#5D6A5D}
+.pf.v-runway .pf-marke i{color:var(--gold-hi)}
+
+/* ─────────────────────────────────────────────────────────────────
+   09 · TITAN — gebürstetes Metall, eingraviert
+   ───────────────────────────────────────────────────────────────── */
+.buehne.b-titan{background:#0B0B0C;padding:30px}
+.pf.v-titan{border-radius:5px;border:1px solid #37373A;
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,.028) 0 1px, transparent 1px 3px),
+    linear-gradient(176deg,#3A3A3D,#252527 42%,#2E2E31);
+  box-shadow:0 14px 40px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14)}
+.pf.v-titan .pf-bp{color:#8C8C92}
+.pf.v-titan .pf-k{color:#F2F2F4;text-shadow:0 1px 0 rgba(0,0,0,.65)}
+.pf.v-titan .pf-s{color:#9E9EA4}
+.pf.v-titan .pf-lead::after{content:"";position:absolute;top:18px;bottom:18px;right:0;
+  width:2px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.5),transparent);
+  box-shadow:1px 0 0 rgba(255,255,255,.08)}
+.pf.v-titan .pf-grouplbl{color:#8C8C92;text-shadow:0 1px 0 rgba(0,0,0,.5)}
+.pf.v-titan .pf-tile{background:linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.14));
+  border:1px solid rgba(0,0,0,.42);border-radius:4px;color:#E6E6EA;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
+.pf.v-titan .pf-tile.an{background:linear-gradient(180deg,rgba(201,168,76,.24),rgba(201,168,76,.1));
+  border-color:rgba(201,168,76,.5);color:#FFF6E0}
+.pf.v-titan .pf-led{width:8px;height:8px;background:#1A1A1C;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.85)}
+.pf.v-titan .pf-tile.an .pf-led{background:var(--gold-hi);
+  box-shadow:0 0 9px rgba(232,204,122,.9), inset 0 1px 1px rgba(255,255,255,.5)}
+.pf.v-titan .pf-qr .scan{color:#8C8C92}
+.pf.v-titan .pf-marke i{color:var(--gold-hi)}
+
+/* ─────────────────────────────────────────────────────────────────
+   10 · RADAR — Sweep-Bogen, Module als Kontakte
+   ───────────────────────────────────────────────────────────────── */
+.buehne.b-radar{background:#040706;padding:30px}
+.pf.v-radar{background:
+  radial-gradient(circle at 86px 50%, rgba(63,165,108,.18), transparent 42%),
+  #080B09;border:1px solid #16201A;border-radius:5px}
+.pf.v-radar .pf-lead::before{content:"";position:absolute;left:24px;top:50%;
+  width:96px;height:96px;margin-top:-48px;border-radius:50%;
+  border:1px solid rgba(63,165,108,.26);
+  box-shadow:inset 0 0 0 16px rgba(63,165,108,.05), inset 0 0 0 32px rgba(63,165,108,.035)}
+.pf.v-radar .pf-lead::after{content:"";position:absolute;left:72px;top:50%;width:48px;height:1px;
+  background:linear-gradient(90deg,rgba(111,215,156,.9),transparent);
+  transform-origin:left center;transform:rotate(-34deg)}
+.pf.v-radar .pf-bp{color:#5A7264;position:relative}
+.pf.v-radar .pf-k{color:#E6F2EA;position:relative}
+.pf.v-radar .pf-s{color:#7A8F80;position:relative}
+.pf.v-radar .pf-grouplbl{color:#5A7264}
+.pf.v-radar .pf-tile{background:rgba(6,10,8,.8);border:1px solid #16201A;border-radius:12px;
+  color:#BFCFC4;font-size:12.5px}
+.pf.v-radar .pf-tile.an{border-color:rgba(111,215,156,.5);color:#EAFBF1;
+  background:rgba(63,165,108,.1)}
+.pf.v-radar .pf-led{width:7px;height:7px;background:#16201A}
+.pf.v-radar .pf-tile.an .pf-led{background:#6FD79C;
+  box-shadow:0 0 12px 3px rgba(111,215,156,.7)}
+.pf.v-radar .pf-qr .code{filter:hue-rotate(96deg) saturate(.45) brightness(.8)}
+.pf.v-radar .pf-qr .scan{color:#5A7264}
+.pf.v-radar .pf-marke i{color:#6FD79C}
+
+/* ─────────────────────────────────────────────────────────────────
+   11 · KANTE — fast nichts, nur eine leuchtende Linie
+   ───────────────────────────────────────────────────────────────── */
+.buehne.b-kante{background:#060606;padding:30px}
+.pf.v-kante{background:#0B0B0A;border:0;border-radius:0;
+  border-left:2px solid var(--gold);
+  box-shadow:-10px 0 34px -14px rgba(201,168,76,.55)}
+.pf.v-kante .pf-bp{color:#4E4940;letter-spacing:.3em}
+.pf.v-kante .pf-k{color:#F2EDE3;letter-spacing:.24em}
+.pf.v-kante .pf-s{color:#6B6458}
+.pf.v-kante .pf-grouplbl{color:#4E4940}
+.pf.v-kante .pf-seg{border-left:1px solid #171613}
+.pf.v-kante .pf-tile{background:transparent;border:0;border-bottom:1px solid #171613;
+  padding:7px 16px 7px 0;color:#7E7768;font-size:13px}
+.pf.v-kante .pf-row{flex-direction:column;gap:0}
+.pf.v-kante .pf-tile.an{color:#F2EDE3;border-bottom-color:rgba(201,168,76,.45)}
+.pf.v-kante .pf-led{width:4px;height:4px;background:#241F19}
+.pf.v-kante .pf-tile.an .pf-led{background:var(--gold-hi);
+  box-shadow:0 0 10px 2px rgba(232,204,122,.7)}
+.pf.v-kante .pf-qr .code{opacity:.42}
+.pf.v-kante .pf-qr .scan{color:#4E4940}
+.pf.v-kante .pf-marke i{color:var(--gold)}
+
+/* ── Einstellungs-Mockup ──────────────────────────────────────── */
+.einstellung{margin-top:56px;background:var(--flaeche);border:1px solid var(--linie);
+  border-radius:5px;padding:28px}
+.einstellung h2{font-family:var(--disp);font-size:22px;margin:0 0 6px}
+.einstellung > p{color:var(--leise);font-size:15px;margin:0 0 24px;max-width:62ch}
+.opt-liste{display:flex;flex-direction:column;border-top:1px solid var(--linie)}
+.opt{display:flex;gap:15px;align-items:flex-start;padding:16px 2px;
+  border-bottom:1px solid var(--linie)}
+.opt .radio{width:17px;height:17px;border-radius:50%;border:1.5px solid var(--sehr-leise);
+  flex:none;margin-top:3px;position:relative}
+.opt.gewaehlt .radio{border-color:var(--gold)}
+.opt.gewaehlt .radio::after{content:"";position:absolute;inset:3px;border-radius:50%;
+  background:var(--gold)}
+.opt-text strong{display:block;font-size:15px;font-weight:600;margin-bottom:3px}
+.opt-text span{font-size:13.5px;color:var(--leise)}
+
+.fuss{margin-top:46px;padding-top:24px;border-top:1px solid var(--linie);
+  font-size:14px;color:var(--sehr-leise);max-width:70ch}
+.fuss b{color:var(--leise)}
+code{font-family:var(--mono);font-size:.88em;background:rgba(201,168,76,.1);
+  padding:2px 6px;border-radius:2px;color:var(--gold-hi)}
+</style>
+
+<div class="huelle">
+
+<header class="kopf">
+  <p class="augenbraue">DealPilot · Entwurf v1424 · zweiter Anlauf</p>
+  <h1>Pre-Flight Entwürfe</h1>
+  <p class="vorspann">Zehn Hüllen für dieselbe Leiste — im Tab Objekt und im QuickCheck.
+  <b>Der Inhalt ist in jeder Variante identisch</b>; verändert wird nur, woraus die Karte
+  gemacht ist.</p>
+</header>
+
+<section class="zurueck">
+  <h2>Was am ersten Satz falsch war</h2>
+  <p><b>Ich habe „seriöser" als „amtlich" gelesen</b> — und Aktendeckel, Prüfprotokoll und
+  Urkunde gebaut. Das ist Behörde, nicht wertig. Diesmal geht es um Material, Licht und
+  Präzision: die Karte soll aussehen wie ein Instrument, das etwas kostet.</p>
+  <p><b>Und die Karten waren zu klein.</b> Sie hatten 660 px Mindestbreite bei 9-px-Schrift und
+  wirkten wie geschrumpfte Bildchen. Jetzt sind sie in echter Größe gebaut und werden
+  als Ganzes proportional auf die Bühne gerechnet — gleiche Wirkung auf jedem Schirm.</p>
+</section>
+
+<nav class="leiste" aria-label="Zu einem Entwurf springen">
+  <div class="leiste-innen">
+    <b>Springen</b>
+    <a href="#e01">01 Heute</a>
+    <a href="#e02">02 Glas</a>
+    <a href="#e03">03 Triebwerk</a>
+    <a href="#e04">04 HUD</a>
+    <a href="#e05">05 Carbon</a>
+    <a href="#e06">06 Rack</a>
+    <a href="#e07">07 Monolith</a>
+    <a href="#e08">08 Runway</a>
+    <a href="#e09">09 Titan</a>
+    <a href="#e10">10 Radar</a>
+    <a href="#e11">11 Kante</a>
+  </div>
+</nav>
+
+<div id="entwuerfe"></div>
+
+<section class="einstellung">
+  <h2>So sähe die Umstellung aus</h2>
+  <p>Einstellungen · Darstellung · <b>Pre-Flight-Karte</b>. Technisch ist es eine Klasse am
+  Behälter — dasselbe Muster wie der vorhandene helle Skin
+  (<code>body.dp-chrome-hell</code>). Markup, Schalter und Logik bleiben unberührt.</p>
+  <div class="opt-liste">
+    <div class="opt gewaehlt">
+      <span class="radio"></span>
+      <span class="opt-text"><strong>Bordkarte</strong>
+      <span>Wie bisher — goldene Fläche, Boarding-Pass-Optik.</span></span>
+    </div>
+    <div class="opt">
+      <span class="radio"></span>
+      <span class="opt-text"><strong>Instrument</strong>
+      <span>Dunkel, Material, Gold nur als Licht. Fürs tägliche Arbeiten.</span></span>
+    </div>
+    <div class="opt">
+      <span class="radio"></span>
+      <span class="opt-text"><strong>Reduziert</strong>
+      <span>Fast nichts — für alle, die oben Ruhe wollen.</span></span>
+    </div>
+  </div>
+</section>
+
+<p class="fuss"><b>Sag mir die Nummern</b>, die in die Einstellungen sollen — zwei oder drei
+genügen. Die Karte im QuickCheck und die im Tab Objekt teilen sich dasselbe Markup, die
+Entscheidung gilt also für beide. Gebaut aus der gemessenen Struktur
+(<code>js/object-actions.js:283</code>), aber noch nicht in der App.</p>
+
+</div>
+
+<script>
+/* Ein Markup, elf Hüllen. Die Kachelnamen folgen der Anbieter-Neutralität
+   aus CLAUDE.md: die beiden Bewertungspartner werden nicht namentlich
+   genannt, ImmoMetrica darf es. In der App stehen dort die Logos. */
+const ENTWUERFE = [
+  { id:'e01', nr:'01', slug:'ist', titel:'Heute · Bordkarte',
+    marke:{text:'Ist-Zustand', cls:'ist'},
+    idee:'Der Stand von heute, zum Vergleich. Der volle Runway-Verlauf als Fläche über die ganze Breite.',
+    dafuer:'Unverwechselbar, die Luftfahrt sitzt sofort.',
+    dagegen:'Gold als Fläche liest sich als Werbebande — die echten Statuslichter gehen darin unter.',
+    wofuer:'Bleibt als Wahlmöglichkeit.' },
+
+  { id:'e02', nr:'02', slug:'glas', titel:'Glas',
+    marke:{text:'Empfehlung', cls:'tipp'},
+    idee:'Milchglas über farbiger Tiefe, eine Lichtkante an der Oberkante, Statuslichter glimmen durch. Das Gold liegt hinter dem Glas, nicht darauf.',
+    dafuer:'Wertig ohne Anstrengung, und modern ohne Mode. Die Tiefe macht aus der Leiste ein Objekt statt eines Balkens.',
+    dagegen:'Backdrop-Filter kostet etwas Leistung; auf sehr schwachen Geräten fällt die Unschärfe weg.',
+    wofuer:'Erste Wahl, wenn es teuer aussehen soll.' },
+
+  { id:'e03', nr:'03', slug:'triebwerk', titel:'Triebwerk',
+    marke:{text:'Empfehlung', cls:'tipp'},
+    idee:'Konzentrische Ringe hinter dem Kopf wie ein Fan-Gehäuse, warmes Glühen aus der Mitte. Gewählte Module leuchten von innen.',
+    dafuer:'Die Luftfahrt wird zum Material statt zur Beschriftung. Der Blick geht automatisch nach links zum Kopf und dann nach rechts durch die Module.',
+    dagegen:'Der Ring braucht Höhe — bei sehr flacher Leiste wird er beschnitten.',
+    wofuer:'Wenn die Marke sichtbar bleiben soll, ohne laut zu sein.' },
+
+  { id:'e04', nr:'04', slug:'hud', titel:'HUD',
+    idee:'Head-up-Display: Phosphorgrün auf fast Schwarz, Fadenkreuz-Ecken, alles in Mono. Gewählt heißt leuchtet.',
+    dafuer:'Sofort als Cockpit lesbar und technisch glaubwürdig. Zustände sind auf einen Blick klar.',
+    dagegen:'Grün ist im System die Statusfarbe — wird es zur Grundfarbe, verliert es diese Bedeutung.',
+    wofuer:'Wer die Luftfahrt am liebsten wörtlich hätte.' },
+
+  { id:'e05', nr:'05', slug:'carbon', titel:'Carbon',
+    idee:'Feine Kohlefaser-Struktur, matt, und eine einzige goldene Kante an der Unterkante.',
+    dafuer:'Teuer ohne Glanz. Die Struktur trägt die Fläche, damit braucht es keine Farbe.',
+    dagegen:'Die Faser ist ein Muster — auf kleinen Schirmen wird sie zu Rauschen.',
+    wofuer:'Wenn es technisch-hochwertig wirken soll.' },
+
+  { id:'e06', nr:'06', slug:'rack', titel:'Rack',
+    marke:{text:'Empfehlung', cls:'tipp'},
+    idee:'Die Module sitzen als Einschübe in einer Schiene, nahtlos aneinander, die Kopfzeile als eigene Kammer mit goldener Flanke.',
+    dafuer:'Sagt am ehrlichsten, was die Karte ist: ein Gerät, in dem Module stecken. Das gewählte Modul ist sichtbar eingerastet, nicht nur eingefärbt.',
+    dagegen:'Nüchtern — von der Marke bleibt nur die goldene Flanke.',
+    wofuer:'Erste Wahl fürs tägliche Arbeiten.' },
+
+  { id:'e07', nr:'07', slug:'monolith', titel:'Monolith',
+    idee:'Eine einzige schwarze Fläche. Keine Rahmen, keine Kacheln — nur Typografie, Abstand und ein Goldpunkt je aktivem Modul.',
+    dafuer:'Die ruhigste Variante. Nimmt dem Objekt-Tab nichts weg und altert nie.',
+    dagegen:'Ohne Kacheln muss man lernen, dass die Zeilen klickbar sind.',
+    wofuer:'Wenn oben auf der Seite schon viel los ist.' },
+
+  { id:'e08', nr:'08', slug:'runway', titel:'Runway',
+    idee:'Eine Mittellinie läuft gestrichelt durch die ganze Karte wie eine Startbahn; die Statuslichter sind Befeuerung, keine Lämpchen.',
+    dafuer:'Das Markenbild einmal wörtlich genommen — und trotzdem dunkel und ruhig. Der Runway-Verlauf kommt zurück, aber als Linie statt als Fläche.',
+    dagegen:'Die Linie kreuzt die Kacheln; bei vielen Modulen wird es unruhig.',
+    wofuer:'Wenn die Marke ein eigenes Bild bekommen soll.' },
+
+  { id:'e09', nr:'09', slug:'titan', titel:'Titan',
+    idee:'Gebürstetes Metall mit gerichtetem Glanz, eingravierte Beschriftung, versenkte Kacheln mit echter Lichtkante.',
+    dafuer:'Haptisch. Man meint, die Oberfläche zu spüren — das gibt es sonst nirgends in der App.',
+    dagegen:'Metallgrau ist markenfremd; das Gold muss die Marke allein tragen.',
+    wofuer:'Wenn es nach Gerät aussehen soll, nicht nach Software.' },
+
+  { id:'e10', nr:'10', slug:'radar', titel:'Radar',
+    idee:'Ein Radarschirm hinter dem Kopf, mit Sweep-Strahl; die Module sind Kontakte, gewählte leuchten auf.',
+    dafuer:'Erzählt, was die Karte tut: sie sucht Quellen ab. Die Metapher passt zur Marktbewertung.',
+    dagegen:'Wie beim HUD: Grün als Grundfarbe schwächt Grün als Statusfarbe.',
+    wofuer:'Eher für den QuickCheck als für den Objekt-Tab.' },
+
+  { id:'e11', nr:'11', slug:'kante', titel:'Kante',
+    idee:'Fast nichts: eine leuchtende Goldkante links, ein weicher Schein daneben, der Rest ist Schrift auf Schwarz.',
+    dafuer:'Der kleinste mögliche Eingriff mit sichtbarer Wirkung. Behält das Gold als Markenzeichen, aber als Licht statt als Fläche.',
+    dagegen:'Ohne Rahmen kann die Karte im Layout zerfließen.',
+    wofuer:'Naheliegendster Ersatz für den Ist-Zustand.' }
+];
+
+function karte(slug){
+  const kachel = (name, an, werkzeug) =>
+    '<span class="pf-tile' + (an ? ' an' : '') + (werkzeug ? ' werkzeug' : '') + '">' +
+      '<span class="pf-led"></span>' + name + '</span>';
+
+  return '<div class="pf v-' + slug + '">' +
+    '<div class="pf-lead">' +
+      '<span class="pf-bp">Boarding Pass</span>' +
+      '<span class="pf-k">PRE-FLIGHT</span>' +
+      '<span class="pf-s">DealPilot · Boarding</span>' +
+    '</div>' +
+    '<div class="pf-mitte">' +
+      '<div class="pf-seg">' +
+        '<span class="pf-grouplbl">Marktbewertung</span>' +
+        '<div class="pf-row">' +
+          kachel('<span class="pf-marke">Deal<i>Pilot</i></span>', true, false) +
+          kachel('Bewertungspartner I', false, false) +
+          kachel('Bewertungspartner II', false, false) +
+        '</div>' +
+      '</div>' +
+      '<div class="pf-seg">' +
+        '<span class="pf-grouplbl">Daten einlesen</span>' +
+        '<div class="pf-row">' +
+          kachel('Exposé', false, true) +
+          kachel('Sprache', false, true) +
+          kachel('ImmoMetrica', false, true) +
+        '</div>' +
+      '</div>' +
+      '<span class="pf-qr"><span class="code"></span><span class="scan">Scan ›</span></span>' +
+    '</div>' +
+  '</div>';
+}
+
+document.getElementById('entwuerfe').innerHTML = ENTWUERFE.map(e =>
+  '<section class="entwurf" id="' + e.id + '">' +
+    '<div class="entwurf-kopf">' +
+      '<span class="nr">' + e.nr + '</span>' +
+      '<h3>' + e.titel + '</h3>' +
+      (e.marke ? '<span class="marke ' + e.marke.cls + '">' + e.marke.text + '</span>' : '') +
+    '</div>' +
+    '<p class="idee">' + e.idee + '</p>' +
+    '<div class="buehne b-' + e.slug + '"><div class="skalierer">' + karte(e.slug) + '</div></div>' +
+    '<dl class="notiz">' +
+      '<div><dt>Spricht dafür</dt><dd>' + e.dafuer + '</dd></div>' +
+      '<div><dt>Spricht dagegen</dt><dd>' + e.dagegen + '</dd></div>' +
+      '<div><dt>Wofür</dt><dd>' + e.wofuer + '</dd></div>' +
+    '</dl>' +
+  '</section>'
+).join('');
+
+/* Die Karte wird in ihrer NATUERLICHEN Groesse gebaut und als Ganzes auf die
+   Buehne skaliert. Dann stimmen alle Proportionen auf jedem Schirm, und die
+   Schrift wird nie unlesbar klein relativ zur Karte.
+
+   Gemessen wird die tatsaechliche Breite, nicht eine angenommene: im ersten
+   Anlauf stand dort eine feste Zahl, und alles was breiter war, verschwand
+   hinter overflow:hidden. Die Buehne bekommt anschliessend genau die Hoehe,
+   die die skalierte Karte wirklich braucht — sonst klafft darunter Luft oder
+   die Karte ragt heraus.
+
+   Waehrend der Messung wird die Skalierung zurueckgesetzt: offsetWidth eines
+   bereits skalierten Elements liefert zwar die unskalierte Breite, aber die
+   Randbedingungen (margin der Karte) rechnen sich sonst falsch. */
+function skalieren(){
+  document.querySelectorAll('.buehne').forEach(b => {
+    const s = b.querySelector('.skalierer');
+    const pf = s && s.querySelector('.pf');
+    if (!s || !pf) return;
+    s.style.transform = 'none';
+    s.style.height = 'auto';
+    const stil = getComputedStyle(b);
+    const luft = parseFloat(stil.paddingLeft) + parseFloat(stil.paddingRight);
+    const platz = b.clientWidth - luft;
+    const breite = s.offsetWidth;          /* echte Breite inkl. Kartenrand */
+    if (!breite || !platz) return;
+    const f = Math.min(1, platz / breite);
+    if (f < 1) {
+      s.style.transform = 'scale(' + f + ')';
+      s.style.height = (s.offsetHeight * f) + 'px';
+    }
+  });
+}
+if (window.ResizeObserver) {
+  const ro = new ResizeObserver(skalieren);
+  document.querySelectorAll('.buehne').forEach(b => ro.observe(b));
+}
+window.addEventListener('resize', skalieren);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(skalieren);
+skalieren();
+setTimeout(skalieren, 120);
+</script>
