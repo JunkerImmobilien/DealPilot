@@ -947,6 +947,19 @@
 
   // V186: Schwarze Highlight-Box mit goldener Zahl — RND prominent darstellen.
   // Ersetzt die alte buildFinalCard mit der dezenten Variante.
+  /* v1426 · Anwendungsgrenzen der Anlage 2 sichtbar machen. Der Kern liefert
+     sie seit 3.1.0 in r.grenzen; ohne diese Zeilen stuende dort "0 Jahre",
+     wo er bewusst KEINEN Wert ausgibt. */
+  function grenzenHtml(r) {
+    const g = (r && Array.isArray(r.grenzen)) ? r.grenzen.filter(function (x) { return x && x.greift; }) : [];
+    if (!g.length) return '';
+    return '<ul class="rnd-result-hero-grenzen" style="margin:10px 0 0;padding-left:18px;font-size:12px;line-height:1.45;text-align:left;opacity:.85">'
+      + g.map(function (x) {
+          return '<li>' + esc(x.text) + (x.quelle ? ' <em>(' + esc(x.quelle) + ')</em>' : '') + '</li>';
+        }).join('')
+      + '</ul>';
+  }
+
   function buildHeroCard(r, afa) {
     const subText = r.final_source || 'Restnutzungsdauer nach DealPilot-Methodik';
     let kpisHtml = '';
@@ -970,9 +983,10 @@
     return ''
       + '<div class="rnd-result-hero">'
       + '  <p class="rnd-result-hero-label">Empfohlene Restnutzungsdauer</p>'
-      + '  <h2 class="rnd-result-hero-value">' + r.final_rnd
-      +     '<span class="rnd-result-hero-unit">Jahre</span></h2>'
+      + '  <h2 class="rnd-result-hero-value">' + (r.verfahren === 'keines' ? '—' : r.final_rnd)
+      +     (r.verfahren === 'keines' ? '' : '<span class="rnd-result-hero-unit">Jahre</span>') + '</h2>'
       + '  <p class="rnd-result-hero-sub">' + esc(subText) + '</p>'
+      +    grenzenHtml(r)
       +    kpisHtml
       + '</div>';
   }

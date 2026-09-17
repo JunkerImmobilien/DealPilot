@@ -1,59 +1,71 @@
 /**
  * DealPilot — Restnutzungsdauer GND-Tabelle
  * ============================================
- * Gesamtnutzungsdauern nach Anlage 22 BewG / SW-RL / BelWertV
- * Quelle: Anlage 1 zu § 12 Abs. 5 Satz 1 ImmoWertV, KL-V (8) S. 887 f.
+ * Version 3.3.0 (13.09.2026)
+ * Gesamtnutzungsdauern nach Anlage 1 zu § 12 Absatz 5 Satz 1 ImmoWertV 2021
+ *
+ * FACHLICHE GRUNDLAGE:
+ * Für ein RND-Gutachten nach § 7 Abs. 4 Satz 2 EStG ist die ImmoWertV 2021
+ * maßgeblich (bestätigt durch BFH IX R 25/19 vom 28.07.2021 und
+ * BMF-Schreiben vom 01.12.2025), NICHT die Anlage 22 BewG. Anlage 22 BewG
+ * gilt nur für die pauschale Grundbesitzbewertung (Erbschaft/Schenkung).
+ *
+ * ÄNDERUNG ggü. V3.2.0:
+ *   Wohngebäude (EFH/MFH/ETW/Reihenhaus): 70 → 80 Jahre
+ *   Quelle-Referenzen: "Anl. 22 BewG" → "Anl. 1 ImmoWertV"
+ *   BewG-70J bleibt als bewusster Kommentar zur Erinnerung an den Unterschied
  *
  * Verwendung:
- *   const gnd = DealPilotRND_GND.getDefault('mfh'); // 70
- *   const list = DealPilotRND_GND.list();           // alle Optionen
+ *   const gnd = DealPilotRND_GND.getDefault('mfh'); // 80
+ *   const list = DealPilotRND_GND.list();
  */
 (function (global) {
   'use strict';
 
-  // Struktur: id → { label, gnd_default, gnd_min, gnd_max, source }
-  // gnd_default = Empfehlung für Standardfall
+  // Struktur: id → { label, gnd_default, gnd_min, gnd_max, source, note }
+  // gnd_default = Empfehlung für Standardfall (ImmoWertV 2021)
+  // note = optionaler Hinweis auf Abweichung nach BewG
   const TABLE = {
-    // Wohngebäude
-    'efh':         { label: 'Ein-/Zweifamilienhaus, Doppel-/Reihenhaus', gnd_default: 70, gnd_min: 50, gnd_max: 100, source: 'Anl. 22 BewG' },
-    'efh_std3':    { label: 'EFH Standardstufe 3 (mittel)',              gnd_default: 70, gnd_min: 60, gnd_max: 75,  source: 'SW-RL' },
-    'efh_std4':    { label: 'EFH Standardstufe 4 (gehoben)',             gnd_default: 75, gnd_min: 60, gnd_max: 80,  source: 'SW-RL' },
-    'efh_std5':    { label: 'EFH Standardstufe 5 (hochwertig)',          gnd_default: 80, gnd_min: 60, gnd_max: 100, source: 'SW-RL' },
-    'mfh':         { label: 'Mehrfamilienhaus (Mietwohngebäude)',        gnd_default: 70, gnd_min: 30, gnd_max: 80,  source: 'Anl. 22 BewG' },
-    'etw':         { label: 'Eigentumswohnung',                          gnd_default: 70, gnd_min: 30, gnd_max: 80,  source: 'Anl. 22 BewG' },
-    'mischnutz':   { label: 'Wohnhaus mit Mischnutzung',                 gnd_default: 70, gnd_min: 30, gnd_max: 80,  source: 'Anl. 22 BewG' },
+    // ─── Wohngebäude (ImmoWertV 2021: 80 Jahre — BewG-Alternative 70) ───
+    'efh':         { label: 'Ein-/Zweifamilienhaus, Doppel-/Reihenhaus', gnd_default: 80, gnd_min: 60, gnd_max: 100, source: 'Anl. 1 ImmoWertV', note: 'BewG Anl. 22: 70 J.' },
+    'efh_std3':    { label: 'EFH Standardstufe 3 (mittel)',              gnd_default: 80, gnd_min: 60, gnd_max: 90,  source: 'Anl. 1 ImmoWertV / SW-RL' },
+    'efh_std4':    { label: 'EFH Standardstufe 4 (gehoben)',             gnd_default: 80, gnd_min: 60, gnd_max: 100, source: 'Anl. 1 ImmoWertV / SW-RL' },
+    'efh_std5':    { label: 'EFH Standardstufe 5 (hochwertig)',          gnd_default: 90, gnd_min: 70, gnd_max: 100, source: 'Anl. 1 ImmoWertV / SW-RL' },
+    'mfh':         { label: 'Mehrfamilienhaus (Mietwohngebäude)',        gnd_default: 80, gnd_min: 60, gnd_max: 100, source: 'Anl. 1 ImmoWertV', note: 'BewG Anl. 22: 70 J.' },
+    'etw':         { label: 'Eigentumswohnung',                          gnd_default: 80, gnd_min: 60, gnd_max: 100, source: 'Anl. 1 ImmoWertV', note: 'BewG Anl. 22: 70 J.' },
+    'mischnutz':   { label: 'Wohnhaus mit Mischnutzung',                 gnd_default: 80, gnd_min: 60, gnd_max: 100, source: 'Anl. 1 ImmoWertV', note: 'BewG Anl. 22: 70 J.' },
 
-    // Gewerbe
-    'geschaeft':   { label: 'Geschäftshaus',                             gnd_default: 60, gnd_min: 30, gnd_max: 70,  source: 'Anl. 22 BewG' },
-    'buero':       { label: 'Bürogebäude',                               gnd_default: 60, gnd_min: 30, gnd_max: 70,  source: 'Anl. 22 BewG' },
+    // ─── Gewerbe (unverändert) ───
+    'geschaeft':   { label: 'Geschäftshaus',                             gnd_default: 60, gnd_min: 30, gnd_max: 70,  source: 'Anl. 1 ImmoWertV' },
+    'buero':       { label: 'Bürogebäude',                               gnd_default: 60, gnd_min: 30, gnd_max: 70,  source: 'Anl. 1 ImmoWertV' },
     'bank':        { label: 'Bankgebäude',                               gnd_default: 60, gnd_min: 50, gnd_max: 70,  source: 'SW-RL' },
 
-    // Beherbergung
-    'hotel':       { label: 'Hotel',                                     gnd_default: 40, gnd_min: 15, gnd_max: 50,  source: 'Anl. 22 BewG' },
+    // ─── Beherbergung (unverändert) ───
+    'hotel':       { label: 'Hotel',                                     gnd_default: 40, gnd_min: 15, gnd_max: 50,  source: 'Anl. 1 ImmoWertV' },
     'budgethotel': { label: 'Budgethotel',                               gnd_default: 40, gnd_min: 35, gnd_max: 45,  source: 'SW-RL' },
     'gaststaette': { label: 'Gaststätte',                                gnd_default: 30, gnd_min: 20, gnd_max: 40,  source: 'SW-RL' },
 
-    // Verbrauchermärkte / Handel
-    'markt':       { label: 'Verbrauchermarkt, Autohaus',                gnd_default: 30, gnd_min: 10, gnd_max: 40,  source: 'Anl. 22 BewG' },
-    'kaufhaus':    { label: 'Kauf- / Warenhaus',                         gnd_default: 50, gnd_min: 15, gnd_max: 50,  source: 'Anl. 22 BewG' },
+    // ─── Verbrauchermärkte / Handel (unverändert) ───
+    'markt':       { label: 'Verbrauchermarkt, Autohaus',                gnd_default: 30, gnd_min: 10, gnd_max: 40,  source: 'Anl. 1 ImmoWertV' },
+    'kaufhaus':    { label: 'Kauf- / Warenhaus',                         gnd_default: 50, gnd_min: 15, gnd_max: 50,  source: 'Anl. 1 ImmoWertV' },
 
-    // Garagen / Parkhäuser
-    'garage_einzel':{ label: 'Einzelgarage',                             gnd_default: 60, gnd_min: 50, gnd_max: 60,  source: 'Anl. 22 BewG' },
+    // ─── Garagen / Parkhäuser (unverändert) ───
+    'garage_einzel':{ label: 'Einzelgarage',                             gnd_default: 60, gnd_min: 50, gnd_max: 60,  source: 'Anl. 1 ImmoWertV' },
     'garage_mehr': { label: 'Mehrfachgarage',                            gnd_default: 60, gnd_min: 50, gnd_max: 60,  source: 'SW-RL' },
-    'parkhaus':    { label: 'Parkhaus / Tiefgarage',                     gnd_default: 40, gnd_min: 15, gnd_max: 40,  source: 'Anl. 22 BewG' },
+    'parkhaus':    { label: 'Parkhaus / Tiefgarage',                     gnd_default: 40, gnd_min: 15, gnd_max: 40,  source: 'Anl. 1 ImmoWertV' },
     'carport':     { label: 'Carport',                                   gnd_default: 40, gnd_min: 30, gnd_max: 50,  source: 'SW-RL' },
 
-    // Industrie / Lager
-    'werkstatt':   { label: 'Gewerbe- / Industriegebäude (Werkstatt)',   gnd_default: 40, gnd_min: 15, gnd_max: 50,  source: 'Anl. 22 BewG' },
-    'lager':       { label: 'Lager- / Logistikgebäude',                  gnd_default: 40, gnd_min: 15, gnd_max: 50,  source: 'Anl. 22 BewG' },
+    // ─── Industrie / Lager (unverändert) ───
+    'werkstatt':   { label: 'Gewerbe- / Industriegebäude (Werkstatt)',   gnd_default: 40, gnd_min: 15, gnd_max: 50,  source: 'Anl. 1 ImmoWertV' },
+    'lager':       { label: 'Lager- / Logistikgebäude',                  gnd_default: 40, gnd_min: 15, gnd_max: 50,  source: 'Anl. 1 ImmoWertV' },
     'kaltlager':   { label: 'Warm-/Kaltlager mit Sozialtrakt',           gnd_default: 30, gnd_min: 15, gnd_max: 40,  source: 'SW-RL' },
 
-    // Sonderbauten
-    'kindergarten':{ label: 'Kindergarten / Kita',                       gnd_default: 50, gnd_min: 30, gnd_max: 50,  source: 'Anl. 22 BewG' },
-    'schule':      { label: 'Schule',                                    gnd_default: 50, gnd_min: 40, gnd_max: 60,  source: 'Anl. 22 BewG' },
-    'pflegeheim':  { label: 'Pflegeheim / Wohnheim',                     gnd_default: 50, gnd_min: 40, gnd_max: 70,  source: 'Anl. 22 BewG' },
-    'krankenhaus': { label: 'Krankenhaus / Reha',                        gnd_default: 40, gnd_min: 15, gnd_max: 60,  source: 'Anl. 22 BewG' },
-    'sporthalle':  { label: 'Sport-/Turnhalle',                          gnd_default: 40, gnd_min: 15, gnd_max: 60,  source: 'Anl. 22 BewG' }
+    // ─── Sonderbauten (unverändert) ───
+    'kindergarten':{ label: 'Kindergarten / Kita',                       gnd_default: 50, gnd_min: 30, gnd_max: 50,  source: 'Anl. 1 ImmoWertV' },
+    'schule':      { label: 'Schule',                                    gnd_default: 50, gnd_min: 40, gnd_max: 60,  source: 'Anl. 1 ImmoWertV' },
+    'pflegeheim':  { label: 'Pflegeheim / Wohnheim',                     gnd_default: 50, gnd_min: 40, gnd_max: 70,  source: 'Anl. 1 ImmoWertV' },
+    'krankenhaus': { label: 'Krankenhaus / Reha',                        gnd_default: 40, gnd_min: 15, gnd_max: 60,  source: 'Anl. 1 ImmoWertV' },
+    'sporthalle':  { label: 'Sport-/Turnhalle',                          gnd_default: 40, gnd_min: 15, gnd_max: 60,  source: 'Anl. 1 ImmoWertV' }
   };
 
   // Heuristik: Mappt DealPilot-Objekttypen auf RND-Kategorie
@@ -74,7 +86,7 @@
 
   function getDefault(id) {
     const entry = TABLE[id];
-    return entry ? entry.gnd_default : 70;
+    return entry ? entry.gnd_default : 80;  // Fallback: 80 (ImmoWertV-Standard Wohngebäude)
   }
 
   function getEntry(id) {

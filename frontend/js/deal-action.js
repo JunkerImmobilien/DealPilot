@@ -324,7 +324,7 @@ window.DealPilotDealAction = (function() {
       var typId = (typeof DealPilotRND_GND !== 'undefined' && DealPilotRND_GND.suggestFromObjectType)
         ? DealPilotRND_GND.suggestFromObjectType(objektTyp) : 'mfh';
       var gnd = (typeof DealPilotRND_GND !== 'undefined' && DealPilotRND_GND.getDefault)
-        ? DealPilotRND_GND.getDefault(typId) : 70;
+        ? DealPilotRND_GND.getDefault(typId) : 80;
       var gewerke = sanstand <= 2 ? { fenster: 'gehoben', dach: 'gehoben', heizung: 'gehoben' }
                   : sanstand === 3 ? { fenster: 'standard', dach: 'standard', heizung: 'standard' }
                   : { fenster: 'veraltet', dach: 'veraltet', heizung: 'veraltet' };
@@ -2072,9 +2072,9 @@ window.DealPilotDealAction = (function() {
       }
       if (!result.gnd) {
         if (typeof DealPilotRND_GND !== 'undefined' && DealPilotRND_GND.getDefault) {
-          result.gnd = DealPilotRND_GND.getDefault(gutachtenState.objekt_typ) || 70;
+          result.gnd = DealPilotRND_GND.getDefault(gutachtenState.objekt_typ) || 80;
         } else {
-          result.gnd = 70; // sicherer Default für Wohnobjekte
+          result.gnd = 80; // v1426: Anlage 1 ImmoWertV, Wohngebaeude
         }
       }
     } catch (e) { console.warn('[RND] Result-Enrichment fehlgeschlagen:', e); }
