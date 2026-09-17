@@ -62,6 +62,10 @@ export const DealPilotObjectMapper = {
       vacancy: vacancyFrom(d),
       // Bodenrichtwert aus DealPilot als BORIS-Fallback
       land_value_manual: num(pick(d, ['brw'])),
+      /* v1427b-ZFH · Die Objektart bleibt grob (haus), das Merkmal reist
+         getrennt: ohne es wuerde der Korrekturfaktor 1,05 fuer
+         Zweifamilienhaeuser (NHK 2010) aus der App nie ankommen. */
+      zweifamilienhaus: /zfh|zweifamilien/i.test(String(pick(d, ['objart', 'objektart']) || '')),
       /* ═══ v1320 · Erbbaurecht ═══════════════════════════════════════
          Marcels Frage: "funktioniert die erbpacht jetzt in jedem
          marktbericht unter marktbewertung?"

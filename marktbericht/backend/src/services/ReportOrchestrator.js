@@ -97,6 +97,9 @@ export const ReportOrchestrator = {
       modernization: input.modernization || null,
       modernization_year: input.modernization_year ? Number(input.modernization_year) : null,
       energy_class: input.energy_class || null,
+      /* v1427b-ZFH · aus dem App-Import ODER aus einer Objektart zfh */
+      zweifamilienhaus: input.zweifamilienhaus === true
+        || /(^|[^a-z])zfh([^a-z]|$)|zweifamilien/i.test(String(input.property_type || '')),
       /* === v1345 - DIE AUSSTATTUNGSFELDER KAMEN NIE AN =================
          Gemessen am 13.09.2026: zehn Felder des Formulars standen in KEINER
          Datenliste dieses Dienstes. Der Nutzer fuellte sie aus, das Frontend

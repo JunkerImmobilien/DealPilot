@@ -16897,3 +16897,56 @@ Bj 1890 → `verfahren: keines`, Steuersatz = `Tax.calcGrenzsteuersatz`
    die Tabelle sagt 80 (so aus dem Paket, das den Kern nicht anfassen laesst).
 4. Gespeicherte RND-Gutachten mit GND 70 behalten ihren Wert; nur neue
    bekommen 80 vorgeschlagen.
+
+
+## Rollout-Journal · 17.09.2026 (2) — v1427: Sachwert-Rechenweg aus dem Gutachten-Paket
+
+**Auftrag (Marcel):** „die rechnungen und formeln aus dem modul nutzen und das
+mit unseren ernten … verbinden. der ablauf bleibt gleich, nur der rechenkern
+aus dem modul. wenn das neue modul besser oder gleichwertig rechnet, umsetzen."
+Word-Gutachten ausdrücklich **nicht**.
+
+**Was — gemessen, beide Kerne mit identischen Eingaben:**
+
+| Baustein | Messung | Ergebnis |
+|---|---|---|
+| Sachwert-Kette gegen das **unterschriebene Gutachten Löhner Str. 278** (ZFH) | Modul −0,01 € · unser Kern bisher **−10.047,63 €** | Modul besser → **Rechenweg übernommen** |
+| davon: Korrekturfaktor Zweifamilienhaus 1,05 (NHK 2010) | fehlte bei uns ganz, ≈ 8.640 € | übernommen |
+| davon: Außenanlagen-% auf Haus **und** Garage (SW-RL Nr. 4.2) | bei uns nur Haus, ≈ 1.546 € | übernommen, Garage steht jetzt davor |
+| davon: Gutachterrundung (Index 3 Stellen, Kennwert auf Cent) | ≈ 1 € | übernommen |
+| Garage mit Zwischenstufe (Ausstattungsmatrix) | Gutachten 381,80 €/m² zwischen St. 3/4 | übernommen, linear interpoliert |
+| Ertragswert | gleiche Formel; Abweichung 0,001–0,017 % nur durch Barwertfaktor auf 2 Stellen — so rechnet auch das Gutachten (10,92) | **gleichwertig**, unverändert — unserer kann zusätzlich § 41 rentierlich, NRW-BWK, Zins aus Ernte |
+| Restnutzungsdauer (`VW_IMMOWERTV.berechneModifRND`) | interpolierte Prozenttabelle statt Formel Anlage 2: bis **40 Jahre** daneben, Mittel 8, 51 Rasterpunkte ≥ 5 J. | **schlechter**, nicht übernommen (das Paket widerspricht hier seinem eigenen `rnd-calc.js`) |
+| NHK-Kennwerte (`data-nhk2010.js`) | **60 von 76** Zellen weichen von unserer belegten Tabelle ab; Typen falsch benannt (1.21, 4.x) | schlechter, nicht übernommen |
+| Baupreisindex | s. v1426: 2,4–3,7 % über Hamburg/Dortmund | nicht übernommen |
+
+Sachwertfaktor und Liegenschaftszins kommen unverändert aus dem Register —
+der Ablauf (zwei Läufe, Faktor nach vorläufigem Sachwert) ist unberührt.
+
+**Commit.** `2d4b23e` (Kern + Prüfstrecke). mb-backend auf Staging neu gebaut.
+
+**Nachweis.**
+- `node marktbericht/backend/tools/pruefstrecke-v1427-sachwert.mjs` 14/14 —
+  lokal **und im Container** `dealpilot-mb-backend`. Endwert 362.536 gegen
+  Gutachten 362.536,63 (Rest = Euro-Rundung des Berichts).
+- Alt gegen neu (HEAD-Fassung gegen v1427): EFH, ETW, RH, MFH ohne Garage
+  **auf den Euro unverändert**; EFH + Garage +541 € (Außenanlagen);
+  ZFH +10.466 € (+3,89 %).
+- Kette im Container, echter `CrossCheckService.compute`, Hiddenhausen
+  (AGS 05758016): Sachwertfaktor **Stufe A** aus „Grundstücksmarktbericht
+  2026 für den Kreis Herford, 5.1.2" angewandt; ZFH-Zeile in der Staffel,
+  beim EFH nicht; Faktor je vorläufigem Sachwert 0,897 (ZFH) / 0,903 (EFH).
+- Container-Log ohne Fehler.
+
+**Rest:**
+1. **Die Eingabe fehlt noch:** Gewerkestufen der Garage und `objektart: zfh`
+   müssen im Formular ankommen — der Kern kann es, ob jeder Einstieg (Import,
+   DealPilot-Mapper) `zfh` durchreicht, ist nicht geprüft.
+2. Berichte zu Zweifamilienhäusern liegen ab jetzt ≈ 4 % höher als vorher.
+   Das ist die Korrektur, kein Sprung — aber ein alter und ein neuer Bericht
+   zum selben ZFH widersprechen sich.
+3. Aus dem Paket noch ungenutzt: Wohnrecht/Nießbrauch-Barwert mit Sterbetafel
+   (`berechneBoG`). Der Marktbericht erfasst solche Rechte heute nicht.
+4. Die Sachwert-Sollwerte der Testobjekte in `CLAUDE.md` bleiben ohnehin neu
+   abzunehmen (Index 1,91 seit v1407); für Löhner gilt jetzt zusätzlich der
+   ZFH-Faktor.

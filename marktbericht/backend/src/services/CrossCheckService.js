@@ -243,6 +243,7 @@ export const CrossCheckService = {
           || (istWohnung ? _nhkTypWhg(Number(ref.units || 0)) : null), keller_dg: (p && p.keller_dg) || ref.keller_dg,
         standardstufe: (p && p.standardstufe) || ref.standardstufe,
         bgf_direkt: (p && p.bgf_direkt) || ref.bgf, wohnflaeche_qm: wfl, objektart: ref.property_type,
+        zweifamilienhaus: ref.zweifamilienhaus === true,   /* v1427b-ZFH */
         baupreisindex: BAUPREISINDEX, regionalfaktor: (p && p.regionalfaktor) || null,
         /* v1056-WRND-1 · Bisher bekam der Sachwert die alte Schaetzung,
          * waehrend der Ertragswert seit v1052 nach Anlage 2 rechnet: 38
@@ -361,6 +362,7 @@ export const CrossCheckService = {
             standardstufe: (p && p.standardstufe) || ref.standardstufe,
             bgf_direkt: (p && p.bgf_direkt) || ref.bgf, wohnflaeche_qm: wfl,
             objektart: ref.property_type, baupreisindex: BAUPREISINDEX,
+            zweifamilienhaus: ref.zweifamilienhaus === true,   /* v1427b-ZFH · zweiter Lauf */
             regionalfaktor: (p && p.regionalfaktor) || null,
             gnd_jahre: _gndSw, rnd_jahre: _rndEinheitlich(_gndSw),
         /* v1337: der Hinweis steht NACH rnd_jahre - _rndEinheitlich()
