@@ -16950,3 +16950,22 @@ der Ablauf (zwei Läufe, Faktor nach vorläufigem Sachwert) ist unberührt.
 4. Die Sachwert-Sollwerte der Testobjekte in `CLAUDE.md` bleiben ohnehin neu
    abzunehmen (Index 1,91 seit v1407); für Löhner gilt jetzt zusätzlich der
    ZFH-Faktor.
+
+### Nachtrag v1427b — ZFH-Merkmal bis in den Sachwert
+
+**Was.** Rest 1 aus v1427 nachgemessen: DealPilotObjectMapper.js machte aus
+zfh pauschal haus — der Faktor 1,05 waere bei App-Objekten nie angekommen.
+Die Objektart bleibt grob (GeoMap, Paragraf-256-Rueckfall und Stockwerksfaktor
+vergleichen hart auf haus); das Merkmal zweifamilienhaus reist getrennt:
+Mapper -> Orchestrator (auch aus property_type zfh) -> CrossCheck, beide Laeufe.
+
+**Commit.** 21f8caf · mb-backend auf Staging neu gebaut.
+
+**Nachweis.** Im Container ueber Mapper + CrossCheck: ZFH / Zweifamilienhaus
+-> Merkmal true, ZFH-Zeile in der Staffel; EFH / MFH -> ohne. Pruefstrecke
+v1427 im Container gruen, Log ohne Fehler. Die Orchestrator-Zeile ist per
+node --check und Sichtpruefung abgenommen, der Test stellt ihre Regel nach.
+
+**Rest:** Im Marktbericht-FORMULAR (frontend/app.js) gibt es nur haus/wohnung
+— wer dort von Hand ein ZFH anlegt, bekommt den Faktor nicht. Garagen-
+Zwischenstufe ebenfalls nur ueber Import/Parameter erreichbar.
