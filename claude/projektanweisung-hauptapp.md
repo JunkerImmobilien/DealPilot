@@ -16856,3 +16856,44 @@ Fehler im Log.
 3. Pre-Flight-Entwuerfe: Marcels Auswahl steht aus.
 4. Staging und Prod liegen weiterhin ~340 Commits auseinander — der
    Marktbericht-Strang ist nicht auf Prod.
+
+
+## Rollout-Journal · 17.09.2026 — v1426: RND-Kern 3.1.0 aus dem Gutachten-Paket
+
+**Was.** Marcel hat `Dateien/gutachten-paket-v1.0.0.zip` abgelegt (Rechenkerne,
+Bruecke, Word-Reporting, Pruefstrecken). Gemessen statt uebernommen:
+
+| Teil | Befund | Entscheidung |
+|---|---|---|
+| `rnd-calc.js` | unser Kern faellt bei **4 von 22** Pruefungen gegen drei unterschriebene Gutachten durch (Am Markt 18: 44,07 statt 40 — Formel unter ihrer Schwelle angewandt; Bj 1890 bekam 46 Jahre) | **uebernommen** |
+| `rnd-gnd-table.js` | Wohngebaeude 70 (Anl. 22 BewG) statt 80 (Anl. 1 ImmoWertV) | **uebernommen** |
+| `bmf-afa.js`, `bmf-data.js` | byteidentisch | nichts zu tun |
+| `data-baupreisindex.js` | Anker 70,8 unbelegt; Faktor 1,969 fuer Q1/2026 liegt **2,4–3,7 %** ueber Hamburg 1,911 / Dortmund 1,906 | **nicht** uebernommen — Idee (Reihe mit Stichtag) richtig, Zahlen nicht |
+| `calc-engine.js` (Verkehrswert) | prueft nur gegen das eigene Beispiel des Moduls; kein Vorteil gegenueber `nhk2010.js`/CrossCheck | nicht uebernommen |
+| `kpa-pipeline.js` | Portierung unseres `bmfPipelineService.js` | nichts Neues |
+| `rnd-massnahmen/-standard/-spanne`, `reporting/` (FastAPI, Word) | neue Faehigkeiten, kein Ersatz | offen, s. Rest |
+
+Beim Zusammenfuehren blieben DealPilot-eigene Staende erhalten: v1364
+Steuertarif aus `Tax`, V193 999 EUR. Der Schadensabschlag-Schalter in
+`rnd-ui.js` wirkt jetzt wieder (V187 hatte ihn im Kern hart abgeschaltet,
+der Knopf war seitdem tot); Standard bleibt „Nein". Anzeige: „—" statt
+„0 Jahre", wenn kein Verfahren rechnet, Grenzen mit Fundstelle.
+`deal-action.js`: GND-Rueckfall 70 → 80.
+
+**Commit.** `b15c260`
+
+**Nachweis.** `node tools/rnd-pruefung/rnd-gutachten-test.mjs` laeuft gegen
+`frontend/js` selbst: 22/22. Bruecke 35/35, Ende-zu-Ende 20/20 mit unserem
+Kern. Staging im Browser: Skripte `?v=v1426`, `VERSION 3.1.0`, GND mfh 80,
+Bj 1890 → `verfahren: keines`, Steuersatz = `Tax.calcGrenzsteuersatz`
+(0,318 / 0,42), Gutachterkosten 999.
+
+**Rest:**
+1. Word-Gutachten aus `reporting/` braucht einen eigenen Python-Dienst
+   (Port 8100) — Server-Entscheidung, nicht gebaut.
+2. `rnd-massnahmen.js` (Punkte nach Zeit **und** Anteil, Westerfeldstr. 140)
+   koennte die Punkterfassung im Wizard ersetzen — braucht Marcels Abnahme.
+3. `rnd-calc.js` `Number(input.gnd) || 70` — Rueckfall im Kern noch 70,
+   die Tabelle sagt 80 (so aus dem Paket, das den Kern nicht anfassen laesst).
+4. Gespeicherte RND-Gutachten mit GND 70 behalten ihren Wert; nur neue
+   bekommen 80 vorgeschlagen.
