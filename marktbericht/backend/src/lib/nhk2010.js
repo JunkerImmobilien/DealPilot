@@ -668,6 +668,20 @@ export function korrekturWohnung({ wohnflaeche_je_we, grundriss }) {
  * bei einem Mehrfamilienhaus ist sie unbrauchbar, weil Treppenhaus,
  * Keller und Nebenraeume je nach Gebaeude stark schwanken.
  */
+/* v1427-GPK · Korrekturfaktor Zweifamilienhaus nach NHK 2010 (SW-RL 2012
+ * Anlage 1, Gebaeudearten 1. bis 3.): 1,05. Er fehlte hier ganz. Gemessen
+ * am unterschriebenen Gutachten Loehner Str. 278 (ZFH, 17.09.2026): ohne
+ * ihn lag der marktangepasste Sachwert 10.048 EUR unter dem Gutachten.
+ * Uebernommen aus dem Rechenkern des Gutachten-Pakets (calc-engine.js,
+ * zfhKorrektur). Fuer Mehrfamilienhaeuser gilt er nicht — dort stehen die
+ * Korrekturen fuer Wohnungsgroesse und Grundriss. */
+export function zfhKorrektur({ nhk_typ, objektart, zweifamilienhaus } = {}) {
+  if (!/^[123]./.test(String(nhk_typ || ''))) return 1;
+  const zfh = zweifamilienhaus === true
+    || /(^|[^a-z])zfh([^a-z]|$)|zweifamilien/i.test(String(objektart || ''));
+  return zfh ? 1.05 : 1;
+}
+
 export function bgf({ bgf_direkt, wohnflaeche_qm, objektart }) {
   const d = Number(bgf_direkt);
   if (Number.isFinite(d) && d > 0) return { wert: d, herkunft: 'direkt', verlaesslich: true };
@@ -751,10 +765,22 @@ export function sachwert(ein, bodenwertErgebnis, param) {
   if (!index) { out.grund = 'Ohne Baupreisindex kein Sachwert.'; return out; }
   const regional = Number(ein.regionalfaktor) || 1.0;
 
-  let herst = Math.round(kw * f.wert * index * regional * korr);   /* v1074-WBTL-2 · let: Bauteile kommen dazu */
+  /* v1427-GPK · RECHENWEG DES GUTACHTEN-PAKETS (calc-engine.js)
+   * Die Gutachterkonvention: Baupreisindex auf DREI Stellen, der Kennwert
+   * zum Stichtag auf den CENT, erst dann mal BGF. Bisher wurde das Produkt
+   * am Ende auf den Euro gerundet. Am Gutachten Loehner Str. 278:
+   * 861,20 x 1,05 = 904,26 -> x 1,982 = 1.792,24 EUR/m2 -> x 346,62 m2
+   * = 621.226 EUR (Gutachten 621.226,23). */
+  const _zfh = zfhKorrektur(ein);
+  const _index3 = Math.round(index * 1000) / 1000;
+  const kennwertStichtag = Math.round(kw * _zfh * korr * regional * _index3 * 100) / 100;
+  let herst = Math.round(kennwertStichtag * f.wert);   /* v1074-WBTL-2 · let: Bauteile kommen dazu */
+  out.kennwert_stichtag_eur_qm = kennwertStichtag;
+  if (_zfh !== 1) out.zfh_korrektur = _zfh;
   out.staffel.push({ pos: `Normalherstellungskosten (${kw} €/m² BGF × ${f.wert} m²)`, wert: Math.round(kw * f.wert) });
+  if (_zfh !== 1) out.staffel.push({ pos: `× Korrekturfaktor Zweifamilienhaus`, detail: 'NHK 2010, SW-RL 2012 Anlage 1', faktor: _zfh, wert: null });
   if (korr !== 1) out.staffel.push({ pos: `× Korrektur Wohnungsgröße / Grundriss`, faktor: korr, wert: null });
-  out.staffel.push({ pos: `× Baupreisindex ${index}`, faktor: index, wert: null });
+  out.staffel.push({ pos: `× Baupreisindex ${_index3}`, faktor: _index3, wert: null });
   if (regional !== 1) out.staffel.push({ pos: `× Regionalfaktor ${regional}`, faktor: regional, wert: null });
   /* v1074-WBTL-1 · Sonstige Bauteile (Gauben, Balkone, Vordaecher,
    * Terrassen) als HERSTELLUNGSKOSTEN zum Stichtag — sie unterliegen
@@ -808,6 +834,60 @@ export function sachwert(ein, bodenwertErgebnis, param) {
   let geb = herst - minderung;
   const bes = Number(ein.bes_bauteile) || 0;
   if (bes) { geb += bes; out.staffel.push({ pos: '+ besondere Bauteile', wert: bes }); }
+  /* v1427-GPK · DIE GARAGE STEHT JETZT VOR DEN AUSSENANLAGEN.
+   * Die Aussenanlagen sind ein Prozentsatz vom Sachwert ALLER baulichen
+   * Anlagen (SW-RL 2012 Nr. 4.2), die Garage gehoert dazu. So rechnen das
+   * Gutachten Loehner Str. 278 (7 % x 236.964,39 = 16.587,51 EUR) und der
+   * Rechenkern des Gutachten-Pakets. Hier standen die Aussenanlagen vorher
+   * und liefen nur auf das Wohnhaus: 1.546 EUR zu wenig. */
+  /* v1072-WGAR-1 · GARAGEN ALS EIGENE BAULICHE ANLAGE.
+   * Die NHK 2010 fuehren fuer Garagen eigene Kostenkennwerte (Gebaeudeart
+   * 14.1: 245 / 485 / 780 EUR/m2 BGF, Baunebenkosten 12 %). Das Gutachten
+   * setzt die Garage mit rund 28.500 EUR an — bei uns fehlte sie ganz.
+   *
+   * Eigene Gesamtnutzungsdauer: Anlage 3 SW-RL nennt fuer Einzelgaragen
+   * 60 Jahre. Sie mit den 80 Jahren des Hauses zu rechnen waere bequem und
+   * falsch — eine Garage haelt nicht so lange wie ein Wohnhaus.
+   *
+   * Ohne Bruttogrundflaeche der Garage wird NICHT geschaetzt. Die Zahl der
+   * Stellplaetze allein sagt nichts ueber die Flaeche. */
+  const _garBgf = Number(ein.garagen_bgf_qm);
+  if (Number.isFinite(_garBgf) && _garBgf > 0) {
+    /* v1427-GPK · Zwischenstufen wie im Gutachten-Paket (Ausstattungsmatrix):
+     * Loehner Str. 278 setzt die Garage mit 381,80 EUR/m2 an — zwischen
+     * Stufe 3 (245) und 4 (485). Eine ganze Stufe kann das nicht abbilden.
+     * Linear interpoliert, wie beim gewogenen Kennwert des Wohnhauses. */
+    const _garRoh = Math.min(5, Math.max(3, Number(ein.garagen_stufe) || 3));
+    const _garU = Math.floor(_garRoh), _garO = Math.ceil(_garRoh);
+    const _garStufe = Math.round(_garRoh * 100) / 100;
+    const _garKw = Math.round((NHK_2010.WERTE['14.1|' + _garU]
+      + (NHK_2010.WERTE['14.1|' + _garO] - NHK_2010.WERTE['14.1|' + _garU]) * (_garRoh - _garU)) * 100) / 100;
+    if (Number.isFinite(_garKw)) {
+      const _garGnd = Number(ein.garagen_gnd) || GND_GARAGE;
+      const _garRnd = Number.isFinite(Number(ein.garagen_rnd))
+        ? Number(ein.garagen_rnd)
+        : Math.max(0, Math.min(_garGnd, rnd));
+      /* v1427-GPK · dieselbe Konvention wie beim Wohnhaus */
+      const _garKwStichtag = Math.round(_garKw * _index3 * 100) / 100;
+      const _garHerst = Math.round(_garKwStichtag * _garBgf);
+      const _garMind = Math.round(_garHerst * ((_garGnd - _garRnd) / _garGnd));
+      const _garWert = _garHerst - _garMind;
+      geb += _garWert;
+      out.staffel.push({
+        pos: '+ Garage / Stellplatz',
+        detail: _garBgf + ' m² × ' + _garKw + ' €/m² × ' + (index || 1)
+          + ' − Alterswertminderung (' + Math.round(_garGnd - _garRnd) + ' von ' + _garGnd + ' Jahren)',
+        wert: _garWert,
+      });
+      out.garage = {
+        bgf_qm: _garBgf, standardstufe: _garStufe, kennwert_eur_qm: _garKw,
+        gnd_jahre: _garGnd, rnd_jahre: _garRnd,
+        herstellungskosten_eur: _garHerst, wert_eur: _garWert,
+        quelle: 'NHK 2010, Gebäudeart 14.1 (Einzel-/Mehrfachgaragen); '
+          + 'Gesamtnutzungsdauer 60 Jahre nach Anlage 3 SW-RL',
+      };
+    }
+  }
   /* v1072-WAUS-1 · Aussenanlagen als PROZENTSATZ des Gebaeudesachwerts.
    * Das Gutachten zu Loehner Str. 278 setzt 7 % an ("aufgrund der
    * Ausfuehrung der Aussenanlagen") und kommt auf 15.693 EUR — bei uns
@@ -833,45 +913,6 @@ export function sachwert(ein, bodenwertErgebnis, param) {
     out.aussenanlagen_herkunft = aussenHerkunft;
   }
 
-  /* v1072-WGAR-1 · GARAGEN ALS EIGENE BAULICHE ANLAGE.
-   * Die NHK 2010 fuehren fuer Garagen eigene Kostenkennwerte (Gebaeudeart
-   * 14.1: 245 / 485 / 780 EUR/m2 BGF, Baunebenkosten 12 %). Das Gutachten
-   * setzt die Garage mit rund 28.500 EUR an — bei uns fehlte sie ganz.
-   *
-   * Eigene Gesamtnutzungsdauer: Anlage 3 SW-RL nennt fuer Einzelgaragen
-   * 60 Jahre. Sie mit den 80 Jahren des Hauses zu rechnen waere bequem und
-   * falsch — eine Garage haelt nicht so lange wie ein Wohnhaus.
-   *
-   * Ohne Bruttogrundflaeche der Garage wird NICHT geschaetzt. Die Zahl der
-   * Stellplaetze allein sagt nichts ueber die Flaeche. */
-  const _garBgf = Number(ein.garagen_bgf_qm);
-  if (Number.isFinite(_garBgf) && _garBgf > 0) {
-    const _garStufe = Math.min(5, Math.max(3, Math.round(Number(ein.garagen_stufe) || 3)));
-    const _garKw = NHK_2010.WERTE['14.1|' + _garStufe];
-    if (Number.isFinite(_garKw)) {
-      const _garGnd = Number(ein.garagen_gnd) || GND_GARAGE;
-      const _garRnd = Number.isFinite(Number(ein.garagen_rnd))
-        ? Number(ein.garagen_rnd)
-        : Math.max(0, Math.min(_garGnd, rnd));
-      const _garHerst = Math.round(_garKw * _garBgf * (index || 1));
-      const _garMind = Math.round(_garHerst * ((_garGnd - _garRnd) / _garGnd));
-      const _garWert = _garHerst - _garMind;
-      geb += _garWert;
-      out.staffel.push({
-        pos: '+ Garage / Stellplatz',
-        detail: _garBgf + ' m² × ' + _garKw + ' €/m² × ' + (index || 1)
-          + ' − Alterswertminderung (' + Math.round(_garGnd - _garRnd) + ' von ' + _garGnd + ' Jahren)',
-        wert: _garWert,
-      });
-      out.garage = {
-        bgf_qm: _garBgf, standardstufe: _garStufe, kennwert_eur_qm: _garKw,
-        gnd_jahre: _garGnd, rnd_jahre: _garRnd,
-        herstellungskosten_eur: _garHerst, wert_eur: _garWert,
-        quelle: 'NHK 2010, Gebäudeart 14.1 (Einzel-/Mehrfachgaragen); '
-          + 'Gesamtnutzungsdauer 60 Jahre nach Anlage 3 SW-RL',
-      };
-    }
-  }
   out.staffel.push({ pos: '= Gebäudesachwert', wert: geb, summe: true });
   /* v1056-WSW-1 · Diese Werte gab es nur als lokale Variablen. Die
    * Ergebniskarte las sw.gebaeude_sachwert_eur und bekam undefined —
