@@ -369,11 +369,15 @@
        "Netzwerk aktuell nicht erreichbar." — auch ein abgelaufenes Token.
        Genau daran war Backlog-Punkt 1 nicht zu greifen. Ab jetzt sagt die
        Meldung, was los ist. */
+    _netLaeuft = true;
     var _fail = function (msg) {
+      _netLaeuft = false; _netOk = false;
       var h = document.getElementById('dab-rails-host');
       if (h) h.innerHTML = '<div class="dab-net-load">' + msg + '</div>';
     };
     var _apply = function (data) {
+      _netLaeuft = false;
+      _netOk = !!(data && Array.isArray(data.cards));
       _cards = (data && data.cards) || [];
       _cats = (data && data.categories) || [];
       buildRails();
@@ -411,47 +415,34 @@
       .then(function (data) { if (data !== null) _apply(data); })
       .catch(function () { _fail('Netzwerk aktuell nicht erreichbar.'); });
   }
-  /* v878-rotate: Netzwerk-Karten mischen + rotieren */
-  var _dabRotTimer = null, _dabRotPaused = false;
+  /* v878-rotate: gemischte Startreihenfolge der Netzwerk-Karten.
+     v1429: die automatische Rotation (alle 10 s ein Slide) ist entfernt —
+     Marcels Backlog v22, Punkt 3: die Karte bleibt stehen, bis der Nutzer
+     selbst blaettert (Pfeile, Wischen, Mausrad). */
   function _dabShuffle(a){ for (var i=a.length-1;i>0;i--){ var j=(Math.random()*(i+1))|0, t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
-  function _dabStartRotate(){
-    if (_dabRotTimer){ clearInterval(_dabRotTimer); _dabRotTimer=null; }
-    try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch(e){}
-    var rails = document.querySelectorAll('#s8 .dab-rail');
-    rails.forEach(function(rail){
-      rail.addEventListener('mouseenter', function(){ _dabRotPaused = true; });
-      rail.addEventListener('mouseleave', function(){ _dabRotPaused = false; });
-    });
-    _dabRotTimer = setInterval(function(){
-      if (_dabRotPaused) return;
-      var s8 = document.getElementById('s8'); if (!s8 || s8.offsetParent === null) return;
-      document.querySelectorAll('#s8 .dab-rail').forEach(function(rail){
-        var cards = rail.querySelectorAll('.dab-bp:not(.dab-bp-ad)');
-        if (cards.length < 2) return;
-        if (rail.getAttribute('data-sliding') === '1') return;
-        var first = cards[0], ad = rail.querySelector('.dab-bp-ad');
-        var cs = window.getComputedStyle(rail);
-        var gap = parseFloat(cs.columnGap || cs.gap || '0') || 0;
-        var dx = first.getBoundingClientRect().width + gap;
-        if (!(dx > 0)) { if (ad) { rail.insertBefore(first, ad); } else { rail.appendChild(first); } return; }
-        /* v890-rotate: weiches Slide (leicht weiter gleiten), dann lautlos umsortieren */
-        rail.setAttribute('data-sliding', '1');
-        rail.style.transition = 'transform .7s cubic-bezier(.33,0,.2,1)';
-        rail.style.transform = 'translateX(-' + dx + 'px)';
-        var done = function(){
-          if (rail.getAttribute('data-sliding') !== '1') return;
-          rail.removeEventListener('transitionend', done);
-          rail.style.transition = 'none';
-          rail.style.transform = 'translateX(0)';
-          if (ad) { rail.insertBefore(first, ad); } else { rail.appendChild(first); }
-          void rail.offsetWidth;
-          rail.removeAttribute('data-sliding');
-        };
-        rail.addEventListener('transitionend', done);
-        setTimeout(function(){ if (rail.getAttribute('data-sliding') === '1') done(); }, 900);
-      });
-    }, 10000);
+
+  /* v1429 — Punkt 4: „Partnernetzwerk erscheint beim ersten Oeffnen nicht,
+     nach F5 schon." Geladen wurde GENAU EINMAL: renderTab() laeuft beim
+     Seitenstart (deal-action-bootstrap.js, DOMContentLoaded), und scheitert
+     dieser eine Abruf — noch nicht angemeldet, Netz weg, 15-s-Timeout —,
+     blieb der Bereich leer, bis die Seite neu geladen wurde. Jetzt merkt
+     sich das Modul, ob der Abruf gelungen ist, und holt ihn nach, sobald
+     der Reiter geoeffnet wird oder die Anmeldung steht (dp:plan-ready). */
+  var _netOk = false, _netLaeuft = false;
+  function _netNachholen() {
+    if (_netOk || _netLaeuft) return;
+    if (!document.getElementById('dab-rails-host')) return;
+    try { loadNetwork(); } catch (e) {}
   }
+  document.addEventListener('click', function (e) {
+    var t = e.target && e.target.closest && e.target.closest('.tab');
+    if (!t || _netOk) return;
+    setTimeout(function () {
+      var s8 = document.getElementById('s8');
+      if (s8 && s8.classList.contains('active')) _netNachholen();
+    }, 120);
+  }, true);
+  window.addEventListener('dp:plan-ready', function () { _netNachholen(); });
   function buildRails() {
     var host = document.getElementById('dab-rails-host');
     if (!host) return;
@@ -478,7 +469,6 @@
       }, { passive: false });
       updArrows(el.id);
     });
-    _dabStartRotate();
   }
   function bgAttrs(card) {
     var bg = card.hintergrund || 'weiss';
@@ -1221,7 +1211,6 @@
     /* v890: eigene Pflichtdokumente + weiche Rotation */
     '#s8 .dab-req li .dab-cdoc{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-family:var(--dab-fs);font-size:9px;font-weight:700;color:var(--dab-gold3);cursor:pointer;white-space:nowrap}',
     '#s8 .dab-req li .dab-cdoc input{width:13px;height:13px;accent-color:var(--dab-green,#3FA56C);cursor:pointer}',
-    '#s8 .dab-rail{will-change:transform}',
     /* Abrisskanten */
     '#s8 .dab-edge{position:relative;width:0;flex-shrink:0}',
     '#s8 .dab-edge-k1{border-left:2px dashed var(--kante,rgba(42,39,39,.16))}',
