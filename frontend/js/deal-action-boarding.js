@@ -1214,6 +1214,8 @@
     '#s8 .dab-req li.no .ic{background:rgba(184,98,80,.12);color:var(--dab-red)}',
     '#s8 .dab-req li.ok{color:#2A2727}',
     '#s8 .dab-req-fix{margin-left:auto;font-family:var(--dab-fs);font-size:9px;font-weight:700;color:var(--dab-gold3);background:#fff;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);border-radius:6px;padding:2px 8px;cursor:pointer}',
+    /* v1441d: am Handy nur 56x20 - Trefferflaeche 64x30 (Zeilenabstand ~24 px, 44 px wuerde der Nachbarzeile den Tipp stehlen) */
+    '@media(max-width:768px){#s8 .dab-req-fix{position:relative}#s8 .dab-req-fix::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100%,64px);height:max(100%,30px)}}',
     /* v890: eigene Pflichtdokumente + weiche Rotation */
     '#s8 .dab-req li .dab-cdoc{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-family:var(--dab-fs);font-size:9px;font-weight:700;color:var(--dab-gold3);cursor:pointer;white-space:nowrap}',
     '#s8 .dab-req li .dab-cdoc input{width:13px;height:13px;accent-color:var(--dab-green,#3FA56C);cursor:pointer}',
