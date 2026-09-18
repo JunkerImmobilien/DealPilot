@@ -17111,3 +17111,10 @@ abgenommen** — die Chrome-Erweiterung war nicht verbunden.
 **Rest:** 9, 12, 13, 19 (Teil 2), 20 BLOCKIERT bis Browser; 5, 6, 8 (Teil 2),
 17, 21, 22 warten auf Marcels Entscheidung; alle Pakete v1429–v1439 noch
 nicht auf Prod.
+
+**Nachtrag 18.09.2026 (4):** v1440 (`076bd35`, Punkt 9 Teil 1) — Sprechlauf:
+Kurzantworten ab 2 Zeichen (vorher 422 unter 10), OpenAI-Zeitgrenze 45 s,
+AudioContext-resume (Handy), veraltete Antwort raeumt ihren Wartezustand ab.
+Backend auf Staging neu gebaut, healthy. Befund dabei: der Sprechlauf hat
+KEINE Sprachausgabe — „Barge-in" im Backlog setzt eine voraus. Demo zu 12/13:
+`design/Vorschläge/bank-und-score-hell-demo.html`. Nicht am Geraet abgenommen.
