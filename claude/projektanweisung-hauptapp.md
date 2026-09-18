@@ -16969,3 +16969,45 @@ node --check und Sichtpruefung abgenommen, der Test stellt ihre Regel nach.
 **Rest:** Im Marktbericht-FORMULAR (frontend/app.js) gibt es nur haus/wohnung
 — wer dort von Hand ein ZFH anlegt, bekommt den Faktor nicht. Garagen-
 Zwischenstufe ebenfalls nur ueber Import/Parameter erreichbar.
+
+---
+
+## Rollout-Journal · 18.09.2026 — PROD: staging vollstaendig
+
+**Was.** Auf Marcels Anweisung („alles ausrollen, damit wir saubere Staende
+haben") erstmals seit Langem **staging komplett nach main gemerged** statt
+per Cherry-Pick. Damit sind auf Prod: v1424–v1427b (Pre-Flight-Entwuerfe
+und Bordkarten, RND-Kern 3.1.0, Sachwert-Rechenweg aus dem Gutachten-Paket,
+ZFH-Merkmal), der gesamte **Marktbericht-Strang** (SWF-Register aller
+Laender, Quellenlinks, Ausstattungsstufen, CrossCheck mit GND aus dem
+Register) und das **Sicherheitspaket** (security_events, Rollen/Ausnahmen,
+Schwellen, Nutzereinstellungen).
+
+**Commit** `006a630` auf `main`, staging per fast-forward auf denselben
+Stand gezogen. Ein Konflikt: `frontend/index.html` — Staging-Fassung
+genommen, vorher geprueft, dass alle vier Zeilen, die nur main hatte
+(flyer-code, promo-erstflug, subscription, easter-egg), in staging stehen.
+Merge-Ergebnis gegen `origin/staging`: **null Unterschied**.
+
+**Vorher gesichert und angesehen:** `haupt-20260918-1709.sql.gz` (11 MB,
+60 COPY), `mb-20260918-1709.sql.gz` (741 KB, 33 COPY).
+
+**Nachweis auf Prod:**
+- Migrationen 071–074 angewendet, `schema_migrations` bis 74
+- dealpilot-backend healthy, mb-backend Up, keine Fehler im Log
+- app.dealpilot.immo und dealpilot.immo: 200
+- **170 von 170** Skript-/Stylesheet-Verweisen der App-Seite: 200
+- Fingerabdruck `git ls-files -s frontend backend marktbericht` auf
+  Staging- und Prod-Server identisch (`2bb3bc19d2d7`)
+- Neue Umgebungsvariablen (SECURITY_ALERT_TO, SECURITY_ALERT_RUHE_MIN,
+  RATE_LIMIT_MAX_ACCOUNT, CREDIT_ALERT_TO) haben Standardwerte, auf
+  keinem Server gesetzt — laeuft wie Staging
+
+**Rest:**
+1. **Quellenregister der mb-DB weicht ab** (Daten, kein Code):
+   `gaa_documents` Staging 75 / Prod 36, `gaa_sources` 115 / 90.
+   Register selbst gleich (`wert_parameter` 2564, `param_modell` 493).
+   Abgleich ist ein DB-Eingriff auf Prod — Freigabe noetig.
+2. Gold-Audit auf beiden Servern RC=1: `js/dashboard.js` 0 -> 2 (Altlast,
+   nicht aus diesem Rollout).
+3. Fachliche Abnahme im Browser auf Prod (Marktbericht Loehner) steht aus.
