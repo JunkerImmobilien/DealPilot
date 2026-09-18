@@ -700,6 +700,7 @@
     var gi = _gesamtinvestition();
     var d = _darlehenSumme();
     var neu = Math.max(0, gi.wert - _zahl('ek') - d.d2);
+    _d1Modus = 'auto';   /* v1433: ab jetzt laeuft das Darlehen wieder mit */
     _setzen('d1', neu);
     if (typeof window.toast === 'function') {
       window.toast('✓ Darlehen I auf ' + _eur(neu) + ' gesetzt — Gesamtinvestition minus Eigenkapital' + (d.d2 ? ' und Darlehen II' : ''));
@@ -717,6 +718,7 @@
     var ek = _zahl('ek');
     var btnEk = document.getElementById('kd-btn-ek');
     var btnD1 = document.getElementById('kd-btn-d1');
+    try { window.dpDarlehenHerleitung(); } catch (e) {}   /* v1433 */
 
     /* Solange nichts eingetragen ist, wird nichts behauptet. */
     if (gi.wert <= 0 || (ek === 0 && d.summe === 0)) {
@@ -799,6 +801,92 @@
   /* Die Feld-Listener haengen NICHT am calc-Hook: sie werden einmal
      gesetzt, egal ob calc schon da ist. Sonst haette ein Abbruch der
      Warteschleife auch sie mitgenommen — und die Zeile waere still tot. */
+  /* ── v1433 · Backlog v22 Punkt 2: erst Eigenkapital, dann Darlehen ─────────
+     Marcel: „Zuerst soll das Eigenkapital festgelegt werden ... Anschliessend
+     die Finanzierungssumme automatisch zurueckrechnen und eintragen", mit der
+     Option „Eigenkapital entspricht den Kaufnebenkosten".
+
+     Grundlogik: Darlehen I = Gesamtinvestition − Eigenkapital − Darlehen II,
+     Gesamtinvestition = Kaufpreis + Nebenkosten + Sanierung + Moeblierung
+     (State.gi aus calc.js - hier wird sie NICHT nachgerechnet; die
+     Nebenkosten ergeben sich als State.gi − kp − san − moebl).
+
+     Das Darlehen laeuft nur mit, solange es niemand von Hand gesetzt hat.
+     Wer einen eigenen Betrag tippt, behaelt ihn; „Darlehen passend setzen"
+     schaltet das Mitlaufen wieder ein. Nachgezogen wird NUR nach einer
+     Eingabe des Nutzers (isTrusted) - nie beim Laden. Sonst koennte ein
+     calc()-Lauf waehrend des Objektwechsels das gespeicherte Darlehen des
+     neuen Objekts mit Werten des alten ueberschreiben. */
+  var _d1Modus = null;   /* 'auto' | 'hand' | null = noch nicht bestimmt */
+  var AUSLOESER = { ek:1, kp:1, san:1, moebl:1, d2:1, d2_enable:1, ek_ist_nk:1,
+    makler_p:1, notar_p:1, gba_p:1, gest_p:1, ji_p:1,
+    makler_e:1, notar_e:1, gba_e:1, gest_e:1, ji_e:1 };
+
+  function _teile() {
+    var gi = _gesamtinvestition();
+    var kp = _zahl('kp'), san = _zahl('san'), moebl = _zahl('moebl');
+    var nk = gi.sicher ? Math.max(0, gi.wert - kp - san - moebl) : 0;
+    var d = _darlehenSumme();
+    var ek = _zahl('ek');
+    return { gi: gi, kp: kp, nk: nk, san: san, moebl: moebl, ek: ek, d: d,
+             soll: Math.max(0, gi.wert - ek - d.d2) };
+  }
+  function _modusBestimmen() {
+    var t = _teile();
+    _d1Modus = (t.d.d1 <= 0 || Math.abs(t.d.d1 - t.soll) <= 1) ? 'auto' : 'hand';
+  }
+
+  window.dpDarlehenNachziehen = function () {
+    var t = _teile();
+    if (!t.gi.sicher) return;
+    var cb = document.getElementById('ek_ist_nk');
+    if (cb && cb.checked && Math.abs(t.ek - t.nk) > 1) {
+      _setzen('ek', t.nk);
+      t = _teile();
+    }
+    if (_d1Modus === null) _d1Modus = (t.d.d1 <= 0) ? 'auto' : 'hand';
+    if (_d1Modus === 'auto' && Math.abs(t.d.d1 - t.soll) > 1) _setzen('d1', t.soll);
+    window.dpDarlehenHerleitung();
+  };
+
+  window.dpDarlehenHerleitung = function () {
+    var h = document.getElementById('d1-herleitung');
+    if (!h) return;
+    var t = _teile();
+    if (!t.gi.sicher || t.gi.wert <= 0) { h.textContent = ''; return; }
+    var weg = 'Kaufpreis ' + _eur(t.kp) + ' + Nebenkosten ' + _eur(t.nk)
+      + (t.san ? ' + Sanierung ' + _eur(t.san) : '')
+      + (t.moebl ? ' + Möblierung ' + _eur(t.moebl) : '')
+      + ' − Eigenkapital ' + _eur(t.ek)
+      + (t.d.d2 ? ' − Darlehen II ' + _eur(t.d.d2) : '')
+      + ' = ' + _eur(t.soll);
+    var auto = (_d1Modus !== 'hand') && Math.abs(t.d.d1 - t.soll) <= 1;
+    h.textContent = auto
+      ? 'Automatisch: ' + weg + '. Du kannst den Betrag überschreiben.'
+      : 'Von Hand gesetzt. Rechnerisch: ' + weg + '.';
+  };
+
+  /* Nutzereingaben: Darlehen von Hand -> 'hand'; alles andere -> nachziehen,
+     nachdem calc() (300 ms entprellt) State.gi fortgeschrieben hat. */
+  var _nachT = 0;
+  function _eingabe(e) {
+    if (!e || !e.isTrusted || !e.target) return;
+    var id = e.target.id;
+    if (id === 'd1') { _d1Modus = 'hand'; setTimeout(window.dpDarlehenHerleitung, 360); return; }
+    if (!AUSLOESER[id]) return;
+    /* Ein eigenes Eigenkapital heisst: nicht mehr = Nebenkosten. */
+    if (id === 'ek') { var cb = document.getElementById('ek_ist_nk'); if (cb && cb.checked) cb.checked = false; }
+    clearTimeout(_nachT);
+    _nachT = setTimeout(window.dpDarlehenNachziehen, 380);
+  }
+  document.addEventListener('input', _eingabe, true);
+  document.addEventListener('change', _eingabe, true);
+  /* Objektwechsel: Modus aus den geladenen Werten ableiten, nichts schreiben. */
+  window.addEventListener('dp:object-ready', function () {
+    _d1Modus = null;
+    setTimeout(function () { _modusBestimmen(); window.dpDarlehenHerleitung(); }, 400);
+  });
+
   function _listener() {
     ['ek', 'd1', 'd2', 'd2_enable'].forEach(function (id) {
       var e = document.getElementById(id);

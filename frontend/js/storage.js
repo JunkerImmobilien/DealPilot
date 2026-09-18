@@ -173,6 +173,9 @@ function collectData() {
   if (erbCb) d['_erbpacht'] = erbCb.checked;
   var erbW = document.getElementById('erb_wert_ist_erb');
   if (erbW) d['_erb_wert_ist_erb'] = erbW.checked;
+  /* v1433: Eigenkapital = Kaufnebenkosten */
+  var ekNk = document.getElementById('ek_ist_nk');
+  if (ekNk) d['_ek_ist_nk'] = ekNk.checked;
   // V63.99: Küche-im-Kaufpreis-Checkbox
   /* V291.1-storage-cleanup: kueche_im_kp-Checkbox entfernt — kein Save mehr nötig */
   // BWK mode
@@ -373,6 +376,10 @@ function loadData(d) {
       if (anFields1) anFields1.style.display = cbAn1.checked ? '' : 'none';
     }
   }
+  /* v1433: Eigenkapital = Kaufnebenkosten. Alte Objekte kennen den Schalter
+     nicht - dann AUS, sonst erbte ein geladenes Objekt den Haken des vorigen. */
+  var ekNkL = document.getElementById('ek_ist_nk');
+  if (ekNkL) ekNkL.checked = !!d._ek_ist_nk;
   // V23: Mietentwicklungs-Toggle wiederherstellen
   if (d._me_inc_ze !== undefined) {
     var meCb = document.getElementById('me_inc_ze');

@@ -2497,6 +2497,13 @@ label.dp-required.qc-required::after {
         <div class="g2">
           <div class="f"><label>Eigenkapital * <button type="button" class="dp-tip" data-tip-id="tab5.eigenkapital" tabindex="-1" aria-label="Hilfe zu tab5.eigenkapital"></button></label><div class="iw"><span class="pfx">€</span><input id="ek" type="text" inputmode="decimal" placeholder="17905" class="trl" oninput="calc()"></div></div>
         </div>
+        <!-- v1433 · Backlog v22 Punkt 2: erst Eigenkapital, dann Darlehen -->
+        <div class="f checkbox-row" id="ek-ist-nk-row">
+          <label class="cb-label" title="Setzt das Eigenkapital auf die Kaufnebenkosten (Makler, Notar/Grundbuch, Grunderwerbsteuer, weitere). Das Darlehen finanziert dann Kaufpreis, Sanierung und Möblierung.">
+            <input id="ek_ist_nk" type="checkbox">
+            <span>Eigenkapital entspricht den Kaufnebenkosten</span>
+          </label>
+        </div>
         <div class="f checkbox-row">
           <label class="cb-label" title="LTV-Bezugsgröße: AUS = LTV gegen Kaufpreis (Standard-Bankenpraxis, Beleihungsbasis ≈ KP). AN = LTV gegen Gesamtinvestition inkl. Erwerbsnebenkosten (konservativere Sicht — strenger, da KNK nicht als Sicherheit zählen).">
             <input id="ek_inkl_nk" type="checkbox" onchange="calc()">
@@ -2504,7 +2511,7 @@ label.dp-required.qc-required::after {
             <span class="info-tag">ℹ</span>
           </label>
         </div>
-        <div class="f"><label class="dp-required" data-v236-required-set="1">Anfängl. Darlehenssumme</label><div class="iw"><span class="pfx">€</span><input id="d1" type="text" inputmode="decimal" placeholder="200000" class="trl" oninput="calc()"></div></div>
+        <div class="f"><label class="dp-required" data-v236-required-set="1">Anfängl. Darlehenssumme</label><div class="iw"><span class="pfx">€</span><input id="d1" type="text" inputmode="decimal" placeholder="200000" class="trl" oninput="calc()"></div><div class="cf-hint" id="d1-herleitung" style="margin-top:4px"></div></div>
         <!-- v1244 · Testbericht Block F: „Sollte hier die Reihenfolge nicht
              anders sein? Erst eintragen was fuer ein Kredit ich bekomme und
              den EK-Einsatz berechnet er automatisch (wie Immocation Tool)"
@@ -3465,7 +3472,7 @@ label.dp-required.qc-required::after {
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=v1360"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v1313"></script>
+<script src="js/storage.js?v=v1433"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=W33"></script>
@@ -3490,7 +3497,7 @@ label.dp-required.qc-required::after {
 <script src="js/star-rating.js?v=364"></script>
 <script src="js/pdf-import.js?v=v1252"></script>
 <script src="js/beleg-import.js?v=v1406"></script>
-<script src="js/financing.js?v=v1244c"></script>
+<script src="js/financing.js?v=v1433"></script>
 <script src="js/financing-pdf.js?v=20260611105943"></script>
 <script src="js/immokalk-import.js?v=v1260"></script>
 <script src="js/import-export-modal.js?v=893u"></script>
