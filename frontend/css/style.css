@@ -32120,6 +32120,12 @@ select.oab-missing-hl {
   gap: 12px;
   margin-top: 2px;
 }
+/* v1441c: bei 390 px waren die Ausstattungsfelder 146 px breit und kuerzten ihren
+   Text ("- keine Angab"). Kleinere Schrift geht nicht - unter 16 px zoomt iOS
+   beim Antippen. Also einspaltig. Gleiche Spezifitaet, spaetere Regel gewinnt. */
+@media (max-width: 480px) {
+  #obj-extra-wrap.obj-extra-wrap { grid-template-columns: 1fr; }
+}
 
 /* =================================================================
    v446 - Deal-Header Kontakt raus (Logo/Schriftzug bleibt, Tel/Mail weg)
