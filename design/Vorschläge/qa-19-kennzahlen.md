@@ -77,3 +77,9 @@ anders als die Haupt-App.** Nicht geändert — welche Definition gilt, ist
 Marcels Entscheidung. Vorschlag: im Score **vor Steuern** (vergleichbar
 zwischen Anlegern mit verschiedenem Steuersatz), nach Steuern als eigene,
 anders benannte Kennzahl („EK-Rendite nach Steuern").
+
+**Konsistenz (Eingabe ändern → alles zieht nach):** Kaufpreis 200.000 →
+250.000 € am geladenen Objekt: Gesamtinvestition 220.400 → 275.500, BMY
+6,60 → 5,28 %, Score 87 → 82; LTV (Bezug Verkehrswert) und DSCR (gleiches
+Darlehen) richtig unverändert. Zurückgesetzt → alle Werte wie vorher. Ohne
+Reiterwechsel gemessen (der speichert das Objekt).
