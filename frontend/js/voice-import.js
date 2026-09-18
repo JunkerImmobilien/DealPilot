@@ -25,6 +25,19 @@
  * ════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
+  /* v1428: Whitelabel-Gold fuer Canvas und SVG-Attribute - dort wirkt kein var().
+     Ohne Whitelabel liefert _wlc() das Literal zurueck (Muster aus dashboard.js). */
+  function _wlc(h) {
+    try {
+      var v = getComputedStyle(document.documentElement).getPropertyValue('--wl-' + h.slice(1).toLowerCase());
+      v = (v || '').trim();
+      if (/^#[0-9a-f]{6}$/i.test(v)) return v;
+    } catch (e) {}
+    return h;
+  }
+  function _hexA(h, a) {
+    return 'rgba(' + parseInt(h.substr(1, 2), 16) + ',' + parseInt(h.substr(3, 2), 16) + ',' + parseInt(h.substr(5, 2), 16) + ',' + a + ')';
+  }
   if (window.VoiceImport) return;
 
   var TOKEN_KEY = 'ji_token';
@@ -1716,12 +1729,13 @@
     for (var i = 0; i <= n; i++) { var t = t0 + (t1 - t0) * i / n, w = Math.PI * (1 - t); p.push((cx + r * Math.cos(w)).toFixed(1) + ',' + (cy - r * Math.sin(w)).toFixed(1)); }
     return p.join(' ');
   }
-  var _ZD = [['#B86250', '#FF8E72', 0, 0.5], ['#C9A84C', '#FFE49A', 0.5, 0.7], ['#3FA56C', '#74FFB8', 0.7, 1]];
+  /* v1428: zur Renderzeit, damit ein spaeter gesetztes Whitelabel greift */
+  function _zd() { return [['#B86250', '#FF8E72', 0, 0.5], [_wlc('#C9A84C'), '#FFE49A', 0.5, 0.7], ['#3FA56C', '#74FFB8', 0.7, 1]]; }
   function _glow(p) { return p >= 70 ? '#56E89A' : p >= 50 ? '#F2CF6C' : '#FF6E54'; }
   function _gaugeMain(score) {
     var id = ++_UID, cx = 110, cy = 104, r = 84, sw = 12, t = Math.max(0, Math.min(1, score / 100)), g = _glow(score);
-    var grads = _ZD.map(function (z, i) { return '<linearGradient id="zg' + id + '_' + i + '" x1="0" x2="1"><stop offset="0" stop-color="' + z[0] + '"/><stop offset="1" stop-color="' + z[1] + '"/></linearGradient>'; }).join('');
-    var arcs = _ZD.map(function (z, i) { return '<polyline points="' + _arcPts(cx, cy, r, z[2], z[3], 18) + '" fill="none" stroke="url(#zg' + id + '_' + i + ')" stroke-width="' + sw + '" filter="url(#gl' + id + ')"/>'; }).join('');
+    var grads = _zd().map(function (z, i) { return '<linearGradient id="zg' + id + '_' + i + '" x1="0" x2="1"><stop offset="0" stop-color="' + z[0] + '"/><stop offset="1" stop-color="' + z[1] + '"/></linearGradient>'; }).join('');
+    var arcs = _zd().map(function (z, i) { return '<polyline points="' + _arcPts(cx, cy, r, z[2], z[3], 18) + '" fill="none" stroke="url(#zg' + id + '_' + i + ')" stroke-width="' + sw + '" filter="url(#gl' + id + ')"/>'; }).join('');
     var ticks = ''; for (var k = 0; k <= 10; k++) { var w0 = Math.PI * (1 - k / 10), r1 = r - sw / 2 - 3, r2 = r - sw / 2 - (k % 5 === 0 ? 10 : 6); ticks += '<line x1="' + (cx + r1 * Math.cos(w0)).toFixed(1) + '" y1="' + (cy - r1 * Math.sin(w0)).toFixed(1) + '" x2="' + (cx + r2 * Math.cos(w0)).toFixed(1) + '" y2="' + (cy - r2 * Math.sin(w0)).toFixed(1) + '" stroke="#54545e" stroke-width="' + (k % 5 === 0 ? 1.6 : 1) + '"/>'; }
     var w = Math.PI * (1 - t), nx = cx + (r - 11) * Math.cos(w), ny = cy - (r - 11) * Math.sin(w);
     return '<svg viewBox="0 0 220 122" style="width:100%;max-width:168px;display:block;overflow:visible">' +
@@ -1736,8 +1750,8 @@
   }
   function _gaugeMini(score) {
     var id = ++_UID, cx = 70, cy = 62, r = 50, sw = 8.5, t = Math.max(0, Math.min(1, score / 100)), g = _glow(score);
-    var grads = _ZD.map(function (z, i) { return '<linearGradient id="mg' + id + '_' + i + '" x1="0" x2="1"><stop offset="0" stop-color="' + z[0] + '"/><stop offset="1" stop-color="' + z[1] + '"/></linearGradient>'; }).join('');
-    var arcs = _ZD.map(function (z, i) { return '<polyline points="' + _arcPts(cx, cy, r, z[2], z[3], 14) + '" fill="none" stroke="url(#mg' + id + '_' + i + ')" stroke-width="' + sw + '" filter="url(#ml' + id + ')"/>'; }).join('');
+    var grads = _zd().map(function (z, i) { return '<linearGradient id="mg' + id + '_' + i + '" x1="0" x2="1"><stop offset="0" stop-color="' + z[0] + '"/><stop offset="1" stop-color="' + z[1] + '"/></linearGradient>'; }).join('');
+    var arcs = _zd().map(function (z, i) { return '<polyline points="' + _arcPts(cx, cy, r, z[2], z[3], 14) + '" fill="none" stroke="url(#mg' + id + '_' + i + ')" stroke-width="' + sw + '" filter="url(#ml' + id + ')"/>'; }).join('');
     var w = Math.PI * (1 - t), nx = cx + (r - 8) * Math.cos(w), ny = cy - (r - 8) * Math.sin(w);
     return '<svg viewBox="0 0 140 76" style="width:100%;max-width:108px;overflow:visible">' +
       '<defs>' + grads + '<filter id="ml' + id + '" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>' +
@@ -1758,12 +1772,13 @@
       if (!canvas.isConnected) return;  /* Modal zu -> Schleife endet */
       var W = canvas.width, H = canvas.height;
       ctx.clearRect(0, 0, W, H);
+      var gold = _wlc('#C9A84C');  /* v1428: einmal je Bild, nicht je Punkt */
       for (var j = 0; j < dots.length; j++) {
         var d = dots[j]; d.y -= d.s / 100; if (d.y < -0.02) { d.y = 1.02; d.x = Math.random(); }
         var px = d.x * W, py = d.y * H;
         ctx.beginPath(); ctx.arc(px, py, d.r, 0, 6.283);
-        ctx.fillStyle = (d.c ? 'rgba(201,168,76,' : 'rgba(120,255,184,') + d.a.toFixed(2) + ')';
-        ctx.shadowBlur = 3 * DPR; ctx.shadowColor = d.c ? '#C9A84C' : '#3FA56C';  /* v525: weniger Glow */
+        ctx.fillStyle = d.c ? _hexA(gold, d.a.toFixed(2)) : 'rgba(120,255,184,' + d.a.toFixed(2) + ')';
+        ctx.shadowBlur = 3 * DPR; ctx.shadowColor = d.c ? gold : '#3FA56C';  /* v525: weniger Glow */
         ctx.fill();
       }
       requestAnimationFrame(frame);
@@ -3667,7 +3682,7 @@
       /* v1359: der Unterschied zwischen zwei gleich klingenden Feldern.
          Kein Fehlerton - es ist kein Fehler, sondern eine Klarstellung. */
       '.vi-rf-unterschied{margin-top:9px;padding:8px 11px;border-radius:8px;' +
-        'background:rgba(201,168,76,0.09);border-left:2px solid var(--wl-c9a84c,#C9A84C);' +
+        'background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 9%, transparent);border-left:2px solid var(--wl-c9a84c,#C9A84C);' +
         'font-size:12px;line-height:1.5;opacity:.9}',
 
 
@@ -4073,7 +4088,7 @@
          abgesetzt und leiser als die Frage, damit er sie nicht ueberlagert. */
       '.vi-rf-wozu{margin:9px 0 2px;padding:8px 11px;border-radius:8px;',
       '  border-left:3px solid var(--wl-C9A84C,#C9A84C);',
-      '  background:rgba(201,168,76,.07);',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent);',
       '  font:400 12px/1.5 Inter,system-ui,sans-serif;opacity:.88}',
       '.vi-rf-wozu b{font:600 9.5px/1 "JetBrains Mono",ui-monospace,monospace;',
       '  text-transform:uppercase;letter-spacing:.05em;opacity:.6;margin-right:6px}',

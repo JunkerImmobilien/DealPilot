@@ -242,7 +242,7 @@ async function _zeigeKaufAngebot(d) {
     '</div>' +
     '<button type="button" id="mbKaufBtn" data-art="' + art + '" ' +
       'style="cursor:pointer;border:0;border-radius:9px;padding:10px 16px;font-weight:700;' +
-      'background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#221a06;">' +
+      'background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#221a06;">' +
       'Eine ' + name + ' kaufen' + (preis ? ' · ' + preis : '') +
     '</button>' +
     '<div style="font-size:11.5px;opacity:.75;margin-top:8px;">' +
@@ -934,7 +934,7 @@ function _renderWertverfahren(d) {
          traegt die Markenfarbe ueber das Whitelabel-Token - ein hartes
          Gold waere beim Mandanten falsch. */
       + '#wv-box .wv-quelle{margin-top:8px;padding:7px 10px;border-radius:7px;'
-      + '  background:rgba(201,168,76,.06);border-left:3px solid var(--wl-c9a84c,#c9a84c);'
+      + '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 6%, transparent);border-left:3px solid var(--wl-c9a84c,#c9a84c);'
       + '  font-size:11.5px;line-height:1.5;opacity:.9}'
       + '#wv-box .wv-quelle a{color:var(--wl-c9a84c,#c9a84c);text-decoration:underline;'
       + '  white-space:nowrap}'
@@ -959,7 +959,7 @@ function _renderWertverfahren(d) {
       + '  word-break:break-all}'
 
       /* v1198b · Der Grund, warum kein Bodenwert dasteht. */
-      + '#wv-box .wv-bwgrund{margin-top:9px;padding:9px 11px;border-radius:8px;font-size:11.5px;line-height:1.55;border:1px solid rgba(201,168,76,.32);background:rgba(201,168,76,.09)}'
+      + '#wv-box .wv-bwgrund{margin-top:9px;padding:9px 11px;border-radius:8px;font-size:11.5px;line-height:1.55;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 32%, transparent);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 9%, transparent)}'
       + '#wv-box .wv-g{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}'
       + '#wv-box .wv-k{padding:13px 15px;border:1px solid rgba(128,128,128,.22);border-radius:8px}'
       + '#wv-box .wv-t{font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.6}'

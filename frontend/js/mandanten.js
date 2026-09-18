@@ -595,7 +595,7 @@
         +   '<button type="button" class="btn btn-outline btn-sm" onclick="DealPilotMandanten.uiEdit(\'privat\')">Bearbeiten</button>'
         + '</div>'
         + '<div style="margin-top:14px;padding:20px 22px;border:1px solid var(--gold,#C9A84C);border-radius:14px;background:#FAF9F4">'
-        +   '<div style="font:700 13px/1 \'DM Sans\',sans-serif;letter-spacing:1.4px;text-transform:uppercase;color:#b8932f;margin-bottom:8px">Pro-Funktion</div>'
+        +   '<div style="font:700 13px/1 \'DM Sans\',sans-serif;letter-spacing:1.4px;text-transform:uppercase;color:var(--wl-b8932f,#b8932f);margin-bottom:8px">Pro-Funktion</div>'
         +   '<p style="margin:0 0 14px;color:#2A2727;font-size:14px;line-height:1.55">Mit <b>Mandanten</b> h\u00e4ltst du Objekte privat <i>oder</i> in einer GmbH/UG \u2014 mit eigener K\u00f6rperschaftsteuer-Rechnung, Cockpit-Filter pro Halter und (in Vorbereitung) GuV/Bilanz-Export. Verf\u00fcgbar im <b>Pro</b>-Plan.</p>'
         +   '<button type="button" class="btn btn-gold" onclick="(function(){var b=document.querySelector(\'.st-tab[data-tab=&quot;plan&quot;]\');if(b)b.click();})()"><span class="ic"><svg width="12" height="12"><use href="#i-star"/></svg></span>Pro freischalten</button>'
         + '</div>';
@@ -604,7 +604,7 @@
   }
 
   function _badge(rf) {
-    var col = rf === 'privat' ? '#3FA56C' : (rf === 'gmbh' ? '#C9A84C' : (rf === 'ug' ? '#B86250' : '#7A7370'));
+    var col = rf === 'privat' ? '#3FA56C' : (rf === 'gmbh' ? 'var(--wl-c9a84c,#C9A84C)' : (rf === 'ug' ? '#B86250' : '#7A7370'));
     return '<span style="font:600 10px/1 \'JetBrains Mono\',monospace;letter-spacing:.8px;text-transform:uppercase;'
       + 'padding:3px 8px;border-radius:999px;border:1px solid ' + col + ';color:' + col + '">' + esc(rf) + '</span>';
   }
@@ -919,7 +919,7 @@
     /* v841-zve-host: Privat -> echte INLINE-Steuerzeitraeume-Verwaltung (DB-gebunden). */
     var transHint =
         '<div id="mand-transparent-hint" style="display:' + (corp ? 'none' : 'block') + '">'
-      +   '<div style="margin-top:16px;padding:13px 15px;background:#FAF9F4;border:1px solid rgba(201,168,76,.25);border-radius:10px;font-size:12.5px;color:#2A2727;line-height:1.5;margin-bottom:14px">'
+      +   '<div style="margin-top:16px;padding:13px 15px;background:#FAF9F4;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);border-radius:10px;font-size:12.5px;color:#2A2727;line-height:1.5;margin-bottom:14px">'
       +     '<b>Privatvermögen</b> wird über dein <b>zu versteuerndes Einkommen (zvE)</b> besteuert — gilt für alle privaten Objekte. Pflege die Zeiträume hier:'
       +   '</div>'
       +   '<div id="mand-tax-periods-host"></div>'
@@ -933,7 +933,7 @@
          Beispiel mit drei privaten und zwei GbR-Objekten waren das 9,6
          Prozent zu viel ausgewiesene Entlastung. */
       + '<div id="mand-gbr-only" style="display:' + (rf === 'gbr' ? 'block' : 'none') + '">'
-      +   '<div style="margin-top:16px;padding:13px 15px;background:#FAF9F4;border:1px solid rgba(201,168,76,.25);border-radius:10px;font-size:12.5px;color:#2A2727;line-height:1.55;margin-bottom:12px">'
+      +   '<div style="margin-top:16px;padding:13px 15px;background:#FAF9F4;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);border-radius:10px;font-size:12.5px;color:#2A2727;line-height:1.55;margin-bottom:12px">'
       +     '<b>Warum diese Angabe nötig ist:</b> Eine GbR zahlt selbst keine Einkommensteuer. '
       +     'Ihr Ergebnis wird den Gesellschaftern zugerechnet und fließt in <b>deren</b> '
       +     'Steuererklärung — bei dir also in <b>dasselbe zvE</b> wie deine privaten Objekte. '
@@ -1095,11 +1095,11 @@
         var kz = (d.kuerzel || '').toString().toUpperCase() || label.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase() || 'OB';
         return '<button type="button" onclick="DealPilotMandanten._uewPick(\'' + String(o.id).replace(/'/g, '') + '\', this)" '
           + 'style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:11px 13px;border:1px solid #ece7df;border-radius:12px;background:#fff;cursor:pointer;font-family:inherit;transition:border-color .15s">'
-          + '<span style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#E8CC7A,#b8932f);color:#1a1508;display:inline-flex;align-items:center;justify-content:center;font:700 12px \'Space Grotesk\',sans-serif;flex-shrink:0;letter-spacing:.5px">' + esc(kz) + '</span>'
+          + '<span style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-b8932f,#b8932f));color:#1a1508;display:inline-flex;align-items:center;justify-content:center;font:700 12px \'Space Grotesk\',sans-serif;flex-shrink:0;letter-spacing:.5px">' + esc(kz) + '</span>'
           + '<span style="flex:1;min-width:0"><b style="display:block;font:600 14px/1.25 \'Space Grotesk\',sans-serif;color:#2A2727;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(label) + '</b>'
           + (subline ? '<span style="font-size:12px;color:#7A7370">' + esc(subline) + '</span>' : '')
           + '</span>'
-          + '<span style="color:#b8932f;font:700 15px sans-serif;flex-shrink:0">\u2192</span></button>';
+          + '<span style="color:var(--wl-b8932f,#b8932f);font:700 15px sans-serif;flex-shrink:0">\u2192</span></button>';
       }).join('') + '</div>';
     }).catch(function () { host.innerHTML = '<div style="color:#B86250;font-size:13px">Objekte konnten nicht geladen werden.</div>'; });
   }

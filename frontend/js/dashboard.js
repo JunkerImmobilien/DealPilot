@@ -1242,7 +1242,7 @@
       '  flex-wrap:wrap;margin-bottom:13px}',
       '.sk-titel{font:600 15px/1.2 "Space Grotesk",Inter,sans-serif;color:var(--dp-text,inherit)}',
       '.sk-art{font:600 10px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.09em;',
-      '  text-transform:uppercase;color:var(--wl-c9a84c,#C9A84C);border:1px solid rgba(201,168,76,.32);',
+      '  text-transform:uppercase;color:var(--wl-c9a84c,#C9A84C);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 32%, transparent);',
       '  border-radius:999px;padding:5px 10px;white-space:nowrap}',
       '.sk-art-kst{color:#7A9CC6;border-color:rgba(122,156,198,.34)}',
       /* Kacheln: gleiche Breite, gleiche Grundlinie — eine Reihe, kein Flickenteppich */
@@ -1260,7 +1260,7 @@
       '.sk-u-btn{font:600 11.5px/1 Inter,sans-serif;padding:7px 12px;border-radius:7px;cursor:pointer;',
       '  border:1px solid rgba(122,115,112,.24);background:transparent;color:var(--dp-muted,#7A7370);',
       '  transition:background .15s,color .15s,border-color .15s}',
-      '.sk-u-btn:hover{border-color:rgba(201,168,76,.45);color:var(--wl-c9a84c,#C9A84C)}',
+      '.sk-u-btn:hover{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);color:var(--wl-c9a84c,#C9A84C)}',
       '.sk-u-an{background:var(--wl-c9a84c,#C9A84C);border-color:var(--wl-c9a84c,#C9A84C);color:#2c2410}',
       '.sk-u-an:hover{color:#2c2410}',
       '.sk-u-btn:focus-visible{outline:2px solid var(--wl-c9a84c,#C9A84C);outline-offset:2px}',
