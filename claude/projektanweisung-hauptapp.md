@@ -17118,3 +17118,13 @@ AudioContext-resume (Handy), veraltete Antwort raeumt ihren Wartezustand ab.
 Backend auf Staging neu gebaut, healthy. Befund dabei: der Sprechlauf hat
 KEINE Sprachausgabe — „Barge-in" im Backlog setzt eine voraus. Demo zu 12/13:
 `design/Vorschläge/bank-und-score-hell-demo.html`. Nicht am Geraet abgenommen.
+
+**Nachtrag 18.09.2026 (5) — mit Browser:** Chrome verbunden. Auf Staging im
+Browser abgenommen: alle Skripte v1429–v1440 geladen; Hell-Schalter setzt
+`kanzlei` und speichert (v1431); Darlehens-Herleitung und BGF-Hinweis
+erscheinen; Netzwerk laedt 5 Karten; QC-Knopf ohne Flugzeug, Baujahr und
+dpmb-Wache im Code. Punkt 20 Teil 1: v1441 (Finanzamt-PDF-Knopf, Stresstest-
+Etikett) und v1441b (dp-tip-Trefferflaeche, overflow:hidden aus v639) — danach
+null Ueberlaeufe in 390/844/820. **Prod-Rollout v1429–v1441b: Marcels „ja",
+Sicherungen gezogen (haupt/mb-20260918-2007), der Befehl wurde aber vom
+Sicherheitsfilter („Production Deploy") abgewiesen — Prod unveraendert f5802de.**
