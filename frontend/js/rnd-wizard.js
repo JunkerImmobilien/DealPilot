@@ -840,14 +840,20 @@
     return { total: Math.min(20, total), elements: elements };
   }
 
+  /* v1439 · Backlog v22 Punkt 22 (Bestandsaufnahme): hier stand eine eigene
+     GND-Liste mit 70 Jahren fuer Wohngebaeude. Die zentrale Tabelle
+     (rnd-gnd-table.js) und der Rechenkern (v1426) fuehren 80 - Anlage 1
+     ImmoWertV 2021. Die Wohngebaeude stehen jetzt auf 80. Die Tabelle direkt
+     zu fragen ginge NICHT: unbekannte Bezeichnungen ("Buerogebaeude") landen
+     dort bei mfh = 80 statt 60. Die Gewerbewerte hier stimmen mit ihr ueberein. */
   function gndFromObjektTyp(typ) {
-    if (!typ) return 70;
+    if (!typ) return 80;
     const t = String(typ).toLowerCase();
     if (t.indexOf('hotel') >= 0 || t.indexOf('budget') >= 0) return 40;
     if (t.indexOf('büro') >= 0 || t.indexOf('buero') >= 0 || t.indexOf('geschäft') >= 0) return 60;
     if (t.indexOf('industrie') >= 0 || t.indexOf('lager') >= 0 || t.indexOf('werk') >= 0) return 40;
     if (t.indexOf('garage') >= 0) return 60;
-    return 70; // ETW, MFH, EFH
+    return 80; // ETW, MFH, EFH - Anl. 1 ImmoWertV (v1439, vorher 70)
   }
 
   // ============================================================

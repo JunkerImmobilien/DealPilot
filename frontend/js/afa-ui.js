@@ -52,7 +52,8 @@
     }
 
     var zustand = ($('ds2_zustand') || {}).value || '';
-    var baujahr = ($('bj') || {}).value || '';
+    /* v1439: das Feld heisst baujahr (index.html) - #bj gibt es nur im Quick Check. */
+    var baujahr = ($('baujahr') || $('bj') || {}).value || '';
     var afaSatz = ($('afa_satz') || {}).value || '';
 
     var elig = window.Afa.checkDegressivEligibility({
