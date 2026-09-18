@@ -2167,6 +2167,9 @@
            Der Knopf saehe aus, als haette er gewirkt. */
         if (_fs.pause) return;
         if (_fs.laeuft > 0) return;                      /* Auswertung unterwegs */
+        /* v1440: ein angehaltener Audio-Kontext liefert Pegel 0 - die Phase
+           bleibt 'warte' und fiel unten durch das "alles in Ordnung". */
+        if (_fs.ctx && _fs.ctx.state === 'suspended') { try { _fs.ctx.resume(); } catch (eR) {} }
         if (_fs.phase === 'rauschen' || _fs.phase === 'warte'
             || _fs.phase === 'spricht') return;          /* alles in Ordnung */
         if (_fs.phase === 'aus') return;                 /* bewusst beendet */
@@ -2208,6 +2211,10 @@
       try {
         var AC = window.AudioContext || window.webkitAudioContext;
         _fs.ctx = new AC();
+        /* v1440 · Auf iOS/Android startet der Kontext oft 'suspended', weil er
+           im getUserMedia-Versprechen entsteht, nicht im Tipp. Dann liest der
+           Pegel 0, und der Sprechlauf wartet ewig auf Sprache. */
+        try { if (_fs.ctx.state === 'suspended') _fs.ctx.resume(); } catch (eR) {}
         var src = _fs.ctx.createMediaStreamSource(stream);
         _fs.analyser = _fs.ctx.createAnalyser();
         _fs.analyser.fftSize = 1024;
@@ -2459,7 +2466,14 @@
         });
       }).then(function (r) {
         _fs.laeuft--;
-        if (!_rf || _rf.offen[_rf.i] !== eintrag) return;
+        if (!_rf || _rf.offen[_rf.i] !== eintrag) {
+          /* v1440: die Frage ist weiter - die Antwort gehoert zur alten. Bisher
+             blieb dabei das "einen Moment ..." stehen und der halbe Satz der
+             alten Frage haengte sich an die naechste Antwort. */
+          _fs.rest = '';
+          if (_fs.laeuft === 0) { try { _rfDenkt(false); } catch (eD) {} }
+          return;
+        }
         var txt = (r && r.transcript) ? String(r.transcript).trim() : '';
         /* v1290: Der gemerkte Satzanfang wird vorangestellt. */
         if (_fs.rest) { txt = (_fs.rest + ' ' + txt).replace(/\s+/g, ' ').trim(); _fs.rest = ''; }

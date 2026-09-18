@@ -24,6 +24,11 @@
    `gpt-4o-mini-transcribe`; Code und Doku waren auseinander.
    Weiterhin per OPENAI_TRANSCRIBE_MODEL ueberschreibbar — wer Sprechertrennung
    braucht (Aufnahme einer Besichtigung zu zweit), setzt sie dort. */
+/* v1440 · Die OpenAI-Aufrufe hatten keine Zeitgrenze. Hing einer, wartete der
+   Browser bis zu seinen eigenen 120 s mit "einen Moment ...". Nach 45 s wird
+   abgebrochen; der catch macht daraus 502, und der Dialog sagt "Die Verbindung
+   hat gehakt - sag es nochmal" und hoert wieder zu. */
+const OPENAI_TIMEOUT_MS = Number(process.env.OPENAI_VOICE_TIMEOUT_MS) || 45000;
 const TRANSCRIBE_MODEL = process.env.OPENAI_TRANSCRIBE_MODEL || 'gpt-4o-mini-transcribe';
 const EXTRACT_MODEL = process.env.OPENAI_VOICE_EXTRACT_MODEL || process.env.OPENAI_MODEL || 'gpt-5.5';
 /* v1329: war gpt-4o-mini - in ChatGPT abgeschaltet, der API-Snapshot steht
@@ -217,6 +222,7 @@ async function transcribe(buf, mime, apiKey, sammler) {
   let r;
   try {
     r = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      signal: AbortSignal.timeout(OPENAI_TIMEOUT_MS),   /* v1440 */
       method: 'POST',
       headers: { Authorization: 'Bearer ' + apiKey },
       body: fd
@@ -419,6 +425,7 @@ async function extractFields(transcript, catalog, apiKey, sammler, zusatz) {
   let r;
   try {
     r = await fetch('https://api.openai.com/v1/responses', {
+      signal: AbortSignal.timeout(OPENAI_TIMEOUT_MS),   /* v1440 */
       method: 'POST',
       headers: { Authorization: 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -537,7 +544,10 @@ async function extractFromAudio(audioB64, mime, catalog, opts) {
   if (!buf || buf.length < 2000) throw httpErr(400, 'Aufnahme zu kurz oder leer.');
   const sammler = neuerSammler();  /* v1259 */
   const transcript = await transcribe(buf, mime, key, sammler);
-  if (!transcript || transcript.length < 10) throw httpErr(422, 'Keine Sprache erkannt \u2014 bitte erneut aufnehmen.');
+  /* v1440 · Backlog v22 Punkt 9: hier stand `< 10`. Damit scheiterten genau die
+     Antworten, die ein Dialog am haeufigsten bekommt: "ja", "nein", "1990",
+     "zwoelf" - der Nutzer hoerte "nicht verstanden" und musste wiederholen. */
+  if (!transcript || transcript.trim().length < 2) throw httpErr(422, 'Keine Sprache erkannt \u2014 bitte erneut aufnehmen.');
   /* v1280: Auch die gesprochene Kurzantwort soll mit dem bekannten Stand
      rechnen koennen ("zehn Prozent vom Kaufpreis"). Der Zusatz entsteht in
      _zusatzAusKontext, damit Text- und Sprachweg dieselbe Regel sehen. */
@@ -582,6 +592,7 @@ async function quickMatch(transcript, catalog, apiKey) {
   let r;
   try {
     r = await fetch('https://api.openai.com/v1/responses', {
+      signal: AbortSignal.timeout(OPENAI_TIMEOUT_MS),   /* v1440 */
       method: 'POST',
       headers: { Authorization: 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -677,6 +688,7 @@ async function verifyFields(transcript, prev, catalog, apiKey, sammler) {
   let r;
   try {
     r = await fetch('https://api.openai.com/v1/responses', {
+      signal: AbortSignal.timeout(OPENAI_TIMEOUT_MS),   /* v1440 */
       method: 'POST',
       headers: { Authorization: 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({
