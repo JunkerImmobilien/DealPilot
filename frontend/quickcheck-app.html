@@ -4444,6 +4444,9 @@ const QcApp = (function() {
           objektart: inputs.objektart,
           wfl:       QcEngine.num(inputs.wfl),
           bj:        inputs.bj ? QcEngine.num(inputs.bj) : null,
+          /* v1438 · Das Backend (sprengnetter-/pricehubble-client) liest baujahr, nicht bj -
+             das Baujahr kam aus dem Quick Check nie bei der Bewertung an. Backlog v22 Punkt 18. */
+          baujahr:   inputs.bj ? QcEngine.num(inputs.bj) : null,
           zimmer:    inputs.zimmer ? QcEngine.num(inputs.zimmer) : null
         })
       });
@@ -4536,6 +4539,9 @@ const QcApp = (function() {
           objektart: inputs.objektart,
           wfl:       QcEngine.num(inputs.wfl),
           bj:        inputs.bj ? QcEngine.num(inputs.bj) : null,
+          /* v1438 · Das Backend (sprengnetter-/pricehubble-client) liest baujahr, nicht bj -
+             das Baujahr kam aus dem Quick Check nie bei der Bewertung an. Backlog v22 Punkt 18. */
+          baujahr:   inputs.bj ? QcEngine.num(inputs.bj) : null,
           sanj:      inputs.sanj ? QcEngine.num(inputs.sanj) : null,
           zimmer:    inputs.zimmer ? QcEngine.num(inputs.zimmer) : null,
           gfl:       inputs.gfl ? QcEngine.num(inputs.gfl) : null,

@@ -247,7 +247,9 @@ export const IrwConnector = {
         if (Math.abs(p) >= 40) stark = true;
       }
     }
-    const bj = Number(ref && ref.construction_year);
+    /* v1438 · Backlog v22 Punkt 18: ref fuehrt das Baujahr als build_year (ReportOrchestrator) -
+       construction_year gab es dort nie, die Baujahr-Abweichung zum Normobjekt fiel deshalb immer aus. */
+    const bj = Number(ref && (ref.build_year || ref.construction_year));
     if (n.baujahr > 0 && bj > 0) {
       const d = bj - n.baujahr;
       if (Math.abs(d) >= 10) {

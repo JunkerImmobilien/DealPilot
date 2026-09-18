@@ -107,21 +107,29 @@ export const ReportOrchestrator = {
          v1055, v1062, v1067, v1074: die ref-Liste ist ausdruecklich, wer
          hier fehlt, existiert fuer den Bericht nicht. */
       eq_energie: input.eq_energie || null,
-      eq_heating: input.eq_heating || null,
-      eq_windows: input.eq_windows || null,
-      eq_floor: input.eq_floor || null,
-      eq_bath: input.eq_bath || null,
-      eq_guest_wc: input.eq_guest_wc || null,
-      eq_store_room: input.eq_store_room || null,
-      eq_walls: input.eq_walls || null,
+      /* v1438 · Backlog v22 Punkt 18 — die Ausstattung kam unter ZWEI Namen an:
+       * die Marktbericht-App (app.js v736) und der DealPilotObjectMapper (v727)
+       * schicken heating/windows/floor_covering/bath/guest_wc/store_room/
+       * exterior_walls/roof, gelesen wurde hier nur eq_*. Auf dem Weg aus der
+       * App fiel die Ausstattung damit still weg — ausstattung_stufen.js und
+       * immowertv.js (Standardstufe, Modernisierungspunkte) bekamen nichts.
+       * Beide Namen werden angenommen, eq_* hat Vorrang. */
+      eq_heating: input.eq_heating || input.heating || null,
+      eq_windows: input.eq_windows || input.windows || null,
+      eq_floor: input.eq_floor || input.floor_covering || null,
+      eq_bath: input.eq_bath || input.bath || null,
+      eq_guest_wc: input.eq_guest_wc || input.guest_wc || null,
+      eq_store_room: input.eq_store_room || input.store_room || null,
+      eq_walls: input.eq_walls || input.exterior_walls || null,
       eq_dachform: input.eq_dachform || null,
-      eq_roof: input.eq_roof || null,
+      eq_roof: input.eq_roof || input.roof || null,
       bathrooms: input.bathrooms ? Number(input.bathrooms) : null,
       balcony_area: input.balcony_area ? Number(input.balcony_area) : null,
       garden_area: input.garden_area ? Number(input.garden_area) : null,
       plot_area: input.plot_area ? Number(input.plot_area) : null,
       units: input.units ? Number(input.units) : null,
-      elevator: input.elevator === true || input.elevator === 'true' || input.elevator === 'ja' || false,
+      /* v1438: der Mapper liefert eq_elevator als 'Ja' (Grossschreibung) — das fiel bisher durch. */
+      elevator: input.elevator === true || /^(true|ja)$/i.test(String(input.elevator == null ? '' : input.elevator)) || false,
       garages: input.garages ? Number(input.garages) : null,
       outdoor_parking: input.outdoor_parking ? Number(input.outdoor_parking) : null,
       purchase_price: input.purchase_price ? Number(input.purchase_price) : null,
