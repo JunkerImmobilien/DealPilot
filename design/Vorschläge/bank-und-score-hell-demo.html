@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bank und Score hell</title>
+<!-- Backlog v22 Punkte 12 und 13 · 18.09.2026 · Demo, nichts in der App umgebaut.
+     Farben aus der Marke (CLAUDE.md) und der Landing-Hero-Palette:
+     Creme #FDFCFA / #eee6d3, Tinte #221a06, Gold #C9A84C / #E8CC7A / #b8932f. -->
+<style>
+  :root{--ob:#050505;--cream:#FDFCFA;--card:#FBF6E9;--sand:#eee6d3;--ink:#221a06;--ink2:#6b6356;--line:#e6dfcf;
+        --gold:#C9A84C;--gold-hi:#E8CC7A;--gold-lo:#b8932f;--green:#3FA56C;--red:#B8625C}
+  *{box-sizing:border-box}
+  body{margin:0;background:#F4F2EE;color:#1d1c1a;font:15px/1.55 Inter,system-ui,sans-serif}
+  .wrap{max-width:1120px;margin:0 auto;padding:36px 16px 70px}
+  h1{font:600 28px/1.2 "Space Grotesk",Inter,sans-serif;margin:0 0 6px}
+  h2{font:600 20px/1.3 "Space Grotesk",Inter,sans-serif;margin:34px 0 4px}
+  .lead{color:#5b5751;max-width:760px;margin:0 0 18px}
+  .tag{font:600 11px/1 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-lo)}
+  .row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:12px}
+  @media(max-width:900px){.row{grid-template-columns:1fr}}
+  .lab{font-size:13px;color:#5b5751;margin:8px 2px 0}
+  /* ── Ready fuer die Bank ── */
+  .rb{border-radius:14px;padding:18px;min-height:250px}
+  .rb h3{margin:0 0 4px;font:600 16px/1.3 "Space Grotesk",sans-serif}
+  .rb .sub{font-size:12.5px;margin-bottom:12px}
+  .chk{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13.5px}
+  .ok{color:var(--green);font-weight:600}.no{color:var(--red);font-weight:600}
+  .bar{height:6px;border-radius:4px;margin:12px 0 4px;overflow:hidden}
+  .bar i{display:block;height:100%;width:67%}
+  .rb.alt{background:linear-gradient(160deg,#141416,#0a0a0a);color:#f6f2e8}
+  .rb.alt .sub{color:rgba(255,255,255,.55)} .rb.alt .chk{border-bottom:1px solid rgba(255,255,255,.07)}
+  .rb.alt .bar{background:rgba(255,255,255,.08)} .rb.alt .bar i{background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo))}
+  .rb.a{background:#fff;border:1px solid var(--line);color:#1d1c1a}
+  .rb.a .sub{color:var(--ink2)} .rb.a .chk{border-bottom:1px solid #f0ece3}
+  .rb.a .bar{background:#f0ece3} .rb.a .bar i{background:var(--gold)}
+  .rb.a h3{border-left:3px solid var(--gold);padding-left:9px}
+  .rb.b{background:var(--cream);border:1px solid var(--line);color:#1d1c1a}
+  .rb.b .sub{color:var(--ink2)} .rb.b .chk{border-bottom:1px dashed var(--line)}
+  .rb.b .bar{background:var(--sand)} .rb.b .bar i{background:#2F5D8A}
+  .rb.b .kopf{display:flex;justify-content:space-between;align-items:baseline}
+  .rb.b .sig{font:600 11px/1 "JetBrains Mono",monospace;color:#2F5D8A;letter-spacing:.06em}
+  .btn{display:inline-block;margin-top:12px;padding:8px 14px;border-radius:8px;font:600 13px/1 Inter,sans-serif}
+  .rb.alt .btn{background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));color:#1a1508}
+  .rb.a .btn{background:#1d1c1a;color:#fff} .rb.b .btn{background:#fff;border:1px solid #2F5D8A;color:#2F5D8A}
+  /* ── Scores ── */
+  .sc{border-radius:16px;padding:18px;display:flex;gap:16px;align-items:center;min-height:170px}
+  .ring{width:96px;height:96px;flex:0 0 auto}
+  .sc .n{font:700 30px/1 "Space Grotesk",sans-serif}
+  .pill{display:inline-block;font:700 10.5px/1 "JetBrains Mono",monospace;letter-spacing:.08em;padding:5px 9px;border-radius:999px;margin-top:6px}
+  .kv{display:grid;grid-template-columns:1fr auto;gap:3px 14px;font-size:12.5px;margin-top:8px}
+  .sc.dunkel{background:linear-gradient(150deg,#141416,#0a0a0a);color:#f6f2e8}
+  .sc.dunkel .kv span{color:rgba(255,255,255,.6)} .sc.dunkel .pill{background:rgba(63,165,108,.16);color:#74d9a0}
+  .sc.hell{background:var(--cream);border:1px solid var(--line);color:var(--ink)}
+  .sc.hell .kv span{color:var(--ink2)} .sc.hell .pill{background:rgba(63,165,108,.12);color:#2d7d52}
+  .sc.hell2{background:#fff;border:1px solid var(--line);color:var(--ink);box-shadow:0 1px 0 rgba(0,0,0,.02)}
+  .sc.hell2 .kv span{color:var(--ink2)} .sc.hell2 .pill{background:var(--card);color:var(--gold-lo);border:1px solid var(--sand)}
+  .regel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:16px;font-size:14px}
+  .regel li{margin:3px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tag">Backlog v22 · Punkte 12 und 13 · Demo</div>
+  <h1>„Ready für die Bank" und die Scores in hell</h1>
+  <p class="lead">Nur eine Demo — nichts in der App ist umgebaut. Gezeigt wird die Richtung; die genaue Umsetzung wird danach am echten Bildschirm gemessen (Kaskade, Handy-Breite).</p>
+
+  <h2>12 · Ready für die Bank</h2>
+  <div class="row">
+    <div><div class="rb alt"><h3>Bankreife 4 von 6</h3><div class="sub">heute: dunkel, im Cockpit-Stil</div>
+      <div class="chk">Objektdaten vollständig <span class="ok">✓</span></div><div class="chk">Finanzierung plausibel <span class="ok">✓</span></div><div class="chk">Mieterliste <span class="no">fehlt</span></div><div class="chk">Energieausweis <span class="no">fehlt</span></div>
+      <div class="bar"><i></i></div><span class="btn">Bankunterlagen erzeugen</span></div><div class="lab">Heute (Skizze)</div></div>
+    <div><div class="rb a"><h3>Bankreife 4 von 6</h3><div class="sub">Was die Bank noch braucht</div>
+      <div class="chk">Objektdaten vollständig <span class="ok">✓</span></div><div class="chk">Finanzierung plausibel <span class="ok">✓</span></div><div class="chk">Mieterliste <span class="no">fehlt</span></div><div class="chk">Energieausweis <span class="no">fehlt</span></div>
+      <div class="bar"><i></i></div><span class="btn">Bankunterlagen erzeugen</span></div><div class="lab"><b>A · Weiß, ruhig</b> — passt zur hellen Bankfassung des Investment-PDF (v1436). Gold nur als Linie und Balken.</div></div>
+    <div><div class="rb b"><div class="kopf"><h3>Unterlagen für die Bank</h3><span class="sig">4 / 6</span></div><div class="sub">Checkliste Finanzierungsanfrage</div>
+      <div class="chk">Objektdaten vollständig <span class="ok">✓</span></div><div class="chk">Finanzierung plausibel <span class="ok">✓</span></div><div class="chk">Mieterliste <span class="no">fehlt</span></div><div class="chk">Energieausweis <span class="no">fehlt</span></div>
+      <div class="bar"><i></i></div><span class="btn">Bankunterlagen erzeugen</span></div><div class="lab"><b>B · Creme mit Bankblau</b> — bewusst „Finanzsprache", Gold zurückgenommen. Deutlicher Bruch zur Marke.</div></div>
+  </div>
+
+  <h2>13 · Deal-Score und Investor-Score</h2>
+  <div class="row">
+    <div><div class="sc dunkel">
+      <svg class="ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="9"/><circle cx="50" cy="50" r="42" fill="none" stroke="#3FA56C" stroke-width="9" stroke-dasharray="207 264" stroke-linecap="round" transform="rotate(-90 50 50)"/></svg>
+      <div><div class="n">78</div><span class="pill">GUT</span><div class="kv"><span>Bruttorendite</span><b>6,4 %</b><span>DSCR</span><b>1,28</b><span>Cashflow</span><b>+214 €</b></div></div></div><div class="lab">Dunkel (wie heute)</div></div>
+    <div><div class="sc hell">
+      <svg class="ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="#eee6d3" stroke-width="9"/><circle cx="50" cy="50" r="42" fill="none" stroke="#3FA56C" stroke-width="9" stroke-dasharray="207 264" stroke-linecap="round" transform="rotate(-90 50 50)"/></svg>
+      <div><div class="n">78</div><span class="pill">GUT</span><div class="kv"><span>Bruttorendite</span><b>6,4 %</b><span>DSCR</span><b>1,28</b><span>Cashflow</span><b>+214 €</b></div></div></div><div class="lab"><b>Hell · Creme</b> — Hero-Palette umgekehrt: Creme-Fläche, Tinte #221a06, Ring auf Sand.</div></div>
+    <div><div class="sc hell2">
+      <svg class="ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="#f0ece3" stroke-width="9"/><circle cx="50" cy="50" r="42" fill="none" stroke="#3FA56C" stroke-width="9" stroke-dasharray="207 264" stroke-linecap="round" transform="rotate(-90 50 50)"/></svg>
+      <div><div class="n">78</div><span class="pill">GUT</span><div class="kv"><span>Bruttorendite</span><b>6,4 %</b><span>DSCR</span><b>1,28</b><span>Cashflow</span><b>+214 €</b></div></div></div><div class="lab"><b>Hell · Weiß</b> — noch ruhiger, Stufen-Pille in Gold statt Farbe.</div></div>
+  </div>
+
+  <div class="regel"><b>Vorschlag zur Einstellung (Punkt 13):</b>
+    <ul>
+      <li>Die Scores <b>folgen dem globalen Profil</b> (Hell/Dunkel, v1162) — kein eigener Schalter im Standard.</li>
+      <li>Optional in „Darstellung": <i>Scores immer dunkel</i> — überschreibt nur die Scores, sonst nichts.</li>
+      <li>Statusfarben (Grün/Gold/Rot, Schwellen 85/70/50/35) bleiben in beiden Fassungen gleich.</li>
+    </ul>
+    <b>Entscheidung Marcel:</b> Bank A oder B · Score Creme oder Weiß · eigener Score-Schalter ja/nein.
+  </div>
+</div>
+</body>
+</html>
