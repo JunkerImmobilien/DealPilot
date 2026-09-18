@@ -33553,7 +33553,10 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
     padding: 0 !important; border-radius: 50% !important;
     align-self: center !important; vertical-align: middle !important;
     flex: 0 0 18px !important; box-sizing: border-box !important;
-    overflow: hidden !important;
+    /* v1441: war hidden. Den Kreis macht border-radius; hidden schnitt nur die
+       44-px-Trefferflaeche (::after, Block "Trefferflaechen") ab - gemessen:
+       15 px neben der Mitte traf der Finger das Feld, nicht den Hilfe-Knopf. */
+    overflow: visible !important;
   }
 }
 
