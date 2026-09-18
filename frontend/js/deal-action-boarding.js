@@ -85,6 +85,8 @@
   function buildTop() {
     var docs =
       docRow('invest', 'Investment-PDF', 'Business-Case, bank-fertig: Kaufpreis, Finanzierung, Cashflow, DSCR/LTV, Stress-Test.', true) +
+      /* v1436 · Backlog v22 Punkt 11: helle Bankfassung als ZWEITE Wahl, das bisherige PDF bleibt */
+      docRow('invest_bank', 'Investment-PDF · Bankfassung (hell)', 'Neu zum Testen: ruhige, helle Fassung für Bank und Investoren — Tabellen, Kennzahlen, 10 Jahre Cashflow.', false) +
       faRow() +
       docRow('kpa', 'Kaufpreisaufteilung (Finanzamt)', 'BMF-Anlage: Aufteilung Grund/Geb\u00e4ude, AfA-Bemessungsgrundlage &amp; Verprobung der 3 Verfahren.', false) +
       docRow('track', 'Track Record', 'Auswahl-Ansicht \u00f6ffnen: gewonnene Deals filtern, Einzel- oder Sammel-PDF erzeugen.', false);
@@ -138,7 +140,7 @@
 
   function docRow(which, name, desc, gold) {
     var badge = gold ? ' <span class="dab-doc-badge">Empfohlen</span>' : '';
-    var ic = which === 'invest'
+    var ic = (which === 'invest' || which === 'invest_bank')   /* v1436 */
       ? '<path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/>'
       : which === 'bmf'
         ? '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 14l6-6M9.5 9h.01M14.5 14h.01"/>'
@@ -661,6 +663,10 @@
   function exportDoc(which) {
     try {
       if (which === 'invest' && typeof window.exportPDF === 'function') return window.exportPDF();
+      if (which === 'invest_bank') {   /* v1436 */
+        if (typeof window.exportPDFBank === 'function') return window.exportPDFBank();
+        toast('Bankfassung noch nicht geladen.'); return;
+      }
       if (which === 'bmf') {
         // v854: Steuerformular-PDF (Anlage V) statt Kaufpreisaufteilung
         if (typeof window.exportWerbungskostenPDF === 'function') {
