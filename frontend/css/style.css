@@ -18631,7 +18631,9 @@ html body .body {
 }
 .bc-stress-footer .bc-bank-tag {
   flex: 1;
-  min-width: 350px;
+  /* v1441: min(…,100%) - bei 390 px war das Etikett breiter als die Karte
+     und wurde am overflow:hidden der .bc-card abgeschnitten (gemessen +25 px). */
+  min-width: min(350px, 100%);
   margin-top: 0;
 }
 
