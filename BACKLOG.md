@@ -51,19 +51,19 @@ Leitplanke aus v22: **das bestehende Investment-PDF bleibt erhalten.**
 |---|---|---|---|
 | 1 | Aktuelle Version auf PROD, Smoke-Test | Rollout | **ERLEDIGT 18.09.2026** — staging vollständig nach main (`006a630`), Quellenregister beidseitig abgeglichen, v1428; main = staging = beide Server (`f5802de`). Smoke: 170/170 Assets 200, Migrationen 071–074, Löhner-Sachwert auf Prod grün. Journal 18.09. (1) und (2). |
 | 2 | Finanzierung: erst EK, Option „EK = Kaufnebenkosten", Darlehen = KP + NK + Sanierung − EK, editierbar, Herleitung zeigen | Bau | offen — vorhandene Rückrechnung/Button weiterverwenden |
-| 3 | Partnernetzwerk: automatische Rotation aus | Bau | offen |
-| 4 | Partnernetzwerk erscheint beim ersten Öffnen von Deal-Aktionen nicht (nach F5 schon) | Bug | offen |
+| 3 | Partnernetzwerk: automatische Rotation aus | Bau | **ERLEDIGT v1429** (`90b80e7`) — 10-s-Rotation samt Timer entfernt, Blättern nur von Hand. Staging-Abnahme im Browser offen (Erweiterung nicht verbunden). |
+| 4 | Partnernetzwerk erscheint beim ersten Öffnen von Deal-Aktionen nicht (nach F5 schon) | Bug | **ERLEDIGT v1429** (`90b80e7`) — Ursache: geladen wurde GENAU EINMAL beim Seitenstart (`deal-action-bootstrap.js`, DOMContentLoaded); scheiterte der Abruf (noch nicht angemeldet, Netz, 15-s-Timeout), blieb der Bereich bis F5 leer. Jetzt Nachladen beim Öffnen des Reiters und bei `dp:plan-ready`, solange kein Abruf gelungen ist. Staging-Abnahme im Browser offen. |
 | 5 | MFH + hohe Sanierung: LTV > 400 % — Nenner prüfen, Kaufpreis / Ist-Wert / Wert nach Sanierung trennen | Analyse → Vorschlag | offen — **nicht ausblenden**, erst Logik |
 | 6 | Ist-/Soll-Modell + erweiterter MFH-Konfigurator (Einheiten) | Konzept | offen — Vorschlag UX, Datenmodell, Aggregation |
 | 7 | Marktbericht: Stufen sauber trennen — **Marktpreisindikation ohne Sach-/Ertragswert** | Bau | offen — Dokument = gebuchter Umfang |
 | 8 | Bruttofläche (BGF DIN 277) automatisch ableiten, typabhängig, überschreibbar, Annahme zeigen | Bau | offen |
 | 9 | Sprechlauf: Zustandswechsel, Barge-in, schlechte Verbindung (Latenz/Jitter/Reconnect), Mobile | Bau + Test | offen — baut auf Block C (C14 Zuhören) und D (Modelle) auf |
-| 10 | Einstellungen: Wechsel auf Hell geht nicht / hält nicht | Bug | offen — Skin-API `_dpDispSkin`, Merker `dp_chrome_hell` |
+| 10 | Einstellungen: Wechsel auf Hell geht nicht / hält nicht | Bug | **ERLEDIGT v1431** (`7973054`) — Namenskonflikt: `main.js` deklariert seit v1257 eine globale `function _dpProfil` (Standardwerte) und überschrieb damit `window._dpProfil` aus `settings.js` (der Schalter). Der Knopf „Hell" las still einen Wert. Umbenannt in `_dpProfilWert`; in Node nachgestellt (vorher `undefined`, nachher Schalter). Scan nach weiteren Konflikten: 9 Funde, keiner sonst echt. Persistenz: `dp_user_settings` übersteht Neuladen und Abmelden. FALLEN.md-Eintrag. |
 | 11 | Investment-PDF: **zusätzliche** helle Bank-Fassung, Vorbild Anschaffungskosten/Finanzamt-Dokument | Bau | offen — altes PDF bleibt |
 | 12 | Deal-Aktionen „Ready für die Bank" heller und seriöser | Design | offen — nach 11 |
 | 13 | Deal-Score + Investor-Score hell/dunkel, folgt der globalen Einstellung | Design | offen — nach 10 |
-| 14 | Quick Check „Abrufen" und Objekt-Pre-Flight-Karte: Flugzeug-Symbol raus | Bau | offen |
-| 15 | Quick Check: Marktwert kommt bei „Marktbewertung D-Pilot + Exposé" nicht an | Bug | offen — alle Kombinationen gegenprüfen |
+| 14 | Quick Check „Abrufen" und Objekt-Pre-Flight-Karte: Flugzeug-Symbol raus | Bau | **ERLEDIGT v1430** (`ca21cc0`, `f1f83a5`) — drei Knöpfe (QC-HTML, QC-Neuaufbau nach „Neuer Vorgang", Pre-Flight im Objekt-Tab). Das Symbol der Quick-Boarding-Karte bleibt (andere Funktion). QC-Cache-Buster erst mit v1432 nachgezogen. |
+| 15 | Quick Check: Marktwert kommt bei „Marktbewertung D-Pilot + Exposé" nicht an | Bug | **ERLEDIGT v1432** (`f9d7533`) — Ursache: der Orchestrator wartete auf den Exposé-Import nur **60 s**; dauert der Import länger, lief DealPilot mit leeren Feldern los und brach still ab, das später übernommene Exposé fand keinen Abruf mehr. Jetzt 15 min wie bei Sprache, und dpmb hält an, wenn PLZ/Ort fehlen. Andere Kombinationen im Code geprüft (ph/spr halten an, voice 15 min, ImmoMetrica meldet beim Schließen, KI ohne Pflichtfelder). **Am echten Exposé abzunehmen.** |
 | 16 | Sprechlauf: Fragen je Objektart (MFH: Einheiten statt Zimmer) — Fragenbaum, gleiche Logik wie Tab Objekt | Analyse → Bau | offen |
 | 17 | Objektzustand: Sterne → verbale Skala, ggf. Komponenten; API-Mapping, Altbestand lesbar | Analyse → Vorschlag | offen |
 | 18 | Marktbewertung: Input-/Schnittstellen-Audit (GeoMap, Zensus, alle Anbieter) — haben/senden/könnten/zurück/verwendet | Audit | offen |
