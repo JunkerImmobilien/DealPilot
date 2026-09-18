@@ -4513,3 +4513,34 @@ selbst, die Freigaben nicht.
 Verden führt der EFH-Kalkulator keine Lage-Achse, der Reihenhaus-
 Kalkulator sehr wohl. „Gebiet X ist erntbar" ist deshalb keine gültige
 Aussage — es gilt je Teilmarkt.
+
+---
+
+## Eine globale `function` überschreibt `window.X` aus einer früheren Datei
+
+**Gemessen am 18.09.2026 (v1431).** Der Knopf „Hell" unter Profil & Anzeige
+tat seit v1257 (07.09.) nichts. `settings.js` setzt zur Laufzeit
+`window._dpProfil = function (p) {…}` (den Profilschalter, v1162).
+`main.js` deklariert ganz oben `function _dpProfil(schluessel, rueckfall)`
+(Standardwerte aus dem Investmentprofil). In einem klassischen Skript legt
+eine Deklaration auf oberster Ebene eine Eigenschaft am globalen Objekt an —
+und **überschreibt** dabei, was eine frühere Datei dort zugewiesen hat.
+`main.js` lädt nach `settings.js` → der Knopf rief die falsche Funktion,
+bekam `undefined` zurück, kein Fehler, keine Konsolenmeldung.
+
+**Warum es niemand sah:** beide Stellen sehen für sich richtig aus. Ein
+`grep` nach dem Namen findet beide, aber nichts sagt, welche am Ende gilt —
+das entscheidet die **Ladereihenfolge in `index.html`**.
+
+**Nachgestellt in Node** (`vm`, beide Quellen in Ladereihenfolge): vorher
+`undefined`, nach der Umbenennung in `_dpProfilWert` kommt der Aufruf an.
+
+**Suchen statt raten:** ein Scan über alle Skripte in Ladereihenfolge —
+Deklaration in Datei B, `window.X =` in früherer Datei A → Verdacht.
+Am 18.09. gelaufen, 9 Funde, einer echt. Die anderen waren **Hooks**
+(`loadData`, `loadSaved`, `showSettings` wickeln sich erst zur Laufzeit
+um die fertige Funktion — gewollt) oder Deklarationen in einer IIFE.
+
+**Regel:** Globale Hilfsfunktionen bekommen einen Namen, der nicht nach
+einem `window.`-Einstiegspunkt klingt — oder stehen in einer IIFE.
+Ein `onclick="name()"` im HTML ruft IMMER die zuletzt gebundene Fassung.
