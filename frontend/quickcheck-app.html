@@ -5758,6 +5758,10 @@ function renderTransferList() {
   /* V339: fehlende Pflichtfelder eines Providers (mit Key + Label) */
   function _qcMissingFull(src) {
     var inputs = QcEngine.getInputs();
+    if (src === 'dpmb') {  /* v1432: dealpilot-mb-qc run() braucht PLZ ODER Ort */
+      var _hat = function (k) { return inputs[k] && String(inputs[k]).trim() !== ''; };
+      return (_hat('plz') || _hat('ort')) ? [] : [['plz','PLZ oder Ort']];
+    }
     return (QC7_REQUIRED[src] || []).filter(function(f){
       return !inputs[f[0]] || String(inputs[f[0]]).trim() === '';
     });
@@ -5776,7 +5780,7 @@ function renderTransferList() {
       var host = document.getElementById('qc6-progress');
       var box = document.createElement('div');
       box.className = 'qc6-pausebox';
-      box.innerHTML = '<div class="qc6-pausebox-txt">\u26A0 <b>' + (prov==='ph'?'PriceHubble':'Sprengnetter') +
+      box.innerHTML = '<div class="qc6-pausebox-txt">\u26A0 <b>' + (prov==='ph'?'PriceHubble':prov==='dpmb'?'DealPilot':'Sprengnetter') +
         '</b> braucht noch: <b>' + miss.map(function(f){return f[1];}).join(', ') +
         '</b>. Bitte ausf\u00FCllen, dann auf \u201EWeiter\u201C.</div>' +
         '<button type="button" class="qc6-pausebox-btn">Weiter</button>';
@@ -5813,7 +5817,13 @@ function renderTransferList() {
           await new Promise(function(resolve){
             window._qcImportResolve = resolve;
             try { window.parent.postMessage({ source:'dp-qc', type:'qc-import-pdf' }, '*'); } catch(e){}
-            setTimeout(function(){ if (window._qcImportResolve){ window._qcImportResolve(); window._qcImportResolve = null; } }, 60000);
+            /* v1432: 60 s -> 15 min (wie voice). Der Import meldet sich IMMER zurueck -
+               beim Uebernehmen und beim Schliessen (object-actions _fireOabiDone). Die
+               60 s schnitten nur echte Importe ab: PDF waehlen + KI-Auswertung + Pruefen
+               dauert oft laenger. Dann lief DealPilot mit leeren Feldern los, brach still
+               ab (kein PLZ/Ort) - und das spaeter uebernommene Expose fand keinen Abruf
+               mehr vor. Backlog v22 Punkt 15. */
+            setTimeout(function(){ if (window._qcImportResolve){ window._qcImportResolve(); window._qcImportResolve = null; } }, 900000);
           });
         }
         if (ordered[i] === 'immometrica') {
@@ -5841,7 +5851,13 @@ function renderTransferList() {
             await sprengnetter({ silent:true });
           }
         }
-        if (ordered[i] === 'dpmb') { try { if (window.DealPilotMBQc) await window.DealPilotMBQc.run(); } catch (e) {} }
+        if (ordered[i] === 'dpmb') {
+          /* v1432: nach Expose/Sprache/ImmoMetrica wurde die Lage vorab NICHT geprueft
+             (_hasExpose). Fehlt sie danach immer noch, anhalten wie bei ph/spr -
+             statt run() still mit 'Bitte PLZ oder Ort' abbrechen zu lassen. */
+          if (_qcMissingFull('dpmb').length) await _qcPauseForMissing('dpmb');
+          try { if (window.DealPilotMBQc) await window.DealPilotMBQc.run(); } catch (e) {}
+        }
         if (ordered[i] === 'ki')  await kiResearch({ silent:true });
       } catch (e) { /* einzelner Abruf fehlgeschlagen — weiter */ }
       steps[i].state = 'done'; _progressRender(steps);
