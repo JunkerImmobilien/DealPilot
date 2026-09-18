@@ -1840,7 +1840,7 @@ konfliktfrei nebeneinander.
 | `param_lauf` | Zähler + `protokoll` jsonb — der Saatlauf schreibt dort hinein |
 | `gaa_sources` → `gaa_documents` | 67 Dokumente, alle `status = neu` — nie extrahiert |
 | `param_probe` | **Quellenwächter** (http_status, content_type, urteil) — NICHT das Prüfprotokoll |
-| `param_werte` | Open-Data-Sätze (28.827 auf Staging, **0 auf Prod**) |
+| `param_werte` | Open-Data-Sätze (28.827 auf **beiden** Servern, gemessen 18.09.2026) |
 
 Der `sha256` in `gaa_documents` trägt mehr, als er aussieht: ändert ein
 Ausschuss seinen Bericht, ändert sich der Hash, und das Dokument fällt
@@ -2641,7 +2641,13 @@ für 150 €.
 
 ### Open Data
 
-- **Auf Produktion liegen KEINE Open-Data-Sätze** in `param_werte`
+- **Gemessen am 18.09.2026: 28.827 Open-Data-Sätze in `param_werte` auf BEIDEN
+  Servern** (16 Länder, 22.767 offen). Bis dahin stand hier das Gegenteil — und
+  gemessen war es umgekehrt: Prod hatte die Sätze (erfasst 03.08.2026 12:05 UTC),
+  Staging null (28.827 eingefügt, 28.827 gelöscht). Am 18.09. von Prod nach
+  Staging gespielt. Der alte Wortlaut:
+
+  > Auf Produktion liegen KEINE Open-Data-Sätze in `param_werte`
   (`quelle_parser='p1-imbde'` = 0). Die 28.827 Sätze existieren nur auf Staging
   (davon 6.060 benannt, 22.767 offen). **`param_modell` ist davon unberührt** —
   dort liegen die 493 Registerdatensätze auf beiden Servern.
