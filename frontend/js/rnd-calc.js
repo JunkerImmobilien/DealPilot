@@ -16,6 +16,13 @@
  * Halbierung. "Gehoben" wirkt mit voller Gewichtung.
  *
  * Punktrastermethode: identisch geblieben, war korrekt.
+ *
+ * v1426 · Kern 3.1.0 aus dem Gutachten-Paket 1.0.0 (17.09.2026) uebernommen:
+ *   Anwendungsgrenzen der Anlage 2 (Schwelle, 70/90-%-Streckung, kein
+ *   Extrapolieren ab Alter >= GND), kein stiller 5-Jahres-Boden mehr,
+ *   Plausibilitaetsanker 30 % GND. Gegen drei unterschriebene Gutachten
+ *   geprueft (tools/rnd-pruefung/rnd-gutachten-test.mjs, 22/22).
+ *   DealPilot-eigene Staende bleiben: v1364 Steuertarif, V193 999 EUR.
  */
 (function (global) {
   'use strict';
@@ -175,22 +182,64 @@
   // ============================================================
   // VERFAHREN 5: Punktrastermethode (unverändert — war korrekt)
   // ============================================================
-  function calcPunktraster(alter, gnd, modPoints) {
+  function calcPunktraster(alter, gnd, modPoints, kernsaniert) {
+    /* v3.1.0-GRENZ — Anlage 2 zu Paragraf 12 Abs. 5 Satz 1 ImmoWertV kennt drei
+       Grenzen, die V3.0.0 nicht geprueft hat:
+         1. Die Formel ist erst ab einem relativen Alter anwendbar, das die
+            Tabelle je Punktzahl nennt. Darunter gilt RND = GND - Alter.
+         2. Die RND wird auf hoechstens 70 % der GND gestreckt, bei
+            nachgewiesener Kernsanierung auf bis zu 90 %.
+         3. Die Parabel hat ihren Scheitel bei Alter = b*GND/(2a) und steigt
+            danach wieder. Ab Alter >= GND wird deshalb nicht extrapoliert.
+       Ohne 1. lieferte die Methode bei jungen Gebaeuden mehr RND als linear,
+       ohne 3. bekam ein Haus von 1900 mehr RND als eines von 1964.          */
     const punkte = clampInt(modPoints, 0, 20);
     const k = PUNKTRASTER_KOEFF[punkte];
     const relAlter = gnd > 0 ? (alter / gnd) * 100 : 0;
+    const quote = kernsaniert ? 0.90 : 0.70;
+    const kappe = gnd * quote;
 
-    let rnd = (k.a * alter * alter / gnd) - (k.b * alter) + (k.c * gnd);
-    rnd = Math.max(0, rnd);
-    if (rnd > gnd) rnd = gnd;
+    let rnd, rohwert = null, anwendbar = true, grenze = null, hinweis = null;
+
+    if (gnd <= 0) {
+      rnd = 0; anwendbar = false; grenze = 'keine_gnd';
+      hinweis = 'Ohne Gesamtnutzungsdauer keine Rechnung.';
+    } else if (alter >= gnd) {
+      rnd = 0; anwendbar = false; grenze = 'ueber_gnd';
+      hinweis = 'Das Alter erreicht oder ueberschreitet die Gesamtnutzungsdauer. '
+              + 'Die Kurve der Anlage 2 liegt hier hinter ihrem Scheitel (Alter '
+              + round2(k.b * gnd / (2 * k.a)) + ' Jahre) und wuerde wieder steigen. '
+              + 'Es wird nicht extrapoliert.';
+    } else if (relAlter < k.rel) {
+      rnd = Math.max(0, gnd - alter); anwendbar = false; grenze = 'unter_schwelle';
+      hinweis = 'Relatives Alter ' + round2(relAlter) + ' % liegt unter der Schwelle von '
+              + k.rel + ' % fuer ' + punkte + ' Modernisierungspunkte. '
+              + 'Modernisierungen wirken sich erst ab dieser Schwelle aus; '
+              + 'bis dahin gilt RND = GND - Alter.';
+    } else {
+      rohwert = (k.a * alter * alter / gnd) - (k.b * alter) + (k.c * gnd);
+      rnd = Math.max(0, rohwert);
+      if (rnd > kappe) {
+        grenze = 'gestreckt';
+        hinweis = 'Rohwert ' + round2(rohwert) + ' Jahre auf ' + round2(kappe)
+                + ' Jahre gekappt (' + Math.round(quote * 100) + ' % der Gesamtnutzungsdauer'
+                + (kernsaniert ? ', Kernsanierung nachgewiesen' : '') + ').';
+        rnd = kappe;
+      }
+    }
 
     const awm = gnd > 0 ? ((gnd - rnd) / gnd) * 100 : 0;
 
     // Formatiere wie im Original-Gutachten:
     // "1,2500 x 30 Jahre² / 70 Jahre - 2,6250 x 30 Jahre + 1,5250 * 70 Jahre = 44,07 Jahre"
-    const formula = fmtNum4(k.a) + ' × ' + alter + ' Jahre² / ' + gnd + ' Jahre - '
-                  + fmtNum4(k.b) + ' × ' + alter + ' Jahre + '
-                  + fmtNum4(k.c) + ' × ' + gnd + ' Jahre = ' + fmtNum2(rnd) + ' Jahre';
+    const formula = anwendbar
+      ? (fmtNum4(k.a) + ' × ' + alter + ' Jahre² / ' + gnd + ' Jahre - '
+         + fmtNum4(k.b) + ' × ' + alter + ' Jahre + '
+         + fmtNum4(k.c) + ' × ' + gnd + ' Jahre = '
+         + fmtNum2(rohwert === null ? rnd : rohwert) + ' Jahre')
+      : (grenze === 'unter_schwelle'
+          ? (gnd + ' Jahre - ' + alter + ' Jahre = ' + fmtNum2(rnd) + ' Jahre (linear, Formel noch nicht anwendbar)')
+          : 'Formel nicht anwendbar');
 
     return {
       method: 'punktraster',
@@ -199,6 +248,13 @@
       modernisierungsgrad_text: punkteToGrad(punkte),
       relatives_alter_pct: round2(relAlter),
       koeffizienten: { a: k.a, b: k.b, c: k.c, schwelle_rel: k.rel },
+      /* v3.1.0-GRENZ */
+      anwendbar: anwendbar,
+      grenze: grenze,
+      hinweis: hinweis,
+      rohwert: rohwert === null ? null : round2(rohwert),
+      streckungsgrenze: round2(kappe),
+      streckungsquote_pct: Math.round(quote * 100),
       alterswertminderung_pct: round2(awm),
       restnutzungsdauer: round2(rnd),
       formula: formula,
@@ -341,16 +397,14 @@
     const weights = input.gewerkeWeights || null;
     const gewerkeRLD = input.gewerkeRestlebensdauer || null;
     const schaeden = input.schaeden || [];
-    // V187: Schäden gehen nicht mehr automatisch in die RND-Berechnung ein.
-    // Sie werden weiterhin im Gutachten dokumentiert, aber der Sachverständige
-    // bewertet eventuelle Abschläge manuell.
-    const applySchadensAbschlag = false;
+    const applySchadensAbschlag = input.applySchadensAbschlag === true;
 
     const linear = calcLinear(alter, gnd);
     const vogels = calcVogels(alter, gnd);
     const ross = calcRoss(alter, gnd);
     const parabel = calcParabel(alter, gnd);
-    const punktraster = calcPunktraster(alter, gnd, modPoints);
+    const kernsaniert = input.kernsaniert === true;
+    const punktraster = calcPunktraster(alter, gnd, modPoints, kernsaniert);
     const technisch = calcTechnisch(alter, gnd, gewerke, weights, gewerkeRLD);
 
     const schadensInfo = processSchaeden(schaeden);
@@ -362,30 +416,74 @@
       recommendedNachSchaden = Math.max(0, recommendedNachSchaden);
     }
 
-    let final = recommendedNachSchaden;
-    let finalSource = applySchadensAbschlag && schadensInfo.gesamtAbschlag_pct > 0
-      ? 'technisch + Schadensabschlag (-' + schadensInfo.gesamtAbschlag_pct + '%)'
-      : 'technisch (vorrangig)';
+    /* v3.1.0-GRENZ — Verfahrenswahl mit Herkunft statt stillem Rueckfall.
+       Die technische Alterswertminderung fuehrt, solange sie eine Basis hat
+       (GND > Alter). Hat sie keine, tritt das Punktraster an ihre Stelle,
+       aber nur wenn es nach Anlage 2 ueberhaupt anwendbar ist. Sonst gibt es
+       KEINEN Wert - eine Zahl ohne Verfahren waere schlimmer als keine.     */
+    const grenzen = [];
+    const basisTechnisch = Math.max(0, gnd - alter);
 
-    // V195 FIX: Wenn technische RND ≤ 0 (sehr alte Häuser mit AWM > 100%),
-    // fallback auf Punktraster oder Linear — der nächstbesten Methode > 0.
-    if (final <= 0) {
-      if (punktraster.restnutzungsdauer > 0) {
-        final = punktraster.restnutzungsdauer;
-        finalSource = 'Punktraster (technisch ergab 0)';
-      } else if (linear.restnutzungsdauer > 0) {
-        final = linear.restnutzungsdauer;
-        finalSource = 'Linear (technisch+Punktraster ergaben 0)';
-      } else {
-        // Notfall — mindestens 5 Jahre als realistischer Floor
-        final = 5;
-        finalSource = 'Floor 5 J. (alle Methoden ergaben 0)';
-      }
+    let final, finalSource, verfahren;
+    if (basisTechnisch > 0) {
+      final = recommendedNachSchaden;
+      verfahren = 'technisch';
+      finalSource = applySchadensAbschlag && schadensInfo.gesamtAbschlag_pct > 0
+        ? 'technische Alterswertminderung + Schadensabschlag (-' + schadensInfo.gesamtAbschlag_pct + '%)'
+        : 'technische Alterswertminderung (vorrangig)';
+    } else if (punktraster.anwendbar && punktraster.restnutzungsdauer > 0) {
+      final = punktraster.restnutzungsdauer;
+      verfahren = 'punktraster';
+      finalSource = 'Punktrastermethode - technisch nicht mehr ableitbar (Alter >= GND)';
+    } else {
+      final = 0;
+      verfahren = 'keines';
+      finalSource = 'kein Verfahren liefert einen Wert (Alter >= GND, Anlage 2 nicht anwendbar)';
+      grenzen.push({
+        greift: true, art: 'kein_verfahren',
+        text: 'Das Alter (' + alter + ' J.) erreicht die Gesamtnutzungsdauer (' + gnd + ' J.). '
+            + 'Kein Verfahren rechnet hier - die technische Ermittlung hat keine Basis mehr, '
+            + 'und die Kurve der Anlage 2 liegt hinter ihrem Scheitel. '
+            + 'Naechster Schritt: Gesamtnutzungsdauer pruefen (bei Kernsanierung gilt ein '
+            + 'fiktives Baujahr) oder eine reelle Restnutzungsdauer sachverstaendig setzen.',
+        quelle: 'Anlage 2 ImmoWertV - Anwendungsbereich'
+      });
     }
 
+    if (punktraster.grenze) {
+      grenzen.push({
+        greift: true, art: punktraster.grenze, text: punktraster.hinweis,
+        quelle: punktraster.grenze === 'unter_schwelle'
+          ? 'Anlage 2 ImmoWertV, Spalte "ab einem relativen Alter von"'
+          : 'Anlage 2 ImmoWertV - Modellansatz'
+      });
+    }
+
+    /* Plausibilitaetsanker 30 % der GND. Paragraf 185 Abs. 3 Satz 5 BewG:
+       "Die Restnutzungsdauer eines noch nutzbaren Gebaeudes betraegt regelmaessig
+       mindestens 30 Prozent der wirtschaftlichen Gesamtnutzungsdauer."
+       Das gilt fuer die steuerliche Grundbesitzbewertung. Fuer ein Gutachten nach
+       Paragraf 7 Abs. 4 Satz 2 EStG ist es KEIN bindender Grenzwert - deshalb
+       wird gemeldet und nicht gekappt.                                        */
+    const mindest30 = round2(gnd * 0.30);
+    const unter30 = final > 0 && final < mindest30;
+    if (unter30) {
+      grenzen.push({
+        greift: true, art: 'unter_30_prozent',
+        text: 'Ergebnis ' + round2(final) + ' Jahre liegt unter 30 % der Gesamtnutzungsdauer ('
+            + mindest30 + ' Jahre) und entspraeche einem AfA-Satz von '
+            + round2(100 / final) + ' % gegenueber 2 % im gesetzlichen Normalfall. '
+            + 'Sachverstaendig wuerdigen, bevor der Wert uebernommen wird.',
+        quelle: 'Paragraf 185 Abs. 3 Satz 5 BewG - dort bindend, hier Plausibilitaetsanker'
+      });
+    }
+
+    let reell = null;
     if (input.reelleRND != null && input.reelleRND > 0) {
+      reell = round2(Number(input.reelleRND));
       final = Number(input.reelleRND);
-      finalSource = 'Sachverständigen-Override (reelle RND)';
+      verfahren = 'reell';
+      finalSource = 'reelle Restnutzungsdauer - sachverstaendige Korrektur';
     }
 
     return {
@@ -408,7 +506,16 @@
       recommended_rnd: round2(recommended),
       recommended_rnd_nach_schaden: round2(recommendedNachSchaden),
       final_rnd: round2(final),
-      final_source: finalSource
+      final_source: finalSource,
+      /* v3.1.0-GRENZ */
+      verfahren: verfahren,
+      reelle_rnd: reell,
+      grenzen: grenzen,
+      plausibilitaet: {
+        mindest_30_prozent: mindest30,
+        unterschritten: unter30,
+        afa_satz_pct: final > 0 ? round2(100 / final) : null
+      }
     };
   }
 
@@ -489,14 +596,34 @@
     };
   }
 
+  /* ═══ v1364 · DIE ZONENGRENZEN KOMMEN AUS DEM TARIF ══════════════════
+     Hier stand eine dritte Steuerstaffel mit eigenen Grenzen (12.096 /
+     17.443 / 68.480) - der Jahrgang 2025. Zusammen mit tax.js (11.604)
+     und dashboard.js (11.784) waren das DREI verschiedene
+     Grundfreibetraege im selben Programm, keiner davon 2026.
+
+     Marcels Vorgabe: „das darf ja nicht an 3 stellen unterschiedlich
+     sein." Der Satz kommt jetzt aus `Tax.calcGrenzsteuersatz()`, also aus
+     demselben Tarif wie jede andere Steuerzahl der App.
+
+     WAS BLEIBT: der Solidaritaetszuschlag ab 96.000 EUR und der Deckel
+     bei 47,5 %. Beides gehoert nicht in den §-32a-Tarif, sondern ist die
+     Naeherung DIESER Stelle - sie zu entfernen waere eine Aenderung am
+     Ergebnis, und genau die soll es nicht geben.
+
+     Der Rueckfall rechnet wie bisher, falls tax.js einmal fehlt. Er
+     traegt bewusst KEINE eigenen Jahreszahlen mehr, sondern die lineare
+     Naeherung - eine zweite Staffel waere wieder eine dritte Wahrheit. */
+
   function estimateGrenzsteuersatz(zve) {
     const z = Number(zve) || 0;
     let satz;
-    if (z <= 12096) satz = 0;
-    else if (z <= 17443) satz = 0.14 + ((z - 12096) / (17443 - 12096)) * 0.10;
-    else if (z <= 68480) satz = 0.24 + ((z - 17443) / (68480 - 17443)) * 0.18;
-    else if (z <= 277825) satz = 0.42;
-    else satz = 0.45;
+    if (typeof Tax !== 'undefined' && Tax && typeof Tax.calcGrenzsteuersatz === 'function') {
+      satz = Tax.calcGrenzsteuersatz(z);
+    } else {
+      /* grobe Naeherung ohne Jahresbezug - nur, wenn tax.js fehlt */
+      satz = z <= 12000 ? 0 : (z <= 70000 ? 0.14 + (z - 12000) / 58000 * 0.28 : 0.42);
+    }
     const soli = (z > 96000) ? satz * 0.055 : 0;
     return Math.min(0.475, satz + soli);
   }
@@ -687,6 +814,7 @@
 
   // EXPORT
   global.DealPilotRND = {
+    VERSION: '3.1.0',   /* v3.1.0-GRENZ */
     MOD_ELEMENTS: MOD_ELEMENTS,
     GEWERKE: GEWERKE,
     GRADE: GRADE,

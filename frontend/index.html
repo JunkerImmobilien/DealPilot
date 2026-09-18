@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1297"><!-- v1148-spalt-1025px -->
+<link rel="stylesheet" href="css/style.css?v=v1357"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1192">
     <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
@@ -47,7 +47,7 @@
       f={'data-ui-theme':s.ui_theme,'data-ui-cards':s.ui_cards,'data-ui-surface':s.ui_surface};
       Object.keys(m).forEach(function(a){var v=f[a]||'';if(m[a].indexOf(v)>=0)r.setAttribute(a,v);});}catch(e){}})();</script>
 <link rel="stylesheet" href="css/bmf-modal.css?v=W34">  <!-- V289 -->
-<link rel="stylesheet" href="css/bmf-modal-v292.css?v=v994"><!-- V292-modal-refactor -->
+<link rel="stylesheet" href="css/bmf-modal-v292.css?v=v1382"><!-- V292-modal-refactor -->
   <link rel="stylesheet" href="css/legal.css?v=W34">
 <link rel="stylesheet" href="css/pricing-modal.css?v=W34">
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
@@ -514,6 +514,11 @@ label.dp-required.qc-required::after {
     <symbol id="i-door" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5"/><polyline points="14 16 18 12 14 8"/><line x1="18" y1="12" x2="9" y2="12"/></symbol>
     <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
     <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+    <!-- v1380: der Reiter "Darstellung" (settings.js:235) zeigte auf #i-eye,
+         und dieses Symbol gab es im Sprite nicht. Ein <use> auf eine leere id
+         wirft keinen Fehler - es rendert nichts. Zehn Reiter trugen ein Icon,
+         einer eine leere Flaeche. -->
+    <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></symbol>
     <symbol id="i-trend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
     <symbol id="i-coins" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="M16.71 13.88l.7.71-2.82 2.82"/></symbol>
     <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
@@ -1874,32 +1879,59 @@ label.dp-required.qc-required::after {
        eine Progression ueber mehrere Objekte gibt es nicht. Der WK-Aggregator
        holt die Werbungskosten der anderen Objekte, aber calc.js:2174 sagt
        selbst „Eigentliche Steuerberechnung weiterhin auf K.zve_immo basiert". -->
+  <!-- v1379-PROG · Erscheint nur, wenn der effektive Satz vom eingegebenen
+       Grenzsteuersatz abweicht. Gefuellt von _progHinweisZeichnen() in calc.js. -->
+  <div class="card" id="prog-hinweis" style="margin-top:14px" hidden></div>
+
+  <!-- ═══ v1397 · DIESER TEXT SAGTE, WAS DIE APP NICHT TUT — SIE TUT ES JETZT ══
+       Marcel am 14.09.2026: "warum steht das noch drin? wollten wir das nicht
+       aendern?" Er hatte recht, und die Messung hat noch mehr gefunden:
+       tax.js SALDIERTE seit V276 bereits (baseIncome + Bestandssaldo), calc.js
+       nicht ("nur Display", V258-07). Zwei Stellen, zwei Antworten auf
+       dieselbe Frage. Seit v1397 gehen beide durch window._dpBestandSaldo. -->
   <div class="card" id="tax-flow-hint" style="margin-top:14px">
     <div class="ct"><span class="ct-ico"><svg width="22" height="22"><use href="#i-info"/></svg></span>Was mit diesen Werten passiert</div>
     <p class="hint" style="margin-bottom:0">
-      Dein Grenzsteuersatz wirkt auf das steuerliche Ergebnis <b>dieses</b> Objekts —
-      Miete abzüglich Kosten und AfA. Daraus entsteht die Steuer und daraus der
-      <b>Cashflow nach Steuer</b>. Im Portfolio-Cockpit werden die Cashflows nach
-      Steuer deiner Bestandsobjekte addiert.
+      Das steuerliche Ergebnis <b>dieses</b> Objekts — Miete abzüglich Kosten und AfA —
+      wird auf dein zu versteuerndes Einkommen gerechnet. Die Steuerwirkung ist die
+      <b>Differenz zweier Tarifberechnungen nach § 32a EStG</b>, einmal mit und einmal
+      ohne dieses Objekt. Damit folgt sie der Progression: bei einem Verlust wirkt der
+      letzte Euro weniger als der erste. Daraus entsteht der <b>Cashflow nach Steuer</b>.
+      <b>Deine übrigen Bestandsobjekte rechnen dabei mit</b> — ihr Ergebnis senkt
+      oder hebt die Basis, bevor dieses Objekt seine Wirkung entfaltet.
     </p>
     <details class="dp-erkl" style="margin-top:10px">
-      <summary style="cursor:pointer;font-size:12.5px;font-weight:600">Und was DealPilot dabei <u>nicht</u> tut</summary>
+      <summary style="cursor:pointer;font-size:12.5px;font-weight:600">Wie die Objekte zusammen gerechnet werden</summary>
       <div style="font-size:12.5px;line-height:1.6;margin-top:8px">
         <p style="margin:0 0 8px">
-          <b>Die Objekte verschieben sich gegenseitig nicht die Progression.</b>
-          Jedes rechnet mit demselben Grenzsteuersatz aus deinem zvE. Ein Verlust
-          aus Objekt A senkt in dieser Rechnung <b>nicht</b> den Steuersatz von
-          Objekt B — in deiner echten Steuererklärung tut er das sehr wohl, weil
-          dort alle Einkünfte aus Vermietung und Verpachtung zusammenfließen.
+          <b>Die Reihenfolge ist der Kaufzeitpunkt.</b> Dieses Objekt trifft auf ein
+          Einkommen, das um die Ergebnisse aller <b>früher gekauften</b> Objekte bereits
+          verschoben ist — so, wie sie in deiner Steuererklärung zusammenfließen. Ein
+          Verlust aus dem älteren Objekt senkt also die Basis, auf der dieses hier
+          spart, und die Ersparnis fällt entsprechend geringer aus.
         </p>
         <p style="margin:0 0 8px">
-          <b>Was das heißt:</b> je Objekt ist die Zahl eine saubere Einzelbetrachtung.
-          Die Summe im Cockpit ist die Summe dieser Einzelbetrachtungen — nicht die
-          Steuer, die am Ende auf deinem Bescheid steht. Bei mehreren Objekten mit
-          Anfangsverlusten liegt die tatsächliche Entlastung eher höher.
+          <b>Warum das wichtig ist.</b> Ohne diese Verrechnung wird die Entlastung
+          <b>zu hoch</b> ausgewiesen — immer in dieselbe Richtung. Gemessen am Tarif
+          2026: bei 80.000 € zvE und zwei Objekten mit −25.000 € und −20.000 €
+          steuerlichem Verlust ergäbe die getrennte Rechnung <b>18.348 €</b>,
+          tatsächlich entlastet werden <b>16.794 €</b> — rund <b>9 %</b> Unterschied.
+          Bei drei Objekten etwa 12 %. Ab rund 120.000 € zvE sinkt er unter ein
+          Prozent, ab 150.000 € auf null: dort liegst du auch nach allen Verlusten
+          noch in der Proportionalzone, und dort ist jeder Euro gleich viel wert.
+        </p>
+        <p style="margin:0 0 8px">
+          <b>Was das nicht leistet.</b> Die <b>Summe</b> über dein Portfolio ist damit
+          richtig — welcher Anteil davon <b>welchem</b> Objekt zugerechnet wird, ist
+          eine Konvention: hier der Kaufzeitpunkt. Das früher gekaufte Objekt bekommt
+          die erste, wirksamere Stufe der Progression. Verlustverrechnungs&shy;beschränkungen
+          (§ 15a, § 15b, § 10d EStG) bleiben außen vor — dafür braucht es deine
+          Steuerbescheide, und das ist Steuerberatung, keine Kalkulation.
         </p>
         <p style="margin:0;color:var(--muted)">
-          Ein Sonderfall ist bereits abgebildet: gehört das Objekt einer
+          Die Verrechnung greift für gespeicherte Bestandsobjekte. Ist ein Objekt noch
+          nicht gespeichert, rechnet es für sich allein — dann steht oben kein
+          Bestandssaldo. Ein Sonderfall ist außerdem abgebildet: gehört das Objekt einer
           Gesellschaft, rechnet DealPilot ab dem Übergabestichtag mit dem
           Körperschaftsteuersatz statt mit deinem Grenzsteuersatz — im Stichtagsjahr
           monatsgenau geteilt.
@@ -2136,6 +2168,24 @@ label.dp-required.qc-required::after {
     <p class="hint" style="margin-bottom:10px">
       Hier kannst du pro Jahr Verluste/Werbungskosten manuell überschreiben. Der App-Vorschlag basiert auf deinen Eingaben (Mietsteigerung, Tilgungsplan, AfA). Manuelle Änderungen fließen in die Cashflow-Projektion und in den Steuerverlauf oben ein.
     </p>
+    <!-- v1406 · Belege einlesen, hier im Tab Steuern. Der Knopf oeffnet
+         DASSELBE Modal wie im BMF-Dialog, nur im WK-Modus: andere
+         Kategorien, andere Zielfelder, und das Jahr zaehlt. -->
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px">
+      <button type="button" class="btn btn-sm"
+              onclick="if(window.DealPilotBelegImport)DealPilotBelegImport.open('wk')"
+              title="Hausgeld- und Nebenkostenabrechnungen, Grundsteuer, Handwerker- und Versicherungsrechnungen als PDF oder Foto einlesen. Die KI teilt eine Hausgeldabrechnung in umlagefaehige und nicht umlagefaehige Kosten auf und erkennt die Ruecklagenzufuehrung."
+              style="background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#2c2410;border:1px solid var(--wl-b8932f, #b8932f);padding:8px 15px;border-radius:7px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">
+        📎 Belege &amp; Abrechnungen einlesen (KI)
+      </button>
+      <span class="hint" style="margin:0;flex:1 1 260px;min-width:220px;font-size:11.5px;line-height:1.45">
+        Hausgeld, Nebenkostenabrechnung, Grundsteuer, Handwerker. Eine Hausgeldabrechnung wird
+        <b>aufgeteilt</b> — umlagefähig, nicht umlagefähig, Verwaltergebühr. Die
+        <b>Zuführung zur Erhaltungsrücklage</b> wird erkannt und <b>bewusst nicht übernommen</b>:
+        sie ist erst absetzbar, wenn die Gemeinschaft das Geld für Erhaltung ausgibt.
+        Jede Zeile wird dir vor der Übernahme zur Bestätigung vorgelegt.
+      </span>
+    </div>
     <div id="yearly-tax-form-box">
       <div style="text-align:center;color:var(--muted);padding:20px">Wird automatisch befüllt sobald Daten eingegeben sind</div>
     </div>
@@ -3342,7 +3392,7 @@ label.dp-required.qc-required::after {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="js/pdf-anlage-bmf.js?v=v992"></script>
-<script src="js/bmf-modal.js?v=v1194"></script>
+<script src="js/bmf-modal.js?v=v1382"></script>
 <script src="js/bmf-modal-v292.js?v=v993"></script><!-- v987-v292-restore -->
 <!-- V63.86: html2canvas für 1:1-Capture von Tab-Kennzahlen-Tabellen ins PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -3369,13 +3419,13 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v1313"></script>
+  <script src="js/calc.js?v=v1398"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v1240"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v1258b"></script>
+<script src="js/tax.js?v=v1406"></script>
 <script src="js/config.js?v=v1328"></script>
   <script src="js/legal-links.js?v=174" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
@@ -3386,17 +3436,17 @@ label.dp-required.qc-required::after {
 <script src="js/score-tiers.js?v=463"></script>
 <script src="js/dealscore.js?v=463"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=W34">
-<script src="js/datenraum.js?v=889"></script>
+<script src="js/datenraum.js?v=1375"></script>
 <script src="js/tooltip-content.js?v=v1253"></script>
   <script src="js/tooltip-engine.js?v=2351"></script>
   <script src="js/immometrica-import.js?v=839"></script>
   <script src="js/immometrica-qc.js?v=672"></script>
   <script src="js/modal-boarding-skin.js?v=v1116"></script>
-  <script src="js/provider-keys.js?v=672-netauth"></script>
-  <script src="js/mandanten.js?v=v1236"></script>
+  <script src="js/provider-keys.js?v=v1354"></script>
+  <script src="js/mandanten.js?v=v1404"></script>
   <script src="js/ueberfuehrung-wizard.js?v=v1236"></script>
   <script src="js/apikeys.js?v=811"></script>
-  <script src="js/settings.js?v=v1297"></script>
+  <script src="js/settings.js?v=v1355"></script>
 <script src="js/pricing-modal.js?v=v1297"></script>
   <script src="js/flyer-code.js?v=v1421c"></script>
   <script src="js/promo-erstflug.js?v=v1421c"></script>
@@ -3413,35 +3463,42 @@ label.dp-required.qc-required::after {
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
-<script src="js/ui.js?v=v1323"></script>
+<script src="js/ui.js?v=v1360"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
 <script src="js/storage.js?v=v1313"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=W33"></script>
 <script src="js/track-record.js?v=W39"></script>
-<script src="js/pdf.js?v=TR7"></script>
+<script src="js/pdf.js?v=v1383"></script>
 <script src="js/auth.js?v=860"></script>
   <script src="js/auth-401-handler.js?v=950" defer></script>
+  <!-- v1370 (B5): nach dem 401-Handler, damit beide dieselbe Auth.apiCall umschliessen -->
+  <script src="js/rate-limit-handler.js?v=v1370" defer></script>
+  <!-- v1374 (B21): vermittelt die KI-Anfrage des Quick-Checks; eigene Datei,
+       damit qc-bridge.js (Nicht-anfassen-Liste) unberuehrt bleibt -->
+  <script src="js/qc-ai-bridge.js?v=v1374" defer></script>
 <script src="js/subscription.js?v=v1421"></script>
 <script src="js/bmf-data.js?v=166"></script>
 <script src="js/bmf-afa.js?v=287"></script>
 <!-- V311-A1-bmfui-removed: bmf-ui.js (V35-Modal) toter Code, durch V292-Modal abgeloest -->
-<script src="js/dealscore2.js?v=838b"></script>
-<script src="js/dealscore2-ui.js?v=671"></script>
+<script src="js/dealscore2.js?v=v1352"></script>
+<script src="js/dealscore2-ui.js?v=v1363"></script>
 <script src="js/ds2-ai.js?v=166"></script>
 <script src="js/ki-lage.js?v=187h2"></script>
 <script src="js/ki-miete.js?v=v1242c"></script>
 <script src="js/star-rating.js?v=364"></script>
 <script src="js/pdf-import.js?v=v1252"></script>
-<script src="js/beleg-import.js?v=v1188"></script>
+<script src="js/beleg-import.js?v=v1406"></script>
 <script src="js/financing.js?v=v1244c"></script>
 <script src="js/financing-pdf.js?v=20260611105943"></script>
 <script src="js/immokalk-import.js?v=v1260"></script>
 <script src="js/import-export-modal.js?v=893u"></script>
 <script src="js/quick-check.js?v=463"></script>
-<script src="js/qc-bridge.js?v=v1233c"></script>
-<script src="js/bodenrichtwert.js?v=v1288"></script>
+<script src="js/qc-bridge.js?v=v1374"></script>
+<script src="js/bodenrichtwert.js?v=v1388"></script>
+<!-- v1391: welche Felder zu welcher Objektart gehoeren -->
+<script src="js/objektart-felder.js?v=v1391"></script>
 <script src="js/adress-autocomplete.js?v=v1271"></script><!-- v1270: PLZ->Ort, Strassenliste -->
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
 <script src="js/ai-credits.js?v=v1296"></script>
@@ -3458,7 +3515,7 @@ label.dp-required.qc-required::after {
 <script src="js/feedback-modal.js?v=777e"></script>
   <script src="js/email-change.js?v=774"></script><!-- v774-change-email -->
 <!-- V63.74: Deal-Aktion Tab (10. Tab) -->
-<script src="js/deal-action.js?v=v1188"></script>
+<script src="js/deal-action.js?v=v1426"></script>
 <script src="js/deal-action-readycheck.js?v=852"></script>
 <script src="js/deal-action-boarding.js?v=v1118c"></script>
 <script src="js/deal-action-pilot.js?v=876"></script>
@@ -3472,29 +3529,29 @@ label.dp-required.qc-required::after {
 <script src="js/marktbewertung-card.js?v=540"></script>
 <script src="js/avm-section.js?v=v1178"></script>
 <script src="js/dealpilot-mb.js?v=v1323"></script>
-  <script src="js/marktbericht-view.js?v=1229c"></script>
+  <script src="js/marktbericht-view.js?v=1351"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
 <script src="js/selbstauskunft.js?v=W40"></script>
 <!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->
-<script src="js/rnd-gnd-table.js?v=142"></script>
+<script src="js/rnd-gnd-table.js?v=v1426"></script>
 <script src="js/rnd-bte-katalog.js?v=142"></script>
-<script src="js/rnd-calc.js?v=353"></script>
+<script src="js/rnd-calc.js?v=v1426"></script>
 <script src="js/rnd-pdf.js?v=20260611105943"></script>
 <script src="js/rnd-docx.js?v=142"></script>
-<script src="js/rnd-ui.js?v=v1161"></script>
-<script src="js/rnd-wizard.js?v=v1256"></script>
+<script src="js/rnd-ui.js?v=v1426"></script>
+<script src="js/rnd-wizard.js?v=v1426"></script>
 <script src="js/free-lock.js?v=495"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
 <script src="js/investment-profile.js?v=v1257"></script>
-<script src="js/dashboard.js?v=v1227"></script>
+<script src="js/dashboard.js?v=v1405"></script>
 <script src="js/score-fx.js?v=464"></script>
 <script src="js/main.js?v=v1257"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v1330"></script>
+  <script src="js/object-actions.js?v=v1331"></script>
   <script src="js/dpsh-score-hero.js?v=v1116"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v1183"></script>
-  <script src="js/voice-import.js?v=v1331"></script>
+  <script src="js/voice-import.js?v=v1386"></script>
 </div><!-- .main-col --></div><!-- .app-wrap -->
 </form><!-- V32 dp-noform -->
 <!-- V54: Floating Save-Button entfernt — Speichern steht in der Tab-Leiste rechts. -->
@@ -3928,7 +3985,7 @@ document.addEventListener('DOMContentLoaded', function(){
          seit v650/v652, v1077 und v1112 bis v1117 handytauglich gebaut.
          ACHTUNG: ui-varianten.js liest dasselbe Kennzeichen dp_wl_cache fuer
          die Whitelabel-Sperre der Mandanten (v1111). Das bleibt. -->
-    <script src="js/ui-varianten.js?v=v1175"></script>
+    <script src="js/ui-varianten.js?v=v1380"></script>
     <script src="js/karten-kompakt.js?v=v1095c"></script><!--v1092-kompakt-aufklappbar-->
     <script src="js/deal-action-pdf-gate.js?v=W3"></script>
 </body>

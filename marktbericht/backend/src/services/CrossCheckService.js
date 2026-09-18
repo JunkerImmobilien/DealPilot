@@ -3,6 +3,9 @@
 // (indikativ, KEIN Gutachten): alle Annahmen als Konstanten dokumentiert und im
 // Output unter assumptions ausgewiesen. Reine Rechnung — keine API-Kosten.
 import { round } from '../lib/stats.js';
+/* v1099-WQL · Der Weg zur Quelle - fuer den Fall, dass wir keinen Wert
+   haben. Dann ist der Link die einzige Auskunft, die wir geben koennen. */
+import { quelleFuer, quellenSatz } from '../lib/quellen_links.js';
 /* WKERN-1 · Ertragswert wird nicht mehr hier gerechnet, sondern im gemeinsamen
  * Kern. Zwei Ertragswerte im selben Bericht waeren zwei Wahrheiten. */
 import { ErtragswertService } from './ErtragswertService.js';
@@ -19,7 +22,43 @@ import { sachwertfaktor as swfNachTabelle } from '../lib/gutachterausschuss.js';
 
 // ---- Annahmen (dokumentiert, anpassbar) ----
 const NHK_EFH_BGF = 835;          // NHK 2010, EFH Standardstufe 3, €/m² BGF
-const BAUPREISINDEX = 2.02;       // Baupreisindex Wohngebäude 2010 -> 2026 (Destatis, gerundet)
+/* ═══ v1407 · DER BAUPREISINDEX WAR 5,7 PROZENT ZU HOCH ═══════════════════
+   Hier stand `2.02` mit dem Vermerk „Destatis, gerundet". Gemessen am
+   15.09.2026 sagen ZWEI unabhaengige amtliche Quellen etwas anderes — beide
+   zum selben Stichtag 01.01.2026:
+
+     Immobilienmarktbericht Hamburg 2026   1,911   (Basis Mai 2010 = 1)
+     Grundstuecksmarktbericht Dortmund 2026 1,906
+
+   Die beiden sind sich auf zwei Nachkommastellen einig; unsere Konstante lag
+   5,7 Prozent darueber. Was das kostet, am Gebaeudesachwert gerechnet
+   (NHK 835 EUR/m2 BGF, BGF = Wohnflaeche x 1,35):
+
+     120 m2, RND 40/80    136.623 statt 129.250 EUR    +7.373
+     150 m2, RND 60/80    256.168 statt 242.345 EUR   +13.823
+     200 m2, RND 50/80    284.631 statt 269.272 EUR   +15.359
+
+   Durchgehend 5,7 Prozent zu hoch — und zwar in die gefaehrliche Richtung:
+   der Sachwert faellt zu gross aus, das Objekt sieht zu gut aus.
+
+   WARUM 1,91 UND NICHT EINER DER BEIDEN WERTE: sie unterscheiden sich um
+   0,26 Prozent, und ihre Basis ist minimal verschieden (Hamburg nennt
+   ausdruecklich „Mai 2010", Dortmund keinen Monat). Auf zwei Stellen sind
+   sie identisch. Eine dritte Stelle vorzutaeuschen, die die Quellen nicht
+   hergeben, waere Scheingenauigkeit.
+
+   UND DAS BLEIBT FALSCH, auch mit der besseren Zahl: eine KONSTANTE hat
+   keinen Stichtagsbezug. Fuer einen Wertermittlungsstichtag in der
+   Vergangenheit rechnet sie zwangslaeufig daneben. Der richtige Weg ist der
+   Registerdatensatz — 33 Saetze fuehren den Index bereits, aber als
+   FLIESSTEXT („Preisindizes des Statistischen Bundesamtes fuer den Neubau
+   von Wohngebaeuden") statt als Zahl. Nur Hamburg hat ihn beziffert. Das
+   ist dasselbe Muster wie bei der Gesamtnutzungsdauer vor v1338: der Wert
+   steht da, aber nicht in einem Feld, das jemand abholen kann.
+   Siehe Backlog B1 (2). */
+const BAUPREISINDEX = 1.91;       // Neubau Wohngebaeude, 2010 -> 01.01.2026
+                                  // Quellen: IMB Hamburg 2026 (1,911),
+                                  // GMB Dortmund 2026 (1,906)
 const BGF_FAKTOR = 1.35;          // BGF ≈ Wohnfläche × 1,35 (EFH-Faustwert)
 const GND_JAHRE = 80;             // Gesamtnutzungsdauer Wohngebäude
 const RND_MIN = 10;               // Mindest-Restnutzungsdauer
@@ -141,7 +180,28 @@ export const CrossCheckService = {
     };
     const _SCHAETZUNG = 'Restnutzungsdauer geschätzt (Gesamtnutzungsdauer '
       + 'minus Alter) — Anlage 2 ImmoWertV wurde nicht angewandt.';
-    const _rndEinheitlich = () => {
+    /* === v1338 - DIE GESAMTNUTZUNGSDAUER IST EIN MODELLPARAMETER ======
+       Sie stand hier als Konstante (`GND_JAHRE = 80`) und war damit fuer
+       jeden Ausschuss dieselbe. Das Register fuehrt sie aber je Modell:
+       38 Saetze mit 70, 4 mit 80, 5 mit 60, 73 ausdruecklich ohne Zahl.
+
+       Paragraf 21 Abs. 3 ImmoWertV: der Sachwertfaktor darf nur mit dem
+       Modell verwendet werden, aus dem er abgeleitet wurde. Eine
+       Restnutzungsdauer aus dem 80er-Rahmen in ein 70er-Modell zu stecken
+       ist nicht modellkonform - der Faktor passt dann auf eine Rechnung,
+       die es beim Ausschuss nie gab.
+
+       Deshalb bekommt die Ableitung die GND jetzt mit. Sie leitet die
+       Restnutzungsdauer im RICHTIGEN Rahmen NEU ab (Anlage 2, aus Baujahr
+       und Modernisierungspunkten) - sie rechnet keine fertige Zahl um.
+       Das ist der Unterschied, auf den es ankommt: eine Neuableitung ist
+       eindeutig, eine Umrechnung waere eine Methodenwahl (34/80 auf 70
+       ergibt je nach Weg 30 oder 24 Jahre - 19.000 Euro Unterschied an
+       einem Reihenhaus). Diese Wahl trifft die Software nicht. */
+    const _rndEinheitlich = (gndArg) => {
+      const GND = Number(gndArg) > 0 ? Number(gndArg) : GND_JAHRE;
+      _rndHerkunft.gnd_jahre = GND;
+
       const _mp = _num(ref.mod_punkte);
       if (_mp == null) {
         return _rndMerke('geschaetzt', 'kein_modernisierungsgrad', rnd,
@@ -156,17 +216,26 @@ export const CrossCheckService = {
         return _rndMerke('geschaetzt', 'kein_baujahr', rnd,
           _SCHAETZUNG + ' Es liegt kein verwertbares Baujahr vor.');
       }
-      const _a2 = anlage2Rnd({ gnd: GND_JAHRE, alter: Math.max(0, (new Date().getFullYear()) - _bj),
+      const _a2 = anlage2Rnd({ gnd: GND, alter: Math.max(0, (new Date().getFullYear()) - _bj),
                                punkte: _mp, kernsaniert: _kern });
       if (!(_a2 && _a2.rnd != null)) {
         return _rndMerke('geschaetzt', 'anlage2_ohne_ergebnis', rnd,
           _SCHAETZUNG + ' Die Berechnung nach Anlage 2 lieferte kein Ergebnis.');
       }
       return _rndMerke('anlage2', null, _a2.rnd,
-        'Restnutzungsdauer nach Anlage 2 ImmoWertV, aus ' + _mp
+        'Restnutzungsdauer nach Anlage 2 ImmoWertV bei einer Gesamtnutzungsdauer von '
+        + GND + ' Jahren, aus ' + _mp
         + ' Modernisierungspunkten' + (_kern ? ' (Kernsanierung)' : '') + '.');
     };
+    /* v1338: Die GND, mit der der Sachwert rechnet. Vor dem ersten Lauf
+       kennt niemand das Modell des Ausschusses - der Faktor wird erst
+       geholt, wenn ein vorlaeufiger Sachwert dasteht. Der erste Lauf
+       nimmt deshalb Anlage 1; findet der zweite Lauf ein Modell mit
+       eigener GND, wird sie dort gesetzt und die Rechnung wiederholt. */
+    let _gndSw = GND_JAHRE;
+    let _gndModell = null;
     const _bgfWhg = Number((p && p.bgf_direkt) || ref.bgf || 0);
+
     const _nhkTypWhg = (u) => (u > 20 ? '4.3' : (u > 6 ? '4.2' : '4.1'));
     if (NHK_2010.geprueft && ref.property_type && (!istWohnung || _bgfWhg > 0)) {
       let _sw = nhkSachwert({   /* v1076-WLET-1 · weiter unten steht _sw = _sw2 */
@@ -174,6 +243,7 @@ export const CrossCheckService = {
           || (istWohnung ? _nhkTypWhg(Number(ref.units || 0)) : null), keller_dg: (p && p.keller_dg) || ref.keller_dg,
         standardstufe: (p && p.standardstufe) || ref.standardstufe,
         bgf_direkt: (p && p.bgf_direkt) || ref.bgf, wohnflaeche_qm: wfl, objektart: ref.property_type,
+        zweifamilienhaus: ref.zweifamilienhaus === true,   /* v1427b-ZFH */
         baupreisindex: BAUPREISINDEX, regionalfaktor: (p && p.regionalfaktor) || null,
         /* v1056-WRND-1 · Bisher bekam der Sachwert die alte Schaetzung,
          * waehrend der Ertragswert seit v1052 nach Anlage 2 rechnet: 38
@@ -181,7 +251,20 @@ export const CrossCheckService = {
          * ein Haus sind in keinem Verfahren zu rechtfertigen; der Sachwert
          * lag dadurch rund 50.000 EUR zu niedrig. Liegen
          * Modernisierungspunkte vor, gilt Anlage 2 fuer BEIDE. */
-        gnd_jahre: GND_JAHRE, rnd_jahre: _rndEinheitlich(),
+        gnd_jahre: _gndSw, rnd_jahre: _rndEinheitlich(_gndSw),
+        /* v1337: der Hinweis steht NACH rnd_jahre - _rndEinheitlich()
+           setzt ihn, und Objektliterale werten in Quelltextreihenfolge
+           aus. Umgekehrt waere er null. */
+        rnd_hinweis: _rndHerkunft.hinweis,
+        /* v1338: besondere objektspezifische Grundstuecksmerkmale und die
+           Flagge, ob die Restnutzungsdauer sachverstaendig verkuerzt wurde.
+           Beide kommen aus dem Payload; ohne sie kann nhk2010.js den
+           Doppelabzug nicht melden. */
+        bom_eur: (p && p.bom_eur) != null ? p.bom_eur : (ref.bom_eur != null ? ref.bom_eur : null),
+        bom_grund: (p && p.bom_grund) || ref.bom_grund || null,
+        bom_positionen: (p && p.bom_positionen) || ref.bom_positionen || null,
+        rnd_verkuerzt: !!((p && p.rnd_verkuerzt) || ref.rnd_verkuerzt),
+        streuung: null,
         bes_bauteile: (p && p.bes_bauteile) || null, aussenanlagen: (p && p.aussenanlagen) || null,
         /* v1074-WAUS9-5 · Kette. */
         ausstattung: (p && p.ausstattung) || ref.ausstattung || null,
@@ -203,6 +286,14 @@ export const CrossCheckService = {
        * Ein gepflegter Wert aus der Parametertabelle hat Vorrang: die
        * Tabelle ist kuratiert, die Matrix gilt fuer genau einen Kreis. */
       let _swfTab = null;
+      /* v1099-WQL: der Weg zur Quelle, unabhaengig davon, ob ein Wert
+         gefunden wird. Genau dann zaehlt er am meisten. */
+      let _swfQuelle = null;
+      try {
+        const _qa = (p && p.ags) || ref.ags || null;
+        const _q = _qa ? quelleFuer(_qa) : null;
+        if (_q) _swfQuelle = { quelle_link: { ..._q, satz: quellenSatz(_q, 'sachwertfaktor') } };
+      } catch { _swfQuelle = null; }
       /* v1144-SWFELD · Dieselbe Feldverwechslung wie in nhk2010.js:868.
        * Geprüft wurde `.sachwertfaktor`, geliefert wird `.wert` — die Weiche
        * stand deshalb IMMER auf Tabellenweg, auch wenn ein eigener Wert
@@ -228,17 +319,65 @@ export const CrossCheckService = {
           brw_eur_qm: (p && p.bodenwert && p.bodenwert.quelle && p.bodenwert.quelle.brw_sqm)
             || (p && p.brw_sqm) || ref.brw_sqm || null,
           bgf_qm: (p && p.bgf_direkt) || ref.bgf || null,
+          /* v1101-WSTD - die Standardstufe wird zwei Zeilen weiter unten an
+             nhkSachwert uebergeben, kam aber HIER nie an. Wolfenbuettel
+             korrigiert den Faktor nach ihr um bis zu 21 Prozent,
+             Teltow-Flaeming fuehrt je Stufe eigene Bodenrichtwertbaender.
+             Ohne diese Zeile rechnete das eine still ohne Korrektur, das
+             andere gar nicht - und beides saehe im Bericht gleich aus. */
+          standardstufe: (p && p.standardstufe) || ref.standardstufe || null,
+          /* v1102-WORT - ueber den Ortsnamen findet Barnim seine Region.
+             Trifft kein Name, meldet der Auswerter 'kategorie_ohne_wert'
+             und der Bericht sagt, dass er die Lage nicht zuordnen kann -
+             eine von vier Funktionen zu raten waere schlimmer als nichts. */
+          ort: (p && p.gemeinde) || ref.gemeinde || null,
+          ortsteil: (p && p.ortsteil) || ref.ortsteil || null,
+          /* v1103-WWFL - Havelland, Berliner Umland: Grundstuecks- mal
+             Wohnflaeche. Ohne diese Zeile bliebe die halbe Tabelle leer. */
+          wohnflaeche_qm: ref.living_area || null,
+          grundstuecksflaeche_qm: ref.plot_area || null,
+          /* v1105-WMOD - Cottbus trennt unsaniert (MODG 0-6) von
+             teilsaniert/saniert (ab 7). */
+          unterkellerung: (p && p.keller_dg) || ref.keller_dg || null,
+          mod_punkte: (p && p.mod_punkte) != null ? p.mod_punkte
+            : (ref.mod_punkte != null ? ref.mod_punkte : null),
+
+
+
         });
         if (_swfTab && _swfTab.verfuegbar) {
+          /* v1338: Fuehrt das Modell des Ausschusses eine eigene
+             Gesamtnutzungsdauer, gilt SIE - sonst passt der Faktor auf
+             eine Rechnung, die es beim Ausschuss nie gab (Paragraf 21
+             Abs. 3). `null` ist eine Antwort, keine Luecke: dann druckt
+             der Bericht keine Zahl, und die eines Nachbarkreises darf
+             nicht einspringen. */
+          const _mg = Number(_swfTab.modell_gnd_jahre);
+          if (_mg > 0 && _mg !== GND_JAHRE) { _gndSw = _mg; _gndModell = _mg; }
           const _sw2 = nhkSachwert({
+
             nhk_typ: (p && p.nhk_typ) || ref.nhk_typ
               || (istWohnung ? _nhkTypWhg(Number(ref.units || 0)) : null),
             keller_dg: (p && p.keller_dg) || ref.keller_dg,
             standardstufe: (p && p.standardstufe) || ref.standardstufe,
             bgf_direkt: (p && p.bgf_direkt) || ref.bgf, wohnflaeche_qm: wfl,
             objektart: ref.property_type, baupreisindex: BAUPREISINDEX,
+            zweifamilienhaus: ref.zweifamilienhaus === true,   /* v1427b-ZFH · zweiter Lauf */
             regionalfaktor: (p && p.regionalfaktor) || null,
-            gnd_jahre: GND_JAHRE, rnd_jahre: _rndEinheitlich(),
+            gnd_jahre: _gndSw, rnd_jahre: _rndEinheitlich(_gndSw),
+        /* v1337: der Hinweis steht NACH rnd_jahre - _rndEinheitlich()
+           setzt ihn, und Objektliterale werten in Quelltextreihenfolge
+           aus. Umgekehrt waere er null. */
+        rnd_hinweis: _rndHerkunft.hinweis,
+        /* v1338: besondere objektspezifische Grundstuecksmerkmale und die
+           Flagge, ob die Restnutzungsdauer sachverstaendig verkuerzt wurde.
+           Beide kommen aus dem Payload; ohne sie kann nhk2010.js den
+           Doppelabzug nicht melden. */
+        bom_eur: (p && p.bom_eur) != null ? p.bom_eur : (ref.bom_eur != null ? ref.bom_eur : null),
+        bom_grund: (p && p.bom_grund) || ref.bom_grund || null,
+        bom_positionen: (p && p.bom_positionen) || ref.bom_positionen || null,
+        rnd_verkuerzt: !!((p && p.rnd_verkuerzt) || ref.rnd_verkuerzt),
+        streuung: null,
             bes_bauteile: (p && p.bes_bauteile) || null,
             aussenanlagen: (p && p.aussenanlagen) || null,
             /* v1074-WFIX-1 · Der zweite Lauf (mit amtlichem Sachwertfaktor)
@@ -255,12 +394,24 @@ export const CrossCheckService = {
           }, (p && p.bodenwert) || null, {
             sachwertfaktor: _swfTab.wert, stufe: _swfTab.stufe,
             quelle: _swfTab.quelle_text,
+            /* v1338: die Streuung des Registersatzes - sie lag seit jeher
+               in `satz.streuung` und war nur beim Liegenschaftszins
+               durchgereicht. */
+            streuung: _swfTab.streuung != null ? _swfTab.streuung : null,
           });
           /* Nur uebernehmen, wenn der zweite Lauf denselben vorlaeufigen
            * Sachwert liefert — sonst haette sich zwischen den Laeufen etwas
            * geaendert, und das waere ein Fehler, kein Ergebnis. */
+          /* v1338: Die Gleichheitspruefung aus v1074 bleibt - sie faengt
+             echte Abweichungen zwischen den Laeufen ab. Hat sich aber die
+             Gesamtnutzungsdauer geaendert, IST der vorlaeufige Sachwert
+             ein anderer, und zwar mit Absicht. Sonst haette die
+             Sicherung ausgerechnet die modellkonforme Rechnung verworfen. */
+          const _erwartetAbweichend = _gndModell != null;
           if (_sw2 && _sw2.wert != null
-              && _sw2.vorlaeufiger_sachwert_eur === _sw.vorlaeufiger_sachwert_eur) {
+              && (_erwartetAbweichend
+                  || _sw2.vorlaeufiger_sachwert_eur === _sw.vorlaeufiger_sachwert_eur)) {
+
             _sw = _sw2;
           } else {
             _swfTab = { verfuegbar: false, grund: 'zweiter_lauf_abweichend' };
@@ -274,6 +425,26 @@ export const CrossCheckService = {
            * nach aussen. `quelle` ist 'anlage2' oder 'geschaetzt'; im zweiten
            * Fall steht in `hinweis`, warum — und der gehoert in den Bericht. */
           restnutzungsdauer_herkunft: _rndHerkunft,
+          /* v1338: Womit gerechnet wurde und warum. Ohne diese drei
+             Felder sieht niemand, ob die Zahl im Modell des Ausschusses
+             steht oder aus Anlage 1 stammt. */
+          gnd_jahre: _gndSw,
+          gnd_quelle: _gndModell != null ? 'modell_gutachterausschuss' : 'anlage1_immowertv',
+          gnd_hinweis: _gndModell != null
+            ? ('Der Gutachterausschuss leitet seine Sachwertfaktoren mit einer '
+               + 'Gesamtnutzungsdauer von ' + _gndModell + ' Jahren ab. Die Rechnung folgt '
+               + 'diesem Modell, nicht Anlage 1 ImmoWertV (' + GND_JAHRE + ' Jahre) '
+               + '\u2014 ein Faktor gilt nur f\u00fcr das Modell, aus dem er stammt (\u00a7 21 Abs. 3 ImmoWertV).')
+            : ((_swfTab && _swfTab.modell_gnd_hinweis)
+               || 'Gesamtnutzungsdauer nach Anlage 1 ImmoWertV. Der Gutachterausschuss '
+                  + 'beziffert in seinem Modell keine eigene \u2014 der Wert eines anderen '
+                  + 'Ausschusses wird nicht ersatzweise \u00fcbernommen.'),
+
+          /* v1338: bOM und die Streuung wandern mit nach aussen. */
+          bom_eur: _sw.bom_eur != null ? _sw.bom_eur : null,
+          bom_grund: _sw.bom_grund || null,
+          bom_positionen: _sw.bom_positionen || null,
+          hinweise_sachwert: _sw.hinweise || null,
           available: true, value_eur: _sw.wert, staffel: _sw.staffel,
           marktangepasst: _sw.marktangepasst, sachwertfaktor: _sw.sachwertfaktor || null,
           /* v1069-WSWF-3 · Bleibt der Sachwert vorlaeufig, soll dastehen
@@ -290,6 +461,61 @@ export const CrossCheckService = {
            * gehoert an die Zahl — sonst sieht ein Leser nicht, ob sie
            * ueberhaupt fuer seinen Ort gilt. */
           sachwertfaktor_ausschuss: (_swfTab && _swfTab.ausschuss) || null,
+          /* v1099-WQL · Und der Weg dorthin, wo er steht. Gerade beim
+           * Sachwertfaktor ist das haeufig die einzige Auskunft: 39 von 73
+           * NRW-Gebieten haben keinen, und in den meisten Laendern fuehren
+           * wir noch gar keinen. Ein Link ist dort mehr wert als ein
+           * Grund-Code. */
+          sachwertfaktor_quelle_link: (_swfQuelle && _swfQuelle.quelle_link) || null,
+          /* v1107-WNACH - DER QUELLENVERMERK IST EINE RECHTLICHE AUFLAGE,
+             keine Fussnote. Die Brandenburger Saetze stehen unter
+             dl-de/by-2-0: Namensnennung ist PFLICHT, und ohne sie darf die
+             Zahl in keinen Kundenbericht. Sie lag an jedem Registersatz und
+             kam im Bericht nie an. */
+          sachwertfaktor_quellenvermerk: (_swfTab && _swfTab.quellenvermerk) || null,
+          sachwertfaktor_lizenz: (_swfTab && _swfTab.lizenz) || null,
+          sachwertfaktor_quelle_url: (_swfTab && _swfTab.quelle_url) || null,
+
+          /* ═══ v1402 · AUS WELCHEM JAHRGANG DIE ZAHL STAMMT ══════════════
+             MARCELS ANSTOSS: „für bayern und rheinland-pfalz gibt es vlt
+             alte berichte die umsonst sind aus 2025 oder 2024? dann könnte
+             man diese verwenden und einen vermerk daran setzen."
+
+             Der Vermerk fehlte. Der Registersatz trägt `stichtag`,
+             `berichtsjahr` und `modellversion` seit jeher, und
+             `gutachterausschuss.js` reicht sie auch heraus (Z. 492–494) —
+             HIER endete der Weg. Der Kunde sah einen Sachwertfaktor, ohne
+             zu erfahren, aus welchem Berichtsjahr er stammt.
+
+             OHNE DIESE ANGABE IST EIN ÄLTERER JAHRGANG NICHT VERWENDBAR.
+             § 10 ImmoWertV verlangt Modellkonformität zum
+             Wertermittlungsstichtag; ein Faktor von 2014 an einem Stichtag
+             2026 ist es nicht. Mit der Angabe wird er zu etwas anderem:
+             einer belegten, datierten Auskunft, die der Anwender selbst
+             einordnen kann. Genau das ist der Unterschied, den Marcels
+             Vorschlag braucht.
+
+             GEMESSEN am 15.09.2026 als Anlass: Bayern verkauft ältere
+             Jahrgänge deutlich billiger (Straubing 2024 für 20 € gegen
+             2026 für 60 €), Coburg gibt die Jahrgänge 2014 und 2016 sogar
+             gebührenfrei ab. Über die 13 Berichte mit Sachwertfaktor
+             gerechnet: 610 statt 725 €, wenn man auf den jeweils
+             günstigsten Jahrgang ab 2022 geht. */
+          sachwertfaktor_berichtsjahr: (_swfTab && _swfTab.berichtsjahr != null)
+            ? _swfTab.berichtsjahr : null,
+          sachwertfaktor_stichtag: (_swfTab && _swfTab.stichtag) || null,
+          sachwertfaktor_modellversion: (_swfTab && _swfTab.modellversion) || null,
+          /* Wie alt die Zahl im laufenden Jahr ist, in JAHREN. Nur die
+             Messung, keine Bewertung — wer sie liest, entscheidet selbst.
+             Bezug ist bewusst das laufende Jahr: `ref` trägt keinen
+             Wertermittlungsstichtag, und eine ehrliche Näherung ist besser
+             als ein Feld, das es nicht gibt. */
+          sachwertfaktor_alter_jahre: (function () {
+            const bj = Number(_swfTab && _swfTab.berichtsjahr);
+            if (!Number.isFinite(bj) || bj < 1990) return null;
+            return new Date().getFullYear() - bj;
+          })(),
+
           sachwertfaktor_tabellenwert: (_swfTab && _swfTab.tabellenwert) || null,
           sachwertfaktor_korrekturen: (_swfTab && _swfTab.verfuegbar
             && (_swfTab.korrektur_rnd != null || _swfTab.korrektur_bgf != null))
@@ -569,7 +795,26 @@ export const CrossCheckService = {
         lzs_herabgestuft: !!p.lzs_herabgestuft,
         lzs_streuung_pp: p.lzs_streuung_pp != null ? p.lzs_streuung_pp : null,
         lzs_massstab: p.lzs_massstab || null,
-        bog_eur: _num(p.bog_eur), bog_grund: p.bog_grund || null,
+        /* === v1338d - `_num` VERWIRFT JEDE NEGATIVE ZAHL ===============
+           `const _num = (v) => Number.isFinite(n) && n > 0 ? n : null` - der
+           Helfer heisst 'Zahl' und bedeutet 'Zahl groesser null'. Fuer
+           Flaechen und Mieten ist das richtig. Fuer `bog_eur` ist es toedlich:
+           besondere objektspezifische Grundstuecksmerkmale sind fast immer
+           ein ABZUG, also negativ. `_num(-18000)` gab null.
+
+           GEMESSEN am Bericht 116 (12.09.2026): `bog_eur: -18000` stand im
+           ref, kam durch den ganzen Orchestrator bis hierher - und wurde in
+           dieser einen Zeile stillschweigend zu null. Die Ertragswert-Staffel
+           endete beim vorlaeufigen Ertragswert, ohne ein Wort dazu.
+
+           Das Feld gibt es seit WPDF12; es hat also NIE funktioniert, ausser
+           bei einem Zuschlag. Aufgefallen ist es erst, als v1338 ein
+           Eingabefeld dafuer bekam - vorher konnte es niemand fuellen. */
+        bog_eur: (function () {
+          const n = Number(p.bog_eur);
+          return Number.isFinite(n) && n !== 0 ? n : null;
+        })(),
+        bog_grund: p.bog_grund || null,
       };
       /* v1048-WMOD-3 */
       const _hatModell = ['agvga_nrw_2016'].indexOf(String(p.modellversion || '')) >= 0;
@@ -647,6 +892,22 @@ export const CrossCheckService = {
           liegenschaftszins_max: _num(p.lzs_max),
           liegenschaftszins_herabgestuft: !!p.lzs_herabgestuft,
           liegenschaftszins_quelle: kern.lzs ? kern.lzs.quelle : null,
+          /* v1099-WQL · DER WEG ZUR QUELLE GEHOERT AN DEN WERT.
+           *
+           * Marcels Vorgabe: der Kunde soll sehen, wer die Zahl fuehrt und
+           * wo er sie selbst holen kann - auch und GERADE dann, wenn wir
+           * keine liefern. Ein Bericht, der "kein Wert hinterlegt" sagt und
+           * den Nutzer damit allein laesst, ist schlechter als einer, der
+           * den zustaendigen Ausschuss beim Namen nennt.
+           *
+           * WertParameterService haengt das Feld an jede Antwort; hier geht
+           * es nur weiter. */
+          liegenschaftszins_quelle_link: kern.lzs ? (kern.lzs.quelle_link || null) : null,
+          /* v1107-WNACH - derselbe Grund wie beim Sachwertfaktor. */
+          liegenschaftszins_quellenvermerk: kern.lzs ? (kern.lzs.quellenvermerk || kern.lzs.quelle || null) : null,
+          liegenschaftszins_lizenz: kern.lzs ? (kern.lzs.lizenz || null) : null,
+          liegenschaftszins_quelle_url: kern.lzs ? (kern.lzs.quelle_url || null) : null,
+
           /* v1071-WMIE-1 · mieteQuelle wird seit v1059 bestimmt und war
            * nirgends sichtbar. Bei Loehner Strasse 278 war KEINE Miete
            * erfasst — der Rohertrag von 27.065 EUR stammt vollstaendig aus
@@ -794,6 +1055,54 @@ export const CrossCheckService = {
           ? round((Math.max(...nums) / Math.min(...nums) - 1) * 100, 1) : null,
       };
     }
+
+    /* === v1107-WNACH - DER QUELLENNACHWEIS =============================
+       Wer eine Zahl unter dl-de/by-2-0 verwendet, MUSS ihre Herkunft
+       nennen. Bis hierher hing der Vermerk an jedem Registersatz und
+       erschien in keinem Bericht - damit durfte keine dieser Zahlen zum
+       Kunden. Betroffen waren zuletzt alle sechzehn Brandenburger Saetze
+       und Aurich mit einundvierzig Kreisschluesseln.
+
+       GENANNT WIRD NUR, WAS IN DIESEM BERICHT WIRKLICH STECKT. Eine
+       Namensnennung fuer einen Ausschuss, der hier gar nicht vorkommt,
+       ist genauso falsch wie eine fehlende - sie behauptet eine Herkunft.
+
+       Entdoppelt wird ueber den Vermerkstext: fuehrt derselbe Ausschuss
+       Zins UND Sachwertfaktor, steht er einmal da, mit beiden Kennzahlen. */
+    const _nachweis = new Map();
+    /* v1402: `jahrgang` kommt dazu — eine Namensnennung ohne Datum sagt
+       zwar, WER die Zahl erhoben hat, aber nicht WANN. Bei einem älteren
+       Bericht ist genau das die entscheidende Auskunft. */
+    const _merke = (vermerk, kennzahl, url, lizenz, jahrgang) => {
+      const t = String(vermerk || '').trim();
+      if (!t) return;
+      const e = _nachweis.get(t) || { vermerk: t, kennzahlen: [], url: url || null,
+                                      lizenz: lizenz || null, jahrgang: jahrgang || null };
+      if (e.kennzahlen.indexOf(kennzahl) < 0) e.kennzahlen.push(kennzahl);
+      if (!e.url && url) e.url = url;
+      if (!e.lizenz && lizenz) e.lizenz = lizenz;
+      /* Führt derselbe Ausschuss zwei Kennzahlen aus verschiedenen
+         Jahrgängen, gewinnt der ÄLTERE — er begrenzt die Aussagekraft des
+         Eintrags, und das ist die Zahl, die der Leser wissen muss. */
+      if (jahrgang && (!e.jahrgang || Number(jahrgang) < Number(e.jahrgang))) {
+        e.jahrgang = jahrgang;
+      }
+      _nachweis.set(t, e);
+    };
+    if (out.sachwert && out.sachwert.marktangepasst) {
+      _merke(out.sachwert.sachwertfaktor_quellenvermerk, 'Sachwertfaktor',
+             out.sachwert.sachwertfaktor_quelle_url, out.sachwert.sachwertfaktor_lizenz,
+             out.sachwert.sachwertfaktor_berichtsjahr);
+    }
+    if (out.ertragswert && out.ertragswert.available
+        && out.ertragswert.liegenschaftszins_pct != null) {
+      _merke(out.ertragswert.liegenschaftszins_quellenvermerk, 'Liegenschaftszinssatz',
+             out.ertragswert.liegenschaftszins_quelle_url, out.ertragswert.liegenschaftszins_lizenz,
+             out.ertragswert.liegenschaftszins_berichtsjahr || null);
+    }
+    out.quellen_nachweis = Array.from(_nachweis.values());
+
     return out;
+
   },
 };

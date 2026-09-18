@@ -107,7 +107,14 @@
      Jetzt aus VERFAHREN in wertermittlung.js abgeschrieben:
        markt   pflicht ptype, area, year, baustatus · empfohlen cond, quality
        ertrag  pflicht plot, units
-       sach    pflicht plot, year (bei ETW nicht anwendbar)
+       sach    pflicht plot, year - empfohlen quality
+               bei Wohnungen zusaetzlich empfohlen bgf, standardstufe
+               (v1097-WETW). Die frueher hier notierte Sperre fuer
+               Eigentumswohnungen war ueberholt: der Rechenkern rechnet
+               Wohnungen seit v1047.
+               BEDARF unten bleibt bewusst UNVERAENDERT - es steuert
+               erreicht(), und eine Wohnung ohne BGF wuerde sonst Stufe 3
+               nicht mehr erreichen.
 
      Eine Leiste, die mehr behauptet als da ist, ist schlimmer als keine. */
   /* ── v1229 · `baustatus` steht bei Stufe 1, nicht bei Stufe 2 ────────────
@@ -148,6 +155,54 @@
      v1201: `mea` ist hier RAUS — er wird jetzt schon in bedarf1() verlangt,
      und zweimal dieselbe Forderung in zwei Stufen zu fuehren waere genau die
      Doppelliste, an der der Marktbericht schon sechsmal gescheitert ist. */
+  /* === v1333 - "Wohneinheiten" darf niemanden mehr aussperren ========
+     Marcels Befund: "Dann wollte er unbedingt fuer das Objekt
+     Wolfenbuettel dass ich bei Wohneinheiten was eintrage sonst konnte
+     ich den Bericht erst garnicht erzeugen."
+
+     Er hat recht, und der Widerspruch stand im Formular selbst: das Feld
+     ist mit "- nur MFH" beschriftet (index.html), die Pflichtregel hier
+     verlangt es aber bei JEDER Objektart. Wer eine Eigentumswohnung
+     bewertet, liest "nur MFH", laesst es leer und kommt nicht weiter.
+
+     Weglassen geht nicht: der Ertragswert braucht die Zahl, weil die
+     Verwaltungskosten je BEWERTETER Einheit angesetzt werden
+     (Anlage 3 ImmoWertV). Ohne sie rechnet das Verfahren halb, und das
+     ist die eine Sache, die der Marktbericht nie tut.
+
+     Aber bei den meisten Objektarten muss man gar nicht fragen - die
+     Antwort steht in der Objektart:
+
+       ETW  - die bewertete Einheit IST die Wohnung          -> 1
+       EFH  - ein Einfamilienhaus hat eine Wohnung           -> 1
+       DHH  - eine Haelfte ist eine Einheit                  -> 1
+       RH   - ein Reihenhaus ist eine Einheit                -> 1
+       GAR  - Garage/Stellplatz, kein Wohnraum               -> 1
+       MFH  - unbekannt, muss gefragt werden                 -> Pflicht
+       Gewerbe - Zahl der Nutzungseinheiten, unbekannt       -> Pflicht
+
+     Der Wert wird SICHTBAR ins Feld geschrieben, nicht heimlich in die
+     Rechnung geschoben: er steht da, er ist begruendet, und wer es
+     besser weiss, ueberschreibt ihn. Angefasst wird nur ein LEERES Feld
+     - eine eigene Eingabe bleibt unangetastet (dieselbe Regel wie
+     v1333 in mb-objektwahl.js). */
+  var EINHEIT_JE_ART = { ETW: 1, EFH: 1, DHH: 1, RH: 1, GAR: 1 };
+  function _einheitenSelbstverstaendlich() {
+    var pt = wert('ptype').toUpperCase();
+    return Object.prototype.hasOwnProperty.call(EINHEIT_JE_ART, pt) ? EINHEIT_JE_ART[pt] : 0;
+  }
+  function einheitenVorbelegen() {
+    var el = $('units'); if (!el) return;
+    var n = _einheitenSelbstverstaendlich();
+    if (!n) { if (el.getAttribute('data-mbst-auto')) { el.value = ''; el.removeAttribute('data-mbst-auto'); } return; }
+    /* Nur ein leeres Feld oder ein zuvor selbst gesetztes anfassen. */
+    if (String(el.value || '').trim() !== '' && !el.getAttribute('data-mbst-auto')) return;
+    if (String(el.value || '').trim() === String(n)) { el.setAttribute('data-mbst-auto', '1'); return; }
+    el.value = String(n);
+    el.setAttribute('data-mbst-auto', '1');
+    try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+  }
+
   function bedarf3() {
     var l = BEDARF[3].slice();
     if (!istWohnung()) { l.push(['standardstufe', 'Standardstufe']); l.push(['nhkHaus', 'Hausform (NHK)']); }
@@ -211,7 +266,48 @@
     return null;
   }
 
+  /* === v1335 - "1 x MPI" ist ein PREIS, kein Kontingent ===============
+     Marcels Befund: "Dann gefaellt mir hinter den Bericht
+     auswahlmoeglichkeiten die Anzeige 1xMPI, 1xMPI+ und 1xWEV nicht.
+     damit kann ich nichts anfangen. Schreib doch dahinter wieviele noch
+     zu verfuegung stehen."
+
+     Er hat recht, und zwar doppelt. Erstens sagt das Kuerzel niemandem
+     etwas, der es nicht selbst erfunden hat. Zweitens - und das ist der
+     eigentliche Punkt - stand dort ein PREIS, wo der Nutzer einen
+     BESTAND erwartet. Wie viele Bewertungen noch frei sind, erfuhr er
+     bisher erst NACH dem Klick, wenn der Server mit 402 antwortet
+     (app.js:495 -> _zeigeKaufAngebot). Das ist genau die falsche
+     Reihenfolge: die teure Entscheidung faellt vorher.
+
+     Der Bestand steht in /ai/credits - dieselbe Quelle wie die Pille in
+     der Kopfleiste der Haupt-App (js/ai-credits.js). Der Bericht laeuft
+     im iframe unter demselben Origin und mit demselben Token; ein
+     eigener Zaehler waere eine zweite Wahrheit. */
+  var _rest = null;
+  function restHolen() {
+    var tok = null; try { tok = localStorage.getItem('ji_token'); } catch (e) {}
+    if (!tok) return Promise.resolve(null);
+    return fetch('/api/v1/ai/credits', { headers: { Authorization: 'Bearer ' + tok } })
+      .then(function (x) { return x.ok ? x.json() : null; })
+      .then(function (d) {
+        /* `Number(null)` ist 0 und besteht Number.isFinite - erst auf
+           Abwesenheit pruefen, dann rechnen. */
+        if (!d || !d.arten) { _rest = null; return null; }
+        _rest = d.arten;
+        zeichnen();
+        return d;
+      })
+      .catch(function () { _rest = null; return null; });
+  }
+  function restFuer(art) {
+    if (!_rest || !_rest[art]) return null;
+    var v = _rest[art].rest;
+    return (v == null) ? null : v;
+  }
+
   function preisHolen() {
+
     var r = ref();
     var url = '/api/v1/marktbericht/stufenpreis' + (r ? ('?ref=' + encodeURIComponent(r)) : '');
     var tok = null; try { tok = localStorage.getItem('ji_token'); } catch (e) {}
@@ -249,7 +345,17 @@
      dasselbe lesen. */
   function preisText(k) {
     if (!k || k.anzahl === 0) return 'bezahlt';
-    return k.anzahl + ' × ' + (ART_KURZ[k.art] || k.art);
+    return k.anzahl + ' \u00d7 ' + (ART_KURZ[k.art] || k.art);
+  }
+  /* v1335: Was die Stufe kostet UND was davon noch da ist. Ohne Bestand
+     (kein Token, Server stumm) bleibt es beim Preis allein - eine Zahl
+     zu erfinden waere schlimmer als keine zu zeigen. */
+  function bestandText(k) {
+    if (!k || k.anzahl === 0) return '';
+    var r = restFuer(k.art);
+    if (r == null) return '';
+    if (r <= 0) return '<span class="mbst-leer">keine mehr frei</span>';
+    return '<span class="mbst-frei">noch ' + r + ' frei</span>';
   }
   function preisTextLang(k) {
     if (!k || k.anzahl === 0) return 'ohne Aufpreis';
@@ -283,6 +389,8 @@
       '.mbst-zeile{display:flex;gap:8px;align-items:baseline}',
       '.mbst-name{font-size:12.5px;font-weight:600;opacity:.7}',
       '.mbst-ms.an .mbst-name{opacity:1}',
+      '.mbst-frei{color:#3FA56C;font-size:10.5px;margin-left:6px;white-space:nowrap}' +
+      '.mbst-leer{color:#D8564C;font-size:10.5px;margin-left:6px;white-space:nowrap;font-weight:600}' +
       '.mbst-kero{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:11px;',
         'font-weight:600;color:var(--wl-c9a84c,#C9A84C);white-space:nowrap}',
       '.mbst-was{font-size:10.5px;line-height:1.45;opacity:.6;margin-top:2px}',
@@ -475,7 +583,7 @@
         '<div class="mbst-pkt">' + (dieseWahl ? '●' : (fertig ? '✓' : n)) + '</div>' +
         '<div class="mbst-txt">' +
           '<div class="mbst-zeile"><span class="mbst-name">' + NAMEN[n] + '</span>' +
-            '<span class="mbst-kero">' + preisText(k) + '</span></div>' +
+            '<span class="mbst-kero">' + preisText(k) + bestandText(k) + '</span></div>' +
           unten +
         '</div></div>';
     }).join('');
@@ -565,9 +673,17 @@
       _letzte = -1;                             /* Neuzeichnen erzwingen */
       melden();
     }, true);
+    /* v1333: Die Objektart beantwortet die Wohneinheiten meistens selbst. */
+    try { einheitenVorbelegen(); } catch (e) {}
+    document.addEventListener('change', function (ev) {
+      if (ev && ev.target && ev.target.id === 'ptype') {
+        try { einheitenVorbelegen(); } catch (e) {}
+      }
+    }, true);
     _letzte = 0;
     melden();
     preisHolen();
+    restHolen();   /* v1335 */
     /* Objektwechsel im Dropdown -> neuer Preis. */
     var sel = document.querySelector('#mbow-host select');
     if (sel) sel.addEventListener('change', function () { setTimeout(preisHolen, 300); });
@@ -579,6 +695,8 @@
   window.DealPilotMbStufen = {
     erreicht: erreicht, zeichnen: zeichnen, preisHolen: preisHolen,
     gewaehlt: gewaehlt, offenFuer: offenFuer,          /* v1202 */
+    einheitenVorbelegen: einheitenVorbelegen,          /* v1333b */
+    restHolen: restHolen,                             /* v1335 */
     _stand: function () { return { erreicht: erreicht(), gewaehlt: gewaehlt(), offen: offenFuer(), bezahlt: _bezahlt, kosten: _kosten, faellig: _faellig }; }
   };
 })();

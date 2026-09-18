@@ -1,0 +1,86 @@
+{
+  "land_code": "NI",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Schaumburg",
+  "gaa_kennz": "03257",
+  "ags": ["03257"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2025-10-01",
+  "auswertezeitraum": "01/2022 bis 10/2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-03-02",
+  "quelle_url": "https://public.tableau.com/views/2026_sw_efh_hmhhsg/dash",
+  "quelle_datei": "Tableau-Kalkulator 2026_sw_efh_hmhhsg (Grundstücksmarktinformationen Niedersachsen 2026)",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Ein- und Zweifamilienhäuser, Kalkulator 2026_sw_efh_hmhhsg",
+  "stufe": "B",
+
+  "modellansaetze": {
+    "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung.",
+    "nhk": "NHK 2010",
+    "bezugsmassstab": "Brutto-Grundflaeche",
+    "alterswertminderung": "linear"
+  },
+
+  "stichprobe": {
+    "faelle": 474,
+    "kaufzeitpunkt": "03.01.2022 bis 28.10.2025",
+    "spannen": {
+      "vorlaeufiger_sachwert_eur": [123133, 830333],
+      "bodenrichtwert_eur_qm": [17, 230],
+      "grundstuecksflaeche_qm": [318, 1491],
+      "wohnflaeche_qm": [84, 292],
+      "modifiziertes_baujahr": [1960, 2021],
+      "rnd_jahre": [18, 77]
+    }
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehendes Ein- und Zweifamilienhaus",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [125000, 175000, 200000, 250000, 300000, 400000, 550000, 700000, 830000],
+        "achse_y_feld": "brw",
+        "achse_y_bez": "Bodenrichtwert in €/m²",
+        "achse_y": [17, 40, 60, 80, 120, 170, 230],
+        "zellen": {
+          "17":  [0.95, 0.82, 0.78, 0.70, 0.65, 0.57, 0.49, 0.43, 0.40],
+          "40":  [1.12, 0.97, 0.91, 0.82, 0.76, 0.66, 0.57, 0.50, 0.46],
+          "60":  [1.20, 1.03, 0.97, 0.88, 0.81, 0.70, 0.60, 0.53, 0.49],
+          "80":  [1.26, 1.08, 1.02, 0.92, 0.84, 0.73, 0.63, 0.56, 0.51],
+          "120": [1.34, 1.15, 1.08, 0.97, 0.89, 0.78, 0.66, 0.59, 0.54],
+          "170": [1.40, 1.20, 1.13, 1.02, 0.93, 0.81, 0.69, 0.61, 0.56],
+          "230": [1.46, 1.25, 1.18, 1.06, 0.97, 0.84, 0.72, 0.63, 0.58]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "normobjekt": "Standardstufe 2,5",
+        "hinweis": "Alle 63 Zellen sind am NORMOBJEKT abgetastet. GEGENPROBE: das Dashboard weist als Anwendungsbeispiel Bodenrichtwert 80 €/m² und vorläufigen Sachwert 200.000 € mit dem Faktor 1,02 aus; die Zelle [80][200000] trägt genau diese 1,02."
+      },
+
+      "korrekturen": [
+        {
+          "bez": "Abweichende Standardstufe",
+          "feld": "standardstufe",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": { "1.5": 0.80, "2.5": 1.00, "3.5": 1.26 },
+          "rundung_stellen": 2,
+          "hinweis": "Drei abgedruckte Stützstellen. Probe: bei der Normstufe 2,5 ist der Koeffizient 1,00. Schaumburg spreizt nach oben am weitesten aller bisher erfassten Gebiete (1,26 bei Stufe 3,5) — in einem Landkreis mit niedrigen Bodenrichtwerten (Median 78 €/m²) wiegt die Ausstattung schwerer."
+        }
+      ],
+
+      "beleg": "Kalkulator 2026_sw_efh_hmhhsg (Tableau Public, Profil ogagmd2026), Datenbasis 01.10.2025, veroeffentlicht 02.03.2026, Stichprobe 474 Kauffaelle. 63 Stuetzpunkte des Gitters am Normobjekt abgefragt (Bodenrichtwert 17 bis 230 EUR/qm x vorlaeufiger Sachwert 125.000 bis 830.000 EUR), dazu 3 abgedruckte Stuetzstellen der Standardstufenkurve. GEGENPROBE am Anwendungsbeispiel: Bodenrichtwert 80, vorlaeufiger Sachwert 200.000, Standardstufe 2,5 ergibt 1,02 - die Zelle traegt genau diese Zahl. KEIN LAGE-EINGABEFELD, von Hand gegengelesen.",
+
+      "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung). NUR BAUJAHRE AB 1950. Für Baujahre 1800 bis 1945 führt der Ausschuss einen EIGENEN Kalkulator, der hier nicht erfasst ist. ABWEICHENDER STICHTAG: 01.10.2025. SCHAUMBURG FÜHRT KEINE KORREKTUR FÜR DIE RESTNUTZUNGSDAUER, obwohl die Stichprobe sie von 18 bis 77 Jahren ausweist — anders als die Region Hannover und der Landkreis Hildesheim beim selben Ausschuss. Das ist das Modell für dieses Gebiet, kein fehlender Datensatz. WO DIE QUELLE ENDET, ENDET DIE RECHNUNG: das Gitter deckt 125.000 bis 830.000 € und 17 bis 230 €/m² ab.",
+      "stufe": "B",
+      "stufe_begruendung": "Stufe B statt A: die Gitterwerte sind am amtlichen Kalkulator abgetastet, die Stützstellen von uns gewählt. Die Standardstufenkurve ist vom Ausschuss abgedruckt und damit Stufe A."
+    }
+  ]
+}

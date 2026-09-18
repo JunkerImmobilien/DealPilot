@@ -101,7 +101,83 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                             'sued-nord.json',        /* v1089 · BY, NI */
                             'nord2.json',            /* v1090 · NI */
                             'laender2.json',         /* v1093 · BB, HE, NI, NRW */
-                            'laender3.json'];        /* v1094 · BB, HE, NI */
+                            'laender3.json',        /* v1094 · BB, HE, NI */
+                            /* v1339: Erbbaurechtskoeffizienten Braunschweig-Wolfsburg.
+                               MARKTABGELEITET - wo sie vorliegen, gehen sie dem
+                               finanzmathematischen Wert nach Paragraf 50 ImmoWertV vor. */
+                            'erbbau-bs-wob.json',
+                            /* v1098: Sachwertfaktoren Hamburg. EIGENE Datei, weil
+                               `swf-nrw.json` sonst ein zweites Bundesland unter
+                               falschem Namen truege. `rezept2register.py` schreibt
+                               seit v1098 je Land eine Datei und nennt sie am Ende
+                               seines Laufs - jede davon gehoert hierher. */
+                            'swf-hh.json',
+                            /* v1098d: Sachwertfaktoren Kassel (Hessen), Jahrgang 2024.
+                               dl-de/zero-2-0 - der Bericht sagt woertlich "ohne
+                               Einschraenkung oder Bedingung". */
+                            'swf-he.json',
+                            /* v1098g: Sachwertfaktoren Landkreis Wolfenbüttel.
+                               Niedersachsen fuehrt seine Faktoren als Tableau-
+                               Kalkulator, nicht als Tabelle im PDF — die Werte
+                               sind einzeln am Kalkulator abgefragt. dl-de/by-2-0,
+                               Quellenvermerk ist Pflicht. */
+                            'swf-ni.json',
+                            /* v1098i: Sachwertfaktoren Mainz. Erster Satz aus
+                               Rheinland-Pfalz. Der Bericht druckt die Funktion
+                               ab UND ein Anwendungsbeispiel — beides
+                               nachgerechnet, beides zeichengleich. */
+                            'swf-rp.json',
+                            /* v1098j: Ludwigslust-Parchim. verwendung: gutachten -
+                               auszugsweise Wiedergabe ist gestattet, verlangt aber
+                               Quellenangabe UND ein Belegexemplar. Im Kundenbericht
+                               steht bis zur Klaerung nur der Link. */
+                            'swf-mv.json',
+                            /* v1100: Brandenburg - Potsdam (zwei Konstanten) und
+                               Oberhavel (Matrix nach Region PLUS BGF-Korrektur je
+                               Region, beide laut Bericht gleichzeitig anzuwenden). */
+                            'swf-bb.json',
+                            /* v1110: Sachsen-Anhalt. Der Gutachterausschuss dort
+                               fuehrt keine Tabellen, sondern multiple
+                               Regressionsfunktionen - je Region und
+                               Baujahresklasse eine eigene. */
+                            'swf-st.json',
+                            /* v1114: Sachsen. Leipzig fuehrt VIER Gebaeudetypen
+                               getrennt - freistehend, Doppelhaushaelfte,
+                               Reihenend- und Reihenmittelhaus. */
+                            'swf-sn.json',
+                            /* v1117: Berlin. Der Satz aus v1085 ordnete ueber
+                               ALTBEZIRKE zu und fand sein Feld nie - jetzt
+                               laeuft die Zuordnung ueber den Ortsteil, mit der
+                               amtlichen Tabelle des Ausschusses. */
+                            'swf-be.json',
+                            /* v1118: Schleswig-Holstein. Drei Ausschuesse mit
+                               Bodenrichtwertklassen als Kurvenschar - Luebeck,
+                               Herzogtum Lauenburg, Ostholstein. */
+                            'swf-sh.json',
+                            /* v1145: THUERINGEN - die erste neue Saatdatei seit
+                               v1118. Das TLBG veroeffentlicht die Faktoren als
+                               eigene PDF-Blaetter je Ausschuss, nicht im
+                               Marktbericht. Eichsfeld/Unstrut-Hainich fuehrt
+                               VIER Objektarten getrennt, darunter
+                               Reihenmittelhaeuser mit einer viel steileren
+                               Kurve als Doppelhaushaelften.
+
+                               WER HIER EINE DATEI ERGAENZT, MUSS SIE AUCH HIER
+                               EINTRAGEN. Der Registerbau erzeugt out/swf-th.json
+                               klaglos, der Auswerter laedt aber nur, was in
+                               dieser Liste steht - genau daran scheiterte
+                               Berlin in v1085 mit fuenfzehn Fehltreffern. */
+                            'swf-th.json',
+                            /* v1160: Baden-Wuerttemberg, Heilbronn. ERSTER Satz
+                               aus BW - und die Datei gehoert von Anfang an hier
+                               herein, nicht erst wenn jemand merkt, dass nichts
+                               rechnet. Das ist die Berlin-Falle aus v1085: der
+                               Registerbau schreibt swf-<land>.json fuer JEDES
+                               Land, das ein Rezept hat, aber geladen wird nur,
+                               was in dieser Liste steht. Eine fehlende Zeile
+                               sieht aus wie "kein Ausschuss hinterlegt" und ist
+                               keine. */
+                            'swf-bw.json'];
 
 export function ladeSaat(dateien = SAATDATEIEN) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])

@@ -147,6 +147,21 @@ const FELDBRUECKE = {
   brw: ['brw_eur_qm', 'brw_sqm', 'brw'],
   rnd: ['rnd_jahre', 'restnutzungsdauer_jahre', 'rnd'],
   bgf: ['bgf_qm', 'bgf_direkt', 'bgf'],
+  /* v1103-WWFL - Havelland staffelt seine Sachwertfaktoren im Berliner
+     Umland nach Grundstuecks- UND WOHNflaeche. Die Wohnflaeche stand in
+     keiner Bruecke; das Modell haette 'achse_y_fehlt' gemeldet, obwohl
+     die Zahl im Formular seit jeher erhoben wird. */
+  wohnflaeche: ['wohnflaeche_qm', 'wohnflaeche', 'living_area', 'wfl'],
+  /* v1113-WKEL - die Altmark fuehrt die Unterkellerung als eigenes Glied
+     ihrer Gleichung; vierzehn Prozentpunkte haengen daran. */
+  unterkellerung: ['unterkellerung', 'keller_dg', 'keller'],
+  /* v1105-WMOD - Cottbus unterscheidet seine Sachwertfaktoren nach dem
+     MODERNISIERUNGSGRAD nach Anlage 2 ImmoWertV: 0 bis 6 Punkte gelten
+     als unsaniert, ab 7 als teilsaniert bis saniert. Zwischen beiden
+     liegen bei gleichem Baujahr bis zu acht Prozent. */
+  mod_punkte: ['mod_punkte', 'modernisierungsgrad', 'modg'],
+
+
   baujahr: ['baujahr', 'build_year'],
   flaeche: ['grundstuecksflaeche_qm', 'flaeche_qm', 'gsfl', 'flaeche'],
   baugrundstuecksflaeche: ['baugrundstuecksflaeche_qm',
@@ -155,7 +170,24 @@ const FELDBRUECKE = {
   lagewert: ['lagewert', 'brw_eur_qm', 'brw_sqm'],
   /* v1088 */
   gebaeudestandard: ['gebaeudestandard', 'standardstufe'],
-  ort: ['ort', 'gemeinde_name', 'gemeinde'],
+  /* v1101-WSTD - GEMESSEN, nicht vermutet: `gebaeudestandard` stand seit
+     v1088 in dieser Bruecke und wurde von KEINEM Rezept benutzt. Die
+     Rezepte nennen die Achse `standardstufe` - Wolfenbuettel als
+     Korrektur (bis 0,81 bis 1,21, also bis 21 Prozent!), Teltow-Flaeming
+     als Kategorieachse. Beide liefen damit ins Leere: Wolfenbuettel
+     rechnete still OHNE die Standardstufenkorrektur, Teltow-Flaeming
+     haette `kategorie_fehlt` gemeldet.
+
+     Der Eintrag darueber bleibt stehen - er kostet nichts und faengt ein
+     Rezept ab, das den anderen Namen waehlt. */
+  standardstufe: ['standardstufe', 'gebaeudestandard'],
+  ort: ['ort', 'gemeinde_name', 'gemeinde', 'stadt'],
+  /* v1102-WORT - der Ortsteil ist EIGENSTAENDIG und faellt NICHT auf den
+     Gemeindenamen zurueck: wer nach einem Ortsteil zuordnet, meint den
+     Ortsteil. Ein stiller Rueckfall auf die Gemeinde koennte in eine
+     andere Region zeigen. */
+  ortsteil: ['ortsteil', 'stadtteil', 'district'],
+
 };
 
 /* v1096a-WVOK · EIN VOKABULAR, NICHT ZWEI.
@@ -222,15 +254,55 @@ function eingabeBruecke(o) {
  * "das Register fuehrt ohnehin nur einen Zweig, dann nimm den" — das waere
  * ein stiller Rueckfall und wuerde einer Eigentumswohnung den Faktor fuer
  * Einfamilienhaeuser geben. */
+/* === v1341 - HIER STANDEN ECHTE BACKSPACE-ZEICHEN ===================
+   In dieser Tabelle standen an zwanzig Stellen BACKSPACE-Zeichen (0x08),
+   wo eine Wortgrenze \\b hingehoert. Der Unterschied ist im Editor,
+   in `grep` und selbst in `String(regex)` UNSICHTBAR:
+
+     String(Z[7][0])  ->  /einfamilien|efh|freistehend/i      sieht richtig aus
+     Z[7][0].test("Einfamilienhaus")  ->  true
+     Z[7][0].test("EFH")              ->  FALSE
+
+   Sichtbar wurde es erst ueber `JSON.stringify` (dort wird 0x08 als \\b
+   ausgegeben) und ueber `file`, das die Datei die ganze Zeit mit
+   "with overstriking" gemeldet hat - zweimal ueberlesen.
+
+   WAS DAS ANGERICHTET HAT: unsere Oberflaeche liefert Kurzformen (EFH,
+   ETW, MFH, RH, DHH). Genau die wurden von dieser Tabelle NIE erkannt.
+   Nur wenn der Registerzweig zufaellig gleich hiess wie die Kurzform in
+   Kleinschrift, griff der direkte Weg davor.
+
+   GEMESSEN am 12.09.2026 mit ptype "EFH":
+
+     Remscheid  (Zweig "efh")   -> 1,08     direkter Weg, ging
+     Olpe       (Zweig "efh")   -> 0,92     direkter Weg, ging
+     Potsdam    (Zweig "ezfh")  -> NICHTS   "objektart_nicht_abgeleitet"
+     Uckermark  (Zweig "ezfh")  -> NICHTS
+
+   Mit `objektart: "ezfh"` liefert Potsdam 1,06. Der Faktor lag also die
+   ganze Zeit im Register und der Bericht meldete "kein Sachwertfaktor
+   abgeleitet" - eine Fehlanzeige, die wie ein Befund aussieht.
+
+   Wer diese Tabelle anfasst: Escape-Sequenzen NIE tippen, immer
+   generieren. Ein Werkzeug, das \\b als Steuerzeichen liest, hinterlaesst
+   genau diesen Schaden, und er ueberlebt jedes Gegenlesen. */
 const ZWEIG_VORZUG = [
-  [/eigentumswohnung|etw|whg|wohnung/i, ['etw', 'we', 'wohnung']],
-  [/mehrfamilien|mfh/i, ['mfh', 'mfh_bis6', 'mfh_ueber6']],
-  [/dreifamilien|dreifh/i, ['dreifh']],
-  [/reihenmittel|rmh/i, ['rmh', 'rh', 'rhdhh']],
-  [/reihenend|doppelhaus|dhh|reh/i, ['rhdhh', 'dhh', 'reh', 'rh']],
-  [/reihenhaus|rh/i, ['rh', 'rhdhh', 'rmh']],
-  [/zweifamilien|zfh/i, ['zfh', 'ezfh']],
-  [/einfamilien|efh|freistehend/i, ['efh', 'ezfh']],
+
+  [/eigentumswohnung|\betw\b|\bwhg\b|wohnung/i, ['etw', 'we', 'wohnung']],
+  [/mehrfamilien|\bmfh\b/i, ['mfh', 'mfh_bis6', 'mfh_ueber6']],
+  [/dreifamilien|\bdreifh\b/i, ['dreifh']],
+  [/reihenmittel|\brmh\b/i, ['rmh', 'rh', 'rhdhh']],
+  /* v1114-WREH - REIHENENDHAUS UND DOPPELHAUSHAELFTE GETRENNT.
+     Beide trafen bisher DIESELBE Zeile und suchten in derselben
+     Reihenfolge - ein Reihenendhaus bekam damit den Satz der
+     Doppelhaushaelfte, sobald ein Ausschuss beide getrennt fuehrt.
+     Leipzig tut genau das: 1,21 fuer Reihenendhaeuser, 1,18 fuer
+     Doppelhaushaelften. Drei Prozent, still. */
+  [/reihenend|\breh\b/i, ['reh', 'rhdhh', 'rh', 'dhh']],
+  [/doppelhaus|\bdhh\b/i, ['dhh', 'rhdhh', 'rh']],
+  [/reihenhaus|\brh\b/i, ['rh', 'rhdhh', 'rmh']],
+  [/zweifamilien|\bzfh\b/i, ['zfh', 'ezfh']],
+  [/einfamilien|\befh\b|freistehend/i, ['efh', 'ezfh']],
   [/fertighaus/i, ['fertighaus']],
 ];
 
@@ -342,6 +414,10 @@ function zweigWaehlen(reg, gefuehrt, objektart, baujahr) {
  * ist trotzdem das ganze Land. */
 const EBENE_GESPERRT = {
   sachwertfaktor: new Set(['bezirk', 'land', 'bund']),
+  /* v1339: Ein Erbbaurechtskoeffizient ist das Verhaeltnis zweier
+     oertlicher Kaufpreise. Ein Landes- oder Bundesmittel davon hat keine
+     Bedeutung - dieselbe Sperre wie beim Sachwertfaktor. */
+  erbbaurechtskoeffizient: new Set(['bezirk', 'land', 'bund']),
 };
 
 function ebeneErlaubt(kennzahl, satz) {
@@ -423,6 +499,69 @@ function ausRegisterRechnen(o, ags) {
   r.lizenz = satz.lizenz || null;
   r.geltungsbereich = satz.geltungsbereich || null;
   r.beleg = (satz.belege || [])[0] || null;
+
+  /* === v1338 - DIE GESAMTNUTZUNGSDAUER DES MODELLS ====================
+     Marcels Frage aus dem Gutachten zu Wolfenbuettel: "Steckst du eine
+     Zahl aus dem 80er-Rahmen in ein 70er-Modell, ist das Ergebnis nicht
+     mehr modellkonform nach Paragraf 21 Abs. 3."
+
+     Er hat recht, und es traf uns selbst. GEMESSEN im Register:
+
+       38 Saetze fuehren gnd_jahre 70
+        4 Saetze fuehren 80
+        5 Saetze fuehren 60
+       73 Saetze fuehren sie ausdruecklich als null (nicht abgedruckt)
+
+     Und `CrossCheckService.js:24` rechnete ausnahmslos mit einer
+     Konstanten: `const GND_JAHRE = 80`. Der Wert stand also seit jeher
+     im Register und wurde von NIEMANDEM abgeholt - dasselbe Muster wie
+     `restnutzungsdauer_herkunft` (v1337) und `dealpilot_marktbewertung`.
+
+     Was das kostet: bei Alter 30 ergibt GND 70 eine Restnutzungsdauer
+     von 40 Jahren, GND 80 eine von 50. An einem Reihenhaus mit rund
+     176.000 Euro Herstellungskosten sind das etwa 25.000 Euro
+     Gebaeudesachwert - lautlos.
+
+     `null` ist hier eine ANTWORT, keine Luecke: der Bericht des
+     Ausschusses druckt dann keine Zahl, und der Wert eines Nachbarkreises
+     darf nicht einspringen. Genau das steht in der Saatdatei fuer
+     Braunschweig-Wolfsburg woertlich. */
+  const _ma = satz.modellansaetze || {};
+  /* ═══ v1130-WGND3 · DREI SCHREIBWEISEN, EIN FELD ═══════════════════════
+     GEMESSEN am 14.09.2026, und es ist die dritte Stufe derselben Falle.
+
+     Hier stand nur `_ma.gnd_jahre`. Die Rezepte schreiben die
+     Gesamtnutzungsdauer aber unter DREI Namen:
+
+       gnd_jahre                 Brandenburg (wird gelesen)
+       gesamtnutzungsdauer_jahre Wolfenbuettel (wurde NICHT gelesen)
+       gnd                       Koeln, Duesseldorf, Hessen (NICHT gelesen)
+
+     Die Folge: Oberursel rechnet mit GND 70, schrieb sie ordentlich ins
+     Rezept — und der Auswerter nahm weiter 80. Zwischen beiden liegen an
+     einem Reihenhaus rund 25.000 Euro Gebaeudesachwert.
+
+     Der Fehler war zweimal derselbe und zweimal unsichtbar: erst stand
+     die Zahl nur im Fliesstext (v1129), dann im falschen Feld. Beide Male
+     sah der Datensatz vollstaendig aus.
+
+     ALLE DREI NAMEN werden jetzt gelesen. Das ist robuster, als 150
+     Rezepte zu vereinheitlichen — und es kostet nichts: wo mehrere
+     stehen, gewinnt der spezifischste zuerst. Ein Text statt einer Zahl
+     ("gemaess Anlage 1 ImmoWertV") ergibt weiterhin `null`, und null ist
+     eine Antwort: dann druckt der Bericht keine Zahl. */
+  const _gndRoh = (_ma.gnd_jahre != null) ? _ma.gnd_jahre
+                : (_ma.gesamtnutzungsdauer_jahre != null) ? _ma.gesamtnutzungsdauer_jahre
+                : (_ma.gnd != null) ? _ma.gnd
+                : null;
+  const _gndZahl = Number(_gndRoh);
+  r.modell_gnd_jahre = (_gndRoh == null || !Number.isFinite(_gndZahl) || _gndZahl <= 0)
+                         ? null : _gndZahl;
+  r.modell_gnd_hinweis = _ma.gnd_hinweis || _ma.hinweis || null;
+  r.modell_gnd_beleg = _ma.gnd_beleg || null;
+  r.modell_gnd_warnung = _ma.gnd_warnung || null;
+  r.modellansaetze = _ma;
+
   return r;
 }
 
@@ -574,7 +713,260 @@ export function liegenschaftszinssatz(arg = {}) {
  * einfach. "einfach" heisst dort nicht "mäßig" — das war eine naheliegende
  * und falsche Lesart.
  */
+/**
+ * v1339 · ERBBAURECHTSKOEFFIZIENT — was der Markt zahlt, nicht was die
+ * Rechnung ergibt.
+ *
+ * Das Erbbaurecht wird bei uns seit v1312 finanzmathematisch nach
+ * Paragraf 50 ImmoWertV gerechnet: Volleigentum minus Bodenwert, plus
+ * Zinsvorteil, minus Heimfall. Das ist der richtige Weg, SOLANGE nichts
+ * Besseres vorliegt.
+ *
+ * Es liegt aber etwas Besseres vor, wo ein Gutachterausschuss den
+ * Koeffizienten aus echten Kauffaellen abgeleitet hat. Der Ausschuss
+ * Braunschweig-Wolfsburg tut das fuer sieben Gebiete aus den Jahren
+ * 2021 bis 2024 und druckt sogar ein Anwendungsbeispiel ab:
+ *
+ *   500.000 Euro Volleigentum x 0,79 = 395.000 Euro Erbbaurecht
+ *
+ * Ein marktabgeleiteter Koeffizient schlaegt eine Modellrechnung -
+ * er enthaelt alles, was die Formel nicht kennt: die Erwartung des
+ * Marktes an Vertragsbedingungen, Anpassungsklauseln, Heimfallrisiko.
+ *
+ * WICHTIG: er gilt gegen den Wert des BEBAUTEN Grundstuecks im
+ * Normaleigentum, nicht gegen den Bodenwert. Und er gilt nur fuer die
+ * Objektart, fuer die er abgeleitet wurde - Braunschweig-Wolfsburg
+ * fuehrt Reihenhaeuser und Doppelhaushaelften NUR fuer die Stadt
+ * Wolfsburg.
+ */
+export function erbbaurechtskoeffizient(arg = {}) {
+  const { ags, zweig, objektart, volleigentum_eur } = arg;
+  const alle = finde('erbbaurechtskoeffizient', ags).filter((x) => ebeneErlaubt('erbbaurechtskoeffizient', x));
+  if (!alle.length) {
+    return { verfuegbar: false, grund: 'kein_koeffizient_hinterlegt',
+      hinweis: 'Für diesen Ort ist kein marktabgeleiteter '
+        + 'Erbbaurechtskoeffizient hinterlegt. Gerechnet wird finanzmathematisch '
+        + 'nach § 50 ImmoWertV.' };
+  }
+
+  const gefuehrt = alle.map((x) => String(x.zweig || '').toLowerCase());
+
+  /* === v1339b - DIE OBJEKTART DER APP IST NICHT DER ZWEIG DES BERICHTS =
+     GEMESSEN am 12.09.2026 im Container:
+
+       erbbaurechtskoeffizient({ags:"03101", objektart:"ezfh"}) -> 0,79 OK
+       erbbaurechtskoeffizient({ags:"03101", objektart:"EFH"})  -> nichts
+
+     obwohl `ZWEIG_VORZUG` fuer /efh/ ausdruecklich `[efh, ezfh]` fuehrt und
+     `nachArt(satz, "ezfh")` isoliert genau einen Treffer liefert. Die
+     Ursache ist INZWISCHEN GEFUNDEN und behoben (v1341): in
+     `ZWEIG_VORZUG` standen Backspace-Zeichen statt Wortgrenzen. Die Karte
+     unten bleibt trotzdem stehen - sie ist lesbarer als die Regex-Kaskade
+     und unabhaengig von ihr.
+
+     Diese Karte loest das Problem aber nicht nur pragmatisch, sie ist auch
+     die richtige Stelle: unsere `ptype`-Werte (EFH, DHH, RH, ETW, MFH)
+     sind Oberflaechen-Kuerzel, die Zweige der niedersaechsischen Berichte
+     heissen anders (`ezfh`, `rh_dhh`). Eine ausdrueckliche Zuordnung ist
+     lesbar und pruefbar; eine Regex-Kaskade, die fuer NRW gebaut wurde,
+     ist es nicht.
+
+     DHH und RH gehen BEWUSST nicht auf `ezfh`: der Ausschuss wertet
+     Reihenhaeuser und Doppelhaushaelften getrennt aus und nur fuer die
+     Stadt Wolfsburg. Ein Reihenhaus in Wolfenbuettel bekommt deshalb
+     keinen Koeffizienten - und genau das soll es auch (Paragraf 10). */
+  const PTYPE_ZU_ZWEIG = {
+    efh: ['ezfh', 'efh'],
+    zfh: ['ezfh', 'zfh'],
+    ezfh: ['ezfh'],
+    dhh: ['rh_dhh', 'rhdhh', 'dhh'],
+    rh: ['rh_dhh', 'rhdhh', 'rh'],
+    rmh: ['rh_dhh', 'rhdhh', 'rmh'],
+    etw: ['etw', 'we', 'wohnung'],
+    mfh: ['mfh'],
+  };
+  const _roh = String(zweig || objektart || '').toLowerCase().trim();
+  let satz = null;
+  if (_roh) {
+    const kandidaten = PTYPE_ZU_ZWEIG[_roh] || [_roh];
+    for (const z of kandidaten) {
+      const t = alle.filter((x) => String(x.zweig || '').toLowerCase().trim() === z
+                                || String(x.objektart || '').toLowerCase().trim() === z);
+      if (t.length === 1) { satz = t[0]; break; }
+      if (t.length > 1) {
+        /* Mehrere Jahrgaenge: der juengste gilt, die aelteren sind
+           Dokumentation (dieselbe Regel wie waehleAusGruppe). */
+        const jung = Math.max(...t.map((x) => Number(x.berichtsjahr) || 0));
+        const j = t.filter((x) => (Number(x.berichtsjahr) || 0) === jung);
+        if (j.length === 1) { satz = j[0]; break; }
+      }
+    }
+  }
+  if (!satz) satz = zweigWaehlen(alle, gefuehrt, zweig || objektart, arg.baujahr || null);
+
+  if (!satz) {
+    return { verfuegbar: false, grund: 'objektart_nicht_abgeleitet',
+      hinweis: 'Der Gutachterausschuss hat für diese Objektart keinen '
+        + 'Erbbaurechtskoeffizienten abgeleitet. Geführt werden: ' + gefuehrt.join(', ')
+        + '. Koeffizienten anderer Objektarten dürfen nicht übertragen werden '
+        + '(§ 10 ImmoWertV).',
+      ausschuss: alle[0].gaa_name || null, gefuehrte_zweige: gefuehrt };
+  }
+
+  const luecke = unvollstaendig(satz);
+  if (luecke) { luecke.zweig = satz.zweig; return luecke; }
+
+  const k = Number((satz.formel || {}).wert);
+  if (!Number.isFinite(k) || !(k > 0)) {
+    return { verfuegbar: false, grund: 'kein_wert', ausschuss: satz.gaa_name || null };
+  }
+
+  const r = {
+    verfuegbar: true,
+    wert: k,
+    einheit: 'faktor',
+    wert_art: (satz.formel || {}).wert_art || null,
+    spanne: (satz.formel || {}).spanne || null,
+    herkunft: 'register',
+    zweig: satz.zweig,
+    ausschuss: satz.gaa_name || null,
+    gebiet: satz.gebiet_name || null,
+    fallzahl: satz.fallzahl ?? null,
+    streuung: satz.streuung ?? null,
+    stichtag: satz.stichtag || null,
+    berichtsjahr: satz.berichtsjahr ?? null,
+    modellversion: satz.modellversion || null,
+    stufe: satz.stufe || null,
+    indikativ: satz.indikativ === true,
+    fundstelle: satz.fundstelle || null,
+    quelle_url: satz.quelle_url || null,
+    quellenvermerk: satz.quellenvermerk || null,
+    lizenz: satz.lizenz || null,
+    modellansaetze: satz.modellansaetze || {},
+    geltungsbereich: satz.geltungsbereich || null,
+    quelle_text: (satz.gaa_name || 'Gutachterausschuss')
+      + (satz.berichtsjahr ? ', Grundstücksmarktdaten ' + satz.berichtsjahr : '')
+      + (satz.fundstelle ? ', ' + satz.fundstelle : ''),
+    hinweis: (satz.formel || {}).hinweis || null,
+  };
+
+  /* Liegt der Wert des Volleigentums vor, wird gleich gerechnet - genau
+     so, wie es das Anwendungsbeispiel des Ausschusses vormacht. */
+  const V = Number(volleigentum_eur);
+  if (Number.isFinite(V) && V > 0) {
+    r.volleigentum_eur = Math.round(V);
+    r.erbbaurecht_eur = Math.round(V * k);
+    r.abschlag_eur = Math.round(V * k) - Math.round(V);
+    r.abschlag_pct = Math.round((k - 1) * 1000) / 10;
+    if (r.spanne && r.spanne.length === 2) {
+      r.erbbaurecht_spanne_eur = [Math.round(V * r.spanne[0]), Math.round(V * r.spanne[1])];
+    }
+    r.rechenweg = Math.round(V).toLocaleString('de-DE') + ' \u20ac \u00d7 '
+      + String(k).replace('.', ',') + ' = ' + Math.round(V * k).toLocaleString('de-DE') + ' \u20ac';
+  }
+  return r;
+}
+
+/**
+ * v1343 · WO BEKOMME ICH DIESE WERTE HER?
+ *
+ * Marcels Frage: „wenn die Adresse eingegeben ist, dass du automatisch
+ * dort ranschreibst, wo man die herbekommt. Also die Gutachterausschuesse
+ * oder so, dass du gleich den Link ausgibst."
+ *
+ * Das Register fuehrt zu jedem Satz Fundstelle, Quell-URL, Lizenz und
+ * Berichtsjahr — 31 verschiedene amtliche Quellen. Gelesen hat sie bisher
+ * nur der Bericht, wenn ein Wert TATSAECHLICH gerechnet wurde. Wer den
+ * Wert von Hand eintragen soll, bekam nichts.
+ *
+ * Diese Auskunft dreht das um: sie sagt fuer einen Ort, WAS hinterlegt ist
+ * (dann muss man nichts suchen), und WO es steht, wenn nicht.
+ *
+ * KEIN ERFUNDENER LINK. Ausgegeben wird nur, was im Registersatz belegt
+ * ist, plus das bundesweite BORIS-D-Portal — das steht seit v1077 in
+ * `connectors/boris/registry.js` als geprueft.
+ */
+const KENNZAHL_NAME = {
+  liegenschaftszinssatz: 'Liegenschaftszinssatz',
+  sachwertfaktor: 'Sachwertfaktor',
+  erbbaurechtskoeffizient: 'Erbbaurechtskoeffizient',
+  erbbauzinssatz: 'Erbbauzinssatz',
+  bodenpreisniveau: 'Bodenpreisniveau',
+  durchschnittspreis: 'Durchschnittspreis',
+  preisentwicklung: 'Preisentwicklung',
+  bodenpreisindex: 'Bodenpreisindex',
+};
+
+/* Die Kennzahlen, die ein Sachverstaendiger im Zusatzwerte-Block von Hand
+   eintragen koennte. Reihenfolge = Reihenfolge der Anzeige. */
+
+const QUELLEN_KENNZAHLEN = ['liegenschaftszinssatz', 'sachwertfaktor',
+  'erbbaurechtskoeffizient', 'erbbauzinssatz', 'bodenpreisniveau',
+  'durchschnittspreis', 'preisentwicklung'];
+
+export function quellen({ ags } = {}) {
+  const out = { ags: ags || null, ausschuss: null, gebiet: null,
+                hinterlegt: [], fehlt: [], portale: [] };
+  if (!ags) { out.grund = 'keine_ags'; return out; }
+
+  for (const k of QUELLEN_KENNZAHLEN) {
+    const saetze = finde(k, ags).filter((x) => ebeneErlaubt(k, x));
+    if (!saetze.length) { out.fehlt.push({ kennzahl: k, name: KENNZAHL_NAME[k] || k }); continue; }
+    /* Der juengste Jahrgang steht vorn. */
+
+    const jung = saetze.slice().sort((a, b) => (Number(b.berichtsjahr) || 0) - (Number(a.berichtsjahr) || 0));
+    const s0 = jung[0];
+    if (!out.ausschuss && s0.gaa_name) out.ausschuss = s0.gaa_name;
+    if (!out.gebiet && s0.gebiet_name) out.gebiet = s0.gebiet_name;
+    out.hinterlegt.push({
+      kennzahl: k,
+      name: KENNZAHL_NAME[k] || k,
+      zweige: jung.map((x) => x.zweig).filter(Boolean),
+      werte: jung.map((x) => ({
+        zweig: x.zweig || null,
+        wert: (x.formel && x.formel.form === 'konstante') ? x.formel.wert : null,
+        liefert: (x.formel && x.formel.liefert) || null,
+        spanne: (x.formel && x.formel.spanne) || null,
+        stufe: x.stufe || null,
+        fallzahl: x.fallzahl ?? null,
+      })),
+      berichtsjahr: s0.berichtsjahr ?? null,
+      fundstelle: s0.fundstelle || null,
+      quelle_url: s0.quelle_url || null,
+      quellenvermerk: s0.quellenvermerk || null,
+      lizenz: s0.lizenz || null,
+      gebiet: s0.gebiet_name || null,
+      ausschuss: s0.gaa_name || null,
+    });
+  }
+
+  /* Ein handgeschriebenes Modul ist mehr wert als ein Registersatz — es
+     traegt das ganze Modell, nicht nur eine Zahl. */
+  const modul = zustaendig(ags);
+  if (modul) {
+    out.modul = { name: modul.name, bericht: modul.bericht || null,
+                  berichtsjahr: modul.berichtsjahr ?? null };
+    if (!out.ausschuss) out.ausschuss = modul.name;
+  }
+
+  /* Bodenrichtwerte kommen nicht aus dem Register, sondern aus BORIS.
+     Das bundesweite Portal ist in connectors/boris/registry.js als
+     geprueft gefuehrt; laenderspezifische Portale werden hier NICHT
+     geraten. */
+  out.portale.push({
+    fuer: 'Bodenrichtwert',
+    name: 'BORIS-D (bundesweites Portal der Gutachterausschüsse)',
+    url: 'https://www.bodenrichtwerte-boris.de/',
+    hinweis: 'Adresse suchen, auf das Grundstück klicken, Wert und Stichtag ablesen. '
+      + 'Auf die richtige Nutzungsart achten — für eine Wohnung ist das die Wohnbaufläche.',
+  });
+
+  return out;
+}
+
 export function bodenpreisniveau({ ags, nutzungsart, lage } = {}) {
+
+
   const treffer = finde('bodenpreisniveau', ags);
   if (!treffer.length) {
     return { verfuegbar: false, grund: 'kein_niveau_hinterlegt',
@@ -915,6 +1307,8 @@ export function bezugsgroesse(ags) {
 }
 
 export default { AUSSCHUESSE, zustaendig, sachwertfaktor, gartenland,
+  erbbaurechtskoeffizient,   /* v1339 */
+  quellen,                   /* v1343 */
   bezugsgroesse, kreisAus, liegenschaftszinssatz, bodenpreisniveau,
   marktdaten, durchschnittspreis, vergleichsfaktor, bodenpreisindex,
   registerStand };

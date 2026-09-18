@@ -152,7 +152,163 @@ function _buildDeal2FromState() {
   return deal;
 }
 
+/* === v1356 - DIE PERSOENLICHE SCHMERZGRENZE BEKOMMT EINEN LESER =====
+   Beim Audit gemessen: die drei Felder unter „Persoenliche Mindest-
+   Schwellen" - min_dscr, min_cashflow_vor_st, max_ltv - wurden vom
+   Formular geschrieben, in config.js vorbelegt (1,20 / 0 EUR / 90 %)
+   und von NIEMANDEM gelesen. Gegengeprueft ueber alle Konsumenten des
+   Profils: main.js fragt sieben Schluessel ab, keiner davon ist dabei,
+   und auch sonst kein Treffer im Frontend, im Backend oder in einer
+   Anzeige.
+
+   Marcel trug dort eine Zahl ein, sah sie beim naechsten Oeffnen wieder
+   und durfte annehmen, sie wirke. Ein Feld ohne Leser sieht aus wie ein
+   Feld - in dieser Sitzung zum siebten Mal.
+
+   ER HAT SICH FUERS ANSCHLIESSEN ENTSCHIEDEN, nicht fuers Wegraeumen:
+   die Schwellen stehen jetzt als eigene Ampel neben dem Score.
+
+   WARUM NEBEN DEM SCORE UND NICHT IM SCORE: die Schwellen sind seine
+   persoenliche Kaufgrenze, keine Bewertung. Ein Objekt kann 82 Punkte
+   holen und trotzdem unter seinem Mindest-DSCR liegen. Wuerde die
+   Schwelle in den Score einfliessen, waere sie nicht mehr ablesbar -
+   und der Score haette zwei Bedeutungen.
+
+   DIE ISTWERTE KOMMEN AUS `deal`, nicht aus einer zweiten Rechnung.
+   `_buildDeal2FromState()` traegt dscr, ltv und cashflowMonatlich
+   bereits - dieselben Zahlen, die auch der Score benutzt. Eine eigene
+   KPI-Berechnung daneben waere die naechste Doppelrechnung.
+
+   Statusfarben bleiben Statusfarben: Gruen und Rot werden NICHT
+   tokenisiert, sie bedeuten in jeder Marke dasselbe. */
+function _ds2Schwelle(name, soll, ist, einheit, besserIstGroesser, nachkomma, spanne, leerText) {
+  /* Number(null) ist 0 und besteht Number.isFinite - deshalb zuerst auf
+     Abwesenheit pruefen, dann rechnen. */
+  var hatSoll = (soll != null && soll !== '' && isFinite(Number(soll)));
+  var hatIst  = (ist  != null && ist  !== '' && isFinite(Number(ist)));
+  if (!hatSoll) return '';
+
+  var sollN = Number(soll);
+  var istN  = hatIst ? Number(ist) : null;
+
+  var zustand = 'unbekannt';
+  if (hatIst) {
+    var erfuellt = besserIstGroesser ? (istN >= sollN) : (istN <= sollN);
+    if (erfuellt) {
+      zustand = 'erfuellt';
+    } else {
+      /* v1356b - DIE SPANNE KOMMT VON AUSSEN, SIE WIRD NICHT GERECHNET.
+         Erst stand hier `Math.abs(sollN) * 0.1` - eine Zehntel-Spanne.
+         Gemessen im Trockentest fiel auf: die Formel passt fuer den DSCR
+         (0,12 um 1,20), ist beim LTV viel zu weit (9 Prozentpunkte, damit
+         gilt 95 % gegen eine Grenze von 90 % noch als „knapp") und beim
+         Cashflow-Sollwert 0 viel zu eng, weil `Math.abs(0)*0.1 || 0.1`
+         auf zehn Cent faellt.
+
+         Eine Formel, die fuer alle drei gleichzeitig falsch ist, ist
+         schlechter als drei ehrliche Zahlen. Die Spanne gehoert zur
+         Kennzahl, nicht zur Rechnung. */
+      var sp = (spanne != null && isFinite(Number(spanne))) ? Math.abs(Number(spanne)) : 0;
+      var abstand = Math.abs(istN - sollN);
+      zustand = (sp > 0 && abstand <= sp) ? 'knapp' : 'verfehlt';
+
+    }
+  }
+
+  var farbe = zustand === 'erfuellt' ? '#2FBE6E'
+            : zustand === 'knapp'    ? '#E5BD53'
+            : zustand === 'verfehlt' ? '#D55B5B'
+            : 'var(--g-leer, rgba(255,255,255,0.30))';
+  var zeichen = zustand === 'erfuellt' ? '\u2713'
+              : zustand === 'knapp'    ? '\u2248'
+              : zustand === 'verfehlt' ? '\u2717'
+              : '\u2013';
+
+  function zahl(v) {
+    if (v == null) return '\u2013';
+    var n = Number(v);
+    var k = (nachkomma == null) ? 2 : nachkomma;
+    return n.toLocaleString('de-DE', { minimumFractionDigits: k, maximumFractionDigits: k });
+  }
+
+  return '<div class="ds2-grenze-zeile">' +
+    '<span class="ds2-grenze-ampel" style="color:' + farbe + '">' + zeichen + '</span>' +
+    '<span class="ds2-grenze-name">' + name + '</span>' +
+    '<span class="ds2-grenze-ist" style="color:' + farbe + '">' +
+      (hatIst ? zahl(istN) + einheit : (leerText || 'keine Angabe')) + '</span>' +
+    '<span class="ds2-grenze-soll">' + (besserIstGroesser ? 'min. ' : 'max. ') +
+      zahl(sollN) + einheit + '</span>' +
+  '</div>';
+}
+
+function _ds2GrenzenBlock(deal, aufHell) {
+  var P = window.DealPilotInvestmentProfile;
+  var D = (window.DealPilotConfig && window.DealPilotConfig.investmentProfileDefaults) || {};
+  function soll(k) {
+    var v;
+    try { if (P && typeof P.get === 'function') v = P.get(k); } catch (e) {}
+    if (v == null || v === '' || !isFinite(Number(v))) v = D[k];
+    return (v == null || v === '' || !isFinite(Number(v))) ? null : Number(v);
+  }
+
+  /* v1357c - NULL IST KEIN WERT, UND d_total GIBT ES NICHT.
+     Zwei Befunde nacheinander, beide am Objekt d9f56595 gemessen:
+
+     ERSTENS liefert die KPI-Engine ohne eingetragene Finanzierung
+     dscr = 0 und ltv = 0. Die Ampel las das als „Grenze 1,20 verfehlt"
+     und zeigte ein rotes Kreuz - obwohl es kein Darlehen gibt, das
+     gedeckt werden muesste. Dieselbe Falle wie in CLAUDE.md:
+     Number(null) ist 0 und besteht Number.isFinite.
+
+     ZWEITENS stand im ersten Anlauf `State.kpis.d_total` als Pruefung
+     da - diesen Schluessel gibt es dort nicht. Die Pruefung war damit
+     IMMER falsch, und beide Zeilen sagten immer „ohne Finanzierung".
+     Ein Leser, der ins Leere greift, sieht aus wie ein Leser - zum
+     achten Mal in dieser Sitzung. Gefunden nur, weil der Durchlauf mit
+     Eigenkapital dasselbe Ergebnis lieferte wie der ohne.
+
+     Die Schluessel, die es wirklich gibt, sind `kd_dscr` (Kapitaldienst)
+     und `d1` (Darlehen). Sie werden getrennt geprueft, weil sie
+     verschiedene Fragen beantworten: der DSCR deckt den KAPITALDIENST,
+     der LTV misst die DARLEHENSSUMME. */
+  var _k = (window.State && State.kpis) ? State.kpis : {};
+  function _pos(v) { return (v != null && isFinite(Number(v)) && Number(v) > 0); }
+  var hatKapitaldienst = _pos(_k.kd_dscr);
+  var hatDarlehen      = _pos(_k.d1) || _pos(_k.kd_dscr);
+
+  /* Die Zahl vor dem Text ist die Spanne, ab der es nicht mehr „knapp"
+     heisst. Sie gehoert zur Kennzahl und steht deshalb hier, nicht in
+     einer Formel: 0,10 beim DSCR, 100 Euro beim Monats-Cashflow, zwei
+     Prozentpunkte beim LTV. */
+  var zeilen =
+    _ds2Schwelle('Kapitaldienstdeckung (DSCR)', soll('min_dscr'),
+                 hatKapitaldienst ? deal.dscr : null, '', true, 2, 0.10,
+                 'ohne Finanzierung') +
+    _ds2Schwelle('Cashflow vor Steuer', soll('min_cashflow_vor_st'),
+                 deal.cashflowMonatlich, '\u00a0\u20ac/Mon', true, 0, 100) +
+    _ds2Schwelle('Beleihungsauslauf (LTV)', soll('max_ltv'),
+                 hatDarlehen ? deal.ltv : null, '\u00a0%', false, 1, 2,
+                 'ohne Finanzierung');
+
+
+
+
+  if (!zeilen) return '';
+
+  return '<div class="ds2-grenzen' + (aufHell ? ' ds2-grenzen-hell' : '') + '">' +
+    '<div class="ds2-grenzen-kopf">' +
+      '<span>Deine Kaufgrenzen</span>' +
+      '<span class="ds2-grenzen-quelle">Einstellungen \u203a Standardwerte</span>' +
+    '</div>' +
+    zeilen +
+    '<div class="ds2-grenzen-fuss">Diese Grenzen sind deine eigenen und flie\u00dfen ' +
+      '<strong>nicht</strong> in den Score ein \u2014 ein Objekt kann gut bewertet sein ' +
+      'und trotzdem unter deiner Grenze liegen.</div>' +
+  '</div>';
+}
+
 function renderDealScore2() {
+
   var box = document.getElementById('dealscore2-box');
   if (!box) return;
   if (!window.DealScore2) return;
@@ -178,12 +334,40 @@ function renderDealScore2() {
     return;
   }
 
+  /* ═══ v1363 · DENSELBEN SCORE NICHT ZWEIMAL RECHNEN ══════════════════
+     Gemessen vor v1362: eine Eingabe im Kaufpreisfeld loeste ACHT
+     Score-Berechnungen aus. v1362 hat die Haelfte beseitigt (der Header
+     rechnete, bevor der Cache gefuellt war). Uebrig blieben vier, davon
+     zwei von hier.
+
+     `_dpComputeDS2Cached()` in calc.js rechnet unmittelbar vor dem
+     Rendern genau dasselbe: derselbe `_buildDeal2FromState()`, dieselbe
+     `compute()`. Seit v1363 legt es Ergebnis, Deal UND Zeitpunkt ab.
+
+     WARUM EIN ZEITFENSTER UND KEIN SCHLAUER VERGLEICH: „stammt dieser
+     Cache aus demselben Zustand?" laesst sich nicht zuverlaessig pruefen,
+     ohne den Zustand selbst zu vergleichen - und das waere teurer als
+     die Rechnung. 300 ms sind kurz genug, dass in der Zwischenzeit keine
+     Eingabe passiert sein kann, ohne dass calc() erneut lief und den
+     Cache erneuert haette. Ist der Cache aelter oder fehlt er, wird wie
+     bisher gerechnet.
+
+     KEINE EINSCHRAENKUNG: derselbe Wert, nur nicht doppelt. Wer den
+     Panel ohne vorhergehendes calc() oeffnet, bekommt die eigene
+     Rechnung - genau wie vorher. */
   var deal, result;
   try {
-    deal = _buildDeal2FromState();
-    result = window.DealScore2.compute(deal);
+    var _frisch = (window._dpLastDS2Zeit && (Date.now() - window._dpLastDS2Zeit) < 300);
+    if (_frisch && window._dpLastDS2Result && window._dpLastDS2Deal) {
+      deal = window._dpLastDS2Deal;
+      result = window._dpLastDS2Result;
+    } else {
+      deal = _buildDeal2FromState();
+      result = window.DealScore2.compute(deal);
+    }
     try { window._dpLastDs2 = result; } catch (e) {}
   } catch (err) {
+
     // V43: Defensiv — wenn compute crasht (z.B. wegen ungültiger Energieklasse), Fallback statt Crash
     console.warn('[ds2] compute fehlgeschlagen:', err.message);
     box.innerHTML = '<div style="text-align:center;color:var(--muted);padding:30px">' +
@@ -261,11 +445,23 @@ function renderDealScore2() {
             '📋 Welche KPIs fehlen noch?' +
           '</button>' +
         '</div>' +
-        '<div class="ds2-threshold-hint">' +
+        '<div class="ds2-threshold-hint">'  +
           'Trag in den Tabs <strong>Objekt</strong> (Lage, Energieklasse, Zustand), ' +
           '<strong>Bewirtschaftung</strong> und <strong>Steuer</strong> die fehlenden Werte ein.' +
         '</div>' +
-      '</div>';
+      '</div>' +
+      /* === v1357 - DIE KAUFGRENZEN WARTEN NICHT AUF DEN SCORE ==========
+         Gemessen am Objekt d9f56595: Kaufpreis 300.000, Miete 900 - DSCR,
+         Cashflow und LTV stehen damit fest, aber der Investor Deal Score
+         erscheint erst ab 70 % von 24 KPIs (hier: 46 %). Die Ampel hing
+         an ihm und war deshalb genau dann unsichtbar, wenn man sie am
+         dringendsten braucht: beim ersten Blick auf ein neues Objekt.
+
+         Marcels Kaufgrenzen brauchen keine 24 Kennzahlen. Sie brauchen
+         drei, und die drei stehen mit Kaufpreis, Miete und Finanzierung.
+         `deal` wird ohnehin VOR dieser Pruefung gebaut - der Block kostet
+         also keine zusaetzliche Rechnung. */
+      _ds2GrenzenBlock(deal, true);
     if (typeof window._updateDs2CollapseSummary === 'function') {
       window._updateDs2CollapseSummary(null, 'Daten unvollständig (' + pct + '%)');
     }
@@ -372,7 +568,10 @@ function renderDealScore2() {
         '<div class="ds-metrics ds2-metrics">' + catBars + '</div>' +
       '</div>' +
 
+      _ds2GrenzenBlock(deal) +
+
       '<div class="ds2-pn-grid">' +
+
         '<div class="ds2-pn-col ds2-pn-pos"><h5>Positive Faktoren</h5><ul>' + posHtml + '</ul></div>' +
         '<div class="ds2-pn-col ds2-pn-neg"><h5>Negative Faktoren</h5><ul>' + negHtml + '</ul></div>' +
       '</div>' +
@@ -453,7 +652,84 @@ function _ds2BuildSettingsOverlay() {
   return ov;
 }
 
+/* === v1352 - DIE PROFILKARTE ZEIGT IHRE GEWICHTE ======================
+   Zwei Befunde aus dem Audit, beide gemessen im Reiter Deal Score:
+
+   1. GLEICHE HOEHE, WEIL EIN SATZ ZU LANG WAR. Die sechs Karten standen
+      in zwei Reihen von 161 und 143 Pixeln. Ursache war genau EIN Text:
+      "Konservativ" hatte 122 Zeichen und brauchte vier Zeilen statt drei,
+      das Raster streckte die ganze erste Reihe mit. Kein Layoutfehler -
+      ein Textfehler.
+
+   2. PROSA SAGT NICHTS. Marcel woertlich: "Wie setzen sie sich zusammen?
+      Welchen Einfluss haben sie auf den Score? Das gehoert sichtbar."
+      "Strengere Bewertung mit Fokus auf Substanz" beantwortet das nicht.
+      40 % Lage statt 10 % beantwortet es.
+
+   Die Karte traegt deshalb jetzt einen Balken aus den fuenf echten
+   Hauptgewichten (Quelle: getPresets(), v1352 - abgeleitet, nicht
+   getippt) und darunter die zwei staerksten in Worten. Der Balken hat
+   feste Hoehe, die Zeile darunter genau eine - damit sind alle Karten
+   gleich hoch, ohne dass irgendwo etwas abgeschnitten wird.
+
+   Die Schaerfe steht daneben, weil die Gewichte den zweiten Hebel
+   verschweigen: Konservativ verlangt 8 % Bruttorendite fuer dieselben
+   80 Punkte, fuer die Optimistisch 6 % genuegen. Zwei Profile koennen
+   identische Gewichte haben und trotzdem verschieden streng sein. */
+/* v1353: die Reihenfolge der Toene wechselt bewusst zwischen hell und
+   dunkel. Vorher liefen sie von hell nach dunkel durch und ergaben im
+   Screenshot eine einzige goldene Flaeche. Nebeneinander stehen jetzt nie
+   zwei benachbarte Helligkeiten. */
+var _DS2_KAT = {
+  rendite:      { kurz: 'Rendite',  farbe: 'var(--wl-c9a84c, #C9A84C)' },  /* mittel  */
+  finanzierung: { kurz: 'Finanz.',  farbe: 'var(--wl-f0d98a, #F0D98A)' },  /* hell    */
+  risiko:       { kurz: 'Risiko',   farbe: 'var(--wl-7a5d18, #7a5d18)' },  /* dunkel  */
+  lage:         { kurz: 'Lage',     farbe: 'var(--wl-e8cc7a, #E8CC7A)' },  /* hell    */
+  upside:       { kurz: 'Upside',   farbe: 'var(--wl-b8932f, #b8932f)' }   /* dunkler */
+};
+
+var _DS2_REIHE = ['rendite', 'finanzierung', 'risiko', 'lage', 'upside'];
+
+function _ds2GewichtBalken(w) {
+  if (!w) return '';
+  var summe = 0;
+  _DS2_REIHE.forEach(function (k) { summe += (Number(w[k]) || 0); });
+  if (!summe) return '';
+  var seg = _DS2_REIHE.map(function (k) {
+    var v = Number(w[k]) || 0;
+    if (!v) return '';
+    var kat = _DS2_KAT[k];
+    return '<span class="ds2-pw-seg" style="flex:' + v + ';background:' + kat.farbe + '" ' +
+           'title="' + kat.kurz + ' ' + v + ' %"></span>';
+  }).join('');
+  return '<span class="ds2-pw-bar" aria-hidden="true">' + seg + '</span>';
+}
+
+/* Die zwei staerksten Treiber in Worten - bei Gleichstand die Reihenfolge
+   aus _DS2_REIHE, damit dieselbe Konfiguration immer denselben Text ergibt. */
+function _ds2GewichtText(w) {
+  if (!w) return '';
+  var sortiert = _DS2_REIHE.slice().sort(function (a, b) {
+    var d = (Number(w[b]) || 0) - (Number(w[a]) || 0);
+    return d !== 0 ? d : (_DS2_REIHE.indexOf(a) - _DS2_REIHE.indexOf(b));
+  });
+  return sortiert.slice(0, 2).map(function (k) {
+    return _DS2_KAT[k].kurz + ' ' + (Number(w[k]) || 0) + ' %';
+  }).join(' \u00b7 ');
+}
+
+function _ds2Schaerfe(p) {
+  if (!p || !p.schaerfe) return '';
+  var t = (p.schaerfe > 0) ? 'strenger' : 'lockerer';
+  var wie = (p.schwelle80 != null)
+    ? ' \u2014 ' + String(p.schwelle80).replace('.', ',') + ' % Bruttorendite f\u00fcr 80 Punkte'
+    : '';
+  return '<span class="ds2-pw-schaerfe ds2-pw-s' + (p.schaerfe > 0 ? 'plus' : 'minus') + '" ' +
+         'title="Schwellen ' + t + wie + '">' + (p.schaerfe > 0 ? '\u25b2' : '\u25bc') + ' ' + t + '</span>';
+}
+
 function _ds2FillSettingsForm() {
+
   var cfg = window.DealScore2.loadConfig();
   // V63.21: Wenn Inline-Container im Settings-Modal existiert, diesen befüllen.
   // Sonst (Legacy-Path) den ursprünglichen ds2-settings-body im DS2-Modal befüllen.
@@ -474,18 +750,30 @@ function _ds2FillSettingsForm() {
     var isActive = (activePreset === p.key);
     html += '<button type="button" class="ds2-preset-card' + (isActive ? ' ds2-preset-active' : '') + '" ' +
               'onclick="ds2SetPreset(\'' + p.key + '\')" data-preset="' + p.key + '">' +
-              '<div class="ds2-preset-icon">' + p.icon + '</div>' +
-              '<div class="ds2-preset-label">' + p.label + '</div>' +
-              '<div class="ds2-preset-desc">' + p.description + '</div>' +
+              '<div class="ds2-preset-top">' +
+                '<span class="ds2-preset-icon">' + p.icon + '</span>' +
+                '<span class="ds2-preset-label">' + p.label + '</span>' +
+              '</div>' +
+              _ds2GewichtBalken(p.weights) +
+              '<div class="ds2-preset-zahlen">' + _ds2GewichtText(p.weights) +
+                (p.schaerfe ? ' ' + _ds2Schaerfe(p) : '') + '</div>' +
+              '<div class="ds2-preset-desc" title="' + String(p.description || '').replace(/"/g, '&quot;') + '">' +
+                (p.description || '') + '</div>' +
             '</button>';
+
   });
   // Custom-Karte (nur sichtbar wenn der User manuell editiert hat)
   if (activePreset === 'custom') {
     html += '<button type="button" class="ds2-preset-card ds2-preset-active" data-preset="custom">' +
-              '<div class="ds2-preset-icon">✎</div>' +
-              '<div class="ds2-preset-label">Benutzerdefiniert</div>' +
+              '<div class="ds2-preset-top">' +
+                '<span class="ds2-preset-icon">✎</span>' +
+                '<span class="ds2-preset-label">Benutzerdefiniert</span>' +
+              '</div>' +
+              _ds2GewichtBalken(cfg.weights) +
+              '<div class="ds2-preset-zahlen">' + _ds2GewichtText(cfg.weights) + '</div>' +
               '<div class="ds2-preset-desc">Manuell angepasste Werte. Klick auf eines der Profile oben, um es zu überschreiben.</div>' +
             '</button>';
+
   }
   html += '</div></div>';
 

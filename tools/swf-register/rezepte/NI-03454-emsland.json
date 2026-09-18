@@ -1,0 +1,83 @@
+{
+  "land_code": "NI",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Osnabrück-Meppen, Bereich Landkreis Emsland",
+  "gaa_kennz": "03454",
+  "ags": ["03454"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "05.07.2023 bis 29.09.2025",
+  "beschlossen": "2026-01",
+  "veroeffentlicht": "2026-03-20",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_osmep_osmepel",
+  "quelle_datei": "Tableau-Dashboard 2026_sw_rh_osmep_osmepel/Dash, abgetastet am 14.09.2026",
+  "quellenvermerk": "Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis 01.01.2026, Tag der Veröffentlichung 20.03.2026",
+  "lizenz": "frei zugänglich, kostenfreier Abruf",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Anwendung setzt eine modellkonforme Wertermittlung nach der Modellbeschreibung Sachwertfaktoren des Ausschusses voraus (NHK 2010, Regionalfaktor 1,0, GND 80 Jahre, lineare Alterswertminderung, RND nach Anlage 2 ImmoWertV, Außenanlagen pauschal).",
+  "fundstelle": "Kalkulator „Sachwertfaktoren für ein Reihenhaus/Doppelhaushälfte — Landkreis Emsland“ nebst Diagramm „Sachwertfaktoren in Abhängigkeit von Lage und Sachwert“ und „Umrechnungskoeffizienten für abweichendes modifiziertes Baujahr“.",
+
+  "modellansaetze": {
+    "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+    "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+    "gnd_jahre": 80,
+    "regionalfaktor": 1.0,
+    "alterswertminderung": "linear (§ 38 ImmoWertV)",
+    "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+    "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+    "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+    "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+    "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de"
+  },
+
+  "modelle": [
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhaus oder Doppelhaushälfte",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [150000, 175000, 200000, 225000, 250000, 275000, 300000, 325000, 350000, 375000, 400000],
+        "achse_y_feld": "brw",
+        "achse_y_bez": "Bodenrichtwert in €/m²",
+        "achse_y": [50, 100, 150, 200, 300],
+        "zellen": {
+          "50":  [1.16, 1.06, 0.98, 0.92, 0.86, 0.82, 0.78, 0.75, 0.72, 0.70, 0.68],
+          "100": [1.22, 1.11, 1.03, 0.96, 0.90, 0.86, 0.82, 0.78, 0.75, 0.73, 0.71],
+          "150": [1.26, 1.15, 1.06, 0.99, 0.93, 0.89, 0.84, 0.81, 0.78, 0.75, 0.73],
+          "200": [1.30, 1.18, 1.09, 1.02, 0.96, 0.91, 0.87, 0.83, 0.80, 0.77, 0.74],
+          "300": [1.37, 1.24, 1.15, 1.07, 1.00, 0.95, 0.91, 0.87, 0.83, 0.80, 0.78]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "98 Kauffälle, Standardabweichung durchgehend ±0,12 — die engste Streuung aller bisher geernteten Sätze. Die Werte sind am amtlichen Kalkulator ABGEFRAGT, Punkt für Punkt über die fünf abgedruckten Bodenrichtwertkurven (50, 100, 150, 200, 300 €/m²) und den abgedruckten Sachwertbereich 150.000 bis 400.000 €. Der Kalkulator rechnet darüber hinaus weiter; übernommen ist nur, was das Diagramm abdeckt.",
+        "normobjekt": "Modifiziertes Baujahr 1990 — die Vorgabe des Kalkulators, dort steht der Umrechnungskoeffizient auf 1,00. Stichprobe: Bodenrichtwert 26 bis 310 €/m² (Median 138), modifiziertes Baujahr 1958 bis 2024 (Median 1987), Kaufzeitpunkte 05.07.2023 bis 29.09.2025."
+      },
+      "korrekturen": [
+        {
+          "bez": "Abweichendes modifiziertes Baujahr",
+          "feld": "baujahr",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "1960": 0.85,
+            "1970": 0.90,
+            "1980": 0.95,
+            "1990": 1.0,
+            "2000": 1.05,
+            "2010": 1.09,
+            "2020": 1.14
+          },
+          "rundung_stellen": 2,
+          "hinweis": "Umrechnungskoeffizient aus dem zweiten Diagramm des Kalkulators, Normstelle 1990. Zwischen den abgedruckten Jahrzehnten wird interpoliert, wie die Kurve es zeichnet. WICHTIG: gemeint ist das MODIFIZIERTE Baujahr nach Anlage 2 ImmoWertV, nicht das tatsächliche — bei einem modernisierten Gebäude liegt es höher. Zwischen 1960 und 2020 liegen 29 Prozent."
+        }
+      ],
+      "beleg": "Kalkulator 2026_sw_rh_osmep_osmepel des Gutachterausschusses Osnabrueck-Meppen fuer den Landkreis Emsland, Wertermittlungsstichtag 01.01.2026, 98 Kauffaelle. 55 Stuetzstellen am Kalkulator abgefragt (fuenf Bodenrichtwertkurven mal elf Sachwerte), dazu die abgedruckte Kurve der Baujahres-Umrechnungskoeffizienten.",
+      "stufe": "A",
+      "stufe_grund": "Die Werte stammen aus dem amtlichen Kalkulator des Ausschusses selbst — nicht aus einer abgelesenen Kurve. Jede Zelle ist eine einzelne Auskunft desselben Rechners, den der Ausschuss der Öffentlichkeit zur Verfügung stellt.",
+      "fallzahl": 98
+    }
+  ]
+}

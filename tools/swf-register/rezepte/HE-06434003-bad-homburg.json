@@ -1,0 +1,98 @@
+{
+  "land_code": "HE",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Bad Homburg v. d. Höhe",
+  "gaa_kennz": "06434003",
+  "ags": ["06434003"],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2026,
+  "stichtag": "2025-01-01",
+  "auswertezeitraum": "Kaufverträge 01.10.2023 bis 31.12.2024",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-08",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_datei": "2026_IMB_Stadt_Bad Homburg.pdf, Immobilienmarktbericht 2026, Kapitel 11.1 und 11.2, Tabellen 11.1 und 11.2, Seiten 69 bis 72",
+  "quellenvermerk": "Gutachterausschuss für den Bereich der Stadt Bad Homburg v. d. Höhe, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 (Anlage 4 ImmoWertV), Baunebenkosten darin enthalten, kein Korrekturfaktor, Bezugsmaßstab Bruttogrundfläche, Baupreisindex quartalsweise zum Beurkundungsdatum, GESAMTNUTZUNGSDAUER 70 JAHRE nach Leitfaden I der ZGGH, wirtschaftliche Restnutzungsdauer mindestens 20 Jahre, lineare Alterswertminderung, Außenanlagen 2 bis 8 Prozent des vorläufigen Sachwerts, Bodenwert zum 01.01.2024, nur Baujahre 1950 bis 2020.",
+  "fundstelle": "Kapitel 11 Sachwertfaktoren, Tabelle 11.1 (Sachwertmodell) sowie Tabellen 11.1 und 11.2 (Faktoren), Seiten 69 bis 72.",
+
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 70,
+    "alterswertminderung": "linear",
+    "regionalfaktor": 1.0,
+    "bezugsmassstab": "BGF"
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [500000, 600000, 700000, 800000, 900000, 1000000,
+                    1100000, 1200000, 1300000, 1400000, 1500000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["800-2000"],
+        "kategorie_baender": [
+          { "von": 800, "bis": 2000, "kategorie": "800-2000" }
+        ],
+        "zellen": {
+          "800-2000": [1.265, 1.204, 1.156, 1.115, 1.080, 1.050, 1.024, 1.000, 0.979, 0.960, 0.942]
+        },
+        "rundung_stellen": 3,
+        "liefert": "faktor",
+        "hinweis": "20 Kauffälle, Bestimmtheitsmaß 0,3857. Der Bericht druckt zusätzlich die Regressionsformel k = 42,589 · vSW^-0,268 ab; hinterlegt ist BEWUSST die Tabelle, nicht die Formel — nachgerechnet weicht die Formel bei 500.000 Euro um ein Promille von der abgedruckten Tabelle ab (1,2638 gegen 1,265), weil die Koeffizienten gerundet abgedruckt sind. Bei 1.200.000 und 1.500.000 Euro stimmen beide zeichengleich überein. Der Prüfmaßstab ist die Tabelle des amtlichen Dokuments. Der Ausschuss weist ausdrücklich darauf hin, dass die Sachwertfaktoren KEINE signifikante Abhängigkeit vom Bodenrichtwert zeigten — deshalb nur eine einzige Bodenrichtwertklasse.",
+        "normobjekt": "Nur Baujahre 1950 bis 2020. Median des bereinigten Kaufpreises 1.090.000 Euro bei einem Bodenrichtwert von 1.250 Euro/qm, Mittelwert 1.077.065 Euro bei 1.375 Euro/qm. Garagen, Außenanlagen und Nebengebäude sind wertmäßig im Sachwert berücksichtigt, Außenanlagen mit 2 bis 8 Prozent des vorläufigen Sachwerts."
+      },
+      "korrekturen": [],
+      "beleg": "Immobilienmarktbericht 2026 des Gutachterausschusses für den Bereich der Stadt Bad Homburg v. d. Höhe, Kapitel 11.1, Tabelle 11.1, Seite 71.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle samt Regressionsformel und Bestimmtheitsmass. KEINE Stufe A: nur ZWANZIG Kauffaelle, Bestimmtheitsmass 0,3857, und der ausgewertete Bereich beginnt erst bei 500.000 Euro vorlaeufigem Sachwert.",
+      "fallzahl": 20
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser und Doppelhaushälften",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [200000, 300000, 400000, 500000, 600000, 700000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["800-1900"],
+        "kategorie_baender": [
+          { "von": 800, "bis": 1900, "kategorie": "800-1900" }
+        ],
+        "zellen": {
+          "800-1900": [1.587, 1.448, 1.356, 1.289, 1.237, 1.194]
+        },
+        "rundung_stellen": 3,
+        "liefert": "faktor",
+        "hinweis": "21 Kauffälle. Der Ausschuss stellt ausdrücklich fest, dass zwischen Reihenmittelhäusern, Reihenendhäusern und Doppelhaushälften KEINE signifikante Unterscheidung ermittelbar war — dieser eine Satz gilt für alle drei. Der Bodenrichtwertbereich reicht hier bis 1.900 Euro/qm, bei den freistehenden Häusern bis 2.000.",
+        "normobjekt": "Nur Baujahre 1950 bis 2020. Median des bereinigten Kaufpreises 650.000 Euro bei einem Bodenrichtwert von 1.100 Euro/qm, Mittelwert 649.626 Euro bei 1.074 Euro/qm."
+      },
+      "korrekturen": [],
+      "beleg": "Immobilienmarktbericht 2026 des Gutachterausschusses für den Bereich der Stadt Bad Homburg v. d. Höhe, Kapitel 11.2, Tabelle 11.2, Seite 72.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle. KEINE Stufe A: nur EINUNDZWANZIG Kauffaelle, und der Bericht weist fuer diesen Zweig kein eigenes Bestimmtheitsmass aus.",
+      "fallzahl": 21
+    }
+  ],
+
+  "anmerkungen": [
+    "ACHTUNG GESAMTNUTZUNGSDAUER: Bad Homburg rechnet mit 70 JAHREN, nicht mit 80. Der Bericht schreibt 'noch gem. Leitfaden I der ZGGH (70 Jahre)' — das 'noch' kündigt die Umstellung an. Wer diesen Faktor auf einen mit GND 80 ermittelten vorläufigen Sachwert anwendet, rechnet modellwidrig (§ 10 ImmoWertV). Die Nachbarn Frankfurt, Wiesbaden und Gießen stehen bereits auf 80, Oberursel wie Bad Homburg auf 70.",
+    "ACHTUNG STICHTAG: Der Bericht trägt das Jahr 2026, die Sachwertfaktoren sind aber zum 01.01.2025 aus Kaufverträgen vom 01.10.2023 bis 31.12.2024 ermittelt. Der Bodenwert der Auswertung bezieht sich auf den Bodenrichtwert zum 01.01.2024. Das ist kein Erntefehler, sondern steht so im Dokument.",
+    "Der Ausschuss ermittelt die Faktoren NUR in Abhängigkeit vom vorläufigen Sachwert, weil sich keine signifikante Abhängigkeit vom Bodenrichtwert zeigte. Die hinterlegten Bodenrichtwertbänder (800 bis 2.000 beziehungsweise 800 bis 1.900 Euro/qm) sind deshalb keine Differenzierung, sondern die Spanne, für die der Ausschuss seine Werte gelten lässt.",
+    "Kapitel 11.3 druckt die hessenweiten Faktoren der Zentralen Geschäftsstelle ab und stellt selbst fest, sie stimmten mit den örtlichen 'nur bedingt' überein, weil der Bodenrichtwertbereich in Bad Homburg nachfragebedingt erst in einem deutlich höheren Segment einsetze. Diese Landeswerte sind hier NICHT als Ortswert hinterlegt."
+  ]
+}

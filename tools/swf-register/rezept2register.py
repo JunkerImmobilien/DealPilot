@@ -54,6 +54,11 @@ ERLAUBT = {
                           'achse_y_feld','achse_y_bez','zellen','rundung_stellen',
                           'liefert','hinweis','normobjekt'},
     'matrix_kategorial': {'form','achse_x','achse_x_feld','achse_x_bez','achse_k_feld',
+                          # v1098d: Die Zuordnung ueber ein ZAHLENBAND gibt es im
+                          # Auswerter seit v1094 (kategorieAus, fuer Wiesbaden) -
+                          # hier fehlte sie. Ein Rezept mit kategorie_baender waere
+                          # am Werkzeug gescheitert, obwohl der Auswerter es kann.
+                          'kategorie_baender','zuordnung_feld','kategorie_zuordnung',
                           'achse_k_bez','kategorien','zellen','rundung_stellen',
                           'liefert','hinweis','normobjekt'},
     'matrix_band':       {'form','achse_x_feld','achse_x_bez','achse_y_feld','achse_y_bez',
@@ -70,6 +75,37 @@ ERLAUBT = {
                           'feld_2','bez_2','gueltig_2','rundung_stellen','liefert',
                           'hinweis','normobjekt'},
     'konstante':         {'form','wert','rundung_stellen','liefert','hinweis','normobjekt'},
+    # v1098i: Die Formen unten kennt der Auswerter seit v1088 bis v1093,
+    # im Werkzeug fehlten sie. Ein Rezept damit waere hier gescheitert,
+    # obwohl swf_modelle.js sie rechnet - dieselbe Luecke wie bei
+    # kategorie_baender (v1098d).
+    'baender_1d':        {'form','achse_feld','achse_bez','baender','rundung_stellen',
+                          'liefert','hinweis','normobjekt'},
+    'stufen_kategorial': {'form','achse_feld','achse_bez','kategorie_feld','kategorie_bez',
+                          'kategorien','stufen','rundung_stellen','liefert','hinweis',
+                          'normobjekt'},
+    'log_1d':            {'form','achse_feld','achse_bez','a','b','gueltig_von',
+                          'gueltig_bis','rundung_stellen','liefert','hinweis','normobjekt'},
+    'spanne_kategorial': {'form','achse_feld','achse_bez','kategorien','spannen',
+                          'rundung_stellen','liefert','hinweis','normobjekt'},
+    # v1101-WBKAT: Baender, die JE KATEGORIE anders laufen.
+    'baender_kategorial': {'form','achse_feld','achse_bez','achse_k_feld',
+                           'achse_k_bez','kategorien','kategorie_baender',
+                           'zuordnung_feld','kategorie_zuordnung','baender_je_kategorie',
+                           'rundung_stellen','liefert','hinweis','normobjekt'},
+    # v1103-WVERZ: je Kategorie ein VOLLSTAENDIGES Modell. Ersetzt das
+    # potenz_kategorial aus v1102 - Havelland braucht je Region andere
+    # ACHSEN, nicht nur andere Parameter.
+    'verzweigt': {'form','achse_k_feld','achse_k_bez','kategorien',
+                  'kategorie_baender','zuordnung_feld','kategorie_zuordnung','kategorie_sonst','kategorie_mehrdeutig','sonst_auch_ohne_wert',
+                  'modell_je_kategorie','rundung_stellen','liefert','hinweis',
+                  'normobjekt'},
+    # v1110: die Schluessel hier stimmten NIE mit dem Auswerter ueberein
+    # (basis/glieder gegen intercept/terme) - die Form war nie benutzt worden.
+    'regression_additiv': {'form','intercept','terme','diskret','aussen_exponent',
+                           'aussen_funktion',
+                           'rundung_stellen','liefert',
+                           'hinweis','normobjekt'},
 }
 
 # Schluessel, die NICHTS berechnen, sondern erklaeren. Sie duerfen in jeder
@@ -80,8 +116,15 @@ ERLAUBT = {
 # der Art "alles mit _bez ist Doku" wuerde einen Tippfehler in einem
 # rechnenden Schluessel mit durchlassen, und der waere ein stiller Rueckfall
 # auf den Standardwert des Auswerters.
+# v1100c-WBED: `bedingungen` beschreibt den Anwendungsbereich, den der
+# Bericht selbst nennt (Uckermark: nur Bodenrichtwert ueber 30 EUR/qm).
+# Sie gilt formunabhaengig und wird VOR der Rechnung geprueft.
 DOKU = {'zellen_schluessel', 'jahrgang', 'ci', 'umrechnung', 'vorbehalt',
-        'kategorien_bez', 'normierung', 'quelle_hinweis', 'fundstelle'}
+        'kategorien_bez', 'normierung', 'quelle_hinweis', 'fundstelle',
+        # `bedingungen` RECHNET nicht, aber es SPERRT - und das ist kein
+        # Dokumentationsschluessel im eigentlichen Sinn. Es steht hier, weil
+        # es in jeder Form vorkommen darf; geprueft wird es im Auswerter.
+        'bedingungen'}
 
 EBENEN = {'gemeinde', 'kreis', 'bezirk', 'gaa', 'land', 'bund'}
 EINHEITEN = {'faktor', 'prozent', 'zuschlag_prozent', 'wert_eur'}
@@ -89,7 +132,87 @@ EINHEITEN = {'faktor', 'prozent', 'zuschlag_prozent', 'wert_eur'}
 fehler = []
 
 
+# v1098-WKORR · Korrekturen liefen bis hierher UNGEPRUEFT durch.
+#
+# Der Auswerter kennt fuenf Arten. Steht in `art` etwas anderes - ein
+# Tippfehler genuegt -, faellt er in den `stufen`-Zweig, findet dort keine
+# Stufen und gibt `null` zurueck: KEINE Korrektur. Still. Das Ergebnis
+# bleibt plausibel, es ist nur falsch.
+#
+# Darum dieselbe Regel wie bei den Formeln: bekannte Schluessel je Art,
+# alles andere bricht ab.
+# Erlaubt in JEDER Art: "hinweis" erklaert die Korrektur im Bericht und
+# rechnet nicht mit. Er stand in den vorhandenen Rezepten und haette sie beim
+# ersten Lauf abbrechen lassen - gefunden vom Gegentest gegen die 14 NRW-Rezepte.
+KORREKTUR_DOKU = {'hinweis', 'fundstelle', 'quelle_hinweis', 'vorbehalt'}
+
+KORREKTUR_ARTEN = {
+    'stufen':     {'art','feld','bez','stufen','wirkung','rundung_stellen'},
+    'band':       {'art','feld','bez','baender','wirkung','rundung_stellen'},
+    'potenz':     {'art','feld','bez','basis','exponent','wirkung',
+                   'rundung_stellen','deckel_ab','deckel_wert','boden_ab','boden_wert'},
+    'linear':     {'art','feld','bez','a','b','wirkung',
+                   'rundung_stellen','deckel_ab','deckel_wert','boden_ab','boden_wert'},
+    'kategorial': {'art','feld','bez','werte','wirkung','rundung_stellen'},
+    # v1100-WK2D: eine Korrektur, die von einer ZAHL und einer KATEGORIE
+    # abhaengt - Oberhavel druckt die BGF-Korrektur je Region anders ab.
+    # v1408: 'kategorie_baender' leitet die Kategorie aus einer ZAHL ab -
+    # Hamburgs Modernisierungsfaktor braucht die Baujahrsklasse, und die
+    # steht in keinem Eingabefeld. Fuer die Modellachse gibt es den Weg
+    # seit v1094; hier fehlte er.
+    'stufen_kategorial': {'art','feld','bez','kategorie_feld','stufen',
+                           'kategorie_baender',
+                           'wirkung','rundung_stellen'},
+    # v1412: EINE KORREKTUR, DEREN WERTE WIR NICHT HABEN.
+    # Der Landkreis Verden fuehrt eine Kurve fuer abweichenden
+    # Energiebedarf - im Dashboard steht ihre Beschriftung, im PDF-Export
+    # aber KEINE Stuetzstelle; sie erscheint erst bei einer Auswahl.
+    #
+    # Bisher gab es dafuer nur zwei Wege, und beide sind falsch: die
+    # Korrektur weglassen (dann rechnet das Modell halb und niemand sieht
+    # es) oder Werte schaetzen (dann erfinden wir eine Zahl). Diese Art ist
+    # der dritte Weg - sie steht im Satz, traegt ihren Grund, und der
+    # Auswerter weist sie als OFFEN aus, statt sie anzuwenden.
+    'offen':      {'art','feld','bez','wirkung'},
+}
+
+
+def pruefe_korrekturen(datei, korrekturen):
+    for i, k in enumerate(korrekturen):
+        if not isinstance(k, dict):
+            meckern(datei, f'Korrektur {i}: kein Objekt')
+            continue
+        # Fehlt `art`, galt bisher `stufen` - das bleibt so, weil die
+        # vierzehn vorhandenen Rezepte es so schreiben.
+        art = k.get('art') or 'stufen'
+        if art not in KORREKTUR_ARTEN:
+            meckern(datei, f"Korrektur {i} ('{k.get('bez') or k.get('feld')}'): "
+                           f"unbekannte Art '{art}' - bekannt sind "
+                           + ', '.join(sorted(KORREKTUR_ARTEN)))
+            continue
+        fremd = set(k) - KORREKTUR_ARTEN[art] - DOKU - KORREKTUR_DOKU
+        if fremd:
+            meckern(datei, f"Korrektur {i} ('{k.get('bez') or k.get('feld')}', "
+                           f"Art '{art}'): unbekannte Schluessel "
+                           + ', '.join(sorted(fremd)))
+        if not k.get('feld'):
+            meckern(datei, f'Korrektur {i}: kein `feld`')
+        if k.get('wirkung') not in (None, 'additiv', 'multiplikativ'):
+            meckern(datei, f"Korrektur {i}: `wirkung` ist "
+                           f"'{k.get('wirkung')}' - erlaubt sind additiv und multiplikativ")
+        # Eine multiplikative Korrektur mit Wert 0 setzt das Ergebnis auf
+        # null. Das ist fast nie gemeint und immer eine Meldung wert.
+        if art == 'kategorial':
+            for name, wert in (k.get('werte') or {}).items():
+                if not isinstance(wert, (int, float)):
+                    meckern(datei, f"Korrektur {i}: '{name}' traegt keinen Zahlwert")
+                elif k.get('wirkung') == 'multiplikativ' and wert == 0:
+                    meckern(datei, f"Korrektur {i}: '{name}' ist multiplikativ 0")
+    return korrekturen
+
+
 def meckern(datei, text):
+
     fehler.append(f'{datei}: {text}')
 
 
@@ -138,6 +261,75 @@ def normalisiere(datei, m):
     if fremd:
         meckern(datei, f"unbekannte Schluessel in formel: {sorted(fremd)}")
         return None
+
+    # v1102-WEIND - EIN NAME DARF NUR IN EINER KATEGORIE STEHEN.
+    #
+    # GEFUNDEN an Barnim: `Stolzenhagen` ist dort ein Ortsteil von Wandlitz
+    # (Region Suedbarnim, Faktor rund 1,07) UND ein Ortsteil von
+    # Lunow-Stolzenhagen (Region Nordbarnim, Faktor 0,96). kategorieAus()
+    # nimmt den ERSTEN Treffer in der Reihenfolge der Kategorien - fuer die
+    # Haelfte der Faelle waere das die falsche Region, und niemand saehe es.
+    #
+    # Ein mehrdeutiger Name gehoert in KEINE Liste: dann meldet der
+    # Auswerter 'kategorie_ohne_wert' und der Bericht sagt, dass er die
+    # Lage nicht zuordnen kann. Kein Treffer heisst kein Wert.
+    zu = formel.get('kategorie_zuordnung') or {}
+    if isinstance(zu, dict):
+        gesehen = {}
+        for kat, liste in zu.items():
+            if not isinstance(liste, list):
+                continue
+            for name in liste:
+                schl = str(name).strip().lower()
+                if schl in gesehen and gesehen[schl] != kat:
+                    meckern(datei, f"'{name}' steht in zwei Kategorien "
+                            f"({gesehen[schl]} und {kat}) - mehrdeutig")
+                    return None
+                gesehen[schl] = kat
+
+    # v1103-WVERZ - jede Kategorie braucht ihr Modell, und jedes Modell eine
+    # Form, die der Auswerter kennt. Sonst stuende eine Kategorie im Rezept,
+    # fuer die spaeter still nichts herauskommt.
+    # v1105-WTIEFE - ZWEI EBENEN, NICHT MEHR.
+    #
+    # Potsdam-Mittelmark verzweigt zuerst nach der Region (Berliner Umland
+    # oder weiterer Metropolenraum) und INNERHALB jeder Region noch einmal
+    # nach dem Bodenrichtwertbereich - und die Bereiche ueberschneiden sich
+    # zwischen den Regionen (110 bis 500 hier, 110 bis 290 dort). Eine
+    # Ebene reicht dafuer nicht.
+    #
+    # Tiefer als zwei geht nicht: kein bisher gelesener Bericht braucht es,
+    # und eine unbegrenzte Schachtelung waere im Rezept nicht mehr
+    # nachvollziehbar.
+    def pruefe_verzweigt(f, tiefe, pfad):
+        mjk = f.get('modell_je_kategorie') or {}
+        fehlen = [k for k in (f.get('kategorien') or []) if str(k) not in mjk]
+        if fehlen:
+            meckern(datei, f'{pfad}ohne Modell: {fehlen}')
+            return False
+        for k, um in mjk.items():
+            wo = f"{pfad}Untermodell '{k}': "
+            if not isinstance(um, dict) or um.get('form') not in ERLAUBT:
+                meckern(datei, wo + f"Form '{(um or {}).get('form')}' "
+                        'kennt der Auswerter nicht')
+                return False
+            if um['form'] == 'verzweigt':
+                if tiefe >= 2:
+                    meckern(datei, wo + 'dritte Verzweigungsebene')
+                    return False
+                if not pruefe_verzweigt(um, tiefe + 1, wo):
+                    return False
+                continue
+            fremd_u = set(um) - ERLAUBT[um['form']] - DOKU - {'korrekturen'}
+            if fremd_u:
+                meckern(datei, wo + f'unbekannte Schluessel {sorted(fremd_u)}')
+                return False
+            pruefe_korrekturen(datei, um.get('korrekturen') or [])
+        return True
+
+    if form == 'verzweigt':
+        if not pruefe_verzweigt(formel, 1, ''):
+            return None
 
     einheit = formel.get('liefert', 'faktor')
     if einheit not in EINHEITEN:
@@ -227,7 +419,15 @@ def bauen():
 
             for ags in ags_liste:
                 saetze.append({
-                    'land_code': 'NW',
+                    # v1098-WLAND: Das Landeskuerzel stand hier HART auf 'NW'.
+                    # Vierzehn Rezepte kamen aus NRW, und solange das so war, fiel
+                    # es nicht auf. Das erste Hamburger Rezept waere damit als
+                    # nordrhein-westfaelisch ins Register gegangen - und die
+                    # Kaskade haette es ueber einen NRW-Gemeindeschluessel gesucht,
+                    # den es nicht gibt. Fallback bleibt 'NW', damit die
+                    # vorhandenen Rezepte ohne Aenderung weiterlaufen.
+                    'land_code': d.get('land_code') or 'NW',
+
                     'ags': str(ags),
                     'ebene': ebene,
                     'gebiet_name': d.get('gebiet_name') or d.get('gaa_name'),
@@ -235,7 +435,8 @@ def bauen():
                     'kennzahl': 'sachwertfaktor',
                     'zweig': m.get('zweig'),
                     'formel': formel,
-                    'korrekturen': m.get('korrekturen') or [],
+                    'korrekturen': pruefe_korrekturen(datei, m.get('korrekturen') or []),
+
                     'modellansaetze': m.get('modellansaetze') or d.get('modellansaetze') or {},
                     'geltungsbereich': m.get('geltungsbereich') or {},
                     'belege': [beleg],
@@ -250,6 +451,25 @@ def bauen():
                     'quelle_parser': 'v1084-WREZ',
                     'quellenvermerk': d.get('quellenvermerk'),
                     'lizenz': d.get('lizenz'),
+                    # v1098j · ZWEI VERSCHIEDENE FRAGEN, die bis hierher
+                    # vermengt waren:
+                    #
+                    #   1. Darf Marcel als Sachverstaendiger mit dem Wert
+                    #      arbeiten? Amtliche Marktdaten in einem
+                    #      Verkehrswertgutachten zu verwenden ist der
+                    #      vorgesehene Zweck dieser Berichte.
+                    #   2. Darf der Wert in einem DealPilot-Bericht an einen
+                    #      KUNDEN gehen? Das entscheidet die Lizenz.
+                    #
+                    # `verwendung` trennt beides:
+                    #   'produkt'    darf ausgeliefert werden
+                    #   'gutachten'  Marcel arbeitet damit; im Kundenbericht
+                    #                steht nur der Link zur Quelle
+                    #
+                    # Fehlt das Feld, gilt 'produkt' - so sind die vierzehn
+                    # NRW-Rezepte geschrieben, deren Lizenz zero-2-0 ist.
+                    'verwendung': d.get('verwendung') or 'produkt',
+                    'auflagen': d.get('auflagen'),
                     'fundstelle': d.get('fundstelle'),
                 })
 
@@ -270,8 +490,28 @@ def bauen():
         gesehen[k] = True
 
     os.makedirs(os.path.dirname(ZIEL) or '.', exist_ok=True)
-    with open(ZIEL, 'w', encoding='utf-8') as f:
-        json.dump(saetze, f, ensure_ascii=False, indent=1)
+
+    # v1098-WLAND2 · JE LAND EINE DATEI.
+    #
+    # Bis hierher ging alles in `out/swf-nrw.json` — richtig, solange nur NRW
+    # drin war. Mit Hamburg waere ein Bundesland in einer Datei namens "nrw"
+    # gelandet, und beim naechsten Land das dritte. Der Name haette gelogen,
+    # und `SAATDATEIEN` im Backend haette nicht gesagt, was wo liegt.
+    #
+    # NW behaelt seinen Dateinamen: er steht in `ausschuss_register.js` und
+    # in jedem bisherigen Nachweis. Alle anderen bekommen `swf-<land>.json`.
+    NW_ZIEL = ZIEL
+    nach_land = {}
+    for s in saetze:
+        nach_land.setdefault(s['land_code'], []).append(s)
+
+    geschrieben = []
+    for land, teil in sorted(nach_land.items()):
+        pfad = NW_ZIEL if land == 'NW' else os.path.join(
+            os.path.dirname(NW_ZIEL) or '.', f'swf-{land.lower()}.json')
+        with open(pfad, 'w', encoding='utf-8') as f:
+            json.dump(teil, f, ensure_ascii=False, indent=1)
+        geschrieben.append((land, pfad, len(teil)))
 
     gebiete = len({s['ags'] for s in saetze})
     aus = len({s['gaa_name'] for s in saetze})
@@ -280,7 +520,13 @@ def bauen():
           f'{gebiete} Zustaendigkeitsschluessel · {zellen} Tabellenzellen')
     for e in sorted({s['ebene'] for s in saetze}):
         print(f'  ebene={e}: {sum(1 for s in saetze if s["ebene"] == e)}')
-    print(f'-> {ZIEL}')
+    for land, pfad, n in geschrieben:
+        print(f'-> {pfad}  ({land}: {n})')
+    if len(geschrieben) > 1:
+        namen = [os.path.basename(p) for _, p, _ in geschrieben]
+        print('   Jede Datei muss in SAATDATEIEN stehen '
+              '(marktbericht/backend/src/lib/ausschuss_register.js): '
+              + ', '.join(namen))
     return 0
 
 

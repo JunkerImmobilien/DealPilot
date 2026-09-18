@@ -360,7 +360,97 @@ router.post('/lage', authenticate, plzValidator.middleware, /* V229: PLZ-Halluzi
  *
  * Response: { suggestions: { fieldId: { value, reasoning } } }
  */
-router.post('/ds2-suggest', authenticate, /* V186: kein requireUnderLimit, AI-Credits ist Wahrheit */ async (req, res, next) => {
+/* ══════════════════════════════════════════════════════════════════════
+   v1374 (B21) · DIE QUICK-CHECK-ANALYSE LAEUFT UEBER DEN SERVER
+   ══════════════════════════════════════════════════════════════════════
+   Punkt B21: `quickcheck-app.html` rief `api.openai.com` DIREKT aus dem
+   Browser auf - mit einem Schluessel, den der Nutzer in ein Feld tippt.
+   Drei Dinge waren daran falsch:
+
+     1. der Prompt stand im Klartext im ausgelieferten HTML
+     2. der Weg lief am Backend vorbei - an jeder Zaehlung, jedem Limit
+        und jedem Protokoll
+     3. ein API-Schluessel lag im Browserspeicher
+
+   Der Prompt steht jetzt hier. Er ist derselbe wie vorher - bewusst:
+   dieser Umbau soll den WEG aendern, nicht das ERGEBNIS. Wer ihn
+   spaeter verbessert, tut das an einer Stelle.
+
+   WARUM EIN EIGENER ENDPUNKT UND NICHT /analyze: der Quick-Check hat ein
+   anderes Datenformat (flache Eingaben statt Objektstruktur) und
+   erwartet eine andere Antwort (verdict/negotiate/pros/cons/opinion
+   statt der sieben Textbloecke). Beides in einen Endpunkt zu zwingen
+   haette eine Weiche gebraucht, die mit der Zeit zur zweiten Logik wird.
+   ══════════════════════════════════════════════════════════════════════ */
+router.post('/quickcheck-analyse', authenticate, dialogLimiter, async (req, res, next) => {
+  try {
+    const p = req.body || {};
+    const userApiKey = typeof p.userApiKey === 'string' && p.userApiKey.startsWith('sk-')
+      ? p.userApiKey : null;
+
+    const z = (v) => (v == null || v === '' ? null : Number(String(v).replace(',', '.')));
+    const eur = (v) => (v == null ? '?' : Math.round(v).toLocaleString('de-DE'));
+
+    const i = p.inputs || {};
+    const k = p.kpi || {};
+    const avm = p.avm || null;
+
+    if (!z(i.kp) || !z(i.nkm)) {
+      return res.status(400).json({ error: 'kp_oder_nkm_fehlt' });
+    }
+
+    /* Der Prompt. Frueher stand er in quickcheck-app.html ab Zeile 5299. */
+    const prompt = [
+      'Du bist ein Immobilien-Investment-Experte. Analysiere diesen Deal auf Deutsch.',
+      '',
+      'Eingaben:',
+      '- Objekt: ' + (i.objektart || '?') + ' in ' + (i.plz || '?') + ' ' + (i.ort || '')
+        + ', ' + (i.wfl || '?') + ' m2, Bj. ' + (i.bj || '?'),
+      '- Kaufpreis: ' + eur(z(i.kp)) + ' EUR',
+      '- Nettokaltmiete: ' + (i.nkm || '?') + ' EUR/Mon',
+      '- Hausgeld: ' + (i.hg || '?') + ' EUR/Mon',
+      '- Eigenkapital: ' + eur(z(i.ek)) + ' EUR, Zins: ' + (i.zins || '?')
+        + ' %, Tilgung: ' + (i.tilg || '?') + ' %',
+      '',
+      'Berechnete Kennzahlen: Bruttomietrendite ' + (k.bmr != null ? k.bmr : '?')
+        + ' %, Nettomietrendite ' + (k.nmr != null ? k.nmr : '?')
+        + ' %, Eigenkapitalrendite ' + (k.ekr != null ? k.ekr : '?')
+        + ' %, Cashflow ' + (k.cfMon != null ? k.cfMon : '?') + ' EUR/Mon',
+      'Score: ' + (p.score != null ? p.score : '?') + '/100'
+        + (p.label ? ' (' + p.label + ')' : ''),
+      avm && avm.marktwert
+        ? '\nMarktdaten eines unabhaengigen Bewertungspartners: Marktwert '
+          + eur(z(avm.marktwert)) + ' EUR'
+          + (avm.scoreLocation != null ? ', Lage ' + avm.scoreLocation + '/10' : '')
+        : '',
+      '',
+      'Antworte ALS JSON (keine Markdown-Codebloecke, nur reines JSON):',
+      '{',
+      '  "verdict": "Starker Kauf / Kauf moeglich / Vorsicht",',
+      '  "negotiate": "konkrete Verhandlungsempfehlung mit Prozent",',
+      '  "pros": ["Punkt 1", "Punkt 2", "Punkt 3", "Punkt 4"],',
+      '  "cons": ["Punkt 1", "Punkt 2", "Punkt 3"],',
+      '  "opinion": "Sachliche Experten-Meinung in 3-4 Saetzen"',
+      '}'
+    ].filter(Boolean).join('\n');
+
+    const roh = await openaiService.callOpenAI(prompt, {
+      userApiKey,
+      maxTokens: 900,
+      temperature: 0.5
+    });
+
+    const ergebnis = openaiService.extractJson(roh && roh.text ? roh.text : roh);
+    if (!ergebnis) return res.status(502).json({ error: 'antwort_nicht_lesbar' });
+
+    res.json({ analyse: ergebnis });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.post('/ds2-suggest', authenticate,
+ /* V186: kein requireUnderLimit, AI-Credits ist Wahrheit */ async (req, res, next) => {
   try {
     const payload = req.body || {};
     const userApiKey = typeof payload.userApiKey === 'string' && payload.userApiKey.startsWith('sk-')
@@ -603,7 +693,12 @@ router.post('/extract-voice', authenticate, dialogLimiter, async (req, res, next
  */
 router.post('/copilot-frage', authenticate, dialogLimiter, async (req, res, next) => {
   try {
-    const { frage, kontext } = req.body || {};
+    /* v1378 (C2): Der Begleitton kommt aus dem Frontend. Zwei Werte sind
+       erlaubt, alles andere faellt auf "normal" zurueck - ein unbekannter
+       Wert darf nie dazu fuehren, dass gar keine Tonregel im Prompt steht. */
+    const { frage, kontext, modus } = req.body || {};
+    const TON = (modus === 'lernen' || modus === 'profi') ? modus : 'normal';
+
     if (!config.openai.apiKey) return res.status(503).json({ error: 'Kein OpenAI-API-Key verfuegbar.' });
     if (!frage || typeof frage !== 'string' || frage.trim().length < 2) {
       return res.status(400).json({ error: 'Body muss "frage" enthalten.' });
@@ -630,8 +725,34 @@ router.post('/copilot-frage', authenticate, dialogLimiter, async (req, res, next
       zeilen.join('\n'),
       '',
       'REGELN:',
-      '1. Antworte auf DEUTSCH, im Du, in zwei bis vier Saetzen. Kein Markdown,',
-      '   keine Aufzaehlung, keine Ueberschrift.',
+      /* ═══ v1378 (C2) · DER BEGLEITTON ═══════════════════════════════════
+         Marcels Anforderung: zwei Modi, jederzeit umschaltbar - Lernmodus,
+         der erklaert WOZU eine Angabe gebraucht wird, und Investor-Modus,
+         der knapp bleibt.
+
+         Hier stand nur die eine harte Regel "zwei bis vier Saetze". Sie ist
+         ein guter Standard und bleibt es - aber sie war der Grund, warum
+         das Frontend keinen Ton anfordern konnte: es gab keinen Parameter,
+         nur einen festgeschriebenen Satz.
+
+         Was sich NICHT aendert: alle anderen Regeln. Der Lernmodus darf
+         mehr erklaeren, aber nichts erfinden; der Investor-Modus darf
+         kuerzen, aber keine Quelle weglassen. Der Ton bestimmt die Laenge
+         und die Tiefe der Erklaerung, nie den Inhalt. */
+      TON === 'lernen'
+        ? '1. Antworte auf DEUTSCH, im Du, in drei bis sechs Saetzen. LERNMODUS: ' +
+          'erklaere zusaetzlich, WOZU die Groesse dient und wie sie sich auf die ' +
+          'Rechnung auswirkt - eine Kennzahl ohne ihren Zweck ist eine Zahl zum ' +
+          'Abschreiben. Ein Beispiel mit den bekannten Werten hilft mehr als eine ' +
+          'Definition. Kein Markdown, keine Aufzaehlung, keine Ueberschrift.'
+        : TON === 'profi'
+        ? '1. Antworte auf DEUTSCH, im Du, in EINEM bis ZWEI Saetzen. ' +
+          'INVESTOR-MODUS: der Nutzer kennt die Begriffe. Nenne die Zahl und die ' +
+          'Folge, ohne den Begriff zu erklaeren. Keine Einleitung, kein ' +
+          '"gute Frage", kein Markdown.'
+        : '1. Antworte auf DEUTSCH, im Du, in zwei bis vier Saetzen. Kein Markdown, ' +
+          'keine Aufzaehlung, keine Ueberschrift.',
+
       '2. Rechne gern mit den bekannten Werten und nenne dabei, WORAUS du',
       '   rechnest ("bei 200.000 Kaufpreis und 490 Miete sind das ...").',
       '3. Was nicht im bekannten Stand steht, ERFINDE NICHT. Sag stattdessen,',
@@ -1372,6 +1493,11 @@ router.post('/extract-beleg', authenticate, extractLimiter, async (req, res, nex
       return res.status(403).json({ error: 'Der KI-Beleg-Import ist ab dem Investor-Plan verfuegbar.' });
     }
     const belege = (req.body && Array.isArray(req.body.belege)) ? req.body.belege : [];
+    /* v1406: 'wk' liest laufende Werbungskosten (Hausgeld, Nebenkosten-
+       abrechnung, Grundsteuer) statt Anschaffungskosten. Alles andere
+       faellt auf den bisherigen Modus zurueck - ein unbekannter Wert darf
+       nicht dazu fuehren, dass gar nichts gelesen wird. */
+    const _modus = (req.body && req.body.modus === 'wk') ? 'wk' : 'ak';
     if (!belege.length) return res.status(400).json({ error: 'Keine Belege uebergeben.' });
     if (belege.length > 40) return res.status(400).json({ error: 'Zu viele Belege pro Lauf (max. 40).' });
 
@@ -1388,7 +1514,7 @@ router.post('/extract-beleg', authenticate, extractLimiter, async (req, res, nex
       const nm = b.name || ('Beleg ' + (i + 1));
       if (!imgs.length) { results.push({ name: nm, ok: false, error: 'keine Bilddaten' }); continue; }
       try {
-        const out = await openaiService.extractBeleg(imgs, { userApiKey });
+        const out = await openaiService.extractBeleg(imgs, { userApiKey, modus: _modus });
         const positionen = (out && Array.isArray(out.positionen)) ? out.positionen : [];
         results.push({ name: nm, ok: positionen.length > 0, positionen: positionen, pages: (out && out.pages) || imgs.length, diag: (out && out.diag) || '' });
         if (positionen.length > 0) okCount++;

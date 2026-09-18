@@ -41,7 +41,51 @@ function zahl(v) {
   return Number.isFinite(n) ? n : null;
 }
 
+/* === v1103-WRND - ZWEIMAL RUNDEN VERSCHIEBT DAS ERGEBNIS ==============
+   GEMESSEN an Barnim: 566,13 * 500.000^-0,485 ergibt 0,97479. Die Form
+   `potenz` rundete hart auf DREI Stellen (0,975), der Registerweg danach
+   auf die zwei des Rezepts - und aus 0,975 wird 0,98. Der Bericht druckt
+   an dieser Stelle 0,97 ab.
+
+   Ein Cent auf hunderttausend Euro ist wenig; eine Zahl, die dem
+   abgedruckten Wert widerspricht, ist viel. Sie laesst den Anwender
+   zweifeln, ob die Maschine das Modell ueberhaupt richtig anwendet -
+   und dieses Register lebt davon, dass sie es beweisbar tut.
+
+   Deshalb rundet jede Form auf die Stelle, die das REZEPT nennt. Drei
+   Stellen bleiben der Rueckfall fuer Rezepte, die nichts sagen. */
+function gerundet(m, wert) {
+  const st = (m && m.rundung_stellen != null) ? m.rundung_stellen : 3;
+  const q = Math.pow(10, st);
+  return Math.round(wert * q) / q;
+}
+
+/* === v1109-WSCHL - EIN SCHLUESSEL, DER NUMERISCH GEMEINT IST =========
+   GEFUNDEN an Prignitz: seine Anpassungstabelle fuer Reihenhaeuser fuehrt
+   die Standardstufen als "1.4", "1.6", "1.8", "2.0", "2.2" ... Der
+   Auswerter sortiert sie ueber Number() und greift danach mit
+   String(2) zu - und "2" ist nicht "2.0". Der abgedruckte Wert lag da
+   und war unerreichbar; heraus kam `korrektur_unplausibel`.
+
+   Beim Einfamilienhaus-Satz desselben Berichts fiel es nicht auf, weil
+   dort "2" steht. Ein Rezept ist aber keine Programmiersprache: wer eine
+   Stufe 2,0 abdruckt, schreibt sie auch so hin.
+
+   Dieser Zugriff sucht ueber den ZAHLENWERT, nicht ueber die
+   Schreibweise. "2", "2.0" und "2.00" sind damit derselbe Schluessel. */
+function beiZahl(tabelle, zahlwert) {
+  if (!tabelle || zahlwert == null) return undefined;
+  const direkt = tabelle[String(zahlwert)];
+  if (direkt !== undefined) return direkt;
+  for (const k of Object.keys(tabelle)) {
+    if (Number(k) === Number(zahlwert)) return tabelle[k];
+  }
+  return undefined;
+}
+
 function nichts(grund, hinweis) {
+
+
   return { verfuegbar: false, wert: null, grund, hinweis, korrekturen: [] };
 }
 
@@ -90,9 +134,36 @@ function matrixInterp(m, e) {
   }
   const ax = [...m.achse_x].sort((p, q) => p - q);
   const i0 = ax.indexOf(nx[0]); const i1 = ax.indexOf(nx[1]);
+  /* ═══ v1098g-WEXA · EIN EXAKTER TREFFER BRAUCHT KEINE NACHBARN ═══════
+     GEMESSEN an Wolfenbuettel: der Bericht druckt fuer Bodenrichtwert 40
+     und 100.000 Euro Sachwert den Wert 1,33 ab. Der Auswerter gab
+     `zelle_leer` — weil er VIER Zellen holt und die Nachbarkurve (Band
+     130) bei 100.000 Euro leer ist. Der abgedruckte Wert war damit
+     unerreichbar, obwohl er dasteht.
+
+     Liegt die Anfrage GENAU auf beiden Stuetzstellen, ist nichts zu
+     interpolieren: die Zelle IST die Antwort. Das aendert an keinem
+     bestehenden Fall etwas — bei einem exakten Treffer liefert die
+     Interpolation denselben Wert, sie scheitert nur, wenn ein Nachbar
+     fehlt, den sie gar nicht braucht.
+
+     Die Regel bleibt unangetastet: eine LEERE Zelle wird weiterhin nicht
+     durch einen Nachbarwert ersetzt. Hier ist die Zelle nicht leer. */
+  const exaktX = ax.includes(x);
+  const exaktY = (m.achse_y || []).includes(y);
+  if (exaktX && exaktY) {
+    const direkt = zelle(m.zellen, y, ax.indexOf(x));
+    if (direkt !== null) {
+      return { verfuegbar: true, wert: gerundet(m, direkt),
+               tabellenwert: gerundet(m, direkt), korrekturen: [],
+               stuetzstellen: { x: [x, x], y: [y, y] } };
+    }
+  }
+
   const c = [zelle(m.zellen, ny[0], i0), zelle(m.zellen, ny[0], i1),
              zelle(m.zellen, ny[1], i0), zelle(m.zellen, ny[1], i1)];
   if (c.some((v) => v === null)) {
+
     return nichts('zelle_leer',
       'Fuer diese Kombination fuehrt der Bericht keinen Wert. '
       + 'Eine leere Zelle wird nicht durch einen Nachbarwert ersetzt.');
@@ -100,8 +171,8 @@ function matrixInterp(m, e) {
   const oben  = zwischen(x, nx[0], nx[1], c[0], c[1]);
   const unten = zwischen(x, nx[0], nx[1], c[2], c[3]);
   const wert  = zwischen(y, ny[0], ny[1], oben, unten);
-  return { verfuegbar: true, wert: Math.round(wert * 1000) / 1000,
-           tabellenwert: Math.round(wert * 1000) / 1000, korrekturen: [],
+  return { verfuegbar: true, wert: gerundet(m, wert),
+           tabellenwert: gerundet(m, wert), korrekturen: [],
            stuetzstellen: { x: nx, y: ny } };
 }
 
@@ -133,8 +204,8 @@ function matrixKategorial(m, e) {
   }
   const wert = zwischen(x, n[0], n[1],
                         zelle(m.zellen, n[0], idx), zelle(m.zellen, n[1], idx));
-  return { verfuegbar: true, wert: Math.round(wert * 1000) / 1000,
-           tabellenwert: Math.round(wert * 1000) / 1000, korrekturen: [],
+  return { verfuegbar: true, wert: gerundet(m, wert),
+           tabellenwert: gerundet(m, wert), korrekturen: [],
            kategorie: m.kategorien[idx] };
 }
 
@@ -174,9 +245,9 @@ function stufen1d(m, e) {
       `Der Bericht fuehrt ${m.achse_bez} von ${stufen[0]} bis `
       + `${stufen[stufen.length - 1]}; extrapoliert wird nicht.`);
   }
-  const wert = zwischen(x, n[0], n[1], m.stufen[String(n[0])], m.stufen[String(n[1])]);
-  return { verfuegbar: true, wert: Math.round(wert * 1000) / 1000,
-           tabellenwert: Math.round(wert * 1000) / 1000, korrekturen: [] };
+  const wert = zwischen(x, n[0], n[1], beiZahl(m.stufen, n[0]), beiZahl(m.stufen, n[1]));
+  return { verfuegbar: true, wert: gerundet(m, wert),
+           tabellenwert: gerundet(m, wert), korrekturen: [] };
 }
 
 /** potenz — Y = a * X^b. Der Geltungsbereich ist Pflicht. */
@@ -188,8 +259,8 @@ function potenz(m, e) {
   if (m.gueltig_bis != null && x > m.gueltig_bis)
     return nichts('ausserhalb_der_stichprobe', `Oberhalb der Stichprobe (${m.gueltig_bis}).`);
   const wert = m.a * Math.pow(x * (m.x_faktor ?? 1), m.b);
-  return { verfuegbar: true, wert: Math.round(wert * 1000) / 1000,
-           tabellenwert: Math.round(wert * 1000) / 1000, korrekturen: [],
+  return { verfuegbar: true, wert: gerundet(m, wert),
+           tabellenwert: gerundet(m, wert), korrekturen: [],
            formel: `${m.a} * (${m.achse_bez}${m.x_faktor ? ' * ' + m.x_faktor : ''})^${m.b}` };
 }
 
@@ -301,8 +372,30 @@ function regressionAdditiv(m, e) {
         `${t.bez || t.feld} liegt ausserhalb der Datenspanne `
         + `${t.gueltig[0]} bis ${t.gueltig[1]}.`);
     }
+    /* v1110b-WLN - EIN LOGARITHMUS IST KEINE POTENZ.
+       Magdeburg druckt fuer Baujahre ab 1991 ab:
+         - 0,18684634 x ln vorlaeufiger Sachwert
+       Ohne diesen Zweig muesste man den Term weglassen oder als Potenz
+       missdeuten - beides ergaebe eine andere Gleichung, und beide
+       Ergebnisse blieben im plausiblen Band. */
     const exp = zahl(t.exponent);
-    const basis = (exp === null || exp === 1) ? x : Math.pow(x, exp);
+    let basis;
+    if (t.transform === 'ln') {
+      if (!(x > 0)) {
+        return nichts('term_unbestimmt',
+          `${t.bez || t.feld} = ${x}; der natuerliche Logarithmus ist dort `
+          + 'nicht erklaert.');
+      }
+      basis = Math.log(x);
+    } else if (t.transform === 'log10') {
+      if (!(x > 0)) {
+        return nichts('term_unbestimmt',
+          `${t.bez || t.feld} = ${x}; der Zehnerlogarithmus ist dort nicht erklaert.`);
+      }
+      basis = Math.log10(x);
+    } else {
+      basis = (exp === null || exp === 1) ? x : Math.pow(x, exp);
+    }
     if (!Number.isFinite(basis)) {
       return nichts('term_unbestimmt',
         `${t.bez || t.feld} = ${x} ergibt in diesem Term keinen endlichen `
@@ -321,16 +414,90 @@ function regressionAdditiv(m, e) {
    * Standardfall der Gleichung, nicht ein uebersehener Term. */
   for (const dz of (m.diskret || [])) {
     const v = String(e[dz.feld] ?? '').toLowerCase().trim();
-    if (!v) continue;
+    /* v1110-WPFL - MANCHE DISKRETEN MERKMALE SIND PFLICHT.
+       Halle (Saale) fuehrt fuer Baujahre ab 1991 den Term
+       "- 0,06348555 x Gemarkung" MITTEN in der Regressionsgleichung; die
+       Gemarkung ist dort in zwei Gruppen eingeteilt (West = 1, Ost = 2).
+       Ihn zu ueberspringen hiesse, mit einer anderen Gleichung zu rechnen
+       als der Ausschuss - und das faellt niemandem auf, weil das Ergebnis
+       im Band bleibt.
+
+       Ein diskreter Zuschlag OHNE `pflicht` bleibt dagegen, was er war:
+       fehlt die Auspraegung, gilt kein Zuschlag. Das ist bei einem
+       Zuschlag der ausdrueckliche Standardfall, bei einem Glied der
+       Gleichung nicht. */
+    if (!v) {
+      if (dz.pflicht) {
+        return nichts('feld_fehlt',
+          `${dz.bez || dz.feld} ist nicht erfasst. Die Gleichung fuehrt `
+          + 'dieses Merkmal als eigenes Glied; ohne den Wert waere es eine '
+          + 'andere Gleichung.');
+      }
+      continue;
+    }
     const w = zahl((dz.werte || {})[v]);
-    if (w === null) continue;
+    if (w === null) {
+      if (dz.pflicht) {
+        return nichts('auspraegung_unbekannt',
+          `Fuer "${v}" fuehrt der Bericht keinen Wert des Merkmals `
+          + `${dz.bez || dz.feld}.`);
+      }
+      continue;
+    }
     summe += w;
     teile.push(`${w >= 0 ? '+' : '−'} ${Math.abs(w).toFixed(4)} (${dz.bez || dz.feld})`);
   }
 
+  /* v1110-WAEXP - EIN EXPONENT AUF DER GANZEN SUMME.
+     Halle (Saale) druckt fuer Baujahre vor 1991 ab:
+
+       SWF = ( 4,1081 - 27,7358 * vSW^-0,29 - 0,0139 * BRW^0,5
+               + 1,4482 * WF^-0,29 - 2,2382 * GStd^0,15 ) ^ -1,32
+
+     Die Klammer ist keine Schreibweise, sondern Teil des Modells: ohne
+     den aeusseren Exponenten kaeme statt 1,05 ein negativer Wert heraus.
+     Ein Modell halb zu rechnen ist schlimmer, als es gar nicht zu fuehren. */
+  let ergebnis = summe;
+
+  /* v1116-WEXP - DER LOGARITHMUS STEHT LINKS.
+     Dresden druckt ab:
+       ln(SWF) = -0,3450*ln(vSW) - 0,0001*BRW + 0,1754*ln(RND) + 3,9573
+     Die Summe ist nicht der Faktor, sondern sein Logarithmus - der Faktor
+     ist e hoch dieser Summe. Sein Anwendungsbeispiel rechnet es vor:
+     0,0942 ergibt 1,0988, und 1,0988 x 440.000 sind 483.472 Euro.
+
+     Ohne diesen Zweig kaeme 0,09 heraus statt 1,10 - eine Zahl, die der
+     Einheitenwaechter zu Recht verwerfen wuerde. Schlimmer waere ein
+     Modell, das man deshalb weglaesst: Dresden ist die zweitgroesste
+     Stadt Sachsens. */
+  if (m.aussen_funktion === 'exp') {
+    ergebnis = Math.exp(summe);
+    teile.push(`= e^(${summe.toFixed(4)}) = ${ergebnis.toFixed(4)}`);
+    if (!Number.isFinite(ergebnis)) {
+      return nichts('term_unbestimmt',
+        'Die Gleichung ergibt fuer dieses Objekt keinen endlichen Wert.');
+    }
+  }
+
+  const aexp = zahl(m.aussen_exponent);
+  if (aexp !== null && aexp !== 1 && m.aussen_funktion !== 'exp') {
+    if (summe <= 0 && !Number.isInteger(aexp)) {
+      return nichts('term_unbestimmt',
+        `Die Klammersumme ist ${summe.toFixed(4)}; mit dem Exponenten `
+        + `${aexp} ergibt das keinen reellen Wert. Das Objekt liegt damit `
+        + 'ausserhalb dessen, was die Gleichung abbildet.');
+    }
+    ergebnis = Math.pow(summe, aexp);
+    teile.push(`= (${summe.toFixed(4)}) ^${aexp}`);
+    if (!Number.isFinite(ergebnis)) {
+      return nichts('term_unbestimmt',
+        'Die Gleichung ergibt fuer dieses Objekt keinen endlichen Wert.');
+    }
+  }
+
   const st = m.rundung_stellen ?? 2;
   const p = Math.pow(10, st);
-  const wert = Math.round(summe * p) / p;
+  const wert = Math.round(ergebnis * p) / p;
   return { verfuegbar: true, wert, tabellenwert: wert, korrekturen: [],
            rechenweg_terme: teile };
 }
@@ -457,7 +624,129 @@ function konstante(m) {
   return { verfuegbar: true, wert: m.wert, tabellenwert: m.wert, korrekturen: [] };
 }
 
+/* ═══ v1101-WBKAT · BAENDER, DIE JE KATEGORIE ANDERS LAUFEN ════════════
+   Teltow-Flaeming staffelt seine Sachwertfaktoren nach Standardstufe UND
+   Bodenrichtwertniveau — und die Bodenrichtwertbaender sind je
+   Standardstufe andere:
+
+     Stufe 2:  bis 20 · 21-100 · 101-250 · ab 251
+     Stufe 3:  bis 100 · 101-200 · 201-300 · ab 301
+     Stufe 4:  bis 100 · 101-200 · 201-350 · ab 351
+
+   `matrix_band` kann das nicht: sie hat EINE Bandliste je Achse. Eine
+   gemeinsame Liste zu bilden hiesse, Grenzen zu erfinden, die im Bericht
+   nicht stehen — und an genau diesen erfundenen Grenzen laege der Faktor
+   dann falsch, ohne dass es auffiele.
+
+   Hier traegt jede Kategorie ihre EIGENEN Baender. Was der Bericht
+   abdruckt, steht so im Rezept. */
+function baenderKategorial(m, e) {
+  const kat = kategorieAus(m, e);
+  if (!kat.wert) {
+    return nichts(kat.bekannt_aber_ohne_wert ? 'kategorie_ohne_wert' : 'kategorie_fehlt',
+      `${m.achse_k_bez || 'Die Kategorie'} ist nicht bestimmbar`
+      + (kat.ueber ? ` (gelesen aus "${kat.ueber}")` : '') + '.');
+  }
+  /* Die Kategorien stehen im Rezept in ihrer Schreibweise; verglichen wird
+     ohne Gross-/Kleinschreibung, aber nicht unscharf. */
+  const schluessel = Object.keys(m.baender_je_kategorie || {})
+    .find((k) => k.toLowerCase() === String(kat.wert).toLowerCase());
+  if (schluessel === undefined) {
+    return nichts('kategorie_unbekannt',
+      `Fuer "${kat.wert}" fuehrt der Bericht keine Reihe.`);
+  }
+  const reihe = m.baender_je_kategorie[schluessel] || [];
+  const x = zahl(e[m.achse_feld]);
+  if (x === null) return nichts('achse_fehlt', `${m.achse_bez} nicht erfasst.`);
+
+  const b = reihe.find((r) => (r.von == null || x >= r.von)
+                           && (r.bis == null || x <= r.bis));
+  if (!b) {
+    return nichts('ausserhalb_der_klassen',
+      `${m.achse_bez} = ${x} faellt in keine der ${reihe.length} Klassen, `
+      + `die der Bericht fuer "${schluessel}" fuehrt.`);
+  }
+  if (!istZahl(b.wert)) {
+    return nichts('klasse_ohne_wert',
+      `Fuer "${schluessel}" und ${b.bez || 'diese Klasse'} fuehrt der Bericht keinen Wert.`);
+  }
+  const st = m.rundung_stellen ?? 2;
+  const q = Math.pow(10, st);
+  return { verfuegbar: true, wert: Math.round(b.wert * q) / q,
+           tabellenwert: Math.round(b.wert * q) / q, korrekturen: [],
+           kategorie: schluessel, klasse: b.bez || null,
+           klasse_fallzahl: b.fallzahl ?? null,
+           klasse_spanne: (b.min != null && b.max != null) ? [b.min, b.max] : null };
+}
+
+/* === v1103-WVERZ - JE KATEGORIE EIN VOLLSTAENDIGES MODELL =============
+   GEFUNDEN an Havelland: der Landkreis druckt fuer seine zwei Regionen
+   zwei Tabellen ab, die nicht einmal dieselben ACHSEN haben -
+
+     Berliner Umland        Grundstuecksflaeche x WOHNflaeche, Bezugsbaujahr 2000
+     weiterer Metropolenraum Grundstuecksflaeche x BGF,        Bezugsbaujahr 1960
+
+   und dazu je Region eine eigene Baujahrskorrektur (1,16 bis 0,97 gegen
+   1,08 bis 0,92). Barnim hatte je Region eine eigene Potenzfunktion.
+
+   Statt fuer jede dieser Kombinationen eine eigene Form zu bauen -
+   `potenz_kategorial`, `matrix_kategorial_2`, und so weiter - traegt
+   diese hier je Kategorie ein GANZES Modell und wertet es ueber
+   auswerten() aus. Damit gilt fuer das Untermodell alles, was sonst
+   auch gilt: seine Bedingungen, seine Korrekturen, sein Einheitenwaechter.
+
+   v1102 hatte dafuer `potenz_kategorial` gebaut. Diese Form ist damit
+   ueberfluessig und WEG - zwei Wege zum selben Ziel laufen frueher oder
+   spaeter auseinander. Barnim steht jetzt als `verzweigt` mit vier
+   `potenz`-Untermodellen im Register; seine dreizehn Pruefungen sind
+   dieselben geblieben.
+
+   Die Korrekturen der AEUSSEREN Ebene wirken zusaetzlich - was fuer alle
+   Kategorien gilt, steht aussen, was je Kategorie verschieden ist, innen. */
+function verzweigt(m, e) {
+  const kat = kategorieAus(m, e);
+  if (!kat.wert) {
+    return nichts(kat.bekannt_aber_ohne_wert ? 'kategorie_ohne_wert' : 'kategorie_fehlt',
+      `${m.achse_k_bez || 'Die Kategorie'} ist nicht bestimmbar`
+      + (kat.ueber ? ` (gelesen aus "${kat.ueber}")` : '') + '.');
+  }
+  const tab = m.modell_je_kategorie || {};
+  const schluessel = Object.keys(tab)
+    .find((k) => k.toLowerCase() === String(kat.wert).toLowerCase());
+  if (schluessel === undefined) {
+    return nichts('kategorie_unbekannt',
+      `Fuer "${kat.wert}" fuehrt der Bericht kein Modell.`);
+  }
+  const unter = tab[schluessel];
+  if (!unter || !unter.form) {
+    return nichts('form_unbekannt',
+      `Das Modell fuer "${schluessel}" traegt keine Form.`);
+  }
+  /* Die Einheit der aeusseren Ebene gilt, wenn das Untermodell keine
+     eigene nennt - sonst koennte ein Untermodell still eine andere
+     Einheit liefern als der Registersatz verspricht. */
+  const r = auswerten({ ...unter, liefert: unter.liefert || m.liefert }, e);
+  if (!r.verfuegbar) return { ...r, kategorie: schluessel };
+
+  /* GEMESSEN an Havelland: das Untermodell hatte richtig gerechnet -
+     0,92 aus der Tabelle mal 1,16 fuer Baujahr 1900 = 1,07 -, und die
+     aeussere Ebene warf es weg. Sie rechnet naemlich ab `tabellenwert`
+     weiter, und der stand noch auf den nackten 0,92.
+
+     Der Endwert des Untermodells IST der Tabellenwert dieser Ebene: was
+     unten passiert ist, ist von hier aus die Tabelle. Die Korrekturen
+     des Untermodells wandern nach `korrekturen_kategorie`, damit sie im
+     Rechenweg sichtbar bleiben statt still ueberschrieben zu werden. */
+  return { ...r, kategorie: schluessel, tabellenwert: r.wert,
+           korrekturen_kategorie: r.korrekturen || [],
+           rechenweg_kategorie: r.rechenweg || null,
+           korrekturen: [] };
+}
+
 const AUSWERTER = {
+
+
+
   matrix_interp: matrixInterp,
   matrix_kategorial: matrixKategorial,
   matrix_band: matrixBand,
@@ -471,6 +760,8 @@ const AUSWERTER = {
   baender_1d: baender1d,                 /* v1089-WBND1 */
   log_1d: log1d,                         /* v1093-WLOG */
   spanne_kategorial: spanneKategorial,   /* v1093-WSPN */
+  baender_kategorial: baenderKategorial, /* v1101-WBKAT */
+  verzweigt: verzweigt,                 /* v1103-WVERZ */
 };
 
 /* ── Additive Korrekturen ──────────────────────────────────────────────── */
@@ -481,8 +772,165 @@ const AUSWERTER = {
  * (Herford 0,89 + 0,02 - 0,03 = 0,88; Hoexter 0,70 + 0,06 + 0,01 = 0,77).
  */
 function korrekturAnwenden(k, e) {
+  /* ═══ v1098-WPOT · DREI KORREKTURARTEN, DIE KEINE TABELLE SIND ═══════
+     Bis hierher kannte diese Funktion zwei Arten: `stufen` (interpoliert)
+     und `band` (nicht). Beide sind Tabellen ueber eine ZAHL.
+
+     Hamburg druckt seinen Sachwertfaktor als PRODUKT aus 19 Faktoren ab,
+     und die wenigsten davon sind Tabellen:
+
+       Lagefaktor              (NormBRW20 / 630) ^ 0,1902
+       Bodenwertanteilsfaktor  0,67318 + 0,5447 × Bodenwertanteil
+       Stadtteilfaktor         rund 100 Namen, je ein Wert
+
+     Eine Potenz als Stufentabelle nachzubilden hiesse, eine geschlossene
+     Funktion durch Stuetzstellen zu ersetzen und zwischen ihnen LINEAR zu
+     interpolieren — an einer gekruemmten Kurve ist das ein Fehler, den
+     niemand sieht, weil das Ergebnis plausibel bleibt.
+
+     WARUM KEINE NEUE MODELLFORM: die Multiplikation gibt es hier seit
+     v1093 (`wirkung: multiplikativ`), samt Waechter und Rechenweg. Hamburg
+     ist damit `konstante` 0,788 plus 19 multiplikative Korrekturen — die
+     vorhandene Mechanik traegt es, sobald sie diese drei Arten kennt.
+
+     `kategorial` liest ausdruecklich den ROHWERT, keine Zahl: ein
+     Stadtteil heisst "Blankenese". */
+  /* ═══ v1100-WK2D · EINE KORREKTUR, DIE VON ZWEI GROESSEN ABHAENGT ═════
+     Der Landkreis Oberhavel druckt zwei Tabellen ab und schreibt dazu:
+     „Bei modellkonformer Verkehrswertermittlung sind beide Faktoren
+     gleichzeitig anzuwenden." Die erste gibt den Sachwertfaktor nach Region
+     und vorlaeufigem Sachwert, die zweite eine Korrektur nach
+     Bruttogrundflaeche — und die Korrekturkurve ist JE REGION eine andere.
+
+     Die bisherigen Arten koennen das nicht: `stufen` liest eine Zahl,
+     `kategorial` einen Text. Hier braucht es beides — die Zahl sagt WO auf
+     der Kurve, die Kategorie sagt WELCHE Kurve.
+
+     Ohne diese Art bliebe nur, die zweite Tabelle wegzulassen. Dann
+     rechnete das Modell halb, und das Ergebnis saehe trotzdem plausibel
+     aus — genau die Fehlerklasse, die dieses Register vermeiden soll.
+
+     WICHTIG: faellt die Kategorie nicht in die Tabelle, gibt es KEINE
+     Korrektur — nicht die einer Nachbarregion. */
+  if (k.art === 'stufen_kategorial') {
+    /* ═══ v1408 · DIE KATEGORIE KANN AUS EINER ZAHL KOMMEN ════════════════
+       Bisher las dieser Zweig die Kategorie ausschliesslich als TEXT aus
+       `e[k.kategorie_feld]` — der Aufrufer musste sie also kennen.
+
+       Hamburgs Modernisierungsfaktor braucht etwas anderes: seine Kategorie
+       ist die BAUJAHRSKLASSE, und die steht in keinem Eingabefeld. Sie
+       ergibt sich aus dem Baujahr, und die Klassengrenzen kennt nur der
+       Bericht:
+
+         bis 1919 · 1920-39 · 1940-59 · 1960-69 · 1970-79
+         1980-89 · 1990-99 · 2000-09 · ab 2010
+
+       Der Aufrufer kann sie nicht liefern, ohne den Bericht zu kennen —
+       dann stuende die Zuordnung an zwei Stellen. Fuer die MODELLachse gibt
+       es diesen Weg seit v1094 (`kategorie_baender` in `kategorieAus`);
+       hier fehlte er. Dieselbe Mechanik, dasselbe Rezeptwort.
+
+       KEINE INTERPOLATION ZWISCHEN DEN KLASSEN: ein Baujahr faellt in genau
+       eine. Faellt es in keine, gibt es keine Korrektur — nicht die der
+       Nachbarklasse. */
+    let kat = '';
+    if (Array.isArray(k.kategorie_baender) && k.kategorie_baender.length) {
+      const zv = zahl(e[k.kategorie_feld]);
+      if (zv === null) return null;
+      const tr = k.kategorie_baender.find((b) => (b.von == null || zv >= b.von)
+                                              && (b.bis == null || zv <= b.bis));
+      if (!tr) return null;                      /* ausserhalb aller Klassen */
+      kat = String(tr.kategorie);
+    } else {
+      kat = String(e[k.kategorie_feld] ?? '').trim();
+    }
+    if (!kat) return null;
+    const tab = k.stufen || {};
+    let reihe = tab[kat];
+    if (reihe === undefined) {
+      const treffer = Object.keys(tab).find(
+        (n) => n.toLowerCase() === kat.toLowerCase());
+      if (treffer !== undefined) reihe = tab[treffer];
+    }
+    if (!reihe || typeof reihe !== 'object') return null;
+
+    const xk = zahl(e[k.feld]);
+    if (xk === null) return null;
+    const st = Object.keys(reihe).map(Number).filter((n) => Number.isFinite(n))
+                     .sort((p, q) => p - q);
+    if (!st.length) return null;
+    /* Ausserhalb der Reihe gilt der Randwert — der Bericht druckt sie als
+       vollstaendig ab, ohne Fortsetzung nach aussen. Dieselbe Regel wie bei
+       `stufen`. */
+    const v2 = xk <= st[0] ? beiZahl(reihe, st[0])
+             : xk >= st[st.length - 1] ? beiZahl(reihe, st[st.length - 1])
+             : (() => { const n2 = nachbarn(st, xk);
+                        return zwischen(xk, n2[0], n2[1],
+                                        beiZahl(reihe, n2[0]), beiZahl(reihe, n2[1])); })();
+    if (!istZahl(v2)) return null;
+    const st2 = k.rundung_stellen ?? 3;
+    const q2 = Math.pow(10, st2);
+    return { merkmal: k.bez, wert: Math.round(v2 * q2) / q2,
+             wirkung: k.wirkung === 'multiplikativ' ? 'multiplikativ' : 'additiv',
+             ausprägung: `${xk} (${kat})` };
+  }
+
+  if (k.art === 'kategorial') {
+
+    const roh = e[k.feld];
+    if (roh === undefined || roh === null || roh === '') return null;
+    const schluessel = String(roh).trim();
+    const tab = k.werte || {};
+    /* Ohne Beachtung von Gross-/Kleinschreibung, aber NICHT unscharf: wer
+       einen Namen falsch schreibt, bekommt keine Korrektur statt einer
+       falschen. */
+    let v = tab[schluessel];
+    if (v === undefined) {
+      const treffer = Object.keys(tab).find(
+        (n) => n.toLowerCase() === schluessel.toLowerCase());
+      if (treffer !== undefined) v = tab[treffer];
+    }
+    if (!istZahl(v)) return null;
+    return { merkmal: k.bez, wert: v,
+             wirkung: k.wirkung === 'multiplikativ' ? 'multiplikativ' : 'additiv',
+             ausprägung: schluessel };
+  }
+
   const x = zahl(e[k.feld]);
   if (x === null) return null;                  // nicht erfasst = keine Korrektur
+
+  if (k.art === 'potenz' || k.art === 'linear') {
+    const wirkungP = k.wirkung === 'multiplikativ' ? 'multiplikativ' : 'additiv';
+    let v;
+    if (k.art === 'potenz') {
+      /* (x / basis) ^ exponent — `basis` ist die Normstelle, an der die
+         Korrektur 1 ergibt. Sie steht in jedem Bericht ausdruecklich
+         daneben ("bei 120 m² Wohnflaeche: 1"). */
+      const basis = zahl(k.basis);
+      const exp = zahl(k.exponent);
+      if (basis === null || exp === null || !(basis > 0) || !(x > 0)) return null;
+      v = Math.pow(x / basis, exp);
+    } else {
+      const a = zahl(k.a), b = zahl(k.b);
+      if (a === null || b === null) return null;
+      v = a + b * x;
+    }
+    /* Deckelung: Hamburg kappt zwei Faktoren ausdruecklich ("wenn
+       Wohnflaeche >= 300 m²: 1,427"). Ohne die Kappung rechnet die Potenz
+       weiter und laeuft aus dem Gueltigkeitsbereich der Stichprobe heraus. */
+    if (k.deckel_ab != null && x >= zahl(k.deckel_ab) && istZahl(zahl(k.deckel_wert))) {
+      v = zahl(k.deckel_wert);
+    }
+    if (k.boden_ab != null && x <= zahl(k.boden_ab) && istZahl(zahl(k.boden_wert))) {
+      v = zahl(k.boden_wert);
+    }
+    if (!istZahl(v)) return null;
+    const stP = k.rundung_stellen ?? 5;
+    const qP = Math.pow(10, stP);
+    return { merkmal: k.bez, wert: Math.round(v * qP) / qP, wirkung: wirkungP,
+             ausprägung: String(x) };
+  }
+
 
   /* v1093-WMUL · `wirkung` sagt, WIE die Korrektur wirkt; `art` sagt, welche
    * FORM ihre Tabelle hat. Zwei verschiedene Dinge — die Rezepte hatten
@@ -490,6 +938,23 @@ function korrekturAnwenden(k, e) {
    * gilt additiv: so drucken es Herford, Hoexter und Dortmund ab, und so
    * hat der Auswerter seit v1083 gerechnet. */
   const wirkung = k.wirkung === 'multiplikativ' ? 'multiplikativ' : 'additiv';
+
+  /* ═══ v1412-WOFN · EINE KORREKTUR, DEREN WERTE WIR NICHT HABEN ════════
+     Der Landkreis Verden fuehrt eine Kurve fuer abweichenden
+     Energiebedarf. Im Dashboard steht ihre Beschriftung, im PDF-Export
+     aber KEINE Stuetzstelle — sie erscheint erst bei einer Auswahl.
+
+     Bisher gab es dafuer zwei Wege, und beide sind falsch: die Korrektur
+     weglassen (dann rechnet das Modell halb, und das Ergebnis sieht
+     trotzdem plausibel aus) oder Werte schaetzen (dann erfinden wir eine
+     Zahl). Das ist der dritte Weg — die Korrektur steht im Satz, traegt
+     ihren Grund und wird als OFFEN ausgewiesen.
+
+     TECHNISCH kam das bisher schon heraus: ohne `stufen` faellt die
+     Funktion unten auf `return null`, und null bedeutet offen. Aber
+     zufaellig richtig ist nicht richtig — wer `art: "offen"` liest, soll
+     die Stelle finden, die es behandelt. */
+  if (k.art === 'offen') return null;
 
   if (k.art === 'band') {
     const b = (k.baender || []).find((r) => x >= r.von && x <= r.bis);
@@ -500,11 +965,11 @@ function korrekturAnwenden(k, e) {
   if (!stufen.length) return null;
   // Ausserhalb der Korrekturtabelle gilt der Randwert - der Bericht druckt
   // die Reihe als vollstaendig ab, ohne Fortsetzung nach aussen.
-  const v = x <= stufen[0] ? k.stufen[String(stufen[0])]
-          : x >= stufen[stufen.length - 1] ? k.stufen[String(stufen[stufen.length - 1])]
+  const v = x <= stufen[0] ? beiZahl(k.stufen, stufen[0])
+          : x >= stufen[stufen.length - 1] ? beiZahl(k.stufen, stufen[stufen.length - 1])
           : (() => { const n = nachbarn(stufen, x);
                      return zwischen(x, n[0], n[1],
-                                     k.stufen[String(n[0])], k.stufen[String(n[1])]); })();
+                                     beiZahl(k.stufen, n[0]), beiZahl(k.stufen, n[1])); })();
   // Auch die Rundung ist Dokumentverhalten. Herford druckt seine Zu-/Abschlaege
   // ZWEISTELLIG ab und summiert erst danach: 0,899 + (-0,01) + 0,00 = 0,889.
   // Wer erst summiert und dann rundet, kommt auf 0,89 - eine andere Zahl.
@@ -593,11 +1058,56 @@ function kategorieAus(m, e) {
     return { wert: String(treffer.kategorie).toLowerCase(), ueber: feldZ };
   }
 
+  /* v1104-WMEHRD - NAMEN, DIE AUSDRUECKLICH KEINEN WERT ERGEBEN.
+
+     Dahme-Spreewald teilt zwei Gemeinden GEMARKUNGSSCHARF: die
+     Gemarkungen Koenigs Wusterhausen und Deutsch Wusterhausen gehoeren
+     zur S-Bahn-Region, die uebrigen Gemarkungen derselben Stadt nicht;
+     bei Schoenefeld ebenso. Der Gemeindename allein sagt also nichts.
+
+     Ohne diese Liste faenden solche Namen den Weg in die Restkategorie
+     und bekaemen den Faktor des weiteren Metropolenraums - fuer ein
+     Grundstueck im Berliner Umland. Die Restkategorie ist fuer das
+     gedacht, was der Bericht NICHT aufzaehlt, nicht fuer das, was er
+     feiner aufteilt, als die Anfrage es hergibt.
+
+     Diese Pruefung steht VOR der Zuordnung: ein mehrdeutiger Name
+     gewinnt gegen jede Liste. */
+  const mehrdeutig = m.kategorie_mehrdeutig;
+  if (Array.isArray(mehrdeutig) && mehrdeutig.length) {
+    const feldM = m.zuordnung_feld || 'altbezirk';
+    const vM = String(e[feldM] ?? '').toLowerCase().trim();
+    if (vM && mehrdeutig.some((x) => String(x).toLowerCase().trim() === vM)) {
+      return { wert: '', ueber: feldM, bekannt_aber_ohne_wert: true,
+               mehrdeutig: true };
+    }
+  }
+
   const zu = m.kategorie_zuordnung;
+
   if (!zu) return { wert: '', ueber: null };
   const feld = m.zuordnung_feld || 'altbezirk';
   const v = String(e[feld] ?? '').toLowerCase().trim();
-  if (!v) return { wert: '', ueber: null };
+  if (!v) {
+    /* v1112-WOHNE - ZWEI ARTEN VON RESTKATEGORIE.
+
+       Bei Barnim BESTIMMT der Ort die Region: ohne ihn ist nicht zu sagen,
+       ob 1,25 oder 0,96 gilt, und dann gibt es keinen Wert.
+
+       Bei Dessau-Rosslau und den drei Landkreisen SCHLIESST der Ort nur
+       AUS: das Blatt gilt fuer den ganzen Bereich `ohne
+       Grossstadtrandlage`, und die Randlage sind acht benannte Orte im
+       Jerichower Land. Fehlt der Name, ist die Restkategorie die richtige
+       Antwort - die Ausnahme bleibt die Ausnahme.
+
+       Welcher Fall vorliegt, entscheidet das REZEPT. Ohne
+       `sonst_auch_ohne_wert` bleibt es beim strengen Verhalten. */
+    if (m.kategorie_sonst && m.sonst_auch_ohne_wert) {
+      return { wert: String(m.kategorie_sonst).toLowerCase(), ueber: null,
+               ueber_rest: true };
+    }
+    return { wert: '', ueber: null };
+  }
 
   for (const kat of (m.kategorien || [])) {
     const liste = zu[String(kat)];
@@ -606,8 +1116,28 @@ function kategorieAus(m, e) {
       return { wert: String(kat).toLowerCase(), ueber: feld };
     }
   }
+  /* v1103-WSONST - EINE RESTKATEGORIE, ABER NUR WENN DER BERICHT SIE NENNT.
+
+     Oder-Spree zaehlt elf Gemarkungen als Berliner Umland auf und
+     schreibt fuer den weiteren Metropolenraum ausdruecklich `Doerfer:
+     alle uebrigen`. Ohne Restkategorie bekaeme der groesste Teil des
+     Landkreises keinen Faktor, obwohl der Bericht ihn eindeutig zuordnet.
+
+     Sie greift NUR, wenn ein Zuordnungswert vorliegt und in keiner Liste
+     steht. Fehlt der Wert ganz, bleibt es bei 'kategorie_fehlt': wer
+     nicht weiss, wo das Objekt liegt, darf es nicht in den Rest sortieren.
+
+     `kategorie_sonst` gehoert ins Rezept und ist dort zu belegen. Wo ein
+     Bericht seine Kategorien NICHT erschoepfend teilt - Barnims vier
+     Regionen etwa -, steht das Feld nicht, und ein unbekannter Ort bleibt
+     ohne Wert. */
+  if (m.kategorie_sonst) {
+    return { wert: String(m.kategorie_sonst).toLowerCase(), ueber: feld,
+             ueber_rest: true };
+  }
   return { wert: '', ueber: feld, bekannt_aber_ohne_wert: true };
 }
+
 
 /* ── Der Vertrag nach aussen ───────────────────────────────────────────── */
 
@@ -620,8 +1150,61 @@ function kategorieAus(m, e) {
  * @returns {{verfuegbar:boolean, wert:number|null, tabellenwert?:number,
  *            korrekturen:Array, grund?:string, hinweis?:string, rechenweg?:string}}
  */
+/* ═══ v1100c-WBED · EINE BEDINGUNG AUF EINEM ZWEITEN FELD ═══════════════
+   GEFUNDEN an der Uckermark: der Bericht wertet Ein- und
+   Zweifamilienhaeuser nur fuer Bodenrichtwerte UEBER 30 EUR/qm aus. Die
+   Modellform `potenz` kennt genau eine Achse (den vorlaeufigen Sachwert)
+   und konnte das nicht pruefen.
+
+   Folge waere: wer fuer ein Objekt mit 20 EUR/qm rechnet, bekommt einen
+   Faktor — aus einer Auswertung, die fuer sein Objekt gar nicht gilt. Das
+   Ergebnis saehe plausibel aus. Genau die Fehlerklasse, gegen die dieses
+   Register gebaut ist.
+
+   `bedingungen` gilt fuer JEDE Modellform und wird VOR der Rechnung
+   geprueft. Sie beschreibt, was der Bericht ueber seinen
+   Anwendungsbereich sagt — nicht, was DealPilot fuer sinnvoll haelt.
+
+   Fehlt das Feld beim Objekt, wird NICHT gerechnet: eine Bedingung, die
+   man nicht pruefen kann, ist nicht erfuellt. Der Bericht hat seinen
+   Anwendungsbereich benannt; ihn zu ignorieren, weil eine Angabe fehlt,
+   waere die Umkehrung seiner Aussage. */
+function bedingungPruefen(modell, eingabe) {
+  const bed = modell.bedingungen;
+  if (!Array.isArray(bed) || !bed.length) return null;
+  for (const b of bed) {
+    if (!b || !b.feld) continue;
+    const v = zahl(eingabe[b.feld]);
+    if (v === null) {
+      return nichts('bedingung_nicht_pruefbar',
+        `${b.bez || b.feld} ist nicht erfasst. Der Bericht wertet nur aus, `
+        + `wenn ${b.bez || b.feld} ${b.text || 'im Anwendungsbereich liegt'} — `
+        + 'ohne die Angabe laesst sich das nicht pruefen, und ohne Pruefung '
+        + 'wird nicht gerechnet.');
+    }
+    const zuKlein = b.groesser_als != null && !(v > b.groesser_als);
+    const zuGross = b.kleiner_als  != null && !(v < b.kleiner_als);
+    const unter   = b.mindestens   != null && v < b.mindestens;
+    const ueber   = b.hoechstens   != null && v > b.hoechstens;
+    if (zuKlein || zuGross || unter || ueber) {
+      return nichts('ausserhalb_des_anwendungsbereichs',
+        `${b.bez || b.feld} = ${v}. Der Bericht wertet nur aus, wenn `
+        + `${b.bez || b.feld} ${b.text || 'im Anwendungsbereich liegt'}. `
+        + 'Fuer dieses Objekt hat der Gutachterausschuss keinen Faktor '
+        + 'abgeleitet; ein Faktor aus einem anderen Segment gilt hier nicht '
+        + '(§ 10 ImmoWertV).');
+    }
+  }
+  return null;
+}
+
 export function auswerten(modell, eingabe) {
   if (!modell || !modell.form) return nichts('kein_modell', 'Kein Modell hinterlegt.');
+
+  /* v1100c-WBED: der Anwendungsbereich wird geprueft, BEVOR gerechnet wird. */
+  const _bed = bedingungPruefen(modell, eingabe || {});
+  if (_bed) return _bed;
+
   const fn = AUSWERTER[modell.form];
   if (!fn) return nichts('form_unbekannt', `Modellform '${modell.form}' kennt der Auswerter nicht.`);
 
@@ -629,6 +1212,25 @@ export function auswerten(modell, eingabe) {
   if (!r.verfuegbar) return r;
 
   const einheit = modell.liefert || FORM_EINHEIT[modell.form] || 'faktor';
+
+  /* ═══ v1100b-WK2D · DIE ERMITTELTE KATEGORIE GEHT AN DIE KORREKTUREN ══
+     GEMESSEN an Oberhavel: die BGF-Korrektur greift je Region anders, und
+     die Region leitet die FORMEL aus dem Bodenrichtwert ab. Sie stand
+     danach in `r.kategorie` — aber nicht im Eingabeobjekt, das die
+     Korrekturen lesen. Die Korrektur fand ihre Kategorie nie und lieferte
+     still nichts: 0,97 statt 0,97 x 1,01.
+
+     Der Aufrufer kann sie auch nicht selbst setzen — er kennt die
+     Zuordnungsregel des Berichts nicht, sonst braeuchte es sie im Rezept
+     nicht. Also reicht der Auswerter sie durch.
+
+     Eine ausdrueckliche Angabe des Aufrufers gewinnt: wer die Region
+     kennt, soll sie setzen koennen. */
+  const _eingabeK = (r && r.kategorie && modell.achse_k_feld
+                     && (eingabe || {})[modell.achse_k_feld] == null)
+    ? { ...(eingabe || {}), [modell.achse_k_feld]: r.kategorie }
+    : (eingabe || {});
+
 
   /* v1094-WEUR · EIN EURO-BETRAG BEKOMMT SEINE KORREKTUREN.
    *
@@ -651,7 +1253,7 @@ export function auswerten(modell, eingabe) {
     const kE = [];
     const offenE = [];
     for (const k of (modell.korrekturen || [])) {
-      const t = korrekturAnwenden(k, eingabe || {});
+      const t = korrekturAnwenden(k, _eingabeK);
       if (t && (t.wert || t.wirkung === 'multiplikativ')) kE.push(t);
       else if (t == null) offenE.push(k.bez || k.feld);
     }
@@ -691,7 +1293,7 @@ export function auswerten(modell, eingabe) {
   const korr = [];
   const offen = [];
   for (const k of (modell.korrekturen || [])) {
-    const t = korrekturAnwenden(k, eingabe || {});
+    const t = korrekturAnwenden(k, _eingabeK);
     /* v1093-WMUL · Ein additiver Zuschlag von 0,00 ist ein Nichts — so
      * druckt Herford ihn ab (kBgf 0,00), und so wird er seit v1083
      * uebersprungen. Ein MULTIPLIKATIVER Faktor 0 ist kein Nichts: er

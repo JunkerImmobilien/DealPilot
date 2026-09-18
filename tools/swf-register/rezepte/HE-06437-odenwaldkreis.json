@@ -1,0 +1,73 @@
+{
+  "land_code": "HE",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "gaa_kennz": "06AFBHP-ODW",
+  "ags": ["06437"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "Kaufverträge 2024 bis 2025, Kaufpreise unter 900.000 Euro",
+  "beschlossen": "2026-01-01",
+  "veroeffentlicht": "2026-08",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_datei": "2026_IMB_SÜDHESSEN_ AFB_HEPPENHEIM_GESAMTAUSGABE.pdf, Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.1, Seite 110",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises, Immobilienmarktbericht Südhessen 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 einschließlich Baunebenkosten, Bezugsparameter Bruttogrundfläche, Baupreisindex quartalsweise zum Beurkundungsdatum, Gesamtnutzungsdauer 80 Jahre, modifizierte wirtschaftliche Restnutzungsdauer 20 bis 80 Jahre nach der Punktetabelle der Anlage 2 ImmoWertV, lineare Alterswertminderung, Standardstufe mindestens 2,0, Nebengebäude pauschaler Zeitwert, Außenanlagen pauschal 5 Prozent vom Zeitwert der baulichen Anlagen, Regionalfaktor mit Beschluss zum 01.01.2026 auf 1,0 festgesetzt. Nur Kaufpreise unter 900.000 Euro.",
+  "fundstelle": "Kapitel 8.3.1.1, Tabelle Durchschnittlicher Sachwertfaktor, Seite 110.",
+
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 80,
+    "alterswertminderung": "linear",
+    "regionalfaktor": 1.0,
+    "bezugsmassstab": "BGF"
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser im Odenwaldkreis",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [150000, 200000, 250000, 300000, 350000, 400000, 450000,
+                    500000, 550000, 600000, 650000, 700000, 750000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["alle"],
+        "kategorie_baender": [
+          { "von": 0, "bis": null, "kategorie": "alle" }
+        ],
+        "zellen": {
+          "alle": [1.59, 1.36, 1.20, 1.09, 1.00, 0.93, 0.88, 0.83, 0.79, 0.75, 0.72, 0.69, 0.66]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "43 Kauffälle 2024/2025, Bestimmtheitsmaß 0,61 — der belastbarste Wert der fünf südhessischen Kreise. Standardabweichung ±0,20. Keine Untergliederung nach Bodenrichtwertbereichen; der Odenwaldkreis ist der ländlichste der fünf Kreise mit einem mittleren Bodenrichtwert von 135 Euro/qm. Der Bericht sagt: Zwischenwerte sind zu interpolieren, Extrapolationen über die angegebene Spanne hinaus können nur in geringem Umfang marktgerecht durchgeführt werden.",
+        "normobjekt": "Mittlerer vorläufiger Sachwert 394.000 Euro, mittlere Grundstücksgröße 750 qm, mittlerer Bodenrichtwert 135 Euro/qm, mittlere wirtschaftliche Restnutzungsdauer 42 Jahre, mittlere Standardstufe 2,8, mittlere BGF 350 qm, mittlere Wohnfläche 170 qm. Mittlerer Kaufpreis 2.240 Euro je qm Wohnfläche (1.230 bis 3.620) — der niedrigste der fünf Kreise."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Odenwaldkreis, ungeteilt",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser in konventioneller Bauweise",
+        "extrapolation": "laut Bericht nur in geringem Umfang marktgerecht, hier ausgeschlossen"
+      },
+      "beleg": "Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.1, Tabelle Durchschnittlicher Sachwertfaktor, Seite 110.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle mit Fallzahl, Bestimmtheitsmass 0,61 und Standardabweichung. KEINE Stufe A: 43 Kauffaelle, Standardabweichung 0,20 - die groesste der fuenf Kreise -, und der Ausschuss weist selbst auf die hohe Schwankungsbreite hin.",
+      "fallzahl": 43,
+      "streuung": 0.20
+    }
+  ],
+
+  "anmerkungen": [
+    "Für Reihenhäuser und Doppelhaushälften führt der Bericht im Odenwaldkreis AUSDRÜCKLICH KEINE Werte — die Spalte in Kapitel 8.3.1.2 ist durchgehend leer, ohne Fallzahl und ohne Bestimmtheitsmaß. Ein rhdhh-Zweig ist deshalb nicht hinterlegt; der Rechner antwortet für ein Reihenhaus mit objektart_nicht_abgeleitet, und das ist hier die richtige Antwort.",
+    "Der Ausschuss hat zum Bericht 2026 ERSTMALS getrennt nach den fünf südhessischen Landkreisen ausgewertet. Kreis Groß-Gerau und Kreis Offenbach liegen als eigene Rezepte im Register; Kreis Bergstraße und Landkreis Darmstadt-Dieburg sind zusätzlich in Ost- und Westbereich getrennt und noch nicht erfasst.",
+    "Der Auswertung liegen die Bodenrichtwerte zum Stichtag 01.01.2024 zugrunde; auf eine konjunkturelle Anpassung wurde wegen der stagnierenden Preisentwicklung verzichtet. Für aktuelle Bewertungsfälle sind laut Bericht die Bodenrichtwerte zum 01.01.2026 zu verwenden."
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "land_code": "NI",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Bereich übriger Landkreis Diepholz",
+  "gaa_kennz": "03251",
+  "ags": ["03251"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "13.01.2022 bis 27.10.2025",
+  "beschlossen": "2026-01",
+  "veroeffentlicht": "2026-03-02",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_sulverdhostsywe",
+  "quelle_datei": "Tableau-Dashboard 2026_sw_rh_sulverdhostsywe/dash, abgetastet am 14.09.2026",
+  "quellenvermerk": "Gutachterausschüsse für Grundstückswerte in Niedersachsen, Datenbasis 01.01.2026, Tag der Veröffentlichung 02.03.2026",
+  "lizenz": "frei zugänglich, kostenfreier Abruf",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Anwendung setzt eine modellkonforme Wertermittlung nach der Modellbeschreibung Sachwertfaktoren des Ausschusses voraus.",
+  "fundstelle": "Kalkulator „Sachwertfaktoren für ein Reihenhaus oder Doppelhaushälfte — Übriger Landkreis Diepholz“ nebst den beiden Diagrammen der Umrechnungskoeffizienten.",
+
+  "modellansaetze": {
+    "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+    "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+    "gnd_jahre": 80,
+    "regionalfaktor": 1.0,
+    "alterswertminderung": "linear (§ 38 ImmoWertV)",
+    "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+    "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+    "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+    "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+    "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de"
+  },
+
+  "modelle": [
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhaus oder Doppelhaushälfte",
+      "form": "stufen_1d",
+      "formel": {
+        "form": "stufen_1d",
+        "achse_feld": "sachwert",
+        "achse_bez": "vorläufiger Sachwert in Euro",
+        "stufen": {
+          "100000": 1.12,
+          "125000": 1.08,
+          "150000": 1.05,
+          "175000": 1.01,
+          "200000": 0.98,
+          "225000": 0.95,
+          "250000": 0.92,
+          "275000": 0.89,
+          "300000": 0.85,
+          "325000": 0.82,
+          "350000": 0.79,
+          "375000": 0.77,
+          "400000": 0.74
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "186 Kauffälle, Standardabweichung durchgehend ±0,14. DIESES MODELL KENNT KEINEN BODENRICHTWERT — anders als die übrigen niedersächsischen Kalkulatoren hat es nur zwei Eingaben: den vorläufigen Sachwert und das Verhältnis von Bruttogrundfläche zu Wohnfläche. Die Werte sind am amtlichen Kalkulator abgefragt, dreizehn Stützstellen über den abgedruckten Bereich 100.000 bis 400.000 €.",
+        "normobjekt": "Verhältnis Bruttogrundfläche zu Wohnfläche 2,0 — die Vorgabe des Kalkulators, dort steht der Umrechnungskoeffizient auf 1,00. Stichprobe: vorläufiger Sachwert 61.000 bis 384.000 € (Median 214.000), Standardstufe 1,5 bis 3,8 (Median 2,7), BGF/Wohnfläche 1,06 bis 2,67 (Median 1,65), Baujahr 1926 bis 2017 (Median 1984), Bodenrichtwert 18 bis 155 €/m² (Median 81), Wohnfläche 59 bis 186 m²."
+      },
+      "korrekturen": [
+        {
+          "bez": "Abweichendes Verhältnis Bruttogrundfläche zu Wohnfläche",
+          "feld": "bgf_wfl",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "1.2": 1.07,
+            "1.4": 1.05,
+            "1.6": 1.03,
+            "1.8": 1.01,
+            "2.0": 1.0,
+            "2.2": 0.99,
+            "2.4": 0.98,
+            "2.6": 0.98,
+            "2.8": 0.97
+          },
+          "rundung_stellen": 2,
+          "hinweis": "Umrechnungskoeffizient aus dem zweiten Diagramm, Normstelle 2,0. Die Spanne ist klein — zwischen 1,2 und 2,8 liegen zehn Prozent. ACHTUNG: das Feld `bgf_wfl` ist ein VERHÄLTNIS und wird nirgends erhoben; die Korrektur liegt hier bereit und greift erst, wenn Bruttogrundfläche und Wohnfläche beide vorliegen und der Aufrufer den Quotienten mitgibt. Ohne die Angabe rechnet das Modell am Normobjekt — so, wie es der Kalkulator selbst vorgibt."
+        }
+      ],
+      "beleg": "Kalkulator 2026_sw_rh_sulverdhostsywe des Gutachterausschusses Sulingen-Verden fuer den uebrigen Landkreis Diepholz, Wertermittlungsstichtag 01.01.2026, 186 Kauffaelle. Dreizehn Stuetzstellen am Kalkulator abgefragt, dazu die abgedruckte Kurve der BGF/Wohnflaechen-Umrechnungskoeffizienten.",
+      "stufe": "A",
+      "stufe_grund": "Die Werte stammen aus dem amtlichen Kalkulator des Ausschusses selbst. Die sieben im Diagramm beschrifteten Stützstellen (100.000 bis 400.000 in 50.000er Schritten) kommen zeichengleich heraus; abgetastet ist doppelt so fein.",
+      "fallzahl": 186
+    }
+  ]
+}

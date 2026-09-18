@@ -409,7 +409,38 @@
     if (!g.ok || !gd || gd.lat == null || gd.lon == null) {
       return { ok: false, grund: 'geocode', fehler: 'Adresse nicht geokodierbar' };
     }
-    var b = await fetch(_apiBase() + '/marktbericht/boris?lat=' + gd.lat + '&lon=' + gd.lon, {
+    /* ═══ v1388-WLAND · DAS LAND MITGEBEN ════════════════════════════════
+       Marcels Befund: „wir haben eigentlich alle 16 Bundeslaender abgedeckt
+       … vielleicht hast du den falschen genommen."
+
+       GEMESSEN an Rinteln (Niedersachsen), lat 52.2057 / lon 9.0882: Die
+       Registry waehlt ihren Adapter ueber RECHTECKE, und das NRW-Rechteck
+       reicht bis maxLon 9.52 / maxLat 52.60 — es verschluckt einen breiten
+       Streifen Niedersachsen entlang der Weser. BORIS-NRW wurde gefragt,
+       lieferte (richtig) nichts, und weil es ein VERIFIZIERTER Landesdienst
+       ist, brach die Kette dort ab: Catch-alls sind fuer verifizierte
+       Laender ausgeschlossen („ein leeres NRW bleibt ein Befund").
+
+       Fuer Niedersachsen gibt es aber gar keinen Landesdienst — es laeuft
+       ueber BORIS-D, also ueber genau so einen Catch-all. Der haette
+       80 EUR/m2 geliefert.
+
+       Dieses Fenster kennt die PLZ und damit das Land. Die Registry
+       braucht nur diese eine Angabe, um zu erkennen, dass der Punkt
+       ausserhalb des beanspruchten Landes liegt. Der Marktbericht schickt
+       das Feld NICHT und verhaelt sich unveraendert.
+
+       MEHRDEUTIGE PLZ SAGEN NICHTS. `_plzToBundesland` kennt Mischcodes
+       wie "NRW-NI" oder "HB-NI" — Postleitzahlen, die ueber eine
+       Landesgrenze reichen. Dort das erste Kuerzel zu nehmen waere genau
+       die Sorte Rateschluss, die diesen Fehler ueberhaupt erzeugt hat.
+       Bei Mehrdeutigkeit wird KEIN Land mitgegeben; dann greift die alte
+       Logik, und die ist immer noch besser als eine falsche Angabe. */
+    var _land = _plzToBundesland(plz);
+    var _landCode = (_land && String(_land).indexOf('-') < 0) ? String(_land) : '';
+    if (_landCode === 'NRW') _landCode = 'NW';                  /* Registry-Schreibweise */
+    var b = await fetch(_apiBase() + '/marktbericht/boris?lat=' + gd.lat + '&lon=' + gd.lon
+                        + (_landCode ? '&land=' + encodeURIComponent(_landCode) : ''), {
       headers: { 'Authorization': 'Bearer ' + token }
     });
     var bd = await b.json().catch(function () { return null; });

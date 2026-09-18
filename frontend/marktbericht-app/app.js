@@ -751,6 +751,29 @@ function _renderWertverfahren(d) {
     + (hk.kurz ? '<div class="wv-hk">Liegenschaftszinssatz: '
         + (hk.liegenschaftszins_pct != null ? String(hk.liegenschaftszins_pct).replace('.', ',') + ' % \u00b7 ' : '')
         + hk.kurz + (hk.indikativ ? ' (indikativ)' : '') + '</div>' : '')
+    /* ═══ v1099b-WQL · DER WEG ZUR QUELLE, AUF DEM BILDSCHIRM ═══════════
+       Marcels Vorgabe: "gib im Marktbericht bei den Liegenschaftszinsen
+       und Sachwertfaktoren den Link an, wenn der Kunde die Adresse
+       eingegeben hat. Dann kann er selber die Werte holen oder kaufen."
+
+       Er steht IMMER da, nicht nur wenn eine Zahl fehlt: wo eine steht,
+       belegt er sie; wo keine steht, ist er die einzige Auskunft, die wir
+       geben koennen.
+
+       `rel="noopener"` und `target="_blank"`, weil der Nutzer seinen
+       Bericht nicht verlieren soll, wenn er nachschaut. */
+    + ((hk.quelle_link && hk.quelle_link.satz)
+        ? '<div class="wv-quelle">'
+          + esc(hk.quelle_link.satz.text)
+          /* v1118-WAQ - warum hier keine Zahl steht. */
+          + (hk.quelle_link.satz.warum_kein_wert
+              ? ' ' + esc(hk.quelle_link.satz.warum_kein_wert) : '')
+          + (hk.quelle_link.satz.kosten ? ' ' + esc(hk.quelle_link.satz.kosten) : '')
+          + ' <a href="' + esc(hk.quelle_link.url) + '" target="_blank" rel="noopener">'
+          + 'zur Quelle</a>'
+          + (hk.quelle_link.satz.hinweis ? '<br><span class="wv-quelle-hw">' + esc(hk.quelle_link.satz.hinweis) + '</span>' : '')
+          + '</div>'
+        : '')
     /* v1141-RW \u00b7 Der Bodenwert geht in BEIDE anderen Verfahren ein, deshalb
      * gehoert sein Weg direkt unter seine Zahl \u2014 nicht in eine der Karten.
      * Seine Schritte heissen `schritte` (ErtragswertService.bodenwert), die
@@ -819,7 +842,78 @@ function _renderWertverfahren(d) {
           : (sw.grund || 'nicht ausgewiesen'),
         'sach', sw.staffel,
         (sw.available && !sw.marktangepasst) ? (sw.sachwertfaktor_hinweis || null) : null)
-    + '</div>';
+    + '</div>'
+    /* v1106-WQLS - derselbe Weg wie beim Liegenschaftszins, nur fuer den
+       Sachwertfaktor. Er steht UNTER den drei Karten, weil er sich auf die
+       Sachwertkarte bezieht und nicht auf den Bodenwert darueber. */
+    + ((sw.sachwertfaktor_quelle_link && sw.sachwertfaktor_quelle_link.satz)
+        ? '<div class="wv-quelle">'
+          + esc(sw.sachwertfaktor_quelle_link.satz.text)
+          /* v1118-WAQ - warum hier keine Zahl steht. */
+          + (sw.sachwertfaktor_quelle_link.satz.warum_kein_wert
+              ? ' ' + esc(sw.sachwertfaktor_quelle_link.satz.warum_kein_wert) : '')
+          + (sw.sachwertfaktor_quelle_link.satz.kosten
+              ? ' ' + esc(sw.sachwertfaktor_quelle_link.satz.kosten) : '')
+          + ' <a href="' + esc(sw.sachwertfaktor_quelle_link.url) + '" target="_blank"'
+          + ' rel="noopener">zur Quelle</a>'
+          + (sw.sachwertfaktor_quelle_link.satz.hinweis
+              ? '<br><span class="wv-quelle-hw">'
+                + esc(sw.sachwertfaktor_quelle_link.satz.hinweis) + '</span>' : '')
+          + '</div>'
+        : '')
+    /* === v1107-WNACH - DIE NAMENSNENNUNG IST EINE AUFLAGE ==============
+       Wo eine Zahl unter dl-de/by-2-0 steht, gehoert ihr Quellenvermerk
+       sichtbar dazu. Bis hierher hing er an jedem Registersatz und
+       erschien nirgends - und damit durfte keine dieser Zahlen zum Kunden.
+       Genannt wird nur, was in diesem Bericht wirklich steckt. */
+    + (function () {
+        var qn = (cc && cc.quellen_nachweis) || [];
+        if (!qn.length) return '';
+        /* v1402 · DER JAHRGANG GEHOERT ZUR NAMENSNENNUNG.
+           Marcels Anstoss: aeltere Berichte sind guenstiger oder sogar
+           gebuehrenfrei — „dann koennte man diese verwenden und einen
+           vermerk daran setzen". Genau der Vermerk stand hier nicht. Eine
+           Quellenangabe ohne Datum sagt, WER die Zahl erhoben hat, aber
+           nicht WANN; bei einem Bericht von 2016 ist das die wichtigere
+           Haelfte. Ab vier Jahren wird es ausdruecklich benannt — nicht
+           als Warnung, sondern als Tatsache, die der Leser einordnen
+           koennen muss (Paragraf 10 ImmoWertV, Modellkonformitaet zum
+           Wertermittlungsstichtag). */
+        var jetzt = new Date().getFullYear();
+        return '<div class="wv-nachweis"><b>Quellennachweis</b>'
+          + qn.map(function (q) {
+              var alt = q.jahrgang ? (jetzt - Number(q.jahrgang)) : null;
+              return '<div class="wv-nw-z">' + esc(q.vermerk)
+                + ((q.kennzahlen && q.kennzahlen.length)
+                    ? ' <span class="wv-nw-kz">(' + esc(q.kennzahlen.join(' und ')) + ')</span>'
+                    : '')
+                + (q.jahrgang
+                    ? ' <span class="wv-nw-jg' + (alt != null && alt >= 4 ? ' wv-nw-alt' : '') + '">'
+                      + 'Berichtsjahr ' + esc(String(q.jahrgang))
+                      + (alt != null && alt >= 4
+                          ? ' · ' + alt + ' Jahre alt — zum heutigen Stichtag nur eingeschränkt modellkonform'
+                          : '')
+                      + '</span>'
+                    : '')
+                /* v1409 · DIE LIZENZ GEHOERT SICHTBAR DAZU.
+                   Sie wird seit v1107 im Nachweis gesammelt und wurde
+                   nirgends ausgegeben — dabei entscheidet gerade sie, was
+                   der Kunde mit der Zahl tun darf. Gemessen am 15.09.2026:
+                   18 Sachwertfaktor-Saetze tragen GAR KEINE Lizenzangabe,
+                   die meisten davon auch keine Quell-URL. Wer sie verwendet,
+                   weiss nicht, unter welchen Bedingungen. Ein Strich sagt
+                   mehr als ein Weglassen. */
+                + ' <span class="wv-nw-liz' + (q.lizenz ? '' : ' wv-nw-liz-offen') + '">'
+                +   (q.lizenz ? esc(q.lizenz) : 'Lizenz nicht hinterlegt')
+                + '</span>'
+                + (q.url ? '<br><a href="' + esc(q.url) + '" target="_blank"'
+                           + ' rel="noopener">' + esc(q.url) + '</a>' : '')
+                + '</div>';
+            }).join('')
+          + '</div>';
+      })();
+
+
 
   if (!document.getElementById('wv-css')) {
     var st = document.createElement('style'); st.id = 'wv-css';
@@ -835,6 +929,35 @@ function _renderWertverfahren(d) {
       + '#wv-box .wv-boden b{font-size:22px;white-space:nowrap}'
       + '#wv-box .wv-boden span{font-size:12px;opacity:.7}'
       + '#wv-box .wv-hk{margin-top:6px;font-size:12px;opacity:.75}'
+      /* v1099b-WQL · Der Quellenhinweis steht leiser als die Zahl, aber
+         nicht versteckt: er ist eine Auskunft, keine Fussnote. Der Link
+         traegt die Markenfarbe ueber das Whitelabel-Token - ein hartes
+         Gold waere beim Mandanten falsch. */
+      + '#wv-box .wv-quelle{margin-top:8px;padding:7px 10px;border-radius:7px;'
+      + '  background:rgba(201,168,76,.06);border-left:3px solid var(--wl-c9a84c,#c9a84c);'
+      + '  font-size:11.5px;line-height:1.5;opacity:.9}'
+      + '#wv-box .wv-quelle a{color:var(--wl-c9a84c,#c9a84c);text-decoration:underline;'
+      + '  white-space:nowrap}'
+      + '#wv-box .wv-quelle-hw{display:block;margin-top:3px;font-size:10.5px;opacity:.7}'
+      /* v1107-WNACH - leiser als der Quellenhinweis, aber lesbar: eine
+         Namensnennung, die niemand liest, erfuellt die Lizenz nicht. */
+      + '#wv-box .wv-nachweis{margin-top:18px;padding:10px 12px;border-radius:8px;'
+      + '  border:1px solid rgba(128,128,128,.2);font-size:11px;line-height:1.5;opacity:.85}'
+      + '#wv-box .wv-nachweis b{display:block;margin-bottom:5px;font-size:11px;'
+      + '  letter-spacing:.04em;text-transform:uppercase;opacity:.7}'
+      + '#wv-box .wv-nw-z{margin-top:4px}'
+      + '#wv-box .wv-nw-kz{opacity:.65}'
+      /* v1402: der Jahrgang steht als eigene Marke — ab vier Jahren in Rot,
+         weil er dann die Aussagekraft der Zahl begrenzt. Rot ist hier eine
+         Statusfarbe und bleibt in jeder Marke dieselbe. */
+      + '#wv-box .wv-nw-jg{opacity:.65;white-space:nowrap}'
+      + '#wv-box .wv-nw-alt{opacity:1;color:#B8625C;white-space:normal}'
+      /* v1409: die Lizenz als eigene Marke — fehlt sie, faellt es auf. */
+      + '#wv-box .wv-nw-liz{opacity:.6;white-space:nowrap}'
+      + '#wv-box .wv-nw-liz-offen{opacity:1;color:#B8625C;white-space:normal}'
+      + '#wv-box .wv-nachweis a{color:var(--wl-c9a84c,#c9a84c);text-decoration:underline;'
+      + '  word-break:break-all}'
+
       /* v1198b · Der Grund, warum kein Bodenwert dasteht. */
       + '#wv-box .wv-bwgrund{margin-top:9px;padding:9px 11px;border-radius:8px;font-size:11.5px;line-height:1.55;border:1px solid rgba(201,168,76,.32);background:rgba(201,168,76,.09)}'
       + '#wv-box .wv-g{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}'
@@ -3974,10 +4097,42 @@ async function exportPdf(out) {
         need(_hz.length * 3.2 + 3); doc.text(_hz, M, y); y += _hz.length * 3.2 + 2;
       });
     }
+
+    /* === v1106-WQLS - DER WEG ZUR QUELLE, AUCH BEIM SACHWERTFAKTOR ====
+       Marcels Vorgabe vom 13.09.2026 nannte BEIDE Kennzahlen: "gib im
+       Marktbericht bei den Liegenschaftszinsen und Sachwertfaktoren den
+       Link an". Der Zins bekam ihn in v1099, der Sachwertfaktor nicht -
+       das Backend liefert `sachwertfaktor_quelle_link` seither, es las nur
+       niemand.
+
+       Gerade hier ist der Link haeufig die EINZIGE Auskunft: wo kein Faktor
+       im Register steht, ist die Adresse des zustaendigen Ausschusses alles,
+       was wir ehrlich sagen koennen. Deshalb steht er auch dann, wenn der
+       Sachwert unangepasst bleibt. */
+    var _sql = _swx.sachwertfaktor_quelle_link;
+    if (_sql && _sql.satz) {
+      y += 1;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5);
+      doc.setTextColor(140, 132, 118);
+      var _sqt = doc.splitTextToSize(String(_sql.satz.text)
+        + (_sql.satz.warum_kein_wert ? ' ' + _sql.satz.warum_kein_wert : '')
+        + (_sql.satz.kosten ? ' ' + _sql.satz.kosten : ''), blockW);
+      need(_sqt.length * 3.2 + 8); doc.text(_sqt, M, y); y += _sqt.length * 3.2 + 1;
+      doc.setTextColor(120, 110, 140);
+      var _squ = doc.splitTextToSize(String(_sql.url), blockW);
+      doc.text(_squ, M, y); y += _squ.length * 3.2 + 1;
+      if (_sql.satz.hinweis) {
+        doc.setTextColor(140, 132, 118);
+        var _sqh = doc.splitTextToSize(String(_sql.satz.hinweis), blockW);
+        need(_sqh.length * 3.2 + 3); doc.text(_sqh, M, y); y += _sqh.length * 3.2 + 1;
+      }
+      doc.setTextColor(...MUT);
+    }
     y += 4;
   }
 
-  /* WPDF-1 · Rechenweg Ertragswertverfahren.
+  /* WPDF-1 
+· Rechenweg Ertragswertverfahren.
    * Bisher zeigte das PDF nur das Ergebnis. Fuer ein Dossier, das vor einer Bank
    * besteht, muss der Weg dastehen — Zeile fuer Zeile, mit der Herkunft des
    * Liegenschaftszinses. Eine Zahl ohne Herleitung ist im Dossier wertlos. */
@@ -4095,6 +4250,27 @@ async function exportPdf(out) {
       _q += ' · ' + String(_ew.liegenschaftszins_quelle).split(',')[0];
     }
     doc.text(doc.splitTextToSize('Herkunft: ' + _q, blockW - 40), M + 30, y + 11.5);
+
+    /* ═══ v1099-WQL · WO DER LESER DEN WERT SELBST HOLT ═══════════════════
+       Marcels Vorgabe vom 13.09.2026: „gib im Marktbericht bei den
+       Liegenschaftszinsen und Sachwertfaktoren den Link an, wenn der Kunde
+       die Adresse eingegeben hat."
+
+       Der Link steht IMMER da, nicht nur wenn ein Wert fehlt: er belegt
+       die Zahl und laesst sie nachpruefen. Wo keine Zahl steht, ist er die
+       einzige Auskunft, die wir geben koennen - und damit die wichtigste.
+
+       Was er NICHT sagt: dass DealPilot den Wert liefert. Der Satz nennt
+       den Ausschuss, der ihn fuehrt. */
+    var _ql = _ew.liegenschaftszins_quelle_link;
+    if (_ql && _ql.satz) {
+      doc.setFontSize(6.5); doc.setTextColor(140, 132, 118);
+      var _zl = _ql.satz.text + (_ql.satz.kosten ? ' ' + _ql.satz.kosten : '');
+      doc.text(doc.splitTextToSize(_zl, blockW - 10), M + 5, y + 15.5);
+      doc.setTextColor(120, 110, 140);
+      doc.text(doc.splitTextToSize(_ql.url, blockW - 10), M + 5, y + 18.5);
+      doc.setTextColor(110, 110, 118);
+    }
 
     /* Die Spanne. Ein Mittelwert, dessen Standardabweichung die Haelfte
      * seines Betrags ausmacht, ist ohne sie eine Behauptung. */
@@ -4241,6 +4417,56 @@ async function exportPdf(out) {
       + 'Ohne Ortsbesichtigung, Bauakten- und Grundbucheinsicht. Grundlage sind die erfassten Angaben.', blockW);
     doc.text(_hr, M, y + 3);
     y += 5 + _hr.length * 3;
+
+    /* === v1107-WNACH - DER QUELLENNACHWEIS, UND WARUM ER PFLICHT IST ===
+       Die amtlichen Daten stehen teils unter dl-de/by-2-0. Diese Lizenz
+       erlaubt jede Verwendung, auch die gewerbliche - unter EINER
+       Bedingung: der Quellenvermerk muss genannt werden. Ohne ihn duerfen
+       die Zahlen nicht in einen Kundenbericht.
+
+       Er steht hier, nicht in der Fussnote: v1150b kuerzt Quellenangaben
+       dort auf 26 Zeichen, und ein by-2-0-Vermerk ist ein Vielfaches
+       davon. Eine abgeschnittene Namensnennung ist keine.
+
+       Genannt wird nur, was in DIESEM Bericht wirklich steckt - die Liste
+       baut das Backend aus den tatsaechlich verwendeten Registersaetzen. */
+    var _qn = (d.cross_check && d.cross_check.quellen_nachweis) || [];
+    if (_qn.length) {
+      need(14 + _qn.length * 8);
+      y += 3;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+      doc.setTextColor(...TXT);
+      doc.text('Quellennachweis', M, y); y += 4;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.3);
+      _qn.forEach(function (q) {
+        doc.setTextColor(...MUT);
+        var _kz = (q.kennzahlen || []).join(' und ');
+        /* v1402: Berichtsjahr in dieselbe Zeile. Ab vier Jahren mit dem
+           ausdruecklichen Zusatz — ein Datum, das der Leser selbst suchen
+           muesste, ist im PDF kein Datum. */
+        var _alt = q.jahrgang ? (new Date().getFullYear() - Number(q.jahrgang)) : null;
+        var _jg = q.jahrgang
+          ? '  Berichtsjahr ' + q.jahrgang
+            + (_alt != null && _alt >= 4
+                ? ' (' + _alt + ' Jahre alt \u2014 zum heutigen Stichtag nur eingeschr\u00e4nkt modellkonform)'
+                : '')
+          : '';
+        /* v1409: die Lizenz gehoert auch ins PDF — das ist das Blatt, das
+           zur Bank geht. Fehlt sie, steht das ausdruecklich da. */
+        var _lz = '  ' + (q.lizenz ? q.lizenz : 'Lizenz nicht hinterlegt');
+        var _zl = doc.splitTextToSize(q.vermerk + (_kz ? '  (' + _kz + ')' : '') + _jg + _lz, blockW);
+        need(_zl.length * 3 + 4);
+        doc.text(_zl, M, y); y += _zl.length * 3 + 0.5;
+        if (q.url) {
+          doc.setTextColor(120, 110, 140);
+          var _ul = doc.splitTextToSize(String(q.url), blockW);
+          doc.text(_ul, M, y); y += _ul.length * 3;
+        }
+        y += 1.5;
+      });
+      doc.setTextColor(...MUT);
+      y += 2;
+    }
   }
 
   /* v1208-lage · VIER BLOECKE, EINE SEKTION.

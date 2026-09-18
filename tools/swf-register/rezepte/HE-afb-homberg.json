@@ -1,0 +1,119 @@
+{
+  "land_code": "HE",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Hersfeld-Rotenburg, Schwalm-Eder und Werra-Meißner",
+  "gaa_kennz": "06AFBHR",
+  "ags": ["06632", "06634", "06636"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "Kaufverträge 2024 bis 2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-08",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_datei": "2026_IMB_AfB_Homberg.pdf, Immobilienmarktbericht 2026, Kapitel 13.2.1, Seiten 98 bis 100",
+  "quellenvermerk": "Amt für Bodenmanagement Homberg (Efze), Geschäftsstelle Gutachterausschuss für Immobilienwerte, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 (Anlage 4 ImmoWertV 2021), Gebäudestandard nach Leitfaden I, Baunebenkosten darin enthalten, kein Korrekturfaktor, Bezugsmaßstab Bruttogrundfläche, Baupreisindex quartalsweise zum Beurkundungsdatum, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, wirtschaftliche Restnutzungsdauer mindestens 20 Jahre, lineare Alterswertminderung, Nebengebäude und Außenanlagen wertmäßig berücksichtigt, lage- und objektangepasster Bodenrichtwert.",
+  "fundstelle": "Kapitel 13.2.1 Regionale Auswertung von Ein- und Zweifamilienhäusern, Seiten 98 bis 100.",
+
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 80,
+    "alterswertminderung": "linear",
+    "regionalfaktor": 1.0,
+    "bezugsmassstab": "BGF",
+    "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert auf Grundlage von Nachbewertungen"
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "Ein- und Zweifamilienhäuser einschließlich Doppelhaushälften und Reihenhäuser",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x": [25, 50, 75, 100],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenrichtwert in Euro/m²",
+        "achse_y": [75000, 125000, 175000, 225000, 275000, 325000, 375000, 425000, 475000],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "75000":  [0.99, 1.39, 1.60, null],
+          "125000": [0.88, 1.12, 1.26, null],
+          "175000": [0.81, 0.99, 1.10, 1.16],
+          "225000": [0.77, 0.91, 1.00, 1.05],
+          "275000": [0.73, 0.85, 0.92, 0.97],
+          "325000": [0.69, 0.80, 0.87, 0.91],
+          "375000": [0.66, 0.76, 0.82, 0.86],
+          "425000": [null, 0.72, 0.77, 0.81],
+          "475000": [null, 0.68, 0.73, null]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Echte zweiachsige Matrix mit STÜTZSTELLEN (nicht Klassen) für den Bodenrichtwert: 25, 50, 75 und 100 Euro/qm. Zwischen ihnen wird interpoliert, wie der Ausschuss es mit der multiplen Regression über beide Eingangsgrößen angelegt hat. 370 Kauffälle 2024/2025, multipler Korrelationskoeffizient 0,78. Der Ausschuss stellt ausdrücklich fest, dass die Faktoren für Doppelhaushälften und Reihenhäuser nur unwesentlich von denen der freistehenden Häuser abweichen und in der Region GEMEINSAM verwendet werden können.",
+        "normobjekt": "Nur Baujahre 1965 bis 2020 und älter als fünf Jahre, ausschließlich Standardobjekte mit regional üblicher Grundstücksgröße und ortsüblichem Bodenpreis. Kaufpreise durften nicht durch besondere Bauteile, hochpreisige Nebengebäude oder Außenanlagen beeinflusst sein. Mittlerer vorläufiger Sachwert 243.561 Euro, mittlere Grundstücksgröße 759 qm, mittlerer Bodenrichtwert 55 Euro/qm, mittlere Restnutzungsdauer 33 Jahre, mittlere Standardstufe 2,4, mittlere BGF 347 qm, mittlere Wohnfläche 148 qm."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Hersfeld-Rotenburg, Schwalm-Eder-Kreis und Werra-Meißner-Kreis, flächendeckend ohne ausgenommene Städte",
+        "sachlich": "Ein- und Zweifamilienhäuser, Doppelhaushälften und Reihenhäuser gemeinsam",
+        "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+        "kauffaelle_je_brw_stuetzstelle": { "25": 87, "50": 143, "75": 117, "100": 23 }
+      },
+      "beleg": "Immobilienmarktbericht 2026 des Amtes für Bodenmanagement Homberg (Efze), Kapitel 13.2.1, Sachwertfaktortabelle und Kauffalltabelle auf Seite 98, Merkmale der Datengrundlage auf Seite 99.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Matrix mit Kauffallzahlen je Zelle und multiplem Korrelationskoeffizienten 0,78 - der hoechste Wert unter den bisher geernteten hessischen Ausschuessen. KEINE Stufe A, weil die Stuetzstelle 100 Euro/qm nur 23 Kauffaelle traegt und die Randzellen der Matrix teils auf zwei bis drei Faellen beruhen.",
+      "fallzahl": 370
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Doppelhaushälften und Reihenhäuser",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x": [25, 50, 75, 100],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenrichtwert in Euro/m²",
+        "achse_y": [75000, 125000, 175000, 225000, 275000, 325000, 375000, 425000, 475000],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "75000":  [0.99, 1.39, 1.60, null],
+          "125000": [0.88, 1.12, 1.26, null],
+          "175000": [0.81, 0.99, 1.10, 1.16],
+          "225000": [0.77, 0.91, 1.00, 1.05],
+          "275000": [0.73, 0.85, 0.92, 0.97],
+          "325000": [0.69, 0.80, 0.87, 0.91],
+          "375000": [0.66, 0.76, 0.82, 0.86],
+          "425000": [null, 0.72, 0.77, 0.81],
+          "475000": [null, 0.68, 0.73, null]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "DIESELBE Matrix wie beim Zweig ezfh — das ist keine Verdopplung, sondern der ausdrückliche Satz des Berichts: 'Die Sachwertfaktoren für Doppelhaushälften und Reihenhäuser weichen nur unwesentlich von den freistehenden Ein- und Zweifamilienhäusern ab und können daher in der Region für diese Häusertypen gemeinsam verwendet werden.' Die 370 Kauffälle enthalten beide Haustypen; der Ausschuss weist sie nicht getrennt aus.",
+        "normobjekt": "wie beim Zweig ezfh: nur Baujahre 1965 bis 2020 und älter als fünf Jahre, ausschließlich Standardobjekte mit regional üblicher Grundstücksgröße und ortsüblichem Bodenpreis."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Hersfeld-Rotenburg, Schwalm-Eder-Kreis und Werra-Meißner-Kreis",
+        "sachlich": "Doppelhaushälften und Reihenhäuser, vom Ausschuss gemeinsam mit den freistehenden Häusern ausgewertet",
+        "extrapolation": "ausgeschlossen, leere Zellen bleiben leer"
+      },
+      "beleg": "Immobilienmarktbericht 2026 des Amtes für Bodenmanagement Homberg (Efze), Kapitel 13.2.1, Seite 98: Tabellenüberschrift 'Sachwertfaktor k für Ein- und Zweifamilienhäuser inkl. Doppelhaushälften und Reihenhäuser'.",
+      "stufe": "B",
+      "stufe_grund": "Dieselbe amtliche Matrix, vom Ausschuss ausdruecklich auch fuer diese Haustypen freigegeben. KEINE Stufe A aus denselben Gruenden wie beim Zweig ezfh, und zusaetzlich, weil der Bericht die Fallzahl fuer diesen Haustyp nicht gesondert ausweist.",
+      "fallzahl": 370
+    }
+  ],
+
+  "anmerkungen": [
+    "Der Ausschuss fasst freistehende Ein- und Zweifamilienhäuser, Doppelhaushälften und Reihenhäuser AUSDRÜCKLICH zu einem Satz zusammen. Deshalb steht dieselbe Matrix hier zweimal — einmal als Zweig ezfh, einmal als rhdhh. Das ist keine Verdopplung, sondern die einzige Art, die Aussage der Quelle im Register abzubilden: der Auswerter ordnet ein Reihenhaus dem Zweig rhdhh zu und fände ohne diesen Eintrag keinen Wert. Beim ersten Anlauf stand hier nur ezfh; der Rechner antwortete für ein Reihenhaus mit objektart_nicht_abgeleitet, obwohl der Bericht einen Wert hergibt.",
+    "ACHTUNG BEIM NACHLESEN IM PDF: Die Zahlen der Zeilen- und Spaltenköpfe dieser Tabelle sind in einer Schrift ohne Unicode-Zuordnung gesetzt. Kein Modus von pdftotext gibt sie aus — weder -layout noch -raw noch der Standardmodus. Die Faktoren selbst kommen durch, die Achsen nicht. Wer die Tabelle nur aus dem Textstrom liest, hält neun Zeilen ohne Beschriftung in der Hand und rät die Stützstellen. Gelesen wurden sie hier aus der mit pdftoppm gerenderten Seite 98.",
+    "Der Bericht führt zusätzlich Sachwertmodelle für Hofreiten und für Mehrfamilienhäuser auf, hält dafür aber ausdrücklich fest, der Gutachterausschuss habe auf der neuen Rechtsgrundlage NOCH KEINE Sachwertfaktoren beschlossen. Diese Zweige sind deshalb nicht hinterlegt.",
+    "Die Bodenrichtwerte dieser Region sind niedrig: die Matrix endet bei 100 Euro/qm, der Mittelwert liegt bei 55 Euro/qm. Für ein Objekt mit höherem Bodenrichtwert führt der Bericht keinen Wert."
+  ]
+}

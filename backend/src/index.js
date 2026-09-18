@@ -65,15 +65,275 @@ app.use('/api/v1/webhooks/stripe', stripeWebhookRoutes);
 app.use(express.json({ limit: '50mb' }));
 
 // ── Rate limiting (skip health checks) ──────────────
+/* ══════════════════════════════════════════════════════════════════════
+   v1366 · DAS LIMIT HAENGT AM KONTO, NICHT AN DER LEITUNG
+   ══════════════════════════════════════════════════════════════════════
+   B3 aus Marcels Schutz-Lastenheft verlangt Anomalie-Erkennung JE
+   ACCOUNT. Bis hierher zaehlte express-rate-limit nach IP - mit zwei
+   Folgen, beide am 13.09.2026 gemessen:
+
+   1. ZU ENG FUER ECHTE ARBEIT. Ein Seitenstart samt drei geoeffneten
+      Objekten erzeugt 57 API-Anfragen in 24 Sekunden. Das Limit stand
+      bei 100 pro Minute (printenv im Container - NICHT die 200/900 s aus
+      config.js, die dort als Default stehen).
+
+   2. MEHRERE MITARBEITER TEILEN SICH EINEN ZAEHLER. Hinter einem
+      Firmenanschluss laufen alle ueber dieselbe IP. Zwei Kollegen
+      gleichzeitig, und einer bekommt 429 - ohne etwas falsch gemacht zu
+      haben.
+
+   Beides loest derselbe Griff: wer eingeloggt ist, wird unter seiner
+   Nutzerkennung gezaehlt und bekommt ein deutlich groesseres Kontingent.
+   Wer nicht eingeloggt ist, bleibt bei der IP und beim engen Limit -
+   dort ist Vorsicht richtig.
+
+   DER SCHLUESSEL WIRD NICHT VERIFIZIERT, NUR GELESEN. Die Zaehlung
+   laeuft vor jeder Route, also vor `authenticate`. Ein gefaelschter
+   Token traefe damit einen fremden Zaehler-Eimer - schaden kann er
+   nicht, denn die Route selbst prueft ihn weiterhin richtig und lehnt
+   ihn ab. Wer mit fremder Kennung zaehlt, verbraucht nur Anfragen, die
+   er ohnehin nicht beantwortet bekommt.
+
+   HIER STAND EIN TOTER SCHALTER. Das Objekt trug `skip` ZWEIMAL:
+
+     skip: function (req) { ...Authorization vorhanden -> nicht limitieren... }
+     standardHeaders: true,
+     legacyHeaders: false,
+     skip: (req) => req.path.startsWith('/health')
+
+   In JavaScript gewinnt die zweite Eigenschaft. Die Ausnahme aus v395
+   (Commit 94e4f6f, 01.06.2026) war damit seit ueber drei Monaten
+   wirkungslos - die Datei sagte das Gegenteil von dem, was sie tat. Fuer
+   den Schutz war der Zufallszustand der bessere; jetzt steht es
+   ausdruecklich da.
+   ══════════════════════════════════════════════════════════════════════ */
+const jwtUtil = require('./utils/jwt');
+const securityEvents = require('./services/securityEventService');
+
+/* Wie oft ist dieser Schluessel in der letzten Stunde angelaufen? Nur im
+   Arbeitsspeicher - beim Neustart faengt die Zaehlung von vorn an, und das
+   ist richtig so: die dauerhafte Wahrheit steht in security_events, hier
+   liegt nur, was fuer die Einstufung des naechsten Ereignisses gebraucht
+   wird. Ein Eintrag je Konto, aufgeraeumt sobald er eine Stunde alt ist. */
+const _limitGedaechtnis = new Map();
+setInterval(() => {
+  const grenze = Date.now() - 60 * 60 * 1000;
+  for (const [k, v] of _limitGedaechtnis) {
+    if (v.seit < grenze) _limitGedaechtnis.delete(k);
+  }
+}, 15 * 60 * 1000).unref();
+
+
+/* Wer ist das? Gibt die Nutzerkennung zurueck oder null. */
+function _kontoAusToken(req) {
+  try {
+    const h = req.headers && req.headers.authorization;
+    if (!h) return null;
+    const m = /^Bearer\s+(.+)$/i.exec(h);
+    if (!m) return null;
+    const p = jwtUtil.verify(m[1]);
+    return (p && p.userId) ? String(p.userId) : null;
+  } catch (e) {
+    /* abgelaufen oder gefaelscht - dann zaehlt die IP, und die Route
+       lehnt die Anfrage ohnehin ab. */
+    return null;
+  }
+}
+
+/* Bei IPv6 bekommt ein einzelner Anschluss ein ganzes /64-Netz - wer
+   darin die Adresse wechselt, haette sonst jedes Mal einen frischen
+   Zaehler. Deshalb wird auf die ersten vier Bloecke gekuerzt. IPv4
+   bleibt, wie es ist. */
+function _ipSchluessel(ip) {
+  const roh = String(ip || 'unbekannt');
+  if (roh.indexOf(':') < 0) return roh;              /* IPv4 */
+  const ohneV4 = roh.replace(/^::ffff:/i, '');
+  if (ohneV4.indexOf(':') < 0) return ohneV4;        /* IPv4 in IPv6-Schreibweise */
+  return ohneV4.split(':').slice(0, 4).join(':') + '::/64';
+}
+
+const LIMIT_KONTO = parseInt(process.env.RATE_LIMIT_MAX_ACCOUNT || '600', 10);
+
+/* ══════════════════════════════════════════════════════════════════════
+   v1371 (B11) · AUSNAHMEN — befreit vom Limit, NICHT vom Protokoll
+
+   Marcels Auflage: „Administratoren, Entwickler und ausdruecklich
+   freigeschaltete Testkonten muessen weiterarbeiten koennen ... Ausnahmen
+   muessen rollenbasiert umgesetzt und trotzdem protokolliert werden."
+
+   Der zweite Halbsatz ist der wichtige. Eine Ausnahme ohne Protokoll
+   waere ein blinder Fleck: genau die Konten mit den weitesten Rechten
+   waeren die, ueber die niemand etwas weiss. Hier wird deshalb nur der
+   BREMSKLOTZ entfernt, nicht die Beobachtung.
+
+   WARUM EIN CACHE: die Ausnahme steht in der Datenbank, der Limiter
+   laeuft vor JEDER Anfrage. Eine Abfrage je Anfrage waere genau die
+   Sorte Kosten, die das Schutzsystem vermeiden soll. Fuenf Minuten
+   Gueltigkeit sind ein vertretbarer Kompromiss - wer eine Ausnahme
+   setzt, wartet hoechstens fuenf Minuten auf ihre Wirkung.
+   ══════════════════════════════════════════════════════════════════════ */
+const _ausnahmen = new Map();      /* userId -> { frei: bool, bis: ms } */
+const AUSNAHME_TTL = 5 * 60 * 1000;
+
+function _ausnahmeBekannt(konto) {
+  const e = _ausnahmen.get(konto);
+  return (e && e.bis > Date.now()) ? e.frei : null;
+}
+
+async function _ausnahmeLaden(konto) {
+  try {
+    const r = await require('./db/pool').query(
+      'SELECT security_exempt, role FROM users WHERE id = $1', [konto]);
+    /* Rollen, die von Haus aus befreit sind - sie muessen arbeiten
+       koennen, auch wenn gerade jemand das Limit ausreizt. */
+    const rolle = r.rows[0] && r.rows[0].role;
+    const frei = !!(r.rows[0] && (r.rows[0].security_exempt ||
+                    rolle === 'owner' || rolle === 'admin' || rolle === 'developer'));
+    _ausnahmen.set(konto, { frei, bis: Date.now() + AUSNAHME_TTL });
+    return frei;
+  } catch (e) {
+    /* Im Zweifel NICHT befreien - eine Ausnahme, die aus einem Fehler
+       entsteht, ist keine. */
+    _ausnahmen.set(konto, { frei: false, bis: Date.now() + 30 * 1000 });
+    return false;
+  }
+}
+
+
+
 const limiter = rateLimit({
   windowMs: config.rateLimit.windowMs,
-  max: config.rateLimit.max,
-  skip: function (req) { /* v395-ratelimit-skip: eingeloggte App-Requests nicht limitieren */ return !!(req.headers && req.headers.authorization && /^Bearer /i.test(req.headers.authorization)); },
+  max: (req) => (_kontoAusToken(req) ? LIMIT_KONTO : config.rateLimit.max),
+  keyGenerator: (req) => {
+    const konto = _kontoAusToken(req);
+    if (konto) return 'u:' + konto;
+    return 'ip:' + _ipSchluessel(req.ip);
+  },
+  /* Die eingebaute Pruefung warnt bei einem eigenen keyGenerator, weil
+     man dabei leicht die IPv6-Praefixe vergisst. Genau das erledigt
+     `_ipSchluessel` - deshalb ist die Warnung hier abgestellt und nicht
+     ueberhoert. Die Version im Container (express-rate-limit 7.5)
+     exportiert keinen `ipKeyGenerator`, sonst waere der der Weg. */
+  /* v1366b: der Schluessel heisst in 7.5 schlicht `ip` - mein erster
+     Versuch (keyGeneratorIpFallback) ist dort unbekannt und erzeugte beim
+     Start eine ValidationError-Zeile im Log. Eine Fehlermeldung, die
+     immer dasteht, wird nicht gelesen. */
+  validate: { ip: false },
+
   standardHeaders: true,
   legacyHeaders: false,
-  skip: (req) => req.path.startsWith('/health')
+  skip: (req) => {
+    if (req.path.startsWith('/health')) return true;
+
+    /* v1371: Ausnahmen ueberspringen das Limit - aber nur, wenn die
+       Antwort schon im Cache liegt. `skip` ist synchron; eine Abfrage
+       ist hier nicht moeglich. Beim ersten Mal wird deshalb normal
+       limitiert und die Ausnahme im Hintergrund nachgeladen; ab der
+       zweiten Anfrage greift sie. Fuer ein Konto, das dauernd arbeitet,
+       ist das eine Anfrage Unterschied. */
+    const konto = _kontoAusToken(req);
+    if (!konto) return false;
+
+    const bekannt = _ausnahmeBekannt(konto);
+    if (bekannt === null) { _ausnahmeLaden(konto); return false; }
+    return bekannt;
+  },
+
+  /* B3-Vorarbeit: eine Ueberschreitung ist noch kein Verstoss, aber sie
+     gehoert protokolliert. Mehr passiert hier bewusst NICHT - Marcels
+     Auflage: „Eine technische Auffaelligkeit darf nicht automatisch als
+     rechtlich bewiesener Vertragsverstoss behandelt werden." */
+  handler: (req, res) => {
+    const konto = _kontoAusToken(req);
+
+    /* v1367: das Ereignis geht in die Ablage, nicht nur ins Log. Bis
+       hierher stand es in console.warn - fluechtig, beim naechsten
+       Rebuild weg, nicht durchsuchbar. Ein Muster ueber Tage erkennt
+       man darin nicht.
+
+       Die Stufe steigt mit der Haeufigkeit, NICHT mit der Schwere des
+       Pfades: wer einmal ueber das Limit kommt, hat zu schnell
+       geklickt; wer es dauernd tut, arbeitet anders. Mehr sagt die
+       Stufe nicht - sie ist kein Score und loest nichts aus.
+
+       `await` gibt es hier nicht: der Handler muss antworten, nicht
+       warten. Faellt das Schreiben aus, steht es im Log und der Nutzer
+       merkt nichts - ein Protokoll darf die Anwendung nicht aufhalten. */
+    try {
+      const jetzt = Date.now();
+      const schluessel = konto ? ('u:' + konto) : ('ip:' + _ipSchluessel(req.ip));
+      const zuvor = _limitGedaechtnis.get(schluessel) || { n: 0, seit: jetzt };
+      if (jetzt - zuvor.seit > 60 * 60 * 1000) { zuvor.n = 0; zuvor.seit = jetzt; }
+      zuvor.n += 1;
+      _limitGedaechtnis.set(schluessel, zuvor);
+
+      const stufe = zuvor.n >= 20 ? 'ernst' : (zuvor.n >= 5 ? 'auffaellig' : 'hinweis');
+
+      /* v1370 (B8): NUR an den Schwellen nachrechnen und melden.
+
+         Bei jeder Ueberschreitung `stufeBerechnen()` aufzurufen wuerde
+         zwei Datenbankabfragen kosten - bei einem Skript mit tausend
+         Anfragen also zweitausend. Die Benachrichtigung wuerde teurer
+         als der Vorgang, den sie meldet, und das Problem verschlimmern.
+
+         Die Stufe kann sich nur an den Schwellen aendern (20 und 50, aus
+         SCHWELLEN in securityEventService). Genau dort wird geprueft -
+         zweimal je Konto und Stunde statt tausendmal. */
+      if (konto && (zuvor.n === 20 || zuvor.n === 50)) {
+        setImmediate(async () => {
+          try {
+            const sec = require('./services/securityEventService');
+            const alert = require('./services/securityAlert');
+            const bewertung = await sec.stufeBerechnen(konto);
+            if (bewertung.stufe === 'warnung' || bewertung.stufe === 'hohes_risiko') {
+              const u = await require('./db/pool').query(
+                'SELECT email FROM users WHERE id = $1', [konto]);
+              await alert.stufeMelden({
+                userId: konto,
+                email: u.rows[0] && u.rows[0].email,
+                stufe: bewertung.stufe,
+                grund: bewertung.grund,
+                vergleich: bewertung.vergleich
+              });
+            }
+          } catch (e) {
+            console.warn('[limit] Stufenmeldung fehlgeschlagen:', e.message);
+          }
+        });
+      }
+
+
+      securityEvents.schreibe({
+        userId: konto,
+        ipKey: konto ? null : _ipSchluessel(req.ip),
+        art: securityEvents.ARTEN.RATE_LIMIT,
+        stufe,
+        pfad: req.path,
+        methode: req.method,
+        detail: {
+          /* v1371: war das ein befreites Konto? Steht im Protokoll, auch
+             wenn es hier nur selten vorkommt - beim allerersten Aufruf,
+             bevor der Cache gefuellt ist. */
+          ausnahme: _ausnahmeBekannt(konto) === true,
+          limit: konto ? LIMIT_KONTO : config.rateLimit.max,
+
+          fenster_s: Math.ceil(config.rateLimit.windowMs / 1000),
+          ueberschreitungen_1h: zuvor.n
+        }
+      });
+    } catch (e) {
+      console.warn('[limit] Ereignis nicht protokolliert:', e.message);
+    }
+
+    res.status(429).json({
+      error: 'Zu viele Anfragen in kurzer Zeit. Bitte einen Moment warten.',
+      retry_after_s: Math.ceil(config.rateLimit.windowMs / 1000)
+    });
+
+  }
 });
 app.use(limiter);
+
 
 // Stricter rate limit for auth endpoints (prevent brute-force)
 const authLimiter = rateLimit({
@@ -94,6 +354,10 @@ app.use('/api/v1/bmf', require('./routes/bmf'));  /* V288-bmf-route-applied */
 app.use('/api/v1/tax-snapshots', require('./routes/taxSnapshots'));  // V278-tax-snapshots
 app.use('/api/v1/objects', objectRoutes);
 app.use('/api/v1/users', userRoutes);
+/* v1375 (A5): Einstellungen, die den Geraetewechsel ueberleben muessen -
+   erster Nutzer ist der Datenraum, dessen Links bisher nur im
+   localStorage lagen. */
+app.use('/api/v1/user-settings', require('./routes/userSettings'));
 app.use('/api/v1/plans', planRoutes);
 app.use('/api/v1/subscription', subscriptionRoutes);
 app.use('/api/v1/tax-records', taxRecordsRoutes);
@@ -203,6 +467,47 @@ async function start() {
     setTimeout(_runRetention, 60 * 1000);          // erster Lauf 60s nach Start
     setInterval(_runRetention, _RET_INTERVAL_MS);  // danach taeglich
     console.log('✓ Retention-Scheduler aktiv (taeglich)');
+
+    /* ══════════════════════════════════════════════════════════════════
+       v1373 (B15) · DAS LOESCHKONZEPT MUSS AUCH LAUFEN
+       ══════════════════════════════════════════════════════════════════
+       Die Datenschutzerklaerung sagt seit v1373 zu: Sicherheitsereignisse
+       nach 90 Tagen geloescht, Ereignisse mit Entscheidung nach drei
+       Jahren.
+
+       Eine Loeschfrist, die nur im Text steht, ist keine Loeschfrist -
+       sie ist eine Zusage, die man nicht haelt. Deshalb laeuft sie hier
+       mit, im selben taeglichen Takt wie die Kundenbindung.
+
+       DIE DREI JAHRE FUER ENTSCHEIDUNGEN sind kein Selbstzweck: wer
+       eingeschraenkt wurde, soll das im Streitfall nachvollziehen
+       koennen, und die regelmaessige Verjaehrung betraegt drei Jahre
+       (§ 195 BGB). Ein Protokoll, das vorher verschwindet, schuetzt
+       weder den Anbieter noch den Nutzer.
+       ══════════════════════════════════════════════════════════════════ */
+    const _SEC_LOESCH_MS = 24 * 60 * 60 * 1000;
+    const _secAufraeumen = async () => {
+      try {
+        const db = require('./db/pool');
+        const r1 = await db.query(
+          `DELETE FROM security_events
+            WHERE created_at < NOW() - INTERVAL '90 days'
+              AND art NOT IN ('eingeschraenkt','gesperrt','freigegeben')`);
+        const r2 = await db.query(
+          `DELETE FROM security_events
+            WHERE created_at < NOW() - INTERVAL '3 years'`);
+        if (r1.rowCount || r2.rowCount) {
+          console.log('[sec-retention] geloescht:', r1.rowCount, 'Beobachtungen (>90 Tage),',
+                      r2.rowCount, 'Entscheidungen (>3 Jahre)');
+        }
+      } catch (e) {
+        console.error('[sec-retention] Lauf-Fehler:', e.message);
+      }
+    };
+    setTimeout(_secAufraeumen, 90 * 1000);
+    setInterval(_secAufraeumen, _SEC_LOESCH_MS);
+    console.log('✓ Sicherheits-Loeschlauf aktiv (90 Tage / 3 Jahre)');
+
   } catch (e) {
     console.error('✗ Retention-Scheduler konnte nicht starten:', e.message);
   }

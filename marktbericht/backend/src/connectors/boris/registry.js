@@ -94,6 +94,20 @@ const F = {
 // ---- Laender-Konfiguration ----------------------------------------------
 // VERIFIZIERT (Capabilities gefetcht): nrw, bb
 // VORBEREITET (Endpunkt bekannt, GetFeatureInfo-Felder beim 1. echten Call zu pruefen): be, he
+/* v1388-WLAND · Welcher Adapter gehoert zu welchem Bundesland.
+ *
+ * Die Codes sind schon die Laenderkuerzel - bis auf `nrw`, das im Rest des
+ * Systems `NW` heisst (so steht es in den Registerdatensaetzen und in
+ * grest-plz-lookup.js). Diese eine Abweichung ist der Grund, warum hier
+ * eine Tabelle steht und kein `code.toUpperCase()`.
+ *
+ * Die Catch-alls stehen BEWUSST NICHT darin: sie gehoeren zu keinem Land,
+ * und genau das unterscheidet sie. */
+const LAND_VON_CODE = {
+  nrw: 'NW', be: 'BE', bb: 'BB', he: 'HE', mv: 'MV',
+  sh: 'SH', by: 'BY', bw: 'BW', sl: 'SL',
+};
+
 const ADAPTERS = [
   {
     /* v1071-WLIZ-1 · BORIS-NRW stellt die Bodenrichtwerte unter
@@ -137,8 +151,34 @@ const ADAPTERS = [
     crs: 'EPSG:4326', axis: 'latlon', format: 'gml', time: null,
   },
   {
-    code: 'he', name: 'BORIS-Hessen', license: 'open data (HVBG)', enabled: true, verified: false,
-    base: 'https://www.gds.hessen.de/wss/service/INSPIRE-HE-Bodenrichtwerte/guest', // verifizieren
+    /* ═══ v1395 · HESSEN ABGESCHALTET — der Endpunkt ist tot ═════════════
+     *
+     * GEMESSEN am 14.09.2026 an Wiesbaden, Frankfurt und Kassel: HTTP 404
+     * an allen dreien. Drei gesuchte Nachfolger (gds.hessen.de mit und
+     * ohne /INSPIRE/, geodaten.hessen.de) antworten ebenso.
+     *
+     * ABGESCHALTET UND NICHT NUR STEHENGELASSEN, weil ein toter Adapter
+     * an ERSTER Stelle zwei Dinge anrichtet:
+     *   1. Jeder hessische Abruf kostet einen Fehlversuch, bevor der
+     *      Catch-all drankommt.
+     *   2. Schlimmer: seine Fehlermeldung faerbt auf die NACHBARN ab.
+     *      Aschaffenburg liegt im Hessen-Rechteck, gehoert aber zu
+     *      Bayern - und meldete "HTTP 404 gds.hessen.de" fuer ein
+     *      bayerisches Objekt. Wer das liest, sucht den Fehler in Hessen.
+     *
+     * HESSEN FUNKTIONIERT WEITER, ueber BORIS-D. Gemessen mit dem
+     * abgeschalteten Adapter: Wiesbaden 2250, Frankfurt 6800, Kassel 450
+     * EUR/m2. Es geht also nichts verloren - es wird nur ein Umweg
+     * weniger gegangen.
+     *
+     * ZU TUN: aktuellen INSPIRE-Endpunkt beim HVBG erfragen; sobald er
+     * vorliegt, `enabled` zurueck auf true. */
+    code: 'he', name: 'BORIS-Hessen', license: 'open data (HVBG)',
+    enabled: false, verified: false,
+    note: 'Der hessische INSPIRE-Dienst antwortet seit 14.09.2026 mit HTTP 404. '
+      + 'Die Bodenrichtwerte kommen stattdessen über BORIS-D — geprüft an '
+      + 'Wiesbaden, Frankfurt und Kassel.',
+    base: 'https://www.gds.hessen.de/wss/service/INSPIRE-HE-Bodenrichtwerte/guest', // tot, s. o.
     bbox: { minLon: 7.77, maxLon: 10.24, minLat: 49.39, maxLat: 51.66 },
     layer: () => 'brw', crs: 'EPSG:4326', axis: 'latlon', format: 'gml', time: null,
   },
@@ -190,9 +230,33 @@ const ADAPTERS = [
      * Wuerzburg) lag ausserhalb und fiel faelschlich an den Catch-all.
      * Freigabe der zustaendigen Stelle liegt vor (Aktennotiz Junker
      * Solution; Az. bei M. Junker — bei Vorlage wortgleich nachtragen). */
+    /* v1389-WAUSFALL · DER ENDPUNKT IST TOT. Gemessen am 14.09.2026 fuer
+     * Muenchen, Nuernberg und Augsburg: HTTP 404 auf
+     * gdi.bayern.de/services/bodenrichtwerte/<jahr>/vboris, und zwar fuer
+     * jeden Jahrgang 2026 bis 2023. Drei gesuchte Nachfolger antworten
+     * ebenfalls mit 404 (geoservices.bayern.de/wms/v1 und /v2 sowie die
+     * im TUM-Katalog genannte Adresse). BORIS-D deckt Bayern nicht ab -
+     * es gibt also derzeit keinen Weg zum bayerischen Bodenrichtwert.
+     *
+     * `enabled` bleibt ABSICHTLICH true: der Adapter soll weiter versucht
+     * werden, damit ein wiederhergestellter Dienst von selbst greift. Der
+     * Hinweis unten sagt dem Nutzer, woran es liegt - `note` erscheint in
+     * der Antwort und damit in der Oberflaeche.
+     * ZU TUN: aktuellen Endpunkt bei den Gutachterausschuessen Bayern
+     * erfragen; der Viewer auf bodenrichtwerte.bayern.de laedt seine
+     * Kacheln ueber einen Weg, den ein GetCapabilities nicht hergibt. */
     code: 'by', name: 'BORIS-Bayern',
     license: 'Freigabe (Aktennotiz Junker Solution)',
     enabled: true, verified: true,
+    /* v1393 · DIE NOTIZ AUS v1389 WAR FALSCH und wird hier zurueckgenommen.
+     * Sie sagte, der Dienst antworte mit HTTP 404. Das stimmte nur, weil
+     * ihm der Referer fehlte; mit ihm antwortet er vollstaendig. Der
+     * eigentliche Grund ist ein anderer und steht seit jeher im Kopf
+     * dieser Datei: Bayern gibt den WERT nicht kostenfrei heraus. Alles
+     * uebrige - Zone, Gemarkung, Stichtag, Ausschuss - schon. */
+    note: 'Bayern gibt den Bodenrichtwert nur gegen Gebühr heraus. Zone, '
+      + 'Gemarkung und zuständiger Gutachterausschuss werden trotzdem '
+      + 'ermittelt — damit findest du den Wert im BORIS-Bayern-Viewer sofort.',
     quellenvermerk: 'Gutachterausschüsse in Bayern, BayernAtlas / GDI Bayern '
       + '(www.bodenrichtwerte.bayern.de)',
     base: 'https://gdi.bayern.de/services/bodenrichtwerte',
@@ -201,7 +265,32 @@ const ADAPTERS = [
     bbox: { minLon: 8.95, maxLon: 13.90, minLat: 47.20, maxLat: 50.60 },
     layer: (y) => 'bodenrichtwerte_' + (y || CURRENT_BRW_YEAR),
     crs: 'EPSG:4326', axis: 'latlon', format: 'gml', infoFormat: 'text/xml',
-    featureCount: '5', headers: browserHeaders, time: null,
+    featureCount: '5',
+    /* v1393 · ZWEI FEHLER AUF EINMAL, beide am 14.09.2026 gemessen.
+     *
+     * 1. DER REFERER FEHLTE. Bayern war der einzige Adapter mit blossem
+     *    `browserHeaders` — Schleswig-Holstein (Z. 189) und BW (Z. 260)
+     *    setzen laengst einen. Ohne ihn antwortet gdi.bayern.de mit
+     *    HTTP 404, MIT ihm mit HTTP 200. Das sah vier Jahrgaenge lang
+     *    wie ein toter Dienst aus und war eine fehlende Kopfzeile.
+     *
+     * 2. BAYERN ERMITTELT NUR ALLE ZWEI JAHRE. Es gibt 2024 und 2026,
+     *    KEIN 2025 und kein 2023. Die Jahreskaskade lief auf 2023 aus,
+     *    und genau dieser letzte Fehlversuch stand dann in der Meldung —
+     *    ein 404 auf einen Jahrgang, den es nie gab. */
+    headers: () => Object.assign(browserHeaders(), { 'Referer': 'https://atlas.bayern.de/' }),
+    /* Nur gerade Jahrgaenge, absteigend - und nur die, die es GIBT.
+     * v1394: Der erste Entwurf nahm drei (2026, 2024, 2022). 2022 liefert
+     * HTTP 404: der Dienst fuehrt nur die beiden aktuellen Stichtage.
+     * Ein 404 auf einen Jahrgang, den es nie gab, ist genau der Fehler,
+     * den v1393 bei 2023 behoben hat - hier waere er gleich wieder
+     * eingebaut worden, nur eine Stelle weiter. */
+    years: (y) => {
+      const jetzt = y || CURRENT_BRW_YEAR;
+      const start = jetzt % 2 === 0 ? jetzt : jetzt - 1;
+      return [start, start - 2];
+    },
+    time: null,
   },
   {
     /* v1082-WBW-1 · BW LIVE: BORIS-BW-Viewer nutzt gis.nrw.de als
@@ -514,7 +603,7 @@ export const BorisRegistry = {
 
   // Hauptfunktion: { lat, lon, year, manualBrw } -> einheitliches Ergebnis.
   // manualBrw = in DealPilot eingegebener Bodenrichtwert (Feld "brw") als Fallback.
-  async landValue({ lat, lon, year, manualBrw }) {
+  async landValue({ lat, lon, year, manualBrw, land }) {
     const fallback = (reason) => {
       const mv = num(manualBrw);
       if (mv != null) {
@@ -525,7 +614,7 @@ export const BorisRegistry = {
                note: 'Kein automatischer Bodenrichtwert und kein manueller Wert vorhanden.' };
     };
 
-    const claimed = this.claim(lat, lon);
+    let claimed = this.claim(lat, lon);   /* v1395: kann auf einen Ersatz wechseln */
     if (!claimed) return fallback('land_nicht_unterstuetzt');
     if (claimed.restricted) {
       const fb = fallback('land_kostenpflichtig_oder_gesperrt');
@@ -533,10 +622,36 @@ export const BorisRegistry = {
       fb.note = claimed.note || fb.note;
       return fb;
     }
+    /* ═══ v1395 · EIN ABGESCHALTETER DIENST BEENDET NICHTS ═══════════════
+     *
+     * Hier stand ein `return` — und das machte aus jedem abgeschalteten
+     * Landesadapter eine Sackgasse fuer sein ganzes Rechteck.
+     *
+     * BEIM ABSCHALTEN VON HESSEN SOFORT AUFGEFALLEN, in der Gegenprobe:
+     * Wiesbaden und Frankfurt lieferten vorher 2250 und 6800 EUR/m2 ueber
+     * BORIS-D — nach dem Abschalten gar nichts mehr, mit der Begruendung
+     * "land_vorbereitet_nicht_aktiv". Der Catch-all, der die Werte die
+     * ganze Zeit geliefert hatte, kam nicht mehr an die Reihe.
+     *
+     * Derselbe Gedanke wie v1389: ein Dienst, der NICHTS SAGT, ist kein
+     * Befund. Ein abgeschalteter sagt erst recht nichts. Also wird er
+     * uebersprungen statt zum Abbruch erklaert — und die Kette laeuft mit
+     * den uebrigen passenden Adaptern weiter, Catch-alls eingeschlossen.
+     *
+     * Nur wenn es gar keinen anderen gibt, bleibt es bei der alten
+     * Auskunft. */
     if (!claimed.enabled) {
-      const fb = fallback('land_vorbereitet_nicht_aktiv');
-      fb.claimed_land = claimed.name;
-      return fb;
+      const ersatz = ADAPTERS.filter((c) => c !== claimed && c.enabled && !c.restricted
+                                            && inBox(lat, lon, c.bbox));
+      if (!ersatz.length) {
+        const fb = fallback('land_vorbereitet_nicht_aktiv');
+        fb.claimed_land = claimed.name;
+        if (claimed.note) fb.note = claimed.note;
+        return fb;
+      }
+      /* Der erste Ersatz uebernimmt die Rolle des zustaendigen Adapters;
+         die uebrigen haengen ueber die normale Kettenlogik daran. */
+      claimed = ersatz[0];
     }
     /* v1077-WFBK-1 · Adapterkette statt Einzeladapter. Ein UNVERIFIZIERTER
      * Landesadapter (be/he/mv) darf bei kein_wert/request_failed auf die
@@ -557,31 +672,139 @@ export const BorisRegistry = {
         if (c !== claimed && c.enabled && !c.restricted && inBox(lat, lon, c.bbox)) chain.push(c);
       }
     } else if (!claimed.catchAll) {
-      /* v1082-WFBK-8 · GRENZKORREKTUR unter verifizierten Landesdiensten:
-       * die Rechteck-Boxen koennen schraege Landesgrenzen nicht abbilden
-       * (Stuttgart liegt im erweiterten Bayern-Rechteck). Liefert der
-       * verifizierte Erstadapter nichts, duerfen ANDERE verifizierte
-       * LANDESdienste mit passender Box antworten — NIE die
-       * Bundes-Catch-alls: ein leeres NRW bleibt ein Befund. */
+      /* v1388-WLAND · DAS RECHTECK IST KEINE LANDESGRENZE ════════════════
+       *
+       * Marcels Befund vom 14.09.2026: "wir haben eigentlich alle 16
+       * Bundeslaender abgedeckt und koennen ueberall die Bodenrichtwerte
+       * aufrufen. Vielleicht hast du den falschen genommen."
+       *
+       * GEMESSEN an Rinteln (Niedersachsen), lat 52.2057 / lon 9.0882:
+       *
+       *   claim()     -> BORIS-NRW      (verifiziert)
+       *   BORIS-NRW   -> nichts          richtig, es IST nicht NRW
+       *   Kette bricht ab, weil "verifiziert" keine Catch-alls zulaesst
+       *   BORIS-D     -> 80 EUR/m2       der Wert war die ganze Zeit da
+       *
+       * Die NRW-Box reicht bis maxLon 9.52 / maxLat 52.60 und verschluckt
+       * damit einen breiten Streifen Niedersachsen entlang der Weser. Fuer
+       * Niedersachsen gibt es keinen eigenen Landesdienst - es laeuft ueber
+       * BORIS-D, also ueber einen CATCH-ALL. Genau den schloss die Regel
+       * aus.
+       *
+       * DIE REGEL BLEIBT RICHTIG, nur ihre Voraussetzung fehlte: "ein
+       * leeres NRW ist ein Befund" gilt, WENN der Punkt in NRW liegt. Sagt
+       * der Aufrufer das Land (`land`), laesst sich das pruefen. Sagt er
+       * nichts, bleibt alles wie bisher - der Marktbericht schickt das Feld
+       * nicht und sieht deshalb keinen Unterschied. */
+      const claimLand = LAND_VON_CODE[claimed.code] || null;
+      const fremd = !!(land && claimLand && String(land).toUpperCase() !== claimLand);
       for (const c of ADAPTERS) {
-        if (c !== claimed && !c.catchAll && c.enabled && c.verified && inBox(lat, lon, c.bbox)) chain.push(c);
+        if (c === claimed || !c.enabled || !inBox(lat, lon, c.bbox)) continue;
+        /* Der zustaendige Landesdienst des GENANNTEN Landes zuerst. */
+        if (land && LAND_VON_CODE[c.code] === String(land).toUpperCase()) {
+          chain.push(c); continue;
+        }
+        if (!c.catchAll && c.verified) { chain.push(c); continue; }
+        /* Catch-alls nur, wenn der Punkt nachweislich AUSSERHALB des
+         * beanspruchten Landes liegt. Ohne Landesangabe nie. */
+        if (c.catchAll && fremd) chain.push(c);
       }
     }
 
-    let hit = null, first = null;
+    /* ═══ v1389-WAUSFALL · EIN TOTER DIENST IST KEIN BEFUND ══════════════
+     *
+     * Marcels Ziel: "dass wir fuer jedes Bundesland die Bodenrichtwerte
+     * abrufen koennen. eigentlich haben wir dafuer alles das muss aber
+     * jetzt funktionieren."
+     *
+     * GEMESSEN ueber alle 16 Laender (Landeshauptstaedte): 15 liefern,
+     * Bayern nicht. Grund ist NICHT "kein Wert an dieser Stelle", sondern
+     *
+     *   HTTP 404  https://gdi.bayern.de/services/bodenrichtwerte/2023/vboris
+     *
+     * fuer JEDEN Jahrgang (2026 bis 2023). Der Endpunkt existiert nicht
+     * mehr; drei gesuchte Nachfolger (geoservices.bayern.de/wms/v1 und /v2,
+     * die im TUM-Katalog genannte Adresse) antworten ebenfalls mit 404.
+     *
+     * DIE UNTERSCHEIDUNG, DIE BISHER FEHLTE: "kein Wert am Punkt" ist eine
+     * AUSSAGE des Dienstes — dort gibt es wirklich keine Zone, und ein
+     * anderer Dienst zu fragen waere Shopping. "HTTP 404" oder ein
+     * Zeitueberlauf ist ein AUSFALL — der Dienst hat gar nichts gesagt.
+     * Die Regel "ein leeres NRW bleibt ein Befund" trifft den ersten Fall
+     * und darf nicht auf den zweiten angewandt werden.
+     *
+     * Deshalb: faellt ein verifizierter Landesdienst mit einem FEHLER aus,
+     * duerfen die Catch-alls ran. Fuer Bayern hilft das nicht (BORIS-D
+     * deckt es nicht ab, gemessen an Muenchen, Nuernberg und Augsburg) —
+     * fuer jedes andere Land ist es der Unterschied zwischen einem
+     * voruebergehenden Ausfall und einem Totalausfall bei uns. */
+    /* ═══ v1395 · DER GRUND KOMMT VOM AUSSAGEKRAEFTIGSTEN ADAPTER ════════
+     *
+     * Bisher stand in der Meldung immer der Befund des ERSTEN Adapters.
+     * Gemessen an Aschaffenburg (Bayern, liegt im Hessen-Rechteck):
+     * Hessen wurde zuerst gefragt, gab HTTP 404 - und genau das las der
+     * Nutzer, obwohl danach noch Bayern, BORIS-D und der BORIS-D-WMS
+     * sauber geantwortet hatten ("hier gibt es keine Zone").
+     *
+     * "Kein Wert am Punkt" ist eine AUSKUNFT, ein HTTP-Fehler ein
+     * AUSFALL. Wenn irgendein Adapter sauber geantwortet hat, ist seine
+     * Auskunft die bessere - auch wenn ein anderer vorher gescheitert
+     * ist. Deshalb wird der erste SAUBERE Befund gemerkt und bevorzugt.
+     *
+     * Dasselbe gilt fuer die Gebuehrenauskunft aus v1393: sie ist die
+     * aussagekraeftigste Antwort ueberhaupt und schlaegt beide. */
+    let hit = null, first = null, sauber = null, gebuehr = null, ausfall = false;
     for (const a of chain) {
       const r = await this._queryAdapter(a, lat, lon, year);
       if (first == null) first = r;
+      if (r.gebuehr && gebuehr == null) gebuehr = r;
+      if (!r.lastErr && sauber == null) sauber = r;
       if (r.value != null) { hit = { a, r }; break; }
+      if (r.lastErr) ausfall = true;
+    }
+    if (!hit && ausfall) {
+      for (const c of ADAPTERS) {
+        if (chain.indexOf(c) >= 0 || !c.catchAll || !c.enabled) continue;
+        if (!inBox(lat, lon, c.bbox)) continue;
+        const r = await this._queryAdapter(c, lat, lon, year);
+        if (r.value != null) { hit = { a: c, r }; break; }
+      }
     }
 
     if (!hit) {
-      const r0 = first || {};
+      /* v1395: Gebuehrenauskunft schlaegt saubere Fehlanzeige schlaegt
+         Ausfall - in dieser Reihenfolge, nicht nach Aufrufreihenfolge. */
+      const r0 = gebuehr || sauber || first || {};
       const fb = fallback(r0.lastErr ? 'request_failed:' + r0.lastErr : 'kein_wert_am_punkt');
       fb.tried_source = chain.map((c) => c.name).join(' -> ');   /* v1077-WFBK-3 */
       fb.tried_layers = r0.layers || null;
       fb.tried_years = r0.years || null;
       fb.properties_raw = r0.raw != null ? r0.raw : null; // damit das Mapping bei Bedarf justiert werden kann
+      /* v1389-WAUSFALL: Traegt der zustaendige Adapter eine Notiz zu einem
+         bekannten Ausfall, gehoert sie in die Antwort. Bisher erschien sie
+         NUR bei gesperrten Laendern (Z. 565) - ausgerechnet im Ausfall,
+         wo der Nutzer am ehesten wissen will, woran es liegt, kam die
+         Standardfloskel "kein automatischer Bodenrichtwert vorhanden". */
+      if (claimed.note) fb.note = claimed.note;
+      fb.claimed_land = claimed.name;
+      /* ═══ v1393 · DER WEG ZUM WERT, WENN ER GELD KOSTET ════════════════
+       * Bayern antwortet vollstaendig und setzt an die Stelle des Wertes
+       * „Information gebuehrenpflichtig". Zone, Gemarkung, Stichtag und
+       * der zustaendige Gutachterausschuss stehen aber in derselben
+       * Antwort. Die gehoeren weitergereicht: „wo kein Wert vorliegt,
+       * bekommt der Kunde den Weg dorthin" (CLAUDE.md). Mit Zone und
+       * Ausschuss findet er ihn in einer Minute. */
+      if (r0.gebuehr) {
+        fb.reason = 'wert_gebuehrenpflichtig';
+        fb.gebuehr = r0.gebuehr;
+        const g = r0.gebuehr;
+        fb.note = 'Der Bodenrichtwert liegt vor, wird von diesem Bundesland aber '
+          + 'nur gegen Gebühr herausgegeben.'
+          + (g.zone ? ' Bodenrichtwertzone: „' + g.zone + '".' : '')
+          + (g.gemarkung ? ' Gemarkung ' + g.gemarkung + '.' : '')
+          + (g.stichtag ? ' Stichtag ' + g.stichtag + '.' : '')
+          + (g.ausschuss ? ' Zuständig: ' + g.ausschuss + '.' : '');
+      }
       return fb;
     }
 
@@ -625,9 +848,15 @@ export const BorisRegistry = {
      * jahresabhaengigen Layer) stellen fuer jedes Kandidatenjahr dieselbe
      * Anfrage — ein Durchlauf genuegt. Schont den Behoerdenserver
      * (ein Abruf je Sekunde gilt unveraendert). */
+    /* v1393: Ein Adapter darf seine eigene Jahresliste mitbringen. Bayern
+       ermittelt nur alle ZWEI Jahre (2024, 2026) - die Standardkaskade
+       lief dort auf 2023 aus und meldete am Ende einen 404 auf einen
+       Jahrgang, den es nie gab. Das sah aus wie ein toter Dienst. */
     const yearCandidates = year ? [year]
-      : (a.yearIndependent ? [nowY] : [nowY, nowY - 1, nowY - 2, nowY - 3]);
+      : (typeof a.years === 'function' ? a.years(nowY)
+      : (a.yearIndependent ? [nowY] : [nowY, nowY - 1, nowY - 2, nowY - 3]));
     let value = null, stichtag = null, nutzung = null, zone = null, raw = null, usedLayer = null, usedYear = null, lastErr = null;
+    let gebuehr = null;   /* v1393: gesperrter Wert samt Zone und Ausschuss */
     outer:
     for (const yr of yearCandidates) {
       /* v1080-WJR-1 · Layer je KANDIDATENJAHR aufloesen — erst damit greift
@@ -685,16 +914,38 @@ export const BorisRegistry = {
           const vRoh = parseGmlField(text, F.value);
           /* v1081-WBY-2 · Sperrtexte ("Information gebuehrenpflichtig",
            * auch als &#252;-Entitaet mit Ziffern) sind KEIN Wert. */
-          v = (vRoh && /geb(ührenpflichtig|uehrenpflichtig|&#252;hrenpflichtig)/i.test(String(vRoh)))
-            ? null : num(vRoh);
+          const gesperrt = !!(vRoh && /geb(ührenpflichtig|uehrenpflichtig|&#252;hrenpflichtig)/i.test(String(vRoh)));
+          v = gesperrt ? null : num(vRoh);
           st = parseGmlField(text, F.stichtag);
           nu = parseGmlField(text, F.nutzung); zo = parseGmlField(text, F.zone);
+          /* ═══ v1393 · EIN GESPERRTER WERT IST KEIN LEERES ERGEBNIS ══════
+           *
+           * Gemessen am Marienplatz, 14.09.2026: Bayern antwortet
+           * vollstaendig — Gutachterausschuss, Gemarkung,
+           * Bodenrichtwertzone („Marienplatz"), Stichtag 01.01.2024 — und
+           * setzt an die Stelle des Wertes den Satz „Information
+           * gebuehrenpflichtig". Der Sperrtext wurde seit v1081 richtig
+           * als Nicht-Wert erkannt, aber ALLES UEBRIGE fiel mit ihm weg.
+           *
+           * Das ist der Unterschied zwischen „wir wissen nichts" und „der
+           * Wert existiert, die Zone heisst so, und er kostet Geld". Nach
+           * CLAUDE.md bekommt der Kunde genau dann den WEG zum Wert. */
+          if (gesperrt) {
+            gebuehr = {
+              zone: zo || null,
+              stichtag: st || null,
+              gemarkung: parseGmlField(text, ['gemarkung']) || null,
+              ausschuss: parseGmlField(text, ['gutachterausschuss_name']) || null,
+              gemeinde: parseGmlField(text, ['gemeinde_name']) || null,
+            };
+          }
         }
         if (v != null) { value = v; stichtag = st; nutzung = nu; zone = zo; raw = rw; usedLayer = ln; usedYear = yr; break outer; }
         if (rw && raw == null) raw = rw; // letzten Roh-Response fuer Diagnose behalten
       }
     }
-    return { value, stichtag, nutzung, zone, raw, usedLayer, usedYear, lastErr, layers: layersInfo, years: yearCandidates };
+    return { value, stichtag, nutzung, zone, raw, usedLayer, usedYear, lastErr, gebuehr,
+             layers: layersInfo, years: yearCandidates };
   },
 
   // Ein-Klick-Verifikation: testet jedes hinterlegte Land mit Dienst an einem Beispielpunkt

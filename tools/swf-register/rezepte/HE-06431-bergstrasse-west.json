@@ -1,0 +1,123 @@
+{
+  "land_code": "HE",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "gaa_kennz": "06AFBHP-BS-W",
+  "ags": ["06431002", "06431003", "06431005", "06431006", "06431010",
+          "06431011", "06431013", "06431016", "06431020", "06431022"],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "Kaufverträge 2024 bis 2025, Kaufpreise unter 900.000 Euro",
+  "beschlossen": "2026-01-01",
+  "veroeffentlicht": "2026-08",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_datei": "2026_IMB_SÜDHESSEN_ AFB_HEPPENHEIM_GESAMTAUSGABE.pdf, Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.1 und 8.3.1.2, Gemeindezuordnung Seite 108",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises, Immobilienmarktbericht Südhessen 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 einschließlich Baunebenkosten, Bezugsparameter Bruttogrundfläche, Baupreisindex quartalsweise zum Beurkundungsdatum, Gesamtnutzungsdauer 80 Jahre, modifizierte wirtschaftliche Restnutzungsdauer 20 bis 80 Jahre nach der Punktetabelle der Anlage 2 ImmoWertV, lineare Alterswertminderung, Standardstufe mindestens 2,0, Nebengebäude pauschaler Zeitwert, Außenanlagen pauschal 5 Prozent vom Zeitwert der baulichen Anlagen, Regionalfaktor mit Beschluss zum 01.01.2026 auf 1,0 festgesetzt. Nur Kaufpreise unter 900.000 Euro.",
+  "fundstelle": "Kapitel 8.3.1.1 (Seite 109) und 8.3.1.2 (Seite 112), Gemeindezuordnung Ost/West auf Seite 108.",
+
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 80,
+    "alterswertminderung": "linear",
+    "regionalfaktor": 1.0,
+    "bezugsmassstab": "BGF"
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser im Westbereich des Kreises Bergstraße",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000, 550000,
+                    600000, 650000, 700000, 750000, 800000, 850000, 900000, 950000, 1000000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["bis 499", "ab 500"],
+        "kategorie_baender": [
+          { "von": 0,   "bis": 499,  "kategorie": "bis 499" },
+          { "von": 500, "bis": null, "kategorie": "ab 500" }
+        ],
+        "zellen": {
+          "bis 499": [null, null, 1.27, 1.19, 1.13, 1.07, 1.03, 0.99, 0.96, 0.93, 0.90, 0.88, 0.85, 0.83, 0.82, 0.80, null, null],
+          "ab 500":  [null, null, null, 1.24, 1.17, 1.12, 1.07, 1.03, 0.99, 0.96, 0.93, 0.90, 0.88, 0.86, 0.84, 0.82, null, null]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Westbereich des Kreises Bergstraße — der Rheinebenenteil mit deutlich höheren Bodenrichtwerten als der Odenwaldteil im Osten. 54 Kauffälle (32 und 22), Bestimmtheitsmaß 0,46 und 0,32, Standardabweichung ±0,16 und ±0,14. Der Bericht sagt: Zwischenwerte sind zu interpolieren, Extrapolationen über die angegebene Spanne hinaus können nur in geringem Umfang marktgerecht durchgeführt werden.",
+        "normobjekt": "Bis 499 Euro/qm: mittlerer vorläufiger Sachwert 536.000 Euro, Grundstücksgröße 600 qm, Bodenrichtwert 375 Euro/qm, Restnutzungsdauer 40 Jahre, Standardstufe 2,7, Wohnfläche 180 qm. Ab 500 Euro/qm: 585.000 Euro, 520 qm, 640 Euro/qm, 42 Jahre, Standardstufe 2,7, Wohnfläche 155 qm."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Westbereich des Kreises Bergstraße: Bensheim, Biblis, Bürstadt, Einhausen, Groß-Rohrheim, Heppenheim (Bergstraße), Lampertheim, Lorsch, Viernheim, Zwingenberg. Die Zuordnung steht als Gemeindeliste auf Seite 108 des Berichts; die Gemeindeschlüssel stammen aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser in konventioneller Bauweise",
+        "extrapolation": "laut Bericht nur in geringem Umfang marktgerecht, hier ausgeschlossen",
+        "spannen_je_brw_bereich": {
+          "bis 499": { "kauffaelle": 32, "r2": 0.46, "streuung": 0.16, "sachwert_mittel": 536000, "gsflaeche_mittel": 600, "brw_mittel": 375, "rnd_mittel": 40, "standardstufe": 2.7 },
+          "ab 500":  { "kauffaelle": 22, "r2": 0.32, "streuung": 0.14, "sachwert_mittel": 585000, "gsflaeche_mittel": 520, "brw_mittel": 640, "rnd_mittel": 42, "standardstufe": 2.7 }
+        }
+      },
+      "beleg": "Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.1, Tabelle Durchschnittlicher Sachwertfaktor, Seite 109.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle mit Fallzahl, Bestimmtheitsmass und Standardabweichung je Klasse. KEINE Stufe A: 32 und 22 Kauffaelle, Bestimmtheitsmass 0,46 und 0,32.",
+      "fallzahl": 54,
+      "streuung": 0.16
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser und Doppelhaushälften im Westbereich des Kreises Bergstraße",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [150000, 200000, 250000, 300000, 350000, 400000,
+                    450000, 500000, 550000, 600000, 650000, 700000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["bis 499", "ab 500"],
+        "kategorie_baender": [
+          { "von": 0,   "bis": 499,  "kategorie": "bis 499" },
+          { "von": 500, "bis": null, "kategorie": "ab 500" }
+        ],
+        "zellen": {
+          "bis 499": [null, 1.39, 1.30, 1.23, 1.17, 1.12, 1.08, 1.05, 1.02, null, null, null],
+          "ab 500":  [null, null, null, 1.37, 1.30, 1.24, 1.19, 1.15, 1.11, 1.08, 1.05, 1.02]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "44 Kauffälle (16 und 28), Bestimmtheitsmaß 0,34 und 0,35, Standardabweichung ±0,17 und ±0,14. Anders als im Ostbereich wird hier auch bei den Reihenhäusern nach Bodenrichtwertbereichen getrennt.",
+        "normobjekt": "Bis 499 Euro/qm: mittlerer vorläufiger Sachwert 365.000 Euro, Grundstücksgröße 335 qm, Bodenrichtwert 410 Euro/qm. Ab 500 Euro/qm: 463.000 Euro, 295 qm, 670 Euro/qm."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Westbereich des Kreises Bergstraße, zehn Gemeinden nach der Liste auf Seite 108",
+        "sachlich": "Reihenhäuser und Doppelhaushälften in konventioneller Bauweise",
+        "extrapolation": "laut Bericht nur in geringem Umfang marktgerecht, hier ausgeschlossen",
+        "spannen_je_brw_bereich": {
+          "bis 499": { "kauffaelle": 16, "r2": 0.34, "streuung": 0.17, "sachwert_mittel": 365000, "gsflaeche_mittel": 335, "brw_mittel": 410 },
+          "ab 500":  { "kauffaelle": 28, "r2": 0.35, "streuung": 0.14, "sachwert_mittel": 463000, "gsflaeche_mittel": 295, "brw_mittel": 670 }
+        }
+      },
+      "beleg": "Immobilienmarktbericht Südhessen 2026, Kapitel 8.3.1.2, Tabelle Durchschnittlicher Sachwertfaktor, Seite 112.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Tabelle mit Fallzahl, Bestimmtheitsmass und Standardabweichung je Klasse. KEINE Stufe A: 16 und 28 Kauffaelle bei einem Bestimmtheitsmass um 0,35.",
+      "fallzahl": 44,
+      "streuung": 0.17
+    }
+  ],
+
+  "anmerkungen": [
+    "Der Kreis Bergstraße ist im Bericht in Ost- und Westbereich getrennt; der Ostbereich liegt als eigenes Rezept im Register (HE-06431-bergstrasse-ost). Der Unterschied ist erheblich: bei 300.000 Euro vorläufigem Sachwert und einem Bodenrichtwert von 250 Euro/qm liefert der Osten 1,25, der Westen 1,19 — und bei den Reihenhäusern trennt der Osten gar nicht nach Bodenrichtwert, der Westen schon.",
+    "Der Ausschuss hat zum Bericht 2026 ERSTMALS getrennt nach den fünf südhessischen Landkreisen ausgewertet, weil der Markt zu heterogen für einen gemeinsamen Satz ist.",
+    "Der Auswertung liegen die Bodenrichtwerte zum Stichtag 01.01.2024 zugrunde; auf eine konjunkturelle Anpassung wurde wegen der stagnierenden Preisentwicklung verzichtet. Für aktuelle Bewertungsfälle sind laut Bericht die Bodenrichtwerte zum 01.01.2026 zu verwenden."
+  ]
+}

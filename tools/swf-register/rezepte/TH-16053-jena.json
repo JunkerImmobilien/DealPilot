@@ -1,0 +1,614 @@
+{
+  "land_code": "TH",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "ebene": "kreis",
+  "berichtsjahr": 2025,
+  "beschlossen": "2025-03-18",
+  "veroeffentlicht": "2025",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_datei": "2025_SWF_R266.pdf, Sachwertfaktoren 2025, Kapitel 3",
+  "quellenvermerk": "Sachwertfaktoren 2025 © Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010, Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung. Kein gesonderter Wertansatz für Dachgauben bis etwa 5 m Gesamtlänge, Balkone und Dachterrassen bis 5 m² Grundfläche, Vordächer in üblichem Umfang und übliche Außentreppen — diese sind im Sachwertfaktor enthalten. Der vorläufige Sachwert ist in die Schätzfunktion in MIO EURO einzusetzen.",
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 80,
+    "alterswertminderung": "linear",
+    "bezugsmassstab": "BGF"
+  },
+  "gaa_kennz": "16053",
+  "ags": [
+    "16053"
+  ],
+  "stichtag": "2023-01-01",
+  "auswertezeitraum": "Kauffälle des Jahres 2023",
+  "fundstelle": "Sachwertfaktoren 2025, Kapitel 3.4, Tabelle 13, Seite 21.",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser in der kreisfreien Stadt Jena",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Vier Bodenrichtwertniveaus als Stützstellen (100 bis 800 Euro/qm) — die höchsten der drei Gebiete. Hinterlegt ist der JAHRGANG 2023: k = a × (vSW / 1 Mio)^-0,19303 mit a = 0,93224 · 0,99438 · 1,06065 · 1,13135, gegen jeden abgedruckten Wert geprüft.",
+        "normobjekt": "Stichprobe im Gebiet: 18 freistehende Ein- und Zweifamilienhäuser, 17 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+        "achse_x": [
+          100,
+          200,
+          400,
+          800
+        ],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenrichtwertniveau in Euro/m²",
+        "achse_y": [
+          80000,
+          120000,
+          160000,
+          200000,
+          240000,
+          280000,
+          320000,
+          360000,
+          400000,
+          440000,
+          480000,
+          520000,
+          560000,
+          600000,
+          640000,
+          680000,
+          720000,
+          760000,
+          800000,
+          840000,
+          880000,
+          920000,
+          960000
+        ],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "80000": [
+            1.52,
+            1.62,
+            1.73,
+            1.84
+          ],
+          "120000": [
+            1.4,
+            1.5,
+            1.6,
+            1.7
+          ],
+          "160000": [
+            1.33,
+            1.42,
+            1.51,
+            1.61
+          ],
+          "200000": [
+            1.27,
+            1.36,
+            1.45,
+            1.54
+          ],
+          "240000": [
+            1.23,
+            1.31,
+            1.4,
+            1.49
+          ],
+          "280000": [
+            1.19,
+            1.27,
+            1.36,
+            1.45
+          ],
+          "320000": [
+            1.16,
+            1.24,
+            1.32,
+            1.41
+          ],
+          "360000": [
+            1.14,
+            1.21,
+            1.29,
+            1.38
+          ],
+          "400000": [
+            1.11,
+            1.19,
+            1.27,
+            1.35
+          ],
+          "440000": [
+            1.09,
+            1.17,
+            1.24,
+            1.33
+          ],
+          "480000": [
+            1.07,
+            1.15,
+            1.22,
+            1.3
+          ],
+          "520000": [
+            1.06,
+            1.13,
+            1.2,
+            1.28
+          ],
+          "560000": [
+            1.04,
+            1.11,
+            1.19,
+            1.27
+          ],
+          "600000": [
+            1.03,
+            1.1,
+            1.17,
+            1.25
+          ],
+          "640000": [
+            1.02,
+            1.08,
+            1.16,
+            1.23
+          ],
+          "680000": [
+            1.0,
+            1.07,
+            1.14,
+            1.22
+          ],
+          "720000": [
+            0.99,
+            1.06,
+            1.13,
+            1.21
+          ],
+          "760000": [
+            0.98,
+            1.05,
+            1.12,
+            1.19
+          ],
+          "800000": [
+            0.97,
+            1.04,
+            1.11,
+            1.18
+          ],
+          "840000": [
+            0.96,
+            1.03,
+            1.1,
+            1.17
+          ],
+          "880000": [
+            0.96,
+            1.02,
+            1.09,
+            1.16
+          ],
+          "920000": [
+            0.95,
+            1.01,
+            1.08,
+            1.15
+          ],
+          "960000": [
+            0.94,
+            1.0,
+            1.07,
+            1.14
+          ]
+        }
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren 2025, Kapitel 3.4, Tabelle 13, Seite 21.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (18 und 17 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+      "fallzahl": null
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Doppelhaushälften und Reihenendhäuser in der kreisfreien Stadt Jena",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Vier Bodenrichtwertniveaus als Stützstellen (100 bis 800 Euro/qm) — die höchsten der drei Gebiete. Hinterlegt ist der JAHRGANG 2023: k = a × (vSW / 1 Mio)^-0,19303 mit a = 0,93224 · 0,99438 · 1,06065 · 1,13135, gegen jeden abgedruckten Wert geprüft.",
+        "normobjekt": "Stichprobe im Gebiet: 18 freistehende Ein- und Zweifamilienhäuser, 17 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+        "achse_x": [
+          100,
+          200,
+          400,
+          800
+        ],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenrichtwertniveau in Euro/m²",
+        "achse_y": [
+          80000,
+          120000,
+          160000,
+          200000,
+          240000,
+          280000,
+          320000,
+          360000,
+          400000,
+          440000,
+          480000,
+          520000,
+          560000,
+          600000,
+          640000,
+          680000,
+          720000,
+          760000,
+          800000,
+          840000,
+          880000,
+          920000,
+          960000
+        ],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "80000": [
+            1.52,
+            1.62,
+            1.73,
+            1.84
+          ],
+          "120000": [
+            1.4,
+            1.5,
+            1.6,
+            1.7
+          ],
+          "160000": [
+            1.33,
+            1.42,
+            1.51,
+            1.61
+          ],
+          "200000": [
+            1.27,
+            1.36,
+            1.45,
+            1.54
+          ],
+          "240000": [
+            1.23,
+            1.31,
+            1.4,
+            1.49
+          ],
+          "280000": [
+            1.19,
+            1.27,
+            1.36,
+            1.45
+          ],
+          "320000": [
+            1.16,
+            1.24,
+            1.32,
+            1.41
+          ],
+          "360000": [
+            1.14,
+            1.21,
+            1.29,
+            1.38
+          ],
+          "400000": [
+            1.11,
+            1.19,
+            1.27,
+            1.35
+          ],
+          "440000": [
+            1.09,
+            1.17,
+            1.24,
+            1.33
+          ],
+          "480000": [
+            1.07,
+            1.15,
+            1.22,
+            1.3
+          ],
+          "520000": [
+            1.06,
+            1.13,
+            1.2,
+            1.28
+          ],
+          "560000": [
+            1.04,
+            1.11,
+            1.19,
+            1.27
+          ],
+          "600000": [
+            1.03,
+            1.1,
+            1.17,
+            1.25
+          ],
+          "640000": [
+            1.02,
+            1.08,
+            1.16,
+            1.23
+          ],
+          "680000": [
+            1.0,
+            1.07,
+            1.14,
+            1.22
+          ],
+          "720000": [
+            0.99,
+            1.06,
+            1.13,
+            1.21
+          ],
+          "760000": [
+            0.98,
+            1.05,
+            1.12,
+            1.19
+          ],
+          "800000": [
+            0.97,
+            1.04,
+            1.11,
+            1.18
+          ],
+          "840000": [
+            0.96,
+            1.03,
+            1.1,
+            1.17
+          ],
+          "880000": [
+            0.96,
+            1.02,
+            1.09,
+            1.16
+          ],
+          "920000": [
+            0.95,
+            1.01,
+            1.08,
+            1.15
+          ],
+          "960000": [
+            0.94,
+            1.0,
+            1.07,
+            1.14
+          ]
+        }
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren 2025, Kapitel 3.4, Tabelle 13, Seite 21.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (18 und 17 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+      "fallzahl": null
+    },
+    {
+      "zweig": "rmh",
+      "zweig_bez": "Reihenmittelhäuser in der kreisfreien Stadt Jena",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Vier Bodenrichtwertniveaus als Stützstellen (100 bis 800 Euro/qm) — die höchsten der drei Gebiete. Hinterlegt ist der JAHRGANG 2023: k = a × (vSW / 1 Mio)^-0,19303 mit a = 0,93224 · 0,99438 · 1,06065 · 1,13135, gegen jeden abgedruckten Wert geprüft.",
+        "normobjekt": "Stichprobe im Gebiet: 18 freistehende Ein- und Zweifamilienhäuser, 17 Doppelhaushälften, Reihenend- und Reihenmittelhäuser.",
+        "achse_x": [
+          100,
+          200,
+          400,
+          800
+        ],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenrichtwertniveau in Euro/m²",
+        "achse_y": [
+          80000,
+          120000,
+          160000,
+          200000,
+          240000,
+          280000,
+          320000,
+          360000,
+          400000,
+          440000,
+          480000,
+          520000,
+          560000,
+          600000,
+          640000,
+          680000,
+          720000,
+          760000,
+          800000,
+          840000,
+          880000,
+          920000,
+          960000
+        ],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "80000": [
+            1.52,
+            1.62,
+            1.73,
+            1.84
+          ],
+          "120000": [
+            1.4,
+            1.5,
+            1.6,
+            1.7
+          ],
+          "160000": [
+            1.33,
+            1.42,
+            1.51,
+            1.61
+          ],
+          "200000": [
+            1.27,
+            1.36,
+            1.45,
+            1.54
+          ],
+          "240000": [
+            1.23,
+            1.31,
+            1.4,
+            1.49
+          ],
+          "280000": [
+            1.19,
+            1.27,
+            1.36,
+            1.45
+          ],
+          "320000": [
+            1.16,
+            1.24,
+            1.32,
+            1.41
+          ],
+          "360000": [
+            1.14,
+            1.21,
+            1.29,
+            1.38
+          ],
+          "400000": [
+            1.11,
+            1.19,
+            1.27,
+            1.35
+          ],
+          "440000": [
+            1.09,
+            1.17,
+            1.24,
+            1.33
+          ],
+          "480000": [
+            1.07,
+            1.15,
+            1.22,
+            1.3
+          ],
+          "520000": [
+            1.06,
+            1.13,
+            1.2,
+            1.28
+          ],
+          "560000": [
+            1.04,
+            1.11,
+            1.19,
+            1.27
+          ],
+          "600000": [
+            1.03,
+            1.1,
+            1.17,
+            1.25
+          ],
+          "640000": [
+            1.02,
+            1.08,
+            1.16,
+            1.23
+          ],
+          "680000": [
+            1.0,
+            1.07,
+            1.14,
+            1.22
+          ],
+          "720000": [
+            0.99,
+            1.06,
+            1.13,
+            1.21
+          ],
+          "760000": [
+            0.98,
+            1.05,
+            1.12,
+            1.19
+          ],
+          "800000": [
+            0.97,
+            1.04,
+            1.11,
+            1.18
+          ],
+          "840000": [
+            0.96,
+            1.03,
+            1.1,
+            1.17
+          ],
+          "880000": [
+            0.96,
+            1.02,
+            1.09,
+            1.16
+          ],
+          "920000": [
+            0.95,
+            1.01,
+            1.08,
+            1.15
+          ],
+          "960000": [
+            0.94,
+            1.0,
+            1.07,
+            1.14
+          ]
+        }
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren 2025, Kapitel 3.4, Tabelle 13, Seite 21.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Schaetzfunktion, gegeneinander nachgerechnet. KEINE Stufe A: die Stichprobe dieses Gebiets ist klein (18 und 17 Kauffaelle) und der Bericht weist sie nicht je Objektart aus.",
+      "fallzahl": null
+    }
+  ],
+  "anmerkungen": [
+    "Der Ausschuss ist für DREI Gebiete zuständig und wertet sie GETRENNT aus: Saale-Holzland-Kreis, Saale-Orla-Kreis und die kreisfreie Stadt Jena. Alle drei liegen als eigene Rezepte im Register. Die Objektarten freistehende Ein- und Zweifamilienhäuser, Doppelhaushälften, Reihenend- und Reihenmittelhäuser sind gemeinsam ausgewertet; dieselbe Matrix steht deshalb unter allen drei Zweigen.",
+    "JENA FÜHRT ZWEI JAHRGÄNGE: Tabelle 10 für 2022 und Tabelle 13 für 2023. Hinterlegt ist 2023, der neuere. Der Unterschied ist erheblich — bei 80.000 Euro vorläufigem Sachwert und 100 Euro/qm Bodenwertniveau lag der Faktor 2022 bei 1,86, 2023 bei 1,52. Das sind 18 Prozent in einem Jahr. Wer den älteren Jahrgang braucht, findet ihn in Tabelle 10 desselben Berichts (a = 1,00416 · 1,06611 · 1,13188 · 1,20172, b = -0,24493).",
+    "Die Stichprobe ist mit 18 freistehenden Häusern und 17 Doppel- und Reihenhäusern die kleinste der drei Gebiete.",
+    "Der Auswertung liegen Kauffälle des Jahres 2023 zugrunde; beschlossen wurde am 18.03.2025."
+  ]
+}

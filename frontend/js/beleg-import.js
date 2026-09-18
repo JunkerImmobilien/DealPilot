@@ -49,6 +49,71 @@
     ak_sonst: 'Sonstiges', bmf_hk: 'Herstellungskosten Gebäude (§255 II)'
   };
 
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     v1406 · ZWEITER MODUS: LAUFENDE WERBUNGSKOSTEN
+     ═══════════════════════════════════════════════════════════════════════
+     Bis hierher las dieses Modul nur ANSCHAFFUNGSKOSTEN — Notar, Makler,
+     Grunderwerbsteuer, aufgerufen aus dem BMF-Modal. Das ist der Kauf.
+
+     Marcels Wunsch ist das LAUFENDE Jahr: Hausgeld, Nebenkostenabrechnung,
+     Grundsteuer, Handwerkerrechnung — und die Aufteilung, die eine
+     Hausgeldabrechnung braucht.
+
+     DREI UNTERSCHIEDE ZUM AK-MODUS:
+       1. andere Kategorien und andere Zielfelder (Anlage V statt BMF)
+       2. das JAHR zaehlt — eine Abrechnung fuer 2025 gehoert ins
+          Veranlagungsjahr 2025, auch wenn sie im Mai 2026 kommt
+       3. eine Kategorie fliesst ABSICHTLICH in KEIN Feld: die Zufuehrung
+          zur Erhaltungsruecklage ist beim Eigentuemer nicht sofort
+          abziehbar. Sie wird trotzdem angezeigt — damit der Nutzer sieht,
+          dass sie erkannt und bewusst nicht uebernommen wurde.          */
+  var _modus = 'ak';   /* 'ak' = Anschaffungskosten · 'wk' = Werbungskosten */
+
+  var KAT_WK = [
+    'Nebenkosten umlagefähig', 'Nebenkosten nicht umlagefähig',
+    'Erhaltungsrücklage (nicht absetzbar)', 'Hausverwaltung',
+    'Erhaltungsaufwand / Reparatur', 'Grundsteuer', 'Versicherung',
+    'Schuldzinsen', 'Kontoführung', 'Steuerberatung',
+    'Fahrtkosten', 'Inserat / Vermietung', 'Porto & Telefon',
+    'Gericht & Rechtsanwalt', 'Sonstiges'
+  ];
+
+  /* Kategorie -> Feld der Anlage-V-Jahrestabelle (tax.js, _taxYearlyOverrides).
+     `null` heisst ausdruecklich: wird NICHT uebernommen. */
+  var FIELD_MAP_WK = {
+    'Nebenkosten umlagefähig':               'nk_umlf',
+    'Nebenkosten nicht umlagefähig':         'nk_n_umlf',
+    'Erhaltungsrücklage (nicht absetzbar)':  null,
+    'Hausverwaltung':                        'hausverwaltung',
+    'Erhaltungsaufwand / Reparatur':         'betr_sonst',
+    'Grundsteuer':                           'betr_sonst',
+    'Versicherung':                          'betr_sonst',
+    'Schuldzinsen':                          'schuldzinsen',
+    'Kontoführung':                          'kontofuehrung',
+    'Steuerberatung':                        'steuerber',
+    'Fahrtkosten':                           'fahrtkosten',
+    'Inserat / Vermietung':                  'inserat',
+    'Porto & Telefon':                       'porto',
+    'Gericht & Rechtsanwalt':                'gericht',
+    'Sonstiges':                             'sonst_kosten'
+  };
+
+  var LABELS_WK = {
+    nk_umlf: 'Umlagefähige Nebenkosten', nk_n_umlf: 'Nicht umlagefähige Nebenkosten',
+    hausverwaltung: 'Hausverwaltung', betr_sonst: 'Sonstige Bewirtschaftung',
+    schuldzinsen: 'Schuldzinsen', kontofuehrung: 'Kontoführung',
+    steuerber: 'Steuerberatung', fahrtkosten: 'Fahrtkosten',
+    inserat: 'Inserate / Vermietung', porto: 'Porto & Telefon',
+    gericht: 'Gericht & Rechtsanwalt', sonst_kosten: 'Sonstige Kosten'
+  };
+
+  /* Die im aktuellen Modus geltenden Tabellen — damit der restliche Code
+     nicht an zwanzig Stellen verzweigen muss. */
+  function _katListe()  { return _modus === 'wk' ? KAT_WK : KAT; }
+  function _feldKarte() { return _modus === 'wk' ? FIELD_MAP_WK : FIELD_MAP; }
+  function _beschrift() { return _modus === 'wk' ? LABELS_WK : LABELS; }
+
   /* ---------- Token / Headers (gleiches Muster wie bmf-modal.js) ---------- */
   function _tok() {
     if (window.Sub && typeof window.Sub.getToken === 'function') return window.Sub.getToken();
@@ -202,7 +267,12 @@
     document.head.appendChild(st);
   }
 
-  function open() {
+  /* v1406: der Modus waehlt, WAS gelesen wird — 'wk' fuer laufende
+     Werbungskosten, sonst Anschaffungskosten wie bisher. Ohne Argument
+     bleibt alles, wie es war: der Aufruf aus dem BMF-Modal aendert sich
+     nicht. */
+  function open(modus) {
+    _modus = (modus === 'wk') ? 'wk' : 'ak';
     if (!_hasFeature()) {
       alert('Der KI-Beleg-Import ist ab dem Investor-Plan verfügbar.');
       return;
@@ -214,7 +284,7 @@
     ov.id = 'beleg-import-ov';
     ov.innerHTML =
       '<div class="bi-card">' +
-        '<div class="bi-bar"><span class="bi-t">📎 Belege importieren</span>' +
+        '<div class="bi-bar"><span class="bi-t">📎 ' + (_modus === 'wk' ? 'Belege & Abrechnungen einlesen' : 'Belege importieren') + '</span>' +
           '<button class="bi-x" type="button" onclick="DealPilotBelegImport.close()" aria-label="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' + /* v1116-x */
         '<div class="bi-hero">KI liest Datum · Betrag · USt · Aussteller · Kategorie — du bestätigst jede Zeile, bevor sie in die Anschaffungskosten fließt.</div>' +
         '<div class="bi-body">' +
@@ -237,7 +307,7 @@
         '<div class="bi-note" id="bi-note"></div>' +
         '<div class="bi-ft"><button class="bi-ghost" type="button" onclick="DealPilotBelegImport.close()">Abbrechen</button>' +
           '<button class="bi-ghost" id="bi-csv" type="button" disabled onclick="DealPilotBelegImport.csv()">📥 CSV-Auswertung</button>' +
-          '<button class="bi-btn" id="bi-take" type="button" disabled onclick="DealPilotBelegImport.apply()">In die Anschaffungskosten übernehmen</button></div>' +
+          '<button class="bi-btn" id="bi-take" type="button" disabled onclick="DealPilotBelegImport.apply()">' + (_modus === 'wk' ? 'In die Werbungskosten übernehmen' : 'In die Anschaffungskosten übernehmen') + '</button></div>' +
       '</div>';
     document.body.appendChild(ov);
     ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
@@ -264,6 +334,23 @@
     _run(ai, tbl);
   }
 
+  /* v1406 · Das Abrechnungsjahr eines Belegs.
+     Reihenfolge mit Absicht: das ausdrueckliche `jahr` der KI zuerst, dann
+     das Datum. Eine Hausgeldabrechnung traegt als Datum ihren Erstellungstag
+     — das Jahr, um das es geht, steht woanders. Wer nur das Datum liest,
+     bucht die Abrechnung 2025 ins Jahr 2026. */
+  function _jahrAus(d) {
+    var j = parseInt(d && d.jahr, 10);
+    if (j >= 1990 && j <= 2200) return j;
+    var s = String((d && d.datum) || '');
+    var m = s.match(/(19|20)\d{2}/);
+    if (m) {
+      var j2 = parseInt(m[0], 10);
+      if (j2 >= 1990 && j2 <= 2200) return j2;
+    }
+    return null;
+  }
+
   /* Eine Zeile aus KI-Ergebnis ODER Tabellenzeile in _rows uebernehmen. */
   function _pushPositions(name, poss) {
     poss.forEach(function (d, idx) {
@@ -272,10 +359,15 @@
       var brutto = d.betrag_brutto != null ? _parseDe(d.betrag_brutto)
                  : (d.brutto != null ? _parseDe(d.brutto) : (netto + ust));
       if (!netto && brutto) netto = brutto - ust;
-      var kat = KAT.indexOf(d.kategorie) >= 0 ? d.kategorie : 'Sonstiges';
+      var kat = _katListe().indexOf(d.kategorie) >= 0 ? d.kategorie : 'Sonstiges';
       _rows.push({
         name: name, teil: poss.length > 1 ? (idx + 1) : 0, teilvon: poss.length,
         datum: d.datum || '—', aussteller: d.aussteller || '—', beschreibung: d.beschreibung || '',
+        /* v1406: das Abrechnungsjahr. Die KI liefert es im WK-Modus als
+           eigenes Feld; sonst wird es aus dem Datum gelesen. Eine
+           Hausgeldabrechnung fuer 2025, die im Mai 2026 kommt, gehoert
+           ins Veranlagungsjahr 2025 — deshalb hat 'jahr' Vorrang. */
+        jahr: _jahrAus(d),
         netto: netto, ust: ust, brutto: brutto, kategorie: kat,
         konfidenz: (d.konfidenz || '—'), keep: true
       });
@@ -315,7 +407,7 @@
       if (belege.length) {
         setT('KI liest ' + belege.length + ' Beleg(e) …');
         try {
-          var resp = await fetch('/api/v1/ai/extract-beleg', { method: 'POST', headers: _hdrs(), body: JSON.stringify({ belege: belege }) });
+          var resp = await fetch('/api/v1/ai/extract-beleg', { method: 'POST', headers: _hdrs(), body: JSON.stringify({ belege: belege, modus: _modus }) });
           /* v1187: seit v1183 gibt es hier keine 402 mehr — der Beleg-Import
              ist im Plan enthalten. Der Zweig bleibt als Riegel stehen, falls
              das je zurueckgedreht wird, aber ohne die alte Waehrung. */
@@ -421,7 +513,7 @@
       if (!brutto && (netto || ust)) brutto = netto + ust;
       if (!brutto && !netto) continue;
       var kat = iKat >= 0 ? String(row[iKat] || '').trim() : '';
-      if (KAT.indexOf(kat) < 0) kat = 'Sonstiges';
+      if (_katListe().indexOf(kat) < 0) kat = 'Sonstiges';
       out.push({
         datum: iDatum >= 0 ? String(row[iDatum] || '').trim() : '',
         aussteller: iAus >= 0 ? String(row[iAus] || '').trim() : '',
@@ -440,7 +532,7 @@
     var box = document.getElementById('bi-review');
     if (!box) return;
     if (!_rows.length) { box.innerHTML = '<p style="color:#a4443d">Keine Belege gelesen.</p>'; return; }
-    var opts = function (sel) { return KAT.map(function (k) { return '<option' + (k === sel ? ' selected' : '') + '>' + _esc(k) + '</option>'; }).join(''); };
+    var opts = function (sel) { return _katListe().map(function (k) { return '<option' + (k === sel ? ' selected' : '') + '>' + _esc(k) + '</option>'; }).join(''); };
     var body = _rows.map(function (r, i) {
       return '<tr' + (r.keep ? '' : ' class="off"') + ' data-i="' + i + '">' +
         '<td><input type="checkbox"' + (r.keep ? ' checked' : '') + ' onchange="DealPilotBelegImport._keep(' + i + ',this.checked)"></td>' +
@@ -500,7 +592,7 @@
       if (!r.keep) return;
       count++; total += r.brutto;
       if (SANIERUNG[r.kategorie]) sanierung += r.brutto;   // fuer die 15%-Ampel
-      var f = FIELD_MAP[r.kategorie];                       // Sanierung -> bmf_hk (Herstellungskosten Gebaeude)
+      var f = _feldKarte()[r.kategorie];                       // Sanierung -> bmf_hk (Herstellungskosten Gebaeude)
       if (f) byField[f] = (byField[f] || 0) + r.brutto;
     });
     var uebernahme = 0;
@@ -534,7 +626,7 @@
   function _sums() {
     var a = _aggregate();
     var rowsHtml = Object.keys(a.byField).map(function (f) {
-      return '<div class="k">' + _esc(LABELS[f] || f) + '</div><div class="v">' + _fmtEur(a.byField[f]) + ' €</div>';
+      return '<div class="k">' + _esc(_beschrift()[f] || f) + '</div><div class="v">' + _fmtEur(a.byField[f]) + ' €</div>';
     }).join('');
     if (a.sanierung > 0) rowsHtml += '<div class="k">Instandsetzung/Modernisierung</div><div class="v">' + _fmtEur(a.sanierung) + ' €</div>';
     rowsHtml += '<div class="k" style="border-top:1px solid #e6e0d2;padding-top:6px;font-weight:600">Übernahme gesamt</div>' +
@@ -580,7 +672,7 @@
     var a = _aggregate();
     L.push('');
     L.push(_csvCell('Zusammenfassung'));
-    Object.keys(a.byField).forEach(function (f) { L.push([_csvCell(LABELS[f] || f), _csvNum(a.byField[f])].join(D)); });
+    Object.keys(a.byField).forEach(function (f) { L.push([_csvCell(_beschrift()[f] || f), _csvNum(a.byField[f])].join(D)); });
     if (a.sanierung > 0) L.push([_csvCell('Instandsetzung/Modernisierung'), _csvNum(a.sanierung)].join(D));
     L.push([_csvCell('Uebernahme gesamt (ohne Sanierung)'), _csvNum(a.uebernahme)].join(D));
     L.push([_csvCell('Belege ausgewählt'), a.count].join(D));
@@ -598,11 +690,89 @@
     return true;
   }
 
+  /* ═══ v1406 · ÜBERNAHME IM WK-MODUS ══════════════════════════════════════
+     Anders als bei den Anschaffungskosten gibt es hier kein einzelnes
+     Zielfeld je Kategorie, sondern ein Zielfeld JE JAHR. Deshalb wird
+     zuerst nach Jahr gruppiert und dann je Jahr übergeben.
+
+     Was hier absichtlich NICHT passiert: raten, in welches Jahr ein Beleg
+     ohne Jahresangabe gehört. Solche Zeilen werden benannt und übersprungen
+     — der Nutzer kann das Jahr in der Liste nachtragen. Ein falsch
+     gebuchtes Jahr fällt später niemandem auf, und dann steht die
+     Abrechnung im falschen Veranlagungszeitraum.                        */
+  function _applyWk() {
+    var jeJahr = {}, ohneJahr = 0, nichtAbsetzbar = 0, nichtAbsetzbarEur = 0;
+    _rows.forEach(function (r) {
+      if (!r.keep) return;
+      if (!(r.brutto > 0)) return;
+      var f = FIELD_MAP_WK[r.kategorie];
+      /* `null` ist eine ANTWORT, kein fehlender Eintrag: die Zuführung zur
+         Erhaltungsrücklage ist beim Eigentümer nicht sofort abziehbar. */
+      if (f === null) { nichtAbsetzbar++; nichtAbsetzbarEur += r.brutto; return; }
+      if (!f) return;
+      if (!r.jahr) { ohneJahr++; return; }
+      var k = String(r.jahr);
+      (jeJahr[k] = jeJahr[k] || {});
+      jeJahr[k][f] = (jeJahr[k][f] || 0) + r.brutto;
+    });
+
+    var jahre = Object.keys(jeJahr);
+    if (!jahre.length) {
+      var m = 'Nichts zu übernehmen.';
+      if (ohneJahr) m = ohneJahr + ' Position(en) ohne erkennbares Jahr — bitte das Jahr in der Liste ergänzen.';
+      else if (nichtAbsetzbar) m = 'Nur Rücklagenzuführungen erkannt — die sind nicht sofort absetzbar.';
+      try { if (window.toast) window.toast(m); } catch (e) {}
+      return;
+    }
+    if (typeof window.dpWkUebernehmen !== 'function') {
+      try { if (window.toast) window.toast('✗ Steuer-Modul nicht geladen — Seite neu laden.'); } catch (e) {}
+      return;
+    }
+
+    /* Vorhandene Jahre, die der Tab Steuern gar nicht führt, benennen —
+       sonst landet ein Beleg in einem Jahr, das niemand sieht. */
+    var gefuehrt = [];
+    try { gefuehrt = (typeof window.dpWkJahre === 'function') ? (window.dpWkJahre() || []) : []; } catch (e) {}
+    var fremd = gefuehrt.length
+      ? jahre.filter(function (j) { return gefuehrt.indexOf(parseInt(j, 10)) < 0; })
+      : [];
+
+    var text = 'Diese Beträge werden zu den Werten der Jahre ADDIERT:\n\n'
+      + jahre.sort().map(function (j) {
+          var f = jeJahr[j];
+          return j + ':  ' + Object.keys(f).map(function (k) {
+            return (LABELS_WK[k] || k) + ' ' + _fmtEur(f[k]) + ' €';
+          }).join(' · ');
+        }).join('\n')
+      + (fremd.length ? '\n\nACHTUNG: Für ' + fremd.join(', ') + ' führt dieser Objekt-Tab kein Jahr. '
+                        + 'Der Wert wird trotzdem hinterlegt, ist aber erst sichtbar, wenn der '
+                        + 'Betrachtungszeitraum so weit reicht.' : '')
+      + '\n\nOK = übernehmen (addieren)\nAbbrechen = nichts tun';
+    if (!window.confirm(text)) return;
+
+    var n = 0, jahreOk = [];
+    jahre.forEach(function (j) {
+      var r = window.dpWkUebernehmen(parseInt(j, 10), jeJahr[j], 'add');
+      if (r && r.ok) { n += r.anzahl; jahreOk.push(j); }
+    });
+
+    var meld = n + ' Position(en) in ' + jahreOk.length + ' Jahr(en) übernommen.';
+    if (nichtAbsetzbar) {
+      meld += ' ' + nichtAbsetzbar + ' Rücklagenzuführung(en) über '
+        + _fmtEur(nichtAbsetzbarEur) + ' € wurden bewusst NICHT übernommen '
+        + '(erst bei Verwendung absetzbar).';
+    }
+    if (ohneJahr) meld += ' ' + ohneJahr + ' ohne Jahr übersprungen.';
+    try { if (window.toast) window.toast(meld); } catch (e) {}
+    close();
+  }
+
   function apply() {
+    if (_modus === 'wk') { _applyWk(); return; }
     var byField = {};
     _rows.forEach(function (r) {
       if (!r.keep) return;
-      var f = FIELD_MAP[r.kategorie];
+      var f = _feldKarte()[r.kategorie];
       if (f && r.brutto > 0) byField[f] = (byField[f] || 0) + r.brutto;
     });
     var targets = Object.keys(byField);
@@ -611,7 +781,7 @@
     var occupied = targets.filter(function (f) { var el = document.getElementById(f); return el && _parseDe(el.value) > 0; });
     var mode = 'add';
     if (occupied.length) {
-      var names = occupied.map(function (f) { return LABELS[f] || f; }).join(', ');
+      var names = occupied.map(function (f) { return _beschrift()[f] || f; }).join(', ');
       mode = window.confirm('Diese Felder haben bereits Werte:\n' + names + '\n\nOK = ERSETZEN (überschreiben)\nAbbrechen = zu bestehenden Werten ADDIEREN') ? 'replace' : 'add';
     }
     var n = 0;

@@ -670,7 +670,11 @@
     // Hauptergebnis: RND
     html += '<div class="rnd-wiz-result-hero">'
       + '<div class="rnd-wiz-result-hero-label">Restnutzungsdauer</div>'
-      + '<div class="rnd-wiz-result-hero-value">' + r.final_rnd + ' Jahre</div>'
+      + '<div class="rnd-wiz-result-hero-value">' + (r.verfahren === 'keines' ? '—' : r.final_rnd + ' Jahre') + '</div>'
+      /* v1426 · Anwendungsgrenzen der Anlage 2 aus dem Kern 3.1.0 */
+      + ((r.grenzen || []).filter(function (x) { return x && x.greift; }).map(function (x) {
+          return '<div class="rnd-wiz-result-hero-sub" style="font-size:12px;opacity:.85">' + escapeHTML(x.text) + '</div>';
+        }).join(''))
       + '<div class="rnd-wiz-result-hero-sub">'
       +   'Objekt: ' + escapeHTML(pkg.objekt_adresse) + (pkg.objekt_einheit ? ' (' + escapeHTML(pkg.objekt_einheit) + ')' : '')
       + '</div>'

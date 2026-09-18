@@ -4101,9 +4101,72 @@ const QcApp = (function() {
 
   function updateAll() {
     const inputs = QcEngine.getInputs();
-    /* v969n: DealPilot Score (V1) im iframe. DealKpis -> computeFromKpis. Fallback: computeScore. */
-    const score = window._dpPilotScore ? window._dpPilotScore(inputs, (_avmResults[0]||null))
-                                        : QcEngine.computeScore(inputs, (_avmResults[0]||null));
+    /* v969n: DealPilot Score (V1) im iframe. DealKpis -> computeFromKpis.
+       Fallback: QcEngine.computeScore.
+
+       v1365 · DER RUECKFALL KONNTE NICHT GREIFEN.
+       Hier stand `window._dpPilotScore ? ... : QcEngine.computeScore(...)`
+       - geprueft wurde also, ob die FUNKTION existiert, nicht ob sie ein
+       Ergebnis geliefert hat. Sie steht am Ende derselben Datei und ist
+       damit immer vorhanden; sie gibt aber `null` zurueck, wenn
+       `DealKpis` oder `DealScore` fehlen (Zeile 6449). In genau dem Fall
+       - fuer den der Rueckfall gedacht ist - wurde er uebersprungen, und
+       die naechste Zeile las `score.score` auf null.
+
+       Dasselbe Muster wie beim Pruefhaken in v1359c: was nur auf
+       Existenz prueft, faellt nicht zurueck, wenn das Ergebnis fehlt.
+       Ein Rueckfall, der nicht greifen kann, ist keiner.
+
+       KEINE EINSCHRAENKUNG: im Normalfall aendert sich nichts, denn
+       `_dpPilotScore` liefert dann ein Ergebnis. Der Unterschied zeigt
+       sich nur, wenn eines der beiden Kern-Skripte nicht laedt - dort,
+       wo bisher ein TypeError stand, rechnet jetzt QcEngine. */
+    let score = null;
+    let _ausRueckfall = false;
+    if (window._dpPilotScore) {
+      try { score = window._dpPilotScore(inputs, (_avmResults[0]||null)); } catch (_e) { score = null; }
+    }
+    if (!score) {
+      score = QcEngine.computeScore(inputs, (_avmResults[0]||null));
+      _ausRueckfall = true;
+    }
+
+    /* v1365b · EIN NOTBEHELF DARF NICHT AUSSEHEN WIE DAS ECHTE.
+       Gemessen am 13.09.2026 mit identischen Eingaben (300.000 / 900 /
+       250 / 60.000): der aktive Weg sagt 15, der Rueckfall sagt 30.
+       Doppelt so viel, und ohne Hinweis nicht zu unterscheiden.
+
+       Das sind zwei verschiedene Modelle - DealScore.computeFromKpis
+       gegen QcEngine.computeScore -, und der Unterschied ist kein
+       Fehler, sondern ihre Natur. Ein Score, der bei einer
+       Kaufentscheidung um 100 % danebenliegt, darf aber nicht
+       ununterscheidbar danebenstehen. Genau diese Sorte Widerspruch hat
+       v1203 schon einmal gekostet: derselbe Score, zwei verschiedene
+       Woerter.
+
+       Der Hinweis erscheint NUR im Notfall - wenn eines der Kern-Skripte
+       nicht geladen hat. Im Normalbetrieb sieht ihn niemand. */
+    var _rueckHinweis = document.getElementById('qc-rueckfall-hinweis');
+    if (_ausRueckfall && score && score.score != null) {
+      if (!_rueckHinweis) {
+        var _mega = document.getElementById('sb-mega');
+        if (_mega) {
+          _rueckHinweis = document.createElement('div');
+          _rueckHinweis.id = 'qc-rueckfall-hinweis';
+          _rueckHinweis.style.cssText = 'margin-top:6px;font-size:10.5px;line-height:1.45;' +
+            'color:#B8625C;text-align:center;max-width:210px;margin-left:auto;margin-right:auto';
+          _mega.appendChild(_rueckHinweis);
+        }
+      }
+      if (_rueckHinweis) {
+        _rueckHinweis.textContent = 'Ersatzrechnung \u2014 die Bewertungsmodule sind gerade ' +
+          'nicht erreichbar. Diese Zahl kann deutlich abweichen; bitte neu laden.';
+      }
+    } else if (_rueckHinweis) {
+      _rueckHinweis.textContent = '';
+    }
+
+
     const stage = QcEngine.stage(inputs);
     const comp = QcEngine.completeness(inputs);
     const avmReady = QcEngine.isAvmReady(inputs);
@@ -5287,63 +5350,88 @@ const QcApp = (function() {
     setTimeout(() => document.getElementById('api-key-input').focus(), 100);
   }
   function closeApiModal() { document.getElementById('api-modal').classList.remove('show'); }
+  /* ═══════════════════════════════════════════════════════════════════
+     v1374 (B21) · DIE ANALYSE LAEUFT UEBER DEN SERVER
+     ═══════════════════════════════════════════════════════════════════
+     Hier stand ein direkter Aufruf an api.openai.com - mit einem
+     Schluessel aus einem Eingabefeld und dem vollstaendigen Prompt im
+     ausgelieferten HTML.
+
+     Drei Dinge waren daran falsch: der Prompt war lesbar, der Weg lief
+     am Backend vorbei (an jeder Zaehlung, jedem Limit, jedem Protokoll),
+     und ein API-Schluessel lag im Browserspeicher.
+
+     Der Quick-Check laeuft im iframe und hat keine Auth-Anbindung. Die
+     Anfrage geht deshalb per postMessage an die Hauptanwendung, die sie
+     angemeldet weiterreicht (js/qc-ai-bridge.js -> /ai/quickcheck-analyse).
+
+     WAS SICH FUER DEN NUTZER AENDERT: er braucht keinen eigenen
+     OpenAI-Schluessel mehr. Wer einen hat, pflegt ihn in den
+     Einstellungen; der Server nimmt ihn von dort. Das Ergebnis ist
+     dasselbe - derselbe Prompt, dasselbe Antwortformat. */
+  var _aiWartet = null;
+
+  window.addEventListener('message', function (ev) {
+    var d = ev.data;
+    if (!d || d.source !== 'dp-parent' || d.type !== 'qc-ai-antwort') return;
+    if (!_aiWartet) return;
+    var fertig = _aiWartet; _aiWartet = null;
+    fertig(d);
+  });
+
   async function runRealAi() {
-    const key = document.getElementById('api-key-input').value.trim();
-    if (!key.startsWith('sk-')) { showToast('⚠ API-Key muss mit sk- beginnen'); return; }
     closeApiModal();
-    showToast('🤖 OpenAI wird angefragt...');
-    document.getElementById('ai-source').textContent = 'OpenAI · GPT-4 (Live)';
+    showToast('\u2728 Analyse laeuft \u2026');
+    document.getElementById('ai-source').textContent = 'DealPilot \u00b7 KI-Analyse';
+
     const inputs = QcEngine.getInputs();
     const score = QcEngine.computeScore(inputs, (_avmResults[0]||null));
     const avmData = _avmResults.length > 0 ? _avmResults[0] : null;
-    const prompt = `Du bist ein Immobilien-Investment-Experte. Analysiere diesen Deal auf Deutsch.
 
-Eingaben:
-- Objekt: ${inputs.objektart} in ${inputs.plz} ${inputs.ort}, ${inputs.wfl} m², Bj. ${inputs.bj}
-- Kaufpreis: ${fmt0(QcEngine.num(inputs.kp))} €
-- Nettokaltmiete: ${inputs.nkm} €/Mo
-- Hausgeld: ${inputs.hg} €/Mo
-- EK: ${fmt0(QcEngine.num(inputs.ek))} €, Zins: ${inputs.zins}%, Tilg: ${inputs.tilg}%
+    if (!window.parent || window.parent === window) {
+      showToast('\u26a0 Analyse nur in der App verfuegbar');
+      return;
+    }
 
-Berechnete KPIs: BMR ${score.kpi.bmr}%, NMR ${score.kpi.nmr}%, EKR ${score.kpi.ekr}%, CF ${score.kpi.cfMon}€/Mo, DSCR ${score.kpi.dscr}, LTV ${score.kpi.ltvPct}%
-Score: ${score.score}/100 (${score.label})
-${avmData ? `\nAVM-Daten (PriceHubble): Marktwert ${fmt0(avmData.marktwert)} €, Lage ${avmData.scoreLocation}/10, Wertentwicklung ${avmData.wertentwicklung}% p.a.` : ''}
+    /* Eine Anfrage nach der anderen - zwei gleichzeitig wuerden sich die
+       Antwort gegenseitig wegnehmen. */
+    if (_aiWartet) { showToast('\u23f3 Eine Analyse laeuft bereits'); return; }
 
-Antworte ALS JSON (keine Markdown-Codeblöcke, nur reines JSON):
-{
-  "verdict": "Starker Kauf / Kauf möglich / Vorsicht",
-  "negotiate": "konkrete Verhandlungsempfehlung mit Prozent",
-  "pros": ["Punkt 1", "Punkt 2", "Punkt 3", "Punkt 4"],
-  "cons": ["Punkt 1", "Punkt 2", "Punkt 3"],
-  "opinion": "Sachliche Experten-Meinung in 3-4 Sätzen"
-}`;
-    try {
-      const res = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [{ role: 'user', content: prompt }],
-          temperature: 0.5
-        })
-      });
-      const data = await res.json();
-      if (data.error) { showToast('⚠ ' + data.error.message); return; }
-      const content = data.choices[0].message.content;
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) { showToast('⚠ KI-Antwort nicht parsebar'); return; }
-      const result = JSON.parse(jsonMatch[0]);
-      
+    var abgelaufen = setTimeout(function () {
+      if (_aiWartet) { _aiWartet = null; showToast('\u26a0 Zeitueberschreitung'); }
+    }, 60000);
+
+    _aiWartet = function (d) {
+      clearTimeout(abgelaufen);
+      if (!d.ok) {
+        showToast('\u26a0 ' + (d.fehler || 'Analyse fehlgeschlagen'));
+        return;
+      }
+      var result = d.analyse || {};
       document.getElementById('ai-verdict-headline').textContent = result.verdict || 'Analyse';
-      document.getElementById('ai-negotiate-v').innerHTML = result.negotiate || '—';
-      document.getElementById('ai-pros').innerHTML = (result.pros || []).map(p => '<li>' + p + '</li>').join('');
-      document.getElementById('ai-cons').innerHTML = (result.cons || []).map(p => '<li>' + p + '</li>').join('');
+      document.getElementById('ai-negotiate-v').innerHTML = result.negotiate || '\u2014';
+      document.getElementById('ai-pros').innerHTML =
+        (result.pros || []).map(function (p) { return '<li>' + p + '</li>'; }).join('');
+      document.getElementById('ai-cons').innerHTML =
+        (result.cons || []).map(function (p) { return '<li>' + p + '</li>'; }).join('');
       document.getElementById('ai-opinion').innerHTML = result.opinion || '';
-      showToast('✓ GPT-4-Analyse fertig');
+      showToast('\u2713 Analyse fertig');
+    };
+
+    try {
+      window.parent.postMessage({
+        source: 'dp-qc', type: 'qc-ai-anfrage',
+        inputs: inputs,
+        kpi: score.kpi || {},
+        score: score.score, label: score.label,
+        avm: avmData
+      }, '*');
     } catch (e) {
-      showToast('⚠ Fehler: ' + e.message);
+      clearTimeout(abgelaufen); _aiWartet = null;
+      showToast('\u26a0 Fehler: ' + e.message);
     }
   }
+
 
   /* ─── Save-Modal mit Transfer-Daten ─── */
   function openSaveModal() { /* qb-final2-iframe */

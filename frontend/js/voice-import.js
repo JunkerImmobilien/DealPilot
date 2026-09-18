@@ -331,7 +331,7 @@
 
   /* Checkbox-Label im qc7-src-Format (von object-actions render() eingebunden) */
   function srcLabel() {
-    return '<label class="qc7-src" data-src="voice" title="Objekt frei einsprechen 2014 im Plan enthalten">' +
+    return '<label class="qc7-src" data-src="voice" title="Objekt frei einsprechen — im Plan enthalten">' +
       '<input type="checkbox" value="voice">' +
       '<span class="qc7-box">' + checkSvg() + '</span>' +
       '<span class="qc7-ic">' + micSvg(14) + '</span> Sprachaufzeichnung</label>';
@@ -387,7 +387,7 @@
     /* QC-Einzelposten (virtuell) zusaetzlich */
     if (_qcTarget) {
       WL_VIRT.forEach(function (w) {
-        cat.push({ id: w.id, kind: 'num', label: w.label, g: w.g, hint: 'Nur den Einzelposten; Summe gehoert zusaetzlich in ze' });
+        cat.push({ id: w.id, kind: 'num', label: w.label, g: w.g, hint: 'Nur den Einzelposten; Summe gehört zusätzlich in ze' });
       });
     }
     return cat;
@@ -424,7 +424,7 @@
                  hint: 'true, wenn ' + g[1] + ' saniert werden muss' });
       out.push({ id: 'fesh_' + g[0] + '_cost', kind: 'num',
                  label: 'Sanierungskosten ' + g[1] + ' (€)',
-                 hint: 'geschaetzte Kosten fuer ' + g[1] + ', nur wenn eine Zahl genannt wird' });
+                 hint: 'geschätzte Kosten für ' + g[1] + ', nur wenn eine Zahl genannt wird' });
     });
     return out;
   }
@@ -914,7 +914,129 @@
       'Ich frage der Reihe nach und rechne unterwegs mit. Antworten kannst du sprechen oder tippen — ' +
       '„Weiß ich nicht" überspringt, „Fertig" bringt dich jederzeit zur Übersicht.');
     var catalog = _qcTarget ? buildCatalog() : buildFullCatalog();
-    rueckfragen(OA, { transcript: '', fields: {}, unsicher: [] }, catalog, true);
+    rueckfragen(OA, { transcript: '', fields: {}, unsicher: [] }, catalog, true);  }
+
+  /* === v1115-WEIN - DER CO-PILOT STELLT SICH VOR =======================
+     Marcels Ansage vom 14.09.2026: "wenn wir den Sprechlauf starten, dann
+     sollten wir einmal kurz sagen: Hey, ich bin dein Co-Pilot, irgendwie
+     eine coole Einleitung machen, ich leite dich hier heute durch, dann
+     kurz erklaeren, fragen: bist du das erste Mal hier? Soll ich dir das
+     kurz erklaeren? ... Man soll einfach auswaehlen koennen: Was ist man
+     fuer ein Investor? Ist man Einsteiger? Ist man Profi? Braucht man
+     Hilfestellungen?"
+
+     DIE ERFAHRUNGSFRAGE IST KEINE NEUE EINSTELLUNG. Sie setzt den Ton,
+     den es seit v1378 gibt (Lernmodus / Normal / Investor-Modus) - nur
+     dass ihn bisher niemand gefragt hat: er stand als Knopf in der
+     Nebenleiste, und wer ihn nicht fand, bekam immer Normal.
+
+     Sie kommt EINMAL. Wer schon gewaehlt hat, faengt sofort an - die
+     Antwort steht in `dp_rf_erfahrung`, und wer sie aendern will, sagt
+     es unterwegs oder nimmt den Knopf. */
+  var RF_ERF_SPEICHER = 'dp_rf_erfahrung';
+
+  function _rfErfahrung() {
+    try { return localStorage.getItem(RF_ERF_SPEICHER) || ''; } catch (e) { return ''; }
+  }
+
+  function _rfEinstieg(weiter) {
+    _rfEinstiegWeiter = weiter;
+    /* Wer schon einmal gewaehlt hat, wird nicht wieder gefragt. */
+    if (_rfErfahrung()) { weiter(); return; }
+    _rfBlase('co',
+      '<b>Moin, ich bin dein Co-Pilot.</b> Ich nehme das Objekt mit dir zusammen auf — ' +
+      'du sprichst oder tippst, ich rechne unterwegs mit und hole, was ich selbst holen kann: ' +
+      'Bodenrichtwert, Lage, Marktpreisindikation.' +
+      '<div class="vi-rf-wozu" style="margin-top:8px"><b>Damit ich den richtigen Ton treffe:</b> ' +
+      'wie viel Erfahrung hast du mit Immobilien-Investments?</div>');
+    _rfAktion('erf_neu',
+      'Ich erkläre bei jeder Frage, wozu die Angabe dient — und was sie am Ende bewirkt.',
+      'Erste Immobilie');
+    _rfAktion('erf_mittel',
+      'Kurze Fragen, Erklärung auf Zuruf: sag jederzeit "erklär mir das".',
+      'Schon ein paar gemacht');
+    _rfAktion('erf_profi',
+      'Knapp und ohne Beiwerk. Die Erklärungen bleiben auf Abruf verfügbar.',
+      'Profi');
+  }
+
+  var _rfEinstiegWeiter = null;
+
+  /* === v1115-WERK - ERKLAERUNG AUF ABRUF, AN JEDER FRAGE ==============
+     Marcels Ansage: "Bei jedem Punkt kann man dann auch sagen: Erklaere
+     mir das oder Erklaerung abgeben, oder man hat so ein Infofenster, wo
+     dann eine Erklaerung kommt, wenn man die anklickt - also so ein
+     bisschen interaktiver wird und auch fuer Leute, die keine Ahnung
+     haben, dass es erklaert wird."
+
+     Der Lernmodus zeigt den Wozu-Satz seit v1378 von selbst. Was fehlte,
+     war der Weg dorthin fuer alle anderen: ein Knopf an der Frage, der
+     dieselbe Erklaerung auf Verlangen zeigt - ohne den Ton umzustellen.
+
+     Was hier NICHT passiert: eine neue Erklaerung erfinden. Es ist
+     derselbe Text, den der Lernmodus zeigt, plus die Auskunft des
+     Co-Piloten, wenn jemand mehr wissen will. */
+  function _rfErklaerZeigen() {
+    if (!_rf) return;
+    var e = _rf.offen && _rf.offen[_rf.i];
+    if (!e) return;
+    var w = _rfWozu(e);
+    var name = _rfFeldName((e.ids && e.ids[0]) || '') || e.frage;
+    _rfBlase('ich', 'Erklär mir das.');
+    if (w) {
+      _rfBlase('co', '<b>' + escH(name) + '</b>' +
+        '<div class="vi-rf-wozu" style="margin-top:6px">' + escH(w) + '</div>' +
+        '<div style="margin-top:8px;opacity:.8">Reicht dir das nicht, frag einfach weiter — ' +
+        'zum Beispiel <b>"wie wirkt sich das auf den Score aus"</b>.</div>');
+    } else {
+      /* Kein hinterlegter Satz: dann antwortet der Co-Pilot selbst, über
+         denselben Weg wie bei jeder freien Frage — statt zu schweigen oder
+         hier eine zweite Erklärquelle aufzumachen. */
+      try {
+        _rfFrageBeantworten('Was bedeutet "' + name + '" bei einer Immobilien-Investition, '
+          + 'und wozu brauchst du die Angabe? Kurz und in einfachen Worten.');
+        return;   /* die Antwort zeichnet selbst weiter */
+      } catch (ex) {
+        _rfBlase('co', 'Dazu habe ich gerade keine Erklärung — frag mich ruhig direkt.');
+      }
+    }
+    _rfDranZeichnen();
+  }
+
+
+  function _rfErfahrungGewaehlt(art) {
+    var modus = art === 'erf_neu' ? 'lernen' : (art === 'erf_profi' ? 'profi' : 'normal');
+    try { localStorage.setItem(RF_ERF_SPEICHER, art); } catch (e) {}
+    _rfAktionWeg('erf_neu'); _rfAktionWeg('erf_mittel'); _rfAktionWeg('erf_profi');
+    _rfModusSetzen(modus, true);
+    _rfBlase('ich', art === 'erf_neu' ? 'Erste Immobilie.'
+      : (art === 'erf_profi' ? 'Profi.' : 'Schon ein paar gemacht.'));
+
+    if (art === 'erf_neu') {
+      _rfBlase('co',
+        'Alles klar — dann gehen wir es in Ruhe an. <b>So laeuft es ab:</b>' +
+        '<div class="vi-rf-wozu" style="margin-top:6px">' +
+        '<b>1.</b> Ich frage der Reihe nach — Adresse, Größe, Preis, Miete, Finanzierung. ' +
+        'Unter jeder Frage steht, wozu die Angabe dient.<br>' +
+        '<b>2.</b> Was ich selbst holen kann, hole ich: Bodenrichtwert, Lage, ' +
+        'Marktpreisindikation. Du sagst nur, ob ich soll.<br>' +
+        '<b>3.</b> Weisst du etwas nicht, sag <b>"weiß ich nicht"</b> — ich frage spaeter noch einmal ' +
+        'oder rechne ohne.<br>' +
+        '<b>4.</b> Am Ende siehst du eine Übersicht, und das Objekt wird angelegt.</div>' +
+        '<div style="margin-top:8px">Du kannst mich jederzeit unterbrechen: ' +
+        '<b>"erklär mir das"</b>, <b>"warum fragst du das"</b> oder eine eigene Frage — ' +
+        'danach machen wir weiter, wo wir waren.</div>');
+    } else if (art === 'erf_profi') {
+      _rfBlase('co', 'Verstanden — kurz und knapp. ' +
+        '<b>"weiß ich nicht"</b> überspringt, <b>"fertig"</b> bringt dich zur Übersicht, ' +
+        'und <b>"erklär mir das"</b> gibt es trotzdem, wenn du es brauchst.');
+    } else {
+      _rfBlase('co', 'Gut. Ich halte es kurz und erkläre, wenn du fragst — ' +
+        'sag einfach <b>"erklär mir das"</b>. <b>"weiß ich nicht"</b> überspringt.');
+    }
+
+    var w = _rfEinstiegWeiter; _rfEinstiegWeiter = null;
+    if (w) setTimeout(w, 300);
   }
 
   /* ── Aufnahme + Live-Vorschau ─────────────────────────────────────── */
@@ -1208,7 +1330,7 @@
     ze_sonst:'Sonstige Zusatzeinnahmen pro Monat',
     /* v1259 — bei den Frage-Pillen erklaert der Tooltip, WAS gemeint ist */
     thesis:'Warum lohnt sich dieses Objekt? Deine Investment-These in einem Satz',
-    risiken:'Was koennte schiefgehen? Sanierungsstau, Mieter, Lage, Recht …',
+    risiken:'Was könnte schiefgehen? Sanierungsstau, Mieter, Lage, Recht …',
     notizen:'Alles, was sonst noch wichtig ist und kein eigenes Feld hat'
   };
   /* QC-Einzelposten (virtuell) — Gruppe Miete */
@@ -1816,7 +1938,7 @@
         });
     }).catch(function (err) {
       if (err && err.needs_credits) {
-        toast('Spracheingabe gerade nicht verf00fcgbar');
+        toast('Spracheingabe gerade nicht verfügbar');
         try { if (typeof window.showSettings === 'function') window.showSettings('plan'); } catch (e) {}
       } else {
         toast('Sprachauswertung fehlgeschlagen: ' + ((err && err.message) || err));
@@ -1960,7 +2082,8 @@
     rausch: 0, schwelle: 0.012, t0: 0, tSprach: 0, tStill: 0, aufnahme: false,
     sprechMs: 0,     /* v1290: wie lange wirklich gesprochen wurde */
     rest: '',        /* v1290: ein angefangener Satz, der auf seine Fortsetzung wartet */
-    laeuft: 0        /* v1290: eine Auswertung ist unterwegs */
+    laeuft: 0,       /* v1290: eine Auswertung ist unterwegs */
+    pause: false     /* v1381: angehalten - das Mikrofon hoert NICHT mit */
   };
 
   /* v1290: 1,6 s statt 1,1 s. Marcels „Oh, das Objekt steht in… ähm…" ist
@@ -1992,6 +2115,55 @@
     return Math.sqrt(summe / _fs.daten.length);
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1121-WWACH · DER WIEDERANLAUF-WÄCHTER
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Befund vom 14.09.2026: „dass er manchmal einfach abgebrochen
+     hat und hat nicht mehr aufgenommen. Ich musste dann händisch
+     eingreifen und das eingeben."
+
+     GEMESSEN, warum das passieren MUSS: `_fsHoeren(true)` steht an
+     dreissig Stellen im Ablauf — hinter jeder Antwort, jeder Auskunft,
+     jedem Abruf, jedem Fehlerzweig. Jede dieser Stellen ist eine
+     Gelegenheit, es zu vergessen, und `_rfVorabErkennen` allein hat ein
+     Dutzend Zweige, die mit `return true` enden. Vergisst einer den
+     Wiederanlauf, hört der Co-Pilot still auf zuzuhören. Nichts
+     widerspricht: das Mikrofon-Symbol bleibt, der Dialog steht, nur es
+     passiert nichts mehr.
+
+     EIN WÄCHTER STATT DREISSIG EINZELSTELLEN. Alle drei Sekunden wird
+     geprüft: Freisprechen an, Strom da, Dialog offen, keine Auswertung
+     unterwegs — und trotzdem keine Phase aktiv? Dann hat jemand den
+     Wiederanlauf vergessen, und der Wächter holt ihn nach.
+
+     Er ERSETZT die bestehenden Aufrufe nicht, er sichert sie ab: wo
+     `_fsHoeren` schon läuft, tut der Wächter nichts (die Funktion prüft
+     die Phase selbst). `aus` heisst „bewusst beendet" und bleibt
+     unangetastet — sonst würde er das Schliessen des Dialogs bekämpfen. */
+  var FS_WAECHTER_MS = 3000;
+
+  function _fsWaechterAn() {
+    if (_fs.waechter) return;
+    _fs.waechter = setInterval(function () {
+      try {
+        if (!_rf || !_fs.an || !_fs.stream) return;
+        /* v1381: WICHTIG. Ohne diese Zeile hebt der Waechter jede Pause
+           nach spaetestens drei Sekunden wieder auf — und zwar still.
+           Der Knopf saehe aus, als haette er gewirkt. */
+        if (_fs.pause) return;
+        if (_fs.laeuft > 0) return;                      /* Auswertung unterwegs */
+        if (_fs.phase === 'rauschen' || _fs.phase === 'warte'
+            || _fs.phase === 'spricht') return;          /* alles in Ordnung */
+        if (_fs.phase === 'aus') return;                 /* bewusst beendet */
+        _fsHoeren(true);
+      } catch (e) { /* ein Waechter, der wirft, waere schlimmer als keiner */ }
+    }, FS_WAECHTER_MS);
+  }
+
+  function _fsWaechterAus() {
+    if (_fs.waechter) { clearInterval(_fs.waechter); _fs.waechter = null; }
+  }
+
   function _fsAus() {
     try { if (_fs.uhr) { clearInterval(_fs.uhr); _fs.uhr = null; } } catch (e) {}
     try { if (_fs.rec && _fs.rec.state === 'recording') { _fs.rec.onstop = null; _fs.rec.stop(); } } catch (e) {}
@@ -2000,6 +2172,13 @@
     _fs.stream = null; _fs.ctx = null; _fs.analyser = null; _fs.rec = null;
     _fs.kopf = null; _fs.chunks = []; _fs.rest = ''; _fs.laeuft = 0;
     _fs.phase = 'aus'; _fs.aufnahme = false;
+    /* v1381: Ein abgerissener Strom ist nicht angehalten, sondern aus.
+       Bliebe die Pause stehen, waere das Freisprechen nach dem naechsten
+       Einschalten taub — mit einem Knopf, der „Weiter" anbietet und auf
+       einen Recorder zeigt, den es nicht mehr gibt. */
+    _fs.pause = false;
+    try { _fsPauseKnopf(); } catch (e) {}
+    _fsWaechterAus();   /* v1121-WWACH */
   }
 
   /* Einmal öffnen, für den ganzen Dialog — und einmal starten. */
@@ -2035,6 +2214,7 @@
         _fsRingBegrenzen();
       };
       try { _fs.rec.start(FS_SCHEIBE_MS); _fs.aufnahme = true; } catch (e) { return false; }
+      _fsWaechterAn();   /* v1121-WWACH: ab jetzt passt jemand auf. */
       return true;
     }).catch(function () { return false; });
   }
@@ -2046,6 +2226,7 @@
      mitten im Satz der Puffer verloren. */
   function _fsHoeren(neu) {
     if (!_fs.an || !_fs.stream || !_fs.rec) return;
+    if (_fs.pause) return;   /* v1381: angehalten heisst angehalten */
     if (!neu && (_fs.phase === 'warte' || _fs.phase === 'spricht' || _fs.phase === 'rauschen')) return;
     if (_fs.uhr) { clearInterval(_fs.uhr); _fs.uhr = null; }
     _fs.chunks = [];                 /* der KOPF bleibt */
@@ -2062,9 +2243,13 @@
       _fs.rest ? 'Deinen Satzanfang habe ich mir gemerkt.' : 'Ich merke selbst, wenn du fertig bist.');
 
     _fs.uhr = setInterval(function () {
-      if (!_rf || !_fs.an) { return; }
+      if (!_rf || !_fs.an || _fs.pause) { return; }   /* v1381 */
       var p = _fsPegel(), jetzt = Date.now(), seit = jetzt - _fs.t0;
       _fsPegelZeigen(p);   /* v1277: der Ausschlag beantwortet "hoert er mich?" */
+      /* v1119-WPULS: der Rahmen der Leiste faerbt sich gruen, solange
+         aufgenommen wird. Marcels Befund: "ob er gerade am Aufnehmen ist,
+         das kommt nicht richtig hervor." */
+      try { _rfZustandSetzen(null); } catch (xz) {}
 
       if (_fs.phase === 'rauschen') {
         summe += p; proben++;
@@ -2108,10 +2293,100 @@
     /* v1290: Der Recorder wird NICHT gestoppt — er laeuft durch, und der
        Kopf bleibt gueltig. Nur der laufende Abschnitt wird verworfen. */
     _fs.chunks = [];
+    /* v1119-WPULS: das Gruen geht mit dem Zuhoeren aus. Ohne diese Zeile
+       bliebe der Rahmen gruen, weil das Intervall nicht mehr laeuft. */
+    try { _rfZustandSetzen(null); } catch (xz) {}
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     v1381 · ANHALTEN — das Mikrofon wartet, der Dialog bleibt stehen
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Wunsch: „beim micro irgendwo die möglichkeit geben die auto
+     tracking ob man was sagt auszuschalten oder zu halten? … es kann ja
+     sein das ich kurz gestört werde dann möchte ich vlt den prozess
+     unterbrechen und in ein paar minuten wieder was sagen."
+
+     WARUM DER VORHANDENE SCHALTER DAS NICHT KONNTE: die Checkbox
+     „Freisprechen" oben in der Kopfzeile ruft `_fsAus()` — und das
+     REISST ALLES AB: Stream gestoppt, AudioContext geschlossen,
+     Recorder weg, `_fs.kopf` auf null, und `_fs.rest` (der gemerkte
+     Satzanfang) ebenfalls. Wer sie wieder einschaltet, beginnt mit einem
+     neuen `getUserMedia`. Das ist ein Ausschalter, keine Pause.
+
+     UND DER EIGENTLICHE SCHADEN IST NICHT DIE ZEIT. Wer gestört wird und
+     nichts drückt, dessen Mikrofon läuft weiter — was der Störer sagt,
+     landet im Transkript und wird als Antwort auf die offene Frage
+     ausgewertet. Eine falsche Zahl im Objekt ist teurer als eine
+     verlorene Minute.
+
+     DIE MECHANIK. Zwei Riegel, weil einer nicht reicht:
+
+       `rec.pause()`        schneidet nichts mehr mit — und behält dabei
+                            den Container-Header. Genau darauf baut die
+                            v1290-Mechanik (`_fs.kopf`): nach `resume()`
+                            ist der Blob weiter eine vollständige Datei.
+       `track.enabled=false` schaltet das Signal selbst stumm. Ohne das
+                            liefe die Pegelmessung weiter und der Ausschlag
+                            würde anzeigen, dass zugehört wird.
+
+     Der Strom bleibt offen, der Dialogzustand bleibt, `_fs.rest` bleibt.
+     Nach dem Weiter geht es an derselben Frage weiter — kein neuer
+     Berechtigungsdialog, kein verlorener Satzanfang.
+
+     DREI STELLEN MUSSTEN MIT, sonst hebt sich die Pause von selbst auf:
+     `_fsHoeren` (30 Aufrufstellen im Ablauf), die Uhr darin, und vor
+     allem der Wiederanlauf-Wächter aus v1121 — der hätte nach drei
+     Sekunden wieder angeworfen, und der Knopf hätte ausgesehen, als
+     hätte er gewirkt. */
+  function _fsAngehalten() { return !!_fs.pause; }
+
+  function _fsPause() {
+    if (_fs.pause) return;
+    _fs.pause = true;
+    _fsStopHoeren();
+    try { if (_fs.rec && _fs.rec.state === 'recording') _fs.rec.pause(); } catch (e) {}
+    try { (_fs.stream ? _fs.stream.getAudioTracks() : []).forEach(function (t) { t.enabled = false; }); } catch (e) {}
+    try { _fsPegelZeigen(0); } catch (e) {}
+    _fsMikroKasten(false, 'Angehalten — ich höre gerade nicht zu.',
+      _fs.rest ? 'Dein Satzanfang ist gemerkt. Nimm dir Zeit.'
+               : 'Nimm dir Zeit. Mit „Weiter" geht es an derselben Frage weiter.');
+    _fsPauseKnopf();
+  }
+
+  function _fsWeiter() {
+    if (!_fs.pause) return;
+    _fs.pause = false;
+    try { (_fs.stream ? _fs.stream.getAudioTracks() : []).forEach(function (t) { t.enabled = true; }); } catch (e) {}
+    try { if (_fs.rec && _fs.rec.state === 'paused') _fs.rec.resume(); } catch (e) {}
+    _fsPauseKnopf();
+    /* Der Recorder hat waehrend der Pause nichts geschrieben; der laufende
+       Abschnitt beginnt deshalb hier neu — der Kopf gilt weiter. */
+    _fsHoeren(true);
+  }
+
+  function _fsPauseUm() { if (_fs.pause) _fsWeiter(); else _fsPause(); }
+
+  /* Der Knopf sagt, was er TUT, nicht wo er steht. */
+  function _fsPauseKnopf() {
+    var b = $('vi-rf-halt');
+    if (!b) return;
+    var p = !!_fs.pause;
+    b.textContent = p ? '▶  Weiter' : '❚❚  Anhalten';
+    b.setAttribute('title', p ? 'Wieder zuhören' : 'Mikrofon anhalten — der Dialog bleibt stehen');
+    b.classList.toggle('an', p);
+    var k = $('vi-rf-mikro');
+    if (k) {
+      k.classList.toggle('halt', p);
+      /* „taub" heisst „Freisprechen ist aus" und blendet den Kasten ab.
+         Angehalten ist etwas anderes — der Kasten wartet, er ist nicht
+         weg. _fsMikroKasten(false, …) setzt taub; hier wird es fuer den
+         Pausenfall wieder abgenommen. */
+      if (p) k.classList.remove('taub');
+    }
   }
 
   /* Spricht der Nutzer gerade? Dann darf die naechste Frage warten. */
-  function _fsSprichtGerade() { return _fs.an && (_fs.phase === 'spricht'); }
+  function _fsSprichtGerade() { return _fs.an && !_fs.pause && (_fs.phase === 'spricht'); }
 
   /* v1290 · Endet der Satz offen, ist er nicht zu Ende.
      „Oh, das Objekt steht in" — da kommt noch was. Ein Co-Pilot, der
@@ -2361,7 +2636,28 @@
     { nr: 3, name: 'Lage & Zustand', ziel: 'wo es steht und wie es dasteht' },
     { nr: 4, name: 'Feinschliff',    ziel: 'Bewirtschaftung, Entwicklung, Steuer' },
     { nr: 5, name: 'Deine Sicht',    ziel: 'These und Risiken' },
-    { nr: 6, name: 'Feinheiten',     ziel: 'alle übrigen Felder' }
+    { nr: 6, name: 'Feinheiten',     ziel: 'alle übrigen Felder' },
+    /* ═══ v1386 · DIE WERTERMITTLUNGS-SCHLEIFE ═══════════════════════════
+       Marcels Wunsch: „wenn wir die Pro-Version haben, koennten wir auch
+       nachfragen: Moechtest du vielleicht auch eine Wertermittlung haben?
+       … eine Wertermittlung nach ImmoWertV und dann koennen wir uns die
+       Daten dann auch holen, fragen dann auch in unseren Tabellen die
+       Gutachterausschuesse ab … das waere dann nochmal ein Extra, also
+       eine extra Schleife."
+
+       GEMESSEN, warum es eine EIGENE Etappe braucht und kein Anhaengsel:
+       Das Sachwertverfahren nach ImmoWertV braucht zwei Angaben, die im
+       Formular stehen und die der Sprechlauf NIE gefragt hat —
+       `standardstufe` (Gebaeudestandard nach Anlage 4) und
+       `garagen_bgf_qm`. CrossCheckService liest beide (Z. 208 f., 239).
+       Ohne sie rechnet das Verfahren am Standard vorbei oder gar nicht.
+
+       Sie stehen deshalb NICHT in den Feinheiten: wer keine Wertermittlung
+       will, soll nicht nach dem Gebaeudestandard nach Anlage 4 gefragt
+       werden. Wer sie will, bekommt dafuer eine eigene, angekuendigte
+       Runde — und am Ende den amtlichen Sachwertfaktor seines
+       Gutachterausschusses aus unserem Register. */
+    { nr: 7, name: 'Wertermittlung', ziel: 'Sachwertverfahren nach ImmoWertV', extra: true }
   ];
 
   var RFRAGEN = [
@@ -2429,15 +2725,133 @@
       frage: 'Wie entwickelt sich der Ort — Bevölkerung, Nachfrage, Wertsteigerung, Entwicklungsmöglichkeiten?' },
     { et: 4, ids: ['kaufdat', 'wirtschaftlicher_uebergang'], rang: 10,
       frage: 'Wann wird gekauft, und ab wann gehören dir Mieten und Kosten?' },
-    { et: 4, ids: ['afa_satz', 'geb_ant', 'grenz'], rang: 16, vorbelegt: 1, profil: 'steuer',
-      frage: 'Zur Steuer — AfA-Satz, Gebäudeanteil und dein Grenzsteuersatz.' },
+    /* v1377b (C5): Das zu versteuernde Einkommen stand zwar in der
+       Feldbeschreibung fuer das Extraktionsmodell, aber in keinem Block -
+       es wurde nie gefragt. Jetzt ist es der zweite Weg zum Steuersatz:
+       eines von beiden genuegt (`eins`). */
+    { et: 4, ids: ['afa_satz', 'geb_ant', 'grenz', 'zve'], eins: ['grenz', 'zve'],
+      rang: 16, vorbelegt: 1, profil: 'steuer',
+      frage: 'Zur Steuer — AfA-Satz, Gebäudeanteil und dein Grenzsteuersatz. ' +
+             'Wenn du den Satz nicht im Kopf hast: sag mir dein zu versteuerndes ' +
+             'Einkommen, dann rechne ich ihn aus.' },
+
 
     /* ── Etappe 5 · Deine Sicht ───────────────────────────────────── */
     { et: 5, ids: ['thesis', 'risiken', 'notizen'], rang: 13,
       frage: 'Warum lohnt sich das Objekt für dich, was könnte schiefgehen, und was ist sonst wichtig?' }
   ];
 
+  /* ═══ v1386 · DIE FRAGEN DER WERTERMITTLUNGS-SCHLEIFE ══════════════════
+     Sie stehen BEWUSST NICHT in RFRAGEN. Dort wuerde `_rfLuecken` sie als
+     gewoehnliche Luecken zaehlen und jedem stellen — auch dem, der nur
+     wissen will, ob sich der Kauf rechnet. Der Gebaeudestandard nach
+     Anlage 4 ImmoWertV ist keine Frage fuer den schnellen Weg.
+
+     Angehaengt werden sie erst, wenn jemand die Schleife ausdruecklich
+     will (`_rfWertStarten`) — dieselbe Technik wie bei den Feinheiten
+     (`_rfTiefeStarten`, v1282). */
+  var RFRAGEN_WERT = [
+    { et: 7, ids: ['standardstufe'], rang: 4, wert: 1,
+      frage: 'Wie ist das Gebäude ausgestattet? Die Normalherstellungskosten 2010 kennen '
+           + 'fünf Standardstufen: 1 sehr einfach, 2 einfach, 3 Standard, 4 gehoben, '
+           + '5 stark gehoben. Es geht um die Qualität der Ausstattung — nicht um den '
+           + 'Zustand, der steckt im Modernisierungsgrad.' },
+    { et: 7, ids: ['gsfl', 'brw'], rang: 3, wert: 1,
+      frage: 'Wie groß ist das Grundstück, und welcher Bodenrichtwert gilt? '
+           + 'Den Bodenrichtwert hole ich dir auch ab.' },
+    { et: 7, ids: ['garagen', 'stellpl_aussen', 'garagen_bgf_qm'], rang: 8, wert: 1,
+      frage: 'Wie viele Garagen und Stellplätze gehören dazu? Wenn du die Grundfläche '
+           + 'der Garagen kennst, nimm sie mit — sie geht in den Sachwert ein.' },
+    { et: 7, ids: ['modernis'], rang: 5, wert: 1,
+      frage: 'Was wurde am Gebäude modernisiert? Daraus ergibt sich die Restnutzungsdauer '
+           + 'nach Anlage 2 ImmoWertV.' }
+  ];
+
+  /* ═══════════════════════════════════════════════════════════════════
+     v1378 (C2) · WOZU DIE ANGABE GEBRAUCHT WIRD
+     ═══════════════════════════════════════════════════════════════════
+     Der Lernmodus zeigt diesen Satz unter jeder Frage. Er beantwortet
+     nicht "was soll ich eintragen" - das steht in der Frage -, sondern
+     "warum will er das wissen".
+
+     DER UNTERSCHIED ZU EINEM HILFETEXT: hier steht, was die Angabe in
+     DIESER Software bewirkt - welche Kennzahl sie traegt, welche Rechnung
+     ohne sie nicht laeuft. Eine Lexikondefinition kann jeder nachschlagen;
+     dass ohne das nicht umlagefaehige Hausgeld der Cashflow zu gut
+     aussieht, steht nirgends sonst.
+
+     Der Schluessel ist die ERSTE Feld-Id des Blocks. Bloecke ohne Eintrag
+     zeigen im Lernmodus einfach nichts - besser als ein Fuellsatz. */
+  var RF_WOZU = {
+    plz: 'Die Adresse ist der Schlüssel zu allem Amtlichen: Bodenrichtwert aus BORIS, ' +
+         'Grunderwerbsteuersatz des Landes, Miet- und Kaufpreisniveau der Lage. ' +
+         'Ohne Hausnummer trifft der Bodenrichtwert nur das Ortszentrum.',
+    objart: 'Die Wohnfläche ist der Nenner fast jeder Vergleichszahl — Preis je m², ' +
+            'Miete je m², Sachwert. Die Objektart entscheidet, welche Verfahren ' +
+            'überhaupt rechnen: eine Eigentumswohnung ohne Miteigentumsanteil ' +
+            'bekommt keinen eigenen Bodenwert.',
+    baujahr: 'Das Baujahr steuert die AfA (2 oder 2,5 Prozent), die Restnutzungsdauer ' +
+             'im Sachwert und die Erwartung an Zustand und Energie. Der Kaufpreis ist ' +
+             'die Basis der Kaufnebenkosten und der Nenner jeder Rendite.',
+    nkm: 'Die Kaltmiete trägt die Mietrendite, den Cashflow und über den DSCR die ' +
+         'Frage, ob sich das Objekt selbst trägt. Zusatzeinnahmen wie Stellplätze ' +
+         'zählen mit — sie gehören zum Rohertrag, auch wenn sie klein wirken.',
+    ek: 'Eigenkapital und Zins entscheiden über den Hebel: dieselbe Wohnung ist mit ' +
+        '20 Prozent Eigenkapital eine andere Investition als mit 40. Die Zinsbindung ' +
+        'sagt, wie lange die Rechnung sicher ist — danach beginnt das ' +
+        'Zinsänderungsrisiko.',
+    makler_p: 'Die Kaufnebenkosten sind echtes Geld, das nie in der Immobilie landet. ' +
+              'Sie erhöhen die Investition, nicht den Wert — deshalb drücken sie jede ' +
+              'Rendite. Die Grunderwerbsteuer ist Landesrecht und liegt zwischen ' +
+              '3,5 und 6,5 Prozent.',
+    makrolage: 'Die Lage geht in den Investor Deal Score ein und ist das, was sich ' +
+               'später NICHT ändern lässt. Region und Straße getrennt, weil beides ' +
+               'auseinanderfallen kann: gute Stadt, laute Straße.',
+    ds2_zustand: 'Zustand und Energieausweis sagen, was an Investitionen noch kommt. ' +
+                 'Eine Heizung von 1995 ist keine Sanierung von heute, aber eine von ' +
+                 'übermorgen — und die Energieklasse wirkt auf Mieterwartung und ' +
+                 'Wiederverkauf.',
+    san: 'Geplante Sanierungen gehören in die Investitionssumme, nicht in die ' +
+         'laufenden Kosten — sonst sieht der Cashflow im ersten Jahr zu schlecht und ' +
+         'die Rendite zu gut aus. Mitverkauftes Inventar kann die ' +
+         'Bemessungsgrundlage der Grunderwerbsteuer senken.',
+    brw: 'Der Bodenrichtwert trennt Grund und Gebäude. Das ist zweimal wichtig: für ' +
+         'den Sachwert und für den Gebäudeanteil, denn nur der Gebäudeteil wird ' +
+         'abgeschrieben. Den Wert hole ich amtlich aus BORIS, wenn du willst.',
+    erbbauzins: 'Beim Erbbaurecht kaufst du das Gebäude, nicht den Boden. Der ' +
+                'Erbbauzins läuft wie eine zweite Miete mit, und die Restlaufzeit ' +
+                'entscheidet, ob eine Bank überhaupt finanziert.',
+    hg_ul: 'Nur der NICHT umlagefähige Teil des Hausgelds trifft dich — der Rest geht ' +
+           'an den Mieter weiter. Wer das Hausgeld komplett als Kosten rechnet, macht ' +
+           'sein Objekt schlechter, als es ist; wer es ganz weglässt, besser.',
+    mietstg: 'Diese drei Prozentsätze bestimmen die Prognose über die Haltedauer. Sie ' +
+             'sind Annahmen, keine Tatsachen — deshalb siehst du in der Übersicht, ' +
+             'mit welchen gerechnet wurde. Leerstand ist der ehrlichste Posten: er ' +
+             'kommt, die Frage ist nur wann.',
+    ds2_bevoelkerung: 'Das ist die Zukunft des Ortes, nicht des Objekts: zieht die ' +
+                      'Bevölkerung hin oder weg, ist die Nachfrage da, kommt ' +
+                      'Entwicklung. Vier Einschätzungen für den Investor Deal Score, ' +
+                      'die ich dir auch aus einer Marktpreisindikation holen kann.',
+    kaufdat: 'Das Kaufdatum startet die AfA und die Spekulationsfrist von zehn Jahren. ' +
+             'Der wirtschaftliche Übergang ist der Tag, ab dem dir Mieten und Kosten ' +
+             'gehören — er liegt oft Wochen nach der Beurkundung.',
+    afa_satz: 'Die Steuer entscheidet über den Cashflow nach Steuern, und der ist der, ' +
+              'der auf deinem Konto ankommt. Der Gebäudeanteil ist die ' +
+              'Bemessungsgrundlage der AfA — Grund und Boden wird nicht abgeschrieben. ' +
+              'Der Grenzsteuersatz sagt, was der nächste Euro kostet, nicht der ' +
+              'Durchschnitt.',
+    thesis: 'Das rechnet nichts — und ist trotzdem das Wichtigste. In zwei Jahren ' +
+            'weißt du nicht mehr, warum dieses Objekt und kein anderes. Die Risiken ' +
+            'aufzuschreiben schützt außerdem davor, sie später wegzurechnen.'
+  };
+
+  function _rfWozu(e) {
+    if (!e || !e.ids || !e.ids.length) return '';
+    return RF_WOZU[e.ids[0]] || '';
+  }
+
   var RF_MAX = 3;
+
   var _rf = null;   /* { offen:[], i:0, data:{}, catalog:[], OA:{}, alle:bool } */
 
   function _rfFehlt(eintrag, fields) {
@@ -2468,7 +2882,22 @@
          galten sie als beantwortet, und die Rechnung haette stillschweigend
          mit einer Vorbelegung gerechnet, die niemand bestaetigt hat. */
       var da = eintrag.vorbelegt ? gesagt : (gesagt || fieldHasValue(id));
+      /* ═══ v1377b (C5) · Zwei Wege zur selben Zahl ══════════════════════
+         `eins` nennt Felder, von denen EINES genuegt. Gebraucht wird das
+         beim Steuersatz: wer seinen Grenzsteuersatz kennt, nennt ihn; wer
+         ihn nicht kennt, nennt sein zu versteuerndes Einkommen, und der
+         Co-Pilot rechnet. Beides zu verlangen waere, nach derselben Zahl
+         zweimal zu fragen. */
+      if (!da && eintrag.eins && eintrag.eins.indexOf(id) >= 0) {
+        for (var j = 0; j < eintrag.eins.length; j++) {
+          var aid = eintrag.eins[j];
+          if (aid === id) continue;
+          var ag = !!(fields && (aid in fields) && fields[aid] !== '' && fields[aid] != null);
+          if (eintrag.vorbelegt ? ag : (ag || fieldHasValue(aid))) { da = true; break; }
+        }
+      }
       if (!da) return true;   /* eine Luecke im Block genuegt */
+
     }
     return false;
   }
@@ -3017,6 +3446,17 @@
       '.vi-rf-kopfzeile{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}',
       '.vi-rf-kopf{font:700 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;',
       '  text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C)}',
+      /* ═══ v1119-WFORT · Der Kopf traegt jetzt drei Dinge ════════════════
+         Etappe, Frage x von y und einen Balken. Er bleibt EINE Zeile: der
+         Balken sitzt in der Grundlinie, nicht darunter. */
+      '.vi-rf-kopf{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;min-width:0}',
+      '.vi-kopf-txt{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.vi-kopf-zahl{flex:0 0 auto;font-weight:600;opacity:.62;letter-spacing:.06em}',
+      '.vi-kopf-bar{flex:0 0 60px;height:4px;border-radius:99px;',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);overflow:hidden}',
+      '.vi-kopf-bar i{display:block;height:100%;border-radius:99px;',
+      '  background:linear-gradient(90deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C));',
+      '  transition:width .45s cubic-bezier(.22,.8,.3,1)}',
       '.vi-rf-schalter{display:flex;align-items:center;gap:14px;flex-wrap:wrap}',
       '.vi-rf-fs{display:flex;align-items:center;gap:7px;cursor:pointer;',
       '  font:600 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;opacity:.75}',
@@ -3094,8 +3534,41 @@
       '.vi-rf-st.ok{opacity:1} .vi-rf-st.ok .z{color:#3FA56C}',
       '.vi-rf-st.vor{opacity:.78} .vi-rf-st.vor .z{color:#8A837F}',
       '.vi-rf-st.weg{opacity:.4} .vi-rf-st.weg .z{color:#B8625C}',
-      '.vi-rf-st.dran{opacity:1;font-weight:600} .vi-rf-st.dran .z{color:var(--wl-c9a84c, #C9A84C)}',
+      /* ═══ v1384 · DAS GEFRAGTE FELD MUSS MAN SEHEN ══════════════════
+         Marcels Wunsch: „mehr animation immer das feld was gefragt ist
+         nach unten und farblich gekennzeichnet. das muss schlau sein und
+         interaktiv."
+
+         Bisher trug die aktive Zeile NUR Textfarbe und Fettschrift — in
+         einer Spalte mit zwanzig Zeilen, von denen die erledigten
+         ebenfalls voll deckend sind (`.ok{opacity:1}`), ist das zu wenig
+         Unterschied. Jetzt bekommt sie eine FLAECHE mit goldenem Balken
+         links, und beim Wechsel laeuft ein kurzes Aufleuchten, damit das
+         Auge dem Sprung folgen kann. */
+      '.vi-rf-st.dran{opacity:1;font-weight:600}',
+      '.vi-rf-st.dran .vi-rf-st-k{position:relative;padding:5px 8px 5px 10px;',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 13%, transparent);',
+      '  box-shadow:inset 3px 0 0 0 var(--wl-c9a84c, #C9A84C);',
+      '  transition:background .18s ease}',
+      '.vi-rf-st.dran .z{color:var(--wl-c9a84c, #C9A84C)}',
       '.vi-rf-st.dran .n{color:var(--wl-e8cc7a, #E8CC7A)}',
+      /* Das Aufleuchten haengt an einer Klasse, die JS kurz setzt — nicht
+         an `.dran` selbst. Sonst liefe es bei jedem Neuzeichnen der
+         Spalte erneut, und die passiert bei jeder Antwort mehrfach. */
+      '.vi-rf-st.dran.frisch .vi-rf-st-k{animation:viRfDran .9s ease-out}',
+      '@keyframes viRfDran{',
+      '  0%{background:color-mix(in srgb, var(--wl-e8cc7a, #E8CC7A) 52%, transparent);',
+      '     box-shadow:inset 3px 0 0 0 var(--wl-e8cc7a, #E8CC7A), 0 0 0 4px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent)}',
+      '  100%{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 13%, transparent);',
+      '     box-shadow:inset 3px 0 0 0 var(--wl-c9a84c, #C9A84C), 0 0 0 0 transparent}}',
+      /* Wer die Reihenfolge selbst bestimmen will, klickt eine offene
+         Zeile an. Das ist der „interaktiv"-Teil des Wunsches. */
+      '.vi-rf-st.springbar .vi-rf-st-k{cursor:pointer}',
+      '.vi-rf-st.springbar:hover .vi-rf-st-k{',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 9%, transparent);',
+      '  box-shadow:inset 3px 0 0 0 color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent)}',
+      '@media (prefers-reduced-motion: reduce){',
+      '  .vi-rf-st.dran.frisch .vi-rf-st-k{animation:none}}',
       /* Die Einzelwerte: erst beim Klick, dann sauber im Raster. */
       '.vi-rf-st-w{display:none}',
       '.vi-rf-st.auf .vi-rf-st-w{display:grid;grid-template-columns:minmax(0,1fr) auto;',
@@ -3191,6 +3664,12 @@
       '.vi-rf-treffer{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(42,39,39,.16);',
       '  font:600 11.5px/1.5 "JetBrains Mono",ui-monospace,monospace;color:#3FA56C}',
       '.vi-rf-zaehler{font:600 10.5px/1 "JetBrains Mono",monospace;opacity:.5;margin-top:7px}',
+      /* v1359: der Unterschied zwischen zwei gleich klingenden Feldern.
+         Kein Fehlerton - es ist kein Fehler, sondern eine Klarstellung. */
+      '.vi-rf-unterschied{margin-top:9px;padding:8px 11px;border-radius:8px;' +
+        'background:rgba(201,168,76,0.09);border-left:2px solid var(--wl-c9a84c,#C9A84C);' +
+        'font-size:12px;line-height:1.5;opacity:.9}',
+
 
       /* ═══ v1299 · Die Pillen mit den Schlagwörtern ═══════════════════════
          Marcels Vorgabe: „hinter den Fragen noch Pillen mit den
@@ -3314,6 +3793,27 @@
       '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent);transition:border-color .2s ease}',
       '.vi-rf-mikro.hoert{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 70%, transparent)}',
       '.vi-rf-mikro.taub{opacity:.55}',
+      /* ═══ v1381 · Anhalten ═══════════════════════════════════════════
+         Der angehaltene Kasten muss sich vom tauben unterscheiden: „taub"
+         heisst „Freisprechen ist aus", „halt" heisst „ich warte auf dich".
+         Deshalb keine weitere Abblendung, sondern ein ruhiger, neutraler
+         Rahmen — und der Puls des Mikrofonsymbols steht still.
+         Der Knopf traegt Gold nur im Ruhezustand; angehalten wird er
+         gefuellt, damit „Weiter" der naechste sichtbare Schritt ist. */
+      '.vi-rf-mikro.halt{border-style:dashed;',
+      '  border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent);',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 3%, transparent)}',
+      '.vi-rf-mikro.halt .vi-rf-mikro-icon{animation:none;filter:grayscale(.75);opacity:.7}',
+      '.vi-rf-halt{flex:0 0 auto;cursor:pointer;white-space:nowrap;',
+      '  font:600 12px/1 var(--font-mono, ui-monospace, monospace);letter-spacing:.02em;',
+      '  padding:7px 11px;border-radius:9px;transition:background .15s ease,border-color .15s ease;',
+      '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 42%, transparent);',
+      '  background:transparent;color:var(--wl-c9a84c, #C9A84C)}',
+      '.vi-rf-halt:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);',
+      '  border-color:var(--wl-c9a84c, #C9A84C)}',
+      '.vi-rf-halt.an{background:var(--wl-c9a84c, #C9A84C);border-color:var(--wl-c9a84c, #C9A84C);color:#100e08}',
+      '.vi-rf-halt.an:hover{background:var(--wl-e8cc7a, #E8CC7A)}',
+      '.vi-rf-halt:focus-visible{outline:2px solid var(--wl-e8cc7a, #E8CC7A);outline-offset:2px}',
       '.vi-rf-mikro-icon{width:30px;height:30px;border-radius:50%;flex:0 0 30px;display:flex;',
       '  align-items:center;justify-content:center;font-size:15px;',
       '  background:linear-gradient(160deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C));color:#100e08}',
@@ -3358,6 +3858,53 @@
       '.vi-rf-dran{margin:12px 2px 2px;border-radius:12px;overflow:hidden;',
       '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent);',
       '  background:var(--wl-fffdf7, #FFFDF7)}',
+      /* ═══ v1119-WPULS · WO ER GERADE STEHT, LEUCHTET ════════════════════
+         Marcels Befund vom 14.09.2026: „vielleicht dass der Rahmen um den
+         Co-Pilot einmal so blinkt, wo er gerade steht … vielleicht auch
+         einfach die Box, den Rahmen, dass der ein bisschen leuchtet oder
+         ein bisschen blinkt, wo er ist, und die Box dahinter vielleicht
+         auch eine andere Farbe."
+
+         Die Leiste sagt seit v1291, WAS offen ist. Sie sagte nicht, DASS
+         etwas offen ist — ein ruhiger goldener Rahmen sieht aus wie jeder
+         andere Kasten auf der Seite.
+
+         DREI ZUSTÄNDE, drei Bilder:
+           data-zustand="frage"   ruhig gold, eine Frage wartet
+           data-zustand="angebot" pulsierender Rahmen, eine Entscheidung
+           data-zustand="hoert"   grüner Schein, das Mikrofon nimmt auf
+
+         Der Puls läuft drei Runden und hält dann an — ein Rahmen, der
+         ewig blinkt, wird nach einer Minute übersehen und nervt bis
+         dahin. `prefers-reduced-motion` schaltet ihn ganz ab. */
+      '@keyframes viPuls{0%{box-shadow:0 0 0 0 color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent)}',
+      '  70%{box-shadow:0 0 0 7px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 0%, transparent)}',
+      '  100%{box-shadow:0 0 0 0 color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 0%, transparent)}}',
+      '@keyframes viHoert{0%,100%{box-shadow:0 0 0 0 rgba(63,165,108,.5)}',
+      '  60%{box-shadow:0 0 0 6px rgba(63,165,108,0)}}',
+      '.vi-rf-dran[data-zustand="angebot"]{animation:viPuls 1.6s ease-out 3;',
+      '  border-color:var(--wl-c9a84c, #C9A84C)}',
+      '.vi-rf-dran[data-zustand="angebot"] .vi-dran-a{',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 17%, transparent)}',
+      '.vi-rf-dran[data-zustand="angebot"] .vi-dran-lbl{color:var(--wl-b8932f, #b8932f);font-size:10px}',
+      /* v1119c-WZWEI: die Aufnahme laeuft ueber OUTLINE, der Puls ueber
+         box-shadow — so koennen beide gleichzeitig zu sehen sein. Vorher
+         gewann das Zuhoeren immer, und weil das Mikrofon im
+         Freisprechmodus dauernd laeuft, sah man den Puls nie. */
+      '.vi-rf-dran[data-hoert="1"]{outline:2px solid #3FA56C;outline-offset:2px}',
+      '.vi-rf-dran[data-hoert="1"] .vi-dran-f i{color:#3FA56C;animation:viHoert 1.9s ease-out infinite;',
+      '  border-radius:50%}',
+      /* Der Nein-Knopf steht neben den Abrufen, sieht aber nicht aus wie
+         einer: ein Angebot und seine Ablehnung duerfen nicht gleich
+         aussehen, sonst klickt man daneben. */
+      '.vi-dran-btn.nein{background:transparent;color:var(--vi-muted, #6b6257);',
+      '  border:1px dashed rgba(42,39,39,.26);box-shadow:none;font-weight:600}',
+      '.vi-dran-btn.nein:hover:not(:disabled){background:rgba(42,39,39,.05);transform:none;',
+      '  box-shadow:none;color:#2A2727}',
+      '.vi-dran-btn.nein b{font-size:13px;opacity:.7}',
+      '@media (prefers-reduced-motion:reduce){',
+      '  .vi-rf-dran[data-zustand="angebot"],.vi-rf-dran[data-hoert="1"] .vi-dran-f i{animation:none}',
+      '  .vi-kopf-bar i{transition:none}}',
       /* v1300: flacher. Die Zeile mit der Frage trug 9 px oben und unten
          und eine Zeilenhöhe von 1.45 — zusammen fast 40 px für einen Satz. */
       '.vi-dran-f{display:flex;gap:8px;align-items:baseline;padding:6px 13px;',
@@ -3522,6 +4069,35 @@
       '  font:400 11px/1.5 Inter,system-ui,sans-serif;opacity:.72}',
       '.vi-sc-annahmen b{opacity:.9}',
       '.vi-sc-weiter{margin-top:10px;font:400 12.5px/1.45 Inter,system-ui,sans-serif;opacity:.8}',
+      /* v1378 (C2): Der Wozu-Satz ist Erklaerung, kein Inhalt - er steht
+         abgesetzt und leiser als die Frage, damit er sie nicht ueberlagert. */
+      '.vi-rf-wozu{margin:9px 0 2px;padding:8px 11px;border-radius:8px;',
+      '  border-left:3px solid var(--wl-C9A84C,#C9A84C);',
+      '  background:rgba(201,168,76,.07);',
+      '  font:400 12px/1.5 Inter,system-ui,sans-serif;opacity:.88}',
+      '.vi-rf-wozu b{font:600 9.5px/1 "JetBrains Mono",ui-monospace,monospace;',
+      '  text-transform:uppercase;letter-spacing:.05em;opacity:.6;margin-right:6px}',
+      /* Der Tonknopf traegt den Zustand als Farbe mit - ein Schalter, dem
+         man nicht ansieht, wo er steht, wird zweimal gedrueckt. */
+      '#vi-rf-ton[data-ton="lernen"]{border-color:var(--wl-C9A84C,#C9A84C);',
+      '  color:var(--wl-C9A84C,#C9A84C)}',
+      '#vi-rf-ton[data-ton="profi"]{border-color:#3FA56C;color:#3FA56C}',
+
+      /* v1376 (C7): zwei Werte nebeneinander. Beide gleich gross, beide mit
+         ihrer Herkunft - keiner sieht wichtiger aus als der andere, denn
+         welcher stimmt, weiss nur der Nutzer. Gold fuer den abgerufenen
+         Wert waere schon eine Empfehlung. */
+      '.vi-rf-knf{margin-top:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}',
+      '@media(max-width:560px){.vi-rf-knf{grid-template-columns:1fr}}',
+      '.vi-rf-knf-z{padding:8px 10px;border:1px solid rgba(42,39,39,.16);border-radius:8px;',
+      '  background:rgba(42,39,39,.03)}',
+      '.vi-rf-knf-z span{display:block;opacity:.55;text-transform:uppercase;letter-spacing:.04em;',
+      '  font:600 9.5px/1.3 "JetBrains Mono",ui-monospace,monospace}',
+      '.vi-rf-knf-z b{display:block;margin-top:3px;',
+      '  font:700 16px/1.2 "JetBrains Mono",ui-monospace,monospace}',
+      '.vi-rf-knf-z i{display:block;margin-top:3px;font-style:normal;opacity:.6;',
+      '  font:400 10.5px/1.35 Inter,system-ui,sans-serif}',
+
       /* v1290: der Fliesstext der vollen Stufe — eingeklappt, damit er die
          Karte nicht sprengt, aber vorhanden. Wer dafuer bezahlt, soll ihn
          auch sehen koennen. */
@@ -3794,7 +4370,66 @@
     '[\\s.!]*$', 'i');
   var RF_ALLES_GUT = /^(alles (in ordnung|gut|ok|okay|klar|frisch|neu|saniert))[\s.!]*$/i;
 
+  /* ═══ v1358 · DIE VERNEINUNG STEHT NICHT IMMER VORNE ═══════════════
+     Marcels Screenshot vom 12.09.2026 (design/mockups/fehler 4.png). Auf
+     die Frage nach Investment-These, Risiken und Notizen die Antwort:
+
+       „Investmentthese habe ich keine."
+
+     Ergebnis: „Ich habe … verstanden, aber nichts gefunden, was hierher
+     passt. Sag es einfach nochmal." Zwei Saetze vorher hatte derselbe
+     Co-Pilot dieselbe Verneinung fuer zwei ANDERE Felder akzeptiert.
+
+     Der Grund: `RF_NEIN` verlangt, dass die Verneinung den GANZEN Text
+     ausmacht, und `RF_NEIN_TEIL` prueft Satzteile, die MIT der Verneinung
+     beginnen. Beides passt nicht auf „Thema zuerst, Verneinung danach" -
+     und genau so spricht man Deutsch: „Balkon haben wir keinen",
+     „Garage gibt es nicht", „Investmentthese habe ich keine."
+
+     WARUM DAS SICHER IST: es genuegt nicht, dass der Satz auf eine
+     Verneinung endet. Er muss ausserdem das GEFRAGTE Thema nennen - die
+     Stichworte stehen ohnehin im Katalog (`kw`) und im Label. „Nichts
+     unter 300.000" bleibt damit weiter keine Verneinung, und ein Satz
+     ueber ein anderes Feld faellt nicht faelschlich in diesen Zweig.
+
+     Der Satz darf auch kurz sein - laenger als zwoelf Woerter wird er
+     nicht geprueft, dieselbe Vorsicht wie bei `_rfIstVerneinung`. */
+  var RF_NEIN_HINTEN = new RegExp(
+    '(hab(e)?\\s+ich|haben\\s+wir|gibt\\s+es|ist|sind|war(en)?|steht|stehen|brauche?\\s+ich|brauchen\\s+wir)' +
+    '\\s+(keine[rsn]?|kein|nichts|nicht(\\s+vorhanden|\\s+bekannt|\\s+n(ö|oe)tig)?)' +
+    '[\\s.!]*$', 'i');
+
+  function _rfThemaVerneint(text, e) {
+    var t = String(text || '').trim();
+    if (!t || !e || !e.ids || !e.ids.length) return false;
+    if (t.split(/\s+/).length > 12) return false;
+    if (!RF_NEIN_HINTEN.test(t)) return false;
+
+    /* Nennt der Satz das, wonach gerade gefragt ist? */
+    var klein = t.toLowerCase().replace(/[^a-zäöüß0-9\s-]/g, ' ');
+    for (var i = 0; i < e.ids.length; i++) {
+      /* v1359c: (_rf && _rf.catalog) statt _rf.catalog - der Pruefhaken aus
+         v1359b ruft die Funktion OHNE laufenden Sprechlauf auf, und dann
+         ist _rf null. Im Betrieb kam das nie vor, aber ein Pruefhaken,
+         der wirft, ist keiner. */
+      var kat = ((_rf && _rf.catalog) || []).filter(function (c) { return c.id === e.ids[i]; })[0];
+      if (!kat) continue;
+      var woerter = (kat.kw || []).slice();
+      if (kat.label) {
+        String(kat.label).toLowerCase().split(/[^a-zäöüß0-9]+/).forEach(function (w) {
+          if (w && w.length >= 4) woerter.push(w);
+        });
+      }
+      for (var k = 0; k < woerter.length; k++) {
+        var w = String(woerter[k]).toLowerCase();
+        if (w.length >= 4 && klein.indexOf(w) >= 0) return true;
+      }
+    }
+    return false;
+  }
+
   function _rfIstVerneinung(text) {
+
     var t = String(text || '').trim();
     if (!t) return false;
     if (RF_NEIN.test(t)) return true;
@@ -4135,8 +4770,15 @@
                      escH(w.v) + '</b></span>';
             }).join('') + '</div>'
           : '';
-        return '<div class="vi-rf-st ' + klasse + (werte.length ? ' hatwerte' : '') + '"' +
-               (werte.length ? ' title="' + escH(kurz) + '"' : '') + '>' +
+        /* v1384: anspringbar ist nur, was NOCH offen ist und nicht gerade
+           dran. `i` ist der Index in _rf.offen; die Bloecke vor der Liste
+           (bereits gefuellt, aus dem Formular) tragen negative Indizes und
+           sind damit von selbst ausgeschlossen. */
+        var springbar = (i >= 0) && !z.erledigt && !dran && !uebersprungen;
+        return '<div class="vi-rf-st ' + klasse + (werte.length ? ' hatwerte' : '') +
+               (springbar ? ' springbar' : '') + '" data-i="' + i + '"' +
+               (springbar ? ' title="Diesen Block jetzt beantworten"'
+                          : (werte.length ? ' title="' + escH(kurz) + '"' : '')) + '>' +
                '<div class="vi-rf-st-k">' +
                  '<span class="z">' + zeichen + '</span>' +
                  '<span class="n">' + escH(_rfKurzname(e)) + '</span>' +
@@ -4155,10 +4797,64 @@
     [].slice.call(host.querySelectorAll('.vi-rf-st.hatwerte')).forEach(function (z) {
       z.addEventListener('click', function () { z.classList.toggle('auf'); });
     });
+    /* ═══ v1384 · DEM SPRUNG FOLGEN KOENNEN ════════════════════════════
+       Zwei Dinge, die vorher fehlten:
+
+       1. `block:'nearest'` scrollt so wenig wie moeglich — die Zeile
+          landet am Rand des sichtbaren Bereichs und ist formal sichtbar.
+          `block:'center'` stellt sie in die Mitte, dorthin, wo das Auge
+          ohnehin hinsieht. Und `behavior:'smooth'` macht den Weg
+          nachvollziehbar: ein Sprung ohne Bewegung sieht aus wie ein
+          Neuaufbau der Liste.
+       2. Das Aufleuchten. Es haengt an einer eigenen Klasse, die nur
+          gesetzt wird, wenn sich das GEFRAGTE FELD wirklich geaendert
+          hat — `_rfStandZeichnen()` laeuft bei jeder Antwort mehrfach,
+          und eine Animation, die dabei jedes Mal neu startet, flackert
+          statt zu fuehren. */
     try {
       var dranEl = host.querySelector('.vi-rf-st.dran');
-      if (dranEl) dranEl.scrollIntoView({ block: 'nearest' });
+      if (dranEl) {
+        var _schl = (_rf.offen[_rf.i] && _rf.offen[_rf.i].ids)
+                    ? _rf.offen[_rf.i].ids.join(',') : String(_rf.i);
+        if (_rf._dranZuletzt !== _schl) {
+          _rf._dranZuletzt = _schl;
+          dranEl.classList.add('frisch');
+          setTimeout(function () {
+            try { dranEl.classList.remove('frisch'); } catch (e) {}
+          }, 950);
+        }
+        var _sanft = true;
+        try {
+          _sanft = !window.matchMedia
+                 || !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        } catch (e) {}
+        dranEl.scrollIntoView({ block: 'center',
+                                behavior: _sanft ? 'smooth' : 'auto' });
+      }
     } catch (ex) {}
+
+    /* ═══ v1384 · „das muss schlau sein und interaktiv" ═════════════════
+       Wer eine noch offene Zeile anklickt, springt dorthin. Bisher
+       bestimmte allein der Co-Pilot die Reihenfolge; wer die Zahl zu
+       Block 7 gerade zur Hand hatte, musste trotzdem 4, 5 und 6 abwarten
+       oder ueberspringen.
+
+       NUR NACH VORN UND NUR AUF OFFENES: ein erledigter Block wuerde beim
+       Anspringen seine eigene Frage noch einmal stellen, und der laufende
+       ist schon dran. Beides waere Verwirrung statt Abkuerzung. */
+    [].slice.call(host.querySelectorAll('.vi-rf-st.springbar')).forEach(function (z) {
+      z.addEventListener('click', function (ev) {
+        /* Der Auf-/Zuklapp-Klick der Werte hat Vorrang — sonst koennte man
+           die Einzelwerte eines Blocks gar nicht mehr ansehen. */
+        if (z.classList.contains('hatwerte') && ev.target.closest('.vi-rf-st-w')) return;
+        var ziel = parseInt(z.getAttribute('data-i'), 10);
+        if (!isFinite(ziel) || ziel < 0 || ziel === _rf.i) return;
+        try { _fsStopHoeren(); } catch (e) {}
+        _rf.i = ziel;
+        _rfStandZeichnen();
+        try { _rfFrage(); } catch (e) {}
+      });
+    });
   }
 
   /* Aus „Wie finanzierst du? Eigenkapital, Zinssatz, …" wird „Finanzierung".
@@ -4805,12 +5501,50 @@
     var R = r.R, Z = r.Z, st = _stufe(R.score);
     var cats = R.categories || {};
     var namen = { rendite: 'Rendite', finanzierung: 'Finanzierung', risiko: 'Risiko', lage: 'Lage', upside: 'Upside' };
+    /* ═══ v1121-WKPI · SO WIE IM TAB BEWERTUNGEN ═══════════════════════
+       Marcels Befund vom 14.09.2026: „da wäre es ja auch irgendwie cool,
+       wenn wir tatsächlich den Investor-Deal-Score und den
+       Investor-Deal-Score 2 anzeigen, auch mit den KPIs, die dahinter
+       stehen. Also ungefähr so, wie wir ihn im Tab Bewertungen haben."
+
+       GEMESSEN, was der Tab zeigt und der Sprechlauf nicht: das GEWICHT
+       der Kategorie, die Zahl der belegten KENNZAHLEN je Kategorie und
+       die Listen der Stärken und Schwächen. Der Sprechlauf zeigte nur
+       „Rendite 72 / 100" — eine Zahl ohne das, woraus sie entsteht.
+
+       Das Gewicht steht in `configUsed.weights`, die Kennzahlen je
+       Kategorie in `availableKpis`/`totalKpis`, Stärken und Schwächen in
+       `positives`/`negatives`. Alles liegt schon im Ergebnis; es wurde
+       nur nicht gelesen. */
+    var gew = (R.configUsed && R.configUsed.weights) || {};
     var gitter = Object.keys(namen).map(function (k) {
       var c = cats[k];
       if (!c) return '';
       var s = Math.round(c.score || 0);
-      return _zeile(namen[k], s + ' / 100', s >= 70 ? 'gut' : (s < 50 ? 'schlecht' : ''));
+      var zusatz = [];
+      if (gew[k]) zusatz.push(gew[k] + ' %');
+      if (c.totalKpis) zusatz.push(c.availableKpis + '/' + c.totalKpis + ' Kennz.');
+      var bez = namen[k] + (zusatz.length ? ' (' + zusatz.join(' · ') + ')' : '');
+      return _zeile(bez, s + ' / 100', s >= 70 ? 'gut' : (s < 50 ? 'schlecht' : ''));
     }).join('');
+
+    /* Stärken und Schwächen — im Tab stehen sie als Listen, hier in je
+       einer Zeile. Was der Score gut findet und was nicht, ist die
+       eigentliche Auskunft; die Zahl allein sagt nur, wie es ausging. */
+    var stTxt = '';
+    try {
+      var pos = (R.positives || []).slice(0, 4).map(function (p) {
+        return escH(p.name) + ' <span style="opacity:.6">' + Math.round(p.points) + '</span>'; });
+      var neg = (R.negatives || []).slice(0, 4).map(function (p) {
+        return escH(p.name) + ' <span style="opacity:.6">' + Math.round(p.points) + '</span>'; });
+      if (pos.length || neg.length) {
+        stTxt = '<div class="vi-sc-annahmen" style="margin-top:8px">'
+          + (pos.length ? '<b>Stark:</b> ' + pos.join(' · ') : '')
+          + (pos.length && neg.length ? '<br>' : '')
+          + (neg.length ? '<b>Schwach:</b> ' + neg.join(' · ') : '')
+          + '</div>';
+      }
+    } catch (e) {}
     var vollst = '';
     try {
       var av = 0, ge = 0;
@@ -4860,7 +5594,7 @@
     return '<div class="vi-sc">' +
       _scoreKopf('Investor Deal Score 2.0', R.score, st, st.kamel) +
       fazit +
-      '<div class="vi-sc-gitter">' + gitter + '</div>' + mp + hb +
+      '<div class="vi-sc-gitter">' + gitter + '</div>' + stTxt + mp + hb +
       (R.explanation ? '<div class="vi-sc-text">' + escH(String(R.explanation).replace(/\s+/g, ' ').slice(0, 420)) + '</div>' : '') +
       (vollst ? '<div class="vi-sc-annahmen"><b>Datenlage:</b> ' + escH(vollst) +
                 ' — was fehlt, zählt nicht gegen dich, es zählt gar nicht.</div>' : '') +
@@ -4996,7 +5730,10 @@
     });
     var akt = (_rf.offen[_rf.i] && _rf.offen[_rf.i].et) || 0;
     var liste = ETAPPEN.filter(function (E) { return da[E.nr]; });
-    if (liste.length < 2) { host.innerHTML = ''; host.style.display = 'none'; return; }
+    if (liste.length < 2) { host.innerHTML = ''; host.style.display = 'none';
+      /* v1119-WFORT: der Kopf traegt den Fortschritt auch OHNE Etappenband -
+         sonst haette ein kurzer Lauf gar keine Standanzeige. */
+      _rfKopfZeichnen(akt, liste); return; }
     host.style.display = '';
     var eigen = 0;
     liste.forEach(function (E) { if (E.nr === akt) eigen = 1; });
@@ -5013,16 +5750,41 @@
           '<small>' + f + ' / ' + g + '</small></span>' +
           '</span>';
       }).join('') + '</div>';
-    /* Die Kopfzeile links nennt die Etappe samt Ziel — „DER CO-PILOT
-       FRAGT" sagt nur, dass jemand fragt, nicht worueber. */
+    /* ═══ v1119-WFORT · WO STEHST DU GERADE — in einer Zeile ════════════
+       Marcels Befund vom 14.09.2026: „stehen dort als erstes: Ich führe
+       dich durch mit 16 Fragen und allem, und danach: Wo stehst du
+       gerade? Das kann man irgendwie verbinden und halt auch immer
+       visualisieren."
+
+       Die Zahl stand bisher NUR klein unter der Frage („Frage 4 von 16")
+       und war damit dort, wo man sie erst findet, wenn man schon
+       weitergelesen hat. Die Etappe stand oben, die Zahl unten — zwei
+       Auskünfte über dieselbe Sache an zwei Orten.
+
+       Jetzt trägt der Kopf beides und einen Balken dazu: Etappe, Frage x
+       von y, und wie weit der Lauf ist. Der Balken ist die eigentliche
+       Antwort — eine Zahl muss man lesen, eine Länge sieht man. */
+    _rfKopfZeichnen(akt, liste);
+  }
+
+  function _rfKopfZeichnen(akt, liste) {
+    if (!_rf) return;
+    liste = liste || [];
     var kopf = document.querySelector('.oabi-ov.vi-mode .vi-rf-kopf');
     if (kopf) {
-      kopf.textContent = akt
-        ? 'Etappe ' + akt + ' von ' + liste.length + ' · ' + _etName(akt)
-        : (_rf.alle ? 'Der Co-Pilot fragt' : 'Noch offen');
+      var _ges = _rf.offen.length || 0;
+      var _nr  = Math.min(_rf.i + 1, _ges);
+      var _pct = _ges ? Math.round((_rf.i / _ges) * 100) : 0;
+      kopf.innerHTML =
+        '<span class="vi-kopf-txt">' + escH(akt
+          ? 'Etappe ' + akt + ' von ' + liste.length + ' · ' + _etName(akt)
+          : (_rf.alle ? 'Der Co-Pilot fragt' : 'Noch offen')) + '</span>' +
+        (_ges ? '<span class="vi-kopf-zahl">Frage ' + _nr + ' / ' + _ges + '</span>' +
+                '<span class="vi-kopf-bar"><i style="width:' + _pct + '%"></i></span>' : '');
       kopf.title = akt ? _etZiel(akt) : '';
     }
   }
+
 
   /* ── Die Skalen in der Frage nennen (Backlog-Punkt 2) ───────────────
      Wir bewerten nach diesen Stufen — also soll der Nutzer sie hoeren,
@@ -5076,7 +5838,45 @@
     return id;
   }
 
+  /* ═══ v1359 · ZWEI DINGE, DIE GLEICH HEISSEN ══════════════════════════
+     Marcels Screenshot vom 12.09.2026 (design/mockups/fehler3.png). Er
+     antwortet „1,5 % Wertsteigerung, 2 % Mietsteigerung und 0 %
+     Leerstand" — und die NAECHSTE Frage fragt wieder nach
+     „Wertsteigerung".
+
+     GEMESSEN: das ist keine Doppelfrage. Es sind zwei verschiedene
+     Felder, die fast gleich heissen:
+
+       wertstg             „Wertsteigerung %"          — die Zahl in der
+                                                          Prognoserechnung
+       ds2_wertsteigerung  „Wertsteigerungs-Erwartung" — sehr hoch … keines,
+                                                          fuer den Score
+
+     Der Code ist also richtig, und trotzdem hat Marcel recht: die zwei
+     Fragen stehen direkt hintereinander (Rang 14 und 15), und die zweite
+     benutzt dasselbe Wort fuer etwas anderes. Wer das liest, denkt, er
+     habe gerade geantwortet.
+
+     Ein Fehler, der keiner ist, bleibt trotzdem ein Fehler — er kostet
+     Vertrauen in jede weitere Frage. Also sagt der Co-Pilot den
+     Unterschied, und zwar NUR dann, wenn die Zahl schon steht. Wer sie
+     nicht genannt hat, braucht die Erklaerung nicht. */
+  function _rfDoppeldeutig(e) {
+    if (!e || !e.ids || e.ids.indexOf('ds2_wertsteigerung') < 0) return '';
+    var zahl = _rf && _rf.data && _rf.data.fields ? _rf.data.fields['wertstg'] : null;
+    if (zahl == null || String(zahl).trim() === '') {
+      var el = document.getElementById('wertstg');
+      zahl = el ? el.value : null;
+    }
+    if (zahl == null || String(zahl).trim() === '') return '';
+    return '<div class="vi-rf-unterschied">Die <b>' +
+      escH(String(zahl).replace('.', ',')) + ' %</b> aus deiner Prognose habe ich. ' +
+      'Hier geht es um etwas anderes: wie du die <b>Lage</b> einsch\u00e4tzt \u2014 ' +
+      'das flie\u00dft in den Score ein, nicht in die Rechnung.</div>';
+  }
+
   function _rfPillen(eintrag) {
+
     if (!eintrag || !eintrag.ids || !eintrag.ids.length) return '';
     var teile = (eintrag.ids).map(function (id) {
       /* Klammerzusätze raus — „Wohnfläche (m²)" wird zu „Wohnfläche".
@@ -5264,19 +6064,67 @@
 
   var AKT_ICON = {
     brw: '📍', lage: '🌍', markt: '📊', markt2: '📈',
-    tiefe: '＋', tabelle: '✓', adresse: '📮'
+    erklaer: '💡', erf_neu: '🌱', erf_mittel: '○', erf_profi: '⚡',   /* v1115 */
+    tiefe: '＋', tabelle: '✓', adresse: '📮',
+    knf_neu: '⇄', knf_alt: '✓',  /* v1376 (C7) */
+    wert: '⚖️',                   /* v1386: Wertermittlung nach ImmoWertV */
+    nachfass: '↻'                 /* v1377 (C5) */
   };
+
+
+  /* ═══ v1119-WPULS · Der Zustand der Leiste, an EINER Stelle ═══════════
+     Aufgerufen aus `_rfDranZeichnen` (wenn sich der Inhalt aendert) UND
+     aus dem Pegel-Intervall (wenn sich die Phase aendert). Der zuletzt
+     gewuenschte Grundzustand wird gemerkt, damit das Intervall ihn nach
+     dem Zuhoeren wiederherstellen kann, ohne die Leiste neu zu bauen.
+
+     Das Attribut wird nur GESETZT, wenn es sich aendert - sonst startet
+     die Animation bei jedem Durchlauf von vorn und blinkt endlos. */
+  var _rfGrundZustand = '';
+  function _rfZustandSetzen(grund) {
+    if (grund != null) _rfGrundZustand = grund;
+    var host = $('vi-rf-dran'); if (!host) return;
+    /* v1119c-WZWEI · ZWEI SIGNALE, NICHT EINES.
+
+       GEMESSEN im Browser: der Zustand "hoert" ueberschrieb "angebot",
+       und weil im Freisprechmodus das Mikrofon DAUERND laeuft, war der
+       Angebots-Puls nie zu sehen. Zwei verschiedene Auskuenfte in einem
+       Attribut — eine davon gewinnt immer, und es war die falsche.
+
+       Jetzt trennen sie sich: data-zustand sagt, was ANSTEHT (Frage oder
+       Entscheidung), data-hoert sagt, ob gerade AUFGENOMMEN wird. Sie
+       nutzen verschiedene CSS-Eigenschaften — Puls ueber box-shadow,
+       Aufnahme ueber outline — und stoeren sich deshalb nicht. */
+    var z = _rfGrundZustand;
+    if (host.getAttribute('data-zustand') !== z) host.setAttribute('data-zustand', z);
+    var h = (_fs && _fs.an && /^(rauschen|warte|spricht)$/.test(_fs.phase || '')) ? '1' : '';
+    if (host.getAttribute('data-hoert') !== h) {
+      if (h) host.setAttribute('data-hoert', h); else host.removeAttribute('data-hoert');
+    }
+  }
 
   function _rfDranZeichnen() {
     var host = $('vi-rf-dran'); if (!host || !_rf) return;
     var e = _rf.offen[_rf.i];
-    var akt = (_rf.aktionen || []);
+    /* v1376d (C7): Ein Widerspruch steht VORNE. GEMESSEN im Durchlauf:
+       nach einem Fragewechsel standen die Markt-Knoepfe zuerst und der
+       Vorspann "Zwei Werte widersprechen sich" davor - er sagte damit
+       etwas Falsches ueber die Knoepfe, die daneben lagen. */
+    var akt = (_rf.aktionen || []).slice().sort(function (a, b) {
+      return (b.art.indexOf('knf_') === 0 ? 1 : 0) - (a.art.indexOf('knf_') === 0 ? 1 : 0);
+    });
+
     /* Die Frage steht immer da — auch ohne Angebot. Wer nach einer langen
        Auskunft wieder hinsieht, muss nicht nach oben scrollen, um zu
        wissen, was gerade gefragt war. */
     var frage = '';
-    if (_rf.abschlussOffen) {
+    if (_rf.nachfassOffen) {
+      /* v1377: Hier steht keine Feldfrage an - die Leiste wuerde sonst die
+         letzte beantwortete Frage zeigen, als waere sie noch offen. */
+      frage = '<b>Übersprungen</b> — willst du die offenen Fragen noch nachtragen?';
+    } else if (_rf.abschlussOffen) {
       frage = '<b>Fertig</b> — deine Werte warten in der Übersicht. Fragen darfst du mich weiter.';
+
     } else if (_rf.adresseFrage) {
       frage = '<b>Stimmt die Adresse?</b> Sag „ja" — oder nenn sie mir noch einmal.';
     } else if (e) {
@@ -5284,11 +6132,64 @@
     }
     if (!frage && !akt.length) { host.style.display = 'none'; host.innerHTML = ''; return; }
     host.style.display = '';
+    /* ═══ v1119-WPULS · Der Zustand steht am Rahmen ══════════════════════
+       Drei Lagen, drei Bilder. „angebot" schlaegt „frage": wo etwas zu
+       entscheiden ist, gehoert die Aufmerksamkeit hin. Das Attribut wird
+       nur GESETZT, wenn es sich aendert — sonst startet die Animation bei
+       jedem Neuzeichnen von vorn und blinkt endlos. */
+    /* v1119b: Ein blosser Erklaer-Knopf ist KEINE offene Entscheidung -
+       er steht an jeder Frage. Wuerde er pulsen, pulste die Leiste
+       dauernd, und der Puls saegte genau das nicht mehr, wofuer er da
+       ist. GEMESSEN im Browser: bei Frage 1 stand nur der Erklaer-Knopf an, und
+       der Rahmen pulsierte trotzdem. */
+    var _zuEnt = akt.filter(function (a) { return a.art !== 'erklaer'; }).length;
+    _rfZustandSetzen(_zuEnt ? 'angebot' : (frage || akt.length ? 'frage' : ''));
     host.innerHTML =
       (frage ? '<div class="vi-dran-f"><i>▸</i><span>' + frage + '</span></div>' : '') +
       (akt.length
         ? '<div class="vi-dran-a">' +
-          '<span class="vi-dran-lbl">Ich kann das für dich holen:</span>' +
+          /* v1376 (C7): Bei einem Widerspruch wird nicht geholt, sondern
+             entschieden. Der alte Vorspann haette in die Irre gefuehrt. */
+          (function () {
+            var knf  = akt.filter(function (a) { return a.art.indexOf('knf_') === 0; }).length;
+            /* v1377: "holen" waere beim Nachtragen falsch - das tut der Nutzer. */
+            var nf   = akt.filter(function (a) { return a.art === 'nachfass'; }).length;
+            /* ═══ v1119b-WLBL · DIE ZEILE MUSS ZU DEN KNOEPFEN PASSEN ══════
+               GEMESSEN im Browser, gleich nach v1119: ueber dem Knopf
+               „Erklär mir das" stand „Soll ich das jetzt fuer dich
+               abrufen?" — und ueber den drei Erfahrungsstufen des Einstiegs
+               ebenfalls. Beides ist kein Abruf.
+
+               Der alte Text („Ich kann das fuer dich holen:") war dort
+               genauso falsch, nur unauffaelliger. Eine Frage faellt auf,
+               wenn sie nicht passt — das ist besser, aber nur, wenn sie
+               dann auch passt.
+
+               Gezaehlt wird deshalb, was WIRKLICH geholt wird. */
+            var hol  = akt.filter(function (a) {
+              return a.art === 'markt' || a.art === 'markt2'
+                  || a.art === 'brw' || a.art === 'lage';
+            }).length;
+            var erf  = akt.filter(function (a) { return a.art.indexOf('erf_') === 0; }).length;
+            var rest = akt.length - knf - nf;
+            return '<span class="vi-dran-lbl">' +
+              (knf && rest ? 'Eine Entscheidung steht offen — und ich kann etwas holen:'
+               : knf       ? 'Zwei Werte widersprechen sich — welcher gilt?'
+               : nf        ? 'Offen geblieben:'
+               : erf       ? 'Damit ich den richtigen Ton treffe:'
+               /* v1119-WEIN2 · EINE Zeile statt zweier. Marcels Befund vom
+                  14.09.2026: „für mich stehen dort zu viele Doppelinformationen.
+                  Es steht da einmal: Wo geht's jetzt weiter? und er fragt
+                  gleichzeitig: Das kann ich für dich holen." Die Frage steht
+                  schon in der Zeile darüber — hier gehört hin, was ENTSCHIEDEN
+                  werden soll, und zwar als Frage, die man mit Ja oder
+                  Überspringen beantwortet. */
+               : hol       ? 'Soll ich das jetzt für dich abrufen?'
+               /* Alles Uebrige ist ein Angebot, kein Abruf: die Erklaerung,
+                  die Adressbestaetigung, der Vorschlag aus einer Auskunft. */
+                           : 'Auf Wunsch:') + '</span>';
+          })() +
+
           /* ═══ v1300 · EINE Erklärzeile statt einer je Knopf ══════════════
              Marcels Befund vom 11.09.2026: „der Balken für Marktindikation,
              erweiterte Marktindikation und Lage recherchieren ist recht
@@ -5312,6 +6213,22 @@
                    (a.frei != null ? '<i>' + escH(String(a.frei)) + ' frei</i>' : '') +
                    '</button>';
           }).join('') +
+          /* ═══ v1119-WSKIP · „Nein, überspringen" gehört daneben ══════════
+             Marcels Befund: „man kann's anklicken, man kann auch sagen:
+             Nee, überspringen." Bisher gab es nur den Weg durch das
+             Angebot — wer nichts abrufen wollte, musste weiterreden und
+             das Angebot blieb stehen. Ein Angebot ohne sichtbares Nein
+             ist eine Aufforderung. */
+          (function () {
+            var holbar = akt.filter(function (a) {
+              return a.art === 'markt' || a.art === 'markt2'
+                  || a.art === 'brw' || a.art === 'lage';
+            }).length;
+            if (!holbar) return '';
+            return '<button type="button" class="vi-dran-btn nein" data-akt="ueberspringen"' +
+                   ' title="Ich frage im Lauf nicht noch einmal danach — holen kannst du es später jederzeit.">' +
+                   '<b>×</b>Nein, überspringen</button>';
+          })() +
           '</div>' +
           (function () {
             var mit = akt.filter(function (a) { return a.txt; });
@@ -5344,6 +6261,25 @@
     if (knopf) { knopf.disabled = true; knopf.classList.add('laeuft'); }
     var a = (_rf.aktionen || []).filter(function (x) { return x.art === art; })[0] || {};
     _rfAktionWeg(art);
+    /* ═══ v1119-WSKIP · Überspringen räumt ALLE Abrufe weg ═══════════════
+       Nicht nur den einen, auf den geklickt wurde: wer „nein" sagt, meint
+       das Angebot, nicht eine Zeile davon. Die Frage darunter bleibt
+       offen — übersprungen ist der ABRUF, nicht die Angabe. */
+    if (art === 'ueberspringen') {
+      ['markt', 'markt2', 'brw', 'lage'].forEach(_rfAktionWeg);
+      _rfBlase('ich', 'Nein, überspringen.');
+      _rfBlase('co', 'Alles klar — ich hole nichts. '
+        + 'Du kannst es später jederzeit im Objekt nachholen.');
+      _rfDranZeichnen();
+      if (_fs.an && _fs.stream) _fsHoeren(true);
+      return;
+    }
+    /* v1115-WEIN: die Erfahrungsfrage aus dem Einstieg. */
+    if (art === 'erf_neu' || art === 'erf_mittel' || art === 'erf_profi') {
+      _rfErfahrungGewaehlt(art); return;
+    }
+    /* v1115-WERK: die Erklaerung auf Abruf. */
+    if (art === 'erklaer') { _rfErklaerZeigen(); return; }
     if (art === 'adresse') {
       _rf.adresseFrage = 0;
       _rfBlase('ich', 'Ja, stimmt.');
@@ -5371,7 +6307,39 @@
       else _rfDranZeichnen();
       return;
     }
+    /* ═══ v1376 (C7) · der Widerspruch wird entschieden ═══════════════ */
+    if (art === 'knf_neu' || art === 'knf_alt') {
+      var kf = _rf.konfliktOffen;
+      _rf.konfliktOffen = null;
+      _rfAktionWeg('knf_neu'); _rfAktionWeg('knf_alt');
+      if (!kf) return;
+      if (art === 'knf_neu') {
+        _rf.data.fields[kf.id] = kf.neu;
+        if (!_rf.quelle) _rf.quelle = {};
+        _rf.quelle[kf.id] = kf.quelleNeu;
+        _rfBlase('ich', 'Nimm den abgerufenen Wert.');
+        _rfBlase('co', 'Übernommen: <b>' + escH(_rfKonfliktWert(kf.id, kf.neu)) + '</b>. ' +
+          'In der Übersicht steht dazu <span style="opacity:.7">' + escH(kf.quelleNeu) + '</span> — ' +
+          'nicht deine Angabe.');
+      } else {
+        _rfBlase('ich', 'Meine Angabe gilt.');
+        _rfBlase('co', 'Gut — es bleibt bei <b>' + escH(_rfKonfliktWert(kf.id, kf.alt)) + '</b>. ' +
+          'Der abgerufene Wert (' + escH(_rfKonfliktWert(kf.id, kf.neu)) + ') wird nicht verwendet.');
+      }
+      _rfStandZeichnen();
+      /* Der naechste Widerspruch, falls einer wartet - sonst zurueck zur
+         Frage, die vor dem Abruf offen war. */
+      if (!_rfKonfliktZeigen()) { _rfFrageNochmal(); }
+      if (_fs.an && _fs.stream) _fsHoeren(true);
+      return;
+    }
+    /* v1377 (C5) */
+    if (art === 'nachfass') { _rfBlase('ich', 'Ja, die trage ich nach.'); _rfNachfassStarten(); return; }
     if (art === 'tabelle')  { _rfZurTabelle(); return; }
+    /* v1386 */
+    if (art === 'wert')     { _rfBlase('ich', 'Ja, mach die Wertermittlung.'); _rfWertStarten(); return; }
+
+
     if (art === 'tiefe')    { _rf.tiefeOffen = 0; _rfBlase('ich', 'Ja, lass uns weitermachen.'); _rfTiefeStarten(); return; }
     if (art === 'brw')      { _rfBlase('ich', 'Hol den Bodenrichtwert.'); _rfBrwHolen(); return; }
     if (art === 'lage')     { _rfBlase('ich', 'Recherchier die Lage.'); _rfLageRecherche(); return; }
@@ -5461,9 +6429,30 @@
   function _rfRestNachAktion(text) {
     if (!_rf) return;
     var t = String(text || '');
-    /* Ohne Zahl ist nichts nachzutragen — „nimm die erweiterte" allein
-       ist der ganze Satz. Ein Datum oder ein Prozentwert zählt mit. */
-    if (!/\d/.test(t)) return;
+    /* v1358 · EINE NULL IST EINE ANGABE.
+       Marcels Screenshot vom 12.09.2026 (design/mockups/fehler 2.png):
+
+         „Kannst du auch aus den Einstellungen übernehmen.
+          Keine Maklerprovision."
+
+       Die Übernahme lief, die Ausnahme fiel weg — und der Co-Pilot fragte
+       zurück, ihm fehle „die genaue Höhe der verbleibenden
+       Kaufnebenkosten". Die standen im selben Atemzug in den
+       Einstellungen, die er gerade übernommen hatte.
+
+       Der Grund stand hier: der Rest wurde nur weitergereicht, wenn er
+       eine ZIFFER trug. „Keine Maklerprovision" trägt keine — und ist
+       trotzdem eine Angabe, nämlich null Prozent. Wer „keine" sagt, hat
+       geantwortet, nicht geschwiegen.
+
+       Durchgelassen wird deshalb jetzt auch ein Rest ohne Ziffer, wenn er
+       eine Verneinung MIT Gegenstand trägt („keine Maklerprovision",
+       „ohne Makler"). Eine blanke Verneinung ohne Gegenstand bleibt
+       draußen — die ist im Zweifel die Antwort auf den Befehl selbst und
+       hat in der Feldauswertung nichts verloren. */
+    var RF_NULLANGABE = /\b(keine?[rsn]?|ohne|null)\s+[a-zäöüß]{4,}/i;
+    if (!/\d/.test(t) && !RF_NULLANGABE.test(t)) return;
+
     /* Der Befehlsteil wird entfernt, damit die Auswertung nicht darüber
        stolpert. Was übrig bleibt, muss noch eine Zahl tragen. */
     var rest = t
@@ -5472,7 +6461,8 @@
       .replace(/\b(erweiterte|erweiterten|einfache|vertiefte|volle)\b/gi, ' ')
       .replace(/\b(marktpreisindikation|marktbewertung|marktwert|indikation|bodenrichtwert|boris|lage|makrolage|mikrolage)\w*/gi, ' ')
       .replace(/\s{2,}/g, ' ').trim();
-    if (!/\d/.test(rest) || rest.length < 4) return;
+    if ((!/\d/.test(rest) && !RF_NULLANGABE.test(rest)) || rest.length < 4) return;
+
     try { _rfAuswerten(rest, false); } catch (e) {}
   }
 
@@ -5515,6 +6505,12 @@
   function _rfAktionJa(text) {
     var akt = (_rf && _rf.aktionen) || [];
     if (!akt.length) return false;
+
+    /* v1376b (C7): Die Entscheidung selbst steht in `_rfKonfliktAntwort` -
+       sie wird an ZWEI Stellen gebraucht. Hier gilt sie auch bei einem
+       blanken "ja": wer zustimmt, ohne zu sagen wozu, wird gefragt. */
+    if (_rf.konfliktOffen) return _rfKonfliktAntwort(text, true);
+
     if (akt.length > 1) {
       /* „hol den bodenrichtwert" / „die lage" — wer die Aktion NENNT,
          bekommt sie; sonst fragt der Co-Pilot einmal nach. */
@@ -5573,20 +6569,183 @@
     return true;
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1376 (C7) · EIN WIDERSPRUCH WIRD GEFRAGT, NICHT WEGGEWORFEN
+     ═══════════════════════════════════════════════════════════════════
+     Hier stand nur `return false`. Wer den Bodenrichtwert selbst genannt
+     hatte, behielt seinen — richtig so, eine Nutzerangabe wird nicht
+     ueberschrieben.
+
+     Falsch war, was danach geschah: NICHTS. Der amtliche Abruf lief, die
+     Blase darunter zeigte "340 €/m² — amtlicher Bodenrichtwert", und der
+     Wert ging in kein Feld. Der Nutzer sah eine Zahl und durfte annehmen,
+     sie gelte. Gerechnet wurde mit seinen 300.
+
+     Das ist die teuerste Art von Fehler: nichts widerspricht. Kein Rot,
+     keine Meldung, nur eine Zahl, die nirgends ankam.
+
+     JETZT: Weicht der abgerufene Wert von der Angabe ab, wird gefragt.
+     Beide Zahlen stehen nebeneinander, beide Herkuenfte sind benannt,
+     und der Nutzer entscheidet. Stimmen sie ueberein, passiert weiterhin
+     nichts — eine Bestaetigung ist keine Frage wert.
+
+     GEFRAGT WIRD NUR BEI ABRUFEN (`opt.konflikt`). Wenn der Nutzer selbst
+     etwas auswaehlt oder bestaetigt, ist das keine fremde Quelle, die
+     widerspricht, sondern seine eigene Hand. */
+
+  /* Zwei Werte sind derselbe, wenn sie dieselbe Zahl meinen: "300" und
+     "300,00" sind kein Widerspruch. Was keine Zahl ist, wird als Text
+     verglichen, ohne Rand und ohne Gross-/Kleinschreibung. */
+  /* Deutsche Schreibweise: Punkt trennt Tausender, Komma die Nachkomma-
+     stellen. "1.200,50" ist eintausendzweihundert Komma fuenfzig - nicht
+     1,2. Wer das verwechselt, vergleicht 1200 mit 1,2 und sieht einen
+     Widerspruch, wo keiner ist. */
+  function _rfZahl(v) {
+    if (v === null || v === undefined) return null;
+    var t = String(v).trim().replace(/[^\d.,\-]/g, '');
+    if (!t) return null;
+    if (/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(t)) t = t.replace(/\./g, '');
+    t = t.replace(',', '.');
+    var n = parseFloat(t);
+    return isFinite(n) ? n : null;
+  }
+
+  function _rfGleicherWert(a, b) {
+    var za = _rfZahl(a), zb = _rfZahl(b);
+
+    if (za != null && zb != null) return Math.abs(za - zb) < 0.005;
+    return String(a).trim().toLowerCase() === String(b).trim().toLowerCase();
+  }
+
   /* Ein Wert plus seine Herkunft. Ueberschreibt NICHT, was gesagt wurde:
      wer den Bodenrichtwert selbst genannt hat, behaelt seinen. */
-  function _rfSetzen(id, wert, quelle) {
+  function _rfSetzen(id, wert, quelle, opt) {
     if (!_rf || wert === null || wert === undefined || wert === '') return false;
     if (!_rf.data.fields) _rf.data.fields = {};
     var alt = _rf.data.fields[id];
-    if (alt !== undefined && alt !== null && alt !== '') return false;
+    if (alt !== undefined && alt !== null && alt !== '') {
+      if (opt && opt.konflikt && !_rfGleicherWert(alt, wert)) {
+        if (!_rf.konflikte) _rf.konflikte = [];
+        /* Zu einem Feld nur EIN offener Widerspruch. Ein zweiter Abruf
+           derselben Zahl soll nicht zweimal dieselbe Frage stellen. */
+        var schonDa = _rf.konflikte.filter(function (k) { return k.id === id; })[0];
+        if (!schonDa) {
+          _rf.konflikte.push({
+            id: id, alt: alt, neu: wert,
+            quelleAlt: (_rf.quelle && _rf.quelle[id]) || 'deine Angabe',
+            quelleNeu: quelle || 'Abruf'
+          });
+        }
+      }
+      return false;
+    }
+
     _rf.data.fields[id] = wert;
     if (!_rf.quelle) _rf.quelle = {};
     if (quelle) _rf.quelle[id] = quelle;
+    /* v1121-WFRUEH: steht damit alles fuer die erweiterte Indikation?
+       Dann laeuft sie ab jetzt nebenher statt erst am Ende. */
+    try { _rfMarkt2Pruefen(); } catch (e) {}
+    return true;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     v1376 (C7) · DIE WIDERSPRUCHSFRAGE
+     ═══════════════════════════════════════════════════════════════════
+     Sie stellt IMMER nur einen Widerspruch auf einmal. Zwei Fragen mit je
+     zwei Knoepfen nebeneinander waeren vier Knoepfe, von denen zwei zur
+     falschen Zahl gehoeren — und "ja" waere nicht mehr eindeutig.
+
+     Gefragt wird, nachdem der Abruf seine Blase geschrieben hat: der
+     Nutzer sieht erst, was gefunden wurde, dann die Frage dazu. */
+
+  /* Fuer die Anzeige: Lagen sind Zahlen im Feld, aber Woerter im Text. */
+  function _rfKonfliktWert(id, wert) {
+    if (id === 'makrolage' || id === 'mikrolage') {
+      var w = _lageWort(wert);
+      if (w && w !== '–') return w;
+    }
+    return String(wert);
+  }
+
+  /* ═══ v1376b (C7) · Die Antwort auf einen Widerspruch ════════════════
+     GEMESSEN am ersten Anlauf: der Einbau sass zu tief. "Nein, bleib bei
+     meiner Angabe" erreichte ihn nie - der Satz wurde vorher schon als
+     Antwort auf die laufende Frage gedeutet, und der Widerspruch blieb
+     offen stehen. Er SAH richtig aus, weil der Wert ohnehin der alte war.
+
+     Deshalb steht die Pruefung jetzt ganz vorn, gleich hinter der
+     Adress-Rueckfrage. Aber nur fuer EINDEUTIGE Saetze:
+
+     `auchUnklar = false` (frueher Weg): nur wenn der Satz sagt, WELCHER
+     Wert gilt. Sonst faellt er durch und bleibt eine normale Antwort.
+     `auchUnklar = true` (nach einem "ja"): dann wird nachgefragt, statt
+     zu raten.
+
+     EINE NACKTE ZAHL ENTSCHEIDET NICHT. Wer auf die Frage nach dem
+     Kaufpreis "215000" sagt, beantwortet die Frage - nicht den
+     Widerspruch. Erst "215000 stimmt" oder "nimm 215000" ist eine
+     Entscheidung. */
+  function _rfKonfliktAntwort(text, auchUnklar) {
+    if (!_rf || !_rf.konfliktOffen) return false;
+    var kf = _rf.konfliktOffen;
+    var tk = _de(text);
+    var zahlNeu = _rfZahl(kf.neu), zahlAlt = _rfZahl(kf.alt);
+
+    /* Nur mit einem Wort, das die Zahl als Entscheidung ausweist. */
+    var mitWort = /stimmt|gilt|nimm|nehmen|passt|richtig|genau|bleibt|es sind|sind es/.test(tk);
+    var gz = mitWort ? _rfZahl((String(text).match(/-?[\d.]+(?:,\d+)?/) || [])[0]) : null;
+
+    var willNeu = /amtlich|boris|abgerufen|abruf|offiziell|neuen? wert|uebernimm|ubernimm|indikation|recherche|gutachter/.test(tk) ||
+                  (gz != null && zahlNeu != null && Math.abs(gz - zahlNeu) < 0.005);
+    var willAlt = /meine|meiner|bleib|behalt|behalte|dabei bleiben|eigenen? wert|hab ich gesagt|stimmt so|richtig so/.test(tk) ||
+                  (gz != null && zahlAlt != null && Math.abs(gz - zahlAlt) < 0.005);
+
+    if (willNeu && !willAlt) { _rfBlase('ich', escH(text)); _rfAktionKlick('knf_neu'); return true; }
+    if (willAlt && !willNeu) { _rfBlase('ich', escH(text)); _rfAktionKlick('knf_alt'); return true; }
+    if (!auchUnklar) return false;   /* kein Konfliktsatz - normal weiter */
+
+    /* Unklar: nachfragen statt raten. Eine falsch uebernommene Zahl
+       rechnet still weiter; eine Rueckfrage kostet einen Satz. */
+    _rfBlase('ich', escH(text));
+    _rfBlase('co', 'Welcher Wert soll gelten — <b>' + escH(_rfKonfliktWert(kf.id, kf.alt)) +
+      '</b> (deine Angabe) oder <b>' + escH(_rfKonfliktWert(kf.id, kf.neu)) +
+      '</b> (' + escH(kf.quelleNeu) + ')? Sag die Zahl mit einem "stimmt" dahinter ' +
+      'oder tipp auf einen der Knöpfe.');
+    if (_fs.an && _fs.stream) _fsHoeren(true);
+    return true;
+  }
+
+  function _rfKonfliktZeigen() {
+
+    if (!_rf || !_rf.konflikte || !_rf.konflikte.length) return false;
+    if (_rf.konfliktOffen) return true;          /* einer reicht */
+    var k = _rf.konflikte.shift();
+    _rf.konfliktOffen = k;
+
+    var name = _rfFeldName(k.id) || k.id;
+    _rfBlase('co',
+      '<b>Da widersprechen sich zwei Angaben.</b>' +
+      '<div class="vi-rf-knf">' +
+        '<div class="vi-rf-knf-z"><span>' + escH(name) + ' — von dir</span>' +
+          '<b>' + escH(_rfKonfliktWert(k.id, k.alt)) + '</b>' +
+          '<i>' + escH(k.quelleAlt) + '</i></div>' +
+        '<div class="vi-rf-knf-z"><span>' + escH(name) + ' — abgerufen</span>' +
+          '<b>' + escH(_rfKonfliktWert(k.id, k.neu)) + '</b>' +
+          '<i>' + escH(k.quelleNeu) + '</i></div>' +
+      '</div>' +
+      '<div class="vi-rf-zaehler">Ich rechne mit dem, den du waehlst — und die Herkunft ' +
+        'steht danach in der Übersicht.</div>');
+
+    _rfAktion('knf_neu', 'Der abgerufene Wert ersetzt deine Angabe. Die Herkunft wird mitgefuehrt.',
+              _rfKonfliktWert(k.id, k.neu) + ' übernehmen');
+    _rfAktion('knf_alt', 'Deine Angabe bleibt stehen. Der abgerufene Wert wird verworfen.',
+              'Bei ' + _rfKonfliktWert(k.id, k.alt) + ' bleiben');
     return true;
   }
 
   /* ── Die Angebote zu einer Frage ──────────────────────────────────
+
      v1291: Sie erscheinen nicht mehr IN der Frageblase, sondern in der
      Aktionsleiste unten. Was hier passiert, ist deshalb nur noch
      anmelden — das Zeichnen macht `_rfDranZeichnen`. */
@@ -5830,7 +6989,7 @@
         var wort = _optionText(feld, d.value) || d.label || d.value;
         zeilen.push(_zeile(LAGE_NAME[k], wort,
                     (d.score != null && d.score >= 70) ? 'gut' : ((d.score != null && d.score < 40) ? 'schlecht' : '')));
-        if (_rfSetzen(feld, d.value, Q + (d.source && d.source.label ? ' · ' + d.source.label : ''))) gesetzt.push(LAGE_NAME[k]);
+        if (_rfSetzen(feld, d.value, Q + (d.source && d.source.label ? ' · ' + d.source.label : ''), { konflikt: true })) gesetzt.push(LAGE_NAME[k]);
         if (d.source && d.source.label && quellen.indexOf(d.source.label) < 0) quellen.push(d.source.label);
       });
       if (!zeilen.length) throw new Error('Die Recherche kam ohne verwertbare Angaben zurück');
@@ -5852,7 +7011,12 @@
           : '<div class="vi-sc-annahmen">Deine eigenen Angaben bleiben stehen — ich habe nur ergänzt, was fehlte.</div>') +
         '</div>');
       _rfStandZeichnen();
+      /* v1376 (C7): Die Zeile darueber sagt "Deine eigenen Angaben bleiben
+         stehen". Das stimmt - aber es verschweigt, WO sie der Recherche
+         widersprechen. Genau das wird jetzt gefragt. */
+      _rfKonfliktZeigen();
       _rfLageWeiter();
+
     }).catch(function (err) {
       _rfDenkt(false);
       var m = (err && err.data && err.data.error) || (err && err.message) || '';
@@ -5905,13 +7069,16 @@
          genauen Anschrift. */
       var herkunft = 'BORIS' + (r.stichtag ? ' ' + r.stichtag : '') + (r.zone ? ' · Zone ' + r.zone : '') +
                      ((_rf && _rf.zentrum) ? ' · Ortszentrum (Näherung)' : '');
-      _rfSetzen('brw', String(r.wert).replace('.', ','), herkunft);
+      _rfSetzen('brw', String(r.wert).replace('.', ','), herkunft, { konflikt: true });
       _rfBlase('co', '<b>' + escH(String(r.wert).replace('.', ',')) + ' €/m²</b> — amtlicher Bodenrichtwert. ' +
         '<span style="opacity:.7">' + escH(herkunft) + '</span>' +
         '<div class="vi-rf-zaehler">Herkunft steht in der Übersicht — nicht „Sprachaufzeichnung".</div>');
       _rfStandZeichnen();
-      _rfFrageNochmal();     /* v1306 */
+      /* v1376 (C7): Widerspricht der amtliche Wert dem gesagten, wird
+         gefragt - und die Frage tritt an die Stelle der Rueckkehr. */
+      if (!_rfKonfliktZeigen()) _rfFrageNochmal();     /* v1306 */
       if (_fs.an && _fs.stream) _fsHoeren(true);
+
     }).catch(function (e) {
       _rfDenkt(false);
       _rfBlase('co', 'Der Abruf ist fehlgeschlagen — sag mir den Bodenrichtwert einfach selbst.');
@@ -5959,8 +7126,20 @@
       return !(el && String(el.value || '').trim() !== '');
     });
     if (!fehlt.length) return;
-    _rfDranBlase(_rfBlase('co', escH(e.frage) + _rfPillen(e) +
+    /* v1378 (C2): GEMESSEN beim Umschalten - hier fehlte der Wozu-Satz.
+       Der Schalter wirkte, der Knopf zeigte "Lernmodus", die KI-Antworten
+       waren laenger - nur an der offenen FRAGE sah man nichts davon. Eine
+       Einstellung, deren Wirkung man an der Stelle nicht sieht, an der man
+       sie erwartet, gilt als kaputt, auch wenn sie greift. */
+    _rfDranBlase(_rfBlase('co', escH(e.frage) + _rfDoppeldeutig(e) +
+      (function () {
+        if (_rfModus() !== 'lernen') return '';
+        var w = _rfWozu(e);
+        return w ? '<div class="vi-rf-wozu"><b>Wozu?</b> ' + escH(w) + '</div>' : '';
+      })() +
+      _rfPillen(e) +
       '<div class="vi-rf-zaehler">Noch offen: ' + escH(_rfFelderNamen(fehlt)) + '</div>'));
+
     _rfDranZeichnen();
   }
 
@@ -6145,7 +7324,12 @@
     if (stufe >= 2) {
       _rfBlase('co', '<span style="opacity:.8">Gemerkt. Die erweiterte hole ich am Ende von ' +
         '<b>Etappe 4</b> — dann kennt sie Zustand, Energieausweis, Bodenrichtwert und deine ' +
-        'Lagebewertung. Vorher gerechnet wäre sie schlechter, als sie sein kann.</span>');
+        'Lagebewertung. Vorher gerechnet wäre sie schlechter, als sie sein kann.<br>' +
+        /* v1119-WMB: Marcel — „Es wird ja ein Marktbericht erzeugt. Dann kann
+           man noch sagen: Den Marktbericht hänge ich dir hinten später im
+           Objekt an.“ Wer das vorher weiss, sucht ihn nachher nicht. */
+        'Den <b>Marktbericht</b> dazu hänge ich dir am Objekt an — du findest ihn ' +
+        'später unter den Berichten, auch ohne dass du jetzt etwas tun musst.</span>');
       return;
     }
     /* Stehen Flaeche, Baujahr und Kaufpreis schon, geht es sofort los —
@@ -6157,6 +7341,54 @@
 
   function _rfMarktBereit() {
     return !!(_rfFeld('plz') || _rfFeld('ort')) && _rfNum(_rfFeld('wfl')) != null;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     v1121-WFRUEH · DIE ERWEITERTE LÄUFT, SOBALD SIE KANN
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Befund vom 14.09.2026: „ich frage am Anfang die erweiterte
+     Marktpreisindikation ab, und dann könnte er den Bericht ja schon
+     automatisch nebenbei beziehen. Das macht er dann erst irgendwie am
+     Schluss, dass er sagt: ach ja, das dauert jetzt länger. Das kann ja
+     schon parallel laufen."
+
+     Er hat recht, und die Ursache ist ein FESTER Zeitpunkt statt einer
+     Bedingung: bisher startete Stufe 2 am Ende von Etappe 4, weil dort
+     erfahrungsgemäss alles beisammen ist. Wer die Angaben früher nennt —
+     im Freitext, aus dem Profil, aus einem gelesenen Marktbericht —,
+     wartet trotzdem bis zum Etappenende.
+
+     WARUM NICHT EINFACH SOFORT: die erweiterte Indikation liest Zustand,
+     Energieausweis, Bodenrichtwert und die Lagebewertung. Ohne sie
+     rechnet sie am Durchschnitt und liefert dasselbe wie die einfache.
+     Früher starten heisst deshalb nicht „sofort", sondern „in dem
+     Moment, in dem die letzte nötige Angabe steht".
+
+     Geprüft wird nach jeder Übernahme. Fehlt etwas, bleibt es beim
+     bisherigen Weg: Ende Etappe 4, dann mit dem, was da ist. */
+  function _rfMarkt2Bereit() {
+    if (!_rf) return false;
+    if (!(_rfFeld('plz') || _rfFeld('ort'))) return false;
+    if (_rfNum(_rfFeld('wfl')) == null) return false;
+    if (_rfNum(_rfFeld('baujahr')) == null) return false;
+    /* Die beiden, die den Unterschied zur einfachen Stufe ausmachen. */
+    if (!_rfFeld('ds2_zustand')) return false;
+    if (_rfNum(_rfFeld('brw')) == null) return false;
+    return true;
+  }
+
+  /* Nach jeder Übernahme aufgerufen. Tut nichts, solange etwas fehlt —
+     und genau einmal etwas, wenn alles steht. */
+  function _rfMarkt2Pruefen() {
+    if (!_rf) return;
+    if (!_rf.marktGewollt || (_rf.marktStufe || 0) < 2) return;
+    if (_rf.markt2 || _rf.marktLaeuft || _rf.marktPlusGetan) return;
+    if (!_rfMarkt2Bereit()) return;
+    _rf.marktPlusGetan = 1;
+    _rfBlase('co', '<span style="opacity:.85">Alles beisammen, was die <b>erweiterte '
+      + 'Marktpreisindikation</b> braucht — ich starte sie <b>jetzt</b> statt erst am Ende. '
+      + 'Sie rechnet neben deinen Antworten weiter; wenn wir unten ankommen, liegt sie da.</span>');
+    _rfMarktStarten(2);
   }
 
   /* Nach Etappe 4: alles da, was der volle Bericht liest. Wer Stufe 1
@@ -6449,19 +7681,75 @@
 
     var Q = (stufe >= 2) ? 'Marktpreisindikation (erweitert)' : 'Marktpreisindikation';
     var eingetragen = [];
-    if (M.makro && _rfSetzen('makrolage', M.makro, Q)) eingetragen.push('Makrolage');
-    if (M.mikro && _rfSetzen('mikrolage', M.mikro, Q)) eingetragen.push('Mikrolage');
-    if (M.mietSqm != null && _rfSetzen('ds2_marktmiete', String(Math.round(M.mietSqm * 100) / 100).replace('.', ','), Q)) eingetragen.push('Marktmiete');
-    if (M.mw != null && _rfSetzen('svwert', String(Math.round(M.mw)), Q)) eingetragen.push('Marktwert');
+    var KNF = { konflikt: true };   /* v1376 (C7) */
+    if (M.makro && _rfSetzen('makrolage', M.makro, Q, KNF)) eingetragen.push('Makrolage');
+    if (M.mikro && _rfSetzen('mikrolage', M.mikro, Q, KNF)) eingetragen.push('Mikrolage');
+    if (M.mietSqm != null && _rfSetzen('ds2_marktmiete', String(Math.round(M.mietSqm * 100) / 100).replace('.', ','), Q, KNF)) eingetragen.push('Marktmiete');
+    if (M.mw != null && _rfSetzen('svwert', String(Math.round(M.mw)), Q, KNF)) eingetragen.push('Marktwert');
+
 
     /* v1290: Wer fuer die volle Stufe bezahlt, bekommt auch zu sehen, was
        sie mehr kann. Ein Fliesstext, der nur in der Antwort steht und
-       nirgends erscheint, ist bezahlte Unsichtbarkeit. */
+       nirgends erscheint, ist bezahlte Unsichtbarkeit.
+
+       ═══ v1385 · UND DER GANZE BERICHT, NICHT NUR 1400 ZEICHEN ═════════
+       Marcels Wunsch: „wenn ich die erweiterte Marktpreisindikation haben
+       moechte, dann moechte ich gerne das Gleiche haben wie unter
+       Marktbericht … das komplette PDF, was da rauskommt."
+
+       GEMESSEN: Der Sprechlauf ruft laengst DENSELBEN Endpunkt wie der
+       Marktbericht-Tab (`/marktbericht/reports/from-dealpilot`,
+       `wert_stufe: 2`) und bekommt DIESELBE Antwort — mit Fliesstext,
+       Zensus, Bevoelkerungsentwicklung, allem. Er zeigte davon sechs
+       Kennzahlen und 1400 Zeichen Text.
+
+       Der Rest war nicht weg, nur unsichtbar. Jetzt:
+         · der Fliesstext vollstaendig (aufklappbar, mit Absaetzen)
+         · die Zusatzwerte, die der Bericht sonst noch fuehrt
+         · und ein Knopf, der den vollen Marktbericht oeffnet — dort
+           liegt auch das PDF. */
     var text = '';
     if (M.text) {
-      var kurz = M.text.replace(/[#*_>`]/g, '').replace(/\s+/g, ' ').trim();
-      text = '<details class="vi-sc-mehr"><summary>Einordnung im Fließtext</summary>' +
-             '<p>' + escH(kurz.slice(0, 1400)) + (kurz.length > 1400 ? ' …' : '') + '</p></details>';
+      var roh = String(M.text);
+      /* Markdown-Ueberschriften und Listenzeichen weg, Absaetze behalten:
+         ein Fliesstext ohne Absaetze ist eine Wand. */
+      var abs = roh.replace(/^[#>\s]*#+\s*/gm, '')
+                   .replace(/[*_`]/g, '')
+                   .split(/\n{2,}/)
+                   .map(function (p) { return p.replace(/\s+/g, ' ').trim(); })
+                   .filter(function (p) { return p.length > 1; });
+      if (abs.length) {
+        text = '<details class="vi-sc-mehr"><summary>Einordnung im Fließtext</summary>'
+             + abs.map(function (p) { return '<p>' + escH(p) + '</p>'; }).join('')
+             + '</details>';
+      }
+    }
+
+    /* Die Zusatzwerte des Berichts — sie standen schon in M, wurden aber
+       nirgends gezeigt. */
+    var extra = [];
+    if (M.bevRaw != null) {
+      extra.push(_zeile('Bevölkerung', (M.bevRaw >= 0 ? '+' : '') + _pctTxt(M.bevRaw, 1) + ' Trend'));
+    }
+    if (M.tageRaw != null) extra.push(_zeile('Vermarktungsdauer', Math.round(M.tageRaw) + ' Tage'));
+    if (M.marktkontext) {
+      var mk = String(M.marktkontext).replace(/\s+/g, ' ').trim();
+      if (mk) extra.push(_zeile('Marktkontext', mk.slice(0, 90)));
+    }
+    if (extra.length) zeilen = zeilen.concat(extra);
+
+    /* Der Weg zum vollen Bericht. Nur bei Stufe 2 — die einfache
+       Indikation erzeugt keinen. */
+    var zumBericht = '';
+    if (stufe >= 2) {
+      zumBericht =
+        '<div class="vi-sc-annahmen" style="margin-top:8px">'
+      + '<b>Der vollständige Marktbericht ist erstellt.</b> Er führt zusätzlich '
+      + 'Zensusdaten, Bevölkerungs- und Preisentwicklung, Vergleichsobjekte und die '
+      + 'ausformulierte Einordnung — und dort liegt auch das PDF. '
+      + '<button type="button" class="vi-rf-abruf-btn" id="vi-rf-zum-mb" '
+      + 'style="margin-top:6px">Marktbericht öffnen</button>'
+      + '</div>';
     }
 
     _rfBlase('co', '<b>Die ' + escH(was) + ' ist da.</b>' +
@@ -6472,9 +7760,48 @@
         ? '<div class="vi-sc-annahmen"><b>Übernommen:</b> ' + escH(eingetragen.join(', ')) +
           ' — in der Übersicht mit Herkunft „' + escH(Q) + '", nicht als etwas, das du gesagt hast.</div>'
         : '') +
+      zumBericht +
       '</div>');
+
+    /* v1385: Der Knopf oeffnet den Marktbericht. Er wird NACH _rfBlase
+       gebunden, weil die Blase das Markup erst dort einhaengt.
+       Der Dialog wird dabei geschlossen — zwei Vollbildansichten
+       uebereinander waeren ein Ratespiel, welche gerade gilt. */
+    try {
+      var _zmb = $('vi-rf-zum-mb');
+      if (_zmb) _zmb.addEventListener('click', function () {
+        /* DIE NAMEN SIND GEMESSEN, NICHT GERATEN. Der erste Entwurf rief
+           `closeVoiceImport()` und `openMarktbericht()` — beide gibt es
+           nicht. Richtig heissen sie `openMarktberichtView` (global aus
+           marktbericht-view.js:214), und zum Schliessen gibt es keine
+           Funktion: der Abbrechen-Knopf macht es inline (Z. 680 ff.).
+           Ein Knopf, der auf einen falschen Namen zeigt, wirft im
+           try/catch nicht einmal einen sichtbaren Fehler — er tut
+           einfach nichts. */
+        try { _fsStopHoeren(); } catch (e) {}
+        try { _fsAus(); } catch (e) {}
+        /* Vorher speichern: der Bericht liest die Objektfelder, und was
+           im Sprechlauf gerade erfragt wurde, soll darin stehen. */
+        try { if (typeof window.dpTabSwitchSave === 'function') window.dpTabSwitchSave(); } catch (e) {}
+        try { _viAufraeumen('Marktbericht'); } catch (e) {}
+        try { var _ovx = $('oabi-ov'); if (_ovx) _ovx.remove(); } catch (e) {}
+        try { if (window.OA && typeof OA.setMode === 'function') OA.setMode(false, null); } catch (e) {}
+        setTimeout(function () {
+          try {
+            if (typeof window.openMarktberichtView === 'function') window.openMarktberichtView();
+            else if (typeof toast === 'function') toast('Marktbericht-Ansicht nicht verfügbar.');
+          } catch (e) {}
+        }, 160);
+      });
+    } catch (e) {}
     _rfStandZeichnen();
+    /* v1376 (C7): Widerspricht ein abgerufener Wert dem, was gesagt wurde,
+       steht die Frage jetzt in der Leiste. Sie ueberlebt den Fragewechsel
+       (siehe _rfWeiter), der Dialog laeuft also normal weiter - nur die
+       Entscheidung bleibt sichtbar offen, statt still zu verschwinden. */
+    _rfKonfliktZeigen();
     /* v1307: Der Bericht trägt mehr als Marktwert und Lage — er sagt auch,
+
        wie sich der Ort entwickelt. Das wird jetzt gelesen. */
     _rfBerichtLesen(M, Q);
     /* ═══ v1324 · Die wartende Ort-Frage aufloesen ══════════════════════
@@ -6584,6 +7911,11 @@
           '<small id="vi-rf-mikro-sub">Ich merke selbst, wenn du fertig bist.</small></span>' +
         '<span class="vi-rf-pegel" id="vi-rf-pegel">' +
           '<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>' +
+        /* v1381: Der Halt-Knopf steht IM Mikrofonkasten, nicht oben bei
+           den Schaltern. Wer spricht, schaut hierher — auf den Pegel und
+           den Satz „Ich höre zu". Ein Knopf in der Kopfzeile wäre da, wo
+           gerade niemand hinsieht. */
+        '<button type="button" class="vi-rf-halt" id="vi-rf-halt">❚❚  Anhalten</button>' +
       '</div>' +
       '<div class="vi-rf-zeile">' +
         '<input id="vi-rf-in" placeholder="… oder tippen — du darfst mich auch etwas fragen" autocomplete="off">' +
@@ -6591,6 +7923,11 @@
       '</div>' +
       '<div class="vi-rf-neben" id="vi-rf-neben">' +
         '<button type="button" id="vi-rf-nix">Weiß ich nicht</button>' +
+        /* v1378 (C2): Der Ton steht bei den Nebenknoepfen, nicht in der
+           Aktionsleiste. Dort stehen ENTSCHEIDUNGEN, die verschwinden,
+           wenn sie getroffen sind - der Ton ist eine Dauereinstellung. */
+        '<button type="button" id="vi-rf-ton" title="Ton umschalten: Lernmodus · Normal · Investor-Modus"></button>' +
+
         '<button type="button" id="vi-rf-passt" style="display:none"></button>' +
         '<button type="button" id="vi-rf-ende">Fertig — zur Übersicht</button>' +
       '</div>' +
@@ -6605,7 +7942,14 @@
     /* Wer tippt, will nicht gleichzeitig belauscht werden. */
     inp.addEventListener('input', function () { if (inp.value.trim()) _fsStopHoeren(); });
     $('vi-rf-ok').addEventListener('click', _rfSenden);
+    /* v1381 · Anhalten und Weiter. */
+    $('vi-rf-halt').addEventListener('click', function () { _fsPauseUm(); });
+    _fsPauseKnopf();
     $('vi-rf-nix').addEventListener('click', function () { _rfUeberspringen(); });
+    /* v1378 (C2) */
+    $('vi-rf-ton').addEventListener('click', function () { _rfModusWeiter(); });
+    _rfTonKnopf();
+
     $('vi-rf-ende').addEventListener('click', function () { _rfFertig(true); });   /* v1282: ausdruecklich beendet - nicht nach den Feinheiten fragen */
     $('vi-rf-passt').addEventListener('click', function () {
       var e = _rf.offen[_rf.i];
@@ -6664,6 +8008,11 @@
     });
     $('vi-rf-fs').addEventListener('change', function () {
       _fs.an = this.checked;
+      /* v1381: Ein Halt-Knopf ohne Freisprechen hat nichts anzuhalten.
+         _fsAus() setzt die Pause selbst zurueck; hier geht nur die
+         Sichtbarkeit mit. */
+      var hb = $('vi-rf-halt');
+      if (hb) hb.style.display = _fs.an ? '' : 'none';
       if (_fs.an) { _fsStart().then(function (ok) { if (ok) _fsHoeren(true); else _fsMikroKasten(false, 'Mikrofon nicht verfügbar', 'Bitte tippen.'); }); }
       else { _fsStopHoeren(); _fsAus(); _fsMikroKasten(false, 'Freisprechen ist aus', 'Tippe deine Antworten.'); }
     });
@@ -6720,16 +8069,30 @@
     _rf.nachgehakt = 0;   /* v1290: Nachhaken gilt nur fuer die Frage, in der es passiert ist */
     /* v1291: Angebote gelten fuer IHRE Frage. Was bleibt, ist der
        Marktabruf — der laeuft ueber den ganzen Dialog. */
+    /* v1376 (C7): Ein Widerspruch gehoert zum FELD, nicht zur Frage. Wuerde
+       er hier mit weggeraeumt, waere er genau das, was er nicht mehr sein
+       soll: still verschwunden. Er bleibt stehen, bis jemand entscheidet. */
     (_rf.aktionen || []).slice().forEach(function (a) {
-      if (a.art !== 'markt' && a.art !== 'markt2') _rfAktionWeg(a.art);
+      if (a.art !== 'markt' && a.art !== 'markt2' && a.art.indexOf('knf_') !== 0) _rfAktionWeg(a.art);
     });
+
     /* v1280: Der Vorschlag aus den Einstellungen steht IN der Frage - nicht
        als stiller Knopf daneben. Wer gefragt wird, soll sehen, was der
        Co-Pilot vorhat, bevor er ja sagt. */
     var pv = _rfProfilVorschlag(e);
     /* v1288: Bei einer Auswahl stehen die STUFEN in der Frage. Wir bewerten
        danach - also soll der Nutzer sie hoeren, statt Freitext zu raten. */
-    _rfDranBlase(_rfBlase('co', escH(e.frage) + _rfPillen(e) + _rfSkalen(e) +
+    _rfDranBlase(_rfBlase('co', escH(e.frage) + _rfDoppeldeutig(e) +
+      /* v1378 (C2): Im Lernmodus steht unter der Frage, WOZU die Angabe
+         gebraucht wird. Vor den Pillen, damit der Grund vor der Auswahl
+         kommt - wer weiss, worum es geht, waehlt anders. */
+      (function () {
+        if (_rfModus() !== 'lernen') return '';
+        var w = _rfWozu(e);
+        return w ? '<div class="vi-rf-wozu"><b>Wozu?</b> ' + escH(w) + '</div>' : '';
+      })() +
+      _rfPillen(e) + _rfSkalen(e) +
+
       (pv ? '<div class="vi-rf-vorschlag">Aus deinen Einstellungen hätte ich: <b>' +
             escH(pv.text) + '</b></div>' : '') +
       /* v1309: Die Bankbewertung kennt beim Aufnehmen fast niemand — der
@@ -6745,6 +8108,17 @@
           'sag einfach <b>ja</b>, oder nenn mir deine Zahl.</span></div>';
       })() +
       (function(){ try { _rfVertiefungHier(e); } catch(x){} return ''; })() +
+      /* v1115-WERK: der Weg zur Erklaerung steht AN der Frage, nicht nur
+         im Ton. Im Lernmodus steht sie ohnehin schon darunter - dort
+         waere der Knopf eine Dopplung. */
+      (function () {
+        if (_rfModus() === 'lernen') return '';
+        if (!_rfWozu(e)) return '';
+        try { _rfAktion('erklaer',
+          'Was die Angabe bedeutet und wozu DealPilot sie braucht.',
+          'Erklär mir das'); } catch (x) {}
+        return '';
+      })() +
       _rfAbrufAngebot(e) +
       '<div class="vi-rf-zaehler">Frage ' + (_rf.i + 1) + ' von ' + _rf.offen.length +
         (e.et ? ' · Etappe ' + e.et + ' · ' + escH(_etName(e.et)) : '') + '</div>'));
@@ -7137,6 +8511,187 @@
     _rfFrage();
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1386 · DIE WERTERMITTLUNG NACH ImmoWertV — eine eigene Schleife
+     ═══════════════════════════════════════════════════════════════════
+     Marcel: „Moechtest du vielleicht auch eine Wertermittlung haben? …
+     dann koennen wir uns die Daten dann auch holen, fragen dann auch in
+     unseren Tabellen die Gutachterausschuesse ab."
+
+     Das schliesst zwei Dinge zusammen, die bisher nebeneinander lagen:
+     den Sprechlauf und das Sachwertfaktor-Register (355 Saetze, 71
+     Ausschuesse, 13 Laender). Der Kunde sagt vier Antworten, und am Ende
+     steht der amtliche Faktor SEINES Gutachterausschusses — mit Stufe,
+     Ausschussnamen und Modellvermerk.
+
+     WARUM PRO: Der Abruf geht gegen den Marktbericht-Dienst und rechnet
+     ein vollstaendiges Sachwertverfahren. Das ist dieselbe Leistung wie
+     die erweiterte Marktpreisindikation, nicht der schnelle Ueberschlag.
+
+     WO DIE GRENZE LIEGT, und sie wird ausgesprochen: Ohne Treffer im
+     Register gibt es keinen Faktor — und dann auch keinen erfundenen.
+     Der Kunde bekommt den zustaendigen Ausschuss und den Weg zu seiner
+     Quelle (CLAUDE.md: „Wo kein Wert vorliegt, bekommt der Kunde den Weg
+     dorthin"). */
+  /* DER SCHLUESSEL IST GEMESSEN, NICHT GERATEN. Der erste Entwurf fragte
+     `Plan.has('marktbericht_voll')` — den Schluessel gibt es nicht, und
+     CLAUDE.md sagt, was dann passiert: „Unbekannter Feature-Schluessel =
+     fuer jeden false, auch fuer Pro." Das Angebot waere niemandem je
+     erschienen, und zwar lautlos.
+
+     Der Sprechlauf prueft die erweiterte Indikation ueber das KONTINGENT
+     (`_rfKontingent`, Z. 7211) — `mpi_plus` ist der Topf, aus dem der
+     volle Bericht bezahlt wird. Die Wertermittlung rechnet dasselbe
+     Verfahren und nimmt denselben Topf. */
+  function _rfWertVerfuegbar() {
+    var kg = _rfKontingent();
+    /* Kein Kontingentstand heisst NICHT „kein Pro" — es heisst, dass die
+       Auskunft gerade nicht zu haben ist (v1293d). Dann lieber nichts
+       anbieten als etwas Falsches behaupten. */
+    if (!kg) return false;
+    return (kg.mpi_plus > 0);
+  }
+
+  /* Das Angebot — einmal, am Ende, und nur wenn es etwas zu holen gibt. */
+  function _rfWertAnbieten() {
+    if (!_rf || _rf.wertAn || _rf.wertGefragt) return false;
+    if (!_rf.alle) return false;                 /* nur im gefuehrten Weg */
+    if (!_rfFeld('plz') || !_rfFeld('wfl')) return false;
+    _rf.wertGefragt = 1;
+    if (!_rfWertVerfuegbar()) {
+      /* Kein Pro: das Angebot trotzdem NENNEN, aber als das, was es ist.
+         Eine Funktion, die es gibt und die niemand erwaehnt, ist fuer den
+         Kunden keine. */
+      _rfBlase('co',
+        '<span style="opacity:.8">Mit <b>Pro</b> könnte ich hier noch eine '
+      + '<b>Wertermittlung nach ImmoWertV</b> anschließen: vier weitere Fragen, '
+      + 'dann hole ich den amtlichen <b>Sachwertfaktor deines Gutachterausschusses</b> '
+      + 'und rechne das Sachwertverfahren durch.</span>');
+      return false;
+    }
+    _rfAktion('wert',
+      'Soll ich noch eine Wertermittlung nach ImmoWertV anschließen?',
+      'Ja, Wertermittlung');
+    return true;
+  }
+
+  function _rfWertStarten() {
+    if (!_rf || _rf.wertAn) return;
+    _rf.wertAn = 1;
+    _rfAktionWeg('wert');
+    var neu = RFRAGEN_WERT.filter(function (e) { return _rfFehlt(e); });
+    _rfBlase('co',
+      '<b>Wertermittlung nach ImmoWertV.</b><br>'
+    + '<span style="opacity:.8">' + (neu.length
+        ? 'Ich brauche noch ' + neu.length + (neu.length === 1 ? ' Angabe' : ' Angaben') + '. '
+        : 'Alles Nötige steht schon. ')
+    + 'Danach frage ich unser Register nach dem Sachwertfaktor, den dein '
+    + 'Gutachterausschuss abgeleitet hat — kein Durchschnitt, kein Nachbarkreis.</span>');
+    if (!neu.length) return _rfWertAbrufen();
+    _rfKatalogErgaenzen(neu);
+    _rf.offen = _rf.offen.concat(_rfAufKatalog(neu, _rf.catalog));
+    _rfStandZeichnen();
+    _rfFrage();
+  }
+
+  /* Der Abruf. Derselbe Endpunkt wie die erweiterte Indikation — er
+     traegt das Sachwertverfahren bereits in sich (CrossCheckService);
+     was ihm bisher fehlte, waren Standardstufe und Garagenflaeche. */
+  function _rfWertAbrufen() {
+    if (!_rf || _rf.wertLaeuft) return;
+    _rf.wertLaeuft = 1;
+    var obj = {};
+    ['plz', 'ort', 'str', 'hnr', 'objart', 'wfl', 'zimmer', 'baujahr', 'kp',
+     'gsfl', 'brw', 'mea', 'etage', 'standardstufe', 'modernis', 'garagen',
+     'stellpl_aussen', 'garagen_bgf_qm', 'ds2_zustand', 'ds2_energie'
+    ].forEach(function (id) {
+      var v = _rfFeld(id);
+      if (v !== null && v !== undefined && v !== '') obj[id] = v;
+    });
+    _rfBlase('co', '<span style="opacity:.75">Die Wertermittlung läuft — ich frage den '
+      + 'Gutachterausschuss deines Gebiets ab und rechne das Sachwertverfahren.</span>');
+    Auth.apiCall('/marktbericht/reports/from-dealpilot',
+                 { method: 'POST',
+                   body: { wert_stufe: 2, wertermittlung: true, object: obj,
+                           external_ref: (window._currentObjKey || null) },
+                   timeout: 180000 })
+      .then(function (d) { if (_rf) _rfWertFertig(d); })
+      .catch(function (err) { if (_rf) _rfWertFehler(err); });
+  }
+
+  function _rfWertFehler(err) {
+    _rf.wertLaeuft = 0;
+    var m = (err && err.data && err.data.error) || (err && err.message) || '';
+    _rfBlase('co', '<span style="opacity:.6">Die Wertermittlung hat nicht geklappt'
+      + (m ? ': ' + escH(String(m).slice(0, 120)) : '') + '. Es wurde nichts abgebucht.</span>');
+    if (_fs.an && _fs.stream) _fsHoeren(true);
+  }
+
+  function _rfWertFertig(d) {
+    _rf.wertLaeuft = 0;
+    var p = (d && (d.data || d)) || {};
+    var cc = p.crosscheck || p.cross_check || p.sachwert || {};
+    var gaa = p.gutachterausschuss || cc.gutachterausschuss || {};
+    var zeilen = [];
+
+    var swf = (gaa.wert != null) ? gaa.wert
+            : (cc.sachwertfaktor != null ? cc.sachwertfaktor : null);
+    var sw  = (cc.sachwert != null) ? cc.sachwert
+            : (cc.marktangepasster_sachwert != null ? cc.marktangepasster_sachwert : null);
+
+    if (cc.vorlaeufiger_sachwert != null) {
+      zeilen.push(_zeile('Vorläufiger Sachwert', _euroKurz(cc.vorlaeufiger_sachwert)));
+    }
+    if (swf != null) {
+      zeilen.push(_zeile('Sachwertfaktor', String(swf).replace('.', ',')
+        + (gaa.stufe ? ' · Stufe ' + escH(gaa.stufe) : '')));
+    }
+    if (sw != null) zeilen.push(_zeile('Sachwert (marktangepasst)', _euroKurz(sw)));
+    if (cc.bodenwert != null) zeilen.push(_zeile('Bodenwert', _euroKurz(cc.bodenwert)));
+    if (cc.rnd_jahre != null) zeilen.push(_zeile('Restnutzungsdauer', Math.round(cc.rnd_jahre) + ' Jahre'));
+
+    /* DER AUSSCHUSS GEHOERT DAZU. Eine amtliche Zahl ohne ihre Herkunft
+       ist im Gutachten wertlos — und der Modellvermerk ist Pflicht
+       (§ 10 ImmoWertV). */
+    var herkunft = '';
+    if (gaa.ausschuss || gaa.gaa_name) {
+      herkunft = '<div class="vi-sc-annahmen"><b>Herkunft:</b> '
+        + escH(String(gaa.ausschuss || gaa.gaa_name))
+        + (gaa.stichtag ? ' · Stichtag ' + escH(gaa.stichtag) : '')
+        + (gaa.fundstelle ? '<br><span style="opacity:.75">' + escH(String(gaa.fundstelle).slice(0, 220)) + '</span>' : '')
+        + '</div>';
+    }
+
+    if (!zeilen.length) {
+      /* KEIN WERT IST AUCH EINE ANTWORT — aber nur mit dem Weg dorthin. */
+      var grund = gaa.grund || cc.grund || null;
+      _rfBlase('co', '<b>Für dieses Gebiet liegt kein Sachwertfaktor vor.</b>'
+        + '<div class="vi-sc"><div class="vi-sc-annahmen">'
+        + (grund ? 'Grund: ' + escH(String(grund)) + '. ' : '')
+        + (gaa.ausschuss || gaa.stelle
+            ? 'Zuständig ist <b>' + escH(String(gaa.ausschuss || gaa.stelle)) + '</b>. '
+            : '')
+        + (gaa.url ? 'Die Quelle liegt hier: ' + escH(String(gaa.url)) + ' '
+                   : '')
+        + 'Erfunden wird hier nichts — ohne abgeleiteten Faktor rechnet das '
+        + 'Sachwertverfahren nicht zu Ende.'
+        + '</div></div>');
+      _rf.wertAn = 2;
+      if (_fs.an && _fs.stream) _fsHoeren(true);
+      return;
+    }
+
+    _rfBlase('co', '<b>Die Wertermittlung ist da.</b>'
+      + '<div class="vi-sc"><div class="vi-sc-kopf"><span class="vi-sc-titel">'
+      + 'Sachwertverfahren nach ImmoWertV</span></div>'
+      + '<div class="vi-sc-gitter">' + zeilen.join('') + '</div>'
+      + herkunft
+      + '</div>');
+    _rf.wertAn = 2;
+    _rfStandZeichnen();
+    if (_fs.an && _fs.stream) _fsHoeren(true);
+  }
+
   /* ═══ v1288 · Der Abschluss ═══════════════════════════════════════════
      Vor der Tabelle steht die Antwort auf die Frage, mit der Marcel den
      ganzen Umbau begonnen hat: „wohin geht die Reise, lohnt sich das,
@@ -7152,6 +8707,14 @@
      Abschluss aus und es geht direkt zur Tabelle. Ein Fazit, das „keine
      Daten" sagt, ist ein Umweg. */
   function _rfFertig(erzwungen) {
+    /* v1386: Laeuft die Wertermittlungs-Schleife und sind ihre Fragen
+       beantwortet, wird JETZT abgerufen — vor allem anderen. Sie ist der
+       Grund, warum der Nutzer noch hier ist. `wertAn === 1` heisst
+       „gestartet, noch kein Ergebnis"; 2 heisst fertig. */
+    if (_rf && _rf.wertAn === 1 && !_rf.wertLaeuft) {
+      var nochOffen = RFRAGEN_WERT.some(function (e) { return _rfFehlt(e); });
+      if (!nochOffen) { _rfWertAbrufen(); return; }
+    }
     /* v1282: Ist die Pflichtstrecke durch, wird EINMAL nach den Feinheiten
        gefragt - aber nur im gefuehrten Weg und nur, wenn der Nutzer nicht
        selbst „Fertig" gedrueckt hat. Wer abbricht, will abbrechen. */
@@ -7159,10 +8722,28 @@
       _rf.tiefeGefragt = 1;
       if (_rfTiefeAnbieten()) return;   /* v1287: nur wenn der Knopf wirklich steht */
     }
+    /* v1377 (C5): Was uebersprungen wurde, wird EINMAL angeboten - vor
+       dem Abschluss, denn danach ist der Weg zur Tabelle offen und
+       niemand kehrt freiwillig um. Nicht bei "Fertig" gedrueckt: wer
+       abbricht, will abbrechen. */
+    if (!erzwungen && _rf && !_rf.nachfassGefragt && !_rf.nachfassLauf) {
+      if (_rfNachfassAnbieten()) return;
+    }
+    /* v1386: Die Wertermittlung ist das LETZTE Angebot vor dem Abschluss.
+       Sie steht hinter dem Nachfassen, weil sie auf vollstaendige Angaben
+       aufbaut — ein Sachwert aus halb gefuellten Feldern waere genau die
+       Zahl, die man nicht liefern darf. Und sie haelt den Dialog NICHT
+       an: `_rfWertAnbieten` legt das Angebot in die Leiste, wo es offen
+       stehen bleibt, waehrend der Abschluss laeuft. Wer es nicht will,
+       merkt nichts davon. */
+    if (!erzwungen && _rf && !_rf.wertGefragt) {
+      try { _rfWertAnbieten(); } catch (e) {}
+    }
     if (_rf && !_rf.abschlussGezeigt) {
       _rf.abschlussGezeigt = 1;
       if (_rfAbschluss()) return;       /* wartet auf „Zur Übersicht" */
     }
+
     _rfZurTabelle();
   }
 
@@ -7213,7 +8794,82 @@
     try { console.log('[voice-import] Herkunft gemerkt:', n, 'Felder'); } catch (e) {}
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1377 (C5) · WAS UEBERSPRUNGEN WURDE, KOMMT NOCH EINMAL
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Anforderung: ueberspringen erlauben UND spaeter darauf
+     zurueckkommen. Das Ueberspringen gab es laengst - `_rf.weg[i] = 1`.
+     Das Zurueckkommen nicht: der Eintrag wurde ausschliesslich als "–" in
+     der Standspalte gezeichnet und danach nie wieder gelesen.
+
+     Eine uebersprungene Frage ist aber keine beantwortete. Wer mitten im
+     Gespraech "weiss ich nicht" sagt, meint meistens "jetzt nicht" - er
+     hat die Nebenkostenabrechnung im anderen Fenster, den Steuerbescheid
+     im Ordner. Am Ende weiss er es oft.
+
+     WICHTIG: es ist ein ANGEBOT, keine zweite Pflichtrunde. Wer wieder
+     ueberspringt, ueberspringt endgueltig - dieselbe Frage ein drittes
+     Mal zu stellen waere Schikane.
+
+     WAS NICHT NOCHMAL GEFRAGT WIRD: was inzwischen doch einen Wert hat.
+     Ein Abruf kann die Luecke laengst geschlossen haben; dann ist die
+     Frage erledigt, auch wenn sie damals uebersprungen wurde. */
+  function _rfNachfassListe() {
+    if (!_rf || !_rf.weg) return [];
+    var raus = [];
+    Object.keys(_rf.weg).forEach(function (k) {
+      var i = parseInt(k, 10);
+      var e = _rf.offen[i];
+      if (!e) return;
+      if (!_rfFehlt(e, _rf.data.fields)) return;   /* inzwischen gefuellt */
+      raus.push(e);
+    });
+    return raus;
+  }
+
+  function _rfNachfassAnbieten() {
+    var liste = _rfNachfassListe();
+    if (!liste.length) return false;
+    _rf.nachfassGefragt = 1;
+    _rf.nachfassListe = liste;
+
+    var namen = liste.slice(0, 4).map(function (e) { return _rfKurzname(e); });
+    _rfBlase('co',
+      '<b>' + liste.length + ' Frage' + (liste.length === 1 ? '' : 'n') + ' ' +
+      (liste.length === 1 ? 'ist' : 'sind') + ' offen geblieben.</b> ' +
+      escH(namen.join(', ')) + (liste.length > 4 ? ' und ' + (liste.length - 4) + ' weitere' : '') +
+      '.<div class="vi-rf-zaehler">Sag „ja", wenn du sie jetzt nachtragen willst — ' +
+      'sonst geht es zur Übersicht. Was offen bleibt, zählt im Score weder ' +
+      'für dich noch gegen dich.</div>');
+    _rf.nachfassOffen = 1;
+    _rfAktion('nachfass', 'Nur die übersprungenen Fragen, keine neuen.',
+              liste.length + (liste.length === 1 ? ' Frage' : ' Fragen') + ' nachtragen');
+    var inpN = $('vi-rf-in'); if (inpN) inpN.disabled = false;
+    if (_fs.an && _fs.stream) _fsHoeren(true);
+    return true;
+  }
+
+  /* Die zweite Runde nutzt dieselbe Mechanik wie die erste - `offen` wird
+     neu gesetzt, `i` auf null. Eine eigene Schleife danebenzubauen hiesse,
+     jede spaetere Aenderung an zwei Stellen zu pflegen. */
+  function _rfNachfassStarten() {
+    var liste = _rf.nachfassListe || _rfNachfassListe();
+    _rf.nachfassOffen = 0;
+    _rfAktionWeg('nachfass');
+    if (!liste.length) { _rfFertig(true); return; }
+    _rf.nachfassLauf = 1;
+    _rf.offen = liste;
+    _rf.i = 0;
+    _rf.weg = {};              /* der zweite Strich ist endgueltig */
+    _rfBlase('co', '<span style="opacity:.75">Gut — die ' + liste.length +
+      (liste.length === 1 ? ' Frage' : ' Fragen') + ' noch einmal. Überspringen ' +
+      'gilt diesmal endgültig.</span>');
+    _rfStandZeichnen();
+    setTimeout(_rfFrage, 500);
+  }
+
   function _rfAbschluss() {
+
     var k1 = null, k2 = null;
     try { k1 = _rfScore1Karte(); } catch (e) {}
     try { k2 = _rfScore2Karte(); } catch (e) {}
@@ -7235,9 +8891,39 @@
     var nk = null;
     try { nk = _rfNkAnnahme(); } catch (e) {}
 
+    /* ═══ v1121-WMBEIN · WAS AUS DEM MARKTBERICHT KAM, STEHT HIER ══════
+       Marcels Befund vom 14.09.2026: „wenn wir dann unten angekommen
+       sind, haben wir das schon. Dann kann man sagen: Hier, der
+       Marktbericht ist da, wir lassen die und die Sachen jetzt alle mit
+       einfliessen."
+
+       Die Herkunft steht je Feld im Zustand des Laufs — hier wird sie
+       einmal zusammengefasst, damit am Ende sichtbar ist, WAS der Bericht
+       beigesteuert hat. Ohne diese Zeile sieht der Nutzer nur Zahlen und
+       weiss nicht, welche davon er selbst gesagt hat und welche der
+       Co-Pilot geholt hat. */
+    var ausBericht = [];
+    try {
+      Object.keys(_rf.quelle || {}).forEach(function (id) {
+        var q = String(_rf.quelle[id] || '');
+        if (/markt|indikation|bericht/i.test(q)) {
+          var n = _rfFeldName(id);
+          if (n && ausBericht.indexOf(n) < 0) ausBericht.push(n);
+        }
+      });
+    } catch (e) {}
+    var berichtZeile = ausBericht.length
+      ? '<div class="vi-sc-annahmen" style="margin-top:10px">'
+        + '<b>Aus der Marktpreisindikation ist eingeflossen:</b> '
+        + escH(ausBericht.slice(0, 10).join(', '))
+        + (ausBericht.length > 10 ? ' und ' + (ausBericht.length - 10) + ' weitere' : '')
+        + '. In der Übersicht steht an jeder Zeile, woher sie kommt.</div>'
+      : '';
+
     _rfBlase('co',
       '<b>Das ist der Stand.</b> Beide Scores rechnen mit dem, was du gesagt hast — ' +
       'nichts davon steht schon im Objekt; das entscheidest du gleich in der Übersicht.' +
+      berichtZeile +
       (k1 || '') + (k2 || '') +
       (fehlt.length
         ? '<div class="vi-sc-annahmen" style="margin-top:12px"><b>Was ich nicht weiß:</b> ' +
@@ -7285,9 +8971,41 @@
       var name = (kat ? kat.label : id) + ' = ' + v;
       if (gefragt) namen.push(name); else extra.push(name);
     });
+    /* ═══ v1377b (C5) · Aus dem Einkommen wird der Steuersatz ══════════
+       Wer sein zu versteuerndes Einkommen nennt, hat den Grenzsteuersatz
+       damit gesagt - er weiss es nur nicht. Ihn danach noch einmal zu
+       fragen waere, nach derselben Zahl zweimal zu fragen.
+
+       Gerechnet wird ueber `Tax.calcGrenzsteuersatz` - dieselbe Quelle wie
+       im Formular und in der Prognose. Eine zweite Rechnung hier waere die
+       vierte Kopie desselben Tarifs (siehe FALLEN 150).
+
+       Der Satz wird NICHT ueberschrieben, wenn er schon steht: wer beides
+       nennt, meint seinen eigenen Satz. */
+    try {
+      var _zv = _rfNum(_rf.data.fields.zve);
+      if (_zv != null && _zv > 0 && window.Tax && Tax.calcGrenzsteuersatz &&
+          !_rf.zveGerechnet) {
+        var _gs = Tax.calcGrenzsteuersatz(_zv, new Date().getFullYear());
+        if (_gs != null && isFinite(_gs) && _gs > 0) {
+          _rf.zveGerechnet = 1;
+          var _gsTxt = String(Math.round(_gs * 1000) / 10).replace('.', ',');
+          var _neu = _rfSetzen('grenz', _gsTxt, 'aus deinem zu versteuernden Einkommen berechnet');
+          _rfBlase('co', 'Bei <b>' + escH(_euroKurz(_zv)) +
+            '</b> zu versteuerndem Einkommen liegt dein Grenzsteuersatz bei ' +
+            '<b>' + escH(_gsTxt) + ' %</b>' +
+            (_neu ? ' — damit rechne ich.' : ' — du hast aber einen eigenen Satz genannt, der gilt.') +
+            '<div class="vi-rf-zaehler">§ 32a EStG, Tarif ' + new Date().getFullYear() +
+            '. Ohne Soli und Kirchensteuer.</div>');
+          _rfStandZeichnen();
+        }
+      }
+    } catch (_e) {}
+
     /* Nebenbei Gesagtes allein traegt die Frage nicht — aber es soll auch
        nicht stillschweigend verschwinden. Wer es sagt, sieht, dass es
        angekommen ist. */
+
     if (extra.length) {
       _rfBlase('co', '<span style="opacity:.85">Das nehme ich gleich mit: <b>' +
         escH(extra.join(' · ')) + '</b></span>');
@@ -7591,10 +9309,33 @@
 
   var RF_FRAGEWORT = /^(was|wie|wieso|warum|weshalb|wer|wo|wann|welche[rsn]?|kannst du|kannst|koenntest|könntest|erklaer|erklär|rechne|zeig|sag mir|ist das|macht das|lohnt|passt das|waere|wäre|soll ich|hab ich|habe ich)\b/i;
 
+  /* ═══ v1119-WBIT · EIN BEFEHL IST AUCH EINE FRAGE ═══════════════════
+     Marcels Befund vom 14.09.2026: „ich hab die Postleitzahl vergessen
+     und hab dann gesagt: Hol mir die Postleitzahl. Das hat er nicht
+     verstanden. Erst wo ich gesagt hab: Kannst du mir einmal die
+     Postleitzahl von Herford besorgen? Dann hat er's gemacht."
+
+     GEMESSEN, warum: „Hol mir die Postleitzahl" hat kein Fragezeichen und
+     kein Fragewort — also keine Frage. „hol" ist zwar ein Abrufverb, aber
+     „Postleitzahl" steht nicht in RF_ABRUF_SACHE (dort stehen nur die
+     Dinge, die DealPilot selbst abruft). Der Satz fiel durch beide Netze
+     und wurde als ANTWORT auf die offene Frage gelesen.
+
+     Ein Imperativ am Satzanfang ist im Deutschen dasselbe wie eine Frage
+     mit „kannst du" — nur kürzer. Er wird hier genauso behandelt.
+
+     WARUM DAS SICHER IST: geprüft wird nur der SATZANFANG. Eine Angabe
+     fängt nie mit „hol" oder „such" an; „300 Euro" und „Baujahr 1975"
+     bleiben Antworten. Und die Abrufpfade laufen VORHER — „hol die
+     erweiterte Marktpreisindikation" bleibt ein Abruf, kein Gespräch. */
+  var RF_BITTE = /^(bitte\s+)?(hol|hole|besorg|besorge|such|suche|finde|find|nenn|nenne|gib\s+mir|sag\s+mir|zeig\s+mir|ermittle|recherchier\w*|prüf|pruef|schau\s+(mal\s+)?nach)\b/i;
+
   function _rfIstFrage(text) {
     var t = String(text || '').trim();
     if (!t) return false;
     if (/\?\s*$/.test(t)) return true;
+    /* v1119-WBIT: „Hol mir die Postleitzahl von Herford" */
+    if (RF_BITTE.test(t) && t.split(/\s+/).length >= 3) return true;
     if (RF_FRAGEWORT.test(t) && t.split(/\s+/).length >= 3) return true;
     return false;
   }
@@ -7668,12 +9409,80 @@
     }).catch(function () { _melde(false); });
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1378 (C2) · ZWEI BEGLEITTOENE
+     ═══════════════════════════════════════════════════════════════════
+     Marcels Anforderung: ein LERNMODUS, der erklaert, wozu eine Angabe
+     gebraucht wird, und ein INVESTOR-MODUS, der knapp bleibt - jederzeit
+     umschaltbar.
+
+     Der Ton aendert ZWEI Dinge und sonst nichts:
+       1. die Laenge und Tiefe der KI-Auskunft (Parameter `modus`),
+       2. ob unter einer Frage steht, WOZU sie gestellt wird (`wozu`).
+
+     WAS ER NICHT AENDERT: welche Fragen kommen, welche Werte gelten, was
+     gerechnet wird. Ein Modus, der den Inhalt aendert, waere kein Ton
+     mehr, sondern eine zweite Anwendung.
+
+     Er wird GEMERKT - wer einmal auf knapp gestellt hat, will nicht bei
+     jedem Objekt neu umschalten. Der Aufnahmeweg ("frei erzaehlen" gegen
+     "frag mich durch") wird bewusst nicht gemerkt (v1275); das ist eine
+     Entscheidung fuer DIESES Objekt. Der Ton ist eine ueber die Person. */
+  var MODUS_KEY = 'dp_rf_modus';
+  var MODUS_NAME = { lernen: 'Lernmodus', normal: 'Normal', profi: 'Investor-Modus' };
+  var MODUS_FOLGE = ['lernen', 'normal', 'profi'];
+
+  function _rfModus() {
+    if (_rf && _rf.modus) return _rf.modus;
+    var m = null;
+    try { m = localStorage.getItem(MODUS_KEY); } catch (e) {}
+    return (m === 'lernen' || m === 'profi') ? m : 'normal';
+  }
+
+  function _rfModusSetzen(m, stumm) {
+    if (MODUS_FOLGE.indexOf(m) < 0) m = 'normal';
+    if (_rf) _rf.modus = m;
+    try { localStorage.setItem(MODUS_KEY, m); } catch (e) {}
+    if (!stumm) {
+      _rfBlase('co', '<span style="opacity:.8">Ton: <b>' + escH(MODUS_NAME[m]) + '</b> — ' +
+        escH(m === 'lernen'
+          ? 'ich sage jetzt bei jeder Frage dazu, wozu die Angabe gebraucht wird, und erkläre ausführlicher.'
+          : m === 'profi'
+          ? 'ich halte mich kurz: Zahl und Folge, ohne Begriffserklärung.'
+          : 'normale Länge, ohne Zusatzerklärungen.') + '</span>');
+    }
+    _rfTonKnopf();
+    _rfDranZeichnen();
+    /* Die offene Frage kommt mit dem neuen Ton wieder - sonst wirkt der
+       Wechsel erst bei der naechsten Frage, und das sieht nach nichts aus. */
+    if (_rf && !_rf.abschlussOffen && !_rf.nachfassOffen) _rfFrageNochmal();
+
+  }
+
+
+  /* Der Knopf sagt, was gerade gilt - nicht, was er tut. Ein Schalter, der
+     "Lernmodus" heisst, waehrend der Lernmodus laeuft, ist mehrdeutig; einer,
+     der den Zustand zeigt, ist es nicht. Was der Klick tut, steht im title. */
+  function _rfTonKnopf() {
+    var b = $('vi-rf-ton'); if (!b) return;
+    var m = _rfModus();
+    b.textContent = (m === 'lernen' ? '🎓 ' : m === 'profi' ? '⚡ ' : '○ ') + MODUS_NAME[m];
+    b.setAttribute('data-ton', m);
+  }
+
+  function _rfModusWeiter() {
+
+    var i = MODUS_FOLGE.indexOf(_rfModus());
+    _rfModusSetzen(MODUS_FOLGE[(i + 1) % MODUS_FOLGE.length]);
+  }
+
   function _rfFrageBeantworten(text) {
+
     _rfBlase('ich', escH(text));
     _rfMelden('', true);
     return Auth.apiCall('/ai/copilot-frage', {
       method: 'POST',
-      body: { frage: text, kontext: _rfKontextKlar() || _rfKontext() }
+      body: { frage: text, kontext: _rfKontextKlar() || _rfKontext(), modus: _rfModus() }
     }).then(function (r) {
       _rfDenkt(false);
       _rfBlase('co', escH((r && r.antwort) || 'Dazu weiß ich gerade nichts.'));
@@ -7782,8 +9591,13 @@
 
     /* v1291: Die Adress-Rueckfrage hat Vorrang vor allem anderen. */
     if (_rf.adresseFrage && _rfAdresseAntwort(t, ausSprache)) return true;
+    /* v1376b (C7): Ein offener Widerspruch steht VOR der Feldauswertung -
+       aber nur fuer Saetze, die ihn eindeutig beantworten. Alles andere
+       faellt durch und bleibt eine normale Antwort auf die Frage. */
+    if (_rf.konfliktOffen && _rfKonfliktAntwort(t, false)) return true;
     /* v1307: Der Bericht-Vorschlag ebenso - "ja" heisst dort etwas
        anderes als bei einer Feldfrage. */
+
     if (_rf.berichtOffen && _rfBerichtAntwort(t, ausSprache)) return true;
     /* v1309: "ja" auf den Marktwert-Vorschlag zur Bankbewertung. */
     if (_rf.mwVorschlag && (RF_JA.test(t) || _istZustimmung(t))) {
@@ -7802,6 +9616,24 @@
        Aktion beim Namen nennt („hol den Bodenrichtwert"), bekommt sie
        auch dann, wenn mehrere offenstehen. */
     /* v1305: auch hier ein gesprochenes „ja gerne, mach das" statt nur „ja". */
+    /* ═══ v1119-WSKIP · „Nee, überspringen" ist die zweite Antwort ══════
+       Zum Angebot gehören zwei Antworten, nicht eine. Bisher gab es nur
+       den Ja-Weg; ein „nein danke" fiel durch und wurde als Antwort auf
+       die Feldfrage gelesen — bei „Bodenrichtwert?" hätte das beinahe
+       „kein Bodenrichtwert" bedeutet.
+
+       Die Prüfung steht VOR dem Ja-Weg und greift nur, wenn ein ABRUF
+       offensteht: bei einem Widerspruch (knf_) ist „nein" keine Antwort,
+       und beim Nachtragen auch nicht. */
+    if ((_rf.aktionen || []).some(function (a) {
+          return a.art === 'markt' || a.art === 'markt2'
+              || a.art === 'brw' || a.art === 'lage';
+        })
+        && !_rf.konfliktOffen
+        && /^(nein|nee|ne|nö|noe|nicht n(ö|oe)tig|lass (das|es)|brauch(e)? ich nicht|(ü|ue)berspring\w*|sp(ä|ae)ter)\b/i.test(t)) {
+      _rfAktionKlick('ueberspringen');
+      return true;
+    }
     if ((_rf.aktionen || []).length && (RF_JA.test(t) || _istZustimmung(t))) {
       /* v1327: was der Satz SONST noch trug, geht nicht verloren. */
       if (_rfAktionJa(t)) { _rfRestNachAktion(t); return true; }
@@ -7843,8 +9675,14 @@
        ueberspringen. Wer ein Angebot ablehnt, will nicht die Frage
        ueberspringen — er will nur den Abruf nicht. */
     if ((_rf.aktionen || []).length && (RF_NEIN_ANGEBOT.test(t) || _istAblehnung(t))) {
+      /* v1376 (C7): Steht ein Widerspruch offen, ist "nein" keine Absage an
+         ein Angebot, sondern eine Entscheidung: es bleibt bei der eigenen
+         Angabe. Alles stumm wegzuraeumen waere hier das Schlimmste - der
+         Nutzer haette nie erfahren, wie es ausging. */
+      if (_rf.konfliktOffen) { _rfBlase('ich', escH(t)); _rfAktionKlick('knf_alt'); return true; }
       _rf.abrufOffen = null;
       (_rf.aktionen || []).slice().forEach(function (a) { _rfAktionWeg(a.art); });
+
       _rfBlase('ich', escH(t));
       _rfBlase('co', '<span style="opacity:.7">Alles klar — dann frage ich die Werte ganz normal ab.</span>');
       if (ausSprache && _fs.an) _fsHoeren(true);
@@ -7868,8 +9706,33 @@
 
 
 
+    /* ═══ v1377 (C5) · Das Nachfass-Angebot ═══════════════════════════
+       "Ja" fuehrt in die zweite Runde, "nein" zum Abschluss. Ohne den
+       Nein-Weg haette der Nutzer an einem Angebot gehangen, das nur einen
+       Knopf hat - und "nein danke" haette die Knoepfe geraeumt, ohne
+       irgendwohin zu fuehren. */
+    if (_rf.nachfassOffen) {
+      if (RF_JA.test(t) || _istZustimmung(t) ||
+          /^(ja|klar|gerne|gern|okay|ok|mach|los|nachtragen|weiter)\b/i.test(t)) {
+        _rfBlase('ich', escH(t));
+        _rfNachfassStarten();
+        return true;
+      }
+      if (RF_NEIN.test(t) || _istAblehnung(t) ||
+          /^(nein|nee|reicht|fertig|passt so|das reicht|(ü|ue)bersicht|lass)\b/i.test(t)) {
+        _rf.nachfassOffen = 0;
+        _rfAktionWeg('nachfass');
+        _rfBlase('ich', escH(t));
+        _rfBlase('co', '<span style="opacity:.7">Alles klar — was offen bleibt, zählt im ' +
+          'Score weder für dich noch gegen dich.</span>');
+        _rfFertig(true);
+        return true;
+      }
+    }
+
     /* v1287: Steht die Feinheiten-Frage offen, ist „ja" die Antwort darauf -
        nicht eine Angabe zu einem Feld. Auch gesprochen. */
+
     if (_rf.tiefeOffen) {
       if (/^(ja|jo|klar|gerne|gern|okay|ok|mach|weiter ins detail|los)\b/i.test(t)) {
         _rf.tiefeOffen = 0;
@@ -7886,7 +9749,25 @@
       }
     }
 
+    /* ═══ v1378 (C2) · Den Ton sagt man, statt ihn zu suchen ═══════════
+       "Erklär mir das genauer" ist die natuerlichere Bitte als ein Knopf
+       in der Nebenleiste. Eng gefasst: nur kurze Saetze, die aus nichts
+       anderem bestehen - "erklaer mir den Zustand der Wohnung" ist eine
+       Frage zum Objekt, kein Moduswechsel. */
+    if (t.split(/\s+/).length <= 6) {
+      if (/^(?:kannst du |bitte |jetzt )?(?:etwas |mehr |bitte )?(?:ausf(ü|ue)hrlicher|genauer erkl(ä|ae)ren|mehr erkl(ä|ae)ren|lernmodus|lern-?modus|erkl(ä|ae)rmodus)\b[\s.!,]*$/i.test(t)) {
+        _rfBlase('ich', escH(t)); _rfModusSetzen('lernen'); return true;
+      }
+      if (/^(?:bitte |jetzt )?(?:k(ü|ue)rzer|kurz fassen|knapper|knapp halten|investor-?modus|profi-?modus|schneller durch)\b[\s.!,]*$/i.test(t)) {
+        _rfBlase('ich', escH(t)); _rfModusSetzen('profi'); return true;
+      }
+      if (/^(?:bitte |wieder )?(?:normal|normaler ton|standard|wie vorher)\b[\s.!,]*$/i.test(t)) {
+        _rfBlase('ich', escH(t)); _rfModusSetzen('normal'); return true;
+      }
+    }
+
     /* ═══ v1309 · Navigation per Sprache ══════════════════════════════════
+
        Marcels Wunsch: „Ich möchte überspringen oder weiter oder ich möchte
        auch eine Frage zurückspringen."
 
@@ -7922,8 +9803,13 @@
     /* 1. Frage? Dann beantworten statt eintragen. */
     if (!_hoeflich && _rfIstFrage(t)) { _rfFrageBeantworten(t); return true; }
 
-    /* 2. Verneinung: „haben wir nicht", „kommt nicht in Frage", „weiter". */
-    if (_rfIstVerneinung(t)) {   /* v1288b: auch satzweise */
+    /* 2. Verneinung: „haben wir nicht", „kommt nicht in Frage", „weiter".
+          v1358: auch „Investmentthese habe ich keine" - Thema vorne,
+          Verneinung hinten. Das zweite Muster verlangt zusaetzlich, dass
+          der Satz das gefragte Thema nennt. */
+    if (_rfIstVerneinung(t) ||
+        _rfThemaVerneint(t, (_rf.offen || [])[_rf.i])) {   /* v1288b: auch satzweise */
+
       _rfBlase('ich', escH(t));
       _rfUeberspringen(true);
       return true;
@@ -8358,7 +10244,11 @@
         try { _rfMarktAnbieten(); } catch (ex) { try { console.warn('[voice] Marktangebot', ex); } catch (e2) {} }
         _rfBandZeichnen();   /* v1291b: kein Anhalten mehr — das Angebot steht in der Leiste */
       }
-      _rfFrage();
+      /* v1115-WEIN: Der Co-Pilot stellt sich vor und fragt EINMAL nach der
+         Erfahrung - erst danach beginnt der Fragenlauf. Wer schon gewaehlt
+         hat, merkt davon nichts. */
+      if (alle && !_rfErfahrung()) _rfEinstieg(_rfFrage);
+      else _rfFrage();
     });
   }
 
@@ -8513,6 +10403,9 @@
                          _score2Karte: _rfScore2Karte,
                          _kontingent: _rfKontingent,
                          _verneinung: _rfIstVerneinung,  /* v1288b */
+                         /* v1359: der zweite Weg gehoert auch heraus -
+                            sonst ist er von aussen nicht messbar. */
+                         _themaVerneint: _rfThemaVerneint,
                          _kontextKlar: _rfKontextKlar,
                          /* v1315: Pruefhaken - der Kontext und die
                             Bestaetigungs-Uebertragung sind von aussen
@@ -8525,5 +10418,24 @@
                          _fsStand: function () { return { phase: _fs.phase, kopf: !!_fs.kopf,
                              chunks: _fs.chunks.length, rest: _fs.rest, laeuft: _fs.laeuft,
                              recState: _fs.rec ? _fs.rec.state : null }; },
+                         /* v1376 (C7): Der Widerspruch ist von aussen nicht
+                            messbar, wenn er nicht heraussieht. Wer pruefen
+                            will, ob eine abweichende Zahl wirklich gefragt
+                            wird, braucht genau diese drei. */
+                         _setzen: _rfSetzen,
+                         /* v1377 (C5) */
+                         _nachfassListe: _rfNachfassListe,
+                         /* v1378 (C2) */
+                         _modus: _rfModus,
+                         _modusSetzen: _rfModusSetzen,
+                         _wozu: _rfWozu,
+
+                         _nachfassAnbieten: _rfNachfassAnbieten,
+                         _ueberspringen: _rfUeberspringen,
+
+                         _konfliktZeigen: _rfKonfliktZeigen,
+                         _gleicherWert: _rfGleicherWert,
+                         _zahl: _rfZahl,
                          _stand: function () { return _rf; } };
+
 })();

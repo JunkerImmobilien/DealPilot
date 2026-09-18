@@ -13467,6 +13467,2584 @@ Zeile des `try`-Blocks bewies etwas.
 
 **Commits** `0e5e634`, `8d7e195`, `d884ca6`. Auf Staging.
 
+## PROD-ROLLOUT 12.09.2026 (2) — v1324 bis v1331
+
+Zweiter Rollout desselben Tages. **17 Commits, 10 Dateien**, keine
+Migrationen. Freigabe von Marcel: *„ja roll mal aus."*
+
+### Was rausgegangen ist
+
+**Sprechlauf** (v1324–v1328) — höfliche Anweisungen werden als Befehle
+gelesen, die Ort-Frage wartet auf die erweiterte Indikation, die
+Ausstattung geht endlich mit, eine Auskunft die eine Lücke füllt wird
+angeboten, ein Satz darf Befehl UND Angabe tragen, und es gibt Standards
+für Mietsteigerung, Wertsteigerung und Leerstand.
+
+**KI-Modelle** (v1329) — Structured Outputs statt handgeschriebener
+Entzäunung (die stand **viermal** in der Datei), `gpt-5.6-luna` statt
+drei abgekündigter Modelle, Prompt-Caching im Marktbericht.
+
+**Die Kette** (v1330) — Exposé → Sprechlauf blieb nach v1317 immer noch
+stehen. Der Rückruf lag am Ende einer ungeschützten Schleife: ohne PDF
+läuft die nullmal, mit PDF über jedes Feld.
+
+**Stand-Box** (v1331) — Exposé-Werte zählen grün, Vorbelegungen nicht.
+
+### Nachweis nach dem Rollout
+
+```
+Prod-Stand             47e3673  == lokal
+dealpilot-backend      Up, healthy
+dealpilot-mb-backend   Up
+https://app.dealpilot.immo/   200
+Gold-Audit             genau auf der Basislinie
+plans-sync             "nichts zu tun — plans stimmt mit Stripe überein"
+Cache-Buster           voice-import v1331 · object-actions v1330 · config v1328
+Marker im Container    schemaAusKatalog 2 · gpt-5.6-luna 6 · VERSATZ_MS 2
+```
+
+**Extraktion live auf Prod gefahren**, nicht nur die Datei geprüft:
+
+```
+{"objart":"ETW","eq_heating":"FUSSBODENHEIZUNG","kp":300000,"wfl":100}
+```
+
+Die beiden Enum-Werte sind der Beweis, dass das Schema greift:
+Formularwerte, keine Anzeigetexte.
+
+Sicherungen vor dem Rollout, beide mit PostgreSQL-Kopf gelesen:
+`haupt-20260912-1405.sql.gz`, `mb-20260912-1405.sql.gz`.
+
+**Rückweg:**
+```
+ssh root@157.90.117.167 "cd /opt/dealpilot && git reset --hard 4a69378 \
+  && docker compose -f docker-compose.prod.yml up -d --build backend mb-backend"
+```
+
+## v1332–v1337 · Der Marktbericht, Punkt für Punkt — 12.09.2026
+
+Marcels Liste aus dem Ziel, in der Reihenfolge, in der sie kam.
+
+### v1332 · Alterswertminderung nachgerechnet
+
+Die Formel in `nhk2010.js:776` ist korrekt nach § 38 Abs. 1 ImmoWertV:
+`minderung = herst × (gnd − rnd) / gnd`. Gegen echte Fälle gemessen
+(Stichtag 2026, GND 80): Bj 1968 → RND 22 → 72,5 % · Neubau → 0 % ·
+Bj 1900 → RND 0 → 100 % · Bj 1975 → RND 29 → 63,7 %.
+
+Dabei fiel toter Code in `immowertv.js` auf:
+`const jahre = Math.max(linear, linear > 0 ? 0 : 0)` — das ist `linear`.
+Verhalten bewusst gelassen (eine Untergrenze ohne Modernisierungsnachweis
+wäre nicht begründbar), Code klargestellt. Commit `b307c50`.
+
+### v1333–v1333d · Nutzereingaben sind unantastbar
+
+**Marcels Befund:** „beim ersten mal habe ich eine andere adresse
+eingegeben und alle werte angegeben und dann hat er einfach das letzte
+objekt genommen … erst beim 2 mal ändern hat er die neue Adresse
+übernommen."
+
+**GEMESSEN im Staging-iframe, Objekt 2026-1033:**
+
+```
+load     @128 ms
+getippt  @129 ms   "Meine Teststrasse 1, 38300 Wolfenbuettel"
+@605 ms  ->        "32120 Hiddenhausen"
+```
+
+Die eigene Eingabe stand 476 ms, dann war sie weg — ohne Meldung.
+
+**Ursache:** zwischen dem Laden des Formulars und `fillFromData()` liegen
+ZWEI Netzrunden (`buildDropdown` holt die Objektliste, `loadDetail` das
+Detail). Der Auto-Select aus `?ref` feuert also eine halbe Sekunde nach
+dem Laden, und `setVal()` schrieb bis dahin bedingungslos. Beim zweiten
+Versuch ist der Fetch durch — genau das hat Marcel beschrieben.
+
+**Zweiter Teil, der teurere:** `window._mbwRef` wird beim Dropdown-Klick
+gesetzt und wurde NIE geläscht. Ein Bericht für eine neue Adresse landete
+unter dem alten Objekt (`external_ref`), trug dessen Label und bekam
+dessen Preis — samt „ist bereits bezahlt" für eine Adresse, für die nie
+jemand gezahlt hat.
+
+**Drei eigene Fehler auf dem Weg, alle beim Nachmessen gefunden:**
+
+| | Fehler | Warum er durchging |
+|---|---|---|
+| v1333b | Sicherung hing allein an `isTrusted` | Der Testaufbau feuert synthetische Ereignisse — die Messung war rot, obwohl die Regel griff. Sie hätte umgekehrt genauso gut grün sein können. |
+| v1333c | Ausgangsstand LAZY beim ersten `setVal` erfasst | Der erste `setVal` IST der Aufruf, gegen den gesperrt werden soll: er trug den getippten Wert als „Ausgangsstand" ein und winkte sich durch. |
+| v1333d | Schlussmeldung sagte immer „Objektdaten übernommen" | Seit v1333 kann die Übernahme Felder auslassen. Eine Erfolgsmeldung, die das verschweigt, erzeugt ungedecktes Vertrauen. |
+
+Die Sicherung hängt jetzt an ZWEI unabhängigen Dingen: am Ereignis
+(`isTrusted`) und am Wert (Vergleich mit dem, was zuletzt von hier
+geschrieben wurde). Der Ausgangsstand wird beim Modulstart genommen, neue
+Felder erfasst ein Beobachter beim Entstehen.
+
+**Wohneinheiten** sperren niemanden mehr aus. Das Label sagte „— nur MFH",
+die Pflichtregel in `mb-stufen.js` verlangte sie bei jeder Objektart. Bei
+ETW, EFH, DHH, RH und GAR beantwortet die Objektart die Zahl selbst (1);
+sie wird SICHTBAR ins leere Feld geschrieben, nicht heimlich in die
+Rechnung geschoben. Bei MFH und Gewerbe bleibt sie Pflicht — der
+Ertragswert braucht sie für die Verwaltungskosten je bewerteter Einheit
+(Anlage 3 ImmoWertV).
+
+**Abnahme:** eigene Adresse hält · `_mbwRef` = null · Hinweis sichtbar ·
+`units` = 1 bei ETW · `area` aus dem Objekt übernommen.
+
+### v1334–v1334b · Feldhilfe für das ganze Grundformular
+
+**Marcels Befund:** „Die beschreibungen fehlen. Was ist mit zum Beispiel
+geschossen gemeint oder Etagen? Vollgeschosse mit oder ohne Dachboden?
+Ich würde mir mehr beschreibung wünschen und vlt zusätzlich wo bekomme ich
+das her."
+
+Er hatte zweimal recht. **Kein einziges Feld des Grundformulars trug ein
+ⓘ** — alle 19 vorhandenen Texte hingen an der Wertermittlung, also am
+tiefsten Teil. Und „wo bekomme ich das her" ist die Frage, die in der
+Praxis wirklich aufhält.
+
+- **33 neue Texte**, jeder mit eigenem Feld `woher`, gerendert als feste
+  Zeile „Wo du das findest:".
+- **Die ⓘ hängen sich selbst an** (`zeichenAnhaengen()` in `feldhilfe.js`)
+  — von Hand wären es 35 Stellen im HTML gewesen, und beim nächsten Feld
+  fängt es von vorn an.
+- **Vorschau beim Drüberfahren** (`.fh-tip`, 260 ms Verzögerung), auf
+  Geräten ohne Maus abgeschaltet (`@media (hover: none)`).
+- **Nebenbefund behoben:** `start()` band den Klick nur an die ⓘ, die es
+  beim Start schon gab. Die Zeichen der Wertermittlung sahen richtig aus
+  und taten nichts. Die Bindung hängt jetzt am `document`.
+
+**Marcels Kernfrage steht jetzt im Text:** `floor` = „In welchem Geschoss
+die Wohnung liegt — **nicht** wie viele Geschosse das Haus hat";
+`nhkGeschosse` = Vollgeschosse, mit der Landesbauordnungs-Definition und
+dem ausdrücklichen Satz, dass ein nicht ausgebauter Dachboden NIE ein
+Vollgeschoss ist.
+
+**v1334b, eigener Fehler:** die Label-Suche nahm das erste `<label>` im
+umgebenden `div`. Beim Adressfeld ist das umgebende `div` das ganze
+`.panel`. Sichtbar wurde es an einem doppelten Zeichen; der Fehler war,
+dass das Zeichen überhaupt am falschen Label hing.
+
+**Abnahme:** 41 Zeichen, keine doppelten, jedes am richtigen Label,
+Tooltip trägt den Text.
+
+### v1335 · „1 × MPI" war ein Preis, kein Kontingent
+
+**Marcels Befund:** „damit kann ich nichts anfangen. Schreib doch dahinter
+wieviele noch zu verfügung stehen."
+
+Doppelt richtig. Das Kürzel sagt niemandem etwas, der es nicht selbst
+erfunden hat — und dort stand ein PREIS, wo man einen BESTAND erwartet.
+Wie viele Bewertungen frei sind, erfuhr man erst NACH dem Klick, wenn der
+Server mit 402 antwortet. Die teure Entscheidung fällt vorher.
+
+Der Bestand kommt aus `/ai/credits` — dieselbe Quelle wie die Pille in der
+Kopfleiste. Ein eigener Zähler wäre eine zweite Wahrheit. Ohne Bestand
+(kein Token, Server stumm) bleibt es beim Preis allein.
+
+**Abnahme:** „1 × MPI · noch 35 frei" / „1 × MPI+ · noch 7 frei" /
+„1 × WEV · noch 8 frei".
+
+### v1336–v1336c · Die Eingabefelder fluchten
+
+**Marcels Befund:** „Die Formatierung der Felder passt oft nicht
+Eingabefelder zu Textfeldern fluchten nicht."
+
+**GEMESSEN bei 1240 px Panelbreite:**
+
+| Zeile | Befund |
+|---|---|
+| `eq_energie / eq_heating / eq_windows` | drittes Feld 960 statt 474 px, Versatz 95 px |
+| `eq_walls / eq_dachform / eq_roof` | dasselbe |
+| `balcony / garden / plot / units` | Versatz 133 px — die Labels von `plot` und `units` sind zweizeilig (58 statt 19 px) |
+
+`flex:1 1 calc(50% - 6px)` kann drei Felder nicht tragen: das dritte
+bricht um und nimmt die ganze Breite. Ersetzt durch Grid mit `auto-fit` —
+die Spaltenzahl richtet sich nach dem Platz, nicht nach einer geratenen
+Prozentzahl.
+
+**v1336b/c, zwei eigene Fehler:**
+
+- `margin-top:auto` am Feld funktioniert nur, solange das Feld das LETZTE
+  Element der Zelle ist. Ist es oft nicht: die Stufenleiste hängt eine
+  „fehlt"-Markierung an, die Feldhilfe einen Ankertext. Gemessen: `#plot`
+  hat drei Kinder, `#cond` vier. Dort schob `auto` das Feld nach OBEN.
+- **Dieselbe Regel stand ein zweites Mal**, 60 Zeilen weiter oben, als
+  `v651-mb-css: Feld-Flucht`. Mein eigener Block war nicht der Täter. Die
+  Flucht macht jetzt `labelsAngleichen()` in `mb-wizard.js`: Zellen mit
+  derselben Oberkante bilden eine Rasterzeile, deren Labels bekommen die
+  größte vorkommende Höhe. Eine CSS-Regel kann das nicht — welche Felder
+  nebeneinander landen, entscheidet erst der Umbruch.
+
+**Abnahme über alle 7 Reiter und 5 Breiten (390 / 600 / 768 / 900 /
+1024 px): alle Rasterzeilen fluchten, kein waagerechter Überlauf.**
+
+### v1337 · Die Alterswertminderung zeigt ihren Rechenweg
+
+Die Zeile sagte „58 von 80 Jahren" — zwei Zahlen, und der Bruch, der
+daraus wird, blieb im Dunkeln. Die Garage direkt darunter führt längst ein
+`detail` mit ihrem Rechenweg. Dieselbe Staffel, zwei Maßstäbe.
+
+`restnutzungsdauer_herkunft.hinweis` lag seit v1052 im Payload und wurde
+von NIEMANDEM gelesen — dasselbe Muster wie `dealpilot_marktbewertung` und
+`ref` im Orchestrator. Er gehört genau dorthin: ob die Restnutzungsdauer
+nach Anlage 2 abgeleitet oder nur geschätzt ist, ändert das Ergebnis um
+Zehntausende.
+
+**Funktionslauf im Container:**
+
+```
+289.428 € × (80 − 22) / 80 = 72,5 % — linear nach § 38 Abs. 1 ImmoWertV.
+Restnutzungsdauer nach Anlage 2 ImmoWertV, aus 12 Modernisierungspunkten.
+```
+
+Neubau: `× (80 − 80) / 80 = 0 %`. Backend neu gebaut, `node --check` im
+Container grün für beide Dateien.
+
+### Nebenbei beantwortet: Sachwertfaktor und Liegenschaftszins
+
+Marcels Zwischenfrage. Das Register (`marktbericht/backend/src/lib/register/`)
+führt beim Start gemessen **2.150 Sätze, 525 Gebiete**:
+
+| Kennzahl | Sätze |
+|---|---|
+| Liegenschaftszinssatz | 1.078 |
+| Bodenpreisniveau | 403 |
+| Durchschnittspreis | 386 |
+| Preisentwicklung | 215 |
+| **Sachwertfaktor** | **52** |
+| Erbbauzinssatz | 15 |
+
+Sachwertfaktoren fast nur NRW (34), dazu BB 5, TH 5, NI 4, BY 2, BE 1,
+ST 1. Dazu zwei handgeschriebene Module: Minden-Lübbecke und Herford.
+
+**Für Wolfenbüttel** (Kreis 03158, GAA Braunschweig-Wolfsburg,
+Grundstücksmarktdaten 2025): Liegenschaftszins JA (1,9 % EZFH, 1,9 % WE
+vermietet, mit Quelle und Lizenz dl-de/by-2-0) — **Sachwertfaktor NEIN.**
+Das Verfahren meldet `kein_ausschuss_hinterlegt` mit dem Hinweis auf § 10
+ImmoWertV statt einen fremden Wert zu übertragen. Manuelle Eingabe steht
+zur Verfügung. **Offen:** die Braunschweig-Wolfsburg-Sachwertfaktoren
+nachtragen — die Quelle ist im Register schon verlinkt.
+
+### Commits
+
+`b307c50` v1332 · `a052c58` v1333 · `f5e2fbc` v1333b · `3512ed5` v1333c ·
+`bdcd12c` v1333d · `d3d08fc` v1334 · `0e9e4c1` v1334b · `177f465` v1335 ·
+`6919ee5` v1336 · `9aeb346` v1336b · `0e4cc5f` v1336c · `343ed2b` v1337
+
+**Alles auf Staging, nichts auf Produktion.**
+
+## v1338–v1339b · Das Gutachten, nachgeprüft — 12.09.2026 (Abend)
+
+Marcel brachte ein Reihenhaus im Landkreis Wolfenbüttel mit, an dem in einem
+anderen Chat um Restnutzungsdauer, Gesamtnutzungsdauer und Bauschäden
+gerungen wurde. **Die Prüfung fand fünf Löcher — alle in unserer Software,
+nicht in seiner Rechnung.**
+
+### Befund 1 · Die Gesamtnutzungsdauer war eine Konstante
+
+`CrossCheckService.js:24` führte `const GND_JAHRE = 80` und rechnete damit
+für jeden Ausschuss. **Das Register führt sie längst je Modell:**
+
+| gnd_jahre | Sätze |
+|---|---|
+| 70 | 38 |
+| 80 | 4 |
+| 60 | 5 |
+| ausdrücklich null | 73 |
+
+**Und kein Leser holte sie ab.** Dasselbe Muster wie
+`restnutzungsdauer_herkunft` (v1337) und `dealpilot_marktbewertung`.
+
+Was das kostet: bei Alter 30 ergibt GND 70 eine Restnutzungsdauer von 40
+Jahren, GND 80 eine von 50. An einem Reihenhaus mit rund 176.000 € Herstel­
+lungskosten sind das etwa 25.000 € Gebäudesachwert — lautlos.
+
+§ 21 Abs. 3 ImmoWertV: ein Sachwertfaktor gilt nur für das Modell, aus dem
+er abgeleitet wurde.
+
+**Gelöst:** `gutachterausschuss.js` reicht `modellansaetze` durch, der
+zweite Sachwertlauf nimmt die Modell-GND, und die Restnutzungsdauer wird im
+richtigen Rahmen **neu abgeleitet** — nicht umgerechnet. Der Unterschied ist
+entscheidend: eine Neuableitung aus Baujahr und Modernisierungspunkten ist
+eindeutig, eine Umrechnung wäre eine Methodenwahl (34/80 auf 70 ergibt je
+nach Weg 30 oder 24 Jahre — 19.000 € Unterschied). Diese Wahl trifft die
+Software nicht.
+
+Die v1074-Sicherung („zweiter Lauf muss denselben vorläufigen Sachwert
+liefern") hätte die modellkonforme Rechnung sonst verworfen — bei geänderter
+GND ist die Abweichung jetzt ausdrücklich erwartet.
+
+### Befund 2 · Der Sachwert kannte keine bOM
+
+Die Staffel endete beim marktangepassten Sachwert. **Besondere
+objektspezifische Grundstücksmerkmale nach § 8 Abs. 3 ImmoWertV fehlten
+vollständig** — der Ertragswert kennt sie seit jeher, der Sachwert nicht.
+
+An Marcels Fall: Schimmel, Wasserschaden, Estrich, Setzungen summieren sich
+auf 41.000 bis 86.000 €. Bei einem Verkehrswert um 153.000 € sind das 27 bis
+56 %. Ein Verfahren, das diesen Schritt nicht kennt, kann für so ein Objekt
+keinen Verkehrswert ausweisen.
+
+**Sie kommen NACH der Marktanpassung.** Die Faktoren werden aus Kauffällen
+OHNE solche Merkmale abgeleitet; wer vorher abzieht, lässt den Faktor auf
+einen Wert wirken, den es in der Stichprobe nicht gab.
+
+Dazu die **Warnung vor dem Doppelabzug** — wer die Restnutzungsdauer wegen
+derselben Mängel verkürzt UND sie hier abzieht, rechnet sie zweimal.
+
+### Befund 3 · Die Streuung des Sachwertfaktors kam nie an
+
+`satz.streuung` liegt im Register und war nur beim Liegenschaftszins
+durchgereicht. Bei 0,21 sind das an einem Reihenhaus knapp 39.000 €.
+
+**v1338b, eigener Fehler:** die Spanne stand zuerst VOR dem bOM-Abzug —
+gemessen 184.761 € Endwert bei einer Spanne von [186.901 … 264.622]. Eine
+Spanne, die ihr eigenes Ergebnis nicht enthält, ist schlimmer als keine.
+Jetzt steht sie auf dem Endwert.
+
+### Befund 4 · `bog_eur` gab es, ein Feld dafür nie
+
+`bog_eur`/`bog_grund` existieren seit WPDF12 im Orchestrator und im
+ErtragswertService — **und im Formular gab es dafür kein Feld.** Erreichbar
+nur über einen direkten API-Aufruf.
+
+Gelöst: ein Feldpaar (`bomEur`/`bomGrund`) speist beide Verfahren. Ein
+Schimmelschaden ist im Ertragswert derselbe wie im Sachwert.
+
+### Befund 5 · `_num` verwarf jede negative Zahl
+
+```js
+const _num = (v) => { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; };
+```
+
+Der Helfer heißt „Zahl" und bedeutet „Zahl größer null". Für Flächen und
+Mieten richtig. Für `bog_eur` tödlich — ein Abzug ist negativ.
+
+**GEMESSEN am Bericht 116:** `bog_eur: -18000` stand im ref, lief durch den
+ganzen Orchestrator bis `CrossCheckService.js:669` und wurde dort still zu
+null. Das Feld hat also **nie** funktioniert, außer bei einem Zuschlag.
+Aufgefallen erst, als v1338 ein Eingabefeld dafür bekam — vorher konnte es
+niemand füllen.
+
+**Beweis über zwei echte Läufe:**
+
+| Bericht | Zeilen | letzte Zeile | Wert |
+|---|---|---|---|
+| 116 (vorher) | 11 | = vorläufiger Ertragswert | 149.639 € |
+| **117 (nachher)** | **13** | **= Ertragswert** | **131.639 €** |
+
+Differenz exakt 18.000 € — der bOM-Abzug.
+
+### v1339 · Erbbaurechtskoeffizienten Braunschweig-Wolfsburg
+
+Der Backlog-Punkt „Sachwertfaktoren nachtragen" ist **beantwortet, nicht
+offen**. Der Grundstücksmarktbericht 2025 sagt auf Seite 34 wörtlich:
+
+> Sachwertfaktoren — Zu diesem Thema gibt es keine zusätzlichen regionalen
+> Auswertungen des Gutachterausschusses Braunschweig-Wolfsburg.
+
+Es gibt sie nicht. Der Faktor 1,20–1,22, den Marcel im Kalkulator abgelesen
+hat, stammt also aus einem anderen Modell als dem des örtlichen Ausschusses
+— das gehört in sein Gutachten.
+
+**Dafür fand die Quelle etwas Besseres:** Erbbaurechtskoeffizienten für
+sieben Gebiete, Kauffälle 2021–2024, mit abgedrucktem Anwendungsbeispiel.
+
+| Gebiet | AGS | Koeffizient | Spanne | Fälle |
+|---|---|---|---|---|
+| Braunschweig, Stadt | 03101 | 0,79 | 0,47–1,12 | 28 |
+| Wolfsburg, Stadt | 03103 | 0,91 | 0,46–1,39 | 58 |
+| Gifhorn, LK | 03151 | 0,84 | 0,48–1,21 | 42 |
+| Helmstedt, LK | 03154 | 0,73 | 0,34–1,48 | 47 |
+| **Wolfenbüttel, LK** | **03158** | **0,81** | **0,39–1,05** | **30** |
+| Celle, LK | 03351 | 0,77 | 0,32–1,26 | 25 |
+| Peine, LK | 03157 | 0,72 | 0,36–1,06 | 20 |
+| Wolfsburg, Stadt (RH/DHH) | 03103 | 0,92 | 0,36–1,44 | 144 |
+
+Neue Saatdatei `erbbau-bs-wob.json`, neue Kennzahl
+`erbbaurechtskoeffizient`, Ebenen bezirk/land/bund gesperrt. **Ein
+marktabgeleiteter Koeffizient schlägt die Modellrechnung nach § 50
+ImmoWertV** — er enthält, was die Formel nicht kennt: Vertragsbedingungen,
+Anpassungsklauseln, Heimfallrisiko.
+
+**Prüfmaßstab ist das abgedruckte Anwendungsbeispiel:**
+`500.000 € × 0,79 = 395.000 €` — gemessen zeichengleich.
+
+Alle Sperren greifen: ein Reihenhaus in Wolfenbüttel bekommt **keinen**
+Koeffizienten (der Ausschuss hat RH/DHH nur für Wolfsburg abgeleitet, § 10),
+Hüllhorst fällt auf den finanzmathematischen Weg zurück.
+
+**v1339b, offener Befund:** `zweigWaehlen()` findet aus `objektart: 'EFH'`
+den Zweig `ezfh` nicht, obwohl `ZWEIG_VORZUG` ausdrücklich `['efh','ezfh']`
+führt und `nachArt(satz,'ezfh')` isoliert genau einen Treffer liefert. Nach
+drei Anläufen abgebrochen statt weiter zu raten. Gelöst über eine
+ausdrückliche Karte `ptype → Registerzweig` im Leser — das ist ohnehin die
+richtige Stelle, weil unsere `ptype`-Werte Oberflächenkürzel sind und die
+Zweige der niedersächsischen Berichte anders heißen. **Die Ursache in
+`zweigWaehlen` steht noch aus** und betrifft möglicherweise auch den
+Sachwertfaktor.
+
+### Demo
+
+`design/Vorschläge/marktbericht-eingabe-varianten.html` — Ist-Zustand gegen
+zwei Varianten (Ruhig / Karten), mit denselben Feldern, Labels und
+Hilfetexten wie das echte Formular. Nichts gebaut, bevor Marcel gewählt hat.
+
+### Commits
+
+`303d3e9` v1338 · `cdebc95` v1338b · `6e885d2` v1338c · `90baebb` v1338d ·
+`b0c1580` v1339 · `0c9b4d2` v1339b
+
+**Alles auf Staging, nichts auf Produktion.**
+
+## v1340–v1340d · Die Eingabe-Karten (Variante B) — 12.09.2026 (Nacht)
+
+Marcels Wahl aus der Demo: „mach b das ist cool". Neue Datei
+`frontend/marktbericht-app/mb-karten.js`, geladen NACH `mb-wizard.js` —
+vorher liegen die Zeilen noch nicht in ihren Reitern.
+
+**Neun Blöcke**, jeder mit Goldkante links, Titel und Zähler rechts:
+
+```
+Wo steht das Objekt      3 / 3      Dach und Wände        0 / 3
+Eckdaten                 3 / 4      Flächen               1 / 4
+Geld            2 / 2 · optional    Stellplätze u. Aufzug 0 / 3
+Zustand                  1 / 4      Energie und Heizung   0 / 4
+Innen                    0 / 5
+```
+
+Der Zähler ist der Grund für diese Variante: er beantwortet „wie weit bin
+ich?" **innerhalb eines Reiters**. Die Stufenleiste beantwortet sie nur für
+den ganzen Bericht.
+
+**Es wird verschoben, nicht neu gebaut** — dieselben DOM-Knoten, dieselben
+Ids, dieselben Listener. Ein Neubau hätte v1129b wiederholt (doppelte Ids,
+`getElementById` nimmt die erste, der Nutzerwert steht in der anderen).
+Gemessen: keine doppelten Ids, `payload()` läuft, die ⓘ aus v1334 sind
+mitgewandert, die Flucht aus v1336c hält.
+
+**Keine zweite Pflichtliste.** Was Pflicht ist, weiß `mb-stufen.js` und
+niemand sonst; `optional` hier steuert nur die Beschriftung.
+
+### Drei eigene Fehler, alle beim Nachmessen gefunden
+
+| | Fehler | Wie er sichtbar wurde |
+|---|---|---|
+| v1340b | Der Zähler fragte `offsetParent` — also „ist das Feld gerade auf dem Schirm". Acht von neun Blöcken liegen in einem geschlossenen Reiter | acht Zähler blieben leer |
+| v1340c | Die Mono-Labels kamen als Inter 13px an | der Hell-Skin in `index.html:74` setzt `font-family` selbst mit `!important` — dagegen hilft nur `!important` |
+| v1340d | `zeileVon()` fiel für Felder ohne `.row` auf `parentElement` zurück. Beim Adressfeld ist das der ganze Reiter-Container | **im Screenshot gesehen**: „Eckdaten" saß INNERHALB von „Wo steht das Objekt" |
+
+v1340d ist dieselbe Sorte Fehler wie v1334b — ein zu weit gefasster
+Vorfahre. Deshalb jetzt zwei Sicherungen: eine eigene Hülle für Felder ohne
+`.row`, **und** die Regel, dass eine Zeile nie übernommen wird, wenn sie ein
+Feld einer anderen Gruppe trägt. Die zweite fängt auch Fälle ab, die ich
+noch nicht gesehen habe.
+
+### Abnahme
+
+- 390 / 768 / 1024 px: kein Überlauf, kein Versatz, kein Block steht über
+- Labels: JetBrains Mono 10px uppercase, `letter-spacing` 1,1px
+- keine Verschachtelung, keine doppelten Ids, `payload()` in Ordnung
+- **Gold-Audit: „Genau auf der Basislinie. Kein neues Hartgold."** — die neue
+  Datei nutzt durchgehend `var(--wl-…)`
+
+### Commits
+
+`4c6b153` v1340 · `a1d3908` v1340b · `0ad54a0` v1340c · `acd4529` v1340d
+
+## v1341–v1342b · Die zwei offenen Punkte, geschlossen — 12.09.2026 (Nacht)
+
+### v1341 · In `ZWEIG_VORZUG` standen Backspace-Zeichen
+
+Der offene Befund aus v1339b ist aufgeklärt, und er war größer als gedacht.
+**An zwanzig Stellen standen echte Backspace-Zeichen (0x08), wo eine
+Wortgrenze `\b` hingehört.**
+
+Der Unterschied ist im Editor, in `grep` und selbst in `String(regex)`
+**unsichtbar**:
+
+```
+String(Z[7][0])                  ->  /einfamilien|efh|freistehend/i
+Z[7][0].test("Einfamilienhaus")  ->  true
+Z[7][0].test("EFH")              ->  FALSE
+```
+
+Sichtbar wurde es über `JSON.stringify` (dort erscheint 0x08 als `\b`) und
+über `file`, das die Datei die ganze Zeit mit **„with overstriking"**
+gemeldet hat — zweimal überlesen.
+
+**Was das angerichtet hat:** unsere Oberfläche liefert Kurzformen — EFH,
+ETW, MFH, RH, DHH. Genau die erkannte diese Tabelle nie. Nur wenn der
+Registerzweig zufällig gleich hieß wie die Kurzform in Kleinschrift, griff
+der direkte Weg davor.
+
+**Gemessen mit `ptype: 'EFH'`, vorher gegen nachher:**
+
+| Ausschuss | Zweig | vorher | nachher |
+|---|---|---|---|
+| Remscheid | `efh` | 1,08 | 1,08 |
+| Olpe | `efh` | 0,92 | 0,92 |
+| **Potsdam** | `ezfh` | **nichts** | **1,06** |
+| **Uckermark** | `ezfh` | **nichts** | Objektart gefunden |
+
+Der Faktor lag die ganze Zeit im Register, und der Bericht meldete „kein
+Sachwertfaktor abgeleitet" — **eine Fehlanzeige, die wie ein Befund
+aussieht.**
+
+Betroffen war jede Kennzahl, die über `zweigWaehlen()` läuft: Sachwert-
+faktor, Vergleichsfaktor, Durchschnittspreis, Erbbaurechtskoeffizient.
+
+**Beim Beheben dieselbe Falle eine Ebene höher:** `perl -pe 's/\x08/\b/g'`
+ersetzt Backspace durch Backspace — im Ersatzstring ist `\b` wieder das
+Steuerzeichen. Erst `chr(92) . 'b'` schreibt wirklich einen Backslash.
+
+### v1342 · Der Erbbaurechtskoeffizient geht der Formel vor
+
+Liegt für Ort und Objektart ein Koeffizient des Gutachterausschusses vor
+(v1339), wird **er** ausgewiesen. Er stammt aus echten Kauffällen und
+enthält, was § 50 nicht kennt: Vertragsbedingungen, Anpassungsklauseln,
+Heimfallrisiko.
+
+Die Formel wird trotzdem gerechnet und **mit ausgewiesen** — zwei Wege, die
+weit auseinanderliegen, sind ein Befund; einer allein wäre eine Behauptung.
+Ab 10 % Abstand sagt der Bericht, dass das im Gutachten begründet gehört.
+
+**Funktionslauf:**
+
+```
+Prüfwert                41277                          OK
+ohne Koeffizient        § 50, 265.526 €, 11,5 %
+mit Koeffizient 0,81    243.000 € (19 %)
+  § 50 käme auf         265.526 €  ->  9,3 % Abstand, „dicht beieinander"
+  Spanne 0,39–1,05      117.000 – 315.000 €
+Anwendungsbeispiel      500.000 × 0,79 = 395.000 €     ZEICHENGLEICH
+```
+
+**v1342b, eigener Fehler:** mein Abschlag kam als **−19 %**, während die
+Formel denselben Sachverhalt mit **+11,5 %** ausweist. Im Bericht hätte
+„Abschlag −19,0 %" gestanden. Ein Abschlag ist positiv — dieselbe
+Konvention wie oben.
+
+### Commits
+
+`698ebec` v1341 · `49fd37c` v1342 · `eddc19e` v1342b
+
+## v1343–v1344d · Stufen-Vorhang und „wo bekomme ich das her" — 13.09.2026
+
+Zwei Wünsche von Marcel.
+
+### 1 · „Egal was ich auswähle, sind immer noch alle Felder sichtbar"
+
+**GEMESSEN, Felder je Reiter bei gewählter Stufe 1:**
+
+```
+b2 Objekt=9 · b3 Zustand=6 · b4 Ausstattung=7 · b5 Gebäude=10
+b6 Wertermittlung=0 · b7 Zusatzwerte=6
+```
+
+Reiter 6 ist bei Stufe 1 schon leer — dort greift die Stufenlogik von
+`wertermittlung.js`. **Reiter 7 stand mit sechs Feldern voll da**:
+Liegenschaftszins, Sachwertfaktor, Bodenrichtwert, Stichtag, Anpassung,
+Grund. Die gehen ausschließlich in die Wertermittlung ein.
+
+Sie liegen jetzt hinter einem Vorhang: *„Diese Angaben brauchst du für die
+gewählte Tiefe nicht"* mit Knopf **Trotzdem ausfüllen**. Der Reiter selbst
+wird gedimmt und trägt „· ab Stufe 3".
+
+**Verborgen, nicht entfernt** — wer ausgefüllt hat und die Tiefe wechselt,
+behält seine Eingaben.
+
+**Bewusst NICHT ausgeblendet: Zustand, Ausstattung, Gebäude.** Die
+verbessern auch die einfache Marktpreisindikation — der Konfidenz-Balken
+sagt das ausdrücklich. Sie wegzublenden wäre kein Aufräumen, sondern ein
+Rückschritt. Eine allgemeine „alles ab Stufe N verbergen"-Mechanik wäre
+bequemer zu schreiben und fachlich falsch.
+
+### 2 · „Schreib ran, wo man die herbekommt"
+
+Neuer Endpunkt `GET /quellen?plz=` (v1343). Das Register führt zu jedem
+Satz Fundstelle, Quell-URL, Lizenz und Berichtsjahr — **31 amtliche
+Quellen**. Gelesen wurden sie bisher nur, wenn ein Wert tatsächlich
+gerechnet wurde; wer ihn von Hand eintragen sollte, bekam nichts.
+
+**Für Wolfenbüttel zeigt der Kasten jetzt:**
+
+```
+Zuständig für Wolfenbüttel (Niedersachsen):
+Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg
+
+Liegenschaftszinssatz — ezfh 1,9 % · we_v 1,9 %
+  „Grundstücksmarktdaten 2025", Kapitel Liegenschaftszinssätze …, S. 26–29   [Quelle öffnen]
+Erbbaurechtskoeffizient — ezfh 0,81
+  Grundstücksmarktdaten 2025, S. 35                                          [Quelle öffnen]
+
+Diese Werte holt der Bericht sich SELBST — du musst sie nicht eintragen.
+Nicht hinterlegt: Sachwertfaktor, Erbbauzinssatz, Bodenpreisniveau, …
+Bodenrichtwert: BORIS-D (bundesweites Portal)  + Anleitung
+© Gutachterausschuss …, dl-de/by-2-0
+```
+
+**Kein erfundener Link.** Ausgegeben wird nur, was im Registersatz belegt
+ist, plus das bundesweite BORIS-D-Portal — das steht seit v1077 in
+`connectors/boris/registry.js` als geprüft. Länderportale werden NICHT
+geraten.
+
+### Vier eigene Fehler, alle beim Nachmessen gefunden
+
+| | Fehler | Befund |
+|---|---|---|
+| v1343b | Endpunkt las `plzInfo.ags` | `AgsResolver` liefert `gemeinde_ags`/`kreis_ags` — ein Feld `ags` gibt es dort nicht. Jede PLZ kam als „keine_ags" zurück. Dieselbe Sorte wie v1144. |
+| v1344b | `start()` setzte die Listener NACH dem ersten Lauf | Wirft der erste Lauf, gibt es nie wieder eine Nachführung. Der Vorhang entstand beim Klick nie, von Hand aber sofort. Muster aus v1330. |
+| v1344c | `/quellen` fehlte in der Proxy-Pfadliste | `/health` gab 200, `/quellen` 404 — und im Container antwortete `/quellen` einwandfrei. Der Proxy im Haupt-Backend führt eine ausdrückliche Liste. |
+| v1344c | Der Vorhang hätte den Quellen-Kasten mitverborgen | Er sagt gerade dann etwas Nützliches, wenn die Felder zu sind. |
+| v1344d | Fundstelle doppelt betitelt | „Grundstücksmarktdaten **2024**, „Grundstücksmarktdaten **2025**", Kapitel …" — zwei Jahreszahlen, die sich widersprechen. |
+
+### Abnahme
+
+- Stufe 1 → Vorhang zu, 2 Elemente verborgen, Reiter gedimmt
+- Stufe 3 → Vorhang weg, nichts verborgen
+- Quellen-Kasten bleibt in beiden Fällen sichtbar
+- drei Links: 2× amtlicher Marktbericht, 1× BORIS-D
+- keine Konsolen-Warnungen
+
+### Commits
+
+`d9eea6a` v1343 · `bacb766` v1343b · `79a0563` v1344 · `6edf83d` v1344b ·
+`a02d18c` v1344c · `f3d6313` v1344d
+
+## v1345–v1345b · Die Ausstattungsfelder wirken jetzt — 13.09.2026
+
+**Marcels Einwand war richtig, und er saß genauer als meine Antwort darauf.**
+Ich hatte behauptet, Zustand und Ausstattung verbesserten auch die einfache
+Marktpreisindikation. Für den Zustand stimmt das; für zehn andere Felder
+nicht.
+
+### Der Befund
+
+| Feld | fließt ein? | wo |
+|---|---|---|
+| `cond` Zustand | **ja** | `ValuationService:65`, Teilprodukt gedeckelt auf 0,82–1,22 |
+| `quality`, `modern`, `modyear` | ja | derselbe Block |
+| `energy`, `floor` | ja | eigene Faktoren |
+| `balcony`, `garden`, `elevator`, `baths` | ja | Amenity-Faktor |
+| **die zehn `eq_*`-Felder** | **NEIN** | **standen in KEINER Datenliste des Orchestrators** |
+
+Energieträger, Heizung, Verglasung, Bodenbelag, Bad, Gäste-WC, Keller,
+Außenwände, Dachform, Dacheindeckung — das Formular schickte sie, das
+Backend nahm sie nicht auf. Sie stammen aus der Zeit, als ein externer
+Bewertungsdienst sie bekam (v736-mb-eq); seit wir selbst rechnen, liefen
+sie ins Leere.
+
+Ein Rest verriet, wohin sie gehört hätten: `immowertv.js` führt eine
+fertige Tabelle `eq_roof → dach_inkl_daemmung` … **ohne einen einzigen
+Leser.** Sie zielt allerdings auf **Anlage 2** (Modernisierungspunkte) —
+und das ist der falsche Platz. „Dreifachverglasung" sagt etwas über den
+STANDARD, nicht über eine Modernisierung. Der richtige Platz ist
+**Anlage 4** (Standardstufe).
+
+### Was gebaut wurde
+
+Neue `lib/ausstattung_stufen.js`: aus sechs Feldern entsteht ein
+Standardstufen-**Vorschlag** je Gewerk.
+
+```
+aussenwaende 23 · dach 15 · fenster_tueren 11 · sanitaer 9 ·
+heizung 9 · fussboeden 5              = 72 von 100 Wägungsanteilen
+```
+
+**Drei Grenzen, die ausdrücklich eingehalten werden:**
+
+1. **Stufe D, nicht amtlich.** Die Zuordnung „Dreifachverglasung → Stufe 4"
+   ist eine sachverständige Einordnung, kein Abdruck aus Anlage 4. Der
+   Vermerk steht am Ergebnis.
+2. **Die eigene Angabe gewinnt immer** — auch wenn sie niedriger ist. Ein
+   Vorschlag, der eine Eingabe überschreibt, ist kein Vorschlag.
+3. **72 Anteile ergeben KEINE Standardstufe.** `standardstufeAusGewerken()`
+   verlangt volle 100; die restlichen drei Gewerke bleiben eine
+   Einschätzung. Aus 72 hochzurechnen wäre eine Behauptung.
+
+**Gemessener Lauf:**
+
+```
+einfaches Haus   {aussenwaende:2, dach:1, fenster:1, sanitaer:2, heizung:1, boeden:1}
+gehobenes Haus   {aussenwaende:3, dach:4, fenster:4, sanitaer:5, heizung:5, boeden:4}
+  - Gäste-WC hebt die Sanitärstufe von 4 auf 5
+  - Energieträger hebt die Heizungsstufe von 4 auf 5
+Abdeckung        72 von 100  ->  stufe: null, Grund genannt
+mit den drei     stufe 4 (roh 3,95)
+eigene Angabe    Vorschlag 3 -> genommen 2 (eigene_angabe)
+```
+
+### Dazu: was ein Feld bewirkt, steht am Feld
+
+17 Wirkungszeilen unter den Eingabefeldern — „Zustand, Qualität und
+Modernisierung wirken zusammen bis ±22 % auf den Marktwert", „+2 %, wenn
+vorhanden", „Geht in die Standardstufe ein (Wägungsanteil 23 — der größte)".
+Die Zahlen sind aus `ValuationService.js` gemessen, nicht geschätzt.
+
+### v1345b, eigener Fehler
+
+`cond`, `energy` und `baths` landeten in **keinem** Block. Die Sicherung aus
+v1340d hatte recht: `cond` und `energy` stehen in DERSELBEN `.row`, ich
+hatte sie auf zwei Gruppen verteilt — eine Zeile mit Feldern zweier Gruppen
+wird von beiden verworfen. Die Gruppen folgen jetzt den tatsächlichen
+Zeilen UND der Reiter-Zuordnung.
+
+Und noch einmal die Backslash-Falle aus FALLEN 140: `\u00e4` im
+perl-Ersatz wurde zu `00e4`. Diesmal mit echten Umlauten geschrieben.
+
+### Abnahme
+
+17 Wirkungszeilen, keine fehlt · keine doppelten Ids · 10 Blöcke mit
+korrekten Umlauten · Zähler arbeiten.
+
+### Commits
+
+`9b2226b` v1345 · `f1fc6d6` v1345b
+
+## v1346–v1347b · Stil wie der Objekt-Tab, Felder wachsen mit der Tiefe — 13.09.2026
+
+Zwei Wünsche von Marcel, beide umgesetzt.
+
+### v1346 · Der Stil, gemessen statt geraten
+
+Am laufenden Tab Objekt ausgelesen (`#s0 .card.qz-card`) und angeglichen:
+
+| | Tab Objekt (Soll) | Marktbericht (Ist, nachgemessen) |
+|---|---|---|
+| Karte | `#fff` · Goldrand 22 % · r12 · 22/24 · Schatten | ✓ |
+| Kopf | DM Sans **700** · 11,5px · VERSALIEN · ls 1,4 · `rgb(154,127,51)` | ✓ |
+| Label | Inter **500** · 11px · normal | ✓ |
+| Feld | r8 · DM Sans 13px | ✓ (Höhe 42 statt 38 — Polsterung) |
+
+**Mein Mono-Versalien-Label aus v1340c war genau falsch herum:** die App
+setzt Versalien am KARTENKOPF, nicht am Label. Zurückgenommen.
+
+DM Sans wird jetzt auch im iframe geladen — dieselbe Schrift wie die
+Haupt-App.
+
+**Eine Abweichung, bewusst:** unter 768 px bleibt die Feldhöhe bei 44 px und
+die Schrift bei 16 px. 38/13 sind auf dem Handy zu klein, und v1077-mb-touch
+hat das teuer gelernt (iOS zoomt unter 16 px hinein).
+
+**Zwei eigene Fehler beim Angleichen, beide dieselbe Ursache:**
+
+- **v1346b:** `font-size:13px` angeordnet, 15 px angekommen — der Hell-Skin
+  in `index.html` setzt `font-family` für jedes `input` mit `!important`.
+- **v1346c:** auch mit `!important` blieb die Schrift Inter. **Bei ZWEI
+  `!important` gewinnt die höhere Spezifität**, und `html[data-mb-theme]
+  input` (0,1,2) schlägt `.mbk-block input` (0,1,1). Mit dem Attribut davor
+  sind es (0,2,2).
+
+### v1347 · Die Felder wachsen mit der gewählten Tiefe
+
+Marcels Vorgabe: *„Marktpreisindikation klicke ich an. Es werden unten nur
+die Felder angezeigt, die ich brauche. … Wenn ich Wertermittlung anklicke,
+dann werden die anderen auch noch mit angezeigt."*
+
+**Die Zuordnung ist aus `BEDARF` (mb-stufen.js) abgeleitet** — der einzigen
+Stelle, die weiß, was eine Stufe verlangt:
+
+| Stufe | Blöcke |
+|---|---|
+| 1 Marktpreisindikation | Wo steht das Objekt · Eckdaten · Geld |
+| 2 Erweiterte | + Zustand und Qualität · Aufzug · Flächen · Stellplätze |
+| 3 Wertermittlung | + Energie und Heizung · Innen · Dach und Wände |
+
+Die drei Ausstattungsblöcke kommen erst bei Stufe 3, weil sie seit v1345 die
+**Standardstufe nach Anlage 4** speisen — die braucht nur das
+Sachwertverfahren.
+
+**Minimiert, nicht entfernt.** Der Kopf bleibt stehen und sagt „ab
+Wertermittlung · einblenden"; ein Klick öffnet. **Ein Block mit Inhalt
+klappt NIE von selbst zu** — Eingaben verschwinden nicht aus dem Blick. Ein
+Stufenwechsel setzt die Handaufklapper zurück.
+
+**Gemessen:**
+
+```
+geklickt 1 -> gewaehlt=1 | OFFEN(3)  | ZU(7)
+geklickt 2 -> gewaehlt=2 | OFFEN(7)  | ZU(3)
+geklickt 3 -> gewaehlt=3 | OFFEN(10) | ZU(0)
+```
+
+**v1347b:** `stufenFilter` und `gewaehlteStufe` nach außen exportiert. Der
+erste Prüflauf las zu früh und meldete fälschlich „öffnet nicht wieder" —
+eine Funktion, die man nicht aufrufen kann, misst man über Umwege, und
+Umwege messen etwas anderes.
+
+### Abnahme
+
+390 / 768 / 1024 px: kein Überlauf, kein Versatz, Feldhöhe 44 px unter
+768 px · Stil deckungsgleich mit dem Objekt-Tab · Stufenfilter 3 → 7 → 10.
+
+### Commits
+
+`42ce090` v1346+v1347 · `6b71a67` v1347b · `92e7150` v1346b · `34ba2ec` v1346c
+
+## v1348–v1348c · Ganze Schritte fallen weg, alles Zurückgestellte sieht gleich aus — 13.09.2026
+
+### 1 · Weniger Reiter statt minimierter Blöcke
+
+Marcel: *„ich würde aber vlt die bereiche dann oder den gesamten schritt
+ausblenden. die folge hat dann halt weniger tabs."*
+
+Die Stufe steht seit v1129 in `SCHRITTE[].stufe` — **hier wird keine zweite
+Liste geführt.**
+
+| Stufe | sichtbare Reiter | weg |
+|---|---|---|
+| 1 | Übersicht · Objekt | 5 |
+| 2 | + Zustand · Ausstattung · Gebäude & Außen | 2 |
+| 3 | alle sieben | 0 |
+
+Dazu eine Fußzeile: *„5 weitere Schritte erscheinen, wenn du eine größere
+Tiefe wählst."* — sonst wirkt es wie ein Verlust statt wie eine Verkürzung.
+
+**Drei Dinge müssen zusammenpassen, sonst entsteht eine Sackgasse:**
+
+1. der Reiter verschwindet,
+2. „Weiter" **überspringt** ihn (`nachbar()` statt `_aktiv ± 1`, und die
+   Knöpfe sperren gegen die sichtbaren Schritte statt gegen
+   `SCHRITTE.length`),
+3. fällt der **gerade offene** Schritt weg, wandert die Ansicht mit.
+
+Ohne das dritte stünde man vor einem leeren Blatt.
+
+**Ein Schritt mit Inhalt bleibt immer stehen** — dieselbe Regel wie bei den
+Blöcken (v1347).
+
+**Gemessen:**
+
+```
+Start        1Übersicht · weiter=frei    zurück=gesperrt
+nach Weiter  2Objekt    · weiter=gesperrt zurück=frei
+nochmal      2Objekt    · unverändert (kein Sprung ins Leere)
+nach Zurück  1Übersicht · wie am Anfang
+```
+
+### 2 · Ein Aussehen für alles Zurückgestellte
+
+Marcel: *„achte darauf das alles gleich aussieht alle ausgeblendeten sachen
+werte felder. das sieht irgendwie manchmal nicht einheitlich aus."*
+
+Er hatte recht — **vier Muster waren nebeneinander gewachsen**: der
+Reiter-Hinweis (v1196), der Stufen-Vorhang (v1344), die minimierten Blöcke
+(v1347) und die Fehlt-Markierung.
+
+Jetzt zwei Klassen zentral in `mb-wizard.js`, die anderen Dateien greifen
+darauf zu: `.mb-zurueck` (Kasten) und `.mb-auf` (Knopf).
+
+**v1348c, der eigentliche Fehler dabei:** die alten Einzelregeln haben die
+gemeinsamen ÜBERSCHRIEBEN. Gemessen:
+
+```
+vorher   Kästen: 3 · zwei Stile (Radius 8 und 10, graue Ränder)
+         Knöpfe: 3 · gefüllter Goldknopf gegen Umriss
+nachher  Kästen: 3 · EIN Stil (Inter 12,5px, Radius 10, Goldrand 26 %)
+         Knöpfe: 3 · EIN Stil
+```
+
+Die Lösung war **wegnehmen, nicht überschreiben**: eine dritte Regel hätte
+das Problem verdoppelt. Ebenso raus: der doppelte Reiter-Zugriff aus
+`mb-quellen.js` — zwei Hände an derselben Klasse waren genau die
+Uneinheitlichkeit.
+
+### Commits
+
+`1329f0d` v1348 · `15d6e58` v1348b · `e3b6d1b` v1348c
+
+### v1349–v1350b · Der Weg vor dem Audit
+
+`v1349` zog die gemeinsamen Klassen `.mb-zurueck` / `.mb-auf` durch,
+nachdem `v1348c` gezeigt hatte, dass gemeinsame Klassen nichts nützen,
+solange die alten Einzelregeln daneben stehen bleiben. **Beim
+Vereinheitlichen wird die alte Regel entfernt, nicht überschrieben.**
+
+`v1350` war der erste Griff in die Einstellungen: `.ds-pane-title` stand
+in Cormorant Garamond 22 px — eine Serifenschrift mitten in einem
+Formular, in dem alles andere DM Sans 15 px ist. Dazu `.ds-setting-row`
+von 130 px auf 172 px Labelspalte, weil die Beschriftungen umbrachen.
+
+`v1350b` war eine eigene Nachlässigkeit: der Gold-Audit meldete neues
+Hartgold in `mb-karten.js` (0 → 2) und `mb-wizard.js` (1 → 3) — meine
+eigenen Werte aus der Objekt-Tab-Messung, hart eingetippt statt als
+`var(--wl-…)`. Danach stand die Basislinie bei **467 Fundstellen in 55
+Dateien**, einen Eintrag niedriger als vorher. Der Deckel darf sinken.
+
+### Commits
+
+`ca4e4c1` v1349 · `73f4fd1` v1350 · `439800c` v1350b
+
+---
+
+## Audit „Aktionen / Einstellungen" — v1351 bis v1354
+
+Marcels Auftrag: *„geh das einmal komplett durch, mach da mal einen
+Audit… können wir es besser sortieren, können wir es übersichtlicher
+machen?"* Mit der ausdrücklichen Auflage: *„Sachen, die überflüssig
+sind, könnten wir rausschmeißen. Müsstest du aber vorher einmal
+sagen."*
+
+### v1351 · Ein Kommentar, der seit V112 falsch war
+
+In `settings.js` stand:
+
+```
+// V111: DS1 + DS2 schließen sich gegenseitig aus — Plan-Konfig steuert
+```
+
+**Das stimmt nicht, und es stimmte nie.** Gemessen in `config.js`:
+
+| Plan | `deal_score_basic` | `deal_score_v2` |
+|---|---|---|
+| Free | `true` | `'demo'` |
+| Starter | `true` | `false` |
+| Investor | `true` | `true` |
+| Pro | `true` | `true` |
+
+Marcel dazu wörtlich: *„der dealscore ist ja aus dem Quickcheck oder der
+einfachen Bewertung wenn du den Starter Plan hast. Sobald du den Investor
+Plan hast und die passenden Felder ausgefüllt hast kannst du den DS2 also
+Investor Deal Score ZUSÄTZLICH sehen."*
+
+**Der Code war immer richtig, nur seine Beschreibung war falsch.** Das
+ist die gefährlichere Sorte Fehler: wer den Kommentar liest, baut den
+nächsten Griff auf einer Annahme auf, die der Code nicht teilt.
+
+### v1352 · Ein Profil zeigt seine Zahlen, nicht seine Absicht
+
+Zwei Befunde im Reiter Deal Score, beide gemessen:
+
+**1. Gleiche Höhe, weil ein Satz zu lang war.** Die sechs Profilkarten
+standen in zwei Reihen von **161 und 143 px**. Ursache war genau *ein*
+Text: „Konservativ" hatte 122 Zeichen und brauchte eine vierte Zeile,
+die das ganze Raster mitzog. **Kein Layoutfehler — ein Textfehler.**
+
+**2. Prosa beantwortet die Frage nicht.** Marcel: *„Wie setzen sie sich
+zusammen? Welchen Einfluss haben sie auf den Score? Das gehört
+sichtbar."* „Strengere Bewertung mit Fokus auf Substanz" sagt nichts.
+**40 % Lage statt 10 % sagt alles.**
+
+`getPresets()` gibt seitdem zwei abgeleitete Größen mit:
+
+- `weights` — die effektiven Hauptgewichte, `DEFAULTS` überschrieben mit
+  `overrides`. Nicht die Overrides allein: ein Profil, das nur drei von
+  fünf Gewichten anfasst, sähe sonst löchrig aus.
+- `schaerfe` — `+1` strenger, `0` Standard, `−1` lockerer, abgelesen an
+  der Bruttorendite-Schwelle für 80 Punkte.
+
+**Warum die Schärfe überhaupt mitkommt:** die Gewichte verschweigen den
+zweiten Hebel. Konservativ verlangt **8 %** Bruttorendite für dieselben
+80 Punkte, für die Optimistisch **6 %** genügen. Zwei Profile können
+identische Gewichte tragen und trotzdem verschieden streng sein.
+
+Beides wird bei jedem Aufruf frisch abgeleitet. **Eine zweite Liste mit
+Anzeigewerten wäre genau die Doppelliste**, an der die Score-Stufen
+schon einmal auseinandergelaufen sind.
+
+### v1352b · Der Deckel, der gerade entfernt wurde, war fast wieder da
+
+Nachgemessen: Karten jetzt gleich hoch (125/126 px), aber genau die zwei
+Karten *mit* Schärfe-Pille schnitten ihre Zahlenzeile ab — „Rendite 30 %
+· Finanz. 30 % ▲ strenger" passt nicht in 208 px.
+
+**Die Zeile zu kürzen wäre derselbe Fehler in klein gewesen.** Sie darf
+jetzt umbrechen und ist dafür fest zwei Zeilen hoch. Dazu der eine Pixel:
+mit 1,5 px Rand und 2 px bei der aktiven Karte war die Reihe mit der
+Aktiven einen Pixel höher als die andere.
+
+### v1353 · Der Kasten im Kasten
+
+`.ds2-settings-body-inline` war auf **480 px** gedeckelt und scrollte —
+sein Inhalt ist **2019 px** hoch. Darüber scrollt `.pane-wrap` ohnehin
+schon. Man sah also nicht einmal ein Viertel des Reiters.
+
+**Zwei Rollbalken übereinander lesen sich nicht als „hier geht es
+weiter", sondern als „hier ist etwas abgeschnitten"** — und genau so
+hatte Marcel es auch beschrieben.
+
+Dazu der Gewichtsbalken: fünf Goldtöne nebeneinander ergaben im
+Screenshot **eine Fläche, keinen Balken.** Die Töne wechseln jetzt
+zwischen hell und dunkel statt durchzulaufen, und zwischen den Segmenten
+steht eine Fuge. **Die Fuge trägt die Lesbarkeit, nicht die Farbe** —
+damit funktioniert der Balken auch beim Mandanten, dessen Goldtöne enger
+beieinanderliegen können. Alle fünf Werte stehen als `var(--wl-<hex>)`
+und in `WL_TINTS`.
+
+### v1354 · Umlaute im Nutztext, ein Anbietername zu viel
+
+**Gesucht wurde nicht im Code, sondern im sichtbaren Text aller elf
+Reiter** — dort steht, was der Kunde wirklich liest. Genau zwei Stellen:
+
+- Reiter „Externe Anbieter": „Meta-Suche **fuer** Off-Market-Deals",
+  „**Zugaenge**", „**Loeschen**", „**Verschluesselt**"
+- Reiter „Account & Sicherheit": „**Schuetze** deinen Account"
+
+Mehr gibt es nicht. `ae/oe/ue` gehören in Kommentare, nie in Nutztext.
+
+Dazu ein Verstoß gegen die Anbieter-Neutralität: unter den API-Keys stand
+*„Weitere Anbieter (PriceHubble) folgen."* CLAUDE.md ist da eindeutig —
+Sprengnetter und PriceHubble werden nach außen nie namentlich genannt,
+ImmoMetrica darf. Jetzt: *„Weitere Bewertungspartner folgen."*
+
+### Der Befund, der noch keine Änderung ist
+
+**„Profil & Anzeige" ist zwei Reiter in einem.** Gemessen: 3.933 Zeichen,
+**14 Blöcke**, 3.038 px — der mit Abstand größte Einstellungsreiter.
+Die Blöcke zerfallen sauber in zwei Hälften:
+
+| Hälfte | Blöcke | Was sie tun |
+|---|---|---|
+| Rechenvorgaben | Finanzierung · Bewirtschaftung · Mindest-Schwellen · Steuer · Standort & Nebenkosten | fließen in **jede** Kalkulation ein |
+| Darstellung | Anzeige-Optionen · Aussehen · Markt-Daten · Investor Deal Score beim Öffnen · Quickboarding · Bilder · Tooltip-Hilfe · Marktbericht-Design · Darstellung | ändern **keine** Zahl |
+
+Der Name sagt es selbst: „Profil **und** Anzeige". **Hier wird nichts
+angefasst, bevor Marcel entschieden hat** — er hat ausdrücklich verlangt,
+vor dem Aufräumen gefragt zu werden.
+
+Dazu drei kleinere Befunde aus demselben Durchgang:
+
+- **Der Datenraum lebt nur im Browser.** `dp_datenraum_v141` liegt
+  ausschließlich im `localStorage`; ein Gerätewechsel kostet alle
+  Verknüpfungen. Bei einem Bereich, aus dem Bank-Anfragen verschickt
+  werden, ist das ein Ausfallrisiko — und es gehört zu Block B, wo
+  ohnehin Logik vom Browser ins Backend wandern soll.
+- **„Externe Anbieter" ist ein ganzer Reiter für einen Anbieter** —
+  380 Zeichen, 238 px, vier Bedienelemente.
+- **„Rechtliches" ist reiner Lesetext** — 7.722 Zeichen, 25
+  Überschriften, **null Bedienelemente** — in einem Dialog, der sonst
+  zum Einstellen da ist.
+
+### Commits
+
+`0c0e73c` v1351/v1352 · `7307f90` v1352b · `28cbbdf` v1353 ·
+`882fb86` v1354
+
+
+### v1355 · Marcels Entscheidungen, umgesetzt
+
+Er hat alle vier Empfehlungen übernommen. Zwei davon waren Umbau:
+
+**„Profil & Anzeige" ist jetzt „Standardwerte" und „Darstellung".**
+Gemessen nach der Teilung — die Hälften sind fast exakt gleich groß:
+
+| | vorher | nachher |
+|---|---|---|
+| Profil & Anzeige | 3.933 z · 3.038 px · 14 Blöcke | — |
+| Standardwerte | — | 1.971 z · 1.495 px · 5 Blöcke |
+| Darstellung | — | 1.961 z · 1.489 px · 9 Blöcke |
+
+**Der Schnitt lag schon im Reiter drin.** Die Trennlinie zwischen
+„Standort & Nebenkosten" und „Anzeige-Optionen" hat die beiden Hälften
+vorher im selben Reiter getrennt; sie ist damit überflüssig geworden.
+
+**„Externe Anbieter" ist kein Reiter mehr.** 380 Zeichen, vier
+Bedienelemente, ein Anbieter. Der Host steht jetzt im Account-Pane, der
+Lazy-Render hängt an `'account'` statt an `'anbieter'`. Account wuchs
+von 1.185 auf 1.566 Zeichen — genau die 381, die der andere Reiter trug.
+
+**Elf Reiter sind zehn geworden**, und keiner davon ist mehr über
+3.000 px hoch.
+
+Die Initialisierung bedient beide neuen Reiter gemeinsam
+(`pane === 'standardwerte' || pane === 'darstellung'`). Sie ist
+durchgehend defensiv — jeder Griff prüft erst, ob sein Ziel existiert.
+**Eine aufgeteilte Initialisierung wäre die nächste Doppelliste**
+gewesen.
+
+### Der Befund zu den Schwellen — gemessen, noch nicht entschieden
+
+Marcels vierte Antwort war „erst messen, dann entscheiden". Die Messung
+ist eindeutig und fällt anders aus als die Frage vermuten ließ:
+
+**Die drei „Persönlichen Mindest-Schwellen" haben keinen Leser.**
+
+```
+min_dscr · min_cashflow_vor_st · max_ltv
+  geschrieben in  investment-profile.js  (das Formular)
+  vorbelegt in    config.js              (1,20 · 0 € · 90 %)
+  gelesen von     — niemandem —
+```
+
+Gegengeprüft über alle Konsumenten des Profils: `main.js` fragt über
+`_dpProfil()` genau sieben Schlüssel ab — `bwk_anteil_default`,
+`bwk_ul_pct_default`, `grenzsteuersatz`, `mietausfall_pct`,
+`notar_grundbuch`, `tilgung_default`, `zinsbindung_default`. Die drei
+Schwellen sind nicht darunter, und auch sonst nirgends im Frontend, im
+Backend oder in einer Anzeige.
+
+**Die Frage nach zwei konkurrierenden Schwellensystemen hat sich damit
+erledigt — es gibt nur eines.** Das andere ist ein Formular, das in
+einen Speicher schreibt, aus dem nie jemand liest.
+
+Das ist zum siebten Mal in dieser Sitzung dasselbe Muster: **ein Feld
+ohne Leser sieht aus wie ein Feld.** Marcel trägt dort eine Zahl ein,
+sieht sie beim nächsten Öffnen wieder und darf annehmen, sie wirke.
+
+Zwei Wege, beide brauchen seine Entscheidung:
+
+- **Anschließen** — die Schwellen als persönliche Ampel neben den Score
+  stellen („dein Mindest-DSCR ist 1,20, dieses Objekt liegt bei 1,08").
+  Das wäre das, was die Felder versprechen.
+- **Wegräumen** — drei Felder weniger, dafür keine falsche Zusage mehr.
+
+### Commits
+
+`6ba2e99` v1355
+
+
+## v1356 / v1357 · Die Kaufgrenzen bekommen einen Leser
+
+Marcels Entscheidung zu A8 war **anschließen, nicht wegräumen**. Die drei
+Schwellen stehen jetzt als eigene Ampel im Deal-Score-Panel.
+
+**Neben dem Score, nicht im Score.** Die Schwellen sind seine persönliche
+Kaufgrenze, keine Bewertung. Ein Objekt kann 82 Punkte holen und trotzdem
+unter seinem Mindest-DSCR liegen. Würde die Schwelle in den Score
+einfließen, wäre sie nicht mehr ablesbar — und der Score hätte zwei
+Bedeutungen. Die Fußzeile sagt das dem Nutzer auch ausdrücklich.
+
+Die Istwerte kommen aus `deal`, nicht aus einer zweiten Rechnung:
+`_buildDeal2FromState()` trägt `dscr`, `ltv` und `cashflowMonatlich`
+bereits — **dieselben Zahlen, die der Score benutzt.**
+
+### Vier Korrekturen, alle beim Nachmessen gefunden
+
+Das Stück ist in vier Anläufen entstanden. Jeder Fehler kam aus einer
+Annahme, die eine Messung widerlegt hat.
+
+**v1356b — die Spanne gehört zur Kennzahl, nicht in eine Formel.**
+Erst stand dort `Math.abs(sollN) * 0.1`. Im Trockentest, bevor die Ampel
+je ein Objekt gesehen hatte:
+
+| | Spanne aus der Formel | passend? |
+|---|---|---|
+| DSCR, Grenze 1,20 | 0,12 | ja |
+| LTV, Grenze 90 % | **9 Punkte** | nein — 95 % galt noch als „knapp" |
+| Cashflow, Grenze 0 € | **0,10 €** | nein — `Math.abs(0)*0.1 \|\| 0.1` |
+
+**Eine Formel, die für alle drei gleichzeitig falsch ist, ist schlechter
+als drei ehrliche Zahlen.** Jetzt: 0,10 · 100 € · 2 Prozentpunkte, als
+Parameter.
+
+**v1357 — die Kaufgrenzen warten nicht auf den Score.** Gemessen am
+Objekt `d9f56595`: Kaufpreis 300.000, Miete 900 — DSCR, Cashflow und LTV
+stehen damit fest. Der Investor Deal Score erscheint aber erst ab 70 %
+von 24 KPIs, hier waren es **46 %**. Die Ampel hing an ihm und war damit
+genau dann unsichtbar, wenn man sie am dringendsten braucht: beim ersten
+Blick auf ein neues Objekt. Sie steht jetzt auch im Sperrbildschirm.
+
+**v1357 — zwei Gründe, eine Ampel.** Dabei fiel auf: der volle Panel
+liegt auf Obsidian (`#050505`), der Sperrbildschirm dagegen auf der
+hellen Grundfläche (`#F8F6F1`) — gemessen, nicht vermutet. Dieselben
+hellen Töne wären dort unsichtbar gewesen. Statt jede Regel doppelt zu
+schreiben, tragen die Regeln lokale Variablen; `.ds2-grenzen-hell`
+tauscht sechs Werte aus. **Die Ampelfarben bleiben in beiden Fällen
+dieselben** — Grün und Rot bedeuten auf hellem wie auf dunklem Grund
+dasselbe.
+
+**v1357b/c — null ist kein Wert, und `d_total` gibt es nicht.**
+Zwei Befunde nacheinander, beide am selben Objekt:
+
+Ohne eingetragene Finanzierung liefert die KPI-Engine `dscr = 0` und
+`ltv = 0`. Die Ampel las das als „Grenze 1,20 verfehlt" und zeigte ein
+rotes Kreuz — obwohl es kein Darlehen gibt, das gedeckt werden müsste.
+Genau die Falle aus `CLAUDE.md`: **`Number(null)` ist 0 und besteht
+`Number.isFinite`.**
+
+Die Reparatur war dann selbst falsch: ich prüfte auf
+`State.kpis.d_total` — **diesen Schlüssel gibt es dort nicht.** Die
+Bedingung war damit immer unerfüllt, und beide Zeilen sagten in jedem
+Fall „ohne Finanzierung", auch bei eingetragenem Darlehen. Gefunden nur,
+weil der Durchlauf **mit** Eigenkapital exakt dasselbe Ergebnis lieferte
+wie der ohne.
+
+> **Ein Leser, der ins Leere greift, sieht aus wie ein Leser.** In dieser
+> Sitzung zum achten Mal dasselbe Muster — diesmal von mir selbst gebaut,
+> beim Beheben genau dieses Musters.
+
+Die Schlüssel, die es wirklich gibt, sind `kd_dscr` (Kapitaldienst) und
+`d1` (Darlehen). Sie werden getrennt geprüft, weil sie verschiedene
+Fragen beantworten: **der DSCR deckt den Kapitaldienst, der LTV misst die
+Darlehenssumme.**
+
+### Abnahme
+
+Neun Fälle im Trockentest (grün/gelb/rot je Kennzahl, beide Richtungen,
+fehlender Ist- und fehlender Sollwert) und zwei echte Objekte:
+
+| Objekt | DSCR | Cashflow | LTV |
+|---|---|---|---|
+| `2026-1004` | 1,83 ✓ | 494 €/Mon ✓ | 83,9 % ✓ |
+| `2026-1033` | 1,37 ✓ | 86 €/Mon ✓ | 70,5 % ✓ |
+
+Die Werte stimmen mit `State.kpis` überein — der Leser greift.
+
+### Nebenbefund: die PRE-FLIGHT-Karte nennt zwei Anbieter beim Namen
+
+Beim Screenshot der Objektansicht aufgefallen: in der PRE-FLIGHT-Karte
+stehen unter „Marktbewertung" die **Logos von Sprengnetter und
+PriceHubble**, mit `alt="Sprengnetter"` und `alt="PriceHubble"`.
+
+`CLAUDE.md` ist eindeutig: *Sprengnetter und PriceHubble nie namentlich
+nach außen — „unabhängige Bewertungspartner". ImmoMetrica darf genannt
+werden.* Ein Markenlogo ist eine namentliche Nennung, und diese hier steht
+prominenter als die Textstelle, die `v1354` im Einstellungsreiter behoben
+hat.
+
+**Nicht angefasst** — die Karte ist ein zentrales Bedienelement, und
+welche Quellen dem Nutzer wie angeboten werden, ist eine
+Produktentscheidung. Marcel bekommt den Befund vorgelegt.
+
+### Commits
+
+`17a4d5f` v1356 · `f35f238` v1356b · `6cf0cbc` v1357 ·
+`5bee222` v1357b · `be6ef13` v1357c
+
+
+## B1 · Bestandsaufnahme — was heute im Browser liegt
+
+Erster Punkt aus Marcels Schutz-Lastenheft. Die Frage war nicht „wie
+sicher ist die App", sondern: **welches Wissen liegt im Klartext beim
+Nutzer?**
+
+### Der Rahmen
+
+`frontend/` hat **keinen Bundler, keinen Build-Schritt, keine
+Minifizierung.** `index.html` lädt **158 einzelne `<script src=…>`** als
+unveränderten Quelltext. Gemessen auf dem Staging-Server:
+
+```
+157 JS-Dateien · 5,3 MB · unminifiziert
+js/dealscore2.js → 37 KB, 933 Zeilen, alle Kommentare
+```
+
+Ausgeliefert wird damit nicht nur die Logik, sondern die **vollständige
+Kommentierung** — und die ist hier fachlich ergiebig: Herleitungen aus
+Gutachten, Excel-Nachbauten, gemessene Fehlerfälle, Quellen mit
+Abrufdatum. **Ein Nachbauer bekommt Code plus Begründung plus
+Kalibrierungshistorie.**
+
+### Die fünf teuersten Stellen
+
+**1 · `js/dealscore2.js` (933 Zeilen) — der größte Einzelverlust.**
+Kein „eine Formel", sondern ein kalibriertes Modell: 5 Hauptgewichte,
+**24 Sub-Gewichte**, **13 Schwellenkurven** als Stützpunktlisten,
+2 Range-Bucket-Tabellen (LTV, Tilgung), Energieklassen-Mapping,
+7 kategoriale Skalen, die **LTV×DSCR-Interaktionsregel** (+5/−20/−25) und
+**6 fertige Anlegerprofile**. Dazu die Kommentare „war 4 → jetzt 5", die
+verraten, *wie* kalibriert wurde. Wer die Datei kopiert, hat das
+Produktversprechen.
+
+**2 · `js/ui.js` Z. 547–625 — der Analyse-Prompt.**
+Prompt-Engineering im Klartext: Rollendefinition, die verbindliche
+**„DEALPILOT-BEWERTUNGSSKALA"** mit vorgeschriebenem Wortlaut je
+LTV-/DSCR-Band, die Anti-Halluzinations-Regeln (erkennbar aus echten
+Fehlausgaben entstanden) und die 7-Block-Ausgabestruktur mit
+Längenvorgaben. Ein Wettbewerber spart sich die gesamte
+Iterationsschleife — **und bekommt denselben Ton**, also genau das, was
+Kunden als „die KI von DealPilot" wahrnehmen.
+
+**3 · `js/tax.js` (2.106) + `afa-engine.js` (313) + `calc.js` (4.240).**
+Die deutsche Steuer- und Finanzierungsmechanik als lauffähiges Paket:
+§ 32a EStG mit Originalkoeffizienten, AfA linear/degressiv/§ 7b samt
+Wechsel-Optimierung, die 15-%-Grenze für anschaffungsnahe
+Herstellungskosten, Anschlussfinanzierungs-Phasen,
+Bausparvertrags-Zuteilung. **Das Backend hat davon nichts** —
+`taxService.js` ist reine Persistenz, ein SQL-Upsert über 43 Spalten ohne
+eine einzige Steuerformel. Der Aufwand steckt nicht in den Paragrafen,
+die sind frei; er steckt in der Verzahnung mit Cashflow und Restschuld.
+
+**4 · Das Sachverständigen-Paket (~1.490 Zeilen).**
+`bmf-data.js` (69 Bauindex-Jahrgänge, 64 Grundstücksarten × 5
+Kennwerte), `bmf-afa.js` (BMF-Sachwertverfahren komplett nachgebaut),
+`rnd-calc.js` (Punktraster Anlage 2, 9 Gewerke mit Gewichtung),
+`rnd-bte-katalog.js` (~190 Bauteile nach DIN 276-1), `rnd-gnd-table.js`
+(30 GND-Sätze). **Besonders heikel:** die RND-Formel ist laut Kommentar
+aus zwei konkreten Originalgutachten rückwärts abgeleitet und gegen deren
+Ergebnisse validiert. Dieses Reverse Engineering ist schwer wiederholbar
+und steht als Fließtext im Quelltext.
+
+**5 · `js/config.js` (1.374 Zeilen) — unterschätzt.**
+Alle Standardannahmen des Produkts (BWK-Quoten, Mietausfall, Wert- und
+Mietsteigerung, Mindest-DSCR, Grenzsteuersatz, Nebenkostenpauschalen),
+die **Bankmargen je Bonitätsstufe**, die Pfandbrief-Zinsstruktur — plus
+die **vollständige Plan-, Feature- und Kontingentmatrix**. Die
+Annahmen sind die „Hausmeinung", auf der jede Zahl im Produkt ruht; die
+Matrix zeigt einem Wettbewerber Preisarchitektur und Gating auf einen
+Blick.
+
+### Der Querschnittsbefund, der die Reihenfolge bestimmt
+
+**Es gibt drei Score-Engines und drei ESt-Tarife, unabhängig voneinander:**
+
+| | Kopien |
+|---|---|
+| Scoring | `dealscore2.js` · `dealscore.js` · `QcEngine` in `quickcheck-app.html` |
+| ESt-Tarif | `tax.js` · `dashboard.js` (Z. 636) · `rnd-calc.js` (Z. 495) |
+
+**Eine Verlagerung muss alle Kopien erfassen**, sonst bleibt das Modell
+über die übersehene Variante weiter rekonstruierbar. Das ist kein
+Schönheitsfehler, sondern bestimmt den Zuschnitt jedes Pakets.
+
+### Was bereits serverseitig liegt — und gut geschützt ist
+
+Der **gesamte ImmoWertV-Kern des Marktberichts** liegt im Backend:
+`nhk2010.js`, `immowertv.js`, die Sachwertfaktor- und Mietmodelle,
+`gutachterausschuss.js`, `verfahrenswahl.js`, `erbbaurecht.js`, dazu die
+Services und BORIS-Connectoren. Ebenso die serverseitigen KI-Prompts
+(`openaiService.js`, `report_prompt.txt`), die BMF-Pipeline über
+LibreOffice und — **entscheidend** — die Durchsetzung von Plan, Credits
+und Limits.
+
+> **Das Geld ist geschützt, das Wissen nicht.** Objekt-, KI- und
+> PDF-Kontingente werden in `middleware/planLimits.js` serverseitig
+> geprüft. Wer im Browser seinen Plan hochschaltet — `DealPilotConfig`
+> ist global, beschreibbar und konfigurierbar, gemessen —, sieht mehr
+> Knöpfe, bekommt aber keine einzige zusätzliche KI-Analyse.
+
+### Ein eigener Befund: der Direktweg zu OpenAI
+
+`quickcheck-app.html` Z. 5299 ff. ruft **`api.openai.com` direkt aus dem
+Browser** auf, mit einem Schlüssel aus `localStorage` (`ji_ak_oai`). Das
+ist kein IP-Schutzthema, sondern ein eigenes: ein API-Schlüssel im
+Browserspeicher, ein Pfad, der am Backend und damit an jeder Zählung,
+jedem Limit und jedem Protokoll vorbeiläuft.
+
+### Der Ist-Zustand der Abwehr, gemessen
+
+| | Stand |
+|---|---|
+| Rate-Limit | **100 Anfragen / 60 s** (`printenv` im Container — **nicht** die 200/900 s aus `config.js`), **IP-basiert** |
+| Normalnutzung | **57 API-Anfragen in 24 s** für Start + drei Objekte |
+| Rollen | `users`: nur `admin`/`user`. Getrennt `admin_users` mit owner/support/readonly + TOTP |
+| Audit | `admin_audit_log` existiert — nur **Admin**-Aktionen, kein Nutzerverhalten |
+| Kopfzeilen | HSTS, nosniff, SAMEORIGIN, Referrer-Policy gesetzt · **keine CSP** |
+
+**Das Limit ist zu eng und an der falschen Größe.** Bei 57 Anfragen in
+24 Sekunden ist ein zügiger Nutzer nach gut einer halben Minute bei über
+der Hälfte — und weil es an der IP hängt, teilen sich mehrere
+Mitarbeiter hinter einem Firmenanschluss dasselbe Kontingent. Genau das
+löst Marcels eigene Anforderung B3: **je Account statt je IP.**
+
+### Ein toter Schalter seit dem 01.06.2026
+
+```js
+const limiter = rateLimit({
+  skip: function (req) { /* v395: eingeloggte App-Requests nicht limitieren */ … },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.path.startsWith('/health')      // ← diese gewinnt
+});
+```
+
+**`skip` steht zweimal im selben Objektliteral.** In JavaScript gewinnt
+die zweite Eigenschaft; die Ausnahme aus `v395` (Commit `94e4f6f`,
+01.06.2026) ist seit ihrer Einführung wirkungslos. Für das Schutzsystem
+ist der Zufallszustand der bessere — aber **die Datei sagt seit über drei
+Monaten das Gegenteil von dem, was sie tut.**
+
+### Die Erkennungsgrundlage für B3, gemessen statt geschätzt
+
+| Merkmal | Normalnutzung | Auslese-Skript |
+|---|---|---|
+| Endpunktgruppen | **12 verschiedene** | ein bis zwei |
+| Streuung der Abstände | **5,13** (Variationskoeffizient) | nahe null |
+
+**Vielfalt und Unregelmäßigkeit unterscheiden besser als Frequenz.** Ein
+Mensch klickt stoßweise und löst dabei zwölf verschiedene Dinge aus; ein
+Skript zieht gleichmäßig eine Sache ab. Das trifft Marcels Vorgabe aus
+B18 — Fehlalarme vermeiden, statt jeden schnellen Nutzer zu sperren.
+
+
+## v1358 / v1359 · Der Sprechlauf hört zu, aber er handelt nicht danach
+
+Marcel hatte am Morgen des 12.09.2026 vier Screenshots in
+`design/mockups/` abgelegt — `fehler1.png` bis `fehler 4.png`. Drei davon
+zeigen denselben Befund aus verschiedenen Winkeln.
+
+**Der gemeinsame Grund: der Sprechlauf erkannte Angaben nur, wenn sie
+Ziffern trugen oder allein standen.**
+
+### v1358 · Die Verneinung steht nicht immer vorne
+
+`fehler 4.png`. Auf die Frage nach Investment-These, Risiken und Notizen:
+
+> **„Investmentthese habe ich keine."**
+> → *„Ich habe … verstanden, aber nichts gefunden, was hierher passt.
+> Sag es einfach nochmal."*
+
+**Zwei Sätze vorher hatte derselbe Co-Pilot dieselbe Verneinung für zwei
+andere Felder akzeptiert.**
+
+`RF_NEIN` verlangt, dass die Verneinung den **ganzen** Text ausmacht;
+`RF_NEIN_TEIL` prüft Satzteile, die **mit** der Verneinung beginnen.
+Beides passt nicht auf „Thema zuerst, Verneinung danach" — und genau so
+spricht man Deutsch: *„Balkon haben wir keinen", „Garage gibt es nicht",
+„Stellplätze sind keine".*
+
+Neu: `RF_NEIN_HINTEN` plus `_rfThemaVerneint()`. **Es genügt nicht, dass
+der Satz auf eine Verneinung endet** — er muss außerdem das *gefragte*
+Thema nennen. Die Stichworte stehen ohnehin im Katalog (`kw`) und im
+Label. „Nichts unter 300.000" bleibt damit weiter keine Verneinung, und
+ein Satz über ein anderes Feld fällt nicht fälschlich in diesen Zweig.
+
+### v1358 · Eine Null ist eine Angabe
+
+`fehler 2.png`:
+
+> **„Kannst du auch aus den Einstellungen übernehmen. Keine
+> Maklerprovision."**
+> → Die Übernahme lief, die Ausnahme fiel weg, und der Co-Pilot fragte
+> zurück, ihm fehle *„die genaue Höhe der verbleibenden
+> Kaufnebenkosten"*.
+
+Die standen im selben Atemzug in den Einstellungen, die er gerade
+übernommen hatte.
+
+Grund: `_rfRestNachAktion` reichte den Rest nur weiter, wenn er eine
+**Ziffer** trug. „Keine Maklerprovision" trägt keine — und ist trotzdem
+eine Angabe, nämlich null Prozent. **Wer „keine" sagt, hat geantwortet,
+nicht geschwiegen.** Eine blanke Verneinung ohne Gegenstand bleibt
+draußen; die ist im Zweifel die Antwort auf den Befehl selbst.
+
+### v1359 · Zwei Dinge, die gleich heißen
+
+`fehler3.png`. Marcel antwortet *„1,5 % Wertsteigerung, 2 %
+Mietsteigerung und 0 % Leerstand"* — und die **nächste** Frage fragt
+wieder nach „Wertsteigerung".
+
+**Gemessen: das ist keine Doppelfrage.** Es sind zwei verschiedene
+Felder, die fast gleich heißen:
+
+| Feld | Label | wofür |
+|---|---|---|
+| `wertstg` | „Wertsteigerung %" | die Zahl in der Prognoserechnung |
+| `ds2_wertsteigerung` | „Wertsteigerungs-Erwartung" | sehr hoch … keines, für den Score |
+
+Der Code ist also richtig, **und trotzdem hat Marcel recht**: die zwei
+Fragen stehen direkt hintereinander (Rang 14 und 15), und die zweite
+benutzt dasselbe Wort für etwas anderes. Wer das liest, denkt, er habe
+gerade geantwortet.
+
+**Ein Fehler, der keiner ist, bleibt trotzdem einer** — er kostet
+Vertrauen in jede weitere Frage. Der Co-Pilot sagt jetzt den Unterschied,
+und zwar nur dann, wenn die Zahl schon steht.
+
+### Abnahme — und was sie zusätzlich gefunden hat
+
+14 Fälle gegen die Muster **aus der Datei**, dann drei Fälle gegen die
+laufende Maschine mit ihrem echten Katalog, dann der Durchstich:
+
+```
+Frage 14 (Investment-These) · getippt: „Investmentthese habe ich keine."
+  Index danach ......................... 15   (übersprungen)
+  „nichts gefunden, was hierher passt" . erscheint nicht
+  „Sag es einfach nochmal" ............. erscheint nicht
+```
+
+**Drei eigene Fehler fielen dabei auf:**
+
+1. **Der erste Prüflauf meldete drei Fehler — die Datei war heil.** Das
+   Testskript hatte die Muster in ein Heredoc abgetippt, und das halbiert
+   Backslashes: aus `\\s` wurde `s`. Der Test prüfte eine kaputte
+   Abschrift. Seitdem liest das Skript die Muster **aus der echten
+   Datei**.
+2. **`q{}` in Perl zählt Klammern.** Eine CSS-Regel mit geschweiften
+   Klammern zerlegte den Ersatztext und hinterließ ein `},` mitten im
+   JavaScript.
+3. **`_rfThemaVerneint` warf, sobald kein Sprechlauf lief** —
+   `_rf.catalog` auf `null`. Im Betrieb kam das nie vor; der Prüfhaken
+   aus `v1359b` fand es **im ersten Aufruf**. Ein Prüfhaken, der wirft,
+   ist keiner (`v1359c`).
+
+Alle drei stehen in `FALLEN.md` beziehungsweise sind jetzt dort.
+
+### Commits
+
+`34605ba` v1358 · `aa3b23b` v1359 · `e12feae` v1359b · `8663a4c` v1359c
+
+
+## v1360 · B2 beginnt — der Analyse-Prompt ist aus dem Browser verschwunden
+
+Marcels Wahl für den Startpunkt von B2. Der Befund war besser als
+erwartet: **die Verlagerung war schon passiert, nur das Aufräumen
+fehlte.**
+
+### Was dort stand
+
+78 Zeilen Prompt in `ui.js`: Rollendefinition, die verbindliche
+**„DEALPILOT-BEWERTUNGSSKALA"** mit vorgeschriebenem Wortlaut je LTV- und
+DSCR-Band, die Anti-Halluzinations-Regeln („Ein LTV von 84 % ist SOLIDE …
+bezeichne ihn NIE als hoch") und die Sieben-Block-Ausgabestruktur samt
+Längenvorgaben. `B1` nennt das als **zweitteuerste Auslesestelle** der
+Anwendung.
+
+### Warum er dort nichts mehr tat
+
+`openaiService.js` baut denselben Prompt seit Langem serverseitig — ab
+Zeile 34, die Bewertungsskala ab 86, sogar mit ausführlicheren Regeln.
+Gemessen an der laufenden Maschine:
+
+```
+GET /api/v1/ai/status
+  { available: true, server_key_configured: true,
+    accepts_user_key: true, model: "gpt-4o-mini", web_search: true }
+```
+
+**`available` ist im Backend hart auf `true` gesetzt** (`ai.js:197`), mit
+dem Kommentar „Backend nimmt User-Keys an, auch ohne Server-Key". Damit
+war `serverMode` in `_runAIGuarded()` immer wahr — und der
+Frontend-Prompt seit **V26 unerreichbar.** Er wurde nicht mehr
+ausgeführt, nur noch ausgeliefert.
+
+### Was mitging
+
+`_runAIClient()` rief **`api.openai.com` direkt aus dem Browser** auf.
+Der Weg ist weg, die Funktion nicht: `/ai/analyze` nimmt seit V26 einen
+`userApiKey` im Body entgegen (`ai.js:214`), und `_buildAIPayload()`
+schickt ihn längst mit (`ui.js:866`). Wer einen eigenen Schlüssel pflegt,
+wird weiterhin bedient — **jetzt aber mit Zählung, Limit und einem
+Prompt, der den Server nie verlässt.**
+
+Offen bleibt nur der Fall, dass das Backend gar nicht erreichbar ist.
+Dafür steht jetzt eine klare Meldung statt eines stillen Umwegs — und in
+dem Fall funktioniert ohnehin nichts anderes in der App.
+
+**Unterm Strich 167 Zeilen weniger im ausgelieferten Code.**
+
+### Abnahme
+
+Gegen den **ausgelieferten** Text, nicht gegen die Arbeitskopie:
+
+| geprüft | Ergebnis |
+|---|---|
+| Bewertungsskala, Anti-Halluzination, Ausgabestruktur, Rollendefinition | **alle vier weg** |
+| `fetch('https://api.openai.com` | **weg** |
+| `renderAIResponse` (wird auch von `storage.js:475` gebraucht) | erhalten |
+| `_runAIServer`, `_buildAIPayload`, `payload.userApiKey` | erhalten |
+| `runAI` und `renderAIResponse` als Funktionen geladen | ja |
+
+### Eine eigene Fehldiagnose, zurückgenommen
+
+Ich hatte notiert, `_buildAIPayload()` schicke den Nutzerschlüssel
+**nicht** mit. **Das stimmt nicht** — er steht in `ui.js:866`. Mein
+`grep` hatte `head -5` und `ui.js` lag darunter. Der entsprechende
+Patch-Teil wurde vor dem Anwenden entfernt; er hätte eine zweite,
+konkurrierende Stelle geschaffen — genau die Doppelliste, vor der dieses
+Journal an anderer Stelle warnt.
+
+---
+
+## Der zweite Direktweg — B21, gemessen, nicht angefasst
+
+`quickcheck-app.html` Z. 5290 ff. (`runRealAi`) ruft ebenfalls
+`api.openai.com` direkt auf, mit einem Schlüssel aus einem Eingabefeld.
+
+**Warum das nicht mit v1360 mitging:** Der Quick-Check ist eine eigene
+Seite im iframe und hat **keine Auth-Anbindung** — `Auth.apiCall` kommt
+dort null mal vor. Er spricht mit der Hauptanwendung ausschließlich über
+`postMessage` (qc-bridge). Der Umbau heißt also: Anfrage über die Brücke
+reichen, in der Hauptanwendung authentifiziert weiterleiten, Antwort
+zurückspielen — plus ein Backend-Endpunkt, denn das Payload-Format des
+Quick-Checks passt auf keinen bestehenden. Das ist ein eigenes Paket,
+kein Nebenschritt.
+
+---
+
+## A9 wird größer: die Anbieter-Neutralität betrifft mehr als eine Karte
+
+Beim Lesen des Quick-Check-Prompts fiel auf, dass er **PriceHubble
+namentlich** nennt. Die Suche danach zeigt: das ist kein Einzelfall.
+
+| Ort | was |
+|---|---|
+| PRE-FLIGHT-Karte (Objektansicht) | Logos beider Anbieter, `alt="Sprengnetter"` / `alt="PriceHubble"` |
+| `quickcheck-app.html` | Auswahlkacheln mit Logos, `title="Sprengnetter"` |
+| ebenda | Meldung „🏛 PriceHubble wird angefragt…" |
+| ebenda | `provider: 'PriceHubble'`, `source: 'PriceHubble'` in den Daten |
+| ebenda, Z. 5309 | der KI-Prompt nennt „AVM-Daten (PriceHubble)" |
+| Einstellungen | **behoben in v1354** |
+
+`CLAUDE.md`: *Sprengnetter und PriceHubble nie namentlich nach außen —
+„unabhängige Bewertungspartner". ImmoMetrica darf genannt werden.*
+
+**Nichts davon angefasst.** Es ist ein Thema, nicht sechs Fundstellen,
+und es gehört als ein Vorgang entschieden: entweder die Marken erscheinen
+nach außen oder nicht. Ein Flickenteppich — Prompt geändert, Logos
+stehen gelassen — wäre schlechter als beides. Marcel entscheidet.
+
+### Commits
+
+`051e003` v1360
+
+
+## v1361 – v1363 · B2 ohne Einschränkungen
+
+Marcels Vorgabe für den weiteren Weg: *„alles muss genauso funktional
+bleiben wie bisher. es darf keine einschränkungen geben."*
+
+Das schließt den naheliegenden nächsten Schritt aus — den Deal Score
+serverseitig zu rechnen, denn das kostet Latenz bei jeder Eingabe. Also
+zuerst das, was Schutz bringt, **ohne irgendetwas zu verändern**: die
+Duplikate.
+
+### v1361 · Ein Steuertarif, nicht zwei
+
+`dashboard.js` trug eine zweite, eigene Fassung des § 32a EStG. Sie war
+nicht nur überflüssig — **sie war bereits auseinandergelaufen.** Beide
+Fassungen durchgerechnet, Code aus den echten Dateien gelesen statt
+abgetippt:
+
+| | `tax.js` | `dashboard.js` |
+|---|---|---|
+| Grundfreibetrag | 11.604 | **11.784** |
+| Rundung | `Math.floor` | **`Math.round`** |
+
+Neunzehn Stützstellen gerechnet: bis zu **43 €** Abweichung in der
+Eingangszone, **1 €** überall dort, wo die Rundung kippt. **§ 32a EStG
+schreibt Abrundung vor** — `tax.js` macht es richtig, die Kopie nicht.
+
+Der Betrag ist klein, der strukturelle Fehler nicht: wer den Tarif
+aktualisiert, muss es sonst zweimal tun, und die zweite Stelle vergisst
+man. **Genau so ist der Unterschied entstanden.** `CLAUDE.md` sagt es
+unter „Rechenkerne — nie duplizieren".
+
+> **Noch offen und für Marcel:** es gibt eine **dritte** Stelle mit
+> Steuerlogik — `rnd-calc.js:492` schätzt den *Grenzsteuersatz* (eine
+> andere Größe, kein Tarif) und benutzt dafür die Zonengrenzen
+> 12.096 / 17.443 / 68.480. Damit stehen im Code **drei verschiedene
+> Grundfreibeträge**: 11.604, 11.784, 12.096. `tax.js` trägt dabei den
+> Kommentar „Tarif 2026". Welcher Jahrgang gelten soll, ist eine
+> Fachfrage — sie gehört Marcel, nicht mir.
+
+### v1362 · Erst rechnen, dann anzeigen
+
+**Gemessen, bevor etwas geändert wurde:** eine einzige Eingabe im
+Kaufpreisfeld löste **acht** Score-Berechnungen aus, über drei Wege:
+
+```
+3x  updHeaderBadges       (calc.js:174)
+2x  _dpComputeDS2Cached   (calc.js:4031)
+2x  renderDealScore2      (dealscore2-ui.js:340)
+1x  weiterer Durchlauf
+```
+
+Die Entprellung von rund zwei Sekunden greift — die Mehrfachrechnung
+**innerhalb** einer Runde nicht.
+
+Die Ursache stand offen da: in `_calcImmediate` kam `updHeaderBadges()`
+**vor** `_dpComputeDS2Cached()` und acht Zeilen später noch einmal, mit
+dem Kommentar „Header neu mit gecachtem Wert". **Der zweite Aufruf war
+der Beleg, dass der erste zu früh kam** — `updHeaderBadges` liest den
+Cache und rechnet nur selbst, wenn er leer ist. Vor dem Cache-Aufruf war
+er das immer.
+
+### v1363 · Denselben Score nicht zweimal rechnen
+
+Übrig blieben vier, zwei davon aus `renderDealScore2`.
+`_dpComputeDS2Cached()` rechnet unmittelbar vorher **exakt dasselbe** —
+derselbe `_buildDeal2FromState()`, dieselbe `compute()`. Es legt jetzt
+Ergebnis, Deal und Zeitpunkt ab; `renderDealScore2` nimmt den frischen
+Cache.
+
+**Warum ein Zeitfenster und kein schlauer Vergleich:** „stammt dieser
+Cache aus demselben Zustand?" lässt sich nicht zuverlässig prüfen, ohne
+den Zustand selbst zu vergleichen — und das wäre teurer als die Rechnung.
+**300 ms** sind kurz genug, dass in der Zwischenzeit keine Eingabe
+passiert sein kann, ohne dass `calc()` erneut lief und den Cache
+erneuert hätte. Ist er älter oder fehlt er, wird wie bisher gerechnet.
+
+Nebenbei die zweite Doppelliste entschärft: **`_dpLastDs2` und
+`_dpLastDS2Result`** — zwei Cache-Namen, die sich nur in einem
+Buchstaben unterscheiden. `_dpLastDs2` (gelesen von `ui.js:799`) entstand
+bisher eigenständig in `dealscore2-ui.js`; es wird jetzt im Cache
+mitgesetzt. Zwei Namen bleiben zwei Namen, aber sie haben **eine
+Quelle**.
+
+### Das Ergebnis, gemessen
+
+```
+8 Berechnungen (Ausgang)  ->  4 (v1362)  ->  2 (v1363)
+```
+
+Gegenprobe am selben Objekt: Kaufpreis von 288.000 auf 265.000 gesenkt,
+Score steigt von **72 auf 79** — die Rechnung reagiert also weiterhin,
+und plausibel. Die Kaufgrenzen aus `v1356/v1357` stehen unverändert.
+
+**Keine Einschränkung an irgendeiner Stelle.** Dieselben Werte, nur
+einmal statt viermal gerechnet.
+
+### Warum das für B2 zählt
+
+Jede dieser Berechnungen wäre bei einer Serververlagerung **eine
+Anfrage**. Das Limit liegt bei 100 pro Minute (gemessen per `printenv`).
+Mit acht Anfragen je Eingabe wäre jede Verlagerung von vornherein
+unmöglich gewesen; mit einer ist sie machbar — **die Serverrunde
+dauert 34 ms**, gemessen gegen `/ai/status`.
+
+Das ist der eigentliche Ertrag dieser drei Pakete: nicht der gesparte
+Rechenaufwand, sondern dass der Weg zum Backend jetzt überhaupt offen
+steht.
+
+### Commits
+
+`7daeae0` v1361 · `5af0379` v1362 · `9a15087` v1363
+
+
+## v1364 · Der Tarif steht an einer Stelle und kennt sein Jahr
+
+Marcels Auftrag: *„mir wäre wichtig, dass wir immer die aktuellen sätze
+verwenden für das entsprechende jahr. können wir das automatisch holen
+und abgleichen? das darf ja nicht an 3 stellen unterschiedlich sein. hol
+das mal für 2026 und pass es an."*
+
+### Es war an drei Stellen unterschiedlich — und keine davon war 2026
+
+| Datei | Wert |
+|---|---|
+| `tax.js` | Grundfreibetrag **11.604**, Kommentar sagte „Tarif 2026" |
+| `dashboard.js` | Grundfreibetrag **11.784** (zusammengeführt in `v1361`) |
+| `rnd-calc.js` | Zonengrenzen **12.096 / 17.443 / 68.480** |
+
+**Der Wert 11.604 ist nicht einmal ein gültiger Jahrgang.** Er war der
+ursprünglich *geplante* Grundfreibetrag 2024, bevor er auf 11.784
+angehoben wurde — und stand seitdem unter der Überschrift „Tarif 2026".
+
+### Die Quelle ist das Gesetz, nicht eine Suchmaschine
+
+Abgerufen am 13.09.2026 von `gesetze-im-internet.de/estg/__32a.html`,
+amtliche Fassung *„ab dem Veranlagungszeitraum 2026"*:
+
+```
+Grundfreibetrag      12.348
+Zone 2  bis  17.799  (914,51 · y + 1.400) · y      y = (x − 12.348)/10.000
+Zone 3  bis  69.878  (173,10 · z + 2.397) · z + 1.034,87   z = (x − 17.799)/10.000
+Zone 4  bis 277.825  0,42 · x − 11.135,63
+Zone 5   darüber     0,45 · x − 19.470,38
+```
+
+**Eine Suchmaschine lieferte zuvor abweichende Zahlen** — 954,80 statt
+914,51 und eine Zonengrenze von 17.005 statt 17.799. Die Primärquelle
+gewinnt; das ist derselbe Grundsatz, den `CLAUDE.md` für die
+Wertermittlung festhält („Der Prüfmaßstab ist das Anwendungsbeispiel des
+amtlichen Dokuments").
+
+### Gegengeprüft über die Stetigkeit
+
+Es gibt kein amtliches Rechenbeispiel zum Tarif. Die beste verfügbare
+Probe ist die **Stetigkeit an den Zonengrenzen**: falsche Koeffizienten
+erzeugen dort einen Sprung.
+
+```
+bei  12.348 EUR   0        -> 0          Stufe 0 EUR
+bei  17.799 EUR   1.034    -> 1.035      Stufe 1 EUR
+bei  69.878 EUR   18.213   -> 18.213     Stufe 0 EUR
+bei 277.825 EUR   105.550  -> 105.551    Stufe 1 EUR
+```
+
+Alles im Bereich der Rundung. Dazu geprüft: **42 %** Grenzbelastung in
+Zone 4, **45 %** in Zone 5, und die Abrundung auf volle Euro nach Satz 5
+— genau die Regel, an der die zweite Fassung in `dashboard.js` mit
+`Math.round` gescheitert war.
+
+### Der Tarif kennt jetzt sein Jahr
+
+`TARIFE` ist eine Jahrestabelle, `calcEStG(zvE, jahr)` wählt daraus.
+Fehlt ein Jahrgang, nimmt die Funktion den nächstälteren **und meldet das
+über `tarifInfo()`** — statt still eine andere Zahl zu rechnen.
+
+> **Warum nur ein Jahrgang drinsteht:** Für 2025 ließen sich die Zonen 4
+> und 5 nicht aus einer Primärquelle belegen (die Zonen 1–3 schon:
+> 12.096 / 17.443 / 68.480 mit 932,30 und 176,64). **Eine halb belegte
+> Zahl ist schlechter als keine.** Wer einen Jahrgang braucht, trägt ihn
+> dort ein — und alle drei Stellen bekommen ihn.
+>
+> Für die App ist das kein Mangel: sie rechnet Prognosen in die Zukunft.
+> Ein Objekt, das 2026 gekauft und fünfzehn Jahre projiziert wird, nutzt
+> durchgehend den Tarif 2026, weil künftige Tarife niemand kennt.
+
+### Die dritte Stelle
+
+`rnd-calc.js` nutzt jetzt `Tax.calcGrenzsteuersatz()`. **Was bleibt:**
+der Solidaritätszuschlag ab 96.000 € und der Deckel bei 47,5 %. Beides
+gehört nicht in den § 32a-Tarif, sondern ist die Näherung *dieser*
+Stelle — sie zu entfernen wäre eine Änderung am Ergebnis, und genau die
+soll es nicht geben.
+
+Der Rückfall für den Fall, dass `tax.js` fehlt, trägt bewusst **keine
+eigenen Jahreszahlen mehr**, sondern eine lineare Näherung. Eine zweite
+Staffel wäre wieder eine dritte Wahrheit.
+
+### Wirkung
+
+| zvE | vorher | jetzt |
+|---|---|---|
+| 45.000 | 9.155 | **8.835** |
+| 60.000 | 14.680 | **14.233** |
+| 120.000 | 39.797 | **39.264** |
+
+Der alte Tarif war drei Jahre alt — deshalb die Größenordnung.
+
+### Abnahme in der laufenden App
+
+```
+Tax.tarifInfo()  ->  Jahr 2026 · exakt · Grundfreibetrag 12.348
+                     Quelle: § 32a Abs. 1 EStG, Fassung ab VZ 2026
+dashboard.js     ->  nutzt Tax (keine eigene Fassung mehr)
+rnd-calc.js      ->  nutzt Tax, alte Staffel weg, Soli und Deckel bleiben
+Steuer-Tab       ->  keine NaN, keine undefined
+```
+
+### Zwei Beobachtungen am Rand
+
+**Der Grenzsteuersatz im Steuer-Tab ist ein Schalter, kein Automatismus.**
+`grenz_auto` muss angehakt sein; dann füllt `onGrenzAutoToggle()` das Feld
+aus `Tax.calcGrenzsteuersatz(zvE)` — und profitiert damit ab sofort vom
+Tarif 2026. Ist der Schalter aus, gilt der eingetragene Wert (Standard
+40,45 % aus `investmentProfileDefaults`). Das ist richtig so: eine
+Nutzereinstellung ist kein Tarif. Gemessen bei zvE 68.000 sagt der Tarif
+**41,5 %**, das Feld zeigte **40,45 %** — der Schalter war aus.
+
+**Das „automatisch holen" hat eine Grenze.** Es gibt keine amtliche
+Schnittstelle, die die Tarifparameter maschinenlesbar ausliefert. Der
+ehrliche Weg ist der gewählte: eine Jahrestabelle mit Quellenangabe je
+Jahrgang, an einer Stelle, mit einem Prüfhaken (`tarifInfo`), der sagt,
+welcher Jahrgang gerade rechnet.
+
+### Commits
+
+`ed08931` v1364
+
+
+## v1365 · Die dritte Score-Engine — und ein Rückfall, der nicht greifen konnte
+
+`B1` hatte `QcEngine.computeScore` im Quick-Check als dritte,
+eigenständige Scoring-Engine gezählt. **Gemessen ist sie das nicht:**
+aktiv ist `_dpPilotScore`, und das rechnet über `DealKpis.compute()` und
+`DealScore.computeFromKpis()` — also über genau die kanonischen Kerne,
+die `CLAUDE.md` unter „Rechenkerne — nie duplizieren" nennt.
+`QcEngine.computeScore` ist der **Rückfall**.
+
+### Der Rückfall konnte nicht greifen
+
+```js
+const score = window._dpPilotScore ? window._dpPilotScore(...)
+                                   : QcEngine.computeScore(...);
+```
+
+Geprüft wurde, ob die **Funktion existiert** — nicht, ob sie ein Ergebnis
+geliefert hat. Sie steht am Ende derselben Datei und ist damit immer
+vorhanden; sie gibt aber `null` zurück, wenn `DealKpis` oder `DealScore`
+fehlen. **In genau dem Fall, für den der Rückfall gedacht ist, wurde er
+übersprungen** — und die nächste Zeile las `score.score` auf `null`.
+
+> Dasselbe Muster wie beim Prüfhaken in `v1359c`: **was nur auf Existenz
+> prüft, fällt nicht zurück, wenn das Ergebnis fehlt.** Ein Rückfall, der
+> nicht greifen kann, ist keiner.
+
+### v1365b · Und dann fiel auf, wie weit die beiden auseinanderliegen
+
+Nach der Reparatur mit **identischen Eingaben** gemessen
+(300.000 / 900 / 250 / 60.000 €):
+
+| Weg | Score |
+|---|---|
+| aktiv — `DealScore.computeFromKpis` | **15** |
+| Rückfall — `QcEngine.computeScore` | **30** |
+
+**Doppelt so viel, und ohne Hinweis nicht zu unterscheiden.**
+
+Das sind zwei verschiedene Modelle, und der Unterschied ist kein Fehler,
+sondern ihre Natur. Aber ein Score, der bei einer Kaufentscheidung um
+100 % danebenliegt, darf nicht ununterscheidbar danebenstehen — genau
+diese Sorte Widerspruch hat `v1203` schon einmal gekostet: derselbe
+Score, zwei verschiedene Wörter.
+
+Greift der Rückfall, steht unter dem Score jetzt:
+
+> *Ersatzrechnung — die Bewertungsmodule sind gerade nicht erreichbar.
+> Diese Zahl kann deutlich abweichen; bitte neu laden.*
+
+**Im Normalbetrieb sieht das niemand.**
+
+### Abnahme — beide Fälle am laufenden Quick-Check
+
+```
+Normalfall   Score 16 · Hinweis-Element gar nicht vorhanden
+Notfall      Score 31 · Hinweis sichtbar, rot (rgb(184,98,92))
+Erholung     Score 16 · Hinweis wieder leer
+```
+
+Der Notfall wurde erzeugt, indem `DealKpis` im iframe zur Laufzeit
+entfernt wurde — also genau der Zustand, für den der Rückfall existiert.
+**Vor `v1365` stand dort ein TypeError und die Anzeige blieb leer.**
+
+### Zu `qc-bridge.js`
+
+Davon ist nur die Versionsziffer in Zeile 31 hochgezogen, damit die
+Reparatur am Browser-Cache vorbeikommt. **Das `qcpm`-Overlay ab Zeile
+~348, auf das sich der Nicht-anfassen-Vermerk in `CLAUDE.md` bezieht, ist
+unberührt.**
+
+### Was B1 an dieser Stelle korrigiert
+
+Die Bestandsaufnahme nannte drei Score-Engines. Richtig ist: **zwei
+Produkte und ein Notnagel.** DS1 und DS2 sind Marcels zwei Stufen
+(Quick-Check und Investor, ergänzend — siehe `v1351`), `QcEngine` ist der
+Rückfall. Die Zahl „drei" stimmte, die Deutung nicht.
+
+### Commits
+
+`2ed6838` v1365 · `f9dd7a3` v1365b
+
+
+## v1366 · Das Limit hängt am Konto, nicht an der Leitung
+
+**B2 ist damit abgeschlossen.** Marcels Entscheidung zur Verlagerung des
+Deal Scores selbst: *„dann lassen wir das raus. ist ja auch nicht hoch
+komplex."* Die Gewichtsmatrix bleibt bewusst im Browser — der Schutz wäre
+nur mit einer Serverrunde je Eingabe zu haben, und der Score ist den
+Preis nicht wert. Das ist eine Abwägung, keine offene Aufgabe.
+
+Weiter mit **B3** (Anomalie-Erkennung je Account) und **B16**
+(API-Endpunkte, Rate-Limits).
+
+### Zwei Befunde, ein Griff
+
+Bis hierher zählte `express-rate-limit` nach **IP**. Beides am
+13.09.2026 gemessen:
+
+**1. Zu eng für echte Arbeit.** Ein Seitenstart samt drei geöffneten
+Objekten erzeugt **57 API-Anfragen in 24 Sekunden**. Das Limit stand bei
+**100 pro Minute** — gemessen per `printenv` im Container, **nicht** die
+200 / 900 s, die in `config.js` als Default stehen.
+
+**2. Mehrere Mitarbeiter teilen sich einen Zähler.** Hinter einem
+Firmenanschluss laufen alle über dieselbe IP. Zwei Kollegen gleichzeitig,
+und einer bekommt 429 — ohne etwas falsch gemacht zu haben.
+
+Beides löst derselbe Griff: **wer eingeloggt ist, wird unter seiner
+Nutzerkennung gezählt** und bekommt 600 statt 100 pro Fenster
+(`RATE_LIMIT_MAX_ACCOUNT`, Standard 600). Wer nicht eingeloggt ist,
+bleibt bei IP und engem Limit — dort ist Vorsicht richtig.
+
+### Der Token wird gelesen, nicht geglaubt
+
+Die Zählung läuft **vor** jeder Route, also vor `authenticate`. Der Token
+wird deshalb nur dekodiert, um den Zähler-Eimer zu bestimmen. **Ein
+gefälschter Token träfe einen fremden Eimer** — schaden kann er nicht,
+denn die Route prüft ihn weiterhin richtig und lehnt ihn ab. Wer mit
+fremder Kennung zählt, verbraucht nur Anfragen, die er ohnehin nicht
+beantwortet bekommt.
+
+### Der tote Schalter ist weg
+
+```js
+skip: function (req) { /* v395: eingeloggte Requests nicht limitieren */ … },
+standardHeaders: true,
+legacyHeaders: false,
+skip: (req) => req.path.startsWith('/health')      // ← diese gewann
+```
+
+**`skip` stand zweimal im selben Objektliteral.** In JavaScript gewinnt
+die zweite Eigenschaft — die Ausnahme aus `v395` (Commit `94e4f6f`,
+01.06.2026) war seit **über drei Monaten wirkungslos.** Die Datei sagte
+das Gegenteil von dem, was sie tat. Für den Schutz war der Zufallszustand
+der bessere; jetzt steht es ausdrücklich da.
+
+### IPv6 bekommt ein Präfix, keine Adresse
+
+Bei IPv6 gehört einem einzelnen Anschluss ein ganzes /64-Netz. Wer darin
+die Adresse wechselt, hätte jedes Mal einen frischen Zähler — deshalb
+wird auf die ersten vier Blöcke gekürzt.
+
+> **`v1366b`, ein eigener Fehler:** Die eingebaute Prüfung dazu heißt in
+> `express-rate-limit` 7.5 schlicht `ip`. Mein erster Versuch hieß
+> `keyGeneratorIpFallback` — den kennt die Version nicht, und beim Start
+> stand deshalb eine `ValidationError`-Zeile im Log. Der Server lief, die
+> Meldung blieb. **Eine Fehlermeldung, die immer dasteht, wird nicht
+> gelesen** — dasselbe Prinzip, das beim Gold-Audit schon einmal galt.
+
+### B3-Vorarbeit: zählen, nicht urteilen
+
+Eine Überschreitung wird jetzt protokolliert — Konto, Pfad, Methode,
+Zeit. **Mehr passiert bewusst nicht.** Marcels Auflage im Lastenheft:
+
+> *„Eine technische Auffälligkeit oder ein automatisch erzeugter
+> Risikoscore darf NICHT automatisch als rechtlich bewiesener
+> Vertragsverstoß behandelt werden."*
+
+Das Protokoll ist die Grundlage, auf der B3 später Muster erkennen kann —
+zusammen mit der Messgrundlage, die schon steht: Normalnutzung trifft
+**12 verschiedene Endpunktgruppen** bei einem Variationskoeffizienten von
+**5,13**; ein Auslese-Skript trifft ein bis zwei Gruppen bei einer
+Streuung nahe null.
+
+### Abnahme an der laufenden Maschine
+
+```
+mit Token (Konto-Eimer)   RateLimit-Limit: 600   Rest: 583
+ohne Token (IP-Eimer)     RateLimit-Limit: 100   Rest:  92
+Startlog                  nur „Server listening" — keine Warnung mehr
+```
+
+Die verschiedenen Reststände zeigen, dass es wirklich **zwei getrennte
+Zähler** sind und nicht einer mit zwei Beschriftungen.
+
+### Commits
+
+`1506a70` v1366 · v1366b im selben Zug
+
+
+## v1367 · Sicherheitsereignisse bekommen eine Ablage
+
+**B3** (Anomalie-Erkennung je Account) und **B10** (Audit Trail,
+append-only).
+
+Seit `v1366` wird jede Limit-Überschreitung protokolliert — aber nur mit
+`console.warn` ins Container-Log. **Das ist flüchtig** (weg beim nächsten
+Rebuild), nicht durchsuchbar, nicht auswertbar. Ein Muster über Tage
+erkennt man darin nicht.
+
+### Was die Tabelle bewusst nicht enthält
+
+`security_events` (Migration 071) sammelt **Beobachtungen, keine Urteile.**
+Drei Dinge fehlen mit Absicht, alle drei aus Marcels Lastenheft:
+
+| fehlt | warum |
+|---|---|
+| **Risikoscore** | *„Eine technische Auffälligkeit oder ein automatisch erzeugter Risikoscore darf NICHT automatisch als rechtlich bewiesener Vertragsverstoß behandelt werden."* Die Bewertung ist ein zweiter Schritt und gehört einem Menschen. |
+| **Inhalte** | Gespeichert wird, *welcher* Endpunkt getroffen wurde — nicht, *was* übertragen wurde. Der Pfad wird vor dem `?` abgeschnitten. |
+| **User-Agent, Geräte-Merkmale** | *„Keine unnötige Überwachung des Endgeräts und keine heimliche Ausspähung."* |
+
+**Append-only ist ernst gemeint:** keine `updated_at`-Spalte, kein Weg im
+Code, eine Zeile zu ändern. Wer einen Fall bearbeitet, schreibt ein
+**neues** Ereignis dagegen — die Bearbeitungsspuren stehen damit in
+derselben Chronologie wie das, was sie bewerten.
+
+### Die zwei Kennzahlen
+
+Die Auswertung gibt **Zahlen zurück, kein Urteil**:
+
+- **Vielfalt** — wie viele verschiedene Endpunktgruppen getroffen wurden
+- **Streuung** — Variationskoeffizient der Abstände
+
+Beide kommen mit dem gemessenen Vergleichswert in derselben Antwort:
+Normalnutzung trifft **12 Gruppen bei Streuung 5,13**, ein Skript ein bis
+zwei bei nahe null. **Der Maßstab gehört zur Zahl** — sonst liest jemand
+„3" und weiß nicht, ob das viel ist.
+
+Unter fünf Ereignissen bleibt die Streuung `null`: bei drei Abständen ist
+ein Variationskoeffizient Rauschen. Und **`null` heißt „weiß ich nicht",
+nicht „unauffällig"**.
+
+### Abnahme an der laufenden Maschine
+
+108 anonyme Anfragen gegen ein Limit von 100:
+
+```
+99 × 200,  9 × 429        das Limit greift exakt bei 100
+9 Ereignisse geschrieben  ip_key gesetzt, user_id leer (anonym)
+Stufe 1–4: hinweis        ab 5: auffaellig — die Eskalation greift
+detail: { limit, fenster_s, ueberschreitungen_1h }  nur Zahlen
+pfad: /api/v1/plans       ohne Parameter
+```
+
+Dann die Auswertung mit fünf verschiedenen Pfaden:
+
+```
+Vielfalt 5 · Streuung 0,65     gegen Normalnutzung 12 / 5,13
+```
+
+Die Testdaten sehen aus wie ein Skript — **sie waren eins.** Genau das
+sollen die Kennzahlen zeigen.
+
+### Zwei eigene Fehler auf dem Weg
+
+**`v1367b` — das Backend lief in eine Neustartschleife.** Mein Import
+hieß `require('../db')`, das Modul heißt `../db/pool`. Ergebnis: *Cannot
+find module*, Status `Restarting`, `/health` tot.
+
+> **`node --check` prüft nur Syntax, keine Auflösung von `require`.** Das
+> steht wörtlich in `CLAUDE.md` — *„Verträge prüft nur ein echter Lauf"* —
+> und ich habe trotzdem nur geprüft statt aufgerufen. Der Fehler wäre in
+> einer Sekunde sichtbar gewesen.
+
+**`v1367c` — eine Kennzahl, die immer dasselbe sagt.** Die Vielfalt
+gruppierte nach dem ersten Pfadsegment — und das ist bei **jedem**
+Endpunkt `api`, weil alle mit `/api/v1/` beginnen. Gemeldet wurde immer
+`vielfalt: 1`.
+
+Gefunden nur, weil der Probelauf fünf verschiedene Pfade schrieb und die
+Antwort `1` sagte. **Dieselbe Sorte Fehler wie ein Leser, der ins Leere
+greift** — sie fällt nur auf, wenn man das Ergebnis gegen eine bekannte
+Erwartung hält.
+
+### Vor dem Eingriff gesichert
+
+`/root/backups/vor-071-20260913-0731.sql.gz`, 46 MB, Anfang gegengelesen
+(`zcat … | head -3`). Die Regel aus `CLAUDE.md`: *„Eine Sicherung, die man
+nicht ansieht, ist keine."*
+
+### Commits
+
+`6047716` v1367 · v1367b und v1367c im selben Zug
+
+
+## v1368 · B9 — Sicherheit / Missbrauchserkennung im Admin
+
+Seit `v1367` sammelt `security_events` Beobachtungen. **Ohne einen Ort,
+an dem man sie ansieht, liegen sie in einer Tabelle, die niemand
+öffnet** — und ein Protokoll, das keiner liest, ist so gut wie keins.
+
+### Drei Endpunkte, drei Fragen
+
+| | |
+|---|---|
+| `/security/events` | *Was ist passiert?* — Liste mit Filtern (Stufe, Art, Zeitraum, Suche über E-Mail, IP und Pfad) |
+| `/security/auffaellig` | *Wer fällt auf?* — verdichtet je Konto |
+| `/security/fall/:id` | *Was war bei diesem?* — die Fallakte aus B19 |
+
+### Kein Sperrknopf — und zwar mit Absicht
+
+**Nicht, weil er schwer zu bauen wäre.** Sondern weil ein Knopf neben
+einer Zahl dazu verführt, die Zahl für ein Urteil zu halten. Marcels
+Auflage steht über der ganzen Ansicht:
+
+> *„Eine technische Auffälligkeit oder ein automatisch erzeugter
+> Risikoscore darf NICHT automatisch als rechtlich bewiesener
+> Vertragsverstoß behandelt werden."*
+
+Wer sperren will, tut das in der Nutzerverwaltung — mit dem Fall vor
+Augen. Und die Rangliste sortiert nach **Zählung**, nicht nach einem
+Score: wie viele Ereignisse, wie schwer die schwerste Stufe, wann
+zuletzt. Mehr steht bewusst nicht da.
+
+### Drei Entscheidungen, die man sehen soll
+
+**Der Hinweiskasten steht VOR den Zahlen.** Wer zuerst rote Zahlen sieht
+und dann liest, dass es Beobachtungen sind, hat sich sein Urteil längst
+gebildet.
+
+**Die Fallakte zeigt jede Kennzahl mit ihrem Maßstab im selben Kasten** —
+Vielfalt gegen 12, Streuung gegen 5,13 aus der Messung echter Nutzung.
+Eine Kennzahl ohne Vergleichswert lädt zum Raten ein.
+
+**Gold ist die mittlere Stufe, nicht Rot.** „Auffällig" ist keine
+Anklage. Rot bleibt „ernst" vorbehalten.
+
+### Eigene Datei statt elfte Ansicht in `admin-app.js`
+
+Die hat 1.700 Zeilen und trägt zehn Ansichten; eine weitere
+hineinzuschreiben macht sie nicht besser. `admin-security.js` hängt sich
+über `data-view="security"` **selbst** ein — `admin-app.js` bleibt
+unangetastet.
+
+### Abnahme
+
+Die Oberfläche ist vollständig geladen:
+
+```
+Menüeintrag „Sicherheit"   vorhanden
+view-security              vorhanden
+view-security-fall         vorhanden
+AdminSecurity              geladen
+CSS (.sec-kachel)          greift (min-width 108px)
+```
+
+Die Kernabfrage direkt gegen die Datenbank, mit den Daten aus dem
+`v1367`-Test:
+
+| Zugriff | Ereignisse | versch. Pfade | höchste Stufe |
+|---|---|---|---|
+| anonym (IP) | 9 | **1** | auffällig |
+| Konto `info@junker-immobilien.io` | 6 | **5** | Hinweis |
+
+**Genau die Unterscheidung, für die die Kennzahl gebaut ist:** der
+anonyme Zugriff traf neunmal denselben Pfad — das ist das Muster eines
+Skripts. Das Konto traf fünf verschiedene.
+
+> **Was ich nicht prüfen konnte:** Der Adminbereich hat eine eigene
+> Anmeldung. Passwörter einzugeben ist mir verwehrt, also habe ich die
+> Endpunkte über ihre SQL-Abfragen an der echten Datenbank geprüft statt
+> über HTTP. Die Ansicht selbst muss Marcel einmal öffnen — sie ist
+> geladen und die Daten liegen bereit.
+
+### Zugriff
+
+`requireAdmin` genügt zum Lesen. Eine engere Rolle wäre hier falsch:
+**Support muss einen Fehlalarm nachvollziehen können**, sonst landet jede
+Rückfrage beim Inhaber.
+
+### Commits
+
+`8639165` v1368
+
+
+## v1369 · B4 — Risikostufen: wo die Maschine aufhört und der Mensch anfängt
+
+Marcels Stufenleiter aus dem Lastenheft:
+
+```
+NORMAL → AUFFÄLLIG → WARNUNG → HOHES RISIKO
+       → EINGESCHRÄNKT → GESPERRT → MANUELL FREIGEGEBEN
+```
+
+### Seine Entscheidung zieht die Trennlinie mitten hinein
+
+Gefragt war, **ab wann das System selbst eingreift**. Seine Antwort:
+*gar nicht.*
+
+| Stufen | wie |
+|---|---|
+| NORMAL · AUFFÄLLIG · WARNUNG · HOHES RISIKO | **berechnet** — Messwerte |
+| EINGESCHRÄNKT · GESPERRT · FREIGEGEBEN | **gesetzt** — Entscheidungen |
+
+Das System stuft ein und meldet; jede Einschränkung und jede Sperre setzt
+ein Mensch. **Das ist die strengste Auslegung seiner eigenen Auflage** —
+und die einzige, bei der ein Fehlalarm keinen zahlenden Kunden aussperrt.
+
+### Muster **und** Menge — die zweite Entscheidung
+
+Eine Stufe steigt nur, wenn **beides** zutrifft: viele Überschreitungen
+*und* ein skript-typisches Muster.
+
+```
+hohes_risiko   ab 50 Überschreitungen · Vielfalt ≤ 2 · Streuung ≤ 1,0
+warnung        ab 20 Überschreitungen · Vielfalt ≤ 3 · Streuung ≤ 1,5
+auffaellig     ab  5 Überschreitungen
+```
+
+**Warum das nötig ist, zeigt die Messung:** echte Nutzung trifft 12
+Endpunktgruppen bei einer Streuung von 5,13. Ein Nutzer mit großem
+Portfolio erzeugt viel Verkehr — aber *ungleichmäßig* und über viele
+Endpunkte. **Wer nur die Menge zählt, trifft zuerst den fleißigsten
+Kunden.** Das ist B18 wörtlich genommen.
+
+`streuung === null` heißt „zu wenig Daten" — **und zu wenig Daten dürfen
+nie eine höhere Stufe rechtfertigen.**
+
+### Kein eigenes Statusfeld
+
+Der Zustand ergibt sich aus der **jüngsten Entscheidung in der
+append-only-Chronik**. Ein zweiter Speicher daneben könnte auseinander-
+laufen, und dann hätte man zwei Wahrheiten darüber, ob jemand gesperrt
+ist.
+
+### Der Endpunkt verlangt drei Dinge
+
+1. **Eine Rolle** — lesen darf jeder Admin, entscheiden nur `owner` und
+   `support`. Wer einen Fall nur nachvollziehen soll, soll ihn nicht aus
+   Versehen schließen können.
+2. **Eine Begründung** — ohne Notiz kein Eintrag. Sonst steht in der Akte
+   später eine Sperre, die niemand prüfen kann. Der Knopf bleibt gesperrt,
+   solange das Feld leer ist.
+3. **Den berechneten Stand im Moment der Entscheidung** — mitgeschrieben,
+   damit später nachvollziehbar ist, worauf sie sich stützte.
+
+### Die Knöpfe stehen in der Fallakte, nicht in der Liste
+
+Wer entscheidet, soll die Chronik über sich haben und die Kennzahlen
+daneben. **Ein Knopf in einer Übersichtstabelle lädt dazu ein, nach der
+Zahl zu urteilen statt nach dem Fall.**
+
+Und: berechnete Stufen erscheinen in Grün und Gold, nur die von einem
+Menschen gesetzten in Rot. **Eine Maschine soll nicht rot leuchten.**
+
+### Abnahme — der vollständige Kreislauf
+
+```
+1. berechnet      Auffällig
+                  „6 Limit-Überschreitungen (Schwelle 5) · 5 Endpunkt-
+                   gruppen · Streuung 0,65 in 60 Minuten"
+2. Knöpfe         alle drei gesperrt (Notizfeld leer)
+   bei 2 Zeichen  weiterhin gesperrt
+   bei Begründung alle drei frei
+3. eingeschränkt  „Gesetzt von … · berechnet wäre: Auffällig"
+                  Notiz steht dabei, Eintrag oben in der Chronik
+4. freigegeben    wieder Auffällig, mit Vermerk wer und wann
+```
+
+Die Entscheidung schlägt die Berechnung — **und beide bleiben sichtbar.**
+
+### Drei eigene Fehler auf dem Weg
+
+**Die schließende Klammer verschluckt.** Mein Patch ersetzte das
+`ARTEN`-Objekt und ließ `};` weg. `node --check` hätte es gefunden — ich
+habe es gefunden, weil der Bash-Tool-Hinweis die geänderte Datei zeigte
+und die Zeile ins Auge sprang.
+
+**`[object Object]` in der Detail-Spalte.** Der Renderer setzte jeden Wert
+unbesehen in einen String; bei einem verschachtelten Objekt kommt genau
+das heraus. Jetzt werden Objekte flach ausgeschrieben und die Schlüssel
+tragen deutsche Namen — *was ein Mensch lesen soll, soll auf Deutsch
+dastehen.*
+
+**Ein Patch, der still nichts tat.** Der Teil, der Entscheidungszeilen
+markieren sollte, stand in einem `if (index(…) >= 0)` statt in der
+prüfenden `rep()`-Funktion. Der Anker traf nicht, das `if` übersprang den
+Block, **der Patch meldete Erfolg und die Datei war unverändert.**
+Gefunden nur, weil die Nachmessung `markierteEntscheidungen: 0` sagte.
+
+> Beim Nachziehen die nächste Falle derselben Familie: die beiden
+> Zeilenbauer sehen gleich aus und unterscheiden sich nur in der
+> Einrückung — **ein Anker mit zehn Leerzeichen trifft als Teilstring
+> auch die Zeile mit vierzehn.** Gelöst über Zeilennummern, von hinten
+> nach vorn, damit die Nummern stabil bleiben.
+
+### Commits
+
+`974cadf` v1369 · v1369b und v1369c im selben Zug
+
+
+## v1370 · B5 und B8 — die Meldung an den Nutzer und die an den Admin
+
+### B5 · Wenn das Kontingent voll ist, soll man es erfahren
+
+Das Sicherheitsereignis schreibt das Backend seit `v1367`. Was fehlte,
+war die **sichtbare** Meldung: bei HTTP 429 warf `Auth.apiCall` einen
+Fehler, und ob der ankam, hing vom Aufrufer ab. Meist passierte schlicht
+nichts — ein Knopf tat nichts, eine Liste blieb leer, und niemand wusste
+warum.
+
+**Der Ton ist dabei die eigentliche Arbeit.** Das System sperrt niemanden
+von selbst (`v1369`) — also darf die Meldung auch nicht so klingen, als
+stünde etwas bevor:
+
+> **Kurz durchatmen**
+> Du hast gerade sehr viele Anfragen in kurzer Zeit gestellt. DealPilot
+> bremst das automatisch ab, damit der Dienst für alle schnell bleibt.
+> *In etwa 45 Sekunden geht es normal weiter. Es passiert nichts weiter —
+> deinem Konto entsteht kein Nachteil.*
+
+Kein Vorwurf, keine Drohung, kein Hinweis auf Folgen, die es nicht gibt.
+**Wer diese Meldung sieht, hat in aller Regel einfach zügig gearbeitet.**
+
+Und sie erscheint **einmal**, nicht zehnmal: bei vollem Kontingent laufen
+oft zehn Anfragen gleichzeitig ins Limit. Zehn Meldungen übereinander
+wären eine Bestrafung für etwas, das keine ist.
+
+Der Handler legt sich um `Auth.apiCall` — **dasselbe Muster wie der
+401-Handler** (V156), damit es nur einen Ort gibt, an dem solche Antworten
+behandelt werden.
+
+### B8 · Adminbenachrichtigung
+
+Beobachtungen zu sammeln setzt voraus, dass jemand hinsieht. **Wer nachts
+um drei ausgelesen wird, erfährt es sonst am Montag.**
+
+Zwei Anlässe lösen eine Mail aus:
+
+| | |
+|---|---|
+| berechnete Stufe erreicht **WARNUNG** oder **HOHES RISIKO** | mit Ruhefenster (6 h je Konto) |
+| ein Mensch hat **eingeschränkt oder gesperrt** | ohne Ruhefenster |
+
+**„Auffällig" ausdrücklich nicht.** Diese Stufe erreicht jeder, der einmal
+zu schnell klickt — eine Mail dafür wäre nach drei Tagen Tapete, und dann
+liest auch die wichtige niemand mehr.
+
+**Geprüft wird nur an den Schwellen** (bei der 20. und 50.
+Überschreitung). Bei jeder Überschreitung nachzurechnen würde zwei
+Datenbankabfragen kosten — bei tausend Anfragen also zweitausend. Die
+Benachrichtigung wäre teurer als der Vorgang, den sie meldet, und würde
+das Problem verschlimmern.
+
+Der Mailtext berichtet **Zahlen und nennt den Maßstab daneben**. Er
+fordert nichts und schlägt nichts vor, und er sagt ausdrücklich:
+
+> *Das System hat NICHTS gesperrt und wird auch nichts sperren; jede
+> Einschränkung setzt ein Mensch.*
+
+Spam-Schutz über `app_alerts` — dieselbe Tabelle und dasselbe Muster wie
+`creditAlert.js` (v554).
+
+### Abnahme
+
+```
+B5  Handler geladen, Auth.apiCall umschlossen
+    Meldung erscheint, Text und Ton geprüft
+    drei Aufrufe hintereinander -> genau EINE Meldung
+    schließbar, verschwindet von selbst
+
+B8  'auffaellig' -> gesendet: false     (die Kernregel)
+    'normal'     -> gesendet: false
+    Empfänger info@dealpilot.immo · Ruhefenster 360 Minuten
+```
+
+> **Was ich bewusst nicht getestet habe:** den tatsächlichen Mailversand
+> bei WARNUNG oder HOHES RISIKO. Das hätte eine echte Mail ausgelöst, und
+> Nachrichten verschicke ich nicht ungefragt — auch nicht an die eigene
+> Betreiberadresse. Der Versandweg ist derselbe wie bei `creditAlert.js`
+> und dort seit v554 in Betrieb. Marcel kann eine Probemail auslösen
+> lassen, wenn er sie sehen will.
+
+### Ein Test, der schlecht gestellt war
+
+Der erste Entprellungstest meldete **null Meldungen statt einer**. Grund:
+die vorherige Meldung lief noch in ihrer Ruhephase, und die drei neuen
+Aufrufe fielen genau hinein. **Das war korrektes Verhalten** — mein Test
+hat den Zustand aus dem vorigen Prüflauf nicht berücksichtigt.
+
+Nach dem Neuladen stimmte es. Die Falle steht seit Langem in der
+Werkzeugnotiz: *Zustand aus dem vorigen Prüflauf verfälscht die nächste
+Messung.*
+
+### Commits
+
+`v1370` — B5 und B8 in einem Zug
+
+
+## v1371 – v1373 · Die Pipeline abgearbeitet: B11, B17, B20, B13–B15
+
+Marcels Auftrag: *„arbeite alle punkte ab die du kannst die noch in der
+pipeline sind."*
+
+### v1371 (B11) · Ausnahmen — befreit vom Limit, nicht vom Protokoll
+
+Marcels Auflage: *„Administratoren, Entwickler und ausdrücklich
+freigeschaltete Testkonten müssen weiterarbeiten können … Ausnahmen
+müssen rollenbasiert umgesetzt und **trotzdem protokolliert** werden."*
+
+**Der zweite Halbsatz ist der wichtige.** Eine Ausnahme ohne Protokoll
+wäre ein blinder Fleck: ausgerechnet die Konten mit den weitesten Rechten
+wären die, über die niemand etwas weiß. Entfernt wird deshalb nur der
+Bremsklotz, nicht die Beobachtung — das Ereignis trägt einen Vermerk.
+
+Rollen jetzt `owner` / `admin` / `developer` / `support` / `user`.
+**`admin` und `user` bleiben gültig**, damit der Bestand unverändert
+weiterläuft. Die Ausnahme ist eine eigene Spalte und keine weitere Rolle:
+**ein Testkonto kann ein ganz normaler `user` sein und trotzdem befreit.**
+
+> Die zwei Rollensysteme bleiben absichtlich getrennt: `users.role` sagt,
+> wer das in der *Anwendung* ist, `admin_users.role`, wer was im
+> *Adminbereich* darf. Ein Entwickler braucht Ausnahmen im Betrieb, aber
+> nicht zwingend Zugriff auf Kundendaten.
+
+### v1371 (B17) · Die Schwellen gehören dem Betreiber
+
+Bis hierher standen sie als Konstante im Code. **Das war für den Anfang
+richtig — man kann nichts einstellen, was man noch nicht gemessen hat.**
+Jetzt gibt es Messwerte.
+
+**Eine Zeile, keine Tabelle mit Zeilen je Schwelle.** Die Schwellen sind
+ein zusammenhängendes Modell: wer die Warnstufe verschiebt, muss die
+Stufe darüber mitdenken. Der `CHECK` in Migration 073 erzwingt das —
+gemessen an der laufenden Datenbank:
+
+```
+UPDATE security_config SET warnung_ab = 90;
+  ERROR: violates check constraint "security_config_reihenfolge"
+  Werte danach unverändert: 20 / 50
+```
+
+Ohne diese Prüfung stünde WARNUNG über HOHES RISIKO und **die höchste
+Stufe wäre unerreichbar**.
+
+Lesen darf jeder Admin, ändern nur `owner`: wer an den Schwellen dreht,
+verschiebt, wann überhaupt jemand auffällt. Fällt die Tabelle aus, gelten
+die eingebauten Werte — **ein Schutzsystem, das ohne Konfiguration
+stehenbleibt, schützt nicht.**
+
+### v1372 (B20) · Tests — vierzehn, alle grün
+
+Der `tests/`-Ordner fehlte bisher ganz; `package.json` zeigte mit
+`node --test tests/` auf ein Verzeichnis, das es nicht gab.
+
+**Der Fehlalarm-Test ist der wichtigste.** Ein Schutzsystem, das zu viel
+greift, wird abgeschaltet — und dann schützt es gar nicht mehr:
+
+```
+60 Überschreitungen · 12 Endpunktgruppen · unregelmäßige Abstände
+  → darf NICHT „hohes Risiko" sein, obwohl die Menge weit über der
+    Schwelle liegt                                        ✓ bestanden
+```
+
+**Genau daran scheitern Systeme, die nur zählen.**
+
+Dazu geprüft: jede Eskalationsstufe einzeln, dass zu wenig Daten keine
+höhere Stufe rechtfertigen, dass eine Entscheidung die Berechnung
+schlägt, dass die Freigabe sie wieder freigibt, dass eine Entscheidung
+ohne Begründung abgelehnt wird, dass die Ausnahme vom Limit befreit aber
+nicht vom Protokoll — und zwei Eigenschaften direkt am **Schema** statt am
+Verhalten: `security_events` hat keine Spalte zum Ändern. **Append-only
+ist damit nicht Absicht, sondern Struktur.**
+
+### v1373 (B13/B14) · Die AGB-Klausel — als Entwurf gekennzeichnet
+
+Eingefügt als **Unterpunkte von VII**, damit die Nummerierung der
+Hauptabschnitte unverändert bleibt. Marcels Auflage: *„Bestehende AGB
+dürfen nicht kommentarlos überschrieben werden."* Gemessen nach dem
+Einbau: `I II III IV V VI VII VIII IX X XI XII XIII` — unverändert.
+
+**Der Entwurf ist als Entwurf sichtbar**, nicht nur im Kommentar: rote
+Marke neben der Überschrift, farbiger Kasten mit dem Hinweis. *Ein
+Entwurf, den man nicht als solchen erkennt, wird irgendwann wie geltendes
+Recht gelesen.*
+
+**B2C und B2B getrennt, wie verlangt:**
+
+| | |
+|---|---|
+| Unternehmer | Ermessensklausel nach § 315 BGB, **25.000 € als Obergrenze der Bemessung** statt als Festbetrag |
+| Verbraucher | **keine Vertragsstrafe** — § 309 Nr. 6 BGB verbietet sie in AGB |
+
+**Kein Automatismus, ausdrücklich im Text:** eine Vertragsstrafe wird
+niemals allein aufgrund technischer Messwerte oder eines maschinell
+erzeugten Risikowerts ausgelöst. Vorher Gelegenheit zur Stellungnahme,
+Darlegungs- und Beweislast beim Anbieter.
+
+Für die anwaltliche Prüfung sind die bekannten Streitpunkte **im Text
+aufgelistet**: § 309 Nr. 6 BGB, die Inhaltskontrolle nach § 307 BGB auch
+gegenüber Unternehmern, die Angemessenheit der Höhe,
+Individualvereinbarung statt AGB, und das Verhältnis zu § 4 Nr. 3 UWG
+und zum GeschGehG.
+
+### v1373 (B15) · Datenschutz — und das Löschkonzept läuft auch
+
+Neuer Abschnitt **13a** mit Zweck, Daten, Auswertung, Rechtsgrundlage,
+Aufbewahrung, Empfängern und Betroffenenrechten. Nummerierung geprüft:
+`11 12 13 13a 14 15`.
+
+Er beschreibt genau das, was Migration 071 wirklich speichert — **und
+ebenso ausdrücklich, was nicht**: keine Inhalte, keine Suchbegriffe,
+keine Browserkennung, keine Gerätemerkmale. *Eine Datenschutzerklärung,
+die mehr oder weniger beschreibt als der Code tut, ist schlechter als
+keine.*
+
+Art. 22 DSGVO ist ausdrücklich adressiert: **es findet keine
+automatisierte Entscheidung mit rechtlicher Wirkung statt.**
+
+> **Und die Löschfristen laufen wirklich.** Eine Frist, die nur im Text
+> steht, ist eine Zusage, die man nicht hält. Der tägliche Lauf entfernt
+> Beobachtungen nach 90 Tagen und Entscheidungen nach drei Jahren — die
+> drei Jahre orientieren sich an der regelmäßigen Verjährung (§ 195 BGB),
+> damit eine Einschränkung im Streitfall nachvollziehbar bleibt.
+>
+> ```
+> ✓ Sicherheits-Loeschlauf aktiv (90 Tage / 3 Jahre)
+> ```
+
+### Zwei eigene Fehler
+
+**`\x{2713}` ist Perl-Syntax, kein JavaScript.** Mein Patch schrieb es in
+eine `console.log`-Zeile — und beschädigte dabei eine **bestehende**
+Zeile, die vorher ein echtes Häkchen trug. `node --check` fand es
+(*Invalid hexadecimal escape sequence*), behoben, beide Zeilen tragen
+wieder ein ✓.
+
+**Die Reparatur selbst scheiterte zweimal**, weil das Ersetzungsmuster
+durch die Shell lief und dort die Backslashes verlor. Gelöst mit dem
+Edit-Werkzeug statt über die Kommandozeile — dieselbe Familie wie Falle
+148.
+
+### Commits
+
+`v1371` B11/B17 · `v1372` B20 · `v1373` B13/B14/B15
+
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
@@ -13484,3 +16062,910 @@ einzige Grund, warum das gutging.
 **Konsequenz:** die Marktbericht-Fassung heißt jetzt
 `claude/projektanweisung-marktbericht-20260812-abend.md`. **Nie wieder zwei
 Projektanweisungen mit gleichem Dateinamen.** Und: nach einem `cat >>` auf eine
+
+### v1368b–d · Drei Nachbesserungen, sichtbar erst mit Anmeldung
+
+Marcel hat mich im Adminbereich angemeldet — und damit wurde pruefbar,
+was vorher nur „geladen“ war.
+
+**`v1368b` — HTTP 401 trotz gueltiger Anmeldung.** Mein Abruf setzte
+`Authorization: Bearer`. Der Adminbereich schickt seinen Token als
+**`X-Admin-Token`** (`admin-api.js:14`). Der Schluesselname im
+`localStorage` stimmte sogar — nur das Tuerschild war ein anderes.
+
+> Dieselbe Familie wie die Leser, die ins Leere greifen: der Code sah
+> richtig aus, und nichts widersprach, bis jemand angemeldet war.
+
+**`v1368c` — `\uXXXX` ist im HTML kein Escape, sondern Text.** Der
+Zurueck-Knopf zeigte woertlich `zur\u00fcck`. Neun solche Sequenzen
+standen im Markup, aus dem Perl-Patch uebernommen, wo sie fuer
+JavaScript-Strings richtig gewesen waeren.
+
+**Eine Messung haette das nie gezeigt:** die Elemente waren da, die
+Klassen stimmten, das Skript lud. Nur der Text war falsch. Gefunden beim
+ersten Blick auf den Screenshot.
+
+**`v1368d` — lange Pfade liefen in die Detail-Spalte.**
+`/api/v1/subscription` ueberlappte `probe: true`. Nachgemessen:
+**0 Ueberlappungen** bei 15 Zeilen, breitester Pfad 166 px.
+
+### Abnahme mit Anmeldung
+
+```
+Kacheln          0 Ernst · 5 Auffaellig · 10 Hinweis
+Konten           2 Zeilen — anonym (9 Ereignisse, 1 Pfad, auffaellig)
+                           Konto (6 Ereignisse, 5 Pfade, Hinweis)
+Chronik          15 Zeilen
+Fallakte         5 Gruppen gegen 12 · Streuung 0,65 gegen 5,13
+Escape-Reste     0
+```
+
+Die Eskalation ist in der Chronik direkt ablesbar: das Detail zaehlt
+`ueberschreitungen_1h` von 1 bis 9 hoch, und ab der fuenften springt die
+Stufe von `Hinweis` auf `Auffaellig`.
+
+### v1374 (B21) · Der letzte Direktweg ist zu
+
+`quickcheck-app.html` rief `api.openai.com` **direkt aus dem Browser**
+auf — mit einem Schlüssel, den der Nutzer in ein Feld tippt. Drei Dinge
+waren daran falsch: der Prompt stand im Klartext im ausgelieferten HTML,
+der Weg lief am Backend vorbei (an jeder Zählung, jedem Limit, jedem
+Protokoll), und ein API-Schlüssel lag im Browserspeicher.
+
+Der Prompt steht jetzt im Backend. **Er ist derselbe wie vorher —
+bewusst:** dieser Umbau soll den *Weg* ändern, nicht das *Ergebnis*.
+
+**Eigener Endpunkt statt `/analyze`:** der Quick-Check hat ein anderes
+Datenformat und erwartet eine andere Antwort. Beides in einen Endpunkt
+zu zwingen hätte eine Weiche gebraucht, die mit der Zeit zur zweiten
+Logik wird.
+
+**Eigene Brückendatei statt `qc-bridge.js`:** die steht unter „Nicht
+anfassen“. Der neue Vermittler hört auf eine eigene Nachrichtenart. Das
+ist auch sonst die sauberere Trennung: die Brücke überträgt
+Objektdaten, dieser Vermittler eine KI-Anfrage.
+
+Er prüft, dass die Nachricht **wirklich aus dem eigenen iframe** kommt —
+ohne diese Prüfung könnte jede eingebettete Seite Analysen auf Kosten
+des Kontos auslösen.
+
+Der Nutzerschlüssel geht bewusst **nicht** durch die Brücke: wer einen
+hat, pflegt ihn in den Einstellungen, und von dort holt ihn der Server.
+*Ein Schlüssel, der durch zwei Fenster gereicht wird, ist einer zu viel
+unterwegs.*
+
+#### Abnahme
+
+```
+iframe-Version        v1374
+fetch an api.openai   0 Treffer im ausgelieferten HTML
+Prompt im HTML        weg
+neuer Weg             vorhanden
+```
+
+Und die Kette selbst, **ohne KI-Credits zu verbrauchen**: eine
+absichtlich unvollständige Anfrage aus dem iframe —
+
+```
+iframe -> Vermittler -> Backend -> zurück ins iframe
+Antwort: { ok:false, fehler:kp_oder_nkm_fehlt, status:400 }
+```
+
+Der Endpunkt lehnt sauber ab, bevor die KI gefragt wird. **Die Kette
+trägt an jeder Stelle.**
+
+> **Ein Test, der falsch gestellt war:** mein erster Versuch schickte die
+> Nachricht *an* das iframe statt *aus* ihm. Der Vermittler prüft die
+> Herkunft — also kam keine Antwort, und es sah aus wie eine
+> unterbrochene Kette. **Die Prüfung hat genau getan, was sie soll.**
+
+---
+
+## v1375 — Der Datenraum überlebt den Gerätewechsel (A5)
+
+**Was.** Die Datenraum-Verknüpfungen lagen ausschließlich im localStorage
+unter `dp_datenraum_v141`. Wer den Browser wechselt, das Profil löscht oder
+am Laptop statt am Rechner arbeitet, hatte **alle** Ordner-Links verloren —
+in einem Bereich, aus dem Bank-Anfragen rausgehen. Der Link im Anschreiben
+ist genau das, was die Bank anklickt.
+
+Neu: Tabelle `user_settings (user_id, schluessel, wert JSONB)` als allgemeine
+Ablage für Client-Einstellungen, die einen Gerätewechsel überstehen müssen.
+Eine feste Liste `ERLAUBT` hält sie davon ab, mit der Zeit zum Abstellraum zu
+werden; Grenze 200 KB, damit hier keine Dokumente landen.
+
+**Die Regel im Client: Server gewinnt, aber nie gegen Leere.** Kommt vom
+Server nichts zurück — neues Konto, keine Verbindung —, bleibt der lokale
+Stand stehen. Ein leerer Server darf niemals einen gefüllten Browser
+überschreiben; das wäre Datenverlust durch Synchronisierung, und den merkt
+man erst, wenn es zu spät ist.
+
+**Commit.** `c82fd1b` · Migration 074 · Backend-Rebuild (Sicherung
+`vor-074-20260913-1033.sql.gz`, 46 MB, Kopf geprüft)
+
+**Nachweis.** Beide Richtungen im Browser gemessen:
+
+```
+localStorage geleert, Reiter gezeichnet  ->  Link ist zurück
+Server leer, Browser gefüllt, neu geladen ->  lokaler Stand bleibt
+gleicher Link zweimal geschrieben        ->  ein Eintrag, ein Zeitstempel
+```
+
+**Rest.** Nur der Datenraum nutzt die Tabelle. Wer die nächste Einstellung
+verlagert, trägt den Schlüssel in `ERLAUBT` ein und braucht keine Migration.
+
+---
+
+## v1376–v1376d — Ein Widerspruch wird gefragt, nicht weggeworfen (C7)
+
+**Was.** `_rfSetzen` brach bei einem bereits belegten Feld still ab
+(`return false`). Dass eine Nutzerangabe nicht überschrieben wird, ist
+richtig. Falsch war, was danach geschah: **nichts.** Der amtliche Abruf lief,
+die Blase darunter zeigte „340 €/m² — amtlicher Bodenrichtwert", und der Wert
+ging in kein Feld. Der Nutzer sah eine Zahl und durfte annehmen, sie gelte.
+Gerechnet wurde mit seinen 300.
+
+Bei der Lage-Recherche stand sogar ausdrücklich „Deine eigenen Angaben
+bleiben stehen — ich habe nur ergänzt, was fehlte." Wahr. Aber es verschwieg,
+**wo** sie sich widersprachen.
+
+**Drei Dinge, die erst der echte Lauf zeigte:**
+
+1. **Der Widerspruch gehört zum Feld, nicht zur Frage.** Der Fragewechsel
+   räumt alle Aktionen ab außer `markt`/`markt2` — ein Konflikt wäre dort
+   genau das geworden, was er nicht mehr sein soll: still verschwunden.
+2. **Mein erster Einbau saß zu tief.** „Nein, bleib bei meiner Angabe"
+   erreichte ihn nie — der Satz wurde vorher als Antwort auf die laufende
+   Frage gedeutet. Der Konflikt blieb offen und **sah trotzdem richtig aus**,
+   weil der Wert ohnehin der alte war. Die Prüfung steht jetzt ganz vorn in
+   `_rfVorabErkennen`, gleich hinter der Adress-Rückfrage — aber nur für
+   eindeutige Sätze; alles andere fällt durch.
+3. **Eine nackte Zahl entscheidet nicht.** Wer auf die Frage nach dem
+   Kaufpreis „215000" sagt, beantwortet die Frage. Erst „215000 stimmt"
+   oder „nimm 215000" ist eine Entscheidung.
+
+**Commits.** `8e893a9` · `0575898` (Prüfhaken) · `dd0732d` · `c6bad7c`
+
+**Nachweis.** Sieben Fälle im laufenden Sprechlauf auf Staging gemessen:
+
+```
+300 vs 300,00 abgerufen   ->  kein Widerspruch (Zahl, nicht Zeichen)
+300 vs 340 abgerufen      ->  Widerspruch, beide Werte sichtbar
+zweimal derselbe Abruf    ->  nicht zweimal dieselbe Frage
+ohne konflikt-Flag        ->  still wie bisher (Nutzerhand)
+"340"  (nackte Zahl)      ->  entscheidet NICHT
+"ja"   (blank)            ->  Rückfrage, nichts übernommen
+"nimm den amtlichen"      ->  340 übernommen, Herkunft BORIS
+"nein, bleib bei meiner"  ->  3 bleibt, Quelle Sprachaufzeichnung
+Fragewechsel dazwischen   ->  Knöpfe stehen noch, Vorspann passt
+```
+
+**Rest.** Gefragt wird nur bei Abrufen (BORIS, Marktpreisindikation,
+Lage-Recherche). Wählt oder bestätigt der Nutzer selbst, ist das keine fremde
+Quelle, die widerspricht, sondern seine Hand.
+
+---
+
+## v1377 / v1377b — Übersprungenes kommt zurück, zvE wird gefragt (C5)
+
+**Was (v1377).** Das Überspringen gab es längst — `_rf.weg[i] = 1`. Das
+Zurückkommen nicht: der Eintrag wurde ausschließlich als „–" in der
+Standspalte gezeichnet und danach nie wieder gelesen.
+
+Eine übersprungene Frage ist aber keine beantwortete. Wer mitten im Gespräch
+„weiß ich nicht" sagt, meint meistens „jetzt nicht" — er hat die
+Nebenkostenabrechnung im anderen Fenster, den Steuerbescheid im Ordner. Am
+Ende weiß er es oft.
+
+Vor dem Abschluss wird deshalb **einmal** angeboten, die offenen Fragen
+nachzutragen. Danach ist der Weg zur Tabelle offen, und niemand kehrt
+freiwillig um.
+
+Drei Regeln: es ist ein **Angebot**, keine zweite Pflichtrunde — wer wieder
+überspringt, überspringt endgültig. Was inzwischen doch einen Wert hat, wird
+nicht nochmal gefragt. Und „nein" führt zum Abschluss; ohne den Nein-Weg
+hätte der Nutzer an einem Angebot gehangen, das nur einen Knopf hat.
+
+**Was (v1377b).** Das zu versteuernde Einkommen stand in der
+Feldbeschreibung, aber in **keinem Fragenblock** — es wurde nie gefragt. Der
+Grenzsteuersatz schon, aber den hat kaum jemand im Kopf.
+
+Neu ist `eins: ['grenz','zve']` am Block: **eines von beiden genügt.** Wer
+sein Einkommen nennt, bekommt den Satz ausgerechnet — über
+`Tax.calcGrenzsteuersatz`, dieselbe Quelle wie Formular und Prognose.
+
+**Commits.** `9c25f79` · `8b88263`
+
+**Nachweis.** Im laufenden Sprechlauf auf Staging:
+
+```
+3 Fragen übersprungen        ->  Liste: 3
+eine davon nachträglich voll ->  Liste: 2 (die gefüllte fällt raus)
+"ja, die trage ich nach"     ->  zweite Runde, offen=2, i=0, weg leer
+zweites Überspringen         ->  endgültig, kein drittes Angebot
+"nein, lass gut sein"        ->  Abschluss, Tabelle sichtbar
+
+Tarif 2026: 40k->31,8 %  60k->38,7 %  80k->42,0 %  300k->45,0 %
+Block leer          ->  offen
+nur Grenzsteuersatz ->  erfüllt
+nur zvE             ->  erfüllt
+zvE ohne AfA-Satz   ->  weiter offen (andere Felder gelten normal)
+
+Echter Satz durch die KI-Extraktion:
+"Mein zu versteuerndes Einkommen liegt bei 80.000 Euro, AfA 2 %, Gebäude 80 %"
+  -> zve 80000 · grenz 42 · Quelle "aus deinem zvE berechnet"
+  -> Blase: "Bei 80.000 € ... Grenzsteuersatz bei 42 % — damit rechne ich."
+```
+
+> **Eine Falle beim Bauen:** die erste Fassung rief `_fmtEuro` — die Funktion
+> gibt es in dieser Datei nicht. Der umgebende `try/catch` hätte den
+> ReferenceError geschluckt, und die Blase wäre **einfach nie erschienen**.
+> Richtig ist `_euroKurz`. Ein `try/catch` um neuen Code herum macht jeden
+> Tippfehler zu stiller Abwesenheit.
+
+> **Und ein Test, der nichts maß:** die „eins"-Regel schien zu greifen, weil
+> alle drei Fälle `false` ergaben — auch der, der `true` hätte sein müssen.
+> `_luecken` liefert nur die obersten drei Blöcke, der Steuerblock war nie
+> dabei. Siehe FALLEN 156.
+
+---
+
+## v1378 / v1378b — Zwei Begleittöne (C2)
+
+**Was.** Ein **Lernmodus**, der erklärt, wozu eine Angabe gebraucht wird, und
+ein **Investor-Modus**, der knapp bleibt — jederzeit umschaltbar. Bisher gab
+es nichts davon: der Ton war im Backend festgeschrieben („zwei bis vier
+Sätze", Regel 1), das Frontend hatte keinen Parameter, über den es etwas
+anderes hätte anfordern können.
+
+Der Ton ändert **zwei** Dinge und sonst nichts: Länge und Tiefe der
+KI-Auskunft, und ob unter der Frage steht, **wozu** sie gestellt wird. Er
+ändert nicht, welche Fragen kommen, welche Werte gelten, was gerechnet wird.
+Ein Modus, der den Inhalt ändert, wäre kein Ton mehr, sondern eine zweite
+Anwendung.
+
+Die 16 Wozu-Sätze sind kein Lexikon. Sie sagen, was die Angabe **in dieser
+Software** bewirkt: dass nur der nicht umlagefähige Teil des Hausgelds den
+Cashflow trifft, dass der Bodenrichtwert zweimal zählt (Sachwert **und**
+Gebäudeanteil für die AfA), dass der wirtschaftliche Übergang oft Wochen nach
+der Beurkundung liegt.
+
+Gemerkt wird er (`dp_rf_modus`) — im Unterschied zum Aufnahmeweg „frei
+erzählen" gegen „frag mich durch", der bewusst **nicht** gemerkt wird
+(v1275). Der Aufnahmeweg ist eine Entscheidung für dieses Objekt, der Ton
+eine über die Person.
+
+**Commits.** `4f034a6` · `567fe96` · Backend-Rebuild
+
+**Nachweis.** Dieselbe Frage („Was ist der DSCR?"), derselbe Kontext:
+
+```
+Lernmodus       666 Zeichen · 5 Sätze · erklärt Begriff und Zweck
+Investor-Modus  206 Zeichen · 1 Satz  · Zahl und Folge, ohne Definition
+```
+
+Beide nennen die bekannten Werte, beide erfinden nichts. Umschalten per Knopf
+und per Sprache („ausführlicher" / „kürzer" / „normal") gemessen; der
+Wozu-Satz erscheint mit Gold-Rand unter der Frage.
+
+> **Ein Fehler, den nur das Nachmessen zeigte:** nach dem Umschalten wirkte
+> der Schalter, der Knopf zeigte „Lernmodus", die KI-Antworten waren länger —
+> **nur an der offenen Frage sah man nichts davon.** `_rfFrageNochmal` baute
+> die Blase ohne den Wozu-Satz neu. Eine Einstellung, deren Wirkung man an
+> der Stelle nicht sieht, an der man sie erwartet, gilt als kaputt, auch wenn
+> sie greift.
+
+---
+
+## v1365 / v1365b — Die Steuerwirkung folgt der Progression
+
+**Marcels Frage:** „wir geben das hier textuell an im tab Steuern. Wäre es für
+uns möglich die progression passend zu berechnen und den Steuersatz
+anzupassen?" — und nach dem Befund die Freigabe: „ja bitte setz das genau so
+um das es fachlich richtig ist. wenn der satz angepasst ist sollte man ein
+hinweis setzen und das erklären."
+
+### Was falsch war
+
+`calc.js` rechnete die Steuer eines Objekts als **`base * grenz`** — ein
+linearer Satz auf das steuerliche Ergebnis. Das stimmt nur, solange das
+Ergebnis den Steuerpflichtigen nicht aus seiner Tarifzone trägt. Bei einem
+Verlust läuft man die Progression aber **hinab**.
+
+Gemessen am Tarif 2026 (§ 32a EStG):
+
+| zvE | Verlust | ausgewiesen | tatsächlich | Abweichung |
+|---|---|---|---|---|
+| 45.000 | 30.000 | 10.080 € | 8.400 € | **−1.680 €** (−17 %) |
+| 60.000 | 20.000 | 7.740 € | 7.024 € | **−716 €** (−9 %) |
+| 75.000 | 30.000 | 12.600 € | 11.529 € | **−1.071 €** (−9 %) |
+| 90.000 | 20.000 | 8.400 € | 8.400 € | 0 € |
+
+> **Der Fehler ging immer in dieselbe Richtung.** Die Ersparnis wurde zu hoch
+> ausgewiesen, der Deal also zu gut gerechnet — und er traf genau die
+> mittleren Einkommen. Ab rund 90.000 € zvE bleibt man in der
+> Proportionalzone, dort stimmte die lineare Rechnung.
+
+### Das Werkzeug lag fertig da und war nicht verdrahtet
+
+`tax.js` enthält seit Langem `calcImmoTaxImpact()` — mit `taxBefore`,
+`taxAfter`, `taxDelta`, Grenz- und Durchschnittssatz vor und nach der
+Immobilie. Dazu `calculateForObject()`. **Beide wurden nirgends aufgerufen.**
+Ein `grep` über das ganze Frontend findet keinen einzigen Nutzer.
+
+Der Tarif selbst ist gepflegt: Jahrgang 2026, Quelle im Kommentar, Rückfall
+auf den nächstälteren Jahrgang über `tarifFuer()`, Stetigkeitsprüfung an den
+Zonengrenzen. Er war nie das Problem.
+
+### Was jetzt gilt
+
+Die Steuerwirkung ist die **Differenz zweier Tarifberechnungen**:
+
+```
+Steuerwirkung = ESt(zvE + Ergebnis) − ESt(zvE)
+```
+
+Gerechnet wird mit `Tax.calcEStG()` — die Progression wird **nicht**
+nachgebaut, das wäre ein zweiter Rechenkern. Der globale Name ist übrigens
+`Tax`, nicht `DealPilotTax`; das war eine Annahme, die das Nachsehen
+widerlegt hat.
+
+**Zwei Rückfälle erhalten das alte Verhalten:**
+
+- **kein zvE eingegeben** — ohne Basis ist keine Progression rechenbar
+- **`tax.js` nicht geladen** — `index.html` lädt es **nach** `calc.js`
+
+In beiden Fällen gilt weiter `base * grenz`, und `_progAktiv` bleibt `false`.
+Genau dieses Merkmal liest der Hinweis.
+
+### Der Hinweis
+
+Ein neuer Block `#prog-hinweis` im Tab Steuern, gefüllt von
+`_progHinweisZeichnen()`. Er erscheint **nur**, wenn die Progression wirklich
+gerechnet wurde und der effektive Satz um mindestens einen halben
+Prozentpunkt abweicht. Er nennt beide Zahlen, den Euro-Unterschied und
+erklärt aufklappbar, warum der letzte Euro Verlust weniger wirkt als der
+erste.
+
+Effektive Sätze bei 42 % Grenzsteuersatz:
+
+```
+zvE  45.000, Verlust 30.000  ->  28,0 %   Hinweis erscheint
+zvE  60.000, Verlust 20.000  ->  35,1 %   Hinweis erscheint
+zvE  75.000, Verlust 30.000  ->  38,4 %   Hinweis erscheint
+zvE 120.000, Verlust 20.000  ->  42,0 %   Hinweis bleibt aus
+```
+
+### Zwei Texte, die nicht mehr stimmten
+
+Der Block „Was mit diesen Werten passiert" sagte, der Grenzsteuersatz wirke
+auf das Ergebnis — jetzt steht dort die Tarifdifferenz. Und der Absatz über
+mehrere Objekte sagte, jedes rechne „mit demselben Grenzsteuersatz"; richtig
+ist: jedes rechnet die Progression **von derselben Basis aus**, ohne die
+anderen Objekte zu kennen. Diese Einschränkung bleibt bestehen und ist dort
+weiterhin benannt.
+
+### Nachweis
+
+- **Rechenlogik isoliert:** fünf von fünf — Vorzeichen bei Verlust und
+  Gewinn, Proportionalzone, Rückfall ohne zvE
+- **Hinweisfunktion im Browser:** vier Fälle — Verlust, Gewinn,
+  Proportionalzone (bleibt aus), ohne zvE (bleibt aus)
+- **Kette in der laufenden App:** Felder gefüllt, `calc()` gelaufen, der
+  Hinweis erschien mit den Werten aus der echten Rechnung (39,4 % statt 42 %)
+
+> **Was das für Bestandsobjekte heißt:** jede angezeigte Steuerzahl ändert
+> sich — Cashflow nach Steuern, Rendite, Deal-Score, PDF —, und zwar nach
+> unten bei allen Kunden unter rund 90.000 € zvE. Das ist die fachlich
+> richtige Zahl, aber es ist kein stiller Bugfix: wer gestern gerechnet hat,
+> sieht heute andere Werte. Der Hinweis ist auch dafür da.
+
+`v1365` · `v1365b`
+
+> **Nachtrag 14.09.2026 — die Nummer war falsch.** Dieses Paket trug zuerst
+> `v1365`/`v1365b`. Die Nummern waren längst vergeben (Quickcheck-Rückfall,
+> `quickcheck-app.html:4107`), die Reihe stand bereits bei **v1378b**. Marker
+> und Cache-Buster stehen jetzt auf **`v1379`**. Der Fehler entstand, weil ich
+> die nächste Nummer aus diesem Journal gelesen habe statt aus `git log` —
+> steht mit Gegenmittel in `FALLEN.md`.
+
+## Rollout-Journal · 14.09.2026 — Darstellung
+
+### `v1380` · Das fehlende Icon und der fehlende Hell-Schalter
+
+**Marcels Befund:**
+
+> „unter einstellungen, darstellung ist erstmal kein Icon und dann kann man
+> nicht in den Hell Modus schalten."
+
+Beides gemessen, beides stimmt — und es sind zwei verschiedene Ursachen.
+
+**1 · Das Icon.** Der Reiter „Darstellung" (`settings.js:235`) zeigt auf
+`#i-eye`. Dieses Symbol **gibt es im Sprite von `index.html` nicht** — einmal
+verwendet, nirgends definiert; die übrigen zehn Reiter haben ihres.
+Entstanden mit `v1355`, als aus einem Reiter zwei wurden.
+
+> Ein `<use href="#…">` auf eine leere id **wirft keinen Fehler**. Es rendert
+> nichts, und zwar still. In der Konsole steht nichts, im DOM steht ein
+> vollständig aussehendes `<svg>`. Der einzige Weg, das zu finden, ist die
+> Gegenprobe: jede benutzte id gegen die Liste der definierten halten.
+
+**2 · Der Hell-Modus.** Schwerer wiegt der zweite Teil. Das Darstellungs-Panel
+(`ui-varianten.js`) hatte **nie** einen Modus-Schalter. Den alten trug das
+abgelöste Panel (`settings.js:3556`). Seit `v1085` Skin und Vorlage koppelt,
+führte der einzige Weg nach Hell über die Wahl einer hellen Vorlage — und
+welche der sechs hell ist, **steht nirgends**: „Rein weiß", „Kühl", „Serife",
+„Creme" sind Namen, keine Ansage. Wer Hell wollte, musste raten.
+
+**Behoben, ohne einen zweiten Mechanismus einzuführen.** Der neue Schalter
+geht genau den Weg der Vorlagen-Kacheln: `save({ui_theme})` → `anwenden()` →
+`skinNachziehen()`. Die Vorlage bleibt die Flächenentscheidung (`v1156-GRUND`);
+der Schalter wählt nur eine passende — und lässt eine schon passende stehen.
+Wer auf „Hell" drückt und auf „Panel" steht, behält Panel.
+
+Beide Richtungen sind gebunden: der Schalter setzt die Vorlage, jede
+Vorlagenwahl setzt den Schalter, und `vorlageNachziehen()` markiert ihn auch
+dann mit, wenn der Anstoß von außen kam — `darstellung-reseller.js` und
+`mandant-branding.js` rufen `_dpDispSkin` direkt.
+
+**Nachweis:** `node --check` auf dem Server, RC=0. Ausgeliefert geprüft:
+`#i-eye` steht im Sprite der ausgelieferten Seite, `dpuv-modus` viermal in der
+ausgelieferten `ui-varianten.js`, Cache-Buster `v1380` angekommen.
+**Offener Staging-Abnahmepunkt:** dass der Klick im angemeldeten Browser
+tatsächlich umschaltet, habe ich nicht selbst gesehen.
+
+**Commit** `v1380`. Auf Staging, **nicht auf Prod**.
+
+> **Die Nummer dieses Pakets war zuerst `v1288` — ebenfalls vergeben**
+> (`bodenrichtwert.js`). Zwei falsche Nummern in einer Sitzung: die Sitzung
+> ist lang, und der Nummernvorrat steht in `git log`, nicht im Journal.
+
+### `v1381` · Den Sprechlauf anhalten
+
+**Marcels Wunsch:**
+
+> „beim micro irgendwo die möglichkeit geben die auto tracking ob man was sagt
+> auszuschalten oder zu halten? warum? es kann ja sein das ich kurz gestört
+> werde dann möchte ich vlt den prozess unterbrechen und in ein paar minuten
+> wieder was sagen"
+
+**Warum der vorhandene Schalter das nicht konnte.** Die Checkbox
+„Freisprechen" oben in der Kopfzeile ruft `_fsAus()` — und das **reißt alles
+ab**: Stream gestoppt, AudioContext geschlossen, Recorder weg, `_fs.kopf` auf
+`null` und `_fs.rest` (der gemerkte Satzanfang aus `v1290`) ebenfalls. Wieder
+einschalten heißt ein neues `getUserMedia`. Das ist ein Ausschalter, keine
+Pause.
+
+> **Und der eigentliche Schaden ist nicht die Zeit.** Wer gestört wird und
+> nichts drücken kann, dessen Mikrofon läuft weiter — was der Störer sagt,
+> landet im Transkript und wird als Antwort auf die offene Frage ausgewertet.
+> **Eine falsche Zahl im Objekt ist teurer als eine verlorene Minute.**
+
+**Die Mechanik — zwei Riegel, weil einer nicht reicht:**
+
+| | |
+|---|---|
+| `rec.pause()` | schneidet nichts mehr mit **und behält den Container-Header**. Genau darauf baut `v1290` (`_fs.kopf`); nach `resume()` ist der Blob weiter eine vollständige Datei. |
+| `track.enabled = false` | schaltet das Signal stumm. Ohne das liefe die Pegelmessung weiter — der Ausschlag würde anzeigen, dass zugehört wird. |
+
+Strom, Dialogzustand und `_fs.rest` bleiben. Nach „Weiter" geht es an derselben
+Frage weiter.
+
+**Drei Stellen mussten mit, sonst hebt sich die Pause von selbst auf:**
+`_fsHoeren` (30 Aufrufstellen im Ablauf), die Uhr darin, und vor allem **der
+Wiederanlauf-Wächter aus `v1121`** — der hätte nach spätestens drei Sekunden
+wieder angeworfen, und der Knopf hätte ausgesehen, als hätte er gewirkt.
+
+**Der Knopf steht im Mikrofonkasten, nicht oben bei den Schaltern.** Wer
+spricht, schaut auf den Pegel und den Satz „Ich höre zu"; ein Knopf in der
+Kopfzeile wäre da, wo gerade niemand hinsieht. Angehalten sieht anders aus als
+taub — gestrichelter Rahmen, stehender Puls, gefüllter Weiter-Knopf statt
+Abblendung: „taub" heißt *Freisprechen ist aus*, „halt" heißt *ich warte auf
+dich*.
+
+**Nachweis:** `node --check` RC=0; die acht Glieder der Kette einzeln
+gegengezählt (Riegel in `_fsHoeren`, Uhr, Wächter, `_fsSprichtGerade`,
+Rücksetzer in `_fsAus`, Knopf, Bindung, CSS). Ausgeliefert geprüft.
+**Offener Staging-Abnahmepunkt:** dass `rec.pause()/resume()` auf Marcels
+Browser den Header hält, ist die Zusicherung der MediaRecorder-Spezifikation —
+gemessen habe ich es nicht.
+
+**Commit** `v1381`. Auf Staging, **nicht auf Prod**.
+
+---
+
+## Rollout-Journal · 16.09.2026 — v1421: Preise geprueft, Flyer-Code, Intro aus
+
+**Was.** Vier Dinge in einem Paket: eine vollstaendige Preispruefung gegen
+BEIDE Stripe-Konten, der Weg vom gedruckten Flyer bis in den Checkout, das
+Abschalten des Intro-Videos auf der Landing, und ein Entwurfssatz fuer die
+Pre-Flight-Karte.
+
+**Wie gemessen wurde — und warum nicht ueber das Stripe-MCP.** Das MCP war
+nicht angemeldet; wichtiger aber: es haette nur EIN Konto gesehen. Staging
+rechnet gegen die Sandbox (`acct_1TWXFqKEjyPDo0wo`), Produktion gegen das
+Live-Konto (`acct_1TWXFdGefFev8arz`). Gepruefte wurde deshalb IM Container
+jeder Umgebung, wo der jeweils richtige Schluessel schon in `process.env`
+liegt. Der Schluessel selbst wurde nie ausgelesen — nur Ergebnisse.
+
+**Befund Abopreise: sauber, in beiden Umgebungen.** Starter 19,99 / 219 ·
+Investor 34,99 / 384 · Pro 49,99 / 549 · Partner 49 / 539. Alle acht
+hinterlegten Preis-IDs zeigen auf aktive Stripe-Preise mit genau diesen
+Betraegen, und `config.js`, die Tabelle `plans` und Stripe stimmen ueberein.
+Die Bewertungspakete loesen ueber `lookup_key` auf und sind in beiden Konten
+vollstaendig (`dp_nachkauf_*`, `dp_einzeln_*`).
+
+**Befund Mandanten-Seat: in BEIDEN Umgebungen falsch, auf je eigene Weise.**
+- Produktion bucht nach der ALTEN Staffel **35 / 29 / 24 EUR** je Seat
+  (`price_1TtM0D…`). Der aktuelle Preis in Stripe ist `dp_seat_monthly` mit
+  **19 / 15 / 12 EUR** — Prod ist damit fast doppelt so teuer wie gewollt.
+- Staging zeigt auf einen **archivierten** Seat-Preis. Ein Seat-Checkout
+  kann dort nicht funktionieren, Stripe nimmt archivierte Preise nicht an.
+- Migration 065 nennt im Kommentar eine DRITTE Staffel (24 / 19 / 15).
+  Drei Staende, keine Entscheidung. Das ist Geld und gehoert Marcel.
+Der Seat steht in der `.env`, nicht in `plans` — deshalb faellt er bei jeder
+Pruefung der Plantabelle durch das Raster. Kuenftig mitpruefen.
+
+**Befund Portal:** Staging rechnet Wechsel mit `proration_behavior=none` ab,
+Produktion mit `always_invoice`. Staging testet damit nicht, was Prod tut.
+
+**Befund ERSTFLUG: es gibt ihn, und er gibt 16 %, nicht 15 %.**
+In beiden Konten: Promotion-Code `ERSTFLUG`, aktiv, `forever`, gilt fuer alle
+Produkte, **0 von 100** eingeloest, kein Ablaufdatum. Daneben liegt ein
+zweiter Coupon `ERSTFLUG15` mit 15 % — **ohne jeden Promotion-Code**, also
+fuer Kunden nicht einloesbar. Genau die Luecke, die `promo-erstflug.js` im
+Kopf beschreibt: dort steht seit v1246 `ERSTFLUG_PROZENT = 15`, waehrend
+Stripe 16 % ausgibt. Ein Stripe-Coupon laesst seinen Prozentsatz nicht
+aendern; fuer 15 % muesste der Code umgehaengt werden (alten deaktivieren,
+neuen mit demselben Namen auf `ERSTFLUG15`).
+
+**Flyer -> Checkout (neu).** Auf den Flyer kommt `dealpilot.immo/erstflug`.
+Gemessen: beide Domains antworten dort bereits mit 200, weil Caddys
+`try_files` auf die Landing faellt — **kein Eingriff am Caddyfile noetig**.
+`flyer-code.js` (liegt zweimal, wie `promo-erstflug.js`) liest das
+Pfadsegment, merkt den Code und raeumt die Adresszeile auf.
+> **Die Falle war die Domaingrenze.** Landing und App liegen auf
+> verschiedenen Rechnernamen, `localStorage` traegt dort nicht hinueber.
+> Gemerkt wird deshalb als **Cookie auf `.dealpilot.immo`**. Im Browser
+> nachgemessen: auf der App-Domain ist `localStorage` leer und der Code
+> trotzdem da.
+Das Backend loest den Code bei Stripe auf und setzt `discounts[]`.
+`allow_promotion_codes` und `discounts` schliessen einander aus — eine
+Stelle entscheidet, welches von beiden gesetzt wird. **Fail-open:** ein Code,
+den es nicht gibt, faellt auf das Eingabefeld zurueck statt den Kauf zu
+verhindern.
+
+**Intro-Video.** `landing-motion.js` bekommt `INTRO_AKTIV=false`. Die
+Funktion bleibt stehen, `dp-intro-cockpit.mp4` bleibt auf dem Server. Das
+alte Licht-Intro kommt NICHT zurueck — es haengt an der harten CSS-Regel
+`#intro{display:none!important}`, nicht an `body.dpm-on`. Das
+Hero-Hintergrundvideo ist nicht das Intro und laeuft weiter.
+
+**Nachweis.** 6 Dateien `node --check` ohne Befund; 12 von 12
+Logikpruefungen der Code-Erkennung gruen; **echter Lauf gegen die Sandbox**:
+Investor 34,99 -> **29,39 EUR** mit ERSTFLUG (Rabatt 5,60), unbekannter Code
+-> voller Preis MIT Eingabefeld, kein Code -> wie bisher. Testkunde wieder
+geloescht. Im Browser auf Staging nachgemessen: Intro weg, Code gemerkt,
+Cookie traegt ueber die Domaingrenze.
+
+**Rest.**
+1. Seat-Preis Prod (35/29/24 gegen 19/15/12) — **Entscheidung Marcel.**
+2. Seat-Preis Staging zeigt auf archiviert — Checkout dort kaputt.
+3. ERSTFLUG 16 % gegen die 15 % in `promo-erstflug.js` — **Entscheidung.**
+4. `proration_behavior` Staging gegen Prod angleichen.
+5. Elf Registersaetze ohne Lizenzangabe (unveraendert offen).
+6. Pre-Flight-Entwuerfe: Auswahl steht aus, dann Einbau.
+
+**Commit** `v1421`. Auf Staging, **nicht auf Prod**.
+
+---
+
+## Rollout-Journal · 16.09.2026 (2) — v1421b/c: ERSTFLUG auf 15 %, Empfang, Checkboxen
+
+**Was.** Marcels drei Befunde nach v1421, alle am Original nachgemessen,
+plus die Rabatt-Entscheidung.
+
+**1 · „Komme einfach nur auf die Startseite" — der Befund stimmte.**
+`flyer-code.js` merkte den Code lautlos im Cookie; nichts sagte dem Gast,
+dass er 15 % bekommt. `promo-erstflug.js` ist die fertige Maschine dafuer
+und war nur abgeschaltet — sie geht jetzt fuer FLYER-GAESTE an und bleibt
+fuer alle anderen aus (v1246 gilt unveraendert). Das ist zugleich das
+Versprechen des Flyers: der Rabatt gehoert dem, der ihn in der Hand hatte.
+> **Das reichte nicht.** Gemessen: das Banner sitzt bei der Preistabelle,
+> **5544 px** unter der Oberkante. Deshalb in v1421c ein zweiter, schlanker
+> **Empfangsbalken ganz oben** — eine Zeile plus „Kostenlos starten",
+> wegklickbar. **Bewusst ohne Einblendung**, siehe Messfalle unten.
+> Der Prozentsatz wird dort NICHT bestimmt: der Balken startet ohne Zahl,
+> `promo-erstflug.js` traegt sie nach, sobald Stripe sie bestaetigt hat.
+
+**2 · Ein eigener Fehler aus v1421, unsichtbar geblieben.**
+`linkeAnreichern()` verglich mit `href.indexOf(location.hostname)`. Auf der
+Landing ist das `staging.dealpilot.immo` — eine **Teilzeichenkette** von
+`app.staging.dealpilot.immo`. Jeder Link in die App galt als „dieselbe
+Domain" und wurde uebersprungen: fuenf Links auf `?register=1`, kein
+einziger mit `code=`. Dass der Code trotzdem ankam, lag allein am Cookie —
+**der Guertel hielt, waehrend der Hosentraeger riss.** Jetzt wird der Host
+geparst und exakt verglichen; nachgemessen: 11 von 11 Links tragen den Code.
+
+**3 · „Checkboxen sind riesig" — 33x33 px, und das ist KEIN Bug.**
+v1147-CB33, Marcels eigene Entscheidung vom 12.08.2026, weil die Felder
+vorher 13x13 px massen. In einer Formularzeile passt das; neben zwei Zeilen
+Fliesstext bei 12px-Schrift steht dort ein Quadrat von fast dreifacher
+Zeilenhoehe. Geaendert wurden deshalb **nur die beiden Registrierungsfelder**
+per Inline-Stil (hoehere Spezifitaet, kein `!important` noetig). Gemessen:
+17x17 px, Label weiterhin 72 bzw. 54 px hoch und klickbar — die
+Trefferflaeche bleibt gross. `#erbpacht` steht unveraendert auf 33 px.
+
+**ERSTFLUG: 15 %, kein Kontingent, dauerhaft.** Marcels Entscheidung:
+„genau 15 Prozent … nicht auf die ersten 100 User, das ist ein Messerabatt,
+den bekommen alle." Ein Stripe-Coupon aendert seinen Prozentsatz nie —
+der Weg war: alten Code deaktivieren (macht den Namen frei), neuen Code
+`ERSTFLUG` auf den bereits vorhandenen 15-%-Coupon `ERSTFLUG15`, **ohne
+`max_redemptions`**. Die Banner-Texte „Noch X von Y Plaetzen" und „Code im
+Bezahlvorgang eingeben" sind entfallen — beide waren nicht mehr wahr.
+**Auf Staging erledigt, auf PROD nicht** (siehe Rest).
+
+> **MESSFALLE, zweimal hineingelaufen.** Ich meldete zwischendurch „die
+> Preise sind kaputt" und „der Banner bleibt unsichtbar". **Beides war
+> falsch.** Ursache jeweils `document.visibilityState === "hidden"` im
+> ferngesteuerten Tab: dann feuert `requestAnimationFrame` nie und
+> CSS-Transitions laufen nicht — und genau daran haengen sowohl die
+> rollende Preiszahl als auch die Einblendung des Banners. Die Regel stand
+> in meinen Notizen. **Vor jeder Messung an etwas Animiertem zuerst
+> `visibilityState` lesen**, sonst misst man den eigenen Messaufbau.
+
+**Nachweis.** node --check ohne Befund, 12 von 12 Logikpruefungen gruen.
+Im sichtbaren Browser gemessen: Balken oben bei 0 px mit „15 % dauerhaft",
+Banner opacity 1, Preise **16,99 / 29,74 / 42,49** aus 19,99 / 34,99 / 49,99
+(exakt 15 %), Code traegt ueber die Domaingrenze (localStorage auf der
+App-Domain leer, Cookie da), Stripe-Probe 34,99 -> 29,74 EUR.
+
+**Rest — beides braucht Marcels Freigabe:**
+1. **Stripe PROD steht noch auf 16 % mit 100 Plaetzen.** Der schreibende
+   Zugriff wurde abgewiesen (Geld-Eingriff auf Produktion). Skript liegt
+   bereit, Trockenlauf auf Prod gelaufen und sauber.
+2. **Prod hat das ganze Paket nicht** (Stand 12.09., `47e3673`). Dort
+   laeuft das Intro-Video noch und `/erstflug` kann nichts tun. Ein
+   Prod-Rollout braucht einen Backend-Neubau (Flyer-Code im Checkout).
+3. Seat-Preis Prod (35/29/24 gegen 19/15/12) — unveraendert offen.
+4. Gold-Wächter ist rot, aus v1384–v1405, nicht aus diesem Paket.
+
+**Commits** `v1421b` `06e9adc`, `v1421c` `e798754`. Staging, nicht Prod.
+
+---
+
+## Rollout-Journal · 16.09.2026 (3) — PROD: v1421 bis v1421c
+
+**Was.** Erster Prod-Rollout seit dem 12.09. Marcels Freigabe. Auf Prod
+sind jetzt: Intro-Video aus, Flyer-Code bis in den Checkout,
+Empfangsbalken, Rabatt-Anzeige fuer Flyer-Gaeste, Registrierungs-
+Checkboxen 17 px. Dazu Stripe LIVE auf **15 % dauerhaft ohne Kontingent**.
+
+> **NICHT gemerged, sondern per Cherry-Pick geloest — und das war noetig.**
+> Zwischen `main` und `staging` lagen **346 Commits, 217 Dateien, 118.897
+> Zeilen und vier offene Migrationen**. Ein Merge haette den kompletten
+> **Marktbericht-Strang** und jede Migration seit dem 12.09. mit
+> ausgerollt. Gewollt waren drei Commits. Vorher gemessen, ob es sauber
+> geht: von elf betroffenen Dateien wich auf `main` nur
+> `frontend/index.html` ab.
+
+**Die Konfliktstelle war ein echter Fund, kein Formalie.** `v1421` brachte
+in `index.html` die Script-Tags von `rate-limit-handler.js` (v1370) und
+`qc-ai-bridge.js` (v1374) mit — **beide Dateien gibt es auf `main`
+nicht**. Waeren sie mitgekommen, haette die Prod-Seite zwei Skripte
+geladen, die ins Leere zeigen. Uebernommen wurde nur der Cache-Buster von
+`subscription.js`; danach **jeder** Skriptverweis der Seite gegen das
+Dateisystem geprueft, keiner zeigt ins Leere.
+
+**Vorher gesichert** (Regel): Haupt-DB 11 MB, Marktbericht-DB 698 KB,
+beide mit `ls -lh` und `zcat | head -2` angesehen. Keine Attrappe.
+
+**Nachweis auf PROD im Browser gemessen:**
+- Intro-Video: kein `#dp-intro` im DOM
+- `dealpilot.immo/erstflug` -> Empfangsbalken „15 % dauerhaft", Adresszeile
+  auf `/` aufgeraeumt
+- **12 von 12** Links in die App tragen `code=ERSTFLUG`
+- Preise **16,99 / 29,74 / 42,49** aus 19,99 / 34,99 / 49,99 (exakt 15 %)
+- Code traegt ueber die Domaingrenze nach `app.dealpilot.immo`
+- Registrierungs-Checkboxen 17x17, Label 72 bzw. 54 px, klickbar
+- Backend gesund, keine Fehler im Log
+- Stripe LIVE: `promo_1UGDXLGefFev8arzRmd71cq6`, 15 %, `forever`,
+  ohne `max_redemptions`; am echten Checkout 34,99 -> 29,74 EUR
+
+**Der alte 16-%-Code ist abgeschaltet, nicht geloescht** — bei 0
+Einloesungen verliert niemand etwas, und laufende Abos haetten ihren
+Rabatt ohnehin behalten.
+
+**Rest — unveraendert offen:**
+1. **Seat-Preis Prod bucht 35/29/24 statt 19/15/12** (steht in der `.env`,
+   nicht in `plans`). Geldentscheidung.
+2. Seat-Preis Staging zeigt auf einen archivierten Preis.
+3. `proration_behavior` Staging (`none`) gegen Prod (`always_invoice`).
+4. Gold-Waechter rot aus v1384–v1405 (nicht aus diesem Paket).
+5. Pre-Flight-Entwuerfe: Marcels Auswahl steht aus.
+6. **Staging und Prod liegen jetzt wieder 343 Commits auseinander** —
+   der Marktbericht-Strang ist weiterhin nicht auf Prod.
+
+**Commit** `7a8ee2c` auf `main`. Prod laeuft darauf.
+
+---
+
+## Rollout-Journal · 16.09.2026 (4) — v1423: Seat, Partnerpreis, Rabatte im Admin
+
+**Auf Staging UND Prod ausgerollt** (`9d9c306` / Prod `a64a46b`).
+
+**1 · Der Seat-Preis war in beiden Umgebungen falsch — und die Landing hat
+die ganze Zeit den richtigen versprochen.**
+Prod buchte die alte Staffel **35 / 29 / 24 EUR** je Seat, Staging zeigte
+auf einen **archivierten** Preis (24 / 19 / 15 — der dritte Stand, den
+Migration 065 im Kommentar nennt). Gueltig sind **19 / 15 / 12**, und genau
+das steht seit Langem auf der Landing: „Mandanten-Seats ab 12 EUR je
+Mandant". Prod hat also fast das Doppelte des beworbenen Preises
+abgerechnet — kein reiner Preisfehler, sondern eine falsche Zusage.
+
+> **Warum es durch jedes Raster fiel:** der Seat ist der einzige Preis,
+> der **nicht in `plans`** steht, sondern in der `.env`. Wer `config.js`,
+> `plans` und die Portal-Konfiguration prueft, haelt alles fuer sauber.
+> **Eine ID in einer Umgebungsvariablen altert still.**
+
+**Die Loesung ist nicht „neue IDs in die .env", sondern der `lookup_key`.**
+`resellerPortal.js` loest den Seat jetzt ueber `dp_seat_monthly` /
+`dp_seat_yearly` auf — umgebungsblind und immer der AKTIVE Preis, dasselbe
+Muster wie bei den Bewertungspaketen. Die `.env` bleibt als Rueckfall.
+> **Der Rueckfall wurde mitgezogen, und das war noetig:** er zeigte auf
+> Prod weiter auf 35/29/24. Ein Rueckfall auf einen FALSCHEN Preis ist
+> schlimmer als gar keiner — bei einem Aussetzer haette er still das
+> Doppelte gebucht. Beide `.env` tragen jetzt die neuen IDs,
+> `--force-recreate`, und **im Container mit `printenv` nachgemessen**.
+> Danach liefern beide Wege dasselbe: 19/15/12 bzw. 209/165/132.
+> Sicherung: `.env.pre-v1423` auf beiden Servern.
+
+**2 · Der Partnerpreis auf der Landing stand in DREI Staenden auf einer
+Seite:** `99` als Startwert im HTML (Zeile 1088), `149` sobald das JS lief
+(Zeile 4143) — und in Wahrheit **49**. Dazu „oder 1.490 EUR/Jahr — 2 Monate
+geschenkt", waehrend der Jahrespreis 539 EUR betraegt und elf
+Monatsbeitraegen entspricht, also **einem** Freimonat. Alle fuenf Stellen
+korrigiert (539/12 = 44,92, deshalb „rund 45 EUR/Monat").
+
+**3 · Rabattcodes im Admin** (neuer Reiter zwischen Rechnungen und
+Audit-Log). Counter je Code, Abschalten per Knopf, neuen Code anlegen mit
+eigenem Namen, Prozentsatz, Dauer und optionaler Begrenzung.
+Die Wahrheit bleibt **Stripe** — keine zweite Tabelle, die auseinanderlaeuft.
+Die Oberflaeche spricht drei Dinge aus, die sonst teuer werden:
+- Abschalten nimmt niemandem seinen Rabatt weg (nur `active:false`, kein
+  Loeschen — ein geloeschter Code waere aus der Historie verschwunden, die
+  Rabatte aber weiter in den Abos)
+- ein Prozentsatz laesst sich **nie** aendern, nur neu anlegen
+- ein Coupon **ohne** Code ist fuer Kunden unerreichbar; solche Leichen
+  werden angezeigt statt verschwiegen — genau so lag `ERSTFLUG15`
+  monatelang herum
+Nur Rolle `owner`. Eigener Pfad `/api/v1/admin-rabatte`, nicht als
+Unterpfad von `/api/v1/admin` (dort fuehrt `admin.js` eigene `:id`-Routen).
+
+**Nachweis.** Vier Dateien `node --check` ohne Befund. Vor dem Prod-Merge
+**jeder** Skriptverweis der Admin-Seite und **jedes**
+`require('./routes/…')` gegen das Dateisystem geprueft — die Lehre aus dem
+Vormittag, als v1421 zwei Script-Tags mitbringen wollte, deren Dateien es
+auf `main` nicht gibt. Auf Prod gemessen: Route antwortet 401 (da),
+Partnerpreis 49, Seat 19/15/12 auf beiden Wegen, Backend gesund, keine
+Fehler im Log.
+
+**Rest:**
+1. `proration_behavior` Staging (`none`) gegen Prod (`always_invoice`).
+2. Gold-Waechter rot aus v1384–v1405.
+3. Pre-Flight-Entwuerfe: Marcels Auswahl steht aus.
+4. Staging und Prod liegen weiterhin ~340 Commits auseinander — der
+   Marktbericht-Strang ist nicht auf Prod.
+
+
+## Rollout-Journal · 17.09.2026 — v1426: RND-Kern 3.1.0 aus dem Gutachten-Paket
+
+**Was.** Marcel hat `Dateien/gutachten-paket-v1.0.0.zip` abgelegt (Rechenkerne,
+Bruecke, Word-Reporting, Pruefstrecken). Gemessen statt uebernommen:
+
+| Teil | Befund | Entscheidung |
+|---|---|---|
+| `rnd-calc.js` | unser Kern faellt bei **4 von 22** Pruefungen gegen drei unterschriebene Gutachten durch (Am Markt 18: 44,07 statt 40 — Formel unter ihrer Schwelle angewandt; Bj 1890 bekam 46 Jahre) | **uebernommen** |
+| `rnd-gnd-table.js` | Wohngebaeude 70 (Anl. 22 BewG) statt 80 (Anl. 1 ImmoWertV) | **uebernommen** |
+| `bmf-afa.js`, `bmf-data.js` | byteidentisch | nichts zu tun |
+| `data-baupreisindex.js` | Anker 70,8 unbelegt; Faktor 1,969 fuer Q1/2026 liegt **2,4–3,7 %** ueber Hamburg 1,911 / Dortmund 1,906 | **nicht** uebernommen — Idee (Reihe mit Stichtag) richtig, Zahlen nicht |
+| `calc-engine.js` (Verkehrswert) | prueft nur gegen das eigene Beispiel des Moduls; kein Vorteil gegenueber `nhk2010.js`/CrossCheck | nicht uebernommen |
+| `kpa-pipeline.js` | Portierung unseres `bmfPipelineService.js` | nichts Neues |
+| `rnd-massnahmen/-standard/-spanne`, `reporting/` (FastAPI, Word) | neue Faehigkeiten, kein Ersatz | offen, s. Rest |
+
+Beim Zusammenfuehren blieben DealPilot-eigene Staende erhalten: v1364
+Steuertarif aus `Tax`, V193 999 EUR. Der Schadensabschlag-Schalter in
+`rnd-ui.js` wirkt jetzt wieder (V187 hatte ihn im Kern hart abgeschaltet,
+der Knopf war seitdem tot); Standard bleibt „Nein". Anzeige: „—" statt
+„0 Jahre", wenn kein Verfahren rechnet, Grenzen mit Fundstelle.
+`deal-action.js`: GND-Rueckfall 70 → 80.
+
+**Commit.** `b15c260`
+
+**Nachweis.** `node tools/rnd-pruefung/rnd-gutachten-test.mjs` laeuft gegen
+`frontend/js` selbst: 22/22. Bruecke 35/35, Ende-zu-Ende 20/20 mit unserem
+Kern. Staging im Browser: Skripte `?v=v1426`, `VERSION 3.1.0`, GND mfh 80,
+Bj 1890 → `verfahren: keines`, Steuersatz = `Tax.calcGrenzsteuersatz`
+(0,318 / 0,42), Gutachterkosten 999.
+
+**Rest:**
+1. Word-Gutachten aus `reporting/` braucht einen eigenen Python-Dienst
+   (Port 8100) — Server-Entscheidung, nicht gebaut.
+2. `rnd-massnahmen.js` (Punkte nach Zeit **und** Anteil, Westerfeldstr. 140)
+   koennte die Punkterfassung im Wizard ersetzen — braucht Marcels Abnahme.
+3. `rnd-calc.js` `Number(input.gnd) || 70` — Rueckfall im Kern noch 70,
+   die Tabelle sagt 80 (so aus dem Paket, das den Kern nicht anfassen laesst).
+4. Gespeicherte RND-Gutachten mit GND 70 behalten ihren Wert; nur neue
+   bekommen 80 vorgeschlagen.
+
+
+## Rollout-Journal · 17.09.2026 (2) — v1427: Sachwert-Rechenweg aus dem Gutachten-Paket
+
+**Auftrag (Marcel):** „die rechnungen und formeln aus dem modul nutzen und das
+mit unseren ernten … verbinden. der ablauf bleibt gleich, nur der rechenkern
+aus dem modul. wenn das neue modul besser oder gleichwertig rechnet, umsetzen."
+Word-Gutachten ausdrücklich **nicht**.
+
+**Was — gemessen, beide Kerne mit identischen Eingaben:**
+
+| Baustein | Messung | Ergebnis |
+|---|---|---|
+| Sachwert-Kette gegen das **unterschriebene Gutachten Löhner Str. 278** (ZFH) | Modul −0,01 € · unser Kern bisher **−10.047,63 €** | Modul besser → **Rechenweg übernommen** |
+| davon: Korrekturfaktor Zweifamilienhaus 1,05 (NHK 2010) | fehlte bei uns ganz, ≈ 8.640 € | übernommen |
+| davon: Außenanlagen-% auf Haus **und** Garage (SW-RL Nr. 4.2) | bei uns nur Haus, ≈ 1.546 € | übernommen, Garage steht jetzt davor |
+| davon: Gutachterrundung (Index 3 Stellen, Kennwert auf Cent) | ≈ 1 € | übernommen |
+| Garage mit Zwischenstufe (Ausstattungsmatrix) | Gutachten 381,80 €/m² zwischen St. 3/4 | übernommen, linear interpoliert |
+| Ertragswert | gleiche Formel; Abweichung 0,001–0,017 % nur durch Barwertfaktor auf 2 Stellen — so rechnet auch das Gutachten (10,92) | **gleichwertig**, unverändert — unserer kann zusätzlich § 41 rentierlich, NRW-BWK, Zins aus Ernte |
+| Restnutzungsdauer (`VW_IMMOWERTV.berechneModifRND`) | interpolierte Prozenttabelle statt Formel Anlage 2: bis **40 Jahre** daneben, Mittel 8, 51 Rasterpunkte ≥ 5 J. | **schlechter**, nicht übernommen (das Paket widerspricht hier seinem eigenen `rnd-calc.js`) |
+| NHK-Kennwerte (`data-nhk2010.js`) | **60 von 76** Zellen weichen von unserer belegten Tabelle ab; Typen falsch benannt (1.21, 4.x) | schlechter, nicht übernommen |
+| Baupreisindex | s. v1426: 2,4–3,7 % über Hamburg/Dortmund | nicht übernommen |
+
+Sachwertfaktor und Liegenschaftszins kommen unverändert aus dem Register —
+der Ablauf (zwei Läufe, Faktor nach vorläufigem Sachwert) ist unberührt.
+
+**Commit.** `2d4b23e` (Kern + Prüfstrecke). mb-backend auf Staging neu gebaut.
+
+**Nachweis.**
+- `node marktbericht/backend/tools/pruefstrecke-v1427-sachwert.mjs` 14/14 —
+  lokal **und im Container** `dealpilot-mb-backend`. Endwert 362.536 gegen
+  Gutachten 362.536,63 (Rest = Euro-Rundung des Berichts).
+- Alt gegen neu (HEAD-Fassung gegen v1427): EFH, ETW, RH, MFH ohne Garage
+  **auf den Euro unverändert**; EFH + Garage +541 € (Außenanlagen);
+  ZFH +10.466 € (+3,89 %).
+- Kette im Container, echter `CrossCheckService.compute`, Hiddenhausen
+  (AGS 05758016): Sachwertfaktor **Stufe A** aus „Grundstücksmarktbericht
+  2026 für den Kreis Herford, 5.1.2" angewandt; ZFH-Zeile in der Staffel,
+  beim EFH nicht; Faktor je vorläufigem Sachwert 0,897 (ZFH) / 0,903 (EFH).
+- Container-Log ohne Fehler.
+
+**Rest:**
+1. **Die Eingabe fehlt noch:** Gewerkestufen der Garage und `objektart: zfh`
+   müssen im Formular ankommen — der Kern kann es, ob jeder Einstieg (Import,
+   DealPilot-Mapper) `zfh` durchreicht, ist nicht geprüft.
+2. Berichte zu Zweifamilienhäusern liegen ab jetzt ≈ 4 % höher als vorher.
+   Das ist die Korrektur, kein Sprung — aber ein alter und ein neuer Bericht
+   zum selben ZFH widersprechen sich.
+3. Aus dem Paket noch ungenutzt: Wohnrecht/Nießbrauch-Barwert mit Sterbetafel
+   (`berechneBoG`). Der Marktbericht erfasst solche Rechte heute nicht.
+4. Die Sachwert-Sollwerte der Testobjekte in `CLAUDE.md` bleiben ohnehin neu
+   abzunehmen (Index 1,91 seit v1407); für Löhner gilt jetzt zusätzlich der
+   ZFH-Faktor.
+
+### Nachtrag v1427b — ZFH-Merkmal bis in den Sachwert
+
+**Was.** Rest 1 aus v1427 nachgemessen: DealPilotObjectMapper.js machte aus
+zfh pauschal haus — der Faktor 1,05 waere bei App-Objekten nie angekommen.
+Die Objektart bleibt grob (GeoMap, Paragraf-256-Rueckfall und Stockwerksfaktor
+vergleichen hart auf haus); das Merkmal zweifamilienhaus reist getrennt:
+Mapper -> Orchestrator (auch aus property_type zfh) -> CrossCheck, beide Laeufe.
+
+**Commit.** 21f8caf · mb-backend auf Staging neu gebaut.
+
+**Nachweis.** Im Container ueber Mapper + CrossCheck: ZFH / Zweifamilienhaus
+-> Merkmal true, ZFH-Zeile in der Staffel; EFH / MFH -> ohne. Pruefstrecke
+v1427 im Container gruen, Log ohne Fehler. Die Orchestrator-Zeile ist per
+node --check und Sichtpruefung abgenommen, der Test stellt ihre Regel nach.
+
+**Rest:** Im Marktbericht-FORMULAR (frontend/app.js) gibt es nur haus/wohnung
+— wer dort von Hand ein ZFH anlegt, bekommt den Faktor nicht. Garagen-
+Zwischenstufe ebenfalls nur ueber Import/Parameter erreichbar.

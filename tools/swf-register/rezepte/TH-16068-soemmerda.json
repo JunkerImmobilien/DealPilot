@@ -1,0 +1,508 @@
+{
+  "land_code": "TH",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar",
+  "berichtsjahr": 2025,
+  "stichtag": "2024-01-01",
+  "auswertezeitraum": "643 ausgewertete Kauffälle aus den Jahren 2023 und 2024 (von 771 erfassten; 128 ausgeschlossen wegen abweichenden Gebäudetyps oder nicht schadensfreien Zustands)",
+  "beschlossen": "2025-06-18",
+  "veroeffentlicht": "2025",
+  "quelle_url": "https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt",
+  "quelle_datei": "2025_SWF_R262.pdf, Sachwertfaktoren 2025, Kapitel 3",
+  "quellenvermerk": "Sachwertfaktoren 2025 © Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "verwendung": "produkt",
+  "auflagen": "Der vom Herausgeber vorgeschriebene Quellenvermerk ist wörtlich anzugeben. Modellkonformität nach § 10 ImmoWertV: NHK 2010 einschließlich Baunebenkosten, Regionalfaktor 1, Bezugsmaßstab Bruttogrundfläche nach Anlage 4 Nr. I ImmoWertV, Baupreisindex des Statistischen Bundesamtes zum Kaufdatum, Gesamtnutzungsdauer 80 Jahre nach Anlage 1 zu § 12 Abs. 5 ImmoWertV, Restnutzungsdauer gegebenenfalls nach Anlage 2 verlängert, lineare Alterswertminderung, Bodenwert erschließungsbeitragsfrei. WICHTIG: bauliche Außenanlagen, sonstige Anlagen und bei der BGF-Berechnung nicht erfasste Bauteile bekommen KEINEN gesonderten Wertansatz — sie sind im üblichen Umfang bereits im Sachwertfaktor enthalten.",
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 80,
+    "alterswertminderung": "linear",
+    "regionalfaktor": 1.0,
+    "bezugsmassstab": "BGF",
+    "aussenanlagen": "kein gesonderter Ansatz, im Sachwertfaktor enthalten"
+  },
+  "gaa_kennz": "16068",
+  "ags": [
+    "16068"
+  ],
+  "ebene": "kreis",
+  "fundstelle": "Sachwertfaktoren 2025, Kapitel 3, Abbildung 3, Seite 11; Modellbeschreibung Abbildung 2, Seite 9.",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser im Landkreis Sömmerda",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x": [
+          30,
+          60,
+          100
+        ],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenwertniveau in Euro/m² (erschließungsbeitragsfrei)",
+        "achse_y": [
+          50000,
+          60000,
+          70000,
+          80000,
+          90000,
+          100000,
+          120000,
+          140000,
+          160000,
+          180000,
+          200000,
+          220000,
+          240000,
+          260000,
+          280000,
+          300000,
+          320000,
+          340000,
+          360000,
+          380000,
+          400000
+        ],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "50000": [
+            1.22,
+            1.31,
+            1.38
+          ],
+          "60000": [
+            1.16,
+            1.27,
+            1.34
+          ],
+          "70000": [
+            1.12,
+            1.23,
+            1.31
+          ],
+          "80000": [
+            1.09,
+            1.2,
+            1.28
+          ],
+          "90000": [
+            1.06,
+            1.18,
+            1.26
+          ],
+          "100000": [
+            1.03,
+            1.15,
+            1.24
+          ],
+          "120000": [
+            0.99,
+            1.11,
+            1.21
+          ],
+          "140000": [
+            0.95,
+            1.08,
+            1.18
+          ],
+          "160000": [
+            0.92,
+            1.06,
+            1.16
+          ],
+          "180000": [
+            0.9,
+            1.03,
+            1.13
+          ],
+          "200000": [
+            0.87,
+            1.01,
+            1.12
+          ],
+          "220000": [
+            0.85,
+            1.0,
+            1.1
+          ],
+          "240000": [
+            0.84,
+            0.98,
+            1.09
+          ],
+          "260000": [
+            0.82,
+            0.97,
+            1.07
+          ],
+          "280000": [
+            0.81,
+            0.95,
+            1.06
+          ],
+          "300000": [
+            0.79,
+            0.94,
+            1.05
+          ],
+          "320000": [
+            0.78,
+            0.93,
+            1.04
+          ],
+          "340000": [
+            0.77,
+            0.92,
+            1.03
+          ],
+          "360000": [
+            0.76,
+            0.91,
+            1.02
+          ],
+          "380000": [
+            0.75,
+            0.9,
+            1.01
+          ],
+          "400000": [
+            0.74,
+            0.89,
+            1.0
+          ]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Der Ausschuss wertet freistehende Ein- und Zweifamilienhäuser, Doppelhaushälften und Reihenhäuser GEMEINSAM aus und stellt eine einzige Tabelle für alle drei auf. Dieselbe Matrix steht deshalb unter allen drei Zweigen — der Auswerter ordnet ein Reihenhaus sonst keinem Satz zu. Drei Bodenwertniveaus als Stützstellen (30, 60, 100 Euro/qm), zwischen denen interpoliert wird. Abgedruckte Potenzkoeffizienten je Spalte: a=0.5951 b=-0.23864 · a=0.75381 b=-0.18445 · a=0.87215 b=-0.15334 — dort ist der vorläufige Sachwert in Mio. Euro einzusetzen. Hinterlegt ist die abgedruckte Tabelle, weil sie der Prüfmaßstab des Dokuments ist.",
+        "normobjekt": "643 ausgewertete Kauffälle 2023/2024 über alle drei Gebiete des Ausschusses. Bodenwert erschließungsbeitragsfrei. Bauliche Außenanlagen und nicht in der BGF erfasste Bauteile sind im üblichen Umfang bereits im Faktor enthalten und dürfen NICHT gesondert angesetzt werden."
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren 2025 des Gutachterausschusses für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar, Abbildung 3, Seite 11.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Potenzkoeffizienten je Spalte, beschlossen am 18.06.2025. KEINE Stufe A, weil der Bericht die Fallzahl nicht je Gebiet und Objektart ausweist - die 643 Kauffaelle verteilen sich auf drei Gebiete und drei Haustypen.",
+      "fallzahl": null
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Doppelhaushälften und Reihenendhäuser im Landkreis Sömmerda",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x": [
+          30,
+          60,
+          100
+        ],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenwertniveau in Euro/m² (erschließungsbeitragsfrei)",
+        "achse_y": [
+          50000,
+          60000,
+          70000,
+          80000,
+          90000,
+          100000,
+          120000,
+          140000,
+          160000,
+          180000,
+          200000,
+          220000,
+          240000,
+          260000,
+          280000,
+          300000,
+          320000,
+          340000,
+          360000,
+          380000,
+          400000
+        ],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "50000": [
+            1.22,
+            1.31,
+            1.38
+          ],
+          "60000": [
+            1.16,
+            1.27,
+            1.34
+          ],
+          "70000": [
+            1.12,
+            1.23,
+            1.31
+          ],
+          "80000": [
+            1.09,
+            1.2,
+            1.28
+          ],
+          "90000": [
+            1.06,
+            1.18,
+            1.26
+          ],
+          "100000": [
+            1.03,
+            1.15,
+            1.24
+          ],
+          "120000": [
+            0.99,
+            1.11,
+            1.21
+          ],
+          "140000": [
+            0.95,
+            1.08,
+            1.18
+          ],
+          "160000": [
+            0.92,
+            1.06,
+            1.16
+          ],
+          "180000": [
+            0.9,
+            1.03,
+            1.13
+          ],
+          "200000": [
+            0.87,
+            1.01,
+            1.12
+          ],
+          "220000": [
+            0.85,
+            1.0,
+            1.1
+          ],
+          "240000": [
+            0.84,
+            0.98,
+            1.09
+          ],
+          "260000": [
+            0.82,
+            0.97,
+            1.07
+          ],
+          "280000": [
+            0.81,
+            0.95,
+            1.06
+          ],
+          "300000": [
+            0.79,
+            0.94,
+            1.05
+          ],
+          "320000": [
+            0.78,
+            0.93,
+            1.04
+          ],
+          "340000": [
+            0.77,
+            0.92,
+            1.03
+          ],
+          "360000": [
+            0.76,
+            0.91,
+            1.02
+          ],
+          "380000": [
+            0.75,
+            0.9,
+            1.01
+          ],
+          "400000": [
+            0.74,
+            0.89,
+            1.0
+          ]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Der Ausschuss wertet freistehende Ein- und Zweifamilienhäuser, Doppelhaushälften und Reihenhäuser GEMEINSAM aus und stellt eine einzige Tabelle für alle drei auf. Dieselbe Matrix steht deshalb unter allen drei Zweigen — der Auswerter ordnet ein Reihenhaus sonst keinem Satz zu. Drei Bodenwertniveaus als Stützstellen (30, 60, 100 Euro/qm), zwischen denen interpoliert wird. Abgedruckte Potenzkoeffizienten je Spalte: a=0.5951 b=-0.23864 · a=0.75381 b=-0.18445 · a=0.87215 b=-0.15334 — dort ist der vorläufige Sachwert in Mio. Euro einzusetzen. Hinterlegt ist die abgedruckte Tabelle, weil sie der Prüfmaßstab des Dokuments ist.",
+        "normobjekt": "643 ausgewertete Kauffälle 2023/2024 über alle drei Gebiete des Ausschusses. Bodenwert erschließungsbeitragsfrei. Bauliche Außenanlagen und nicht in der BGF erfasste Bauteile sind im üblichen Umfang bereits im Faktor enthalten und dürfen NICHT gesondert angesetzt werden."
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren 2025 des Gutachterausschusses für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar, Abbildung 3, Seite 11.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Potenzkoeffizienten je Spalte, beschlossen am 18.06.2025. KEINE Stufe A, weil der Bericht die Fallzahl nicht je Gebiet und Objektart ausweist - die 643 Kauffaelle verteilen sich auf drei Gebiete und drei Haustypen.",
+      "fallzahl": null
+    },
+    {
+      "zweig": "rmh",
+      "zweig_bez": "Reihenmittelhäuser im Landkreis Sömmerda",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x": [
+          30,
+          60,
+          100
+        ],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenwertniveau in Euro/m² (erschließungsbeitragsfrei)",
+        "achse_y": [
+          50000,
+          60000,
+          70000,
+          80000,
+          90000,
+          100000,
+          120000,
+          140000,
+          160000,
+          180000,
+          200000,
+          220000,
+          240000,
+          260000,
+          280000,
+          300000,
+          320000,
+          340000,
+          360000,
+          380000,
+          400000
+        ],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "50000": [
+            1.22,
+            1.31,
+            1.38
+          ],
+          "60000": [
+            1.16,
+            1.27,
+            1.34
+          ],
+          "70000": [
+            1.12,
+            1.23,
+            1.31
+          ],
+          "80000": [
+            1.09,
+            1.2,
+            1.28
+          ],
+          "90000": [
+            1.06,
+            1.18,
+            1.26
+          ],
+          "100000": [
+            1.03,
+            1.15,
+            1.24
+          ],
+          "120000": [
+            0.99,
+            1.11,
+            1.21
+          ],
+          "140000": [
+            0.95,
+            1.08,
+            1.18
+          ],
+          "160000": [
+            0.92,
+            1.06,
+            1.16
+          ],
+          "180000": [
+            0.9,
+            1.03,
+            1.13
+          ],
+          "200000": [
+            0.87,
+            1.01,
+            1.12
+          ],
+          "220000": [
+            0.85,
+            1.0,
+            1.1
+          ],
+          "240000": [
+            0.84,
+            0.98,
+            1.09
+          ],
+          "260000": [
+            0.82,
+            0.97,
+            1.07
+          ],
+          "280000": [
+            0.81,
+            0.95,
+            1.06
+          ],
+          "300000": [
+            0.79,
+            0.94,
+            1.05
+          ],
+          "320000": [
+            0.78,
+            0.93,
+            1.04
+          ],
+          "340000": [
+            0.77,
+            0.92,
+            1.03
+          ],
+          "360000": [
+            0.76,
+            0.91,
+            1.02
+          ],
+          "380000": [
+            0.75,
+            0.9,
+            1.01
+          ],
+          "400000": [
+            0.74,
+            0.89,
+            1.0
+          ]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Der Ausschuss wertet freistehende Ein- und Zweifamilienhäuser, Doppelhaushälften und Reihenhäuser GEMEINSAM aus und stellt eine einzige Tabelle für alle drei auf. Dieselbe Matrix steht deshalb unter allen drei Zweigen — der Auswerter ordnet ein Reihenhaus sonst keinem Satz zu. Drei Bodenwertniveaus als Stützstellen (30, 60, 100 Euro/qm), zwischen denen interpoliert wird. Abgedruckte Potenzkoeffizienten je Spalte: a=0.5951 b=-0.23864 · a=0.75381 b=-0.18445 · a=0.87215 b=-0.15334 — dort ist der vorläufige Sachwert in Mio. Euro einzusetzen. Hinterlegt ist die abgedruckte Tabelle, weil sie der Prüfmaßstab des Dokuments ist.",
+        "normobjekt": "643 ausgewertete Kauffälle 2023/2024 über alle drei Gebiete des Ausschusses. Bodenwert erschließungsbeitragsfrei. Bauliche Außenanlagen und nicht in der BGF erfasste Bauteile sind im üblichen Umfang bereits im Faktor enthalten und dürfen NICHT gesondert angesetzt werden."
+      },
+      "korrekturen": [],
+      "beleg": "Sachwertfaktoren 2025 des Gutachterausschusses für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar, Abbildung 3, Seite 11.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich beschlossene und abgedruckte Tabelle samt Potenzkoeffizienten je Spalte, beschlossen am 18.06.2025. KEINE Stufe A, weil der Bericht die Fallzahl nicht je Gebiet und Objektart ausweist - die 643 Kauffaelle verteilen sich auf drei Gebiete und drei Haustypen.",
+      "fallzahl": null
+    }
+  ],
+  "anmerkungen": [
+    "Der Ausschuss ist für DREI Gebiete zuständig und wertet sie GETRENNT aus: Landkreis Sömmerda, Landkreis Weimarer Land und kreisfreie Stadt Weimar. Jedes hat eigene Bodenwertniveaus und eine eigene Tabelle; alle drei liegen als eigene Rezepte im Register.",
+    "Die Unterschiede sind erheblich: Sömmerda führt Bodenwertniveaus von 30 bis 100 Euro/qm, Weimarer Land 30 bis 90, die Stadt Weimar 130 bis 280. Und die Faktoren der Stadt liegen weit höher — bei 100.000 Euro vorläufigem Sachwert 1,50 bis 1,94 gegen 1,03 bis 1,24 im Landkreis Sömmerda.",
+    "MODELLBESONDERHEIT: bauliche Außenanlagen, sonstige Anlagen und bei der BGF-Berechnung nicht erfasste Bauteile bekommen KEINEN gesonderten Wertansatz — sie stecken bereits im Sachwertfaktor. Wer sie zusätzlich ansetzt, rechnet sie doppelt. Das gilt für alle Thüringer Ausschüsse dieser Reihe, während die meisten anderen Länder 5 Prozent ansetzen.",
+    "Der Bodenwert ist ERSCHLIESSUNGSBEITRAGSFREI anzusetzen; das steht als Spaltenüberschrift über den Tabellen."
+  ]
+}

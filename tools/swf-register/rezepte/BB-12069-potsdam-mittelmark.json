@@ -1,0 +1,285 @@
+{
+  "land_code": "BB",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Potsdam-Mittelmark",
+  "gaa_kennz": "12069",
+  "ags": ["12069"],
+  "ebene": "kreis",
+  "berichtsjahr": 2025,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06-25",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_PM.pdf",
+  "quelle_datei": "BB-potsdam-mittelmark-gmb-2025.pdf",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, S. 42 ff. Tabellen 34 bis 39 (Merkmalsübersichten und Übersichten der Sachwertfaktoren).",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "region",
+        "achse_k_bez": "Region im Landkreis Potsdam-Mittelmark",
+        "kategorien": ["berliner_umland", "weiterer_metropolenraum"],
+        "zuordnung_feld": "ort",
+        "kategorie_zuordnung": {
+          "hinweis": "Der Bericht nennt die Gemeinde- und Stadtbereiche in den Kopfzeilen seiner Tabellen 36 und 39. Berliner Umland: Michendorf, Nuthetal, Schwielowsee, Seddiner See, Stahnsdorf, Werder (Havel), Kleinmachnow, Teltow. Weiterer Metropolenraum: Bad Belzig, Beelitz, Beetzsee, Brück, Groß Kreutz (Havel), Kloster Lehnin, Niemegk, Treuenbrietzen, Wiesenburg/Mark, Wusterwitz, Ziesar. KEINE Restkategorie: der Bericht zählt beide Seiten auf, ohne zu sagen, dass die Aufzählung den Landkreis erschöpft.",
+          "berliner_umland": ["Michendorf", "Nuthetal", "Schwielowsee", "Seddiner See",
+                              "Stahnsdorf", "Werder", "Werder (Havel)", "Kleinmachnow",
+                              "Teltow", "Bergholz-Rehbrücke", "Caputh", "Ferch", "Geltow",
+                              "Wilhelmshorst", "Langerwisch", "Neuseddin", "Seddin"],
+          "weiterer_metropolenraum": ["Bad Belzig", "Belzig", "Beelitz", "Beetzsee", "Brück",
+                                      "Groß Kreutz", "Groß Kreutz (Havel)", "Kloster Lehnin",
+                                      "Lehnin", "Niemegk", "Treuenbrietzen",
+                                      "Wiesenburg", "Wiesenburg/Mark", "Wusterwitz", "Ziesar",
+                                      "Görzke", "Planebruch", "Mühlenfließ", "Rabenstein/Fläming",
+                                      "Golzow", "Päwesin", "Roskow", "Bensdorf", "Rosenau",
+                                      "Havelsee", "Beetzseeheide", "Wollin", "Wenzlow",
+                                      "Borkheide", "Borkwalde", "Linthe", "Planetal"]
+        },
+        "modell_je_kategorie": {
+          "berliner_umland": {
+            "form": "verzweigt",
+            "achse_k_feld": "brw_bereich",
+            "achse_k_bez": "Bodenrichtwertbereich",
+            "kategorien": ["bis_500", "ab_550"],
+            "zuordnung_feld": "brw",
+            "kategorie_baender": [
+              { "von": 110, "bis": 500, "kategorie": "bis_500" },
+              { "von": 550, "bis": 950, "kategorie": "ab_550" }
+            ],
+            "modell_je_kategorie": {
+              "bis_500": {
+                "form": "stufen_1d",
+                "achse_feld": "sachwert",
+                "achse_bez": "vorläufiger Sachwert in Euro",
+                "stufen": {
+                  "218600": 1.10, "250000": 1.09, "300000": 1.09, "350000": 1.09,
+                  "400000": 1.08, "450000": 1.08, "490000": 1.07, "500000": 1.07,
+                  "550000": 1.06, "600000": 1.05, "650000": 1.04, "700000": 1.03,
+                  "750000": 1.01, "800000": 1.00, "850000": 0.99, "900000": 0.96,
+                  "950000": 0.95, "1000000": 0.93, "1050000": 0.91, "1100000": 0.88,
+                  "1150000": 0.86, "1200000": 0.83, "1250000": 0.81, "1269100": 0.80
+                },
+                "rundung_stellen": 2, "liefert": "faktor",
+                "hinweis": "44 Kauffälle 2025, Bodenrichtwert 110 bis 500 €/m² (Ø 344), Sachwertfaktoren 0,67 bis 1,46 (Ø 1,05), Baujahre 1840 bis 2019, Restnutzungsdauer 21 bis 74 Jahre, Standardstufe 1,2 bis 4,4. Korrelationskoeffizient 0,3010, Bestimmtheitsmaß 0,0906. Der Bericht führt zusätzlich die Regressionsfunktion y = −2,45·10⁻¹³x² + 8,07·10⁻⁸x + 1,09; hier steht die abgedruckte Tabelle, die sie erzeugt."
+              },
+              "ab_550": {
+                "form": "stufen_1d",
+                "achse_feld": "sachwert",
+                "achse_bez": "vorläufiger Sachwert in Euro",
+                "stufen": {
+                  "490000": 1.10, "500000": 1.10, "550000": 1.09, "600000": 1.08,
+                  "650000": 1.07, "700000": 1.06, "750000": 1.05, "800000": 1.04,
+                  "850000": 1.04, "900000": 1.03, "950000": 1.03, "1000000": 1.02,
+                  "1050000": 1.02, "1100000": 1.02, "1150000": 1.01, "1200000": 1.01,
+                  "1250000": 1.01, "1264500": 1.01
+                },
+                "rundung_stellen": 2, "liefert": "faktor",
+                "hinweis": "34 Kauffälle 2025, Bodenrichtwert 550 bis 950 €/m² (Ø 678), Sachwertfaktoren 0,76 bis 1,58 (Ø 1,06), Baujahre 1930 bis 2012, Restnutzungsdauer 21 bis 67 Jahre. Bestimmtheitsmaß 0,0174 — die Kurve ist fast waagerecht."
+              }
+            },
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "ZWISCHEN 500 UND 550 €/m² FÜHRT DER BERICHT NICHTS. Die beiden Untersuchungsbereiche sind getrennt erhoben; die Lücke ist nicht zu schließen, ohne eine Zahl zu erfinden."
+          },
+          "weiterer_metropolenraum": {
+            "form": "verzweigt",
+            "achse_k_feld": "brw_bereich",
+            "achse_k_bez": "Bodenrichtwertbereich",
+            "kategorien": ["bis_100", "ab_110"],
+            "zuordnung_feld": "brw",
+            "kategorie_baender": [
+              { "von": 15, "bis": 100, "kategorie": "bis_100" },
+              { "von": 110, "bis": 290, "kategorie": "ab_110" }
+            ],
+            "modell_je_kategorie": {
+              "bis_100": {
+                "form": "stufen_1d",
+                "achse_feld": "sachwert",
+                "achse_bez": "vorläufiger Sachwert in Euro",
+                "stufen": {
+                  "96700": 1.14, "100000": 1.14, "136000": 1.15, "150000": 1.15,
+                  "153000": 1.15, "200000": 1.13, "250000": 1.09, "300000": 1.02,
+                  "350000": 0.94, "400000": 0.84, "450000": 0.71, "500000": 0.56,
+                  "521000": 0.49
+                },
+                "rundung_stellen": 2, "liefert": "faktor",
+                "hinweis": "35 Kauffälle 2025, Bodenrichtwert 15 bis 100 €/m² (Ø 55), Sachwertfaktoren 0,45 bis 1,89 (Ø 1,05), Baujahre 1870 bis 2021. DIE STEILSTE KURVE DIESES BERICHTS: von 1,15 bei 153.000 € auf 0,49 bei 521.000 €. Bestimmtheitsmaß 0,142."
+              },
+              "ab_110": {
+                "form": "stufen_1d",
+                "achse_feld": "sachwert",
+                "achse_bez": "vorläufiger Sachwert in Euro",
+                "stufen": {
+                  "153000": 1.02, "200000": 1.03, "250000": 1.03, "300000": 1.03,
+                  "350000": 1.02, "400000": 1.01, "450000": 0.99, "500000": 0.97,
+                  "521000": 0.96, "550000": 0.94, "600000": 0.91, "650000": 0.87,
+                  "700000": 0.83, "750000": 0.78, "795000": 0.73
+                },
+                "rundung_stellen": 2, "liefert": "faktor",
+                "hinweis": "33 Kauffälle 2025, Bodenrichtwert 110 bis 290 €/m². Bestimmtheitsmaß 0,106."
+              }
+            },
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "ZWISCHEN 100 UND 110 €/m² FÜHRT DER BERICHT NICHTS."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "ZWEI EBENEN: erst die Region, dann der Bodenrichtwertbereich. Das ist nötig, weil sich die Bereiche zwischen den Regionen ÜBERSCHNEIDEN — im Berliner Umland gilt 110 bis 500 €/m², im weiteren Metropolenraum 110 bis 290 €/m², und beide führen andere Zahlen. Wer nur nach dem Bodenrichtwert zuordnete, träfe bei 200 €/m² zwei verschiedene Tabellen. Vier Tabellen, 70 abgedruckte Stützstellen, 146 Kauffälle.",
+        "normobjekt": "Gebrauchte freistehende Ein- und Zweifamilienhäuser mit Wohnflächen bis 250 m². Kauffälle, deren Gesamtkaufpreis unter dem rentierlichen Bodenwertanteil lag, sind nicht einbezogen. Bodenrichtwerte zum Stichtag 01.01.2025."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
+        "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
+        "kauffaelle_gesamt": 146,
+        "besonderheit": "Der Bericht weist für zwei Bereiche zusätzliche signifikante Abhängigkeiten aus: im Berliner Umland bis 500 €/m² zur RESTNUTZUNGSDAUER (R = 0,33, Faktoren 0,96 bis 1,16 bei 21 bis 74 Jahren), ab 550 €/m² zur HÖHE DES BODENRICHTWERTS (R = 0,30, Faktoren 1,02 bis 1,14 bei 550 bis 950 €/m²). Diese zweiten Abhängigkeiten sind hier NICHT abgebildet — der Bericht druckt dafür keine Tabelle ab, nur den Befund."
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Potsdam-Mittelmark, zwei Regionen mit je zwei Bodenrichtwertbereichen",
+        "sachlich": "gebrauchte freistehende Ein- und Zweifamilienhäuser mit Wohnfläche bis 250 m²",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "wohnflaeche_qm": { "min": 60, "max": 250 },
+          "brw_eur_qm":     { "min": 15, "max": 950 },
+          "baujahr":        { "min": 1840, "max": 2021 },
+          "rnd_jahre":      { "min": 18, "max": 76 },
+          "standardstufe":  { "min": 1.2, "max": 4.4 }
+        },
+        "vorbehalt": "DIE BESTIMMTHEITSMASSE SIND NIEDRIG: 0,0906 · 0,0174 · 0,142 · 0,106. Im Berliner Umland ab 550 €/m² erklärt die Kurve nicht einmal zwei Prozent der Streuung — dort ist der Faktor praktisch eine Konstante um 1,05.\n\nDIE STICHPROBENSPANNEN SIND SEHR WEIT: im weiteren Metropolenraum bis 100 €/m² reichen die beobachteten Sachwertfaktoren von 0,45 bis 1,89.\n\nZWEI LÜCKEN SIND BEABSICHTIGT: zwischen 500 und 550 €/m² (Berliner Umland) und zwischen 100 und 110 €/m² (weiterer Metropolenraum) führt der Bericht keine Werte. Dort gibt es auch hier keinen Faktor.\n\nNICHT ABGEBILDET: die zweiten Abhängigkeiten zur Restnutzungsdauer und zur Bodenrichtwerthöhe, die der Bericht nennt, aber nicht tabelliert.",
+        "hinweis": "Der Bericht führt zusätzlich Sachwertfaktoren für Reihenhäuser und Doppelhaushälften (Kap. 8.3.2) sowie Wohnflächenpreise (8.2.3) — hier noch nicht erfasst."
+      },
+
+      "stufe": "B",
+      "stufe_grund": "Vier amtliche Tabellen mit vollständigen Merkmalsübersichten, Korrelationskoeffizienten und Bestimmtheitsmaßen. Stufe B, weil kein Anwendungsbeispiel vorliegt und die Bestimmtheitsmaße zwischen 0,017 und 0,142 liegen.",
+      "fallzahl": 146,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht Potsdam-Mittelmark 2025, Kap. 8.2.2, Tabellen 36 und 39: vier Sachwertfaktor-Tabellen für freistehende Ein- und Zweifamilienhäuser — Berliner Umland 110 bis 500 €/m² (44 Kauffälle) und 550 bis 950 €/m² (34), weiterer Metropolenraum 15 bis 100 €/m² (35) und 110 bis 290 €/m² (33), zusammen 146 Kauffälle des Jahres 2025."
+    },
+
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser und Doppelhaushälften",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "region",
+        "achse_k_bez": "Region im Landkreis Potsdam-Mittelmark",
+        "kategorien": ["berliner_umland", "weiterer_metropolenraum"],
+        "zuordnung_feld": "ort",
+        "kategorie_zuordnung": {
+          "hinweis": "Der Bericht nennt für diesen Teilmarkt in den Tabellenköpfen andere Gemeinden als beim Einfamilienhaus: Nuthetal, Seddiner See, Stahnsdorf und Teltow im Bereich 220 bis 500 €/m², Kleinmachnow, Stahnsdorf und Teltow im Bereich 550 bis 950 €/m². Die Listen hier folgen der Regionszuordnung des Berichts; die Feinunterscheidung innerhalb des Berliner Umlands übernimmt der Bodenrichtwert.",
+          "berliner_umland": ["Michendorf", "Nuthetal", "Schwielowsee", "Seddiner See",
+                              "Stahnsdorf", "Werder", "Werder (Havel)", "Kleinmachnow",
+                              "Teltow", "Bergholz-Rehbrücke", "Caputh", "Ferch", "Geltow",
+                              "Wilhelmshorst", "Langerwisch", "Neuseddin", "Seddin"],
+          "weiterer_metropolenraum": ["Bad Belzig", "Belzig", "Beelitz", "Beetzsee", "Brück",
+                                      "Groß Kreutz", "Groß Kreutz (Havel)", "Kloster Lehnin",
+                                      "Lehnin", "Niemegk", "Treuenbrietzen",
+                                      "Wiesenburg", "Wiesenburg/Mark", "Wusterwitz", "Ziesar",
+                                      "Görzke", "Planebruch", "Mühlenfließ", "Rabenstein/Fläming",
+                                      "Golzow", "Päwesin", "Roskow", "Bensdorf", "Rosenau",
+                                      "Havelsee", "Beetzseeheide", "Wollin", "Wenzlow",
+                                      "Borkheide", "Borkwalde", "Linthe", "Planetal"]
+        },
+        "modell_je_kategorie": {
+          "berliner_umland": {
+            "form": "verzweigt",
+            "achse_k_feld": "brw_bereich",
+            "achse_k_bez": "Bodenrichtwertbereich",
+            "kategorien": ["bis_500", "ab_550"],
+            "zuordnung_feld": "brw",
+            "kategorie_baender": [
+              { "von": 220, "bis": 500, "kategorie": "bis_500" },
+              { "von": 550, "bis": 950, "kategorie": "ab_550" }
+            ],
+            "modell_je_kategorie": {
+              "bis_500": {
+                "form": "stufen_1d",
+                "achse_feld": "sachwert",
+                "achse_bez": "vorläufiger Sachwert in Euro",
+                "stufen": {
+                  "172000": 1.40, "200000": 1.40, "230000": 1.40, "250000": 1.39,
+                  "300000": 1.37, "350000": 1.33, "400000": 1.29, "417000": 1.27
+                },
+                "rundung_stellen": 2, "liefert": "faktor",
+                "hinweis": "29 Kauffälle 2025, Bodenrichtwert 220 bis 500 €/m² (Ø 393), Sachwertfaktoren 1,07 bis 1,70 (Ø 1,38), Baujahre 1900 bis 2009, Restnutzungsdauer 41 bis 64 Jahre. Bestimmtheitsmaß 0,0494 — die Kurve ist über den ganzen Bereich fast waagerecht zwischen 1,40 und 1,27."
+              },
+              "ab_550": {
+                "form": "stufen_1d",
+                "achse_feld": "sachwert",
+                "achse_bez": "vorläufiger Sachwert in Euro",
+                "stufen": {
+                  "230000": 1.96, "250000": 1.93, "300000": 1.76, "350000": 1.62,
+                  "400000": 1.48, "417000": 1.40, "450000": 1.36, "500000": 1.26,
+                  "550000": 1.16, "600000": 1.08, "650000": 1.02, "700000": 0.97,
+                  "750000": 0.93, "800000": 0.91, "850000": 0.90, "915000": 0.90
+                },
+                "rundung_stellen": 2, "liefert": "faktor",
+                "hinweis": "26 Kauffälle 2025, Bodenrichtwert 550 bis 950 €/m². BESTIMMTHEITSMASS 0,844 — mit Abstand der höchste Wert dieses Registers. Der Faktor fällt von 1,96 auf 0,90 und ist hier tatsächlich stark vom vorläufigen Sachwert abhängig."
+              }
+            },
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "ZWISCHEN 500 UND 550 €/m² FÜHRT DER BERICHT NICHTS, wie beim Einfamilienhaus-Satz."
+          },
+          "weiterer_metropolenraum": {
+            "form": "stufen_1d",
+            "achse_feld": "sachwert",
+            "achse_bez": "vorläufiger Sachwert in Euro",
+            "stufen": {
+              "76000": 0.81, "100000": 0.86, "125000": 0.90, "150000": 0.93,
+              "175000": 0.95, "200000": 0.96, "225000": 0.96, "250000": 0.95,
+              "275000": 0.93, "300000": 0.91, "325000": 0.87, "350000": 0.83,
+              "375000": 0.77, "400000": 0.71, "425000": 0.64, "440000": 0.59
+            },
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "NUR DOPPELHAUSHÄLFTEN. Der Bericht schreibt ausdrücklich: „Die folgenden Faktoren sind ausschließlich für Doppelhaushälften abgeleitet worden. Für Reihenhäuser wurden zwei Kauffälle im Raum Beelitz untersucht. Hier ergeben sich Faktoren von 1,84 und 1,92 für Reihenhäuser der Baujahre 1996 und 2001.\" Diese zwei Einzelwerte sind NICHT übernommen — zwei Kauffälle sind keine Ableitung, und sie liegen doppelt so hoch wie die Doppelhaushälften-Kurve. 12 Kauffälle, Bodenrichtwert 25 bis 220 €/m², Sachwertfaktoren 0,57 bis 1,31 (Ø 0,89), Bestimmtheitsmaß 0,277. DIE KURVE HAT EIN MAXIMUM bei rund 210.000 € (0,96) und fällt danach steil auf 0,59."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "DREI TABELLEN, ZWEI EBENEN. Im Berliner Umland trennt der Bericht nach Bodenrichtwert (220 bis 500 gegen 550 bis 950 €/m²), im weiteren Metropolenraum führt er eine einzige Reihe — und die gilt ausdrücklich NUR für Doppelhaushälften. Die Bestimmtheitsmaße gehen weit auseinander: 0,0494 · 0,844 · 0,277.",
+        "normobjekt": "Gebrauchte Reihenhäuser und Doppelhaushälften. Bodenrichtwerte zum Stichtag 01.01.2025."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
+        "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
+        "kauffaelle_gesamt": 67
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Potsdam-Mittelmark, Berliner Umland mit zwei Bodenrichtwertbereichen, weiterer Metropolenraum",
+        "sachlich": "Reihenhäuser und Doppelhaushälften; im weiteren Metropolenraum NUR Doppelhaushälften",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "brw_bu":        { "min": 220, "max": 950 },
+          "brw_wmr":       { "min": 25, "max": 220 },
+          "baujahr_bu":    { "min": 1900, "max": 2009 },
+          "baujahr_wmr":   { "min": 1905, "max": 2009 },
+          "rnd_bu":        { "min": 41, "max": 64 },
+          "rnd_wmr":       { "min": 21, "max": 64 },
+          "standardstufe": { "min": 1.7, "max": 3.4 }
+        },
+        "vorbehalt": "IM WEITEREN METROPOLENRAUM GILT DIE REIHE NUR FÜR DOPPELHAUSHÄLFTEN. Für Reihenhäuser liegen dort zwei Kauffälle vor (1,84 und 1,92) — sie sind hier nicht übernommen, weil zwei Fälle keine Ableitung sind. Wer dort ein Reihenhaus bewertet, bekommt den Doppelhaushälften-Faktor; der Bericht selbst führt die Tabelle unter „Reihenhäuser und Doppelhaushälften\" und die Untertabelle unter „Doppelhaushälften\". Das ist eine bewusste Näherung und im Zweifel zu prüfen.\n\nDIE STICHPROBEN SIND KLEIN: 29, 26 und 12 Kauffälle.\n\nDAS BESTIMMTHEITSMASS IM BEREICH 220 BIS 500 €/m² LIEGT BEI 0,0494 — dort erklärt die Kurve praktisch nichts, und der Faktor ist faktisch eine Konstante um 1,35.",
+        "hinweis": "Der Bericht führt zusätzlich Wohnflächenpreise für Reihenhäuser (Kap. 8.3.3.1) — hier nicht erfasst."
+      },
+
+      "stufe": "C",
+      "stufe_grund": "Amtliche Tabellen mit vollständigen Merkmalsübersichten. Stufe C statt B, weil zwei der drei Reihen Bestimmtheitsmaße unter 0,3 haben, die Stichproben klein sind und im weiteren Metropolenraum Reihenhäuser gar nicht abgeleitet wurden.",
+      "fallzahl": 67,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht Potsdam-Mittelmark 2025, Kap. 8.3.2, Tabellen 45 und 47, S. 52 ff.: Sachwertfaktoren für Reihenhäuser und Doppelhaushälften — Berliner Umland 220 bis 500 €/m² (29 Kauffälle) und 550 bis 950 €/m² (26), weiterer Metropolenraum nur Doppelhaushälften 25 bis 220 €/m² (12)."
+}
+  ]
+}

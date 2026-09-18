@@ -1,0 +1,156 @@
+{
+  "land_code": "BB",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Cottbus/Chóśebuz",
+  "gaa_kennz": "12052",
+  "ags": ["12052000"],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2025,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "2024 und 2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06-25",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_CB.pdf",
+  "quelle_datei": "BB-cottbus-gmb-2025.pdf",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.2, Übersicht der Sachwertfaktoren S. 60 (Stichtag 01.01.2026). Modellkonformität nach § 10 ImmoWertV, Tabelle S. 117 bis 119.",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser, ausschließlich Weiterverkauf",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "baujahrklasse",
+        "achse_k_bez": "Baujahresklasse",
+        "kategorien": ["bis_1948", "1949_1989", "1990_1999", "2000_2021"],
+        "zuordnung_feld": "baujahr",
+        "kategorie_baender": [
+          { "von": null, "bis": 1948, "kategorie": "bis_1948" },
+          { "von": 1949, "bis": 1989, "kategorie": "1949_1989" },
+          { "von": 1990, "bis": 1999, "kategorie": "1990_1999" },
+          { "von": 2000, "bis": 2021, "kategorie": "2000_2021" }
+        ],
+        "modell_je_kategorie": {
+          "bis_1948": {
+            "form": "baender_1d",
+            "achse_feld": "mod_punkte",
+            "achse_bez": "Modernisierungsgrad nach Anlage 2 ImmoWertV",
+            "baender": [
+              { "von": null, "bis": 6, "wert": 1.05, "bez": "unsaniert (MODG 0 bis 6)", "fallzahl": 31, "min": 0.60, "max": 1.56 },
+              { "von": 7, "bis": null, "wert": 1.00, "bez": "teilsaniert bis saniert (MODG ab 7)", "fallzahl": 24, "min": 0.54, "max": 1.38 }
+            ],
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "Baujahre vor 1948. Unsaniert 31 Kauffälle (Bodenrichtwert 15 bis 170 €/m², vorläufiger Sachwert 73.000 bis 342.000 €, Standardstufe 1,0 bis 3,0), teilsaniert bis saniert 24 Kauffälle (55 bis 220 €/m², 155.000 bis 640.000 €, Standardstufe 1,9 bis 3,2)."
+          },
+          "1949_1989": {
+            "form": "baender_1d",
+            "achse_feld": "mod_punkte",
+            "achse_bez": "Modernisierungsgrad nach Anlage 2 ImmoWertV",
+            "baender": [
+              { "von": null, "bis": 6, "wert": 0.89, "bez": "unsaniert (MODG 0 bis 6)", "fallzahl": 18, "min": 0.66, "max": 1.21 },
+              { "von": 7, "bis": null, "wert": 0.81, "bez": "teilsaniert bis saniert (MODG ab 7)", "fallzahl": 10, "min": 0.65, "max": 1.06 }
+            ],
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "Baujahre 1949 bis 1989. AUFFÄLLIG UND SO ABGEDRUCKT: der sanierte Bestand trägt hier den NIEDRIGEREN Faktor (0,81 gegen 0,89) — die Sanierung steckt bereits im vorläufigen Sachwert, der Markt zahlt sie nicht zusätzlich. Die sanierte Reihe umfasst nur 10 Kauffälle."
+          },
+          "1990_1999": {
+            "form": "konstante", "wert": 0.93,
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "29 Kauffälle, Spanne 0,65 bis 1,25. Bodenrichtwert 25 bis 170 €/m², vorläufiger Sachwert 250.000 bis 553.000 €, Standardstufe 2,2 bis 3,3. Der Bericht unterscheidet für diese Baujahre NICHT nach Sanierungsstand."
+          },
+          "2000_2021": {
+            "form": "konstante", "wert": 1.02,
+            "rundung_stellen": 2, "liefert": "faktor",
+            "hinweis": "30 Kauffälle, Spanne 0,69 bis 1,44. Bodenrichtwert 55 bis 200 €/m², vorläufiger Sachwert 173.000 bis 770.000 €, Standardstufe 3,0 bis 4,0. Der Bericht unterscheidet für diese Baujahre NICHT nach Sanierungsstand."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "SECHS KLASSEN AUS BAUJAHR UND SANIERUNGSSTAND, Stichtag 01.01.2026 aus dem Auswertungszeitraum 2024/2025. Für Baujahre vor 1990 trennt der Bericht unsaniert (Modernisierungsgrad 0 bis 6) von teilsaniert bis saniert (ab 7); für jüngere Baujahre führt er nur einen Wert. Der Modernisierungsgrad wird deshalb nur dort verlangt, wo der Bericht ihn unterscheidet.",
+        "normobjekt": "Freistehende Ein- und Zweifamilienhäuser des Cottbuser Marktes, ausschließlich Weiterverkauf. Ermittlung nach der Verwaltungsvorschrift Ertrags- und Sachwert; Modellkonformität nach § 10 ImmoWertV ist über die Tabelle S. 117 bis 119 des Berichts sicherzustellen."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
+        "stichtag": "01.01.2026",
+        "auswertungszeitraum": "2024 bis 2025",
+        "kauffaelle_gesamt": 142,
+        "hinweis": "Die Modellansätze und -parameter stehen im Bericht auf den Seiten 117 bis 119 und sind für die Modellkonformität nach § 10 ImmoWertV maßgeblich."
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Stadt Cottbus/Chóśebuz",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser, ausschließlich Weiterverkauf",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "brw_eur_qm":   { "min": 15, "max": 350 },
+          "flaeche_qm":   { "min": 200, "max": 2850 },
+          "sachwert_eur": { "min": 73000, "max": 770000 },
+          "standardstufe": { "min": 1.0, "max": 4.0 },
+          "baujahr":      { "min": null, "max": 2021 }
+        },
+        "vorbehalt": "DER BERICHT NENNT SIE ORIENTIERUNGSWERTE: „Diese stellen Orientierungswerte dar und müssen entsprechend des Bewertungsobjektes sachverständig geprüft und ggf. angepasst werden.\"\n\nDIE STICHPROBEN SIND KLEIN: zwischen 10 und 31 Kauffällen je Klasse, bei Spannen von 0,54 bis 1,56.\n\nDIE KLASSENGRENZE DES SANIERUNGSSTANDES liegt beim Modernisierungsgrad 7 nach Anlage 2 ImmoWertV. Wer den Modernisierungsgrad anders ermittelt als der Ausschuss, verschiebt die Klasse — und damit bei Baujahren vor 1990 den Faktor um bis zu acht Prozent.",
+        "hinweis": "Der Bericht führt zusätzlich Sachwertfaktoren für Reihenhäuser und Doppelhaushälften (S. 74) sowie eine zweite Tabelle zum Stichtag 01.01.2025 (Auswertungszeitraum 2023/2024) — beides hier nicht erfasst. Der ältere Stichtag steht für Wertermittlungen auf zurückliegende Stichtage zur Verfügung: 1,06 / 1,06 / 0,94 / 0,87 / 0,88 / 1,02."
+      },
+
+      "stufe": "B",
+      "stufe_grund": "Amtliche Tabelle mit Fallzahlen, Spannen und vollständiger Stichprobenbeschreibung je Klasse. Stufe B, weil kein Anwendungsbeispiel vorliegt, die Klassen mit 10 bis 31 Kauffällen klein sind und der Bericht seine Werte selbst als Orientierungswerte bezeichnet.",
+      "fallzahl": 142,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 der Stadt Cottbus/Chóśebuz, Kap. 8.2.2, S. 60: Übersicht der Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser zum Stichtag 01.01.2026 aus dem Auswertungszeitraum 2024/2025 — sechs Klassen nach Baujahr und Sanierungsstand aus 142 Kauffällen."
+    },
+
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser und Doppelhaushälften",
+      "form": "baender_1d",
+      "formel": {
+        "form": "baender_1d",
+        "achse_feld": "baujahr",
+        "achse_bez": "Baujahr",
+        "baender": [
+          { "von": null, "bis": 1948, "wert": 1.17, "bez": "vor 1948",      "fallzahl": 14, "min": 0.71, "max": 1.79 },
+          { "von": 1949, "bis": 1989, "wert": 1.30, "bez": "1949 bis 1989", "fallzahl": 7,  "min": 0.77, "max": 1.78 },
+          { "von": 1990, "bis": null, "wert": 1.03, "bez": "ab 1990",       "fallzahl": 27, "min": 0.67, "max": 1.46 }
+        ],
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "NUR NACH BAUJAHR, OHNE SANIERUNGSSTAND. Anders als bei den freistehenden Ein- und Zweifamilienhäusern trennt der Bericht diesen Teilmarkt nicht nach Modernisierungsgrad — die Stichproben wären zu klein. Stichtag 01.01.2026 aus den Auswertungszeiträumen 2024/2025 (vor 1948 und ab 1990) beziehungsweise 2022 bis 2025 (1949 bis 1989).",
+        "normobjekt": "Reihenhäuser und Doppelhaushälften des Cottbuser Marktes. Modellkonformität nach § 10 ImmoWertV über die Tabelle S. 117 bis 119 des Berichts."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
+        "stichtag": "01.01.2026",
+        "kauffaelle_gesamt": 48,
+        "hinweis": "Die Modellansätze stehen im Bericht auf den Seiten 117 bis 119."
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Stadt Cottbus/Chóśebuz",
+        "sachlich": "Reihenhäuser und Doppelhaushälften",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "brw_eur_qm":   { "min": 40, "max": 170 },
+          "flaeche_qm":   { "min": 163, "max": 1050 },
+          "sachwert_eur": { "min": 104000, "max": 388000 },
+          "standardstufe": { "min": 1.9, "max": 3.5 }
+        },
+        "vorbehalt": "DER BERICHT NENNT SIE ORIENTIERUNGSWERTE und verlangt ausdrücklich die sachverständige Prüfung am Bewertungsobjekt.\n\nDIE MITTLERE KLASSE BERUHT AUF SIEBEN KAUFFÄLLEN, verteilt über vier Jahrgänge (2022 bis 2025), bei einer Spanne von 0,77 bis 1,78. Sie trägt zugleich den HÖCHSTEN Faktor der drei Klassen (1,30) — bei den freistehenden Häusern ist es umgekehrt die niedrigste. Das ist im Bericht so abgedruckt; die Stichprobe ist zu klein, um daraus mehr zu lesen als eine Orientierung.\n\nALLE DREI KLASSEN STREUEN WEIT: 0,67 bis 1,79 über die ganze Tabelle.",
+        "hinweis": "Der Bericht führt zusätzlich eine Tabelle zum Stichtag 01.01.2025 (Auswertungszeiträume 2021 bis 2024): 1,21 · 1,36 · 1,15. Sie steht für Wertermittlungen auf zurückliegende Stichtage zur Verfügung."
+      },
+
+      "stufe": "C",
+      "stufe_grund": "Amtliche Tabelle mit Fallzahlen, Spannen und Stichprobenbeschreibung. Stufe C, weil die Klassen mit 7 bis 27 Kauffällen klein sind, die Spannen sehr weit reichen und der Bericht seine Werte selbst als Orientierungswerte bezeichnet.",
+      "fallzahl": 48,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 der Stadt Cottbus/Chóśebuz, Kap. 8.3.2, S. 74: Übersicht der Sachwertfaktoren für Reihenhäuser und Doppelhaushälften zum Stichtag 01.01.2026 — drei Baujahresklassen aus 48 Kauffällen (14 / 7 / 27)."
+    }
+  ]
+}

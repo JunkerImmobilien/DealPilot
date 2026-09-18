@@ -43,6 +43,10 @@
 <title>DealPilot · Marktbericht</title>
 <link rel="stylesheet" href="vendor/leaflet.css" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<!-- v1346: DM Sans — dieselbe Schrift wie die Haupt-App (frontend/index.html:37).
+     Der Marktbericht soll aussehen wie der Objekt-Tab, nicht wie eine
+     zweite Anwendung. -->
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
   :root{
     --bg:#050505; --panel:#141417; --panel2:#1b1b20; --line:#2a2a31;
@@ -77,7 +81,14 @@
   /* v651-mb-css: Feld-Flucht + Hell-Lesbarkeit + Letzte-Ausgabe raus */
   .row{align-items:stretch;}
   .row>div{display:flex;flex-direction:column;}
-  .row>div>input:not([type=checkbox]),.row>div>select{margin-top:auto;}
+  /* v1336c - die v651-Regel ist HIER, nicht nur in meinem eigenen Block.
+     Sie loest dieselbe Aufgabe auf dem Weg, der bei zwei Kindern je Zelle
+     aufgeht und bei dreien kippt: haengt hinter dem Feld noch eine
+     "fehlt"-Markierung oder ein Ankertext, schiebt `auto` das FELD nach
+     oben statt den Rest nach unten. Gemessen in der Zeile
+     Balkon/Garten/Grundstueck/Wohneinheiten: 34 px Versatz, obwohl alle
+     vier Labels exakt gleich hoch waren. Die Flucht macht jetzt
+     labelsAngleichen() in mb-wizard.js. */
   html[data-mb-theme="light"] input,html[data-mb-theme="light"] select,html[data-mb-theme="light"] textarea,html[data-mb-theme="light"] option{color:#161616 !important;}
   html[data-mb-theme="light"] select option{background:#ffffff !important;color:#161616 !important;}
   html[data-mb-theme="light"] #saveFileBtn,html[data-mb-theme="light"] #loadFileBtn{color:#161616 !important;border-color:var(--wl-c9a84c, #C9A84C) !important;background:#ffffff !important;}
@@ -111,7 +122,48 @@
   input,select{width:100%;background:#0f0f12;border:1px solid var(--line);color:var(--txt);
     border-radius:11px;padding:12px 14px;font-family:'Inter';font-size:15px;min-height:44px;box-sizing:border-box;}
   input:focus,select:focus{outline:none;border-color:var(--gold);}
-  .row{display:flex;gap:12px;flex-wrap:wrap;}.row>div{flex:1 1 calc(50% - 6px);min-width:128px;}
+  /* v1336 - DIE EINGABEFELDER FLUCHTEN JETZT.
+     Marcels Befund: "Die Formatierung der Felder passt oft nicht
+     Eingabefelder zu Textfeldern fluchten nicht."
+
+     GEMESSEN im Staging-iframe bei 1240 px Panelbreite:
+       eq_energie/eq_heating/eq_windows  -> drittes Feld 960 statt 474 px,
+                                            Versatz 95 px
+       eq_walls/eq_dachform/eq_roof      -> dasselbe
+       balcony/garden/plot/units         -> Versatz 133 px, weil die
+                                            Labels von plot und units
+                                            zweizeilig sind (39 statt 19 px)
+
+     Zwei Ursachen, eine Zeile CSS. `flex:1 1 calc(50% - 6px)` kann drei
+     Felder nicht tragen: das dritte bricht um und nimmt dann die ganze
+     Breite. Und weil das Eingabefeld direkt unter dem Label sitzt,
+     wandert es mit jeder zweiten Labelzeile nach unten.
+
+     Grid mit auto-fit loest das erste: die Spaltenzahl richtet sich nach
+     dem Platz, nicht nach einer geratenen Prozentzahl - zwei Felder
+     ergeben zwei Spalten, drei ergeben drei, auf dem Handy alle
+     untereinander. Die Zelle als Flex-Spalte mit `margin-top:auto` am
+     Feld loest das zweite: das Label darf wachsen, das Eingabefeld bleibt
+     unten und steht damit auf einer Linie mit seinen Nachbarn. */
+  .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:0 12px;align-items:stretch;}
+  .row>div{display:flex;flex-direction:column;min-width:0;}
+  /* v1336b - EIGENER FEHLER, GEMESSEN UND ZURUECKGENOMMEN.
+     `margin-top:auto` am Eingabefeld sollte es ans Zellenende druecken.
+     Das funktioniert nur, solange das Feld das LETZTE Element der Zelle
+     ist - und das ist es oft nicht: die Stufenleiste haengt eine
+     "fehlt"-Markierung an, die Feldhilfe einen Ankertext. Gemessen hat
+     die Zelle #plot drei Kinder und #cond vier. Dort schob `auto` das
+     Feld nach OBEN, weg von seinen Nachbarn - aus 133 px Versatz wurden
+     33, aber weg war er nicht.
+
+     Das Feld sitzt jetzt wieder direkt unter seinem Label. Damit sie
+     trotzdem fluchten, bekommen die Labels einer Rasterzeile dieselbe
+     Hoehe - das macht `labelsAngleichen()` in mb-wizard.js, weil es sich
+     nach dem tatsaechlichen Umbruch richten muss und keine CSS-Regel das
+     kann. */
+
+
   input[type=number]{padding-right:8px;}
   button.go{margin-top:18px;width:100%;background:var(--gold);color:#1a1500;border:none;
     border-radius:999px;padding:13px;font-family:'Space Grotesk';font-weight:600;font-size:15px;
@@ -286,6 +338,7 @@
     .report h1{font-size:19px !important}
     .report h2{font-size:15px !important}
     canvas,img{max-width:100% !important;height:auto}
+    .row{grid-template-columns:1fr !important}   /* v1336: auf dem Handy untereinander */
     .row>div{min-width:0 !important}
     table{display:block;overflow-x:auto;max-width:100%}
   }
@@ -487,7 +540,7 @@
           <div><label>Balkon / Terrasse (m²)</label><input id="balcony" type="number" placeholder="0" /></div>
           <div><label>Garten (m²)</label><input id="garden" type="number" placeholder="0" /></div>
           <div><label>Grundstück (m²) <span style="color:#6a6a72;font-weight:400;font-size:11px;"><!-- WFELD-4 --> — bei Eigentumswohnung: Gesamtgrundstück, Anteil über MEA</span></label><input id="plot" type="number" placeholder="z.B. 650" /></div>
-          <div><label>Wohneinheiten <span style="color:#6a6a72;font-weight:400;font-size:11px;">— nur MFH</span></label><input id="units" type="number" placeholder="z.B. 4" /></div>
+          <div><label>Wohneinheiten <span style="color:#6a6a72;font-weight:400;font-size:11px;">— Wohnungen im Gebäude; bei ETW, EFH, DHH und Reihenhaus ist es 1</span></label><input id="units" type="number" placeholder="z.B. 4" /></div>
         </div>
         <div class="row">
           <div><label>Garagen / TG-Stellplätze</label><input id="garages" type="number" placeholder="0" /></div>
@@ -636,8 +689,8 @@ if (!window._wlrgbaH) {
 <script src="vendor/leaflet.js"></script>
 <script src="vendor/jspdf.umd.min.js"></script>
 <script src="vendor/jspdf.plugin.autotable.min.js"></script>
-<script src="app.js?v=1229c"></script>
-<script src="mb-objektwahl.js?v=1229b"></script><!-- v566-objektwahl -->
+<script src="app.js?v=1409"></script>
+<script src="mb-objektwahl.js?v=1333d"></script><!-- v566-objektwahl -->
 <script>
 /* DealPilot-Partikelfeld: leichte, langsam driftende Gold-Punkte hinter dem Content */
 (function () {
@@ -664,9 +717,15 @@ document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e
 try{var _u=new URLSearchParams(location.search).get('theme');if(_u==='light'||_u==='dark'){sessionStorage.setItem(K,_u);apply(_u);}else{var s=sessionStorage.getItem(K);if(s)apply(s);}}catch(_){}
 })();</script>
 <!-- WUI10-1 · Wertermittlung: Zielfrage, Stufenfelder, Pflichtfeld-Ampel -->
-<script src="feldhilfe.js?v=1146b"></script>
-<script src="wertermittlung.js?v=1229b"></script>
-<script src="mb-stufen.js?v=1229b"></script>
-<script src="mb-wizard.js?v=1196b"></script><!-- v1127: Reiter, nach mb-stufen.js --><!-- v1126: Stufen als Meilensteine, nach wertermittlung.js -->
+<script src="feldhilfe.js?v=1338"></script>
+<script src="wertermittlung.js?v=1351"></script>
+<script src="mb-stufen.js?v=1351"></script>
+<script src="mb-wizard.js?v=1350"></script><!-- v1127: Reiter, nach mb-stufen.js --><!-- v1126: Stufen als Meilensteine, nach wertermittlung.js -->
+<!-- v1340: Eingabe-Karten (Variante B). NACH mb-wizard.js — vorher liegen die
+     Zeilen noch nicht in ihren Reitern. -->
+<script src="mb-karten.js?v=1350"></script>
+<!-- v1344: Stufen-Vorhang fuer die Zusatzwerte + Auskunft "wo bekomme ich das her".
+     NACH mb-karten.js. -->
+<script src="mb-quellen.js?v=1348c"></script>
 </body>
 </html>

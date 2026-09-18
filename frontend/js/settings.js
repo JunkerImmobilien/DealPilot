@@ -206,21 +206,48 @@ function showSettings(initialTab) {
             '<span class="help-sidebar-item-title">Deal Score</span></div>' +
           '<span class="help-sidebar-item-desc">Gewichtung, Schwellenwerte</span>' +
         '</button>' +
-        '<button class="help-sidebar-item st-tab ms-tab" data-tab="profilanzeige" onclick="_swSet(this)">' +
+        /* === v1355 - AUS EINEM REITER WERDEN ZWEI ======================
+           Gemessen vor der Teilung: „Profil & Anzeige" war 3.933 Zeichen,
+           14 Bloecke, 3.038 Pixel - der mit Abstand groesste Reiter. Der
+           Name sagte das Problem selbst: Profil UND Anzeige.
+
+           Die Bloecke zerfallen sauber in zwei Haelften:
+
+             Standardwerte  Finanzierung - Bewirtschaftung - Mindest-
+                            Schwellen - Steuer - Standort & Nebenkosten
+                            => fliessen in JEDE Kalkulation ein
+
+             Darstellung    Anzeige-Optionen - Aussehen - Markt-Daten -
+                            Investor Deal Score beim Oeffnen - Quick-
+                            boarding - Bilder - Tooltip-Hilfe -
+                            Marktbericht-Design - Darstellung
+                            => aendern KEINE Zahl
+
+           Marcel hat der Teilung am 13.09.2026 ausdruecklich zugestimmt,
+           nachdem ihm die Messung vorlag. Es geht nichts verloren, nur
+           die Sortierung aendert sich. */
+        '<button class="help-sidebar-item st-tab ms-tab" data-tab="standardwerte" onclick="_swSet(this)">' +
           '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-target"/></svg></span>' +
-            '<span class="help-sidebar-item-title">Profil &amp; Anzeige</span></div>' +
-          '<span class="help-sidebar-item-desc">Sichtbarkeit, Darstellung</span>' +
+            '<span class="help-sidebar-item-title">Standardwerte</span></div>' +
+          '<span class="help-sidebar-item-desc">Finanzierung, Bewirtschaftung, Steuer</span>' +
         '</button>' +
+        '<button class="help-sidebar-item st-tab ms-tab" data-tab="darstellung" onclick="_swSet(this)">' +
+          '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-eye"/></svg></span>' +
+            '<span class="help-sidebar-item-title">Darstellung</span></div>' +
+          '<span class="help-sidebar-item-desc">Sichtbarkeit, Farben, Hinweise</span>' +
+        '</button>' +
+
         '<button class="help-sidebar-item st-tab ms-tab" data-tab="datenraum" onclick="_swSet(this)">' +
           '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-share"/></svg></span>' +
             '<span class="help-sidebar-item-title">Datenraum</span></div>' +
           '<span class="help-sidebar-item-desc">Freigaben, Zugriffe</span>' +
         '</button>' +
-        '<button class="help-sidebar-item st-tab ms-tab" data-tab="anbieter" onclick="_swSet(this)">' +
-          '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-share"/></svg></span>' +
-            '<span class="help-sidebar-item-title">Externe Anbieter</span></div>' +
-          '<span class="help-sidebar-item-desc">Partner &amp; Vermittlung</span>' +
-        '</button>' +
+        /* v1355: der Reiter „Externe Anbieter" ist weg. Er trug 380
+           Zeichen und vier Bedienelemente fuer EINEN Anbieter. API-Zugaenge
+           sind Zugangsdaten und stehen jetzt dort, wo Passwort und
+           Zwei-Faktor stehen: unter Account & Sicherheit. Der Inhalt ist
+           unveraendert, nur sein Platz nicht mehr ein eigener Reiter. */
+
         '<button class="help-sidebar-item st-tab ms-tab" data-tab="mandanten" onclick="_swSet(this)">' +
           '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-home"/></svg></span>' +
             '<span class="help-sidebar-item-title">Mandanten</span></div>' +
@@ -309,7 +336,7 @@ function showSettings(initialTab) {
       (typeof Auth !== 'undefined' && Auth.isApiMode && Auth.isApiMode() ?
         '<hr class="dvd">' +
         '<h3 class="set-section-h">Zwei-Faktor-Authentifizierung (2FA)</h3>' +
-        '<p class="hint">Schuetze deinen Account mit Zwei-Faktor-Authentifizierung. Du brauchst eine Authenticator-App (Google Authenticator, Authy, 1Password, Microsoft Authenticator).</p>' +
+        '<p class="hint">Schütze deinen Account mit Zwei-Faktor-Authentifizierung. Du brauchst eine Authenticator-App (Google Authenticator, Authy, 1Password, Microsoft Authenticator).</p>' +
         '<div id="sec-2fa-host"><div class="sec-2fa-loading" style="padding:14px;color:var(--muted)">Lade 2FA-Status...</div></div>'
       : '') +
 
@@ -331,8 +358,16 @@ function showSettings(initialTab) {
           '</div>'
         : '') +
 
+        /* v1355: die API-Zugaenge externer Anbieter stehen jetzt hier, im
+           Account-Pane. Sie sind Zugangsdaten wie Passwort und Zwei-Faktor
+           auch - ein eigener Reiter fuer einen einzigen Anbieter war ein
+           Reiter zu viel. Befuellt wird der Host weiterhin lazy, jetzt
+           beim Wechsel auf „account" statt auf „anbieter". */
+        '<hr class="dvd">' +
+        '<div id="anbieter-host"></div>' +
 '</div>' +
       // V275-2fa-final: Security-Pane entfernt - sec-2fa-host jetzt im Account-Pane
+
 
       // Tab 2: Contact & Logo
       '<div class="st-pane" data-pane="contact" style="display:none">' +
@@ -561,7 +596,26 @@ function showSettings(initialTab) {
       // Tab 4: DealScore
       '<div class="st-pane" data-pane="dealscore" style="display:none">' +
 
-        // V111: DS1 + DS2 schließen sich gegenseitig aus — Plan-Konfig steuert was sichtbar ist
+        /* v1351 - DER KOMMENTAR HIER WAR FALSCH, UND ZWAR SEIT V112.
+           Er sagte: "DS1 + DS2 schliessen sich gegenseitig aus". Das
+           stimmt seit V112 nicht mehr - und der Code tat auch damals
+           schon etwas anderes. Marcel am 13.09.2026, woertlich:
+
+             "der dealscore ist ja aus dem Quickcheck oder der einfachen
+              Bewertung wenn du den Starter-Plan hast. Sobald du den
+              Investor-Plan hast und die passenden Felder ausgefuellt hast,
+              kannst du den DS2 also Investor Deal Score ZUSAETZLICH sehen."
+
+           GEMESSEN in config.js, und es passt zu Marcels Beschreibung:
+             Free     deal_score_basic true · deal_score_v2 'demo'
+             Starter  deal_score_basic true · deal_score_v2 false
+             Investor beide true
+             Pro      beide true
+
+           Es ist also eine ERGAENZUNG, kein Ausschluss. Ein Kommentar,
+           der das Gegenteil dessen behauptet, was der Code tut, ist
+           schlimmer als keiner: wer ihn liest, baut auf einer falschen
+           Annahme weiter. */
         // ───── DEALPILOT SCORE (klassisch) — nur wenn deal_score_basic aktiv ─────
         ((window.DealPilotConfig && DealPilotConfig.pricing &&
           DealPilotConfig.pricing.hasFeature('deal_score_basic'))
@@ -652,10 +706,18 @@ function showSettings(initialTab) {
         '<div id="dr-settings-host"><!-- wird beim Tab-Wechsel befüllt --></div>' +
       '</div>' +
 
-      '<div class="st-pane" data-pane="profilanzeige" style="display:none">' +
+      /* v1355: PANE EINS - was Zahlen aendert. */
+      '<div class="st-pane" data-pane="standardwerte" style="display:none">' +
         '<div id="ip-pane-host"><!-- wird beim Tab-Wechsel von DealPilotInvestmentProfile.renderPaneHtml() befüllt --></div>' +
-        '<hr class="dvd" style="margin:32px 0 22px">' +
+      '</div>' +
+
+      /* v1355: PANE ZWEI - was nur die Ansicht aendert. Der Schnitt liegt
+         genau hier: alles ab „Anzeige-Optionen" beruehrt keine Rechnung
+         mehr. Die Trennlinie, die vorher die beiden Haelften im selben
+         Reiter trennte, ist damit ueberfluessig geworden. */
+      '<div class="st-pane" data-pane="darstellung" style="display:none">' +
         '<h2 class="set-section-h2">Anzeige-Optionen</h2>' +
+
         '<p class="hint">Steuere, welche UI-Elemente in der App angezeigt werden.</p>' +
         /* ── v1162-PROFIL · Hell und Dunkel als zwei Profile ────────────────
            Marcels Vorgabe (Backlog Punkt 5): „DealPilot wird im dunklen Modus
@@ -789,7 +851,6 @@ function showSettings(initialTab) {
         '<p class="hint" style="margin-bottom:12px">Farben, Schrift und Modus stellst du im Darstellungs-Men\u00fc direkt in der App ein \u2014 so siehst du jede \u00c4nderung sofort.</p>' +
         '<button type="button" class="btn" onclick="_dpOpenFromSettings()">Darstellung \u00f6ffnen</button>' +
       '</div>' +
-            '<div class="st-pane" data-pane="anbieter"><div id="anbieter-host"></div></div>' +
       '</div>' +    // pane-wrap Ende
       '<div class="settings-footer save-row">' +
         '<div class="save-info">' +
@@ -1021,13 +1082,14 @@ function _swSet(btn) {
   try {
     var _tab = btn && btn.getAttribute('data-tab');
     var _SOH = {
-      account:['Account & Sicherheit','Login-Daten, Passwort und Zwei-Faktor-Absicherung.'],
+      account:['Account & Sicherheit','Login-Daten, Passwort, Zwei-Faktor und externe Zug\u00e4nge.'],
       contact:['Kontakt & Logo','Kontaktdaten und Logo f\u00fcr den Bankexport.'],
       api:['KI','Analyse-Tonalit\u00e4t, Fokus und Instruktionen f\u00fcr alle Pilot-Analysen.'],
       dealscore:['Deal Score','Gewichtung der Score-Kategorien und Schwellenwerte.'],
-      profilanzeige:['Profil & Anzeige','Investmentprofil und Anzeige-Einstellungen.'],
+      standardwerte:['Standardwerte','Vorgaben, die in jede Kalkulation einfliessen.'],
+      darstellung:['Darstellung','Was angezeigt wird und wie es aussieht.'],
+
       datenraum:['Datenraum','Geteilte Objekte und Portfolio-P\u00e4sse.'],
-      anbieter:['Externe Anbieter','ImmoMetrica und weitere Datenquellen verbinden.'],
       mandanten:['Mandanten','Gesellschaften, Halter und Steuerregime verwalten.'],
       plan:['Plan','Dein aktueller Tarif und dein Bewertungs-Kontingent.'],
       info:['Info','Version, Changelog und Systemstatus.'],
@@ -1096,8 +1158,11 @@ function _swSet(btn) {
   if (pane === 'security') {
     if (typeof _renderTwoFactor === 'function') _renderTwoFactor();
   }
-  // v655: Externe-Anbieter-Pane lazy rendern
-  if (pane === 'anbieter' && window.DealPilotProviderKeys) {
+  /* v655, seit v1355 im Account-Pane: die Anbieter-Keys lazy rendern.
+     Der Host steht nicht mehr in einem eigenen Reiter, also haengt der
+     Aufruf jetzt an „account". */
+  if (pane === 'account' && window.DealPilotProviderKeys) {
+
     var apHost = document.getElementById('anbieter-host');
     if (apHost) { apHost.innerHTML = window.DealPilotProviderKeys.renderPane(); window.DealPilotProviderKeys.afterRender(); }
   }
@@ -1126,8 +1191,12 @@ function _swSet(btn) {
     }
   }
 
-  // V63.78: vereinter Tab "Profil & Anzeige" — beide Panes initialisieren
-  if (pane === 'profilanzeige') {
+  /* V63.78, seit v1355 zwei Reiter: die Initialisierung bedient beide.
+     Sie ist durchgehend defensiv (jeder Griff prueft erst, ob es sein
+     Ziel gibt), deshalb schadet der Doppelaufruf nichts - und eine
+     aufgeteilte Initialisierung waere die naechste Doppelliste. */
+  if (pane === 'standardwerte' || pane === 'darstellung') {
+
     if (window.DealPilotInvestmentProfile) {
       var host = document.getElementById('ip-pane-host');
       if (host) host.innerHTML = window.DealPilotInvestmentProfile.renderPaneHtml();
@@ -3457,7 +3526,7 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
     var a=LS('dp_accent_ui'); if(a){ try{ if(window.DealPilotConfig&&DealPilotConfig.branding) DealPilotConfig.branding.setTheme({accent:a}); }catch(e){} }
   }catch(e){} }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
-  try{ document.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('[data-tab="profilanzeige"]'); if(t) setTimeout(window._dpDispRefresh,60); }); }catch(e){}
+  try{ document.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('[data-tab="darstellung"]'); if(t) setTimeout(window._dpDispRefresh,60); }); }catch(e){}
 })();
 /* === /v922-display-handlers === */
 
@@ -3834,7 +3903,7 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
   /* Beim Oeffnen des Panes markieren — der Tab rendert lazy. */
   try {
     document.addEventListener('click', function (e) {
-      var t = e.target && e.target.closest && e.target.closest('[data-tab="profilanzeige"]');
+      var t = e.target && e.target.closest && e.target.closest('[data-tab="darstellung"]');
       if (t) setTimeout(markieren, 60);
     }, true);
   } catch (e) {}

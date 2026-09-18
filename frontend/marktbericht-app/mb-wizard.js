@@ -112,17 +112,45 @@
       '.mbw-r .n{font-family:"JetBrains Mono",monospace;font-size:10.5px;opacity:.6;margin-right:5px}',
       '.mbw-r.fertig .n::after{content:" ✓";color:#4caf7d;opacity:1}',
       '.mbw-blatt{display:none}',
+      /* === v1348 - EIN AUSSEHEN FUER ALLES ZURUECKGESTELLTE ==========
+         Marcel: "achte darauf das alles gleich aussieht alle ausgeblendeten
+         sachen werte felder. das sieht irgendwie manchmal nicht einheitlich
+         aus." Er hat recht - es waren vier verschiedene Muster nebeneinander
+         gewachsen: der Reiter-Hinweis (v1196), der Stufen-Vorhang (v1344),
+         die minimierten Bloecke (v1347) und die Fehlt-Markierung.
+
+         Ab hier gilt EIN Satz Regeln, und die anderen Dateien greifen
+         darauf zu: dieselbe Schrift, dieselbe Farbe, derselbe Knopf. */
+      '.mbw-r.mbw-spaeter{display:none}',
+      '.mbw-spaeter-fuss{font-family:"Inter",system-ui,sans-serif;font-size:11px;',
+        'color:var(--muted,#8a8a93);margin:-8px 0 12px;line-height:1.45;',
+        'max-width:960px}',
+      /* Der gemeinsame Hinweiskasten. mb-quellen.js und mb-karten.js
+         benutzen dieselben Klassen. */
+      '.mb-zurueck{margin:10px 0 14px;padding:13px 15px;border-radius:10px;',
+        'font-family:"Inter",system-ui,sans-serif;font-size:12.5px;line-height:1.55;',
+        'color:var(--muted,#9a9aa3);',
+        'border:1px solid color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 26%, transparent);',
+        'background:color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 5%, transparent)}',
+      '.mb-zurueck b{color:var(--wl-b8932f,#b8932f);font-weight:600}',
+      'html[data-mb-theme="light"] .mb-zurueck{background:#fffdf7;color:#5b564d}',
+      'html[data-mb-theme="light"] .mb-zurueck b{color:var(--wl-9a7f33, #9a7f33)}',
+      /* Der gemeinsame Knopf zum Einblenden. */
+      '.mb-auf{appearance:none;border:1px solid var(--wl-c9a84c,#C9A84C);',
+        'background:transparent;color:var(--wl-c9a84c,#C9A84C);cursor:pointer;',
+        'border-radius:999px;padding:7px 15px;margin-top:10px;',
+        'font-family:"Inter",system-ui,sans-serif;font-size:12px;font-weight:600}',
+      '.mb-auf:hover{background:color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 14%, transparent)}',
+      'html[data-mb-theme="light"] .mb-auf{border-color:var(--wl-9a7f33, #9a7f33);color:var(--wl-9a7f33, #9a7f33)}',
       '.mbw-blatt.an{display:block;animation:mbwRein .22s ease}',
       '@keyframes mbwRein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}',
       '.mbw-kurz{font-size:11px;opacity:.6;margin:-6px 0 12px}',
       /* v1196 · Hinweis in einem Reiter, dessen Angaben noch nicht dran sind. */
-      '.mbw-leer{margin:10px 0;padding:13px 15px;border-radius:8px;font-size:12.5px;line-height:1.55;',
-        'border:1px solid rgba(128,128,128,.28);background:rgba(201,168,76,.07)}',
-      '.mbw-leer b{color:var(--wl-b8932f,#b8932f)}',
-      '.mbw-leer-btn{display:inline-block;margin-top:10px;appearance:none;border:0;border-radius:999px;',
-        'padding:8px 15px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;',
-        'background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));',
-        'color:#221a06}',
+      /* v1348c: der Leer-Hinweis traegt .mb-zurueck / .mb-auf und
+         bekommt sein Aussehen von dort. Die eigenen Werte hier
+         standen im Widerspruch dazu (Radius 8 statt 10, grauer
+         Rahmen, gefuellter Goldknopf statt Umriss) - GEMESSEN als
+         zwei verschiedene Kasten-Stile nebeneinander. */
       '.mbw-nav{display:flex;gap:8px;align-items:center;margin:14px 0 10px;flex-wrap:wrap}',
       '.mbw-nav button{appearance:none;border:1px solid rgba(128,128,128,.35);background:transparent;',
         'color:inherit;border-radius:999px;padding:8px 15px;font:inherit;font-size:12.5px;cursor:pointer}',
@@ -191,6 +219,12 @@
       'html.mb-breit .mbw-reiter{max-width:960px;margin-left:auto;margin-right:auto}',
       'html.mb-breit .mbw-r{font-size:14px;padding:13px 20px}',
       'html.mb-breit .mbw-kurz{max-width:960px;margin-left:auto;margin-right:auto;font-size:12px}',
+      /* v1349: dieselbe Ausrichtung wie Reiterleiste und Kurztext. Sie
+         hatte nur max-width und klebte deshalb im Breit-Modus am linken
+         Rand, waehrend alles andere zentriert stand - im Bild sofort zu
+         sehen, im Code nicht. Wer eine Breite setzt, muss auch sagen, wo
+         der Rest hin soll. */
+      'html.mb-breit .mbw-spaeter-fuss{max-width:960px;margin-left:auto;margin-right:auto}',
       'html.mb-breit input:not([type=checkbox]):not([type=radio]),html.mb-breit select{',
         'font-size:15px;padding:11px 12px}',
       'html.mb-breit label{font-size:13px}',
@@ -427,8 +461,9 @@
       if (b) _klappWahl = true;
       if (b) zeige(parseInt(b.getAttribute('data-mbw'), 10));
     });
-    id('mbw-vor').addEventListener('click', function () { zeige(Math.min(SCHRITTE.length, _aktiv + 1)); });
-    id('mbw-zur').addEventListener('click', function () { zeige(Math.max(1, _aktiv - 1)); });
+    /* v1348: ueber das Weggefallene springen, nicht durch. */
+    id('mbw-vor').addEventListener('click', function () { var n = nachbar(1); if (n != null) zeige(n); });
+    id('mbw-zur').addEventListener('click', function () { var n = nachbar(-1); if (n != null) zeige(n); });
     return true;
   }
 
@@ -538,7 +573,7 @@
     if (alt && alt.parentNode) alt.parentNode.removeChild(alt);
 
     var box = document.createElement('div');
-    box.className = 'mbw-leer';
+    box.className = 'mbw-leer mb-zurueck';
     box.setAttribute('data-fuer', name + '|' + fehlt);
     var p = document.createElement('div');
     p.innerHTML = '<b>Diese Angaben gehören zu: ' + name + '.</b><br>' +
@@ -546,7 +581,7 @@
       (fehlt ? ' Dafür ' + fehlt.replace(/^fehlt:/, 'fehlt noch:') + '.' : '');
     var btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'mbw-leer-btn';
+    btn.className = 'mbw-leer-btn mb-auf';
     btn.textContent = 'Angaben einblenden';
     /* ── v1196b · Die Ampel-Zeile NICHT festhalten, sondern frisch suchen ──
        Der erste Anlauf schrieb `zeile.click()` mit der Referenz, die beim
@@ -575,7 +610,110 @@
     blatt.appendChild(box);
   }
 
+  /* === v1348 - GANZE SCHRITTE FALLEN WEG, NICHT NUR FELDER ===========
+     Marcels Vorgabe: „ich wuerde aber vlt die bereiche dann oder den
+     gesamten schritt ausblenden. die folge hat dann halt weniger tabs."
+
+     Die Stufe steht seit v1129 in `SCHRITTE[].stufe` — 0, 1, 2, 2, 2, 3, 3.
+     Hier wird KEINE zweite Liste gefuehrt; das waere die Doppelliste, an
+     der der Marktbericht schon sechsmal gescheitert ist.
+
+       Stufe 1  Uebersicht · Objekt
+       Stufe 2  + Zustand · Ausstattung · Gebaeude & Aussen
+       Stufe 3  + Wertermittlung · Zusatzwerte
+
+     DREI DINGE MUESSEN ZUSAMMENPASSEN, sonst entsteht eine Sackgasse:
+     der Reiter verschwindet, „Weiter" ueberspringt ihn, und wenn der
+     GERADE OFFENE Schritt wegfaellt, wandert die Ansicht auf den letzten
+     sichtbaren. Ohne das dritte stuende man vor einem leeren Blatt.
+
+     Ein Schritt, in dem schon etwas ausgefuellt ist, bleibt IMMER stehen.
+     Eingaben verschwinden nicht aus dem Blick — dieselbe Regel wie bei den
+     Bloecken (v1347). */
+  function gewaehlteStufe() {
+    try {
+      var st = window.DealPilotMbStufen;
+      if (st && typeof st.gewaehlt === 'function') {
+        var n = parseInt(st.gewaehlt(), 10);
+        if (n >= 1 && n <= 3) return n;
+      }
+    } catch (e) {}
+    return 3;
+  }
+
+  function schrittHatInhalt(sid) {
+    var b = id('mbw-b' + sid);
+    if (!b) return false;
+    var f = b.querySelectorAll('input,select,textarea');
+    for (var i = 0; i < f.length; i++) {
+      var e = f[i];
+      if (e.type === 'checkbox') { if (e.checked) return true; continue; }
+      if (String(e.value == null ? '' : e.value).trim() !== '') return true;
+    }
+    return false;
+  }
+
+  /* Welche Schritte gelten gerade? Reihenfolge bleibt die von SCHRITTE. */
+  function sichtbareSchritte() {
+    var stufe = gewaehlteStufe();
+    return SCHRITTE.filter(function (s) {
+      if (!s.stufe) return true;               /* Uebersicht: immer */
+      if (s.stufe <= stufe) return true;
+      return schrittHatInhalt(s.id);           /* was gefuellt ist, bleibt */
+    });
+  }
+
+  function schritteFiltern() {
+    var sicht = sichtbareSchritte();
+    var erlaubt = {};
+    sicht.forEach(function (s) { erlaubt[s.id] = 1; });
+    var weg = 0;
+    SCHRITTE.forEach(function (s) {
+      var r = document.querySelector('.mbw-r[data-mbw="' + s.id + '"]');
+      var b = id('mbw-b' + s.id);
+      var aus = !erlaubt[s.id];
+      if (aus) weg++;
+      if (r) r.classList.toggle('mbw-spaeter', aus);
+      if (b && aus) b.classList.remove('an');
+    });
+
+    /* Die Fusszeile sagt, was fehlt — sonst wirkt es wie ein Verlust. */
+    var leiste = id('mbw-reiter');
+    var alt = document.querySelector('.mbw-spaeter-fuss');
+    if (leiste && weg > 0) {
+      if (!alt) {
+        alt = document.createElement('div');
+        alt.className = 'mbw-spaeter-fuss';
+        if (leiste.parentNode) leiste.parentNode.insertBefore(alt, leiste.nextSibling);
+      }
+      alt.textContent = weg + (weg === 1 ? ' weiterer Schritt erscheint' : ' weitere Schritte erscheinen')
+        + ', wenn du eine gr\u00f6\u00dfere Tiefe w\u00e4hlst.';
+    } else if (alt && alt.parentNode) {
+      alt.parentNode.removeChild(alt);
+    }
+
+    /* Steht die Ansicht auf einem weggefallenen Schritt, wandert sie. */
+    if (!erlaubt[_aktiv] && sicht.length) {
+      var ziel = sicht[sicht.length - 1];
+      for (var i = 0; i < sicht.length; i++) { if (sicht[i].id > _aktiv) { ziel = sicht[i]; break; } }
+      if (ziel && ziel.id !== _aktiv) { zeige(ziel.id); return true; }
+    }
+    return false;
+  }
+
+  /* „Weiter" und „Zurueck" springen ueber das Weggefallene. */
+  function nachbar(richtung) {
+    var sicht = sichtbareSchritte();
+    var pos = -1;
+    for (var i = 0; i < sicht.length; i++) { if (sicht[i].id === _aktiv) { pos = i; break; } }
+    if (pos < 0) return sicht.length ? sicht[0].id : 1;
+    var n = pos + richtung;
+    if (n < 0 || n >= sicht.length) return null;
+    return sicht[n].id;
+  }
+
   function zeige(n) {
+
     _aktiv = n;
     SCHRITTE.forEach(function (s) {
       var b = id('mbw-b' + s.id);
@@ -590,8 +728,12 @@
       }
     });
     var z = id('mbw-zur'), v = id('mbw-vor');
-    if (z) z.disabled = (n === 1);
-    if (v) v.disabled = (n === SCHRITTE.length);
+    /* v1348: nicht mehr gegen die GESAMTZAHL, sondern gegen das, was
+       gerade gilt. Sonst zeigt „Weiter" auf einen Schritt, den es nicht
+       mehr gibt. */
+    if (z) z.disabled = (nachbar(-1) == null);
+    if (v) v.disabled = (nachbar(1) == null);
+
     /* v1153-KLAPP · Kopfzeile mitziehen, und auf schmalen Schirmen nach der
        Wahl zuklappen: die Liste hat ihren Zweck erfuellt und gaebe sonst
        die Flaeche nicht frei. Ein Wechsel ueber „Weiter" laesst sie zu, wie
@@ -603,7 +745,16 @@
 
   function angestossen() {
     if (_plan) clearTimeout(_plan);
-    _plan = setTimeout(function () { einraeumen(); zeige(_aktiv); }, 120);
+    _plan = setTimeout(function () {
+      einraeumen();
+      /* v1348: erst filtern, dann zeigen. `schritteFiltern` kann die
+         Ansicht selbst umsetzen (wenn der offene Schritt wegfaellt)
+         und meldet das - dann waere ein zweites `zeige` nur ein
+         ueberfluessiger Neuaufbau. */
+      var gewandert = false;
+      try { gewandert = schritteFiltern(); } catch (e) {}
+      if (!gewandert) zeige(_aktiv);
+    }, 120);
   }
 
   /* ── v1128 · Breit, solange kein Ergebnis da ist ──────────────────────
@@ -691,6 +842,76 @@
     /* Die Reiter-Haken folgen der erreichten Stufe. */
     document.addEventListener('change', function () { setTimeout(function () { zeige(_aktiv); }, 250); }, true);
   }
+
+  /* === v1336b - GLEICHE LABELHOEHE, DAMIT DIE FELDER FLUCHTEN =========
+     Marcel: "Die Formatierung der Felder passt oft nicht Eingabefelder zu
+     Textfeldern fluchten nicht."
+
+     Gemessen in der Zeile Balkon / Garten / Grundstueck / Wohneinheiten:
+     die ersten beiden Labels sind 19 px hoch, die letzten beiden 58 -
+     ihre Erklaerung braucht drei Zeilen. Damit stehen die Eingabefelder
+     derselben Zeile 133 px versetzt.
+
+     Eine CSS-Regel kann das nicht loesen: welche Felder nebeneinander
+     landen, entscheidet erst der Umbruch, und der haengt an der
+     Fensterbreite. Deshalb wird nach dem Umbruch gemessen - Zellen mit
+     derselben Oberkante bilden eine Rasterzeile, und deren Labels
+     bekommen die groesste vorkommende Hoehe.
+
+     `min-height` statt `height`: ein Label darf wachsen, wenn der Text
+     laenger wird, es soll nur nicht kuerzer sein als seine Nachbarn. */
+  function labelsAngleichen() {
+    var zeilen = document.querySelectorAll('.panel .row');
+    for (var i = 0; i < zeilen.length; i++) {
+      var r = zeilen[i];
+      var zellen = Array.prototype.slice.call(r.children);
+      if (zellen.length < 2) continue;
+      var labs = [];
+      for (var j = 0; j < zellen.length; j++) {
+        var l = null;
+        for (var k = 0; k < zellen[j].children.length; k++) {
+          if (zellen[j].children[k].tagName === 'LABEL') { l = zellen[j].children[k]; break; }
+        }
+        if (l) { l.style.minHeight = ''; labs.push({ zelle: zellen[j], lab: l }); }
+      }
+      if (labs.length < 2) continue;
+      /* Erst nach dem Zuruecksetzen messen - sonst misst man die eigene
+         Vorgabe vom letzten Lauf (dieselbe Falle wie beim Skin). */
+      var gruppen = {};
+      for (var m = 0; m < labs.length; m++) {
+        var oben = Math.round(labs[m].zelle.getBoundingClientRect().top);
+        (gruppen[oben] = gruppen[oben] || []).push(labs[m].lab);
+      }
+      Object.keys(gruppen).forEach(function (oben) {
+        var g = gruppen[oben];
+        if (g.length < 2) return;
+        var hoch = 0;
+        for (var n = 0; n < g.length; n++) hoch = Math.max(hoch, g[n].getBoundingClientRect().height);
+        if (hoch <= 0) return;
+        for (var p = 0; p < g.length; p++) g[p].style.minHeight = hoch + 'px';
+      });
+    }
+  }
+  window.MbLabelsAngleichen = labelsAngleichen;
+
+  var _angZeit = null;
+  function angleichenBald() {
+    if (_angZeit) clearTimeout(_angZeit);
+    _angZeit = setTimeout(function () { _angZeit = null; try { labelsAngleichen(); } catch (e) {} }, 120);
+  }
+  function angleichenStarten() {
+    angleichenBald();
+    window.addEventListener('resize', angleichenBald);
+    /* Reiterwechsel, neue Felder, ein eingehaengter Ankertext - alles
+       aendert die Labelhoehe. Gedrosselt, sonst misst der Beobachter
+       seine eigene Aenderung. */
+    try {
+      new MutationObserver(function () { angleichenBald(); })
+        .observe(document.documentElement, { childList: true, subtree: true });
+    } catch (e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', angleichenStarten);
+  else angleichenStarten();
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();

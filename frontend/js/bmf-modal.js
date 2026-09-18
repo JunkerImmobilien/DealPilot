@@ -184,12 +184,135 @@ function syncFromTabInvest(){
   setTimeout(_maybeAutoTriggerBmf, 200);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   v1382-BMFPFLICHT · DER RECHNER SAGT, WAS IHM FEHLT
+   ═══════════════════════════════════════════════════════════════════════
+   Marcels Befund: „den kann man aufmachen obwohl pflichtangaben fehlen."
+
+   GEMESSEN, und es ist schlimmer als „das Fenster geht auf". Drei Befunde:
+
+   1. `openBMFModal()` prueft NUR den Plan (`_hasBmfCalc()`), keine einzige
+      Angabe.
+   2. `runBmf()` prueft ebenfalls nichts — es schickt `0` fuer alles, was
+      fehlt, an das Backend.
+   3. Und das Backend rechnet damit durch. AM ECHTEN SERVICE GEMESSEN,
+      Demo-Datensatz des Selbsttests, nur die Grundstuecksflaeche auf 0:
+
+          mit Grundstuecksflaeche   Gebaeudeanteil  87,89 %
+          OHNE (= 0)                Gebaeudeanteil 100,00 %
+
+      Das ist kein Fehler, den man sieht. Es ist ein sauber aussehendes
+      Ergebnis, das den Bodenwert auf null setzt — steuerlich der maximal
+      guenstige Wert, und vor dem Finanzamt nicht haltbar.
+
+   UND DIE ALTE LISTE WAR ZU KURZ. `required` fuehrte fuenf Felder;
+   fachlich sind es acht (BMF-Arbeitshilfe Juni 2023, dazu
+   docs/kundendaten-checkliste.md, Abschnitt A2). Es fehlten ausgerechnet
+   die GRUNDSTUECKSFLAECHE — die den Befund oben ausloest — und der
+   MITEIGENTUMSANTEIL, ohne den bei einer Eigentumswohnung der Bodenwert
+   nicht auf die Einheit umgelegt werden kann.
+
+   Die Liste steht jetzt an EINER Stelle und wird von drei Seiten gelesen:
+   dem Auto-Ausloeser, dem Hinweiskasten und `runBmf()`. */
+
+/* Jede Angabe nennt ihr Feld im Modal, ihr Feld in der App und den Ort,
+   an dem der Nutzer sie eintraegt — ein Hinweis, der nur „fehlt" sagt,
+   schickt ihn suchen. */
+var BMF_PFLICHT = [
+  { id: 'ak_kp',     alt: 'kp',      name: 'Kaufpreis',            wo: 'Tab Investition' },
+  /* `text`, weil ein Datum keine Zahl ist. Ohne das ginge die Pruefung
+     ueber parseDe und traefe nur zufaellig: "2024-03-01" wird dabei zu
+     2024 und besteht, "0000-00-00" waere 0 und fiele durch. Richtig ist
+     hier die Frage, ob ueberhaupt etwas dasteht. */
+  { id: 'bmf_datum', alt: 'kaufdat', name: 'Datum des Kaufvertrags', wo: 'Tab Objekt',
+    art: 'text' },
+  { id: 'bmf_bj',    alt: 'baujahr', name: 'Baujahr',              wo: 'Tab Objekt' },
+  { id: 'bmf_wfl',   alt: 'wfl',     name: 'Wohn-/Nutzfläche',     wo: 'Tab Objekt' },
+  { id: 'bmf_gsfl',  alt: 'gsfl',    name: 'Grundstücksfläche',    wo: 'Tab Objekt',
+    warum: 'Ohne sie ist der Bodenwert null — der Rechner käme auf 100 % Gebäudeanteil.' },
+  { id: 'bmf_brw',   alt: 'brw',     name: 'Bodenrichtwert',       wo: 'Tab Objekt',
+    warum: 'Steht auch im Gutachterausschuss-Block dieses Fensters zum Übernehmen bereit.' },
+  /* Nur bei Wohnungseigentum — die Pruefung haengt an der Grundstuecksart. */
+  { id: 'bmf_mea',   alt: 'mea',     name: 'Miteigentumsanteil',   wo: 'Tab Objekt',
+    nurWE: true,
+    warum: 'Bei einer Eigentumswohnung wird der Bodenwert darüber auf die Einheit umgelegt.' }
+];
+
+/* Liest einen Wert aus dem Modalfeld, sonst aus dem App-Feld. Genau die
+   Reihenfolge, die runBmf() selbst benutzt — sonst meldete der Kasten
+   „fehlt", waehrend gerechnet wird, oder umgekehrt. */
+function _bmfWert(e){
+  function _raw(id){ var el = $(id); return el ? String(el.value || '').trim() : ''; }
+  return _raw(e.id) || (e.alt ? _raw(e.alt) : '');
+}
+
+function _bmfIstWE(){
+  var a = ($('bmf_art') || {}).value || '';
+  return /wohnungseigentum|\[WE\]/i.test(a);
+}
+
+/* Die eine Wahrheit: was fehlt gerade? */
+function _bmfFehlend(){
+  var fehlt = [];
+  for (var i = 0; i < BMF_PFLICHT.length; i++){
+    var e = BMF_PFLICHT[i];
+    if (e.nurWE && !_bmfIstWE()) continue;
+    var v = _bmfWert(e);
+    /* Eine 0 ist hier keine Angabe: weder ein Grundstueck von 0 m2 noch
+       ein Bodenrichtwert von 0 EUR/m2 kommt vor, und parseDe('') ist
+       ebenfalls 0. Beides muss dasselbe bedeuten — fehlt.
+       Textfelder (das Datum) beantworten dagegen nur die Frage, ob
+       ueberhaupt etwas dasteht. */
+    if (e.art === 'text' ? !v : (!v || !(parseDe(v) > 0))) fehlt.push(e);
+  }
+  return fehlt;
+}
+
+/* Den Kasten zeichnen und die betroffenen Felder markieren. */
+function _bmfPflichtZeichnen(){
+  var box = $('bmfPflichtBox');
+  if (!box) return [];
+  var fehlt = _bmfFehlend();
+
+  /* Markierung immer erst abraeumen — sonst bleibt sie an einem Feld
+     stehen, das inzwischen gefuellt ist. */
+  for (var j = 0; j < BMF_PFLICHT.length; j++){
+    var el = $(BMF_PFLICHT[j].id);
+    if (el) el.classList.remove('dp-required-bmf');
+  }
+
+  if (!fehlt.length){ box.hidden = true; box.innerHTML = ''; return fehlt; }
+
+  var zeilen = fehlt.map(function(e){
+    var el = $(e.id);
+    if (el) el.classList.add('dp-required-bmf');
+    return '<li><b>' + e.name + '</b> <span class="bmfpf-wo">' + e.wo + '</span>'
+         + (e.warum ? '<br><span class="bmfpf-warum">' + e.warum + '</span>' : '')
+         + '</li>';
+  }).join('');
+
+  box.innerHTML =
+    '<div class="bmfpf-kopf">Es fehlen ' + fehlt.length + ' Pflichtangabe'
+      + (fehlt.length === 1 ? '' : 'n') + ' — solange wird nicht gerechnet.</div>'
+    + '<ul class="bmfpf-liste">' + zeilen + '</ul>'
+    + '<div class="bmfpf-fuss">Die BMF-Arbeitshilfe rechnet auch mit Lücken — sie setzt '
+    + 'das Fehlende dann auf null. Dabei kommt eine Aufteilung heraus, die '
+    + 'plausibel aussieht und vor dem Finanzamt nicht hält. Deshalb hält der '
+    + 'Rechner hier an, statt eine Zahl zu liefern.</div>';
+  box.hidden = false;
+  return fehlt;
+}
+
 // V289.2: Auto-Berechnen wenn alle Pflichtfelder ausgefüllt
 function _maybeAutoTriggerBmf(){
-  var required = ['ak_kp', 'bmf_bj', 'bmf_datum', 'bmf_wfl', 'bmf_brw'];
-  for(var i = 0; i < required.length; i++){
-    var v = ($(required[i]) || {}).value || '';
-    if(!v.trim()) return; // noch nicht alle Pflicht-Felder
+  /* v1382: derselbe Prueter wie fuer Kasten und Knopf. Die alte Liste
+     stand hier als Literal und war zu kurz. */
+  var fehlt = _bmfPflichtZeichnen();
+  if (fehlt.length) {
+    var h = $('bmfAutoHint');
+    if (h) h.textContent = 'Angehalten — ' + fehlt.length + ' Pflichtangabe'
+      + (fehlt.length === 1 ? '' : 'n') + ' fehlt' + (fehlt.length === 1 ? '' : 'en') + '.';
+    return;
   }
   // Alle Pflichtfelder voll → runBmf() automatisch
   if(typeof runBmf === 'function'){
@@ -349,6 +472,23 @@ function runBmf(){
   // V289.2: Echter Backend-Call statt Mock
   // V289.2.5 Issue #5/6: Lage aus echten DealPilot-Feldern (plz/ort/str/hnr) statt ak_plz/etc.
   //                       + _lastBmfInputs persistieren für XLSX-Download
+  /* v1382-BMFPFLICHT · DER RIEGEL, AUF DEN ES ANKOMMT.
+     Der Kasten oben ist die Auskunft; DIESE Zeile ist die Sperre. Ohne sie
+     schickt jeder andere Aufrufer (Feld-Handler, Uebernehmen-Knoepfe des
+     Gutachterausschuss-Blocks, ein spaeterer Zweig) weiter Nullen an das
+     Backend — und bekommt 100 % Gebaeudeanteil zurueck, ohne dass etwas
+     widerspricht. Kein Verfahren rechnet halb. */
+  var _fehlt = (typeof _bmfPflichtZeichnen === 'function') ? _bmfPflichtZeichnen() : [];
+  if (_fehlt.length) {
+    var _h0 = $('bmfAutoHint');
+    if (_h0) _h0.textContent = 'Angehalten — es fehlt: '
+      + _fehlt.map(function(e){ return e.name; }).join(', ') + '.';
+    var _r0 = $('bmfResult');
+    if (_r0) _r0.style.display = 'none';
+    var _b0 = $('btnBmf');
+    if (_b0) _b0.disabled = false;
+    return;
+  }
   var btn = $('btnBmf');
   var hint = $('bmfAutoHint');
   if(btn){ btn.disabled = true; }
@@ -1638,7 +1778,7 @@ function _ensureModalLoaded(callback){
   _bmfModalLoading = true;
   console.log('[bmf-modal] Modal-HTML wird geladen...');
 
-  fetch('/js/bmf-modal-html.html?v=v1008', { cache: 'no-store' })
+  fetch('/js/bmf-modal-html.html?v=v1382', { cache: 'no-store' })
     .then(function(r){
       if(!r.ok){ throw new Error('HTTP ' + r.status); }
       return r.text();
@@ -1697,6 +1837,36 @@ function openBMFModal(){
     if(typeof syncFromTabInvest === 'function'){
       setTimeout(syncFromTabInvest, 50);
     }
+
+    /* v1382-BMFPFLICHT: Das Fenster geht weiter auf — Marcels Wunsch war
+       „kenntlich machen", nicht „zusperren". Wer den Rechner oeffnet, um
+       zu sehen, WAS er braucht, soll das koennen; er bekommt die Liste
+       statt einer leeren Maske.
+       Nach dem Sync gezeichnet, nicht davor: vorher sind die Felder noch
+       leer, und der Kasten meldete alles als fehlend. */
+    setTimeout(function(){
+      try { _bmfPflichtZeichnen(); } catch(e){}
+    }, 260);
+
+    /* Und mitziehen, waehrend getippt wird — ein Kasten, der erst beim
+       naechsten Oeffnen verschwindet, erzieht dazu, ihn zu uebersehen. */
+    try {
+      if (!ov.hasAttribute('data-pflicht-gebunden')) {
+        ov.setAttribute('data-pflicht-gebunden', '1');
+        ov.addEventListener('input', function(ev){
+          var t = ev.target; if (!t || !t.id) return;
+          for (var i = 0; i < BMF_PFLICHT.length; i++){
+            if (BMF_PFLICHT[i].id === t.id || t.id === 'bmf_art'){
+              clearTimeout(window._bmfPflichtTimer);
+              window._bmfPflichtTimer = setTimeout(function(){
+                try { _bmfPflichtZeichnen(); } catch(e){}
+              }, 300);
+              return;
+            }
+          }
+        });
+      }
+    } catch(e){}
 
     // V312-dead-get-removed: GET /api/v1/tax-snapshots/:id/bmf entfernt
     // Endpoint existiert nicht (404), Block lief nie erfolgreich.

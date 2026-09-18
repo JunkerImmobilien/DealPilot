@@ -668,6 +668,20 @@ export function korrekturWohnung({ wohnflaeche_je_we, grundriss }) {
  * bei einem Mehrfamilienhaus ist sie unbrauchbar, weil Treppenhaus,
  * Keller und Nebenraeume je nach Gebaeude stark schwanken.
  */
+/* v1427-GPK · Korrekturfaktor Zweifamilienhaus nach NHK 2010 (SW-RL 2012
+ * Anlage 1, Gebaeudearten 1. bis 3.): 1,05. Er fehlte hier ganz. Gemessen
+ * am unterschriebenen Gutachten Loehner Str. 278 (ZFH, 17.09.2026): ohne
+ * ihn lag der marktangepasste Sachwert 10.048 EUR unter dem Gutachten.
+ * Uebernommen aus dem Rechenkern des Gutachten-Pakets (calc-engine.js,
+ * zfhKorrektur). Fuer Mehrfamilienhaeuser gilt er nicht — dort stehen die
+ * Korrekturen fuer Wohnungsgroesse und Grundriss. */
+export function zfhKorrektur({ nhk_typ, objektart, zweifamilienhaus } = {}) {
+  if (!/^[123]./.test(String(nhk_typ || ''))) return 1;
+  const zfh = zweifamilienhaus === true
+    || /(^|[^a-z])zfh([^a-z]|$)|zweifamilien/i.test(String(objektart || ''));
+  return zfh ? 1.05 : 1;
+}
+
 export function bgf({ bgf_direkt, wohnflaeche_qm, objektart }) {
   const d = Number(bgf_direkt);
   if (Number.isFinite(d) && d > 0) return { wert: d, herkunft: 'direkt', verlaesslich: true };
@@ -751,10 +765,22 @@ export function sachwert(ein, bodenwertErgebnis, param) {
   if (!index) { out.grund = 'Ohne Baupreisindex kein Sachwert.'; return out; }
   const regional = Number(ein.regionalfaktor) || 1.0;
 
-  let herst = Math.round(kw * f.wert * index * regional * korr);   /* v1074-WBTL-2 · let: Bauteile kommen dazu */
+  /* v1427-GPK · RECHENWEG DES GUTACHTEN-PAKETS (calc-engine.js)
+   * Die Gutachterkonvention: Baupreisindex auf DREI Stellen, der Kennwert
+   * zum Stichtag auf den CENT, erst dann mal BGF. Bisher wurde das Produkt
+   * am Ende auf den Euro gerundet. Am Gutachten Loehner Str. 278:
+   * 861,20 x 1,05 = 904,26 -> x 1,982 = 1.792,24 EUR/m2 -> x 346,62 m2
+   * = 621.226 EUR (Gutachten 621.226,23). */
+  const _zfh = zfhKorrektur(ein);
+  const _index3 = Math.round(index * 1000) / 1000;
+  const kennwertStichtag = Math.round(kw * _zfh * korr * regional * _index3 * 100) / 100;
+  let herst = Math.round(kennwertStichtag * f.wert);   /* v1074-WBTL-2 · let: Bauteile kommen dazu */
+  out.kennwert_stichtag_eur_qm = kennwertStichtag;
+  if (_zfh !== 1) out.zfh_korrektur = _zfh;
   out.staffel.push({ pos: `Normalherstellungskosten (${kw} €/m² BGF × ${f.wert} m²)`, wert: Math.round(kw * f.wert) });
+  if (_zfh !== 1) out.staffel.push({ pos: `× Korrekturfaktor Zweifamilienhaus`, detail: 'NHK 2010, SW-RL 2012 Anlage 1', faktor: _zfh, wert: null });
   if (korr !== 1) out.staffel.push({ pos: `× Korrektur Wohnungsgröße / Grundriss`, faktor: korr, wert: null });
-  out.staffel.push({ pos: `× Baupreisindex ${index}`, faktor: index, wert: null });
+  out.staffel.push({ pos: `× Baupreisindex ${_index3}`, faktor: _index3, wert: null });
   if (regional !== 1) out.staffel.push({ pos: `× Regionalfaktor ${regional}`, faktor: regional, wert: null });
   /* v1074-WBTL-1 · Sonstige Bauteile (Gauben, Balkone, Vordaecher,
    * Terrassen) als HERSTELLUNGSKOSTEN zum Stichtag — sie unterliegen
@@ -774,11 +800,94 @@ export function sachwert(ein, bodenwertErgebnis, param) {
   const gnd = Number(ein.gnd_jahre), rnd = Number(ein.rnd_jahre);
   if (!gnd || rnd == null) { out.grund = 'Ohne Rest- und Gesamtnutzungsdauer kein Sachwert.'; return out; }
   const minderung = Math.round(herst * ((gnd - rnd) / gnd));
-  out.staffel.push({ pos: `− Alterswertminderung (${gnd - rnd} von ${gnd} Jahren)`, wert: -minderung, summe: true });
+  /* === v1337 - DIE ALTERSWERTMINDERUNG ZEIGT IHREN RECHENWEG =========
+     Marcels Frage: "Dann sehe ich im Gutachten Alterswertminderung. Wie
+     kommt die zustande? Pruef mal ob das ueberhaupt richtig ist."
+
+     Die Rechnung ist richtig - linear nach Paragraf 38 Abs. 1 ImmoWertV,
+     gegen echte Faelle nachgerechnet (Bj 1968, GND 80, Stichtag 2026:
+     RND 22, Minderung 72,5 %; Neubau 0 %; Bj 1900 100 %). Die Zeile sagte
+     nur nicht, WIE. "22 von 80 Jahren" nennt zwei Zahlen und verschweigt
+     den Bruch, der daraus wird - und die Garage direkt darunter fuehrt
+     laengst ein `detail` mit ihrem Rechenweg. Dieselbe Staffel, zwei
+     Massstaebe.
+
+     Der Hinweis zur Restnutzungsdauer kommt aus dem CrossCheckService
+     (`restnutzungsdauer_herkunft.hinweis`, seit v1052). Er wurde bisher
+     geliefert und NIRGENDS gelesen - dasselbe Muster wie bei
+     dealpilot_marktbewertung und `ref` im Orchestrator. Er gehoert genau
+     hierhin: die Restnutzungsdauer entscheidet ueber die Minderung, und
+     ob sie nach Anlage 2 abgeleitet oder nur geschaetzt ist, aendert das
+     Ergebnis um Zehntausende. */
+  const _awmProzent = Math.round(((gnd - rnd) / gnd) * 1000) / 10;
+  let _awmDetail = herst.toLocaleString('de-DE') + ' \u20ac \u00d7 (' + gnd + ' \u2212 ' + rnd
+    + ') / ' + gnd + ' = ' + String(_awmProzent).replace('.', ',') + ' % '
+    + '\u2014 linear nach \u00a7 38 Abs. 1 ImmoWertV';
+  if (ein.rnd_hinweis) _awmDetail += '. ' + String(ein.rnd_hinweis);
+  out.staffel.push({
+    pos: `\u2212 Alterswertminderung (${gnd - rnd} von ${gnd} Jahren)`,
+    detail: _awmDetail,
+    wert: -minderung, summe: true,
+  });
+
 
   let geb = herst - minderung;
   const bes = Number(ein.bes_bauteile) || 0;
   if (bes) { geb += bes; out.staffel.push({ pos: '+ besondere Bauteile', wert: bes }); }
+  /* v1427-GPK · DIE GARAGE STEHT JETZT VOR DEN AUSSENANLAGEN.
+   * Die Aussenanlagen sind ein Prozentsatz vom Sachwert ALLER baulichen
+   * Anlagen (SW-RL 2012 Nr. 4.2), die Garage gehoert dazu. So rechnen das
+   * Gutachten Loehner Str. 278 (7 % x 236.964,39 = 16.587,51 EUR) und der
+   * Rechenkern des Gutachten-Pakets. Hier standen die Aussenanlagen vorher
+   * und liefen nur auf das Wohnhaus: 1.546 EUR zu wenig. */
+  /* v1072-WGAR-1 · GARAGEN ALS EIGENE BAULICHE ANLAGE.
+   * Die NHK 2010 fuehren fuer Garagen eigene Kostenkennwerte (Gebaeudeart
+   * 14.1: 245 / 485 / 780 EUR/m2 BGF, Baunebenkosten 12 %). Das Gutachten
+   * setzt die Garage mit rund 28.500 EUR an — bei uns fehlte sie ganz.
+   *
+   * Eigene Gesamtnutzungsdauer: Anlage 3 SW-RL nennt fuer Einzelgaragen
+   * 60 Jahre. Sie mit den 80 Jahren des Hauses zu rechnen waere bequem und
+   * falsch — eine Garage haelt nicht so lange wie ein Wohnhaus.
+   *
+   * Ohne Bruttogrundflaeche der Garage wird NICHT geschaetzt. Die Zahl der
+   * Stellplaetze allein sagt nichts ueber die Flaeche. */
+  const _garBgf = Number(ein.garagen_bgf_qm);
+  if (Number.isFinite(_garBgf) && _garBgf > 0) {
+    /* v1427-GPK · Zwischenstufen wie im Gutachten-Paket (Ausstattungsmatrix):
+     * Loehner Str. 278 setzt die Garage mit 381,80 EUR/m2 an — zwischen
+     * Stufe 3 (245) und 4 (485). Eine ganze Stufe kann das nicht abbilden.
+     * Linear interpoliert, wie beim gewogenen Kennwert des Wohnhauses. */
+    const _garRoh = Math.min(5, Math.max(3, Number(ein.garagen_stufe) || 3));
+    const _garU = Math.floor(_garRoh), _garO = Math.ceil(_garRoh);
+    const _garStufe = Math.round(_garRoh * 100) / 100;
+    const _garKw = Math.round((NHK_2010.WERTE['14.1|' + _garU]
+      + (NHK_2010.WERTE['14.1|' + _garO] - NHK_2010.WERTE['14.1|' + _garU]) * (_garRoh - _garU)) * 100) / 100;
+    if (Number.isFinite(_garKw)) {
+      const _garGnd = Number(ein.garagen_gnd) || GND_GARAGE;
+      const _garRnd = Number.isFinite(Number(ein.garagen_rnd))
+        ? Number(ein.garagen_rnd)
+        : Math.max(0, Math.min(_garGnd, rnd));
+      /* v1427-GPK · dieselbe Konvention wie beim Wohnhaus */
+      const _garKwStichtag = Math.round(_garKw * _index3 * 100) / 100;
+      const _garHerst = Math.round(_garKwStichtag * _garBgf);
+      const _garMind = Math.round(_garHerst * ((_garGnd - _garRnd) / _garGnd));
+      const _garWert = _garHerst - _garMind;
+      geb += _garWert;
+      out.staffel.push({
+        pos: '+ Garage / Stellplatz',
+        detail: _garBgf + ' m² × ' + _garKw + ' €/m² × ' + (index || 1)
+          + ' − Alterswertminderung (' + Math.round(_garGnd - _garRnd) + ' von ' + _garGnd + ' Jahren)',
+        wert: _garWert,
+      });
+      out.garage = {
+        bgf_qm: _garBgf, standardstufe: _garStufe, kennwert_eur_qm: _garKw,
+        gnd_jahre: _garGnd, rnd_jahre: _garRnd,
+        herstellungskosten_eur: _garHerst, wert_eur: _garWert,
+        quelle: 'NHK 2010, Gebäudeart 14.1 (Einzel-/Mehrfachgaragen); '
+          + 'Gesamtnutzungsdauer 60 Jahre nach Anlage 3 SW-RL',
+      };
+    }
+  }
   /* v1072-WAUS-1 · Aussenanlagen als PROZENTSATZ des Gebaeudesachwerts.
    * Das Gutachten zu Loehner Str. 278 setzt 7 % an ("aufgrund der
    * Ausfuehrung der Aussenanlagen") und kommt auf 15.693 EUR — bei uns
@@ -804,45 +913,6 @@ export function sachwert(ein, bodenwertErgebnis, param) {
     out.aussenanlagen_herkunft = aussenHerkunft;
   }
 
-  /* v1072-WGAR-1 · GARAGEN ALS EIGENE BAULICHE ANLAGE.
-   * Die NHK 2010 fuehren fuer Garagen eigene Kostenkennwerte (Gebaeudeart
-   * 14.1: 245 / 485 / 780 EUR/m2 BGF, Baunebenkosten 12 %). Das Gutachten
-   * setzt die Garage mit rund 28.500 EUR an — bei uns fehlte sie ganz.
-   *
-   * Eigene Gesamtnutzungsdauer: Anlage 3 SW-RL nennt fuer Einzelgaragen
-   * 60 Jahre. Sie mit den 80 Jahren des Hauses zu rechnen waere bequem und
-   * falsch — eine Garage haelt nicht so lange wie ein Wohnhaus.
-   *
-   * Ohne Bruttogrundflaeche der Garage wird NICHT geschaetzt. Die Zahl der
-   * Stellplaetze allein sagt nichts ueber die Flaeche. */
-  const _garBgf = Number(ein.garagen_bgf_qm);
-  if (Number.isFinite(_garBgf) && _garBgf > 0) {
-    const _garStufe = Math.min(5, Math.max(3, Math.round(Number(ein.garagen_stufe) || 3)));
-    const _garKw = NHK_2010.WERTE['14.1|' + _garStufe];
-    if (Number.isFinite(_garKw)) {
-      const _garGnd = Number(ein.garagen_gnd) || GND_GARAGE;
-      const _garRnd = Number.isFinite(Number(ein.garagen_rnd))
-        ? Number(ein.garagen_rnd)
-        : Math.max(0, Math.min(_garGnd, rnd));
-      const _garHerst = Math.round(_garKw * _garBgf * (index || 1));
-      const _garMind = Math.round(_garHerst * ((_garGnd - _garRnd) / _garGnd));
-      const _garWert = _garHerst - _garMind;
-      geb += _garWert;
-      out.staffel.push({
-        pos: '+ Garage / Stellplatz',
-        detail: _garBgf + ' m² × ' + _garKw + ' €/m² × ' + (index || 1)
-          + ' − Alterswertminderung (' + Math.round(_garGnd - _garRnd) + ' von ' + _garGnd + ' Jahren)',
-        wert: _garWert,
-      });
-      out.garage = {
-        bgf_qm: _garBgf, standardstufe: _garStufe, kennwert_eur_qm: _garKw,
-        gnd_jahre: _garGnd, rnd_jahre: _garRnd,
-        herstellungskosten_eur: _garHerst, wert_eur: _garWert,
-        quelle: 'NHK 2010, Gebäudeart 14.1 (Einzel-/Mehrfachgaragen); '
-          + 'Gesamtnutzungsdauer 60 Jahre nach Anlage 3 SW-RL',
-      };
-    }
-  }
   out.staffel.push({ pos: '= Gebäudesachwert', wert: geb, summe: true });
   /* v1056-WSW-1 · Diese Werte gab es nur als lokale Variablen. Die
    * Ergebniskarte las sw.gebaeude_sachwert_eur und bekam undefined —
@@ -887,14 +957,150 @@ export function sachwert(ein, bodenwertErgebnis, param) {
     out.warnungen.push('Kein Sachwertfaktor verfügbar. Ausgewiesen ist der vorläufige Sachwert '
       + 'ohne Marktanpassung — das ist eine Herstellungskostenrechnung, kein Marktwert. '
       + 'Abweichungen von 30 % und mehr sind normal.');
+    /* v1338c: Besondere objektspezifische Merkmale werden hier NICHT
+       abgezogen. Sie gehoeren nach die Marktanpassung - ohne Faktor gibt es
+       keine, und ein Abzug auf eine Herstellungskostenrechnung erzeugt eine
+       Zahl, die nach Verkehrswert aussieht und keiner ist. Der Nutzer soll
+       aber nicht raetseln, wo seine Eingabe geblieben ist. */
+    if (Number.isFinite(Number(ein.bom_eur)) && Number(ein.bom_eur) !== 0) {
+      out.bom_eur_erfasst = Math.round(Number(ein.bom_eur));
+      out.warnungen.push('Die besonderen objektspezifischen Grundst\u00fccksmerkmale ('
+        + Math.round(Number(ein.bom_eur)).toLocaleString('de-DE')
+        + ' \u20ac) sind erfasst, wirken hier aber nicht: sie werden nach der '
+        + 'Marktanpassung angesetzt, und ohne Sachwertfaktor gibt es keine. '
+        + 'Im Ertragswertverfahren werden sie ber\u00fccksichtigt.');
+    }
     return out;
   }
   const marktwert = Math.round(vorlaeufig * swf);
-  out.staffel.push({ pos: `× Sachwertfaktor ${String(swf).replace('.', ',')}`, faktor: swf, wert: null });
+  out.staffel.push({ pos: `\u00d7 Sachwertfaktor ${String(swf).replace('.', ',')}`, faktor: swf, wert: null });
   out.staffel.push({ pos: '= marktangepasster Sachwert', wert: marktwert, summe: true });
-  out.wert = marktwert;
   out.marktangepasst = true;
   out.sachwertfaktor = { wert: swf, stufe: param.stufe || null, quelle: param.quelle || null };
+
+  /* === v1338 - DIE STREUUNG DES SACHWERTFAKTORS GEHOERT AN DIE ZAHL ===
+     Sie wird im Register gefuehrt (`satz.streuung`) und war bisher nur
+     beim Liegenschaftszins durchgereicht. Beim Sachwertfaktor schlaegt
+     sie voll durch: eine Standardabweichung von 0,21 sind an einem
+     Reihenhaus mit 145.000 Euro vorlaeufigem Sachwert gut 30.000 Euro.
+     Ein Punktwert ohne Streuung behauptet eine Genauigkeit, die die
+     Regression nicht hergibt. */
+  /* === v1338b - EIGENER FEHLER, IM FUNKTIONSLAUF GEFUNDEN ============
+     Die Streuungsspanne stand VOR dem bOM-Abzug. Gemessen am Reihenhaus:
+
+       = Sachwert                       184.761 EUR
+       Streuung-Spanne     [186.901 ... 264.622] EUR
+
+     Der Endwert lag UNTERHALB der eigenen Spanne. Eine Spanne, die ihr
+     eigenes Ergebnis nicht enthaelt, ist schlimmer als keine - sie sieht
+     nach Sorgfalt aus und widerspricht der Zeile darueber.
+
+     Die Spanne wird jetzt zuletzt gebildet, auf demselben Endwert.
+     Deshalb steht der bOM-Block hier VOR der Streuung. */
+
+  /* === v1338 - BESONDERE OBJEKTSPEZIFISCHE GRUNDSTUECKSMERKMALE =======
+     Paragraf 8 Abs. 3 ImmoWertV. Sie fehlten im Sachwertverfahren
+     VOLLSTAENDIG - die Staffel endete beim marktangepassten Sachwert.
+     Der Ertragswert kennt sie seit jeher (`bog` in ErtragswertService),
+     der Sachwert nicht. Zwei Verfahren, zwei Massstaebe, und das teurere
+     Loch im haeufiger genutzten.
+
+     An einem echten Fall gemessen: Schimmel, Wasserschaden, Estrich und
+     Setzungen summierten sich auf 41.000 bis 86.000 Euro - bei einem
+     Verkehrswert um 185.000 Euro sind das 22 bis 47 Prozent. Ein
+     Verfahren, das diesen Schritt nicht kennt, kann fuer so ein Objekt
+     keinen Verkehrswert ausweisen.
+
+     SIE KOMMEN NACH DER MARKTANPASSUNG, nicht davor. Die Sachwertfaktoren
+     werden aus Kauffaellen OHNE solche Merkmale abgeleitet; wer sie vorher
+     abzieht, laesst den Faktor auf einen Wert wirken, den es in der
+     Stichprobe nicht gab.
+
+     DER DOPPELABZUG IST DIE GEFAHR: wer die Restnutzungsdauer wegen
+     derselben Maengel verkuerzt UND sie hier noch einmal abzieht, rechnet
+     sie zweimal. */
+  out.hinweise = out.hinweise || [];
+  const _bom = Number(ein.bom_eur);
+  let _bomWert = 0;
+  if (Number.isFinite(_bom) && _bom !== 0) {
+    _bomWert = Math.round(_bom);
+    out.bom_eur = _bomWert;
+    out.bom_grund = ein.bom_grund || null;
+    if (Array.isArray(ein.bom_positionen) && ein.bom_positionen.length) {
+      out.bom_positionen = ein.bom_positionen;
+    }
+    out.staffel.push({
+      pos: (_bomWert < 0 ? '\u2212' : '+') + ' besondere objektspezifische Grundst\u00fccksmerkmale',
+      detail: (ein.bom_grund ? String(ein.bom_grund) + ' \u2014 ' : '')
+        + '\u00a7 8 Abs. 3 ImmoWertV, nach der Marktanpassung angesetzt',
+      wert: _bomWert,
+    });
+    out.wert = marktwert + _bomWert;
+    out.staffel.push({ pos: '= Sachwert', wert: out.wert, summe: true });
+
+    if (!ein.bom_grund) {
+      out.warnungen.push('Besondere objektspezifische Grundst\u00fccksmerkmale sind ohne '
+        + 'Begr\u00fcndung angesetzt. Ohne Begr\u00fcndung sind sie im Dossier nicht verwertbar.');
+    }
+    out.hinweise.push('Besondere objektspezifische Grundst\u00fccksmerkmale d\u00fcrfen nicht '
+      + 'zus\u00e4tzlich in der Restnutzungsdauer stecken. Wurde die Restnutzungsdauer wegen '
+      + 'derselben M\u00e4ngel verk\u00fcrzt, wird hier ein zweites Mal abgezogen \u2014 dann geh\u00f6rt '
+      + 'entweder die Verk\u00fcrzung zur\u00fcckgenommen oder der Ansatz hier gek\u00fcrzt.');
+    if (ein.rnd_verkuerzt) {
+      out.warnungen.push('DOPPELABZUG M\u00d6GLICH: die Restnutzungsdauer wurde sachverst\u00e4ndig '
+        + 'verk\u00fcrzt UND es sind besondere objektspezifische Grundst\u00fccksmerkmale '
+        + 'angesetzt. Beides darf nicht denselben Mangel erfassen.');
+    }
+
+    /* v1338b: Das unguenstigste Szenario ist KEIN zweiter Verkehrswert.
+       Es sagt, wohin der Wert laeuft, wenn eine noch offene Position
+       oben herauskommt - typisch Setzungen, die statisch relevant sein
+       koennen. Ein Baugrundgutachten macht daraus eine Zahl; bis dahin
+       ist die Spanne die ehrlichere Aussage. */
+    const _worst = Number(ein.bom_worst_eur);
+    if (Number.isFinite(_worst) && _worst !== 0 && Math.round(_worst) !== _bomWert) {
+      out.bom_worst_eur = Math.round(_worst);
+      out.wert_worst_eur = marktwert + Math.round(_worst);
+      out.hinweise.push('Ung\u00fcnstigstes Szenario: mit '
+        + Math.abs(Math.round(_worst)).toLocaleString('de-DE')
+        + ' \u20ac statt ' + Math.abs(_bomWert).toLocaleString('de-DE') + ' \u20ac ergibt sich '
+        + out.wert_worst_eur.toLocaleString('de-DE') + ' \u20ac. Das ist ein Szenario, '
+        + 'kein zweiter Verkehrswert \u2014 es tritt ein, wenn eine noch offene Position '
+        + 'am oberen Rand herauskommt.');
+    }
+  } else {
+    out.wert = marktwert;
+  }
+
+  /* === v1338 - DIE STREUUNG DES SACHWERTFAKTORS GEHOERT AN DIE ZAHL ===
+     Sie wird im Register gefuehrt (`satz.streuung`) und war bisher nur
+     beim Liegenschaftszins durchgereicht. Beim Sachwertfaktor schlaegt
+     sie voll durch: eine Standardabweichung von 0,21 sind an einem
+     Reihenhaus mit 185.000 Euro vorlaeufigem Sachwert knapp 39.000 Euro.
+     Ein Punktwert ohne Streuung behauptet eine Genauigkeit, die die
+     Regression nicht hergibt.
+
+     v1338b: Die Spanne steht auf dem ENDWERT, also einschliesslich der
+     besonderen objektspezifischen Merkmale - sonst enthaelt sie ihr
+     eigenes Ergebnis nicht. */
+  const _streu = Number(param.streuung);
+  if (Number.isFinite(_streu) && _streu > 0) {
+    out.sachwertfaktor.streuung = _streu;
+    out.sachwertfaktor.spanne_eur = [
+      Math.round(vorlaeufig * (swf - _streu)) + _bomWert,
+      Math.round(vorlaeufig * (swf + _streu)) + _bomWert,
+    ];
+    out.hinweise.push('Der Sachwertfaktor hat eine Standardabweichung von \u00b1'
+      + String(_streu).replace('.', ',') + '. Daraus ergibt sich eine Spanne von '
+      + out.sachwertfaktor.spanne_eur[0].toLocaleString('de-DE') + ' bis '
+      + out.sachwertfaktor.spanne_eur[1].toLocaleString('de-DE')
+      + ' \u20ac' + (_bomWert ? ' (einschlie\u00dflich der besonderen objektspezifischen Merkmale)' : '')
+      + '. Sie geh\u00f6rt ins Gutachten \u2014 ein Punktwert behauptet eine '
+      + 'Genauigkeit, die die Regression nicht hergibt.');
+  }
+
   out.anwendbar = true;
   return out;
 }
+
+

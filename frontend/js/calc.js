@@ -651,6 +651,104 @@ function _computeBsvLifecycle() {
   };
 }
 
+/* ═══ v1379-PROG · DER HINWEIS ZUM ANGEPASSTEN STEUERSATZ ══════════════════
+ *
+ * Marcels Vorgabe: „wenn der satz angepasst ist sollte man ein hinweis setzen
+ * und das erklaeren."
+ *
+ * Der Nutzer gibt 42 Prozent ein und sieht eine Ersparnis, die 38 Prozent
+ * entspricht. Ohne Erklaerung sieht das nach einem Rechenfehler aus. Der
+ * Hinweis nennt deshalb BEIDE Zahlen und den Grund: das steuerliche Ergebnis
+ * traegt ihn aus seiner Tarifzone, und der letzte Euro Verlust wirkt weniger
+ * als der erste.
+ *
+ * Der Hinweis erscheint NUR, wenn er etwas zu sagen hat - also wenn die
+ * Progression wirklich gerechnet wurde UND der effektive Satz spuerbar
+ * abweicht (ab einem halben Prozentpunkt). Wer in der Proportionalzone
+ * bleibt, sieht nichts; bei ihm stimmen beide Zahlen ueberein. */
+function _progHinweisZeichnen(zveImmo, steuer, grenzSatz, effSatz, zveBasis, _saldo, _anz) {
+  var el = document.getElementById('prog-hinweis');
+  if (!el) return;
+  var _zeigen = (effSatz != null) && isFinite(effSatz) && (grenzSatz > 0)
+                && Math.abs(effSatz - grenzSatz) >= 0.005;
+  if (!_zeigen) { el.hidden = true; el.innerHTML = ''; return; }
+
+  var _pz = function (x) { return (x * 100).toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %'; };
+  var _eu = function (x) { return Math.round(Math.abs(x)).toLocaleString('de-DE') + ' €'; };
+  var _verlust  = zveImmo < 0;
+  var _wirkung  = _verlust ? 'Ersparnis' : 'Belastung';
+  var _richtung = _verlust ? 'niedriger' : 'höher';
+  var _linear   = zveImmo * grenzSatz;
+  var _diff     = Math.abs(steuer) - Math.abs(_linear);
+
+  el.hidden = false;
+  el.innerHTML =
+      '<div class="ct"><span class="ct-ico"><svg width="22" height="22"><use href="#i-info"/></svg></span>'
+    + 'Dein Steuersatz wurde angepasst</div>'
+    + '<p class="hint" style="margin-bottom:8px">'
+    + 'Du hast <b>' + _pz(grenzSatz) + '</b> Grenzsteuersatz angegeben. Auf dieses Objekt wirken '
+    + 'tatsächlich <b>' + _pz(effSatz) + '</b> — die ' + _wirkung + ' fällt damit um '
+    + '<b>' + _eu(_diff) + '</b> ' + _richtung + ' aus als bei einer Rechnung mit dem festen Satz.'
+    + '</p>'
+    /* ═══ v1397 · WENN ANDERE OBJEKTE DIE BASIS SCHON VERSCHOBEN HABEN ══
+       Der Absatz darueber nennt die Ausgangsbasis. Seit v1397 ist das nicht
+       mehr zwangslaeufig das eingetragene zvE: hat der Nutzer frueher
+       gekaufte Bestandsobjekte, steht dieses Objekt auf einer bereits
+       gesenkten (oder gehobenen) Basis. Ohne diesen Satz stuende dort eine
+       Zahl, die im Tab Steuern nirgends auftaucht — und der Nutzer suchte
+       den Fehler bei sich. */
+    + (_saldo && Math.abs(_saldo) >= 1
+        ? '<p class="hint" style="margin-bottom:8px">'
+          + 'Darin sind <b>' + _anz + ' weitere ' + (_anz === 1 ? 'Bestandsobjekt' : 'Bestandsobjekte') + '</b> '
+          + 'bereits berücksichtigt: ' + (_saldo < 0 ? 'ihr Verlust senkt' : 'ihr Überschuss hebt')
+          + ' deine Ausgangsbasis um <b>' + _eu(_saldo) + '</b> auf <b>' + _eu(zveBasis) + '</b>, '
+          + 'bevor dieses Objekt wirkt. '
+          + (_saldo < 0
+              ? 'Dieses Objekt spart deshalb weniger, als es allein sparen würde — genau so, wie es in deiner Steuererklärung zusammenläuft.'
+              : 'Dieses Objekt wirkt deshalb auf ein höheres Einkommen als allein.')
+          + '</p>'
+        : '')
+    + '<details class="dp-erkl">'
+    + '<summary>Warum ist das so?</summary>'
+    + '<p class="hint" style="margin-top:8px">'
+    + 'Der Grenzsteuersatz gilt für den <b>nächsten</b> Euro deines Einkommens — nicht für jeden. '
+    + (_verlust ? 'Der steuerliche Verlust dieses Objekts von <b>' + _eu(zveImmo) + '</b> '
+                : 'Der steuerliche Gewinn dieses Objekts von <b>' + _eu(zveImmo) + '</b> ')
+    + (_verlust
+        ? 'senkt dein zu versteuerndes Einkommen von ' + _eu(zveBasis) + ' auf ' + _eu(zveBasis + zveImmo) + '. '
+          + 'Dabei läufst du die Progression hinab: die ersten Euro des Verlusts sparen noch ' + _pz(grenzSatz)
+          + ', die letzten deutlich weniger. Der Durchschnitt über den ganzen Verlust sind die ' + _pz(effSatz) + '.'
+        : 'hebt dein zu versteuerndes Einkommen von ' + _eu(zveBasis) + ' auf ' + _eu(zveBasis + zveImmo) + '. '
+          + 'Dabei läufst du die Progression hinauf: die letzten Euro werden höher besteuert als die ersten. '
+          + 'Der Durchschnitt über den ganzen Gewinn sind die ' + _pz(effSatz) + '.')
+    + '</p>'
+    + '<p class="hint" style="margin-top:8px">'
+    + 'Gerechnet wird die Steuer deshalb nicht mit einem festen Satz, sondern als Differenz zweier '
+    + 'Tarifberechnungen nach <b>§ 32a EStG</b>: einmal mit und einmal ohne das Ergebnis dieses Objekts. '
+    + 'Ab rund 90.000 € zu versteuerndem Einkommen liegst du in der Proportionalzone — dort sind beide '
+    + 'Zahlen gleich und dieser Hinweis erscheint nicht.'
+    + '</p>'
+    /* ═══ v1383 · WAS HIER STEHT UND WAS NICHT ══════════════════════════
+       Marcel hat zwei Dinge gefragt: "rechnet er runter, wenn neue Objekte
+       dazukommen?" und "was ist, wenn wir den aendern?".
+       Die ERSTE Frage gehoert NICHT hierher. Dieser Kasten steht direkt
+       ueber `#tax-flow-hint`, und der erklaert seit jeher das Modell —
+       dort steht die Mehrobjekt-Frage jetzt ausfuehrlich mit Zahlen.
+       Beides hier zu wiederholen hiesse, dieselbe Aussage an zwei Stellen
+       zu pflegen; genau daraus werden Widersprueche.
+       Dieser Kasten erklaert die EINE konkrete Zahl dieses Objekts. Die
+       zweite Frage haengt unmittelbar am eingegebenen Satz und gehoert
+       deshalb hierher. */
+    + '<p class="hint" style="margin-top:8px;margin-bottom:0">'
+    + '<b>Und was ändert sich, wenn du den Satz oben selbst setzt?</b> Für dieses Objekt '
+    + 'nichts: solange ein zu versteuerndes Einkommen erfasst ist, rechnet DealPilot über '
+    + 'den Tarif, nicht über den eingetragenen Satz. Der Satz bleibt als Vergleichsgröße '
+    + 'stehen und erscheint so auch im PDF. Willst du bewusst mit einem festen Satz rechnen, '
+    + 'lösche das zu versteuernde Einkommen — dann greift wieder die einfache Multiplikation.'
+    + '</p>'
+    + '</details>';
+}
+
 // 30 calc-Läufe hintereinander stattfinden. Bei wirklich erstem Aufruf
 // (z.B. nach dem Laden eines Objekts) sofort ausführen.
 var _calcDebounceTimer = null;
@@ -1445,10 +1543,164 @@ function _calcImmediate(){
     if (_d2zd0) _d2zd0.textContent = '\u2014';
     st('d2_zaer_m', '\u2014');
   }
+  /* v1383-GRENZAUTO: Die Automatik VOR dem Lesen nachziehen, sonst rechnet
+     dieser Lauf noch mit dem alten gespeicherten Satz. Still — ein Toast
+     bei jedem Rechenlauf waere unbrauchbar. tax.js laedt NACH calc.js,
+     deshalb der Funktionstest statt eines direkten Aufrufs. */
+  try { if (typeof window._grenzAutoNachziehen === 'function') window._grenzAutoNachziehen(false); } catch (_e) {}
   var grenz=v('grenz')/100;
-  /* mand v804: Halter-Regime — Privat/GbR = grenz (1:1 wie heute), GmbH/UG = KSt(+GewSt), KEINE Erstattung bei Verlust */
+
+  /* ═══ v1379-PROG · DIE STEUERWIRKUNG FOLGT DER PROGRESSION ═══════════════
+   *
+   * Bis hierher stand ueberall `base * grenz`: ein LINEARER Satz auf das
+   * steuerliche Ergebnis der Immobilie. Das ist nur dann richtig, wenn das
+   * Ergebnis den Steuerpflichtigen NICHT aus seiner Tarifzone traegt.
+   *
+   * Bei einem Verlust laeuft man die Progression aber HINAB. Gemessen am
+   * Tarif 2026 (§ 32a EStG):
+   *
+   *   zvE 45.000, Verlust 30.000 -> linear 10.080 EUR, echt  8.400 EUR  (-17 %)
+   *   zvE 60.000, Verlust 20.000 -> linear  7.740 EUR, echt  7.024 EUR  (-9 %)
+   *   zvE 75.000, Verlust 30.000 -> linear 12.600 EUR, echt 11.529 EUR  (-9 %)
+   *   zvE 90.000, Verlust 20.000 -> linear  8.400 EUR, echt  8.400 EUR  (0 %)
+   *
+   * Der Fehler ging IMMER in dieselbe Richtung: die Ersparnis wurde zu hoch
+   * ausgewiesen, der Deal also zu gut gerechnet. Und er traf genau die
+   * mittleren Einkommen - ab rund 90.000 EUR zvE bleibt man in der
+   * Proportionalzone, dort stimmte die lineare Rechnung.
+   *
+   * Richtig ist die Differenz zweier Tarifberechnungen:
+   *     Steuerwirkung = ESt(zvE + Ergebnis) - ESt(zvE)
+   *
+   * Die Progression wird hier NICHT nachgebaut - das waere ein zweiter
+   * Rechenkern. Gerechnet wird mit Tax.calcEStG() aus tax.js, wo der Tarif
+   * samt Jahrgang und Stetigkeitspruefung steht.
+   *
+   * ZWEI RUECKFAELLE, die das alte Verhalten erhalten:
+   *   - kein zvE eingegeben  -> ohne Basis ist keine Progression rechenbar
+   *   - tax.js nicht geladen -> index.html laedt tax.js NACH calc.js
+   * In beiden Faellen gilt weiter `base * grenz`, und `_progAktiv` bleibt
+   * false. Der Hinweis im Tab Steuern liest genau dieses Merkmal. */
+  var _zveBasis = (function(){ try { var _z = v('zve'); return (_z > 0) ? _z : 0; } catch(_e){ return 0; } })();
+  var _progAktiv = false;
+  var _progEff   = null;   /* effektiver Satz der Immobilienwirkung, fuer die Anzeige */
+
+  /* ═══ v1397 · DIE ANDEREN OBJEKTE SENKEN DIE BASIS — HIER AUCH ════════
+   *
+   * MARCELS FRAGE: "warum steht das noch drin? wollten wir das nicht
+   * aendern?" — zum Hinweistext im Tab Steuern, der sagt, die Objekte
+   * verschoeben sich gegenseitig nicht die Progression.
+   *
+   * GEMESSEN: der Satz stimmte seit V276 nur noch zur HAELFTE. `tax.js`
+   * rechnet im Tab Steuern laengst saldiert (baseIncome + Bestandssaldo,
+   * DANN calcImmoTaxImpact). HIER stand die Saldierung ausdruecklich als
+   * "nur Display" — der Aggregator wurde gefragt, die Zahl angezeigt und
+   * dann NICHT gerechnet (Kommentar bei der WK-Anzeige, V258-07).
+   *
+   * Zwei Stellen, zwei Antworten auf dieselbe Frage: der Tab Steuern wies
+   * eine andere Steuerwirkung aus als der Cashflow desselben Objekts, und
+   * das Portfolio-Cockpit summierte die ungenauere von beiden.
+   *
+   * WELCHE ZAHL IST DIE RICHTIGE: die saldierte. In der Steuererklaerung
+   * fliessen alle Einkuenfte aus V+V zusammen; ein Verlust aus dem frueher
+   * gekauften Objekt senkt die Basis, auf der das spaetere seine Ersparnis
+   * erzielt. Wer das ignoriert, weist die Ersparnis ZU HOCH aus — immer in
+   * dieselbe Richtung, und genau in den mittleren Einkommen am staerksten.
+   *
+   * GERECHNET WIRD NICHT HIER. `window._dpBestandSaldo` liegt in tax.js,
+   * weil dort der Kaufdatums-Filter sitzt (V280: nur Objekte, die vor dem
+   * eigenen gekauft wurden und im Bezugsjahr schon bestanden). Die zweite
+   * Aggregator-Funktion, `getWKForOtherObjects`, filtert das NICHT — mit
+   * ihr kaeme hier eine andere Zahl heraus als im Tab Steuern. Genau diese
+   * Dublette waere der naechste stille Widerspruch.
+   *
+   * RUECKFALL 0: ist der Aggregator-Cache noch nicht geladen, wird nicht
+   * saldiert und es gilt das bisherige Verhalten. Lieber unveraendert als
+   * halb saldiert — eine Zahl, die je nach Ladezustand springt, ist
+   * schlimmer als eine, die bekannt konservativ ist. */
+  var _bestandSaldo_w = 0;     /* der tatsaechlich angewandte Saldo */
+  var _bestandAnz_w   = 0;     /* wie viele Objekte darin stecken */
+  /* ═══ v1398 · EIN SALDO, DER ZU SPAET KOMMT, IST EIN FALSCHER ══════════
+   *
+   * GEMESSEN als Folge von v1397: `_dpBestandSaldo` liest NUR den Cache des
+   * WK-Aggregators. Laeuft calc() bevor der geladen ist — und beim ersten
+   * Oeffnen eines Objekts ist das der Regelfall — kommt 0 zurueck, und der
+   * Cashflow nach Steuer faellt ZU GUT aus. An drei Objekten gerechnet:
+   * 24.607 statt 20.894 Euro, also 17,77 Prozent.
+   *
+   * Schlimmer als der Betrag ist, dass nichts nachzieht: `tax.js` hat dafuer
+   * `_ensureBestandDataAndRerender`, `calc.js` hatte nichts. Die zu gute
+   * Zahl waere stehengeblieben, bis der Nutzer irgendetwas anfasst.
+   *
+   * WARUM KEIN `.then(calcNow)` AM VORHANDENEN loadAll: dort steht seit
+   * v730 eine ausdrueckliche Warnung vor der Render-Schleife
+   * POST steuer-snapshot -> loadAll -> GET -> Re-Render -> POST. Ein
+   * Neurechnen an dieser Stelle wuerde sie wieder schliessen.
+   *
+   * DESHALB DER MERKER, UND ZWAR VOR DEM LADEN GESETZT: es gibt genau
+   * EINEN Nachlauf je Sitzung. Schlaegt das Laden fehl, wird es nicht
+   * wiederholt — lieber einmal ohne Saldo rechnen als in einer Schleife
+   * haengen. */
+  function _bestandEinmalNachladen() {
+    try {
+      if (window._dpBestandNachgeladen) return;
+      if (!window.DealPilotWKAggregator
+          || typeof window.DealPilotWKAggregator.loadAll !== 'function') return;
+      var _c = (typeof window.DealPilotWKAggregator.getAllObjectsWithWK === 'function')
+        ? window.DealPilotWKAggregator.getAllObjectsWithWK() : null;
+      /* Cache ist da: nichts nachzuladen, und kuenftig auch nicht pruefen. */
+      if (Array.isArray(_c) && _c.length > 0) { window._dpBestandNachgeladen = true; return; }
+      window._dpBestandNachgeladen = true;   /* VOR dem Laden — genau ein Anlauf */
+      window.DealPilotWKAggregator.loadAll(false).then(function () {
+        if (typeof calcNow === 'function') setTimeout(calcNow, 120);
+      }).catch(function () {});
+    } catch (_e) {}
+  }
+
+  function _bestandSaldo(jahr) {
+    try {
+      if (typeof window._dpBestandSaldo !== 'function') return 0;
+      var _j = (typeof jahr === 'number' && jahr > 1900)
+        ? jahr : new Date().getFullYear();
+      var _s = window._dpBestandSaldo(_j);
+      /* Kein Saldo kann zweierlei heissen: es gibt keine Vorobjekte, oder
+         die Daten sind noch nicht da. Nur im zweiten Fall wird nachgeladen. */
+      if (!_s) _bestandEinmalNachladen();
+      return (typeof _s === 'number' && isFinite(_s)) ? _s : 0;
+    } catch (_e) { return 0; }
+  }
+  function _estDelta(base, jahr) {
+    var _lin = base * grenz;
+    if (!(_zveBasis > 0)) return _lin;
+    if (typeof Tax === 'undefined' || !Tax || typeof Tax.calcEStG !== 'function') return _lin;
+    try {
+      var _sal = _bestandSaldo(jahr);
+      /* Uebersteigt der Verlust der Vorobjekte das zvE, ist die Basis null —
+         nicht negativ. Ein negatives zvE gibt es im Tarif nicht. */
+      var _bas = _zveBasis + _sal;
+      if (!(_bas > 0)) _bas = 0;
+      var _vor  = Tax.calcEStG(_bas, jahr);
+      var _nach = Tax.calcEStG(_bas + base, jahr);
+      var _d = _nach - _vor;
+      if (!isFinite(_d)) return _lin;
+      _progAktiv = true;
+      if (_sal !== 0) {
+        _bestandSaldo_w = _sal;
+        try {
+          _bestandAnz_w = (typeof window._dpBestandAnzahl === 'function')
+            ? (window._dpBestandAnzahl(_j2(jahr)) || 0) : 0;
+        } catch (_e2) { _bestandAnz_w = 0; }
+      }
+      return _d;
+    } catch (_e) { return _lin; }
+  }
+  function _j2(jahr) {
+    return (typeof jahr === 'number' && jahr > 1900) ? jahr : new Date().getFullYear();
+  }
+
+  /* mand v804: Halter-Regime — Privat/GbR = ESt nach Progression, GmbH/UG = KSt(+GewSt), KEINE Erstattung bei Verlust */
   var _mandRate = (function(){ try{ if(window.DealPilotMandanten && DealPilotMandanten.effRate){ var _r=DealPilotMandanten.effRate(); return (_r!=null && isFinite(_r)) ? _r : null; } }catch(_e){} return null; })();
-  function _mtx(base){ return (_mandRate!=null) ? (Math.max(0, base) * _mandRate) : (base * grenz); }
+  function _mtx(base, jahr){ return (_mandRate!=null) ? (Math.max(0, base) * _mandRate) : _estDelta(base, jahr); }
   /* v813-3b: Stichtag-Schnitt im Ueberfuehrungsjahr. Faellt fuer JEDEN anderen Fall
      (Neukauf, kein Stichtag, Privat-Halter) exakt auf _mtx zurueck -> kein Verhaltenswechsel. */
   function _mtxYear(base, calYear){
@@ -1458,18 +1710,18 @@ function _calcImmediate(){
         if (_hs && /^\d{4}-\d{2}-\d{2}$/.test(_hs) && typeof calYear === 'number') {
           var _hy = parseInt(_hs.slice(0,4), 10);
           var _hm = parseInt(_hs.slice(5,7), 10);
-          if (calYear < _hy) return base * grenz;       /* noch privat: ESt */
-          if (calYear > _hy) return _mtx(base);          /* GmbH: KSt */
+          if (calYear < _hy) return _estDelta(base, calYear);   /* noch privat: ESt nach Progression */
+          if (calYear > _hy) return _mtx(base, calYear);         /* GmbH: KSt */
           /* Stichtagsjahr: anteilig Privat (vor Stichtag) + GmbH (ab Stichtag) */
           var _gf = (_hm >= 1 && _hm <= 12) ? (13 - _hm) / 12 : 1;  /* GmbH-Anteil ab Stichtagsmonat */
           var _pf = 1 - _gf;                                        /* Privat-Anteil davor */
-          var _taxPrivat = (base * _pf) * grenz;                    /* ESt-Seite (Erstattung moeglich) */
+          var _taxPrivat = _estDelta(base * _pf, calYear);          /* ESt-Seite (Erstattung moeglich) */
           var _taxGmbh   = Math.max(0, base * _gf) * _mandRate;     /* KSt-Seite (kein Negativwert) */
           return _taxPrivat + _taxGmbh;
         }
       }
     } catch (_e) {}
-    return _mtx(base);
+    return _mtx(base, calYear);
   }
   var _calYearBase = (function(){ try { if (window.DealPilotAnteilig && DealPilotAnteilig.getBaseYear){ var _y = DealPilotAnteilig.getBaseYear(); if (_y) return _y; } } catch(_e){} return (new Date()).getFullYear(); })();
   var zins_j=(d1_zm+d2_zm)*12, tilg_j=(d1_tm+d2_tm)*12;
@@ -1486,6 +1738,15 @@ function _calcImmediate(){
   var cf_operativ = nkm_j - bwk_cf - zins_j;          // intern: vor Tilg, für Steuer
   var zve_immo = cf_operativ - afa;
   var steuer   = _mtxYear(zve_immo, _calYearBase);
+
+  /* v1379-PROG · DER EFFEKTIVE SATZ, den dieses Objekt tatsaechlich traegt.
+     Er weicht vom eingegebenen Grenzsteuersatz ab, sobald das Ergebnis den
+     Steuerpflichtigen aus seiner Tarifzone traegt. Genau diese Zahl erklaert
+     dem Nutzer, warum seine Ersparnis kleiner ist als sein Grenzsteuersatz -
+     ohne sie sieht es nach einem Rechenfehler aus. */
+  _progEff = (_progAktiv && Math.abs(zve_immo) > 0.5) ? (steuer / zve_immo) : null;
+  try { _progHinweisZeichnen(zve_immo, steuer, grenz, _progEff, _zveBasis + _bestandSaldo_w, _bestandSaldo_w, _bestandAnz_w); } catch (_e) {}
+
   // Öffentliche Werte: alle nach Tilgung (Banker) und nach BSV-Sparrate
   var cf_op = cf_operativ - tilg_j - bspar_y;          // CF v.St. NACH Tilgung & BSV
   var cf_ns = cf_op - steuer;                          // CF n.St. NACH Tilgung & BSV
@@ -1854,7 +2115,7 @@ function _calcImmediate(){
   var bspar_y_ezb = _d1IsAussetzung ? bspar_y : 0;
   // V63.40: CF v.St. = nach Tilgung (Banker-Sicht)
   var cf_op_ezb_operativ = nkm_ezb - bwk_cf_ezb - zins_ezb;     // intern für Steuer
-  var ster_ezb = _mtx(cf_op_ezb_operativ - afa);
+  var ster_ezb = _mtx(cf_op_ezb_operativ - afa, _calYearBase);
   var cf_op_ezb = cf_op_ezb_operativ - tilg_ezb - bspar_y_ezb;  // V63.52: nach Tilg & BSV
   var cf_ns_ezb = cf_op_ezb - ster_ezb;                          // Banker-CF n.St.
   var cf_ezb = cf_ns_ezb;
@@ -1964,7 +2225,7 @@ function _calcImmediate(){
     }
   }
   var cf_op_an_operativ = nkm_an - bwk_cf_an - zins_an;          // intern für Steuer
-  var ster_an = _mtx(cf_op_an_operativ - afa);
+  var ster_an = _mtx(cf_op_an_operativ - afa, _calYearBase);
   var cf_op_an = cf_op_an_operativ - tilg_an - bspar_y_an;       // V63.52
   var cf_ns_an = cf_op_an - ster_an;                             // Banker-CF n.St.
   // KPI color coding
@@ -3059,16 +3320,40 @@ function _calcImmediate(){
     try { MietEntwicklung.refresh(); } catch(e) {}
   }
   // V36: Header-Badges aktualisieren (DSCR/CF/BMR)
-  updHeaderBadges();
+  /* ═══ v1362 · ERST RECHNEN, DANN ANZEIGEN ════════════════════════════
+     Hier stand `updHeaderBadges()` VOR `_dpComputeDS2Cached()` - und acht
+     Zeilen spaeter noch einmal, mit dem Kommentar „Header neu mit
+     gecachtem Wert". Der zweite Aufruf war der Beleg, dass der erste zu
+     frueh kam: `updHeaderBadges` liest `window._dpLastDS2Result` und
+     rechnet nur SELBST, wenn der Cache leer ist. Vor dem Cache-Aufruf war
+     er das immer.
 
+     GEMESSEN, bevor etwas geaendert wurde: eine einzige Eingabe im
+     Kaufpreisfeld loeste ACHT Score-Berechnungen aus, ueber drei Wege:
+
+       3x  updHeaderBadges        (calc.js:174)   <- dieser hier
+       2x  _dpComputeDS2Cached    (calc.js:4031)
+       2x  renderDealScore2       (dealscore2-ui.js:340)
+       1x  weiterer Durchlauf
+
+     Die Entprellung von rund zwei Sekunden greift, die Mehrfachrechnung
+     INNERHALB einer Runde nicht. Das war bisher nur Verschwendung; fuer
+     B2 ist es ein Hindernis: jede dieser Rechnungen waere spaeter eine
+     Serveranfrage, und das Limit liegt bei 100 pro Minute.
+
+     KEINE EINSCHRAENKUNG: derselbe Wert, nur einmal statt zweimal
+     gerechnet. Der Selbstrechnungs-Zweig in `updHeaderBadges` bleibt als
+     Rueckfall stehen - faellt der Cache aus, rechnet der Header wie
+     bisher. */
   // V48: DS2 zentral cachen + alle Anzeigen synchronisieren (verhindert Score-Mismatch)
   if (typeof window._dpComputeDS2Cached === 'function') {
     window._dpComputeDS2Cached();
   }
-  // Header neu mit gecachtem Wert
+  // Header liest den frisch gecachten Wert
   if (typeof updHeaderBadges === 'function') {
     try { updHeaderBadges(); } catch(e) {}
   }
+
   // V48: Aktive Karte links neu rendern damit Score live mit Header übereinstimmt
   // (entkoppelt via setTimeout damit calc() nicht durch DOM-Render verzögert wird)
   if (typeof renderSaved === 'function') {
@@ -4030,10 +4315,23 @@ function _dpComputeDS2Cached() {
     var deal = window._buildDeal2FromState();
     var result = window.DealScore2.compute(deal);
     window._dpLastDS2Result = result;
+    /* v1363: Deal und Zeitpunkt kommen mit, damit renderDealScore2()
+       dieselbe Rechnung nicht ein zweites Mal anstellen muss. Und
+       `_dpLastDs2` - der zweite Cache-Name, den ui.js:799 liest - wird
+       hier gleich mitgesetzt, statt in dealscore2-ui.js eigenstaendig
+       zu entstehen. Zwei Namen fuer dieselbe Sache bleiben zwei Namen,
+       aber sie haben jetzt EINE Quelle. */
+    window._dpLastDS2Deal = deal;
+    window._dpLastDS2Zeit = Date.now();
+    try { window._dpLastDs2 = result; } catch (e2) {}
     return result;
   } catch (e) {
+
     console.warn('[V48] DS2 compute fail:', e.message);
     window._dpLastDS2Result = null;
+    window._dpLastDS2Deal = null;
+    window._dpLastDS2Zeit = 0;
+
     return null;
   }
 }

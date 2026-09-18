@@ -47,6 +47,23 @@ zum Zusammenführen steht dort in Abschnitt 6.
 Abschluss selbst nach "Fertig" verschieben, mit Datum und Commit-Hash,
 und committen.
 
+**Der Marktbericht-Strang hat ein eigenes Ziel, das über die Wertermittlung
+hinausgeht: die Ernte.** Für jedes der 16 Bundesländer sollen zwei amtliche
+Kennzahlen im Register liegen — Liegenschaftszinssatz (§ 21 Abs. 2) und
+Sachwertfaktor (§ 21 Abs. 3) — und für jeden Ausschuss soll **in der Datenbank
+stehen, woher die Zahl kommt**: Link, Jahrgang, Lizenz, Stichtag, Seite. Ohne
+diese Liste fängt die jährliche Nachernte jedes Mal bei der Recherche an.
+Stand: **6 von 16 Ländern**, rund 40 % der Einwohner beim Zins, 25 % beim
+Faktor. Ablauf, Datenbankstruktur und Quellenregister stehen in
+`claude/projektanweisung-marktbericht-20260812-abend.md`; die offenen Punkte im
+Backlog unter „MARKTBERICHT / ERNTE — Workstream (D)".
+
+**Wo kein Wert vorliegt, bekommt der Kunde den Weg dorthin** — den zuständigen
+Ausschuss und den Link auf seine Quelle, bei kostenpflichtigen Berichten mit
+dem Hinweis darauf. Das ist kein Eingeständnis, sondern das Gegenstück zur
+Doktrin: wir erfinden keine Zahl, also müssen wir umso genauer sagen können, wo
+die echte steht.
+
 **Vorlagen:** `design/mockups/` zeigt den Zielzustand. Bei Layoutfragen dort
 nachsehen statt raten. `design/logo/` enthaelt die Logo-Varianten.
 Uebernommen wird die Gestaltung, nicht der Code — die Mockups sind Neubauten.
@@ -359,7 +376,20 @@ eine selbst ausgerechnete Zahl.
 - **Löhner Str. 278**, 32120 Hiddenhausen, ZFH 233 m², Bj 1964 —
   Verkehrswert 350.094,36 €, BGF 346,62 m², Bodenwert 144.840 €
 
-> **Der Prüfmaßstab ist der DATENSATZ, nicht die Adresse.** Das Objekt
+> **⚠ Diese Sachwerte sind mit dem alten Baupreisindex 2,02 entstanden und
+> liegen seit v1407 rund 5,8 Prozent zu hoch.** Am echten Rechenkern
+> (`nhk2010.js`) gemessen:
+>
+> | | mit 2,02 | mit 1,91 | Unterschied |
+> |---|---:|---:|---:|
+> | EFH 233 m², RND 18/80 | 137.002 € | 129.542 € | −7.460 € |
+> | EFH 150 m², RND 40/80 | 196.500 € | 185.800 € | −10.700 € |
+> | MFH 100 m², RND 24/70 | 89.636 € | 84.755 € | −4.881 € |
+>
+> **Wer gegen die Zahlen oben prüft, findet eine Abweichung, die keine ist.**
+> Die Sollwerte gehören am Gutachten neu abgenommen — bis dahin ist die
+> RICHTUNG der Prüfmaßstab: der Sachwert muss jetzt niedriger liegen als
+> dort notiert, und zwar um rund 5,8 Prozent des Gebäudeanteils.> **Der Prüfmaßstab ist der DATENSATZ, nicht die Adresse.** Das Objekt
 > `2026-001` in der App trägt dieselbe Anschrift wie das Testobjekt Hüllhorst,
 > aber **andere Werte**: ETW **100 m²**, Bj **1962**, Grundstück 950 m² plus
 > 828 m² Hinterland, MEA 50 %. Gemessen am 03.09.2026 rechnet es Sachwert
@@ -374,6 +404,70 @@ eine selbst ausgerechnete Zahl.
 > 242.274 €, der Bodenwert 950 × 90 + 828 × 5, −10 % Lärm, × 50 % MEA
 > = 40.338 €. Die BWK-Quote steht auf dem **gesamten** Rohertrag inklusive
 > Stellplätzen, wie es sein muss.
+
+**Drei Dinge, die im Rechenkern still falsch rechnen** (am 13.09.2026 auf
+Staging nachgemessen, alle drei offen, im Backlog unter B1):
+
+- **`GND_JAHRE = 80` ist die Rückfallzahl, nicht mehr die einzige** —
+  seit v1338 liest `CrossCheckService` die Gesamtnutzungsdauer aus dem
+  Registerdatensatz (`modellansaetze.gnd`) und leitet die
+  Restnutzungsdauer im richtigen Rahmen **neu** ab (Anlage 2, aus Baujahr
+  und Modernisierungspunkten) — statt eine fertige Zahl umzurechnen. Das
+  ist der Unterschied, auf den es ankommt: 34/80 auf 70 ergibt je nach Weg
+  30 oder 24 Jahre, an einem Reihenhaus rund 19.000 €.
+  > **Der Fehler ist damit verlagert, nicht verschwunden:** er sitzt jetzt
+  > im REZEPT. Führt ein Ausschuss eine abweichende GND und steht sie nur
+  > im Fließtext der `auflagen` statt als Zahl in `modellansaetze.gnd`,
+  > rechnet das System weiter mit 80 — und nichts widerspricht. Gemessen
+  > am 14.09.2026 an Oberursel (GND **70**): `modellansaetze` war leer,
+  > die 70 stand nur im Text. **Beim Anlegen eines Rezepts gehört jede
+  > abweichende GND als ZAHL ins Feld**, und danach wird sie nachgemessen.
+- **Der Baupreisindex ist korrigiert, aber immer noch eine Konstante.**
+  Bis v1406 stand dort `2.02`; gemessen sagen **zwei** unabhängige amtliche
+  Quellen zum 01.01.2026 etwas anderes — Hamburg **1,911**, Dortmund
+  **1,906**. Seit **v1407** steht dort `1.91`, und der Sachwert fällt rund
+  **5,8 %** niedriger aus (am echten `nhk2010.js` gemessen: bei 150 m² und
+  RND 40/80 sind das 10.700 €).
+  > **Der Rest des Befundes bleibt:** eine Konstante hat keinen
+  > Stichtagsbezug und rechnet für einen Stichtag in der Vergangenheit
+  > zwangsläufig falsch. Der richtige Weg ist der Registerdatensatz — und
+  > dort liegt dasselbe Problem wie vor v1338 bei der Gesamtnutzungsdauer:
+  > **33 Sätze führen den Index bereits, aber als Fließtext**
+  > („Preisindizes des Statistischen Bundesamtes für den Neubau von
+  > Wohngebäuden") statt als Zahl. **Nur Hamburg hat ihn beziffert**
+  > (`modellansaetze.baupreisindex_stichtag`). Beim Anlegen eines Rezepts
+  > gehört der Index als ZAHL ins Feld, sonst rechnet das System weiter mit
+  > der Konstanten — und nichts widerspricht.
+- **Die NRW-Bewirtschaftungskosten sind stichtagsabhängig** — das AGVGA-Modell
+  schreibt die Ausgangswerte von 2002 über den VPI fort. Das hinterlegte Paar
+  gilt nur für den 01.01.2015.
+
+**Die Namensnennung ist erfüllt — die frühere Sperre gilt nicht mehr.**
+Sätze unter `dl-de/by-2-0` verlangen eine Namensnennung, und die steht jetzt
+im Bericht: `CrossCheckService` sammelt die Vermerke der **tatsächlich
+verwendeten** Registersätze entdoppelt in `quellen_nachweis`, die Web-Ansicht
+zeigt sie als Block „Quellennachweis", das PDF druckt sie mit Kennzahl und URL.
+
+> **Hier stand bis zum 15.09.2026:** „Der Vermerk hängt an jedem
+> Registerdatensatz im Feld `quellenvermerk` und **fehlt im Bericht**. Solange
+> das so ist, dürfen diese Zahlen in keinen Kundenbericht."
+>
+> **Gemessen am 15.09.2026 stimmt das nicht mehr:** von 383
+> Sachwertfaktor-Sätzen tragen **355 einen Quellenvermerk**, und von den
+> **47 Sätzen unter `by-2-0` fehlt er bei keinem einzigen**. Beide
+> Ausgabewege sind gebaut. Eine Sperre, die nicht mehr gilt, hält Arbeit auf,
+> die längst erlaubt ist — deshalb steht sie hier nicht mehr.
+
+**Die Regel dahinter bleibt:** genannt wird nur, was in *diesem* Bericht
+wirklich steckt. Eine Namensnennung für einen Ausschuss, der gar nicht
+vorkommt, ist genauso falsch wie eine fehlende — sie behauptet eine Herkunft.
+
+**Offen ist nur noch eine Kleinigkeit:** 28 Sätze führen keinen Vermerk. 17
+davon stehen unter `zero-2-0`, wo keine Namensnennung verlangt ist — das ist
+richtig so. Bei **elf** (Dortmund 3, Duisburg 4, Essen 2, München 2) fehlt
+dagegen die **Lizenzangabe selbst**. Ohne sie lässt sich nicht entscheiden, ob
+ein Vermerk nötig wäre. Nachzutragen, wenn diese Sätze ohnehin angefasst
+werden.
 
 ---
 

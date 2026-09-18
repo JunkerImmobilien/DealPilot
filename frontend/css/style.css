@@ -3787,7 +3787,12 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 }
 .ds-setting-row {
   display: grid;
-  grid-template-columns: 130px 1fr;
+  /* v1350: 130px waren zu schmal - "Rendite (Nettomietrendite)" und
+     "Potenzial (Bruttofaktor)" brachen um. GEMESSEN: Zeilenhoehe 33px
+     gegen 17px bei den kurzen Labels, dadurch stehen die Regler
+     unruhig untereinander. Marcels Befund "Formatierungen sind nicht
+     so schoen". */
+  grid-template-columns: 172px 1fr;
   align-items: center;
   gap: 12px;
 }
@@ -7081,8 +7086,134 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   font-style: italic;
 }
 
+/* ── v1356 · Die persoenlichen Kaufgrenzen im Deal-Score-Panel ────────
+   Sitzt zwischen dem Donut und den Positiv/Negativ-Spalten. Das Panel
+   ist dunkel, deshalb helle Schrift auf leicht aufgehellter Flaeche -
+   nicht auf einer eigenen Karte, sonst wirkt es wie ein zweiter Score.
+
+   Die Ampelfarben stehen im JS und sind bewusst NICHT tokenisiert:
+   Gruen und Rot bedeuten in jeder Marke dasselbe. */
+/* v1357: DIE AMPEL STEHT AUF ZWEI VERSCHIEDENEN GRUENDEN.
+   Gemessen: der volle Score-Panel liegt auf Obsidian (#050505), der
+   Sperrbildschirm „Bitte 70 % ausfuellen" dagegen auf der hellen
+   Grundflaeche (#F8F6F1). Dieselben hellen Toene waeren dort unsichtbar
+   gewesen.
+
+   Statt jede Regel doppelt zu schreiben, tragen die Regeln lokale
+   Variablen - `.ds2-grenzen-hell` tauscht nur die sechs Werte aus. Die
+   Ampelfarben bleiben in beiden Faellen dieselben: Gruen und Rot
+   bedeuten auf hellem wie auf dunklem Grund dasselbe. */
+.ds2-grenzen {
+  --g-flaeche: rgba(255,255,255,0.035);
+  --g-rand:    rgba(255,255,255,0.08);
+  --g-kopf:    rgba(255,255,255,0.72);
+  --g-text:    rgba(255,255,255,0.80);
+  --g-schwach: rgba(255,255,255,0.42);
+  --g-linie:   rgba(255,255,255,0.055);
+  --g-leer:    rgba(255,255,255,0.30);
+  margin: 18px 0 4px;
+  padding: 14px 16px 12px;
+  background: var(--g-flaeche);
+  border: 1px solid var(--g-rand);
+  border-radius: 10px;
+}
+.ds2-grenzen-hell {
+  --g-flaeche: rgba(0,0,0,0.022);
+  --g-rand:    rgba(0,0,0,0.09);
+  --g-kopf:    var(--ch, #2A2727);
+  --g-text:    var(--ch, #2A2727);
+  --g-schwach: var(--muted, #7A7370);
+  --g-linie:   rgba(0,0,0,0.07);
+  --g-leer:    rgba(0,0,0,0.28);
+}
+
+.ds2-grenzen-kopf {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: var(--g-kopf);
+  margin-bottom: 10px;
+}
+.ds2-grenzen-quelle {
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  text-transform: none;
+  font-size: 10.5px;
+  color: var(--g-schwach);
+}
+
+/* Vier Spalten: Ampel, Name, Istwert, Sollwert. Der Istwert steht vor
+   dem Sollwert, weil er die Antwort ist - der Sollwert ist nur der
+   Massstab, an dem sie gemessen wird. */
+.ds2-grenze-zeile {
+  display: grid;
+  grid-template-columns: 18px 1fr auto auto;
+  align-items: baseline;
+  gap: 4px 10px;
+  padding: 6px 0;
+  border-top: 1px solid var(--g-linie);
+}
+.ds2-grenze-zeile:first-of-type {
+  border-top: 0;
+}
+.ds2-grenze-ampel {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+}
+.ds2-grenze-name {
+  font-size: 12.5px;
+  color: var(--g-text);
+}
+.ds2-grenze-ist {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.ds2-grenze-soll {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--g-schwach);
+  white-space: nowrap;
+  min-width: 76px;
+  text-align: right;
+}
+.ds2-grenzen-fuss {
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid var(--g-linie);
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--g-schwach);
+}
+.ds2-grenzen-fuss strong {
+  color: var(--g-text);
+  font-weight: 700;
+}
+
+/* Schmal: Name und Werte untereinander, damit nichts abgeschnitten wird.
+   Genau der Fehler, der im selben Audit bei den Profilkarten steckte. */
+@media (max-width: 560px) {
+  .ds2-grenze-zeile {
+    grid-template-columns: 18px 1fr auto;
+  }
+  .ds2-grenze-soll {
+    grid-column: 2 / -1;
+    text-align: left;
+    min-width: 0;
+  }
+}
+
 .ds2-pn-grid {
   display: grid;
+
   grid-template-columns: 1fr 1fr;
   gap: 18px;
   padding: 18px 0 14px;
@@ -15459,10 +15590,16 @@ body.hdr-collapsed .hdr-toggle-btn {
   box-shadow: 0 2px 6px color-mix(in srgb, var(--gold) 30%, transparent);
 }
 .ds-pane-icon { font-size: 20px; }
+/* v1350: war Cormorant Garamond 22px - eine Serifenschrift direkt
+   neben der Reiterliste in IBM Plex Sans 12,5px. GEMESSEN und von
+   Marcel gesehen: "Farbe, Form, das passt nicht so richtig". Die
+   Serife bleibt der Hauptansicht (.sec-title, .total-val); im
+   Einstellungsdialog gilt die Schrift der App. */
 .ds-pane-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 22px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 15px;
   font-weight: 600;
+  letter-spacing: .1px;
   color: var(--ch);
   margin: 0 0 2px;
 }
@@ -16560,15 +16697,24 @@ body:not(.hdr-collapsed) .hdr-toggle-btn-chevron {
    V63.21 — DS2 Inline-Konfiguration im Settings-DealScore-Tab
    (User-Wunsch: kein Modal-über-Modal mehr)
    ═══════════════════════════════════════════════════════════════ */
+/* v1353: DER KASTEN IM KASTEN IST WEG.
+   Gemessen im Reiter Deal Score: dieser Kasten war auf 480 px gedeckelt
+   und scrollte, sein Inhalt ist aber 2019 px hoch - man sah also nicht
+   einmal ein Viertel. Darueber scrollt .pane-wrap ohnehin schon. Zwei
+   Rollbalken uebereinander lesen sich nicht als „hier geht es weiter",
+   sondern als „hier ist etwas abgeschnitten", und genau so hat Marcel es
+   auch beschrieben.
+
+   Der Reiter scrollt jetzt als Ganzes. Rahmen und Fuellung bleiben - sie
+   halten den Bereich optisch zusammen, ohne ihn zu beschneiden. */
 .ds2-settings-body-inline {
   background: rgba(0,0,0,0.02);
   border: 1px solid rgba(0,0,0,0.08);
   border-radius: 8px;
   padding: 12px;
   margin-top: 8px;
-  max-height: 480px;
-  overflow-y: auto;
 }
+
 .ds2-settings-body-inline .ds2-set-section {
   margin-bottom: 14px;
   padding-bottom: 10px;
@@ -27616,10 +27762,13 @@ aside.sidebar .sb-card.deal-won.active {
 .ds2-preset-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 16px;
+  gap: 7px;                 /* v1352: vier Teile statt drei */
+  padding: 14px 15px;
+
   background: linear-gradient(135deg, var(--surface, #F8F6F1), #fff);
-  border: 1.5px solid color-mix(in srgb, var(--gold) 20%, transparent);
+  /* v1352b: 2 px bei allen - mit 1.5 px war die Reihe mit der aktiven
+     Karte einen Pixel hoeher als die andere. */
+  border: 2px solid color-mix(in srgb, var(--gold) 20%, transparent);
   border-radius: 12px;
   cursor: pointer;
   text-align: left;
@@ -27634,7 +27783,6 @@ aside.sidebar .sb-card.deal-won.active {
 }
 .ds2-preset-card.ds2-preset-active {
   border-color: var(--gold, #C9A84C);
-  border-width: 2px;
   background: linear-gradient(135deg, rgba(232,201,100,0.10), #fff);
   box-shadow: 0 4px 18px color-mix(in srgb, var(--gold) 30%, transparent), 0 0 0 3px color-mix(in srgb, var(--gold) 10%, transparent);
 }
@@ -27652,21 +27800,114 @@ aside.sidebar .sb-card.deal-won.active {
   border-radius: 8px;
   box-shadow: 0 2px 8px color-mix(in srgb, var(--gold) 40%, transparent);
 }
+/* ---- v1352: Profilkarte - Kopfzeile, Gewichtsbalken, geklemmter Text
+   Gemessen vor dem Umbau: sechs Karten in zwei Reihen von 161 und 143 px.
+   Ausloeser war EIN Beschreibungstext mit 122 Zeichen, der vier statt drei
+   Zeilen brauchte und das ganze Raster mitzog. Deshalb steht hier keine
+   feste Kartenhoehe - die waere nur der naechste Deckel, unter dem Text
+   verschwindet -, sondern jeder Bestandteil bekommt eine feste Zeilenzahl.
+   Die Karte ist dann von selbst ueberall gleich hoch, und was nicht mehr
+   hineinpasst, steht vollstaendig im title-Attribut. */
+.ds2-preset-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 22px;
+}
 .ds2-preset-icon {
   font-size: 22px;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  color: var(--gold, #C9A84C);
+  flex: 0 0 auto;
 }
 .ds2-preset-label {
   font-size: 14px;
   font-weight: 700;
   color: var(--ch, #2A2727);
   letter-spacing: -0.2px;
+  line-height: 1.2;
 }
+
+/* Der Balken ist die Antwort auf Marcels Frage, was ein Profil eigentlich
+   tut: fuenf Segmente im Verhaeltnis der Hauptgewichte. flex-grow traegt
+   den Prozentwert, deshalb stimmt das Bild auch dann, wenn die Summe
+   einmal nicht exakt 100 ergibt. */
+.ds2-pw-bar {
+  display: flex;
+  height: 7px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--gold) 10%, transparent);
+  flex: 0 0 auto;
+}
+/* v1353: die fuenf Segmente waren im Screenshot nicht auseinanderzuhalten
+   - fuenf Goldtoene nebeneinander ergeben eine Flaeche, keinen Balken.
+   Zwei Aenderungen: die Toene wechseln jetzt hell und dunkel ab statt
+   durchzulaufen, und zwischen ihnen steht eine Fuge. Die Fuge traegt die
+   Lesbarkeit, nicht die Farbe - damit funktioniert der Balken auch beim
+   Mandanten, dessen Goldtoene enger beieinander liegen koennen. */
+.ds2-pw-seg {
+  display: block;
+  min-width: 3px;
+  border-right: 1.5px solid var(--surface, #F8F6F1);
+}
+.ds2-pw-seg:last-child {
+  border-right: 0;
+}
+
+/* v1352b: gemessen wurde, dass genau die zwei Karten mit Schaerfe-Pille
+   ihre Zeile abschnitten - "Rendite 30 % - Finanz. 30 % [strenger]" ist
+   in 208 px nicht unterzubringen. Statt den Text zu kuerzen darf die
+   Zeile jetzt umbrechen und ist dafuer immer zwei Zeilen hoch. Damit
+   bleiben alle Karten gleich hoch, egal wie lang ein Profilname einmal
+   wird, und nichts verschwindet unter einem Deckel. */
+.ds2-preset-zahlen {
+  display: flex;
+  align-items: baseline;
+  align-content: flex-start;
+  gap: 4px 7px;
+  flex-wrap: wrap;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: var(--ch, #2A2727);
+  line-height: 1.3;
+  min-height: 31px;
+}
+
+.ds2-pw-schaerfe {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  padding: 1px 5px;
+  border-radius: 6px;
+  flex: 0 0 auto;
+}
+/* Streng und locker sind kein Gut und Boese - deshalb beide in Gold und
+   nicht in Gruen/Rot. Die Statusfarben gehoeren dem Score, nicht der
+   Einstellung, mit der man ihn misst. */
+.ds2-pw-splus,
+.ds2-pw-sminus {
+  background: color-mix(in srgb, var(--gold) 16%, transparent);
+  color: var(--gold-3, #9a7f33);
+}
+
+/* Zwei Zeilen, danach Ellipse. Der vollstaendige Satz haengt im title. */
 .ds2-preset-desc {
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--muted, #7A7370);
   line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 33px;
+  margin-top: -2px;
 }
+
 
 /* Mobile: Preset-Cards untereinander */
 @media (max-width: 640px) {

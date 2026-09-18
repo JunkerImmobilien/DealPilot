@@ -1,0 +1,95 @@
+{
+  "land_code": "NI",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Celle",
+  "gaa_kennz": "03351",
+  "ags": ["03351"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "11/2022 bis 2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-03-02",
+  "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bsce/dash",
+  "quelle_datei": "Tableau-Kalkulator 2026_sw_efh_bsce (Grundstücksmarktinformationen Niedersachsen 2026)",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Ein- und Zweifamilienhäuser, Kalkulator 2026_sw_efh_bsce",
+  "stufe": "B",
+
+  "modellansaetze": {
+    "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung.",
+    "nhk": "NHK 2010",
+    "bezugsmassstab": "Brutto-Grundflaeche",
+    "alterswertminderung": "linear"
+  },
+
+  "stichprobe": {
+    "faelle": 415,
+    "spannen": {
+      "vorlaeufiger_sachwert_eur": [102469, 762982],
+      "bodenrichtwert_eur_qm": [20, 230],
+      "standardstufe": [1.4, 3.9],
+      "rnd_jahre": [14, 80]
+    }
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehendes Ein- und Zweifamilienhaus",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [100000, 150000, 200000, 250000, 300000, 400000, 500000, 600000, 750000],
+        "achse_y_feld": "brw",
+        "achse_y_bez": "Bodenrichtwert in €/m²",
+        "achse_y": [20, 50, 80, 120, 160, 200, 230],
+        "zellen": {
+          "20":  [1.41, 1.12, 0.95, 0.83, 0.74, 0.61, 0.53, 0.46, 0.39],
+          "50":  [1.48, 1.19, 1.01, 0.88, 0.79, 0.66, 0.57, 0.50, 0.43],
+          "80":  [1.53, 1.23, 1.05, 0.92, 0.83, 0.69, 0.60, 0.53, 0.46],
+          "120": [1.58, 1.28, 1.10, 0.97, 0.87, 0.73, 0.64, 0.57, 0.49],
+          "160": [1.63, 1.32, 1.14, 1.00, 0.90, 0.76, 0.67, 0.60, 0.51],
+          "200": [1.67, 1.36, 1.17, 1.04, 0.94, 0.79, 0.69, 0.62, 0.54],
+          "230": [1.70, 1.39, 1.20, 1.06, 0.96, 0.81, 0.71, 0.64, 0.56]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "normobjekt": "Wohnfläche 130 m² · Standardstufe 2,5",
+        "hinweis": "Alle 63 Zellen sind am NORMOBJEKT abgetastet. GEGENPROBE: das Dashboard weist als Anwendungsbeispiel Bodenrichtwert 120 €/m² und vorläufigen Sachwert 250.000 € mit dem Faktor 0,97 aus; die Zelle [120][250000] trägt genau diese 0,97. Beide Normwerte sind ABSICHTLICH Gitterachsen — läge das Anwendungsbeispiel zwischen zwei Stützstellen, wäre die Gegenprobe nur interpoliert und damit kein Beweis."
+      },
+
+      "korrekturen": [
+        {
+          "bez": "Abweichende Wohnfläche",
+          "feld": "wohnflaeche",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "60": 0.93, "80": 0.95, "100": 0.97, "120": 0.99, "140": 1.01,
+            "160": 1.02, "180": 1.04, "200": 1.05, "220": 1.07, "240": 1.08
+          },
+          "rundung_stellen": 2,
+          "hinweis": "Zehn abgedruckte Stützstellen. Die Normwohnfläche 130 m² liegt zwischen 120 (0,99) und 140 (1,01); interpoliert ergibt das 1,00 — die Probe stimmt. Celle führt die Norm bei 130 m², Gifhorn und Braunschweig bei 150."
+        },
+        {
+          "bez": "Abweichende Standardstufe",
+          "feld": "standardstufe",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": { "1.5": 0.62, "2.0": 0.86, "2.5": 1.00, "3.0": 1.09, "3.5": 1.16 },
+          "rundung_stellen": 2,
+          "hinweis": "Fünf abgedruckte Stützstellen. Probe: bei der Normstufe 2,5 ist der Koeffizient 1,00. Celle spreizt nach unten am weitesten von allen bisher erfassten Gebieten (0,62 bei Stufe 1,5) — die Stichprobe reicht dort bis 1,4."
+        }
+      ],
+
+      "beleg": "Kalkulator 2026_sw_efh_bsce (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, veroeffentlicht 02.03.2026, Stichprobe 415 Kauffaelle. 63 Stuetzpunkte des Gitters am Normobjekt abgefragt (Bodenrichtwert 20 bis 230 EUR/qm x vorlaeufiger Sachwert 100.000 bis 750.000 EUR), dazu 15 abgedruckte Stuetzstellen der beiden Umrechnungskurven. GEGENPROBE am Anwendungsbeispiel: Bodenrichtwert 120, vorlaeufiger Sachwert 250.000, Wohnflaeche 130, Standardstufe 2,5 ergibt 0,97 - die Zelle traegt genau diese Zahl. KEIN LAGE-EINGABEFELD: die Eingabemaske fuehrt nur Bodenrichtwert, Sachwert, Wohnflaeche und Standardstufe, von Hand gegengelesen.",
+
+      "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung). WO DIE QUELLE ENDET, ENDET DIE RECHNUNG: das Gitter deckt 100.000 bis 750.000 € und 20 bis 230 €/m² ab — das ist der Bereich der Stichprobe. CELLE FÜHRT KEINE KORREKTUR FÜR DIE RESTNUTZUNGSDAUER, obwohl die Stichprobe sie von 14 bis 80 Jahren ausweist; das ist das Modell des Ausschusses, kein fehlender Datensatz.",
+      "stufe": "B",
+      "stufe_begruendung": "Stufe B statt A: die Gitterwerte sind am amtlichen Kalkulator abgetastet, die Stützstellen von uns gewählt. Die beiden Korrekturkurven sind vom Ausschuss abgedruckt und damit Stufe A."
+    }
+  ]
+}

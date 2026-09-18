@@ -2603,3 +2603,566 @@ Chat geliefert; 2.700 Zeilen wurden aus dem verbleibenden Kontext nicht
 herausgeschrieben. **Erster Schritt der Konsolidierung: die Datei von ihm
 anfordern.** Das Rezept steht in Abschnitt 6 des Nachtrags — dort um diesen
 dritten Strang ergänzt, denn Marcels Fassung kennt nur zwei.
+
+---
+
+> **Angehaengt am 13.09.2026** aus der Cowork-Sitzung des Marktbericht-
+> Strangs (`Dateien/integration-marktbericht.zip`, Block 04). Nichts in
+> den Teilen I-V wurde dabei geaendert oder geloescht - die folgenden
+> Teile kommen dazu. Die eine Korrektur, die der Einbauplan vorsieht
+> (MFH-Sachwert nicht mehr vertagt), steht als Nachtrag in Teil X,
+> Abschnitt "Drei Ruecknahmen" - der alte Satz bleibt stehen, damit
+> nachvollziehbar ist, was wann falsch war.
+
+# TEIL VI — DAS ZIELBILD DER ERNTE
+
+**Für jedes der 16 Bundesländer sollen zwei amtliche Kennzahlen im Register
+liegen** — Liegenschaftszinssatz (§ 21 Abs. 2) und Sachwertfaktor
+(§ 21 Abs. 3) — jeweils so kleinräumig, wie der zuständige Gutachterausschuss
+sie veröffentlicht.
+
+**Und gleichwertig daneben: für jeden Ausschuss steht in der Datenbank, WOHER
+die Zahl kommt.** Link, Jahrgang, Lizenz, Stichtag, Seite. Nicht als Notiz in
+einem Markdown-Dokument, sondern als Zeile in einer Tabelle, die man abfragen,
+sortieren und **jährlich abarbeiten** kann.
+
+Daraus folgen drei Dinge, die zusammengehören:
+
+**① Die Ernte wird wiederholbar.** Die Ausschüsse veröffentlichen jährlich neu.
+Ohne Quellenliste heißt „Jahrgang 2027 einpflegen", die Recherche von vorn zu
+machen. Mit ihr heißt es: Liste durchgehen, `sha256` vergleichen, nur die
+geänderten Dokumente neu ernten.
+
+**② Die Abdeckung wird messbar.** Heute steht sie in einem Markdown-Bericht,
+der bei jeder Ernte veraltet. Sie gehört in eine Abfrage.
+
+**③ Wo wir keinen Wert haben, bekommt der Kunde den Weg dorthin.**
+Siehe Teil VIII.
+
+**Das ist kein Beiwerk, sondern das Gegenstück zur Doktrin.** Wir erfinden
+keine Zahl — deshalb müssen wir umso genauer sagen können, wo die echte steht.
+Der Wettbewerb schreibt an dieser Stelle einen geschätzten Wert hin
+(ImmoInvent: **1,13** gegen amtliche **0,87** an der Löhner Straße). Ein
+ehrliches „hier ist die Quelle" ist für einen Sachverständigen mehr wert als
+eine erfundene Zahl — und es ist belegbar.
+
+## Wo wir stehen
+
+| | Ziel | Stand 30.08.2026 |
+|---|---|---|
+| Länder mit Liegenschaftszins | 16 | **6** |
+| Länder mit Sachwertfaktor | 16 | **6** |
+| Deckung nach Einwohnern, Zins | 100 % | **~40 %** |
+| Deckung nach Einwohnern, Faktor | 100 % | **~25 %** |
+| Quellenliste in der Datenbank | vollständig, gepflegt | **nur je Datensatz** `quelle_url`; die Landkarte liegt in Markdown |
+| Kunden-Verlinkung bei fehlender Quelle | vorhanden | **nicht gebaut** |
+| Admin-Sicht auf Register und Quellen | vorhanden | **nicht gebaut** |
+
+**Die realistische Obergrenze ist nicht 16.** In fünf Ländern sperrt die Lizenz
+die kommerzielle Verwertung. Dort ist das Ziel nicht der Wert, sondern **der
+Link plus die ehrliche Aussage, warum wir ihn nicht führen** — und, wo es geht,
+eine Anfrage beim Herausgeber.
+
+---
+---
+
+# TEIL VII — DER ERNTE-ABLAUF
+
+Die Werkzeuge, Regeln und Prüfungen stehen weiter oben in dieser Datei. Hier
+steht nur die **Reihenfolge**, damit niemand einen Schritt überspringt.
+
+## Sieben Schritte
+
+**① Quelle finden und die Lizenz VOR den Daten prüfen.** Lizenz und
+Inhaltsverzeichnis im **ersten** Abruf zusammen lesen — spart einen Abruf und
+verhindert vergebliche Ernte. *Kiels Daten wären lesbar gewesen.*
+**Die Lizenz ist jahrgangsgebunden** — ein Jahrgangswechsel kann eine Quelle
+öffnen oder schließen.
+
+**② Dokument beschaffen** — nach den Regeln unter „Die Beschaffung".
+
+**③ Text gewinnen** — die dreistufige Extraktionsleiter.
+
+**④ Rezept schreiben** — Muster `tools/rezepte/312-hoexter.json`.
+
+**⑤ Prüfstand laufen lassen.** Fällt eine Prüfung durch, entsteht **kein**
+Registerdatensatz (RC 1).
+
+**⑥ Registerdatensatz erzeugen** — `formel`, `korrekturen`, `modellansaetze`,
+`geltungsbereich`, `belege`, Zeitangaben, Lizenz, Quellenvermerk.
+
+**⑦ In die Saatdatei und/oder über den Saatlauf in `mb.param_modell`.**
+Seit v1095 ergänzen sich Tabelle und Saatdatei **je Datensatz** — ein Saatlauf
+ist nur nötig, um eine Ernte **ohne Deploy** wirksam zu machen.
+**Nach jedem Saatlauf `docker restart dealpilot-mb-backend`.**
+
+## Einen neuen Ausschuss aufnehmen
+
+```
+1  Quellenseite + Lizenz + Inhaltsverzeichnis in EINEM Abruf lesen
+2  Lizenz entgegenstehend?  -> Quellenregister-Zeile mit Status, KEINE Ernte
+3  Dokument holen, Text gewinnen
+4  Rezept nach dem Muster 312-hoexter.json
+5  python3 tools/gmb-ernte.py --rezept tools/rezepte/<gaa>.json   -> RC 0
+6  Registerdatensatz erzeugen, Zeitangaben und Lizenz mit
+7  Saatdatei ergaenzen  ODER  Saatlauf + docker restart
+8  Abnahme: register/probe fuer eine echte Adresse des Gebiets
+9  Quellenregister-Zeile fortschreiben: Status, Jahrgang, naechste Pruefung
+```
+
+**Schritt 9 ist neu und wird gern vergessen** — ohne ihn hat die Ernte
+stattgefunden, aber niemand weiß es im nächsten Jahr.
+
+---
+---
+
+# TEIL VIII — DAS QUELLENREGISTER
+
+> **Marcels Vorgabe vom 13.09.2026:** *„Es muss zusätzlich eine Liste gepflegt
+> werden, woher die Daten stammen — also einfach in der Datenbank. Dann können
+> wir jährlich neu abrechnen. Dort, wo es kostenpflichtig ist, sollten wir
+> wenigstens den Link ausgeben, damit der Kunde direkt dorthin springen kann."*
+
+## 1 · Warum das nötig ist
+
+Heute steht die Herkunft an **zwei** Stellen, und beide reichen nicht:
+
+**① Je Registerdatensatz** in `param_modell.quelle_url` / `quellenvermerk` /
+`lizenz`. Korrekt und gebraucht — **aber es gibt die Zeile nur, wenn wir den
+Wert haben.** Für die zehn Länder ohne Daten steht dort nichts.
+
+**② In Markdown-Dokumenten** (`claude/abdeckung-laender-kreise-20260814.md`,
+`claude/laender-lizenzlage-20260813.md`). Dort steht die vollständige
+Landkarte — nicht abfragbar, veraltet mit jeder Ernte, außerhalb des Produkts.
+
+## 2 · Was es schon gibt
+
+**`mb.gaa_sources` → `mb.gaa_documents` ist genau diese Liste**, gebaut und nie
+verdrahtet: **67 Dokumente, alle `status = neu`, nie extrahiert.**
+
+Der `sha256` in `gaa_documents` ist der eigentliche Wert: **ändert ein
+Ausschuss seinen Bericht, ändert sich der Hash, und das Dokument fällt
+automatisch zurück in die Warteschlange.** Die Jahrgangspflege läuft von
+selbst, sobald der Schritt `gaa_documents → param_modell` gebaut ist.
+
+**`mb.param_probe` ist der Quellenwächter** (http_status, content_type,
+urteil) — er misst Erreichbarkeit. Er ist **nicht** das Prüfprotokoll der
+Ernte; das steht in `param_lauf.protokoll`.
+
+**Vor dem Bau beide Tabellen lesen.** Es kann sein, dass sie die Hälfte der
+unten geforderten Spalten schon tragen:
+
+```
+docker exec dealpilot-mb-db psql -U mb -d marktbericht -c "\d mb.gaa_sources"
+docker exec dealpilot-mb-db psql -U mb -d marktbericht -c "\d mb.gaa_documents"
+docker exec dealpilot-mb-db psql -U mb -d marktbericht -c "\d mb.param_probe"
+docker exec dealpilot-mb-db psql -U mb -d marktbericht -c "\d mb.param_lauf"
+```
+
+*Bevor ein zweites Werkzeug gebaut wird, nachsehen, ob es das erste schon gibt.*
+Genau so wurde v1083 erheblich kleiner, weil `param-repository.js` mit fertigem
+`schreibeModelle()`/`holeModelle()` schon dalag.
+
+## 3 · Die Spezifikation
+
+**Eine Zeile je (Ausschuss × Kennzahl)**, nicht je Dokument. Grund: Bielefeld
+führt Sachwertfaktoren auf Datengrundlage 2025 und Liegenschaftszinssätze auf
+Kauffällen 2024 — ein Dokument, zwei Jahrgänge, zwei Zustände.
+
+| Feld | Inhalt |
+|---|---|
+| `land_code` · `gaa_name` · `ags_liste` | wer, und für welche Gebietsschlüssel |
+| `kennzahl` | `liegenschaftszinssatz` · `sachwertfaktor` · … |
+| **`status`** | **als CHECK-Constraint, nicht Freitext** |
+| `quelle_url` | **die Seite, die dem Kunden gezeigt wird** — Landingseite, kein Deep-Link |
+| `dokument_url` | das PDF selbst, wenn stabil adressierbar (für uns) |
+| `seite_hinweis` | Kapitelseite je Kennzahl, gemessen |
+| `lizenz` · `lizenz_fundstelle` · `lizenz_geprueft_am` | jahrgangsgebunden |
+| `kosten_eur` · `bestellweg_url` | für kostenpflichtige Quellen |
+| `jahrgang_im_register` · `jahrgang_verfuegbar` | woran man Nachernte-Bedarf sieht |
+| `letzter_check_am` · `letzter_http_status` · `sha256` | der Wächter |
+| `naechste_pruefung` | Datum, treibt den Jahresablauf |
+| `notiz` | z. B. „Streudiagramm ohne Zahlentabelle" |
+
+**Der Status — bewusst fein, weil jeder Wert eine andere Handlung auslöst:**
+
+| Status | Bedeutung | Handlung |
+|---|---|---|
+| `im_register` | Wert liegt vor | jährlich `sha256` prüfen |
+| `geerntet_gesperrt` | Rezept fertig, Freigabe fehlt | eine Entscheidung |
+| `erreichbar_ungeerntet` | Dokument frei, Rezept fehlt | Ernte einplanen |
+| `lizenz_gesperrt` | kommerzielle Verwertung untersagt | Anfrage oder nie |
+| `kostenpflichtig` | Bericht kostet Geld | **Link an den Kunden** |
+| `darstellung_untauglich` | Streudiagramm ohne Tabelle (BW) | Anfrage beim Ausschuss |
+| `nicht_erreichbar` | 403, robots, Captcha | Marcel lädt von Hand |
+| `unbekannt` | noch nicht recherchiert | recherchieren |
+
+**Erstbefüllung ist eine Übertragung, keine neue Recherche.** Die Landkarte
+liegt fertig in `claude/abdeckung-laender-kreise-20260814.md` und
+`claude/laender-lizenzlage-20260813.md` — nur im falschen Format.
+
+**Migration:** mb-Track. **Erst `public._mb_migrations` lesen** (sie führt
+Dateinamen, keine Nummern). Vor einer Migration, die bestehende Zeilen anfasst,
+trocken laufen lassen:
+
+```
+docker exec dealpilot-mb-db psql -U mb -d marktbericht -c "BEGIN; <UPDATE>; ROLLBACK;"
+```
+
+*(Migration 012 lief in den Eindeutigkeitsindex und hängte den Container in
+eine Neustartschleife.)*
+
+## 4 · Die Kunden-Verlinkung
+
+**Heute** steht im Bericht „kein Ausschuss hinterlegt". Ehrlich, aber es hilft
+niemandem weiter. **Künftig** drei Fälle, drei Texte:
+
+**① Wert vorhanden.** Wie heute: Ausschuss, Stichtag, Stufe, Modellvermerk.
+Bei `by-2-0` zusätzlich der Quellenvermerk.
+
+**② Wert fehlt, Quelle frei zugänglich.**
+> *„Für dieses Gebiet ist der Gutachterausschuss ‹X› zuständig. Ein
+> Sachwertfaktor ist bei DealPilot noch nicht hinterlegt. Der
+> Grundstücksmarktbericht des Ausschusses ist unter ‹Link› abrufbar."*
+
+**③ Wert fehlt, Quelle kostenpflichtig.**
+> *„Für dieses Gebiet ist der Gutachterausschuss ‹X› zuständig. Der
+> Grundstücksmarktbericht ist kostenpflichtig (‹Betrag› €) und über ‹Link› zu
+> beziehen. DealPilot führt für dieses Gebiet keinen Wert."*
+
+**Vier Regeln, nicht verhandelbar:**
+
+**Der Link darf nicht suggerieren, dass DealPilot den Wert liefert.** Er ist
+ein Wegweiser, kein Ersatz. Der Satz muss beides sagen: wer zuständig ist
+**und** dass wir nichts führen.
+
+**Kein Betrag ohne Beleg.** Der Preis für den RLP-Landesbericht ist
+**unbestätigt** — eine Notiz sagt 150 €, die Seite nennt 28 € für
+Einzellisten. Solange das nicht am Dokument geprüft ist, steht dort kein
+Betrag, sondern nur „kostenpflichtig".
+
+**Nur die Landingseite verlinken, nie das Jahrgangs-PDF.** Deep-Links brechen
+jährlich. **Ein toter Link im Kundenbericht ist schlimmer als kein Link** —
+dieselbe Klasse wie ein stiller Rückfall.
+
+**Der Link kommt aus der Datenbank, nicht aus einer Konstante im Frontend.**
+Sonst gibt es eine zweite Wahrheit neben dem Quellenregister, und Doppellisten
+laufen auseinander (Lehre v1126d: `BEDARF` gegen `VERFAHREN[].pflicht`).
+
+**Derselbe Bauplatz wie der Quellenvermerk nach `by-2-0`** — beide schreiben
+einen Quellenblock ans Berichtsende. **Zusammen bauen.**
+
+## 5 · Der Jahresablauf
+
+```
+1  Alle Zeilen mit naechste_pruefung <= heute holen
+2  HEAD/GET auf dokument_url -> http_status + sha256 in param_probe
+3  sha256 unveraendert  -> naechste_pruefung + 1 Jahr, fertig
+4  sha256 geaendert     -> Status 'erreichbar_ungeerntet', Jahrgang pruefen
+5  Lizenz ERNEUT lesen  -> sie ist jahrgangsgebunden
+6  Rezept anwenden, Pruefstand, Registerdatensatz, Saatlauf
+7  Zeile fortschreiben: jahrgang_im_register, letzter_check_am
+```
+
+**Schritt 5 ist der, den man vergisst.** Ein Jahrgangswechsel kann eine Quelle
+öffnen — oder schließen.
+
+**Der Taktgeber existiert bereits** (`HARVEST_SCHEDULER=1`,
+`harvestScheduler.js`). **Achtung:** er hat schon einmal 38 frisch geprüfte
+Quellen als „seit 18 Monaten stumm" gemeldet. *Ein Wächter, der Unfug meldet,
+wird überlesen.* Vor dem Anschließen prüfen, woran er sein Datum misst.
+
+---
+---
+
+# TEIL IX — DER ADMIN
+
+## 1 · Die ehrliche Antwort
+
+**Für das Ausschuss-Register gibt es im Admin nichts.** Kein View, keine Route,
+keine Anzeige. Der einzige Weg an den Bestand führt über
+`docker exec … psql` oder den `register/stand`-Endpunkt im Container.
+
+Das war vertretbar, solange das Register 493 NRW-Sätze aus einer CSV hatte.
+Bei 2.150 Sätzen aus acht Ländern, zwölf Modellformen und einer Quellenliste,
+die jährlich abgearbeitet werden soll, ist es das nicht mehr.
+
+## 2 · Die Regeln des Admin (alle schon einmal bezahlt)
+
+`frontend/admin/` ist eine **eigene App**. Zusatzmodule additiv **nach**
+`admin-app.js`, Backend-Routen in `admin.js` **vor** `module.exports`.
+
+- **Der Admin-API-Wrapper exportiert KEIN `call()`** — nur benannte Methoden.
+  Eigene Module machen ihr **eigenes** `fetch(BASE + path)` mit
+  `BASE='/api/v1/admin'` + `X-Admin-Token`. (v973a-Fix.)
+- **Admin-Charts sind ein eigener SVG-Helfer, nicht Chart.js:**
+  `Charts.renderLineChart(container, data, opts)` + `Charts.renderDonut`.
+- **`var(--text)`/`var(--text-muted)` lösen im Admin dunkel auf** → auf dunklen
+  Karten unlesbar. Feste helle Töne (`#F2ECDC` Werte, `#A89F8E` Labels,
+  `#E8E2D4` Balken). Bei eingebetteten Panels die **echte** Kartenhelligkeit
+  messen, nicht den Skin raten.
+
+## 3 · Spezifikation „Ausschuss-Register"
+
+**Zwei Reiter, beide zuerst read-only.** Ein Schreibzugriff auf das Register
+aus dem Admin heraus wäre ein zweiter Weg neben dem Erntewerkzeug — und
+Dubletten laufen auseinander.
+
+**Reiter 1 — Bestand.** Filter nach Land · Kennzahl · Ausschuss ·
+Berichtsjahr. Je Zeile: `gaa_name` · `kennzahl` · `zweig` · `ebene` · `stufe` ·
+`berichtsjahr` · `stichtag` · `fallzahl` · `lizenz` · Modellform aus `formel` ·
+Beleg-Fundstelle aus `belege` · `quelle_url` als Link.
+Kopfzahlen wie `register/stand` — **damit ein Widerspruch sofort auffällt.**
+
+**Reiter 2 — Quellen.** Das Quellenregister aus Teil VIII, sortierbar nach
+Status und nach Einwohnern. **Die eigentliche Arbeitsansicht sind zwei Filter:**
+„nächste Prüfung fällig" und „Jahrgang verfügbar > Jahrgang im Register".
+Damit ist die jährliche Nachernte eine Liste statt einer Recherche.
+
+**Backend:**
+
+```
+GET /api/v1/admin/register/bestand?land=&kennzahl=&gaa=&jahr=
+GET /api/v1/admin/register/quellen?status=&land=&faellig=1
+GET /api/v1/admin/register/stand
+```
+
+**Achtung: die Daten liegen in der mb-DB, der Admin hängt am Haupt-Backend.**
+Der Weg führt über den Proxy `backend/src/routes/marktbericht.js` →
+`mb-backend:4000`, **kein Catch-all, jede Route einzeln**. Und **`qstrUser()`
+setzt `user_id` immer aus `req.user.id`** — für Admin-Routen ist das der
+falsche Pfad, hier gilt `requireAdmin` mit `X-Admin-Token`.
+**Das ist die Stelle, an der ein Datenleck entstehen kann; sie gehört bewusst
+entschieden, nicht nebenbei.**
+
+Änderungen am Proxy brauchen einen Rebuild von **`backend`**, nicht nur
+`mb-backend`.
+
+**Buster:** `frontend/admin/index.html` — eigene Kette, **nicht** die
+vierteilige des Marktberichts.
+
+---
+---
+
+# TEIL X — DREI RÜCKNAHMEN UND WAS UNGEMESSEN IST
+
+## 1 · Drei Rücknahmen
+
+**① „MFH-Sachwert (vertagt; Spezifikation liegt vor)"** — steht in dieser Datei
+unter „Wertermittlung, nach Wirkung", Punkt 5. **Überholt.**
+Die „Spezifikation" *ist* die Tabelle, und sie ist seit v1068/v1072 vollständig
+installiert:
+
+```
+'4.1|3': 825  '4.1|4': 985  '4.1|5': 1190     bis 6 WE
+'4.2|3': 765  '4.2|4': 915  '4.2|5': 1105     7 bis 20 WE
+'4.3|3': 755  '4.3|4': 900  '4.3|5': 1090     ueber 20 WE
+```
+
+Dazu `korrektur_wohnungsgroesse`, `korrektur_grundriss`, `korrekturWohnung()`
+— **303 Kennwerte über 77 Gebäudearten**, `NHK_2010.geprueft === true`.
+Was fehlte, war die Freigabe in der Oberfläche: **v1097**.
+
+**Der alte Punkt wird nicht gelöscht** — er bekommt einen Verweis auf diesen
+Abschnitt, damit nachvollziehbar bleibt, was wann falsch war.
+
+**② `market=seed` auf Prod ist NICHT belegt.** Der offene Punkt („Kunden sehen
+Seed-Vergleichsdaten") stützt sich auf ein Etikett: `MARKET_SOURCE: seed` steht
+hart in `docker-compose.prod.yml`, und `cfg.market.source` wird **nur geloggt**
+(`server.js` Z. 91, `api.js` Z. 114). Ob GeoMap läuft, entscheiden
+`GEOMAP_TOKEN` und `MB_DEMO`. Zu messen:
+
+```
+docker exec dealpilot-mb-backend sh -c 'echo MB_DEMO=[$MB_DEMO]; [ -n "$GEOMAP_TOKEN" ] && echo GEOMAP_TOKEN=gesetzt || echo GEOMAP_TOKEN=LEER'
+```
+
+**③ Kosmetisch, aber irreführend:** die Kommentare in `lib/nhk2010.js` Z. 13
+und Z. 570 behaupten, die Gebäudearten 1.x–3.x fehlten. **Sie führen alle fünf
+Standardstufen.**
+
+Und in `claude/v1083-ernte-lzs-nrw-alle-73.md`, Befund 4, steht weiter
+**„Bochum rechnet MFH mit GND 60"** — GAA 10400 ist die **Bundesstadt Bonn**.
+Korrigiert in der Projektanweisung und in
+`claude/v1083-korrektur-bonn-20260812.md`, im Erntedokument nicht.
+
+## 2 · Was in dieser Datei NICHT gemessen ist
+
+Damit es niemand für dokumentiert hält:
+
+- **Die DDL von `gaa_sources`, `gaa_documents`, `param_probe`, `param_lauf`
+  und `valuation_inputs`.** Rollen bekannt, Spalten nicht. Befehle in Teil VIII.
+  **Nichts hineinschreiben, was nicht vorher gelesen wurde** — `laufEnde(id,
+  zahlen, protokoll)` nimmt das Protokoll als **drittes Argument**, nicht als
+  Feld in `zahlen`; das wurde am Code gelesen, nicht geraten.
+- **Der erlaubte Wertebereich von `param_modell_ebene_check`.** `gemeinde` und
+  `kreis` sind belegt, `gemeinde_verbund` fiel durch und kostete 24 Sätze,
+  **`gaa` und `land` (49 Sätze) liegen im Bestand und sind ungemessen.**
+- **Ob die NRW-Landesübersicht (S. 141–142) verwertbare Modelle enthält** oder
+  nur Spannen. Eine Landesübersicht ohne Korrekturen und Modellvermerk liefert
+  **keinen** Registerdatensatz. Seite **182** ist sicher wertvoll: die amtliche
+  Zuständigkeitsliste der 73 Ausschüsse, auf die sich die Kaskade heute nicht
+  stützen kann.
+- **Handel 5,5 % gegen 5,6 %** — Medianliste und Streuungstabelle
+  widersprechen sich, in dieser Datei **und** im Erntedokument. Vermutlich
+  harmlos (Median über alle Sätze gegen die 471 mit Streuungsangabe), aber an
+  `lzs.csv` nachzumessen. **Gefunden hat es die ChatGPT-Blindprobe, nicht wir.**
+
+## 3 · Die ChatGPT-Blindprobe — das Ergebnis in drei Sätzen
+
+Auf die Frage, ob ein Sprachmodell die fehlenden Werte liefern könnte, wurde
+**gemessen statt behauptet**: 18 Fragen, Sollwerte aus unseren eigenen 1.078
+NRW-Sätzen, Maßstab **vor** der Messung festgelegt
+(`claude/chatgpt-blindprobe-20260814.md`).
+
+**Mit Netzzugriff hat ChatGPT unsere Quelldatei heruntergeladen und daraus
+gerechnet** — alle vier Landeswerte exakt inklusive der Ausschusszahlen
+(50/64/63/8), beide Negativkontrollen richtig, eine Feldfalle von sich aus
+vermieden. **Es wusste aber nichts**; es hat getan, was unser Erntewerkzeug
+tut.
+
+**Für die Lücke ändert das nichts:** in fünf von acht Ländern ohne Daten ist
+die Sperre die **Lizenz**, und die hebt kein Browsing auf. **Als Sucher und
+Extraktor** ist es dagegen stärker als angenommen — Dokumente finden,
+Seitenzahlen liefern, PDF lesen. **Nicht als Quelle:** ohne Fundstelle kein
+Beleg, ohne Beleg kein Registerdatensatz (`CHECK (jsonb_array_length(belege) >
+0)`).
+
+---
+
+## v1097 — Sachwert für Eigentumswohnungen und Mehrfamilienhäuser (13.09.2026)
+
+**Was.** Der Rechenkern rechnet ETW/MFH seit v1047, die NHK-Zeilen 4.1–4.3
+stehen seit v1068 in `nhk2010.js`. Die Oberfläche sperrte es trotzdem — mit
+der Regel aus v955, einem roten Kreuz und der Begründung, das Verfahren gelte
+für Wohnungen nicht.
+
+Schlimmer als der falsche Text war die zweite Wirkung: `nichtWenn` übersprang
+auch die **Feldsammlung**. Die Ampel hat BGF und Standardstufe — genau die
+beiden Felder, die der Rechenkern braucht — nie eingefordert, und der Nutzer
+bekam danach vom Backend „die Standardstufe fehlt". Dieselbe alte Regel stand
+im Prompt der KI-Zweitmeinung.
+
+**Commit.** `d8d8247` · Paket aus `Dateien/uebergabe-claude-code-20260908.zip`,
+eingespielt mit `apply.sh`, danach ins Repo zurückgeholt und `mb-backend`
+gebaut.
+
+**Nachweis — der Klicktest aus A1, im Browser gefahren:**
+
+```
+ETW · Stufe 3 · BGF und Standardstufe leer
+  ✓ Sachwert rechnet — genauer mit: Ausstattungsqualität,
+                                    Bruttogrundfläche (m²), Standardstufe (NHK 2010)
+
+EFH (Gegenprobe)
+  ✓ Sachwert rechnet — genauer mit: Ausstattungsqualität
+```
+
+Kein rotes Kreuz, kein „bei Eigentumswohnung nicht anwendbar", und die
+Zusatzfelder erscheinen **nur** bei Wohnungen. Damit sind beide Kettenglieder
+belegt: `empfohlenZusatz` wird gesetzt *und* gelesen.
+
+**Offen (ehrlich als Abnahmepunkt):** Test 2 aus A1 — eine ETW mit gefüllter
+BGF und Standardstufe durchrechnen und prüfen, dass im **Bericht** ein
+Sachwert erscheint. Der braucht einen echten Berichtslauf; er wurde nicht
+gefahren.
+
+> **Ein Punkt der Prüfstrecke fiel zuerst durch, und das war kein Fehler des
+> Pakets:** `app.js-Buster unangetastet gelassen` prüfte auf
+> `/app\.js\?v=1154b/` — den Wert vom 30.08. Der Parallel-Strang läuft weiter,
+> heute steht dort `1229c`. **Gemessen: der Patch fasst `app.js` überhaupt
+> nicht an** (1229c vorher, 1229c nachher).
+>
+> Eine Prüfung, die einen konkreten **Wert** erwartet statt einer
+> **Eigenschaft**, fällt mit jedem fremden Rollout durch. Sie vergleicht jetzt
+> die `app.js`-Zeile der gepatchten Datei gegen die des Originals und bekommt
+> dafür den Originalpfad als zweites Argument.
+
+---
+
+## v1098 — Drei Korrekturarten, und die Ernte läuft wieder (13.09.2026)
+
+**Marcels Auftrag:** den Rechenkern erweitern, wenn es sinnvoll ist, dann so
+viel ernten wie möglich — alle Bundesländer, auch Vorjahre.
+
+### Der Rechenkern brauchte weniger als gedacht
+
+**Keine neue Modellform.** Der Auswerter kennt die Multiplikation seit v1093
+(`wirkung: multiplikativ`), samt Wächter und Rechenweg. Gefehlt haben nur drei
+**Korrekturarten** — bis dahin gab es zwei, beide Tabellen über eine Zahl:
+
+```
+potenz      (x / basis) ^ exponent, mit Deckel und Boden
+linear      a + b * x
+kategorial  Textschlüssel -> Wert (Stadtteil, Dachform, Stellung)
+```
+
+Damit ist Hamburg `konstante` 0,788 plus 18 multiplikative Korrekturen.
+
+> **Warum keine Stufentabelle:** eine Potenz als Stützstellen nachzubilden und
+> zwischen ihnen linear zu interpolieren ist an einer gekrümmten Kurve ein
+> Fehler, den niemand sieht — das Ergebnis bleibt plausibel.
+
+### Zwei Blocker im Werkzeug, beide gefunden statt vermutet
+
+1. **`land_code` stand hart auf `'NW'`.** Vierzehn Rezepte kamen aus NRW,
+   solange fiel es nicht auf. Das Hamburger Rezept wäre als
+   nordrhein-westfälisch ins Register gegangen.
+2. **Korrekturen liefen ungeprüft durch.** Ein Tippfehler in `art` hätte den
+   Auswerter in den `stufen`-Zweig fallen lassen — dort findet er keine Stufen
+   und liefert still keine Korrektur. Der Gegentest gegen die 14 NRW-Rezepte
+   zeigte sofort, dass `hinweis` in jeder Art erlaubt sein muss.
+
+Dazu: `rezept2register.py` schreibt jetzt **je Land eine Datei** und nennt sie
+am Ende seines Laufs — jede gehört in `SAATDATEIEN`.
+
+### Geerntet
+
+| Land | Stand |
+|---|---|
+| **Hamburg** | ✅ vollständig · `0,788 × 18 Faktoren` · rechnet im Register mit 0,7667 am Normobjekt |
+| **Kassel (HE)** | ✅ vollständig · zwei Matrizen, 144 Zellen · vier Tabellenwerte zeichengleich getroffen |
+| **Hessen landesweit** | ✅ erfasst, **Stufe C** · zwei Matrizen, 850 + 497 Kauffälle · wird bewusst ausgefiltert (Landeswert) |
+| **Niedersachsen** | Modell entschlüsselt, Lizenz frei, Grundkurve fehlt noch |
+| Mecklenburg-Vorpommern | ⛔ „Vervielfältigungen nur mit Genehmigung des Herausgebers" |
+| Frankfurt | ⛔ HTTP 403 plus Content-Signals in `robots.txt` |
+| Darmstadt | ⛔ Marktanpassungsfaktoren nur als **Streudiagramm**, keine Tabelle, keine Gleichung |
+
+**Registerstand:** 2163 Sätze, **57 Sachwertfaktoren** (vorher 52),
+1892 Tabellenzellen, 17 Ausschüsse.
+
+### Drei Dinge, die nur der echte Lauf gezeigt hat
+
+> **① Hamburg ist eine Gemeinde, kein Land.** Im Rezept stand `ebene: land` —
+> Hamburg *ist* ein Bundesland. Der Auflöser gab trotzdem
+> `kein_ausschuss_hinterlegt`. Ursache ist die Schutzregel aus v1085: ein Satz
+> auf Landesebene zählt beim Sachwertfaktor als kein Satz. Bei einem
+> Flächenland wäre das ein Mittel über viele Ausschüsse. Beim Stadtstaat ist
+> es der Wert des **einen** zuständigen Ausschusses — Berlin steht deshalb
+> seit v1085 als `gemeinde` mit AGS 11000000 im Register. Nachgesehen statt
+> geraten. **Nicht der Schutz war falsch, sondern meine Einordnung.**
+
+> **② Die Register-Dateien sind ins Image gebacken.** Ein `docker restart` lädt
+> die alte Fassung; es braucht `up -d --build`. Das kostete einen Prüflauf, bei
+> dem die Zahl schon richtig im Rezept stand.
+
+> **③ Zahlenbänder gab es im Auswerter längst.** Kassels Rezept trug den
+> Bodenrichtwertbereich als Kategorie und das Feld `brw` — der Auswerter las
+> die Zahl 250 als Kategorienamen. `kategorie_baender` existiert seit v1094
+> (gebaut für Wiesbaden), fehlte aber in der erlaubten Schlüsselliste des
+> Werkzeugs. Ein Rezept damit wäre am Werkzeug gescheitert, obwohl der
+> Auswerter es kann.
+
+### Was die Lizenzprüfung ergab
+
+**Die Lizenz ist der Flaschenhals, nicht die Technik.** Drei Muster:
+
+- **`dl-de/zero-2-0` im Wortlaut** (Kassel, Hessen): *„Jede Nutzung … ist ohne
+  Einschränkung oder Bedingung erlaubt … für kommerzielle und nicht
+  kommerzielle Nutzung."* Sofort verwertbar.
+- **Frei mit Quellenangabe** (Hamburg): *„Verwendung und Weiterverbreitung …
+  unter Angabe der Quelle gestattet."* Verwertbar, Quellenblock Pflicht (A2).
+- **Gesperrt** (Ludwigslust-Parchim): *„Vervielfältigungen sind nur mit
+  Genehmigung des Herausgebers gestattet."* Nicht übernehmen.
+
+**Commits.** `c713b68` · `ae0f494` · `26ec989` · `f83a1a7` · `945116d` ·
+`935a0d3`

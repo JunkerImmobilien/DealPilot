@@ -1,0 +1,69 @@
+{
+  "land_code": "BB",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Oder-Spree und in der Stadt Frankfurt (Oder)",
+  "gaa_kennz": "12053",
+  "ags": ["12053000"],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2025,
+  "stichtag": "2024-07-01",
+  "auswertezeitraum": "03/2023 bis 03/2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06-25",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_LOS.pdf",
+  "quelle_datei": "BB-oder-spree-gmb-2025.pdf",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.3.2, S. 118 (Teil Frankfurt (Oder) desselben Berichts). Modellansatz im Anhang.",
+
+  "modelle": [
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser und Doppelhaushälften",
+      "form": "potenz",
+      "formel": {
+        "form": "potenz",
+        "achse_feld": "sachwert",
+        "achse_bez": "vorläufiger Sachwert in Euro",
+        "a": 2953.7,
+        "b": -0.642,
+        "gueltig_von": 150000,
+        "gueltig_bis": 325000,
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "DIE FUNKTION IST ABGEDRUCKT, die Tabelle ist ihr Ergebnis: y = 2953,7 · x^-0,642 (R² = 0,50, Korrelationskoeffizient -0,66). Sechs Stützstellen nachgerechnet und zeichengleich (150.000 → 1,40 · 175.000 → 1,27 · 200.000 → 1,17 · 225.000 → 1,08 · 250.000 → 1,01 · 275.000 → 0,95 · 300.000 → 0,90 · 325.000 → 0,85). Mit R² = 0,50 ist das die belastbarste Reihe dieses Berichts.",
+        "normobjekt": "Sachwertfaktoren SW23 nach ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) vom 03.05.2023. Stichtag 01.07.2024."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) vom 03.05.2023",
+        "bezeichnung": "SW23",
+        "stichtag": "01.07.2024",
+        "funktion": "y = 2953,7 · x^-0,642, R² = 0,50",
+        "kauffaelle_gesamt": 10
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Stadt Frankfurt (Oder)",
+        "sachlich": "Reihenhäuser und Doppelhaushälften",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwert_eur": { "min": 150000, "max": 325000 },
+          "brw_eur_qm":   { "min": 35, "max": 105 },
+          "flaeche_qm":   { "min": 193, "max": 872 },
+          "baujahr":      { "min": 1921, "max": 2006 }
+        },
+        "vorbehalt": "ZEHN KAUFFÄLLE. Das ist die kleinste Stichprobe dieses Registers, verteilt auf zwei Jahre. Das Bestimmtheitsmaß von 0,50 ist zwar das höchste im Bericht, aber es beschreibt eine Kurve durch zehn Punkte — der Faktor ist eine Orientierung für den Teilmarkt, keine Aussage über das einzelne Haus.\n\nDER STICHTAG IST DER 01.07.2024, über ein Jahr vor dem Berichtsstichtag.\n\nFÜR FREISTEHENDE EIN- UND ZWEIFAMILIENHÄUSER IN FRANKFURT (ODER) FÜHRT DER BERICHT KEINEN SACHWERTFAKTOR: die Auswertung unter 8.2.2 betrifft ausdrücklich den Landkreis Oder-Spree. Wer hier ein freistehendes Haus bewertet, bekommt deshalb keinen Faktor — und nicht etwa den des Landkreises.",
+        "hinweis": "Derselbe Bericht führt für die Stadt Frankfurt (Oder) auch Liegenschaftszinssätze für Reihenhaus- und Doppelhaushälftengrundstücke (Kap. 8.3.4) — hier noch nicht erfasst. Der Bericht vermerkt dort, die Objekte seien überwiegend eigengenutzt, was eine Abweichung zum Landesmodell darstellt."
+      },
+
+      "stufe": "C",
+      "stufe_grund": "Amtliche Funktion mit Stichprobenbeschreibung, an acht abgedruckten Stützstellen nachgerechnet und zeichengleich. Stufe C, weil die Stichprobe nur zehn Kauffälle umfasst und der Stichtag über ein Jahr zurückliegt.",
+      "fallzahl": 10,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 des Gutachterausschusses im Landkreis Oder-Spree und in der Stadt Frankfurt (Oder), Kap. 8.3.2 im Teil Frankfurt (Oder), S. 118: Regressionsfunktion y = 2953,7x^-0,642 (R² = 0,50) aus 10 Kauffällen von 03/2023 bis 03/2025, tabellarisch von 150.000 bis 325.000 € vorläufigem Sachwert."
+    }
+  ]
+}

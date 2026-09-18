@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marktbericht · Eingabebereich — zwei Varianten</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ═══════════════════════════════════════════════════════════════════
+     DEMO-FIRST · Marcels Punkt "optisch aufwerten. Eingabebereich etc."
+     ───────────────────────────────────────────────────────────────────
+     Drei Stände nebeneinander, mit DENSELBEN Feldern und Beschriftungen
+     wie im echten Formular. Nichts ist erfunden: die Labels stammen aus
+     frontend/marktbericht-app/index.html, die Hilfetexte aus feldhilfe.js.
+
+     Gebaut wird KEINE dieser Varianten, bevor du sie ausgesucht hast.
+     ═══════════════════════════════════════════════════════════════════ */
+  :root{
+    --obsidian:#050505;
+    --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+    --gruen:#3FA56C; --rot:#B8625C;
+    --panel:#111115; --panel2:#0d0d10; --line:#26262c;
+    --txt:#e8e8ea; --muted:#8a8a93;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--obsidian);color:var(--txt);
+       font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.55}
+  .kopf{padding:26px 22px 0;max-width:1340px;margin:0 auto}
+  .kopf h1{font-family:'Space Grotesk',system-ui,sans-serif;font-size:26px;margin:0 0 6px;
+           font-weight:700;letter-spacing:-.2px}
+  .kopf .sub{color:var(--muted);max-width:70ch;margin:0 0 18px}
+  .kopf .sub b{color:var(--gold-hi);font-weight:600}
+
+  .schalter{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 22px}
+  .schalter button{appearance:none;border:1px solid var(--line);background:transparent;
+    color:var(--txt);border-radius:999px;padding:9px 17px;font:inherit;font-size:13px;
+    cursor:pointer;transition:.15s;min-height:44px}
+  .schalter button:hover{border-color:var(--gold-lo)}
+  .schalter button.an{background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));
+    color:#221a06;border-color:transparent;font-weight:600}
+
+  .buehne{max-width:1340px;margin:0 auto;padding:0 22px 60px}
+  .karte-wrap{display:none}
+  .karte-wrap.an{display:block}
+
+  .befund{border:1px solid var(--line);border-left:3px solid var(--gold);
+    border-radius:0 10px 10px 0;padding:14px 18px;margin:0 0 22px;background:rgba(201,168,76,.05)}
+  .befund h3{font-family:'Space Grotesk',sans-serif;font-size:14px;margin:0 0 7px;color:var(--gold-hi)}
+  .befund p{margin:0 0 7px;font-size:13px;color:#c3c3cb}
+  .befund p:last-child{margin:0}
+  .befund code{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold-hi)}
+
+  .rahmen{max-width:430px;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .rahmen.breit{max-width:980px}
+
+  /* ═══ IST-ZUSTAND ═══════════════════════════════════════════════ */
+  .ist{background:linear-gradient(180deg,var(--panel),var(--panel2));padding:20px}
+  .ist label{display:block;font-size:12.5px;color:var(--muted);margin:13px 0 6px}
+  .ist input,.ist select{width:100%;background:#0f0f12;border:1px solid var(--line);
+    color:var(--txt);border-radius:11px;padding:12px 14px;font-family:'Inter';font-size:15px;
+    min-height:44px}
+  .ist .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0 12px}
+  .ist .zusatz{color:#6a6a72;font-weight:400;font-size:11px}
+
+  /* ═══ VARIANTE A · RUHIG ════════════════════════════════════════ */
+  .a{background:#0a0a0d;padding:0}
+  .a .gruppe{padding:20px 22px;border-bottom:1px solid rgba(255,255,255,.05)}
+  .a .gruppe:last-child{border-bottom:0}
+  .a .gtitel{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--gold);margin:0 0 16px;display:flex;
+    align-items:center;gap:10px}
+  .a .gtitel::after{content:'';flex:1;height:1px;
+    background:linear-gradient(90deg,rgba(201,168,76,.35),transparent)}
+  .a .zeile{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px 14px}
+  .a .feld{display:flex;flex-direction:column;min-width:0}
+  .a .feld label{font-size:12px;color:#9a9aa3;margin:0 0 7px;display:flex;
+    align-items:baseline;gap:6px}
+  .a .feld .ii{color:var(--gold);opacity:.65;cursor:pointer;font-size:12px}
+  .a .feld .ii:hover{opacity:1}
+  .a input,.a select{width:100%;background:transparent;border:0;border-bottom:1px solid #2c2c33;
+    color:var(--txt);padding:9px 2px;font-family:'Inter';font-size:15px;min-height:44px;
+    border-radius:0;transition:border-color .15s}
+  .a input:focus,.a select:focus{outline:none;border-bottom-color:var(--gold)}
+  .a input::placeholder{color:#4d4d55}
+  .a select{appearance:none;
+    background-image:linear-gradient(45deg,transparent 50%,#6a6a72 50%),linear-gradient(135deg,#6a6a72 50%,transparent 50%);
+    background-position:calc(100% - 12px) 21px,calc(100% - 7px) 21px;
+    background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+
+  /* ═══ VARIANTE B · KARTEN ═══════════════════════════════════════ */
+  .b{background:#08080a;padding:18px}
+  .b .block{background:linear-gradient(180deg,#131317,#0e0e12);border:1px solid #23232a;
+    border-radius:13px;padding:17px 18px 19px;margin:0 0 14px;position:relative;overflow:hidden}
+  .b .block::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+    background:linear-gradient(180deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));
+    opacity:.85}
+  .b .bkopf{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 15px}
+  .b .btitel{font-family:'Space Grotesk',sans-serif;font-size:14.5px;font-weight:600}
+  .b .bzahl{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);
+    border:1px solid #2a2a32;border-radius:999px;padding:3px 9px;white-space:nowrap}
+  .b .bzahl.voll{color:var(--gruen);border-color:rgba(63,165,108,.4)}
+  .b .zeile{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px 12px}
+  .b .feld{display:flex;flex-direction:column;min-width:0}
+  .b .feld label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.11em;
+    text-transform:uppercase;color:#7e7e88;margin:0 0 6px;display:flex;align-items:center;gap:5px}
+  .b .feld .ii{color:var(--gold);opacity:.7;cursor:pointer;font-size:11px}
+  .b input,.b select{width:100%;background:#08080b;border:1px solid #2a2a32;color:var(--txt);
+    border-radius:9px;padding:11px 13px;font-family:'Inter';font-size:15px;min-height:44px;
+    transition:.14s}
+  .b input:focus,.b select:focus{outline:none;border-color:var(--gold);
+    box-shadow:0 0 0 3px rgba(201,168,76,.13)}
+  .b input::placeholder{color:#4a4a52}
+  .b .hint{font-size:11px;color:#6d6d76;margin:6px 0 0;line-height:1.45}
+
+  /* ═══ gemeinsam: Tooltip-Vorschau ═══════════════════════════════ */
+  .tip{position:fixed;z-index:99;max-width:330px;padding:9px 11px;background:#15151a;
+    border:1px solid var(--gold);border-radius:8px;font-size:12px;line-height:1.5;
+    color:#d8d8e0;box-shadow:0 8px 26px rgba(0,0,0,.55);pointer-events:none;display:none}
+  .tip b{color:#b9b9c2}
+  .tip .w{display:block;margin-top:6px;color:#9a9aa3;font-size:11px}
+
+  .beine{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:26px 0 0}
+  .bein{border:1px solid var(--line);border-radius:12px;padding:15px 17px}
+  .bein h4{font-family:'Space Grotesk',sans-serif;font-size:13px;margin:0 0 8px;color:var(--gold-hi)}
+  .bein ul{margin:0;padding-left:17px;font-size:12.5px;color:#b0b0b9}
+  .bein li{margin:0 0 5px}
+
+  @media (max-width:640px){
+    .kopf,.buehne{padding-left:14px;padding-right:14px}
+    .rahmen{max-width:100%}
+    .a .zeile,.b .zeile,.ist .row{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<div class="kopf">
+  <h1>Marktbericht · Eingabebereich</h1>
+  <p class="sub">Drei Stände mit <b>denselben</b> Feldern und Beschriftungen wie im echten
+  Formular. Die Labels stammen aus <code>index.html</code>, die Hilfetexte aus
+  <code>feldhilfe.js</code> — nichts ist für die Demo erfunden. Fahr über die ⓘ.</p>
+  <div class="schalter">
+    <button data-z="ist" class="an">Ist-Zustand (v1336c)</button>
+    <button data-z="a">Variante A · Ruhig</button>
+    <button data-z="b">Variante B · Karten</button>
+  </div>
+</div>
+
+<div class="buehne">
+
+  <!-- ══════════════════════════════════════════════ IST ══════════ -->
+  <div class="karte-wrap an" id="w-ist">
+    <div class="befund">
+      <h3>Was heute schon stimmt</h3>
+      <p>Seit v1336c fluchten die Eingabefelder über alle sieben Reiter und fünf
+      Breiten, und seit v1334 trägt jedes Feld ein ⓘ mit Erklärung und Herkunft.
+      Das ist der Stand, gegen den die beiden Varianten antreten.</p>
+      <p>Offen bleibt die <b>Gestaltung</b>: gleich breite Kästen, alle Felder mit
+      demselben Gewicht, keine sichtbare Gliederung innerhalb eines Reiters.</p>
+    </div>
+    <div class="rahmen">
+      <div class="ist">
+        <label>Adresse <span class="ii" data-tip="address">ⓘ</span></label>
+        <input value="Hermannstr. 9, 32609 Hüllhorst">
+        <div class="row">
+          <div><label>Objektart</label>
+            <select><option>Eigentumswohnung (ETW)</option></select></div>
+          <div><label>Nutzung</label>
+            <select><option>Kapitalanlage</option></select></div>
+        </div>
+        <div class="row">
+          <div><label>Wohnfläche (m²)</label><input type="number" value="80"></div>
+          <div><label>Zimmer</label><input type="number" value="3"></div>
+        </div>
+        <div class="row">
+          <div><label>Baujahr</label><input type="number" placeholder="z. B. 1995"></div>
+          <div><label>Etage</label><input type="number" placeholder="z. B. 1"></div>
+        </div>
+        <div class="row">
+          <div><label>Kaltmiete/Monat (€) <span class="zusatz">— optional, sonst Marktmiete</span></label>
+            <input type="number" placeholder="falls vermietet"></div>
+          <div><label>Kaufpreis (€) <span class="zusatz">— optional</span></label>
+            <input type="number" placeholder="falls bekannt"></div>
+        </div>
+        <div class="row">
+          <div><label>Grundstück (m²) <span class="zusatz">— bei ETW: Gesamtgrundstück</span></label>
+            <input type="number" placeholder="z.B. 650"></div>
+          <div><label>Wohneinheiten <span class="zusatz">— bei ETW ist es 1</span></label>
+            <input type="number" value="1"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ A ════════════ -->
+  <div class="karte-wrap" id="w-a">
+    <div class="befund">
+      <h3>Variante A · Ruhig</h3>
+      <p>Die Felder verlieren ihren Kasten und behalten nur eine Grundlinie. Was
+      bleibt, ist der eingetragene Wert — das Auge liest eine Spalte Zahlen statt
+      zwölf Rechtecke. Die Gliederung übernehmen <b>Gruppentitel</b> in
+      Mono-Versalien mit auslaufender Linie.</p>
+      <p>Passt zur Marke, weil Gold hier nur zwei Aufgaben hat: Gruppentitel und
+      Fokus. <b>Risiko:</b> ein Feld ohne Rahmen wirkt auf manchen Bildschirmen
+      weniger wie ein Eingabefeld — vor allem bei hellem Umgebungslicht.</p>
+    </div>
+    <div class="rahmen">
+      <div class="a">
+        <div class="gruppe">
+          <div class="gtitel">Wo steht das Objekt</div>
+          <div class="zeile" style="grid-template-columns:1fr">
+            <div class="feld"><label>Adresse <span class="ii" data-tip="address">ⓘ</span></label>
+              <input value="Hermannstr. 9, 32609 Hüllhorst"></div>
+          </div>
+          <div class="zeile" style="margin-top:16px">
+            <div class="feld"><label>Objektart <span class="ii" data-tip="ptype">ⓘ</span></label>
+              <select><option>Eigentumswohnung (ETW)</option></select></div>
+            <div class="feld"><label>Nutzung <span class="ii" data-tip="usage">ⓘ</span></label>
+              <select><option>Kapitalanlage</option></select></div>
+          </div>
+        </div>
+        <div class="gruppe">
+          <div class="gtitel">Eckdaten</div>
+          <div class="zeile">
+            <div class="feld"><label>Wohnfläche (m²) <span class="ii" data-tip="area">ⓘ</span></label>
+              <input type="number" value="80"></div>
+            <div class="feld"><label>Zimmer <span class="ii" data-tip="rooms">ⓘ</span></label>
+              <input type="number" value="3"></div>
+            <div class="feld"><label>Baujahr <span class="ii" data-tip="year">ⓘ</span></label>
+              <input type="number" placeholder="z. B. 1995"></div>
+            <div class="feld"><label>Etage <span class="ii" data-tip="floor">ⓘ</span></label>
+              <input type="number" placeholder="z. B. 1"></div>
+          </div>
+        </div>
+        <div class="gruppe">
+          <div class="gtitel">Geld</div>
+          <div class="zeile">
+            <div class="feld"><label>Kaltmiete/Monat (€) <span class="ii" data-tip="rent">ⓘ</span></label>
+              <input type="number" placeholder="falls vermietet"></div>
+            <div class="feld"><label>Kaufpreis (€) <span class="ii" data-tip="price">ⓘ</span></label>
+              <input type="number" placeholder="falls bekannt"></div>
+          </div>
+        </div>
+        <div class="gruppe">
+          <div class="gtitel">Grundstück</div>
+          <div class="zeile">
+            <div class="feld"><label>Grundstück (m²) <span class="ii" data-tip="plot">ⓘ</span></label>
+              <input type="number" placeholder="z.B. 650"></div>
+            <div class="feld"><label>Wohneinheiten <span class="ii" data-tip="units">ⓘ</span></label>
+              <input type="number" value="1"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ B ════════════ -->
+  <div class="karte-wrap" id="w-b">
+    <div class="befund">
+      <h3>Variante B · Karten</h3>
+      <p>Jede Feldgruppe wird eine eigene Karte mit Goldkante links und einem
+      Zähler rechts oben, der sagt, wie viel davon ausgefüllt ist. Die Labels
+      stehen klein in Mono-Versalien über dem Feld — dieselbe Schriftlogik wie die
+      Kennzahlen-Labels in der Haupt-App.</p>
+      <p>Der Zähler ist der eigentliche Gewinn: er beantwortet die Frage
+      „<b>wie weit bin ich?</b>" innerhalb eines Reiters, die heute nur die
+      Stufenleiste für den ganzen Bericht beantwortet. <b>Risiko:</b> mehr
+      Rahmen, mehr Höhe — auf dem Handy scrollt man länger.</p>
+    </div>
+    <div class="rahmen">
+      <div class="b">
+        <div class="block">
+          <div class="bkopf"><div class="btitel">Wo steht das Objekt</div>
+            <div class="bzahl voll">3 / 3</div></div>
+          <div class="zeile" style="grid-template-columns:1fr">
+            <div class="feld"><label>Adresse <span class="ii" data-tip="address">ⓘ</span></label>
+              <input value="Hermannstr. 9, 32609 Hüllhorst"></div>
+          </div>
+          <div class="zeile" style="margin-top:14px">
+            <div class="feld"><label>Objektart <span class="ii" data-tip="ptype">ⓘ</span></label>
+              <select><option>Eigentumswohnung (ETW)</option></select></div>
+            <div class="feld"><label>Nutzung <span class="ii" data-tip="usage">ⓘ</span></label>
+              <select><option>Kapitalanlage</option></select></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="bkopf"><div class="btitel">Eckdaten</div>
+            <div class="bzahl">2 / 4</div></div>
+          <div class="zeile">
+            <div class="feld"><label>Wohnfläche m² <span class="ii" data-tip="area">ⓘ</span></label>
+              <input type="number" value="80"></div>
+            <div class="feld"><label>Zimmer <span class="ii" data-tip="rooms">ⓘ</span></label>
+              <input type="number" value="3"></div>
+            <div class="feld"><label>Baujahr <span class="ii" data-tip="year">ⓘ</span></label>
+              <input type="number" placeholder="z. B. 1995"></div>
+            <div class="feld"><label>Etage <span class="ii" data-tip="floor">ⓘ</span></label>
+              <input type="number" placeholder="z. B. 1"></div>
+          </div>
+          <p class="hint">Etage heißt: in welchem Geschoss die Wohnung liegt — nicht,
+          wie viele Geschosse das Haus hat.</p>
+        </div>
+        <div class="block">
+          <div class="bkopf"><div class="btitel">Geld</div>
+            <div class="bzahl">0 / 2 · optional</div></div>
+          <div class="zeile">
+            <div class="feld"><label>Kaltmiete / Monat € <span class="ii" data-tip="rent">ⓘ</span></label>
+              <input type="number" placeholder="falls vermietet"></div>
+            <div class="feld"><label>Kaufpreis € <span class="ii" data-tip="price">ⓘ</span></label>
+              <input type="number" placeholder="falls bekannt"></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="bkopf"><div class="btitel">Grundstück</div>
+            <div class="bzahl">1 / 2</div></div>
+          <div class="zeile">
+            <div class="feld"><label>Grundstück m² <span class="ii" data-tip="plot">ⓘ</span></label>
+              <input type="number" placeholder="z.B. 650"></div>
+            <div class="feld"><label>Wohneinheiten <span class="ii" data-tip="units">ⓘ</span></label>
+              <input type="number" value="1"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="beine">
+    <div class="bein">
+      <h4>Was in beiden Varianten gleich bleibt</h4>
+      <ul>
+        <li>Dieselben Feld-Ids — kein zweiter Feldkatalog</li>
+        <li>Die Flucht aus v1336c (Grid, gleiche Labelhöhe je Rasterzeile)</li>
+        <li>Alle ⓘ mit Erklärung und „Wo du das findest"</li>
+        <li>44 px Mindesthöhe, 16 px Schrift gegen den iOS-Zoom</li>
+        <li>Eine Spalte ab 640 px Breite</li>
+      </ul>
+    </div>
+    <div class="bein">
+      <h4>Aufwand, ehrlich geschätzt</h4>
+      <ul>
+        <li><b>A:</b> reines CSS am vorhandenen Markup — ein Paket</li>
+        <li><b>B:</b> CSS plus ein Gruppierer, der die vorhandenen
+        <code>.row</code>-Zeilen in Blöcke fasst und zählt — zwei Pakete,
+        weil der Zähler an dieselbe Quelle muss wie die Stufenleiste</li>
+        <li>Beide ändern <b>keine</b> Rechenlogik</li>
+      </ul>
+    </div>
+    <div class="bein">
+      <h4>Mein Vorschlag</h4>
+      <ul>
+        <li><b>B</b>, wegen des Zählers: „wie weit bin ich" ist die Frage, die
+        beim Ausfüllen wirklich aufkommt</li>
+        <li>aber mit den ruhigeren Feldern aus <b>A</b> innerhalb der Karten,
+        damit es nicht nach Rahmen im Rahmen aussieht</li>
+        <li>Sag welche — oder „misch sie", dann baue ich genau das</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="tip" id="tip"></div>
+
+<script>
+/* Die Texte stammen wörtlich aus frontend/marktbericht-app/feldhilfe.js (v1334). */
+var TEXTE = {
+  address:{k:'Straße, Hausnummer, Postleitzahl und Ort — in einer Zeile. Sie bestimmt den Gutachterausschuss, den Bodenrichtwert und das Vergleichsgebiet.',w:'Kaufvertrag, Exposé oder Grundbuchauszug.'},
+  ptype:{k:'Die Objektart steuert das ganze Verfahren: welche Normalherstellungskosten gelten, welcher Liegenschaftszinssatz gezogen wird und ob ein Sachwert überhaupt sinnvoll ist.',w:'Kaufvertrag oder Teilungserklärung.'},
+  usage:{k:'Kapitalanlage oder Eigennutzung. Ändert nicht den Verkehrswert, aber die Kennzahlen daneben.',w:'Deine eigene Absicht.'},
+  area:{k:'Wohnfläche in m² nach Wohnflächenverordnung — nicht die Grundfläche und nicht die Bruttogrundfläche.',w:'Kaufvertrag, Teilungserklärung mit Aufteilungsplan, Mietvertrag oder Wohnflächenberechnung.'},
+  rooms:{k:'Anzahl der Wohnräume. Küche, Bad, Flur und Abstellraum zählen nicht mit.',w:'Grundriss oder Exposé.'},
+  year:{k:'Baujahr im Sinne der Bezugsfertigkeit — nicht das Jahr der Baugenehmigung.',w:'Bauakte beim Bauamt, Grundbuch, Energieausweis oder Exposé.'},
+  floor:{k:'In welchem Geschoss die Wohnung liegt — <b>nicht</b> wie viele Geschosse das Haus hat. 0 ist das Erdgeschoss, 1 das erste Obergeschoss.',w:'Teilungserklärung mit Aufteilungsplan, Klingelschild oder Exposé.'},
+  rent:{k:'Monatliche Nettokaltmiete des Wohnraums — ohne Betriebskosten, ohne Stellplatz, ohne Möblierungszuschlag.',w:'Mietvertrag oder Mieterliste. Bei Leerstand leer lassen.'},
+  price:{k:'Kaufpreis oder Angebotspreis. Er geht nicht in die Wertermittlung ein — der Bericht stellt ihn dem ermittelten Wert gegenüber.',w:'Kaufvertrag oder Exposé.'},
+  plot:{k:'Grundstücksfläche in m². Ohne sie kein Bodenwert.',w:'Kaufvertrag, Grundbuchauszug oder Liegenschaftskataster.'},
+  units:{k:'Anzahl der Wohnungen im Gebäude. Bei ETW, Einfamilienhaus, Doppelhaushälfte und Reihenhaus ist es 1 — das wird automatisch gesetzt.',w:'Teilungserklärung, Mieterliste oder Klingelanlage.'}
+};
+var tip = document.getElementById('tip'), zeit = null;
+document.addEventListener('mouseover', function (ev) {
+  var i = ev.target.closest && ev.target.closest('[data-tip]');
+  if (!i) return;
+  if (zeit) clearTimeout(zeit);
+  zeit = setTimeout(function () {
+    var t = TEXTE[i.getAttribute('data-tip')]; if (!t) return;
+    tip.innerHTML = t.k + '<span class="w"><b>Wo du das findest:</b> ' + t.w + '</span>';
+    tip.style.display = 'block';
+    var r = i.getBoundingClientRect(), b = tip.getBoundingClientRect();
+    tip.style.left = Math.min(Math.max(8, r.left), innerWidth - b.width - 8) + 'px';
+    var oben = r.bottom + 8;
+    if (oben + b.height > innerHeight - 8) oben = Math.max(8, r.top - b.height - 8);
+    tip.style.top = oben + 'px';
+  }, 220);
+}, true);
+document.addEventListener('mouseout', function (ev) {
+  if (ev.target.closest && ev.target.closest('[data-tip]')) {
+    if (zeit) clearTimeout(zeit);
+    tip.style.display = 'none';
+  }
+}, true);
+
+document.querySelectorAll('.schalter button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    document.querySelectorAll('.schalter button').forEach(function (x) { x.classList.remove('an'); });
+    b.classList.add('an');
+    document.querySelectorAll('.karte-wrap').forEach(function (w) { w.classList.remove('an'); });
+    document.getElementById('w-' + b.getAttribute('data-z')).classList.add('an');
+  });
+});
+</script>
+</body>
+</html>

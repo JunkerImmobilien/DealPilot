@@ -67,49 +67,145 @@ function _v269_getStartYear() {
 }
 
 var Tax = (function() {
-  // Tarif 2026 (§32a EStG)
-  function calcEStG(zvE) {
-    zvE = Math.floor(zvE); // immer abrunden
-    if (zvE <= 11604) return 0;
+  /* ══════════════════════════════════════════════════════════════════════
+     v1364 · DER TARIF STEHT AN EINER STELLE UND KENNT SEIN JAHR
+     ══════════════════════════════════════════════════════════════════════
+     Marcels Vorgabe: „mir waere wichtig, dass wir immer die aktuellen
+     saetze verwenden fuer das entsprechende jahr … das darf ja nicht an 3
+     stellen unterschiedlich sein."
 
-    // Zone 1: 11.605 - 17.005 (Eingangs-Progression)
-    if (zvE <= 17005) {
-      var y = (zvE - 11604) / 10000;
-      return Math.floor((922.98 * y + 1400) * y);
+     Es WAR an drei Stellen unterschiedlich. Gemessen am 13.09.2026:
+
+       tax.js        Grundfreibetrag 11.604   (Kommentar sagte „Tarif 2026")
+       dashboard.js  Grundfreibetrag 11.784   (zusammengefuehrt in v1361)
+       rnd-calc.js   Zonengrenzen 12.096 / 17.443 / 68.480
+
+     KEINER DAVON WAR 2026. Der Wert 11.604 ist nicht einmal ein gueltiger
+     Jahrgang - er war der urspruenglich GEPLANTE Grundfreibetrag 2024,
+     bevor er auf 11.784 angehoben wurde. Er stand hier unter der
+     Ueberschrift „Tarif 2026".
+
+     DIE QUELLE IST DAS GESETZ, NICHT EINE SUCHMASCHINE. Abgerufen am
+     13.09.2026 von gesetze-im-internet.de/estg/__32a.html, der amtlichen
+     Fassung „ab dem Veranlagungszeitraum 2026". Eine Suchmaschine lieferte
+     zuvor abweichende Zahlen (954,80 statt 914,51; Zonengrenze 17.005
+     statt 17.799) - die Primaerquelle gewinnt.
+
+     GEGENGEPRUEFT UEBER DIE STETIGKEIT. Der Tarif muss an jeder
+     Zonengrenze denselben Wert liefern, sonst springt die Steuer:
+
+       bei 17.799 EUR   Zone 2 -> 1.034,87   Zone 3 -> 1.034,87   passt
+       bei 69.878 EUR   Zone 3 -> 18.213     Zone 4 -> 18.213     passt
+       bei 277.825 EUR  Zone 4 -> 105.550,87 Zone 5 -> 105.550,87 passt
+
+     Das ist die beste Probe, die es ohne amtliches Rechenbeispiel gibt:
+     falsche Koeffizienten erzeugen an den Grenzen einen Sprung.
+
+     WARUM NUR EIN JAHRGANG IN DER TABELLE STEHT: fuer 2025 liessen sich
+     die Zonen 4 und 5 in der verfuegbaren Zeit nicht aus einer
+     Primaerquelle belegen. Eine halb belegte Zahl ist schlechter als
+     keine - wer einen Jahrgang braucht, traegt ihn hier ein, und alle
+     drei Stellen bekommen ihn. Fehlt das angefragte Jahr, nimmt die
+     Funktion den naechstaelteren vorhandenen und SAGT das ueber
+     `tarifInfo()`, statt still eine andere Zahl zu rechnen.
+
+     Die App rechnet Prognosen in die Zukunft: ein Objekt, das 2026
+     gekauft und fuenfzehn Jahre projiziert wird, nutzt durchgehend den
+     Tarif 2026, weil kuenftige Tarife niemand kennt. Historische
+     Jahrgaenge braucht nur, wer eine alte Veranlagung nachrechnet.
+     ══════════════════════════════════════════════════════════════════════ */
+  var TARIFE = {
+    2026: {
+      quelle: '\u00a7 32a Abs. 1 EStG, Fassung ab VZ 2026 \u2014 gesetze-im-internet.de, abgerufen 13.09.2026',
+      grundfreibetrag: 12348,
+      /* Zone 2: (a*y + b) * y   mit y = (x - grundfreibetrag) / 10000 */
+      z2bis: 17799, z2a: 914.51, z2b: 1400,
+      /* Zone 3: (a*z + b) * z + c   mit z = (x - z3basis) / 10000 */
+      z3basis: 17799, z3bis: 69878, z3a: 173.10, z3b: 2397, z3c: 1034.87,
+      /* Zone 4: 0,42 * x - c */
+      z4bis: 277825, z4satz: 0.42, z4c: 11135.63,
+      /* Zone 5: 0,45 * x - c */
+      z5satz: 0.45, z5c: 19470.38
     }
+  };
 
-    // Zone 2: 17.006 - 66.760 (Progressions-Bereich)
-    if (zvE <= 66760) {
-      var z = (zvE - 17005) / 10000;
-      return Math.floor((181.19 * z + 2397) * z + 1025.38);
+  var TARIF_JAHRE = Object.keys(TARIFE).map(Number).sort(function (a, b) { return a - b; });
+
+  /* Welcher Jahrgang gilt fuer dieses Jahr? Gibt es ihn nicht, wird der
+     naechstaeltere genommen - und das ist ueber tarifInfo() ablesbar. */
+  function tarifFuer(jahr) {
+    var j = parseInt(jahr, 10);
+    if (!isFinite(j)) j = new Date().getFullYear();
+    if (TARIFE[j]) return { jahr: j, tarif: TARIFE[j], exakt: true };
+    var gewaehlt = TARIF_JAHRE[0];
+    for (var i = 0; i < TARIF_JAHRE.length; i++) {
+      if (TARIF_JAHRE[i] <= j) gewaehlt = TARIF_JAHRE[i];
     }
-
-    // Zone 3: 66.761 - 277.825 (42% linear)
-    if (zvE <= 277825) {
-      return Math.floor(0.42 * zvE - 10602.13);
-    }
-
-    // Zone 4: ab 277.826 (45% Reichensteuer)
-    return Math.floor(0.45 * zvE - 18936.88);
+    return { jahr: gewaehlt, tarif: TARIFE[gewaehlt], exakt: false, angefragt: j };
   }
+
+  /* Fuer Anzeige und Pruefung: welcher Tarif wurde benutzt, und woher
+     stammt er? Ohne das ist von aussen nicht erkennbar, ob gerade der
+     passende Jahrgang gerechnet wird oder ein Ersatz. */
+  function tarifInfo(jahr) {
+    var t = tarifFuer(jahr);
+    return {
+      jahr: t.jahr,
+      exakt: t.exakt,
+      angefragt: t.angefragt || t.jahr,
+      grundfreibetrag: t.tarif.grundfreibetrag,
+      /* v1405: die Zonengrenzen gehoeren dorthin, wo der Tarif steht. Die
+         Progressionskurve im Cockpit braucht sie, um an den richtigen
+         Stellen zu knicken — sie soll sie nicht selbst kennen muessen. */
+      zonen: { z2bis: t.tarif.z2bis, z3bis: t.tarif.z3bis, z4bis: t.tarif.z4bis },
+      quelle: t.tarif.quelle,
+      verfuegbareJahre: TARIF_JAHRE.slice()
+    };
+  }
+
+  /* § 32a Abs. 1 EStG. `x` ist das auf volle Euro ABGERUNDETE zu
+     versteuernde Einkommen - das schreibt Satz 5 ausdruecklich vor, und
+     genau daran ist die zweite Fassung in dashboard.js gescheitert, die
+     mit Math.round arbeitete (v1361). */
+  function calcEStG(zvE, jahr) {
+    var T = tarifFuer(jahr).tarif;
+    var x = Math.floor(Number(zvE) || 0);
+    if (x <= T.grundfreibetrag) return 0;
+    if (x <= T.z2bis) {
+      var y = (x - T.grundfreibetrag) / 10000;
+      return Math.floor((T.z2a * y + T.z2b) * y);
+    }
+    if (x <= T.z3bis) {
+      var z = (x - T.z3basis) / 10000;
+      return Math.floor((T.z3a * z + T.z3b) * z + T.z3c);
+    }
+    if (x <= T.z4bis) return Math.floor(T.z4satz * x - T.z4c);
+    return Math.floor(T.z5satz * x - T.z5c);
+  }
+
 
   /**
    * Calculates marginal tax rate (Grenzsteuersatz) at a given zvE.
    * Useful to know what the next euro of income will be taxed at.
    */
-  function calcGrenzsteuersatz(zvE) {
-    // Use 1000€ increment for stable result (Math.floor in calcEStG would give 0 for 1€)
-    var t1 = calcEStG(zvE);
-    var t2 = calcEStG(zvE + 1000);
+  /* v1364: das Jahr wird durchgereicht, damit der Grenzsteuersatz aus
+     demselben Tarif stammt wie die Steuer selbst. Der Abstand von 1.000
+     EUR bleibt: calcEStG rundet nach Satz 5 auf volle Euro ab, ein
+     Ein-Euro-Schritt ergaebe deshalb oft 0. */
+  function calcGrenzsteuersatz(zvE, jahr) {
+    var t1 = calcEStG(zvE, jahr);
+    var t2 = calcEStG(zvE + 1000, jahr);
     return (t2 - t1) / 1000;
   }
+
 
   /**
    * Average tax rate (Durchschnittssteuersatz)
    */
-  function calcDurchschnittssteuersatz(zvE) {
+  function calcDurchschnittssteuersatz(zvE, jahr) {
     if (zvE <= 0) return 0;
-    return calcEStG(zvE) / zvE;
+    return calcEStG(zvE, jahr) / zvE;
+
   }
 
   /**
@@ -218,6 +314,7 @@ var Tax = (function() {
 
   return {
     calcEStG: calcEStG,
+    tarifInfo: tarifInfo,   /* v1364: welcher Jahrgang gilt gerade? */
     calcGrenzsteuersatz: calcGrenzsteuersatz,
     calcDurchschnittssteuersatz: calcDurchschnittssteuersatz,
     calcImmoResult: calcImmoResult,
@@ -313,11 +410,55 @@ function _getBestandLossesForYear(displayYear) {
       var raw = (kdEl && kdEl.value) || (wuEl && wuEl.value) || '';
       if (raw && raw.length >= 10) currentObjKaufdat = raw.substring(0, 10);
     } catch(_) {}
+    /* v1400/v1404: die Steuersphaere DIESES Objekts — Bezugspunkt der
+       Trennung unten. `privat` und `gbr` teilen sich die Sphaere 'est',
+       jede Kapitalgesellschaft hat ihre eigene. Faellt mandanten.js aus,
+       gilt der Halter selbst als Sphaere: dann wird eher zu fein getrennt
+       als vermischt. */
+    function _sphVon(h) {
+      try {
+        if (window.DealPilotMandanten && DealPilotMandanten.sphaere) {
+          return DealPilotMandanten.sphaere(h || 'privat');
+        }
+      } catch (_e) {}
+      return String(h || 'privat');
+    }
+    /* Anteil am Ergebnis (1 = 100 %). Nur die GbR fuehrt eine Quote. */
+    function _antVon(h) {
+      try {
+        if (window.DealPilotMandanten && DealPilotMandanten.anteil) {
+          var a = DealPilotMandanten.anteil(h || 'privat');
+          return (typeof a === 'number' && isFinite(a) && a > 0) ? a : 1;
+        }
+      } catch (_e) {}
+      return 1;
+    }
+    var _curHalterId = 'privat';
+    try {
+      var _hEl = document.getElementById('halter');
+      _curHalterId = String((_hEl && _hEl.value) || 'privat');
+    } catch (_) { _curHalterId = 'privat'; }
+    var _curSphaere = _sphVon(_curHalterId);
     // Year-Key als String
     var yearKey = String(displayYear);
     all.forEach(function(obj) {
       if (!obj || !obj.id) return;
       if (currentId && obj.id === currentId) return;  // sich selbst ueberspringen
+      /* ═══ v1404 · GLEICHE SPHAERE STATT GLEICHER HALTER ══════════════════
+         Bis v1403 stand hier `_objHalter !== _curHalterId` — also: nur
+         Objekte DESSELBEN Halters. Das trennte GmbH und UG richtig ab, aber
+         es trennte auch die GbR vom Privatvermoegen, und das ist falsch: eine
+         GbR zahlt keine Einkommensteuer, ihr Ergebnis fliesst beim
+         Gesellschafter in DASSELBE zvE.
+
+         Gemessen an drei privaten und zwei GbR-Objekten: 9,6 Prozent zu viel
+         ausgewiesene Entlastung, weil beide Toepfe die Progression von vorn
+         durchliefen.
+
+         `sphaere()` liegt in mandanten.js, wo auch die Rechtsformen stehen —
+         eine zweite Fassung hier liefe frueher oder spaeter auseinander. */
+      var _objSph = _sphVon(obj.halter);
+      if (_objSph !== _curSphaere) return;
       // V280-correct-filter: Anderes Objekt nur wenn dessen Kaufdatum
       //   1) VOR meinem eigenen Kaufdatum liegt UND
       //   2) Bis zum Card-Year (displayYear) bereits existierte
@@ -330,7 +471,12 @@ function _getBestandLossesForYear(displayYear) {
       var refYear = parseInt(refDateStr.substring(0, 4), 10);
       if (!refYear || refYear > displayYear) return;
       // Wert holen
+      /* v1404: nur DEIN Anteil geht in deine Steuerrechnung ein. Bei einer
+         GbR mit 50 Prozent zaehlt ein Verlust von 20.000 bei dir mit 10.000.
+         Privat und Kapitalgesellschaft liefern immer 1. */
+      var _ant = _antVon(obj.halter);
       var val = obj.wk_per_year && obj.wk_per_year[yearKey];
+      if (typeof val === 'number' && _ant !== 1) val = val * _ant;
       if (typeof val !== 'number' || val === 0) {
         // Falls nichts da: trotzdem Objekt mit 0 anzeigen
         result.list.push({
@@ -510,9 +656,28 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
         var escHtml = function(s) {
           return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         };
-        /* Fall 1: keine anderen Bestandsobjekte */
-        if (!_bestandInfo || !_bestandInfo.list || _bestandInfo.list.length === 0) {
-          return '<div class="tax-item"><div class="tax-label">Überschuss/Verlust V+V (aktueller Bestand) <span class="tax-info" title="Keine anderen Bestandsobjekte mit Kaufdatum vor diesem Objekt">ⓘ</span></div><div class="tax-val" style="color:var(--muted)">—</div></div>';
+        /* ═══ v1399 · "KEINE" UND "NOCH NICHT GELADEN" SIND ZWEIERLEI ══════
+           Hier stand EINE Antwort fuer zwei voellig verschiedene Zustaende:
+           die Liste ist leer, WEIL es keine frueheren Objekte gibt — oder
+           weil der Aggregator nichts geliefert hat (kein Token, Backend
+           stumm, Netz weg). Der Text behauptete in beiden Faellen "Keine
+           anderen Bestandsobjekte".
+
+           Das ist die gefaehrliche Richtung: faellt der Abruf aus, rechnet
+           das Objekt ohne Saldierung — also mit einer ZU HOHEN Ersparnis —
+           und die Oberflaeche bestaetigt dem Nutzer, dass das richtig sei.
+           `_bestandInfo.loaded` unterscheidet die beiden Faelle und lag
+           ungenutzt daneben. */
+        if (!_bestandInfo || !_bestandInfo.loaded) {
+          return '<div class="tax-item"><div class="tax-label">Überschuss/Verlust V+V (aktueller Bestand) '
+               + '<span class="tax-info" title="Die Daten deiner übrigen Objekte werden gerade geladen. '
+               + 'Solange rechnet dieses Objekt für sich allein — die ausgewiesene Ersparnis kann dadurch zu hoch sein. '
+               + 'Bleibt die Anzeige stehen, lade die Seite neu.">ⓘ</span></div>'
+               + '<div class="tax-val" style="color:var(--muted)">wird geladen …</div></div>';
+        }
+        /* Fall 1: geladen, und es gibt wirklich keine frueheren Objekte */
+        if (!_bestandInfo.list || _bestandInfo.list.length === 0) {
+          return '<div class="tax-item"><div class="tax-label">Überschuss/Verlust V+V (aktueller Bestand) <span class="tax-info" title="Geprüft: es gibt kein weiteres gespeichertes Objekt mit einem Kaufdatum vor diesem. Dieses Objekt rechnet deshalb auf deinem vollen zvE.">ⓘ</span></div><div class="tax-val" style="color:var(--muted)">—</div></div>';
         }
         var sumColor = _bestandInfo.sum < 0 ? 'c-red' : (_bestandInfo.sum > 0 ? 'c-green' : '');
         var count = _bestandInfo.list.length;
@@ -1585,6 +1750,76 @@ function updateTaxOverride(input) {
   if (typeof calc === 'function') setTimeout(calc, 50);
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1406 · BELEGE IN DIE JAHRESFELDER ÜBERNEHMEN
+   ═══════════════════════════════════════════════════════════════════════
+   Marcel: „da wäre schon cool, wenn wir … eine Nebenkostenabrechnung oder
+   Hausgeld … da reingeben könnten und der teilt das passend auf."
+
+   Der Beleg-Import liest und teilt auf; HIER landet das Ergebnis. Bewusst
+   eine eigene Funktion statt `updateTaxOverride()`: die erwartet ein
+   DOM-Element mit `dataset`, und ein Beleg hat keins.
+
+   DAS JAHR IST NICHT VERHANDELBAR. Eine Hausgeldabrechnung für 2025, die
+   im Mai 2026 kommt, gehört ins Veranlagungsjahr 2025 — deshalb nimmt diese
+   Funktion das Jahr als Pflichtangabe und schreibt niemals „ins aktuelle".
+   Der Beleg-Import liest es aus der Abrechnung; findet er keins, fragt er.
+
+   ADDIEREN IST DER VORGABEFALL. Ein Jahr hat mehrere Handwerkerrechnungen,
+   und die zweite darf die erste nicht löschen. Ersetzen nur, wenn der
+   Aufrufer es ausdrücklich sagt.                                          */
+function dpWkUebernehmen(jahr, posten, modus) {
+  var j = parseInt(jahr, 10);
+  if (!j || j < 1990 || j > 2200) return { ok: false, grund: 'kein gültiges Jahr' };
+  if (!posten || typeof posten !== 'object') return { ok: false, grund: 'keine Posten' };
+  var ersetzen = (modus === 'replace');
+  var n = 0, felder = [];
+  Object.keys(posten).forEach(function (feld) {
+    var betrag = Number(posten[feld]);
+    if (!isFinite(betrag) || betrag === 0) return;
+    var alt = _getYearOverride(j, feld);
+    var neu;
+    if (ersetzen || alt === undefined || alt === null || !isFinite(Number(alt))) {
+      /* Kein Override vorhanden: der Beleg SETZT den Wert. Der Auto-Vorschlag
+         der App wird damit überschrieben — genau das ist gewollt, ein Beleg
+         ist die bessere Auskunft als eine Schätzung. */
+      neu = betrag;
+    } else {
+      neu = Number(alt) + betrag;
+    }
+    _setYearOverride(j, feld, neu);
+    felder.push(feld);
+    n++;
+  });
+  if (!n) return { ok: false, grund: 'keine übernehmbaren Beträge' };
+  try { if (typeof renderYearlyTaxForm === 'function') renderYearlyTaxForm(); } catch (e) {}
+  try { if (typeof renderTaxTimeline === 'function') renderTaxTimeline(); } catch (e) {}
+  try { if (typeof renderTaxModule === 'function') renderTaxModule(); } catch (e) {}
+  try { if (typeof calc === 'function') setTimeout(calc, 60); } catch (e) {}
+  return { ok: true, anzahl: n, jahr: j, felder: felder, modus: ersetzen ? 'replace' : 'add' };
+}
+window.dpWkUebernehmen = dpWkUebernehmen;
+
+/** Welche Jahre der Tab Steuern gerade führt — damit der Beleg-Import
+ *  merkt, wenn ein Beleg in ein Jahr fällt, das es hier gar nicht gibt. */
+function dpWkJahre() {
+  try {
+    if (!State || !State.cfRows || !State.cfRows.length) return [];
+    var basis = (typeof _taxBaseYear === 'function') ? _taxBaseYear() : null;
+    if (!basis) {
+      var k = document.getElementById('kaufdat');
+      var w = document.getElementById('wirtschaftlicher_uebergang');
+      var raw = (k && k.value) || (w && w.value) || '';
+      basis = raw.length >= 4 ? parseInt(raw.substring(0, 4), 10) : new Date().getFullYear();
+    }
+    var out = [];
+    for (var i = 0; i < State.cfRows.length; i++) out.push(basis + i);
+    return out;
+  } catch (e) { return []; }
+}
+window.dpWkJahre = dpWkJahre;
+
 function resetTaxOverride(year, field) {
   _setYearOverride(parseInt(year), field, undefined);
   renderYearlyTaxForm();
@@ -1616,25 +1851,138 @@ renderTaxTimeline = function() {
 // ═══════════════════════════════════════════════════
 // Grenzsteuersatz automatisch aus zvE (Punkt 2)
 // ═══════════════════════════════════════════════════
-function onGrenzAutoToggle() {
+/* ═══ v1383-GRENZAUTO · EINE AUTOMATIK, DIE ANGEHAKT WAR UND NICHT LIEF ══
+ *
+ * Marcels Frage: „Grauen wir den aus?"
+ *
+ * GEMESSEN: Die Checkbox steht in index.html:1940 auf `checked` — sie ist
+ * also ab Werk an. Gerufen wurde `onGrenzAutoToggle()` aber NUR an zwei
+ * Stellen: beim Klick auf die Checkbox selbst und beim Tippen ins
+ * zvE-Feld. Beim LADEN eines Objekts feuert weder das eine noch das
+ * andere (kein dispatchEvent in storage.js oder main.js).
+ *
+ * Folge: Wer ein Objekt oeffnet, sieht eine angehakte Automatik und ein
+ * FREI EDITIERBARES Feld mit dem gespeicherten alten Wert. Beides
+ * zusammen ist eine Luege — der Haken sagt „wird berechnet", und
+ * berechnet wird nichts.
+ *
+ * Die Nachfuehrung steht deshalb jetzt in einer eigenen Funktion, die
+ * auch STILL laufen kann: `calc()` ruft sie bei jedem Lauf, und ein
+ * Toast bei jedem Rechenlauf waere unbrauchbar. */
+function _grenzAutoNachziehen(mitToast) {
   var auto = document.getElementById('grenz_auto');
   var grenzInput = document.getElementById('grenz');
-  if (!auto || !grenzInput) return;
+  if (!auto || !grenzInput) return false;
   if (auto.checked) {
     var zve = parseDe((document.getElementById('zve') || {}).value) || 0;
     if (zve > 0) {
       var gss = Tax.calcGrenzsteuersatz(zve) * 100;
-      grenzInput.value = gss.toFixed(2);
+      var neu = gss.toFixed(2);
+      var geaendert = (String(grenzInput.value).replace(',', '.') !== neu);
+      grenzInput.value = neu;
       grenzInput.disabled = true;
       grenzInput.style.background = 'rgba(201,168,76,0.12)';
-      if (typeof toast === 'function') toast('✓ Grenzsteuersatz aus zvE berechnet: ' + gss.toFixed(2) + ' %');
+      /* ═══ v1398 · DAS FELD ZEIGT DEN PERSOENLICHEN SATZ, NICHT DEN WIRKSAMEN
+         Seit v1397 rechnet das Objekt gegen eine Basis, die um die Ergebnisse
+         frueher gekaufter Objekte verschoben ist. Der hier angezeigte Satz
+         bleibt bewusst der auf das VOLLE zvE — das ist der persoenliche
+         Grenzsteuersatz, und danach fragt das Feld.
+         Gemessen an drei Objekten (zvE 80.000): das Feld zeigt dreimal
+         42,00 %, waehrend die wirksame Basis 80.000 / 55.000 / 35.000 betraegt
+         und dort 42,00 / 37,00 / 30,10 % gelten. Ohne diesen Zusatz stuende
+         die Abweichung unerklaert da. */
+      var _salT = 0;
+      try {
+        if (typeof window._dpBestandSaldo === 'function') {
+          _salT = window._dpBestandSaldo(
+            (State && State._taxDisplayYear) || new Date().getFullYear()) || 0;
+        }
+      } catch (_eT) { _salT = 0; }
+      grenzInput.title = 'Wird aus deinem zu versteuernden Einkommen berechnet '
+        + '(§ 32a EStG). Zum Ändern den Haken darunter entfernen.'
+        + (Math.abs(_salT) >= 1
+            ? ' — Achtung: das ist dein persönlicher Satz auf das volle zvE. '
+              + 'Dieses Objekt rechnet auf einer um '
+              + Math.round(Math.abs(_salT)).toLocaleString('de-DE') + ' € '
+              + (_salT < 0 ? 'gesenkten' : 'erhöhten')
+              + ' Basis, weil früher gekaufte Bestandsobjekte einfließen. Der '
+              + 'tatsächlich wirkende Satz steht im Hinweis „Dein Steuersatz '
+              + 'wurde angepasst".'
+            : '');
+      if (mitToast && typeof toast === 'function') {
+        toast('✓ Grenzsteuersatz aus zvE berechnet: ' + neu + ' %');
+      }
+      return geaendert;
     }
-  } else {
+    /* Haken an, aber kein zvE: dann kann nichts berechnet werden. Das
+       Feld bleibt frei — sonst waere es gesperrt UND leer. */
     grenzInput.disabled = false;
     grenzInput.style.background = '';
+    grenzInput.title = 'Kein zu versteuerndes Einkommen erfasst — der Satz '
+      + 'lässt sich nicht berechnen. Trage ihn selbst ein oder ergänze das zvE.';
+    return false;
   }
+  grenzInput.disabled = false;
+  grenzInput.style.background = '';
+  grenzInput.title = '';
+  return false;
+}
+
+function onGrenzAutoToggle() {
+  _grenzAutoNachziehen(true);
   if (typeof calcNow === 'function') calcNow();
 }
+window._grenzAutoNachziehen = _grenzAutoNachziehen;
+
+/* ═══ v1397 · EIN WEG ZUR BESTANDSSALDIERUNG, NICHT ZWEI ═══════════════════
+ *
+ * GEMESSEN am 14.09.2026, ausgeloest durch Marcels Frage "warum steht das
+ * noch drin?" zum Hinweistext im Tab Steuern.
+ *
+ * Der Text behauptet: "Die Objekte verschieben sich gegenseitig nicht die
+ * Progression." Das stimmt seit V276 nur noch zur HAELFTE:
+ *
+ *   tax.js  (Tab Steuern)   rechnet baseIncome + _bestandInfo.sum und
+ *                           DANN erst calcImmoTaxImpact  -> saldiert
+ *   calc.js (Cashflow/KPI)  rechnet _estDelta gegen das rohe zvE-Feld
+ *                           -> saldiert NICHT
+ *
+ * In calc.js steht der Grund woertlich im Kommentar: "Effektives zvE ohne
+ * Immobilie + WK anderer Objekte (nur Display)". Die Zahl wurde also
+ * ermittelt, angezeigt - und nicht gerechnet.
+ *
+ * Damit weist dieselbe App fuer dasselbe Objekt zwei verschiedene
+ * Steuerwirkungen aus, und die Summe im Portfolio-Cockpit haengt an der
+ * ungenaueren von beiden.
+ *
+ * DIESE FUNKTION IST DER EINE WEG. Sie liegt hier, weil hier auch der
+ * Kaufdatums-Filter liegt (V280: nur Objekte, die VOR dem eigenen gekauft
+ * wurden und im Bezugsjahr schon existierten). `getWKForOtherObjects` des
+ * Aggregators filtert das NICHT - wer sie nimmt, bekommt eine andere Zahl
+ * als der Tab Steuern. Genau diese Dublette soll hier nicht entstehen.
+ *
+ * Rueckgabe 0 heisst: kein Saldo anzuwenden. Das ist der richtige
+ * Rueckfall, wenn der Aggregator-Cache noch nicht geladen ist - dann
+ * rechnet calc.js wie bisher, statt mit einer halben Wahrheit.
+ */
+window._dpBestandSaldo = function (jahr) {
+  try {
+    if (typeof _getBestandLossesForYear !== 'function') return 0;
+    var r = _getBestandLossesForYear(jahr);
+    if (!r || !r.loaded) return 0;
+    return (typeof r.sum === 'number' && isFinite(r.sum)) ? r.sum : 0;
+  } catch (_e) { return 0; }
+};
+
+/* Wie viele andere Bestandsobjekte in den Saldo eingegangen sind — fuer die
+ * Anzeige, damit eine gesenkte Basis nicht unerklaert dasteht. */
+window._dpBestandAnzahl = function (jahr) {
+  try {
+    if (typeof _getBestandLossesForYear !== 'function') return 0;
+    var r = _getBestandLossesForYear(jahr);
+    return (r && r.loaded && Array.isArray(r.list)) ? r.list.length : 0;
+  } catch (_e) { return 0; }
+};
 
 // Hook zvE input to update Grenz when auto is on
 document.addEventListener('DOMContentLoaded', function() {

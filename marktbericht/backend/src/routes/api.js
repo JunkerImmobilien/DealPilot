@@ -127,11 +127,14 @@ router.get('/boris', async (req, res) => {
   const lon = parseFloat(req.query.lon);
   const year = req.query.year ? parseInt(req.query.year, 10) : undefined;
   const manualBrw = req.query.brw != null ? req.query.brw : undefined;
+  /* v1388-WLAND: optionales Bundeslandkuerzel. Ohne Angabe verhaelt sich
+     der Endpunkt exakt wie bisher - der Marktbericht schickt es nicht. */
+  const land = req.query.land ? String(req.query.land).toUpperCase() : undefined;
   if (isNaN(lat) || isNaN(lon)) {
     return res.status(400).json({ error: 'lat und lon erforderlich, z.B. /boris?lat=52.3186&lon=8.671' });
   }
   try {
-    const result = await BorisConnector.landValue({ lat, lon, year, manualBrw });
+    const result = await BorisConnector.landValue({ lat, lon, year, manualBrw, land });
     res.json(result);
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -547,7 +550,50 @@ router.get('/openai/check', async (req, res) => {
 });
 
 // GET /ags?plz=32052 — Kreis-Schlüssel (AGS) zur PLZ (via OpenPLZ). Test der AGS-Auflösung.
+/* === v1343 - "Wo bekomme ich diese Werte her?" =======================
+   Nimmt eine PLZ oder eine AGS und sagt, was der zustaendige
+   Gutachterausschuss hinterlegt hat - und wo es steht, wenn nicht.
+   Antwortet IMMER mit 200 und einer Begruendung; eine Auskunft, die mit
+   500 antwortet, sieht im Frontend aus wie ein kaputter Bericht. */
+router.get('/quellen', async (req, res) => {
+  try {
+    let ags = (req.query.ags || '').replace(/\D/g, '');
+    let plzInfo = null;
+    if (!ags && req.query.plz) {
+      plzInfo = await AgsResolver.fromPostcode(req.query.plz);
+      /* v1343b: AgsResolver liefert `gemeinde_ags` und `kreis_ags` -
+         ein Feld `ags` gibt es dort NICHT. Die erste Fassung las genau
+         das und bekam fuer jede PLZ 'keine_ags' zurueck. Dieselbe Sorte
+         Fehler wie v1144 (sachwertfaktor statt wert): der Leser prueft ein
+         Feld, das der Lieferant nie gesetzt hat, und faellt still zurueck.
+
+         Die Gemeindekennziffer hat Vorrang: das Register laeuft die
+         Kaskade 8 -> 5 -> 3 -> 2 und findet mit der feineren Eingabe auch
+         den Kreissatz, umgekehrt aber nicht den Gemeindesatz. */
+      const _ags = plzInfo && (plzInfo.gemeinde_ags || plzInfo.kreis_ags);
+      if (_ags) ags = String(_ags).replace(/[^0-9]/g, '');
+    }
+    if (!ags) {
+      return res.json({ ags: null, grund: 'keine_ags',
+        hinweis: 'Ohne Postleitzahl oder Gemeindeschlüssel lässt sich der zuständige '
+          + 'Gutachterausschuss nicht bestimmen.', hinterlegt: [], fehlt: [], portale: [] });
+    }
+    const q = GAA.quellen({ ags });
+    if (plzInfo) {
+      q.plz = req.query.plz;
+      q.ort = plzInfo.kreis_name || null;
+      q.bundesland = plzInfo.bundesland || null;
+      q.gemeinde_ags = plzInfo.gemeinde_ags || null;
+    }
+    res.json(q);
+  } catch (e) {
+    res.json({ ags: null, grund: 'fehler', hinweis: e.message,
+               hinterlegt: [], fehlt: [], portale: [] });
+  }
+});
+
 router.get('/ags', async (req, res) => {
+
   const info = await AgsResolver.fromPostcode(req.query.plz);
   res.json(info || { error: 'kein AGS gefunden für PLZ ' + (req.query.plz || '') });
 });

@@ -1,0 +1,82 @@
+{
+  "land_code": "HE",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "gaa_kennz": "06AFBFD-MB3",
+  "ags": ["06631006", "06631008", "06631015", "06631017", "06631018", "06631020"],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "Kaufverträge 2023 bis 2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-08",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_datei": "2026_IMB_AfB_Fulda.pdf, Immobilienmarktbericht 2026, Kapitel 10.6.2.2, Tabelle 10-14, Seite 119; Marktbereichskarte Abb. 1-1, Seite 10",
+  "quellenvermerk": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte beim Amt für Bodenmanagement Fulda, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010, kein Korrekturfaktor (Regionalfaktor 1,0), Bezugsmaßstab Bruttogrundfläche, Gesamtnutzungsdauer 80 Jahre nach Leitfaden I, Restnutzungsdauer mindestens rund 25 Prozent der Gesamtnutzungsdauer, lineare Alterswertminderung. Der Sachwertfaktor gilt für Eigenheime mit Nebengebäuden und Außenanlagen.",
+  "fundstelle": "Kapitel 10.6.2.2 Regionale Auswertung Landkreis Fulda 2023-2025 MB 3, Tabelle 10-14, Seite 119.",
+
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 80,
+    "alterswertminderung": "linear",
+    "regionalfaktor": 1.0,
+    "bezugsmassstab": "BGF",
+    "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert"
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser im Landkreis Fulda, Marktbereich 3",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x": [50, 75, 100, 150, 200, 250],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenrichtwert in Euro/m²",
+        "achse_y": [200000, 250000, 300000, 350000, 400000, 450000,
+                    500000, 550000, 600000, 650000, 700000],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "200000": [1.16, 1.21, 1.26, null, null, null],
+          "250000": [1.05, 1.10, 1.14, 1.22, 1.30, null],
+          "300000": [0.99, 1.02, 1.06, 1.12, 1.19, null],
+          "350000": [0.94, 0.97, 1.00, 1.06, 1.11, 1.17],
+          "400000": [0.90, 0.93, 0.95, 1.00, 1.06, 1.11],
+          "450000": [0.88, 0.90, 0.92, 0.97, 1.01, 1.06],
+          "500000": [0.85, 0.87, 0.89, 0.93, 0.97, 1.01],
+          "550000": [0.84, 0.85, 0.87, 0.91, 0.95, 0.98],
+          "600000": [0.82, 0.84, 0.85, 0.89, 0.92, null],
+          "650000": [null, null, 0.84, null, null, null],
+          "700000": [null, null, 0.82, null, null, null]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Marktbereich 3 des Landkreises Fulda — die Stadtregion. Zweiachsige Matrix mit sechs Bodenrichtwert-Stützstellen (50 bis 250 Euro/qm), zwischen denen interpoliert wird. 113 Kauffälle 2023 bis 2025, multipler Korrelationskoeffizient 0,83 — der höchste Wert aller hessischen Ausschüsse im Register. Die beiden untersten Zeilen (650.000 und 700.000 Euro) sind NUR in der Spalte 100 Euro/qm besetzt; das war im Textstrom des PDF nicht eindeutig und wurde an der gerenderten Seite 119 abgelesen.",
+        "normobjekt": "Mittlerer vorläufiger Sachwert 373.740 Euro, mittlere Grundstücksgröße 808 qm, mittlerer Bodenrichtwert 121 Euro/qm, mittlere Restnutzungsdauer 39 Jahre, mittlere Standardstufe 2,6, mittlere BGF 353 qm, mittlere Wohnfläche 168 qm, mittlerer Wert der Außenanlagen 11.255 Euro."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Sechs Gemeinden des Landkreises Fulda im Marktbereich 3: Eichenzell, Flieden, Hünfeld, Künzell, Neuhof, Petersberg. Die Stadt Fulda liegt ebenfalls im Marktbereich 3, ist hier aber AUSGENOMMEN, weil sie einen eigenen Gutachterausschuss führt. Die Zuordnung stammt aus der Übersichtskarte Abb. 1-1 auf Seite 10 des Berichts; die Gemeindeschlüssel aus dem Gemeindeverzeichnis des Statistischen Bundesamtes, Gebietsstand 30.09.2026.",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+        "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+        "kauffaelle": 113,
+        "korrelationskoeffizient": 0.83
+      },
+      "beleg": "Immobilienmarktbericht 2026 der Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Kapitel 10.6.2.2, Tabelle 10-14, Seite 119.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Matrix mit 113 Kauffaellen und multiplem Korrelationskoeffizienten 0,83. KEINE Stufe A, weil der Bericht die Fallzahl nicht je Zelle ausweist und die Randzellen erkennbar duenn besetzt sind - die beiden untersten Zeilen tragen nur noch je einen Wert.",
+      "fallzahl": 113
+    }
+  ],
+
+  "anmerkungen": [
+    "DIE STADT FULDA IST NICHT ENTHALTEN, obwohl sie auf der Karte im Marktbereich 3 liegt. Sie führt einen eigenen Gutachterausschuss mit eigenem Immobilienmarktbericht 2026; für ihr Gebiet ist dieser zuständig (§ 10 ImmoWertV). Dessen Sachwertfaktoren stehen allerdings ausschließlich als Diagramm ohne Formel und ohne Stützstellen — sie sind nicht ablesbar. Für die Stadt Fulda gibt es deshalb keinen Wert im Register, sondern einen Eintrag in AUSSCHUSS_QUELLEN mit dem Weg zur Quelle. Lieber kein Wert als der eines anderen Ausschusses.",
+    "Marktbereich 2 desselben Landkreises hat eine eigene, deutlich andere Tabelle und liegt als eigenes Rezept im Register (HE-06631-fulda-mb2). Bei einem Bodenrichtwert von 100 Euro/qm und 300.000 Euro vorläufigem Sachwert liefert Marktbereich 3 den Wert 1,06, Marktbereich 2 den Wert 0,96.",
+    "Für Reihenendhäuser und Doppelhaushälften druckt der Bericht in Kapitel 10.6.2.5 nur die Merkmale der Datengrundlage ab (17 Kauffälle, Bestimmtheitsmaß 0,57) und zwei Grafiken, KEINE Faktortabelle. Ein rhdhh-Zweig ist deshalb nicht hinterlegt."
+  ]
+}

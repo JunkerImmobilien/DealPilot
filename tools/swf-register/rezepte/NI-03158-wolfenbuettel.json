@@ -1,0 +1,115 @@
+{
+  "land_code": "NI",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Wolfenbüttel",
+  "gaa_kennz": "03158",
+  "ags": ["03158"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "11/2022 bis 11/2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-03-02",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bswf",
+  "quelle_datei": "Tableau-Kalkulator 2026_sw_rh_bswf, Modellbeschreibung bs_2026_sw_modellbeschreibung.pdf",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Reihenhaus/Doppelhaushälfte, Kalkulator 2026_sw_rh_bswf",
+
+  "modelle": [
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhaus / Doppelhaushälfte",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000, 550000],
+        "achse_y_feld": "brw",
+        "achse_y_bez": "Bodenrichtwert in €/m²",
+        "achse_y": [40, 130, 200, 280],
+        "zellen": {
+          "40":  [1.33, 1.13, 0.99, 0.88, 0.80, 0.72, null, null, null, null],
+          "130": [null, 1.16, 1.01, 0.90, 0.82, 0.75, 0.69, null, null, null],
+          "200": [null, null, 1.09, 0.97, 0.88, 0.81, 0.75, 0.69, null, null],
+          "280": [null, null, 1.27, 1.15, 1.05, 0.97, 0.90, 0.84, 0.79, 0.74]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Alle Werte am NORMOBJEKT gemessen (Wohnfläche 120 m², Restnutzungsdauer 40 Jahre, Standardstufe 2,5) — dort stehen alle drei Korrekturkurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen.",
+        "normobjekt": "Wohnfläche 120 m² · Restnutzungsdauer 40 Jahre · Standardstufe 2,5"
+      },
+
+      "korrekturen": [
+        {
+          "bez": "Abweichende Wohnfläche",
+          "feld": "wohnflaeche",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": { "60": 0.95, "80": 0.97, "100": 0.98, "120": 1.00, "140": 1.02,
+                      "160": 1.03, "180": 1.05, "190": 1.06, "200": 1.07 },
+          "rundung_stellen": 2,
+          "hinweis": "Umrechnungskoeffizient aus dem Sekundärdiagramm des Kalkulators. Normstelle 120 m²."
+        },
+        {
+          "bez": "Abweichende Restnutzungsdauer",
+          "feld": "rnd_jahre",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": { "15": 0.72, "25": 0.87, "35": 0.96, "45": 1.03, "55": 1.08,
+                      "65": 1.12, "75": 1.16 },
+          "rundung_stellen": 2,
+          "hinweis": "Normstelle 40 Jahre (zwischen 35 und 45 abgelesen: dort ergibt die Kurve 1,00)."
+        },
+        {
+          "bez": "Abweichende Standardstufe",
+          "feld": "standardstufe",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": { "1.5": 0.81, "2": 0.92, "2.5": 1.00, "3": 1.07, "3.5": 1.12,
+                      "4": 1.17, "4.5": 1.21 },
+          "rundung_stellen": 2,
+          "hinweis": "Normstelle 2,5."
+        }
+      ],
+
+      "modellansaetze": {
+        "verfahren": "multiple Regressionsanalyse aus Kauffalluntersuchungen",
+        "gesamtnutzungsdauer_jahre": 80,
+        "alterswertminderung": "linear (§ 38 ImmoWertV)",
+        "herstellungskosten": "NHK 2010, Anlage 4 ImmoWertV",
+        "baupreisindex": "BPI Neubau Wohngebäude konventioneller Bauart, Basis 2021 = 100, § 36 Abs. 2 ImmoWertV",
+        "modernisierungsgrad": "Anlage 2 ImmoWertV, abweichend von den ImmoWertA gilt der Nds. Erlass vom 16.01.2024",
+        "bodenwert": "Bodenrichtwert × Fläche × Umrechnungskoeffizient, nur rentierliche Flächen",
+        "bruttogrundflaeche": "Anlage 4 I.2 ImmoWertV und DIN 277-1:2005-02, Bereiche a und b",
+        "restnutzungsdauer": "§ 4 Abs. 3 ImmoWertV",
+        "aussenanlagen_eur": "5.000 bis 20.000 (Wochenendhäuser 4.000 bis 15.000)",
+        "garagen_nebengebaeude_eur": "3.000 bis 12.000, im Mittel 5.000",
+        "genauigkeitsmass": "Standardabweichung aus den Residuen, je Funktion konstant: ±0,21",
+        "selektion": "keine Widersprüche bei Musselementen · Anlass Kauf · kein wertbeeinflussender Umstand · keine ungewöhnlichen Verhältnisse · selbständiges Objekt · Sachwert nach NHK 2010 vorhanden · Objekte mit überdurchschnittlichen Baumängeln ausgeschlossen"
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Wolfenbüttel",
+        "sachlich": "Reihenhaus / Doppelhaushälfte",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "kaufzeitpunkt": { "min": "2022-11-01", "max": "2025-11-14", "median": "2024-06-04" },
+          "brw_eur_qm":    { "min": 20, "max": 310, "median": 220 },
+          "wohnflaeche_qm": { "min": 53, "max": 200, "median": 114 },
+          "standardstufe":  { "min": 1.4, "max": 4.5, "median": 2.5 },
+          "rnd_jahre":      { "min": 12, "max": 80, "median": 34 },
+          "sachwert_eur":   { "min": 36482, "max": 589913, "median": 221656 }
+        },
+        "vorbehalt": "ZWEI DINGE, DIE GEMESSEN SIND UND HIERHER GEHÖREN.\n\n(1) IN BODENRICHTWERT-RICHTUNG IST UNSERE INTERPOLATION NICHT ZEICHENGLEICH. Der amtliche Kalkulator rechnet eine geschlossene Regressionsfunktion; die vier Bänder 40/130/200/280 €/m² sind nur ihre Darstellung. Gemessen: bei BRW 240 und 250.000 € Sachwert gibt der Kalkulator 1,05, die lineare Interpolation zwischen 200 (0,97) und 280 (1,15) ergibt 1,06. Abweichung 0,01 bei einer Standardabweichung von ±0,21 — unerheblich für die Aussage, aber NICHT zeichengleich mit der amtlichen Quelle. Deshalb Stufe B.\n\nIn Sachwert-Richtung stimmt die lineare Interpolation dagegen exakt: bei BRW 280 und 275.000 € gibt der Kalkulator 1,10, die Interpolation zwischen 250.000 (1,15) und 300.000 (1,05) ebenfalls 1,10.\n\n(2) DER AMTLICHE KALKULATOR EXTRAPOLIERT, WIR NICHT. Bei BRW 310 (über dem höchsten Band) liefert er 1,26. Diese Matrix endet bei 280 — 'wo die Quelle endet, endet die Rechnung'. Der Stichprobenrahmen reicht beim Bodenrichtwert bis 310 €/m²; wer darüber hinaus rechnet, verlässt ihn ohnehin.",
+        "hinweis": "Der Bericht nennt kein Anwendungsbeispiel mit Zahlen. Prüfmaßstab ist deshalb der Kalkulator selbst: jeder Wert dieser Matrix ist dort einzeln abgefragt worden, am Normobjekt."
+      },
+
+      "stufe": "B",
+      "stufe_grund": "Amtliche Quelle, Werte einzeln am Kalkulator abgefragt und ein Kontrollpunkt reproduziert. Stufe B statt A, weil die Zwischenwerte in Bodenrichtwert-Richtung durch lineare Interpolation entstehen und dort um bis zu 0,01 vom amtlichen Kalkulator abweichen.",
+      "fallzahl": 213,
+      "streuung": 0.21,
+      "beleg": "Kalkulator 2026_sw_rh_bswf (Tableau Public, eingebettet auf gag.niedersachsen.de), Datenbasis 01.01.2026, veröffentlicht 02.03.2026, Stichprobe 213 Kauffälle. 30 Stützpunkte am Normobjekt abgefragt, dazu 23 Stützpunkte der drei Umrechnungskoeffizienten-Kurven. Modellbeschreibung als PDF: bs_2026_sw_modellbeschreibung.pdf."
+    }
+  ]
+}

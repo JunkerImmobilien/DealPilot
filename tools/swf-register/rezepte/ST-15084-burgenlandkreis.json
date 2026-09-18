@@ -1,0 +1,276 @@
+{
+  "land_code": "ST",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "gaa_kennz": "15084",
+  "ags": [
+    "15084"
+  ],
+  "ebene": "kreis",
+  "berichtsjahr": 2024,
+  "stichtag": "2024-07-01",
+  "auswertezeitraum": "bis 07/2024",
+  "beschlossen": null,
+  "veroeffentlicht": "2025-01-22",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_datei": "ST-ezh_sk_blk_msh_vor1991.pdf, ST-ezh_sk_blk_msh_ab1991.pdf, ST-drh_sk_blk_msh_ab1991.pdf",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren veröffentlicht am 22.01.2025, Landesamt für Vermessung und Geoinformation Sachsen-Anhalt",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Modellparameter der landesweiten Modellbeschreibung sind einzuhalten (Modellkonformität).",
+  "fundstelle": "Sachwertfaktoren Landkreise Saalekreis, Burgenlandkreis und Mansfeld-Südharz, Baujahre vor 1991 und ab 1991. Hier der Satz für Burgenlandkreis (Ausprägung „BLK\").",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "baujahrklasse",
+        "achse_k_bez": "Baujahresklasse",
+        "kategorien": [
+          "vor_1991",
+          "ab_1991"
+        ],
+        "zuordnung_feld": "baujahr",
+        "kategorie_baender": [
+          {
+            "von": null,
+            "bis": 1990,
+            "kategorie": "vor_1991"
+          },
+          {
+            "von": 1991,
+            "bis": null,
+            "kategorie": "ab_1991"
+          }
+        ],
+        "modell_je_kategorie": {
+          "vor_1991": {
+            "form": "regression_additiv",
+            "intercept": 5.12475,
+            "terme": [
+              {
+                "feld": "sachwert",
+                "bez": "vorläufiger Sachwert",
+                "koeffizient": -0.0768,
+                "exponent": 0.15,
+                "gueltig": [
+                  58000,
+                  362000
+                ]
+              },
+              {
+                "feld": "standardstufe",
+                "bez": "Gebäudestandard",
+                "koeffizient": -1.3343,
+                "exponent": -0.47,
+                "gueltig": [
+                  1.4,
+                  3.3
+                ]
+              },
+              {
+                "feld": "brw",
+                "bez": "Bodenrichtwert",
+                "koeffizient": -0.6449,
+                "exponent": -0.16,
+                "gueltig": [
+                  11,
+                  110
+                ]
+              },
+              {
+                "feld": "baujahr",
+                "bez": "Baujahr",
+                "koeffizient": -0.0013,
+                "exponent": 1,
+                "gueltig": [
+                  1880,
+                  1990
+                ]
+              }
+            ],
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "DER LANDKREIS IST EIN GLIED DER GLEICHUNG: „+ 0,0415 × Landkreis\" mit den Basiswerten MSH + QFT = 1,09, BLK = 1,70 und SK = 3,09. Für Burgenlandkreis ist die Basis 1,7; der Term ist ins Absolutglied eingerechnet: 5,0542 + 0,0415 × 1,7 = 5,12475. 125 Kauffälle dieser Ausprägung, durchschnittlicher Bodenrichtwert 38 €/m². Multiples Bestimmtheitsmaß 0,37, Variationskoeffizient 0,12. DAS BAUJAHR IST EIGENE EINFLUSSGRÖSSE (− 0,0013 je Jahr) — über die Spanne 1880 bis 1990 macht das 0,14 Faktorpunkte aus."
+          },
+          "ab_1991": {
+            "form": "regression_additiv",
+            "intercept": -0.11258412,
+            "terme": [
+              {
+                "feld": "sachwert",
+                "bez": "vorläufiger Sachwert",
+                "koeffizient": 24.18665376,
+                "exponent": -0.29,
+                "gueltig": [
+                  120000,
+                  665000
+                ]
+              },
+              {
+                "feld": "brw",
+                "bez": "Bodenrichtwert",
+                "koeffizient": 0.07619509,
+                "exponent": 0.25,
+                "gueltig": [
+                  11,
+                  180
+                ]
+              },
+              {
+                "feld": "standardstufe",
+                "bez": "Gebäudestandard",
+                "koeffizient": 0.0600613,
+                "exponent": 1,
+                "gueltig": [
+                  2.3,
+                  4
+                ]
+              }
+            ],
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "Basiswerte des Landkreisglieds ab 1991: MSH + QFT = 0,91, BLK = 2,09, SK = 2,98. Für Burgenlandkreis eingerechnet: −0,33482063 + 0,10633326 × 2,09 = -0,11258412. 47 Kauffälle dieser Ausprägung, durchschnittlicher Bodenrichtwert 42 €/m². Multiples Bestimmtheitsmaß 0,51, Variationskoeffizient 0,11. Der Bericht warnt: zwischen vorläufigem Sachwert und Gebäudestandard besteht ein Korrelationskoeffizient von −0,50, zwischen Bodenrichtwert und Landkreis von 0,50 — die Größen sind nicht unabhängig voneinander anwendbar."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "ZWEI GLEICHUNGEN, BEIDE MIT EINEM LANDKREIS-GLIED. Der Ausschuss wertet Saalekreis, Burgenlandkreis und Mansfeld-Südharz gemeinsam aus und trennt sie über eine Kennziffer. Hier steht je Kreis ein eigener Satz mit fertig eingerechnetem Absolutglied — damit greift der richtige Wert allein über den Kreisschlüssel.",
+        "normobjekt": "NHK 2010 gemäß Anlage 4 ImmoWertV, BGF aus amtlichen Geobasisdaten, Regionalfaktor 1, Eigennutzung, kein Neubau oder Erstverkauf."
+      },
+      "korrekturen": [],
+      "modellansaetze": {
+        "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
+        "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
+        "regionalfaktor": 1
+      },
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Burgenlandkreis",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwert_vor_1991": {
+            "min": 58000,
+            "max": 362000
+          },
+          "sachwert_ab_1991": {
+            "min": 120000,
+            "max": 665000
+          },
+          "brw_vor_1991": {
+            "min": 11,
+            "max": 110
+          },
+          "brw_ab_1991": {
+            "min": 11,
+            "max": 180
+          },
+          "baujahr_vor_1991": {
+            "min": 1880,
+            "max": 1990
+          },
+          "standardstufe_vor_1991": {
+            "min": 1.4,
+            "max": 3.3
+          },
+          "standardstufe_ab_1991": {
+            "min": 2.3,
+            "max": 4
+          }
+        },
+        "vorbehalt": "DIE EINFLUSSGRÖSSEN SIND NICHT UNABHÄNGIG — der Bericht sagt es für beide Gleichungen ausdrücklich.\n\nDAS BAUJAHR IST FÜR OBJEKTE VOR 1991 EINE EIGENE EINFLUSSGRÖSSE und auf 1880 bis 1990 begrenzt. Ein älteres Haus liegt außerhalb der Stichprobe, auch wenn alle anderen Merkmale passen.\n\nDer Burgenlandkreis ist das Normobjekt beider Blätter — die abgedruckten Kurven gelten unmittelbar für ihn.",
+        "hinweis": "Die Ausprägung „BLK\" umfasst 125 Kauffälle für Baujahre vor 1991 und 47 ab 1991."
+      },
+      "stufe": "A",
+      "stufe_grund": "Amtliche Regressionsfunktionen, Glied für Glied übernommen, und an der ABGEDRUCKTEN NORMOBJEKT-KURVE geprüft: 16 von 16 Stützstellen von 60.000 bis 360.000 Euro zeichengleich (Normobjekt ist der Burgenlandkreis). Damit ist auch der ins Absolutglied gezogene Landkreis-Basiswert belegt — dieselbe Gleichung trifft für alle drei Ausprägungen. Der Bericht schränkt die Unabhängigkeit der Einflussgrößen ein; das steht als Vorbehalt im Satz.",
+      "fallzahl": 172,
+      "streuung": null,
+      "beleg": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser, Landkreise Saalekreis, Burgenlandkreis und Mansfeld-Südharz, veröffentlicht am 22.01.2025: Baujahre vor 1991 (R² = 0,37) und ab 1991 (R² = 0,51), Ausprägung „BLK\" mit 125 und 47 Kauffällen."
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser und Doppelhaushälften, Baujahre ab 1991",
+      "form": "regression_additiv",
+      "formel": {
+        "form": "regression_additiv",
+        "intercept": -0.11258412,
+        "terme": [
+          {
+            "feld": "sachwert",
+            "bez": "vorläufiger Sachwert",
+            "koeffizient": 24.18665376,
+            "exponent": -0.29,
+            "gueltig": [
+              149000,
+              389000
+            ]
+          },
+          {
+            "feld": "brw",
+            "bez": "Bodenrichtwert",
+            "koeffizient": 0.07619509,
+            "exponent": 0.25,
+            "gueltig": [
+              20,
+              180
+            ]
+          },
+          {
+            "feld": "standardstufe",
+            "bez": "Gebäudestandard",
+            "koeffizient": 0.0600613,
+            "exponent": 1,
+            "gueltig": [
+              2.2,
+              3.7
+            ]
+          }
+        ],
+        "bedingungen": [
+          {
+            "feld": "baujahr",
+            "mindestens": 1991,
+            "bez": "Baujahr",
+            "text": "ab 1991 liegt"
+          }
+        ],
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "DIESELBE GLEICHUNG WIE BEIM FREISTEHENDEN HAUS AB 1991, mit engeren Stichprobenspannen (149.000 bis 389.000 € statt 120.000 bis 665.000). Landkreisglied für Burgenlandkreis eingerechnet. FÜR BAUJAHRE VOR 1991 FÜHRT DER BERICHT EINE GANZ ANDERE GLEICHUNG — sie rechnet ohne vorläufigen Sachwert und mit drei diskreten Merkmalen (Baujahresklasse, Regionstyp, Landkreis) und ist hier noch nicht erfasst. Deshalb sperrt eine Bedingung dieses Modell für ältere Baujahre, statt es stillschweigend anzuwenden.",
+        "normobjekt": "Wie beim freistehenden Haus."
+      },
+      "korrekturen": [],
+      "modellansaetze": {
+        "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
+        "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert"
+      },
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Burgenlandkreis",
+        "sachlich": "Reihenhäuser und Doppelhaushälften, Baujahre ab 1991",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwert_eur": {
+            "min": 149000,
+            "max": 389000
+          },
+          "brw_eur_qm": {
+            "min": 20,
+            "max": 180
+          },
+          "standardstufe": {
+            "min": 2.2,
+            "max": 3.7
+          }
+        },
+        "vorbehalt": "NUR FÜR BAUJAHRE AB 1991. Für ältere Reihenhäuser und Doppelhaushälften führt der Ausschuss eine eigene Gleichung mit drei diskreten Merkmalen (Baujahresklasse, Regionstyp, Landkreis) und OHNE den vorläufigen Sachwert — dort war er keine signifikante Einflussgröße. Diese Gleichung braucht die gemeindescharfe Regionstyp-Zuordnung und ist noch nicht erfasst; bis dahin gibt dieser Satz für Baujahre vor 1991 keinen Wert.",
+        "hinweis": "Die Gleichung ist mit der des freistehenden Hauses ab 1991 identisch; der Ausschuss hat beide Objektarten gemeinsam ausgewertet."
+      },
+      "stufe": "A",
+      "stufe_grund": "Amtliche Regressionsfunktion, Glied für Glied übernommen, mit eingerechnetem Landkreis-Basiswert.",
+      "fallzahl": null,
+      "streuung": null,
+      "beleg": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für Reihenhäuser und Doppelhaushälften, Landkreise Saalekreis, Burgenlandkreis und Mansfeld-Südharz, Baujahre ab 1991, veröffentlicht am 22.01.2025, R² = 0,51."
+    }
+  ]
+}

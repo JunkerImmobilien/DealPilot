@@ -1,6 +1,7 @@
 // v564-neutralized: Anbieternamen aus provenance + steps entfernt
 // ReportOrchestrator.js — orchestriert die gesamte Bericht-Pipeline.
 import { q, q1 } from '../lib/db.js';
+import { quelleFuer, quellenSatz } from '../lib/quellen_links.js';   /* v1099b-WQL */
 import { cfg, geomapEnabled, geoEnabled } from '../lib/config.js';
 import { GeocodingService } from './GeocodingService.js';
 import { MarketAnalysisService } from './MarketAnalysisService.js';
@@ -18,7 +19,8 @@ import { CrossCheckService } from './CrossCheckService.js';
 import { flaechenaufteilung, manuelleAufteilung } from '../lib/umrechnung_nrw.js';
 /* v1073-WGAA-4 · Vorschlag fuer den Gartenland-Wertansatz aus dem
  * zustaendigen Grundstuecksmarktbericht. */
-import { gartenland as gartenlandVorschlag, zustaendig as gaaZustaendig }
+import { gartenland as gartenlandVorschlag, zustaendig as gaaZustaendig,
+         erbbaurechtskoeffizient as erbbauKoeffizient }   /* v1342 */
   from '../lib/gutachterausschuss.js';
 import { ScoringService } from './ScoringService.js';
 import { ReportGenerationService } from './ReportGenerationService.js';
@@ -33,6 +35,8 @@ import { vergleichsfaktor as amtlicherVf } from '../lib/vergleichsfaktoren_nrw.j
 import { AgsResolver } from '../connectors/AgsResolver.js';
 import { ZensusConnector } from '../connectors/ZensusConnector.js';
 import * as Erbbaurecht from '../lib/erbbaurecht.js';   /* v1320 */
+import { ableiten as ausstAbleiten, zusammenfuehren as ausstMerge }
+  from '../lib/ausstattung_stufen.js';   /* v1345 */
 import { finde as findeKennzahl } from '../lib/ausschuss_register.js';   /* v1320b */
 import { MarktkontextService } from './MarktkontextService.js';   /* v1321 */
 
@@ -93,6 +97,25 @@ export const ReportOrchestrator = {
       modernization: input.modernization || null,
       modernization_year: input.modernization_year ? Number(input.modernization_year) : null,
       energy_class: input.energy_class || null,
+      /* v1427b-ZFH · aus dem App-Import ODER aus einer Objektart zfh */
+      zweifamilienhaus: input.zweifamilienhaus === true
+        || /(^|[^a-z])zfh([^a-z]|$)|zweifamilien/i.test(String(input.property_type || '')),
+      /* === v1345 - DIE AUSSTATTUNGSFELDER KAMEN NIE AN =================
+         Gemessen am 13.09.2026: zehn Felder des Formulars standen in KEINER
+         Datenliste dieses Dienstes. Der Nutzer fuellte sie aus, das Frontend
+         schickte sie, und hier fielen sie still weg. Dieselbe Lehre wie
+         v1055, v1062, v1067, v1074: die ref-Liste ist ausdruecklich, wer
+         hier fehlt, existiert fuer den Bericht nicht. */
+      eq_energie: input.eq_energie || null,
+      eq_heating: input.eq_heating || null,
+      eq_windows: input.eq_windows || null,
+      eq_floor: input.eq_floor || null,
+      eq_bath: input.eq_bath || null,
+      eq_guest_wc: input.eq_guest_wc || null,
+      eq_store_room: input.eq_store_room || null,
+      eq_walls: input.eq_walls || null,
+      eq_dachform: input.eq_dachform || null,
+      eq_roof: input.eq_roof || null,
       bathrooms: input.bathrooms ? Number(input.bathrooms) : null,
       balcony_area: input.balcony_area ? Number(input.balcony_area) : null,
       garden_area: input.garden_area ? Number(input.garden_area) : null,
@@ -133,8 +156,22 @@ export const ReportOrchestrator = {
       beitrag_abzug_eur: input.beitrag_abzug_eur ? Number(input.beitrag_abzug_eur) : null,
       stellplatz_miete_monat: input.stellplatz_miete_monat ? Number(input.stellplatz_miete_monat) : null,
       bwk_modus: input.bwk_modus || null,
-      bog_eur: input.bog_eur ? Number(input.bog_eur) : null,
-      bog_grund: input.bog_grund || null,
+      /* === v1338c - EIN FELDPAAR, BEIDE VERFAHREN ======================
+         `bog_eur` und `bog_grund` gibt es hier und im ErtragswertService
+         seit jeher - und im Formular gab es dafuer KEIN Feld. Sie waren
+         also nur ueber einen direkten API-Aufruf erreichbar; ueber die
+         Oberflaeche hat sie nie jemand setzen koennen.
+
+         Besondere objektspezifische Grundstuecksmerkmale nach Paragraf 8
+         Abs. 3 ImmoWertV sind Eigenschaften des GRUNDSTUECKS - sie haengen
+         nicht am Verfahren. Ein Schimmelschaden ist im Ertragswert
+         derselbe wie im Sachwert. Deshalb speist das neue Feldpaar
+         (`bom_eur`/`bom_grund`, v1338) beide; die alten Namen behalten
+         Vorrang, damit ein Aufrufer, der sie schon setzt, nichts merkt. */
+      bog_eur: Number.isFinite(Number(input.bog_eur)) ? Number(input.bog_eur)
+        : (Number.isFinite(Number(input.bom_eur)) ? Number(input.bom_eur) : null),
+      bog_grund: input.bog_grund || input.bom_grund || null,
+
       wert_stufe: input.wert_stufe ? Number(input.wert_stufe) : 1,
       /* WNHK-3 · Sachwertfelder aus dem Formular */
       nhk_typ: input.nhk_typ || null,
@@ -152,6 +189,16 @@ export const ReportOrchestrator = {
       regionalfaktor: input.regionalfaktor ? Number(input.regionalfaktor) : null,
       sachwertfaktor: input.sachwertfaktor ? Number(input.sachwertfaktor) : null,
       bes_bauteile: input.bes_bauteile ? Number(input.bes_bauteile) : null,
+      /* v1338: bOM nach Paragraf 8 Abs. 3 ImmoWertV. Die ref-Liste ist
+         ausdruecklich - wer hier fehlt, existiert fuer den Bericht nicht
+         (dieselbe Lehre wie v1055, v1062, v1067, v1074).
+         `? :` auf Wahrheit waere hier falsch: ein Abzug ist negativ und
+         0 ist eine Aussage. */
+      bom_eur: Number.isFinite(Number(input.bom_eur)) ? Number(input.bom_eur) : null,
+      bom_grund: input.bom_grund || null,
+      bom_worst_eur: Number.isFinite(Number(input.bom_worst_eur)) ? Number(input.bom_worst_eur) : null,
+      rnd_verkuerzt: input.rnd_verkuerzt === true || input.rnd_verkuerzt === 'ja',
+
       /* v1071-WHIN-3 · Zusaetzliche Grundstuecksflaeche mit eigenem Ansatz. */
       hinterland_qm: input.hinterland_qm ? Number(input.hinterland_qm) : null,
       hinterland_eur_qm: input.hinterland_eur_qm ? Number(input.hinterland_eur_qm) : null,
@@ -172,6 +219,37 @@ export const ReportOrchestrator = {
         ?? input.inst ?? input.instandhaltung ?? null,
       leerstand_pct: input.leerstand_pct ?? input.leerstand ?? input.mietausfall ?? null,
     };
+
+    /* === v1345 - AUS DEN AUSSTATTUNGSANGABEN EIN STANDARDSTUFEN-VORSCHLAG
+       Sechs der Felder beschreiben Gewerke der Anlage 4 ImmoWertV:
+       Aussenwaende (Waegung 23), Dach (15), Fenster (11), Sanitaer (9),
+       Heizung (9), Fussboeden (5) = 72 von 100 Waegungsanteilen.
+
+       DIE EIGENE ANGABE GEWINNT IMMER. Wer die Gewerke selbst einschaetzt,
+       dessen Zahl steht; der Vorschlag fuellt nur, was leer ist. Ein
+       Vorschlag, der eine Eingabe ueberschreibt, ist kein Vorschlag.
+
+       Und er ergibt fuer sich KEINE Standardstufe: `standardstufeAusGewerken`
+       verlangt volle 100 Waegungsanteile. Die restlichen drei Gewerke
+       (Innenwaende, Decken/Treppen, sonstige Technik) bleiben eine
+       sachverstaendige Einschaetzung. Aus 72 Anteilen hochzurechnen waere
+       eine Behauptung. */
+    try {
+      const _av = ausstAbleiten(ref);
+      if (_av.anzahl > 0) {
+        const _zus = ausstMerge(ref.ausstattung || {}, _av.gewerke);
+        ref.ausstattung = _zus.gewerke;
+        ref.ausstattung_herkunft = {
+          woher: _zus.woher,
+          abgeleitet: _av.herkunft,
+          hinweise: _av.hinweise,
+          stufe: 'D',
+          vermerk: 'Aus den Ausstattungsangaben abgeleitet, nicht aus Anlage 4 '
+            + 'ImmoWertV zitiert. Eigene Einschaetzungen haben Vorrang.',
+        };
+        step('ausstattung: ' + _av.anzahl + ' Gewerk(e) aus den Angaben abgeleitet');
+      }
+    } catch (e) { step('ausstattung: Ableitung uebersprungen (' + e.message + ')'); }
 
     // 2) Property persistieren
     step('property: insert');
@@ -250,10 +328,31 @@ export const ReportOrchestrator = {
       return z;
     })().catch((e) => { step('zensus: fehler ' + e.message); return { available: false, source: 'zensus2022', reason: e.message }; });
 
-    // Bodenrichtwert (BORIS-NRW, echt; nur NRW) als eigener paralleler Strang:
+    /* ═══ v1392 · DERSELBE WEG WIE IM TAB OBJEKT ═════════════════════════
+     *
+     * Marcels Frage: „hast du die verknuepft mit der abfrage des
+     * bodenrichtwertes im tab objekt und im marktbericht und auch beim
+     * sprechlauf? falls wir dort noch einen alten weg haben sollten wir
+     * den dann rausnehmen."
+     *
+     * GEMESSEN: Es gab zwei Aufrufer, und nur einer war auf dem neuen
+     * Stand. Der Tab Objekt gibt seit v1388 das Bundesland mit; HIER stand
+     * der Aufruf ohne — der Kommentar sagte es sogar noch selbst:
+     * „BORIS-NRW, echt; nur NRW". Damit lief der Marktbericht (und der
+     * Sprechlauf, der ueber /reports/from-dealpilot geht) weiter in die
+     * Rechteck-Falle aus v1388: fuer Rinteln kam kein Bodenrichtwert,
+     * obwohl der Tab Objekt daneben 80 EUR/m2 zeigte.
+     *
+     * Das Land kommt hier aus dem AMTLICHEN GEMEINDESCHLUESSEL, nicht aus
+     * der Postleitzahl — die ersten zwei Ziffern sind das Bundesland, und
+     * das ist eindeutig. Der AGS-Strang laeuft ohnehin (agsP, Z. 295);
+     * hier wird nur auf ihn gewartet. */
     const borisP = (async () => {
-      const lv = await BorisConnector.landValue({ lat, lon, manualBrw: ref.land_value_manual });
-      step(`Bodenrichtwert: ${lv && lv.available ? lv.value_sqm + ' EUR/m²' : 'keine Daten'}`);
+      let land = null;
+      try { land = (await agsP)?.land_code || null; } catch (e) { land = null; }
+      const lv = await BorisConnector.landValue({ lat, lon, land, manualBrw: ref.land_value_manual });
+      step(`Bodenrichtwert: ${lv && lv.available ? lv.value_sqm + ' EUR/m²' : 'keine Daten'}`
+           + (land ? ` (${land})` : ''));
       return lv;
     })().catch((e) => { step('boris: fehler ' + e.message); return null; });
 
@@ -303,7 +402,24 @@ export const ReportOrchestrator = {
         _agsWert = String((_ai && (_ai.gemeinde_ags || _ai.kreis_ags)) || '').replace(/\D/g, '');
       } catch (e) { /* ohne Schluessel bleibt es beim Auffangwert */ }
     }
+    /* v1102-WORT - DER ORTSNAME IST EIN WERTMERKMAL, kein Beiwerk.
+       Barnim druckt VIER Sachwertfaktor-Funktionen ab, eine je Region,
+       und die Regionen sind ueber Gemeinden und Ortsteile definiert
+       (1,25 gegen 0,96 - der Unterschied ist groesser als jede
+       Alterskorrektur). Der Name lag zweimal vor, in BORIS und in der
+       Geokodierung, wurde aber nur fuer die amtliche Miete benutzt.
+       Ab hier haengt er am ref und steht damit JEDEM Baustein offen. */
+    try {
+      const _bpO = (landValue && landValue.properties_raw) || {};
+      ref.gemeinde = ref.gemeinde || _bpO.Gemeinde || _bpO.GENA
+        || (geo && geo.components && (geo.components.city || geo.components.town)) || null;
+      ref.ortsteil = ref.ortsteil
+        || (geo && geo.components && geo.components.district) || null;
+    } catch (e) { /* ohne Ortsnamen laeuft alles weiter wie bisher */ }
+    step('ort: ' + (ref.gemeinde || 'KEINER')
+      + (ref.ortsteil ? ' / ' + ref.ortsteil : ''));
     step('wertparameter: ags=' + (_agsWert || 'KEINER'));
+
     /* v1075-WAGS-1 · ref.ags war NIE gesetzt (kein Formularfeld, keine
      * Zuweisung) — alle 'ags: ref.ags'-Stellen dahinter (Hinterland, UK,
      * IRW, Vergleichsfaktoren, Sachwertfaktor im CrossCheck) liefen mit
@@ -746,7 +862,32 @@ export const ReportOrchestrator = {
         const _rnd = (_wertParams && _wertParams.restnutzungsdauer != null)
           ? _wertParams.restnutzungsdauer
           : (ref.build_year ? Math.max(20, 80 - (new Date().getFullYear() - ref.build_year)) : null);
+        /* === v1342 - DEN MARKTABGELEITETEN KOEFFIZIENTEN HOLEN =========
+           Liegt fuer diesen Ort und diese Objektart ein Erbbaurechts-
+           koeffizient vor (v1339), geht er der Formel vor. Er stammt aus
+           tatsaechlichen Kauffaellen und enthaelt, was Paragraf 50 nicht
+           kennt: Vertragsbedingungen, Anpassungsklauseln, Heimfallrisiko.
+
+           Kein Treffer heisst kein Wert - dann rechnet die Formel weiter,
+           genau wie bisher. Ein Koeffizient aus einem anderen Kreis wird
+           NICHT ersatzweise genommen (Paragraf 10 ImmoWertV); die Sperre
+           dafuer sitzt im Register-Leser. */
+        let _koeff = null, _koeffQuelle = null, _koeffSpanne = null;
+        try {
+          const _k = erbbauKoeffizient({
+            ags: (p && p.ags) || ref.ags || null,
+            objektart: ref.property_type,
+            baujahr: ref.build_year || null,
+          });
+          if (_k && _k.verfuegbar && Number(_k.wert) > 0) {
+            _koeff = Number(_k.wert);
+            _koeffQuelle = _k.quelle_text || _k.ausschuss || null;
+            _koeffSpanne = _k.spanne || null;
+          }
+        } catch (e) { /* ohne Koeffizient rechnet die Formel weiter */ }
+
         erbbau = Erbbaurecht.compute({
+
           volleigentum: _mv,
           bodenwert: _bwGesamt,
           restlaufzeit: ref.leasehold_years_left,
@@ -754,14 +895,18 @@ export const ReportOrchestrator = {
           objektart: ref.property_type,
           restnutzungsdauer: _rnd,
           zinssatzAngemessen: _zinsAmtlich,
+          koeffizient: _koeff,                /* v1342 */
+          koeffizientQuelle: _koeffQuelle,
+          koeffizientSpanne: _koeffSpanne,
         });
+
         if (erbbau && erbbau.ok && _zinsAmtlich != null) {
           erbbau.annahmen.zinsQuelle = _zinsQuelle;
           erbbau.annahmen.zinsHinweis = _zinsHinweis;
           erbbau.hinweise.push(`Der angemessene Erbbauzins von ${_zinsAmtlich.toFixed(1).replace('.', ',')} % ist oertlich erhoben (${_zinsQuelle}), nicht die bundesweite Marktmitte.`);
         }
         step(erbbau.ok
-          ? `Erbbaurecht: Abschlag ${Math.round(erbbau.abschlag).toLocaleString('de-DE')} EUR (${erbbau.abschlagPct.toFixed(1)} %)`
+          ? `Erbbaurecht (${erbbau.weg === 'koeffizient' ? 'Koeffizient ' + _koeff : '\u00a7 50'}): Abschlag ${Math.round(erbbau.abschlag).toLocaleString('de-DE')} EUR (${erbbau.abschlagPct.toFixed(1)} %)`
           : `Erbbaurecht: erkannt, aber nicht rechenbar (fehlt: ${erbbau.fehlt.join(', ')})`);
       } catch (e) {
         step('erbbaurecht: fehler ' + e.message);
@@ -871,9 +1016,24 @@ export const ReportOrchestrator = {
                   D: ['indikativ, gesetzlicher Auffangwert', 'nach § 256 BewG, nicht marktabgeleitet', true],
                   E: ['eigene Angabe', 'vom Nutzer gesetzt', true] }[st]
                 || ['indikativ', 'Herkunft nicht bestimmbar', true];
+        /* v1099b-WQL · Der Weg zur Quelle geht auch an den BILDSCHIRM.
+         * Im PDF steht er seit v1099; die Web-Ansicht las `wertermittlung_
+         * herkunft` und hatte das Feld nicht. Ein Link, den nur das PDF
+         * zeigt, erreicht den halben Weg. */
+        var _qlnk = null;
+        try {
+          var _qa = (_wertParams && _wertParams.lzs_quelle_link) || null;
+          if (!_qa) {
+            var _q2 = quelleFuer((ref && ref.ags) || null);
+            if (_q2) _qa = Object.assign({}, _q2, { satz: quellenSatz(_q2, 'liegenschaftszinssatz') });
+          }
+          _qlnk = _qa;
+        } catch (e) { _qlnk = null; }
         return { stufe: st, kurz: e[0], lang: e[1], indikativ: e[2],
                  liegenschaftszins_pct: _wertParams ? _wertParams.lzs_pct : null,
-                 quelle: _wertParams ? _wertParams.lzs_quelle : null };
+                 quelle: _wertParams ? _wertParams.lzs_quelle : null,
+                 quelle_link: _qlnk };
+
       })(),
     /* WKIGEG-2 · Zweitmeinung im Bericht, klar getrennt vom Ergebnis. */
       ki_gegenrechnung: _kiGegen,

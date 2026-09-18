@@ -1,0 +1,107 @@
+{
+  "land_code": "BB",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Potsdam",
+  "gaa_kennz": "12054",
+  "ags": ["12054000"],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2025,
+  "stichtag": "2025-07-01",
+  "auswertezeitraum": "Januar 2025 bis Dezember 2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-06-25",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_P.pdf",
+  "quelle_datei": "BB-potsdam-gmb-2025.pdf",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht. Der Bericht verlangt ZUSÄTZLICH zur Quellenangabe die Nennung der Internetadresse https://gutachterausschuss.brandenburg.de — dieselbe doppelte Auflage wie in Niedersachsen.",
+  "fundstelle": "Kap. 8.2.2 (S. 47 f.) und 8.3.2 (S. 57 f.), Modellvermerk Anhang A ab S. 105",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "Ein- und Zweifamilienhäuser sowie kleine Villen und Landhäuser (bis 300 m² Wohnfläche)",
+      "form": "konstante",
+      "formel": {
+        "form": "konstante",
+        "wert": 1.06,
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Ein einziger Faktor für das ganze Stadtgebiet. Der Bericht stellt ausdrücklich fest, dass KEINE statistische Abhängigkeit des vorläufigen Sachwerts zum Sachwertfaktor nachweisbar war — deshalb eine Konstante und keine Kurve. Spanne der Stichprobe 0,69 bis 1,47, Vertrauensbereich (95 %) 1,01 bis 1,12.",
+        "normobjekt": "Übliche Außenanlagen, ein bis zwei Garagen oder Carports und typische Nebengebäude sind im vorläufigen Sachwert mitberücksichtigt. Einbauküche mit mittlerem Standard in der Regel vorhanden."
+      },
+      "korrekturen": [],
+      "modellansaetze": {
+        "verfahren": "Sachwertverfahren §§ 35 bis 39 ImmoWertV 2021, Marktanpassung nach § 21 ImmoWertV 2021 / § 193 Abs. 5 Satz 2 BauGB",
+        "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert des typischen Objektes",
+        "typisches_objekt": "übliche Außenanlagen, ein bis zwei Garagen oder Carports, typische Nebengebäude, Einbauküche mittleren Standards",
+        "nicht_beruecksichtigt": "große Villen über 300 m² Wohnfläche · Bauern- und Vierseitengehöfte · Grundstücke über 1.500 m² · Wohnfläche unter 80 oder über 300 m² · Bodenwertanteil am Kaufpreis über 80 % · Abweichung zwischen Kaufpreis und normiertem Kaufpreis über 20 % · Grundstücke mit direktem oder indirektem Wasserzugang · ungewöhnliche oder persönliche Verhältnisse · Erbbaurecht · Mischnutzung Wohnen/Gewerbe · Paketverkäufe",
+        "besonderheit": "Kauffälle mit denkmalgeschützten Hauptgebäuden wurden ausdrücklich EINBEZOGEN."
+      },
+      "geltungsbereich": {
+        "raeumlich": "Landeshauptstadt Potsdam",
+        "sachlich": "Ein- und Zweifamilienhäuser, Landhäuser und Villen bis 300 m² Wohnfläche, gewerblicher Anteil 0 %",
+        "extrapolation": "nicht_geregelt",
+        "spannen": {
+          "bodenwertniveau_eur_qm": { "min": 150, "max": 900, "mittel": 595 },
+          "standardstufe":          { "min": 3, "max": 4 },
+          "rnd_jahre":              { "min": 34, "max": 74, "mittel": 54 },
+          "bgf_qm":                 { "min": 125, "max": 520, "mittel": 275 },
+          "sachwert_eur":           { "min": 358000, "max": 1069000, "mittel": 693000 },
+          "wohnflaeche_qm":         { "min": 90, "max": 230 },
+          "gsflaeche_qm":           { "min": 335, "max": 990 },
+          "baujahr":                { "von": "19. Jh.", "bis": 2019 }
+        },
+        "vorbehalt": "DIE SPANNE IST WEIT. Der Mittelwert 1,06 steht einer Stichprobenspanne von 0,69 bis 1,47 gegenüber — das ist mehr als das Doppelte vom unteren zum oberen Rand. Der Vertrauensbereich (95 %) von 1,01 bis 1,12 gilt für den MITTELWERT, nicht für das Einzelobjekt. Der Bericht sagt es selbst: „Die ausgewiesenen Faktoren sind entsprechend den objektspezifischen Merkmalen sachverständig anzuwenden und ggf. anzupassen.\"",
+        "hinweis": "Die Kennzahlen der Stichprobe sind laut Bericht zur ERLÄUTERUNG angegeben und legen „nicht unbedingt nahe, dass sie einen signifikanten Werteinfluss haben\"."
+      },
+      "stufe": "B",
+      "stufe_grund": "Amtlicher Wert mit vollständigem Modellvermerk, aber ohne Anwendungsbeispiel und mit weiter Streuung (0,69 bis 1,47 bei 48 Kauffällen).",
+      "fallzahl": 48,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 Landeshauptstadt Potsdam, Abb. 63, S. 48: durchschnittlicher Sachwertfaktor 1,06, Spanne der Stichprobe 0,69 bis 1,47, Vertrauensbereich (95 %) 1,01 bis 1,12, 48 Kauffälle, Stichtag 01.07.2025."
+    },
+
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser, Doppelhaushälften und Siedlungshäuser",
+      "form": "konstante",
+      "formel": {
+        "form": "konstante",
+        "wert": 1.40,
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Spanne der Stichprobe 0,85 bis 1,92, Vertrauensbereich (95 %) 1,35 bis 1,45. ANDERS ALS BEI DEN FREISTEHENDEN HÄUSERN konnte hier eine statistische Abhängigkeit des vorläufigen Sachwerts zum Sachwertfaktor ermittelt werden — der Bericht weist sie als Diagramm aus (Abb. 81/82) und gibt dazu keine Zahlen. Geführt ist deshalb der Mittelwert; die Abhängigkeit ist im Einzelfall sachverständig zu berücksichtigen.",
+        "normobjekt": "Übliche Außenanlagen, ABER KEINE Garagen, Carports oder Nebengebäude im vorläufigen Sachwert. Einbauküche mit mittlerem Standard in der Regel vorhanden."
+      },
+      "korrekturen": [],
+      "modellansaetze": {
+        "verfahren": "Sachwertverfahren §§ 35 bis 39 ImmoWertV 2021",
+        "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert des typischen Objektes",
+        "typisches_objekt": "übliche Außenanlagen, KEINE Garagen/Carports/Nebengebäude, Einbauküche mittleren Standards",
+        "unterschied_zu_ezfh": "Beim freistehenden Haus sind ein bis zwei Garagen oder Carports und typische Nebengebäude im vorläufigen Sachwert enthalten, beim Reihenhaus NICHT. Wer denselben vorläufigen Sachwert für beide Zweige bildet, rechnet mit dem falschen Modell."
+      },
+      "geltungsbereich": {
+        "raeumlich": "Landeshauptstadt Potsdam",
+        "sachlich": "Reihenhäuser, Doppelhaushälften, Siedlungshäuser, gewerblicher Anteil 0 %",
+        "extrapolation": "nicht_geregelt",
+        "spannen": {
+          "bodenwertniveau_eur_qm": { "min": 450, "max": 900, "mittel": 665 },
+          "standardstufe":          { "min": 3, "max": 4 },
+          "rnd_jahre":              { "min": 32, "max": 73, "mittel": 55 },
+          "bgf_qm":                 { "min": 120, "max": 330, "mittel": 195 },
+          "sachwert_eur":           { "min": 240000, "max": 595000, "mittel": 406000 },
+          "wohnflaeche_qm":         { "min": 90, "max": 170 },
+          "gsflaeche_qm":           { "min": 95, "max": 780 },
+          "baujahr":                { "von": "19. Jh.", "bis": 2018 }
+        },
+        "vorbehalt": "Spanne 0,85 bis 1,92 bei 81 Kauffällen. Zusätzlich weist der Bericht Sachwertfaktoren je Untersuchungsraum aus (Abb. 83) — als Grafik ohne Zahlentabelle, deshalb hier nicht geführt. Wer für ein bestimmtes Potsdamer Gebiet rechnet, sollte dort nachsehen."
+      },
+      "stufe": "B",
+      "stufe_grund": "Amtlicher Wert mit vollständigem Modellvermerk. Stufe B, weil eine nachgewiesene Abhängigkeit vom vorläufigen Sachwert und eine Gliederung nach Untersuchungsräumen existieren, die der Bericht nur grafisch ausweist — der geführte Mittelwert ist damit gröber als das, was der Ausschuss kennt.",
+      "fallzahl": 81,
+      "streuung": null,
+      "beleg": "Grundstücksmarktbericht 2025 Landeshauptstadt Potsdam, Abb. 80, S. 58: durchschnittlicher Sachwertfaktor 1,40, Spanne 0,85 bis 1,92, Vertrauensbereich (95 %) 1,35 bis 1,45, 81 Kauffälle, Stichtag 01.07.2025."
+    }
+  ]
+}

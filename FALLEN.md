@@ -2870,3 +2870,1646 @@ gelesen.
 **Regel: Bevor man „kommt aus dem Formular" als Ausschlusskriterium
 benutzt, prüfen, wie viele verschiedene Wege in dieses Formular führen.**
 Ein Speicherort ist keine Herkunft.
+
+## 132 · Eine Sicherung, die nur an Ereignissen hängt, misst sich selbst
+
+`setVal()` im Marktbericht überschrieb Nutzereingaben. Die erste Sicherung
+merkte sich angefasste Felder über `input`/`change` mit `isTrusted`.
+
+**Die Regel war richtig und die Messung trotzdem rot** — der Testaufbau
+setzte `el.value` und feuerte ein synthetisches Ereignis, das Register
+blieb leer. Sie hätte umgekehrt genauso gut grün sein können.
+
+**Regel: eine Sicherung gegen Überschreiben braucht einen Anker, den auch
+ein Prüfwerkzeug auslöst.** Der Wert selbst ist so ein Anker: vergleichen,
+was im Feld steht, mit dem, was zuletzt von dort hineingeschrieben wurde.
+Das Ereignis bleibt als zweite, unabhängige Sicherung daneben.
+
+## 133 · Ein Ausgangsstand, der LAZY erfasst wird, ist immer zu spät
+
+Nachfolgefehler von 132. Der Vergleichswert wurde beim ersten `setVal` für
+ein Feld gesetzt — und der erste `setVal` IST der Aufruf, gegen den die
+Sperre schützen soll. Er trug den bereits getippten Wert als
+„Ausgangsstand" ein, verglich ihn mit sich selbst und winkte sich durch.
+
+Gefunden über einen Setter auf `#address`, der den Stack mitschrieb:
+
+```
+"32120 Hiddenhausen" << setVal (mb-objektwahl.js:151)
+                     << fillFromData << uebernehmen
+```
+
+Die neue Fassung war geladen, die Sperre lief trotzdem ins Leere.
+
+**Regel: ein Referenzzustand wird genommen, BEVOR der erste Schreiber
+laufen kann** — beim Modulstart, und für später entstehende Elemente über
+einen Beobachter beim Entstehen.
+
+## 134 · `margin-top:auto` richtet nur aus, wenn nichts dahinter steht
+
+Zum Ausrichten von Eingabefeldern in Spalten unterschiedlicher Labelhöhe
+lag nahe: Zelle als Flex-Spalte, `margin-top:auto` am Feld. Das funktioniert,
+solange das Feld das LETZTE Element der Zelle ist.
+
+Gemessen war es das oft nicht: die Stufenleiste hängt eine
+„fehlt"-Markierung an (`.mbst-fuer`), die Feldhilfe einen Ankertext
+(`.fh-anker`). `#plot` hatte drei Kinder, `#cond` vier. Dort schob `auto`
+das FELD nach oben, weg von seinen Nachbarn.
+
+**Und dieselbe Regel stand bereits ein zweites Mal in derselben Datei**,
+60 Zeilen weiter oben, aus einem alten Paket („v651-mb-css: Feld-Flucht").
+Der eigene neue Block war nicht der Täter — gemessen wurde
+`getComputedStyle(...).marginTop === 'auto'`, obwohl die eigene Zeile
+schon weg war.
+
+**Regel: vor dem Einfügen einer Layoutregel nach genau dieser Eigenschaft
+in derselben Datei greppen.** Und: Felder fluchten zuverlässig nur über
+gleiche Labelhöhe je Rasterzeile — welche Felder nebeneinander landen,
+entscheidet erst der Umbruch, das kann keine statische CSS-Regel wissen.
+
+## 135 · Ein Perl-Anker in einfachen Anführungszeichen interpretiert kein `\x{...}`
+
+Beim Patchen einer Datei mit Sonderzeichen im Anker (`− Alterswertminderung`)
+schlug `str_replace` mit 0 Treffern fehl. Ursache: `'\x{e2}\x{88}\x{92}'` in
+einem single-quoted Perl-String ist buchstäblich dieser Text, nicht das
+Zeichen. Dazu kommt die CRLF-Falle: ein mit `"\n"` gebauter mehrzeiliger
+Anker trifft in einer CRLF-Datei nie.
+
+**Regel: mehrzeilige Anker über einen Regex aus der geladenen Datei
+HOLEN** (`if ($s =~ /(…)/) { $anker = $1 }`), statt ihn zu tippen. Dann
+stimmen Zeilenenden und Sonderzeichen zwangsläufig.
+
+## 136 · Ein Helfer namens `_num` bedeutete „Zahl größer null"
+
+```js
+const _num = (v) => { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; };
+```
+
+Für Flächen, Mieten und Baujahre ist das richtig. Für `bog_eur` — besondere
+objektspezifische Grundstücksmerkmale nach § 8 Abs. 3 ImmoWertV — ist es
+tödlich: ein solcher Ansatz ist fast immer ein **Abzug**, also negativ.
+`_num(-18000)` gab null.
+
+**GEMESSEN am Bericht 116:** der Wert stand im `ref`, lief durch den ganzen
+Orchestrator bis `CrossCheckService.js:669` und wurde dort still zu null.
+Die Ertragswert-Staffel endete beim vorläufigen Ertragswert, ohne ein Wort
+dazu. Das Feld gibt es seit WPDF12 — es hat **nie** funktioniert, außer bei
+einem Zuschlag.
+
+**Warum es so lange unentdeckt blieb: es gab kein Eingabefeld dafür.**
+Erreichbar war es nur über einen direkten API-Aufruf. Aufgefallen ist es
+erst, als das Feld gebaut wurde.
+
+**Regel: ein Umwandlungshelfer, dessen Name nur „Zahl" sagt, aber
+zusätzlich ein Vorzeichen erzwingt, gehört umbenannt oder je Feld
+gewählt.** Und: bevor ein Feld ins Formular kommt, prüfen, ob der
+Backend-Pfad dahinter je mit echten Werten gelaufen ist — ein Feld ohne
+Oberfläche ist ein Feld ohne Prüfung.
+
+## 137 · Ein Modellparameter als Konstante macht jede Rechnung unprüfbar
+
+`const GND_JAHRE = 80` in `CrossCheckService.js` galt für jeden
+Gutachterausschuss. Das Register führt die Gesamtnutzungsdauer aber **je
+Modell**: 38 Sätze mit 70, 4 mit 80, 5 mit 60, 73 ausdrücklich ohne Zahl.
+Gelesen hat sie niemand.
+
+§ 21 Abs. 3 ImmoWertV: ein Sachwertfaktor gilt nur für das Modell, aus dem
+er abgeleitet wurde. Bei Alter 30 ergibt GND 70 eine Restnutzungsdauer von
+40 Jahren, GND 80 eine von 50 — an einem Reihenhaus rund 25.000 €.
+
+**Beim Beheben eine zweite Falle:** die Sicherung aus v1074 („der zweite
+Lauf muss denselben vorläufigen Sachwert liefern") hätte ausgerechnet die
+modellkonforme Rechnung verworfen, weil eine andere GND selbstverständlich
+einen anderen Sachwert ergibt.
+
+**Regel: eine Gleichheitsprüfung zwischen zwei Läufen muss wissen, welche
+Abweichungen beabsichtigt sind.** Sonst schützt sie vor dem Falschen.
+
+Und: **eine fertige Zahl aus einem fremden Rahmen wird nicht umgerechnet,
+sondern im richtigen Rahmen neu abgeleitet.** 34 Jahre aus einem
+80er-Modell ergeben im 70er-Modell je nach Methode 30 oder 24 Jahre — das
+ist eine Methodenwahl, keine Rechnung, und sie gehört nicht in Code.
+
+## 138 · Eine Spanne, die ihr eigenes Ergebnis nicht enthält
+
+Die Streuung des Sachwertfaktors (±0,21) wurde auf den marktangepassten
+Sachwert gerechnet, der Abzug für besondere Merkmale kam danach:
+
+```
+= Sachwert                       184.761 EUR
+Streuung-Spanne     [186.901 ... 264.622] EUR
+```
+
+Der Endwert lag **unterhalb** der eigenen Spanne. Das sieht nach Sorgfalt
+aus und widerspricht der Zeile darüber.
+
+**Regel: eine Spanne wird zuletzt gebildet, auf demselben Endwert, den sie
+beschreibt.** Gefunden nur, weil der Funktionslauf beide Zahlen
+nebeneinander ausgab — die Einzelprüfung des Streuungsblocks war grün.
+
+## 139 · Ein zu weit gefasster Vorfahre, zum zweiten Mal
+
+`mb-karten.js` fasst `.row`-Zeilen in benannte Blöcke. Für Felder ohne
+`.row` — das Adressfeld etwa — fiel der Code auf `el.parentElement`
+zurück. Das ist dort der **ganze Reiter-Container**: er wurde samt allem,
+was darin stand, in den ersten Block geschoben. Im Bild saß „Eckdaten"
+innerhalb von „Wo steht das Objekt".
+
+**Dieselbe Sorte Fehler wie v1334b**, wo das Info-Zeichen am ersten
+`<label>` im Panel landete statt am eigenen.
+
+**Regel: wer von einem Feld aufwärts sucht, braucht eine Abbruchbedingung
+UND eine Gegenprobe.** Die Abbruchbedingung allein reicht nicht — hier ist
+es die Gegenprobe, die trägt: *enthält der gefundene Behälter ein Element,
+das zu einer anderen Gruppe gehört?* Wenn ja, ist er der falsche. Diese
+Prüfung fängt auch Fälle ab, die man noch nicht gesehen hat.
+
+**Und: sichtbar ist nicht dasselbe wie vorhanden.** Ein Zähler im selben
+Modul fragte `offsetParent` und blieb deshalb in jedem geschlossenen
+Reiter leer — also überall dort, wo er helfen sollte. Die richtige Frage
+war, ob das Feld ÜBERHAUPT existiert; was nicht gebraucht wird, baut die
+Wertermittlung gar nicht erst.
+
+## 140 · Unsichtbare Steuerzeichen in einer Regex — und derselbe Fehler beim Beheben
+
+In `ZWEIG_VORZUG` (gutachterausschuss.js) standen an zwanzig Stellen echte
+**Backspace-Zeichen (0x08)**, wo eine Wortgrenze `\b` hingehört. Die Tabelle
+übersetzt die Objektart-Kurzformen der Oberfläche (EFH, ETW, MFH, RH, DHH)
+auf die Zweige der amtlichen Register.
+
+**Der Fehler ist an jeder üblichen Stelle unsichtbar:**
+
+```
+String(regex)              ->  /einfamilien|efh|freistehend/i   sieht richtig aus
+regex.test("Einfamilienhaus") ->  true
+regex.test("EFH")          ->  FALSE
+grep, Editor, Code-Ansicht ->  zeigen nichts Auffälliges
+```
+
+Sichtbar wird er nur über `JSON.stringify` (dort erscheint 0x08 als `\b`)
+und über `file`, das **„with overstriking"** meldet. Diese Meldung stand
+zweimal im Protokoll und wurde beide Male überlesen.
+
+**Wirkung:** jede Kennzahl, die über diese Tabelle geht — Sachwertfaktor,
+Vergleichsfaktor, Durchschnittspreis — fand für Ausschüsse mit abweichendem
+Zweignamen nichts und meldete „nicht abgeleitet". **Eine Fehlanzeige, die wie
+ein Befund aussieht** — niemand prüft nach, ob ein „liegt nicht vor" stimmt.
+
+**Und beim Beheben dieselbe Falle eine Ebene höher:**
+
+```
+perl -pe 's/\x08/\b/g'     ersetzt Backspace durch BACKSPACE
+```
+
+Im Ersatzstring ist `\b` wieder das Steuerzeichen. Erst ein explizit
+gebautes `chr(92) . 'b'` schreibt einen echten Backslash. Zwei Durchläufe
+meldeten „ersetzt", ohne etwas zu ändern; erst das Nachzählen im Skript
+(`my $n = ($s =~ s/.../.../g)`) machte es sichtbar.
+
+**Regeln:**
+- `file` liest man mit. „with overstriking", „with LF, CRLF line
+  terminators", „data" statt „text" sind Befunde, keine Verzierung.
+- Eine Regex, die man nicht selbst getippt hat, prüft man mit
+  `JSON.stringify(regex.source)`, nicht mit `String(regex)`.
+- Escape-Sequenzen **nie tippen, immer generieren** — und die Ersetzung
+  zählen lassen, statt dem „OK" zu glauben.
+
+## 141 · Die Nachführung muss den ersten Lauf überleben
+
+`start()` in `mb-quellen.js`:
+
+```js
+stil();
+vorhang();                        <- wirft hier etwas,
+holen();
+document.addEventListener(...)    <- werden diese nie gesetzt
+```
+
+Gemessen: der Vorhang entstand beim Klick auf eine Stufe **nie**, ein
+Aufruf von Hand baute ihn **sofort**. Ein gescheiterter erster Lauf hatte
+die ganze Nachführung mitgenommen — und weil die Entprellfunktion ihre
+Ausnahmen selbst schluckt, war danach still.
+
+**Dasselbe Muster wie v1330** (der Rückruf am Ende einer ungeschützten
+Schleife), nur in der Startreihenfolge statt in einer Schleife.
+
+**Regel: Listener, Beobachter und Timer werden VOR dem ersten Lauf
+gesetzt.** Der erste Lauf darf scheitern — der nächste Anlass holt es nach.
+Ein Modul, das nur beim Start funktioniert, ist kein Modul, sondern ein
+Zufall.
+
+**Dazu, aus derselben Fehlersuche:** reines Entprellen (`clearTimeout` bei
+jedem Ereignis) feuert bei einem Dauerstrom von DOM-Änderungen **nie**.
+Eine Obergrenze gehört dazu — spätestens nach X ms wird ausgeführt. Hier
+lag kein Dauerstrom vor (gemessen: 0 Schübe in 3 s), die Hypothese war
+falsch — die Obergrenze bleibt trotzdem drin, weil sie nichts kostet.
+
+## 142 · Ein Proxy mit ausdrücklicher Pfadliste
+
+`backend/src/routes/marktbericht.js` leitet an den Microservice weiter —
+aber **nur die Pfade, die dort einzeln eingetragen sind**. Ein neuer
+Endpunkt im mb-backend ist damit vom Browser aus 404, obwohl er läuft.
+
+Gemessen:
+
+```
+/api/v1/marktbericht/health          -> 200
+/api/v1/marktbericht/quellen         -> 404
+im Container: /quellen               -> antwortet einwandfrei
+```
+
+**Regel: ein neuer Endpunkt im mb-backend ist erst fertig, wenn er in der
+Proxy-Liste steht** — und die Prüfung läuft vom BROWSER aus, nicht aus dem
+Container. Eine Messung im Container prüft den Dienst, nicht die Kette.
+
+Backend-Änderung heißt hier außerdem: `--build backend`, nicht
+`--build mb-backend`.
+
+## 143 · Ein Feld, das niemand liest, sieht aus wie ein Feld
+
+Zehn Eingabefelder des Marktberichts — Energieträger, Heizung, Verglasung,
+Bodenbelag, Bad, Gäste-WC, Keller, Außenwände, Dachform, Dacheindeckung —
+standen in **keiner Datenliste** des `ReportOrchestrator`. Das Formular
+schickte sie, das Backend nahm sie nicht auf, sie bewirkten nichts.
+
+Aufgefallen ist es **dem Nutzer**, nicht uns: *„da gebe ich vlt werte an
+die ich nicht bräuchte und garnicht mit einfließen."*
+
+Sie stammten aus der Zeit eines externen Bewertungsdienstes. Als wir auf
+eigene Rechnung umstellten, blieben die Felder stehen — sichtbar,
+ausfüllbar, wirkungslos.
+
+**Ein Rest zeigte, wohin sie gehört hätten:** eine fertige Zuordnungstabelle
+in `immowertv.js`, ohne einen einzigen Leser. Sie zielte allerdings auf die
+FALSCHE Anlage (Anlage 2, Modernisierungspunkte statt Anlage 4,
+Standardstufe) — eine halbfertige Spur ist nicht dasselbe wie eine richtige.
+
+**Regeln:**
+- **Wird ein externer Dienst abgelöst, gehören seine Eingabefelder auf den
+  Prüfstand** — entweder sie bekommen einen neuen Leser oder sie
+  verschwinden. Ein Feld ohne Wirkung kostet den Nutzer Zeit und Vertrauen.
+- Vor jeder Behauptung „das Feld verbessert das Ergebnis" **den Leser
+  suchen**, nicht den Namen. `grep` nach dem Feldnamen in den
+  Bewertungsdiensten kostet eine Minute.
+- Eine gefundene Zuordnungstabelle ohne Leser ist ein **Hinweis**, keine
+  Lösung: prüfen, ob sie überhaupt auf die richtige Rechtsgrundlage zeigt.
+
+## 144 · Bei zwei `!important` entscheidet die Spezifität
+
+Der Marktbericht sollte die Feldschrift des Objekt-Tabs bekommen. Angeordnet
+war `.mbk-block input{font-family:"DM Sans"!important}` — angekommen ist
+Inter.
+
+Der Grund steht im Hell-Skin von `index.html`:
+
+```
+html[data-mb-theme="light"] input,… {font-family:'Inter',…!important}
+```
+
+**`!important` gegen `!important` ist kein Patt** — dann gilt wieder die
+normale Kaskade, und `html[attr] input` (0,1,2) schlägt `.mbk-block input`
+(0,1,1). Erst `html[data-mb-theme] .mbk-block input` (0,2,2) gewinnt.
+
+Auffällig war es nur, weil **die Schriftgröße ankam und die Schriftart
+nicht** — zwei Eigenschaften derselben Regel, unterschiedlich behandelt,
+weil nur eine davon vom Skin überschrieben wird.
+
+**Regel: `!important` ist kein Trumpf, sondern eine eigene Kaskadenebene.**
+Innerhalb dieser Ebene gelten Spezifität und Reihenfolge weiter. Und: nach
+jeder Stil-Anordnung die Eigenschaften EINZELN nachmessen — eine Regel kann
+teilweise greifen.
+
+## 145 · Eine gemeinsame Regel hilft nur, wenn die alten weichen
+
+Vier Hinweiskästen im Marktbericht sahen unterschiedlich aus — sie waren
+über Monate einzeln gewachsen. Die Zusammenführung bekam zwei gemeinsame
+Klassen (`.mb-zurueck`, `.mb-auf`), und alle vier Stellen trugen sie
+zusätzlich zu ihrer alten.
+
+**Gemessen war danach: immer noch zwei Stile.** Die alten Einzelregeln
+standen in anderen `<style>`-Blöcken, hatten dieselbe Spezifität und
+gewannen über die Reihenfolge — Radius 8 gegen 10, graue Ränder gegen
+goldene, gefüllter Knopf gegen Umriss.
+
+**Regel: beim Vereinheitlichen wird die alte Regel ENTFERNT, nicht
+überschrieben.** Ein `!important` obendrauf hätte eine dritte Regel ergeben
+und das Problem verdoppelt. Und: **nach dem Zusammenführen zählen**, wie
+viele verschiedene Stile tatsächlich übrig sind —
+
+```js
+var m = new Set();
+document.querySelectorAll('.mb-zurueck').forEach(function (el) {
+  var cs = getComputedStyle(el);
+  m.add(cs.fontFamily + cs.fontSize + cs.borderRadius + cs.borderColor);
+});
+// m.size === 1  ->  wirklich einheitlich
+```
+
+Ein Blick aufs Bild hätte den Unterschied zwischen 8 und 10 Pixeln Radius
+nicht gefunden.
+
+---
+
+## 146 · Was nur auf Existenz prüft, fällt nicht zurück
+
+**Am selben Tag zweimal getroffen** — einmal geerbt, einmal selbst gebaut.
+
+```js
+const score = window._dpPilotScore ? window._dpPilotScore(...)
+                                   : QcEngine.computeScore(...);
+```
+
+Geprüft wird, ob die **Funktion existiert** — nicht, ob sie ein **Ergebnis**
+geliefert hat. `_dpPilotScore` steht am Ende derselben Datei und ist damit
+immer vorhanden; sie gibt aber `null` zurück, wenn ihre Kerne fehlen. **In
+genau dem Fall, für den der Rückfall gedacht ist, wird er übersprungen** —
+und die nächste Zeile liest `score.score` auf `null`.
+
+Richtig ist, das Ergebnis zu prüfen:
+
+```js
+let score = null;
+if (window._dpPilotScore) { try { score = window._dpPilotScore(...); } catch (e) { score = null; } }
+if (!score) score = QcEngine.computeScore(...);
+```
+
+**Die zweite Variante desselben Fehlers:** eine Funktion, die `_rf.catalog`
+liest, tut das im Betrieb gefahrlos — aber ein Prüfhaken ruft sie **ohne
+laufenden Ablauf** auf, und dann ist `_rf` null. *Ein Prüfhaken, der wirft,
+ist keiner.* Er hat das im ersten Aufruf gefunden; genau dafür ist er da.
+
+> **Merksatz:** Ein Rückfall, der nicht greifen kann, ist keiner. Prüfe das
+> Ergebnis, nicht die Zuständigkeit.
+
+`v1359c`, `v1365`
+
+---
+
+## 147 · Zwei gleichnamige Eigenschaften im selben Objektliteral
+
+```js
+const limiter = rateLimit({
+  skip: function (req) { /* eingeloggte Requests nicht limitieren */ … },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.path.startsWith('/health')      // ← diese gewinnt
+});
+```
+
+**JavaScript nimmt die zweite, schweigend.** Kein Fehler, keine Warnung,
+kein Linter-Treffer im Lauf. Die Absicht aus `v395` war damit **über drei
+Monate wirkungslos** (Commit `94e4f6f`, 01.06.2026 → gefunden 13.09.2026),
+und die Datei sagte die ganze Zeit das Gegenteil von dem, was sie tat.
+
+Gefunden wurde es nur beim Lesen — nicht durch ein Symptom. Deshalb: **wenn
+ein Konfigurationsobjekt länger als ein Bildschirm ist, einmal die
+Schlüsselnamen zählen.**
+
+`v1366`
+
+---
+
+## 148 · Ein Testskript, das Muster abtippt, prüft die Abschrift
+
+Ein Prüflauf meldete **drei Fehler**, obwohl die Datei heil war. Ursache:
+das Skript hatte die Regex-Muster in ein Heredoc abgetippt, und **ein
+Heredoc halbiert Backslashes** — aus `'\\s+'` wurde `'s+'`. Geprüft wurde
+also ein kaputtes Muster, nicht das echte.
+
+Das ist besonders tückisch, weil der Testlauf *plausibel* fehlschlägt: man
+sucht den Fehler in der Datei, die keinen hat.
+
+**Richtig ist, das Muster aus der echten Datei zu holen:**
+
+```js
+var quelle = fs.readFileSync(process.argv[2], 'utf8');
+var m = quelle.match(/var RF_NEIN_HINTEN = new RegExp\(([\s\S]*?)\);/);
+var RF_NEIN_HINTEN = eval('new RegExp(' + m[1] + ')');
+```
+
+Dazu zwei Nachbarn derselben Familie:
+- **`q{}` in Perl zählt Klammern.** Eine CSS-Regel mit `{…}` im
+  Ersatztext zerlegt den String und hinterlässt ein `},` mitten im
+  JavaScript.
+- **`\x{fc}` in Perl schreibt ein Latin-1-Byte**, kein UTF-8. Die Datei
+  wird dadurch von „UTF-8 text" zu „Non-ISO extended-ASCII". Entweder
+  `\xc3\xbc` schreiben oder mit `use utf8` + `utf8::encode` arbeiten.
+
+`v1358`, `v1359`
+
+---
+
+## 149 · Eine Fehlermeldung, die immer dasteht, wird nicht gelesen
+
+Nach einem Backend-Rebuild stand im Startlog:
+
+```
+ValidationError: options.validate.keyGeneratorIpFallback is not recognized.
+✓ Server listening on http://localhost:3001
+```
+
+**Der Server lief** — die Meldung war „nur" eine Warnung, und der Schlüssel
+hieß in der installierten Version schlicht `ip`. Genau so entstehen Logs,
+die niemand mehr liest: eine Zeile, die immer da ist, wird zur Tapete.
+
+Dasselbe Prinzip stand schon einmal in `CLAUDE.md`, für den Gold-Audit:
+*„Ein Rot, das immer rot ist, wird nicht gelesen."*
+
+> **Merksatz:** Nach jedem Rebuild einmal ins Startlog sehen und jede
+> Meldung entweder beheben oder begründen. Beides ist billiger als ein Log,
+> dem man nicht mehr traut.
+
+`v1366b`
+
+---
+
+## 150 · Drei Kopien derselben Rechnung laufen auseinander — garantiert
+
+Im Code standen **drei verschiedene Grundfreibeträge** für denselben
+§-32a-Tarif:
+
+| Datei | Wert | |
+|---|---|---|
+| `tax.js` | 11.604 | Kommentar sagte „Tarif 2026" |
+| `dashboard.js` | 11.784 | dazu `Math.round` statt `Math.floor` |
+| `rnd-calc.js` | 12.096 | Zonengrenzen von 2025 |
+
+**Keiner davon war 2026**, und 11.604 war nicht einmal ein gültiger
+Jahrgang — es war der ursprünglich *geplante* Grundfreibetrag 2024, bevor er
+angehoben wurde.
+
+Der Betrag war klein (bis 43 €), der strukturelle Fehler nicht: **wer den
+Tarif aktualisiert, muss es sonst dreimal tun, und die dritte Stelle
+vergisst man.** Genau so ist der Unterschied entstanden.
+
+Zwei Lehren für jede Zahl, die aus einem Gesetz oder einer amtlichen Tabelle
+stammt:
+
+1. **Die Primärquelle gewinnt.** Eine Suchmaschine lieferte für 2026
+   `954,80` und die Zonengrenze `17.005`; das Gesetz sagt `914,51` und
+   `17.799`.
+2. **Ohne amtliches Rechenbeispiel prüft man die Stetigkeit.** Der Tarif
+   muss an jeder Zonengrenze denselben Wert liefern — falsche Koeffizienten
+   erzeugen dort einen Sprung. Bei 12.348 / 17.799 / 69.878 / 277.825 blieb
+   die Stufe bei 0 bis 1 €, also reine Rundung.
+
+Und: **ein Jahrgang, der sich nicht belegen lässt, kommt nicht in die
+Tabelle.** Fehlt er, nimmt die Funktion den nächstälteren und *meldet das* —
+eine halb belegte Zahl ist schlechter als keine.
+
+`v1361`, `v1364`
+
+---
+
+## 151 · Derselbe Wert, achtmal gerechnet — und niemand merkt es
+
+Eine einzige Eingabe im Kaufpreisfeld löste **acht** Score-Berechnungen aus.
+Die Entprellung von zwei Sekunden griff; die Mehrfachrechnung **innerhalb**
+einer Runde nicht.
+
+Die Ursache stand offen im Code:
+
+```js
+updHeaderBadges();                      // rechnet, weil der Cache noch alt ist
+_dpComputeDS2Cached();                  // rechnet
+updHeaderBadges();                      // „Header neu mit gecachtem Wert"
+```
+
+**Der zweite Aufruf war der Beleg, dass der erste zu früh kam** — statt ihn
+zu verschieben, hatte man einen weiteren angehängt. Dazu ein zweiter
+Cache-Name (`_dpLastDs2` neben `_dpLastDS2Result`), der sich nur in einem
+Buchstaben unterscheidet und eigenständig entstand.
+
+Das kostet im Browser nur Rechenzeit — **aber es blockiert jede spätere
+Verlagerung auf den Server**: acht Anfragen je Eingabe scheitern an einem
+Limit von 100 pro Minute, eine nicht.
+
+> **Merksatz:** Wenn ein Aufruf zweimal hintereinander steht und der zweite
+> einen Kommentar trägt wie „jetzt mit dem richtigen Wert", ist der erste am
+> falschen Platz.
+
+`v1362`, `v1363`
+
+---
+
+## 152 · `node --check` prueft keine `require`-Pfade
+
+Ein neuer Dienst, ein Import mit falschem Pfad (`../db` statt
+`../db/pool`) — und das Backend lief nach dem Rebuild in eine
+**Neustartschleife**. `Cannot find module`, Status `Restarting`,
+`/health` tot.
+
+Vorher hatte `node --check` **SYNTAX-OK** gemeldet. Das ist kein Fehler
+des Werkzeugs: es prueft die Grammatik, nicht die Aufloesung von
+Modulen. `CLAUDE.md` sagt es woertlich — *„`node --check` prueft nur
+Syntax. Vertraege prueft nur ein echter Lauf.“*
+
+> **Merksatz:** Bei einer neuen Datei mit `require` genuegt `--check`
+> nicht. Ein `node -e "require(...)"` im Container kostet eine Sekunde
+> und faengt genau das ab.
+
+`v1367b`
+
+---
+
+## 153 · Eine Kennzahl, die immer dasselbe sagt, sieht aus wie eine Kennzahl
+
+Die Auswertung sollte zaehlen, wie viele verschiedene Endpunktgruppen
+ein Konto trifft. Sie gruppierte nach dem ersten Pfadsegment:
+
+```js
+const g = String(pfad).replace(/^/+/, ).split(/)[0];   // -> immer api
+```
+
+**Alle Pfade beginnen mit `/api/v1/`.** Die Vielfalt war damit konstant
+`1` — bei einem Menschen wie bei einem Skript.
+
+Gefunden nur, weil der Probelauf **fuenf verschiedene Pfade** schrieb und
+die Antwort `1` sagte. Ohne diese Erwartung waere die Zahl nie
+aufgefallen: sie sah plausibel aus, sie kam aus einer Rechnung, und sie
+war immer falsch.
+
+> **Merksatz:** Jede neue Kennzahl einmal gegen einen Fall halten, bei
+> dem man das Ergebnis vorher kennt. Eine Zahl, die nie schwankt, ist
+> verdaechtig — auch wenn sie richtig aussieht.
+
+Verwandt mit Falle 143 (*ein Feld, das niemand liest, sieht aus wie ein
+Feld*) und mit dem Leser, der ins Leere greift: dieselbe Familie — etwas
+sieht funktionsfaehig aus, weil nichts widerspricht.
+
+`v1367c`
+
+---
+
+## 154 · Eine Klasse abschreiben heisst nicht, dass es sie gibt
+
+Fuer eine neue Admin-Ansicht habe ich `class="tbl"` aus den bestehenden
+Tabellen uebernommen. Das Ergebnis sah aus wie eine Tabelle — und war
+unformatiert:
+
+```
+Zell-Innenabstand   1 px   (Browser-Standard)
+Tabellenbreite      710 px statt 1.400
+Spaltenabstand      1 px
+```
+
+**`.tbl` ist in keiner der beiden Admin-CSS-Dateien definiert.** Die
+echte Klasse heisst `.data-table` (`admin.css:146`) und bringt alles mit:
+100 % Breite, 12 px Innenabstand, Zeilentrennung, Hover.
+
+Schlimmer: der erste Reparaturversuch setzte `padding-right` auf
+`#view-security .tbl th` — also **auf dieselbe nicht existierende
+Klasse**. Die Regel war syntaktisch fehlerfrei, stand im ausgelieferten
+CSS und tat nichts.
+
+> Dieselbe Falle, die `CLAUDE.md` fuer den Anker `#app` festhaelt: *eine
+> Regel mit diesem Anker greift nirgends und sieht dabei plausibel aus.*
+
+**Merksatz:** Bevor eine Klasse benutzt wird, einmal `grep` im CSS. Zwei
+Sekunden gegen eine Ansicht, die niemand formatiert.
+
+`v1368e`
+
+---
+
+## 155 · Ein Abruf, der still nichts tut, waehrend die Anzeige das Gegenteil sagt
+
+**Gefunden bei C7 (v1376), 13.09.2026.**
+
+`_rfSetzen` brach bei einem bereits belegten Feld mit `return false` ab. Das
+ist richtig: eine Nutzerangabe wird nicht ueberschrieben. Der Aufrufer las den
+Rueckgabewert aber nie:
+
+```js
+_rfSetzen('brw', String(r.wert).replace('.', ','), herkunft);
+_rfBlase('co', '<b>' + wert + ' €/m²</b> — amtlicher Bodenrichtwert. ...');
+```
+
+Die Blase erschien **immer**. Wer den Bodenrichtwert vorher selbst genannt
+hatte, sah eine amtliche Zahl, die in kein Feld ging — und rechnete
+weiter mit seiner eigenen.
+
+Bei der Lage-Recherche stand es sogar ausdruecklich da: „Deine eigenen
+Angaben bleiben stehen — ich habe nur ergaenzt, was fehlte." Wahr, und
+trotzdem irrefuehrend: es verschwieg, WO sich etwas widersprach.
+
+**Merksatz:** Ein Rueckgabewert, den niemand liest, ist kein Rueckgabewert.
+Wo eine Funktion `false` liefern kann, gehoert an die Aufrufstelle die Frage:
+**was zeigt die Oberflaeche in genau diesem Fall?**
+
+`v1376`
+
+---
+
+## 156 · Eine Reparatur, die richtig aussieht, weil sich nichts geaendert hat
+
+**Gefunden beim Nachmessen von C7 (v1376c), 13.09.2026.**
+
+Die Konfliktantwort war eingebaut und syntaktisch in Ordnung. Der Prueflauf
+sagte:
+
+```
+"nein, bleib bei meiner angabe"  ->  Feld: 3, Quelle: Sprachaufzeichnung
+```
+
+Genau das Gewuenschte — nur dass **nichts passiert war**. Der Satz erreichte
+die Konfliktlogik gar nicht; er wurde vorher als Antwort auf die laufende
+Frage gedeutet. Das Feld stand auf 3, weil es vorher schon auf 3 stand.
+
+Aufgefallen ist es nur an einem Nebenwert: `konfliktOffen` war weiterhin
+`true`. Ohne diese eine Zeile im Prueflauf waere die Reparatur als
+funktionierend durchgegangen.
+
+**Merksatz:** Wenn die Antwort eines Tests gleich dem Ausgangszustand ist,
+misst der Test nichts. Immer **zusaetzlich** pruefen, ob der Mechanismus
+gelaufen ist — nicht nur, ob das Ergebnis stimmt. Am besten mit einem Fall,
+in dem sich der Wert AENDERN muss.
+
+`v1376c`
+
+---
+
+## 157 · Der Pruefer las die Datei auf dem Server, nicht die eigene
+
+**Gefunden bei v1376, 13.09.2026.**
+
+Lokal gibt es kein node. Der Syntaxtest lief deshalb so:
+
+```
+ssh SERVER "docker run --rm -v /opt/dealpilot/frontend:/f:ro node:22 \
+            node --check /f/js/voice-import.js && echo SYNTAX-OK"
+```
+
+Es kam `SYNTAX-OK` — fuer die **alte, noch nicht ausgerollte** Datei. Die
+gerade geaenderte lag unveraendert auf dem Entwicklungsrechner und enthielt
+zwei echte Fehler (ein ueber zwei Zeilen offener String und ein
+verschwundenes `@media`).
+
+**Merksatz:** Erst `scp` in eine eigene Datei, dann pruefen:
+
+```
+scp frontend/js/datei.js SERVER:/tmp/pruef.js
+ssh SERVER "docker run --rm -v /tmp/pruef.js:/p.js:ro node:22 node --check /p.js"
+```
+
+Verwandt mit 152 (`node --check` prueft keine require-Pfade) und dem
+Grundmuster: **ein Pruefer, der nicht dieselbe Datei liest wie die Maschine,
+misst sich selbst.**
+
+`v1376`
+
+---
+
+## 158 · Perl frisst `@media` in doppelten Anfuehrungszeichen
+
+**Gefunden bei v1376, 13.09.2026.**
+
+Beim Patchen eines CSS-Blocks, der als JS-String vorliegt:
+
+```perl
+"      '\@media(max-width:560px){...}',"     # richtig
+"      '@media(max-width:560px){...}',"      # @media wird als Array gelesen
+```
+
+Mit `use strict` bricht es ab („Global symbol @media requires explicit
+package name") — das ist der gute Fall. Ohne `use strict` waere `@media`
+still zu einem leeren Array interpoliert und die Regel haette
+`'(max-width:560px){...}'` gelautet: **gueltiges CSS ohne jede Wirkung.**
+
+Dazu im selben Patch: eine CSS-Regel ueber zwei Zeilen zu schreiben ist in
+dieser Datei nur als **zwei abgeschlossene Strings mit Komma** erlaubt —
+
+```js
+'.x{padding:8px;',
+'  background:red}',
+```
+
+Ein ueber den Zeilenumbruch offener String ist ein Syntaxfehler.
+
+**Merksatz:** In Perl-Patches gehoeren `@` und `$` in einfache
+Anfuehrungszeichen oder escaped. Und nach jedem generierten CSS-Block einmal
+hinsehen, ob jede Zeile mit `',` endet.
+
+`v1376`
+
+---
+
+## 159 · Ein `try/catch` um neuen Code macht jeden Tippfehler zu stiller Abwesenheit
+
+**Gefunden bei C5 (v1377b), 13.09.2026.**
+
+Der neue Block war defensiv gebaut:
+
+```js
+try {
+  var _zv = _rfNum(_rf.data.fields.zve);
+  if (_zv != null && ...) {
+    _rfBlase('co', 'Bei <b>' + escH(_fmtEuro(_zv)) + '</b> ...');
+  }
+} catch (_e) {}
+```
+
+`_fmtEuro` gibt es in dieser Datei **nicht** — sie heisst `_euroKurz`. Der
+ReferenceError waere im leeren `catch` gelandet, und die Blase waere einfach
+nie erschienen. Kein Fehler in der Konsole, kein falscher Wert, nichts.
+
+Aufgefallen ist es nur, weil nach dem Patch einmal `grep -n "_fmtEuro"` lief
+und **zwei** Treffer meldete — beide meine eigenen.
+
+**Merksatz:** `try/catch` schuetzt vor fremden Fehlern, nicht vor eigenen.
+Nach jedem neuen Block: **jeden aufgerufenen Namen einmal greppen.** Ein
+leeres `catch` ist ein Ort, an dem Tippfehler unsichtbar werden.
+
+```
+for f in _euroKurz _rfNum _rfSetzen; do
+  echo "$f: $(grep -c "function $f(" datei.js)"
+done
+```
+
+`v1377b`
+
+---
+
+> **Uebernommen am 13.09.2026** aus der Cowork-Sitzung des Marktbericht-
+> Strangs (`Dateien/integration-marktbericht.zip`, Block 03). Sie stehen
+> hier als EIN nummerierter Eintrag mit Unterabschnitten, weil sie
+> zusammen einen Arbeitsbereich beschreiben und nicht einzeln entstanden
+> sind wie die Nummern davor.
+
+## 160 · Marktbericht und Ernte - gesammelte Fallen aus dem Parallel-Strang
+
+### Prüfungen, die sich selbst betrügen
+
+**Eine Prüfung darf ihre Vorbedingung nicht selbst herstellen.**
+Die Kettenprüfung von v1083 rief `ladeSaat()` selbst auf — und deckte damit zu,
+dass es im Serverbetrieb **niemand** tat. Das Register blieb leer, jede Adresse
+bekam „kein Ausschuss hinterlegt", und die Prüfung war grün. Seit v1083b wird
+**am Ausgabeobjekt UND an seinem Leser** gemessen: für jedes Feld wird geprüft,
+dass es **gesetzt und gelesen** wird.
+
+**Eine Auskunft, die einen anderen Weg nimmt als der Rechenweg, misst sich
+selbst.** `swf-abfrage --stand` und `registerStand()` starten je einen eigenen
+Node-Prozess, lesen nur die Saatdatei und rufen `ladeAusDb()` nie auf — beide
+meldeten **2150**, während der Server **1565** führte. Die ehrliche Zahl steht
+im Startlog oder kommt aus dem Endpunkt.
+
+**Ein Prüfwerkzeug mit einer Abhängigkeit, die der geprüften Maschine fehlt,
+prüft die Maschine nicht.** `abnahme.sh` wertete mit `node -e` auf dem **Host**
+aus. Staging hat Node 18, **Prod hat kein node auf dem Host** → dreizehn Zeilen
+„FEHL … ist (leer)", während das Serverlog daneben sauber 2150 meldete.
+**Prüfwerkzeuge laufen im Container.**
+
+**Die dumme Prüfung fängt mehr als die kluge.** Beim fehlerhaften Suchmuster
+vom 11.08. fand der Parser 54 statt 56 Zeilen — Monotonie, Wertebereich und
+Anwendungsbeispiel gingen **alle** durch. Nur das Nachzählen fand es.
+Dieselbe Klasse: „428 Zeilen, 428 verschiedene `gaa_kennz`" entlarvte eine
+Verknüpfung, die inhaltlich plausibel aussah.
+
+**Ein Prüfstand, der nur bestätigt, ist keiner.** Der LZS-Prüfstand fing am
+12.08. den Autor selbst: das GND-Band „nur 40/60/80" war erfunden, der Bestand
+führt 40 bis 82.
+
+---
+
+### Cache-Buster (Marktbericht-Kette, vier Glieder)
+
+**Die vier Glieder stehen in ZWEI Schreibweisen.** Ein attributgebundenes
+Muster trifft nur die eine:
+
+```
+frontend/index.html        src="js/marktbericht-view.js?v=1172"      HTML-Attribut
+frontend/js/marktbericht-view.js
+                           '/marktbericht-app/index.html?v=1172&theme=' + …   JS-String
+```
+
+**„Höchster Buster" kann ein Zeitstempel sein.** Ein blanker Scan auf
+`\?v=(\d+)` sammelte **20260612081556** ein und hätte den Buster darauf gesetzt.
+*Eine Zahl messen heißt nicht, die richtige Zahl zu messen.*
+
+**Eine Datei, zwei Stellen.** `wertermittlung.js` und `mb-stufen.js` hängen
+**beide** in `marktbericht-app/index.html`. Eine Buster-Schleife, die je Glied
+frisch von der Platte liest, überschreibt mit dem zweiten Schreibvorgang den
+ersten. Gefangen hat es die Prüfung „alle vier Glieder tragen **denselben**
+Wert" — nicht „jedes Glied hat einen Buster".
+
+**Nicht die Liste prüfen, sondern die Zuordnung.** In
+`marktbericht-app/index.html` hängen mehr als vier Skripte mit eigenem Buster;
+`grep -o "v=1[01][0-9][0-9]"` liefert deshalb mehrere verschiedene Werte.
+
+---
+
+### Patch-Disziplin
+
+**Ein Prüfmuster darf nicht an einem String hängen, den der eigene
+Erklärkommentar zitiert.** Die Prüfung „Text ‚bei Eigentumswohnung nicht
+anwendbar' ist WEG" schlug fehl, weil der neue Kommentar den Satz erklärte.
+Lehre 18 (Marker-Kollision), nur mit Prosa statt Marker.
+
+**Ein Prüfstand muss die eigene Implementierung kennen.**
+`v.empfohlenZusatz` kommt durch Wache **und** Aufruf zweimal vor — `=== 1` war
+falsch. *Ein Wächter, der Unfug meldet, wird überlesen.*
+
+**In `app.js` stehen echte UTF-8-Zeichen, in `wertermittlung.js` stehen
+`\u`-Escapes literal im Quelltext.** Die Ausnahme gilt nur dort. Wer sie auf
+die falsche Datei anwendet, trifft null Mal — `apply.sh` bricht dann korrekt
+ab, ohne etwas zu schreiben.
+
+---
+
+### Register und Datenbank
+
+**Die Zusammenführung von Tabelle und Saatdatei läuft je DATENSATZ, nicht je
+Kennzahl** (`v1095-WMRG2`). v1084a führte sie je Kennzahl zusammen — und weil
+in `mb.param_modell` 493 Liegenschaftszinssätze vom 12.08. lagen, gewann die
+Tabelle für die **ganze** Kennzahl. 585 neuere Sätze fielen still heraus:
+`2150 − 1078 + 493 = 1565`, die Rechnung ging exakt auf.
+**Die Annahme darunter war falsch:** dass die Tabelle mindestens so aktuell ist
+wie die Datei. Die Datei ist versioniert und fährt mit dem Code mit, die
+Tabelle wird von Hand nachgezogen.
+
+**Ein CHECK-Constraint sagt nicht, was er erlaubt — er sagt nur nein.**
+`param_modell_ebene_check` verwarf 24 Sätze mit `ebene='gemeinde_verbund'`.
+**Vor dem ersten Schreiben `pg_get_constraintdef` lesen.**
+
+**Ein In-Memory-Register braucht nach jeder Datenänderung einen Neustart.**
+Der Saatlauf schrieb 493 Sätze, das Log meldete weiter 469 — der Boot-Hook
+hatte vor dem Saatlauf gelesen. `docker restart dealpilot-mb-backend`.
+
+**`gaa_kennz` ist NICHT der Ausschussschlüssel.** `schluessel.csv` hat 428
+Zeilen mit **428 verschiedenen** `gaa_kennz` — es ist ein Schlüssel je
+**Gemeinde**. Wer stumpf darüber verknüpft, findet nichts oder greift den
+Nachbarn. Die richtige Auflösung ist die Kaskade **8 → 5 → 3 → 2**.
+
+**`m.ags` im param-repository ist ein SKALAR, keine Liste.** Eine Gemeindeliste
+je Ausschuss hätte `schreibeModelle()` klaglos geschrieben, und `holeModelle()`
+hätte nie etwas gefunden — dort vergleicht `ags = $2` exakt.
+
+**Zwei Modelle mit demselben `zweig` unter demselben AGS und Berichtsjahr
+kollidieren** im Eindeutigkeitsschlüssel; eines wird still überschrieben.
+Trennen sie sich nach **Gebiet** → verschiedene AGS. Trennen sie sich nach
+einem **Merkmal** innerhalb desselben Gebiets → EIN Modell mit Kategorienachse.
+
+**Ein multiplikativer Faktor 0 verschwindet still**, weil `0` falsy ist und
+`if (t && t.wert)` ihn überspringt. Für einen **additiven** Zuschlag ist 0 ein
+Nichts (Herford druckt so eine Zeile ab), für einen **Faktor** eine
+Katastrophe.
+
+**`land_code` war fest verdrahtet** (`'NW'`), seit das Register nur NRW führte
+— 86 Sätze aus vier Ländern trugen es. Funktional unkritisch, aber die Spalte
+lügt und steht im Eindeutigkeitsschlüssel. **Wo ein Fehler ausgeliefert wurde,
+braucht es einen Schritt, der den SCHADEN sucht** — nicht nur einen, der die
+Quelle schließt.
+
+**Eine Sicherung, die man nicht ansieht, ist keine.** Datenbank `marktbericht`,
+Nutzer `mb` — nicht `postgres`. Ein `pg_dump -U postgres postgres` erzeugte
+eine **20 Byte große Datei**, die wie eine Sicherung aussah, ohne Fehler
+zurückzugeben.
+
+---
+
+### Ernte und Quellen
+
+**Die WebFetch-Grenze ist eine Textmenge, keine Seitenzahl.** Gemessen über
+zehn Läufe: Abbruch zwischen Seite **21 und 55**, unabhängig davon, ob das
+Dokument 56 oder 157 Seiten hat. `pdftotext -layout` schafft **458 Seiten am
+Stück** — die Grenze war nie eine des PDF, sondern des Weges.
+
+**„Ältere Jahrgänge sind kürzer" ist widerlegt.** Der NRW-Landesbericht 2016
+bricht früher ab als 2025. Abbruchseite und Kapitelseite bewegen sich
+unabhängig.
+
+**Die Lizenz ist jahrgangsgebunden.** Derselbe NRW-Landesbericht trägt 2016
+`by-2-0` und 2025 `zero-2-0`. Brandenburg trägt `by-2-0` erst ab Berichtsjahr
+2018. **Einzelne Berichte sind in sich widersprüchlich** — der Märkische Kreis
+führt Lizenztext Zero 2.0 **und** Quellenvermerk by-2-0.
+
+**Die Lizenzprüfung gehört VOR die Datenprüfung.** Kiels Daten wären lesbar
+gewesen — geerntet, was man nicht verwenden darf.
+
+**Ein Extraktionsmodell erfindet Tabellen.** Bei Bochum kam eine perfekt
+gestaffelte Sachwertfaktor-Matrix zurück, die es im Dokument **nicht gibt**,
+dazu eine verdrehte Fallzahl (847 statt 747).
+
+**Ein Schlüssel ist kein Name.** GAA 10400 sah nach der Ruhrgebietsreihe aus
+und ist die **Bundesstadt Bonn**. Der Fehler stand fett in einem
+Projektdokument, bevor die Kettenprüfung ihn fand. **Amtliche Kennziffern
+werden nachgeschlagen.**
+*(Steht so noch falsch in `claude/v1083-ernte-lzs-nrw-alle-73.md`, Befund 4 —
+bei der Konsolidierung mitziehen.)*
+
+**Die Rundung ist Dokumentverhalten.** Herford druckt seine Zu-/Abschläge
+**zweistellig** ab und summiert erst danach: 0,899 + (−0,01) + 0,00 = **0,889**.
+Wer erst summiert und dann rundet, kommt auf 0,89 — eine andere Zahl.
+
+**Chrome blockt mehrere automatische Downloads je Seitenaufruf stumm.**
+Zwei je Aufruf gehen zuverlässig durch. Steht die Domain einmal in
+`chrome://settings/content/automaticDownloads`, hilft nur das Entfernen des
+Eintrags.
+
+---
+
+### Bash
+
+**`grep … | cat || echo` kann nie anschlagen.** Der Rückgabewert einer Pipeline
+ist der des letzten Glieds. Erst in eine Datei, dann `grep -c … || true`.
+
+**`python3 patch.py | grep -q SKIP` tötet den Doppellauf.** `grep -q` beendet
+sich beim ersten Treffer, schließt die Pipe, Python stirbt an SIGPIPE — die
+Prüfung meldet „kein SKIP", obwohl eines kam.
+
+**Auf Prod gibt es kein node auf dem Host.** Nur im Container.
+
+---
+
+## 161 · Eine Zugangsdiagnose altert — 403 wurde zu 404
+
+**Gefunden bei der Hamburg-Ernte (13.09.2026).**
+
+Im Backlog stand seit Wochen: *„Hamburg — reine Zugriffsfrage, `hamburg.de`
+gibt 403."* Hamburg war damit Platz 1 der Ernte-Reihenfolge **und** blockiert,
+weil 403 „gesperrt" heisst.
+
+Nachgemessen gaben dieselben Pfade **404**. Der Unterschied ist alles:
+
+```
+403  der Server kennt die Seite und verweigert sie   -> gesperrt
+404  der Server kennt die Seite nicht                -> Adresse veraltet
+```
+
+Die Adressen von `hamburg.de` waren umgebaut worden. Eine Suche fand die neue
+Seite in einem Anlauf, das PDF war frei abrufbar, und die Lizenz stand woertlich
+im Impressum. **Ein Bundesland lag wochenlang still wegen einer Statuszeile,
+die einmal gestimmt hatte.**
+
+**Merksatz:** Ein Zugangsbefund gehoert mit **Datum und Statuscode** notiert,
+und vor jeder Planung, die darauf aufbaut, einmal nachgemessen. Eine Sperre
+ist ein Zustand, kein Merkmal. Das gilt in beide Richtungen — Niedersachsen
+brauchte am selben Tag die umgekehrte Ruecknahme (die Lizenz erlaubte laengst,
+was als „Anfrage noetig" notiert war).
+
+`v1097`
+
+---
+
+## 162 · Werte, die nur gezeichnet sind, findet kein Textleser
+
+**Gefunden bei der Niedersachsen-Ernte (13.09.2026).**
+
+Das Tableau-Dashboard zeigt Sachwertfaktoren, Stichprobenwerte und
+Korrekturkurven. `get_page_text` und der Accessibility-Baum liefern davon
+**nur die Achsenbeschriftungen** — die Zahlen selbst sind ins Canvas
+gezeichnet und existieren als Text nirgends.
+
+Drei Folgerungen, alle teuer gelernt:
+
+1. **Ein leeres Textergebnis ist kein Beweis, dass nichts da ist.** Der erste
+   Abruf sah aus, als traege die Seite keine Daten. Der Screenshot zeigte
+   dreiundzwanzig Stuetzpunkte.
+2. **Screenshots sind hier die Messung**, nicht die Illustration. Der
+   Tooltip eines Kurvenpunkts nennt alle Groessen im Klartext und ist die
+   genauere Quelle als das Ablesen aus der Grafik.
+3. **Serien scheitern am Renderer.** Drei Anlaeufe endeten in
+   `Page.captureScreenshot timed out after 30000ms`, waehrend Tableau neu
+   rechnete. Einzelabrufe gehen zuverlaessig, Messreihen nicht.
+
+**Merksatz:** Bei Canvas-Oberflaechen zuerst einen Screenshot machen, dann
+entscheiden, ob der Textweg ueberhaupt in Frage kommt. Und eine Messreihe
+gegen eine rechnende Oberflaeche braucht Wartezeit zwischen den Punkten —
+oder einen anderen Weg.
+
+`v1097`
+
+---
+
+## 163 · Ein Interpolator, der vier Zellen holt, obwohl er eine braucht
+
+**Gefunden bei der Wolfenbuettel-Ernte (v1098h), 13.09.2026.**
+
+`matrixInterp` holt zur Interpolation immer die vier umgebenden Zellen und
+bricht ab, wenn eine davon leer ist:
+
+```js
+const c = [zelle(..., ny[0], i0), zelle(..., ny[0], i1),
+           zelle(..., ny[1], i0), zelle(..., ny[1], i1)];
+if (c.some((v) => v === null)) return nichts('zelle_leer', ...);
+```
+
+Die Regel dahinter ist richtig — **eine leere Zelle wird nicht durch einen
+Nachbarwert ersetzt.** Nur traf sie auch den Fall, in dem gar nicht
+interpoliert werden muss: liegt die Anfrage GENAU auf beiden Stuetzstellen,
+ist die Zelle die Antwort.
+
+Bei Wolfenbuettel sind die Kurven verschieden lang (Band 40 endet bei
+350.000 Euro, Band 280 reicht bis 550.000). An allen vier Ecken der Matrix
+fehlte deshalb ein Nachbar — und **vier im Bericht abgedruckte Werte waren
+unerreichbar**, obwohl sie dastanden.
+
+**Merksatz:** Bevor ein Verfahren seine Umgebung braucht, pruefen, ob es sie
+ueberhaupt braucht. Ein exakter Treffer ist kein Sonderfall der
+Interpolation, sondern ihr Gegenteil.
+
+Und zum Finden: aufgefallen ist es nur, weil der Prueflauf **die Randwerte
+mitgemessen hat**. Die drei Werte aus der Mitte gingen alle durch.
+
+`v1098h`
+
+---
+
+## 164 · Ein Dashboard, das nur beim Neuaufbau antwortet
+
+**Gefunden bei der Niedersachsen-Ernte (v1098g), 13.09.2026.**
+
+Die Sachwertfaktoren Niedersachsens liegen in Tableau-Kalkulatoren. Der
+Versuch, sie in einer Messreihe abzufragen — Feld setzen, Enter, Screenshot,
+naechster Wert — scheiterte dreimal:
+
+```
+Error capturing screenshot: CDP sendCommand "Page.captureScreenshot"
+timed out after 30000ms. The renderer may be frozen or unresponsive.
+```
+
+Tableau rechnet nach jeder Eingabe neu; waehrenddessen antwortet der Renderer
+nicht. Das Fenster liess sich nicht vergroessern, und der Ergebniswert steht
+NICHT im Accessibility-Baum — er ist ins Canvas gezeichnet.
+
+**Was traegt:** je Messpunkt eine FRISCHE URL mit Parametern
+(`?Brw=40&Sach=150000`), **sieben Sekunden warten**, dann nur den
+Ergebnisbereich zoomen. So laufen vier Messungen in einem Durchgang, ohne
+einen einzigen Timeout.
+
+**Merksatz:** Wenn eine Oberflaeche auf Eingaben rechnet, ist der vollstaendige
+Neuaufbau billiger als die Zustandsaenderung — und zuverlaessiger. Und: ein
+`zoom` auf einen kleinen Bereich kostet weniger als ein voller Screenshot,
+schlaegt aber genauso fehl, wenn der Renderer blockiert. Die Wartezeit ist
+nicht verhandelbar.
+
+`v1098g`
+
+---
+
+## `perl -pi` mit Umlauten im Ersatz zerstört die ganze Datei
+
+**Gemessen am 14.09.2026 in `voice-import.js`, zweimal hintereinander.**
+
+```bash
+perl -pi -e "s/Erklaer mir das/Erklär mir das/g" datei.js    # FALSCH
+```
+
+Ergebnis: **959 Stellen Mojibake** — `Erklär` wird zu `ErklÃ¤r`, und zwar
+nicht nur an den ersetzten Stellen, sondern **in der ganzen Datei**. Der
+Ersatzstring kommt als UTF-8-Bytes aus der Shell; Perl liest die Datei
+byteweise, hält die Bytes für Latin-1 und kodiert beim Schreiben noch
+einmal.
+
+**`-CSD` hilft nicht, es verschiebt den Schaden nur**: dann ist die Datei
+richtig dekodiert, aber der Ersatz aus der Shell wird doppelt kodiert.
+
+### Was stattdessen gilt
+
+| Fall | Werkzeug |
+|---|---|
+| Ersetzung **rein ASCII** | `perl -pi` ist in Ordnung |
+| Ersatz enthält **Umlaute, Anführungszeichen, Gedankenstriche** | `head`/`tail` + `cat <<'EOF'` (Heredoc, in Anführungszeichen) |
+| Eine ganze Zeile austauschen | `sed -i '<nr>s|.*|neu|'` oder head/tail |
+
+**Nach jedem Schreibschritt prüfen:**
+
+```bash
+grep -c 'Ã' datei.js       # muss 0 sein
+```
+
+Das kostet eine Sekunde. Der Rückbau kostete zweimal eine Viertelstunde —
+und beim zweiten Mal waren zwei fertige, ungetestete Umbauten mit weg,
+weil `git checkout --` sie zurücknahm.
+
+### Zwei Geschwister derselben Falle
+
+**Backticks in einem doppelt gequoteten Perl-Skript** führt die Shell aus:
+
+```bash
+perl -0pi -e "s/…/… `data-zustand` …/"     # die Shell sucht ein Programm
+```
+
+Der Text landet dann ohne den Teil in Backticks in der Datei — im obigen
+Fall stand im Kommentar nur noch „Die Herkunft steht je Feld in , hier".
+**Auch dafür: Heredoc.**
+
+**Und `$` am Zeilenende trifft bei CRLF nicht.** Das Frontend ist
+durchgehend CRLF; `s/^…;$/…/` findet nichts, weil vor dem Zeilenende noch
+ein `\r` steht. Entweder `\r?$` schreiben oder über die Zeilennummer
+gehen.
+
+`v1121`
+
+---
+
+## Die Tabelle ist da, die Achsen fehlen
+
+Im Immobilienmarktbericht 2026 des AfB Homberg (Efze) steht die
+Sachwertfaktor-Matrix im Textstrom so:
+
+```
+ . €     0,99    1,39    1,60
+ . €     0,88    1,12    1,26
+ . €     0,81    0,99    1,10    1,16
+```
+
+Die Faktoren kommen durch, die Zeilen- und Spaltenköpfe nicht. Gemeint
+sind 75.000 € bis 475.000 € und Bodenrichtwerte von 25 bis 100 €/m² —
+**neun Zeilen und vier Spalten, die man ohne die Achsen raten müsste.**
+
+Die Ziffern der Köpfe stecken in einer eingebetteten Schrift ohne
+`ToUnicode`-Zuordnung. **Kein Modus von `pdftotext` gibt sie aus** —
+weder `-layout` noch `-raw` noch der Standardmodus; alle drei wurden
+probiert. Die Zahlen sind auch kein Bild: sie sind Text, nur ohne
+Übersetzung.
+
+**Der Ausweg ist, die Seite zu rendern und anzusehen:**
+
+```bash
+pdftoppm -f 98 -l 98 -r 150 -png bericht.pdf seite
+```
+
+Dann das PNG lesen. Bei 150 dpi ist eine Tabellenseite gut lesbar und
+rund 350 KB groß.
+
+> **Die Falle ist nicht das fehlende Werkzeug, sondern die Plausibilität
+> des Rests.** Neun Zeilen mit vier sauberen Faktoren sehen nach einer
+> vollständigen Tabelle aus. Wer die Stützstellen aus dem Zusammenhang
+> erschließt — „wird schon bei 100.000 anfangen und in 50.000er Schritten
+> gehen" —, baut ein Register, das an jeder Stelle einen Wert liefert und
+> an keiner den richtigen. **Bei einer Tabelle ohne sichtbare Achsen wird
+> gerendert, nicht geschlossen.**
+
+`v1137`
+
+---
+
+## Ein Zweig, den das Rezept nicht führt, liefert keinen Wert
+
+Homberg schreibt ausdrücklich, seine Sachwertfaktoren gälten für
+Ein- und Zweifamilienhäuser **einschließlich Doppelhaushälften und
+Reihenhäuser** — eine Tabelle für alle drei. Das Rezept trug die Matrix
+deshalb nur einmal, als `zweig: "ezfh"`.
+
+Der Rechner ordnet ein Reihenhaus aber dem Zweig `rhdhh` zu und
+antwortete:
+
+```
+RH = derselbe Satz    objektart_nicht_abgeleitet
+```
+
+**Der Bericht gab einen Wert her, das Register nicht.** Gefunden nur,
+weil die Prüfstrecke ein Reihenhaus und eine Doppelhaushälfte abfragte,
+obwohl die Tabelle „für alle gilt".
+
+**Fasst ein Ausschuss Haustypen zusammen, muss dieselbe Tabelle unter
+JEDEM betroffenen Zweig stehen.** Das ist keine Verdopplung, sondern die
+einzige Art, die Aussage der Quelle abzubilden. Betroffen sind bisher
+Homberg, Marburg-Stadt und Bad Homburg.
+
+**Die Gegenprobe gehört in jede Prüfstrecke:** nicht nur
+`Einfamilienhaus` abfragen, sondern auch `Reihenmittelhaus` und
+`Doppelhaushaelfte` — und zwar gegen denselben Sollwert, wenn der
+Bericht sie zusammenfasst.
+
+Das Gegenstück ist genauso wichtig: Der AfB Marburg druckt für
+Reihenhäuser **nur den hessenweiten Wert** ab, keinen regionalen. Dort
+darf `rhdhh` gerade nicht angelegt werden — eine Lücke der Quelle ist
+kein Erntefehler.
+
+`v1137`
+
+---
+
+## `rm -f` vor dem Pull löscht auch, was committet ist
+
+Beim Ausrollen der hessischen Ernte brach `git pull` zweimal ab, weil
+noch nicht committete Rezepte im Weg lagen:
+
+```
+error: The following untracked working tree files would be
+overwritten by merge: tools/swf-register/rezepte/HE-06413-offenbach.json
+```
+
+Der Einzeiler dagegen war:
+
+```bash
+rm -f tools/swf-register/rezepte/HE-*.json && git pull -q origin staging
+```
+
+Gemeint waren die **untracked** Dateien. Getroffen wurden **alle** — auch
+die sechs, die längst im Zweig standen: Frankfurt, Offenbach, Wiesbaden,
+Oberursel, Kassel und der Landessatz.
+
+**Und `git pull` holt sie nicht zurück.** Bei einem Fast-Forward, der
+diese Dateien nicht anfasst, bleibt die Löschung im Arbeitsbaum stehen.
+Der Pull meldet Erfolg, der Zweig ist auf dem richtigen Stand — und
+sechs Dateien fehlen trotzdem.
+
+Der Registerbau lief danach ohne Fehler durch und meldete:
+
+```
+-> out/swf-he.json  (HE: 33)
+```
+
+**33 statt 43 — und das ist die einzige Stelle, an der es sichtbar war.**
+Hätte diese Saatdatei den Weg in einen Commit gefunden, wären fünf
+Ausschüsse aus dem Register verschwunden, ohne dass irgendetwas
+fehlschlägt: kein Fehler, kein Abbruch, nur ein Kunde in Frankfurt, der
+plötzlich keinen Sachwertfaktor mehr bekommt.
+
+**Richtig ist, gezielt nur Unversioniertes zu entfernen:**
+
+```bash
+git clean -f tools/swf-register/rezepte/   # nur untracked
+git checkout -- tools/swf-register/        # tracked zurueckholen
+```
+
+> **Die Lehre ist nicht „rm ist gefährlich", sondern: eine Zahl, die
+> sinken kann, muss vor jedem Commit gelesen werden.** Der Registerbau
+> nennt sie bei jedem Lauf. Aufgefallen ist der Verlust nur, weil die
+> Prüfstrecke neben den neuen Kreisen auch die *Stadt* Offenbach abfragte
+> — ein Nachbarschlüssel, der mit der neuen Ernte gar nichts zu tun
+> hatte. **Wer nur prüft, was er gerade gebaut hat, sieht nie, was er
+> dabei zerstört hat.**
+
+`v1141`
+
+---
+
+## Ein neuer Jahrgang, der nie zum Zug kommt
+
+Erfurt stand seit Langem mit dem Jahrgang **2021** im Register. Der neue
+Bericht von 2024 wurde eingespielt, gegen 285 Tabellenwerte geprüft, das
+Register gebaut — und der Rechner antwortete weiter mit **2021**.
+
+Zwei Ursachen, beide unsichtbar:
+
+**1. Die Kaskade hört beim feineren Schlüssel auf.** Der Altsatz lag auf
+`16051000` (achtstellig), das neue Rezept auf `16051` (fünfstellig). Die
+Kaskade prüft 8 → 5 → 3 → 2 und **nimmt den ersten Treffer.** Der neue Satz
+wurde nie erreicht. Sichtbar wurde es erst, als die Abfrage den Jahrgang
+mit ausgab.
+
+**2. `objektart` schlägt `zweig`.** Der Auswerter filtert mit
+
+```js
+return z === code || a === code;      // z = zweig, a = objektart
+```
+
+Der Altsatz heißt im Zweig `efh_bis1990`, trägt aber zusätzlich
+`objektart: "efh"` — und `ZWEIG_VORZUG` prüft für ein Einfamilienhaus die
+Codes **in dieser Reihenfolge**: `['efh', 'ezfh']`. Ein neuer Satz mit
+`zweig: "ezfh"` kommt damit nie an die Reihe; der Altsatz trifft schon beim
+ersten Code, und der Jahrgangsvergleich findet **innerhalb** dieser Gruppe
+statt — also gar nicht.
+
+**Bei Doppelhaushälften trat das Problem nicht auf**, weil beide Jahrgänge
+dort denselben Zweignamen `rhdhh` tragen. Dort gewann der neuere Jahrgang
+von allein. Genau das machte den Fehler so tückisch: **die Hälfte
+funktionierte.**
+
+> **Die Lehre: Wer einen Jahrgang ablöst, muss auf demselben Schlüssel und
+> unter demselben Code landen wie der Altsatz.** Nicht auf einem gröberen,
+> nicht unter einem anderen Zweignamen. Sonst liegen beide im Register, der
+> Registerbau meldet Erfolg — und der Kunde bekommt den alten Wert.
+>
+> **Die Prüfung, die es zeigt, ist eine Zeile:** nicht nur den Wert
+> abfragen, sondern `berichtsjahr` und `stichtag` mit ausgeben. Ein Wert
+> allein sieht immer richtig aus.
+
+`rezept2register.py` überträgt das Feld `objektart` übrigens nicht — ein
+Rezept kann es also gar nicht setzen. Der einzige Weg ist der Zweigname.
+
+`v1151`
+
+## Eine Versionsnummer, die schon vergeben war
+
+**14.09.2026.** Die Steuerprogression bekam in der Sitzung die Nummer
+`v1365`, das Darstellungs-Paket die Nummer `v1288`. **Beide waren längst
+vergeben** — `v1365`/`v1365b` für den Quickcheck-Rückfall (`quickcheck-app.html`,
+`qc-bridge.js`), `v1288` für `bodenrichtwert.js`. Die Reihe der Haupt-App stand
+zu dem Zeitpunkt bei **v1378b**; beide neuen Pakete lagen also rund hundert
+Nummern zu tief.
+
+**Warum es passiert ist:** Ich habe die nächste Nummer aus dem gelesen, was
+gerade vor mir lag — dem Journal der Haupt-App, dessen letzter Eintrag bei
+`v1293` endet. Das Journal ist aber nicht der Nummernvorrat. **Den führt
+`git log`.** Und weil zwei Stränge parallel laufen (`v11xx` Marktbericht,
+`v13xx` Haupt-App), sieht eine Nummer aus dem falschen Kreis völlig plausibel
+aus: `v1156` und `v1365` standen in derselben Woche nebeneinander im Log.
+
+**Was das anrichtet:** CLAUDE.md, Regel 5 sagt es vorweg — „nie geänderten
+Inhalt unter altem Namen ausliefern, sonst halten Marker und Cache-Buster den
+neuen Stand für den alten." Konkret:
+
+* `grep -n v1365` findet jetzt zwei verschiedene Arbeiten in vier Dateien.
+* Ein Cache-Buster `?v=v1365b`, den es schon gab, ist für einen Browser, der
+  ihn einmal gesehen hat, **kein neuer Wert** — die Datei kommt aus dem Cache.
+* Wer später den Fehler sucht, liest den Marker und landet im falschen Paket.
+
+**Die Regel:** Die nächste Nummer kommt aus
+
+```
+git log --oneline -800 | grep -oE "^[0-9a-f]+ v13[0-9]{2}" | awk '{print $2}' | sort -u | tail -3
+```
+
+— nicht aus dem Journal, nicht aus dem Gedächtnis, nicht aus dem letzten
+Commit der eigenen Sitzung. Für den Marktbericht dasselbe mit `v11[0-9]{2}`.
+
+**Und eine zweite Falle beim Aufräumen:** `sed -i 's/v1288/v1380/g' index.html`
+zog auch `bodenrichtwert.js?v=v1288` mit hoch — einen **fremden**
+Cache-Buster, der mit dem Paket nichts zu tun hatte. Eine hochgezogene
+Versionsnummer ist keine harmlose Textänderung: sie lädt beim Kunden eine
+Datei neu, für die es keinen Grund gibt. **Beim Umbenennen von Nummern immer
+zeilengenau arbeiten** (`sed -i '<zeile>s|…|…|'`) und danach jede geänderte
+Zeile einzeln ansehen.
+
+## Ein PDF, das aussieht wie der Bericht und die Beschreibung ist
+
+**14.09.2026, MV-Ernte.** Die Geoshops der `geocms.com`-Plattform galten als
+„laden dynamisch, kein Zugang". Der Grund war ein Link, der zu gut funktioniert:
+
+```
+mod/media/ajax/1/GetMedia/?con=<id>     ->  HTTP 200, echtes PDF, 153 KB
+```
+
+Das ist **nicht** der Bericht, sondern die **Produktbeschreibung**. Sie trägt
+das vollständige Inhaltsverzeichnis samt der Kapitelüberschrift
+„Sachwertfaktoren für Ein- und Zweifamilienhäuser" — vier Seiten, die wie der
+Anfang eines Berichts aussehen, dem die Tabellen fehlen.
+
+**Nichts daran ist ein Fehler**, den ein Prüfschritt abfangen würde: der
+Statuscode stimmt, der Dateityp stimmt, `pdftotext` liefert lesbaren Text, und
+der Text passt zum Thema. Aufgefallen ist es nur an einer Zahl auf der
+HTML-Seite daneben: „Dateigröße: 1,9 MB".
+
+**Der echte Download steht auf der Produktseite**, nicht auf der Übersicht:
+
+```
+<shop>/de/<produktliste>/<id>,<mandant>.html
+   -> href=".../GetProduct/con=<id>,<m>&method=store/<name>.pdf"
+```
+
+Man kommt also nur an ihn, wenn man **jede Produktseite einzeln lädt**. Die
+Übersichtsseite führt ihn nirgends.
+
+**Die Lehre, allgemein:** Ein Download, der plausibel antwortet, ist noch kein
+Beleg dafür, dass man das Richtige geholt hat. Wo die Quelle eine Größe, eine
+Seitenzahl oder eine Kapitelzahl nennt, gehört sie gegen das Geholte geprüft —
+`pdfinfo | grep Pages` kostet nichts. Ein Bericht mit vier Seiten ist keiner.
+
+**Zweiter Teil derselben Falle:** Die Seite heißt nicht überall gleich. Rostock
+führt sie als `grundstuecksmarktberichte.html`, Schwerin als
+`grundstuecksmarkt.html`. Ein fest verdrahteter Pfad liefert dort HTTP 200 und
+**null Produkte** — ein Befund, der wie „nichts vorhanden" aussieht und keiner
+ist. Den Menüpunkt suchen, nicht raten.
+
+## Das zweite Argument ist der NW-Pfad, nicht das Ziel
+
+**14.09.2026.** `rezept2register.py rezepte <pfad>` sieht aus, als nähme es ein
+Ausgabeziel. Es nimmt aber den **NW-Pfad** (Z. 487: `NW_ZIEL = ZIEL`); alle
+übrigen Länder werden als `swf-<land>.json` daneben abgelegt.
+
+Mit `…/register/swf-mv.json` als Argument passiert deshalb Folgendes: MV wird
+nach `swf-mv.json` geschrieben — und NW überschreibt dieselbe Datei
+alphabetisch danach. Am Ende steht in `swf-mv.json` **Nordrhein-Westfalen**,
+und die Ausgabe sagt es sogar, wenn man sie liest:
+
+```
+-> …/register/swf-mv.json  (MV: 4)
+-> …/register/swf-mv.json  (NW: 31)      <- zweimal derselbe Pfad
+```
+
+**Der Aufruf nennt immer `swf-nrw.json`.** Und nach jedem Bau gehört
+`git status` auf das Registerverzeichnis: geändert werden darf nur, was sich
+ändern sollte.
+
+> **Dabei ein Fehlalarm, den eine falsche Zahl von mir ausgelöst hat.** Der Bau
+> meldete 348 Sätze, während im Erntetagebuch 364 standen — es sah aus, als
+> verlöre der Generator Datensätze (die v1141-Falle). Gemessen im Repo waren es
+> aber 345, und 345 + 3 neue = 348. Der Generator war vollständig, meine Zahl
+> war zu hoch. **Eine Zahl aus dem Gedächtnis ist kein Messwert**, und ein
+> Vergleich gegen sie erzeugt Fehlalarme, die Zeit kosten — hier
+> `cat swf-*.json | grep -c '"kennzahl"'`.
+
+## Ein 404 auf einen geratenen Namen ist kein Befund
+
+**14.09.2026, viermal in einer Sitzung — immer dieselbe Klasse: angenommen
+statt gemessen, und jedes Mal sah das Ergebnis aus wie ein Ergebnis.**
+
+| was angenommen wurde | was stimmt | wie es aussah |
+|---|---|---|
+| Geoshop heißt `geoshop-lk-seenplatte` | `geoshop-lk-mecklenburgische-seenplatte` | HTTP 404 → „hat keinen Shop" |
+| Bayerische Ausschuss-URLs aus Kreisnamen gebildet | echte Liste steht auf der **Startseite**; `/gutachterausschuss` selbst ist 404 | 48 von 60 → 404 |
+| Kostenlos steht als Wort „kostenfrei" da | die Seenplatte schreibt **„0,00 €"** | 17 kostenfreie Berichte → „0 kostenfrei" |
+| Der neueste Jahrgang ist der gesuchte Bericht | „Bericht LuF 2026" ist der **Land- und Forstwirtschaftsbericht** | hätte still das falsche Dokument geerntet |
+
+**Das Gemeinsame:** Keiner dieser Fälle wirft einen Fehler. Ein 404 ist eine
+gültige Antwort, „0 Produkte" ist eine Zahl, und ein PDF mit dem richtigen
+Jahr ist ein PDF. Alle vier Befunde waren plausibel und falsch.
+
+**Die Regel:** Wo ein Name, ein Pfad oder eine Formulierung in die Abfrage
+eingeht, wird er **ausgelesen, nicht gebildet** — aus der Übersichtsseite,
+dem Menü, der Produktliste. Und wo gefiltert wird, gehört die Gegenprobe
+dazu: *wie viele hat die Seite insgesamt, und wie viele bleiben übrig?* Eine
+Filterquote von 0 % oder 100 % ist fast immer ein Filterfehler, kein Befund.
+
+## Eine Zahl, die ermittelt, angezeigt und nicht gerechnet wird
+
+**v1397, 14.09.2026.** In `calc.js` stand seit V258-07 wörtlich im Code:
+
+```js
+// Effektives zvE ohne Immobilie + WK anderer Objekte (nur Display)
+// Note: Eigentliche Steuerberechnung weiterhin auf K.zve_immo basiert
+```
+
+Der WK-Aggregator wurde also **gefragt**, die Zahl **ermittelt**, als Tooltip
+**angezeigt** — und dann nicht verwendet. `tax.js` rechnete dieselbe Sache
+zwei Türen weiter **sehr wohl** mit (`baseIncome + _bestandInfo.sum`).
+
+**Damit wies dieselbe App für dasselbe Objekt zwei verschiedene
+Steuerwirkungen aus.** Aufgefallen ist es nicht durch einen Fehler, sondern
+durch Marcels Frage nach einem *Text*: „warum steht das noch drin?"
+
+**Die Lehre:** Ein `// nur Display` neben einem Rechenwert ist eine offene
+Aufgabe, keine Entwurfsentscheidung. Wer eine Größe ermittelt und nur zeigt,
+hat die halbe Arbeit getan — und die andere Hälfte sieht aus, als wäre sie
+erledigt. Dasselbe Muster wie „bleibt stehen, bis der letzte alte Aufrufer weg
+ist".
+
+**Und die Gegenprobe dazu:** die Frage nach einem Text ist oft eine Frage nach
+der Funktion. Der Text war fachlich korrekt — er beschrieb nur einen Zustand,
+den die App zur Hälfte nicht mehr hatte.
+
+## Zwei Aggregator-Funktionen, zwei Filter
+
+Derselbe `DealPilotWKAggregator` bietet `getWKForOtherObjects(id, jahr)` und
+wird in `tax.js` von `_getBestandLossesForYear(jahr)` ergänzt. **Sie liefern
+verschiedene Zahlen:** die erste summiert *alle* anderen Objekte, die zweite
+nur die **vor dem eigenen gekauften**, die im Bezugsjahr schon bestanden
+(V280).
+
+Wer für eine neue Rechenstelle die erstbeste greift, baut einen stillen
+Widerspruch zum Tab Steuern. **Vor dem Aufruf den Filter lesen, nicht den
+Namen.**
+
+## Eine feste Zahl mitten in einer Nutzerrechnung
+
+`var ZVE_BASE=78000;` stand in `dashboard.js` und war die Basis für die
+**gesamte** Steuerwirkung der Cockpit-Projektion — für jeden Nutzer dieselbe.
+Das Profil-zvE lag die ganze Zeit daneben (`DealPilotZvE.getForYear`), samt
+Historie.
+
+Der Fehler war unsichtbar, weil 78.000 € für einen mittleren Fall **plausibel
+aussieht**. Er trifft die Ränder: wer 45.000 € verdient, bekam die Entlastung
+eines Gutverdieners vorgerechnet.
+
+**Eine Konstante, die einen Nutzerwert vertritt, ist immer ein Platzhalter** —
+auch wenn sie seit Jahren dort steht und nie gemeldet wurde. Im selben Zug
+gefunden: `vuvY1` summierte `_kpis_vuv`, ein Feld, das **nirgends gesetzt
+wird**. Ergebnis immer 0, verwendet nie. Ein grep nach dem Feldnamen hätte es
+jederzeit gezeigt.
+
+## `sed -i "${L}a\…"` mit leerem $L schreibt in JEDE Zeile
+
+**15.09.2026, an `app.js` (5.286 Zeilen) passiert.** Der Befehl war
+
+```bash
+L=$(grep -n "…" datei | cut -d: -f1) && sed -i "${L}a\…" datei
+```
+
+Der `grep` fand **nichts**, also war `L` leer. Aus `sed -i "${L}a\…"` wurde
+damit `sed -i "a\…"` — und **ein `a` ohne Zeilenadresse gilt für jede Zeile**.
+Ergebnis: **5.298 Einfügungen** statt einer. Die Datei war unbrauchbar.
+
+**Bemerkt hat es erst ein `grep -c`** zwei Schritte später, das statt `1` eine
+vierstellige Zahl meldete. Der `sed` selbst lief ohne Fehler durch; die
+Fehlermeldung, die im selben Aufruf erschien, kam von einem *anderen* Teil der
+Befehlskette und lenkte den Blick auf die falsche Stelle.
+
+**Behoben mit `git checkout -- datei`** — deshalb wird committet, bevor an
+einer zweiten Stelle derselben Datei gearbeitet wird.
+
+### Die Regel
+
+- **Zeilennummern vor dem Einsetzen prüfen.** `[ -n "$L" ] || exit 1` kostet
+  nichts. Eine leere Adresse ist bei `sed` kein Fehler, sondern eine
+  *Erweiterung* des Geltungsbereichs auf alles.
+- **Besser gar kein `sed a/i` für mehrzeilige Blöcke**, sondern der Splice:
+  `{ head -N datei; cat block; tail -n +M datei; } > neu`. Der schlägt bei
+  einer leeren Variablen sichtbar fehl, statt still alles zu treffen.
+- **Nach jedem Einsetzen zählen**, wie oft der neue Text vorkommt. `grep -c`
+  auf einen Marker aus dem Block ist eine Zeile und fängt genau diesen Fall.
+
+---
+
+## `einheit` sagt, wie der Bericht druckt — nicht, was in `wert` steht
+
+Gemessen am 15.09.2026 beim Aufbau der Regressionsstrecke über alle 383
+Sachwertfaktor-Sätze (`tools/swf-register/regression-swf.mjs`).
+
+Ein Ergebnis aus `swf_modelle.js` trägt drei Felder, und zwei davon werden
+leicht verwechselt:
+
+| Feld | was drinsteht |
+|---|---|
+| `dokumentwert` | die Zahl, **wie der Bericht sie druckt** — 90,86 · 26 · 1,02 |
+| `einheit` | in welcher Einheit **diese Zahl** steht |
+| `wert` | **immer der Faktor** — außer bei `eur` |
+
+Der Auswerter rechnet in `IN_FAKTOR` um (`swf_modelle.js:982`):
+`prozent → v/100`, `zuschlag_prozent → 1 + v/100`, `faktor → v`.
+
+**Wer `einheit` für die Einheit von `wert` hält, prüft gegen das falsche
+Band.** Drei Sätze zeigen alle drei Ausgänge dieses Irrtums:
+
+- **Stadt Paderborn** (`linear_sachwert`, `eur`) — 308.942. Der **einzige**
+  Fall, in dem `wert` wirklich kein Faktor ist. Sah nach einem entgleisten
+  Faktor aus und war korrekt.
+- **Kreis Lippe/Detmold** (`doppel_log`, `prozent`) — der Bericht druckt
+  90,86 %, `wert` ist längst 0,9086. Gegen ein Prozentband geprüft, fiel die
+  **richtige** Zahl durch.
+- **Stadt Dortmund** (`stufen_1d`, `zuschlag_prozent`) — der Bericht druckt
+  +26 Prozentpunkte, `wert` ist 1,26. Dieser Satz lief **still durch**, weil
+  1,26 zufällig im Faktorband liegt.
+
+> **Der dritte ist der gefährliche.** Ein falsch gelesenes Feld, das rot
+> wird, kostet zehn Minuten. Eines, das grün wird, weil die Zahl zufällig
+> ins falsche Band passt, kostet nichts — und schützt auch nichts. Das ist
+> dieselbe Klasse wie der `gold-audit`, der 6 statt 181 Dateien las und
+> „sauber" meldete.
+
+### Die Regel
+
+**Ein Prüfstand, der eine Umrechnung prüfen soll, darf die zu prüfende
+Umrechnung nicht aufrufen.** `regression-swf.mjs` führt die Tabelle
+absichtlich ein zweites Mal (`KETTE`) und rechnet `dokumentwert` selbst auf
+`wert` nach. Läuft der Auswerter künftig auseinander, meldet der Lauf einen
+Kettenbruch — statt beiden Seiten gleichzeitig zu glauben.
+
+Und: **eine Einheit, die der Prüfstand nicht kennt, ist ein Befund, kein
+Durchlauf.** Vorher fiel jede unbekannte Einheit stillschweigend auf das
+Faktorband zurück. Genau so kam Dortmund durch.
+
+---
+
+## Ein Filter, der zu eng sucht, gibt frei statt zu sperren
+
+Gemessen am 15.09.2026 bei der Niedersachsen-Ernte. Ein Registersatz wurde
+deshalb **gebaut, geprüft, ausgerollt — und musste zurückgezogen werden**
+(v1417 → v1418).
+
+Die niedersächsischen Sachwertfaktor-Kalkulatoren wählen teils über eine
+**Lagegruppe** zwischen mehreren Kurven aus. Ohne den zugehörigen
+URL-Parameter ist ein abgetastetes Gitter nur für die Vorgabe-Lage gültig,
+und im Satz stünde nicht, für welche. `ni-lageachse.sh` sollte genau diese
+Gebiete sperren.
+
+**Das Kriterium war: ein Feld `Lage:` UND eine Kurve „Sachwerte und
+Regionen".** Beides zu eng, und der Fehler ging in beide Richtungen:
+
+| Dashboard | steht dort | alter Filter | richtig |
+|---|---|---|---|
+| Salzgitter | `Lage im Landkreis: Bruchmachtersen…` | erntbar | **gesperrt** |
+| Peine | `Lage im Kreis [Umrechnungskoef.]: …` | erntbar | **gesperrt** |
+| Braunschweig | nur Grafiktitel „…von Lage und Sachwert" | erntbar | erntbar ✓ |
+
+Kein `Lage:` mit direktem Doppelpunkt, keine Kurve „und Regionen" — also
+freigegeben. **71 von 81 galten als erntbar; richtig sind 55.** Sechzehn
+Gebiete waren falsch freigegeben.
+
+> ### Warum das schlimmer ist als ein Filter, der zu viel sperrt
+>
+> Ein zu strenger Filter kostet Arbeit: man sieht nach und gibt frei. Ein
+> zu lascher Filter **erzeugt einen Datensatz, der richtig aussieht** — mit
+> Gegenprobe am Anwendungsbeispiel, mit Belegen, mit Stufe und Modell-
+> vermerk. Der Salzgitter-Satz hat jede Prüfung bestanden, die ich ihm
+> gestellt habe. Er war trotzdem falsch, weil die Frage nie gestellt wurde.
+>
+> Dieselbe Klasse wie der `gold-audit`, der 6 statt 181 Dateien las und
+> „sauber" meldete, und wie der Einheiten-Prüfstand, der Dortmunds
+> `zuschlag_prozent` still durchwinkte, weil 1,26 zufällig im Faktorband
+> lag.
+
+### Zwei Regeln daraus
+
+**① Ein Merkmal, das ein Filter sucht, muss an der Stelle gesucht werden,
+wo es strukturell steht** — nicht dort, wo es zufällig auch vorkommt. Das
+Lage-Feld gehört zur EINGABEMASKE (die ersten Zeilen des Dokuments);
+Grafiktitel stehen weiter unten. Danach wird jetzt gefiltert, und
+Braunschweig fällt nicht mehr fälschlich mit hinein.
+
+**② Gefunden wurde es nicht durch eine Prüfung, sondern weil im Steckbrief
+eines anderen Gebiets die Zeile `Gemeinde Edemissen [1,00]` auffiel.** Wer
+einen Filter baut, sollte seine Freigaben stichprobenweise von Hand
+gegenlesen — gerade die, die er freigibt. Die Sperrungen erklären sich
+selbst, die Freigaben nicht.
+
+### Und ein Nebenbefund, der dieselbe Form hat
+
+**Die Teilmärkte EINES Gebiets können sich unterscheiden.** Beim Landkreis
+Verden führt der EFH-Kalkulator keine Lage-Achse, der Reihenhaus-
+Kalkulator sehr wohl. „Gebiet X ist erntbar" ist deshalb keine gültige
+Aussage — es gilt je Teilmarkt.

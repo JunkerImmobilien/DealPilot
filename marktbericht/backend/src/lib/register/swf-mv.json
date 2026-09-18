@@ -1,0 +1,1155 @@
+[
+ {
+  "land_code": "MV",
+  "ags": "13071",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x": [
+    100000,
+    130000,
+    160000,
+    190000,
+    220000,
+    250000,
+    280000,
+    310000,
+    340000,
+    370000,
+    400000,
+    430000,
+    460000,
+    490000,
+    520000,
+    550000,
+    580000,
+    610000,
+    640000,
+    670000,
+    700000
+   ],
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_k_feld": "brw_klasse",
+   "zuordnung_feld": "brw",
+   "kategorie_baender": [
+    {
+     "kategorie": "bis_80",
+     "bis": 80
+    },
+    {
+     "kategorie": "80_bis_100",
+     "von": 80.01,
+     "bis": 100
+    },
+    {
+     "kategorie": "ueber_100",
+     "von": 100.01
+    }
+   ],
+   "kategorien": [
+    "bis_80",
+    "80_bis_100",
+    "ueber_100"
+   ],
+   "zellen_schluessel": "x-Stützstelle -> Werte in Reihenfolge kategorien",
+   "zellen": {
+    "100000": [
+     1.0584,
+     1.0975,
+     1.1194
+    ],
+    "130000": [
+     1.0195,
+     1.0584,
+     1.092
+    ],
+    "160000": [
+     0.9897,
+     1.0284,
+     1.0707
+    ],
+    "190000": [
+     0.9657,
+     1.0042,
+     1.0534
+    ],
+    "220000": [
+     0.9457,
+     0.984,
+     1.0389
+    ],
+    "250000": [
+     0.9286,
+     0.9668,
+     1.0264
+    ],
+    "280000": [
+     0.9137,
+     0.9517,
+     1.0154
+    ],
+    "310000": [
+     0.9006,
+     0.9384,
+     1.0057
+    ],
+    "340000": [
+     0.8888,
+     0.9265,
+     0.9969
+    ],
+    "370000": [
+     0.8781,
+     0.9157,
+     0.989
+    ],
+    "400000": [
+     0.8684,
+     0.9058,
+     0.9817
+    ],
+    "430000": [
+     0.8595,
+     0.8968,
+     0.975
+    ],
+    "460000": [
+     0.8512,
+     0.8885,
+     0.9688
+    ],
+    "490000": [
+     0.8436,
+     0.8807,
+     0.963
+    ],
+    "520000": [
+     0.8365,
+     0.8735,
+     0.9576
+    ],
+    "550000": [
+     0.8298,
+     0.8668,
+     0.9526
+    ],
+    "580000": [
+     0.8235,
+     0.8604,
+     0.9478
+    ],
+    "610000": [
+     0.8176,
+     0.8544,
+     0.9433
+    ],
+    "640000": [
+     0.812,
+     0.8488,
+     0.939
+    ],
+    "670000": [
+     0.8067,
+     0.8434,
+     0.9349
+    ],
+    "700000": [
+     0.8017,
+     0.8383,
+     0.931
+    ]
+   },
+   "rundung_stellen": 4,
+   "liefert": "faktor",
+   "hinweis": "DER AUSSCHUSS SCHRÄNKT SELBST EIN, Seite 52 wörtlich: „Auf Grund der teilweise geringen Zahl an auswertbaren Kauffällen sind die Sachwertfaktoren, Liegenschaftszinssätze und Vergleichsfaktoren für einige Gebäudeklassen statistisch nicht gesichert und dienen nur der Orientierung.\" Die Korrelationskoeffizienten geben ihm recht. BÄNDER, KEINE STÜTZSTELLEN: Der Bericht teilt den Bodenrichtwert in Klassen und gibt je Klasse eine eigene Potenzfunktion an — zwischen den Klassen wird NICHT interpoliert. bis 80: k = 0.76193 × (vSW in Mio €)^-0.14272 (Ø BRW 77 €/m², 24 Fälle, r = 0.481) · 80 bis 100: k = 0.7979 × (vSW in Mio €)^-0.13847 (Ø BRW 91 €/m², 24 Fälle, r = 0.500) · ueber 100: k = 0.90012 × (vSW in Mio €)^-0.0947 (Ø BRW 124 €/m², 18 Fälle, r = 0.141). Hinterlegt sind die abgedruckten Tabellen, jede der 63 Zellen gegen die zugehörige Funktion geprüft. DIE KLASSENGRENZEN UNTERSCHEIDEN SICH JE OBJEKTART: bei Ein- und Zweifamilienhäusern 80 und 100 €/m², bei Doppelhaushälften und Reihenhäusern 85 €/m². Die Spalte „gesamt\" des Berichts ist bewusst NICHT hinterlegt: sie ist die Auswertung ohne Klassenbildung, und wo der Bodenrichtwert bekannt ist, gilt die Klasse.",
+   "normobjekt": "Tabellenbereich 100.000 bis 700.000 Euro vorläufiger Sachwert. Bodenrichtwertklassen nach dem Bericht; außerhalb gibt es keinen Wert."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "Anlage 4 Punkt II ImmoWertV",
+   "gebaeudestandard": "Anlage 4 Punkt III ImmoWertV"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Grundstücksmarktbericht 2024, Abschnitt 5.2.1, Seiten 56 f."
+  ],
+  "stufe": "C",
+  "stufe_grund": "KEINE Stufe B, und der Ausschuss begruendet es selbst: er weist die Werte fuer einige Gebaeudeklassen ausdruecklich als \"statistisch nicht gesichert\" aus, die nur der Orientierung dienen (Seite 52). Die Korrelationskoeffizienten reichen von 0.141 bis 0.500 bei 18 bis 24 Kauffaellen je Klasse. Amtlich abgedruckt und gegen die Konstanten nachgerechnet ist der Satz gleichwohl.",
+  "fallzahl": 66,
+  "streuung": null,
+  "stichtag": "2024-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Grundstücksmarktbericht 2024 © Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "lizenz": "Kostenfrei über den Geoshop des Landkreises abrufbar; Wiedergabe mit Quellenangabe",
+  "verwendung": "produkt",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: Normalherstellungskosten nach Anlage 4 Punkt II (zu § 12 Abs. 5 Satz 3) ImmoWertV, Gebäudestandard nach Anlage 4 Punkt III, Bodenwert aus dem zutreffenden Bodenrichtwert angepasst an die Merkmale des Einzelobjekts, marktübliche objektbezogene Grundstücksfläche, besondere objektspezifische Grundstücksmerkmale über eine entsprechende Kaufpreisbereinigung. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN; die abgedruckten Potenzfunktionen rechnen intern mit Millionen. Der Herausgeber weist die Werte für einige Gebäudeklassen ausdrücklich als statistisch nicht gesichert und nur der Orientierung dienend aus.",
+  "fundstelle": "Grundstücksmarktbericht 2024, Kapitel 5.2 „Sachwertfaktoren\", Abschnitte 5.2.1 (Ein- und Zweifamilienhäuser) und der Abschnitt „Doppelhaushälften und Reihenhäuser 2023\", Seiten 55 bis 58."
+ },
+ {
+  "land_code": "MV",
+  "ags": "13071",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x": [
+    100000,
+    120000,
+    140000,
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000,
+    400000,
+    420000,
+    440000,
+    460000,
+    480000,
+    500000
+   ],
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_k_feld": "brw_klasse",
+   "zuordnung_feld": "brw",
+   "kategorie_baender": [
+    {
+     "kategorie": "bis_85",
+     "bis": 85
+    },
+    {
+     "kategorie": "ueber_85",
+     "von": 85.01
+    }
+   ],
+   "kategorien": [
+    "bis_85",
+    "ueber_85"
+   ],
+   "zellen_schluessel": "x-Stützstelle -> Werte in Reihenfolge kategorien",
+   "zellen": {
+    "100000": [
+     1.0502,
+     1.1232
+    ],
+    "120000": [
+     1.0288,
+     1.1084
+    ],
+    "140000": [
+     1.011,
+     1.096
+    ],
+    "160000": [
+     0.9959,
+     1.0854
+    ],
+    "180000": [
+     0.9827,
+     1.0761
+    ],
+    "200000": [
+     0.971,
+     1.0679
+    ],
+    "220000": [
+     0.9606,
+     1.0605
+    ],
+    "240000": [
+     0.9512,
+     1.0538
+    ],
+    "260000": [
+     0.9427,
+     1.0477
+    ],
+    "280000": [
+     0.9348,
+     1.0421
+    ],
+    "300000": [
+     0.9275,
+     1.0369
+    ],
+    "320000": [
+     0.9208,
+     1.032
+    ],
+    "340000": [
+     0.9145,
+     1.0275
+    ],
+    "360000": [
+     0.9086,
+     1.0232
+    ],
+    "380000": [
+     0.9031,
+     1.0192
+    ],
+    "400000": [
+     0.8978,
+     1.0154
+    ],
+    "420000": [
+     0.8929,
+     1.0118
+    ],
+    "440000": [
+     0.8882,
+     1.0084
+    ],
+    "460000": [
+     0.8838,
+     1.0051
+    ],
+    "480000": [
+     0.8795,
+     1.002
+    ],
+    "500000": [
+     0.8755,
+     0.999
+    ]
+   },
+   "rundung_stellen": 4,
+   "liefert": "faktor",
+   "hinweis": "DER AUSSCHUSS SCHRÄNKT SELBST EIN, Seite 52 wörtlich: „Auf Grund der teilweise geringen Zahl an auswertbaren Kauffällen sind die Sachwertfaktoren, Liegenschaftszinssätze und Vergleichsfaktoren für einige Gebäudeklassen statistisch nicht gesichert und dienen nur der Orientierung.\" Die Korrelationskoeffizienten geben ihm recht. BÄNDER, KEINE STÜTZSTELLEN: Der Bericht teilt den Bodenrichtwert in Klassen und gibt je Klasse eine eigene Potenzfunktion an — zwischen den Klassen wird NICHT interpoliert. bis 85: k = 0.80948 × (vSW in Mio €)^-0.11307 (Ø BRW 79 €/m², 19 Fälle, r = 0.365) · ueber 85: k = 0.94988 × (vSW in Mio €)^-0.07278 (Ø BRW 111 €/m², 18 Fälle, r = 0.184). Hinterlegt sind die abgedruckten Tabellen, jede der 42 Zellen gegen die zugehörige Funktion geprüft. DIE KLASSENGRENZEN UNTERSCHEIDEN SICH JE OBJEKTART: bei Ein- und Zweifamilienhäusern 80 und 100 €/m², bei Doppelhaushälften und Reihenhäusern 85 €/m². Die Spalte „gesamt\" des Berichts ist bewusst NICHT hinterlegt: sie ist die Auswertung ohne Klassenbildung, und wo der Bodenrichtwert bekannt ist, gilt die Klasse.",
+   "normobjekt": "Tabellenbereich 100.000 bis 500.000 Euro vorläufiger Sachwert. Bodenrichtwertklassen nach dem Bericht; außerhalb gibt es keinen Wert."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "Anlage 4 Punkt II ImmoWertV",
+   "gebaeudestandard": "Anlage 4 Punkt III ImmoWertV"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Grundstücksmarktbericht 2024, Abschnitt „Doppelhaushälften und Reihenhäuser 2023\", Seiten 57 f."
+  ],
+  "stufe": "C",
+  "stufe_grund": "KEINE Stufe B, und der Ausschuss begruendet es selbst: er weist die Werte fuer einige Gebaeudeklassen ausdruecklich als \"statistisch nicht gesichert\" aus, die nur der Orientierung dienen (Seite 52). Die Korrelationskoeffizienten reichen von 0.184 bis 0.365 bei 18 bis 19 Kauffaellen je Klasse. Amtlich abgedruckt und gegen die Konstanten nachgerechnet ist der Satz gleichwohl.",
+  "fallzahl": 37,
+  "streuung": null,
+  "stichtag": "2024-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Grundstücksmarktbericht 2024 © Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "lizenz": "Kostenfrei über den Geoshop des Landkreises abrufbar; Wiedergabe mit Quellenangabe",
+  "verwendung": "produkt",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: Normalherstellungskosten nach Anlage 4 Punkt II (zu § 12 Abs. 5 Satz 3) ImmoWertV, Gebäudestandard nach Anlage 4 Punkt III, Bodenwert aus dem zutreffenden Bodenrichtwert angepasst an die Merkmale des Einzelobjekts, marktübliche objektbezogene Grundstücksfläche, besondere objektspezifische Grundstücksmerkmale über eine entsprechende Kaufpreisbereinigung. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN; die abgedruckten Potenzfunktionen rechnen intern mit Millionen. Der Herausgeber weist die Werte für einige Gebäudeklassen ausdrücklich als statistisch nicht gesichert und nur der Orientierung dienend aus.",
+  "fundstelle": "Grundstücksmarktbericht 2024, Kapitel 5.2 „Sachwertfaktoren\", Abschnitte 5.2.1 (Ein- und Zweifamilienhäuser) und der Abschnitt „Doppelhaushälften und Reihenhäuser 2023\", Seiten 55 bis 58."
+ },
+ {
+  "land_code": "MV",
+  "ags": "13071",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x": [
+    100000,
+    120000,
+    140000,
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000,
+    400000,
+    420000,
+    440000,
+    460000,
+    480000,
+    500000
+   ],
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_k_feld": "brw_klasse",
+   "zuordnung_feld": "brw",
+   "kategorie_baender": [
+    {
+     "kategorie": "bis_85",
+     "bis": 85
+    },
+    {
+     "kategorie": "ueber_85",
+     "von": 85.01
+    }
+   ],
+   "kategorien": [
+    "bis_85",
+    "ueber_85"
+   ],
+   "zellen_schluessel": "x-Stützstelle -> Werte in Reihenfolge kategorien",
+   "zellen": {
+    "100000": [
+     1.0502,
+     1.1232
+    ],
+    "120000": [
+     1.0288,
+     1.1084
+    ],
+    "140000": [
+     1.011,
+     1.096
+    ],
+    "160000": [
+     0.9959,
+     1.0854
+    ],
+    "180000": [
+     0.9827,
+     1.0761
+    ],
+    "200000": [
+     0.971,
+     1.0679
+    ],
+    "220000": [
+     0.9606,
+     1.0605
+    ],
+    "240000": [
+     0.9512,
+     1.0538
+    ],
+    "260000": [
+     0.9427,
+     1.0477
+    ],
+    "280000": [
+     0.9348,
+     1.0421
+    ],
+    "300000": [
+     0.9275,
+     1.0369
+    ],
+    "320000": [
+     0.9208,
+     1.032
+    ],
+    "340000": [
+     0.9145,
+     1.0275
+    ],
+    "360000": [
+     0.9086,
+     1.0232
+    ],
+    "380000": [
+     0.9031,
+     1.0192
+    ],
+    "400000": [
+     0.8978,
+     1.0154
+    ],
+    "420000": [
+     0.8929,
+     1.0118
+    ],
+    "440000": [
+     0.8882,
+     1.0084
+    ],
+    "460000": [
+     0.8838,
+     1.0051
+    ],
+    "480000": [
+     0.8795,
+     1.002
+    ],
+    "500000": [
+     0.8755,
+     0.999
+    ]
+   },
+   "rundung_stellen": 4,
+   "liefert": "faktor",
+   "hinweis": "DER AUSSCHUSS SCHRÄNKT SELBST EIN, Seite 52 wörtlich: „Auf Grund der teilweise geringen Zahl an auswertbaren Kauffällen sind die Sachwertfaktoren, Liegenschaftszinssätze und Vergleichsfaktoren für einige Gebäudeklassen statistisch nicht gesichert und dienen nur der Orientierung.\" Die Korrelationskoeffizienten geben ihm recht. BÄNDER, KEINE STÜTZSTELLEN: Der Bericht teilt den Bodenrichtwert in Klassen und gibt je Klasse eine eigene Potenzfunktion an — zwischen den Klassen wird NICHT interpoliert. bis 85: k = 0.80948 × (vSW in Mio €)^-0.11307 (Ø BRW 79 €/m², 19 Fälle, r = 0.365) · ueber 85: k = 0.94988 × (vSW in Mio €)^-0.07278 (Ø BRW 111 €/m², 18 Fälle, r = 0.184). Hinterlegt sind die abgedruckten Tabellen, jede der 42 Zellen gegen die zugehörige Funktion geprüft. DIE KLASSENGRENZEN UNTERSCHEIDEN SICH JE OBJEKTART: bei Ein- und Zweifamilienhäusern 80 und 100 €/m², bei Doppelhaushälften und Reihenhäusern 85 €/m². Die Spalte „gesamt\" des Berichts ist bewusst NICHT hinterlegt: sie ist die Auswertung ohne Klassenbildung, und wo der Bodenrichtwert bekannt ist, gilt die Klasse.",
+   "normobjekt": "Tabellenbereich 100.000 bis 500.000 Euro vorläufiger Sachwert. Bodenrichtwertklassen nach dem Bericht; außerhalb gibt es keinen Wert."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "Anlage 4 Punkt II ImmoWertV",
+   "gebaeudestandard": "Anlage 4 Punkt III ImmoWertV"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Grundstücksmarktbericht 2024, Abschnitt „Doppelhaushälften und Reihenhäuser 2023\", Seiten 57 f."
+  ],
+  "stufe": "C",
+  "stufe_grund": "KEINE Stufe B, und der Ausschuss begruendet es selbst: er weist die Werte fuer einige Gebaeudeklassen ausdruecklich als \"statistisch nicht gesichert\" aus, die nur der Orientierung dienen (Seite 52). Die Korrelationskoeffizienten reichen von 0.184 bis 0.365 bei 18 bis 19 Kauffaellen je Klasse. Amtlich abgedruckt und gegen die Konstanten nachgerechnet ist der Satz gleichwohl.",
+  "fallzahl": 37,
+  "streuung": null,
+  "stichtag": "2024-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Grundstücksmarktbericht 2024 © Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "lizenz": "Kostenfrei über den Geoshop des Landkreises abrufbar; Wiedergabe mit Quellenangabe",
+  "verwendung": "produkt",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: Normalherstellungskosten nach Anlage 4 Punkt II (zu § 12 Abs. 5 Satz 3) ImmoWertV, Gebäudestandard nach Anlage 4 Punkt III, Bodenwert aus dem zutreffenden Bodenrichtwert angepasst an die Merkmale des Einzelobjekts, marktübliche objektbezogene Grundstücksfläche, besondere objektspezifische Grundstücksmerkmale über eine entsprechende Kaufpreisbereinigung. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN; die abgedruckten Potenzfunktionen rechnen intern mit Millionen. Der Herausgeber weist die Werte für einige Gebäudeklassen ausdrücklich als statistisch nicht gesichert und nur der Orientierung dienend aus.",
+  "fundstelle": "Grundstücksmarktbericht 2024, Kapitel 5.2 „Sachwertfaktoren\", Abschnitte 5.2.1 (Ein- und Zweifamilienhäuser) und der Abschnitt „Doppelhaushälften und Reihenhäuser 2023\", Seiten 55 bis 58."
+ },
+ {
+  "land_code": "MV",
+  "ags": "13073",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    100,
+    200
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwertniveau in Euro/m²",
+   "achse_y": [
+    120000,
+    140000,
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000,
+    400000,
+    420000,
+    440000,
+    460000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "120000": [
+     1.18,
+     null,
+     null,
+     null
+    ],
+    "140000": [
+     1.12,
+     1.16,
+     null,
+     null
+    ],
+    "160000": [
+     1.08,
+     1.12,
+     1.16,
+     null
+    ],
+    "180000": [
+     1.03,
+     1.08,
+     1.13,
+     1.18
+    ],
+    "200000": [
+     1.0,
+     1.05,
+     1.11,
+     1.16
+    ],
+    "220000": [
+     0.97,
+     1.03,
+     1.09,
+     1.14
+    ],
+    "240000": [
+     0.94,
+     1.0,
+     1.07,
+     1.13
+    ],
+    "260000": [
+     0.92,
+     0.98,
+     1.05,
+     1.12
+    ],
+    "280000": [
+     0.9,
+     0.97,
+     1.03,
+     1.1
+    ],
+    "300000": [
+     0.88,
+     0.95,
+     1.02,
+     1.09
+    ],
+    "320000": [
+     0.86,
+     0.93,
+     1.01,
+     1.08
+    ],
+    "340000": [
+     0.84,
+     0.92,
+     1.0,
+     1.07
+    ],
+    "360000": [
+     0.83,
+     0.9,
+     0.98,
+     1.06
+    ],
+    "380000": [
+     null,
+     0.89,
+     0.97,
+     1.06
+    ],
+    "400000": [
+     null,
+     null,
+     0.96,
+     1.05
+    ],
+    "420000": [
+     null,
+     null,
+     null,
+     1.04
+    ],
+    "440000": [
+     null,
+     null,
+     null,
+     1.03
+    ],
+    "460000": [
+     null,
+     null,
+     null,
+     1.03
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "ACHTUNG, ZWEI EINSCHRAENKUNGEN, die dieser Ausschuss selbst setzt. ERSTENS: Die Stichprobe umfasst NUR BAUJAHRE AB 1990 — für ein älteres Gebäude ist dieser Faktor nicht abgeleitet worden, auch wenn der vorläufige Sachwert in der Tabelle liegt. ZWEITENS: Der Ausschuss wertet nur möglichst schadensfreie Objekte mit einer Restnutzungsdauer über 25 Jahren aus. Der Ausschuss leitet je Bodenwertniveau eine eigene Potenzfunktion ab (25 €/m²: k = 0.59 × (vSW in Mio €)^-0.33 · 50 €/m²: k = 0.69 × (vSW in Mio €)^-0.26 · 100 €/m²: k = 0.8 × (vSW in Mio €)^-0.2 · 200 €/m²: k = 0.92 × (vSW in Mio €)^-0.15) und druckt die daraus gerechneten Tabellen mit ab; hinterlegt sind die TABELLEN, gegen jede der 54 besetzten Zellen geprüft. Vier Bodenwertniveaus als Stützstellen, zwischen denen interpoliert wird. DIE TABELLE IST BEWUSST NICHT VOLLSTÄNDIG BESETZT: jede Spalte deckt einen anderen Sachwertbereich ab — bei 25 €/m² von 120.000 bis 360.000 Euro, bei 200 €/m² von 180.000 bis 460.000. Wo der Bericht nichts abdruckt, gibt es hier keinen Wert. Grundlage sind 179 Kauffälle.",
+   "normobjekt": "Tabellenbereich 120.000 bis 460.000 Euro vorläufiger Sachwert, Bodenrichtwert 25 bis 200 Euro/m². Baujahre ab 1990, Restnutzungsdauer über 25 Jahre."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010 (Anlage 1 SW-RL)",
+   "gnd_quelle": "Anlage 3 SW-RL",
+   "alterswertminderung": "linear (§ 23 ImmoWertV)",
+   "bezugsmassstab": "BGF nach 4.1.1.4 SW-RL",
+   "aussenanlagen": "2 bis 4 Prozent vom Zeitwert des Gebäudes"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Tabelle 52 (Potenzfunktionen) und Tabelle 53 (Sachwertfaktoren), Seite 58."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtlich abgedruckte Tabellen samt Potenzfunktionen, gegeneinander nachgerechnet. KEINE Stufe B, und zwar aus zwei Gruenden: der juengste oeffentlich abrufbare Abdruck ist der Bericht 2019 mit Kauffaellen aus 2017 und 2018 - der Stichtag liegt damit weit zurueck -, und die Stichprobe umfasst nur Baujahre ab 1990. Der Landes-Grundstuecksmarktbericht 2025 weist fuer diesen Ausschuss zum 01.01.2025 Sachwertfaktoren aus; die liegen also vor, sind aber nicht veroeffentlicht.",
+  "fallzahl": 179,
+  "streuung": null,
+  "stichtag": "2019-01-01",
+  "berichtsjahr": 2019,
+  "modellversion": "GMB 2019",
+  "quelle_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Grundstücksmarktbericht 2019 © Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "lizenz": "Kostenfrei über den Geoshop des Landkreises abrufbar; Wiedergabe mit Quellenangabe",
+  "verwendung": "produkt",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010 (Anlage 1 SW-RL), Bezugsmaßstab Bruttogrundfläche nach 4.1.1.4 SW-RL auf Grundlage der ALK, ursprüngliches Baujahr, Gesamtnutzungsdauer nach Anlage 3 SW-RL, lineare Alterswertminderung nach § 23 ImmoWertV, Baunebenkosten in den NHK enthalten, bauliche Außenanlagen 2 bis 4 Prozent vom Zeitwert des Gebäudes. Bodenwert ungedämpft aus dem zutreffenden Bodenrichtwert, selbständig nutzbare Teilflächen getrennt erfasst. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN; die abgedruckten Potenzfunktionen rechnen intern mit Millionen. NUR FÜR BAUJAHRE AB 1990 abgeleitet.",
+  "fundstelle": "Grundstücksmarktbericht 2019, Tabellen 51 bis 55 (Modellparameter, Potenzfunktionen und Sachwertfaktoren), Seiten 57 bis 59."
+ },
+ {
+  "land_code": "MV",
+  "ags": "13073",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    100,
+    200
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwertniveau in Euro/m²",
+   "achse_y": [
+    80000,
+    100000,
+    120000,
+    140000,
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000,
+    400000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "80000": [
+     1.22,
+     null,
+     null,
+     null
+    ],
+    "100000": [
+     1.12,
+     1.25,
+     null,
+     null
+    ],
+    "120000": [
+     1.04,
+     1.17,
+     null,
+     null
+    ],
+    "140000": [
+     0.98,
+     1.11,
+     1.24,
+     1.37
+    ],
+    "160000": [
+     0.92,
+     1.05,
+     1.18,
+     1.31
+    ],
+    "180000": [
+     0.88,
+     1.01,
+     1.14,
+     1.26
+    ],
+    "200000": [
+     0.85,
+     0.97,
+     1.1,
+     1.22
+    ],
+    "220000": [
+     0.82,
+     0.94,
+     1.06,
+     1.19
+    ],
+    "240000": [
+     0.79,
+     0.91,
+     1.03,
+     1.15
+    ],
+    "260000": [
+     0.76,
+     null,
+     1.01,
+     1.13
+    ],
+    "280000": [
+     0.74,
+     null,
+     0.98,
+     1.1
+    ],
+    "300000": [
+     0.72,
+     null,
+     0.96,
+     1.08
+    ],
+    "320000": [
+     0.7,
+     null,
+     null,
+     1.06
+    ],
+    "340000": [
+     0.69,
+     null,
+     null,
+     1.04
+    ],
+    "360000": [
+     null,
+     null,
+     null,
+     1.02
+    ],
+    "380000": [
+     null,
+     null,
+     null,
+     1.0
+    ],
+    "400000": [
+     null,
+     null,
+     null,
+     0.98
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "ACHTUNG, ZWEI EINSCHRAENKUNGEN, die dieser Ausschuss selbst setzt. ERSTENS: Die Stichprobe umfasst NUR BAUJAHRE AB 1990 — für ein älteres Gebäude ist dieser Faktor nicht abgeleitet worden, auch wenn der vorläufige Sachwert in der Tabelle liegt. ZWEITENS: Der Ausschuss wertet nur möglichst schadensfreie Objekte mit einer Restnutzungsdauer über 25 Jahren aus. Der Ausschuss leitet je Bodenwertniveau eine eigene Potenzfunktion ab (25 €/m²: k = 0.45 × (vSW in Mio €)^-0.39 · 50 €/m²: k = 0.55 × (vSW in Mio €)^-0.36 · 100 €/m²: k = 0.64 × (vSW in Mio €)^-0.33 · 200 €/m²: k = 0.74 × (vSW in Mio €)^-0.31) und druckt die daraus gerechneten Tabellen mit ab; hinterlegt sind die TABELLEN, gegen jede der 45 besetzten Zellen geprüft. Vier Bodenwertniveaus als Stützstellen, zwischen denen interpoliert wird. DIE TABELLE IST BEWUSST NICHT VOLLSTÄNDIG BESETZT: jede Spalte deckt einen anderen Sachwertbereich ab — bei 25 €/m² von 120.000 bis 360.000 Euro, bei 200 €/m² von 180.000 bis 460.000. Wo der Bericht nichts abdruckt, gibt es hier keinen Wert. Grundlage sind 92 Kauffälle.",
+   "normobjekt": "Tabellenbereich 80.000 bis 400.000 Euro vorläufiger Sachwert, Bodenrichtwert 25 bis 200 Euro/m². Baujahre ab 1990, Restnutzungsdauer über 25 Jahre."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010 (Anlage 1 SW-RL)",
+   "gnd_quelle": "Anlage 3 SW-RL",
+   "alterswertminderung": "linear (§ 23 ImmoWertV)",
+   "bezugsmassstab": "BGF nach 4.1.1.4 SW-RL",
+   "aussenanlagen": "2 bis 4 Prozent vom Zeitwert des Gebäudes"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Tabelle 54 (Potenzfunktionen) und Tabelle 55 (Sachwertfaktoren), Seite 59."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtlich abgedruckte Tabellen samt Potenzfunktionen, gegeneinander nachgerechnet. KEINE Stufe B, und zwar aus zwei Gruenden: der juengste oeffentlich abrufbare Abdruck ist der Bericht 2019 mit Kauffaellen aus 2017 und 2018 - der Stichtag liegt damit weit zurueck -, und die Stichprobe umfasst nur Baujahre ab 1990. Der Landes-Grundstuecksmarktbericht 2025 weist fuer diesen Ausschuss zum 01.01.2025 Sachwertfaktoren aus; die liegen also vor, sind aber nicht veroeffentlicht.",
+  "fallzahl": 92,
+  "streuung": null,
+  "stichtag": "2019-01-01",
+  "berichtsjahr": 2019,
+  "modellversion": "GMB 2019",
+  "quelle_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Grundstücksmarktbericht 2019 © Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "lizenz": "Kostenfrei über den Geoshop des Landkreises abrufbar; Wiedergabe mit Quellenangabe",
+  "verwendung": "produkt",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010 (Anlage 1 SW-RL), Bezugsmaßstab Bruttogrundfläche nach 4.1.1.4 SW-RL auf Grundlage der ALK, ursprüngliches Baujahr, Gesamtnutzungsdauer nach Anlage 3 SW-RL, lineare Alterswertminderung nach § 23 ImmoWertV, Baunebenkosten in den NHK enthalten, bauliche Außenanlagen 2 bis 4 Prozent vom Zeitwert des Gebäudes. Bodenwert ungedämpft aus dem zutreffenden Bodenrichtwert, selbständig nutzbare Teilflächen getrennt erfasst. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN; die abgedruckten Potenzfunktionen rechnen intern mit Millionen. NUR FÜR BAUJAHRE AB 1990 abgeleitet.",
+  "fundstelle": "Grundstücksmarktbericht 2019, Tabellen 51 bis 55 (Modellparameter, Potenzfunktionen und Sachwertfaktoren), Seiten 57 bis 59."
+ },
+ {
+  "land_code": "MV",
+  "ags": "13073",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    100,
+    200
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwertniveau in Euro/m²",
+   "achse_y": [
+    80000,
+    100000,
+    120000,
+    140000,
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000,
+    400000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "80000": [
+     1.22,
+     null,
+     null,
+     null
+    ],
+    "100000": [
+     1.12,
+     1.25,
+     null,
+     null
+    ],
+    "120000": [
+     1.04,
+     1.17,
+     null,
+     null
+    ],
+    "140000": [
+     0.98,
+     1.11,
+     1.24,
+     1.37
+    ],
+    "160000": [
+     0.92,
+     1.05,
+     1.18,
+     1.31
+    ],
+    "180000": [
+     0.88,
+     1.01,
+     1.14,
+     1.26
+    ],
+    "200000": [
+     0.85,
+     0.97,
+     1.1,
+     1.22
+    ],
+    "220000": [
+     0.82,
+     0.94,
+     1.06,
+     1.19
+    ],
+    "240000": [
+     0.79,
+     0.91,
+     1.03,
+     1.15
+    ],
+    "260000": [
+     0.76,
+     null,
+     1.01,
+     1.13
+    ],
+    "280000": [
+     0.74,
+     null,
+     0.98,
+     1.1
+    ],
+    "300000": [
+     0.72,
+     null,
+     0.96,
+     1.08
+    ],
+    "320000": [
+     0.7,
+     null,
+     null,
+     1.06
+    ],
+    "340000": [
+     0.69,
+     null,
+     null,
+     1.04
+    ],
+    "360000": [
+     null,
+     null,
+     null,
+     1.02
+    ],
+    "380000": [
+     null,
+     null,
+     null,
+     1.0
+    ],
+    "400000": [
+     null,
+     null,
+     null,
+     0.98
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "ACHTUNG, ZWEI EINSCHRAENKUNGEN, die dieser Ausschuss selbst setzt. ERSTENS: Die Stichprobe umfasst NUR BAUJAHRE AB 1990 — für ein älteres Gebäude ist dieser Faktor nicht abgeleitet worden, auch wenn der vorläufige Sachwert in der Tabelle liegt. ZWEITENS: Der Ausschuss wertet nur möglichst schadensfreie Objekte mit einer Restnutzungsdauer über 25 Jahren aus. Der Ausschuss leitet je Bodenwertniveau eine eigene Potenzfunktion ab (25 €/m²: k = 0.45 × (vSW in Mio €)^-0.39 · 50 €/m²: k = 0.55 × (vSW in Mio €)^-0.36 · 100 €/m²: k = 0.64 × (vSW in Mio €)^-0.33 · 200 €/m²: k = 0.74 × (vSW in Mio €)^-0.31) und druckt die daraus gerechneten Tabellen mit ab; hinterlegt sind die TABELLEN, gegen jede der 45 besetzten Zellen geprüft. Vier Bodenwertniveaus als Stützstellen, zwischen denen interpoliert wird. DIE TABELLE IST BEWUSST NICHT VOLLSTÄNDIG BESETZT: jede Spalte deckt einen anderen Sachwertbereich ab — bei 25 €/m² von 120.000 bis 360.000 Euro, bei 200 €/m² von 180.000 bis 460.000. Wo der Bericht nichts abdruckt, gibt es hier keinen Wert. Grundlage sind 92 Kauffälle.",
+   "normobjekt": "Tabellenbereich 80.000 bis 400.000 Euro vorläufiger Sachwert, Bodenrichtwert 25 bis 200 Euro/m². Baujahre ab 1990, Restnutzungsdauer über 25 Jahre."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "nhk": "NHK 2010 (Anlage 1 SW-RL)",
+   "gnd_quelle": "Anlage 3 SW-RL",
+   "alterswertminderung": "linear (§ 23 ImmoWertV)",
+   "bezugsmassstab": "BGF nach 4.1.1.4 SW-RL",
+   "aussenanlagen": "2 bis 4 Prozent vom Zeitwert des Gebäudes"
+  },
+  "geltungsbereich": {},
+  "belege": [
+   "Tabelle 54 (Potenzfunktionen) und Tabelle 55 (Sachwertfaktoren), Seite 59."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtlich abgedruckte Tabellen samt Potenzfunktionen, gegeneinander nachgerechnet. KEINE Stufe B, und zwar aus zwei Gruenden: der juengste oeffentlich abrufbare Abdruck ist der Bericht 2019 mit Kauffaellen aus 2017 und 2018 - der Stichtag liegt damit weit zurueck -, und die Stichprobe umfasst nur Baujahre ab 1990. Der Landes-Grundstuecksmarktbericht 2025 weist fuer diesen Ausschuss zum 01.01.2025 Sachwertfaktoren aus; die liegen also vor, sind aber nicht veroeffentlicht.",
+  "fallzahl": 92,
+  "streuung": null,
+  "stichtag": "2019-01-01",
+  "berichtsjahr": 2019,
+  "modellversion": "GMB 2019",
+  "quelle_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Grundstücksmarktbericht 2019 © Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "lizenz": "Kostenfrei über den Geoshop des Landkreises abrufbar; Wiedergabe mit Quellenangabe",
+  "verwendung": "produkt",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010 (Anlage 1 SW-RL), Bezugsmaßstab Bruttogrundfläche nach 4.1.1.4 SW-RL auf Grundlage der ALK, ursprüngliches Baujahr, Gesamtnutzungsdauer nach Anlage 3 SW-RL, lineare Alterswertminderung nach § 23 ImmoWertV, Baunebenkosten in den NHK enthalten, bauliche Außenanlagen 2 bis 4 Prozent vom Zeitwert des Gebäudes. Bodenwert ungedämpft aus dem zutreffenden Bodenrichtwert, selbständig nutzbare Teilflächen getrennt erfasst. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN; die abgedruckten Potenzfunktionen rechnen intern mit Millionen. NUR FÜR BAUJAHRE AB 1990 abgeleitet.",
+  "fundstelle": "Grundstücksmarktbericht 2019, Tabellen 51 bis 55 (Modellparameter, Potenzfunktionen und Sachwertfaktoren), Seiten 57 bis 59."
+ },
+ {
+  "land_code": "MV",
+  "ags": "13076",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "baender_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "baender": [
+    {
+     "von": null,
+     "bis": 90000,
+     "wert": 1.1,
+     "schluessel": "bis 90.000",
+     "streuung": 0.13
+    },
+    {
+     "von": 90000,
+     "bis": 150000,
+     "wert": 1.07,
+     "schluessel": "90.000–150.000",
+     "streuung": 0.17
+    },
+    {
+     "von": 150000,
+     "bis": 190000,
+     "wert": 1.02,
+     "schluessel": "150.000–190.000",
+     "streuung": 0.13
+    },
+    {
+     "von": 190000,
+     "bis": null,
+     "wert": 1.01,
+     "schluessel": "über 190.000",
+     "streuung": 0.1
+    }
+   ],
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Der Bericht nennt sie Marktanpassungsfaktoren (§ 14 Abs. 2 Nr. 1 ImmoWertV). Vier Bänder mit Ø-Faktor und Spanne (± Standardabweichung). Für drei Bänder druckt er zusätzlich eine quadratische Funktion ab — sie steht unter modellansaetze.funktionen und ist hier NICHT als Rechenweg geführt: innerhalb eines Bandes schwankt sie erheblich, während der Bericht den Ø-Faktor als anwendbaren Wert ausweist.",
+   "normobjekt": "Kein Normobjekt. Der Bericht stellt ausdrücklich fest, dass WEDER eine Abhängigkeit vom Bodenwertniveau NOCH vom fiktiven Baujahr signifikant abgeleitet werden konnte."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "herstellungskosten": "NHK 2010",
+   "bezugsmassstab": "Bruttogrundfläche nach DIN 277 Ausgabe 2005 und Sachwertrichtlinie Punkt 4.1.1.4",
+   "baupreisindex": "Statistisches Bundesamt",
+   "baujahresklasse": "ohne Berücksichtigung",
+   "alterswertminderung": "linear",
+   "bodenwert": "aktueller Bodenwert",
+   "aussenanlagen": "pauschal 2 bis 4 %",
+   "selektion": "nur schadensfreie Objekte mit lagetypischen Grundstücksgrößen; Baujahre 1900 bis 2014; üblicher Bau- und Unterhaltungszustand",
+   "funktionen": {
+    "bis 90.000": "y = 5×10⁻¹⁰ x² − 8×10⁻⁵ x + 4,0522   (R² = 0,40)",
+    "90.000–150.000": "y = 1×10⁻¹⁰ x² − 3×10⁻⁵ x + 3,1056   (R² = 0,34)",
+    "150.000–190.000": "keine Funktion abgeleitet — der Bericht schreibt: „konnte kein abhängiges Einflussmerkmal signifikant abgeleitet werden\"",
+    "über 190.000": "y = 2×10⁻¹¹ x² − 1×10⁻⁵ x + 2,7738   (R² = 0,35)"
+   },
+   "nhk2000_verhaeltnis": "Sachwertfaktoren auf Basis NHK 2000 liegen im Mittel 12,5 % UNTER denen auf Basis NHK 2010 — wichtig beim Vergleich mit älteren Gutachten."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Ludwigslust-Parchim",
+   "sachlich": "individueller Wohnungsbau, Baujahre 1900 bis 2014",
+   "extrapolation": "gesperrt",
+   "vorbehalt": "SCHWACHE DATENLAGE, UND DER BERICHT SAGT ES SELBST. Wörtlich: „Auch in diesem Jahr haben die Auswertungen gezeigt, dass sich das Marktgeschehen zum Teil immer noch sehr ungeordnet darstellt. Dabei konnte weder eine Abhängigkeit vom Bodenwertniveau noch vom fiktiven Baujahr signifikant abgeleitet werden. … ist die Streubreite der Kaufpreise immer noch sehr groß. Insbesondere im Bereich der vorläufigen Sachwerte zwischen 150.000 und 190.000 € konnte kein abhängiges Einflussmerkmal signifikant abgeleitet werden.\" Die Bestimmtheitsmaße liegen bei 0,34 bis 0,40 — drei Fünftel der Streuung erklärt das Modell NICHT. Die Spannen (± Standardabweichung) sind deshalb mitgeführt und gehören in jede Anwendung.",
+   "hinweis": "JAHRGANG 2018. Das ist der neueste frei abrufbare Bericht dieses Ausschusses; auf der Seite stehen sonst 2012 bis 2017. Ein Jahrgang 2023 wird verlinkt, die Datei trägt aber denselben Inhalt (Titel im PDF: GMB_LWL_2018.indd). Vor einer Anwendung auf einen heutigen Stichtag ist zu prüfen, ob inzwischen ein neuerer Bericht vorliegt."
+  },
+  "belege": [
+   "Grundstücksmarktbericht 2018 Landkreis Ludwigslust-Parchim, Tabelle 27, S. 58: vier Bänder des vorläufigen Sachwerts mit Ø-Faktor, Spanne (± Standardabweichung), Funktion und Bestimmtheitsmaß."
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtliche Tabelle, aber ohne Anwendungsbeispiel, mit ausdrücklich benannter schwacher Erklärkraft (R² 0,34 bis 0,40) und aus dem Jahrgang 2018. Der Bericht selbst nennt das Marktgeschehen „sehr ungeordnet\".",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2018-01-01",
+  "berichtsjahr": 2018,
+  "modellversion": "GMB 2018",
+  "quelle_url": "https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Grundstücksmarktbericht 2018 für den Bereich des Landkreises Ludwigslust-Parchim, Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim",
+  "lizenz": "auszugsweise Wiedergabe mit Quellenangabe und Belegexemplar",
+  "verwendung": "gutachten",
+  "auflagen": "Auszugsweise Wiedergabe ist ohne Genehmigung gestattet, verlangt aber (1) eindeutige Quellenangaben und (2) die Zusendung eines Belegexemplars an den Herausgeber. Vollständige Vervielfältigung braucht die Genehmigung des Herausgebers. Vor einer Auslieferung im Kundenbericht ist das Belegexemplar zu klären — bis dahin steht dort nur der Link.",
+  "fundstelle": "Kap. 5.2 Sachwertfaktoren, Tabelle 27, S. 58"
+ }
+]

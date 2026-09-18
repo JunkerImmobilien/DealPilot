@@ -1,0 +1,192 @@
+{
+  "land_code": "ST",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "gaa_kennz": "15083",
+  "ags": ["15083", "15089"],
+  "ebene": "kreis",
+  "berichtsjahr": 2024,
+  "stichtag": "2023-12-31",
+  "auswertezeitraum": "bis 07/2024",
+  "beschlossen": null,
+  "veroeffentlicht": "2025-01-22",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_datei": "ST-ezh_mz_gz_d_bk_hz_slk_vor1991.pdf, ST-ezh_mz_gz_d_bk_hz_slk_ab1991.pdf, ST-drh_mz_gz_d_bk_hz_slk.pdf",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren veröffentlicht am 22.01.2025, Landesamt für Vermessung und Geoinformation Sachsen-Anhalt",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Die Modellparameter der landesweiten Modellbeschreibung sind einzuhalten (Modellkonformität).",
+  "fundstelle": "Sachwertfaktoren Landkreise Börde, Harz und Salzlandkreis, Regionstypen Mittelzentrum, Grundzentrum und Dorf. Hier die Sätze für Börde und Salzlandkreis; der Harz führt für Baujahre ab 1991 einen eigenen Wert und steht in ST-15085-harz.json.",
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser",
+      "form": "verzweigt",
+      "formel": {
+        "form": "verzweigt",
+        "achse_k_feld": "baujahrklasse",
+        "achse_k_bez": "Baujahresklasse",
+        "kategorien": ["vor_1991", "ab_1991"],
+        "zuordnung_feld": "baujahr",
+        "kategorie_baender": [
+          { "von": null, "bis": 1990, "kategorie": "vor_1991" },
+          { "von": 1991, "bis": null, "kategorie": "ab_1991" }
+        ],
+        "modell_je_kategorie": {
+          "vor_1991": {
+            "form": "regression_additiv",
+            "intercept": -1.32561882,
+            "terme": [
+              { "feld": "sachwert",      "bez": "vorläufiger Sachwert", "koeffizient": -0.00000260, "exponent": 1,    "gueltig": [32000, 333000] },
+              { "feld": "brw",           "bez": "Bodenrichtwert",       "koeffizient": 0.23008854,  "transform": "ln", "gueltig": [10, 140] },
+              { "feld": "standardstufe", "bez": "Gebäudestandard",      "koeffizient": 1.02336571,  "exponent": 0.5,  "gueltig": [1.1, 3.2] },
+              { "feld": "flaeche",       "bez": "Grundstücksfläche",    "koeffizient": 0.00677110,  "exponent": 0.5,  "gueltig": [105, 1697] },
+              { "feld": "wohnflaeche",   "bez": "Wohnfläche",           "koeffizient": 0.00080288,  "exponent": 1,    "gueltig": [50, 240] }
+            ],
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "FÜNF EINFLUSSGRÖSSEN, und die Zeit ist keine davon: „Die Einflussgröße Zeit bleibt in diesem Fall unberücksichtigt, da sie keinen signifikanten Einfluss auf den Sachwertfaktor hat.\" Multiples Bestimmtheitsmaß 0,40, Variationskoeffizient 0,24, mittlerer absoluter prozentualer Fehler ± 23 % — der höchste Wert dieses Ausschusses. Normobjekt: 150.000 €, BRW 35 €/m², Gebäudestandard 2,1, Grundstück 650 m², Wohnfläche 125 m² → 0,86."
+          },
+          "ab_1991": {
+            "form": "regression_additiv",
+            "intercept": 4.46786561,
+            "terme": [
+              { "feld": "sachwert",      "bez": "vorläufiger Sachwert", "koeffizient": -0.34213428, "transform": "ln", "gueltig": [149000, 495000] },
+              { "feld": "brw",           "bez": "Bodenrichtwert",       "koeffizient": 0.03476947,  "exponent": 0.5,   "gueltig": [10, 135] },
+              { "feld": "standardstufe", "bez": "Gebäudestandard",      "koeffizient": 0.16264802,  "exponent": 1,     "gueltig": [2.1, 4.0] }
+            ],
+            "rundung_stellen": 2,
+            "liefert": "faktor",
+            "hinweis": "DER LANDKREIS IST EIN GLIED DER GLEICHUNG: „− 0,11650925 × Landkreis\" mit den Basiswerten BÖ, SLK = 0 und HZ = 1. Dieser Satz gilt für Börde und Salzlandkreis, also Basis 0 — der Term entfällt. Für den Harz steht ein eigener Registersatz mit um 0,11650925 verringertem Absolutglied. Multiples Bestimmtheitsmaß 0,50, MAPE ± 10 %. Normobjekt: 310.000 €, BRW 50 €/m², Gebäudestandard 3,0 → 0,88."
+          }
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "ZWEI GLEICHUNGEN MIT VERSCHIEDENEN EINFLUSSGRÖSSEN. Vor 1991 zählen fünf Größen einschließlich Grundstücks- und Wohnfläche, ab 1991 nur drei. Beide gelten für alle drei Regionstypen (Mittelzentrum, Grundzentrum, Dorf) — anders als in der Altmark, wo Dörfer eine eigene Gleichung haben.",
+        "normobjekt": "NHK 2010 gemäß Anlage 4 ImmoWertV, BGF aus amtlichen Geobasisdaten, Regionalfaktor 1, Eigennutzung, kein Neubau oder Erstverkauf."
+      },
+      "korrekturen": [],
+
+      "modellansaetze": {
+        "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
+        "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
+        "regionalfaktor": 1.0
+      },
+
+      "geltungsbereich": {
+        "raeumlich": "Landkreise Börde und Salzlandkreis, Regionstypen Mittelzentrum, Grundzentrum und Dorf",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwert_vor_1991": { "min": 32000, "max": 333000 },
+          "sachwert_ab_1991":  { "min": 149000, "max": 495000 },
+          "brw_vor_1991":      { "min": 10, "max": 140 },
+          "brw_ab_1991":       { "min": 10, "max": 135 },
+          "flaeche_vor_1991":  { "min": 105, "max": 1697 },
+          "wohnflaeche_vor_1991": { "min": 50, "max": 240 },
+          "standardstufe_vor_1991": { "min": 1.1, "max": 3.2 },
+          "standardstufe_ab_1991":  { "min": 2.1, "max": 4.0 }
+        },
+        "vorbehalt": "DER MITTLERE ABSOLUTE PROZENTUALE FEHLER BETRÄGT FÜR BAUJAHRE VOR 1991 ± 23 PROZENT. Das ist die höchste Unsicherheit, die ein Blatt dieses Ausschusses ausweist — und sie steht dort ausdrücklich. Ein Faktor von 0,86 kann demnach zwischen rund 0,66 und 1,06 liegen.\n\nDIE GLEICHUNG IST NICHT AUF DEN BERLINER-UMLAND-TYP EINES EINFAMILIENHAUSES GEMÜNZT: die Stichprobe beginnt bei 32.000 € vorläufigem Sachwert und einem Bodenrichtwert von 10 €/m². Für höherwertige Objekte endet sie bei 333.000 €.\n\nDIE EINFLUSSGRÖSSEN SIND NICHT UNABHÄNGIG. Wer eine davon verändert und die anderen festhält, verlässt das Modell."
+      },
+
+      "stufe": "B",
+      "stufe_grund": "Amtliche Regressionsfunktionen mit vollständiger Modellbeschreibung, Glied für Glied übernommen und am abgedruckten Normobjekt nachgerechnet. Stufe B: die abgedruckte Normobjekt-Kurve ist an 13 von 14 Stützstellen zeichengleich — bei 240.000 Euro ergibt die Gleichung 0,62, das Diagramm zeigt 0,63. Dazu weist der Bericht für Baujahre vor 1991 selbst einen mittleren Fehler von ± 23 % aus.",
+      "fallzahl": null,
+      "streuung": null,
+      "beleg": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser, Landkreise Börde, Harz und Salzlandkreis, Regionstypen Mittelzentrum, Grundzentrum, Dorf, veröffentlicht am 22.01.2025."
+    },
+
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Doppelhaushälften und Reihenendhäuser",
+      "form": "regression_additiv",
+      "formel": {
+        "form": "regression_additiv",
+        "intercept": 0.44193543,
+        "terme": [
+          { "feld": "sachwert",      "bez": "vorläufiger Sachwert", "koeffizient": -0.00000146, "exponent": 1,    "gueltig": [39000, 332000] },
+          { "feld": "brw",           "bez": "Bodenrichtwert",       "koeffizient": 0.00311008,  "exponent": 1,    "gueltig": [10, 130] },
+          { "feld": "standardstufe", "bez": "Gebäudestandard",      "koeffizient": 0.44905126,  "exponent": 0.5,  "gueltig": [1.2, 3.4] },
+          { "feld": "flaeche",       "bez": "Grundstücksfläche",    "koeffizient": 0.00561587,  "exponent": 0.5,  "gueltig": [63, 1318] },
+          { "feld": "wohnflaeche",   "bez": "Wohnfläche",           "koeffizient": -2.50394441, "exponent": -0.5, "gueltig": [60, 250] }
+        ],
+        "aussen_exponent": 2,
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "DIE GANZE SUMME WIRD QUADRIERT. Der Bericht druckt die Klammer aus und setzt ^2 dahinter. DER ZEITTERM IST EINGEFROREN: das Blatt führt „− 0,00020705 × Tag\" mit dem Bezug 06.08.2023 und schreibt dazu, die Funktion sei über den zeitlichen Bezug hinaus nur bis zum 31.12.2023 (426. Tag) anwendbar, danach seien keine weiteren Abschläge vorzunehmen. Eingerechnet: 0,53013873 − 0,00020705 × 426 = 0,44193543. DIE GEBÄUDESTELLUNG ist mit Basis 0 (DHH, REH) eingesetzt; Reihenmittelhäuser tragen Basis 1 und stehen als eigener Satz. Multiples Bestimmtheitsmaß 0,48, MAPE ± 16 %. Normobjekt: 135.000 €, BRW 35 €/m², Gebäudestandard 2,2, Grundstück 500 m², Wohnfläche 110 m², DHH/REH, 3. Quartal 2023.",
+        "normobjekt": "NHK 2010, BGF aus amtlichen Geobasisdaten, Regionalfaktor 1, Eigennutzung, kein Erstverkauf."
+      },
+      "korrekturen": [],
+      "modellansaetze": {
+        "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
+        "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert"
+      },
+      "geltungsbereich": {
+        "raeumlich": "Landkreise Börde, Harz und Salzlandkreis, alle Regionstypen",
+        "sachlich": "Doppelhaushälften und Reihenendhäuser",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwert_eur":   { "min": 39000, "max": 332000 },
+          "brw_eur_qm":     { "min": 10, "max": 130 },
+          "flaeche_qm":     { "min": 63, "max": 1318 },
+          "wohnflaeche_qm": { "min": 60, "max": 250 },
+          "standardstufe":  { "min": 1.2, "max": 3.4 }
+        },
+        "vorbehalt": "DER ZEITBEZUG IST EINGEFROREN (Tag 426, 31.12.2023). Für einen früheren Stichtag wäre der Faktor dieses Satzes zu niedrig.\n\nMITTLERER ABSOLUTER PROZENTUALER FEHLER ± 16 %.\n\nANDERS ALS BEIM FREISTEHENDEN HAUS gilt diese eine Gleichung für ALLE DREI Landkreise — der Landkreis ist hier kein Glied.",
+        "hinweis": "Reihenmittelhäuser tragen in derselben Gleichung die Gebäudestellung 1 statt 0 und stehen als eigener Registersatz unter dem Zweig `rmh`."
+      },
+      "stufe": "B",
+      "stufe_grund": "Amtliche Regressionsfunktion mit vollständiger Modellbeschreibung, Glied für Glied übernommen. Stufe B wegen des ausgewiesenen mittleren Fehlers von ± 16 % und der Festlegung beim Zeitterm.",
+      "fallzahl": null,
+      "streuung": null,
+      "beleg": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für Reihenhäuser und Doppelhaushälften, Landkreise Börde, Harz und Salzlandkreis, veröffentlicht am 22.01.2025, R² = 0,48."
+    },
+
+    {
+      "zweig": "rmh",
+      "zweig_bez": "Reihenmittelhäuser",
+      "form": "regression_additiv",
+      "formel": {
+        "form": "regression_additiv",
+        "intercept": 0.3957924,
+        "terme": [
+          { "feld": "sachwert",      "bez": "vorläufiger Sachwert", "koeffizient": -0.00000146, "exponent": 1,    "gueltig": [39000, 332000] },
+          { "feld": "brw",           "bez": "Bodenrichtwert",       "koeffizient": 0.00311008,  "exponent": 1,    "gueltig": [10, 130] },
+          { "feld": "standardstufe", "bez": "Gebäudestandard",      "koeffizient": 0.44905126,  "exponent": 0.5,  "gueltig": [1.2, 3.4] },
+          { "feld": "flaeche",       "bez": "Grundstücksfläche",    "koeffizient": 0.00561587,  "exponent": 0.5,  "gueltig": [63, 1318] },
+          { "feld": "wohnflaeche",   "bez": "Wohnfläche",           "koeffizient": -2.50394441, "exponent": -0.5, "gueltig": [60, 250] }
+        ],
+        "aussen_exponent": 2,
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "DIESELBE GLEICHUNG WIE FÜR DOPPELHAUSHÄLFTEN UND REIHENENDHÄUSER, nur mit der Gebäudestellung 1 statt 0. Das Absolutglied trägt beide Festlegungen: 0,53013873 − 0,00020705 × 426 (Zeit) − 0,04614303 (Gebäudestellung RMH) = 0,39579240. Ein Reihenmittelhaus liegt damit bei sonst gleichen Merkmalen rund neun Prozent unter einer Doppelhaushälfte.",
+        "normobjekt": "Wie beim Zweig rhdhh, Gebäudestellung RMH."
+      },
+      "korrekturen": [],
+      "modellansaetze": {
+        "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
+        "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert"
+      },
+      "geltungsbereich": {
+        "raeumlich": "Landkreise Börde, Harz und Salzlandkreis, alle Regionstypen",
+        "sachlich": "Reihenmittelhäuser",
+        "extrapolation": "gesperrt",
+        "spannen": {
+          "sachwert_eur":   { "min": 39000, "max": 332000 },
+          "brw_eur_qm":     { "min": 10, "max": 130 },
+          "flaeche_qm":     { "min": 63, "max": 1318 },
+          "wohnflaeche_qm": { "min": 60, "max": 250 },
+          "standardstufe":  { "min": 1.2, "max": 3.4 }
+        },
+        "vorbehalt": "Dieselben Vorbehalte wie beim Zweig für Doppelhaushälften: eingefrorener Zeitbezug, mittlerer absoluter prozentualer Fehler ± 16 %, gemeinsame Stichprobe für alle drei Landkreise.",
+        "hinweis": "Die Stichprobenspannen des Blattes gelten für beide Gebäudestellungen gemeinsam."
+      },
+      "stufe": "B",
+      "stufe_grund": "Wie beim Zweig rhdhh: amtliche Gleichung, Glied für Glied übernommen, mit zwei belegten Festlegungen im Absolutglied.",
+      "fallzahl": null,
+      "streuung": null,
+      "beleg": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Sachwertfaktoren für Reihenhäuser und Doppelhaushälften, Landkreise Börde, Harz und Salzlandkreis, veröffentlicht am 22.01.2025, Basiswert Gebäudestellung RMH = 1."
+    }
+  ]
+}

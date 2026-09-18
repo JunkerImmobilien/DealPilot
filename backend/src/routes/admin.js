@@ -510,7 +510,385 @@ router.get('/users.csv', requireAdmin, async (req, res) => {
   }
 });
 
+/* ══════════════════════════════════════════════════════════════════════
+   v1368 · B9 — SICHERHEIT / MISSBRAUCHSERKENNUNG
+   ══════════════════════════════════════════════════════════════════════
+   Marcels Punkt B9: „Admin-Bereich ‚Sicherheit / Missbrauchserkennung'
+   mit Filtern und Fallakte."
+
+   Seit v1367 sammelt `security_events` Beobachtungen. Ohne einen Ort,
+   an dem man sie ansieht, liegen sie in einer Tabelle, die niemand
+   oeffnet - und ein Protokoll, das keiner liest, ist so gut wie keins.
+
+   DREI ENDPUNKTE, DREI FRAGEN:
+     /security/events    was ist passiert?      (Liste mit Filtern)
+     /security/auffaellig wer faellt auf?       (verdichtet je Konto)
+     /security/fall/:id  was war bei diesem?    (Fallakte, B19)
+
+   WAS DIESE ENDPUNKTE NICHT TUN: sperren, bewerten, einen Score bilden.
+   Marcels Auflage steht ueber allem: „Eine technische Auffaelligkeit
+   oder ein automatisch erzeugter Risikoscore darf NICHT automatisch als
+   rechtlich bewiesener Vertragsverstoss behandelt werden." Hier wird
+   gezeigt, nicht entschieden.
+
+   ZUGRIFF: `requireAdmin` genuegt zum Lesen - wer den Adminbereich
+   betreten darf, darf auch sehen, was dort protokolliert ist. Eine
+   engere Rolle waere hier falsch: Support muss einen Fehlalarm
+   nachvollziehen koennen, sonst landet jede Rueckfrage beim Inhaber.
+   ══════════════════════════════════════════════════════════════════════ */
+router.get('/security/events', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  const { stufe = '', art = '', suche = '', tage = 7, limit = 200 } = req.query;
+  try {
+    const params = [];
+    let where = '1=1';
+
+    params.push(Math.min(Math.max(parseInt(tage, 10) || 7, 1), 365));
+    where += ` AND e.created_at >= NOW() - ($${params.length} || ' days')::interval`;
+
+    if (stufe) { params.push(stufe); where += ` AND e.stufe = $${params.length}`; }
+    if (art)   { params.push(art);   where += ` AND e.art = $${params.length}`; }
+    if (suche) {
+      params.push(`%${suche}%`);
+      where += ` AND (u.email ILIKE $${params.length} OR e.ip_key ILIKE $${params.length}`
+             + ` OR e.pfad ILIKE $${params.length})`;
+    }
+
+    params.push(Math.min(parseInt(limit, 10) || 200, 1000));
+
+    const r = await db.query(`
+      SELECT e.id, e.art, e.stufe, e.pfad, e.methode, e.detail, e.created_at,
+             e.user_id, e.ip_key, u.email AS user_email
+        FROM security_events e
+        LEFT JOIN users u ON u.id = e.user_id
+       WHERE ${where}
+       ORDER BY e.created_at DESC
+       LIMIT $${params.length}`, params);
+
+    /* Die Zaehlung je Stufe gehoert dazu - eine Liste von 200 Zeilen sagt
+       nicht, ob das viel ist. */
+    const summe = await db.query(`
+      SELECT stufe, COUNT(*)::int AS n
+        FROM security_events
+       WHERE created_at >= NOW() - ($1 || ' days')::interval
+       GROUP BY stufe`, [params[0]]);
+
+    res.json({
+      events: r.rows,
+      je_stufe: summe.rows.reduce((a, z) => (a[z.stufe] = z.n, a), {}),
+      hinweis: 'Beobachtungen, keine Urteile. Eine Auffaelligkeit ist kein bewiesener Verstoss.'
+    });
+  } catch (e) {
+    console.error('[admin] security/events:', e.message);
+    res.status(500).json({ error: 'security_events_failed' });
+  }
+});
+
+/* Wer faellt auf? Verdichtet je Konto, sortiert nach Gewicht - aber das
+   Gewicht ist eine ZAEHLUNG, kein Score: wie viele Ereignisse, wie
+   schwer die schwerste Stufe, wann zuletzt. Mehr steht hier bewusst
+   nicht, damit niemand eine Rangliste fuer eine Schuldfeststellung
+   haelt. */
+router.get('/security/auffaellig', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  const tage = Math.min(Math.max(parseInt(req.query.tage, 10) || 7, 1), 365);
+  try {
+    const r = await db.query(`
+      SELECT e.user_id, e.ip_key, u.email AS user_email,
+             COUNT(*)::int AS ereignisse,
+             COUNT(DISTINCT e.pfad)::int AS pfade,
+             MAX(CASE e.stufe WHEN 'ernst' THEN 3 WHEN 'auffaellig' THEN 2 ELSE 1 END) AS hoechste,
+             MIN(e.created_at) AS erstes,
+             MAX(e.created_at) AS letztes
+        FROM security_events e
+        LEFT JOIN users u ON u.id = e.user_id
+       WHERE e.created_at >= NOW() - ($1 || ' days')::interval
+       GROUP BY e.user_id, e.ip_key, u.email
+       ORDER BY hoechste DESC, ereignisse DESC
+       LIMIT 100`, [String(tage)]);
+
+    const STUFE = { 1: 'hinweis', 2: 'auffaellig', 3: 'ernst' };
+    res.json({
+      konten: r.rows.map((z) => ({
+        user_id: z.user_id,
+        user_email: z.user_email,
+        ip_key: z.user_id ? null : z.ip_key,
+        ereignisse: z.ereignisse,
+        verschiedene_pfade: z.pfade,
+        hoechste_stufe: STUFE[z.hoechste] || 'hinweis',
+        erstes: z.erstes,
+        letztes: z.letztes
+      })),
+      tage
+    });
+  } catch (e) {
+    console.error('[admin] security/auffaellig:', e.message);
+    res.status(500).json({ error: 'security_auffaellig_failed' });
+  }
+});
+
+/* Die Fallakte (B19): alles zu einem Konto, chronologisch, plus die zwei
+   Kennzahlen aus v1367 samt ihrem Massstab. Wer hier eine Entscheidung
+   trifft, soll sehen, woran er sie misst. */
+router.get('/security/fall/:userId', requireAdmin, async (req, res) => {
+  try {
+    const sec = require('../services/securityEventService');
+    const db = req.app.get('db');
+    const uid = req.params.userId;
+
+    const nutzer = await db.query(
+      'SELECT id, email, name, role, is_active, created_at FROM users WHERE id = $1', [uid]);
+    if (!nutzer.rowCount) return res.status(404).json({ error: 'user_not_found' });
+
+    const [chronik, muster24, zustand] = await Promise.all([
+      sec.chronik(uid, { limit: 500 }),
+      sec.muster(uid, { fensterMinuten: 1440 }),
+      /* v1369: der geltende Zustand gehoert in die Akte - sonst sieht man
+         Beobachtungen, ohne zu wissen, ob schon jemand entschieden hat. */
+      sec.zustand(uid)
+    ]);
+
+
+    res.json({
+      nutzer: nutzer.rows[0],
+      chronik,
+      muster_24h: muster24,
+      zustand,
+      hinweis: 'Diese Akte sammelt Beobachtungen. Die Bewertung trifft ein Mensch.'
+    });
+  } catch (e) {
+    console.error('[admin] security/fall:', e.message);
+    res.status(500).json({ error: 'security_fall_failed' });
+  }
+});
+
+/* ══════════════════════════════════════════════════════════════════════
+   v1369 (B4) · DIE ENTSCHEIDUNG — und wer sie treffen darf
+   ══════════════════════════════════════════════════════════════════════
+   Marcels Entscheidung vom 13.09.2026 auf die Frage, ab wann das System
+   selbst eingreift: GAR NICHT. Es stuft ein und meldet; jede
+   Einschraenkung und jede Sperre setzt ein Mensch.
+
+   Deshalb gibt es genau diesen einen Endpunkt, der einen Zustand setzt -
+   und er verlangt drei Dinge:
+
+     1. eine ROLLE. Lesen darf jeder Admin, entscheiden nur owner und
+        support. Wer einen Fall nur nachvollziehen soll, soll ihn nicht
+        aus Versehen schliessen koennen.
+     2. eine BEGRUENDUNG. Ohne Notiz kein Eintrag - sonst steht in der
+        Akte spaeter eine Sperre, die niemand pruefen kann.
+     3. den BERECHNETEN STAND im Moment der Entscheidung. Er wird
+        mitgeschrieben, damit spaeter nachvollziehbar ist, worauf sie
+        sich stuetzte.
+
+   Aufgehoben wird eine Sperre durch `freigegeben` - nicht durch Loeschen.
+   Die Tabelle ist append-only (B10): eine Korrektur ist eine neue Zeile,
+   kein Radiergummi.
+   ══════════════════════════════════════════════════════════════════════ */
+router.post('/security/entscheidung', requireAdmin, requireRole('owner', 'support'),
+  async (req, res) => {
+    try {
+      const sec = require('../services/securityEventService');
+      const { user_id, art, notiz } = req.body || {};
+
+      if (!user_id) return res.status(400).json({ error: 'user_id fehlt' });
+      if (!notiz || String(notiz).trim().length < 3) {
+        return res.status(400).json({
+          error: 'begruendung_fehlt',
+          hinweis: 'Wer einschraenkt, soll sagen warum - und zwar bevor er es tut.'
+        });
+      }
+
+      const eintrag = await sec.entscheiden({
+        userId: user_id,
+        art,
+        adminEmail: req.adminUser && req.adminUser.email,
+        notiz
+      });
+
+      if (!eintrag) return res.status(500).json({ error: 'nicht_gespeichert' });
+
+      const zustand = await sec.zustand(user_id);
+
+      /* v1370 (B8): eine Entscheidung wird IMMER gemeldet - ohne
+         Ruhefenster. Wer sperrt, tut das selten; jede dieser
+         Entscheidungen gehoert dokumentiert und gemeldet. Der Versand
+         laeuft nebenher, damit die Antwort nicht darauf wartet. */
+      setImmediate(async () => {
+        try {
+          const alert = require('../services/securityAlert');
+          const u = await req.app.get('db').query(
+            'SELECT email FROM users WHERE id = $1', [user_id]);
+          await alert.entscheidungMelden({
+            email: u.rows[0] && u.rows[0].email,
+            adminEmail: req.adminUser && req.adminUser.email,
+            art,
+            notiz,
+            standVorher: zustand.berechnet && zustand.berechnet.stufe
+          });
+        } catch (e) {
+          console.warn('[admin] Entscheidungsmeldung fehlgeschlagen:', e.message);
+        }
+      });
+
+      res.json({ ok: true, eintrag, zustand });
+
+    } catch (e) {
+      console.error('[admin] security/entscheidung:', e.message);
+      res.status(400).json({ error: e.message });
+    }
+  });
+
+/* ══════════════════════════════════════════════════════════════════════
+   v1371 (B17) · DIE SCHWELLEN LESEN UND SETZEN
+   ══════════════════════════════════════════════════════════════════════
+   Marcels Punkt B17: "Konfigurationsbereich im Admin fuer alle
+   Schwellen."
+
+   Lesen darf jeder Admin, aendern nur `owner` - wer an den Schwellen
+   dreht, verschiebt, wann ueberhaupt jemand auffaellt. Das ist eine
+   Betreiberentscheidung, keine Supportaufgabe.
+
+   Jede Aenderung wird mit Name und Zeit festgehalten. Die Datenbank
+   erzwingt zusaetzlich, dass die Stufen aufeinander aufbauen (CHECK in
+   Migration 073) - sonst koennte jemand "warnung" ueber "hohes Risiko"
+   setzen und die hoechste Stufe waere unerreichbar.
+   ══════════════════════════════════════════════════════════════════════ */
+router.get('/security/config', requireAdmin, async (req, res) => {
+  try {
+    const sec = require('../services/securityEventService');
+    const cfg = await sec.konfiguration();
+    res.json({
+      config: cfg.roh,
+      aus_datenbank: cfg.aus_datenbank,
+      vorgabe: sec.SCHWELLEN_VORGABE,
+      hinweis: cfg.aus_datenbank ? null
+        : 'Die Tabelle antwortet nicht - es gelten die eingebauten Vorgabewerte.'
+    });
+  } catch (e) {
+    console.error('[admin] security/config:', e.message);
+    res.status(500).json({ error: 'config_failed' });
+  }
+});
+
+router.post('/security/config', requireAdmin, requireRole('owner'), async (req, res) => {
+  const db = req.app.get('db');
+  try {
+    const f = ['warnung_ab','warnung_vielfalt','warnung_streuung',
+               'hoch_ab','hoch_vielfalt','hoch_streuung','auffaellig_ab',
+               'limit_konto','limit_anonym','alert_ruhe_minuten'];
+    const setz = [], werte = [];
+    f.forEach((k) => {
+      if (req.body[k] == null || req.body[k] === '') return;
+      const n = Number(req.body[k]);
+      if (!isFinite(n) || n < 0) throw new Error(k + ' ist keine gueltige Zahl');
+      werte.push(n); setz.push(k + ' = $' + werte.length);
+    });
+    if (!setz.length) return res.status(400).json({ error: 'nichts_zu_aendern' });
+
+    werte.push(req.adminUser && req.adminUser.email);
+    setz.push('geaendert_von = $' + werte.length);
+    werte.push(String(req.body.notiz || '').slice(0, 500));
+    setz.push('notiz = $' + werte.length);
+    setz.push('geaendert_am = NOW()');
+
+    const r = await db.query(
+      'UPDATE security_config SET ' + setz.join(', ') + ' WHERE id = 1 RETURNING *', werte);
+
+    /* Sofort wirksam machen, statt bis zu einer Minute auf den Cache zu
+       warten - wer eine Schwelle setzt, will sie gelten sehen. */
+    require('../services/securityEventService').konfigurationVergessen();
+
+    res.json({ ok: true, config: r.rows[0] });
+  } catch (e) {
+    /* Der CHECK aus Migration 073 meldet sich hier, wenn jemand die
+       Reihenfolge der Stufen verdreht. Die Meldung sagt das auch. */
+    const reihenfolge = /security_config_reihenfolge/.test(e.message || '');
+    console.error('[admin] security/config POST:', e.message);
+    res.status(400).json({
+      error: reihenfolge ? 'reihenfolge_verletzt' : e.message,
+      hinweis: reihenfolge
+        ? 'Die Stufen muessen aufeinander aufbauen: auffaellig <= warnung <= hohes Risiko, '
+          + 'und die Muster-Grenzen muessen nach oben strenger werden.'
+        : undefined
+    });
+  }
+});
+
+/* ══════════════════════════════════════════════════════════════════════
+   v1371 (B11) · AUSNAHMEN — setzen und auflisten
+
+   Marcels Auflage: "Ausnahmen muessen rollenbasiert umgesetzt und
+   trotzdem protokolliert werden."
+
+   Deshalb: eine Begruendung ist Pflicht, das Setzen schreibt ein
+   Sicherheitsereignis, und es gibt eine Liste aller Befreiten. Eine
+   Ausnahme, die man suchen muss, wird vergessen.
+   ══════════════════════════════════════════════════════════════════════ */
+router.get('/security/ausnahmen', requireAdmin, async (req, res) => {
+  try {
+    const r = await req.app.get('db').query(
+      `SELECT id, email, name, role, security_exempt, security_exempt_grund,
+              security_exempt_seit
+         FROM users
+        WHERE security_exempt = TRUE OR role IN ('owner','admin','developer')
+        ORDER BY security_exempt DESC, role, email`);
+    res.json({
+      konten: r.rows,
+      hinweis: 'Rollen owner/admin/developer sind von Haus aus befreit. '
+             + 'Die Ereignisse werden trotzdem protokolliert.'
+    });
+  } catch (e) {
+    res.status(500).json({ error: 'ausnahmen_failed' });
+  }
+});
+
+router.post('/security/ausnahme', requireAdmin, requireRole('owner'), async (req, res) => {
+  try {
+    const { user_id, frei, grund } = req.body || {};
+    if (!user_id) return res.status(400).json({ error: 'user_id fehlt' });
+    if (frei && (!grund || String(grund).trim().length < 3)) {
+      return res.status(400).json({
+        error: 'begruendung_fehlt',
+        hinweis: 'Ohne Begruendung ist eine Ausnahme in einem halben Jahr nicht '
+               + 'mehr erklaerbar, und niemand traut sich, sie zu entfernen.'
+      });
+    }
+
+    const r = await req.app.get('db').query(
+      `UPDATE users SET security_exempt = $2,
+              security_exempt_grund = $3,
+              security_exempt_seit = CASE WHEN $2 THEN NOW() ELSE NULL END
+        WHERE id = $1 RETURNING id, email, security_exempt, security_exempt_grund`,
+      [user_id, !!frei, frei ? String(grund).trim().slice(0, 500) : null]);
+
+    if (!r.rowCount) return res.status(404).json({ error: 'user_not_found' });
+
+    /* Die Ausnahme selbst ist ein Ereignis - sonst waere ausgerechnet
+       diese Entscheidung die einzige ohne Spur. */
+    const sec = require('../services/securityEventService');
+    await sec.schreibe({
+      userId: user_id,
+      art: sec.ARTEN.MUSTER,
+      stufe: sec.STUFEN.HINWEIS,
+      detail: {
+        vorgang: frei ? 'ausnahme_gesetzt' : 'ausnahme_aufgehoben',
+        admin: req.adminUser && req.adminUser.email,
+        notiz: frei ? String(grund).trim().slice(0, 500) : 'aufgehoben'
+      }
+    });
+
+    res.json({ ok: true, konto: r.rows[0] });
+  } catch (e) {
+    console.error('[admin] security/ausnahme:', e.message);
+    res.status(400).json({ error: e.message });
+  }
+});
+
 router.get('/audit-log.csv', requireAdmin, async (req, res) => {
+
+
+
   const db = req.app.get('db');
   const { action = '', limit = 5000 } = req.query;
   try {

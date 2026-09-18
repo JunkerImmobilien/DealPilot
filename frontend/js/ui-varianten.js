@@ -482,6 +482,30 @@
         '<p>Jede Änderung wirkt sofort — dahinter siehst du das Ergebnis.</p></div>' +
         '<button type="button" id="dpuv-x" aria-label="Schließen">✕</button></div>' +
       '<div id="dpuv-b">' +
+        /* ── v1380 · Hell und Dunkel, wieder bedienbar ────────────────────
+           Marcels Befund: „dann kann man nicht in den Hell Modus schalten."
+           GEMESSEN, und er hat recht: dieses Panel hatte nie einen
+           Modus-Schalter. Den alten trug das abgeloeste Panel
+           (settings.js:3556, `dp-tb-sec` mit Dunkel/Hell); als v1085 Skin
+           und Vorlage koppelte, blieb nur noch der Weg ueber die Vorlage —
+           und welche der sechs hell ist, steht nirgends. „Rein weiss",
+           „Kuehl", „Serife", „Creme" sind Namen, keine Ansage.
+
+           Der Schalter fuehrt deshalb keinen zweiten Mechanismus ein: er
+           geht genau den Weg der Vorlagen-Kacheln (save + anwenden +
+           skinNachziehen). Die Vorlage IST die Flaechenentscheidung
+           (v1156-GRUND) — der Schalter waehlt nur eine, die zur
+           gewuenschten Helligkeit passt, und laesst eine bereits passende
+           stehen. */
+        '<div class="dpuv-g"><h3>Modus</h3>' +
+          '<p class="dpuv-hint">Grundhelligkeit der Oberfläche. Wählt die passende Vorlage ' +
+            'darunter mit aus — eine, die schon passt, bleibt stehen.</p>' +
+          '<div class="dp-tt-mode-toggle" id="dpuv-modus">' +
+            '<button type="button" class="dp-tt-mode-btn" data-v="obsidian">Dunkel' +
+              '<span class="dp-tt-mode-btn-label">Obsidian &amp; Gold</span></button>' +
+            '<button type="button" class="dp-tt-mode-btn" data-v="hell">Hell' +
+              '<span class="dp-tt-mode-btn-label">Helle Flächen</span></button>' +
+          '</div></div>' +
         '<div class="dpuv-g"><h3>App-Darstellung</h3>' +
           '<p class="dpuv-hint">Aufbau, Dichte und Typografie der gesamten Oberfläche.</p>' +
           segHtml('dpuv-theme', THEMES, get('ui_theme', THEMES)) + '</div>' +
@@ -616,7 +640,49 @@
         if (nachher) nachher();
       });
     }
-    segBinden('dpuv-theme',   'ui_theme',   THEMES);
+    /* ── v1380 · Modus-Schalter ───────────────────────────────────────────
+       Zwei Richtungen, eine Wahrheit: der Schalter setzt die Vorlage, und
+       jede Vorlagenwahl setzt den Schalter. Sonst zeigt er eine Helligkeit
+       an, die nicht mehr gilt — genau das Auseinanderlaufen, das v1085
+       beheben sollte. */
+    function modusMarkieren() {
+      var host = document.getElementById('dpuv-modus');
+      if (!host) return;
+      var soll = istHell(get('ui_theme', THEMES)) ? 'hell' : 'obsidian';
+      host.querySelectorAll('.dp-tt-mode-btn').forEach(function (x) {
+        x.classList.toggle('active', x.getAttribute('data-v') === soll);
+      });
+    }
+    (function modusBinden() {
+      var host = document.getElementById('dpuv-modus');
+      if (!host) return;
+      host.addEventListener('click', function (ev) {
+        var b = ev.target.closest ? ev.target.closest('.dp-tt-mode-btn') : null;
+        if (!b) return;
+        var hell = (b.getAttribute('data-v') === 'hell');
+        /* Passt die laufende Vorlage schon zur Helligkeit, bleibt sie
+           stehen — wer auf „Hell" drueckt und auf „Panel" steht, will
+           nicht nach „Kontor" geworfen werden. */
+        if (hell !== istHell(get('ui_theme', THEMES))) {
+          save({ ui_theme: hell ? 'kontor' : '' });
+          anwenden();
+          var th = document.getElementById('dpuv-theme');
+          if (th) {
+            var jetzt = get('ui_theme', THEMES);
+            th.querySelectorAll('.dpuv-sgb').forEach(function (x) {
+              x.classList.toggle('on', (x.getAttribute('data-v') || '') === jetzt);
+            });
+          }
+        }
+        /* Merker und body-Klasse nachziehen, auch wenn die Vorlage blieb —
+           sonst steht dp_chrome_hell weiter auf dem alten Wert. */
+        try { skinNachziehen(); } catch (e) {}
+        modusMarkieren();
+      });
+      modusMarkieren();
+    })();
+
+    segBinden('dpuv-theme',   'ui_theme',   THEMES, modusMarkieren);
     segBinden('dpuv-cards',   'ui_cards',   CARDS);
     segBinden('dpuv-surface', 'ui_surface', SURFACE);
     segBinden('dpuv-form',    'ui_form',    FORMEN);      /* v1098 */
@@ -1160,6 +1226,16 @@
         var jetzt = get('ui_theme', THEMES);
         host.querySelectorAll('.dpuv-sgb').forEach(function (x) {
           x.classList.toggle('on', (x.getAttribute('data-v') || '') === jetzt);
+        });
+      }
+      /* v1380: der Modus-Schalter haengt an derselben Wahrheit und muss
+         mitgehen — auch wenn der Anstoss von aussen kam (Reseller,
+         Mandanten-Branding rufen _dpDispSkin direkt). */
+      var mh = document.getElementById('dpuv-modus');
+      if (mh) {
+        var soll = hell ? 'hell' : 'obsidian';
+        mh.querySelectorAll('.dp-tt-mode-btn').forEach(function (x) {
+          x.classList.toggle('active', x.getAttribute('data-v') === soll);
         });
       }
     } catch (e) {}

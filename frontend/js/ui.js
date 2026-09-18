@@ -544,88 +544,36 @@ function saveKey() {
   toast('✓ API-Key gespeichert');
 }
 
-function buildPrompt() {
-  var K = State.kpis;
-  var addr = [g('str'), g('hnr'), g('plz'), g('ort')].filter(Boolean).join(' ');
-  return 'Du bist erfahrener Immobilieninvestmentberater und Sachverständiger in Deutschland mit 20+ Jahren Erfahrung. Erstelle eine ausführliche, professionelle Investmentanalyse für ein Sachverständigenbüro auf Deutsch. Sei präzise, nutze konkrete Zahlen aus den Daten und gib handlungsorientierte Empfehlungen.\n\n' +
-    'OBJEKT:\n' +
-    '  Adresse: ' + addr + '\n' +
-    '  Typ: ' + g('objart') + ' · Fläche: ' + g('wfl') + ' m² · Baujahr: ' + g('baujahr') + ' · Kaufdatum: ' + g('kaufdat') + '\n' +
-    '  Makrolage: ' + g('makrolage') + ' · Mikrolage: ' + g('mikrolage') + '\n' +
-    '  Bewertung: Bank ' + fE(v('bankval')) + ', SVW ' + fE(v('svwert')) + ', Wertpuffer ' + fE(K.wp_kpi, 0, true) + '\n\n' +
-    'INVESTITION:\n' +
-    '  Kaufpreis: ' + fE(K.kp) + ' (' + (v('wfl') > 0 ? fE(K.kp/v('wfl')) + '/m²' : '—') + ')\n' +
-    '  Gesamtinvestition: ' + fE(K.gi) + ' (Nebenkosten ' + fP((K.gi-K.kp)/K.kp*100, 1) + ')\n' +
-    '  Eigenkapital: ' + fE(K.ek) + ' | LTV: ' + fP(K.ltv, 1) + '\n\n' +
-    'MIETE & ERTRAG:\n' +
-    '  NKM: ' + fE(K.nkm_j/12) + '/Mon. (' + fE(K.nkm_j) + '/J.) | Warmmiete: ' + fE(K.wm_j/12) + '/Mon.\n' +
-    '  Bruttomietrendite: ' + fP(K.bmy) + ' | Nettomietrendite: ' + fP(K.nmy) + '\n' +
-    '  CF operativ: ' + fE(K.cf_op, 0, true) + '/J. | CF nach Steuern: ' + fE(K.cf_ns, 0, true) + '/J. (' + fE(K.cf_m, 0, true) + '/Mon.)\n\n' +
-    'FINANZIERUNG:\n' +
-    '  Darlehen I: ' + fE(K.d1) + ' bei ' + fP(K.d1z_pct, 2) + ' Zins, ' + fP(K.d1t_pct, 2) + ' Tilgung\n' +
-    '  Zinsbindung: ' + g('d1_bindj') + ' Jahre | Restschuld EZB: ' + fE(State.rs) + '\n' +
-    (State.d2_enabled ? '  Darlehen II: ' + fE(State.d2) + ' (' + State.d2_type + ')\n' : '') +
-    '  Anschlusszins kalkuliert: ' + fP(v('anschl_z'), 1) + ' | Zinsänderungsrisiko: ' + fE(K.zaer_m) + '/Mon.\n\n' +
-    'KENNZAHLEN:\n' +
-    '  DSCR: ' + fN(K.dscr, 2) + '\n' +
-    '  LTV: ' + fP(K.ltv, 1) + '\n' +
-    '  Faktor (KP/NKM): ' + fN(K.fak, 1) + ' | IRR: ' + fP(K.irr, 1) + ' | EM: ' + fX(K.em) + '\n' +
-    '  Wertpuffer: ' + fE(K.wp_kpi, 0, true) + '\n\n' +
-    '═══════════════════════════════════════════════════\n' +
-    'DEALPILOT-BEWERTUNGSSKALA (verbindlich verwenden!)\n' +
-    '═══════════════════════════════════════════════════\n' +
-    'Halte dich strikt an diese Schwellwerte und an den unten formulierten Wortlaut.\n\n' +
-    'LTV (Loan to Value) — Beleihungsauslauf:\n\n' +
-    '🟢 SOLIDE — LTV unter 85 %:\n' +
-    '   Marktüblicher und bankenseitig meist gut darstellbarer Finanzierungsbereich für\n' +
-    '   Kapitalanleger in Deutschland. Bietet in der Regel eine solide Sicherheitsreserve\n' +
-    '   und gute Finanzierungskonditionen. Ein LTV zwischen 80-85 % gilt ausdrücklich\n' +
-    '   NICHT als "hoch", sondern als übliche Investmentfinanzierung.\n\n' +
-    '🟡 ERHÖHT — LTV zwischen 85 % und 100 %:\n' +
-    '   Erhöhte Fremdkapitalquote mit geringerer Sicherheitsreserve. Die Finanzierung\n' +
-    '   reagiert sensibler auf Marktveränderungen, Zinsanstiege oder Leerstand. Banken\n' +
-    '   prüfen solche Finanzierungen häufig strenger und Konditionen können sich\n' +
-    '   verschlechtern.\n\n' +
-    '🔴 KRITISCH — LTV über 100 %:\n' +
-    '   Sehr hohe bzw. vollständige Fremdfinanzierung mit erhöhter finanzieller Belastung\n' +
-    '   und geringer Absicherung. Bereits kleinere Marktwertverluste oder unerwartete\n' +
-    '   Kosten können die Finanzierung deutlich belasten. Anschlussfinanzierungen und\n' +
-    '   Nachbewertungen können problematisch werden.\n\n' +
-    'DSCR (Debt Service Coverage Ratio):\n' +
-    '🔴 KRITISCH — DSCR unter 1,0: Schuldendienst nicht durch Mieteinnahmen gedeckt.\n' +
-    '🟡 KNAPP — DSCR zwischen 1,0 und 1,2: Bedienung gerade so gedeckt, kleiner Puffer.\n' +
-    '🟢 SOLIDE — DSCR ab 1,2: Tilgung & Zins komfortabel gedeckt, ausreichender Puffer.\n\n' +
-    'WICHTIGE INSTRUKTIONEN:\n' +
-    '- Verwende die Begriffe "SOLIDE", "ERHÖHT", "KRITISCH" / "KNAPP" exakt wie oben.\n' +
-    '- Ein LTV von 84 % ist SOLIDE und gehört in die Stärken — bezeichne ihn NIE als\n' +
-    '  "hoch", "relativ hoch" oder "erhöht". Das ist faktisch falsch.\n' +
-    '- Ein DSCR von 1,25 ist SOLIDE und damit eine STÄRKE, kein Risiko.\n\n' +
-    'INVESTITIONSSTRATEGIE: ' + g('ai_strat') + '\n' +
-    'VERKÄUFER-SITUATION: ' + g('ai_verk') + '\n' +
-    'EIGENE RISIKOTOLERANZ: ' + g('ai_risk') + '\n' +
-    'MARKTPHASE: ' + g('ai_markt') + '\n' +
-    'INVESTITIONSTHESE: ' + (g('thesis') || 'Keine Angabe') + '\n\n' +
-    '═══════════════════════════════════════════════════\n' +
-    'GIB DEINE ANALYSE IN GENAU DIESEN 7 BLÖCKEN AUS:\n' +
-    '═══════════════════════════════════════════════════\n\n' +
-    '(Format: GROSSBUCHSTABEN-Überschrift, Doppelpunkt, Zeilenumbruch, dann Inhalt. Halte dich exakt daran.)\n\n' +
-    'INVESTITIONSBEWERTUNG:\n' +
-    '(8-12 Sätze ausführlicher Fließtext. Bewerte: Lage, Marktumfeld, Bauqualität implizit, Verhältnis von Kaufpreis zu Marktwert (Wertpuffer), Renditequalität (BMR/NMR), Cashflow-Stärke, Hebelwirkung der Finanzierung, steuerliche Vorteile, Bewirtschaftungskosten-Anteil, Zinsänderungsrisiko und Anschlussfinanzierungs-Phase. Gib am Ende ein eindeutiges Investment-Rating: SEHR ATTRAKTIV / ATTRAKTIV / NEUTRAL / KRITISCH / UNGEEIGNET. Verwende konkrete Zahlen aus den Eingaben.)\n\n' +
-    'STÄRKEN:\n' +
-    '(3-5 nummerierte Punkte. Jeder Punkt: Überschrift, dann Begründung mit konkreten Zahlen. Beispiel: "1. Sofortiger Wertpuffer von 57.000 € — Kauf zu 76% des Marktwerts schafft Sicherheitsmarge bei Verkauf und ermöglicht günstige Beleihung.")\n\n' +
-    'RISIKEN:\n' +
-    '(3-4 nummerierte Punkte. Sei ehrlich und quantifiziere wo möglich. Erkläre, was schiefgehen kann und welche Maßnahmen zur Mitigation möglich sind.)\n\n' +
-    'VERHANDLUNGSEMPFEHLUNG:\n' +
-    '(Konkrete Zahlen: Erstangebot in €, Zielpreis in €, Schmerzgrenze in €. Begründung mit 2-3 Argumenten basierend auf Marktwert, Mängeln, Marktphase. 5-7 Sätze.)\n\n' +
-    'KAUFPREIS-OFFERTE:\n' +
-    '(Vorgefertigter, professioneller Text als Vorlage für die schriftliche Kaufpreisofferte an den Verkäufer. Soll direkt verwendbar sein. Inkl. Anrede, Begründung des Angebots ohne Preisdrückerei, Wertschätzung der Immobilie, klares Angebot mit Zahl, Hinweis auf Finanzierungszusage und kurzem Notartermin als Vorteil. Etwa 200-300 Wörter, formell aber freundlich. Format als sofort kopierbares Schreiben.)\n\n' +
-    'BANKARGUMENTE:\n' +
-    '(Genau 3-4 starke Argumente für die Finanzierungsanfrage. Mit konkreten Zahlen. Was die Bank gerne hört: stabile Mieteinnahmen, niedriger LTV auf Marktwert, DSCR >1.5, stabile Region.)\n\n' +
-    'FAZIT:\n' +
-    '(2-3 Sätze klare Empfehlung: KAUFEN / NICHT KAUFEN / NUR UNTER BEDINGUNGEN. Bei letzterem: welche konkreten Bedingungen. Mit Begründung.)';
-}
+/* ═══════════════════════════════════════════════════════════════════════
+   v1360 · DER ANALYSE-PROMPT IST AUS DEM BROWSER VERSCHWUNDEN
+   ═══════════════════════════════════════════════════════════════════════
+   Hier standen 78 Zeilen Prompt: Rollendefinition, die verbindliche
+   „DEALPILOT-BEWERTUNGSSKALA" mit vorgeschriebenem Wortlaut je LTV- und
+   DSCR-Band, die Anti-Halluzinations-Regeln und die Sieben-Block-
+   Ausgabestruktur samt Laengenvorgaben.
+
+   Das ist Prompt-Engineering, das aus echten Fehlausgaben entstanden ist,
+   und es lag im Klartext bei jedem Nutzer. Punkt B1 der Bestandsaufnahme
+   nennt es als zweitteuerste Auslesestelle der ganzen Anwendung: ein
+   Wettbewerber spart sich damit die Iterationsschleife UND bekommt
+   denselben Ton - das, was Kunden als „die KI von DealPilot" wahrnehmen.
+
+   DIE VERLAGERUNG WAR SCHON PASSIERT, NUR DAS AUFRAEUMEN FEHLTE.
+   `backend/src/services/openaiService.js` baut denselben Prompt seit
+   Langem serverseitig, ab Zeile 34, mit derselben Bewertungsskala (dort
+   ab Zeile 86) und sogar ausfuehrlicheren Regeln. Gemessen an der
+   laufenden Maschine:
+
+     GET /api/v1/ai/status  ->  { available: true, accepts_user_key: true }
+
+   `available` ist im Backend HART auf true gesetzt (ai.js:197) - das
+   Backend nimmt Nutzerschluessel entgegen, auch ohne eigenen. Damit war
+   `serverMode` immer wahr und dieser Prompt seit V26 unerreichbar. Er
+   wurde nicht mehr ausgefuehrt, nur noch ausgeliefert.
+   ═══════════════════════════════════════════════════════════════════════ */
 
 // Antwort in farbige HTML-Sektionen umwandeln
+
 function renderAIResponse(text) {
   var secs = ['INVESTITIONSBEWERTUNG', 'STÄRKEN', 'RISIKEN', 'VERHANDLUNGSEMPFEHLUNG', 'KAUFPREIS-OFFERTE', 'BANKARGUMENTE', 'FAZIT'];
   var html = '';
@@ -1360,99 +1308,40 @@ async function _runMiniAIGuarded() {
 }
 
 /**
- * Alte Client-seitige KI-Analyse (Fallback, wenn Backend keine KI-Recherche anbietet).
+ * v1360 · Frueher: „Alte Client-seitige KI-Analyse (Fallback, wenn Backend
+ * keine KI-Recherche anbietet)". Sie rief `api.openai.com` DIREKT aus dem
+ * Browser auf, mit einem Schluessel aus den Einstellungen.
+ *
+ * Drei Gruende, warum dieser Weg weg ist:
+ *
+ *   1. Er war unerreichbar. /ai/status meldet `available: true` fest
+ *      verdrahtet, also lief immer _runAIServer.
+ *   2. Er trug den vollstaendigen Analyse-Prompt im Klartext aus.
+ *   3. Er lief am Backend vorbei - an jeder Zaehlung, jedem Limit und
+ *      jedem Protokoll. Genau der Punkt, um den es in B21 geht.
+ *
+ * DIE FUNKTION IST NICHT VERLOREN: /ai/analyze nimmt seit V26 einen
+ * `userApiKey` im Body entgegen (ai.js:214). Wer einen eigenen Schluessel
+ * gepflegt hat, wird jetzt ueber den Server bedient - mit demselben
+ * Schluessel, aber mit Zaehlung, Limit und dem Prompt, der den Server nie
+ * verlaesst. `_buildAIPayload()` schickt ihn seit v1360 mit; andere Module
+ * (copilot.js, ds2-ai.js) taten das laengst.
+ *
+ * Bleibt nur ein Fall offen: das Backend ist gar nicht erreichbar. Dann
+ * gibt es eine klare Meldung statt eines stillen Umwegs - und in dem Fall
+ * funktioniert ohnehin nichts anderes in der App.
  */
 async function _runAIClient(btn) {
-  // Read API-Key + Model from Settings (preferred), then fallback to old fields
-  var apiKey = '', model = 'gpt-4o-mini';
-  if (typeof Settings !== 'undefined') {
-    var s = Settings.get();
-    apiKey = s.openai_api_key || '';
-    model = s.openai_model || 'gpt-4o-mini';
+  var box = document.getElementById('ai-content');
+  if (box) {
+    box.innerHTML = '<div class="ai-error">\u26a0 Die Analyse ist gerade nicht erreichbar. ' +
+      'Bitte pr\u00fcfe deine Verbindung und versuch es noch einmal.</div>';
   }
-  if (!apiKey) apiKey = localStorage.getItem('ji_ak_oai') || '';
-  if (!apiKey) {
-    var inp = document.getElementById('api-key');
-    apiKey = inp ? inp.value.trim() : '';
-  }
-  if (!apiKey) {
-    btn.disabled = false;
-    btn.textContent = '🤖 Analyse starten';
-    toast('⚠ Bitte API-Key in Einstellungen eintragen');
-    if (typeof showSettings === 'function') setTimeout(showSettings, 800);
-    return;
-  }
-  var modelSel = document.getElementById('oai-model');
-  if (modelSel && modelSel.value) model = modelSel.value;
-
-  btn.textContent = '⏳ ChatGPT analysiert...';
-  document.getElementById('ai-content').innerHTML =
-    '<div class="ai-loading">' +
-      '<div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>' +
-      '<span style="margin-left:10px;color:rgba(255,255,255,.5);font-size:12px">ChatGPT (' + model + ') analysiert deine Kalkulation...</span>' +
-    '</div>';
-
-  try {
-    var prompt = buildPrompt();
-    // Track usage (and enforce plan limit) before calling OpenAI
-    if (typeof Sub !== 'undefined' && Sub.isApiMode()) {
-      try {
-        await Sub.trackUsage('ai_analysis');
-      } catch (e) {
-        if (e.status === 403) {
-          var box = document.getElementById('ai-content');
-          if (box) box.innerHTML = '<div class="ai-error">⚠ Pilot-Analyse-Limit erreicht. Bitte upgrade deinen Plan.</div>';
-          if (btn) { btn.disabled = false; btn.textContent = '🤖 Analyse starten'; }
-          return;
-        }
-        console.warn('Usage tracking failed:', e.message);
-      }
-    }
-
-    var res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + apiKey
-      },
-      body: JSON.stringify({
-        model: model,
-        max_tokens: 3500,
-        messages: [
-          { role: 'system', content: 'Du bist ein erfahrener Immobilieninvestmentberater und Sachverständiger in Deutschland. Antworte präzise und handlungsorientiert auf Deutsch.' },
-          { role: 'user', content: prompt }
-        ]
-      })
-    });
-
-    if (!res.ok) {
-      var ed = await res.json();
-      throw new Error((ed.error && ed.error.message) || 'KI API Fehler ' + res.status);
-    }
-    var data = await res.json();
-    var text = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content || '';
-    if (!text) throw new Error('Keine Antwort von ChatGPT');
-
-    window._aiText = text;
-    document.getElementById('ai-content').innerHTML = renderAIResponse(text);
-    toast('✓ ChatGPT-Analyse abgeschlossen');
-    // V63.69: KI-Analyse persistieren
-    if (typeof saveObj === 'function') {
-      try { saveObj({ silent: true }); } catch(e) { console.warn('[ai] auto-save failed:', e); }
-    }
-
-  } catch(e) {
-    var msg = '⚠ Fehler: ' + e.message + '<br><br>' +
-      'API-Key prüfen: <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--wl-c9a84c, #C9A84C)">platform.openai.com/api-keys →</a><br><br>' +
-      'Guthaben prüfen: <a href="https://platform.openai.com/settings/organization/billing" target="_blank" style="color:var(--wl-c9a84c, #C9A84C)">Billing →</a>';
-    document.getElementById('ai-content').innerHTML = '<div class="ai-body" style="color:#f08080">' + msg + '</div>';
-  }
-
-  btn.disabled = false;
-  btn.textContent = '✦ Analyse aktualisieren';
+  if (btn) { btn.disabled = false; btn.textContent = '\u2726 Analyse starten'; }
 }
 
 // Portfolio collapse toggle
+
 function togglePortfolio() {
   var content = document.getElementById('sb-portfolio-content');
   var arr = document.getElementById('sb-port-arrow');

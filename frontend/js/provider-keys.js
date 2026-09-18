@@ -11,16 +11,16 @@
   function renderPane() {
     return '' +
       '<h3 class="set-section-h">API-Keys externer Anbieter</h3>' +
-      '<p class="hint" style="margin-bottom:14px">Hinterlege deine eigenen Zugaenge. Gespeicherte Keys werden maskiert; Anzeigen nur nach Passwort. Ohne Zugang sind die Buttons in der PRE-FLIGHT-Karte ausgegraut.</p>' +
+      '<p class="hint" style="margin-bottom:14px">Hinterlege deine eigenen Zugänge. Gespeicherte Keys werden maskiert; Anzeigen nur nach Passwort. Ohne Zugang sind die Buttons in der PRE-FLIGHT-Karte ausgegraut.</p>' +
       '<div id="pk-imo" style="border:1px solid rgba(201,168,76,.3);border-radius:12px;padding:14px 15px;background:#FAF9F4">' +
         '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">' +
           '<span style="font-weight:700;font-size:15px"><span style="color:#C9A84C">Immo</span>Metrica</span>' +
           '<span id="pk-imo-badge" style="margin-left:auto;font-size:11px;font-family:ui-monospace,monospace;padding:3px 9px;border-radius:999px;border:1px solid #ddd;color:#888">…</span>' +
         '</div>' +
-        '<p class="hint" style="margin:0 0 12px">Meta-Suche fuer Off-Market-Deals. Erfordert ein <b>Investor-Pro-Abo</b> bei ImmoMetrica – den API-Token findest du dort im Dashboard.</p>' +
+        '<p class="hint" style="margin:0 0 12px">Meta-Suche für Off-Market-Deals. Erfordert ein <b>Investor-Pro-Abo</b> bei ImmoMetrica – den API-Token findest du dort im Dashboard.</p>' +
         '<div id="pk-imo-body"></div>' +
       '</div>' +
-      '<p class="hint" style="margin-top:12px;font-size:11px;color:var(--muted,#5F5E5A)">Weitere Anbieter (PriceHubble) folgen.</p>';
+      '<p class="hint" style="margin-top:12px;font-size:11px;color:var(--muted,#5F5E5A)">Weitere Bewertungspartner folgen.</p>';
   }
 
   function setBadge(state) {
@@ -45,9 +45,9 @@
       '<div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:11px">' +
         '<button type="button" class="btn btn-sm btn-ghost" onclick="DealPilotProviderKeys.reveal()">Anzeigen</button>' +
         '<button type="button" class="btn btn-sm btn-ghost" onclick="DealPilotProviderKeys.copy()">Kopieren</button>' +
-        '<button type="button" class="btn btn-sm" style="color:#B86250;border:1px solid #e3c9c4;background:#fff" onclick="DealPilotProviderKeys.del()">Loeschen</button>' +
+        '<button type="button" class="btn btn-sm" style="color:#B86250;border:1px solid #e3c9c4;background:#fff" onclick="DealPilotProviderKeys.del()">Löschen</button>' +
       '</div>' +
-      '<p class="hint" style="margin-top:8px;font-size:11px">Verschluesselt im Backend gespeichert · „Anzeigen" verlangt dein Konto-Passwort.</p>';
+      '<p class="hint" style="margin-top:8px;font-size:11px">Verschlüsselt im Backend gespeichert · „Anzeigen" verlangt dein Konto-Passwort.</p>';
   }
 
   function load() {
@@ -110,7 +110,7 @@
       if (!confirm('ImmoMetrica-Zugang wirklich loeschen?')) return;
       fetch(API + '/credentials', { method: 'DELETE', headers: hdr() })
         .then(function () { load(); if (window.toast) toast('Zugang geloescht'); })
-        .catch(function () { alert('Loeschen fehlgeschlagen.'); });
+        .catch(function () { alert('Löschen fehlgeschlagen.'); });
     },
   };
 

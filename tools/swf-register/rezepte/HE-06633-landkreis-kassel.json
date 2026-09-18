@@ -1,0 +1,131 @@
+{
+  "land_code": "HE",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Kassel und Waldeck-Frankenberg",
+  "gaa_kennz": "06AFBKB-KS",
+  "ags": ["06633"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2025-12-31",
+  "auswertezeitraum": "Kaufverträge 2023 bis 2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-08",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte",
+  "quelle_datei": "2026_IMB_AFB_KORBACH.pdf, Immobilienmarktbericht 2026, Kapitel 9.4.1.1 und 9.4.1.2, Tabellen 45 und 46, Seiten 158 bis 163",
+  "quellenvermerk": "Amt für Bodenmanagement Korbach, Geschäftsstelle des Gutachterausschusses, Immobilienmarktbericht 2026",
+  "lizenz": "frei zugänglich, kostenfreier Download über das Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation",
+  "verwendung": "produkt",
+  "auflagen": "Quellenangabe. Modellkonformität nach § 10 ImmoWertV: NHK 2010 (Anlage 4 ImmoWertV 2021), Baunebenkosten darin enthalten, Regionalfaktor 1,0, Bruttogrundfläche überschlägig aus den Außenmaßen der amtlichen Geobasisdaten, Baupreisindex quartalsweise zum Beurkundungstermin (Basisjahr 2010), Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung nach § 38 ImmoWertV, Außenanlagen als pauschaler Prozentsatz vom Zeitwert der baulichen Anlagen, Nebengebäude und Stellplätze pauschal als Zeitwert, Bodenwert zum Stichtag 01.01.2022 beziehungsweise 01.01.2024. Lineare Regression, Kaufpreise jenseits der 3-Sigma-Umgebung als Ausreißer eliminiert, erkennbare Verwandtschaftskäufe eliminiert.",
+  "fundstelle": "Kapitel 9.4.1.1 und 9.4.1.2, Tabellen 45 und 46, Seiten 158 bis 163.",
+
+  "modellansaetze": {
+    "nhk": "NHK 2010",
+    "gnd_jahre": 80,
+    "alterswertminderung": "linear",
+    "regionalfaktor": 1.0,
+    "bezugsmassstab": "BGF",
+    "ermittlungsmethodik": "lineare Regression, Extremwertbereinigung über die 3-Sigma-Umgebung"
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser im Landkreis Kassel",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [125000, 150000, 175000, 200000, 225000, 250000, 275000, 300000,
+                    325000, 350000, 375000, 400000, 425000, 450000, 475000, 500000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["bis 49", "50-99", "100-149", "150-199", "200-249"],
+        "kategorie_baender": [
+          { "von": 0,   "bis": 49,  "kategorie": "bis 49" },
+          { "von": 50,  "bis": 99,  "kategorie": "50-99" },
+          { "von": 100, "bis": 149, "kategorie": "100-149" },
+          { "von": 150, "bis": 199, "kategorie": "150-199" },
+          { "von": 200, "bis": 249, "kategorie": "200-249" }
+        ],
+        "zellen": {
+          "bis 49":   [0.98, 0.90, 0.83, 0.78, 0.74, 0.70, 0.67, 0.64, 0.62, null, null, null, null, null, null, null],
+          "50-99":    [null, null, 1.21, 1.14, 1.07, 1.02, 0.97, 0.93, 0.89, 0.86, 0.83, null, null, null, null, null],
+          "100-149":  [null, null, null, null, null, 1.01, 0.98, 0.96, 0.94, 0.92, 0.90, 0.89, 0.87, null, null, null],
+          "150-199":  [null, null, null, null, null, null, 1.02, 0.99, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86, 0.84, null],
+          "200-249":  [null, null, null, null, null, null, null, 0.99, 0.98, 0.97, 0.96, 0.94, 0.93, 0.92, 0.92, 0.91]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "Fünf Bodenrichtwertklassen mal 16 Sachwertstufen, 211 Kauffälle der Jahre 2023 bis 2025. Bestimmtheitsmaß 0,40 · 0,32 · 0,18 · 0,25 · 0,0831. Der Ausschuss veröffentlicht die Klasse 200 bis 249 Euro/qm TROTZ eines Bestimmtheitsmaßes unter 10 Prozent, weil 22 Kauffälle vorliegen und das Ergebnis plausibel ins Gesamtgefüge passt — er schreibt ausdrücklich dazu, das sei bei einer Anwendung sachverständig zu würdigen.",
+        "normobjekt": "Mittlere Grundstücksgröße 699 bis 817 qm, mittlere Wohnfläche 152 bis 172 qm, mittlere BGF 331 bis 367 qm, mittlere Restnutzungsdauer 34 bis 41 Jahre, mittlere Standardstufe 2,3 bis 2,7. Marktübliche, objektbezogene Grundstücksgröße; Übergrößen und separat nutzbare Grundstücksteile bleiben unberücksichtigt."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Kassel. Die kreisfreie Stadt Kassel führt einen eigenen Gutachterausschuss und liegt unter einem eigenen Kreisschlüssel (06611) — sie ist von diesem Satz nicht berührt.",
+        "sachlich": "freistehende Ein- und Zweifamilienhäuser",
+        "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+        "spannen_je_brw_bereich": {
+          "bis 49":  { "kauffaelle": 15, "r2": 0.40,   "sachwert_mittel": 240000, "gsflaeche_mittel": 817, "brw_mittel": 33,  "rnd_mittel": 34, "standardstufe": 2.3, "bgf_mittel": 339, "wohnflaeche_mittel": 152, "bodenwertanteil": 0.16 },
+          "50-99":   { "kauffaelle": 54, "r2": 0.32,   "sachwert_mittel": 318000, "gsflaeche_mittel": 791, "brw_mittel": 76,  "rnd_mittel": 41, "standardstufe": 2.7, "bgf_mittel": 338, "wohnflaeche_mittel": 159, "bodenwertanteil": 0.22 },
+          "100-149": { "kauffaelle": 79, "r2": 0.18,   "sachwert_mittel": 346000, "gsflaeche_mittel": 805, "brw_mittel": 121, "rnd_mittel": 40, "standardstufe": 2.6, "bgf_mittel": 331, "wohnflaeche_mittel": 157, "bodenwertanteil": 0.32 },
+          "150-199": { "kauffaelle": 41, "r2": 0.25,   "sachwert_mittel": 383000, "gsflaeche_mittel": 717, "brw_mittel": 173, "rnd_mittel": 40, "standardstufe": 2.6, "bgf_mittel": 354, "wohnflaeche_mittel": 164, "bodenwertanteil": 0.37 },
+          "200-249": { "kauffaelle": 22, "r2": 0.0831, "sachwert_mittel": 429000, "gsflaeche_mittel": 699, "brw_mittel": 214, "rnd_mittel": 39, "standardstufe": 2.6, "bgf_mittel": 367, "wohnflaeche_mittel": 172, "bodenwertanteil": 0.38 }
+        },
+        "vorbehalt": "Die Klasse 200 bis 249 Euro/qm hat ein Bestimmtheitsmaß von 0,0831. Der Ausschuss veröffentlicht sie bewusst und verlangt dafür eine sachverständige Würdigung im Einzelfall."
+      },
+      "beleg": "Immobilienmarktbericht 2026 des Amtes für Bodenmanagement Korbach, Kapitel 9.4.1.1, Tabelle 45, Seite 160.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Matrix mit Fallzahl und Bestimmtheitsmass je Klasse. KEINE Stufe A, weil das Bestimmtheitsmass in drei von fuenf Klassen unter 0,30 liegt, in einer sogar unter 0,10 - der Ausschuss sagt das selbst und verlangt eine sachverstaendige Wuerdigung.",
+      "fallzahl": 211
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhäuser und Doppelhaushälften im Landkreis Kassel",
+      "form": "matrix_kategorial",
+      "formel": {
+        "form": "matrix_kategorial",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [100000, 125000, 150000, 175000, 200000, 225000,
+                    250000, 275000, 300000, 325000, 350000],
+        "achse_k_feld": "brw_bereich",
+        "achse_k_bez": "Bodenrichtwertbereich in €/m²",
+        "zuordnung_feld": "brw",
+        "kategorien": ["100-149", "150-199"],
+        "kategorie_baender": [
+          { "von": 100, "bis": 149, "kategorie": "100-149" },
+          { "von": 150, "bis": 199, "kategorie": "150-199" }
+        ],
+        "zellen": {
+          "100-149": [1.61, 1.47, 1.37, 1.28, 1.22, 1.16, 1.11, 1.07, 1.03, null, null],
+          "150-199": [null, null, 1.47, 1.38, 1.30, 1.24, 1.19, 1.14, 1.10, 1.07, 1.04]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "hinweis": "NUR ZWEI Bodenrichtwertklassen, 64 Kauffälle, Bestimmtheitsmaß 0,40 und 0,18. Für die Bereiche bis 49, 50 bis 99 und 200 bis 249 Euro/qm schreibt der Ausschuss ausdrücklich, es lägen zu wenige auswertbare Kauffälle vor, um statistisch abgesicherte Sachwertfaktoren abzuleiten — dort gibt es deshalb bewusst keinen Wert, obwohl die freistehenden Häuser dort welche haben.",
+        "normobjekt": "Mittlere Grundstücksgröße 309 beziehungsweise 387 qm, mittlere Wohnfläche 120 und 124 qm, mittlere BGF 243 und 246 qm, mittlere Restnutzungsdauer jeweils 43 Jahre, Standardstufe jeweils 2,6."
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "raeumlich": "Landkreis Kassel ohne die kreisfreie Stadt Kassel",
+        "sachlich": "Reihenhäuser und Doppelhaushälften",
+        "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+        "spannen_je_brw_bereich": {
+          "100-149": { "kauffaelle": 34, "r2": 0.40, "sachwert_mittel": 231000, "gsflaeche_mittel": 309, "brw_mittel": 125, "rnd_mittel": 43, "standardstufe": 2.6, "bgf_mittel": 243, "wohnflaeche_mittel": 120, "bodenwertanteil": 0.15 },
+          "150-199": { "kauffaelle": 30, "r2": 0.18, "sachwert_mittel": 256000, "gsflaeche_mittel": 387, "brw_mittel": 174, "rnd_mittel": 43, "standardstufe": 2.6, "bgf_mittel": 246, "wohnflaeche_mittel": 124, "bodenwertanteil": 0.23 }
+        }
+      },
+      "beleg": "Immobilienmarktbericht 2026 des Amtes für Bodenmanagement Korbach, Kapitel 9.4.1.2, Tabelle 46, Seite 162.",
+      "stufe": "B",
+      "stufe_grund": "Amtlich abgedruckte Matrix mit Fallzahl und Bestimmtheitsmass. KEINE Stufe A: 34 und 30 Kauffaelle, Bestimmtheitsmass 0,40 und 0,18, und drei von fuenf Bodenrichtwertbereichen lassen sich gar nicht belegen.",
+      "fallzahl": 64
+    }
+  ],
+
+  "anmerkungen": [
+    "ACHTUNG GESAMTNUTZUNGSDAUER: Der Ausschuss hat zum Bericht 2026 auf 80 Jahre umgestellt und vermerkt das ausdrücklich — 'Bis 2024 (veröffentlicht im IMB 2025) wurde eine GND von 70 Jahren angenommen!' Werte aus dem Vorjahresbericht dürfen deshalb nicht mit diesen gemischt werden.",
+    "Der Landkreis Waldeck-Frankenberg desselben Ausschusses hat EIGENE, abweichende Werte und liegt als eigenes Rezept im Register (HE-06635-waldeck-frankenberg). Ein Ausschuss, zwei Landkreise, zwei Tabellen — wer beide unter einen Satz legt, rechnet in einem der Kreise falsch.",
+    "Der Bericht führt zusätzlich Sachwertfaktoren für Mehrfamilienhäuser, Ferienhäuser und innerörtliche Hofstellen. Diese Zweige sind hier nicht hinterlegt, weil das Register sie nicht führt — sie bleiben für eine spätere Ernte offen und sind in Kapitel 9.4.2 bis 9.4.4 belegt."
+  ]
+}
