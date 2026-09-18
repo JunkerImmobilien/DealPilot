@@ -36,7 +36,45 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN: Marcels Auftrag vom 13.09.2026
+## → HIER WEITERMACHEN: Marcels Backlog v22 vom 18.09.2026
+
+Volltext mit allen Unterpunkten: **`Dateien/dealpilot_backlog_v22.md`** —
+dort steht, was genau verlangt ist. Hier steht der **Stand**. Marcels
+Reihenfolge: (1) Prod · (2) Bugs und klar abgegrenzte UX · (3) Konzepte
+MFH/Ist-Soll/Bewertung · (4) Schnittstellen · (5) Design/PDF/Theme ·
+(6) QA 19 · (7) Mobile-QA 20. **Konzeptpunkte (6, 21, 22 und die
+Vorschlagsteile von 5, 16, 17, 18) liefern zuerst ein Dokument in
+`design/Vorschläge/` — gebaut wird erst nach Marcels Auswahl.**
+Leitplanke aus v22: **das bestehende Investment-PDF bleibt erhalten.**
+
+| # | Punkt | Art | Stand / Bezug |
+|---|---|---|---|
+| 1 | Aktuelle Version auf PROD, Smoke-Test | Rollout | **ERLEDIGT 18.09.2026** — staging vollständig nach main (`006a630`), Quellenregister beidseitig abgeglichen, v1428; main = staging = beide Server (`f5802de`). Smoke: 170/170 Assets 200, Migrationen 071–074, Löhner-Sachwert auf Prod grün. Journal 18.09. (1) und (2). |
+| 2 | Finanzierung: erst EK, Option „EK = Kaufnebenkosten", Darlehen = KP + NK + Sanierung − EK, editierbar, Herleitung zeigen | Bau | offen — vorhandene Rückrechnung/Button weiterverwenden |
+| 3 | Partnernetzwerk: automatische Rotation aus | Bau | offen |
+| 4 | Partnernetzwerk erscheint beim ersten Öffnen von Deal-Aktionen nicht (nach F5 schon) | Bug | offen |
+| 5 | MFH + hohe Sanierung: LTV > 400 % — Nenner prüfen, Kaufpreis / Ist-Wert / Wert nach Sanierung trennen | Analyse → Vorschlag | offen — **nicht ausblenden**, erst Logik |
+| 6 | Ist-/Soll-Modell + erweiterter MFH-Konfigurator (Einheiten) | Konzept | offen — Vorschlag UX, Datenmodell, Aggregation |
+| 7 | Marktbericht: Stufen sauber trennen — **Marktpreisindikation ohne Sach-/Ertragswert** | Bau | offen — Dokument = gebuchter Umfang |
+| 8 | Bruttofläche (BGF DIN 277) automatisch ableiten, typabhängig, überschreibbar, Annahme zeigen | Bau | offen |
+| 9 | Sprechlauf: Zustandswechsel, Barge-in, schlechte Verbindung (Latenz/Jitter/Reconnect), Mobile | Bau + Test | offen — baut auf Block C (C14 Zuhören) und D (Modelle) auf |
+| 10 | Einstellungen: Wechsel auf Hell geht nicht / hält nicht | Bug | offen — Skin-API `_dpDispSkin`, Merker `dp_chrome_hell` |
+| 11 | Investment-PDF: **zusätzliche** helle Bank-Fassung, Vorbild Anschaffungskosten/Finanzamt-Dokument | Bau | offen — altes PDF bleibt |
+| 12 | Deal-Aktionen „Ready für die Bank" heller und seriöser | Design | offen — nach 11 |
+| 13 | Deal-Score + Investor-Score hell/dunkel, folgt der globalen Einstellung | Design | offen — nach 10 |
+| 14 | Quick Check „Abrufen" und Objekt-Pre-Flight-Karte: Flugzeug-Symbol raus | Bau | offen |
+| 15 | Quick Check: Marktwert kommt bei „Marktbewertung D-Pilot + Exposé" nicht an | Bug | offen — alle Kombinationen gegenprüfen |
+| 16 | Sprechlauf: Fragen je Objektart (MFH: Einheiten statt Zimmer) — Fragenbaum, gleiche Logik wie Tab Objekt | Analyse → Bau | offen |
+| 17 | Objektzustand: Sterne → verbale Skala, ggf. Komponenten; API-Mapping, Altbestand lesbar | Analyse → Vorschlag | offen |
+| 18 | Marktbewertung: Input-/Schnittstellen-Audit (GeoMap, Zensus, alle Anbieter) — haben/senden/könnten/zurück/verwendet | Audit | offen |
+| 19 | Abschluss-QA Marktbericht, Bewertung, gesamte App — Übersicht getestet/gefunden/behoben/offen/Entscheidung | QA | nach 2–18 |
+| 20 | Responsive/Mobile/Tablet-QA der ganzen App inkl. Sprechlauf | QA | nach 19 |
+| 21 | Light Mode Redesign für Steuerkanzleien — 5–6 Layout-Konzepte, **nichts implementieren** vor Auswahl | Konzept | offen |
+| 22 | Steuern: AfA manuell, RND ermitteln/übernehmen über den **vorhandenen** Kern, Vererbung Objekt → Gebäude → Einheit, RND-Gutachten auslösen | Konzept | offen — **deckt sich mit Block R (R3–R5)**, dort weiterführen statt doppelt |
+
+---
+
+## Marcels Auftrag vom 13.09.2026 (Blöcke A–C, S, D, R)
 
 Drei große Blöcke, von Marcel in einem Zug beauftragt. **Reihenfolge wie
 hier** — der Audit zuerst, weil er den kleinsten Vorlauf braucht und
