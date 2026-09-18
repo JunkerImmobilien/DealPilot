@@ -2681,7 +2681,9 @@
        Score, keine Marktpreisindikation und keinen Bodenrichtwert. */
     { et: 1, ids: ['plz', 'ort', 'str', 'hnr'],     rang: 5,
       frage: 'Wo steht das Objekt? Straße, Hausnummer, PLZ und Ort.' },
-    { et: 1, ids: ['objart', 'wfl', 'zimmer'],      rang: 3,
+    /* v1437: 'einheiten' ist Kandidat — gefragt nur, wo die Art sie
+       verlangt (MFH). 'zimmer' nur, wo es passt. Den Text baut _rfNachArt. */
+    { et: 1, ids: ['objart', 'wfl', 'zimmer', 'einheiten'], rang: 3, nachArt: 1,
       frage: 'Was für ein Objekt ist es, und wie groß? Art, Wohnfläche, Zimmer.' },
     { et: 1, ids: ['baujahr', 'kp'],                rang: 1,
       frage: 'Baujahr und Kaufpreis?' },
@@ -2709,11 +2711,11 @@
        `abruf` heisst: das kann der Co-Pilot selbst holen. */
     { et: 3, ids: ['makrolage', 'mikrolage'],       rang: 12, skalen: 1, abruf: 'lage',
       frage: 'Wie schätzt du die Lage ein — erst die Region, dann die Straße?' },
-    { et: 3, ids: ['ds2_zustand', 'ds2_energie'],   rang: 12, skalen: 1,
+    { et: 3, ids: ['ds2_zustand', 'ds2_energie'],   rang: 12, skalen: 1, nachArt: 1,
       frage: 'Wie ist der Zustand der Wohnung, und was steht im Energieausweis?' },
     { et: 3, ids: ['san', 'moebl'],                 rang: 9,
       frage: 'Muss etwas saniert werden, und wird etwas mitverkauft — Küche, Möbel?' },
-    { et: 3, ids: ['brw', 'gsfl', 'mea'],           rang: 11, abruf: 'brw',
+    { et: 3, ids: ['brw', 'gsfl', 'mea'],           rang: 11, abruf: 'brw', nachArt: 1,
       frage: 'Was weißt du zum Grundstück — Bodenrichtwert, Fläche, Miteigentumsanteil? Und: ist das Grundstück Erbbaurecht?',
       /* v1313 · Marcel: „den brauchst du nicht abfragen wenn man den
          abrufen kann. nur wenn man ihn nicht abruft." Der Bodenrichtwert
@@ -2731,7 +2733,7 @@
 
     /* ── Etappe 4 · Feinschliff ───────────────────────────────────────
        Verfeinert die Rechnung, entscheidet aber nichts mehr. */
-    { et: 4, ids: ['hg_ul', 'hg_nul'],              rang: 8, vorbelegt: 1, profil: 'bewirtschaftung',
+    { et: 4, ids: ['hg_ul', 'hg_nul'],              rang: 8, vorbelegt: 1, profil: 'bewirtschaftung', nachArt: 1,
       frage: 'Wie hoch ist das Hausgeld pro Jahr, und wie viel davon ist nicht umlagefähig?' },
     { et: 4, ids: ['mietstg', 'wertstg', 'leerstand'], rang: 14, vorbelegt: 1, profil: 'langfrist',
       frage: 'Womit rechnest du langfristig — Mietsteigerung, Wertsteigerung und Leerstand in Prozent?' },
@@ -2936,6 +2938,7 @@
   function _rfZuschnitt(e) {
     if (e.abruf === 'brw' && e.frageWennAbruf && _rfBrwMoeglich()) {
       var k = {}; for (var s in e) { if (Object.prototype.hasOwnProperty.call(e, s)) k[s] = e[s]; }
+      k._orig = e._orig || e;   /* v1437 */
       k.ids = e.ids.filter(function (id) { return id !== 'brw'; });
       k.frage = e.frageWennAbruf;
       return k;
@@ -2943,8 +2946,71 @@
     return e;
   }
 
+  /* ═══ v1437 · Backlog v22 Punkt 16 — DIE FRAGEN RICHTEN SICH NACH DER ART ══
+     Gemessen: der Sprechlauf hatte KEINE Typlogik. Einem Mehrfamilienhaus
+     wurden die Zimmer abgefragt (und an Sprengnetter geschickt), jedem Haus
+     der Miteigentumsanteil — der in calc.js den Grundstuecksanteil kuerzt —,
+     und die Wohneinheiten, die das MFH zwingend braucht, nie.
+
+     Die Regel kommt aus objektart-felder.js (DealPilotObjektart.passt) —
+     derselben Tabelle, die im Objekt-Tab Felder ein- und ausblendet. Keine
+     dritte Typlogik.
+
+     Die Art wird aus dem GESPRAECH gelesen (fields.objart), sonst aus dem
+     Formular. Ist sie noch unbekannt, faellt jedes typabhaengige Feld aus
+     dem Block und wird in der naechsten Runde gefragt, sobald die Art steht —
+     lieber einmal mehr fragen als einem MFH seine Zimmer abverlangen.
+
+     Kopie statt Aenderung (wie _rfZuschnitt); _orig zeigt aufs Original,
+     damit der Block ueberall als derselbe erkannt wird. */
+  function _rfArt(fields) {
+    var a = fields && fields.objart;
+    if (!a) { var e = document.getElementById('objart'); a = e ? e.value : ''; }
+    a = String(a || '').trim().toUpperCase();
+    var OA = window.DealPilotObjektart;
+    return (OA && OA._arten && OA._arten[a]) ? a : '';
+  }
+  function _rfNachArt(e, fields) {
+    if (!e.nachArt) return e;
+    var OA = window.DealPilotObjektart;
+    if (!OA || typeof OA.passt !== 'function') return e;
+    var art = _rfArt(fields);
+    var k = {}; for (var s in e) { if (Object.prototype.hasOwnProperty.call(e, s)) k[s] = e[s]; }
+    k._orig = e._orig || e;
+    k.ids = e.ids.filter(function (id) {
+      if (id === 'einheiten') return !!art && OA.pflicht(art, id);   /* nur wo verlangt */
+      return OA.passt(art, id) === true;
+    });
+    var hat = function (id) { return k.ids.indexOf(id) >= 0; };
+    var wohnung = (art === 'ETW');
+    if (hat('objart')) {
+      var teile = ['Art', /^(BUERO|GESCH|HOTEL|GEW|GAR)$/.test(art) ? 'Fläche' : 'Wohnfläche'];
+      if (hat('zimmer')) teile.push('Zimmer');
+      if (hat('einheiten')) teile.push('Zahl der Wohneinheiten');
+      k.frage = 'Was für ein Objekt ist es, und wie groß? ' + teile.slice(0, -1).join(', ') + ' und ' + teile[teile.length - 1] + '.';
+    }
+    if (hat('ds2_zustand')) {
+      k.frage = 'Wie ist der Zustand ' + (wohnung ? 'der Wohnung' : (art ? 'des Gebäudes' : 'des Objekts'))
+        + ', und was steht im Energieausweis?';
+    }
+    if (hat('gsfl') && !hat('mea')) {
+      k.frage = hat('brw')
+        ? 'Was weißt du zum Grundstück — Bodenrichtwert und Fläche? Und: ist das Grundstück Erbbaurecht?'
+        : 'Wie groß ist das Grundstück? Den Bodenrichtwert hole ich gleich amtlich. Und: ist das Grundstück Erbbaurecht?';
+    }
+    if (hat('hg_ul') && art && !wohnung) {
+      k.frage = 'Wie hoch sind die laufenden Bewirtschaftungskosten pro Jahr, und wie viel davon ist nicht umlagefähig?';
+    }
+    return k.ids.length ? k : null;
+  }
+  function _rfZugeschnitten(fields) {
+    return RFRAGEN.map(_rfZuschnitt)
+      .map(function (e) { return _rfNachArt(e, fields); })
+      .filter(Boolean);
+  }
+
   function _rfLuecken(fields) {
-    var offen = RFRAGEN.map(_rfZuschnitt).filter(function (e) { return _rfFehlt(e, fields); });
+    var offen = _rfZugeschnitten(fields).filter(function (e) { return _rfFehlt(e, fields); });
     offen.sort(function (a, b) { return (a.rang || 99) - (b.rang || 99); });
     return offen.slice(0, RF_MAX);
   }
@@ -4731,7 +4797,7 @@
     /* v1283d: ALLE Blöcke, nicht nur die offenen. */
     var alle = _rf.offen.slice();
     var drin = {};
-    _rf.offen.forEach(function (e) { drin[e.ids.join(',')] = 1; });
+    _rf.offen.forEach(function (e) { drin[(e._orig || e).ids.join(',')] = 1; });   /* v1437: zugeschnittene Kopien zaehlen als ihr Original */
     var vorher = [];
     RFRAGEN.forEach(function (e) {
       if (drin[e.ids.join(',')]) return;
@@ -7476,6 +7542,12 @@
         if (v !== null && v !== undefined && v !== '') obj[id] = v;
       });
     }
+    /* v1437 · Was zur Objektart nicht passt, geht nicht mit - dieselbe Tabelle
+       wie Fragen und Objekt-Tab (zimmer beim MFH, mea beim Haus ...). */
+    try {
+      var _oa = window.DealPilotObjektart, _art = String(obj.objart || '').toUpperCase();
+      if (_oa && _oa.passt) Object.keys(obj).forEach(function (id) { if (_oa.passt(_art, id) === false) delete obj[id]; });
+    } catch (e) {}
     var koerper = (stufe >= 2) ? { wert_stufe: 2, object: obj } : { fast: true, object: obj };
     try { koerper.external_ref = window._currentObjKey || null; } catch (e) {}
     _rfBlase('co', '<span style="opacity:.75">' +
@@ -8411,6 +8483,8 @@
     (window.FIELDS || []).forEach(function (id) {
       if (schon[id]) return;
       if (TIEFE_NICHT_ID.test(id)) return;                    /* v1289b */
+      /* v1437: auch die Feinheiten fragen nur, was zur Objektart passt (etage beim Haus etc.) */
+      if (window.DealPilotObjektart && DealPilotObjektart.passt && DealPilotObjektart.passt(_rfArt(null), id) === false) return;
       var el = document.getElementById(id);
       if (!el) return;
       if (el.readOnly || el.disabled || el.type === 'hidden') return;
@@ -10173,7 +10247,7 @@
   function rueckfragen(OA, data, catalog, alle) {
     var fields = (data && data.fields) || {};
     var luecken = alle
-      ? RFRAGEN.map(_rfZuschnitt).filter(function (e) { return _rfFehlt(e, fields); })
+      ? _rfZugeschnitten(fields).filter(function (e) { return _rfFehlt(e, fields); })   /* v1437 */
       : _rfLuecken(fields);
     /* v1293g: Was der Katalog nicht kennt, wird nicht gefragt. */
     luecken = _rfAufKatalog(luecken, catalog);

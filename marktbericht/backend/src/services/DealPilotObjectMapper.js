@@ -55,6 +55,10 @@ export const DealPilotObjectMapper = {
       rooms: num(pick(d, ['zimmer'])),
       build_year: num(pick(d, ['baujahr'])),
       floor: num(pick(d, ['etage'])),
+      /* v1437: Wohneinheiten fehlten - der Ertragswert setzt die Verwaltungskosten
+         je BEWERTETER Einheit an (Anlage 3 ImmoWertV) und rechnete auf dem Objektweg
+         ohne sie am Durchschnitt. Der Sprechlauf fragt sie beim MFH jetzt ab. */
+      units: num(pick(d, ['einheiten', 'units'])),
       condition: pick(d, ['ds2_zustand', 'zustand']) || 'gepflegt',
       energy_class: pick(d, ['ds2_energie', 'energieklasse', 'energie_label']),
       purchase_price: num(pick(d, ['kp', 'kaufpreis'])),

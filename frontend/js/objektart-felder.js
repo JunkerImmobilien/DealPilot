@@ -193,5 +193,21 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
-  global.DealPilotObjektart = { anwenden: anwenden, _arten: ARTEN };
+  /* v1437 · Backlog v22 Punkt 16: „Sprechlauf und Objekt-Tab sollen dieselbe
+     fachliche Logik und dasselbe Datenmodell verwenden." Bis hierher hatte
+     der Sprechlauf KEINE Typlogik und fragte einem Mehrfamilienhaus die
+     Zimmer ab. Jetzt fragt er diese Tabelle — eine Quelle fuer beide.
+       passt(art, id)  -> true | false | null (null = Art unbekannt)
+       pflicht(art, id)-> true, wenn die Art das Feld zwingend braucht */
+  function passt(art, id) {
+    if (ALLE.indexOf(id) < 0) return true;          /* nicht typabhaengig */
+    var a = ARTEN[String(art || '').toUpperCase()];
+    if (!a) return null;
+    return a.passt.indexOf(id) >= 0;
+  }
+  function pflicht(art, id) {
+    var a = ARTEN[String(art || '').toUpperCase()];
+    return !!(a && a.pflicht.indexOf(id) >= 0);
+  }
+  global.DealPilotObjektart = { anwenden: anwenden, _arten: ARTEN, passt: passt, pflicht: pflicht };
 })(window);
