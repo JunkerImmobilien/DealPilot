@@ -207,7 +207,7 @@ window.DealPilotInvestmentProfile = (function() {
         /* v1257 · Marcels Wunsch: „Mietausfall und BWK-Quote kannst du gerne
            in die Einstellungen packen." Die nicht-umlagefähige Quote stand
            hier schon — sie kam nur nie im Formular an (siehe main.js
-           _dpProfil). Jetzt wirken alle drei. */
+           _dpProfilWert, bis v1431 _dpProfil). Jetzt wirken alle drei. */
         field('ip_bwk_ul_pct_default', 'Bewirtschaftung umlagefähig', p.bwk_ul_pct_default, '% der NKM', 'Hausgeld umlagefähig, Grundsteuer — typisch 15–20 %'),
         field('ip_bwk_anteil_default', 'Bewirtschaftung nicht umlagefähig', p.bwk_anteil_default, '% der NKM', 'Verwaltung, Rücklagen — typisch 15–22 %'),
         field('ip_mietausfall_pct', 'Kalkulatorischer Mietausfall', p.mietausfall_pct, '% der NKM', 'wird beim neuen Objekt in Euro umgerechnet — A-Lage eher 1 %, C-Lage eher 3 %'),

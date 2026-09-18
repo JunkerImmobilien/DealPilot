@@ -29,7 +29,13 @@
    exakt die bisherigen — und die Profil-Vorgaben in config.js wurden an
    sie angeglichen. Wer nichts einstellt, bekommt also genau wie bisher.
    Erst wer etwas einträgt, merkt einen Unterschied. */
-function _dpProfil(schluessel, rueckfall) {
+/* v1431: hiess bis hierher _dpProfil — derselbe Name wie der Hell/Dunkel-
+   Schalter aus settings.js (window._dpProfil, v1162). Eine globale
+   function-Deklaration ueberschreibt die window-Eigenschaft, und main.js
+   laedt NACH settings.js: seit v1257 rief der Knopf "Hell" diese Funktion
+   hier auf, las still einen Profilwert und schaltete nichts um.
+   Backlog v22 Punkt 10. */
+function _dpProfilWert(schluessel, rueckfall) {
   try {
     if (window.DealPilotInvestmentProfile &&
         typeof window.DealPilotInvestmentProfile.get === 'function') {
@@ -43,7 +49,7 @@ function _dpProfil(schluessel, rueckfall) {
 }
 
 function setDefaults() {
-  sv('notar_p', _dpProfil('notar_grundbuch', 2.20));
+  sv('notar_p', _dpProfilWert('notar_grundbuch', 2.20));
   /* v1238 · Testbericht Block D: „Grundbuchamt mit 0,5 % vorbelegen — der
      Anwender kennt den Wert nicht."
      Gemessen am 04.09.2026: `gba_p` stand in dieser Liste als EINZIGE der
@@ -58,8 +64,8 @@ function setDefaults() {
   sv('gest_p',  6.50);
   sv('ji_p',    1.50);
   sv('d1z',     3.50);
-  sv('d1t',     _dpProfil('tilgung_default', 1.00));
-  sv('d1_bindj',_dpProfil('zinsbindung_default', 10));
+  sv('d1t',     _dpProfilWert('tilgung_default', 1.00));
+  sv('d1_bindj',_dpProfilWert('zinsbindung_default', 10));
   sv('mietstg', 3.0);
   sv('wertstg', 1.5);
   sv('kostenstg', 1.0);
@@ -70,21 +76,21 @@ function setDefaults() {
   sv('anschl_bj', 15);
   // zaer wird automatisch aus anschl_z - d1z berechnet
   sv('geb_ant',  80);
-  sv('grenz',    _dpProfil('grenzsteuersatz', 40.45));
+  sv('grenz',    _dpProfilWert('grenzsteuersatz', 40.45));
   /* v1257 · Die Bewirtschaftungsquoten und der Mietausfall kommen jetzt
      ebenfalls aus dem Profil. Bisher standen 17 und 16 als `value=` fest
      im HTML — ein Wert, den man nur durch Überschreiben loswird, und der
      bei jedem neuen Objekt wiederkommt. Der Mietausfall hatte gar keine
      Vorgabe.
      Die Rückfallwerte sind exakt die bisherigen HTML-Werte. */
-  sv('bwk_ul_pct',  _dpProfil('bwk_ul_pct_default', 17));
-  sv('bwk_nul_pct', _dpProfil('bwk_anteil_default', 16));
+  sv('bwk_ul_pct',  _dpProfilWert('bwk_ul_pct_default', 17));
+  sv('bwk_nul_pct', _dpProfilWert('bwk_anteil_default', 16));
   /* Der kalkulatorische Mietausfall steht in EURO im Formular, das Profil
      führt ihn als Prozentsatz der Jahres-Nettokaltmiete. Ohne Miete gibt
      es nichts zu rechnen — dann bleibt das Feld leer, statt eine Null zu
      behaupten. */
   (function () {
-    var pct = _dpProfil('mietausfall_pct', 0);
+    var pct = _dpProfilWert('mietausfall_pct', 0);
     var nkmEl = document.getElementById('nkm');
     var nkm = nkmEl ? parseFloat(String(nkmEl.value || '').replace(/\./g, '').replace(',', '.')) : 0;
     if (pct > 0 && isFinite(nkm) && nkm > 0) {
