@@ -49,3 +49,31 @@ Die Gesamtinvestition stimmt in allen fünf Fällen (KP + NK + Sanierung).
 - Konsistenz: Eingabe ändern → alle Tabs, Score, PDF ziehen nach.
 - Regression der zentralen Abläufe, Sichtabnahmen v1428–v1439.
 - Punkt 20 (Mobile/Tablet) vollständig.
+
+---
+
+## Teil 2 — im Browser, am echten Objekt (18.09.2026, abends)
+
+**Beide Rechenkerne am selben Objekt** (Staging, geladenes Objekt, Bezug
+Verkehrswert 214.600 €): `calc.js` (Haupt-App) gegen `DealKpis.compute()`
+(Quick Check, Sprechlauf, Dashboard) mit denselben Eingaben.
+
+| Kennzahl | calc.js | DealKpis | |
+|---|---:|---:|---|
+| Gesamtinvestition | 220.400 | 220.400 | gleich |
+| Bruttomietrendite | 6,60 % | 6,60 % | gleich |
+| Nettomietrendite | 5,957 % | 5,957 % | gleich |
+| LTV | 83,877 % | 83,877 % | gleich |
+| DSCR | 1,833 | 1,833 | gleich |
+| **EK-Rendite** | **20,58 %** | **29,65 %** | **verschieden** |
+
+**Ursache — zwei Definitionen unter einem Namen:**
+- `calc.js:2079`: `ekr = cf_ns / ekv` — Cashflow **nach** Steuern.
+- `deal-kpis.js:169`: `ekr = cf_banker_j / ek` — Cashflow **vor** Steuern.
+
+Beide gehen als „Cash-on-Cash" in den Deal Score (`dealscore2-ui.js:54`,
+`quick-check.js:541`). **Der Quick Check bewertet dasselbe Objekt deshalb
+anders als die Haupt-App.** Nicht geändert — welche Definition gilt, ist
+Marcels Entscheidung. Vorschlag: im Score **vor Steuern** (vergleichbar
+zwischen Anlegern mit verschiedenem Steuersatz), nach Steuern als eigene,
+anders benannte Kennzahl („EK-Rendite nach Steuern").
