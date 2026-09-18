@@ -17017,3 +17017,55 @@ Merge-Ergebnis gegen `origin/staging`: **null Unterschied**.
 2. Gold-Audit auf beiden Servern RC=1: `js/dashboard.js` 0 -> 2 (Altlast,
    nicht aus diesem Rollout).
 3. Fachliche Abnahme im Browser auf Prod (Marktbericht Loehner) steht aus.
+
+---
+
+## Rollout-Journal · 18.09.2026 (2) — Quellenabgleich, v1428, beide Server gleich
+
+**Was.** Die drei offenen Punkte aus dem Prod-Rollout (s. o.), auf Marcels
+Freigabe („ja alle quellen abgleichen und alles so umsetzen").
+
+**1 · Quellenregister der mb-DB abgeglichen — in BEIDE Richtungen.**
+Verglichen ueber den fachlichen Schluessel (`name`+`bundesland` bzw. `url`),
+nicht ueber die `id` — die ist auf beiden Servern unabhaengig vergeben.
+- Staging -> Prod: 25 Quellen, 41 Dokumente neu; Rechercheinhalte der 90
+  gemeinsamen Quellen von Staging (ausfuehrlicher, inhaltlich gleichlautend).
+  MV-Satz „Druckausgabe 30 EUR ist KEIN Grund fuer kostenpflichtig" gab es
+  nur auf Prod — an die Staging-Notiz angehaengt.
+- Prod -> Staging: 2 MV-Dokumente, die Prod selbst gefunden hatte; die
+  neueren Zeitstempel (`letzter_fund`/`letzter_check` = GREATEST).
+- Ergebnis beide: **115 Quellen, 77 Dokumente, 0 Waisen**. Unterschied nur
+  noch `created_at`/`gefunden_am` (Einfuegezeitpunkt, naturgemaess).
+- Vorher gesichert: Prod `mb-20260918-*-vor-quellenabgleich.sql.gz` (742 KB),
+  Staging dito (914 KB).
+
+**Dabei gefunden: `param_werte` lag umgekehrt, als die Doku sagte.** Prod
+28.827 Saetze, Staging **0** (28.827 eingefuegt und wieder geloescht). Von
+Prod nach Staging gespielt; Doku in beiden Projektanweisungen berichtigt.
+`wert_parameter`, `param_modell`, `ags_namen`, `api_sources` inhaltlich
+identisch (md5 ueber alle fachlichen Spalten).
+
+**2 · v1428 — Gold-Waechter wieder gruen** (`b0b4244`, Basislinie `a13f383`).
+Vier Dateien lagen ueber der Basislinie: dashboard.js 0->2, mandanten.js
+6->7, voice-import.js 5->7, marktbericht-app/app.js 8->9. Stilangaben auf
+`var(--wl-*)` bzw. `color-mix(in srgb, var(--wl-c9a84c,#C9A84C) N%,
+transparent)` — ein reines Token haette die Transparenz verloren. Canvas und
+SVG-Verlaeufe in voice-import ueber eine lokale `_wlc()`, der Goldton wird
+einmal je Bild gelesen, nicht je Punkt. Tachozonen `_ZD` -> `_zd()`, damit
+ein spaeter gesetztes Whitelabel greift. **448 Fundstellen in 54 Dateien**
+(vorher 468/56), Basislinie gesenkt. Audit auf Staging UND Prod RC=0.
+
+**3 · Loehner auf Prod nachgerechnet** — `pruefstrecke-v1427-sachwert.mjs`
+im Prod-Container: 362.536,00 gegen Soll 362.536,63, Gegenproben gruen.
+Identisch auf Staging.
+
+**Stand:** main = staging = Prod-Server = Staging-Server.
+
+**Rest:** Sichtabnahme v1428 im Browser (Sprechlauf-Tacho, Partikel im
+Voice-Modal, Mandanten-Badges) — die Browser-Erweiterung war in dieser
+Sitzung nicht verbunden. Staging-Abnahmepunkt.
+
+`deploy-staging.ps1` bricht bei einer geloeschten, verfolgten Datei ab
+(Marcels `Dateien/dealpilot-feature-texte-erweitert.md`) — fuer den Deploy
+per `git stash push -- <pfad>` geparkt und danach zurueckgeholt, NICHT
+committet.
