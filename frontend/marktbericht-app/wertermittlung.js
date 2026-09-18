@@ -86,22 +86,6 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
      * Feld aus Stufe 2 bewegt den Wert annaehernd so stark, und es kostet
      * einen Klick. In der Feinjustierung war es falsch aufgehoben. */
     stufe1: [
-      /* ── v1201 · Der Miteigentumsanteil steht jetzt GANZ VORN ─────────────
-         Marcels Entscheidung vom 02.09.2026: „der Miteigentumsanteil muss
-         ausgefuellt werden als Pflichtwert, sonst kann man es nicht
-         ausfuehren."
-
-         Er stand bis hierher in `stufe3` und wurde erst gebaut, wenn jemand
-         die Wertermittlung ansteuerte (`if (s >= 3)`). Damit war er bei
-         Stufe 1 und 2 NICHT EINMAL SICHTBAR — eine Pflicht, die man nicht
-         erfuellen kann, ist keine Pflicht, sondern eine Sackgasse.
-
-         `wenn: istWohnung()` sorgt weiterhin dafuer, dass er nur bei
-         Eigentumswohnungen erscheint; bei Haeusern gibt es ihn nach wie vor
-         nicht. Der Eintrag ist unveraendert uebernommen, nur verschoben. */
-      { id: 'mea', label: 'Miteigentumsanteil (%)', typ: 'number', hilfe: 'mea',
-        pflichtWenn: function () { return istWohnung(); },
-        wenn: function () { return istWohnung(); } },
       { id: 'baustatus', label: 'Baustatus', typ: 'select', pflicht: true, hilfe: 'baustatus',
         opt: [['', '– bitte wählen –'],
               ['bestand', 'Bestand'],
@@ -121,6 +105,14 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
      * liefert. Anpassung und Begruendung sind Feinjustierung fuer den
      * Sachverstaendigen. Die Stellplatzmiete ist ohne Stellplaetze sinnlos. */
     stufe3: [
+      /* v1435 · Wieder hier, wo er vor v1201 stand. v1201 hatte ihn nach
+         Stufe 1 geholt, WEIL der Ertragswert dort schon erschien. Seit v1435
+         gibt der Rechenkern Boden-, Ertrags- und Sachwert erst ab Stufe 3
+         aus (Backlog v22 Punkt 7) — der Grund fuer die fruehe Pflicht ist
+         entfallen. Eine Marktpreisindikation fragt nicht mehr danach. */
+      { id: 'mea', label: 'Miteigentumsanteil (%)', typ: 'number', hilfe: 'mea',
+        pflichtWenn: function () { return istWohnung(); },
+        wenn: function () { return istWohnung(); } },
       { id: 'plot', label: 'Grundst\u00fccksfl\u00e4che (m\u00b2)', typ: 'number', pflicht: true, hilfe: 'plot',
         vorhanden: true },
       { id: 'units', label: 'Anzahl Wohneinheiten', typ: 'number', pflicht: true, vorhanden: true },
@@ -368,9 +360,10 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
     /* v1018 · "ab Stufe 3" war irrefuehrend: der Quercheck rechnet den
      * Ertragswert immer, nur mit Pauschalen. Ab Stufe 3 rechnet derselbe
      * Kern mit echten Parametern. */
-    { key: 'ertrag', name: 'Ertragswert', ab: 1, genauerAb: 3,
+    /* v1435: ab 3 — der Rechenkern gibt die Verfahren erst dort aus. */
+    { key: 'ertrag', name: 'Ertragswert', ab: 3, genauerAb: 3,
       pflicht: ['plot', 'units'], empfohlen: ['lzs', 'baustatus'] },
-    { key: 'sach', name: 'Sachwert', ab: 1, genauerAb: 3,
+    { key: 'sach', name: 'Sachwert', ab: 3, genauerAb: 3,
       pflicht: ['plot', 'year'], empfohlen: ['quality'],
       /* v1097-WETW-1 · DIE SPERRE WAR UEBERHOLT, DER RECHENKERN NICHT.
        * Seit v1047-WSWE-1 rechnet CrossCheckService den Sachwert fuer eine

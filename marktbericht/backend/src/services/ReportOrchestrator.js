@@ -914,7 +914,7 @@ export const ReportOrchestrator = {
       }
     }
 
-    const crossCheck = CrossCheckService.compute(ref, landValue, rent, valuation, _wertParams);
+    let crossCheck = CrossCheckService.compute(ref, landValue, rent, valuation, _wertParams);
 
     /* v1141b · Der Bodenwert-Rechenweg blieb im Backend liegen.
      * `ErtragswertService.bodenwert()` protokolliert jeden Schritt in
@@ -939,10 +939,35 @@ export const ReportOrchestrator = {
       };
     }
 
+    /* v1435 · Backlog v22 Punkt 7 — DAS DOKUMENT ENTSPRICHT DEM GEBUCHTEN UMFANG.
+     * Marcel: „keinen Sachwert und keinen Ertragswert auf dem Dokument
+     * ausweisen, wenn der Kunde lediglich eine Marktpreisindikation erworben
+     * hat." Stufe 1 und 2 sind Marktpreisindikationen; Boden-, Ertrags- und
+     * Sachwert verspricht erst Stufe 3 (mb-stufen.js WAS[3]).
+     *
+     * Bisher lief der Quercheck auf jeder Stufe und ging vollstaendig in den
+     * Bericht — Web-Ansicht, PDF-Rechenweg und KI-Fliesstext. Die Sperre steht
+     * HIER, vor dem Payload, damit sie alle Ausgabewege auf einmal trifft und
+     * die Werte auch ueber die API nicht herauskommen. Gerechnet wird intern
+     * weiter nichts damit; die Marktpreisindikation kommt aus valuation.
+     *
+     * Quellennachweis faellt mit: genannt wird nur, was im Bericht steckt. */
+    const _stufe = Number(ref.wert_stufe) || 1;
+    if (_stufe < 3) {
+      crossCheck = {
+        available: false,
+        nicht_im_umfang: true,
+        stufe: _stufe,
+        grund: 'Boden-, Ertrags- und Sachwert gehören zur Wertermittlung nach ImmoWertV (Stufe 3) '
+          + 'und sind in dieser Marktpreisindikation nicht enthalten.',
+      };
+      step('quercheck: nicht im Umfang (Stufe ' + _stufe + ')');
+    }
+
     /* WKIGEG-3 · Zweitmeinung einholen, wenn eingeschaltet. Faellt sie aus,
      * laeuft der Bericht unveraendert weiter — sie ist eine Probe, kein
      * Bestandteil der Rechnung. */
-    if (String(process.env.KI_GEGENRECHNUNG || '0') === '1') {
+    if (String(process.env.KI_GEGENRECHNUNG || '0') === '1' && !crossCheck.nicht_im_umfang) {
       try {
         const _ein = KiGegenrechnungService.baueEingabe(ref, landValue, sale, rent, _wertParams);
         _kiGegen = await KiGegenrechnungService.rechne(_ein, crossCheck);

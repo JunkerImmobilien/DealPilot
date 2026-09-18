@@ -146,10 +146,11 @@
      Das Feld wird seit v1201 auch schon im ersten Block gezeichnet
      (wertermittlung.js, FELDER.stufe1) — sonst waere die Pflicht eine
      Sackgasse. */
+  /* v1435: der Miteigentumsanteil ist wieder eine Angabe der Wertermittlung
+     (bedarf3). Bei der Marktpreisindikation erscheint kein Ertragswert mehr,
+     der ihn braucht. */
   function bedarf1() {
-    var l = BEDARF[1].slice();
-    if (istWohnung()) l.push(['mea', 'Miteigentumsanteil']);
-    return l;
+    return BEDARF[1].slice();
   }
   /* Die objektartabhaengigen Pflichtangaben der Wertermittlung.
      v1201: `mea` ist hier RAUS — er wird jetzt schon in bedarf1() verlangt,
@@ -205,6 +206,7 @@
 
   function bedarf3() {
     var l = BEDARF[3].slice();
+    if (istWohnung()) l.push(['mea', 'Miteigentumsanteil']);   /* v1435, zurueck aus bedarf1 */
     if (!istWohnung()) { l.push(['standardstufe', 'Standardstufe']); l.push(['nhkHaus', 'Hausform (NHK)']); }
     return l;
   }

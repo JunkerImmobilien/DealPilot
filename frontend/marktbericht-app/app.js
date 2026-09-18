@@ -665,6 +665,19 @@ function _renderWertverfahren(d) {
   var alt = document.getElementById('wv-box');
   if (alt) alt.remove();
   var cc = d.cross_check || {};
+  /* v1435 · Unter Stufe 3 liefert der Rechenkern keine Verfahrenswerte
+     (ReportOrchestrator, nicht_im_umfang). Ein Satz statt dreier leerer
+     Karten mit Strich. */
+  if (cc.nicht_im_umfang) {
+    var hin = document.createElement('div');
+    hin.id = 'wv-box';
+    hin.style.cssText = 'margin:14px 0;padding:11px 14px;border-radius:10px;font-size:12.5px;line-height:1.5;'
+      + 'background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent);'
+      + 'border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent)';
+    hin.textContent = cc.grund || 'Boden-, Ertrags- und Sachwert gehören zur Wertermittlung nach ImmoWertV (Stufe 3).';
+    wrap.appendChild(hin);
+    return;
+  }
   var lv = d.land_value || {};
   var hk = d.wertermittlung_herkunft || {};
   var e = cc.ertragswert || {}, sw = cc.sachwert || {};

@@ -357,8 +357,12 @@ async function runReport(req, res) {
     const objectLabel = (externalRef && _lm[String(externalRef)]) || null;
     let out;
     if (isRich) {
+      /* v1435 · Backlog v22 Punkt 7: der Bericht bekommt die Stufe, die hier
+         abgerechnet wurde (_stufeAus: fast deckelt auf 1) - nicht die rohe
+         Angabe aus dem Body. Der Rechenkern gibt danach nur aus, was zur
+         Stufe gehoert. */
       out = await forward('POST', '/reports/generate', {
-        body: Object.assign({}, body, { user_id: req.user.id, object_label: objectLabel })
+        body: Object.assign({}, body, { user_id: req.user.id, object_label: objectLabel, wert_stufe: _stufeAus(body) })
       });
     } else {
       out = await forward('POST', '/reports/from-dealpilot', {
@@ -368,7 +372,10 @@ async function runReport(req, res) {
             external_ref: externalRef,
             fast: fast,
             user_id: req.user.id,
-            object_label: objectLabel
+            object_label: objectLabel,
+            /* v1435: bisher fehlte die Stufe hier ganz - abgerechnet wurde
+               Stufe 2, der Bericht hielt sich fuer Stufe 1. */
+            wert_stufe: _stufeAus(body)
           })
         }
       });
@@ -519,8 +526,8 @@ router.post('/reports/generate-stream', authenticate, async function (req, res) 
   const _lm2 = await labelMap(req, [externalRef]);                      /* v942 */
   const objectLabel = (externalRef && _lm2[String(externalRef)]) || null; /* v942 */
   const mbBody = isRich
-    ? Object.assign({}, body, { user_id: req.user.id, object_label: objectLabel })
-    : { dealpilot: obj, external_ref: externalRef, fast: fast, user_id: req.user.id, object_label: objectLabel };
+    ? Object.assign({}, body, { user_id: req.user.id, object_label: objectLabel, wert_stufe: _stufeAus(body) })   /* v1435 */
+    : { dealpilot: obj, external_ref: externalRef, fast: fast, user_id: req.user.id, object_label: objectLabel, wert_stufe: _stufeAus(body) };
   const mbPath = isRich ? '/reports/generate-stream' : '/reports/generate-stream';
 
   res.writeHead(200, {
