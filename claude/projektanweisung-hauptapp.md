@@ -17069,3 +17069,45 @@ Sitzung nicht verbunden. Staging-Abnahmepunkt.
 (Marcels `Dateien/dealpilot-feature-texte-erweitert.md`) — fuer den Deploy
 per `git stash push -- <pfad>` geparkt und danach zurueckgeholt, NICHT
 committet.
+
+---
+
+## Rollout-Journal · 18.09.2026 (3) — Backlog v22 abgearbeitet (Staging)
+
+**Was.** Marcels Backlog v22 (22 Punkte, `Dateien/dealpilot_backlog_v22.md`)
+als oberster Block in BACKLOG.md eingetragen und abgearbeitet. **Alles unten
+liegt auf STAGING, nicht auf Prod** (Prod steht auf `a13f383` = v1428).
+
+| Paket | Commit | Punkt | Kern |
+|---|---|---|---|
+| v1429 | `90b80e7` | 3, 4 | Partnernetzwerk: Rotation weg; Netzwerk wurde nur EINMAL beim Seitenstart geladen — jetzt Nachladen beim Oeffnen des Reiters und bei dp:plan-ready |
+| v1430 | `ca21cc0` `f1f83a5` | 14 | Flugzeug-Symbol an drei Abrufen-Knoepfen entfernt |
+| v1431 | `7973054` | 10 | Hell-Schalter tot seit v1257: globale `function _dpProfil` in main.js ueberschrieb `window._dpProfil` aus settings.js. Umbenannt; FALLEN.md-Eintrag |
+| v1432 | `f9d7533` | 15 | QC: Expose-Wartezeit 60 s -> 15 min; dpmb haelt an statt still abzubrechen; QC-Cache-Buster (stand seit v1374) |
+| v1433 | `2da26e5` | 2 | Finanzierung: Haken „EK = Kaufnebenkosten", Darlehen rechnet sich zurueck (nur nach Nutzereingabe, nie beim Laden), Herleitung sichtbar; 11 Faelle in Node |
+| v1434 | `1caf664` | 8 (Teil) | BGF-Hinweis im Formular (Ableitung gab es im Kern schon) |
+| v1435 | `f271a44` | 7 | Marktbericht: unter Stufe 3 kein Boden-/Ertrags-/Sachwert — Sperre im Rechenkern vor dem Payload; Proxy schickt abgerechnete Stufe; MEA zurueck nach Stufe 3. Am Kern gemessen |
+| v1436 | `ef0c211` | 11 | Investment-PDF Bankfassung (hell) NEBEN dem alten; in Node gerendert und angesehen |
+| v1437 | `47042b7` | 16 | Sprechlauf fragt nach Objektart — dieselbe Tabelle wie der Objekt-Tab (`DealPilotObjektart.passt`); Mapper uebernimmt Wohneinheiten |
+| v1438 | `29ef2e4` | 18 | drei stille Datenverluste: QC-Baujahr (`bj`), Ausstattung (`heating` statt `eq_*`, gemessen), IRW `construction_year` |
+| v1439 | `f6367ed` | 22 | afa-ui las `#bj`; RND-Wizard GND 70 -> 80 |
+
+**Vorschlaege statt Bau** (Entscheidung bei Marcel), alle in `design/Vorschläge/`:
+`ltv-sanierung-value-add.md` (5), `zustand-und-schnittstellen.md` (17/18),
+`mfh-ist-soll-konfigurator.md` (6), `light-mode-kanzlei-konzepte.html` (21),
+`afa-rnd-gutachten.md` (22), `qa-19-kennzahlen.md` (19 Teil 1).
+
+**Selbst korrigiert (Regel 4):** Im LTV-Vorschlag stand zuerst, der Quick
+Check bewerte bei Bankbewertung einen anderen LTV — stimmt nicht, kein
+DealKpis-Aufrufer uebergibt eine Bankbewertung; im Dokument zurueckgenommen.
+Im QA-Lauf schob mein Pruefkommentar die negative EK-Anzeige der Sanierung zu —
+sie entsteht bei jeder Finanzierung ueber der LTV-Bezugsgroesse.
+
+**Nachweis:** jede Aenderung `node --check`, Deploy-Skript „Serverstand
+geprueft", Gold-Audit auf Staging RC=0. Rechenkern-Aenderungen (v1435, v1437,
+v1438) am laufenden mb-backend auf Staging gemessen. **Nicht im Browser
+abgenommen** — die Chrome-Erweiterung war nicht verbunden.
+
+**Rest:** 9, 12, 13, 19 (Teil 2), 20 BLOCKIERT bis Browser; 5, 6, 8 (Teil 2),
+17, 21, 22 warten auf Marcels Entscheidung; alle Pakete v1429–v1439 noch
+nicht auf Prod.
