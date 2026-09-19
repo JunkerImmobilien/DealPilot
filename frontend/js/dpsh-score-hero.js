@@ -721,7 +721,34 @@
 '.dpshp-item-go{font-family:"JetBrains Mono",monospace;font-size:14px;font-weight:700;color:#cab089}',
 '.dpshp-item:hover .dpshp-item-go{color:var(--gold-lo, #b8932f)}',
 '.dpshp-note{padding:4px 18px 15px;font-size:11px;color:#9a9488;line-height:1.4}',
-'@media(max-width:780px){.dpsh-mainrow{flex-direction:column;gap:18px}.dpsh-headrow{flex-wrap:wrap}.dpsh-stub{flex-basis:150px}.dpshm-sw{grid-template-columns:1fr}}'
+'@media(max-width:780px){.dpsh-mainrow{flex-direction:column;gap:18px}.dpsh-headrow{flex-wrap:wrap}.dpsh-stub{flex-basis:150px}.dpshm-sw{grid-template-columns:1fr}}',
+/* v1443 · Backlog v22 Punkt 13, Marcels Wahl „hell weiss": steht die App auf einer
+   hellen Vorlage (ui-varianten.js HELLE: kontor/panel/kanzlei/boarding) oder dem
+   alten hellen Skin, sind beide Scores weisse Karten statt schwarzer Bordkarten.
+   Sie folgen damit der globalen Einstellung - kein eigener Schalter. Statusfarben
+   (Gruen/Gold/Rot) bleiben. Gemessen: vorher .dpsh-pass #1b1815 im hellen Profil. */
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-pass{background:#FFFFFF;box-shadow:0 1px 2px rgba(42,39,39,.05);border:1px solid #E6E0D3}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-main{background:#FFFFFF}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-star{display:none}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-chip{background:#F8F6F1}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-chip.t-g{color:#2e8a57}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-chip.t-o{color:var(--gold-lo, #b8932f)}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-chip.t-r{color:#B8625C}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-empty-ic{color:#8A8272;background:#F8F6F1;box-shadow:inset 0 0 0 1px #E6E0D3}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-empty-t{color:#2A2727}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-empty-s{color:#6B6356}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-logo{background:#FBF6E9}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-logo .t{color:#2A2727}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-n{color:#2A2727}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-st{border-left-color:#EFEBE3}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-sv{color:#2A2727}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-cbar-name{color:#2A2727}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-cbar-score{color:#2A2727}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-cbar-track{background:#EFEBE3}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-verdictbar{border-top-color:#EFEBE3}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-verdict{background:#FBFAF8;box-shadow:inset 0 0 0 1px #E6E0D3}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-vlead{color:#2A2727}',
+':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-notch{background:#F7F5F1}',
   ].join('\n');
 
   if (document.readyState !== 'loading') boot();
