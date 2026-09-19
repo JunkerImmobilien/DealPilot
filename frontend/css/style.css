@@ -37860,3 +37860,14 @@ html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card,
 :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body #hdr-badges :is(.sc-tip,.sc-l span){ color:#3B352D !important; }
 :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(.bc-section-eyebrow,.dab-kick,.dab-tafel-bar .l,.dab-donut-v small){ color:#3B352D !important; }
 /* === /v1453b === */
+/* v1453c · (1) "Dein Kontingent" sitzt im DUNKLEN Aufklappfeld .dp-kg-panel -
+   v1453 hatte es auf Tinte gesetzt (Kontrast 1,0). Zurueck auf Gold.
+   (2) Gold auf hellem Grund in Leiste und Kopf, vom ersten Messlauf verpasst
+   (Farben im Format color(srgb ...) las das Werkzeug falsch).
+   (3) "Wirkt zu hell": Nebenschriften lagen bei Kontrast 3,0-3,4 (Soll 4,5).
+   #6A6358 auf #F7F5F1 ergibt rund 5,4. */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .dp-kg-panel .dp-kg-h{ color:var(--wl-c9a84c, #C9A84C) !important; }
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(.sbc-seq,.sb-actions-l,.sb-version-badge,.sb-section-title span,#hdr-obj-num,#hdr-credits-pill-label){ color:#3B352D !important; }
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .sb-card .sbc-seq{ background:#F2EFE9 !important; border-color:#DDD7CC !important; }
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(.sbc-date,.sb-user-email,.sec-desc,.sfx,.cf-hint,.obj-extra-acc-lbl,.qz-acc-lbl,.qz-acc-hint,.dz-sub,.v235-tab-nav-hint){ color:#6A6358 !important; }
+/* === /v1453c === */
