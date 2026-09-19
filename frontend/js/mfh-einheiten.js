@@ -97,7 +97,7 @@
     var m = document.createElement('div'); m.id = 'mfh-modal';
     m.style.cssText = 'position:fixed;inset:0;background:rgba(42,39,39,.55);z-index:99998;display:flex;align-items:center;justify-content:center;padding:12px';
     m.innerHTML = '<div style="background:#fff;border-radius:12px;max-width:1040px;width:100%;max-height:92vh;display:flex;flex-direction:column;border:1px solid #E6E0D3;color:#2A2727;font-family:Inter,sans-serif">' +
-      '<div style="padding:18px 20px 8px"><div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#9a7f33">Mehrfamilienhaus</div>' +
+      '<div style="padding:18px 20px 8px"><div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33)">Mehrfamilienhaus</div>' +
       '<h3 style="margin:6px 0 2px;font:600 20px/1.3 \'Space Grotesk\',sans-serif">Einheiten erfassen</h3>' +
       '<div style="font-size:12.5px;color:#6B6356">Ähnliche Wohnungen mit ⧉ duplizieren. „Übernehmen" schreibt Fläche, Einheitenzahl und Ist-Kaltmiete (vermietete Einheiten) ins Objekt.</div></div>' +
       '<div style="overflow:auto;padding:0 20px;flex:1 1 auto"><table style="border-collapse:collapse;font-size:12px;min-width:880px"><thead><tr style="text-align:left;color:#8A8272">' +
