@@ -17180,3 +17180,11 @@ Sachwert in 132 nicht ausgewiesen — ETW ohne direkte BGF (gewollt).
 
 **Rest:** 21 wartet auf Auswahl; 6 und 22 weitere Stufen im Konzept; Pakete
 v1442–v1448 noch nicht auf Prod.
+
+**PROD-Rollout 19.09.2026 (2) — v1442 bis v1448b** (Marcel: „ja los"). main per
+fast-forward auf `d659f27`, backend + mb-backend neu gebaut. Vorher gesichert
+und angesehen: `haupt-20260919-0844.sql.gz` (11 MB), `mb-20260919-0844.sql.gz`
+(745 KB). Nachweis: backend healthy, keine Fehler im Log, drei Seiten 200,
+Gold-Audit RC=0, Loehner gruen, Fingerabdruck Prod = Staging (`3b71a1aa5569`),
+Karte Gutachten.org mit Ziel-Mail auch auf Prod. Im Browser auf
+app.dealpilot.immo: 15 neue Skripte, style.css v1443c, Module geladen.
