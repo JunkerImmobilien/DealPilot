@@ -1267,6 +1267,37 @@
     '.dabm-note{font-size:10.5px;color:#7A7370;margin-bottom:14px;line-height:1.5}',
     '.dabm-actions{display:flex;gap:9px}',
     '.dabm-go{flex:1;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#1a1508;border:none;border-radius:10px;padding:12px;font-family:"Space Grotesk",sans-serif;font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent)}',
-    '.dabm-x{background:#fff;color:#7A7370;border:1.5px solid rgba(42,39,39,.1);border-radius:10px;padding:12px 16px;font-family:"Space Grotesk",sans-serif;font-size:13px;font-weight:600;cursor:pointer}'
+    '.dabm-x{background:#fff;color:#7A7370;border:1.5px solid rgba(42,39,39,.1);border-radius:10px;padding:12px 16px;font-family:"Space Grotesk",sans-serif;font-size:13px;font-weight:600;cursor:pointer}',
+    /* ── v1443 · Backlog v22 Punkt 12, Marcels Wahl „weiss" (Demo-Variante A) ──
+       „Ready fuer die Bank" war ein schwarzes Cockpit (Radialverlauf #17181a).
+       Jetzt eine weisse, ruhige Karte — passend zur hellen Bankfassung des
+       Investment-PDF (v1436). Gilt in beiden Skins: der Bereich richtet sich an
+       die Bank. Gleiche Selektoren wie oben, spaeter in der Liste -> gewinnt.
+       Gruen wird dunkler (#2e8a57), weil Minzgruen auf Weiss nicht lesbar ist.
+       Der Ring bekommt seine Farben per CSS — stroke="var(...)" als SVG-
+       Attribut wirkt nicht (CLAUDE.md). */
+    '#s8 .dab-cockpit{--dab-m2:#2e8a57;--dab-glow:rgba(63,165,108,.18);--dab-ob:#FFFFFF;background:#FFFFFF;border:1px solid #E6E0D3;box-shadow:0 1px 2px rgba(42,39,39,.04)}',
+    '#s8 .dab-cockpit.ready{box-shadow:0 1px 2px rgba(42,39,39,.04)}',
+    '#s8 .dab-cockpit .dab-pill{color:#2A2727;background:#FFFFFF;border-color:#E6E0D3}',
+    '#s8 .dab-cockpit.ready .dab-pill{color:#2e8a57;border-color:#2e8a57;box-shadow:none}',
+    '#s8 .dab-cockpit .dab-rc-load{color:#7A7370}',
+    '#s8 .dab-cockpit .dab-rtitle,#s8 .dab-cockpit .dab-title{color:#2A2727}',
+    '#s8 .dab-cockpit .dab-count,#s8 .dab-cockpit .dab-route{color:#7A7370}',
+    '#s8 .dab-cockpit .dab-donut-v b{color:#2A2727;text-shadow:none}',
+    '#s8 .dab-cockpit .dab-donut-v span{color:#7A7370}',
+    '#s8 .dab-cockpit .dab-donut-v small{color:var(--dab-gold3)}',
+    '#s8 .dab-cockpit .dab-donut circle:first-child{stroke:#EDE8DD}',
+    '#s8 .dab-cockpit .dab-donut .ring{stroke:#3FA56C}',
+    '#s8 .dab-cockpit .dab-seg{background:#EDE8DD}',
+    '#s8 .dab-cockpit .dab-seg.lit{background:#3FA56C;box-shadow:none}',
+    '#s8 .dab-cockpit .dab-plane{color:#2e8a57;filter:none}',
+    '#s8 .dab-cockpit .dab-cap{color:#6B6356;border-top-color:#EFEBE3}#s8 .dab-cockpit .dab-cap b{color:#2A2727}',
+    '#s8 .dab-cockpit .dab-chips-lbl{color:#8A8272}',
+    '#s8 .dab-cockpit .dab-chip{color:#2e8a57;background:rgba(63,165,108,.09)}#s8 .dab-cockpit .dab-chip:hover{background:rgba(63,165,108,.16)}',
+    '#s8 .dab-cockpit .dab-tafel{background:#FFFFFF;border:1px solid #E6E0D3;box-shadow:none}',
+    '#s8 .dab-cockpit .dab-tafel-bar{background:#F8F6F1;border-bottom:1px solid #E6E0D3}',
+    '#s8 .dab-cockpit .dab-tafel-bar .l{color:var(--dab-gold3)}#s8 .dab-cockpit .dab-tafel-bar .r{color:#7A7370}',
+    '#s8 .dab-cockpit .dab-row-flip{background:#2A2727}',
+    '#s8 .dab-cockpit .dab-perf::before,#s8 .dab-cockpit .dab-perf::after{background:#F8F6F1}',
   ].join('\n');
 })();
