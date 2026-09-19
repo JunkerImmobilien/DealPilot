@@ -59,7 +59,7 @@ var FIELDS = [
   // (Migration bei Load: alte kp_kueche-Werte werden in inv_kueche kopiert)
   'san','moebl','inv_kueche','inv_moebel','inv_geraete','inv_pv','inv_stellplatz','inv_sonst', /* V291-inventar-fields-applied */
   'brw','mea','gsfl','mietstg','wertstg','kostenstg','leerstand',
-  'btj','exit_bmy','nkm','ze','umlagef','afa_satz','geb_ant','zve','grenz',
+  'btj','exit_bmy','nkm','ze','umlagef','afa_satz','afa_eigen','afa_eigen_grundlage','afa_rnd_jahre','geb_ant','zve','grenz',
   'ek','d1','d1z','d1t','d1_bindj','anschl_z','anschl_t','anschl_bj',
   'hg_ul','grundsteuer','ul_sonst','hg_nul','weg_r','eigen_r',
   'mietausfall','nul_sonst','kp1','kp1l','kp2','kp2l','kp3','kp3l','kp4','kp4l',
