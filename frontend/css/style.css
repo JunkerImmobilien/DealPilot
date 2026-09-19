@@ -35533,6 +35533,12 @@ body[data-dp-skin="hell"] .sc-main .sc-donut::before{
   background:#FFFDF7 !important;
 }
 /* /v917-donut */
+/* v1443c · Backlog v22 Punkt 13: die Regeln oben haengen an body[data-dp-skin="hell"] -
+   die hellen VORLAGEN (ui-varianten.js HELLE) setzen das nicht. Gemessen: im Profil
+   kanzlei blieb die Donut-Mitte im Kopf #0a0a0a mit weisser Zahl. */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) #hdr-badges .sc-donut::before{ background:#FFFFFF !important; }
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) #hdr-badges .sc-donut span{ color:#1a1a1a !important; }
+
 
 /*v918-cream*/
 /* Alle Daten-Karten aufs einheitliche Creme (#FBF6E9) statt reinem Weiss -> kein grelles Weiss,
