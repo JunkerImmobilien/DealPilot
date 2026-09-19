@@ -17128,3 +17128,25 @@ Etikett) und v1441b (dp-tip-Trefferflaeche, overflow:hidden aus v639) — danach
 null Ueberlaeufe in 390/844/820. **Prod-Rollout v1429–v1441b: Marcels „ja",
 Sicherungen gezogen (haupt/mb-20260918-2007), der Befehl wurde aber vom
 Sicherheitsfilter („Production Deploy") abgewiesen — Prod unveraendert f5802de.**
+
+---
+
+## Rollout-Journal · 19.09.2026 — PROD: v1429 bis v1441d
+
+**Was.** Marcels Freigabe („ja bitte mach den prod rollout"). main per
+fast-forward auf staging `ecc21bc`, Prod gezogen, backend + mb-backend neu
+gebaut. Inhalt: alle Pakete aus Backlog v22 (v1429–v1441d, siehe Journal
+18.09. (3)–(5)).
+
+**Vorher gesichert und angesehen:** `haupt-20260919-0736.sql.gz` (11 MB),
+`mb-20260919-0736.sql.gz` (745 KB), beide mit PostgreSQL-Kopf. Keine neuen
+Migrationen in diesem Rollout.
+
+**Nachweis auf Prod:** backend healthy, mb-backend Up, keine Fehler im Log;
+`/`, `quickcheck-app.html`, `marktbericht-app/index.html` 200; Gold-Audit
+RC=0; Loehner-Pruefstrecke gruen; Fingerabdruck `git ls-files -s frontend
+backend marktbericht` auf Prod und Staging identisch (`32fafb3bc478`). Im
+Browser auf app.dealpilot.immo: 13 neue Skripte geladen, style.css v1441c,
+Bankfassung und Hell-Schalter vorhanden.
+
+**Stand:** main = staging = Prod-Server = Staging-Server (`ecc21bc`).
