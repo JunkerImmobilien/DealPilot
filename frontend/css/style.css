@@ -37845,3 +37845,18 @@ html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card,
 :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .card{ border-color:rgba(26,23,20,.10) !important; }
 :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(input,select,textarea):not([type="checkbox"]):not([type="radio"]){ border-color:#D6D0C5 !important; }
 /* === /v1453 === */
+/* v1453b · nachgemessen: (1) die Link-Regel oben setzte die Telefonnummer im
+   DUNKLEN Junker-Banner auf Tinte - Schwarz auf Schwarz. Zurueck auf Gold.
+   (2) Reiter verloren gegen "header.hdr.has-v64-score + nav.tabs .tab .tab-lbl"
+   (hoehere Spezifitaet), Betraege in der Auswertung gegen "#s6 .kv-v.c-gold"
+   (ID). Beide Anker hier nachgebaut. (3) Sechs goldene Schriften auf hellem
+   Grund nachgezogen. Gold bleibt auf dunklem Grund (Tabellentrenner,
+   PDF-Fenster, Banner) und als Stufenfarbe der Score-Pille. */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .junker-action-banner a, :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body #dp-banner-phone{ color:var(--wl-c9a84c, #C9A84C) !important; text-decoration:none !important; }
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(header.hdr, header.hdr.has-v64-score) + nav.tabs .tab, :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(header.hdr, header.hdr.has-v64-score) + nav.tabs .tab .tab-lbl{ color:#5C554B !important; }
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(header.hdr, header.hdr.has-v64-score) + nav.tabs .tab.active, :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(header.hdr, header.hdr.has-v64-score) + nav.tabs .tab.active .tab-lbl{ color:#1A1714 !important; font-weight:600 !important; }
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(#s0,#s1,#s2,#s3,#s4,#s5,#s6,#s7,#s8,#s9) :is(.c-gold,.kv-v.c-gold){ color:#1A1714 !important; }
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(#v10-rate-var,#v10-rate-20){ color:#1A1714 !important; }
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body #hdr-badges :is(.sc-tip,.sc-l span){ color:#3B352D !important; }
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(.bc-section-eyebrow,.dab-kick,.dab-tafel-bar .l,.dab-donut-v small){ color:#3B352D !important; }
+/* === /v1453b === */
