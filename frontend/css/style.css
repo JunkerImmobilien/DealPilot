@@ -37738,3 +37738,45 @@ button.btn-brw.brw-veraltet::after {
   .plan-paket-grid { grid-template-columns: 1fr; }
   .plan-paket-grid .plan-credit-sub { min-height: 0; }
 }
+
+/* ═══ v1449 · HYBRID WORKSPACE (Backlog v22 Punkt 21, Marcels Wahl „Hybrid") ═══
+   Gilt nur im hellen Profil (Vorlage kanzlei). Ablauf, Reiterleiste und
+   Rechnung bleiben; geaendert wird die Darstellung:
+   · Seitenleiste als kompakte LISTE statt Schaufensterkarten (vorher 344x210 px
+     je Objekt, gemessen) - Foto, Kacheln und Halter entfallen, Kuerzel,
+     Adresse, Kaufpreis und Score bleiben. Eingeklappt: die vorhandene
+     44-px-Leiste (dp-sidebar-collapsed) bleibt unveraendert.
+   · Ueberschriften ohne Serifen.
+   · Rechte Aktionsspalte: js/hybrid-aktionen.js (ab 1500 px Breite). */
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar { width:300px !important; min-width:300px !important; }
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card {
+  min-height:0 !important; height:auto !important; padding:9px 12px 9px 12px !important; margin:0 8px 4px !important;
+  border-radius:8px !important; box-shadow:none !important; border:1px solid #ECE7DC !important; background:#FFFFFF !important;
+}
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card:hover { background:#FBF9F4 !important; }
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-thumb,
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-mini-grid,
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-halter,
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-score-label { display:none !important; }
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-top { padding:0 !important; gap:0 !important; min-height:0 !important; }
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-top-body { padding-right:52px !important; }
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-address { font:600 13px/1.3 Inter,system-ui,sans-serif !important; }
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-kp { font:500 12px/1.3 "JetBrains Mono",ui-monospace,monospace !important; color:#6B6356 !important; }
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-score-overlay {
+  top:50% !important; right:10px !important; transform:translateY(-50%) scale(.62) !important; transform-origin:right center !important;
+}
+html[data-ui-theme="kanzlei"] .sec .sec-title { font-family:"Space Grotesk",Inter,system-ui,sans-serif !important; font-weight:600 !important; letter-spacing:-.01em !important; }
+/* Rechte Aktionsspalte (hybrid-aktionen.js setzt body.dp-hybrid-rail) */
+html[data-ui-theme="kanzlei"] body.dp-hybrid-rail .main-col { padding-right:212px !important; }
+#dp-hybrid-aktionen { display:none; }
+html[data-ui-theme="kanzlei"] body.dp-hybrid-rail #dp-hybrid-aktionen {
+  display:flex; flex-direction:column; gap:8px; position:fixed; right:0; top:0; bottom:0; width:200px; z-index:40;
+  padding:18px 14px; background:#FFFFFF; border-left:1px solid #E6E1D6; font-family:Inter,system-ui,sans-serif;
+}
+#dp-hybrid-aktionen .lbl { font:600 10.5px/1 "JetBrains Mono",ui-monospace,monospace; letter-spacing:.08em; text-transform:uppercase; color:#8E877C; margin:6px 0 2px; }
+#dp-hybrid-aktionen button { text-align:left; border:1px solid #E6E1D6; background:#FFFFFF; border-radius:8px; padding:9px 11px; font:500 13px Inter,system-ui,sans-serif; color:#23211F; cursor:pointer; }
+#dp-hybrid-aktionen button:hover { background:#F8F6F1; }
+#dp-hybrid-aktionen button.dunkel { background:#23211F; color:#FFFFFF; border-color:#23211F; }
+#dp-hybrid-aktionen .kpi { border-top:1px solid #F0ECE4; padding:8px 0 0; font-size:12px; color:#5E5850; display:flex; justify-content:space-between; }
+#dp-hybrid-aktionen .kpi b { color:#23211F; font-variant-numeric:tabular-nums; }
+/* === /v1449 === */
