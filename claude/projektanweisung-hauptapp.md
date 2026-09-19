@@ -17208,3 +17208,23 @@ bei Soll 1.300 €/Monat, Sanierungshaken sichtbar. Gold-Audit RC=0 auf Basislin
 
 **Rest:** Soll-Miete als Sprung in der Mietentwicklung, Ist/Soll ins Bank-PDF, Vererbung
 Objekt → Gebäude → Einheit. v1449–v1451 noch nicht auf Prod.
+
+## Rollout-Journal · 19.09.2026 (4) — Helles Profil: Schrift in Tinte (Staging)
+
+Marcel: „in den Schriften zu viel Gold … mehr Schwarz, wirkt alles zu hell".
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1453 | `27cbe10` | Titel, Beträge, Reiter, Etiketten, Links in Tinte #1A1714 / #3B352D; Kartenränder neutral |
+| v1453b | `edb2160` | Reiter und `#s6 .kv-v.c-gold` (höhere Spezifität) nachgebaut; Banner-Telefonnummer zurück auf Gold |
+| v1453c | `e907aa5` | „Dein Kontingent" auf dunklem Feld zurück auf Gold; Leiste/Kopf; Nebenschrift #6A6358 (Kontrast ~5,4 statt 3,0–3,4) |
+
+**Nachweis:** Goldschrift auf hellem Grund 211 → 21, Rest gewollt (Score-Stufe, kpi-eval-Status,
+Logo, Warnhinweis, Boarding-Pass). Gold-Audit RC=0. Vorlage kanzlei im Browser nach Neuladen.
+
+**Eigene Fehler unterwegs (zurückgenommen):** ein Messlauf lief im Profil Obsidian (Server stellte
+das Profil beim Neuladen zurück) und war ungültig; zwei Sammelregeln setzten Schrift auf DUNKLEM
+Grund auf Tinte (Banner-Telefon, Kontingent) — gefunden über eine Kontrastmessung, nicht über die
+Farbsuche. Das Messwerkzeug las `color(srgb …)` als fast schwarz und übersah so Goldschrift.
+
+**Rest:** `#hdr-obj-num` und `.sbc-date` verlieren noch gegen eine ID-Regel (kosmetisch). Nicht auf Prod.
