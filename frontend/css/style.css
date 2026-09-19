@@ -37871,3 +37871,10 @@ html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card,
 :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .sb-card .sbc-seq{ background:#F2EFE9 !important; border-color:#DDD7CC !important; }
 :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(.sbc-date,.sb-user-email,.sec-desc,.sfx,.cf-hint,.obj-extra-acc-lbl,.qz-acc-lbl,.qz-acc-hint,.dz-sub,.v235-tab-nav-hint){ color:#6A6358 !important; }
 /* === /v1453c === */
+/* v1453d · Rest aus v1453c, per Kaskaden-Walker gemessen: #hdr-obj-num verlor
+   gegen "html[data-ui-theme=kanzlei] body header.hdr #hdr-obj-num" (1-2-3),
+   .sbc-date gegen "html[data-ui-theme] body aside.sidebar .sb-card .sbc-date"
+   (0-4-3). Beide Anker hier mit einer Stufe mehr. */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(header.hdr, header.hdr.has-v64-score) #hdr-obj-num{ color:#3B352D !important; }
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body aside.sidebar .sb-card.sb-card .sbc-date{ color:#6A6358 !important; }
+/* === /v1453d === */
