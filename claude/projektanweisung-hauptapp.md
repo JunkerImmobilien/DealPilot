@@ -17188,3 +17188,23 @@ und angesehen: `haupt-20260919-0844.sql.gz` (11 MB), `mb-20260919-0844.sql.gz`
 Gold-Audit RC=0, Loehner gruen, Fingerabdruck Prod = Staging (`3b71a1aa5569`),
 Karte Gutachten.org mit Ziel-Mail auch auf Prod. Im Browser auf
 app.dealpilot.immo: 15 neue Skripte, style.css v1443c, Module geladen.
+
+## Rollout-Journal · 19.09.2026 (3) — Hybrid, eigener AfA-Satz, MFH Ist/Soll (Staging)
+
+Marcel: „nimm hybrid und arbeite alles ab".
+
+| Paket | Commit | Punkt | Was |
+|---|---|---|---|
+| v1449–v1449d | `52d7179`…`7fe5dc3` | 21 | Hybrid Workspace im hellen Profil: kompakte Objektliste, Aktionsspalte ab 1500 px (`js/hybrid-aktionen.js`) |
+| v1450 | `0dab26e` | 22 | Eigener AfA-Satz / RND im Steuer-Tab (`js/afa-eigen.js`), als Zahl-Option in `#afa_satz` — kein Leser geändert |
+| v1451 | `576e170` | 6 | MFH Stufe 2: Maßnahmen je Einheit, Kennzahlen Ist gegen Soll (`Dscr.compute()`) |
+
+**Nachweis:** v1449 in der Messkabine (390/820/1500+ px) ohne Überlauf und Überlappung;
+v1450 RND 34 → 2,94 %, AfA 3.319 → 4.879 €, Rücknahme sauber; v1451 DSCR 1,83 → 2,17
+bei Soll 1.300 €/Monat, Sanierungshaken sichtbar. Gold-Audit RC=0 auf Basislinie 448.
+
+**Falle unterwegs:** Die Hybrid-Zeilen fielen auf 29 px zusammen — Flex-Kinder im
+`overflow:auto`-Behälter schrumpfen, sobald die alte `min-height` fehlt → `flex:0 0 auto`.
+
+**Rest:** Soll-Miete als Sprung in der Mietentwicklung, Ist/Soll ins Bank-PDF, Vererbung
+Objekt → Gebäude → Einheit. v1449–v1451 noch nicht auf Prod.
