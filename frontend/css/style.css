@@ -37748,7 +37748,7 @@ button.btn-brw.brw-veraltet::after {
      44-px-Leiste (dp-sidebar-collapsed) bleibt unveraendert.
    · Ueberschriften ohne Serifen.
    · Rechte Aktionsspalte: js/hybrid-aktionen.js (ab 1500 px Breite). */
-html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar { width:300px !important; min-width:300px !important; }
+@media (min-width: 1025px) { html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar { width:300px !important; min-width:300px !important; } }  /* v1449d: nur Desktop - am Handy/Tablet ist die Leiste eine Schublade */
 html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card {
   min-height:0 !important; height:auto !important; padding:9px 12px 9px 12px !important; margin:0 8px 4px !important;
   border-radius:8px !important; box-shadow:none !important; border:1px solid #ECE7DC !important; background:#FFFFFF !important;
@@ -37784,7 +37784,7 @@ html[data-ui-theme="kanzlei"] body.dp-hybrid-rail #dp-hybrid-aktionen {
    66px Inhalt -> Zeilen ueberlappten; jetzt auto. Die schwebenden Baender Won/Investor
    passen nicht in eine Listenzeile: Won wird ein Statuspunkt links, Investor faellt
    (der Score steht rechts). */
-html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) .app-wrap { grid-template-columns:300px minmax(0,1fr) !important; }
+@media (min-width: 1025px) { html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) .app-wrap { grid-template-columns:300px minmax(0,1fr) !important; } }  /* v1449d: nur Desktop - am Handy/Tablet ist die Leiste eine Schublade */
 html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-top { height:auto !important; max-height:none !important; }
 html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-investor-ribbon, html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-won-ribbon { display:none !important; }
 html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card.deal-won { border-left:3px solid #2E8A57 !important; }
