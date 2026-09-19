@@ -52,7 +52,7 @@ var WM_FIELDS = [
 ];
 
 var FIELDS = [
-  'plz','ort','str','hnr','objart','wfl','baujahr','kaufdat','wirtschaftlicher_uebergang','kuerzel','ausst',
+  'plz','ort','str','hnr','objart','wfl','baujahr','wert_soll','kaufdat','wirtschaftlicher_uebergang','kuerzel','ausst',
   'thesis','risiken','notizen','bankval','svwert','makrolage','mikrolage',
   'vermstand','exitstr','kp','makler_p','notar_p','gba_p','gest_p','ji_p',
   // V291.1-storage-cleanup: kp_kueche deprecated — Eingabe komplett über inv_* Felder

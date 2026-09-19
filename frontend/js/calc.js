@@ -1435,9 +1435,34 @@ function _calcImmediate(){
   State.ltv_basis = ltv_basis;
   State.ltv_basis_label = ltv_basis_label;
   var ltv = ltv_basis > 0 ? d_total / ltv_basis * 100 : 0;
-  var ek_p=100-ltv;
+  /* v1445 · Backlog v22 Punkt 5 — SANIERUNGSFINANZIERUNG (Marcel: „was wuerdest
+     du vorschlagen?" -> umgesetzt wie in design/Vorschlaege/ltv-sanierung-value-add.md).
+     Ab Sanierung >= 15 % des Kaufpreises finanziert das Darlehen wesentlich die
+     Sanierung mit; der LTV gegen Kaufpreis/Wert heute ist dann fachlich falsch
+     bezogen (gemessen: 250 % am Value-Add). Dazu: LTC = Darlehen / Gesamtinvestition,
+     LTV nach Sanierung = Darlehen / Wert nach Sanierung (wenn eingetragen). */
+  var _sanV = v('san'), _sanFin = kp > 0 && _sanV >= 0.15 * kp;
+  var _ltc = gi > 0 ? d_total / gi * 100 : 0;
+  var _wertSoll = v('wert_soll'), _ltvSoll = _wertSoll > 0 ? d_total / _wertSoll * 100 : null;
+  State.san_fin = _sanFin; State.ltc = _ltc; State.ltv_soll = _ltvSoll;
+  /* EK-Anzeige: Anteil des Eigenkapitals an der GESAMTINVESTITION. Bisher 100 - LTV —
+     negativ, sobald das Darlehen ueber der LTV-Bezugsgroesse liegt (QA 19). */
+  var _ekAnt = gi > 0 ? Math.max(0, Math.min(100, v('ek') / gi * 100)) : 0;
+  var ek_p = gi > 0 ? _ekAnt : 100-ltv;
   var bar=el('ek-bar');if(bar)bar.style.width=Math.max(2,Math.min(98,ek_p)).toFixed(1)+'%';
-  st('ek-pct',ek_p.toFixed(0)+'%');st('fk-pct',ltv.toFixed(0)+'%');
+  st('ek-pct',ek_p.toFixed(0)+'%');st('fk-pct',(gi > 0 ? Math.min(999, _ltc) : ltv).toFixed(0)+'%');   /* v1445: FK = Darlehen / GI */
+  try {
+    var _sfEl = el('r-sanfin');
+    if (_sfEl) {
+      if (_sanFin) {
+        _sfEl.style.display = '';
+        _sfEl.innerHTML = '<b>Sanierungsfinanzierung</b> (Sanierung ≥ 15 % des Kaufpreises): '
+          + 'LTC ' + _ltc.toFixed(1).replace('.', ',') + ' %'
+          + (_ltvSoll != null ? ' · LTV nach Sanierung ' + _ltvSoll.toFixed(1).replace('.', ',') + ' %' : ' · für den LTV nach Sanierung den „Wert nach Sanierung" im Objekt eintragen')
+          + '. Der LTV gegen ' + ltv_basis_label + ' enthält die Sanierung nicht.';
+      } else { _sfEl.style.display = 'none'; _sfEl.textContent = ''; }
+    }
+  } catch (e) {}
   var bindj=v('d1_bindj')||10;State.bindj=bindj;
   var rs=d1, rs2=d2;
   for(var y=0;y<bindj;y++){
@@ -2589,7 +2614,7 @@ function _calcImmediate(){
      Prozent zurück) und darf NULL sein — „nicht bestimmbar" ist etwas
      anderes als „null Prozent". Jeder Leser muss auf Abwesenheit prüfen,
      bevor er rechnet: Number(null) ist 0 und besteht Number.isFinite. */
-  State.kpis={bmy:bmy,nmy:nmy,fak:fak,em:em,em_pe:em_pe,ekr:ekr,ekr_ns:ekr_ns,
+  State.kpis={bmy:bmy,bmy_gi:(gi>0?nkm_j/gi*100:0),san_fin:_sanFin,ltc:_ltc,ltv_soll:_ltvSoll,nmy:nmy,fak:fak,em:em,em_pe:em_pe,ekr:ekr,ekr_ns:ekr_ns,
     irr:irr,be_cf:be.cf,be_kum:be.kum,be_kum_ek:be.kumEk,dscr:dscr,dscr_netto:dscr_netto,noi_dscr:noi_dscr,kd_dscr:kd_dscr,ltv:ltv,cf_op:cf_op,cf_ns:cf_ns,cf_m:cf_m,cf_ezb:cf_ezb,cf_op_ezb:cf_op_ezb,cf_ns_ezb:cf_ns_ezb,zins_ezb:zins_ezb,tilg_ezb:tilg_ezb,bspar_ezb:bspar_y_ezb,bwk_ezb:bwk_ezb,wm_ezb:wm_ezb,nkm_ezb:nkm_ezb,bwk_cf_ezb:bwk_cf_ezb,ster_ezb:ster_ezb,afa_ezb:afa,cf_op_an:cf_op_an,cf_ns_an:cf_ns_an,zins_an:zins_an,tilg_an:tilg_an,bspar_an:bspar_y_an,wm_an:wm_an,bwk_an:bwk_an,nkm_an:nkm_an,bwk_cf_an:bwk_cf_an,rate_an_m:rate_an_m,ster_an:ster_an,exit_vkp:exit_vkp,wm_j:wm_j,nkm_j:nkm_j,bwk:bwk,bwk_cf:bwk_cf,zins_j:zins_j,tilg_j:tilg_j,bspar_j:bspar_y,steuer:steuer,afa:afa,zve_immo:zve_immo,zaer_m:zaer_m,zaer_pct:zaer_pct,wp_kpi:wp_kpi,d1:d1,ek:ekv,gi:gi,kp:kp,bwk_ul:ul,bwk_nul:nul,d1z_pct:d1z*100,d1t_pct:d1t*100,d1IsAussetzung:_d1IsAussetzung};
 
   // V258-07: WK-Snapshot + andere Objekte beruecksichtigen

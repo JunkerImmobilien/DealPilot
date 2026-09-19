@@ -476,7 +476,7 @@ function renderKpiEval() {
     _evalNettomietrendite(k.nmy),
     _evalEkRendite(k.ekr, k.ek),
     _evalEquityMultiple(k.em, k.ek),
-    _evalRisikoLtv(k.ltv)
+    _evalRisikoLtv(k.san_fin ? (k.ltv_soll != null ? k.ltv_soll : k.ltc) : k.ltv)   /* v1445 */
   ];
 
   body.innerHTML =

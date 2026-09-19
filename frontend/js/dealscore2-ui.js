@@ -66,7 +66,9 @@ function _buildDeal2FromState() {
 
   // Finanzierung
   deal.dscr     = k.dscr;
-  deal.ltv      = k.ltv;       // bereits in %
+  /* v1445: bei Sanierungsfinanzierung bewertet der Score den LTV nach Sanierung,
+     ohne eingetragenen Wert die LTC - nicht den LTV gegen den Kaufpreis (250 %). */
+  deal.ltv      = k.san_fin ? (k.ltv_soll != null ? k.ltv_soll : k.ltc) : k.ltv;       // bereits in %
   deal.zinsSatz = v('d1z');    // wir nehmen den Zins der Hauptfinanzierung
   deal.tilgung  = v('d1t');
   deal.eigenkapitalQuote = (ek2 != null && State.gi > 0) ? (ek2 / State.gi) * 100 : null;
