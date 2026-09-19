@@ -2179,6 +2179,9 @@ window.DealPilotDealAction = (function() {
       alert('Keine Wizard-Daten zum Senden vorhanden.');
       return;
     }
+    /* v1447 · Backlog v22 Punkt 22: Marcels Entscheidung - direkt an Gutachten.org.
+       Der alte Weg (JSON an /rnd-request, Mail an Junker) bleibt nur als Rueckfall. */
+    if (window.DpGutachtenOrg && typeof window.DpGutachtenOrg.anfragen === "function") return window.DpGutachtenOrg.anfragen(r);
 
     // Vollständiges JSON-Payload für späteren Import im RND-Modul
     var payload = {
