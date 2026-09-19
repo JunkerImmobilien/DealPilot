@@ -37779,4 +37779,15 @@ html[data-ui-theme="kanzlei"] body.dp-hybrid-rail #dp-hybrid-aktionen {
 #dp-hybrid-aktionen button.dunkel { background:#23211F; color:#FFFFFF; border-color:#23211F; }
 #dp-hybrid-aktionen .kpi { border-top:1px solid #F0ECE4; padding:8px 0 0; font-size:12px; color:#5E5850; display:flex; justify-content:space-between; }
 #dp-hybrid-aktionen .kpi b { color:#23211F; font-variant-numeric:tabular-nums; }
+/* v1449b · im Browser gemessen: .app-wrap ist ein Raster mit fest 380px - die Liste
+   ist 300px breit, also hier auch 300px. .sbc-top behielt eine feste Hoehe (9px) bei
+   66px Inhalt -> Zeilen ueberlappten; jetzt auto. Die schwebenden Baender Won/Investor
+   passen nicht in eine Listenzeile: Won wird ein Statuspunkt links, Investor faellt
+   (der Score steht rechts). */
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) .app-wrap { grid-template-columns:300px minmax(0,1fr) !important; }
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-top { height:auto !important; max-height:none !important; }
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-investor-ribbon, html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-won-ribbon { display:none !important; }
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card.deal-won { border-left:3px solid #2E8A57 !important; }
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card.active { background:#F5EDD8 !important; border-color:#E4D6AE !important; }
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-top-line1 { min-height:0 !important; }
 /* === /v1449 === */
