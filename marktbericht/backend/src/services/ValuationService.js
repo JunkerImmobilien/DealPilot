@@ -10,6 +10,10 @@ const CONDITION_FACTOR = {
   gut: 1.0, gepflegt: 1.0, normal: 0.99, mittel: 0.96,
   renovierungsbeduerftig: 0.88, 'renovierungsbedürftig': 0.88,
   sanierungsbeduerftig: 0.82, 'sanierungsbedürftig': 0.82, unsaniert: 0.92, abrissreif: 0.70,
+  /* v1444 · Backlog v22 Punkt 17: die Werte der App-Auswahl ds2_zustand kamen hier
+     nicht vor und fielen still auf 1,0 - „neubau" wie „gepflegt", und
+     „stark sanierungsbeduerftig" ebenso. Jetzt eindeutig zugeordnet. */
+  neubau: 1.08, stark_sanierungsbeduerftig: 0.82, 'stark sanierungsbedürftig': 0.82,
 };
 // Ausstattungsqualität (einfach … luxuriös)
 const QUALITY_FACTOR = { einfach: 0.93, normal: 1.0, gehoben: 1.06, luxurioes: 1.12, 'luxuriös': 1.12, luxus: 1.12 };

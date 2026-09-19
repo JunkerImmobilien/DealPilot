@@ -60,6 +60,9 @@ export const DealPilotObjectMapper = {
          ohne sie am Durchschnitt. Der Sprechlauf fragt sie beim MFH jetzt ab. */
       units: num(pick(d, ['einheiten', 'units'])),
       condition: pick(d, ['ds2_zustand', 'zustand']) || 'gepflegt',
+      /* v1444: ValuationService liest ref.quality - hier kam die Ausstattung nur als
+         `ausstattung` an, der Qualitaetsfaktor griff auf dem Objektweg nie. */
+      quality: pick(d, ['quality', 'ausst', 'ausstattung']),
       energy_class: pick(d, ['ds2_energie', 'energieklasse', 'energie_label']),
       purchase_price: num(pick(d, ['kp', 'kaufpreis'])),
       monthly_net_rent: num(pick(d, ['nkm', 'nettokaltmiete'])),

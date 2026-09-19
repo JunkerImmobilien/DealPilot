@@ -28,9 +28,12 @@ window.StarRating = (function() {
     0: '– keine Bewertung –',
     1: 'Stark sanierungsbedürftig',
     2: 'Renovierungsbedürftig',
-    3: 'Gut in Stand gehalten',
-    4: 'Gehobenes Niveau',
-    5: 'Neu / kürzlich modernisiert'
+    /* v1444 · Backlog v22 Punkt 17: 4 hiess „Gehobenes Niveau" - eine Qualitaets-,
+       keine Zustandsaussage. Jetzt fuenf Zustandsstufen, gleiche Richtung wie
+       bisher (Altbestand bleibt 1:1 lesbar). */
+    3: 'Gepflegt',
+    4: 'Modernisiert',
+    5: 'Neuwertig'
   };
 
   // Lucide-style SVG-Icons für die 4 Bereiche (24x24)

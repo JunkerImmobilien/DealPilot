@@ -150,7 +150,22 @@ if (!window._wlc) {
     var el = $('obj-id') || $('object-id'); if (el && el.value) return String(el.value);
     return null;
   }
-  function inputs() { return { plz: vIn('plz'), ort: vIn('ort'), str: vIn('str'), hnr: vIn('hnr'), objektart: vIn('objart'), wfl: numDe(vIn('wfl')), baujahr: numDe(vIn('baujahr')), kp: numDe(vIn('kp')) }; }
+  /* v1444 · Backlog v22 Punkt 17/18: die Karte schickte 8 Felder - ohne Zustand
+     rechnete die Marktpreisindikation jedes Objekt als „gepflegt", ohne Ausstattung
+     als „normal". Der DealPilotObjectMapper versteht das ganze Objekt; mit geht,
+     was im Formular steht (leere Felder nicht). */
+  var ZUSATZ = ['ds2_zustand', 'ausst', 'ds2_energie', 'modernis', 'gsfl', 'einheiten', 'zimmer', 'etage', 'vermstand',
+    'eq_heating', 'eq_windows', 'eq_floor', 'eq_bath', 'eq_guest_wc', 'eq_store_room', 'eq_walls', 'eq_roof', 'eq_elevator'];
+  function inputs() {
+    var o = { plz: vIn('plz'), ort: vIn('ort'), str: vIn('str'), hnr: vIn('hnr'), objektart: vIn('objart'), objart: vIn('objart'), wfl: numDe(vIn('wfl')), baujahr: numDe(vIn('baujahr')), kp: numDe(vIn('kp')) };
+    var art = String(o.objart || '').toUpperCase(), OA = window.DealPilotObjektart;
+    ZUSATZ.forEach(function (id) {
+      var v = vIn(id); if (v == null || String(v).trim() === '') return;
+      if (OA && OA.passt && OA.passt(art, id) === false) return;   /* v1437: nur was zur Art passt */
+      o[id] = v;
+    });
+    return o;
+  }
 
   function mapCard(d) {
     d = d || {};
