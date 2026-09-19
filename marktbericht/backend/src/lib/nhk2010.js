@@ -682,18 +682,54 @@ export function zfhKorrektur({ nhk_typ, objektart, zweifamilienhaus } = {}) {
   return zfh ? 1.05 : 1;
 }
 
-export function bgf({ bgf_direkt, wohnflaeche_qm, objektart }) {
+/* v1446 · Backlog v22 Punkt 8 — Marcel: „Hol dir eine Quelle."
+ * QUELLE: Entwurf der Sachwertrichtlinie (SW-RL), Stand 25.10.2011, Anlage 1
+ * „NHK 2010", Tabelle „Merkmale der NHK-Objekte fuer Ein- und Zweifamilienhaeuser"
+ * (Spalte BGF/Wohnflaeche) und bei 4. Mehrfamilienhaeuser die Zeile
+ * „BGF/Nutzeinheit" (m² BGF je m² WFL). Abgerufen 19.09.2026,
+ * verkehrswert.com/verkehrswert-downloads/sw_rl_gesamt.pdf. Es sind die
+ * Mittelwerte der NHK-2010-Stichprobenobjekte — also eine NAEHERUNG, keine
+ * Messung; direkt angegebene BGF schlaegt sie immer.
+ * Der alte Pauschalfaktor 1,55 stammt aus BewG Anlage 24 Teil II und gilt dort
+ * fuer WOHNUNGSEIGENTUM in Mehrfamilienhaeusern — nicht fuer Haeuser. Er bleibt
+ * nur als Rueckfall, wenn der Gebaeudetyp fehlt, und ist dann so bezeichnet.
+ * Schluessel Haus: die zwei Ziffern nach dem Punkt (Geschosse | Dach), gemessen
+ * an den freistehenden Typen 1.xy; fuer 2.xy (Doppel-/Reihenend-) und 3.xy
+ * (Reihenmittelhaus) uebertragen — die Tabelle fuehrt nur 1.xy. */
+const SWRL_BGF_WF_HAUS = { '01': 2.3, '02': 3.8, '03': 2.6, '11': 1.9, '12': 2.8, '13': 2.1,
+                           '21': 1.6, '22': 2.6, '23': 1.4, '31': 1.5, '32': 2.1, '33': 1.4 };
+const SWRL_BGF_WF_MFH = { '4.1': { 3: 1.8, 4: 1.9, 5: 2.1 }, '4.2': { 3: 1.8, 4: 2.4, 5: 2.1 },
+                          '4.3': { 3: 2.1, 4: 2.5, 5: 2.0 } };
+const SWRL_QUELLE = 'SW-RL-Entwurf 25.10.2011, Anl. 1 (Merkmale der NHK-Objekte)';
+
+export function bgf({ bgf_direkt, wohnflaeche_qm, objektart, nhk_typ, standardstufe }) {
   const d = Number(bgf_direkt);
   if (Number.isFinite(d) && d > 0) return { wert: d, herkunft: 'direkt', verlaesslich: true };
   const w = Number(wohnflaeche_qm);
   if (!Number.isFinite(w) || w <= 0) return { wert: null, herkunft: null, verlaesslich: false };
+  const typ = String(nhk_typ || '').trim();
+  const mh = typ.match(/^([123])\.(\d)(\d)$/);
+  if (mh) {
+    const fk = SWRL_BGF_WF_HAUS[mh[2] + mh[3]];
+    if (fk) return { wert: Math.round(w * fk), faktor: fk, verlaesslich: false,
+      herkunft: 'Naeherung aus Wohnflaeche, Faktor ' + String(fk).replace('.', ',') + ' fuer Typ ' + typ
+        + (mh[1] === '1' ? '' : ' (von 1.' + mh[2] + mh[3] + ' uebertragen)') + ' - ' + SWRL_QUELLE };
+  }
+  const mm = typ.match(/^4\.[123]$/);
+  const st = Number(standardstufe);
+  if (mm && SWRL_BGF_WF_MFH[typ][st]) {
+    const fk = SWRL_BGF_WF_MFH[typ][st];
+    return { wert: Math.round(w * fk), faktor: fk, verlaesslich: false,
+      herkunft: 'Naeherung aus Wohnflaeche, Faktor ' + String(fk).replace('.', ',') + ' fuer Typ ' + typ + ', Standardstufe ' + st + ' - ' + SWRL_QUELLE };
+  }
   const istMfh = /mfh|mehrfamilien/i.test(String(objektart || ''));
   if (istMfh) {
     return { wert: null, herkunft: null, verlaesslich: false,
-      hinweis: 'Bei Mehrfamilienhaeusern ist die Naeherung aus der Wohnflaeche zu ungenau. '
-             + 'Bruttogrundflaeche bitte direkt angeben.' };
+      hinweis: 'Bei Mehrfamilienhaeusern ohne Gebaeudetyp (4.1 bis 4.3) und Standardstufe 3 bis 5 '
+             + 'gibt es keine belegte Naeherung aus der Wohnflaeche. Bruttogrundflaeche bitte direkt angeben.' };
   }
-  return { wert: Math.round(w * 1.55), herkunft: 'Naeherung aus Wohnflaeche', verlaesslich: false };
+  return { wert: Math.round(w * 1.55), faktor: 1.55, verlaesslich: false,
+    herkunft: 'pauschale Naeherung 1,55 ohne Gebaeudetyp (BewG Anl. 24 II, dort fuer Wohnungseigentum) - Gebaeudetyp angeben fuer den belegten Faktor' };
 }
 
 /**
@@ -757,8 +793,8 @@ export function sachwert(ein, bodenwertErgebnis, param) {
     return out;
   }
   if (!f.verlaesslich) {
-    out.hinweise.push('Die Bruttogrundfläche wurde aus der Wohnfläche genähert (Faktor 1,55). '
-      + 'Für ein belastbares Ergebnis bitte direkt angeben.');
+    out.hinweise.push('Die Bruttogrundfläche wurde aus der Wohnfläche genähert (' + f.herkunft + '). '
+      + 'Für ein belastbares Ergebnis bitte direkt angeben.');   /* v1446 */
   }
 
   const index = Number(ein.baupreisindex) || null;

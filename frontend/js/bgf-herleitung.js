@@ -26,7 +26,7 @@
    ════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var FAKTOR_HAUS = 1.55;   /* = nhk2010.js bgf(), Naeherung aus Wohnflaeche */
+  var FAKTOR_HAUS = 1.55;   /* = nhk2010.js bgf() Rueckfall OHNE Gebaeudetyp; mit Typ gilt die SW-RL-Tabelle (v1446) */
   var HAEUSER = { EFH: 1, ZFH: 1, DHH: 1, RH: 1 };
 
   function el(id) { return document.getElementById(id); }
@@ -65,11 +65,11 @@
       text = 'Direkt angegeben — damit rechnet der Sachwert.';
     } else if (HAEUSER[art]) {
       text = wfl > 0
-        ? 'Leer gelassen: der Marktbericht nähert die BGF aus der Wohnfläche (' + qm(wfl) + ' × 1,55 ≈ '
+        ? 'Leer gelassen: der Marktbericht nähert die BGF aus der Wohnfläche mit dem Faktor der Gebäudeart (Sachwertrichtlinie, NHK 2010 — z. B. 1,5 bei Typ 1.31; ohne Gebäudeart pauschal 1,55 ≈ '
           + qm(wfl * FAKTOR_HAUS) + ') und weist sie als Näherung aus. Ein gemessener Wert macht den Sachwert belastbarer.'
         : 'Leer gelassen: der Marktbericht nähert die BGF aus der Wohnfläche (× 1,55), sobald diese eingetragen ist.';
     } else if (art === 'MFH') {
-      text = 'Bei Mehrfamilienhäusern gibt es keine verlässliche Näherung aus der Wohnfläche — ohne BGF entfällt der Sachwert.';
+      text = 'Bei Mehrfamilienhäusern nähert der Marktbericht die BGF nur mit Gebäudetyp (4.1 bis 4.3) und Standardstufe 3 bis 5 (Faktor 1,8 bis 2,5 laut Sachwertrichtlinie). Sonst bitte direkt angeben.';
     } else if (art === 'ETW') {
       text = 'Bei Eigentumswohnungen rechnet der Sachwert nur mit direkt angegebener BGF — ohne sie entfällt er.';
     }
