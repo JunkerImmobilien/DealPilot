@@ -17150,3 +17150,33 @@ Browser auf app.dealpilot.immo: 13 neue Skripte geladen, style.css v1441c,
 Bankfassung und Hell-Schalter vorhanden.
 
 **Stand:** main = staging = Prod-Server = Staging-Server (`ecc21bc`).
+
+---
+
+## Rollout-Journal · 19.09.2026 (2) — Marcels Entscheidungen umgesetzt (Staging)
+
+Marcel: „marktbericht darfst du erstellen, 5 was würdest du vorschlagen?
+6 was würdest du machen? 8 Hol dir eine Quelle. 12 weiß, 13 auch hell weiß,
+17 das was das beste ist, 21 richtige Demo, 22 direkt an gutachten.org,
+EK-Rendite vor Steuer".
+
+| Paket | Commit | Punkt | Kern |
+|---|---|---|---|
+| v1442 | `642d626` | EK-Rendite | calc.js vor Steuern wie DealKpis; nach Steuern als ekr_ns. Browser: beide 29,65 % |
+| v1443 | `1566107` | 12 | Bankreife-Cockpit weiß |
+| v1443b/c | `7848b91` `109387a` | 13 | Score-Bordkarten und Kopf-Donut auf hellen Vorlagen weiß |
+| v1444 | `ec4278a` | 17 | Zustand/Qualität kommen in der Marktbewertung an (0,82 / 1,06 gemessen), Karte schickt Merkmale, Sterne-Begriffe |
+| v1445 | `a6fbf3f` | 5 | Sanierungsfinanzierung: LTC, LTV nach Sanierung, EK an GI, Score |
+| v1446 | `ff5c028` | 8 | BGF-Näherung mit Quelle (SW-RL-Entwurf 2011 Anl. 1), Löhner 1,5 ≈ 1,49 |
+| v1447 | `d17e85e` | 22 | RND-Anfrage direkt an Gutachten.org mit Bestätigung |
+| v1448 | `e7d287c` | 6 | Einheitenliste MFH (Stufe 1) |
+
+**Marktbericht erzeugt** (Freigabe): Bericht 131 Stufe 1 — Verfahren gesperrt,
+MPI 128.000 €; Bericht 132 Stufe 3 — Ertragswert 80.500 €, Quellennachweis.
+Abgebucht 0 L: für das Objekt war Stufe 3 bereits bezahlt (Summe 37 L).
+Sachwert in 132 nicht ausgewiesen — ETW ohne direkte BGF (gewollt).
+
+**Punkt 21:** klickbare Demo https://claude.ai/artifact/5vWnSbZQsogMGfweKfJnRY.
+
+**Rest:** 21 wartet auf Auswahl; 6 und 22 weitere Stufen im Konzept; Pakete
+v1442–v1448 noch nicht auf Prod.

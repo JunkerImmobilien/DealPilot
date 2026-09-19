@@ -1,0 +1,251 @@
+<title>DealPilot Kanzlei-Modus</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+  /* Bewusst EIN Thema: das ist die Demo des hellen Kanzlei-Modus. Alle Farben explizit. */
+  :root{
+    --ground:#EFEDE8; --paper:#FFFFFF; --soft:#F8F6F1; --line:#E6E1D6; --line2:#F0ECE4;
+    --ink:#23211F; --ink2:#5E5850; --ink3:#8E877C; --gold:#B8932F; --gold-soft:#F5EDD8; --gold-ink:#8A6D1E;
+    --green:#2E8A57; --green-soft:#E6F3EB; --red:#B8625C; --red-soft:#F7E9E7; --blue:#2F5D8A;
+    --f-body:Inter,system-ui,-apple-system,"Segoe UI",sans-serif; --f-num:"Space Grotesk",Inter,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,monospace;
+    color-scheme:light;
+  }
+  *{box-sizing:border-box}
+  html,body{background:var(--ground);color:var(--ink)}
+  body{font:14px/1.5 var(--f-body);padding-inline:16px;padding-block:20px 48px}
+  .shell{max-width:1320px;margin:0 auto}
+  h1{font:600 24px/1.2 var(--f-num);margin:0 0 4px;letter-spacing:-.01em;text-wrap:balance}
+  .lead{color:var(--ink2);margin:0 0 16px;max-width:70ch}
+  .bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:14px}
+  .seg{display:flex;flex-wrap:wrap;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+  .seg button{border:0;background:transparent;font:500 13px var(--f-body);color:var(--ink2);padding:7px 11px;border-radius:7px;cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
+  .seg button:focus-visible,.x:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .lbl{font:600 10.5px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+  .idee{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:16px}
+  @media (max-width:820px){.idee{grid-template-columns:1fr}}
+  .idee h2{font:600 17px/1.3 var(--f-num);margin:2px 0 4px}
+  .idee p{margin:0;color:var(--ink2);font-size:13.5px}
+  .idee ul{margin:4px 0 0;padding-left:18px;color:var(--ink2);font-size:13px}
+  .pro h4{color:var(--green)} .con h4{color:var(--red)} .idee h4{margin:0;font:600 11px/1 var(--f-mono);letter-spacing:.06em;text-transform:uppercase}
+  .frame-wrap{overflow-x:auto}
+  .frame{container-type:inline-size;margin:0 auto;background:var(--soft);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(35,33,31,.05),0 12px 32px -18px rgba(35,33,31,.25);transition:width .25s}
+  .frame[data-w="desk"]{width:100%} .frame[data-w="tab"]{width:820px;max-width:100%} .frame[data-w="phone"]{width:390px;max-width:100%}
+  @media (prefers-reduced-motion:reduce){.frame{transition:none}}
+  /* ── App-Bausteine ── */
+  .app{display:flex;flex-direction:column;min-height:620px}
+  .top{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--paper);border-bottom:1px solid var(--line)}
+  .logo{font:700 15px var(--f-num);letter-spacing:-.01em}.logo b{color:var(--gold)}
+  .crumb{color:var(--ink2);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .crumb b{color:var(--ink)}
+  .sp{flex:1}
+  .x{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:6px 10px;font:500 12.5px var(--f-body);color:var(--ink);cursor:pointer;white-space:nowrap}
+  .x.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .tabs{display:flex;gap:2px;padding:0 12px;background:var(--paper);border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+  .tabs button{border:0;background:transparent;padding:11px 10px 9px;font:500 13px var(--f-body);color:var(--ink2);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+  .tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--gold)}
+  .row{display:flex;flex:1;min-height:0}
+  .list{width:280px;flex:0 0 280px;background:var(--paper);border-right:1px solid var(--line);display:flex;flex-direction:column}
+  .list .head{padding:12px 14px 8px;display:flex;justify-content:space-between;align-items:center}
+  .search{margin:0 12px 8px;border:1px solid var(--line);border-radius:8px;padding:7px 10px;font:13px var(--f-body);width:calc(100% - 24px)}
+  .item{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:9px 14px;border-left:3px solid transparent;cursor:pointer;border-bottom:1px solid var(--line2)}
+  .item:hover{background:var(--soft)}
+  .item[aria-current="true"]{background:var(--gold-soft);border-left-color:var(--gold)}
+  .item .adr{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .item .meta{font:12px var(--f-mono);color:var(--ink3)}
+  .item .sc{grid-row:1/3;grid-column:2;align-self:center}
+  .pill{display:inline-block;font:700 10px/1 var(--f-mono);letter-spacing:.06em;padding:4px 7px;border-radius:99px}
+  .p-top,.p-gut{background:var(--green-soft);color:var(--green)} .p-sol{background:var(--gold-soft);color:var(--gold-ink)} .p-sch,.p-kri{background:var(--red-soft);color:var(--red)}
+  .main{flex:1;min-width:0;padding:16px;display:flex;flex-direction:column;gap:14px;overflow:auto}
+  .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+  .kpi{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .kpi .v{font:600 20px/1.2 var(--f-num);font-variant-numeric:tabular-nums;margin-top:4px}
+  .kpi .s{font-size:11.5px;color:var(--ink3)}
+  .v.g{color:var(--green)} .v.r{color:var(--red)}
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .panel h3{font:600 14px var(--f-num);margin:0 0 10px}
+  .form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}
+  .fld label{display:block;font-size:12px;color:var(--ink2);margin-bottom:3px}
+  .fld .in{border:1px solid var(--line);border-radius:7px;padding:7px 9px;font-variant-numeric:tabular-nums;background:#fff}
+  .kv{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line2);font-size:13px}
+  .kv b{font-variant-numeric:tabular-nums}
+  .kv.sum{border-top:1px solid var(--gold);border-bottom:0;font-weight:600} .kv.sum b{color:var(--gold-ink)}
+  table.t{width:100%;border-collapse:collapse;font-size:13px;background:var(--paper)}
+  .t th{font:600 10.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);cursor:pointer;white-space:nowrap}
+  .t td{padding:9px 10px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .t tr:hover td{background:var(--soft)}
+  .t td.num,.t th.num{text-align:right}
+  .toc a{display:block;padding:7px 10px;border-radius:6px;color:var(--ink2);text-decoration:none;font-size:13px}
+  .toc a[aria-current="true"]{background:var(--gold-soft);color:var(--ink);font-weight:600}
+  .doc{max-width:720px;margin:0 auto;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:26px 30px}
+  .doc h2{font:600 18px var(--f-num);margin:22px 0 8px;padding-top:12px;border-top:1px solid var(--line2)} .doc h2:first-of-type{border-top:0;margin-top:0;padding-top:0}
+  .actions{width:210px;flex:0 0 210px;background:var(--paper);border-left:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:8px}
+  .actions .x{text-align:left}
+  .mand{width:200px;flex:0 0 200px;background:var(--soft);border-right:1px solid var(--line);padding:10px 8px}
+  .mand .item{border-bottom:0;border-radius:6px;margin-bottom:2px}
+  /* ── schmale Rahmen: Container-Queries ── */
+  @container (max-width:900px){ .actions{display:none} .mand{width:160px;flex-basis:160px} .kpis{grid-template-columns:repeat(2,minmax(0,1fr))} }
+  @container (max-width:640px){
+    .list,.mand{display:none} .list.offen{display:flex;position:absolute;z-index:3;inset:92px auto 0 0;width:86%;box-shadow:8px 0 24px -12px rgba(0,0,0,.3)}
+    .row{position:relative} .form{grid-template-columns:1fr} .main{padding:12px} .crumb{display:none} .hide-s{display:none}
+    .doc{padding:18px}
+  }
+  .only-s{display:none} @container (max-width:640px){ .only-s{display:inline-block} }
+  .note{font-size:12px;color:var(--ink3)}
+  .collapsed .list{width:56px;flex-basis:56px} .collapsed .list .adr,.collapsed .list .meta,.collapsed .list .sc,.collapsed .search,.collapsed .list .head .lbl{display:none}
+  .collapsed .item{grid-template-columns:1fr;padding:9px 8px;justify-items:center}
+  .kz{font:600 11px var(--f-mono);color:var(--ink2)}
+</style>
+
+<div class="shell">
+  <div class="lbl">Backlog v22 · Punkt 21 · Demo</div>
+  <h1>Heller Modus für Kanzleien — sechs Layouts</h1>
+  <p class="lead">Klickbare Demo mit echten Beispielobjekten. Oben das Konzept und die Bildschirmgröße wählen; in der Demo lassen sich Objekte wechseln, Reiter öffnen und — je nach Konzept — die Leiste einklappen oder die Tabelle sortieren. Rechnung, Ablauf und Reiterleiste bleiben in jedem Konzept dieselben.</p>
+  <div class="bar">
+    <div class="seg" id="konzepte" role="group" aria-label="Konzept"></div>
+    <div class="seg" id="groesse" role="group" aria-label="Bildschirm">
+      <button type="button" data-w="desk" aria-pressed="true">Desktop</button>
+      <button type="button" data-w="tab" aria-pressed="false">Tablet</button>
+      <button type="button" data-w="phone" aria-pressed="false">Handy</button>
+    </div>
+  </div>
+  <section class="idee" id="idee" aria-live="polite"></section>
+  <div class="frame-wrap"><div class="frame" id="frame" data-w="desk"><div id="stage"></div></div></div>
+  <p class="note" style="margin-top:10px">Beispieldaten aus der Staging-App (Objekte 2026-001 ff.). Keine echten Mandanten.</p>
+</div>
+
+<script>
+(function () {
+  var OBJ = [
+    { id: '2026-001', adr: 'Hermannstraße 9', ort: '32609 Hüllhorst', art: 'Eigentumswohnung', wfl: 100, bj: 1962, kp: 200000, nkm: 1100, gi: 220400, ek: 20000, d1: 180000, zins: 3.8, bmy: 6.60, dscr: 1.83, cf: 494, ltv: 83.9, score: 87, mand: 'Privat' },
+    { id: '2026-1034', adr: 'Hölderlinstraße 1', ort: '32545 Bad Oeynhausen', art: 'Eigentumswohnung', wfl: 74, bj: 1972, kp: 139000, nkm: 740, gi: 153180, ek: 18000, d1: 135000, zins: 3.9, bmy: 6.39, dscr: 1.37, cf: 86, ltv: 70.5, score: 71, mand: 'Müller GbR' },
+    { id: '2026-1035', adr: 'Wilhelm-Busch-Straße 10', ort: '31737 Rinteln', art: 'Mehrfamilienhaus', wfl: 612, bj: 1968, kp: 850000, nkm: 5200, gi: 935000, ek: 135000, d1: 800000, zins: 3.9, bmy: 7.34, dscr: 1.32, cf: 617, ltv: 94.1, score: 68, mand: 'Schneider Holding GmbH' },
+    { id: '2026-1036', adr: 'Löhner Straße 278', ort: '32120 Hiddenhausen', art: 'Zweifamilienhaus', wfl: 233, bj: 1964, kp: 350000, nkm: 1650, gi: 385000, ek: 60000, d1: 325000, zins: 3.7, bmy: 5.66, dscr: 1.08, cf: -120, ltv: 92.9, score: 52, mand: 'Müller GbR' },
+    { id: '2026-1037', adr: 'Am Markt 9', ort: '32584 Löhne', art: 'Mehrfamilienhaus', wfl: 410, bj: 1911, kp: 400000, nkm: 2000, gi: 1040000, ek: 40000, d1: 1000000, zins: 4.1, bmy: 6.00, dscr: 0.39, cf: -3517, ltv: 96.2, score: 31, mand: 'Schneider Holding GmbH' },
+    { id: '2026-1038', adr: 'Bünder Straße 44', ort: '32257 Bünde', art: 'Eigentumswohnung', wfl: 61, bj: 1994, kp: 118000, nkm: 590, gi: 130040, ek: 13000, d1: 117000, zins: 3.8, bmy: 6.00, dscr: 1.21, cf: 44, ltv: 90.0, score: 64, mand: 'Privat' }
+  ];
+  var TABS = ['Objekt', 'Investition', 'Miete', 'Finanzierung', 'Bewirtschaftung', 'Steuer', 'Pilot-Analyse', 'Bewertung', 'Deal-Aktion'];
+  var st = { k: 0, obj: 0, tab: 0, zu: false, sort: 'score', auf: false, mand: 'Alle' };
+
+  function eur(n) { return (n < 0 ? '−' : '') + Math.abs(Math.round(n)).toLocaleString('de-DE') + ' €'; }
+  function pct(n, d) { return n.toFixed(d == null ? 1 : d).replace('.', ',') + ' %'; }
+  function stufe(s) { return s >= 85 ? ['TOP', 'p-top'] : s >= 70 ? ['GUT', 'p-gut'] : s >= 50 ? ['SOLIDE', 'p-sol'] : s >= 35 ? ['SCHWACH', 'p-sch'] : ['KRITISCH', 'p-kri']; }
+  function pill(s) { var x = stufe(s); return '<span class="pill ' + x[1] + '">' + s + ' · ' + x[0] + '</span>'; }
+  function o() { return OBJ[st.obj]; }
+
+  var K = [
+    { n: 'Professional Workspace', kurz: 'Workspace', idee: 'Objektliste statt Schaufensterkarten links, der Deal rechts mit der bekannten Reiterleiste. Zwölf bis fünfzehn Objekte auf einen Blick.', pro: ['kleinster Umbau', 'schneller Objektwechsel', 'vertraut'], con: ['kein Portfolio-Überblick', 'Leiste kostet Breite'] },
+    { n: 'Kanzlei- und Mandantenansicht', kurz: 'Mandanten', idee: 'Erst der Mandant, dann seine Objekte. Die Mandantenverwaltung ist schon da — hier wird sie zur Hauptnavigation.', pro: ['passt zur Kanzleiarbeit', 'Mandantentrennung sichtbar'], con: ['für Einzelinvestoren eine Ebene zu viel', 'drei Spalten eng auf Tablet'] },
+    { n: 'Financial Dashboard', kurz: 'Dashboard', idee: 'Einstieg über eine sortierbare Portfolio-Tabelle mit Summen. Ein Klick öffnet den Deal mit der gewohnten Reiterleiste.', pro: ['bester Überblick', 'sortieren wie in Excel'], con: ['Objektwechsel über „zurück"', 'viel neue Oberfläche'] },
+    { n: 'Digitale Akte', kurz: 'Akte', idee: 'Das Objekt als ein durchgehendes Dokument; die Reiter werden zum Inhaltsverzeichnis. Ruhig, druckfertig, gut für Besprechungen.', pro: ['sehr ruhig', 'druck- und besprechungsfertig'], con: ['viel Scrollen', 'Objektwechsel umständlich'] },
+    { n: 'Compact Professional', kurz: 'Compact', idee: 'Für Vielnutzer: kleine Schrift, dreispaltige Formulare, Liste mit 25+ Objekten, Tastaturkürzel.', pro: ['sehr viel auf einen Blick', 'schnell für Profis'], con: ['abschreckend für Einsteiger', 'kaum tabletfähig'] },
+    { n: 'Hybrid Workspace', kurz: 'Hybrid', idee: 'Einklappbare Objektleiste, großzügiger Inhalt, rechts eine schmale Aktionsspalte (PDF, Bank, Marktbericht). Meine Empfehlung als Basis.', pro: ['viel Arbeitsfläche', 'klappt sauber aufs Tablet'], con: ['eingeklappt weniger Orientierung', 'Aktionsspalte ist neu'] }
+  ];
+
+  function top(extra) {
+    return '<div class="top"><span class="logo">Deal<b>Pilot</b></span>'
+      + '<button type="button" class="x only-s" data-a="liste">☰ Objekte</button>'
+      + '<span class="crumb">' + (extra || '') + '<b>' + o().id + '</b> · ' + o().adr + '</span><span class="sp"></span>'
+      + '<button type="button" class="x hide-s">Speichern</button><button type="button" class="x dark">Bankunterlagen</button></div>';
+  }
+  function tabs() { return '<div class="tabs" role="tablist">' + TABS.map(function (t, i) { return '<button type="button" role="tab" data-tab="' + i + '" aria-selected="' + (i === st.tab) + '">' + t + '</button>'; }).join('') + '</div>'; }
+  function liste(filterMand) {
+    var l = OBJ.map(function (x, i) { return { x: x, i: i }; }).filter(function (p) { return !filterMand || filterMand === 'Alle' || p.x.mand === filterMand; });
+    return '<div class="list' + (st.auf ? ' offen' : '') + '"><div class="head"><span class="lbl">Objekte · ' + l.length + '</span><button type="button" class="x" data-a="zu" title="Leiste ein-/ausklappen">' + (st.zu ? '»' : '«') + '</button></div>'
+      + '<input class="search" id="suche' + st.k + '" placeholder="Suchen …" aria-label="Objekte suchen">'
+      + l.map(function (p) { return '<div class="item" role="button" tabindex="0" data-obj="' + p.i + '" aria-current="' + (p.i === st.obj) + '"><span class="adr">' + p.x.adr + '</span><span class="sc">' + (st.zu ? '<span class="kz">' + p.x.score + '</span>' : pill(p.x.score)) + '</span><span class="meta">' + p.x.id + ' · ' + eur(p.x.kp) + '</span></div>'; }).join('') + '</div>';
+  }
+  function kpis() {
+    var x = o();
+    return '<div class="kpis">'
+      + '<div class="kpi"><div class="lbl">Bruttomietrendite</div><div class="v">' + pct(x.bmy, 2) + '</div><div class="s">auf Kaufpreis</div></div>'
+      + '<div class="kpi"><div class="lbl">Cashflow v. St.</div><div class="v ' + (x.cf >= 0 ? 'g' : 'r') + '">' + eur(x.cf) + '</div><div class="s">je Monat</div></div>'
+      + '<div class="kpi"><div class="lbl">DSCR</div><div class="v ' + (x.dscr >= 1.2 ? 'g' : x.dscr < 1 ? 'r' : '') + '">' + x.dscr.toFixed(2).replace('.', ',') + '</div><div class="s">Schuldendienstdeckung</div></div>'
+      + '<div class="kpi"><div class="lbl">Deal Score</div><div class="v">' + x.score + '</div><div class="s">' + pill(x.score) + '</div></div></div>';
+  }
+  function inhalt() {
+    var x = o(), t = TABS[st.tab];
+    if (t === 'Finanzierung') return '<div class="panel"><h3>Finanzierung</h3>'
+      + '<div class="kv"><span>Kaufpreis</span><b>' + eur(x.kp) + '</b></div><div class="kv"><span>Nebenkosten & Sanierung</span><b>' + eur(x.gi - x.kp) + '</b></div>'
+      + '<div class="kv sum"><span>Gesamtinvestition</span><b>' + eur(x.gi) + '</b></div><div class="kv"><span>Eigenkapital</span><b>' + eur(x.ek) + '</b></div>'
+      + '<div class="kv"><span>Darlehen I · ' + pct(x.zins, 2) + ' Zins</span><b>' + eur(x.d1) + '</b></div><div class="kv"><span>LTV</span><b>' + pct(x.ltv) + '</b></div></div>';
+    if (t === 'Bewertung') return '<div class="panel"><h3>Deal Score</h3><div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">'
+      + '<div style="font:700 44px/1 var(--f-num)">' + x.score + '</div><div>' + pill(x.score) + '<div class="note" style="margin-top:6px">Rendite, Finanzierung, Risiko, Lage und Potenzial gewichtet — dieselbe Rechnung wie heute.</div></div></div></div>';
+    return '<div class="panel"><h3>Objektdaten</h3><div class="form">'
+      + fld('Straße und Hausnummer', x.adr) + fld('PLZ und Ort', x.ort) + fld('Objektart', x.art) + fld('Wohnfläche', x.wfl + ' m²')
+      + fld('Baujahr', String(x.bj)) + fld('Kaufpreis', eur(x.kp)) + fld('Kaltmiete / Monat', eur(x.nkm)) + fld('Mandant', x.mand) + '</div></div>';
+  }
+  function fld(l, v) { return '<div class="fld"><label>' + l + '</label><div class="in">' + v + '</div></div>'; }
+
+  var R = [
+    function () { return '<div class="app">' + top() + tabs() + '<div class="row">' + liste() + '<div class="main">' + kpis() + inhalt() + '</div></div></div>'; },
+    function () {
+      var M = ['Alle', 'Privat', 'Müller GbR', 'Schneider Holding GmbH'];
+      return '<div class="app">' + top(st.mand !== 'Alle' ? st.mand + ' › ' : '') + '<div class="row"><div class="mand"><div class="lbl" style="padding:4px 6px 8px">Mandanten</div>'
+        + M.map(function (m) { var n = m === 'Alle' ? OBJ.length : OBJ.filter(function (x) { return x.mand === m; }).length; return '<div class="item" role="button" tabindex="0" data-mand="' + m + '" aria-current="' + (st.mand === m) + '"><span class="adr">' + m + '</span><span class="meta">' + n + ' Objekte</span></div>'; }).join('')
+        + '</div>' + liste(st.mand) + '<div class="main" style="padding:0"><div style="padding:0">' + tabs() + '</div><div style="padding:16px;display:flex;flex-direction:column;gap:14px">' + kpis() + inhalt() + '</div></div></div></div>';
+    },
+    function () {
+      var l = OBJ.map(function (x, i) { return { x: x, i: i }; }).sort(function (a, b) { return (b.x[st.sort] || 0) - (a.x[st.sort] || 0); });
+      var sum = OBJ.reduce(function (a, x) { a.kp += x.kp; a.d += x.d1; a.cf += x.cf; return a; }, { kp: 0, d: 0, cf: 0 });
+      return '<div class="app"><div class="top"><span class="logo">Deal<b>Pilot</b></span><span class="crumb"><b>Portfolio</b> · ' + OBJ.length + ' Objekte</span><span class="sp"></span><button type="button" class="x dark">+ Objekt</button></div>'
+        + '<div class="main"><div class="kpis"><div class="kpi"><div class="lbl">Kaufpreise gesamt</div><div class="v">' + eur(sum.kp) + '</div></div><div class="kpi"><div class="lbl">Darlehen gesamt</div><div class="v">' + eur(sum.d) + '</div></div>'
+        + '<div class="kpi"><div class="lbl">Cashflow gesamt</div><div class="v ' + (sum.cf >= 0 ? 'g' : 'r') + '">' + eur(sum.cf) + '</div><div class="s">je Monat</div></div><div class="kpi"><div class="lbl">Ø Deal Score</div><div class="v">' + Math.round(OBJ.reduce(function (a, x) { return a + x.score; }, 0) / OBJ.length) + '</div></div></div>'
+        + '<div style="overflow-x:auto;border:1px solid var(--line);border-radius:10px"><table class="t"><thead><tr><th>Objekt</th><th class="hide-s">Mandant</th><th class="num" data-sort="kp">Kaufpreis ▾</th><th class="num" data-sort="bmy">Rendite</th><th class="num" data-sort="dscr">DSCR</th><th class="num" data-sort="cf">CF/Mon</th><th data-sort="score">Score ▾</th></tr></thead><tbody>'
+        + l.map(function (p) { var x = p.x; return '<tr data-obj="' + p.i + '" style="cursor:pointer"><td><b>' + x.adr + '</b><div class="note">' + x.id + ' · ' + x.art + '</div></td><td class="hide-s">' + x.mand + '</td><td class="num">' + eur(x.kp) + '</td><td class="num">' + pct(x.bmy, 2) + '</td><td class="num">' + x.dscr.toFixed(2).replace('.', ',') + '</td><td class="num" style="color:' + (x.cf >= 0 ? 'var(--green)' : 'var(--red)') + '">' + eur(x.cf) + '</td><td>' + pill(x.score) + '</td></tr>'; }).join('')
+        + '</tbody></table></div><div class="note">Klick auf eine Spaltenüberschrift sortiert, Klick auf eine Zeile öffnet den Deal (Konzept 1).</div></div></div>';
+    },
+    function () {
+      var x = o();
+      return '<div class="app">' + top() + '<div class="row"><div class="mand" style="background:var(--paper)"><div class="lbl" style="padding:4px 8px 8px">Akte · Inhalt</div><nav class="toc">'
+        + TABS.map(function (t, i) { return '<a href="#k' + i + '" data-tab="' + i + '" aria-current="' + (i === st.tab) + '">' + (i + 1) + ' · ' + t + '</a>'; }).join('') + '</nav></div>'
+        + '<div class="main"><div class="doc"><div class="lbl">Objektakte ' + x.id + ' · Stand 19.09.2026</div><h1 style="font-size:22px;margin:6px 0 2px">' + x.adr + '</h1><div class="note">' + x.ort + ' · ' + x.art + ' · Mandant ' + x.mand + '</div>'
+        + '<h2 id="k0">1 · Objekt</h2>' + '<div class="kv"><span>Wohnfläche</span><b>' + x.wfl + ' m²</b></div><div class="kv"><span>Baujahr</span><b>' + x.bj + '</b></div>'
+        + '<h2 id="k1">2 · Investition</h2><div class="kv"><span>Kaufpreis</span><b>' + eur(x.kp) + '</b></div><div class="kv sum"><span>Gesamtinvestition</span><b>' + eur(x.gi) + '</b></div>'
+        + '<h2 id="k3">4 · Finanzierung</h2><div class="kv"><span>Darlehen I</span><b>' + eur(x.d1) + '</b></div><div class="kv"><span>DSCR</span><b>' + x.dscr.toFixed(2).replace('.', ',') + '</b></div>'
+        + '<h2 id="k7">8 · Bewertung</h2><p style="margin:0">' + pill(x.score) + ' — Bruttomietrendite ' + pct(x.bmy, 2) + ', Cashflow ' + eur(x.cf) + ' im Monat.</p></div></div></div></div>';
+    },
+    function () {
+      return '<div class="app" style="font-size:12.5px">' + top() + tabs() + '<div class="row">' + liste() + '<div class="main" style="padding:10px;gap:10px">' + kpis()
+        + '<div class="panel" style="padding:10px 12px"><h3 style="font-size:13px;margin-bottom:8px">Objektdaten · Investition · Finanzierung</h3><div class="form" style="grid-template-columns:repeat(3,minmax(0,1fr));gap:6px 10px">'
+        + fld('Adresse', o().adr) + fld('Objektart', o().art) + fld('Baujahr', String(o().bj)) + fld('Kaufpreis', eur(o().kp)) + fld('Gesamtinvestition', eur(o().gi)) + fld('Eigenkapital', eur(o().ek))
+        + fld('Darlehen I', eur(o().d1)) + fld('Zins', pct(o().zins, 2)) + fld('Kaltmiete', eur(o().nkm)) + '</div><div class="note" style="margin-top:8px">Tastatur: J/K = nächstes/voriges Objekt · 1–9 = Reiter</div></div></div></div></div>';
+    },
+    function () {
+      return '<div class="app' + (st.zu ? ' collapsed' : '') + '">' + top() + tabs() + '<div class="row">' + liste() + '<div class="main">' + kpis() + inhalt() + '</div>'
+        + '<div class="actions"><div class="lbl">Aktionen</div><button type="button" class="x">Investment-PDF (Bank)</button><button type="button" class="x">Marktbericht erstellen</button><button type="button" class="x">Finanzamt-PDF</button><button type="button" class="x">Bankunterlagen</button><div class="note" style="margin-top:auto">Die Leiste links klappt mit « ein — dann bleiben nur die Scores.</div></div></div></div>';
+    }
+  ];
+
+  function zeichne() {
+    document.getElementById('stage').innerHTML = R[st.k]();
+    var k = K[st.k];
+    document.getElementById('idee').innerHTML = '<div><div class="lbl">Konzept ' + (st.k + 1) + ' von 6</div><h2>' + k.n + '</h2><p>' + k.idee + '</p></div>'
+      + '<div class="pro"><h4>Vorteile</h4><ul>' + k.pro.map(function (p) { return '<li>' + p + '</li>'; }).join('') + '</ul></div>'
+      + '<div class="con"><h4>Nachteile</h4><ul>' + k.con.map(function (p) { return '<li>' + p + '</li>'; }).join('') + '</ul></div>';
+    Array.prototype.forEach.call(document.querySelectorAll('#konzepte button'), function (b, i) { b.setAttribute('aria-pressed', String(i === st.k)); });
+  }
+  document.getElementById('konzepte').innerHTML = K.map(function (k, i) { return '<button type="button" data-k="' + i + '" aria-pressed="false">' + (i + 1) + ' ' + k.kurz + '</button>'; }).join('');
+  document.getElementById('konzepte').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; st.k = +b.dataset.k; st.auf = false; zeichne(); });
+  document.getElementById('groesse').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    document.getElementById('frame').setAttribute('data-w', b.dataset.w);
+    Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+  });
+  document.getElementById('stage').addEventListener('click', function (e) {
+    var t = e.target.closest('[data-obj],[data-tab],[data-a],[data-mand],[data-sort]'); if (!t) return;
+    if (t.dataset.sort) { st.sort = t.dataset.sort; zeichne(); return; }
+    if (t.dataset.obj != null) { st.obj = +t.dataset.obj; st.auf = false; if (st.k === 2) st.k = 0; zeichne(); return; }
+    if (t.dataset.tab != null) { e.preventDefault(); st.tab = +t.dataset.tab; zeichne(); return; }
+    if (t.dataset.mand) { st.mand = t.dataset.mand; var f = OBJ.findIndex(function (x) { return st.mand === 'Alle' || x.mand === st.mand; }); if (f >= 0) st.obj = f; zeichne(); return; }
+    if (t.dataset.a === 'zu') { st.zu = !st.zu; if (st.k !== 5) st.zu = false; zeichne(); return; }
+    if (t.dataset.a === 'liste') { st.auf = !st.auf; zeichne(); }
+  });
+  document.getElementById('stage').addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-obj],[data-mand]')) { e.preventDefault(); e.target.click(); } });
+  document.addEventListener('keydown', function (e) {
+    if (st.k !== 4 || /input|textarea/i.test(e.target.tagName)) return;
+    if (e.key === 'j') { st.obj = (st.obj + 1) % OBJ.length; zeichne(); } else if (e.key === 'k') { st.obj = (st.obj + OBJ.length - 1) % OBJ.length; zeichne(); }
+    else if (/^[1-9]$/.test(e.key)) { st.tab = +e.key - 1; zeichne(); }
+  });
+  st.k = 5; zeichne();
+})();
+</script>
