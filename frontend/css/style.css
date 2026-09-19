@@ -37795,3 +37795,53 @@ html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card 
    im #sb-list auf 29px, Adresse und Preis liefen in die naechste Zeile. */
 html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card, html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-top { flex:0 0 auto !important; }
 /* === /v1449 === */
+
+/* ═══ v1453 · HELLES PROFIL: SCHRIFT IN TINTE, GOLD NUR ALS AKZENT ═══════
+   Marcel 19.09.2026: „in den Schriften zu viel Gold … mehr Schwarz als
+   Schrift, wirkt alles zu hell". Gemessen im Profil kanzlei: 211 Textstellen
+   in 75 Klassen trugen Gold (Kartentitel #9A7F33, Reiter #C9A84C, Betraege
+   .c-gold, Etiketten, Links), Kartenraender goldgetoent. Gold auf Creme hat
+   zu wenig Kontrast und nimmt dem Akzent die Wirkung.
+   Regel ab hier fuer alle hellen Vorlagen (ui-varianten.js HELLE):
+     Schrift    Tinte #1A1714, Nebenschrift #3B352D, Beschriftung #5C554B
+     Gold       nur Akzent: aktiver Reiter (Unterstrich), Symbolkaesten,
+                Titelstrich, Score-Ring, Hauptknoepfe, Logo
+     Statusfarben (Gruen/Rot, kpi-eval-*) bleiben unberuehrt.
+   Dunkle Bauteile (Boarding-Pass, Konditionen-Karte) sind nicht betroffen:
+   hier werden nur benannte Klassen angesprochen, keine Sammelregel. */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body{
+  --dp-ink:#1A1714; --dp-ink-2:#3B352D; --dp-ink-lbl:#5C554B;
+}
+/* Kartentitel und Abschnittstitel */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(.ct,.card-title,.dab-ct,.dab-req-t,.dpsh-sectitle,.cf-phase-title,.dp-kg-h,summary.ai-pdf-sections-h){
+  color:#1A1714 !important; font-weight:600 !important;
+}
+/* Betraege und Kennzahlen, die bisher gold geschrieben wurden */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(.c-gold,.kv-v.c-gold,.total-val,.sc-pill-v,.ds2-metric-score,.sbcm-val,#mr-ek-pct,#vN-rate-var,#vN-rate-N,#dp-hy-kpi b){
+  color:#1A1714 !important;
+}
+/* Reiter: inaktiv Beschriftungsgrau, aktiv Tinte mit goldenem Unterstrich */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .tab{ color:#5C554B !important; }
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .tab .tab-lbl{ color:#5C554B !important; }
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .tab.active,
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .tab.active .tab-lbl{ color:#1A1714 !important; font-weight:600 !important; }
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .tab.active{ border-bottom-color:var(--wl-c9a84c, #C9A84C) !important; }
+/* Etiketten und kleine Marken: dunkle Schrift auf neutralem Grund */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(.ds2-tag,.sbc-ds2-hint,.badge,.dab-bp-tag,.dab-bp-adbadge,.mrpf-top-label,.dpsh-stublabel,.dpsh-sub,.sb-act-l,.sb-neu-lbl,.sb-neu-sr,.bsheet-tile-l,.sc-tip,.dab-req-fix){
+  color:#3B352D !important;
+}
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(.ds2-tag,.sbc-ds2-hint,.dab-bp-tag,.badge){
+  background:#F2EFE9 !important; border-color:#DDD7CC !important;
+}
+/* Verweise: Tinte, der Akzent sitzt im Unterstrich */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(.main-col a:not(.btn),a.v842-tax-link,a.dab-bp-web,.sb-add-new){
+  color:#1A1714 !important; text-decoration:underline; text-decoration-color:var(--wl-c9a84c, #C9A84C); text-underline-offset:3px;
+}
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .sb-add-new{ text-decoration:none; }
+/* Hinweistexte, die gold geschrieben waren (Neubau-Hinweis) */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(.v234-neubau-banner,.v234-neubau-banner strong,.v234-neubau-banner em){ color:#3B352D !important; }
+/* Beschriftungen einen Ton dunkler, Kartenraender neutral statt goldgetoent */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .f label{ color:#4A443C !important; }
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .card{ border-color:rgba(26,23,20,.10) !important; }
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(input,select,textarea):not([type="checkbox"]):not([type="radio"]){ border-color:#D6D0C5 !important; }
+/* === /v1453 === */
