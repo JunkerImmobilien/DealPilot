@@ -2076,7 +2076,12 @@ function _calcImmediate(){
   } catch (e) { /* eine Kennzahl darf die Seite nie anhalten */ }
   // PE-Definition als Alternative behalten für Vergleich:
   var em_pe = ekv > 0 ? (Math.max(0,cfkum)+Math.max(0,net_exit))/ekv : 0;
-  var ekr=ekv>0?cf_ns/ekv*100:0;
+  /* v1442 · Marcels Entscheidung 19.09.2026: EK-Rendite VOR Steuern - wie DealKpis
+     (Quick Check, Sprechlauf). Bisher cf_ns (nach Steuern): dasselbe Objekt bekam
+     in der Haupt-App 20,58 %, im Quick Check 29,65 % (QA 19 Teil 2). Nach Steuern
+     bleibt als eigene Kennzahl ekr_ns erhalten. */
+  var ekr=ekv>0?cf_op/ekv*100:0;
+  var ekr_ns=ekv>0?cf_ns/ekv*100:0;
   // EZB = Ende der Zinsbindung — V63.61: Werte AM Ende der Zinsbindung (nach `bindj` vollen
   // Jahren), nicht im letzten Bindungsjahr (bindj-1). Das war ein Off-by-One-Fehler:
   // - Tabelle 'Cashflow-Projektion' zeigt Zeile bindj mit den 'EZB'-Werten
@@ -2584,7 +2589,7 @@ function _calcImmediate(){
      Prozent zurück) und darf NULL sein — „nicht bestimmbar" ist etwas
      anderes als „null Prozent". Jeder Leser muss auf Abwesenheit prüfen,
      bevor er rechnet: Number(null) ist 0 und besteht Number.isFinite. */
-  State.kpis={bmy:bmy,nmy:nmy,fak:fak,em:em,em_pe:em_pe,ekr:ekr,
+  State.kpis={bmy:bmy,nmy:nmy,fak:fak,em:em,em_pe:em_pe,ekr:ekr,ekr_ns:ekr_ns,
     irr:irr,be_cf:be.cf,be_kum:be.kum,be_kum_ek:be.kumEk,dscr:dscr,dscr_netto:dscr_netto,noi_dscr:noi_dscr,kd_dscr:kd_dscr,ltv:ltv,cf_op:cf_op,cf_ns:cf_ns,cf_m:cf_m,cf_ezb:cf_ezb,cf_op_ezb:cf_op_ezb,cf_ns_ezb:cf_ns_ezb,zins_ezb:zins_ezb,tilg_ezb:tilg_ezb,bspar_ezb:bspar_y_ezb,bwk_ezb:bwk_ezb,wm_ezb:wm_ezb,nkm_ezb:nkm_ezb,bwk_cf_ezb:bwk_cf_ezb,ster_ezb:ster_ezb,afa_ezb:afa,cf_op_an:cf_op_an,cf_ns_an:cf_ns_an,zins_an:zins_an,tilg_an:tilg_an,bspar_an:bspar_y_an,wm_an:wm_an,bwk_an:bwk_an,nkm_an:nkm_an,bwk_cf_an:bwk_cf_an,rate_an_m:rate_an_m,ster_an:ster_an,exit_vkp:exit_vkp,wm_j:wm_j,nkm_j:nkm_j,bwk:bwk,bwk_cf:bwk_cf,zins_j:zins_j,tilg_j:tilg_j,bspar_j:bspar_y,steuer:steuer,afa:afa,zve_immo:zve_immo,zaer_m:zaer_m,zaer_pct:zaer_pct,wp_kpi:wp_kpi,d1:d1,ek:ekv,gi:gi,kp:kp,bwk_ul:ul,bwk_nul:nul,d1z_pct:d1z*100,d1t_pct:d1t*100,d1IsAussetzung:_d1IsAussetzung};
 
   // V258-07: WK-Snapshot + andere Objekte beruecksichtigen

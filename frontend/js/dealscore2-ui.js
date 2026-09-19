@@ -52,7 +52,7 @@ function _buildDeal2FromState() {
       deal._cocReason = 'vollfinanzierung_neutral';
     }
   } else if (k.ekr != null && isFinite(k.ekr) && ekV108 > 0) {
-    // Normalfall: aus State.kpis.ekr (= cf_ns / ek * 100)
+    // Normalfall: aus State.kpis.ekr (= cf_op / ek * 100, VOR Steuern seit v1442)
     deal.cashOnCash = k.ekr;
   } else {
     // Fallback: aus CF und EK selbst rechnen

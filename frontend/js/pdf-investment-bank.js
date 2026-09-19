@@ -185,7 +185,7 @@
       ['Cashflow vor Steuern', eur(K.cf_m), 'je Monat'],
       ['DSCR', zahl(K.dscr, 2), ''],
       ['LTV', pct(K.ltv, 1), S.ltv_basis_label ? 'auf ' + S.ltv_basis_label : ''],
-      ['EK-Rendite', pct(K.ekr, 2), 'p. a.'],
+      ['EK-Rendite', pct(K.ekr, 2), 'p. a., vor Steuern'],
       ['Interner Zinsfuß (IRR)', da(K.irr) === null ? 'nicht bestimmbar' : pct(K.irr, 2), ''],
       ['Kaltmiete', rows[0] ? eur(rows[0].nkm_y) : '—', 'im ersten Jahr']
     ]);

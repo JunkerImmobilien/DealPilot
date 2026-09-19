@@ -442,7 +442,7 @@
     },
     'tab8.ek_rendite': {
       title: 'EK-Rendite (Eigenkapital-Rendite)',
-      body: 'Cashflow nach Steuern ÷ eingesetztes Eigenkapital. Bei 100%-Finanzierung mit nur Kaufnebenkosten als EK: oft 20%+ (Leverage-Effekt). Bei viel EK: niedriger, dafür sicherer. ∞ bei 0 € EK = maximaler Hebel.',
+      body: 'Cashflow vor Steuern (nach Zins und Tilgung) ÷ eingesetztes Eigenkapital — so vergleichbar zwischen Anlegern mit verschiedenem Steuersatz. Bei 100%-Finanzierung mit nur Kaufnebenkosten als EK: oft 20%+ (Leverage-Effekt). Bei viel EK: niedriger, dafür sicherer. ∞ bei 0 € EK = maximaler Hebel.',
       severity: 'pro'
     },
     'tab8.equity_multiple': {

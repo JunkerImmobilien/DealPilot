@@ -1241,7 +1241,7 @@ async function _exportPDFInner() {
     ['Bruttomietrendite',    pP(K.bmy)],
     ['Nettomietrendite',     pP(K.nmy)],
     ['Faktor (KP/NKM)',      pN(K.fak, 1)],
-    ['EK-Rendite p.a.',      pP(K.ekr, 1)],
+    ['EK-Rendite p.a. (v. St.)', pP(K.ekr, 1)],
     ['Equity Multiple',      pN(K.em, 1) + 'x'],
     ['DSCR',                 pN(K.dscr, 2)],
     ['LTV',                  pP(K.ltv, 1)],
