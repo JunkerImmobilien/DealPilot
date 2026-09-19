@@ -17227,4 +17227,4 @@ das Profil beim Neuladen zurück) und war ungültig; zwei Sammelregeln setzten S
 Grund auf Tinte (Banner-Telefon, Kontingent) — gefunden über eine Kontrastmessung, nicht über die
 Farbsuche. Das Messwerkzeug las `color(srgb …)` als fast schwarz und übersah so Goldschrift.
 
-**Rest:** `#hdr-obj-num` und `.sbc-date` verlieren noch gegen eine ID-Regel (kosmetisch). Nicht auf Prod.
+**Nachtrag v1453d** (`57c9c84`): `#hdr-obj-num` und `.sbc-date` nachgezogen, gemessen #3B352D / #6A6358. Partner-Logos im Boarding-Pass bleiben (Marcel 19.09.2026). Nicht auf Prod.
