@@ -176,6 +176,8 @@ function collectData() {
   /* v1433: Eigenkapital = Kaufnebenkosten */
   var ekNk = document.getElementById('ek_ist_nk');
   if (ekNk) d['_ek_ist_nk'] = ekNk.checked;
+  /* v1448: Einheitenliste des Mehrfamilienhauses (mfh-einheiten.js) */
+  if (window._dpMfh && window._dpMfh.einheiten && window._dpMfh.einheiten.length) d._mfh = window._dpMfh;
   // V63.99: Küche-im-Kaufpreis-Checkbox
   /* V291.1-storage-cleanup: kueche_im_kp-Checkbox entfernt — kein Save mehr nötig */
   // BWK mode
@@ -380,6 +382,8 @@ function loadData(d) {
      nicht - dann AUS, sonst erbte ein geladenes Objekt den Haken des vorigen. */
   var ekNkL = document.getElementById('ek_ist_nk');
   if (ekNkL) ekNkL.checked = !!d._ek_ist_nk;
+  /* v1448: Einheitenliste - fehlt sie, ist sie leer (sonst erbte das Objekt die des vorigen) */
+  window._dpMfh = (d._mfh && Array.isArray(d._mfh.einheiten)) ? d._mfh : null;
   // V23: Mietentwicklungs-Toggle wiederherstellen
   if (d._me_inc_ze !== undefined) {
     var meCb = document.getElementById('me_inc_ze');
