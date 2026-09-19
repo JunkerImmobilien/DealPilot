@@ -37790,4 +37790,8 @@ html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card 
 html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card.deal-won { border-left:3px solid #2E8A57 !important; }
 html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card.active { background:#F5EDD8 !important; border-color:#E4D6AE !important; }
 html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-top-line1 { min-height:0 !important; }
+/* v1449c · FALLEN/CLAUDE.md: Flex-Kinder in overflow:auto-Containern schrumpfen statt
+   zu scrollen. min-height:0 oben hob die bisherige Sperre auf - die Karten schrumpften
+   im #sb-list auf 29px, Adresse und Preis liefen in die naechste Zeile. */
+html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card, html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-top { flex:0 0 auto !important; }
 /* === /v1449 === */
