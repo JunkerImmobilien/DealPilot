@@ -17228,3 +17228,10 @@ Grund auf Tinte (Banner-Telefon, Kontingent) — gefunden über eine Kontrastmes
 Farbsuche. Das Messwerkzeug las `color(srgb …)` als fast schwarz und übersah so Goldschrift.
 
 **Nachtrag v1453d** (`57c9c84`): `#hdr-obj-num` und `.sbc-date` nachgezogen, gemessen #3B352D / #6A6358. Partner-Logos im Boarding-Pass bleiben (Marcel 19.09.2026). Nicht auf Prod.
+
+**PROD-Rollout 19.09.2026 (3) — v1449 bis v1453d** (Marcel: „roll v1449 bis v1453d auf Prod aus“).
+main per fast-forward auf `001aaf8` (16 Commits, nur Frontend und Doku — kein Neubau, keine Migration).
+Vorher gesichert und angesehen: `haupt-20260919-1403.sql.gz` (11 MB, 63 Tabellen), `mb-20260919-1403.sql.gz`
+(744 KB, 33 Tabellen). Nachweis: Fingerabdruck Prod = Staging (`773ebb8cd5b0`), Gold-Audit RC=0, Backend healthy,
+Seite und neue Module 200; im Browser auf app.dealpilot.immo: style.css v1453d, DpAfaEigen mit Option „eigen“,
+DpMfhEinheiten.istSoll, hybrid-aktionen.js geladen, san_ust gekürzt.
