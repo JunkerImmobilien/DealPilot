@@ -21,6 +21,18 @@
 
    Das alte Investment-PDF (pdf.js, exportPDF) bleibt unverändert. Diese
    Fassung läuft daneben: window.exportPDFBank().
+
+   v1460 (Marcel 20.09.2026: „die anderen Sachen aus dem jetzigen PDF müssen
+   auch drauf, nur in diesem Design"): die Bankfassung trägt jetzt ALLE
+   Blöcke des alten Investment-PDFs —
+     Deal Score · Ertragsrechnung (Warmmiete bis Cashflow nach Steuern) ·
+     Bewirtschaftung umlagefähig / nicht umlagefähig · drei Phasen (Heute,
+     Ende Zinsbindung, Anschluss) · Zinsänderungsrisiko · Cashflow-Jahre ·
+     Vermögensaufbau als Kurve (Wert, Restschuld, Eigenkapital) ·
+     Einheiten beim Mehrfamilienhaus · Annahmen und Hinweise.
+   Weiter gilt: DIESE DATEI RECHNET NICHTS. Der Score kommt aus dem
+   Rechenkern DealScore.computeFromKpis(), die Phasen aus State.kpis
+   (…_ezb, …_an), die Jahre aus State.cfRows.
    ════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -132,6 +144,81 @@
       });
       y += Math.ceil(items.length / 3) * (bh + sp) + 4;
     }
+    /* Tabelle im selben Strich wie die Zeilen: Haarlinien, Kopf in Gold. */
+    function tabelle(spalten, zeilen, o) {
+      o = o || {};
+      var fak = CW / spalten.reduce(function (a, s) { return a + s[1]; }, 0);
+      function tz(werte, kopfzeile, fett) {
+        var x = L;
+        doc.setFont('helvetica', (kopfzeile || fett) ? 'bold' : 'normal'); doc.setFontSize(kopfzeile ? 7.4 : 8.4);
+        doc.setTextColor(kopfzeile ? 110 : (fett ? 26 : 45));
+        werte.forEach(function (w, i) {
+          var bw = spalten[i][1] * fak;
+          if (i === 0 || spalten[i][2] === 'l') doc.text(String(w), x, y);
+          else doc.text(String(w), x + bw - 1, y, { align: 'right' });
+          x += bw;
+        });
+        doc.setDrawColor(kopfzeile ? G[0] : 236, kopfzeile ? G[1] : 232, kopfzeile ? G[2] : 223);
+        doc.setLineWidth(kopfzeile ? 0.5 : 0.15); doc.line(L, y + 2.2, W - R, y + 2.2); doc.setLineWidth(0.2);
+        y += kopfzeile ? 7 : 6.2;
+      }
+      tz(spalten.map(function (s) { return s[0]; }), true);
+      zeilen.forEach(function (z) {
+        if (y > H - 28) { doc.addPage(); kopf(o.titel || 'Investment Case', 'Fortsetzung'); tz(spalten.map(function (s) { return s[0]; }), true); }
+        tz(z.werte || z, false, !!z.fett);
+      });
+      if (o.hinweis) { doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130); doc.text(o.hinweis, L, y + 1); y += 5; }
+      y += 4;
+    }
+
+    /* Kurve: Vermoegensaufbau. Bewusst ohne Farbflaechen — zwei Linien,
+       Gold fuer den Wert, Tinte fuer die Restschuld, Raster in Grau. */
+    function kurve(reihen, jahre, o) {
+      o = o || {};
+      var hoehe = o.hoehe || 52, bx = L + 20, bw = CW - 20, by = y, bh = hoehe;
+      var alle = reihen.reduce(function (a, r) { return a.concat(r.werte); }, []).filter(function (n) { return isFinite(n); });
+      if (!alle.length || jahre.length < 2) return;
+      var max = Math.max.apply(null, alle), min = Math.min(0, Math.min.apply(null, alle));
+      var sp = max - min || 1;
+      function px(i) { return bx + (bw * i) / (jahre.length - 1); }
+      function py(v) { return by + bh - ((v - min) / sp) * bh; }
+      /* Raster und Achsenbeschriftung */
+      doc.setDrawColor(236, 232, 223); doc.setLineWidth(0.15);
+      for (var t = 0; t <= 4; t++) {
+        var wert = min + (sp * t) / 4, yy = py(wert);
+        doc.line(bx, yy, bx + bw, yy);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4); doc.setTextColor(140);
+        doc.text(zahl(Math.round(wert / 1000)) + 'k', bx - 2, yy + 1.6, { align: 'right' });
+      }
+      reihen.forEach(function (r) {
+        var f = r.gold ? GD : (r.grau ? [150, 145, 135] : [40, 40, 40]);
+        doc.setDrawColor(f[0], f[1], f[2]); doc.setLineWidth(r.gold ? 0.7 : 0.5);
+        for (var i = 1; i < r.werte.length; i++) {
+          if (!isFinite(r.werte[i - 1]) || !isFinite(r.werte[i])) continue;
+          doc.line(px(i - 1), py(r.werte[i - 1]), px(i), py(r.werte[i]));
+        }
+      });
+      doc.setLineWidth(0.2);
+      /* Jahreszahlen: nie durch Intl (CLAUDE.md) */
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4); doc.setTextColor(140);
+      jahre.forEach(function (j, i) {
+        if (jahre.length > 12 && i % 2) return;
+        doc.text(String(j), px(i), by + bh + 4, { align: 'center' });
+      });
+      y = by + bh + 8;
+      /* Legende */
+      var lx = bx;
+      reihen.forEach(function (r) {
+        var f = r.gold ? GD : (r.grau ? [150, 145, 135] : [40, 40, 40]);
+        doc.setDrawColor(f[0], f[1], f[2]); doc.setLineWidth(r.gold ? 0.7 : 0.5);
+        doc.line(lx, y - 1.2, lx + 6, y - 1.2); doc.setLineWidth(0.2);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(7.4); doc.setTextColor(90);
+        doc.text(r.name, lx + 8, y);
+        lx += 8 + doc.getTextWidth(r.name) + 10;
+      });
+      y += 8;
+    }
+
     function fuss() {
       var n = doc.getNumberOfPages();
       for (var p = 1; p <= n; p++) {
@@ -178,6 +265,9 @@
     y += 1;
 
     abschnitt('Kennzahlen');
+    /* Score aus dem Rechenkern — nicht aus der Oberflaeche gelesen. */
+    var SC = null;
+    try { if (window.DealScore && typeof window.DealScore.computeFromKpis === 'function') SC = window.DealScore.computeFromKpis(K); } catch (e) {}
     raster([
       ['Bruttomietrendite', pct(K.bmy, 2), 'auf Kaufpreis'],
       ['Nettomietrendite', pct(K.nmy, 2), 'auf Gesamtinvest.'],
@@ -187,8 +277,79 @@
       ['LTV', pct(K.ltv, 1), S.ltv_basis_label ? 'auf ' + S.ltv_basis_label : ''],
       ['EK-Rendite', pct(K.ekr, 2), 'p. a., vor Steuern'],
       ['Interner Zinsfuß (IRR)', da(K.irr) === null ? 'nicht bestimmbar' : pct(K.irr, 2), ''],
-      ['Kaltmiete', rows[0] ? eur(rows[0].nkm_y) : '—', 'im ersten Jahr']
+      ['Kaltmiete', rows[0] ? eur(rows[0].nkm_y) : '—', 'im ersten Jahr'],
+      ['Equity Multiple', da(K.em) === null ? '—' : zahl(K.em, 1) + 'x', 'über die Haltedauer'],
+      ['Wertpuffer / Equity', eur(K.wp_kpi), 'heute'],
+      ['Deal Score', (SC && SC.score) ? zahl(SC.score, 0) + ' / 100' : '—', (SC && SC.label) ? SC.label : '']
     ]);
+
+    /* ── Ertragsrechnung ─────────────────────────────────────── */
+    doc.addPage();
+    kopf('Ertrag und Cashflow', (adr || 'Objekt') + ' · laufendes Jahr');
+
+    abschnitt('Von der Warmmiete zum Cashflow');
+    zeile('Warmmiete / Jahr (Kaltmiete und Umlagen)', eur(K.wm_j));
+    zeile('abzüglich umlagefähiger Bewirtschaftung', da(K.bwk_ul) === null ? '—' : '− ' + eur(K.bwk_ul), { einzug: true });
+    zeile('Kaltmiete / Jahr (netto, inkl. Zuschläge)', eur(K.nkm_j), { fett: true });
+    zeile('abzüglich nicht umlagefähiger Bewirtschaftung', da(K.bwk_cf) === null ? '—' : '− ' + eur(K.bwk_cf), { einzug: true });
+    zeile('Betriebsergebnis (NOI)', da(K.nkm_j) === null ? '—' : eur(K.nkm_j - (K.bwk_cf || 0)), { fett: true });
+    zeile('abzüglich Zinsen', da(K.zins_j) === null ? '—' : '− ' + eur(K.zins_j), { einzug: true });
+    if (da(K.bspar_j) && K.bspar_j > 0) zeile('abzüglich Bausparrate', '− ' + eur(K.bspar_j), { einzug: true });
+    zeile('abzüglich Tilgung', da(K.tilg_j) === null ? '—' : '− ' + eur(K.tilg_j), { einzug: true });
+    zeile('Cashflow vor Steuern / Jahr', eur(K.cf_op), { summe: true });
+    zeile('Steuern (Belastung −, Erstattung +)', da(K.steuer) === null ? '—' : (K.steuer < 0 ? '+ ' : '− ') + eur(Math.abs(K.steuer)), { einzug: true });
+    zeile('Cashflow nach Steuern / Jahr', eur(K.cf_ns), { summe: true });
+    zeile('Cashflow nach Steuern / Monat', da(K.cf_ns) === null ? '—' : eur(K.cf_ns / 12, 2), { fett: true });
+    y += 2;
+
+    abschnitt('Bewirtschaftung');
+    zeile('Hausgeld umlagefähig / Jahr', eur(num('hg_ul')));
+    zeile('Grundsteuer / Jahr', eur(num('grundsteuer')));
+    if (num('ul_sonst')) zeile('Sonstiges umlagefähig', eur(num('ul_sonst')));
+    zeile('Summe umlagefähig (durchlaufend)', eur(K.bwk_ul), { fett: true });
+    zeile('Hausgeld nicht umlagefähig / Jahr', eur(num('hg_nul')));
+    if (num('weg_r')) zeile('WEG-Rücklage / Jahr (nachrichtlich)', eur(num('weg_r')), { klein: true });
+    if (num('eigen_r')) zeile('Eigene Instandhaltungsrücklage', eur(num('eigen_r')));
+    if (num('mietausfall')) zeile('Kalkulatorischer Mietausfall', eur(num('mietausfall')));
+    zeile('Summe nicht umlagefähig (im Cashflow)', eur(K.bwk_cf), { summe: true });
+    y += 2;
+
+    abschnitt('Steuerliche Wirkung');
+    zeile('Abschreibung (AfA) / Jahr', eur(K.afa));
+    zeile('Zu versteuerndes Ergebnis', eur(K.zve_immo));
+    zeile('Persönlicher Grenzsteuersatz', num('grenz') !== null ? pct(num('grenz'), 2) : '—');
+
+    /* ── Drei Phasen ─────────────────────────────────────────── */
+    var bindj = num('d1_bindj');
+    var hatPhasen = da(K.cf_ns_ezb) !== null || da(K.cf_ns_an) !== null;
+    if (hatPhasen) {
+      doc.addPage();
+      kopf('Drei Phasen', 'Heute · Ende der Zinsbindung' + (bindj ? ' (nach ' + zahl(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung');
+
+      abschnitt('Cashflow je Phase');
+      function ph(label, a, b, c) { return { werte: [label, a, b, c] }; }
+      tabelle(
+        [['', 46], ['Heute', 26], ['Ende Zinsbindung', 30], ['Anschluss', 26]],
+        [
+          ph('Warmmiete / Jahr', eur(K.wm_j), eur(K.wm_ezb), eur(K.wm_an)),
+          ph('Bewirtschaftung (nicht umlagef.)', eur(K.bwk_cf), eur(K.bwk_cf_ezb), eur(K.bwk_cf_an)),
+          ph('Zinsen', eur(K.zins_j), eur(K.zins_ezb), eur(K.zins_an)),
+          ph('Tilgung', eur(K.tilg_j), eur(K.tilg_ezb), eur(K.tilg_an)),
+          ph('Steuern', eur(K.steuer), eur(K.ster_ezb), eur(K.ster_an)),
+          { werte: ['Cashflow vor Steuern', eur(K.cf_op), eur(K.cf_op_ezb), eur(K.cf_op_an)], fett: true },
+          { werte: ['Cashflow nach Steuern', eur(K.cf_ns), eur(K.cf_ns_ezb), eur(K.cf_ns_an)], fett: true },
+          { werte: ['Cashflow nach Steuern / Monat', eur((K.cf_ns || 0) / 12, 2), eur((K.cf_ns_ezb || 0) / 12, 2), eur((K.cf_ns_an || 0) / 12, 2)], fett: true }
+        ],
+        { titel: 'Drei Phasen', hinweis: 'Ende Zinsbindung: mit fortgeschriebener Miete und dem dann erreichten Tilgungsstand. Anschluss: mit dem angenommenen Anschlusszins.' });
+
+      abschnitt('Zinsänderungsrisiko');
+      zeile('Zinsbindung', bindj !== null ? zahl(bindj) + ' Jahre' : '—');
+      zeile('Restschuld am Ende der Zinsbindung', eur(S.rs));
+      zeile('Angenommener Anschlusszins / Tilgung', [pct(num('anschl_z'), 2), pct(num('anschl_t'), 2)].join('  ·  '));
+      zeile('Rate nach Anschluss / Monat', eur(K.rate_an_m, 2));
+      zeile('Mehrbelastung gegenüber heute / Monat', eur(K.zaer_m, 2), { summe: true });
+      if (da(K.zaer_pct) !== null) zeile('Das entspricht einer Veränderung von', pct(K.zaer_pct, 1), { klein: true });
+    }
 
     /* ── Seite 2 ─────────────────────────────────────────────── */
     doc.addPage();
@@ -219,6 +380,24 @@
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
       doc.text('Beträge in Euro je Jahr. CF v. St. = Cashflow vor Steuern (Kaltmiete - Bewirtschaftung - Zins - Tilgung).', L, y + 1);
       y += 10;
+    }
+
+    /* ── Vermögensaufbau ─────────────────────────────────────── */
+    if (rows.length > 2) {
+      if (y > H - 110) { doc.addPage(); kopf('Vermögensaufbau', (adr || 'Objekt') + ' · Wert, Restschuld und Eigenkapital'); }
+      else { abschnitt('Vermögensaufbau'); }
+      var jahre = rows.map(function (r) { return r.cal || r.y; });
+      kurve([
+        { name: 'Objektwert (angenommen)', werte: rows.map(function (r) { return Number(r.wert_y); }), gold: true },
+        { name: 'Restschuld', werte: rows.map(function (r) { return Number(r.rs); }) },
+        { name: 'Eigenkapital im Objekt', werte: rows.map(function (r) { return Number(r.eq_y); }), grau: true }
+      ], jahre, { hoehe: 52 });
+      var l = rows[rows.length - 1];
+      zeile('Eigenkapital heute', eur(rows[0] ? rows[0].eq_y : null));
+      zeile('Eigenkapital nach ' + jahre.length + ' Jahren', eur(l ? l.eq_y : null), { summe: true });
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
+      doc.text('Der Objektwert ist eine Annahme aus der hinterlegten Wertsteigerung, keine Bewertung nach § 194 BauGB.', L, y - 1);
+      y += 6;
     }
 
     /* ── v1458 · Mieterliste und Ist/Soll (nur wenn Einheiten erfasst sind) ──
@@ -278,6 +457,18 @@
       doc.splitTextToSize(hin, CW).forEach(function (t) { doc.text(t, L, y); y += 4.2; });
       y += 6;
     }
+
+    if (y > H - 80) { doc.addPage(); kopf('Annahmen und Hinweise', (adr || 'Objekt')); }
+    abschnitt('Annahmen');
+    zeile('Mietsteigerung p. a.', num('mietstg') !== null ? pct(num('mietstg'), 1) : '—');
+    zeile('Kostensteigerung p. a.', num('kostenstg') !== null ? pct(num('kostenstg'), 1) : '—');
+    zeile('Wertsteigerung p. a.', num('wertstg') !== null ? pct(num('wertstg'), 1) : '—');
+    zeile('Betrachtungszeitraum', S.btj ? zahl(S.btj) + ' Jahre' : '—');
+    zeile('Anschlusszins / Anschlusstilgung (Annahme)', [pct(num('anschl_z'), 2), pct(num('anschl_t'), 2)].join('  ·  '));
+    zeile('Persönlicher Grenzsteuersatz', num('grenz') !== null ? pct(num('grenz'), 2) : '—');
+    if (K.d1IsAussetzung) zeile('Darlehenstyp', 'Tilgungsaussetzung mit Bausparvertrag');
+    if (num('bspar_rate')) zeile('Bausparrate / Monat', eur(num('bspar_rate')));
+    y += 2;
 
     abschnitt('Grundlagen und Hinweise');
     doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(60);
