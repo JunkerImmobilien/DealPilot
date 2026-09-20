@@ -68,7 +68,36 @@ window.MietEntwicklung = (function() {
    * Im Detail-Modus: Treppen-Faktor, nach jeder Erhöhung springt der Wert.
    * Im Prognose-Modus: (1+mstg)^y.
    */
+  /* v1457 · Sprung auf die Soll-Miete (MFH-Konfigurator, Backlog v22 Punkt 6).
+     Sind Einheiten mit Soll-Miete erfasst UND ein Jahr gesetzt, wirkt ab
+     diesem Jahr zusaetzlich der Faktor Soll ÷ Ist. Die normale Steigerung
+     laeuft davor und danach unveraendert weiter — der Sprung ist ein
+     EINMALIGER Aufschlag, keine zweite Steigerungsreihe.
+     Der Faktor wird hier gebildet, damit calc.js, Cashflow und Exit alle
+     dieselbe Kurve sehen (calc liest ausschliesslich MietEntwicklung.factor). */
+  function sollSprung() {
+    var d = window._dpMfh;
+    if (!d || !Array.isArray(d.einheiten) || !d.einheiten.length) return null;
+    var jahr = Math.round(Number(d.sollAbJahr) || 0);
+    if (!(jahr > 0)) return null;
+    function z(v) { if (v == null || String(v).trim() === '') return 0; var n = (typeof window.parseDe === 'function') ? window.parseDe(String(v)) : parseFloat(String(v).replace(/\./g, '').replace(',', '.')); return isFinite(n) ? n : 0; }
+    var ist = 0, soll = 0;
+    d.einheiten.forEach(function (e) {
+      if (e.status !== 'leer') ist += z(e.ist);
+      soll += z(e.soll) || z(e.ist);
+    });
+    if (!(ist > 0) || !(soll > ist)) return null;
+    return { jahr: jahr, faktor: soll / ist, ist: ist, soll: soll };
+  }
+
   function factor(y) {
+    if (y <= 0) return 1.0;
+    var _s = sollSprung();
+    var _auf = (_s && y >= _s.jahr) ? _s.faktor : 1.0;
+    if (_auf !== 1.0) return _basisFaktor(y) * _auf;
+    return _basisFaktor(y);
+  }
+  function _basisFaktor(y) {
     if (y <= 0) return 1.0;
     var mode = getMode();
     if (mode === 'prog') {
@@ -269,6 +298,7 @@ window.MietEntwicklung = (function() {
     getMode: getMode,
     setMode: setMode,
     appliesToZE: appliesToZE,
+    sollSprung: sollSprung,
     setAppliesToZE: setAppliesToZE,
     factor: factor,
     snapshot: snapshot,

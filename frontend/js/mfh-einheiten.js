@@ -210,6 +210,9 @@
       + '<div style="margin-top:12px;padding:10px 12px;border:1px solid #E6E0D3;border-radius:8px;background:#FBFAF7;font-size:13px">'
       + '<b>Gebäude gesamt:</b> ' + d.punkteGew.toFixed(1).replace('.', ',') + ' Punkte flächengewichtet'
       + (r > 0 ? ' · Restnutzungsdauer ' + r + ' Jahre' : '')
+      + (d.s.hatSoll ? '<div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">Soll-Miete wirkt ab Jahr '
+        + '<input id="mfh-soll-jahr" type="text" inputmode="numeric" value="' + esc(String(daten().sollAbJahr || '')) + '" placeholder="z. B. 3" style="width:64px;padding:5px 7px;border:1px solid #E6E0D3;border-radius:6px;font:13px Inter,sans-serif">'
+        + '<span style="font-size:12px;color:#6B6356">der Mietentwicklung (leer = kein Sprung)</span></div>' : '')
       + '<div style="margin-top:8px;display:grid;gap:6px">'
       + '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mfh-uep" checked> Modernisierungsgrad ins Objekt übernehmen (<b>' + opt + ' Punkte</b>)</label>'
       + (r > 0 ? '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mfh-uer"> Restnutzungsdauer <b>' + r + ' Jahre</b> in die AfA übernehmen (eigener Satz ' + (100 / r).toFixed(2).replace('.', ',') + ' %)</label>' : '')
@@ -307,7 +310,9 @@
   function uebernehmen() {
     var list = _arbeit.filter(function (e) { return zahl(e.wfl) > 0 || zahl(e.ist) > 0 || String(e.lage || '').trim(); });
     var d = ergebnisDaten();
-    window._dpMfh = { einheiten: list, gebaeude: _geb, gnd: gnd(), stand: new Date().toISOString().slice(0, 10) };
+    var jahrFeld = el('mfh-soll-jahr');
+    var sollAb = jahrFeld ? Math.round(zahl(jahrFeld.value)) : Math.round(zahl(daten().sollAbJahr));
+    window._dpMfh = { einheiten: list, gebaeude: _geb, gnd: gnd(), sollAbJahr: sollAb > 0 ? sollAb : null, stand: new Date().toISOString().slice(0, 10) };
     var s = summe(list), meldung = list.length + ' Einheiten übernommen';
     if (list.length) {
       if (s.flaeche > 0) setzen('wfl', s.flaeche);
@@ -356,7 +361,8 @@
       z('DSCR', f(K.dscr), f(dscrSoll)) +
       z('Leerstand', s.leer ? s.leer + ' WE' : '—', '—') +
       (s.kosten ? z('Maßnahmen', '', eur(s.kosten)) : '') +
-      '</table><div class="cf-hint" style="margin-top:4px">Soll = vereinbarte Soll-Mieten aller Einheiten nach den Maßnahmen, gleiche Finanzierung und Kosten. Die Rechnung oben bleibt beim Ist.</div>';
+      '</table><div class="cf-hint" style="margin-top:4px">Soll = vereinbarte Soll-Mieten aller Einheiten nach den Maßnahmen, gleiche Finanzierung und Kosten. '
+      + (d.sollAbJahr > 0 ? 'Ab Jahr ' + d.sollAbJahr + ' rechnet die Mietentwicklung mit der Soll-Miete.' : 'Die Rechnung oben bleibt beim Ist — ein Jahr für den Sprung steht im Konfigurator, Schritt 4.') + '</div>';
   }
   function anhaengen() {
     if (typeof window.calc !== 'function') return false;
