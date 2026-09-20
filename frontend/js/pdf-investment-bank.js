@@ -180,24 +180,28 @@
       y += o.summe ? 8 : 6.1;
     }
     /* Kennzahlen als Raster 3 × n: ruhig, gut lesbar, ohne Farbflächen */
-    function raster(items) {
+    function raster(items, o) {
+      o = o || {};
       var sp = 3, bw = (CW - 2 * sp) / 3, bh = 17;
       /* v1462: gemessen — zwoelf Kacheln liefen am Objekt mit Foto in die
          Fusszeile. Das Raster bricht jetzt selbst um. */
       /* v1462c: Das Raster bleibt ZUSAMMEN. Passt es nicht mehr, beginnt es
          geschlossen auf der naechsten Seite — ein zerrissener Kennzahlenblock
          liest sich schlechter als eine halbe Seite Luft davor. */
-      var reihen = Math.ceil(items.length / 3), bedarf = reihen * (bh + sp) + 4;
+      /* v1462d: die Ueberschrift gehoert ZUM Raster — sonst blieb sie als
+         Waise auf der Seite davor stehen. */
+      var reihen = Math.ceil(items.length / 3), bedarf = reihen * (bh + sp) + 4 + (o.titel ? 7.5 : 0);
       if (y + bedarf > H - 24) {
         if (bedarf < H - 60) { doc.addPage(); kopf(_titel, _unter); }
         else {
           var proSeite = Math.max(1, Math.floor((H - 24 - y) / (bh + sp)));
-          raster(items.slice(0, proSeite * 3));
+          raster(items.slice(0, proSeite * 3), o);
           doc.addPage(); kopf(_titel, _unter);
           raster(items.slice(proSeite * 3));
           return;
         }
       }
+      if (o.titel) abschnitt(o.titel);
       items.forEach(function (it, i) {
         var c = i % 3, r = Math.floor(i / 3), x = L + c * (bw + sp), yy = y + r * (bh + sp);
         doc.setDrawColor(226, 221, 210); doc.setLineWidth(0.25); doc.rect(x, yy, bw, bh);
@@ -357,7 +361,6 @@
     zeile('Finanzierung gesamt', eur((d1 || 0) + (d2 || 0)), { summe: true });
     y += 1;
 
-    abschnitt('Kennzahlen');
     /* Score aus dem Rechenkern — nicht aus der Oberflaeche gelesen. */
     var SC = null;
     try { if (window.DealScore && typeof window.DealScore.computeFromKpis === 'function') SC = window.DealScore.computeFromKpis(K); } catch (e) {}
@@ -374,7 +377,7 @@
       ['Equity Multiple', da(K.em) === null ? '—' : zahl(K.em, 1) + 'x', 'über die Haltedauer'],
       ['Wertpuffer / Equity', eur(K.wp_kpi), 'heute'],
       ['Deal Score', (SC && SC.score) ? zahl(SC.score, 0) + ' / 100' : '—', (SC && SC.label) ? SC.label : '']
-    ]);
+    ], { titel: 'Kennzahlen' });
     if (SC && SC.interpretation) {
       platz(16);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(70);
