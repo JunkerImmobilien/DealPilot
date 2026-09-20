@@ -105,7 +105,7 @@
      Die Plan-Sperre steckt BEREITS in DealPilotConfig.branding.get(): unter
      Pro liefert sie die Vorgabewerte, ab Pro die eigenen Daten (config.js,
      V192). Die Bankfassung hatte darueber eine ZWEITE Sperre gelegt
-     (custom_logo UND Firma ungleich "Junker Immobilien") — dadurch stand auf
+     (custom_logo UND Firma ungleich "Junker Immobilien") - dadurch stand auf
      jedem Dokument "DealPilot", auch fuer den eingeloggten Pro-Nutzer.
      Gemessen am 20.09.2026 an den drei abgelegten PDFs. */
   function marke() {
@@ -246,7 +246,7 @@
     /* ── Bausteine ───────────────────────────────────────────── */
     function kopf(titel, unter) {
       y = 22;
-      /* Eigenes Logo, wenn der Plan es hergibt — sonst der Firmenname. */
+      /* Eigenes Logo, wenn der Plan es hergibt - sonst der Firmenname. */
       var logoOk = false;
       if (ab.b && ab.b.logo_b64) {
         try {
@@ -583,7 +583,7 @@
       y += Math.ceil(gal.length / 2) * (bh2 + sp2) + 4;
     }
 
-    /* Ansprechpartner — dieselben Daten wie im alten PDF (Deckblattfuss). */
+    /* Ansprechpartner - dieselben Daten wie im alten PDF (Deckblattfuss). */
     (function () {
       var b = ab.b || {};
       var hatEtwas = b.company || b.name || b.address || b.email || b.phone || b.website;
@@ -617,7 +617,7 @@
       zeile('Halter des Objekts', sauber(name));
       zeile('Besteuerung', korp ? 'Körperschaft- und Gewerbesteuer (Kapitalgesellschaft)' : 'Einkommensteuer der Gesellschafter (Personengesellschaft)');
       if (satz != null && isFinite(satz)) zeile('Angesetzter effektiver Steuersatz', pct(satz * 100, 2));
-      if (korp) zeile('Verluste', 'werden nicht erstattet — sie mindern nur künftige Gewinne', { klein: true });
+      if (korp) zeile('Verluste', 'werden nicht erstattet - sie mindern nur künftige Gewinne', { klein: true });
       if (txt('obj_herkunft') === 'ueberfuehrung' || num('ueberf_preis') !== null) {
         zeile('Überführung aus dem Privatbestand', txt('halter_seit') || 'Stichtag offen');
         if (num('verkehrswert_ueberf') !== null) zeile('Verkehrswert (AfA-Basis der Gesellschaft)', eur(num('verkehrswert_ueberf')));
