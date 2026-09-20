@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════════
-   v1436 · INVESTMENT CASE — BANKFASSUNG (hell)
+   v1436 · INVESTMENT CASE - BANKFASSUNG (hell)
    ════════════════════════════════════════════════════════════════════
 
    Backlog v22, Punkt 11: „Das bestehende Investment-PDF unbedingt
@@ -16,7 +16,7 @@
    DIESE DATEI RECHNET NICHTS. Sie liest, was calc.js bereits hat:
      State.gi, State.kpis (bmy, nmy, fak, ekr, dscr, ltv, cf_m, irr …),
      State.ltv_basis_label, State.cfRows (Jahreswerte).
-   Fehlt ein Wert, steht ein Strich — nie eine Null, die wie eine Messung
+   Fehlt ein Wert, steht ein Strich - nie eine Null, die wie eine Messung
    aussieht (CLAUDE.md: Number(null) ist 0 und besteht isFinite).
 
    Das alte Investment-PDF (pdf.js, exportPDF) bleibt unverändert. Diese
@@ -24,18 +24,18 @@
 
    v1460 (Marcel 20.09.2026: „die anderen Sachen aus dem jetzigen PDF müssen
    auch drauf, nur in diesem Design"): die Bankfassung trägt jetzt ALLE
-   Blöcke des alten Investment-PDFs —
+   Blöcke des alten Investment-PDFs -
      Deal Score · Ertragsrechnung (Warmmiete bis Cashflow nach Steuern) ·
      Bewirtschaftung umlagefähig / nicht umlagefähig · drei Phasen (Heute,
      Ende Zinsbindung, Anschluss) · Zinsänderungsrisiko · Cashflow-Jahre ·
      Vermögensaufbau als Kurve (Wert, Restschuld, Eigenkapital) ·
      Einheiten beim Mehrfamilienhaus · Annahmen und Hinweise.
-   v1461: die Abschnitte FLIESSEN — eine neue Seite entsteht nur, wenn der
+   v1461: die Abschnitte FLIESSEN - eine neue Seite entsteht nur, wenn der
    Block nicht mehr passt (vorher begann jeder Block auf einer neuen Seite,
    die Seiten endeten nach der Haelfte). Dazu Objektfotos (Titelbild und
    Galerie) und ein Kurzfazit aus dem Score.
 
-   v1463 (MARKER_V1463): Abgleich Zeile fuer Zeile gegen js/pdf.js —
+   v1463 (MARKER_V1463): Abgleich Zeile fuer Zeile gegen js/pdf.js -
    54 Positionen des alten Investment-PDFs fehlten hier. Ergaenzt:
      · Erwerbsnebenkosten EINZELN (Makler, Notar, Grundbuch, GrESt, Beratung)
      · Darlehen im Detail, Mischzins, Gesamtrate, Zinsbindung, Restschuld
@@ -47,7 +47,7 @@
    Gelesen wird auch hier nur: State, State.kpis, die Felder und die
    fertigen Zellen aus dem Zinsaenderungs-Block.
 
-   v1464 (MARKER_V1464): der Rest aus dem alten PDF — Stress-Matrix (5x5
+   v1464 (MARKER_V1464): der Rest aus dem alten PDF - Stress-Matrix (5x5
    DSCR-Szenarien), Vermoegenszuwachs als Jahrestabelle, Bewirtschaftungs-
    kosten gesamt und in Prozent der Kaltmiete, Leerstand in den Annahmen,
    effektive Restschuld am Bindungsende, Kaufpreis-Offerte der KI.
@@ -70,15 +70,15 @@
   }
   function da(v) { return (v === null || v === undefined || v === '' || !isFinite(Number(v))) ? null : Number(v); }
   function eur(v, dec) {
-    v = da(v); if (v === null) return '—';
+    v = da(v); if (v === null) return '-';
     return new Intl.NumberFormat('de-DE', { minimumFractionDigits: dec || 0, maximumFractionDigits: dec || 0 }).format(v) + ' €';
   }
   function pct(v, dec) {
-    v = da(v); if (v === null) return '—';
+    v = da(v); if (v === null) return '-';
     return new Intl.NumberFormat('de-DE', { minimumFractionDigits: dec == null ? 2 : dec, maximumFractionDigits: dec == null ? 2 : dec }).format(v) + ' %';
   }
   function zahl(v, dec) {
-    v = da(v); if (v === null) return '—';
+    v = da(v); if (v === null) return '-';
     return new Intl.NumberFormat('de-DE', { minimumFractionDigits: dec || 0, maximumFractionDigits: dec || 0 }).format(v);
   }
   function gold() {
@@ -101,7 +101,7 @@
     return ('0' + t.getDate()).slice(-2) + '.' + ('0' + (t.getMonth() + 1)).slice(-2) + '.' + t.getFullYear();
   }
 
-  /* Absender: dieselbe Regel wie die Finanzamt-Anlage (v975) — eigenes
+  /* Absender: dieselbe Regel wie die Finanzamt-Anlage (v975) - eigenes
      Branding nur mit custom_logo UND gesetzter Firma, sonst neutral. */
   function absender() {
     var b = (window.DealPilotConfig && DealPilotConfig.branding && typeof DealPilotConfig.branding.get === 'function')
@@ -124,16 +124,16 @@
     GEW: 'Gewerbe', GAR: 'Garage / Stellplatz' };
 
   /* Objektfotos: Groesse muss bekannt sein, sonst verzerrt addImage.
-     Deshalb laedt diese Funktion sie vorher — der Export ist async. */
+     Deshalb laedt diese Funktion sie vorher - der Export ist async. */
   /* MARKER_V1462 · Zuschnitt mittig auf ein Zielverhaeltnis. jsPDF kann
-     nicht beschneiden — deshalb vorher auf einer Leinwand schneiden. */
+     nicht beschneiden - deshalb vorher auf einer Leinwand schneiden. */
   function zuschneiden(b, verhaeltnis, breitePx) {
     try {
       var zw = breitePx || 1400, zh = Math.round(zw / verhaeltnis);
       var c = document.createElement('canvas'); c.width = zw; c.height = zh;
       var ctx = c.getContext('2d');
       var s = Math.max(zw / b.w, zh / b.h), iw = b.w * s, ih = b.h * s;
-      /* Das BEREITS geladene Element nehmen — ein frisch erzeugtes Image
+      /* Das BEREITS geladene Element nehmen - ein frisch erzeugtes Image
          ist beim Zeichnen womoeglich noch nicht dekodiert und bliebe leer. */
       var i = b.el; if (!i || !i.naturalWidth) return b;
       ctx.drawImage(i, (zw - iw) / 2, (zh - ih) / 2, iw, ih);
@@ -156,16 +156,16 @@
     })).then(function (a) { return a.filter(Boolean); });
   }
 
-  /* Die vier Bank-Diagramme stehen als SVG im Cockpit. jsPDF kann kein SVG —
+  /* Die vier Bank-Diagramme stehen als SVG im Cockpit. jsPDF kann kein SVG -
      also serialisieren, auf eine Leinwand zeichnen, als Bild einsetzen. */
   /* MARKER_V1463C · gemessen: solange die Bankansicht nie offen war, sind die
-     Diagramm-Flaechen 0 px breit und bleiben leer — buildCharts() zeichnet
+     Diagramm-Flaechen 0 px breit und bleiben leer - buildCharts() zeichnet
      dann nichts. Deshalb wird hier bei Bedarf in eine EIGENE Flaeche
      gezeichnet (BankCharts.renderX(host, State), 640x340). Der Wasserfall
      braucht eine Variable aus der Bankansicht und faellt dann aus. */
   var BC_FN = { 'bc-equity': 'renderEquityBuild', 'bc-cockpit': 'renderBankCockpit',
     'bc-waterfall': 'renderWaterfall', 'bc-stress': 'renderStressMatrix' };
-  /* v1463f · gemessen: querySelector('svg') greift das ERSTE SVG — und das
+  /* v1463f · gemessen: querySelector('svg') greift das ERSTE SVG - und das
      ist in zwei der vier Diagramme ein Symbol in der Ueberschrift. Im PDF
      stand dann ein Pfeil bzw. ein Haken statt der Zeichnung. Genommen wird
      jetzt das GROESSTE SVG im Behaelter. */
@@ -224,7 +224,7 @@
   }
 
   window.exportPDFBank = async function () {
-    if (typeof window.jspdf === 'undefined') { alert('PDF-Bibliothek noch nicht geladen — bitte kurz warten und erneut versuchen.'); return; }
+    if (typeof window.jspdf === 'undefined') { alert('PDF-Bibliothek noch nicht geladen - bitte kurz warten und erneut versuchen.'); return; }
     try { if (typeof window.calcNow === 'function') window.calcNow(); } catch (e) {}
     var S = window.State || {}, K = S.kpis || {}, rows = S.cfRows || [];
 
@@ -264,7 +264,7 @@
     function zeile(label, wert, o) {
       o = o || {};
       /* v1461b: Umbruch in der Zeile selbst. Vorher sprang ein ganzer Block
-         auf die naechste Seite, sobald er nicht mehr komplett passte —
+         auf die naechste Seite, sobald er nicht mehr komplett passte -
          die Seiten endeten dadurch nach der Haelfte. */
       if (y > H - 22) { doc.addPage(); kopf(_titel, _unter); }
       if (o.summe) { doc.setDrawColor(G[0], G[1], G[2]); doc.setLineWidth(0.6); doc.line(L, y - 3.8, W - R, y - 3.8); doc.setLineWidth(0.2); }
@@ -280,12 +280,12 @@
     function raster(items, o) {
       o = o || {};
       var sp = 3, bw = (CW - 2 * sp) / 3, bh = 17;
-      /* v1462: gemessen — zwoelf Kacheln liefen am Objekt mit Foto in die
+      /* v1462: gemessen - zwoelf Kacheln liefen am Objekt mit Foto in die
          Fusszeile. Das Raster bricht jetzt selbst um. */
       /* v1462c: Das Raster bleibt ZUSAMMEN. Passt es nicht mehr, beginnt es
-         geschlossen auf der naechsten Seite — ein zerrissener Kennzahlenblock
+         geschlossen auf der naechsten Seite - ein zerrissener Kennzahlenblock
          liest sich schlechter als eine halbe Seite Luft davor. */
-      /* v1462d: die Ueberschrift gehoert ZUM Raster — sonst blieb sie als
+      /* v1462d: die Ueberschrift gehoert ZUM Raster - sonst blieb sie als
          Waise auf der Seite davor stehen. */
       var reihen = Math.ceil(items.length / 3), bedarf = reihen * (bh + sp) + 4 + (o.titel ? 7.5 : 0);
       if (y + bedarf > H - 24) {
@@ -353,7 +353,7 @@
       y += 4;
     }
 
-    /* Kurve: Vermoegensaufbau. Bewusst ohne Farbflaechen — zwei Linien,
+    /* Kurve: Vermoegensaufbau. Bewusst ohne Farbflaechen - zwei Linien,
        Gold fuer den Wert, Tinte fuer die Restschuld, Raster in Grau. */
     function kurve(reihen, jahre, o) {
       o = o || {};
@@ -375,7 +375,7 @@
       reihen.forEach(function (r) {
         var f = r.gold ? GD : (r.grau ? [150, 145, 135] : [40, 40, 40]);
         doc.setDrawColor(f[0], f[1], f[2]); doc.setLineWidth(r.gold ? 0.7 : 0.5);
-        /* gestrichelt fuer die dritte Linie — sonst liegen zwei Linien
+        /* gestrichelt fuer die dritte Linie - sonst liegen zwei Linien
            deckungsgleich, sobald kein Darlehen im Spiel ist. */
         try { if (r.grau) doc.setLineDashPattern([1.2, 1.2], 0); } catch (e) {}
         for (var i = 1; i < r.werte.length; i++) {
@@ -435,16 +435,16 @@
     if (fotos.length) { bild(fotos[0], L, y, CW, CW / 2.5, true); y += CW / 2.5 + 6; }
 
     abschnitt('Objekt');
-    zeile('Anschrift', adr || '—');
-    zeile('Objektart', OBJART[txt('objart')] || txt('objart') || '—');
-    zeile('Wohnfläche', num('wfl') !== null ? zahl(num('wfl'), 0) + ' m²' : '—');
-    zeile('Baujahr', txt('baujahr') || '—');     /* Jahreszahl nie durch Intl (CLAUDE.md) */
+    zeile('Anschrift', adr || '-');
+    zeile('Objektart', OBJART[txt('objart')] || txt('objart') || '-');
+    zeile('Wohnfläche', num('wfl') !== null ? zahl(num('wfl'), 0) + ' m²' : '-');
+    zeile('Baujahr', txt('baujahr') || '-');     /* Jahreszahl nie durch Intl (CLAUDE.md) */
     if (txt('kaufdat')) zeile('Kaufdatum', txt('kaufdat'));
     y += 3;
 
     abschnitt('Investition');
     zeile('Kaufpreis', eur(kp));
-    /* Nebenkosten einzeln wie im alten PDF — eine Summe allein beantwortet
+    /* Nebenkosten einzeln wie im alten PDF - eine Summe allein beantwortet
        der Bank die Frage nach der Zusammensetzung nicht. */
     function nkZeile(feld, name) {
       var pz = num(feld);
@@ -470,7 +470,7 @@
     var aussetzung = (txt('d1_type') === 'tilgungsaussetzung');
     zeile('Eigenkapital' + (gi && ek !== null ? ' (' + pct(ek / gi * 100, 1) + ' der Gesamtinvestition)' : ''), eur(ek));
     zeile('Darlehen I' + (aussetzung ? ' · Tilgungsaussetzung' : ' · Annuitätendarlehen'), eur(d1));
-    zeile('Sollzins / Tilgung / Zinsbindung', [pct(num('d1z'), 2), aussetzung ? 'über Bausparvertrag' : pct(num('d1t'), 2), num('d1_bindj') !== null ? zahl(num('d1_bindj')) + ' Jahre' : '—'].join('  ·  '), { einzug: true, klein: true });
+    zeile('Sollzins / Tilgung / Zinsbindung', [pct(num('d1z'), 2), aussetzung ? 'über Bausparvertrag' : pct(num('d1t'), 2), num('d1_bindj') !== null ? zahl(num('d1_bindj')) + ' Jahre' : '-'].join('  ·  '), { einzug: true, klein: true });
     if (da(S.d1_rate_monthly)) zeile('Rate Darlehen I / Monat', eur(S.d1_rate_monthly, 2), { einzug: true, klein: true });
     if (d2an) {
       zeile('Darlehen II', eur(d2));
@@ -484,11 +484,11 @@
     zeile('Finanzierung gesamt', eur((d1 || 0) + (d2 || 0)), { summe: true });
     zeile('Beleihungsauslauf (LTV)', pct(K.ltv, 1) + (S.ltv_basis_label ? '  ·  auf ' + S.ltv_basis_label : ''));
     var bindEl = el('r-bindend');
-    if (bindEl && bindEl.textContent.trim() && bindEl.textContent.trim() !== '—') zeile('Zinsbindung bis', bindEl.textContent.trim());
+    if (bindEl && bindEl.textContent.trim() && bindEl.textContent.trim() !== '-') zeile('Zinsbindung bis', bindEl.textContent.trim());
     zeile('Restschuld am Ende der Zinsbindung', eur(S.rs));
     y += 1;
 
-    /* Bausparvertrag — nur beim Tilgungsaussetzungsdarlehen. */
+    /* Bausparvertrag - nur beim Tilgungsaussetzungsdarlehen. */
     if (aussetzung) {
       platz(46);
       abschnitt('Bausparvertrag (Tilgungsersatz)');
@@ -499,8 +499,8 @@
       zeile('Sparrate / Jahr (fließt aus dem Cashflow ab)', eur((num('bspar_rate') || 0) * 12));
       if (num('bspar_zins') !== null) zeile('Guthabenzins', pct(num('bspar_zins'), 2));
       /* Zuteilung, Status und Bauspardarlehen stehen als fertige Zellen in der
-         Finanzierung (DIV, kein Eingabefeld) — hier nur uebernommen. */
-      function zellText(id) { var e = el(id); var t = e ? sauber(e.textContent) : ''; return (t && t !== '-' && t !== '—') ? t : null; }
+         Finanzierung (DIV, kein Eingabefeld) - hier nur uebernommen. */
+      function zellText(id) { var e = el(id); var t = e ? sauber(e.textContent) : ''; return (t && t !== '-' && t !== '-') ? t : null; }
       var zut = zellText('bspar_zuteil_detail') || zellText('bspar_zuteil_auto');
       if (zut) zeile('Zuteilung', zut);
       var zStatus = zellText('bspar_zuteil_status');
@@ -528,7 +528,7 @@
       y += 1;
     }
 
-    /* Score aus dem Rechenkern — nicht aus der Oberflaeche gelesen. */
+    /* Score aus dem Rechenkern - nicht aus der Oberflaeche gelesen. */
     var SC = null;
     try { if (window.DealScore && typeof window.DealScore.computeFromKpis === 'function') SC = window.DealScore.computeFromKpis(K); } catch (e) {}
     raster([
@@ -540,10 +540,10 @@
       ['LTV', pct(K.ltv, 1), S.ltv_basis_label ? 'auf ' + S.ltv_basis_label : ''],
       ['EK-Rendite', pct(K.ekr, 2), 'p. a., vor Steuern'],
       ['Interner Zinsfuß (IRR)', da(K.irr) === null ? 'nicht bestimmbar' : pct(K.irr, 2), ''],
-      ['Kaltmiete', rows[0] ? eur(rows[0].nkm_y) : '—', 'im ersten Jahr'],
-      ['Equity Multiple', da(K.em) === null ? '—' : zahl(K.em, 1) + 'x', 'über die Haltedauer'],
+      ['Kaltmiete', rows[0] ? eur(rows[0].nkm_y) : '-', 'im ersten Jahr'],
+      ['Equity Multiple', da(K.em) === null ? '-' : zahl(K.em, 1) + 'x', 'über die Haltedauer'],
       ['Wertpuffer / Equity', eur(K.wp_kpi), 'heute'],
-      ['Deal Score', (SC && SC.score) ? zahl(SC.score, 0) + ' / 100' : '—', (SC && SC.label) ? SC.label : '']
+      ['Deal Score', (SC && SC.score) ? zahl(SC.score, 0) + ' / 100' : '-', (SC && SC.label) ? SC.label : '']
     ], { titel: 'Kennzahlen' });
     if (SC && SC.interpretation) {
       platz(16);
@@ -568,17 +568,17 @@
     platz(46, 'Ertrag und Cashflow', (adr || 'Objekt') + ' · laufendes Jahr');
     abschnitt('Von der Warmmiete zum Cashflow');
     zeile('Warmmiete / Jahr (Kaltmiete und Umlagen)', eur(K.wm_j));
-    zeile('abzüglich umlagefähiger Bewirtschaftung', da(K.bwk_ul) === null ? '—' : '- ' + eur(K.bwk_ul), { einzug: true });
+    zeile('abzüglich umlagefähiger Bewirtschaftung', da(K.bwk_ul) === null ? '-' : '- ' + eur(K.bwk_ul), { einzug: true });
     zeile('Kaltmiete / Jahr (netto, inkl. Zuschläge)', eur(K.nkm_j), { fett: true });
-    zeile('abzüglich nicht umlagefähiger Bewirtschaftung', da(K.bwk_cf) === null ? '—' : '- ' + eur(K.bwk_cf), { einzug: true });
-    zeile('Betriebsergebnis (NOI)', da(K.nkm_j) === null ? '—' : eur(K.nkm_j - (K.bwk_cf || 0)), { fett: true });
-    zeile('abzüglich Zinsen', da(K.zins_j) === null ? '—' : '- ' + eur(K.zins_j), { einzug: true });
+    zeile('abzüglich nicht umlagefähiger Bewirtschaftung', da(K.bwk_cf) === null ? '-' : '- ' + eur(K.bwk_cf), { einzug: true });
+    zeile('Betriebsergebnis (NOI)', da(K.nkm_j) === null ? '-' : eur(K.nkm_j - (K.bwk_cf || 0)), { fett: true });
+    zeile('abzüglich Zinsen', da(K.zins_j) === null ? '-' : '- ' + eur(K.zins_j), { einzug: true });
     if (da(K.bspar_j) && K.bspar_j > 0) zeile('abzüglich Bausparrate', '- ' + eur(K.bspar_j), { einzug: true });
-    zeile('abzüglich Tilgung', da(K.tilg_j) === null ? '—' : '- ' + eur(K.tilg_j), { einzug: true });
+    zeile('abzüglich Tilgung', da(K.tilg_j) === null ? '-' : '- ' + eur(K.tilg_j), { einzug: true });
     zeile('Cashflow vor Steuern / Jahr', eur(K.cf_op), { summe: true });
-    zeile('Steuern (Belastung -, Erstattung +)', da(K.steuer) === null ? '—' : (K.steuer < 0 ? '+ ' : '- ') + eur(Math.abs(K.steuer)), { einzug: true });
+    zeile('Steuern (Belastung -, Erstattung +)', da(K.steuer) === null ? '-' : (K.steuer < 0 ? '+ ' : '- ') + eur(Math.abs(K.steuer)), { einzug: true });
     zeile('Cashflow nach Steuern / Jahr', eur(K.cf_ns), { summe: true });
-    zeile('Cashflow nach Steuern / Monat', da(K.cf_ns) === null ? '—' : eur(K.cf_ns / 12, 2), { fett: true });
+    zeile('Cashflow nach Steuern / Monat', da(K.cf_ns) === null ? '-' : eur(K.cf_ns / 12, 2), { fett: true });
     y += 2;
 
     platz(34);
@@ -593,14 +593,14 @@
     if (num('mietausfall')) zeile('Kalkulatorischer Mietausfall', eur(num('mietausfall')));
     zeile('Summe nicht umlagefähig (im Cashflow)', eur(K.bwk_cf), { summe: true });
     zeile('Bewirtschaftungskosten gesamt / Jahr', eur(K.bwk));
-    zeile('davon Anteil an der Kaltmiete', (da(K.nkm_j) && K.nkm_j > 0) ? pct(K.bwk / K.nkm_j * 100, 1) : '—', { klein: true });
+    zeile('davon Anteil an der Kaltmiete', (da(K.nkm_j) && K.nkm_j > 0) ? pct(K.bwk / K.nkm_j * 100, 1) : '-', { klein: true });
     y += 2;
 
     platz(30);
     abschnitt('Steuerliche Wirkung');
     zeile('Abschreibung (AfA) / Jahr', eur(K.afa));
     zeile('Zu versteuerndes Ergebnis', eur(K.zve_immo));
-    zeile('Persönlicher Grenzsteuersatz', num('grenz') !== null ? pct(num('grenz'), 2) : '—');
+    zeile('Persönlicher Grenzsteuersatz', num('grenz') !== null ? pct(num('grenz'), 2) : '-');
 
     /* ── Drei Phasen ─────────────────────────────────────────── */
     var bindj = num('d1_bindj');
@@ -624,9 +624,9 @@
         ],
         { titel: 'Drei Phasen', hinweis: 'Ende Zinsbindung: mit fortgeschriebener Miete und dem dann erreichten Tilgungsstand. Anschluss: mit dem angenommenen Anschlusszins.' });
 
-      /* Kennzahlen je Phase — die Zellen hat calc bereits gefuellt
+      /* Kennzahlen je Phase - die Zellen hat calc bereits gefuellt
          (Zinsaenderungs-Block). Hier wird nur uebernommen, nicht gerechnet. */
-      function zT(id) { var e = el(id); var t = e ? sauber(e.textContent) : ''; return t || '—'; }
+      function zT(id) { var e = el(id); var t = e ? sauber(e.textContent) : ''; return t || '-'; }
       if (el('zaer-zins-now')) {
         platz(56);
         abschnitt('Kennzahlen je Phase');
@@ -638,14 +638,14 @@
             { werte: ['Cashflow / Monat vor Steuern', zT('zaer-cfvst-now'), zT('zaer-cfvst-ezb'), zT('zaer-cfvst-an')] },
             { werte: ['Cashflow / Monat nach Steuern', zT('zaer-cf-now'), zT('zaer-cf-ezb'), zT('zaer-cf-an')] },
             { werte: ['DSCR', zT('zaer-dscr-now'), zT('zaer-dscr-ezb'), zT('zaer-dscr-an')] },
-            { werte: ['Veränderung der Rate gegenüber heute', '—', zT('zaer-drate-ezb'), zT('zaer-drate-an')], fett: true }
+            { werte: ['Veränderung der Rate gegenüber heute', '-', zT('zaer-drate-ezb'), zT('zaer-drate-an')], fett: true }
           ],
           { titel: 'Kennzahlen je Phase' });
       }
 
       platz(44, 'Zinsänderungsrisiko', 'Was passiert, wenn die Zinsbindung endet');
       abschnitt('Zinsänderungsrisiko');
-      zeile('Zinsbindung', bindj !== null ? zahl(bindj) + ' Jahre' : '—');
+      zeile('Zinsbindung', bindj !== null ? zahl(bindj) + ' Jahre' : '-');
       zeile('Restschuld am Ende der Zinsbindung', eur(S.rs));
       zeile('Angenommener Anschlusszins / Tilgung', [pct(num('anschl_z'), 2), pct(num('anschl_t'), 2)].join('  ·  '));
       zeile('Rate nach Anschluss / Monat', eur(K.rate_an_m, 2));
@@ -673,7 +673,7 @@
     }
     if (!rows.length) {
       doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(110);
-      doc.text('Keine Jahreswerte vorhanden — bitte Objekt vollständig erfassen.', L, y); y += 8;
+      doc.text('Keine Jahreswerte vorhanden - bitte Objekt vollständig erfassen.', L, y); y += 8;
     } else {
       tabZeile(sp.map(function (s) { return s[0]; }), false, true);
       rows.slice(0, 10).forEach(function (r) {
@@ -704,7 +704,7 @@
 
     /* ── v1458 · Mieterliste und Ist/Soll (nur wenn Einheiten erfasst sind) ──
        Backlog v22 Punkt 6: die Bank will die Einheiten sehen, nicht nur die
-       Summe. Gerechnet wird NICHT hier — die Zahlen kommen aus
+       Summe. Gerechnet wird NICHT hier - die Zahlen kommen aus
        DpMfhEinheiten.berichtDaten() (Anlage-2-Punkte und RND aus dem
        RND-Kern) und aus State.kpis. */
     var MFH = (window.DpMfhEinheiten && typeof window.DpMfhEinheiten.berichtDaten === 'function')
@@ -730,11 +730,11 @@
       mZeile(spM.map(function (s) { return s[0]; }), true);
       MFH.zeilen.forEach(function (z) {
         if (y > H - 30) { doc.addPage(); kopf('Einheiten und Zustand', 'Fortsetzung'); mZeile(spM.map(function (s) { return s[0]; }), true); }
-        mZeile([z.e.nr || '', (z.e.lage || '').slice(0, 18), z.fl ? zahl(z.fl, 0) : '—',
-          z.e.ist ? zahl(Number(String(z.e.ist).replace(',', '.')), 0) : '—',
-          z.e.soll ? zahl(Number(String(z.e.soll).replace(',', '.')), 0) : '—',
+        mZeile([z.e.nr || '', (z.e.lage || '').slice(0, 18), z.fl ? zahl(z.fl, 0) : '-',
+          z.e.ist ? zahl(Number(String(z.e.ist).replace(',', '.')), 0) : '-',
+          z.e.soll ? zahl(Number(String(z.e.soll).replace(',', '.')), 0) : '-',
           z.e.status === 'leer' ? 'leer' : 'vermietet',
-          z.punkte + ' P.' + (z.geerbt === 4 ? '*' : ''), z.rnd != null ? Math.round(z.rnd) + ' J.' : '—']);
+          z.punkte + ' P.' + (z.geerbt === 4 ? '*' : ''), z.rnd != null ? Math.round(z.rnd) + ' J.' : '-']);
       });
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
       doc.text('Anlage 2 ImmoWertV: Modernisierungspunkte je Einheit; * = Zustand vollständig vom Gebäude übernommen. '
@@ -743,10 +743,10 @@
 
       abschnitt('Ist gegen Soll');
       var istJ = (K.nkm_j || 0), sollJ = MFH.s.soll * 12;
-      zeile('Kaltmiete p. a. — Ist', eur(istJ));
-      zeile('Kaltmiete p. a. — Soll (nach Maßnahmen)', eur(sollJ));
+      zeile('Kaltmiete p. a. - Ist', eur(istJ));
+      zeile('Kaltmiete p. a. - Soll (nach Maßnahmen)', eur(sollJ));
       zeile('Bruttomietrendite Ist (auf Kaufpreis)', pct(K.bmy, 2));
-      zeile('Bruttomietrendite Soll (auf Gesamtinvestition)', da(K.gi) && K.gi > 0 ? pct(sollJ / K.gi * 100, 2) : '—');
+      zeile('Bruttomietrendite Soll (auf Gesamtinvestition)', da(K.gi) && K.gi > 0 ? pct(sollJ / K.gi * 100, 2) : '-');
       zeile('Rechtliche Einheit', MFH.aufgeteilt ? 'in Wohnungseigentum aufgeteilt (WEG)' : 'ungeteiltes Gebäude');
       if (MFH.s.leer) zeile('Leerstand', MFH.s.leer + ' Einheiten / ' + zahl(MFH.s.leerFl, 0) + ' m²');
       if (MFH.s.kosten) zeile('Geplante Maßnahmen', eur(MFH.s.kosten));
@@ -755,7 +755,7 @@
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7.6); doc.setTextColor(130);
       var hin = MFH.sollAbJahr
         ? 'Die Cashflow-Rechnung setzt die Soll-Miete ab Jahr ' + MFH.sollAbJahr + ' an; davor und danach gilt die hinterlegte Mietentwicklung.'
-        : 'Die Cashflow-Rechnung rechnet durchgehend mit der Ist-Miete — die Soll-Miete ist hier nur nachrichtlich.';
+        : 'Die Cashflow-Rechnung rechnet durchgehend mit der Ist-Miete - die Soll-Miete ist hier nur nachrichtlich.';
       doc.splitTextToSize(hin, CW).forEach(function (t) { doc.text(t, L, y); y += 4.2; });
       y += 6;
     }
@@ -766,7 +766,7 @@
       platz(52, 'Exit und Vermögenszuwachs', (adr || 'Objekt'));
       abschnitt('Exit und Vermögenszuwachs');
       zeile('Objektwert heute (Anker der Wertsteigerung)', eur(S.wert_basis));
-      zeile('Angenommene Wertsteigerung p. a.', num('wertstg') !== null ? pct(num('wertstg'), 1) : '—');
+      zeile('Angenommene Wertsteigerung p. a.', num('wertstg') !== null ? pct(num('wertstg'), 1) : '-');
       zeile('Angenommener Verkaufspreis' + (S.btj ? ' nach ' + zahl(S.btj) + ' Jahren' : ''), eur(K.exit_vkp));
       if (letzteZeile) zeile('Restschuld zum Verkaufszeitpunkt', eur(letzteZeile.rs));
       if (letzteZeile && da(K.exit_vkp) !== null) zeile('Möglicher Erlös nach Ablösung', eur(K.exit_vkp - Math.max(0, letzteZeile.rs || 0)), { summe: true });
@@ -841,12 +841,12 @@
         });
       }
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
-      doc.text('Erzeugt von einem Sprachmodell aus den erfassten Angaben — eine Einschätzung, keine Beratung.', L, y + 1);
+      doc.text('Erzeugt von einem Sprachmodell aus den erfassten Angaben - eine Einschätzung, keine Beratung.', L, y + 1);
       y += 7;
     }
 
     /* ── Belastungsprobe (Stress-Matrix) ─────────────────────── */
-    /* Sie ist kein Diagramm, sondern HTML — deshalb unsichtbar rendern
+    /* Sie ist kein Diagramm, sondern HTML - deshalb unsichtbar rendern
        lassen und die 25 Zellen auslesen. Gerechnet wird dort, nicht hier. */
     function stressDaten() {
       if (!window.BankCharts || typeof window.BankCharts.renderStressMatrix !== 'function') return null;
@@ -870,7 +870,7 @@
       platz(72, 'Belastungsprobe', (adr || 'Objekt') + ' · Schuldendeckung unter Druck');
       abschnitt('Belastungsprobe · DSCR je Szenario');
       einleitung('Jede Zelle ist der DSCR, wenn sich Zins und Miete gleichzeitig ändern. Zeilen: Zinsänderung. Spalten: Mietausfall bzw. Aufwertung. Werte unter 1,0 bedeuten, dass die Miete den Kapitaldienst nicht mehr deckt.');
-      var spalten = [['Zinsänderung', 40], ['Miete −20 %', 27], ['−10 %', 27], ['±0 %', 27], ['+10 %', 27], ['+20 %', 27]];
+      var spalten = [['Zinsänderung', 40], ['Miete -20 %', 27], ['-10 %', 27], ['±0 %', 27], ['+10 %', 27], ['+20 %', 27]];
       var faktorS = CW / spalten.reduce(function (a, s) { return a + s[1]; }, 0);
       /* Kopf */
       (function () {
@@ -896,7 +896,7 @@
           doc.rect(x + 1, y - 2.5, bw - 2, hoehe - 1.5, 'F');
           if (z.basis) { doc.setDrawColor(GD[0], GD[1], GD[2]); doc.setLineWidth(0.5); doc.rect(x + 1, y - 2.5, bw - 2, hoehe - 1.5); doc.setLineWidth(0.2); }
           doc.setFont('helvetica', z.basis ? 'bold' : 'normal'); doc.setFontSize(8.6); doc.setTextColor(26, 26, 26);
-          doc.text(z.wert || '—', x + bw / 2, y + 3, { align: 'center' });
+          doc.text(z.wert || '-', x + bw / 2, y + 3, { align: 'center' });
           x += bw;
         }
         y += hoehe;
@@ -921,16 +921,16 @@
 
     platz(48, 'Annahmen und Hinweise', (adr || 'Objekt'));
     abschnitt('Annahmen');
-    zeile('Mietsteigerung p. a.', num('mietstg') !== null ? pct(num('mietstg'), 1) : '—');
-    zeile('Kostensteigerung p. a.', num('kostenstg') !== null ? pct(num('kostenstg'), 1) : '—');
-    zeile('Wertsteigerung p. a.', num('wertstg') !== null ? pct(num('wertstg'), 1) : '—');
-    zeile('Betrachtungszeitraum', S.btj ? zahl(S.btj) + ' Jahre' : '—');
+    zeile('Mietsteigerung p. a.', num('mietstg') !== null ? pct(num('mietstg'), 1) : '-');
+    zeile('Kostensteigerung p. a.', num('kostenstg') !== null ? pct(num('kostenstg'), 1) : '-');
+    zeile('Wertsteigerung p. a.', num('wertstg') !== null ? pct(num('wertstg'), 1) : '-');
+    zeile('Betrachtungszeitraum', S.btj ? zahl(S.btj) + ' Jahre' : '-');
     if (num('leerstand') !== null) zeile('Kalkulierter Leerstand p. a.', pct(num('leerstand'), 1));
     zeile('Anschlusszins / Anschlusstilgung (Annahme)', [pct(num('anschl_z'), 2), pct(num('anschl_t'), 2)].join('  ·  '));
-    zeile('Persönlicher Grenzsteuersatz', num('grenz') !== null ? pct(num('grenz'), 2) : '—');
-    zeile('Gebäudeanteil am Kaufpreis', num('geb_ant') !== null ? pct(num('geb_ant'), 0) : '—');
-    zeile('AfA-Satz Gebäude', num('afa_satz') !== null ? pct(num('afa_satz'), 2) : (txt('afa_satz') || '—'));
-    zeile('Grunderwerbsteuer (Land)', num('gest_p') !== null ? pct(num('gest_p'), 2) : '—');
+    zeile('Persönlicher Grenzsteuersatz', num('grenz') !== null ? pct(num('grenz'), 2) : '-');
+    zeile('Gebäudeanteil am Kaufpreis', num('geb_ant') !== null ? pct(num('geb_ant'), 0) : '-');
+    zeile('AfA-Satz Gebäude', num('afa_satz') !== null ? pct(num('afa_satz'), 2) : (txt('afa_satz') || '-'));
+    zeile('Grunderwerbsteuer (Land)', num('gest_p') !== null ? pct(num('gest_p'), 2) : '-');
     if (num('exit_bmy') !== null) zeile('Exit-Rendite (Verkaufsszenario)', pct(num('exit_bmy'), 1));
     if (K.d1IsAussetzung) zeile('Darlehenstyp', 'Tilgungsaussetzung mit Bausparvertrag');
     if (num('bspar_rate')) zeile('Bausparrate / Monat', eur(num('bspar_rate')));
