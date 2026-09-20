@@ -442,8 +442,19 @@
       zeile('Bausparsumme', eur(num('bspar_sum')));
       zeile('Sparrate / Monat', eur(num('bspar_rate'), 2));
       zeile('Sparrate / Jahr (fließt aus dem Cashflow ab)', eur((num('bspar_rate') || 0) * 12));
-      if (txt('bspar_zuteil')) zeile('Zuteilungsdatum', txt('bspar_zuteil'));
       if (num('bspar_zins') !== null) zeile('Guthabenzins', pct(num('bspar_zins'), 2));
+      /* Zuteilung, Status und Bauspardarlehen stehen als fertige Zellen in der
+         Finanzierung (DIV, kein Eingabefeld) — hier nur uebernommen. */
+      function zellText(id) { var e = el(id); var t = e ? (e.textContent || '').trim().replace(/\s+/g, ' ') : ''; return (t && t !== '—') ? t : null; }
+      var zut = zellText('bspar_zuteil_detail') || zellText('bspar_zuteil_auto');
+      if (zut) zeile('Zuteilung', zut);
+      var zStatus = zellText('bspar_zuteil_status');
+      if (zStatus) zeile('Zuteilungsstatus', zStatus, { klein: true });
+      if (num('bspar_dar_z') !== null) zeile('Bauspardarlehen · Zins', pct(num('bspar_dar_z'), 2));
+      if (num('bspar_dar_t') !== null) zeile('Bauspardarlehen · Tilgung', pct(num('bspar_dar_t'), 2));
+      var darRate = zellText('bspar_dar_rate');
+      if (darRate) zeile('Bauspardarlehen · Rate', darRate);
+      if (num('bspar_quote_min') !== null) zeile('Mindest-Sparquote für die Zuteilung', pct(num('bspar_quote_min'), 0));
       var bs = S.bsvSummary;
       if (bs) {
         if (da(bs.eingezahlt) !== null) zeile('Eingezahlt bis Ende der Zinsbindung' + (bs.jahre ? ' (' + zahl(bs.jahre) + ' Jahre)' : ''), eur(bs.eingezahlt));
@@ -702,6 +713,9 @@
     }
 
     /* ── Diagramme aus dem Cockpit ───────────────────────────── */
+    /* MARKER_V1463B */
+    try { if (typeof window.buildCharts === 'function') window.buildCharts(); } catch (e) {}
+    await new Promise(function (f) { setTimeout(f, 450); });
     var DIA = [['bc-equity', 'Eigenkapital und Restschuld'], ['bc-cockpit', 'Cockpit'],
       ['bc-waterfall', 'Vom Mietertrag zum Cashflow'], ['bc-stress', 'Belastungsprobe']];
     var diagramme = [];
