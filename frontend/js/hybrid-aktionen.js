@@ -53,9 +53,15 @@
      Die Stufen-Schwellen stehen in js/dashboard.js:390 - hier wird nur
      eingefaerbt, nicht neu bewertet. */
   function farbe(n) { return n >= 85 ? '#2E8455' : n >= 70 ? '#3FA56C' : n >= 50 ? 'var(--wl-c9a84c, #C9A84C)' : n >= 35 ? '#C2703F' : '#B8625C'; }
+  /* v1455c · gemessen: der Kopf LAESST den alten Score im DOM stehen und
+     blendet ihn per Inline-Stil aus (display:none), dazu body.hdr-no-score.
+     Ohne diese Pruefung zeigte die Spalte den Score des VORIGEN Objekts.
+     Dieselbe Mechanik bei der Vollstaendigkeit. */
+  function gilt(e) { return !!e && e.style.display !== 'none'; }
   function score() {
     var host = document.getElementById('dp-hy-score'); if (!host) return;
     var mini = document.getElementById('hdr-score-mini');
+    if (document.body.classList.contains('hdr-no-score') || !gilt(mini)) { host.innerHTML = ''; host.style.display = 'none'; return; }
     var b = mini && mini.querySelector('b'), st = mini && mini.querySelector('span');
     var n = b ? parseInt(String(b.textContent).replace(/[^0-9]/g, ''), 10) : NaN;
     if (!isFinite(n)) { host.innerHTML = ''; host.style.display = 'none'; return; }
@@ -65,13 +71,13 @@
       + '<em style="background:' + farbe(n) + '">' + ((st && st.textContent.trim()) || '') + '</em></div>'
       + '<div class="dp-hy-bar"><i style="width:' + Math.max(2, Math.min(100, n)) + '%;background:' + farbe(n) + '"></i></div>';
   }
-  function ausKopf(sel) { var e = document.querySelector(sel); var t = e && e.textContent.trim().replace(/\s+/g, ' '); return t || null; }
+  function ausKopf(sel, wirt) { var e = document.querySelector(sel); if (!e) return null; if (wirt && !gilt(document.querySelector(wirt))) return null; var t = e.textContent.trim().replace(/\s+/g, ' '); return t || null; }
   function kennzahlen() {
     score();
     var host = document.getElementById('dp-hy-kpi'); if (!host) return;
     var K = (window.State && window.State.kpis) || {};
     function z(n, d, s) { return (n == null || !isFinite(n)) ? '—' : Number(n).toFixed(d).replace('.', ',') + (s || ''); }
-    var voll = ausKopf('.hdr-comp-text'), pflicht = ausKopf('#tabs-status-text');
+    var voll = ausKopf('.hdr-comp-text', '#hdr-completeness'), pflicht = ausKopf('#tabs-status-text');
     host.innerHTML =
       (voll ? '<div class="kpi"><span>Vollständigkeit</span><b>' + voll.replace(' Felder', '') + '</b></div>' : '') +
       (pflicht ? '<div class="kpi"><span>Pflichtfelder</span><b>' + pflicht + '</b></div>' : '') +
