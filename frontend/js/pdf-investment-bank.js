@@ -184,13 +184,19 @@
       var sp = 3, bw = (CW - 2 * sp) / 3, bh = 17;
       /* v1462: gemessen — zwoelf Kacheln liefen am Objekt mit Foto in die
          Fusszeile. Das Raster bricht jetzt selbst um. */
-      var proSeite = Math.max(1, Math.floor((H - 24 - y) / (bh + sp)));
-      if (Math.ceil(items.length / 3) > proSeite) {
-        var passt = proSeite * 3;
-        raster(items.slice(0, passt));
-        doc.addPage(); kopf(_titel, _unter);
-        raster(items.slice(passt));
-        return;
+      /* v1462c: Das Raster bleibt ZUSAMMEN. Passt es nicht mehr, beginnt es
+         geschlossen auf der naechsten Seite — ein zerrissener Kennzahlenblock
+         liest sich schlechter als eine halbe Seite Luft davor. */
+      var reihen = Math.ceil(items.length / 3), bedarf = reihen * (bh + sp) + 4;
+      if (y + bedarf > H - 24) {
+        if (bedarf < H - 60) { doc.addPage(); kopf(_titel, _unter); }
+        else {
+          var proSeite = Math.max(1, Math.floor((H - 24 - y) / (bh + sp)));
+          raster(items.slice(0, proSeite * 3));
+          doc.addPage(); kopf(_titel, _unter);
+          raster(items.slice(proSeite * 3));
+          return;
+        }
       }
       items.forEach(function (it, i) {
         var c = i % 3, r = Math.floor(i / 3), x = L + c * (bw + sp), yy = y + r * (bh + sp);
