@@ -144,6 +144,11 @@
       doc.setDrawColor(226, 221, 210); doc.line(L, y + 1.8, W - R, y + 1.8);
       y += 7.5;
     }
+    function einleitung(t) {
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(120);
+      doc.splitTextToSize(t, CW).forEach(function (z) { doc.text(z, L, y); y += 4.2; });
+      y += 2.5;
+    }
     function zeile(label, wert, o) {
       o = o || {};
       /* v1461b: Umbruch in der Zeile selbst. Vorher sprang ein ganzer Block
@@ -398,6 +403,7 @@
     if (hatPhasen) {
       platz(62, 'Drei Phasen', 'Heute · Ende der Zinsbindung' + (bindj ? ' (nach ' + zahl(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung');
       abschnitt('Cashflow je Phase');
+      einleitung('Heute · Ende der Zinsbindung' + (bindj ? ' (nach ' + zahl(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung mit dem angenommenen Zins.');
       function ph(label, a, b, c) { return { werte: [label, a, b, c] }; }
       tabelle(
         [['', 46], ['Heute', 26], ['Ende Zinsbindung', 30], ['Anschluss', 26]],
@@ -413,7 +419,7 @@
         ],
         { titel: 'Drei Phasen', hinweis: 'Ende Zinsbindung: mit fortgeschriebener Miete und dem dann erreichten Tilgungsstand. Anschluss: mit dem angenommenen Anschlusszins.' });
 
-      platz(44);
+      platz(44, 'Zinsänderungsrisiko', 'Was passiert, wenn die Zinsbindung endet');
       abschnitt('Zinsänderungsrisiko');
       zeile('Zinsbindung', bindj !== null ? zahl(bindj) + ' Jahre' : '—');
       zeile('Restschuld am Ende der Zinsbindung', eur(S.rs));
@@ -456,14 +462,14 @@
 
     /* ── Vermögensaufbau ─────────────────────────────────────── */
     if (rows.length > 2) {
-      platz(104, 'Vermögensaufbau', (adr || 'Objekt') + ' · Wert, Restschuld und Eigenkapital');
+      platz(84, 'Vermögensaufbau', (adr || 'Objekt') + ' · Wert, Restschuld und Eigenkapital');
       abschnitt('Vermögensaufbau');
       var jahre = rows.map(function (r) { return r.cal || r.y; });
       kurve([
         { name: 'Objektwert (angenommen)', werte: rows.map(function (r) { return Number(r.wert_y); }), gold: true },
         { name: 'Restschuld', werte: rows.map(function (r) { return Number(r.rs); }) },
         { name: 'Eigenkapital im Objekt', werte: rows.map(function (r) { return Number(r.eq_y); }), grau: true }
-      ], jahre, { hoehe: 52 });
+      ], jahre, { hoehe: 44 });
       var l = rows[rows.length - 1];
       zeile('Eigenkapital heute', eur(rows[0] ? rows[0].eq_y : null));
       zeile('Eigenkapital nach ' + jahre.length + ' Jahren', eur(l ? l.eq_y : null), { summe: true });
