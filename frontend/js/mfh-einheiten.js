@@ -112,7 +112,7 @@
   }
 
   /* ── Modal mit vier Schritten ───────────────────────────────────── */
-  var _arbeit = [], _geb = {}, _schritt = 0;
+  var _arbeit = [], _geb = {}, _schritt = 0, _weg = false;
 
   function selHtml(attrs, wert, opts) {
     return '<select ' + attrs + ' style="padding:6px;border:1px solid #E6E0D3;border-radius:6px;font:13px Inter,sans-serif;max-width:100%">'
@@ -135,6 +135,10 @@
       + '<tr><td colspan="2" style="padding:12px 0 4px;font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8A8272">Vorgabe für die Wohnungen</td></tr>'
       + WE_IDS.map(function (id) { return zeile(id, true); }).join('')
       + '</tbody></table>'
+      + '<div style="margin-top:12px;padding:9px 11px;border:1px solid #E6E0D3;border-radius:8px;background:#FBFAF7;font-size:13px">'
+        + '<label style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="mfh-weg"' + (_weg ? ' checked' : '') + '>'
+        + '<span><b>In Wohnungseigentum aufgeteilt</b> (Teilungserklärung nach WEG)<div style="font-size:11.5px;color:#8A8272">'
+        + 'Dann ist jede Einheit einzeln verkäuflich — für Bank und Exit ein Unterschied. Die Rechnung bleibt davon unberührt.</div></span></label></div>'
       + '<div class="cf-hint" style="margin-top:8px">Gebäudepunkte: <b id="mfh-geb-p">—</b> von 20 (Anlage 2). Dach, Außenwand, Leitungen und Heizung kann eine einzelne Wohnung nicht abweichend haben.</div>';
   }
 
@@ -204,6 +208,7 @@
     if (!list.length) return null;
     var r = auswerten(list, d.gebaeude || {});
     r.sollAbJahr = d.sollAbJahr || null;
+    r.aufgeteilt = !!d.aufgeteilt;
     r.geerbteGewerke = GEB_IDS.concat(WE_IDS).map(function (id) { return { id: id, label: labelVon(id), stufe: (d.gebaeude || {})[id] || '0', punkte: punkteVon(id, (d.gebaeude || {})[id] || '0') }; });
     return r;
   }
@@ -255,6 +260,7 @@
     var d = daten();
     _arbeit = JSON.parse(JSON.stringify(d.einheiten || []));
     _geb = JSON.parse(JSON.stringify(d.gebaeude || {}));
+    _weg = !!d.aufgeteilt;
     _schritt = schritt || 0;
     if (!_arbeit.length) _arbeit.push({ nr: '1', art: 'wohnen', status: 'vermietet' });
     var m = document.createElement('div'); m.id = 'mfh-modal';
@@ -283,6 +289,7 @@
     m.addEventListener('click', function (ev) {
       var t = ev.target;
       if (t === m) schliessen();
+      if (t.id === 'mfh-weg') { _weg = t.checked; }
       if (t.dataset && t.dataset.s != null) { _schritt = +t.dataset.s; zeichnen(); }
       if (t.dataset && t.dataset.dup != null) { var i = +t.dataset.dup, c = JSON.parse(JSON.stringify(_arbeit[i])); c.nr = String(_arbeit.length + 1); c.lage = ''; _arbeit.splice(i + 1, 0, c); zeichnen(); }
       if (t.dataset && t.dataset.del != null) { _arbeit.splice(+t.dataset.del, 1); zeichnen(); }
@@ -324,7 +331,8 @@
     var d = ergebnisDaten();
     var jahrFeld = el('mfh-soll-jahr');
     var sollAb = jahrFeld ? Math.round(zahl(jahrFeld.value)) : Math.round(zahl(daten().sollAbJahr));
-    window._dpMfh = { einheiten: list, gebaeude: _geb, gnd: gnd(), sollAbJahr: sollAb > 0 ? sollAb : null, stand: new Date().toISOString().slice(0, 10) };
+    var wegFeld = el('mfh-weg');
+    window._dpMfh = { einheiten: list, gebaeude: _geb, gnd: gnd(), aufgeteilt: wegFeld ? wegFeld.checked : _weg, sollAbJahr: sollAb > 0 ? sollAb : null, stand: new Date().toISOString().slice(0, 10) };
     var s = summe(list), meldung = list.length + ' Einheiten übernommen';
     if (list.length) {
       if (s.flaeche > 0) setzen('wfl', s.flaeche);
