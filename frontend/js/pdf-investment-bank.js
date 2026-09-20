@@ -35,6 +35,18 @@
    die Seiten endeten nach der Haelfte). Dazu Objektfotos (Titelbild und
    Galerie) und ein Kurzfazit aus dem Score.
 
+   v1463 (MARKER_V1463): Abgleich Zeile fuer Zeile gegen js/pdf.js —
+   54 Positionen des alten Investment-PDFs fehlten hier. Ergaenzt:
+     · Erwerbsnebenkosten EINZELN (Makler, Notar, Grundbuch, GrESt, Beratung)
+     · Darlehen im Detail, Mischzins, Gesamtrate, Zinsbindung, Restschuld
+     · Bausparvertrag komplett (State.bsvSummary: Guthaben bei EZB, Deckung)
+     · Kennzahlen je Phase (Zinssatz, Rate, CF/Monat, DSCR, Differenz)
+     · Exit und Vermoegenszuwachs
+     · die vier Bank-Diagramme (SVG aus dem Cockpit)
+     · KI-Investment-Analyse, wenn eine vorliegt
+   Gelesen wird auch hier nur: State, State.kpis, die Felder und die
+   fertigen Zellen aus dem Zinsaenderungs-Block.
+
    Weiter gilt: DIESE DATEI RECHNET NICHTS. Der Score kommt aus dem
    Rechenkern DealScore.computeFromKpis(), die Phasen aus State.kpis
    (…_ezb, …_an), die Jahre aus State.cfRows.
@@ -124,6 +136,36 @@
         } catch (e) { fertig(null); }
       });
     })).then(function (a) { return a.filter(Boolean); });
+  }
+
+  /* Die vier Bank-Diagramme stehen als SVG im Cockpit. jsPDF kann kein SVG —
+     also serialisieren, auf eine Leinwand zeichnen, als Bild einsetzen. */
+  function svgBild(id) {
+    return new Promise(function (fertig) {
+      try {
+        var host = document.getElementById(id), svg = host && host.querySelector('svg');
+        if (!svg) return fertig(null);
+        var k = svg.cloneNode(true);
+        var b = svg.getBoundingClientRect();
+        var br = Math.max(320, Math.round(b.width || 640)), ho = Math.max(200, Math.round(b.height || 360));
+        k.setAttribute('width', br); k.setAttribute('height', ho);
+        if (!k.getAttribute('viewBox')) k.setAttribute('viewBox', '0 0 ' + br + ' ' + ho);
+        k.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        var txt = new XMLSerializer().serializeToString(k);
+        var url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(txt);
+        var i = new Image();
+        i.onload = function () {
+          try {
+            var c = document.createElement('canvas'); c.width = br * 2; c.height = ho * 2;
+            var ctx = c.getContext('2d'); ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, c.width, c.height);
+            ctx.drawImage(i, 0, 0, c.width, c.height);
+            fertig({ src: c.toDataURL('image/png'), w: c.width, h: c.height, id: id });
+          } catch (e) { fertig(null); }
+        };
+        i.onerror = function () { fertig(null); };
+        i.src = url;
+      } catch (e) { fertig(null); }
+    });
   }
 
   window.exportPDFBank = async function () {
@@ -347,19 +389,73 @@
 
     abschnitt('Investition');
     zeile('Kaufpreis', eur(kp));
-    zeile('Erwerbsnebenkosten' + (kp && nk !== null ? ' (' + pct(nk / kp * 100, 1) + ')' : ''), eur(nk));
+    /* Nebenkosten einzeln wie im alten PDF — eine Summe allein beantwortet
+       der Bank die Frage nach der Zusammensetzung nicht. */
+    function nkZeile(feld, name) {
+      var pz = num(feld);
+      if (pz === null || !kp) return 0;
+      var betrag = kp * pz / 100;
+      if (!betrag) return 0;
+      zeile(name + ' (' + pct(pz, 2) + ')', eur(betrag), { einzug: true, klein: true });
+      return betrag;
+    }
+    var summeNk = 0;
+    summeNk += nkZeile('makler_p', 'Maklercourtage');
+    summeNk += nkZeile('notar_p', 'Notar');
+    summeNk += nkZeile('gba_p', 'Grundbuchamt');
+    summeNk += nkZeile('gest_p', 'Grunderwerbsteuer');
+    summeNk += nkZeile('ji_p', 'Vermittlung / Beratung');
+    zeile('Erwerbsnebenkosten' + (kp && nk !== null ? ' (' + pct(nk / kp * 100, 1) + ' vom Kaufpreis)' : ''), eur(nk), { fett: true });
     if (san) zeile('Sanierung / Modernisierung', eur(san));
     if (moebl) zeile('Möblierung / Inventar', eur(moebl));
     zeile('Gesamtinvestition', eur(gi), { summe: true });
     y += 1;
 
     abschnitt('Finanzierung');
+    var aussetzung = (txt('d1_type') === 'tilgungsaussetzung');
     zeile('Eigenkapital' + (gi && ek !== null ? ' (' + pct(ek / gi * 100, 1) + ' der Gesamtinvestition)' : ''), eur(ek));
-    zeile('Darlehen I', eur(d1));
-    zeile('Sollzins / Tilgung / Zinsbindung', [pct(num('d1z'), 2), pct(num('d1t'), 2), num('d1_bindj') !== null ? zahl(num('d1_bindj')) + ' Jahre' : '—'].join('  ·  '), { einzug: true, klein: true });
-    if (d2an) zeile('Darlehen II', eur(d2));
+    zeile('Darlehen I' + (aussetzung ? ' · Tilgungsaussetzung' : ' · Annuitätendarlehen'), eur(d1));
+    zeile('Sollzins / Tilgung / Zinsbindung', [pct(num('d1z'), 2), aussetzung ? 'über Bausparvertrag' : pct(num('d1t'), 2), num('d1_bindj') !== null ? zahl(num('d1_bindj')) + ' Jahre' : '—'].join('  ·  '), { einzug: true, klein: true });
+    if (da(S.d1_rate_monthly)) zeile('Rate Darlehen I / Monat', eur(S.d1_rate_monthly, 2), { einzug: true, klein: true });
+    if (d2an) {
+      zeile('Darlehen II', eur(d2));
+      zeile('Sollzins / Tilgung', [pct(num('d2z'), 2), pct(num('d2t'), 2)].join('  ·  '), { einzug: true, klein: true });
+      var r2 = (d2 || 0) * ((num('d2z') || 0) + (num('d2t') || 0)) / 100 / 12;
+      zeile('Rate Darlehen II / Monat', eur(r2, 2), { einzug: true, klein: true });
+      var sum = (d1 || 0) + (d2 || 0);
+      if (sum > 0) zeile('Mischzins (gewichtet)', pct(((d1 || 0) * (num('d1z') || 0) + (d2 || 0) * (num('d2z') || 0)) / sum, 2), { einzug: true, klein: true });
+      zeile('Gesamtrate / Monat', eur((S.d1_rate_monthly || 0) + r2, 2), { einzug: true, klein: true });
+    }
     zeile('Finanzierung gesamt', eur((d1 || 0) + (d2 || 0)), { summe: true });
+    zeile('Beleihungsauslauf (LTV)', pct(K.ltv, 1) + (S.ltv_basis_label ? '  ·  auf ' + S.ltv_basis_label : ''));
+    var bindEl = el('r-bindend');
+    if (bindEl && bindEl.textContent.trim() && bindEl.textContent.trim() !== '—') zeile('Zinsbindung bis', bindEl.textContent.trim());
+    zeile('Restschuld am Ende der Zinsbindung', eur(S.rs));
     y += 1;
+
+    /* Bausparvertrag — nur beim Tilgungsaussetzungsdarlehen. */
+    if (aussetzung) {
+      platz(46);
+      abschnitt('Bausparvertrag (Tilgungsersatz)');
+      if (txt('bspar_inst')) zeile('Bausparkasse', txt('bspar_inst'));
+      if (txt('bspar_vertrag')) zeile('Vertragsnummer', txt('bspar_vertrag'));
+      zeile('Bausparsumme', eur(num('bspar_sum')));
+      zeile('Sparrate / Monat', eur(num('bspar_rate'), 2));
+      zeile('Sparrate / Jahr (fließt aus dem Cashflow ab)', eur((num('bspar_rate') || 0) * 12));
+      if (txt('bspar_zuteil')) zeile('Zuteilungsdatum', txt('bspar_zuteil'));
+      if (num('bspar_zins') !== null) zeile('Guthabenzins', pct(num('bspar_zins'), 2));
+      var bs = S.bsvSummary;
+      if (bs) {
+        if (da(bs.eingezahlt) !== null) zeile('Eingezahlt bis Ende der Zinsbindung' + (bs.jahre ? ' (' + zahl(bs.jahre) + ' Jahre)' : ''), eur(bs.eingezahlt));
+        if (da(bs.guthaben) !== null) zeile('Guthaben inkl. Zinsen bei Bindungsende', eur(bs.guthaben));
+        if (da(bs.restschuld) !== null) zeile('Restschuld Hauptdarlehen dann', eur(bs.restschuld));
+        if (da(bs.restschuld) && bs.restschuld > 0) {
+          var deck = Math.min(100, ((bs.guthaben || 0) + (bs.bauspardarlehen || 0)) / bs.restschuld * 100);
+          zeile('Deckung durch Bausparguthaben und -darlehen', pct(deck, 1), { summe: true });
+        }
+      }
+      y += 1;
+    }
 
     /* Score aus dem Rechenkern — nicht aus der Oberflaeche gelesen. */
     var SC = null;
@@ -454,6 +550,25 @@
           { werte: ['Cashflow nach Steuern / Monat', eur((K.cf_ns || 0) / 12, 2), eur((K.cf_ns_ezb || 0) / 12, 2), eur((K.cf_ns_an || 0) / 12, 2)], fett: true }
         ],
         { titel: 'Drei Phasen', hinweis: 'Ende Zinsbindung: mit fortgeschriebener Miete und dem dann erreichten Tilgungsstand. Anschluss: mit dem angenommenen Anschlusszins.' });
+
+      /* Kennzahlen je Phase — die Zellen hat calc bereits gefuellt
+         (Zinsaenderungs-Block). Hier wird nur uebernommen, nicht gerechnet. */
+      function zT(id) { var e = el(id); var t = e ? e.textContent.trim() : ''; return t || '—'; }
+      if (el('zaer-zins-now')) {
+        platz(56);
+        abschnitt('Kennzahlen je Phase');
+        tabelle(
+          [['', 46], ['Heute', 26], ['Ende Zinsbindung', 30], ['Anschluss', 26]],
+          [
+            { werte: ['Sollzins', zT('zaer-zins-now'), zT('zaer-zins-ezb'), zT('zaer-zins-an')] },
+            { werte: ['Rate / Monat', zT('zaer-rate-now'), zT('zaer-rate-ezb'), zT('zaer-rate-an')] },
+            { werte: ['Cashflow / Monat vor Steuern', zT('zaer-cfvst-now'), zT('zaer-cfvst-ezb'), zT('zaer-cfvst-an')] },
+            { werte: ['Cashflow / Monat nach Steuern', zT('zaer-cf-now'), zT('zaer-cf-ezb'), zT('zaer-cf-an')] },
+            { werte: ['DSCR', zT('zaer-dscr-now'), zT('zaer-dscr-ezb'), zT('zaer-dscr-an')] },
+            { werte: ['Veränderung der Rate gegenüber heute', '—', zT('zaer-drate-ezb'), zT('zaer-drate-an')], fett: true }
+          ],
+          { titel: 'Kennzahlen je Phase' });
+      }
 
       platz(44, 'Zinsänderungsrisiko', 'Was passiert, wenn die Zinsbindung endet');
       abschnitt('Zinsänderungsrisiko');
@@ -572,6 +687,86 @@
       y += 6;
     }
 
+    /* ── Exit und Vermögenszuwachs ───────────────────────────── */
+    var letzteZeile = rows.length ? rows[rows.length - 1] : null;
+    if (da(K.exit_vkp) !== null || da(S.wert_basis) !== null) {
+      platz(52, 'Exit und Vermögenszuwachs', (adr || 'Objekt'));
+      abschnitt('Exit und Vermögenszuwachs');
+      zeile('Objektwert heute (Anker der Wertsteigerung)', eur(S.wert_basis));
+      zeile('Angenommene Wertsteigerung p. a.', num('wertstg') !== null ? pct(num('wertstg'), 1) : '—');
+      zeile('Angenommener Verkaufspreis' + (S.btj ? ' nach ' + zahl(S.btj) + ' Jahren' : ''), eur(K.exit_vkp));
+      if (letzteZeile) zeile('Restschuld zum Verkaufszeitpunkt', eur(letzteZeile.rs));
+      if (letzteZeile && da(K.exit_vkp) !== null) zeile('Möglicher Erlös nach Ablösung', eur(K.exit_vkp - Math.max(0, letzteZeile.rs || 0)), { summe: true });
+      if (num('exit_bmy') !== null) zeile('Unterstellte Exit-Rendite (Verkaufsszenario)', pct(num('exit_bmy'), 1), { klein: true });
+      y += 1;
+    }
+
+    /* ── Diagramme aus dem Cockpit ───────────────────────────── */
+    var DIA = [['bc-equity', 'Eigenkapital und Restschuld'], ['bc-cockpit', 'Cockpit'],
+      ['bc-waterfall', 'Vom Mietertrag zum Cashflow'], ['bc-stress', 'Belastungsprobe']];
+    var diagramme = [];
+    for (var di = 0; di < DIA.length; di++) {
+      var bd = await svgBild(DIA[di][0]);
+      if (bd) diagramme.push({ bild: bd, titel: DIA[di][1] });
+    }
+    if (diagramme.length) {
+      platz(60, 'Diagramme', (adr || 'Objekt') + ' · aus der Bankansicht');
+      abschnitt('Diagramme');
+      var dw = (CW - 6) / 2;
+      diagramme.forEach(function (d, i) {
+        var dh = Math.min(62, dw * d.bild.h / d.bild.w);
+        if (i % 2 === 0 && i > 0) y += 0;
+        var sp = i % 2, rr = Math.floor(i / 2);
+        if (sp === 0 && platz(dh + 12)) { /* Seitenwechsel vor der Reihe */ }
+        var xx = L + sp * (dw + 6), yy = y + (sp === 0 ? 0 : 0);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(7.4); doc.setTextColor(120);
+        doc.text(d.titel, xx, yy + 3.4);
+        bild(d.bild, xx, yy + 5, dw, dh);
+        if (sp === 1 || i === diagramme.length - 1) y += dh + 12;
+      });
+      y += 2;
+    }
+
+    /* ── KI-Analyse, wenn vorhanden ──────────────────────────── */
+    var ai = window._aiAnalysis || null, aiText = window._aiText || '';
+    if (ai || aiText) {
+      platz(60, 'KI-Investment-Analyse', (adr || 'Objekt'));
+      abschnitt('KI-Investment-Analyse');
+      function liste(titel, arr) {
+        if (!arr || !arr.length) return;
+        zeile(titel, '', { fett: true });
+        arr.slice(0, 6).forEach(function (t) {
+          doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(60);
+          doc.splitTextToSize('· ' + String(t).replace(/\s+/g, ' '), CW - 4).forEach(function (z) {
+            if (y > H - 22) { doc.addPage(); kopf(_titel, _unter); }
+            doc.text(z, L + 3, y); y += 4.4;
+          });
+        });
+        y += 2;
+      }
+      if (ai) {
+        if (ai.empfehlung || ai.recommendation) zeile('Empfehlung', String(ai.empfehlung || ai.recommendation).slice(0, 60), { summe: true });
+        liste('Stärken', ai.staerken || ai.strengths);
+        liste('Risiken', ai.risiken || ai.schwaechen || ai.risks);
+        if (ai.fazit || ai.summary) {
+          doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(60);
+          doc.splitTextToSize(String(ai.fazit || ai.summary).replace(/\s+/g, ' '), CW).forEach(function (z) {
+            if (y > H - 22) { doc.addPage(); kopf(_titel, _unter); }
+            doc.text(z, L, y); y += 4.4;
+          });
+        }
+      } else {
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(60);
+        doc.splitTextToSize(String(aiText).replace(/\s+/g, ' ').slice(0, 2400), CW).forEach(function (z) {
+          if (y > H - 22) { doc.addPage(); kopf(_titel, _unter); }
+          doc.text(z, L, y); y += 4.4;
+        });
+      }
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
+      doc.text('Erzeugt von einem Sprachmodell aus den erfassten Angaben — eine Einschätzung, keine Beratung.', L, y + 1);
+      y += 7;
+    }
+
     platz(48, 'Annahmen und Hinweise', (adr || 'Objekt'));
     abschnitt('Annahmen');
     zeile('Mietsteigerung p. a.', num('mietstg') !== null ? pct(num('mietstg'), 1) : '—');
@@ -580,6 +775,10 @@
     zeile('Betrachtungszeitraum', S.btj ? zahl(S.btj) + ' Jahre' : '—');
     zeile('Anschlusszins / Anschlusstilgung (Annahme)', [pct(num('anschl_z'), 2), pct(num('anschl_t'), 2)].join('  ·  '));
     zeile('Persönlicher Grenzsteuersatz', num('grenz') !== null ? pct(num('grenz'), 2) : '—');
+    zeile('Gebäudeanteil am Kaufpreis', num('geb_ant') !== null ? pct(num('geb_ant'), 0) : '—');
+    zeile('AfA-Satz Gebäude', num('afa_satz') !== null ? pct(num('afa_satz'), 2) : (txt('afa_satz') || '—'));
+    zeile('Grunderwerbsteuer (Land)', num('gest_p') !== null ? pct(num('gest_p'), 2) : '—');
+    if (num('exit_bmy') !== null) zeile('Exit-Rendite (Verkaufsszenario)', pct(num('exit_bmy'), 1));
     if (K.d1IsAussetzung) zeile('Darlehenstyp', 'Tilgungsaussetzung mit Bausparvertrag');
     if (num('bspar_rate')) zeile('Bausparrate / Monat', eur(num('bspar_rate')));
     y += 2;
