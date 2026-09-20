@@ -95,6 +95,19 @@
 
   /* Objektfotos: Groesse muss bekannt sein, sonst verzerrt addImage.
      Deshalb laedt diese Funktion sie vorher — der Export ist async. */
+  /* MARKER_V1462 · Zuschnitt mittig auf ein Zielverhaeltnis. jsPDF kann
+     nicht beschneiden — deshalb vorher auf einer Leinwand schneiden. */
+  function zuschneiden(b, verhaeltnis, breitePx) {
+    try {
+      var zw = breitePx || 1400, zh = Math.round(zw / verhaeltnis);
+      var c = document.createElement('canvas'); c.width = zw; c.height = zh;
+      var ctx = c.getContext('2d');
+      var s = Math.max(zw / b.w, zh / b.h), iw = b.w * s, ih = b.h * s;
+      var i = new Image(); i.src = b.src;
+      ctx.drawImage(i, (zw - iw) / 2, (zh - ih) / 2, iw, ih);
+      return { src: c.toDataURL('image/jpeg', 0.82), w: zw, h: zh };
+    } catch (e) { return b; }
+  }
   function bilderLaden(max) {
     var quelle = (window.imgs && window.imgs.length) ? window.imgs : [];
     var liste = quelle.slice(0, max).map(function (o) { return (o && o.src) ? o.src : o; }).filter(Boolean);
@@ -167,6 +180,16 @@
     /* Kennzahlen als Raster 3 × n: ruhig, gut lesbar, ohne Farbflächen */
     function raster(items) {
       var sp = 3, bw = (CW - 2 * sp) / 3, bh = 17;
+      /* v1462: gemessen — zwoelf Kacheln liefen am Objekt mit Foto in die
+         Fusszeile. Das Raster bricht jetzt selbst um. */
+      var proSeite = Math.max(1, Math.floor((H - 24 - y) / (bh + sp)));
+      if (Math.ceil(items.length / 3) > proSeite) {
+        var passt = proSeite * 3;
+        raster(items.slice(0, passt));
+        doc.addPage(); kopf(_titel, _unter);
+        raster(items.slice(passt));
+        return;
+      }
       items.forEach(function (it, i) {
         var c = i % 3, r = Math.floor(i / 3), x = L + c * (bw + sp), yy = y + r * (bh + sp);
         doc.setDrawColor(226, 221, 210); doc.setLineWidth(0.25); doc.rect(x, yy, bw, bh);
@@ -185,10 +208,11 @@
       return false;
     }
     /* Bild proportional in einen Rahmen setzen (nie verzerren). */
-    function bild(b, x, yy, bw, bh) {
+    function bild(b, x, yy, bw, bh, schneiden) {
       if (!b) return;
-      var s = Math.min(bw / b.w, bh / b.h), iw = b.w * s, ih = b.h * s;
-      try { doc.addImage(b.src, x + (bw - iw) / 2, yy + (bh - ih) / 2, iw, ih); } catch (e) { return; }
+      var q = schneiden ? zuschneiden(b, bw / bh, Math.round(bw * 12)) : b;
+      var s = Math.min(bw / q.w, bh / q.h), iw = q.w * s, ih = q.h * s;
+      try { doc.addImage(q.src, x + (bw - iw) / 2, yy + (bh - ih) / 2, iw, ih); } catch (e) { return; }
       doc.setDrawColor(226, 221, 210); doc.setLineWidth(0.25);
       doc.rect(x + (bw - iw) / 2, yy + (bh - ih) / 2, iw, ih); doc.setLineWidth(0.2);
     }
@@ -299,7 +323,7 @@
     /* ── Seite 1 ─────────────────────────────────────────────── */
     kopf('Investment Case', (adr || 'Objekt ohne Anschrift') + ' · Finanzierungsunterlage · Stand ' + heute());
 
-    if (fotos.length) { bild(fotos[0], L, y, CW, 46); y += 50; }
+    if (fotos.length) { bild(fotos[0], L, y, CW, CW / 3.2, true); y += CW / 3.2 + 5; }
 
     abschnitt('Objekt');
     zeile('Anschrift', adr || '—');
@@ -344,6 +368,7 @@
       ['Deal Score', (SC && SC.score) ? zahl(SC.score, 0) + ' / 100' : '—', (SC && SC.label) ? SC.label : '']
     ]);
     if (SC && SC.interpretation) {
+      platz(16);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(70);
       doc.splitTextToSize('Einordnung: ' + String(SC.interpretation).replace(/\s+/g, ' '), CW).forEach(function (t) { doc.text(t, L, y); y += 4.4; });
       y += 4;
@@ -353,10 +378,10 @@
     if (fotos.length > 1) {
       platz(96, 'Objektfotos', (adr || 'Objekt'));
       abschnitt('Objektfotos');
-      var gal = fotos.slice(1, 5), sp2 = 4, bw2 = (CW - sp2) / 2, bh2 = 44;
+      var gal = fotos.slice(1, 5), sp2 = 4, bw2 = (CW - sp2) / 2, bh2 = (CW - sp2) / 2 * 0.72;
       gal.forEach(function (f, i) {
         var c = i % 2, r = Math.floor(i / 2);
-        bild(f, L + c * (bw2 + sp2), y + r * (bh2 + sp2), bw2, bh2);
+        bild(f, L + c * (bw2 + sp2), y + r * (bh2 + sp2), bw2, bh2, true);
       });
       y += Math.ceil(gal.length / 2) * (bh2 + sp2) + 4;
     }
