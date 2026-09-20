@@ -177,10 +177,12 @@
         var i = new Image();
         i.onload = function () {
           try {
-            var c = document.createElement('canvas'); c.width = br * 2; c.height = ho * 2;
+            /* v1463d: PNG blies das Dokument auf 13,7 MB. JPEG mit weissem
+               Grund bringt dieselbe Zeichnung bei rund einem Fuenfzigstel. */
+            var c = document.createElement('canvas'); c.width = Math.round(br * 1.6); c.height = Math.round(ho * 1.6);
             var ctx = c.getContext('2d'); ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, c.width, c.height);
             ctx.drawImage(i, 0, 0, c.width, c.height);
-            fertig({ src: c.toDataURL('image/png'), w: c.width, h: c.height, id: id });
+            fertig({ src: c.toDataURL('image/jpeg', 0.86), w: c.width, h: c.height, id: id });
           } catch (e) { fertig(null); }
         };
         i.onerror = function () { fertig(null); };
