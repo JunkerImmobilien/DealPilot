@@ -17391,3 +17391,39 @@ ausgelesen und im PDF neu gesetzt — gerechnet wird weiterhin nur in bank-chart
 Tilgungsaussetzung 7, Mehrfamilienhaus 8, Vollfinanzierung 6 Seiten; 0,18-0,26 MB):
 kein Kauderwelsch, nichts unter der Fusszeile, keine Ueberlappung, kein Block fehlt.
 Drei Fassungen heruntergeladen und auf der Platte gegengelesen.
+
+## Rollout-Journal · 20.09.2026 (6) — Absender aus den Einstellungen, Gesellschaft, Rechenwege geprueft
+
+Marcel: „Waeren dort auch am Anfang ein Bild vom Objekt und auch die Daten des Kunden aus den
+Einstellungen? … Macht das auch Sinn ein PDF fuer die Gesellschaft zu haben? … Bitte pruefe auch
+alle Rechenwege und gleiche es mit den aktuellen Rechnungen ab."
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1466 / b | `dbb6b92`, `17abe71` | Absender und Ansprechpartner aus den Einstellungen, eigenes Logo im Kopf, Abschnitt „Erwerb ueber eine Gesellschaft" |
+
+**Befund an den drei abgelegten PDFs:** im Kopf stand „DealPilot", nicht die eigenen Daten.
+Ursache: die Plan-Sperre steckt BEREITS in `DealPilotConfig.branding.get()` (config.js V192:
+unter Pro die Vorgabewerte, ab Pro die Einstellungen). Die Bankfassung hatte darueber eine
+ZWEITE Sperre gelegt (`hasFeature(custom_logo)` UND Firma ungleich „Junker Immobilien") — sie
+unterdrueckte die Daten auch fuer den Pro-Nutzer. Jetzt nur noch `branding.get()`.
+Gemessen: Kopf und Block „Ansprechpartner" tragen Firma, Person, Anschrift, Telefon, E-Mail, Web.
+
+**Titelbild:** liegt am Objekt. Hat das Objekt Fotos, steht das erste im Panoramaschnitt oben auf
+Seite 1, die weiteren als Galerie. Das Testobjekt 2026-1033 hat keine — deshalb fehlte es dort.
+
+**Gesellschaft:** KEIN zweites Dokument. Die Rechnung kennt den Halter bereits
+(`DealPilotMandanten.effRate()` liefert KSt+GewSt, calc.js `_mtx`/`_mtxYear`, Verluste ohne
+Erstattung). Die Bankfassung zeigt jetzt automatisch den Abschnitt „Erwerb ueber eine
+Gesellschaft": Halter, Besteuerung, effektiver Satz, Ueberfuehrung (Stichtag, Verkehrswert,
+Ueberfuehrungspreis, uebernommene Restschuld), Gesellschafterdarlehen. Mit einem simulierten
+Halter geprueft (nichts angelegt): 8 Seiten, Block vollstaendig.
+
+**Rechenwege gegen die App abgeglichen** (ETW, 300.000 EUR, 60.000 EK, 3,8 % / 2,0 %, 10 Jahre):
+20 von 20 Betraegen deckungsgleich (Kaufpreis, jede Nebenkostenposition einzeln, Gesamt-
+investition, Finanzierung, Restschuld, Warm- und Kaltmiete, Cashflow vor und nach Steuern, AfA,
+zu versteuerndes Ergebnis, Bewirtschaftung gesamt und nicht umlagefaehig, Anschlussrate,
+Mehrbelastung, Verkaufspreis). Kennzahlen 8 von 8 (Equity Multiple 4,05 wird als 4,1 gerundet
+ausgewiesen). Drei Phasen und die Jahreszeile 1 stimmen Ziffer fuer Ziffer.
+
+**Das alte Investment-PDF bleibt unveraendert** (`js/pdf.js`, letzte Aenderung v1442 vom 19.09.).
