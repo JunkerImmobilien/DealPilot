@@ -17372,3 +17372,22 @@ heruntergeladen und auf der Platte geprueft (6/6/7 Seiten, 3/3/6 Bilder).
 4. Ein Zeichen ausserhalb WinAnsi (hier das Haekchen) kippt die ganze Zeile in Doppelbyte.
 
 **Rest:** die Stress-Matrix fehlt im PDF (rendert in der eigenen Flaeche nicht). Nicht auf Prod.
+
+## Rollout-Journal · 20.09.2026 (5) — Stress-Matrix im PDF, Rumpfjahr-Fehler gefunden
+
+Marcel: „kannst du den Rest auch ins PDF bauen und auch die Stress-Matrix?"
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1464 | `dd70340` | Belastungsprobe als 5x5-Tabelle mit Ampelfarben, Vermoegenszuwachs als Jahrestabelle, Bewirtschaftungskosten gesamt und als Quote, Leerstand in den Annahmen, effektive Restschuld am Bindungsende, Kaufpreis-Offerte der KI |
+| v1464b | `7e4e632` | alle Zeichen ausserhalb WinAnsi aus der Datei (Minus in den Spaltenkoepfen) |
+| v1465 | `6aef931` | **Fehler in der Bankansicht:** die Stress-Matrix rechnete auf cfRows[0] — beim Kauf im laufenden Jahr ein RUMPFJAHR (3.600 statt 11.124 EUR Miete, Zins und Tilgung anteilig, Restschuld voll). Im Szenario -2 Prozentpunkte wurde der Kapitaldienst rechnerisch null, die ganze untere Zeile zeigte 0,00 — auch in der App. Basis ist jetzt das erste VOLLE Jahr. Gemessen: untere Zeile 1,04 bis 1,56 statt 0,00 |
+
+**Die Matrix ist kein Diagramm, sondern HTML.** Sie wird unsichtbar gerendert
+(`BankCharts.renderStressMatrix(host, State)`), die 25 Zellen samt Ampelklasse werden
+ausgelesen und im PDF neu gesetzt — gerechnet wird weiterhin nur in bank-charts.js.
+
+**Nachweis:** fuenf Szenarien erneut gebaut und geprueft (ETW 7, zwei Darlehen 6,
+Tilgungsaussetzung 7, Mehrfamilienhaus 8, Vollfinanzierung 6 Seiten; 0,18-0,26 MB):
+kein Kauderwelsch, nichts unter der Fusszeile, keine Ueberlappung, kein Block fehlt.
+Drei Fassungen heruntergeladen und auf der Platte gegengelesen.
