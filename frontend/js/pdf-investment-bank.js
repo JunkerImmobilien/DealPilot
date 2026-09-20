@@ -78,6 +78,17 @@
     try { if (typeof window._pdfGold === 'function') return window._pdfGold(); } catch (e) {}
     return [201, 168, 76];
   }
+  /* v1463e · Text aus der Oberflaeche kann Zeichen tragen, die WinAnsi nicht
+     kennt (gemessen: das Haekchen U+2713 im Zuteilungsstatus). jsPDF schaltet
+     dann still auf Doppelbyte um, und im Dokument steht Kauderwelsch. */
+  function sauber(t) {
+    return String(t == null ? '' : t)
+      .replace(/[\u2713\u2714]/g, '+')
+      .replace(/[\u2717\u2718\u26A0\uFE0F]/g, '!')
+      .replace(/[\u2212\u2011\u2012]/g, '-')
+      .replace(/[^\x00-\xFF]/g, '')
+      .replace(/\s+/g, ' ').trim();
+  }
   function heute() {
     var t = new Date();
     return ('0' + t.getDate()).slice(-2) + '.' + ('0' + (t.getMonth() + 1)).slice(-2) + '.' + t.getFullYear();
@@ -468,7 +479,7 @@
       if (num('bspar_zins') !== null) zeile('Guthabenzins', pct(num('bspar_zins'), 2));
       /* Zuteilung, Status und Bauspardarlehen stehen als fertige Zellen in der
          Finanzierung (DIV, kein Eingabefeld) — hier nur uebernommen. */
-      function zellText(id) { var e = el(id); var t = e ? (e.textContent || '').trim().replace(/\s+/g, ' ') : ''; return (t && t !== '—') ? t : null; }
+      function zellText(id) { var e = el(id); var t = e ? sauber(e.textContent) : ''; return (t && t !== '-' && t !== '—') ? t : null; }
       var zut = zellText('bspar_zuteil_detail') || zellText('bspar_zuteil_auto');
       if (zut) zeile('Zuteilung', zut);
       var zStatus = zellText('bspar_zuteil_status');
@@ -587,7 +598,7 @@
 
       /* Kennzahlen je Phase — die Zellen hat calc bereits gefuellt
          (Zinsaenderungs-Block). Hier wird nur uebernommen, nicht gerechnet. */
-      function zT(id) { var e = el(id); var t = e ? e.textContent.trim() : ''; return t || '—'; }
+      function zT(id) { var e = el(id); var t = e ? sauber(e.textContent) : ''; return t || '—'; }
       if (el('zaer-zins-now')) {
         platz(56);
         abschnitt('Kennzahlen je Phase');
