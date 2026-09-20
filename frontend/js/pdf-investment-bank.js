@@ -260,7 +260,12 @@
       doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(120);
       doc.text('I M M O B I L I E N - I N V E S T I T I O N S A N A L Y S E', L, y + 4.6);
       doc.setFontSize(8); doc.setTextColor(110);
-      var by = y - 2.5; ab.zeilen.forEach(function (t) { doc.text(t, W - R, by, { align: 'right' }); by += 3.8; });
+      /* MARKER_V1467 · gemessen: mit vier Absenderzeilen lag die letzte auf der
+         Goldlinie (Linie bei y+8.5). Der Block wird jetzt so gesetzt, dass die
+         letzte Zeile 2 mm darueber endet. */
+      var zl = ab.zeilen.slice(0, 4), schritt = 3.6;
+      var by = (y + 6.5) - (zl.length - 1) * schritt;
+      zl.forEach(function (t) { doc.text(t, W - R, by, { align: 'right' }); by += schritt; });
       y += 8.5;
       doc.setDrawColor(G[0], G[1], G[2]); doc.setLineWidth(0.8); doc.line(L, y, W - R, y); doc.setLineWidth(0.2);
       y += 10;
@@ -461,6 +466,8 @@
     if (txt('kaufdat')) zeile('Kaufdatum', txt('kaufdat'));
     y += 3;
 
+    ansprechpartner();
+
     abschnitt('Investition');
     zeile('Kaufpreis', eur(kp));
     /* Nebenkosten einzeln wie im alten PDF - eine Summe allein beantwortet
@@ -583,8 +590,10 @@
       y += Math.ceil(gal.length / 2) * (bh2 + sp2) + 4;
     }
 
-    /* Ansprechpartner - dieselben Daten wie im alten PDF (Deckblattfuss). */
-    (function () {
+    /* Ansprechpartner - dieselben Daten wie im alten PDF (Deckblattfuss).
+       v1467: steht jetzt auf Seite 1 unter dem Objekt, nicht erst hinter den
+       Kennzahlen - die Bank will wissen, wer das Papier verschickt hat. */
+    function ansprechpartner() {
       var b = ab.b || {};
       var hatEtwas = b.company || b.name || b.address || b.email || b.phone || b.website;
       if (!hatEtwas) return;
@@ -598,7 +607,7 @@
       if (b.email) zeile('E-Mail', sauber(b.email));
       if (b.website) zeile('Web', sauber(String(b.website).replace(/^https?:\/\//, '')));
       y += 2;
-    })();
+    }
 
     /* ── Erwerb ueber eine Gesellschaft ───────────────────────── */
     (function () {
