@@ -266,6 +266,7 @@
       zeile('Kaltmiete p. a. — Soll (nach Maßnahmen)', eur(sollJ));
       zeile('Bruttomietrendite Ist (auf Kaufpreis)', pct(K.bmy, 2));
       zeile('Bruttomietrendite Soll (auf Gesamtinvestition)', da(K.gi) && K.gi > 0 ? pct(sollJ / K.gi * 100, 2) : '—');
+      zeile('Rechtliche Einheit', MFH.aufgeteilt ? 'in Wohnungseigentum aufgeteilt (WEG)' : 'ungeteiltes Gebäude');
       if (MFH.s.leer) zeile('Leerstand', MFH.s.leer + ' Einheiten / ' + zahl(MFH.s.leerFl, 0) + ' m²');
       if (MFH.s.kosten) zeile('Geplante Maßnahmen', eur(MFH.s.kosten));
       zeile('Modernisierungsgrad (flächengewichtet)', zahl(MFH.punkteGew, 1) + ' von 20 Punkten');
