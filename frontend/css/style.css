@@ -37878,3 +37878,17 @@ html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card,
 :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body :is(header.hdr, header.hdr.has-v64-score) #hdr-obj-num{ color:#3B352D !important; }
 :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body aside.sidebar .sb-card.sb-card .sbc-date{ color:#6A6358 !important; }
 /* === /v1453d === */
+/* v1455 · Hybrid: Score und Kopf-Kennzahlen unten in der Aktionsspalte,
+   im hellen Profil laesst der Kopf sie dafuer dauerhaft weg (Marcel 20.09.2026:
+   „unten dann den Investor Deal Score anzeigen … und diesen Header dann
+   dauerhaft rauslassen, aber nur in diesem White-Modus"). Ausgeblendet wird
+   nur die ANZEIGE - die Bausteine bleiben im DOM, die Spalte liest sie aus. */
+html[data-ui-theme="kanzlei"] body.dp-hybrid-rail :is(#hdr-score-mini,#hdr-completeness){ display:none !important; }
+#dp-hybrid-aktionen .dp-hy-fuss{ margin-top:auto; }
+#dp-hybrid-aktionen .dp-hy-score-z{ display:flex; align-items:baseline; gap:5px; margin:2px 0 6px; }
+#dp-hybrid-aktionen .dp-hy-score-z b{ font:600 28px/1 "Space Grotesk",Inter,sans-serif; font-variant-numeric:tabular-nums; }
+#dp-hybrid-aktionen .dp-hy-score-z span{ font-size:11.5px; color:#8E877C; }
+#dp-hybrid-aktionen .dp-hy-score-z em{ margin-left:auto; font:600 10px/1 "JetBrains Mono",ui-monospace,monospace; letter-spacing:.06em; text-transform:uppercase; color:#FFFFFF; border-radius:999px; padding:4px 7px; font-style:normal; }
+#dp-hybrid-aktionen .dp-hy-bar{ height:4px; border-radius:999px; background:#EFEBE3; overflow:hidden; margin-bottom:4px; }
+#dp-hybrid-aktionen .dp-hy-bar i{ display:block; height:100%; border-radius:999px; }
+/* === /v1455 === */

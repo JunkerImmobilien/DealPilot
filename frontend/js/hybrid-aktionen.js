@@ -9,6 +9,13 @@
      exportPDFBank / exportPDF / openMarktberichtView /
      exportWerbungskostenPDF / Reiter Deal-Aktion.
    Die Breite setzt body.dp-hybrid-rail; das Layout steht in style.css (v1449).
+
+   v1455 (Marcel 20.09.2026): unten in der Spalte stehen der Investor Deal
+   Score und die Kennzahlen, die bisher oben im Kopf standen — im hellen
+   Profil laesst der Kopf sie dafuer dauerhaft weg (style.css v1455).
+   Die Zahlen werden NICHT neu gerechnet: Score und Vollstaendigkeit werden
+   aus den Kopf-Bausteinen gelesen (sie bleiben im DOM, nur unsichtbar),
+   die Renditen kommen wie bisher aus State.kpis.
    ════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -35,17 +42,39 @@
     a.setAttribute('aria-label', 'Aktionen');
     var h = '<div class="lbl">Aktionen</div>';
     AKTIONEN.forEach(function (x, i) { h += '<button type="button" data-i="' + i + '" class="' + x[1] + '">' + x[0] + '</button>'; });
-    h += '<div class="lbl" style="margin-top:14px">Dieses Objekt</div><div id="dp-hy-kpi"></div>';
+    h += '<div class="dp-hy-fuss"><div id="dp-hy-score"></div>'
+      + '<div class="lbl">Dieses Objekt</div><div id="dp-hy-kpi"></div></div>';
     a.innerHTML = h;
     a.addEventListener('click', function (e) { var b = e.target.closest('button[data-i]'); if (b) AKTIONEN[+b.dataset.i][2](); });
     document.body.appendChild(a);
     return a;
   }
+  /* Score aus dem Kopf uebernehmen (dort ausgeblendet, aber im DOM).
+     Die Stufen-Schwellen stehen in js/dashboard.js:390 - hier wird nur
+     eingefaerbt, nicht neu bewertet. */
+  function farbe(n) { return n >= 85 ? '#2E8455' : n >= 70 ? '#3FA56C' : n >= 50 ? 'var(--wl-c9a84c, #C9A84C)' : n >= 35 ? '#C2703F' : '#B8625C'; }
+  function score() {
+    var host = document.getElementById('dp-hy-score'); if (!host) return;
+    var mini = document.getElementById('hdr-score-mini');
+    var b = mini && mini.querySelector('b'), st = mini && mini.querySelector('span');
+    var n = b ? parseInt(String(b.textContent).replace(/[^0-9]/g, ''), 10) : NaN;
+    if (!isFinite(n)) { host.innerHTML = ''; host.style.display = 'none'; return; }
+    host.style.display = '';
+    host.innerHTML = '<div class="lbl">Investor Deal Score</div>'
+      + '<div class="dp-hy-score-z"><b style="color:' + farbe(n) + '">' + n + '</b><span>/ 100</span>'
+      + '<em style="background:' + farbe(n) + '">' + ((st && st.textContent.trim()) || '') + '</em></div>'
+      + '<div class="dp-hy-bar"><i style="width:' + Math.max(2, Math.min(100, n)) + '%;background:' + farbe(n) + '"></i></div>';
+  }
+  function ausKopf(sel) { var e = document.querySelector(sel); var t = e && e.textContent.trim().replace(/\s+/g, ' '); return t || null; }
   function kennzahlen() {
+    score();
     var host = document.getElementById('dp-hy-kpi'); if (!host) return;
     var K = (window.State && window.State.kpis) || {};
     function z(n, d, s) { return (n == null || !isFinite(n)) ? '—' : Number(n).toFixed(d).replace('.', ',') + (s || ''); }
+    var voll = ausKopf('.hdr-comp-text'), pflicht = ausKopf('#tabs-status-text');
     host.innerHTML =
+      (voll ? '<div class="kpi"><span>Vollständigkeit</span><b>' + voll.replace(' Felder', '') + '</b></div>' : '') +
+      (pflicht ? '<div class="kpi"><span>Pflichtfelder</span><b>' + pflicht + '</b></div>' : '') +
       '<div class="kpi"><span>Bruttorendite</span><b>' + z(K.bmy, 2, ' %') + '</b></div>' +
       '<div class="kpi"><span>DSCR</span><b>' + z(K.dscr, 2) + '</b></div>' +
       '<div class="kpi"><span>Cashflow / Monat</span><b>' + (K.cf_m == null || !isFinite(K.cf_m) ? '—' : Math.round(K.cf_m).toLocaleString('de-DE') + ' €') + '</b></div>';
@@ -67,7 +96,12 @@
   var n = 0;
   function start() { anwenden(); if (!anhaengen() && ++n < 12) setTimeout(start, 400); }
   window.addEventListener('resize', function () { clearTimeout(window._dpHyT); window._dpHyT = setTimeout(anwenden, 150); });
-  window.addEventListener('dp:object-ready', function () { setTimeout(kennzahlen, 500); });
+  window.addEventListener('dp:object-ready', function () { setTimeout(kennzahlen, 500); setTimeout(kennzahlen, 1600); });
+  /* Der Score wird vom Kopf gesetzt, nicht von calc - deshalb dort lauschen. */
+  try {
+    new MutationObserver(function () { if (document.body.classList.contains('dp-hybrid-rail')) kennzahlen(); })
+      .observe(document.querySelector('header.hdr') || document.body, { subtree: true, childList: true, characterData: true });
+  } catch (e) {}
   /* Die Vorlage kann nach dem Laden wechseln (Profil-Schalter). */
   try { new MutationObserver(anwenden).observe(document.documentElement, { attributes: true, attributeFilter: ['data-ui-theme'] }); } catch (e) {}
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
