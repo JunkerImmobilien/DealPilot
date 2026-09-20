@@ -396,6 +396,10 @@
         doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4); doc.setTextColor(140);
         doc.text(zahl(Math.round(wert / 1000)) + 'k', bx - 2, yy + 1.6, { align: 'right' });
       }
+      /* MARKER_V1469 · gemessen: liegen zwei Linien am Ende aufeinander (ohne
+         Darlehen sind Objektwert und Eigenkapital gleich), druckten sich die
+         beiden Endwerte uebereinander. Belegte Hoehen merken und ausweichen. */
+      var belegt = [];
       reihen.forEach(function (r) {
         var f = r.gold ? GD : (r.grau ? [150, 145, 135] : [40, 40, 40]);
         doc.setDrawColor(f[0], f[1], f[2]); doc.setLineWidth(r.gold ? 0.7 : 0.5);
@@ -409,8 +413,11 @@
         try { doc.setLineDashPattern([], 0); } catch (e) {}
         var letzte = r.werte[r.werte.length - 1];
         if (isFinite(letzte)) {
+          var ly = py(letzte) + 1.6;
+          while (belegt.some(function (v) { return Math.abs(v - ly) < 3.2; })) ly += 3.4;
+          belegt.push(ly);
           doc.setFont('helvetica', 'bold'); doc.setFontSize(6.6); doc.setTextColor(f[0], f[1], f[2]);
-          doc.text(zahl(Math.round(letzte / 1000)) + 'k', bx + bw + 1.5, py(letzte) + 1.6);
+          doc.text(zahl(Math.round(letzte / 1000)) + 'k', bx + bw + 1.5, ly);
         }
       });
       doc.setLineWidth(0.2);
