@@ -17427,3 +17427,25 @@ Mehrbelastung, Verkaufspreis). Kennzahlen 8 von 8 (Equity Multiple 4,05 wird als
 ausgewiesen). Drei Phasen und die Jahreszeile 1 stimmen Ziffer fuer Ziffer.
 
 **Das alte Investment-PDF bleibt unveraendert** (`js/pdf.js`, letzte Aenderung v1442 vom 19.09.).
+
+## Rollout-Journal · 20.09.2026 (7) — Titelbild in allen Faellen, Kopf, Hinweis statt Luecke
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1467 | `95d3e48` | Absenderblock endet 2 mm ueber der Goldlinie (mit vier Zeilen lag er darauf); Ansprechpartner steht auf Seite 1 unter dem Objekt |
+| v1468 | `02c85c6` | Abschnitt „Was in dieser Fassung fehlt" — nennt den Grund, wenn Vermoegensaufbau, Diagramme und Belastungsprobe nicht erscheinen |
+| v1469 | `f13db79` | Endwerte der Kurve weichen einander aus (ohne Darlehen lagen Objektwert und Eigenkapital uebereinander) |
+
+**Titelbild in allen Faellen geprueft** (echtes Objekt 2026-1004, Fotos liegen als Daten-URI vor,
+also kein Zugriffsproblem): ohne Foto keine Flaeche und kein leerer Block (4 Seiten, 0 Bilder);
+genau ein Foto = nur Titelbild (1 Bild); sechs Fotos = Titelbild plus vier in der Galerie
+(5 Bilder, Deckel greift); reines Hochformat wird mittig auf Panorama beschnitten (1 Bild).
+
+**Warum bei 2026-1004 keine Diagramme erscheinen** — und das ist KEIN Fehler: am Objekt steht
+ein Privat-Ende zum 01.01.2026, calc.js kappt den Betrachtungszeitraum darauf (v816-CUT,
+`State.btj` = 1, obwohl im Feld 15 steht). Die Bankdiagramme brauchen mindestens zwei
+Jahresreihen. Seit v1468 steht genau das im Dokument.
+
+**Nachweis auf der Platte:** Hoelderlinstr. 6 Seiten / 5 Bilder (Titelbild + Galerie),
+Hiddenhausen 7 Seiten / 3 Bilder (Diagramme); beide mit „Junker Immobilien" im Kopf und
+Block „Ansprechpartner". Keine Ueberlappung, kein Kauderwelsch.
