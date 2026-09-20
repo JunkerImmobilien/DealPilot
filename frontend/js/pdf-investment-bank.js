@@ -992,6 +992,30 @@
         { titel: 'Vermögenszuwachs im Detail', hinweis: 'Eigenkapital im Objekt = angenommener Wert minus Restschuld. Der Wert ist eine Annahme, keine Bewertung.' });
     }
 
+    /* MARKER_V1468 · Fehlen Diagramme, Vermoegensaufbau und Belastungsprobe,
+       steht hier WARUM. Gemessen am 20.09.2026 an Objekt 2026-1004: dort ist
+       ein Privat-Ende zum 01.01.2026 gesetzt, calc.js kappt den Betrachtungs-
+       zeitraum auf ein Jahr (v816-CUT) - die Bankdiagramme brauchen aber
+       mindestens zwei Jahresreihen. Ohne Hinweis sieht das aus wie ein Fehler. */
+    if (rows.length < 2 || (!diagramme.length && !SM)) {
+      platz(26);
+      abschnitt('Was in dieser Fassung fehlt');
+      var gruende = [];
+      if (rows.length < 2) gruende.push('Die Projektion endet nach ' + (rows.length || 0) + ' Jahr' + (rows.length === 1 ? '' : 'en') + '. Vermögensaufbau, Diagramme und Belastungsprobe brauchen mindestens zwei Jahresreihen.');
+      if (rows.length < 2 && txt('ueberf_ende')) gruende.push('Grund ist das gesetzte Privat-Ende zum ' + sauber(txt('ueberf_ende')) + ' - ab dann rechnet die Gesellschaft weiter.');
+      if (rows.length >= 2 && !diagramme.length) gruende.push('Die Diagramme der Bankansicht ließen sich nicht erzeugen.');
+      if (rows.length >= 2 && !SM) gruende.push('Die Belastungsprobe ließ sich nicht erzeugen.');
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(70);
+      gruende.forEach(function (t) {
+        doc.splitTextToSize(t, CW).forEach(function (z) {
+          if (y > H - 22) { doc.addPage(); kopf(_titel, _unter); }
+          doc.text(z, L, y); y += 4.4;
+        });
+        y += 1.5;
+      });
+      y += 3;
+    }
+
     platz(48, 'Annahmen und Hinweise', (adr || 'Objekt'));
     abschnitt('Annahmen');
     zeile('Mietsteigerung p. a.', num('mietstg') !== null ? pct(num('mietstg'), 1) : '-');
