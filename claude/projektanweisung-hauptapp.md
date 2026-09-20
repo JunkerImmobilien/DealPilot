@@ -17235,3 +17235,29 @@ Vorher gesichert und angesehen: `haupt-20260919-1403.sql.gz` (11 MB, 63 Tabellen
 (744 KB, 33 Tabellen). Nachweis: Fingerabdruck Prod = Staging (`773ebb8cd5b0`), Gold-Audit RC=0, Backend healthy,
 Seite und neue Module 200; im Browser auf app.dealpilot.immo: style.css v1453d, DpAfaEigen mit Option „eigen“,
 DpMfhEinheiten.istSoll, hybrid-aktionen.js geladen, san_ust gekürzt.
+
+## Rollout-Journal · 20.09.2026 — MFH Stufe 3 und Score in der Aktionsspalte (Staging)
+
+Marcel: Einheiten „auch bewerten … nach den Kriterien vom Restnutzungsdauergutachten.
+Ausser das, was man vom Haupthaus erbt, also Dach oder Heizung" und „im Weissmodus unten
+den Investor Deal Score und die KPIs aus dem Header — den Header dafuer dauerhaft raus".
+
+| Paket | Commit | Punkt | Was |
+|---|---|---|---|
+| v1454 | `f9df9f1` | 6 | MFH-Modal in VIER Schritten; Zustand je Einheit nach Anlage 2, Vererbung vom Gebaeude; RND je Einheit aus `DealPilotRND.calcAll`; Uebernahme in `mod_punkte` und in die AfA |
+| v1455 / b / c | `0918e1a`, `9a20dbb`, `10326a1` | 21 | Score + Kopf-Kennzahlen unten in der Aktionsspalte; Kopf laesst sie im hellen Profil weg; Luft gegen die Fusszeile; kein Score eines fremden Objekts mehr |
+
+**Nachweis v1454:** Bj 1968, GND 80. Haus: Dach erneuert, Leitungen teilweise, Heizung erneuert,
+Fenster teilweise = 8 Punkte. Wohnung 1 erbt alles → 8 P. / 37 J.; Wohnung 2 mit eigenem Bad und
+Innenausbau → 12 P. / 41 J.; flaechengewichtet 10,1 P. / 39 J. Uebernahme gemessen: wfl 150,
+Einheiten 2, nkm 1.100, mod_punkte 8, AfA 2,56 % mit Grundlagenvermerk. Danach alles zurueckgesetzt.
+
+**Nachweis v1455:** Spalte zeigt „71 / 100 GUT" mit Balken, darunter Vollstaendigkeit 18/24,
+Pflichtfelder 6/6, Bruttorendite 5,70 %, DSCR 1,37, Cashflow 86 €. Objektwechsel hin und zurueck
+sauber. Gold-Audit RC=0.
+
+**Falle:** der Kopf LAESST den alten Score im DOM stehen und blendet ihn per Inline-Stil aus
+(display:none, dazu body.hdr-no-score). Wer ihn ausliest, zeigt den Score des VORIGEN Objekts.
+Gleiches gilt fuer die Vollstaendigkeit. Gueltig ist nur, was NICHT inline ausgeblendet ist.
+
+**Rest:** Soll-Miete als Sprung in der Mietentwicklung, Ist/Soll ins Bank-PDF. Nicht auf Prod.
