@@ -138,7 +138,7 @@
       y += 10;
     }
     function abschnitt(t) {
-      if (y > H - 40) { doc.addPage(); kopf('Investment Case', 'Fortsetzung'); }
+      if (y > H - 34) { doc.addPage(); kopf(_titel, _unter); }
       doc.setFont('helvetica', 'bold'); doc.setFontSize(8.6); doc.setTextColor(GD[0], GD[1], GD[2]);
       doc.text(t.toUpperCase(), L, y);
       doc.setDrawColor(226, 221, 210); doc.line(L, y + 1.8, W - R, y + 1.8);
@@ -146,6 +146,10 @@
     }
     function zeile(label, wert, o) {
       o = o || {};
+      /* v1461b: Umbruch in der Zeile selbst. Vorher sprang ein ganzer Block
+         auf die naechste Seite, sobald er nicht mehr komplett passte —
+         die Seiten endeten dadurch nach der Haelfte. */
+      if (y > H - 22) { doc.addPage(); kopf(_titel, _unter); }
       if (o.summe) { doc.setDrawColor(G[0], G[1], G[2]); doc.setLineWidth(0.6); doc.line(L, y - 3.8, W - R, y - 3.8); doc.setLineWidth(0.2); }
       doc.setFont('helvetica', (o.summe || o.fett) ? 'bold' : 'normal'); doc.setFontSize(9.2);
       doc.setTextColor(o.summe ? 26 : (o.klein ? 110 : 50));
@@ -171,7 +175,7 @@
        Ohne das beginnt jeder Block auf einer halbleeren Seite. */
     var _titel = 'Investment Case', _unter = '';
     function platz(bedarf, titel, unter) {
-      if (titel) { _titel = titel; _unter = unter || _unter; }
+      if (titel) { _titel = titel; _unter = unter || ''; }
       if (y + bedarf > H - 24) { doc.addPage(); kopf(_titel, _unter); return true; }
       return false;
     }
@@ -353,7 +357,7 @@
     }
 
     /* ── Ertragsrechnung ─────────────────────────────────────── */
-    platz(150, 'Ertrag und Cashflow', (adr || 'Objekt') + ' · laufendes Jahr');
+    platz(46, 'Ertrag und Cashflow', (adr || 'Objekt') + ' · laufendes Jahr');
     abschnitt('Von der Warmmiete zum Cashflow');
     zeile('Warmmiete / Jahr (Kaltmiete und Umlagen)', eur(K.wm_j));
     zeile('abzüglich umlagefähiger Bewirtschaftung', da(K.bwk_ul) === null ? '—' : '- ' + eur(K.bwk_ul), { einzug: true });
@@ -369,7 +373,7 @@
     zeile('Cashflow nach Steuern / Monat', da(K.cf_ns) === null ? '—' : eur(K.cf_ns / 12, 2), { fett: true });
     y += 2;
 
-    platz(78);
+    platz(34);
     abschnitt('Bewirtschaftung');
     zeile('Hausgeld umlagefähig / Jahr', eur(num('hg_ul')));
     zeile('Grundsteuer / Jahr', eur(num('grundsteuer')));
@@ -382,7 +386,7 @@
     zeile('Summe nicht umlagefähig (im Cashflow)', eur(K.bwk_cf), { summe: true });
     y += 2;
 
-    platz(36);
+    platz(30);
     abschnitt('Steuerliche Wirkung');
     zeile('Abschreibung (AfA) / Jahr', eur(K.afa));
     zeile('Zu versteuerndes Ergebnis', eur(K.zve_immo));
@@ -392,7 +396,7 @@
     var bindj = num('d1_bindj');
     var hatPhasen = da(K.cf_ns_ezb) !== null || da(K.cf_ns_an) !== null;
     if (hatPhasen) {
-      platz(96, 'Drei Phasen', 'Heute · Ende der Zinsbindung' + (bindj ? ' (nach ' + zahl(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung');
+      platz(62, 'Drei Phasen', 'Heute · Ende der Zinsbindung' + (bindj ? ' (nach ' + zahl(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung');
       abschnitt('Cashflow je Phase');
       function ph(label, a, b, c) { return { werte: [label, a, b, c] }; }
       tabelle(
@@ -409,7 +413,7 @@
         ],
         { titel: 'Drei Phasen', hinweis: 'Ende Zinsbindung: mit fortgeschriebener Miete und dem dann erreichten Tilgungsstand. Anschluss: mit dem angenommenen Anschlusszins.' });
 
-      platz(56);
+      platz(44);
       abschnitt('Zinsänderungsrisiko');
       zeile('Zinsbindung', bindj !== null ? zahl(bindj) + ' Jahre' : '—');
       zeile('Restschuld am Ende der Zinsbindung', eur(S.rs));
@@ -420,7 +424,7 @@
     }
 
     /* ── Cashflow-Jahre ──────────────────────────────────────── */
-    platz(30 + Math.min(10, rows.length || 0) * 6.2, 'Cashflow-Entwicklung', (adr || 'Objekt') + ' · die ersten ' + Math.min(10, rows.length || 0) + ' Jahre');
+    platz(52, 'Cashflow-Entwicklung', (adr || 'Objekt') + ' · die ersten ' + Math.min(10, rows.length || 0) + ' Jahre');
     abschnitt('Cashflow je Jahr');
     var sp = [['Jahr', 16], ['Kaltmiete', 24], ['Bewirtsch.', 22], ['Zins', 22], ['Tilgung', 22], ['CF v. St.', 24], ['Restschuld', 26], ['LTV', 16]];
     var fak = CW / sp.reduce(function (a, s) { return a + s[1]; }, 0);
@@ -476,7 +480,7 @@
     var MFH = (window.DpMfhEinheiten && typeof window.DpMfhEinheiten.berichtDaten === 'function')
       ? window.DpMfhEinheiten.berichtDaten() : null;
     if (MFH && MFH.zeilen.length) {
-      platz(60 + MFH.zeilen.length * 6.2, 'Einheiten und Zustand', (adr || 'Objekt') + ' · ' + MFH.zeilen.length + ' Einheiten');
+      platz(56, 'Einheiten und Zustand', (adr || 'Objekt') + ' · ' + MFH.zeilen.length + ' Einheiten');
       abschnitt('Mieterliste');
       var spM = [['Nr.', 14], ['Lage', 30], ['m²', 16], ['Ist €/M', 20], ['Soll €/M', 20], ['Status', 20], ['Anlage 2', 20], ['RND', 16]];
       var fakM = CW / spM.reduce(function (a, s) { return a + s[1]; }, 0);
@@ -526,7 +530,7 @@
       y += 6;
     }
 
-    platz(76, 'Annahmen und Hinweise', (adr || 'Objekt'));
+    platz(48, 'Annahmen und Hinweise', (adr || 'Objekt'));
     abschnitt('Annahmen');
     zeile('Mietsteigerung p. a.', num('mietstg') !== null ? pct(num('mietstg'), 1) : '—');
     zeile('Kostensteigerung p. a.', num('kostenstg') !== null ? pct(num('kostenstg'), 1) : '—');
