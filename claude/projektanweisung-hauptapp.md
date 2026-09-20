@@ -17298,3 +17298,39 @@ main per fast-forward auf `b13000b` (12 Commits, keine Migration), mb-backend ne
 Staging (`7c2bf3a3354b`), Gold-Audit RC=0, keine Fehler im mb-Log, Seiten 200, Bodenrichtwert
 Wolfenbuettel auf Prod 260 EUR/m2 MIT Quellenvermerk; im Browser DpMfhEinheiten.berichtDaten,
 MietEntwicklung.sollSprung und DpAfaEigen geladen, style.css v1455b.
+
+## Rollout-Journal · 20.09.2026 (3) — Bankfassung traegt jetzt alles (Staging)
+
+Marcel: „die anderen Sachen muessen auch drauf aus dem jetzigen PDF, nur in diesem Design".
+
+**Die PDFs der App (Bestandsaufnahme):**
+
+| Datei | Einstieg | Was |
+|---|---|---|
+| `js/pdf.js` | `exportPDF()` | Investment-PDF, dunkle Fassung, seit V5.0 (3.406 Zeilen) |
+| `js/pdf-investment-bank.js` | `exportPDFBank()` | Investment Case, helle Bankfassung (v1436, jetzt vollstaendig) |
+| `js/werbungskosten-pdf.js` | `exportWerbungskostenPDF()` | Finanzamt: Werbungskosten je Jahr |
+| `js/pdf-anlage-bmf.js` | BMF-Modal | Anlage Kaufpreisaufteilung fuers Finanzamt (gestalterische Referenz der Bankfassung) |
+| `js/financing-pdf.js` | Finanzierungsanfrage | Unterlage fuer die Bank/Vermittler |
+| `js/rnd-pdf.js`, `rnd-docx.js` | RND-Assistent | Restnutzungsdauer-Dokument |
+| `js/rp-pdf-engine.js` | Partner-Portal | Objekt-Exposé im Reseller-Portal |
+| Marktbericht-Backend | Bericht | Wertermittlung nach ImmoWertV |
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1460 / b | `e48c573`, `d4a69be` | Bankfassung bekommt Score, Ertragsrechnung, Bewirtschaftung, Steuerwirkung, drei Phasen, Zinsaenderungsrisiko, Vermoegensaufbau (gezeichnete Kurve), Annahmen |
+| v1461 / b / c | `8ca4f01`, `6cc3909`, `2a1fd84` | Abschnitte FLIESSEN (vorher begann jeder Block auf halber Seite), Objektfotos, Kurzfazit aus dem Score, Zwischenzeilen |
+| v1462 … e | `84ee686` … `8f41335` | Fotos mittig zugeschnitten (Titelbild im Panorama, Galerie 4:3), Kennzahlenraster bricht um und bleibt zusammen samt Ueberschrift, groesseres Titelbild |
+
+**Nachweis:** PDF im Browser erzeugt, im Seitenstrom gelesen UND als Bild gerendert (pdf.js in der
+Messkabine): 4 Seiten ohne Fotos, 5 mit Fotos und Einheiten. Gold-Audit RC=0.
+
+**Zwei Fallen, teuer bezahlt:**
+1. **Das typografische Minus U+2212 kennt WinAnsi nicht.** jsPDF schaltet dann still auf
+   Doppelbyte um — im Dokument stand Kauderwelsch. Nur ASCII-Bindestrich verwenden.
+   Beim Messen am Seitenstrom faellt es auf, im Text-Extrakt sieht man `\u0012\u0000`.
+2. **`doc.addImage` mit einem frisch erzeugten `new Image()` zeichnet nichts**, solange es
+   nicht dekodiert ist. Das BEREITS geladene Element durchreichen. Und: jsPDF kann nicht
+   beschneiden — Zuschnitt vorher auf einer Leinwand.
+
+**Rest:** nicht auf Prod.
