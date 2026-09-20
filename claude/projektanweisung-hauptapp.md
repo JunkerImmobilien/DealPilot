@@ -17261,3 +17261,32 @@ sauber. Gold-Audit RC=0.
 Gleiches gilt fuer die Vollstaendigkeit. Gueltig ist nur, was NICHT inline ausgeblendet ist.
 
 **Rest:** Soll-Miete als Sprung in der Mietentwicklung, Ist/Soll ins Bank-PDF. Nicht auf Prod.
+
+## Rollout-Journal · 20.09.2026 (2) — Bodenrichtwert-Probe, MFH komplett (Staging)
+
+Marcel: Bodenrichtwert Josef-Mueller-Str. 92, 38300 Wolfenbuettel „ueber das Programm" mit Quelle,
+dann ausrollen und „die Punkte weiter ausbauen, dass wir die MFH komplett haben".
+
+**Bodenrichtwert (ueber das Programm, Staging):** geokodiert 52,1584551 / 10,5530126,
+dann `GET /boris`. Ergebnis **260 EUR/m2**, Stichtag 01.01.2026, Zone 00600024
+„Linden / Am Wall / Josef-Mueller-Strasse", Nutzung 1100, Entwicklungszustand 1000,
+Gutachterausschuss 03006, Gemeinde Wolfenbuettel (AGS 03158037), Quelle BORIS-D,
+Lizenz dl-de/by-2-0.
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1456 | `1df1fc0` | **Befund bei der Probe:** der bundesweite BORIS-D-Adapter (ArcGIS) lieferte `quellenvermerk: null`, sein WMS-Zwilling fuehrt ihn. Ein dl-de/by-2-0-Wert ohne Namensnennung darf in keinen Kundenbericht → Vermerk nachgetragen, mb-backend neu gebaut, nachgemessen |
+| v1457 | `7d5bd17` | Soll-Miete als Sprung in `MietEntwicklung.factor` ab wählbarem Jahr (Einmal-Aufschlag Soll÷Ist, Steigerung laeuft davor und danach weiter) |
+| v1458 | `b4dc243` | Bank-PDF Seite 3: Mieterliste, Anlage-2-Punkte und RND je Einheit, Ist gegen Soll; Auswertung als EINE Funktion fuer Modal und Bericht |
+| v1459 / b | `abbd947`, `b4894f1` | Frage „in Wohnungseigentum aufgeteilt (WEG)" in Schritt 1, im Bank-PDF ausgewiesen |
+
+**Nachweis:** Mietfaktor Jahr 0–5 ohne Sprung 1,000/1,030/1,061/1,093/1,126/1,159, mit Sprung ab
+Jahr 3 → 1,391/1,432/1,475 (Faktor 1,2727 aus Ist 1.100 gegen Soll 1.400). Bank-PDF drei Seiten,
+im Seitenstrom gelesen: drei Einheiten mit 8/12/8 Punkten und 37/41/37 Jahren, Leerstand 1 WE,
+Massnahmen 22.000, 9,6 von 20 Punkten, 39 Jahre, Hinweis „Soll-Miete ab Jahr 3". Gold-Audit RC=0.
+
+**Werkzeugfalle:** `jsPDF.prototype.save` zu ueberschreiben greift NICHT — `save` haengt an der
+INSTANZ. Abfangen ueber einen Proxy auf den Konstruktor. Und: ein Regex ohne Klammern im
+Zeichenvorrat verliert jede Zeile mit Klammern — die Texte fehlten scheinbar im PDF.
+
+**Rest aus dem Konzept:** Summenfelder bei gefuelltem Konfigurator sperren (bewusst offen).
