@@ -158,16 +158,30 @@
      braucht eine Variable aus der Bankansicht und faellt dann aus. */
   var BC_FN = { 'bc-equity': 'renderEquityBuild', 'bc-cockpit': 'renderBankCockpit',
     'bc-waterfall': 'renderWaterfall', 'bc-stress': 'renderStressMatrix' };
+  /* v1463f · gemessen: querySelector('svg') greift das ERSTE SVG — und das
+     ist in zwei der vier Diagramme ein Symbol in der Ueberschrift. Im PDF
+     stand dann ein Pfeil bzw. ein Haken statt der Zeichnung. Genommen wird
+     jetzt das GROESSTE SVG im Behaelter. */
+  function groesstesSvg(wurzel) {
+    if (!wurzel) return null;
+    var alle = wurzel.querySelectorAll('svg'), best = null, bestF = 0;
+    for (var i = 0; i < alle.length; i++) {
+      var s = alle[i], r = s.getBoundingClientRect(), f = r.width * r.height;
+      if (!f) { var vb = (s.getAttribute('viewBox') || '').split(/[ ,]+/); f = (+vb[2] || 0) * (+vb[3] || 0); }
+      if (f > bestF) { bestF = f; best = s; }
+    }
+    return bestF > 2000 ? best : null;
+  }
   function svgQuelle(id) {
-    var host = document.getElementById(id), svg = host && host.querySelector('svg');
-    if (svg && (svg.getBoundingClientRect().width > 40)) return { svg: svg, breite: Math.round(host.getBoundingClientRect().width) || 640, hoehe: Math.round(host.getBoundingClientRect().height) || 340 };
+    var host = document.getElementById(id), svg = groesstesSvg(host);
+    if (svg && (svg.getBoundingClientRect().width > 120)) return { svg: svg, breite: Math.round(host.getBoundingClientRect().width) || 640, hoehe: Math.round(host.getBoundingClientRect().height) || 340 };
     var fn = BC_FN[id];
     if (!fn || !window.BankCharts || typeof window.BankCharts[fn] !== 'function') return null;
     var tmp = document.createElement('div');
     tmp.style.cssText = 'position:fixed;left:-3000px;top:0;width:640px;height:340px;background:#FFFFFF';
     document.body.appendChild(tmp);
     try { window.BankCharts[fn](tmp, window.State); } catch (e) { tmp.remove(); return null; }
-    var s2 = tmp.querySelector('svg');
+    var s2 = groesstesSvg(tmp);
     if (!s2) { tmp.remove(); return null; }
     return { svg: s2, breite: 640, hoehe: 340, aufraeumen: tmp };
   }
