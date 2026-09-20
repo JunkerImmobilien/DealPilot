@@ -182,11 +182,13 @@
   }
 
   /* Schritt 4 — Ergebnis */
-  function ergebnisDaten() {
-    var s = summe(_arbeit), gp = 0;
-    GEB_IDS.concat(WE_IDS).forEach(function (id) { gp += punkteVon(id, _geb[id] || '0'); });
-    var zeilen = _arbeit.map(function (e) {
-      var p = punkteEinheit(e, _geb), fl = zahl(e.wfl);
+  /* v1458 · dieselbe Auswertung fuer das Modal (Arbeitsstand) und fuer den
+     Bankbericht (gespeicherter Stand) — eine Rechnung, zwei Aufrufer. */
+  function auswerten(list, geb) {
+    var s = summe(list), gp = 0;
+    GEB_IDS.concat(WE_IDS).forEach(function (id) { gp += punkteVon(id, geb[id] || '0'); });
+    var zeilen = list.map(function (e) {
+      var p = punkteEinheit(e, geb), fl = zahl(e.wfl);
       return { e: e, fl: fl, punkte: p.punkte, geerbt: p.geerbt, rnd: rndFuer(p.punkte) };
     });
     var flSum = zeilen.reduce(function (a, z) { return a + z.fl; }, 0);
@@ -194,6 +196,16 @@
       : (zeilen.length ? zeilen.reduce(function (a, z) { return a + z.punkte; }, 0) / zeilen.length : 0);
     var rGew = flSum > 0 ? zeilen.reduce(function (a, z) { return a + (z.rnd || 0) * z.fl; }, 0) / flSum : 0;
     return { s: s, gebPunkte: Math.min(20, gp), zeilen: zeilen, punkteGew: pGew, rndGew: rGew };
+  }
+  function ergebnisDaten() { return auswerten(_arbeit, _geb); }
+  /* Fuer Bankunterlagen und PDF: aus dem GESPEICHERTEN Stand. */
+  function berichtDaten() {
+    var d = daten(), list = d.einheiten || [];
+    if (!list.length) return null;
+    var r = auswerten(list, d.gebaeude || {});
+    r.sollAbJahr = d.sollAbJahr || null;
+    r.geerbteGewerke = GEB_IDS.concat(WE_IDS).map(function (id) { return { id: id, label: labelVon(id), stufe: (d.gebaeude || {})[id] || '0', punkte: punkteVon(id, (d.gebaeude || {})[id] || '0') }; });
+    return r;
   }
   function optionFuer(p) { var o = [0, 4, 8, 14, 19], b = o[0]; o.forEach(function (x) { if (Math.abs(x - p) < Math.abs(b - p)) b = x; }); return b; }
   function schritt4() {
@@ -382,5 +394,5 @@
   }
   window.addEventListener('dp:object-ready', function () { setTimeout(knopf, 250); setTimeout(istSoll, 700); });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
-  window.DpMfhEinheiten = { oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten };
+  window.DpMfhEinheiten = { oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, berichtDaten: berichtDaten, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten };
 })();

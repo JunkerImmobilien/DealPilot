@@ -221,6 +221,63 @@
       y += 10;
     }
 
+    /* ── v1458 · Mieterliste und Ist/Soll (nur wenn Einheiten erfasst sind) ──
+       Backlog v22 Punkt 6: die Bank will die Einheiten sehen, nicht nur die
+       Summe. Gerechnet wird NICHT hier — die Zahlen kommen aus
+       DpMfhEinheiten.berichtDaten() (Anlage-2-Punkte und RND aus dem
+       RND-Kern) und aus State.kpis. */
+    var MFH = (window.DpMfhEinheiten && typeof window.DpMfhEinheiten.berichtDaten === 'function')
+      ? window.DpMfhEinheiten.berichtDaten() : null;
+    if (MFH && MFH.zeilen.length) {
+      doc.addPage();
+      kopf('Einheiten und Zustand', (adr || 'Objekt') + ' · ' + MFH.zeilen.length + ' Einheiten');
+      var spM = [['Nr.', 14], ['Lage', 30], ['m²', 16], ['Ist €/M', 20], ['Soll €/M', 20], ['Status', 20], ['Anlage 2', 20], ['RND', 16]];
+      var fakM = CW / spM.reduce(function (a, s) { return a + s[1]; }, 0);
+      function mZeile(werte, kopfzeile) {
+        var x = L;
+        doc.setFont('helvetica', kopfzeile ? 'bold' : 'normal'); doc.setFontSize(kopfzeile ? 7.4 : 8.4);
+        doc.setTextColor(kopfzeile ? 110 : 40);
+        werte.forEach(function (w, i) {
+          var bw = spM[i][1] * fakM;
+          if (i <= 1 || i === 5) doc.text(String(w), x, y); else doc.text(String(w), x + bw - 1, y, { align: 'right' });
+          x += bw;
+        });
+        doc.setDrawColor(kopfzeile ? G[0] : 236, kopfzeile ? G[1] : 232, kopfzeile ? G[2] : 223);
+        doc.setLineWidth(kopfzeile ? 0.5 : 0.15); doc.line(L, y + 2.2, W - R, y + 2.2); doc.setLineWidth(0.2);
+        y += kopfzeile ? 7 : 6.2;
+      }
+      mZeile(spM.map(function (s) { return s[0]; }), true);
+      MFH.zeilen.forEach(function (z) {
+        if (y > H - 30) { doc.addPage(); kopf('Einheiten und Zustand', 'Fortsetzung'); mZeile(spM.map(function (s) { return s[0]; }), true); }
+        mZeile([z.e.nr || '', (z.e.lage || '').slice(0, 18), z.fl ? zahl(z.fl, 0) : '—',
+          z.e.ist ? zahl(Number(String(z.e.ist).replace(',', '.')), 0) : '—',
+          z.e.soll ? zahl(Number(String(z.e.soll).replace(',', '.')), 0) : '—',
+          z.e.status === 'leer' ? 'leer' : 'vermietet',
+          z.punkte + ' P.' + (z.geerbt === 4 ? '*' : ''), z.rnd != null ? Math.round(z.rnd) + ' J.' : '—']);
+      });
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
+      doc.text('Anlage 2 ImmoWertV: Modernisierungspunkte je Einheit; * = Zustand vollständig vom Gebäude übernommen. '
+        + 'RND = Restnutzungsdauer (indikativ, kein Gutachten).', L, y + 1);
+      y += 10;
+
+      abschnitt('Ist gegen Soll');
+      var istJ = (K.nkm_j || 0), sollJ = MFH.s.soll * 12;
+      zeile('Kaltmiete p. a. — Ist', eur(istJ));
+      zeile('Kaltmiete p. a. — Soll (nach Maßnahmen)', eur(sollJ));
+      zeile('Bruttomietrendite Ist (auf Kaufpreis)', pct(K.bmy, 2));
+      zeile('Bruttomietrendite Soll (auf Gesamtinvestition)', da(K.gi) && K.gi > 0 ? pct(sollJ / K.gi * 100, 2) : '—');
+      if (MFH.s.leer) zeile('Leerstand', MFH.s.leer + ' Einheiten / ' + zahl(MFH.s.leerFl, 0) + ' m²');
+      if (MFH.s.kosten) zeile('Geplante Maßnahmen', eur(MFH.s.kosten));
+      zeile('Modernisierungsgrad (flächengewichtet)', zahl(MFH.punkteGew, 1) + ' von 20 Punkten');
+      if (MFH.rndGew > 0) zeile('Restnutzungsdauer (flächengewichtet)', Math.round(MFH.rndGew) + ' Jahre', { summe: true });
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.6); doc.setTextColor(130);
+      var hin = MFH.sollAbJahr
+        ? 'Die Cashflow-Rechnung setzt die Soll-Miete ab Jahr ' + MFH.sollAbJahr + ' an; davor und danach gilt die hinterlegte Mietentwicklung.'
+        : 'Die Cashflow-Rechnung rechnet durchgehend mit der Ist-Miete — die Soll-Miete ist hier nur nachrichtlich.';
+      doc.splitTextToSize(hin, CW).forEach(function (t) { doc.text(t, L, y); y += 4.2; });
+      y += 6;
+    }
+
     abschnitt('Grundlagen und Hinweise');
     doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(60);
     var hinweis = 'Alle Werte beruhen auf den im Objekt erfassten Angaben und den dort hinterlegten Annahmen '
