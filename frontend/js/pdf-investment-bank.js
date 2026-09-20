@@ -30,6 +30,11 @@
      Ende Zinsbindung, Anschluss) · Zinsänderungsrisiko · Cashflow-Jahre ·
      Vermögensaufbau als Kurve (Wert, Restschuld, Eigenkapital) ·
      Einheiten beim Mehrfamilienhaus · Annahmen und Hinweise.
+   v1461: die Abschnitte FLIESSEN — eine neue Seite entsteht nur, wenn der
+   Block nicht mehr passt (vorher begann jeder Block auf einer neuen Seite,
+   die Seiten endeten nach der Haelfte). Dazu Objektfotos (Titelbild und
+   Galerie) und ein Kurzfazit aus dem Score.
+
    Weiter gilt: DIESE DATEI RECHNET NICHTS. Der Score kommt aus dem
    Rechenkern DealScore.computeFromKpis(), die Phasen aus State.kpis
    (…_ezb, …_an), die Jahre aus State.cfRows.
@@ -88,7 +93,25 @@
     DHH: 'Doppelhaushälfte', RH: 'Reihenhaus', BUERO: 'Bürogebäude', GESCH: 'Geschäftshaus', HOTEL: 'Hotel',
     GEW: 'Gewerbe', GAR: 'Garage / Stellplatz' };
 
-  window.exportPDFBank = function () {
+  /* Objektfotos: Groesse muss bekannt sein, sonst verzerrt addImage.
+     Deshalb laedt diese Funktion sie vorher — der Export ist async. */
+  function bilderLaden(max) {
+    var quelle = (window.imgs && window.imgs.length) ? window.imgs : [];
+    var liste = quelle.slice(0, max).map(function (o) { return (o && o.src) ? o.src : o; }).filter(Boolean);
+    return Promise.all(liste.map(function (src) {
+      return new Promise(function (fertig) {
+        try {
+          var i = new Image();
+          i.onload = function () { fertig({ src: src, w: i.naturalWidth || 4, h: i.naturalHeight || 3 }); };
+          i.onerror = function () { fertig(null); };
+          i.src = src;
+          if (i.complete && i.naturalWidth) fertig({ src: src, w: i.naturalWidth, h: i.naturalHeight });
+        } catch (e) { fertig(null); }
+      });
+    })).then(function (a) { return a.filter(Boolean); });
+  }
+
+  window.exportPDFBank = async function () {
     if (typeof window.jspdf === 'undefined') { alert('PDF-Bibliothek noch nicht geladen — bitte kurz warten und erneut versuchen.'); return; }
     try { if (typeof window.calcNow === 'function') window.calcNow(); } catch (e) {}
     var S = window.State || {}, K = S.kpis || {}, rows = S.cfRows || [];
@@ -144,6 +167,23 @@
       });
       y += Math.ceil(items.length / 3) * (bh + sp) + 4;
     }
+    /* Neue Seite NUR, wenn der naechste Block nicht mehr passt.
+       Ohne das beginnt jeder Block auf einer halbleeren Seite. */
+    var _titel = 'Investment Case', _unter = '';
+    function platz(bedarf, titel, unter) {
+      if (titel) { _titel = titel; _unter = unter || _unter; }
+      if (y + bedarf > H - 24) { doc.addPage(); kopf(_titel, _unter); return true; }
+      return false;
+    }
+    /* Bild proportional in einen Rahmen setzen (nie verzerren). */
+    function bild(b, x, yy, bw, bh) {
+      if (!b) return;
+      var s = Math.min(bw / b.w, bh / b.h), iw = b.w * s, ih = b.h * s;
+      try { doc.addImage(b.src, x + (bw - iw) / 2, yy + (bh - ih) / 2, iw, ih); } catch (e) { return; }
+      doc.setDrawColor(226, 221, 210); doc.setLineWidth(0.25);
+      doc.rect(x + (bw - iw) / 2, yy + (bh - ih) / 2, iw, ih); doc.setLineWidth(0.2);
+    }
+
     /* Tabelle im selben Strich wie die Zeilen: Haarlinien, Kopf in Gold. */
     function tabelle(spalten, zeilen, o) {
       o = o || {};
@@ -175,7 +215,7 @@
        Gold fuer den Wert, Tinte fuer die Restschuld, Raster in Grau. */
     function kurve(reihen, jahre, o) {
       o = o || {};
-      var hoehe = o.hoehe || 52, bx = L + 20, bw = CW - 20, by = y, bh = hoehe;
+      var hoehe = o.hoehe || 52, bx = L + 20, bw = CW - 32, by = y, bh = hoehe;
       var alle = reihen.reduce(function (a, r) { return a.concat(r.werte); }, []).filter(function (n) { return isFinite(n); });
       if (!alle.length || jahre.length < 2) return;
       var max = Math.max.apply(null, alle), min = Math.min(0, Math.min.apply(null, alle));
@@ -193,9 +233,18 @@
       reihen.forEach(function (r) {
         var f = r.gold ? GD : (r.grau ? [150, 145, 135] : [40, 40, 40]);
         doc.setDrawColor(f[0], f[1], f[2]); doc.setLineWidth(r.gold ? 0.7 : 0.5);
+        /* gestrichelt fuer die dritte Linie — sonst liegen zwei Linien
+           deckungsgleich, sobald kein Darlehen im Spiel ist. */
+        try { if (r.grau) doc.setLineDashPattern([1.2, 1.2], 0); } catch (e) {}
         for (var i = 1; i < r.werte.length; i++) {
           if (!isFinite(r.werte[i - 1]) || !isFinite(r.werte[i])) continue;
           doc.line(px(i - 1), py(r.werte[i - 1]), px(i), py(r.werte[i]));
+        }
+        try { doc.setLineDashPattern([], 0); } catch (e) {}
+        var letzte = r.werte[r.werte.length - 1];
+        if (isFinite(letzte)) {
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(6.6); doc.setTextColor(f[0], f[1], f[2]);
+          doc.text(zahl(Math.round(letzte / 1000)) + 'k', bx + bw + 1.5, py(letzte) + 1.6);
         }
       });
       doc.setLineWidth(0.2);
@@ -235,10 +284,13 @@
     var kp = num('kp'), san = num('san'), moebl = num('moebl'), gi = da(S.gi);
     var nk = (gi !== null && kp !== null) ? Math.max(0, gi - kp - (san || 0) - (moebl || 0)) : null;
     var ek = num('ek'), d1 = num('d1');
+    var fotos = await bilderLaden(5);
     var d2an = el('d2_enable') && el('d2_enable').checked, d2 = d2an ? num('d2') : null;
 
     /* ── Seite 1 ─────────────────────────────────────────────── */
     kopf('Investment Case', (adr || 'Objekt ohne Anschrift') + ' · Finanzierungsunterlage · Stand ' + heute());
+
+    if (fotos.length) { bild(fotos[0], L, y, CW, 46); y += 50; }
 
     abschnitt('Objekt');
     zeile('Anschrift', adr || '—');
@@ -282,11 +334,26 @@
       ['Wertpuffer / Equity', eur(K.wp_kpi), 'heute'],
       ['Deal Score', (SC && SC.score) ? zahl(SC.score, 0) + ' / 100' : '—', (SC && SC.label) ? SC.label : '']
     ]);
+    if (SC && SC.interpretation) {
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(70);
+      doc.splitTextToSize('Einordnung: ' + String(SC.interpretation).replace(/\s+/g, ' '), CW).forEach(function (t) { doc.text(t, L, y); y += 4.4; });
+      y += 4;
+    }
+
+    /* Galerie: die uebrigen Fotos, ruhig im Raster, ohne Balken. */
+    if (fotos.length > 1) {
+      platz(96, 'Objektfotos', (adr || 'Objekt'));
+      abschnitt('Objektfotos');
+      var gal = fotos.slice(1, 5), sp2 = 4, bw2 = (CW - sp2) / 2, bh2 = 44;
+      gal.forEach(function (f, i) {
+        var c = i % 2, r = Math.floor(i / 2);
+        bild(f, L + c * (bw2 + sp2), y + r * (bh2 + sp2), bw2, bh2);
+      });
+      y += Math.ceil(gal.length / 2) * (bh2 + sp2) + 4;
+    }
 
     /* ── Ertragsrechnung ─────────────────────────────────────── */
-    doc.addPage();
-    kopf('Ertrag und Cashflow', (adr || 'Objekt') + ' · laufendes Jahr');
-
+    platz(150, 'Ertrag und Cashflow', (adr || 'Objekt') + ' · laufendes Jahr');
     abschnitt('Von der Warmmiete zum Cashflow');
     zeile('Warmmiete / Jahr (Kaltmiete und Umlagen)', eur(K.wm_j));
     zeile('abzüglich umlagefähiger Bewirtschaftung', da(K.bwk_ul) === null ? '—' : '- ' + eur(K.bwk_ul), { einzug: true });
@@ -302,6 +369,7 @@
     zeile('Cashflow nach Steuern / Monat', da(K.cf_ns) === null ? '—' : eur(K.cf_ns / 12, 2), { fett: true });
     y += 2;
 
+    platz(78);
     abschnitt('Bewirtschaftung');
     zeile('Hausgeld umlagefähig / Jahr', eur(num('hg_ul')));
     zeile('Grundsteuer / Jahr', eur(num('grundsteuer')));
@@ -314,6 +382,7 @@
     zeile('Summe nicht umlagefähig (im Cashflow)', eur(K.bwk_cf), { summe: true });
     y += 2;
 
+    platz(36);
     abschnitt('Steuerliche Wirkung');
     zeile('Abschreibung (AfA) / Jahr', eur(K.afa));
     zeile('Zu versteuerndes Ergebnis', eur(K.zve_immo));
@@ -323,9 +392,7 @@
     var bindj = num('d1_bindj');
     var hatPhasen = da(K.cf_ns_ezb) !== null || da(K.cf_ns_an) !== null;
     if (hatPhasen) {
-      doc.addPage();
-      kopf('Drei Phasen', 'Heute · Ende der Zinsbindung' + (bindj ? ' (nach ' + zahl(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung');
-
+      platz(96, 'Drei Phasen', 'Heute · Ende der Zinsbindung' + (bindj ? ' (nach ' + zahl(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung');
       abschnitt('Cashflow je Phase');
       function ph(label, a, b, c) { return { werte: [label, a, b, c] }; }
       tabelle(
@@ -342,6 +409,7 @@
         ],
         { titel: 'Drei Phasen', hinweis: 'Ende Zinsbindung: mit fortgeschriebener Miete und dem dann erreichten Tilgungsstand. Anschluss: mit dem angenommenen Anschlusszins.' });
 
+      platz(56);
       abschnitt('Zinsänderungsrisiko');
       zeile('Zinsbindung', bindj !== null ? zahl(bindj) + ' Jahre' : '—');
       zeile('Restschuld am Ende der Zinsbindung', eur(S.rs));
@@ -351,9 +419,9 @@
       if (da(K.zaer_pct) !== null) zeile('Das entspricht einer Veränderung von', pct(K.zaer_pct, 1), { klein: true });
     }
 
-    /* ── Seite 2 ─────────────────────────────────────────────── */
-    doc.addPage();
-    kopf('Cashflow-Entwicklung', (adr || 'Objekt') + ' · die ersten ' + Math.min(10, rows.length || 0) + ' Jahre');
+    /* ── Cashflow-Jahre ──────────────────────────────────────── */
+    platz(30 + Math.min(10, rows.length || 0) * 6.2, 'Cashflow-Entwicklung', (adr || 'Objekt') + ' · die ersten ' + Math.min(10, rows.length || 0) + ' Jahre');
+    abschnitt('Cashflow je Jahr');
     var sp = [['Jahr', 16], ['Kaltmiete', 24], ['Bewirtsch.', 22], ['Zins', 22], ['Tilgung', 22], ['CF v. St.', 24], ['Restschuld', 26], ['LTV', 16]];
     var fak = CW / sp.reduce(function (a, s) { return a + s[1]; }, 0);
     function tabZeile(werte, fett, kopfzeile) {
@@ -384,8 +452,8 @@
 
     /* ── Vermögensaufbau ─────────────────────────────────────── */
     if (rows.length > 2) {
-      if (y > H - 110) { doc.addPage(); kopf('Vermögensaufbau', (adr || 'Objekt') + ' · Wert, Restschuld und Eigenkapital'); }
-      else { abschnitt('Vermögensaufbau'); }
+      platz(104, 'Vermögensaufbau', (adr || 'Objekt') + ' · Wert, Restschuld und Eigenkapital');
+      abschnitt('Vermögensaufbau');
       var jahre = rows.map(function (r) { return r.cal || r.y; });
       kurve([
         { name: 'Objektwert (angenommen)', werte: rows.map(function (r) { return Number(r.wert_y); }), gold: true },
@@ -408,8 +476,8 @@
     var MFH = (window.DpMfhEinheiten && typeof window.DpMfhEinheiten.berichtDaten === 'function')
       ? window.DpMfhEinheiten.berichtDaten() : null;
     if (MFH && MFH.zeilen.length) {
-      doc.addPage();
-      kopf('Einheiten und Zustand', (adr || 'Objekt') + ' · ' + MFH.zeilen.length + ' Einheiten');
+      platz(60 + MFH.zeilen.length * 6.2, 'Einheiten und Zustand', (adr || 'Objekt') + ' · ' + MFH.zeilen.length + ' Einheiten');
+      abschnitt('Mieterliste');
       var spM = [['Nr.', 14], ['Lage', 30], ['m²', 16], ['Ist €/M', 20], ['Soll €/M', 20], ['Status', 20], ['Anlage 2', 20], ['RND', 16]];
       var fakM = CW / spM.reduce(function (a, s) { return a + s[1]; }, 0);
       function mZeile(werte, kopfzeile) {
@@ -458,7 +526,7 @@
       y += 6;
     }
 
-    if (y > H - 80) { doc.addPage(); kopf('Annahmen und Hinweise', (adr || 'Objekt')); }
+    platz(76, 'Annahmen und Hinweise', (adr || 'Objekt'));
     abschnitt('Annahmen');
     zeile('Mietsteigerung p. a.', num('mietstg') !== null ? pct(num('mietstg'), 1) : '—');
     zeile('Kostensteigerung p. a.', num('kostenstg') !== null ? pct(num('kostenstg'), 1) : '—');
