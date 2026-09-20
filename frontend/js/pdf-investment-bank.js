@@ -101,22 +101,32 @@
     return ('0' + t.getDate()).slice(-2) + '.' + ('0' + (t.getMonth() + 1)).slice(-2) + '.' + t.getFullYear();
   }
 
-  /* Absender: dieselbe Regel wie die Finanzamt-Anlage (v975) - eigenes
-     Branding nur mit custom_logo UND gesetzter Firma, sonst neutral. */
+  /* MARKER_V1466 · Absender und Ansprechpartner kommen aus den Einstellungen.
+     Die Plan-Sperre steckt BEREITS in DealPilotConfig.branding.get(): unter
+     Pro liefert sie die Vorgabewerte, ab Pro die eigenen Daten (config.js,
+     V192). Die Bankfassung hatte darueber eine ZWEITE Sperre gelegt
+     (custom_logo UND Firma ungleich "Junker Immobilien") — dadurch stand auf
+     jedem Dokument "DealPilot", auch fuer den eingeloggten Pro-Nutzer.
+     Gemessen am 20.09.2026 an den drei abgelegten PDFs. */
+  function marke() {
+    try {
+      if (window.DealPilotConfig && DealPilotConfig.branding && typeof DealPilotConfig.branding.get === 'function') {
+        return DealPilotConfig.branding.get() || {};
+      }
+    } catch (e) {}
+    return {};
+  }
   function absender() {
-    var b = (window.DealPilotConfig && DealPilotConfig.branding && typeof DealPilotConfig.branding.get === 'function')
-      ? (DealPilotConfig.branding.get() || {}) : {};
-    var darf = false;
-    try { darf = !!(DealPilotConfig.pricing && DealPilotConfig.pricing.hasFeature && DealPilotConfig.pricing.hasFeature('custom_logo')); } catch (e) {}
-    var firma = String(b.company || '').trim();
-    if (!darf || !firma || firma === 'Junker Immobilien') {
-      return { firma: 'DealPilot', zeilen: ['DealPilot', 'dealpilot.junker-immobilien.io'] };
-    }
+    var b = marke();
+    var firma = String(b.company || '').trim() || 'DealPilot';
     var z = [firma];
+    var person = String(b.name || '').trim();
+    if (person && person !== firma) z.push(person + (b.role ? ' · ' + b.role : ''));
     var l2 = [String(b.address || '').trim(), ((b.plz || '') + ' ' + (b.city || '')).trim()].filter(Boolean).join(' · ');
     if (l2) z.push(l2);
-    if (b.email) z.push(String(b.email)); else if (b.website) z.push(String(b.website));
-    return { firma: firma, zeilen: z };
+    var kontakt = [b.phone ? 'Tel ' + b.phone : '', b.email || ''].filter(Boolean).join(' · ');
+    if (kontakt) z.push(kontakt); else if (b.website) z.push(String(b.website).replace(/^https?:\/\//, ''));
+    return { firma: firma, zeilen: z.slice(0, 4), b: b };
   }
 
   var OBJART = { ETW: 'Eigentumswohnung', EFH: 'Einfamilienhaus', ZFH: 'Zweifamilienhaus', MFH: 'Mehrfamilienhaus',
@@ -236,8 +246,17 @@
     /* ── Bausteine ───────────────────────────────────────────── */
     function kopf(titel, unter) {
       y = 22;
+      /* Eigenes Logo, wenn der Plan es hergibt — sonst der Firmenname. */
+      var logoOk = false;
+      if (ab.b && ab.b.logo_b64) {
+        try {
+          var lw = 34, lh = 10;
+          doc.addImage(String(ab.b.logo_b64), L, y - 6.5, lw, lh, undefined, 'FAST');
+          logoOk = true;
+        } catch (e) { logoOk = false; }
+      }
       doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.setTextColor(26, 26, 26);
-      doc.text(ab.firma, L, y);
+      if (!logoOk) doc.text(ab.firma, L, y);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(120);
       doc.text('I M M O B I L I E N - I N V E S T I T I O N S A N A L Y S E', L, y + 4.6);
       doc.setFontSize(8); doc.setTextColor(110);
@@ -563,6 +582,51 @@
       });
       y += Math.ceil(gal.length / 2) * (bh2 + sp2) + 4;
     }
+
+    /* Ansprechpartner — dieselben Daten wie im alten PDF (Deckblattfuss). */
+    (function () {
+      var b = ab.b || {};
+      var hatEtwas = b.company || b.name || b.address || b.email || b.phone || b.website;
+      if (!hatEtwas) return;
+      platz(34);
+      abschnitt('Ansprechpartner');
+      if (b.company) zeile('Unternehmen', sauber(b.company));
+      if (b.name && b.name !== b.company) zeile(b.role ? sauber(b.role) : 'Ansprechpartner', sauber(b.name));
+      var anschrift = [String(b.address || '').trim(), ((b.plz || '') + ' ' + (b.city || '')).trim()].filter(Boolean).join(', ');
+      if (anschrift) zeile('Anschrift', sauber(anschrift));
+      if (b.phone) zeile('Telefon', sauber(b.phone));
+      if (b.email) zeile('E-Mail', sauber(b.email));
+      if (b.website) zeile('Web', sauber(String(b.website).replace(/^https?:\/\//, '')));
+      y += 2;
+    })();
+
+    /* ── Erwerb ueber eine Gesellschaft ───────────────────────── */
+    (function () {
+      var halterSel = el('halter');
+      var halter = halterSel ? String(halterSel.value || '') : '';
+      if (!halter || halter === 'privat') return;
+      var M = window.DealPilotMandanten || {};
+      var name = halter;
+      try { var h = M.get ? M.get(halter) : null; if (h && h.name) name = h.name; } catch (e) {}
+      var korp = false;
+      try { korp = !!(M.isCorp && M.isCorp(halter)); } catch (e) {}
+      var satz = null;
+      try { satz = (M.effRate && M.effRate()); } catch (e) {}
+      platz(44);
+      abschnitt('Erwerb über eine Gesellschaft');
+      zeile('Halter des Objekts', sauber(name));
+      zeile('Besteuerung', korp ? 'Körperschaft- und Gewerbesteuer (Kapitalgesellschaft)' : 'Einkommensteuer der Gesellschafter (Personengesellschaft)');
+      if (satz != null && isFinite(satz)) zeile('Angesetzter effektiver Steuersatz', pct(satz * 100, 2));
+      if (korp) zeile('Verluste', 'werden nicht erstattet — sie mindern nur künftige Gewinne', { klein: true });
+      if (txt('obj_herkunft') === 'ueberfuehrung' || num('ueberf_preis') !== null) {
+        zeile('Überführung aus dem Privatbestand', txt('halter_seit') || 'Stichtag offen');
+        if (num('verkehrswert_ueberf') !== null) zeile('Verkehrswert (AfA-Basis der Gesellschaft)', eur(num('verkehrswert_ueberf')));
+        if (num('ueberf_preis') !== null) zeile('Überführungspreis (Basis Grunderwerbsteuer)', eur(num('ueberf_preis')));
+        if (num('ueberf_restschuld') !== null) zeile('Übernommene Restschuld', eur(num('ueberf_restschuld')));
+      }
+      if (num('gesellschafterdarlehen') !== null) zeile('Gesellschafterdarlehen', eur(num('gesellschafterdarlehen')));
+      y += 2;
+    })();
 
     /* ── Ertragsrechnung ─────────────────────────────────────── */
     platz(46, 'Ertrag und Cashflow', (adr || 'Objekt') + ' · laufendes Jahr');
