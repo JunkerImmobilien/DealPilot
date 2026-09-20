@@ -17290,3 +17290,11 @@ INSTANZ. Abfangen ueber einen Proxy auf den Konstruktor. Und: ein Regex ohne Kla
 Zeichenvorrat verliert jede Zeile mit Klammern — die Texte fehlten scheinbar im PDF.
 
 **Rest aus dem Konzept:** Summenfelder bei gefuelltem Konfigurator sperren (bewusst offen).
+
+**PROD-Rollout 20.09.2026 — v1454 bis v1459b** (Marcel: „dann bitte direkt weiter ausrollen").
+main per fast-forward auf `b13000b` (12 Commits, keine Migration), mb-backend neu gebaut
+(BORIS-Quellenvermerk). Vorher gesichert und angesehen: `haupt-20260920-0840.sql.gz` (11 MB,
+63 Tabellen), `mb-20260920-0840.sql.gz` (745 KB, 33 Tabellen). Nachweis: Fingerabdruck Prod =
+Staging (`7c2bf3a3354b`), Gold-Audit RC=0, keine Fehler im mb-Log, Seiten 200, Bodenrichtwert
+Wolfenbuettel auf Prod 260 EUR/m2 MIT Quellenvermerk; im Browser DpMfhEinheiten.berichtDaten,
+MietEntwicklung.sollSprung und DpAfaEigen geladen, style.css v1455b.
