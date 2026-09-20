@@ -898,7 +898,18 @@ if (!window._wlc) {
     }
     // Base-Case: heutiger DSCR
     var ze = (state.ze || 0);
+    /* v1465 · gemessen am 20.09.2026: cfRows[0] ist beim Kauf im laufenden
+       Jahr ein RUMPFJAHR (Beispiel: 3.600 EUR Miete statt 11.124, Zins und
+       Tilgung anteilig) — die Restschuld darin ist aber die volle. Die
+       Matrix rechnete deshalb mit einem zu kleinen Kapitaldienst; im
+       Szenario "-2 Prozentpunkte" wurde er rechnerisch null und die ganze
+       untere Zeile zeigte 0,00. Basis ist jetzt das erste VOLLE Jahr. */
     var r0 = cfRows[0];
+    if (cfRows.length > 1 && (cfRows[0].nkm_m || 0) * 12 > 0) {
+      var voll = (cfRows[1].nkm_m || 0) * 12;
+      var erst = (cfRows[0].nkm_m || 0) * 12;
+      if (voll > 0 && erst < voll * 0.9) r0 = cfRows[1];
+    }
     var noiBase = (r0.nkm_m + ze) * 12;
     var zinsBase = r0.zy;
     var tilgBase = r0.ty;
