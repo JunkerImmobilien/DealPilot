@@ -335,7 +335,7 @@
     /* ── Seite 1 ─────────────────────────────────────────────── */
     kopf('Investment Case', (adr || 'Objekt ohne Anschrift') + ' · Finanzierungsunterlage · Stand ' + heute());
 
-    if (fotos.length) { bild(fotos[0], L, y, CW, CW / 3.2, true); y += CW / 3.2 + 5; }
+    if (fotos.length) { bild(fotos[0], L, y, CW, CW / 2.5, true); y += CW / 2.5 + 6; }
 
     abschnitt('Objekt');
     zeile('Anschrift', adr || '—');
