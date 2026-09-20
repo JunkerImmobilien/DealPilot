@@ -140,14 +140,35 @@
 
   /* Die vier Bank-Diagramme stehen als SVG im Cockpit. jsPDF kann kein SVG —
      also serialisieren, auf eine Leinwand zeichnen, als Bild einsetzen. */
+  /* MARKER_V1463C · gemessen: solange die Bankansicht nie offen war, sind die
+     Diagramm-Flaechen 0 px breit und bleiben leer — buildCharts() zeichnet
+     dann nichts. Deshalb wird hier bei Bedarf in eine EIGENE Flaeche
+     gezeichnet (BankCharts.renderX(host, State), 640x340). Der Wasserfall
+     braucht eine Variable aus der Bankansicht und faellt dann aus. */
+  var BC_FN = { 'bc-equity': 'renderEquityBuild', 'bc-cockpit': 'renderBankCockpit',
+    'bc-waterfall': 'renderWaterfall', 'bc-stress': 'renderStressMatrix' };
+  function svgQuelle(id) {
+    var host = document.getElementById(id), svg = host && host.querySelector('svg');
+    if (svg && (svg.getBoundingClientRect().width > 40)) return { svg: svg, breite: Math.round(host.getBoundingClientRect().width) || 640, hoehe: Math.round(host.getBoundingClientRect().height) || 340 };
+    var fn = BC_FN[id];
+    if (!fn || !window.BankCharts || typeof window.BankCharts[fn] !== 'function') return null;
+    var tmp = document.createElement('div');
+    tmp.style.cssText = 'position:fixed;left:-3000px;top:0;width:640px;height:340px;background:#FFFFFF';
+    document.body.appendChild(tmp);
+    try { window.BankCharts[fn](tmp, window.State); } catch (e) { tmp.remove(); return null; }
+    var s2 = tmp.querySelector('svg');
+    if (!s2) { tmp.remove(); return null; }
+    return { svg: s2, breite: 640, hoehe: 340, aufraeumen: tmp };
+  }
   function svgBild(id) {
     return new Promise(function (fertig) {
       try {
-        var host = document.getElementById(id), svg = host && host.querySelector('svg');
-        if (!svg) return fertig(null);
+        var q = svgQuelle(id);
+        if (!q) return fertig(null);
+        var svg = q.svg, weg = q.aufraeumen;
         var k = svg.cloneNode(true);
-        var b = svg.getBoundingClientRect();
-        var br = Math.max(320, Math.round(b.width || 640)), ho = Math.max(200, Math.round(b.height || 360));
+        if (weg) weg.remove();
+        var br = Math.max(320, q.breite), ho = Math.max(200, q.hoehe);
         k.setAttribute('width', br); k.setAttribute('height', ho);
         if (!k.getAttribute('viewBox')) k.setAttribute('viewBox', '0 0 ' + br + ' ' + ho);
         k.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
