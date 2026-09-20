@@ -47,6 +47,13 @@
    Gelesen wird auch hier nur: State, State.kpis, die Felder und die
    fertigen Zellen aus dem Zinsaenderungs-Block.
 
+   v1464 (MARKER_V1464): der Rest aus dem alten PDF — Stress-Matrix (5x5
+   DSCR-Szenarien), Vermoegenszuwachs als Jahrestabelle, Bewirtschaftungs-
+   kosten gesamt und in Prozent der Kaltmiete, Leerstand in den Annahmen,
+   effektive Restschuld am Bindungsende, Kaufpreis-Offerte der KI.
+   Die Matrix wird NICHT nachgerechnet: BankCharts.renderStressMatrix()
+   zeichnet sie unsichtbar als HTML, hier werden die Zellen ausgelesen.
+
    Weiter gilt: DIESE DATEI RECHNET NICHTS. Der Score kommt aus dem
    Rechenkern DealScore.computeFromKpis(), die Phasen aus State.kpis
    (…_ezb, …_an), die Jahre aus State.cfRows.
@@ -508,6 +515,11 @@
         if (da(bs.eingezahlt) !== null) zeile('Eingezahlt bis Ende der Zinsbindung' + (bs.jahre ? ' (' + zahl(bs.jahre) + ' Jahre)' : ''), eur(bs.eingezahlt));
         if (da(bs.guthaben) !== null) zeile('Guthaben inkl. Zinsen bei Bindungsende', eur(bs.guthaben));
         if (da(bs.restschuld) !== null) zeile('Restschuld Hauptdarlehen dann', eur(bs.restschuld));
+        var effZ = rows.filter(function (r) { return da(r.eff_rs) !== null; });
+        if (effZ.length && bs.jahre) {
+          var tr = rows[Math.min(rows.length - 1, Math.max(0, Math.round(bs.jahre) - 1))];
+          if (tr && da(tr.eff_rs) !== null) zeile('Effektive Restschuld am Bindungsende (nach Verrechnung)', eur(tr.eff_rs));
+        }
         if (da(bs.restschuld) && bs.restschuld > 0) {
           var deck = Math.min(100, ((bs.guthaben || 0) + (bs.bauspardarlehen || 0)) / bs.restschuld * 100);
           zeile('Deckung durch Bausparguthaben und -darlehen', pct(deck, 1), { summe: true });
@@ -580,6 +592,8 @@
     if (num('eigen_r')) zeile('Eigene Instandhaltungsrücklage', eur(num('eigen_r')));
     if (num('mietausfall')) zeile('Kalkulatorischer Mietausfall', eur(num('mietausfall')));
     zeile('Summe nicht umlagefähig (im Cashflow)', eur(K.bwk_cf), { summe: true });
+    zeile('Bewirtschaftungskosten gesamt / Jahr', eur(K.bwk));
+    zeile('davon Anteil an der Kaltmiete', (da(K.nkm_j) && K.nkm_j > 0) ? pct(K.bwk / K.nkm_j * 100, 1) : '—', { klein: true });
     y += 2;
 
     platz(30);
@@ -807,7 +821,9 @@
         y += 2;
       }
       if (ai) {
-        if (ai.empfehlung || ai.recommendation) zeile('Empfehlung', String(ai.empfehlung || ai.recommendation).slice(0, 60), { summe: true });
+        if (ai.empfehlung || ai.recommendation) zeile('Empfehlung', sauber(ai.empfehlung || ai.recommendation).slice(0, 60), { summe: true });
+        var offerte = ai.kaufpreis_offerte || ai.offerte || ai.kaufpreisempfehlung;
+        if (offerte) zeile('Vorgeschlagene Kaufpreis-Offerte', typeof offerte === 'number' ? eur(offerte) : sauber(offerte).slice(0, 60));
         liste('Stärken', ai.staerken || ai.strengths);
         liste('Risiken', ai.risiken || ai.schwaechen || ai.risks);
         if (ai.fazit || ai.summary) {
@@ -829,12 +845,87 @@
       y += 7;
     }
 
+    /* ── Belastungsprobe (Stress-Matrix) ─────────────────────── */
+    /* Sie ist kein Diagramm, sondern HTML — deshalb unsichtbar rendern
+       lassen und die 25 Zellen auslesen. Gerechnet wird dort, nicht hier. */
+    function stressDaten() {
+      if (!window.BankCharts || typeof window.BankCharts.renderStressMatrix !== 'function') return null;
+      var tmp = document.createElement('div');
+      tmp.style.cssText = 'position:fixed;left:-3000px;top:0;width:700px;height:420px';
+      document.body.appendChild(tmp);
+      try { window.BankCharts.renderStressMatrix(tmp, window.State); } catch (e) { tmp.remove(); return null; }
+      var zellen = [].slice.call(tmp.querySelectorAll('.bc-matrix-cell')).map(function (c) {
+        var v = c.querySelector('.bc-matrix-cell-val');
+        return { wert: v ? sauber(v.textContent) : '', titel: sauber(c.getAttribute('title') || ''),
+          stufe: /critical/.test(c.className) ? 'rot' : (/warn/.test(c.className) ? 'gelb' : (/good|ok/.test(c.className) ? 'gruen' : '')),
+          basis: /is-base/.test(c.className) };
+      });
+      var yr = [].slice.call(tmp.querySelectorAll('.bc-matrix-axis-y-row')).map(function (e) { return sauber(e.textContent); });
+      tmp.remove();
+      if (zellen.length !== 25 || yr.length !== 5) return null;
+      return { zellen: zellen, y: yr };
+    }
+    var SM = stressDaten();
+    if (SM) {
+      platz(72, 'Belastungsprobe', (adr || 'Objekt') + ' · Schuldendeckung unter Druck');
+      abschnitt('Belastungsprobe · DSCR je Szenario');
+      einleitung('Jede Zelle ist der DSCR, wenn sich Zins und Miete gleichzeitig ändern. Zeilen: Zinsänderung. Spalten: Mietausfall bzw. Aufwertung. Werte unter 1,0 bedeuten, dass die Miete den Kapitaldienst nicht mehr deckt.');
+      var spalten = [['Zinsänderung', 40], ['Miete −20 %', 27], ['−10 %', 27], ['±0 %', 27], ['+10 %', 27], ['+20 %', 27]];
+      var faktorS = CW / spalten.reduce(function (a, s) { return a + s[1]; }, 0);
+      /* Kopf */
+      (function () {
+        var x = L;
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(7.4); doc.setTextColor(110);
+        spalten.forEach(function (s, i) {
+          var bw = s[1] * faktorS;
+          if (i === 0) doc.text(s[0], x, y); else doc.text(s[0], x + bw / 2, y, { align: 'center' });
+          x += bw;
+        });
+        doc.setDrawColor(G[0], G[1], G[2]); doc.setLineWidth(0.5); doc.line(L, y + 2.2, W - R, y + 2.2); doc.setLineWidth(0.2);
+        y += 7;
+      })();
+      SM.y.forEach(function (zeileName, r) {
+        var x = L, hoehe = 9;
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(8.2); doc.setTextColor(45);
+        doc.text(zeileName.replace(/\s*(Krise|Stress|Mittel|Heute|Erholung)\s*/, ' · $1'), x, y + 3);
+        x += spalten[0][1] * faktorS;
+        for (var c = 0; c < 5; c++) {
+          var z = SM.zellen[r * 5 + c], bw = spalten[c + 1][1] * faktorS;
+          var f = z.stufe === 'rot' ? [246, 231, 230] : (z.stufe === 'gelb' ? [247, 240, 220] : [230, 241, 234]);
+          doc.setFillColor(f[0], f[1], f[2]);
+          doc.rect(x + 1, y - 2.5, bw - 2, hoehe - 1.5, 'F');
+          if (z.basis) { doc.setDrawColor(GD[0], GD[1], GD[2]); doc.setLineWidth(0.5); doc.rect(x + 1, y - 2.5, bw - 2, hoehe - 1.5); doc.setLineWidth(0.2); }
+          doc.setFont('helvetica', z.basis ? 'bold' : 'normal'); doc.setFontSize(8.6); doc.setTextColor(26, 26, 26);
+          doc.text(z.wert || '—', x + bw / 2, y + 3, { align: 'center' });
+          x += bw;
+        }
+        y += hoehe;
+      });
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
+      doc.text('Grün ab 1,2 · Gelb 1,0 bis 1,2 · Rot unter 1,0. Der golden umrandete Wert ist der heutige Stand.', L, y + 2);
+      y += 8;
+    }
+
+    /* ── Vermögenszuwachs im Detail ──────────────────────────── */
+    if (rows.length > 2) {
+      platz(60, 'Vermögenszuwachs im Detail', (adr || 'Objekt'));
+      abschnitt('Vermögenszuwachs im Detail');
+      var ekStart = da(rows[0].eq_y) !== null ? rows[0].eq_y : 0;
+      tabelle(
+        [['Jahr', 18], ['Immobilienwert', 30], ['Restschuld', 28], ['Eigenkapital im Objekt', 34], ['Zuwachs gegenüber heute', 34]],
+        rows.filter(function (r, i) { return rows.length <= 12 || i % 2 === 0 || i === rows.length - 1; }).map(function (r) {
+          return { werte: [r.cal || r.y, eur(r.wert_y), eur(r.rs), eur(r.eq_y), eur((r.eq_y || 0) - ekStart)] };
+        }),
+        { titel: 'Vermögenszuwachs im Detail', hinweis: 'Eigenkapital im Objekt = angenommener Wert minus Restschuld. Der Wert ist eine Annahme, keine Bewertung.' });
+    }
+
     platz(48, 'Annahmen und Hinweise', (adr || 'Objekt'));
     abschnitt('Annahmen');
     zeile('Mietsteigerung p. a.', num('mietstg') !== null ? pct(num('mietstg'), 1) : '—');
     zeile('Kostensteigerung p. a.', num('kostenstg') !== null ? pct(num('kostenstg'), 1) : '—');
     zeile('Wertsteigerung p. a.', num('wertstg') !== null ? pct(num('wertstg'), 1) : '—');
     zeile('Betrachtungszeitraum', S.btj ? zahl(S.btj) + ' Jahre' : '—');
+    if (num('leerstand') !== null) zeile('Kalkulierter Leerstand p. a.', pct(num('leerstand'), 1));
     zeile('Anschlusszins / Anschlusstilgung (Annahme)', [pct(num('anschl_z'), 2), pct(num('anschl_t'), 2)].join('  ·  '));
     zeile('Persönlicher Grenzsteuersatz', num('grenz') !== null ? pct(num('grenz'), 2) : '—');
     zeile('Gebäudeanteil am Kaufpreis', num('geb_ant') !== null ? pct(num('geb_ant'), 0) : '—');
