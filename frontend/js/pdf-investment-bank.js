@@ -289,15 +289,15 @@
 
     abschnitt('Von der Warmmiete zum Cashflow');
     zeile('Warmmiete / Jahr (Kaltmiete und Umlagen)', eur(K.wm_j));
-    zeile('abzüglich umlagefähiger Bewirtschaftung', da(K.bwk_ul) === null ? '—' : '− ' + eur(K.bwk_ul), { einzug: true });
+    zeile('abzüglich umlagefähiger Bewirtschaftung', da(K.bwk_ul) === null ? '—' : '- ' + eur(K.bwk_ul), { einzug: true });
     zeile('Kaltmiete / Jahr (netto, inkl. Zuschläge)', eur(K.nkm_j), { fett: true });
-    zeile('abzüglich nicht umlagefähiger Bewirtschaftung', da(K.bwk_cf) === null ? '—' : '− ' + eur(K.bwk_cf), { einzug: true });
+    zeile('abzüglich nicht umlagefähiger Bewirtschaftung', da(K.bwk_cf) === null ? '—' : '- ' + eur(K.bwk_cf), { einzug: true });
     zeile('Betriebsergebnis (NOI)', da(K.nkm_j) === null ? '—' : eur(K.nkm_j - (K.bwk_cf || 0)), { fett: true });
-    zeile('abzüglich Zinsen', da(K.zins_j) === null ? '—' : '− ' + eur(K.zins_j), { einzug: true });
-    if (da(K.bspar_j) && K.bspar_j > 0) zeile('abzüglich Bausparrate', '− ' + eur(K.bspar_j), { einzug: true });
-    zeile('abzüglich Tilgung', da(K.tilg_j) === null ? '—' : '− ' + eur(K.tilg_j), { einzug: true });
+    zeile('abzüglich Zinsen', da(K.zins_j) === null ? '—' : '- ' + eur(K.zins_j), { einzug: true });
+    if (da(K.bspar_j) && K.bspar_j > 0) zeile('abzüglich Bausparrate', '- ' + eur(K.bspar_j), { einzug: true });
+    zeile('abzüglich Tilgung', da(K.tilg_j) === null ? '—' : '- ' + eur(K.tilg_j), { einzug: true });
     zeile('Cashflow vor Steuern / Jahr', eur(K.cf_op), { summe: true });
-    zeile('Steuern (Belastung −, Erstattung +)', da(K.steuer) === null ? '—' : (K.steuer < 0 ? '+ ' : '− ') + eur(Math.abs(K.steuer)), { einzug: true });
+    zeile('Steuern (Belastung -, Erstattung +)', da(K.steuer) === null ? '—' : (K.steuer < 0 ? '+ ' : '- ') + eur(Math.abs(K.steuer)), { einzug: true });
     zeile('Cashflow nach Steuern / Jahr', eur(K.cf_ns), { summe: true });
     zeile('Cashflow nach Steuern / Monat', da(K.cf_ns) === null ? '—' : eur(K.cf_ns / 12, 2), { fett: true });
     y += 2;
