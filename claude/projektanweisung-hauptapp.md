@@ -17334,3 +17334,41 @@ Messkabine): 4 Seiten ohne Fotos, 5 mit Fotos und Einheiten. Gold-Audit RC=0.
    beschneiden — Zuschnitt vorher auf einer Leinwand.
 
 **Rest:** nicht auf Prod.
+
+## Rollout-Journal · 20.09.2026 (4) — Bankfassung vollstaendig, fuenf Szenarien geprueft
+
+Marcel: „vergleich das mal mit dem normalen Investment-PDF … da muss wirklich alles drauf",
+und „mit mehreren Finanzierungen, Tilgungsaussetzungsdarlehen, ETW und Mehrfamilienhaus".
+
+**Abgleich statt Schaetzen:** die Zeilenbeschriftungen aus `js/pdf.js` (104 Stueck) gegen die
+Bankfassung gehalten — **54 fehlten**. Alle nachgezogen (v1463): Nebenkosten einzeln,
+Darlehen im Detail mit Mischzins und Gesamtrate, Bausparvertrag komplett (`State.bsvSummary`,
+Zuteilung, Bauspardarlehen, Mindest-Sparquote), Kennzahlen je Phase, Exit und Vermoegens-
+zuwachs, die Bank-Diagramme, KI-Analyse, erweiterte Annahmen.
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1463 | `38bf256` | die 54 Positionen |
+| v1463b | `bf682d1` | Diagramme vorher zeichnen lassen; echte Bauspar-Feldnamen |
+| v1463c | `0fc61ec` | Diagramme notfalls in eine eigene Flaeche rendern |
+| v1463d | `40844af` | Diagramme als JPEG statt PNG — das Dokument war 13,7 MB |
+| v1463e | `e589c62` | Text aus der Oberflaeche WinAnsi-sicher (Haekchen U+2713) |
+| v1463f | `f636aaa` | groesstes SVG im Behaelter nehmen — im PDF standen Symbole statt Diagrammen |
+
+**Pruefstrecke (fuenf Szenarien am selben Objekt, nichts gespeichert):**
+ETW klassisch · ETW mit zwei Darlehen · ETW mit Tilgungsaussetzung und Bausparvertrag ·
+Mehrfamilienhaus mit fuenf Einheiten, Sanierung, Soll-Sprung und Fotos · Vollfinanzierung (EK 0).
+Je Lauf geprueft: Seitenzahl, Doppelbyte-Kauderwelsch, Text unter der Fusszeile, Text ueber dem
+Satzspiegel, ueberlappende Zeilen (Textpositionen aus pdf.js) und die erwarteten Bloecke.
+Ergebnis: 6/6/6/7/6 Seiten, 0,14–0,22 MB, **keine Fehler**. Drei Fassungen zusaetzlich echt
+heruntergeladen und auf der Platte geprueft (6/6/7 Seiten, 3/3/6 Bilder).
+
+**Fallen dazu:**
+1. Diagramme entstehen erst, wenn die Bankansicht offen war — sonst sind die Flaechen 0 px breit.
+   `BankCharts.renderAll()` allein wirft `tilgEffektivBrutto is not defined`; der Weg ist
+   `buildCharts()` oder das Rendern in eine eigene 640x340-Flaeche.
+2. `host.querySelector('svg')` trifft das Symbol in der Ueberschrift, nicht die Zeichnung.
+3. Diagramme als PNG in ein jsPDF-Dokument = 13,7 MB. JPEG 0,86 bei 1,6-facher Aufloesung reicht.
+4. Ein Zeichen ausserhalb WinAnsi (hier das Haekchen) kippt die ganze Zeile in Doppelbyte.
+
+**Rest:** die Stress-Matrix fehlt im PDF (rendert in der eigenen Flaeche nicht). Nicht auf Prod.
