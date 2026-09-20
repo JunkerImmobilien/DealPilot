@@ -103,7 +103,9 @@
       var c = document.createElement('canvas'); c.width = zw; c.height = zh;
       var ctx = c.getContext('2d');
       var s = Math.max(zw / b.w, zh / b.h), iw = b.w * s, ih = b.h * s;
-      var i = new Image(); i.src = b.src;
+      /* Das BEREITS geladene Element nehmen — ein frisch erzeugtes Image
+         ist beim Zeichnen womoeglich noch nicht dekodiert und bliebe leer. */
+      var i = b.el; if (!i || !i.naturalWidth) return b;
       ctx.drawImage(i, (zw - iw) / 2, (zh - ih) / 2, iw, ih);
       return { src: c.toDataURL('image/jpeg', 0.82), w: zw, h: zh };
     } catch (e) { return b; }
@@ -115,10 +117,10 @@
       return new Promise(function (fertig) {
         try {
           var i = new Image();
-          i.onload = function () { fertig({ src: src, w: i.naturalWidth || 4, h: i.naturalHeight || 3 }); };
+          i.onload = function () { fertig({ src: src, w: i.naturalWidth || 4, h: i.naturalHeight || 3, el: i }); };
           i.onerror = function () { fertig(null); };
           i.src = src;
-          if (i.complete && i.naturalWidth) fertig({ src: src, w: i.naturalWidth, h: i.naturalHeight });
+          if (i.complete && i.naturalWidth) fertig({ src: src, w: i.naturalWidth, h: i.naturalHeight, el: i });
         } catch (e) { fertig(null); }
       });
     })).then(function (a) { return a.filter(Boolean); });
