@@ -353,6 +353,13 @@ const ADAPTERS = [
     // Sachsen-Anhalt, Thueringen). Steht ZULETZT + catchAll -> spezifische verifizierte
     // Landesadapter (NRW...) und die restriktiven Marker gewinnen immer zuerst.
     code: 'borisd', name: 'BORIS-D (bundesweit)', license: 'dl-de/by-2-0 (laenderspezifisch)',
+    /* v1456 · gemessen am 20.09.2026 (Josef-Mueller-Str. 92, Wolfenbuettel):
+       dieser Eintrag lieferte quellenvermerk=null, obwohl die Lizenz eine
+       Namensnennung verlangt — der WMS-Zwilling darunter fuehrt sie. Ein Wert
+       ohne Vermerk darf nach unserer Doktrin in keinen Kundenbericht. */
+    quellenvermerk: '© Daten der Gutachterausschüsse für Grundstückswerte '
+      + CURRENT_BRW_YEAR + ', dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), '
+      + 'bereitgestellt über BORIS-D https://www.bodenrichtwerte-boris.de',
     // Sobald die echte GetFeatureInfo-URL als ENV gesetzt ist, geht der Dienst automatisch live
     // (deckt 11 Laender ab). Keine Code-Aenderung noetig.
     /* WBORISD-2 · Endpunkt im Portal ermittelt (DevTools, 01.08.2026):
