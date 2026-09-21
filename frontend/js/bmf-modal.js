@@ -191,11 +191,18 @@ function syncFromTabInvest(){
 
   /* V300-miete-sync-readonly: bmf_miete aus nkm. Vorhanden -> readonly+Auto;
    * leer (Leerstand) -> editierbar + Pflichtfeld. */
+  /* v1492 · Marcel 21.09.2026: "fuer mich sieht das aus, als ob das manchmal
+     mit den Formatierungen nicht passt, der Felder."
+     Gemessen an Rinteln: jedes Euro-Feld im Reiter 1 steht als "690.000,00",
+     die Miete stand daneben als nacktes "4200". Zwei Schreibweisen fuer
+     dieselbe Sorte Zahl im selben Fenster - das liest sich wie ein Fehler,
+     auch wenn richtig gerechnet wird. Die Miete geht jetzt durch denselben
+     Formatierer. */
   var _nkm = parseDe(_val('nkm'));
   var _mEl = $('bmf_miete');
   if (_mEl) {
     if (_nkm > 0) {
-      _mEl.value = _nkm.toString().replace('.', ',');
+      _mEl.value = _formatEur(_nkm);   /* v1492: gleiches Format wie jedes andere Euro-Feld */
       _mEl.setAttribute('readonly', '');
       _mEl.setAttribute('data-auto', '');
       _mEl.classList.remove('dp-required-bmf');
@@ -332,6 +339,7 @@ function _bmfPflichtZeichnen(){
     + 'plausibel aussieht und vor dem Finanzamt nicht hält. Deshalb hält der '
     + 'Rechner hier an, statt eine Zahl zu liefern.</div>';
   box.hidden = false;
+  try { _bmfTabsSperren(); } catch(e) {}   /* v1492 */
   return fehlt;
 }
 
@@ -369,7 +377,52 @@ document.addEventListener('keydown', function(e){
   }
 });
 
+/* v1492 · Marcel: "man kann es ja oeffnen, kann dann sagen, wenn Daten
+   fehlen und kann dann vielleicht nicht weiterklicken. Weil dafuer muessen ja
+   alle Daten vorhanden sein."
+   Vorher liess sich jeder Reiter oeffnen. Auf Reiter 3 und 4 stand dann
+   entweder nichts oder - schlimmer - der Stand des zuletzt gerechneten
+   Objekts: Zahlen, die aussehen wie die eigenen. Das Fenster geht weiter
+   auf (man soll ja sehen, was fehlt), aber die Reiter, die ein Ergebnis
+   zeigen, bleiben zu, bis es eines gibt. */
+var _BMF_BRAUCHT_ERGEBNIS = ['p-afa', 'p-hebel'];
+
+function _bmfTabsSperren(){
+  var fehlt = (typeof _bmfFehlend === 'function') ? _bmfFehlend() : [];
+  var zu = fehlt.length > 0;
+  document.querySelectorAll('.bmfmo-tab').forEach(function(b){
+    if (_BMF_BRAUCHT_ERGEBNIS.indexOf(b.dataset.pane) < 0) return;
+    b.classList.toggle('bmfmo-tab-gesperrt', zu);
+    b.setAttribute('aria-disabled', zu ? 'true' : 'false');
+    b.title = zu
+      ? 'Erst die Pflichtangaben ausfuellen - es fehlen noch ' + fehlt.length + '.'
+      : '';
+  });
+  var weiter = document.getElementById('btnBmfNext');
+  if (weiter) {
+    var aktiv = document.querySelector('.bmfmo-pane.active');
+    var zielGesperrt = zu && aktiv && _BMF_BRAUCHT_ERGEBNIS.indexOf(
+      _BMF_PANE_ORDER[_BMF_PANE_ORDER.indexOf(aktiv.id) + 1]) >= 0;
+    weiter.classList.toggle('bmfmo-tab-gesperrt', !!zielGesperrt);
+  }
+  return fehlt;
+}
+
 function switchPane(id){
+  /* Sperre zuerst - erst danach wird irgendetwas umgeschaltet. */
+  if (_BMF_BRAUCHT_ERGEBNIS.indexOf(id) >= 0) {
+    var fehlt = (typeof _bmfFehlend === 'function') ? _bmfFehlend() : [];
+    if (fehlt.length) {
+      if (typeof _bmfPflichtZeichnen === 'function') _bmfPflichtZeichnen();
+      var namen = fehlt.map(function(e){ return e.name; }).join(', ');
+      if (typeof window.toast === 'function') {
+        window.toast('Noch nicht so weit \u2014 es fehlt: ' + namen);
+      }
+      var box = document.getElementById('bmfPflichtBox');
+      if (box && box.scrollIntoView) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+  }
   // V289.2.3: Klassen-Fix — beim Mockup-Rename wurden HTML-Klassen .mtab → .bmfmo-tab
   // umbenannt, aber diese JS-Selektoren nicht mit gefixt → Tabs ohne Funktion.
   document.querySelectorAll('.bmfmo-tab').forEach(function(b){
@@ -380,6 +433,7 @@ function switchPane(id){
   });
   // V289.2.3: Footer-Navigation aktualisieren
   if(typeof _updateFooterNav === 'function') _updateFooterNav(id);
+  try { _bmfTabsSperren(); } catch(e) {}   /* v1492 */
 
   // V289.2.5: Pane-spezifische Render-Funktionen
   if(id === 'p-afa' && typeof _renderVergleich === 'function'){

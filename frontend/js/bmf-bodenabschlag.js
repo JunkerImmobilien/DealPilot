@@ -102,7 +102,9 @@
         '<label style="font-size:12px">Restnutzungsdauer von / bis<br><span style="display:inline-flex;align-items:center;gap:5px;margin-top:4px">' +
           '<input id="bmf-boden-rnd-von" type="text" inputmode="numeric" style="width:56px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:14px Inter,sans-serif;text-align:right">' +
           '<b>bis</b><input id="bmf-boden-rnd-bis" type="text" inputmode="numeric" style="width:56px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:14px Inter,sans-serif;text-align:right"><b>Jahre</b></span>' +
-          '<div style="font-size:11px;color:#8A8272;margin-top:3px;max-width:240px">v1479: Steht eine Spanne, rechnet das PDF jedes Jahr darin einzeln durch.</div></label>' +
+          '<div style="font-size:11px;color:#8A8272;margin-top:3px;max-width:240px">Steht eine Spanne, rechnet das PDF jedes Jahr darin einzeln durch.</div>' +
+          '<button type="button" class="btn btn-outline btn-sm" id="bmf-boden-rnd-rechnen" style="margin-top:6px">Restnutzungsdauer berechnen</button>' +
+          '<div id="bmf-boden-rnd-info" style="font-size:11px;color:#8A8272;margin-top:4px;max-width:260px"></div></label>' +
         '<label style="font-size:12px">Sofort abzugsfähige Kosten<br><span style="display:inline-flex;align-items:center;gap:6px;margin-top:4px">' +
           '<input id="bmf-boden-sofort" type="text" inputmode="decimal" value="" placeholder="z. B. 549" style="width:90px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:14px Inter,sans-serif;text-align:right"><b>€</b></span>' +
           '<div style="font-size:11px;color:#8A8272;margin-top:3px;max-width:240px">Honorar für Kaufpreisaufteilung, Restnutzungsdauergutachten, Steuerberatung — Werbungskosten, keine Anschaffungskosten.</div></label>' +
@@ -430,8 +432,9 @@
       (heim || feld.parentNode).appendChild(box);
     }
     var namen = { amtlich: 'Amtlich', konservativ: 'Konservativ', optimiert: 'Optimiert', aggressiv: 'Aggressiv' };
+    /* v1492: ae/oe/ue gehoeren in Kommentare, nicht in Nutztext. */
     box.textContent = name
-      ? 'Uebernommen aus Reiter 4, Variante ' + (namen[name] || name) + '. Aenderbar.'
+      ? 'Übernommen aus Reiter 4, Variante ' + (namen[name] || name) + '. Änderbar.'
       : 'Von Hand eingetragen.';
   }
 
@@ -441,6 +444,84 @@
     if (window._dpBodenStillsetzen) return;
     window._dpBodenQuelle = null;
     herkunftZeigen(null);
+  });
+
+
+  /* v1492 · Marcel 21.09.2026: "bei der Restnutzungsdauer koennte man das
+     Objekt ja einmal durch den Restnutzungsdauerrechner geben. Vielleicht
+     macht man da auch einfach, wenn noch Daten fehlen, einen Button rein und
+     wuerde dann die Restnutzungsdauer einmal berechnen."
+     Der Knopf rechnet mit demselben Kern wie das Restnutzungsdauergutachten
+     (window.DealPilotRND.calcAll) - kein zweiter Rechenweg. Gefuellt werden
+     beide Felder: die technische Restnutzungsdauer als Untergrenze und das
+     Punktraster nach Anlage 2 als Obergrenze. Wo beide gleich sind, steht
+     eine Zahl statt einer Spanne. */
+  function rndRechnen() {
+    var info = el('bmf-boden-rnd-info');
+    function sagen(t) { if (info) info.textContent = t; }
+
+    if (!window.DealPilotRND || typeof window.DealPilotRND.calcAll !== 'function') {
+      sagen('Der Restnutzungsdauer-Rechner ist nicht geladen.'); return;
+    }
+    var bj = zahl((el('bmf_bj') && el('bmf_bj').value) || (el('baujahr') && el('baujahr').value));
+    if (!bj || bj < 1500) { sagen('Ohne Baujahr geht es nicht — es steht im Reiter Objekt.'); return; }
+
+    /* Gesamtnutzungsdauer aus der Grundstuecksart, nicht geraten. */
+    var gnd = 80;
+    try {
+      var art = String((el('objart') && el('objart').value) || '').toUpperCase();
+      var typId = ({ ETW: 'etw', MFH: 'mfh', EFH: 'efh', ZFH: 'efh', DHH: 'efh', RH: 'efh',
+                     BUERO: 'buero', GESCH: 'geschaeft' })[art] || 'mfh';
+      if (window.DealPilotRND_GND && window.DealPilotRND_GND.getDefault) {
+        gnd = Number(window.DealPilotRND_GND.getDefault(typId)) || 80;
+      }
+    } catch (e) {}
+
+    /* Modernisierungen: die Auswahl aus Reiter 2 zaehlt, nicht eine Annahme. */
+    var GEWERKE = { mod_dach: 'dach', mod_fenster: 'fenster', mod_leit: 'leitungen',
+                    mod_heiz: 'heizung', mod_daemm: 'aussenwand', mod_bad: 'baeder',
+                    mod_innen: 'innenausbau', mod_grdr: 'grundriss' };
+    var bewertung = {}, punkte = 0, gezaehlt = 0;
+    Object.keys(GEWERKE).forEach(function (id) {
+      var e = el(id); if (!e) return;
+      var v = String(e.value || '').toLowerCase();
+      gezaehlt++;
+      if (v === 'ja' || v === 'voll' || v === 'v') { bewertung[GEWERKE[id]] = 'gehoben'; punkte += 2; }
+      else if (v === 'teil' || v === 'teilweise' || v === 'h') { bewertung[GEWERKE[id]] = 'standard'; punkte += 1; }
+      else { bewertung[GEWERKE[id]] = 'veraltet'; }
+    });
+
+    var stichtag = (el('bmf_datum') && el('bmf_datum').value)
+                || (el('kaufdat') && el('kaufdat').value)
+                || new Date().toISOString().slice(0, 10);
+
+    var r;
+    try {
+      r = window.DealPilotRND.calcAll({ baujahr: bj, stichtag: stichtag, gnd: gnd,
+                                        modPoints: punkte, gewerkeBewertung: bewertung });
+    } catch (e) { sagen('Die Berechnung ist gescheitert: ' + e.message); return; }
+    if (!r) { sagen('Die Berechnung hat nichts geliefert.'); return; }
+
+    var tech = Math.round(Number(r.methods && r.methods.technisch && r.methods.technisch.restnutzungsdauer) || 0);
+    var raster = Math.round(Number(r.methods && r.methods.punktraster && r.methods.punktraster.restnutzungsdauer) || 0);
+    var werte = [tech, raster].filter(function (x) { return x > 0; });
+    if (!werte.length) { sagen('Es kam keine brauchbare Restnutzungsdauer heraus.'); return; }
+    var von = Math.min.apply(null, werte), bis = Math.max.apply(null, werte);
+
+    window._dpBodenStillsetzen = true;
+    try {
+      if (el('bmf-boden-rnd-von')) el('bmf-boden-rnd-von').value = String(von);
+      if (el('bmf-boden-rnd-bis')) el('bmf-boden-rnd-bis').value = String(bis === von ? '' : bis);
+    } finally { window._dpBodenStillsetzen = false; }
+
+    window._lastRndResult = { result: r };
+    sagen('Baujahr ' + bj + ', GND ' + gnd + ' Jahre, ' + punkte + ' von ' + (gezaehlt * 2) +
+          ' Modernisierungspunkten. Technisch ' + tech + ' Jahre, Anlage 2 ' + raster + ' Jahre.');
+    try { rechnen(); } catch (e) {}
+  }
+
+  document.addEventListener('click', function (ev) {
+    if (ev.target && ev.target.id === 'bmf-boden-rnd-rechnen') { ev.preventDefault(); rndRechnen(); }
   });
 
 })();

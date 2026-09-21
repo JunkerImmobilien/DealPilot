@@ -829,3 +829,13 @@ span.auto-tag {
 /* Miete volle Zeile -> LZS + Vergleichsfaktor ruecken nebeneinander (2er-Grid) */
 #bmfOverlay #p-bmf .f:has(#bmf_miete){grid-column:1 / -1}
 /* ===== /v994-lzs ===== */
+
+/* ─── v1492: gesperrter Reiter, solange Pflichtangaben fehlen ────── */
+.bmfmo-tab-gesperrt {
+  opacity: .45;
+  cursor: not-allowed;
+}
+.bmfmo-tab-gesperrt:hover { opacity: .55; }
+
+/* v1492: Das Baujahr stand als einziges Zahlenfeld linksbuendig. */
+#bmf_bj { text-align: right; }
