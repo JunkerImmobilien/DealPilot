@@ -59,6 +59,10 @@
      Zeichen gar nicht haben, und hat ein Fachdokument schlechter gemacht:
      "Gebaeudeanteil" steht in keinem Gesetz.
      Nur der DATEINAME bleibt ohne Umlaute - der geht durch fremde Systeme. */
+  /* v1494: Die Ueberschriften und Zeilentexte tragen wieder echte Umlaute.
+     Sie sind in WinAnsi darstellbar (gemessen), und "Gebaeudeanteil" steht in
+     keinem Gesetz. In KOMMENTAREN bleibt ae/oe/ue - die Quelldatei selbst
+     soll ASCII bleiben. */
   function sauber(t) {
     return String(t == null ? '' : t)
       .replace(/[✓✔]/g, '+').replace(/[✗✘⚠️]/g, '!')
@@ -287,14 +291,14 @@
     if (sachwert) zeile('Sachwert (marktangepasst)', eur(sachwert));
     if (ertrag) zeile('Ertragswert', eur(ertrag));
     zeile('Massgebender Verkehrswert', eur(vw), { fett: true });
-    zeile('davon Gebaeude (Verkehrswert abzüglich Bodenwert)', eur((vw || 0) - (bodenwert || 0)));
-    zeile('Gebaeudeanteil = Gebaeude ÷ Verkehrswert', pct(gebPct, 2), { summe: true });
+    zeile('davon Gebäude (Verkehrswert abzüglich Bodenwert)', eur((vw || 0) - (bodenwert || 0)));
+    zeile('Gebäudeanteil = Gebäude ÷ Verkehrswert', pct(gebPct, 2), { summe: true });
     y += 1;
-    zeile('Anschaffungskosten × Gebaeudeanteil', eur(kpGeb, 2), { fett: true });
+    zeile('Anschaffungskosten × Gebäudeanteil', eur(kpGeb, 2), { fett: true });
     zeile('Anschaffungskosten × Bodenanteil', eur(kpGrund, 2), { fett: true });
 
     /* ── Aufteilung mit Abschlag ─────────────────────────────────── */
-    neueSeite('Kaufpreisaufteilung fuer den Notarvertrag', 'Angepasste Aufteilung mit Abschlag auf den Grund und Boden');
+    neueSeite('Kaufpreisaufteilung für den Notarvertrag', 'Angepasste Aufteilung mit Abschlag auf den Grund und Boden');
     abschnitt('Angepasste Kaufpreisaufteilung - amtlich gegen ' + pct(abschlag, 0) + ' Abschlag');
     einleitung('Die Arbeitshilfe bindet das Finanzgericht nicht (BFH, Urteil vom 21.07.2020, IX R 26/19). Eine niedrigere Bodenkomponente ist ansetzbar, wenn sie begruendet ist' + (grundBegr ? ' - hier: ' + grundBegr : '') + '.');
     function zv(label, a, n, fmt, fett) {
@@ -307,11 +311,11 @@
       [
         zv('Kaufpreis (ohne Inventar)', kp, kp),
         zv('davon Grund und Boden', bodenAnteilKp, bodenNeu),
-        zv('davon Gebaeude', gebAnteilKp, gebNeu),
-        zv('Gebaeudeanteil', gebPct, gebPctNeu, function (v) { return pct(v, 2); }, true),
-        zv('Nebenkosten auf das Gebaeude', nkGebAlt, nkGebNeu),
+        zv('davon Gebäude', gebAnteilKp, gebNeu),
+        zv('Gebäudeanteil', gebPct, gebPctNeu, function (v) { return pct(v, 2); }, true),
+        zv('Nebenkosten auf das Gebäude', nkGebAlt, nkGebNeu),
         zv('AfA-Bemessungsgrundlage', basisAlt, basisNeu, null, true),
-        (nkAussen > 0.005 ? zv('zuzueglich weiterer Nebenkosten (Gebaeudeanteil)', nkAussen * gebPct / 100, nkAussen * gebPctNeu / 100) : null)
+        (nkAussen > 0.005 ? zv('zuzüglich weiterer Nebenkosten (Gebäudeanteil)', nkAussen * gebPct / 100, nkAussen * gebPctNeu / 100) : null)
       ].filter(Boolean).concat([
       ]),
       'Der Kaufpreis bleibt gleich; der Abschlag verschiebt nur, was auf den Boden entfaellt. Ohne tragfaehige Begruendung setzt das Finanzamt die Aufteilung der Arbeitshilfe an.');
@@ -363,7 +367,7 @@
     if (zusatzTxt) {
       if (y > H - 46) { doc.addPage(); kopf(_titel, _unter); }
       doc.setFont('helvetica', 'bold'); doc.setFontSize(8.6); doc.setTextColor(90);
-      doc.text(sauber('Moeglicher Zusatz, falls das Finanzamt die Aufteilung hinterfragt'), L, y);
+      doc.text(sauber('Möglicher Zusatz, falls das Finanzamt die Aufteilung hinterfragt'), L, y);
       y += 5.5;
       doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(26, 26, 26);
       String(zusatzTxt).split('\n').forEach(function (absatz) {
@@ -388,17 +392,17 @@
       saetze.map(function (s) {
         return zv(pct(s[0], 2) + ' · ' + s[1], basisAlt * s[0] / 100, basisNeu * s[0] / 100);
       }),
-      'AfA je Jahr auf die jeweilige Bemessungsgrundlage. Die Pauschale von 2,00 % folgt § 7 Abs. 4 Satz 1 EStG; ein hoeherer Satz aus einer kuerzeren Nutzungsdauer folgt § 7 Abs. 4 Satz 2 EStG und setzt deren Nachweis voraus.');
+      'AfA je Jahr auf die jeweilige Bemessungsgrundlage. Die Pauschale von 2,00 % folgt § 7 Abs. 4 Satz 1 EStG; ein höherer Satz aus einer kürzeren Nutzungsdauer folgt § 7 Abs. 4 Satz 2 EStG und setzt deren Nachweis voraus.');
 
-    /* Sofort abzugsfaehige Kosten — sie teilen sich NICHT auf. */
+    /* Sofort abzugsfähige Kosten — sie teilen sich NICHT auf. */
     var sofort = num('bmf-boden-sofort');
     if (sofort) {
       var grenz = num('grenz') || 42;
       platz(34);
-      abschnitt('Sofort abzugsfaehige Kosten');
+      abschnitt('Sofort abzugsfähige Kosten');
       zeile('Honorar Kaufpreisaufteilung, Restnutzungsdauer, Steuerberatung', eur(sofort, 2));
       zeile('Steuerwirkung im Jahr der Zahlung bei ' + pct(grenz, 2), eur(sofort * grenz / 100, 2), { summe: true });
-      einleitung('Diese Kosten dienen der Ermittlung der Abschreibung, nicht dem Erwerb. Sie sind Werbungskosten und im Jahr der Zahlung in voller Hoehe abziehbar; sie erhoehen die Bemessungsgrundlage nicht.');
+      einleitung('Diese Kosten dienen der Ermittlung der Abschreibung, nicht dem Erwerb. Sie sind Werbungskosten und im Jahr der Zahlung in voller Höhe abziehbar; sie erhöhen die Bemessungsgrundlage nicht.');
     }
 
     platz(40);
