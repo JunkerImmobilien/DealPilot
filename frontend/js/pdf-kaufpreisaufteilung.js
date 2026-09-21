@@ -67,7 +67,17 @@
     return String(t == null ? '' : t)
       .replace(/[✓✔]/g, '+').replace(/[✗✘⚠️]/g, '!')
       .replace(/[−‑‒–—]/g, '-')
-      .replace(/[^\x00-\xFF]/g, '').replace(/\s+/g, ' ').trim();
+      /* v1497 · gemessen am 21.09.2026 mit pdf.js: im GANZEN PDF stand
+         KEIN EINZIGES Euro-Zeichen - alle Betraege ohne Waehrung. Ursache ist
+         diese Zeile: sie wirft alles ausserhalb Latin-1 weg, und das Euro-
+         Zeichen ist U+20AC, liegt also ausserhalb. Dass jsPDF es drucken kann
+         (als WinAnsi-Byte 0x80), half nichts - es kam nie bis dorthin.
+         Die Schutzzeile hat damit genau das kaputtgemacht, was sie schuetzen
+         sollte, und zwar stumm: eine Zahl ohne Waehrung sieht aus wie eine
+         Zahl. Jetzt bleiben die WinAnsi-Sonderzeichen stehen; entfernt wird
+         nur, was wirklich ausserhalb liegt. */
+      .replace(/[^\x00-\xFF\u20AC\u201A\u0192\u201E\u2026\u2020\u2021\u2030\u2039\u2018\u2019\u201C\u201D\u2022\u2122\u203A]/g, '')
+      .replace(/\s+/g, ' ').trim();
   }
   function heute() {
     var t = new Date();
@@ -273,7 +283,11 @@
     /* v1495 · Marcel: "Stichtag bitte leer lassen." Der Rueckfall auf das
        Modalfeld hat ein Datum gedruckt, das nur eine Vorbelegung war - bei
        einem Objekt ohne Kaufvertrag sah das aus wie ein Vertragsdatum. */
-    zeile('Stichtag', sauber(I.kaufdatum) || '');
+    /* v1497 · Marcel: "Stichtag bitte leer lassen." Am Objekt steht der
+       14.09.2026 - das ist das Datum der Anlage, nicht das eines Kaufvertrags;
+       zu dieser Anfrage gibt es noch keinen. Ein gedrucktes Datum haette
+       einen Vertrag behauptet. Die Zeile bleibt als Platz zum Eintragen. */
+    zeile('Stichtag', '');
     y += 2;
 
     platz(60);
@@ -282,7 +296,19 @@
     nkFelder.forEach(function (f) {
       var v = num(f[0]);
       if (!v) return;
+      /* v1497 · Marcel 21.09.2026: "bitte im PDF auch noch die Prozentzahlen
+         angeben, was Grunderwerbsteuer, Notar, Grundbuchamt ausmacht."
+         Die Saetze stehen im Reiter Investition (gest_p, notar_p, gba_p,
+         makler_p) - gedruckt wird der HINTERLEGTE Satz, nicht ein aus dem
+         Betrag zurueckgerechneter. Ein zurueckgerechneter Satz sieht bei
+         krummen Betraegen falsch aus und behauptet eine Genauigkeit, die es
+         nicht gibt. */
+      var SATZ_FELD = { ak_grest: 'gest_p', ak_notar: 'notar_p', ak_gba: 'gba_p', ak_makler: 'makler_p' };
       var zus = '';
+      if (SATZ_FELD[f[0]]) {
+        var s = num(SATZ_FELD[f[0]]);
+        if (s) zus = ' (' + pct(s, 2) + ' vom Kaufpreis)';
+      }
       if (f[0] === 'ak_fahrt' && num('ak_fahrt_km')) zus = ' (' + new Intl.NumberFormat('de-DE').format(num('ak_fahrt_km')) + ' km × ' + eur(num('ak_fahrt_satz'), 2) + ')';
       zeile(f[1] + zus, eur(v, 2), { einzug: true, klein: true });
     });
