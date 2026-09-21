@@ -368,5 +368,30 @@
      v1474, Freigabe Marcel 21.09.2026). Zwei Stellen fuer dieselbe Regel
      waeren eine Falle fuer den naechsten Leser. */
 
+  /* v1485 · gemessen: nach runBmf() stand im Reiter weiter "zuerst die
+     amtliche Berechnung starten", bis man den Reiter erneut anklickte. Der
+     Lauf wird deshalb umhuellt und das Blatt danach neu gezeichnet. */
+  (function () {
+    var n5 = 0;
+    (function wickeln() {
+      var f = window.runBmf;
+      if (typeof f === 'function' && !f._dpBoden) {
+        var neuF = function () {
+          var r = f.apply(this, arguments);
+          var vorher = window._lastBmfResults, versuche = 0;
+          var t = setInterval(function () {
+            if (window._lastBmfResults && window._lastBmfResults !== vorher) { clearInterval(t); rechnen(); }
+            else if (++versuche > 40) clearInterval(t);
+          }, 800);
+          return r;
+        };
+        for (var k in f) { if (Object.prototype.hasOwnProperty.call(f, k)) neuF[k] = f[k]; }
+        neuF._dpBoden = true; window.runBmf = neuF;
+        return;
+      }
+      if (++n5 < 120) setTimeout(wickeln, 700);
+    })();
+  })();
+
   window.DpBmfBodenabschlag = { rechnen: rechnen, einhaengen: einhaengen, _basis: basis };
 })();
