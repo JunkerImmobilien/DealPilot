@@ -38,7 +38,7 @@
         <div class="g2">
           <div class="f">
             <label>Kaufpreis (aus Notarvertrag) <span class="auto" title="Aus Tab Investition · #kp">Auto</span></label>
-            <div class="iw"><span class="pfx">€</span><input id="ak_kp" type="text" inputmode="decimal" value="87.569,13" class="trl tr from-tab" oninput="calcAk()" readonly data-auto></div>
+            <div class="iw"><span class="pfx">€</span><input id="ak_kp" type="text" inputmode="decimal" value="" placeholder="0,00" class="trl tr from-tab" oninput="calcAk()" readonly data-auto></div>
           </div>
           <div class="f">
             <label>Anschaffungsnahe Herstellkosten <span class="badge badge-blue" style="margin-left:6px">§ 6 Abs. 1 Nr. 1a EStG</span></label>
@@ -58,11 +58,11 @@
         <div class="g3">
           <div class="f">
             <label>Grunderwerbsteuer <span class="auto" title="Aus Tab Investition · #gest_e">Auto</span></label>
-            <div class="iw"><span class="pfx">€</span><input id="ak_grest" type="text" inputmode="decimal" value="4.250,00" class="trl tr from-tab" oninput="calcAk()" readonly data-auto></div>
+            <div class="iw"><span class="pfx">€</span><input id="ak_grest" type="text" inputmode="decimal" value="" placeholder="0,00" class="trl tr from-tab" oninput="calcAk()" readonly data-auto></div>
           </div>
           <div class="f">
             <label>Notar <span class="auto" title="Aus Tab Investition · #notar_e">Auto</span></label>
-            <div class="iw"><span class="pfx">€</span><input id="ak_notar" type="text" inputmode="decimal" value="1.492,26" class="trl tr from-tab" oninput="calcAk()" readonly data-auto></div>
+            <div class="iw"><span class="pfx">€</span><input id="ak_notar" type="text" inputmode="decimal" value="" placeholder="0,00" class="trl tr from-tab" oninput="calcAk()" readonly data-auto></div>
           </div>
           <div class="f">
             <label>Grundbuchamt <span class="auto" title="Aus Tab Investition · #gba_e">Auto</span></label>
@@ -83,19 +83,29 @@
 
         <hr class="dvd">
 
+        <!-- v1496b: dasselbe bei Kaufpreis, Grunderwerbsteuer und Notar.
+             v1496 · Marcel 21.09.2026: "das muss schon plausibel sein, was wir
+             da jetzt aufteilen." Hier standen FESTE Beispielwerte im HTML:
+             2.151 km, 817,44 EUR Fahrtkosten, 56,00 EUR Verpflegung, 40,00 EUR
+             Unterkunft - bei JEDEM Objekt, unabhaengig davon, ob jemand
+             gefahren ist. Seit v1478 gehen die Fahrtkosten in die
+             AfA-Bemessungsgrundlage ein; damit rechnete die Aufteilung mit
+             einer erfundenen Zahl, und im PDF stand sie als Beleg.
+             Eine Vorbelegung, die wie eine Angabe aussieht, ist schlimmer als
+             ein leeres Feld. Jetzt leer mit Platzhalter. -->
         <div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin-bottom:8px">Erwerbskosten Käufer (Reise &amp; Aufwand)</div>
 
         <div class="g3">
           <div class="f">
             <label>Fahrtkosten</label>
-            <div class="iw"><span class="pfx">€</span><input id="ak_fahrt" type="text" inputmode="decimal" value="817,44" class="trl tr" oninput="calcAk()"></div>
+            <div class="iw"><span class="pfx">€</span><input id="ak_fahrt" type="text" inputmode="decimal" value="" placeholder="0,00" class="trl tr" oninput="calcAk()"></div>
             <span class="hint">0,38 €/km PKW (BMF-Pauschale 2026) oder Beleg</span>
             <details class="fold" style="margin-top:4px">
               <summary style="font-size:11px">Fahrtkosten-Helfer</summary>
               <div class="g2" style="margin-top:6px">
                 <div class="f">
                   <label style="font-size:10px">Strecke (km gesamt)</label>
-                  <div class="iw"><input id="ak_fahrt_km" type="text" inputmode="decimal" value="2.151" class="tr" oninput="calcFahrt()"><span class="sfx">km</span></div>
+                  <div class="iw"><input id="ak_fahrt_km" type="text" inputmode="decimal" value="" placeholder="z. B. 370" class="tr" oninput="calcFahrt()"><span class="sfx">km</span></div>
                 </div>
                 <div class="f">
                   <label style="font-size:10px">Satz je km</label>
@@ -106,12 +116,12 @@
           </div>
           <div class="f">
             <label>Verpflegungsmehraufwand</label>
-            <div class="iw"><span class="pfx">€</span><input id="ak_verpfl" type="text" inputmode="decimal" value="56,00" class="trl tr" oninput="calcAk()"></div>
+            <div class="iw"><span class="pfx">€</span><input id="ak_verpfl" type="text" inputmode="decimal" value="" placeholder="0,00" class="trl tr" oninput="calcAk()"></div>
             <span class="hint">14 €/28 € Pauschale je Tag</span>
           </div>
           <div class="f">
             <label>Unterkunft</label>
-            <div class="iw"><span class="pfx">€</span><input id="ak_hotel" type="text" inputmode="decimal" value="40,00" class="trl tr" oninput="calcAk()"></div>
+            <div class="iw"><span class="pfx">€</span><input id="ak_hotel" type="text" inputmode="decimal" value="" placeholder="0,00" class="trl tr" oninput="calcAk()"></div>
             <span class="hint">Hotel/Pension mit Beleg</span>
           </div>
         </div>

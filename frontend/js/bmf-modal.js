@@ -1884,7 +1884,7 @@ function _ensureModalLoaded(callback){
   _bmfModalLoading = true;
   console.log('[bmf-modal] Modal-HTML wird geladen...');
 
-  fetch('/js/bmf-modal-html.html?v=v1382', { cache: 'no-store' })
+  fetch('/js/bmf-modal-html.html?v=v1496', { cache: 'no-store' })
     .then(function(r){
       if(!r.ok){ throw new Error('HTTP ' + r.status); }
       return r.text();
