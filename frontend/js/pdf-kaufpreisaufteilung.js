@@ -274,8 +274,20 @@
     try { rnd = window._lastRndResult && window._lastRndResult.result && window._lastRndResult.result.final_rnd; } catch (e) {}
     /* v1477 · gemessen: die lange Beschriftung lief in die Zahlenspalte.
        Kurz in der Tabelle, die Fundstelle steht in der Fussnote. */
+    /* v1479 · Marcel: „wenn eine Spanne rauskommt, die Tabelle erweitern
+       durch mehrere Jahre — dann alle Jahre mit Rechnung." Steht im Reiter
+       eine Spanne (von/bis), bekommt jedes Jahr darin eine eigene Zeile. */
     var saetze = [[2, 'gesetzliche Pauschale']];
-    if (rnd && rnd > 0) saetze.push([100 / rnd, 'Restnutzungsdauer ' + Math.round(rnd) + ' Jahre']);
+    var rvon = num('bmf-boden-rnd-von'), rbis = num('bmf-boden-rnd-bis');
+    if (rvon && rbis && rbis > rvon && (rbis - rvon) <= 25) {
+      for (var jj = Math.round(rvon); jj <= Math.round(rbis); jj++) {
+        saetze.push([100 / jj, 'Restnutzungsdauer ' + jj + ' Jahre']);
+      }
+    } else if (rvon) {
+      saetze.push([100 / Math.round(rvon), 'Restnutzungsdauer ' + Math.round(rvon) + ' Jahre']);
+    } else if (rnd && rnd > 0) {
+      saetze.push([100 / rnd, 'Restnutzungsdauer ' + Math.round(rnd) + ' Jahre']);
+    }
     var eigen = num('afa_eigen');
     if (eigen && (!rnd || Math.abs(eigen - 100 / rnd) > 0.01)) saetze.push([eigen, 'im Objekt hinterlegter Satz']);
 
@@ -287,6 +299,17 @@
         return zv(pct(s[0], 2) + ' · ' + s[1], basisAlt * s[0] / 100, basisNeu * s[0] / 100);
       }),
       'AfA je Jahr auf die jeweilige Bemessungsgrundlage. Die Pauschale von 2,00 % folgt § 7 Abs. 4 Satz 1 EStG; ein hoeherer Satz aus einer kuerzeren Nutzungsdauer folgt § 7 Abs. 4 Satz 2 EStG und setzt deren Nachweis voraus.');
+
+    /* Sofort abzugsfaehige Kosten — sie teilen sich NICHT auf. */
+    var sofort = num('bmf-boden-sofort');
+    if (sofort) {
+      var grenz = num('grenz') || 42;
+      platz(34);
+      abschnitt('Sofort abzugsfaehige Kosten');
+      zeile('Honorar Kaufpreisaufteilung, Restnutzungsdauer, Steuerberatung', eur(sofort, 2));
+      zeile('Steuerwirkung im Jahr der Zahlung bei ' + pct(grenz, 2), eur(sofort * grenz / 100, 2), { summe: true });
+      einleitung('Diese Kosten dienen der Ermittlung der Abschreibung, nicht dem Erwerb. Sie sind Werbungskosten und im Jahr der Zahlung in voller Hoehe abziehbar; sie erhoehen die Bemessungsgrundlage nicht.');
+    }
 
     /* ── Vertragstext ────────────────────────────────────────────── */
     platz(70, 'Kaufpreisaufteilung', 'Formulierung für den Kaufvertrag');
@@ -304,6 +327,21 @@
       });
     });
     y += 6;
+
+    var zusatz = (window._dpKpaTexte && window._dpKpaTexte.zusatz) || '';
+    if (zusatz) {
+      platz(60, 'Kaufpreisaufteilung', 'Ergaenzende Begruendung');
+      abschnitt('Zusatztext bei Rueckfragen des Finanzamts');
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8.8); doc.setTextColor(50);
+      String(zusatz).split('\n').forEach(function (absatz) {
+        if (!absatz.trim()) { y += 2.5; return; }
+        doc.splitTextToSize(sauber(absatz), CW).forEach(function (z) {
+          if (y > H - 22) { doc.addPage(); kopf(_titel, _unter); }
+          doc.text(z, L, y); y += 4.6;
+        });
+      });
+      y += 6;
+    }
 
     platz(40);
     abschnitt('Grundlagen und Hinweise');

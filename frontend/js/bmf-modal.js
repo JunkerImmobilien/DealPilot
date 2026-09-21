@@ -512,7 +512,19 @@ function runBmf(){
       var nk = (parseDe(_v('gest_e')) || 0) + (parseDe(_v('notar_e')) || 0)
              + (parseDe(_v('gba_e')) || 0) + (parseDe(_v('makler_e')) || 0)
              + (parseDe(_v('ji_e')) || 0);
-      return immoKp + nk;
+      /* v1478 · Marcel 21.09.2026: "warum ist die Fahrten nicht mit drin? das sind
+         Fahrten die ja mit dem Kauf zusammenhaengen". Richtig — Fahrten zum Objekt
+         und zum Notar, ein Wertgutachten zur Kaufentscheidung, Anwaltskosten des
+         Erwerbs und sonstige Erwerbskosten sind ANSCHAFFUNGSNEBENKOSTEN. Sie
+         gehoeren in die Summe, die die Arbeitshilfe aufteilt. Bis hierher kamen
+         nur GrESt, Notar, Grundbuch, Makler und Vermittlung an.
+         NICHT hier hinein gehoeren Kosten, die erst die AfA ermitteln
+         (Honorar fuer die Kaufpreisaufteilung, Restnutzungsdauergutachten,
+         Steuerberatung) — die sind sofort abziehbar und stehen im Reiter
+         Bodenabschlag als eigener Posten. */
+      var nkWeitere = (parseDe(_v('ak_fahrt')) || 0) + (parseDe(_v('ak_gutachten')) || 0)
+                    + (parseDe(_v('ak_anwalt')) || 0) + (parseDe(_v('ak_sonst')) || 0);
+      return immoKp + nk + nkWeitere;
     })(),
     baujahr: parseInt(($('bmf_bj') || {}).value || _v('baujahr')) || 0,
     wohnflaeche: parseDe(($('bmf_wfl') || {}).value || _v('wfl')),

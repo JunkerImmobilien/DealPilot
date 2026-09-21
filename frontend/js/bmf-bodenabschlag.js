@@ -59,11 +59,13 @@
        selben Verhaeltnis und gehoeren in die AfA-Bemessungsgrundlage. */
     /* Feldnamen am Modal gemessen (v1471): gba statt grundbuch, gutachten
        statt gutachter, dazu anwalt und ji. */
-    /* v1476 · GEMESSEN: in die amtliche Rechnung gehen nur diese fuenf
-       Nebenkosten (bmf-modal.js, runBmf). Fahrt, Gutachten, Anwalt, Reise und
-       Sonstiges bleiben aussen vor — sie hier mitzurechnen haette eine
-       Bemessungsgrundlage ergeben, die zur amtlichen Zahl nicht passt. */
-    var nkFelder = ['ak_grest', 'ak_notar', 'ak_gba', 'ak_makler', 'ak_ji'];
+    /* v1478 · Seit der Korrektur in bmf-modal.js gehen auch Fahrtkosten,
+       Wertgutachten, Anwalt und Sonstiges in die amtliche Aufteilung — es sind
+       Anschaffungsnebenkosten. Verpflegung und Uebernachtung bleiben draussen.
+       Kosten, die erst die AfA ermitteln, stehen weiter unten als eigener
+       Posten: sie sind sofort abziehbar und teilen sich NICHT auf. */
+    var nkFelder = ['ak_grest', 'ak_notar', 'ak_gba', 'ak_makler', 'ak_ji',
+      'ak_fahrt', 'ak_gutachten', 'ak_anwalt', 'ak_sonst'];
     var nk = nkFelder.reduce(function (a, i) { return a + (zahl(el(i) && el(i).value) || 0); }, 0);
     return { kp: kp, inv: inv, immoKp: immoKp, nk: nk, gebPct: gebPct, boden: boden,
       gebAmtlich: immoKp * gebPct / 100, bodenAmtlich: immoKp * (100 - gebPct) / 100 };
@@ -97,16 +99,35 @@
       '<div style="display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px">' +
         '<label style="font-size:12px">Abschlag auf den Bodenwert<br><span style="display:inline-flex;align-items:center;gap:6px;margin-top:4px">' +
           '<input id="bmf-boden-pct" type="text" inputmode="decimal" value="20" style="width:70px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:14px Inter,sans-serif;text-align:right"><b>%</b></span></label>' +
+        '<label style="font-size:12px">Restnutzungsdauer von / bis<br><span style="display:inline-flex;align-items:center;gap:5px;margin-top:4px">' +
+          '<input id="bmf-boden-rnd-von" type="text" inputmode="numeric" style="width:56px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:14px Inter,sans-serif;text-align:right">' +
+          '<b>bis</b><input id="bmf-boden-rnd-bis" type="text" inputmode="numeric" style="width:56px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:14px Inter,sans-serif;text-align:right"><b>Jahre</b></span>' +
+          '<div style="font-size:11px;color:#8A8272;margin-top:3px;max-width:240px">v1479: Steht eine Spanne, rechnet das PDF jedes Jahr darin einzeln durch.</div></label>' +
+        '<label style="font-size:12px">Sofort abzugsfähige Kosten<br><span style="display:inline-flex;align-items:center;gap:6px;margin-top:4px">' +
+          '<input id="bmf-boden-sofort" type="text" inputmode="decimal" value="" placeholder="z. B. 549" style="width:90px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:14px Inter,sans-serif;text-align:right"><b>€</b></span>' +
+          '<div style="font-size:11px;color:#8A8272;margin-top:3px;max-width:240px">Honorar für Kaufpreisaufteilung, Restnutzungsdauergutachten, Steuerberatung — Werbungskosten, keine Anschaffungskosten.</div></label>' +
         '<label style="font-size:12px;flex:1 1 320px">Begründung (kommt in den Vertragstext)<br>' +
           '<input id="bmf-boden-grund" type="text" value="" placeholder="z. B. Hinterlandanteil, Zuschnitt, Lärmbelastung, Bebauung nutzt den Boden nicht aus" style="width:100%;margin-top:4px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:13px Inter,sans-serif"></label>' +
       '</div>' +
       '<div id="bmf-boden-out"></div>' +
-      '<div id="bmf-boden-klausel" style="margin-top:14px"></div>';
+      '<div id="bmf-boden-klausel" style="margin-top:14px"></div>' +
+      '<div id="bmf-boden-zusatz"></div>';
     vorlage.parentNode.appendChild(p);
 
-    var f = el('bmf-boden-pct'), gr = el('bmf-boden-grund');
+    var f = el('bmf-boden-pct'), gr = el('bmf-boden-grund'), so = el('bmf-boden-sofort');
     if (f) f.addEventListener('input', rechnen);
     if (gr) gr.addEventListener('input', rechnen);
+    if (so) so.addEventListener('input', rechnen);
+    ['bmf-boden-rnd-von', 'bmf-boden-rnd-bis'].forEach(function (i) { var e = el(i); if (e) e.addEventListener('input', rechnen); });
+    /* Vorbelegung aus der ermittelten Restnutzungsdauer: der Wert selbst und
+       vier Jahre darueber — die Bandbreite, die auch im Gutachten steht. */
+    try {
+      var r0 = window._lastRndResult && window._lastRndResult.result && window._lastRndResult.result.final_rnd;
+      if (r0 && el('bmf-boden-rnd-von') && !el('bmf-boden-rnd-von').value) {
+        el('bmf-boden-rnd-von').value = String(Math.round(r0));
+        el('bmf-boden-rnd-bis').value = String(Math.round(r0) + 4);
+      }
+    } catch (e) {}
     return true;
   }
 
@@ -153,6 +174,14 @@
       zeile('Anschaffungsnebenkosten auf das Gebäude', nkGebAlt, nkGebNeu) +
       zeile('AfA-Bemessungsgrundlage', basisAlt, basisNeu, { summe: true }) +
       zeile('AfA pro Jahr bei ' + pct(satz, 2), afaAlt, afaNeu, { summe: true }) +
+      (function () {
+        var so = zahl(el('bmf-boden-sofort') && el('bmf-boden-sofort').value);
+        if (!so) return '';
+        var g = zahl(el('grenz') && el('grenz').value) || 42;
+        return '<tr><td style="padding:6px 8px 6px 0;border-bottom:1px solid #F0ECE3">Sofort abzugsfähige Kosten (im Jahr des Erwerbs)</td>' +
+          '<td colspan="2" style="padding:6px 8px;text-align:right;border-bottom:1px solid #F0ECE3">' + eur(so) + '</td>' +
+          '<td style="padding:6px 0;text-align:right;border-bottom:1px solid #F0ECE3;color:#2E8455">Steuerwirkung ' + eur(so * g / 100) + '</td></tr>';
+      })() +
       '</tbody></table>' +
       '<div class="cf-hint" style="margin-top:8px">Die linke Spalte ist das Ergebnis der amtlichen Arbeitshilfe und bleibt unverändert. Der Abschlag verschiebt nur, was auf den Boden entfällt — der Kaufpreis bleibt gleich. Ohne tragfähige Begründung trägt das Finanzamt die Aufteilung der Arbeitshilfe ein.</div>';
 
@@ -166,19 +195,55 @@
     function v(id) { var e = el(id); return e ? String(e.value || '').trim() : ''; }
     var adr = ((v('str') + ' ' + v('hnr')).trim() + ', ' + (v('plz') + ' ' + v('ort')).trim()).replace(/^, |, $/, '');
     var grund = v('bmf-boden-grund');
+    /* v1478 · Wortlaut nach Marcels Vorlage vom 21.09.2026: verbindliche
+       Erklaerung, danach Methode und Begruendung, damit das Finanzamt die
+       Herleitung im Vertrag findet und nicht nachfragen muss. */
+    var stand = new Date().toLocaleDateString('de-DE');
+    var rnd = null;
+    try { rnd = window._lastRndResult && window._lastRndResult.result && window._lastRndResult.result.final_rnd; } catch (e) {}
+    var verfahren = null;
+    try { verfahren = window._lastBmfResults && window._lastBmfResults.ertragswert && window._lastBmfResults.ertragswert.value ? 'Ertragswertverfahren' : 'Sachwertverfahren'; } catch (e) {}
+    var brw = zahl(el('bmf_brw') && el('bmf_brw').value) || zahl(el('brw') && el('brw').value);
+    var gsfl = zahl(el('bmf_gsfl') && el('bmf_gsfl').value) || zahl(el('gsfl') && el('gsfl').value);
     var txt =
-      'Kaufpreisaufteilung\n\n' +
-      'Die Vertragsparteien teilen den Gesamtkaufpreis in Höhe von ' + eur(B.kp, 2) +
-      ' für das Objekt ' + (adr || '[Objektadresse]') + ' wie folgt auf:\n' +
-      '  · auf den Grund und Boden entfallen ' + eur(bodenNeu, 2) + '\n' +
-      '  · auf das Gebäude entfallen ' + eur(gebNeu, 2) + '\n' +
-      (B.inv > 0 ? '  · auf mitverkauftes Inventar entfallen ' + eur(B.inv, 2) + '\n' : '') +
-      '\nDie Aufteilung folgt der Arbeitshilfe des Bundesfinanzministeriums und berücksichtigt ' +
-      'zusätzlich einen Abschlag von ' + pct(ab, 0) + ' auf den Bodenwert' +
-      (grund ? ' wegen ' + grund : '') + '. Die Arbeitshilfe bindet das Gericht nicht ' +
-      '(BFH, Urteil vom 21.07.2020, IX R 26/19); eine abweichende Aufteilung ist zulässig, wenn sie ' +
-      'begründet ist. Die Aufteilung ist Grundlage für die Absetzung für Abnutzung nach § 7 EStG und ' +
-      'steht unter dem Vorbehalt abweichender Feststellung durch das Finanzamt.';
+      'Hiermit erklären die Vertragsparteien rechtsverbindlich:\n\n' +
+      'Der vereinbarte Gesamtkaufpreis in Höhe von ' + eur(B.kp, 2) + ' für das in der Vertragsurkunde ' +
+      'näher bezeichnete Objekt ' + (adr || '[Objektadresse]') + ' entfällt nach übereinstimmender ' +
+      'Bewertung wie folgt:\n\n' +
+      '  Grund und Boden: ' + eur(bodenNeu, 2) + '\n' +
+      '  Gebäude inkl. wesentlicher Gebäudeteile: ' + eur(gebNeu, 2) + '\n' +
+      (B.inv > 0 ? '  Mitverkauftes Inventar: ' + eur(B.inv, 2) + '\n' : '') +
+      '\nDiese Aufteilung wurde nach der Arbeitshilfe des Bundesfinanzministeriums (Fassung Juni 2023) ' +
+      'im ' + (verfahren || 'maßgeblichen Verfahren') + ' erstellt' +
+      (brw && gsfl ? ', unter Ansatz des lagespezifischen Bodenrichtwerts von ' + eur(brw, 0) + ' je m² für ' +
+        new Intl.NumberFormat('de-DE').format(gsfl) + ' m² Grundstücksfläche' : '') +
+      (rnd ? ' sowie der für das Gebäude ermittelten Restnutzungsdauer von ' + Math.round(rnd) + ' Jahren' : '') +
+      '. Auf den Bodenwert wurde ein Abschlag von ' + pct(ab, 0) + ' angesetzt' +
+      (grund ? ' wegen ' + grund : '') + '.\n\n' +
+      'Sie hat verbindlichen Charakter und ist wirtschaftlich angemessen im Sinne der Rechtsprechung ' +
+      'des Bundesfinanzhofs (BFH, Urteil vom 21.07.2020, IX R 26/19). Die Parteien sind sich einig, ' +
+      'dass eine pauschale Aufteilung im Verhältnis 80/20 im konkreten Fall nicht sachgerecht wäre. ' +
+      'Eine abweichende Wertfeststellung durch das Finanzamt setzt eine substantiierte Gegenbewertung ' +
+      'voraus (vgl. § 199 BewG).\n\n' +
+      'Stand: ' + stand + '.';
+    var zusatz =
+      'Ergänzende Begründung der Aufteilung (auf Anforderung des Finanzamts)\n\n' +
+      '1. Verfahren. Die Aufteilung folgt der Arbeitshilfe des Bundesfinanzministeriums (Fassung Juni 2023). ' +
+      'Maßgeblich ist das ' + (verfahren || 'dort vorgesehene Verfahren') + ', weil es der Grundstücksart entspricht. ' +
+      'Der Bodenwert ergibt sich aus Grundstücksfläche und amtlichem Bodenrichtwert, der Gebäudeanteil als ' +
+      'Differenz zum maßgebenden Verkehrswert.\n\n' +
+      '2. Bodenwertabschlag. Auf den so ermittelten Bodenwert wurde ein Abschlag von ' + pct(ab, 0) + ' angesetzt' +
+      (grund ? ', begründet mit ' + grund : '') + '. Der Bodenrichtwert gilt für ein Grundstück mit den ' +
+      'Merkmalen des Richtwertgrundstücks; weicht das bewertete Grundstück davon ab, ist der Wert anzupassen ' +
+      '(§ 196 Abs. 1 Satz 3 BauGB in Verbindung mit § 15 ImmoWertV).\n\n' +
+      '3. Bindungswirkung. Die Arbeitshilfe ist ein Schätzhilfsmittel und bindet weder die Beteiligten noch ' +
+      'die Gerichte (BFH, Urteil vom 21.07.2020, IX R 26/19). Eine vertragliche Aufteilung ist der Besteuerung ' +
+      'zugrunde zu legen, solange sie wirtschaftlich vernünftig ist und keine nennenswerten Zweifel an ihrer ' +
+      'Angemessenheit bestehen (BFH, Urteil vom 16.09.2015, IX R 12/14).\n\n' +
+      (rnd ? '4. Restnutzungsdauer. Für das Gebäude wurde eine Restnutzungsdauer von ' + Math.round(rnd) + ' Jahren ' +
+        'ermittelt; die Abschreibung folgt § 7 Abs. 4 Satz 2 EStG. Die Herleitung liegt als gesonderte ' +
+        'Berechnung bei.\n\n' : '') +
+      'Die vollständige Herleitung mit allen Eingangswerten ist der beigefügten Kaufpreisaufteilung zu entnehmen.';
     host.innerHTML =
       '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted,#8A8272);margin-bottom:6px">Text für den Kaufvertrag</div>' +
       '<textarea id="bmf-boden-klausel-text" readonly style="width:100%;min-height:150px;padding:10px 12px;border:1px solid #E6E0D3;border-radius:8px;font:12.5px/1.6 Inter,sans-serif;background:#FBFAF7;color:#2A2727"></textarea>' +
@@ -186,6 +251,18 @@
       + '<button type="button" class="btn btn-sm" id="bmf-boden-pdf" style="background:#2A2727;color:#fff;border:none">Kaufpreisaufteilung als PDF</button>' +
       (grund ? '' : '<span class="cf-hint" style="margin-left:10px">Ohne Begründung bleibt der Abschlag angreifbar — sie gehört in den Text.</span>') + '</div>';
     el('bmf-boden-klausel-text').value = txt;
+    var zHost = el('bmf-boden-zusatz');
+    if (zHost) {
+      zHost.innerHTML =
+        '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted,#8A8272);margin:14px 0 6px">Zusatztext bei Rückfragen des Finanzamts</div>' +
+        '<textarea id="bmf-boden-zusatz-text" readonly style="width:100%;min-height:170px;padding:10px 12px;border:1px solid #E6E0D3;border-radius:8px;font:12.5px/1.6 Inter,sans-serif;background:#FBFAF7;color:#2A2727"></textarea>' +
+        '<div style="margin-top:6px"><button type="button" class="btn btn-outline btn-sm" id="bmf-boden-zusatz-copy">Zusatztext kopieren</button></div>';
+      el('bmf-boden-zusatz-text').value = zusatz;
+      el('bmf-boden-zusatz-copy').onclick = function () {
+        try { navigator.clipboard.writeText(zusatz); if (typeof window.toast === 'function') window.toast('+ Zusatztext kopiert'); } catch (e) {}
+      };
+    }
+    window._dpKpaTexte = { klausel: txt, zusatz: zusatz };
     var pdfKnopf = el('bmf-boden-pdf');
     if (pdfKnopf) pdfKnopf.onclick = function () { if (typeof window.exportPDFKaufpreisaufteilung === 'function') window.exportPDFKaufpreisaufteilung(); };
     el('bmf-boden-copy').onclick = function () {
