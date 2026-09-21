@@ -1967,14 +1967,21 @@ window.DealPilotDealAction = (function() {
       'ds2_energie':     ['ds2_energie',   'input-ds2-energie'],
       'ds2_zustand':     ['ds2_zustand',   'input-ds2-zustand']
     };
+    /* v1503 · gemessen am 21.09.2026 an Rinteln: ds2_energie und ds2_zustand
+       kamen als "- keine Angabe" und "- bitte waehlen" im Wizard an. Beide
+       Felder sind LEERE Auswahllisten; `el.value` ist '', und der Rueckfall
+       auf `el.textContent` liest dann den Text ALLER Optionen. Eine leere
+       Liste wurde so zu einer Angabe - dieselbe Sorte Fehler wie die
+       Vorbelegungen im BMF-Modal. Bei Eingabefeldern gilt nur der Wert. */
     Object.keys(fieldMap).forEach(function(wizField) {
       var ids = fieldMap[wizField];
       for (var i = 0; i < ids.length; i++) {
         var el = document.getElementById(ids[i]);
-        if (el) {
-          var val = el.value || el.textContent || '';
-          if (val) { prefill[wizField] = val; break; }
-        }
+        if (!el) continue;
+        var istFeld = /^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName);
+        var val = istFeld ? (el.value || '') : (el.value || el.textContent || '');
+        val = String(val).trim();
+        if (val) { prefill[wizField] = val; break; }
       }
     });
 
@@ -2008,14 +2015,45 @@ window.DealPilotDealAction = (function() {
     if (prefill.mea) prefill.einheit = prefill.mea;
     if (prefill.kuerzel) prefill.kuerzel_kurz = prefill.kuerzel;
 
-    // Auftraggeber aus User-Settings
+    /* v1503 · Marcel: "schau, ob wir alle Felder schon vorbefuellen, die wir
+       vorbefuellen koennen."
+       Gemessen: Strasse, PLZ, Ort und E-Mail des Auftraggebers blieben LEER,
+       obwohl sie in den Einstellungen stehen - nur unter anderen Namen. Hier
+       wurde nach user_str/user_plz/user_ort/user_email gesucht, gespeichert
+       sind sie als pdf_address/pdf_plz/pdf_city/pdf_email. Ein
+       Namensraum-Irrtum, der still nichts findet.
+       Zweite Quelle ist das Branding - dasselbe, aus dem die PDFs ihren
+       Absender nehmen. Und wie dort gilt: steht im Namensfeld eine
+       E-Mail-Adresse, ist das kein Name. */
     try {
       var settings = JSON.parse(localStorage.getItem('dp_user_settings') || '{}');
-      if (settings.user_name)  prefill.auftraggeber_name    = settings.user_name;
-      if (settings.user_email) prefill.auftraggeber_email   = settings.user_email;
-      if (settings.user_str)   prefill.auftraggeber_strasse = settings.user_str;
-      if (settings.user_plz)   prefill.auftraggeber_plz     = settings.user_plz;
-      if (settings.user_ort)   prefill.auftraggeber_ort     = settings.user_ort;
+      var marke = {};
+      try {
+        if (window.DealPilotConfig && DealPilotConfig.branding &&
+            typeof DealPilotConfig.branding.get === 'function') {
+          marke = DealPilotConfig.branding.get() || {};
+        }
+      } catch(e2) {}
+      function istMail(s){ return /\S+@\S+\.\S+/.test(String(s || '')); }
+      function nimm(){
+        for (var i = 0; i < arguments.length; i++) {
+          var v = arguments[i];
+          if (v != null && String(v).trim() !== '') return String(v).trim();
+        }
+        return '';
+      }
+      var name = nimm(settings.user_name, marke.name, marke.company);
+      if (istMail(name)) name = nimm(settings.user_company, marke.company);
+      var mail = nimm(settings.pdf_email, settings.user_email, marke.email,
+                      istMail(settings.user_name) ? settings.user_name : '');
+      var str  = nimm(settings.pdf_address, settings.user_str, marke.address);
+      var plz  = nimm(settings.pdf_plz, settings.user_plz, marke.plz);
+      var ort  = nimm(settings.pdf_city, settings.user_ort, marke.city);
+      if (name) prefill.auftraggeber_name    = name;
+      if (mail) prefill.auftraggeber_email   = mail;
+      if (str)  prefill.auftraggeber_strasse = str;
+      if (plz)  prefill.auftraggeber_plz     = plz;
+      if (ort)  prefill.auftraggeber_ort     = ort;
     } catch(e) {}
     // Stichtag = heute
     prefill.stichtag = new Date().toISOString().slice(0, 10);
