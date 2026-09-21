@@ -530,14 +530,14 @@
     });
 
     var luecken = [];
-    if (!gnd) luecken.push('die Objektart (daraus kommt die Gesamtnutzungsdauer)');
-    if (!bewertet) luecken.push('die Modernisierungen im Reiter BMF-Aufteilung');
+    if (!gnd) luecken.push('die Objektart');
+    if (!bewertet) luecken.push('der Modernisierungsstand');
     if (luecken.length) {
-      sagen('Dafuer fehlt noch ' + luecken.join(' und ') + '. Der Restnutzungsdauer-Rechner wird geoeffnet.');
-      if (window.DealPilotDealAction && typeof window.DealPilotDealAction.openRndWizard === 'function') {
-        try { window.DealPilotDealAction.openRndWizard(); return; } catch (e) {}
-      }
-      sagen('Dafuer fehlt noch ' + luecken.join(' und ') + '. Bitte im Reiter BMF-Aufteilung ergaenzen.');
+      var fehltTxt = luecken.length > 1
+        ? 'Dafür fehlen noch ' + luecken.join(' und ') + '.'
+        : 'Dafür fehlt noch ' + luecken[0] + '.';
+      if (wizardOeffnen(fehltTxt)) return;
+      sagen(fehltTxt + ' Bitte im Reiter BMF-Aufteilung ergänzen.');
       return;
     }
 
@@ -558,18 +558,59 @@
     if (!werte.length) { sagen('Es kam keine brauchbare Restnutzungsdauer heraus.'); return; }
     var von = Math.min.apply(null, werte), bis = Math.max.apply(null, werte);
 
-    window._dpBodenStillsetzen = true;
-    try {
-      if (el('bmf-boden-rnd-von')) el('bmf-boden-rnd-von').value = String(von);
-      if (el('bmf-boden-rnd-bis')) el('bmf-boden-rnd-bis').value = String(bis === von ? '' : bis);
-    } finally { window._dpBodenStillsetzen = false; }
-
+    spanneSetzen(von, bis);
     window._lastRndResult = { result: r };
     sagen('Baujahr ' + bj + ', Gesamtnutzungsdauer ' + gnd + ' Jahre' +
           (gndQuelle ? ' (' + gndQuelle + ')' : '') + ', ' + bewertet + ' von ' + gezaehlt +
           ' Gewerken bewertet, ' + punkte + ' von ' + (gezaehlt * 2) + ' Punkten. ' +
           'Technisch ' + tech + ' Jahre, nach Anlage 2 ' + raster + ' Jahre.');
     try { rechnen(); } catch (e) {}
+  }
+
+  /* v1502: eine Stelle, die die Spanne setzt - egal ob sie aus dem Knopf
+     oder aus dem Wizard kommt. */
+  function spanneSetzen(von, bis) {
+    window._dpBodenStillsetzen = true;
+    try {
+      if (el('bmf-boden-rnd-von')) el('bmf-boden-rnd-von').value = String(von);
+      if (el('bmf-boden-rnd-bis')) el('bmf-boden-rnd-bis').value = String(bis === von ? '' : bis);
+    } finally { window._dpBodenStillsetzen = false; }
+  }
+
+  /* v1502 · Marcel: "im Tab Steuer kommt ein Modal." Genau das kommt jetzt
+     auch hier - derselbe Wizard, dieselbe Vorbefuellung. Neu ist nur, was
+     danach passiert: sein Ergebnis landet in den beiden Feldern, statt den
+     Nutzer die Zahl abschreiben zu lassen. */
+  function wizardOeffnen(fehltTxt) {
+    var DA = window.DealPilotDealAction || {};
+    var W  = window.DealPilotRND_Wizard;
+    if (!W || typeof W.open !== 'function' || typeof DA.getRndPrefill !== 'function') return false;
+    var info = el('bmf-boden-rnd-info');
+    if (info) info.textContent = fehltTxt + ' Der Restnutzungsdauer-Rechner ist geöffnet.';
+    try {
+      W.open({
+        prefill: DA.getRndPrefill(),
+        onComplete: function (stand) {
+          try {
+            var eingabe = (typeof DA.buildRndCalcInput === 'function')
+              ? DA.buildRndCalcInput(stand) : null;
+            if (!eingabe) return;
+            var r = window.DealPilotRND.calcAll(eingabe);
+            var tech   = Math.round(Number(r.methods && r.methods.technisch && r.methods.technisch.restnutzungsdauer) || 0);
+            var raster = Math.round(Number(r.methods && r.methods.punktraster && r.methods.punktraster.restnutzungsdauer) || 0);
+            var werte  = [tech, raster].filter(function (x) { return x > 0; });
+            if (!werte.length) return;
+            spanneSetzen(Math.min.apply(null, werte), Math.max.apply(null, werte));
+            window._lastRndResult = { result: r };
+            if (info) info.textContent = 'Aus dem Restnutzungsdauer-Rechner übernommen: technisch ' +
+              tech + ' Jahre, nach Anlage 2 ' + raster + ' Jahre.';
+            try { W.close(); } catch (e) {}
+            try { rechnen(); } catch (e) {}
+          } catch (e) { console.warn('[v1502] Übernahme:', e.message); }
+        },
+      });
+      return true;
+    } catch (e) { console.warn('[v1502] Wizard:', e.message); return false; }
   }
 
   document.addEventListener('click', function (ev) {

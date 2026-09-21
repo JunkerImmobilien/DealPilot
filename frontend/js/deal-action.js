@@ -2475,6 +2475,11 @@ window.DealPilotDealAction = (function() {
        Vorbefuellung benutzen statt zweier Listen, wird sie hier
        herausgegeben. */
     getRndPrefill: _getRndPrefill,
+    /* v1502: auch die Umrechnung der Wizard-Antworten in die Eingaben des
+       Rechenkerns wird herausgegeben - sonst baut der BMF-Rechner eine
+       zweite Abbildung derselben Felder, und die beiden laufen
+       auseinander, sobald eine Frage dazukommt. */
+    buildRndCalcInput: _buildCalcInputFromWizard,
     openRndWizard: openExpertWithRnd,
     openPortfolioStrategy: openPortfolioStrategy,
     openDatenraumSettings: openDatenraumSettings,
