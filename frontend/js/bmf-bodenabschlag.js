@@ -221,5 +221,27 @@
     if (t && t.closest && t.closest('[onclick*="openBMF"], #bmf-open, [data-bmf-open]')) setTimeout(start, 400);
   }, true);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+  /* v1472 · GEMESSEN am Objekt Rinteln: die Live-Aktualisierung der Pipeline
+     haengt an Bodenrichtwert, Flaeche, Baujahr, Datum und Miete — NICHT an der
+     GRUNDSTUECKSART (#bmf_art). Wer sie korrigiert (hier: Wohnungseigentum ->
+     Mietwohngrundstueck), bekam in Reiter 2 die neue Zahl (80,59 % Gebaeude),
+     in Reiter 3 und 4 aber weiter die alte (81,54 %) — zwei Aufteilungen im
+     selben Fenster. Die Art wird hier nachtraeglich angehaengt. */
+  (function () {
+    var n3 = 0;
+    (function haengen() {
+      var a = document.getElementById('bmf_art');
+      if (a && typeof window._v292Pipeline === 'function' && !a._dpArtSync) {
+        a._dpArtSync = true;
+        a.addEventListener('change', function () {
+          try { window._v292Pipeline(); } catch (e) {}
+          setTimeout(rechnen, 1200);
+        });
+        return;
+      }
+      if (++n3 < 120) setTimeout(haengen, 700);
+    })();
+  })();
+
   window.DpBmfBodenabschlag = { rechnen: rechnen, einhaengen: einhaengen, _basis: basis };
 })();
