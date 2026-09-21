@@ -116,7 +116,7 @@
     function abschnitt(t) {
       if (y > H - 34) { doc.addPage(); kopf(_titel, _unter); }
       doc.setFont('helvetica', 'bold'); doc.setFontSize(8.6); doc.setTextColor(GD[0], GD[1], GD[2]);
-      doc.text(String(t).toUpperCase(), L, y);
+      doc.text(sauber(String(t)).toUpperCase(), L, y);
       doc.setDrawColor(226, 221, 210); doc.line(L, y + 1.8, W - R_, y + 1.8);
       y += 7.5;
     }
@@ -133,7 +133,7 @@
       doc.setTextColor(o.summe ? 26 : (o.klein ? 110 : 50));
       doc.text(sauber(label), L + (o.einzug ? 4 : 0), y);
       if (o.summe) doc.setTextColor(GD[0], GD[1], GD[2]); else doc.setTextColor(26, 26, 26);
-      doc.text(String(wert), W - R_, y, { align: 'right' });
+      doc.text(sauber(String(wert)), W - R_, y, { align: 'right' });
       if (!o.summe) { doc.setDrawColor(236, 232, 223); doc.setLineWidth(0.15); doc.line(L, y + 2, W - R_, y + 2); doc.setLineWidth(0.2); }
       y += o.summe ? 8 : 6.1;
     }
@@ -183,7 +183,12 @@
        Verpflegung, Uebernachtung und Sonstiges gehen NICHT mit. Dieses
        Dokument darf deshalb nicht die volle Summe als Grundlage ausweisen -
        sonst stehen zwei Zahlen fuer dieselbe Sache im selben Blatt. */
-    var IN_BMF = { ak_grest: 1, ak_notar: 1, ak_gba: 1, ak_makler: 1, ak_ji: 1 };
+    /* v1481 · seit v1478 gehen auch Fahrt, Gutachten, Anwalt und Sonstiges in
+       die amtliche Aufteilung (bmf-modal.js runBmf). Diese Liste muss der dort
+       entsprechen, sonst weist das PDF eine andere Bemessungsgrundlage aus als
+       die Rechnung - gemessen 605.332 statt 605.939 EUR. */
+    var IN_BMF = { ak_grest: 1, ak_notar: 1, ak_gba: 1, ak_makler: 1, ak_ji: 1,
+      ak_fahrt: 1, ak_gutachten: 1, ak_anwalt: 1, ak_sonst: 1 };
     var nkSumme = nkFelder.reduce(function (a, f) { return a + (num(f[0]) || 0); }, 0);
     var nkInBmf = nkFelder.reduce(function (a, f) { return a + (IN_BMF[f[0]] ? (num(f[0]) || 0) : 0); }, 0);
     var nkAussen = nkSumme - nkInBmf;
