@@ -17520,3 +17520,30 @@ und auf der Platte gegengelesen.
 
 **Offen zur Entscheidung:** ob Fahrtkosten, Gutachter- und Anwaltskosten in die amtliche
 Aufteilung einfliessen sollen. Das ist eine steuerliche Frage — Marcel entscheidet.
+
+## Rollout-Journal · 21.09.2026 (4) — Nebenkosten richtig zugeordnet, Vertragstext, RND-Spanne
+
+Marcel: „warum ist die Fahrt nicht mit drin? … auch meine Rechnung sollte mit einfliessen …
+schau mal genau im Netz nach, ob du dir da wirklich sicher bist."
+
+**Recherchiert und belegt:** Besichtigungsfahrten zum konkreten Objekt und Fahrten zum
+Notartermin sind ANSCHAFFUNGSNEBENKOSTEN, wenn der Kauf zustande kommt (BFH VIII R 195/77;
+Haufe, IWW). Ein Wertgutachten, das nach grundsaetzlich gefasster Erwerbsentscheidung der
+Anschaffung dient, ebenfalls. Sofort abziehbar bleiben Kosten, die erst die AfA ermitteln
+(Honorar Kaufpreisaufteilung, Restnutzungsdauergutachten, Steuerberatung) sowie Gutachten
+ueber Reparaturbedarf.
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1478 | `8a38ac5` | `runBmf` nimmt jetzt auch Fahrt, Gutachten, Anwalt und Sonstiges in die Summe, die die Arbeitshilfe aufteilt (vorher nur GrESt, Notar, Grundbuch, Makler, Vermittlung). Neues Feld „sofort abzugsfaehige Kosten" im Reiter — teilt sich NICHT auf, mit Steuerwirkung. Vertragstext nach Marcels Vorlage (verbindliche Erklaerung, Methode, BFH IX R 26/19, § 199 BewG, Stand) plus Zusatztext fuer Rueckfragen des Finanzamts |
+| v1479 | `8a38ac5` | Restnutzungsdauer als SPANNE: steht von/bis, rechnet das PDF jedes Jahr darin einzeln |
+| v1480 / v1481 | `94c02dd`, `c82f96e` | PDF ohne Umlaute (Umschrift ae/oe/ue/ss, auch fuer Werte, Ueberschriften und Texte aus der Oberflaeche); Nebenkostenliste im PDF an die des Programms angeglichen (605.332 gegen 605.939 EUR auseinandergelaufen) |
+| v1482 | `24b971c` | Hinweistext an die neue Zuordnung angepasst |
+
+**Objekt Rinteln, Endstand:** Anschaffungskosten 739.039,60 EUR (inkl. Fahrt 140,60 und
+Kurzbewertung 599), Gebaeudeanteil 81,99 %, Bemessungsgrundlage 605.939 EUR; mit 20 % Abschlag
+85,59 % und 632.559 EUR. Honorar Kaufpreisaufteilung 549 EUR sofort abziehbar.
+PDF vier Seiten, keine Umlaute, keine Ueberlappung, heruntergeladen und gegengelesen.
+
+**Preise laut junker-immobilien.io:** Kaufpreisaufteilung 549 EUR Festpreis,
+Restnutzungsdauergutachten ab 951 EUR, Wertgutachten ab 499 EUR, Schadensgutachten ab 399 EUR.
