@@ -17564,3 +17564,37 @@ heruntergeladen und auf der Platte geprueft.
 konkreten Objekt und zum Notartermin sowie ein Wertgutachten nach gefasster Erwerbsentscheidung
 sind Anschaffungsnebenkosten und teilen sich mit auf; Honorar fuer Kaufpreisaufteilung und
 Restnutzungsdauergutachten sind sofort abziehbar. Preis laut junker-immobilien.io: 549 EUR.
+
+## Rollout-Journal · 21.09.2026 (6) — Arbeitshilfe quer, Notarblatt, Grundstuecksart
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1486 | `ec41d18` | **Arbeitshilfe-PDF: quer und nur die Kaufpreisaufteilung.** Gemessen war es sechs Seiten hoch, weil LibreOffice ALLE NEUN Blaetter ausgibt (KPA, Fiktives Baujahr, Verweise, AfA, THK, SW-NHK, SW-Bau-Index, EW-BWK, EW-Bewertungsparameter). Die Aufteilung steht allein auf KPA und endet in Zeile 122 („Summe"). Jetzt: eine KOPIE fuer den Druck, darin alle anderen Blaetter versteckt, KPA quer und auf Seitenbreite — der vorlageneigene Festwert `scale 59` haette sonst dagegengehalten. Dazu `PageRange 1-2` als zweite Sicherung |
+| v1487 | `ec41d18` | Die angepasste Aufteilung beginnt auf einem **neuen Blatt** mit der Kopfzeile „Kaufpreisaufteilung fuer den Notarvertrag". Vertragstext und Zusatz wieder **normal, schwarz, linksbuendig** — nimmt v1483 zurueck: kursiv und mittig las sich wie ein Zitat, der Text ist aber der Wortlaut, den der Notar uebernimmt |
+| v1488 | `213be3c` | **Die BMF-Grundstuecksart kam aus dem Nichts.** `#bmf_art` stand immer auf „Wohnungseigentum [WE]" — der ersten Option der Liste; gesetzt wurde sie nirgends. Gemessen an Rinteln: `objart = MFH`, acht Einheiten, gerechnet als Eigentumswohnung. An der Art haengen in der Arbeitshilfe THK, Bewirtschaftungskosten und die Miteigentumsrechnung. Jetzt Abbildung `objart` -> Wortlaut der amtlichen Auswahlliste; HOTEL und GAR bleiben ungeraten |
+| v1489 | `8e88523` | Die Abschreibungstabelle stand ZWISCHEN angepasster Aufteilung und Vertragstext und hat dem Notarblatt die Kopfzeile weggenommen (gemessen: Seite 4 trug wieder „Kaufpreisaufteilung"). Abschreibung und Sofortkosten stehen jetzt als Anlage dahinter |
+
+**Nachweis, am echten Knopf erzeugt und mit pdf.js nachgemessen:**
+
+| | vorher | nachher |
+|---|---|---|
+| Arbeitshilfe | 6 Seiten, hoch, alle 9 Blaetter | **2 Seiten, quer**, nur KPA, mit Zeile „Summe" |
+| Kaufpreisaufteilung | 4 Seiten, Notarteil mitten drin | **5 Seiten**, Seite 3+4 „fuer den Notarvertrag", Seite 5 Steuerwirkung |
+| Vertragstext | kursiv, zentriert | normal, x=51 = linker Rand |
+| Grundstuecksart | Wohnungseigentum | Mietwohngrundstuecke (MFH) |
+
+**Zur Umlautfrage.** Gemessen an den erzeugten Dateien: die Kaufpreisaufteilung
+traegt **null Umlaute und null verstuemmelte Zeichen**. Die 121 Umlaute stehen in
+der **BMF-Arbeitshilfe** — das ist der Wortlaut des Ministeriums („Gebaeudeanteil",
+„Grundstueckart"), und LibreOffice setzt ihn korrekt, nicht verstuemmelt. Die Regel
+„PDF ohne Umlaute" kam von jsPDF, das nur WinAnsi kann; dieser Grund gilt hier
+nicht. **Ein amtliches Formular wird nicht umgeschrieben** — sonst behauptet das
+Blatt einen Wortlaut, den es amtlich nicht gibt.
+
+> **Blinder Fleck im eigenen Pruefwerkzeug, ausdruecklich vermerkt:** der Node-
+> Pruefer `umlaut-check.js` liest nur `(...)Tj` in Latin-1. Er meldete die
+> Arbeitshilfe als „Texte=0, Umlaute=0" — in Wahrheit liegen deren Texte in
+> **komprimierten Stroemen mit Teilschriften und CID-Kodierung**, an die er nicht
+> herankommt. Ein Pruefer, der nichts findet, weil er nichts lesen kann, sieht
+> aus wie ein Pruefer, der nichts zu beanstanden hat. **Umlaute nur noch mit
+> pdf.js messen** und die Zahl der gefundenen Textstuecke immer mitnennen.
