@@ -17629,3 +17629,33 @@ Blatt einen Wortlaut, den es amtlich nicht gibt.
 > Fachdokument, das „Gebaeudeanteil" schrieb: ein Wort, das in keinem Gesetz
 > steht. **Eine Schutzmassnahme braucht denselben Nachweis wie eine
 > Funktion** — sonst schuetzt sie vor nichts und kostet etwas.
+
+## Rollout-Journal · 21.09.2026 (8) — Erfundene Vorbelegungen, fehlendes Euro-Zeichen
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1495 | `a92c79f` | Die Abschreibungstabelle erzwingt keinen Seitenwechsel mehr, sie haengt am Notarblatt. „Sofort abzugsfaehige Kosten" komplett raus (Abschnitt, Feld, Tabellenzeile, Ereignisbindung). Klauseltext: die Betraege als **vollstaendiger Satz** statt eingerueckter Liste — in einer Urkunde steht ein Satz, den man vorlesen kann. Der Satz zur Bindungswirkung ist kein Vertragstext mehr, sondern steht als Information darunter, normal statt kursiv. Ueberschrift „Möglicher Zusatz …" in Gold |
+| v1496 | `ebb9059` | **Erfundene Vorbelegungen im BMF-Modal.** Im HTML standen FESTE Beispielwerte: `ak_fahrt_km` **2.151**, `ak_fahrt` **817,44 €**, `ak_verpfl` **56,00 €**, `ak_hotel` **40,00 €** — bei JEDEM Objekt. Seit v1478 gehen die Fahrtkosten in die AfA-Bemessungsgrundlage ein: **die Aufteilung rechnete mit einer erfundenen Zahl, und das PDF druckte sie als Beleg.** Dieselbe Falle bei `ak_kp` (87.569,13), `ak_grest` (4.250,00), `ak_notar` (1.492,26) — die Vorbefuellung aus dem Objekt setzt sie nur bei einem Wert > 0, stand dort nichts, blieb der Beispielwert in der Summe. Alle geleert, Platzhalter statt Wert. Der Kilometersatz 0,38 bleibt, das ist eine echte Pauschale |
+| v1497 | `edbcf2a` | **Im ganzen PDF stand kein einziges Euro-Zeichen.** Ursache war die eigene Schutzzeile in `sauber()`: `[^ -ÿ]` wirft alles ausserhalb Latin-1 weg — und das Euro-Zeichen ist **U+20AC**, liegt also ausserhalb. Dass jsPDF es als WinAnsi-Byte 0x80 drucken KANN, half nichts; es kam nie dorthin. Jetzt bleiben die WinAnsi-Sonderzeichen stehen. Dazu: Grunderwerbsteuer, Notar, Grundbuch und Makler tragen den **hinterlegten** Satz in Klammern (nicht zurueckgerechnet), Stichtag bleibt leer |
+
+**Nachweis am erzeugten PDF (pdf.js):** 4 Seiten · **68 Euro-Zeichen** (vorher 0) ·
+67 Umlaute, 0 verstuemmelt · „Grunderwerbsteuer (5,00 % vom Kaufpreis)", „Notar
+(1,50 %)", „Grundbuchamt (0,50 %)" · „Fahrtkosten (370 km × 0,38 €) 140,60 €" ·
+„Gutachten 549,00 €" · Stichtag leer · Gold der Zusatz-Ueberschrift gemessen
+**165,138,62** (= `#C9A84C` × 0,82) · Anschaffungskosten **738.989,60 €**.
+
+> **Zwei Fehler derselben Bauart, beide von mir, beide stumm.**
+> Eine **Vorbelegung, die wie eine Angabe aussieht**, ist schlimmer als ein
+> leeres Feld: niemand prueft eine Zahl, die schon dasteht. Und eine
+> **Schutzmassnahme ohne Nachweis** macht kaputt, was sie schuetzen soll —
+> `sauber()` sollte verstuemmelte Zeichen verhindern und hat dafuer die
+> Waehrung geloescht. Beides faellt nicht auf, weil das Ergebnis PLAUSIBEL
+> aussieht: 2.151 km koennten stimmen, und „140,60" liest man als Euro.
+> **Was das Dokument behauptet, gehoert gemessen — nicht, ob es gut aussieht.**
+
+> **Offen und gemeldet:** die Positionen im Reiter 1 (`ak_fahrt`, `ak_gutachten`,
+> `ak_anwalt`, `ak_sonst`, Reisekosten) haben **kein Gegenstueck am Objekt** und
+> werden nicht gespeichert. Seit die Beispielwerte weg sind, faellt das auf:
+> eingetragene Betraege sind beim naechsten Oeffnen weg. Vorher fiel es nicht
+> auf, weil immer etwas dastand — die falsche Zahl hat den fehlenden Speicher
+> verdeckt.
