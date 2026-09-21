@@ -491,30 +491,55 @@
     var bj = zahl((el('bmf_bj') && el('bmf_bj').value) || (el('baujahr') && el('baujahr').value));
     if (!bj || bj < 1500) { sagen('Ohne Baujahr geht es nicht — es steht im Reiter Objekt.'); return; }
 
-    /* Gesamtnutzungsdauer aus der Grundstuecksart, nicht geraten. */
-    var gnd = 80;
+    /* v1501: Die Gesamtnutzungsdauer kommt aus der Grundstuecksart. Steht
+       dort nichts, wird NICHT stillschweigend mit 80 gerechnet - dann fehlt
+       eine Angabe, und das gehoert gesagt. */
+    var gnd = 0, gndQuelle = '';
     try {
       var art = String((el('objart') && el('objart').value) || '').toUpperCase();
       var typId = ({ ETW: 'etw', MFH: 'mfh', EFH: 'efh', ZFH: 'efh', DHH: 'efh', RH: 'efh',
                      BUERO: 'buero', GESCH: 'geschaeft' })[art] || 'mfh';
-      if (window.DealPilotRND_GND && window.DealPilotRND_GND.getDefault) {
-        gnd = Number(window.DealPilotRND_GND.getDefault(typId)) || 80;
+      if (art && window.DealPilotRND_GND && window.DealPilotRND_GND.getDefault) {
+        gnd = Number(window.DealPilotRND_GND.getDefault(typId)) || 0;
+        gndQuelle = art;
       }
     } catch (e) {}
 
     /* Modernisierungen: die Auswahl aus Reiter 2 zaehlt, nicht eine Annahme. */
+    /* v1501 · Marcel: "was passiert, wenn welche fehlen? Wir sollten schon
+       drauf achten, dass dort die Pflichtfelder ausgefuellt werden."
+       Gemessen an Rinteln: alle acht Modernisierungsfelder standen auf
+       'nein' - das ist die Vorbelegung der Liste, nicht die Aussage 'nichts
+       wurde gemacht'. Der Knopf hat daraus 'alles veraltet' gemacht und eine
+       Restnutzungsdauer von 18 Jahren gerechnet. Eine nicht gestellte Frage
+       darf nicht als Antwort gelten.
+       Darum: fehlen Angaben, oeffnet sich derselbe Wizard wie im Reiter
+       Steuer - mit derselben Vorbefuellung - und sein Ergebnis kommt zurueck
+       in die Felder. */
     var GEWERKE = { mod_dach: 'dach', mod_fenster: 'fenster', mod_leit: 'leitungen',
                     mod_heiz: 'heizung', mod_daemm: 'aussenwand', mod_bad: 'baeder',
                     mod_innen: 'innenausbau', mod_grdr: 'grundriss' };
-    var bewertung = {}, punkte = 0, gezaehlt = 0;
+    var bewertung = {}, punkte = 0, gezaehlt = 0, bewertet = 0;
     Object.keys(GEWERKE).forEach(function (id) {
       var e = el(id); if (!e) return;
       var v = String(e.value || '').toLowerCase();
       gezaehlt++;
-      if (v === 'ja' || v === 'voll' || v === 'v') { bewertung[GEWERKE[id]] = 'gehoben'; punkte += 2; }
-      else if (v === 'teil' || v === 'teilweise' || v === 'h') { bewertung[GEWERKE[id]] = 'standard'; punkte += 1; }
+      if (v === 'ja' || v === 'voll' || v === 'v') { bewertung[GEWERKE[id]] = 'gehoben'; punkte += 2; bewertet++; }
+      else if (v === 'teil' || v === 'teilweise' || v === 'h') { bewertung[GEWERKE[id]] = 'standard'; punkte += 1; bewertet++; }
       else { bewertung[GEWERKE[id]] = 'veraltet'; }
     });
+
+    var luecken = [];
+    if (!gnd) luecken.push('die Objektart (daraus kommt die Gesamtnutzungsdauer)');
+    if (!bewertet) luecken.push('die Modernisierungen im Reiter BMF-Aufteilung');
+    if (luecken.length) {
+      sagen('Dafuer fehlt noch ' + luecken.join(' und ') + '. Der Restnutzungsdauer-Rechner wird geoeffnet.');
+      if (window.DealPilotDealAction && typeof window.DealPilotDealAction.openRndWizard === 'function') {
+        try { window.DealPilotDealAction.openRndWizard(); return; } catch (e) {}
+      }
+      sagen('Dafuer fehlt noch ' + luecken.join(' und ') + '. Bitte im Reiter BMF-Aufteilung ergaenzen.');
+      return;
+    }
 
     var stichtag = (el('bmf_datum') && el('bmf_datum').value)
                 || (el('kaufdat') && el('kaufdat').value)
@@ -540,8 +565,10 @@
     } finally { window._dpBodenStillsetzen = false; }
 
     window._lastRndResult = { result: r };
-    sagen('Baujahr ' + bj + ', GND ' + gnd + ' Jahre, ' + punkte + ' von ' + (gezaehlt * 2) +
-          ' Modernisierungspunkten. Technisch ' + tech + ' Jahre, Anlage 2 ' + raster + ' Jahre.');
+    sagen('Baujahr ' + bj + ', Gesamtnutzungsdauer ' + gnd + ' Jahre' +
+          (gndQuelle ? ' (' + gndQuelle + ')' : '') + ', ' + bewertet + ' von ' + gezaehlt +
+          ' Gewerken bewertet, ' + punkte + ' von ' + (gezaehlt * 2) + ' Punkten. ' +
+          'Technisch ' + tech + ' Jahre, nach Anlage 2 ' + raster + ' Jahre.');
     try { rechnen(); } catch (e) {}
   }
 

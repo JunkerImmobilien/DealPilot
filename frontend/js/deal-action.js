@@ -2465,6 +2465,17 @@ window.DealPilotDealAction = (function() {
     openFB: openFB,
     openExpert: openExpert,
     openExpertWithRnd: openExpertWithRnd,
+    /* v1501 · Marcel 21.09.2026: "bei dem Button Restnutzungsdauer berechnen
+       gibt er automatisch eine Spanne an, das macht er im Tab Steuer nicht,
+       dort kommt ein Modal. Hat er denn ueberhaupt alle Werte dafuer im
+       BMF-Rechner?"
+       Nein, hatte er nicht - und das war der Fehler. Der Knopf im BMF-Rechner
+       nahm fehlende Modernisierungsangaben still als "veraltet" an und rechnete
+       damit eine zu kurze Restnutzungsdauer. Damit beide Wege dieselbe
+       Vorbefuellung benutzen statt zweier Listen, wird sie hier
+       herausgegeben. */
+    getRndPrefill: _getRndPrefill,
+    openRndWizard: openExpertWithRnd,
     openPortfolioStrategy: openPortfolioStrategy,
     openDatenraumSettings: openDatenraumSettings,
     _rndOrderExpert: _rndOrderExpert,
