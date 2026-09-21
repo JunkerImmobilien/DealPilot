@@ -325,26 +325,6 @@
     var eigen = num('afa_eigen');
     if (eigen && (!rnd || Math.abs(eigen - 100 / rnd) > 0.01)) saetze.push([eigen, 'im Objekt hinterlegter Satz']);
 
-    platz(60, 'Kaufpreisaufteilung', 'Abschreibung');
-    abschnitt('Abschreibung je Aufteilung');
-    vergleich(
-      [['AfA-Satz', 62], ['Amtlich', 28], ['Mit Abschlag', 28], ['Unterschied', 26]],
-      saetze.map(function (s) {
-        return zv(pct(s[0], 2) + ' · ' + s[1], basisAlt * s[0] / 100, basisNeu * s[0] / 100);
-      }),
-      'AfA je Jahr auf die jeweilige Bemessungsgrundlage. Die Pauschale von 2,00 % folgt § 7 Abs. 4 Satz 1 EStG; ein hoeherer Satz aus einer kuerzeren Nutzungsdauer folgt § 7 Abs. 4 Satz 2 EStG und setzt deren Nachweis voraus.');
-
-    /* Sofort abzugsfaehige Kosten — sie teilen sich NICHT auf. */
-    var sofort = num('bmf-boden-sofort');
-    if (sofort) {
-      var grenz = num('grenz') || 42;
-      platz(34);
-      abschnitt('Sofort abzugsfaehige Kosten');
-      zeile('Honorar Kaufpreisaufteilung, Restnutzungsdauer, Steuerberatung', eur(sofort, 2));
-      zeile('Steuerwirkung im Jahr der Zahlung bei ' + pct(grenz, 2), eur(sofort * grenz / 100, 2), { summe: true });
-      einleitung('Diese Kosten dienen der Ermittlung der Abschreibung, nicht dem Erwerb. Sie sind Werbungskosten und im Jahr der Zahlung in voller Hoehe abziehbar; sie erhoehen die Bemessungsgrundlage nicht.');
-    }
-
     /* ── Vertragstext ────────────────────────────────────────────── */
     platz(70);
     abschnitt('Text für den Kaufvertrag');
@@ -383,6 +363,30 @@
       y += 6;
     }
     doc.setFont('helvetica', 'normal');
+
+    /* v1489: die steuerliche Auswirkung ist eine Anlage, kein Vertragsinhalt -
+       sie stand vorher ZWISCHEN angepasster Aufteilung und Vertragstext und hat
+       dem Notarblatt die Kopfzeile weggenommen (gemessen: Seite 4 trug wieder
+       "Kaufpreisaufteilung"). Jetzt steht sie hinter dem Vertragstext. */
+    neueSeite('Kaufpreisaufteilung', 'Steuerliche Auswirkung der Aufteilung');
+    abschnitt('Abschreibung je Aufteilung');
+    vergleich(
+      [['AfA-Satz', 62], ['Amtlich', 28], ['Mit Abschlag', 28], ['Unterschied', 26]],
+      saetze.map(function (s) {
+        return zv(pct(s[0], 2) + ' · ' + s[1], basisAlt * s[0] / 100, basisNeu * s[0] / 100);
+      }),
+      'AfA je Jahr auf die jeweilige Bemessungsgrundlage. Die Pauschale von 2,00 % folgt § 7 Abs. 4 Satz 1 EStG; ein hoeherer Satz aus einer kuerzeren Nutzungsdauer folgt § 7 Abs. 4 Satz 2 EStG und setzt deren Nachweis voraus.');
+
+    /* Sofort abzugsfaehige Kosten — sie teilen sich NICHT auf. */
+    var sofort = num('bmf-boden-sofort');
+    if (sofort) {
+      var grenz = num('grenz') || 42;
+      platz(34);
+      abschnitt('Sofort abzugsfaehige Kosten');
+      zeile('Honorar Kaufpreisaufteilung, Restnutzungsdauer, Steuerberatung', eur(sofort, 2));
+      zeile('Steuerwirkung im Jahr der Zahlung bei ' + pct(grenz, 2), eur(sofort * grenz / 100, 2), { summe: true });
+      einleitung('Diese Kosten dienen der Ermittlung der Abschreibung, nicht dem Erwerb. Sie sind Werbungskosten und im Jahr der Zahlung in voller Hoehe abziehbar; sie erhoehen die Bemessungsgrundlage nicht.');
+    }
 
     platz(40);
     abschnitt('Grundlagen und Hinweise');
