@@ -839,3 +839,23 @@ span.auto-tag {
 
 /* v1492: Das Baujahr stand als einziges Zahlenfeld linksbuendig. */
 #bmf_bj { text-align: right; }
+
+/* ─── v1500: die Pillen neben den Beschriftungen waren zu wuchtig ──
+   Marcel: "die Checkboxen sind auch sehr gross." Gemeint sind die
+   goldenen AUTO-Pillen und die Paragraphen-Pillen. Gemessen: 21 px hoch
+   bei 9 px Schrift - fast so hoch wie die Beschriftung daneben, und
+   dadurch wie ein Bedienelement wirkend. Sie sind ein Hinweis, kein
+   Schalter, also treten sie zurueck. */
+#bmfOverlay span.auto,
+#bmfOverlay span.auto-tag {
+  font-size: 8.5px;
+  line-height: 1.25;
+  padding: 0 5px;
+  margin-left: 5px;
+  letter-spacing: 0.06em;
+}
+#bmfOverlay .badge {
+  font-size: 9.5px;
+  line-height: 1.3;
+  padding: 0 6px;
+}

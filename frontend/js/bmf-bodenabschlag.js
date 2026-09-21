@@ -96,21 +96,35 @@
       '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33);margin-bottom:6px">Szenario neben der amtlichen Aufteilung</div>' +
       '<h3 style="margin:0 0 6px;font:600 19px/1.3 \'Space Grotesk\',sans-serif">Abschlag auf den Grund und Boden</h3>' +
       '<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:var(--muted,#6B6356)">Die Arbeitshilfe des BMF bindet das Finanzgericht nicht (BFH IX R 26/19). Wer eine niedrigere Bodenkomponente begründen kann, darf abweichend aufteilen. Dieses Blatt lässt die amtliche Zahl unangetastet und stellt das Szenario daneben.</p>' +
-      '<div style="display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px">' +
-        '<label style="font-size:12px">Abschlag auf den Bodenwert<br><span style="display:inline-flex;align-items:center;gap:6px;margin-top:4px">' +
-          '<input id="bmf-boden-pct" type="text" inputmode="decimal" value="20" style="width:70px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:14px Inter,sans-serif;text-align:right"><b>%</b></span></label>' +
+      /* v1500 · Marcel 21.09.2026: "die Formatierung ist schlecht beim
+         Bodenabschlag. Die Restnutzungsdauer von/bis ist nicht schoen mit den
+         anderen Feldern in einer Reihe. Auch kann man einfach den Abschlag
+         beliebig setzen, da bitte nur die 4 Abstufungen zum Auswaehlen."
+         Gemessen: die Reihe war ein flex mit align-items:flex-end, und die
+         Restnutzungsdauer-Spalte war wegen Hilfetext, Knopf und Infozeile
+         143 px hoch gegen 60 px der Nachbarn - sie begann 83 px weiter oben.
+         Jetzt ein Raster mit drei Spalten und gemeinsamer Oberkante; was
+         Hoehe braucht (Knopf, Infozeile), steht UNTER der Reihe.
+         Der Abschlag ist eine Auswahl mit genau den vier Stufen aus Reiter 4 -
+         eine frei tippbare Zahl war eine Einladung, eine zu waehlen, die
+         nirgends hergeleitet ist. */
+      '<div style="display:grid;grid-template-columns:230px 250px minmax(260px,1fr);gap:14px 18px;align-items:start;margin-bottom:6px">' +
+        '<label style="font-size:12px">Abschlag auf den Bodenwert<br>' +
+          '<select id="bmf-boden-pct" style="width:100%;margin-top:4px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:14px Inter,sans-serif;background:#fff">' +
+            '<option value="0">Amtlich · kein Abschlag</option>' +
+            '<option value="15">Konservativ · 15 %</option>' +
+            '<option value="20" selected>Optimiert · 20 %</option>' +
+            '<option value="25">Aggressiv · 25 %</option>' +
+          '</select></label>' +
         '<label style="font-size:12px">Restnutzungsdauer von / bis<br><span style="display:inline-flex;align-items:center;gap:5px;margin-top:4px">' +
-          '<input id="bmf-boden-rnd-von" type="text" inputmode="numeric" style="width:56px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:14px Inter,sans-serif;text-align:right">' +
-          '<b>bis</b><input id="bmf-boden-rnd-bis" type="text" inputmode="numeric" style="width:56px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:14px Inter,sans-serif;text-align:right"><b>Jahre</b></span>' +
-          '<div style="font-size:11px;color:#8A8272;margin-top:3px;max-width:240px">Steht eine Spanne, rechnet das PDF jedes Jahr darin einzeln durch.</div>' +
-          '<button type="button" class="btn btn-outline btn-sm" id="bmf-boden-rnd-rechnen" style="margin-top:6px">Restnutzungsdauer berechnen</button>' +
-          '<div id="bmf-boden-rnd-info" style="font-size:11px;color:#8A8272;margin-top:4px;max-width:260px"></div></label>' +
-        /* v1495 · Marcel: "und sofort abzugsfaehige Kosten, die koennen wir
-           rausnehmen, komplett." Das Feld und der Abschnitt im PDF sind weg -
-           das Honorar fuer Aufteilung und Gutachten gehoert in die
-           Steuererklaerung, nicht in ein Papier ueber die Aufteilung. */
-        '<label style="font-size:12px;flex:1 1 320px">Begründung (kommt in den Vertragstext)<br>' +
-          '<input id="bmf-boden-grund" type="text" value="" placeholder="z. B. Hinterlandanteil, Zuschnitt, Lärmbelastung, Bebauung nutzt den Boden nicht aus" style="width:100%;margin-top:4px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:13px Inter,sans-serif"></label>' +
+          '<input id="bmf-boden-rnd-von" type="text" inputmode="numeric" style="width:62px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:14px Inter,sans-serif;text-align:right">' +
+          '<b>bis</b><input id="bmf-boden-rnd-bis" type="text" inputmode="numeric" style="width:62px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:14px Inter,sans-serif;text-align:right"><b>Jahre</b></span></label>' +
+        '<label style="font-size:12px">Begründung (kommt in den Vertragstext)<br>' +
+          '<input id="bmf-boden-grund" type="text" value="" placeholder="z. B. Hinterlandanteil, Zuschnitt, Lärmbelastung" style="width:100%;margin-top:4px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:13px Inter,sans-serif"></label>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">' +
+        '<button type="button" class="btn btn-outline btn-sm" id="bmf-boden-rnd-rechnen">Restnutzungsdauer berechnen</button>' +
+        '<div id="bmf-boden-rnd-info" style="font-size:11.5px;color:#8A8272;line-height:1.45;flex:1 1 320px">Steht eine Spanne, rechnet das PDF jedes Jahr darin einzeln durch.</div>' +
       '</div>' +
       '<div id="bmf-boden-out"></div>' +
       '<div id="bmf-boden-klausel" style="margin-top:14px"></div>' +
@@ -119,7 +133,7 @@
 
     /* v1495-reste: das Feld fuer sofort abzugsfaehige Kosten ist weg. */
     var f = el('bmf-boden-pct'), gr = el('bmf-boden-grund');
-    if (f) f.addEventListener('input', rechnen);
+    if (f) { f.addEventListener('input', rechnen); f.addEventListener('change', rechnen); }
     if (gr) gr.addEventListener('input', rechnen);
     ['bmf-boden-rnd-von', 'bmf-boden-rnd-bis'].forEach(function (i) { var e = el(i); if (e) e.addEventListener('input', rechnen); });
     /* Vorbelegung aus der ermittelten Restnutzungsdauer: der Wert selbst und
@@ -451,6 +465,7 @@
   /* Wer die Zahl selbst aendert, hat sie selbst gewaehlt. */
   document.addEventListener('input', function (ev) {
     if (!ev.target || ev.target.id !== 'bmf-boden-pct') return;
+    /* v1500b: auch die Auswahl von Hand zaehlt als eigene Wahl. */
     if (window._dpBodenStillsetzen) return;
     window._dpBodenQuelle = null;
     herkunftZeigen(null);
