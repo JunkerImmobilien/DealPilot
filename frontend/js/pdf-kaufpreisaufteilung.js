@@ -37,8 +37,17 @@
     if (v == null || !isFinite(v)) return '-';
     return new Intl.NumberFormat('de-DE', { minimumFractionDigits: dec == null ? 2 : dec, maximumFractionDigits: dec == null ? 2 : dec }).format(v) + ' %';
   }
-  function sauber(t) {
+  /* v1480 · Marcel 21.09.2026: "bitte PDF ohne Umlaute". Jeder Text wird
+     umgeschrieben (ae oe ue ss), bevor er ins Dokument geht - auch die Texte
+     aus der Oberflaeche (Vertragstext, Begruendung, Absender, Adresse). */
+  function ohneUmlaut(t) {
     return String(t == null ? '' : t)
+      .replace(/\u00C4/g, 'Ae').replace(/\u00D6/g, 'Oe').replace(/\u00DC/g, 'Ue')
+      .replace(/\u00E4/g, 'ae').replace(/\u00F6/g, 'oe').replace(/\u00FC/g, 'ue')
+      .replace(/\u00DF/g, 'ss');
+  }
+  function sauber(t) {
+    return ohneUmlaut(String(t == null ? '' : t))
       .replace(/[✓✔]/g, '+').replace(/[✗✘⚠️]/g, '!')
       .replace(/[−‑‒–—]/g, '-')
       .replace(/[^\x00-\xFF]/g, '').replace(/\s+/g, ' ').trim();
@@ -85,18 +94,18 @@
     function kopf(titel, unter) {
       y = 22;
       doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.setTextColor(26, 26, 26);
-      doc.text(firma, L, y);
+      doc.text(sauber(firma), L, y);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(120);
       doc.text('K A U F P R E I S A U F T E I L U N G   N A C H   B M F - A R B E I T S H I L F E', L, y + 4.6);
       doc.setFontSize(8); doc.setTextColor(110);
       var zl = absZeilen.slice(0, 4), schritt = 3.6;
       var by = (y + 6.5) - (zl.length - 1) * schritt;
-      zl.forEach(function (t) { doc.text(t, W - R_, by, { align: 'right' }); by += schritt; });
+      zl.forEach(function (t) { doc.text(sauber(t), W - R_, by, { align: 'right' }); by += schritt; });
       y += 8.5;
       doc.setDrawColor(G[0], G[1], G[2]); doc.setLineWidth(0.8); doc.line(L, y, W - R_, y); doc.setLineWidth(0.2);
       y += 10;
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(26, 26, 26); doc.text(titel, L, y); y += 5.5;
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(110); doc.text(unter || '', L, y);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(26, 26, 26); doc.text(sauber(titel), L, y); y += 5.5;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(110); doc.text(sauber(unter || ''), L, y);
       y += 10;
     }
     function platz(bedarf, titel, unter) {
