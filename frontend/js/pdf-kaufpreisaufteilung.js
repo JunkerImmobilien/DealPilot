@@ -212,8 +212,15 @@
     var kp = num('ak_kp') || num('kp');
     var nkFelder = [['ak_grest', 'Grunderwerbsteuer'], ['ak_notar', 'Notar'], ['ak_gba', 'Grundbuchamt'],
       ['ak_makler', 'Maklercourtage'], ['ak_gutachten', 'Gutachten'], ['ak_anwalt', 'Rechtsberatung'],
-      ['ak_ji', 'Vermittlung / Beratung'], ['ak_fahrt', 'Fahrtkosten'], ['ak_verpfl', 'Verpflegung'],
-      ['ak_hotel', 'Übernachtung'], ['ak_sonst', 'Sonstige Nebenkosten']];
+      /* v1495 · Marcel 21.09.2026: "dann hast du jetzt irgendwelche
+         Verpflegungen und Uebernachtungen mit reingenommen. Das ist Quatsch."
+         Stimmt: Verpflegungsmehraufwand und Hotel sind Reisekosten. Sie
+         teilen sich nicht mit dem Kaufpreis auf und haben in einer
+         Kaufpreisaufteilung nichts verloren. In die Bemessungsgrundlage sind
+         sie nie eingegangen - sie standen nur in der Aufstellung und haben
+         sie unplausibel gemacht. */
+      ['ak_ji', 'Vermittlung / Beratung'], ['ak_fahrt', 'Fahrtkosten'],
+      ['ak_sonst', 'Sonstige Nebenkosten']];
     /* v1476 · GEMESSEN: in die amtliche Arbeitshilfe geht nur
        Kaufpreis + Grunderwerbsteuer + Notar + Grundbuch + Makler +
        Vermittlung (bmf-modal.js, runBmf). Fahrtkosten, Gutachten, Anwalt,
@@ -263,7 +270,10 @@
     zeile('Grundstücksfläche', (I.grundstuecksflaeche || num('bmf_gsfl')) ? new Intl.NumberFormat('de-DE').format(I.grundstuecksflaeche || num('bmf_gsfl')) + ' m²' : '-');
     zeile('Bodenrichtwert', (I.bodenrichtwert || num('bmf_brw')) ? eur(I.bodenrichtwert || num('bmf_brw'), 0) + ' je m²' : '-');
     if (num('bmf_miete')) zeile('Angesetzte Nettokaltmiete', eur(num('bmf_miete'), 2) + ' je Monat');
-    zeile('Stichtag', sauber(I.kaufdatum || txt('bmf_datum')) || '-');
+    /* v1495 · Marcel: "Stichtag bitte leer lassen." Der Rueckfall auf das
+       Modalfeld hat ein Datum gedruckt, das nur eine Vorbelegung war - bei
+       einem Objekt ohne Kaufvertrag sah das aus wie ein Vertragsdatum. */
+    zeile('Stichtag', sauber(I.kaufdatum) || '');
     y += 2;
 
     platz(60);
@@ -361,12 +371,24 @@
         doc.text(z, L, y); y += 4.8;
       });
     });
-    y += 5;
+    y += 3;
+    /* v1495: der Hinweis zur Bindungswirkung steht als Information darunter -
+       normal, nicht kursiv; er geht nicht in die Urkunde. */
+    var hinweisTxt = (window._dpKpaTexte && window._dpKpaTexte.hinweis) || '';
+    if (hinweisTxt) {
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8.6); doc.setTextColor(95);
+      doc.splitTextToSize(sauber(hinweisTxt), CW).forEach(function (z) {
+        if (y > H - 22) { doc.addPage(); kopf(_titel, _unter); }
+        doc.text(z, L, y); y += 4.4;
+      });
+      y += 5;
+    }
     /* Der Zusatz steht NUR hier - als moeglicher Anhang zum Vertragstext. */
     var zusatzTxt = (window._dpKpaTexte && window._dpKpaTexte.zusatz) || '';
     if (zusatzTxt) {
       if (y > H - 46) { doc.addPage(); kopf(_titel, _unter); }
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(8.6); doc.setTextColor(90);
+      /* v1495 · Marcel: "muss natuerlich in Gold formatiert sein." */
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(GD[0], GD[1], GD[2]);
       doc.text(sauber('Möglicher Zusatz, falls das Finanzamt die Aufteilung hinterfragt'), L, y);
       y += 5.5;
       doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(26, 26, 26);
@@ -385,7 +407,11 @@
        sie stand vorher ZWISCHEN angepasster Aufteilung und Vertragstext und hat
        dem Notarblatt die Kopfzeile weggenommen (gemessen: Seite 4 trug wieder
        "Kaufpreisaufteilung"). Jetzt steht sie hinter dem Vertragstext. */
-    neueSeite('Kaufpreisaufteilung', 'Steuerliche Auswirkung der Aufteilung');
+    /* v1495-teil2 · Marcel 21.09.2026: "steuerliche Auswirkungen der
+       Aufteilung wandert auf das naechste Blatt. Das kann bitte mit auf das
+       vorherige Blatt." Kein erzwungener Wechsel mehr - die Tabelle haengt
+       sich an, solange Platz ist, und wechselt nur, wenn keiner mehr da ist. */
+    platz(60);
     abschnitt('Abschreibung je Aufteilung');
     vergleich(
       [['AfA-Satz', 62], ['Amtlich', 28], ['Mit Abschlag', 28], ['Unterschied', 26]],
@@ -393,17 +419,6 @@
         return zv(pct(s[0], 2) + ' · ' + s[1], basisAlt * s[0] / 100, basisNeu * s[0] / 100);
       }),
       'AfA je Jahr auf die jeweilige Bemessungsgrundlage. Die Pauschale von 2,00 % folgt § 7 Abs. 4 Satz 1 EStG; ein höherer Satz aus einer kürzeren Nutzungsdauer folgt § 7 Abs. 4 Satz 2 EStG und setzt deren Nachweis voraus.');
-
-    /* Sofort abzugsfähige Kosten — sie teilen sich NICHT auf. */
-    var sofort = num('bmf-boden-sofort');
-    if (sofort) {
-      var grenz = num('grenz') || 42;
-      platz(34);
-      abschnitt('Sofort abzugsfähige Kosten');
-      zeile('Honorar Kaufpreisaufteilung, Restnutzungsdauer, Steuerberatung', eur(sofort, 2));
-      zeile('Steuerwirkung im Jahr der Zahlung bei ' + pct(grenz, 2), eur(sofort * grenz / 100, 2), { summe: true });
-      einleitung('Diese Kosten dienen der Ermittlung der Abschreibung, nicht dem Erwerb. Sie sind Werbungskosten und im Jahr der Zahlung in voller Höhe abziehbar; sie erhöhen die Bemessungsgrundlage nicht.');
-    }
 
     platz(40);
     abschnitt('Grundlagen und Hinweise');

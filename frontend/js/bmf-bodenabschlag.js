@@ -105,9 +105,10 @@
           '<div style="font-size:11px;color:#8A8272;margin-top:3px;max-width:240px">Steht eine Spanne, rechnet das PDF jedes Jahr darin einzeln durch.</div>' +
           '<button type="button" class="btn btn-outline btn-sm" id="bmf-boden-rnd-rechnen" style="margin-top:6px">Restnutzungsdauer berechnen</button>' +
           '<div id="bmf-boden-rnd-info" style="font-size:11px;color:#8A8272;margin-top:4px;max-width:260px"></div></label>' +
-        '<label style="font-size:12px">Sofort abzugsfähige Kosten<br><span style="display:inline-flex;align-items:center;gap:6px;margin-top:4px">' +
-          '<input id="bmf-boden-sofort" type="text" inputmode="decimal" value="" placeholder="z. B. 549" style="width:90px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:14px Inter,sans-serif;text-align:right"><b>€</b></span>' +
-          '<div style="font-size:11px;color:#8A8272;margin-top:3px;max-width:240px">Honorar für Kaufpreisaufteilung, Restnutzungsdauergutachten, Steuerberatung — Werbungskosten, keine Anschaffungskosten.</div></label>' +
+        /* v1495 · Marcel: "und sofort abzugsfaehige Kosten, die koennen wir
+           rausnehmen, komplett." Das Feld und der Abschnitt im PDF sind weg -
+           das Honorar fuer Aufteilung und Gutachten gehoert in die
+           Steuererklaerung, nicht in ein Papier ueber die Aufteilung. */
         '<label style="font-size:12px;flex:1 1 320px">Begründung (kommt in den Vertragstext)<br>' +
           '<input id="bmf-boden-grund" type="text" value="" placeholder="z. B. Hinterlandanteil, Zuschnitt, Lärmbelastung, Bebauung nutzt den Boden nicht aus" style="width:100%;margin-top:4px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:13px Inter,sans-serif"></label>' +
       '</div>' +
@@ -116,10 +117,10 @@
       '<div id="bmf-boden-zusatz"></div>';
     vorlage.parentNode.appendChild(p);
 
-    var f = el('bmf-boden-pct'), gr = el('bmf-boden-grund'), so = el('bmf-boden-sofort');
+    /* v1495-reste: das Feld fuer sofort abzugsfaehige Kosten ist weg. */
+    var f = el('bmf-boden-pct'), gr = el('bmf-boden-grund');
     if (f) f.addEventListener('input', rechnen);
     if (gr) gr.addEventListener('input', rechnen);
-    if (so) so.addEventListener('input', rechnen);
     ['bmf-boden-rnd-von', 'bmf-boden-rnd-bis'].forEach(function (i) { var e = el(i); if (e) e.addEventListener('input', rechnen); });
     /* Vorbelegung aus der ermittelten Restnutzungsdauer: der Wert selbst und
        vier Jahre darueber — die Bandbreite, die auch im Gutachten steht. */
@@ -176,14 +177,6 @@
       zeile('Anschaffungsnebenkosten auf das Gebäude', nkGebAlt, nkGebNeu) +
       zeile('AfA-Bemessungsgrundlage', basisAlt, basisNeu, { summe: true }) +
       zeile('AfA pro Jahr bei ' + pct(satz, 2), afaAlt, afaNeu, { summe: true }) +
-      (function () {
-        var so = zahl(el('bmf-boden-sofort') && el('bmf-boden-sofort').value);
-        if (!so) return '';
-        var g = zahl(el('grenz') && el('grenz').value) || 42;
-        return '<tr><td style="padding:6px 8px 6px 0;border-bottom:1px solid #F0ECE3">Sofort abzugsfähige Kosten (im Jahr des Erwerbs)</td>' +
-          '<td colspan="2" style="padding:6px 8px;text-align:right;border-bottom:1px solid #F0ECE3">' + eur(so) + '</td>' +
-          '<td style="padding:6px 0;text-align:right;border-bottom:1px solid #F0ECE3;color:#2E8455">Steuerwirkung ' + eur(so * g / 100) + '</td></tr>';
-      })() +
       '</tbody></table>' +
       '<div class="cf-hint" style="margin-top:8px">Die linke Spalte ist das Ergebnis der amtlichen Arbeitshilfe und bleibt unverändert. Der Abschlag verschiebt nur, was auf den Boden entfällt — der Kaufpreis bleibt gleich. Ohne tragfähige Begründung trägt das Finanzamt die Aufteilung der Arbeitshilfe ein.</div>';
 
@@ -211,10 +204,15 @@
       'Hiermit erklären die Vertragsparteien rechtsverbindlich:\n\n' +
       'Der vereinbarte Gesamtkaufpreis in Höhe von ' + eur(B.kp, 2) + ' für das in der Vertragsurkunde ' +
       'näher bezeichnete Objekt ' + (adr || '[Objektadresse]') + ' entfällt nach übereinstimmender ' +
-      'Bewertung wie folgt:\n\n' +
-      '  Grund und Boden: ' + eur(bodenNeu, 2) + '\n' +
-      '  Gebäude inkl. wesentlicher Gebäudeteile: ' + eur(gebNeu, 2) + '\n' +
-      (B.inv > 0 ? '  Mitverkauftes Inventar: ' + eur(B.inv, 2) + '\n' : '') +
+      /* v1495 · Marcel 21.09.2026: "wir wollten, dass wir die Aufteilung
+         Grund und Boden, Gebaeude inklusive wesentlicher Gebaeudeteile
+         textuell verfassen ... dann ein vollstaendiger Satz."
+         Vorher standen die Betraege als eingerueckte Liste. Eine Liste ist
+         keine Erklaerung - in einer Urkunde steht ein Satz, den man vorlesen
+         kann. */
+      'Bewertung wie folgt: Auf den Grund und Boden entfallen ' + eur(bodenNeu, 2) + ', auf das ' +
+      'Gebäude einschließlich der wesentlichen Gebäudeteile entfallen ' + eur(gebNeu, 2) +
+      (B.inv > 0 ? ' und auf das mitverkaufte Inventar entfallen ' + eur(B.inv, 2) : '') + '.\n' +
       /* v1490 · Marcel 21.09.2026: "Diese Aufteilung wurde nach der
          Arbeitshilfe ... bis Stand - das koennen wir wegmachen, weil wir das
          spaeter bei Moeglicher Zusatz schon drin haben." Stimmt: Verfahren,
@@ -224,8 +222,12 @@
          das Finanzamt und steht dort, wo sie hingehoert.
          Damit beim Streichen nichts verloren geht, tragen Punkt 1 und 3 des
          Zusatzes jetzt die konkreten Zahlen und den 80/20-Satz. */
-      '\nSie hat verbindlichen Charakter und ist wirtschaftlich angemessen im Sinne der ' +
-      'Rechtsprechung des Bundesfinanzhofs (BFH, Urteil vom 21.07.2020, IX R 26/19).';
+      '';
+    /* v1495 · Marcel: "das bitte nicht mehr kursiv, sondern einfach als
+       Information darunter." Also raus aus dem Vertragstext - der ist der
+       Wortlaut fuer die Urkunde - und als eigene Zeile darunter. */
+    var hinweis = 'Diese Aufteilung hat verbindlichen Charakter und ist wirtschaftlich angemessen im Sinne ' +
+      'der Rechtsprechung des Bundesfinanzhofs (BFH, Urteil vom 21.07.2020, IX R 26/19).';
     var zusatz =
       'Ergänzende Begründung der Aufteilung (auf Anforderung des Finanzamts)\n\n' +
       '1. Verfahren. Die Aufteilung folgt der Arbeitshilfe des Bundesfinanzministeriums (Fassung Juni 2023). ' +
@@ -256,6 +258,14 @@
       + '<button type="button" class="btn btn-outline btn-sm" id="bmf-boden-arbeitshilfe">BMF-Arbeitshilfe als PDF</button>' +
       (grund ? '' : '<span class="cf-hint" style="margin-left:10px">Ohne Begründung bleibt der Abschlag angreifbar — sie gehört in den Text.</span>') + '</div>';
     el('bmf-boden-klausel-text').value = txt;
+    var hHost = el('bmf-boden-hinweis');
+    if (!hHost) {
+      hHost = document.createElement('div');
+      hHost.id = 'bmf-boden-hinweis';
+      hHost.style.cssText = 'margin-top:6px;font-size:11.5px;color:#6B6356;line-height:1.5';
+      el('bmf-boden-klausel-text').parentNode.insertBefore(hHost, el('bmf-boden-klausel-text').nextSibling);
+    }
+    hHost.textContent = hinweis;
     var zHost = el('bmf-boden-zusatz');
     if (zHost) {
       zHost.innerHTML =
@@ -267,7 +277,7 @@
         try { navigator.clipboard.writeText(zusatz); if (typeof window.toast === 'function') window.toast('+ Zusatztext kopiert'); } catch (e) {}
       };
     }
-    window._dpKpaTexte = { klausel: txt, zusatz: zusatz };
+    window._dpKpaTexte = { klausel: txt, zusatz: zusatz, hinweis: hinweis };
     var ahKnopf = el('bmf-boden-arbeitshilfe');
     if (ahKnopf) ahKnopf.onclick = function () {
       /* v1484 · die ausgefuellte BMF-Arbeitshilfe selbst als PDF. Gerechnet wird
