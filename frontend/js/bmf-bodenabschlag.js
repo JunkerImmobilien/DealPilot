@@ -396,4 +396,51 @@
   })();
 
   window.DpBmfBodenabschlag = { rechnen: rechnen, einhaengen: einhaengen, _basis: basis };
+
+  /* v1491 · Marcel 21.09.2026: "auf der letzten Seite, dass wenn man das
+     auswaehlt, dass das auch uebernommen wird und man dort nicht einfach eine
+     Zahl eingeben kann. Vielleicht machen wir das so, dass man sie aendern
+     koennte."
+     Also: die Wahl in Reiter 4 setzt den Abschlag hier. Das Feld bleibt
+     editierbar - wer eine eigene Zahl braucht, traegt sie ein, und die
+     Herkunftszeile sagt dann, dass sie von Hand kommt. Ein gesperrtes Feld
+     haette den Fall "ich brauche 18 %" unmoeglich gemacht. */
+  var ABSCHLAG_JE_VARIANTE = { amtlich: 0, konservativ: 15, optimiert: 20, aggressiv: 25 };
+
+  window._dpBodenAusVariante = function (name) {
+    var pct = ABSCHLAG_JE_VARIANTE[name];
+    if (pct == null) return;
+    var feld = el('bmf-boden-pct');
+    if (!feld) return;
+    feld.value = String(pct);
+    window._dpBodenQuelle = name;
+    herkunftZeigen(name);
+    try { rechnen(); } catch (e) { console.warn('[v1491] rechnen:', e.message); }
+  };
+
+  function herkunftZeigen(name) {
+    var feld = el('bmf-boden-pct'); if (!feld) return;
+    var box = el('bmf-boden-herkunft');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'bmf-boden-herkunft';
+      box.className = 'cf-hint';
+      box.style.cssText = 'margin-top:4px;font-size:11.5px';
+      var heim = feld.closest ? feld.closest('label') : null;
+      (heim || feld.parentNode).appendChild(box);
+    }
+    var namen = { amtlich: 'Amtlich', konservativ: 'Konservativ', optimiert: 'Optimiert', aggressiv: 'Aggressiv' };
+    box.textContent = name
+      ? 'Uebernommen aus Reiter 4, Variante ' + (namen[name] || name) + '. Aenderbar.'
+      : 'Von Hand eingetragen.';
+  }
+
+  /* Wer die Zahl selbst aendert, hat sie selbst gewaehlt. */
+  document.addEventListener('input', function (ev) {
+    if (!ev.target || ev.target.id !== 'bmf-boden-pct') return;
+    if (window._dpBodenStillsetzen) return;
+    window._dpBodenQuelle = null;
+    herkunftZeigen(null);
+  });
+
 })();

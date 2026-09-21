@@ -29,7 +29,9 @@
   // ─── State ───────────────────────────────────────────────────────────
   window._v292State = {
     response: null,           // Backend-Response von /pipeline
-    selectedVariant: 'konservativ',
+    /* v1491: Vorauswahl ist die AMTLICHE Zahl - wer abweichen will, waehlt
+       das bewusst, nicht durch Nichtstun. */
+    selectedVariant: 'amtlich',
     isLoading: false,
     lastError: null,
     lastInputs: null
@@ -238,9 +240,17 @@
 
   // ─── Variant-Wahl ────────────────────────────────────────────────────
   window._v292SelectVariant = function(name){
-    if (!['konservativ', 'optimiert', 'aggressiv'].includes(name)) return;
+    if (!['amtlich', 'konservativ', 'optimiert', 'aggressiv'].includes(name)) return;
     window._v292State.selectedVariant = name;
     window._v292RenderAll();
+    /* v1491 · Marcel: "wenn man das auswaehlt, dass das auch uebernommen wird
+       und man dort nicht einfach eine Zahl eingeben kann" - der Reiter
+       Bodenabschlag zieht den Prozentsatz der gewaehlten Variante nach.
+       Aendern bleibt erlaubt; das Feld sagt dann nur nicht mehr, es komme
+       von hier. Die Uebernahme selbst steht in bmf-bodenabschlag.js. */
+    try {
+      if (typeof window._dpBodenAusVariante === 'function') window._dpBodenAusVariante(name);
+    } catch (e) { console.warn('[v1491] Bodenabschlag-Sync:', e.message); }
     /* V292.6.3-variant-klausel-sync: Klauseltext auch updaten
      * (selectKlausel updated 'AKTUELLE VARIANTE: XYZ' + Klauseltext-Box) */
     try {
@@ -412,15 +422,17 @@
     var p11 = r.phase11_risiko;
 
     var ampelEmoji = { gruen: '🟢', gelb: '🟡', rot: '🔴' };
-    var variants = ['konservativ', 'optimiert', 'aggressiv'];
+    /* v1491: vier Spalten - amtlich plus drei Abweichungen. */
+    var variants = ['amtlich', 'konservativ', 'optimiert', 'aggressiv'];
     var labels = {
-      konservativ: { name: 'Konservativ', sub: '× 1,00 · BMF-Wert' },
-      optimiert:   { name: 'Optimiert',   sub: '× 0,85 · Boden −15 %' },
+      amtlich:     { name: 'Amtlich',     sub: '× 1,00 · BMF-Arbeitshilfe' },
+      konservativ: { name: 'Konservativ', sub: '× 0,85 · Boden −15 %' },
+      optimiert:   { name: 'Optimiert',   sub: '× 0,80 · Boden −20 %' },
       aggressiv:   { name: 'Aggressiv',   sub: '× 0,75 · Boden −25 %' }
     };
 
     var html = '<div class="v292-pane3-header">' +
-      '<div class="banner info"><strong>Drei Vertragsvarianten — wählen Sie in Pane 4 die für Ihre Risikobereitschaft passende.</strong> ' +
+      '<div class="banner info"><strong>Die amtliche Aufteilung und drei Abweichungen davon — wählen Sie in Pane 4.</strong> ' +
       'Alle Werte basieren auf der BMF-Berechnung (' + _fmtPct(r.phase4_bmf.gebaeudeanteil_prozent) + ' Gebäude per Ertragswertverfahren).</div>' +
       '</div>' +
       '<table class="v292-vergleich-tbl">' +
@@ -486,19 +498,22 @@
 
     var ampelEmoji = { gruen: '🟢', gelb: '🟡', rot: '🔴' };
     var labels = {
+      amtlich:     'Amtlich',
       konservativ: 'Konservativ',
       optimiert:   'Optimiert',
       aggressiv:   'Aggressiv'
     };
     var subLabels = {
-      konservativ: '× 1,00 · BMF-Referenz',
-      optimiert:   '× 0,85 · Boden −15 %',
+      amtlich:     '× 1,00 · BMF-Arbeitshilfe',
+      konservativ: '× 0,85 · Boden −15 %',
+      optimiert:   '× 0,80 · Boden −20 %',
       aggressiv:   '× 0,75 · Boden −25 %'
     };
 
     var html = '';
-    ['konservativ', 'optimiert', 'aggressiv'].forEach(function(name){
+    ['amtlich', 'konservativ', 'optimiert', 'aggressiv'].forEach(function(name){
       var v = p5[name];
+      if (!v) return;
       var afa = p10[name];
       var risk = p11[name];
       var isSelected = name === selected;
@@ -593,7 +608,8 @@
       var klauselTextEl = document.getElementById('klauselText');
       if (klauselTextEl && (!klauselTextEl.innerHTML || klauselTextEl.innerHTML.trim() === '')) {
         if (typeof window.selectKlausel === 'function') {
-          window.selectKlausel(selected === 'konservativ' ? 'konservativ' : (selected === 'aggressiv' ? 'aggressiv' : 'moderat'));
+          /* v1491: vier Varianten auf die drei Klauseltexte abbilden. */
+          window.selectKlausel(selected === 'amtlich' ? 'konservativ' : (selected === 'aggressiv' ? 'aggressiv' : 'moderat'));
         }
       }
     } catch(e) { console.warn('[v292.2] selectKlausel:', e); }
@@ -666,7 +682,7 @@
         badge.style.cssText = 'margin-left:6px;padding:2px 6px;background:var(--gold,#C9A84C);color:#fff;border-radius:3px;font-size:10px;font-weight:600;letter-spacing:.05em';
         label.appendChild(badge);
       } else {
-        existingBadge.textContent = '🤖 BMF · ' + ({konservativ:'Kons',optimiert:'Opt',aggressiv:'Aggr'}[selected] || selected);
+        existingBadge.textContent = '🤖 BMF · ' + ({amtlich:'Amtl',konservativ:'Kons',optimiert:'Opt',aggressiv:'Aggr'}[selected] || selected);
       }
     }
 

@@ -151,19 +151,26 @@
   font-size: 12px;
 }
 
-/* ─── Pane 4: 3 Variant-Cards (Radio-Wahl) ───────────────────────── */
+/* ─── Pane 4: 4 Variant-Cards (Radio-Wahl) ───────────────────────── */
+/* v1491: vierte Kachel dazu. Damit vier statt drei in dieselbe Breite
+   passen, gehen Abstand und Innenrand herunter; die Kacheln duerfen
+   schrumpfen (minmax 0), sonst sprengt der laengste Zahlenwert das Raster. */
 .bmfmo-var-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
   margin-top: 14px;
+}
+@media (max-width: 1100px) {
+  .bmfmo-var-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 .v292-var-card {
   background: var(--surface, #FAF7F2);
   border: 2px solid var(--border, #E5DCC9);
   border-radius: 10px;
-  padding: 16px 14px;
+  padding: 13px 10px;   /* v1491: enger, damit vier nebeneinander passen */
+  min-width: 0;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
