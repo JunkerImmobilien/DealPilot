@@ -303,7 +303,51 @@ function convertToPdf(xlsxPath) {
   });
 }
 
+/* v1498 · Marcel 21.09.2026: "wenn ich auf BMF-Rechner klicke dauert es
+   extrem lange."
+   Gemessen an Rinteln ueber Resource Timing: beim OEFFNEN laufen zwei
+   Backend-Rufe - bmf/pipeline (3.124 ms) und bmf/aufteilung (3.089 ms) -,
+   und bmf/pipeline ruft intern GENAU DIESE Funktion. Dieselbe Arbeitshilfe
+   geht also zweimal durch LibreOffice, mit denselben Eingaben, im Abstand
+   von einer Sekunde. Das ist keine Rechenzeit, das ist die doppelte.
+   Der Speicher haelt das Ergebnis kurz fest: gleiche Eingaben und gleiche
+   Optionen ergeben dieselbe Antwort ohne zweiten Lauf. Kurz gehalten, weil
+   das Ergebnis an Eingaben haengt, die laufend geaendert werden - der
+   Schluessel enthaelt sie alle, eine Aenderung faellt also nie in den
+   Speicher hinein. */
+const KPA_SPEICHER = new Map();
+const KPA_SPEICHER_MS = parseInt(process.env.BMF_CACHE_MS || '120000', 10);
+const KPA_SPEICHER_MAX = 12;
+
+function _kpaSchluessel(inputs, opts) {
+  const roh = JSON.stringify(inputs, Object.keys(inputs || {}).sort())
+    + '|' + (opts.includeFile !== false ? 'F' : '-')
+    + '|' + (opts.includePdf ? 'P' : '-');
+  return crypto.createHash('sha1').update(roh).digest('hex');
+}
+
+function _kpaAusSpeicher(schluessel) {
+  const e = KPA_SPEICHER.get(schluessel);
+  if (!e) return null;
+  if (Date.now() - e.zeit > KPA_SPEICHER_MS) { KPA_SPEICHER.delete(schluessel); return null; }
+  return e.wert;
+}
+
+function _kpaInSpeicher(schluessel, wert) {
+  KPA_SPEICHER.set(schluessel, { zeit: Date.now(), wert });
+  while (KPA_SPEICHER.size > KPA_SPEICHER_MAX) {
+    KPA_SPEICHER.delete(KPA_SPEICHER.keys().next().value);
+  }
+}
+
 async function calculateKpa(inputs, opts = {}) {
+  const _schluessel = _kpaSchluessel(inputs, opts);
+  const _gespeichert = _kpaAusSpeicher(_schluessel);
+  if (_gespeichert) {
+    return Object.assign({}, _gespeichert, {
+      meta: Object.assign({}, _gespeichert.meta, { aus_speicher: true }),
+    });
+  }
   if (!ExcelJS) throw new Error("exceljs nicht installiert — bitte 'npm i exceljs' im backend/");
   if (!fs.existsSync(TEMPLATE_PATH)) {
     throw new Error(`BMF-Vorlage fehlt: ${TEMPLATE_PATH}`);
@@ -427,7 +471,7 @@ async function calculateKpa(inputs, opts = {}) {
   // 6) Cleanup
   try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch (_) {}
 
-  return {
+  const _ergebnis = {
     ok: true,
     stage: 'done',
     inputs_received: inputs,
@@ -443,6 +487,9 @@ async function calculateKpa(inputs, opts = {}) {
       recalc_engine: 'LibreOffice headless',
     },
   };
+
+  _kpaInSpeicher(_schluessel, _ergebnis);
+  return _ergebnis;
 }
 
 // ----------------------------------------------------------------------
