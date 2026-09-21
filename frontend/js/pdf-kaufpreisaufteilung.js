@@ -272,19 +272,21 @@
     /* ── AfA ─────────────────────────────────────────────────────── */
     var rnd = null;
     try { rnd = window._lastRndResult && window._lastRndResult.result && window._lastRndResult.result.final_rnd; } catch (e) {}
-    var saetze = [[2, 'gesetzliche Pauschale, § 7 Abs. 4 Satz 1 EStG']];
-    if (rnd && rnd > 0) saetze.push([100 / rnd, 'ermittelte Restnutzungsdauer ' + Math.round(rnd) + ' Jahre, § 7 Abs. 4 Satz 2 EStG']);
+    /* v1477 · gemessen: die lange Beschriftung lief in die Zahlenspalte.
+       Kurz in der Tabelle, die Fundstelle steht in der Fussnote. */
+    var saetze = [[2, 'gesetzliche Pauschale']];
+    if (rnd && rnd > 0) saetze.push([100 / rnd, 'Restnutzungsdauer ' + Math.round(rnd) + ' Jahre']);
     var eigen = num('afa_eigen');
     if (eigen && (!rnd || Math.abs(eigen - 100 / rnd) > 0.01)) saetze.push([eigen, 'im Objekt hinterlegter Satz']);
 
     platz(60, 'Kaufpreisaufteilung', 'Abschreibung');
     abschnitt('Abschreibung je Aufteilung');
     vergleich(
-      [['AfA-Satz', 52], ['Amtlich', 30], ['Mit Abschlag', 30], ['Unterschied', 28]],
+      [['AfA-Satz', 62], ['Amtlich', 28], ['Mit Abschlag', 28], ['Unterschied', 26]],
       saetze.map(function (s) {
         return zv(pct(s[0], 2) + ' · ' + s[1], basisAlt * s[0] / 100, basisNeu * s[0] / 100);
       }),
-      'AfA je Jahr auf die jeweilige Bemessungsgrundlage. Ein Satz ueber der Pauschale setzt den Nachweis einer kuerzeren Nutzungsdauer voraus.');
+      'AfA je Jahr auf die jeweilige Bemessungsgrundlage. Die Pauschale von 2,00 % folgt § 7 Abs. 4 Satz 1 EStG; ein hoeherer Satz aus einer kuerzeren Nutzungsdauer folgt § 7 Abs. 4 Satz 2 EStG und setzt deren Nachweis voraus.');
 
     /* ── Vertragstext ────────────────────────────────────────────── */
     platz(70, 'Kaufpreisaufteilung', 'Formulierung für den Kaufvertrag');
