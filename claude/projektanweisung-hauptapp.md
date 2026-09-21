@@ -17598,3 +17598,34 @@ Blatt einen Wortlaut, den es amtlich nicht gibt.
 > herankommt. Ein Pruefer, der nichts findet, weil er nichts lesen kann, sieht
 > aus wie ein Pruefer, der nichts zu beanstanden hat. **Umlaute nur noch mit
 > pdf.js messen** und die Zahl der gefundenen Textstuecke immer mitnennen.
+
+## Rollout-Journal · 21.09.2026 (7) — BMF-Modal durchgegangen, Umlaute zurueck
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1490 | `c4bf00e` | **Die Umlaut-Sperre aus v1475 ist zurueckgenommen.** Gemessen mit jsPDF 3.0 und mit pdf.js gegengelesen: „Mietwohngrundstücke (Mehrfamilienhäuser) Größe ÄÖÜäöüß · 690.000 €" kommt Zeichen fuer Zeichen an, kursiv wie normal. Umlaute, ß, Euro und Mittelpunkt stehen ALLE in WinAnsi. Die Transliteration war eine Vorsichtsmassnahme gegen ein Problem, das diese Zeichen gar nicht haben — kaputt gehen nur Zeichen AUSSERHALB Latin-1 (Pfeile, Haken, Gedankenstriche), und die ersetzt `sauber()` weiter. Nur der DATEINAME bleibt ohne Umlaute. Dazu: Vertragstext und Zusatz kursiv, linksbuendig, schwarz; aus der Urkunde faellt der Begruendungsteil („Diese Aufteilung wurde nach der Arbeitshilfe … Stand"), der Zusatztext traegt jetzt die Bodenrichtwert-Zahlen und den 80/20-Satz |
+| v1491 | `ff3a1ea` | **Vier AfA-Varianten statt drei.** Vorher hiess die unveraenderte BMF-Zahl „Konservativ" — ein Name, der eine Haltung behauptet, wo keine ist. `BODEN_FAKTOREN` jetzt **amtlich 1,00 · konservativ 0,85 · optimiert 0,80 · aggressiv 0,75**, Risikoscore 0/1/2/3, Vorauswahl **amtlich**. Raster auf vier Spalten (`minmax(0,1fr)`, engerer Innenrand), unter 1100 px zwei. Die Wahl in Reiter 4 setzt den Abschlag im Reiter Bodenabschlag; das Feld bleibt aenderbar und sagt, woher die Zahl kommt. **Beruehrt `bmf-modal-v292.js` — geschuetzte Datei, auf ausdrueckliche Ansage** |
+| v1492 | `2355da2` | Formatierungen: die Miete stand als nacktes „4200" neben lauter „690.000,00"; das Baujahr war das einzige linksbuendige Zahlenfeld. Reiter 3 und 4 bleiben zu, solange Pflichtangaben fehlen — vorher zeigten sie entweder nichts oder den Stand des ZULETZT gerechneten Objekts. Knopf **„Restnutzungsdauer berechnen"** im Reiter Bodenabschlag ueber `DealPilotRND.calcAll` — kein zweiter Rechenweg |
+| v1493 | `4a03d94` | **Die Sperre ging nicht wieder auf.** Gemessen: Baujahr geleert → Reiter zu (richtig), Baujahr nachgetragen → Reiter blieb zu. `_bmfPflichtZeichnen()` springt bei „nichts fehlt" frueh heraus, und das Nachziehen stand hinter dem Ausstieg. **Ein Schloss, das sich nicht wieder oeffnet, ist schlimmer als keines** |
+| v1494 / b | `104282b`, `70976a1` | 16 Textstellen im PDF von der Umschrift auf echte Umlaute: „Kaufpreisaufteilung für den Notarvertrag", „Gebäudeanteil", „Sofort abzugsfähige Kosten", „Möglicher Zusatz", „tragfähige", „einschließlich", „Begründung". In KOMMENTAREN bleibt ae/oe/ue |
+
+**Nachweis, am echten Knopf erzeugt und mit pdf.js nachgemessen:**
+
+| | Befund |
+|---|---|
+| Kaufpreisaufteilung | 5 Seiten · **73 Umlaute, 0 verstuemmelt, 0 Umschrift-Reste** |
+| Kopfzeilen | 1–2 „Kaufpreisaufteilung", **3–4 „für den Notarvertrag"**, 5 Steuerwirkung |
+| Abschnitte | alle neun vorhanden, Zusatz genau einmal, kein „Stand:" mehr |
+| Abschreibung | 9 Jahreszeilen aus der Spanne 18–26 |
+| Vier Kacheln | 258 px in 1057 px, kein Ueberlauf, gleiche Hoehe; 81,99 / 84,69 / 85,59 / 86,49 % |
+| Uebernahme | Kachel Konservativ → 15, Aggressiv → 25, Amtlich → 0; Herkunftszeile steht |
+| Reitersperre | Luecke → zu, nachgetragen → offen |
+| Restnutzungsdauer | Knopf: Bj 1972, GND 80, 0/16 Punkte → technisch 18, Anlage 2 26 Jahre |
+
+> **Die Lehre aus der Umlaut-Kehrtwende:** ich habe in v1475 eine PAUSCHALE
+> Vorsichtsmassnahme eingebaut, ohne zu messen, welche Zeichen ueberhaupt
+> betroffen sind. Der echte Befund aus v1221b betraf `→ ≥ ✓ —` — Zeichen
+> ausserhalb Latin-1. Umlaute waren nie das Problem. Die Folge war ein
+> Fachdokument, das „Gebaeudeanteil" schrieb: ein Wort, das in keinem Gesetz
+> steht. **Eine Schutzmassnahme braucht denselben Nachweis wie eine
+> Funktion** — sonst schuetzt sie vor nichts und kostet etwas.
