@@ -320,7 +320,15 @@ function _bmfPflichtZeichnen(){
     if (el) el.classList.remove('dp-required-bmf');
   }
 
-  if (!fehlt.length){ box.hidden = true; box.innerHTML = ''; return fehlt; }
+  if (!fehlt.length){
+    box.hidden = true; box.innerHTML = '';
+    /* v1493: AUCH hier nachziehen. Vorher sprang die Funktion an dieser
+       Stelle heraus, und die Sperre aus dem Zustand davor blieb stehen -
+       gemessen: Baujahr nachgetragen, Reiter weiter zu. Ein Schloss, das
+       sich nicht wieder oeffnet, ist schlimmer als keines. */
+    try { _bmfTabsSperren(); } catch(e) {}
+    return fehlt;
+  }
 
   var zeilen = fehlt.map(function(e){
     var el = $(e.id);
@@ -1899,6 +1907,9 @@ function _ensureModalLoaded(callback){
 }
 
 function openBMFModal(){
+  /* v1493: nach dem Vorbefuellen den Reiterzustand setzen. Ohne das stand
+     die Sperre aus dem Moment des Oeffnens, als die Felder noch leer waren. */
+  setTimeout(function(){ try { _bmfPflichtZeichnen(); } catch(e) {} }, 350);
   // V289.2.1: Plan-Check defensiv beim Klick
   // W41-bmf-gate: hier stand der Advanced-Check — das Pro-Extra. Damit war der
   //               ganze Rechner Pro-only, obwohl die Landing (Z.2850) Investor
