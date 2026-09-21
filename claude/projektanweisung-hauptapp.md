@@ -17498,3 +17498,25 @@ GrESt 5 %, Notar 1,5 %, Grundbuch 0,5 %, Fahrtkosten 370 km (0,38 EUR/km = 140,6
 alle neun Gewerke „veraltet"): technische Alterswertminderung **13,00 Jahre** (fuehrend), Anlage 2
 25,81, linear 26, Vogels 29,78, Ross 34,77, Parabel 43,55. Das deckt sich mit der Anfrage
 (dort 13,00 als fuehrendes Verfahren, Bandbreite 15-19 Jahre als vorsichtige Rundung).
+
+## Rollout-Journal · 21.09.2026 (3) — Quelle sauber, PDF der Kaufpreisaufteilung
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1474 | `f0cebb7` | **Quelle bereinigt (Freigabe Marcel):** in `bmf-modal-v292.js` war `objart_bmf` fest auf „Wohnungseigentum [WE]" verdrahtet. Jetzt aus `#bmf_art`. Die Umhuellung aus v1473 wurde zurueckgenommen — zwei Stellen fuer dieselbe Regel waeren eine Falle |
+| v1475 | `f0cebb7` | neues `js/pdf-kaufpreisaufteilung.js`: Objekt und Grundlagen, Anschaffungskosten, **Herleitung** der amtlichen Arbeitshilfe, Aufteilungssatz amtlich gegen Abschlag, Abschreibung je Aufteilung, Vertragstext, Hinweise. Gestaltung wie die Bankfassung, Absender aus den Einstellungen. Knopf im Reiter Bodenabschlag |
+| v1476 | `ea57bf0` | **Befund:** in die amtliche Rechnung gehen nur Kaufpreis, GrESt, Notar, Grundbuch, Makler und Vermittlung (bmf-modal.js, runBmf). Fahrtkosten, Gutachten, Anwalt, Reise und Sonstiges NICHT. Dokument und Reiter rechnen jetzt auf derselben Grundlage und weisen den Rest getrennt aus |
+| v1477 | `d1a793f` | AfA-Beschriftung lief in die Zahlenspalte |
+
+**Objekt 2026-1036 (Rinteln) mit der korrigierten Nettokaltmiete 4.200 EUR/Monat:**
+Ertragswert 662.950 EUR (massgebend), Bodenwert 119.440 EUR, Gebaeudeanteil **81,99 %**,
+Anschaffungskosten in der Aufteilung 738.300 EUR -> Gebaeude 605.332 EUR, Grund 132.968 EUR.
+Mit 20 % Bodenabschlag: Gebaeudeanteil 85,59 %, Bemessungsgrundlage 631.926 EUR (+26.594).
+Restnutzungsdauer 13 Jahre (technische Alterswertminderung) -> 7,69 %: AfA 46.564 EUR amtlich,
+48.610 EUR mit Abschlag.
+
+**Nachweis:** PDF drei Seiten, 30 KB, keine Ueberlappung, alle Bloecke vorhanden, heruntergeladen
+und auf der Platte gegengelesen.
+
+**Offen zur Entscheidung:** ob Fahrtkosten, Gutachter- und Anwaltskosten in die amtliche
+Aufteilung einfliessen sollen. Das ist eine steuerliche Frage — Marcel entscheidet.
