@@ -17449,3 +17449,28 @@ Jahresreihen. Seit v1468 steht genau das im Dokument.
 **Nachweis auf der Platte:** Hoelderlinstr. 6 Seiten / 5 Bilder (Titelbild + Galerie),
 Hiddenhausen 7 Seiten / 3 Bilder (Diagramme); beide mit „Junker Immobilien" im Kopf und
 Block „Ansprechpartner". Keine Ueberlappung, kein Kauderwelsch.
+
+## Rollout-Journal · 21.09.2026 — zweite Pruefrunde am Investment Case (Staging)
+
+Marcel: „nochmal".
+
+**Geprueft wurde der Aufbau, nicht nur der Inhalt:** 20 Abschnitte auf 7 Seiten in fester
+Reihenfolge (Objekt · Ansprechpartner · Investition · Finanzierung | Kennzahlen · Warmmiete bis
+Cashflow | Bewirtschaftung · Steuerwirkung · Cashflow je Phase · Kennzahlen je Phase |
+Zinsaenderungsrisiko · Cashflow je Jahr · Vermoegensaufbau | Exit · Diagramme | Belastungsprobe ·
+Vermoegenszuwachs · Annahmen | Grundlagen). Raender gemessen: links 18 mm, rechts 17,6 mm,
+oben 17,7 mm, Fusszeile 11,5 mm — auf jeder Seite gleich. 530 Textelemente, keine Ueberlappung,
+kein Text unter der Fusszeile, kein Doppelbyte-Kauderwelsch.
+
+**Zahlen erneut gegen die laufende Rechnung:** 19 Einzelbetraege, 4 Phasenzeilen (je drei Spalten)
+und ALLE 10 Jahreszeilen (Miete, Bewirtschaftung, Zins, Tilgung, Cashflow, Restschuld) Ziffer fuer
+Ziffer deckungsgleich.
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1470 | `1dd2245` | Annahmen brachen mit EINER Waisenzeile auf die letzte Seite um — der Block bleibt jetzt zusammen |
+| v1470b | `71c37da` | Belastungsprobe: der Ausgangsfall heisst jetzt „gerechnet auf dem ersten vollen Jahr". Er kann leicht vom DSCR von heute abweichen (gemessen 0,85 gegen 0,84), seit die Matrix das Rumpfjahr meidet (v1465) — ohne den Zusatz sieht das aus wie ein Widerspruch |
+
+**Gegengeprueft:** Tilgungsaussetzung 7 Seiten (Bausparblock, Bauspardarlehen, Belastungsprobe),
+Mehrfamilienhaus 8 Seiten (Mieterliste, Ist gegen Soll, Objektfotos, rechtliche Einheit) —
+beide ohne Befund.
