@@ -17474,3 +17474,27 @@ Ziffer deckungsgleich.
 **Gegengeprueft:** Tilgungsaussetzung 7 Seiten (Bausparblock, Bauspardarlehen, Belastungsprobe),
 Mehrfamilienhaus 8 Seiten (Mieterliste, Ist gegen Soll, Objektfotos, rechtliche Einheit) —
 beide ohne Befund.
+
+## Rollout-Journal · 21.09.2026 (2) — Bodenabschlag, Objekt Rinteln, zwei Befunde
+
+Marcel: „ein Reiter mit 20% Abzug vom Grund und Boden … Leg das Objekt an … gib mir die
+Kaufpreisaufteilung vorher und nachher".
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1471 / b | `1463056`, `f4ec5c4` | neuer Reiter „Bodenabschlag" im BMF-Fenster: freier Abschlag (Vorgabe 20 %) auf den Bodenwert, Gegenueberstellung zur amtlichen Arbeitshilfe, Vertragstext mit Begruendung. Eigenes Modul `js/bmf-bodenabschlag.js` — `bmf-modal-v292.js` steht unter „Nicht anfassen" |
+| v1472 | `eb6e5ed` | die Live-Aktualisierung hing an BRW, Flaeche, Baujahr und Miete, NICHT an der Grundstuecksart |
+| v1473 | `b3eb04b` | **schwerer Befund:** in `bmf-modal-v292.js` steht `objart_bmf: 'Wohnungseigentum [WE]'` FEST verdrahtet. Die Reiter 3 und 4 (AfA-Vorschau, AfA-Hebel **samt Vertragstext**) rechneten damit bei JEDEM Objekt als waere es eine Eigentumswohnung. Gemessen am MFH Rinteln: 81,54 % Gebaeude gegen 80,59 % amtlich, Ertragswert 647.019 gegen 615.123 EUR. Von aussen umhuellt (`_v292CollectInputs`), die Art kommt jetzt aus `#bmf_art`. **Die Quelle gehoert noch bereinigt — dafuer muss die geschuetzte Datei angefasst werden.** |
+
+**Objekt 2026-1036 angelegt:** Wilhelm-Busch-Strasse 10 + 11, 31737 Rinteln, MFH, Bj 1972,
+607 m2, 8 Wohnungen, 2 Garagen, Grundstueck 1.493 m2, BRW 80 EUR/m2, Kaufpreis 690.000 EUR,
+GrESt 5 %, Notar 1,5 %, Grundbuch 0,5 %, Fahrtkosten 370 km (0,38 EUR/km = 140,60 EUR).
+
+**Amtliche Arbeitshilfe (nach der Korrektur):** Bodenwert 119.440 EUR, Ertragswert 615.123 EUR
+(massgebend), Sachwert 574.083 EUR, Gebaeudeanteil 80,59 %. Aufteilung der Anschaffungskosten
+738.440,60 EUR: Grund 143.304 EUR, Gebaeude 594.996 EUR.
+
+**Restnutzungsdauer im Programm** (DealPilotRND, Bj 1972, Stichtag 14.09.2026, GND 80, 0 Punkte,
+alle neun Gewerke „veraltet"): technische Alterswertminderung **13,00 Jahre** (fuehrend), Anlage 2
+25,81, linear 26, Vogels 29,78, Ross 34,77, Parabel 43,55. Das deckt sich mit der Anfrage
+(dort 13,00 als fuehrendes Verfahren, Bandbreite 15-19 Jahre als vorsichtige Rundung).
