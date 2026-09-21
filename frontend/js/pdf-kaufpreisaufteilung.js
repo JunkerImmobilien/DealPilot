@@ -168,8 +168,18 @@
       ['ak_makler', 'Maklercourtage'], ['ak_gutachten', 'Gutachten'], ['ak_anwalt', 'Rechtsberatung'],
       ['ak_ji', 'Vermittlung / Beratung'], ['ak_fahrt', 'Fahrtkosten'], ['ak_verpfl', 'Verpflegung'],
       ['ak_hotel', 'Übernachtung'], ['ak_sonst', 'Sonstige Nebenkosten']];
+    /* v1476 · GEMESSEN: in die amtliche Arbeitshilfe geht nur
+       Kaufpreis + Grunderwerbsteuer + Notar + Grundbuch + Makler +
+       Vermittlung (bmf-modal.js, runBmf). Fahrtkosten, Gutachten, Anwalt,
+       Verpflegung, Uebernachtung und Sonstiges gehen NICHT mit. Dieses
+       Dokument darf deshalb nicht die volle Summe als Grundlage ausweisen -
+       sonst stehen zwei Zahlen fuer dieselbe Sache im selben Blatt. */
+    var IN_BMF = { ak_grest: 1, ak_notar: 1, ak_gba: 1, ak_makler: 1, ak_ji: 1 };
     var nkSumme = nkFelder.reduce(function (a, f) { return a + (num(f[0]) || 0); }, 0);
+    var nkInBmf = nkFelder.reduce(function (a, f) { return a + (IN_BMF[f[0]] ? (num(f[0]) || 0) : 0); }, 0);
+    var nkAussen = nkSumme - nkInBmf;
     var ak = (kp || 0) + nkSumme;
+    var akBmf = (kp || 0) + nkInBmf;
 
     var gebPct = zahl(wertVon(R.gebaeudeanteil_prozent));
     var bodenwert = zahl(wertVon(R.bodenwert));
@@ -188,7 +198,7 @@
     var bodenNeu = bodenAnteilKp * (1 - abschlag / 100);
     var gebNeu = (kp || 0) - bodenNeu;
     var gebPctNeu = kp ? gebNeu / kp * 100 : 0;
-    var nkGebAlt = nkSumme * gebPct / 100, nkGebNeu = nkSumme * gebPctNeu / 100;
+    var nkGebAlt = nkInBmf * gebPct / 100, nkGebNeu = nkInBmf * gebPctNeu / 100;
     var basisAlt = gebAnteilKp + nkGebAlt, basisNeu = gebNeu + nkGebNeu;
 
     /* ── Seite 1 ─────────────────────────────────────────────────── */
@@ -217,7 +227,10 @@
     });
     zeile('Anschaffungsnebenkosten' + (kp ? ' (' + pct(nkSumme / kp * 100, 2) + ' vom Kaufpreis)' : ''), eur(nkSumme, 2), { fett: true });
     zeile('Anschaffungskosten gesamt', eur(ak, 2), { summe: true });
-    einleitung('Die Arbeitshilfe teilt die Anschaffungskosten einschliesslich Nebenkosten auf. Die Nebenkosten folgen deshalb demselben Verhaeltnis wie der Kaufpreis.');
+    y += 1;
+    zeile('davon in der amtlichen Aufteilung angesetzt', eur(akBmf, 2), { fett: true });
+    if (nkAussen > 0.005) zeile('nicht angesetzt (Fahrt, Gutachten, Anwalt, Reise, Sonstiges)', eur(nkAussen, 2), { einzug: true, klein: true });
+    einleitung('Die Arbeitshilfe teilt die Anschaffungskosten einschliesslich Nebenkosten auf; die Nebenkosten folgen demselben Verhaeltnis wie der Kaufpreis. Die Arbeitshilfe bekommt Kaufpreis, Grunderwerbsteuer, Notar, Grundbuch, Makler und Vermittlung. Weitere Positionen sind Anschaffungsnebenkosten, gehen hier aber nicht in die Quote ein - sie teilen sich im selben Verhaeltnis und erhoehen die Bemessungsgrundlage entsprechend.');
 
     /* ── Herleitung der amtlichen Aufteilung ─────────────────────── */
     platz(80, 'Kaufpreisaufteilung', 'Herleitung nach der amtlichen Arbeitshilfe');
@@ -250,8 +263,10 @@
         zv('davon Gebaeude', gebAnteilKp, gebNeu),
         zv('Gebaeudeanteil', gebPct, gebPctNeu, function (v) { return pct(v, 2); }, true),
         zv('Nebenkosten auf das Gebaeude', nkGebAlt, nkGebNeu),
-        zv('AfA-Bemessungsgrundlage', basisAlt, basisNeu, null, true)
-      ],
+        zv('AfA-Bemessungsgrundlage', basisAlt, basisNeu, null, true),
+        (nkAussen > 0.005 ? zv('zuzueglich weiterer Nebenkosten (Gebaeudeanteil)', nkAussen * gebPct / 100, nkAussen * gebPctNeu / 100) : null)
+      ].filter(Boolean).concat([
+      ]),
       'Der Kaufpreis bleibt gleich; der Abschlag verschiebt nur, was auf den Boden entfaellt. Ohne tragfaehige Begruendung setzt das Finanzamt die Aufteilung der Arbeitshilfe an.');
 
     /* ── AfA ─────────────────────────────────────────────────────── */

@@ -59,7 +59,11 @@
        selben Verhaeltnis und gehoeren in die AfA-Bemessungsgrundlage. */
     /* Feldnamen am Modal gemessen (v1471): gba statt grundbuch, gutachten
        statt gutachter, dazu anwalt und ji. */
-    var nkFelder = ['ak_grest', 'ak_notar', 'ak_gba', 'ak_makler', 'ak_gutachten', 'ak_anwalt', 'ak_ji', 'ak_fahrt', 'ak_verpfl', 'ak_hotel', 'ak_sonst'];
+    /* v1476 · GEMESSEN: in die amtliche Rechnung gehen nur diese fuenf
+       Nebenkosten (bmf-modal.js, runBmf). Fahrt, Gutachten, Anwalt, Reise und
+       Sonstiges bleiben aussen vor — sie hier mitzurechnen haette eine
+       Bemessungsgrundlage ergeben, die zur amtlichen Zahl nicht passt. */
+    var nkFelder = ['ak_grest', 'ak_notar', 'ak_gba', 'ak_makler', 'ak_ji'];
     var nk = nkFelder.reduce(function (a, i) { return a + (zahl(el(i) && el(i).value) || 0); }, 0);
     return { kp: kp, inv: inv, immoKp: immoKp, nk: nk, gebPct: gebPct, boden: boden,
       gebAmtlich: immoKp * gebPct / 100, bodenAmtlich: immoKp * (100 - gebPct) / 100 };
