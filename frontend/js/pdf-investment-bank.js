@@ -1023,7 +1023,10 @@
       y += 3;
     }
 
-    platz(48, 'Annahmen und Hinweise', (adr || 'Objekt'));
+    /* v1470: gemessen - mit 48 mm blieb EINE Annahmen-Zeile allein auf der
+       letzten Seite stehen. Der Block braucht rund 70 mm; passt er nicht,
+       beginnt er geschlossen auf der naechsten Seite. */
+    platz(70, 'Annahmen und Hinweise', (adr || 'Objekt'));
     abschnitt('Annahmen');
     zeile('Mietsteigerung p. a.', num('mietstg') !== null ? pct(num('mietstg'), 1) : '-');
     zeile('Kostensteigerung p. a.', num('kostenstg') !== null ? pct(num('kostenstg'), 1) : '-');
