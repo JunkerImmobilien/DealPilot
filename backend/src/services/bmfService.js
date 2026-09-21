@@ -219,6 +219,41 @@ function recalcWithLibreOffice(xlsxPath) {
 // ----------------------------------------------------------------------
 // Hauptfunktion: Eingaben → BMF-Berechnung → Ergebnis + Datei
 // ----------------------------------------------------------------------
+/* v1484 · Marcel 21.09.2026: "es waere super, wenn wir die BMF-Arbeitshilfe
+   mit ausgeben als PDF". Dieselbe LibreOffice-Strecke wie der Recalc, nur mit
+   --convert-to pdf. Die ausgefuellte Arbeitshilfe wird damit zum Beleg, den
+   man dem Finanzamt beilegen kann. Faellt die Umwandlung aus, bleibt es beim
+   XLSX - die Berechnung selbst haengt nicht daran. */
+function convertToPdf(xlsxPath) {
+  return new Promise((resolve) => {
+    const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bmf-pdf-'));
+    const profileDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lo-pdf-'));
+    const args = [
+      '--headless', '--norestore', '--nologo', '--nofirststartwizard',
+      `-env:UserInstallation=file://${profileDir}`,
+      '--calc', '--convert-to', 'pdf:calc_pdf_Export',
+      '--outdir', outDir, xlsxPath,
+    ];
+    const proc = spawn(LIBREOFFICE_BIN, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+    let stderr = '';
+    proc.stderr.on('data', (d) => { stderr += d.toString(); });
+    const timer = setTimeout(() => { try { proc.kill('SIGKILL'); } catch (_) {} }, RECALC_TIMEOUT_MS);
+    proc.on('close', () => {
+      clearTimeout(timer);
+      try {
+        const treffer = fs.readdirSync(outDir).filter((f) => f.toLowerCase().endsWith('.pdf'));
+        const pdf = treffer.length ? fs.readFileSync(path.join(outDir, treffer[0])).toString('base64') : null;
+        resolve(pdf);
+      } catch (e) { resolve(null); }
+      finally {
+        try { fs.rmSync(outDir, { recursive: true, force: true }); } catch (_) {}
+        try { fs.rmSync(profileDir, { recursive: true, force: true }); } catch (_) {}
+      }
+    });
+    proc.on('error', () => { clearTimeout(timer); resolve(null); });
+  });
+}
+
 async function calculateKpa(inputs, opts = {}) {
   if (!ExcelJS) throw new Error("exceljs nicht installiert — bitte 'npm i exceljs' im backend/");
   if (!fs.existsSync(TEMPLATE_PATH)) {
@@ -324,6 +359,12 @@ async function calculateKpa(inputs, opts = {}) {
     filledBase64 = fs.readFileSync(workPath).toString('base64');
   }
 
+  // 5b) Arbeitshilfe zusaetzlich als PDF (v1484, nur auf Anforderung)
+  let pdfBase64 = null;
+  if (opts.includePdf) {
+    try { pdfBase64 = await convertToPdf(workPath); } catch (_) { pdfBase64 = null; }
+  }
+
   // 6) Cleanup
   try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch (_) {}
 
@@ -334,6 +375,8 @@ async function calculateKpa(inputs, opts = {}) {
     results,
     file_base64: filledBase64,
     file_name: `BMF_Aufteilung_${new Date().toISOString().slice(0,10)}.xlsx`,
+    pdf_base64: pdfBase64,
+    pdf_name: `BMF_Arbeitshilfe_${new Date().toISOString().slice(0,10)}.pdf`,
     meta: {
       template_version: 'Fassung Juni 2023',
       template_path: TEMPLATE_PATH,

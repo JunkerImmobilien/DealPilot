@@ -248,7 +248,8 @@
       '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted,#8A8272);margin-bottom:6px">Text für den Kaufvertrag</div>' +
       '<textarea id="bmf-boden-klausel-text" readonly style="width:100%;min-height:150px;padding:10px 12px;border:1px solid #E6E0D3;border-radius:8px;font:12.5px/1.6 Inter,sans-serif;background:#FBFAF7;color:#2A2727"></textarea>' +
       '<div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn btn-outline btn-sm" id="bmf-boden-copy">Text kopieren</button>'
-      + '<button type="button" class="btn btn-sm" id="bmf-boden-pdf" style="background:#2A2727;color:#fff;border:none">Kaufpreisaufteilung als PDF</button>' +
+      + '<button type="button" class="btn btn-sm" id="bmf-boden-pdf" style="background:#2A2727;color:#fff;border:none">Kaufpreisaufteilung als PDF</button>'
+      + '<button type="button" class="btn btn-outline btn-sm" id="bmf-boden-arbeitshilfe">BMF-Arbeitshilfe als PDF</button>' +
       (grund ? '' : '<span class="cf-hint" style="margin-left:10px">Ohne Begründung bleibt der Abschlag angreifbar — sie gehört in den Text.</span>') + '</div>';
     el('bmf-boden-klausel-text').value = txt;
     var zHost = el('bmf-boden-zusatz');
@@ -263,6 +264,31 @@
       };
     }
     window._dpKpaTexte = { klausel: txt, zusatz: zusatz };
+    var ahKnopf = el('bmf-boden-arbeitshilfe');
+    if (ahKnopf) ahKnopf.onclick = function () {
+      /* v1484 · die ausgefuellte BMF-Arbeitshilfe selbst als PDF. Gerechnet wird
+         nichts neu: derselbe Aufruf wie die amtliche Berechnung, nur mit dem
+         Schalter include_pdf - der Server wandelt die ausgefuellte Datei um. */
+      var inputs = window._lastBmfInputs;
+      if (!inputs) { if (window.toast) window.toast('Zuerst die amtliche Berechnung starten'); return; }
+      ahKnopf.disabled = true; var alt = ahKnopf.textContent; ahKnopf.textContent = 'Arbeitshilfe wird erzeugt ...';
+      var kopf = { 'Content-Type': 'application/json' };
+      try { var t = localStorage.getItem('dp_token') || localStorage.getItem('token'); if (t) kopf.Authorization = 'Bearer ' + t; } catch (e) {}
+      fetch('/api/v1/bmf/aufteilung', { method: 'POST', headers: kopf, body: JSON.stringify({ inputs: inputs, include_pdf: true }) })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (!d || !d.pdf_base64) throw new Error('keine PDF-Fassung erhalten');
+          var bin = atob(d.pdf_base64), arr = new Uint8Array(bin.length);
+          for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+          var url = URL.createObjectURL(new Blob([arr], { type: 'application/pdf' }));
+          var a2 = document.createElement('a'); a2.href = url; a2.download = d.pdf_name || 'BMF_Arbeitshilfe.pdf';
+          document.body.appendChild(a2); a2.click(); a2.remove();
+          setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+          if (window.toast) window.toast('+ Arbeitshilfe als PDF gespeichert');
+        })
+        .catch(function (e) { if (window.toast) window.toast('Arbeitshilfe als PDF nicht moeglich: ' + e.message); })
+        .then(function () { ahKnopf.disabled = false; ahKnopf.textContent = alt; });
+    };
     var pdfKnopf = el('bmf-boden-pdf');
     if (pdfKnopf) pdfKnopf.onclick = function () { if (typeof window.exportPDFKaufpreisaufteilung === 'function') window.exportPDFKaufpreisaufteilung(); };
     el('bmf-boden-copy').onclick = function () {

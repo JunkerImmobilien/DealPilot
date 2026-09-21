@@ -47,6 +47,8 @@ router.post('/aufteilung', authenticate, requireFeature('bmf_advanced'), async (
     const body = req.body || {};
     const inputs = body.inputs;
     const includeFile = !!body.include_file;
+    /* v1484: die ausgefuellte Arbeitshilfe zusaetzlich als PDF. */
+    const includePdf = !!body.include_pdf;
 
     if (!inputs || typeof inputs !== 'object') {
       return res.status(400).json({ error: 'Body muss { inputs: {...} } enthalten.' });
@@ -62,7 +64,7 @@ router.post('/aufteilung', authenticate, requireFeature('bmf_advanced'), async (
       });
     }
 
-    const result = await bmfService.calculateKpa(inputs, { includeFile });
+    const result = await bmfService.calculateKpa(inputs, { includeFile, includePdf });
 
     /* V289-results-fix-applied */
     res.json({
@@ -72,7 +74,9 @@ router.post('/aufteilung', authenticate, requireFeature('bmf_advanced'), async (
       meta: result.meta,
       warnings: result.warnings || [],
       file_base64: includeFile ? result.file_base64 : undefined,
-      file_name: includeFile ? 'BMF_Aufteilung_' + Date.now() + '.xlsx' : undefined
+      file_name: includeFile ? 'BMF_Aufteilung_' + Date.now() + '.xlsx' : undefined,
+      pdf_base64: includePdf ? result.pdf_base64 : undefined,
+      pdf_name: includePdf ? result.pdf_name : undefined
     });
   } catch (err) {
     // Operational errors aus LibreOffice → 500 mit kontrollierter Message

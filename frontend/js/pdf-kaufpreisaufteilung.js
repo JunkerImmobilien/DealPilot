@@ -83,11 +83,20 @@
     var G = gold(), GD = [Math.round(G[0] * 0.82), Math.round(G[1] * 0.82), Math.round(G[2] * 0.82)];
     var b = marke();
     var firma = sauber(b.company) || 'DealPilot';
+    /* v1483 · Marcel 21.09.2026: "zwei E-Mail-Adressen - welche nimmt er?"
+       Gemessen: branding.get() liefert name = "info@junker-immobilien.io" (im
+       Einstellungsfeld Name steht eine Adresse) und email = "info@dealpilot.immo".
+       Beide standen untereinander. Jetzt: der Name wird nur gedruckt, wenn er
+       KEINE Adresse ist; als Kontakt steht genau eine Adresse - die aus dem Feld
+       E-Mail, sonst die aus dem Namensfeld. Geaendert wird das in den
+       Einstellungen unter Marke. */
+    function istMail(s) { return /\S+@\S+\.\S+/.test(String(s || '')); }
     var absZeilen = [firma];
-    if (b.name && b.name !== b.company) absZeilen.push(sauber(b.name) + (b.role ? ' · ' + sauber(b.role) : ''));
+    if (b.name && b.name !== b.company && !istMail(b.name)) absZeilen.push(sauber(b.name) + (b.role ? ' · ' + sauber(b.role) : ''));
     var l2 = [sauber(b.address), sauber(((b.plz || '') + ' ' + (b.city || '')).trim())].filter(Boolean).join(' · ');
     if (l2) absZeilen.push(l2);
-    var kontakt = [b.phone ? 'Tel ' + sauber(b.phone) : '', sauber(b.email)].filter(Boolean).join(' · ');
+    var mail = sauber(b.email) || (istMail(b.name) ? sauber(b.name) : '');
+    var kontakt = [b.phone ? 'Tel ' + sauber(b.phone) : '', mail].filter(Boolean).join(' · ');
     if (kontakt) absZeilen.push(kontakt);
 
     var _titel = 'Kaufpreisaufteilung', _unter = '';
@@ -115,8 +124,9 @@
     }
     function abschnitt(t) {
       if (y > H - 34) { doc.addPage(); kopf(_titel, _unter); }
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(8.6); doc.setTextColor(GD[0], GD[1], GD[2]);
-      doc.text(sauber(String(t)).toUpperCase(), L, y);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9.4); doc.setTextColor(GD[0], GD[1], GD[2]);
+      /* v1483: Ueberschriften in normaler Schreibweise statt Versalien. */
+      doc.text(sauber(String(t)), L, y);
       doc.setDrawColor(226, 221, 210); doc.line(L, y + 1.8, W - R_, y + 1.8);
       y += 7.5;
     }
@@ -261,8 +271,8 @@
     zeile('Anschaffungskosten × Bodenanteil', eur(kpGrund, 2), { fett: true });
 
     /* ── Aufteilung mit Abschlag ─────────────────────────────────── */
-    platz(90, 'Kaufpreisaufteilung', 'Amtliche Arbeitshilfe und Abschlag auf den Grund und Boden');
-    abschnitt('Aufteilungssatz: amtlich gegen Abschlag von ' + pct(abschlag, 0));
+    platz(90, 'Kaufpreisaufteilung', 'Angepasste Aufteilung mit Abschlag auf den Grund und Boden');
+    abschnitt('Angepasste Kaufpreisaufteilung - amtlich gegen ' + pct(abschlag, 0) + ' Abschlag');
     einleitung('Die Arbeitshilfe bindet das Finanzgericht nicht (BFH, Urteil vom 21.07.2020, IX R 26/19). Eine niedrigere Bodenkomponente ist ansetzbar, wenn sie begruendet ist' + (grundBegr ? ' - hier: ' + grundBegr : '') + '.');
     function zv(label, a, n, fmt, fett) {
       var d = (a != null && n != null) ? n - a : null;
@@ -332,30 +342,36 @@
     if (!klausel) {
       klausel = 'Die Vertragsparteien teilen den Gesamtkaufpreis in Höhe von ' + eur(kp, 2) + ' für das Objekt ' + (adr || '[Objektadresse]') + ' wie folgt auf: auf den Grund und Boden entfallen ' + eur(bodenNeu, 2) + ', auf das Gebäude entfallen ' + eur(gebNeu, 2) + '.';
     }
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(45);
+    /* v1483 · Marcel: "kursiv machen und mittig zentrieren". Der Text soll sich
+       vom Rechenteil absetzen - er geht woertlich in die Urkunde. */
+    var TW = CW - 20;
+    doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(45);
     String(klausel).split('\n').forEach(function (absatz) {
       if (!absatz.trim()) { y += 2.5; return; }
-      doc.splitTextToSize(sauber(absatz), CW).forEach(function (z) {
+      doc.splitTextToSize(sauber(absatz), TW).forEach(function (z) {
         if (y > H - 22) { doc.addPage(); kopf(_titel, _unter); }
-        doc.text(z, L, y); y += 4.8;
+        doc.text(z, W / 2, y, { align: 'center' }); y += 4.8;
       });
     });
-    y += 6;
-
-    var zusatz = (window._dpKpaTexte && window._dpKpaTexte.zusatz) || '';
-    if (zusatz) {
-      platz(60, 'Kaufpreisaufteilung', 'Ergaenzende Begruendung');
-      abschnitt('Zusatztext bei Rueckfragen des Finanzamts');
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(8.8); doc.setTextColor(50);
-      String(zusatz).split('\n').forEach(function (absatz) {
-        if (!absatz.trim()) { y += 2.5; return; }
-        doc.splitTextToSize(sauber(absatz), CW).forEach(function (z) {
+    y += 4;
+    /* Der Zusatz steht NUR hier - als moeglicher Anhang zum Vertragstext. */
+    var zusatzTxt = (window._dpKpaTexte && window._dpKpaTexte.zusatz) || '';
+    if (zusatzTxt) {
+      if (y > H - 46) { doc.addPage(); kopf(_titel, _unter); }
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8.2); doc.setTextColor(110);
+      doc.text(sauber('Moeglicher Zusatz, falls das Finanzamt die Aufteilung hinterfragt'), W / 2, y, { align: 'center' });
+      y += 6;
+      doc.setFont('helvetica', 'italic'); doc.setFontSize(8.6); doc.setTextColor(60);
+      String(zusatzTxt).split('\n').forEach(function (absatz) {
+        if (!absatz.trim()) { y += 2.2; return; }
+        doc.splitTextToSize(sauber(absatz), TW).forEach(function (z) {
           if (y > H - 22) { doc.addPage(); kopf(_titel, _unter); }
-          doc.text(z, L, y); y += 4.6;
+          doc.text(z, W / 2, y, { align: 'center' }); y += 4.5;
         });
       });
       y += 6;
     }
+    doc.setFont('helvetica', 'normal');
 
     platz(40);
     abschnitt('Grundlagen und Hinweise');
@@ -373,7 +389,8 @@
     });
 
     fuss();
-    var slug = (adr || 'Objekt').replace(/[^A-Za-z0-9ÄÖÜäöüß]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 40);
+    /* v1483: auch der Dateiname ohne Umlaute. */
+    var slug = ohneUmlaut(adr || 'Objekt').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 40);
     doc.save('Kaufpreisaufteilung_' + slug + '_' + heute().split('.').reverse().join('') + '.pdf');
   };
 })();
