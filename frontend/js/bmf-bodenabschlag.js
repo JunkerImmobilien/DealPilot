@@ -243,5 +243,38 @@
     })();
   })();
 
+  /* v1473 · BEFUND, der schwerer wiegt als der Reiter selbst:
+     In bmf-modal-v292.js steht die Grundstuecksart der Pipeline FEST
+     verdrahtet — objart_bmf: 'Wohnungseigentum [WE]'. Die Reiter 3 und 4
+     (AfA-Vorschau, AfA-Hebel samt Vertragstext) rechnen deshalb bei JEDEM
+     Objekt als waere es eine Eigentumswohnung. Gemessen am Mehrfamilienhaus
+     Rinteln: Pipeline 81,54 % Gebaeude gegen 80,59 % der amtlichen Rechnung,
+     Ertragswert 647.019 gegen 615.123 EUR.
+     Die Datei steht unter "Nicht anfassen" (CLAUDE.md) — deshalb wird die
+     Sammelfunktion hier UMHUELLT statt geaendert. Die Art kommt jetzt aus
+     dem Feld #bmf_art, der bisherige Wert bleibt der Rueckfall. */
+  (function () {
+    var n4 = 0;
+    (function wickeln() {
+      var f = window._v292CollectInputs;
+      if (typeof f === 'function' && !f._dpArt) {
+        var neu = function () {
+          var i = f.apply(this, arguments);
+          try {
+            var a = document.getElementById('bmf_art');
+            if (a && a.value && i && i.phase1_inputs && i.phase1_inputs.objekt) {
+              i.phase1_inputs.objekt.objart_bmf = a.value;
+            }
+          } catch (e) {}
+          return i;
+        };
+        for (var k in f) { if (Object.prototype.hasOwnProperty.call(f, k)) neu[k] = f[k]; }
+        neu._dpArt = true; window._v292CollectInputs = neu;
+        return;
+      }
+      if (++n4 < 120) setTimeout(wickeln, 700);
+    })();
+  })();
+
   window.DpBmfBodenabschlag = { rechnen: rechnen, einhaengen: einhaengen, _basis: basis };
 })();
