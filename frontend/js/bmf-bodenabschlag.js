@@ -213,25 +213,25 @@
       '  Grund und Boden: ' + eur(bodenNeu, 2) + '\n' +
       '  Gebäude inkl. wesentlicher Gebäudeteile: ' + eur(gebNeu, 2) + '\n' +
       (B.inv > 0 ? '  Mitverkauftes Inventar: ' + eur(B.inv, 2) + '\n' : '') +
-      '\nDiese Aufteilung wurde nach der Arbeitshilfe des Bundesfinanzministeriums (Fassung Juni 2023) ' +
-      'im ' + (verfahren || 'maßgeblichen Verfahren') + ' erstellt' +
-      (brw && gsfl ? ', unter Ansatz des lagespezifischen Bodenrichtwerts von ' + eur(brw, 0) + ' je m² für ' +
-        new Intl.NumberFormat('de-DE').format(gsfl) + ' m² Grundstücksfläche' : '') +
-      (rnd ? ' sowie der für das Gebäude ermittelten Restnutzungsdauer von ' + Math.round(rnd) + ' Jahren' : '') +
-      '. Auf den Bodenwert wurde ein Abschlag von ' + pct(ab, 0) + ' angesetzt' +
-      (grund ? ' wegen ' + grund : '') + '.\n\n' +
-      'Sie hat verbindlichen Charakter und ist wirtschaftlich angemessen im Sinne der Rechtsprechung ' +
-      'des Bundesfinanzhofs (BFH, Urteil vom 21.07.2020, IX R 26/19). Die Parteien sind sich einig, ' +
-      'dass eine pauschale Aufteilung im Verhältnis 80/20 im konkreten Fall nicht sachgerecht wäre. ' +
-      'Eine abweichende Wertfeststellung durch das Finanzamt setzt eine substantiierte Gegenbewertung ' +
-      'voraus (vgl. § 199 BewG).\n\n' +
-      'Stand: ' + stand + '.';
+      /* v1490 · Marcel 21.09.2026: "Diese Aufteilung wurde nach der
+         Arbeitshilfe ... bis Stand - das koennen wir wegmachen, weil wir das
+         spaeter bei Moeglicher Zusatz schon drin haben." Stimmt: Verfahren,
+         Bodenwertabschlag, Bindungswirkung und Restnutzungsdauer stehen im
+         Zusatztext ausfuehrlicher. In die URKUNDE gehoert nur, was die
+         Parteien erklaeren - die Betraege. Die Begruendung ist Beiwerk fuer
+         das Finanzamt und steht dort, wo sie hingehoert.
+         Damit beim Streichen nichts verloren geht, tragen Punkt 1 und 3 des
+         Zusatzes jetzt die konkreten Zahlen und den 80/20-Satz. */
+      '\nSie hat verbindlichen Charakter und ist wirtschaftlich angemessen im Sinne der ' +
+      'Rechtsprechung des Bundesfinanzhofs (BFH, Urteil vom 21.07.2020, IX R 26/19).';
     var zusatz =
       'Ergänzende Begründung der Aufteilung (auf Anforderung des Finanzamts)\n\n' +
       '1. Verfahren. Die Aufteilung folgt der Arbeitshilfe des Bundesfinanzministeriums (Fassung Juni 2023). ' +
       'Maßgeblich ist das ' + (verfahren || 'dort vorgesehene Verfahren') + ', weil es der Grundstücksart entspricht. ' +
       'Der Bodenwert ergibt sich aus Grundstücksfläche und amtlichem Bodenrichtwert, der Gebäudeanteil als ' +
-      'Differenz zum maßgebenden Verkehrswert.\n\n' +
+      'Differenz zum maßgebenden Verkehrswert' +
+      (brw && gsfl ? '. Angesetzt wurde der lagespezifische Bodenrichtwert von ' + eur(brw, 0) + ' je m² für ' +
+        new Intl.NumberFormat('de-DE').format(gsfl) + ' m² Grundstücksfläche' : '') + '.\n\n' +
       '2. Bodenwertabschlag. Auf den so ermittelten Bodenwert wurde ein Abschlag von ' + pct(ab, 0) + ' angesetzt' +
       (grund ? ', begründet mit ' + grund : '') + '. Der Bodenrichtwert gilt für ein Grundstück mit den ' +
       'Merkmalen des Richtwertgrundstücks; weicht das bewertete Grundstück davon ab, ist der Wert anzupassen ' +
@@ -239,7 +239,9 @@
       '3. Bindungswirkung. Die Arbeitshilfe ist ein Schätzhilfsmittel und bindet weder die Beteiligten noch ' +
       'die Gerichte (BFH, Urteil vom 21.07.2020, IX R 26/19). Eine vertragliche Aufteilung ist der Besteuerung ' +
       'zugrunde zu legen, solange sie wirtschaftlich vernünftig ist und keine nennenswerten Zweifel an ihrer ' +
-      'Angemessenheit bestehen (BFH, Urteil vom 16.09.2015, IX R 12/14).\n\n' +
+      'Angemessenheit bestehen (BFH, Urteil vom 16.09.2015, IX R 12/14). Eine pauschale Aufteilung im ' +
+      'Verhältnis 80/20 wäre im konkreten Fall nicht sachgerecht; eine abweichende Wertfeststellung ' +
+      'durch das Finanzamt setzt eine substantiierte Gegenbewertung voraus (vgl. § 199 BewG).\n\n' +
       (rnd ? '4. Restnutzungsdauer. Für das Gebäude wurde eine Restnutzungsdauer von ' + Math.round(rnd) + ' Jahren ' +
         'ermittelt; die Abschreibung folgt § 7 Abs. 4 Satz 2 EStG. Die Herleitung liegt als gesonderte ' +
         'Berechnung bei.\n\n' : '') +

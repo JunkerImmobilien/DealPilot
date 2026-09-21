@@ -46,8 +46,21 @@
       .replace(/\u00E4/g, 'ae').replace(/\u00F6/g, 'oe').replace(/\u00FC/g, 'ue')
       .replace(/\u00DF/g, 'ss');
   }
+  /* v1490 · Marcel 21.09.2026: "Grundstuecksart wird immer noch mit ae und ue
+     geschrieben, da muessten auch ae/oe/ue rein" (gemeint: die echten Umlaute).
+     Ich nehme v1475 ausdruecklich zurueck. Gemessen am 21.09.2026 mit jsPDF
+     3.0 und pdf.js gegengelesen: "Mietwohngrundstücke (Mehrfamilienhäuser)
+     Größe ÄÖÜäöüß · 690.000 €" kommt Zeichen fuer Zeichen an, kursiv wie
+     normal. Umlaute, ss-Zeichen, Euro und Mittelpunkt stehen ALLE in WinAnsi,
+     das jsPDF fuer die Standardschriften benutzt. Kaputt gehen nur Zeichen
+     AUSSERHALB Latin-1 - Pfeile, Haken, Minuszeichen, Gedankenstriche; die
+     ersetzt die Zeile darunter weiterhin. Mein frueheres "PDF ohne Umlaute"
+     war eine pauschale Vorsichtsmassnahme gegen ein Problem, das diese
+     Zeichen gar nicht haben, und hat ein Fachdokument schlechter gemacht:
+     "Gebaeudeanteil" steht in keinem Gesetz.
+     Nur der DATEINAME bleibt ohne Umlaute - der geht durch fremde Systeme. */
   function sauber(t) {
-    return ohneUmlaut(String(t == null ? '' : t))
+    return String(t == null ? '' : t)
       .replace(/[✓✔]/g, '+').replace(/[✗✘⚠️]/g, '!')
       .replace(/[−‑‒–—]/g, '-')
       .replace(/[^\x00-\xFF]/g, '').replace(/\s+/g, ' ').trim();
@@ -332,11 +345,11 @@
     if (!klausel) {
       klausel = 'Die Vertragsparteien teilen den Gesamtkaufpreis in Höhe von ' + eur(kp, 2) + ' für das Objekt ' + (adr || '[Objektadresse]') + ' wie folgt auf: auf den Grund und Boden entfallen ' + eur(bodenNeu, 2) + ', auf das Gebäude entfallen ' + eur(gebNeu, 2) + '.';
     }
-    /* v1487 · Marcel 21.09.2026: "das muss nicht kursiv und ganz normal
-       schwarz und auch linksbuendig sein". Nimmt v1483 zurueck - kursiv und
-       mittig las sich wie ein Zitat, der Text ist aber der Wortlaut, den der
-       Notar uebernimmt. */
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(26, 26, 26);
+    /* v1490 · Marcel: "das muss kursiv geschrieben werden, genauso mit
+       'hiermit erklaeren die Vertragsparteien rechtsverbindlich'". Also:
+       kursiv wie ein Zitat, aber LINKSBUENDIG und schwarz - das war der Punkt
+       an v1487, nicht die Schriftlage. */
+    doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(26, 26, 26);
     String(klausel).split('\n').forEach(function (absatz) {
       if (!absatz.trim()) { y += 2.5; return; }
       doc.splitTextToSize(sauber(absatz), CW).forEach(function (z) {
@@ -352,7 +365,7 @@
       doc.setFont('helvetica', 'bold'); doc.setFontSize(8.6); doc.setTextColor(90);
       doc.text(sauber('Moeglicher Zusatz, falls das Finanzamt die Aufteilung hinterfragt'), L, y);
       y += 5.5;
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(26, 26, 26);
+      doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(26, 26, 26);
       String(zusatzTxt).split('\n').forEach(function (absatz) {
         if (!absatz.trim()) { y += 2.2; return; }
         doc.splitTextToSize(sauber(absatz), CW).forEach(function (z) {
