@@ -352,7 +352,18 @@ function _bmfPflichtZeichnen(){
 }
 
 // V289.2: Auto-Berechnen wenn alle Pflichtfelder ausgefüllt
-function _maybeAutoTriggerBmf(){
+/* v1499: ... aber nur, wenn das Ergebnis auch jemand sieht. Vorher lief die
+   Rechnung beim Oeffnen und nach jeder Eingabe - jedes Mal ein LibreOffice-
+   Lauf von rund drei Sekunden, auch wenn der Nutzer nur die
+   Anschaffungskosten eintippen wollte. Gerechnet wird jetzt, wenn ein Reiter
+   das Ergebnis zeigt. `erzwingen` ist der ausdrueckliche Wunsch - etwa beim
+   Wechsel auf Reiter 3 oder 4. */
+function _bmfErgebnisSichtbar(){
+  var aktiv = document.querySelector('.bmfmo-pane.active');
+  return !!aktiv && _BMF_BRAUCHT_ERGEBNIS.indexOf(aktiv.id) >= 0;
+}
+function _maybeAutoTriggerBmf(erzwingen){
+  if (!erzwingen && !_bmfErgebnisSichtbar()) return;
   /* v1382: derselbe Prueter wie fuer Kasten und Knopf. Die alte Liste
      stand hier als Literal und war zu kurz. */
   var fehlt = _bmfPflichtZeichnen();
@@ -442,6 +453,12 @@ function switchPane(id){
   // V289.2.3: Footer-Navigation aktualisieren
   if(typeof _updateFooterNav === 'function') _updateFooterNav(id);
   try { _bmfTabsSperren(); } catch(e) {}   /* v1492 */
+
+  /* v1499: JETZT rechnen - der Reiter zeigt gleich ein Ergebnis. */
+  if (_BMF_BRAUCHT_ERGEBNIS.indexOf(id) >= 0) {
+    try { if (typeof window._v292Pipeline === 'function') window._v292Pipeline(); } catch(e) {}
+    try { _maybeAutoTriggerBmf(true); } catch(e) {}
+  }
 
   // V289.2.5: Pane-spezifische Render-Funktionen
   if(id === 'p-afa' && typeof _renderVergleich === 'function'){
@@ -1007,6 +1024,13 @@ document.addEventListener('input', function(e){
     try{ _dpInjectTreeHk(); }catch(_e){}
     if(_dpPipeT) clearTimeout(_dpPipeT);
     _dpPipeT = setTimeout(function(){
+      /* v1499: die Pipeline fuettert Reiter 3 und 4. Wer im Reiter 1 tippt,
+         loest damit keinen Backend-Lauf mehr aus; die Summenbox rechnet
+         ohnehin lokal mit. */
+      if (typeof _bmfErgebnisSichtbar === 'function' && !_bmfErgebnisSichtbar()) {
+        try{ if(typeof window._v292SofortSumme === 'function') window._v292SofortSumme(); }catch(_e){}
+        return;
+      }
       try{ if(typeof window._v292Pipeline === 'function') window._v292Pipeline(); }catch(_e){}
     }, 400);
   }

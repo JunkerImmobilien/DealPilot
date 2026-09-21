@@ -769,37 +769,86 @@
       var bannerInfo = document.querySelector('#p-ak .banner.info');
       if (bannerInfo) bannerInfo.style.display = 'none';
 
-      var paneAk = document.getElementById('p-ak');
-      var skeleton = document.getElementById('v292_ak_summary');
-      if (paneAk && !skeleton) {
-        skeleton = document.createElement('div');
-        skeleton.id = 'v292_ak_summary';
-        skeleton.className = 'v292-summary-box';
-        skeleton.innerHTML =
-          '<div class="v292-summary-banner v292-compact">' +
-            '⏳ <strong>Pipeline berechnet...</strong> ' +
-            'Werte aus Tab Investition + Inventar-Detail-Box werden zusammengeführt.' +
-          '</div>' +
-          '<div class="v292-summary-grid v292-compact" style="opacity:0.4">' +
-            '<div class="v292-row"><span>Brutto-Kaufpreis</span><span>...</span></div>' +
-            '<div class="v292-row v292-row-minus"><span>− Inventar (Detail-Box)</span><span>...</span></div>' +
-            '<div class="v292-row v292-row-result"><span><b>= Immobilien-KP</b></span><span>...</span></div>' +
-            '<div class="v292-row v292-row-plus"><span>+ Nebenkosten</span><span>...</span></div>' +
-            '<div class="v292-row v292-row-final"><span><b>= Prognose-AK</b></span><span><b>...</b></span></div>' +
-          '</div>';
-        paneAk.insertBefore(skeleton, paneAk.firstChild);
-      }
-
-      // V292 Banner: zeigt dass Pipeline läuft
-      _renderLoading();
-
-      // Ersten Pipeline-Call triggern (direkt, nicht debounced)
-      _doPipelineCall();
+      /* v1499b: hier stand eine Platzhalterbox mit 'Pipeline berechnet...'
+         und Punkten statt Zahlen. Sie ist ersatzlos weg - die Werte stehen
+         sofort zur Verfuegung, es gibt nichts zu ueberbruecken. */
+      /* v1499: Reiter 1 wird sofort aus den Feldern gefuellt. Die Pipeline
+         laeuft NICHT mehr beim Oeffnen - sie fuettert Reiter 3 und 4, und die
+         sind zu, solange keine Pflichtangabe fehlt. Angestossen wird sie beim
+         Wechsel dorthin (switchPane in bmf-modal.js). Vorher standen beim
+         Oeffnen zwei Backend-Rufe von je rund drei Sekunden an, fuer einen
+         Reiter, der sie gar nicht braucht. */
+      try { _v292SofortSumme(); } catch (e) { console.warn('[v1499] Sofortsumme:', e.message); }
 
       // Event-Listener für Live-Berechnung bei Pane 2 GAA-Änderungen
       _attachLivePipelineListeners();
     }, 100);
   };
+
+  /* v1499 · Marcel 21.09.2026: "wenn ich auf BMF-Rechner klicke dauert es
+     extrem lange bis die Anschaffungskosten geladen sind."
+     Gemessen: die Zahlen sind nach 1 ms da - aber der Reiter zeigte ein
+     Skelett mit "Pipeline berechnet..." und Platzhalterpunkten, bis das
+     Backend nach rund drei Sekunden antwortete. Und die Antwort enthaelt
+     NICHTS, was der Browser nicht schon wuesste: Brutto-Kaufpreis, Inventar,
+     Nebenkosten und Prognose-AK stehen alle als Felder im DOM (gegengeprueft
+     an Rinteln: prognose_ak 738.300 = ak_total, nk_aufschluesselung = die
+     vier ak_-Felder). Das Backend hat drei Sekunden lang nachgerechnet, was
+     daneben schon stand.
+     Also: die Box wird SOFORT aus den Feldern gefuellt. Die Pipeline
+     ueberschreibt sie spaeter - und ist damit eine Gegenprobe statt einer
+     Wartezeit. */
+  function _v292SofortSumme(){
+    var paneAk = document.getElementById('p-ak');
+    if (!paneAk) return;
+    function z(id){
+      var el = document.getElementById(id);
+      if (!el) return 0;
+      var s = (el.value || el.textContent || '').toString();
+      s = s.replace(/\./g, '').replace(',', '.').replace(/[^\d.\-]/g, '');
+      var v = parseFloat(s);
+      return isNaN(v) ? 0 : v;
+    }
+    var kp       = z('ak_kp');
+    var inv      = z('inv_kueche') + z('inv_moebel') + z('inv_geraete')
+                 + z('inv_pv') + z('inv_stellplatz') + z('inv_sonst');
+    var grest    = z('ak_grest'), notar = z('ak_notar'), gba = z('ak_gba');
+    var makler   = z('ak_makler'), jiSonst = z('ak_ji');
+    var reise    = z('ak_fahrt') + z('ak_verpfl') + z('ak_hotel');
+    var sonstige = z('ak_gutachten') + z('ak_anwalt') + z('ak_sonst');
+    var nk       = grest + notar + gba + makler + jiSonst + reise + sonstige;
+    var immoKp   = kp - inv;
+    var ak       = immoKp + nk;
+    if (!kp && !nk) return;   /* nichts zu zeigen - dann auch keine leere Box */
+
+    var box = document.getElementById('v292_ak_summary');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'v292_ak_summary';
+      box.className = 'v292-summary-box';
+      paneAk.insertBefore(box, paneAk.firstChild);
+    }
+    box.innerHTML =
+      '<div class="v292-summary-banner v292-compact">' +
+        'Werte aus Tab Investition + Inventar-Detail-Box. Änderungen bitte dort.' +
+      '</div>' +
+      '<div class="v292-summary-grid v292-compact">' +
+        '<div class="v292-row"><span>Brutto-Kaufpreis</span><span>' + _fmtEur(kp) + '</span></div>' +
+        (inv > 0 ? '<div class="v292-row v292-row-minus"><span>− Inventar (Detail-Box)</span><span>' + _fmtEur(inv) + '</span></div>' : '') +
+        '<div class="v292-row v292-row-result"><span><b>= Immobilien-KP</b> <span class="v292-arrow">→ Basis für BMF</span></span><span><b>' + _fmtEur(immoKp) + '</b></span></div>' +
+        '<div class="v292-row v292-row-plus"><span>+ Nebenkosten</span><span>' + _fmtEur(nk) + '</span></div>' +
+        '<div class="v292-nk-detail">' +
+          (grest   > 0 ? '<div>├ Grunderwerbsteuer: <b>' + _fmtEur(grest) + '</b></div>' : '') +
+          (notar   > 0 ? '<div>├ Notar: <b>' + _fmtEur(notar) + '</b></div>' : '') +
+          (gba     > 0 ? '<div>├ Grundbuchamt: <b>' + _fmtEur(gba) + '</b></div>' : '') +
+          (makler  > 0 ? '<div>├ Makler: <b>' + _fmtEur(makler) + '</b></div>' : '') +
+          (reise   > 0 ? '<div>├ Fahrtkosten: <b>' + _fmtEur(reise, 2) + '</b></div>' : '') +
+          (sonstige > 0 ? '<div>└ Gutachten/Anwalt/Sonstiges: <b>' + _fmtEur(sonstige, 2) + '</b></div>' : '') +
+        '</div>' +
+        '<div class="v292-row v292-row-final"><span><b>= Prognose-AK</b> <span class="v292-arrow">→ Basis für AfA</span></span><span class="v292-final-value"><b>' + _fmtEur(ak) + '</b></span></div>' +
+      '</div>';
+  }
+  window._v292SofortSumme = _v292SofortSumme;
 
   function _attachLivePipelineListeners(){
     // Verhindere doppeltes Anhängen
