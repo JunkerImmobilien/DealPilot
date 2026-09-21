@@ -17659,3 +17659,41 @@ Blatt einen Wortlaut, den es amtlich nicht gibt.
 > eingetragene Betraege sind beim naechsten Oeffnen weg. Vorher fiel es nicht
 > auf, weil immer etwas dastand — die falsche Zahl hat den fehlenden Speicher
 > verdeckt.
+
+## Rollout-Journal · 21.09.2026 (9) — BMF-Rechner durchgegangen
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1498 | `7003b7e` | Ergebnisspeicher in `bmfService.calculateKpa` (120 s, Schluessel = Hash ueber alle Eingaben plus Datei-Optionen). **Loest das Ladeproblem NICHT** — siehe Ruecknahme unten —, spart aber den doppelten LibreOffice-Lauf, wenn wirklich zweimal dasselbe gefragt wird (etwa Rechnung und PDF kurz nacheinander) |
+| v1499 | `9563451` | **Reiter 1 sofort statt drei Sekunden Wartezeit.** Gemessen: beim Oeffnen liefen `bmf/pipeline` (3.396 ms) und `bmf/aufteilung` (2.862 ms), und Reiter 1 zeigte solange ein Skelett mit „Pipeline berechnet…" und Punkten statt Zahlen. Die Antwort enthielt **nichts, was der Browser nicht schon wusste**: `prognose_ak` 738.300 = `ak_total`, `nk_aufschluesselung` = die vier `ak_`-Felder. Jetzt fuellt `_v292SofortSumme()` die Box aus den Feldern; die Pipeline laeuft beim **Wechsel auf Reiter 3 oder 4**, nicht beim Oeffnen und nicht bei jeder Eingabe. Gemessen danach: **kein einziger Backend-Ruf beim Oeffnen** |
+| v1500 | `983e205` | Bodenabschlag als Raster statt `flex/flex-end` — die RND-Spalte war wegen Knopf und Infozeile 143 px hoch gegen 60 px der Nachbarn und begann 83 px weiter oben. Jetzt drei Spalten, gemeinsame Oberkante, Knopf darunter. Der Abschlag ist eine **Auswahl mit genau vier Stufen** (0 / 15 / 20 / 25 %). Die goldenen AUTO- und Paragraphen-Pillen von 21 px auf 16 bzw. 14 px |
+| v1501 / v1502 | `4e588fa`, `f0f3fe8` | **Die Restnutzungsdauer wurde aus Vorbelegungen geraten.** Alle acht Modernisierungsfelder standen auf „nein" — das ist die Vorbelegung der Liste, nicht die Aussage „nichts wurde gemacht". Daraus wurde „alles veraltet" und **18 Jahre**; mit drei bewerteten Gewerken sind es **35 Jahre**. Ebenso fiel die Gesamtnutzungsdauer still auf 80 zurueck. Jetzt: fehlt die Objektart oder ist kein Gewerk bewertet, oeffnet sich **derselbe Wizard wie im Reiter Steuer** und sein Ergebnis kommt in die Felder zurueck. Vorbefuellung und Umrechnung gibt `deal-action` heraus statt einer zweiten Liste |
+| v1503 | `a0ea2fd` | **Vorbefuellung des Wizards repariert.** `ds2_energie`/`ds2_zustand` kamen als „– keine Angabe" und „– bitte waehlen" an: beide sind LEERE Auswahllisten, `el.value` ist `''`, und der Rueckfall auf `el.textContent` liest den Text ALLER Optionen. Strasse, PLZ, Ort und E-Mail des Auftraggebers blieben leer, weil nach `user_str`/`user_plz`/`user_ort` gesucht wurde — gespeichert sind sie als `pdf_address`/`pdf_plz`/`pdf_city`. Zweite Quelle ist jetzt das Branding |
+
+**Nachweis (gemessen im Browser):** Oeffnen ohne Backend-Ruf, Summenbox
+sofort gefuellt · Wechsel auf Reiter 3 loest `bmf/aufteilung` und
+`bmf/pipeline` aus, 13 Ergebnisse, vier Varianten · Bodenabschlag: drei
+Felder, eine Oberkante (371 px), Auswahl mit vier Stufen · RND-Knopf ohne
+Angaben → Wizard offen; mit drei bewerteten Gewerken → 35–36 Jahre samt
+Herkunft · Vorbefuellung: Name, E-Mail, Strasse, PLZ, Ort gefuellt,
+Platzhaltertexte weg.
+
+> **Eine Diagnose ausdruecklich zurueckgenommen.** Ich hatte gemeldet, die
+> beiden Backend-Rufe rechneten „dieselbe Arbeitshilfe doppelt", weil
+> `bmf/pipeline` intern `calculateKpa` ruft. **Das stimmt nicht:** die
+> Pipeline rechnet mit `phase3.prognose_ak` als Kaufpreis, die Route
+> `/aufteilung` mit dem Kaufpreis aus dem Modal. Zwei verschiedene Rechnungen,
+> kein Duplikat — der Speicher aus v1498 konnte dort also gar nicht greifen,
+> und die Messung hat das auch gezeigt (2.862 ms beim zweiten Ruf).
+
+> **Und eine Messfalle, die fast zu einer falschen Zahl gefuehrt haette:**
+> der Chrome-Tab lief im Hintergrund. Dort **drosselt Chrome jeden Timer auf
+> rund eine Sekunde** — meine erste Ladezeitmessung ergab dadurch exakt
+> 1006 ms fuer etwas, das synchron 0 ms braucht, und die Netzrufe standen
+> scheinbar im Sekundenabstand. `document.visibilityState` gehoert vor jede
+> Zeitmessung; ein Screenshot holt den Tab NICHT in den Vordergrund.
+
+**Zwischen den beiden Investment-PDFs wird nicht umgeschaltet, es sind zwei
+Knoepfe** — in der Aktionsleiste rechts stehen „Investment-PDF · Bank"
+(neue Bankfassung, `exportPDFBank`) und „Investment-PDF" (die alte,
+`exportPDF`) direkt untereinander.
