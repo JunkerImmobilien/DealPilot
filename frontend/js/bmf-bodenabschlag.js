@@ -178,9 +178,12 @@
     host.innerHTML =
       '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted,#8A8272);margin-bottom:6px">Text für den Kaufvertrag</div>' +
       '<textarea id="bmf-boden-klausel-text" readonly style="width:100%;min-height:150px;padding:10px 12px;border:1px solid #E6E0D3;border-radius:8px;font:12.5px/1.6 Inter,sans-serif;background:#FBFAF7;color:#2A2727"></textarea>' +
-      '<div style="margin-top:6px"><button type="button" class="btn btn-outline btn-sm" id="bmf-boden-copy">Text kopieren</button>' +
+      '<div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn btn-outline btn-sm" id="bmf-boden-copy">Text kopieren</button>'
+      + '<button type="button" class="btn btn-sm" id="bmf-boden-pdf" style="background:#2A2727;color:#fff;border:none">Kaufpreisaufteilung als PDF</button>' +
       (grund ? '' : '<span class="cf-hint" style="margin-left:10px">Ohne Begründung bleibt der Abschlag angreifbar — sie gehört in den Text.</span>') + '</div>';
     el('bmf-boden-klausel-text').value = txt;
+    var pdfKnopf = el('bmf-boden-pdf');
+    if (pdfKnopf) pdfKnopf.onclick = function () { if (typeof window.exportPDFKaufpreisaufteilung === 'function') window.exportPDFKaufpreisaufteilung(); };
     el('bmf-boden-copy').onclick = function () {
       try { navigator.clipboard.writeText(txt); if (typeof window.toast === 'function') window.toast('✓ Text kopiert'); } catch (e) {}
     };
@@ -243,38 +246,10 @@
     })();
   })();
 
-  /* v1473 · BEFUND, der schwerer wiegt als der Reiter selbst:
-     In bmf-modal-v292.js steht die Grundstuecksart der Pipeline FEST
-     verdrahtet — objart_bmf: 'Wohnungseigentum [WE]'. Die Reiter 3 und 4
-     (AfA-Vorschau, AfA-Hebel samt Vertragstext) rechnen deshalb bei JEDEM
-     Objekt als waere es eine Eigentumswohnung. Gemessen am Mehrfamilienhaus
-     Rinteln: Pipeline 81,54 % Gebaeude gegen 80,59 % der amtlichen Rechnung,
-     Ertragswert 647.019 gegen 615.123 EUR.
-     Die Datei steht unter "Nicht anfassen" (CLAUDE.md) — deshalb wird die
-     Sammelfunktion hier UMHUELLT statt geaendert. Die Art kommt jetzt aus
-     dem Feld #bmf_art, der bisherige Wert bleibt der Rueckfall. */
-  (function () {
-    var n4 = 0;
-    (function wickeln() {
-      var f = window._v292CollectInputs;
-      if (typeof f === 'function' && !f._dpArt) {
-        var neu = function () {
-          var i = f.apply(this, arguments);
-          try {
-            var a = document.getElementById('bmf_art');
-            if (a && a.value && i && i.phase1_inputs && i.phase1_inputs.objekt) {
-              i.phase1_inputs.objekt.objart_bmf = a.value;
-            }
-          } catch (e) {}
-          return i;
-        };
-        for (var k in f) { if (Object.prototype.hasOwnProperty.call(f, k)) neu[k] = f[k]; }
-        neu._dpArt = true; window._v292CollectInputs = neu;
-        return;
-      }
-      if (++n4 < 120) setTimeout(wickeln, 700);
-    })();
-  })();
+  /* v1474 · Die Umhuellung von _v292CollectInputs ist entfallen: die
+     Grundstuecksart wird jetzt an der QUELLE gelesen (bmf-modal-v292.js,
+     v1474, Freigabe Marcel 21.09.2026). Zwei Stellen fuer dieselbe Regel
+     waeren eine Falle fuer den naechsten Leser. */
 
   window.DpBmfBodenabschlag = { rechnen: rechnen, einhaengen: einhaengen, _basis: basis };
 })();

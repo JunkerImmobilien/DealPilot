@@ -114,7 +114,15 @@
       ort:        _v('ort'),
       str:        _v('str'),
       hnr:        _v('hnr'),
-      objart_bmf: 'Wohnungseigentum [WE]',
+      /* v1474 · Hier stand 'Wohnungseigentum [WE]' FEST verdrahtet. Die
+         Pipeline rechnete damit jedes Objekt als Eigentumswohnung — auch ein
+         Mietwohngrundstueck. Gemessen am MFH Rinteln (21.09.2026): 81,54 %
+         Gebaeudeanteil statt 80,59 %, Ertragswert 647.019 statt 615.123 EUR.
+         Betroffen waren Reiter 3 und 4 inklusive des VERTRAGSTEXTES, waehrend
+         Reiter 2 (amtlicher Lauf) richtig rechnete — zwei Aufteilungen im
+         selben Fenster. Die Art kommt jetzt aus der Auswahl; der alte Wert
+         bleibt nur noch Rueckfall, wenn das Feld fehlt. */
+      objart_bmf: (_v('bmf_art') || 'Wohnungseigentum [WE]'),
       /* V293d-pane2-bevorzugt: Pane-2-Felder (bmf_*) BEVORZUGT vor Tab-Quellen.
        * Grund: Listener haengen auf bmf_* — Aenderung dort muss in die Berechnung.
        * Fallback auf Tab-Quelle, falls Pane-2-Feld leer. */
