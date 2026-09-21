@@ -186,6 +186,30 @@
     };
   }
 
+  /* ── Start: das Modal wird erst beim Oeffnen nachgeladen ───────────
+     v1471b: eine begrenzte Warteschleife lief ab, bevor der Nutzer das
+     Fenster ueberhaupt geoeffnet hatte — dann fehlte der Reiter. Jetzt
+     haengt der Einbau am Oeffnen selbst und zusaetzlich an einem Beobachter. */
+  (function () {
+    var alt = window.openBMFModal;
+    function wickeln() {
+      if (typeof window.openBMFModal !== 'function' || window.openBMFModal._dpBoden) return false;
+      var o = window.openBMFModal;
+      var neu = function () { var r = o.apply(this, arguments); setTimeout(function () { if (einhaengen()) rechnen(); }, 600); return r; };
+      for (var k in o) { if (Object.prototype.hasOwnProperty.call(o, k)) neu[k] = o[k]; }
+      neu._dpBoden = true; window.openBMFModal = neu; return true;
+    }
+    var n2 = 0;
+    (function warten() { if (!wickeln() && ++n2 < 60) setTimeout(warten, 500); })();
+    try {
+      new MutationObserver(function () {
+        if (document.querySelector('.bmfmo-tab') && !document.getElementById('bmf-boden-tab')) {
+          if (einhaengen()) rechnen();
+        }
+      }).observe(document.body, { childList: true, subtree: true });
+    } catch (e) {}
+  })();
+
   /* ── Start: warten, bis das Modal im DOM ist ──────────────────────── */
   var n = 0;
   function start() {
