@@ -142,6 +142,38 @@ function syncFromTabInvest(){
   // Vorher: Felder behielten HTML-Defaults (96,2 etc.) oder KI-Werte (brw 160)
   // wenn der Tab-Objekt-Wert 0 war. Jetzt: IMMER aus Tab Objekt setzen,
   // bei 0 leeren statt Default/KI-Wert behalten.
+  /* v1488 · gemessen am 21.09.2026 an Rinteln (objart = MFH, 8 Einheiten):
+     #bmf_art stand auf "Wohnungseigentum [WE]" - der ersten Option der Liste.
+     Die Grundstuecksart wurde NIRGENDS aus dem Objekt gesetzt, sie blieb
+     schlicht stehen. In der amtlichen Arbeitshilfe haengen daran die
+     typisierten Herstellungskosten, die Bewirtschaftungskosten und die
+     Miteigentumsrechnung - ein Mehrfamilienhaus als Eigentumswohnung
+     gerechnet ergibt eine falsche Aufteilung, und nichts widerspricht.
+     Die Liste der Arbeitshilfe kennt sieben Arten; abgebildet wird auf den
+     Wortlaut der Vorlage, denn die Zelle ist dort eine Auswahlliste. */
+  var _BMF_ART = {
+    ETW:   'Wohnungseigentum [WE]',
+    MFH:   'Mietwohngrundstücke (Mehrfamilienhäuser)',
+    EFH:   'Ein- und Zweifamilienhäuser [EFH/ZFH]',
+    ZFH:   'Ein- und Zweifamilienhäuser [EFH/ZFH]',
+    DHH:   'Ein- und Zweifamilienhäuser [EFH/ZFH]',
+    RH:    'Ein- und Zweifamilienhäuser [EFH/ZFH]',
+    BUERO: 'Geschäftsgrundstücke, Bürogebäude',
+    GESCH: 'Geschäftsgrundstücke, Geschäftshäuser',
+    GEW:   'Geschäftsgrundstücke, Geschäftshäuser',
+  };
+  (function () {
+    var sel = $('bmf_art'); if (!sel) return;
+    var art = _BMF_ART[String(_val('objart') || '').toUpperCase()];
+    if (!art) return;                       /* HOTEL, GAR, leer: nicht raten */
+    var kennt = false;
+    for (var i = 0; i < sel.options.length; i++) if (sel.options[i].value === art) kennt = true;
+    if (!kennt) return;
+    if (sel.value === art) return;
+    sel.value = art;
+    try { sel.dispatchEvent(new Event('change', { bubbles: true })); } catch (_) {}
+  })();
+
   _setField('bmf_bj', _val('baujahr'), true);
   _setField('bmf_datum', _val('kaufdat'), true);
   // Wohnfläche mit Komma-Format — IMMER setzen (auch leeren bei 0)
