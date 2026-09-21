@@ -272,8 +272,18 @@
       var inputs = window._lastBmfInputs;
       if (!inputs) { if (window.toast) window.toast('Zuerst die amtliche Berechnung starten'); return; }
       ahKnopf.disabled = true; var alt = ahKnopf.textContent; ahKnopf.textContent = 'Arbeitshilfe wird erzeugt ...';
-      var kopf = { 'Content-Type': 'application/json' };
-      try { var t = localStorage.getItem('dp_token') || localStorage.getItem('token'); if (t) kopf.Authorization = 'Bearer ' + t; } catch (e) {}
+      /* v1484b · gemessen: der Token liegt unter ji_token/auth_token bzw. kommt
+         aus Sub.getToken() - nicht unter dp_token. Dieselbe Funktion nehmen wie
+         das Modal selbst, sonst antwortet der Server mit 401. */
+      var kopf = (typeof window._authHeaders === 'function')
+        ? window._authHeaders()
+        : (function () {
+            var h = { 'Content-Type': 'application/json' };
+            var t = (window.Sub && typeof Sub.getToken === 'function') ? Sub.getToken()
+              : (localStorage.getItem('ji_token') || localStorage.getItem('auth_token') || localStorage.getItem('token'));
+            if (t) h.Authorization = 'Bearer ' + t;
+            return h;
+          })();
       fetch('/api/v1/bmf/aufteilung', { method: 'POST', headers: kopf, body: JSON.stringify({ inputs: inputs, include_pdf: true }) })
         .then(function (r) { return r.json(); })
         .then(function (d) {
