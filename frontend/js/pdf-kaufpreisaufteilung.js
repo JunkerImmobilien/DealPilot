@@ -244,7 +244,7 @@
     y += 1;
     zeile('davon in der amtlichen Aufteilung angesetzt', eur(akBmf, 2), { fett: true });
     if (nkAussen > 0.005) zeile('nicht angesetzt (Fahrt, Gutachten, Anwalt, Reise, Sonstiges)', eur(nkAussen, 2), { einzug: true, klein: true });
-    einleitung('Die Arbeitshilfe teilt die Anschaffungskosten einschliesslich Nebenkosten auf; die Nebenkosten folgen demselben Verhaeltnis wie der Kaufpreis. Die Arbeitshilfe bekommt Kaufpreis, Grunderwerbsteuer, Notar, Grundbuch, Makler und Vermittlung. Weitere Positionen sind Anschaffungsnebenkosten, gehen hier aber nicht in die Quote ein - sie teilen sich im selben Verhaeltnis und erhoehen die Bemessungsgrundlage entsprechend.');
+    einleitung('Die Arbeitshilfe teilt die Anschaffungskosten einschliesslich Nebenkosten auf; die Nebenkosten folgen demselben Verhaeltnis wie der Kaufpreis. Angesetzt sind alle Anschaffungsnebenkosten des Erwerbs: Grunderwerbsteuer, Notar, Grundbuch, Makler und Vermittlung ebenso wie Fahrten zur Besichtigung und zum Notartermin, ein Wertgutachten zur Kaufentscheidung sowie Rechtsberatung des Erwerbs (BFH VIII R 195/77; BFH IX R 20/08). Kosten, die erst die Abschreibung ermitteln, stehen gesondert und sind sofort abziehbar.');
 
     /* ── Herleitung der amtlichen Aufteilung ─────────────────────── */
     platz(80, 'Kaufpreisaufteilung', 'Herleitung nach der amtlichen Arbeitshilfe');
