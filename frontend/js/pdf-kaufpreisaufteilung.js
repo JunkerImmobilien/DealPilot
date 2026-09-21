@@ -117,6 +117,16 @@
       doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(110); doc.text(sauber(unter || ''), L, y);
       y += 10;
     }
+    /* v1487 · Marcel 21.09.2026: "das waere cool, wenn wir das auf ein neues
+       Blatt separieren ... bei der Ueberschrift dann Kaufpreisaufteilung fuer
+       den Notarvertrag". Der amtliche Teil und der angepasste Teil sind zwei
+       Dokumente in einem: das erste belegt die Herleitung, das zweite geht zum
+       Notar. platz() wechselt nur, wenn der Platz knapp wird - hier soll IMMER
+       gewechselt werden. */
+    function neueSeite(titel, unter) {
+      _titel = titel; _unter = unter || '';
+      doc.addPage(); kopf(_titel, _unter);
+    }
     function platz(bedarf, titel, unter) {
       if (titel) { _titel = titel; _unter = unter || ''; }
       if (y + bedarf > H - 24) { doc.addPage(); kopf(_titel, _unter); return true; }
@@ -271,7 +281,7 @@
     zeile('Anschaffungskosten × Bodenanteil', eur(kpGrund, 2), { fett: true });
 
     /* ── Aufteilung mit Abschlag ─────────────────────────────────── */
-    platz(90, 'Kaufpreisaufteilung', 'Angepasste Aufteilung mit Abschlag auf den Grund und Boden');
+    neueSeite('Kaufpreisaufteilung fuer den Notarvertrag', 'Angepasste Aufteilung mit Abschlag auf den Grund und Boden');
     abschnitt('Angepasste Kaufpreisaufteilung - amtlich gegen ' + pct(abschlag, 0) + ' Abschlag');
     einleitung('Die Arbeitshilfe bindet das Finanzgericht nicht (BFH, Urteil vom 21.07.2020, IX R 26/19). Eine niedrigere Bodenkomponente ist ansetzbar, wenn sie begruendet ist' + (grundBegr ? ' - hier: ' + grundBegr : '') + '.');
     function zv(label, a, n, fmt, fett) {
@@ -336,37 +346,38 @@
     }
 
     /* ── Vertragstext ────────────────────────────────────────────── */
-    platz(70, 'Kaufpreisaufteilung', 'Formulierung für den Kaufvertrag');
+    platz(70);
     abschnitt('Text für den Kaufvertrag');
     var klausel = (el('bmf-boden-klausel-text') && el('bmf-boden-klausel-text').value) || '';
     if (!klausel) {
       klausel = 'Die Vertragsparteien teilen den Gesamtkaufpreis in Höhe von ' + eur(kp, 2) + ' für das Objekt ' + (adr || '[Objektadresse]') + ' wie folgt auf: auf den Grund und Boden entfallen ' + eur(bodenNeu, 2) + ', auf das Gebäude entfallen ' + eur(gebNeu, 2) + '.';
     }
-    /* v1483 · Marcel: "kursiv machen und mittig zentrieren". Der Text soll sich
-       vom Rechenteil absetzen - er geht woertlich in die Urkunde. */
-    var TW = CW - 20;
-    doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(45);
+    /* v1487 · Marcel 21.09.2026: "das muss nicht kursiv und ganz normal
+       schwarz und auch linksbuendig sein". Nimmt v1483 zurueck - kursiv und
+       mittig las sich wie ein Zitat, der Text ist aber der Wortlaut, den der
+       Notar uebernimmt. */
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(26, 26, 26);
     String(klausel).split('\n').forEach(function (absatz) {
       if (!absatz.trim()) { y += 2.5; return; }
-      doc.splitTextToSize(sauber(absatz), TW).forEach(function (z) {
+      doc.splitTextToSize(sauber(absatz), CW).forEach(function (z) {
         if (y > H - 22) { doc.addPage(); kopf(_titel, _unter); }
-        doc.text(z, W / 2, y, { align: 'center' }); y += 4.8;
+        doc.text(z, L, y); y += 4.8;
       });
     });
-    y += 4;
+    y += 5;
     /* Der Zusatz steht NUR hier - als moeglicher Anhang zum Vertragstext. */
     var zusatzTxt = (window._dpKpaTexte && window._dpKpaTexte.zusatz) || '';
     if (zusatzTxt) {
       if (y > H - 46) { doc.addPage(); kopf(_titel, _unter); }
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(8.2); doc.setTextColor(110);
-      doc.text(sauber('Moeglicher Zusatz, falls das Finanzamt die Aufteilung hinterfragt'), W / 2, y, { align: 'center' });
-      y += 6;
-      doc.setFont('helvetica', 'italic'); doc.setFontSize(8.6); doc.setTextColor(60);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8.6); doc.setTextColor(90);
+      doc.text(sauber('Moeglicher Zusatz, falls das Finanzamt die Aufteilung hinterfragt'), L, y);
+      y += 5.5;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(26, 26, 26);
       String(zusatzTxt).split('\n').forEach(function (absatz) {
         if (!absatz.trim()) { y += 2.2; return; }
-        doc.splitTextToSize(sauber(absatz), TW).forEach(function (z) {
+        doc.splitTextToSize(sauber(absatz), CW).forEach(function (z) {
           if (y > H - 22) { doc.addPage(); kopf(_titel, _unter); }
-          doc.text(z, W / 2, y, { align: 'center' }); y += 4.5;
+          doc.text(z, L, y); y += 4.8;
         });
       });
       y += 6;

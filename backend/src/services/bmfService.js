@@ -224,6 +224,51 @@ function recalcWithLibreOffice(xlsxPath) {
    --convert-to pdf. Die ausgefuellte Arbeitshilfe wird damit zum Beleg, den
    man dem Finanzamt beilegen kann. Faellt die Umwandlung aus, bleibt es beim
    XLSX - die Berechnung selbst haengt nicht daran. */
+/* v1486 · Marcel 21.09.2026: "bei der bmf arbeitshilfe ist die formatierung
+   falsch. auch sollte man querformat nehmen und auch nur bis zur
+   Kaufpreisaufteilung abbilden. die ersten 2 seiten".
+   Gemessen am erzeugten PDF: sechs Seiten hoch, weil LibreOffice ALLE NEUN
+   Blaetter der Arbeitshilfe ausgibt (KPA, Fiktives Baujahr, Verweise, AfA,
+   THK, SW-NHK, SW-Bau-Index, EW-BWK, EW-Bewertungsparameter). Die eigentliche
+   Kaufpreisaufteilung steht allein auf dem Blatt KPA und endet dort in
+   Zeile 122 ("Summe"). Also: fuer den Druck eine KOPIE anlegen, darin alle
+   anderen Blaetter verstecken (versteckte Blaetter druckt LibreOffice nicht),
+   das Blatt KPA auf Querformat und auf Seitenbreite ziehen - der Vorlage
+   eigener Festwert scale 59 wuerde sonst dagegenhalten.
+   Die Kopie wird nur gedruckt; gerechnet und heruntergeladen wird weiter die
+   unveraenderte Arbeitshilfe. */
+const DRUCK_BLATT = 'KPA';
+const DRUCK_BEREICH = 'C1:M122';
+
+async function druckfassung(xlsxPath) {
+  const ziel = xlsxPath.replace(/\.xlsx$/i, '') + '_druck.xlsx';
+  const wb = new ExcelJS.Workbook();
+  await wb.xlsx.readFile(xlsxPath);
+  let gefunden = false;
+  wb.eachSheet((ws) => {
+    if (ws.name === DRUCK_BLATT) {
+      gefunden = true;
+      ws.state = 'visible';
+      ws.pageSetup = Object.assign({}, ws.pageSetup, {
+        orientation: 'landscape',
+        fitToPage: true,
+        fitToWidth: 1,
+        fitToHeight: 0,
+        scale: undefined,
+        printArea: DRUCK_BEREICH,
+        horizontalCentered: true,
+        verticalCentered: false,
+        margins: { left: 0.3, right: 0.3, top: 0.4, bottom: 0.4, header: 0.2, footer: 0.2 },
+      });
+    } else {
+      ws.state = 'hidden';
+    }
+  });
+  if (!gefunden) return xlsxPath;   // Blatt umbenannt? Dann lieber alles drucken.
+  await wb.xlsx.writeFile(ziel);
+  return ziel;
+}
+
 function convertToPdf(xlsxPath) {
   return new Promise((resolve) => {
     const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bmf-pdf-'));
@@ -231,7 +276,11 @@ function convertToPdf(xlsxPath) {
     const args = [
       '--headless', '--norestore', '--nologo', '--nofirststartwizard',
       `-env:UserInstallation=file://${profileDir}`,
-      '--calc', '--convert-to', 'pdf:calc_pdf_Export',
+      '--calc', '--convert-to',
+      /* zusaetzlich hart auf die ersten zwei Seiten begrenzt - falls eine
+         kuenftige Fassung der Vorlage doch laenger laeuft. JSON-Filteroptionen
+         kann LibreOffice ab 7.4 (im Container laeuft 7.4.7.2). */
+      'pdf:calc_pdf_Export:{"PageRange":{"type":"string","value":"1-2"}}',
       '--outdir', outDir, xlsxPath,
     ];
     const proc = spawn(LIBREOFFICE_BIN, args, { stdio: ['ignore', 'pipe', 'pipe'] });
@@ -362,7 +411,17 @@ async function calculateKpa(inputs, opts = {}) {
   // 5b) Arbeitshilfe zusaetzlich als PDF (v1484, nur auf Anforderung)
   let pdfBase64 = null;
   if (opts.includePdf) {
-    try { pdfBase64 = await convertToPdf(workPath); } catch (_) { pdfBase64 = null; }
+    let druckPfad = null;
+    try {
+      druckPfad = await druckfassung(workPath);
+      pdfBase64 = await convertToPdf(druckPfad);
+    } catch (_) {
+      pdfBase64 = null;
+    } finally {
+      if (druckPfad && druckPfad !== workPath) {
+        try { fs.rmSync(druckPfad, { force: true }); } catch (_) {}
+      }
+    }
   }
 
   // 6) Cleanup
