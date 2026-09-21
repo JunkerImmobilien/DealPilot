@@ -17547,3 +17547,20 @@ PDF vier Seiten, keine Umlaute, keine Ueberlappung, heruntergeladen und gegengel
 
 **Preise laut junker-immobilien.io:** Kaufpreisaufteilung 549 EUR Festpreis,
 Restnutzungsdauergutachten ab 951 EUR, Wertgutachten ab 499 EUR, Schadensgutachten ab 399 EUR.
+
+## Rollout-Journal · 21.09.2026 (5) — Dokument ueberarbeitet, Arbeitshilfe als PDF
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1483 | `29bee30` | Absender: nur noch EINE Adresse. Gemessen: branding.get() liefert name = "info@junker-immobilien.io" (im Feld Name steht eine Adresse) und email = "info@dealpilot.immo" — beide standen untereinander. Der Name wird jetzt nur gedruckt, wenn er keine Adresse ist. Ueberschriften in normaler Schreibweise statt Versalien. Abschnitt heisst „Angepasste Kaufpreisaufteilung". Vertragstext kursiv und zentriert, der Zusatz steht direkt darunter und nur noch EINMAL. Dateiname ohne Umlaute |
+| v1484 / b | `29bee30`, `8a740d1` | **BMF-Arbeitshilfe als PDF**: derselbe LibreOffice-Weg wie der Recalc, nur `--convert-to pdf`. Backend `include_pdf`, Knopf im Reiter. Der Token liegt unter ji_token/auth_token bzw. Sub.getToken() — nicht dp_token (401 behoben) |
+| v1485 | `22d3800` | der Reiter zeichnet sich nach `runBmf()` selbst neu; vorher stand dort weiter „zuerst die amtliche Berechnung starten" |
+
+**Nachweis:** Kaufpreisaufteilung vier Seiten, null Umlaute, genau eine E-Mail-Adresse, Zusatz
+einmal, Ueberschriften normal. Arbeitshilfe als PDF sechs Seiten, 86 KB, ueber den Knopf
+heruntergeladen und auf der Platte geprueft.
+
+**Steuerliche Einordnung recherchiert und belegt** (siehe Rollout 21.09. (4)): Fahrten zum
+konkreten Objekt und zum Notartermin sowie ein Wertgutachten nach gefasster Erwerbsentscheidung
+sind Anschaffungsnebenkosten und teilen sich mit auf; Honorar fuer Kaufpreisaufteilung und
+Restnutzungsdauergutachten sind sofort abziehbar. Preis laut junker-immobilien.io: 549 EUR.
