@@ -281,7 +281,7 @@
     y += 1;
     zeile('davon in der amtlichen Aufteilung angesetzt', eur(akBmf, 2), { fett: true });
     if (nkAussen > 0.005) zeile('nicht angesetzt (Fahrt, Gutachten, Anwalt, Reise, Sonstiges)', eur(nkAussen, 2), { einzug: true, klein: true });
-    einleitung('Die Arbeitshilfe teilt die Anschaffungskosten einschliesslich Nebenkosten auf; die Nebenkosten folgen demselben Verhaeltnis wie der Kaufpreis. Angesetzt sind alle Anschaffungsnebenkosten des Erwerbs: Grunderwerbsteuer, Notar, Grundbuch, Makler und Vermittlung ebenso wie Fahrten zur Besichtigung und zum Notartermin, ein Wertgutachten zur Kaufentscheidung sowie Rechtsberatung des Erwerbs (BFH VIII R 195/77; BFH IX R 20/08). Kosten, die erst die Abschreibung ermitteln, stehen gesondert und sind sofort abziehbar.');
+    einleitung('Die Arbeitshilfe teilt die Anschaffungskosten einschließlich Nebenkosten auf; die Nebenkosten folgen demselben Verhältnis wie der Kaufpreis. Angesetzt sind alle Anschaffungsnebenkosten des Erwerbs: Grunderwerbsteuer, Notar, Grundbuch, Makler und Vermittlung ebenso wie Fahrten zur Besichtigung und zum Notartermin, ein Wertgutachten zur Kaufentscheidung sowie Rechtsberatung des Erwerbs (BFH VIII R 195/77; BFH IX R 20/08). Kosten, die erst die Abschreibung ermitteln, stehen gesondert und sind sofort abziehbar.');
 
     /* ── Herleitung der amtlichen Aufteilung ─────────────────────── */
     platz(80, 'Kaufpreisaufteilung', 'Herleitung nach der amtlichen Arbeitshilfe');
@@ -318,7 +318,7 @@
         (nkAussen > 0.005 ? zv('zuzüglich weiterer Nebenkosten (Gebäudeanteil)', nkAussen * gebPct / 100, nkAussen * gebPctNeu / 100) : null)
       ].filter(Boolean).concat([
       ]),
-      'Der Kaufpreis bleibt gleich; der Abschlag verschiebt nur, was auf den Boden entfaellt. Ohne tragfaehige Begruendung setzt das Finanzamt die Aufteilung der Arbeitshilfe an.');
+      'Der Kaufpreis bleibt gleich; der Abschlag verschiebt nur, was auf den Boden entfällt. Ohne tragfähige Begründung setzt das Finanzamt die Aufteilung der Arbeitshilfe an.');
 
     /* ── AfA ─────────────────────────────────────────────────────── */
     var rnd = null;
@@ -410,7 +410,7 @@
     doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(60);
     [
       'Die amtliche Aufteilung stammt aus der Arbeitshilfe des Bundesfinanzministeriums (Berechnungsblatt), ausgefuehrt mit den oben genannten Angaben.',
-      'Der Abschlag auf den Grund und Boden ist ein Szenario daneben und ersetzt die Arbeitshilfe nicht. Er braucht eine Begruendung, die zum Grundstueck passt, und ist im Zweifel nachzuweisen.',
+      'Der Abschlag auf den Grund und Boden ist ein Szenario daneben und ersetzt die Arbeitshilfe nicht. Er braucht eine Begründung, die zum Grundstück passt, und ist im Zweifel nachzuweisen.',
       'Dieses Dokument ist eine Aufbereitung der Berechnung und keine Steuerberatung. Die Feststellung trifft das Finanzamt.'
     ].forEach(function (t) {
       doc.splitTextToSize(sauber(t), CW).forEach(function (z) {
