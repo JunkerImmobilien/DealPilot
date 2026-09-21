@@ -982,7 +982,10 @@
         y += hoehe;
       });
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
-      doc.text('Grün ab 1,2 · Gelb 1,0 bis 1,2 · Rot unter 1,0. Der golden umrandete Wert ist der heutige Stand.', L, y + 2);
+      /* v1470b: die Matrix rechnet seit v1465 auf dem ersten VOLLEN Jahr -
+         der Ausgangswert kann daher leicht vom DSCR von heute abweichen
+         (gemessen 0,85 gegen 0,84). Das steht jetzt dabei. */
+      doc.text('Grün ab 1,2 · Gelb 1,0 bis 1,2 · Rot unter 1,0. Der golden umrandete Wert ist der Ausgangsfall, gerechnet auf dem ersten vollen Jahr.', L, y + 2);
       y += 8;
     }
 
