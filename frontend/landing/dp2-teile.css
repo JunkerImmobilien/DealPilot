@@ -102,7 +102,18 @@
 .trust b{display:block;font-size:13.4px;font-weight:600;color:var(--ink)}
 .trust span{display:block;font-size:11.6px;color:var(--mut);margin-top:1px}
 
-/* ══ Tarife ═════════════════════════════════════════════════════════════ */
+/* ══ Tarife ═══════════════════════════════════════════════════════════
+   v1551 · Marcel: "Die Preispakete haette ich gerne so, wie wir sie von
+   meiner normalen Page angegeben hatten - da fand ich sie cooler."
+
+   Also das Ticket-Design der bisherigen Landing, unveraendert per Skript
+   herauskopiert: goldener Kopf mit Sternen und Bestseller-Plakette,
+   weisser Koerper, gerahmte Kerosin-Zeile, gestrichelte Abrisskante.
+   Mein eigener, flacherer Entwurf ist dafuer entfallen - zwei
+   Tarif-Stile nebeneinander haetten sich nur gegenseitig ueberschrieben.
+
+   Die Umschalter (.pseg/.seg) bleiben meine, sie gehoeren zur Seite.
+   ═══════════════════════════════════════════════════════════════════ */
 .pseg{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
 .seg{display:inline-flex;background:rgba(255,255,255,.05);border:1px solid var(--line);padding:4px}
 .seg button{border:0;background:none;padding:10px 20px;cursor:pointer;
@@ -112,36 +123,49 @@
   padding:3px 6px;margin-left:7px;border-radius:20px}
 .seg button.on .spar{background:var(--stub);color:var(--grnh)}
 .pseg-sub{text-align:center;color:var(--mdk);font-size:14.5px;margin:0 0 34px}
-.tkg{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:start}
-.tk-c{background:#fff;color:var(--ink);position:relative;display:flex;flex-direction:column;
-  border:1px solid rgba(255,255,255,.1);transition:transform .3s var(--e-weich)}
-.tk-c:hover{transform:translateY(-4px)}
-.tk-c.best{outline:2px solid var(--gd);outline-offset:-2px}
-.tk-top{display:flex;align-items:center;justify-content:space-between;gap:8px;
-  padding:9px 16px;background:var(--stub);color:var(--gdh);
-  font:700 8.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
-.tk-c.best .tk-top{background:var(--runway);color:var(--gold-on)}
-.tk-in{padding:20px 19px 22px;flex:1;display:flex;flex-direction:column}
-.tk-name{font:700 19px/1.1 var(--disp);margin-bottom:3px}
-.tk-tag{font-size:12.4px;color:var(--mut);margin-bottom:15px}
-.tk-p{font:700 33px/1 var(--disp);margin-bottom:2px;font-variant-numeric:tabular-nums}
-.tk-p small{font-size:13px;color:var(--mut);font-weight:400}
-.tk-note{font-size:12.2px;color:var(--grn);min-height:18px;font-weight:500}
-.tk-ker{display:flex;align-items:center;gap:8px;background:var(--cream2);
-  padding:10px 12px;margin:14px 0;font-size:12.4px;color:var(--inkm)}
-.tk-ker i{color:var(--gdi);font-style:normal}
-.tk-f{margin:0 0 16px;padding:0;list-style:none;font-size:12.8px;color:var(--inkm);flex:1}
-.tk-f li{padding:4px 0 4px 17px;position:relative;line-height:1.5}
-.tk-f li::before{content:'';position:absolute;left:1px;top:10px;width:8px;height:4.5px;
-  border-left:1.5px solid var(--grn);border-bottom:1.5px solid var(--grn);transform:rotate(-45deg)}
-.tk-b{display:block;text-align:center;background:var(--ob);color:var(--gdh);padding:12px;
-  font-size:14px;font-weight:600;transition:.22s}
-.tk-b:hover{background:var(--stub)}
-.tk-c.best .tk-b{background:var(--runway);color:#14100a}
-.tk-stub{display:flex;align-items:center;justify-content:space-between;
-  background:var(--stub);color:#9a8f6a;padding:9px 16px;
-  font:700 8px/1 var(--mono);letter-spacing:.11em}
-.tk-stub b{color:var(--gdh)}
+
+#pricing .ptoggle{display:inline-flex;gap:2px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:3px;margin-top:20px}
+#pricing .ptoggle button{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.55);background:transparent;border:0;border-radius:9px;padding:9px 18px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:7px}
+#pricing .ptoggle button.on{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#221a06;font-weight:700}
+.tkg{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:30px;align-items:stretch}
+.tk-stub{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#221a06;padding:14px 20px 12px;position:relative}
+.tk-stars{font-size:11px;letter-spacing:3px;color:#221a06;line-height:1;margin-bottom:5px}
+.tk-bs{position:absolute;top:13px;right:14px;font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;background:#0a0a0a;color:#E8CC7A;border-radius:20px;padding:3px 9px;font-weight:700}
+.tk-tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#5a4711}
+.tk-name{font-family:'Space Grotesk',sans-serif;font-size:23px;font-weight:700;color:#1a1305;margin-top:1px}
+.tk-body{background:#fff;padding:16px 20px 20px;display:flex;flex-direction:column;flex:1}
+.tk-price{display:flex;align-items:baseline;gap:3px;margin-bottom:2px}
+.tk-price b{font-family:'Space Grotesk',sans-serif;font-size:42px;font-weight:700;color:#1a1305;line-height:1}
+.tk.best .tk-price b{background:linear-gradient(110deg,#b8932f,#8a6d24);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tk-price .cur{font-family:'Space Grotesk',sans-serif;font-size:18px;color:#1a1305}
+.tk-price .per{font-family:'JetBrains Mono',monospace;font-size:11px;color:#6b6250;margin-left:3px}
+.tk-note{font-family:'JetBrains Mono',monospace;font-size:10px;color:#b8932f;min-height:14px;margin-bottom:14px}
+.tk-ker{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.03em;color:#1a1305;background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.34);border-radius:9px;padding:7px 10px;display:flex;align-items:center;gap:7px;margin-bottom:16px}
+.tk-ker span{color:#b8932f}
+.tk-feat{list-style:none;padding:0;margin:0 0 20px;display:flex;flex-direction:column;gap:9px;flex:1}
+.tk-feat li{font-size:13px;line-height:1.4;color:#3a352c;padding-left:22px;position:relative}
+.tk-feat li::before{content:'✓';position:absolute;left:0;top:0;color:#2f8a58;font-weight:700}
+.tk-cta{display:block;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;border-radius:11px;padding:13px 16px;border:1px solid #b8932f;color:#b8932f;transition:.16s}
+.tk-cta:hover{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#221a06;border-color:transparent;font-weight:700}
+.tk.best .tk-cta{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#221a06;border-color:transparent;font-weight:700}
+#pricing .tkg{align-items:stretch}
+#pricing .tk-class{font-family:var(--mono);font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;color:#221a06;opacity:.75;margin-top:5px;font-weight:700}
+#pricing .tk-rip{position:relative;background:#fff;border-top:2px dashed #d8d2c2;padding:9px 16px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+#pricing .tk-rip::before,#pricing .tk-rip::after{content:"";position:absolute;top:-8px;width:16px;height:16px;border-radius:50%;background:#070707;z-index:2}
+#pricing .tk-rip::before{left:-9px}
+#pricing .tk-rip::after{right:-9px}
+#pricing .tk-rip .bar{flex:1;max-width:56%;height:22px;background:repeating-linear-gradient(90deg,#1a1305 0 2px,transparent 2px 4px,#1a1305 4px 5px,transparent 5px 9px);border-radius:2px;opacity:.8}
+#pricing .tk-rip .bp-txt{font-family:var(--mono);font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:#8a7c60;white-space:nowrap}
+#pricing .tk.best .tk-stub{position:relative;overflow:hidden}
+#pricing .tk.best .tk-stub::after{content:"";position:absolute;top:0;bottom:0;left:-70%;width:46%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(-18deg);animation:tkSheen 4.2s ease-in-out infinite}
+#pricing .tk.best .tk-bs{box-shadow:0 4px 14px -4px rgba(0,0,0,.5)}
+#pricing .dp-tgrow .ptoggle{margin-top:0}
+@media(max-width:900px){
+.tkg{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+.tkg{grid-template-columns:1fr}
+}
 
 /* Partner-Ansicht */
 .pbox{display:none}
@@ -192,20 +216,24 @@
   background:rgba(232,204,122,.1);padding:5px 9px;display:inline-block}
 
 /* ══ Cockpit-Matrix ═════════════════════════════════════════════════════ */
-.mx-wrap{overflow-x:auto;border:1px solid var(--line)}
-.mx{width:100%;border-collapse:collapse;font-size:13.4px;background:rgba(255,255,255,.02);min-width:780px}
-.mx th,.mx td{padding:11px 14px;text-align:center;border-bottom:1px solid var(--line)}
+/* v1550 · Marcel: "die Cockpit-Matrix waere cool, wenn du das im hellen
+   Bereich machst". 35 Zeilen auf Obsidian waren eine dunkle Wand; auf
+   Papier liest sich eine Tabelle wie eine Tabelle. */
+.mx-wrap{overflow-x:auto;border:1px solid var(--cream-line);background:#fff}
+.mx{width:100%;border-collapse:collapse;font-size:13.4px;min-width:780px}
+.mx th,.mx td{padding:11px 14px;text-align:center;border-bottom:1px solid var(--cream-line)}
 .mx th:first-child,.mx td:first-child{text-align:left}
 .mx thead th{background:var(--runway);color:var(--gold-on);position:sticky;top:0;z-index:2;
   font:700 10px/1.3 var(--mono);letter-spacing:.07em;text-transform:uppercase}
-.mx tbody td{color:var(--mdk)}
-.mx tbody td:first-child{color:#fff;font-weight:500}
-.mx tbody tr:hover{background:rgba(255,255,255,.035)}
-.mx .ja{color:var(--grnh);font-weight:700}
-.mx .nein{color:rgba(255,255,255,.22)}
-.mx .wert{color:var(--gdh);font-family:var(--mono);font-size:12px}
-.mx-foot{padding:16px 18px;font-size:12.3px;color:var(--ddk);line-height:1.6;
-  border-top:1px solid var(--line)}
+.mx tbody td{color:var(--inkm)}
+.mx tbody td:first-child{color:var(--ink);font-weight:500}
+.mx tbody tr:nth-child(even){background:#FCFBF8}
+.mx tbody tr:hover{background:var(--cream2)}
+.mx .ja{color:var(--grn);font-weight:700}
+.mx .nein{color:rgba(20,18,15,.22)}
+.mx .wert{color:var(--gdi);font-family:var(--mono);font-size:12px}
+.mx-foot{padding:16px 18px;font-size:12.3px;color:var(--mut);line-height:1.6;
+  border-top:1px solid var(--cream-line);background:var(--cream2)}
 .mx-foot p{margin:0 0 8px}
 .mx-foot p:last-child{margin:0}
 

@@ -203,20 +203,31 @@ img{max-width:100%;display:block}
 .tk:hover .tk-t{animation-play-state:paused}
 @keyframes mq{to{transform:translateX(-50%)}}
 
-/* Abschluss-Band */
-.board-band{background:var(--stub);color:var(--txtd);position:relative;padding:64px 0}
-.board-band .perf-edge{position:absolute;top:0;left:0;right:0;height:2px;background:var(--runway)}
-.board-band .inner{max-width:var(--max);margin:0 auto;padding:0 26px;display:flex;
-  align-items:center;justify-content:space-between;gap:34px;flex-wrap:wrap}
-.board-band .kick{font:700 10px/1 var(--mono);letter-spacing:.2em;color:var(--gdh);margin-bottom:12px}
-.board-band h2{font-size:clamp(25px,3.4vw,40px);margin-bottom:10px}
-.board-band p{margin:0;color:var(--mdk);max-width:52ch}
+/* ── Das Boarding-Band ────────────────────────────────────────────────
+   v1550 · Marcel: "Das Willkommen an Bord waere cool, wenn wir das so
+   machen wie in der Version davor." Gemeint ist das GOLDENE Band der
+   bisherigen Landing mit der Lochstanzung an der Kante - ein
+   Bordkarten-Abriss, kein dunkler Streifen. Uebernommen samt der
+   radialen Stanzung: 14 px breit, alle 22 px eine Kerbe. */
+.board-band{position:relative;background:var(--runway);color:var(--inks);overflow:hidden}
+.board-band .perf-edge{position:absolute;top:0;bottom:0;left:0;width:14px;z-index:2;
+  background:radial-gradient(circle at 0 8px,var(--ob) 6px,transparent 6px) 0 0/14px 22px repeat-y}
+.board-band .perf-edge.rechts{left:auto;right:0;
+  background:radial-gradient(circle at 14px 8px,var(--ob) 6px,transparent 6px) 0 0/14px 22px repeat-y}
+.board-band .inner{max-width:var(--max);margin:0 auto;padding:42px 36px;display:flex;
+  align-items:center;justify-content:space-between;gap:30px;flex-wrap:wrap}
+.board-band .txt{flex:1;min-width:280px}
+.board-band .kick{font:700 11px/1 var(--mono);letter-spacing:.3em;color:var(--gold-on);margin-bottom:11px}
+.board-band h2{font-size:clamp(24px,3.2vw,34px);color:#1a1407;margin-bottom:9px}
+.board-band p{margin:0;font-size:14.5px;color:var(--inks);max-width:52ch}
+.board-band .btn-p{background:var(--ob);color:var(--gdh);box-shadow:none}
+.board-band .btn-p:hover{background:var(--stub);transform:translateY(-2px)}
 
 /* Fuss */
 .footer{background:var(--ob0);color:var(--ddk);padding:58px 0 28px;font-size:13.8px}
 .footer h4{font:700 10px/1 var(--mono);letter-spacing:.15em;text-transform:uppercase;
   color:var(--gd);margin:0 0 14px}
-.footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:34px}
+.footer-grid{display:grid;grid-template-columns:1.5fr .9fr .9fr .9fr .9fr;gap:30px}
 .footer a{display:block;padding:3.5px 0;color:var(--ddk);transition:.2s}
 .footer a:hover{color:var(--gdh);transform:translateX(3px)}
 .footer-tag{margin:14px 0 0;max-width:330px;line-height:1.6}
@@ -232,7 +243,7 @@ img{max-width:100%;display:block}
   .nav ul{display:none}
   .burger{display:block}
   .g5,.g4{grid-template-columns:repeat(2,1fr)}
-  .footer-grid{grid-template-columns:1fr 1fr}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:28px}
 }
 @media(max-width:700px){
   .sec{padding:72px 0}

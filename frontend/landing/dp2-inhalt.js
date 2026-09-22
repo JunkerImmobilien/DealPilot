@@ -199,12 +199,34 @@
   }
 
   /* ── 4 · Tarif-Umschalter ────────────────────────────────────────── */
+  /* ══ Der Monatlich/Jaehrlich-Umschalter ═══════════════════════════════
+     v1551 · Die Tickets tragen jetzt das Markup der bisherigen Landing:
+     der Preis steht in .tk-price mit data-m und data-y, die Notiz in
+     .tk-note mit data-save. Die Partner-Karte behaelt ihr eigenes
+     data-m/data-j - beide Schreibweisen werden gelesen, damit keine
+     Zahl stehen bleibt, nur weil sie anders benannt ist. */
   var zeit = 'm';
+  function eur(n) { return Number(n).toFixed(2).replace('.', ',').replace(/,00$/, ''); }
   function preise() {
-    document.querySelectorAll('[data-m]').forEach(function (e) {
+    /* Die Tickets */
+    document.querySelectorAll('.tk-price[data-m]').forEach(function (e) {
+      var m = e.dataset.m, y = e.dataset.y;
+      if (m == null || y == null) return;
+      e.innerHTML = '<b>' + (zeit === 'j' ? eur(y) : eur(m)) + '</b>'
+        + '<span class="cur">€</span>'
+        + '<span class="per">/ ' + (zeit === 'j' ? 'Jahr' : 'Monat') + '</span>';
+    });
+    document.querySelectorAll('.tk-note[data-save]').forEach(function (e) {
+      var k = e.closest('.tk'), pr = k && k.querySelector('.tk-price[data-m]');
+      if (!pr) return;
+      e.textContent = zeit === 'j'
+        ? 'spart ' + e.dataset.save + ' € im Jahr'
+        : 'oder ' + eur(pr.dataset.y) + ' €/Jahr';
+    });
+    /* Die Partner-Karte */
+    document.querySelectorAll('.pr[data-m], .prn[data-m]').forEach(function (e) {
       var v = e.dataset[zeit]; if (v == null) return;
-      if (e.classList.contains('tk-p')) e.innerHTML = v + '<small> / Monat</small>';
-      else if (e.classList.contains('pr')) e.innerHTML = v + '<small> / ' + (zeit === 'j' ? 'Jahr' : 'Monat') + '</small>';
+      if (e.classList.contains('pr')) e.innerHTML = v + '<small> / ' + (zeit === 'j' ? 'Jahr' : 'Monat') + '</small>';
       else e.textContent = v;
     });
   }
