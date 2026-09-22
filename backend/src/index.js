@@ -365,6 +365,8 @@ app.use('/api/v1/ai', aiRoutes);
 app.use('/api/v1/market-rates', marketRatesRoutes);
 app.use('/api/v1/beta-signup', betaSignupRoutes);
 app.use('/api/v1/track', rateLimit({ windowMs: 60000, max: 120 }), require('./routes/track')); // v973
+/* v1523: oeffentliche Kennzahlen fuer die Landing - ohne Token, nur Summen. */
+app.use('/api/v1/public/stats', rateLimit({ windowMs: 60000, max: 60 }), require('./routes/publicStats'));
 app.use('/api/v1/deal-action', dealActionRoutes);
 app.use('/api/v1/feedback', feedbackRoutes);
 app.use('/api/v1/listing', scrapeRoutes);  // V63.85: URL-Scraper für Quick-Check
