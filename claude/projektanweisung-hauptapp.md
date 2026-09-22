@@ -17853,3 +17853,48 @@ Parameter ueberhaupt entgegen), **Bilanz und GuV fuer die Immobilien-GmbH**,
 > `requestAnimationFrame` nicht und CSS-Uebergaenge starten nicht. **Regel:
 > Endzustand zuerst setzen, Animation ist Zugabe** — plus ein Zeitnetz, das
 > nach 1,6 s alles sichtbar macht.
+
+## Rollout-Journal · 22.09.2026 (5) — Landing-Entwurf C
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1525 / b | `022893c`, `1a71d5a` | **Entwurf C** — `frontend/landing/entwurf-c.html`, erreichbar unter `staging.dealpilot.immo/entwurf-c.html` |
+
+Marcel zu A und B: *„haben mir beide Entwuerfe noch nicht zugesagt."* Konkret:
+Video fehlt, zu wenig Effekte, Menuestruktur nicht professionell genug,
+Partner-Umschalter ohne Jahresansicht, Paketinhalte zu duenn aufgeschluesselt.
+
+**Von junker-immobilien.io uebernommen** (dort im Browser gemessen):
+
+| Gemessen | Uebernommen |
+|---|---|
+| Topbar mit Kontakt und Verweis aufs Schwesterangebot | Topbar mit Telefon, Mail und Link zum Sachverstaendigenbuero |
+| Menue mit **Untermenues**, je Eintrag Titel **plus Erklaerung** („Haeufige Fragen — Antworten zu Gutachten, AfA und Ablauf") | Drei Untermenues mit je Titel und Beschreibung |
+| Kicker vor jedem Abschnitt („Kompetenzfelder", „Fallbeispiele", „Unser Ansatz") | Kicker mit vorangestelltem Strich |
+| Ueberschriften mit Zeilenumbruch, zweite Zeile in Gold | Ebenso |
+| Abschnittshoehen 800–1300 px, Gesamthoehe 10.265 px | Grosszuegige Abschnitte |
+| 16 animierte Elemente, durchgehend `.rv` | Reveal auf allen Abschnitten, gestaffelt |
+
+**Neu gegenueber A und B:**
+- **Hero mit dem vorhandenen Video** `dp-hero-flug.mp4` (3,7 MB, lag ungenutzt
+  in `frontend/landing/assets/video/`), dazu ein wanderndes Raster und eine
+  zeilenweise einfahrende Ueberschrift
+- **Ablauf als Zeitstrahl**, dessen Goldlinie beim Erreichen waechst, mit
+  Punkten, Zeitangaben je Schritt und Hover-Effekt
+- **Preise mit ZWEI Umschaltern**: Einzelplatz/Partner **und** monatlich/
+  jaehrlich — auch die Partnerpreise rechnen jetzt aufs Jahr um
+- **Pakete aufgeschluesselt**: Kontingent getrennt vom Umfang, „alles aus X,
+  dazu" statt Wiederholung, ausgegraute Zeilen fuer das, was NICHT enthalten
+  ist; Partner mit der echten Staffel 24 / 19 / 15 EUR je Mandanten-Platz
+
+> **Warum der Entwurf im Landing-Ordner liegt und nicht neben den anderen:**
+> gemessen `readyState 0`, `videoWidth 0` — das Video lud nicht, weil der
+> Entwurf auf der App-Domain lag und das Video auf der Landing-Domain. Jetzt
+> liegt er dort, wo das Video liegt, und laedt es relativ.
+
+> **Und eine Messfalle, die dreimal zugeschlagen hat:** im Hintergrund-Tab
+> laedt Chrome **keine Videos** (`networkState 2`, aber `readyState 0` auf
+> Dauer), startet **keine CSS-Uebergaenge** und feuert **kein**
+> `requestAnimationFrame`. Alle drei Male sah es nach einem Fehler im Entwurf
+> aus. Wer eine Seite so prueft, muss `document.visibilityState` mitlesen —
+> und die Seite so bauen, dass sie **ohne** diese Dinge vollstaendig ist.
