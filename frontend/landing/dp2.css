@@ -194,13 +194,13 @@ img{max-width:100%;display:block}
 .btn-dark:hover{background:var(--stub)}
 
 /* Laufband */
-.tk{background:var(--ob1);border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+.laufband{background:var(--ob1);border-top:1px solid var(--line);border-bottom:1px solid var(--line);
   overflow:hidden;font:700 10px/1 var(--mono);letter-spacing:.17em;color:rgba(232,204,122,.6);
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
   mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
-.tk-t{display:inline-flex;gap:50px;padding:14px 0;white-space:nowrap;
+.laufband-t{display:inline-flex;gap:50px;padding:14px 0;white-space:nowrap;
   animation:mq 52s linear infinite}
-.tk:hover .tk-t{animation-play-state:paused}
+.tk:hover .laufband-t{animation-play-state:paused}
 @keyframes mq{to{transform:translateX(-50%)}}
 
 /* ── Das Boarding-Band ────────────────────────────────────────────────
@@ -237,7 +237,7 @@ img{max-width:100%;display:block}
 
 @media(prefers-reduced-motion:reduce){
   .rv{opacity:1;transform:none;transition:none}
-  .tk-t{animation:none}
+  .laufband-t{animation:none}
 }
 @media(max-width:1080px){
   .nav ul{display:none}

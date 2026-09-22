@@ -41,7 +41,7 @@
   }
 
   /* ── Laufbaender verdoppeln, damit der Ruecksprung unsichtbar ist ─ */
-  document.querySelectorAll('.tk-t, .pmarq-track').forEach(function (t) {
+  document.querySelectorAll('.laufband-t, .pmarq-track').forEach(function (t) {
     if (!t.dataset.doppelt) { t.innerHTML += t.innerHTML; t.dataset.doppelt = '1'; }
   });
 
