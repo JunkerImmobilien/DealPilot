@@ -69,7 +69,50 @@
     host.innerHTML = '<div class="lbl">Investor Deal Score</div>'
       + '<div class="dp-hy-score-z"><b style="color:' + farbe(n) + '">' + n + '</b><span>/ 100</span>'
       + '<em style="background:' + farbe(n) + '">' + ((st && st.textContent.trim()) || '') + '</em></div>'
-      + '<div class="dp-hy-bar"><i style="width:' + Math.max(2, Math.min(100, n)) + '%;background:' + farbe(n) + '"></i></div>';
+      + '<div class="dp-hy-bar"><i style="width:' + Math.max(2, Math.min(100, n)) + '%;background:' + farbe(n) + '"></i></div>'
+      + bereiche();
+  }
+
+  /* v1516 · Marcel 22.09.2026: "dass wir dort halt auch noch den Deal-Score
+     hinpacken ... also quasi das, was wir oben haben, mit den Parametern
+     Rendite, Finanzierung, Risiko, Lage und Upside."
+     Die Zahlen kommen aus DealScore2.compute() - demselben Kern, der auch
+     den Kopf speist. Kein zweiter Rechenweg, kein Abschreiben aus dem DOM:
+     nur die Gesamtzahl wird weiter aus dem Kopf uebernommen, weil sie dort
+     schon steht (und die Spalte sonst einen anderen Stand zeigen koennte als
+     der Kopf zwei Zentimeter daneben). */
+  var BEREICHE = [
+    ['rendite', 'Rendite'],
+    ['finanzierung', 'Finanzierung'],
+    ['risiko', 'Risiko'],
+    ['lage', 'Lage'],
+    ['upside', 'Upside'],
+  ];
+  function bereiche() {
+    var erg = null;
+    try {
+      if (window.DealScore2 && typeof window.DealScore2.compute === 'function'
+          && typeof window._buildDeal2FromState === 'function') {
+        erg = window.DealScore2.compute(window._buildDeal2FromState());
+      }
+    } catch (e) { return ''; }
+    if (!erg || !erg.categories) return '';
+    var zeilen = BEREICHE.map(function (b) {
+      var c = erg.categories[b[0]];
+      if (!c || c.score == null || !isFinite(c.score)) return '';
+      var w = Math.max(2, Math.min(100, Math.round(c.score)));
+      /* Wie viele Kennzahlen dahinterstehen, gehoert dazu: ein Bereich aus
+         einer einzigen Angabe ist etwas anderes als einer aus sechs. */
+      var tief = (c.availableKpis != null && c.totalKpis)
+        ? '<em>' + c.availableKpis + '/' + c.totalKpis + '</em>' : '';
+      return '<div class="dp-hy-br">'
+        + '<span>' + b[1] + tief + '</span>'
+        + '<div class="dp-hy-brbar"><i style="width:' + w + '%;background:' + farbe(c.score) + '"></i></div>'
+        + '<b>' + Math.round(c.score) + '</b>'
+        + '</div>';
+    }).join('');
+    if (!zeilen) return '';
+    return '<div class="dp-hy-bereiche">' + zeilen + '</div>';
   }
   function ausKopf(sel, wirt) { var e = document.querySelector(sel); if (!e) return null; if (wirt && !gilt(document.querySelector(wirt))) return null; var t = e.textContent.trim().replace(/\s+/g, ' '); return t || null; }
   function kennzahlen() {
