@@ -17697,3 +17697,48 @@ Platzhaltertexte weg.
 Knoepfe** — in der Aktionsleiste rechts stehen „Investment-PDF · Bank"
 (neue Bankfassung, `exportPDFBank`) und „Investment-PDF" (die alte,
 `exportPDF`) direkt untereinander.
+
+## Rollout-Journal · 22.09.2026 (1) — RND-Wizard, Investment-PDF-Sperre
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1504 | `3f6ea18` | Die Sofortbox im Reiter 1 zeigt dieselben Zeilen wie nach der Pipeline, auch die mit null. Eine Aufstellung, die beim Oeffnen kuerzer ist als zwei Sekunden spaeter, liest sich wie eine fehlende Tabelle |
+| v1505 | `3f6ea18` | **Das Investment-PDF prueft seine Zahlen.** Gemessen an Rinteln (Anfrage ohne Finanzierung): Zins 0, Tilgung 0, LTV 0, DSCR 0, Eigenkapitalrendite 0, Multiplikator 0, kein IRR — und das PDF entstand trotzdem ueber 20 Seiten. **Eine Null ist keine Aussage**, sie behauptet eine Finanzierung, die es nicht gibt. Gesperrt wird bei Kaufpreis, Miete, Finanzierung, Cashflow-Jahren; gewarnt bei DSCR null trotz Darlehen, fehlenden Bewirtschaftungskosten, fehlendem IRR, fehlender Steuerwirkung. `window.pruefeInvestmentDaten` steht nach aussen, damit die alte Fassung dieselbe Liste benutzt |
+| v1506 | `290bd0b` | **Der Wizard kannte gar keine Uebernahme.** Der letzte Schritt trug „Anfrage senden" und rief `_submitWizardAsRequest()` — und die Funktion ruft `onComplete` **gar nicht**. Wer ihn oeffnete, um eine Zahl zu bekommen, loeste eine Gutachten-Anfrage aus und bekam keinen Wert. Jetzt zwei Betriebsarten: `anfrage` (Reiter Steuer) und `uebernehmen` (Bodenabschlag). Dazu die **Spanne** unter der grossen Zahl (technische RND bis Punktraster nach Anlage 2) und `DM Sans` → `Inter` — DM Sans steht in keiner Markenliste |
+| v1507 | `c56ffd5` | Schritt 8 verlangte Name, E-Mail und Erstellungsort des Sachverstaendigen, „erforderlich fuer den Versand". Im Uebernahme-Modus wird nichts versendet — Pflichtangaben fuer einen Vorgang, den es nicht gibt, halten genau die Arbeit auf, fuer die der Knopf da ist |
+| v1508 | `2ee5fa4` | **Zweite Wahrheit beseitigt.** Der Wizard zeigte „Spanne 17 bis 26", uebernommen wurden 17 bis 24 — weil ich im Rueckweg NOCHMAL gerechnet habe, ueber `_buildCalcInputFromWizard`. Die Funktion erwartet `g.gewerkeBewertung`/`g.modPoints`, im Wizard-Zustand heissen die Felder `state.gewerke`/`state.mod`; sie rechnete mit leeren Gewerken. Genommen wird jetzt **das Ergebnis des Wizards** |
+
+**Nachweis:** Investment-PDF bei Rinteln gesperrt, Dialog nennt „Finanzierung ·
+Reiter Finanzierung" · Wizard-Knopf „✓ Werte übernehmen" · „Spanne 17 bis 26
+Jahre" im Wizard = 17 bis 26 in den Feldern · Wizard schliesst sich.
+
+### Bestandsaufnahme der RND-Module (auf Marcels Frage „hast du das richtige genommen?")
+
+**Ja.** `frontend/js/rnd-wizard.js` (`DealPilotRND_Wizard`, V3, zuletzt v1439
+vom 18.09.2026) ist die aktuelle Oberflaeche und wird von drei Stellen
+geoeffnet: Gutachten-Modal, Steuer-Reiter (`afa-eigen.js`) und jetzt dem
+Bodenabschlag.
+
+`frontend/js/rnd-ui.js` (`DealPilotRND_UI`, V2) ist die **aeltere Oberflaeche**
+und praktisch **unerreichbar**: ihr einziger Einstieg `openRND()` haengt an
+`submitExpert()` mit `typ === 'rnd'`, aber seit V144 faengt ein
+`change`-Listener am Radio genau diesen Fall ab und startet den Wizard. Der
+Zweig ist toter Code (~1.100 Zeilen plus ~200 in `deal-action.js`). Im
+`BACKLOG.md` steht sie zweimal nur noch als Aufraeumposten.
+
+Keine Leiche sind dagegen `rnd-calc.js` (Master-Kern 3.1.0), `rnd-gnd-table.js`,
+`rnd-bte-katalog.js`, `rnd-pdf.js`, `rnd-docx.js` — das sind die Bausteine.
+
+> **Warum das Modal „alt" aussah:** das CSS `frontend/css/rnd-styles.css` hing
+> in `index.html:54` mit dem Cache-Buster **`?v=W34`**, waehrend das JS bei
+> `v1439` stand. **Jede Stilaenderung der letzten Monate waere nie angekommen.**
+> Dazu war `DM Sans` die Hausschrift der Datei — eine Schrift, die in keiner
+> Markenliste steht. Beides behoben; Cormorant Garamond bleibt fuer die grosse
+> Zahl, die ist als Serifenschrift der Marke gedeckt.
+
+> **Offen und benannt:** der Wizard zeigt `final_rnd` weiterhin punktgenau als
+> grosse Zahl (die Spanne steht jetzt darunter). `tools/rnd-pruefung/rnd-spanne.js`
+> begruendet auf 50 Kommentarzeilen, warum nach aussen **nur** eine Spanne
+> gehoert — dieses Modul ist in der App nirgends eingebunden. Das ist der
+> groesste Widerspruch zwischen Konzept und Produkt und eine
+> Produktentscheidung, keine Reparatur.
