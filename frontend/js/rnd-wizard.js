@@ -21,6 +21,7 @@
   const TOTAL_STEPS = 9;
   let state = null;
   let onCompleteCb = null;
+  let modus = 'anfrage';   /* v1506: 'anfrage' | 'uebernehmen' */
   let overlayEl = null;
 
   // ============================================================
@@ -110,9 +111,20 @@
   // ============================================================
   // INIT & PUBLIC API
   // ============================================================
+  /* v1506 · Marcel 21.09.2026: "beim Bodenabschlag, wenn man die RND
+     ermittelt, muss ein Uebernahme-Button angegeben werden und nicht
+     Anfrage."
+     Gemessen: der letzte Schritt trug '\u2709 Anfrage senden' und rief
+     _submitWizardAsRequest() - und DIE Funktion ruft onComplete GAR NICHT.
+     Wer den Wizard also oeffnete, um eine Zahl zu bekommen, bekam statt
+     dessen eine Gutachten-Anfrage und keinen Wert zurueck.
+     Jetzt gibt es zwei Betriebsarten: 'anfrage' (wie bisher, aus dem Reiter
+     Steuer) und 'uebernehmen' - dort heisst der Knopf, was er tut, und das
+     Ergebnis geht an den Aufrufer. */
   function open(opts) {
     opts = opts || {};
     onCompleteCb = opts.onComplete || null;
+    modus = (opts.modus === 'uebernehmen') ? 'uebernehmen' : 'anfrage';
     state = buildInitialState(opts.prefill || {});
     currentStep = 1;
     mountOverlay();
@@ -356,7 +368,10 @@
       nextBtn.textContent = 'Berechnen →';
     } else if (currentStep === TOTAL_STEPS) {
       // V194: "In Editor übernehmen" raus — direkt zum Anfrage-Versand
-      nextBtn.textContent = '✉ Anfrage senden →';
+      // v1506: ... ausser der Aufrufer wollte einen Wert zurueck.
+      nextBtn.textContent = (modus === 'uebernehmen')
+        ? '✓ Werte übernehmen'
+        : '✉ Anfrage senden →';
     } else {
       nextBtn.textContent = 'Weiter →';
     }
@@ -453,6 +468,15 @@
     }
     clearErrors();
     if (currentStep < TOTAL_STEPS) { currentStep++; renderCurrentStep(); }
+    else if (modus === 'uebernehmen') {
+      /* v1506: zurueck an den Aufrufer - keine Anfrage. */
+      var erg = state._computedResult || computeFinalResult();
+      window._lastRndResult = { state: state, result: erg, afa: state._computedAfa || null };
+      var paket = { state: state, result: erg };
+      try { Object.keys(state).forEach(function (k) { if (paket[k] === undefined) paket[k] = state[k]; }); } catch (e) {}
+      closeWizardOverlay();
+      if (onCompleteCb) onCompleteCb(paket);
+    }
     else {
       // V194: Letzter Step → direkt Anfrage senden (statt zum Editor zu wechseln)
       _submitWizardAsRequest();
@@ -1367,8 +1391,29 @@
       + '    <p style="font-size:10px;color:rgba(255,255,255,0.45);text-align:center;margin:0 0 14px;font-style:italic">(Ersteinschätzung — verbindliche Berechnung im Gutachten)</p>'
       + '    <h2 style="font-family:Cormorant Garamond,serif;font-size:110px;font-weight:600;color:#C9A84C;line-height:0.95;letter-spacing:-2px;margin:0;text-align:center;text-shadow:0 0 30px rgba(201,168,76,0.45),0 0 60px rgba(201,168,76,0.22),0 4px 16px rgba(0,0,0,0.4);transform-origin:center;animation:rndw-zoom-in 1.2s cubic-bezier(0.34,1.56,0.64,1) 0.2s both, rndw-pulse 4s ease-in-out 1.4s infinite">'
       + fmtJ(result.final_rnd)
-      + '<span style="font-family:DM Sans,sans-serif;font-size:24px;font-weight:500;color:#C9A84C;margin-left:10px;letter-spacing:0.5px;vertical-align:middle;opacity:0.85">Jahre</span>'
+      + '<span style="font-family:Inter,sans-serif;font-size:24px;font-weight:500;color:#C9A84C;margin-left:10px;letter-spacing:0.5px;vertical-align:middle;opacity:0.85">Jahre</span>'
       + '    </h2>'
+      /* v1506 · Marcel: "es wird keine Spanne ausgegeben."
+         Der Wizard zeigte nur final_rnd - eine punktgenaue Zahl aus einem
+         Formular. Sie taeuscht eine Genauigkeit vor, die eine
+         Ersteinschaetzung nicht hat. Darunter steht jetzt der Korridor aus
+         den beiden Verfahren, die ihn aufspannen: die technische
+         Restnutzungsdauer und das Punktraster nach Anlage 2 - dieselben
+         beiden, aus denen der Reiter Bodenabschlag seine Spanne bildet. */
+      + (function () {
+          try {
+            var m = result.methods || {};
+            var a = Math.round(Number(m.technisch && m.technisch.restnutzungsdauer) || 0);
+            var b = Math.round(Number(m.punktraster && m.punktraster.restnutzungsdauer) || 0);
+            var w = [a, b].filter(function (x) { return x > 0; });
+            if (w.length < 2) return '';
+            var von = Math.min.apply(null, w), bis = Math.max.apply(null, w);
+            if (von === bis) return '';
+            return '<p style="margin:10px 0 0;text-align:center;font-size:13px;color:rgba(255,255,255,0.78);letter-spacing:.3px">'
+              + 'Spanne <b style="color:#E8CC7A">' + von + ' bis ' + bis + ' Jahre</b>'
+              + '<span style="display:block;font-size:11px;color:rgba(255,255,255,0.45);margin-top:3px">technische Restnutzungsdauer bis Punktraster nach Anlage 2</span></p>';
+          } catch (e) { return ''; }
+        })()
       + '    <p style="margin:14px 0 0;font-size:13px;color:rgba(255,255,255,0.7);line-height:1.5;text-align:center;font-style:italic;animation:rndw-fade-in 0.8s ease-out 1.2s both">'
       + escapeHtml(lohntText)
       + '    </p>'

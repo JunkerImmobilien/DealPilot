@@ -589,6 +589,10 @@
     if (info) info.textContent = fehltTxt + ' Der Restnutzungsdauer-Rechner ist geöffnet.';
     try {
       W.open({
+        /* v1506: der Wizard soll hier einen Wert liefern, keine Anfrage
+           ausloesen - der Knopf im letzten Schritt heisst entsprechend
+           'Werte uebernehmen'. */
+        modus: 'uebernehmen',
         prefill: DA.getRndPrefill(),
         onComplete: function (stand) {
           try {
