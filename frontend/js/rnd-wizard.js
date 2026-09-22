@@ -93,6 +93,13 @@
       sub: 'Wer erstellt das Gutachten?', render: renderStep8,
       validate: function () {
         const e = [];
+        /* v1507 · gemessen beim Durchklicken: hier verlangt der Wizard Name,
+           E-Mail und Erstellungsort des Sachverständigen - 'erforderlich für
+           den Versand'. Im Uebernahme-Modus wird aber nichts versendet; dort
+           will der Nutzer nur eine Zahl. Eine Pflichtangabe fuer einen
+           Vorgang, den es nicht gibt, haelt genau die Arbeit auf, fuer die
+           der Knopf da ist. */
+        if (modus === 'uebernehmen') return e;
         if (!state.sv_name || !state.sv_name.trim())
           e.push(['sv_name', 'Name des Sachverständigen fehlt']);
         if (!state.sv_email || !state.sv_email.trim())
