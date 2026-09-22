@@ -52,6 +52,18 @@
   /* Score aus dem Kopf uebernehmen (dort ausgeblendet, aber im DOM).
      Die Stufen-Schwellen stehen in js/dashboard.js:390 - hier wird nur
      eingefaerbt, nicht neu bewertet. */
+  /* v1521 · gemessen an der Hermannstrasse: der Kopf liefert bei 87 Punkten
+     'Sehr gut'. Die Kette der Objektkarte (js/dashboard.js:390) kennt diese
+     Stufe nicht - dort heisst es ab 85 TOP, ab 70 GUT, ab 50 SOLIDE, ab 35
+     SCHWACH, darunter KRITISCH. Die Abweichung steht in CLAUDE.md als offen
+     vermerkt; solange der Kopf im Hellmodus ausgeblendet ist, ist die Spalte
+     die EINZIGE Anzeige - dann muss dort die geltende Kette stehen.
+     Der Kopftext wird nur noch genommen, wenn er zur Kette passt. */
+  function stufe(n, st) {
+    var soll = n >= 85 ? 'TOP' : n >= 70 ? 'GUT' : n >= 50 ? 'SOLIDE' : n >= 35 ? 'SCHWACH' : 'KRITISCH';
+    var ausKopfText = (st && st.textContent.trim()) || '';
+    return ausKopfText.toUpperCase() === soll ? ausKopfText : soll;
+  }
   function farbe(n) { return n >= 85 ? '#2E8455' : n >= 70 ? '#3FA56C' : n >= 50 ? 'var(--wl-c9a84c, #C9A84C)' : n >= 35 ? '#C2703F' : '#B8625C'; }
   /* v1455c · gemessen: der Kopf LAESST den alten Score im DOM stehen und
      blendet ihn per Inline-Stil aus (display:none), dazu body.hdr-no-score.
@@ -98,7 +110,7 @@
     host.style.display = '';
     host.innerHTML = '<div class="lbl">Investor Deal Score</div>'
       + '<div class="dp-hy-score-z"><b style="color:' + farbe(n) + '">' + n + '</b><span>/ 100</span>'
-      + '<em style="background:' + farbe(n) + '">' + ((st && st.textContent.trim()) || '') + '</em></div>'
+      + '<em style="background:' + farbe(n) + '">' + stufe(n, st) + '</em></div>'
       + '<div class="dp-hy-bar"><i style="width:' + Math.max(2, Math.min(100, n)) + '%;background:' + farbe(n) + '"></i></div>'
       + bereiche();
   }
