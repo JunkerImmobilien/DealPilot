@@ -1085,15 +1085,16 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
               <div class="dp-plead">Ihre Mandanten rechnen unter Ihrer Marke. Sie pr&uuml;fen, geben frei und behalten den &Uuml;berblick &mdash; ohne E-Mail-Ping-Pong.</div>
             </div>
             <div class="dp-pbody">
-              <div class="dp-pprice"><b id="dp-pnum">49</b><span class="cur">&euro;</span><span class="per" id="dp-pper">/ Monat</span></div>
-              <div class="dp-pnote" id="dp-pnote">oder 539 &euro;/Jahr &mdash; 1 Monat geschenkt</div>
+              <!-- v1536 -->
+              <div class="dp-pprice"><b id="dp-pnum">99</b><span class="cur">&euro;</span><span class="per" id="dp-pper">/ Monat</span></div>
+              <div class="dp-pnote" id="dp-pnote">oder 1.089 &euro;/Jahr &mdash; 1 Monat geschenkt</div>
               <ul class="dp-pinc">
                 <li>Mandanten-Konsole &mdash; einladen, Seats vergeben, Status sehen</li>
                 <li>Whitelabel: Ihr Logo, Ihre Farben, Ihr Name</li>
-                <li>3 Berater-Seats inklusive</li>
+                <li>3 Mandanten-Pl&auml;tze inklusive &mdash; Wert 57 &euro;</li>
                 <li>Freigabe-Workflow mit l&uuml;ckenlosem Protokoll</li>
-                <li>Voller Pro-Funktionsumfang f&uuml;r Ihr ganzes Team</li>
-                <li>Mandanten-Seats separat &mdash; ab 12 &euro; je Mandant</li>
+                <li>Voller Pro-Funktionsumfang f&uuml;r Ihren Zugang</li>
+                <li>Weitere Mandanten-Pl&auml;tze &mdash; ab 12 &euro; je Mandant</li>
                 <li>Schnittstellen &amp; Anpassungen auf Wunsch &mdash; nach Aufwand</li>
               </ul>
               <a class="dp-pcta" href="mailto:info@dealpilot.immo?subject=Partner-Anfrage%20%E2%80%93%20DealPilot&amp;body=Guten%20Tag%2C%0A%0Aich%20interessiere%20mich%20f%C3%BCr%20den%20Partner-Plan.%0A%0AName%3A%0AKanzlei%20%2F%20B%C3%BCro%3A%0ARolle%20(Steuerberater%20%2F%20Makler%20%2F%20Finanzierer%20%2F%20Hausverwalter)%3A%0AEtwa%20wie%20viele%20Mandanten%3A%0A%0AMeine%20Frage%3A%0A">Unverbindlich anfragen &rarr;</a>
@@ -1110,9 +1111,9 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
                 <div><div class="dp-et">Mandanten-Seats &mdash; Mengenstaffel</div>
                 <div class="dp-ed" style="margin-top:2px">Je mehr Mandanten, desto g&uuml;nstiger jeder einzelne Platz.</div></div>
               </div>
-              <div class="dp-st"><span>1 &ndash; 9 Mandanten</span><b>24 &euro; / Seat</b></div>
-              <div class="dp-st"><span>10 &ndash; 24 Mandanten</span><b>19 &euro; / Seat</b></div>
-              <div class="dp-st"><span>ab 25 Mandanten</span><b>15 &euro; / Seat</b></div>
+              <div class="dp-st"><span>1 &ndash; 9 Mandanten</span><b>19 &euro; / Seat</b></div>
+              <div class="dp-st"><span>10 &ndash; 24 Mandanten</span><b>15 &euro; / Seat</b></div>
+              <div class="dp-st"><span>ab 25 Mandanten</span><b>12 &euro; / Seat</b></div>
               <div class="dp-sf">Ihr Mandant arbeitet mit einem Werkzeug, das einzeln 34,99 &euro; kostet &mdash; Sie zahlen ab 12 &euro;. Wird ein Mandat beendet, wird der Seat frei und ist sofort neu vergebbar. Monatlich oder j&auml;hrlich, j&auml;hrlich mit einem Freimonat.</div>
             </div>
             <div class="dp-e">
@@ -4140,10 +4141,10 @@ html{scroll-behavior:smooth}
     var on=pt.querySelector('button.on');
     var y = on && on.getAttribute('data-p')==='yearly';
     var n=$('dp-pnum'), pr=$('dp-pper'), no=$('dp-pnote');
-    if(n)  n.textContent  = y ? '539' : '49';
+    if(n)  n.textContent  = y ? '1.089' : '99';
     if(pr) pr.textContent = y ? '/ Jahr' : '/ Monat';
-    if(no) no.innerHTML   = y ? 'entspricht rund 45 €/Monat — 1 Monat geschenkt'
-                              : 'oder 539 €/Jahr — 1 Monat geschenkt';
+    if(no) no.innerHTML   = y ? 'entspricht rund 91 €/Monat — 1 Monat geschenkt'
+                              : 'oder 1.089 €/Jahr — 1 Monat geschenkt';
   }
   function seg(i){
     var b1=$('dp-seg-1'), b2=$('dp-seg-2');

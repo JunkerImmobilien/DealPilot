@@ -60,10 +60,15 @@ async function getPool(resellerId) {
     [resellerId]
   );
   const row = r.rows[0] || {};
+  const gekauft = parseInt(row.gekauft, 10) || 0;
   return {
-    gekauft:    parseInt(row.gekauft, 10)    || 0,
+    gekauft:    gekauft,
     zugewiesen: parseInt(row.zugewiesen, 10) || 0,
-    frei:       parseInt(row.frei, 10)       || 0
+    frei:       parseInt(row.frei, 10)       || 0,
+    /* v1537: davon im Grundpreis enthalten - nur zur Anzeige, nie zum
+       Rechnen. Wer Plaetze zaehlt, nimmt 'gekauft'. */
+    inklusiv:   Math.min(INKLUSIV_MANDANTEN, gekauft),
+    bezahlt:    Math.max(0, gekauft - INKLUSIV_MANDANTEN)
   };
 }
 
@@ -72,8 +77,25 @@ async function getPool(resellerId) {
  * Mehr nötig -> neue pool-Zeilen. Weniger -> löscht NUR freie pool-Zeilen
  * (zugewiesene bleiben immer erhalten).
  */
-async function syncPoolQuantity(resellerId, targetQty, opts = {}) {
-  targetQty = Math.max(0, parseInt(targetQty, 10) || 0);
+/* ═══ v1537 · Marcel 22.09.2026 ═══════════════════════════════════════════
+   Das Partner-Paket enthaelt seit der Preisumstellung auf 99 EUR drei
+   Mandanten-Plaetze. Damit das nicht nur auf der Preisseite steht, sondern
+   auch wirkt, wird der Aufschlag HIER gerechnet - an der einen Stelle, die
+   alle Aufrufer durchlaufen.
+
+   Warum nicht beim Aufrufer: es gibt zwei (Pool-Abruf und Checkout-Return),
+   und ein dritter wuerde den Aufschlag vergessen. Genau so ist auf der
+   alten Landing das Versprechen "3 Berater-Seats inklusive" entstanden,
+   das die Software nie eingeloest hat.
+
+   uebergeben wird weiterhin die GEKAUFTE Menge aus Stripe. Wer null Seats
+   kauft, hat drei; wer fuenf kauft, hat acht. Beim Herunterstufen werden
+   nur freie Pool-Zeilen geloescht, es bleiben also immer mindestens drei.
+   ════════════════════════════════════════════════════════════════════════ */
+const INKLUSIV_MANDANTEN = 3;
+
+async function syncPoolQuantity(resellerId, gekaufteSeats, opts = {}) {
+  const targetQty = Math.max(0, parseInt(gekaufteSeats, 10) || 0) + INKLUSIV_MANDANTEN;
   const cycle = opts.interval === 'yearly' ? 'jaehrlich' : 'monatlich';
   const cur = await getPool(resellerId);
 
@@ -447,6 +469,7 @@ module.exports = {
   ensureReseller,
   getPool,
   syncPoolQuantity,
+  INKLUSIV_MANDANTEN,
   createClient,
   listClients,
   assignSeat,
