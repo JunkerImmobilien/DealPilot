@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- DealPilot API · v1542 -->
+<!DOCTYPE html><!-- DealPilot API · v1543 -->
 <html lang="de"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -7,21 +7,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="dp2.css?v=v1542">
-<link rel="stylesheet" href="dp2-teile.css?v=v1542">
+<link rel="stylesheet" href="dp2.css?v=v1543">
+<link rel="stylesheet" href="dp2-teile.css?v=v1543">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════
-   Die API-Dokumentation kommt UNVERAENDERT aus der bisherigen Landing
-   (frontend/landing/index.html, Z.1348-1447) - per Skript herauskopiert.
-   Sieben Kapitel: Uebersicht, Schnellstart, Authentifizierung, Endpunkte,
-   Datenmodell mit 18 Feldgruppen, Fehler & Limits, Grenzen & Roadmap.
+   API-Dokumentation aus frontend/landing/index.html Z.1348-1446 (7 Kapitel).
+   Der Inhalt ist per Skript herauskopiert, nicht abgetippt.
 
-   Beim CSS sind zwei Filter noetig: die API benutzt sehr kurze
-   Klassennamen (.s .num .ep .mm), die in der alten Datei auch anderswo
-   vorkommen. Uebernommen wurde nur, was eine api-eigene Klasse traegt und
-   keine Klasse des Fundaments ueberschreibt.
+   Das CSS kommt MIT seinen @media-Abfragen. Der erste Versuch hat die
+   Abfragen verworfen und die Regeln nackt uebernommen - dadurch galten
+   die Handy-Regeln auf jedem Bildschirm, und das Inhaltsverzeichnis
+   stand einspaltig statt dreispaltig.
+   42 Regeln ohne Kontext, 2 Media-Abfragen.
    ═══════════════════════════════════════════════════════════════════════ */
+.lu-top,.api-back{display:none}
 hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z-index:2}
+.api-hero{background:var(--ob);padding:46px 0 40px}
 .api-back{display:inline-flex;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--gdh);text-transform:uppercase;margin-bottom:22px;cursor:pointer;background:none;border:0}
 .api-hero h1{font-size:clamp(30px,4vw,46px);color:#fff;margin:8px 0 12px}
 .api-hero .lead{color:var(--mdk);max-width:62ch;font-size:15.5px}
@@ -29,21 +30,16 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 .api-hero .chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--gdh);border:1px solid var(--line);border-radius:20px;padding:6px 13px;background:rgba(201,168,76,.06)}
 .api-body{background:var(--cream);color:var(--inkm);padding:0 0 90px}
 .api-layout{display:grid;grid-template-columns:210px 1fr;gap:44px;padding-top:36px}
-.api-layout{grid-template-columns:1fr;gap:20px}
 .api-nav{position:sticky;top:82px;align-self:start;display:flex;flex-direction:column;gap:2px}
-.api-nav{position:static;flex-direction:row;flex-wrap:wrap;gap:6px}
 .api-nav a{display:flex;gap:10px;align-items:center;font-family:var(--mono);font-size:12px;color:var(--mut);padding:9px 12px;border-radius:8px;border-left:2px solid transparent;cursor:pointer;transition:.14s}
 .api-nav a .n{color:var(--gdd);font-weight:600}
 .api-nav a:hover{background:var(--cream2);color:var(--ink)}
 .api-nav a.on{background:#fff;color:var(--ink);border-left-color:var(--gd);box-shadow:0 2px 10px -6px rgba(20,18,15,.3)}
-.api-nav a{border-left:0;border-bottom:2px solid transparent}
-.api-nav a.on{border-left:0;border-bottom-color:var(--gd)}
 .apsec{margin-bottom:50px;scroll-margin-top:24px}
 .apsec h2{font-size:25px;color:var(--ink);margin-bottom:8px;display:flex;align-items:baseline;gap:12px}
 .apsec h2 .num{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--gdd)}
 .apsec .lead{color:var(--mut);margin-bottom:16px;font-size:14.5px}
 .uc{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:16px 0}
-.uc{grid-template-columns:1fr}
 .uc .c{background:#fff;border:1px solid var(--cream-line);border-radius:12px;padding:16px 17px}
 .uc .c h3{font-size:14.5px;color:var(--ink);margin-bottom:5px}
 .uc .c p{font-size:13px;color:var(--mut);line-height:1.55}
@@ -67,6 +63,15 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 .fldt th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;opacity:.6}
 .fldt td{padding:6px 10px;border-top:1px solid rgba(127,127,127,.16);font-size:13px;vertical-align:top}
 .fldt td:first-child{white-space:nowrap;width:1%}
+@media(max-width:820px){
+.api-layout{grid-template-columns:1fr;gap:20px}
+.api-nav{position:static;flex-direction:row;flex-wrap:wrap;gap:6px}
+.api-nav a{border-left:0;border-bottom:2px solid transparent}
+.api-nav a.on{border-left:0;border-bottom-color:var(--gd)}
+}
+@media(max-width:560px){
+.uc{grid-template-columns:1fr}
+}
 </style>
 </head><body>
 
@@ -102,29 +107,29 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
 
 <nav class="nav"><div class="wrap">
-  <a class="mark" href="dp2.html#"><span class="sig"><svg class="ico" style="width:15px;height:15px"><use href="dp2.html#i-haus"/></svg></span>Deal<b>Pilot</b></a>
+  <a class="mark" href="dp2.html#"><span class="sig"><svg class="ico" style="width:15px;height:15px"><use href="#i-haus"/></svg></span>Deal<b>Pilot</b></a>
   <button class="burger" aria-label="Menü"><span></span><span></span><span></span></button>
   <ul>
     <li><a href="dp2.html#workflow">So funktioniert's</a></li>
     <li><a href="dp2.html#features">Funktionen<i class="kar"></i></a>
       <ul class="sub">
-        <li><a href="dp2.html#features"><svg class="ico si"><use href="dp2.html#i-blitz"/></svg><span><b>Die 19 Module</b><span>Von Boarding über Deal Score bis Bankexport</span></span></a></li>
-        <li><a href="leistungsumfang.html"><svg class="ico si"><use href="dp2.html#i-buch"/></svg><span><b>Leistungsumfang</b><span>Alle 18 Kapitel ausführlich — was jedes Modul kann</span></span></a></li>
-        <li><a href="dp2.html#feature-matrix"><svg class="ico si"><use href="dp2.html#i-ziel"/></svg><span><b>Cockpit-Matrix</b><span>Jede Funktion, jeder Tarif — im Vergleich</span></span></a></li>
-        <li><a href="api.html" class="hier"><svg class="ico si"><use href="dp2.html#i-code"/></svg><span><b>API</b><span>REST-Schnittstelle, voller CRUD — im Pro-Plan</span></span></a></li>
+        <li><a href="dp2.html#features"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Die 19 Module</b><span>Von Boarding über Deal Score bis Bankexport</span></span></a></li>
+        <li><a href="leistungsumfang.html"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Leistungsumfang</b><span>Alle 18 Kapitel ausführlich — was jedes Modul kann</span></span></a></li>
+        <li><a href="dp2.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Cockpit-Matrix</b><span>Jede Funktion, jeder Tarif — im Vergleich</span></span></a></li>
+        <li><a href="api.html" class="hier"><svg class="ico si"><use href="#i-code"/></svg><span><b>API</b><span>REST-Schnittstelle, voller CRUD — im Pro-Plan</span></span></a></li>
       </ul></li>
     <li><a href="dp2.html#stories">Stories</a></li>
     <li><a href="dp2.html#pricing">Preise<i class="kar"></i></a>
       <ul class="sub">
-        <li><a href="dp2.html#pricing"><svg class="ico si"><use href="dp2.html#i-bank"/></svg><span><b>Einzelplatz</b><span>Vier Pakete von kostenlos bis Pro</span></span></a></li>
-        <li><a href="dp2.html#partner-plan"><svg class="ico si"><use href="dp2.html#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>Ihre Mandanten unter Ihrer Marke</span></span></a></li>
-        <li><a href="dp2.html#feature-matrix"><svg class="ico si"><use href="dp2.html#i-ziel"/></svg><span><b>Alles im Vergleich</b><span>Die vollständige Matrix</span></span></a></li>
+        <li><a href="dp2.html#pricing"><svg class="ico si"><use href="#i-bank"/></svg><span><b>Einzelplatz</b><span>Vier Pakete von kostenlos bis Pro</span></span></a></li>
+        <li><a href="dp2.html#partner-plan"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>Ihre Mandanten unter Ihrer Marke</span></span></a></li>
+        <li><a href="dp2.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Alles im Vergleich</b><span>Die vollständige Matrix</span></span></a></li>
       </ul></li>
     <li><a href="dp2.html#partner">Partner</a></li>
     <li><a href="sicherheit.html">Sicherheit<i class="kar"></i></a>
       <ul class="sub">
-        <li><a href="sicherheit.html"><svg class="ico si"><use href="dp2.html#i-schild"/></svg><span><b>Daten &amp; Server</b><span>Hetzner, DSGVO, was gespeichert wird</span></span></a></li>
-        <li><a href="fragen.html"><svg class="ico si"><use href="dp2.html#i-frage"/></svg><span><b>Häufige Fragen</b><span>Die Antworten, die wir sonst am Telefon geben</span></span></a></li>
+        <li><a href="sicherheit.html"><svg class="ico si"><use href="#i-schild"/></svg><span><b>Daten &amp; Server</b><span>Hetzner, DSGVO, was gespeichert wird</span></span></a></li>
+        <li><a href="fragen.html"><svg class="ico si"><use href="#i-frage"/></svg><span><b>Häufige Fragen</b><span>Die Antworten, die wir sonst am Telefon geben</span></span></a></li>
       </ul></li>
   </ul>
   <a class="b-log" href="https://app.dealpilot.immo/">Anmelden</a>
@@ -275,5 +280,5 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
   ziele.forEach(function(z){ if(z) io.observe(z); });
 })();
 </script>
-<script src="dp2.js?v=v1542"></script>
+<script src="dp2.js?v=v1543"></script>
 </body></html>
