@@ -57,7 +57,10 @@
    Gemessen: bei 52 px passt es. */
 .hero h1{font-size:clamp(26px,3.3vw,45px);line-height:1.06;margin:18px 0 20px;
   letter-spacing:-.032em}
-.hero h1 .zl{display:block;overflow:hidden}
+/* Die Zeilen sind einzeln gekapselt, damit sie von unten einfahren.
+   overflow:hidden darf dabei nicht abschneiden, was nach dem weichen
+   Trennstrich in die zweite Zeile rutscht - deshalb keine feste Hoehe. */
+.hero h1 .zl{display:block;overflow:hidden;hyphens:manual}
 .hero h1 .zl i{display:block;font-style:normal;transform:translateY(105%);
   animation:zlHoch .95s var(--e-hoch) forwards}
 .hero h1 .zl:nth-child(2) i{animation-delay:.12s}
