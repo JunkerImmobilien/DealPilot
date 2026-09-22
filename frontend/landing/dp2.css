@@ -1,0 +1,236 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   dp2.css · v1540 · Das Fundament der neuen DealPilot-Seite
+   ───────────────────────────────────────────────────────────────────────
+   Marcel am 22.09.2026: "DealPilot hat nichts mit dem Sachverstaendigen-
+   buero zu tun." Deshalb traegt diese Seite die EIGENE Palette der alten
+   DealPilot-Landing - sie ist durchdacht und steht fuer sich:
+   vier Goldstufen mit klarer Arbeitsteilung, dazu Obsidian, Papier und
+   der Stub-Ton des Boarding-Passes.
+
+   Uebernommen wurde die ARBEITSWEISE, nicht die Farbe:
+     · Rahmen statt schwebender Karten (gap:0 plus ein Aussenrahmen)
+     · fast keine Radien - Kanten wirken wie ein Gutachten
+     · lange, leise Bewegungen im Hintergrund, kurze bei Interaktion
+     · das Mono-Label als durchgehende zweite Stimme
+   ═══════════════════════════════════════════════════════════════════════ */
+:root{
+  /* Flaechen */
+  --ob:#070707; --ob0:#050505; --ob1:#0a0a0a; --stub:#0c0b09;
+  --paper:#EDE7DA; --cream:#FDFCFA; --cream2:#F4F0E7;
+  --cream-line:rgba(20,18,15,.10);
+  /* Schrift */
+  --ink:#16130d; --inks:#3a2e08; --inkm:#4a4536; --mut:#6f685b;
+  /* Gold: vier Stufen mit klarer Arbeitsteilung */
+  --gd:#C9A84C;        /* Linien, Icons, Rahmen */
+  --gdh:#E8CC7A;       /* Gold AUF dunklem Grund */
+  --gdd:#b8932f;       /* Ueberschriften-Akzent */
+  --gdi:#8a6c1e;       /* Gold ALS TEXT auf hellem Grund */
+  --gold-on:#5a4a14;   /* Text AUF Gold */
+  /* Status - nie tokenisieren, in jeder Marke gleich */
+  --grn:#3FA56C; --grnh:#5BD98E; --rd:#B86250;
+  /* Dunkel */
+  --txtd:#ece6d6; --mdk:rgba(255,255,255,.66); --ddk:rgba(255,255,255,.42);
+  --perf:#d9cfb4; --line:rgba(201,168,76,.24);
+  --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  /* Schrift */
+  --disp:'Space Grotesk',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --body:'Inter',system-ui,sans-serif;
+  --ser:'Cormorant Garamond',Georgia,serif;
+  /* Bewegung: genau zwei Kurven */
+  --e-weich:cubic-bezier(.2,.7,.3,1);
+  --e-hoch:cubic-bezier(.2,.72,.2,1);
+  --max:1240px; --nav-h:74px; --bar-h:34px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--ink);
+  font:16.5px/1.68 var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3,h4{font-family:var(--disp);font-weight:700;margin:0;
+  line-height:1.1;letter-spacing:-.025em;hyphens:auto}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 26px}
+[id]{scroll-margin-top:calc(var(--nav-h) + var(--bar-h) + 20px)}
+
+.eye{font:700 10px/1 var(--mono);letter-spacing:.26em;text-transform:uppercase;
+  color:var(--gdi);display:flex;align-items:center;gap:11px}
+.eye::before{content:'';width:24px;height:1px;background:var(--gd);flex:none}
+.eye.ctr{justify-content:center}
+.sec-dark .eye,.hero .eye{color:var(--gdh)}
+.sec-dark .eye::before,.hero .eye::before{background:var(--gdh)}
+.ico{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:1.6;
+  stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ══ Topbar ══════════════════════════════════════════════════════════════
+   Marcel: "da nur Infos zu DealPilot rein". Keine Telefonnummer, kein
+   Verweis auf das Sachverstaendigenbuero - hier steht, was DealPilot
+   ausmacht. */
+.tb{background:var(--ob0);border-bottom:1px solid rgba(201,168,76,.15);
+  height:var(--bar-h);display:flex;align-items:center;
+  font:700 10px/1 var(--mono);letter-spacing:.14em;color:rgba(232,204,122,.72)}
+.tb .wrap{display:flex;align-items:center;gap:26px;width:100%}
+.tb .pkt{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.tb .pkt i{width:5px;height:5px;background:var(--gd);flex:none}
+.tb .rechts{margin-left:auto;display:flex;gap:22px;align-items:center}
+.tb a{color:rgba(232,204,122,.72);transition:color .22s}
+.tb a:hover{color:var(--gdh)}
+
+/* ══ Kopf ═══════════════════════════════════════════════════════════════ */
+.nav{position:sticky;top:0;z-index:200;height:var(--nav-h);display:flex;
+  align-items:center;background:rgba(253,252,250,.94);backdrop-filter:blur(12px);
+  border-bottom:1px solid transparent;transition:.3s}
+.nav.fest{border-bottom-color:var(--cream-line);box-shadow:0 8px 28px rgba(22,19,13,.07)}
+.nav .wrap{display:flex;align-items:center;gap:26px;width:100%}
+.mark{font:700 22px/1 var(--disp);letter-spacing:-.9px;display:flex;align-items:center;gap:10px}
+.mark b{color:var(--gdd);font-weight:700}
+.mark .sig{width:28px;height:28px;border:1.5px solid var(--gd);display:flex;
+  align-items:center;justify-content:center;color:var(--gdi)}
+.nav ul{display:flex;gap:2px;margin:0 0 0 auto;padding:0;list-style:none;align-items:center}
+.nav ul li{position:relative}
+.nav ul li > a{display:flex;align-items:center;gap:6px;padding:10px 13px;
+  font-size:14.5px;color:var(--inkm);transition:.2s;position:relative}
+.nav ul li > a::after{content:'';position:absolute;left:13px;right:13px;bottom:4px;
+  height:1.5px;background:var(--gd);width:0;transition:width .25s var(--e-weich)}
+.nav ul li:hover > a::after,.nav ul li > a.hier::after{width:calc(100% - 26px)}
+.nav ul li:hover > a,.nav ul li > a.hier{color:var(--ink)}
+.kar{width:7px;height:7px;border-right:1.4px solid currentColor;
+  border-bottom:1.4px solid currentColor;transform:rotate(45deg) translateY(-2px);
+  transition:transform .25s}
+.nav li:hover .kar{transform:rotate(225deg) translateY(-2px)}
+.sub{position:absolute;top:100%;left:-6px;min-width:330px;background:#fff;
+  border:1px solid var(--cream-line);padding:7px;opacity:0;visibility:hidden;
+  transform:translateY(8px);transition:.22s var(--e-weich);list-style:none;margin:0;
+  box-shadow:0 20px 50px rgba(22,19,13,.13)}
+.nav li:hover .sub,.nav li:focus-within .sub{opacity:1;visibility:visible;transform:none}
+.sub::before{content:'';position:absolute;top:-10px;left:0;right:0;height:10px}
+.sub li{display:block}
+.sub a{display:flex;gap:11px;padding:10px 12px;transition:.18s;align-items:flex-start}
+.sub a::after{display:none}
+.sub a:hover{background:var(--cream2)}
+.sub .si{width:17px;height:17px;color:var(--gdi);margin-top:3px;flex:none}
+.sub b{display:block;font-size:14px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.sub span{display:block;font-size:12.3px;color:var(--mut);line-height:1.45}
+.b-log{font-size:14px;color:var(--ink);border-bottom:1.5px solid var(--gd);padding-bottom:2px}
+.b-cta{background:var(--runway);color:#14100a;padding:11px 20px;font-weight:600;
+  font-size:14px;position:relative;overflow:hidden;transition:.22s}
+.b-cta::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(105deg,transparent,rgba(255,255,255,.45),transparent);
+  transform:translateX(-130%);transition:transform .75s cubic-bezier(.3,.7,.3,1)}
+.b-cta:hover::after{transform:translateX(130%)}
+.burger{display:none;margin-left:auto;background:none;border:0;padding:8px;cursor:pointer}
+.burger span{display:block;width:22px;height:2px;background:var(--ink);margin:4px 0}
+
+/* ══ Abschnitte ═════════════════════════════════════════════════════════ */
+.sec{padding:104px 0}
+.sec.eng{padding:72px 0}
+.sec-cream{background:var(--cream2)}
+.sec-paper{background:var(--paper)}
+.sec-dark{background:var(--ob);color:var(--txtd)}
+.sec-dark h2,.sec-dark h3,.sec-dark h4{color:#fff}
+.head{max-width:800px;margin-bottom:46px}
+.head.ctr{margin-left:auto;margin-right:auto;text-align:center}
+.head h2{font-size:clamp(26px,4.4vw,50px);margin:14px 0}
+.head h2 .ac{color:var(--gdd)}
+.sec-dark .head h2 .ac{color:var(--gdh)}
+.head p{margin:0;color:var(--inkm);font-size:17px;max-width:62ch}
+.head.ctr p{margin-left:auto;margin-right:auto}
+.sec-dark .head p{color:var(--mdk)}
+
+.rv{opacity:0;transform:translateY(24px);
+  transition:opacity .8s var(--e-weich),transform .8s var(--e-weich)}
+.rv.in{opacity:1;transform:none}
+
+/* ══ Bausteine ══════════════════════════════════════════════════════════ */
+/* Das Blatt: gap:0, ein Aussenrahmen, 1px-Trenner an den Kindern. */
+.blatt{border:1px solid var(--cream-line);background:#fff;display:grid;gap:0}
+.blatt > *{border-right:1px solid var(--cream-line);
+  border-bottom:1px solid var(--cream-line);padding:30px 26px;position:relative}
+.sec-dark .blatt{background:rgba(255,255,255,.02);border-color:var(--line)}
+.sec-dark .blatt > *{border-color:var(--line)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g5{grid-template-columns:repeat(5,1fr)}
+
+/* Der goldene Streifen, der herausfaehrt. */
+.zieh::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--runway);transform:scaleY(0);transform-origin:top;
+  transition:transform .3s var(--e-weich)}
+.zieh:hover::before{transform:scaleY(1)}
+.zieh:hover{background:var(--cream)}
+.sec-dark .zieh:hover{background:rgba(255,255,255,.04)}
+
+.kico{width:36px;height:36px;background:rgba(201,168,76,.11);display:flex;
+  align-items:center;justify-content:center;color:var(--gdi);margin-bottom:14px;flex:none}
+.kico .ico{width:19px;height:19px}
+.sec-dark .kico{background:rgba(232,204,122,.1);color:var(--gdh)}
+.kt{font-size:17px;margin-bottom:8px}
+.kb{margin:0;font-size:14px;color:var(--inkm)}
+.sec-dark .kb{color:var(--mdk)}
+.kl{margin:13px 0 0;padding:0;list-style:none;font-size:13.4px;color:var(--inkm)}
+.sec-dark .kl{color:var(--mdk)}
+.kl li{padding:4px 0 4px 18px;position:relative;line-height:1.5}
+.kl li::before{content:'';position:absolute;left:1px;top:11px;width:8px;height:4.5px;
+  border-left:1.6px solid var(--grn);border-bottom:1.6px solid var(--grn);transform:rotate(-45deg)}
+.mlbl{font:700 9px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--mut)}
+
+/* Knoepfe */
+.btn-p{display:inline-block;background:var(--runway);color:#14100a;padding:15px 30px;
+  font-weight:600;font-size:16px;position:relative;overflow:hidden;transition:.22s}
+.btn-p:hover{transform:translateY(-2px)}
+.btn-l{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(236,230,214,.3);
+  padding:15px 26px;font-size:15.5px;color:var(--txtd);transition:.22s}
+.btn-l:hover{border-color:var(--gd);background:rgba(201,168,76,.1)}
+.btn-dark{display:inline-block;background:var(--ob);color:var(--gdh);padding:14px 28px;
+  font-weight:600;font-size:15px;transition:.22s}
+.btn-dark:hover{background:var(--stub)}
+
+/* Laufband */
+.tk{background:var(--ob1);border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  overflow:hidden;font:700 10px/1 var(--mono);letter-spacing:.17em;color:rgba(232,204,122,.6);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
+.tk-t{display:inline-flex;gap:50px;padding:14px 0;white-space:nowrap;
+  animation:mq 52s linear infinite}
+.tk:hover .tk-t{animation-play-state:paused}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* Abschluss-Band */
+.board-band{background:var(--stub);color:var(--txtd);position:relative;padding:64px 0}
+.board-band .perf-edge{position:absolute;top:0;left:0;right:0;height:2px;background:var(--runway)}
+.board-band .inner{max-width:var(--max);margin:0 auto;padding:0 26px;display:flex;
+  align-items:center;justify-content:space-between;gap:34px;flex-wrap:wrap}
+.board-band .kick{font:700 10px/1 var(--mono);letter-spacing:.2em;color:var(--gdh);margin-bottom:12px}
+.board-band h2{font-size:clamp(25px,3.4vw,40px);margin-bottom:10px}
+.board-band p{margin:0;color:var(--mdk);max-width:52ch}
+
+/* Fuss */
+.footer{background:var(--ob0);color:var(--ddk);padding:58px 0 28px;font-size:13.8px}
+.footer h4{font:700 10px/1 var(--mono);letter-spacing:.15em;text-transform:uppercase;
+  color:var(--gd);margin:0 0 14px}
+.footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:34px}
+.footer a{display:block;padding:3.5px 0;color:var(--ddk);transition:.2s}
+.footer a:hover{color:var(--gdh);transform:translateX(3px)}
+.footer-tag{margin:14px 0 0;max-width:330px;line-height:1.6}
+.footer-bottom{margin-top:38px;padding-top:22px;border-top:1px solid rgba(255,255,255,.08);
+  display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  font-size:12.3px;color:rgba(255,255,255,.3)}
+
+@media(prefers-reduced-motion:reduce){
+  .rv{opacity:1;transform:none;transition:none}
+  .tk-t{animation:none}
+}
+@media(max-width:1080px){
+  .nav ul{display:none}
+  .burger{display:block}
+  .g5,.g4{grid-template-columns:repeat(2,1fr)}
+  .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:700px){
+  .sec{padding:72px 0}
+  .g5,.g4,.g3,.g2{grid-template-columns:1fr}
+  .blatt > *{border-right:0}
+  .footer-grid{grid-template-columns:1fr}
+  .tb .rechts{display:none}
+}
