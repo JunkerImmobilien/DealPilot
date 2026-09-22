@@ -265,7 +265,14 @@
      tragen einen Stand und sind damit ehrlich, nur nicht tagesaktuell. */
   var MON = ['Jan','Feb','M\u00e4r','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
   function pz(v) { return (Math.round(v * 100) / 100).toFixed(2).replace('.', ',') + '\u00a0%'; }
-  fetch('https://app.dealpilot.immo/api/v1/market-rates/pfandbrief?maturities=5,10,15,20')
+  /* v1547: RELATIVER Pfad, nicht die App-Domain. Gemessen am
+       22.09.2026: ein Abruf von staging.dealpilot.immo nach
+       app.dealpilot.immo scheitert an CORS (Failed to fetch, die
+       App-Domain sendet keine Access-Control-Header). Ueber die
+       EIGENE Domain kommt derselbe Endpunkt mit 200 durch - der
+       Caddy leitet ihn weiter. Beim Nutzerzaehler steht es laengst
+       so; hier war es inkonsequent. */
+  fetch('/api/v1/market-rates/pfandbrief?maturities=5,10,15,20')
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (res) {
       /* Defensiv: die Nutzdaten koennen oben oder unter .data liegen. */
