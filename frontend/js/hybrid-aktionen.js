@@ -64,7 +64,23 @@
     if (document.body.classList.contains('hdr-no-score') || !gilt(mini)) { host.innerHTML = ''; host.style.display = 'none'; return; }
     var b = mini && mini.querySelector('b'), st = mini && mini.querySelector('span');
     var n = b ? parseInt(String(b.textContent).replace(/[^0-9]/g, ''), 10) : NaN;
-    if (!isFinite(n)) { host.innerHTML = ''; host.style.display = 'none'; return; }
+    if (!isFinite(n)) {
+      /* v1518 · gemessen an Rinteln: die Spalte blieb leer, obwohl der
+         Rechenkern laengst Zahlen hatte. Ursache ist der 70-%-Riegel in
+         calc.js: unter dieser Vollstaendigkeit zeigt der Kopf KEINEN Score
+         (body.hdr-banner-only), und die Spalte schrieb ihn nur ab.
+         Die Regel bleibt - eine Gesamtnote aus einem Drittel der Angaben
+         waere eine Behauptung. Aber die fuenf Bereiche stehen trotzdem, und
+         dazu der Grund, warum die Note fehlt. Das ist der Unterschied
+         zwischen 'nichts da' und 'noch nicht so weit'. */
+      var teile = bereiche();
+      if (!teile) { host.innerHTML = ''; host.style.display = 'none'; return; }
+      host.style.display = '';
+      host.innerHTML = '<div class="lbl">Investor Deal Score</div>'
+        + '<div class="dp-hy-warte">' + wartetext() + '</div>'
+        + teile;
+      return;
+    }
     host.style.display = '';
     host.innerHTML = '<div class="lbl">Investor Deal Score</div>'
       + '<div class="dp-hy-score-z"><b style="color:' + farbe(n) + '">' + n + '</b><span>/ 100</span>'
@@ -113,6 +129,15 @@
     }).join('');
     if (!zeilen) return '';
     return '<div class="dp-hy-bereiche">' + zeilen + '</div>';
+  }
+  /* Sagt, warum die Gesamtnote noch fehlt - mit der Zahl, die der Kopf
+     ohnehin fuehrt, nicht mit einer zweiten Rechnung. */
+  function wartetext() {
+    var t = ausKopf('.hdr-comp-text', '#hdr-completeness');
+    var proz = t && t.match(/(\d+)\s*%/);
+    return proz
+      ? 'Gesamtnote ab 70 % Vollst\u00e4ndigkeit \u00b7 aktuell ' + proz[1] + ' %'
+      : 'Gesamtnote erscheint ab 70 % Vollst\u00e4ndigkeit';
   }
   function ausKopf(sel, wirt) { var e = document.querySelector(sel); if (!e) return null; if (wirt && !gilt(document.querySelector(wirt))) return null; var t = e.textContent.trim().replace(/\s+/g, ' '); return t || null; }
   function kennzahlen() {

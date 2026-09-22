@@ -37941,3 +37941,5 @@ html[data-ui-theme="kanzlei"] body.dp-hybrid-rail #dp-hybrid-aktionen{ padding-b
 #dp-hybrid-aktionen .dp-hy-brbar i{ display:block; height:100%; border-radius:99px; }
 #dp-hybrid-aktionen .dp-hy-br > b{ font:600 11.5px/1 "JetBrains Mono",ui-monospace,monospace;
   text-align:right; color:#2A2727; font-variant-numeric:tabular-nums; }
+#dp-hybrid-aktionen .dp-hy-warte{ font-size:11px; line-height:1.45; color:#8A8272;
+  background:#FBF6E9; border:1px solid #EDE4CE; border-radius:7px; padding:6px 8px; margin:4px 0 2px; }
