@@ -1,180 +1,457 @@
-<!DOCTYPE html><!-- DealPilot Unterseite · v1533 -->
+<!DOCTYPE html><!-- DealPilot Fragen · v1554 -->
 <html lang="de"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Häufige Fragen · DealPilot</title>
-<meta name="description" content="Was DealPilot rechnet, woher die Zahlen kommen, was die Pakete kosten und wo die Grenzen liegen — die Fragen, die am häufigsten gestellt werden.">
+<meta name="description" content="Was DealPilot rechnet, woher die Zahlen kommen, was die Pakete kosten und wo die Grenzen liegen — die Fragen, die am häufigsten gestellt werden, ausführlich beantwortet.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="dp-seite.css?v=v1533">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="dp2.css?v=v1554">
+<link rel="stylesheet" href="dp2-teile.css?v=v1554">
+<style>
+/* ── Frageseite ───────────────────────────────────────────────────── */
+.fq-nav{position:sticky;top:calc(var(--nav-h) + var(--bar-h));z-index:90;
+  background:rgba(253,252,250,.96);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--cream-line);overflow-x:auto}
+.fq-nav .wrap{display:flex;gap:2px;padding-top:0;padding-bottom:0}
+.fq-nav a{white-space:nowrap;padding:14px 15px;font:700 10px/1 var(--mono);
+  letter-spacing:.13em;text-transform:uppercase;color:var(--mut);transition:.2s;
+  border-bottom:2px solid transparent}
+.fq-nav a:hover{color:var(--ink)}
+.fq-nav a.on{color:var(--gdi);border-bottom-color:var(--gd)}
+.fq-grp{margin-bottom:56px}
+.fq-grp:last-child{margin-bottom:0}
+.fq-grp > .eye{margin-bottom:12px}
+.fq-grp > h2{font-size:clamp(23px,3vw,34px);margin-bottom:28px}
+.fq-grp > h2 .ac{color:var(--gdd)}
+.fq{background:#fff;border:1px solid var(--cream-line);margin-bottom:10px;overflow:hidden;
+  transition:border-color .24s var(--e-weich),box-shadow .24s var(--e-weich)}
+.fq[open]{border-color:var(--gd);box-shadow:0 12px 34px -20px rgba(22,19,13,.5)}
+.fq summary{padding:18px 22px;cursor:pointer;font:700 16.5px/1.45 var(--disp);
+  list-style:none;display:flex;align-items:flex-start;gap:14px;transition:background .2s}
+.fq summary::-webkit-details-marker{display:none}
+.fq summary::after{content:'';margin-left:auto;width:9px;height:9px;flex:none;margin-top:7px;
+  border-right:2px solid var(--gdi);border-bottom:2px solid var(--gdi);
+  transform:rotate(45deg);transition:transform .25s var(--e-weich)}
+.fq[open] summary::after{transform:rotate(225deg)}
+.fq summary:hover{background:var(--cream2)}
+.fq .ant{padding:2px 22px 22px;color:var(--inkm);font-size:15px;max-width:76ch}
+.fq .ant p{margin:0 0 12px}
+.fq .ant p:last-child{margin:0}
+.fq .ant b{color:var(--ink)}
+.fq .ant ul{margin:0 0 12px;padding:0;list-style:none}
+.fq .ant li{padding:5px 0 5px 20px;position:relative;line-height:1.55}
+.fq .ant li::before{content:'';position:absolute;left:2px;top:12px;width:8px;height:4.5px;
+  border-left:1.6px solid var(--grn);border-bottom:1.6px solid var(--grn);transform:rotate(-45deg)}
+.fq .ant a{color:var(--gdi);border-bottom:1px solid rgba(138,108,30,.4)}
+.fq .wo{margin-top:14px;background:var(--cream2);border-left:3px solid var(--gd);
+  padding:12px 16px;font-size:13.6px;color:var(--inkm)}
+.fq .wo b{display:block;font:700 9px/1 var(--mono);letter-spacing:.15em;
+  text-transform:uppercase;color:var(--gdi);margin-bottom:6px}
+</style>
 </head><body>
 
 <svg style="display:none" aria-hidden="true">
-<symbol id="i-haus2" viewBox="0 0 24 24"><path d="M3 21V10l9-7 9 7v11"/><path d="M9 21v-6h6v6"/><path d="M3 21h18"/></symbol>
+<symbol id="i-haus" viewBox="0 0 24 24"><path d="M3 21V10l9-7 9 7v11"/><path d="M9 21v-6h6v6"/><path d="M3 21h18"/></symbol>
+<symbol id="i-blitz" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></symbol>
+<symbol id="i-buch" viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 0 4 22.5V4.5Z"/><path d="M8 7h8M8 11h6"/></symbol>
+<symbol id="i-ziel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></symbol>
+<symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6"/><path d="M5 10v8m5-8v8m4-8v8m5-8v8M3 21h18"/></symbol>
+<symbol id="i-ebenen" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5M3 18l9 5 9-5"/></symbol>
+<symbol id="i-schild" viewBox="0 0 24 24"><path d="M12 2 4 5.5v6c0 5 3.4 8.9 8 10.5 4.6-1.6 8-5.5 8-10.5v-6L12 2Z"/><path d="m9 12 2.2 2.2L15.5 10"/></symbol>
+<symbol id="i-frage" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.3a2.9 2.9 0 0 1 5.6 1c0 1.9-2.8 2.4-2.8 4M12 17.5h.01"/></symbol>
 </svg>
 
-<div class="tb"><div class="w tb-in">
-  <span>◆ GUTACHTEN · KAPITALANLAGE · SOFTWARE</span>
-  <div class="tb-r">
-    <a href="tel:+4915129820057">+49 (0) 151 298 200 57</a>
+<div class="tb"><div class="wrap">
+  <span class="pkt"><i></i>19 MODULE</span>
+  <span class="pkt"><i></i>24 KENNZAHLEN IM SCORE</span>
+  <span class="pkt"><i></i>SERVER IN DEUTSCHLAND</span>
+  <div class="rechts">
+    <span><b data-nutzer>866</b> REGISTRIERTE NUTZER</span>
     <a href="mailto:info@dealpilot.immo">INFO@DEALPILOT.IMMO</a>
-    <a href="https://junker-immobilien.io">SACHVERSTÄNDIGENBÜRO ↗</a>
   </div>
 </div></div>
 
-<header id="kopf"><div class="w kopf">
-  <a class="logo" href="entwurf-voll.html"><span class="sig"><svg class="ico" style="width:14px;height:14px"><use href="#i-haus2"/></svg></span>Deal<em>Pilot</em></a>
-  <ul class="hn">
-    <li><a href="entwurf-voll.html#module">Module</a></li>
-    <li><a href="entwurf-voll.html#ablauf">Ablauf</a></li>
-    <li><a href="sicherheit.html">Sicherheit</a></li>
+<nav class="nav"><div class="wrap">
+  <a class="mark" href="dp2.html"><span class="sig"><svg class="ico" style="width:15px;height:15px"><use href="#i-haus"/></svg></span>Deal<b>Pilot</b></a>
+  <button class="burger" aria-label="Menü"><span></span><span></span><span></span></button>
+  <ul>
+    <li><a href="dp2.html#workflow">So funktioniert's</a></li>
+    <li><a href="dp2.html#features">Funktionen</a></li>
+    <li><a href="leistungsumfang.html">Leistungsumfang</a></li>
+    <li><a href="dp2.html#pricing">Preise</a></li>
+    <li><a href="api.html">API</a></li>
     <li><a href="fragen.html" class="hier">Fragen</a></li>
-    <li><a href="entwurf-voll.html#preise">Preise</a></li>
   </ul>
   <a class="b-log" href="https://app.dealpilot.immo/">Anmelden</a>
   <a class="b-cta" href="https://app.dealpilot.immo/?register=1">Kostenlos starten</a>
-</div></header>
+</div></nav>
 
-<div class="sk"><div class="raster"></div><div class="w">
-  <div class="kick">Häufige Fragen</div>
-  <h1>Die Fragen, die <em>wirklich gestellt werden.</em></h1>
-  <p>Kein Marketingtext — die Antworten, die wir sonst am Telefon geben.</p>
-  <div class="brot"><a href="entwurf-voll.html">DEALPILOT</a> › FRAGEN</div>
-</div></div>
-
-<section><div class="w-schmal">
-  <div class="kz rv" style="margin-bottom:28px"><div class="kick">Einstieg</div>
-    <h2>Loslegen und <em>ausprobieren.</em></h2></div>
-
-  <details class="fq rv"><summary>Was kostet der Einstieg?</summary><div class="ant">
-    <p>Nichts. Das Free-Paket ist dauerhaft kostenlos, und die <b>ersten vier Wochen
-       läuft es mit dem vollen Pro-Umfang</b> — ohne Zahlungsdaten.</p>
-    <p>Danach bleibt Free bestehen: ein Objekt, eine Marktpreisindikation im Monat,
-       PDF mit Wasserzeichen. Wer mehr braucht, wechselt; wer nicht, bleibt.</p></div></details>
-
-  <details class="fq rv"><summary>Wie lange dauert es, bis ich eine Zahl sehe?</summary><div class="ant">
-    <p>Der Quick-Check braucht sechs Angaben — Kaufpreis, Fläche, Miete, Eigenkapital,
-       Zins, Tilgung — und rechnet sofort. Das ist eine Minute.</p>
-    <p>Ein vollständig durchgerechnetes Objekt mit Steuerwirkung und Bankunterlage
-       dauert je nach Datenlage zehn bis zwanzig Minuten. Wenn ein Exposé vorliegt,
-       weniger: das PDF wird eingelesen und füllt die Felder.</p></div></details>
-
-  <details class="fq rv"><summary>Muss ich alles eintippen?</summary><div class="ant">
-    <p>Nein. Es gibt drei Wege: <b>Exposé-PDF hochladen</b>, das Objekt <b>diktieren</b>
-       (Sprechlauf, in sechs Etappen) oder <b>Belege scannen</b>. Alle drei lassen sich
-       mischen und mit der Hand nachbessern.</p></div></details>
-
-  <details class="fq rv"><summary>Kann ich monatlich kündigen?</summary><div class="ant">
-    <p>Ja. Alle Pakete sind monatlich kündbar. Beim Jahrestarif zahlen Sie für zwölf
-       Monate und sparen dafür etwa 17 Prozent.</p>
-    <p>Nicht genutzte Bewertungsabrufe verfallen nicht — sie bleiben auf dem Konto,
-       solange das Abo läuft.</p></div></details>
-</div></section>
-
-<section class="sec-creme"><div class="w-schmal">
-  <div class="kz rv" style="margin-bottom:28px"><div class="kick">Die Zahlen</div>
-    <h2>Woher sie <em>kommen.</em></h2></div>
-
-  <details class="fq rv"><summary>Sind die Werte amtlich oder geschätzt?</summary><div class="ant">
-    <p>Jede Zahl trägt ihre Herkunft: Quelle, Jahrgang, Stichtag. Die Kaufpreisaufteilung
-       rechnet mit der <b>BMF-Arbeitshilfe</b>, die Restnutzungsdauer nach <b>Anlage 2
-       ImmoWertV</b>, die Bodenrichtwerte kommen aus den amtlichen Portalen der Länder.</p>
-    <p>Wo keine amtliche Angabe vorliegt, erscheint <b>kein Wert</b> — sondern der
-       zuständige Gutachterausschuss und der Link auf seine Quelle. Wir erfinden keine Zahl,
-       und wir nehmen auch nicht den Nachbarkreis.</p></div></details>
-
-  <details class="fq rv"><summary>Ersetzt das ein Gutachten?</summary><div class="ant">
-    <p>Nein, und das ist keine Floskel. DealPilot rechnet nach den Verfahren der ImmoWertV,
-       aber ein Verkehrswertgutachten ist eine <b>persönliche Leistung eines
-       Sachverständigen</b> mit Ortsbesichtigung und Haftung.</p>
-    <p>Was DealPilot liefert, ist eine belegbare Entscheidungshilfe — gut genug für die
-       Vorauswahl, den Banktermin und das Gespräch mit dem Steuerberater. Wenn es ein
-       Gutachten sein muss, sagt Ihnen das Programm das auch.</p></div></details>
-
-  <details class="fq rv"><summary>Warum zeigt ein Verfahren manchmal gar nichts an?</summary><div class="ant">
-    <p>Weil eine Pflichtangabe fehlt. <b>Kein Verfahren rechnet halb.</b> Ein Ertragswert
-       ohne Liegenschaftszinssatz wäre keine vorsichtige Schätzung, sondern eine Behauptung
-       mit Nachkommastellen.</p>
-    <p>Stattdessen steht dort, was fehlt und wo es zu bekommen ist.</p></div></details>
-
-  <details class="fq rv"><summary>Wie entsteht der Investor Deal Score?</summary><div class="ant">
-    <p>Aus 24 Kennzahlen in fünf Bereichen: Rendite, Finanzierung, Risiko, Lage, Upside.
-       Jeder Bereich zeigt mit, auf wie vielen Angaben er beruht — ein Wert aus einer
-       einzigen Kennzahl ist etwas anderes als einer aus sechs.</p>
-    <p>Die Gesamtnote erscheint erst <b>ab 70 Prozent Vollständigkeit</b>. Darunter sehen
-       Sie die fünf Bereiche, aber keine Note — eine Gesamtbewertung aus einem Drittel
-       der Angaben wäre irreführend.</p></div></details>
-</div></section>
-
-<section><div class="w-schmal">
-  <div class="kz rv" style="margin-bottom:28px"><div class="kick">Für Büros</div>
-    <h2>Mehrere <em>Nutzer.</em></h2></div>
-
-  <details class="fq rv"><summary>Was unterscheidet das Partner-Paket von mehreren Einzelplätzen?</summary><div class="ant">
-    <p>Drei Dinge: <b>Ihre Marke</b> (Logo, Farben, Absenderadresse in App und PDFs),
-       eine <b>Mandanten-Konsole</b> mit Freigaben, und das Reseller-Portal.</p>
-    <p>Ein Berater-Platz hat den vollen Pro-Umfang und kostet deshalb auch etwa so viel
-       wie Pro — das Partner-Paket ist kein günstigerer Weg zu mehreren Einzelplätzen,
-       sondern ein anderes Produkt.</p></div></details>
-
-  <details class="fq rv"><summary>Was ist der Unterschied zwischen Berater- und Mandanten-Plätzen?</summary><div class="ant">
-    <p>Ein <b>Berater</b> arbeitet wie ein Pro-Nutzer: alle Objekte des Büros, alle Module,
-       alle Ausgaben.</p>
-    <p>Ein <b>Mandant</b> sieht nur seine eigenen Objekte, unter Ihrer Marke, und nur das,
-       was Sie freigeben. Deshalb kostet ein Mandanten-Platz deutlich weniger.</p></div></details>
-
-  <details class="fq rv"><summary>Gibt es Whitelabel mit eigener Domain?</summary><div class="ant">
-    <p>Ja. Eigene Domain, eigene Farbwelt in App und Dokumenten, eigene Absenderadresse,
-       erweiterter API-Zugang. Das wird individuell aufgesetzt — sprechen Sie uns an.</p></div></details>
-</div></section>
-
-<section class="sec-papier"><div class="w-schmal">
-  <div class="kz rv" style="margin-bottom:28px"><div class="kick">Technik &amp; Daten</div>
-    <h2>Wo alles <em>liegt.</em></h2></div>
-
-  <details class="fq rv"><summary>Wo werden meine Daten gespeichert?</summary><div class="ant">
-    <p>Auf Servern in Deutschland, bei der Hetzner Online GmbH. Kein Server außerhalb
-       der EU, keine Weitergabe zu Werbezwecken, keine Profilbildung.</p>
-    <p>Die Einzelheiten stehen auf der Seite
-       <a href="sicherheit.html" style="color:var(--gold-lo);border-bottom:1px solid">Sicherheit &amp; Datenschutz</a>.</p></div></details>
-
-  <details class="fq rv"><summary>Brauche ich einen Vertrag zur Auftragsverarbeitung?</summary><div class="ant">
-    <p>Wenn Sie DealPilot beruflich für Mandanten nutzen: ja, nach Art. 28 DSGVO.
-       Den Vertrag stellen wir bereit — kurze E-Mail genügt.</p></div></details>
-
-  <details class="fq rv"><summary>Läuft das auf dem Handy?</summary><div class="ant">
-    <p>Ja. Die Anwendung läuft im Browser und passt sich der Bildschirmbreite an; sie
-       lässt sich auf dem Startbildschirm ablegen wie eine App. Für den Vor-Ort-Termin
-       ist besonders der Sprechlauf gedacht — diktieren statt tippen.</p></div></details>
-
-  <details class="fq rv"><summary>Kann ich meine Daten wieder herausbekommen?</summary><div class="ant">
-    <p>Ja. Investment-PDF, Bankexport als Excel mit 25 Spalten, und auf Anforderung
-       eine vollständige Herausgabe Ihrer gespeicherten Daten.</p></div></details>
-</div></section>
-
-<div class="schluss"><div class="w">
-  <h2>Ihre Frage war <em>nicht dabei?</em></h2>
-  <p>Schreiben Sie sie uns — die Antwort landet meistens hier auf der Seite.</p>
-  <a class="b-gross" href="mailto:info@dealpilot.immo?subject=Frage zu DealPilot">Frage stellen</a>
-</div></div>
-
-<footer><div class="w">
-  <div class="ff">
-    <div><div class="logo" style="color:#F6F3EC"><span class="sig"><svg class="ico" style="width:14px;height:14px"><use href="#i-haus2"/></svg></span>Deal<em>Pilot</em></div>
-      <p style="margin:14px 0 0;max-width:330px">Entstanden aus der Gutachtenpraxis eines
-        DESAG-zertifizierten Sachverständigen.</p></div>
-    <div><h4>Produkt</h4><a href="entwurf-voll.html#module">Module</a>
-      <a href="entwurf-voll.html#ablauf">Ablauf</a><a href="entwurf-voll.html#matrix">Vergleich</a>
-      <a href="entwurf-voll.html#preise">Preise</a></div>
-    <div><h4>Vertrauen</h4><a href="sicherheit.html">Sicherheit &amp; Server</a>
-      <a href="fragen.html">Häufige Fragen</a><a href="https://junker-immobilien.io">Sachverständigenbüro</a></div>
-    <div><h4>Rechtliches</h4><a href="/impressum.html">Impressum</a>
-      <a href="/datenschutz.html">Datenschutz</a><a href="/agb.html">AGB</a></div>
+<div class="sk" style="background:var(--ob);color:var(--txtd);padding:56px 0 50px;position:relative;overflow:hidden">
+  <div class="wrap" style="position:relative">
+    <div class="eye" style="color:var(--gdh)">Häufige Fragen</div>
+    <h2 style="font-size:clamp(28px,4vw,46px);margin:15px 0 13px;color:#fff">Die Fragen, die
+      <span style="color:var(--gdh)">wirklich gestellt werden.</span></h2>
+    <p style="margin:0;max-width:62ch;color:var(--mdk);font-size:17px">Kein Marketingtext —
+      die Antworten, die wir sonst am Telefon geben. Ausführlich, mit dem Weg dorthin.</p>
   </div>
-  <div class="fe"><span>© 2026 Junker Immobilien · Keine Steuer- oder Finanzberatung.</span>
-    <span>Alle Berechnungen sind Entscheidungshilfen, keine Gutachten.</span></div>
+</div>
+
+<div class="fq-nav"><div class="wrap">
+  <a href="#einstieg" class="on">01 Einstieg</a>
+  <a href="#quickcheck">02 Quick-Check</a>
+  <a href="#zahlen">03 Die Zahlen</a>
+  <a href="#rechnen">04 Rechnen &amp; Steuer</a>
+  <a href="#buero">05 Für Büros</a>
+  <a href="#technik">06 Technik &amp; Daten</a>
+</div></div>
+
+<section class="sec"><div class="wrap" style="max-width:980px">
+
+<!-- ══ 01 EINSTIEG ═══════════════════════════════════════════════════ -->
+<div class="fq-grp rv" id="einstieg">
+  <div class="eye">01 · Einstieg</div>
+  <h2>Loslegen und <span class="ac">ausprobieren.</span></h2>
+
+  <details class="fq" open><summary>Was kostet der Einstieg?</summary><div class="ant">
+    <p>Nichts. Das Free-Paket ist dauerhaft kostenlos, und die <b>ersten vier Wochen läuft
+      jedes neue Konto mit dem vollen Pro-Umfang</b> — ohne Zahlungsdaten, ohne Kündigung.</p>
+    <p>In diesen vier Wochen haben Sie 5 Marktpreisindikationen, 3 erweiterte und 1
+      Wertermittlung nach ImmoWertV. Danach wird daraus automatisch Free: ein Objekt, eine
+      Marktpreisindikation im Monat, PDFs mit Wasserzeichen. Nicht genutzte Bewertungen aus
+      der Testphase verfallen.</p>
+    <p>Wer mehr braucht, wechselt monatlich kündbar. Wer nicht, bleibt auf Free.</p></div></details>
+
+  <details class="fq"><summary>Wie lange dauert es, bis ich eine belastbare Zahl sehe?</summary><div class="ant">
+    <p>Das hängt davon ab, wie tief Sie gehen wollen — und genau das bestimmen Sie:</p>
+    <ul>
+      <li><b>Eine Minute</b> — Quick-Check mit sechs Angaben. Reicht für die Frage
+        „lohnt das Weiterrechnen überhaupt?"</li>
+      <li><b>Zehn bis zwanzig Minuten</b> — ein vollständig gerechnetes Objekt mit
+        Finanzierung, Steuerwirkung und Deal Score.</li>
+      <li><b>Wenige Minuten mehr</b> — der Investment-Case als PDF für die Bank.</li>
+    </ul>
+    <p>Liegt ein Exposé vor, geht es schneller: Das PDF wird eingelesen und füllt die Felder.</p></div></details>
+
+  <details class="fq"><summary>Muss ich alles eintippen?</summary><div class="ant">
+    <p>Nein. Es gibt vier Wege, und sie lassen sich mischen:</p>
+    <ul>
+      <li><b>Exposé-PDF hochladen</b> — die KI liest Eckdaten und Bilder heraus.</li>
+      <li><b>Sprechlauf</b> — das Objekt diktieren, in sechs Etappen. Die Spracherkennung
+        schreibt mit, die KI ordnet jede Zahl dem richtigen Feld zu.</li>
+      <li><b>Belege scannen</b> — Rechnungen einlesen, Werte übernehmen.</li>
+      <li><b>ImmoMetrica</b> — wer einen Zugang hat, übernimmt Inserate mit einem Klick.</li>
+    </ul>
+    <p>Alles Übernommene lässt sich von Hand nachbessern — nichts wird ungefragt festgeschrieben.</p></div></details>
+
+  <details class="fq"><summary>Kann ich monatlich kündigen?</summary><div class="ant">
+    <p>Ja, alle Pakete sind monatlich kündbar. Beim Jahrestarif zahlen Sie zwölf Monate im
+      Voraus und sparen rund 17 Prozent.</p>
+    <p><b>Nicht genutzte Bewertungen verfallen nicht</b> — sie bleiben auf dem Konto, solange
+      das Abo läuft. Ist das Monatskontingent aufgebraucht, lässt es sich einmal nachkaufen:
+      dieselbe Menge für ein Viertel des Monatsbeitrags.</p></div></details>
+</div>
+
+<!-- ══ 02 QUICK-CHECK ════════════════════════════════════════════════ -->
+<div class="fq-grp rv" id="quickcheck">
+  <div class="eye">02 · Quick-Check</div>
+  <h2>Sechs Zahlen, <span class="ac">eine Minute.</span></h2>
+
+  <details class="fq"><summary>Was genau muss ich für den Quick-Check eingeben?</summary><div class="ant">
+    <p>Sechs Angaben — mehr nicht:</p>
+    <ul>
+      <li><b>Kaufpreis</b> — der geforderte Preis aus dem Inserat</li>
+      <li><b>Wohnfläche</b> in Quadratmetern</li>
+      <li><b>Nettokaltmiete</b> im Monat (bei Leerstand: die erwartete)</li>
+      <li><b>Eigenkapital</b>, das Sie einsetzen wollen</li>
+      <li><b>Zinssatz</b> — oder Sie übernehmen den Live-Marktzins</li>
+      <li><b>Tilgung</b> in Prozent</li>
+    </ul>
+    <p>Daraus fallen sofort sechs Kennzahlen: Bruttomietrendite, Faktor, monatliche Rate,
+      Cashflow vor Steuern, Beleihungsauslauf und Kaufpreis je Quadratmeter.</p></div></details>
+
+  <details class="fq"><summary>Muss ich Zins und Tilgung jedes Mal neu eintragen?</summary><div class="ant">
+    <p>Nein. <b>Ihre Standardannahmen hinterlegen Sie einmal in den Einstellungen</b>, und
+      jeder neue Quick-Check startet damit. Das betrifft vor allem die Angaben, die sich von
+      Objekt zu Objekt kaum ändern:</p>
+    <ul>
+      <li>Zinssatz und Tilgung, mit denen Sie üblicherweise rechnen</li>
+      <li>Ihr typischer Eigenkapitaleinsatz</li>
+      <li>Das Bundesland — davon hängen Grunderwerbsteuer und Notarkosten ab</li>
+      <li>Ihr persönlicher Steuersatz für die Steuerwirkung</li>
+      <li>Die Bewirtschaftungsquote, mit der Sie kalkulieren</li>
+    </ul>
+    <p>Beim Zinssatz können Sie stattdessen auch den <b>Live-Marktzins</b> ziehen — dann
+      rechnet jeder Check mit dem tagesaktuellen Satz aus der Pfandbrief-Zinsstruktur.</p>
+    <div class="wo"><b>Wo einzustellen</b>
+      In der App unter <b>Einstellungen → Standardannahmen</b>. Was dort steht, füllt jedes
+      neue Objekt vor — überschreiben können Sie es pro Objekt jederzeit.</div></div></details>
+
+  <details class="fq"><summary>Was bedeutet die Ampel am Ende?</summary><div class="ant">
+    <p>Sie fasst die sechs Kennzahlen zu einer Richtung zusammen:</p>
+    <ul>
+      <li><b>Rot</b> — passt nicht. Die Zahlen tragen nicht, Weiterrechnen lohnt selten.</li>
+      <li><b>Gold</b> — lohnt einen zweiten Blick. Vieles hängt an Annahmen, die Sie prüfen sollten.</li>
+      <li><b>Grün</b> — Vollanalyse machen. Hier steckt etwas drin.</li>
+    </ul>
+    <p>Die Ampel ist bewusst grob. Sie ersetzt keine Analyse, sondern entscheidet nur, ob
+      sich eine lohnt.</p></div></details>
+
+  <details class="fq"><summary>Kann ich aus dem Quick-Check ein richtiges Objekt machen?</summary><div class="ant">
+    <p>Ja, mit einem Klick. Die sechs Angaben wandern in ein neues Objekt, und Sie rechnen
+      dort weiter — nichts muss noch einmal eingegeben werden.</p>
+    <p>Umgekehrt geht es auch: Ein bestehendes Objekt lässt sich als Quick-Check öffnen,
+      wenn Sie nur schnell an einer Stellschraube drehen wollen.</p></div></details>
+</div>
+
+<!-- ══ 03 DIE ZAHLEN ═════════════════════════════════════════════════ -->
+<div class="fq-grp rv" id="zahlen">
+  <div class="eye">03 · Die Zahlen</div>
+  <h2>Woher sie <span class="ac">kommen.</span></h2>
+
+  <details class="fq"><summary>Sind die Werte amtlich oder geschätzt?</summary><div class="ant">
+    <p>Jede Zahl trägt ihre Herkunft: Quelle, Jahrgang, Stichtag. Konkret:</p>
+    <ul>
+      <li><b>Kaufpreisaufteilung</b> — BMF-Arbeitshilfe in der Fassung Juni 2023</li>
+      <li><b>Restnutzungsdauer</b> — Anlage 2 ImmoWertV, sechs Verfahren</li>
+      <li><b>Bodenrichtwerte</b> — die amtlichen Portale aller 16 Länder (BORIS)</li>
+      <li><b>Liegenschaftszinssatz und Sachwertfaktor</b> — die Gutachterausschüsse,
+        mit Link, Jahrgang und Stichtag</li>
+      <li><b>Marktzinsen</b> — Pfandbrief-Zinsstruktur der Deutschen Bundesbank</li>
+    </ul>
+    <p>Wo keine amtliche Angabe vorliegt, erscheint <b>kein Wert</b> — sondern der zuständige
+      Ausschuss und der Link auf seine Quelle. Wir erfinden keine Zahl, und wir nehmen auch
+      nicht den Nachbarkreis oder ein Landesmittel.</p></div></details>
+
+  <details class="fq"><summary>Sind die Marktzinsen wirklich live?</summary><div class="ant">
+    <p>Ja. Sie kommen aus der Zinsstruktur der <b>Deutschen Bundesbank</b> und werden
+      arbeitstäglich nachgezogen. Angezeigt wird die Pfandbrief-Rendite je Zinsbindung plus
+      eine Bank-Marge, konservativ gerechnet für Beleihungsausläufe über 90 Prozent.</p>
+    <p>Jede Kachel nennt beides getrennt: die Rendite und die Marge. So sehen Sie, woraus
+      der Satz entsteht. Das ist eine <b>indikative Schätzung, kein Bankangebot</b> — und
+      keine Finanzierungsberatung im Sinne des § 34c GewO.</p></div></details>
+
+  <details class="fq"><summary>Warum zeigt ein Verfahren manchmal gar nichts an?</summary><div class="ant">
+    <p>Weil eine Pflichtangabe fehlt. <b>Kein Verfahren rechnet halb.</b> Ein Ertragswert ohne
+      Liegenschaftszinssatz wäre keine vorsichtige Schätzung, sondern eine Behauptung mit
+      Nachkommastellen.</p>
+    <p>Stattdessen steht dort, was fehlt und wo es zu bekommen ist — der zuständige
+      Gutachterausschuss mit Link, bei kostenpflichtigen Berichten mit dem Hinweis darauf.</p></div></details>
+
+  <details class="fq"><summary>Wie entsteht der Investor Deal Score?</summary><div class="ant">
+    <p>Aus 24 Kennzahlen in fünf Bereichen, jeder mit eigenem Gewicht:</p>
+    <ul>
+      <li><b>Rendite</b> (35 %) — Bruttomietrendite, Faktor, Cashflow, Eigenkapitalrendite</li>
+      <li><b>Finanzierung</b> (25 %) — Beleihungsauslauf, Kapitaldienstdeckung, Tilgung, Zinsbindung</li>
+      <li><b>Risiko</b> (20 %) — Zustand, Mietausfall, Anschlussfinanzierung, Klumpenrisiko</li>
+      <li><b>Lage &amp; Markt</b> (10 %) — Makro- und Mikrolage, Demografie, Mietniveau</li>
+      <li><b>Potenzial</b> (10 %) — Mietsteigerung, Sanierung, Aufteilung</li>
+    </ul>
+    <p>Jeder Bereich zeigt mit, auf wie vielen Angaben er beruht — ein Wert aus einer
+      einzigen Kennzahl ist etwas anderes als einer aus sechs. Die Gewichte können Sie
+      verschieben, wenn Ihr Blick auf Immobilien ein anderer ist.</p>
+    <p><b>Die Gesamtnote erscheint erst ab 70 Prozent Vollständigkeit.</b> Darunter sehen Sie
+      die fünf Bereiche, aber keine Note — eine Gesamtbewertung aus einem Drittel der Angaben
+      wäre irreführend.</p></div></details>
+
+  <details class="fq"><summary>Ersetzt das ein Gutachten?</summary><div class="ant">
+    <p>Nein, und das ist keine Floskel. DealPilot rechnet nach den Verfahren der ImmoWertV,
+      aber ein Verkehrswertgutachten ist eine <b>persönliche Leistung eines Sachverständigen</b>
+      mit Ortsbesichtigung, Beweiskraft und Haftung.</p>
+    <p>Was DealPilot liefert, ist eine belegbare Entscheidungshilfe — gut genug für die
+      Vorauswahl, den Banktermin und das Gespräch mit dem Steuerberater. Wenn es ein Gutachten
+      sein muss, sagt Ihnen das Programm das auch und nennt den Weg dorthin.</p></div></details>
+</div>
+
+<!-- ══ 04 RECHNEN & STEUER ═══════════════════════════════════════════ -->
+<div class="fq-grp rv" id="rechnen">
+  <div class="eye">04 · Rechnen &amp; Steuer</div>
+  <h2>Was mitgerechnet <span class="ac">wird.</span></h2>
+
+  <details class="fq"><summary>Welche Finanzierungsformen kann ich abbilden?</summary><div class="ant">
+    <ul>
+      <li><b>Annuitätendarlehen</b> mit Tilgungsplan über die volle Laufzeit</li>
+      <li><b>Zweitdarlehen</b> parallel zum Hauptdarlehen</li>
+      <li><b>KfW-Mittel</b> mit eigenen Konditionen und tilgungsfreien Anlaufjahren</li>
+      <li><b>Tilgungsaussetzung gegen Bausparvertrag</b> — mit dem vollen Lebenszyklus
+        und der Prüfung, ob die Bausparsumme am Ende wirklich reicht</li>
+      <li><b>Anschlussfinanzierung</b> mit Stresstest: Was passiert, wenn der Zins bei
+        Ablauf der Bindung deutlich höher liegt?</li>
+    </ul></div></details>
+
+  <details class="fq"><summary>Welche AfA-Methoden sind hinterlegt?</summary><div class="ant">
+    <p>Linear (50 Jahre ab Baujahr 1925, 40 Jahre davor, 33 Jahre ab Baujahr 2023),
+      <b>degressiv nach § 7 Abs. 5a EStG</b> und die <b>Sonder-AfA nach § 7b</b> mit der
+      Flächenobergrenze.</p>
+    <p>Dazu die Kaufpreisaufteilung nach der BMF-Arbeitshilfe mit drei Verfahren — sie
+      bestimmt, welcher Anteil überhaupt abgeschrieben werden darf. Die Steuerwirkung wird
+      mit dem Tarif 2026 und Ihrem Grenzsteuersatz gerechnet.</p>
+    <p>Das ist eine Modellrechnung auf Basis Ihrer Eingaben, <b>keine Steuerberatung</b>.
+      Ob die Ansätze in Ihrem Fall tragen, entscheidet Ihr Steuerberater.</p></div></details>
+
+  <details class="fq"><summary>Was hat es mit der 15-Prozent-Regel auf sich?</summary><div class="ant">
+    <p>Übersteigen die Instandsetzungskosten in den ersten drei Jahren nach dem Kauf
+      15 Prozent der Gebäude-Anschaffungskosten, gelten sie als <b>anschaffungsnahe
+      Herstellungskosten</b> — dann sind sie nicht sofort als Werbungskosten absetzbar,
+      sondern nur über die Abschreibung.</p>
+    <p>DealPilot zeigt beim Eintragen der Sanierungskosten einen Live-Balken, der genau
+      diese Grenze mitführt. Sie sehen also beim Tippen, wann es kippt — nicht erst beim
+      Steuerbescheid.</p></div></details>
+
+  <details class="fq"><summary>Wie weit rechnet die Projektion?</summary><div class="ant">
+    <p>15 Jahre. Für jedes Jahr: Mieteinnahmen mit Ihrer Entwicklungsannahme,
+      Bewirtschaftungskosten, Zins und Tilgung, Abschreibung, Steuerwirkung und der
+      Cashflow nach Steuern.</p>
+    <p>Die Mietentwicklung können Sie als gleichmäßige Prognose ansetzen oder als Treppe mit
+      konkreten Erhöhungsschritten — Letzteres ist ehrlicher, wenn Sie schon wissen, wann
+      Sie anpassen können.</p></div></details>
+</div>
+
+<!-- ══ 05 FÜR BÜROS ══════════════════════════════════════════════════ -->
+<div class="fq-grp rv" id="buero">
+  <div class="eye">05 · Für Büros</div>
+  <h2>Mehrere <span class="ac">Nutzer.</span></h2>
+
+  <details class="fq"><summary>Was unterscheidet das Partner-Paket von mehreren Einzelplätzen?</summary><div class="ant">
+    <p>Drei Dinge, die es einzeln nicht gibt:</p>
+    <ul>
+      <li><b>Ihre Marke</b> — Logo, Hausfarbe und Name erscheinen in der App Ihres Mandanten
+        und auf jedem PDF, das er erzeugt. DealPilot tritt dabei nicht in Erscheinung.</li>
+      <li><b>Mandanten-Konsole</b> — einladen, Plätze vergeben, Status sehen, mit
+        lückenlosem Freigabe-Protokoll.</li>
+      <li><b>Reseller-Portal</b> und eine Sammelrechnung für Basis und Plätze zusammen.</li>
+    </ul>
+    <p>Ihr eigener Zugang hat dabei den vollen Pro-Umfang. Das Partner-Paket ist <b>kein
+      günstigerer Weg zu mehreren Einzelplätzen</b>, sondern ein anderes Produkt.</p></div></details>
+
+  <details class="fq"><summary>Was ist ein Mandanten-Platz genau?</summary><div class="ant">
+    <p>Ein Zugang für einen Ihrer Mandanten. Er sieht <b>nur seine eigenen Objekte</b>, unter
+      Ihrer Marke, und entscheidet pro Objekt, was Sie sehen dürfen: nur ansehen, gemeinsam
+      bearbeiten oder verbindlich prüfen. Jederzeit widerrufbar, jeder Schritt protokolliert.</p>
+    <p><b>Drei Plätze sind im Partner-Paket enthalten</b>, weitere kosten gestaffelt 19, 15
+      oder 12 € — je mehr Mandanten, desto günstiger jeder einzelne. Wird ein Mandat beendet,
+      wird der Platz frei und ist sofort neu vergebbar.</p></div></details>
+
+  <details class="fq"><summary>Können mehrere Berater im Büro gleichzeitig arbeiten?</summary><div class="ant">
+    <p>Heute nicht mit getrennten Zugängen. Das Partner-Paket enthält <b>einen</b> Vollzugang
+      plus die Mandanten-Verwaltung. Ein Team-Konto, in dem mehrere Berater mit eigenem Login
+      auf denselben Objektbestand zugreifen, ist noch nicht gebaut.</p>
+    <p>Wir sagen das lieber vorher, als es zu versprechen. Wenn Sie es brauchen, schreiben
+      Sie uns — es steht auf der Liste, und Ihr Bedarf entscheidet über die Reihenfolge.</p></div></details>
+
+  <details class="fq"><summary>Gibt es Whitelabel mit eigener Domain?</summary><div class="ant">
+    <p>Ja. Eigene Domain, eigene Farbwelt in App und Dokumenten, eigene Absenderadresse für
+      Systemmails, erweiterter API-Zugang. Das wird individuell aufgesetzt.</p>
+    <p>Partner schalten wir derzeit persönlich frei — inklusive Einrichtung Ihres Brandings
+      und einer kurzen Einweisung.</p></div></details>
+</div>
+
+<!-- ══ 06 TECHNIK & DATEN ════════════════════════════════════════════ -->
+<div class="fq-grp rv" id="technik">
+  <div class="eye">06 · Technik &amp; Daten</div>
+  <h2>Wo alles <span class="ac">liegt.</span></h2>
+
+  <details class="fq"><summary>Wo werden meine Daten gespeichert?</summary><div class="ant">
+    <p>Auf Servern in Deutschland, bei der Hetzner Online GmbH. Kein Server außerhalb der EU,
+      keine Weitergabe zu Werbezwecken, keine Profilbildung. Jede Verbindung läuft über TLS,
+      Passwörter werden nur als Streuwert gespeichert.</p>
+    <p>Die Einzelheiten — auch was <em>nicht</em> gespeichert wird — stehen auf der Seite
+      <a href="sicherheit.html">Sicherheit &amp; Datenschutz</a>.</p></div></details>
+
+  <details class="fq"><summary>Was passiert bei einem Bewertungsabruf mit meinen Daten?</summary><div class="ant">
+    <p>Für eine Marktpreisindikation werden Adresse und Objektbeschreibung an einen
+      unabhängigen Bewertungspartner übertragen — anders ließe sich kein Marktwert ermitteln.
+      Das geschieht <b>nur, wenn Sie einen Abruf ausdrücklich auslösen</b>, und es wird Ihnen
+      vorher angezeigt.</p>
+    <p>Spracheingabe, Beleg-Import, Bodenrichtwert und Feldvorschläge laufen ohne solche
+      Übertragung und zählen gegen kein Kontingent.</p></div></details>
+
+  <details class="fq"><summary>Brauche ich einen Vertrag zur Auftragsverarbeitung?</summary><div class="ant">
+    <p>Wenn Sie DealPilot beruflich für Mandanten nutzen: ja, nach Art. 28 DSGVO. Den Vertrag
+      stellen wir bereit — eine kurze E-Mail genügt.</p></div></details>
+
+  <details class="fq"><summary>Läuft das auf dem Handy?</summary><div class="ant">
+    <p>Ja. Die Anwendung läuft im Browser und passt sich der Bildschirmbreite an. Für den
+      Vor-Ort-Termin sind besonders zwei Dinge gedacht: der <b>Quick-Check</b> mit sechs
+      Zahlen und der <b>Sprechlauf</b> — diktieren statt tippen, während Sie durch die
+      Wohnung gehen.</p></div></details>
+
+  <details class="fq"><summary>Kann ich meine Daten wieder herausbekommen?</summary><div class="ant">
+    <p>Ja. Investment-PDF, Bankexport als Excel mit 25 Spalten, JSON-Objektsicherung im
+      Pro-Plan — und auf Anforderung eine vollständige Herausgabe aller zu Ihnen
+      gespeicherten Daten.</p>
+    <p>Objekte und Dokumente löschen Sie selbst in der Anwendung. Das ganze Konto löschen
+      wir auf Anforderung, mit allem, was daran hängt.</p></div></details>
+
+  <details class="fq"><summary>Gibt es eine Schnittstelle?</summary><div class="ant">
+    <p>Ja, im Pro-Plan: eine vollständige REST-Schnittstelle über HTTPS, JSON rein und raus,
+      voller Zugriff auf den Objektbestand — anlegen, lesen, ändern, löschen. 120 Anfragen
+      pro Minute, bis zu fünf aktive Schlüssel.</p>
+    <p>Die vollständige Dokumentation mit Datenmodell und Beispielen steht unter
+      <a href="api.html">API</a>.</p></div></details>
+</div>
+
+</div></section>
+
+<div class="board-band">
+  <span class="perf-edge"></span><span class="perf-edge rechts"></span>
+  <div class="inner">
+    <div class="txt">
+      <div class="kick">PRE-FLIGHT · CHECK-IN</div>
+      <h2>Ihre Frage war nicht dabei?</h2>
+      <p>Schreiben Sie sie uns — die Antwort landet meistens hier auf der Seite.</p>
+    </div>
+    <div><a class="btn-p" href="mailto:info@dealpilot.immo?subject=Frage%20zu%20DealPilot">Frage stellen →</a></div>
+  </div>
+</div>
+
+<footer class="footer"><div class="wrap">
+  <div class="footer-grid">
+    <div>
+      <div class="mark" style="color:#fff"><span class="sig"><svg class="ico" style="width:15px;height:15px"><use href="#i-haus"/></svg></span>Deal<b>Pilot</b></div>
+      <p class="footer-tag">Immobilien-Investmentanalyse für strukturierte Entscheidungen.
+        Entwickelt von Junker Immobilien · Sachverständigenbüro &amp; Projektentwicklung.</p>
+    </div>
+    <div><h4>Produkt</h4>
+      <a href="dp2.html#workflow">So funktioniert's</a><a href="dp2.html#features">Funktionen</a>
+      <a href="leistungsumfang.html">Leistungsumfang</a><a href="dp2.html#pricing">Preise</a>
+      <a href="api.html">API</a><a href="dp2.html#feature-matrix">Cockpit-Matrix</a></div>
+    <div><h4>Vertrauen</h4>
+      <a href="sicherheit.html">Sicherheit &amp; Server</a><a href="fragen.html">Häufige Fragen</a>
+      <a href="dp2.html#partner">Partner &amp; Datenquellen</a></div>
+    <div><h4>Junker Immobilien</h4>
+      <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Sachverständigenbüro</a>
+      <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Kapitalanlage</a>
+      <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Projektentwicklung</a></div>
+    <div><h4>Kontakt</h4>
+      <a href="mailto:support@dealpilot.immo">support@dealpilot.immo</a>
+      <a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a>
+      <a href="/impressum.html">Impressum</a><a href="/datenschutz.html">Datenschutz</a>
+      <a href="/agb.html">AGB</a></div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 Junker Immobilien</div>
+    <div>Keine Steuer- oder Finanzberatung. Analyse-Werkzeug für eigene Kalkulationen.</div>
+  </div>
 </div></footer>
 
-<script src="dp-seite.js?v=v1533"></script>
+<script src="dp2.js?v=v1554"></script>
+<script>
+/* Die Sprungleiste hebt hervor, in welcher Gruppe man steht. */
+(function(){
+  var links=[].slice.call(document.querySelectorAll('.fq-nav a'));
+  var ziele=links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  if(!ziele.filter(Boolean).length) return;
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var i=ziele.indexOf(e.target);
+      links.forEach(function(a,j){ a.classList.toggle('on', j===i); });
+    });
+  },{rootMargin:'-25% 0px -65% 0px'});
+  ziele.forEach(function(z){ if(z) io.observe(z); });
+})();
+</script>
 </body></html>
