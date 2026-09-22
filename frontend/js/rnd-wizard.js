@@ -1386,63 +1386,43 @@
     var lohntText = (afa && afa.empfehlung) ? afa.empfehlung
       : 'Detaillierte AfA-Berechnung im Gutachten.';
 
+    /* v1513 · Marcel 22.09.2026: "die Angabe von der Restnutzungsdauer, das
+       muss alles ein bisschen stilvoller sein, so ein bisschen wie diese
+       neuere, helle Investment-PDF ... dass es einfach ein bisschen mehr
+       Vertrauen schafft."
+       Hier standen 58 Zeilen Inline-Stil: eine dunkle Flaeche mit fuenf
+       animierten Sternchen, einer von 0,15 auf 1 zoomenden 110-px-Zahl und
+       einem Puls-Effekt alle vier Sekunden. Das sieht nach Gewinnspiel aus,
+       nicht nach Gutachten.
+       Jetzt: helle Karte, Goldlinie oben, ruhige Typografie - dieselbe
+       Sprache wie die Bankfassung des Investment-PDF, ohne Animation. */
     let html = ''
-      // ─── Hero-Box mit Skalier-Animation + Sternschnuppen ──────────────
-      + '<div style="position:relative;overflow:hidden;background:linear-gradient(135deg,#0d0c0c 0%,#2A2727 50%,#1a1818 100%);color:#fff;border-radius:16px;padding:42px 36px 36px;margin-bottom:20px;box-shadow:0 12px 36px rgba(0,0,0,0.32),0 0 0 1px rgba(201,168,76,0.18) inset">'
-      + '  <div style="position:absolute;top:-60%;right:-15%;width:480px;height:480px;background:radial-gradient(circle,rgba(201,168,76,0.22) 0%,transparent 65%);pointer-events:none;z-index:0"></div>'
-      // 6 Sternschnuppen
-      + '  <span class="rndw-spark" style="position:absolute;top:18%;left:12%;width:6px;height:6px;border-radius:50%;background:#FFE680;box-shadow:0 0 8px 2px #FFE680;animation:rndw-spark 2.8s ease-out 0.0s infinite;z-index:1"></span>'
-      + '  <span class="rndw-spark" style="position:absolute;top:32%;left:78%;width:5px;height:5px;border-radius:50%;background:#FFD66B;box-shadow:0 0 8px 2px #FFD66B;animation:rndw-spark 3.2s ease-out 0.6s infinite;z-index:1"></span>'
-      + '  <span class="rndw-spark" style="position:absolute;top:64%;left:22%;width:4px;height:4px;border-radius:50%;background:#FFEC9C;box-shadow:0 0 6px 2px #FFEC9C;animation:rndw-spark 3.5s ease-out 1.2s infinite;z-index:1"></span>'
-      + '  <span class="rndw-spark" style="position:absolute;top:48%;left:88%;width:5px;height:5px;border-radius:50%;background:#FFD66B;box-shadow:0 0 7px 2px #FFD66B;animation:rndw-spark 3.0s ease-out 1.8s infinite;z-index:1"></span>'
-      + '  <span class="rndw-spark" style="position:absolute;top:78%;left:55%;width:5px;height:5px;border-radius:50%;background:#FFE680;box-shadow:0 0 8px 2px #FFE680;animation:rndw-spark 2.5s ease-out 0.3s infinite;z-index:1"></span>'
-      + '  <span class="rndw-spark" style="position:absolute;top:24%;left:48%;width:4px;height:4px;border-radius:50%;background:#FFEC9C;box-shadow:0 0 6px 2px #FFEC9C;animation:rndw-spark 3.4s ease-out 2.1s infinite;z-index:1"></span>'
-      + '  <div style="position:relative;z-index:2">'
-      + '    <p style="font-size:11px;text-transform:uppercase;letter-spacing:3px;color:rgba(201,168,76,0.85);font-weight:700;margin:0 0 4px;text-align:center">Geschätzte Restnutzungsdauer</p>'
-      + '    <p style="font-size:10px;color:rgba(255,255,255,0.45);text-align:center;margin:0 0 14px;font-style:italic">(Ersteinschätzung — verbindliche Berechnung im Gutachten)</p>'
-      + '    <h2 style="font-family:Cormorant Garamond,serif;font-size:110px;font-weight:600;color:#C9A84C;line-height:0.95;letter-spacing:-2px;margin:0;text-align:center;text-shadow:0 0 30px rgba(201,168,76,0.45),0 0 60px rgba(201,168,76,0.22),0 4px 16px rgba(0,0,0,0.4);transform-origin:center;animation:rndw-zoom-in 1.2s cubic-bezier(0.34,1.56,0.64,1) 0.2s both, rndw-pulse 4s ease-in-out 1.4s infinite">'
-      /* v1509 · Marcels Entscheidung: "wir sollten keine feste Zahl zeigen,
-         sondern wirklich erst mal nur eine Spanne." */
+      + '<div style="background:#FDFCFA;border:1px solid #E6E0D3;border-top:3px solid #C9A84C;border-radius:12px;padding:26px 30px 24px;margin-bottom:18px">'
+      + '  <p style="font:600 10.5px/1 JetBrains Mono,ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:#9a7f33;margin:0 0 3px;text-align:center">Geschätzte Restnutzungsdauer</p>'
+      + '  <p style="font-size:11px;color:#8A8272;text-align:center;margin:0 0 16px">Ersteinschätzung — die verbindliche Berechnung steht im Gutachten</p>'
+      + '  <div style="text-align:center">'
+      + '    <span style="font-family:Cormorant Garamond,serif;font-size:82px;font-weight:600;color:#b8932f;line-height:1;letter-spacing:-1px">'
       + (function () {
           var sp = spanneAus(result);
           if (!sp) return fmtJ(result.final_rnd);
-          return sp.einzeln ? String(sp.von) : (sp.von + '\u2013' + sp.bis);
+          return sp.einzeln ? String(sp.von) : (sp.von + "\u2013" + sp.bis);
         })()
-      + '<span style="font-family:Inter,sans-serif;font-size:24px;font-weight:500;color:#C9A84C;margin-left:10px;letter-spacing:0.5px;vertical-align:middle;opacity:0.85">Jahre</span>'
-      + '    </h2>'
-      /* v1506 · Marcel: "es wird keine Spanne ausgegeben."
-         Der Wizard zeigte nur final_rnd - eine punktgenaue Zahl aus einem
-         Formular. Sie taeuscht eine Genauigkeit vor, die eine
-         Ersteinschaetzung nicht hat. Darunter steht jetzt der Korridor aus
-         den beiden Verfahren, die ihn aufspannen: die technische
-         Restnutzungsdauer und das Punktraster nach Anlage 2 - dieselben
-         beiden, aus denen der Reiter Bodenabschlag seine Spanne bildet. */
-      + (function () {
-          try {
-            var m = result.methods || {};
-            var a = Math.round(Number(m.technisch && m.technisch.restnutzungsdauer) || 0);
-            var b = Math.round(Number(m.punktraster && m.punktraster.restnutzungsdauer) || 0);
-            var w = [a, b].filter(function (x) { return x > 0; });
-            if (w.length < 2) return '';
-            var von = Math.min.apply(null, w), bis = Math.max.apply(null, w);
-            if (von === bis) return '';
-            /* v1509: die Spanne steht jetzt oben als Ergebnis - hier steht,
-               woraus sie besteht. */
-            return '<p style="margin:10px 0 0;text-align:center;font-size:12.5px;color:rgba(255,255,255,0.7);letter-spacing:.2px">'
-              + 'technisch <b style="color:#E8CC7A">' + a + '</b> \u00b7 Punktraster nach Anlage 2 <b style="color:#E8CC7A">' + b + '</b>'
-              + '<span style="display:block;font-size:11px;color:rgba(255,255,255,0.45);margin-top:3px">Eine einzelne Zahl behauptet eine Genauigkeit, die eine Ersteinsch\u00e4tzung nicht hat.</span></p>';
-          } catch (e) { return ''; }
-        })()
-      + '    <p style="margin:14px 0 0;font-size:13px;color:rgba(255,255,255,0.7);line-height:1.5;text-align:center;font-style:italic;animation:rndw-fade-in 0.8s ease-out 1.2s both">'
-      + escapeHtml(lohntText)
-      + '    </p>'
+      + '</span>'
+      + '    <span style="font-family:Inter,sans-serif;font-size:19px;font-weight:500;color:#8A8272;margin-left:9px">Jahre</span>'
       + '  </div>'
-      + '  <style>'
-      + '    @keyframes rndw-zoom-in { 0%{transform:scale(0.15);opacity:0;filter:blur(8px)} 50%{opacity:1;filter:blur(0)} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1;filter:blur(0)} }'
-      + '    @keyframes rndw-spark { 0%{transform:scale(0);opacity:0} 20%{transform:scale(1.4);opacity:1} 60%{transform:scale(0.8);opacity:0.6} 100%{transform:scale(0);opacity:0} }'
-      + '    @keyframes rndw-pulse { 0%,100%{text-shadow:0 0 30px rgba(201,168,76,0.45),0 0 60px rgba(201,168,76,0.22),0 4px 16px rgba(0,0,0,0.4)} 50%{text-shadow:0 0 40px rgba(201,168,76,0.6),0 0 80px rgba(201,168,76,0.35),0 4px 16px rgba(0,0,0,0.4)} }'
-      + '    @keyframes rndw-fade-in { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }'
-      + '  </style>'
+      + (function () {
+          var sp = spanneAus(result);
+          var mm = (result && result.methods) || {};
+          var a = Math.round(Number(mm.technisch && mm.technisch.restnutzungsdauer) || 0);
+          var b = Math.round(Number(mm.punktraster && mm.punktraster.restnutzungsdauer) || 0);
+          if (!sp || sp.einzeln || !a || !b) return "";
+          return '<p style="margin:14px 0 0;text-align:center;font-size:12.5px;color:#6B6356">'
+            + 'technisch <b style="color:#2A2727">' + a + '</b> · Punktraster nach Anlage 2 <b style="color:#2A2727">' + b + '</b>'
+            + '<span style="display:block;font-size:11px;color:#8A8272;margin-top:4px">Eine einzelne Zahl behauptet eine Genauigkeit, die eine Ersteinschätzung nicht hat.</span></p>';
+        })()
+      + '  <p style="margin:16px 0 0;font-size:12.5px;color:#6B6356;line-height:1.55;text-align:center;font-style:italic">'
+      + escapeHtml(lohntText)
+      + '  </p>'
       + '</div>';
 
     // ─── Tabelle "Wie die Schätzung zustande kommt" ────────────────
