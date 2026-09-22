@@ -234,7 +234,7 @@ if (!window._pdfGold) {
         '<div><div class="rp-fl">Abrechnung</div><div class="rp-seg"><button class="on" data-iv="monthly">Monatlich</button><button data-iv="yearly">Jährlich · 2 Mon. frei</button></div></div>' +
         '<div><div class="rp-fl">Anzahl Seats</div><div class="rp-step"><button id="rp-minus">–</button><input id="rp-qty" value="' + _st.qty + '" readonly><button id="rp-plus">+</button></div></div>' +
         '<div class="rp-price"><div class="per"></div><div class="tot"></div></div></div>' +
-        '<div class="rp-buyfoot"><div class="rp-staffel">Volume-Staffel: <b>1–9 → 19 €</b> · <b>10–24 → 15 €</b> · <b>25+ → 12 €</b><br>Der Stückpreis gilt für alle Seats.</div>' +
+        '<div class="rp-buyfoot"><div class="rp-staffel">' + staffelText() + '<br>Der Stückpreis gilt für alle Seats.</div>' +
         '<button class="rp-checkout" id="rp-checkout">Zur Kasse (Stripe)</button></div></div>';
     box.querySelectorAll('.rp-seg button').forEach(function (b) { b.addEventListener('click', function () { _st.iv = b.getAttribute('data-iv'); box.querySelectorAll('.rp-seg button').forEach(function (x) { x.classList.remove('on'); }); b.classList.add('on'); calcPrice(); }); });
     $('rp-minus').addEventListener('click', function () { _st.qty = Math.max(1, _st.qty - 1); $('rp-qty').value = _st.qty; calcPrice(); });
@@ -242,8 +242,35 @@ if (!window._pdfGold) {
     $('rp-checkout').addEventListener('click', doCheckout);
     calcPrice();
   }
+  /* ═══ v1535 · Marcel 22.09.2026 ═══════════════════════════════════════
+     Gemessen am 22.09.2026: der Hinweistext im Kaufpanel sagte
+     "1-9 -> 19 EUR", der Rechner zwei Zeilen darunter rechnete mit
+     35/29/24 - der ALTEN Staffel von vor v1423. Wer fuenf Seats waehlte,
+     las 175 EUR und bekam 95 EUR abgebucht (5 x 19).
+     Gegengeprueft in Stripe (beide Konten, lookup_key dp_seat_monthly):
+     Volume-Staffel 19/15/12, jaehrlich 209/165/132 - also elf Monatsraten,
+     ein Freimonat. Der Rechner nahm m*10, also zehn.
+     Die Staffel steht jetzt EINMAL in STAFFEL; Text und Summe lesen
+     dieselbe Liste. Abgerechnet wird ohnehin der Stripe-Preis - diese
+     Zahlen sind reine Vorschau und muessen deshalb zu ihm passen. */
+  var STAFFEL = [
+    { bis: 9,        monat: 19, jahr: 209 },
+    { bis: 24,       monat: 15, jahr: 165 },
+    { bis: Infinity, monat: 12, jahr: 132 },
+  ];
+  function staffelSatz(q, iv) {
+    for (var i = 0; i < STAFFEL.length; i++) {
+      if (q <= STAFFEL[i].bis) return iv === 'yearly' ? STAFFEL[i].jahr : STAFFEL[i].monat;
+    }
+    return STAFFEL[STAFFEL.length - 1][iv === 'yearly' ? 'jahr' : 'monat'];
+  }
+  function staffelText() {
+    return 'Volume-Staffel: <b>1\u20139 \u2192 ' + STAFFEL[0].monat + ' \u20ac</b> \u00b7 '
+      + '<b>10\u201324 \u2192 ' + STAFFEL[1].monat + ' \u20ac</b> \u00b7 '
+      + '<b>25+ \u2192 ' + STAFFEL[2].monat + ' \u20ac</b>';
+  }
   function calcPrice() {
-    var q = _st.qty, m = q <= 9 ? 35 : (q <= 24 ? 29 : 24), per = _st.iv === 'yearly' ? m * 10 : m, tot = per * q;
+    var q = _st.qty, per = staffelSatz(q, _st.iv), tot = per * q;
     var box = $('rp-buypanel'); if (!box) return;
     box.querySelector('.per').innerHTML = '<b>' + per + ' €</b> / Seat / ' + (_st.iv === 'yearly' ? 'Jahr' : 'Monat');
     box.querySelector('.tot').innerHTML = eur(tot) + ' €<small> / ' + (_st.iv === 'yearly' ? 'Jahr' : 'Monat') + '</small>';
@@ -603,6 +630,9 @@ if (!window._pdfGold) {
            Partner ist ein erweiterter Pro -> Pro KLONEN statt eine Liste pflegen,
            die beim naechsten Pro-Feature wieder veraltet ist. */
         var _pro = DealPilotConfig.pricing.plans.pro || {};
+        /* v1535: der Kommentar hier darueber fuehrte bis heute die Staffel
+           24/19/15. Gueltig ist 19/15/12 - so steht es in Stripe unter
+           dp_seat_monthly, und danach wird abgerechnet. */
         var _pf = {}, _pl = {};
         try { _pf = JSON.parse(JSON.stringify(_pro.features || {})); } catch (e) { _pf = {}; }
         try { _pl = JSON.parse(JSON.stringify(_pro.limits   || {})); } catch (e) { _pl = {}; }
