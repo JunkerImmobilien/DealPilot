@@ -49,10 +49,13 @@
 @keyframes eckAuf{to{opacity:1}}
 
 .hero .wrap{position:relative;z-index:4}
-.hero-grid{display:grid;grid-template-columns:1fr 1.02fr;gap:46px;align-items:center;
+.hero-grid{display:grid;grid-template-columns:1.04fr .96fr;gap:44px;align-items:center;
   padding:66px 0 72px;min-height:640px}
-.hero h1{font-size:clamp(31px,5vw,60px);line-height:1.03;margin:18px 0 20px;
-  letter-spacing:-.035em}
+/* v1541: die Obergrenze war 60 px - bei 1568 px Fensterbreite passte
+   "Immobilienentscheidungen" damit nicht in eine Zeile und wurde getrennt.
+   Gemessen: bei 52 px passt es. */
+.hero h1{font-size:clamp(29px,3.9vw,52px);line-height:1.05;margin:18px 0 20px;
+  letter-spacing:-.032em}
 .hero h1 .zl{display:block;overflow:hidden}
 .hero h1 .zl i{display:block;font-style:normal;transform:translateY(105%);
   animation:zlHoch .95s var(--e-hoch) forwards}
@@ -65,10 +68,10 @@
 @keyframes einbl{to{opacity:1}}
 .hero-btn{display:flex;gap:13px;flex-wrap:wrap;margin-bottom:34px;
   opacity:0;animation:einbl .8s ease .66s forwards}
-.hbeleg{display:flex;gap:30px;flex-wrap:wrap;padding-top:24px;
+.hbeleg{display:flex;gap:26px;flex-wrap:wrap;padding-top:24px;
   border-top:1px solid rgba(236,230,214,.13);opacity:0;animation:einbl .8s ease .82s forwards}
-.hbeleg div b{display:block;font:700 26px/1 var(--disp);color:var(--gdh)}
-.hbeleg div span{font:700 9px/1.4 var(--mono);letter-spacing:.13em;
+.hbeleg div b{display:block;font:700 23px/1 var(--disp);color:var(--gdh)}
+.hbeleg div span{font:700 8.2px/1.4 var(--mono);letter-spacing:.1em;
   color:var(--ddk);display:block;margin-top:5px}
 
 /* ══ Die Boarding-Pass-Score-Karte ══════════════════════════════════════ */
