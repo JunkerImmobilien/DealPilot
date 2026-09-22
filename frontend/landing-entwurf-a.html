@@ -496,6 +496,20 @@ footer a:hover{color:var(--gold-hi)}
       var b=document.querySelector('[data-zahl="865"]');
       if(b){ b.dataset.zahl=String(n); if(b.dataset.fertig) b.textContent=n.toLocaleString('de-DE'); }
     }).catch(function(){});
+
+  /* v1524b · Sicherheitsnetz: Wenn der Beobachter aus irgendeinem Grund
+     nicht feuert - Hintergrund-Tab, alter Browser, Fehler weiter oben -,
+     bleiben ALLE Abschnitte auf opacity 0 und die Seite sieht leer aus.
+     Eine Animation darf nie die Bedingung dafuer sein, dass man etwas
+     sieht. Nach 1,6 Sekunden wird deshalb alles sichtbar, was noch
+     versteckt ist. */
+  setTimeout(function(){
+    document.querySelectorAll(".rv:not(.da)").forEach(function(el){ el.classList.add("da"); });
+    document.querySelectorAll("[data-zahl]").forEach(function(z){
+      if(z.dataset.fertig) return; z.dataset.fertig="1";
+      z.textContent = parseInt(z.dataset.zahl,10).toLocaleString("de-DE");
+    });
+  }, 1600);
 })();
 </script>
 </body></html>
