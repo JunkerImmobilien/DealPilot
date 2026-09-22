@@ -17768,3 +17768,38 @@ Keine Leiche sind dagegen `rnd-calc.js` (Master-Kern 3.1.0), `rnd-gnd-table.js`,
 > **Und beim Schreiben DIESES Eintrags ist sie ein drittes Mal zugeschlagen** —
 > der Satz ueber die Falle enthielt sie selbst. Lehre: Apostrophe in erzeugtem
 > Text nie tippen, sondern `String.fromCharCode(39)` benutzen.
+
+## Rollout-Journal · 22.09.2026 (3) — Bestandsaufnahme Landing, fuenf Ideen
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1515 | `4c6efde` | Fuenf Ideen fuer die Landing im Stil von junker-immobilien.io: `frontend/landing-ideen.html` |
+
+**Die Landing liegt in `frontend/landing/index.html` — 1,16 MB, 4.246 Zeilen**,
+eine Mini-Anwendung mit drei Ansichten (Landing, API-Doku, Leistungsumfang),
+ausgeliefert auf einer **eigenen Domain** (`{$LANDING_DOMAIN}` im Caddyfile,
+`/srv/landing`). Dort sind nur **drei** API-Pfade durchgereicht:
+`reseller-inquiries`, `track`, `market-rates`.
+
+### Sechs Befunde, alle belegt
+
+| Befund | Beleg |
+|---|---|
+| **Es gibt keinen Login** | Null Treffer auf login/anmelden/einloggen in der ganzen Datei. Alle **13** App-Verweise fuehren auf `?register=1`. Ein Bestandskunde findet keinen beschrifteten Weg in die App |
+| **Preise 5.544 px tief** | Siebter Abschnitt, nach Hero, Willkommensband, Stories, Workflow, Features und Marktzinsen. Die Zahl steht bereits im Repo (`flyer-code.js`) |
+| **Erstflug ist aus** | `promo-erstflug.js`: `ANZEIGE_AKTIV = false` — auf **Marcels eigene Anweisung vom 07.09.2026** („bitte nicht auf der Seite mehr angeben"). Sichtbar nur fuer Besucher ueber `/erstflug`. Ein Eingabefeld existiert nirgends; der Code kommt per Cookie und geht direkt an Stripe |
+| **Kein Kundenzaehler** | Keine Nutzungszahl auf der Seite; die vier Hero-Zahlen sind Produkteigenschaften. **Kein oeffentlicher Stats-Endpunkt** im Backend — alle Zahlen-Endpunkte sind `requireAdmin` |
+| **Zwei App-Domains** | **16** Links zeigen auf `app.dealpilot.junker-immobilien.io`, die Seite laeuft auf `dealpilot.immo`. Nachgemessen: **beide antworten mit 200** |
+| **1,16 MB Seitengroesse** | Viel inline-Base64, dazu ein **toter App-Preis-Baustein** (Zeilen 2780–3197), der auf der Landing nie greift |
+
+> **Zur Erstflug-Idee gehoert eine Rueckfrage, keine stille Aenderung.** Der
+> Rabatt ist nicht vergessen worden, er wurde **bewusst abgeschaltet** — und
+> zwar von Marcel selbst. Die Idee, ihn wieder aufpoppen zu lassen, dreht
+> diese Entscheidung um. Der Schalter ist eine Zeile; die Entscheidung ist es
+> nicht.
+
+> **Fuer den Kundenzaehler reicht Frontend-Arbeit nicht.** Noetig sind ein
+> oeffentlicher Endpunkt, ein zusaetzlicher `handle`-Block im Caddyfile fuer
+> die Landing-Domain und eine Pflegemaske im Admin (der Bereich „Landing"
+> waere der Platz — dort liegen schon Besucher und Funnel). Offene
+> Produktfrage: echte Zahlen aus der Datenbank oder gepflegte Werte.
