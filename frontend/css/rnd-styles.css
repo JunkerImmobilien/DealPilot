@@ -1270,7 +1270,9 @@
   width: min(1143px, calc(100vw - 48px)) !important;
   max-height: 915px !important;
   border-radius: 12px !important;
-  background: var(--surface, #FDFCFA) !important;
+  /* v1513b: --surface ist im Hellprofil reines Weiss - hier soll die
+     Cremeflaeche des BMF-Rechners stehen, also der Wert direkt. */
+  background: #FDFCFA !important;
 }
 
 /* Die Schrittpunkte sind eine Anzeige, kein Knopf. */
