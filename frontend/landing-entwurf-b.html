@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DealPilot · Die Zahlen, die die Bank sehen will</title>
+<meta name="description" content="Kaufpreisaufteilung, Restnutzungsdauer, Cashflow und Steuerwirkung — aus einer Eingabe, nach amtlichen Quellen, bankfertig.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:#0A0908; --nacht:#16130E;
+  --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#a8842a;
+  --papier:#FCFBF8; --sand:#F4F1E9; --linie:#E7E1D3;
+  --ink:#231F1B; --ink-2:#5C5549; --ink-3:#8C8478;
+  --gruen:#3FA56C; --rot:#B8625C;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--papier);color:var(--ink);
+  font:16px/1.65 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Space Grotesk',sans-serif;margin:0;letter-spacing:-.6px}
+a{color:inherit}
+.w{max-width:1240px;margin:0 auto;padding:0 30px}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+
+/* Kopf */
+header{position:sticky;top:0;z-index:80;background:rgba(252,251,248,.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:.25s}
+header.fest{border-bottom-color:var(--linie);box-shadow:0 4px 20px rgba(35,31,27,.05)}
+.kopf{display:flex;align-items:center;gap:26px;padding:15px 0}
+.logo{font:700 19px/1 'Space Grotesk',sans-serif;text-decoration:none;letter-spacing:-.6px}
+.logo i{font-style:normal;color:var(--gold-lo)}
+nav{margin-left:auto;display:flex;gap:22px;font-size:14px}
+nav a{text-decoration:none;color:var(--ink-2)}
+nav a:hover{color:var(--gold-lo)}
+.k-login{font-size:13.5px;text-decoration:none;color:var(--ink);border-bottom:1px solid var(--gold);padding-bottom:2px}
+.k-cta{background:var(--obsidian);color:#F6F3EC;border-radius:6px;padding:10px 18px;
+  font-size:13.5px;font-weight:600;text-decoration:none;transition:.2s}
+.k-cta:hover{background:var(--gold-lo);color:#1a1509}
+
+/* Hero: heller Grund, dunkle Karte als Akzent */
+.hero{padding:70px 0 0;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-180px;right:-140px;width:620px;height:620px;
+  border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.13),transparent 66%)}
+.hero-in{position:relative;display:grid;grid-template-columns:1fr;gap:34px;text-align:center;
+  max-width:880px;margin:0 auto}
+.marke{font:600 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold-lo)}
+.hero h1{font-size:clamp(36px,5.4vw,66px);line-height:1.02;margin:18px 0}
+.hero h1 b{font-weight:600;background:linear-gradient(110deg,#E8CC7A,#a8842a);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.l{font-size:18px;color:var(--ink-2);margin:0 auto 28px;max-width:640px}
+.hbtn{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.b1{background:var(--obsidian);color:#F6F3EC;border-radius:8px;padding:15px 28px;
+  font-weight:600;font-size:15.5px;text-decoration:none;transition:.2s;
+  box-shadow:0 6px 22px rgba(10,9,8,.2)}
+.b1:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(10,9,8,.26)}
+.b2{border:1px solid var(--linie);background:#fff;border-radius:8px;padding:15px 24px;
+  font-size:15px;text-decoration:none;transition:.2s}
+.b2:hover{border-color:var(--gold)}
+.mini{font-size:12.8px;color:var(--ink-3)}
+
+/* Cockpit-Streifen */
+.cockpit{margin:46px auto 0;max-width:1080px;background:var(--obsidian);border-radius:16px 16px 0 0;
+  padding:22px 26px 26px;color:#F6F3EC;box-shadow:0 -6px 50px rgba(10,9,8,.22)}
+.ck-leiste{display:flex;gap:7px;margin-bottom:18px}
+.ck-leiste span{width:9px;height:9px;border-radius:50%;background:rgba(246,243,236,.16)}
+.ck-leiste span:first-child{background:var(--gold)}
+.ck-raster{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+.kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:9px;
+  padding:12px 13px}
+.kpi span{display:block;font:600 8.5px/1.3 'JetBrains Mono',monospace;letter-spacing:.11em;
+  color:rgba(246,243,236,.42);margin-bottom:6px}
+.kpi b{font:600 19px/1 'Space Grotesk',sans-serif;color:#F6F3EC}
+.kpi b.g{color:var(--gold-hi)}
+.kpi b.p{color:var(--gruen)}
+
+section{padding:78px 0}
+.sec-sand{background:var(--sand)}
+.sec-dunkel{background:var(--nacht);color:#F6F3EC}
+.sec-dunkel h2,.sec-dunkel h3{color:#F6F3EC}
+.kz{max-width:720px;margin:0 auto 42px;text-align:center}
+.kz h2{font-size:clamp(27px,3.5vw,40px);line-height:1.12;margin:12px 0 13px}
+.kz h2 em{font-style:normal;color:var(--gold-lo)}
+.sec-dunkel .kz h2 em{color:var(--gold-hi)}
+.kz p{margin:0;color:var(--ink-2);font-size:16.5px}
+.sec-dunkel .kz p{color:rgba(246,243,236,.64)}
+
+.rv{opacity:0;transform:translateY(24px);transition:opacity .75s cubic-bezier(.25,.9,.3,1),transform .75s cubic-bezier(.25,.9,.3,1)}
+.rv.da{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
+
+/* Leistungs-Spalten */
+.spalten{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.sp{background:#fff;border:1px solid var(--linie);border-radius:14px;padding:26px 24px 28px}
+.sec-dunkel .sp{background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.09)}
+.sp .nr{font:600 34px/1 'Cormorant Garamond',serif;color:var(--gold)}
+.sp h3{font-size:19px;margin:8px 0 12px}
+.sp ul{margin:0;padding:0;list-style:none}
+.sp li{padding:7px 0 7px 22px;position:relative;font-size:14px;color:var(--ink-2);line-height:1.5;
+  border-bottom:1px solid rgba(0,0,0,.04)}
+.sec-dunkel .sp li{color:rgba(246,243,236,.7);border-bottom-color:rgba(255,255,255,.06)}
+.sp li:last-child{border:0}
+.sp li::before{content:'→';position:absolute;left:0;color:var(--gold);font-size:12px;top:8px}
+
+/* Vergleichstabelle */
+.tab{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--linie);
+  border-radius:13px;overflow:hidden;font-size:14px}
+.tab th,.tab td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--linie)}
+.tab thead th{background:var(--obsidian);color:#F6F3EC;font:600 11px/1.3 'JetBrains Mono',monospace;
+  letter-spacing:.07em;text-transform:uppercase}
+.tab thead th.best{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#a8842a);color:#1a1509}
+.tab td{color:var(--ink-2)}
+.tab td:first-child{color:var(--ink);font-weight:500}
+.tab tbody tr:hover{background:#FCFAF5}
+.tab .ja{color:var(--gruen);font-weight:700}
+.tab .nein{color:var(--ink-3)}
+.tab td.mark{background:rgba(201,168,76,.07);font-weight:600;color:var(--ink)}
+
+/* Fälle mit Bild */
+.faelle{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.fall{background:#fff;border:1px solid var(--linie);border-radius:15px;overflow:hidden;
+  display:grid;grid-template-columns:150px 1fr;transition:.22s}
+.fall:hover{box-shadow:0 14px 36px rgba(35,31,27,.1);transform:translateY(-2px)}
+.fall .bild{background:var(--obsidian);position:relative}
+.fall .bild svg{position:absolute;inset:0;width:100%;height:100%}
+.fall .txt{padding:22px 24px 24px}
+.fall h3{font-size:17px;margin:0 0 9px}
+.fall p{margin:0 0 12px;font-size:14px;color:var(--ink-2);line-height:1.6}
+.fall .ergebnis{font:600 12.5px/1.45 'JetBrains Mono',monospace;color:var(--gold-lo);
+  border-left:2px solid var(--gold);padding-left:11px}
+
+/* Preise als Leiste */
+.pleiste{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--linie);
+  border-radius:14px;overflow:hidden;background:#fff}
+.pl{padding:26px 22px 28px;border-right:1px solid var(--linie);position:relative}
+.pl:last-child{border-right:0}
+.pl.best{background:linear-gradient(180deg,rgba(201,168,76,.09),transparent 60%)}
+.pl .n{font:600 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3)}
+.pl .p{font:600 35px/1 'Space Grotesk',sans-serif;margin:12px 0 2px}
+.pl .p small{font-size:13px;color:var(--ink-3);font-weight:400}
+.pl .j{font-size:12.5px;color:var(--gruen);margin-bottom:14px}
+.pl ul{margin:0 0 18px;padding:0;list-style:none;font-size:13.5px;color:var(--ink-2)}
+.pl li{padding:4px 0}
+.pl a{display:block;text-align:center;border:1px solid var(--obsidian);border-radius:7px;
+  padding:10px;font-size:13.8px;font-weight:600;text-decoration:none;transition:.2s}
+.pl a:hover{background:var(--obsidian);color:#F6F3EC}
+.pl.best a{background:var(--obsidian);color:#F6F3EC}
+.pl.best a:hover{background:var(--gold-lo);color:#1a1509;border-color:var(--gold-lo)}
+.pbadge{position:absolute;top:0;left:0;right:0;background:var(--gold);color:#1a1509;
+  font:700 9px/1 'JetBrains Mono',monospace;letter-spacing:.11em;text-align:center;padding:5px}
+.pl.best{padding-top:40px}
+
+/* Zahlen */
+.zb{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center}
+.zb div b{display:block;font:600 46px/1 'Cormorant Garamond',serif;color:var(--gold-hi)}
+.zb div span{font:600 9.5px/1.5 'JetBrains Mono',monospace;letter-spacing:.13em;
+  color:rgba(246,243,236,.45);display:block;margin-top:7px}
+
+footer{background:var(--obsidian);color:rgba(246,243,236,.58);padding:54px 0 28px;font-size:13.6px}
+footer h4{font:600 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--gold);margin:0 0 13px}
+.ff{display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr;gap:32px}
+footer a{color:rgba(246,243,236,.58);text-decoration:none;display:block;padding:3px 0}
+footer a:hover{color:var(--gold-hi)}
+.fe{margin-top:34px;padding-top:20px;border-top:1px solid rgba(255,255,255,.08);
+  font-size:12.3px;color:rgba(246,243,236,.34)}
+
+@media(max-width:1000px){
+  .ck-raster{grid-template-columns:repeat(3,1fr)}
+  .spalten,.faelle{grid-template-columns:1fr}
+  .pleiste{grid-template-columns:repeat(2,1fr)}
+  .pl{border-bottom:1px solid var(--linie)}
+  .zb{grid-template-columns:repeat(2,1fr)}
+  .ff{grid-template-columns:1fr 1fr}
+  nav{display:none}
+  .tab{font-size:12.5px}
+}
+@media(max-width:620px){
+  .ck-raster{grid-template-columns:repeat(2,1fr)}
+  .fall{grid-template-columns:1fr}
+  .fall .bild{height:120px}
+  .pleiste{grid-template-columns:1fr}
+}
+</style>
+</head><body>
+
+<header id="kopf"><div class="w kopf">
+  <a class="logo" href="#">Deal<i>Pilot</i></a>
+  <nav><a href="#kann">Was es kann</a><a href="#vergleich">Vergleich</a>
+    <a href="#praxis">Praxis</a><a href="#preise">Preise</a></nav>
+  <a class="k-login" href="https://app.dealpilot.immo/">Anmelden</a>
+  <a class="k-cta" href="https://app.dealpilot.immo/?register=1">Kostenlos starten</a>
+</div></header>
+
+<div class="hero"><div class="w">
+  <div class="hero-in">
+    <div>
+      <div class="marke">Junker Immobilien · Sachverständigenbüro</div>
+      <h1>Die Zahlen, die die<br><b>Bank sehen will.</b></h1>
+      <p class="l">DealPilot rechnet Kaufpreisaufteilung, Restnutzungsdauer, Cashflow und
+        Steuerwirkung aus einer Eingabe — nach amtlichen Quellen, mit Herkunft je Zahl,
+        bankfertig als PDF.</p>
+      <div class="hbtn">
+        <a class="b1" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro testen</a>
+        <a class="b2" href="#praxis">Erst ansehen</a>
+      </div>
+      <p class="mini">Keine Zahlungsdaten nötig · <span id="z2">865</span> registrierte Nutzer</p>
+    </div>
+  </div>
+
+  <div class="cockpit rv">
+    <div class="ck-leiste"><span></span><span></span><span></span></div>
+    <div class="ck-raster">
+      <div class="kpi"><span>DEAL SCORE</span><b class="g" data-zahl="82">0</b></div>
+      <div class="kpi"><span>BRUTTORENDITE</span><b>7,30 %</b></div>
+      <div class="kpi"><span>CASHFLOW / MON.</span><b class="p">+1.240 €</b></div>
+      <div class="kpi"><span>DSCR</span><b>1,42</b></div>
+      <div class="kpi"><span>GEBÄUDEANTEIL</span><b>85,6 %</b></div>
+      <div class="kpi"><span>RESTNUTZUNG</span><b>17–26 J.</b></div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ══ WAS ES KANN ══ -->
+<section id="kann"><div class="w">
+  <div class="kz rv"><div class="marke">◆ Drei Ebenen</div>
+    <h2>Vom Exposé bis zur <em>Steuererklärung.</em></h2>
+    <p>Alles auf derselben Datenbasis. Was Sie einmal erfassen, steht überall — im Score,
+       in der Steuer, im PDF für die Bank.</p></div>
+  <div class="spalten">
+    <div class="sp rv"><div class="nr">I</div><h3>Erfassen &amp; Rechnen</h3>
+      <ul><li>Exposé-PDF einlesen, diktieren oder Belege scannen</li>
+        <li>Finanzierung mit Zweitdarlehen, KfW und Bausparvertrag</li>
+        <li>Tilgungsaussetzung und Zinsänderungsrisiko</li>
+        <li>Mietentwicklung als Prognose oder Erhöhungs-Treppe</li>
+        <li>Mehrfamilienhaus je Einheit: Ist/Soll, Maßnahme, Kosten</li>
+        <li>Erbbaurecht — rechnet den Abschlag selbst</li></ul></div>
+    <div class="sp rv"><div class="nr">II</div><h3>Bewerten &amp; Belegen</h3>
+      <ul><li>Investor Deal Score aus 24 Kennzahlen, Gewichte einstellbar</li>
+        <li>Restnutzungsdauer über sechs Verfahren, Ergebnis als Spanne</li>
+        <li>Kaufpreisaufteilung nach der BMF-Arbeitshilfe</li>
+        <li>Bodenrichtwert aus 22 amtlichen Portalen</li>
+        <li>Liegenschaftszinssatz und Sachwertfaktor der Ausschüsse</li>
+        <li>Marktpreisindikation über zwei unabhängige Partner</li></ul></div>
+    <div class="sp rv"><div class="nr">III</div><h3>Ausgeben &amp; Abgeben</h3>
+      <ul><li>Investment-Case als PDF, zwei Fassungen</li>
+        <li>Bankexport mit 25 Spalten</li>
+        <li>Kaufpreisaufteilung fürs Finanzamt samt Vertragstext</li>
+        <li>Werbungskosten bis zur Zeile der Anlage V 2025</li>
+        <li>Bilanz und GuV für die Immobilien-GmbH</li>
+        <li>Datenraum mit Dokumenten-Checkliste je Objekt</li></ul></div>
+  </div>
+</div></section>
+
+<!-- ══ VERGLEICH ══ -->
+<section class="sec-sand" id="vergleich"><div class="w">
+  <div class="kz rv"><div class="marke">◆ Ohne und mit</div>
+    <h2>Was sich <em>tatsächlich ändert.</em></h2>
+    <p>Nicht „schneller" — sondern belegbar statt geschätzt.</p></div>
+  <table class="tab rv">
+    <thead><tr><th>Aufgabe</th><th>Excel &amp; Bauchgefühl</th><th class="best">Mit DealPilot</th></tr></thead>
+    <tbody>
+      <tr><td>Kaufpreisaufteilung</td><td>80/20 aus dem Vertrag, das Finanzamt kürzt</td>
+        <td class="mark">Amtliche Arbeitshilfe, drei Verfahren, Vertragstext zum Einsetzen</td></tr>
+      <tr><td>Restnutzungsdauer</td><td>„50 Jahre, wie immer"</td>
+        <td class="mark">Sechs Verfahren, 27 Gebäudetypen, 190 Bauteile — als Spanne</td></tr>
+      <tr><td>Bodenrichtwert</td><td>Googeln, Portal suchen, abtippen</td>
+        <td class="mark">Aus 22 amtlichen Portalen, mit Jahrgang und Stichtag</td></tr>
+      <tr><td>Cashflow-Planung</td><td>Ein Blatt je Objekt, Formeln kopiert</td>
+        <td class="mark">15 Jahre, mit Steuer, Zinsbindung und Belastungsprobe</td></tr>
+      <tr><td>Bankgespräch</td><td>Zahlen zusammensuchen</td>
+        <td class="mark">PDF und Excel mit 25 Spalten, Checkliste im Datenraum</td></tr>
+      <tr><td>Kauf über die GmbH</td><td>Steuerberater fragen, Wochen warten</td>
+        <td class="mark">Beide Wege nebeneinander, mit Bilanz und GuV</td></tr>
+    </tbody>
+  </table>
+</div></section>
+
+<!-- ══ PRAXIS ══ -->
+<section id="praxis"><div class="w">
+  <div class="kz rv"><div class="marke">◆ Aus der Gutachtenpraxis</div>
+    <h2>Vier Situationen, <em>die Geld kosten.</em></h2>
+    <p>Jede davon ist der Grund, warum ein bestimmtes Modul entstanden ist.</p></div>
+  <div class="faelle">
+    <article class="fall rv"><div class="bild">
+      <svg viewBox="0 0 150 190" fill="none" stroke="#C9A84C" stroke-width="1.1" opacity=".85">
+        <rect x="26" y="52" width="98" height="110" rx="2"/>
+        <path d="M18 54 75 20l57 34" stroke-width="1.6"/>
+        <rect x="42" y="72" width="24" height="24"/><rect x="84" y="72" width="24" height="24"/>
+        <rect x="42" y="110" width="24" height="24"/><rect x="84" y="110" width="24" height="24"/>
+        <path d="M60 162v-22h30v22"/>
+        <path d="M14 176h122" stroke-dasharray="3 3"/>
+        <text x="16" y="186" fill="#E8CC7A" stroke="none" font-size="7" font-family="monospace">GRUND UND BODEN</text>
+      </svg></div>
+      <div class="txt"><h3>Die gekürzte Abschreibung</h3>
+        <p>Der Vertrag teilt 80/20 auf, das Finanzamt rechnet mit der eigenen Arbeitshilfe —
+           und plötzlich fehlen Jahr für Jahr mehrere tausend Euro Abschreibung.</p>
+        <div class="ergebnis">Mit begründetem Bodenabschlag: 81,99 % → 85,59 % Gebäudeanteil</div></div>
+    </article>
+    <article class="fall rv"><div class="bild">
+      <svg viewBox="0 0 150 190" fill="none" stroke="#C9A84C" stroke-width="1.1" opacity=".85">
+        <path d="M22 30v130h110" stroke-width="1.5"/>
+        <path d="M30 150l22-18 22-30 22-14 22-32" stroke="#E8CC7A" stroke-width="1.8"/>
+        <path d="M30 156l22-10 22-16 22-9 22-18" stroke-dasharray="4 4"/>
+        <circle cx="118" cy="56" r="4" fill="#E8CC7A" stroke="none"/>
+        <text x="24" y="24" fill="#E8CC7A" stroke="none" font-size="7" font-family="monospace">15 JAHRE</text>
+      </svg></div>
+      <div class="txt"><h3>Der Zins nach der Bindung</h3>
+        <p>Zehn Jahre sind schnell um. Was passiert, wenn die Anschlussfinanzierung drei
+           Punkte teurer wird — trägt das Objekt sich dann noch?</p>
+        <div class="ergebnis">Belastungsprobe: DSCR 1,42 → 0,96 bei +3 Prozentpunkten</div></div>
+    </article>
+    <article class="fall rv"><div class="bild">
+      <svg viewBox="0 0 150 190" fill="none" stroke="#C9A84C" stroke-width="1.1" opacity=".85">
+        <rect x="24" y="40" width="44" height="120" rx="2"/>
+        <rect x="82" y="40" width="44" height="120" rx="2" stroke="#E8CC7A" stroke-width="1.5"/>
+        <path d="M32 58h28M32 74h28M32 90h20M32 106h24M32 122h16"/>
+        <path d="M90 58h28M90 74h28M90 90h20M90 106h24M90 122h16" stroke="#E8CC7A"/>
+        <text x="26" y="34" fill="#8A8272" stroke="none" font-size="6.5" font-family="monospace">PRIVAT</text>
+        <text x="84" y="34" fill="#E8CC7A" stroke="none" font-size="6.5" font-family="monospace">GMBH</text>
+        <path d="M70 100h12m-4-4 4 4-4 4" stroke="#E8CC7A"/>
+      </svg></div>
+      <div class="txt"><h3>Privat oder Gesellschaft</h3>
+        <p>Die Frage kommt bei jedem zweiten Objekt — und die Antwort hängt an Haltedauer,
+           Steuersatz und dem, was beim Verkauf übrig bleibt.</p>
+        <div class="ergebnis">Beide Wege gerechnet, inklusive Bilanz und GuV</div></div>
+    </article>
+    <article class="fall rv"><div class="bild">
+      <svg viewBox="0 0 150 190" fill="none" stroke="#C9A84C" stroke-width="1.1" opacity=".85">
+        <rect x="28" y="34" width="94" height="126" rx="3"/>
+        <path d="M40 54h70M40 70h70M40 86h48" stroke-width="1.4"/>
+        <rect x="40" y="102" width="70" height="44" stroke="#E8CC7A" stroke-width="1.4"/>
+        <path d="M48 138l14-16 14 10 14-22 12 14" stroke="#E8CC7A" stroke-width="1.5"/>
+        <text x="30" y="28" fill="#E8CC7A" stroke="none" font-size="7" font-family="monospace">BANKUNTERLAGE</text>
+      </svg></div>
+      <div class="txt"><h3>Das Bankgespräch</h3>
+        <p>Der Berater will Zahlen in seinem Raster — nicht Ihre Excel-Tabelle. Und er will sehen,
+           woher jede Zahl stammt.</p>
+        <div class="ergebnis">PDF in zwei Fassungen · Excel mit 25 Spalten · Checkliste</div></div>
+    </article>
+  </div>
+</div></section>
+
+<!-- ══ ZAHLEN ══ -->
+<section class="sec-dunkel"><div class="w">
+  <div class="kz rv"><div class="marke" style="color:var(--gold-hi)">◆ Belegbar</div>
+    <h2>Zahlen, die <em>nicht erfunden</em> sind.</h2>
+    <p>Jede davon steht so im Programm — und lässt sich nachzählen.</p></div>
+  <div class="zb">
+    <div class="rv"><b data-zahl="24">0</b><span>KENNZAHLEN IM DEAL SCORE</span></div>
+    <div class="rv"><b data-zahl="6">0</b><span>VERFAHREN RESTNUTZUNGSDAUER</span></div>
+    <div class="rv"><b data-zahl="190">0</b><span>BAUTEILE MIT LEBENSDAUER</span></div>
+    <div class="rv"><b data-zahl="25">0</b><span>SPALTEN IM BANKEXPORT</span></div>
+  </div>
+</div></section>
+
+<!-- ══ PREISE ══ -->
+<section class="sec-sand" id="preise"><div class="w">
+  <div class="kz rv"><div class="marke">◆ Tarife</div>
+    <h2>Vier Pakete. <em>Ein Cockpit.</em></h2>
+    <p>Monatlich kündbar · jährlich rund 17 % günstiger · nicht genutzte Bewertungen verfallen nicht</p></div>
+  <div class="pleiste rv">
+    <div class="pl"><div class="n">Free</div><div class="p">0 €<small>/Mon.</small></div>
+      <div class="j">4 Wochen als Pro</div>
+      <ul><li>1 Objekt</li><li>1 Bewertung / Monat</li><li>PDF mit Wasserzeichen</li></ul>
+      <a href="https://app.dealpilot.immo/?register=1&plan=free">Starten</a></div>
+    <div class="pl"><div class="n">Starter</div><div class="p">19,99 €<small>/Mon.</small></div>
+      <div class="j">219 € im Jahr · spart 21 €</div>
+      <ul><li>5 Objekte</li><li>5 Bewertungen / Monat</li><li>Marktreport</li></ul>
+      <a href="https://app.dealpilot.immo/?register=1&plan=starter">Auswählen</a></div>
+    <div class="pl best"><div class="pbadge">MEISTGEWÄHLT</div>
+      <div class="n">Investor</div><div class="p">34,99 €<small>/Mon.</small></div>
+      <div class="j">384 € im Jahr · spart 36 €</div>
+      <ul><li>25 Objekte</li><li>Investor Deal Score</li><li>BMF-Rechner &amp; Bankexport</li></ul>
+      <a href="https://app.dealpilot.immo/?register=1&plan=investor">Auswählen</a></div>
+    <div class="pl"><div class="n">Pro</div><div class="p">49,99 €<small>/Mon.</small></div>
+      <div class="j">549 € im Jahr · spart 51 €</div>
+      <ul><li>unbegrenzt Objekte</li><li>Wertermittlung ImmoWertV</li><li>Steuer-Mappe</li></ul>
+      <a href="https://app.dealpilot.immo/?register=1&plan=pro">Auswählen</a></div>
+  </div>
+  <p class="mini" style="text-align:center;margin-top:20px">
+    Partner &amp; Whitelabel: 49 € im Monat, drei Berater-Plätze inklusive,
+    Mandanten-Plätze ab 15 €.</p>
+</div></section>
+
+<footer><div class="w">
+  <div class="ff">
+    <div><div class="logo" style="color:#F6F3EC">Deal<i>Pilot</i></div>
+      <p style="margin:12px 0 0;max-width:320px">Entstanden aus der Gutachtenpraxis eines
+         DESAG-zertifizierten Sachverständigen — weil dieselben Zahlen jeden Tag gebraucht werden.</p></div>
+    <div><h4>Produkt</h4><a href="#kann">Funktionen</a><a href="#preise">Preise</a>
+      <a href="#">Leistungsumfang</a><a href="#">API</a></div>
+    <div><h4>Junker Immobilien</h4><a href="https://junker-immobilien.io">Sachverständigenbüro</a>
+      <a href="#">Gutachten</a><a href="#">Kontakt</a></div>
+    <div><h4>Rechtliches</h4><a href="/impressum.html">Impressum</a>
+      <a href="/datenschutz.html">Datenschutz</a><a href="/agb.html">AGB</a></div>
+  </div>
+  <div class="fe">© 2026 Junker Immobilien · Keine Steuer- oder Finanzberatung.</div>
+</div></footer>
+
+<script>
+(function(){
+  var kopf=document.getElementById('kopf');
+  addEventListener('scroll',function(){ kopf.classList.toggle('fest',scrollY>8); },{passive:true});
+
+  function hoch(el,ziel){
+    el.textContent=ziel.toLocaleString('de-DE');     /* Endwert zuerst - sicher auch ohne rAF */
+    if(document.visibilityState!=='visible') return;
+    var start=null;
+    requestAnimationFrame(function lauf(t){
+      if(!start) start=t;
+      var p=Math.min(1,(t-start)/1100), e=1-Math.pow(1-p,3);
+      el.textContent=Math.round(ziel*e).toLocaleString('de-DE');
+      if(p<1) requestAnimationFrame(lauf);
+    });
+  }
+  var b=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      e.target.classList.add('da');
+      e.target.querySelectorAll('[data-zahl]').forEach(function(z){
+        if(z.dataset.fertig) return; z.dataset.fertig='1';
+        hoch(z,parseInt(z.dataset.zahl,10));
+      });
+      b.unobserve(e.target);
+    });
+  },{threshold:.2});
+  var i=0;
+  document.querySelectorAll('.rv').forEach(function(el){
+    el.style.transitionDelay=((i++%3)*90)+'ms'; b.observe(el);
+  });
+
+  fetch('https://app.dealpilot.immo/api/v1/public/stats')
+    .then(function(r){ return r.ok?r.json():null; })
+    .then(function(d){
+      if(d&&d.registrierte_nutzer){
+        var e=document.getElementById('z2');
+        if(e) e.textContent=d.registrierte_nutzer.toLocaleString('de-DE');
+      }
+    }).catch(function(){});
+})();
+</script>
+</body></html>
