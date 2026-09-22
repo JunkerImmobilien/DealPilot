@@ -120,7 +120,13 @@
           'Auch wenn du dich erst umsiehst, bleibt er gültig.</p>' +
       '</div>';
     document.body.appendChild(d);
-    requestAnimationFrame(function () { d.classList.add('an'); });
+    /* v1522b · gemessen auf der Staging-Landing: die Klasse blieb aus, das
+       Fenster stand auf opacity 0 - und haette als unsichtbare Flaeche die
+       ganze Seite blockiert (inset:0). Ursache: im HINTERGRUND-Tab feuert
+       requestAnimationFrame gar nicht. Wer den Link in einem neuen Tab
+       oeffnet und erst spaeter hinschaut, haette eine tote Seite gesehen.
+       Ein Timer wird im Hintergrund nur gedrosselt, nicht angehalten. */
+    setTimeout(function () { d.classList.add('an'); }, 30);
 
     function zu() {
       d.classList.remove('an');
