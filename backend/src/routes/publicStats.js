@@ -27,9 +27,6 @@ const CACHE_MS = parseInt(process.env.PUBLIC_STATS_CACHE_MS || '60000', 10);
 
 let speicher = { zeit: 0, wert: null };
 
-/* Auf Zehner runden, solange die Zahl klein ist, spaeter auf Fuenfziger.
-   Eine Zahl, die sich stuendlich um eins aendert, sieht aus wie ein
-   Zaehlwerk - und lenkt von dem ab, was sie sagen soll. */
 /* v1523b · gemessen beim ersten Lauf: Sockel 865 + 1 Nutzer = 866, und das
    Abrunden auf Zehner machte daraus 860 - WENIGER als der Sockel. Eine Zahl,
    die nach dem ersten Kunden kleiner wird, ist schlimmer als gar keine.
