@@ -17898,3 +17898,134 @@ Partner-Umschalter ohne Jahresansicht, Paketinhalte zu duenn aufgeschluesselt.
 > `requestAnimationFrame`. Alle drei Male sah es nach einem Fehler im Entwurf
 > aus. Wer eine Seite so prueft, muss `document.visibilityState` mitlesen —
 > und die Seite so bauen, dass sie **ohne** diese Dinge vollstaendig ist.
+
+
+## Rollout-Journal · 22.09.2026 — v1530 bis v1539: Landing, Partnerpreis, Hellmodus
+
+**Was.** Drei Stränge an einem Tag: die vollständige neue Landing samt zwei
+Unterseiten, die Umstellung des Partner-Pakets von 49 auf 99 EUR, und die
+Reparatur der Reiterleiste im Hellmodus.
+
+**Commits.** `c73cb3f` v1530 · `547aa3b` v1531 · `dce9760` v1532/33 ·
+`16fa004` v1534 · `2026cb1` v1535 · `a2a96fd` v1536/37 · `8c106f4` v1538 ·
+`38cf726` v1539. Alle auf Staging, Serverstand je Rollout gegengeprüft.
+
+### 1 · Landing (v1530–v1534)
+
+`frontend/landing/entwurf-voll.html` nimmt die alte Seite vollständig mit:
+20 Module in vier Gruppen, die Cockpit-Matrix mit 33 Zeilen, die Geschichte
+„Der Anruf am Donnerstagabend", Ablauf in sechs Schritten, Vertrauensband
+(Hetzner, DSGVO), Kundenstimmen. Dazu `sicherheit.html` und `fragen.html`
+mit gemeinsamem Gerüst in `dp-seite.css` / `dp-seite.js`.
+
+**Ohne Emoji:** 20 eigene SVG-Strichzeichnungen. Gemessen — im Dokument steht
+kein Zeichen aus den Emoji-Blöcken mehr, nur das Häkchen in der Matrix.
+
+**Der Hero trägt die weiße Investor-Deal-Score-Karte**, Aufbau eins zu eins an
+der laufenden App gemessen (`hybrid-aktionen.js` Z.73–160, `style.css`
+Z.37888–37942).
+
+**Gestaltung von junker-immobilien.io übernommen** (v1534). Die vier Mittel,
+die dort tragen: *gap:0 plus ein Außenrahmen plus 1px-Trenner* statt
+schwebender Karten; *fast keine Radien*; der *goldene 3px-Streifen*, der per
+`scaleY` herausfährt; *lange, leise Bewegungen* (Raster 46 s, Laufband 60 s)
+bei nur zwei kurzen Kurven.
+
+> **Die vierte Goldstufe.** Gold ist dort kein einzelner Wert, sondern ein
+> **Paar**: `#7d611a` für Gold als TEXT auf hellem Grund, `#E8CC7A` für Gold
+> AUF dunklem Grund. Unser `--gold-lo` `#a8842a` lag dazwischen und war auf
+> Creme zu blass — genau das, was Marcel als „zu hell mit Gold" beschrieben
+> hat. Neu als `--gold-txt`. Die drei Marken-Goldtöne bleiben unberührt.
+
+### 2 · Partner-Paket 49 → 99 EUR (v1535–v1537)
+
+> **Der Befund, der die Richtung geändert hat.** Mein Vorschlag war 159 EUR
+> mit drei BERATER-Plätzen. Beim Messen zeigte sich: **die gibt es nicht.**
+> `plans.max_users` steht für ALLE Pläne auf 1 und wird **nirgends
+> durchgesetzt** — nur angezeigt. Die `licenses`-Tabelle kennt ausschließlich
+> MANDANTEN-Seats, und die bekommen Investor-Tier. Die alte Landing bewirbt
+> seit v1250 „3 Berater-Seats inklusive": ein Versprechen ohne Entsprechung
+> im Code. **Marcels Entscheidung: 99 EUR mit drei MANDANTEN-Plätzen** — das
+> kann die Software heute.
+
+Der eigentliche Fehler war der Preis selbst: Partner kostete **49,00 EUR und
+lag damit 99 Cent UNTER Pro** (49,99) — bei vollem Pro-Umfang plus Whitelabel
+plus Reseller-Konsole.
+
+**Stripe**, beide Konten, neue Preise mit übertragenem `lookup_key`:
+
+| | monatlich | jährlich |
+|---|---|---|
+| Sandbox | `price_1UIS4VKEjyPDo0wonEnXVuAJ` | `price_1UIS4bKEjyPDo0wogWU0PSeG` |
+| **LIVE** | `price_1UIS6NGefFev8arzQhprWAKe` | `price_1UIS6rGefFev8arzIX3XuO3e` |
+
+9900 / 108900 Cent. Vorher geprüft: **auf den alten Partner-Preisen lief in
+Prod kein Abo**. Staging nachgemessen — `plans` steht auf 9900/108900, und
+`[plans-sync]` meldet *„nichts zu tun, plans stimmt mit Stripe überein"*.
+**Prod zieht beim nächsten Backend-Start nach; dort wurde nichts angefasst.**
+
+**Dass die drei Plätze wirken** (v1537): `syncPoolQuantity` rechnet
+`INKLUSIV_MANDANTEN = 3` auf die gekaufte Stripe-Menge auf — an der einen
+Stelle, die alle Aufrufer durchlaufen. Beim Aufrufer wäre es falsch: es gibt
+zwei, und ein dritter würde es vergessen. **Genau so ist das leere
+Berater-Seat-Versprechen entstanden.** Echter Funktionslauf im Container:
+
+    INKLUSIV_MANDANTEN = 3
+    10 gekauft → 13 Plätze (3 inklusiv, 10 bezahlt)
+     0 gekauft →  3 Plätze (3 inklusiv,  0 bezahlt)
+
+> **Der Seat-Rechner zeigte 35/29/24 und buchte 19/15/12 ab** (v1535). Der
+> Hinweistext im Kaufpanel nannte die richtige Staffel, der Rechner zwei
+> Zeilen darunter die alte von vor v1423. Fünf Seats: **angezeigt 175 EUR,
+> abgebucht 95 EUR.** Jährlich nahm er zehn Monatsraten, Stripe führt elf.
+> Beide Zahlen falsch, in verschiedene Richtungen. Die Staffel steht jetzt
+> EINMAL in einer Liste, Text und Summe lesen dieselbe.
+> Dazu: die alte Landing bewarb **24/19/15**, also zu hohe Preise — seit v1250.
+
+### 3 · Hellmodus: die Reiterleiste (v1538)
+
+> **Keine der sechs Kartenvarianten hat die Reiterleiste je eingefärbt** —
+> auch die Vorauswahl v4 nicht, und auch meine v1527-Regel in `style.css`
+> nicht. Nicht die Farbe war falsch, sondern die **Spezifität**.
+> `ui-varianten.css` färbt `nav.tabs` über eine Regel mit vier
+> Teilselektoren, und der stärkste ist
+>
+>     html[data-ui-theme] body header.hdr.has-v64-score + nav.tabs.tabs
+>     = 1 Attribut + 3 Klassen + 2 Typen = (0,4,2), mit !important
+>
+> Alle Varianten hatten (0,1,2). Aufgefallen ist es nicht, weil die Sidebar
+> richtig aussah: dort gibt es keinen so spezifischen Konkurrenten.
+> **Bei einer Regel mit mehreren Selektoren zählt für ein Element der
+> stärkste, der auf es passt** — nicht der erste und nicht der kürzeste.
+> Behoben mit demselben Anker plus doppelter Klasse `.tabs.tabs` = (0,5,2).
+> Ohne ID und ohne `:not(#id)`, das würde ID-Spezifität erben.
+
+Nachgemessen: Reiterleiste, Kopfleiste und Aktionsspalte alle `#FFFFFF`,
+Schriftkontrast **17,85** gegen **17,37** in der Aktionsspalte — praktisch
+gleich, wie gewünscht. Kein goldener Text mehr in Reiterleiste und Sidebar.
+
+> **Werkzeugfalle dabei:** Die Reiterschrift kommt als `oklab(...)`. Meine
+> Kontrastrechnung zog die Zahlen per Regex heraus und gab **22946** aus —
+> offensichtlicher Unsinn, aber ein Wert, den man ungeprüft übernehmen könnte.
+> Richtig geht es nur über den Browser selbst: Farbe auf ein 1×1-Canvas legen
+> und das Pixel auslesen.
+
+### 4 · Demo statt Alleingang (v1539)
+
+Nach v1538 ist `.dp-pfbar` die **einzige vollflächige Farbe** in der hellen
+Ansicht — 1280 × 78 Pixel Runway-Verlauf mit Kacheln in `#0a0a0a`. Im
+Dunkelmodus fügt es sich ein, im Hellmodus zieht es den Blick stärker an als
+die Felder, in denen gearbeitet wird. Das ist eine Optikentscheidung, keine
+Messfrage → `frontend/demo-preflight-hell.html` zeigt vier Fassungen im
+echten Umfeld. Empfehlung: Cremeband, weil es dieselbe Farbe ist wie die
+Objektkarte und dieselbe Aussage dieselbe Farbe tragen sollte.
+
+### Rest
+
+- **Prod-Backend nicht neu gestartet** — Stripe steht, die Prod-`plans` zieht
+  beim nächsten Start nach.
+- **Die drei Kundenstimmen sind Platzhalter** und im Quelltext so bezeichnet.
+  Erfundene Kundenurteile sind nach § 5 UWG abmahnbar — vor dem Livegang
+  durch echte ersetzen.
+- Die Fassung des Pre-Flight-Bands ist offen (Demo liegt).
+- `entwurf-voll.html` ist noch ein Entwurf neben der alten `index.html`.
