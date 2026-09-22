@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Partner-Paket — das Loch und vier Wege heraus</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A84C;--gold-lo:#a8842a;--ink:#221E19;--ink-2:#5A5347;--ink-3:#8C8478;
+  --linie:#E5DFD0;--creme:#F5F2EA;--rot:#B8625C;--gruen:#3FA56C;--obsidian:#0A0908}
+*{box-sizing:border-box}
+body{margin:0;background:var(--creme);color:var(--ink);font:15.5px/1.62 Inter,system-ui,sans-serif}
+h1,h2,h3{font-family:'Space Grotesk',sans-serif;margin:0;letter-spacing:-.6px}
+.w{max-width:1120px;margin:0 auto;padding:0 28px}
+header{background:var(--obsidian);color:#F6F3EC;padding:30px 0 28px}
+header h1{font-size:28px;margin-bottom:8px}
+header p{margin:0;color:rgba(246,243,236,.66);max-width:760px;font-size:15px}
+.mono{font-family:'JetBrains Mono',monospace}
+section{padding:36px 0}
+.kasten{background:#fff;border:1px solid var(--linie);border-radius:14px;padding:24px 26px;margin-bottom:22px}
+.kasten.alarm{border-left:4px solid var(--rot);background:#FEF9F7}
+.kasten h2{font-size:20px;margin-bottom:12px}
+.kasten h3{font-size:16px;margin:18px 0 9px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--linie)}
+thead th{background:var(--obsidian);color:#F6F3EC;font:600 11px/1.3 'JetBrains Mono',monospace;
+  letter-spacing:.06em;text-transform:uppercase}
+td.z{text-align:right;font-family:'JetBrains Mono',monospace}
+tr.hervor td{background:rgba(184,98,92,.08);font-weight:600}
+.mini{font-size:12.6px;color:var(--ink-3)}
+.rechner{background:#fff;border:1px solid var(--linie);border-radius:14px;padding:24px 26px}
+.regler{display:grid;grid-template-columns:200px 1fr 70px;gap:14px;align-items:center;margin-bottom:14px}
+.regler label{font-size:14px;color:var(--ink-2)}
+.regler input[type=range]{width:100%;accent-color:var(--gold)}
+.regler .wert{font:600 16px/1 'JetBrains Mono',monospace;text-align:right}
+.modelle{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:22px}
+.mk{border:1px solid var(--linie);border-radius:12px;padding:18px 20px;background:#FCFBF8;transition:.2s}
+.mk.gut{border-color:var(--gruen);box-shadow:0 4px 16px rgba(63,165,108,.14)}
+.mk h3{font-size:16.5px;margin-bottom:5px}
+.mk .wie{font-size:13px;color:var(--ink-2);margin-bottom:12px;line-height:1.55}
+.mk .summe{font:600 27px/1 'Space Grotesk',sans-serif;color:var(--gold-lo)}
+.mk .je{font-size:12.5px;color:var(--ink-3);margin-top:4px}
+.mk .pruef{margin-top:12px;padding-top:11px;border-top:1px solid var(--linie);font-size:12.8px}
+.mk .ok{color:var(--gruen)}
+.mk .warn{color:var(--rot)}
+ul.frei{margin:10px 0 0;padding-left:19px;font-size:13.6px;color:var(--ink-2);line-height:1.62}
+.fuss{background:#fff;border-top:1px solid var(--linie);padding:24px 0 40px;font-size:13.5px;color:var(--ink-2)}
+@media(max-width:820px){.modelle{grid-template-columns:1fr}.regler{grid-template-columns:1fr}}
+</style>
+</head><body>
+
+<header><div class="w">
+  <h1>Das Partner-Paket hebelt das Einzelgeschäft aus</h1>
+  <p>Gemessen in der Staging-Datenbank am 22.09.2026, Tabelle <span class="mono">plans</span>.
+     Nicht aus der Landing abgeschrieben — die sagt teils etwas anderes.</p>
+</div></header>
+
+<section><div class="w">
+
+  <div class="kasten alarm">
+    <h2>Befund 1 · Partner ist der billigere Pro</h2>
+    <table>
+      <thead><tr><th>Plan</th><th class="z">Monat</th><th class="z">Jahr</th>
+        <th class="z">Objekte</th><th class="z">Nutzer laut DB</th></tr></thead>
+      <tbody>
+        <tr><td>Starter</td><td class="z">19,99 €</td><td class="z">219 €</td><td class="z">5</td><td class="z">1</td></tr>
+        <tr><td>Investor</td><td class="z">34,99 €</td><td class="z">384 €</td><td class="z">25</td><td class="z">1</td></tr>
+        <tr><td>Pro</td><td class="z">49,99 €</td><td class="z">549 €</td><td class="z">∞</td><td class="z">1</td></tr>
+        <tr class="hervor"><td>Partner</td><td class="z">49,00 €</td><td class="z">539 €</td><td class="z">∞</td><td class="z">1</td></tr>
+      </tbody>
+    </table>
+    <p><b>Partner kostet 99 Cent weniger als Pro</b> — und kann zusätzlich Reseller-Portal,
+       Whitelabel, API-Zugang, Mandantenverwaltung und Migrationsservice. Es gibt damit
+       <b>keinen rationalen Grund, Pro zu buchen.</b> Das ist kein Seat-Problem, das ist
+       ein Rangfolge-Problem: Das teuerste Einzelpaket ist zugleich das schwächste Angebot.</p>
+  </div>
+
+  <div class="kasten alarm">
+    <h2>Befund 2 · Die drei Berater-Plätze gibt es nur im Werbetext</h2>
+    <p>Die Landing schreibt <b>„3 Berater-Seats inklusive"</b>. In der Datenbank steht beim
+       Partner-Plan <span class="mono">max_users = 1</span>, und es gibt <b>keine Spalte</b>
+       für inkludierte Berater-Plätze — weder in <span class="mono">plans</span> noch in
+       <span class="mono">resellers</span>. Auch im Backend findet sich keine Stelle, die drei
+       freie Plätze vergibt.</p>
+    <p class="mini">Geprüft: <span class="mono">plans</span>, <span class="mono">resellers</span>,
+       <span class="mono">reseller_members</span>, <span class="mono">licenses</span>,
+       Routen unter <span class="mono">backend/src/routes/reseller*</span>.</p>
+    <p><b>Zwei Risiken:</b> Ein Kunde, der die drei Plätze einfordert, hat den Werbetext auf
+       seiner Seite. Und falls sie technisch doch vergeben werden, kostet ein Platz
+       <b>16,33 €</b> — ein Drittel des Einzelpreises.</p>
+  </div>
+
+  <div class="rechner">
+    <h2>Vier Wege heraus — rechnen Sie durch</h2>
+    <p class="mini" style="margin:6px 0 18px">Stellen Sie ein, wie ein typischer Partner aussieht.
+      Die Modelle rechnen mit denselben Zahlen.</p>
+
+    <div class="regler">
+      <label>Berater im Partnerbüro</label>
+      <input type="range" id="r-berater" min="1" max="12" value="3">
+      <span class="wert" id="w-berater">3</span>
+    </div>
+    <div class="regler">
+      <label>Mandanten mit eigenem Zugang</label>
+      <input type="range" id="r-mandanten" min="0" max="40" value="8">
+      <span class="wert" id="w-mandanten">8</span>
+    </div>
+
+    <div class="modelle" id="modelle"></div>
+
+    <h3 style="margin-top:26px">Was dabei zu prüfen ist</h3>
+    <ul class="frei">
+      <li><b>Kein Modell darf billiger sein als drei Einzelplätze</b>, wenn es dasselbe leistet.
+        Drei Pro kosten heute 149,97 € im Monat — das ist die Messlatte.</li>
+      <li><b>Der Partner-Platz sollte etwas anderes sein als ein Pro-Platz.</b> Wenn ein
+        Berater-Platz nur Mandanten-Objekte bearbeiten kann und keine eigenen, ist er kein
+        Ersatz für Pro — dann ist auch ein günstiger Preis unbedenklich.</li>
+      <li><b>Die Grundgebühr sollte das tragen, was nur Partner bekommen</b> (eigene Marke,
+        Mandantenkonsole, Portal, API). Die Plätze tragen die Nutzung.</li>
+      <li><b>Pro muss wieder das teuerste Einzelpaket sein</b> — sonst bleibt es unverkäuflich.</li>
+    </ul>
+  </div>
+
+</div></section>
+
+<div class="fuss"><div class="w">
+  <b>Entscheidung liegt bei dir.</b> Ich ändere keine Preise ohne dein Wort — weder in der
+  Datenbank noch bei Stripe. Diese Seite rechnet nur vor.
+  <span class="mini" style="display:block;margin-top:8px">Hinweis: Ein Stripe-Coupon lässt seinen
+  Prozentsatz nicht nachträglich ändern; neue Preise brauchen dort neue Preis-Objekte, und die
+  Preis-ID steht an vier Stellen (config.js, plans, Billing-Portal, .env).</span>
+</div></div>
+
+<script>
+var MODELLE = [
+  { name: 'A · Grundgebühr plus Platz',
+    wie: 'Partner-Plattform 49 € (Marke, Mandantenkonsole, Portal, API). Jeder Berater-Platz 39 €. Mandanten-Platz gestaffelt wie heute.',
+    rechne: function(b,m){ return 49 + b*39 + staffel(m); },
+    gut: true },
+  { name: 'B · Höherer Einstieg mit drei Plätzen',
+    wie: 'Partner 159 € mit drei Berater-Plätzen (53 € je Platz), jeder weitere 45 €. Mandanten wie heute.',
+    rechne: function(b,m){ return 159 + Math.max(0,b-3)*45 + staffel(m); },
+    gut: true },
+  { name: 'C · Nur Mandanten zählen',
+    wie: 'Partner 99 € mit beliebig vielen Beratern — bezahlt wird nur je Mandant (höhere Staffel: 34/28/22 €).',
+    rechne: function(b,m){ return 99 + staffelHoch(m); },
+    gut: false },
+  { name: 'D · Heute (zum Vergleich)',
+    wie: 'Partner 49 € mit angeblich drei Plätzen, Mandanten 24/19/15 €.',
+    rechne: function(b,m){ return 49 + staffel(m); },
+    gut: false }
+];
+
+function staffel(m){
+  if(m<=0) return 0;
+  var s=0;
+  for(var i=1;i<=m;i++){ s += i<=9 ? 24 : (i<=24 ? 19 : 15); }
+  return s;
+}
+function staffelHoch(m){
+  if(m<=0) return 0;
+  var s=0;
+  for(var i=1;i<=m;i++){ s += i<=9 ? 34 : (i<=24 ? 28 : 22); }
+  return s;
+}
+function eur(n){ return n.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; }
+
+function zeichne(){
+  var b=+document.getElementById('r-berater').value;
+  var m=+document.getElementById('r-mandanten').value;
+  document.getElementById('w-berater').textContent=b;
+  document.getElementById('w-mandanten').textContent=m;
+  var messlatte = b*49.99;                    /* so viel kosten b Einzelplätze Pro */
+  document.getElementById('modelle').innerHTML = MODELLE.map(function(mo){
+    var summe=mo.rechne(b,m);
+    var jePlatz=summe/Math.max(1,b);
+    var haelt = summe >= messlatte;
+    return '<div class="mk'+(mo.gut&&haelt?' gut':'')+'">'
+      + '<h3>'+mo.name+'</h3>'
+      + '<div class="wie">'+mo.wie+'</div>'
+      + '<div class="summe">'+eur(summe)+'<span style="font-size:14px;color:var(--ink-3)"> / Monat</span></div>'
+      + '<div class="je">'+eur(jePlatz)+' je Berater-Platz</div>'
+      + '<div class="pruef">'
+      +   (haelt
+            ? '<span class="ok">✓ Hält die Messlatte: '+b+' × Pro = '+eur(messlatte)+'</span>'
+            : '<span class="warn">✗ Billiger als '+b+' × Pro ('+eur(messlatte)+') — hebelt das Einzelgeschäft aus</span>')
+      + '</div></div>';
+  }).join('');
+}
+document.getElementById('r-berater').addEventListener('input',zeichne);
+document.getElementById('r-mandanten').addEventListener('input',zeichne);
+zeichne();
+</script>
+</body></html>
