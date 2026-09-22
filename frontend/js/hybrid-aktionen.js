@@ -61,7 +61,21 @@
   function score() {
     var host = document.getElementById('dp-hy-score'); if (!host) return;
     var mini = document.getElementById('hdr-score-mini');
-    if (document.body.classList.contains('hdr-no-score') || !gilt(mini)) { host.innerHTML = ''; host.style.display = 'none'; return; }
+    /* v1519 · gemessen: der Zweig aus v1518 wurde nie erreicht. Diese Zeile
+       steigt VORHER aus, wenn der Kopf keinen Score zeigt - und genau dann
+       soll die Spalte ja einspringen. Schon zum zweiten Mal in diesem
+       Projekt hat ein frueher Ausstieg eine neue Ergaenzung verschluckt
+       (siehe v1493). Wer unten etwas anhaengt, muss oben nachsehen, ob die
+       Funktion dort schon herausspringt. */
+    if (document.body.classList.contains('hdr-no-score') || !gilt(mini)) {
+      var nurTeile = bereiche();
+      if (!nurTeile) { host.innerHTML = ''; host.style.display = 'none'; return; }
+      host.style.display = '';
+      host.innerHTML = '<div class="lbl">Investor Deal Score</div>'
+        + '<div class="dp-hy-warte">' + wartetext() + '</div>'
+        + nurTeile;
+      return;
+    }
     var b = mini && mini.querySelector('b'), st = mini && mini.querySelector('span');
     var n = b ? parseInt(String(b.textContent).replace(/[^0-9]/g, ''), 10) : NaN;
     if (!isFinite(n)) {
