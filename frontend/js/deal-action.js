@@ -1475,13 +1475,11 @@ window.DealPilotDealAction = (function() {
     var typeEl = document.querySelector('input[name="expert-type"]:checked');
     var typ    = typeEl ? typeEl.value : 'sonstiges';
 
-    // V63.77: Bei "Restnutzungsdauer-Gutachten" + Pro/Business-Plan → RND-Modul öffnen
-    // statt Mail-Anfrage.
-    if (typ === 'rnd' && planAllowsBankExport() && typeof window.DealPilotRND_UI !== 'undefined') {
-      closeModal();
-      setTimeout(openRND, 100);
-      return;
-    }
+    /* v1510: Hier stand die Weiche auf die ALTE Restnutzungsdauer-Oberflaeche
+       (rnd-ui.js). Sie war seit V144 unerreichbar: ein change-Listener am
+       Radio faengt die Auswahl "rnd" schon vorher ab und oeffnet den Wizard.
+       Oberflaeche und Weiche sind jetzt ausgebaut - die Datei liegt unter
+       docs/abgeloest/rnd-ui.js, falls jemand nachsehen will. */
 
     var msg    = val('da-expert-msg');
     var data   = collectObjectData();
@@ -1511,226 +1509,14 @@ window.DealPilotDealAction = (function() {
 
   // V63.77: RND-Modul öffnen (Pro/Business). Free/Starter/Investor sehen Anfrage-Hinweis.
   // V63.78: Pro-Mode komplett überarbeitet — Headline + CTA + Auto-Import, kein PDF-Export sichtbar
-  function openRND() {
-    var data = collectObjectData();
-    if (!data.objekt.adresse) {
-      return alert('Bitte zuerst Adresse im Objekt-Tab erfassen.');
-    }
-    var c = cfg();
-    var canUseModule = planAllowsBankExport() && typeof window.DealPilotRND_UI !== 'undefined';
+  /* v1510 · Marcel 22.09.2026: "kannst du das alte Modul ausbauen ... wenn
+     wir es einfach nicht brauchen, dann sollten wir es auch nicht abfragen."
+     Hier standen openRND(), _hideRNDExtras(), _updateRNDHeadline(),
+     _rndDealData() und submitRNDFromModule() - zusammen 221 Zeilen, die
+     alle nur die alte Oberflaeche bedient haben und seit V144 nicht mehr
+     erreichbar waren. Die beiden Helfer wurden ausschliesslich von openRND
+     benutzt (nachgesehen: keine weiteren Aufrufer). */
 
-    if (!canUseModule) {
-      // Kein Plan → Anfrage-Modal mit RND-spezifischem Vorschlagstext
-      openModal({
-        title: 'Restnutzungsdauer-Gutachten anfragen',
-        body: [
-          renderObjectPreview(data),
-          '<div class="da-rnd-upsell">',
-          '  <strong>RND-Vollmodul ist Pro/Business-exklusiv.</strong> Du kannst die Anfrage trotzdem stellen — wir erstellen das Gutachten manuell für dich.',
-          '</div>',
-          '<div class="da-cmt"><label>Was brauchst du genau?</label>',
-          '  <textarea id="da-rnd-msg" rows="4" placeholder="Beschreibe Modernisierungen, bekannte Schäden, Sondereinflüsse...">Ich benötige ein Restnutzungsdauer-Gutachten zur AfA-Optimierung für mein Objekt.</textarea>',
-          '</div>'
-        ].join(''),
-        foot: [
-          '<button class="btn btn-outline" onclick="DealPilotDealAction.closeModal()">Abbrechen</button>',
-          '<button class="btn btn-primary" onclick="DealPilotDealAction.submitRNDRequest()">' + ico('upload', 14) + ' Anfrage senden</button>'
-        ].join('')
-      });
-      return;
-    }
-
-    // V63.78: Pro/Business — neuer Aufbau
-    // - Großes Modal
-    // - Headline mit empfohlener RND prominent
-    // - RND-Modul gerendert (Export + AfA-Card per CSS-Klasse versteckt)
-    // - CTA "Gutachten beantragen" am Ende (sendet alles an dealpilot@)
-    openModal({
-      title: 'Restnutzungsdauer ermitteln — DealPilot Pro',
-      body: [
-        '<div class="da-rnd-headline" id="da-rnd-headline">',
-        '  <div class="da-rnd-headline-label">Empfohlene Restnutzungsdauer</div>',
-        '  <div class="da-rnd-headline-value">',
-        '    <span id="da-rnd-headline-num">—</span>',
-        '    <span class="da-rnd-headline-unit">Jahre</span>',
-        '  </div>',
-        '  <div class="da-rnd-headline-method" id="da-rnd-headline-method">wird berechnet…</div>',
-        '</div>',
-        '<div id="rnd-host" class="da-rnd-host da-rnd-host-pro"></div>'
-      ].join(''),
-      foot: [
-        '<button class="btn btn-outline" onclick="DealPilotDealAction.closeModal()">Schließen</button>',
-        '<button class="btn btn-primary da-rnd-cta" onclick="DealPilotDealAction.submitRNDFromModule()">',
-        ico('upload', 16) + ' Restnutzungsdauer-Gutachten beantragen',
-        '</button>'
-      ].join('')
-    });
-
-    // RND-Modul rendern + Objektdaten AUTOMATISCH übernehmen + Headline live updaten
-    setTimeout(function() {
-      var host = document.getElementById('rnd-host');
-      if (!host) return;
-      try {
-        window.DealPilotRND_UI.render(host, {
-          showPlanGate: false,
-          initialData: _rndDealData(data),
-          // V63.78: Bei jedem Recalc den Headline-Wert aktualisieren
-          onRecalc: function(result, afa) {
-            window._daRNDLastResult = { result: result, afa: afa };
-            _updateRNDHeadline(result);
-          }
-        });
-        // Objekt automatisch importieren — kein User-Klick nötig
-        if (typeof window.DealPilotRND_UI.loadObject === 'function') {
-          window.DealPilotRND_UI.loadObject(_rndDealData(data));
-        }
-        // V63.78: Cards verstecken die für den User nicht relevant sind
-        // (Berater-Sachen — Export, AfA-Vergleich mit Gutachterkosten, Override, Gutachten-Metadaten)
-        _hideRNDExtras(host);
-      } catch (e) {
-        console.error('[deal-action] RND init failed:', e);
-        host.innerHTML = '<p style="color:var(--red);padding:20px">RND-Modul konnte nicht geladen werden: ' + e.message + '</p>';
-      }
-    }, 50);
-  }
-
-  // V63.78: Versteckt Cards im RND-Modul, die für den End-User nicht relevant sind.
-  // Wir matchen über den H3-Text (robust gegen RND-interne Refactorings).
-  function _hideRNDExtras(host) {
-    var hideKeywords = [
-      'Export',
-      'AfA-Vergleich',
-      'Lohnt sich ein Gutachten',
-      'Sachverständigen-Override',
-      'Sachverständigen-RND',
-      'Gutachten-Daten',
-      'Gutachten-Metadaten'
-    ];
-    var cards = host.querySelectorAll('.rnd-card');
-    cards.forEach(function(card) {
-      var h3 = card.querySelector('h3');
-      if (!h3) return;
-      var text = (h3.textContent || '').trim();
-      for (var i = 0; i < hideKeywords.length; i++) {
-        if (text.indexOf(hideKeywords[i]) >= 0) {
-          card.style.display = 'none';
-          return;
-        }
-      }
-    });
-    // Disclaimer am Ende auch dezenter
-    var dis = host.querySelector('.rnd-disclaimer');
-    if (dis) dis.style.display = 'none';
-  }
-
-  // V63.78: Headline mit empfohlener RND aktualisieren
-  function _updateRNDHeadline(result) {
-    var num = $('da-rnd-headline-num');
-    var method = $('da-rnd-headline-method');
-    if (!result || !num) return;
-    // result-Struktur (RND-Modul): { rndJahre, methode, ... } oder result.empfehlung
-    var rnd = null, methodLabel = '';
-    if (result.empfehlung && result.empfehlung.rnd) {
-      rnd = result.empfehlung.rnd;
-      methodLabel = result.empfehlung.label || result.empfehlung.methode || '';
-    } else if (typeof result.rndJahre === 'number') {
-      rnd = result.rndJahre;
-      methodLabel = result.methode || '';
-    } else if (result.median) {
-      rnd = result.median;
-      methodLabel = 'Median über alle Verfahren';
-    }
-    if (rnd != null) num.textContent = Math.round(rnd);
-    if (methodLabel && method) method.textContent = 'Methode: ' + methodLabel;
-  }
-
-  // RND-Datenformat aus collectObjectData ableiten
-  function _rndDealData(d) {
-    var settings = {};
-    try { settings = JSON.parse(localStorage.getItem('dp_user_settings') || '{}'); } catch (e) {}
-    // V139: Komplettes Roh-Objekt aus localStorage holen, damit der V3-Mapper
-    // alle rate_*-Felder, ds2_*-Energieklasse, geb_ant etc. greifen kann.
-    var raw = {};
-    try {
-      var allObjs = JSON.parse(localStorage.getItem('ji_objects') || '[]');
-      var currentId = localStorage.getItem('dp_current_object_id') || '';
-      var match = allObjs.filter(function(o) { return o.id === currentId; })[0];
-      if (match && match.data) raw = match.data;
-    } catch (e) {}
-
-    return {
-      // Roh-Objekt-Felder für den V3-Mapper (rate_bad/boden/fenster/kueche, ds2_*, geb_ant)
-      kp:              d.finanz.kaufpreis || raw.kp,
-      geb_ant:         raw.geb_ant != null ? raw.geb_ant : 80,
-      rate_bad:        raw.rate_bad,
-      rate_boden:      raw.rate_boden,
-      rate_fenster:    raw.rate_fenster,
-      rate_kueche:     raw.rate_kueche,
-      ds2_energie:     raw.ds2_energie || raw.energieklasse,
-      ds2_zustand:     raw.ds2_zustand,
-      objart:          raw.objart || raw.objektTyp || 'etw',
-      grenz:           raw.grenz,
-      afa_satz:        raw.afa_satz,
-      // Plus die abstrahierten Felder als Fallback (V2-Kompat)
-      baujahr:         d.objekt.baujahr ? parseInt(d.objekt.baujahr, 10) : (raw.baujahr || null),
-      objektTyp:       'etw',
-      kaufdatum:       d.objekt.kaufdatum || raw.kaufdatum || new Date().toISOString().slice(0, 10),
-      kaufpreis:       d.finanz.kaufpreis || raw.kp,
-      grundstueckswert: 0,
-      adresse:         d.objekt.adresse,
-      einheit:         '',
-      wohnflaeche:     d.objekt.wohnflaeche || raw.wfl,
-      eigentuemer:     settings.user_name || '',
-      zve_geschaetzt:  0
-    };
-  }
-
-  // V63.78: Submit aus dem RND-Modul (Pro) — nutzt aktuelle Berechnung
-  function submitRNDFromModule() {
-    var data = collectObjectData();
-    var c    = cfg();
-    var rndResult = window._daRNDLastResult || {};
-    var rndStr = '';
-    try {
-      if (typeof window.DealPilotRND_UI !== 'undefined' && typeof window.DealPilotRND_UI.getCurrentResult === 'function') {
-        var current = window.DealPilotRND_UI.getCurrentResult();
-        if (current) rndResult = current;
-      }
-    } catch (e) {}
-
-    if (rndResult && rndResult.result) {
-      var emp = rndResult.result.empfehlung || {};
-      rndStr += '\n── Berechnete Restnutzungsdauer ──\n';
-      if (emp.rnd) rndStr += 'Empfohlene RND: ' + Math.round(emp.rnd) + ' Jahre\n';
-      if (emp.label || emp.methode) rndStr += 'Methode: ' + (emp.label || emp.methode) + '\n';
-      if (rndResult.result.byMethod) {
-        rndStr += 'Alle Verfahren:\n';
-        Object.keys(rndResult.result.byMethod).forEach(function(k) {
-          var v = rndResult.result.byMethod[k];
-          if (v && typeof v.rnd === 'number') {
-            rndStr += '  ' + k + ': ' + Math.round(v.rnd) + ' J.\n';
-          }
-        });
-      }
-    }
-
-    var subject = 'RND-Gutachten beantragen — ' + (data.objekt.adresse || 'Objekt');
-    var bodyText = buildEmailBody('expert', data, 'Bitte erstellt mir ein Restnutzungsdauer-Gutachten für mein Objekt. Die mit DealPilot ermittelten Werte habe ich unten beigefügt.') + rndStr;
-
-    submitWithFallback({
-      kind: 'expert',
-      to: c.expert && c.expert.email,
-      subject: subject,
-      body: bodyText,
-      data: data,
-      files: {}
-    }, function(success, mode) {
-      if (success) showSuccess('expert', c.expert.email, mode);
-      else alert('Versand fehlgeschlagen.');
-    });
-  }
-
-  // Submit der RND-Anfrage (Free/Starter/Investor — Mail-Workflow)
   function submitRNDRequest() {
     var msg  = val('da-rnd-msg');
     var data = collectObjectData();
@@ -2049,6 +1835,14 @@ window.DealPilotDealAction = (function() {
       var str  = nimm(settings.pdf_address, settings.user_str, marke.address);
       var plz  = nimm(settings.pdf_plz, settings.user_plz, marke.plz);
       var ort  = nimm(settings.pdf_city, settings.user_ort, marke.city);
+      /* v1509 · Marcel: "am Schluss die E-Mail-Adresse, die haben wir ja
+         meistens auch, dann koennen wir das auch uebernehmen."
+         Schritt 8 des Wizards fragt Name, E-Mail und Erstellungsort des
+         SACHVERSTAENDIGEN - bei Marcel ist das er selbst. Die Angaben stehen
+         in denselben Einstellungen, aus denen der Absender der PDFs kommt. */
+      if (name) prefill.sv_name = name;
+      if (mail) prefill.sv_email = mail;
+      if (ort)  prefill.erstellungsort = ort;
       if (name) prefill.auftraggeber_name    = name;
       if (mail) prefill.auftraggeber_email   = mail;
       if (str)  prefill.auftraggeber_strasse = str;
@@ -2530,9 +2324,7 @@ window.DealPilotDealAction = (function() {
     openConsult: openConsult,
     openConsultQuick: openConsultQuick,
     submitExpert: submitExpert,
-    openRND: openRND,
     submitRNDRequest: submitRNDRequest,
-    submitRNDFromModule: submitRNDFromModule,
     submitConsultQuick: submitConsultQuick,
     bookSlot: bookSlot,
     submit: submit,

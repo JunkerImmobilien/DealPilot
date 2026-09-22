@@ -701,7 +701,11 @@
     // Hauptergebnis: RND
     html += '<div class="rnd-wiz-result-hero">'
       + '<div class="rnd-wiz-result-hero-label">Restnutzungsdauer</div>'
-      + '<div class="rnd-wiz-result-hero-value">' + (r.verfahren === 'keines' ? '—' : r.final_rnd + ' Jahre') + '</div>'
+      + '<div class="rnd-wiz-result-hero-value">' + (r.verfahren === 'keines' ? '—' : (function () {
+          var sp = spanneAus(r);
+          if (!sp) return r.final_rnd + ' Jahre';
+          return (sp.einzeln ? String(sp.von) : (sp.von + '\u2013' + sp.bis)) + ' Jahre';
+        })()) + '</div>'
       /* v1426 · Anwendungsgrenzen der Anlage 2 aus dem Kern 3.1.0 */
       + ((r.grenzen || []).filter(function (x) { return x && x.greift; }).map(function (x) {
           return '<div class="rnd-wiz-result-hero-sub" style="font-size:12px;opacity:.85">' + escapeHTML(x.text) + '</div>';
@@ -1397,7 +1401,13 @@
       + '    <p style="font-size:11px;text-transform:uppercase;letter-spacing:3px;color:rgba(201,168,76,0.85);font-weight:700;margin:0 0 4px;text-align:center">Geschätzte Restnutzungsdauer</p>'
       + '    <p style="font-size:10px;color:rgba(255,255,255,0.45);text-align:center;margin:0 0 14px;font-style:italic">(Ersteinschätzung — verbindliche Berechnung im Gutachten)</p>'
       + '    <h2 style="font-family:Cormorant Garamond,serif;font-size:110px;font-weight:600;color:#C9A84C;line-height:0.95;letter-spacing:-2px;margin:0;text-align:center;text-shadow:0 0 30px rgba(201,168,76,0.45),0 0 60px rgba(201,168,76,0.22),0 4px 16px rgba(0,0,0,0.4);transform-origin:center;animation:rndw-zoom-in 1.2s cubic-bezier(0.34,1.56,0.64,1) 0.2s both, rndw-pulse 4s ease-in-out 1.4s infinite">'
-      + fmtJ(result.final_rnd)
+      /* v1509 · Marcels Entscheidung: "wir sollten keine feste Zahl zeigen,
+         sondern wirklich erst mal nur eine Spanne." */
+      + (function () {
+          var sp = spanneAus(result);
+          if (!sp) return fmtJ(result.final_rnd);
+          return sp.einzeln ? String(sp.von) : (sp.von + '\u2013' + sp.bis);
+        })()
       + '<span style="font-family:Inter,sans-serif;font-size:24px;font-weight:500;color:#C9A84C;margin-left:10px;letter-spacing:0.5px;vertical-align:middle;opacity:0.85">Jahre</span>'
       + '    </h2>'
       /* v1506 · Marcel: "es wird keine Spanne ausgegeben."
@@ -1416,9 +1426,11 @@
             if (w.length < 2) return '';
             var von = Math.min.apply(null, w), bis = Math.max.apply(null, w);
             if (von === bis) return '';
-            return '<p style="margin:10px 0 0;text-align:center;font-size:13px;color:rgba(255,255,255,0.78);letter-spacing:.3px">'
-              + 'Spanne <b style="color:#E8CC7A">' + von + ' bis ' + bis + ' Jahre</b>'
-              + '<span style="display:block;font-size:11px;color:rgba(255,255,255,0.45);margin-top:3px">technische Restnutzungsdauer bis Punktraster nach Anlage 2</span></p>';
+            /* v1509: die Spanne steht jetzt oben als Ergebnis - hier steht,
+               woraus sie besteht. */
+            return '<p style="margin:10px 0 0;text-align:center;font-size:12.5px;color:rgba(255,255,255,0.7);letter-spacing:.2px">'
+              + 'technisch <b style="color:#E8CC7A">' + a + '</b> \u00b7 Punktraster nach Anlage 2 <b style="color:#E8CC7A">' + b + '</b>'
+              + '<span style="display:block;font-size:11px;color:rgba(255,255,255,0.45);margin-top:3px">Eine einzelne Zahl behauptet eine Genauigkeit, die eine Ersteinsch\u00e4tzung nicht hat.</span></p>';
           } catch (e) { return ''; }
         })()
       + '    <p style="margin:14px 0 0;font-size:13px;color:rgba(255,255,255,0.7);line-height:1.5;text-align:center;font-style:italic;animation:rndw-fade-in 0.8s ease-out 1.2s both">'
@@ -1442,7 +1454,11 @@
       + '    <tr><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;color:#7A7370">Linear-Verfahren</td><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;text-align:right;font-variant-numeric:tabular-nums;color:#2A2727">' + fmtJ(m.linear.restnutzungsdauer) + ' J. (' + RND.fmtNum2(m.linear.alterswertminderung_pct) + ' % AWM)</td></tr>'
       + '    <tr><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;color:#7A7370">Punktraster-Verfahren</td><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;text-align:right;font-variant-numeric:tabular-nums;color:#2A2727">' + fmtJ(m.punktraster.restnutzungsdauer) + ' J. (' + RND.fmtNum2(m.punktraster.alterswertminderung_pct) + ' % AWM)</td></tr>'
       + '    <tr><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;color:#7A7370">Technisches Verfahren</td><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;text-align:right;font-variant-numeric:tabular-nums;color:#2A2727">' + fmtJ(m.technisch.restnutzungsdauer) + ' J. (' + RND.fmtNum2(m.technisch.alterswertminderung_pct) + ' % AWM)</td></tr>'
-      + '    <tr><td style="padding:10px 4px;border-bottom:2px solid #C9A84C;color:#2A2727;font-weight:600">= Geschätzte RND <span style="color:#7A7370;font-size:11.5px;font-weight:400">(' + result.final_source + ')</span></td><td style="padding:10px 4px;border-bottom:2px solid #C9A84C;text-align:right;font-variant-numeric:tabular-nums;color:#C9A84C;font-weight:700;font-family:Cormorant Garamond,serif;font-size:16px">' + fmtJ(result.final_rnd) + ' Jahre</td></tr>';
+      + '    <tr><td style="padding:10px 4px;border-bottom:2px solid #C9A84C;color:#2A2727;font-weight:600">= Geschätzte RND <span style="color:#7A7370;font-size:11.5px;font-weight:400">(' + result.final_source + ')</span></td><td style="padding:10px 4px;border-bottom:2px solid #C9A84C;text-align:right;font-variant-numeric:tabular-nums;color:#C9A84C;font-weight:700;font-family:Cormorant Garamond,serif;font-size:16px">' + (function () {
+        var sp = spanneAus(result);
+        if (!sp) return fmtJ(result.final_rnd);
+        return sp.einzeln ? String(sp.von) : (sp.von + '\u2013' + sp.bis);
+      })() + ' Jahre</td></tr>';
 
     if (afa && afa.valid) {
       html += ''
@@ -1488,11 +1504,43 @@
   // ============================================================
   // BERECHNUNGEN
   // ============================================================
+  /* v1509 · gemessen beim Abgleich mit dem Rechenkern: `calcAll` kennt einen
+     Schalter `kernsaniert`, der im Punktraster die Quote von 0,70 auf 0,90
+     hebt (rnd-calc.js: calcPunktraster). Der Wizard hat die Kernsanierung
+     zwar als Auswahl (Schritt 5) und zaehlt sie bei den Punkten voll - den
+     Schalter selbst hat er nie uebergeben. Damit rechnete ein kernsaniertes
+     Haus wie ein normal modernisiertes. */
+  function istKernsaniert(mod) {
+    if (!mod) return false;
+    return Object.keys(mod).some(function (k) {
+      return /kernsanier/i.test(String(mod[k] || ''));
+    });
+  }
+
+  /* v1509 · Die Spanne ist ab hier das Ergebnis, nicht die Einzelzahl.
+     Aufgespannt wird sie von den beiden Verfahren, die der Kern getrennt
+     ausweist: der technischen Restnutzungsdauer und dem Punktraster nach
+     Anlage 2. Fallen beide zusammen, gibt es keine Spanne - dann steht eine
+     Zahl, und das ist dann auch ehrlich. */
+  function spanneAus(result) {
+    try {
+      var m = (result && result.methods) || {};
+      var a = Math.round(Number(m.technisch && m.technisch.restnutzungsdauer) || 0);
+      var b = Math.round(Number(m.punktraster && m.punktraster.restnutzungsdauer) || 0);
+      var w = [a, b].filter(function (x) { return x > 0; });
+      if (!w.length) return null;
+      var von = Math.min.apply(null, w), bis = Math.max.apply(null, w);
+      return { von: von, bis: bis, einzeln: von === bis };
+    } catch (e) { return null; }
+  }
+  global.__rndSpanneAus = spanneAus;
+
   function computeFinalResult() {
     if (!global.DealPilotRND) return null;
     const RND = global.DealPilotRND;
     const modPunkte = computeModPoints(state.mod);
     return RND.calcAll({
+      kernsaniert: istKernsaniert(state.mod),
       baujahr: parseInt(state.baujahr, 10) || new Date().getFullYear() - 30,
       stichtag: state.stichtag,
       gnd: gndFromObjektTyp(state.objekt_typ),
