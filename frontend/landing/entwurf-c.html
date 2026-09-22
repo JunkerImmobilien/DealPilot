@@ -195,8 +195,18 @@ section{padding:88px 0}
 .tag{position:absolute;top:20px;right:20px;font:700 8.5px/1 'JetBrains Mono',monospace;
   letter-spacing:.1em;background:var(--gold);color:#14100a;padding:4px 8px;border-radius:99px}
 
+/* v1526: Nebenmodule als Chips */
+.mehr{margin-top:34px;padding-top:26px;border-top:1px solid var(--linie);text-align:center}
+.mehr .mt{font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-3);display:block;margin-bottom:15px}
+.chips{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}
+.chips span{background:#fff;border:1px solid var(--linie);border-radius:99px;padding:8px 15px;
+  font-size:13px;color:var(--ink-2);transition:.22s}
+.chips span:hover{border-color:var(--gold);color:var(--ink);transform:translateY(-2px);
+  box-shadow:0 5px 14px rgba(201,168,76,.15)}
+
 /* ══════ ABLAUF — Zeitstrahl ══════ */
-.ablauf{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:14px}
+.ablauf{position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:0;margin-top:14px}
 .ablauf::before{content:'';position:absolute;top:31px;left:8%;right:8%;height:2px;
   background:linear-gradient(90deg,var(--linie),var(--gold) 50%,var(--linie))}
 .ablauf::after{content:'';position:absolute;top:31px;left:8%;height:2px;width:0;
@@ -330,6 +340,8 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
   <ul class="hn">
     <li><a href="#leistungen">Leistungen<i class="caret"></i></a>
       <ul class="sub">
+        <li><a href="#leistungen"><b>Quick-Check</b><span>Deal in einer Minute grob durchrechnen — sechs Zahlen genügen</span></a></li>
+        <li><a href="#leistungen"><b>Sprechlauf</b><span>Objekt diktieren statt tippen — in sechs Etappen durchs Objekt</span></a></li>
         <li><a href="#leistungen"><b>Kaufpreisaufteilung</b><span>Amtliche BMF-Arbeitshilfe, drei Verfahren, PDF fürs Finanzamt</span></a></li>
         <li><a href="#leistungen"><b>Restnutzungsdauer</b><span>Sechs Verfahren, Ergebnis als Spanne — nach Anlage 2 ImmoWertV</span></a></li>
         <li><a href="#leistungen"><b>Investor Deal Score</b><span>24 Kennzahlen in fünf Bereichen, Gewichte frei einstellbar</span></a></li>
@@ -377,7 +389,7 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
         <div><b id="hz-nutzer">865</b><span>REGISTRIERTE NUTZER</span></div>
         <div><b>24</b><span>KENNZAHLEN</span></div>
         <div><b>6</b><span>RND-VERFAHREN</span></div>
-        <div><b>22</b><span>AMTLICHE PORTALE</span></div>
+        <div><b>1 Min.</b><span>BIS ZUM QUICK-CHECK</span></div>
       </div>
     </div>
     <div class="bk">
@@ -397,7 +409,8 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
   <span>◆ RESTNUTZUNGSDAUER NACH ANLAGE 2 IMMOWERTV</span>
   <span>◆ BODENRICHTWERT AUS 22 AMTLICHEN PORTALEN</span>
   <span>◆ BANKEXPORT MIT 25 SPALTEN</span>
-  <span>◆ ERBBAURECHT — RECHNET SONST NIEMAND</span>
+  <span>◆ QUICK-CHECK: SECHS ZAHLEN, EINE MINUTE</span>
+  <span>◆ SPRECHLAUF — DAS OBJEKT EINFACH DIKTIEREN</span>
   <span>◆ BILANZ UND GUV FÜR DIE IMMOBILIEN-GMBH</span>
 </div></div>
 
@@ -408,6 +421,16 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
     <p>Jedes Modul arbeitet auf derselben Datenbasis. Was Sie einmal erfassen, steht überall —
        im Score, in der Steuer, im PDF für die Bank.</p></div>
   <div class="kf">
+    <div class="kfk rv"><span class="tag">EINSTIEG</span><div class="sym">⚡</div><h3>Quick-Check</h3>
+      <p>Sechs Zahlen eingeben — Kaufpreis, Fläche, Miete, Eigenkapital, Zins, Tilgung — und Sie
+         wissen in einer Minute, ob sich das Weiterrechnen lohnt.</p>
+      <ul class="liste"><li>Sechs Sofort-Kennzahlen</li><li>Faktor, Rendite, Rate, Cashflow</li>
+        <li>Auf Knopfdruck als Objekt übernehmen</li><li>Ohne Anmeldung ausprobierbar</li></ul></div>
+    <div class="kfk rv"><span class="tag">BELIEBT</span><div class="sym">🎙</div><h3>Sprechlauf</h3>
+      <p>Das Objekt einfach erzählen. Die Spracherkennung schreibt mit, die KI ordnet jede Zahl
+         dem richtigen Feld zu — in sechs Etappen durchs ganze Objekt.</p>
+      <ul class="liste"><li>Basis · Geld · Lage &amp; Zustand</li><li>Feinschliff · Ihre Sicht · Feinheiten</li>
+        <li>Live-Mitschrift zum Mitlesen</li><li>Kombinierbar mit Exposé-Import</li></ul></div>
     <div class="kfk rv"><div class="sym">🏛</div><h3>Kaufpreisaufteilung</h3>
       <p>Füllt die amtliche Arbeitshilfe des Bundesfinanzministeriums aus und vergleicht drei
          Verfahren nebeneinander.</p>
@@ -418,11 +441,6 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
          nicht als Scheingenauigkeit.</p>
       <ul class="liste"><li>27 Gebäudetypen</li><li>190 Bauteile mit Lebensdauer</li>
         <li>Neun Gewerke im Punktsystem</li><li>Als Gutachten exportierbar</li></ul></div>
-    <div class="kfk rv"><span class="tag">SELTEN</span><div class="sym">🏗</div><h3>Erbbaurecht</h3>
-      <p>Rechnet den Erbbau-Abschlag selbst — kein großer Bewertungsanbieter nimmt diesen
-         Parameter überhaupt entgegen.</p>
-      <ul class="liste"><li>Erbbauzins und Restlaufzeit</li><li>Heimfall und Entschädigung</li>
-        <li>Wirkung auf den Verkehrswert</li></ul></div>
     <div class="kfk rv"><div class="sym">📊</div><h3>Investor Deal Score</h3>
       <p>0 bis 100 aus 24 Kennzahlen in fünf Bereichen — mit der Datentiefe je Bereich, damit
          klar ist, worauf die Note beruht.</p>
@@ -439,27 +457,52 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
       <ul class="liste"><li>Bilanz und GuV für GmbH/UG</li><li>Körperschaft- und Gewerbesteuer</li>
         <li>Überführung Privat → Gesellschaft</li></ul></div>
   </div>
+
+  <!-- v1526: Was sonst noch drinsteckt - ohne die Hauptriege zu verwaessern.
+       Erbbaurecht steht hier, nicht mehr als eigene grosse Karte: Marcel am
+       22.09.2026 - "das Erbbaurecht ist nicht das wichtigste". -->
+  <div class="mehr rv">
+    <span class="mt">Und außerdem</span>
+    <div class="chips">
+      <span>Mehrfamilienhaus je Einheit</span>
+      <span>Mietentwicklung als Treppe</span>
+      <span>Exposé-PDF einlesen</span>
+      <span>Belege scannen</span>
+      <span>Marktbericht zur Adresse</span>
+      <span>Datenraum je Objekt</span>
+      <span>Anlage V 2025</span>
+      <span>Überführung Privat → GmbH</span>
+      <span>Erbbaurecht</span>
+      <span>Track Record</span>
+      <span>Portfolio-Cockpit</span>
+      <span>Hell- und Dunkelansicht</span>
+    </div>
+  </div>
 </div></section>
 
 <!-- ══════ ABLAUF ══════ -->
 <section class="sec-creme" id="ablauf"><div class="w">
   <div class="kz mitte rv"><div class="kick">So läuft es ab</div>
     <h2>Von der Anzeige zum <em>Banktermin.</em></h2>
-    <p>Fünf Schritte. Der längste dauert so lange, wie Sie zum Lesen des Exposés brauchen.</p></div>
+    <p>Sechs Schritte. Der erste dauert eine Minute — und entscheidet, ob die anderen fünf
+       sich überhaupt lohnen.</p></div>
   <div class="ablauf" id="ablauf-strahl">
-    <div class="ab rv"><div class="punkt">📄</div><span class="nr">SCHRITT 01</span>
-      <h4>Exposé rein</h4><p>PDF hochladen, diktieren oder Belege scannen. Die Werte landen
-        in den Feldern, nicht im Notizblock.</p><span class="zeit">ca. 2 Min.</span></div>
-    <div class="ab rv"><div class="punkt">⚙️</div><span class="nr">SCHRITT 02</span>
+    <div class="ab rv"><div class="punkt">⚡</div><span class="nr">SCHRITT 01</span>
+      <h4>Quick-Check</h4><p>Sechs Zahlen, eine Minute — lohnt sich das Weiterrechnen
+        überhaupt? Wenn ja, wird daraus ein Objekt.</p><span class="zeit">1 Min.</span></div>
+    <div class="ab rv"><div class="punkt">🎙</div><span class="nr">SCHRITT 02</span>
+      <h4>Erzählen statt tippen</h4><p>Exposé einlesen oder das Objekt diktieren. Die Werte
+        landen in den Feldern, nicht im Notizblock.</p><span class="zeit">ca. 3 Min.</span></div>
+    <div class="ab rv"><div class="punkt">⚙️</div><span class="nr">SCHRITT 03</span>
       <h4>Alles rechnet mit</h4><p>Finanzierung, Bewirtschaftung, Steuer und Cashflow —
         live bei jeder Eingabe, über 15 Jahre.</p><span class="zeit">sofort</span></div>
-    <div class="ab rv"><div class="punkt">🎯</div><span class="nr">SCHRITT 03</span>
+    <div class="ab rv"><div class="punkt">🎯</div><span class="nr">SCHRITT 04</span>
       <h4>Bewerten</h4><p>Der Score aus 24 Kennzahlen zeigt, wo das Objekt trägt —
         und wo die Angaben noch fehlen.</p><span class="zeit">ca. 5 Min.</span></div>
-    <div class="ab rv"><div class="punkt">🏛</div><span class="nr">SCHRITT 04</span>
+    <div class="ab rv"><div class="punkt">🏛</div><span class="nr">SCHRITT 05</span>
       <h4>Belegen</h4><p>Bodenrichtwert, Mietspiegel, Arbeitshilfe — jede Zahl mit Herkunft,
         Jahrgang und Stichtag.</p><span class="zeit">ca. 3 Min.</span></div>
-    <div class="ab rv"><div class="punkt">🏦</div><span class="nr">SCHRITT 05</span>
+    <div class="ab rv"><div class="punkt">🏦</div><span class="nr">SCHRITT 06</span>
       <h4>Zur Bank</h4><p>Investment-Case als PDF, Bankexport als Excel, Checkliste im
         Datenraum — fertig zum Versenden.</p><span class="zeit">ein Klick</span></div>
   </div>
