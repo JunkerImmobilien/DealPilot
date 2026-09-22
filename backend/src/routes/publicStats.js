@@ -30,9 +30,13 @@ let speicher = { zeit: 0, wert: null };
 /* Auf Zehner runden, solange die Zahl klein ist, spaeter auf Fuenfziger.
    Eine Zahl, die sich stuendlich um eins aendert, sieht aus wie ein
    Zaehlwerk - und lenkt von dem ab, was sie sagen soll. */
+/* v1523b · gemessen beim ersten Lauf: Sockel 865 + 1 Nutzer = 866, und das
+   Abrunden auf Zehner machte daraus 860 - WENIGER als der Sockel. Eine Zahl,
+   die nach dem ersten Kunden kleiner wird, ist schlimmer als gar keine.
+   Gerundet wird deshalb erst, wo die Rundung kleiner ist als der Zuwachs:
+   ab 2000 auf Fuenfziger. Darunter steht die echte Summe. */
 function runden(n) {
-  if (n < 100) return n;
-  if (n < 2000) return Math.floor(n / 10) * 10;
+  if (n < 2000) return n;
   return Math.floor(n / 50) * 50;
 }
 
