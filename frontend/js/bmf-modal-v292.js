@@ -834,15 +834,19 @@
       '</div>' +
       '<div class="v292-summary-grid v292-compact">' +
         '<div class="v292-row"><span>Brutto-Kaufpreis</span><span>' + _fmtEur(kp) + '</span></div>' +
-        (inv > 0 ? '<div class="v292-row v292-row-minus"><span>− Inventar (Detail-Box)</span><span>' + _fmtEur(inv) + '</span></div>' : '') +
+        '<div class="v292-row v292-row-minus"><span>− Inventar (Detail-Box)</span><span>' + _fmtEur(inv) + '</span></div>' +
         '<div class="v292-row v292-row-result"><span><b>= Immobilien-KP</b> <span class="v292-arrow">→ Basis für BMF</span></span><span><b>' + _fmtEur(immoKp) + '</b></span></div>' +
         '<div class="v292-row v292-row-plus"><span>+ Nebenkosten</span><span>' + _fmtEur(nk) + '</span></div>' +
         '<div class="v292-nk-detail">' +
-          (grest   > 0 ? '<div>├ Grunderwerbsteuer: <b>' + _fmtEur(grest) + '</b></div>' : '') +
-          (notar   > 0 ? '<div>├ Notar: <b>' + _fmtEur(notar) + '</b></div>' : '') +
-          (gba     > 0 ? '<div>├ Grundbuchamt: <b>' + _fmtEur(gba) + '</b></div>' : '') +
-          (makler  > 0 ? '<div>├ Makler: <b>' + _fmtEur(makler) + '</b></div>' : '') +
-          (reise   > 0 ? '<div>├ Fahrtkosten: <b>' + _fmtEur(reise, 2) + '</b></div>' : '') +
+          /* v1504: dieselben Zeilen wie nach der Pipeline, auch mit null -
+             eine Aufstellung, die beim Oeffnen kuerzer ist als zwei Sekunden
+             spaeter, liest sich wie eine fehlende Tabelle. */
+          '<div>├ Grunderwerbsteuer: <b>' + _fmtEur(grest) + '</b></div>' +
+          '<div>├ Notar: <b>' + _fmtEur(notar) + '</b></div>' +
+          '<div>├ Grundbuchamt: <b>' + _fmtEur(gba) + '</b></div>' +
+          '<div>├ Makler: <b>' + _fmtEur(makler) + '</b></div>' +
+          '<div>├ Sonstiges (ji_e): <b>' + _fmtEur(jiSonst) + '</b></div>' +
+          (reise    > 0 ? '<div>├ Fahrtkosten: <b>' + _fmtEur(reise, 2) + '</b></div>' : '') +
           (sonstige > 0 ? '<div>└ Gutachten/Anwalt/Sonstiges: <b>' + _fmtEur(sonstige, 2) + '</b></div>' : '') +
         '</div>' +
         '<div class="v292-row v292-row-final"><span><b>= Prognose-AK</b> <span class="v292-arrow">→ Basis für AfA</span></span><span class="v292-final-value"><b>' + _fmtEur(ak) + '</b></span></div>' +

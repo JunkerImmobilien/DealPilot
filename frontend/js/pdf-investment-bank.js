@@ -233,9 +233,96 @@
     });
   }
 
+/* v1505 · Marcel 21.09.2026: "zu dem Investment-PDF da muss geschaut werden,
+   ob ueberhaupt alle Zahlen vorliegen, dass das Sinn macht. Ansonsten
+   sperren."
+   Gemessen an Rinteln (Anfrage, noch ohne Finanzierung): `exportPDFBank`
+   prueft heute NUR, ob jsPDF geladen ist, und rechnet dann mit
+   `State.kpis || {}`. Ergebnis waren Zins/Jahr 0, Tilgung 0, LTV 0, DSCR 0,
+   Eigenkapitalrendite 0, Multiplikator 0 - und kein IRR. Das PDF entstand
+   trotzdem, 20 Seiten lang, und sah aus wie eine Analyse. Eine Null ist aber
+   keine Aussage: sie behauptet eine Finanzierung, die es nicht gibt.
+
+   Die Pruefung trennt zwei Sorten:
+     · SPERREN, wo das Dokument ohne die Zahl seinen Zweck verliert -
+       Kaufpreis, Mieteinnahme und eine Finanzierung (Darlehen ODER
+       ausdruecklich Eigenkapital). Ohne sie ist die halbe Bankfassung leer.
+     · WARNEN, wo das Dokument stimmt, aber schoengerechnet ist -
+       Bewirtschaftungskosten von null etwa ueberzeichnen jeden Cashflow.
+   Die Pruefung liegt hier und wird nach aussen gegeben, damit die alte
+   Fassung dieselbe benutzt statt einer zweiten Liste. */
+  function zahl(v) { var n = Number(v); return isFinite(n) ? n : 0; }
+  function feldZahl(id) {
+    var e = document.getElementById(id);
+    if (!e) return 0;
+    if (typeof window.parseDe === 'function') return zahl(window.parseDe(e.value));
+    return zahl(String(e.value || '').replace(/\./g, '').replace(',', '.'));
+  }
+
+  window.pruefeInvestmentDaten = function () {
+    var S = window.State || {}, K = S.kpis || {}, rows = S.cfRows || [];
+    var sperren = [], warnen = [];
+
+    if (!(zahl(K.gi) > 0)) sperren.push({ was: 'Kaufpreis', wo: 'Reiter Investition' });
+    if (!(zahl(K.nkm_j) > 0)) sperren.push({ was: 'Mieteinnahme', wo: 'Reiter Objekt' });
+
+    var darlehen = feldZahl('d1_betrag') + feldZahl('d2_betrag');
+    var ek = feldZahl('ek');
+    if (!(darlehen > 0) && !(ek > 0)) {
+      sperren.push({
+        was: 'Finanzierung',
+        wo: 'Reiter Finanzierung',
+        warum: 'Ohne Darlehen oder Eigenkapital bleiben DSCR, Beleihung, Eigenkapitalrendite und Multiplikator bei null - das sind sechs Kennzahlen der Bankfassung.',
+      });
+    }
+    if (!rows.length) sperren.push({ was: 'Cashflow-Jahre', wo: 'Reiter Finanzierung', warum: 'Ohne sie gibt es keine Jahresuebersicht und keinen Vermoegensaufbau.' });
+
+    if (darlehen > 0 && !(zahl(K.dscr) > 0)) warnen.push('Der Kapitaldienstdeckungsgrad steht auf null, obwohl ein Darlehen hinterlegt ist.');
+    if (!(zahl(K.bwk) > 0) && !(zahl(K.bwk_cf) > 0)) warnen.push('Keine Bewirtschaftungskosten hinterlegt - der Cashflow faellt dadurch zu hoch aus.');
+    if (!isFinite(Number(K.irr))) warnen.push('Kein interner Zinsfuss (IRR) - dafuer fehlen die Angaben zum Verkauf.');
+    if (!(zahl(K.steuer) !== 0)) warnen.push('Keine Steuerwirkung gerechnet - Grenzsteuersatz und Abschreibung pruefen.');
+
+    return { ok: sperren.length === 0, sperren: sperren, warnen: warnen };
+  };
+
+  /* Der Hinweis im Haus-Stil - kein window.confirm, das haelt die Seite an. */
+  function zeigeLuecken(befund) {
+    var alt = document.getElementById('dp-pdf-luecken');
+    if (alt) alt.remove();
+    var ov = document.createElement('div');
+    ov.id = 'dp-pdf-luecken';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(5,5,5,.55);display:flex;align-items:center;justify-content:center;padding:20px';
+    var liste = befund.sperren.map(function (s) {
+      return '<li style="margin-bottom:8px"><b>' + s.was + '</b> <span style="color:#8A8272">· ' + s.wo + '</span>' +
+        (s.warum ? '<div style="font-size:12px;color:#6B6356;line-height:1.5;margin-top:2px">' + s.warum + '</div>' : '') + '</li>';
+    }).join('');
+    ov.innerHTML =
+      '<div style="background:#FDFCFA;border-radius:14px;max-width:520px;width:100%;padding:24px 26px;box-shadow:0 18px 50px rgba(0,0,0,.35)">' +
+        '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#9a7f33;margin-bottom:8px">Investment-PDF</div>' +
+        '<h3 style="margin:0 0 10px;font:600 19px/1.3 \'Space Grotesk\',sans-serif;color:#1a1a1a">Dafür fehlen noch Angaben</h3>' +
+        '<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#6B6356">Das Dokument entsteht sonst mit Nullen an Stellen, an denen eine Bank eine Aussage erwartet.</p>' +
+        '<ul style="margin:0 0 18px;padding-left:18px;font-size:13.5px;line-height:1.5;color:#2A2727">' + liste + '</ul>' +
+        '<div style="display:flex;gap:10px;justify-content:flex-end">' +
+          '<button type="button" id="dp-pdf-luecken-zu" class="btn btn-sm" style="background:#2A2727;color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer">Verstanden</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(ov);
+    function zu() { ov.remove(); }
+    ov.querySelector('#dp-pdf-luecken-zu').onclick = zu;
+    ov.addEventListener('click', function (e) { if (e.target === ov) zu(); });
+  }
+
   window.exportPDFBank = async function () {
     if (typeof window.jspdf === 'undefined') { alert('PDF-Bibliothek noch nicht geladen - bitte kurz warten und erneut versuchen.'); return; }
     try { if (typeof window.calcNow === 'function') window.calcNow(); } catch (e) {}
+
+    /* v1505: erst pruefen, dann drucken. */
+    var befund = window.pruefeInvestmentDaten();
+    if (!befund.ok) { zeigeLuecken(befund); return; }
+    if (befund.warnen.length && typeof window.toast === 'function') {
+      window.toast('Hinweis: ' + befund.warnen[0]);
+    }
+
     var S = window.State || {}, K = S.kpis || {}, rows = S.cfRows || [];
 
     var doc = new window.jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
