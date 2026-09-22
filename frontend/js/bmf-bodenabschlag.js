@@ -596,10 +596,19 @@
         prefill: DA.getRndPrefill(),
         onComplete: function (stand) {
           try {
-            var eingabe = (typeof DA.buildRndCalcInput === 'function')
-              ? DA.buildRndCalcInput(stand) : null;
-            if (!eingabe) return;
-            var r = window.DealPilotRND.calcAll(eingabe);
+            /* v1508 · gemessen: der Wizard zeigte 'Spanne 17 bis 26 Jahre',
+               uebernommen wurden 17 bis 24. Ursache war diese Stelle: ich
+               habe das Ergebnis hier NOCHMAL gerechnet, ueber
+               _buildCalcInputFromWizard. Die Funktion erwartet
+               g.gewerkeBewertung und g.modPoints - im Wizard-Zustand heissen
+               die Felder aber state.gewerke und state.mod, also rechnete sie
+               mit leeren Gewerken und kam auf eine andere Zahl.
+               Der Wizard hat laengst gerechnet. Genommen wird SEIN Ergebnis;
+               eine zweite Rechnung waere eine zweite Wahrheit. */
+            var r = (stand && stand.result)
+              || (window._lastRndResult && window._lastRndResult.result)
+              || null;
+            if (!r) return;
             var tech   = Math.round(Number(r.methods && r.methods.technisch && r.methods.technisch.restnutzungsdauer) || 0);
             var raster = Math.round(Number(r.methods && r.methods.punktraster && r.methods.punktraster.restnutzungsdauer) || 0);
             var werte  = [tech, raster].filter(function (x) { return x > 0; });
