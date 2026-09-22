@@ -1,0 +1,280 @@
+<!DOCTYPE html><!-- DealPilot API · v1542 -->
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>API · DealPilot</title>
+<meta name="description" content="Die DealPilot REST-API: Objekte programmatisch anlegen, lesen, ändern und löschen. JSON über HTTPS, Header X-API-Key, 120 Anfragen pro Minute. Enthalten im Pro-Plan.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="dp2.css?v=v1542">
+<link rel="stylesheet" href="dp2-teile.css?v=v1542">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   Die API-Dokumentation kommt UNVERAENDERT aus der bisherigen Landing
+   (frontend/landing/index.html, Z.1348-1447) - per Skript herauskopiert.
+   Sieben Kapitel: Uebersicht, Schnellstart, Authentifizierung, Endpunkte,
+   Datenmodell mit 18 Feldgruppen, Fehler & Limits, Grenzen & Roadmap.
+
+   Beim CSS sind zwei Filter noetig: die API benutzt sehr kurze
+   Klassennamen (.s .num .ep .mm), die in der alten Datei auch anderswo
+   vorkommen. Uebernommen wurde nur, was eine api-eigene Klasse traegt und
+   keine Klasse des Fundaments ueberschreibt.
+   ═══════════════════════════════════════════════════════════════════════ */
+hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z-index:2}
+.api-back{display:inline-flex;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--gdh);text-transform:uppercase;margin-bottom:22px;cursor:pointer;background:none;border:0}
+.api-hero h1{font-size:clamp(30px,4vw,46px);color:#fff;margin:8px 0 12px}
+.api-hero .lead{color:var(--mdk);max-width:62ch;font-size:15.5px}
+.api-hero .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.api-hero .chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--gdh);border:1px solid var(--line);border-radius:20px;padding:6px 13px;background:rgba(201,168,76,.06)}
+.api-body{background:var(--cream);color:var(--inkm);padding:0 0 90px}
+.api-layout{display:grid;grid-template-columns:210px 1fr;gap:44px;padding-top:36px}
+.api-layout{grid-template-columns:1fr;gap:20px}
+.api-nav{position:sticky;top:82px;align-self:start;display:flex;flex-direction:column;gap:2px}
+.api-nav{position:static;flex-direction:row;flex-wrap:wrap;gap:6px}
+.api-nav a{display:flex;gap:10px;align-items:center;font-family:var(--mono);font-size:12px;color:var(--mut);padding:9px 12px;border-radius:8px;border-left:2px solid transparent;cursor:pointer;transition:.14s}
+.api-nav a .n{color:var(--gdd);font-weight:600}
+.api-nav a:hover{background:var(--cream2);color:var(--ink)}
+.api-nav a.on{background:#fff;color:var(--ink);border-left-color:var(--gd);box-shadow:0 2px 10px -6px rgba(20,18,15,.3)}
+.api-nav a{border-left:0;border-bottom:2px solid transparent}
+.api-nav a.on{border-left:0;border-bottom-color:var(--gd)}
+.apsec{margin-bottom:50px;scroll-margin-top:24px}
+.apsec h2{font-size:25px;color:var(--ink);margin-bottom:8px;display:flex;align-items:baseline;gap:12px}
+.apsec h2 .num{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--gdd)}
+.apsec .lead{color:var(--mut);margin-bottom:16px;font-size:14.5px}
+.uc{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:16px 0}
+.uc{grid-template-columns:1fr}
+.uc .c{background:#fff;border:1px solid var(--cream-line);border-radius:12px;padding:16px 17px}
+.uc .c h3{font-size:14.5px;color:var(--ink);margin-bottom:5px}
+.uc .c p{font-size:13px;color:var(--mut);line-height:1.55}
+.ep{display:flex;align-items:center;gap:12px;margin:10px 0;padding:11px 14px;border:1px solid var(--cream-line);border-radius:11px;background:#fff}
+.mm{font-family:var(--mono);font-weight:700;font-size:11px;padding:5px 9px;border-radius:6px;color:#fff;letter-spacing:.5px}
+.mm.get{background:var(--grn)}
+.mm.post{background:var(--gdd)}
+.mm.put{background:#6b8cc4}
+.mm.del{background:var(--rd)}
+.ep .path{font-family:var(--mono);font-weight:600;font-size:14px;color:var(--ink)}
+.ep .desc{margin-left:auto;color:var(--mut);font-size:12.5px}
+.grp{background:#fff;border:1px solid var(--cream-line);border-radius:12px;padding:14px 16px;margin:10px 0}
+.grp h3{font-size:14px;color:var(--ink);margin-bottom:4px}
+.grp .gd{color:var(--mut);font-size:12.5px;margin-bottom:8px}
+.grp code{margin:2px 3px 2px 0;display:inline-block}
+.note{background:#FAF9F4;border:1px solid var(--line);border-left:3px solid var(--gd);border-radius:10px;padding:14px 16px;margin:16px 0;font-size:13.5px}
+.pill{display:inline-block;background:#F2EEE3;color:#6b551c;border-radius:20px;padding:3px 11px;font-size:12px;font-weight:600}
+#intro .dpi-ring .pill{position:absolute;left:50%;bottom:-26px;transform:translateX(-50%) scale(.6);font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:#57c088;border:1.5px solid #3FA56C;border-radius:20px;padding:4px 13px;white-space:nowrap;opacity:0;background:rgba(63,165,108,.1)}
+#intro.logo-on .dpi-ring .pill{animation:dpiPill .4s ease 1.5s forwards}
+.fldt{width:100%;border-collapse:collapse;margin:10px 0 4px}
+.fldt th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;opacity:.6}
+.fldt td{padding:6px 10px;border-top:1px solid rgba(127,127,127,.16);font-size:13px;vertical-align:top}
+.fldt td:first-child{white-space:nowrap;width:1%}
+</style>
+</head><body>
+
+<svg style="display:none" aria-hidden="true">
+<symbol id="i-haus" viewBox="0 0 24 24"><path d="M3 21V10l9-7 9 7v11"/><path d="M9 21v-6h6v6"/><path d="M3 21h18"/></symbol>
+<symbol id="i-blitz" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></symbol>
+<symbol id="i-globus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></symbol>
+<symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="1"/><rect x="3" y="13" width="18" height="7" rx="1"/><path d="M7 7.5h.01M7 16.5h.01"/></symbol>
+<symbol id="i-schild" viewBox="0 0 24 24"><path d="M12 2 4 5.5v6c0 5 3.4 8.9 8 10.5 4.6-1.6 8-5.5 8-10.5v-6L12 2Z"/><path d="m9 12 2.2 2.2L15.5 10"/></symbol>
+<symbol id="i-schloss" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="1.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="i-pokal" viewBox="0 0 24 24"><path d="M7 3h10v6a5 5 0 0 1-10 0V3Z"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3M9 21h6M12 14v7"/></symbol>
+<symbol id="i-ebenen" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5M3 18l9 5 9-5"/></symbol>
+<symbol id="i-handy" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18.5h2"/></symbol>
+<symbol id="i-pfeil" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></symbol>
+<symbol id="i-buch" viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 0 4 22.5V4.5Z"/><path d="M8 7h8M8 11h6"/></symbol>
+<symbol id="i-ziel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/></symbol>
+<symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6"/><path d="M5 10v8m5-8v8m4-8v8m5-8v8M3 21h18"/></symbol>
+<symbol id="i-frage" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.3a2.9 2.9 0 0 1 5.6 1c0 1.9-2.8 2.4-2.8 4M12 17.5h.01"/></symbol>
+<symbol id="i-blitz2" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></symbol>
+</svg>
+
+
+<div class="tb"><div class="wrap">
+  <span class="pkt"><i></i>19 MODULE</span>
+  <span class="pkt"><i></i>24 KENNZAHLEN IM SCORE</span>
+  <span class="pkt"><i></i>SERVER IN DEUTSCHLAND</span>
+  <div class="rechts">
+    <span><b data-nutzer>865</b> REGISTRIERTE NUTZER</span>
+    <a href="mailto:support@dealpilot.immo">SUPPORT@DEALPILOT.IMMO</a>
+  </div>
+</div></div>
+
+
+<nav class="nav"><div class="wrap">
+  <a class="mark" href="dp2.html#"><span class="sig"><svg class="ico" style="width:15px;height:15px"><use href="dp2.html#i-haus"/></svg></span>Deal<b>Pilot</b></a>
+  <button class="burger" aria-label="Menü"><span></span><span></span><span></span></button>
+  <ul>
+    <li><a href="dp2.html#workflow">So funktioniert's</a></li>
+    <li><a href="dp2.html#features">Funktionen<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="dp2.html#features"><svg class="ico si"><use href="dp2.html#i-blitz"/></svg><span><b>Die 19 Module</b><span>Von Boarding über Deal Score bis Bankexport</span></span></a></li>
+        <li><a href="leistungsumfang.html"><svg class="ico si"><use href="dp2.html#i-buch"/></svg><span><b>Leistungsumfang</b><span>Alle 18 Kapitel ausführlich — was jedes Modul kann</span></span></a></li>
+        <li><a href="dp2.html#feature-matrix"><svg class="ico si"><use href="dp2.html#i-ziel"/></svg><span><b>Cockpit-Matrix</b><span>Jede Funktion, jeder Tarif — im Vergleich</span></span></a></li>
+        <li><a href="api.html" class="hier"><svg class="ico si"><use href="dp2.html#i-code"/></svg><span><b>API</b><span>REST-Schnittstelle, voller CRUD — im Pro-Plan</span></span></a></li>
+      </ul></li>
+    <li><a href="dp2.html#stories">Stories</a></li>
+    <li><a href="dp2.html#pricing">Preise<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="dp2.html#pricing"><svg class="ico si"><use href="dp2.html#i-bank"/></svg><span><b>Einzelplatz</b><span>Vier Pakete von kostenlos bis Pro</span></span></a></li>
+        <li><a href="dp2.html#partner-plan"><svg class="ico si"><use href="dp2.html#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>Ihre Mandanten unter Ihrer Marke</span></span></a></li>
+        <li><a href="dp2.html#feature-matrix"><svg class="ico si"><use href="dp2.html#i-ziel"/></svg><span><b>Alles im Vergleich</b><span>Die vollständige Matrix</span></span></a></li>
+      </ul></li>
+    <li><a href="dp2.html#partner">Partner</a></li>
+    <li><a href="sicherheit.html">Sicherheit<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="sicherheit.html"><svg class="ico si"><use href="dp2.html#i-schild"/></svg><span><b>Daten &amp; Server</b><span>Hetzner, DSGVO, was gespeichert wird</span></span></a></li>
+        <li><a href="fragen.html"><svg class="ico si"><use href="dp2.html#i-frage"/></svg><span><b>Häufige Fragen</b><span>Die Antworten, die wir sonst am Telefon geben</span></span></a></li>
+      </ul></li>
+  </ul>
+  <a class="b-log" href="https://app.dealpilot.immo/">Anmelden</a>
+  <a class="b-cta" href="https://app.dealpilot.immo/?register=1">Kostenlos starten</a>
+</div></nav>
+
+
+<main>
+  <section class="api-hero">
+    <div class="wrap">
+      <button class="api-back" data-view="landing">← zur&uuml;ck zur Startseite</button>
+      <p class="eye ac">◆ DealPilot Platform</p>
+      <h1>DealPilot <span class="ac">API</span></h1>
+      <p class="lead">Greife programmatisch auf deinen Objektbestand zu &mdash; anlegen, lesen, &auml;ndern, l&ouml;schen. Vollst&auml;ndige REST-Schnittstelle &uuml;ber HTTPS, JSON rein und raus. Enthalten im Pro-Plan.</p>
+      <div class="chips"><span class="chip">REST · JSON</span><span class="chip">Header X-API-Key</span><span class="chip">Basis /api/v1</span><span class="chip">Voller CRUD</span><span class="chip">120 Anfragen/min</span></div>
+    </div>
+  </section>
+  <hr class="rws">
+  <div class="api-body">
+    <div class="wrap">
+      <div class="api-layout">
+        <nav class="api-nav" id="apiNav">
+          <a data-t="was" class="on"><span class="n">01</span> &Uuml;bersicht</a>
+          <a data-t="start"><span class="n">02</span> Schnellstart</a>
+          <a data-t="auth"><span class="n">03</span> Auth</a>
+          <a data-t="ep"><span class="n">04</span> Endpunkte</a>
+          <a data-t="modell"><span class="n">05</span> Datenmodell</a>
+          <a data-t="fehler"><span class="n">06</span> Fehler &amp; Limits</a>
+          <a data-t="grenzen"><span class="n">07</span> Grenzen &amp; Roadmap</a>
+        </nav>
+        <div>
+          <div class="apsec" id="ap-was"><h2><span class="num">01</span> Was du damit machst</h2>
+            <p class="lead">Voller Lese- und Schreibzugriff auf deinen eigenen Objektbestand. Ein Key sieht ausschlie&szlig;lich die Objekte des eigenen Kontos.</p>
+            <div class="uc"><div class="c"><h3>Objekte automatisiert anlegen</h3><p>Investments aus Tabelle, CRM oder Akquise-Tool direkt nach DealPilot.</p></div><div class="c"><h3>Bestand synchronisieren</h3><p>Mieten, Konditionen, Sanierungskosten per <code>PUT</code> spiegeln.</p></div><div class="c"><h3>Eigene Dashboards</h3><p>Objektdaten abrufen und ins eigene Reporting/BI speisen.</p></div><div class="c"><h3>Massen-Import</h3><p>Ganzen Bestand &uuml;bernehmen &mdash; Schleife, je ein <code>POST</code>.</p></div></div>
+          </div>
+          <div class="apsec" id="ap-start"><h2><span class="num">02</span> Schnellstart</h2>
+            <p class="lead">Basis-URL:</p><pre>https://app.dealpilot.junker-immobilien.io/api/v1</pre>
+            <p>Key unter <b>Einstellungen &rarr; Account &amp; Sicherheit &rarr; DealPilot API</b> (einmalig gezeigt, <code>dpk_live_&hellip;</code>).</p>
+            <pre><span class="c"># Objekte auflisten (Summaries, ?limit bis 500, ?offset)</span>
+curl -H <span class="s">"X-API-Key: dpk_live_KEY"</span> …/api/v1/objects?limit=100&amp;offset=0</pre>
+            <pre><span class="c"># Objekt anlegen</span>
+curl -X POST -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"data":{"plz":"32609","ort":"Hüllhorst","str":"Musterweg 4","wfl":96,"nkm":820,"ek":40000}}'</span> \
+  …/api/v1/objects</pre>
+            <pre><span class="c"># Objekt ändern (nur data-Felder senden, die sich ändern sollen ist NICHT möglich — data wird komplett ersetzt)</span>
+curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"data":{ …kompletter Datensatz… }}'</span> …/api/v1/objects/OBJEKT-ID</pre>
+          </div>
+          <div class="apsec" id="ap-auth"><h2><span class="num">03</span> Authentifizierung</h2>
+            <table><tr><th>Punkt</th><th>Details</th></tr>
+            <tr><td>Header</td><td><code>X-API-Key: dpk_live_&hellip;</code></td></tr>
+            <tr><td>Voraussetzung</td><td>Aktiver <span class="pill">Pro</span>-Plan</td></tr>
+            <tr><td>Rate-Limit</td><td>120 / min je Key (sonst <code>429</code>)</td></tr>
+            <tr><td>Speicherung</td><td>Nur SHA-256-Hash</td></tr>
+            <tr><td>Keys je Konto</td><td>Bis zu 5 aktive Keys, jeweils mit Namen und optionalem Ablaufdatum</td></tr>
+            <tr><td>Sichtbarkeit</td><td>Klartext-Key wird genau <b>einmal</b> bei Erstellung angezeigt</td></tr>
+            <tr><td>Widerruf</td><td>Jederzeit in den Einstellungen — gilt sofort</td></tr></table>
+          </div>
+          <div class="apsec" id="ap-ep"><h2><span class="num">04</span> Endpunkte</h2>
+            <div class="ep"><span class="mm get">GET</span><span class="path">/objects</span><span class="desc">Liste als Summaries: Adresse, zuletzt gespeicherter KPI-Stand, Vorschaubild. <code>?limit</code> (max 500) &amp; <code>?offset</code></span></div>
+            <div class="ep"><span class="mm get">GET</span><span class="path">/objects/:id</span><span class="desc">Volles Objekt: komplettes <code>data</code>, Fotos, KI-Analyse, Version</span></div>
+            <div class="ep"><span class="mm post">POST</span><span class="path">/objects</span><span class="desc">Anlegen — zählt gegen das Objektlimit deines Plans</span></div>
+            <div class="ep"><span class="mm put">PUT</span><span class="path">/objects/:id</span><span class="desc">Ändern — <code>data</code> wird komplett ersetzt; optional <code>expectedVersion</code> gegen konkurrierende Änderungen</span></div>
+            <div class="ep"><span class="mm del">DEL</span><span class="path">/objects/:id</span><span class="desc">Endgültig löschen (kein Papierkorb)</span></div>
+            <p class="lead" style="margin-top:18px">Antwort-Beispiel <code>GET /objects/:id</code> (gekürzt):</p>
+            <pre>{
+  "id": "9b2f…",
+  "version": 7,
+  "data": { "plz": "32609", "ort": "Hüllhorst", "wfl": 96, "nkm": 820, "ek": 40000, … },
+  "photos": ["data:image/jpeg;base64,…"],
+  "aiAnalysis": "…",
+  "updated_at": "2026-07-01T09:12:33Z"
+}</pre>
+          </div>
+          <div class="apsec" id="ap-modell"><h2><span class="num">05</span> Datenmodell &mdash; Feldreferenz</h2>
+            <div class="note"><b>Voll durchl&auml;ssig:</b> <code>data</code> akzeptiert beliebige Schl&uuml;ssel und gibt sie 1:1 zur&uuml;ck. Die App liest die unten stehenden Feld-IDs &mdash; wer sie beim Anlegen bef&uuml;llt, sieht die Werte direkt in allen Modulen und Berechnungen.</div>
+            <div class="note"><b>Der schnellste Weg zur vollst&auml;ndigen Liste:</b> Lege ein Referenzobjekt in der App an und f&uuml;lle die Tabs aus, die du brauchst &mdash; ein <code>GET /objects/:id</code> zeigt dir anschlie&szlig;end <b>jede</b> Feld-ID deines Datensatzes 1:1 im <code>data</code>-Objekt. So ist deine Integration immer synchron zur App, auch wenn neue Felder dazukommen.</div>
+            <style>.fldt{width:100%;border-collapse:collapse;margin:10px 0 4px}.fldt th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;opacity:.6}.fldt td{padding:6px 10px;border-top:1px solid rgba(127,127,127,.16);font-size:13px;vertical-align:top}.fldt td:first-child{white-space:nowrap;width:1%}</style>
+            <div class="grp"><h3>Objekt &amp; Adresse</h3><table class="fldt"><tr><th>Feld</th><th>Bedeutung</th></tr><tr><td><code>plz</code></td><td>Postleitzahl</td></tr><tr><td><code>ort</code></td><td>Ort</td></tr><tr><td><code>str</code></td><td>Straße</td></tr><tr><td><code>hnr</code></td><td>Hausnummer</td></tr><tr><td><code>objart</code></td><td>Objektart (z. B. ETW, MFH)</td></tr><tr><td><code>wfl</code></td><td>Wohnfläche in m²</td></tr><tr><td><code>baujahr</code></td><td>Baujahr</td></tr><tr><td><code>kaufdat</code></td><td>Kaufdatum</td></tr><tr><td><code>wirtschaftlicher_uebergang</code></td><td>Wirtschaftlicher Übergang (Datum — Start für AfA/Mieten im Jahr 1)</td></tr><tr><td><code>kuerzel</code></td><td>Objekt-Kürzel (Anzeige)</td></tr><tr><td><code>ausst</code></td><td>Ausstattungsniveau</td></tr><tr><td><code>halter</code></td><td>Halter/Mandant (privat oder Gesellschaft)</td></tr></table></div><div class="grp"><h3>These, Lage &amp; Bewertung</h3><table class="fldt"><tr><th>Feld</th><th>Bedeutung</th></tr><tr><td><code>thesis</code></td><td>Investitionsthese (Freitext)</td></tr><tr><td><code>risiken</code></td><td>Bekannte Risiken (Freitext)</td></tr><tr><td><code>notizen</code></td><td>Notizen</td></tr><tr><td><code>bankval</code></td><td>Bankbewertung in €</td></tr><tr><td><code>svwert</code></td><td>Sachverständigenwert in €</td></tr><tr><td><code>makrolage</code></td><td>Makrolage — Selbsteinschätzung</td></tr><tr><td><code>mikrolage</code></td><td>Mikrolage — Selbsteinschätzung</td></tr><tr><td><code>vermstand</code></td><td>Vermietungsstand</td></tr><tr><td><code>exitstr</code></td><td>Exit-Strategie</td></tr></table></div><div class="grp"><h3>Investition &amp; Erwerbskosten</h3><table class="fldt"><tr><th>Feld</th><th>Bedeutung</th></tr><tr><td><code>kp</code></td><td>Kaufpreis in €</td></tr><tr><td><code>makler_p</code></td><td>Maklerprovision in %</td></tr><tr><td><code>notar_p</code></td><td>Notar in %</td></tr><tr><td><code>gba_p</code></td><td>Grundbuchamt in %</td></tr><tr><td><code>gest_p</code></td><td>Grunderwerbsteuer in %</td></tr><tr><td><code>ji_p</code></td><td>Weitere Erwerbskosten in %</td></tr><tr><td><code>san</code></td><td>Sanierungskosten in €</td></tr><tr><td><code>moebl</code></td><td>Möblierung in €</td></tr><tr><td><code>inv_kueche</code></td><td>Inventar: Küche in €</td></tr><tr><td><code>inv_moebel</code></td><td>Inventar: Möbel in €</td></tr><tr><td><code>inv_geraete</code></td><td>Inventar: Geräte in €</td></tr><tr><td><code>inv_pv</code></td><td>Inventar: Photovoltaik in €</td></tr><tr><td><code>inv_stellplatz</code></td><td>Inventar: Stellplatz in €</td></tr><tr><td><code>inv_sonst</code></td><td>Inventar: Sonstiges in €</td></tr><tr><td><code>brw</code></td><td>Bodenrichtwert in €/m²</td></tr><tr><td><code>mea</code></td><td>Miteigentumsanteil</td></tr><tr><td><code>gsfl</code></td><td>Grundstücksfläche in m²</td></tr></table></div><div class="grp"><h3>Annahmen &amp; Projektion</h3><table class="fldt"><tr><th>Feld</th><th>Bedeutung</th></tr><tr><td><code>mietstg</code></td><td>Mietsteigerung in %/Jahr</td></tr><tr><td><code>wertstg</code></td><td>Wertsteigerung in %/Jahr</td></tr><tr><td><code>kostenstg</code></td><td>Kostensteigerung in %/Jahr</td></tr><tr><td><code>leerstand</code></td><td>Leerstand in %</td></tr><tr><td><code>btj</code></td><td>Betrachtungszeitraum in Jahren</td></tr><tr><td><code>exit_bmy</code></td><td>Exit-Bruttomietrendite in %</td></tr></table></div><div class="grp"><h3>Miete &amp; Steuer</h3><table class="fldt"><tr><th>Feld</th><th>Bedeutung</th></tr><tr><td><code>nkm</code></td><td>Nettokaltmiete in €/Monat</td></tr><tr><td><code>ze</code></td><td>Zusatzeinnahmen in €/Monat (Gesamt-Kaltmiete = nkm + ze)</td></tr><tr><td><code>umlagef</code></td><td>Umlagefähige Kosten in €/Monat</td></tr><tr><td><code>afa_satz</code></td><td>AfA-Satz in %</td></tr><tr><td><code>geb_ant</code></td><td>Gebäudeanteil in %</td></tr><tr><td><code>zve</code></td><td>Zu versteuerndes Einkommen in €</td></tr><tr><td><code>grenz</code></td><td>Grenzsteuersatz in %</td></tr></table></div><div class="grp"><h3>Finanzierung — Darlehen 1</h3><table class="fldt"><tr><th>Feld</th><th>Bedeutung</th></tr><tr><td><code>ek</code></td><td>Eigenkapital in €</td></tr><tr><td><code>d1</code></td><td>Darlehenssumme in €</td></tr><tr><td><code>d1z</code></td><td>Sollzins in %</td></tr><tr><td><code>d1t</code></td><td>Anfängliche Tilgung in %</td></tr><tr><td><code>d1_bindj</code></td><td>Zinsbindung in Jahren</td></tr><tr><td><code>d1_type</code></td><td>Darlehenstyp</td></tr><tr><td><code>d1_auszahl</code></td><td>Auszahlungsdatum (Start der Finanzierung in Jahr 1)</td></tr><tr><td><code>d1_vertrag</code></td><td>Vertragsnummer</td></tr><tr><td><code>anschl_z</code></td><td>Anschluss-Zins in %</td></tr><tr><td><code>anschl_t</code></td><td>Anschluss-Tilgung in %</td></tr><tr><td><code>anschl_bj</code></td><td>Anschluss: Bindung in Jahren</td></tr><tr><td><code>bank_inst</code></td><td>Bank / Institut</td></tr></table></div><div class="grp"><h3>Finanzierung — Darlehen 2 &amp; Bauspar</h3><table class="fldt"><tr><th>Feld</th><th>Bedeutung</th></tr><tr><td><code>d2</code></td><td>Darlehen 2: Summe in €</td></tr><tr><td><code>d2z</code></td><td>D2: Sollzins in %</td></tr><tr><td><code>d2t</code></td><td>D2: Tilgung in %</td></tr><tr><td><code>d2_bindj</code></td><td>D2: Zinsbindung in Jahren</td></tr><tr><td><code>d2_inst</code></td><td>D2: Institut</td></tr><tr><td><code>d2_type</code></td><td>D2: Typ (z. B. Tilgungsaussetzung)</td></tr><tr><td><code>d2_auszahl</code></td><td>D2: Auszahlungsdatum</td></tr><tr><td><code>d2_az</code></td><td>D2: Anschluss-Zins in %</td></tr><tr><td><code>d2_at</code></td><td>D2: Anschluss-Tilgung in %</td></tr><tr><td><code>bspar_inst</code></td><td>Bauspar: Institut</td></tr><tr><td><code>bspar_vertrag</code></td><td>Bauspar: Vertragsnummer</td></tr><tr><td><code>bspar_sum</code></td><td>Bauspar: Summe in €</td></tr><tr><td><code>bspar_rate</code></td><td>Bauspar: Sparrate in €/Monat</td></tr><tr><td><code>bspar_zuteil</code></td><td>Bauspar: Zuteilungsdatum</td></tr><tr><td><code>bspar_zins</code></td><td>Bauspar: Guthabenzins in %</td></tr><tr><td><code>bspar_quote_min</code></td><td>Bauspar: Mindest-Sparquote in %</td></tr><tr><td><code>bspar_dar_z</code></td><td>Bauspar-Darlehen: Zins in %</td></tr><tr><td><code>bspar_dar_t</code></td><td>Bauspar-Darlehen: Tilgung in %</td></tr></table></div><div class="grp"><h3>Bewirtschaftung</h3><table class="fldt"><tr><th>Feld</th><th>Bedeutung</th></tr><tr><td><code>hg_ul</code></td><td>Hausgeld umlagefähig in €/Monat</td></tr><tr><td><code>hg_nul</code></td><td>Hausgeld nicht umlagefähig in €/Monat</td></tr><tr><td><code>grundsteuer</code></td><td>Grundsteuer</td></tr><tr><td><code>ul_sonst</code></td><td>Sonstige umlagefähige Kosten</td></tr><tr><td><code>weg_r</code></td><td>WEG-Rücklage</td></tr><tr><td><code>eigen_r</code></td><td>Eigene Rücklage</td></tr><tr><td><code>mietausfall</code></td><td>Mietausfallwagnis</td></tr><tr><td><code>nul_sonst</code></td><td>Sonstige nicht umlagefähige Kosten</td></tr><tr><td><code>bwk_ul_pct</code></td><td>Pauschale umlagefähig in %</td></tr><tr><td><code>bwk_nul_pct</code></td><td>Pauschale nicht umlagefähig in %</td></tr><tr><td><code>bwk_kp_pct</code></td><td>Pauschale vom Kaufpreis in %</td></tr></table></div><div class="grp"><h3>Verhandlung &amp; KI-Texte</h3><table class="fldt"><tr><th>Feld</th><th>Bedeutung</th></tr><tr><td><code>kp1 … kp4</code></td><td>Kaufpreis-Szenarien (Werte in €)</td></tr><tr><td><code>kp1l … kp4l</code></td><td>Labels der Szenarien</td></tr><tr><td><code>ai_strat</code></td><td>KI-Text: Strategie</td></tr><tr><td><code>ai_verk</code></td><td>KI-Text: Verkäufer/Verhandlung</td></tr><tr><td><code>ai_risk</code></td><td>KI-Text: Risiko</td></tr><tr><td><code>ai_markt</code></td><td>KI-Text: Markt</td></tr></table></div>
+            <div class="grp"><h3>Mietentwicklung (Detail-Modus)</h3><table class="fldt"><tr><th>Feld</th><th>Bedeutung</th></tr><tr><td><code>mietspiegel</code></td><td>Mietspiegel-Referenz in €/m²</td></tr><tr><td><code>me_modus</code></td><td>Modus der Mietentwicklung (einfach / detailliert)</td></tr><tr><td><code>me_soll</code></td><td>Sollmiete in €/Monat</td></tr><tr><td><code>me_anz</code></td><td>Anzahl Anpassungsschritte</td></tr><tr><td><code>me_int</code></td><td>Intervall zwischen Schritten in Jahren</td></tr><tr><td><code>me_pct</code></td><td>Anpassung je Schritt in %</td></tr></table></div><div class="grp"><h3>Deal Score 2.0 — Zusatzangaben</h3><table class="fldt"><tr><th>Feld</th><th>Bedeutung</th></tr><tr><td><code>ds2_zustand</code></td><td>Objektzustand</td></tr><tr><td><code>ds2_energie</code></td><td>Energieklasse</td></tr><tr><td><code>ds2_mietausfall</code></td><td>Mietausfall-Einschätzung</td></tr><tr><td><code>ds2_marktmiete</code></td><td>Marktmiete in €/m²</td></tr><tr><td><code>ds2_bevoelkerung</code></td><td>Bevölkerungsentwicklung am Standort</td></tr><tr><td><code>ds2_nachfrage</code></td><td>Nachfrage-Einschätzung</td></tr><tr><td><code>ds2_marktfaktor</code></td><td>Marktfaktor</td></tr><tr><td><code>ds2_wertsteigerung</code></td><td>Wertsteigerungs-Erwartung</td></tr><tr><td><code>ds2_entwicklung</code></td><td>Entwicklungspotenzial</td></tr></table></div><div class="grp"><h3>Qualität, Zustand &amp; Objektdetails</h3><table class="fldt"><tr><th>Feld</th><th>Bedeutung</th></tr><tr><td><code>rate_kueche / rate_bad / rate_boden / rate_fenster</code></td><td>Sterne-Bewertung Küche / Bad / Boden / Fenster</td></tr><tr><td><code>qual_kueche / qual_bad / qual_boden / qual_fenster</code></td><td>Qualitätsstufe Küche / Bad / Boden / Fenster</td></tr><tr><td><code>zimmer</code></td><td>Zimmeranzahl</td></tr><tr><td><code>bad_anz</code></td><td>Anzahl Bäder</td></tr><tr><td><code>etage</code></td><td>Etage</td></tr><tr><td><code>etagen_ges</code></td><td>Etagen gesamt</td></tr><tr><td><code>modernis</code></td><td>Modernisierungsjahr</td></tr><tr><td><code>garagen</code></td><td>Garagenplätze</td></tr><tr><td><code>stellpl_aussen</code></td><td>Außenstellplätze</td></tr><tr><td><code>balkon_flae</code></td><td>Balkon-/Terrassenfläche in m²</td></tr><tr><td><code>einheiten</code></td><td>Anzahl Einheiten (bei Mehrfamilienhäusern)</td></tr></table></div><div class="grp"><h3>Ausstattung für AVM-Bewertung</h3><table class="fldt"><tr><th>Feld</th><th>Bedeutung</th></tr><tr><td><code>eq_heating</code></td><td>Heizung</td></tr><tr><td><code>eq_windows</code></td><td>Fenster</td></tr><tr><td><code>eq_floor</code></td><td>Bodenbeläge</td></tr><tr><td><code>eq_bath</code></td><td>Bad</td></tr><tr><td><code>eq_guest_wc</code></td><td>Gäste-WC</td></tr><tr><td><code>eq_store_room</code></td><td>Abstellraum</td></tr><tr><td><code>eq_walls</code></td><td>Wände</td></tr><tr><td><code>eq_roof</code></td><td>Dach</td></tr><tr><td><code>eq_elevator</code></td><td>Aufzug</td></tr></table><div class="note" style="margin-top:8px">Werte = Ausstattungs-Stufen, wie sie die App in den Ausstattungsdetails anbietet — am einfachsten per Referenzobjekt ablesen.</div></div><div class="grp"><h3>Steuerliche Übernahme</h3><table class="fldt"><tr><th>Feld</th><th>Bedeutung</th></tr><tr><td><code>san_tax_active</code></td><td>Sanierung als Werbungskosten ansetzen (Checkbox)</td></tr><tr><td><code>san_tax_years</code></td><td>Verteilung der Sanierung in Jahren</td></tr><tr><td><code>moebl_tax_active</code></td><td>Möblierung/Inventar steuerlich ansetzen (Checkbox)</td></tr><tr><td><code>moebl_tax_years</code></td><td>Verteilung des Inventars in Jahren</td></tr></table></div><div class="grp"><h3>Erwerb &amp; Inserat</h3><table class="fldt"><tr><th>Feld</th><th>Bedeutung</th></tr><tr><td><code>erwerbsart</code></td><td>Erwerbsart</td></tr><tr><td><code>anbietertyp</code></td><td>Anbietertyp (privat / Makler / Bauträger …)</td></tr></table></div><div class="grp"><h3>Mandant &amp; Überführung</h3><table class="fldt"><tr><th>Feld</th><th>Bedeutung</th></tr><tr><td><code>halter_seit</code></td><td>Halter seit (Datum)</td></tr><tr><td><code>obj_herkunft</code></td><td>Herkunft des Objekts (Kauf / Überführung)</td></tr><tr><td><code>verkehrswert_ueberf</code></td><td>Verkehrswert bei Überführung in €</td></tr><tr><td><code>ueberf_preis</code></td><td>Überführungspreis in €</td></tr><tr><td><code>gesellschafterdarlehen</code></td><td>Gesellschafterdarlehen in €</td></tr><tr><td><code>ueberf_restschuld</code></td><td>Übernommene Restschuld in €</td></tr><tr><td><code>ueberf_rest_zins</code></td><td>Zins der übernommenen Restschuld in %</td></tr><tr><td><code>ueberf_ende</code></td><td>Privat-Phase: Enddatum</td></tr></table></div><div class="grp"><h3>App-interne Felder (nicht setzen)</h3><p style="font-size:13px;margin:6px 0 8px">Felder mit Unterstrich-Präfix verwaltet die App selbst — z. B. <code>_thumb</code> (Vorschaubild), <code>_avm_state</code>, <code>_mb_state</code>, <code>_immometrica_id</code>, <code>_ueberf_link</code> sowie Caches wie <code>ai_lage_cache</code> und <code>brw_ki_result</code>. Beim Schreiben nicht erfinden und nicht leeren.</p><div class="note"><b>Wichtig beim <code>PUT</code>:</b> <code>data</code> wird komplett ersetzt. Deshalb immer <b>Read-Modify-Write</b>: erst <code>GET /objects/:id</code>, die gewünschten Felder im zurückgelieferten <code>data</code> ändern, dann das <b>komplette</b> Objekt zurücksenden — sonst gehen App-interne Felder und Caches verloren.</div></div><div class="grp"><h3>Top-Level (neben <code>data</code>)</h3><table class="fldt"><tr><th>Feld</th><th>Bedeutung</th></tr>
+              <tr><td><code>photos[]</code></td><td>Objektfotos als Base64-Data-URLs (App verkleinert auf max. 1600&nbsp;px + Thumbnail)</td></tr>
+              <tr><td><code>aiAnalysis</code></td><td>Text der letzten KI-Analyse</td></tr>
+              <tr><td><code>expectedVersion</code></td><td>Optionale Versionsnummer beim <code>PUT</code> &mdash; sch&uuml;tzt gegen konkurrierende &Auml;nderungen</td></tr>
+            </table></div>
+            <div class="note">Die Liste (<code>GET /objects</code>) liefert zus&auml;tzlich den <b>zuletzt in der App gespeicherten KPI-Stand</b> je Objekt (u.&nbsp;a. Bruttomietrendite, Cashflow, DSCR, LTV) &mdash; praktisch f&uuml;rs eigene Reporting, ohne das volle Objekt zu laden.</div>
+          </div>
+          <div class="apsec" id="ap-fehler"><h2><span class="num">06</span> Fehler &amp; Limits</h2>
+            <table><tr><th>Status</th><th>Bedeutung</th></tr>
+            <tr><td><code>401</code></td><td>Kein/ung&uuml;ltiger Key</td></tr>
+            <tr><td><code>403</code></td><td>Kein Pro / deaktiviert</td></tr>
+            <tr><td><code>404</code></td><td>Objekt nicht gefunden</td></tr>
+            <tr><td><code>400</code></td><td>Validierungsfehler — Details stehen im Antwort-Body</td></tr>
+            <tr><td><code>429</code></td><td>Rate-Limit — kurz warten, dann erneut senden</td></tr></table>
+          </div>
+          <div class="apsec" id="ap-grenzen"><h2><span class="num">07</span> Grenzen &amp; Roadmap</h2>
+            <p class="lead">Damit du weißt, woran du bist: Die DealPilot-API ist heute eine <b>Daten-API</b> für deinen Objektbestand — bewusst schlank und stabil.</p>
+            <div class="uc">
+              <div class="c"><h3>Das kann sie heute</h3><p>Vollen Lese- und Schreibzugriff auf deine Objekte (CRUD), Summaries mit letztem KPI-Stand, Fotos und KI-Analyse-Text inklusive. Ideal für Import, Sync und eigenes Reporting.</p></div>
+              <div class="c"><h3>Berechnungen</h3><p>Deal Score, DSCR, Cashflow und Steuer werden in der App gerechnet. Die API liefert Rohdaten plus den zuletzt gespeicherten KPI-Stand — eine On-Demand-Berechnung per API gibt es noch nicht.</p></div>
+              <div class="c"><h3>Noch nicht per API</h3><p>KI-Co-Pilot und AVM-Marktbewertungen, PDF-Export-Erzeugung, Webhooks bei Änderungen sowie Volltextsuche/Filter (aktuell <code>limit</code>/<code>offset</code>).</p></div>
+              <div class="c"><h3>Roadmap</h3><p>Genau diese Punkte stehen auf der Ausbauliste. Du brauchst einen davon zuerst? Schreib an <a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a> — API-Wünsche fließen direkt in die Priorisierung.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+<footer class="footer"><div class="wrap">
+  <div class="footer-grid">
+    <div>
+      <div class="mark" style="color:#fff"><span class="sig"><svg class="ico" style="width:15px;height:15px"><use href="#i-haus"/></svg></span>Deal<b>Pilot</b></div>
+      <p class="footer-tag">Immobilien-Investmentanalyse für strukturierte Entscheidungen.
+        Entwickelt von Junker Immobilien · Sachverständigenbüro &amp; Projektentwicklung.</p>
+    </div>
+    <div><h4>Produkt</h4>
+      <a href="#workflow">So funktioniert's</a><a href="#features">Funktionen</a>
+      <a href="leistungsumfang.html">Leistungsumfang</a><a href="#pricing">Preise</a>
+      <a href="api.html">API</a><a href="#app">App</a></div>
+    <div><h4>Vertrauen</h4>
+      <a href="sicherheit.html">Sicherheit &amp; Server</a><a href="fragen.html">Häufige Fragen</a>
+      <a href="#partner">Partner &amp; Datenquellen</a><a href="#feature-matrix">Cockpit-Matrix</a></div>
+    <div><h4>Kontakt</h4>
+      <a href="mailto:support@dealpilot.immo">support@dealpilot.immo</a>
+      <a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a>
+      <a href="/impressum.html">Impressum</a><a href="/datenschutz.html">Datenschutz</a></div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 Junker Immobilien</div>
+    <div>Keine Steuer- oder Finanzberatung. Analyse-Werkzeug für eigene Kalkulationen.</div>
+  </div>
+</div></footer>
+
+
+<script>
+/* Die Sprungnavigation hebt hervor, wo man gerade ist. */
+(function(){
+  var links=[].slice.call(document.querySelectorAll('.api-nav a, #apiNav a'));
+  if(!links.length) return;
+  var ziele=links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var i=ziele.indexOf(e.target);
+      links.forEach(function(a,j){ a.classList.toggle('on', j===i); });
+    });
+  },{rootMargin:'-30% 0px -60% 0px'});
+  ziele.forEach(function(z){ if(z) io.observe(z); });
+})();
+</script>
+<script src="dp2.js?v=v1542"></script>
+</body></html>
