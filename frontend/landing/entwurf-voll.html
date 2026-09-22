@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!-- DealPilot Landing · v1531 -->
 <html lang="de"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -185,7 +185,7 @@ section{padding:88px 0}
   padding-bottom:11px;border-bottom:1px solid var(--linie)}
 .mgruppe .gk h3{font-size:19px}
 .mgruppe .gk span{font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.13em;color:var(--ink-3)}
-.module{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.module{display:grid;grid-template-columns:repeat(5,1fr);gap:13px}
 .mod{background:#fff;border:1px solid var(--linie);border-radius:13px;padding:18px 17px 20px;
   transition:.26s cubic-bezier(.3,.9,.3,1);position:relative}
 .mod:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(34,30,25,.11);border-color:var(--gold)}
@@ -310,7 +310,7 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
 
 @media(max-width:1080px){
   .hero-in,.story{grid-template-columns:1fr;gap:38px}
-  .module{grid-template-columns:repeat(2,1fr)}
+  .module{grid-template-columns:repeat(3,1fr)}
   .ablauf{grid-template-columns:repeat(2,1fr);gap:30px 0}
   .ablauf::before,.ablauf::after{display:none}
   .tarife{grid-template-columns:repeat(2,1fr)}
@@ -401,7 +401,7 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
       <div class="hbeleg">
         <div><b id="hz-nutzer">865</b><span>REGISTRIERTE NUTZER</span></div>
         <div><b>24</b><span>KENNZAHLEN</span></div>
-        <div><b>19</b><span>MODULE</span></div>
+        <div><b>20</b><span>MODULE</span></div>
         <div><b>1 Min.</b><span>BIS ZUM QUICK-CHECK</span></div>
       </div>
     </div>
@@ -478,7 +478,7 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
 <!-- ══ MODULE ══ -->
 <section id="module"><div class="w">
   <div class="kz rv"><div class="kick">Der volle Umfang</div>
-    <h2>Neunzehn Module — <em>ein Datenbestand.</em></h2>
+    <h2>Zwanzig Module — <em>ein Datenbestand.</em></h2>
     <p>Was Sie einmal erfassen, steht überall: im Score, in der Steuer, im PDF für die Bank.
        Kein Abtippen, kein zweiter Rechenweg.</p></div>
 
@@ -531,15 +531,17 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
   </div>
 
   <div class="mgruppe rv">
-    <div class="gk"><h3>Ausgeben &amp; Verwalten</h3><span>16 – 19</span></div>
+    <div class="gk"><h3>Begleiten &amp; Ausgeben</h3><span>16 – 20</span></div>
     <div class="module">
-      <div class="mod"><span class="nr">16</span><div class="mi"><svg class="ico"><use href="#i-bank"/></svg></div>
+      <div class="mod"><span class="nr">16</span><div class="mi"><svg class="ico"><use href="#i-schild"/></svg></div>
+        <h4>Co-Pilot</h4><p>Liest das Objekt gegen, benennt Schwachstellen und schlägt Fragen für den Besichtigungstermin vor.</p></div>
+      <div class="mod"><span class="nr">17</span><div class="mi"><svg class="ico"><use href="#i-bank"/></svg></div>
         <h4>Bankunterlage</h4><p>Investment-Case als PDF in zwei Fassungen, Bankexport mit 25 Spalten.</p></div>
-      <div class="mod"><span class="nr">17</span><div class="mi"><svg class="ico"><use href="#i-beleg"/></svg></div>
+      <div class="mod"><span class="nr">18</span><div class="mi"><svg class="ico"><use href="#i-beleg"/></svg></div>
         <h4>Finanzamt-Mappe</h4><p>Werbungskosten bis zur Zeile der Anlage V 2025, Kaufpreisaufteilung als Anlage.</p></div>
-      <div class="mod"><span class="nr">18</span><div class="mi"><svg class="ico"><use href="#i-raster"/></svg></div>
+      <div class="mod"><span class="nr">19</span><div class="mi"><svg class="ico"><use href="#i-raster"/></svg></div>
         <h4>Portfolio &amp; Track Record</h4><p>Alle Objekte in einer Übersicht, Nachweis über das Gesamtportfolio.</p></div>
-      <div class="mod"><span class="nr">19</span><div class="mi"><svg class="ico"><use href="#i-wolke"/></svg></div>
+      <div class="mod"><span class="nr">20</span><div class="mi"><svg class="ico"><use href="#i-wolke"/></svg></div>
         <h4>Datenraum &amp; Cloud</h4><p>Dokumente je Objekt mit Checkliste, automatisch gespeichert, überall verfügbar.</p></div>
     </div>
   </div>
@@ -793,7 +795,9 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
     preise();
   });
 
-  fetch('https://app.dealpilot.immo/api/v1/public/stats')
+  /* Eigener Host, nicht hart auf Prod: die Landing-Domain laesst genau diesen
+     Pfad durch (gemessen 22.09.2026 - 200, 133 B, registrierte_nutzer 866). */
+  fetch('/api/v1/public/stats')
     .then(function(r){ return r.ok?r.json():null; })
     .then(function(d){
       if(!d||!d.registrierte_nutzer) return;
