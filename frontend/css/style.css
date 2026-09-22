@@ -37943,3 +37943,20 @@ html[data-ui-theme="kanzlei"] body.dp-hybrid-rail #dp-hybrid-aktionen{ padding-b
   text-align:right; color:#2A2727; font-variant-numeric:tabular-nums; }
 #dp-hybrid-aktionen .dp-hy-warte{ font-size:11px; line-height:1.45; color:#8A8272;
   background:#FBF6E9; border:1px solid #EDE4CE; border-radius:7px; padding:6px 8px; margin:4px 0 2px; }
+
+/* ═══ v1520 · Marcel 22.09.2026 ═══════════════════════════════════════
+   "Den Investor Deal Score nehmen wir dann im Hellmodus oben aus dem
+    Header-Bereich raus zwischen den beiden Tab-Bars. Und dann kannst du
+    auch hinten im Hellmodus dieses Aufklappen fuer den Investor Deal Score
+    ausblenden."
+   Er steht jetzt rechts in der Aktionsspalte - mit den fuenf Bereichen und
+   der Datentiefe je Bereich. Zweimal dieselbe Zahl auf einem Schirm ist
+   einer zu viel. Beides gilt NUR in den hellen Profilen und nur, solange
+   die Spalte wirklich da ist (body.dp-hybrid-rail) - sonst waere der Score
+   auf schmalen Fenstern ganz verschwunden.
+   ════════════════════════════════════════════════════════════════════ */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body.dp-hybrid-rail #hdr-score-mini,
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body.dp-hybrid-rail .hdr-score-mini{ display:none !important; }
+
+/* Die aufklappbare Score-Karte im Reiter Kennzahlen entfaellt dort ebenso. */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body.dp-hybrid-rail #dealscore2-card{ display:none !important; }
