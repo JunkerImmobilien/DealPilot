@@ -17803,3 +17803,53 @@ ausgeliefert auf einer **eigenen Domain** (`{$LANDING_DOMAIN}` im Caddyfile,
 > die Landing-Domain und eine Pflegemaske im Admin (der Bereich „Landing"
 > waere der Platz — dort liegen schon Besucher und Funnel). Offene
 > Produktfrage: echte Zahlen aus der Datenbank oder gepflegte Werte.
+
+## Rollout-Journal · 22.09.2026 (4) — Score rechts, Erstflug, Kundenzaehler, Landing-Entwuerfe
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1516 | `6d3cc90` | Die Aktionsspalte zeigt unter dem Score die **fuenf Bereiche** (Rendite, Finanzierung, Risiko, Lage, Upside) mit Balken, Punktzahl und **Datentiefe je Bereich** — aus `DealScore2.compute()`, demselben Kern wie der Kopf |
+| v1517 | `6d3cc90` | **Umschalter fuer die sechs Kartenbilder** direkt in der App: nur in den hellen Profilen, nur auf Zuruf (Tastenfolge `kkk` oder `?karten=1`), setzt `<html data-dp-karte>`. Kopfleiste und Reiterzeile ziehen mit |
+| v1518 / v1519 | `9bd407b`, `959655c` | Die Spalte blieb leer, obwohl der Rechenkern Zahlen hatte: der **70-%-Riegel** in `calc.js` blendet den Kopf-Score aus, und die Spalte schrieb ihn nur ab. Jetzt stehen die Bereiche trotzdem, mit dem Grund darueber. **Der Zweig aus v1518 wurde nie erreicht** — eine Zeile darueber stieg vorher aus; zum zweiten Mal nach v1493 derselbe Fehlertyp |
+| v1520 | `c4e6ed6` | Im Hellmodus entfallen der Score-Block im Kopf und die aufklappbare Score-Karte im Reiter Kennzahlen — er steht jetzt rechts. Nur solange die Spalte da ist (`body.dp-hybrid-rail`) |
+| v1521 | `7504af2` | Bei 87 Punkten zeigte der Kopf **„Sehr gut"** — eine Stufe, die die Kette der Objektkarte nicht kennt (ab 85 = TOP). Die in CLAUDE.md vermerkte Abweichung. Solange der Kopf ausgeblendet ist, ist die Spalte die einzige Anzeige, also gilt dort die Kette |
+| v1522 / b | `ecf3493`, `081ce86` | **Erstflug als Fenster zum Annehmen**, nur ueber `/erstflug`. Die Entscheidung vom 07.09.2026 bleibt: auf der offenen Seite wird nichts beworben. Wer ablehnt, behaelt den Code. **Und ein Fehler, der teuer geworden waere:** das Fenster blieb im Hintergrund-Tab auf `opacity 0` stehen und haette als unsichtbare Flaeche die ganze Seite blockiert — `requestAnimationFrame` feuert dort nicht |
+| v1523 / b | `15bb4bb`, `a9fb9ed` | **Oeffentlicher Endpunkt** `GET /api/v1/public/stats` fuer die Landing: registrierte Nutzer ohne Testkonten plus Sockel aus `PUBLIC_STATS_SOCKEL` (865). Gerundet erst ab 2000 — **der erste Versuch machte aus 866 eine 860**, also weniger als der Sockel |
+| v1524 / b | `a3612c3`, `5478d2d` | **Zwei vollstaendige Landing-Entwuerfe** im Junker-Stil |
+
+> **Der Caddyfile-Umweg, der eine Stunde gekostet hat.** Der Endpunkt braucht
+> einen `handle`-Block in der Landing-Domain. Der Caddyfile ist im Git
+> **verfolgt** (obwohl CLAUDE.md sagt, er darf nie committet werden) und hat
+> den Deploy blockiert. Ich habe ihn mit `git checkout --` zurueckgesetzt,
+> deployed und die Fassung zurueckkopiert — und **danach griff die Aenderung
+> nicht**, obwohl `caddy reload` Erfolg meldete. Ursache: **ein Bind-Mount auf
+> eine einzelne DATEI haengt an der Inode.** `git checkout` ersetzt die Datei,
+> der Container haelt die alte; im Container lag eine Fassung **vom 21. Juli**.
+> Behebung nur mit `--force-recreate`. Seitdem: `git update-index
+> --skip-worktree Caddyfile` auf dem Server.
+
+### Die Landing-Entwuerfe
+
+`frontend/landing-entwurf-a.html` — „Substanz": heller Creme-Grund wie
+junker-immobilien.io, dunkle Akzentbaender, Laufband, Boarding-Karte mit
+animiertem Score-Ring, fuenf Schritte, neun Funktionskarten, drei
+Praxisgeschichten mit Strichzeichnungen.
+
+`frontend/landing-entwurf-b.html` — „Cockpit": sehr hell mit dunklen Akzenten,
+zentrierter Hero mit Cockpit-Streifen, drei Leistungsspalten, Vergleichstabelle
+„ohne und mit", vier Praxisfaelle, Preisleiste.
+
+**Beide zeigen, was die Bestandsaufnahme als Luecke ergab** und heute nirgends
+auf der Landing steht: **Erbbaurecht** (kein Bewertungsanbieter nimmt den
+Parameter ueberhaupt entgegen), **Bilanz und GuV fuer die Immobilien-GmbH**,
+**Ueberfuehrung Privat → GmbH**, **MFH-Konfigurator je Einheit**, **Datenraum**,
+**Anlage V 2025**, **Beleg-Import**. Alle Zahlen sind belegt: 24 Kennzahlen,
+6 RND-Verfahren, 27 Gebaeudetypen, 190 Bauteile, 22 Bodenrichtwert-Portale,
+25 Spalten Bankexport.
+
+> **Dreimal dieselbe Falle an einem Tag:** Animationen, die zur Bedingung
+> dafuer werden, dass man etwas SIEHT. Erst das Erstflug-Fenster, dann die
+> Reveal-Abschnitte der Entwuerfe. Im Hintergrund-Tab feuert
+> `requestAnimationFrame` nicht und CSS-Uebergaenge starten nicht. **Regel:
+> Endzustand zuerst setzen, Animation ist Zugabe** — plus ein Zeitnetz, das
+> nach 1,6 s alles sichtbar macht.
