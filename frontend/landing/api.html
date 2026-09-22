@@ -166,7 +166,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
             <div class="uc"><div class="c"><h3>Objekte automatisiert anlegen</h3><p>Investments aus Tabelle, CRM oder Akquise-Tool direkt nach DealPilot.</p></div><div class="c"><h3>Bestand synchronisieren</h3><p>Mieten, Konditionen, Sanierungskosten per <code>PUT</code> spiegeln.</p></div><div class="c"><h3>Eigene Dashboards</h3><p>Objektdaten abrufen und ins eigene Reporting/BI speisen.</p></div><div class="c"><h3>Massen-Import</h3><p>Ganzen Bestand &uuml;bernehmen &mdash; Schleife, je ein <code>POST</code>.</p></div></div>
           </div>
           <div class="apsec" id="ap-start"><h2><span class="num">02</span> Schnellstart</h2>
-            <p class="lead">Basis-URL:</p><pre>https://app.dealpilot.junker-immobilien.io/api/v1</pre>
+            <p class="lead">Basis-URL:</p><pre>https://app.dealpilot.immo/api/v1</pre>
             <p>Key unter <b>Einstellungen &rarr; Account &amp; Sicherheit &rarr; DealPilot API</b> (einmalig gezeigt, <code>dpk_live_&hellip;</code>).</p>
             <pre><span class="c"># Objekte auflisten (Summaries, ?limit bis 500, ?offset)</span>
 curl -H <span class="s">"X-API-Key: dpk_live_KEY"</span> …/api/v1/objects?limit=100&amp;offset=0</pre>
