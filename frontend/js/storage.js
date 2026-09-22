@@ -1379,8 +1379,8 @@ async function renderSaved(opts) {
 
       /* v815-sb-filter: Mandanten-Switch rendern + Liste nach aktivem Mandanten filtern */
       try { if (window.DealPilotMandanten) { if (DealPilotMandanten.renderSidebarChips) DealPilotMandanten.renderSidebarChips(); if (DealPilotMandanten.filterByHalter) items = DealPilotMandanten.filterByHalter(items); } } catch (_e) {}
-      if (!items.length) { list.innerHTML = '<div class="sb-empty">Keine Objekte f\u00fcr diesen<br>Mandanten.</div>'; return; }
-      list.innerHTML = items.map(function(o) {
+      if (!items.length) { list.innerHTML = _addNewBtn() + '<div class="sb-empty">Keine Objekte f\u00fcr diesen<br>Mandanten.</div>'; return; }
+      list.innerHTML = _addNewBtn() + items.map(function(o) {
         // V63.26: KONSISTENTER Score-Pfad
         // Plan-Gate für Investor-Sternchen
         var hasDs2Feature = false;
@@ -1478,7 +1478,7 @@ async function renderSaved(opts) {
           dateUpdated: o.updated_at ? new Date(o.updated_at).toLocaleDateString('de-DE') : '',
           halter: _halterName(o.halter)
         });
-      }).join('') + _addNewBtn();
+      }).join('');   /* v1512: der Knopf steht jetzt OBEN */
       list.querySelectorAll('.sb-card').forEach(function(el) {
         el.addEventListener('click', function() {
           // V102: Burger-Menü auf Mobile sofort schließen wenn ein Objekt angeklickt wird
@@ -1489,7 +1489,7 @@ async function renderSaved(opts) {
         });
       });
     } catch (err) {
-      list.innerHTML = '<div class="sb-empty">⚠ Fehler: ' + err.message + '</div>' + _addNewBtn();
+      list.innerHTML = _addNewBtn() + '<div class="sb-empty">⚠ Fehler: ' + err.message + '</div>';
     }
   } else {
     // localStorage mode
@@ -1502,10 +1502,10 @@ async function renderSaved(opts) {
       }).sort().reverse();
 
     if (!keys.length) {
-      list.innerHTML = '<div class="sb-empty">Noch keine Objekte<br>gespeichert.</div>' + _addNewBtn();
+      list.innerHTML = _addNewBtn() + '<div class="sb-empty">Noch keine Objekte<br>gespeichert.</div>';
       return;
     }
-    list.innerHTML = keys.map(function(k) {
+    list.innerHTML = _addNewBtn() + keys.map(function(k) {
       var d = {};
       try { d = JSON.parse(localStorage.getItem(k) || '{}'); } catch(e) {}
       var photoSrc = null;
@@ -1550,7 +1550,7 @@ async function renderSaved(opts) {
         dateUpdated: d._at ? new Date(d._at).toLocaleDateString('de-DE') : '',
         halter: _halterName(d.halter || (d.data && d.data.halter))
       });
-    }).join('') + _addNewBtn();
+    }).join('');   /* v1512: der Knopf steht jetzt OBEN */
     list.querySelectorAll('.sb-card').forEach(function(el) {
       el.addEventListener('click', function() {
         // V102: Burger-Menü auf Mobile sofort schließen
@@ -1563,6 +1563,13 @@ async function renderSaved(opts) {
   }
 }
 
+/* v1512 · Marcel 22.09.2026: "wenn wir runterscrollen bei den Häusern, haben
+   wir Neues Objekt hinzufügen. Vielleicht machen wir das ganz nach oben, und
+   dann fängt's an mit den Bestandsimmobilien. Dann können wir nämlich ganz
+   oben die Schaltfläche Objekt anlegen wegmachen."
+   Gemessen: der Knopf stand bei y=1721, also erst nach allen Karten - man
+   musste durch das ganze Portfolio scrollen, um ein neues Objekt anzulegen.
+   Jetzt steht er vor der Liste, und die obere Schaltfläche ist weg. */
 function _addNewBtn() {
   return '<button class="sb-add-new" onclick="newObj()">+ Neues Objekt hinzufügen</button>';
 }

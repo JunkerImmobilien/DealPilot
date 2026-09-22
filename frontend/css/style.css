@@ -37896,3 +37896,36 @@ html[data-ui-theme="kanzlei"] body.dp-hybrid-rail :is(#hdr-score-mini,#hdr-compl
    (Unterkante 970). Die Spalte bekommt unten Luft. */
 html[data-ui-theme="kanzlei"] body.dp-hybrid-rail #dp-hybrid-aktionen{ padding-bottom:38px; }
 /* === /v1455 === */
+
+/* ─── v1512 · Marcel 22.09.2026: "im Hellmodus, wenn ich auf Aktionen
+   klicke, ist das Menü noch schwarz hinterlegt. Das sollte hell werden und
+   die Sachen in Schwarz."
+   Gemessen im Profil kanzlei: der Kasten ist bereits weiss, aber die
+   Einträge stehen in Gold #E8C964 darauf - Kontrast 1,62 : 1 bei nötigen
+   4,5. Lesbar war das nicht. Gold bleibt als Markierung des aktiven
+   Eintrags und beim Überfahren, der Text selbst wird Tinte. */
+:is(html[data-ui-theme="kontor"], html[data-ui-theme="panel"],
+   html[data-ui-theme="kanzlei"], html[data-ui-theme="boarding"])
+  .sb-actions-accordion .sb-act-item {
+  color: #2A2727 !important;
+}
+:is(html[data-ui-theme="kontor"], html[data-ui-theme="panel"],
+   html[data-ui-theme="kanzlei"], html[data-ui-theme="boarding"])
+  .sb-actions-accordion .sb-act-item:hover {
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent) !important;
+  color: #1a1a1a !important;
+}
+:is(html[data-ui-theme="kontor"], html[data-ui-theme="panel"],
+   html[data-ui-theme="kanzlei"], html[data-ui-theme="boarding"])
+  .sb-actions-accordion .sb-act-item.sb-act-active {
+  color: #1a1a1a !important;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 20%, transparent) !important;
+  font-weight: 600;
+}
+:is(html[data-ui-theme="kontor"], html[data-ui-theme="panel"],
+   html[data-ui-theme="kanzlei"], html[data-ui-theme="boarding"])
+  .sb-actions-accordion {
+  box-shadow: 0 -8px 28px rgba(0,0,0,0.14) !important;
+  border: 1px solid #E6E0D3;
+  border-radius: 10px;
+}

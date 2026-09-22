@@ -282,6 +282,29 @@
     if (!isFinite(Number(K.irr))) warnen.push('Kein interner Zinsfuss (IRR) - dafuer fehlen die Angaben zum Verkauf.');
     if (!(zahl(K.steuer) !== 0)) warnen.push('Keine Steuerwirkung gerechnet - Grenzsteuersatz und Abschreibung pruefen.');
 
+    /* v1511 · Marcel 22.09.2026: "es gibt doch die Standardfelder, die wir
+       ausfuellen muessen. Da haben wir doch einen Counter fuer, ob wir
+       vielleicht daran koppeln koennen."
+       Nachgesehen: es gibt FUENF Vollstaendigkeitszaehler nebeneinander -
+       DS2-KPIs (24), ReadyCheck-Grundfelder (15), Workflow-Bereiche (6) und
+       zweimal Quick-Check. Gekoppelt wird an den ReadyCheck: er heisst schon
+       'Bereit fuer die Bank?', fuehrt genau die Grundfelder, die eine Bank
+       sehen will, und dient bereits als Sperre fuer die Partner-Anfrage.
+       Eine SECHSTE Liste waere genau der Fehler, der hier schon fuenfmal
+       gemacht wurde.
+       Er sperrt nicht - fehlende Lage- oder Zustandsangaben machen das
+       Dokument nicht falsch, nur duenner. Gesperrt wird weiter nur, was das
+       Dokument seinen Zweck kostet. */
+    try {
+      if (window.DealPilotReadyCheck && typeof window.DealPilotReadyCheck.getData === 'function') {
+        var rc = window.DealPilotReadyCheck.getData();
+        if (rc && rc.total && rc.missing && rc.missing.length) {
+          warnen.push('Grundfelder für die Bank: ' + rc.filled + ' von ' + rc.total +
+            ' ausgefüllt. Es fehlen ' + rc.missing.map(function (m) { return m.name; }).join(', ') + '.');
+        }
+      }
+    } catch (e) {}
+
     return { ok: sperren.length === 0, sperren: sperren, warnen: warnen };
   };
 
