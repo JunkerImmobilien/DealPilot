@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- DealPilot Landing · v1531 -->
+<!DOCTYPE html><!-- DealPilot Landing · v1532 -->
 <html lang="de"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -76,10 +76,12 @@ header.fest{border-bottom-color:var(--linie);box-shadow:0 8px 30px rgba(34,30,25
 /* Hero */
 .hero{position:relative;background:var(--obsidian);color:#F6F3EC;overflow:hidden;
   min-height:640px;display:flex;align-items:center}
-.hero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.30;
-  filter:saturate(.75) contrast(1.05)}
+.hero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.62;
+  filter:saturate(.9) contrast(1.02);transform:scale(1.06);
+  animation:flugzug 34s ease-in-out infinite alternate}
+@keyframes flugzug{to{transform:scale(1.14) translateX(-1.5%)}}
 .hero .schleier{position:absolute;inset:0;
-  background:linear-gradient(100deg,rgba(8,8,7,.95) 0%,rgba(8,8,7,.82) 42%,rgba(8,8,7,.5) 100%)}
+  background:linear-gradient(100deg,rgba(8,8,7,.88) 0%,rgba(8,8,7,.66) 46%,rgba(8,8,7,.22) 100%)}
 .hero .raster{position:absolute;inset:0;opacity:.14;
   background-image:linear-gradient(rgba(201,168,76,.4) 1px,transparent 1px),
     linear-gradient(90deg,rgba(201,168,76,.4) 1px,transparent 1px);
@@ -112,15 +114,38 @@ header.fest{border-bottom-color:var(--linie);box-shadow:0 8px 30px rgba(34,30,25
 .hbeleg div b{display:block;font:600 26px/1 'Space Grotesk',sans-serif;color:var(--gold-hi)}
 .hbeleg div span{font:600 9px/1.4 'JetBrains Mono',monospace;letter-spacing:.12em;
   color:rgba(246,243,236,.42);display:block;margin-top:5px}
-.bk{background:rgba(18,16,9,.86);backdrop-filter:blur(8px);border:1px solid rgba(201,168,76,.28);
-  border-radius:17px;padding:25px 27px 23px;position:relative;overflow:hidden;
-  box-shadow:0 26px 70px rgba(0,0,0,.5);opacity:0;transform:translateY(22px);
-  animation:kartehoch 1s cubic-bezier(.22,1,.3,1) .35s forwards}
+.bk{background:#FFFFFF;border-radius:17px;padding:22px 24px 21px;position:relative;
+  overflow:hidden;color:#221E19;
+  box-shadow:0 30px 80px rgba(0,0,0,.45),0 0 0 1px rgba(201,168,76,.3);
+  opacity:0;transform:translateY(22px);
+  animation:kartehoch 1s cubic-bezier(.22,1,.3,1) .35s forwards,
+            schweben 7s ease-in-out 1.4s infinite}
+@keyframes schweben{0%,100%{margin-top:0}50%{margin-top:-9px}}
 @keyframes kartehoch{to{opacity:1;transform:none}}
 .bk::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
   background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#a8842a)}
-.bk-k{display:flex;justify-content:space-between;margin-bottom:17px;
-  font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.13em;color:rgba(232,204,122,.66)}
+.bk-k{display:flex;justify-content:space-between;margin-bottom:14px;
+  font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.13em;color:#A79C86}
+.bk .lbl{font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.11em;
+  text-transform:uppercase;color:#8E877C;margin-bottom:7px}
+.sc-z{display:flex;align-items:baseline;gap:5px;margin:2px 0 7px}
+.sc-z b{font:600 34px/1 'Space Grotesk',sans-serif;font-variant-numeric:tabular-nums;color:#3FA56C}
+.sc-z span{font-size:12px;color:#8E877C}
+.sc-z em{margin-left:auto;font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.06em;
+  text-transform:uppercase;color:#fff;background:#3FA56C;border-radius:999px;
+  padding:5px 9px;font-style:normal}
+.sc-bar{height:4px;border-radius:999px;background:#EFEBE3;overflow:hidden;margin-bottom:13px}
+.sc-bar i{display:block;height:100%;border-radius:999px;background:#3FA56C;width:0;
+  transition:width 1.7s cubic-bezier(.25,.9,.3,1)}
+.sc-be{display:grid;gap:6px;margin-bottom:14px}
+.sc-br{display:grid;grid-template-columns:1fr 52px 28px;align-items:center;gap:9px}
+.sc-br > span{font-size:11.5px;color:#6B6356;display:flex;align-items:baseline;gap:5px}
+.sc-br > span em{font:500 9.5px/1 'JetBrains Mono',monospace;color:#A79C86;font-style:normal}
+.sc-brbar{height:4px;border-radius:99px;background:#E9E4D8;overflow:hidden}
+.sc-brbar i{display:block;height:100%;border-radius:99px;width:0;
+  transition:width 1.4s cubic-bezier(.25,.9,.3,1)}
+.sc-br > b{font:600 11.5px/1 'JetBrains Mono',monospace;text-align:right;color:#221E19}
+.bk-tr{border-top:1px solid #EFEBE3;padding-top:11px;margin-top:2px}
 .ring{width:128px;height:128px;margin:2px auto 17px;border-radius:50%;position:relative;
   display:flex;align-items:center;justify-content:center;
   background:conic-gradient(var(--gold) 0 0,rgba(255,255,255,.07) 0 100%);
@@ -130,11 +155,9 @@ header.fest{border-bottom-color:var(--linie);box-shadow:0 8px 30px rgba(34,30,25
   color:var(--gold-hi);font-style:normal}
 .ring .lbl{position:absolute;bottom:20px;z-index:1;font:600 8px/1 'JetBrains Mono',monospace;
   letter-spacing:.14em;color:rgba(232,204,122,.6)}
-.bz{display:flex;justify-content:space-between;font-size:12.6px;padding:7px 0;
-  border-bottom:1px solid rgba(255,255,255,.06);color:rgba(246,243,236,.64)}
-.bz:last-child{border:0}
-.bz b{color:#F6F3EC;font-family:'JetBrains Mono',monospace;font-size:12.6px}
-.bz b.gr{color:#6FCB95}
+.bz{display:flex;justify-content:space-between;font-size:12.4px;padding:5.5px 0;color:#6B6356}
+.bz b{color:#221E19;font-family:'JetBrains Mono',monospace;font-size:12.4px}
+.bz b.gr{color:#2E8455}
 
 .lauf{background:var(--nacht);border-top:1px solid rgba(201,168,76,.13);
   border-bottom:1px solid rgba(201,168,76,.13);overflow:hidden;
@@ -163,6 +186,14 @@ section{padding:88px 0}
   .rv{opacity:1;transform:none;transition:none}
   .lauf-in,.hero .raster{animation:none}
   .hero h1 .zeile i,.hero .lead,.hero-btn,.hbeleg,.bk{transform:none;opacity:1;animation:none}}
+
+/* Vertrauensband */
+.vb{padding:0;background:var(--obsidian);border-bottom:1px solid rgba(201,168,76,.15)}
+.vb-in{display:grid;grid-template-columns:repeat(4,1fr);gap:26px;padding:22px 0}
+.vbz{display:flex;gap:12px;align-items:center;color:rgba(246,243,236,.72)}
+.vbz .ico{width:21px;height:21px;color:var(--gold);flex:none}
+.vbz b{display:block;font:600 13.5px/1.3 Inter,sans-serif;color:#F6F3EC}
+.vbz span{display:block;font-size:11.8px;color:rgba(246,243,236,.45);margin-top:2px}
 
 /* Geschichte */
 .story{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center}
@@ -217,6 +248,23 @@ section{padding:88px 0}
 .ab p{margin:0;font-size:12.8px;color:var(--ink-2);line-height:1.52}
 .ab .zeit{display:inline-block;margin-top:9px;font:600 9.5px/1 'JetBrains Mono',monospace;
   background:rgba(201,168,76,.13);color:var(--gold-lo);padding:5px 9px;border-radius:99px}
+
+/* Stimmen */
+.zg{font-variant-numeric:tabular-nums}
+.stimmen{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.st{background:#fff;border:1px solid var(--linie);border-radius:15px;padding:24px 24px 20px;
+  display:flex;flex-direction:column;gap:17px;transition:.28s cubic-bezier(.3,.9,.3,1)}
+.st:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(34,30,25,.12);border-color:var(--gold)}
+.stn{flex:1;position:relative}
+.stn::before{content:'"';position:absolute;top:-22px;left:-6px;font:600 60px/1 'Cormorant Garamond',serif;
+  color:var(--gold);opacity:.22}
+.stn p{margin:0;font:500 16px/1.6 'Cormorant Garamond',serif;font-size:17.5px;color:var(--ink);position:relative}
+.sta{display:flex;gap:12px;align-items:center;padding-top:15px;border-top:1px solid var(--linie)}
+.sti{width:38px;height:38px;border-radius:50%;background:var(--obsidian);color:var(--gold-hi);
+  display:flex;align-items:center;justify-content:center;flex:none;
+  font:600 12.5px/1 'JetBrains Mono',monospace}
+.sta b{display:block;font-size:13.4px;font-weight:600}
+.sta span{display:block;font-size:12.2px;color:var(--ink-3);margin-top:1px}
 
 /* Matrix */
 .mtx{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--linie);
@@ -311,6 +359,7 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
 @media(max-width:1080px){
   .hero-in,.story{grid-template-columns:1fr;gap:38px}
   .module{grid-template-columns:repeat(3,1fr)}
+  .stimmen,.vb-in{grid-template-columns:repeat(2,1fr)}
   .ablauf{grid-template-columns:repeat(2,1fr);gap:30px 0}
   .ablauf::before,.ablauf::after{display:none}
   .tarife{grid-template-columns:repeat(2,1fr)}
@@ -320,7 +369,7 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
   .mtx{font-size:12px}
 }
 @media(max-width:640px){
-  .module,.tarife,.ablauf{grid-template-columns:1fr}
+  .module,.tarife,.ablauf,.stimmen,.vb-in{grid-template-columns:1fr}
   .tb-r{display:none}
 }
 </style>
@@ -370,6 +419,8 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
         <li><a href="#module"><svg class="ico si"><use href="#i-bank"/></svg><span><b>Ausgeben</b><span>Bankunterlage, Finanzamt-PDF, Datenraum</span></span></a></li>
       </ul></li>
     <li><a href="#ablauf">Ablauf</a></li>
+    <li><a href="sicherheit.html">Sicherheit</a></li>
+    <li><a href="fragen.html">Fragen</a></li>
     <li><a href="#matrix">Vergleich</a></li>
     <li><a href="#preise">Preise<i class="caret"></i></a>
       <ul class="sub">
@@ -407,12 +458,27 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
     </div>
     <div class="bk">
       <div class="bk-k"><span>BOARDING PASS · 2026-1036</span><span>RINTELN</span></div>
-      <div class="ring" id="ring"><i id="ringzahl">0</i><span class="lbl">DEAL SCORE</span></div>
-      <div class="bz"><span>Bruttorendite</span><b>7,30 %</b></div>
-      <div class="bz"><span>Cashflow / Monat</span><b class="gr">+ 1.240 €</b></div>
-      <div class="bz"><span>Kapitaldienstdeckung</span><b>1,42</b></div>
-      <div class="bz"><span>Gebäudeanteil (BMF)</span><b>85,6 %</b></div>
-      <div class="bz"><span>Restnutzungsdauer</span><b>17 – 26 J.</b></div>
+      <div class="lbl">Investor Deal Score</div>
+      <div class="sc-z"><b id="sc-zahl">0</b><span>/ 100</span><em>GUT</em></div>
+      <div class="sc-bar"><i data-breit="82"></i></div>
+      <div class="sc-be">
+        <div class="sc-br"><span>Rendite<em>6/6</em></span>
+          <div class="sc-brbar"><i data-breit="88" style="background:#2E8455"></i></div><b>88</b></div>
+        <div class="sc-br"><span>Finanzierung<em>5/5</em></span>
+          <div class="sc-brbar"><i data-breit="79" style="background:#3FA56C"></i></div><b>79</b></div>
+        <div class="sc-br"><span>Risiko<em>4/5</em></span>
+          <div class="sc-brbar"><i data-breit="74" style="background:#3FA56C"></i></div><b>74</b></div>
+        <div class="sc-br"><span>Lage<em>4/4</em></span>
+          <div class="sc-brbar"><i data-breit="91" style="background:#2E8455"></i></div><b>91</b></div>
+        <div class="sc-br"><span>Upside<em>3/4</em></span>
+          <div class="sc-brbar"><i data-breit="68" style="background:#C9A84C"></i></div><b>68</b></div>
+      </div>
+      <div class="bk-tr">
+        <div class="bz"><span>Bruttorendite</span><b>7,30 %</b></div>
+        <div class="bz"><span>Cashflow / Monat</span><b class="gr">+ 1.240 €</b></div>
+        <div class="bz"><span>Kapitaldienstdeckung</span><b>1,42</b></div>
+        <div class="bz"><span>Restnutzungsdauer</span><b>17 – 26 J.</b></div>
+      </div>
     </div>
   </div>
 </div>
@@ -425,6 +491,18 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
   <span>◆ BODENRICHTWERT AUS 22 AMTLICHEN PORTALEN</span>
   <span>◆ BANKEXPORT MIT 25 SPALTEN</span>
 </div></div>
+
+<!-- ══ VERTRAUEN ══ -->
+<section class="vb"><div class="w"><div class="vb-in">
+  <div class="vbz"><svg class="ico"><use href="#i-schild"/></svg>
+    <div><b>Server in Deutschland</b><span>Hetzner, Nürnberg &amp; Falkenstein</span></div></div>
+  <div class="vbz"><svg class="ico"><use href="#i-beleg"/></svg>
+    <div><b>DSGVO-konform</b><span>Auftragsverarbeitung auf Wunsch</span></div></div>
+  <div class="vbz"><svg class="ico"><use href="#i-schild"/></svg>
+    <div><b>Kein Weiterverkauf</b><span>Ihre Objektdaten bleiben Ihre</span></div></div>
+  <div class="vbz"><svg class="ico"><use href="#i-winkel"/></svg>
+    <div><b>Aus der Gutachtenpraxis</b><span>DESAG-zertifizierter Sachverständiger</span></div></div>
+</div></div></section>
 
 <!-- ══ GESCHICHTE ══ -->
 <section><div class="w">
@@ -544,6 +622,34 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
       <div class="mod"><span class="nr">20</span><div class="mi"><svg class="ico"><use href="#i-wolke"/></svg></div>
         <h4>Datenraum &amp; Cloud</h4><p>Dokumente je Objekt mit Checkliste, automatisch gespeichert, überall verfügbar.</p></div>
     </div>
+  </div>
+</div></section>
+
+<!-- ══ STIMMEN ══
+     ACHTUNG MARCEL: die drei Stimmen sind PLATZHALTER. Erfundene Kundenurteile
+     sind wettbewerbswidrig und abmahnfaehig (§ 5 UWG) - sie muessen durch echte
+     Zitate mit echten Personen ersetzt werden, bevor die Seite live geht.
+     Der Zaehler daneben ist echt: er kommt aus /api/v1/public/stats. -->
+<section class="sec-creme" id="stimmen"><div class="w">
+  <div class="kz mitte rv"><div class="kick mitte">Was Nutzer sagen</div>
+    <h2><em class="zg" id="st-zahl">865</em> Investoren <em>an Bord.</em></h2>
+    <p>Privat-Investoren, Makler und Steuerberater rechnen ihre Objekte hier durch.</p></div>
+  <div class="stimmen">
+    <div class="st rv"><div class="stn">
+      <p>„Ich habe den Steuerberater nicht mehr fragen müssen, wie sich der Kaufpreis
+         aufteilt — das PDF lag dem Finanzamt bei und wurde ohne Rückfrage übernommen."</p></div>
+      <div class="sta"><span class="sti">MS</span><div><b>Platzhalter · echtes Zitat folgt</b>
+        <span>Privat-Investor, Ostwestfalen</span></div></div></div>
+    <div class="st rv"><div class="stn">
+      <p>„Vorher saß ich pro Objekt zwei Stunden in Excel. Heute weiß ich in einer
+         Minute, ob ich überhaupt hinfahre."</p></div>
+      <div class="sta"><span class="sti">TK</span><div><b>Platzhalter · echtes Zitat folgt</b>
+        <span>Kapitalanleger, 11 Einheiten</span></div></div></div>
+    <div class="st rv"><div class="stn">
+      <p>„Die Bank hat die Unterlage so genommen, wie sie aus dem Programm kam.
+         Das hatte ich vorher noch nie."</p></div>
+      <div class="sta"><span class="sti">AB</span><div><b>Platzhalter · echtes Zitat folgt</b>
+        <span>Maklerbüro, Niedersachsen</span></div></div></div>
   </div>
 </div></section>
 
@@ -718,7 +824,8 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
       <p style="margin:14px 0 0;max-width:330px">Entstanden aus der Gutachtenpraxis eines
         DESAG-zertifizierten Sachverständigen — weil dieselben Zahlen jeden Tag gebraucht werden.</p></div>
     <div><h4>Produkt</h4><a href="#module">Module</a><a href="#ablauf">Ablauf</a>
-      <a href="#matrix">Vergleich</a><a href="#preise">Preise</a><a href="#">API</a></div>
+      <a href="#matrix">Vergleich</a><a href="#preise">Preise</a>
+      <a href="sicherheit.html">Datenschutz &amp; Server</a><a href="fragen.html">Häufige Fragen</a></div>
     <div><h4>Junker Immobilien</h4><a href="https://junker-immobilien.io">Sachverständigenbüro</a>
       <a href="https://junker-immobilien.io">Gutachten</a><a href="https://junker-immobilien.io">Über mich</a></div>
     <div><h4>Rechtliches</h4><a href="/impressum.html">Impressum</a>
@@ -766,11 +873,13 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
     es.forEach(function(e){ if(e.isIntersecting){ strahl.classList.add('los'); o.disconnect(); }});
   },{threshold:.3}).observe(strahl); }
 
-  var ring=document.getElementById('ring'), rz=document.getElementById('ringzahl'), ziel=82;
+  /* v1532 · Die Balken laufen erst los, wenn sie sichtbar sind - im
+     Hintergrund-Tab startet keine CSS-Transition, deshalb setzt das
+     Sicherheitsnetz unten sie am Ende hart auf Endbreite. */
   setTimeout(function(){
-    ring.style.background='conic-gradient(#C9A84C 0 '+ziel+'%,rgba(255,255,255,.07) '+ziel+'% 100%)';
-    hoch(rz,ziel);
-  },900);
+    document.querySelectorAll('[data-breit]').forEach(function(i){ i.style.width=i.dataset.breit+'%'; });
+    hoch(document.getElementById('sc-zahl'),82);
+  },850);
 
   var zeit='m';
   function preise(){
@@ -801,9 +910,21 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
     .then(function(r){ return r.ok?r.json():null; })
     .then(function(d){
       if(!d||!d.registrierte_nutzer) return;
-      var e=document.getElementById('hz-nutzer');
-      if(e) e.textContent=d.registrierte_nutzer.toLocaleString('de-DE');
+      ['hz-nutzer','st-zahl'].forEach(function(id){
+        var e=document.getElementById(id);
+        if(e) e.textContent=d.registrierte_nutzer.toLocaleString('de-DE');
+      });
     }).catch(function(){});
+
+  /* Der Hero-Grund zieht beim Rollen leicht nach - reine Zugabe, nie
+     Bedingung dafuer, dass etwas sichtbar wird. */
+  var vid=document.querySelector('.hero video');
+  if(vid && !matchMedia('(prefers-reduced-motion:reduce)').matches){
+    addEventListener('scroll',function(){
+      if(scrollY>820) return;
+      vid.style.transform='scale(1.08) translateY('+(scrollY*0.13)+'px)';
+    },{passive:true});
+  }
 
   /* Eine Animation darf nie Bedingung fürs Sehen sein. */
   setTimeout(function(){
@@ -813,6 +934,8 @@ footer a:hover{color:var(--gold-hi);transform:translateX(3px)}
       z.textContent=parseInt(z.dataset.zahl,10).toLocaleString('de-DE');
     });
     if(strahl) strahl.classList.add('los');
+    document.querySelectorAll('[data-breit]').forEach(function(i){ i.style.width=i.dataset.breit+'%'; });
+    var z=document.getElementById('sc-zahl'); if(z && z.textContent==='0') z.textContent='82';
   },1800);
 })();
 </script>
