@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DealPilot-Landing — fünf Ideen im Junker-Stil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --obsidian:#050505; --nacht:#14120E;
+    --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+    --creme:#F5F2EA; --creme-2:#EBE6DA; --karte:#FBF6E9;
+    --ink:#2A2727; --ink-2:#6B6356; --ink-3:#8A8272;
+    --gruen:#3FA56C; --rot:#B8625C;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--creme);color:var(--ink);
+    font:15.5px/1.6 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+
+  /* ── Kopf der Vorschau ── */
+  .vk{background:#fff;border-bottom:1px solid #E6E0D3;padding:26px 34px 22px}
+  .vk h1{margin:0 0 7px;font:600 25px/1.25 'Space Grotesk',sans-serif}
+  .vk p{margin:0;max-width:820px;color:var(--ink-2);font-size:14px}
+  .befunde{margin-top:15px;display:grid;gap:7px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));max-width:1150px}
+  .bf{background:#FDF8F2;border:1px solid #EDD9C4;border-left:3px solid var(--rot);
+    border-radius:0 7px 7px 0;padding:8px 11px;font-size:12.4px;line-height:1.45}
+  .bf b{color:var(--ink)}
+  .sprung{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+  .sprung a{font:600 11.5px/1 'JetBrains Mono',monospace;letter-spacing:.05em;text-decoration:none;
+    background:var(--ink);color:#fff;padding:8px 13px;border-radius:99px}
+  .sprung a:hover{background:var(--gold-lo)}
+
+  /* ── Rahmen je Idee ── */
+  .idee{margin:30px auto;max-width:1180px;background:#fff;border:1px solid #E6E0D3;
+    border-radius:16px;overflow:hidden;box-shadow:0 2px 14px rgba(42,39,39,.05)}
+  .ik{padding:18px 26px 15px;border-bottom:1px solid #F0ECE3;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+  .ik .nr{font:700 34px/1 'Space Grotesk',sans-serif;color:var(--gold);min-width:44px}
+  .ik h2{margin:0 0 4px;font:600 19px/1.3 'Space Grotesk',sans-serif}
+  .ik p{margin:0;font-size:13.4px;color:var(--ink-2);max-width:780px}
+  .demo{padding:0}
+  .hinweis{padding:14px 26px 18px;background:#FCFBF8;border-top:1px solid #F0ECE3;
+    font-size:12.6px;color:var(--ink-2);line-height:1.55}
+  .hinweis b{color:var(--ink)}
+  .aufwand{display:inline-block;margin-top:7px;font:600 10.5px/1 'JetBrains Mono',monospace;
+    letter-spacing:.06em;text-transform:uppercase;background:#F2EFE7;border:1px solid #E6E0D3;
+    border-radius:99px;padding:5px 10px;color:var(--ink-3)}
+
+  /* ══ Idee 1 · Hero im Junker-Stil ══ */
+  .hero{background:var(--obsidian);color:#F6F3EC;padding:0;position:relative;overflow:hidden}
+  .laufband{background:#0C0B09;border-bottom:1px solid rgba(201,168,76,.22);overflow:hidden;
+    font:600 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.14em;color:rgba(232,204,122,.85)}
+  .lb-inner{display:inline-flex;gap:38px;padding:9px 0;white-space:nowrap;animation:lb 26s linear infinite}
+  @keyframes lb{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .hnav{display:flex;align-items:center;gap:22px;padding:15px 30px;border-bottom:1px solid rgba(255,255,255,.07)}
+  .hlogo{font:700 16px/1 'Space Grotesk',sans-serif;letter-spacing:-.3px}
+  .hlogo span{color:var(--gold)}
+  .hnav nav{display:flex;gap:17px;margin-left:auto;font-size:13px}
+  .hnav nav a{color:rgba(246,243,236,.72);text-decoration:none}
+  .hnav nav a:hover{color:var(--gold-hi)}
+  .btn-login{border:1px solid rgba(201,168,76,.5);color:var(--gold-hi);border-radius:99px;
+    padding:7px 15px;font-size:12.5px;text-decoration:none}
+  .btn-login:hover{background:rgba(201,168,76,.13)}
+  .btn-start{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#1a1509;
+    border-radius:99px;padding:8px 17px;font-weight:600;font-size:12.5px;text-decoration:none}
+  .hbody{display:grid;grid-template-columns:1.15fr .85fr;gap:34px;padding:52px 30px 46px;align-items:center}
+  .kicker{font:600 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.16em;color:var(--gold);margin-bottom:14px}
+  .hbody h3{margin:0 0 16px;font:600 44px/1.08 'Space Grotesk',sans-serif;letter-spacing:-1.2px}
+  .hbody h3 em{font-style:normal;color:var(--gold)}
+  .hbody .lead{margin:0 0 22px;font-size:15px;color:rgba(246,243,236,.74);max-width:530px}
+  .hbtns{display:flex;gap:11px;flex-wrap:wrap;margin-bottom:26px}
+  .zb{display:flex;gap:26px;flex-wrap:wrap;padding-top:20px;border-top:1px solid rgba(255,255,255,.1)}
+  .zb div b{display:block;font:600 27px/1 'Space Grotesk',sans-serif;color:var(--gold-hi)}
+  .zb div span{font:600 9.5px/1.3 'JetBrains Mono',monospace;letter-spacing:.12em;
+    color:rgba(246,243,236,.45);display:block;margin-top:5px}
+  .riss{border:1px solid rgba(201,168,76,.3);border-radius:12px;padding:20px;background:rgba(201,168,76,.045)}
+  .riss .rk{font:600 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.14em;color:rgba(232,204,122,.7);margin-bottom:12px}
+  .ring{width:118px;height:118px;margin:6px auto 12px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font:700 38px/1 'Space Grotesk',sans-serif;color:var(--gold-hi);
+    background:conic-gradient(var(--gold) 0 82%, rgba(255,255,255,.09) 82% 100%);position:relative}
+  .ring::after{content:'';position:absolute;inset:9px;border-radius:50%;background:#0A0908}
+  .ring i{position:relative;z-index:1;font-style:normal}
+  .rz{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;
+    border-bottom:1px solid rgba(255,255,255,.07);color:rgba(246,243,236,.66)}
+  .rz b{color:#F6F3EC;font-family:'JetBrains Mono',monospace;font-size:12px}
+
+  /* ══ Idee 2 · Preisleiste direkt unter dem Hero ══ */
+  .preisband{background:var(--creme-2);padding:26px 30px 30px}
+  .pb-kopf{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+  .pb-kopf h3{margin:0;font:600 21px/1.2 'Space Grotesk',sans-serif}
+  .pb-kopf span{font-size:13px;color:var(--ink-2)}
+  .tarife{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .tarif{background:#fff;border:1px solid #E4DCC8;border-radius:11px;padding:15px 16px 17px;position:relative}
+  .tarif.best{border:1.5px solid var(--gold);box-shadow:0 5px 18px rgba(201,168,76,.18)}
+  .tarif .tn{font:600 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase}
+  .tarif .tp{font:600 27px/1 'Space Grotesk',sans-serif;margin:9px 0 2px}
+  .tarif .tp small{font-size:12.5px;color:var(--ink-3);font-weight:400}
+  .tarif ul{margin:11px 0 14px;padding-left:15px;font-size:12.4px;color:var(--ink-2);line-height:1.6}
+  .tarif a{display:block;text-align:center;background:var(--ink);color:#fff;text-decoration:none;
+    border-radius:8px;padding:8px;font-size:12.8px;font-weight:600}
+  .tarif.best a{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#1a1509}
+  .best-pill{position:absolute;top:-9px;right:13px;background:var(--gold);color:#1a1509;
+    font:700 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;padding:4px 8px;border-radius:99px}
+
+  /* ══ Idee 3 · Erstflug-Einblendung ══ */
+  .ef-buehne{background:var(--creme);padding:30px;position:relative;min-height:290px}
+  .ef-karte{position:absolute;left:50%;bottom:26px;transform:translateX(-50%) translateY(14px);
+    opacity:0;background:var(--nacht);color:#F6F3EC;border:1px solid rgba(201,168,76,.4);
+    border-radius:13px;padding:16px 20px;display:flex;gap:15px;align-items:center;max-width:530px;
+    box-shadow:0 14px 42px rgba(0,0,0,.3);transition:.5s cubic-bezier(.3,.9,.3,1)}
+  .ef-karte.an{opacity:1;transform:translateX(-50%) translateY(0)}
+  .ef-badge{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#1a1509;
+    font:700 11px/1 'JetBrains Mono',monospace;letter-spacing:.1em;padding:8px 11px;border-radius:8px}
+  .ef-karte p{margin:0;font-size:13px;line-height:1.5;color:rgba(246,243,236,.82)}
+  .ef-karte p b{color:var(--gold-hi)}
+  .ef-zu{margin-left:auto;background:none;border:0;color:rgba(246,243,236,.4);font-size:17px;cursor:pointer}
+  .ef-knopf{background:var(--ink);color:#fff;border:0;border-radius:8px;padding:9px 15px;
+    font-size:13px;font-weight:600;cursor:pointer}
+
+  /* ══ Idee 4 · Bewegung ══ */
+  .bw{padding:30px;background:#fff}
+  .rev{opacity:0;transform:translateY(20px);transition:.65s cubic-bezier(.3,.9,.3,1)}
+  .rev.da{opacity:1;transform:none}
+  .zeile{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .zk{background:var(--creme);border:1px solid #E6E0D3;border-radius:11px;padding:18px}
+  .zk b{display:block;font:600 31px/1 'Space Grotesk',sans-serif;color:var(--gold-lo)}
+  .zk span{font-size:12.4px;color:var(--ink-2);display:block;margin-top:6px}
+
+  /* ══ Idee 5 · Kundenzähler ══ */
+  .kz{background:var(--nacht);color:#F6F3EC;padding:30px}
+  .kz-in{display:flex;gap:30px;align-items:center;flex-wrap:wrap;justify-content:center;text-align:center}
+  .kz-in div b{display:block;font:600 36px/1 'Space Grotesk',sans-serif;color:var(--gold-hi)}
+  .kz-in div span{font:600 9.5px/1.4 'JetBrains Mono',monospace;letter-spacing:.13em;
+    color:rgba(246,243,236,.45);display:block;margin-top:6px}
+  .kz-quelle{margin-top:18px;text-align:center;font-size:11.7px;color:rgba(246,243,236,.38)}
+
+  @media(max-width:980px){
+    .hbody{grid-template-columns:1fr}
+    .tarife{grid-template-columns:repeat(2,1fr)}
+    .zeile{grid-template-columns:1fr}
+  }
+</style>
+</head><body>
+
+<div class="vk">
+  <h1>DealPilot-Landing — fünf Ideen im Stil deiner Sachverständigen-Seite</h1>
+  <p>Gemessen auf junker-immobilien.io: <b>Space Grotesk</b> auf warmem Creme <b>#F5F2EA</b>, dunkler
+     Hero mit goldener Hervorhebung, technische Strichzeichnung, Laufband oben, Zahlenband
+     „20 Jahre · 200 Objekte" — und <b>21 Keyframe-Animationen</b>. Die DealPilot-Landing hat davon
+     wenig. Unten fünf Ideen, jede als anfassbares Stück.</p>
+
+  <div class="befunde">
+    <div class="bf"><b>Kein Login.</b> Null Treffer auf „login/anmelden/einloggen" in der ganzen
+      Landing. Alle 13 Knöpfe führen auf <code>?register=1</code>. Ein Bestandskunde findet keinen Weg hinein.</div>
+    <div class="bf"><b>Preise 5.544 px tief.</b> Der Preisblock ist der siebte Abschnitt — rund sechs
+      Bildschirmhöhen unter dem Anfang. Die Zahl steht so im Repo.</div>
+    <div class="bf"><b>Erstflug ist abgeschaltet.</b> <code>ANZEIGE_AKTIV = false</code>. Sichtbar nur
+      für Besucher über <code>/erstflug</code>. Ein Eingabefeld gibt es nirgends.</div>
+    <div class="bf"><b>Kein Kundenzähler</b> und kein öffentlicher Endpunkt dafür. Die Landing-Domain
+      lässt heute nur drei API-Pfade durch.</div>
+    <div class="bf"><b>Zwei App-Domains.</b> 16 Links zeigen auf <code>app.dealpilot.junker-immobilien.io</code>,
+      die Seite läuft auf <code>dealpilot.immo</code>. Beide antworten — aber es ist eine zu viel.</div>
+    <div class="bf"><b>1,16 MB</b> Seitengröße, davon viel inline-Base64 und ein toter
+      App-Preis-Baustein (Zeilen 2780–3197), der auf der Landing nie greift.</div>
+  </div>
+
+  <div class="sprung">
+    <a href="#i1">1 · Hero</a><a href="#i2">2 · Preise nach oben</a><a href="#i3">3 · Erstflug</a>
+    <a href="#i4">4 · Bewegung</a><a href="#i5">5 · Kundenzähler</a>
+  </div>
+</div>
+
+<!-- ══════════ IDEE 1 ══════════ -->
+<section class="idee" id="i1">
+  <div class="ik"><div class="nr">1</div><div>
+    <h2>Hero im Junker-Stil — mit Login und Vertrauenszahlen</h2>
+    <p>Dunkle Fläche, ein Satz mit goldener Hervorhebung, rechts der Deal-Score als technische
+       Zeichnung. Oben das Laufband deiner Seite. Und: ein <b>Anmelden</b>-Knopf, den es heute nicht gibt.</p>
+  </div></div>
+  <div class="demo">
+    <div class="hero">
+      <div class="laufband"><div class="lb-inner" id="lb">
+        <span>◆ BANKFÄHIGE UNTERLAGEN IN 30 SEKUNDEN</span><span>◆ 24 KPIs · INVESTOR DEAL SCORE</span>
+        <span>◆ KAUFPREISAUFTEILUNG NACH BMF-ARBEITSHILFE</span><span>◆ RESTNUTZUNGSDAUER NACH ANLAGE 2</span>
+        <span>◆ MARKTBERICHT AUS AMTLICHEN QUELLEN</span>
+      </div></div>
+      <div class="hnav">
+        <div class="hlogo">Deal<span>Pilot</span></div>
+        <nav><a href="#">Funktionen</a><a href="#">Preise</a><a href="#">Marktbericht</a><a href="#">API</a></nav>
+        <a class="btn-login" href="#">Anmelden</a>
+        <a class="btn-start" href="#">Erstflug starten →</a>
+      </div>
+      <div class="hbody">
+        <div>
+          <div class="kicker">◆ COCKPIT FÜR IMMOBILIEN-INVESTMENTS</div>
+          <h3>Erst die Zahlen.<br>Dann die <em>Unterschrift.</em></h3>
+          <p class="lead">Kaufpreisaufteilung, Restnutzungsdauer, Cashflow über 30 Jahre und die
+             Bankunterlage — aus einer Eingabe. Gerechnet nach amtlichen Quellen, nicht nach Gefühl.</p>
+          <div class="hbtns">
+            <a class="btn-start" href="#">Kostenlos starten →</a>
+            <a class="btn-login" href="#">Beispielbericht ansehen</a>
+          </div>
+          <div class="zb">
+            <div><b>30 Sek.</b><span>BIS ZUR BEWERTUNG</span></div>
+            <div><b>24</b><span>KENNZAHLEN</span></div>
+            <div><b>30 J.</b><span>PROJEKTION</span></div>
+            <div><b id="kz-hero">312</b><span>AKTIVE INVESTOREN</span></div>
+          </div>
+        </div>
+        <div class="riss">
+          <div class="rk">BOARDING PASS · 2026-1036</div>
+          <div class="ring"><i>82</i></div>
+          <div class="rz"><span>Bruttorendite</span><b>7,30 %</b></div>
+          <div class="rz"><span>Cashflow / Monat</span><b>+ 1.240 €</b></div>
+          <div class="rz"><span>Kapitaldienstdeckung</span><b>1,42</b></div>
+          <div class="rz" style="border:0"><span>Gebäudeanteil</span><b>85,6 %</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hinweis"><b>Was das löst:</b> der fehlende Login, der fehlende Vertrauensbeweis und ein
+    Hero, der aussieht wie deine Gutachterseite — dieselbe Schrift, dieselbe Goldkante, dasselbe
+    Laufband.<br>
+    <span class="aufwand">Aufwand: ein Tag · nur Landing, keine App-Änderung</span></div>
+</section>
+
+<!-- ══════════ IDEE 2 ══════════ -->
+<section class="idee" id="i2">
+  <div class="ik"><div class="nr">2</div><div>
+    <h2>Preise direkt unter den Hero</h2>
+    <p>Heute liegen sie 5.544 px tief. Eine kompakte Leiste gleich unter dem Hero zeigt alle vier
+       Pakete; die ausführliche Matrix bleibt unten für die, die vergleichen wollen.</p>
+  </div></div>
+  <div class="demo"><div class="preisband">
+    <div class="pb-kopf"><h3>Vier Pakete. Ein Cockpit.</h3>
+      <span>Monatlich kündbar · jährlich rund 17 % günstiger</span></div>
+    <div class="tarife">
+      <div class="tarif"><div class="tn">Free</div><div class="tp">0 €<small> /Monat</small></div>
+        <ul><li>1 Objekt</li><li>1 Bewertung/Monat</li><li>PDF mit Wasserzeichen</li></ul>
+        <a href="#">Testflug starten</a></div>
+      <div class="tarif"><div class="tn">Starter</div><div class="tp">19,99 €<small> /Monat</small></div>
+        <ul><li>5 Objekte</li><li>5 Bewertungen/Monat</li><li>PDF ohne Wasserzeichen</li></ul>
+        <a href="#">Auswählen</a></div>
+      <div class="tarif best"><div class="best-pill">BESTSELLER</div><div class="tn">Investor</div>
+        <div class="tp">34,99 €<small> /Monat</small></div>
+        <ul><li>25 Objekte</li><li>Investor Deal Score</li><li>Bankexport · Live-Zinsen</li></ul>
+        <a href="#">Auswählen</a></div>
+      <div class="tarif"><div class="tn">Pro</div><div class="tp">49,99 €<small> /Monat</small></div>
+        <ul><li>unbegrenzt Objekte</li><li>Premium-PDF</li><li>bevorzugter Support</li></ul>
+        <a href="#">Auswählen</a></div>
+    </div>
+  </div></div>
+  <div class="hinweis"><b>Was das löst:</b> Wer wissen will, was es kostet, sieht es sofort — statt
+    sechs Bildschirme zu scrollen. Die Zahlen stimmen mit dem heutigen Stand überein.<br>
+    <span class="aufwand">Aufwand: ein halber Tag · Block verschieben, Matrix bleibt</span></div>
+</section>
+
+<!-- ══════════ IDEE 3 ══════════ -->
+<section class="idee" id="i3">
+  <div class="ik"><div class="nr">3</div><div>
+    <h2>Erstflug poppt auf — statt still oben zu stehen</h2>
+    <p>Nach ein paar Sekunden oder beim Erreichen der Preise fährt der Hinweis von unten herein.
+       Wegklickbar, merkt sich das. Drück den Knopf, dann siehst du es.</p>
+  </div></div>
+  <div class="demo"><div class="ef-buehne" id="efb">
+    <button class="ef-knopf" onclick="efZeigen()">Einblendung vorführen</button>
+    <p style="margin-top:14px;font-size:13px;color:var(--ink-2);max-width:620px">
+      Heute steht der Hinweis nur als Balken ganz oben — und nur für Besucher, die über
+      <code>/erstflug</code> kommen. Für alle anderen ist er ganz aus
+      (<code>ANZEIGE_AKTIV = false</code>).</p>
+    <div class="ef-karte" id="efk">
+      <div class="ef-badge">ERSTFLUG</div>
+      <p><b>15 % dauerhaft</b> auf jedes Paket — der Code ist hinterlegt, du musst nichts eingeben.
+         Gilt für deinen ersten Flug und bleibt, solange du fliegst.</p>
+      <button class="ef-zu" onclick="document.getElementById('efk').classList.remove('an')">×</button>
+    </div>
+  </div></div>
+  <div class="hinweis"><b>Zu klären, bevor ich das scharf schalte:</b> Du hattest den Rabatt am
+    07.09.2026 ausdrücklich von der Seite genommen — „bitte nicht auf der Seite mehr angeben". Diese
+    Idee dreht das um. Sag mir, ob das jetzt gelten soll; der Schalter ist eine Zeile.<br>
+    <span class="aufwand">Aufwand: zwei Stunden · Schalter plus Einblendung</span></div>
+</section>
+
+<!-- ══════════ IDEE 4 ══════════ -->
+<section class="idee" id="i4">
+  <div class="ik"><div class="nr">4</div><div>
+    <h2>Bewegung beim Scrollen</h2>
+    <p>Deine Gutachterseite hat 21 Animationen, die Landing hat punktuell vier. Abschnitte fahren
+       beim Erscheinen sanft herein, Zahlen zählen hoch. Scroll durch diesen Block.</p>
+  </div></div>
+  <div class="demo"><div class="bw">
+    <div class="zeile">
+      <div class="zk rev"><b data-zahl="1247">0</b><span>Objekte analysiert</span></div>
+      <div class="zk rev"><b data-zahl="312">0</b><span>aktive Investoren</span></div>
+      <div class="zk rev"><b data-zahl="89">0</b><span>Bankunterlagen erstellt</span></div>
+    </div>
+  </div></div>
+  <div class="hinweis"><b>Was das löst:</b> Die Seite wirkt heute statisch — die Abschnitte stehen
+    einfach da. Ein Reveal-Mechanismus fehlt vollständig (null Treffer auf <code>.in-view</code> und
+    Verwandte).<br>
+    <span class="aufwand">Aufwand: drei Stunden · ein Beobachter, eine CSS-Klasse</span></div>
+</section>
+
+<!-- ══════════ IDEE 5 ══════════ -->
+<section class="idee" id="i5">
+  <div class="ik"><div class="nr">5</div><div>
+    <h2>Kundenzähler — echt, aus dem Admin gepflegt</h2>
+    <p>Ein Band unter dem Hero mit Zahlen, die stimmen. Gepflegt wird es dort, wo schon die
+       Rabattcodes gepflegt werden.</p>
+  </div></div>
+  <div class="demo"><div class="kz">
+    <div class="kz-in">
+      <div><b>312</b><span>AKTIVE INVESTOREN</span></div>
+      <div><b>1.247</b><span>OBJEKTE ANALYSIERT</span></div>
+      <div><b>89</b><span>BANKUNTERLAGEN</span></div>
+      <div><b>6</b><span>BUNDESLÄNDER IM REGISTER</span></div>
+    </div>
+    <div class="kz-quelle">Stand: täglich aktualisiert · gepflegt im Admin unter „Landing"</div>
+  </div></div>
+  <div class="hinweis"><b>Was dafür gebaut werden muss</b> — und warum ich das nicht nebenbei
+    gemacht habe: Es gibt heute <b>keinen öffentlichen Endpunkt</b> für solche Zahlen, und die
+    Landing-Domain lässt nur drei API-Pfade durch (<code>reseller-inquiries</code>, <code>track</code>,
+    <code>market-rates</code>). Nötig sind also: ein Endpunkt <code>/api/v1/public/stats</code>, ein
+    Eintrag im Caddyfile und eine Pflegemaske im Admin. Der Admin-Bereich „Landing" wäre der Platz —
+    dort liegen schon Besucher und Funnel.<br>
+    <b>Wichtige Frage:</b> echte Zahlen aus der Datenbank oder von Hand gepflegt? Automatisch ist
+    ehrlicher, aber am Anfang stehen dort kleine Zahlen. Von Hand ist ein Versprechen, das jemand
+    einhalten muss.<br>
+    <span class="aufwand">Aufwand: ein Tag · Backend + Caddy + Admin-Maske</span></div>
+</section>
+
+<script>
+  /* Laufband verdoppeln, damit es nahtlos läuft */
+  var lb = document.getElementById('lb');
+  lb.innerHTML += lb.innerHTML;
+
+  function efZeigen(){
+    var k = document.getElementById('efk');
+    k.classList.remove('an');
+    setTimeout(function(){ k.classList.add('an'); }, 60);
+  }
+
+  /* Reveal + Zahlen hochzählen */
+  var beob = new IntersectionObserver(function(eintraege){
+    eintraege.forEach(function(e){
+      if (!e.isIntersecting) return;
+      e.target.classList.add('da');
+      var z = e.target.querySelector('[data-zahl]');
+      if (z && !z.dataset.fertig) {
+        z.dataset.fertig = '1';
+        var ziel = parseInt(z.dataset.zahl, 10), start = performance.now();
+        (function lauf(t){
+          var p = Math.min(1, (t - start) / 1100);
+          var e2 = 1 - Math.pow(1 - p, 3);
+          z.textContent = Math.round(ziel * e2).toLocaleString('de-DE');
+          if (p < 1) requestAnimationFrame(lauf);
+        })(start);
+      }
+      beob.unobserve(e.target);
+    });
+  }, { threshold: .3 });
+  document.querySelectorAll('.rev').forEach(function(el, i){
+    el.style.transitionDelay = (i * 90) + 'ms';
+    beob.observe(el);
+  });
+</script>
+</body></html>
