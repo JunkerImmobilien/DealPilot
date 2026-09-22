@@ -38041,3 +38041,17 @@ html[data-ui-theme="kanzlei"] body.dp-hybrid-rail #dp-hybrid-aktionen{ padding-b
 :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body #dp-pf-lead .lbl{
   color:#8A8272 !important;
 }
+/* v1529: gemessen - der dunkle Block heisst .dp-kg-panel (KLASSE), v1527
+   zielte auf die ID und traf nichts. Der Kontingent-Block blieb #141210
+   mitten im hellen Arbeitsbereich. */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .dp-kg-panel,
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .dp-pf-lead{
+  background:#FFFFFF !important;
+  border:1px solid #E8E2D6 !important;
+  color:#1C1A16 !important;
+  box-shadow:0 2px 10px rgba(34,30,25,.05) !important;
+}
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .dp-kg-panel *:not(b):not(strong),
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .dp-pf-lead *:not(b):not(strong){ color:#4A443B !important; }
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .dp-kg-panel b,
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .dp-pf-lead b{ color:#1C1A16 !important; }
