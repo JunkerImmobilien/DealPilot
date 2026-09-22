@@ -37960,3 +37960,84 @@ html[data-ui-theme="kanzlei"] body.dp-hybrid-rail #dp-hybrid-aktionen{ padding-b
 
 /* Die aufklappbare Score-Karte im Reiter Kennzahlen entfaellt dort ebenso. */
 :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body.dp-hybrid-rail #dealscore2-card{ display:none !important; }
+/* ═══ v1527 · Marcel 22.09.2026 ═══════════════════════════════════════
+   "In sich wirkt aber alles viel zu hell mit Gold. Bitte die Schriften in
+    den Tab-Leisten/Header richtig weiss wie rechts in der Leiste, wo
+    Aktionen steht. Dann ist auch das Menue noch schwarz hinterlegt, die
+    Icons muessen dann auch schwarz werden."
+
+   Gemessen im Profil kanzlei:
+     Reiterleiste  Grund #FBFAF7 (Creme), Beschriftung #99803A (GOLD)
+     Aktionsspalte Grund #FFFFFF, Schrift #1C1A16 - so soll es sein
+     Aktionsmenue  Grund weiss, aber ALLE 12 Icons #C9A84C (Gold)
+     Seitenleiste  Suche, Sortierung, Quick-Check, Marktbericht: Gold
+
+   Gold ist ein AKZENT, kein Fliesstext. Wenn Beschriftungen, Symbole und
+   Hinweise alle golden sind, hebt sich nichts mehr ab - und genau das
+   liest sich als "zu hell". Gold bleibt deshalb dort, wo es etwas sagt:
+   aktiver Reiter, Marke, Hervorhebung. Alles andere wird Tinte.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── Reiterleiste: weiss wie die Aktionsspalte, Schrift Tinte ─────── */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body nav.tabs{
+  background:#FFFFFF !important;
+  border-bottom:1px solid #E8E2D6 !important;
+}
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body nav.tabs .tab,
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body nav.tabs .st-tab{
+  color:#4A443B !important;
+}
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body nav.tabs .tab:hover,
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body nav.tabs .st-tab:hover{
+  color:#1C1A16 !important;
+}
+/* Der aktive Reiter darf Gold tragen - dort sagt es etwas. */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body nav.tabs .tab.active,
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body nav.tabs .st-tab.active{
+  color:#1C1A16 !important;
+  font-weight:600;
+  box-shadow:inset 0 -2px 0 var(--wl-c9a84c,#C9A84C);
+}
+
+/* ── Symbole: Tinte statt Gold ────────────────────────────────────── */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .sb-actions-accordion svg,
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .sb-neu-ico,
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .sb-search-box svg,
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .sb-sort-btn svg{
+  stroke:#4A443B !important;
+  color:#4A443B !important;
+}
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .sb-actions-accordion .sb-act-item:hover svg,
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .sb-actions-accordion .sb-act-item.sb-act-active svg,
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .sb-sort-btn.active svg{
+  stroke:#1C1A16 !important;
+  color:#1C1A16 !important;
+}
+
+/* ── Der dunkle Knopf in der Aktionsspalte passt nicht ins Helle ─── */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body #dp-hybrid-aktionen button.dunkel{
+  background:#FFFFFF !important;
+  color:#1C1A16 !important;
+  border:1px solid #D8D2C4 !important;
+  font-weight:600;
+}
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body #dp-hybrid-aktionen button.dunkel:hover{
+  border-color:var(--wl-c9a84c,#C9A84C) !important;
+  background:#FCFAF5 !important;
+}
+
+/* ── Dunkle Panels im Hellmodus aufhellen ─────────────────────────── */
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body #dp-kg-panel,
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body #dp-pf-lead{
+  background:#FFFFFF !important;
+  border:1px solid #E8E2D6 !important;
+  color:#1C1A16 !important;
+}
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body #dp-kg-panel *,
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body #dp-pf-lead *{
+  color:inherit;
+}
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body #dp-kg-panel .lbl,
+:is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body #dp-pf-lead .lbl{
+  color:#8A8272 !important;
+}

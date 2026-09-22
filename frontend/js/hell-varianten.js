@@ -81,7 +81,10 @@
 
   function start() {
     if (!istHell()) return;
-    anwenden(lies(SCHLUESSEL, ''));
+    /* v1527 · Marcel: "zu den Kartenvarianten würde ich zu ohne Creme
+       tendieren". Also ist v4 die Vorauswahl - umschalten bleibt möglich,
+       und wer schon etwas gewählt hat, behält seine Wahl. */
+    anwenden(lies(SCHLUESSEL, null) === null ? 'v4' : lies(SCHLUESSEL, ''));
     var an = lies(SCHALTER_AN, '0') === '1'
       || /[?&]karten=1/.test(location.search);
     if (/[?&]karten=1/.test(location.search)) schreib(SCHALTER_AN, '1');
