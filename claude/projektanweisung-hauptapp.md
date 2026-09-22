@@ -17742,3 +17742,29 @@ Keine Leiche sind dagegen `rnd-calc.js` (Master-Kern 3.1.0), `rnd-gnd-table.js`,
 > gehoert — dieses Modul ist in der App nirgends eingebunden. Das ist der
 > groesste Widerspruch zwischen Konzept und Produkt und eine
 > Produktentscheidung, keine Reparatur.
+
+## Rollout-Journal · 22.09.2026 (2) — RND im Hausstil, Hellmodus, altes Modul raus
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1509 | `c8c338f` | **Keine feste Zahl mehr** — die Ergebnisanzeige zeigt die Spanne. Dazu der Abgleich mit dem Rechenkern: `calcAll` kennt `kernsaniert` (hebt im Punktraster die Quote von 0,70 auf 0,90), der Wizard hat die Kernsanierung als Auswahl und zaehlt sie bei den Punkten voll — **den Schalter aber nie uebergeben**. Ein kernsaniertes Haus rechnete wie ein normal modernisiertes. Schritt 8 wird jetzt vorbefuellt (Name, E-Mail, Erstellungsort) |
+| v1510 | `c8c338f` | **`rnd-ui.js` ausgebaut.** Script-Tag, Weiche in `submitExpert` und **221 Zeilen** toter Code (`openRND`, `_hideRNDExtras`, `_updateRNDHeadline`, `_rndDealData`, `submitRNDFromModule`) samt Exporten. Die Datei liegt unter `docs/abgeloest/rnd-ui.js` |
+| v1511 | `2c41471` | Die Pruefung vor dem Investment-PDF nennt den Stand des ReadyCheck („Bereit fuer die Bank?", 15 Grundfelder) samt fehlender Felder — als Warnung. **Es gibt fuenf Vollstaendigkeitszaehler nebeneinander** (DS2-KPIs 24, ReadyCheck 15, Workflow 6, zweimal Quick-Check); gekoppelt wird an den, der schon so heisst und schon als Bank-Gate dient |
+| v1512 | `2c41471` | „+ Neues Objekt hinzufuegen" stand bei **y=1721**, hinter allen Karten — jetzt bei y=174 ueber dem Portfolio; die obere Schaltflaeche ist weg, Quick-Check und Marktbericht tragen wieder ihre Beschriftung. Aktionsmenue im Hellmodus: Kasten war weiss, Eintraege aber Gold `#E8C964` darauf — **Kontrast 1,62 : 1** bei noetigen 4,5. Jetzt Tinte, gemessen **14,81 : 1** |
+| v1513 / b | `2035188`, `e664623` | RND-Wizard im Hausstil: **920 × 748 → 1143 × 915**, Radius 14 → 12, Grund Weiss → `#FDFCFA`, Schrittpunkte **28 → 18 px**, Felder zweispaltig ab 900 px. Das Ergebnis trug **58 Zeilen Inline-Stil** mit dunkler Flaeche, fuenf animierten Sternchen, einer von 0,15 auf 1 zoomenden 110-px-Zahl und Puls-Effekt — jetzt helle Karte, Goldlinie, keine Animation |
+| v1514 | `ec5be59` | Sechs Moeglichkeiten fuer die Objektkarten im Hellmodus als Vorschau: `frontend/design-hellmodus.html` |
+
+> **Warum „zu viel Creme" stimmt, in Zahlen:** Seite `#F7F5F1`, Seitenleiste
+> `#FBFAF7`, **Karte `#F5EDD8`** (kraeftiger Sandton), Rahmen `#E4D6AE`, **kein
+> Schatten**. Drei Cremetoene uebereinander — deshalb heben sich die Karten
+> nicht ab. Die Vorschau aendert genau diese drei Werte, sechsmal verschieden.
+
+> **Drei Anlaeufe fuer einen Block, zweimal zurueckgenommen — beide Male meine
+> eigene Falle.** Der erste Ersatz griff **146 statt 58 Zeilen** und nahm eine
+> Tabellenzeile mit (`git checkout --`). Der zweite zerlegte im Heredoc die
+> Anfuehrungszeichen um 'JetBrains Mono' — dieselbe Backslash-Falle, die in
+> der Memory steht. Der dritte Anlauf schrieb die Schriftnamen **ohne**
+> Anfuehrungszeichen (CSS erlaubt das) und kam ohne ein einziges Escape aus.
+> **Und beim Schreiben DIESES Eintrags ist sie ein drittes Mal zugeschlagen** —
+> der Satz ueber die Falle enthielt sie selbst. Lehre: Apostrophe in erzeugtem
+> Text nie tippen, sondern `String.fromCharCode(39)` benutzen.
