@@ -81,7 +81,16 @@ html[data-dp-karte="v4"] body .sb-card:hover{
   border-color:#C6CBD3 !important; box-shadow:0 4px 12px rgba(20,25,35,.1) !important;
 }
 html[data-dp-karte="v4"] body header.hdr{ background:#fff !important; border-bottom-color:#E2E5E9 !important; }
-html[data-dp-karte="v4"] body nav.tabs{ background:#F7F8FA !important; border-bottom-color:#E2E5E9 !important; }
+/* ═══ v1538 · die Reiterleiste ══════════════════════════════════════════
+   Marcel am 22.09.2026: "Bitte die Schriften in den Tab-Leisten/Header
+   richtig weiss wie rechts in der Leiste, wo Aktionen steht."
+   Gemessen: nav.tabs stand auf #FBFAF7 (--uv-chrome), nicht auf dem Wert
+   der Variante. Ursache war nicht die Farbe, sondern die Spezifitaet -
+   siehe der Kommentar am Selektor. v4 traegt jetzt Weiss wie die
+   Aktionsspalte (#FFFFFF), damit beide Leisten denselben Grund haben. */
+html[data-dp-karte="v4"] body header.hdr.has-v64-score + nav.tabs.tabs, 
+html[data-dp-karte="v4"] body nav.tabs.tabs{
+  background:#FFFFFF !important; border-bottom:1px solid #E2E5E9 !important; }
 html[data-dp-karte="v4"] body .card,
 html[data-dp-karte="v4"] body .panel{ background:#fff !important; border-color:#E2E5E9 !important; }
 
@@ -119,8 +128,15 @@ html[data-dp-karte="v2"] body header.hdr{
   background:#fff !important; box-shadow:inset 0 -2px 0 rgba(201,168,76,.35);
 }
 html[data-dp-karte="v6"] body header.hdr{ background:#fff !important; box-shadow:none !important; }
-html[data-dp-karte="v1"] body nav.tabs,
-html[data-dp-karte="v2"] body nav.tabs,
-html[data-dp-karte="v5"] body nav.tabs{ background:#FBFAF7 !important; }
-html[data-dp-karte="v3"] body nav.tabs{ background:#F2F0EB !important; border-bottom:1.5px solid #D8D2C4 !important; }
-html[data-dp-karte="v6"] body nav.tabs{ background:#fff !important; border-bottom:1px solid #EDE9E0 !important; }
+html[data-dp-karte="v1"] body header.hdr.has-v64-score + nav.tabs.tabs, 
+html[data-dp-karte="v1"] body nav.tabs.tabs,
+html[data-dp-karte="v2"] body header.hdr.has-v64-score + nav.tabs.tabs, 
+html[data-dp-karte="v2"] body nav.tabs.tabs,
+html[data-dp-karte="v5"] body header.hdr.has-v64-score + nav.tabs.tabs, 
+html[data-dp-karte="v5"] body nav.tabs.tabs{ background:#FBFAF7 !important; }
+html[data-dp-karte="v3"] body header.hdr.has-v64-score + nav.tabs.tabs, 
+html[data-dp-karte="v3"] body nav.tabs.tabs{
+  background:#F2F0EB !important; border-bottom:1.5px solid #D8D2C4 !important; }
+html[data-dp-karte="v6"] body header.hdr.has-v64-score + nav.tabs.tabs, 
+html[data-dp-karte="v6"] body nav.tabs.tabs{
+  background:#fff !important; border-bottom:1px solid #EDE9E0 !important; }
