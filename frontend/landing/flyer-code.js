@@ -283,6 +283,13 @@
     var neu = ausQuery(location.search) || ausPfad(location.pathname);
     var code = neu ? merken(neu) : holen();
 
+    /* v1522 · Marcel 22.09.2026: wer ueber /erstflug hereinkommt, bekommt
+       ein Fenster zum Annehmen statt eines stillen Balkens. Weil die
+       Adresszeile gleich aufgeraeumt wird, merkt sich dieser Schalter den
+       Zugang fuer erstflug-popup.js - sonst waere der Weg nicht mehr
+       erkennbar, sobald der Pfad weg ist. */
+    if (neu) { try { sessionStorage.setItem('dp_flyer_frisch', '1'); } catch (e) {} }
+
     if (neu) adresseAufraeumen();
 
     if (code) {
@@ -290,7 +297,12 @@
       linkeAnreichern(code);
       /* Der Balken nur auf der LANDING. In der App sitzt der Nutzer schon
          im Cockpit; dort fuehrt die Preisansicht den Rabatt selbst. */
-      if (!global.Auth) balkenZeigen(code);
+      /* v1522: Auf der Landing uebernimmt das Fenster (erstflug-popup.js).
+         Der Balken bleibt fuer alle anderen Faelle - etwa wenn jemand den
+         Code aus einem frueheren Besuch mitbringt und KEIN Fenster bekommt. */
+      var frisch = false;
+      try { frisch = sessionStorage.getItem('dp_flyer_frisch') === '1'; } catch (e) {}
+      if (!global.Auth && !frisch) balkenZeigen(code);
       /* Nachzuegler: die Landing baut Teile ihrer Navigation per JS. */
       setTimeout(function () { linkeAnreichern(code); }, 1200);
     }
