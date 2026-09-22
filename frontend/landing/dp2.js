@@ -142,12 +142,17 @@
   document.querySelectorAll('[data-zaehl]').forEach(function (e) { zio.observe(e); });
 
   /* ── Nutzerzahl vom eigenen Host ─────────────────────────────────── */
+  /* v1545: Die Zahl steht fertig im HTML. Kommt sie frisch herein, wird
+     sie ERSETZT und laeuft noch einmal hoch - dann sieht man, dass sie
+     lebt. Faellt der Abruf aus, bleibt der letzte bekannte Stand stehen. */
   fetch('/api/v1/public/stats')
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (d) {
       if (!d || !d.registrierte_nutzer) return;
       document.querySelectorAll('[data-nutzer]').forEach(function (e) {
-        e.textContent = d.registrierte_nutzer.toLocaleString('de-DE');
+        var neu = d.registrierte_nutzer;
+        if (e.hasAttribute('data-zaehl') && document.visibilityState === 'visible') hoch(e, neu);
+        else e.textContent = neu.toLocaleString('de-DE');
       });
     })
     .catch(function () {});

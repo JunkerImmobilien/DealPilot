@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- DealPilot Landing · v1540 -->
+<!DOCTYPE html><!-- DealPilot Landing · v1546 -->
 <html lang="de"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -7,9 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="dp2.css?v=v1541">
-<link rel="stylesheet" href="dp2-hero.css?v=v1541">
-<link rel="stylesheet" href="dp2-teile.css?v=v1540">
+<link rel="stylesheet" href="dp2.css?v=v1546">
+<link rel="stylesheet" href="dp2-hero.css?v=v1546">
+<link rel="stylesheet" href="dp2-teile.css?v=v1546">
 </head><body>
 
 <svg style="display:none" aria-hidden="true">
@@ -80,6 +80,8 @@
 
 <!-- ══ HERO ══════════════════════════════════════════════════════════ -->
 <section class="hero">
+  <video class="hero-bg" autoplay muted loop playsinline preload="metadata"
+         poster="assets/bild/hero.jpg" src="assets/video/dp-hero-flug.mp4"></video>
   <div class="hero-grid-bg"></div>
   <div class="hero-orb a"></div><div class="hero-orb b"></div>
   <div class="hero-veil"></div>
@@ -98,10 +100,10 @@
         <a class="btn-l" href="#workflow"><svg class="ico" style="width:13px;height:13px;color:var(--gdh)"><use href="#i-pfeil"/></svg>So funktioniert's</a>
       </div>
       <div class="hbeleg">
-        <div><b>30 s</b><span>VOM EXPOSÉ ZUR BEWERTUNG</span></div>
+        <div><b><span data-zaehl>30</span> s</b><span>VOM EXPOSÉ ZUR BEWERTUNG</span></div>
         <div><b data-zaehl>24</b><span>KPIs HINTER JEDEM SCORE</span></div>
-        <div><b>15 J.</b><span>CASHFLOW-PROJEKTION</span></div>
-        <div><b>100 %</b><span>BANKFÄHIGE UNTERLAGEN</span></div>
+        <div><b><span data-zaehl>19</span></b><span>MODULE AN BORD</span></div>
+        <div><b><span data-zaehl data-nutzer>866</span></b><span>REGISTRIERTE NUTZER</span></div>
       </div>
     </div>
 
@@ -147,6 +149,40 @@
   <span>◆ SERVER IN DEUTSCHLAND · DSGVO-KONFORM</span>
 </div></div>
 
+<!-- ══ VERTRAUEN — direkt unter dem Laufband, wie in der Fassung davor ══ -->
+<div class="tband"><div class="wrap"><div class="tband-in">
+  <div><svg class="ico"><use href="#i-server"/></svg>
+    <div><b>Server in Deutschland</b><span>Hosting bei Hetzner · DSGVO-konform</span></div></div>
+  <div><svg class="ico"><use href="#i-pokal"/></svg>
+    <div><b>Aus der Gutachtenpraxis</b><span>DESAG-zertifizierter Sachverständiger</span></div></div>
+  <div><svg class="ico"><use href="#i-schild"/></svg>
+    <div><b>Ihre Daten bleiben Ihre</b><span>Kein Weiterverkauf, keine Profilbildung</span></div></div>
+  <div><svg class="ico"><use href="#i-globus"/></svg>
+    <div><b>Made in Germany</b><span>Entwickelt in Nordrhein-Westfalen</span></div></div>
+</div></div></div>
+
+<!-- ══ WAS DEALPILOT MACHT ═══════════════════════════════════════════════
+     Marcel am 22.09.2026: "Nach dem Hero-Bereich muss der Kunde auch
+     verstehen, was DealPilot kann und macht - in einem Satz und in ein
+     paar kurzen Punkten." ══════════════════════════════════════════════ -->
+<section class="sec eng" id="was"><div class="wrap">
+  <div class="satz rv">
+    <div class="eye">In einem Satz</div>
+    <p class="gross">DealPilot rechnet eine Immobilie vollständig durch — vom Exposé über
+      Finanzierung und Steuer bis zur Unterlage, die die Bank annimmt.</p>
+  </div>
+  <div class="vier rv">
+    <div><span class="n">01</span><b>Erfassen statt abtippen</b>
+      <p>Exposé hochladen, diktieren oder Belege scannen. Die Werte landen in den Feldern.</p></div>
+    <div><span class="n">02</span><b>Rechnen statt schätzen</b>
+      <p>Cashflow, DSCR, Steuerwirkung und 15 Jahre Projektion — aus einer Eingabe.</p></div>
+    <div><span class="n">03</span><b>Belegen statt behaupten</b>
+      <p>Jede Zahl mit Quelle: BMF-Arbeitshilfe, ImmoWertV, Bodenrichtwert, Bundesbank.</p></div>
+    <div><span class="n">04</span><b>Ausgeben statt basteln</b>
+      <p>Investment-Case als PDF, Bankexport mit 25 Spalten, Mappe fürs Finanzamt.</p></div>
+  </div>
+</div></section>
+
 <!-- ══ WILLKOMMEN ════════════════════════════════════════════════════ -->
 <div class="board-band">
   <span class="perf-edge"></span>
@@ -187,12 +223,24 @@
 </div></section>
 
 <!-- ══ MODULE ════════════════════════════════════════════════════════ -->
-<section class="sec sec-dark" id="features"><div class="wrap">
+<section class="sec sec-dark mit-bild" id="features">
+  <img class="sec-bild schwach" src="assets/bild/bank.jpg" alt="" loading="lazy">
+  <div class="wrap">
   <div class="head rv"><div class="eye">Funktionsumfang</div>
     <h2>Jeder Bereich ein <span class="ac">Boarding-Pass.</span></h2>
     <p>Das Werkzeug, das wir bei Junker Immobilien selbst täglich für unsere Investments
       und Beratungen nutzen — sauber getrennt, mit Abrisskante.</p></div>
-  <div class="bpg" id="bpGrid"></div>
+  <div class="bpslide">
+    <div class="bpslide-vp"><div class="bpg" id="bpGrid"></div></div>
+    <div class="bpslide-nav">
+      <div class="bpslide-bar"><i id="bpBar"></i></div>
+      <div class="bpslide-z"><span id="bpZahl">1–4</span> von 19</div>
+      <div class="stx-arr">
+        <button class="stx-a" id="bpPrev" aria-label="Zurück">‹</button>
+        <button class="stx-a" id="bpNext" aria-label="Weiter">›</button>
+      </div>
+    </div>
+  </div>
   <p style="margin:30px 0 0;text-align:center">
     <a class="btn-l" href="leistungsumfang.html">Jedes Modul im Detail — der volle Leistungsumfang
       <svg class="ico" style="width:14px;height:14px"><use href="#i-pfeil"/></svg></a></p>
@@ -210,34 +258,25 @@
     <div class="cond-r">
       <div class="cond-band">◆ Indikative Konditionen nach Zinsbindung</div>
       <div class="cond-g" id="condG">
-        <div class="cond-c"><div class="zb">5 JAHRE</div><span class="bd">INDIKATIV</span>
-          <div class="zs">3,59 %</div><div class="er">Pfandbrief 2,59 % + Marge 1,00 %</div></div>
-        <div class="cond-c"><div class="zb">10 JAHRE</div><span class="bd">INDIKATIV</span>
-          <div class="zs">3,93 %</div><div class="er">Pfandbrief 2,93 % + Marge 1,00 %</div></div>
-        <div class="cond-c"><div class="zb">15 JAHRE</div><span class="bd">INDIKATIV</span>
-          <div class="zs">4,17 %</div><div class="er">Pfandbrief 3,17 % + Marge 1,00 %</div></div>
-        <div class="cond-c"><div class="zb">20 JAHRE</div><span class="bd">INDIKATIV</span>
-          <div class="zs">4,31 %</div><div class="er">Pfandbrief 3,31 % + Marge 1,00 %</div></div>
+        <div class="cond-c"><div class="zb">5 JAHRE</div><span class="bd">LIVE</span>
+          <div class="zs">3,98 %</div><div class="er">Pfandbrief 3,68 % + Marge 0,30 %</div></div>
+        <div class="cond-c"><div class="zb">10 JAHRE</div><span class="bd">LIVE</span>
+          <div class="zs">4,18 %</div><div class="er">Pfandbrief 3,88 % + Marge 0,30 %</div></div>
+        <div class="cond-c"><div class="zb">15 JAHRE</div><span class="bd">LIVE</span>
+          <div class="zs">4,29 %</div><div class="er">Pfandbrief 3,99 % + Marge 0,30 %</div></div>
+        <div class="cond-c"><div class="zb">20 JAHRE</div><span class="bd">LIVE</span>
+          <div class="zs">4,35 %</div><div class="er">Pfandbrief 4,05 % + Marge 0,30 %</div></div>
       </div>
-      <div class="cond-foot"><span class="live">● Live · Bundesbank</span> · Stand Feb 2026 ·
+      <div class="cond-foot"><span class="live">● Live · Deutsche Bundesbank</span> · Stand Sep 2026 ·
         indikative Schätzung, kein Bankangebot · keine Finanzierungsberatung (§ 34c GewO)</div>
     </div>
   </div>
 </div></section>
 
-<!-- ══ VERTRAUEN ═════════════════════════════════════════════════════ -->
-<section class="sec eng"><div class="wrap">
-  <div class="trust rv">
-    <div><svg class="ico"><use href="#i-globus"/></svg><div><b>Made in Germany</b><span>Entwickelt in NRW</span></div></div>
-    <div><svg class="ico"><use href="#i-server"/></svg><div><b>Server in Deutschland</b><span>Hosting bei Hetzner</span></div></div>
-    <div><svg class="ico"><use href="#i-schild"/></svg><div><b>DSGVO-konform</b><span>Daten bleiben in der EU</span></div></div>
-    <div><svg class="ico"><use href="#i-schloss"/></svg><div><b>SSL-verschlüsselt</b><span>TLS auf allen Wegen</span></div></div>
-    <div><svg class="ico"><use href="#i-pokal"/></svg><div><b>Sachverständigen-Methodik</b><span>DESAG-zertifizierte Expertise</span></div></div>
-  </div>
-</div></section>
-
 <!-- ══ STORIES ═══════════════════════════════════════════════════════ -->
-<section class="sec sec-dark" id="stories"><div class="wrap">
+<section class="sec sec-dark mit-bild" id="stories">
+  <img class="sec-bild" src="assets/bild/stories.jpg" alt="" loading="lazy">
+  <div class="wrap">
   <div class="head rv"><div class="eye">Aus dem Investor-Alltag</div>
     <h2>Geschichten, die <span class="ac">jeder Investor kennt.</span></h2></div>
   <div class="stx-vp rv"><div class="stx-track" id="stxTrack"></div></div>
@@ -454,6 +493,10 @@
     <div class="plogo"><img src="assets/partner/christian-sperling.png" alt="Christian Sperling"></div>
     <div class="plogo"><img src="assets/partner/junker-immobilien.png" alt="Junker Immobilien"></div>
   </div></div>
+  <figure class="bildzeile rv">
+    <img src="assets/bild/haus.jpg" alt="Mehrfamilienhaus in einer deutschen Wohnstraße" loading="lazy">
+    <figcaption>Worum es geht: ein Bestandsobjekt, ehrlich gerechnet.</figcaption>
+  </figure>
   <div class="blatt g4 rv" style="margin-top:34px">
     <div class="zieh"><div class="mlbl">AMTLICH</div><h4 class="kt" style="margin-top:9px">BORIS</h4>
       <p class="kb">Bodenrichtwerte aus den amtlichen Portalen aller 16 Länder.</p></div>
@@ -505,8 +548,8 @@
   </div>
 </div></footer>
 
-<script src="dp2-daten.js?v=v1540"></script>
-<script src="dp2-inhalt.js?v=v1540"></script>
-<script src="dp2.js?v=v1540"></script>
+<script src="dp2-daten.js?v=v1546"></script>
+<script src="dp2-inhalt.js?v=v1546"></script>
+<script src="dp2.js?v=v1546"></script>
 <script src="erstflug-popup.js?v=v1522b"></script>
 </body></html>
