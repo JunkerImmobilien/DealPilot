@@ -1,0 +1,145 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   dp2-buehne.css · v1566 · Die Inszenierung je Phase
+   ───────────────────────────────────────────────────────────────────────
+   Marcel am 23.09.2026: "Beim Erfassen ein Mikrofon, was sich bewegt,
+   wie aus der DealPilot-App. Das muss visuell fliessend uebergehen,
+   ein paar Sachen aufpoppen. Also das muss richtig geil animieren."
+
+   Jede der vier Phasen bekommt ein eigenes kleines Schauspiel neben dem
+   Text. Das Mikrofon ist aus der App uebernommen - dieselben Masse und
+   dieselbe Ringzeit wie in voice-import.js (Z.261-266):
+     Mikro 110 px, Runway-Verlauf, Ringe 150 px
+     viRing 2,6 s von scale(.8)/opacity .5 auf scale(2.4)/opacity 0
+     drei Ringe, versetzt um 0 / 0,9 / 1,8 s
+   Hier etwas kleiner, weil daneben Text steht.
+
+   Alles laeuft nur, wenn die Buehne sichtbar ist (.ab-b.on) - eine
+   Animation im verborgenen Panel kostet Strom und zeigt nichts.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.ab-b{display:none}
+/* Drei Kinder, zwei Spalten: links Text und Ergebnisse untereinander,
+   rechts die Szene ueber beide Zeilen. So bleibt das Markup einfach -
+   die Ergebnisse muessen nicht in den Textblock hineingeschachtelt
+   werden, nur damit sie an der richtigen Stelle landen. */
+.ab-b.on{display:grid;grid-template-columns:1.25fr .75fr;
+  grid-template-rows:auto auto;gap:22px 34px;align-items:start}
+.ab-links{grid-column:1;grid-row:1}
+.ab-b.on > .ab-erg{grid-column:1;grid-row:2;margin-top:0}
+.ab-szene{grid-column:2;grid-row:1 / 3;align-self:stretch;height:auto;min-height:270px}
+.ab-links{min-width:0}
+.ab-szene{position:relative;height:270px;display:flex;align-items:center;
+  justify-content:center;border:1px solid var(--line);background:rgba(255,255,255,.02);
+  overflow:hidden}
+.ab-szene::before{content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(232,204,122,.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(232,204,122,.07) 1px,transparent 1px);
+  background-size:28px 28px}
+
+/* ══ 1 · ERFASSEN — das Mikrofon aus der App ═══════════════════════════ */
+.sz-mic{position:relative;width:86px;height:86px;border-radius:50%;
+  background:var(--runway);display:grid;place-items:center;z-index:3;
+  box-shadow:0 14px 40px rgba(201,168,76,.35),inset 0 0 0 1px rgba(255,255,255,.25)}
+.sz-mic svg{width:34px;height:34px;color:#241c06;stroke-width:1.6}
+.sz-ringe{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.sz-ringe i{position:absolute;width:110px;height:110px;border-radius:50%;
+  border:1.5px solid rgba(232,204,122,.45)}
+.ab-b.on .sz-ringe i{animation:szRing 2.6s ease-out infinite}
+.ab-b.on .sz-ringe i:nth-child(2){animation-delay:.9s}
+.ab-b.on .sz-ringe i:nth-child(3){animation-delay:1.8s}
+@keyframes szRing{0%{transform:scale(.8);opacity:.5}100%{transform:scale(2.4);opacity:0}}
+/* Die Stichwoerter liegen um das Mikro und werden nacheinander erkannt. */
+.sz-chip{position:absolute;transform:translate(-50%,-50%);z-index:2;
+  background:linear-gradient(180deg,#1b1a17,#121110);
+  border:1px solid rgba(201,168,76,.32);padding:6px 9px;white-space:nowrap;
+  font:600 10px/1.2 var(--mono);color:#fff;opacity:0}
+.ab-b.on .sz-chip{animation:szChip 6s ease-in-out infinite}
+.sz-chip .ck{color:var(--grnh);font-weight:700;opacity:0;margin-right:3px}
+.ab-b.on .sz-chip .ck{animation:szCk 6s ease-in-out infinite}
+@keyframes szChip{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.9)}
+  8%{opacity:.96;transform:translate(-50%,-50%) scale(1)}
+  58%{opacity:.96}
+  70%{opacity:0;transform:translate(-50%,-52%) scale(.94)}
+  100%{opacity:0}
+}
+@keyframes szCk{0%,46%{opacity:0}52%,70%{opacity:1}100%{opacity:0}}
+
+/* ══ 2 · RECHNEN — Zahlen, die sich setzen ═════════════════════════════ */
+.sz-zahlen{display:grid;gap:9px;width:82%;position:relative;z-index:2}
+.sz-z{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding:9px 13px;background:rgba(255,255,255,.04);
+  border-left:2px solid var(--gd);opacity:0}
+.ab-b.on .sz-z{animation:szZeile .55s var(--e-hoch) forwards;
+  animation-delay:calc(var(--n) * 170ms)}
+@keyframes szZeile{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+.sz-z span{font:500 11.5px/1 var(--mono);letter-spacing:.06em;color:var(--mdk)}
+.sz-z b{font:700 17px/1 var(--disp);color:#fff;font-variant-numeric:tabular-nums}
+.sz-z b.gr{color:var(--grnh)}
+
+/* ══ 3 · BELEGEN — der Score faehrt aus ════════════════════════════════ */
+.sz-score{position:relative;width:150px;height:150px;z-index:2}
+.sz-score svg{width:150px;height:150px;transform:rotate(-90deg)}
+.sz-score .tr{fill:none;stroke:rgba(255,255,255,.1);stroke-width:9}
+.sz-score .pg{fill:none;stroke:var(--grn);stroke-width:9;stroke-linecap:round;
+  stroke-dasharray:408;stroke-dashoffset:408;
+  filter:drop-shadow(0 0 8px rgba(63,165,108,.45))}
+.ab-b.on .sz-score .pg{animation:szRing2 2.4s var(--e-hoch) .25s forwards}
+@keyframes szRing2{to{stroke-dashoffset:53}}
+.sz-score .mitte{position:absolute;inset:0;display:grid;place-items:center;
+  font:700 40px/1 var(--disp);color:#fff;opacity:0}
+.ab-b.on .sz-score .mitte{animation:szAuf .5s ease 1.1s forwards}
+@keyframes szAuf{to{opacity:1}}
+.sz-marke{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);
+  font:700 9px/1 var(--mono);letter-spacing:.14em;color:var(--grnh);
+  border:1px solid rgba(91,217,142,.4);padding:5px 10px;opacity:0;white-space:nowrap}
+.ab-b.on .sz-marke{animation:szAuf .5s ease 1.6s forwards}
+
+/* ══ 4 · AUSGEBEN — die Blaetter stapeln sich ══════════════════════════ */
+.sz-pdf{position:relative;width:132px;height:170px;z-index:2}
+.sz-blatt{position:absolute;inset:0;background:#fff;
+  box-shadow:0 14px 34px -14px rgba(0,0,0,.7);opacity:0}
+.ab-b.on .sz-blatt{animation:szBlatt .7s var(--e-hoch) forwards;
+  animation-delay:calc(var(--n) * 230ms)}
+@keyframes szBlatt{
+  from{opacity:0;transform:translate(26px,26px) rotate(7deg)}
+  to{opacity:1}
+}
+.sz-blatt:nth-child(1){transform:rotate(-7deg) translateX(-12px)}
+.sz-blatt:nth-child(2){transform:rotate(4deg) translateX(7px)}
+.sz-blatt:nth-child(3){transform:none}
+.ab-b.on .sz-blatt:nth-child(1){animation-name:szBlatt1}
+.ab-b.on .sz-blatt:nth-child(2){animation-name:szBlatt2}
+@keyframes szBlatt1{from{opacity:0;transform:translate(26px,26px)}
+  to{opacity:1;transform:rotate(-7deg) translateX(-12px)}}
+@keyframes szBlatt2{from{opacity:0;transform:translate(26px,26px)}
+  to{opacity:1;transform:rotate(4deg) translateX(7px)}}
+/* Das oberste Blatt traegt ein angedeutetes Dokument. */
+.sz-blatt.top{display:flex;flex-direction:column;gap:6px;padding:14px 13px}
+.sz-blatt.top .bk{height:7px;background:var(--runway)}
+.sz-blatt.top .zl{height:4px;background:rgba(20,18,15,.14)}
+.sz-blatt.top .zl.k{width:62%}
+.sz-blatt.top .zl.m{width:84%}
+.sz-blatt.top .chart{margin-top:auto;height:38px;display:flex;align-items:flex-end;gap:4px}
+.sz-blatt.top .chart i{flex:1;background:rgba(201,168,76,.5);height:30%}
+.ab-b.on .sz-blatt.top .chart i{animation:szBar .6s var(--e-hoch) forwards;
+  animation-delay:calc(.85s + var(--n) * 90ms)}
+@keyframes szBar{to{height:var(--h)}}
+.sz-stempel{position:absolute;right:-12px;bottom:14px;z-index:4;
+  font:700 8.5px/1 var(--mono);letter-spacing:.12em;
+  background:var(--grn);color:#fff;padding:6px 10px;
+  opacity:0;transform:rotate(-8deg) scale(.7)}
+.ab-b.on .sz-stempel{animation:szStempel .5s cubic-bezier(.2,1.5,.4,1) 1.5s forwards}
+@keyframes szStempel{to{opacity:1;transform:rotate(-8deg) scale(1)}}
+
+@media(prefers-reduced-motion:reduce){
+  .ab-b.on .sz-ringe i,.ab-b.on .sz-chip,.ab-b.on .sz-chip .ck,
+  .ab-b.on .sz-z,.ab-b.on .sz-score .pg,.ab-b.on .sz-score .mitte,
+  .ab-b.on .sz-marke,.ab-b.on .sz-blatt,.ab-b.on .sz-blatt.top .chart i,
+  .ab-b.on .sz-stempel{animation:none;opacity:1}
+  .sz-score .pg{stroke-dashoffset:53}
+}
+@media(max-width:1000px){
+  .ab-b.on{grid-template-columns:1fr}
+  .ab-szene{height:230px;order:-1}
+}

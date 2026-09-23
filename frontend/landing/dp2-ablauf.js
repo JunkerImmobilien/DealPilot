@@ -82,6 +82,54 @@
     },
   ];
 
+
+  /* ══ Die Szene je Phase ══════════════════════════════════════════════
+     Marcel am 23.09.2026: "Beim Erfassen ein Mikrofon, was sich bewegt,
+     wie aus der DealPilot-App ... ein paar Sachen aufpoppen. Also das
+     muss richtig geil animieren."
+     Das Mikrofon ist aus voice-import.js uebernommen - dieselben Ringe,
+     dieselbe Ringzeit. Die Stichwoerter liegen im Kreis darum und werden
+     nacheinander abgehakt, wie im echten Sprechlauf. */
+  function szene(i) {
+    if (i === 0) {
+      var woerter = ["Hermannstraße 9", "165 m²", "Baujahr 1968", "740 € kalt", "ETW"];
+      var chips = woerter.map(function (w, n) {
+        var winkel = (n / woerter.length) * 2 * Math.PI - Math.PI / 2;
+        var x = 50 + Math.cos(winkel) * 34, y = 50 + Math.sin(winkel) * 32;
+        return '<span class="sz-chip" style="left:' + x.toFixed(1) + '%;top:' + y.toFixed(1)
+          + '%;animation-delay:' + (n * 1.1).toFixed(1) + 's"><i class="ck" style="animation-delay:'
+          + (n * 1.1).toFixed(1) + 's">✓</i>' + w + '</span>';
+      }).join("");
+      return '<div class="sz-ringe"><i></i><i></i><i></i></div>' + chips
+        + '<span class="sz-mic"><svg class="ico"><use href="#i-mikro"/></svg></span>';
+    }
+    if (i === 1) {
+      var zeilen = [["Bruttorendite", "7,30 %", ""], ["Cashflow / Monat", "+ 1.240 €", "gr"],
+        ["Kapitaldienstdeckung", "1,42", ""], ["Beleihungsauslauf", "88 %", ""],
+        ["Steuerwirkung / Jahr", "− 2.180 €", "gr"]];
+      return '<div class="sz-zahlen">' + zeilen.map(function (z, n) {
+        return '<div class="sz-z" style="--n:' + n + '"><span>' + z[0]
+          + '</span><b class="' + z[2] + '">' + z[1] + '</b></div>';
+      }).join("") + '</div>';
+    }
+    if (i === 2) {
+      return '<div class="sz-score"><svg viewBox="0 0 150 150" aria-hidden="true">'
+        + '<circle class="tr" cx="75" cy="75" r="65"></circle>'
+        + '<circle class="pg" cx="75" cy="75" r="65"></circle></svg>'
+        + '<div class="mitte">87</div>'
+        + '<span class="sz-marke">◆ SEHR GUT · 23 VON 24 KPIs</span></div>';
+    }
+    var hoehen = [46, 72, 58, 88, 64, 95];
+    return '<div class="sz-pdf">'
+      + '<span class="sz-blatt" style="--n:0"></span>'
+      + '<span class="sz-blatt" style="--n:1"></span>'
+      + '<span class="sz-blatt top" style="--n:2"><i class="bk"></i>'
+      + '<i class="zl m"></i><i class="zl k"></i><i class="zl m"></i>'
+      + '<span class="chart">' + hoehen.map(function (h, n) {
+          return '<i style="--h:' + h + '%;--n:' + n + '"></i>';
+        }).join("") + '</span></span>'
+      + '<span class="sz-stempel">BANKFERTIG</span></div>';
+  }
   var wirt = document.getElementById('ablauf');
   if (!wirt) return;
   var ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -97,6 +145,7 @@
 
   var buehnen = PHASEN.map(function (p, i) {
     return '<div class="ab-b' + (i === 0 ? ' on' : '') + '" data-i="' + i + '">'
+      + '<div class="ab-links">'
       + '<div class="ab-kopf">'
       + '<span class="ab-sym"><svg class="ico"><use href="#' + p.sym + '"/></svg></span>'
       + '<span class="ab-schritt">' + p.schritt + '</span>'
@@ -107,6 +156,8 @@
             + '<b>' + w[0] + '</b><span>' + w[1] + '</span></div>';
         }).join('')
       + '</div>'
+      + '</div>'
+      + '<div class="ab-szene">' + szene(i) + '</div>'
       + '<div class="ab-erg">'
       + p.ergebnis.map(function (e) { return '<span>' + e + '</span>'; }).join('')
       + '</div>'
