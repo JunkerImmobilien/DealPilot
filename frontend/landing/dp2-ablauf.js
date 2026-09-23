@@ -90,46 +90,106 @@
      Das Mikrofon ist aus voice-import.js uebernommen - dieselben Ringe,
      dieselbe Ringzeit. Die Stichwoerter liegen im Kreis darum und werden
      nacheinander abgehakt, wie im echten Sprechlauf. */
+  /* ══ Die Szene je Phase ══════════════════════════════════════════════
+     v1569 · Marcel am 23.09.2026: "Das muss optisch richtig aufgewertet
+     sein, ein richtiger Wow-Effekt ... beim Rechnen vielleicht einfach
+     eine kleine Investor-Deal-Score-Karte, die wir oben im Header haben
+     ... beim Belegen eine Restnutzung, eine Rechnung, eine
+     Verkehrswertrechnung ... bei der Ausgabe ein aktuelles PDF mit
+     Zahlen und einen Auszug draufgeben."
+
+     Jede Szene zeigt jetzt ein ECHTES Stueck Arbeit statt einer
+     Andeutung. Die Zahlen sind durchgerechnet und passen zueinander:
+     ein Objekt, 112 m², 285.000 €, 820 € Kaltmiete - dieselben Werte
+     laufen durch alle vier Szenen.
+
+     Keine echte Anschrift: das Testobjekt der Entwicklung steht an
+     einer Adresse, an der jemand wohnt. */
   function szene(i) {
+
+    /* ── 1 · ERFASSEN ────────────────────────────────────────────────
+       Das Mikrofon aus der App, darum die Stichwoerter im Kreis. */
     if (i === 0) {
-      var woerter = ["Hermannstraße 9", "165 m²", "Baujahr 1968", "740 € kalt", "ETW"];
+      var woerter = ['3-Zimmer-ETW', '112 m²', 'Baujahr 1974', '820 € kalt',
+        '285.000 €', 'mit Stellplatz'];
       var chips = woerter.map(function (w, n) {
         var winkel = (n / woerter.length) * 2 * Math.PI - Math.PI / 2;
-        var x = 50 + Math.cos(winkel) * 34, y = 50 + Math.sin(winkel) * 32;
+        var x = 50 + Math.cos(winkel) * 36, y = 50 + Math.sin(winkel) * 33;
         return '<span class="sz-chip" style="left:' + x.toFixed(1) + '%;top:' + y.toFixed(1)
-          + '%;animation-delay:' + (n * 1.1).toFixed(1) + 's"><i class="ck" style="animation-delay:'
-          + (n * 1.1).toFixed(1) + 's">✓</i>' + w + '</span>';
-      }).join("");
+          + '%;animation-delay:' + (n * 0.95).toFixed(2) + 's"><i class="ck" style="animation-delay:'
+          + (n * 0.95).toFixed(2) + 's">✓</i>' + w + '</span>';
+      }).join('');
       return '<div class="sz-ringe"><i></i><i></i><i></i></div>' + chips
-        + '<span class="sz-mic"><svg class="ico"><use href="#i-mikro"/></svg></span>';
+        + '<span class="sz-mic"><svg class="ico"><use href="#i-mikro"/></svg></span>'
+        + '<span class="sz-mitschrift">„Dreizimmerwohnung, 112 Quadratmeter, '
+        + 'Baujahr vierundsiebzig …"</span>';
     }
+
+    /* ── 2 · RECHNEN ─────────────────────────────────────────────────
+       Die Score-Karte aus dem Kopf, im Kleinen. Derselbe Aufbau:
+       Ring, Zahl, Stufe, darunter die Kennzahlen. */
     if (i === 1) {
-      var zeilen = [["Bruttorendite", "7,30 %", ""], ["Cashflow / Monat", "+ 1.240 €", "gr"],
-        ["Kapitaldienstdeckung", "1,42", ""], ["Beleihungsauslauf", "88 %", ""],
-        ["Steuerwirkung / Jahr", "− 2.180 €", "gr"]];
-      return '<div class="sz-zahlen">' + zeilen.map(function (z, n) {
-        return '<div class="sz-z" style="--n:' + n + '"><span>' + z[0]
-          + '</span><b class="' + z[2] + '">' + z[1] + '</b></div>';
-      }).join("") + '</div>';
+      var zeilen = [['Bruttorendite', '3,45 %'], ['Cashflow / Monat', '+ 214 €', 'gr'],
+        ['Kapitaldienstdeckung', '1,31'], ['Beleihungsauslauf', '84 %']];
+      return '<div class="sz-karte">'
+        + '<div class="sz-k-band"><span>PRE-FLIGHT · DEAL SCORE</span><b>GUT</b></div>'
+        + '<div class="sz-k-body">'
+        + '<div class="sz-k-ring"><svg viewBox="0 0 120 120" aria-hidden="true">'
+        + '<circle class="tr" cx="60" cy="60" r="50"></circle>'
+        + '<circle class="pg" cx="60" cy="60" r="50"></circle></svg>'
+        + '<div class="sz-k-zahl">74</div></div>'
+        + '<div class="sz-k-zahlen">'
+        + zeilen.map(function (z, n) {
+            return '<div class="sz-z" style="--n:' + n + '"><span>' + z[0]
+              + '</span><b class="' + (z[2] || '') + '">' + z[1] + '</b></div>';
+          }).join('')
+        + '</div></div></div>';
     }
+
+    /* ── 3 · BELEGEN ─────────────────────────────────────────────────
+       Drei Nachweise, jeder mit seiner Quelle - das ist der Punkt:
+       nicht die Zahl, sondern woher sie kommt. */
     if (i === 2) {
-      return '<div class="sz-score"><svg viewBox="0 0 150 150" aria-hidden="true">'
-        + '<circle class="tr" cx="75" cy="75" r="65"></circle>'
-        + '<circle class="pg" cx="75" cy="75" r="65"></circle></svg>'
-        + '<div class="mitte">87</div>'
-        + '<span class="sz-marke">◆ SEHR GUT · 23 VON 24 KPIs</span></div>';
+      var belege = [
+        ['Restnutzungsdauer', '34 Jahre', 'Anlage 2 ImmoWertV · Punktraster'],
+        ['Gebäudeanteil', '78,4 %', 'BMF-Arbeitshilfe, Fassung 06/2023'],
+        ['Verkehrswert', '271.400 €', 'Ertragswertverfahren · § 27 ImmoWertV'],
+      ];
+      return '<div class="sz-belege">' + belege.map(function (b, n) {
+        return '<div class="sz-beleg" style="--n:' + n + '">'
+          + '<div class="sz-b-kopf"><b>' + b[0] + '</b><span class="sz-b-wert">' + b[1] + '</span></div>'
+          + '<div class="sz-b-q"><i class="sz-b-ok">✓</i>' + b[2] + '</div>'
+          + '</div>';
+      }).join('') + '</div>';
     }
-    var hoehen = [46, 72, 58, 88, 64, 95];
+
+    /* ── 4 · AUSGEBEN ────────────────────────────────────────────────
+       Eine Seite aus dem Investment-Case, mit den Zahlen der anderen
+       drei Szenen. Der Auszug ist kein Bild, sondern gesetzt - er
+       bleibt damit scharf und laesst sich vorlesen. */
+    var balken = [38, 52, 46, 68, 58, 79, 71, 88];
     return '<div class="sz-pdf">'
       + '<span class="sz-blatt" style="--n:0"></span>'
       + '<span class="sz-blatt" style="--n:1"></span>'
-      + '<span class="sz-blatt top" style="--n:2"><i class="bk"></i>'
-      + '<i class="zl m"></i><i class="zl k"></i><i class="zl m"></i>'
-      + '<span class="chart">' + hoehen.map(function (h, n) {
+      + '<div class="sz-blatt top" style="--n:2">'
+      + '<div class="sz-p-kopf"><span class="sz-p-marke">DEALPILOT</span>'
+      + '<span class="sz-p-typ">INVESTMENT-CASE</span></div>'
+      + '<div class="sz-p-titel">3-Zimmer-Eigentumswohnung<br><i>112 m² · Baujahr 1974</i></div>'
+      + '<div class="sz-p-tab">'
+      + [['Kaufpreis', '285.000 €'], ['Jahresnettomiete', '9.840 €'],
+         ['Cashflow / Monat', '+ 214 €'], ['Deal Score', '74 / 100']]
+        .map(function (z) { return '<div><span>' + z[0] + '</span><b>' + z[1] + '</b></div>'; }).join('')
+      + '</div>'
+      + '<div class="sz-p-chart">'
+      + balken.map(function (h, n) {
           return '<i style="--h:' + h + '%;--n:' + n + '"></i>';
-        }).join("") + '</span></span>'
+        }).join('')
+      + '</div>'
+      + '<div class="sz-p-fuss">Cashflow-Projektion · 15 Jahre</div>'
+      + '</div>'
       + '<span class="sz-stempel">BANKFERTIG</span></div>';
   }
+
   var wirt = document.getElementById('ablauf');
   if (!wirt) return;
   var ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;

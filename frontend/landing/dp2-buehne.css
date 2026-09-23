@@ -1,145 +1,181 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   dp2-buehne.css · v1566 · Die Inszenierung je Phase
+   dp2-buehne.css · v1569 · Die Inszenierung je Phase
    ───────────────────────────────────────────────────────────────────────
-   Marcel am 23.09.2026: "Beim Erfassen ein Mikrofon, was sich bewegt,
-   wie aus der DealPilot-App. Das muss visuell fliessend uebergehen,
-   ein paar Sachen aufpoppen. Also das muss richtig geil animieren."
+   Marcel am 23.09.2026: "Das muss optisch richtig aufgewertet sein, ein
+   richtiger Wow-Effekt ... vielleicht nicht unbedingt überall diese
+   Kachel im Hintergrund."
 
-   Jede der vier Phasen bekommt ein eigenes kleines Schauspiel neben dem
-   Text. Das Mikrofon ist aus der App uebernommen - dieselben Masse und
-   dieselbe Ringzeit wie in voice-import.js (Z.261-266):
-     Mikro 110 px, Runway-Verlauf, Ringe 150 px
-     viRing 2,6 s von scale(.8)/opacity .5 auf scale(2.4)/opacity 0
-     drei Ringe, versetzt um 0 / 0,9 / 1,8 s
-   Hier etwas kleiner, weil daneben Text steht.
+   Das Raster liegt deshalb nur noch hinter der ERSTEN Szene, wo es zum
+   Mikrofon passt - ein Messgitter, auf dem etwas aufgenommen wird. Die
+   anderen drei bekommen je einen eigenen Grund: ein Lichtfeld beim
+   Rechnen, Ruhe beim Belegen, einen Schreibtischton beim Ausgeben.
 
-   Alles laeuft nur, wenn die Buehne sichtbar ist (.ab-b.on) - eine
-   Animation im verborgenen Panel kostet Strom und zeigt nichts.
+   Das Mikrofon ist aus der App uebernommen (voice-import.js Z.261-266):
+   drei Ringe, viRing 2,6 s von scale(.8)/opacity .5 auf
+   scale(2.4)/opacity 0, versetzt um 0 / 0,9 / 1,8 s.
+
+   Alles haengt an .ab-b.on - eine Animation im verborgenen Panel kostet
+   Strom und zeigt nichts.
    ═══════════════════════════════════════════════════════════════════════ */
 
 .ab-b{display:none}
 /* Drei Kinder, zwei Spalten: links Text und Ergebnisse untereinander,
-   rechts die Szene ueber beide Zeilen. So bleibt das Markup einfach -
-   die Ergebnisse muessen nicht in den Textblock hineingeschachtelt
-   werden, nur damit sie an der richtigen Stelle landen. */
-.ab-b.on{display:grid;grid-template-columns:1.25fr .75fr;
+   rechts die Szene ueber beide Zeilen. */
+.ab-b.on{display:grid;grid-template-columns:1.18fr .82fr;
   grid-template-rows:auto auto;gap:22px 34px;align-items:start}
-.ab-links{grid-column:1;grid-row:1}
+.ab-links{grid-column:1;grid-row:1;min-width:0}
 .ab-b.on > .ab-erg{grid-column:1;grid-row:2;margin-top:0}
-.ab-szene{grid-column:2;grid-row:1 / 3;align-self:stretch;height:auto;min-height:270px}
-.ab-links{min-width:0}
-.ab-szene{position:relative;height:270px;display:flex;align-items:center;
-  justify-content:center;border:1px solid var(--line);background:rgba(255,255,255,.02);
-  overflow:hidden}
-.ab-szene::before{content:'';position:absolute;inset:0;
-  background-image:linear-gradient(rgba(232,204,122,.07) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(232,204,122,.07) 1px,transparent 1px);
-  background-size:28px 28px}
+.ab-szene{grid-column:2;grid-row:1 / 3;align-self:stretch;
+  position:relative;min-height:300px;display:flex;align-items:center;
+  justify-content:center;overflow:hidden;border:1px solid var(--line)}
 
-/* ══ 1 · ERFASSEN — das Mikrofon aus der App ═══════════════════════════ */
-.sz-mic{position:relative;width:86px;height:86px;border-radius:50%;
+/* Je Phase ein eigener Grund statt ueberall dasselbe Raster. */
+.ab-b[data-i="0"] .ab-szene{background:rgba(255,255,255,.02)}
+.ab-b[data-i="0"] .ab-szene::before{content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(232,204,122,.08) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(232,204,122,.08) 1px,transparent 1px);
+  background-size:30px 30px;
+  -webkit-mask-image:radial-gradient(58% 58% at 50% 50%,#000,transparent 78%);
+  mask-image:radial-gradient(58% 58% at 50% 50%,#000,transparent 78%)}
+.ab-b[data-i="1"] .ab-szene{background:
+  radial-gradient(90% 70% at 70% 20%,rgba(201,168,76,.13),transparent 62%),#0a0a0a}
+.ab-b[data-i="2"] .ab-szene{background:#0a0a0a}
+.ab-b[data-i="3"] .ab-szene{background:
+  radial-gradient(80% 60% at 30% 100%,rgba(201,168,76,.1),transparent 60%),#0c0b09}
+
+/* ══ 1 · ERFASSEN — das Mikrofon ═══════════════════════════════════════ */
+.sz-mic{position:relative;width:82px;height:82px;border-radius:50%;
   background:var(--runway);display:grid;place-items:center;z-index:3;
-  box-shadow:0 14px 40px rgba(201,168,76,.35),inset 0 0 0 1px rgba(255,255,255,.25)}
-.sz-mic svg{width:34px;height:34px;color:#241c06;stroke-width:1.6}
+  box-shadow:0 14px 40px rgba(201,168,76,.4),inset 0 0 0 1px rgba(255,255,255,.28)}
+.sz-mic svg{width:32px;height:32px;color:#241c06;stroke-width:1.7}
 .sz-ringe{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
-.sz-ringe i{position:absolute;width:110px;height:110px;border-radius:50%;
+.sz-ringe i{position:absolute;width:104px;height:104px;border-radius:50%;
   border:1.5px solid rgba(232,204,122,.45)}
 .ab-b.on .sz-ringe i{animation:szRing 2.6s ease-out infinite}
 .ab-b.on .sz-ringe i:nth-child(2){animation-delay:.9s}
 .ab-b.on .sz-ringe i:nth-child(3){animation-delay:1.8s}
 @keyframes szRing{0%{transform:scale(.8);opacity:.5}100%{transform:scale(2.4);opacity:0}}
-/* Die Stichwoerter liegen um das Mikro und werden nacheinander erkannt. */
 .sz-chip{position:absolute;transform:translate(-50%,-50%);z-index:2;
   background:linear-gradient(180deg,#1b1a17,#121110);
   border:1px solid rgba(201,168,76,.32);padding:6px 9px;white-space:nowrap;
-  font:600 10px/1.2 var(--mono);color:#fff;opacity:0}
-.ab-b.on .sz-chip{animation:szChip 6s ease-in-out infinite}
-.sz-chip .ck{color:var(--grnh);font-weight:700;opacity:0;margin-right:3px}
-.ab-b.on .sz-chip .ck{animation:szCk 6s ease-in-out infinite}
+  font:600 10px/1.2 var(--mono);color:#fff;opacity:0;
+  box-shadow:0 4px 14px rgba(0,0,0,.45)}
+.ab-b.on .sz-chip{animation:szChip 5.7s ease-in-out infinite}
+.sz-chip .ck{color:var(--grnh);font-weight:700;opacity:0;margin-right:3px;font-style:normal}
+.ab-b.on .sz-chip .ck{animation:szCk 5.7s ease-in-out infinite}
 @keyframes szChip{
   0%{opacity:0;transform:translate(-50%,-50%) scale(.9)}
-  8%{opacity:.96;transform:translate(-50%,-50%) scale(1)}
-  58%{opacity:.96}
-  70%{opacity:0;transform:translate(-50%,-52%) scale(.94)}
+  7%{opacity:.96;transform:translate(-50%,-50%) scale(1)}
+  56%{opacity:.96}
+  68%{opacity:0;transform:translate(-50%,-54%) scale(.94)}
   100%{opacity:0}
 }
-@keyframes szCk{0%,46%{opacity:0}52%,70%{opacity:1}100%{opacity:0}}
+@keyframes szCk{0%,44%{opacity:0}50%,68%{opacity:1}100%{opacity:0}}
+/* Die Mitschrift laeuft unten mit, wie im echten Sprechlauf. */
+.sz-mitschrift{position:absolute;left:18px;right:18px;bottom:16px;z-index:3;
+  font:400 11.5px/1.5 var(--body);color:var(--mdk);text-align:center;
+  font-style:italic;opacity:0}
+.ab-b.on .sz-mitschrift{animation:szAuf .6s ease .5s forwards}
 
-/* ══ 2 · RECHNEN — Zahlen, die sich setzen ═════════════════════════════ */
-.sz-zahlen{display:grid;gap:9px;width:82%;position:relative;z-index:2}
-.sz-z{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
-  padding:9px 13px;background:rgba(255,255,255,.04);
-  border-left:2px solid var(--gd);opacity:0}
-.ab-b.on .sz-z{animation:szZeile .55s var(--e-hoch) forwards;
-  animation-delay:calc(var(--n) * 170ms)}
-@keyframes szZeile{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
-.sz-z span{font:500 11.5px/1 var(--mono);letter-spacing:.06em;color:var(--mdk)}
-.sz-z b{font:700 17px/1 var(--disp);color:#fff;font-variant-numeric:tabular-nums}
-.sz-z b.gr{color:var(--grnh)}
+/* ══ 2 · RECHNEN — die Score-Karte aus dem Kopf, im Kleinen ════════════ */
+.sz-karte{width:84%;max-width:290px;background:#fff;color:var(--ink);z-index:2;
+  box-shadow:0 26px 60px -26px rgba(0,0,0,.8);opacity:0;transform:translateY(14px)}
+.ab-b.on .sz-karte{animation:szKarte .6s var(--e-hoch) .1s forwards}
+@keyframes szKarte{to{opacity:1;transform:none}}
+.sz-k-band{display:flex;align-items:center;justify-content:space-between;
+  padding:7px 12px;background:var(--runway);color:var(--gold-on);
+  font:700 8px/1 var(--mono);letter-spacing:.13em}
+.sz-k-band b{background:var(--stub);color:var(--grnh);padding:4px 8px;border-radius:20px}
+.sz-k-body{display:grid;grid-template-columns:96px 1fr;gap:14px;padding:14px 14px 15px;
+  align-items:center}
+.sz-k-ring{position:relative;width:96px;height:96px}
+.sz-k-ring svg{width:96px;height:96px;transform:rotate(-90deg)}
+.sz-k-ring .tr{fill:none;stroke:#ece4d2;stroke-width:9}
+.sz-k-ring .pg{fill:none;stroke:var(--grn);stroke-width:9;stroke-linecap:round;
+  stroke-dasharray:314;stroke-dashoffset:314}
+.ab-b.on .sz-k-ring .pg{animation:szKring 1.9s var(--e-hoch) .45s forwards}
+@keyframes szKring{to{stroke-dashoffset:82}}   /* 74 % von 314 */
+.sz-k-zahl{position:absolute;inset:0;display:grid;place-items:center;
+  font:700 30px/1 var(--disp);color:var(--ink);opacity:0}
+.ab-b.on .sz-k-zahl{animation:szAuf .45s ease 1.1s forwards}
+.sz-k-zahlen{display:grid;gap:5px;min-width:0}
+.sz-z{display:flex;align-items:baseline;justify-content:space-between;gap:8px;
+  opacity:0;border-bottom:1px solid var(--cream-line);padding-bottom:4px}
+.sz-z:last-child{border-bottom:0}
+.ab-b.on .sz-z{animation:szZeile .5s var(--e-hoch) forwards;
+  animation-delay:calc(.65s + var(--n) * 150ms)}
+@keyframes szZeile{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+.sz-z span{font:400 10.5px/1.3 var(--body);color:var(--mut)}
+.sz-z b{font:700 12.5px/1 var(--mono);color:var(--ink);white-space:nowrap}
+.sz-z b.gr{color:var(--grn)}
 
-/* ══ 3 · BELEGEN — der Score faehrt aus ════════════════════════════════ */
-.sz-score{position:relative;width:150px;height:150px;z-index:2}
-.sz-score svg{width:150px;height:150px;transform:rotate(-90deg)}
-.sz-score .tr{fill:none;stroke:rgba(255,255,255,.1);stroke-width:9}
-.sz-score .pg{fill:none;stroke:var(--grn);stroke-width:9;stroke-linecap:round;
-  stroke-dasharray:408;stroke-dashoffset:408;
-  filter:drop-shadow(0 0 8px rgba(63,165,108,.45))}
-.ab-b.on .sz-score .pg{animation:szRing2 2.4s var(--e-hoch) .25s forwards}
-@keyframes szRing2{to{stroke-dashoffset:53}}
-.sz-score .mitte{position:absolute;inset:0;display:grid;place-items:center;
-  font:700 40px/1 var(--disp);color:#fff;opacity:0}
-.ab-b.on .sz-score .mitte{animation:szAuf .5s ease 1.1s forwards}
-@keyframes szAuf{to{opacity:1}}
-.sz-marke{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);
-  font:700 9px/1 var(--mono);letter-spacing:.14em;color:var(--grnh);
-  border:1px solid rgba(91,217,142,.4);padding:5px 10px;opacity:0;white-space:nowrap}
-.ab-b.on .sz-marke{animation:szAuf .5s ease 1.6s forwards}
+/* ══ 3 · BELEGEN — drei Nachweise mit Quelle ═══════════════════════════ */
+.sz-belege{display:grid;gap:10px;width:86%;z-index:2}
+.sz-beleg{background:rgba(255,255,255,.04);border-left:2px solid var(--gd);
+  padding:11px 14px;opacity:0}
+.ab-b.on .sz-beleg{animation:szBeleg .55s var(--e-hoch) forwards;
+  animation-delay:calc(var(--n) * 260ms)}
+@keyframes szBeleg{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:none}}
+.sz-b-kopf{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.sz-b-kopf b{font:700 13px/1.3 var(--disp);color:#fff}
+.sz-b-wert{font:700 15px/1 var(--mono);color:var(--gdh);white-space:nowrap}
+.sz-b-q{margin-top:5px;font:400 10.5px/1.45 var(--body);color:var(--mdk);
+  display:flex;align-items:flex-start;gap:6px}
+.sz-b-ok{color:var(--grnh);font-style:normal;font-weight:700;flex:none}
 
-/* ══ 4 · AUSGEBEN — die Blaetter stapeln sich ══════════════════════════ */
-.sz-pdf{position:relative;width:132px;height:170px;z-index:2}
+/* ══ 4 · AUSGEBEN — eine Seite aus dem Investment-Case ═════════════════ */
+.sz-pdf{position:relative;width:170px;height:224px;z-index:2}
 .sz-blatt{position:absolute;inset:0;background:#fff;
-  box-shadow:0 14px 34px -14px rgba(0,0,0,.7);opacity:0}
-.ab-b.on .sz-blatt{animation:szBlatt .7s var(--e-hoch) forwards;
-  animation-delay:calc(var(--n) * 230ms)}
-@keyframes szBlatt{
-  from{opacity:0;transform:translate(26px,26px) rotate(7deg)}
-  to{opacity:1}
-}
-.sz-blatt:nth-child(1){transform:rotate(-7deg) translateX(-12px)}
-.sz-blatt:nth-child(2){transform:rotate(4deg) translateX(7px)}
-.sz-blatt:nth-child(3){transform:none}
-.ab-b.on .sz-blatt:nth-child(1){animation-name:szBlatt1}
-.ab-b.on .sz-blatt:nth-child(2){animation-name:szBlatt2}
-@keyframes szBlatt1{from{opacity:0;transform:translate(26px,26px)}
-  to{opacity:1;transform:rotate(-7deg) translateX(-12px)}}
-@keyframes szBlatt2{from{opacity:0;transform:translate(26px,26px)}
-  to{opacity:1;transform:rotate(4deg) translateX(7px)}}
-/* Das oberste Blatt traegt ein angedeutetes Dokument. */
-.sz-blatt.top{display:flex;flex-direction:column;gap:6px;padding:14px 13px}
-.sz-blatt.top .bk{height:7px;background:var(--runway)}
-.sz-blatt.top .zl{height:4px;background:rgba(20,18,15,.14)}
-.sz-blatt.top .zl.k{width:62%}
-.sz-blatt.top .zl.m{width:84%}
-.sz-blatt.top .chart{margin-top:auto;height:38px;display:flex;align-items:flex-end;gap:4px}
-.sz-blatt.top .chart i{flex:1;background:rgba(201,168,76,.5);height:30%}
-.ab-b.on .sz-blatt.top .chart i{animation:szBar .6s var(--e-hoch) forwards;
-  animation-delay:calc(.85s + var(--n) * 90ms)}
+  box-shadow:0 16px 38px -14px rgba(0,0,0,.75);opacity:0}
+@keyframes szBlatt1{from{opacity:0;transform:translate(24px,24px)}
+  to{opacity:1;transform:rotate(-6deg) translateX(-11px)}}
+@keyframes szBlatt2{from{opacity:0;transform:translate(24px,24px)}
+  to{opacity:1;transform:rotate(3.5deg) translateX(6px)}}
+@keyframes szBlatt3{from{opacity:0;transform:translate(24px,24px)}to{opacity:1;transform:none}}
+.ab-b.on .sz-blatt:nth-child(1){animation:szBlatt1 .7s var(--e-hoch) forwards}
+.ab-b.on .sz-blatt:nth-child(2){animation:szBlatt2 .7s var(--e-hoch) .22s forwards}
+.ab-b.on .sz-blatt.top{animation:szBlatt3 .7s var(--e-hoch) .44s forwards}
+/* Die oberste Seite traegt einen echten Auszug - gesetzt, nicht gemalt. */
+.sz-blatt.top{display:flex;flex-direction:column;padding:12px 13px 11px;color:var(--ink)}
+.sz-p-kopf{display:flex;align-items:center;justify-content:space-between;
+  padding-bottom:7px;border-bottom:1.5px solid var(--gd)}
+.sz-p-marke{font:700 8.5px/1 var(--disp);letter-spacing:-.3px;color:var(--gdd)}
+.sz-p-typ{font:700 5.5px/1 var(--mono);letter-spacing:.14em;color:var(--mut)}
+.sz-p-titel{margin:9px 0 8px;font:700 9.5px/1.35 var(--disp);color:var(--ink)}
+.sz-p-titel i{font-style:normal;font-weight:400;font-size:7.5px;color:var(--mut)}
+.sz-p-tab{display:grid;gap:3px;margin-bottom:9px}
+.sz-p-tab div{display:flex;justify-content:space-between;gap:6px;
+  padding-bottom:2.5px;border-bottom:1px solid rgba(20,18,15,.08)}
+.sz-p-tab span{font:400 6.5px/1.3 var(--body);color:var(--mut)}
+.sz-p-tab b{font:700 7px/1 var(--mono);color:var(--ink);white-space:nowrap}
+.sz-p-chart{margin-top:auto;height:44px;display:flex;align-items:flex-end;gap:2.5px}
+.sz-p-chart i{flex:1;background:linear-gradient(180deg,#E8CC7A,#C9A84C);height:12%}
+.ab-b.on .sz-p-chart i{animation:szBar .55s var(--e-hoch) forwards;
+  animation-delay:calc(1.05s + var(--n) * 70ms)}
 @keyframes szBar{to{height:var(--h)}}
-.sz-stempel{position:absolute;right:-12px;bottom:14px;z-index:4;
+.sz-p-fuss{margin-top:5px;font:400 5.5px/1 var(--mono);letter-spacing:.1em;color:var(--mut)}
+.sz-stempel{position:absolute;right:-14px;bottom:20px;z-index:4;
   font:700 8.5px/1 var(--mono);letter-spacing:.12em;
-  background:var(--grn);color:#fff;padding:6px 10px;
-  opacity:0;transform:rotate(-8deg) scale(.7)}
-.ab-b.on .sz-stempel{animation:szStempel .5s cubic-bezier(.2,1.5,.4,1) 1.5s forwards}
+  background:var(--grn);color:#fff;padding:7px 11px;
+  opacity:0;transform:rotate(-8deg) scale(.7);
+  box-shadow:0 6px 18px rgba(63,165,108,.4)}
+.ab-b.on .sz-stempel{animation:szStempel .5s cubic-bezier(.2,1.5,.4,1) 1.7s forwards}
 @keyframes szStempel{to{opacity:1;transform:rotate(-8deg) scale(1)}}
+
+@keyframes szAuf{to{opacity:1}}
 
 @media(prefers-reduced-motion:reduce){
   .ab-b.on .sz-ringe i,.ab-b.on .sz-chip,.ab-b.on .sz-chip .ck,
-  .ab-b.on .sz-z,.ab-b.on .sz-score .pg,.ab-b.on .sz-score .mitte,
-  .ab-b.on .sz-marke,.ab-b.on .sz-blatt,.ab-b.on .sz-blatt.top .chart i,
+  .ab-b.on .sz-mitschrift,.ab-b.on .sz-karte,.ab-b.on .sz-k-ring .pg,
+  .ab-b.on .sz-k-zahl,.ab-b.on .sz-z,.ab-b.on .sz-beleg,
+  .ab-b.on .sz-blatt,.ab-b.on .sz-blatt.top,.ab-b.on .sz-p-chart i,
   .ab-b.on .sz-stempel{animation:none;opacity:1}
-  .sz-score .pg{stroke-dashoffset:53}
+  .sz-k-ring .pg{stroke-dashoffset:82}
+  .sz-blatt:nth-child(1){transform:rotate(-6deg) translateX(-11px)}
+  .sz-blatt:nth-child(2){transform:rotate(3.5deg) translateX(6px)}
 }
 @media(max-width:1000px){
   .ab-b.on{grid-template-columns:1fr}
-  .ab-szene{height:230px;order:-1}
+  .ab-szene{grid-column:1;grid-row:auto;order:-1;min-height:260px}
+  .ab-b.on > .ab-erg{grid-row:auto}
 }
