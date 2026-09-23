@@ -68,9 +68,11 @@
 
 /* Die Achse in der Mitte - an ihr haengt alles. */
 .wx-achse{position:absolute;left:50%;top:18px;bottom:18px;width:2px;
+  opacity:0;transition:opacity .45s var(--e-weich);pointer-events:none;
   transform:translateX(-1px);
   background:linear-gradient(180deg,transparent,rgba(201,168,76,.4) 12%,
     rgba(201,168,76,.4) 88%,transparent)}
+.wx-bahn.wechselt .wx-achse{opacity:1}
 .wx-achse i{position:absolute;left:-3px;width:8px;height:8px;border-radius:50%;
   background:var(--gd);top:0;
   box-shadow:0 0 12px rgba(201,168,76,.8);
@@ -143,7 +145,7 @@
 /* ── AKT 1 · die fuenf Werte im Wechsel ──────────────────────────── */
 .wx-werte{display:grid;gap:9px;position:relative}
 .wx-w{display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:center;
-  opacity:0;animation:wxRein .6s var(--e-hoch) forwards;
+  animation:wxRein .6s var(--e-hoch) backwards;
   animation-delay:calc(var(--n) * 520ms)}
 .wx-w .karte{background:rgba(255,255,255,.045);border:1px solid var(--line);
   padding:13px 16px;display:flex;align-items:center;gap:14px;position:relative}
@@ -161,7 +163,8 @@
   width:26px;height:1px;background:rgba(201,168,76,.45)}
 @keyframes wxVonLinks{from{opacity:0;transform:translateX(-38px)}to{opacity:1;transform:none}}
 @keyframes wxVonRechts{from{opacity:0;transform:translateX(38px)}to{opacity:1;transform:none}}
-@keyframes wxRein{from{opacity:0}to{opacity:1}}
+/* Ruhezustand sichtbar */
+@keyframes wxRein{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
 .wx-w .ik{width:34px;height:34px;flex:none;display:grid;place-items:center;
   background:rgba(201,168,76,.14);color:var(--gdh)}
@@ -236,7 +239,7 @@
 .wx-gruende{display:grid;gap:8px;max-width:470px}
 .wx-gr{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;
   background:rgba(255,255,255,.04);border-left:2px solid;
-  opacity:0;animation:wxRein .55s var(--e-hoch) forwards;
+  animation:wxRein .55s var(--e-hoch) backwards;
   animation-delay:calc(.25s + var(--n) * 160ms)}
 .wx-gr.gut{border-color:var(--grn)}
 .wx-gr.gut .ik{color:var(--grnh)}
@@ -251,8 +254,8 @@
   align-items:center;padding:4px 6px}
 .wx-liste{display:grid;gap:7px}
 .wx-li{display:flex;align-items:center;gap:11px;padding:10px 13px;
-  border-left:2px solid;opacity:0;
-  animation:wxRein .5s var(--e-hoch) forwards;
+  border-left:2px solid;
+  animation:wxRein .5s var(--e-hoch) backwards;
   animation-delay:calc(var(--n) * 130ms)}
 .wx-li.amt{background:rgba(63,165,108,.09);border-color:var(--grn)}
 .wx-li.amt .ik{color:var(--grnh)} .wx-li.amt .wt{color:var(--grnh)}
@@ -270,8 +273,8 @@
 
 .wx-pdfs{display:grid;gap:8px}
 .wx-pdf{display:flex;align-items:center;gap:13px;padding:13px 15px;background:#fff;
-  color:var(--ink);opacity:0;
-  animation:wxBlatt .6s cubic-bezier(.2,1.5,.4,1) forwards;
+  color:var(--ink);
+  animation:wxBlatt .6s cubic-bezier(.2,1.5,.4,1) backwards;
   animation-delay:calc(var(--n) * 170ms)}
 @keyframes wxBlatt{from{opacity:0;transform:translateX(30px) rotate(2.5deg)}
   to{opacity:1;transform:none}}

@@ -327,6 +327,14 @@
       });
       buehne.classList.remove('wx-raus');
       buehne.innerHTML = szene(i);
+      /* Die Achse trennt nur, wo wirklich gewechselt wird. Ab Akt 3
+         lief sie mitten durch den Text und trennte nichts. */
+      bahn.classList.toggle('wechselt', a.k === 'sprechen' || a.k === 'bewerten');
+      /* Der Fusstext kommt aus der NEUEN Szene - vorher stand dort der
+         Titel des vorigen Akts, weil bei weichem Uebergang erst 300 ms
+         spaeter gesetzt wird. */
+      fMit.querySelector('.tx').textContent =
+        (buehne.querySelector('.wx-titel h3') || {}).textContent || '';
       nachziehen(i);
     }
     if (weich) { buehne.classList.add('wx-raus'); setTimeout(setzen, 300); }
@@ -344,8 +352,6 @@
 
     fOhne.querySelector('.tx').textContent = a.ohne;
     fOhne.querySelector('.zt').textContent = a.ohneZt;
-    fMit.querySelector('.tx').textContent =
-      (buehne.querySelector('.wx-titel h3') || {}).textContent || '';
     fMit.querySelector('.zt').textContent =
       Math.floor(a.uhr / 60) + ':' + ('0' + (a.uhr % 60)).slice(-2);
   }
