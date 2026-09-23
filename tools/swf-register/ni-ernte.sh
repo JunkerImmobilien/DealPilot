@@ -127,10 +127,28 @@ while IFS=';' read -r wb rohname ags amt befund; do
   # ── Schritt 2: abtasten, nur innerhalb ──────────────────────────────
   timeout 260 bash /tmp/ni-kalkulator-abtasten.sh "$tm" "$wb" "$BRWS" "$SACHS" \
     > "$TMP/roh.csv" 2>/dev/null
-  n=$(grep -cE '^[0-9]+;[0-9]+;' "$TMP/roh.csv" 2>/dev/null || true)
+  # NUR ZEILEN MIT ECHTEN ZAHLEN ZAEHLEN.
+  # Gemessen am 23.09.2026: fuenf Gebiete lieferten 54 Zeilen der Form
+  # "20;60000;LEER;LEER" - das Muster ^[0-9]+;[0-9]+; passte, also hat
+  # das Protokoll brav "OK, 54 Zellen" gemeldet. Eine Datei ohne einen
+  # einzigen Wert galt damit als geerntet.
+  # Ein Pruefer, der gruen wird, ist schlimmer als keiner: niemand
+  # sieht mehr nach.
+  # (Die betroffenen Gebiete sind die Regionen lg und nom. Ihre
+  # Dashboards fuehren eine zusaetzliche Lage-Achse - "Entfernung zum
+  # Marktplatz von Lueneburg" - die der Standardaufruf nicht setzt.
+  # Ohne sie rechnet der Kalkulator nicht. Das ist ein eigener Bau.)
+  n=$(grep -cE '^[0-9]+;[0-9]+;[0-9]' "$TMP/roh.csv" 2>/dev/null || true)
   n=${n:-0}
+  leerz=$(grep -c 'LEER' "$TMP/roh.csv" 2>/dev/null || true)
+  leerz=${leerz:-0}
+  if [ "$n" -eq 0 ] && [ "$leerz" -gt 0 ]; then
+    leer=$((leer+1))
+    echo "$(date +%H:%M:%S) NUR-LEER $wb ($ags $amt) $leerz Zeilen ohne Wert - Lage-Achse?" >> "$PROT"
+    sleep 8; continue
+  fi
   if [ "$n" -gt 0 ]; then
-    grep -E '^[0-9]+;[0-9]+;' "$TMP/roh.csv" > "$ziel"
+    grep -E '^[0-9]+;[0-9]+;[0-9]' "$TMP/roh.csv" > "$ziel"
     echo "# spanne_brw=$bmin-$bmax spanne_sachwert=$smin-$smax" > "$ziel.meta"
     echo "# gitter_brw=$BRWS" >> "$ziel.meta"
     echo "# gitter_sachwert=$SACHS" >> "$ziel.meta"
