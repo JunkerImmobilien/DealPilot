@@ -31,6 +31,7 @@
 /* ══════════════════════════════════════════════════════════════════════
    GEMEINSAME BAUTEILE
    ══════════════════════════════════════════════════════════════════════ */
+.ik-svg{vertical-align:-2px;flex:none}
 .leuchte{display:inline-block;width:7px;height:7px;border-radius:50%;
   background:var(--grn);margin-right:7px;
   animation:puls 1.6s ease-in-out infinite}
@@ -84,8 +85,8 @@
 .v1-k-band{background:var(--runway);color:var(--gold-on);padding:8px 13px;
   font:700 8.5px/1 var(--mono);letter-spacing:.14em;display:flex;
   justify-content:space-between;align-items:center}
-.v1-k-body{padding:15px 15px 17px;min-height:210px;position:relative}
-.v1-k-stand{position:absolute;inset:15px;opacity:0;transition:opacity .4s}
+.v1-k-body{padding:15px 15px 17px;position:relative}
+.v1-k-stand{opacity:0;transition:opacity .4s}
 .v1-k-stand.on{opacity:1}
 .v1-k-lbl{font:700 8px/1 var(--mono);letter-spacing:.15em;color:var(--gdi);margin-bottom:10px}
 .v1-k-gross{font:700 34px/1 var(--disp);margin-bottom:5px}
@@ -103,7 +104,7 @@
    Der Kontrast ist das Argument.
    ══════════════════════════════════════════════════════════════════════ */
 .v2{display:grid;grid-template-columns:1fr 1fr;min-height:430px;position:relative}
-.v2-seite{padding:26px 28px}
+.v2-seite{padding:26px 28px;display:flex;flex-direction:column}
 .v2-alt{background:#141210;position:relative}
 .v2-alt::after{content:'';position:absolute;inset:0;pointer-events:none;
   background:repeating-linear-gradient(45deg,transparent,transparent 9px,
@@ -114,12 +115,29 @@
 .v2-alt .mk{background:rgba(184,98,80,.18);color:#E4A89E}
 .v2-neu .mk{background:var(--runway);color:var(--gold-on)}
 .v2-kopf b{font:700 17px/1.2 var(--disp);color:#fff}
-.v2-zeile{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
-  padding:9px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:13px}
-.v2-zeile span{color:var(--mdk)}
+.v2-zeile{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:9px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:13px;
+  opacity:.28;transition:opacity .45s var(--e-weich),transform .45s var(--e-weich)}
+.v2-zeile.da{opacity:1}
+.v2-zeile span{color:var(--mdk);display:flex;align-items:center;gap:8px}
+/* Die aktuelle Zeile tritt vor - ohne sie waere nicht zu sehen,
+   WO der Vergleich gerade steht. */
+.v2-neu .v2-zeile.jetzt{transform:translateX(5px)}
+.v2-neu .v2-zeile.jetzt span{color:#fff;font-weight:600}
+.v2-neu .v2-zeile.jetzt b{animation:v2blink 1.8s ease-in-out infinite}
+@keyframes v2blink{0%,100%{opacity:1}50%{opacity:.45}}
+/* Die Erlaeuterung klappt nur unter der aktuellen Zeile auf.
+   grid-template-rows 0fr->1fr statt max-height: so wird genau die
+   Hoehe animiert, die der Text wirklich braucht. */
+.v2-detail{display:grid;grid-template-rows:0fr;opacity:0;
+  transition:grid-template-rows .4s var(--e-hoch),opacity .3s}
+.v2-detail.auf{grid-template-rows:1fr;opacity:1}
+.v2-detail > span{overflow:hidden;font-size:11.8px;color:var(--gdh);
+  line-height:1.5;padding-left:23px}
+.v2-detail.auf > span{padding-top:7px;padding-bottom:3px}
 .v2-alt .v2-zeile b{color:#E4A89E;font-family:var(--mono);white-space:nowrap}
 .v2-neu .v2-zeile b{color:var(--grnh);font-family:var(--mono);white-space:nowrap}
-.v2-summe{margin-top:16px;padding:14px 16px;display:flex;align-items:baseline;
+.v2-summe{margin-top:auto;padding:14px 16px;display:flex;align-items:baseline;
   justify-content:space-between;gap:12px}
 .v2-alt .v2-summe{background:rgba(184,98,80,.12);border-left:2px solid var(--rd)}
 .v2-neu .v2-summe{background:rgba(63,165,108,.12);border-left:2px solid var(--grn)}
@@ -166,10 +184,14 @@
   position:relative;min-height:74px;display:grid;place-content:center;gap:4px}
 .v3-f .t{font:700 7.5px/1.2 var(--mono);letter-spacing:.1em;color:var(--mut)}
 .v3-f .w{font:700 14px/1 var(--disp);color:var(--ink);opacity:0}
-.v3-f.on .w{animation:vAuf .4s ease .25s forwards}
-.v3-f .stempel{position:absolute;inset:3px;display:grid;place-items:center;
-  background:rgba(63,165,108,.92);color:#fff;font:700 9px/1.2 var(--mono);
-  letter-spacing:.1em;opacity:0;transform:rotate(-11deg) scale(.4)}
+.v3-f.on{border-style:solid;border-color:rgba(63,165,108,.5);
+  background:rgba(63,165,108,.05)}
+.v3-f.on .w{animation:v3auf .5s cubic-bezier(.2,1.6,.4,1) .2s forwards}
+@keyframes v3auf{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
+.v3-f .stempel{position:absolute;right:-6px;bottom:-7px;padding:3px 7px;
+  background:rgba(63,165,108,.95);color:#fff;font:700 7.5px/1.2 var(--mono);
+  letter-spacing:.09em;opacity:0;transform:rotate(-8deg) scale(.4);
+  box-shadow:0 3px 9px rgba(0,0,0,.2)}
 .v3-f.on .stempel{animation:v3st .45s cubic-bezier(.2,1.7,.4,1) forwards}
 @keyframes v3st{to{opacity:1;transform:rotate(-11deg) scale(1)}}
 .v3-p-rechts{background:var(--stub);color:var(--gdh);padding:18px 14px;

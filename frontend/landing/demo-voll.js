@@ -13,6 +13,33 @@
 (function () {
   'use strict';
 
+  /* ── Symbole ─────────────────────────────────────────────────────
+     Inline-SVG, damit kein Zeichen am Font haengt.
+     Gemessen am 23.09.2026 auf Staging: "Belegen" und "Ausgeben"
+     trugen in der Wegleiste ein Ersatzkaestchen - Space Grotesk kennt
+     U+2696 und U+2398 nicht, und der Fallback traf nicht zu.
+     Eine Canvas-Breitenmessung half nicht weiter: sie gab fuer sieben
+     verschiedene Zeichen dieselbe Breite zurueck und mass damit sich
+     selbst, nicht die Seite. Deshalb haengt hier gar nichts mehr am
+     Font. */
+  var IKON = {
+    mikro: 'M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zM5 11a7 7 0 0 0 14 0M12 18v3',
+    score: 'M12 3l9 9-9 9-9-9z M12 8.5l3.5 3.5L12 15.5 8.5 12z',
+    waage: 'M12 4v16M5 7h14M5 7l-3 6h6zM19 7l3 6h-6zM8 20h8',
+    blatt: 'M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6',
+    flieg: 'M21 15l-9-4.5V5a1.5 1.5 0 0 0-3 0v5.5L0 15v2l9-2.5V20l-2 1.5V23l3.5-1 3.5 1v-1.5L12 20v-5.5L21 17z',
+    haken: 'M4 12.5l5 5L20 6.5',
+    uhr: 'M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18zM12 7v5l3.5 2',
+    euro: 'M17 5.5A7 7 0 1 0 17 18.5M4 10h8M4 14h8',
+    stapel: 'M4 7l8-4 8 4-8 4zM4 12l8 4 8-4M4 17l8 4 8-4'
+  };
+  function ik(k, gr) {
+    return '<svg class="ik-svg" viewBox="0 0 24 24" width="' + (gr || 15) + '" height="'
+      + (gr || 15) + '" fill="none" stroke="currentColor" stroke-width="1.7"'
+      + ' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+      + '<path d="' + IKON[k] + '"/></svg>';
+  }
+
   /* ── Das Musterobjekt ────────────────────────────────────────────── */
   var OBJ = {
     adr: 'Musterweg 12, 32105 Musterstadt',
@@ -23,7 +50,7 @@
   /* ── Die vier Stationen ──────────────────────────────────────────── */
   var DATEN = [
     {
-      k: 'erfassen', sym: '◉', t: 'Erfassen', schritt: 'Schritt 1 · 30 Sekunden',
+      k: 'erfassen', sym: 'mikro', t: 'Erfassen', schritt: 'Schritt 1 · 30 Sekunden',
       kopf: 'Sprechen statt tippen.',
       satz: 'Exposé-PDF rein oder ins Mikrofon sprechen — DealPilot liest '
         + 'Kaufpreis, Fläche, Baujahr, Miete und Hausgeld selbst heraus. '
@@ -43,12 +70,12 @@
       feld: ['OBJEKT', '78 m²'],
       /* für V5 */
       zeit: '0:30', vgl: ['Sonst dafür:', '45 Minuten'],
-      erg: [['◉', 'Exposé eingelesen', '14 von 14 Feldern erkannt, nichts nachgetippt'],
-      ['♪', 'Sprechlauf beendet', 'Hausgeld und Rücklage mündlich ergänzt'],
-      ['◈', 'Objekt steht', 'Musterweg 12 · ETW 78 m² · Bj 1994']]
+      erg: [['mikro', 'Exposé eingelesen', '14 von 14 Feldern erkannt, nichts nachgetippt'],
+      ['uhr', 'Sprechlauf beendet', 'Hausgeld und Rücklage mündlich ergänzt'],
+      ['haken', 'Objekt steht', 'Musterweg 12 · ETW 78 m² · Bj 1994']]
     },
     {
-      k: 'rechnen', sym: '◆', t: 'Rechnen', schritt: 'Schritt 2 · 10 Sekunden',
+      k: 'rechnen', sym: 'score', t: 'Rechnen', schritt: 'Schritt 2 · 10 Sekunden',
       kopf: '24 Kennzahlen. Eine Zahl.',
       satz: 'Rendite, Finanzierung, Risiko, Lage und Upside werden einzeln '
         + 'bewertet und zu einem Score verdichtet. Sechs Profile — wer auf '
@@ -66,12 +93,12 @@
       fort: 50,
       feld: ['SCORE', '74'],
       zeit: '0:40', vgl: ['Sonst dafür:', '2 Stunden Excel'],
-      erg: [['◆', 'Deal Score 74 · Gut', 'Finanzierung trägt, Rendite ist die Schwachstelle'],
-      ['↗', 'DSCR 1,24', 'Kapitaldienst gedeckt — auch im Stresstest bei 5,5 %'],
-      ['€', 'Cashflow +112 €/Monat', 'nach Steuern, nach Rücklage, ab Jahr 1']]
+      erg: [['score', 'Deal Score 74 · Gut', 'Finanzierung trägt, Rendite ist die Schwachstelle'],
+      ['haken', 'DSCR 1,24', 'Kapitaldienst gedeckt — auch im Stresstest bei 5,5 %'],
+      ['euro', 'Cashflow +112 €/Monat', 'nach Steuern, nach Rücklage, ab Jahr 1']]
     },
     {
-      k: 'belegen', sym: '⚖', t: 'Belegen', schritt: 'Schritt 3 · automatisch',
+      k: 'belegen', sym: 'waage', t: 'Belegen', schritt: 'Schritt 3 · automatisch',
       kopf: 'Jede Zahl mit Herkunft.',
       satz: 'Restnutzungsdauer nach Anlage 2 ImmoWertV, Liegenschaftszins und '
         + 'Sachwertfaktor vom zuständigen Gutachterausschuss, Bodenrichtwert '
@@ -88,12 +115,12 @@
       fort: 75,
       feld: ['BELEGT', '3 Quellen'],
       zeit: '0:45', vgl: ['Sonst dafür:', '3 Behördenanfragen'],
-      erg: [['⚖', 'RND 48 Jahre', 'Anlage 2 ImmoWertV · Bj 1994, 9 Modernisierungspunkte'],
-      ['§', 'Liegenschaftszins 3,4 %', 'Gutachterausschuss Musterstadt · GMB 2025, S. 48'],
-      ['⌗', 'Bodenrichtwert 340 €/m²', 'BORIS · Stichtag 01.01.2026 · dl-de/by-2-0']]
+      erg: [['waage', 'RND 48 Jahre', 'Anlage 2 ImmoWertV · Bj 1994, 9 Modernisierungspunkte'],
+      ['waage', 'Liegenschaftszins 3,4 %', 'Gutachterausschuss Musterstadt · GMB 2025, S. 48'],
+      ['waage', 'Bodenrichtwert 340 €/m²', 'BORIS · Stichtag 01.01.2026 · dl-de/by-2-0']]
     },
     {
-      k: 'ausgeben', sym: '⎘', t: 'Ausgeben', schritt: 'Schritt 4 · ein Klick',
+      k: 'ausgeben', sym: 'stapel', t: 'Ausgeben', schritt: 'Schritt 4 · ein Klick',
       kopf: 'Sechs Seiten, bankfähig.',
       satz: 'Investment-Case für die Bank, BMF-Anlage fürs Finanzamt, '
         + 'Marktbericht mit Quellennachweis. Auf Wunsch im eigenen Logo — '
@@ -110,9 +137,9 @@
       fort: 100,
       feld: ['AUSGABE', '3 PDF'],
       zeit: '4:00', vgl: ['Sonst dafür:', '3 Stunden'],
-      erg: [['⎘', 'Investment-Case', '6 Seiten · Kennzahlen, Cashflow, Stresstest, Score'],
-      ['◫', 'BMF-Anlage', '4 Seiten · Kaufpreisaufteilung fürs Finanzamt'],
-      ['⌘', 'Marktbericht', '8 Seiten · mit Quellennachweis und Lizenz']]
+      erg: [['stapel', 'Investment-Case', '6 Seiten · Kennzahlen, Cashflow, Stresstest, Score'],
+      ['blatt', 'BMF-Anlage', '4 Seiten · Kaufpreisaufteilung fürs Finanzamt'],
+      ['blatt', 'Marktbericht', '8 Seiten · mit Quellennachweis und Lizenz']]
     }
   ];
 
@@ -130,15 +157,18 @@
   function hoch(node, ziel, ms) {
     var m = String(ziel).match(/[\d.,]+/);
     if (!m) { node.innerHTML = ziel; return; }
-    var roh = m[0], dez = roh.indexOf(',') >= 0;
+    var roh = m[0];
+    /* Nachkommastellen und Tausenderpunkte werden ABGELESEN, nicht gesetzt. */
+    var kk = roh.indexOf(',') >= 0 ? roh.length - roh.indexOf(',') - 1 : 0;
+    var tp = roh.indexOf('.') >= 0;
     var z = parseFloat(roh.replace(/\./g, '').replace(',', '.'));
     if (!isFinite(z)) { node.innerHTML = ziel; return; }
     var t0 = performance.now();
     (function s(t) {
       var p = Math.min(1, (t - t0) / (ms || 900));
       var e = 1 - Math.pow(1 - p, 3), v = z * e;
-      var txt = dez ? v.toFixed(1).replace('.', ',')
-        : Math.round(v).toLocaleString('de-DE');
+      var txt = v.toFixed(kk).replace('.', ',');
+      if (tp) txt = txt.replace(/\B(?=(\d{3})+(?!\d))/, '.');
       node.innerHTML = String(ziel).replace(roh, txt);
       if (p < 1) requestAnimationFrame(s);
     })(t0);
@@ -150,7 +180,7 @@
   function bauV1(wirt) {
     wirt.innerHTML = '<div class="v1">'
       + '<div class="v1-weg">' + DATEN.map(function (d, i) {
-        return '<div class="v1-st" data-i="' + i + '"><b>' + d.sym + ' ' + d.t + '</b>'
+        return '<div class="v1-st" data-i="' + i + '"><b>' + ik(d.sym) + ' ' + d.t + '</b>'
           + '<span>' + esc(d.schritt) + '</span></div>';
       }).join('') + '</div>'
       + '<div class="v1-buehne"><div class="v1-txt"></div>'
@@ -215,16 +245,16 @@
     ];
 
     return function (i) {
-      a.innerHTML = ALT.slice(0, i + 1).map(function (z, k) {
-        return '<div class="v2-zeile" style="opacity:0;animation:vAuf .5s var(--e-hoch) '
-          + (k * 0.09) + 's forwards"><span>' + esc(z[0]) + '</span><b>' + esc(z[1]) + '</b></div>';
+      a.innerHTML = ALT.map(function (z, k) {
+        return '<div class="v2-zeile' + (k <= i ? ' da' : '') + '">'
+          + '<span>' + esc(z[0]) + '</span><b>' + esc(z[1]) + '</b></div>';
       }).join('');
-      n.innerHTML = DATEN.slice(0, i + 1).map(function (d, k) {
-        return '<div class="v2-zeile" style="opacity:0;animation:vAuf .5s var(--e-hoch) '
-          + (0.15 + k * 0.09) + 's forwards"><span>' + d.sym + ' ' + esc(d.kopf) + '</span>'
+      n.innerHTML = DATEN.map(function (d, k) {
+        return '<div class="v2-zeile' + (k <= i ? ' da' : '') + (k === i ? ' jetzt' : '') + '">'
+          + '<span>' + ik(d.sym) + ' ' + esc(d.kopf) + '</span>'
           + '<b>' + esc(d.zeit) + '</b></div>'
-          + (k === i ? '<div class="v2-zeile" style="border:0;opacity:0;animation:vAuf .5s var(--e-hoch) .3s forwards">'
-            + '<span style="font-size:12px;color:var(--ddk)">' + esc(d.punkte[0]) + '</span></div>' : '');
+          + '<div class="v2-detail' + (k === i ? ' auf' : '') + '"><span>'
+          + esc(d.punkte[0]) + '</span></div>';
       }).join('');
     };
   }
@@ -237,9 +267,11 @@
     for (var b = 0; b < 26; b++) bc += '<i style="height:' + (9 + (b * 7 % 19)) + 'px"></i>';
 
     wirt.innerHTML = '<div class="v3">'
-      + '<div class="v3-bahn"><i></i><span class="v3-flug">✈</span></div>'
+      + '<div class="v3-bahn"><i></i><span class="v3-flug">'
+      + '<svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true">'
+      + '<path d="' + IKON.flieg + '"/></svg></span></div>'
       + '<div class="v3-halt">' + DATEN.map(function (d, i) {
-        return '<div class="v3-h" data-i="' + i + '"><b>' + d.sym + ' ' + d.t + '</b>'
+        return '<div class="v3-h" data-i="' + i + '"><b>' + ik(d.sym) + ' ' + d.t + '</b>'
           + '<span>' + esc(d.schritt) + '</span></div>';
       }).join('') + '</div>'
       + '<div class="v3-pass"><div class="v3-p-links">'
@@ -308,7 +340,7 @@
       st.textContent = DATEN[i].t.toUpperCase() + ' · ' + DATEN[i].schritt.toUpperCase();
       var zs = [];
       DATEN.slice(0, i + 1).forEach(function (d) {
-        zs.push(['ok', d.sym + ' ' + d.t + ' — ' + d.kopf]);
+        zs.push(['ok', '> ' + d.t + ' — ' + d.kopf]);
         d.erg.forEach(function (e) { zs.push(['', '  ' + e[1] + ' · ' + e[2]]); });
       });
       zs = zs.slice(-9);
@@ -326,7 +358,7 @@
       + '<div class="v5-uhr"><div class="v5-ring">'
       + '<svg viewBox="0 0 160 160"><circle class="tr" cx="80" cy="80" r="72"></circle>'
       + '<circle class="pg" cx="80" cy="80" r="72"></circle></svg>'
-      + '<div class="v5-zeit"><b class="v5-t">0:00</b><span>MINUTEN</span></div></div>'
+      + '<div class="v5-zeit"><b class="v5-t">0:00</b><span>MIN : SEK</span></div></div>'
       + '<div class="v5-vgl"><span class="v5-v1">Sonst dafür:</span><b class="v5-v2">—</b></div></div>'
       + '<div class="v5-inhalt"><h3></h3><p></p><div class="v5-erg"></div></div></div>';
 
@@ -349,7 +381,7 @@
       v1.textContent = d.vgl[0]; v2.textContent = d.vgl[1];
       h3.textContent = d.kopf; p.innerHTML = d.satz;
       erg.innerHTML = d.erg.map(function (e, n) {
-        return '<div class="v5-e" style="--n:' + n + '"><span class="ik">' + e[0] + '</span>'
+        return '<div class="v5-e" style="--n:' + n + '"><span class="ik">' + ik(e[0], 16) + '</span>'
           + '<span><b>' + esc(e[1]) + '</b><span>' + esc(e[2]) + '</span></span></div>';
       }).join('');
     };
