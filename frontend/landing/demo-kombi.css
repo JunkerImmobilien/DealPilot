@@ -1,0 +1,260 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   demo-kombi.css · v1574 · Die Kombination aus drei Fassungen
+   ───────────────────────────────────────────────────────────────────────
+   Marcel am 23.09.2026: "kannst du aus den demos mal 2-3 davon
+   kombinieren? auch ein beispiel szenario? fiktive strasse, mit rnd
+   spanne, dealscore, spracheingabe, richtig mit uebergang, zeit die
+   ablaeuft und richtig animiert."
+
+   Genommen wurde aus
+     Fassung 1  der Weg links und die Karte, die sich fuellt
+     Fassung 5  die Uhr - hier oben im Kopf, durchgehend sichtbar
+     Fassung 2  der Kontrast unten: was derselbe Schritt ohne kostet
+
+   Ein durchgehendes Szenario: Lindenallee 14. Jede Szene zeigt das
+   ECHTE Bauteil aus der App - das Mikrofon aus dem Sprechlauf, den
+   Score-Ring, die Restnutzungsdauer als SPANNE (nie als eine Zahl,
+   denn Anlage 2 ImmoWertV liefert einen Rahmen).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.kb{background:var(--ob);border:1px solid var(--line);position:relative;
+  overflow:hidden;display:flex;flex-direction:column;min-height:560px}
+/* Ein sehr langsamer Lichtschein wandert im Hintergrund - genug, dass
+   die Flaeche lebt, zu wenig, um vom Inhalt abzulenken. */
+.kb::before{content:'';position:absolute;inset:-40%;pointer-events:none;
+  background:radial-gradient(38% 30% at 30% 20%,rgba(201,168,76,.13),transparent 70%);
+  animation:kbLicht 19s ease-in-out infinite alternate}
+@keyframes kbLicht{to{transform:translate(38%,26%)}}
+
+/* ══ KOPF: Objekt, Uhr, Fortschritt ═══════════════════════════════════ */
+.kb-kopf{position:relative;z-index:2;display:flex;align-items:center;gap:20px;
+  padding:16px 22px;border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.02)}
+.kb-obj{flex:1;min-width:0}
+.kb-obj b{display:block;font:700 15.5px/1.25 var(--disp);color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kb-obj span{display:block;font:500 10px/1.4 var(--mono);letter-spacing:.09em;
+  color:var(--ddk);margin-top:3px}
+.kb-uhr{display:flex;align-items:center;gap:11px;flex:none}
+.kb-uhr-ring{position:relative;width:52px;height:52px;flex:none}
+.kb-uhr-ring svg{width:52px;height:52px;transform:rotate(-90deg)}
+.kb-uhr-ring .tr{fill:none;stroke:rgba(255,255,255,.12);stroke-width:4}
+.kb-uhr-ring .pg{fill:none;stroke:var(--gd);stroke-width:4;stroke-linecap:round;
+  stroke-dasharray:138;stroke-dashoffset:138;
+  transition:stroke-dashoffset .9s var(--e-hoch);
+  filter:drop-shadow(0 0 7px rgba(201,168,76,.55))}
+.kb-uhr-t{text-align:right}
+.kb-uhr-t b{display:block;font:700 22px/1 var(--disp);color:#fff;
+  font-variant-numeric:tabular-nums}
+.kb-uhr-t span{display:block;font:500 8px/1.3 var(--mono);letter-spacing:.14em;
+  color:var(--gdh);margin-top:3px}
+/* Die Sekunde tickt sichtbar - sonst ist "Zeit" nur ein Wort. */
+.kb-tick{display:inline-block;width:5px;height:5px;border-radius:50%;
+  background:var(--grn);margin-right:6px;vertical-align:1px;
+  animation:kbTick 1s steps(1) infinite}
+@keyframes kbTick{0%,49%{opacity:1}50%,100%{opacity:.2}}
+
+/* ══ HAUPTTEIL ════════════════════════════════════════════════════════ */
+.kb-haupt{position:relative;z-index:2;flex:1;display:grid;
+  grid-template-columns:212px 1fr;min-height:0}
+.kb-weg{border-right:1px solid var(--line);padding:16px 0;
+  background:rgba(0,0,0,.28)}
+.kb-st{position:relative;padding:13px 16px 13px 44px;cursor:pointer;
+  transition:background .3s var(--e-weich)}
+.kb-st::before{content:'';position:absolute;left:19px;top:19px;width:12px;height:12px;
+  border-radius:50%;background:rgba(255,255,255,.14);
+  transition:.35s var(--e-hoch)}
+.kb-st::after{content:'';position:absolute;left:24.5px;top:32px;bottom:-11px;width:1px;
+  background:rgba(255,255,255,.1)}
+.kb-st:last-child::after{display:none}
+.kb-st.on{background:linear-gradient(90deg,rgba(201,168,76,.13),transparent)}
+.kb-st.on::before{background:var(--gd);box-shadow:0 0 0 5px rgba(201,168,76,.2);
+  animation:kbPuls 2s ease-in-out infinite}
+@keyframes kbPuls{50%{box-shadow:0 0 0 9px rgba(201,168,76,0)}}
+.kb-st.fertig::before{background:var(--grn);box-shadow:none}
+.kb-st.fertig::after{background:rgba(63,165,108,.45)}
+.kb-st b{display:flex;align-items:center;gap:7px;
+  font:700 13.5px/1.3 var(--disp);color:rgba(255,255,255,.5);transition:color .3s}
+.kb-st.on b,.kb-st.fertig b{color:#fff}
+.kb-st span{display:block;font:500 9.5px/1.4 var(--mono);letter-spacing:.08em;
+  color:var(--ddk);margin-top:3px;margin-left:22px}
+.kb-st.on span{color:var(--gdh)}
+
+/* ══ BUEHNE: eine Szene geht, die naechste kommt ══════════════════════ */
+.kb-buehne{position:relative;padding:24px 26px;display:grid;
+  grid-template-columns:1fr 296px;gap:24px;align-items:center;min-height:0}
+.kb-szene{display:contents}
+/* Der Uebergang: die alte Szene sinkt weg, die neue steigt auf. */
+.kb-raus{animation:kbRaus .34s var(--e-weich) forwards}
+.kb-rein{animation:kbRein .5s var(--e-hoch) forwards}
+@keyframes kbRaus{to{opacity:0;transform:translateY(-14px)}}
+@keyframes kbRein{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+.kb-txt h3{font-size:24px;color:#fff;margin-bottom:9px;letter-spacing:-.025em}
+.kb-txt > p{margin:0 0 16px;color:var(--mdk);font-size:14px;line-height:1.62;
+  max-width:46ch}
+
+/* ══ SZENE 1 · SPRECHEN ═══════════════════════════════════════════════ */
+.kb-mik{display:flex;align-items:center;gap:18px;margin-bottom:16px}
+.kb-mik-k{position:relative;width:62px;height:62px;flex:none;display:grid;
+  place-items:center;border-radius:50%;background:var(--runway);
+  color:#241c06;box-shadow:0 8px 26px rgba(201,168,76,.4)}
+/* Drei Ringe, 2,6 s versetzt - dieselben Werte wie voice-import.js in
+   der App, damit die Seite nichts anderes zeigt als das Programm. */
+.kb-ring{position:absolute;inset:0;border-radius:50%;border:2px solid var(--gd);
+  opacity:0;animation:kbRing 2.6s ease-out infinite}
+.kb-ring:nth-child(2){animation-delay:.9s}
+.kb-ring:nth-child(3){animation-delay:1.8s}
+@keyframes kbRing{0%{transform:scale(1);opacity:.75}100%{transform:scale(2.5);opacity:0}}
+.kb-welle{display:flex;align-items:center;gap:3px;height:40px}
+.kb-welle i{display:block;width:3px;border-radius:2px;background:var(--gdh);
+  height:20%;animation:kbWelle 1.1s ease-in-out infinite;
+  animation-delay:calc(var(--n) * 70ms)}
+@keyframes kbWelle{0%,100%{height:16%;opacity:.5}50%{height:100%;opacity:1}}
+.kb-mitschrift{font:500 14px/1.6 var(--body);color:var(--txtd);
+  border-left:2px solid var(--gd);padding:9px 0 9px 14px;margin-bottom:16px;
+  min-height:56px}
+.kb-mitschrift .cur{display:inline-block;width:2px;height:15px;
+  background:var(--gdh);vertical-align:-2px;animation:kbTick .9s steps(1) infinite}
+.kb-chips{display:flex;flex-wrap:wrap;gap:7px}
+.kb-chip{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;
+  background:rgba(63,165,108,.12);border:1px solid rgba(63,165,108,.4);
+  font:500 12px/1 var(--mono);color:#fff;opacity:0;
+  animation:kbPop .45s cubic-bezier(.2,1.7,.4,1) forwards;
+  animation-delay:calc(var(--n) * 130ms)}
+.kb-chip i{color:var(--grnh);font-style:normal}
+@keyframes kbPop{from{opacity:0;transform:scale(.6) translateY(8px)}
+  to{opacity:1;transform:none}}
+
+/* ══ SZENE 3 · DIE RND-SPANNE ═════════════════════════════════════════
+   Anlage 2 ImmoWertV liefert keinen Punkt, sondern einen RAHMEN. Wer
+   daraus eine einzelne Zahl macht, behauptet eine Genauigkeit, die das
+   Modell nicht hergibt - deshalb steht hier die Spanne, und der Wert
+   sitzt sichtbar darin. */
+.kb-spanne{margin-bottom:16px}
+.kb-sp-kopf{display:flex;justify-content:space-between;align-items:baseline;
+  margin-bottom:9px}
+.kb-sp-kopf .lb{font:500 9px/1 var(--mono);letter-spacing:.12em;color:var(--ddk)}
+.kb-sp-kopf .wt{font:700 21px/1 var(--disp);color:#fff}
+.kb-sp-kopf .wt small{font:500 11px/1 var(--mono);color:var(--gdh);margin-left:5px}
+.kb-sp-bahn{position:relative;height:34px}
+.kb-sp-grund{position:absolute;left:0;right:0;top:14px;height:5px;
+  background:rgba(255,255,255,.09)}
+.kb-sp-band{position:absolute;top:14px;height:5px;background:var(--runway);
+  width:0;transition:width .9s var(--e-hoch) .15s;
+  box-shadow:0 0 14px rgba(201,168,76,.45)}
+.kb-sp-mark{position:absolute;top:6px;width:3px;height:21px;background:#fff;
+  opacity:0;transition:left .9s var(--e-hoch) .3s,opacity .4s .5s;
+  box-shadow:0 0 9px rgba(255,255,255,.7)}
+.kb-sp-mark.da{opacity:1}
+.kb-sp-skala{display:flex;justify-content:space-between;
+  font:500 9px/1 var(--mono);color:var(--ddk);margin-top:2px}
+.kb-sp-note{margin-top:9px;font-size:11.8px;color:var(--gdh);
+  display:flex;align-items:center;gap:7px}
+
+/* Belege */
+.kb-belege{display:grid;gap:7px}
+.kb-bel{display:flex;align-items:flex-start;gap:11px;padding:10px 13px;
+  background:rgba(255,255,255,.04);border-left:2px solid var(--gd);
+  opacity:0;animation:kbRein .5s var(--e-hoch) forwards;
+  animation-delay:calc(.2s + var(--n) * 140ms)}
+.kb-bel .ik{width:26px;height:26px;display:grid;place-items:center;flex:none;
+  background:rgba(201,168,76,.15);color:var(--gdh)}
+.kb-bel b{display:block;font:700 12.8px/1.3 var(--disp);color:#fff}
+.kb-bel span{display:block;font:500 10.5px/1.45 var(--mono);color:var(--ddk);
+  margin-top:3px}
+
+/* ══ SZENE 4 · DER STAPEL ═════════════════════════════════════════════ */
+.kb-pdfs{display:grid;gap:8px}
+.kb-pdf{display:flex;align-items:center;gap:13px;padding:12px 15px;
+  background:#fff;color:var(--ink);opacity:0;
+  animation:kbBlatt .55s cubic-bezier(.2,1.5,.4,1) forwards;
+  animation-delay:calc(var(--n) * 170ms)}
+@keyframes kbBlatt{from{opacity:0;transform:translateX(26px) rotate(2deg)}
+  to{opacity:1;transform:none}}
+.kb-pdf .ik{width:32px;height:40px;flex:none;background:var(--runway);
+  display:grid;place-items:center;color:#241c06}
+.kb-pdf b{display:block;font:700 13.5px/1.3 var(--disp)}
+.kb-pdf span{display:block;font-size:11.4px;color:var(--mut);margin-top:2px}
+.kb-pdf .s{margin-left:auto;font:700 10px/1 var(--mono);color:var(--gdi);
+  white-space:nowrap}
+
+/* ══ DIE KARTE RECHTS ═════════════════════════════════════════════════ */
+.kb-karte{background:#fff;color:var(--ink);position:relative;
+  box-shadow:0 34px 76px -28px rgba(0,0,0,.9);align-self:center}
+.kb-k-band{background:var(--runway);color:var(--gold-on);padding:8px 13px;
+  font:700 8px/1 var(--mono);letter-spacing:.13em;display:flex;
+  justify-content:space-between;align-items:center}
+.kb-k-body{padding:16px 16px 18px}
+.kb-k-lbl{font:700 8px/1 var(--mono);letter-spacing:.14em;color:var(--gdi);
+  margin-bottom:11px}
+/* Der Score-Ring - dieselbe Aufteilung wie im Kopf der Seite */
+.kb-dial{position:relative;width:118px;height:118px;margin:0 auto 10px}
+.kb-dial svg{width:118px;height:118px;transform:rotate(-90deg)}
+.kb-dial .tr{fill:none;stroke:rgba(20,18,15,.09);stroke-width:9}
+.kb-dial .pg{fill:none;stroke:#C9A84C;stroke-width:9;stroke-linecap:round;
+  stroke-dasharray:333;stroke-dashoffset:333;
+  transition:stroke-dashoffset 1.3s var(--e-hoch) .2s}
+.kb-dv{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.kb-dv b{font:700 37px/1 var(--disp);font-variant-numeric:tabular-nums}
+.kb-dv small{display:block;font:500 10px/1 var(--mono);color:var(--mut);margin-top:2px}
+.kb-stufe{text-align:center;font:700 10px/1 var(--mono);letter-spacing:.13em;
+  padding:6px 0;background:rgba(63,165,108,.14);color:#2E8455;margin-bottom:13px}
+.kb-bars{display:grid;gap:8px}
+.kb-bar .top{display:flex;justify-content:space-between;align-items:baseline;
+  font-size:10.5px;margin-bottom:3px}
+.kb-bar .nm{color:var(--inkm)}
+.kb-bar .nm .wt{color:var(--mut);font:500 8.5px var(--mono);margin-left:5px}
+.kb-bar .sc{font:700 11px var(--mono)}
+.kb-bar .track{display:block;height:4px;background:rgba(20,18,15,.08)}
+.kb-bar .track i{display:block;height:100%;width:0;
+  animation:kbBar 1s var(--e-hoch) forwards;
+  animation-delay:calc(.35s + var(--n) * 110ms)}
+@keyframes kbBar{to{width:var(--b)}}
+/* Perforation und Stub - die Karte bleibt ein Boarding-Pass */
+.kb-tear{position:relative;height:1px;background:repeating-linear-gradient(90deg,
+  rgba(20,18,15,.22) 0 5px,transparent 5px 10px);margin:14px 0 0}
+.kb-foot{display:flex;justify-content:space-between;align-items:flex-end;
+  padding:11px 16px 14px;font:500 7.5px/1.35 var(--mono);
+  letter-spacing:.11em;color:var(--mut)}
+.kb-foot b{display:block;font:700 10px/1.3 var(--disp);color:var(--ink);
+  letter-spacing:0;margin-top:2px}
+.kb-k-zeilen{display:grid;gap:6px}
+.kb-k-z{display:flex;justify-content:space-between;gap:9px;font-size:11.5px;
+  padding-bottom:5px;border-bottom:1px solid var(--cream-line)}
+.kb-k-z b{font:700 11.5px var(--mono)}
+.kb-k-gross{font:700 33px/1 var(--disp);margin-bottom:4px}
+.kb-k-sub{font-size:11.5px;color:var(--mut);line-height:1.5;margin-bottom:13px}
+
+/* ══ FUSS: der Kontrast ═══════════════════════════════════════════════ */
+.kb-fuss{position:relative;z-index:2;display:flex;align-items:center;gap:0;
+  border-top:1px solid var(--line);background:rgba(0,0,0,.3)}
+.kb-f{flex:1;padding:13px 22px;display:flex;align-items:center;gap:13px;
+  min-width:0}
+.kb-f + .kb-f{border-left:1px solid var(--line)}
+.kb-f .mk{font:700 8px/1 var(--mono);letter-spacing:.14em;padding:5px 9px;
+  flex:none}
+.kb-f.ohne .mk{background:rgba(184,98,80,.2);color:#E4A89E}
+.kb-f.mit .mk{background:var(--runway);color:var(--gold-on)}
+.kb-f .tx{font-size:12.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap}
+.kb-f.ohne .tx{color:rgba(228,168,158,.85)}
+.kb-f.mit .tx{color:#fff}
+.kb-f .zt{margin-left:auto;font:700 14px/1 var(--mono);flex:none}
+.kb-f.ohne .zt{color:#E4A89E;text-decoration:line-through;opacity:.8}
+.kb-f.mit .zt{color:var(--grnh)}
+
+@media(prefers-reduced-motion:reduce){
+  .kb *,.kb::before{animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;transition-duration:.01ms !important}
+}
+@media(max-width:900px){
+  .kb-haupt{grid-template-columns:1fr}
+  .kb-buehne{grid-template-columns:1fr}
+  .kb-weg{border-right:0;border-bottom:1px solid var(--line);
+    display:flex;overflow-x:auto;padding:10px}
+  .kb-st{flex:none;min-width:158px}
+  .kb-st::after{display:none}
+  .kb-fuss{flex-direction:column;align-items:stretch}
+  .kb-f + .kb-f{border-left:0;border-top:1px solid var(--line)}
+}
