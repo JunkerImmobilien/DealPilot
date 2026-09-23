@@ -561,3 +561,26 @@
   .ab-kopf{padding-left:0;padding-top:70px}
   .ab-sym{width:52px;height:52px}
 }
+
+/* ── Die zwei Wege im Sprechlauf ─────────────────────────────────────── */
+.zwei-wege{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:24px 0;
+  border:1px solid var(--cream-line);background:#fff}
+.weg{padding:24px 24px 26px;border-right:1px solid var(--cream-line);position:relative}
+.weg:last-child{border-right:0}
+.weg::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--runway);transform:scaleY(0);transform-origin:top;
+  transition:transform .3s var(--e-weich)}
+.weg:hover::before{transform:scaleY(1)}
+.weg:hover{background:var(--cream)}
+.weg-k{display:inline-block;font:700 9px/1 var(--mono);letter-spacing:.16em;
+  text-transform:uppercase;background:var(--stub);color:var(--gdh);
+  padding:5px 9px;margin-bottom:12px}
+.weg h4{font-size:18px;margin-bottom:10px}
+.weg p{margin:0 0 10px;font-size:14px;color:var(--inkm);line-height:1.6}
+.weg .weg-fuer{margin:12px 0 0;padding-top:11px;border-top:1px solid var(--cream-line);
+  font-size:13.2px;color:var(--mut)}
+.weg .weg-fuer b{color:var(--gdi)}
+@media(max-width:760px){
+  .zwei-wege{grid-template-columns:1fr}
+  .weg{border-right:0;border-bottom:1px solid var(--cream-line)}
+}

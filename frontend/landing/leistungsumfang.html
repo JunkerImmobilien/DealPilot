@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="dp2.css?v=v1563">
-<link rel="stylesheet" href="dp2-teile.css?v=v1563">
+<link rel="stylesheet" href="dp2.css?v=v1564">
+<link rel="stylesheet" href="dp2-teile.css?v=v1564">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════
    Leistungsumfang aus frontend/landing/index.html Z.3266-3969 (18 Kapitel).
@@ -862,11 +862,45 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
     <p><strong>Wo er startet:</strong> In der <strong>Pre-Flight-Leiste</strong> über dem Objekt — der Bordkarte mit den Einlese-Kacheln. Dort steht neben Exposé und Marktbericht die Kachel <strong>„Sprache"</strong>. Ein Klick, und der Sprechlauf öffnet sich.</p>
 
-    <p>Beim Öffnen entscheidest du, wie du arbeiten willst. <strong>„Ich erzähle frei"</strong>
-      startet die Aufnahme sofort — du redest am Stück, und die KI stellt dir danach nur noch
-      Rückfragen zu dem, was gefehlt hat. <strong>„Frag mich durch"</strong> dreht es um:
-      DealPilot führt dich Block für Block, du antwortest per Sprache oder tippst.
-      „Weiß ich nicht" überspringt eine Frage, „Fertig" bringt dich jederzeit zur Übersicht.</p>
+    <p>Beim Öffnen steht eine Frage mit zwei Antworten — und sie wird bei <em>jedem</em> Öffnen
+      neu gestellt. Welchen Weg du beim letzten Objekt genommen hast, spielt keine Rolle:
+      ein gemerkter Modus wäre genau dann falsch, wenn er am meisten stört — beim nächsten
+      Objekt, das anders liegt als das letzte.</p>
+
+    <div class="zwei-wege">
+      <div class="weg">
+        <span class="weg-k">Weg A</span>
+        <h4>Ich erzähle frei</h4>
+        <p>Die Aufnahme startet sofort. Du redest am Stück — über das, was dir wichtig ist,
+          in deiner Reihenfolge. Danach wertet die KI aus und fragt nur noch nach, was
+          gefehlt hat.</p>
+        <p class="weg-fuer"><b>Für dich, wenn</b> du das Objekt schon kennst und einfach
+          erzählen willst.</p>
+      </div>
+      <div class="weg" id="frag-mich">
+        <span class="weg-k">Weg B</span>
+        <h4>Frag mich durch</h4>
+        <p>DealPilot führt. Es ist derselbe Fragen-Ablauf wie bei den Rückfragen — nur von
+          Anfang an und über <strong>alle</strong> Blöcke statt nur über die Lücken.
+          29 Fragen in fünf Blöcken, eine nach der anderen.</p>
+        <p class="weg-fuer"><b>Für dich, wenn</b> du nicht weißt, was DealPilot hören will —
+          oder mitten in der Besichtigung stehst.</p>
+      </div>
+    </div>
+
+    <p>Der geführte Weg ist bewusst nicht starr. Du <strong>sprichst oder tippst</strong>,
+      wie es gerade passt — beides geht bei jeder Frage. <strong>„Weiß ich nicht"</strong>
+      überspringt eine Frage, ohne dass etwas Falsches eingetragen wird.
+      <strong>„Fertig"</strong> bringt dich jederzeit zur Übernahme-Tabelle, auch mitten
+      im Block — du musst nicht durchhalten, um etwas zu bekommen.</p>
+
+    <p>Und du kannst auf ein ganzes Thema antworten statt auf ein einzelnes Feld. Sagst du
+      <em>„die Adresse ist Hermannstraße 9 in 32609 Hüllhorst"</em>, füllt das vier Felder
+      auf einmal. Dasselbe gilt für <em>Objektdaten</em>, <em>Finanzierung</em>,
+      <em>Kaufnebenkosten</em>, <em>Mieteinnahmen</em>, <em>Hausgeld</em>, <em>Grundstück</em>
+      und <em>Lage</em> — DealPilot erkennt den Sammelbegriff und hakt die Felder ab, die
+      darin vorkamen.</p>
+
 
     <p>Der geführte Weg läuft in sechs Etappen, und <strong>jede Etappe ist für sich schon
       ein Ergebnis</strong>:</p>
@@ -1120,6 +1154,6 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
 
 
-<script src="dp2-lufeat.js?v=v1563"></script>
-<script src="dp2.js?v=v1563"></script>
+<script src="dp2-lufeat.js?v=v1564"></script>
+<script src="dp2.js?v=v1564"></script>
 </body></html>
