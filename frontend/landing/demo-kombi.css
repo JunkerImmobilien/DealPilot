@@ -120,10 +120,15 @@
 
 /* ══ BUEHNE ═══════════════════════════════════════════════════════════ */
 .kb-buehne{position:relative;padding:22px 24px;display:grid;
-  grid-template-columns:1fr 310px;gap:22px;align-items:center;min-height:0}
+  grid-template-columns:minmax(0,1fr) 310px;gap:22px;align-items:center;min-height:0}
 /* Bei "Rechnen" darf die Karte breiter werden - der Score ist dort die
    Hauptsache, nicht die Beigabe. */
-.kb-buehne.breit{grid-template-columns:1fr 396px}
+.kb-buehne.breit{grid-template-columns:minmax(0,1fr) minmax(0,384px)}
+/* Gemessen am 23.09.2026: ohne min-width:0 lief die Karte rechts aus
+   dem Rahmen - Balken und Fusszeile waren abgeschnitten. Grid-Kinder
+   haben per Vorgabe min-width:auto und schrumpfen deshalb NICHT unter
+   ihre Inhaltsbreite; die Spaltenangabe allein haelt sie nicht. */
+.kb-buehne > *{min-width:0}
 .kb-raus{animation:kbRaus .32s var(--e-weich) forwards}
 .kb-rein{animation:kbRein .5s var(--e-hoch) forwards}
 @keyframes kbRaus{to{opacity:0;transform:translateY(-14px)}}
@@ -257,8 +262,9 @@
    Vorher standen sie uebereinander, dadurch war die Karte schmal und
    hoch - Marcel: "der ist so ein bisschen gedrueckt". Die echte
    .idscard im Kopf der Seite teilt genauso auf. */
-.kb-score-grid{display:grid;grid-template-columns:150px 1fr;gap:16px;
+.kb-score-grid{display:grid;grid-template-columns:146px minmax(0,1fr);gap:14px;
   align-items:center}
+.kb-score-grid > *{min-width:0}
 .kb-dial{position:relative;width:146px;height:146px;margin:0 auto}
 .kb-dial svg{width:146px;height:146px;transform:rotate(-90deg)}
 .kb-dial .tr{fill:none;stroke:rgba(20,18,15,.09);stroke-width:10}
