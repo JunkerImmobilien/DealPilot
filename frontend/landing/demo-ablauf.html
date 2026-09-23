@@ -1,0 +1,266 @@
+<!DOCTYPE html><!-- DealPilot Demo · v1571 -->
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sechs Ideen für den Ablauf · DealPilot</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="dp2.css?v=v1571">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   Sechs Ideen, wie der Ablauf-Bereich besser wirken kann.
+   Jede ist lauffaehig, nicht gemalt - Marcel soll sie vergleichen
+   koennen, nicht sich vorstellen muessen.
+   ═══════════════════════════════════════════════════════════════════════ */
+body{background:var(--cream)}
+.kopf{background:var(--ob);color:var(--txtd);padding:44px 0 38px}
+.kopf h1{font-size:clamp(26px,3.6vw,40px);color:#fff;margin:14px 0 12px}
+.kopf h1 em{font-style:normal;color:var(--gdh)}
+.kopf p{margin:0;max-width:64ch;color:var(--mdk)}
+.kopf .eye{color:var(--gdh)}
+.kopf .eye::before{background:var(--gdh)}
+
+.idee{border-top:1px solid var(--cream-line);padding:44px 0}
+.idee:first-of-type{border-top:0}
+.ik{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.ik .nr{font:700 11px/1 var(--mono);letter-spacing:.18em;color:var(--gdi);flex:none}
+.ik h2{font-size:23px}
+.iw{margin:0 0 6px;color:var(--inkm);max-width:74ch;font-size:15px;line-height:1.62}
+.iu{margin:0 0 22px;font-size:13.2px;color:var(--mut);max-width:74ch;font-style:italic}
+.buehne{background:var(--ob);border:1px solid var(--line);position:relative;
+  overflow:hidden;min-height:300px;display:flex;align-items:center;justify-content:center;
+  padding:26px}
+
+/* ── 1 · Die Karte baut sich auf ────────────────────────────────────── */
+.d1 .kt{width:330px;background:#fff;color:var(--ink);position:relative}
+.d1 .tl{height:0;overflow:hidden;animation:d1auf .6s ease forwards}
+.d1 .tl:nth-child(1){animation-delay:.1s}
+.d1 .tl:nth-child(2){animation-delay:.5s}
+.d1 .tl:nth-child(3){animation-delay:.9s}
+.d1 .tl:nth-child(4){animation-delay:1.3s}
+@keyframes d1auf{to{height:var(--h)}}
+.d1 .b1{background:var(--runway);--h:26px;display:flex;align-items:center;
+  padding:0 12px;font:700 8px/26px var(--mono);letter-spacing:.14em;color:var(--gold-on)}
+.d1 .b2{--h:40px;padding:0 12px;font:700 15px/40px var(--disp)}
+.d1 .b3{--h:74px;padding:8px 12px;display:grid;gap:5px}
+.d1 .b3 i{display:block;height:5px;background:rgba(20,18,15,.1)}
+.d1 .b3 i:nth-child(1){width:88%}.d1 .b3 i:nth-child(2){width:64%}
+.d1 .b3 i:nth-child(3){width:78%}.d1 .b3 i:nth-child(4){width:52%}
+.d1 .b4{--h:34px;background:var(--stub);color:var(--gdh);
+  font:700 8px/34px var(--mono);letter-spacing:.13em;padding:0 12px}
+.d1 .lin{position:absolute;left:-26px;top:0;bottom:0;width:1px;
+  background:linear-gradient(transparent,var(--gd),transparent);
+  animation:d1lin 2s ease-in-out infinite}
+@keyframes d1lin{0%,100%{opacity:.2}50%{opacity:1}}
+
+/* ── 2 · Ein Objekt, vier Zustände ──────────────────────────────────── */
+.d2 .kt{width:290px;background:#fff;color:var(--ink);padding:16px;position:relative;
+  min-height:190px}
+.d2 .st{position:absolute;inset:16px;opacity:0;animation:d2w 12s infinite}
+.d2 .st:nth-child(1){animation-delay:0s}
+.d2 .st:nth-child(2){animation-delay:3s}
+.d2 .st:nth-child(3){animation-delay:6s}
+.d2 .st:nth-child(4){animation-delay:9s}
+@keyframes d2w{0%,2%{opacity:0;transform:translateY(8px)}
+  5%,23%{opacity:1;transform:none}26%,100%{opacity:0}}
+.d2 .lbl{font:700 8px/1 var(--mono);letter-spacing:.15em;color:var(--gdi);margin-bottom:9px}
+.d2 .gr{font:700 26px/1 var(--disp);margin-bottom:6px}
+.d2 .kl{font-size:12px;color:var(--mut)}
+.d2 .fort{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(20,18,15,.08)}
+.d2 .fort i{display:block;height:100%;background:var(--runway);width:0;
+  animation:d2f 12s linear infinite}
+@keyframes d2f{to{width:100%}}
+
+/* ── 3 · Der Stempel-Weg ────────────────────────────────────────────── */
+.d3 .pass{width:360px;background:#fff;color:var(--ink);position:relative;padding:18px 18px 22px}
+.d3 .pk{font:700 8px/1 var(--mono);letter-spacing:.15em;color:var(--mut);margin-bottom:12px}
+.d3 .reihe{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.d3 .feld{border:1px dashed rgba(20,18,15,.2);aspect-ratio:1;display:grid;place-items:center;
+  font:700 7.5px/1.2 var(--mono);color:var(--mut);text-align:center;position:relative}
+.d3 .feld i{position:absolute;inset:2px;display:grid;place-items:center;
+  background:var(--grn);color:#fff;font:700 15px/1 var(--mono);
+  opacity:0;transform:rotate(-12deg) scale(.5);
+  animation:d3st .5s cubic-bezier(.2,1.6,.4,1) forwards}
+.d3 .feld:nth-child(1) i{animation-delay:.4s}
+.d3 .feld:nth-child(2) i{animation-delay:1.3s}
+.d3 .feld:nth-child(3) i{animation-delay:2.2s}
+.d3 .feld:nth-child(4) i{animation-delay:3.1s}
+@keyframes d3st{to{opacity:1;transform:rotate(-12deg) scale(1)}}
+
+/* ── 4 · Datenfluss in die Karte ────────────────────────────────────── */
+.d4{position:relative;width:100%;max-width:440px;height:240px}
+.d4 .ziel{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);
+  width:190px;background:#fff;color:var(--ink);padding:12px}
+.d4 .ziel b{display:block;font:700 22px/1 var(--disp)}
+.d4 .ziel span{font-size:11px;color:var(--mut)}
+.d4 .tropf{position:absolute;top:-8px;font:600 9.5px/1 var(--mono);
+  background:rgba(232,204,122,.14);border:1px solid rgba(201,168,76,.3);
+  color:var(--gdh);padding:5px 8px;white-space:nowrap;opacity:0;
+  animation:d4fall 3.4s ease-in infinite}
+@keyframes d4fall{
+  0%{opacity:0;transform:translateY(0) scale(.9)}
+  12%{opacity:1;transform:translateY(20px) scale(1)}
+  72%{opacity:1;transform:translateY(150px)}
+  88%,100%{opacity:0;transform:translateY(176px) scale(.8)}
+}
+
+/* ── 5 · Vollbild mit Text darüber ──────────────────────────────────── */
+.d5{width:100%;position:relative;min-height:250px;display:flex;align-items:flex-end}
+.d5 .bg{position:absolute;inset:0;
+  background:radial-gradient(70% 90% at 76% 30%,rgba(201,168,76,.22),transparent 60%),
+    linear-gradient(90deg,rgba(7,7,7,.96) 34%,rgba(7,7,7,.5))}
+.d5 .gross{position:absolute;right:20px;top:50%;transform:translateY(-50%);
+  font:700 128px/1 var(--disp);color:rgba(232,204,122,.12);letter-spacing:-6px}
+.d5 .txt{position:relative;max-width:56%;padding:22px}
+.d5 .txt h3{font-size:24px;color:#fff;margin-bottom:9px}
+.d5 .txt p{margin:0;color:var(--mdk);font-size:14px}
+
+/* ── 6 · Die Reiter als Runway ──────────────────────────────────────── */
+.d6{width:100%;max-width:520px}
+.d6 .bahn{position:relative;height:3px;background:rgba(255,255,255,.12);margin:0 14px 26px}
+.d6 .bahn i{position:absolute;left:0;top:0;height:100%;background:var(--runway);width:0;
+  animation:d6b 8s linear infinite}
+@keyframes d6b{to{width:100%}}
+.d6 .flug{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);
+  color:var(--gdh);font-size:15px;animation:d6f 8s linear infinite}
+@keyframes d6f{to{left:100%}}
+.d6 .halt{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.d6 .h{text-align:center}
+.d6 .pkt{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.16);
+  margin:0 auto 9px;animation:d6p 8s linear infinite}
+.d6 .h:nth-child(1) .pkt{animation-delay:0s}
+.d6 .h:nth-child(2) .pkt{animation-delay:2s}
+.d6 .h:nth-child(3) .pkt{animation-delay:4s}
+.d6 .h:nth-child(4) .pkt{animation-delay:6s}
+@keyframes d6p{0%,20%{background:var(--gd);box-shadow:0 0 0 5px rgba(201,168,76,.2)}
+  26%,100%{background:rgba(255,255,255,.16);box-shadow:none}}
+.d6 .h b{display:block;font:700 12.5px/1.3 var(--disp);color:#fff}
+.d6 .h span{display:block;font-size:10.5px;color:var(--mdk);margin-top:3px}
+
+.urteil{background:#fff;border-left:3px solid var(--gd);padding:15px 19px;
+  font-size:14px;color:var(--inkm);margin-top:16px;max-width:74ch;line-height:1.6}
+.urteil b{color:var(--ink)}
+@media(prefers-reduced-motion:reduce){*{animation:none !important}}
+</style>
+</head><body>
+
+<div class="kopf"><div class="wrap">
+  <div class="eye">Zur Auswahl</div>
+  <h1>Sechs Wege, den Ablauf <em>besser zu zeigen.</em></h1>
+  <p>Jede Idee läuft hier wirklich — nicht gemalt. Sag mir eine Nummer, dann baue ich sie
+    aus. Sie lassen sich auch kombinieren.</p>
+</div></div>
+
+<section class="idee d1"><div class="wrap">
+  <div class="ik"><span class="nr">IDEE 01</span><h2>Die Karte baut sich auf</h2></div>
+  <p class="iw">Statt fertig aufzutauchen, wächst die Karte Zeile für Zeile — erst das
+    Goldband, dann der Titel, dann die Kennzahlen, zuletzt der Abriss. Wie ein Dokument,
+    das gerade gedruckt wird.</p>
+  <p class="iu">Stark, weil es zeigt: hier entsteht etwas. Schwach, wenn man es zum
+    zweiten Mal sieht.</p>
+  <div class="buehne"><div class="kt">
+    <span class="lin"></span>
+    <div class="tl b1">DEALPILOT · INVESTMENT-CASE</div>
+    <div class="tl b2">3-Zimmer-ETW · 112 m²</div>
+    <div class="tl b3"><i></i><i></i><i></i><i></i></div>
+    <div class="tl b4">✈ BANKFERTIG · DP-2026</div>
+  </div></div>
+</div></section>
+
+<section class="idee d2"><div class="wrap">
+  <div class="ik"><span class="nr">IDEE 02</span><h2>Ein Objekt, vier Zustände</h2></div>
+  <p class="iw">Eine einzige Karte in der Mitte, die bei jedem Schritt ihren Inhalt wechselt:
+    erst leer mit Mikrofon, dann mit Zahlen, dann mit Quellen, zuletzt als PDF. Dieselbe
+    Wohnung, vier Stationen.</p>
+  <p class="iu">Die stärkste Idee inhaltlich — sie erzählt genau, was DealPilot tut:
+    aus einer Eingabe wird Schritt für Schritt eine Bankunterlage.</p>
+  <div class="buehne"><div class="kt">
+    <div class="st"><div class="lbl">01 · ERFASST</div>
+      <div class="gr">112 m²</div><div class="kl">3-Zimmer-ETW · Baujahr 1974 · noch nichts gerechnet</div></div>
+    <div class="st"><div class="lbl">02 · GERECHNET</div>
+      <div class="gr">+ 214 €</div><div class="kl">Cashflow / Monat · DSCR 1,31 · LTV 84 %</div></div>
+    <div class="st"><div class="lbl">03 · BELEGT</div>
+      <div class="gr">34 Jahre</div><div class="kl">Restnutzungsdauer · Anlage 2 ImmoWertV</div></div>
+    <div class="st"><div class="lbl">04 · AUSGEGEBEN</div>
+      <div class="gr">6 Seiten</div><div class="kl">Investment-Case · bankfertig als PDF</div></div>
+    <span class="fort"><i></i></span>
+  </div></div>
+</div></section>
+
+<section class="idee d3"><div class="wrap">
+  <div class="ik"><span class="nr">IDEE 03</span><h2>Der Boarding-Pass wird gestempelt</h2></div>
+  <p class="iw">Vier leere Felder auf einer Bordkarte. Bei jedem Schritt knallt ein Stempel
+    hinein — erfasst, gerechnet, belegt, ausgegeben. Am Ende ist die Karte voll.</p>
+  <p class="iu">Passt zur Luftfahrt-Bildsprache und ist sofort verständlich. Der Stempel-
+    Effekt trägt aber nur, wenn er hörbar „sitzt" — also kurz und hart, nicht weich.</p>
+  <div class="buehne"><div class="pass">
+    <div class="pk">BOARDING PASS · DP-2026-1036</div>
+    <div class="reihe">
+      <div class="feld">ERFASST<i>✓</i></div>
+      <div class="feld">GERECHNET<i>✓</i></div>
+      <div class="feld">BELEGT<i>✓</i></div>
+      <div class="feld">BANKFERTIG<i>✓</i></div>
+    </div>
+  </div></div>
+</div></section>
+
+<section class="idee d4"><div class="wrap">
+  <div class="ik"><span class="nr">IDEE 04</span><h2>Die Werte fallen in die Karte</h2></div>
+  <p class="iw">Einzelne Angaben schweben von oben herein und verschwinden in der Karte —
+    und mit jedem Wert steigt der Score. Man sieht, woraus die Zahl entsteht.</p>
+  <p class="iu">Schön, wenn wenige Werte fallen. Bei zu vielen wird es Konfetti.</p>
+  <div class="buehne"><div class="d4">
+    <span class="tropf" style="left:8%;animation-delay:0s">285.000 €</span>
+    <span class="tropf" style="left:32%;animation-delay:.6s">112 m²</span>
+    <span class="tropf" style="left:56%;animation-delay:1.2s">820 € kalt</span>
+    <span class="tropf" style="left:78%;animation-delay:1.8s">Bj. 1974</span>
+    <div class="ziel"><b>74 / 100</b><span>Investor Deal Score · 21 von 24 KPIs</span></div>
+  </div></div>
+</div></section>
+
+<section class="idee d5"><div class="wrap">
+  <div class="ik"><span class="nr">IDEE 05</span><h2>Vollbild statt Kasten</h2></div>
+  <p class="iw">Die Szene nimmt die ganze Breite, der Text liegt darüber, und im Hintergrund
+    steht die Schrittzahl riesig und halbtransparent. Kein Rahmen, keine zwei Spalten.</p>
+  <p class="iu">Wirkt großzügig und modern. Braucht aber kurze Texte — lange Absätze
+    schwimmen ohne Kasten.</p>
+  <div class="buehne" style="padding:0"><div class="d5">
+    <span class="bg"></span><span class="gross">02</span>
+    <div class="txt"><h3>Rechnen statt schätzen</h3>
+      <p>Cashflow, DSCR, LTV und Rendite — heute, zum Ende der Zinsbindung und für den
+        Anschluss.</p></div>
+  </div></div>
+</div></section>
+
+<section class="idee d6"><div class="wrap">
+  <div class="ik"><span class="nr">IDEE 06</span><h2>Die Reiter werden zur Landebahn</h2></div>
+  <p class="iw">Über den vier Schritten liegt eine Bahn, auf der ein Flieger entlangfährt.
+    Er hält an jeder Station, der Punkt leuchtet auf, die Szene darunter wechselt.</p>
+  <p class="iu">Die verspielteste Idee — und die einzige, die den Namen DealPilot
+    wörtlich nimmt. Lässt sich mit jeder anderen kombinieren.</p>
+  <div class="buehne"><div class="d6">
+    <div class="bahn"><i></i><span class="flug">✈</span></div>
+    <div class="halt">
+      <div class="h"><span class="pkt"></span><b>Erfassen</b><span>Exposé, Sprache, Belege</span></div>
+      <div class="h"><span class="pkt"></span><b>Rechnen</b><span>Cashflow, Steuer, 15 Jahre</span></div>
+      <div class="h"><span class="pkt"></span><b>Belegen</b><span>Quelle zu jeder Zahl</span></div>
+      <div class="h"><span class="pkt"></span><b>Ausgeben</b><span>PDF, Excel, Datenraum</span></div>
+    </div>
+  </div></div>
+</div></section>
+
+<section class="idee"><div class="wrap">
+  <div class="urteil">
+    <b>Meine Empfehlung: 02 als Grundlage, dazu 06 als Rahmen.</b><br><br>
+    <b>02</b> erzählt inhaltlich genau das Richtige — eine Wohnung, vier Stationen, und am
+    Ende liegt die Bankunterlage da. Das ist kein Effekt, sondern das Versprechen der
+    Software in Bildform. Und es löst nebenbei ein Problem: heute zeigen die vier Szenen
+    vier verschiedene Dinge, und man muss selbst merken, dass es dasselbe Objekt ist.<br><br>
+    <b>06</b> darüber kostet wenig und macht aus vier Reitern einen Weg. Der Flieger ist
+    genau so viel Verspieltheit, wie eine Seite verträgt, die sonst von Zahlen lebt.<br><br>
+    <b>03</b> würde ich mir für den Abschluss aufheben — ein einzelner Stempel „BANKFERTIG"
+    am Ende des Durchlaufs wirkt stärker als vier.
+  </div>
+</div></section>
+
+</body></html>

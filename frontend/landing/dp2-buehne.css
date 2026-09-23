@@ -21,6 +21,10 @@
 .ab-b{display:none}
 /* Drei Kinder, zwei Spalten: links Text und Ergebnisse untereinander,
    rechts die Szene ueber beide Zeilen. */
+/* v1571 · Die Rechnen-Szene traegt die echte Score-Karte und braucht
+   mehr Platz als die anderen - deshalb dort ein anderes Verhaeltnis. */
+.ab-b[data-i="1"].on{grid-template-columns:.92fr 1.08fr}
+.ab-b[data-i="1"] .ab-szene{min-height:360px}
 .ab-b.on{display:grid;grid-template-columns:1.18fr .82fr;
   grid-template-rows:auto auto;gap:22px 34px;align-items:start}
 .ab-links{grid-column:1;grid-row:1;min-width:0}
@@ -91,13 +95,13 @@
 .sz-skal{width:100%;height:100%;display:grid;place-items:center;overflow:hidden;
   position:relative;z-index:2}
 .sz-klein{width:560px;flex:none;
-  transform:scale(.52);transform-origin:center;
+  transform:scale(.72);transform-origin:center;
   opacity:0;animation:none;
   box-shadow:0 30px 70px -26px rgba(0,0,0,.85),0 0 0 1px rgba(201,168,76,.28)}
 .ab-b.on .sz-klein{animation:szKarte .7s var(--e-hoch) .1s forwards}
 @keyframes szKarte{
-  from{opacity:0;transform:scale(.44) translateY(26px)}
-  to{opacity:1;transform:scale(.52)}
+  from{opacity:0;transform:scale(.6) translateY(26px)}
+  to{opacity:1;transform:scale(.72)}
 }
 /* Ring und Balken fahren aus - dieselben Zeiten wie oben im Kopf. */
 .sz-klein .sz-pg{stroke-dasharray:333;stroke-dashoffset:333}
@@ -174,7 +178,7 @@
   .ab-b.on .sz-beleg,
   .ab-b.on .sz-blatt,.ab-b.on .sz-blatt.top,.ab-b.on .sz-p-chart i,
   .ab-b.on .sz-stempel{animation:none;opacity:1}
-  .sz-klein{opacity:1;transform:scale(.52)}
+  .sz-klein{opacity:1;transform:scale(.72)}
   .sz-klein .sz-pg{stroke-dashoffset:87}
   .sz-klein .sz-bal{width:var(--b)}
   .sz-blatt:nth-child(1){transform:rotate(-6deg) translateX(-11px)}
