@@ -95,6 +95,11 @@ img{max-width:100%;display:block}
    Grund wie ein Fremdkoerper. Die gesetzte Wortmarke traegt den hellen
    Kopf besser - die schwarze Zeile darueber bleibt, wie sie ist. */
 .mark{font:700 22px/1 var(--disp);letter-spacing:-.9px;display:flex;align-items:center;gap:10px}
+/* v1565 · "Deal" und "Pilot" stehen in EINEM Element. Vorher war der
+   Textknoten "Deal" ein eigenes anonymes Flex-Item - der gap:10px des
+   Containers galt damit auch zwischen den beiden Worthaelften, also
+   mitten im Namen. Gemessen: drei Flex-Items statt zwei. */
+.mark .wort{white-space:nowrap}
 .mark b{color:var(--gdd);font-weight:700}
 .mark .sig{width:28px;height:28px;border:1.5px solid var(--gd);display:flex;
   align-items:center;justify-content:center;color:var(--gdi)}
