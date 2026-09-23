@@ -319,6 +319,12 @@
 
     function setzen() {
       clearInterval(flugUhr);
+      /* Pillen, die noch unterwegs sind, gehoeren nicht in die naechste
+         Szene - sie haengen an der Bahn, nicht an der Buehne, und
+         wuerden den Wechsel ueberleben. */
+      [].slice.call(bahn.querySelectorAll('.wx-flug')).forEach(function (p) {
+        p.remove();
+      });
       buehne.classList.remove('wx-raus');
       buehne.innerHTML = szene(i);
       nachziehen(i);
@@ -396,24 +402,29 @@
       pille.style.left = (vonR.left - bahnR.left + vonR.width / 2) + 'px';
       pille.style.top = (vonR.top - bahnR.top + vonR.height / 2 - 14) + 'px';
       bahn.appendChild(pille);
-      /* Erst poppen ... */
       pille.classList.add('start');
       var dx = (zuR.left - bahnR.left + 26) - parseFloat(pille.style.left);
       var dy = (zuR.top - bahnR.top + zuR.height / 2 - 14) - parseFloat(pille.style.top);
-      /* ... dann fliegen. Zwei Frames Abstand, sonst fasst der Browser
-         beides zu einem Sprung zusammen. */
-      requestAnimationFrame(function () { requestAnimationFrame(function () {
-        setTimeout(function () {
-          pille.classList.remove('start');
-          pille.classList.add('fliegt');
-          pille.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(.85)';
-          setTimeout(function () {
-            feld.classList.add('voll');
-            feld.querySelector('.vl').textContent = f[1];
-            pille.remove();
-          }, 600);
-        }, 330);
-      }); });
+
+      /* DAS ERGEBNIS HAENGT NICHT AN DER ANIMATION.
+         Gemessen am 23.09.2026: die Flugkette lag in zwei
+         verschachtelten requestAnimationFrame. Im Hintergrund-Tab
+         feuert rAF nie - die Pillen poppten auf, blieben am Mikrofon
+         liegen, und die Felder wurden NIE gefuellt. Der Zustand steckte
+         in der Animation fest.
+         Jetzt setzt ein eigener Timer das Feld, komme was wolle; der
+         Flug ist nur noch Schmuck davor. setTimeout wird im
+         Hintergrund gedrosselt, aber es laeuft. */
+      setTimeout(function () {
+        pille.classList.remove('start');
+        pille.classList.add('fliegt');
+        pille.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(.85)';
+      }, 340);
+      setTimeout(function () {
+        feld.classList.add('voll');
+        feld.querySelector('.vl').textContent = f[1];
+        if (pille.parentNode) pille.remove();
+      }, 950);
       i++;
     }, 980);
   }
