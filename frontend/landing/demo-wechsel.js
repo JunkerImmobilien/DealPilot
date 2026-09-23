@@ -271,7 +271,7 @@
     /* ── 3 · KAUFPREISAUFTEILUNG ─────────────────────────────────── */
     if (a.k === 'aufteilung') {
       var antB = K.boden_angesetzt / O.kaufpreis * 100;
-      return titel('STUFE 3 · KAUFPREISAUFTEILUNG',
+      return titel('STUFE 4 · KAUFPREISAUFTEILUNG',
         'Was in den Notarvertrag gehört.',
         'Nur der Gebäudeanteil wird abgeschrieben. Je sauberer der Bodenwert '
         + 'hergeleitet ist, desto höher die Bemessungsgrundlage — und der Abschlag '
@@ -306,7 +306,7 @@
 
     /* ── 4 · RESTNUTZUNGSDAUER — der Regler ──────────────────────── */
     if (a.k === 'nutzung') {
-      return titel('STUFE 4 · RESTNUTZUNGSDAUER',
+      return titel('STUFE 5 · RESTNUTZUNGSDAUER',
         'Ein Rahmen, keine Zahl — und die Wahl darin.',
         'Anlage 2 ImmoWertV liefert eine Spanne. DealPilot zeigt sie und lässt '
         + 'wählen, statt eine Zahl zu setzen, die niemand belegen kann.')
@@ -338,7 +338,7 @@
 
     /* ── 5 · ABSCHREIBUNG ────────────────────────────────────────── */
     if (a.k === 'afa') {
-      return titel('STUFE 5 · ABSCHREIBUNG',
+      return titel('STUFE 6 · ABSCHREIBUNG',
         'Was die Wahl je Jahr bedeutet.',
         'Eine kürzere Nutzungsdauer heißt höhere Abschreibung. Sie verlangt einen '
         + 'Nachweis nach § 7 Abs. 4 Satz 2 EStG — den liefert das Gutachten, das '
@@ -362,7 +362,7 @@
 
     /* ── 6 · VERKEHRSWERT ────────────────────────────────────────── */
     if (a.k === 'wert') {
-      return titel('STUFE 6 · VERKEHRSWERT',
+      return titel('STUFE 7 · VERKEHRSWERT',
         'Ein Verfahren, begründet gewählt.',
         'Zwei Verfahren nebeneinander zu zeigen, von denen eines nicht passt, '
         + 'sieht nach Gründlichkeit aus und ist das Gegenteil.')
@@ -392,7 +392,7 @@
 
     /* ── 7 · FINANZIERUNG ────────────────────────────────────────── */
     if (a.k === 'finanz') {
-      return titel('STUFE 7 · FINANZIERUNG',
+      return titel('STUFE 8 · FINANZIERUNG',
         'Mit Marktzins, nicht mit Wunschzins.',
         'Eine Indikation, kein Angebot — das steht an der Zeile und nicht im '
         + 'Kleingedruckten.')
@@ -420,7 +420,7 @@
 
     /* ── 8 · DER INVESTOR DEAL SCORE ─────────────────────────────── */
     if (a.k === 'score') {
-      return titel('STUFE 8 · INVESTOR DEAL SCORE',
+      return titel('STUFE 9 · INVESTOR DEAL SCORE',
         'Jetzt sind alle Angaben da.',
         'Dieselbe Karte wie nach dem Quick-Check — nur steht jetzt alles darin: '
         + 'Finanzierung gerechnet, amtliche Werte belegt, Steuerwirkung bekannt.')
@@ -448,7 +448,7 @@
 
     /* ── 9 · DAS URTEIL ──────────────────────────────────────────── */
     var lohnt = C.mit.nach_steuer_monat >= 0;
-    return titel('STUFE 8 · DIE ENTSCHEIDUNG',
+    return titel('STUFE 10 · DIE ENTSCHEIDUNG',
       lohnt ? 'Trägt sich — aber erst nach Steuern.' : 'Trägt sich nicht.',
       'Derselbe Kaufpreis, dieselbe Bank, dasselbe Objekt. Zwei Zahlen sind '
       + 'anders, und beide sind belegbar.')
@@ -486,7 +486,7 @@
      Die drei Antworten stehen in DP_STEUER.COPILOT und sind
      gerechnet, nicht getextet. */
   function szeneCopilot() {
-    return titel('STUFE 10 · FRAG DEN CO-PILOTEN',
+    return titel('STUFE 11 · FRAG DEN CO-PILOTEN',
       'Es trägt sich. Was ginge noch?',
       'Der Co-Pilot kennt das ganze Objekt — die Rechnung, die Annahmen und '
       + 'die Quellen. Er antwortet mit dem, was daraus folgt.')
