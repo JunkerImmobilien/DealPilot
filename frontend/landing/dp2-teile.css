@@ -341,3 +341,66 @@
   background:linear-gradient(transparent,rgba(12,11,9,.88));
   color:var(--gdh);padding:36px 22px 14px;
   font:700 10px/1.4 var(--mono);letter-spacing:.15em;text-transform:uppercase}
+
+/* ═══════════════════════════════════════════════════════════════════
+   v1557 · Die Grundregeln der Tickets - sie hatten gefehlt.
+   Mein Filter in v1551 suchte nach "tkg", "tkt" und "tk-" und hat
+   damit ausgerechnet ".tk" selbst verfehlt: die Regel mit Hintergrund,
+   Radius 16 px und Schatten. Die Tickets trugen deshalb die Farbe des
+   Laufbands. In v1553 habe ich das Laufband umbenannt und damit nur
+   das Symptom behoben. Hier ist die Ursache.
+
+   Marcel am 23.09.2026: "Das muss rund sein." Genau das steckt in
+   dieser Regel - und im Umschalter (12 px aussen, 9 px innen).
+   ═══════════════════════════════════════════════════════════════════ */
+#pricing .ptoggle{display:inline-flex;gap:2px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:3px;margin-top:20px}
+#pricing .ptoggle button{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.55);background:transparent;border:0;border-radius:9px;padding:9px 18px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:7px}
+#pricing .ptoggle button.on{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#221a06;font-weight:700}
+.tk{display:flex;flex-direction:column;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 30px 66px -38px rgba(0,0,0,.8),0 0 0 1px rgba(201,168,76,.28)}
+.tk.best{box-shadow:0 42px 92px -38px rgba(201,168,76,.5),0 0 0 1.6px #C9A84C}
+.tk.best .tk-price b{background:linear-gradient(110deg,#b8932f,#8a6d24);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tk.best .tk-cta{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#221a06;border-color:transparent;font-weight:700}
+#pricing .tk{transition:transform .25s ease,box-shadow .25s ease}
+#pricing .tk:hover{transform:translateY(-4px)}
+#pricing .tk.best{transform:scale(1.045);z-index:2;box-shadow:0 34px 70px -28px rgba(201,168,76,.55),0 0 0 1.5px rgba(201,168,76,.75)}
+#pricing .tk.best:hover{transform:scale(1.045) translateY(-4px)}
+#pricing .tk.best .tk-stub{position:relative;overflow:hidden}
+#pricing .tk.best .tk-stub::after{content:"";position:absolute;top:0;bottom:0;left:-70%;width:46%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(-18deg);animation:tkSheen 4.2s ease-in-out infinite}
+#pricing .tk.best .tk-bs{box-shadow:0 4px 14px -4px rgba(0,0,0,.5)}
+#pricing .dp-tgrow .ptoggle{margin-top:0}
+@media(max-width:900px){
+#pricing .tk.best{transform:none}
+#pricing .tk.best:hover{transform:translateY(-4px)}
+}
+
+/* Die Umschalter tragen jetzt die runde Form der bisherigen Seite. */
+.seg{border-radius:12px;padding:3px}
+.seg button{border-radius:9px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.05em;text-transform:uppercase;padding:9px 18px}
+.seg button.on{font-weight:700}
+.seg button .spar{border-radius:20px}
+
+/* ══ Videobereich ══════════════════════════════════════════════════════ */
+.vidg{display:grid;grid-template-columns:1.6fr .9fr;gap:18px;align-items:start}
+.vid-haupt{position:relative;background:#000;border-radius:14px;overflow:hidden;
+  box-shadow:0 30px 66px -38px rgba(0,0,0,.9)}
+.vid-haupt video{width:100%;display:block;aspect-ratio:16/9;object-fit:cover;background:#000}
+.vid-kopf{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:13px;
+  padding:34px 20px 16px;pointer-events:none;
+  background:linear-gradient(transparent,rgba(7,7,7,.9))}
+.vid-nr{font:700 10px/1 var(--mono);letter-spacing:.14em;color:var(--gold-on);
+  background:var(--runway);padding:6px 9px;border-radius:20px;flex:none}
+.vid-kopf b{display:block;font:700 16px/1.25 var(--disp);color:#fff}
+.vid-kopf span span,.vid-kopf > div > span{display:block;font-size:12.6px;color:var(--mdk);margin-top:2px}
+.vid-liste{display:flex;flex-direction:column;gap:9px}
+.vid-w{display:flex;align-items:center;gap:13px;width:100%;text-align:left;cursor:pointer;
+  background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;
+  padding:14px 15px;transition:.24s var(--e-weich);color:inherit;font:inherit}
+.vid-w:hover{background:rgba(201,168,76,.09);transform:translateX(3px)}
+.vid-w.on{background:rgba(201,168,76,.12);border-color:var(--gd)}
+.vid-wn{font:700 11px/1 var(--mono);color:var(--gdh);flex:none}
+.vid-wt{flex:1;min-width:0}
+.vid-wt b{display:block;font:700 14.5px/1.3 var(--disp);color:#fff}
+.vid-wt span{display:block;font-size:12.4px;color:var(--mdk);margin-top:2px}
+.vid-wd{font:500 10px/1 var(--mono);color:var(--ddk);flex:none}
+@media(max-width:900px){ .vidg{grid-template-columns:1fr} }

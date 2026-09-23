@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   dp2.js · v1540 · Bewegung der neuen DealPilot-Seite
+   dp2.js · v1555 · Bewegung der DealPilot-Seite
    ───────────────────────────────────────────────────────────────────────
    Zwei Regeln, beide teuer gelernt:
    · Eine Animation darf NIE Bedingung dafuer sein, dass etwas sichtbar
@@ -7,10 +7,23 @@
      werden auf ~1 s gedrosselt und CSS-Uebergaenge starten nicht. Jede
      Zahl steht deshalb fertig im HTML und wird nur ERSETZT, nie gesetzt.
    · Wer weniger Bewegung eingestellt hat, bekommt alles sofort und ohne.
+
+   v1555 · Marcel am 23.09.2026: "Im Hero bewegt sich der Score nicht und
+   die Zahlen." Gemessen, und es war ein Eigentor:
+
+      700 ms  ringSetzen(false)  startet die CSS-Transition (1,6 s)
+     2100 ms  ringSetzen(true)   setzt transition:none - MITTEN DRIN
+
+   Das Sicherheitsnetz hat die Animation zerstoert, die es absichern
+   sollte. Jetzt merkt sich jeder Teil, ob er gelaufen ist, und das Netz
+   greift nur bei dem, der es NICHT ist. Dazu starten Ring und Zahlen
+   spaeter und laufen laenger - eine Animation, die vorbei ist, bevor
+   jemand hinsieht, ist keine.
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
   var ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function sichtbar() { return document.visibilityState === 'visible'; }
 
   /* ── Kopf wird fest beim Rollen ─────────────────────────────────── */
   var nav = document.querySelector('.nav');
@@ -47,7 +60,7 @@
 
   /* ── Score-Balken aus einer Liste, damit Zahl und Balken nie
         auseinanderlaufen. Gewichte und KPI-Angaben sind die der
-        laufenden Seite (frontend/landing/index.html Z.1500). ───────── */
+        bisherigen Landing (index.html Z.1500). ────────────────────── */
   var CATS = [
     ['Rendite',            35, 98, '4/4', '#3FA56C'],
     ['Finanzierung',       25, 96, '5/5', '#3FA56C'],
@@ -85,18 +98,67 @@
     host.innerHTML = svg + fp(0, 0) + fp((n - 7) * cell, 0) + '</svg>';
   })();
 
-  /* ── Der Ring und die Balken fahren aus ─────────────────────────── */
-  var UMFANG = 333;           /* 2 * PI * 53, siehe stroke-dasharray im CSS */
-  function ringSetzen(sofort) {
-    var pg = document.querySelector('.ids-dial .pg');
-    if (pg) {
-      var ziel = parseInt(pg.dataset.score || '87', 10);
-      if (sofort) pg.style.transition = 'none';
-      pg.style.strokeDashoffset = (UMFANG * (1 - ziel / 100)).toFixed(1);
-    }
-    document.querySelectorAll('[data-breit]').forEach(function (i) {
-      if (sofort) i.style.transition = 'none';
-      i.style.width = i.dataset.breit + '%';
+  /* ══ Der Score-Ring und die Balken ═══════════════════════════════════
+     Jeder Teil merkt sich, ob er gelaufen ist. Das Sicherheitsnetz
+     greift nur bei dem, der es NICHT ist - sonst zerreisst es die
+     laufende Animation, so wie bisher. */
+  var UMFANG = 333;          /* 2 * PI * 53, siehe stroke-dasharray im CSS */
+  var ring = document.querySelector('.ids-dial .pg');
+  var zielScore = ring ? parseInt(ring.dataset.score || '87', 10) : 0;
+
+  function ringLos(sofort) {
+    if (!ring || ring.dataset.fertig) return;
+    ring.dataset.fertig = '1';
+    if (sofort) ring.style.transition = 'none';
+    ring.style.strokeDashoffset = (UMFANG * (1 - zielScore / 100)).toFixed(1);
+  }
+  function balkenLos(sofort) {
+    document.querySelectorAll('[data-breit]').forEach(function (i, n) {
+      if (i.dataset.fertig) return;
+      i.dataset.fertig = '1';
+      if (sofort) { i.style.transition = 'none'; i.style.width = i.dataset.breit + '%'; return; }
+      /* gestaffelt, damit die fuenf Balken nacheinander einlaufen */
+      setTimeout(function () { i.style.width = i.dataset.breit + '%'; }, n * 130);
+    });
+  }
+
+  /* ══ Zaehler ═════════════════════════════════════════════════════════
+     Die Zahl steht fertig im HTML. Laeuft der Zaehler, faengt er bei
+     null an und ersetzt sie; laeuft er nicht, bleibt sie stehen. */
+  function zahlAus(el) {
+    var z = parseInt(String(el.textContent).replace(/\D/g, ''), 10);
+    return isFinite(z) ? z : null;
+  }
+  function hoch(el, ziel, dauer) {
+    if (el.dataset.fertig) return;
+    el.dataset.fertig = '1';
+    var ende = el.dataset.suffix || '';
+    function fertig() { el.textContent = ziel.toLocaleString('de-DE') + ende; }
+    if (ruhig || !sichtbar() || dauer === 0) { fertig(); return; }
+    var start = null, d = dauer || 1600;
+    requestAnimationFrame(function lauf(t) {
+      if (!start) start = t;
+      var p = Math.min(1, (t - start) / d), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(ziel * e).toLocaleString('de-DE') + ende;
+      if (p < 1) requestAnimationFrame(lauf); else fertig();
+    });
+  }
+
+  /* Die Zahlen im Hero laufen nach dem Einblenden los, gestaffelt.
+     Vorher waren sie nach 1,1 s vorbei - bevor jemand hinsah. */
+  var heroZahlen = [].slice.call(document.querySelectorAll('.hbeleg [data-zaehl]'));
+  heroZahlen.forEach(function (e) {
+    var z = zahlAus(e); if (z != null) e.dataset.ziel = z;
+  });
+  if (!ruhig && sichtbar()) {
+    /* auf null setzen, damit das Hochlaufen ueberhaupt zu sehen ist */
+    heroZahlen.forEach(function (e) { if (e.dataset.ziel) e.textContent = '0'; });
+  }
+  function heroLos() {
+    heroZahlen.forEach(function (e, i) {
+      var z = e.dataset.ziel != null ? parseInt(e.dataset.ziel, 10) : zahlAus(e);
+      if (z == null) return;
+      setTimeout(function () { hoch(e, z, 1500); }, i * 150);
     });
   }
 
@@ -104,8 +166,10 @@
     document.querySelectorAll('.rv:not(.in)').forEach(function (e) { e.classList.add('in'); });
   }
 
-  if (ruhig) { alleZeigen(); ringSetzen(true); }
-  else {
+  if (ruhig) {
+    alleZeigen(); ringLos(true); balkenLos(true);
+    heroZahlen.forEach(function (e) { var z = zahlAus(e); if (z != null) hoch(e, z, 0); });
+  } else {
     var io = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
         if (!e.isIntersecting) return;
@@ -114,45 +178,56 @@
       });
     }, { threshold: 0.08 });
     document.querySelectorAll('.rv').forEach(function (e) { io.observe(e); });
-    setTimeout(function () { ringSetzen(false); }, 700);
-    /* Sicherheitsnetz: nach zwei Sekunden steht alles, komme was wolle. */
-    setTimeout(function () { alleZeigen(); ringSetzen(true); }, 2100);
+
+    /* Der Hero kommt zuletzt in Bewegung: erst faehrt die Karte hoch
+       (ihre Animation laeuft bis 1,3 s), dann der Ring, dann die Zahlen. */
+    setTimeout(function () { ringLos(false); balkenLos(false); }, 1050);
+    setTimeout(heroLos, 1250);
+
+    /* Sicherheitsnetz: nach vier Sekunden steht alles - aber nur das,
+       was nicht ohnehin gelaufen ist. Die Marker verhindern, dass hier
+       eine laufende Animation abgerissen wird. */
+    setTimeout(function () {
+      alleZeigen(); ringLos(true); balkenLos(true);
+      heroZahlen.forEach(function (e) {
+        var z = e.dataset.ziel != null ? parseInt(e.dataset.ziel, 10) : zahlAus(e);
+        if (z != null) hoch(e, z, 0);
+      });
+    }, 4000);
   }
 
-  /* ── Zaehler: die Zahl steht fertig im HTML und wird nur ersetzt ─── */
-  function hoch(el, ziel) {
-    if (ruhig || document.visibilityState !== 'visible') return;
-    var start = null;
-    requestAnimationFrame(function lauf(t) {
-      if (!start) start = t;
-      var p = Math.min(1, (t - start) / 1100), e = 1 - Math.pow(1 - p, 3);
-      el.textContent = Math.round(ziel * e).toLocaleString('de-DE');
-      if (p < 1) requestAnimationFrame(lauf);
-      else el.textContent = ziel.toLocaleString('de-DE');
-    });
-  }
+  /* Alle uebrigen Zahlen laufen, wenn sie ins Bild kommen. */
   var zio = new IntersectionObserver(function (es) {
     es.forEach(function (e) {
       if (!e.isIntersecting) return;
-      var z = parseInt(String(e.target.textContent).replace(/\D/g, ''), 10);
-      if (isFinite(z)) hoch(e.target, z);
+      var z = zahlAus(e.target);
+      if (z != null) hoch(e.target, z);
       zio.unobserve(e.target);
     });
   }, { threshold: 0.35 });
-  document.querySelectorAll('[data-zaehl]').forEach(function (e) { zio.observe(e); });
+  document.querySelectorAll('[data-zaehl]').forEach(function (e) {
+    if (e.closest('.hbeleg')) return;      /* die laufen oben mit */
+    zio.observe(e);
+  });
 
   /* ── Nutzerzahl vom eigenen Host ─────────────────────────────────── */
-  /* v1545: Die Zahl steht fertig im HTML. Kommt sie frisch herein, wird
-     sie ERSETZT und laeuft noch einmal hoch - dann sieht man, dass sie
-     lebt. Faellt der Abruf aus, bleibt der letzte bekannte Stand stehen. */
+  /* Die Zahl steht fertig im HTML. Kommt sie frisch herein und hat sich
+     geaendert, laeuft sie noch einmal hoch - dann sieht man, dass sie lebt. */
   fetch('/api/v1/public/stats')
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (d) {
       if (!d || !d.registrierte_nutzer) return;
+      var neu = d.registrierte_nutzer;
       document.querySelectorAll('[data-nutzer]').forEach(function (e) {
-        var neu = d.registrierte_nutzer;
-        if (e.hasAttribute('data-zaehl') && document.visibilityState === 'visible') hoch(e, neu);
-        else e.textContent = neu.toLocaleString('de-DE');
+        var alt = e.dataset.ziel != null ? parseInt(e.dataset.ziel, 10) : zahlAus(e);
+        e.dataset.ziel = neu;
+        if (alt === neu) return;
+        if (e.hasAttribute('data-zaehl') && sichtbar() && !ruhig) {
+          delete e.dataset.fertig;
+          hoch(e, neu, 900);
+        } else {
+          e.textContent = neu.toLocaleString('de-DE');
+        }
       });
     })
     .catch(function () {});

@@ -78,21 +78,25 @@ img{max-width:100%;display:block}
   font:700 10px/1 var(--mono);letter-spacing:.14em;color:rgba(232,204,122,.72)}
 .tb .wrap{display:flex;align-items:center;gap:26px;width:100%}
 .tb .pkt{display:flex;align-items:center;gap:8px;white-space:nowrap}
+@media(max-width:1180px){ .tb .pkt.hidemid{display:none} }
 .tb .pkt i{width:5px;height:5px;background:var(--gd);flex:none}
 .tb .rechts{margin-left:auto;display:flex;gap:22px;align-items:center}
 .tb a{color:rgba(232,204,122,.72);transition:color .22s}
 .tb a:hover{color:var(--gdh)}
 
 /* ══ Kopf ═══════════════════════════════════════════════════════════════ */
-.nav{position:sticky;top:0;z-index:200;height:var(--nav-h);display:flex;
+.nav{position:sticky;top:0;z-index:200;height:80px;display:flex;
   align-items:center;background:rgba(253,252,250,.94);backdrop-filter:blur(12px);
   border-bottom:1px solid transparent;transition:.3s}
 .nav.fest{border-bottom-color:var(--cream-line);box-shadow:0 8px 28px rgba(22,19,13,.07)}
 .nav .wrap{display:flex;align-items:center;gap:26px;width:100%}
-.mark{font:700 22px/1 var(--disp);letter-spacing:-.9px;display:flex;align-items:center;gap:10px}
-.mark b{color:var(--gdd);font-weight:700}
-.mark .sig{width:28px;height:28px;border:1.5px solid var(--gd);display:flex;
-  align-items:center;justify-content:center;color:var(--gdi)}
+/* v1556 · Die Wortmarke ist jetzt das schwarze Logo mit Goldrahmen.
+   Es traegt die Zeile "by Junker Immobilien" schon in sich - deshalb
+   steht sie im Kopf nicht noch einmal daneben. */
+.mark{display:flex;align-items:center;flex:none}
+.mark img{height:44px;width:auto;display:block;transition:opacity .22s}
+.mark:hover img{opacity:.85}
+.footer .mark img{height:52px}
 .nav ul{display:flex;gap:2px;margin:0 0 0 auto;padding:0;list-style:none;align-items:center}
 .nav ul li{position:relative}
 .nav ul li > a{display:flex;align-items:center;gap:6px;padding:10px 13px;
