@@ -1,0 +1,8 @@
+{
+  "workbook": "2026_sw_rh_bswob",
+  "view": "dash",
+  "kurven": [
+    { "merkmal": "Restnutzungsdauer", "normobjekt": "35", "stuetzstellen": {"15": 0.83, "25": 0.94, "35": 1.0, "45": 1.05, "55": 1.08, "65": 1.11, "75": 1.13} },
+    { "merkmal": "Wohnflächen", "normobjekt": "35", "stuetzstellen": {"15": 0.83, "25": 0.94, "35": 1.0, "45": 1.05, "55": 1.08, "65": 1.11, "75": 1.13} }
+  ]
+}

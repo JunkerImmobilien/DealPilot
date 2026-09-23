@@ -1,0 +1,9 @@
+{
+  "workbook": "2026_sw_rh_bsgf",
+  "view": "dash",
+  "kurven": [
+    { "merkmal": "Restnutzungsdauer", "normobjekt": "45", "stuetzstellen": {"15": 0.97, "25": 0.98, "35": 0.99, "45": 1.0, "55": 1.01, "65": 1.02, "75": 1.03} },
+    { "merkmal": "Standardstufen", "normobjekt": "3,0", "stuetzstellen": {"2,0": 0.85, "2,5": 0.93, "3,0": 1.0, "3,5": 1.07, "4,0": 1.15} },
+    { "merkmal": "Wohnflächen", "normobjekt": "45", "stuetzstellen": {"15": 0.97, "25": 0.98, "35": 0.99, "45": 1.0, "55": 1.01, "65": 1.02, "75": 1.03} }
+  ]
+}

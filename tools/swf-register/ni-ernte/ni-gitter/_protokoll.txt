@@ -1,0 +1,93 @@
+12:09:09 OK 2026_sw_efh_bsbs (03101 Braunschweig) 54 Zellen, BRW 210-520, SW 182153-972368
+12:10:49 OK 2026_sw_efh_bsce (03351 Celle) 54 Zellen, BRW 20-230, SW 102469-762982
+12:12:33 OK 2026_sw_efh_bsgf (03151 Gifhorn) 54 Zellen, BRW 16-320, SW 88426-943335
+12:14:24 OK 2026_sw_efh_bshe (03154 Helmstedt) 54 Zellen, BRW 25-230, SW 90610-602424
+12:16:14 OK 2026_sw_efh_bspe (03157 Peine) 54 Zellen, BRW 45-190, SW 120170-755438
+12:18:09 OK 2026_sw_efh_bssz (03102 Salzgitter) 54 Zellen, BRW 20-300, SW 69949-644113
+12:19:44 OK 2026_sw_efh_bswob (03103 Wolfsburg) 54 Zellen, BRW 145-275, SW 156254-817047
+12:21:38 OK 2026_sw_efh_hmhh (03241 Region Hannover) 54 Zellen, BRW 145-275, SW 156254-817047
+12:24:19 OK 2026_sw_efh_bswob (03103 Wolfsburg) 54 Zellen, BRW 145-275, SW 156254-817047
+12:24:28 KEIN-PDF 2026_sw_efh_hmhh (03241 Region Hannover)
+12:24:35 KEIN-PDF 2026_sw_efh_hmhhi (03254 Hildesheim)
+12:24:41 KEIN-PDF 2026_sw_efh_hmhhm (03252 Hameln-Pyrmont)
+12:24:47 KEIN-PDF 2026_sw_efh_hmhhsg (03257 Schaumburg)
+12:28:02 OK 2026_sw_efh_hmhh (03241 Region Hannover) 54 Zellen, BRW 45-850, SW 100059-1026704
+12:29:58 OK 2026_sw_efh_hmhhi (03254 Hildesheim) 54 Zellen, BRW 28-400, SW 79002-860039
+12:31:54 OK 2026_sw_efh_hmhhm (03252 Hameln-Pyrmont) 54 Zellen, BRW 15-200, SW 81193-662674
+12:33:43 OK 2026_sw_efh_hmhhsg (03257 Schaumburg) 54 Zellen, BRW 17-230, SW 123133-830333
+12:35:27 OK 2026_sw_efh_lgdan (03354 Lüchow-Dannenberg) 45 Zellen, BRW 7-68, SW 36612-513927
+12:37:42 OK 2026_sw_efh_lgue (03360 Uelzen) 54 Zellen, BRW 12-130, SW 36439-586970
+12:40:11 OK 2026_sw_efh_lgwl (03353 Harburg) 54 Zellen, BRW 23-650, SW 47140-1076936
+12:42:26 OK 2026_sw_efh_nomgs (03153 Goslar) 54 Zellen, BRW 13-120, SW 56451-578276
+12:42:37 SPANNE-WIE-VORGAENGER 2026_sw_efh_nomhol (03255 Holzminden) 13-120/56451-578276 - uebersprungen
+12:44:52 OK 2026_sw_efh_nomnom (03155 Northeim) 54 Zellen, BRW 13-120, SW 56451-578276
+12:45:02 OHNE-SPANNE 2026_sw_efh_osmep_osmepel (03454 Emsland) - nicht abgetastet
+12:45:08 OHNE-SPANNE 2026_sw_efh_osmep_osmepnoh (03456 Grafschaft Bentheim) - nicht abgetastet
+12:45:14 OHNE-SPANNE 2026_sw_efh_osmep_osmeposla (03459 Osnabrück) - nicht abgetastet
+12:45:20 OHNE-SPANNE 2026_sw_efh_osmep_osmeposst (03404 Osnabrück) - nicht abgetastet
+12:46:49 OK 2026_sw_efh_ott_cux (03352 Cuxhaven) 54 Zellen, BRW 12-235, SW 65859-656668
+12:48:20 OK 2026_sw_efh_ott_ohz (03356 Osterholz) 54 Zellen, BRW 18-330, SW 128405-793394
+12:49:55 OK 2026_sw_efh_ott_row (03357 Rotenburg (Wümme)) 54 Zellen, BRW 16-280, SW 88528-773706
+12:51:57 NUR-LEER 2026_sw_efh_lgdan (03354 Lüchow-Dannenberg) 45 Zeilen ohne Wert - Lage-Achse?
+12:54:11 NUR-LEER 2026_sw_efh_lgue (03360 Uelzen) 54 Zeilen ohne Wert - Lage-Achse?
+12:56:36 NUR-LEER 2026_sw_efh_lgwl (03353 Harburg) 54 Zeilen ohne Wert - Lage-Achse?
+12:58:49 NUR-LEER 2026_sw_efh_nomgs (03153 Goslar) 54 Zeilen ohne Wert - Lage-Achse?
+12:59:01 SPANNE-WIE-VORGAENGER 2026_sw_efh_nomhol (03255 Holzminden) 13-120/56451-578276 - uebersprungen
+13:01:13 NUR-LEER 2026_sw_efh_nomnom (03155 Northeim) 54 Zeilen ohne Wert - Lage-Achse?
+13:01:23 OHNE-SPANNE 2026_sw_efh_osmep_osmepel (03454 Emsland) - nicht abgetastet
+13:01:29 OHNE-SPANNE 2026_sw_efh_osmep_osmepnoh (03456 Grafschaft Bentheim) - nicht abgetastet
+13:01:35 OHNE-SPANNE 2026_sw_efh_osmep_osmeposla (03459 Osnabrück) - nicht abgetastet
+13:01:41 OHNE-SPANNE 2026_sw_efh_osmep_osmeposst (03404 Osnabrück) - nicht abgetastet
+13:03:12 OK 2026_sw_efh_ott_std (03359 Stade) 54 Zellen, BRW 11-550, SW 76486-888682
+13:03:22 OHNE-SPANNE 2026_sw_efh_sulverhk (03358 Heidekreis) - nicht abgetastet
+13:03:29 OHNE-SPANNE 2026_sw_efh_sulverver (03361 Verden) - nicht abgetastet
+13:05:06 OK 2026_sw_rh_bsbs (03101 Braunschweig) 54 Zellen, BRW 230-550, SW 81669-629297
+13:06:59 OK 2026_sw_rh_bsce (03351 Celle) 54 Zellen, BRW 20-240, SW 59253-477934
+13:08:46 OK 2026_sw_rh_bsgf (03151 Gifhorn) 54 Zellen, BRW 20-270, SW 97780-567104
+13:10:36 OK 2026_sw_rh_bshe (03154 Helmstedt) 54 Zellen, BRW 25-200, SW 50980-506857
+13:12:29 OK 2026_sw_rh_bspe (03157 Peine) 54 Zellen, BRW 60-190, SW 51500-570365
+13:14:24 NUR-LEER 2026_sw_efh_lgdan (03354 Lüchow-Dannenberg) 45 Zeilen ohne Wert - Lage-Achse?
+13:16:43 NUR-LEER 2026_sw_efh_lgue (03360 Uelzen) 54 Zeilen ohne Wert - Lage-Achse?
+13:19:12 NUR-LEER 2026_sw_efh_lgwl (03353 Harburg) 54 Zeilen ohne Wert - Lage-Achse?
+13:21:26 NUR-LEER 2026_sw_efh_nomgs (03153 Goslar) 54 Zeilen ohne Wert - Lage-Achse?
+13:21:37 SPANNE-WIE-VORGAENGER 2026_sw_efh_nomhol (03255 Holzminden) 13-120/56451-578276 - uebersprungen
+13:23:50 NUR-LEER 2026_sw_efh_nomnom (03155 Northeim) 54 Zeilen ohne Wert - Lage-Achse?
+13:24:00 OHNE-SPANNE 2026_sw_efh_osmep_osmepnoh (03456 Grafschaft Bentheim) - nicht abgetastet
+13:24:06 ACHSEN 2026_sw_efh_osmep_osmeposla (03459 Osnabrück) BRW[25 75 125 200 ] SW[150000 200000 250000 300000 400000 500000 600000 700000 ]
+13:24:58 OK 2026_sw_efh_osmep_osmeposla (03459 Osnabrück) 32 Zellen, aus den abgedruckten Achsen
+13:25:08 ACHSEN 2026_sw_efh_osmep_osmeposst (03404 Osnabrück) BRW[200 500 800 ] SW[200000 250000 300000 350000 400000 500000 600000 700000 800000 900000 ]
+13:25:55 OK 2026_sw_efh_osmep_osmeposst (03404 Osnabrück) 30 Zellen, aus den abgedruckten Achsen
+13:26:05 ACHSEN 2026_sw_efh_sulverhk (03358 Heidekreis) BRW[20 60 100 140 180 ] SW[100000 200000 300000 400000 500000 600000 700000 ]
+13:27:10 OK 2026_sw_efh_sulverhk (03358 Heidekreis) 35 Zellen, aus den abgedruckten Achsen
+13:27:20 ACHSEN 2026_sw_efh_sulverver (03361 Verden) BRW[50 100 150 250 350 450 ] SW[100000 200000 300000 400000 500000 600000 700000 800000 ]
+13:28:40 OK 2026_sw_efh_sulverver (03361 Verden) 48 Zellen, aus den abgedruckten Achsen
+13:30:34 OK 2026_sw_rh_bssz (03102 Salzgitter) 54 Zellen, BRW 43-190, SW 45279-350597
+13:32:20 OK 2026_sw_rh_bswf (03158 Wolfenbüttel) 54 Zellen, BRW 20-310, SW 36482-589913
+13:33:56 OK 2026_sw_rh_bswob (03103 Wolfsburg) 54 Zellen, BRW 150-275, SW 98678-469076
+13:35:55 OK 2026_sw_rh_hmhh (03241 Region Hannover) 54 Zellen, BRW 75-900, SW 102924-686570
+13:37:49 OK 2026_sw_rh_hmhhi (03254 Hildesheim) 54 Zellen, BRW 40-380, SW 60882-674263
+13:39:54 OK 2026_sw_rh_hmhhm (03252 Hameln-Pyrmont) 54 Zellen, BRW 25-190, SW 52015-388975
+13:41:50 OK 2026_sw_rh_hmhshg (03257 Schaumburg) 54 Zellen, BRW 34-210, SW 85401-472874
+13:45:20 NUR-LEER 2026_sw_rh_lglg (03355 Lüneburg) 54 Zeilen ohne Wert - Lage-Achse?
+13:45:30 OHNE-SPANNE 2026_sw_rh_lgwl (03353 Harburg) - nicht abgetastet
+13:47:36 NUR-LEER 2026_sw_rh_nomgs (03153 Goslar) 54 Zeilen ohne Wert - Lage-Achse?
+13:47:47 SPANNE-WIE-VORGAENGER 2026_sw_rh_nomhol (03255 Holzminden) 16-210/44571-539125 - uebersprungen
+13:49:55 NUR-LEER 2026_sw_rh_nomnom (03155 Northeim) 54 Zeilen ohne Wert - Lage-Achse?
+13:50:05 ACHSEN 2026_sw_rh_osmep_osmepel (03454 Emsland) BRW[50 100 150 200 300 ] SW[150000 200000 250000 300000 350000 400000 ]
+13:50:54 OK 2026_sw_rh_osmep_osmepel (03454 Emsland) 30 Zellen, aus den abgedruckten Achsen
+13:51:04 ACHSEN 2026_sw_rh_osmep_osmepnoh (03456 Grafschaft Bentheim) BRW[50 100 150 200 ] SW[125000 150000 200000 250000 300000 350000 ]
+13:51:42 OK 2026_sw_rh_osmep_osmepnoh (03456 Grafschaft Bentheim) 24 Zellen, aus den abgedruckten Achsen
+13:51:52 ACHSEN 2026_sw_rh_osmep_osmeposla (03459 Osnabrück) BRW[50 100 150 200 250 ] SW[100000 150000 200000 250000 300000 400000 ]
+13:52:37 OK 2026_sw_rh_osmep_osmeposla (03459 Osnabrück) 30 Zellen, aus den abgedruckten Achsen
+13:52:47 ACHSEN 2026_sw_rh_osmep_osmeposst (03404 Osnabrück) BRW[200 250 300 350 400 500 600 ] SW[150000 200000 250000 300000 350000 400000 450000 500000 ]
+13:54:10 OK 2026_sw_rh_osmep_osmeposst (03404 Osnabrück) 56 Zellen, aus den abgedruckten Achsen
+13:55:45 OK 2026_sw_rh_ott_cux (03352 Cuxhaven) 54 Zellen, BRW 12-340, SW 92187-471688
+13:57:14 OK 2026_sw_rh_ott_ohz (03356 Osterholz) 54 Zellen, BRW 30-320, SW 131728-574863
+13:58:48 OK 2026_sw_rh_ott_row (03357 Rotenburg (Wümme)) 54 Zellen, BRW 37-205, SW 70330-406060
+14:00:24 OK 2026_sw_rh_ott_std (03359 Stade) 54 Zellen, BRW 40-500, SW 93474-541447
+14:00:34 ACHSEN 2026_sw_rh_sulverhk (03358 Heidekreis) BRW[60 90 120 150 ] SW[100000 150000 200000 250000 300000 350000 400000 ]
+14:01:16 OK 2026_sw_rh_sulverhk (03358 Heidekreis) 28 Zellen, aus den abgedruckten Achsen
+14:01:26 ACHSEN 2026_sw_rh_sulverni (03256 Nienburg (Weser)) BRW[50 100 150 200 250 ] SW[100000 150000 200000 250000 300000 350000 400000 ]
+14:02:21 OK 2026_sw_rh_sulverni (03256 Nienburg (Weser)) 35 Zellen, aus den abgedruckten Achsen
+14:02:32 OHNE-SPANNE 2026_sw_rh_sulverver (03361 Verden) - nicht abgetastet
+FERTIG: 55 mit AGS | 21 neu | 21 lagen | 5 ohne Spanne | 8 leer

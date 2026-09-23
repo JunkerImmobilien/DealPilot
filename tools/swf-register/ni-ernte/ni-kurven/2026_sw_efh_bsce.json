@@ -1,0 +1,8 @@
+{
+  "workbook": "2026_sw_efh_bsce",
+  "view": "dash",
+  "kurven": [
+    { "merkmal": "Standardstufen", "normobjekt": "2,5", "stuetzstellen": {"1,5": 0.62, "2,0": 0.86, "2,5": 1.0, "3,0": 1.09, "3,5": 1.16} },
+    { "merkmal": "Wohnflächen", "normobjekt": "", "normobjekt_interpoliert": "130", "stuetzstellen": {"60": 0.93, "80": 0.95, "100": 0.97, "120": 0.99, "140": 1.01, "160": 1.02, "180": 1.04, "200": 1.05, "220": 1.07, "240": 1.08} }
+  ]
+}

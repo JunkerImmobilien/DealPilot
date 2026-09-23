@@ -1,0 +1,7 @@
+{
+  "workbook": "2026_sw_rh_sulverni",
+  "view": "dash",
+  "kurven": [
+    { "merkmal": "Standardstufen", "normobjekt": "2,5", "stuetzstellen": {"1,5": 0.67, "2,0": 0.86, "2,5": 1.0, "3,0": 1.12, "3,5": 1.2, "4,0": 1.28} }
+  ]
+}

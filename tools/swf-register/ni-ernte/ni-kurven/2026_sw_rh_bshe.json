@@ -1,0 +1,9 @@
+{
+  "workbook": "2026_sw_rh_bshe",
+  "view": "dash",
+  "kurven": [
+    { "merkmal": "Restnutzungsdauer", "normobjekt": "35", "stuetzstellen": {"15": 0.69, "25": 0.9, "35": 1.0, "45": 1.06, "55": 1.1, "65": 1.12, "75": 1.14} },
+    { "merkmal": "Standardstufen", "normobjekt": "2,5", "stuetzstellen": {"2,0": 0.91, "2,5": 1.0, "3,0": 1.06, "3,5": 1.1} },
+    { "merkmal": "Wohnflächen", "normobjekt": "35", "stuetzstellen": {"15": 0.69, "25": 0.9, "35": 1.0, "45": 1.06, "55": 1.1, "65": 1.12, "75": 1.14} }
+  ]
+}

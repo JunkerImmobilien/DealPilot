@@ -1,0 +1,132 @@
+# Quelle: https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/einundzweifamilienhaeuser/2026_sw_efh_bsce
+# Dashboard: https://public.tableau.com/views/2026_sw_efh_bsce/dash
+### Kopf, Stichprobe und Umrechnungskurven
+                                            Sachwertfaktoren für ein freistehendes Ein- und Zweifamilienhaus
+                                                                    Landkreis Celle
+                              Berechnung des Sachwertfaktors                                                                       S chprobenübersicht
+                                                          01.01.2026                                                             S chprobe: 415 Kauﬀälle
+Wertermi lungss chtag:
+
+                                                          120                                           Merkmal                           Min.         Max.            Median
+Bodenrichtwert [€/m²]:
+                                                                                                        Kaufzeitpunkt                     01.11.2022   30.10.2025      12.09.2024
+                                                          250.000                                       Bodenrichtwert [€/m²]             20           230             100
+Vorläuﬁger Sachwert [€]:                                                                                Wohnﬂäche [m²]                    53           250             127
+                                                                                                        Standardstufe                     1,4          3,9             2,2
+                                                          130                                           Restnutzungsdauer                 14           80              31
+Wohnﬂäche [m²]:
+                                                                                                        vorläuﬁger Sachwert [€]           102469       762982          267596
+                                                          2,5
+Standardstufe:
+
+Sachwertfaktor:                                                          0,97                                 Modellbeschreibung
+Standardabweichung:                                                     ±0,20
+
+
+                                                          Die Diagramme beziehen sich auf ein Normobjekt.
+                                       Vom Normobjekt abweichende Merkmale bewirken folgende Änderungen der Sachwertfaktoren.
+
+                                         Sachwertfaktoren (Kaufpreis/vorläuﬁger Sachwert) in Abhängigkeit von Lage und Sachwert
+
+
+                           1,40
+           Sachwertfaktor
+
+
+
+
+                           1,20
+
+
+                           1,00
+
+
+                           0,80
+
+
+                           0,60
+                                   100.000 €      150.000 €      200.000 €        250.000 €     300.000 €          350.000 €    400.000 €        450.000 €    500.000 €
+                                   Bodenrichtwert:              25 €/m²             80 €/m²             120 €/m²          200 €/m²
+
+                                                            Umrechnungskoeﬃzienten für abweichende Wohnﬂächen
+           Umrechnungsk.
+
+
+
+
+                           1,10
+                                                                                                                                                                      1,08
+                                                                                                            1,02                                     1,07
+                                                                                                                                         1,05
+                                                                                 0,99                                    1,04
+                           1,00                                  0,97                         1,01
+                                                  0,95
+                                  0,93
+                           0,90
+
+                                    60 m²         80 m²         100 m²          120 m²   140 m²            160 m²       180 m²          200 m²     220 m²          240 m²
+
+                                                           Umrechnungskoeﬃzienten für abweichende Standardstufen
+
+                           1,20
+                                                                                                                                                               1,16
+                                                                                                                                 1,09
+           Umrechnungsk.
+
+
+
+
+                                                                                                 1,00
+                           1,00
+
+                                                                    0,86
+                           0,80
+
+
+                           0,60          0,62
+                                            1,5                          2,0                         2,5                         3,0                         3,5
+
+                           Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröﬀentlichung: 02.03.2026
+
+### Gitter am Normobjekt
+brw;sachwert;faktor;stdabw
+40;100000;1,46;0,20
+40;150000;1,17;0,20
+40;200000;0,99;0,20
+40;250000;0,87;0,20
+40;300000;0,78;0,20
+40;350000;0,70;0,20
+40;400000;0,65;0,20
+40;450000;0,60;0,20
+40;500000;0,56;0,20
+40;550000;0,52;0,20
+130;100000;1,60;0,20
+130;150000;1,29;0,20
+130;200000;1,11;0,20
+130;250000;0,98;0,20
+130;300000;0,88;0,20
+130;350000;0,80;0,20
+130;400000;0,74;0,20
+130;450000;0,69;0,20
+130;500000;0,65;0,20
+130;550000;0,61;0,20
+200;100000;1,67;0,20
+200;150000;1,36;0,20
+200;200000;1,17;0,20
+200;250000;1,04;0,20
+200;300000;0,94;0,20
+200;350000;0,86;0,20
+200;400000;0,79;0,20
+200;450000;0,74;0,20
+200;500000;0,69;0,20
+200;550000;0,66;0,20
+280;100000;1,75;0,20
+280;150000;1,43;0,20
+280;200000;1,23;0,20
+280;250000;1,10;0,20
+280;300000;0,99;0,20
+280;350000;0,91;0,20
+280;400000;0,85;0,20
+280;450000;0,79;0,20
+280;500000;0,74;0,20
+280;550000;0,70;0,20

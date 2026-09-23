@@ -1,0 +1,7 @@
+{
+  "workbook": "2026_sw_rh_osmep_osmepnoh",
+  "view": "Dash",
+  "kurven": [
+    { "merkmal": "modifiziertes Baujahr", "normobjekt": "1990", "stuetzstellen": {"1960": 0.69, "1970": 0.86, "1980": 0.95, "1990": 1.0, "2000": 1.03, "2010": 1.05, "2020": 1.06} }
+  ]
+}
