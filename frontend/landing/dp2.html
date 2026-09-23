@@ -10,8 +10,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="dp2.css?v=v1570">
 <link rel="stylesheet" href="dp2-hero.css?v=v1570">
-<link rel="stylesheet" href="dp2-teile.css?v=v1570">
+<link rel="stylesheet" href="dp2-teile.css?v=v1588">
 <link rel="stylesheet" href="dp2-buehne.css?v=v1570">
+<!-- v1588: der Wechselschritt loest den bisherigen Ablauf ab -->
+<link rel="stylesheet" href="demo-wechsel.css?v=v1588">
 </head><body>
 
 <svg style="display:none" aria-hidden="true">
@@ -193,7 +195,12 @@
        Ziel" wird einer: vier Reiter, darunter faehrt auf, was in dieser
        Phase geschieht. Gefuellt von dp2-ablauf.js - dort stehen die
        Inhalte, hier nur der Platz. -->
-  <div class="ablauf-w rv" id="ablauf"></div>
+  <!-- v1588: Hier lief bis dahin dp2-ablauf.js mit vier Reitern. Jetzt
+       steht der ganze Rechenweg: elf Stufen vom Sprechlauf ueber
+       Kaufpreisaufteilung, Restnutzungsdauer und Verkehrswert bis zum
+       Co-Piloten. Die Zahlen kommen aus demo-steuer-daten.js -
+       derselben Rechenbasis wie auf demo-steuer.html. -->
+  <div class="rv" data-wechsel></div>
 
 </div></section>
 
@@ -429,6 +436,59 @@
 </div></section>
 
 <!-- ══ COCKPIT-MATRIX ════════════════════════════════════════════════ -->
+<!-- ══ NACHKAUF ══════════════════════════════════════════════════════
+     v1588: Diese Funktion gehoerte der alten Landing und hat hier
+     gefehlt. Die Preise sind von dort uebernommen, die Darstellung ist
+     neu - statt "5 · 5 · 5" steht jetzt da, was man bekommt. -->
+<section class="sec sec-dark" id="nachkauf"><div class="wrap">
+  <div class="sec-kopf">
+    <span class="sec-lb">KONTINGENT</span>
+    <h2>Aufgebraucht? Einfach nachlegen.</h2>
+    <p class="sec-sub">Dein Plan setzt das Kontingent jeden Monat neu. Wer in einem Monat
+      mehr braucht, legt nach — <b>zugekauftes Guthaben verfällt nie</b> und ist kein Abo.</p>
+  </div>
+
+  <div class="nk-grid">
+      <div class="nk-k">
+        <span class="nk-name">Starter</span>
+        <span class="nk-preis">5,00&nbsp;€</span>
+        <span class="nk-was">5 Marktpreisindikationen</span>
+        <span class="nk-wofuer">der schnelle Blick auf einen Fund</span>
+        <a class="nk-cta" href="https://app.dealpilot.immo/?register=1&amp;paket=starter">Nachlegen</a>
+      </div>
+      <div class="nk-k best">
+        <span class="nk-name">Investor</span>
+        <span class="nk-preis">8,75&nbsp;€</span>
+        <span class="nk-was">5 Indikationen + 5 erweiterte</span>
+        <span class="nk-wofuer">wenn der Fund es wert ist, genauer hinzusehen</span>
+        <a class="nk-cta" href="https://app.dealpilot.immo/?register=1&amp;paket=investor">Nachlegen</a>
+      </div>
+      <div class="nk-k">
+        <span class="nk-name">Pro</span>
+        <span class="nk-preis">12,50&nbsp;€</span>
+        <span class="nk-was">5 + 5 + 5 Wertermittlungen</span>
+        <span class="nk-wofuer">bis zur Wertermittlung nach ImmoWertV</span>
+        <a class="nk-cta" href="https://app.dealpilot.immo/?register=1&amp;paket=pro">Nachlegen</a>
+      </div>
+  </div>
+
+  <div class="nk-einzel">
+    <div class="nk-e-h">Oder einzeln — genau die eine, die gerade fehlt</div>
+    <div class="nk-e-grid">
+        <div class="nk-e"><span class="nk-e-was">Marktpreisindikation<small>Vergleichspreise, grobe Einordnung</small></span>
+          <span class="nk-e-preis">0,90&nbsp;€</span></div>
+        <div class="nk-e"><span class="nk-e-was">Erweiterte Indikation<small>mit Lage, Zustand und Mietniveau</small></span>
+          <span class="nk-e-preis">1,90&nbsp;€</span></div>
+        <div class="nk-e"><span class="nk-e-was">Wertermittlung nach ImmoWertV<small>Ertrags- oder Sachwert, mit Quellennachweis</small></span>
+          <span class="nk-e-preis">3,90&nbsp;€</span></div>
+    </div>
+    <a class="nk-e-cta" href="https://app.dealpilot.immo/?register=1&amp;credits=1">Guthaben aufladen</a>
+  </div>
+
+  <p class="nk-note">Nachkaufen geht ab dem Starter-Plan · Zugekauftes verfällt nie ·
+    kein Abo · Abrechnung über dieselbe Rechnung wie der Plan.</p>
+</div></section>
+
 <section class="sec sec-cream" id="feature-matrix"><div class="wrap">
   <div class="head ctr rv"><div class="eye ctr">Alle Pakete im Vergleich</div>
     <h2>Cockpit-<span class="ac">Matrix</span></h2>
@@ -558,8 +618,22 @@
 
 <script src="dp2-daten.js?v=v1570"></script>
 <script src="dp2-inhalt.js?v=v1570"></script>
-<script src="dp2-ablauf.js?v=v1570"></script>
+<!-- dp2-ablauf.js abgeloest durch demo-wechsel.js (v1588) -->
 <script src="dp2-video.js?v=v1570"></script>
+<script src="demo-steuer-daten.js?v=v1588"></script>
+<script src="demo-wechsel.js?v=v1588"></script>
 <script src="dp2.js?v=v1570"></script>
+<!-- v1588: Zwei Funktionen, die der alten Landing schon gehoerten und
+     hier gefehlt haben. Beide betreffen Geld, deshalb standen sie ganz
+     oben auf der Abgleichsliste:
+       flyer-code.js     der Weg vom gedruckten Flyer in den Checkout
+       promo-erstflug.js der Founding-Member-Rabatt. Er liest den aktiven
+                         Promotion-Code aus Stripe und rechnet die
+                         Ticketpreise neu. OHNE ihn zeigt die Seite die
+                         vollen Preise, auch wenn ein Rabatt laeuft -
+                         und niemand haette es der Seite angesehen.
+     Reihenfolge wie in index.html: erst der Flyer, dann der Rabatt. -->
+<script src="flyer-code.js?v=v1588"></script>
+<script src="promo-erstflug.js?v=v1588"></script>
 <script src="erstflug-popup.js?v=v1522b"></script>
 </body></html>

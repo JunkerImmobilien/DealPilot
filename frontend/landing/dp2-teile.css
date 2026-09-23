@@ -584,3 +584,60 @@
   .zwei-wege{grid-template-columns:1fr}
   .weg{border-right:0;border-bottom:1px solid var(--cream-line)}
 }
+
+/* ══ NACHKAUF ════════════════════════════════════════════════════════
+   v1588 · Die Kontingent-Nachbuchung. Sie gehoerte der alten Landing
+   und hat hier gefehlt.
+   Marcel ueber die alte Darstellung: "Das kann gar keiner verstehen,
+   dieses 5 und 5, 5 5 5." Deshalb traegt jede Karte jetzt einen Satz,
+   der sagt wofuer - die Zahlenkette steht klein darunter. ══════════ */
+#nachkauf .sec-kopf{text-align:center;margin-bottom:26px}
+#nachkauf .sec-lb{font:700 9px/1 var(--mono);letter-spacing:.2em;color:var(--gdh);
+  display:block;margin-bottom:10px}
+#nachkauf h2{font-size:30px;color:#fff;margin:0 0 10px}
+#nachkauf .sec-sub{margin:0 auto;max-width:64ch;font-size:14.6px;line-height:1.6;
+  color:var(--mdk)}
+#nachkauf .sec-sub b{color:#fff}
+
+.nk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--line);border:1px solid var(--line);max-width:940px;margin:0 auto}
+.nk-k{background:rgba(255,255,255,.035);padding:22px 20px 20px;display:flex;
+  flex-direction:column;gap:7px;transition:background .3s var(--e-weich)}
+.nk-k:hover{background:rgba(255,255,255,.06)}
+.nk-k.best{background:rgba(201,168,76,.1);position:relative}
+.nk-k.best::before{content:'MEIST GEWÄHLT';position:absolute;top:0;left:0;right:0;
+  background:var(--runway);color:var(--gold-on);font:700 7.5px/1 var(--mono);
+  letter-spacing:.14em;text-align:center;padding:5px 0}
+.nk-k.best{padding-top:32px}
+.nk-name{font:700 9px/1 var(--mono);letter-spacing:.15em;color:var(--gdh)}
+.nk-preis{font:700 38px/1 var(--disp);color:#fff;letter-spacing:-.02em}
+.nk-was{font:700 13.5px/1.35 var(--disp);color:#fff}
+.nk-wofuer{font-size:12.4px;line-height:1.5;color:var(--mdk);flex:1}
+.nk-cta{display:block;margin-top:9px;padding:11px 0;text-align:center;
+  background:var(--runway);color:var(--gold-on);font:700 12.5px/1 var(--disp);
+  transition:filter .25s}
+.nk-cta:hover{filter:brightness(1.1)}
+
+.nk-einzel{max-width:940px;margin:22px auto 0;border:1px solid var(--line);
+  background:rgba(255,255,255,.025);padding:20px 22px}
+.nk-e-h{font:700 13.5px/1.3 var(--disp);color:#fff;margin-bottom:14px;
+  text-align:center}
+.nk-e-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.nk-e{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding:12px 14px;background:rgba(255,255,255,.04);border-left:2px solid var(--gd)}
+.nk-e-was{font:600 12.8px/1.3 var(--body);color:var(--txtd)}
+.nk-e-was small{display:block;font:500 10.5px/1.45 var(--mono);color:var(--ddk);
+  margin-top:3px}
+.nk-e-preis{font:700 17px/1 var(--disp);color:var(--gdh);white-space:nowrap;flex:none}
+.nk-e-cta{display:block;margin:16px auto 0;max-width:280px;padding:11px 0;
+  text-align:center;border:1px solid var(--gd);color:var(--gdh);
+  font:700 12.5px/1 var(--disp);transition:.25s var(--e-weich)}
+.nk-e-cta:hover{background:rgba(201,168,76,.14)}
+.nk-note{text-align:center;margin:18px auto 0;max-width:72ch;font-size:12.4px;
+  line-height:1.55;color:var(--mut)}
+
+@media(max-width:860px){
+  .nk-grid,.nk-e-grid{grid-template-columns:1fr}
+  #nachkauf h2{font-size:24px}
+  .nk-preis{font-size:32px}
+}

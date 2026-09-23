@@ -437,7 +437,14 @@
     mountBanner(g);
     paint(g);
     loopPaint(g);
-    var t = document.getElementById('ptoggle');
+    /* v1588: Die neue Landing (dp2.html) nennt ihren Zeit-Umschalter
+       #segZeit statt #ptoggle. Beide werden gesucht - das Skript laeuft
+       damit auf der alten und der neuen Seite, ohne dass eine von
+       beiden ihr Markup aendern muss. Ohne diese Zeile blieben auf
+       dp2.html die rabattierten Preise beim Umschalten Monat/Jahr
+       stehen - der Rabatt waere dann falsch gerechnet. */
+    var t = document.getElementById('ptoggle')
+          || document.getElementById('segZeit');
     if (t && !t.getAttribute('data-dpp')) {
       t.setAttribute('data-dpp', '1');
       t.addEventListener('click', function () { repaint(g); });
