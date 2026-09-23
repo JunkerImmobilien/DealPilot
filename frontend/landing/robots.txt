@@ -1,0 +1,21 @@
+# robots.txt · dealpilot.immo
+# Gemessen am 23.09.2026: unter /robots.txt und /sitemap.xml lieferte die
+# Domain die Startseite aus (200, aber HTML). Eine Suchmaschine liest das
+# als "keine robots.txt vorhanden" und findet keine Sitemap - die Seite
+# wird dann nur ueber Links gefunden, nicht ueber ihre eigene Struktur.
+
+User-agent: *
+Allow: /
+
+# Die Anwendung selbst gehoert nicht in den Index: sie steht hinter der
+# Anmeldung, und jede Adresse dort fuehrt fuer einen Besucher ohne Konto
+# ins Leere.
+Disallow: /app/
+Disallow: /admin/
+
+# Entwuerfe und Demoseiten, die nur zur Abstimmung liegen.
+Disallow: /entwurf-
+Disallow: /demo-
+Disallow: /quickcheck-app.html
+
+Sitemap: https://dealpilot.immo/sitemap.xml
