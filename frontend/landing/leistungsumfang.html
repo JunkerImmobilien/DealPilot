@@ -144,6 +144,15 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 .lu-toc-grid{grid-template-columns:1fr}
 .lu-hero h2{font-size:30px}
 }
+
+/* v1559 · Gewicht je Score-Bereich und der Plan-Hinweis am Kapitelende. */
+.gew{display:inline-block;font:700 9px/1 var(--mono);letter-spacing:.1em;
+  background:rgba(201,168,76,.16);color:var(--gdi);padding:3px 7px;margin:0 6px;
+  vertical-align:middle;border-radius:20px}
+.lu-sec .lu-note{margin-top:20px;padding:12px 16px;background:rgba(201,168,76,.08);
+  border-left:3px solid var(--gd);font-size:14px;color:var(--inkm)}
+.lu-sec.lu-light .lu-note{background:rgba(201,168,76,.1)}
+.lu-list li em{font-style:normal;color:var(--gdi);font-weight:600}
 </style>
 </head><body>
 
@@ -224,7 +233,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
         </div>
         <div class="lu-toc">
           <div class="lu-toc-h">Inhaltsverzeichnis <span>&mdash; direkt anspringen</span></div>
-          <div class="lu-toc-grid"><a class="lu-toc-item" href="#lu-warum"><span class="n">01</span><span class="t">Warum DealPilot existiert</span></a><a class="lu-toc-item" href="#lu-einstieg"><span class="n">02</span><span class="t">Drei Wege zur Analyse</span></a><a class="lu-toc-item" href="#lu-quick-check"><span class="n">03</span><span class="t">Boarding im Detail</span></a><a class="lu-toc-item" href="#lu-pdf-import"><span class="n">04</span><span class="t">PDF-Import &amp; KI-Extraktion</span></a><a class="lu-toc-item" href="#lu-objekt"><span class="n">05</span><span class="t">Objekt-Erfassung &amp; Lage</span></a><a class="lu-toc-item" href="#lu-investition"><span class="n">06</span><span class="t">Investitionsmodul &amp; 15-%-Regel</span></a><a class="lu-toc-item" href="#lu-miete"><span class="n">07</span><span class="t">Miete &amp; Marktvergleich</span></a><a class="lu-toc-item" href="#lu-werbungskosten"><span class="n">08</span><span class="t">Werbungskostenrechner</span></a><a class="lu-toc-item" href="#lu-finanzierung"><span class="n">09</span><span class="t">Finanzierung &amp; Anschlusstest</span></a><a class="lu-toc-item" href="#lu-bewirtschaftung"><span class="n">10</span><span class="t">Bewirtschaftungskosten</span></a><a class="lu-toc-item" href="#lu-dealscore"><span class="n">11</span><span class="t">Investor Deal Score 2.0</span></a><a class="lu-toc-item" href="#lu-ki-analyse"><span class="n">12</span><span class="t">KI-Investment-Analyse</span></a><a class="lu-toc-item" href="#lu-exports"><span class="n">13</span><span class="t">Bankexport &amp; Investment-Case</span></a><a class="lu-toc-item" href="#lu-portfolio"><span class="n">14</span><span class="t">Portfolio &amp; Track-Record</span></a><a class="lu-toc-item" href="#lu-daten"><span class="n">15</span><span class="t">Datensicherheit &amp; Hosting</span></a><a class="lu-toc-item" href="#lu-steuer"><span class="n">16</span><span class="t">Steuer-Modul &amp; AfA</span></a><a class="lu-toc-item" href="#lu-marktdaten"><span class="n">17</span><span class="t">Marktdaten &amp; Marktwert</span></a><a class="lu-toc-item" href="#lu-rnd"><span class="n">18</span><span class="t">RND-Gutachten</span></a></div>
+          <div class="lu-toc-grid"><a class="lu-toc-item" href="#lu-warum"><span class="n">01</span><span class="t">Warum DealPilot existiert</span></a><a class="lu-toc-item" href="#lu-einstieg"><span class="n">02</span><span class="t">Drei Wege zur Analyse</span></a><a class="lu-toc-item" href="#lu-quick-check"><span class="n">03</span><span class="t">Boarding im Detail</span></a><a class="lu-toc-item" href="#lu-pdf-import"><span class="n">04</span><span class="t">PDF-Import &amp; KI-Extraktion</span></a><a class="lu-toc-item" href="#lu-objekt"><span class="n">05</span><span class="t">Objekt-Erfassung &amp; Lage</span></a><a class="lu-toc-item" href="#lu-investition"><span class="n">06</span><span class="t">Investitionsmodul &amp; 15-%-Regel</span></a><a class="lu-toc-item" href="#lu-miete"><span class="n">07</span><span class="t">Miete &amp; Marktvergleich</span></a><a class="lu-toc-item" href="#lu-werbungskosten"><span class="n">08</span><span class="t">Werbungskostenrechner</span></a><a class="lu-toc-item" href="#lu-finanzierung"><span class="n">09</span><span class="t">Finanzierung &amp; Anschlusstest</span></a><a class="lu-toc-item" href="#lu-bewirtschaftung"><span class="n">10</span><span class="t">Bewirtschaftungskosten</span></a><a class="lu-toc-item" href="#lu-dealscore"><span class="n">11</span><span class="t">Investor Deal Score 2.0</span></a><a class="lu-toc-item" href="#lu-ki-analyse"><span class="n">12</span><span class="t">KI-Investment-Analyse</span></a><a class="lu-toc-item" href="#lu-exports"><span class="n">13</span><span class="t">Bankexport &amp; Investment-Case</span></a><a class="lu-toc-item" href="#lu-portfolio"><span class="n">14</span><span class="t">Portfolio &amp; Track-Record</span></a><a class="lu-toc-item" href="#lu-daten"><span class="n">15</span><span class="t">Datensicherheit &amp; Hosting</span></a><a class="lu-toc-item" href="#lu-steuer"><span class="n">16</span><span class="t">Steuer-Modul &amp; AfA</span></a><a class="lu-toc-item" href="#lu-marktdaten"><span class="n">17</span><span class="t">Marktdaten &amp; Marktwert</span></a><a class="lu-toc-item" href="#lu-rnd"><span class="n">18</span><span class="t">RND-Gutachten</span></a><a class="lu-toc-item" href="#lu-sprechlauf"><span class="n">19</span><span class="t">Sprechlauf</span></a><a class="lu-toc-item" href="#lu-beleg"><span class="n">20</span><span class="t">Beleg-Import</span></a><a class="lu-toc-item" href="#lu-datenraum"><span class="n">21</span><span class="t">Datenraum</span></a><a class="lu-toc-item" href="#lu-dealaktion"><span class="n">22</span><span class="t">Deal-Aktion &amp; Netzwerk</span></a></div>
         </div>
       </div>
     </div>
@@ -837,6 +846,167 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       </div>
     </div>
   </section>
+
+<!-- ══ 19 · SPRECHLAUF ══════════════════════════════════════════════════
+     Marcel am 23.09.2026: "Hast du den Sprechlauf auch mit drin im
+     Leistungsumfang?" Nein - er kam nur zweimal als Wort "Spracheingabe"
+     in einer Aufzaehlung vor, obwohl voice-import.js das groesste
+     Einzelmodul der App ist. Die sechs Etappen sind aus ETAPPEN
+     (voice-import.js Z.2662) uebernommen, nicht ausgedacht. ═════════ -->
+<section class="lu-sec" id="lu-sprechlauf">
+  <div class="wrap">
+    <span class="lu-num">19</span>
+    <h2>Sprich das Objekt ein — <span class="ac">in sechs Etappen.</span></h2>
+    <p class="lu-lead">Die aufwändigste Minute einer Besichtigung ist die, in der du danach
+      im Auto sitzt und versuchst, dich zu erinnern. Der Sprechlauf nimmt dir das ab: Du
+      diktierst, was du siehst, und DealPilot füllt die Felder.</p>
+
+    <p>Beim Öffnen entscheidest du, wie du arbeiten willst. <strong>„Ich erzähle frei"</strong>
+      startet die Aufnahme sofort — du redest am Stück, und die KI stellt dir danach nur noch
+      Rückfragen zu dem, was gefehlt hat. <strong>„Frag mich durch"</strong> dreht es um:
+      DealPilot führt dich Block für Block, du antwortest per Sprache oder tippst.
+      „Weiß ich nicht" überspringt eine Frage, „Fertig" bringt dich jederzeit zur Übersicht.</p>
+
+    <p>Der geführte Weg läuft in sechs Etappen, und <strong>jede Etappe ist für sich schon
+      ein Ergebnis</strong>:</p>
+
+    <ul class="lu-list">
+      <li><strong>1 · Basis</strong> — Objekt, Preis und Miete</li>
+      <li><strong>2 · Geld</strong> — Finanzierung und Kaufnebenkosten. <em>Hier steht dein
+        erster Deal Score.</em></li>
+      <li><strong>3 · Lage &amp; Zustand</strong> — wo es steht und wie es dasteht.
+        <em>Hier steht der Investor Deal Score.</em></li>
+      <li><strong>4 · Feinschliff</strong> — Bewirtschaftung, Entwicklung, Steuer</li>
+      <li><strong>5 · Deine Sicht</strong> — These und Risiken</li>
+      <li><strong>6 · Feinheiten</strong> — alle übrigen Felder, nur auf Wunsch</li>
+    </ul>
+
+    <p>Wer nach Etappe 2 aufhört, hat trotzdem eine Antwort auf „lohnt sich das?".</p>
+
+    <p>Während du sprichst, läuft eine Live-Mitschrift mit, und um das Mikrofon kreisen
+      Stichwörter, die verschwinden, sobald du sie gesagt hast. Ausgewertet wird immer die
+      <strong>Tonaufnahme</strong>, nicht der mitgeschriebene Text — Erkennungsfehler in der
+      Mitschrift wirken sich also nicht auf die Werte aus.</p>
+
+    <p>Am Ende bekommst du dieselbe Übernahme-Tabelle wie beim Exposé-Import: jede Zeile mit
+      Häkchen, mit Quelle, Unsicheres markiert. <strong>Erst dein Klick schreibt etwas ins
+      Objekt.</strong></p>
+
+    <div class="lu-info">
+      <h4>Eine siebte Etappe, wenn du sie willst</h4>
+      <p>Ab Pro bietet DealPilot nach den sechs Etappen eine Zusatzrunde <em>Wertermittlung</em>
+        an. Sie fragt die beiden Angaben nach, die das Sachwertverfahren nach ImmoWertV braucht
+        und die sonst nirgends vorkommen — Gebäudestandard nach Anlage 4 und Garagen-BGF — und
+        holt danach den amtlichen Sachwertfaktor deines Gutachterausschusses. Wer keine
+        Wertermittlung will, wird auch nicht danach gefragt.</p>
+    </div>
+
+    <p class="lu-note">Der Sprechlauf ist in jedem Plan enthalten und kostet kein Kontingent.</p>
+  </div>
+</section>
+<hr class="rws">
+
+<!-- ══ 20 · BELEG-IMPORT ═══════════════════════════════════════════════ -->
+<section class="lu-sec lu-light" id="lu-beleg">
+  <div class="wrap">
+    <span class="lu-num">20</span>
+    <h2>Rechnungen einlesen statt <span class="ac">Zahlen abtippen.</span></h2>
+    <p class="lu-lead">Die Anschaffungskosten einer Immobilie liegen nicht an einer Stelle.
+      Sie liegen in der Notarrechnung, im Grunderwerbsteuerbescheid, in der Maklerrechnung,
+      in zwölf Handwerkerrechnungen und in einem Stapel Fahrtbelege. Genau diesen Stapel
+      liest DealPilot.</p>
+
+    <p>Du wählst einen Ordner oder einzelne Dateien — PDF oder Foto, beides geht. Die Seiten
+      werden zu Bildern gerendert und an die Bilderkennung geschickt, die je Beleg Datum,
+      Netto, Umsatzsteuer, Brutto, Aussteller und Kategorie herausliest.</p>
+
+    <p>Danach kommt der wichtigste Schritt: <strong>du bestätigst jede einzelne Zeile.</strong>
+      Nicht der Import entscheidet, was in deine Anschaffungskosten wandert, sondern du — mit
+      dem erkannten Betrag und der vorgeschlagenen Kategorie daneben. Das ist Absicht: Aus
+      diesen Zahlen entsteht die Kaufpreisaufteilung, und die geht ans Finanzamt.</p>
+
+    <ul class="lu-list">
+      <li>PDF <strong>und</strong> Foto, ganze Ordner auf einmal</li>
+      <li>Erkannt werden Datum, Netto, Umsatzsteuer, Brutto, Aussteller und Kategorie</li>
+      <li>Feste Zuordnung in die Anschaffungs- beziehungsweise Herstellungskosten</li>
+      <li>Jede Zeile wird einzeln bestätigt — nichts läuft ungeprüft in die Steuerrechnung</li>
+      <li>Die Summen landen direkt in der BMF-Kaufpreisaufteilung</li>
+    </ul>
+
+    <p class="lu-note">Der Beleg-Import ist ab dem Investor-Plan enthalten.</p>
+  </div>
+</section>
+<hr class="rw">
+
+<!-- ══ 21 · DATENRAUM ══════════════════════════════════════════════════ -->
+<section class="lu-sec" id="lu-datenraum">
+  <div class="wrap">
+    <span class="lu-num">21</span>
+    <h2>Die Unterlagen, <span class="ac">bevor die Bank danach fragt.</span></h2>
+    <p class="lu-lead">Jede Finanzierung hängt irgendwann an einem fehlenden Blatt. Der
+      Datenraum dreht die Reihenfolge um: Du sammelst einmal, und danach weiß die App, was
+      noch fehlt.</p>
+
+    <p>Er hat zwei Ebenen. Der <strong>persönliche Ordner</strong> gilt für alle deine
+      Objekte — Ausweis, SCHUFA-Auskunft, Gehaltsabrechnungen, Lohnsteuerbescheinigung,
+      Steuerbescheide, Selbstauskunft, Rentenbescheid, EÜR, Kontoauszüge. Den
+      <strong>Objektordner</strong> legst du je Immobilie an: Exposé, Grundrisse,
+      Teilungserklärung, WEG-Abrechnung, Mietverträge und was sonst dazugehört.</p>
+
+    <p>Jeder Dokumenttyp trägt zwei Merker: Braucht die <strong>Bank</strong> ihn? Braucht die
+      <strong>Finanzierungsbestätigung</strong> ihn? Daraus entsteht die Fortschrittsanzeige —
+      und ohne ausreichend gefüllten Ordner lässt sich keine Netzwerk-Anfrage abschicken.</p>
+
+    <p>Die Selbstauskunft musst du dabei nicht abtippen: DealPilot erzeugt sie als
+      ausfüllbares PDF, vorbefüllt mit dem, was in deinen Einstellungen steht.</p>
+
+    <ul class="lu-list">
+      <li>Zwei Ebenen: ein persönlicher Ordner, ein eigener Ordner je Immobilie</li>
+      <li>Jeder Typ mit Pflicht-Merker für Bank und Finanzierungsbestätigung</li>
+      <li>Der Füllstand entscheidet, ob eine Anfrage rausgehen kann</li>
+      <li>Selbstauskunft als ausfüllbares PDF, vorbefüllt aus deinen Stammdaten</li>
+      <li>Freigaben pro Objekt, mit Laufzeit und jederzeit widerrufbar</li>
+    </ul>
+  </div>
+</section>
+<hr class="rws">
+
+<!-- ══ 22 · DEAL-AKTION & PARTNERNETZWERK ══════════════════════════════ -->
+<section class="lu-sec lu-light" id="lu-dealaktion">
+  <div class="wrap">
+    <span class="lu-num">22</span>
+    <h2>Wenn die Zahlen stehen, <span class="ac">fängt die Arbeit an.</span></h2>
+    <p class="lu-lead">Eine durchgerechnete Immobilie ist noch keine gekaufte. Danach kommen
+      Bankanfragen, Gutachten, Finanzierungsbestätigungen — und genau da hören die meisten
+      Werkzeuge auf. DealPilot hat dafür einen eigenen Reiter.</p>
+
+    <p>Vier Aktionskarten decken ab, was nach der Analyse ansteht: <strong>Bankanfrage</strong>
+      mit Dokumenten-Upload und Vorprüfung, <strong>Finanzierungsbestätigung</strong> für den
+      Makler, <strong>Gutachten &amp; Expertise</strong> (Verkehrswert, Restnutzungsdauer,
+      Sanierungskonzept) und <strong>Beratung &amp; Zweite Meinung</strong>. Jede Anfrage geht
+      mit deinen Objektdaten, dem Investment-Case-PDF und deinen Unterlagen raus — du stellst
+      nichts noch einmal zusammen.</p>
+
+    <p>Darüber liegt das <strong>Partnernetzwerk</strong>: Sachverständige, Finanzierer,
+      Steuerberater und Handwerksbetriebe als Karten, jede mit Schwerpunkt und Antwortzeit.
+      Bevor eine Anfrage rausgeht, prüft DealPilot, ob sie überhaupt Aussicht hat — sind die
+      Kennzahlen vollständig, liegen die Unterlagen im Datenraum? Fehlt etwas, ist der Knopf
+      gesperrt, und jeder fehlende Punkt verlinkt dorthin, wo du ihn nachtragen kannst.</p>
+
+    <p>Was mitgeht, siehst du vorher. Das Übersichtsblatt listet jede Eckzahl und jeden
+      Datenraum-Link auf, bevor du sendest.</p>
+
+    <ul class="lu-list">
+      <li>Vier Aktionskarten: Bankanfrage · Finanzierungsbestätigung · Gutachten · Beratung</li>
+      <li>Objektdaten, Investment-Case und Unterlagen gehen als ein Paket raus</li>
+      <li>Anforderungsprüfung vor dem Absenden, mit Beheben-Link je Lücke</li>
+      <li>Status je Objekt und Freigabe per QR-Code mit Restlaufzeit</li>
+      <li>Ab Pro können eigene Partner eingereicht werden</li>
+    </ul>
+  </div>
+</section>
+<hr class="rw">
+
   <hr class="rws">
 
   <!-- KEROSIN (hell) -->
