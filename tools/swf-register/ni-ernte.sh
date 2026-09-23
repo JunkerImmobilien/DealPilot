@@ -97,6 +97,45 @@ while IFS=';' read -r wb rohname ags amt befund; do
        | grep -aoE '[0-9]+ +[0-9]+ +[0-9]+' | head -1)
   SZ=$(grep -aiE 'sachwert \[' "$TMP/k.txt" 2>/dev/null \
        | grep -aoE '[0-9]{5,} +[0-9]{5,} +[0-9]{5,}' | head -1)
+
+  # ── ZWEITER WEG: DIE ABGEDRUCKTEN ACHSEN ───────────────────────────
+  # Nicht jedes Dashboard fuehrt beide Stichprobenspannen. Gemessen am
+  # 23.09.2026 an sechs Gebieten der Regionen osmep und sulver: ihre
+  # Merkmalstabelle nennt Bodenrichtwert, Kaufzeitpunkt und
+  # modifiziertes Baujahr - eine Sachwert-Spanne gibt es dort nicht.
+  #
+  # Dafuer druckt das Diagramm seine ACHSEN ab, und die sind sogar die
+  # bessere Quelle: die Modellbeschreibung sagt, die
+  # Diagramm-Wertebereiche gaeben "den Rahmen fuer die Verwendbarkeit
+  # des zugrunde liegenden Modells" wieder. Was dort steht, hat der
+  # Ausschuss selbst als verwendbar gezeigt - ein selbst gebildetes
+  # Gitter ist dagegen immer eine Annaeherung.
+  ACHSE_S=$(grep -aoE '(^|[^0-9])[0-9]{3}\.000 €( +[0-9]{3}\.000 €){3,}' "$TMP/k.txt" 2>/dev/null \
+            | head -1 | grep -aoE '[0-9]{3}\.000' | tr -d '.' | tr '\n' ' ')
+  ACHSE_B=$(grep -a 'Bodenrichtwert:' "$TMP/k.txt" 2>/dev/null \
+            | grep -aoE '[0-9]+ €/m²' | grep -aoE '^[0-9]+' | tr '\n' ' ')
+
+  if [ -z "$SZ" ] && [ -n "$ACHSE_S" ] && [ -n "$ACHSE_B" ]; then
+    BRWS="$ACHSE_B"; SACHS="$ACHSE_S"
+    echo "$(date +%H:%M:%S) ACHSEN $wb ($ags $amt) BRW[$BRWS] SW[$SACHS]" >> "$PROT"
+    timeout 260 bash /tmp/ni-kalkulator-abtasten.sh "$tm" "$wb" "$BRWS" "$SACHS" \
+      > "$TMP/roh.csv" 2>/dev/null
+    n=$(grep -cE '^[0-9]+;[0-9]+;[0-9]' "$TMP/roh.csv" 2>/dev/null || true)
+    n=${n:-0}
+    if [ "$n" -gt 0 ]; then
+      grep -E '^[0-9]+;[0-9]+;[0-9]' "$TMP/roh.csv" > "$ziel"
+      echo "# quelle=abgedruckte_achsen" > "$ziel.meta"
+      echo "# gitter_brw=$BRWS" >> "$ziel.meta"
+      echo "# gitter_sachwert=$SACHS" >> "$ziel.meta"
+      neu=$((neu+1))
+      echo "$(date +%H:%M:%S) OK $wb ($ags $amt) $n Zellen, aus den abgedruckten Achsen" >> "$PROT"
+    else
+      leer=$((leer+1))
+      echo "$(date +%H:%M:%S) ACHSEN-LEER $wb ($ags $amt)" >> "$PROT"
+    fi
+    sleep 8; continue
+  fi
+
   if [ -z "$BZ" ] || [ -z "$SZ" ]; then
     ohne=$((ohne+1))
     echo "$(date +%H:%M:%S) OHNE-SPANNE $wb ($ags $amt) - nicht abgetastet" >> "$PROT"
