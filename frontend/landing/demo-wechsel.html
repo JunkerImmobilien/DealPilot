@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Der Wechselschritt · Was DealPilot macht</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="dp2.css?v=1577">
+<link rel="stylesheet" href="demo-wechsel.css?v=1577">
+<style>
+  body{background:var(--cream2)}
+  .kopfleiste{background:var(--ob);color:#fff;padding:26px 0 24px;
+    border-bottom:2px solid var(--gd)}
+  .kopfleiste .mk{font:700 9.5px/1 var(--mono);letter-spacing:.2em;color:var(--gdh)}
+  .kopfleiste h1{font-size:31px;margin:9px 0 8px}
+  .kopfleiste p{margin:0;color:var(--mdk);max-width:80ch;font-size:14.6px;line-height:1.64}
+  .kopfleiste b{color:#fff}
+  .buehne-aussen{padding:34px 0 10px}
+  .woher{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));
+    gap:1px;background:var(--cream-line);border:1px solid var(--cream-line);
+    margin:26px 0 8px}
+  .woher > div{background:#fff;padding:14px 16px}
+  .woher .t{font:700 8.5px/1 var(--mono);letter-spacing:.12em;color:var(--gdi);
+    display:block;margin-bottom:6px}
+  .woher .s{font-size:12.9px;color:var(--inkm);line-height:1.55}
+  .hinweis{background:#fff;border:1px solid var(--cream-line);
+    border-left:3px solid var(--gd);padding:20px 24px;margin:30px 0 56px}
+  .hinweis h2{font-size:18px;margin-bottom:9px}
+  .hinweis p{margin:0 0 10px;font-size:14.4px;line-height:1.66;color:var(--inkm);
+    max-width:84ch}
+  .hinweis p:last-child{margin-bottom:0}
+  .hinweis b{color:var(--ink)}
+  .rechnung{font-family:var(--mono);font-size:12.6px;background:var(--cream2);
+    padding:13px 16px;margin:12px 0;line-height:1.75;color:var(--inkm);
+    border-left:2px solid var(--gd)}
+  .rechnung b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<header class="kopfleiste">
+  <div class="wrap">
+    <span class="mk">DEMO · NICHT ÖFFENTLICH · v1577</span>
+    <h1>Der Wechselschritt — sechs Akte bis zur Entscheidung</h1>
+    <p>Die Schritte hängen <b>abwechselnd links und rechts</b> an einer Mittelachse.
+    Das Auge bekommt einen Takt statt einer Liste — und sieht auf einen Blick, dass
+    etwas zusammenläuft. Neu ist der Kern: <b>fünf Werte → ein Score → die
+    Entscheidung</b>, und erst danach geht es weiter zu Herkunft und Ausgabe.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="buehne-aussen" data-wechsel></div>
+
+  <div class="woher">
+    <div><span class="t">AKT 1 · DIE PILLE FLIEGT</span><span class="s">Jeder
+      erkannte Wert poppt am Mikrofon auf, fliegt ins Feld und landet dort grün
+      mit Haken — wie im echten Sprechlauf.</span></div>
+    <div><span class="t">AKT 2 · DER WECHSEL</span><span class="s">Die fünf Werte
+      erscheinen abwechselnd links und rechts an der Achse, jeder mit seinem
+      Gewicht und einer Begründung.</span></div>
+    <div><span class="t">AKT 3+4 · SCORE UND URTEIL</span><span class="s">Aus fünf
+      wird eine Zahl, aus der Zahl ein Urteil: <b>lohnt</b> oder
+      <b>lohnt nicht</b> — mit drei Sätzen, die vor der Bank zählen.</span></div>
+    <div><span class="t">GRÖSSER SKALIERT</span><span class="s">Ring 224 statt
+      146 px, Score-Zahl 78 px, Werte in 15er statt 12er Schrift. Eine
+      Kaufentscheidung liest man nicht mit der Lupe.</span></div>
+  </div>
+
+  <div class="hinweis">
+    <h2>Der Score ist gerechnet, nicht gesetzt</h2>
+    <p>Eine Demo, die den Score als feste Zahl hinschreibt, führt genau das vor, was
+    sie zu widerlegen behauptet. Deshalb rechnet die Seite ihn aus den fünf Werten —
+    mit den Gewichten aus <b>DealScore2</b>:</p>
+    <div class="rechnung">
+      Rendite&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;72 × 35&nbsp;% = 2520<br>
+      Finanzierung&nbsp;86 × 25&nbsp;% = 2150<br>
+      Risiko&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;79 × 20&nbsp;% = 1580<br>
+      Lage&nbsp;&amp;&nbsp;Markt&nbsp;&nbsp;71 × 10&nbsp;% =&nbsp;&nbsp;710<br>
+      Upside&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;63 × 10&nbsp;% =&nbsp;&nbsp;630<br>
+      ─────────────────────────<br>
+      <b>7590 ÷ 100 = 75,9 → Score 76</b>
+    </div>
+    <p>Und die Stufe kommt aus derselben Kette wie die Objektkarte der App
+    (≥&nbsp;85 Top · ≥&nbsp;70 Gut · ≥&nbsp;50 Solide · ≥&nbsp;35 Schwach). 76 ergibt
+    <b>Gut</b> — und weil die Schwelle für „lohnt" bei 70 liegt, fällt das Urteil
+    positiv aus. Änderst du einen der fünf Werte, ändern sich Score, Stufe und
+    Urteil von selbst mit.</p>
+  </div>
+
+  <div class="hinweis">
+    <h2>Was hier bewusst nicht behauptet wird</h2>
+    <p>Akt 5 zeigt drei Sorten Zahl. <b>Amtlich</b> heißt: der Wert steht im Bericht
+    des zuständigen Gutachterausschusses, mit Jahrgang, Seite und Lizenz.
+    <b>Abgeleitet</b> heißt: aus Anlage 2 ImmoWertV gerechnet — und die
+    Restnutzungsdauer trägt ihren Rahmen 44–56 mit, weil das Modell einen Rahmen
+    liefert und keinen Punkt.</p>
+    <p>Der dritte Fall ist <b>kein Wert</b>. Dafür steht dort, welcher Ausschuss
+    zuständig ist und wo sein Bericht liegt. Im Register geben heute <b>181 von 383</b>
+    Sachwertfaktor-Sätzen genau diese begründete Auskunft statt einer Zahl.</p>
+    <p><b>Auf dem Handy fällt nichts weg.</b> Unter 760&nbsp;px rückt die Achse an den
+    linken Rand und wird zum Zeitstrahl, die Felder stehen unter dem Mikrofon, und
+    die Pille fliegt nach unten statt nach rechts.</p>
+  </div>
+
+</div>
+
+<script src="demo-wechsel.js?v=1577"></script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   demo-wechsel.css · v1577 · Der Wechselschritt
+   ───────────────────────────────────────────────────────────────────────
+   Marcel am 23.09.2026: "sollten wir vlt die schnellbewertung mit den 5
+   Werten die zum DealScore fuehren angeben, dann die entscheidung lohnt
+   oder lohnt nicht und dann weiter. Schoen waere wenn es uebersichtlich
+   ist. erst links geht es weiter dann erscheint das rechts dann wieder
+   weiter links und so weiter. Die Skalierung passt auch noch nicht."
+
+   Daraus drei Entscheidungen:
+
+   1. EINE MITTELACHSE, und die Schritte haengen abwechselnd links und
+      rechts daran. Das Auge bekommt einen Takt statt einer Liste - und
+      es sieht auf einen Blick, dass etwas zusammenlaeuft.
+
+   2. DREI AKTE statt vier gleichrangiger Stationen:
+        Akt 1  die fuenf Werte der Schnellbewertung, im Wechsel
+        Akt 2  sie fahren zusammen, der Score entsteht
+        Akt 3  die Entscheidung - lohnt oder lohnt nicht
+      Erst danach geht es weiter zu Belegen und Ausgeben.
+
+   3. GROESSER. Der Score ist die Hauptsache dieser Szene und bekommt
+      220 px Ring statt 146. Die Werte tragen 15er Schrift statt 12er.
+      Eine Kaufentscheidung liest man nicht mit der Lupe.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.wx{background:var(--ob);border:1px solid var(--line);position:relative;
+  overflow:hidden;display:flex;flex-direction:column;min-height:660px}
+.wx::before{content:'';position:absolute;inset:-40%;pointer-events:none;
+  background:radial-gradient(40% 32% at 50% 15%,rgba(201,168,76,.12),transparent 70%);
+  animation:wxLicht 21s ease-in-out infinite alternate}
+@keyframes wxLicht{to{transform:translate(-22%,30%)}}
+
+.wx-streifen{position:relative;height:4px;background:var(--runway);
+  overflow:hidden;flex:none;z-index:3}
+.wx-streifen::after{content:'';position:absolute;top:0;bottom:0;left:-30%;width:22%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent);
+  animation:wxGlanz 5.5s ease-in-out infinite}
+@keyframes wxGlanz{0%,62%{left:-30%}100%{left:120%}}
+
+/* ══ KOPF ═════════════════════════════════════════════════════════════ */
+.wx-kopf{position:relative;z-index:2;display:flex;align-items:center;gap:18px;
+  padding:16px 26px;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(201,168,76,.08),rgba(255,255,255,.015))}
+.wx-obj{flex:1;min-width:0}
+.wx-obj b{display:flex;align-items:center;gap:9px;font:700 17px/1.25 var(--disp);
+  color:#fff}
+.wx-obj b .pin{color:var(--gdh);flex:none;display:flex}
+.wx-obj span{display:block;font:500 10.5px/1.4 var(--mono);letter-spacing:.07em;
+  color:var(--ddk);margin-top:4px}
+.wx-akt{display:flex;align-items:center;gap:8px;flex:none}
+.wx-akt i{display:block;width:26px;height:3px;background:rgba(255,255,255,.16);
+  transition:background .45s var(--e-weich)}
+.wx-akt i.da{background:var(--runway)}
+.wx-uhr{display:flex;align-items:center;gap:11px;flex:none;
+  padding-left:18px;border-left:1px solid var(--line)}
+.wx-uhr b{font:700 24px/1 var(--disp);color:#fff;font-variant-numeric:tabular-nums}
+.wx-uhr span{display:block;font:500 8px/1.3 var(--mono);letter-spacing:.14em;
+  color:var(--gdh);margin-top:3px;text-align:right}
+.wx-tick{display:inline-block;width:5px;height:5px;border-radius:50%;
+  background:var(--grn);margin-right:6px;vertical-align:1px;
+  animation:wxTick 1s steps(1) infinite}
+@keyframes wxTick{0%,49%{opacity:1}50%,100%{opacity:.2}}
+
+/* ══ DIE BAHN ═════════════════════════════════════════════════════════ */
+.wx-bahn{position:relative;z-index:2;flex:1;padding:24px 26px 20px;
+  display:flex;flex-direction:column;justify-content:center;min-height:0}
+
+/* Die Achse in der Mitte - an ihr haengt alles. */
+.wx-achse{position:absolute;left:50%;top:18px;bottom:18px;width:2px;
+  transform:translateX(-1px);
+  background:linear-gradient(180deg,transparent,rgba(201,168,76,.4) 12%,
+    rgba(201,168,76,.4) 88%,transparent)}
+.wx-achse i{position:absolute;left:-3px;width:8px;height:8px;border-radius:50%;
+  background:var(--gd);top:0;
+  box-shadow:0 0 12px rgba(201,168,76,.8);
+  transition:top .7s var(--e-hoch)}
+
+/* ── AKT 0 · SPRECHEN: die Pille fliegt ins Feld ─────────────────────
+   Marcel: "geil waere im sprechlauf auch wenn die am animierten
+   mikrofon die werte aufpoppen als pille und dann rechts in die felder
+   gehen und gruen mit haken wie im sprechlauf."
+
+   Die Pille poppt am Mikrofon auf, fliegt zum Zielfeld und loest sich
+   dort auf; im selben Moment faellt der Wert ins Feld und es wird
+   gruen. Der Flug laeuft ueber transform - die Strecke wird im JS
+   gemessen, weil sie von der Breite abhaengt und nicht geraten werden
+   darf. */
+.wx-sprech{display:grid;grid-template-columns:1fr 1fr;gap:0;
+  align-items:center;position:relative;padding:4px 0}
+.wx-links{padding-right:30px}
+.wx-rechts{padding-left:30px}
+.wx-mik{display:flex;align-items:center;gap:18px;margin-bottom:16px}
+.wx-mik-k{position:relative;width:72px;height:72px;flex:none;display:grid;
+  place-items:center;border-radius:50%;background:var(--runway);
+  color:#241c06;box-shadow:0 10px 30px rgba(201,168,76,.45)}
+.wx-ring{position:absolute;inset:0;border-radius:50%;border:2px solid var(--gd);
+  opacity:0;animation:wxRing 2.6s ease-out infinite}
+.wx-ring:nth-child(2){animation-delay:.9s}
+.wx-ring:nth-child(3){animation-delay:1.8s}
+@keyframes wxRing{0%{transform:scale(1);opacity:.75}100%{transform:scale(2.6);opacity:0}}
+.wx-welle{display:flex;align-items:center;gap:3px;height:44px}
+.wx-welle i{display:block;width:3px;border-radius:2px;background:var(--gdh);
+  height:20%;animation:wxWelle 1.1s ease-in-out infinite;
+  animation-delay:calc(var(--n) * 70ms)}
+@keyframes wxWelle{0%,100%{height:16%;opacity:.5}50%{height:100%;opacity:1}}
+.wx-mitschrift{font:500 14px/1.6 var(--body);color:var(--txtd);
+  border-left:2px solid var(--gd);padding:9px 0 9px 14px;min-height:58px}
+.wx-mitschrift .cur{display:inline-block;width:2px;height:15px;
+  background:var(--gdh);vertical-align:-2px;animation:wxTick .9s steps(1) infinite}
+
+/* Die fliegende Pille */
+.wx-flug{position:absolute;z-index:6;display:inline-flex;align-items:center;
+  gap:7px;padding:7px 13px;background:var(--runway);color:#241c06;
+  font:700 12px/1 var(--mono);white-space:nowrap;pointer-events:none;
+  box-shadow:0 8px 22px rgba(201,168,76,.5);
+  transform:scale(.5);opacity:0}
+.wx-flug.start{animation:wxPillePop .34s cubic-bezier(.2,1.8,.4,1) forwards}
+@keyframes wxPillePop{to{transform:scale(1);opacity:1}}
+.wx-flug.fliegt{transition:transform .62s cubic-bezier(.45,0,.25,1),opacity .2s .46s;
+  opacity:0}
+
+/* Die Zielfelder */
+.wx-felder{display:grid;gap:7px}
+.wx-feld{display:flex;align-items:center;gap:12px;padding:12px 15px;
+  background:rgba(255,255,255,.04);border:1px solid var(--line);
+  transition:background .4s var(--e-weich),border-color .4s var(--e-weich)}
+.wx-feld .lb{font:500 11px/1.3 var(--mono);letter-spacing:.06em;color:var(--ddk);
+  transition:color .4s}
+.wx-feld .vl{margin-left:auto;font:700 14.5px/1 var(--mono);color:rgba(255,255,255,.2);
+  transition:color .35s}
+.wx-feld .hk{width:20px;height:20px;flex:none;display:grid;place-items:center;
+  border:1px solid rgba(255,255,255,.18);color:transparent;
+  transition:.35s var(--e-hoch)}
+.wx-feld.voll{background:rgba(63,165,108,.11);border-color:rgba(63,165,108,.5)}
+.wx-feld.voll .lb{color:var(--txtd)}
+.wx-feld.voll .vl{color:#fff;animation:wxTreffer .45s cubic-bezier(.2,1.7,.4,1)}
+.wx-feld.voll .hk{background:var(--grn);border-color:var(--grn);color:#fff;
+  animation:wxHaken .4s cubic-bezier(.2,1.8,.4,1)}
+@keyframes wxTreffer{from{transform:scale(1.35)}to{transform:none}}
+@keyframes wxHaken{from{transform:scale(0) rotate(-45deg)}to{transform:none}}
+
+/* ── AKT 1 · die fuenf Werte im Wechsel ──────────────────────────── */
+.wx-werte{display:grid;gap:9px;position:relative}
+.wx-w{display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:center;
+  opacity:0;animation:wxRein .6s var(--e-hoch) forwards;
+  animation-delay:calc(var(--n) * 520ms)}
+.wx-w .karte{background:rgba(255,255,255,.045);border:1px solid var(--line);
+  padding:13px 16px;display:flex;align-items:center;gap:14px;position:relative}
+/* links haengend */
+.wx-w.li .karte{grid-column:1;margin-right:26px;
+  animation:wxVonLinks .6s var(--e-hoch) backwards;
+  animation-delay:calc(var(--n) * 520ms)}
+.wx-w.li .karte::after{content:'';position:absolute;right:-26px;top:50%;
+  width:26px;height:1px;background:rgba(201,168,76,.45)}
+/* rechts haengend */
+.wx-w.re .karte{grid-column:2;margin-left:26px;
+  animation:wxVonRechts .6s var(--e-hoch) backwards;
+  animation-delay:calc(var(--n) * 520ms)}
+.wx-w.re .karte::after{content:'';position:absolute;left:-26px;top:50%;
+  width:26px;height:1px;background:rgba(201,168,76,.45)}
+@keyframes wxVonLinks{from{opacity:0;transform:translateX(-38px)}to{opacity:1;transform:none}}
+@keyframes wxVonRechts{from{opacity:0;transform:translateX(38px)}to{opacity:1;transform:none}}
+@keyframes wxRein{from{opacity:0}to{opacity:1}}
+
+.wx-w .ik{width:34px;height:34px;flex:none;display:grid;place-items:center;
+  background:rgba(201,168,76,.14);color:var(--gdh)}
+.wx-w .nm{font:700 15px/1.25 var(--disp);color:#fff}
+.wx-w .be{font:500 11px/1.4 var(--mono);color:var(--ddk);margin-top:3px;
+  display:block}
+.wx-w .rechts{margin-left:auto;text-align:right;flex:none;padding-left:12px}
+.wx-w .pkt{font:700 26px/1 var(--disp);font-variant-numeric:tabular-nums}
+.wx-w .gw{font:500 9px/1 var(--mono);letter-spacing:.1em;color:var(--mut);
+  display:block;margin-top:4px}
+.wx-w .bar{position:absolute;left:0;right:0;bottom:0;height:2px;
+  background:rgba(255,255,255,.08)}
+.wx-w .bar i{display:block;height:100%;width:0;
+  animation:wxBar .9s var(--e-hoch) forwards;
+  animation-delay:calc(.35s + var(--n) * 520ms)}
+@keyframes wxBar{to{width:var(--b)}}
+
+/* ── AKT 2 · die Verdichtung ─────────────────────────────────────── */
+.wx-score{display:grid;grid-template-columns:auto 1fr;gap:34px;
+  align-items:center;justify-content:center;padding:4px 10px}
+.wx-dial{position:relative;width:224px;height:224px;flex:none}
+.wx-dial svg{width:224px;height:224px;transform:rotate(-90deg)}
+.wx-dial .tr{fill:none;stroke:rgba(255,255,255,.09);stroke-width:12}
+.wx-dial .pg{fill:none;stroke:url(#wxG);stroke-width:12;stroke-linecap:round;
+  stroke-dasharray:333;stroke-dashoffset:333;
+  transition:stroke-dashoffset 1.5s var(--e-hoch) .25s;
+  filter:drop-shadow(0 0 16px rgba(201,168,76,.55))}
+.wx-dv{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.wx-dv b{font:700 78px/1 var(--disp);color:#fff;font-variant-numeric:tabular-nums;
+  letter-spacing:-.03em}
+.wx-dv small{display:block;font:500 12px/1 var(--mono);color:var(--ddk);margin-top:6px;
+  letter-spacing:.12em}
+.wx-sum{max-width:420px}
+.wx-sum .lb{font:700 9px/1 var(--mono);letter-spacing:.16em;color:var(--gdh);
+  margin-bottom:10px;display:block}
+.wx-sum h4{font:700 25px/1.2 var(--disp);color:#fff;margin:0 0 10px;
+  letter-spacing:-.02em}
+.wx-sum p{margin:0 0 16px;font-size:14px;line-height:1.6;color:var(--mdk)}
+.wx-mini{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;
+  background:var(--line);border:1px solid var(--line)}
+.wx-mini > div{background:rgba(255,255,255,.04);padding:9px 4px;text-align:center}
+.wx-mini b{display:block;font:700 16px/1 var(--disp)}
+.wx-mini span{display:block;font:500 7px/1.25 var(--mono);letter-spacing:.06em;
+  color:var(--mut);margin-top:5px}
+
+/* ── AKT 3 · die Entscheidung ────────────────────────────────────── */
+.wx-ent{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;
+  padding:6px 10px}
+.wx-siegel{position:relative;width:186px;height:186px;flex:none;display:grid;
+  place-items:center;border-radius:50%;
+  background:radial-gradient(circle at 38% 30%,rgba(63,165,108,.28),rgba(63,165,108,.07));
+  border:2px solid var(--grn);
+  animation:wxSiegel .8s cubic-bezier(.2,1.6,.35,1)}
+@keyframes wxSiegel{from{transform:scale(.55) rotate(-14deg);opacity:0}
+  to{transform:none;opacity:1}}
+.wx-siegel::after{content:'';position:absolute;inset:-9px;border-radius:50%;
+  border:1px solid rgba(63,165,108,.45);animation:wxPuls 2.4s ease-out infinite}
+@keyframes wxPuls{0%{transform:scale(1);opacity:.75}100%{transform:scale(1.22);opacity:0}}
+.wx-siegel .in{text-align:center}
+.wx-siegel .hk{color:var(--grnh);display:flex;justify-content:center;
+  margin-bottom:6px}
+.wx-siegel .tx{font:700 27px/1 var(--disp);color:#fff;letter-spacing:-.02em}
+.wx-siegel .ut{font:500 8.5px/1.3 var(--mono);letter-spacing:.15em;
+  color:var(--grnh);margin-top:7px;display:block}
+/* Der andere Fall - gebaut, damit sichtbar ist, dass es ihn gibt */
+.wx-siegel.nein{background:radial-gradient(circle at 38% 30%,rgba(184,98,80,.28),
+  rgba(184,98,80,.07));border-color:var(--rd)}
+.wx-siegel.nein::after{border-color:rgba(184,98,80,.45)}
+.wx-siegel.nein .hk{color:#E4A89E}
+.wx-siegel.nein .ut{color:#E4A89E}
+
+.wx-gruende{display:grid;gap:8px;max-width:470px}
+.wx-gr{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;
+  background:rgba(255,255,255,.04);border-left:2px solid;
+  opacity:0;animation:wxRein .55s var(--e-hoch) forwards;
+  animation-delay:calc(.25s + var(--n) * 160ms)}
+.wx-gr.gut{border-color:var(--grn)}
+.wx-gr.gut .ik{color:var(--grnh)}
+.wx-gr.acht{border-color:var(--gd)}
+.wx-gr.acht .ik{color:var(--gdh)}
+.wx-gr .ik{flex:none;display:flex;margin-top:1px}
+.wx-gr b{display:block;font:700 13.5px/1.3 var(--disp);color:#fff}
+.wx-gr span{display:block;font-size:12px;line-height:1.5;color:var(--mdk);margin-top:3px}
+
+/* ── AKT 4/5 · weiter: belegen und ausgeben ──────────────────────── */
+.wx-weiter{display:grid;grid-template-columns:1fr 1fr;gap:26px;
+  align-items:center;padding:4px 6px}
+.wx-liste{display:grid;gap:7px}
+.wx-li{display:flex;align-items:center;gap:11px;padding:10px 13px;
+  border-left:2px solid;opacity:0;
+  animation:wxRein .5s var(--e-hoch) forwards;
+  animation-delay:calc(var(--n) * 130ms)}
+.wx-li.amt{background:rgba(63,165,108,.09);border-color:var(--grn)}
+.wx-li.amt .ik{color:var(--grnh)} .wx-li.amt .wt{color:var(--grnh)}
+.wx-li.ind{background:rgba(201,168,76,.09);border-color:var(--gd)}
+.wx-li.ind .ik{color:var(--gdh)} .wx-li.ind .wt{color:var(--gdh)}
+.wx-li.weg{background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.3);
+  border-left-style:dashed}
+.wx-li.weg .ik,.wx-li.weg .wt{color:var(--mdk)}
+.wx-li .ik{flex:none;display:flex}
+.wx-li .nm{font:700 13px/1.3 var(--disp);color:#fff}
+.wx-li .qu{font:500 9.5px/1.3 var(--mono);color:var(--ddk);display:block;margin-top:2px}
+.wx-li .wt{margin-left:auto;font:700 13.5px/1 var(--mono);flex:none;padding-left:10px}
+.wx-li .st{font:700 7px/1 var(--mono);letter-spacing:.1em;padding:4px 6px;
+  flex:none;margin-left:7px;background:rgba(255,255,255,.1);color:var(--mdk)}
+
+.wx-pdfs{display:grid;gap:8px}
+.wx-pdf{display:flex;align-items:center;gap:13px;padding:13px 15px;background:#fff;
+  color:var(--ink);opacity:0;
+  animation:wxBlatt .6s cubic-bezier(.2,1.5,.4,1) forwards;
+  animation-delay:calc(var(--n) * 170ms)}
+@keyframes wxBlatt{from{opacity:0;transform:translateX(30px) rotate(2.5deg)}
+  to{opacity:1;transform:none}}
+.wx-pdf .ik{width:34px;height:42px;flex:none;background:var(--runway);
+  display:grid;place-items:center;color:#241c06}
+.wx-pdf b{display:block;font:700 14px/1.3 var(--disp)}
+.wx-pdf span{display:block;font-size:11.5px;color:var(--mut);margin-top:2px}
+.wx-pdf .s{margin-left:auto;font:700 10px/1.4 var(--mono);color:var(--gdi);
+  text-align:right;white-space:nowrap}
+
+.wx-titel{text-align:center;margin-bottom:18px}
+.wx-titel .lb{font:700 9px/1 var(--mono);letter-spacing:.18em;color:var(--gdh);
+  display:block;margin-bottom:8px}
+.wx-titel h3{font:700 26px/1.15 var(--disp);color:#fff;margin:0;
+  letter-spacing:-.025em}
+.wx-titel p{margin:8px auto 0;max-width:62ch;font-size:13.6px;line-height:1.6;
+  color:var(--mdk)}
+
+/* ══ FUSS ═════════════════════════════════════════════════════════════ */
+.wx-fuss{position:relative;z-index:2;display:flex;
+  border-top:1px solid var(--line);background:rgba(0,0,0,.32)}
+.wx-f{flex:1;padding:12px 22px;display:flex;align-items:center;gap:12px;min-width:0}
+.wx-f + .wx-f{border-left:1px solid var(--line)}
+.wx-f .mk{font:700 8px/1 var(--mono);letter-spacing:.14em;padding:5px 9px;flex:none}
+.wx-f.ohne .mk{background:rgba(184,98,80,.2);color:#E4A89E}
+.wx-f.mit .mk{background:var(--runway);color:var(--gold-on)}
+.wx-f .tx{font-size:12.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap}
+.wx-f.ohne .tx{color:rgba(228,168,158,.85)}
+.wx-f.mit .tx{color:#fff}
+.wx-f .zt{margin-left:auto;font:700 14px/1 var(--mono);flex:none;padding-left:8px}
+.wx-f.ohne .zt{color:#E4A89E;text-decoration:line-through;opacity:.8}
+.wx-f.mit .zt{color:var(--grnh)}
+
+.wx-raus{animation:wxRaus .3s var(--e-weich) forwards}
+@keyframes wxRaus{to{opacity:0;transform:translateY(-16px)}}
+
+@media(prefers-reduced-motion:reduce){
+  .wx *,.wx::before{animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;transition-duration:.01ms !important}
+}
+
+/* ══ SCHMAL ═══════════════════════════════════════════════════════════
+   Der Wechsel links/rechts braucht Breite. Darunter stapelt alles
+   einspaltig, und die Achse rueckt an den linken Rand - der Takt
+   bleibt als Zeitstrahl erhalten. */
+@media(max-width:1000px){
+  .wx-score{grid-template-columns:1fr;gap:22px;justify-items:center;text-align:center}
+  .wx-sum{max-width:none} .wx-sum p{margin-left:auto;margin-right:auto}
+  .wx-dial,.wx-dial svg{width:190px;height:190px}
+  .wx-dv b{font-size:64px}
+  .wx-ent{grid-template-columns:1fr;justify-items:center;gap:20px}
+  .wx-weiter{grid-template-columns:1fr;gap:18px}
+}
+@media(max-width:760px){
+  .wx{min-height:0}
+  .wx-achse{left:16px}
+  /* Auf schmal fliegt nichts quer - die Felder stehen unter dem
+     Mikrofon, die Pille fliegt nach unten statt nach rechts. */
+  .wx-sprech{grid-template-columns:1fr;gap:16px}
+  .wx-links{padding-right:0} .wx-rechts{padding-left:0}
+  .wx-w{grid-template-columns:1fr}
+  .wx-w.li .karte,.wx-w.re .karte{grid-column:1;margin:0 0 0 32px}
+  .wx-w.li .karte::after,.wx-w.re .karte::after{left:-32px;right:auto;width:32px}
+  .wx-kopf{flex-wrap:wrap;gap:12px;padding:14px 16px}
+  .wx-obj{flex:1 1 100%;order:1}
+  .wx-akt{order:2} .wx-uhr{order:3;margin-left:auto;padding-left:0;border-left:0}
+  .wx-bahn{padding:18px 16px 16px}
+  .wx-fuss{flex-direction:column}
+  .wx-f + .wx-f{border-left:0;border-top:1px solid var(--line)}
+  .wx-li .qu{display:none}
+}
+@media(max-width:520px){
+  .wx-dial,.wx-dial svg{width:158px;height:158px}
+  .wx-dv b{font-size:54px}
+  .wx-siegel{width:150px;height:150px}
+  .wx-siegel .tx{font-size:22px}
+  .wx-titel h3{font-size:21px}
+  .wx-mini{grid-template-columns:repeat(3,1fr)}
+  .wx-w .pkt{font-size:22px}
+  .wx-li .st{display:none}
+}
