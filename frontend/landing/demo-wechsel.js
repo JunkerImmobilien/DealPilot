@@ -79,10 +79,12 @@
   /* ── Sprechlauf: was gesagt wird und wohin es fällt ──────────────── */
   var SATZ = 'Lindenallee vierzehn, dreikommafünf Zimmer, zweiundachtzig '
     + 'Quadratmeter, Baujahr vierundneunzig, Kaufpreis zweihundertneunund'
-    + 'achtzigtausend, Kaltmiete achthundertvierzig, Hausgeld zweihundertzehn.';
+    + 'achtzigtausend, Kaltmiete tausendachtzig, Hausgeld zweihundertzehn.';
   var FELDER = [
-    ['Kaufpreis', '289.000 €'], ['Wohnfläche', '82 m²'], ['Baujahr', '1994'],
-    ['Kaltmiete', '840 €'], ['Hausgeld', '210 €'], ['Zimmer', '3,5']
+    ['Kaufpreis', eur(S.O.kaufpreis)], ['Wohnfläche', S.O.wfl + ' m²'],
+    ['Baujahr', String(S.O.bj)],
+    ['Kaltmiete', eur(S.O.miete_monat)], ['Hausgeld', eur(S.O.hausgeld_monat)],
+    ['Zimmer', '3,5']
   ];
 
   /* ── Die acht Akte: der ganze Rechenweg, nacheinander ──────────────
