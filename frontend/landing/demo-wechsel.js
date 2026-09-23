@@ -618,6 +618,40 @@
     }, 520);
   }
 
+  /* Zahlen hochlaufen lassen. Das Ausgabeformat wird aus dem ZIELWERT
+     abgelesen, nicht erfunden: "1994" darf keinen Tausenderpunkt
+     bekommen, "1,27" keine abgeschnittene Nachkommastelle (CLAUDE.md).
+
+     Diese Funktion war beim Aufraeumen in v1582 versehentlich mit
+     weggeschnitten worden - sie stand zwischen zwei toten Bloecken und
+     wurde fuer einen dritten gehalten. Gemessen auf Staging:
+     "Uncaught ReferenceError: hoch is not defined", die Waage in
+     Stufe 3 blieb leer. */
+  function hoch(node, ziel, ms) {
+    var m = String(ziel).match(/[\d.,]+/);
+    if (!m) { node.innerHTML = ziel; return; }
+    var roh = m[0];
+    var kk = roh.indexOf(',') >= 0 ? roh.length - roh.indexOf(',') - 1 : 0;
+    var tp = roh.indexOf('.') >= 0;
+    var z = parseFloat(roh.replace(/\./g, '').replace(',', '.'));
+    if (!isFinite(z)) { node.innerHTML = ziel; return; }
+    var t0 = performance.now();
+    (function s(t) {
+      var p = Math.min(1, (t - t0) / (ms || 850));
+      var v = z * (1 - Math.pow(1 - p, 3));
+      var txt = v.toFixed(kk).replace('.', ',');
+      if (tp) txt = txt.replace(/\B(?=(\d{3})+(?!\d))/, '.');
+      node.innerHTML = String(ziel).replace(roh, txt);
+      if (p < 1) requestAnimationFrame(s);
+    })(t0);
+    /* Sicherheitsnetz: im Hintergrund-Tab feuert rAF nie. Dann steht
+       nach der vollen Dauer wenigstens der Endwert da. */
+    setTimeout(function () {
+      if (node.isConnected && node.textContent.indexOf(' ') < 0
+          && node.textContent !== String(ziel)) node.innerHTML = ziel;
+    }, (ms || 850) + 120);
+  }
+
   function ikSmall() {
     return '<svg viewBox="0 0 24 24" width="12" height="12" fill="none"'
       + ' stroke="currentColor" stroke-width="2.4" stroke-linecap="round"'
