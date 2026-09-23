@@ -77,38 +77,41 @@
   font-style:italic;opacity:0}
 .ab-b.on .sz-mitschrift{animation:szAuf .6s ease .5s forwards}
 
-/* ══ 2 · RECHNEN — die Score-Karte aus dem Kopf, im Kleinen ════════════ */
-.sz-karte{width:84%;max-width:290px;background:#fff;color:var(--ink);z-index:2;
-  box-shadow:0 26px 60px -26px rgba(0,0,0,.8);opacity:0;transform:translateY(14px)}
-.ab-b.on .sz-karte{animation:szKarte .6s var(--e-hoch) .1s forwards}
-@keyframes szKarte{to{opacity:1;transform:none}}
-.sz-k-band{display:flex;align-items:center;justify-content:space-between;
-  padding:7px 12px;background:var(--runway);color:var(--gold-on);
-  font:700 8px/1 var(--mono);letter-spacing:.13em}
-.sz-k-band b{background:var(--stub);color:var(--grnh);padding:4px 8px;border-radius:20px}
-.sz-k-body{display:grid;grid-template-columns:96px 1fr;gap:14px;padding:14px 14px 15px;
-  align-items:center}
-.sz-k-ring{position:relative;width:96px;height:96px}
-.sz-k-ring svg{width:96px;height:96px;transform:rotate(-90deg)}
-.sz-k-ring .tr{fill:none;stroke:#ece4d2;stroke-width:9}
-.sz-k-ring .pg{fill:none;stroke:var(--grn);stroke-width:9;stroke-linecap:round;
-  stroke-dasharray:314;stroke-dashoffset:314}
-.ab-b.on .sz-k-ring .pg{animation:szKring 1.9s var(--e-hoch) .45s forwards}
-@keyframes szKring{to{stroke-dashoffset:82}}   /* 74 % von 314 */
-.sz-k-zahl{position:absolute;inset:0;display:grid;place-items:center;
-  font:700 30px/1 var(--disp);color:var(--ink);opacity:0}
-.ab-b.on .sz-k-zahl{animation:szAuf .45s ease 1.1s forwards}
-.sz-k-zahlen{display:grid;gap:5px;min-width:0}
-.sz-z{display:flex;align-items:baseline;justify-content:space-between;gap:8px;
-  opacity:0;border-bottom:1px solid var(--cream-line);padding-bottom:4px}
-.sz-z:last-child{border-bottom:0}
-.ab-b.on .sz-z{animation:szZeile .5s var(--e-hoch) forwards;
-  animation-delay:calc(.65s + var(--n) * 150ms)}
-@keyframes szZeile{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
-.sz-z span{font:400 10.5px/1.3 var(--body);color:var(--mut)}
-.sz-z b{font:700 12.5px/1 var(--mono);color:var(--ink);white-space:nowrap}
-.sz-z b.gr{color:var(--grn)}
+/* ══ 2 · RECHNEN — DIE ECHTE KARTE, nur kleiner ══════════════════════
+   Marcel: "bitte die richtige Investor Deal Score Karte dort anzeigen,
+   aber in kleiner skaliert."
 
+   Verkleinert wird ueber transform:scale() am Wrapper - nicht ueber
+   kleinere Schriften und Abstaende. Der Unterschied: so ist es
+   wirklich DIESELBE Karte. Wer sie oben aendert, aendert sie hier mit,
+   und es kann nicht passieren, dass zwei Fassungen auseinanderlaufen.
+
+   Der Wrapper bekommt feste Masse, weil ein skaliertes Element seinen
+   urspruenglichen Platz behaelt - ohne das entstuende ein Loch.       */
+.sz-skal{width:100%;height:100%;display:grid;place-items:center;overflow:hidden;
+  position:relative;z-index:2}
+.sz-klein{width:560px;flex:none;
+  transform:scale(.52);transform-origin:center;
+  opacity:0;animation:none;
+  box-shadow:0 30px 70px -26px rgba(0,0,0,.85),0 0 0 1px rgba(201,168,76,.28)}
+.ab-b.on .sz-klein{animation:szKarte .7s var(--e-hoch) .1s forwards}
+@keyframes szKarte{
+  from{opacity:0;transform:scale(.44) translateY(26px)}
+  to{opacity:1;transform:scale(.52)}
+}
+/* Ring und Balken fahren aus - dieselben Zeiten wie oben im Kopf. */
+.sz-klein .sz-pg{stroke-dasharray:333;stroke-dashoffset:333}
+.ab-b.on .sz-klein .sz-pg{animation:szPg 1.8s var(--e-hoch) .5s forwards}
+@keyframes szPg{to{stroke-dashoffset:87}}   /* 74 % von 333 */
+.sz-klein .sz-bal{width:0}
+.ab-b.on .sz-klein .sz-bal{animation:szBal 1s var(--e-hoch) forwards;
+  animation-delay:calc(.7s + var(--n) * 130ms)}
+@keyframes szBal{to{width:var(--b)}}
+.sz-klein .ids-dv b{opacity:0}
+.ab-b.on .sz-klein .ids-dv b{animation:szAuf .5s ease 1.2s forwards}
+.sz-klein .ids-badge{opacity:0}
+.ab-b.on .sz-klein .ids-badge{animation:szPop .5s cubic-bezier(.2,1.5,.4,1) 1.5s forwards}
+@keyframes szPop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
 /* ══ 3 · BELEGEN — drei Nachweise mit Quelle ═══════════════════════════ */
 .sz-belege{display:grid;gap:10px;width:86%;z-index:2}
 .sz-beleg{background:rgba(255,255,255,.04);border-left:2px solid var(--gd);
@@ -166,11 +169,14 @@
 
 @media(prefers-reduced-motion:reduce){
   .ab-b.on .sz-ringe i,.ab-b.on .sz-chip,.ab-b.on .sz-chip .ck,
-  .ab-b.on .sz-mitschrift,.ab-b.on .sz-karte,.ab-b.on .sz-k-ring .pg,
-  .ab-b.on .sz-k-zahl,.ab-b.on .sz-z,.ab-b.on .sz-beleg,
+  .ab-b.on .sz-mitschrift,.ab-b.on .sz-klein,.ab-b.on .sz-klein .sz-pg,
+  .ab-b.on .sz-klein .sz-bal,.ab-b.on .sz-klein .ids-dv b,.ab-b.on .sz-klein .ids-badge,
+  .ab-b.on .sz-beleg,
   .ab-b.on .sz-blatt,.ab-b.on .sz-blatt.top,.ab-b.on .sz-p-chart i,
   .ab-b.on .sz-stempel{animation:none;opacity:1}
-  .sz-k-ring .pg{stroke-dashoffset:82}
+  .sz-klein{opacity:1;transform:scale(.52)}
+  .sz-klein .sz-pg{stroke-dashoffset:87}
+  .sz-klein .sz-bal{width:var(--b)}
   .sz-blatt:nth-child(1){transform:rotate(-6deg) translateX(-11px)}
   .sz-blatt:nth-child(2){transform:rotate(3.5deg) translateX(6px)}
 }

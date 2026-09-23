@@ -129,21 +129,41 @@
        Die Score-Karte aus dem Kopf, im Kleinen. Derselbe Aufbau:
        Ring, Zahl, Stufe, darunter die Kennzahlen. */
     if (i === 1) {
-      var zeilen = [['Bruttorendite', '3,45 %'], ['Cashflow / Monat', '+ 214 €', 'gr'],
-        ['Kapitaldienstdeckung', '1,31'], ['Beleihungsauslauf', '84 %']];
-      return '<div class="sz-karte">'
-        + '<div class="sz-k-band"><span>PRE-FLIGHT · DEAL SCORE</span><b>GUT</b></div>'
-        + '<div class="sz-k-body">'
-        + '<div class="sz-k-ring"><svg viewBox="0 0 120 120" aria-hidden="true">'
-        + '<circle class="tr" cx="60" cy="60" r="50"></circle>'
-        + '<circle class="pg" cx="60" cy="60" r="50"></circle></svg>'
-        + '<div class="sz-k-zahl">74</div></div>'
-        + '<div class="sz-k-zahlen">'
-        + zeilen.map(function (z, n) {
-            return '<div class="sz-z" style="--n:' + n + '"><span>' + z[0]
-              + '</span><b class="' + (z[2] || '') + '">' + z[1] + '</b></div>';
+      /* Dieselbe Karte wie im Kopf - nur kleiner. Die Balken kommen aus
+         derselben Liste wie oben, damit beide nie auseinanderlaufen. */
+      var bal = [['Rendite', 35, 71], ['Finanzierung', 25, 84], ['Risiko', 20, 76],
+        ['Lage & Markt', 10, 68], ['Upside', 10, 59]];
+      return '<div class="sz-skal"><div class="idscard sz-klein">'
+        + '<div class="ids-band"><span class="l"><i class="dot"></i>'
+        + 'Pre-Flight · Investor Deal Score</span><span class="cleared">Cleared</span></div>'
+        + '<div class="ids-head"><span class="ids-title">Investor <b>Deal Score</b></span>'
+        + '<span class="ids-allkpi">☰ Alle KPIs</span></div>'
+        + '<div class="ids-body"><div class="ids-left">'
+        + '<div class="ids-dial"><svg viewBox="0 0 120 120" aria-hidden="true">'
+        + '<circle class="tr" cx="60" cy="60" r="53"></circle>'
+        + '<circle class="pg sz-pg" cx="60" cy="60" r="53"></circle></svg>'
+        + '<div class="ids-dv"><b>74</b><small>/&thinsp;100</small></div></div>'
+        + '<div class="ids-badge">◆ Gut</div>'
+        + '<div class="ids-stats">'
+        + '<div><b>285.000&nbsp;€</b><span>Kaufpreis</span></div>'
+        + '<div><b>21/24</b><span>KPIs</span></div>'
+        + '<div><b>88&thinsp;%</b><span>Tiefe</span></div></div></div>'
+        + '<div class="ids-right"><div class="ids-h">So setzt sich der Score zusammen</div>'
+        + bal.map(function (z, n) {
+            var f = z[2] >= 85 ? '#2E8455' : z[2] >= 70 ? '#3FA56C' : '#C9A84C';
+            return '<div class="ids-bar"><div class="top">'
+              + '<span class="nm">' + z[0] + '<span class="wt">' + z[1] + '%</span></span>'
+              + '<span class="sc" style="color:' + f + '">' + z[2] + '<small>/100</small></span>'
+              + '</div><span class="track"><i class="sz-bal" style="--b:' + z[2]
+              + '%;--n:' + n + ';background:' + f + '"></i></span></div>';
           }).join('')
-        + '</div></div></div>';
+        + '</div></div>'
+        + '<div class="ids-tear"><span class="nl"></span><span class="nr"></span></div>'
+        + '<div class="ids-foot">'
+        + '<div class="lab">PASSENGER<b>DealPilot Co-Pilot</b></div>'
+        + '<div class="lab" style="text-align:center">FLIGHT<b>DP · BOARDING</b></div>'
+        + '<div class="ids-qr sz-qr"></div></div>'
+        + '</div></div>';
     }
 
     /* ── 3 · BELEGEN ─────────────────────────────────────────────────
@@ -226,6 +246,25 @@
 
   wirt.innerHTML = '<div class="ab-reiter">' + reiter + '</div>'
     + '<div class="ab-buehne">' + buehnen + '</div>';
+
+    /* Der QR im Stub der kleinen Karte - derselbe feste Startwert wie
+       oben, damit beide Karten dasselbe Muster tragen. */
+    wirt.querySelectorAll('.sz-qr').forEach(function (host) {
+      var n = 11, cell = 3, svg = '<svg width="' + (n * cell) + '" height="' + (n * cell)
+        + '" viewBox="0 0 ' + (n * cell) + ' ' + (n * cell) + '" aria-hidden="true">';
+      function fp(x, y) {
+        return '<rect x="' + x + '" y="' + y + '" width="' + (7 * cell) + '" height="' + (7 * cell) + '" fill="#0c0b09"/>'
+          + '<rect x="' + (x + cell) + '" y="' + (y + cell) + '" width="' + (5 * cell) + '" height="' + (5 * cell) + '" fill="#fff"/>'
+          + '<rect x="' + (x + 2 * cell) + '" y="' + (y + 2 * cell) + '" width="' + (3 * cell) + '" height="' + (3 * cell) + '" fill="#0c0b09"/>';
+      }
+      var seed = 7;
+      function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+      for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) {
+        if ((x < 7 && y < 7) || (x > 3 && y < 7 && x >= n - 7)) continue;
+        if (rnd() > 0.55) svg += '<rect x="' + (x * cell) + '" y="' + (y * cell) + '" width="' + cell + '" height="' + cell + '" fill="#0c0b09"/>';
+      }
+      host.innerHTML = svg + fp(0, 0) + fp((n - 7) * cell, 0) + '</svg>';
+    });
 
   var rs = [].slice.call(wirt.querySelectorAll('.ab-r'));
   var bs = [].slice.call(wirt.querySelectorAll('.ab-b'));
