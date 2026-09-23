@@ -196,6 +196,63 @@
     }, 4000);
   }
 
+  /* ══ Wiederholung ═══════════════════════════════════════════════════
+     v1561 · Marcel am 23.09.2026: "dass die Zahlen hochlaufen, irgendwie
+     alle zehn Sekunden oder so. Genauso soll die Investor-Deal-Score-
+     Karte - die sollte sich auch bewegen."
+
+     Alle zehn Sekunden laufen Hero-Zahlen, Ring und Balken noch einmal.
+     Drei Bedingungen, damit das nicht im Leeren passiert:
+     · das Fenster ist vorn (im verborgenen Tab feuert rAF ohnehin nie)
+     · der Hero steht im Bild - sonst laeuft eine Animation, die niemand
+       sieht, und verbraucht nur Strom
+     · niemand hat weniger Bewegung eingestellt                        */
+  if (!ruhig) {
+    var heroBereich = document.querySelector('.hero');
+    var heroImBild = true;
+    if (heroBereich) {
+      new IntersectionObserver(function (es) {
+        es.forEach(function (e) { heroImBild = e.isIntersecting; });
+      }, { threshold: 0.25 }).observe(heroBereich);
+    }
+    setInterval(function () {
+      if (!sichtbar() || !heroImBild) return;
+      /* Ring und Balken zuruecksetzen und neu ausfahren. */
+      if (ring) {
+        delete ring.dataset.fertig;
+        ring.style.transition = 'none';
+        ring.style.strokeDashoffset = UMFANG;
+        /* Ein Bild abwarten, sonst fasst der Browser beides zusammen
+           und es gibt gar keine Animation. */
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            ring.style.transition = '';
+            ringLos(false);
+          });
+        });
+      }
+      document.querySelectorAll('[data-breit]').forEach(function (i) {
+        delete i.dataset.fertig;
+        i.style.transition = 'none';
+        i.style.width = '0%';
+      });
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          document.querySelectorAll('[data-breit]').forEach(function (i) { i.style.transition = ''; });
+          balkenLos(false);
+        });
+      });
+      /* Und die Zahlen. */
+      heroZahlen.forEach(function (e, i) {
+        delete e.dataset.fertig;
+        setTimeout(function () {
+          var z = e.dataset.ziel != null ? parseInt(e.dataset.ziel, 10) : zahlAus(e);
+          if (z != null) hoch(e, z, 1500);
+        }, i * 150);
+      });
+    }, 10000);
+  }
+
   /* Alle uebrigen Zahlen laufen, wenn sie ins Bild kommen. */
   var zio = new IntersectionObserver(function (es) {
     es.forEach(function (e) {

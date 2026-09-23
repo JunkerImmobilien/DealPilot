@@ -90,13 +90,14 @@ img{max-width:100%;display:block}
   border-bottom:1px solid transparent;transition:.3s}
 .nav.fest{border-bottom-color:var(--cream-line);box-shadow:0 8px 28px rgba(22,19,13,.07)}
 .nav .wrap{display:flex;align-items:center;gap:26px;width:100%}
-/* v1556 · Die Wortmarke ist jetzt das schwarze Logo mit Goldrahmen.
-   Es traegt die Zeile "by Junker Immobilien" schon in sich - deshalb
-   steht sie im Kopf nicht noch einmal daneben. */
-.mark{display:flex;align-items:center;flex:none}
-.mark img{height:44px;width:auto;display:block;transition:opacity .22s}
-.mark:hover img{opacity:.85}
-.footer .mark img{height:52px}
+/* v1561 · Marcel: "oben in dem weissen Bereich bitte wieder das helle
+   DealPilot rein." Das schwarze Logo mit Goldrahmen stand auf weissem
+   Grund wie ein Fremdkoerper. Die gesetzte Wortmarke traegt den hellen
+   Kopf besser - die schwarze Zeile darueber bleibt, wie sie ist. */
+.mark{font:700 22px/1 var(--disp);letter-spacing:-.9px;display:flex;align-items:center;gap:10px}
+.mark b{color:var(--gdd);font-weight:700}
+.mark .sig{width:28px;height:28px;border:1.5px solid var(--gd);display:flex;
+  align-items:center;justify-content:center;color:var(--gdi)}
 .nav ul{display:flex;gap:2px;margin:0 0 0 auto;padding:0;list-style:none;align-items:center}
 .nav ul li{position:relative}
 .nav ul li > a{display:flex;align-items:center;gap:6px;padding:10px 13px;
@@ -256,3 +257,9 @@ img{max-width:100%;display:block}
   .footer-grid{grid-template-columns:1fr}
   .tb .rechts{display:none}
 }
+
+/* v1561 · Das Groesser-Zeichen vor der Nutzerzahl - eigenes Element,
+   damit der Zaehler es nicht mitliest und nicht ueberschreibt. */
+.hbeleg .gr{font-style:normal;color:var(--gdh);opacity:.72;margin-right:2px;font-weight:700}
+.tb .nz{white-space:nowrap}
+.tb .nz b{color:var(--gdh);font-weight:700}
