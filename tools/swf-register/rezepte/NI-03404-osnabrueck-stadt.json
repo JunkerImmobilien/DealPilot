@@ -1,0 +1,72 @@
+{
+  "land_code": "NI",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Osnabrück-Meppen, Bereich Stadt Osnabrück",
+  "gaa_kennz": "03404",
+  "ags": ["03404"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "01/2023 bis 10/2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-03-02",
+  "quelle_url": "https://public.tableau.com/views/2026_sw_efh_osmep_osmeposst/dash",
+  "quelle_datei": "Tableau-Kalkulator 2026_sw_efh_osmep_osmeposst (Grundstücksmarktinformationen Niedersachsen 2026)",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Ein- und Zweifamilienhäuser, Kalkulator 2026_sw_efh_osmep_osmeposst",
+  "stufe": "A",
+
+  "modellansaetze": {
+    "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung.",
+    "nhk": "NHK 2010",
+    "bezugsmassstab": "Brutto-Grundflaeche",
+    "alterswertminderung": "linear"
+  },
+
+  "stichprobe": {
+    "faelle": 235,
+    "kaufzeitpunkt": "13.01.2023 bis 30.10.2025",
+    "spannen": {
+      "bodenrichtwert_eur_qm": [75, 830],
+      "modifiziertes_baujahr": [1955, 2015]
+    }
+  },
+
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehendes Ein- und Zweifamilienhaus",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [200000, 250000, 300000, 350000, 400000, 500000, 600000, 700000, 800000, 900000],
+        "achse_y_feld": "brw",
+        "achse_y_bez": "Bodenrichtwert in €/m²",
+        "achse_y": [200, 300, 400, 500, 600, 700, 800],
+        "zellen": {
+          "200": [1.09, 0.99, 0.93, 0.88, 0.85, 0.80, 0.76, 0.74, 0.72, 0.71],
+          "300": [1.19, 1.10, 1.03, 0.98, 0.94, 0.89, 0.85, 0.82, 0.81, 0.80],
+          "400": [1.28, 1.18, 1.11, 1.05, 1.01, 0.96, 0.92, 0.90, 0.88, 0.87],
+          "500": [1.36, 1.25, 1.18, 1.12, 1.08, 1.02, 0.98, 0.96, 0.94, 0.93],
+          "600": [1.43, 1.32, 1.24, 1.18, 1.14, 1.08, 1.04, 1.01, 1.00, 0.98],
+          "700": [1.49, 1.38, 1.30, 1.24, 1.19, 1.13, 1.09, 1.07, 1.05, 1.04],
+          "800": [1.55, 1.43, 1.35, 1.29, 1.24, 1.18, 1.14, 1.11, 1.10, 1.09]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "normobjekt": "keine weiteren Merkmale — dieser Ausschuss führt für die Stadt Osnabrück KEINE Korrekturkurve",
+        "hinweis": "DIE ACHSEN SIND VOM AUSSCHUSS ABGEDRUCKT, nicht von uns gewählt: die Sachwertachse steht als Beschriftung unter der Hauptgrafik (200.000 bis 900.000 €), die sieben Bodenrichtwertstufen stehen in ihrer Legende (200 bis 800 €/m²). Genau diese 70 Stützstellen wurden abgefragt. GEGENPROBE: das Dashboard weist als Anwendungsbeispiel Bodenrichtwert 300 €/m² und vorläufigen Sachwert 250.000 € mit dem Faktor 1,10 aus; die Zelle [300][250000] trägt genau diese 1,10."
+      },
+
+      "korrekturen": [],
+
+      "beleg": "Kalkulator 2026_sw_efh_osmep_osmeposst (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, veroeffentlicht 02.03.2026, Stichprobe 235 Kauffaelle. 70 Stuetzpunkte abgefragt — und zwar GENAU die vom Ausschuss abgedruckten: Sachwertachse 200.000 bis 900.000 EUR aus der Grafikbeschriftung, Bodenrichtwertstufen 200 bis 800 EUR/qm aus der Legende. GEGENPROBE am Anwendungsbeispiel: Bodenrichtwert 300, vorlaeufiger Sachwert 250.000 ergibt 1,10 - die Zelle traegt genau diese Zahl. KEIN LAGE-EINGABEFELD und KEINE Korrekturkurve: die Eingabemaske fuehrt nur Bodenrichtwert und Sachwert, von Hand gegengelesen.",
+
+      "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung). DIE STREUUNG IST HIER AUSSERGEWÖHNLICH HOCH: ±0,33 am Normobjekt, gegenüber 0,11 bis 0,20 in allen anderen bisher erfassten niedersächsischen Gebieten. Bei 235 Kauffällen in einer Grossstadt mit Bodenrichtwerten von 75 bis 830 €/m² ist der Faktor nur ein grober Anhalt; das gehört in jeden Bericht, der ihn verwendet. WO DIE QUELLE ENDET, ENDET DIE RECHNUNG: das Gitter deckt genau den abgedruckten Bereich ab.",
+      "stufe": "A",
+      "stufe_begruendung": "Stufe A: die Stützstellen sind NICHT von uns gewählt, sondern vom Ausschuss abgedruckt — die Sachwertachse unter der Grafik, die Bodenrichtwertstufen in der Legende. Abgefragt wurde genau dieses Raster, und das Anwendungsbeispiel liegt darauf. Damit ist der Satz eine Übernahme, keine Abtastung."
+    }
+  ]
+}
