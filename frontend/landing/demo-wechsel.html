@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="dp2.css?v=1577">
-<link rel="stylesheet" href="demo-wechsel.css?v=1582">
+<link rel="stylesheet" href="demo-wechsel.css?v=1583">
 <style>
   body{background:var(--cream2)}
   .kopfleiste{background:var(--ob);color:#fff;padding:26px 0 24px;
@@ -75,39 +75,33 @@
   </div>
 
   <div class="hinweis">
-    <h2>Der Score ist gerechnet, nicht gesetzt</h2>
-    <p>Eine Demo, die den Score als feste Zahl hinschreibt, führt genau das vor, was
-    sie zu widerlegen behauptet. Deshalb rechnet die Seite ihn aus den fünf Werten —
-    mit den Gewichten aus <b>DealScore2</b>:</p>
+    <h2>Alles ist gerechnet, nichts ist eingetragen</h2>
+    <p>Diese Seite und die vier Fassungen auf <b>demo-steuer.html</b> lesen aus
+    <b>derselben Rechenbasis</b>. Wenn eine Zahl hier anders aussähe als dort, wäre
+    das ein Darstellungsfehler — keine zweite Wahrheit.</p>
     <div class="rechnung">
-      Rendite&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;72 × 35&nbsp;% = 2520<br>
-      Finanzierung&nbsp;86 × 25&nbsp;% = 2150<br>
-      Risiko&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;79 × 20&nbsp;% = 1580<br>
-      Lage&nbsp;&amp;&nbsp;Markt&nbsp;&nbsp;71 × 10&nbsp;% =&nbsp;&nbsp;710<br>
-      Upside&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;63 × 10&nbsp;% =&nbsp;&nbsp;630<br>
+      Bodenwert&nbsp;&nbsp;101,2 m² × 180&nbsp;€ = 18.216&nbsp;€<br>
+      − Abschlag 20&nbsp;%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= &nbsp;3.643&nbsp;€<br>
+      Gebäudeanteil&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 274.427&nbsp;€<br>
+      ÷ 44 Jahre&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= &nbsp;6.237&nbsp;€ AfA<br>
       ─────────────────────────<br>
-      <b>7590 ÷ 100 = 75,9 → Score 76</b>
+      <b>gegen 5.416 € im Regelfall = +821 € je Jahr</b>
     </div>
-    <p>Und die Stufe kommt aus derselben Kette wie die Objektkarte der App
-    (≥&nbsp;85 Top · ≥&nbsp;70 Gut · ≥&nbsp;50 Solide · ≥&nbsp;35 Schwach). 76 ergibt
-    <b>Gut</b> — und weil die Schwelle für „lohnt" bei 70 liegt, fällt das Urteil
-    positiv aus. Änderst du einen der fünf Werte, ändern sich Score, Stufe und
-    Urteil von selbst mit.</p>
+    <p>Zieh den Regler in Stufe 4 auf 56 Jahre — dann dreht die Steuerwirkung ins
+    Minus und der Cashflow sagt „Zuzahlung nötig". <b>Nichts davon ist
+    hinterlegt</b>, es fällt aus der Rechnung.</p>
   </div>
 
   <div class="hinweis">
-    <h2>Was hier bewusst nicht behauptet wird</h2>
-    <p>Akt 5 zeigt drei Sorten Zahl. <b>Amtlich</b> heißt: der Wert steht im Bericht
-    des zuständigen Gutachterausschusses, mit Jahrgang, Seite und Lizenz.
-    <b>Abgeleitet</b> heißt: aus Anlage 2 ImmoWertV gerechnet — und die
-    Restnutzungsdauer trägt ihren Rahmen 44–56 mit, weil das Modell einen Rahmen
-    liefert und keinen Punkt.</p>
-    <p>Der dritte Fall ist <b>kein Wert</b>. Dafür steht dort, welcher Ausschuss
-    zuständig ist und wo sein Bericht liegt. Im Register geben heute <b>181 von 383</b>
-    Sachwertfaktor-Sätzen genau diese begründete Auskunft statt einer Zahl.</p>
-    <p><b>Auf dem Handy fällt nichts weg.</b> Unter 760&nbsp;px rückt die Achse an den
-    linken Rand und wird zum Zeitstrahl, die Felder stehen unter dem Mikrofon, und
-    die Pille fliegt nach unten statt nach rechts.</p>
+    <h2>Drei Stellen, an denen die Demo bewusst unbequem bleibt</h2>
+    <p><b>Der DSCR steht bei 0,82.</b> Die Miete allein trägt die Rate nicht — das
+    steht in Stufe 7 so da, statt weggerundet zu werden. In einer früheren Fassung
+    hatte ich 1,27 behauptet; das hielt der Rechnung nicht stand.</p>
+    <p><b>Vor Steuern ist der Cashflow negativ.</b> −67 € im Monat. Wer die
+    Steuerwirkung nicht mitrechnet, hält den Deal für schlecht. Genau deshalb
+    entscheidet die Optimierung — und genau deshalb muss sie belegbar sein.</p>
+    <p><b>Der Kaufpreis liegt über dem Verkehrswert</b>, um 2,9 %. In dieser Lage
+    vertretbar, aber es steht in Stufe 6, statt verschwiegen zu werden.</p>
   </div>
 
 </div>
