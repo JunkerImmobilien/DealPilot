@@ -81,9 +81,18 @@ for WB in $WBS; do
 
   # Die Ueberschriften nennen die Kurven. Ohne Ueberschrift keine Kurve -
   # Osnabrueck-Stadt fuehrt zum Beispiel gar keine.
+  #
+  # ZWEI FORMULIERUNGEN, nicht eine. Gemessen am 23.09.2026: die
+  # Region Braunschweig schreibt "Umrechnungskoeffizienten FUER
+  # abweichende Standardstufen", die Region Otterndorf dagegen
+  # "Umrechnungskoeffizienten BEI abweichender Standardstufe" -
+  # anderes Wort, anderer Numerus. Ein Muster nur auf "fuer
+  # abweichende" liess deshalb SECHZEHN von 42 Gebieten ohne jede
+  # Kurve dastehen, obwohl sie welche haben. Ich hatte die
+  # Formulierung eines Ausschusses fuer die aller gehalten.
   TITEL=$(entligatur < "$TMP/k.txt" \
-    | grep -aoE 'Umrechnungskoeffizienten für abweichende[a-zäöüßA-ZÄÖÜ/ ]{0,40}' \
-    | sed 's/Umrechnungskoeffizienten für abweichende[s]* //;s/  */ /g;s/ $//' \
+    | grep -aoE 'Umrechnungskoeffizienten? (für|bei) abweichende[rmns]?[a-zäöüßA-ZÄÖÜ/ ]{0,40}' \
+    | sed -E 's/Umrechnungskoeffizienten? (für|bei) abweichende[rmns]? //;s/  */ /g;s/ $//' \
     | sort -u)
 
   if [ -z "$TITEL" ]; then
@@ -103,8 +112,19 @@ for WB in $WBS; do
         echo "  UNBEKANNTER KURVENTYP: $T" >&2
         continue
       fi
-      PAARE=$(python3 "$LESER" "$TMP/k.xml" "$M" 2>/dev/null)
+      # NUR PAARE MIT WERT. Gemessen am 23.09.2026: das Muster
+      # ^[1-5],[0-9]$ trifft nicht nur die Achsenbeschriftung einer
+      # Standardstufen-Kurve, sondern auch die Stichprobenwerte in der
+      # Merkmalstabelle daneben - "1,3" (Min), "4,1" (Max), "2,7"
+      # (Median) sehen genauso aus. Zu ihnen gibt es keinen
+      # Koeffizienten, und heraus kam {"1,3": , "4,1": } - kaputtes
+      # JSON in 7 von 42 Dateien.
+      # Eine Stuetzstelle ohne Koeffizient ist keine Stuetzstelle.
+      PAARE=$(python3 "$LESER" "$TMP/k.xml" "$M" 2>/dev/null \
+              | awk -F';' 'NF>=2 && $2 != "" && $2+0==$2')
       [ -z "$PAARE" ] && continue
+      # Eine einzelne Stuetzstelle ist keine Kurve.
+      [ "$(echo "$PAARE" | wc -l)" -lt 2 ] && continue
       # Das Normobjekt: der x-Wert, an dem der Koeffizient 1,00 ist.
       NORM=$(echo "$PAARE" | awk -F';' '$2==1 || $2=="1.0" || $2=="1.00" {print $1; exit}')
 
