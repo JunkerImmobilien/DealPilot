@@ -1,8 +1,30 @@
 # Das Normobjekt ist nicht 120 / 40 / 2,5 — es steht je Gebiet woanders
 
-**Gemessen am 23.09.2026 an der Stadt Braunschweig** (`2026_sw_efh_bsbs`).
-Dieser Befund hält den Rezeptbau auf, bis er geklärt ist — deshalb steht er
-hier und nicht nur in einer Commit-Nachricht.
+**Gemessen am 23.09.2026 an der Stadt Braunschweig** (`2026_sw_efh_bsbs`)
+und an Gifhorn (`2026_sw_efh_bsgf`).
+
+> ## ⚠ ENTWARNUNG — nachgetragen am 23.09.2026
+>
+> **Die vorhandenen Rezepte sind NICHT betroffen.** Dieser Text hat zunächst
+> als offene Frage stehen lassen, ob die 15 NI-Rezepte das richtige Normobjekt
+> führen. Sie tun es:
+>
+> | Rezept | trägt | gemessen |
+> |---|---|---|
+> | Braunschweig | RND 35 · Stufe 3,0 · Wfl 150 | RND 35 ✓ · Stufe 3,0 ✓ · 150 ✓ |
+> | Gifhorn | Stufe 2,5 · Wfl 150 | Stufe 2,5 ✓ · 150 ✓ |
+>
+> Bei der Wohnfläche liegt zwischen den Stützstellen 140 (0,99) und 160 (1,01)
+> genau die 150 auf 1,00 — das Rezept ist also **genauer** als meine erste
+> Schätzung „~140".
+>
+> Wer diese Rezepte gebaut hat, hat die Kurven gelesen, statt dem
+> Werkzeugkommentar zu glauben. Und die Normobjekte sind tatsächlich je Gebiet
+> verschieden: Braunschweig Standardstufe 3,0, Gifhorn 2,5.
+>
+> **Falsch ist damit nur der Kommentar in `ni-kalkulator-abtasten.sh`** — nicht
+> die Praxis. Der Rezeptbau kann weitergehen; er muss die Kurven je Gebiet
+> lesen, so wie bisher auch.
 
 ---
 
@@ -62,10 +84,28 @@ die Sorte Zahl, die niemand nachrechnet.
    sind. Das ist das tatsächliche Normobjekt.
 2. Dieses Normobjekt ins Rezept schreiben (`formel.normobjekt`), nicht die
    angenommenen Werte.
-3. Prüfen, ob die vorhandenen NI-Rezepte (15 Stück, vor dieser Messung
-   entstanden) das richtige Normobjekt führen. **Das ist offen** und sollte vor
-   dem nächsten Registerlauf geklärt werden.
-4. Den Kopfkommentar in `ni-kalkulator-abtasten.sh` berichtigen.
+3. ~~Prüfen, ob die vorhandenen NI-Rezepte das richtige Normobjekt führen.~~
+   **Geprüft am 23.09.2026 an Braunschweig und Gifhorn — sie tun es.**
+   Siehe die Entwarnung oben.
+4. Den Kopfkommentar in `ni-kalkulator-abtasten.sh` berichtigen. **Offen.**
+
+## Wie das Normobjekt gelesen wird — der Ablauf
+
+```
+curl …/<workbook>/<View>.pdf   →  pdftotext -bbox-layout dash.pdf dash.xml
+python3 ni-kurven-lesen.py dash.xml "^[1-4],[0-9]$"    # Standardstufen
+python3 ni-kurven-lesen.py dash.xml "^[0-9]{2,3}$"     # Wohnfläche
+python3 ni-kurven-lesen.py dash.xml "^(1[0-9]|[2-8][05])$"  # Restnutzungsdauer
+```
+
+Das Normobjekt ist der x-Wert, an dem der Koeffizient **1,00** ist. Liegt er
+zwischen zwei Stützstellen (Braunschweig: 140 → 0,99, 160 → 1,01), ist es der
+Wert dazwischen — hier 150.
+
+`ni-kurven-lesen.py` ordnet die Zahlen über ihre **x-Position** zu, nicht über
+die Reihenfolge im Textstrom. Das ist nötig, weil die Beschriftungen eines
+Diagramms der Kurve folgen und deshalb in willkürlicher Reihenfolge im Text
+landen.
 
 ## Was der Befund nicht berührt
 
