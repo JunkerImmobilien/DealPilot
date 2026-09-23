@@ -619,6 +619,9 @@
         if (ring.isConnected) ring.style.strokeDashoffset = 333 - 333 * (soll / 100);
       }, 80);
       var sc = buehne.querySelector('.k-score');
+      /* Dieselbe Regel wie in hoch(): im verborgenen Tab gibt es
+         nichts zu animieren, dann steht sofort das Ergebnis da. */
+      if (sc && document.visibilityState !== 'visible') { sc.textContent = soll; sc = null; }
       if (sc) { var t0 = performance.now();
         (function s(tt) {
           var p = Math.min(1, (tt - t0) / 1400);
@@ -845,6 +848,14 @@
     var tp = roh.indexOf('.') >= 0;
     var z = parseFloat(roh.replace(/\./g, '').replace(',', '.'));
     if (!isFinite(z)) { node.innerHTML = ziel; return; }
+    /* KEINE ANIMATION IM HINTERGRUND - dann sofort das Ergebnis.
+       Gemessen am 23.09.2026: die grossen Steuerzahlen standen auf
+       "0 EUR". requestAnimationFrame feuert im verborgenen Tab nie,
+       und das Sicherheitsnetz per setTimeout kam zu spaet, weil auch
+       das dort auf ein Sekundenraster gedrosselt wird.
+       Eine Zahl, die die Aussage der Szene traegt, darf nicht auf
+       eine Animation warten muessen. */
+    if (document.visibilityState !== 'visible') { node.innerHTML = ziel; return; }
     var t0 = performance.now();
     (function s(t) {
       var p = Math.min(1, (t - t0) / (ms || 850));
