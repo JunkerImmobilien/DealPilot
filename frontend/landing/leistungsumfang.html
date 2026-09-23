@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="dp2.css?v=v1561">
-<link rel="stylesheet" href="dp2-teile.css?v=v1561">
+<link rel="stylesheet" href="dp2.css?v=v1563">
+<link rel="stylesheet" href="dp2-teile.css?v=v1563">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════
    Leistungsumfang aus frontend/landing/index.html Z.3266-3969 (18 Kapitel).
@@ -860,6 +860,8 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       im Auto sitzt und versuchst, dich zu erinnern. Der Sprechlauf nimmt dir das ab: Du
       diktierst, was du siehst, und DealPilot füllt die Felder.</p>
 
+    <p><strong>Wo er startet:</strong> In der <strong>Pre-Flight-Leiste</strong> über dem Objekt — der Bordkarte mit den Einlese-Kacheln. Dort steht neben Exposé und Marktbericht die Kachel <strong>„Sprache"</strong>. Ein Klick, und der Sprechlauf öffnet sich.</p>
+
     <p>Beim Öffnen entscheidest du, wie du arbeiten willst. <strong>„Ich erzähle frei"</strong>
       startet die Aufnahme sofort — du redest am Stück, und die KI stellt dir danach nur noch
       Rückfragen zu dem, was gefehlt hat. <strong>„Frag mich durch"</strong> dreht es um:
@@ -1017,31 +1019,38 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
         <p>Gez&auml;hlt werden <strong>Bewertungen</strong>, getrennt nach Art &mdash; weil sie unterschiedlich aufwendig sind. Dein Plan setzt die Kontingente jeden Monat neu. <strong>Was du im Monat nicht nutzt, verf&auml;llt zum Monatsende</strong>. Nur Zugekauftes bleibt dauerhaft.</p>
       </div>
 
-      <div class="lu-sub">Monatliches Kontingent je Plan</div>
-      <div class="lu-tanks">
-        <div class="lu-tank"><div class="g" style="--p:10%"></div><b>1</b><span>Free</span></div>
-        <div class="lu-tank"><div class="g" style="--p:34%"></div><b>5</b><span>Starter</span></div>
-        <div class="lu-tank best"><div class="g" style="--p:67%"></div><b>5 &middot; 5</b><span>Investor</span></div>
-        <div class="lu-tank"><div class="g" style="--p:100%"></div><b>5 &middot; 5 &middot; 5</b><span>Pro</span></div>
-      </div>
+      <div class="lu-sub">Was dein Plan im Monat enthält</div>
+      <p class="kont-vor">Gezählt werden nur <strong>Bewertungen</strong> — Abrufe, bei denen
+        DealPilot einen Marktwert ermittelt. Davon gibt es drei Arten, unterschiedlich
+        aufwendig. Alles andere zählt gegen kein Kontingent: rechnen, Score, PDF,
+        Sprechlauf, Bodenrichtwert, Exposé-Import.</p>
+      <table class="kont-tab">
+        <thead><tr><th>Art der Bewertung</th><th>Free</th><th>Starter</th>
+          <th class="best">Investor</th><th>Pro</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>Marktpreisindikation</b><span>schneller Marktabgleich · einzeln 0,90 €</span></td>
+            <td>1</td><td>5</td><td class="best">5</td><td>5</td>
+          </tr>
+          <tr>
+            <td><b>Erweiterte Indikation</b><span>mit Wertkorridor · einzeln 1,90 €</span></td>
+            <td class="nein">–</td><td class="nein">–</td><td class="best">5</td><td>5</td>
+          </tr>
+          <tr>
+            <td><b>Wertermittlung nach ImmoWertV</b><span>volles Verfahren · einzeln 3,90 €</span></td>
+            <td class="nein">–</td><td class="nein">–</td><td class="best nein">–</td><td>5</td>
+          </tr>
+          <tr class="sum">
+            <td>Zusammen im Monat</td>
+            <td>1</td><td>5</td><td class="best">10</td><td>15</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="kont-nach">Was du im Monat nicht nutzt, <strong>verfällt zum Monatsende</strong>.
+        Ist das Kontingent aufgebraucht, lässt es sich einmal nachkaufen — dieselbe Menge für
+        ein Viertel des Monatsbeitrags. Zugekauftes bleibt dauerhaft.</p>
 
-      <div class="lu-sub">Die drei Bewertungsarten</div>
-      <div class="lu-costs">
-        <div class="lu-cost"><span class="c-n">Marktpreisindikation &middot; schneller Marktabgleich</span><span class="c-v">0,90&nbsp;&euro;</span></div>
-        <div class="lu-cost"><span class="c-n">Erweiterte Marktpreisindikation &middot; mit Korridor</span><span class="c-v">1,90&nbsp;&euro;</span></div>
-        <div class="lu-cost"><span class="c-n">Wertermittlung nach ImmoWertV &middot; volles Verfahren</span><span class="c-v">3,90&nbsp;&euro;</span></div>
-        <!-- v1296: Hier standen zwei weitere Zeilen - Marktwert-Abruf beim
-             Bewertungspartner (5,90) und beim zweiten (9,90). Sie sind raus:
-             Marcels Entscheidung vom 11.09.2026, die Abrufe werden erstmal
-             nicht angeboten.
-             Nebenbei stimmt damit die Ueberschrift wieder. Sie sagte "Die
-             drei Bewertungsarten" und darunter standen FUENF - der
-             Widerspruch, an dem die Frage aufkam, was die beiden ueberhaupt
-             sind. Sie waren etwas anderes: die drei oben rechnen wir selbst,
-             die beiden unten kauften einen fremden Wert zu. -->
-      </div>
-
-      <div class="lu-sub">Nachkaufen &mdash; jederzeit, ohne Abo</div>
+<div class="lu-sub">Nachkaufen &mdash; jederzeit, ohne Abo</div>
       <!-- v1294: Hier standen die vier Bewertungs-Pakete (7,90 / 19,90 /
            39,90 / 69,90 EUR). Seit v1246 sind sie nicht mehr kaufbar - das
            Backend kennt nur dp_nachkauf_* und dp_einzeln_*. Jetzt steht
@@ -1111,6 +1120,6 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
 
 
-<script src="dp2-lufeat.js?v=v1561"></script>
-<script src="dp2.js?v=v1561"></script>
+<script src="dp2-lufeat.js?v=v1563"></script>
+<script src="dp2.js?v=v1563"></script>
 </body></html>

@@ -472,3 +472,92 @@
   .ab-r,.ab-w{border-right:0;border-bottom:1px solid var(--cream-line)}
   .ab-b{padding:24px 20px 26px}
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1563 · Die Kontingent-Tabelle
+   Marcel: "dieses 5 und 5, 5 5 5 - das kann gar keiner verstehen."
+   Jetzt steht in jeder Zeile, WAS gezaehlt wird, und in jeder Spalte
+   ein Plan. Die Tabelle erklaert sich damit selbst.
+   ═══════════════════════════════════════════════════════════════════════ */
+.kont-vor{max-width:66ch;margin:0 0 20px;color:var(--inkm);font-size:15px;line-height:1.62}
+.kont-tab{width:100%;border-collapse:collapse;background:#fff;
+  border:1px solid var(--cream-line);font-size:14.5px}
+.kont-tab th,.kont-tab td{padding:13px 16px;text-align:center;
+  border-bottom:1px solid var(--cream-line)}
+.kont-tab th:first-child,.kont-tab td:first-child{text-align:left}
+.kont-tab thead th{background:var(--stub);color:var(--gdh);
+  font:700 10px/1.3 var(--mono);letter-spacing:.09em;text-transform:uppercase}
+.kont-tab thead th.best{background:var(--runway);color:var(--gold-on)}
+.kont-tab td{color:var(--ink);font-family:var(--mono);font-size:15px;font-weight:700}
+.kont-tab td:first-child{font-family:var(--body);font-weight:400}
+.kont-tab td b{display:block;font:700 15px/1.3 var(--disp);color:var(--ink);margin-bottom:3px}
+.kont-tab td span{display:block;font:400 12.4px/1.4 var(--body);color:var(--mut)}
+.kont-tab td.best{background:rgba(201,168,76,.09)}
+.kont-tab td.nein{color:rgba(20,18,15,.25)}
+.kont-tab tbody tr:last-child td{border-bottom:0}
+.kont-tab tr.sum td{background:var(--cream2);border-top:2px solid var(--gd);
+  font-size:16px}
+.kont-tab tr.sum td:first-child{font:700 13.5px/1.3 var(--disp);color:var(--ink)}
+.kont-tab tr.sum td.best{background:rgba(201,168,76,.16)}
+.kont-nach{max-width:66ch;margin:18px 0 0;color:var(--inkm);font-size:14.4px;line-height:1.62}
+@media(max-width:700px){
+  .kont-tab{font-size:13px}
+  .kont-tab th,.kont-tab td{padding:10px 9px}
+  .kont-tab td span{display:none}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1563 · Der Ablauf in Obsidian
+   Marcel: "nicht einfach nur so ein langweiliges Weiss, sondern auch mit
+   den Schwarztoenen arbeiten ... beim Erfassen vielleicht ein Mikrofon,
+   dann kommt ein Dokument per PDF. Also richtig geil."
+
+   Die Buehne wird dunkel, die Reiter bleiben hell - so sieht man, wo man
+   steht, und der Inhalt bekommt Gewicht. Je Phase poppt ein grosses
+   Symbol auf: Mikrofon, Zahnrad, Zielscheibe, Dokument.
+   ═══════════════════════════════════════════════════════════════════════ */
+.ablauf-w{border:0;background:transparent}
+.ab-reiter{border-bottom:0;gap:0;background:#fff;border:1px solid var(--cream-line);
+  border-bottom:0}
+.ab-buehne{background:var(--ob);color:var(--txtd);min-height:380px;position:relative;
+  overflow:hidden}
+/* Bauzeichnungs-Raster als ruhiger Grund */
+.ab-buehne::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(232,204,122,.09) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(232,204,122,.09) 1px,transparent 1px);
+  background-size:56px 56px;
+  -webkit-mask-image:radial-gradient(70% 70% at 22% 30%,#000,transparent 76%);
+  mask-image:radial-gradient(70% 70% at 22% 30%,#000,transparent 76%)}
+.ab-b{padding:34px 34px 36px;position:relative;z-index:1}
+.ab-kopf{position:relative;padding-left:78px;min-height:64px}
+/* Das Symbol poppt auf */
+.ab-sym{position:absolute;left:0;top:-2px;width:58px;height:58px;display:flex;
+  align-items:center;justify-content:center;
+  background:rgba(232,204,122,.1);border:1px solid rgba(232,204,122,.28);
+  color:var(--gdh);
+  opacity:0;transform:scale(.6) rotate(-12deg);
+  animation:abSym .58s cubic-bezier(.2,1.4,.4,1) forwards}
+.ab-sym .ico{width:28px;height:28px;stroke-width:1.4}
+@keyframes abSym{to{opacity:1;transform:none}}
+.ab-schritt{color:var(--gdh)}
+.ab-kopf h3{color:#fff}
+.ab-kopf p{color:var(--mdk)}
+.ab-wege{border-color:var(--line);background:rgba(255,255,255,.02)}
+.ab-w{border-right-color:var(--line)}
+.ab-w b{color:#fff}
+.ab-w span{color:var(--mdk)}
+.ab-erg span{background:rgba(232,204,122,.12);color:var(--gdh)}
+.ab-erg span::before{color:var(--grnh)}
+/* Der aktive Reiter zeigt nach unten in die dunkle Buehne */
+.ab-r.on{background:var(--ob);color:#fff}
+.ab-r.on .ab-rt{color:#fff}
+.ab-r.on .ab-rn{color:var(--gdh)}
+.ab-r.on .ab-rb{background:rgba(255,255,255,.12)}
+@media(prefers-reduced-motion:reduce){
+  .ab-sym{opacity:1;transform:none;animation:none}
+}
+@media(max-width:620px){
+  .ab-b{padding:26px 20px 28px}
+  .ab-kopf{padding-left:0;padding-top:70px}
+  .ab-sym{width:52px;height:52px}
+}

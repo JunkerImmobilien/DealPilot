@@ -24,7 +24,7 @@
      Phase zwei davon und eine gar keinen. */
   var PHASEN = [
     {
-      k: 'Erfassen',
+      k: 'Erfassen', sym: 'i-mikro',
       t: 'Erfassen statt abtippen',
       schritt: '01 // IMPORT',
       satz: 'Exposé hochladen, das Objekt diktieren oder Belege scannen — die Werte '
@@ -38,7 +38,7 @@
       ergebnis: ['Objekt angelegt', 'Bis zu 30 Fotos', 'Nichts abgetippt'],
     },
     {
-      k: 'Rechnen',
+      k: 'Rechnen', sym: 'i-zahnrad',
       t: 'Rechnen statt schätzen',
       schritt: '02 // ANALYSE',
       satz: 'Cashflow, DSCR, LTV und Rendite — heute, zum Ende der Zinsbindung und für '
@@ -52,7 +52,7 @@
       ergebnis: ['15 Jahre Projektion', 'Cashflow nach Steuern', 'DSCR und LTV'],
     },
     {
-      k: 'Belegen',
+      k: 'Belegen', sym: 'i-ziel',
       t: 'Belegen statt behaupten',
       schritt: '03 // CO-PILOT  ·  04 // BEWERTEN',
       satz: 'Der Co-Pilot kennt alle deine Zahlen und benennt Stärken und Risiken. '
@@ -67,7 +67,7 @@
       ergebnis: ['Score 0–100', 'Jede Zahl mit Quelle', 'Note ab 70 % Vollständigkeit'],
     },
     {
-      k: 'Ausgeben',
+      k: 'Ausgeben', sym: 'i-doc',
       t: 'Ausgeben statt basteln',
       schritt: '05 // EXPORT',
       satz: 'Der Investment-Case für die Bank, die Mappe fürs Finanzamt, der Datenraum '
@@ -97,7 +97,9 @@
 
   var buehnen = PHASEN.map(function (p, i) {
     return '<div class="ab-b' + (i === 0 ? ' on' : '') + '" data-i="' + i + '">'
-      + '<div class="ab-kopf"><span class="ab-schritt">' + p.schritt + '</span>'
+      + '<div class="ab-kopf">'
+      + '<span class="ab-sym"><svg class="ico"><use href="#' + p.sym + '"/></svg></span>'
+      + '<span class="ab-schritt">' + p.schritt + '</span>'
       + '<h3>' + p.t + '</h3><p>' + p.satz + '</p></div>'
       + '<div class="ab-wege">'
       + p.wege.map(function (w, j) {
