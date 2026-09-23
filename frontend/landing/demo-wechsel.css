@@ -144,21 +144,17 @@
 
 /* ── AKT 1 · die fuenf Werte im Wechsel ──────────────────────────── */
 .wx-werte{display:grid;gap:9px;position:relative}
-.wx-w{display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:center;
-  animation:wxRein .6s var(--e-hoch) backwards;
-  animation-delay:calc(var(--n) * 520ms)}
+/* Staffelung: siehe JS - eine CSS-Verzoegerung kann den sichtbaren
+   Zustand nicht tragen, weil sie im Hintergrund-Tab nie ablaeuft. */
+.wx-w{display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:center}
 .wx-w .karte{background:rgba(255,255,255,.045);border:1px solid var(--line);
   padding:13px 16px;display:flex;align-items:center;gap:14px;position:relative}
 /* links haengend */
-.wx-w.li .karte{grid-column:1;margin-right:26px;
-  animation:wxVonLinks .6s var(--e-hoch) backwards;
-  animation-delay:calc(var(--n) * 520ms)}
+.wx-w.li .karte{grid-column:1;margin-right:26px}
 .wx-w.li .karte::after{content:'';position:absolute;right:-26px;top:50%;
   width:26px;height:1px;background:rgba(201,168,76,.45)}
 /* rechts haengend */
-.wx-w.re .karte{grid-column:2;margin-left:26px;
-  animation:wxVonRechts .6s var(--e-hoch) backwards;
-  animation-delay:calc(var(--n) * 520ms)}
+.wx-w.re .karte{grid-column:2;margin-left:26px}
 .wx-w.re .karte::after{content:'';position:absolute;left:-26px;top:50%;
   width:26px;height:1px;background:rgba(201,168,76,.45)}
 @keyframes wxVonLinks{from{opacity:0;transform:translateX(-38px)}to{opacity:1;transform:none}}
@@ -177,9 +173,8 @@
   display:block;margin-top:4px}
 .wx-w .bar{position:absolute;left:0;right:0;bottom:0;height:2px;
   background:rgba(255,255,255,.08)}
-.wx-w .bar i{display:block;height:100%;width:0;
-  animation:wxBar .9s var(--e-hoch) forwards;
-  animation-delay:calc(.35s + var(--n) * 520ms)}
+.wx-w .bar i{display:block;height:100%;width:var(--b);
+  transition:width .9s var(--e-hoch)}
 @keyframes wxBar{to{width:var(--b)}}
 
 /* ── AKT 2 · die Verdichtung ─────────────────────────────────────── */
@@ -239,8 +234,7 @@
 .wx-gruende{display:grid;gap:8px;max-width:470px}
 .wx-gr{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;
   background:rgba(255,255,255,.04);border-left:2px solid;
-  animation:wxRein .55s var(--e-hoch) backwards;
-  animation-delay:calc(.25s + var(--n) * 160ms)}
+}
 .wx-gr.gut{border-color:var(--grn)}
 .wx-gr.gut .ik{color:var(--grnh)}
 .wx-gr.acht{border-color:var(--gd)}
@@ -254,9 +248,7 @@
   align-items:center;padding:4px 6px}
 .wx-liste{display:grid;gap:7px}
 .wx-li{display:flex;align-items:center;gap:11px;padding:10px 13px;
-  border-left:2px solid;
-  animation:wxRein .5s var(--e-hoch) backwards;
-  animation-delay:calc(var(--n) * 130ms)}
+  border-left:2px solid}
 .wx-li.amt{background:rgba(63,165,108,.09);border-color:var(--grn)}
 .wx-li.amt .ik{color:var(--grnh)} .wx-li.amt .wt{color:var(--grnh)}
 .wx-li.ind{background:rgba(201,168,76,.09);border-color:var(--gd)}
@@ -273,9 +265,7 @@
 
 .wx-pdfs{display:grid;gap:8px}
 .wx-pdf{display:flex;align-items:center;gap:13px;padding:13px 15px;background:#fff;
-  color:var(--ink);
-  animation:wxBlatt .6s cubic-bezier(.2,1.5,.4,1) backwards;
-  animation-delay:calc(var(--n) * 170ms)}
+  color:var(--ink)}
 @keyframes wxBlatt{from{opacity:0;transform:translateX(30px) rotate(2.5deg)}
   to{opacity:1;transform:none}}
 .wx-pdf .ik{width:34px;height:42px;flex:none;background:var(--runway);

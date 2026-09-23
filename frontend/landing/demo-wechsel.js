@@ -356,8 +356,34 @@
       Math.floor(a.uhr / 60) + ':' + ('0' + (a.uhr % 60)).slice(-2);
   }
 
+  /* Blendet die Elemente einer Szene gestaffelt ein.
+     Der Startzustand wird per Inline-Stil gesetzt und per setTimeout
+     wieder entfernt - setTimeout wird im Hintergrund gedrosselt, aber
+     es laeuft, und der Endzustand ist der normale Stil des Elements.
+     Eine CSS-Verzoegerung kann das nicht: sie laeuft dort gar nicht
+     erst ab, und das Element bliebe fuer immer unsichtbar. */
+  function staffeln(sel, abstand, weite) {
+    [].slice.call(buehne.querySelectorAll(sel)).forEach(function (el, k) {
+      var x = 0;
+      if (weite) x = el.closest('.wx-w') && el.closest('.wx-w').classList.contains('re')
+        ? weite : -weite;
+      el.style.opacity = '0';
+      el.style.transform = x ? 'translateX(' + x + 'px)' : 'translateY(12px)';
+      setTimeout(function () {
+        if (!el.isConnected) return;
+        el.style.transition = 'opacity .55s var(--e-hoch),transform .55s var(--e-hoch)';
+        el.style.opacity = '';
+        el.style.transform = '';
+      }, 90 + k * abstand);
+    });
+  }
+
   function nachziehen(i) {
     var a = AKTE[i];
+    if (a.k === 'bewerten') staffeln('.wx-w .karte', 480, 38);
+    if (a.k === 'entscheiden') staffeln('.wx-gr', 160);
+    if (a.k === 'belegen') staffeln('.wx-li, .wx-gr', 130);
+    if (a.k === 'ausgeben') staffeln('.wx-pdf, .wx-gr', 160);
 
     /* ── Akt 1: tippen, dann Pillen fliegen lassen ─────────────────── */
     if (a.k === 'sprechen') {
