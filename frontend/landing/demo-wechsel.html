@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="dp2.css?v=1577">
-<link rel="stylesheet" href="demo-wechsel.css?v=1580">
+<link rel="stylesheet" href="demo-wechsel.css?v=1582">
 <style>
   body{background:var(--cream2)}
   .kopfleiste{background:var(--ob);color:#fff;padding:26px 0 24px;
@@ -43,12 +43,15 @@
 
 <header class="kopfleiste">
   <div class="wrap">
-    <span class="mk">DEMO · NICHT ÖFFENTLICH · v1580</span>
-    <h1>Der Wechselschritt — sechs Akte bis zur Entscheidung</h1>
-    <p>Die Schritte hängen <b>abwechselnd links und rechts</b> an einer Mittelachse.
-    Das Auge bekommt einen Takt statt einer Liste — und sieht auf einen Blick, dass
-    etwas zusammenläuft. Neu ist der Kern: <b>fünf Werte → ein Score → die
-    Entscheidung</b>, und erst danach geht es weiter zu Herkunft und Ausgabe.</p>
+    <span class="mk">DEMO · NICHT ÖFFENTLICH · v1582</span>
+    <h1>Der ganze Rechenweg — acht Stufen, die ablaufen</h1>
+    <p>Was auf <a href="demo-steuer.html" style="color:var(--gdh);text-decoration:underline">demo-steuer.html</a>
+    in vier Fassungen untereinander steht, <b>läuft hier ab</b>: Erfassen →
+    Indikation → Aufteilung → Nutzungsdauer → Abschreibung → Verkehrswert →
+    Finanzierung → Entscheidung. Dieselbe Rechenbasis, zwei Darstellungen.</p>
+    <p>Eine Stufe ist keine Vorführung, sondern <b>bedienbar</b>: der Regler für die
+    Restnutzungsdauer fährt von allein von 56 auf 44 — und wer ihn anfasst,
+    übernimmt. Dann hält der ganze Ablauf an und wartet.</p>
   </div>
 </header>
 
@@ -57,18 +60,18 @@
   <div class="buehne-aussen" data-wechsel></div>
 
   <div class="woher">
-    <div><span class="t">AKT 1 · DIE PILLE FLIEGT</span><span class="s">Jeder
-      erkannte Wert poppt am Mikrofon auf, fliegt ins Feld und landet dort grün
+    <div><span class="t">STUFE 1 · DIE PILLE FLIEGT</span><span class="s">Jeder
+      gesprochene Wert poppt am Mikrofon auf, fliegt ins Feld und landet dort grün
       mit Haken — wie im echten Sprechlauf.</span></div>
-    <div><span class="t">AKT 2 · DER WECHSEL</span><span class="s">Die fünf Werte
-      erscheinen abwechselnd links und rechts an der Achse, jeder mit seinem
-      Gewicht und einer Begründung.</span></div>
-    <div><span class="t">AKT 3+4 · SCORE UND URTEIL</span><span class="s">Aus fünf
-      wird eine Zahl, aus der Zahl ein Urteil: <b>lohnt</b> oder
-      <b>lohnt nicht</b> — mit drei Sätzen, die vor der Bank zählen.</span></div>
-    <div><span class="t">GRÖSSER SKALIERT</span><span class="s">Ring 224 statt
-      146 px, Score-Zahl 78 px, Werte in 15er statt 12er Schrift. Eine
-      Kaufentscheidung liest man nicht mit der Lupe.</span></div>
+    <div><span class="t">STUFE 3 · DIE WAAGE KIPPT</span><span class="s">Boden gegen
+      Gebäude, und der 20-Prozent-Abschlag schiebt den Balken sichtbar zugunsten
+      der Abschreibung.</span></div>
+    <div><span class="t">STUFE 4 · DER REGLER</span><span class="s">Die einzige
+      Stufe, die <b>mitmacht</b>: er fährt von 56 auf 44, und AfA, Steuer und
+      Cashflow wandern mit. Anfassen übernimmt.</span></div>
+    <div><span class="t">STUFE 8 · DER KIPPPUNKT</span><span class="s">Links ohne
+      Optimierung, rechts mit — dasselbe Objekt, dieselbe Bank, zwei belegbare
+      Zahlen Unterschied.</span></div>
   </div>
 
   <div class="hinweis">
@@ -109,6 +112,7 @@
 
 </div>
 
-<script src="demo-wechsel.js?v=1580"></script>
+<script src="demo-steuer-daten.js?v=1582"></script>
+<script src="demo-wechsel.js?v=1582"></script>
 </body>
 </html>

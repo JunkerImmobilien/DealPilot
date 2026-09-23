@@ -6,13 +6,19 @@
    oder lohnt nicht und dann weiter ... erst links geht es weiter dann
    erscheint das rechts dann wieder weiter links."
 
-   Die Akte:
-     0  SPRECHEN    Mikrofon links, Felder rechts - die Pille fliegt
-     1  BEWERTEN    fuenf Werte im Wechsel an der Mittelachse
-     2  VERDICHTEN  aus fuenf wird eine Zahl
-     3  ENTSCHEIDEN lohnt oder lohnt nicht, mit Gruenden
-     4  BELEGEN     woher jede Zahl kommt - amtlich, indikativ, kein Wert
-     5  AUSGEBEN    drei Dokumente
+   Die acht Stufen des Rechenwegs, nacheinander:
+     1 ERFASSEN     Mikrofon links, Felder rechts - die Pille fliegt
+     2 INDIKATION   die grobe Spanne, bevor gerechnet wird
+     3 AUFTEILUNG   Boden gegen Gebaeude, mit dem 20-%-Abschlag
+     4 NUTZUNGSDAUER der Rahmen als REGLER - er faehrt, man uebernimmt
+     5 ABSCHREIBUNG was die Wahl je Jahr bedeutet
+     6 VERKEHRSWERT ein Verfahren gewaehlt, eines verworfen
+     7 FINANZIERUNG Marktzins als Indikation
+     8 ENTSCHEIDUNG der Kipppunkt: ohne Optimierung gegen mit
+
+   Alle Zahlen kommen aus demo-steuer-daten.js - dieselbe Rechenbasis
+   wie die vier statischen Fassungen auf demo-steuer.html. Zwei
+   Darstellungen, eine Quelle.
 
    Das Objekt ist erfunden (Lindenallee 14), die Zahlen sind in sich
    gerechnet: Baujahr 1994, GND 80, Stichtag 2026 -> 32 Jahre Alter,
@@ -25,6 +31,13 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
+
+  /* Die Rechenbasis ist dieselbe wie bei den vier statischen Fassungen
+     (demo-steuer-daten.js). Zwei Darstellungen, eine Quelle - wenn hier
+     eine Zahl anders aussieht als dort, ist es ein Darstellungsfehler. */
+  var S = window.DP_STEUER;
+  if (!S) { return; }
+  var eur = S.eur, proz = S.proz, zahl = S.zahl;
 
   var IKON = {
     mikro: 'M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zM5 11a7 7 0 0 0 14 0M12 18v3',
@@ -39,7 +52,10 @@
     blatt: 'M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6',
     lineal: 'M3 8h18v8H3zM7 8v4M11 8v4M15 8v4M19 8v4',
     frage: 'M9.2 9.2a2.9 2.9 0 1 1 3.6 2.8c-.5.2-.8.7-.8 1.2v.8M12 17.5h.01',
-    haus: 'M3 11l9-7 9 7M5 9.5V21h14V9.5M10 21v-6h4v6'
+    haus: 'M3 11l9-7 9 7M5 9.5V21h14V9.5M10 21v-6h4v6',
+    hand: 'M9 11V5.5a1.5 1.5 0 0 1 3 0V11m0-1.5a1.5 1.5 0 0 1 3 0V12m0-1a1.5 1.5 0 0 1 3 0v5a5 5 0 0 1-5 5h-1.6a5 5 0 0 1-3.9-1.9L6 16.5a1.6 1.6 0 0 1 2.4-2.1L9 15',
+    stift: 'M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17v3z',
+    kreuz: 'M6 6l12 12M18 6L6 18'
   };
   function ik(k, gr, fill) {
     return '<svg viewBox="0 0 24 24" width="' + (gr || 15) + '" height="' + (gr || 15)
@@ -49,37 +65,7 @@
   }
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
 
-  var OBJ = {
-    adr: 'Lindenallee 14, 32105 Musterstadt',
-    art: 'Eigentumswohnung · 3,5 Zimmer · 82 m² · Baujahr 1994 · 2. OG mit Balkon'
-  };
-
-  /* ── Die fünf Werte der Schnellbewertung ─────────────────────────
-     Gewichtung wie in DealScore2: 35 / 25 / 20 / 10 / 10. */
-  var WERTE = [
-    ['euro',   'Rendite',      35, 72, 'Mietrendite 3,5 % · Cashflow +138 €/Monat'],
-    ['bank',   'Finanzierung', 25, 86, 'DSCR 1,27 · Zinsbindung 12 Jahre · 22 % EK'],
-    ['schild', 'Risiko',       20, 79, 'WEG-Rücklage auskömmlich · kein Sanierungsstau'],
-    ['pin',    'Lage & Markt', 10, 71, 'B-Lage · Mietspiegel steigend · Leerstand 1,8 %'],
-    ['steig',  'Upside',       10, 63, 'Mietanhebung möglich · Dachgeschoss ausbaubar']
-  ];
-
-  /* Der Score wird GERECHNET, nicht gesetzt. */
-  function rechnenScore() {
-    var s = 0, g = 0;
-    WERTE.forEach(function (w) { s += w[2] * w[3]; g += w[2]; });
-    return Math.round(s / g);
-  }
-  var SCORE = rechnenScore();
-
-  /* Die Stufenkette der Haupt-App (js/dashboard.js:390) - dieselben
-     Schwellen, damit die Seite nicht ein anderes Wort zeigt als das
-     Programm. */
-  function stufe(s) {
-    return s >= 85 ? 'Top' : s >= 70 ? 'Gut' : s >= 50 ? 'Solide'
-      : s >= 35 ? 'Schwach' : 'Kritisch';
-  }
-  var LOHNT = SCORE >= 70;
+  var OBJ = { adr: S.O.adr, art: S.O.art };
 
   /* ── Sprechlauf: was gesagt wird und wohin es fällt ──────────────── */
   var SATZ = 'Lindenallee vierzehn, dreikommafünf Zimmer, zweiundachtzig '
@@ -90,46 +76,52 @@
     ['Kaltmiete', '840 €'], ['Hausgeld', '210 €'], ['Zimmer', '3,5']
   ];
 
-  var BELEGE = [
-    ['amt', 'haus',   'Bodenrichtwert',    '340 €/m²', 'AMTLICH',
-      'BORIS · Stichtag 01.01.2026 · dl-de/by-2-0'],
-    ['amt', 'euro',   'Liegenschaftszins', '3,4 %',    'AMTLICH',
-      'Gutachterausschuss Musterstadt · GMB 2025, S. 48'],
-    ['amt', 'waage',  'Sachwertfaktor',    '1,08',     'AMTLICH',
-      'Kalkulator 2026 · Stichprobe 854 Fälle'],
-    ['ind', 'lineal', 'Restnutzungsdauer', '51 Jahre', 'ABGELEITET',
-      'Anlage 2 ImmoWertV · Rahmen 44–56 Jahre'],
-    ['weg', 'frage',  'Vergleichsfaktor',  'kein Wert', 'WEG',
-      '→ Ausschuss Musterstadt · Vollbericht kostenpflichtig']
-  ];
-
-  /* ── Die sechs Akte ──────────────────────────────────────────────── */
+  /* ── Die acht Akte: der ganze Rechenweg, nacheinander ──────────────
+     Dieselben Stufen wie in den vier statischen Fassungen, nur laufen
+     sie hier ab statt untereinander zu stehen. */
   var AKTE = [
-    { k: 'sprechen',   dauer: 9500, uhr: 32,
-      ohne: '40 Felder aus vier Unterlagen abtippen', ohneZt: '45 min' },
-    { k: 'bewerten',   dauer: 9000, uhr: 44,
-      ohne: 'Excel bauen, Formeln prüfen, hoffen',    ohneZt: '2 Std' },
-    { k: 'verdichten', dauer: 7000, uhr: 47,
-      ohne: 'Fünf Zahlen im Kopf gewichten',          ohneZt: '—' },
-    { k: 'entscheiden',dauer: 8000, uhr: 49,
-      ohne: 'Bauchgefühl',                            ohneZt: 'unbezifferbar' },
-    { k: 'belegen',    dauer: 8000, uhr: 58,
-      ohne: 'Gutachterausschuss anschreiben, warten', ohneZt: '3 Tage' },
-    { k: 'ausgeben',   dauer: 8000, uhr: 238,
-      ohne: 'Bericht layouten, bevor die Bank hinsieht', ohneZt: '55 min' }
+    { k: 'sprechen',   dauer: 10000, uhr: 32,
+      ohne: '40 Felder aus vier Unterlagen abtippen',     ohneZt: '45 min' },
+    { k: 'indikation', dauer: 7000,  uhr: 38,
+      ohne: 'Im Portal nach Vergleichspreisen suchen',    ohneZt: '25 min' },
+    { k: 'aufteilung', dauer: 10000, uhr: 52,
+      ohne: 'Bodenwert schätzen und hoffen',              ohneZt: 'Streit mit dem Finanzamt' },
+    { k: 'nutzung',    dauer: 12000, uhr: 64,
+      ohne: 'Pauschal 50 Jahre ansetzen',                 ohneZt: 'ungeprüft' },
+    { k: 'afa',        dauer: 8500,  uhr: 71,
+      ohne: 'Regel-AfA 2 %, ohne nachzurechnen',          ohneZt: '—' },
+    { k: 'wert',       dauer: 11000, uhr: 95,
+      ohne: 'Gutachterausschuss anschreiben, warten',     ohneZt: '3 Tage' },
+    { k: 'finanz',     dauer: 9000,  uhr: 128,
+      ohne: 'Drei Banken anrufen, drei Antworten',        ohneZt: '1 Woche' },
+    { k: 'urteil',     dauer: 12000, uhr: 238,
+      ohne: 'Bauchgefühl',                                ohneZt: 'unbezifferbar' }
   ];
   var N = AKTE.length;
 
   /* ══════════════════════════════════════════════════════════════════
      Die Szenen
      ══════════════════════════════════════════════════════════════════ */
-  function szene(n) {
-    var a = AKTE[n];
+  function rz(lb, wert, klasse, klein) {
+    return '<div class="wx-r ' + (klasse || '') + '"><span class="lb">' + lb
+      + (klein ? '<small>' + klein + '</small>' : '') + '</span>'
+      + '<span class="wt">' + wert + '</span></div>';
+  }
+  function gewinn(betrag, text) {
+    return '<div class="wx-gew">' + ik('haken', 19) + '<b>' + betrag + '</b>'
+      + '<span>' + text + '</span></div>';
+  }
+  function spPos(v) { return (v - 30) / 40 * 100; }
 
+  function szene(n) {
+    var a = AKTE[n], O = S.O, K = S.KPA, R = S.RND, A = S.AFA, E = S.EW,
+        F = S.FIN, C = S.CF;
+
+    /* ── 1 · SPRECHEN ────────────────────────────────────────────── */
     if (a.k === 'sprechen') {
       var w = '';
       for (var b = 0; b < 26; b++) w += '<i style="--n:' + b + '"></i>';
-      return titel('AKT 1 · ERFASSEN', 'Einmal sprechen. Mehr nicht.',
+      return titel('STUFE 1 · ERFASSEN', 'Einmal sprechen. Mehr nicht.',
         'Der Sprechlauf hört mit und trägt ein. Jeder erkannte Wert poppt am '
         + 'Mikrofon auf und fällt in sein Feld.')
         + '<div class="wx-sprech">'
@@ -148,134 +140,218 @@
         }).join('') + '</div></div></div>';
     }
 
-    if (a.k === 'bewerten') {
-      return titel('AKT 2 · SCHNELLBEWERTUNG', 'Fünf Werte, fünf Gewichte.',
-        'Jeder Bereich wird einzeln bewertet und trägt unterschiedlich schwer. '
-        + 'Rendite zählt 35 Prozent, Upside nur zehn.')
-        + '<div class="wx-werte">' + WERTE.map(function (v, i) {
-          var f = v[3] >= 85 ? '#5BD98E' : v[3] >= 70 ? '#3FA56C' : '#C9A84C';
-          return '<div class="wx-w ' + (i % 2 ? 're' : 'li') + '" style="--n:' + i + '">'
-            + '<div class="karte">'
-            + '<span class="ik">' + ik(v[0], 17) + '</span>'
-            + '<span><span class="nm">' + esc(v[1]) + '</span>'
-            + '<span class="be">' + esc(v[4]) + '</span></span>'
-            + '<span class="rechts"><span class="pkt" style="color:' + f + '">'
-            + v[3] + '</span><span class="gw">GEWICHT ' + v[2] + ' %</span></span>'
-            + '<span class="bar"><i style="--b:' + v[3] + '%;--n:' + i
-            + ';background:' + f + '"></i></span>'
-            + '</div></div>';
-        }).join('') + '</div>';
+    /* ── 2 · MARKTPREISINDIKATION ────────────────────────────────── */
+    if (a.k === 'indikation') {
+      var p0 = (S.MPI.von - 240000) / 80000 * 100;
+      var p1 = (S.MPI.bis - 240000) / 80000 * 100;
+      var pk = (O.kaufpreis - 240000) / 80000 * 100;
+      return titel('STUFE 2 · MARKTPREISINDIKATION',
+        'Erst die grobe Einordnung.',
+        'Bevor irgendetwas gerechnet wird: liegt der Kaufpreis überhaupt im Rahmen? '
+        + 'Das ist eine Indikation aus Vergleichspreisen, kein Gutachten — und sie '
+        + 'wird auch so genannt.')
+        + '<div class="wx-spanne" style="max-width:620px"><div class="wx-sp-kopf">'
+        + '<span class="lb">VERGLEICHSPREISE · ' + eur(S.MPI.qm_von) + '–'
+        + eur(S.MPI.qm_bis) + '/m²</span>'
+        + '<span class="wt">' + eur(S.MPI.von) + ' – ' + eur(S.MPI.bis) + '</span></div>'
+        + '<div class="wx-sp-bahn"><span class="wx-sp-grund"></span>'
+        + '<span class="wx-sp-band" data-l="' + p0 + '" data-w="' + (p1 - p0) + '"></span>'
+        + '<span class="wx-sp-mark" data-l="' + pk + '"></span></div>'
+        + '<div class="wx-sp-skala"><span>240.000 €</span><span>280.000 €</span>'
+        + '<span>320.000 €</span></div>'
+        + '<div class="wx-sp-note">' + ik('pin', 13)
+        + '<span>Der Kaufpreis von ' + eur(O.kaufpreis) + ' liegt im oberen Drittel '
+        + 'der Spanne — auffällig, aber nicht auffällig genug, um abzubrechen. '
+        + 'Die Prüfung geht weiter.</span></div></div>'
+        + '<div class="wx-rech">'
+        + rz('Kaufpreis', eur(O.kaufpreis), '', eur(O.kaufpreis / O.wfl) + ' je m²')
+        + rz('Mitte der Indikation', eur((S.MPI.von + S.MPI.bis) / 2), '',
+          'daraus allein folgt noch nichts')
+        + '</div>';
     }
 
-    if (a.k === 'verdichten') {
-      return titel('AKT 3 · VERDICHTUNG', 'Aus fünf Werten wird eine Zahl.',
-        'Gewichtet, nicht gemittelt — so schlägt die Finanzierung stärker durch '
-        + 'als das Aufwertungspotenzial.')
-        + '<div class="wx-score">'
-        + '<div class="wx-dial"><svg viewBox="0 0 120 120" aria-hidden="true">'
-        + '<defs><linearGradient id="wxG" x1="0" y1="0" x2="1" y2="1">'
-        + '<stop offset="0%" stop-color="#E8CC7A"/><stop offset="55%" stop-color="#C9A84C"/>'
-        + '<stop offset="100%" stop-color="#b8932f"/></linearGradient></defs>'
-        + '<circle class="tr" cx="60" cy="60" r="53"></circle>'
-        + '<circle class="pg" cx="60" cy="60" r="53"></circle></svg>'
-        + '<div class="wx-dv"><b class="wx-zahl">0</b><small>INVESTOR DEAL SCORE</small></div>'
+    /* ── 3 · KAUFPREISAUFTEILUNG ─────────────────────────────────── */
+    if (a.k === 'aufteilung') {
+      var antB = K.boden_angesetzt / O.kaufpreis * 100;
+      return titel('STUFE 3 · KAUFPREISAUFTEILUNG',
+        'Was in den Notarvertrag gehört.',
+        'Nur der Gebäudeanteil wird abgeschrieben. Je sauberer der Bodenwert '
+        + 'hergeleitet ist, desto höher die Bemessungsgrundlage — und der Abschlag '
+        + 'für das Sondereigentum ist begründbar, nicht geschätzt.')
+        + '<div class="wx-waage"><div class="wx-wbalken">'
+        + '<span class="wx-wb bo" data-fb="' + antB + '"><b class="w-bo">–</b>'
+        + '<span>BODEN</span></span>'
+        + '<span class="wx-wb ge" data-fb="' + (100 - antB) + '"><b class="w-ge">–</b>'
+        + '<span>GEBÄUDE · AfA-BASIS</span></span></div>'
+        + '<div class="wx-wlegende"><span>' + proz(K.anteil_boden) + ' Bodenanteil</span>'
+        + '<span>' + proz(1 - K.anteil_boden) + ' abschreibbar</span></div></div>'
+        + '<div class="wx-rech">'
+        + rz('Grundstücksanteil', zahl(K.boden_qm, 1) + ' m²', '',
+          zahl(O.grundstueck_qm) + ' m² × Miteigentumsanteil ' + proz(O.mea, 1))
+        + rz('Bodenrichtwert', eur(O.brw) + '/m²', '', 'BORIS · Stichtag 01.01.2026')
+        + rz('Bodenwert roh', eur(K.boden_roh))
+        + rz('Abschlag ' + K.abschlag_prozent + ' % Sondereigentum',
+          '− ' + eur(K.abschlag_eur), 'minus',
+          'Belastung des Grundstücks durch das Gebäude')
+        + rz('Bodenwert im Vertrag', eur(K.boden_angesetzt), 'summe')
+        + rz('Gebäudeanteil = AfA-Bemessungsgrundlage', eur(K.gebaeude_mit),
+          'summe gross')
         + '</div>'
-        + '<div class="wx-sum"><span class="lb">SO KOMMT DIE ZAHL ZUSTANDE</span>'
-        + '<h4>' + SCORE + ' von 100 — Stufe ' + stufe(SCORE) + '</h4>'
-        + '<p>Die Finanzierung trägt den Deal (86 bei 25 Prozent Gewicht), '
-        + 'die Rendite ist die Schwachstelle (72 bei 35 Prozent). '
-        + 'Alle 24 Kennzahlen stehen dahinter, 21 davon sind belegt.</p>'
-        + '<div class="wx-mini">' + WERTE.map(function (v) {
-          var f = v[3] >= 85 ? '#5BD98E' : v[3] >= 70 ? '#3FA56C' : '#C9A84C';
-          return '<div><b style="color:' + f + '">' + v[3] + '</b><span>'
-            + esc(v[1].split(' ')[0].toUpperCase()) + '<br>' + v[2] + ' %</span></div>';
-        }).join('') + '</div></div></div>';
+        + gewinn('+ ' + eur(K.mehr_bemessung),
+          'mehr Bemessungsgrundlage als ohne den Abschlag. '
+          + '<b>Dieser Satz gehört so in den Notarvertrag</b> — später ist er '
+          + 'nur noch mit Mühe zu ändern.');
     }
 
-    if (a.k === 'entscheiden') {
-      var gruende = LOHNT
-        ? [['gut', 'haken', 'Kapitaldienst gedeckt',
-            'DSCR 1,27 — auch im Stresstest bei 5,5 % bleibt Luft.'],
-          ['gut', 'haken', 'Cashflow ab Jahr 1 positiv',
-            '+138 € im Monat nach Steuern und nach Rücklage.'],
-          ['acht', 'pfeil', 'Achtung: Rendite ist die Schwachstelle',
-            '3,5 % Mietrendite — der schwächste der fünf Werte. Die Mietanhebung '
-            + 'ist eingepreist, nicht gesichert.']]
-        : [['acht', 'pfeil', 'Kapitaldienst reißt im Stresstest', '']];
-      return titel('AKT 4 · DIE ENTSCHEIDUNG', LOHNT ? 'Lohnt sich.' : 'Lohnt sich nicht.',
-        'Der Score allein entscheidet nicht — er sagt, worauf zu achten ist. '
-        + 'Die drei Sätze darunter sind das, was vor der Bank zählt.')
-        + '<div class="wx-ent">'
-        + '<div class="wx-siegel' + (LOHNT ? '' : ' nein') + '"><div class="in">'
-        + '<span class="hk">' + ik(LOHNT ? 'haken' : 'pfeil', 34) + '</span>'
-        + '<span class="tx">' + (LOHNT ? 'LOHNT' : 'LOHNT NICHT') + '</span>'
-        + '<span class="ut">SCORE ' + SCORE + ' · ' + stufe(SCORE).toUpperCase()
-        + '</span></div></div>'
-        + '<div class="wx-gruende">' + gruende.map(function (g, i) {
-          return '<div class="wx-gr ' + g[0] + '" style="--n:' + i + '">'
-            + '<span class="ik">' + ik(g[1], 16) + '</span>'
-            + '<span><b>' + esc(g[2]) + '</b>'
-            + (g[3] ? '<span>' + esc(g[3]) + '</span>' : '') + '</span></div>';
-        }).join('') + '</div></div>';
+    /* ── 4 · RESTNUTZUNGSDAUER — der Regler ──────────────────────── */
+    if (a.k === 'nutzung') {
+      return titel('STUFE 4 · RESTNUTZUNGSDAUER',
+        'Ein Rahmen, keine Zahl — und die Wahl darin.',
+        'Anlage 2 ImmoWertV liefert eine Spanne. DealPilot zeigt sie und lässt '
+        + 'wählen, statt eine Zahl zu setzen, die niemand belegen kann.')
+        + '<div class="wx-reg">'
+        + '<div class="wx-rkopf"><span class="gr n-rnd">' + R.bis + '</span>'
+        + '<span class="ei">JAHRE</span>'
+        + '<span class="hi">Baujahr ' + O.bj + ' · GND ' + O.gnd + ' J. · '
+        + R.modpunkte + ' Modernisierungspunkte</span></div>'
+        + '<div class="wx-rbahn"><span class="wx-rgrund"></span>'
+        + '<span class="wx-rband"></span>'
+        + '<input class="wx-rin" type="range" min="' + R.von + '" max="' + R.bis
+        + '" value="' + R.bis + '" step="1" aria-label="Restnutzungsdauer in Jahren">'
+        + '</div>'
+        + '<div class="wx-rmarken"><b>' + R.von + ' J.</b>'
+        + '<span>rechnerisch ' + R.rechnerisch + '</span><b>' + R.bis + ' J.</b></div>'
+        + '<div class="wx-rfolge">'
+        + '<div><span class="l">ABSCHREIBUNG JE JAHR</span>'
+        + '<span class="v n-afa">–</span><span class="s n-satz">–</span></div>'
+        + '<div><span class="l">STEUER JE JAHR</span>'
+        + '<span class="v n-steuer">–</span>'
+        + '<span class="s">gegenüber dem Regelfall 2 %</span></div>'
+        + '<div><span class="l">CASHFLOW NACH STEUERN</span>'
+        + '<span class="v n-cf">–</span><span class="s n-cfhin">–</span></div>'
+        + '</div>'
+        + '<div class="wx-anfass">' + ik('hand', 15)
+        + '<span>Der Regler fährt von allein — <b style="color:#fff">fass ihn an, '
+        + 'dann übernimmst du</b>.</span></div></div>';
     }
 
-    if (a.k === 'belegen') {
-      return titel('AKT 5 · HERKUNFT', 'Jede Zahl sagt, woher sie kommt.',
-        'Drei Sorten, sichtbar getrennt: amtlich aus dem Bericht des Ausschusses, '
-        + 'abgeleitet und als solches gekennzeichnet — oder gar nicht vorhanden. '
-        + 'Dann steht dort der Weg zur echten Zahl.')
-        + '<div class="wx-weiter"><div class="wx-liste">'
-        + BELEGE.slice(0, 3).map(beleg).join('') + '</div>'
-        + '<div class="wx-liste">' + BELEGE.slice(3).map(function (b, i) {
-          return beleg(b, i + 3);
-        }).join('')
-        + '<div class="wx-gr acht" style="--n:3;margin-top:4px">'
-        + '<span class="ik">' + ik('frage', 15) + '</span>'
-        + '<span><b>Kein Wert ist auch eine Auskunft</b>'
-        + '<span>Im Register geben 181 von 383 Sachwertfaktor-Sätzen genau diese '
-        + 'begründete Auskunft statt einer Zahl.</span></span></div>'
-        + '</div></div>';
+    /* ── 5 · ABSCHREIBUNG ────────────────────────────────────────── */
+    if (a.k === 'afa') {
+      return titel('STUFE 5 · ABSCHREIBUNG',
+        'Was die Wahl je Jahr bedeutet.',
+        'Eine kürzere Nutzungsdauer heißt höhere Abschreibung. Sie verlangt einen '
+        + 'Nachweis nach § 7 Abs. 4 Satz 2 EStG — den liefert das Gutachten, das '
+        + 'aus Stufe 4 ohnehin entsteht.')
+        + '<div class="wx-rech">'
+        + rz('gesetzlicher Regelfall — 2 %, ohne Abschlag', eur(A.standard.jahr), '',
+          '§ 7 Abs. 4 Satz 1 EStG · Bemessung ' + eur(S.KPA.gebaeude_ohne))
+        + rz('bei ' + R.mitte + ' Jahren (Mitte des Rahmens)', eur(A.mitte.jahr), '',
+          proz(A.mitte.satz, 2))
+        + rz('bei ' + R.von + ' Jahren (unteres Ende)', eur(A.kurz.jahr), 'plus',
+          proz(A.kurz.satz, 2) + ' · mit Nachweis')
+        + rz('Mehr-Abschreibung je Jahr', '+ ' + eur(A.mehr_jahr), 'summe plus')
+        + '</div>'
+        + gewinn(eur(A.steuer_jahr),
+          'weniger Steuer je Jahr bei ' + proz(O.steuersatz, 0)
+          + ' Grenzsteuersatz. Über ' + R.von + ' Jahre sind das <b>'
+          + eur(A.steuer_jahr * R.von) + '</b> — bei einem Aufwand von einmal '
+          + 'Gutachten.');
     }
 
-    return titel('AKT 6 · AUSGABE', 'Achtzehn Seiten, bankfähig.',
-      'Investment-Case für die Bank, BMF-Anlage fürs Finanzamt, Marktbericht mit '
-      + 'Quellennachweis — auf Wunsch im eigenen Logo.')
-      + '<div class="wx-weiter"><div class="wx-pdfs">'
-      + [['Investment-Case', 'Kennzahlen, Cashflow, Stresstest, Score', '6 Seiten', '03 Bank'],
-      ['BMF-Anlage', 'Kaufpreisaufteilung fürs Finanzamt', '4 Seiten', '04 Steuern'],
-      ['Marktbericht', 'mit Quellennachweis und Lizenz', '8 Seiten', '05 Bewertung']]
-        .map(function (p, i) {
-          return '<div class="wx-pdf" style="--n:' + i + '">'
-            + '<span class="ik">' + ik('blatt', 18) + '</span>'
-            + '<span><b>' + esc(p[0]) + '</b><span>' + esc(p[1]) + '</span></span>'
-            + '<span class="s">' + esc(p[2]) + '<br>→ ' + esc(p[3]) + '</span></div>';
-        }).join('') + '</div>'
-      + '<div class="wx-gruende">'
-      + '<div class="wx-gr gut" style="--n:0"><span class="ik">' + ik('haken', 16) + '</span>'
-      + '<span><b>Drei Minuten achtundfünfzig</b><span>vom ersten gesprochenen Wort '
-      + 'bis zum fertigen Bankpapier.</span></span></div>'
-      + '<div class="wx-gr gut" style="--n:1"><span class="ik">' + ik('haken', 16) + '</span>'
-      + '<span><b>Jede Zahl mit Herkunft</b><span>Ausschuss, Jahrgang, Seite und '
-      + 'Lizenz stehen im Bericht.</span></span></div>'
-      + '<div class="wx-gr gut" style="--n:2"><span class="ik">' + ik('haken', 16) + '</span>'
-      + '<span><b>Direkt im Datenraum</b><span>abgelegt in den Unterordnern des '
-      + 'Objekts, nicht im Download-Ordner.</span></span></div>'
-      + '</div></div>';
+    /* ── 6 · VERKEHRSWERT ────────────────────────────────────────── */
+    if (a.k === 'wert') {
+      return titel('STUFE 6 · VERKEHRSWERT',
+        'Ein Verfahren, begründet gewählt.',
+        'Zwei Verfahren nebeneinander zu zeigen, von denen eines nicht passt, '
+        + 'sieht nach Gründlichkeit aus und ist das Gegenteil.')
+        + '<div class="wx-verf">'
+        + '<div class="wx-v ja"><span class="ik">' + ik('haken', 16) + '</span>'
+        + '<span><b>' + esc(E.verfahren) + ' · § 27 ImmoWertV</b>'
+        + '<span>' + esc(E.grund) + '</span></span></div>'
+        + '<div class="wx-v nein"><span class="ik">' + ik('kreuz', 16) + '</span>'
+        + '<span><b>' + esc(E.verworfen) + '</b>'
+        + '<span>' + esc(E.verworfen_grund) + '</span></span></div></div>'
+        + '<div class="wx-rech">'
+        + rz('Jahresrohertrag', eur(E.rohertrag), '',
+          eur(O.miete_monat) + '/Monat · ' + eur(O.miete_monat / O.wfl) + '/m²')
+        + rz('Bewirtschaftungskosten ' + proz(O.bwk_quote, 0), '− ' + eur(E.bwk), 'minus')
+        + rz('Reinertrag', eur(E.reinertrag))
+        + rz('Bodenwertverzinsung ' + proz(O.lz), '− ' + eur(E.bodenverzinsung), 'minus',
+          'nur der rentierliche Bodenwert, § 41 ImmoWertV')
+        + rz('Gebäudereinertrag × Vervielfältiger ' + zahl(E.vf, 2),
+          eur(E.ertragswert_geb), '',
+          'Liegenschaftszins ' + proz(O.lz) + ' amtlich · ' + R.mitte + ' Jahre')
+        + rz('+ Bodenwert', eur(S.KPA.boden_angesetzt))
+        + rz('Verkehrswert', eur(E.verkehrswert), 'summe gross')
+        + rz('Kaufpreis liegt darüber', '+ ' + proz(E.abweichung), '',
+          'in dieser Lage vertretbar — aber es steht da')
+        + '</div>';
+    }
+
+    /* ── 7 · FINANZIERUNG ────────────────────────────────────────── */
+    if (a.k === 'finanz') {
+      return titel('STUFE 7 · FINANZIERUNG',
+        'Mit Marktzins, nicht mit Wunschzins.',
+        'Eine Indikation, kein Angebot — das steht an der Zeile und nicht im '
+        + 'Kleingedruckten.')
+        + '<div class="wx-rech">'
+        + rz('Kaufpreis', eur(O.kaufpreis))
+        + rz('Erwerbsnebenkosten ' + proz(F.nk_quote), '+ ' + eur(F.nk), '',
+          'Grunderwerb ' + proz(O.nk_grunderwerb, 1) + ' · Notar '
+          + proz(O.nk_notar, 1) + ' · Makler ' + proz(O.nk_makler, 2))
+        + rz('Gesamtaufwand', eur(F.gesamt), 'summe')
+        + rz('Eigenkapital ' + proz(O.ek_quote, 0), '− ' + eur(F.ek), 'minus')
+        + rz('Darlehen', eur(F.darlehen), 'summe')
+        + rz('Zins ' + proz(F.zins, 2) + ' · Tilgung ' + proz(F.tilgung, 0),
+          eur(F.rate_monat) + '/Mon.', '',
+          'Marktindikation · ' + F.zinsbindung + ' Jahre Zinsbindung')
+        + rz('Kapitaldienstdeckung (DSCR)', zahl(F.dscr, 2), 'minus',
+          'unter 1,0 — die Miete allein trägt die Rate nicht')
+        + '</div>'
+        + '<div class="wx-gew" style="background:rgba(201,168,76,.1);'
+        + 'border-left-color:var(--gd)">' + ik('pfeil', 19)
+        + '<b style="color:var(--gdh)">' + eur(Math.abs(C.ohne.vor_steuer_monat))
+        + '</b><span>fehlen im Monat vor Steuern. '
+        + '<b>Ob der Deal trägt, entscheidet sich jetzt an der Steuer</b> — '
+        + 'und damit an den Stufen 3 und 4.</span></div>';
+    }
+
+    /* ── 8 · DAS URTEIL ──────────────────────────────────────────── */
+    var lohnt = C.mit.nach_steuer_monat >= 0;
+    return titel('STUFE 8 · DIE ENTSCHEIDUNG',
+      lohnt ? 'Trägt sich — aber erst nach Steuern.' : 'Trägt sich nicht.',
+      'Derselbe Kaufpreis, dieselbe Bank, dasselbe Objekt. Zwei Zahlen sind '
+      + 'anders, und beide sind belegbar.')
+      + '<div class="wx-kipp">'
+      + '<div class="wx-kseite a"><span class="l">OHNE OPTIMIERUNG</span>'
+      + '<span class="v">' + eur(C.ohne.nach_steuer_monat) + '</span>'
+      + '<span class="s">je Monat · Regel-AfA 2 %, Bodenwert ohne Abschlag</span></div>'
+      + '<div class="wx-kpfeil">' + ik('pfeil', 20) + '</div>'
+      + '<div class="wx-kseite b"><span class="l">MIT DEALPILOT</span>'
+      + '<span class="v">+ ' + eur(C.mit.nach_steuer_monat) + '</span>'
+      + '<span class="s">je Monat · RND ' + R.von + ' J. + Bodenabschlag</span></div>'
+      + '</div>'
+      + '<div class="wx-gruende" style="margin-top:14px;max-width:620px">'
+      + '<div class="wx-gr gut" style="--n:0"><span class="ik">' + ik('haken', 16)
+      + '</span><span><b>' + eur(C.unterschied_monat) + ' im Monat Unterschied</b>'
+      + '<span>' + eur(C.unterschied_monat * 12) + ' im Jahr, allein aus zwei '
+      + 'belegbaren Ansätzen.</span></span></div>'
+      + '<div class="wx-gr acht" style="--n:1"><span class="ik">' + ik('pfeil', 16)
+      + '</span><span><b>Achtung: vor Steuern bleibt es negativ</b>'
+      + '<span>' + eur(C.ohne.vor_steuer_monat) + ' im Monat. Wer die Steuerwirkung '
+      + 'nicht mitrechnet, hält den Deal für schlecht — oder verlässt sich '
+      + 'darauf, ohne sie belegen zu können.</span></span></div>'
+      + '<div class="wx-gr gut" style="--n:2"><span class="ik">' + ik('haken', 16)
+      + '</span><span><b>Alles mit Herkunft</b>'
+      + '<span>Bodenrichtwert und Liegenschaftszins amtlich, Restnutzungsdauer nach '
+      + 'Anlage 2, Zins als Marktindikation gekennzeichnet.</span></span></div>'
+      + '</div>';
   }
 
   function titel(lb, h, p) {
     return '<div class="wx-titel"><span class="lb">' + esc(lb) + '</span>'
       + '<h3>' + esc(h) + '</h3><p>' + p + '</p></div>';
   }
-  function beleg(b, i) {
-    return '<div class="wx-li ' + b[0] + '" style="--n:' + i + '">'
-      + '<span class="ik">' + ik(b[1], 15) + '</span>'
-      + '<span><span class="nm">' + esc(b[2]) + '</span>'
-      + '<span class="qu">' + esc(b[5]) + '</span></span>'
-      + '<span class="wt">' + esc(b[3]) + '</span>'
-      + '<span class="st">' + esc(b[4]) + '</span></div>';
-  }
-
   /* ══════════════════════════════════════════════════════════════════ */
   var wirt = document.querySelector('[data-wechsel]');
   if (!wirt) return;
@@ -380,14 +456,15 @@
 
   function nachziehen(i) {
     var a = AKTE[i];
-    if (a.k === 'bewerten') staffeln('.wx-w .karte', 480, 38);
-    if (a.k === 'entscheiden') staffeln('.wx-gr', 160);
-    if (a.k === 'belegen') staffeln('.wx-li, .wx-gr', 130);
-    if (a.k === 'ausgeben') staffeln('.wx-pdf, .wx-gr', 160);
+    if (a.k === 'aufteilung') staffeln('.wx-r', 95);
+    if (a.k === 'afa' || a.k === 'wert' || a.k === 'finanz') staffeln('.wx-r', 85);
+    if (a.k === 'indikation') staffeln('.wx-r', 110);
+    if (a.k === 'urteil') staffeln('.wx-gr', 160);
 
-    /* ── Akt 1: tippen, dann Pillen fliegen lassen ─────────────────── */
+    /* ── Stufe 1: tippen, dann die Pillen fliegen lassen ─────────── */
     if (a.k === 'sprechen') {
       var ziel = buehne.querySelector('.wx-tipp');
+      if (!ziel) return;
       var worte = SATZ.split(' '), k = 0;
       var t = setInterval(function () {
         if (!ziel.isConnected) { clearInterval(t); return; }
@@ -396,21 +473,41 @@
       }, 78);
     }
 
-    /* ── Akt 3: Ring und Zahl ──────────────────────────────────────── */
-    if (a.k === 'verdichten') {
-      var ring = buehne.querySelector('.wx-dial .pg');
-      var zahl = buehne.querySelector('.wx-zahl');
-      if (ring) setTimeout(function () {
-        ring.style.strokeDashoffset = 333 - 333 * (SCORE / 100);
-      }, 60);
-      if (zahl) { var t0 = performance.now();
-        (function s(t) {
-          var p = Math.min(1, (t - t0) / 1500);
-          zahl.textContent = Math.round(SCORE * (1 - Math.pow(1 - p, 3)));
-          if (p < 1) requestAnimationFrame(s);
-        })(t0);
+    /* ── Stufe 2: die Spanne faehrt auf ─────────────────────────── */
+    if (a.k === 'indikation') {
+      var band = buehne.querySelector('.wx-sp-band');
+      var mark = buehne.querySelector('.wx-sp-mark');
+      if (band) setTimeout(function () {
+        if (!band.isConnected) return;
+        band.style.left = band.getAttribute('data-l') + '%';
+        band.style.width = band.getAttribute('data-w') + '%';
+      }, 120);
+      if (mark) { mark.style.left = '0%';
+        setTimeout(function () {
+          if (!mark.isConnected) return;
+          mark.style.left = mark.getAttribute('data-l') + '%';
+          mark.classList.add('da');
+        }, 160);
       }
     }
+
+    /* ── Stufe 3: die Waage kippt ───────────────────────────────── */
+    if (a.k === 'aufteilung') {
+      var teile = [].slice.call(buehne.querySelectorAll('.wx-wb'));
+      teile.forEach(function (el) { el.style.flexBasis = '50%'; });
+      setTimeout(function () {
+        teile.forEach(function (el) {
+          if (!el.isConnected) return;
+          el.style.flexBasis = el.getAttribute('data-fb') + '%';
+        });
+        var bo = buehne.querySelector('.w-bo'), ge = buehne.querySelector('.w-ge');
+        if (bo) hoch(bo, eur(S.KPA.boden_angesetzt), 900);
+        if (ge) hoch(ge, eur(S.KPA.gebaeude_mit), 900);
+      }, 220);
+    }
+
+    /* ── Stufe 4: der Regler faehrt - und gibt ab, wer ihn anfasst ─ */
+    if (a.k === 'nutzung') regler();
   }
 
   /* Die Pille poppt am Mikrofon auf und fliegt in ihr Feld.
@@ -460,6 +557,67 @@
       i++;
     }, 980);
   }
+  /* Der Regler faehrt von der oberen Grenze zur unteren und zeigt
+     dabei, wie die Zahlen mitwandern. Wer ihn anfasst, uebernimmt -
+     das Vorfuehren hoert dann auf und der ganze Ablauf haelt an.
+     Alles laeuft ueber setTimeout, nicht ueber CSS-Verzoegerungen:
+     im Hintergrund-Tab wuerde sonst der Zustand haengenbleiben. */
+  function regler() {
+    var inp = buehne.querySelector('.wx-rin');
+    if (!inp) return;
+    var band = buehne.querySelector('.wx-rband');
+    var R = S.RND, K = S.KPA, eigen = false;
+
+    function neu() {
+      var j = +inp.value;
+      var afa = S.afa(K.gebaeude_mit, j);
+      var mehr = afa.jahr - S.AFA.standard.jahr;
+      var steuer = mehr * S.O.steuersatz;
+      var cf = S.cashflow(afa.jahr);
+      function setz(sel, txt, kl) {
+        var el = buehne.querySelector(sel);
+        if (!el) return;
+        el.textContent = txt;
+        if (kl !== undefined) el.className = el.className.split(' ')[0]
+          + ' ' + sel.slice(1) + (kl ? ' ' + kl : '');
+      }
+      var g = buehne.querySelector('.n-rnd'); if (g) g.textContent = j;
+      setz('.n-afa', eur(afa.jahr));
+      setz('.n-satz', proz(afa.satz, 2) + ' je Jahr');
+      setz('.n-steuer', (steuer >= 0 ? '+ ' : '') + eur(steuer),
+        steuer > 0 ? 'acht' : 'schlecht');
+      setz('.n-cf', (cf.nach_steuer_monat >= 0 ? '+ ' : '')
+        + eur(cf.nach_steuer_monat) + '/Mon.',
+        cf.nach_steuer_monat >= 0 ? 'gut' : 'schlecht');
+      setz('.n-cfhin', cf.nach_steuer_monat >= 0 ? 'trägt sich' : 'Zuzahlung nötig');
+      if (band) band.style.width = ((j - R.von) / (R.bis - R.von) * 100) + '%';
+    }
+
+    inp.addEventListener('input', function () {
+      if (!eigen) {
+        eigen = true;
+        clearInterval(flugUhr);
+        aus();                      /* der Ablauf haelt an */
+        var h = buehne.querySelector('.wx-anfass');
+        if (h) h.innerHTML = ik('hand', 15)
+          + '<span style="color:var(--grnh)">Du hast übernommen — '
+          + 'der Ablauf wartet.</span>';
+      }
+      neu();
+    });
+
+    neu();
+    /* Vorfuehren: von der oberen Grenze zur unteren. */
+    var j = R.bis;
+    clearInterval(flugUhr);
+    flugUhr = setInterval(function () {
+      if (!inp.isConnected || eigen) { clearInterval(flugUhr); return; }
+      if (j <= R.von) { clearInterval(flugUhr); return; }
+      inp.value = --j;
+      neu();
+    }, 520);
+  }
+
   function ikSmall() {
     return '<svg viewBox="0 0 24 24" width="12" height="12" fill="none"'
       + ' stroke="currentColor" stroke-width="2.4" stroke-linecap="round"'
