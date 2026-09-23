@@ -63,8 +63,35 @@ while IFS=';' read -r wb rohname ags amt befund; do
   [ -s "$ziel" ] && { schon=$((schon+1)); continue; }
 
   # ── Schritt 1: die Spannen aus dem Dashboard ────────────────────────
+  # ZUERST WEGRAEUMEN. Gemessen am 23.09.2026: Wolfsburg und die Region
+  # Hannover meldeten identische Spannen (BRW 145-275, SW 156254-817047)
+  # - unmoeglich bei zwei so verschiedenen Gebieten. Ursache war, dass
+  # ein fehlgeschlagener Abruf die Datei des VORGAENGERS liegen liess
+  # und sie erneut gelesen wurde. Ein Zustand aus dem vorigen Durchlauf
+  # verfaelscht die naechste Messung, und man sieht es dem Ergebnis
+  # nicht an.
+  rm -f "$TMP/k.pdf" "$TMP/k.txt"
+  # DEN VIEW-NAMEN LESEN, NICHT ANNEHMEN. ni-kopfdaten.sh sagt es
+  # ausdruecklich: "der View heisst je Region mal `Dash`, mal `dash`,
+  # das ist nicht ratbar und wird deshalb GELESEN." Mit festem
+  # "dash.pdf" kamen am 23.09.2026 vier Gebiete der Region Hameln-
+  # Hannover hintereinander ohne PDF zurueck.
+  V=$(curl -s -m 25 -A "$UA" "https://public.tableau.com/profile/api/workbook/$wb" \
+      | grep -o '"defaultViewName":"[^"]*"' | sed 's/.*:"//;s/"//')
+  if [ -z "$V" ]; then
+    ohne=$((ohne+1))
+    echo "$(date +%H:%M:%S) KEIN-VIEW $wb ($ags $amt)" >> "$PROT"
+    sleep 6; continue
+  fi
   curl -s -m 60 -A "$UA" -o "$TMP/k.pdf" \
-    "https://public.tableau.com/views/$wb/dash.pdf?:showVizHome=no&:embed=true"
+    "https://public.tableau.com/views/$wb/$V.pdf?:showVizHome=no&:embed=true"
+  # Und nachsehen, ob wirklich ein PDF kam - nicht nur, ob curl
+  # zufrieden war. Eine Fehlerseite ist auch eine Antwort.
+  if [ ! -s "$TMP/k.pdf" ] || [ "$(head -c 4 "$TMP/k.pdf")" != '%PDF' ]; then
+    ohne=$((ohne+1))
+    echo "$(date +%H:%M:%S) KEIN-PDF $wb ($ags $amt)" >> "$PROT"
+    sleep 6; continue
+  fi
   pdftotext -layout "$TMP/k.pdf" "$TMP/k.txt" 2>/dev/null
   BZ=$(grep -a 'Bodenrichtwert \[' "$TMP/k.txt" 2>/dev/null \
        | grep -aoE '[0-9]+ +[0-9]+ +[0-9]+' | head -1)
@@ -77,6 +104,18 @@ while IFS=';' read -r wb rohname ags amt befund; do
   fi
   bmin=$(echo "$BZ" | awk '{print $1}'); bmax=$(echo "$BZ" | awk '{print $2}')
   smin=$(echo "$SZ" | awk '{print $1}'); smax=$(echo "$SZ" | awk '{print $2}')
+
+  # Gegenprobe: zwei Gebiete mit exakt derselben Stichprobenspanne gibt
+  # es nicht. Wenn doch, ist eine alte Messung durchgerutscht - dann
+  # lieber ueberspringen als einen Satz bauen, den niemand nachprueft.
+  SIG="$bmin-$bmax/$smin-$smax"
+  if [ "$SIG" = "${LETZTE_SIG:-}" ]; then
+    ohne=$((ohne+1))
+    echo "$(date +%H:%M:%S) SPANNE-WIE-VORGAENGER $wb ($ags $amt) $SIG - uebersprungen" >> "$PROT"
+    LETZTE_SIG=''
+    sleep 6; continue
+  fi
+  LETZTE_SIG="$SIG"
   BRWS=$(stufen "$bmin" "$bmax" 6 10)
   SACHS=$(stufen "$smin" "$smax" 9 10000)
   if [ -z "$BRWS" ] || [ -z "$SACHS" ]; then
