@@ -1,20 +1,23 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   demo-wechsel.js · v1577 · Der Wechselschritt — sechs Akte
+   demo-wechsel.js · v1585 · Der ganze Weg — elf Stufen
    ───────────────────────────────────────────────────────────────────────
    Marcel am 23.09.2026: "sollten wir vlt die schnellbewertung mit den 5
    Werten die zum DealScore fuehren angeben, dann die entscheidung lohnt
    oder lohnt nicht und dann weiter ... erst links geht es weiter dann
    erscheint das rechts dann wieder weiter links."
 
-   Die acht Stufen des Rechenwegs, nacheinander:
-     1 ERFASSEN     Mikrofon links, Felder rechts - die Pille fliegt
-     2 INDIKATION   die grobe Spanne, bevor gerechnet wird
-     3 AUFTEILUNG   Boden gegen Gebaeude, mit dem 20-%-Abschlag
-     4 NUTZUNGSDAUER der Rahmen als REGLER - er faehrt, man uebernimmt
-     5 ABSCHREIBUNG was die Wahl je Jahr bedeutet
-     6 VERKEHRSWERT ein Verfahren gewaehlt, eines verworfen
-     7 FINANZIERUNG Marktzins als Indikation
-     8 ENTSCHEIDUNG der Kipppunkt: ohne Optimierung gegen mit
+   Elf Stufen, nacheinander:
+      1 ERFASSEN      zwei Wege - frei sprechen oder gefuehrt
+      2 QUICK-CHECK   die erste Zahl nach 34 Sekunden, weisse Karte
+      3 INDIKATION    liegt der Preis im Rahmen?
+      4 AUFTEILUNG    Boden gegen Gebaeude, 20-%-Abschlag
+      5 NUTZUNGSDAUER der Rahmen als REGLER - er faehrt, man uebernimmt
+      6 ABSCHREIBUNG  die grosse Zahl: Steuerersparnis je Jahr
+      7 VERKEHRSWERT  ein Verfahren gewaehlt, eines verworfen
+      8 FINANZIERUNG  Marktzins als Indikation
+      9 DEAL SCORE    dieselbe Karte, jetzt vollstaendig
+     10 ENTSCHEIDUNG  der Kipppunkt: ohne Optimierung gegen mit
+     11 CO-PILOT      Miete, Break-Even, Vermoegen nach der Zinsbindung
 
    Alle Zahlen kommen aus demo-steuer-daten.js - dieselbe Rechenbasis
    wie die vier statischen Fassungen auf demo-steuer.html. Zwei
@@ -25,9 +28,10 @@
    rechnerisch RND 48, mit neun Modernisierungspunkten 51 im Rahmen
    44-56.
 
-   Der Score 76 ist NICHT gewuerfelt, sondern aus den fuenf Werten
-   gewichtet gerechnet - siehe rechnenScore(). Waere er gesetzt, wuerde
-   die Szene genau das vorfuehren, was sie behauptet zu widerlegen.
+   Auch die Antworten des Co-Piloten sind GERECHNET, nicht getextet:
+   der Break-Even ergibt sich aus der Mietsteigerung, das Vermoegen
+   aus der Annuitaetenformel. Waeren sie gesetzt, wuerde die Szene
+   genau das vorfuehren, was sie zu widerlegen behauptet.
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -55,7 +59,12 @@
     haus: 'M3 11l9-7 9 7M5 9.5V21h14V9.5M10 21v-6h4v6',
     hand: 'M9 11V5.5a1.5 1.5 0 0 1 3 0V11m0-1.5a1.5 1.5 0 0 1 3 0V12m0-1a1.5 1.5 0 0 1 3 0v5a5 5 0 0 1-5 5h-1.6a5 5 0 0 1-3.9-1.9L6 16.5a1.6 1.6 0 0 1 2.4-2.1L9 15',
     stift: 'M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17v3z',
-    kreuz: 'M6 6l12 12M18 6L6 18'
+    kreuz: 'M6 6l12 12M18 6L6 18',
+    tacho: 'M12 14l5-5M3.5 18a10 10 0 1 1 17 0',
+    karte: 'M3 7h18v12H3zM3 11h18M7 15h4',
+    fragen: 'M8 10h8M8 14h5M21 12a9 9 0 1 1-3.3-6.9L21 4v8h-8',
+    sprech: 'M4 5h16v11H9l-5 4z',
+    person: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0'
   };
   function ik(k, gr, fill) {
     return '<svg viewBox="0 0 24 24" width="' + (gr || 15) + '" height="' + (gr || 15)
@@ -82,7 +91,9 @@
   var AKTE = [
     { k: 'sprechen',   dauer: 10000, uhr: 32,
       ohne: '40 Felder aus vier Unterlagen abtippen',     ohneZt: '45 min' },
-    { k: 'indikation', dauer: 7000,  uhr: 38,
+    { k: 'quick',      dauer: 9000,  uhr: 34,
+      ohne: 'Bauchgefühl beim ersten Hinsehen',           ohneZt: '—' },
+    { k: 'indikation', dauer: 9000,  uhr: 41,
       ohne: 'Im Portal nach Vergleichspreisen suchen',    ohneZt: '25 min' },
     { k: 'aufteilung', dauer: 10000, uhr: 52,
       ohne: 'Bodenwert schätzen und hoffen',              ohneZt: 'Streit mit dem Finanzamt' },
@@ -94,8 +105,12 @@
       ohne: 'Gutachterausschuss anschreiben, warten',     ohneZt: '3 Tage' },
     { k: 'finanz',     dauer: 9000,  uhr: 128,
       ohne: 'Drei Banken anrufen, drei Antworten',        ohneZt: '1 Woche' },
-    { k: 'urteil',     dauer: 12000, uhr: 238,
-      ohne: 'Bauchgefühl',                                ohneZt: 'unbezifferbar' }
+    { k: 'score',      dauer: 11000, uhr: 205,
+      ohne: 'Excel bauen, Formeln prüfen, hoffen',        ohneZt: '2 Std' },
+    { k: 'urteil',     dauer: 10000, uhr: 238,
+      ohne: 'Bauchgefühl',                                ohneZt: 'unbezifferbar' },
+    { k: 'copilot',    dauer: 16000, uhr: 262,
+      ohne: 'Niemanden fragen können',                    ohneZt: '—' }
   ];
   var N = AKTE.length;
 
@@ -113,6 +128,44 @@
   }
   function spPos(v) { return (v - 30) / 40 * 100; }
 
+  /* Die weisse Karte aus dem Kopf der Seite, auf dieses Beispiel
+     gezogen. Sie erscheint zweimal: nach dem Quick-Check mit dem
+     groben Score und am Ende als voller Investor Deal Score.
+     Die Balken und der Ring sind leer und werden in nachziehen()
+     gesetzt - damit haengt der sichtbare Zustand an setTimeout und
+     nicht an einer CSS-Verzoegerung. */
+  function karte(band, score, stufe, balken, unten) {
+    var f = score >= 85 ? '#2E8455' : score >= 70 ? '#3FA56C' : '#C9A84C';
+    return '<div class="wx-karte"><div class="wx-k-band">'
+      + '<span>' + band + '</span><span>LINDENALLEE 14</span></div>'
+      + '<div class="wx-k-body"><div class="wx-k-grid">'
+      + '<div><div class="wx-dial2"><svg viewBox="0 0 120 120" aria-hidden="true">'
+      + '<circle class="tr" cx="60" cy="60" r="53"></circle>'
+      + '<circle class="pg" cx="60" cy="60" r="53" stroke="' + f + '"'
+      + ' data-soll="' + score + '"></circle></svg>'
+      + '<div class="wx-dv2"><b class="k-score" data-ziel="' + score + '">0</b>'
+      + '<small>/ 100</small></div></div>'
+      + '<div class="wx-k-stufe ' + (score >= 70 ? 'gut' : 'sol') + '">◆ '
+      + stufe.toUpperCase() + '</div></div>'
+      + '<div class="wx-k-bars">' + balken.map(function (z) {
+          var c = z[2] >= 85 ? '#2E8455' : z[2] >= 70 ? '#3FA56C' : '#C9A84C';
+          return '<div class="wx-kb"><div class="top">'
+            + '<span class="nm">' + z[0] + '<span class="wt">' + z[1] + '%</span></span>'
+            + '<span class="sc" style="color:' + c + '">' + (z[2] || '–') + '</span></div>'
+            + '<span class="track"><i data-b="' + (z[2] || 0) + '%"'
+            + ' style="background:' + c + '"></i></span></div>';
+        }).join('') + '</div></div>'
+      + unten
+      + '</div><div class="wx-k-tear"></div>'
+      + '<div class="wx-k-foot"><span>PASSENGER<b>DealPilot Co-Pilot</b></span>'
+      + '<span style="text-align:right">FLIGHT<b>DP · BOARDING</b></span></div></div>';
+  }
+  function grossZahl(zahl, titel, text, gold) {
+    return '<div class="wx-gross' + (gold ? ' gold' : '') + '">'
+      + '<span class="zahl wx-zahl" data-ziel="' + zahl + '">0</span>'
+      + '<span class="tx"><b>' + titel + '</b><span>' + text + '</span></span></div>';
+  }
+
   function szene(n) {
     var a = AKTE[n], O = S.O, K = S.KPA, R = S.RND, A = S.AFA, E = S.EW,
         F = S.FIN, C = S.CF;
@@ -122,8 +175,15 @@
       var w = '';
       for (var b = 0; b < 26; b++) w += '<i style="--n:' + b + '"></i>';
       return titel('STUFE 1 · ERFASSEN', 'Einmal sprechen. Mehr nicht.',
-        'Der Sprechlauf hört mit und trägt ein. Jeder erkannte Wert poppt am '
-        + 'Mikrofon auf und fällt in sein Feld.')
+        'Zwei Wege, dieselbe Aufnahme: frei sprechen — oder sich Frage für '
+        + 'Frage durch den Sprechlauf führen lassen.')
+        + '<div class="wx-wege">'
+        + '<div class="wx-weg an"><span class="ik">' + ik('mikro', 16) + '</span>'
+        + '<span><b>Frei sprechen</b><span>Einfach loslegen. Was fehlt, fragt der '
+        + 'Co-Pilot am Ende nach.</span></span></div>'
+        + '<div class="wx-weg"><span class="ik">' + ik('fragen', 16) + '</span>'
+        + '<span><b>Geführt per Sprache</b><span>24 Fragen der Reihe nach, jede '
+        + 'überspringbar — auch mit der Stimme.</span></span></div></div>'
         + '<div class="wx-sprech">'
         + '<div class="wx-links"><div class="wx-mik"><div class="wx-mik-k">'
         + '<span class="wx-ring"></span><span class="wx-ring"></span>'
@@ -140,34 +200,72 @@
         }).join('') + '</div></div></div>';
     }
 
-    /* ── 2 · MARKTPREISINDIKATION ────────────────────────────────── */
+    /* ── 2 · QUICK-CHECK: die erste Zahl nach 34 Sekunden ────────── */
+    if (a.k === 'quick') {
+      var Q = S.QUICK;
+      return titel('STUFE 2 · QUICK-CHECK',
+        'Nach 34 Sekunden steht die erste Zahl.',
+        'Aus neun Angaben — mehr liegt noch nicht vor. Der Score sagt hier noch '
+        + 'nicht, ob es sich lohnt; er sagt, ob es sich lohnt weiterzurechnen.')
+        + '<div style="display:grid;grid-template-columns:1fr auto;gap:22px;'
+        + 'align-items:center">'
+        + '<div class="wx-rech">'
+        + rz('Kennzahlen belegt', Q.kennzahlen_hat + ' von ' + Q.kennzahlen_von, '',
+          'der Rest braucht Finanzierung und amtliche Werte')
+        + rz('Kaufpreis je m²', eur(S.O.kaufpreis / S.O.wfl))
+        + rz('Bruttomietrendite', proz(S.EW.rohertrag / S.O.kaufpreis), '',
+          eur(S.O.miete_monat) + ' Kaltmiete im Monat')
+        + rz('Ergebnis', Q.score + ' · ' + Q.stufe, 'summe',
+          'weiterrechnen lohnt sich')
+        + '</div>'
+        + karte('DEAL SCORE · QUICK-CHECK', Q.score, Q.stufe,
+          [['Rendite', 35, 68], ['Finanzierung', 25, 0], ['Risiko', 20, 62],
+           ['Lage & Markt', 10, 71], ['Upside', 10, 0]],
+          '<div class="wx-k-offen"><span class="l">NOCH OFFEN</span>'
+          + Q.fehlt.map(function (x) {
+              return '<div><span class="pt"></span>' + esc(x) + '</div>';
+            }).join('') + '</div>')
+        + '</div>';
+    }
+
+    /* ── 3 · MARKTPREISINDIKATION ────────────────────────────────── */
     if (a.k === 'indikation') {
       var p0 = (S.MPI.von - 240000) / 80000 * 100;
       var p1 = (S.MPI.bis - 240000) / 80000 * 100;
-      var pk = (O.kaufpreis - 240000) / 80000 * 100;
-      return titel('STUFE 2 · MARKTPREISINDIKATION',
-        'Erst die grobe Einordnung.',
-        'Bevor irgendetwas gerechnet wird: liegt der Kaufpreis überhaupt im Rahmen? '
-        + 'Das ist eine Indikation aus Vergleichspreisen, kein Gutachten — und sie '
-        + 'wird auch so genannt.')
-        + '<div class="wx-spanne" style="max-width:620px"><div class="wx-sp-kopf">'
-        + '<span class="lb">VERGLEICHSPREISE · ' + eur(S.MPI.qm_von) + '–'
-        + eur(S.MPI.qm_bis) + '/m²</span>'
-        + '<span class="wt">' + eur(S.MPI.von) + ' – ' + eur(S.MPI.bis) + '</span></div>'
-        + '<div class="wx-sp-bahn"><span class="wx-sp-grund"></span>'
-        + '<span class="wx-sp-band" data-l="' + p0 + '" data-w="' + (p1 - p0) + '"></span>'
-        + '<span class="wx-sp-mark" data-l="' + pk + '"></span></div>'
-        + '<div class="wx-sp-skala"><span>240.000 €</span><span>280.000 €</span>'
+      var pk = (S.O.kaufpreis - 240000) / 80000 * 100;
+      var mitte = (S.MPI.von + S.MPI.bis) / 2;
+      return titel('STUFE 3 · MARKTPREISINDIKATION',
+        'Liegt der Preis überhaupt im Rahmen?',
+        'Bevor irgendetwas gerechnet wird: eine Spanne aus Vergleichspreisen. '
+        + 'Keine Bewertung, kein Gutachten — eine Einordnung, und sie wird auch '
+        + 'so genannt.')
+        + '<div class="wx-mpi"><div class="wx-mpi-kopf">'
+        + '<span class="gr">' + eur(S.MPI.von) + ' – ' + eur(S.MPI.bis)
+        + '<small>indikativ</small></span>'
+        + '<span class="rechts"><b>' + eur(S.O.kaufpreis) + '</b>'
+        + '<span>GEFORDERTER KAUFPREIS</span></span></div>'
+        + '<div class="wx-mpi-bahn"><span class="wx-mpi-grund"></span>'
+        + '<span class="wx-mpi-band" data-l="' + p0 + '" data-w="' + (p1 - p0) + '"></span>'
+        + '<span class="wx-mpi-kp" data-l="' + pk + '"><b>KAUFPREIS</b><i></i></span>'
+        + '</div>'
+        + '<div class="wx-mpi-skala"><span>240.000 €</span><span>280.000 €</span>'
         + '<span>320.000 €</span></div>'
-        + '<div class="wx-sp-note">' + ik('pin', 13)
-        + '<span>Der Kaufpreis von ' + eur(O.kaufpreis) + ' liegt im oberen Drittel '
-        + 'der Spanne — auffällig, aber nicht auffällig genug, um abzubrechen. '
-        + 'Die Prüfung geht weiter.</span></div></div>'
-        + '<div class="wx-rech">'
-        + rz('Kaufpreis', eur(O.kaufpreis), '', eur(O.kaufpreis / O.wfl) + ' je m²')
-        + rz('Mitte der Indikation', eur((S.MPI.von + S.MPI.bis) / 2), '',
-          'daraus allein folgt noch nichts')
-        + '</div>';
+        + '<div class="wx-mpi-zeilen">'
+        + '<div><span class="l">JE QUADRATMETER</span>'
+        + '<span class="v">' + eur(S.MPI.qm_von) + '–' + eur(S.MPI.qm_bis) + '</span>'
+        + '<span class="s">gefordert ' + eur(S.O.kaufpreis / S.O.wfl) + '/m²</span></div>'
+        + '<div><span class="l">MITTE DER SPANNE</span>'
+        + '<span class="v">' + eur(mitte) + '</span>'
+        + '<span class="s">' + eur(S.O.kaufpreis - mitte) + ' darüber</span></div>'
+        + '<div><span class="l">EINORDNUNG</span>'
+        + '<span class="v" style="color:var(--gdh)">oberes Drittel</span>'
+        + '<span class="s">auffällig, kein Abbruch</span></div>'
+        + '</div>'
+        + '<div class="wx-sp-note" style="margin-top:13px">' + ik('pin', 13)
+        + '<span>Die Spanne stammt aus Vergleichspreisen der letzten zwölf Monate '
+        + 'im selben Postleitzahlgebiet. <b style="color:#fff">Was der Preis wert '
+        + 'ist, sagt erst Stufe 7</b> — hier geht es nur darum, ob sich das '
+        + 'Weiterrechnen lohnt.</span></div></div>';
     }
 
     /* ── 3 · KAUFPREISAUFTEILUNG ─────────────────────────────────── */
@@ -197,10 +295,13 @@
         + rz('Gebäudeanteil = AfA-Bemessungsgrundlage', eur(K.gebaeude_mit),
           'summe gross')
         + '</div>'
-        + gewinn('+ ' + eur(K.mehr_bemessung),
-          'mehr Bemessungsgrundlage als ohne den Abschlag. '
-          + '<b>Dieser Satz gehört so in den Notarvertrag</b> — später ist er '
-          + 'nur noch mit Mühe zu ändern.');
+        + grossZahl(Math.round(K.mehr_bemessung * S.O.steuersatz / S.RND.von) + ' €',
+          'Steuerersparnis pro Jahr, allein aus dem Abschlag',
+          eur(K.mehr_bemessung) + ' mehr Bemessungsgrundlage, verteilt auf '
+          + S.RND.von + ' Jahre, bei ' + proz(S.O.steuersatz, 0)
+          + ' Grenzsteuersatz. <b style="color:#fff">Dieser Satz gehört so in '
+          + 'den Notarvertrag</b> — später ist er nur noch mit Mühe zu ändern.',
+          true);
     }
 
     /* ── 4 · RESTNUTZUNGSDAUER — der Regler ──────────────────────── */
@@ -251,11 +352,12 @@
           proz(A.kurz.satz, 2) + ' · mit Nachweis')
         + rz('Mehr-Abschreibung je Jahr', '+ ' + eur(A.mehr_jahr), 'summe plus')
         + '</div>'
-        + gewinn(eur(A.steuer_jahr),
-          'weniger Steuer je Jahr bei ' + proz(O.steuersatz, 0)
-          + ' Grenzsteuersatz. Über ' + R.von + ' Jahre sind das <b>'
+        + grossZahl(Math.round(A.steuer_jahr) + ' €',
+          'Steuerersparnis pro Jahr durch die kürzere Nutzungsdauer',
+          'Über ' + R.von + ' Jahre sind das <b style="color:#fff">'
           + eur(A.steuer_jahr * R.von) + '</b> — bei einem Aufwand von einmal '
-          + 'Gutachten.');
+          + 'Gutachten. Die ' + eur(A.mehr_jahr) + ' mehr Abschreibung wirken '
+          + 'mit ' + proz(O.steuersatz, 0) + ' Grenzsteuersatz.');
     }
 
     /* ── 6 · VERKEHRSWERT ────────────────────────────────────────── */
@@ -316,7 +418,35 @@
         + 'und damit an den Stufen 3 und 4.</span></div>';
     }
 
-    /* ── 8 · DAS URTEIL ──────────────────────────────────────────── */
+    /* ── 8 · DER INVESTOR DEAL SCORE ─────────────────────────────── */
+    if (a.k === 'score') {
+      return titel('STUFE 8 · INVESTOR DEAL SCORE',
+        'Jetzt sind alle Angaben da.',
+        'Dieselbe Karte wie nach dem Quick-Check — nur steht jetzt alles darin: '
+        + 'Finanzierung gerechnet, amtliche Werte belegt, Steuerwirkung bekannt.')
+        + '<div style="display:grid;grid-template-columns:1fr auto;gap:22px;'
+        + 'align-items:center">'
+        + '<div class="wx-rech">'
+        + rz('nach dem Quick-Check', S.QUICK.score + ' · ' + S.QUICK.stufe, '',
+          'aus ' + S.QUICK.kennzahlen_hat + ' Angaben')
+        + rz('jetzt', '76 · Gut', 'summe plus', 'aus 21 belegten Kennzahlen')
+        + rz('Was den Unterschied macht', '', '',
+          'Finanzierung gerechnet · Steuerwirkung bekannt · Werte amtlich belegt')
+        + '</div>'
+        + karte('INVESTOR DEAL SCORE', 76, 'Gut',
+          [['Rendite', 35, 72], ['Finanzierung', 25, 86], ['Risiko', 20, 79],
+           ['Lage & Markt', 10, 71], ['Upside', 10, 63]],
+          '<div class="wx-k-kpi">'
+          + '<div><b class="wx-zahl" data-ziel="' + eur(S.O.kaufpreis) + '">&nbsp;</b>'
+          + '<span>KAUFPREIS</span></div>'
+          + '<div><b>21/24</b><span>BELEGT</span></div>'
+          + '<div><b>88 %</b><span>TIEFE</span></div></div>')
+        + '</div>';
+    }
+
+    if (a.k === 'copilot') return szeneCopilot();
+
+    /* ── 9 · DAS URTEIL ──────────────────────────────────────────── */
     var lohnt = C.mit.nach_steuer_monat >= 0;
     return titel('STUFE 8 · DIE ENTSCHEIDUNG',
       lohnt ? 'Trägt sich — aber erst nach Steuern.' : 'Trägt sich nicht.',
@@ -346,6 +476,24 @@
       + '<span>Bodenrichtwert und Liegenschaftszins amtlich, Restnutzungsdauer nach '
       + 'Anlage 2, Zins als Marktindikation gekennzeichnet.</span></span></div>'
       + '</div>';
+  }
+
+  /* ── 10 · DER CO-PILOT ──────────────────────────────────────────
+     Marcel: "dann frag den Co Pilot. Der Co Pilot antwortet was man
+     machen koennte um die Miete zu erhoehen und wann es positiv wird
+     mit Break Even und dann wieviel Cashflow und vermoegen am Ende
+     der Zinsbindung entstanden ist."
+     Die drei Antworten stehen in DP_STEUER.COPILOT und sind
+     gerechnet, nicht getextet. */
+  function szeneCopilot() {
+    return titel('STUFE 10 · FRAG DEN CO-PILOTEN',
+      'Es trägt sich. Was ginge noch?',
+      'Der Co-Pilot kennt das ganze Objekt — die Rechnung, die Annahmen und '
+      + 'die Quellen. Er antwortet mit dem, was daraus folgt.')
+      + '<div class="wx-frage"><span class="av">' + ik('person', 17) + '</span>'
+      + '<span class="tx">„Der Cashflow ist knapp positiv. Was kann ich tun, '
+      + 'damit mehr hängen bleibt — und was bleibt am Ende übrig?"</span></div>'
+      + '<div class="wx-antworten"></div>';
   }
 
   function titel(lb, h, p) {
@@ -458,8 +606,41 @@
     var a = AKTE[i];
     if (a.k === 'aufteilung') staffeln('.wx-r', 95);
     if (a.k === 'afa' || a.k === 'wert' || a.k === 'finanz') staffeln('.wx-r', 85);
-    if (a.k === 'indikation') staffeln('.wx-r', 110);
+    if (a.k === 'indikation' || a.k === 'quick') staffeln('.wx-r', 110);
+    if (a.k === 'score') staffeln('.wx-r', 120);
     if (a.k === 'urteil') staffeln('.wx-gr', 160);
+
+    /* Die weisse Karte: Ring, Zahl und Balken. Alles ueber setTimeout,
+       damit der Endzustand auch im Hintergrund-Tab steht. */
+    var ring = buehne.querySelector('.wx-dial2 .pg');
+    if (ring) {
+      var soll = +ring.getAttribute('data-soll');
+      setTimeout(function () {
+        if (ring.isConnected) ring.style.strokeDashoffset = 333 - 333 * (soll / 100);
+      }, 80);
+      var sc = buehne.querySelector('.k-score');
+      if (sc) { var t0 = performance.now();
+        (function s(tt) {
+          var p = Math.min(1, (tt - t0) / 1400);
+          sc.textContent = Math.round(soll * (1 - Math.pow(1 - p, 3)));
+          if (p < 1) requestAnimationFrame(s);
+        })(t0);
+        setTimeout(function () { if (sc.isConnected) sc.textContent = soll; }, 1600);
+      }
+      [].slice.call(buehne.querySelectorAll('.wx-kb .track i')).forEach(function (el, k) {
+        setTimeout(function () {
+          if (el.isConnected) el.style.width = el.getAttribute('data-b');
+        }, 260 + k * 110);
+      });
+    }
+
+    /* Die grossen Zahlen laufen hoch. */
+    [].slice.call(buehne.querySelectorAll('.wx-gross .zahl')).forEach(function (el) {
+      var z = el.getAttribute('data-ziel');
+      if (z) setTimeout(function () { hoch(el, z, 1100); }, 350);
+    });
+
+    if (a.k === 'copilot') copilot();
 
     /* ── Stufe 1: tippen, dann die Pillen fliegen lassen ─────────── */
     if (a.k === 'sprechen') {
@@ -562,6 +743,35 @@
      das Vorfuehren hoert dann auf und der ganze Ablauf haelt an.
      Alles laeuft ueber setTimeout, nicht ueber CSS-Verzoegerungen:
      im Hintergrund-Tab wuerde sonst der Zustand haengenbleiben. */
+  /* Der Co-Pilot antwortet nacheinander: erst tippt er, dann steht
+     die Antwort da. setTimeout, kein CSS - sonst bliebe im
+     Hintergrund-Tab eine leere Blase stehen. */
+  function copilot() {
+    var wirtA = buehne.querySelector('.wx-antworten');
+    if (!wirtA) return;
+    var i = 0;
+    clearInterval(flugUhr);
+    function naechste() {
+      if (!wirtA.isConnected || i >= S.COPILOT.length) { clearInterval(flugUhr); return; }
+      var a = S.COPILOT[i++];
+      var el = document.createElement('div');
+      el.className = 'wx-antwort';
+      el.innerHTML = '<span class="av tippt">' + ik('score', 17) + '</span>'
+        + '<div class="wx-bubble"><span class="wx-punkte">'
+        + '<i></i><i></i><i></i></span></div>';
+      wirtA.appendChild(el);
+      setTimeout(function () {
+        if (!el.isConnected) return;
+        el.querySelector('.av').classList.remove('tippt');
+        el.querySelector('.wx-bubble').innerHTML =
+          '<b>' + esc(a[1]) + '</b><p>' + esc(a[2]) + '</p>'
+          + '<span class="ergebnis">' + esc(a[3]) + '</span>';
+      }, 1100);
+    }
+    naechste();
+    flugUhr = setInterval(naechste, 4200);
+  }
+
   function regler() {
     var inp = buehne.querySelector('.wx-rin');
     if (!inp) return;

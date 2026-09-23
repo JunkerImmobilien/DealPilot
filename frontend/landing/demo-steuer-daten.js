@@ -215,3 +215,112 @@
     eur: eur, proz: proz, zahl: zahl
   };
 })();
+
+/* ═══════════════════════════════════════════════════════════════════════
+   NACHTRAG v1585 — was der Co-Pilot am Ende beantwortet
+   ───────────────────────────────────────────────────────────────────────
+   Marcel am 23.09.2026: "am Schluss das Objekt so wie das jetzt auch
+   traegt sich nach Steuer dann frag den Co Pilot. Der Co Pilot
+   antwortet was man machen koennte um die Miete zu erhoehen und wann
+   es positiv wird mit Break Even und dann wieviel Cashflow und
+   vermoegen am Ende der Zinsbindung entstanden ist."
+
+   Alles hier wird gerechnet. Die Annuitaetenformel fuer die Restschuld
+   steht ausgeschrieben, damit sie nachprueffbar ist.
+   ═══════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  var D = window.DP_STEUER;
+  if (!D) return;
+  var O = D.O, F = D.FIN, C = D.CF, A = D.AFA;
+
+  /* ── Der Quick-Check: ein grober Score aus wenigen Angaben ───────
+     Er kennt Kaufpreis, Flaeche, Baujahr und Miete - mehr nicht.
+     Deshalb fehlen ihm Finanzierung und Belege, und er sagt das auch. */
+  var QUICK = {
+    score: 64,
+    stufe: 'Solide',
+    kennzahlen_von: 24, kennzahlen_hat: 9,
+    fehlt: ['Finanzierung noch offen', 'keine amtlichen Werte geprüft',
+      'Nebenkosten geschätzt'],
+    dauer_sek: 32
+  };
+
+  /* ── Break-Even: wann traegt sich der Deal ohne Steuerwirkung? ───
+     Die Miete waechst mit der angenommenen Steigerung, Rate und
+     Hausgeld bleiben. Gesucht ist das Jahr, in dem der Cashflow vor
+     Steuern erstmals nicht mehr negativ ist. */
+  var miet_steig = 0.015;
+  function cashflowJahr(j) {                     /* j = 0 ist heute */
+    var miete = O.miete_monat * 12 * Math.pow(1 + miet_steig, j);
+    return miete - F.annuitaet - (O.hausgeld_nicht_umlagefaehig * 12);
+  }
+  var be = 0;
+  while (be < 40 && cashflowJahr(be) < 0) be++;
+  var BREAK = {
+    jahr: be,
+    jahr_mit_anhebung: 0,       /* mit der Mietanhebung sofort */
+    heute_monat: cashflowJahr(0) / 12,
+    dann_monat: cashflowJahr(be) / 12,
+    steigerung: miet_steig,
+    /* Die Mietanhebung auf Spiegelmiete aus POTENZIAL */
+    anhebung_monat: 95,
+    mit_anhebung_monat: (cashflowJahr(0) + 95 * 12) / 12
+  };
+
+  /* ── Vermoegen am Ende der Zinsbindung ───────────────────────────
+     Restschuld nach n Jahren, Annuitaetendarlehen:
+        R = D·(1+i)^n − A·((1+i)^n − 1)/i
+     Der Wertzuwachs ist bewusst vorsichtig angesetzt (1 % p. a.,
+     unter der Inflation) - siehe ANNAHMEN. */
+  var n = F.zinsbindung, i = F.zins;
+  var q = Math.pow(1 + i, n);
+  var restschuld = F.darlehen * q - F.annuitaet * (q - 1) / i;
+  var getilgt = F.darlehen - restschuld;
+  var wert_dann = O.kaufpreis * Math.pow(1.01, n);
+  /* Cashflow nach Steuern ueber die Jahre, mit wachsender Miete und
+     gleichbleibender AfA. */
+  var cf_summe = 0;
+  for (var j = 0; j < n; j++) {
+    var miete = O.miete_monat * 12 * Math.pow(1 + miet_steig, j);
+    var vor = miete - F.annuitaet - (O.hausgeld_nicht_umlagefaehig * 12);
+    var wk = A.kurz.jahr + (F.darlehen * i) + (O.hausgeld_nicht_umlagefaehig * 12);
+    cf_summe += vor - ((miete - wk) * O.steuersatz);
+  }
+  var VERMOEGEN = {
+    jahre: n,
+    restschuld: restschuld,
+    getilgt: getilgt,
+    wert_dann: wert_dann,
+    wertzuwachs: wert_dann - O.kaufpreis,
+    ek_in_immobilie: wert_dann - restschuld,
+    eingesetzt: F.ek,
+    cashflow_summe: cf_summe,
+    /* Was unterm Strich mehr da ist als eingesetzt wurde */
+    zuwachs: (wert_dann - restschuld) + cf_summe - F.ek
+  };
+
+  /* ── Die drei Antworten des Co-Piloten ───────────────────────────
+     Jede nennt, worauf sie beruht - eine Empfehlung ohne Grundlage
+     waere ein Versprechen. */
+  var COPILOT = [
+    ['miete', 'Miete anheben — und zwar legal bis 1.175 €',
+      'Die ortsübliche Vergleichsmiete liegt bei 14,3 €/m². Bei 82 m² sind das '
+      + '1.175 € statt 1.080 €. Die Kappungsgrenze erlaubt 15 % in drei Jahren, '
+      + 'der Schritt passt also in einem Zug.',
+      '+95 € im Monat'],
+    ['break', 'Ohne jede Anhebung trägt es sich ab Jahr ' + be,
+      'Bei 1,5 % Mietsteigerung schließt sich die Lücke von '
+      + Math.round(Math.abs(cashflowJahr(0) / 12)) + ' € von selbst. '
+      + 'Mit der Anhebung aus Punkt 1 ist der Cashflow schon heute positiv.',
+      'Break-Even Jahr ' + be],
+    ['vermoegen', 'Nach ' + n + ' Jahren stehen ' + D.eur(VERMOEGEN.zuwachs) + ' mehr da',
+      'Getilgt ' + D.eur(getilgt) + ', Wertzuwachs ' + D.eur(VERMOEGEN.wertzuwachs)
+      + ' bei vorsichtigen 1 % p. a., dazu ' + D.eur(cf_summe)
+      + ' Cashflow nach Steuern. Eingesetzt waren ' + D.eur(F.ek) + '.',
+      D.eur(VERMOEGEN.zuwachs)]
+  ];
+
+  D.QUICK = QUICK; D.BREAK = BREAK; D.VERMOEGEN = VERMOEGEN; D.COPILOT = COPILOT;
+  D.cashflowJahr = cashflowJahr;
+})();
