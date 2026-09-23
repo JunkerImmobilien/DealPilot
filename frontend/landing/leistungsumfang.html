@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- DealPilot Leistungsumfang · v1543 -->
+<!DOCTYPE html><!-- v1559 · Score-Bereiche am Rechenkern korrigiert --><!-- DealPilot Leistungsumfang · v1543 -->
 <html lang="de"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="dp2.css?v=v1543">
-<link rel="stylesheet" href="dp2-teile.css?v=v1543">
+<link rel="stylesheet" href="dp2.css?v=v1558">
+<link rel="stylesheet" href="dp2-teile.css?v=v1558">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════
    Leistungsumfang aus frontend/landing/index.html Z.3266-3969 (18 Kapitel).
@@ -217,7 +217,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
         <h2>Vom Fund <span class="ac">bis zur Bank.</span></h2>
         <p class="lu-hero-lead">Jede Zahl, die z&auml;hlt &mdash; in einem Cockpit. Vom Expos&eacute; bis zum bankfertigen Investment-Case: Flugdaten statt Bauchgef&uuml;hl.</p>
         <div class="lu-hero-stats">
-          <div class="lhs"><b>18</b><span>Module</span></div>
+          <div class="lhs"><b>22</b><span>Module</span></div>
           <div class="lhs"><b>24</b><span>KPIs im Score</span></div>
           <div class="lhs"><b>4</b><span>Analyse-Phasen</span></div>
           <div class="lhs"><b>15&nbsp;J</b><span>Cashflow-Projektion</span></div>
@@ -621,11 +621,11 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
       <h3>Die fünf Bereiche</h3>
       <ul>
-        <li><strong>Rendite</strong> — Bruttomietrendite, Nettomietrendite, Cash-on-Cash, Eigenkapitalrendite, IRR über 15 Jahre, Equity Multiple</li>
-        <li><strong>Cashflow</strong> — Monatlicher Cashflow vor und nach Werbungskosten, Cashflow-Stabilität über die Laufzeit, Pufferkapazität, Mietausfall-Toleranz</li>
-        <li><strong>Finanzierung</strong> — DSCR (Debt Service Coverage Ratio), LTV (Loan to Value), Zinssatz, Tilgung, Eigenkapitalquote, Anschlussfinanzierungs-Risiko</li>
-        <li><strong>Risiko</strong> — Leerstand, Instandhaltungsbedarf, Energieklasse, Baujahr/Zustand, Mietausfall-Risiko, Energie-Risiken</li>
-        <li><strong>Potenzial</strong> — Marktfaktor, Wertsteigerungs-Potenzial, Mietsteigerungs-Möglichkeiten, Wertpuffer (Marktwert vs. Kaufpreis)</li>
+        <li><strong>Rendite</strong> <span class="gew">35 %</span> — Bruttorendite, Nettorendite, Cashflow je Monat, Cash-on-Cash</li>
+        <li><strong>Finanzierung</strong> <span class="gew">25 %</span> — DSCR, LTV, Zinssatz, Tilgung, Eigenkapitalbedarf</li>
+        <li><strong>Risiko</strong> <span class="gew">20 %</span> — Leerstand, Instandhaltung, Baujahr und Zustand, Energieklasse, Mietausfall-Risiko, Qualität &amp; Zustand</li>
+        <li><strong>Lage &amp; Markt</strong> <span class="gew">10 %</span> — Ist- gegen Marktmiete, Mietwachstum pro Jahr, Bevölkerung, Nachfrage, Mikrolage</li>
+        <li><strong>Potenzial</strong> <span class="gew">10 %</span> — Mietsteigerungs-Potenzial, Faktor gegen Markt, Wertsteigerung, Entwicklungsmöglichkeiten</li>
       </ul>
 
       <h3>Wie die Bewertung funktioniert</h3>
@@ -684,7 +684,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
         Dein Plan setzt die Kontingente jeden Monat neu (Starter: 5 Marktpreisindikationen, Investor zusätzlich 5 erweiterte, Pro zusätzlich 5 Wertermittlungen). <strong>Was du im Monat nicht nutzt, verfällt zum Monatsende</strong> — das Kontingent gehört zum Plan, nicht auf ein Konto. Brauchst du mehr, kaufst du nach: dein Monatskontingent noch einmal für ein Viertel deines Monatsbeitrags (Starter 5,00 €, Investor 8,75 €, Pro 12,50 €) — oder einzeln ab 0,90 € für eine Marktpreisindikation. Zugekaufte Bewertungen verfallen nie und werden zuletzt verbraucht.
       </p>
       <p>
-        Die kleinen KI-Hilfen — Spracheingabe, Beleg-Import, Bodenrichtwert-Abruf, Feldvorschläge — sind <strong>in jedem Plan enthalten</strong> und zählen gegen kein Kontingent.
+        Die kleinen KI-Hilfen — Spracheingabe, Bodenrichtwert-Abruf und Feldvorschläge — sind <strong>in jedem Plan enthalten</strong> und zählen gegen kein Kontingent.
       </p>
     </div>
   </section>
@@ -833,7 +833,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
         Wichtig zur Einordnung: Das Modul liefert eine <strong>grobe, nachvollziehbare Erst-Einschätzung</strong> — eine Orientierung, kein Gutachten. Für den steuerlich belastbaren Nachweis stellst du die Gutachten-Anfrage an unser Sachverständigenbüro direkt aus der App, und wir kümmern uns um den Rest. Das Einschätzungs-Modul steht ab dem Investor-Plan bereit, die Gutachten-Anfrage in jedem Plan.
       </p>
       <div class="info-card">
-        <p><strong>Direkt eingebunden &mdash; in Partnerschaft mit gutachten.org.</strong> Für das rechtssichere RND-Gutachten arbeiten wir mit unserem Partner <a href="https://gutachten.org" target="_blank" rel="noopener">gutachten.org</a> zusammen: Der Anfrage- und Bestellprozess ist als eingebettetes Fenster (iframe) direkt in DealPilot integriert. Du wechselst die App nicht — das Gutachten läuft nahtlos aus dem RND-Modul heraus.</p>
+        <p><strong>Direkt eingebunden &mdash; in Partnerschaft mit gutachten.org.</strong> Für das rechtssichere RND-Gutachten arbeiten wir mit unserem Partner <a href="https://gutachten.org" target="_blank" rel="noopener">gutachten.org</a> zusammen: Der Anfrage stellst du aus dem RND-Modul heraus — aber <strong>DealPilot schickt nichts selbst an Dritte</strong>. Du siehst vorher genau, welche Angaben mitgehen, und sendest sie über dein eigenes Mailprogramm oder trägst sie per Zwischenablage in das Formular von gutachten.org ein. Der Status „angefragt" wird am Objekt vermerkt.</p>
       </div>
     </div>
   </section>
@@ -942,5 +942,6 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
 
 
-<script src="dp2.js?v=v1543"></script>
+<script src="dp2-lufeat.js?v=v1558"></script>
+<script src="dp2.js?v=v1558"></script>
 </body></html>
