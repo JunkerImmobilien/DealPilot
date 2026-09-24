@@ -28,21 +28,45 @@
   'use strict';
 
   /* ── Was das Objekt ist ─────────────────────────────────────────── */
+  /* v1600 · HIER STAND DIE LINDENALLEE - eine ETW fuer 289.000 EUR.
+     Sie hatte zwei Schwaechen, die Marcel beide benannt hat:
+
+       1. Der Deal Score 76 "Gut" war GESETZT. An den echten Schwellen
+          der App gerechnet waren es 39 "Schwach" - die DSCR-Kurve
+          beginnt bei 0,9, der Wert lag bei 0,82. Eine Demo, die eine
+          Note behauptet, die das eigene Programm nicht vergibt.
+       2. Der Abschreibungssprung war zahm: 50 auf 44 Jahre.
+
+     Ersetzt durch ein Mehrfamilienhaus, das am 24.09.2026 in DealPilot
+     angelegt und KOMPLETT DURCHGERECHNET wurde (Staging, 2026-1037).
+     Alle Kennzahlen unten sind dort gemessen, keine ist gesetzt:
+
+       Bruttorendite 5,58 % · DSCR 1,275 · Faktor 17,9 · LTV 77,9 %
+       DealPilot Score 88 "Top" · Investor Deal Score 76 "Gut"
+
+     Die 76 ist damit zum ersten Mal verdient.
+
+     Und der Sprung sitzt: Baujahr 1968 bei Gesamtnutzungsdauer 70
+     ergibt 58 Jahre Alter. Mit 2 von 20 Modernisierungspunkten nach
+     Anlage 2 ImmoWertV landet die Restnutzungsdauer bei 14 bis 24
+     Jahren - statt der pauschalen 50. */
   var O = {
-    adr: 'Lindenallee 14, 32105 Musterstadt',
-    art: 'Eigentumswohnung · 3,5 Zimmer · 82 m² · Baujahr 1994 · 2. OG mit Balkon',
-    wfl: 82, bj: 1994, stichjahr: 2026,
-    kaufpreis: 289000,
-    miete_monat: 1080,          /* 13,17 €/m² - Mietspiegel Musterstadt */
-    hausgeld_monat: 210,
-    hausgeld_nicht_umlagefaehig: 90,
-    grundstueck_qm: 1100,
-    mea: 0.092,                 /* 92/1000 Miteigentumsanteil */
-    brw: 180,                   /* €/m² - amtlich, BORIS */
-    lz: 0.028,                  /* Liegenschaftszins, amtlich */
-    gnd: 80,                    /* Gesamtnutzungsdauer, Anlage 1 ImmoWertV */
+    adr: 'Gerberstraße 27, 32105 Musterstadt',
+    art: 'Mehrfamilienhaus · 6 Einheiten · 432 m² · Baujahr 1968 · 3 Vollgeschosse',
+    wfl: 432, bj: 1968, stichjahr: 2026,
+    einheiten: 6,
+    kaufpreis: 743000,          /* 1.720 EUR/m² */
+    miete_monat: 3456,          /* 8,00 EUR/m² - sechs Einheiten */
+    hausgeld_monat: 0,          /* kein WEG-Hausgeld: das Haus gehoert ganz */
+    hausgeld_nicht_umlagefaehig: 553,  /* Verwaltung, Instandhaltung,
+                                          Grundsteuer - 16 % vom Rohertrag */
+    grundstueck_qm: 780,
+    mea: 1.0,                   /* ganzes Grundstueck, kein Miteigentumsanteil */
+    brw: 240,                   /* EUR/m² - amtlich, BORIS */
+    lz: 0.035,                  /* Liegenschaftszins MFH, amtlich */
+    gnd: 70,                    /* Gesamtnutzungsdauer MFH, Anlage 1 ImmoWertV */
     bwk_quote: 0.20,            /* Bewirtschaftungskosten */
-    steuersatz: 0.42,           /* Grenzsteuersatz */
+    steuersatz: 0.42,           /* Grenzsteuersatz bei 95.000 EUR zvE */
     /* Erwerbsnebenkosten NRW */
     nk_grunderwerb: 0.065, nk_notar: 0.015, nk_makler: 0.0357,
     ek_quote: 0.30,
@@ -54,8 +78,8 @@
      Eine Spanne, kein Wert - sie stammt aus Vergleichspreisen, nicht
      aus einem Gutachten, und wird deshalb auch so gekennzeichnet. */
   var MPI = {
-    von: 268000, bis: 312000,
-    qm_von: Math.round(268000 / O.wfl), qm_bis: Math.round(312000 / O.wfl),
+    von: 705000, bis: 790000,
+    qm_von: Math.round(705000 / O.wfl), qm_bis: Math.round(790000 / O.wfl),
     hinweis: 'indikativ · Vergleichspreise, kein Gutachten'
   };
 
@@ -86,12 +110,27 @@
      spannen den Rahmen darum auf. */
   var alter = O.stichjahr - O.bj;
   var rnd_rechnerisch = O.gnd - alter;
+  /* v1600 · Gemessen am 24.09.2026 im RND-Assistenten der App, an
+     genau diesem Objekt. Drei Verfahren, drei Ergebnisse:
+
+       linear         22,0 Jahre  (72,50 % Alterswertminderung)
+       Punktraster    24,3 Jahre  (69,61 %)
+       technisch      14,3 Jahre  (82,13 %)  <- vorrangig
+
+     Der Assistent nennt daraus den Rahmen 14 bis 24 Jahre. Die Mitte
+     ist der Wert, den der Regler zuerst zeigt - der Besucher darf ihn
+     verschieben und sieht, was jedes Jahr wert ist.
+
+     Zum Vergleich: die alte Lindenallee hatte 44 bis 56 bei einer
+     Mitte von 50. Da war kein Sprung zu sehen, weil der Regelfall
+     ebenfalls 50 ist. */
   var RND = {
-    alter: alter,
+    alter: alter,               /* 58 Jahre */
     rechnerisch: rnd_rechnerisch,
-    von: 44, bis: 56,
-    mitte: 50,
-    modpunkte: 9
+    von: 14, bis: 24,
+    mitte: 19,
+    modpunkte: 2,               /* von 20, Anlage 2 ImmoWertV */
+    verfahren: { linear: 22.0, punktraster: 24.3, technisch: 14.3 }
   };
 
   /* ── 4 · Was die Wahl der RND an AfA bedeutet ────────────────────
@@ -126,6 +165,36 @@
     var q = Math.pow(1 + p, n);
     return (q - 1) / (p * q);
   }
+  /* ⚠ v1600 · EINE SPANNUNG, DIE KEINE ZAHL AUFLOEST - Marcel muss waehlen.
+
+     Marcel wollte zweierlei: einen hohen Kaufpreis (743.000 EUR) UND
+     einen krassen Abschreibungssprung (50 auf unter 25 Jahre). Beides
+     zusammen geht rechnerisch nicht auf:
+
+       Kaufpreis                 743.000 EUR  (Faktor 17,9)
+       Ertragswert bei RND 19    532.758 EUR
+       Abstand                        -28 %
+
+     Der Grund ist kein Fehler, sondern der Kern der Sache: Der
+     Vervielfaeltiger haengt an der Restnutzungsdauer. Ein Haus mit 19
+     Jahren Restnutzungsdauer traegt keinen Faktor 17,9 - dieselbe kurze
+     Restnutzungsdauer, die 13.000 EUR Steuern im Jahr spart, drueckt den
+     Ertragswert. Man kann nicht beides gleichzeitig haben.
+
+     Die drei ehrlichen Auswege:
+       a) Preis auf rund 560.000 bis 600.000 EUR - dann passt der
+          Ertragswert, der Sprung bleibt, der Preis ist niedriger.
+       b) Juengeres Baujahr - dann passt der Ertragswert, aber der
+          Abschreibungssprung schrumpft auf das, was die Lindenallee
+          schon hatte.
+       c) So lassen und SAGEN, dass der Preis ueber dem Ertragswert
+          liegt. Der Deal traegt trotzdem: +1.184 EUR Cashflow im Monat
+          nach Steuern. Das ist die ehrlichste Fassung und zeigt genau
+          das, was ein Renditerechner nicht kann.
+
+     Bis zur Entscheidung gilt c) - weil an den Eingaben zu drehen, bis
+     es schoen aussieht, genau die erfundene Zahl waere, die wir
+     ueberall sonst bekaempfen. */
   var vf = vervielfaeltiger(O.lz, RND.mitte);
   var EW = {
     verfahren: 'Ertragswertverfahren',

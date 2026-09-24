@@ -80,7 +80,19 @@
     o.textContent = fmt(satz, 2) + ' % eigener Satz' + (grund ? ' — ' + grund : '');
     sel.value = wert;
     if (h) h.textContent = 'Gerechnet wird mit ' + fmt(satz, 2) + ' % linear' + (zahl(el('afa_rnd_jahre').value) ? ' (Nutzungsdauer ' + fmt(zahl(el('afa_rnd_jahre').value), 0) + ' Jahre)' : '') + '. Grundlage: ' + (grund || 'bitte angeben') + '.';
-    if (typeof window.calc === 'function') window.calc();
+    /* v1599 · Hier fehlte die Benachrichtigung. `sel.value = wert` aendert
+       die Auswahl still - kein change-Ereignis, also lief auch
+       afaUpdateMethodLabel() nicht mehr. Die Beschriftung unter
+       "AfA / Jahr (berechnet)" blieb deshalb auf dem Stand DAVOR stehen.
+
+       Gemessen am 24.09.2026 am Mehrfamilienhaus Gerberstrasse: der
+       Betrag sprang auf 42.440,16 EUR (7,14 %), darunter stand weiter
+       "2,0 % linear". Zwei Zahlen zu derselben Sache, und die falsche
+       war die mit dem Prozentzeichen.
+
+       Die Zeile darueber (im Entfernen-Pfad) macht es laengst richtig -
+       sie schickt ein change. Hier wird derselbe Weg genommen. */
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
   }
   /* Nach dem Laden: gespeicherten eigenen Satz wiederherstellen. storage.js
      setzt afa_satz auf eine Zahl, die es als Option noch nicht gibt - die
