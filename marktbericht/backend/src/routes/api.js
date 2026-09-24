@@ -272,12 +272,38 @@ async function ensureFixtures() {
   })().catch((e) => { _fixturesReady = null; console.error('[fixtures] ensure failed:', e.message); throw e; });
   return _fixturesReady;
 }
-async function saveFixture(out) {
+/* v1601 · Die Nutzerkennung steht je nach Weg woanders:
+     /reports/generate         -> body.user_id
+     /reports/generate-stream  -> body.user_id
+     /reports/from-dealpilot   -> body.overrides.user_id
+   Der Proxy setzt sie IMMER aus dem Token, nie aus dem Browser
+   (backend/src/routes/marktbericht.js:365, :374, :529-530). Wer hier
+   raet statt alle drei Stellen zu lesen, speichert nichts mehr - und
+   merkt es erst, wenn ein Replay ins Leere laeuft. */
+function _uidAus(req) {
+  const b = req.body || {};
+  const o = b.overrides || {};
+  const v = req.query.user_id || b.user_id || o.user_id;
+  const n = parseInt(v, 10);
+  return n > 0 ? n : 0;
+}
+
+/* v1601 · uid ist jetzt Pflicht. Ohne sie wird NICHTS gespeichert -
+   ein Bericht ohne Eigentuemer waere genau die globale Zeile, die das
+   Leck war. */
+async function saveFixture(out, uid) {
+  if (!uid) { console.warn('[fixture] ohne user_id - nicht gespeichert'); return; }
   try {
     await ensureFixtures();
     const addr = (out && out.data && out.data.address && out.data.address.formatted)
       || (out && out.data && out.data.ref && out.data.ref.address) || null;
-    const keys = [...new Set(['last', out && out.object_key].filter(Boolean))];
+    /* v1601 · Der Schluessel traegt die Nutzerkennung. Vorher hiess er
+       schlicht 'last' - fuer ALLE Nutzer derselbe, jeder Bericht
+       ueberschrieb den vorigen, und jeder konnte ihn lesen. */
+    const keys = [...new Set([
+      'last:' + uid,
+      (out && out.object_key) ? (uid + ':' + out.object_key) : null
+    ].filter(Boolean))];
     for (const k of keys) {
       await q(`INSERT INTO mb.report_fixtures (key,address,result) VALUES ($1,$2,$3)
                ON CONFLICT (key) DO UPDATE SET address=$2, result=$3, created_at=now()`,
@@ -293,7 +319,7 @@ router.post('/reports/generate', async (req, res) => {
     const out = await runLimited(() => ReportOrchestrator.generate(req.body || {}));
     console.log(`[req] /reports/generate OK in ${out.took_ms}ms (ai_mode=${out.ai_mode})`);
     res.json(out);
-    saveFixture(out);
+    saveFixture(out, _uidAus(req));
   } catch (e) {
     console.error('[req] /reports/generate FEHLER:', e.message);
     res.status(e.status || 500).json({ error: e.message });
@@ -322,7 +348,7 @@ router.post('/reports/generate-stream', async (req, res) => {
     console.log(`[req] /reports/generate-stream OK in ${out.took_ms}ms (ai_mode=${out.ai_mode})`);
     send({ type: 'done', result: out });
     res.end();
-    saveFixture(out);
+    saveFixture(out, _uidAus(req));
   } catch (e) {
     console.error('[req] /reports/generate-stream FEHLER:', e.message);
     send({ type: 'error', error: e.message || 'Fehler' });
@@ -629,7 +655,7 @@ router.post('/reports/from-dealpilot', async (req, res) => {
     const out = await runLimited(() => ReportOrchestrator.generate({ dealpilot: obj, ...(body.overrides || {}) }));
     console.log(`[req] /reports/from-dealpilot OK in ${out.took_ms}ms (ai_mode=${out.ai_mode})`);
     res.json(out);
-    saveFixture(out);
+    saveFixture(out, _uidAus(req));
   } catch (e) {
     console.error('[req] /reports/from-dealpilot FEHLER:', e.message);
     res.status(e.status || 500).json({ error: e.message });
@@ -639,7 +665,16 @@ router.post('/reports/from-dealpilot', async (req, res) => {
 // GET /reports/fixtures — Liste gespeicherter Berichte (fuer den Demo-/Replay-Picker).
 router.get('/reports/fixtures', async (req, res) => {
   try {
-    const r = await q('SELECT key,address,created_at FROM mb.report_fixtures ORDER BY created_at DESC LIMIT 50');
+    /* v1601 · Hier stand ein SELECT ohne WHERE. Die Liste nannte
+       Schluessel und ANSCHRIFT jedes gespeicherten Berichts - auch der
+       fremden. Jetzt gilt dieselbe Regel wie bei /objects. */
+    const uid = parseInt(req.query.user_id, 10);
+    if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
+    const r = await q(
+      `SELECT key,address,created_at FROM mb.report_fixtures
+         WHERE key = $1 OR key LIKE $2
+         ORDER BY created_at DESC LIMIT 50`,
+      ['last:' + uid, uid + ':%']);
     res.json(r);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -648,7 +683,17 @@ router.get('/reports/fixtures', async (req, res) => {
 router.get('/reports/replay', async (req, res) => {
   try {
     await ensureFixtures();
-    const key = req.query.key || 'last';
+    /* v1601 · Hier war das Leck. 'last' war ein GLOBALER Schluessel:
+       jeder angemeldete Nutzer bekam mit ?key=last den zuletzt im System
+       erzeugten Bericht eines beliebigen anderen - vollstaendig, samt
+       Sachwert und Ertragswert, ohne Kontingent. Der Schluessel traegt
+       jetzt die Nutzerkennung, und eine fremde laesst sich nicht
+       angeben: was hereinkommt, wird IMMER mit der eigenen uid
+       praefixiert. */
+    const uid = parseInt(req.query.user_id, 10);
+    if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
+    const roh = String(req.query.key || 'last');
+    const key = (roh === 'last') ? ('last:' + uid) : (uid + ':' + roh.replace(/^\d+:/, ''));
     const rows = await q('SELECT result FROM mb.report_fixtures WHERE key=$1', [key]);
     if (!rows.length) return res.status(404).json({ error: 'Kein gespeicherter Bericht (key=' + key + '). Erst einen Bericht erstellen.' });
     let out = rows[0].result;
