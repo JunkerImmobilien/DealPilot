@@ -1,471 +1,248 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Leistungsumfang · DealPilot · by Junker Immobilien</title>
-  <!-- V270.4-env-detection: schreibt Landing-Links für Staging um -->
-  <script src="assets/env.js?v=1"></script>
-<meta name="description" content="DealPilot im Detail: Von Boarding über KI-Analyse bis Investment-Case. Alle Module ausführlich erklärt.">
-<meta name="theme-color" content="#0a0a0a">
-<link rel="icon" type="image/png" href="assets/dealpilot-favicon.png">
+<!DOCTYPE html><!-- v1559 · Score-Bereiche am Rechenkern korrigiert --><!-- DealPilot Leistungsumfang · v1543 -->
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="google-site-verification" content="sjsXb3XudmYE75JCus789-lKn_IIX5jOySZx50Iy4i0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leistungsumfang · DealPilot</title>
+<meta name="description" content="Alle 18 Module von DealPilot im Detail: Boarding, PDF-Import, Investition, Finanzierung, Deal Score, KI-Analyse, Exporte, Steuer und Restnutzungsdauer.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="dp2.css?v=v1595">
+<link rel="stylesheet" href="dp2-teile.css?v=v1595">
 <style>
-:root {
-  --bg-obsidian: #0a0a0a;
-  --bg-steel: #14110f;
-  --bg-card: rgba(255, 255, 255, 0.04);
-  --bg-glass: rgba(255, 255, 255, 0.06);
-  --gold: #C9A84C;
-  --gold-bright: #e8c878;
-  --gold-soft: rgba(201, 168, 76, 0.14);
-  --gold-border: rgba(201, 168, 76, 0.25);
-  --text: #ffffff;
-  --muted: rgba(255, 255, 255, 0.72);
-  --dim: rgba(255, 255, 255, 0.45);
-  --green: #3FA56C;
-  --red: #B8625C;
-  --border: rgba(255, 255, 255, 0.08);
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg-obsidian);
-  color: var(--text);
-  line-height: 1.7;
-  -webkit-font-smoothing: antialiased;
-  font-weight: 400;
-  overflow-x: hidden;
-}
-a { color: inherit; text-decoration: none; }
-.container { max-width: 880px; margin: 0 auto; padding: 0 24px; }
-.container-wide { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+/* ═══════════════════════════════════════════════════════════════════════
+   Leistungsumfang aus frontend/landing/index.html Z.3266-3969 (18 Kapitel).
+   Der Inhalt ist per Skript herauskopiert, nicht abgetippt.
 
-/* Background */
-.bg-animated { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-.bg-particles { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; opacity: 0.50; }
-.bg-orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.40; will-change: transform; }
-.bg-orb-1 {
-  width: 640px; height: 640px;
-  background: radial-gradient(circle, rgba(201,168,76,0.30), transparent 70%);
-  top: 5%; left: -200px;
-  animation: orb1 30s ease-in-out infinite alternate;
+   Das CSS kommt MIT seinen @media-Abfragen. Der erste Versuch hat die
+   Abfragen verworfen und die Regeln nackt uebernommen - dadurch galten
+   die Handy-Regeln auf jedem Bildschirm, und das Inhaltsverzeichnis
+   stand einspaltig statt dreispaltig.
+   107 Regeln ohne Kontext, 4 Media-Abfragen.
+   ═══════════════════════════════════════════════════════════════════════ */
+.lu-top,.api-back{display:none}
+hr.rw{height:3px;border:0;background:repeating-linear-gradient(90deg,var(--gd) 0 16px,transparent 16px 34px);opacity:.6;margin:0;position:relative;z-index:2}
+hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z-index:2}
+.api-hero .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.api-hero .chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--gdh);border:1px solid var(--line);border-radius:20px;padding:6px 13px;background:rgba(201,168,76,.06)}
+#view-lu .lu-hero{background:var(--ob);padding:44px 0 22px}
+#view-lu .lu-back{display:inline-flex;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--gdh);text-transform:uppercase;margin-bottom:8px;cursor:pointer;background:none;border:0}
+.lu-top{position:sticky;top:0;z-index:20;background:rgba(7,7,7,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.07)}
+.lu-back{display:inline-flex;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gdh);background:none;border:0;cursor:pointer}
+.lu-kick{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
+.lu-sub{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gdi);margin:34px 0 14px}
+.sec-dark .lu-sub{color:var(--gdh)}
+.lu-tanks{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.lu-tank{position:relative;background:#fff;border:1px solid var(--cream-line);border-radius:14px;padding:20px 18px;text-align:center;overflow:hidden}
+.lu-tank.best{border-color:var(--gd);box-shadow:0 18px 40px -26px rgba(201,168,76,.5)}
+.lu-tank .g{position:absolute;left:0;right:0;bottom:0;height:var(--p);background:linear-gradient(0deg,rgba(201,168,76,.16),rgba(201,168,76,.02));z-index:0}
+.lu-tank b{position:relative;font-family:var(--disp);font-weight:700;font-size:26px;color:var(--ink);display:block}
+.lu-tank span{position:relative;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.lu-packs{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.lu-packs-3{grid-template-columns:repeat(3,1fr)}
+.lu-pack{position:relative;background:#fff;border:1px solid var(--cream-line);border-radius:14px;padding:20px 18px;text-align:center}
+.lu-pack.pop{border-color:var(--gd)}
+.lu-pack .lp-tag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--runway);color:#221a06;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px}
+.lu-pack .lp-l{font-family:var(--disp);font-weight:700;font-size:24px;color:var(--ink)}
+.lu-pack .lp-p{font-family:var(--disp);font-weight:700;font-size:15px;color:var(--gdd);margin-top:2px}
+.lu-pack .lp-u{font-family:var(--mono);font-size:9px;color:var(--mut);margin-top:4px}
+.lu-costs{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;background:#fff;border:1px solid var(--cream-line);border-radius:14px;padding:8px 22px}
+.lu-cost{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--cream-line)}
+.lu-cost .c-n{font-size:13px;color:var(--inkm)}
+.lu-cost .c-v{font-family:var(--mono);font-weight:600;font-size:12px;color:var(--gdd);white-space:nowrap}
+.lu-feat{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.lu-phase{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:24px 24px 8px}
+.lu-phase .ph-h{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.lu-phase .ph-n{width:34px;height:34px;border-radius:9px;background:var(--runway);color:#221a06;display:grid;place-items:center;font-family:var(--disp);font-weight:700;font-size:15px}
+.lu-phase .ph-t{font-family:var(--disp);font-weight:700;font-size:17px;color:#fff}
+.lu-phase .ph-s{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--gdh)}
+.lu-item{padding:12px 0;border-top:1px solid rgba(255,255,255,.07)}
+.lu-item h4{font-family:var(--disp);font-weight:600;font-size:14px;color:#fff;margin-bottom:3px}
+.lu-item p{font-size:12.5px;line-height:1.55;color:var(--mdk);margin:0}
+.lu-featsec{background:var(--cream);color:var(--inkm)}
+.lu-phase{border-radius:16px;padding:24px 24px 8px;border:1px solid var(--cream-line);background:#fff}
+.lu-phase.d{background:var(--stub);border-color:rgba(255,255,255,.08)}
+.lu-phase.d .ph-t{color:#fff}
+.lu-phase .ph-t{color:var(--ink)}
+.lu-phase.d .lu-item h4{color:#fff}
+.lu-phase .lu-item h4{color:var(--ink)}
+.lu-phase.d .lu-item p{color:var(--mdk)}
+.lu-phase .lu-item p{color:var(--mut)}
+.lu-phase.d .lu-item{border-top-color:rgba(255,255,255,.08)}
+.lu-phase .lu-item{border-top-color:var(--cream-line)}
+.lu-featsec .lu-sub{color:var(--gdi)}
+.lu-hero{max-width:920px}
+.lu-hero h2{font-family:'Space Grotesk',sans-serif;font-size:40px;font-weight:700;line-height:1.08;letter-spacing:-.015em;margin:12px 0 14px;color:#fff}
+.lu-hero-lead{max-width:660px;color:rgba(255,255,255,.72);font-size:16px;line-height:1.65;margin:0}
+.lu-hero-stats{display:flex;flex-wrap:wrap;gap:12px;margin:26px 0 4px}
+.lhs{background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.28);border-radius:12px;padding:12px 18px;min-width:112px}
+.lhs b{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;display:block;line-height:1;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lhs span{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-top:4px;display:block}
+.lu-toc{margin-top:28px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.24);border-radius:16px;padding:20px 22px}
+.lu-toc-h{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#E8CC7A;margin-bottom:14px}
+.lu-toc-h span{color:rgba(255,255,255,.45)}
+.lu-toc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.lu-toc-item{display:flex;align-items:center;gap:10px;text-decoration:none;padding:8px 10px;border-radius:9px;border:1px solid transparent;transition:.14s}
+.lu-toc-item:hover{border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.06)}
+.lu-toc-item .n{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:#221a06;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);border-radius:20px;min-width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.lu-toc-item .t{font-size:13px;color:rgba(255,255,255,.82);line-height:1.25}
+.lu-toc-item:hover .t{color:#fff}
+.lu-ed{padding:52px 0;scroll-margin-top:80px}
+.lu-ed .eyebrow{display:inline-flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:#E8CC7A;margin-bottom:14px}
+.lu-ed .eyebrow .anchor{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:#221a06;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);border-radius:20px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+.lu-ed h2{font-family:'Space Grotesk',sans-serif;font-size:29px;font-weight:700;color:#fff;margin:0 0 16px;line-height:1.16;letter-spacing:-.01em}
+.lu-ed h2 .gold{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lu-ed h3{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600;color:#E8CC7A;margin:28px 0 8px}
+.lu-ed p{color:rgba(255,255,255,.72);font-size:15px;line-height:1.72;margin:0 0 14px}
+.lu-ed p.lead{font-size:17px;color:rgba(255,255,255,.82)}
+.lu-ed em{color:#E8CC7A;font-style:italic}
+.lu-ed strong{color:#fff;font-weight:600}
+.lu-ed a{color:#E8CC7A;text-decoration:underline;text-underline-offset:2px}
+.lu-ed .info-card{background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.24);border-left:3px solid #C9A84C;border-radius:12px;padding:16px 20px;margin:20px 0}
+.lu-ed .info-card p{margin:0;color:rgba(255,255,255,.8)}
+.lu-ed .info-card p+p{margin-top:10px}
+.lu-ed .stat-row{display:flex;gap:12px;flex-wrap:wrap;margin:22px 0}
+.lu-ed .stat-tile{flex:1;min-width:140px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:16px 18px}
+.lu-ed .stat-tile-num{font-family:'Space Grotesk',sans-serif;font-size:27px;font-weight:700;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.05}
+.lu-ed .stat-tile-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-top:4px}
+.lu-ed .pull{border-left:3px solid #C9A84C;padding:4px 0 4px 20px;margin:24px 0;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;line-height:1.4;color:#fff}
+.lu-ed.light{background:#fff}
+.lu-ed.light h2{color:#1a1305}
+.lu-ed.light h2 .gold{background:linear-gradient(110deg,#b8932f,#8a6d24);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lu-ed.light h3{color:#b8932f}
+.lu-ed.light p{color:#4a4436}
+.lu-ed.light p.lead{color:#2a251c}
+.lu-ed.light em{color:#b8932f}
+.lu-ed.light strong{color:#1a1305}
+.lu-ed.light a{color:#8a6d24}
+.lu-ed.light .eyebrow{color:#b8932f}
+.lu-ed.light .info-card{background:#faf6ea;border-color:rgba(201,168,76,.3);border-left-color:#C9A84C}
+.lu-ed.light .info-card p{color:#4a4436}
+.lu-ed.light .stat-tile{background:#faf6ea;border-color:rgba(201,168,76,.28)}
+.lu-ed.light .stat-tile-num{background:linear-gradient(110deg,#b8932f,#8a6d24);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lu-ed.light .stat-tile-lbl{color:#8a7c60}
+.lu-ed.light .pull{color:#1a1305;border-left-color:#C9A84C}
+.lu-item .luc-chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px}
+.lu-item .luc-chip{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.02em;color:#8a6d24;background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.38);border-radius:20px;padding:3px 9px;white-space:nowrap}
+.lu-item .lu-more{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:#b8932f;text-decoration:none;font-weight:600;cursor:pointer}
+.lu-item .lu-more:hover{color:#8a6d24;text-decoration:underline}
+.lu-phase.d .lu-item .luc-chip{color:#E8CC7A;background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.3)}
+.lu-phase.d .lu-item .lu-more{color:#E8CC7A}
+@media(max-width:640px){
+.lu-tanks{grid-template-columns:1fr 1fr}
+.lu-packs-3{grid-template-columns:1fr}
+.lu-packs{grid-template-columns:1fr 1fr}
+.lu-costs{grid-template-columns:1fr}
 }
-.bg-orb-2 {
-  width: 520px; height: 520px;
-  background: radial-gradient(circle, rgba(201,168,76,0.20), transparent 70%);
-  bottom: 5%; right: -180px;
-  animation: orb2 34s ease-in-out infinite alternate;
+@media(max-width:820px){
+.lu-feat{grid-template-columns:1fr}
 }
-@keyframes orb1 { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(150px,200px) scale(1.1); } }
-@keyframes orb2 { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(-180px,-100px) scale(0.9); } }
-@media (prefers-reduced-motion: reduce) { .bg-orb { animation: none; } }
-
-.page-content { position: relative; z-index: 1; }
-
-/* NAV */
-.nav {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(10, 10, 10, 0.82);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+@media(max-width:760px){
+.lu-toc-grid{grid-template-columns:1fr 1fr}
 }
-.nav-inner {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 24px; max-width: 1240px; margin: 0 auto;
-}
-.nav-logo { height: 88px; width: auto; display: block; }
-.nav-links { display: flex; gap: 28px; align-items: center; }
-.nav-links a { font-size: 14px; color: var(--muted); transition: color 0.2s; font-weight: 500; }
-.nav-links a:hover, .nav-links a.active { color: var(--gold); }
-.nav-cta {
-  background: var(--gold);
-  color: var(--bg-obsidian) !important;
-  padding: 11px 22px; border-radius: 100px;
-  font-weight: 600; font-size: 13px;
-  transition: all 0.25s;
-}
-.nav-cta:hover { background: #fff; }
-
-/* PAGE-HEAD */
-.page-head { padding: 96px 0 56px; text-align: center; }
-.page-head .eyebrow {
-  display: inline-block;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; letter-spacing: 0.22em;
-  color: var(--gold); font-weight: 500;
-  text-transform: uppercase; margin-bottom: 22px;
-}
-.page-head h1 {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(38px, 5.5vw, 60px);
-  font-weight: 500; letter-spacing: -0.03em;
-  line-height: 1.05; margin: 0 0 22px;
-  max-width: 780px; margin-left: auto; margin-right: auto;
-}
-.page-head h1 .accent {
-  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-style: italic; font-weight: 600;
-}
-.page-head .lead {
-  font-size: 18px; color: var(--muted);
-  max-width: 660px; margin: 0 auto;
-  line-height: 1.65;
-}
-
-/* TOC */
-.toc {
-  background: var(--bg-card);
-  border: 1px solid var(--gold-border);
-  border-radius: 16px;
-  padding: 28px 36px;
-  margin: 24px auto 64px;
-  max-width: 800px;
-  backdrop-filter: blur(10px);
-}
-.toc-title {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; letter-spacing: 0.18em;
-  color: var(--gold); font-weight: 500;
-  text-transform: uppercase; margin-bottom: 18px;
-}
-.toc ul { list-style: none; padding: 0; columns: 2; column-gap: 32px; }
-.toc ul li { font-size: 14px; padding: 7px 0; break-inside: avoid; }
-.toc ul li a {
-  color: var(--muted); transition: color 0.2s;
-  display: inline-flex; align-items: baseline; gap: 10px;
-}
-.toc ul li a:hover { color: var(--gold); }
-.toc ul li a span {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; color: var(--gold); font-weight: 500;
-}
-@media (max-width: 600px) { .toc ul { columns: 1; } }
-
-/* CONTENT */
-.content { padding: 0 0 80px; }
-article.section {
-  margin: 0 auto 80px;
-  scroll-margin-top: 110px;
-}
-article.section .eyebrow {
-  display: inline-block;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; letter-spacing: 0.22em;
-  color: var(--gold); font-weight: 500;
-  text-transform: uppercase; margin-bottom: 14px;
-}
-article.section .eyebrow .anchor {
-  display: inline-block; margin-right: 10px;
-  font-weight: 500;
-}
-article.section h2 {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(28px, 3.5vw, 40px);
-  font-weight: 600; letter-spacing: -0.022em;
-  line-height: 1.12; margin: 0 0 22px;
-}
-article.section h2 .gold {
-  background: linear-gradient(135deg, var(--gold), var(--gold-bright));
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-style: italic;
-}
-article.section h3 {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 20px; font-weight: 600;
-  letter-spacing: -0.01em;
-  margin: 36px 0 14px;
-  color: var(--gold);
-}
-article.section p {
-  font-size: 16px; color: var(--muted);
-  margin: 0 0 20px; line-height: 1.75;
-}
-article.section p:last-child { margin-bottom: 0; }
-article.section strong { color: var(--text); font-weight: 600; }
-article.section em { color: var(--gold-bright); font-style: italic; font-weight: 500; }
-article.section ul, article.section ol { margin: 0 0 22px 0; padding-left: 22px; }
-article.section ul li, article.section ol li {
-  font-size: 15.5px; color: var(--muted);
-  margin: 10px 0; line-height: 1.7;
-  padding-left: 8px;
-}
-article.section ul li::marker { color: var(--gold); }
-
-article.section .pull {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 22px; color: var(--text);
-  font-style: italic; line-height: 1.5;
-  margin: 28px 0;
-  padding: 24px 32px;
-  border-left: 3px solid var(--gold);
-  background: linear-gradient(90deg, rgba(201,168,76,0.07), transparent);
-  border-radius: 4px;
+@media(max-width:480px){
+.lu-toc-grid{grid-template-columns:1fr}
+.lu-hero h2{font-size:30px}
 }
 
-article.section .info-card {
-  background: var(--bg-card);
-  border: 1px solid var(--gold-border);
-  border-radius: 14px;
-  padding: 22px 28px;
-  margin: 28px 0;
-}
-article.section .info-card h4 {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; letter-spacing: 0.14em;
-  color: var(--gold); text-transform: uppercase;
-  margin: 0 0 10px;
-}
-article.section .info-card p {
-  font-size: 14.5px; color: var(--muted);
-  margin: 0; line-height: 1.65;
-}
-
-article.section .stat-row {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 16px; margin: 32px 0;
-}
-.stat-tile {
-  background: var(--bg-card);
-  border: 1px solid var(--gold-border);
-  border-radius: 12px;
-  padding: 22px 20px;
-  text-align: center;
-}
-.stat-tile-num {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 30px; font-weight: 700;
-  background: linear-gradient(135deg, var(--gold), var(--gold-bright));
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: -0.025em; line-height: 1;
-  margin-bottom: 6px;
-}
-.stat-tile-lbl {
-  font-size: 12px; color: var(--muted);
-  letter-spacing: 0.04em;
-}
-
-/* CTA */
-.cta-block {
-  background: linear-gradient(135deg, rgba(201,168,76,0.10), rgba(201,168,76,0.04));
-  border: 1px solid var(--gold-border);
-  border-radius: 20px;
-  padding: 48px 40px;
-  margin: 70px auto 0;
-  text-align: center;
-  max-width: 760px;
-}
-.cta-block h3 {
-  font-family: 'Space Grotesk', sans-serif !important;
-  font-size: clamp(28px, 4vw, 38px) !important;
-  font-weight: 600; letter-spacing: -0.02em;
-  margin: 0 0 14px !important;
-  line-height: 1.15;
-}
-.cta-block h3 em {
-  background: linear-gradient(135deg, var(--gold), var(--gold-bright));
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-style: italic;
-}
-.cta-block p {
-  font-size: 16px !important;
-  color: var(--muted) !important;
-  margin: 0 0 28px !important;
-  max-width: 540px; margin-left: auto !important; margin-right: auto !important;
-}
-.btn-primary {
-  background: var(--gold);
-  color: var(--bg-obsidian) !important;
-  padding: 16px 32px; border-radius: 100px;
-  font-weight: 600; font-size: 14px;
-  letter-spacing: 0.03em;
-  display: inline-flex; align-items: center; gap: 10px;
-  transition: all 0.25s;
-  text-decoration: none;
-  box-shadow: 0 6px 24px rgba(201, 168, 76, 0.25);
-}
-.btn-primary:hover {
-  background: #fff;
-  transform: translateX(3px);
-  box-shadow: 0 12px 32px rgba(201, 168, 76, 0.35);
-}
-.btn-secondary {
-  background: transparent;
-  color: var(--text) !important;
-  padding: 16px 32px; border-radius: 100px;
-  border: 1px solid var(--gold-border);
-  font-weight: 500; font-size: 14px;
-  display: inline-flex; align-items: center; gap: 10px;
-  text-decoration: none;
-  transition: all 0.25s;
-  margin-left: 8px;
-}
-.btn-secondary:hover { border-color: var(--gold); color: var(--gold) !important; }
-
-/* FOOTER */
-.footer {
-  background: var(--bg-steel);
-  border-top: 1px solid var(--border);
-  padding: 56px 0 32px;
-  margin-top: 70px;
-}
-.footer-grid {
-  display: grid;
-  grid-template-columns: 1.4fr 0.9fr 0.9fr 0.9fr 1.1fr;
-  gap: 36px; margin-bottom: 40px;
-}
-.footer-logo { height: 68px; width: auto; margin-bottom: 16px; }
-.footer-tagline {
-  font-size: 13px; color: var(--muted);
-  line-height: 1.6; max-width: 320px;
-}
-.footer-col h4 {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; letter-spacing: 0.15em;
-  text-transform: uppercase; color: var(--gold);
-  font-weight: 500; margin-bottom: 16px;
-}
-.footer-col a {
-  display: block; font-size: 13px; color: var(--muted);
-  margin-bottom: 8px; transition: color 0.2s;
-}
-.footer-col a:hover { color: var(--gold); }
-
-.footer-mail {
-  display: block !important;
-  padding: 10px 12px;
-  margin-bottom: 10px !important;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.025);
-  border: 1px solid var(--border);
-  transition: all 0.25s !important;
-  text-decoration: none;
-}
-.footer-mail:hover {
-  background: var(--gold-soft);
-  border-color: var(--gold-border);
-  transform: translateX(2px);
-}
-.footer-mail .footer-mail-label {
-  display: block;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 3px;
-  font-weight: 500;
-}
-.footer-mail .footer-mail-addr {
-  display: block;
-  font-size: 12.5px;
-  color: var(--text);
-  font-weight: 500;
-  word-break: break-all;
-}
-.footer-mail:hover .footer-mail-addr { color: var(--gold-bright); }
-.footer-bottom {
-  border-top: 1px solid var(--border);
-  padding-top: 24px;
-  display: flex; justify-content: space-between;
-  font-size: 12px; color: var(--dim);
-  flex-wrap: wrap; gap: 12px;
-}
-
-/* Reveal */
-.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
-.reveal.is-visible { opacity: 1; transform: translateY(0); }
-
-@media (max-width: 1024px) {
-  .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
-  article.section .stat-row { grid-template-columns: 1fr; }
-}
-@media (max-width: 720px) {
-  .nav-links a:not(.nav-cta) { display: none; }
-  .nav-logo { height: 56px; }
-  .page-head { padding: 56px 0 40px; }
-  .footer-grid { grid-template-columns: 1fr; }
-  .footer-logo { height: 50px; }
-  .cta-block { padding: 36px 24px; }
-  .btn-secondary { margin-left: 0; margin-top: 12px; }
-}
+/* v1559 · Gewicht je Score-Bereich und der Plan-Hinweis am Kapitelende. */
+.gew{display:inline-block;font:700 9px/1 var(--mono);letter-spacing:.1em;
+  background:rgba(201,168,76,.16);color:var(--gdi);padding:3px 7px;margin:0 6px;
+  vertical-align:middle;border-radius:20px}
+.lu-sec .lu-note{margin-top:20px;padding:12px 16px;background:rgba(201,168,76,.08);
+  border-left:3px solid var(--gd);font-size:14px;color:var(--inkm)}
+.lu-sec.lu-light .lu-note{background:rgba(201,168,76,.1)}
+.lu-list li em{font-style:normal;color:var(--gdi);font-weight:600}
 </style>
-</head>
-<body>
+</head><body>
 
-<div class="bg-animated" aria-hidden="true">
-  <canvas class="bg-particles" id="bg-particles"></canvas>
-  <div class="bg-orb bg-orb-1"></div>
-  <div class="bg-orb bg-orb-2"></div>
-</div>
+<svg style="display:none" aria-hidden="true">
+<symbol id="i-haus" viewBox="0 0 24 24"><path d="M3 21V10l9-7 9 7v11"/><path d="M9 21v-6h6v6"/><path d="M3 21h18"/></symbol>
+<symbol id="i-blitz" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></symbol>
+<symbol id="i-globus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></symbol>
+<symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="1"/><rect x="3" y="13" width="18" height="7" rx="1"/><path d="M7 7.5h.01M7 16.5h.01"/></symbol>
+<symbol id="i-schild" viewBox="0 0 24 24"><path d="M12 2 4 5.5v6c0 5 3.4 8.9 8 10.5 4.6-1.6 8-5.5 8-10.5v-6L12 2Z"/><path d="m9 12 2.2 2.2L15.5 10"/></symbol>
+<symbol id="i-schloss" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="1.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="i-pokal" viewBox="0 0 24 24"><path d="M7 3h10v6a5 5 0 0 1-10 0V3Z"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3M9 21h6M12 14v7"/></symbol>
+<symbol id="i-ebenen" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5M3 18l9 5 9-5"/></symbol>
+<symbol id="i-handy" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18.5h2"/></symbol>
+<symbol id="i-pfeil" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></symbol>
+<symbol id="i-buch" viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 0 4 22.5V4.5Z"/><path d="M8 7h8M8 11h6"/></symbol>
+<symbol id="i-ziel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/></symbol>
+<symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6"/><path d="M5 10v8m5-8v8m4-8v8m5-8v8M3 21h18"/></symbol>
+<symbol id="i-frage" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.3a2.9 2.9 0 0 1 5.6 1c0 1.9-2.8 2.4-2.8 4M12 17.5h.01"/></symbol>
+<symbol id="i-blitz2" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></symbol>
+</svg>
 
-<div class="page-content">
 
-<nav class="nav">
-  <div class="nav-inner">
-    <a href="index.html" class="nav-brand">
-      <img src="assets/dealpilot-logo.png" alt="DealPilot by Junker Immobilien" class="nav-logo">
-    </a>
-    <div class="nav-links">
-      <a href="index.html#workflow">So funktioniert's</a>
-      <a href="leistungsumfang.html" class="active">Leistungsumfang</a>
-      <a href="index.html#pricing">Preise</a>
-      <a href="https://app.dealpilot.junker-immobilien.io/">Login</a>
-      <a href="https://app.dealpilot.junker-immobilien.io/?register=1" class="nav-cta">Kostenlos starten →</a>
+<div class="tb"><div class="wrap">
+  <span class="pkt"><i></i>4 WOCHEN PRO — OHNE ZAHLUNGSDATEN</span>
+  <span class="pkt"><i></i>MONATLICH KÜNDBAR</span>
+  <span class="pkt hidemid"><i></i>KEINE BEWERTUNG VERFÄLLT</span>
+  <div class="rechts">
+    <span class="nz">&gt; <b data-nutzer data-zaehl>866</b> NUTZER</span><a href="mailto:info@dealpilot.immo">INFO@DEALPILOT.IMMO</a>
+    <a href="mailto:support@dealpilot.immo">SUPPORT</a>
+  </div>
+</div></div>
+
+<nav class="nav"><div class="wrap">
+  <a class="mark mark-gross" href="/"><span class="wort">Deal<b>Pilot</b></span></a>
+  <button class="burger" aria-label="Menü"><span></span><span></span><span></span></button>
+  <ul>
+    <li><a href="dp2.html#workflow">So funktioniert's</a></li>
+    <li><a href="dp2.html#features">Funktionen<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="dp2.html#features"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Die 19 Module</b><span>Von Boarding über Deal Score bis Bankexport</span></span></a></li>
+        <li><a href="leistungsumfang.html" class="hier"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Leistungsumfang</b><span>Alle 18 Kapitel ausführlich — was jedes Modul kann</span></span></a></li>
+        <li><a href="dp2.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Cockpit-Matrix</b><span>Jede Funktion, jeder Tarif — im Vergleich</span></span></a></li>
+        <li><a href="api.html"><svg class="ico si"><use href="#i-code"/></svg><span><b>API</b><span>REST-Schnittstelle, voller CRUD — im Pro-Plan</span></span></a></li>
+      </ul></li>
+    <li><a href="dp2.html#stories">Stories</a></li>
+    <li><a href="dp2.html#pricing">Preise<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="dp2.html#pricing"><svg class="ico si"><use href="#i-bank"/></svg><span><b>Einzelplatz</b><span>Vier Pakete von kostenlos bis Pro</span></span></a></li>
+        <li><a href="dp2.html#partner-plan"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>Ihre Mandanten unter Ihrer Marke</span></span></a></li>
+        <li><a href="dp2.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Alles im Vergleich</b><span>Die vollständige Matrix</span></span></a></li>
+      </ul></li>
+    <li><a href="dp2.html#partner">Partner</a></li>
+    <li><a href="sicherheit.html">Sicherheit<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="sicherheit.html"><svg class="ico si"><use href="#i-schild"/></svg><span><b>Daten &amp; Server</b><span>Hetzner, DSGVO, was gespeichert wird</span></span></a></li>
+        <li><a href="fragen.html"><svg class="ico si"><use href="#i-frage"/></svg><span><b>Häufige Fragen</b><span>Die Antworten, die wir sonst am Telefon geben</span></span></a></li>
+      </ul></li>
+  </ul>
+  <a class="b-log" href="https://app.dealpilot.immo/">Anmelden</a>
+  <a class="b-cta" href="https://app.dealpilot.immo/?register=1">Kostenlos starten</a>
+</div></nav>
+
+
+<main>
+  <section class="sec sec-dark" id="lu-hero" style="padding-top:44px">
+    <div class="wrap">
+      <div class="lu-hero">
+        <span class="eye">// Alles, was an Bord ist</span>
+        <h2>Vom Fund <span class="ac">bis zur Bank.</span></h2>
+        <p class="lu-hero-lead">Jede Zahl, die z&auml;hlt &mdash; in einem Cockpit. Vom Expos&eacute; bis zum bankfertigen Investment-Case: Flugdaten statt Bauchgef&uuml;hl.</p>
+        <div class="lu-hero-stats">
+          <div class="lhs"><b>22</b><span>Module</span></div>
+          <div class="lhs"><b>24</b><span>KPIs im Score</span></div>
+          <div class="lhs"><b>4</b><span>Analyse-Phasen</span></div>
+          <div class="lhs"><b>15&nbsp;J</b><span>Cashflow-Projektion</span></div>
+        </div>
+        <div class="lu-toc">
+          <div class="lu-toc-h">Inhaltsverzeichnis <span>&mdash; direkt anspringen</span></div>
+          <div class="lu-toc-grid"><a class="lu-toc-item" href="#lu-warum"><span class="n">01</span><span class="t">Warum DealPilot existiert</span></a><a class="lu-toc-item" href="#lu-einstieg"><span class="n">02</span><span class="t">Drei Wege zur Analyse</span></a><a class="lu-toc-item" href="#lu-quick-check"><span class="n">03</span><span class="t">Boarding im Detail</span></a><a class="lu-toc-item" href="#lu-pdf-import"><span class="n">04</span><span class="t">PDF-Import &amp; KI-Extraktion</span></a><a class="lu-toc-item" href="#lu-objekt"><span class="n">05</span><span class="t">Objekt-Erfassung &amp; Lage</span></a><a class="lu-toc-item" href="#lu-investition"><span class="n">06</span><span class="t">Investitionsmodul &amp; 15-%-Regel</span></a><a class="lu-toc-item" href="#lu-miete"><span class="n">07</span><span class="t">Miete &amp; Marktvergleich</span></a><a class="lu-toc-item" href="#lu-werbungskosten"><span class="n">08</span><span class="t">Werbungskostenrechner</span></a><a class="lu-toc-item" href="#lu-finanzierung"><span class="n">09</span><span class="t">Finanzierung &amp; Anschlusstest</span></a><a class="lu-toc-item" href="#lu-bewirtschaftung"><span class="n">10</span><span class="t">Bewirtschaftungskosten</span></a><a class="lu-toc-item" href="#lu-dealscore"><span class="n">11</span><span class="t">Investor Deal Score 2.0</span></a><a class="lu-toc-item" href="#lu-ki-analyse"><span class="n">12</span><span class="t">KI-Investment-Analyse</span></a><a class="lu-toc-item" href="#lu-exports"><span class="n">13</span><span class="t">Bankexport &amp; Investment-Case</span></a><a class="lu-toc-item" href="#lu-portfolio"><span class="n">14</span><span class="t">Portfolio &amp; Track-Record</span></a><a class="lu-toc-item" href="#lu-daten"><span class="n">15</span><span class="t">Datensicherheit &amp; Hosting</span></a><a class="lu-toc-item" href="#lu-steuer"><span class="n">16</span><span class="t">Steuer-Modul &amp; AfA</span></a><a class="lu-toc-item" href="#lu-marktdaten"><span class="n">17</span><span class="t">Marktdaten &amp; Marktwert</span></a><a class="lu-toc-item" href="#lu-rnd"><span class="n">18</span><span class="t">RND-Gutachten</span></a><a class="lu-toc-item" href="#lu-sprechlauf"><span class="n">19</span><span class="t">Sprechlauf</span></a><a class="lu-toc-item" href="#lu-beleg"><span class="n">20</span><span class="t">Beleg-Import</span></a><a class="lu-toc-item" href="#lu-datenraum"><span class="n">21</span><span class="t">Datenraum</span></a><a class="lu-toc-item" href="#lu-dealaktion"><span class="n">22</span><span class="t">Deal-Aktion &amp; Netzwerk</span></a></div>
+        </div>
+      </div>
     </div>
-  </div>
-</nav>
+  </section>
+  <hr class="rws">
 
-<section class="page-head">
-  <div class="container">
-    <span class="eyebrow">// Leistungsumfang im Detail</span>
-    <h1>Was DealPilot <span class="accent">wirklich kann.</span></h1>
-    <p class="lead">
-      Jedes Modul, jede Berechnung, jede Annahme — ausführlich erklärt, mit Praxisbezug.
-      Damit du <strong>vor</strong> dem Check-in weißt, was du bekommst.
-    </p>
-  </div>
-</section>
-
-<section class="container">
-  <div class="toc">
-    <div class="toc-title">Inhaltsverzeichnis</div>
-    <ul>
-      <li><a href="#warum"><span>01</span> Warum DealPilot existiert</a></li>
-      <li><a href="#einstieg"><span>02</span> Drei Wege zur Analyse</a></li>
-      <li><a href="#quick-check"><span>03</span> Boarding im Detail</a></li>
-      <li><a href="#pdf-import"><span>04</span> PDF-Import &amp; KI-Extraktion</a></li>
-      <li><a href="#objekt"><span>05</span> Objekt-Erfassung &amp; Lage</a></li>
-      <li><a href="#investition"><span>06</span> Investitionsmodul &amp; 15-%-Regel</a></li>
-      <li><a href="#miete"><span>07</span> Miete &amp; Marktvergleich</a></li>
-      <li><a href="#werbungskosten"><span>08</span> Werbungskostenrechner</a></li>
-      <li><a href="#finanzierung"><span>09</span> Finanzierung &amp; Anschlusstest</a></li>
-      <li><a href="#bewirtschaftung"><span>10</span> Bewirtschaftungskosten</a></li>
-      <li><a href="#dealscore"><span>11</span> Investor Deal Score 2.0</a></li>
-      <li><a href="#ki-analyse"><span>12</span> KI-Investment-Analyse</a></li>
-      <li><a href="#exports"><span>13</span> Bankexport &amp; Investment-Case</a></li>
-      <li><a href="#portfolio"><span>14</span> Portfolio &amp; Track-Record</a></li>
-      <li><a href="#daten"><span>15</span> Datensicherheit &amp; Hosting</a></li>
-      <li><a href="#steuer"><span>16</span> Steuer-Modul &amp; AfA</a></li>
-      <li><a href="#marktdaten"><span>17</span> Marktdaten &amp; Marktwert</a></li>
-      <li><a href="#rnd"><span>18</span> RND-Gutachten</a></li>
-    </ul>
-  </div>
-</section>
-
-<section class="content">
-  <div class="container">
-
-    <article class="section reveal" id="warum">
+  <!-- LU-§ warum -->
+  <section class="sec sec-dark lu-ed" id="lu-warum">
+    <div class="wrap">
       <span class="eyebrow"><span class="anchor">01</span>Warum DealPilot existiert</span>
       <h2>Bauchgefühl ist ein guter Anfang. Aber <span class="gold">kein Schluss.</span></h2>
       <p>
@@ -481,9 +258,13 @@ article.section .stat-row {
         <h4>Wichtiger Hinweis</h4>
         <p>DealPilot ersetzt keine Steuer- oder Finanzberatung. Für individuelle steuerliche und finanzielle Fragen wende dich bitte an einen Steuerberater oder Finanzdienstleister. Alle Berechnungen sind Annahmen auf Basis deiner Eingaben.</p>
       </div>
-    </article>
+    </div>
+  </section>
+  <hr class="rws">
 
-    <article class="section reveal" id="einstieg">
+  <!-- LU-§ einstieg -->
+  <section class="sec sec-dark lu-ed light" id="lu-einstieg">
+    <div class="wrap">
       <span class="eyebrow"><span class="anchor">02</span>Drei Wege zur Analyse</span>
       <h2>Du bestimmst die <span class="gold">Tiefe.</span></h2>
       <p>
@@ -495,10 +276,10 @@ article.section .stat-row {
         Du tippst sechs Zahlen ein: Kaufpreis, Wohnfläche, Nettokaltmiete, Eigenkapital, Zinssatz, Tilgung. DealPilot rechnet sofort: Bruttomietrendite, Faktor, monatliche Rate, Cashflow vor Steuern, LTV auf den Kaufpreis, Kaufpreis pro Quadratmeter. Eine Ampel-Bewertung zeigt dir auf den ersten Blick, ob die Eckwerte solide sind oder Schwächen haben.
       </p>
       <p>
-        Wenn dir das Ergebnis gefällt, übernimmst du die Eingaben mit einem Klick in die Vollberechnung. Wenn nicht, war es <em>eine Minute investierte Zeit</em> — und du weißt, dass dieses Objekt nicht funktioniert.
+        Wenn dir das Ergebnis gefällt, übernimmst du die Eingaben mit einem Klick in die Vollberechnung. Wenn nicht, war es <em>30 Sekunden investierte Zeit</em> — und du weißt, dass dieses Objekt nicht funktioniert.
       </p>
 
-      <h3>PDF-Import — eine Minute</h3>
+      <h3>PDF-Import — 30 Sekunden</h3>
       <p>
         Du lädst ein Exposé hoch — egal ob ImmoScout, Kleinanzeigen, ImmoWelt, Maklerexposé oder ein eigener Marktbericht. Die KI liest die strukturierten Felder aus: Adresse, PLZ, Ort, Straße, Hausnummer, Kaufpreis, Wohnfläche, Baujahr, Nettokaltmiete, Hausgeld, Nebenkosten, Energieklasse, Heizungsart. Du bekommst eine Liste extrahierter Werte mit Checkboxen und übernimmst sie per Klick.
       </p>
@@ -506,17 +287,21 @@ article.section .stat-row {
         Auch Bilder aus dem Exposé werden ausgelesen und automatisch als Objektfotos vorgeschlagen — bis zu 30 Stück, zugeschnitten und bereit für deinen späteren Investment-Case.
       </p>
 
-      <h3>Vollanalyse — 15 Minuten</h3>
+      <h3>Vollanalyse — 10 Minuten</h3>
       <p>
         Wenn du ein Objekt ernsthaft prüfen willst, gehst du alle Module der Reihe nach durch: Objekt, Investition, Miete, Werbungskosten, Finanzierung, Bewirtschaftung. Am Ende hast du eine 15-Jahres-Cashflow-Projektion, einen Investor Deal Score 2.0 aus 24 Kennzahlen, eine KI-Investment-Analyse mit Verhandlungsempfehlung und ein bankfähiges Investment-Case-PDF.
       </p>
-    </article>
+    </div>
+  </section>
+  <hr class="rws">
 
-    <article class="section reveal" id="quick-check">
+  <!-- LU-§ quick-check -->
+  <section class="sec sec-dark lu-ed" id="lu-quick-check">
+    <div class="wrap">
       <span class="eyebrow"><span class="anchor">03</span>Boarding im Detail</span>
       <h2>Sechs Zahlen. <span class="gold">Eine fundierte Sofort-Bewertung.</span></h2>
       <p>
-        Das Boarding ist nicht die abgespeckte Version der Vollanalyse — es ist eine eigenständige Methode, in unter einer Minute die Tragfähigkeit eines Deals zu bewerten. Sechs Eingabefelder, alles wird <em>live während der Eingabe</em> berechnet. Kein Klick auf „Berechnen", kein Warten.
+        Das Boarding ist nicht die abgespeckte Version der Vollanalyse — es ist eine eigenständige Methode, in unter 30 Sekunden die Tragfähigkeit eines Deals zu bewerten. Sechs Eingabefelder, alles wird <em>live während der Eingabe</em> berechnet. Kein Klick auf „Berechnen", kein Warten.
       </p>
 
       <h3>Was du eingibst</h3>
@@ -547,11 +332,15 @@ article.section .stat-row {
       <p>
         Im erweiterten Modus kannst du zusätzlich ein PDF importieren und die Werte direkt aus der KI-Extraktion übernehmen. Auch optionale Bilder-Uploads für eine erste Visualisierung sind möglich. Damit erledigst du nicht nur die Eckdaten-Prüfung schnell, sondern legst direkt den Grundstein für eine spätere Vollanalyse.
       </p>
-    </article>
+    </div>
+  </section>
+  <hr class="rws">
 
-    <article class="section reveal" id="pdf-import">
+  <!-- LU-§ pdf-import -->
+  <section class="sec sec-dark lu-ed light" id="lu-pdf-import">
+    <div class="wrap">
       <span class="eyebrow"><span class="anchor">04</span>PDF-Import &amp; KI-Extraktion</span>
-      <h2>Vom Exposé zur Kalkulation in <span class="gold">60 Sekunden.</span></h2>
+      <h2>Vom Exposé zur Bewertung in <span class="gold">30 Sekunden.</span></h2>
       <p>
         Das aufwändigste am Beginn einer Objektprüfung ist meistens nicht das Rechnen — es ist das <strong>Abtippen.</strong> Kaufpreis aus dem Exposé, Wohnfläche aus den Plänen, Miete aus dem Mietvertrag, Adresse, Baujahr, Energieklasse, Nebenkosten. Alles steht in PDFs, alles muss von Hand in Felder kopiert werden.
       </p>
@@ -587,9 +376,13 @@ article.section .stat-row {
         <h4>Datenschutz beim PDF-Import</h4>
         <p>Das PDF wird an unsere Server gesendet, dort wird der Text extrahiert und zur Strukturierung an die KI weitergereicht. Wir speichern weder das PDF noch die extrahierten Werte langfristig — sobald du sie in dein Objekt übernommen hast, sind sie nur noch in deinem persönlichen Account. Die KI-Antworten werden nicht für Training verwendet (Enterprise-API ohne Opt-In).</p>
       </div>
-    </article>
+    </div>
+  </section>
+  <hr class="rws">
 
-    <article class="section reveal" id="objekt">
+  <!-- LU-§ objekt -->
+  <section class="sec sec-dark lu-ed" id="lu-objekt">
+    <div class="wrap">
       <span class="eyebrow"><span class="anchor">05</span>Objekt-Erfassung &amp; Lage</span>
       <h2>Mehr als nur <span class="gold">Adresse und Fläche.</span></h2>
       <p>
@@ -623,9 +416,13 @@ article.section .stat-row {
       <p>
         Bis zu 30 Fotos pro Objekt — automatisch komprimiert, in einer übersichtlichen Galerie verwaltet. Sie tauchen später im Investment-Case auf dem Deckblatt und in der Objektübersicht auf.
       </p>
-    </article>
+    </div>
+  </section>
+  <hr class="rws">
 
-    <article class="section reveal" id="investition">
+  <!-- LU-§ investition -->
+  <section class="sec sec-dark lu-ed light" id="lu-investition">
+    <div class="wrap">
       <span class="eyebrow"><span class="anchor">06</span>Investitionsmodul &amp; 15-%-Regel</span>
       <h2>Kaufpreis ist nur <span class="gold">der Anfang.</span></h2>
       <p>
@@ -665,9 +462,13 @@ article.section .stat-row {
       <p>
         Möblierte Vermietung wird steuerlich über zehn Jahre abgeschrieben (linear). Du gibst den Anschaffungspreis ein, DealPilot rechnet automatisch die jährliche Abschreibung und integriert sie in die Werbungskosten-Projektion.
       </p>
-    </article>
+    </div>
+  </section>
+  <hr class="rws">
 
-    <article class="section reveal" id="miete">
+  <!-- LU-§ miete -->
+  <section class="sec sec-dark lu-ed" id="lu-miete">
+    <div class="wrap">
       <span class="eyebrow"><span class="anchor">07</span>Miete &amp; Marktvergleich</span>
       <h2>Was Vermietung <span class="gold">wirklich bringt.</span></h2>
       <p>
@@ -694,9 +495,13 @@ article.section .stat-row {
       <p>
         Mieterhöhungs-Annahmen über 15 Jahre fließen automatisch in die Cashflow-Projektion ein. Du kannst entweder eine konstante prozentuale Steigerung pro Jahr annehmen (typisch 1–2 %) oder Staffelmieten manuell eintragen. DealPilot rechnet dann die exakte Mieteinnahme pro Jahr durch.
       </p>
-    </article>
+    </div>
+  </section>
+  <hr class="rws">
 
-    <article class="section reveal" id="werbungskosten">
+  <!-- LU-§ werbungskosten -->
+  <section class="sec sec-dark lu-ed light" id="lu-werbungskosten">
+    <div class="wrap">
       <span class="eyebrow"><span class="anchor">08</span>Werbungskostenrechner</span>
       <h2>Was die Vermietung an <span class="gold">Werbungskosten erzeugt.</span></h2>
       <p>
@@ -722,9 +527,13 @@ article.section .stat-row {
         <h4>Keine Steuerberatung</h4>
         <p>Das Werbungskostenmodul zeigt nur die <em>wirtschaftlichen Auswirkungen</em> der eingegebenen Positionen. Es ersetzt keine steuerliche Würdigung deiner individuellen Situation. Für die tatsächliche Anerkennung von Werbungskosten ist immer der Steuerberater zuständig.</p>
       </div>
-    </article>
+    </div>
+  </section>
+  <hr class="rws">
 
-    <article class="section reveal" id="finanzierung">
+  <!-- LU-§ finanzierung -->
+  <section class="sec sec-dark lu-ed" id="lu-finanzierung">
+    <div class="wrap">
       <span class="eyebrow"><span class="anchor">09</span>Finanzierung &amp; Anschlusstest</span>
       <h2>Von Annuität bis <span class="gold">Tilgungsaussetzung.</span></h2>
       <p>
@@ -763,9 +572,13 @@ article.section .stat-row {
       <p>
         Wer mit Tilgungsaussetzung arbeitet, hat in der Regel einen Bausparvertrag als Tilgungsträger. DealPilot bildet den vollen Bausparvertrag-Lebenszyklus ab: Ansparphase, Zuteilungs-Zeitpunkt (auf Basis der Mindest-Quote), Darlehensphase mit dem zugesagten Sollzins. <strong>Wenn die Bausparsumme nicht reicht, um das Tilgungsaussetzungsdarlehen abzulösen, warnt dich die App</strong> — das ist die kritische Lücke, die viele Investoren übersehen.
       </p>
-    </article>
+    </div>
+  </section>
+  <hr class="rws">
 
-    <article class="section reveal" id="bewirtschaftung">
+  <!-- LU-§ bewirtschaftung -->
+  <section class="sec sec-dark lu-ed light" id="lu-bewirtschaftung">
+    <div class="wrap">
       <span class="eyebrow"><span class="anchor">10</span>Bewirtschaftungskosten</span>
       <h2>Was die Vermietung <span class="gold">wirklich kostet.</span></h2>
       <p>
@@ -787,9 +600,13 @@ article.section .stat-row {
       <p>
         Für Mietausfall gibt es einen separaten Risikoaufschlag (typisch 2–5 % der Jahresmiete), der direkt in die Cashflow-Projektion einfließt. So sind 1–2 Monate Leerstand pro Mieterwechsel realistisch eingepreist — etwas, das in der Excel-Welt oft komplett übersehen wird.
       </p>
-    </article>
+    </div>
+  </section>
+  <hr class="rws">
 
-    <article class="section reveal" id="dealscore">
+  <!-- LU-§ dealscore -->
+  <section class="sec sec-dark lu-ed" id="lu-dealscore">
+    <div class="wrap">
       <span class="eyebrow"><span class="anchor">11</span>Investor Deal Score 2.0</span>
       <h2>24 KPIs <span class="gold">auf einer Skala.</span></h2>
       <p>
@@ -813,11 +630,11 @@ article.section .stat-row {
 
       <h3>Die fünf Bereiche</h3>
       <ul>
-        <li><strong>Rendite</strong> — Bruttomietrendite, Nettomietrendite, Cash-on-Cash, Eigenkapitalrendite, IRR über 15 Jahre, Equity Multiple</li>
-        <li><strong>Cashflow</strong> — Monatlicher Cashflow vor und nach Werbungskosten, Cashflow-Stabilität über die Laufzeit, Pufferkapazität, Mietausfall-Toleranz</li>
-        <li><strong>Finanzierung</strong> — DSCR (Debt Service Coverage Ratio), LTV (Loan to Value), Zinssatz, Tilgung, Eigenkapitalquote, Anschlussfinanzierungs-Risiko</li>
-        <li><strong>Risiko</strong> — Leerstand, Instandhaltungsbedarf, Energieklasse, Baujahr/Zustand, Mietausfall-Risiko, Energie-Risiken</li>
-        <li><strong>Potenzial</strong> — Marktfaktor, Wertsteigerungs-Potenzial, Mietsteigerungs-Möglichkeiten, Wertpuffer (Marktwert vs. Kaufpreis)</li>
+        <li><strong>Rendite</strong> <span class="gew">35 %</span> — Bruttorendite, Nettorendite, Cashflow je Monat, Cash-on-Cash</li>
+        <li><strong>Finanzierung</strong> <span class="gew">25 %</span> — DSCR, LTV, Zinssatz, Tilgung, Eigenkapitalbedarf</li>
+        <li><strong>Risiko</strong> <span class="gew">20 %</span> — Leerstand, Instandhaltung, Baujahr und Zustand, Energieklasse, Mietausfall-Risiko, Qualität &amp; Zustand</li>
+        <li><strong>Lage &amp; Markt</strong> <span class="gew">10 %</span> — Ist- gegen Marktmiete, Mietwachstum pro Jahr, Bevölkerung, Nachfrage, Mikrolage</li>
+        <li><strong>Potenzial</strong> <span class="gew">10 %</span> — Mietsteigerungs-Potenzial, Faktor gegen Markt, Wertsteigerung, Entwicklungsmöglichkeiten</li>
       </ul>
 
       <h3>Wie die Bewertung funktioniert</h3>
@@ -839,9 +656,13 @@ article.section .stat-row {
         <h4>Free vs. Bezahl-Pläne</h4>
         <p>Im Free-Plan siehst du eine Demo-Version des Deal Score 2.0 (mit Beispielwerten). Der volle Score mit echten Werten aus deinem Objekt ist ab dem Investor-Plan verfügbar. Im Starter-Plan gibt es einen reduzierten 5-Faktoren-Score.</p>
       </div>
-    </article>
+    </div>
+  </section>
+  <hr class="rws">
 
-    <article class="section reveal" id="ki-analyse">
+  <!-- LU-§ ki-analyse -->
+  <section class="sec sec-dark lu-ed light" id="lu-ki-analyse">
+    <div class="wrap">
       <span class="eyebrow"><span class="anchor">12</span>KI-Investment-Analyse</span>
       <h2>Ein erfahrener Berater, <span class="gold">der nie müde wird.</span></h2>
       <p>
@@ -869,11 +690,18 @@ article.section .stat-row {
         DealPilot rechnet in <strong>Bewertungen</strong> — und zwar getrennt nach Art, weil sie unterschiedlich aufwendig sind: die <strong>Marktpreisindikation</strong> als schneller Marktabgleich, die <strong>erweiterte Marktpreisindikation</strong> mit Vergleichswerten und Korridor, und die <strong>Wertermittlung nach ImmoWertV</strong> als vollständiges Verfahren mit Modellvermerken. Jede Art hat ihr eigenes Kontingent. Wir rechnen so statt mit einer Flatrate, weil die Verfahren für uns echte Kosten bedeuten — und ein Pauschalmodell entweder zu teuer für Gelegenheitsnutzer wäre oder zu beschränkt für Power-Nutzer.
       </p>
       <p>
-        Dein Plan setzt die Kontingente jeden Monat neu (Starter: 5 Marktpreisindikationen, Investor zusätzlich 5 erweiterte, Pro zusätzlich 5 Wertermittlungen). <strong>Was du im Monat nicht nutzt, verfällt zum Monatsende</strong> — das Kontingent gehört zum Plan, nicht auf ein Konto. Brauchst du mehr, kaufst du nach: dein Monatskontingent noch einmal für ein Viertel deines Monatsbeitrags (Starter 5,00 €, Investor 8,75 €, Pro 12,50 €) — oder einzeln ab 0,90 € für eine Marktpreisindikation. Zugekaufte Bewertungen verfallen nie und werden zuletzt verbraucht. Die kleinen KI-Hilfen — Spracheingabe, Beleg-Import, Bodenrichtwert, Feldvorschläge — sind in jedem Plan enthalten und zählen gegen kein Kontingent.
+        Dein Plan setzt die Kontingente jeden Monat neu (Starter: 5 Marktpreisindikationen, Investor zusätzlich 5 erweiterte, Pro zusätzlich 5 Wertermittlungen). <strong>Was du im Monat nicht nutzt, verfällt zum Monatsende</strong> — das Kontingent gehört zum Plan, nicht auf ein Konto. Brauchst du mehr, kaufst du nach: dein Monatskontingent noch einmal für ein Viertel deines Monatsbeitrags (Starter 5,00 €, Investor 8,75 €, Pro 12,50 €) — oder einzeln ab 0,90 € für eine Marktpreisindikation. Zugekaufte Bewertungen verfallen nie und werden zuletzt verbraucht.
       </p>
-    </article>
+      <p>
+        Die kleinen KI-Hilfen — Spracheingabe, Bodenrichtwert-Abruf und Feldvorschläge — sind <strong>in jedem Plan enthalten</strong> und zählen gegen kein Kontingent.
+      </p>
+    </div>
+  </section>
+  <hr class="rws">
 
-    <article class="section reveal" id="exports">
+  <!-- LU-§ exports -->
+  <section class="sec sec-dark lu-ed" id="lu-exports">
+    <div class="wrap">
       <span class="eyebrow"><span class="anchor">13</span>Bankexport &amp; Investment-Case</span>
       <h2>Bankfähig in <span class="gold">unter einer Minute.</span></h2>
       <p>
@@ -912,9 +740,13 @@ article.section .stat-row {
       <p>
         Wer mit eigenen Excel-Tools weiterarbeiten will, kann jedes Objekt als CSV oder XLSX exportieren. Der <strong>Bankexport</strong> ist ein spezielles Format mit 25 Spalten pro Objekt — Datum, Adresse, Bank, Vertragsnummer, Darlehenssumme, Zins, Tilgung, Kapitaldienst, Zinsbindung, Restschuld etc. — im Format, das die meisten Banken in Deutschland zur Aufstellung von Immobilien-Engagements erwarten.
       </p>
-    </article>
+    </div>
+  </section>
+  <hr class="rws">
 
-    <article class="section reveal" id="portfolio">
+  <!-- LU-§ portfolio -->
+  <section class="sec sec-dark lu-ed light" id="lu-portfolio">
+    <div class="wrap">
       <span class="eyebrow"><span class="anchor">14</span>Portfolio &amp; Track-Record</span>
       <h2>Vom Einzelobjekt <span class="gold">zum Bestand.</span></h2>
       <p>
@@ -935,9 +767,13 @@ article.section .stat-row {
       <p>
         Das Portfolio-Cockpit aggregiert dein gesamtes Portfolio auf einen Blick: ein <strong>investitionsvolumen-gewichteter Gesamt-Score</strong> über alle gekauften Objekte, dazu Cashflow, Restschuld und Finanzierungskennzahlen als Portfolio-Summen — mit Objekt-Selektor für den schnellen Wechsel ins Detail. Das Cockpit gibt es in Hell und Dunkel und du kannst es als Startansicht festlegen.
       </p>
-    </article>
+    </div>
+  </section>
+  <hr class="rws">
 
-    <article class="section reveal" id="daten">
+  <!-- LU-§ daten -->
+  <section class="sec sec-dark lu-ed" id="lu-daten">
+    <div class="wrap">
       <span class="eyebrow"><span class="anchor">15</span>Datensicherheit &amp; Hosting</span>
       <h2>Deutsche Daten. <span class="gold">Deutsche Server.</span></h2>
       <p>
@@ -956,12 +792,13 @@ article.section .stat-row {
       <p>
         Im Pro-Plan kannst du dein gesamtes Portfolio als JSON-Datei exportieren — als Backup oder zum Übertragen in eine andere Installation. Der Import funktioniert genauso einfach: JSON-Datei reinziehen, Objekte werden übernommen. (JSON-Objektsicherung ist Teil des Pro-Plans.)
       </p>
-    </article>
+    </div>
+  </section>
+  <hr class="rws">
 
-<!-- v498: CTA ans Seitenende verschoben -->
-
-
-    <article class="section reveal" id="steuer"><!-- v497 -->
+  <!-- LU-§ steuer -->
+  <section class="sec sec-dark lu-ed light" id="lu-steuer">
+    <div class="wrap"><!-- v497 -->
       <span class="eyebrow"><span class="anchor">16</span>Steuer-Modul &amp; AfA</span>
       <h2>Die Steuer rechnet <span class="gold">mit.</span></h2>
       <p>
@@ -974,9 +811,13 @@ article.section .stat-row {
         <h4>Wichtiger Hinweis</h4>
         <p>DealPilot ersetzt keine Steuerberatung. Alle steuerlichen Berechnungen sind Modellrechnungen auf Basis deiner Eingaben — für verbindliche Aussagen wende dich an deinen Steuerberater.</p>
       </div>
-    </article>
+    </div>
+  </section>
+  <hr class="rws">
 
-    <article class="section reveal" id="marktdaten">
+  <!-- LU-§ marktdaten -->
+  <section class="sec sec-dark lu-ed" id="lu-marktdaten">
+    <div class="wrap">
       <span class="eyebrow"><span class="anchor">17</span>Marktdaten &amp; Marktwert</span>
       <h2>Live-Daten statt <span class="gold">Bauchgefühl.</span></h2>
       <p>
@@ -985,9 +826,13 @@ article.section .stat-row {
       <p>
         Für die Preisfrage selbst gibt es <strong>drei Stufen</strong> — von der schnellen <strong>Marktpreisindikation</strong> über die <strong>erweiterte Indikation mit Korridor</strong> bis zur vollen <strong>Wertermittlung nach ImmoWertV</strong>, dem Verfahren, mit dem auch Sachverständige arbeiten. Jede Stufe liegt in deinem Monatskontingent; reicht es nicht, kaufst du nach, ohne zusätzliche Abo-Bindung. So siehst du schwarz auf weiß, ob der Angebotspreis im Marktkorridor liegt, bevor du verhandelst.
       </p>
-    </article>
+    </div>
+  </section>
+  <hr class="rws">
 
-    <article class="section reveal" id="rnd">
+  <!-- LU-§ rnd -->
+  <section class="sec sec-dark lu-ed light" id="lu-rnd">
+    <div class="wrap">
       <span class="eyebrow"><span class="anchor">18</span>RND-Gutachten</span>
       <h2>Restnutzungsdauer: der unterschätzte <span class="gold">AfA-Hebel.</span></h2>
       <p>
@@ -996,72 +841,320 @@ article.section .stat-row {
       <p>
         Wichtig zur Einordnung: Das Modul liefert eine <strong>grobe, nachvollziehbare Erst-Einschätzung</strong> — eine Orientierung, kein Gutachten. Für den steuerlich belastbaren Nachweis stellst du die Gutachten-Anfrage an unser Sachverständigenbüro direkt aus der App, und wir kümmern uns um den Rest. Das Einschätzungs-Modul steht ab dem Investor-Plan bereit, die Gutachten-Anfrage in jedem Plan.
       </p>
-    </article>
+      <div class="info-card">
+        <p><strong>Direkt eingebunden &mdash; in Partnerschaft mit gutachten.org.</strong> Für das rechtssichere RND-Gutachten arbeiten wir mit unserem Partner <a href="https://gutachten.org" target="_blank" rel="noopener">gutachten.org</a> zusammen: Der Anfrage stellst du aus dem RND-Modul heraus — aber <strong>DealPilot schickt nichts selbst an Dritte</strong>. Du siehst vorher genau, welche Angaben mitgehen, und sendest sie über dein eigenes Mailprogramm oder trägst sie per Zwischenablage in das Formular von gutachten.org ein. Der Status „angefragt" wird am Objekt vermerkt.</p>
+      </div>
+    </div>
+  </section>
 
-    <div class="cta-block">
-      <h3>Bereit, das in der <em>Praxis</em> zu sehen?</h3>
-      <p>Starte mit dem kostenlosen Plan — kein Kreditkarten-Zwang, kein Verkaufsgespräch. Du kannst innerhalb von Minuten dein erstes Objekt durchrechnen.</p>
-      <a href="https://app.dealpilot.junker-immobilien.io/?register=1" class="btn-primary">Kostenlos registrieren →</a>
-      <a href="index.html#pricing" class="btn-secondary">Pläne ansehen</a>
+<!-- ══ 19 · SPRECHLAUF ══════════════════════════════════════════════════
+     Marcel am 23.09.2026: "Hast du den Sprechlauf auch mit drin im
+     Leistungsumfang?" Nein - er kam nur zweimal als Wort "Spracheingabe"
+     in einer Aufzaehlung vor, obwohl voice-import.js das groesste
+     Einzelmodul der App ist. Die sechs Etappen sind aus ETAPPEN
+     (voice-import.js Z.2662) uebernommen, nicht ausgedacht. ═════════ -->
+<section class="lu-sec" id="lu-sprechlauf">
+  <div class="wrap">
+    <span class="lu-num">19</span>
+    <h2>Sprich das Objekt ein — <span class="ac">in sechs Etappen.</span></h2>
+    <p class="lu-lead">Die aufwändigste Minute einer Besichtigung ist die, in der du danach
+      im Auto sitzt und versuchst, dich zu erinnern. Der Sprechlauf nimmt dir das ab: Du
+      diktierst, was du siehst, und DealPilot füllt die Felder.</p>
+
+    <p><strong>Wo er startet:</strong> In der <strong>Pre-Flight-Leiste</strong> über dem Objekt — der Bordkarte mit den Einlese-Kacheln. Dort steht neben Exposé und Marktbericht die Kachel <strong>„Sprache"</strong>. Ein Klick, und der Sprechlauf öffnet sich.</p>
+
+    <p>Beim Öffnen steht eine Frage mit zwei Antworten — und sie wird bei <em>jedem</em> Öffnen
+      neu gestellt. Welchen Weg du beim letzten Objekt genommen hast, spielt keine Rolle:
+      ein gemerkter Modus wäre genau dann falsch, wenn er am meisten stört — beim nächsten
+      Objekt, das anders liegt als das letzte.</p>
+
+    <div class="zwei-wege">
+      <div class="weg">
+        <span class="weg-k">Weg A</span>
+        <h4>Ich erzähle frei</h4>
+        <p>Die Aufnahme startet sofort. Du redest am Stück — über das, was dir wichtig ist,
+          in deiner Reihenfolge. Danach wertet die KI aus und fragt nur noch nach, was
+          gefehlt hat.</p>
+        <p class="weg-fuer"><b>Für dich, wenn</b> du das Objekt schon kennst und einfach
+          erzählen willst.</p>
+      </div>
+      <div class="weg" id="frag-mich">
+        <span class="weg-k">Weg B</span>
+        <h4>Frag mich durch</h4>
+        <p>DealPilot führt. Es ist derselbe Fragen-Ablauf wie bei den Rückfragen — nur von
+          Anfang an und über <strong>alle</strong> Blöcke statt nur über die Lücken.
+          29 Fragen in fünf Blöcken, eine nach der anderen.</p>
+        <p class="weg-fuer"><b>Für dich, wenn</b> du nicht weißt, was DealPilot hören will —
+          oder mitten in der Besichtigung stehst.</p>
+      </div>
     </div>
 
+    <p>Der geführte Weg ist bewusst nicht starr. Du <strong>sprichst oder tippst</strong>,
+      wie es gerade passt — beides geht bei jeder Frage. <strong>„Weiß ich nicht"</strong>
+      überspringt eine Frage, ohne dass etwas Falsches eingetragen wird.
+      <strong>„Fertig"</strong> bringt dich jederzeit zur Übernahme-Tabelle, auch mitten
+      im Block — du musst nicht durchhalten, um etwas zu bekommen.</p>
+
+    <p>Und du kannst auf ein ganzes Thema antworten statt auf ein einzelnes Feld. Sagst du
+      <em>„die Adresse ist Musterweg 12 in 32105 Musterstadt"</em>, füllt das vier Felder
+      auf einmal. Dasselbe gilt für <em>Objektdaten</em>, <em>Finanzierung</em>,
+      <em>Kaufnebenkosten</em>, <em>Mieteinnahmen</em>, <em>Hausgeld</em>, <em>Grundstück</em>
+      und <em>Lage</em> — DealPilot erkennt den Sammelbegriff und hakt die Felder ab, die
+      darin vorkamen.</p>
+
+
+    <p>Der geführte Weg läuft in sechs Etappen, und <strong>jede Etappe ist für sich schon
+      ein Ergebnis</strong>:</p>
+
+    <ul class="lu-list">
+      <li><strong>1 · Basis</strong> — Objekt, Preis und Miete</li>
+      <li><strong>2 · Geld</strong> — Finanzierung und Kaufnebenkosten. <em>Hier steht dein
+        erster Deal Score.</em></li>
+      <li><strong>3 · Lage &amp; Zustand</strong> — wo es steht und wie es dasteht.
+        <em>Hier steht der Investor Deal Score.</em></li>
+      <li><strong>4 · Feinschliff</strong> — Bewirtschaftung, Entwicklung, Steuer</li>
+      <li><strong>5 · Deine Sicht</strong> — These und Risiken</li>
+      <li><strong>6 · Feinheiten</strong> — alle übrigen Felder, nur auf Wunsch</li>
+    </ul>
+
+    <p>Wer nach Etappe 2 aufhört, hat trotzdem eine Antwort auf „lohnt sich das?".</p>
+
+    <p>Während du sprichst, läuft eine Live-Mitschrift mit, und um das Mikrofon kreisen
+      Stichwörter, die verschwinden, sobald du sie gesagt hast. Ausgewertet wird immer die
+      <strong>Tonaufnahme</strong>, nicht der mitgeschriebene Text — Erkennungsfehler in der
+      Mitschrift wirken sich also nicht auf die Werte aus.</p>
+
+    <p>Am Ende bekommst du dieselbe Übernahme-Tabelle wie beim Exposé-Import: jede Zeile mit
+      Häkchen, mit Quelle, Unsicheres markiert. <strong>Erst dein Klick schreibt etwas ins
+      Objekt.</strong></p>
+
+    <div class="lu-info">
+      <h4>Eine siebte Etappe, wenn du sie willst</h4>
+      <p>Ab Pro bietet DealPilot nach den sechs Etappen eine Zusatzrunde <em>Wertermittlung</em>
+        an. Sie fragt die beiden Angaben nach, die das Sachwertverfahren nach ImmoWertV braucht
+        und die sonst nirgends vorkommen — Gebäudestandard nach Anlage 4 und Garagen-BGF — und
+        holt danach den amtlichen Sachwertfaktor deines Gutachterausschusses. Wer keine
+        Wertermittlung will, wird auch nicht danach gefragt.</p>
+    </div>
+
+    <p class="lu-note">Der Sprechlauf ist in jedem Plan enthalten und kostet kein Kontingent.</p>
   </div>
 </section>
+<hr class="rws">
 
-<footer class="footer">
-  <div class="container-wide">
-    <div class="footer-grid">
-      <div>
-        <img src="assets/dealpilot-logo.png" alt="DealPilot by Junker Immobilien" class="footer-logo">
-        <p class="footer-tagline">
-          Immobilien-Investmentanalyse für strukturierte Entscheidungen.
-          Entwickelt von Junker Immobilien · Sachverständigenbüro &amp; Projektentwicklung.
-        </p>
-      </div>
-      <div class="footer-col">
-        <h4>Produkt</h4>
-        <a href="index.html#workflow">So funktioniert's</a>
-        <a href="leistungsumfang.html">Leistungsumfang</a>
-        <a href="index.html#pricing">Preise</a>
-        <a href="https://app.dealpilot.junker-immobilien.io/">Login</a>
-        <a href="https://app.dealpilot.junker-immobilien.io/?register=1">Check-in</a>
-      </div>
-      <div class="footer-col">
-        <h4>Junker Immobilien</h4>
-        <a href="https://junker-immobilien.io">Hauptseite</a>
-        <a href="https://junker-immobilien.io/kapitalanlageimmobilien/">Kapitalanlage</a>
-        <a href="https://junker-immobilien.io/projektentwicklung/">Projektentwicklung</a>
-        <a href="https://junker-immobilien.io/sachverstaendigenbuero/">Sachverständigenbüro</a>
-        <a href="https://junker-immobilien.io/kontakt/">Kontakt</a>
-      </div>
-      <div class="footer-col">
-        <h4>Rechtliches</h4>
-        <a href="https://junker-immobilien.io/i/">Impressum</a>
-        <a href="https://junker-immobilien.io/datenschutzerklaerung/">Datenschutz</a>
-        <a href="https://junker-immobilien.io/barrierefreiheitserklaerung/">Barrierefreiheit</a>
-        <a href="https://junker-immobilien.io/cookie-richtlinie-eu/">Cookie-Richtlinie</a>
-      </div>
-      <div class="footer-col">
-        <h4>Kontakt</h4>
-        <a href="mailto:support@junker-immobilien.io" class="footer-mail">
-          <span class="footer-mail-label">Support</span>
-          <span class="footer-mail-addr">support@junker-immobilien.io</span>
-        </a>
-        <a href="mailto:dealpilot@junker-immobilien.io" class="footer-mail">
-          <span class="footer-mail-label">Allgemeine Anfragen</span>
-          <span class="footer-mail-addr">dealpilot@junker-immobilien.io</span>
-        </a>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <div>© 2026 Junker Immobilien</div>
-      <div>Keine Steuer- oder Finanzberatung. Analyse-Tool für eigene Kalkulationen.</div>
-    </div>
+<!-- ══ 20 · BELEG-IMPORT ═══════════════════════════════════════════════ -->
+<section class="lu-sec lu-light" id="lu-beleg">
+  <div class="wrap">
+    <span class="lu-num">20</span>
+    <h2>Rechnungen einlesen statt <span class="ac">Zahlen abtippen.</span></h2>
+    <p class="lu-lead">Die Anschaffungskosten einer Immobilie liegen nicht an einer Stelle.
+      Sie liegen in der Notarrechnung, im Grunderwerbsteuerbescheid, in der Maklerrechnung,
+      in zwölf Handwerkerrechnungen und in einem Stapel Fahrtbelege. Genau diesen Stapel
+      liest DealPilot.</p>
+
+    <p>Du wählst einen Ordner oder einzelne Dateien — PDF oder Foto, beides geht. Die Seiten
+      werden zu Bildern gerendert und an die Bilderkennung geschickt, die je Beleg Datum,
+      Netto, Umsatzsteuer, Brutto, Aussteller und Kategorie herausliest.</p>
+
+    <p>Danach kommt der wichtigste Schritt: <strong>du bestätigst jede einzelne Zeile.</strong>
+      Nicht der Import entscheidet, was in deine Anschaffungskosten wandert, sondern du — mit
+      dem erkannten Betrag und der vorgeschlagenen Kategorie daneben. Das ist Absicht: Aus
+      diesen Zahlen entsteht die Kaufpreisaufteilung, und die geht ans Finanzamt.</p>
+
+    <ul class="lu-list">
+      <li>PDF <strong>und</strong> Foto, ganze Ordner auf einmal</li>
+      <li>Erkannt werden Datum, Netto, Umsatzsteuer, Brutto, Aussteller und Kategorie</li>
+      <li>Feste Zuordnung in die Anschaffungs- beziehungsweise Herstellungskosten</li>
+      <li>Jede Zeile wird einzeln bestätigt — nichts läuft ungeprüft in die Steuerrechnung</li>
+      <li>Die Summen landen direkt in der BMF-Kaufpreisaufteilung</li>
+    </ul>
+
+    <p class="lu-note">Der Beleg-Import ist ab dem Investor-Plan enthalten.</p>
   </div>
-</footer>
+</section>
+<hr class="rw">
 
-</div>
+<!-- ══ 21 · DATENRAUM ══════════════════════════════════════════════════ -->
+<section class="lu-sec" id="lu-datenraum">
+  <div class="wrap">
+    <span class="lu-num">21</span>
+    <h2>Die Unterlagen, <span class="ac">bevor die Bank danach fragt.</span></h2>
+    <p class="lu-lead">Jede Finanzierung hängt irgendwann an einem fehlenden Blatt. Der
+      Datenraum dreht die Reihenfolge um: Du sammelst einmal, und danach weiß die App, was
+      noch fehlt.</p>
 
-<script src="assets/effects.js"></script>
-</body>
-</html>
+    <p>Er hat zwei Ebenen. Der <strong>persönliche Ordner</strong> gilt für alle deine
+      Objekte — Ausweis, SCHUFA-Auskunft, Gehaltsabrechnungen, Lohnsteuerbescheinigung,
+      Steuerbescheide, Selbstauskunft, Rentenbescheid, EÜR, Kontoauszüge. Den
+      <strong>Objektordner</strong> legst du je Immobilie an: Exposé, Grundrisse,
+      Teilungserklärung, WEG-Abrechnung, Mietverträge und was sonst dazugehört.</p>
+
+    <p>Jeder Dokumenttyp trägt zwei Merker: Braucht die <strong>Bank</strong> ihn? Braucht die
+      <strong>Finanzierungsbestätigung</strong> ihn? Daraus entsteht die Fortschrittsanzeige —
+      und ohne ausreichend gefüllten Ordner lässt sich keine Netzwerk-Anfrage abschicken.</p>
+
+    <p>Die Selbstauskunft musst du dabei nicht abtippen: DealPilot erzeugt sie als
+      ausfüllbares PDF, vorbefüllt mit dem, was in deinen Einstellungen steht.</p>
+
+    <ul class="lu-list">
+      <li>Zwei Ebenen: ein persönlicher Ordner, ein eigener Ordner je Immobilie</li>
+      <li>Jeder Typ mit Pflicht-Merker für Bank und Finanzierungsbestätigung</li>
+      <li>Der Füllstand entscheidet, ob eine Anfrage rausgehen kann</li>
+      <li>Selbstauskunft als ausfüllbares PDF, vorbefüllt aus deinen Stammdaten</li>
+      <li>Freigaben pro Objekt, mit Laufzeit und jederzeit widerrufbar</li>
+    </ul>
+  </div>
+</section>
+<hr class="rws">
+
+<!-- ══ 22 · DEAL-AKTION & PARTNERNETZWERK ══════════════════════════════ -->
+<section class="lu-sec lu-light" id="lu-dealaktion">
+  <div class="wrap">
+    <span class="lu-num">22</span>
+    <h2>Wenn die Zahlen stehen, <span class="ac">fängt die Arbeit an.</span></h2>
+    <p class="lu-lead">Eine durchgerechnete Immobilie ist noch keine gekaufte. Danach kommen
+      Bankanfragen, Gutachten, Finanzierungsbestätigungen — und genau da hören die meisten
+      Werkzeuge auf. DealPilot hat dafür einen eigenen Reiter.</p>
+
+    <p>Vier Aktionskarten decken ab, was nach der Analyse ansteht: <strong>Bankanfrage</strong>
+      mit Dokumenten-Upload und Vorprüfung, <strong>Finanzierungsbestätigung</strong> für den
+      Makler, <strong>Gutachten &amp; Expertise</strong> (Verkehrswert, Restnutzungsdauer,
+      Sanierungskonzept) und <strong>Beratung &amp; Zweite Meinung</strong>. Jede Anfrage geht
+      mit deinen Objektdaten, dem Investment-Case-PDF und deinen Unterlagen raus — du stellst
+      nichts noch einmal zusammen.</p>
+
+    <p>Darüber liegt das <strong>Partnernetzwerk</strong>: Sachverständige, Finanzierer,
+      Steuerberater und Handwerksbetriebe als Karten, jede mit Schwerpunkt und Antwortzeit.
+      Bevor eine Anfrage rausgeht, prüft DealPilot, ob sie überhaupt Aussicht hat — sind die
+      Kennzahlen vollständig, liegen die Unterlagen im Datenraum? Fehlt etwas, ist der Knopf
+      gesperrt, und jeder fehlende Punkt verlinkt dorthin, wo du ihn nachtragen kannst.</p>
+
+    <p>Was mitgeht, siehst du vorher. Das Übersichtsblatt listet jede Eckzahl und jeden
+      Datenraum-Link auf, bevor du sendest.</p>
+
+    <ul class="lu-list">
+      <li>Vier Aktionskarten: Bankanfrage · Finanzierungsbestätigung · Gutachten · Beratung</li>
+      <li>Objektdaten, Investment-Case und Unterlagen gehen als ein Paket raus</li>
+      <li>Anforderungsprüfung vor dem Absenden, mit Beheben-Link je Lücke</li>
+      <li>Status je Objekt und Freigabe per QR-Code mit Restlaufzeit</li>
+      <li>Ab Pro können eigene Partner eingereicht werden</li>
+    </ul>
+  </div>
+</section>
+<hr class="rw">
+
+  <hr class="rws">
+
+  <!-- KEROSIN (hell) -->
+  <section class="sec sec-cream">
+    <div class="wrap">
+      <div class="head">
+        <span class="eye">// Dein Kontingent</span>
+        <h2>Drei Tiefen, <span class="ac">du entscheidest.</span></h2>
+        <p>Gez&auml;hlt werden <strong>Bewertungen</strong>, getrennt nach Art &mdash; weil sie unterschiedlich aufwendig sind. Dein Plan setzt die Kontingente jeden Monat neu. <strong>Was du im Monat nicht nutzt, verf&auml;llt zum Monatsende</strong>. Nur Zugekauftes bleibt dauerhaft.</p>
+      </div>
+
+      <div class="lu-sub">Was dein Plan im Monat enthält</div>
+      <p class="kont-vor">Gezählt werden nur <strong>Bewertungen</strong> — Abrufe, bei denen
+        DealPilot einen Marktwert ermittelt. Davon gibt es drei Arten, unterschiedlich
+        aufwendig. Alles andere zählt gegen kein Kontingent: rechnen, Score, PDF,
+        Sprechlauf, Bodenrichtwert, Exposé-Import.</p>
+      <table class="kont-tab">
+        <thead><tr><th>Art der Bewertung</th><th>Free</th><th>Starter</th>
+          <th class="best">Investor</th><th>Pro</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>Marktpreisindikation</b><span>schneller Marktabgleich · einzeln 0,90 €</span></td>
+            <td>1</td><td>5</td><td class="best">5</td><td>5</td>
+          </tr>
+          <tr>
+            <td><b>Erweiterte Indikation</b><span>mit Wertkorridor · einzeln 1,90 €</span></td>
+            <td class="nein">–</td><td class="nein">–</td><td class="best">5</td><td>5</td>
+          </tr>
+          <tr>
+            <td><b>Wertermittlung nach ImmoWertV</b><span>volles Verfahren · einzeln 3,90 €</span></td>
+            <td class="nein">–</td><td class="nein">–</td><td class="best nein">–</td><td>5</td>
+          </tr>
+          <tr class="sum">
+            <td>Zusammen im Monat</td>
+            <td>1</td><td>5</td><td class="best">10</td><td>15</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="kont-nach">Was du im Monat nicht nutzt, <strong>verfällt zum Monatsende</strong>.
+        Ist das Kontingent aufgebraucht, lässt es sich einmal nachkaufen — dieselbe Menge für
+        ein Viertel des Monatsbeitrags. Zugekauftes bleibt dauerhaft.</p>
+
+<div class="lu-sub">Nachkaufen &mdash; jederzeit, ohne Abo</div>
+      <!-- v1294: Hier standen die vier Bewertungs-Pakete (7,90 / 19,90 /
+           39,90 / 69,90 EUR). Seit v1246 sind sie nicht mehr kaufbar - das
+           Backend kennt nur dp_nachkauf_* und dp_einzeln_*. Jetzt steht
+           hier, was es wirklich gibt: das eigene Kontingent noch einmal. -->
+      <div class="lu-packs lu-packs-3">
+        <div class="lu-pack"><div class="lp-l">5&nbsp;&middot;&nbsp;0&nbsp;&middot;&nbsp;0</div><div class="lp-p">5,00&nbsp;&euro;</div><div class="lp-u">Starter</div></div>
+        <div class="lu-pack pop"><span class="lp-tag">beliebt</span><div class="lp-l">5&nbsp;&middot;&nbsp;5&nbsp;&middot;&nbsp;0</div><div class="lp-p">8,75&nbsp;&euro;</div><div class="lp-u">Investor</div></div>
+        <div class="lu-pack"><div class="lp-l">5&nbsp;&middot;&nbsp;5&nbsp;&middot;&nbsp;5</div><div class="lp-p">12,50&nbsp;&euro;</div><div class="lp-u">Pro</div></div>
+      </div>
+
+      <p class="dp-note" style="text-align:center;margin-top:16px">Spracheingabe, Beleg-Import, Bodenrichtwert und Feldvorschl&auml;ge sind in jedem Plan enthalten und z&auml;hlen gegen kein Kontingent.</p>
+    </div>
+  </section>
+  <hr class="rw">
+
+  <!-- FEATUREUEBERSICHT (hell/dunkel wechsel) -->
+  <section class="sec lu-featsec">
+    <div class="wrap">
+      <div class="head">
+        <span class="eye">// Funktionsumfang im Detail</span>
+        <h2>Jedes Modul, <span class="ac">jede Kennzahl.</span></h2>
+        <p>Vier Phasen vom Fund bis zur Bank &mdash; du bestimmst die Tiefe.</p>
+      </div>
+      <style>
+      /* v14: Funktionsumfang-Chips + Detail-Link */
+      .lu-item .luc-chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px}
+      .lu-item .luc-chip{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.02em;color:#8a6d24;background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.38);border-radius:20px;padding:3px 9px;white-space:nowrap}
+      .lu-item .lu-more{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:#b8932f;text-decoration:none;font-weight:600;cursor:pointer}
+      .lu-item .lu-more:hover{color:#8a6d24;text-decoration:underline}
+      .lu-phase.d .lu-item .luc-chip{color:#E8CC7A;background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.3)}
+      .lu-phase.d .lu-item .lu-more{color:#E8CC7A}
+      </style>
+      <div class="lu-feat" id="luFeat"></div>
+    </div>
+  </section>
+  <hr class="rws">
+
+  <div class="board-band"><span class="perf-edge"></span><div class="inner">
+    <div class="txt"><div class="kick">PRE-FLIGHT &middot; CHECK-IN</div><h2>Bereit f&uuml;r den Take-off?</h2><p>Starte kostenlos mit dem Free-Plan &mdash; kein Verkaufsgespr&auml;ch. Dein erstes Objekt rechnest du in Minuten durch.</p></div>
+    <div class="act"><a class="btn-dark" href="https://app.dealpilot.immo/?register=1">Kostenlos starten &rarr;</a></div>
+  </div></div>
+</main>
+<footer class="footer"><div class="wrap">
+  <div class="footer-grid">
+    <div>
+      <div class="mark mark-gross" style="color:#fff"><span class="wort">Deal<b>Pilot</b></span></div>
+      <p class="footer-tag">Immobilien-Investmentanalyse für strukturierte Entscheidungen.
+        Entwickelt von Junker Immobilien · Sachverständigenbüro &amp; Projektentwicklung.</p>
+    </div>
+    <div><h4>Produkt</h4>
+      <a href="#workflow">So funktioniert's</a><a href="#features">Funktionen</a>
+      <a href="leistungsumfang.html">Leistungsumfang</a><a href="#pricing">Preise</a>
+      <a href="api.html">API</a><a href="#app">App</a></div>
+    <div><h4>Vertrauen</h4>
+      <a href="sicherheit.html">Sicherheit &amp; Server</a><a href="fragen.html">Häufige Fragen</a>
+      <a href="#partner">Partner &amp; Datenquellen</a><a href="#feature-matrix">Cockpit-Matrix</a></div>
+    <div><h4>Kontakt</h4>
+      <a href="mailto:support@dealpilot.immo">support@dealpilot.immo</a>
+      <a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a>
+      <a href="/impressum.html">Impressum</a><a href="/datenschutz.html">Datenschutz</a></div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 Junker Immobilien</div>
+    <div>Keine Steuer- oder Finanzberatung. Analyse-Werkzeug für eigene Kalkulationen.</div>
+  </div>
+</div></footer>
+
+
+
+<script src="dp2-lufeat.js?v=v1565"></script>
+<script src="dp2.js?v=v1565"></script>
+</body></html>

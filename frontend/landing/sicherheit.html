@@ -1,0 +1,270 @@
+<!DOCTYPE html><!-- DealPilot Sicherheit · v1554 -->
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="google-site-verification" content="sjsXb3XudmYE75JCus789-lKn_IIX5jOySZx50Iy4i0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sicherheit &amp; Datenschutz · DealPilot</title>
+<meta name="description" content="Server in Deutschland bei Hetzner, DSGVO-konform, keine Weitergabe Ihrer Objektdaten. Was DealPilot speichert, wo es liegt und wer es sehen kann.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="dp2.css?v=v1595">
+<link rel="stylesheet" href="dp2-teile.css?v=v1595">
+<style>
+/* Die Sicherheitsseite benutzt die Bausteine der Hauptseite (dp2.css und
+   dp2-teile.css). Hier steht nur, was sie allein braucht. */
+.w, .w-schmal{max-width:var(--max);margin:0 auto;padding:0 26px}
+.w-schmal{max-width:900px}
+.sk{background:var(--ob);color:var(--txtd);padding:56px 0 50px;position:relative;overflow:hidden}
+.sk .raster{position:absolute;inset:0;opacity:.12;
+  background-image:linear-gradient(rgba(232,204,122,.4) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(232,204,122,.4) 1px,transparent 1px);
+  background-size:56px 56px}
+.sk .w{position:relative}
+.sk .kick{font:700 10px/1 var(--mono);letter-spacing:.26em;text-transform:uppercase;
+  color:var(--gdh);display:flex;align-items:center;gap:11px}
+.sk .kick::before{content:'';width:24px;height:1px;background:var(--gdh);flex:none}
+.sk h1{font-size:clamp(28px,4vw,46px);margin:15px 0 13px;color:#fff;line-height:1.08;
+  hyphens:manual}
+.sk h1 em{font-style:normal;color:var(--gdh)}
+.sk p{margin:0;max-width:62ch;color:var(--mdk);font-size:17px}
+.brot{font:700 10px/1 var(--mono);letter-spacing:.13em;color:var(--ddk);margin-top:22px}
+.brot a{color:rgba(236,230,214,.55)}
+.brot a:hover{color:var(--gdh)}
+
+section{padding:76px 0}
+.sec-creme{background:var(--cream2)}
+.sec-papier{background:var(--paper)}
+.kz{max-width:800px;margin-bottom:40px}
+.kz .kick{font:700 10px/1 var(--mono);letter-spacing:.26em;text-transform:uppercase;
+  color:var(--gdi);display:flex;align-items:center;gap:11px}
+.kz .kick::before{content:'';width:24px;height:1px;background:var(--gd);flex:none}
+.kz h2{font-size:clamp(25px,3.2vw,38px);margin:13px 0}
+.kz h2 em{font-style:normal;color:var(--gdd)}
+.kz p{margin:0;color:var(--inkm)}
+
+/* Karten als ein Blatt mit Trennern - wie auf der Hauptseite. */
+.karten{display:grid;grid-template-columns:repeat(3,1fr);gap:0;
+  border:1px solid var(--cream-line);background:#fff}
+.karte{padding:26px 24px 28px;border-right:1px solid var(--cream-line);position:relative}
+.karte:last-child{border-right:0}
+.karte::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--runway);transform:scaleY(0);transform-origin:top;
+  transition:transform .3s var(--e-weich)}
+.karte:hover::before{transform:scaleY(1)}
+.karte:hover{background:var(--cream)}
+.karte .mi{width:34px;height:34px;background:rgba(201,168,76,.11);display:flex;
+  align-items:center;justify-content:center;color:var(--gdi);margin-bottom:13px}
+.karte .mi .ico{width:18px;height:18px}
+.karte h3{font-size:16.5px;margin-bottom:9px}
+.karte p{margin:0;font-size:13.6px;color:var(--inkm);line-height:1.6}
+.karte ul{margin:12px 0 0;padding:0;list-style:none;font-size:13px;color:var(--mut)}
+.karte li{padding:4px 0 4px 18px;position:relative;line-height:1.5}
+.karte li::before{content:'';position:absolute;left:1px;top:11px;width:8px;height:4.5px;
+  border-left:1.5px solid var(--grn);border-bottom:1.5px solid var(--grn);transform:rotate(-45deg)}
+
+.tab-d{width:100%;border-collapse:collapse;background:#fff;
+  border:1px solid var(--cream-line);font-size:14px}
+.tab-d th,.tab-d td{padding:12px 16px;text-align:left;border-bottom:1px solid var(--cream-line)}
+.tab-d thead th{background:var(--runway);color:var(--gold-on);
+  font:700 10px/1.3 var(--mono);letter-spacing:.07em;text-transform:uppercase}
+.tab-d td{color:var(--inkm)}
+.tab-d td:first-child{color:var(--ink);font-weight:500}
+.tab-d tbody tr:nth-child(even){background:#FCFBF8}
+.tab-d tbody tr:last-child td{border-bottom:0}
+
+.hinweis{background:#fff;border-left:3px solid var(--gd);padding:17px 21px;
+  font-size:14.4px;color:var(--inkm);margin:22px 0 0;line-height:1.6}
+.hinweis b{color:var(--ink)}
+.hinweis a{color:var(--gdi);border-bottom:1px solid rgba(138,108,30,.4)}
+
+@media(max-width:900px){
+  .karten{grid-template-columns:1fr}
+  .karte{border-right:0;border-bottom:1px solid var(--cream-line)}
+}
+</style>
+</head><body>
+
+<svg style="display:none" aria-hidden="true">
+<symbol id="i-haus" viewBox="0 0 24 24"><path d="M3 21V10l9-7 9 7v11"/><path d="M9 21v-6h6v6"/><path d="M3 21h18"/></symbol>
+<symbol id="i-blitz" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></symbol>
+<symbol id="i-buch" viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 0 4 22.5V4.5Z"/><path d="M8 7h8M8 11h6"/></symbol>
+<symbol id="i-ziel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></symbol>
+<symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6"/><path d="M5 10v8m5-8v8m4-8v8m5-8v8M3 21h18"/></symbol>
+<symbol id="i-ebenen" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5M3 18l9 5 9-5"/></symbol>
+<symbol id="i-schild" viewBox="0 0 24 24"><path d="M12 2 4 5.5v6c0 5 3.4 8.9 8 10.5 4.6-1.6 8-5.5 8-10.5v-6L12 2Z"/><path d="m9 12 2.2 2.2L15.5 10"/></symbol>
+<symbol id="i-frage" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.3a2.9 2.9 0 0 1 5.6 1c0 1.9-2.8 2.4-2.8 4M12 17.5h.01"/></symbol>
+</svg>
+
+<div class="tb"><div class="wrap">
+  <span class="pkt"><i></i>4 WOCHEN PRO — OHNE ZAHLUNGSDATEN</span>
+  <span class="pkt"><i></i>MONATLICH KÜNDBAR</span>
+  <span class="pkt hidemid"><i></i>KEINE BEWERTUNG VERFÄLLT</span>
+  <div class="rechts">
+    <span class="nz">&gt; <b data-nutzer data-zaehl>866</b> NUTZER</span><a href="mailto:info@dealpilot.immo">INFO@DEALPILOT.IMMO</a>
+    <a href="mailto:support@dealpilot.immo">SUPPORT</a>
+  </div>
+</div></div>
+
+<nav class="nav"><div class="wrap">
+  <a class="mark mark-gross" href="/"><span class="wort">Deal<b>Pilot</b></span></a>
+  <button class="burger" aria-label="Menü"><span></span><span></span><span></span></button>
+  <ul>
+    <li><a href="dp2.html#workflow">So funktioniert's</a></li>
+    <li><a href="dp2.html#features">Funktionen</a></li>
+    <li><a href="leistungsumfang.html">Leistungsumfang</a></li>
+    <li><a href="dp2.html#pricing">Preise</a></li>
+    <li><a href="api.html">API</a></li>
+    <li><a href="sicherheit.html" class="hier">Sicherheit</a></li>
+    <li><a href="fragen.html">Fragen</a></li>
+  </ul>
+  <a class="b-log" href="https://app.dealpilot.immo/">Anmelden</a>
+  <a class="b-cta" href="https://app.dealpilot.immo/?register=1">Kostenlos starten</a>
+</div></nav>
+
+<main>
+<div class="sk"><div class="raster"></div><div class="w">
+  <div class="kick">Sicherheit &amp; Datenschutz</div>
+  <h1>Ihre Objektdaten bleiben <em>Ihre Objektdaten.</em></h1>
+  <p>Wer eine Immobilie durchrechnet, gibt Kaufpreis, Miete und Finanzierung preis —
+     Zahlen, die niemanden sonst etwas angehen. Hier steht, wo sie liegen und wer sie sehen kann.</p>
+  <div class="brot"><a href="/">DEALPILOT</a> › SICHERHEIT</div>
+</div></div>
+
+<section><div class="w">
+  <div class="kz rv"><div class="kick">Der Betrieb</div>
+    <h2>Deutschland. <em>Ohne Umweg.</em></h2>
+    <p>Kein Server außerhalb der EU, kein Datenabfluss in Drittstaaten.</p></div>
+  <div class="karten">
+    <div class="karte rv"><div class="mi"><svg class="ico"><use href="#i-pin"/></svg></div>
+      <h3>Hetzner, Deutschland</h3>
+      <p>Anwendung und Datenbanken laufen auf Servern der Hetzner Online GmbH in
+         deutschen Rechenzentren. Betreiber und Standort liegen beide im Geltungsbereich
+         der DSGVO.</p>
+      <ul><li>Rechenzentren in Nürnberg und Falkenstein</li>
+        <li>Deutsches Unternehmen, deutsches Recht</li>
+        <li>ISO-27001-zertifizierter Betrieb</li></ul></div>
+    <div class="karte rv"><div class="mi"><svg class="ico"><use href="#i-schild"/></svg></div>
+      <h3>Verschlüsselt unterwegs</h3>
+      <p>Jede Verbindung läuft über TLS. Passwörter werden nie im Klartext gespeichert,
+         sondern nur als Streuwert — auch wir können sie nicht lesen.</p>
+      <ul><li>HTTPS erzwungen, HTTP wird umgeleitet</li>
+        <li>Passwörter mit bcrypt gestreut</li>
+        <li>Sitzungen laufen ab und lassen sich beenden</li></ul></div>
+    <div class="karte rv"><div class="mi"><svg class="ico"><use href="#i-wolke"/></svg></div>
+      <h3>Tägliche Sicherung</h3>
+      <p>Die Datenbanken werden gesichert, damit ein technischer Ausfall keine
+         Arbeit kostet. Die Sicherungen liegen am selben Ort — also ebenfalls in Deutschland.</p>
+      <ul><li>Sicherung beider Datenbanken</li>
+        <li>Keine Ablage außerhalb der EU</li>
+        <li>Rücksprung auf einen früheren Stand möglich</li></ul></div>
+  </div>
+</div></section>
+
+<section class="sec-creme"><div class="w">
+  <div class="kz rv"><div class="kick">Was gespeichert wird</div>
+    <h2>Und was <em>nicht.</em></h2></div>
+  <table class="tab-d rv"><thead><tr>
+    <th style="width:34%">Angabe</th><th style="width:33%">Wofür</th><th>Wie lange</th>
+  </tr></thead><tbody>
+    <tr><td>E-Mail-Adresse</td><td>Anmeldung, Zurücksetzen des Passworts, Rechnungen</td><td>bis zur Löschung des Kontos</td></tr>
+    <tr><td>Objektdaten</td><td>Ihre Berechnungen — Kaufpreis, Miete, Finanzierung, Fotos</td><td>bis Sie das Objekt löschen</td></tr>
+    <tr><td>Hochgeladene Dokumente</td><td>Exposés, Belege, Datenraum</td><td>bis Sie sie löschen</td></tr>
+    <tr><td>Abrechnungsdaten</td><td>Zahlungsabwicklung über Stripe</td><td>gesetzliche Aufbewahrungsfrist</td></tr>
+    <tr><td>Zahlungsdaten (Karte, IBAN)</td><td>liegen bei Stripe, <b>nicht</b> bei uns</td><td>—</td></tr>
+    <tr><td>Werbe-Tracker, Profilbildung</td><td>gibt es nicht</td><td>—</td></tr>
+    <tr><td>Weitergabe an Dritte zu Werbezwecken</td><td>findet nicht statt</td><td>—</td></tr>
+  </tbody></table>
+  <div class="hinweis rv"><b>Bewertungsabrufe:</b> Für eine Marktpreisindikation wird die Adresse
+    und die Objektbeschreibung an einen unabhängigen Bewertungspartner übertragen — anders ließe
+    sich kein Marktwert ermitteln. Das geschieht nur, wenn Sie einen Abruf ausdrücklich auslösen,
+    und es wird Ihnen vorher angezeigt.</div>
+</div></section>
+
+<section><div class="w">
+  <div class="kz rv"><div class="kick">Ihre Rechte</div>
+    <h2>Was Sie <em>verlangen können.</em></h2>
+    <p>Alles, was die DSGVO vorsieht — und der Weg, es zu bekommen.</p></div>
+  <div class="karten">
+    <div class="karte rv"><div class="mi"><svg class="ico"><use href="#i-lupe"/></svg></div>
+      <h3>Auskunft und Herausgabe</h3>
+      <p>Sie können jederzeit erfahren, welche Daten zu Ihnen gespeichert sind, und sie
+         in einem gängigen Format herausverlangen. Eine formlose E-Mail genügt.</p></div>
+    <div class="karte rv"><div class="mi"><svg class="ico"><use href="#i-zahnrad"/></svg></div>
+      <h3>Berichtigung und Löschung</h3>
+      <p>Objekte und Dokumente löschen Sie selbst in der Anwendung. Das ganze Konto
+         löschen wir auf Anforderung — mit allem, was daran hängt.</p></div>
+    <div class="karte rv"><div class="mi"><svg class="ico"><use href="#i-leute"/></svg></div>
+      <h3>Auftragsverarbeitung</h3>
+      <p>Wer DealPilot beruflich für Mandanten nutzt, braucht einen Vertrag zur
+         Auftragsverarbeitung nach Art. 28 DSGVO. Den stellen wir bereit.</p></div>
+  </div>
+  <div class="hinweis rv">Zuständig ist <b>Junker Solution, Marcel Junker</b> — Anschrift und
+    Kontakt stehen im <a href="/impressum.html" style="color:var(--gold-lo);border-bottom:1px solid">Impressum</a>.
+    Die vollständige Erklärung finden Sie in der
+    <a href="/datenschutz.html" style="color:var(--gold-lo);border-bottom:1px solid">Datenschutzerklärung</a>.</div>
+</div></section>
+
+<section class="sec-papier"><div class="w">
+  <div class="kz rv"><div class="kick">Grenzen, die wir offen nennen</div>
+    <h2>Was DealPilot <em>nicht ist.</em></h2></div>
+  <div class="karten">
+    <div class="karte rv"><h3>Kein Gutachten</h3>
+      <p>Die Berechnungen sind Entscheidungshilfen. Ein Verkehrswertgutachten nach
+         ImmoWertV ist eine eigene Leistung — die gibt es beim Sachverständigenbüro,
+         nicht per Knopfdruck.</p></div>
+    <div class="karte rv"><h3>Keine Steuerberatung</h3>
+      <p>AfA, § 7b und Kaufpreisaufteilung werden nach den amtlichen Vorgaben gerechnet.
+         Ob sie in Ihrem Fall so anzusetzen sind, entscheidet Ihr Steuerberater.</p></div>
+    <div class="karte rv"><h3>Keine Finanzberatung</h3>
+      <p>Finanzierungsmodelle werden durchgerechnet, nicht empfohlen. Welches Darlehen
+         zu Ihnen passt, klären Sie mit Ihrer Bank.</p></div>
+  </div>
+</div></section>
+
+</main>
+<div class="board-band">
+  <span class="perf-edge"></span><span class="perf-edge rechts"></span>
+  <div class="inner">
+    <div class="txt">
+      <div class="kick">PRE-FLIGHT · CHECK-IN</div>
+      <h2>Ihre Frage war nicht dabei?</h2>
+      <p>Schreiben Sie sie uns — die Antwort landet meistens hier auf der Seite.</p>
+    </div>
+    <div><a class="btn-p" href="mailto:info@dealpilot.immo?subject=Frage%20zu%20DealPilot">Frage stellen →</a></div>
+  </div>
+</div>
+
+<footer class="footer"><div class="wrap">
+  <div class="footer-grid">
+    <div>
+      <div class="mark mark-gross" style="color:#fff"><span class="wort">Deal<b>Pilot</b></span></div>
+      <p class="footer-tag">Immobilien-Investmentanalyse für strukturierte Entscheidungen.
+        Entwickelt von Junker Immobilien · Sachverständigenbüro &amp; Projektentwicklung.</p>
+    </div>
+    <div><h4>Produkt</h4>
+      <a href="dp2.html#workflow">So funktioniert's</a><a href="dp2.html#features">Funktionen</a>
+      <a href="leistungsumfang.html">Leistungsumfang</a><a href="dp2.html#pricing">Preise</a>
+      <a href="api.html">API</a><a href="dp2.html#feature-matrix">Cockpit-Matrix</a></div>
+    <div><h4>Vertrauen</h4>
+      <a href="sicherheit.html">Sicherheit &amp; Server</a><a href="fragen.html">Häufige Fragen</a>
+      <a href="dp2.html#partner">Partner &amp; Datenquellen</a></div>
+    <div><h4>Junker Immobilien</h4>
+      <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Sachverständigenbüro</a>
+      <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Kapitalanlage</a>
+      <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Projektentwicklung</a></div>
+    <div><h4>Kontakt</h4>
+      <a href="mailto:support@dealpilot.immo">support@dealpilot.immo</a>
+      <a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a>
+      <a href="/impressum.html">Impressum</a><a href="/datenschutz.html">Datenschutz</a>
+      <a href="/agb.html">AGB</a></div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 Junker Immobilien</div>
+    <div>Keine Steuer- oder Finanzberatung. Analyse-Werkzeug für eigene Kalkulationen.</div>
+  </div>
+</div></footer>
+
+<script src="dp2.js?v=v1565"></script>
+</body></html>

@@ -1,0 +1,162 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   demo-ideen.css · v1592 · Die fünf Ideen, gebaut statt beschrieben
+   ───────────────────────────────────────────────────────────────────────
+   Marcel am 24.09.2026: "die ideen wollte ich grafisch haben also die
+   letzte demo die du genommen hast und dann davon weitere ideen."
+
+   Jede Idee ist ein laufender Block, keine Beschreibung. Alle rechnen
+   über demo-rechner.js — dieselbe Kette wie die große Demo, nur mit
+   Eingaben, die sich ändern dürfen.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.ide{border-top:1px solid var(--cream-line);padding:46px 0 50px}
+.ide:first-of-type{border-top:0}
+.idk{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.idk .nr{font:700 11px/1 var(--mono);letter-spacing:.18em;color:var(--gdi);flex:none}
+.idk h2{font-size:25px}
+.idw{margin:0 0 6px;color:var(--inkm);max-width:78ch;font-size:15px;line-height:1.62}
+.idu{margin:0 0 22px;font-size:13.2px;color:var(--mut);max-width:78ch;font-style:italic}
+
+.buehne{background:var(--ob);border:1px solid var(--line);position:relative;
+  overflow:hidden}
+.bstreif{height:4px;background:var(--runway)}
+.bkopf{display:flex;align-items:center;gap:16px;padding:15px 22px;
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(201,168,76,.07),transparent)}
+.bkopf .adr{font:700 15px/1.25 var(--disp);color:#fff}
+.bkopf .art{font:500 10px/1.4 var(--mono);letter-spacing:.06em;color:var(--ddk);
+  display:block;margin-top:3px}
+.bkopf .re{margin-left:auto;text-align:right;flex:none}
+.binhalt{padding:22px}
+
+/* ── Idee 1 · der Kaufpreis-Regler ──────────────────────────────────── */
+.kp-wert{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+.kp-wert .gr{font:700 46px/1 var(--disp);color:#fff;font-variant-numeric:tabular-nums}
+.kp-wert .ei{font:500 11px/1 var(--mono);letter-spacing:.11em;color:var(--gdh)}
+.kp-wert .diff{margin-left:auto;font:700 15px/1 var(--mono);white-space:nowrap}
+.kp-wert .diff.gut{color:var(--grnh)} .kp-wert .diff.schlecht{color:#E4A89E}
+.kp-bahn{position:relative;height:42px;margin:2px 0 0}
+.kp-grund{position:absolute;left:0;right:0;top:17px;height:8px;
+  background:rgba(255,255,255,.1);border-radius:4px}
+.kp-band{position:absolute;top:17px;height:8px;background:var(--runway);
+  border-radius:4px;box-shadow:0 0 18px rgba(201,168,76,.4)}
+.kp-in{position:absolute;left:0;right:0;top:9px;width:100%;height:24px;
+  -webkit-appearance:none;appearance:none;background:transparent;margin:0;cursor:grab}
+.kp-in::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;
+  border-radius:50%;background:#fff;border:3px solid var(--gd);cursor:grab;
+  box-shadow:0 4px 16px rgba(0,0,0,.65)}
+.kp-in::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:#fff;
+  border:3px solid var(--gd);cursor:grab;box-shadow:0 4px 16px rgba(0,0,0,.65)}
+.kp-marken{display:flex;justify-content:space-between;font:500 9.5px/1 var(--mono);
+  color:var(--ddk)}
+.kp-folge{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;
+  background:var(--line);border:1px solid var(--line);margin-top:16px}
+.kp-folge > div{background:rgba(255,255,255,.035);padding:12px 10px}
+.kp-folge .l{font:500 8px/1.3 var(--mono);letter-spacing:.1em;color:var(--ddk);
+  display:block;margin-bottom:6px}
+.kp-folge .v{font:700 19px/1 var(--disp);color:#fff;font-variant-numeric:tabular-nums;
+  transition:color .25s}
+.kp-folge .v.gut{color:var(--grnh)} .kp-folge .v.schlecht{color:#E4A89E}
+.kp-folge .v.acht{color:var(--gdh)}
+.kp-folge .s{display:block;font-size:10px;color:var(--mut);margin-top:4px}
+
+/* ── Idee 2 · Quelle auf Klick ──────────────────────────────────────── */
+.q-liste{display:grid;gap:7px;max-width:620px;margin:0 auto}
+.q-z{display:flex;align-items:center;gap:11px;padding:11px 14px;
+  background:rgba(63,165,108,.08);border-left:2px solid var(--grn);cursor:pointer;
+  transition:background .25s}
+.q-z:hover{background:rgba(63,165,108,.15)}
+.q-z .nm{font:700 13px/1.3 var(--disp);color:#fff}
+.q-z .wt{margin-left:auto;font:700 13.5px/1 var(--mono);color:var(--grnh);flex:none}
+.q-z .lupe{flex:none;display:flex;color:var(--gdh);opacity:.6;transition:opacity .25s}
+.q-z:hover .lupe{opacity:1}
+.q-kasten{margin-top:12px;max-width:620px;margin-left:auto;margin-right:auto;
+  background:rgba(201,168,76,.08);border:1px dashed rgba(201,168,76,.4);
+  padding:14px 16px;display:none}
+.q-kasten.auf{display:block;animation:qAuf .35s var(--e-hoch)}
+@keyframes qAuf{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.q-kasten h4{font:700 13px/1.3 var(--disp);color:var(--gdh);margin:0 0 9px}
+.q-r{display:flex;gap:12px;padding:4px 0;font:500 11.5px/1.5 var(--mono)}
+.q-r .k{color:var(--ddk);min-width:96px;flex:none}
+.q-r .v{color:var(--txtd);min-width:0;word-break:break-word}
+
+/* ── Idee 3 · zwei Objekte ──────────────────────────────────────────── */
+.o-wahl{display:flex;gap:8px;margin-bottom:16px;justify-content:center}
+.o-wahl button{background:rgba(255,255,255,.04);border:1px solid var(--line);
+  color:var(--mdk);padding:10px 16px;font:600 12.5px/1 var(--body);cursor:pointer;
+  transition:.25s var(--e-weich)}
+.o-wahl button.an{background:var(--runway);border-color:var(--gd);color:var(--gold-on)}
+.o-erg{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center;
+  max-width:760px;margin:0 auto}
+.o-erg > *{min-width:0}
+.o-siegel{width:168px;height:168px;border-radius:50%;display:grid;place-items:center;
+  text-align:center;flex:none;transition:.4s var(--e-hoch)}
+.o-siegel.ja{background:radial-gradient(circle at 38% 30%,rgba(63,165,108,.28),
+  rgba(63,165,108,.07));border:2px solid var(--grn)}
+.o-siegel.nein{background:radial-gradient(circle at 38% 30%,rgba(184,98,80,.28),
+  rgba(184,98,80,.07));border:2px solid var(--rd)}
+.o-siegel .tx{font:700 24px/1 var(--disp);color:#fff;letter-spacing:-.02em}
+.o-siegel .ut{display:block;font:500 8.5px/1.3 var(--mono);letter-spacing:.14em;
+  margin-top:7px}
+.o-siegel.ja .ut{color:var(--grnh)} .o-siegel.nein .ut{color:#E4A89E}
+.o-zeilen{display:grid;gap:6px}
+.o-z{display:flex;align-items:baseline;gap:12px;padding:6px 0;font-size:13px;
+  border-bottom:1px solid rgba(255,255,255,.06)}
+.o-z .k{color:var(--mdk)} .o-z .v{margin-left:auto;font:700 13.5px/1 var(--mono);
+  color:#fff;white-space:nowrap}
+.o-z .v.gut{color:var(--grnh)} .o-z .v.schlecht{color:#E4A89E}
+
+/* ── Idee 4 · was es sonst kostet ───────────────────────────────────── */
+.k-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center;
+  max-width:820px;margin:0 auto}
+.k-s{padding:16px 18px}
+.k-s.alt{background:rgba(184,98,80,.1);border-left:2px solid var(--rd)}
+.k-s.neu{background:rgba(63,165,108,.11);border-left:2px solid var(--grn)}
+.k-s .l{font:700 8px/1.3 var(--mono);letter-spacing:.14em;color:var(--mdk);
+  display:block;margin-bottom:11px}
+.k-p{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:12.6px;
+  color:var(--mdk)}
+.k-p b{font:700 12.6px/1 var(--mono);white-space:nowrap}
+.k-s.alt .k-p b{color:#E4A89E} .k-s.neu .k-p b{color:var(--grnh)}
+.k-sum{margin-top:11px;padding-top:11px;border-top:1px solid rgba(255,255,255,.12);
+  display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.k-sum span{font:700 8.5px/1 var(--mono);letter-spacing:.13em;color:var(--mdk)}
+.k-sum b{font:700 24px/1 var(--disp);white-space:nowrap}
+.k-s.alt .k-sum b{color:#E4A89E} .k-s.neu .k-sum b{color:var(--grnh)}
+.k-pfeil{width:44px;height:44px;border-radius:50%;background:var(--runway);
+  display:grid;place-items:center;color:#241c06;flex:none}
+.k-note{max-width:820px;margin:14px auto 0;font-size:11.8px;line-height:1.55;
+  color:var(--mut);text-align:center}
+
+/* ── Idee 5 · die Zeitleiste ────────────────────────────────────────── */
+.z-leiste{display:flex;gap:2px;margin-bottom:18px;flex-wrap:wrap}
+.z-s{flex:1;min-width:64px;background:rgba(255,255,255,.04);border:1px solid var(--line);
+  padding:9px 6px;text-align:center;cursor:pointer;transition:.25s var(--e-weich)}
+.z-s:hover{background:rgba(255,255,255,.09)}
+.z-s.da{background:rgba(63,165,108,.12);border-color:rgba(63,165,108,.4)}
+.z-s.an{background:rgba(201,168,76,.16);border-color:var(--gd)}
+.z-s .n{display:block;font:700 8px/1 var(--mono);color:var(--ddk);margin-bottom:4px}
+.z-s .t{display:block;font:600 10px/1.25 var(--body);color:var(--mdk)}
+.z-s.an .t{color:#fff} .z-s.da .t{color:var(--txtd)}
+.z-inhalt{background:rgba(255,255,255,.03);border:1px solid var(--line);
+  padding:18px 20px;min-height:120px}
+.z-inhalt h4{font:700 17px/1.25 var(--disp);color:#fff;margin:0 0 8px}
+.z-inhalt p{margin:0 0 12px;font-size:13.4px;line-height:1.6;color:var(--mdk)}
+.z-w{display:inline-flex;align-items:baseline;gap:8px;padding:8px 13px;
+  background:rgba(201,168,76,.13);border-left:2px solid var(--gd)}
+.z-w b{font:700 19px/1 var(--disp);color:var(--gdh)}
+.z-w span{font:500 10.5px/1 var(--mono);color:var(--mdk)}
+
+@media(max-width:900px){
+  .kp-folge{grid-template-columns:repeat(2,1fr)}
+  .o-erg{grid-template-columns:1fr;justify-items:center;text-align:center}
+  .k-grid{grid-template-columns:1fr}
+  .k-pfeil{transform:rotate(90deg);margin:0 auto}
+}
+@media(max-width:560px){
+  .kp-wert .gr{font-size:34px}
+  .kp-folge{grid-template-columns:1fr}
+  .z-s{min-width:0;flex:1 1 30%}
+  .q-r{flex-direction:column;gap:2px}
+  .q-r .k{min-width:0}
+}

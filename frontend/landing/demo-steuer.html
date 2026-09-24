@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Der Rechenweg · Vier Fassungen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="dp2.css?v=1581">
+<link rel="stylesheet" href="demo-steuer.css?v=1581">
+<style>
+  body{background:var(--cream2)}
+  .kopfleiste{background:var(--ob);color:#fff;padding:26px 0 24px;
+    border-bottom:2px solid var(--gd)}
+  .kopfleiste .mk{font:700 9.5px/1 var(--mono);letter-spacing:.2em;color:var(--gdh)}
+  .kopfleiste h1{font-size:31px;margin:9px 0 8px}
+  .kopfleiste p{margin:0 0 10px;color:var(--mdk);max-width:82ch;font-size:14.6px;
+    line-height:1.64}
+  .kopfleiste p:last-child{margin-bottom:0}
+  .kopfleiste b{color:#fff}
+  .hinweis{background:#fff;border:1px solid var(--cream-line);
+    border-left:3px solid var(--gd);padding:20px 24px;margin:34px 0 10px}
+  .hinweis h2{font-size:18px;margin-bottom:9px}
+  .hinweis p{margin:0 0 10px;font-size:14.4px;line-height:1.66;color:var(--inkm);
+    max-width:86ch}
+  .hinweis p:last-child{margin-bottom:0}
+  .hinweis b{color:var(--ink)}
+  .korrektur{border-left-color:#B8625C}
+  .kette-oben{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:1px;background:var(--cream-line);border:1px solid var(--cream-line);
+    margin:22px 0 10px}
+  .kette-oben > div{background:#fff;padding:12px 14px}
+  .kette-oben .n{font:700 8px/1 var(--mono);letter-spacing:.12em;color:var(--gdi);
+    display:block;margin-bottom:5px}
+  .kette-oben .t{font:700 13px/1.25 var(--disp);display:block}
+  .kette-oben .s{font-size:11.5px;color:var(--mut);display:block;margin-top:3px;
+    line-height:1.4}
+</style>
+</head>
+<body>
+
+<header class="kopfleiste">
+  <div class="wrap">
+    <span class="mk">DEMO · NICHT ÖFFENTLICH · v1581</span>
+    <h1>Der Rechenweg — vier Fassungen</h1>
+    <p>Acht Stufen von der groben Marktpreisindikation bis zur offengelegten
+    Annahme. Alle vier Fassungen lesen aus <b>einer Rechenbasis</b> — wenn eine Zahl
+    irgendwo anders aussieht, ist das ein Fehler in der Darstellung, nicht im Inhalt.</p>
+    <p>Der Bodenrichtwert steht jetzt bei <b>180 €/m²</b> statt 340. Und die
+    Geschichte, die die Zahlen erzählen, ist nicht geschönt: der Deal trägt sich
+    <b>vor Steuern nicht</b> — die Optimierung kippt ihn.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="kette-oben">
+    <div><span class="n">STUFE 1</span><span class="t">Marktpreisindikation</span>
+      <span class="s">grobe Einordnung, bevor gerechnet wird</span></div>
+    <div><span class="n">STUFE 2</span><span class="t">Kaufpreisaufteilung</span>
+      <span class="s">Boden/Gebäude, optimiert für den Notarvertrag</span></div>
+    <div><span class="n">STUFE 3</span><span class="t">Restnutzungsdauer</span>
+      <span class="s">der Rahmen — und die Wahl darin</span></div>
+    <div><span class="n">STUFE 4</span><span class="t">Abschreibung</span>
+      <span class="s">was die Wahl je Jahr bedeutet</span></div>
+    <div><span class="n">STUFE 5</span><span class="t">Verkehrswert</span>
+      <span class="s">ein Verfahren, begründet gewählt</span></div>
+    <div><span class="n">STUFE 6</span><span class="t">Finanzierung</span>
+      <span class="s">mit Marktzins-Indikation</span></div>
+    <div><span class="n">STUFE 7</span><span class="t">Cashflow</span>
+      <span class="s">vor und nach Steuern</span></div>
+    <div><span class="n">STUFE 8</span><span class="t">Potenzial</span>
+      <span class="s">Annahmen offengelegt</span></div>
+  </div>
+
+  <!-- ═══ A ═══════════════════════════════════════════════════════ -->
+  <section class="fs">
+    <div class="fsk"><span class="nr">FASSUNG A</span><h2>Der Rechenweg</h2></div>
+    <p class="fsw">Alle acht Stufen untereinander, jede mit ihrer Herkunft
+    gekennzeichnet — amtlich, indikativ oder gerechnet. Jede Stufe endet mit einer
+    Zwischensumme, und wo etwas gewonnen wird, steht der Betrag im grünen Streifen.</p>
+    <p class="fsu">Stärke: vollständig und prüfbar — ein Sachverständiger kann jede
+    Zeile nachrechnen. Schwäche: lang, verlangt Lesebereitschaft.</p>
+    <div data-steuer="a"></div>
+  </section>
+
+  <!-- ═══ B ═══════════════════════════════════════════════════════ -->
+  <section class="fs">
+    <div class="fsk"><span class="nr">FASSUNG B</span><h2>Der Regler</h2></div>
+    <p class="fsw"><b>Zieh den Schieber.</b> Die Restnutzungsdauer ist ein Rahmen von
+    44 bis 56 Jahren — und während du wählst, rechnen Abschreibung, Steuerwirkung und
+    Cashflow live mit. Bei welchem Wert trägt sich der Deal?</p>
+    <p class="fsu">Stärke: man begreift in fünf Sekunden, was die Wahl bedeutet.
+    Schwäche: zeigt nur eine Stufe der Kette, der Rest muss daneben stehen.</p>
+    <div data-steuer="b"></div>
+  </section>
+
+  <!-- ═══ C ═══════════════════════════════════════════════════════ -->
+  <section class="fs">
+    <div class="fsk"><span class="nr">FASSUNG C</span><h2>Vorher / Nachher</h2></div>
+    <p class="fsw">Dasselbe Objekt, derselbe Kaufpreis, dieselbe Bank — nur zwei
+    Zahlen sind anders: der Bodenwert im Vertrag und die angesetzte Nutzungsdauer.
+    Links trägt sich der Deal nicht, rechts schon.</p>
+    <p class="fsu">Stärke: der Unterschied ist das Argument, nicht die Funktion.
+    Schwäche: verschweigt den Weg dorthin — man sieht das Ergebnis, nicht die Herkunft.</p>
+    <div data-steuer="c"></div>
+  </section>
+
+  <!-- ═══ D ═══════════════════════════════════════════════════════ -->
+  <section class="fs">
+    <div class="fsk"><span class="nr">FASSUNG D</span><h2>Das Blatt</h2></div>
+    <p class="fsw">Alles auf einem Bogen, zweispaltig, wie ein Auszug für den
+    Steuerberater. Jeder Abschnitt trägt oben rechts seine Quelle.</p>
+    <p class="fsu">Stärke: das ist die Seite, die man ausdruckt und mitnimmt.
+    Schwäche: statisch — nichts bewegt sich, nichts erklärt sich von selbst.</p>
+    <div data-steuer="d"></div>
+  </section>
+
+  <!-- ═══ BEFUNDE ═════════════════════════════════════════════════ -->
+  <div class="hinweis korrektur">
+    <h2>Eine Korrektur an meinen eigenen früheren Zahlen</h2>
+    <p>In den Fassungen davor stand <b>DSCR 1,27</b> und „Kapitaldienst gedeckt". Das
+    hält der Rechnung nicht stand. Bei 12.960 € Reinertrag und 12.685 € Annuität
+    liegt der DSCR bei <b>0,82</b> — die Miete allein trägt die Rate nicht.</p>
+    <p>Ich hatte die Zahl gesetzt, statt sie zu rechnen. Jetzt steht sie so da, wie
+    sie ist, und macht die Geschichte sogar stärker: <b>genau deshalb</b> entscheidet
+    die Steueroptimierung über den Deal.</p>
+  </div>
+
+  <div class="hinweis">
+    <h2>Warum nur ein Wertermittlungsverfahren gerechnet wird</h2>
+    <p>Bei einer vermieteten Eigentumswohnung führt das <b>Ertragswertverfahren</b> —
+    der Ertrag bestimmt den Wert. Der Sachwert wäre hier das falsche Verfahren und
+    wird deshalb nicht gerechnet, sondern <b>benannt und begründet verworfen</b>.
+    Zwei Verfahren nebeneinander zu zeigen, von denen eines nicht passt, sieht nach
+    Gründlichkeit aus und ist das Gegenteil.</p>
+    <p>Der Kaufpreis liegt <b>2,9 % über dem Verkehrswert</b>. Das ist in dieser Lage
+    vertretbar — aber es steht da, statt weggerundet zu werden.</p>
+  </div>
+
+  <div class="hinweis">
+    <h2>Was an der Optimierung belegbar ist — und was nicht</h2>
+    <p>Der <b>20-Prozent-Abschlag auf den Bodenwert</b> ist ein Ansatz für die
+    Belastung des Grundstücks durch das Sondereigentum. Er gehört in den
+    Notarvertrag und bringt hier 3.643 € mehr Bemessungsgrundlage.</p>
+    <p>Die <b>kürzere Nutzungsdauer</b> nach § 7 Abs. 4 Satz 2 EStG verlangt einen
+    Nachweis. DealPilot zeigt den Rahmen aus Anlage 2 ImmoWertV und lässt die Wahl —
+    er setzt keine Zahl, die niemand belegen kann. Wer unter 44 Jahre geht, verlässt
+    das Modell und braucht ein Gutachten.</p>
+    <p>Die <b>Marktzins-Indikation</b> ist eine Indikation, kein Angebot. Das steht
+    an der Zeile, nicht im Kleingedruckten.</p>
+  </div>
+
+</div>
+
+<script src="demo-steuer-daten.js?v=1585"></script>
+<script src="demo-steuer.js?v=1581"></script>
+</body>
+</html>
