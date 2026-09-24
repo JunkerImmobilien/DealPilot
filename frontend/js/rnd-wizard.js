@@ -416,6 +416,14 @@
         if (key === 'eigentuemer_abweichend') {
           renderCurrentStep();
         }
+
+        /* v1597 · Die Punktzahl in Schritt 5 trug den Kommentar
+           "Live-Anzeige", wurde aber nur beim Rendern berechnet. Wer die
+           acht Felder ausfuellte, las durchgehend "0 / 20 · nicht
+           modernisiert". Statt den ganzen Schritt neu zu zeichnen - das
+           wuerde den Fokus aus dem gerade bedienten Feld reissen - wird
+           nur der Balken nachgezogen. */
+        if (path[0] === 'mod') aktualisiereModBalken(container);
       });
       // Bei Text-Inputs zusätzlich input-Event
       if (el.type === 'text' || el.tagName === 'TEXTAREA' || el.type === 'number') {
@@ -853,6 +861,25 @@
     });
   }
 
+  /* v1597 · Die Stufenbezeichnung stand nur im Render von Schritt 5.
+     Sie wird jetzt von dort UND vom Live-Aktualisierer gebraucht, also
+     steht sie an einer Stelle - sonst laufen die beiden auseinander. */
+  function modGrad(punkte) {
+    if (punkte <= 1)  return 'nicht modernisiert';
+    if (punkte <= 5)  return 'kleine Modernisierungen';
+    if (punkte <= 10) return 'mittlerer Modernisierungsgrad';
+    if (punkte <= 17) return 'überwiegend modernisiert';
+    return 'umfassend modernisiert';
+  }
+
+  function aktualisiereModBalken(container) {
+    const bar = (container || document).querySelector('.rnd-wiz-result-bar');
+    if (!bar) return;                    /* anderer Schritt - nichts zu tun */
+    const p = computeModPoints(state.mod).total;
+    bar.innerHTML = 'Berechnete Modernisierungs-Punkte: <strong>'
+      + p + ' / 20</strong> &nbsp;·&nbsp; <em>' + modGrad(p) + '</em>';
+  }
+
   function computeModPoints(mod) {
     // Vereinfachte Heuristik:
     // <5 J / kernsaniert = volle Punkte, 5-10 J = halb, 10-20 J = wenig, >20 J / Keine = 0
@@ -1198,7 +1225,12 @@
       ['aussenwand',  'Wärmedämmung Außenwände'],
       ['baeder',      'Bäder'],
       ['innenausbau', 'Innenausbau (Decken, Fußböden, Treppen)'],
-      ['technik',     'Technische Ausstattung']
+      /* v1597 · Hier stand ['technik','Technische Ausstattung'].
+         Anlage 2 ImmoWertV kennt dieses Element nicht; ihr achtes ist
+         die Grundrissgestaltung - und genau die bewertet
+         computeModPoints (grundriss, 2 Punkte). Die Antwort auf
+         'Technische Ausstattung' fiel deshalb ersatzlos weg. */
+      ['grundriss',   'Wesentliche Änderung der Grundrissgestaltung']
     ];
 
     let html = '<div class="rnd-wiz-info-box">'
@@ -1225,12 +1257,7 @@
 
     // Live-Anzeige der berechneten Punktzahl
     const punkte = computeModPoints(state.mod).total;
-    let grad;
-    if (punkte <= 1) grad = 'nicht modernisiert';
-    else if (punkte <= 5) grad = 'kleine Modernisierungen';
-    else if (punkte <= 10) grad = 'mittlerer Modernisierungsgrad';
-    else if (punkte <= 17) grad = 'überwiegend modernisiert';
-    else grad = 'umfassend modernisiert';
+    const grad = modGrad(punkte);        /* v1597 · eine Quelle, siehe oben */
 
     html += '<div class="rnd-wiz-result-bar">'
       + 'Berechnete Modernisierungs-Punkte: <strong>' + punkte + ' / 20</strong>'
