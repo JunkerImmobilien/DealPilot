@@ -112,7 +112,9 @@
     { k: 'urteil',     dauer: 10000, uhr: 238,
       ohne: 'Bauchgefühl',                                ohneZt: 'unbezifferbar' },
     { k: 'copilot',    dauer: 16000, uhr: 262,
-      ohne: 'Niemanden fragen können',                    ohneZt: '—' }
+      ohne: 'Niemanden fragen können',                    ohneZt: '—' },
+    { k: 'dokumente',  dauer: 13000, uhr: 281,
+      ohne: 'Bericht layouten, bevor die Bank hinsieht',  ohneZt: '55 min' }
   ];
   var N = AKTE.length;
 
@@ -209,8 +211,7 @@
         'Nach 34 Sekunden steht die erste Zahl.',
         'Aus neun Angaben — mehr liegt noch nicht vor. Der Score sagt hier noch '
         + 'nicht, ob es sich lohnt; er sagt, ob es sich lohnt weiterzurechnen.')
-        + '<div style="display:grid;grid-template-columns:1fr auto;gap:22px;'
-        + 'align-items:center">'
+        + '<div class="wx-mitkarte">'
         + '<div class="wx-rech">'
         + rz('Kennzahlen belegt', Q.kennzahlen_hat + ' von ' + Q.kennzahlen_von, '',
           'der Rest braucht Finanzierung und amtliche Werte')
@@ -426,8 +427,7 @@
         'Jetzt sind alle Angaben da.',
         'Dieselbe Karte wie nach dem Quick-Check — nur steht jetzt alles darin: '
         + 'Finanzierung gerechnet, amtliche Werte belegt, Steuerwirkung bekannt.')
-        + '<div style="display:grid;grid-template-columns:1fr auto;gap:22px;'
-        + 'align-items:center">'
+        + '<div class="wx-mitkarte">'
         + '<div class="wx-rech">'
         + rz('nach dem Quick-Check', S.QUICK.score + ' · ' + S.QUICK.stufe, '',
           'aus ' + S.QUICK.kennzahlen_hat + ' Angaben')
@@ -447,6 +447,7 @@
     }
 
     if (a.k === 'copilot') return szeneCopilot();
+    if (a.k === 'dokumente') return szeneDokumente();
 
     /* ── 9 · DAS URTEIL ──────────────────────────────────────────── */
     var lohnt = C.mit.nach_steuer_monat >= 0;
@@ -496,6 +497,61 @@
       + '<span class="tx">„Der Cashflow ist knapp positiv. Was kann ich tun, '
       + 'damit mehr hängen bleibt — und was bleibt am Ende übrig?"</span></div>'
       + '<div class="wx-antworten"></div>';
+  }
+
+  /* ── 12 · DIE DOKUMENTE ─────────────────────────────────────────
+     Was am Ende herauskommt - und woher jede Zahl darin stammt.
+     Die Seitenzahlen und Betraege kommen aus der Rechenbasis, damit
+     hier nichts steht, was die Stufen davor nicht hergeben. */
+  function szeneDokumente() {
+    var K = S.KPA, A = S.AFA, E = S.EW, F = S.FIN, R = S.RND, V = S.VERMOEGEN;
+    var DOK = [
+      ['Investment-Case für die Bank', '6 Seiten', '03 Bank',
+        'Kennzahlen, Cashflow über 12 Jahre, Anschluss-Stresstest und der '
+        + 'Deal Score. Mit dem Kapitaldienst aus Stufe 8 — ' + eur(F.rate_monat)
+        + ' im Monat.'],
+      ['BMF-Anlage Kaufpreisaufteilung', '4 Seiten', '04 Steuern',
+        'Die Aufteilung aus Stufe 4, in der Form, die das Finanzamt erwartet: '
+        + 'Boden ' + eur(K.boden_angesetzt) + ' · Gebäude ' + eur(K.gebaeude_mit) + '.'],
+      ['Gutachten Restnutzungsdauer', '5 Seiten', '04 Steuern',
+        'Der Nachweis nach § 7 Abs. 4 Satz 2 EStG für ' + R.von + ' Jahre — '
+        + 'ohne ihn gibt es die ' + eur(A.steuer_jahr) + ' Steuerersparnis nicht.'],
+      ['Marktbericht mit Quellennachweis', '8 Seiten', '05 Bewertung',
+        'Ertragswert ' + eur(E.verkehrswert) + ', jede amtliche Zahl mit '
+        + 'Ausschuss, Jahrgang, Seite und Lizenz.'],
+      ['Werbungskosten-Aufstellung', '3 Seiten', '04 Steuern',
+        'AfA, Zinsen und nicht umlagefähiges Hausgeld — fertig für die Anlage V.']
+    ];
+    return titel('STUFE 12 · DIE UNTERLAGEN',
+      'Sechsundzwanzig Seiten, ein Klick.',
+      'Alles, was in den elf Stufen davor gerechnet wurde, wird zu Papier — '
+      + 'und landet gleich im richtigen Ordner des Objekts.')
+      + '<div class="wx-dok">'
+      + '<div class="wx-pdfs">' + DOK.map(function (d, i) {
+          return '<div class="wx-pdf" style="--n:' + i + '">'
+            + '<span class="ik">' + ik('blatt', 18) + '</span>'
+            + '<span><b>' + esc(d[0]) + '</b><span>' + d[3] + '</span></span>'
+            + '<span class="s">' + esc(d[1]) + '<br>→ ' + esc(d[2]) + '</span></div>';
+        }).join('') + '</div>'
+      + '<div class="wx-ordner">'
+      + '<div class="wx-o-h">' + ik('stapel', 15)
+      + '<span>Datenraum · Lindenallee 14</span></div>'
+      + ['01 Exposé & Inserat', '02 Objektunterlagen', '03 Bank',
+         '04 Steuern', '05 Bewertung', '06 Fotos'].map(function (o, i) {
+          var voll = /03|04|05/.test(o.slice(0, 2));
+          return '<div class="wx-o' + (voll ? ' voll' : '') + '" style="--n:' + i + '">'
+            + '<span class="wx-o-ik">' + ik(voll ? 'haken' : 'blatt', 12) + '</span>'
+            + esc(o) + (voll ? '<span class="wx-o-n">neu</span>' : '') + '</div>';
+        }).join('')
+      + '<div class="wx-o-note">Die drei markierten Ordner haben gerade Zuwachs '
+      + 'bekommen — ohne dass jemand eine Datei verschoben hat.</div>'
+      + '</div></div>'
+      + '<div class="wx-gross" style="max-width:none">'
+      + '<span class="zahl wx-zahl" data-ziel="' + eur(V.zuwachs) + '">0</span>'
+      + '<span class="tx"><b>Vermögenszuwachs nach ' + V.jahre + ' Jahren Zinsbindung</b>'
+      + '<span>' + eur(V.getilgt) + ' getilgt · ' + eur(V.wertzuwachs)
+      + ' Wertzuwachs bei vorsichtigen 1 % · ' + eur(V.cashflow_summe)
+      + ' Cashflow. Eingesetzt waren ' + eur(V.eingesetzt) + '.</span></span></div>';
   }
 
   function titel(lb, h, p) {
@@ -645,6 +701,7 @@
       if (z) setTimeout(function () { hoch(el, z, 1100); }, 350);
     });
 
+    if (a.k === 'dokumente') { staffeln('.wx-pdf', 150); staffeln('.wx-o', 90); }
     if (a.k === 'copilot') copilot();
 
     /* ── Stufe 1: tippen, dann die Pillen fliegen lassen ─────────── */

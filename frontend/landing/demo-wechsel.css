@@ -659,3 +659,68 @@
   .wx-dial2,.wx-dial2 svg{width:126px;height:126px}
   .wx-dv2 b{font-size:38px}
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1590 · Zwei Anzeigefehler, in der Landing gemessen
+   ───────────────────────────────────────────────────────────────────────
+   Marcel am 24.09.2026: "bei der animation auf der linken seite nicht
+   angezeigt. Der DealScore und der Investor deal Score werden verzerrt
+   angezeigt."
+
+   1 INHALTE KLEBTEN LINKS. Die Buehne ist 1134 px breit, die Inhalte
+     tragen max-width 560-640 px - ohne margin:auto standen sie am
+     linken Rand und die rechte Haelfte blieb leer. Gemessen an Stufe 3:
+     wx-mpi 640 px in einer 1134 px breiten Flaeche.
+
+   2 DIE SCORE-KARTE WAR GEQUETSCHT. Das aeussere Grid stand auf
+     "1fr auto"; die linke Spalte nahm sich 821 px, fuer die Karte
+     blieben 291 statt 440. Die Balkenspalte schrumpfte dadurch auf
+     95 px. Der Ring blieb rund - gestaucht war alles daneben, und
+     genau das sieht verzerrt aus.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* 1 · Alles, was schmaler ist als die Buehne, steht in der Mitte. */
+.wx-szene .wx-rech,
+.wx-szene .wx-gew,
+.wx-szene .wx-mpi,
+.wx-szene .wx-waage,
+.wx-szene .wx-reg,
+.wx-szene .wx-verf,
+.wx-szene .wx-kipp,
+.wx-szene .wx-gruende,
+.wx-szene .wx-frage,
+.wx-szene .wx-gross,
+.wx-szene .wx-pdfs,
+.wx-szene .wx-antworten{margin-left:auto;margin-right:auto}
+
+/* 2 · Die Karte bekommt ihre Breite, statt sie sich nehmen zu muessen. */
+.wx-mitkarte{display:grid;grid-template-columns:minmax(0,1fr) 440px;
+  gap:26px;align-items:center}
+.wx-mitkarte > *{min-width:0}
+.wx-mitkarte .wx-karte{max-width:none;width:100%}
+.wx-mitkarte .wx-rech{margin:0}
+
+@media(max-width:1060px){
+  .wx-mitkarte{grid-template-columns:1fr;justify-items:center}
+  .wx-mitkarte .wx-karte{max-width:440px}
+}
+
+/* ── Stufe 12 · Die Unterlagen und der Datenraum ───────────────────── */
+.wx-dok{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:22px;
+  align-items:start;max-width:940px;margin:0 auto 14px}
+.wx-dok > *{min-width:0}
+.wx-ordner{border:1px solid var(--line);background:rgba(255,255,255,.03);
+  padding:14px 15px}
+.wx-o-h{display:flex;align-items:center;gap:8px;font:700 10px/1 var(--mono);
+  letter-spacing:.1em;color:var(--gdh);padding-bottom:10px;
+  border-bottom:1px solid var(--line);margin-bottom:9px}
+.wx-o{display:flex;align-items:center;gap:8px;padding:6px 0;
+  font:500 11.5px/1.3 var(--mono);color:var(--ddk)}
+.wx-o-ik{display:flex;flex:none;color:rgba(255,255,255,.28)}
+.wx-o.voll{color:var(--txtd)}
+.wx-o.voll .wx-o-ik{color:var(--grnh)}
+.wx-o-n{margin-left:auto;font:700 7.5px/1 var(--mono);letter-spacing:.1em;
+  padding:3px 6px;background:rgba(63,165,108,.2);color:#8FE3B2}
+.wx-o-note{margin-top:11px;padding-top:10px;border-top:1px solid var(--line);
+  font-size:10.8px;line-height:1.5;color:var(--mut)}
+@media(max-width:860px){ .wx-dok{grid-template-columns:1fr} }

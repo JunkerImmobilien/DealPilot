@@ -513,10 +513,28 @@
     } catch (e) { return false; }
   }
 
+  function ueberFlyer() {
+    if (/\/erstflug\/?$/i.test(location.pathname)) return true;
+    try { if (sessionStorage.getItem('dp_flyer_frisch') === '1') return true; } catch (e) {}
+    return false;
+  }
+
   function boot() {
     /* v1246: Anzeige aus — siehe Schalter oben.
        v1421b: ausser fuer Flyer-Gaeste. */
-    if (!ANZEIGE_AKTIV && !flyerGast()) return;
+    /* v1590: NUR IN DER SITZUNG, IN DER MAN UEBER /erstflug KAM.
+       Bis hierher reichte ein Flyer-Code im Cookie - und der bleibt.
+       Damit sah jeder, der den Link einmal aufgerufen hatte, auf JEDER
+       Seite dauerhaft das Rabattband. Gemessen am 24.09.2026: Banner
+       sichtbar auf /dp2.html ohne jeden localStorage-Eintrag, allein
+       wegen des Cookies.
+       Marcel am 22.09.2026: "Aber direkt ausgewiesen, wenn man auf die
+       Seite klickt, soll er nicht sein."
+       Geprueft wird jetzt dasselbe wie in erstflug-popup.js: der Pfad
+       ODER die frische Sitzungsmarke. Der Code im Cookie bleibt
+       unberuehrt und greift weiter im Checkout - abgeschaltet ist die
+       WERBEFLAECHE, nicht der Rabatt. */
+    if (!ANZEIGE_AKTIV && !ueberFlyer()) return;
     var isApp = !!(global.Auth && typeof Auth.getApiBase === 'function');
 
     loadPromo().then(function (promo) {
