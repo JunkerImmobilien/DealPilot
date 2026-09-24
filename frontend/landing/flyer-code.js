@@ -295,14 +295,35 @@
     if (code) {
       try { document.documentElement.setAttribute('data-flyer-code', code); } catch (e) {}
       linkeAnreichern(code);
-      /* Der Balken nur auf der LANDING. In der App sitzt der Nutzer schon
-         im Cockpit; dort fuehrt die Preisansicht den Rabatt selbst. */
-      /* v1522: Auf der Landing uebernimmt das Fenster (erstflug-popup.js).
-         Der Balken bleibt fuer alle anderen Faelle - etwa wenn jemand den
-         Code aus einem frueheren Besuch mitbringt und KEIN Fenster bekommt. */
-      var frisch = false;
-      try { frisch = sessionStorage.getItem('dp_flyer_frisch') === '1'; } catch (e) {}
-      if (!global.Auth && !frisch) balkenZeigen(code);
+      /* ── v1593 · Der Balken erscheint NICHT MEHR von selbst ──────────
+         Bis hierher galt: wer ueber /erstflug kommt, bekommt das Fenster
+         (erstflug-popup.js) - alle anderen mit gespeichertem Code den
+         Balken. Der zweite Fall war als Ausnahme gedacht und ist in
+         Wahrheit der Regelfall: der Code liegt in localStorage UND im
+         Cookie, also traegt ihn jeder Besucher, der /erstflug einmal
+         gesehen hat, bei JEDEM weiteren Aufruf wieder mit. Der Balken
+         stand damit dauerhaft ueber der Landing.
+
+         Gemessen am 24.09.2026 auf staging/dp2.html: Sitzungsmarke
+         dp_flyer_frisch geloescht, Seite frisch geladen - der Balken war
+         trotzdem da (58 px, display:flex).
+
+         Marcel dazu: "oben hast du immer dauerhaft diesen Rabatt mit
+         Erstflug. [...] nur wenn man staging.dealpilot.immo/erstflug
+         aufruft, dass dann dieses Modal kommt."
+
+         Der Code selbst bleibt gespeichert - er muss es, sonst faellt
+         der Rabatt bei der Anmeldung weg. Nur die dauerhafte WERBUNG
+         dafuer faellt. Das Fenster bleibt der einzige Weg, auf dem der
+         Rabatt sich zeigt, und das Anreichern der Links darunter
+         ebenfalls: der Rabatt WIRKT weiter, er drängt sich nur nicht
+         mehr auf.
+
+         Der Balken ist damit kein toter Code, sondern eine Ansicht ohne
+         Selbstaufruf - ueber DealPilotFlyerCode.balkenZeigen(code) laesst
+         er sich jederzeit wieder holen. Wer ihn zurueckhaben will,
+         braucht dafuer eine Stelle, die ihn RUFT, keine, die ihn
+         voraussetzt. */
       /* Nachzuegler: die Landing baut Teile ihrer Navigation per JS. */
       setTimeout(function () { linkeAnreichern(code); }, 1200);
     }
@@ -314,6 +335,8 @@
     set:     merken,
     clear:   loeschen,
     prozentNachtragen: prozentNachtragen,
+    /* Seit v1593 ruft niemand mehr von selbst - siehe start(). */
+    balkenZeigen: balkenZeigen,
     /* fuer Tests / Diagnose */
     _ausPfad:  ausPfad,
     _ausQuery: ausQuery
