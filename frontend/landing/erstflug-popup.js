@@ -56,7 +56,17 @@
         .then(function (d) {
           if (fertig) return;
           fertig = true; clearTimeout(zeit);
-          cb(d && d.active && d.percent ? d : null);
+          /* v1595c · Die Antwort ist verpackt: {"promo":{active,percent,…}}.
+             Hier stand `d.active` - das ist am aeusseren Objekt immer
+             undefined, also kam cb(null) und der Notnagel 15 griff JEDES
+             Mal. Gemessen am 24.09.2026 gegen Prod und Staging: beide
+             antworten {"promo":{"active":true,"percent":15}}. Die 15
+             stimmte damit zufaellig - und haette gelogen, sobald der
+             Coupon in Stripe einen anderen Satz bekommt.
+             promo-erstflug.js packt an derselben Stelle richtig aus
+             (j.promo); diese Kopie hat es nicht mituebernommen. */
+          var p = d && d.promo ? d.promo : d;
+          cb(p && p.active && p.percent ? p : null);
         })
         .catch(function () { if (!fertig) { fertig = true; clearTimeout(zeit); cb(null); } });
     } catch (e) { if (!fertig) { fertig = true; clearTimeout(zeit); cb(null); } }
@@ -109,7 +119,9 @@
     d.innerHTML =
       '<div class="k">' +
         '<div class="b">ERSTFLUG</div>' +
-        '<h2>Dein Rabatt liegt<br><em>' + pct + ' % dauerhaft</em> bereit.</h2>' +
+        '<h2>Dein Rabatt liegt' +
+          (pct ? '<br><em>' + String(pct).replace('.', ',') + ' % dauerhaft</em> bereit.'
+               : '<br><em>dauerhaft</em> bereit.') + '</h2>' +
         '<p>Du bist über den Erstflug-Link gekommen. Nimm den Rabatt an, dann gilt er ' +
           'für jedes Paket — und er bleibt, solange du fliegst.</p>' +
         '<div class="z">' +
@@ -145,7 +157,12 @@
     try { if (sessionStorage.getItem(GESEHEN) === '1') return; } catch (e) {}
     var c = code();
     prozent(function (d) {
-      var pct = (d && d.percent) ? d.percent : 15;
+      /* v1595c · KEIN erfundener Prozentsatz mehr. Hier stand `: 15` -
+         eine Zahl, die ueber Geld spricht und aus keiner Quelle stammt.
+         Antwortet der Endpunkt nicht, nennt das Fenster den Rabatt ohne
+         Satz: der Code ist hinterlegt, den genauen Satz zeigt dann der
+         Checkout. Lieber keine Zahl als eine erfundene. */
+      var pct = (d && d.percent) ? d.percent : null;
       try { sessionStorage.setItem(GESEHEN, '1'); } catch (e) {}
       setTimeout(function () { zeigen(pct, c || 'ERSTFLUG'); }, 700);
     });
