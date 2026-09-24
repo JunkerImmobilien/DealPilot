@@ -641,3 +641,13 @@
   #nachkauf h2{font-size:24px}
   .nk-preis{font-size:32px}
 }
+
+/* ── Wortzeichen ohne Haus-Icon ─────────────────────────────────────
+   v1592 · Marcel am 24.09.2026: "bei den Logos ganz oben und unten, da
+   ist irgendwie so ein Icon davor mit einem Haeuschen. Einmal unten aus
+   dem Footer-Bereich raus ... und das Ganze bitte oben im Header auch."
+   Das Wortzeichen traegt jetzt allein - und darf dafuer groesser sein. */
+.mark-gross .wort{font-size:23px;letter-spacing:-.02em}
+.nav .mark-gross{padding-left:2px}
+footer .mark-gross .wort{font-size:21px}
+@media(max-width:700px){ .mark-gross .wort{font-size:20px} }

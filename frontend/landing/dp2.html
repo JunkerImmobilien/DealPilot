@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="dp2.css?v=v1570">
 <link rel="stylesheet" href="dp2-hero.css?v=v1570">
-<link rel="stylesheet" href="dp2-teile.css?v=v1588">
+<link rel="stylesheet" href="dp2-teile.css?v=v1592">
 <link rel="stylesheet" href="dp2-buehne.css?v=v1570">
 <!-- v1588: der Wechselschritt loest den bisherigen Ablauf ab -->
 <link rel="stylesheet" href="demo-wechsel.css?v=v1591">
@@ -56,7 +56,7 @@
 </div></div>
 
 <nav class="nav"><div class="wrap">
-  <a class="mark" href="#"><span class="sig"><svg class="ico" style="width:15px;height:15px"><use href="#i-haus"/></svg></span><span class="wort">Deal<b>Pilot</b></span></a>
+  <a class="mark mark-gross" href="#"><span class="wort">Deal<b>Pilot</b></span></a>
   <button class="burger" aria-label="Menü"><span></span><span></span><span></span></button>
   <ul>
     <li><a href="#workflow">So funktioniert's</a></li>
@@ -516,7 +516,11 @@
      dp2-video.js, ein Eintrag mehr genuegt. Geladen wird erst beim
      Anklicken (preload=none), damit die Seite nicht an Videos haengt,
      die niemand ansieht. ════════════════════════════════════════════ -->
-<section class="sec sec-dark" id="video"><div class="wrap">
+<!-- v1592: "DealPilot in Bewegung" ist ausgeblendet, solange es
+     keine Videos gibt. Marcel am 24.09.2026: "Das koennen wir erst mal
+     rausnehmen, weil wir noch keine Videos haben." Der Abschnitt bleibt
+     im Quelltext - wenn die Filme da sind, faellt nur das hidden weg. -->
+<section class="sec sec-dark" id="video" hidden><div class="wrap">
   <div class="head rv"><div class="eye">Sehen statt lesen</div>
     <h2>DealPilot <span class="ac">in Bewegung.</span></h2>
     <p>Kurze Filme aus dem laufenden Programm — kein Werbespot, sondern
@@ -589,7 +593,7 @@
 <footer class="footer"><div class="wrap">
   <div class="footer-grid">
     <div>
-      <div class="mark" style="color:#fff"><span class="sig"><svg class="ico" style="width:15px;height:15px"><use href="#i-haus"/></svg></span><span class="wort">Deal<b>Pilot</b></span></div>
+      <div class="mark mark-gross" style="color:#fff"><span class="wort">Deal<b>Pilot</b></span></div>
       <p class="footer-tag">Immobilien-Investmentanalyse für strukturierte Entscheidungen.
         Entwickelt von Junker Immobilien · Sachverständigenbüro &amp; Projektentwicklung.</p>
     </div>

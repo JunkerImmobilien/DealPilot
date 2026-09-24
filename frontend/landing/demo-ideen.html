@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Fünf Ideen · zum Anfassen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="dp2.css?v=1592">
+<link rel="stylesheet" href="demo-ideen.css?v=1592">
+<style>
+  body{background:var(--cream2)}
+  .kopfleiste{background:var(--ob);color:#fff;padding:26px 0 24px;
+    border-bottom:2px solid var(--gd)}
+  .kopfleiste .mk{font:700 9.5px/1 var(--mono);letter-spacing:.2em;color:var(--gdh)}
+  .kopfleiste h1{font-size:31px;margin:9px 0 8px}
+  .kopfleiste p{margin:0 0 10px;color:var(--mdk);max-width:82ch;font-size:14.6px;
+    line-height:1.64}
+  .kopfleiste p:last-child{margin-bottom:0}
+  .kopfleiste b{color:#fff}
+  .warn{background:#fff;border:1px solid var(--cream-line);
+    border-left:3px solid #B8625C;padding:20px 24px;margin:26px 0 8px}
+  .warn h2{font-size:18px;margin-bottom:9px}
+  .warn p{margin:0 0 10px;font-size:14.4px;line-height:1.66;color:var(--inkm);
+    max-width:86ch}
+  .warn p:last-child{margin-bottom:0}
+  .warn b{color:var(--ink)}
+  .tab{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.4px}
+  .tab th{text-align:left;font:700 8.5px/1 var(--mono);letter-spacing:.12em;
+    color:var(--gdi);padding:0 10px 7px 0;border-bottom:1px solid var(--cream-line)}
+  .tab td{padding:6px 10px 6px 0;border-bottom:1px solid var(--cream-line);
+    color:var(--inkm)}
+  .tab td b{color:var(--ink);font-family:var(--mono)}
+  .schluss{background:var(--ob);color:var(--txtd);padding:28px 30px;margin:36px 0 56px;
+    border-left:3px solid var(--gd)}
+  .schluss h2{color:#fff;font-size:20px;margin-bottom:11px}
+  .schluss p{margin:0 0 11px;color:var(--mdk);font-size:14.4px;line-height:1.66;
+    max-width:84ch}
+  .schluss p:last-child{margin-bottom:0}
+  .schluss b{color:var(--gdh)}
+</style>
+</head>
+<body>
+
+<header class="kopfleiste">
+  <div class="wrap">
+    <span class="mk">DEMO · NICHT ÖFFENTLICH · v1592</span>
+    <h1>Fünf Ideen — zum Anfassen statt zum Lesen</h1>
+    <p>Jede läuft. Zieh den Regler, klick auf eine Zahl, schalt das Objekt um —
+    alles rechnet durch <b>dieselbe Kette</b> wie die große Demo. Es gibt keine
+    hinterlegten Ergebnisse.</p>
+    <p>Grundlage ist <a href="demo-wechsel.html" style="color:var(--gdh);text-decoration:underline">die
+    zwölfstufige Fassung</a> und dasselbe Objekt: Lindenallee 14.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ═══ BEFUND VORWEG ═══════════════════════════════════════════ -->
+  <div class="warn">
+    <h2>Zuerst ein Befund, der alles darunter betrifft</h2>
+    <p>Um den Regler bauen zu können, musste der Deal Score <b>gerechnet</b> werden
+    statt gesetzt. Dabei habe ich in <b>js/dealscore2.js</b> nachgesehen, wie die
+    echte App ihn bildet — und die Zahlen der Demo halten dem nicht stand.</p>
+    <table class="tab">
+      <tr><th>Teilwert</th><th>Demo zeigte</th><th>echte Skala ergibt</th><th>warum</th></tr>
+      <tr><td>Finanzierung</td><td><b>86</b></td><td><b>0</b></td>
+        <td>die DSCR-Kurve beginnt erst bei 0,9 — unser Wert ist 0,82</td></tr>
+      <tr><td>Rendite</td><td><b>72</b></td><td><b>35</b></td>
+        <td>4,5 % brutto liegt knapp über der untersten Stützstelle</td></tr>
+      <tr><td>Risiko</td><td><b>79</b></td><td><b>68</b></td>
+        <td>44 Jahre Restnutzungsdauer</td></tr>
+      <tr><td><b>Gesamt</b></td><td><b>76 · Gut</b></td><td><b>39 · Schwach</b></td>
+        <td>—</td></tr>
+    </table>
+    <p><b>Das heißt nicht, dass der Deal schlecht ist</b> — er trägt sich nach Steuern,
+    das bleibt richtig. Es heißt, dass die App ihn <b>streng bewertet</b>, und die
+    Demo das bisher verschwiegen hat. Eine Wohnung mit 4,5 % Bruttorendite bei
+    3,62 % Zins ist nach den eigenen Maßstäben kein guter Deal, sondern einer, den
+    man rechnen muss.</p>
+    <p>Alle Blöcke unten zeigen deshalb die <b>gerechneten</b> Werte. Das macht die
+    Demo unbequemer — und glaubwürdiger.</p>
+  </div>
+
+  <!-- ═══ 1 ═══════════════════════════════════════════════════════ -->
+  <section class="ide">
+    <div class="idk"><span class="nr">IDEE 1</span><h2>Der Kaufpreis wird verhandelbar</h2></div>
+    <p class="idw"><b>Zieh den Regler.</b> Jede Stufe hängt am Kaufpreis — Aufteilung,
+    Abschreibung, Rate, Cashflow und Vermögen wandern gleichzeitig mit. Der Besucher
+    sieht in einer Bewegung, was die Verhandlung wert ist.</p>
+    <p class="idu">Aufwand: klein. Wirkung: die höchste von allen fünf — wer den
+    Regler einmal gezogen hat, glaubt der ganzen Seite, dass hier gerechnet wird.</p>
+    <div data-idee="i1"></div>
+  </section>
+
+  <!-- ═══ 2 ═══════════════════════════════════════════════════════ -->
+  <section class="ide">
+    <div class="idk"><span class="nr">IDEE 2</span><h2>Die Quelle hinter jeder Zahl</h2></div>
+    <p class="idw"><b>Klick auf eine Zeile.</b> Ausschuss, Fundstelle, Stichtag, Lizenz
+    und die Namensnennung — das ist der Unterschied zu jedem Renditerechner im Netz,
+    und man sieht ihn bisher nicht.</p>
+    <p class="idu">Aufwand: klein. Die Daten liegen schon vor — quellenvermerk,
+    lizenz und quelle_url stehen an jedem Registersatz.</p>
+    <div data-idee="i2"></div>
+  </section>
+
+  <!-- ═══ 3 ═══════════════════════════════════════════════════════ -->
+  <section class="ide">
+    <div class="idk"><span class="nr">IDEE 3</span><h2>Ein zweites Objekt, das absagt</h2></div>
+    <p class="idw"><b>Schalt um.</b> Der Ahornweg ist älter, schlechter vermietet und
+    im Erdgeschoss — dieselbe Kette, dasselbe Register, und am Ende steht
+    <b>TRÄGT NICHT</b>. Nichts daran ist hinterlegt; die Rechnung kommt zu dem Schluss.</p>
+    <p class="idu">Eine Demo, die immer „lohnt sich" sagt, ist ein Prospekt. Eine, die
+    auch Nein sagen kann, ist ein Werkzeug — und das Nein ist glaubwürdiger als jedes Ja.</p>
+    <div data-idee="i3"></div>
+  </section>
+
+  <!-- ═══ 4 ═══════════════════════════════════════════════════════ -->
+  <section class="ide">
+    <div class="idk"><span class="nr">IDEE 4</span><h2>Was dasselbe sonst kostet</h2></div>
+    <p class="idw">Die Demo zeigt, was DealPilot <b>kann</b>. Sie zeigt nicht, was es
+    <b>ersetzt</b> — und genau dort entscheidet sich der Kauf.</p>
+    <p class="idu">Vorsicht geboten: fremde Preise brauchen eine Quelle, sonst ist es
+    Werbung mit fremden Zahlen. Zwei davon haben wir selbst gemessen, zwei sind
+    Marktspannen und müssen vor dem Livegang belegt oder gestrichen werden.</p>
+    <div data-idee="i4"></div>
+  </section>
+
+  <!-- ═══ 5 ═══════════════════════════════════════════════════════ -->
+  <section class="ide">
+    <div class="idk"><span class="nr">IDEE 5</span><h2>Die Zeitleiste zum Zurückspringen</h2></div>
+    <p class="idw"><b>Klick auf eine Stufe.</b> Heute laufen die zwölf Stufen weiter,
+    ob man mitliest oder nicht. Wer bei der Abschreibung hängenbleibt, verliert den
+    Anschluss und steigt aus. Eine Leiste, die zurückführt, hält ihn.</p>
+    <p class="idu">Aufwand: mittel — der Stand je Stufe müsste gemerkt werden,
+    nicht nur die Nummer.</p>
+    <div data-idee="i5"></div>
+  </section>
+
+  <!-- ═══ EMPFEHLUNG ══════════════════════════════════════════════ -->
+  <div class="schluss">
+    <h2>Meine Reihenfolge</h2>
+    <p><b>1 · Der Kaufpreis-Regler.</b> Kostet am wenigsten, zeigt am meisten. Er
+    beweist in einer Bewegung, dass hier gerechnet und nicht abgespielt wird.</p>
+    <p><b>2 · Die Quellen auf Klick.</b> Ebenfalls klein, und sie trägt das Argument,
+    das uns von allen anderen trennt: jede Zahl hat eine Herkunft.</p>
+    <p><b>3 · Das zweite Objekt.</b> Mittlerer Aufwand, aber es beantwortet die stille
+    Frage „sagt das Ding überhaupt jemals ab?".</p>
+    <p><b>4 · Der Kostenvergleich</b> — erst, wenn jede Zahl darin belegt ist.
+    <b>5 · Die Zeitleiste</b> zuletzt.</p>
+  </div>
+
+</div>
+
+<script src="demo-steuer-daten.js?v=1592"></script>
+<script src="demo-rechner.js?v=1592"></script>
+<script src="demo-ideen.js?v=1592"></script>
+</body>
+</html>
