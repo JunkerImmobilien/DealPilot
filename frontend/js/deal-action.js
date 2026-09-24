@@ -1852,6 +1852,31 @@ window.DealPilotDealAction = (function() {
     // Stichtag = heute
     prefill.stichtag = new Date().toISOString().slice(0, 10);
 
+    /* v1598b · Gebaeudeanteil und Grenzsteuersatz fuer den AfA-Vergleich.
+       Ohne sie rechnete der Ergebnisschirm des Assistenten auf dem
+       Rueckfallwert 200.000 EUR - bei einem Objekt fuer 743.000 EUR
+       standen dort 4.000 EUR Standard-AfA statt 11.888 EUR.
+
+       rnd-wizard.js hat dafuer eine eigene Funktion, prefillFromDealPilot(),
+       die genau das richtig ausrechnet. Sie wird exportiert und von
+       NIEMANDEM aufgerufen (gemessen am 24.09.2026: ein grep ueber
+       frontend/js findet nur Definition und Export). Gefuettert wird der
+       Assistent von hier - also gehoeren die beiden Werte hierher.
+
+       Die Namen mit _dp davor sind die, die buildInitialState in den
+       State durchreicht und computeAfaEstimate dort wieder abholt.
+
+       Gerechnet wird mit parseDe - dem Parser, den calc.js fuer JEDES
+       Feld benutzt. Ein eigener parseFloat haette den deutschen
+       Tausenderpunkt als Dezimalpunkt gelesen: "743.000 €" wurde im
+       Trockenlauf zu 743, der Gebaeudeanteil damit zu 557 EUR. */
+    var _pd  = (typeof window.parseDe === 'function') ? window.parseDe : parseFloat;
+    var _kp  = _pd(prefill.kp) || 0;
+    var _ga  = _pd(prefill.geb_ant) || 80;
+    var _grz = _pd(prefill.grenz) || 42;
+    if (_kp > 0) prefill._dpGebaeudeanteil = _kp * _ga / 100;
+    prefill._dpGrenzsteuersatz = _grz / 100;
+
     console.log('[RND-Wizard] Prefill ermittelt:', prefill);
     return prefill;
   }
