@@ -656,16 +656,14 @@
       schaeden: pkg.schaeden,
       applySchadensAbschlag: pkg.applySchadensAbschlag
     });
-    // Optionale AfA-Berechnung wenn der Wizard-State Gebäudeanteil hatte
-    // (Default-Annahme für Demo: 200.000 EUR Gebäudeanteil, 42% Grenz, Standard-AfA 2%)
-    const afa = RND.calcAfaVergleich({
-      gebaeudeanteil: 200000,
-      rnd: result.final_rnd,
-      grenzsteuersatz: 0.42,
-      standardAfaSatz: 0.02,
-      gutachterkosten: 999,
-      abzinsung: 0.02
-    });
+    /* v1598 · Hier stand der Vergleich ein ZWEITES Mal, mit fest
+       verdrahteten 200.000 EUR Gebaeudeanteil und 42 % Grenzsteuersatz
+       ("Default-Annahme fuer Demo"). Weil dieser Weg den Ergebnisschirm
+       fuellt, sah JEDER Nutzer 200.000 EUR - auch bei einem Objekt fuer
+       743.000 EUR. Der richtige Wert lag daneben bereit: Z.291 rechnet
+       ihn aus Kaufpreis und Gebaeudeanteil, computeAfaEstimate liest ihn.
+       Jetzt gibt es nur noch diesen einen Weg. */
+    const afa = computeAfaEstimate(result);
     return { result: result, afa: afa };
   }
 
@@ -770,7 +768,13 @@
       + '<tr class="total"><td>Netto-Vorteil</td>'
       +   '<td class="num">' + fmtEUR(a.netto_vorteil) + '</td></tr>'
       + '</table>'
-      + '<p class="rnd-wiz-result-hint">Annahmen: Gebäudeanteil 200.000 €, Grenzsteuersatz 42 %, '
+      /* v1598 · Hier stand "Annahmen: Gebäudeanteil 200.000 €,
+         Grenzsteuersatz 42 %" als fester Text. Beides kommt jetzt aus
+         dem Objekt, also wird auch genannt, was wirklich gerechnet
+         wurde - sonst widerspricht die Fussnote der Tabelle darueber. */
+      + '<p class="rnd-wiz-result-hint">Annahmen: Gebäudeanteil '
+      +   fmtEUR(a.input.gebaeudeanteil) + ', Grenzsteuersatz '
+      +   String(a.input.grenzsteuersatz_pct).replace('.', ',') + ' %, '
       + 'Diskontsatz 2 %. Exakte Berechnung im Rechner unten anpassbar.</p>'
       + '</details>';
 
