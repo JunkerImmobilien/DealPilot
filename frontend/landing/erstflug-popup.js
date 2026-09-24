@@ -46,8 +46,21 @@
   }
 
   function prozent(cb) {
-    var basis = (location.hostname.indexOf('localhost') >= 0)
-      ? '/api/v1' : 'https://app.dealpilot.immo/api/v1';
+    /* v1595d · Hier stand fest 'https://app.dealpilot.immo/api/v1' - also
+       die PRODUKTIONS-API, auch wenn die Seite auf Staging lief. Von
+       staging.dealpilot.immo aus weist Prod die Anfrage ab ("Failed to
+       fetch", gemessen am 24.09.2026); auf Staging kam der Prozentsatz
+       damit NIE an. Aufgefallen ist es erst, als der Notnagel `: 15`
+       wegfiel - eine erfundene Zahl hatte den kaputten Abruf gedeckt.
+
+       Der Host wird jetzt aus der eigenen Adresse abgeleitet, wie
+       flyer-code.js es tut: Landing dealpilot.immo -> app.dealpilot.immo,
+       staging.dealpilot.immo -> app.staging.dealpilot.immo. Ein
+       vorangestelltes www faellt weg, sonst entstuende app.www.… */
+    var host = location.hostname.replace(/^www\./i, '');
+    var basis = (host.indexOf('localhost') >= 0 || host.indexOf('127.0.0.1') === 0)
+      ? '/api/v1'
+      : location.protocol + '//' + (host.indexOf('app.') === 0 ? host : 'app.' + host) + '/api/v1';
     var fertig = false;
     var zeit = setTimeout(function () { if (!fertig) { fertig = true; cb(null); } }, 2500);
     try {
