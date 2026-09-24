@@ -790,8 +790,24 @@ export const ReportOrchestrator = {
            * liegen — der Fehler, den v1062 zweimal reparieren musste. */
           lzs_einordnung: (_lzs && _lzs.einordnung) ? _lzs.einordnung : null,
         };
-        step('wertparameter: LZS ' + _lzs.wert + ' % (Stufe ' + _lzs.stufe + ')'
-             + (_bw && _bw.vollstaendig ? ', Bodenwert ' + _bw.wert + ' EUR' : ', kein Bodenwert'));
+        /* v1602 · Hier standen der Liegenschaftszinssatz und der
+           Bodenwert im Klartext - in einer Zeile, die als NDJSON an den
+           Browser geht und dort angezeigt wird. Beide gehoeren zur
+           Wertermittlung nach ImmoWertV (Stufe 3). Bei einer einfachen
+           oder erweiterten Marktpreisindikation liefen sie trotzdem
+           ueber den Bildschirm und standen im trace des JSON-Exports.
+
+           Die Sperre weiter unten (Stufe < 3 -> cross_check verworfen)
+           greift hier nicht: sie sitzt am Ergebnis, nicht am
+           Fortschrittstext. Unterhalb von Stufe 3 wird jetzt nur noch
+           gemeldet, DASS die Parameter geholt wurden - nicht welche. */
+        var _st = Number(ref.wert_stufe) || 1;
+        if (_st >= 3) {
+          step('wertparameter: LZS ' + _lzs.wert + ' % (Stufe ' + _lzs.stufe + ')'
+               + (_bw && _bw.vollstaendig ? ', Bodenwert ' + _bw.wert + ' EUR' : ', kein Bodenwert'));
+        } else {
+          step('wertparameter: geladen (Stufe ' + _lzs.stufe + ')');
+        }
       }
     } catch (e) {
       step('wertparameter: nicht verfuegbar (' + (e && e.message ? e.message : 'Fehler') + ')');

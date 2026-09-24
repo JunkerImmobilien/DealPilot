@@ -3675,8 +3675,18 @@ async function exportPdf(out) {
     if (lv.used_year) info.push('Jahrgang ' + lv.used_year);
     doc.text(info.join('  ·  '), M + 60, y + 9);
     doc.setTextColor(210, 210, 216); doc.setFontSize(9);
-    if (lcomp && lcomp.land_value_total_eur != null) {
+    /* v1602 · Der Bodenwert stand hier ohne jede Stufenpruefung im PDF.
+       valuation.land_component wird - anders als cross_check - nirgends
+       gefiltert, also druckte auch eine einfache Marktpreisindikation
+       einen absoluten Bodenwert. Der Bodenwert gehoert zur
+       Wertermittlung nach ImmoWertV. Unterhalb davon wird nur noch die
+       Grundstuecksgroesse genannt; die ist eine Objektangabe, keine
+       Bewertung. */
+    const _nurGroesse = !!(d.cross_check && d.cross_check.nicht_im_umfang);
+    if (lcomp && lcomp.land_value_total_eur != null && !_nurGroesse) {
       doc.text('Grundstück ' + Math.round(lcomp.plot_area_sqm).toLocaleString('de-DE') + ' m² · Bodenwert ' + euro(lcomp.land_value_total_eur), M + 60, y + 16);
+    } else if (lcomp && lcomp.plot_area_sqm != null && _nurGroesse) {
+      doc.text('Grundstück ' + Math.round(lcomp.plot_area_sqm).toLocaleString('de-DE') + ' m²', M + 60, y + 16);
     } else {
       const bodenAnteil = area && lv.value_sqm ? Math.round(lv.value_sqm * area) : null;
     /* WPDF26-1 · Diese Zeile rechnete Wohnflaeche x Bodenrichtwert, was
