@@ -18029,3 +18029,101 @@ Objektkarte und dieselbe Aussage dieselbe Farbe tragen sollte.
   durch echte ersetzen.
 - Die Fassung des Pre-Flight-Bands ist offen (Demo liegt).
 - `entwurf-voll.html` ist noch ein Entwurf neben der alten `index.html`.
+
+## Rollout-Journal · 24.09.2026 — PROD: die neue Landingpage geht live (v1593–v1596)
+
+**Was.** Marcels Freigabe: „dass du die dann so uebernimmst, die Seite und die
+auch auf Prod ausrollst." Dazu drei Wuensche: „DealPilot in Bewegung" raus (es
+gibt noch keine Videos), der Erstflug-Rabatt nur noch als Fenster ueber
+`/erstflug`, und das Haus-Icon vor dem Schriftzug weg — im Kopf und im Fuss.
+
+**Commit.** Staging `22569de` (v1593–v1595d, v1596) · Prod `346590c`.
+Nur `frontend/landing/`, 55 Dateien. Kein Backend, keine Migration, kein
+Rebuild — das Frontend ist volume-mounted. `main` und `staging` lagen 188
+Commits auseinander; ein Merge haette beide Straenge samt Migrationen
+mitgebracht, deshalb der gezielte `git checkout staging -- frontend/landing/`.
+
+**Nachweis.**
+- Gesichert und **angesehen** (nicht nur angelegt): `haupt-20260924-0733.sql.gz`
+  11 MB / 10.188 Zeilen, `mb-20260924-0733.sql.gz` 745 KB / 35.380 Zeilen.
+- Dreizehn Adressen auf `dealpilot.immo` einzeln abgerufen: jede liefert
+  **eigenen** Inhalt. Vorher reichte der catch-all bei `/fragen.html`,
+  `/sicherheit.html` und `/api.html` die Startseite durch (je 1.156.881 Byte) —
+  genau der Grund, aus dem v1568 sie aus der Sitemap genommen hatte.
+- `demo-wechsel.js` auf Prod und Staging **byte-gleich** (md5
+  `6d38c0dec8cd4aff13ed4427670f9f75`), zwoelf Stufen.
+- Startseite: 40.707 statt 1.156.881 Byte. Matrix 35 Zeilen, kein Haus-Icon,
+  Logos 23 px / 21 px, Videobereich verborgen, kein Waagerecht-Ueberlauf,
+  keine JS-Fehler.
+- `/erstflug` auf Prod: Fenster mit **15 %**, kein Balken, Adresse auf `/`
+  aufgeraeumt, 12 von 12 Anmeldelinks tragen den Code. Danach Wiederkehr auf
+  die Startseite: Code liegt noch, **Balken bleibt weg**, Rabatt wirkt weiter.
+
+**Der eigentliche Befund — der Balken kam aus der anderen Datei.**
+Meine Diagnose vom 23.09. (v1590: `promo-erstflug.js` an die Sitzung binden)
+war **falsch und ist zurueckgenommen**. Gemessen: Sitzungsmarke geloescht,
+Seite frisch geladen — Balken trotzdem da. Er kam aus `flyer-code.js`.
+Dort zeigte `start()` ihn genau dann, wenn jemand einen Code MITBRINGT, aber
+nicht frisch ueber `/erstflug` kam. Das war als Ausnahme gedacht und ist der
+Regelfall: der Code liegt in localStorage UND im Cookie, also traegt ihn jeder
+Besucher nach dem ersten Mal fuer immer mit. Der Selbstaufruf ist weg,
+`balkenZeigen` bleibt ueber die API erreichbar.
+
+**Zwei Geldfehler, gefunden weil vor dem Rollout hingesehen wurde.**
+1. `erstflug-popup.js` pruefte `d.active` am AEUSSEREN Objekt — die Antwort
+   ist aber verpackt (`{"promo":{…}}`). Also immer `cb(null)`, also immer der
+   Notnagel `: 15`. Die Zahl stimmte zufaellig und haette in dem Moment
+   gelogen, in dem der Coupon in Stripe einen anderen Satz bekommt.
+   `promo-erstflug.js` packt an derselben Stelle richtig aus — diese Kopie
+   hatte es nie mituebernommen.
+2. Der Notnagel fiel ersatzlos (**lieber keine Zahl als eine erfundene**) —
+   und machte damit einen zweiten Fehler sichtbar, den er jahrelang gedeckt
+   hatte: das Fenster fragte **fest die Produktions-API**, auch auf Staging.
+   Von `staging.dealpilot.immo` aus weist Prod die Anfrage ab („Failed to
+   fetch", gemessen). Der Host wird jetzt abgeleitet wie in `flyer-code.js`.
+
+> **Das ist der Grund, warum eine erfundene Zahl teurer ist als eine
+> fehlende: sie sieht aus wie ein Ergebnis.** Ein kaputter Abruf, den ein
+> Notnagel auffaengt, meldet sich nie.
+
+**Drei Lueckenbefunde, die ich zurueckgenommen habe.** Ein `grep` im Quelltext
+meldete, der neuen Seite fehlten FAQ, Kerosin und Marktbericht. Alle drei
+waren Werkzeugfehler: die Leistungstabelle wird per JS in `#mxBody` gebaut
+(im HTML steht null, im Browser stehen 35 Zeilen — Zeile fuer Zeile dieselben
+wie alt, `Marktbericht-Import` inklusive), „FAQ" traf in Base64-Bilddaten, und
+„Kerosin" heisst seit v1246 „Bewertungen nachkaufen" (`id="nachkauf"` ist da).
+**Die neue Seite hat sogar eine eigene FAQ-Seite (`fragen.html`), die alte
+hatte keine.**
+
+**Vier Funde auf den Unterseiten, alle vor dem Rollout behoben** (v1595):
+das Haus-Icon stand dort noch im Kopf UND im Fuss; der Cache-Buster von
+`dp2-teile.css` stand auf v1565, die Regel `.mark-gross` kam aber erst in
+v1592 (ohne Hochziehen waere die Aenderung nie angekommen); der Brotkrumen auf
+`sicherheit.html` zeigte auf `entwurf-voll.html`; und `entwurf-c.html`,
+`entwurf-voll.html`, `api-docs.html` hatten kein `noindex` — die beiden
+Entwuerfe tragen denselben `<title>` wie die Startseite.
+
+**Zur Notiz „Die drei Kundenstimmen sind Platzhalter · § 5 UWG":** sie stammt
+vom Landing-Entwurf C (22.09.) und betrifft `entwurf-voll.html`. **Die
+Live-Seite hat keine Kundenstimmen** — der Abschnitt „stories" sind erzaehlte
+Szenarien in Du-Form plus die Gruenderstimme von Marcel. Geprueft: kein
+Personenname mit Rollenangabe, kein Zitat, das jemandem zugeschrieben wird.
+`entwurf-voll.html` traegt jetzt `noindex` und ist von nirgends verlinkt.
+
+**Rest.**
+- `frontend/landing/flyer-code.js` und `frontend/js/flyer-code.js` sollen laut
+  ihrem eigenen Kommentar gleich bleiben und tun es seit laengerem nicht
+  (41 Zeilen, **schon vor v1593**). Die App-Kopie ist bewusst nicht
+  mitgegangen — sie zeigt den Balken ohnehin nie, weil `window.Auth` dort
+  existiert. Anzugleichen, wenn eine der beiden ohnehin angefasst wird.
+- Die Tarifknoepfe senden `?register=1&plan=…` bzw. `&paket=…`. **Niemand
+  liest beides:** `auth.js:461` loescht bei `?register=1` die ganze
+  Abfragezeichenfolge. Das war in der alten Seite genauso, ist also keine
+  Verschlechterung — aber ein vorausgewaehlter Tarif kommt nicht an. Der
+  Rabattcode ueberlebt dagegen, weil `flyer-code.js` seinen Listener in der
+  App vor `main.js` haengt und ihn liest, bevor `auth.js` aufraeumt.
+- Der Deal Score der Demo (76 „Gut") haelt den echten Schwellen nicht stand —
+  gerechnet sind es **39 „Schwach"**, weil die DSCR-Kurve erst bei 0,9 beginnt
+  und unser Wert 0,82 ist. Steht als Warnblock in `demo-ideen.html`.
+- Die Sitemap fuehrt acht Adressen; `/dp2.html` ist nur noch eine
+  Weiterleitung, `/alt-original.html` das Archiv mit `noindex`.
