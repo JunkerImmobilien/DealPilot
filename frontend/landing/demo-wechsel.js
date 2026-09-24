@@ -183,10 +183,10 @@
         + 'Frage durch den Sprechlauf führen lassen.')
         + '<div class="wx-wege">'
         + '<div class="wx-weg an"><span class="ik">' + ik('mikro', 16) + '</span>'
-        + '<span><b>Frei sprechen</b><span>Einfach loslegen. Was fehlt, fragt der '
+        + '<span><b>Ich erzähle frei</b><span>Einfach loslegen. Was fehlt, fragt der '
         + 'Co-Pilot am Ende nach.</span></span></div>'
         + '<div class="wx-weg"><span class="ik">' + ik('fragen', 16) + '</span>'
-        + '<span><b>Geführt per Sprache</b><span>24 Fragen der Reihe nach, jede '
+        + '<span><b>Frag mich durch</b><span>24 Fragen der Reihe nach, jede '
         + 'überspringbar — auch mit der Stimme.</span></span></div></div>'
         + '<div class="wx-sprech">'
         + '<div class="wx-links"><div class="wx-mik"><div class="wx-mik-k">'
