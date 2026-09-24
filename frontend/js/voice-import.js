@@ -8711,8 +8711,19 @@
       var v = _rfFeld(id);
       if (v !== null && v !== undefined && v !== '') obj[id] = v;
     });
-    _rfBlase('co', '<span style="opacity:.75">Die Wertermittlung läuft — ich frage den '
-      + 'Gutachterausschuss deines Gebiets ab und rechne das Sachwertverfahren.</span>');
+    /* v1603 · Hier stand "Die Wertermittlung läuft — ich frage den
+       Gutachterausschuss deines Gebiets ab und rechne das
+       Sachwertverfahren." Abgerechnet wird aber wert_stufe 2, die
+       erweiterte Marktpreisindikation, und die rechnet seit v1435
+       genau das NICHT mehr. Versprochen wurde damit das Stufe-3-Produkt
+       zum Stufe-2-Preis - und geliefert wurde nichts.
+
+       Ob der Sprechlauf kuenftig Stufe 3 buchen soll, ist eine
+       Preisentscheidung und gehoert Marcel. Bis dahin sagt der Satz,
+       was wirklich passiert. */
+    _rfBlase('co', '<span style="opacity:.75">Die erweiterte Marktpreisindikation '
+      + 'läuft — ich hole Lage, Mieten und Vergleichswerte zu deiner '
+      + 'Adresse.</span>');
     Auth.apiCall('/marktbericht/reports/from-dealpilot',
                  { method: 'POST',
                    body: { wert_stufe: 2, wertermittlung: true, object: obj,
@@ -8766,6 +8777,29 @@
     }
 
     if (!zeilen.length) {
+      /* v1603 · ZWEI GRUENDE, DIE NICHTS MITEINANDER ZU TUN HABEN.
+         Hier stand immer "Für dieses Gebiet liegt kein Sachwertfaktor
+         vor" - auch dann, wenn es sehr wohl einen gibt und nur die
+         Stufe nicht gebucht war. Der Satz widersprach sich selbst:
+         "kein Sachwertfaktor vor. Grund: Boden-, Ertrags- und Sachwert
+         gehören zur Wertermittlung nach ImmoWertV (Stufe 3)."
+
+         Das ist derselbe Fehler wie eine erfundene Zahl, nur in Worten:
+         eine Begruendung behaupten, die nicht stimmt. Wer das liest,
+         sucht den Fehler bei seinem Gutachterausschuss statt bei
+         seinem Tarif. */
+      if (cc && cc.nicht_im_umfang) {
+        _rfBlase('co', '<b>Der Sachwert gehört zur Wertermittlung nach ImmoWertV.</b>'
+          + '<div class="vi-sc"><div class="vi-sc-annahmen">'
+          + 'Diese Auswertung ist eine erweiterte Marktpreisindikation — '
+          + 'Boden-, Ertrags- und Sachwert sind darin nicht enthalten. '
+          + 'Ob für dein Gebiet ein Sachwertfaktor vorliegt, ist damit '
+          + 'nicht gesagt; geprüft wurde es hier gar nicht.'
+          + '</div></div>');
+        _rf.wertAn = 2;
+        if (_fs.an && _fs.stream) _fsHoeren(true);
+        return;
+      }
       /* KEIN WERT IST AUCH EINE ANTWORT — aber nur mit dem Weg dorthin. */
       var grund = gaa.grund || cc.grund || null;
       _rfBlase('co', '<b>Für dieses Gebiet liegt kein Sachwertfaktor vor.</b>'
