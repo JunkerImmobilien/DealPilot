@@ -18210,3 +18210,95 @@ Spalte auf Staging, nicht umgekehrt.
   so nicht mehr gibt. Braucht eine Migration auf text/uuid und eine
   eigene Freigabe.
 - Die Ernte ist weiterhin unangetastet.
+
+## Rollout-Journal · 25.09.2026 (2) — Aufklappmenue, dann Ernte
+
+**Was.** Marcel: „schau dir oben auf der landingpage noch die menü punkte
+an, wenn man die aufklappt passt dort die formatierung nicht. dann
+rollout und dann weiter mit der ernte."
+
+**Commit.** Staging `e392afa` · Prod `79f74f1` (nur das Menue; die
+Registersaetze bleiben zunaechst auf Staging).
+
+### 1 · Das Aufklappmenue stand quer (v1611)
+
+Gemessen bei 1521 px, Menuepunkt „Funktionen": vier schmale Textsaeulen
+NEBENEINANDER, Hoehen ausgefranst (115x152, 167x96, 108x170, 124x131).
+
+**Ursache:** `.nav ul{display:flex}` gilt fuer JEDE Liste im Menue — auch
+fuer die verschachtelte `.sub`. Die ist als senkrechte Liste gebaut
+(`min-width:330px`, `.sub li{display:block}`), aber in einem
+Flex-Behaelter werden Kinder zu Flex-Elementen, **egal was an ihnen
+steht**. Ein `display:block` am KIND kann sich gegen den Elternteil nicht
+wehren.
+
+Die Regel heisst `.nav ul.sub` und nicht `.sub`: `.nav ul` ist Klasse
+PLUS Typ und damit staerker. Derselbe Stolperstein wie im Sprechlauf,
+wo eine Regel mit drei Klassen meine mit zweien schlug.
+
+Nachher alle drei Menues: senkrecht, je 328 px breit, gleichmaessige
+Hoehen, kein Ueberlauf — auf Staging und Prod nachgemessen.
+
+### 2 · Ernte: vier neue Sachwertfaktor-Saetze (14 → 18)
+
+Aus der Ernte vom 23.09. wurden erstmals Rezepte gebaut. Zwei neue
+Werkzeuge: `ni-rezepte-bauen.js` (Gitter + Kurven + Kopfdaten → Rezept)
+und `ni-ins-register.js` (Rezept verschachtelt → Register flach, je
+Zweig).
+
+| AGS | Gebiet | Zweige | Fallzahl |
+|---|---|---|---|
+| 03102 | Salzgitter | ezfh + rhdhh | 287 / 417 |
+| 03154 | Helmstedt | ezfh | 262 |
+| 03157 | Peine | ezfh | 557 |
+
+Jeder Satz: 6x9-Gitter, drei Korrekturkurven, Normobjekt benannt.
+**Salzgitter ist das erste NI-Gebiet mit BEIDEN Zweigen.**
+Register gesamt 2498 → 2502, Sachwertfaktoren 392 → 396.
+
+**Kettenprueffung am Rechenkern im Container**, nicht am Diagnose-
+Endpunkt (der reicht `standardstufe` gar nicht durch):
+
+| Fall | Faktor |
+|---|---:|
+| Normobjekt (150 m², RND 31, Stufe 2,5) | 0,74 |
+| 200 m² | 0,79 |
+| RND 55 | 0,87 |
+| Stufe 3,5 | 0,84 |
+| alles zusammen | 1,07 |
+
+Alle drei Korrekturen angewandt, `korrekturen_offen` leer.
+
+### Zwei Zweige absichtlich NICHT gebaut
+
+`2026_sw_rh_bshe` und `2026_sw_rh_bspe`: dort liegt unter
+„Wohnflaechen" **Zeichen fuer Zeichen dieselbe Kurve** wie unter
+„Restnutzungsdauer" — Stuetzstellen 15/25/35/45/55/65/75, das sind
+Jahre, keine Quadratmeter. Der Kurvenleser hat die erste zweimal
+abgelegt; die echte Wohnflaechenkurve wurde nie gelesen.
+
+> Eine daraus gebaute Wohnflaechen-Korrektur waere fuer jedes Objekt
+> mit abweichender Flaeche STILL falsch — und **eine falsche Korrektur
+> ist gefaehrlicher als eine fehlende**, weil der Faktor mit ihr
+> genauso aussieht wie ohne. Der Bauer erkennt Doppelungen jetzt selbst
+> und verweigert das Rezept mit Begruendung.
+
+### Ein eigener Fehler, von der Pruefung gefangen
+
+Mein erster Lauf machte aus der Restnutzungsdauer 30,8333 Jahre **ganze
+308.333** — mein Zahlenleser strich den Punkt als Tausendertrenner. Das
+Dashboard schreibt deutsch („2,5"), der Kurvenleser legt aber
+„30.8333" mit Dezimalpunkt ab. **Beide Schreibweisen liegen nebeneinander
+und sehen gleich aus.** Jetzt entscheidet das Komma: gibt es eins, sind
+Punkte Tausender; gibt es keins, ist der Punkt der Dezimaltrenner.
+
+**Rest.**
+- Fuenf weitere geerntete Gebiete warten auf Rezepte, alle mit
+  Einschraenkung: Hameln-Pyrmont (nur RH, eine Kurve), Cuxhaven,
+  Osterholz und Stade (Kurven nur als Bild), Grafschaft Bentheim und
+  Osnabrueck (je eine Kurve). Sie brauchen einen Weg, die FEHLENDE
+  Korrektur im Ergebnis sichtbar zu machen — `korrekturen_offen` traegt
+  nur, was im Rezept deklariert ist.
+- Die beiden Reihenhaus-Zweige von Helmstedt und Peine brauchen eine
+  Nachernte der Wohnflaechenkurve am Kalkulator.
+- Die Registersaetze sind noch nicht auf Prod.
