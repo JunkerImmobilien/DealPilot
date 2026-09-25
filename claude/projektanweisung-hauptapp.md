@@ -18404,3 +18404,77 @@ darunter ein Tippfehler IM BERICHT („Doanu - Ries").
 - `verfuegbarkeit-by.json` wird noch von keinem Ausgabeweg gelesen —
   die Datei liegt, die Anzeige „Weg zur Quelle" fehlt.
 - Die Registersaetze sind noch nicht auf Prod.
+
+---
+
+## Rollout-Journal 25.09.2026 (4) — der Lage-Parameter ist aufgeklaert
+
+**Was.** Den Blocker aus Eintrag (3) im Browser geknackt und die
+restlichen ungenutzten Quellen gegen das Register geprueft.
+
+**Commit.** siehe unten. **Nachweis.** Verkehr am laufenden Kalkulator
+mitgelesen, Befund in `tools/swf-register/BEFUND-lage-parameter.md`.
+
+### Der Name war nie ratbar
+
+```
+POST .../commands/tabdoc/set-parameter-value-from-index
+  parameterName = [Parameters].[Parameter 2]
+  idx           = 2      <- NULLBASIERTER INDEX, nicht der Wert
+```
+
+**Die Lage heisst intern `Parameter 2`.** „Lage" ist die Beschriftung,
+nicht der Name — fuenf Rateversuche konnten deshalb nicht treffen.
+
+> **Der URL-Weg ist damit nicht ungeloest, sondern tot:** ein Index
+> laesst sich in einer Tableau-URL nicht ausdruecken. Auch
+> `Parameter%202=GS%2001` greift nicht. Das ist ein Ergebnis, kein
+> Fehlschlag — es beendet eine Suche, die sonst wiederkommt.
+
+Dazu gemessen: **jeder** URL-Parameter loescht die Lage auf leer, und
+ohne Lage bleibt der Faktor leer. `Brw=60&Sach=250000` — exakt die
+Vorgabewerte — liefert nichts. Das erklaert die 54 leeren Zeilen im
+Protokoll vollstaendig.
+
+**Die Zahlen stehen nicht im DOM**: Tableau rendert die Kacheln als
+webp-Bilder, im DOM liegen nur die Beschriftungen. Ein Ernter kann den
+Wert nicht auslesen, er braucht den Sitzungs-Export.
+
+**Der Weg ist ein sitzungsgetriebener Ernter** — Sitzung aufbauen, drei
+Parameter per Befehl setzen, Wert aus dem Export lesen. Das ist ein Bau,
+kein Probelauf, und er braucht Marcels Entscheidung.
+
+> **Nebenbefund, der den Bau kleiner machen koennte:** das Diagramm
+> „Umrechnungskoeffizienten" zeigt **alle vier Lage-Kurven
+> gleichzeitig**, mit Legende. Fuer die KORREKTUREN braucht es den
+> Parameter womoeglich gar nicht, nur fuer den Faktor.
+
+### Die uebrigen Quellen sind abgearbeitet
+
+Alle 13 ungenutzten PDFs im Repo gegen das Register geprueft. **Zwoelf
+davon sind laengst drin** (BB fuenf Kreise, HE Kassel, HH, MV, RP,
+NI Wolfenbuettel). Offen war genau eines:
+
+**Darmstadt (06411) ist geschlossen — mit Grund.** Der Ausschuss
+veroeffentlicht beides, Marktanpassungsfaktoren (§ Sachwertfaktoren)
+UND Liegenschaftszinssaetze. Aber die Marktanpassungsfaktoren stehen
+**nur als Streudiagramm** (Abb. 9-10, „die punktierten Linien markieren
+die Bereiche, in denen zwei Drittel der Daten liegen"), und die
+Zinstabelle (Abb. 9-4) ist ebenfalls ein **Bild**. Aus einem
+Streudiagramm laesst sich kein Wert ablesen.
+
+> **Wo die Quelle endet, endet die Rechnung** — auch wenn die Zahl
+> sichtbar auf dem Papier steht. Darmstadt gehoert damit in die
+> „Weg dorthin"-Liste, nicht ins Wertregister.
+
+**Damit ist die Ernte an ihrer Grenze.** Was noch offen ist, sind Bauten
+und keine Abrufe.
+
+**Rest.**
+- Sitzungsgetriebener Ernter fuer die 26 NI-Kalkulatoren — **Marcels
+  Entscheidung**, ob sich der Bau fuer ~15 Kreise lohnt.
+- `verfuegbarkeit-by.json` wird von keinem Ausgabeweg gelesen; Darmstadt
+  gehoert in dieselbe Liste. **Die „Weg dorthin"-Anzeige fehlt ganz** —
+  das ist der Hebel, der jetzt am meisten bringt.
+- Die Wohnflaechenkurve von Helmstedt und Peine (RH) nachernten.
+- Die Registersaetze sind noch nicht auf Prod.
