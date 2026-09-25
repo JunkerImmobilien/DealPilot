@@ -4184,6 +4184,54 @@
          Wert waere schon eine Empfehlung. */
       '.vi-rf-knf{margin-top:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}',
       '@media(max-width:560px){.vi-rf-knf{grid-template-columns:1fr}}',
+
+      /* ═══ v1605 · DER GEFUEHRTE LAUF AUF DEM HANDY ═══════════════════
+         Marcel: "auch da kann man auf dem Handy aktuell nicht wirklich
+         was sehen. Ich meine den Frag mich durch."
+
+         Gemessen am 25.09.2026 im gleich-Origin-iframe bei 390 px:
+
+           .oabi-body   Hoehe 575, Inhalt braucht 815, overflow-y hidden
+           #vi-frage    Hoehe 547, Inhalt braucht 807, overflow-y visible
+           #vi-rf-dran  337 px - ueber die HAELFTE des Koerpers
+           alle Kinder  flex:0 0 auto
+
+         Weil alles 0 0 auto ist und der Koerper hidden, wird der Inhalt
+         NICHT abgeschnitten - er quillt heraus und legt sich auf die
+         Geschwister. Nachgewiesen: fuenf echte Ueberlappungen, u. a.
+         "Erklaer mir das" ueber dem Etappenband, das Mikrofon-Symbol
+         ueber "Geld" und "0/2" ueber "Anhalten".
+
+         Das ist dieselbe Falle wie in FALLEN.md, nur spiegelverkehrt:
+         dort schrumpfen Flex-Kinder statt zu scrollen, hier scrollt
+         nichts, weil keiner schrumpfen darf.
+
+         DIE ANTWORT IST DIE CHAT-SPALTE, die Marcel selbst
+         vorgeschlagen hat. Ein Telefon hat keinen Platz fuer fuenf
+         Dinge nebeneinander - Etappenband, Merkliste, Frage, Antworten
+         und Aufnahme. Ein Chat hat immer nur EINE Spalte: der Verlauf
+         scrollt, die Eingabe steht unten fest. Genau das wird hier
+         gebaut - ohne neue Maschinerie, nur mit Stil. */
+      '@media(max-width:600px){',
+      /* 1 · Der Verlauf scrollt, statt zu quellen. min-height:0 ist
+             Pflicht: ohne sie ignoriert ein Flex-Kind das overflow. */
+      '  .oabi-ov.vi-mode .oabi-body{overflow-y:auto;-webkit-overflow-scrolling:touch}',
+      '  .oabi-ov.vi-mode #vi-frage{overflow-y:auto;min-height:0;flex:1 1 auto}',
+      /* 2 · Die Merkliste ist Nachschlagewerk, nicht Gespraech. Sie
+             bekommt eine Deckelhoehe und scrollt in sich - statt die
+             halbe Anzeige zu belegen. */
+      '  .oabi-ov.vi-mode #vi-rf-dran{max-height:34vh;overflow-y:auto;min-height:0}',
+      /* 3 · Die Aufnahme steht unten fest, wie die Eingabezeile in
+             einem Messenger. Sie ist das, was man dauernd braucht. */
+      '  .oabi-ov.vi-mode #vi-rf-mikro{position:sticky;bottom:0;z-index:5;',
+      '    background:var(--cr,#FDFCFA);box-shadow:0 -8px 18px -10px rgba(0,0,0,.35)}',
+      /* 4 · Das Etappenband bricht nicht mehr uebereinander. */
+      '  .oabi-ov.vi-mode #vi-rf-band{flex-wrap:wrap;row-gap:6px;height:auto;min-height:0}',
+      '  .oabi-ov.vi-mode .vi-rf-gr{flex-wrap:wrap;row-gap:4px}',
+      '  .oabi-ov.vi-mode .vi-rf-gr-n{flex:1 1 100%;white-space:normal;overflow:visible}',
+      /* 5 · Die Kopfzeile mit den zwei Schaltern darf umbrechen. */
+      '  .oabi-ov.vi-mode .vi-rf-kopfzeile{flex-wrap:wrap;row-gap:6px;height:auto}',
+      '}',
       '.vi-rf-knf-z{padding:8px 10px;border:1px solid rgba(42,39,39,.16);border-radius:8px;',
       '  background:rgba(42,39,39,.03)}',
       '.vi-rf-knf-z span{display:block;opacity:.55;text-transform:uppercase;letter-spacing:.04em;',

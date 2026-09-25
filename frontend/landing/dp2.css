@@ -260,7 +260,45 @@ img{max-width:100%;display:block}
   .g5,.g4,.g3,.g2{grid-template-columns:1fr}
   .blatt > *{border-right:0}
   .footer-grid{grid-template-columns:1fr}
+}
+
+/* ═══ v1604 · Die Kopfleiste lief seitlich aus dem Bild ═══════════════
+   Gemessen am 25.09.2026 im gleich-Origin-iframe, Breite fuer Breite.
+   Die Seite liess sich auf dem Handy seitwaerts schieben:
+
+     390 px  ->  76 px Ueberlauf   (die Pillen)
+     427 px  ->  36 px Ueberlauf   (die Pillen)
+     557 px  ->   0
+     697 px  ->   0
+     765 px  ->  45 px Ueberlauf   (.rechts)
+     831 px  ->   0
+
+   ZWEI URSACHEN, zwei Bereiche:
+
+   1 · .tb .wrap ist ein flex mit flex-wrap:nowrap und 26 px Abstand.
+       Bei 372 px nutzbarer Breite standen dort zwei Pillen mit
+       257 + 26 + 139 = 422 px. Die zweite ragte 76 px hinaus, die
+       dritte war auf Breite NULL gequetscht - also unsichtbar, ohne
+       dass es jemand merkt. Umbrechen geht nicht: die Leiste hat eine
+       feste Hoehe (--bar-h). Auf dem Handy bleibt deshalb die
+       staerkste Aussage stehen, der Rest geht.
+
+   2 · .tb .rechts (Nutzerzahl + Mailadressen) verschwand erst bei
+       700 px. Dazwischen - 701 bis rund 820 px, also genau das kleine
+       Tablet und das quer gehaltene Handy - stand es draussen.
+
+   Die uebrigen Auffaelligkeiten der Messung (hero-bg, laufband-t,
+   bp rv) sind KEINE: sie haben alle einen klippenden Vorfahren.
+   Ueberlauf gehoert gegen den Klipper geprueft, nicht gegen den
+   Viewport - sonst jagt man Gespenster. */
+@media(max-width:820px){
   .tb .rechts{display:none}
+}
+@media(max-width:700px){
+  /* Nur die erste Pille - ordnungsunabhaengig, damit ein spaeteres
+     Umsortieren im HTML das hier nicht still aushebelt. */
+  .tb .pkt ~ .pkt{display:none}
+  .tb .wrap{gap:0}
 }
 
 /* v1561 · Das Groesser-Zeichen vor der Nutzerzahl - eigenes Element,
