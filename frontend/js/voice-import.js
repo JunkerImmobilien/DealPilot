@@ -4231,6 +4231,15 @@
       '  .oabi-ov.vi-mode .vi-rf-gr-n{flex:1 1 100%;white-space:normal;overflow:visible}',
       /* 5 · Die Kopfzeile mit den zwei Schaltern darf umbrechen. */
       '  .oabi-ov.vi-mode .vi-rf-kopfzeile{flex-wrap:wrap;row-gap:6px;height:auto}',
+      /* 6 · Die Aufnahmezeile stand auf nowrap: Symbol 30 + Text + Pegel
+             45 + Knopf 102 bei 296 px Breite. Fuer den Text blieben
+             GANZE 63 PIXEL - er brach nach jedem zweiten Wort um und
+             wurde 149 px hoch. Gemessen am 25.09.2026.
+             Jetzt wie in einem Messenger: die Ansage nimmt die erste
+             Zeile ganz, darunter Symbol, Pegel und Knopf nebeneinander. */
+      '  .oabi-ov.vi-mode .vi-rf-mikro{flex-wrap:wrap;row-gap:8px}',
+      '  .oabi-ov.vi-mode .vi-rf-mikro-txt{flex:1 1 100%;order:-1}',
+      '  .oabi-ov.vi-mode .vi-rf-halt{margin-left:auto}',
       '}',
       '.vi-rf-knf-z{padding:8px 10px;border:1px solid rgba(42,39,39,.16);border-radius:8px;',
       '  background:rgba(42,39,39,.03)}',
