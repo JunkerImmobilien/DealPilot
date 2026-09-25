@@ -4256,8 +4256,21 @@
              Nebenknoepfe
              Aufnahme + Uebernehmen   unten festgeklebt          */
       '  .oabi-ov.vi-mode #vi-frage{display:flex;flex-direction:column}',
-      '  .oabi-ov.vi-mode .vi-rf-buehne{flex:1 1 auto;min-height:38vh;display:block}',
-      '  .oabi-ov.vi-mode #vi-rf-chat{height:100%;max-height:none;overflow-y:auto;',
+      /* v1606b · HIER STAND .oabi-ov.vi-mode - ZWEI Klassen, und die
+         Regel verlor. Der Kaskaden-Walker zeigte, wogegen:
+
+             .oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{min-height:0}
+
+         DREI Klassen am Vorfahren schlagen zwei, und eine Media-Query
+         erhoeht die Spezifitaet NICHT. Die Buehne blieb deshalb auf
+         Hoehe 0, obwohl min-height:38vh danebenstand und `order:3` aus
+         derselben Regelgruppe sichtbar ankam.
+
+         Genau der Fall aus CLAUDE.md: lieber Spezifitaet erhoehen als
+         auf Ladereihenfolge bauen - und welche Regel gewinnt, sagt nur
+         der Walker, nicht matches(). */
+      '  .oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{flex:1 1 auto;min-height:38vh;display:block}',
+      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-chat{height:100%;max-height:none;overflow-y:auto;',
       '    -webkit-overflow-scrolling:touch}',
       /* Die aktuelle Frage ist die juengste Wortmeldung, nicht die halbe
          Anzeige. Sie steht direkt ueber der Eingabe und scrollt in sich. */
