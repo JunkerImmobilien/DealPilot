@@ -163,6 +163,41 @@ export const AUSSCHUSS_QUELLEN = {
     warum_kein_wert: 'Der Immobilienmarktbericht 2026 druckt zwar zwei umfangreiche Sachwertfaktor-Tabellen ab, diese sind aber hessenweit von der Zentralen Geschäftsstelle ermittelt und nicht vom Gutachterausschuss beschlossen. Damit sind es keine sonstigen zur Wertermittlung erforderlichen Daten nach § 193 Abs. 5 BauGB. Ein örtlich abgeleiteter Sachwertfaktor liegt für diesen Bereich nicht vor.',
     hinweis: 'Der Bericht ist im Downloadcenter der Hessischen Verwaltung für Bodenmanagement kostenfrei abrufbar (Datei 2026_IMB_AFB_Büdingen.pdf). Kapitel 8.3 nennt das vollständige Sachwertmodell — Gesamtnutzungsdauer 80 Jahre, NHK 2010, kein Regionalfaktor, Außenanlagen 1 bis 10 Prozent je nach Standardstufe —, sodass eine modellkonforme Rechnung mit dem hessenweiten Faktor bewusst möglich bleibt.',
   },
+  /* v1614-WGRD · Darmstadt. Gemessen am 25.09.2026 am Immobilienmarktbericht
+   * 2025: der Ausschuss fuehrt BEIDE Kennzahlen und druckt sie auch ab —
+   * aber ausschliesslich als BILD. Die Marktanpassungsfaktoren stehen in
+   * Abb. 9-10 als Streudiagramm ("die punktierten Linien markieren die
+   * Bereiche, in denen zwei Drittel der Daten liegen"), die Zinstabelle
+   * Abb. 9-4 ist eine Grafik ohne extrahierbaren Text.
+   *
+   * Wo die Quelle endet, endet die Rechnung — auch wenn die Zahl sichtbar
+   * auf dem Papier steht. Eine aus einer Punktwolke abgelesene Zahl waere
+   * geschaetzt, und geschaetzte Zahlen gehoeren nicht in eine
+   * Wertermittlung. */
+  '06411': {
+    stelle: 'Gutachterausschuss für Immobilienwerte für den Bereich der Wissenschaftsstadt Darmstadt',
+    url: 'https://www.darmstadt.de/leben-in-darmstadt/bauen-und-wohnen/gutachterausschuss',
+    zugang: 'kostenfrei',
+    warum_kein_wert: {
+      sachwertfaktor:
+        'Der Immobilienmarktbericht 2025 der Wissenschaftsstadt Darmstadt führt '
+        + 'Marktanpassungsfaktoren für Sachwerte (Kapitel 9.4), stellt sie aber '
+        + 'ausschließlich als Streudiagramm dar (Abbildung 9-10, gegliedert nach '
+        + 'Bodenwertniveau). Es gibt weder eine Wertetabelle noch eine '
+        + 'Regressionsformel. Eine aus der Punktwolke abgelesene Zahl wäre '
+        + 'geschätzt — der Ausschuss gibt die Werte auf Anfrage heraus.',
+      liegenschaftszinssatz:
+        'Der Immobilienmarktbericht 2025 führt Liegenschaftszinssätze und '
+        + 'Ertragsfaktoren (Kapitel 9.3), druckt die Tabelle (Abbildung 9-4) aber '
+        + 'als Grafik ab. Die Zahlen sind dort nicht maschinell auslesbar; der '
+        + 'Ausschuss gibt sie auf Anfrage heraus.',
+    },
+    hinweis:
+      'Der Bericht ist kostenfrei abrufbar und beschreibt beide Modelle '
+      + 'vollständig — Sachwertmodell und Datengrundlage in Abbildung 9-9, das '
+      + 'Ertragswertmodell in Kapitel 9.3. Wer die Zahlen beim Ausschuss erfragt, '
+      + 'kann damit modellkonform rechnen.',
+  },
   /* v1156 · Vorpommern-Greifswald. Der Bericht 2024 ist frei abrufbar und
    * fuehrt das Kapitel 6.1.1 - aber es ist LEER. Woertlich: "Dieses Kapitel
    * ist zum Zeitpunkt der Veroeffentlichung noch nicht vollstaendig
@@ -371,9 +406,18 @@ export function quelleFuer(ags, satz = null) {
     if (treffer) {
       const a = AUSSCHUSS_QUELLEN[treffer];
       const land = LAND_QUELLEN[ziffern.slice(0, 2)];
+      /* v1614-WGRD · `warum_kein_wert` darf jetzt ein Objekt sein. Nach
+         AUSSEN geht trotzdem IMMER eine Zeichenkette - sonst rendert eine
+         Ansicht, die das Feld direkt ausgibt, still "[object Object]".
+         Den vollen Satz traegt `warum_kein_wert_je_kennzahl`; wer ihn je
+         Kennzahl braucht, nimmt quellenSatz(). */
+      const roh = a.warum_kein_wert;
+      const istKarte = roh && typeof roh === 'object';
       return { stelle: a.stelle, url: a.url, land: land ? land.land : null,
                zugang: a.zugang, hinweis: a.hinweis,
-               warum_kein_wert: a.warum_kein_wert, herkunft: 'ausschusstabelle' };
+               warum_kein_wert: istKarte ? (roh.alle || null) : (roh || null),
+               warum_kein_wert_je_kennzahl: istKarte ? roh : null,
+               herkunft: 'ausschusstabelle' };
     }
   }
 
@@ -390,6 +434,20 @@ export function quelleFuer(ags, satz = null) {
  * Er sagt drei Dinge: wer den Wert fuehrt, wo er steht, und ob er etwas
  * kostet. Was er NICHT sagt: dass DealPilot ihn liefert.
  */
+/* v1614-WGRD · Ein Ausschuss kann fuer die eine Kennzahl etwas fuehren und
+   fuer die andere nicht — Bayern zeigt das in Reinform: 59 der 95 Kreise
+   leiten Sachwertfaktoren ab, aber nur 48 Liegenschaftszinssaetze. Ein
+   einziger Grundtext fuer beide waere deshalb fuer eine der beiden falsch.
+   `warum_kein_wert` darf jetzt auch ein Objekt sein, nach Kennzahl
+   geschluesselt. Eine Zeichenkette gilt weiterhin fuer alles — die rund 25
+   bestehenden Eintraege bleiben unveraendert gueltig. */
+function _grundFuer(grund, kennzahl, karte) {
+  const q = karte || grund;
+  if (!q) return null;
+  if (typeof q === 'string') return q;
+  return q[kennzahl] || q.alle || null;
+}
+
 export function quellenSatz(q, kennzahl = 'Wert') {
   if (!q) return null;
   const was = kennzahl === 'sachwertfaktor' ? 'Sachwertfaktoren'
@@ -411,68 +469,210 @@ export function quellenSatz(q, kennzahl = 'Wert') {
     url: q.url,
     hinweis: q.hinweis || null,
     /* v1118-WAQ - warum hier keine Zahl steht. Nur die Ausschusstabelle
-       fuehrt das; bei Land und Registersatz bleibt es leer. */
-    warum_kein_wert: q.warum_kein_wert || null,
+       fuehrt das; bei Land und Registersatz bleibt es leer.
+       v1614-WGRD - je Kennzahl aufloesbar, siehe _grundFuer(). */
+    warum_kein_wert: _grundFuer(q.warum_kein_wert, kennzahl,
+                                q.warum_kein_wert_je_kennzahl),
   };
 }
 
-/* ── Bayern: wo der Ausschuss amtlich KEINE Sachwertfaktoren fuehrt ──────
+/* ── Bayern: was der oertliche Ausschuss amtlich fuehrt — und was nicht ──
  *
- * v1144 · Der Obere Gutachterausschuss fuer Grundstueckswerte im Freistaat
- * Bayern druckt im Immobilienmarktbericht 2026 (Kap. 11, S. 198 f.) eine
+ * Der Obere Gutachterausschuss fuer Grundstueckswerte im Freistaat Bayern
+ * druckt im Immobilienmarktbericht 2026 (Kap. 11, S. 197-199) eine
  * Uebersicht aller gemeldeten Ausschuesse ab: welche wertermittlungs-
- * relevanten Daten in den Jahren 2023 bis 2025 abgeleitet wurden und ob ein
- * Grundstuecksmarktbericht vorliegt.
+ * relevanten Daten in den Jahren 2023 bis 2025 abgeleitet wurden.
  *
- * Fuer die hier gelisteten 35 Zustaendigkeitsbereiche steht in der Spalte
- * "Sachwertfaktoren" NICHTS. Das ist eine amtliche Aussage und keine Luecke
- * unserer Ernte - der Kunde soll sie erfahren, statt eine leere Antwort zu
- * bekommen.
+ * DER BERICHT NENNT KEINE ZAHLEN. Er sagt woertlich: "Bei den
+ * wertermittlungsrelevanten Daten wird lediglich dargestellt, ob diese
+ * vorhanden sind." Die Werte selbst sind beim oertlichen Ausschuss zu
+ * erfragen. Genau deshalb gehoert diese Tabelle hierher und nicht ins
+ * Wertregister: sie ist der WEG zur Quelle, nicht die Quelle.
  *
- * Darunter sind Muenchen LK, Starnberg, Ebersberg, Freising, Erding und
- * Miesbach: der gesamte Speckguertel um Muenchen mit den hoechsten
- * Bodenwerten Deutschlands. Wer dort im Sachwertverfahren bewertet, findet
- * beim oertlich zustaendigen Ausschuss keinen Marktanpassungsfaktor.
+ * v1144 stand hier eine Handliste der 35 Bereiche OHNE Sachwertfaktor.
+ * Sie war richtig - am 25.09.2026 gegen die maschinell geerntete Tabelle
+ * geprueft: 35 gegen 35, kein einziger Widerspruch. Sie war aber nur die
+ * halbe Auskunft.
  *
- * Die Kreisschluessel stammen aus dem Gemeindeverzeichnis des Statistischen
- * Bundesamtes (Gebietsstand 30.09.2026), nicht aus dem Gedaechtnis.
- * Die vollstaendige Auswertung steht in claude/erntekarte-bayern.md. */
-const BY_OHNE_SACHWERTFAKTOR = {
-  '09161': 'Ingolstadt',            '09175': 'Ebersberg',
-  '09177': 'Erding',                '09178': 'Freising',
-  '09181': 'Landsberg am Lech',     '09182': 'Miesbach',
-  '09184': 'München',               '09187': 'Rosenheim',
-  '09188': 'Starnberg',             '09262': 'Passau',
-  '09273': 'Kelheim',               '09274': 'Landshut',
-  '09277': 'Rottal-Inn',            '09279': 'Dingolfing-Landau',
-  '09373': 'Neumarkt i. d. Oberpfalz', '09461': 'Bamberg',
-  '09472': 'Bayreuth',              '09473': 'Coburg',
-  '09475': 'Hof',                   '09478': 'Lichtenfels',
-  '09479': 'Wunsiedel i. Fichtelgebirge', '09561': 'Ansbach',
-  '09565': 'Schwabach',             '09661': 'Aschaffenburg',
-  '09662': 'Schweinfurt',           '09671': 'Aschaffenburg',
-  '09672': 'Bad Kissingen',         '09674': 'Haßberge',
-  '09675': 'Kitzingen',             '09676': 'Miltenberg',
-  '09677': 'Main-Spessart',         '09678': 'Schweinfurt',
-  '09762': 'Kaufbeuren',            '09764': 'Memmingen',
-  '09780': 'Oberallgäu',
+ * v1614-WGRD fuehrt jetzt ALLE 95 Kreise und BEIDE Kennzahlen:
+ *
+ *     59 leiten Sachwertfaktoren ab   ->  36 tun es nicht
+ *     48 leiten Liegenschaftszinssaetze ab -> 47 tun es nicht
+ *
+ * Der Gewinn steckt in den 59: fuer sie gab es bisher nur den allgemeinen
+ * Landesverweis. "Dein Ausschuss HAT einen, frag ihn" ist eine ganz andere
+ * Auskunft als Schweigen - und sie ist amtlich belegt.
+ *
+ * Unter den Bereichen ohne Sachwertfaktor sind Muenchen LK, Starnberg,
+ * Ebersberg, Freising, Erding und Miesbach: der Speckguertel um Muenchen
+ * mit den hoechsten Bodenwerten Deutschlands.
+ *
+ * Die Kreisschluessel sind nicht geraten, sondern gegen die amtliche
+ * Kreisliste aufgeloest (OpenPLZ - dieselbe Quelle, die AgsResolver.js
+ * nutzt). Rohdaten: register/verfuegbarkeit-by.json, Ernte:
+ * tools/swf-register/by-verf.py.
+ *
+ *            AGS      Name                            SWF    LZ          */
+const BY_AUSSCHUSS_DATEN = {
+  '09161': ['Ingolstadt',                         false, false],
+  '09162': ['München, Landeshauptstadt',          true , true ],
+  '09163': ['Rosenheim',                          true , true ],
+  '09171': ['Altötting',                          true , true ],
+  '09172': ['Berchtesgadener Land',               true , true ],
+  '09173': ['Bad Tölz-Wolfratshausen',            true , false],
+  '09174': ['Dachau',                             true , true ],
+  '09175': ['Ebersberg',                          false, false],
+  '09176': ['Eichstätt',                          true , true ],
+  '09177': ['Erding',                             false, false],
+  '09178': ['Freising',                           false, false],
+  '09179': ['Fürstenfeldbruck',                   true , false],
+  '09180': ['Garmisch-Partenkirchen',             true , true ],
+  '09181': ['Landsberg am Lech',                  false, false],
+  '09182': ['Miesbach',                           false, false],
+  '09183': ['Mühldorf a.Inn',                     true , true ],
+  '09184': ['München',                            false, false],
+  '09185': ['Neuburg-Schrobenhausen',             true , true ],
+  '09186': ['Pfaffenhofen a.d.Ilm',               true , true ],
+  '09187': ['Rosenheim',                          false, false],
+  '09188': ['Starnberg',                          false, false],
+  '09189': ['Traunstein',                         true , true ],
+  '09190': ['Weilheim-Schongau',                  true , true ],
+  '09261': ['Landshut',                           true , true ],
+  '09262': ['Passau',                             false, true ],
+  '09263': ['Straubing',                          true , true ],
+  '09271': ['Deggendorf',                         true , false],
+  '09273': ['Kelheim',                            false, false],
+  '09274': ['Landshut',                           false, false],
+  '09275': ['Passau',                             true , false],
+  '09276': ['Regen',                              true , false],
+  '09277': ['Rottal-Inn',                         false, false],
+  '09278': ['Straubing-Bogen',                    true , true ],
+  '09279': ['Dingolfing-Landau',                  false, false],
+  '09361': ['Amberg',                             true , true ],
+  '09362': ['Regensburg',                         true , true ],
+  '09363': ['Weiden i.d.OPf.',                    true , true ],
+  '09371': ['Amberg-Sulzbach',                    true , false],
+  '09372': ['Cham',                               true , true ],
+  '09373': ['Neumarkt i.d.OPf.',                  false, false],
+  '09374': ['Neustadt a.d.Waldnaab',              true , true ],
+  '09375': ['Regensburg',                         true , false],
+  '09376': ['Schwandorf',                         true , false],
+  '09377': ['Tirschenreuth',                      true , false],
+  '09461': ['Bamberg',                            false, false],
+  '09462': ['Bayreuth',                           true , true ],
+  '09463': ['Coburg',                             true , false],
+  '09464': ['Hof',                                true , true ],
+  '09471': ['Bamberg',                            true , true ],
+  '09472': ['Bayreuth',                           false, false],
+  '09473': ['Coburg',                             false, false],
+  '09474': ['Forchheim',                          true , true ],
+  '09475': ['Hof',                                false, false],
+  '09476': ['Kronach',                            true , true ],
+  '09477': ['Kulmbach',                           true , true ],
+  '09478': ['Lichtenfels',                        false, false],
+  '09479': ['Wunsiedel i.Fichtelgebirge',         false, false],
+  '09561': ['Ansbach',                            false, false],
+  '09562': ['Erlangen',                           true , true ],
+  '09563': ['Fürth',                              true , true ],
+  '09564': ['Nürnberg',                           true , true ],
+  '09565': ['Schwabach',                          false, false],
+  '09571': ['Ansbach',                            true , false],
+  '09572': ['Erlangen-Höchstadt',                 true , true ],
+  '09573': ['Fürth',                              true , true ],
+  '09574': ['Nürnberger Land',                    true , true ],
+  '09576': ['Roth',                               true , true ],
+  '09577': ['Weißenburg-Gunzenhausen',            true , true ],
+  '09661': ['Aschaffenburg',                      false, false],
+  '09662': ['Schweinfurt',                        false, false],
+  '09663': ['Würzburg',                           true , true ],
+  '09671': ['Aschaffenburg, Rest LK',             false, false],
+  '09671': ['Aschaffenburg, Rhein-Main LK',       false, false],
+  '09672': ['Bad Kissingen',                      false, false],
+  '09673': ['Rhön-Grabfeld',                      true , false],
+  '09674': ['Haßberge',                           false, false],
+  '09675': ['Kitzingen',                          false, false],
+  '09676': ['Miltenberg',                         false, false],
+  '09677': ['Main-Spessart',                      false, false],
+  '09678': ['Schweinfurt',                        false, false],
+  '09679': ['Würzburg',                           true , true ],
+  '09761': ['Augsburg',                           true , true ],
+  '09762': ['Kaufbeuren',                         false, false],
+  '09763': ['Kempten (Allgäu)',                   true , true ],
+  '09764': ['Memmingen',                          false, false],
+  '09771': ['Aichach-Friedberg',                  true , true ],
+  '09772': ['Augsburg',                           true , true ],
+  '09773': ['Dillingen a.d.Donau',                true , true ],
+  '09774': ['Günzburg',                           true , true ],
+  '09775': ['Neu-Ulm',                            true , true ],
+  '09776': ['Lindau (Bodensee)',                  true , true ],
+  '09777': ['Ostallgäu',                          true , true ],
+  '09778': ['Unterallgäu',                        true , true ],
+  '09779': ['Donau-Ries',                         true , true ],
+  '09780': ['Oberallgäu',                         false, false],
 };
 
-for (const [ags, name] of Object.entries(BY_OHNE_SACHWERTFAKTOR)) {
+/* 09671 (Landkreis Aschaffenburg) steht zweimal in der Quelle - der
+   Ausschuss trennt "Rest LK" und "Rhein-Main LK". Beide melden nichts,
+   deshalb ist die Zusammenfassung hier unschaedlich. */
+
+const BY_PORTAL = 'https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/';
+const BY_BELEG = 'Immobilienmarktbericht Bayern 2026, Kapitel 11, Stand 2025';
+
+function _byGrund(fuehrt, was) {
+  return fuehrt
+    ? `Der zuständige Gutachterausschuss hat für die Jahre 2023 bis 2025 ${was} `
+      + 'abgeleitet — das steht in der Übersicht des Oberen Gutachterausschusses '
+      + `für Grundstückswerte im Freistaat Bayern (${BY_BELEG}). Bayern `
+      + 'veröffentlicht diese Werte aber nicht zentral: der Landesbericht stellt '
+      + 'ausdrücklich nur dar, OB sie vorliegen. Die Zahl selbst ist bei der '
+      + 'Geschäftsstelle des örtlichen Ausschusses zu erfragen.'
+    : `Der zuständige Gutachterausschuss hat für die Jahre 2023 bis 2025 keine ${was} `
+      + 'abgeleitet. Das steht so in der Übersicht des Oberen Gutachterausschusses '
+      + `für Grundstückswerte im Freistaat Bayern (${BY_BELEG}). Ein amtlicher Wert `
+      + 'liegt hier also nicht vor — nicht, weil wir ihn nicht fänden, sondern weil '
+      + 'keiner abgeleitet wurde.';
+}
+
+for (const [ags, [name, hatSwf, hatLzs]] of Object.entries(BY_AUSSCHUSS_DATEN)) {
+  /* ── EIN HANDRECHERCHIERTER EINTRAG WIRD NIE UEBERSCHRIEBEN ──────────
+   *
+   * Beim Einbau am 25.09.2026 waere genau das passiert: Nuernberg (09564)
+   * traegt seit v1145 die Auskunft, dass der Grundstuecksmarktbericht
+   * online nur als Leseprobe steht und die Tabelle der Basissachwert-
+   * faktoren dort die Ueberschrift "Leseprobe ohne Daten" hat. Das ist
+   * deutlich mehr wert als der allgemeine Landessatz — die Schleife haette
+   * ihn stillschweigend ersetzt.
+   *
+   * Der Handeintrag gewinnt also. Ergaenzt wird nur, was er NICHT sagt:
+   * die Landesuebersicht kennt beide Kennzahlen, der Handtext meist nur
+   * eine. So geht nichts verloren und nichts fehlt. */
+  const vorhanden = AUSSCHUSS_QUELLEN[ags];
+  if (vorhanden) {
+    const alt = vorhanden.warum_kein_wert;
+    const altText = typeof alt === 'string' ? alt : null;
+    vorhanden.warum_kein_wert = {
+      sachwertfaktor: (alt && alt.sachwertfaktor) || altText
+        || _byGrund(hatSwf, 'Sachwertfaktoren'),
+      liegenschaftszinssatz: (alt && alt.liegenschaftszinssatz)
+        || _byGrund(hatLzs, 'Liegenschaftszinssätze'),
+    };
+    continue;
+  }
   /* Dritte Stelle 6 kennzeichnet in Bayern die kreisfreien Staedte. */
   const kreisfrei = ags[3] === '6';
   AUSSCHUSS_QUELLEN[ags] = {
     stelle: kreisfrei
       ? `Gutachterausschuss für Grundstückswerte im Bereich der Stadt ${name}`
       : `Gutachterausschuss für Grundstückswerte im Bereich des Landkreises ${name}`,
-    url: 'https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/',
+    url: BY_PORTAL,
     zugang: 'kostenfrei',
-    warum_kein_wert:
-      'Der zuständige Gutachterausschuss hat für die Jahre 2023 bis 2025 keine '
-      + 'Sachwertfaktoren abgeleitet. Das steht so in der Übersicht des Oberen '
-      + 'Gutachterausschusses für Grundstückswerte im Freistaat Bayern '
-      + '(Immobilienmarktbericht 2026, Kapitel 11, Stand 2025). Ein amtlicher '
-      + 'Marktanpassungsfaktor für das Sachwertverfahren liegt hier also nicht vor.',
+    /* v1614-WGRD · je Kennzahl ein eigener Grund. Ein gemeinsamer waere
+       fuer 23 der 95 Kreise falsch - so viele fuehren die eine Kennzahl
+       und die andere nicht. */
+    warum_kein_wert: {
+      sachwertfaktor: _byGrund(hatSwf, 'Sachwertfaktoren'),
+      liegenschaftszinssatz: _byGrund(hatLzs, 'Liegenschaftszinssätze'),
+    },
     hinweis:
       'Die Übersicht sagt nur, OB Daten vorliegen — nicht für welche Objektart '
       + 'oder welchen Stichtag; sie führt außerdem nur, was dem Oberen '

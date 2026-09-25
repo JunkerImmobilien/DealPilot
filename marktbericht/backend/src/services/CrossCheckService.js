@@ -615,6 +615,24 @@ export const CrossCheckService = {
         out.notes.push('Sachwertfaktor 1,0 angesetzt: Ohne Daten des örtlichen Gutachterausschusses erfolgt KEINE Marktanpassung. Reale Sachwertfaktoren liegen je nach Lage zwischen 0,8 und 1,3 – der ausgewiesene Sachwert ist deshalb unangepasst und weicht systematisch vom Verkehrswert ab.');
         if (!istHaus && !istWohnung) out.notes.push('Objektart nicht eindeutig – Sachwert mit EFH-Ansatz gerechnet. Bei Nicht-Wohnnutzung ist er nicht belastbar.');
       }
+
+      /* ── v1614-WGRD · DER WEG ZUR QUELLE UEBERLEBT DEN NICHTTREFFER ──
+       *
+       * `sachwertfaktor_quelle_link` wurde bis hierher NUR im Zweig
+       * `_sw.wert != null` gesetzt (Z. 469). Fehlt aber der Objekttyp, die
+       * Bruttogrundflaeche oder die Standardstufe, entsteht
+       * `out.sachwert = { available:false, grund:… }` — und mit ihm
+       * verschwand der Link, obwohl wir den zustaendigen Ausschuss kennen.
+       *
+       * Das war genau verkehrt herum: wo kein Wert steht, ist der Weg zur
+       * Quelle die EINZIGE Auskunft, die wir geben koennen. Der Link haengt
+       * jetzt an jedem Sachwertblock, egal auf welchem Weg er entstanden
+       * ist — und an EINER Stelle, damit ein spaeter ergaenzter Zweig ihn
+       * nicht wieder verliert. */
+      if (out.sachwert && !out.sachwert.sachwertfaktor_quelle_link
+          && _swfQuelle && _swfQuelle.quelle_link) {
+        out.sachwert.sachwertfaktor_quelle_link = _swfQuelle.quelle_link;
+      }
     }
 
     /* WKERN-2 · ERTRAGSWERT ueber den gemeinsamen Kern.
