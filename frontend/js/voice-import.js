@@ -4269,9 +4269,19 @@
          Genau der Fall aus CLAUDE.md: lieber Spezifitaet erhoehen als
          auf Ladereihenfolge bauen - und welche Regel gewinnt, sagt nur
          der Walker, nicht matches(). */
-      '  .oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{flex:1 1 auto;min-height:38vh;display:block}',
-      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-chat{height:100%;max-height:none;overflow-y:auto;',
-      '    -webkit-overflow-scrolling:touch}',
+      /* v1606c · height:100% reichte nicht: die Buehne hat min-height,
+         keine height - Prozent loest dagegen auf `auto` auf, also blieb
+         der Chat 577 px hoch in einem 265-px-Behaelter und quoll weiter.
+
+         Jetzt ist die Buehne selbst eine Flex-Spalte und der Chat ihr
+         einziges Kind mit flex:1 1 0 und min-height:0. Damit bekommt er
+         GENAU die Hoehe der Buehne und scrollt in sich - und
+         _rfAnsEnde() scrollt weiterhin das richtige Element ans Ende,
+         was bei einem Scroller weiter oben nicht mehr stimmen wuerde. */
+      '  .oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{flex:1 1 auto;min-height:38vh;',
+      '    display:flex;flex-direction:column}',
+      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-chat{flex:1 1 0;min-height:0;height:auto;',
+      '    max-height:none;overflow-y:auto;-webkit-overflow-scrolling:touch}',
       /* Die aktuelle Frage ist die juengste Wortmeldung, nicht die halbe
          Anzeige. Sie steht direkt ueber der Eingabe und scrollt in sich. */
       '  .oabi-ov.vi-mode #vi-rf-dran{max-height:26vh;overflow-y:auto;min-height:0;flex:0 0 auto}',
