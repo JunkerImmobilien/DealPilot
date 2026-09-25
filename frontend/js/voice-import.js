@@ -6914,7 +6914,51 @@
     /* v1121-WFRUEH: steht damit alles fuer die erweiterte Indikation?
        Dann laeuft sie ab jetzt nebenher statt erst am Ende. */
     try { _rfMarkt2Pruefen(); } catch (e) {}
+    try { _rfDarlehenAbleiten(); } catch (e) {}
     return true;
+  }
+
+  /* ═══ v1607 · DAS DARLEHEN WURDE NIE GEFRAGT UND NIE GERECHNET ═══════
+     Gemessen am 25.09.2026 am Demo-Mehrfamilienhaus: Feld `d1` geleert,
+     neu gerechnet — DSCR fiel auf 0,00, der Beleihungsauslauf auf 0,0 %.
+     Die ganze Finanzierungsseite bricht weg.
+
+     Etappe 2 fragt Eigenkapital, Zins, Tilgung und Zinsbindung — aber
+     NICHT den Darlehensbetrag. Abgeleitet wurde er auch nirgends. Wer
+     den Lauf brav zu Ende geht, bekommt am Schluss einen Investor Deal
+     Score, dessen Finanzierungsblock auf null steht. Beim Anlegen des
+     Demo-Objekts musste ich die Zahl von Hand nachtragen.
+
+     Danach FRAGEN waere die dumme Loesung: der Lauf kennt Kaufpreis,
+     Eigenkapital und die vier Nebenkostensaetze. Er rechnet es aus und
+     sagt, dass er es getan hat — die Quelle steht als `abgeleitet` am
+     Feld, also erscheint es nicht als eigene Angabe des Nutzers.
+
+     Was der Nutzer selbst eingibt, bleibt unangetastet: _rfSetzen
+     schreibt nie ueber einen vorhandenen Wert. */
+  function _rfDarlehenAbleiten() {
+    if (!_rf || !_rf.data || !_rf.data.fields) return;
+    var F = _rf.data.fields;
+    if (F.d1 !== undefined && F.d1 !== null && F.d1 !== '') return;   /* selbst gesetzt */
+    var zahl = function (v) {
+      if (v === undefined || v === null || v === '') return null;
+      var n = (typeof window.parseDe === 'function') ? window.parseDe(v) : parseFloat(v);
+      return isFinite(n) ? n : null;
+    };
+    var kp = zahl(F.kp), ek = zahl(F.ek);
+    if (!kp || kp <= 0 || ek === null || ek < 0) return;
+    /* Die Nebenkosten zaehlen mit - finanziert wird der GESAMTaufwand,
+       nicht der Kaufpreis. Fehlt ein Satz, gilt er als null; das ist
+       keine Erfindung, sondern die Angabe, die vorliegt. */
+    var nk = ['makler_p', 'notar_p', 'gba_p', 'gest_p'].reduce(function (s, id) {
+      return s + (zahl(F[id]) || 0);
+    }, 0);
+    var gesamt = kp * (1 + nk / 100);
+    var d1 = Math.round(gesamt - ek);
+    if (d1 <= 0) return;            /* voll aus Eigenkapital - kein Darlehen */
+    F.d1 = String(d1);
+    _rf.quelle = _rf.quelle || {};
+    _rf.quelle.d1 = 'abgeleitet aus Kaufpreis, Nebenkosten und Eigenkapital';
   }
 
   /* ═══════════════════════════════════════════════════════════════════
