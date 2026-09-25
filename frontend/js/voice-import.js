@@ -4291,7 +4291,13 @@
          Auf dem Telefon ist sie Nachschlagewerk, kein Gespraech. Sie
          zeigt nur noch ihren Kopf ("Was schon steht 0 / 16") und klappt
          auf Antippen auf. Damit gehen 189 Pixel zurueck an den Chat. */
-      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-stand{flex:0 0 auto}',
+      /* min-height:0 ist hier das Entscheidende. Es gibt bereits
+         .oabi-ov.vi-mode.vi-dialog .vi-rf-stand{min-height:220px}.
+         Beim ersten Anlauf habe ich nur `height` ueberschrieben - der
+         Koerper war dann ausgeblendet (0 px), die HUELLE blieb aber bei
+         220 und das Gespraech weiter bei 33. Eine halb ueberschriebene
+         Groesse ist keine Groesse. */
+      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-stand{flex:0 0 auto;min-height:0;height:auto}',
       '  .oabi-ov.vi-mode.vi-dialog #vi-rf-stand .vi-rf-stand-body{display:none}',
       '  .oabi-ov.vi-mode.vi-dialog #vi-rf-stand.auf .vi-rf-stand-body{display:block;',
       '    max-height:30vh;overflow-y:auto}',
