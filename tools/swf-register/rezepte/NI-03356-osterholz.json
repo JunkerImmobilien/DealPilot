@@ -1,0 +1,261 @@
+{
+  "land_code": "NI",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Otterndorf, Bereich Landkreis Osterholz",
+  "gaa_kennz": "03356",
+  "ags": [
+    "03356"
+  ],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "11/2022 bis 10/2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-03-02",
+  "quelle_url": "https://public.tableau.com/views/2026_sw_efh_ott_ohz/dash",
+  "quelle_datei": "Tableau-Kalkulatoren für Landkreis Osterholz (Grundstücksmarktinformationen Niedersachsen 2026)",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Osterholz",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehendes Ein- und Zweifamilienhaus",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [
+          130000,
+          210000,
+          290000,
+          380000,
+          460000,
+          540000,
+          630000,
+          710000,
+          790000
+        ],
+        "achse_y_feld": "brw",
+        "achse_y_bez": "Bodenrichtwert in €/m²",
+        "achse_y": [
+          20,
+          80,
+          140,
+          210,
+          270,
+          330
+        ],
+        "zellen": {
+          "20": [
+            1.14,
+            0.99,
+            0.89,
+            0.8,
+            0.73,
+            0.67,
+            0.61,
+            0.57,
+            0.52
+          ],
+          "80": [
+            1.17,
+            1.02,
+            0.91,
+            0.82,
+            0.75,
+            0.7,
+            0.64,
+            0.59,
+            0.55
+          ],
+          "140": [
+            1.2,
+            1.05,
+            0.94,
+            0.85,
+            0.78,
+            0.72,
+            0.66,
+            0.62,
+            0.58
+          ],
+          "210": [
+            1.23,
+            1.08,
+            0.97,
+            0.88,
+            0.81,
+            0.75,
+            0.7,
+            0.65,
+            0.61
+          ],
+          "270": [
+            1.25,
+            1.11,
+            1,
+            0.91,
+            0.84,
+            0.78,
+            0.72,
+            0.68,
+            0.64
+          ],
+          "330": [
+            1.28,
+            1.13,
+            1.03,
+            0.93,
+            0.87,
+            0.81,
+            0.75,
+            0.7,
+            0.66
+          ]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "normobjekt": null,
+        "hinweis": "Die 54 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Keine der Umrechnungskurven war lesbar. Die übrigen bleiben als offene Korrektur im Ergebnis stehen."
+      },
+      "korrekturen": [
+        {
+          "bez": "Umrechnung für abweichende Merkmale (im Dokument nur als Bild)",
+          "feld": "_nicht_lesbar",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {},
+          "rundung_stellen": 2,
+          "hinweis": "Der Ausschuss druckt Umrechnungskurven ab, aber ohne Zahlen an den Datenpunkten — sie sind aus dem PDF nicht lesbar. Der Tabellenwert gilt deshalb nur für die Stellung, an der er abgetastet wurde. Diese Korrektur bleibt absichtlich unbeziffert, damit sie als offen gemeldet wird statt still zu fehlen."
+        }
+      ],
+      "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert.",
+      "stufe": "B",
+      "stufe_begruendung": "Amtliche Quelle, Gitterwerte am Kalkulator des Ausschusses abgetastet. Stufe B statt A: die Stützstellen sind von uns gewählt, und die Umrechnungskurven dieses Gebiets sind im Dokument nur als Bild abgedruckt — sie konnten nicht übernommen werden und werden deshalb als offene Korrektur ausgewiesen.",
+      "fallzahl": 345,
+      "streuung": 0.11,
+      "beleg": "Kalkulator 2026_sw_efh_ott_ohz (Tableau Public, Profil ogagmd2026), Datenbasis ?, Stichprobe 345 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 0,97 aus."
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhaus / Doppelhaushälfte",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [
+          140000,
+          190000,
+          240000,
+          300000,
+          350000,
+          410000,
+          460000,
+          520000,
+          570000
+        ],
+        "achse_y_feld": "brw",
+        "achse_y_bez": "Bodenrichtwert in €/m²",
+        "achse_y": [
+          30,
+          90,
+          150,
+          200,
+          260,
+          320
+        ],
+        "zellen": {
+          "30": [
+            1.3,
+            1.04,
+            0.9,
+            0.8,
+            0.74,
+            0.68,
+            0.65,
+            0.62,
+            0.59
+          ],
+          "90": [
+            1.35,
+            1.08,
+            0.93,
+            0.82,
+            0.76,
+            0.71,
+            0.67,
+            0.64,
+            0.61
+          ],
+          "150": [
+            1.42,
+            1.14,
+            0.98,
+            0.87,
+            0.8,
+            0.74,
+            0.7,
+            0.67,
+            0.64
+          ],
+          "200": [
+            1.51,
+            1.2,
+            1.04,
+            0.91,
+            0.84,
+            0.78,
+            0.74,
+            0.7,
+            0.68
+          ],
+          "260": [
+            1.63,
+            1.3,
+            1.12,
+            0.98,
+            0.9,
+            0.84,
+            0.79,
+            0.75,
+            0.72
+          ],
+          "320": [
+            1.77,
+            1.41,
+            1.21,
+            1.06,
+            0.98,
+            0.91,
+            0.86,
+            0.81,
+            0.78
+          ]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "normobjekt": null,
+        "hinweis": "Die 54 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Keine der Umrechnungskurven war lesbar. Die übrigen bleiben als offene Korrektur im Ergebnis stehen."
+      },
+      "korrekturen": [
+        {
+          "bez": "Umrechnung für abweichende Merkmale (im Dokument nur als Bild)",
+          "feld": "_nicht_lesbar",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {},
+          "rundung_stellen": 2,
+          "hinweis": "Der Ausschuss druckt Umrechnungskurven ab, aber ohne Zahlen an den Datenpunkten — sie sind aus dem PDF nicht lesbar. Der Tabellenwert gilt deshalb nur für die Stellung, an der er abgetastet wurde. Diese Korrektur bleibt absichtlich unbeziffert, damit sie als offen gemeldet wird statt still zu fehlen."
+        }
+      ],
+      "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert.",
+      "stufe": "B",
+      "stufe_begruendung": "Amtliche Quelle, Gitterwerte am Kalkulator des Ausschusses abgetastet. Stufe B statt A: die Stützstellen sind von uns gewählt, und die Umrechnungskurven dieses Gebiets sind im Dokument nur als Bild abgedruckt — sie konnten nicht übernommen werden und werden deshalb als offene Korrektur ausgewiesen.",
+      "fallzahl": 130,
+      "streuung": 0.13,
+      "beleg": "Kalkulator 2026_sw_rh_ott_ohz (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 130 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 0,93 aus."
+    }
+  ]
+}

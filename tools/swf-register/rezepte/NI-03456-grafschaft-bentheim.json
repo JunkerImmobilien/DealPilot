@@ -1,0 +1,119 @@
+{
+  "land_code": "NI",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Osnabrück-Meppen, Bereich Landkreis Grafschaft Bentheim",
+  "gaa_kennz": "03456",
+  "ags": [
+    "03456"
+  ],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "11/2022 bis 10/2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-03-02",
+  "quelle_url": "https://public.tableau.com/views/2026_sw_efh_osmep_osmepnoh/dash",
+  "quelle_datei": "Tableau-Kalkulatoren für Landkreis Grafschaft Bentheim (Grundstücksmarktinformationen Niedersachsen 2026)",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Grafschaft Bentheim",
+  "modelle": [
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhaus / Doppelhaushälfte",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [
+          125000,
+          150000,
+          200000,
+          250000,
+          300000,
+          350000
+        ],
+        "achse_y_feld": "brw",
+        "achse_y_bez": "Bodenrichtwert in €/m²",
+        "achse_y": [
+          50,
+          100,
+          150,
+          200
+        ],
+        "zellen": {
+          "50": [
+            1.25,
+            1.17,
+            1.04,
+            0.94,
+            0.87,
+            0.81
+          ],
+          "100": [
+            1.29,
+            1.21,
+            1.08,
+            0.98,
+            0.9,
+            0.84
+          ],
+          "150": [
+            1.34,
+            1.25,
+            1.12,
+            1.02,
+            0.94,
+            0.87
+          ],
+          "200": [
+            1.39,
+            1.3,
+            1.16,
+            1.06,
+            0.98,
+            0.91
+          ]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "normobjekt": "modifiziertes Baujahr 1990",
+        "hinweis": "Die 24 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Lesbar war die Umrechnung für: modifiziertes Baujahr. Die übrigen bleiben als offene Korrektur im Ergebnis stehen."
+      },
+      "korrekturen": [
+        {
+          "bez": "Abweichendes modifiziertes Baujahr",
+          "feld": "mod_baujahr",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "1960": 0.69,
+            "1970": 0.86,
+            "1980": 0.95,
+            "1990": 1,
+            "2000": 1.03,
+            "2010": 1.05,
+            "2020": 1.06
+          },
+          "rundung_stellen": 2,
+          "hinweis": "7 abgedruckte Stützstellen."
+        },
+        {
+          "bez": "Umrechnung für abweichende Merkmale (im Dokument nur als Bild)",
+          "feld": "_nicht_lesbar",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {},
+          "rundung_stellen": 2,
+          "hinweis": "Der Ausschuss druckt Umrechnungskurven ab, aber ohne Zahlen an den Datenpunkten — sie sind aus dem PDF nicht lesbar. Der Tabellenwert gilt deshalb nur für die Stellung, an der er abgetastet wurde. Diese Korrektur bleibt absichtlich unbeziffert, damit sie als offen gemeldet wird statt still zu fehlen."
+        }
+      ],
+      "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert.",
+      "stufe": "B",
+      "stufe_begruendung": "Amtliche Quelle, Gitterwerte am Kalkulator des Ausschusses abgetastet. Stufe B statt A: die Stützstellen sind von uns gewählt, und die Umrechnungskurven dieses Gebiets sind im Dokument nur als Bild abgedruckt — sie konnten nicht übernommen werden und werden deshalb als offene Korrektur ausgewiesen.",
+      "fallzahl": 181,
+      "streuung": 0.14,
+      "beleg": "Kalkulator 2026_sw_rh_osmep_osmepnoh (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 181 Kauffälle. 24 von 24 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 1,04 aus."
+    }
+  ]
+}

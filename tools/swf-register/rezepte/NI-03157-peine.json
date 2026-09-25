@@ -182,6 +182,161 @@
       "fallzahl": 557,
       "streuung": 0.19,
       "beleg": "Kalkulator 2026_sw_efh_bspe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 557 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 1,14 aus."
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhaus / Doppelhaushälfte",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [
+          60000,
+          120000,
+          180000,
+          250000,
+          310000,
+          380000,
+          440000,
+          510000,
+          570000
+        ],
+        "achse_y_feld": "brw",
+        "achse_y_bez": "Bodenrichtwert in €/m²",
+        "achse_y": [
+          60,
+          90,
+          110,
+          140,
+          160,
+          190
+        ],
+        "zellen": {
+          "60": [
+            2.12,
+            1.36,
+            1.02,
+            0.79,
+            0.66,
+            0.55,
+            0.48,
+            0.42,
+            0.37
+          ],
+          "90": [
+            2.32,
+            1.51,
+            1.15,
+            0.91,
+            0.77,
+            0.65,
+            0.58,
+            0.51,
+            0.46
+          ],
+          "110": [
+            2.4,
+            1.58,
+            1.21,
+            0.96,
+            0.82,
+            0.7,
+            0.62,
+            0.55,
+            0.5
+          ],
+          "140": [
+            2.5,
+            1.66,
+            1.28,
+            1.02,
+            0.88,
+            0.75,
+            0.67,
+            0.59,
+            0.54
+          ],
+          "160": [
+            2.55,
+            1.7,
+            1.32,
+            1.06,
+            0.91,
+            0.78,
+            0.7,
+            0.62,
+            0.56
+          ],
+          "190": [
+            2.61,
+            1.75,
+            1.36,
+            1.09,
+            0.94,
+            0.81,
+            0.73,
+            0.65,
+            0.59
+          ]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "normobjekt": "Restnutzungsdauer 35 · Standardstufen 2,5",
+        "hinweis": "Die 54 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Lesbar war die Umrechnung für: Restnutzungsdauer, Standardstufe. Die übrigen bleiben als offene Korrektur im Ergebnis stehen."
+      },
+      "korrekturen": [
+        {
+          "bez": "Abweichende Restnutzungsdauer",
+          "feld": "rnd_jahre",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "15": 0.98,
+            "25": 0.99,
+            "35": 1,
+            "45": 1,
+            "55": 1.01,
+            "65": 1.01,
+            "70": 1.01,
+            "75": 1.01,
+            "80": 1.01
+          },
+          "rundung_stellen": 2,
+          "hinweis": "9 abgedruckte Stützstellen."
+        },
+        {
+          "bez": "Abweichende Standardstufe",
+          "feld": "standardstufe",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "2": 0.84,
+            "3": 1.11,
+            "4": 1.26,
+            "1.5": 0.61,
+            "2.5": 1,
+            "3.5": 1.19
+          },
+          "rundung_stellen": 2,
+          "hinweis": "6 abgedruckte Stützstellen."
+        },
+        {
+          "bez": "Umrechnung für abweichende Merkmale (im Dokument nur als Bild)",
+          "feld": "_nicht_lesbar",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {},
+          "rundung_stellen": 2,
+          "hinweis": "Der Ausschuss druckt Umrechnungskurven ab, aber ohne Zahlen an den Datenpunkten — sie sind aus dem PDF nicht lesbar. Der Tabellenwert gilt deshalb nur für die Stellung, an der er abgetastet wurde. Diese Korrektur bleibt absichtlich unbeziffert, damit sie als offen gemeldet wird statt still zu fehlen."
+        }
+      ],
+      "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert.",
+      "stufe": "B",
+      "stufe_begruendung": "Amtliche Quelle, Gitterwerte am Kalkulator des Ausschusses abgetastet. Stufe B statt A: die Stützstellen sind von uns gewählt, und die Umrechnungskurven dieses Gebiets sind im Dokument nur als Bild abgedruckt — sie konnten nicht übernommen werden und werden deshalb als offene Korrektur ausgewiesen.",
+      "fallzahl": 233,
+      "streuung": 0.29,
+      "beleg": "Kalkulator 2026_sw_rh_bspe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 233 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 1,1 aus."
     }
   ]
 }
