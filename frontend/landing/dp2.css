@@ -119,6 +119,31 @@ img{max-width:100%;display:block}
   border:1px solid var(--cream-line);padding:7px;opacity:0;visibility:hidden;
   transform:translateY(8px);transition:.22s var(--e-weich);list-style:none;margin:0;
   box-shadow:0 20px 50px rgba(22,19,13,.13)}
+
+/* ═══ v1611 · DAS AUFKLAPPMENUE STAND QUER ═══════════════════════════
+   Marcel: "wenn man die aufklappt passt dort die formatierung nicht."
+
+   Gemessen am 25.09.2026 bei 1521 px, Menuepunkt "Funktionen":
+
+       Die 19 Module     115 x 152 px
+       Leistungsumfang   167 x  96 px
+       Cockpit-Matrix    108 x 170 px
+       API               124 x 131 px
+
+   Vier schmale Textsaeulen NEBENEINANDER, mit ausgefransten Hoehen.
+
+   URSACHE: `.nav ul{display:flex}` gilt fuer JEDE Liste im Menue - auch
+   fuer die verschachtelte `.sub`. Die ist als senkrechte Liste gebaut
+   (min-width 330px, `.sub li{display:block}`), aber in einem
+   Flex-Behaelter werden Kinder zu Flex-Elementen, egal was an ihnen
+   steht. Ein `display:block` am Kind kann sich gegen den Elternteil
+   nicht wehren.
+
+   UND WARUM `.sub{display:block}` NICHT GEREICHT HAETTE: `.nav ul` ist
+   Klasse PLUS Typ und damit staerker als `.sub` allein. Derselbe
+   Stolperstein wie gestern im Sprechlauf - deshalb steht hier
+   `.nav ul.sub`, nicht `.sub`. */
+.nav ul.sub{display:block}
 .nav li:hover .sub,.nav li:focus-within .sub{opacity:1;visibility:visible;transform:none}
 .sub::before{content:'';position:absolute;top:-10px;left:0;right:0;height:10px}
 .sub li{display:block}
