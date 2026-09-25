@@ -1852,6 +1852,26 @@ window.DealPilotDealAction = (function() {
     // Stichtag = heute
     prefill.stichtag = new Date().toISOString().slice(0, 10);
 
+    /* v1608 · Der Modernisierungsgrad aus dem Objekt in den Assistenten.
+       Seit v1608 fragt der Sprechlauf die acht Bauteile nach Anlage 2
+       und legt sie als Objektfelder ab (mod_dach, mod_fenster, ...).
+       Ohne diese Zeilen fragt der Assistent dieselben acht Dinge gleich
+       noch einmal - und der Nutzer haette zu Recht das Gefuehl, dass
+       ihm niemand zuhoert.
+
+       buildInitialState() fuehrt Objekte zusammen statt sie zu
+       ersetzen, `mod` kommt also vollstaendig an. */
+    try {
+      var _mod = {};
+      ['dach', 'fenster', 'leitungen', 'heizung', 'aussenwand',
+       'baeder', 'innenausbau', 'grundriss'].forEach(function (k) {
+        var el = document.getElementById('mod_' + k);
+        var v = el && el.value ? String(el.value).trim() : '';
+        if (v) _mod[k] = v;
+      });
+      if (Object.keys(_mod).length) prefill.mod = _mod;
+    } catch (e) {}
+
     /* v1598b · Gebaeudeanteil und Grenzsteuersatz fuer den AfA-Vergleich.
        Ohne sie rechnete der Ergebnisschirm des Assistenten auf dem
        Rueckfallwert 200.000 EUR - bei einem Objekt fuer 743.000 EUR

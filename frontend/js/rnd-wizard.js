@@ -1692,6 +1692,13 @@
     open: open,
     close: close,
     prefillFromDealPilot: prefillFromDealPilot,
+    /* v1608 · Die Punktzahl nach Anlage 2 wird jetzt auch ausserhalb
+       gebraucht: der Sprechlauf fragt die acht Bauteile und muss daraus
+       dieselbe Zahl bilden. Sie zweimal zu rechnen waere genau die
+       Dopplung, an der schon der AfA-Vergleich gescheitert ist - eine
+       Kopie laeuft frueher oder spaeter auseinander, und hier steuert
+       die Zahl die Restnutzungsdauer und damit die Abschreibung. */
+    modPunkte: computeModPoints,
     STEPS: STEPS
   };
 })(typeof window !== 'undefined' ? window : globalThis);

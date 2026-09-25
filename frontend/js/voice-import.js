@@ -2686,7 +2686,13 @@
        werden. Wer sie will, bekommt dafuer eine eigene, angekuendigte
        Runde — und am Ende den amtlichen Sachwertfaktor seines
        Gutachterausschusses aus unserem Register. */
-    { nr: 7, name: 'Wertermittlung', ziel: 'Sachwertverfahren nach ImmoWertV', extra: true }
+    { nr: 7, name: 'Wertermittlung', ziel: 'Sachwertverfahren nach ImmoWertV', extra: true },
+    /* v1608 · Eigene Etappe aus demselben Grund wie die Wertermittlung:
+       wer keine kuerzere Restnutzungsdauer nachweisen will, soll nicht
+       nach dem Zustand seiner Leitungssysteme gefragt werden. Wer sie
+       will, bekommt dafuer eine angekuendigte Runde - und am Ende die
+       Abschreibung, die ihm zusteht. */
+    { nr: 8, name: 'Restnutzungsdauer', ziel: 'Modernisierungsgrad nach Anlage 2', extra: true }
   ];
 
   var RFRAGEN = [
@@ -2806,6 +2812,37 @@
     { et: 7, ids: ['modernis'], rang: 5, wert: 1,
       frage: 'Was wurde am Gebäude modernisiert? Daraus ergibt sich die Restnutzungsdauer '
            + 'nach Anlage 2 ImmoWertV.' }
+  ];
+
+  /* ═══ v1608 · DIE RESTNUTZUNGSDAUER-STRECKE ═════════════════════════
+     Marcel: "wir koennen ja fragen ob die rnd strecke abgefragt werden
+     soll. wenn ja werden die fragen gestellt. am besten auch wieder mit
+     pillen zum klicken oder per sprache der kunde muss ja wissen was er
+     sagen muss"
+
+     WARUM SIE SICH LOHNT: Die Restnutzungsdauer steuert die
+     Abschreibung. Am Demo-Mehrfamilienhaus waren das 30.552 EUR im
+     Jahr - der Unterschied zwischen dem pauschalen Regelfall (50 Jahre,
+     2 %) und der nachgewiesenen Dauer (14 Jahre, 7,14 %).
+
+     WARUM ZWEI FRAGEN UND NICHT EINE: acht Auswahlfelder in einer Frage
+     ergeben auf dem Telefon eine Wand aus Knoepfen. Geteilt wird nach
+     der Sache, nicht nach der Zahl - erst die Huelle (Dach, Fenster,
+     Daemmung: zusammen 10 der 20 Punkte), dann Technik und Innenausbau.
+
+     `skalen: 1` ist der Schalter fuer die Klick-Knoepfe: _rfSkalen baut
+     sie aus den <option>s der echten Felder. Sprechen geht weiter - wer
+     "vor zehn Jahren" sagt, wird verstanden wie bisher. Und sind alle
+     Felder einer Frage gewaehlt, laeuft der Lauf von selbst weiter. */
+  var RFRAGEN_RND = [
+    { et: 8, ids: ['mod_dach', 'mod_fenster', 'mod_aussenwand'], rang: 5, rnd: 1, skalen: 1,
+      frage: 'Fangen wir mit der Hülle an: Wann wurden Dach, Fenster und die '
+           + 'Wärmedämmung der Außenwände zuletzt erneuert? Wenn nie, sag ruhig nie — '
+           + 'das ist auch eine Antwort.' },
+    { et: 8, ids: ['mod_heizung', 'mod_leitungen', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss'],
+      rang: 6, rnd: 1, skalen: 1,
+      frage: 'Und innen: Heizung, Leitungen, Bäder, Innenausbau — und ob der Grundriss '
+           + 'wesentlich geändert wurde.' }
   ];
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -6606,6 +6643,7 @@
     if (art === 'tabelle')  { _rfZurTabelle(); return; }
     /* v1386 */
     if (art === 'wert')     { _rfBlase('ich', 'Ja, mach die Wertermittlung.'); _rfWertStarten(); return; }
+    if (art === 'rnd')      { _rfBlase('ich', 'Ja, ermittle die Restnutzungsdauer.'); _rfRndStarten(); return; }
 
 
     if (art === 'tiefe')    { _rf.tiefeOffen = 0; _rfBlase('ich', 'Ja, lass uns weitermachen.'); _rfTiefeStarten(); return; }
@@ -6915,6 +6953,19 @@
        Dann laeuft sie ab jetzt nebenher statt erst am Ende. */
     try { _rfMarkt2Pruefen(); } catch (e) {}
     try { _rfDarlehenAbleiten(); } catch (e) {}
+    /* v1608 · Sobald alle acht Bauteile stehen, faellt die Punktzahl von
+       selbst. Der Nutzer soll nicht noch einen Knopf druecken muessen,
+       um zu erfahren, was seine Antworten ergeben haben. Die Sperre
+       verhindert, dass die Meldung bei jedem weiteren Feld erneut
+       kommt. */
+    try {
+      if (id.indexOf('mod_') === 0 && id !== 'mod_punkte' && !_rf.modGerechnet) {
+        var voll = ['dach', 'fenster', 'leitungen', 'heizung', 'aussenwand',
+                    'baeder', 'innenausbau', 'grundriss']
+          .every(function (k) { return !!_rfFeld('mod_' + k); });
+        if (voll) { _rf.modGerechnet = 1; _rfModPunkte(); }
+      }
+    } catch (e) {}
     return true;
   }
 
@@ -8914,6 +8965,70 @@
     _rfFrage();
   }
 
+  /* ═══ v1608 · DIE RESTNUTZUNGSDAUER-STRECKE ═════════════════════════
+     Gebaut wie die Wertermittlung: erst ein Angebot in der Leiste, dann
+     - auf Ja - zwei Fragen mit Klick-Knoepfen. Die Technik dafuer gibt
+     es vollstaendig; sie bekam nur nie einen zweiten Nutzer. */
+  function _rfRndAnbieten() {
+    if (!_rf || _rf.rndAn || _rf.rndGefragt) return false;
+    if (!_rf.alle) return false;                  /* nur im gefuehrten Weg */
+    /* Ohne Baujahr ist die Frage sinnlos: die Restnutzungsdauer wird aus
+       Alter und Modernisierungsgrad gebildet. Kein Baujahr, kein Alter. */
+    if (!_rfFeld('baujahr')) return false;
+    _rf.rndGefragt = 1;
+    _rfAktion('rnd',
+      'Soll ich die Restnutzungsdauer ermitteln? Acht kurze Fragen zum '
+        + 'Modernisierungsgrad — daraus wird deine Abschreibung.',
+      'Ja, Restnutzungsdauer');
+    return true;
+  }
+
+  function _rfRndStarten() {
+    if (!_rf || _rf.rndAn) return;
+    _rf.rndAn = 1;
+    _rfAktionWeg('rnd');
+    var neu = RFRAGEN_RND.filter(function (e) { return _rfFehlt(e); });
+    _rfBlase('co',
+      '<b>Restnutzungsdauer nach Anlage 2 ImmoWertV.</b><br>'
+    + '<span style="opacity:.8">Acht Bauteile, höchstens 20 Punkte. Je mehr '
+    + 'modernisiert wurde, desto länger die Restnutzungsdauer — und je '
+    + 'KÜRZER sie ist, desto höher deine jährliche Abschreibung. '
+    + 'Du kannst tippen, klicken oder sprechen.</span>');
+    if (!neu.length) { _rfModPunkte(); return; }
+    _rfKatalogErgaenzen(neu);
+    _rf.offen = _rf.offen.concat(_rfAufKatalog(neu, _rf.catalog));
+    _rfStandZeichnen();
+    _rfFrage();
+  }
+
+  /* Aus den acht Antworten die Punktzahl - mit der Funktion des
+     Assistenten, nicht mit einer Kopie. Eine zweite Umsetzung derselben
+     Vorschrift laeuft frueher oder spaeter auseinander, und diese Zahl
+     steuert die Abschreibung. */
+  function _rfModPunkte() {
+    var W = window.DealPilotRND_Wizard;
+    if (!W || typeof W.modPunkte !== 'function') return null;
+    var mod = {};
+    ['dach', 'fenster', 'leitungen', 'heizung', 'aussenwand',
+     'baeder', 'innenausbau', 'grundriss'].forEach(function (k) {
+      var v = _rfFeld('mod_' + k);
+      if (v) mod[k] = String(v);
+    });
+    var p = W.modPunkte(mod);
+    if (!p || typeof p.total !== 'number') return null;
+    _rfSetzen('mod_punkte', String(p.total), 'aus deinen Angaben nach Anlage 2');
+    var grad = p.total <= 1 ? 'nicht modernisiert'
+      : p.total <= 5 ? 'kleine Modernisierungen'
+      : p.total <= 10 ? 'mittlerer Modernisierungsgrad'
+      : p.total <= 17 ? 'überwiegend modernisiert' : 'umfassend modernisiert';
+    _rfBlase('co',
+      '<b>' + p.total + ' von 20 Punkten — ' + escH(grad) + '.</b><br>'
+    + '<span style="opacity:.8">Damit steht der Modernisierungsgrad im Objekt. '
+    + 'Die genaue Restnutzungsdauer rechnet der Assistent im Steuer-Bereich '
+    + 'daraus aus — er übernimmt deine Angaben.</span>');
+    return p.total;
+  }
+
   /* Der Abruf. Derselbe Endpunkt wie die erweiterte Indikation — er
      traegt das Sachwertverfahren bereits in sich (CrossCheckService);
      was ihm bisher fehlte, waren Standardstufe und Garagenflaeche. */
@@ -9092,6 +9207,13 @@
        merkt nichts davon. */
     if (!erzwungen && _rf && !_rf.wertGefragt) {
       try { _rfWertAnbieten(); } catch (e) {}
+    }
+    /* v1608 · Dasselbe fuer die Restnutzungsdauer. Sie steht VOR der
+       Wertermittlung in der Leiste, weil sie jedem nuetzt - auch ohne
+       Pro-Abo - und weil sie die Abschreibung bewegt: am
+       Demo-Mehrfamilienhaus 30.552 EUR im Jahr. */
+    if (!erzwungen && _rf && !_rf.rndGefragt) {
+      try { _rfRndAnbieten(); } catch (e) {}
     }
     if (_rf && !_rf.abschlussGezeigt) {
       _rf.abschlussGezeigt = 1;
