@@ -2767,6 +2767,16 @@
       frage: 'Wie hoch ist das Hausgeld pro Jahr, und wie viel davon ist nicht umlagefähig?' },
     { et: 4, ids: ['mietstg', 'wertstg', 'leerstand'], rang: 14, vorbelegt: 1, profil: 'langfrist',
       frage: 'Womit rechnest du langfristig — Mietsteigerung, Wertsteigerung und Leerstand in Prozent?' },
+    /* v1609 · Das Mietausfall-Risiko fehlte im Katalog, obwohl der
+       Investor Deal Score es als eigenen KPI fuehrt (`mietausfall`,
+       Kategorie Risiko). Gemessen am 25.09.2026: der Score kam auf
+       11 von 24 KPIs, und dies war einer der leeren.
+
+       `skalen: 1` gibt ihm Klick-Knoepfe - das Feld ist eine Auswahl
+       mit fuenf Stufen, niemand soll "erhoeht" abtippen muessen. */
+    { et: 4, ids: ['ds2_mietausfall'], rang: 13, skalen: 1,
+      frage: 'Wie schätzt du das Mietausfall-Risiko ein? Bei mehreren Einheiten '
+           + 'verteilt es sich — bei einer trifft ein Auszug voll.' },
     { et: 4, ids: ['ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_wertsteigerung', 'ds2_entwicklung'],
       rang: 15, skalen: 1,
       frage: 'Wie entwickelt sich der Ort — Bevölkerung, Nachfrage, Wertsteigerung, Entwicklungsmöglichkeiten?' },
@@ -5394,6 +5404,20 @@
     deal.marktFaktor = _rfNum(_rfFeld('ds2_marktfaktor'));
     deal.wertsteigerung = _rfFeld('ds2_wertsteigerung') || null;
     deal.entwicklungsmoeglichkeiten = _rfFeld('ds2_entwicklung') || null;
+    /* v1609 · `qualitaetSterne` wurde nie gesetzt - der KPI
+       "Qualitaet & Zustand" blieb deshalb IMMER leer, egal was der
+       Nutzer angab. Das Formular fuehrt vier Sternebewertungen
+       (Kueche, Bad, Boden, Fenster); der Score will EINE Zahl von 1
+       bis 5. Gemittelt wird nur ueber die, die wirklich bewertet
+       wurden - ein nicht vergebener Stern ist keine Null, sondern
+       keine Angabe. */
+    var _st = ['qual_kueche', 'qual_bad', 'qual_boden', 'qual_fenster']
+      .map(function (id) { return _rfNum(_rfFeld(id)); })
+      .filter(function (v) { return v != null && v > 0; });
+    if (_st.length) {
+      deal.qualitaetSterne =
+        Math.round((_st.reduce(function (a, b) { return a + b; }, 0) / _st.length) * 10) / 10;
+    }
     var R = window.DealScore2.compute(deal);
     return { R: R, Z: Z, deal: deal };
   }
@@ -7128,8 +7152,14 @@
         _rfAktion('lage', 'Aus der Marktpreisindikation liegen Makro- und Mikrolage vor.',
                   'Lagewerte übernehmen');
       } else if (_rfLageMoeglich()) {
+        /* v1609 · Hier stand "... Wertsteigerung und Entwicklung". Die
+           Entwicklungsmoeglichkeiten kann keine Marktabfrage liefern:
+           sie fragen, ob sich am OBJEKT etwas machen laesst - Dachausbau,
+           Teilung, Nachverdichtung. Das steht in keiner Statistik.
+           Versprochen wird jetzt, was wirklich kommt. */
         _rfAktion('lage', 'Ich recherchiere Makrolage, Mikrolage, Bevölkerungsentwicklung, ' +
-                  'Nachfrage, Wertsteigerung und Entwicklung — mit Quellenangabe.',
+                  'Nachfrage und Wertsteigerung — mit Quellenangabe. ' +
+                  'Die Entwicklungsmöglichkeiten bleiben deine Einschätzung.',
                   'Lage recherchieren');
       } else return '';
       _rf.abrufOffen = 'lage';
@@ -7237,6 +7267,36 @@
     setz('ds2_wertsteigerung', stufeWert(M.trendRaw), 'erweiterte Marktpreisindikation');
     setz('ds2_bevoelkerung', stufeBev(M.bevRaw), 'amtliche Bevoelkerungsstatistik');
     setz('ds2_nachfrage', stufeNachfrage(M.tageRaw), 'Angebotsdauer im Umkreis');
+
+    /* ═══ v1609 · ZWEI WEITERE, DIE DIE INDIKATION SCHON MITBRINGT ══════
+       Marcel: "Die Sachen kannst du aber ja aus der Schnittstelle
+       herauslesen. Die werden ja vom Marktbericht quasi zurueckgegeben.
+       Also koenntest du die automatisch befuellen."
+
+       Stimmt - und zwei blieben liegen, obwohl die Zahlen da waren:
+
+       MARKTMIETE: M.mietSqm ist der Median der Angebotsmieten je m2.
+       _rfScore2 hat ihn bisher nur INTERN als Rueckfall benutzt; das
+       FELD blieb leer, also fehlte er im gespeicherten Objekt und in
+       jeder spaeteren Rechnung. Jetzt steht er im Feld.
+
+       MARKTFAKTOR: der marktuebliche Kaufpreisfaktor. Er ist keine
+       eigene Auskunft der Schnittstelle, sondern faellt aus zwei
+       Zahlen, die sie liefert - Angebotspreis je m2 geteilt durch die
+       Jahresmiete je m2. Genau das rechnet auch der Score, wenn er
+       "Faktor vs. Markt" vergleicht. Abgeleitet, nicht erfunden: die
+       Herkunft steht am Feld.
+
+       BEIDE NUR, WENN BEIDE ZAHLEN DA SIND. Ein Faktor aus einem
+       geschaetzten Nenner waere eine erfundene Zahl mit Nachkommastelle. */
+    if (M.mietSqm != null && M.mietSqm > 0) {
+      setz('ds2_marktmiete', String(Math.round(M.mietSqm * 100) / 100),
+           'Median der Angebotsmieten im Umkreis');
+      if (M.sqm != null && M.sqm > 0) {
+        setz('ds2_marktfaktor', String(Math.round((M.sqm / (M.mietSqm * 12)) * 10) / 10),
+             'abgeleitet: Angebotspreis je m² zu Jahresmiete je m²');
+      }
+    }
     if (gesetzt.length) _rfStandZeichnen();
     return gesetzt.length;
   }
@@ -7250,9 +7310,24 @@
     if (!trifft) return;
     var kg = _rfKontingent();
     if (!kg || !kg.mpi_plus) return;
+    /* v1609 · HIER FEHLTE DIE PRUEFUNG. Angeboten - und damit abgerechnet -
+       wurde die erweiterte Stufe, sobald eine Entwicklungsfrage kam. Ob
+       ihre Eingaben ueberhaupt vorlagen, hat niemand gefragt. Marcels
+       Befund: "Der hatte aber glaube ich noch gar nicht alle Werte fuer
+       die erweiterte Marktpreisindikation."
+
+       _rfMarkt2Bereit() verlangt Ort, Wohnflaeche, Baujahr UND die
+       beiden, die den Unterschied zur einfachen Stufe ausmachen:
+       Zustand und Bodenrichtwert. Ohne sie rechnet die erweiterte Stufe
+       auf derselben Grundlage wie die einfache - der Kunde zahlt eine
+       Differenz fuer nichts.
+
+       Das Angebot faellt nicht weg, es kommt nur spaeter: beide Wege
+       werden nach jeder Uebernahme erneut geprueft. */
+    if (!_rfMarkt2Bereit()) return;
     _rf.marktPlusHier = 1;
     _rfAktion('markt2',
-      'Sie liefert Bevölkerung, Nachfrage, Wertsteigerung und Entwicklung mit — ' +
+      'Sie liefert Bevölkerung, Nachfrage, Wertsteigerung und die amtliche Lage mit — ' +
       'du musst sie dann nicht schätzen. Die erste Stufe ist schon bezahlt, es kostet die Differenz.',
       'Erweiterte Marktpreisindikation holen', { frei: kg.mpi_plus, stufe: 2 });
     _rf.abrufOffen = 'markt2';
@@ -7768,6 +7843,12 @@
     if (_rf.markt && !_rf.markt2 && !_rf.marktPlusGefragt) {
       var kg = _rfKontingent();
       if (!kg || !kg.mpi_plus) return;
+      /* v1609 · Auch hier fehlte die Pruefung - und der Satz darunter
+         behauptet woertlich "Jetzt haette ich alles beisammen ...
+         Zustand, Energieausweis, Bodenrichtwert". Er wurde gesagt, ohne
+         dass es jemand nachgesehen hat. Eine Behauptung, die Geld
+         kostet, gehoert geprueft, bevor sie faellt. */
+      if (!_rfMarkt2Bereit()) return;
       _rf.marktPlusGefragt = 1;
       _rf.abrufOffen = 'markt2';
       _rfBlase('co', 'Jetzt hätte ich alles beisammen für die <b>erweiterte Marktpreisindikation</b> — ' +
