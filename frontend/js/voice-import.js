@@ -4282,6 +4282,25 @@
       '    display:flex;flex-direction:column}',
       '  .oabi-ov.vi-mode.vi-dialog #vi-rf-chat{flex:1 1 0;min-height:0;height:auto;',
       '    max-height:none;overflow-y:auto;-webkit-overflow-scrolling:touch}',
+      /* v1606d · DIE MERKLISTE WAR DER EIGENTLICHE PLATZFRESSER.
+         Gemessen: #vi-rf-stand nahm 220 der 265 Pixel der Buehne - fuer
+         das Gespraech blieben 33. Das ist der Grund, warum man "nichts
+         sieht": die Checkliste verdraengt das Gespraech, nicht die
+         Frage und nicht die Aufnahme.
+
+         Auf dem Telefon ist sie Nachschlagewerk, kein Gespraech. Sie
+         zeigt nur noch ihren Kopf ("Was schon steht 0 / 16") und klappt
+         auf Antippen auf. Damit gehen 189 Pixel zurueck an den Chat. */
+      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-stand{flex:0 0 auto}',
+      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-stand .vi-rf-stand-body{display:none}',
+      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-stand.auf .vi-rf-stand-body{display:block;',
+      '    max-height:30vh;overflow-y:auto}',
+      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-stand .vi-rf-stand-kopf{cursor:pointer;',
+      '    -webkit-tap-highlight-color:transparent}',
+      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-stand .vi-rf-stand-kopf::after{content:"▾";',
+      '    margin-left:8px;opacity:.55;display:inline-block;transition:transform .2s}',
+      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-stand.auf .vi-rf-stand-kopf::after{',
+      '    transform:rotate(180deg)}',
       /* Die aktuelle Frage ist die juengste Wortmeldung, nicht die halbe
          Anzeige. Sie steht direkt ueber der Eingabe und scrollt in sich. */
       '  .oabi-ov.vi-mode #vi-rf-dran{max-height:26vh;overflow-y:auto;min-height:0;flex:0 0 auto}',
@@ -4390,6 +4409,22 @@
       '  font-weight:600 !important}'
     ].join('');
     document.head.appendChild(s);
+
+    /* v1606d · Der Aufklapper fuer die Merkliste auf dem Telefon.
+       Delegiert und genau EINMAL gebunden: die Liste wird bei jeder
+       Antwort neu gezeichnet, ein Listener am Element selbst waere
+       danach weg. Der Schalter haengt deshalb am Dokument und sucht
+       sich sein Ziel ueber closest().
+
+       Die Klasse liegt am BEHAELTER, nicht am Kopf - so steuert das CSS
+       Kopf und Koerper darueber, und der Zustand ueberlebt ein
+       Neuzeichnen des Koerpers. */
+    document.addEventListener('click', function (ev) {
+      var kopf = ev.target && ev.target.closest && ev.target.closest('.vi-rf-stand-kopf');
+      if (!kopf) return;
+      var box = kopf.closest('#vi-rf-stand');
+      if (box) box.classList.toggle('auf');
+    });
   }
 
   /* ═══ v1304 · `vi-frage` gehört DIREKT in den Körper ════════════════════
