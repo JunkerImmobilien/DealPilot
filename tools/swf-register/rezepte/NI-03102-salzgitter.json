@@ -1,0 +1,343 @@
+{
+  "land_code": "NI",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Stadt Salzgitter",
+  "gaa_kennz": "03102",
+  "ags": [
+    "03102"
+  ],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "11/2022 bis 10/2025",
+  "beschlossen": null,
+  "veroeffentlicht": "2026-03-02",
+  "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bssz/dash",
+  "quelle_datei": "Tableau-Kalkulatoren 2026_sw_efh_bssz und 2026_sw_rh_bssz (Grundstücksmarktinformationen Niedersachsen 2026)",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Stadt Salzgitter",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehendes Ein- und Zweifamilienhaus",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [
+          70000,
+          140000,
+          210000,
+          290000,
+          360000,
+          430000,
+          500000,
+          570000,
+          640000
+        ],
+        "achse_y_feld": "brw",
+        "achse_y_bez": "Bodenrichtwert in €/m²",
+        "achse_y": [
+          20,
+          80,
+          130,
+          190,
+          240,
+          300
+        ],
+        "zellen": {
+          "20": [
+            1.96,
+            1.27,
+            0.96,
+            0.75,
+            0.63,
+            0.54,
+            0.48,
+            0.42,
+            0.38
+          ],
+          "80": [
+            2.12,
+            1.4,
+            1.07,
+            0.85,
+            0.72,
+            0.63,
+            0.56,
+            0.5,
+            0.45
+          ],
+          "130": [
+            2.19,
+            1.45,
+            1.12,
+            0.89,
+            0.76,
+            0.66,
+            0.59,
+            0.53,
+            0.48
+          ],
+          "190": [
+            2.24,
+            1.5,
+            1.16,
+            0.93,
+            0.79,
+            0.7,
+            0.62,
+            0.56,
+            0.51
+          ],
+          "240": [
+            2.28,
+            1.52,
+            1.18,
+            0.95,
+            0.82,
+            0.72,
+            0.64,
+            0.58,
+            0.52
+          ],
+          "300": [
+            2.32,
+            1.55,
+            1.21,
+            0.97,
+            0.84,
+            0.74,
+            0.66,
+            0.59,
+            0.54
+          ]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "normobjekt": "Restnutzungsdauer 31 Jahre · Standardstufe 2,5 · Wohnfläche 150 m²",
+        "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen."
+      },
+      "korrekturen": [
+        {
+          "bez": "Abweichende Restnutzungsdauer",
+          "feld": "rnd_jahre",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "15": 0.7,
+            "25": 0.93,
+            "35": 1.05,
+            "45": 1.13,
+            "55": 1.18,
+            "65": 1.22,
+            "75": 1.25
+          },
+          "rundung_stellen": 2,
+          "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+        },
+        {
+          "bez": "Abweichende Standardstufe",
+          "feld": "standardstufe",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "2": 0.89,
+            "3": 1.08,
+            "4": 1.2,
+            "1.5": 0.74,
+            "2.5": 1,
+            "3.5": 1.14
+          },
+          "rundung_stellen": 2,
+          "hinweis": "6 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+        },
+        {
+          "bez": "Abweichende Wohnfläche",
+          "feld": "wohnflaeche",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "80": 0.88,
+            "100": 0.92,
+            "120": 0.95,
+            "140": 0.98,
+            "160": 1.02,
+            "180": 1.05,
+            "200": 1.07
+          },
+          "rundung_stellen": 2,
+          "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+        }
+      ],
+      "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert, der nach dem Modell der niedersächsischen Gutachterausschüsse ermittelt wurde (NHK 2010, Bezugsmaßstab Brutto-Grundfläche, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre). Für einen nach anderem Modell ermittelten Sachwert gelten sie nicht.",
+      "stufe": "B",
+      "stufe_begruendung": "Stufe B statt A: die Gitterwerte sind nicht aus einer abgedruckten Tabelle übernommen, sondern am amtlichen Kalkulator abgetastet; die Stützstellen sind von uns gewählt. Die drei Korrekturkurven dagegen sind vom Ausschuss selbst abgedruckt.",
+      "fallzahl": 287,
+      "streuung": 0.19,
+      "beleg": "Kalkulator 2026_sw_efh_bssz (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 287 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 1 aus."
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reihenhaus / Doppelhaushälfte",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x_feld": "sachwert",
+        "achse_x_bez": "vorläufiger Sachwert in Euro",
+        "achse_x": [
+          50000,
+          80000,
+          120000,
+          160000,
+          200000,
+          240000,
+          270000,
+          310000,
+          350000
+        ],
+        "achse_y_feld": "brw",
+        "achse_y_bez": "Bodenrichtwert in €/m²",
+        "achse_y": [
+          50,
+          70,
+          100,
+          130,
+          160,
+          190
+        ],
+        "zellen": {
+          "50": [
+            1.97,
+            1.57,
+            1.28,
+            1.09,
+            0.97,
+            0.88,
+            0.82,
+            0.76,
+            0.7
+          ],
+          "70": [
+            1.97,
+            1.57,
+            1.28,
+            1.09,
+            0.97,
+            0.88,
+            0.82,
+            0.76,
+            0.7
+          ],
+          "100": [
+            1.97,
+            1.57,
+            1.28,
+            1.09,
+            0.97,
+            0.88,
+            0.82,
+            0.76,
+            0.7
+          ],
+          "130": [
+            1.97,
+            1.57,
+            1.28,
+            1.09,
+            0.97,
+            0.88,
+            0.82,
+            0.76,
+            0.7
+          ],
+          "160": [
+            1.97,
+            1.57,
+            1.28,
+            1.09,
+            0.97,
+            0.88,
+            0.82,
+            0.76,
+            0.7
+          ],
+          "190": [
+            1.97,
+            1.57,
+            1.28,
+            1.09,
+            0.97,
+            0.88,
+            0.82,
+            0.76,
+            0.7
+          ]
+        },
+        "rundung_stellen": 2,
+        "liefert": "faktor",
+        "normobjekt": "Restnutzungsdauer 30 Jahre · Standardstufe 2,5 · Wohnfläche 100 m²",
+        "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen."
+      },
+      "korrekturen": [
+        {
+          "bez": "Abweichende Restnutzungsdauer",
+          "feld": "rnd_jahre",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "15": 0.79,
+            "25": 0.94,
+            "35": 1.05,
+            "45": 1.12,
+            "55": 1.18,
+            "65": 1.23,
+            "75": 1.27
+          },
+          "rundung_stellen": 2,
+          "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+        },
+        {
+          "bez": "Abweichende Standardstufe",
+          "feld": "standardstufe",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "2": 0.92,
+            "3": 1.07,
+            "4": 1.17,
+            "1.5": 0.81,
+            "2.5": 1,
+            "3.5": 1.12
+          },
+          "rundung_stellen": 2,
+          "hinweis": "6 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+        },
+        {
+          "bez": "Abweichende Wohnfläche",
+          "feld": "wohnflaeche",
+          "art": "stufen",
+          "wirkung": "multiplikativ",
+          "stufen": {
+            "80": 0.99,
+            "100": 1,
+            "120": 1,
+            "140": 1,
+            "160": 1.01,
+            "180": 1.01,
+            "200": 1.01
+          },
+          "rundung_stellen": 2,
+          "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+        }
+      ],
+      "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert, der nach dem Modell der niedersächsischen Gutachterausschüsse ermittelt wurde (NHK 2010, Bezugsmaßstab Brutto-Grundfläche, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre). Für einen nach anderem Modell ermittelten Sachwert gelten sie nicht.",
+      "stufe": "B",
+      "stufe_begruendung": "Stufe B statt A: die Gitterwerte sind nicht aus einer abgedruckten Tabelle übernommen, sondern am amtlichen Kalkulator abgetastet; die Stützstellen sind von uns gewählt. Die drei Korrekturkurven dagegen sind vom Ausschuss selbst abgedruckt.",
+      "fallzahl": 417,
+      "streuung": 0.27,
+      "beleg": "Kalkulator 2026_sw_rh_bssz (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 417 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 0,97 aus."
+    }
+  ]
+}
