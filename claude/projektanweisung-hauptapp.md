@@ -18478,3 +18478,96 @@ und keine Abrufe.
   das ist der Hebel, der jetzt am meisten bringt.
 - Die Wohnflaechenkurve von Helmstedt und Peine (RH) nachernten.
 - Die Registersaetze sind noch nicht auf Prod.
+
+---
+
+## Rollout-Journal 25.09.2026 (5) — der Weg zur Quelle hing am WERT statt am ORT
+
+**Was.** Die Auskunft „wo kein Wert vorliegt, bekommt der Kunde den Weg
+dorthin" vollstaendig gemacht.
+
+**Commit.** `1ed3d72` (v1614), `4b41e85` (v1614b), `699e7dc` (v1614c).
+
+### Eine Behauptung von mir war falsch — ausdruecklich zurueckgenommen
+
+Ich hatte gemeldet, die „Weg dorthin"-Anzeige **fehle ganz**. Das stimmt
+nicht. Sie ist seit v1099/v1118 gebaut und verdrahtet:
+`quellen_links.js` mit `quelleFuer()`/`quellenSatz()`, eingehaengt in
+drei Services, und `.wv-quelle` rendert `warum_kein_wert` **sichtbar und
+unabhaengig davon, ob ein Wert vorliegt**. Es gab sogar schon eine
+Bayern-Liste aus v1144 — aus derselben Tabelle, die ich heute geerntet
+habe.
+
+> Ich habe „ich habe es nicht gefunden" mit „es gibt es nicht"
+> verwechselt. Die Luecken waren enger als behauptet — dafuer waren sie
+> konkret und liessen sich schliessen.
+
+### Der eigentliche Fehler, zweimal derselbe
+
+**Der Weg zur Quelle hing am WERT statt am ORT.**
+
+`sachwertfaktor_quelle_link` wurde nur gesetzt, wenn ein Sachwert
+herauskam. Fehlte der Objekttyp, die Bruttogrundflaeche oder die
+Standardstufe, verlor der Kunde die Auskunft — **genau dann, wenn sie
+die einzige gewesen waere**, die wir ehrlich geben koennen.
+
+Und derselbe Denkfehler ein zweites Mal im PDF: der Quellenblock lag
+hinter `_swx.available && _swx.staffel.length`.
+
+> **Der erste Anlauf (v1614) hat nicht gefeuert**, und das war lehrreich:
+> ich hatte den Einhaenger INNERHALB von
+> `if (NHK_2010.geprueft && ref.property_type && …)` gesetzt. Fehlt der
+> Objekttyp, laeuft dieser Block gar nicht. Die richtige Idee an der
+> falschen Stelle — gefangen nur, weil ich nach dem Ausrollen im
+> Container nachgemessen habe statt es zu glauben. **Klammertiefe zaehlen
+> statt Zeilennummern vertrauen.**
+
+### Was jetzt dasteht
+
+| | vorher | jetzt |
+|---|---:|---:|
+| Ausschuss-Eintraege | 61 | **120** |
+| bayerische Kreise | 35 | **95** |
+| Grund je Kennzahl verschieden | 0 | **95** |
+
+Bayern war nur zur Haelfte erfasst: die Handliste fuehrte die 35
+Bereiche OHNE Sachwertfaktor. Der Gewinn steckt in den **59, die einen
+HABEN** — fuer sie gab es bisher nur den allgemeinen Landesverweis.
+„Dein Ausschuss hat einen, frag ihn" ist eine andere Auskunft als
+Schweigen, und sie ist amtlich belegt.
+
+**Ein Grund galt bisher fuer beide Kennzahlen.** Bei 13 bayerischen
+Kreisen ist das nachweislich falsch — sie fuehren die eine und die
+andere nicht. `warum_kein_wert` darf jetzt eine Karte nach Kennzahl
+sein; die rund 25 bestehenden Zeichenketten gelten unveraendert weiter.
+**Nach aussen geht trotzdem immer eine Zeichenkette**, sonst rendert
+eine Ansicht still `[object Object]`.
+
+Dazu **Darmstadt (06411)** neu, mit dem heute gemessenen Grund: der
+Ausschuss fuehrt beide Kennzahlen und druckt sie ab — aber nur als
+**Bild** (Streudiagramm Abb. 9-10, Grafik Abb. 9-4).
+
+### Beinahe-Regression, vor dem Ausrollen gefangen
+
+Die Schleife ueber die 95 Kreise haette **Nuernberg (09564)**
+ueberschrieben. Dort steht seit v1145 handrecherchiert, dass der Bericht
+online nur als Leseprobe vorliegt und die Faktortabelle die Ueberschrift
+„Leseprobe ohne Daten" traegt — deutlich mehr wert als der allgemeine
+Landessatz. **Ein Handeintrag wird jetzt nie ueberschrieben**, sondern
+nur um das ergaenzt, was er nicht sagt.
+
+**Nachweis.** 120 Ausschuesse und 16 Landesportale ueber beide
+Kennzahlen geprueft: kein Objekt, kein fehlender Text, kein fehlender
+Link. Im Container an drei Faellen ohne Sachwert nachgemessen
+(Starnberg, Muenchen, Darmstadt) — Link jedes Mal da, mit dem richtigen
+Grund. Im Browser die ECHTE `_renderWertverfahren()` mit der Backend-Form
+gefuettert: `.wv-quelle` erscheint, 1258 x 67 px, mit Text, Grund,
+Kostenhinweis und Link.
+
+Cache-Buster `app.js` 1602 -> 1614.
+
+**Rest.**
+- Sitzungsgetriebener Ernter fuer die 26 NI-Kalkulatoren — Marcels
+  Entscheidung.
+- Die Wohnflaechenkurve von Helmstedt und Peine (RH) nachernten.
+- Die Registersaetze und v1614 sind noch nicht auf Prod.
