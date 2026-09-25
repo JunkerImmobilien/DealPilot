@@ -18302,3 +18302,105 @@ Punkte Tausender; gibt es keins, ist der Punkt der Dezimaltrenner.
 - Die beiden Reihenhaus-Zweige von Helmstedt und Peine brauchen eine
   Nachernte der Wohnflaechenkurve am Kalkulator.
 - Die Registersaetze sind noch nicht auf Prod.
+
+---
+
+## Rollout-Journal 25.09.2026 (3) — Ernte abgeschlossen, Niedersachsen ausgeschoepft
+
+**Was.** Die zweite Ernte-Charge ins Register uebertragen, geprueft,
+ausgerollt; danach die restlichen Gebiete abgearbeitet und Bayern
+erschlossen.
+
+**Commit.** `7645b09` (13 neue NI-Saetze, 18 -> 31) und `23ab2af`
+(Verfuegbarkeitstabelle Bayern).
+
+**Nachweis.** `mb-backend` neu gebaut, `registerStand()` meldet **2.515
+Saetze**. Echter Funktionslauf durch `gutachterausschuss.sachwertfaktor()`
+an Stade: Faktor 0,96, Rechenweg „Tabellenwert 0,96", Fallzahl 807,
+Streuung 0,07, Quellenvermerk und Lizenz kommen mit — und die
+unbezifferte Korrektur erscheint in `korrekturen_offen`, statt still zu
+verschwinden. 14 von 16 abgefragten Zweigen treffen; die beiden
+Fehlenden sind genau die, die fehlen sollen.
+
+### Zwei eigene Fehler, beide vor der Auslieferung gefangen
+
+**Ein Objekt im Zahlenfeld.** Rezepte fuehren ihre Stichprobe teils als
+blanke Zahl, teils als Block (`faelle` + Kaufzeitraum + Spannen). Mein
+Rueckgriff schrieb den ganzen BLOCK in `fallzahl`. **JSON nimmt das
+klaglos an** — auffallen wuerde es erst, wenn jemand damit rechnet.
+`fallzahlAus()` packt jetzt aus und laesst nur Zahlen durch.
+
+**Cuxhaven-RH war faul.** 50 von 54 Gitterzellen trugen `0,15` — das ist
+kein Sachwertfaktor, sondern was der Kalkulator ausgibt, wenn die
+abgetastete Stellung ausserhalb seines Gueltigkeitsbereichs liegt. Nur
+vier Zellen waren echt, verstreut. **Eine Datei voller Zahlen, die
+aussah wie eine Ernte.** Der Satz ist raus, das Modell im Rezept
+gesperrt mit Grund; der EZFH-Zweig desselben Ausschusses ist nicht
+betroffen und bleibt.
+
+> Damit das nicht wiederkommt, prueft `gitterBefund()` jedes Gitter vor
+> der Uebernahme — ohne die Quelle zu kennen: wiederholt sich ein Wert
+> in mehr als einem Drittel der Zellen, oder steigt der Faktor mit
+> steigendem vorlaeufigem Sachwert mehr als einmal, wird abgewiesen
+> statt eingetragen. **Ein einzelner Schritt nach oben ist erlaubt** —
+> den tut Osnabrueck-Land in der untersten Bodenrichtwertzeile wirklich.
+
+### Niedersachsen ist ausgeschoepft — der Grund ist gemessen
+
+Alle elf noch offenen Kalkulatoren durchlaufen: **null neue Saetze.**
+Sechs melden keine Spanne, fuenf kommen komplett leer zurueck. Die
+Ursache ist jetzt scharf statt vermutet:
+
+**Der Kalkulator rechnet nur mit gesetzter Lage — und sobald IRGENDEIN
+Parameter in der URL steht, faellt die Lage auf leer.** Gemessen an
+Goslar: ohne Parameter liefert er Lage „GS 01" und Faktor 1,03; mit
+`Brw=60&Sach=250000` — also exakt den Vorgabewerten — ist die Lage weg
+und der Faktor leer.
+
+`Brw` und `Sach` sind die richtigen Namen (nachgewiesen: `Sach=310000`
+setzt 310.000). **`Lage` ist nur die Beschriftung, nicht der
+Parametername.** Fuenf Anlaeufe, den echten Namen zu finden, sind
+gescheitert: Werte-Varianten (`GS 01`, `GS01`, `GS 02 %26 GS 03`),
+Namensvarianten, und der Versuch, die Workbook-Definition ueber die
+Bootstrap-Sitzung zu lesen — der `tsConfigContainer` kommt leer und wird
+erst per JS gefuellt. Danach STOPP nach Regel 2.
+
+> **Es haengen 26 Kalkulatoren an diesem einen Namen**, rund 15 Kreise.
+> Das ist der groesste einzelne Hebel, der in Niedersachsen noch liegt.
+> Der naechste Anlauf gehoert in den Browser: die Lage einmal von Hand
+> klicken und den Netzwerkverkehr mitlesen — der Name steht dann in der
+> Anfrage. Raten hat funf Mal nicht funktioniert.
+
+### Bayern: kein Wert, aber der Weg dorthin
+
+Der Immobilienmarktbericht Bayern 2026 **veroeffentlicht die Zahlen
+nicht.** Kapitel 11 sagt woertlich: „Bei den wertermittlungsrelevanten
+Daten wird lediglich dargestellt, ob diese vorhanden sind." Die Werte
+sind beim oertlichen Ausschuss zu erfragen.
+
+Damit ist Bayern fuer die Wert-Ernte zu — aber nicht fuer die Doktrin.
+Geerntet wurde die Verfuegbarkeitstabelle aller **95** Kreise:
+
+| | |
+|---|---:|
+| fuehren Sachwertfaktoren | **59** |
+| fuehren Liegenschaftszinssaetze | **48** |
+| melden gar nichts | 24 |
+
+Aus „fuer diesen Ort ist nichts hinterlegt" wird damit „der zustaendige
+Ausschuss hat einen Sachwertfaktor abgeleitet — hier ist der Weg".
+Liegt in `register/verfuegbarkeit-by.json`, **ausdruecklich als
+Wegweiser gekennzeichnet, nicht als Wert.**
+
+Die AGS sind nicht geraten, sondern gegen die amtliche Kreisliste
+aufgeloest (OpenPLZ — dieselbe Quelle, die `AgsResolver.js` schon nutzt).
+90 trafen eindeutig, fuenf Schreibweisen wurden einzeln geprueft,
+darunter ein Tippfehler IM BERICHT („Doanu - Ries").
+
+**Rest.**
+- Der Lage-Parameter (26 Kalkulatoren, ~15 Kreise) — naechster Anlauf
+  ueber den Browser, nicht ueber Raten.
+- Die Wohnflaechenkurve von Helmstedt und Peine (RH) nachernten.
+- `verfuegbarkeit-by.json` wird noch von keinem Ausgabeweg gelesen —
+  die Datei liegt, die Anzeige „Weg zur Quelle" fehlt.
+- Die Registersaetze sind noch nicht auf Prod.
