@@ -18127,3 +18127,86 @@ Personenname mit Rollenangabe, kein Zitat, das jemandem zugeschrieben wird.
   und unser Wert 0,82 ist. Steht als Warnblock in `demo-ideen.html`.
 - Die Sitemap fuehrt acht Adressen; `/dp2.html` ist nur noch eine
   Weiterleitung, `/alt-original.html` das Archiv mit `noindex`.
+
+## Rollout-Journal · 25.09.2026 — PROD: Datenschutz-Fix, dann alles gleichgezogen
+
+**Was.** Marcels Freigabe in zwei Schritten: erst „ja mach den
+datenschutzfix", dann „zieh alles gerade das prod und staging gleich sind
+und auch die datenbank".
+
+**Commit.** Prod `b9d5f6c` (Merge von 213 Commits) · Staging `4a23bea`.
+Danach sind beide Zweige **inhaltlich identisch** (`git diff main staging`
+ist leer) und beide Datenbanken **schemagleich**.
+
+**Nachweis.**
+- Gesichert und **angesehen**, dreimal (vor Fix, vor Loeschung, vor
+  Spaltenabbau): Haupt 11 MB / 10.189 Zeilen, MB 745 KB / 35.381 Zeilen,
+  Staging-Haupt 46 MB / 11.641 Zeilen.
+- Leck auf Prod geschlossen, im Browser nachgewiesen: `?key=last` loest
+  auf `last:<eigene UUID>` auf, die Liste gibt 0 eigene Eintraege, und
+  ein untergeschobenes `user_id=2` wird **ignoriert** — der Proxy
+  ueberschreibt es aus dem Token.
+- Sieben Adressen auf Prod nach dem Merge: alle 200.
+- Schemavergleich: Haupt 656 = 656 Spalten, Marktbericht 302 = 302,
+  **null Unterschiede**.
+
+**Der Fund, ohne den der Fix wirkungslos geblieben waere (v1610).**
+Der erste Abruf auf Prod kam mit „user_id erforderlich" zurueck, obwohl
+der Proxy die Kennung mitschickt. Ursache: **`users.id` ist eine UUID**
+(`f214ade7-3f96-…`). `parseInt(uuid)` ergibt `NaN`.
+
+> **Das ist kein Fehler von v1601.** Gegengeprueft:
+> `/marktbericht/objects` und `/objects/history` scheitern auf Prod
+> genauso und tragen dasselbe `parseInt` **seit v942**. Die
+> nutzerbezogenen Marktbericht-Wege waren auf Produktion **nie**
+> benutzbar — aufgefallen ist es nie, weil eine leere Liste aussieht
+> wie „noch nichts da".
+
+Fuer die Fixtures loest es sich ohne Datenbank-Eingriff: ihr Schluessel
+ist TEXT. Die Kennung wird nur noch auf Unbedenklichkeit geprueft
+(`^[A-Za-z0-9-]{1,64}$`), nicht auf Zahligkeit — sie geht in einen
+Schluessel, nicht in eine Rechnung. Ein mitgeschickter Praefix wird
+abgeschnitten, in Ziffern- UND in UUID-Form.
+
+**Der Merge war harmloser als befuerchtet — weil vorher gemessen wurde.**
+Die Sorge aus dem Gedaechtnis („ein Merge bringt IMMER beide Straenge
+samt Migrationen") traf hier nicht zu:
+
+| | |
+|---|---|
+| Migrationen | 89 auf beiden Zweigen, **inhaltlich identisch** |
+| gelaufene Migrationen | 75 auf beiden Servern |
+| 195 Dateien | 140 `tools/` (laufen auf keinem Server), 38 `frontend/`, **5 `backend/`**, Rest Doku |
+
+Die fuenf Backend-Dateien einzeln angesehen; `routes/publicStats.js` ist
+neu und oeffentlich, liefert aber nur gerundete Summen ohne Token und
+ohne personenbezogene Daten — nachgelesen, weil am selben Tag ein Leck
+geschlossen wurde. Der Nutzerzaehler auf der Prod-Landing ist damit
+erstmals echt (868 = Sockel 865 + 3 gezaehlte).
+
+**Zehn Konflikte, alle in `frontend/landing/`** — verursacht durch meinen
+eigenen frueheren Weg: die Landing kam per `git checkout staging --`
+auf main, nicht per Commit, also traf derselbe Inhalt auf zwei Wegen
+aufeinander. Alle zugunsten von Staging aufgeloest, nachdem gemessen
+war, dass Staging der neuere Stand ist (dp2.css +1.610 Zeichen = der
+Mobil-Block, demo-wechsel.js +1.808 = das Mehrfamilienhaus).
+
+**Geloescht (mit Freigabe).** 8 Fixture-Saetze auf Prod, 34 auf Staging —
+alle im alten, nutzerlosen Schluesselschema und damit unerreichbar.
+Es sind Zwischenspeicher fuer den Replay; die Berichte selbst liegen in
+`mb.market_reports`.
+
+**Eine Spalte abgebaut, auf der SICHEREN Seite.** `tax_snapshots
+.bmf_advanced` gab es nur auf Staging. Keine Migration legt sie an, kein
+Code liest oder schreibt sie, und alle 17 Zeilen enthielten nur den
+Standardwert `{}`. **Prod war der richtige Zustand** — also fiel die
+Spalte auf Staging, nicht umgekehrt.
+
+**Rest.**
+- `mb.market_reports.user_id` und `mb.object_snapshots.user_id` sind
+  **INTEGER**. Solange das so ist, koennen Objektliste und Verlauf im
+  Marktbericht auf Prod nicht funktionieren — eine UUID passt nicht
+  hinein. Dort liegen 11 Saetze mit den Altkennungen 2 und 528, die es
+  so nicht mehr gibt. Braucht eine Migration auf text/uuid und eine
+  eigene Freigabe.
+- Die Ernte ist weiterhin unangetastet.
