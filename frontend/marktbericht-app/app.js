@@ -4068,6 +4068,35 @@ async function exportPdf(out) {
    * haeusern FUEHRT der Sachwert (Paragraf 6 Abs. 1) — sein Weg stand
    * trotzdem nie im PDF, nur die Ergebniskarte. Muster wie der
    * Ertragswert-Block darunter. */
+  /* v1614c-WGRD · Zeichnet den Weg zur Quelle. Stand bis hierher INLINE
+     im Sachwertblock und damit hinter dessen Deckel
+     `_swx.available && _swx.staffel.length` - im PDF fehlte er also
+     genau dann, wenn er die einzige Auskunft gewesen waere. Dieselbe
+     Fehlerklasse wie im Backend (v1614b), dieselbe Ursache: der Weg zur
+     Quelle hing am Wert statt am Ort.
+
+     Als Funktion, weil er jetzt an ZWEI Stellen gebraucht wird - unter
+     dem gedruckten Sachwert und, wenn keiner gedruckt wurde, allein. */
+  function _druckeQuelleSwf(_sql) {
+    if (!_sql || !_sql.satz) return;
+    y += 1;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5);
+    doc.setTextColor(140, 132, 118);
+    var _sqt = doc.splitTextToSize(String(_sql.satz.text)
+      + (_sql.satz.warum_kein_wert ? ' ' + _sql.satz.warum_kein_wert : '')
+      + (_sql.satz.kosten ? ' ' + _sql.satz.kosten : ''), blockW);
+    need(_sqt.length * 3.2 + 8); doc.text(_sqt, M, y); y += _sqt.length * 3.2 + 1;
+    doc.setTextColor(120, 110, 140);
+    var _squ = doc.splitTextToSize(String(_sql.url), blockW);
+    doc.text(_squ, M, y); y += _squ.length * 3.2 + 1;
+    if (_sql.satz.hinweis) {
+      doc.setTextColor(140, 132, 118);
+      var _sqh = doc.splitTextToSize(String(_sql.satz.hinweis), blockW);
+      need(_sqh.length * 3.2 + 3); doc.text(_sqh, M, y); y += _sqh.length * 3.2 + 1;
+    }
+    doc.setTextColor(...MUT);
+  }
+
   const _swx = d.cross_check && d.cross_check.sachwert;
   if (_swx && _swx.available && _swx.staffel && _swx.staffel.length) {
     sectionTitle('Sachwertverfahren — Rechenweg', 120);
@@ -4132,25 +4161,21 @@ async function exportPdf(out) {
        im Register steht, ist die Adresse des zustaendigen Ausschusses alles,
        was wir ehrlich sagen koennen. Deshalb steht er auch dann, wenn der
        Sachwert unangepasst bleibt. */
-    var _sql = _swx.sachwertfaktor_quelle_link;
-    if (_sql && _sql.satz) {
-      y += 1;
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5);
-      doc.setTextColor(140, 132, 118);
-      var _sqt = doc.splitTextToSize(String(_sql.satz.text)
-        + (_sql.satz.warum_kein_wert ? ' ' + _sql.satz.warum_kein_wert : '')
-        + (_sql.satz.kosten ? ' ' + _sql.satz.kosten : ''), blockW);
-      need(_sqt.length * 3.2 + 8); doc.text(_sqt, M, y); y += _sqt.length * 3.2 + 1;
-      doc.setTextColor(120, 110, 140);
-      var _squ = doc.splitTextToSize(String(_sql.url), blockW);
-      doc.text(_squ, M, y); y += _squ.length * 3.2 + 1;
-      if (_sql.satz.hinweis) {
-        doc.setTextColor(140, 132, 118);
-        var _sqh = doc.splitTextToSize(String(_sql.satz.hinweis), blockW);
-        need(_sqh.length * 3.2 + 3); doc.text(_sqh, M, y); y += _sqh.length * 3.2 + 1;
-      }
-      doc.setTextColor(...MUT);
-    }
+    _druckeQuelleSwf(_swx && _swx.sachwertfaktor_quelle_link);
+    y += 4;
+  }
+
+  /* v1614c-WGRD · Wurde oben KEIN Sachwert gedruckt, steht der Weg zur
+     Quelle hier allein - mit eigener Ueberschrift, damit er nicht
+     zusammenhanglos zwischen zwei Verfahren schwebt. Wo kein Wert steht,
+     ist die Anschrift des zustaendigen Ausschusses alles, was wir ehrlich
+     sagen koennen; sie deshalb wegzulassen waere die schlechteste aller
+     Antworten. */
+  if (!(_swx && _swx.available && _swx.staffel && _swx.staffel.length)
+      && _swx && _swx.sachwertfaktor_quelle_link
+      && _swx.sachwertfaktor_quelle_link.satz) {
+    sectionTitle('Sachwertfaktor \u2014 wo der Wert zu bekommen ist', 150);
+    _druckeQuelleSwf(_swx.sachwertfaktor_quelle_link);
     y += 4;
   }
 
