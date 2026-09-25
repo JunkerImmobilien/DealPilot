@@ -21,6 +21,7 @@
   const TOTAL_STEPS = 9;
   let state = null;
   let onCompleteCb = null;
+  let modus = 'anfrage';   /* v1506: 'anfrage' | 'uebernehmen' */
   let overlayEl = null;
 
   // ============================================================
@@ -92,6 +93,13 @@
       sub: 'Wer erstellt das Gutachten?', render: renderStep8,
       validate: function () {
         const e = [];
+        /* v1507 · gemessen beim Durchklicken: hier verlangt der Wizard Name,
+           E-Mail und Erstellungsort des Sachverständigen - 'erforderlich für
+           den Versand'. Im Uebernahme-Modus wird aber nichts versendet; dort
+           will der Nutzer nur eine Zahl. Eine Pflichtangabe fuer einen
+           Vorgang, den es nicht gibt, haelt genau die Arbeit auf, fuer die
+           der Knopf da ist. */
+        if (modus === 'uebernehmen') return e;
         if (!state.sv_name || !state.sv_name.trim())
           e.push(['sv_name', 'Name des Sachverständigen fehlt']);
         if (!state.sv_email || !state.sv_email.trim())
@@ -110,9 +118,20 @@
   // ============================================================
   // INIT & PUBLIC API
   // ============================================================
+  /* v1506 · Marcel 21.09.2026: "beim Bodenabschlag, wenn man die RND
+     ermittelt, muss ein Uebernahme-Button angegeben werden und nicht
+     Anfrage."
+     Gemessen: der letzte Schritt trug '\u2709 Anfrage senden' und rief
+     _submitWizardAsRequest() - und DIE Funktion ruft onComplete GAR NICHT.
+     Wer den Wizard also oeffnete, um eine Zahl zu bekommen, bekam statt
+     dessen eine Gutachten-Anfrage und keinen Wert zurueck.
+     Jetzt gibt es zwei Betriebsarten: 'anfrage' (wie bisher, aus dem Reiter
+     Steuer) und 'uebernehmen' - dort heisst der Knopf, was er tut, und das
+     Ergebnis geht an den Aufrufer. */
   function open(opts) {
     opts = opts || {};
     onCompleteCb = opts.onComplete || null;
+    modus = (opts.modus === 'uebernehmen') ? 'uebernehmen' : 'anfrage';
     state = buildInitialState(opts.prefill || {});
     currentStep = 1;
     mountOverlay();
@@ -356,7 +375,10 @@
       nextBtn.textContent = 'Berechnen →';
     } else if (currentStep === TOTAL_STEPS) {
       // V194: "In Editor übernehmen" raus — direkt zum Anfrage-Versand
-      nextBtn.textContent = '✉ Anfrage senden →';
+      // v1506: ... ausser der Aufrufer wollte einen Wert zurueck.
+      nextBtn.textContent = (modus === 'uebernehmen')
+        ? '✓ Werte übernehmen'
+        : '✉ Anfrage senden →';
     } else {
       nextBtn.textContent = 'Weiter →';
     }
@@ -394,6 +416,14 @@
         if (key === 'eigentuemer_abweichend') {
           renderCurrentStep();
         }
+
+        /* v1597 · Die Punktzahl in Schritt 5 trug den Kommentar
+           "Live-Anzeige", wurde aber nur beim Rendern berechnet. Wer die
+           acht Felder ausfuellte, las durchgehend "0 / 20 · nicht
+           modernisiert". Statt den ganzen Schritt neu zu zeichnen - das
+           wuerde den Fokus aus dem gerade bedienten Feld reissen - wird
+           nur der Balken nachgezogen. */
+        if (path[0] === 'mod') aktualisiereModBalken(container);
       });
       // Bei Text-Inputs zusätzlich input-Event
       if (el.type === 'text' || el.tagName === 'TEXTAREA' || el.type === 'number') {
@@ -453,6 +483,15 @@
     }
     clearErrors();
     if (currentStep < TOTAL_STEPS) { currentStep++; renderCurrentStep(); }
+    else if (modus === 'uebernehmen') {
+      /* v1506: zurueck an den Aufrufer - keine Anfrage. */
+      var erg = state._computedResult || computeFinalResult();
+      window._lastRndResult = { state: state, result: erg, afa: state._computedAfa || null };
+      var paket = { state: state, result: erg };
+      try { Object.keys(state).forEach(function (k) { if (paket[k] === undefined) paket[k] = state[k]; }); } catch (e) {}
+      closeWizardOverlay();
+      if (onCompleteCb) onCompleteCb(paket);
+    }
     else {
       // V194: Letzter Step → direkt Anfrage senden (statt zum Editor zu wechseln)
       _submitWizardAsRequest();
@@ -617,16 +656,14 @@
       schaeden: pkg.schaeden,
       applySchadensAbschlag: pkg.applySchadensAbschlag
     });
-    // Optionale AfA-Berechnung wenn der Wizard-State Gebäudeanteil hatte
-    // (Default-Annahme für Demo: 200.000 EUR Gebäudeanteil, 42% Grenz, Standard-AfA 2%)
-    const afa = RND.calcAfaVergleich({
-      gebaeudeanteil: 200000,
-      rnd: result.final_rnd,
-      grenzsteuersatz: 0.42,
-      standardAfaSatz: 0.02,
-      gutachterkosten: 999,
-      abzinsung: 0.02
-    });
+    /* v1598 · Hier stand der Vergleich ein ZWEITES Mal, mit fest
+       verdrahteten 200.000 EUR Gebaeudeanteil und 42 % Grenzsteuersatz
+       ("Default-Annahme fuer Demo"). Weil dieser Weg den Ergebnisschirm
+       fuellt, sah JEDER Nutzer 200.000 EUR - auch bei einem Objekt fuer
+       743.000 EUR. Der richtige Wert lag daneben bereit: Z.291 rechnet
+       ihn aus Kaufpreis und Gebaeudeanteil, computeAfaEstimate liest ihn.
+       Jetzt gibt es nur noch diesen einen Weg. */
+    const afa = computeAfaEstimate(result);
     return { result: result, afa: afa };
   }
 
@@ -670,7 +707,11 @@
     // Hauptergebnis: RND
     html += '<div class="rnd-wiz-result-hero">'
       + '<div class="rnd-wiz-result-hero-label">Restnutzungsdauer</div>'
-      + '<div class="rnd-wiz-result-hero-value">' + (r.verfahren === 'keines' ? '—' : r.final_rnd + ' Jahre') + '</div>'
+      + '<div class="rnd-wiz-result-hero-value">' + (r.verfahren === 'keines' ? '—' : (function () {
+          var sp = spanneAus(r);
+          if (!sp) return r.final_rnd + ' Jahre';
+          return (sp.einzeln ? String(sp.von) : (sp.von + '\u2013' + sp.bis)) + ' Jahre';
+        })()) + '</div>'
       /* v1426 · Anwendungsgrenzen der Anlage 2 aus dem Kern 3.1.0 */
       + ((r.grenzen || []).filter(function (x) { return x && x.greift; }).map(function (x) {
           return '<div class="rnd-wiz-result-hero-sub" style="font-size:12px;opacity:.85">' + escapeHTML(x.text) + '</div>';
@@ -727,7 +768,13 @@
       + '<tr class="total"><td>Netto-Vorteil</td>'
       +   '<td class="num">' + fmtEUR(a.netto_vorteil) + '</td></tr>'
       + '</table>'
-      + '<p class="rnd-wiz-result-hint">Annahmen: Gebäudeanteil 200.000 €, Grenzsteuersatz 42 %, '
+      /* v1598 · Hier stand "Annahmen: Gebäudeanteil 200.000 €,
+         Grenzsteuersatz 42 %" als fester Text. Beides kommt jetzt aus
+         dem Objekt, also wird auch genannt, was wirklich gerechnet
+         wurde - sonst widerspricht die Fussnote der Tabelle darueber. */
+      + '<p class="rnd-wiz-result-hint">Annahmen: Gebäudeanteil '
+      +   fmtEUR(a.input.gebaeudeanteil) + ', Grenzsteuersatz '
+      +   String(a.input.grenzsteuersatz_pct).replace('.', ',') + ' %, '
       + 'Diskontsatz 2 %. Exakte Berechnung im Rechner unten anpassbar.</p>'
       + '</details>';
 
@@ -816,6 +863,25 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;',
                '"': '&quot;', "'": '&#39;' }[c];
     });
+  }
+
+  /* v1597 · Die Stufenbezeichnung stand nur im Render von Schritt 5.
+     Sie wird jetzt von dort UND vom Live-Aktualisierer gebraucht, also
+     steht sie an einer Stelle - sonst laufen die beiden auseinander. */
+  function modGrad(punkte) {
+    if (punkte <= 1)  return 'nicht modernisiert';
+    if (punkte <= 5)  return 'kleine Modernisierungen';
+    if (punkte <= 10) return 'mittlerer Modernisierungsgrad';
+    if (punkte <= 17) return 'überwiegend modernisiert';
+    return 'umfassend modernisiert';
+  }
+
+  function aktualisiereModBalken(container) {
+    const bar = (container || document).querySelector('.rnd-wiz-result-bar');
+    if (!bar) return;                    /* anderer Schritt - nichts zu tun */
+    const p = computeModPoints(state.mod).total;
+    bar.innerHTML = 'Berechnete Modernisierungs-Punkte: <strong>'
+      + p + ' / 20</strong> &nbsp;·&nbsp; <em>' + modGrad(p) + '</em>';
   }
 
   function computeModPoints(mod) {
@@ -1163,7 +1229,12 @@
       ['aussenwand',  'Wärmedämmung Außenwände'],
       ['baeder',      'Bäder'],
       ['innenausbau', 'Innenausbau (Decken, Fußböden, Treppen)'],
-      ['technik',     'Technische Ausstattung']
+      /* v1597 · Hier stand ['technik','Technische Ausstattung'].
+         Anlage 2 ImmoWertV kennt dieses Element nicht; ihr achtes ist
+         die Grundrissgestaltung - und genau die bewertet
+         computeModPoints (grundriss, 2 Punkte). Die Antwort auf
+         'Technische Ausstattung' fiel deshalb ersatzlos weg. */
+      ['grundriss',   'Wesentliche Änderung der Grundrissgestaltung']
     ];
 
     let html = '<div class="rnd-wiz-info-box">'
@@ -1190,12 +1261,7 @@
 
     // Live-Anzeige der berechneten Punktzahl
     const punkte = computeModPoints(state.mod).total;
-    let grad;
-    if (punkte <= 1) grad = 'nicht modernisiert';
-    else if (punkte <= 5) grad = 'kleine Modernisierungen';
-    else if (punkte <= 10) grad = 'mittlerer Modernisierungsgrad';
-    else if (punkte <= 17) grad = 'überwiegend modernisiert';
-    else grad = 'umfassend modernisiert';
+    const grad = modGrad(punkte);        /* v1597 · eine Quelle, siehe oben */
 
     html += '<div class="rnd-wiz-result-bar">'
       + 'Berechnete Modernisierungs-Punkte: <strong>' + punkte + ' / 20</strong>'
@@ -1351,34 +1417,43 @@
     var lohntText = (afa && afa.empfehlung) ? afa.empfehlung
       : 'Detaillierte AfA-Berechnung im Gutachten.';
 
+    /* v1513 · Marcel 22.09.2026: "die Angabe von der Restnutzungsdauer, das
+       muss alles ein bisschen stilvoller sein, so ein bisschen wie diese
+       neuere, helle Investment-PDF ... dass es einfach ein bisschen mehr
+       Vertrauen schafft."
+       Hier standen 58 Zeilen Inline-Stil: eine dunkle Flaeche mit fuenf
+       animierten Sternchen, einer von 0,15 auf 1 zoomenden 110-px-Zahl und
+       einem Puls-Effekt alle vier Sekunden. Das sieht nach Gewinnspiel aus,
+       nicht nach Gutachten.
+       Jetzt: helle Karte, Goldlinie oben, ruhige Typografie - dieselbe
+       Sprache wie die Bankfassung des Investment-PDF, ohne Animation. */
     let html = ''
-      // ─── Hero-Box mit Skalier-Animation + Sternschnuppen ──────────────
-      + '<div style="position:relative;overflow:hidden;background:linear-gradient(135deg,#0d0c0c 0%,#2A2727 50%,#1a1818 100%);color:#fff;border-radius:16px;padding:42px 36px 36px;margin-bottom:20px;box-shadow:0 12px 36px rgba(0,0,0,0.32),0 0 0 1px rgba(201,168,76,0.18) inset">'
-      + '  <div style="position:absolute;top:-60%;right:-15%;width:480px;height:480px;background:radial-gradient(circle,rgba(201,168,76,0.22) 0%,transparent 65%);pointer-events:none;z-index:0"></div>'
-      // 6 Sternschnuppen
-      + '  <span class="rndw-spark" style="position:absolute;top:18%;left:12%;width:6px;height:6px;border-radius:50%;background:#FFE680;box-shadow:0 0 8px 2px #FFE680;animation:rndw-spark 2.8s ease-out 0.0s infinite;z-index:1"></span>'
-      + '  <span class="rndw-spark" style="position:absolute;top:32%;left:78%;width:5px;height:5px;border-radius:50%;background:#FFD66B;box-shadow:0 0 8px 2px #FFD66B;animation:rndw-spark 3.2s ease-out 0.6s infinite;z-index:1"></span>'
-      + '  <span class="rndw-spark" style="position:absolute;top:64%;left:22%;width:4px;height:4px;border-radius:50%;background:#FFEC9C;box-shadow:0 0 6px 2px #FFEC9C;animation:rndw-spark 3.5s ease-out 1.2s infinite;z-index:1"></span>'
-      + '  <span class="rndw-spark" style="position:absolute;top:48%;left:88%;width:5px;height:5px;border-radius:50%;background:#FFD66B;box-shadow:0 0 7px 2px #FFD66B;animation:rndw-spark 3.0s ease-out 1.8s infinite;z-index:1"></span>'
-      + '  <span class="rndw-spark" style="position:absolute;top:78%;left:55%;width:5px;height:5px;border-radius:50%;background:#FFE680;box-shadow:0 0 8px 2px #FFE680;animation:rndw-spark 2.5s ease-out 0.3s infinite;z-index:1"></span>'
-      + '  <span class="rndw-spark" style="position:absolute;top:24%;left:48%;width:4px;height:4px;border-radius:50%;background:#FFEC9C;box-shadow:0 0 6px 2px #FFEC9C;animation:rndw-spark 3.4s ease-out 2.1s infinite;z-index:1"></span>'
-      + '  <div style="position:relative;z-index:2">'
-      + '    <p style="font-size:11px;text-transform:uppercase;letter-spacing:3px;color:rgba(201,168,76,0.85);font-weight:700;margin:0 0 4px;text-align:center">Geschätzte Restnutzungsdauer</p>'
-      + '    <p style="font-size:10px;color:rgba(255,255,255,0.45);text-align:center;margin:0 0 14px;font-style:italic">(Ersteinschätzung — verbindliche Berechnung im Gutachten)</p>'
-      + '    <h2 style="font-family:Cormorant Garamond,serif;font-size:110px;font-weight:600;color:#C9A84C;line-height:0.95;letter-spacing:-2px;margin:0;text-align:center;text-shadow:0 0 30px rgba(201,168,76,0.45),0 0 60px rgba(201,168,76,0.22),0 4px 16px rgba(0,0,0,0.4);transform-origin:center;animation:rndw-zoom-in 1.2s cubic-bezier(0.34,1.56,0.64,1) 0.2s both, rndw-pulse 4s ease-in-out 1.4s infinite">'
-      + fmtJ(result.final_rnd)
-      + '<span style="font-family:DM Sans,sans-serif;font-size:24px;font-weight:500;color:#C9A84C;margin-left:10px;letter-spacing:0.5px;vertical-align:middle;opacity:0.85">Jahre</span>'
-      + '    </h2>'
-      + '    <p style="margin:14px 0 0;font-size:13px;color:rgba(255,255,255,0.7);line-height:1.5;text-align:center;font-style:italic;animation:rndw-fade-in 0.8s ease-out 1.2s both">'
-      + escapeHtml(lohntText)
-      + '    </p>'
+      + '<div style="background:#FDFCFA;border:1px solid #E6E0D3;border-top:3px solid #C9A84C;border-radius:12px;padding:26px 30px 24px;margin-bottom:18px">'
+      + '  <p style="font:600 10.5px/1 JetBrains Mono,ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:#9a7f33;margin:0 0 3px;text-align:center">Geschätzte Restnutzungsdauer</p>'
+      + '  <p style="font-size:11px;color:#8A8272;text-align:center;margin:0 0 16px">Ersteinschätzung — die verbindliche Berechnung steht im Gutachten</p>'
+      + '  <div style="text-align:center">'
+      + '    <span style="font-family:Cormorant Garamond,serif;font-size:82px;font-weight:600;color:#b8932f;line-height:1;letter-spacing:-1px">'
+      + (function () {
+          var sp = spanneAus(result);
+          if (!sp) return fmtJ(result.final_rnd);
+          return sp.einzeln ? String(sp.von) : (sp.von + "\u2013" + sp.bis);
+        })()
+      + '</span>'
+      + '    <span style="font-family:Inter,sans-serif;font-size:19px;font-weight:500;color:#8A8272;margin-left:9px">Jahre</span>'
       + '  </div>'
-      + '  <style>'
-      + '    @keyframes rndw-zoom-in { 0%{transform:scale(0.15);opacity:0;filter:blur(8px)} 50%{opacity:1;filter:blur(0)} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1;filter:blur(0)} }'
-      + '    @keyframes rndw-spark { 0%{transform:scale(0);opacity:0} 20%{transform:scale(1.4);opacity:1} 60%{transform:scale(0.8);opacity:0.6} 100%{transform:scale(0);opacity:0} }'
-      + '    @keyframes rndw-pulse { 0%,100%{text-shadow:0 0 30px rgba(201,168,76,0.45),0 0 60px rgba(201,168,76,0.22),0 4px 16px rgba(0,0,0,0.4)} 50%{text-shadow:0 0 40px rgba(201,168,76,0.6),0 0 80px rgba(201,168,76,0.35),0 4px 16px rgba(0,0,0,0.4)} }'
-      + '    @keyframes rndw-fade-in { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }'
-      + '  </style>'
+      + (function () {
+          var sp = spanneAus(result);
+          var mm = (result && result.methods) || {};
+          var a = Math.round(Number(mm.technisch && mm.technisch.restnutzungsdauer) || 0);
+          var b = Math.round(Number(mm.punktraster && mm.punktraster.restnutzungsdauer) || 0);
+          if (!sp || sp.einzeln || !a || !b) return "";
+          return '<p style="margin:14px 0 0;text-align:center;font-size:12.5px;color:#6B6356">'
+            + 'technisch <b style="color:#2A2727">' + a + '</b> · Punktraster nach Anlage 2 <b style="color:#2A2727">' + b + '</b>'
+            + '<span style="display:block;font-size:11px;color:#8A8272;margin-top:4px">Eine einzelne Zahl behauptet eine Genauigkeit, die eine Ersteinschätzung nicht hat.</span></p>';
+        })()
+      + '  <p style="margin:16px 0 0;font-size:12.5px;color:#6B6356;line-height:1.55;text-align:center;font-style:italic">'
+      + escapeHtml(lohntText)
+      + '  </p>'
       + '</div>';
 
     // ─── Tabelle "Wie die Schätzung zustande kommt" ────────────────
@@ -1390,7 +1465,11 @@
       + '    <tr><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;color:#7A7370">Linear-Verfahren</td><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;text-align:right;font-variant-numeric:tabular-nums;color:#2A2727">' + fmtJ(m.linear.restnutzungsdauer) + ' J. (' + RND.fmtNum2(m.linear.alterswertminderung_pct) + ' % AWM)</td></tr>'
       + '    <tr><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;color:#7A7370">Punktraster-Verfahren</td><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;text-align:right;font-variant-numeric:tabular-nums;color:#2A2727">' + fmtJ(m.punktraster.restnutzungsdauer) + ' J. (' + RND.fmtNum2(m.punktraster.alterswertminderung_pct) + ' % AWM)</td></tr>'
       + '    <tr><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;color:#7A7370">Technisches Verfahren</td><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;text-align:right;font-variant-numeric:tabular-nums;color:#2A2727">' + fmtJ(m.technisch.restnutzungsdauer) + ' J. (' + RND.fmtNum2(m.technisch.alterswertminderung_pct) + ' % AWM)</td></tr>'
-      + '    <tr><td style="padding:10px 4px;border-bottom:2px solid #C9A84C;color:#2A2727;font-weight:600">= Geschätzte RND <span style="color:#7A7370;font-size:11.5px;font-weight:400">(' + result.final_source + ')</span></td><td style="padding:10px 4px;border-bottom:2px solid #C9A84C;text-align:right;font-variant-numeric:tabular-nums;color:#C9A84C;font-weight:700;font-family:Cormorant Garamond,serif;font-size:16px">' + fmtJ(result.final_rnd) + ' Jahre</td></tr>';
+      + '    <tr><td style="padding:10px 4px;border-bottom:2px solid #C9A84C;color:#2A2727;font-weight:600">= Geschätzte RND <span style="color:#7A7370;font-size:11.5px;font-weight:400">(' + result.final_source + ')</span></td><td style="padding:10px 4px;border-bottom:2px solid #C9A84C;text-align:right;font-variant-numeric:tabular-nums;color:#C9A84C;font-weight:700;font-family:Cormorant Garamond,serif;font-size:16px">' + (function () {
+        var sp = spanneAus(result);
+        if (!sp) return fmtJ(result.final_rnd);
+        return sp.einzeln ? String(sp.von) : (sp.von + '\u2013' + sp.bis);
+      })() + ' Jahre</td></tr>';
 
     if (afa && afa.valid) {
       html += ''
@@ -1436,11 +1515,43 @@
   // ============================================================
   // BERECHNUNGEN
   // ============================================================
+  /* v1509 · gemessen beim Abgleich mit dem Rechenkern: `calcAll` kennt einen
+     Schalter `kernsaniert`, der im Punktraster die Quote von 0,70 auf 0,90
+     hebt (rnd-calc.js: calcPunktraster). Der Wizard hat die Kernsanierung
+     zwar als Auswahl (Schritt 5) und zaehlt sie bei den Punkten voll - den
+     Schalter selbst hat er nie uebergeben. Damit rechnete ein kernsaniertes
+     Haus wie ein normal modernisiertes. */
+  function istKernsaniert(mod) {
+    if (!mod) return false;
+    return Object.keys(mod).some(function (k) {
+      return /kernsanier/i.test(String(mod[k] || ''));
+    });
+  }
+
+  /* v1509 · Die Spanne ist ab hier das Ergebnis, nicht die Einzelzahl.
+     Aufgespannt wird sie von den beiden Verfahren, die der Kern getrennt
+     ausweist: der technischen Restnutzungsdauer und dem Punktraster nach
+     Anlage 2. Fallen beide zusammen, gibt es keine Spanne - dann steht eine
+     Zahl, und das ist dann auch ehrlich. */
+  function spanneAus(result) {
+    try {
+      var m = (result && result.methods) || {};
+      var a = Math.round(Number(m.technisch && m.technisch.restnutzungsdauer) || 0);
+      var b = Math.round(Number(m.punktraster && m.punktraster.restnutzungsdauer) || 0);
+      var w = [a, b].filter(function (x) { return x > 0; });
+      if (!w.length) return null;
+      var von = Math.min.apply(null, w), bis = Math.max.apply(null, w);
+      return { von: von, bis: bis, einzeln: von === bis };
+    } catch (e) { return null; }
+  }
+  global.__rndSpanneAus = spanneAus;
+
   function computeFinalResult() {
     if (!global.DealPilotRND) return null;
     const RND = global.DealPilotRND;
     const modPunkte = computeModPoints(state.mod);
     return RND.calcAll({
+      kernsaniert: istKernsaniert(state.mod),
       baujahr: parseInt(state.baujahr, 10) || new Date().getFullYear() - 30,
       stichtag: state.stichtag,
       gnd: gndFromObjektTyp(state.objekt_typ),
@@ -1581,6 +1692,13 @@
     open: open,
     close: close,
     prefillFromDealPilot: prefillFromDealPilot,
+    /* v1608 · Die Punktzahl nach Anlage 2 wird jetzt auch ausserhalb
+       gebraucht: der Sprechlauf fragt die acht Bauteile und muss daraus
+       dieselbe Zahl bilden. Sie zweimal zu rechnen waere genau die
+       Dopplung, an der schon der AfA-Vergleich gescheitert ist - eine
+       Kopie laeuft frueher oder spaeter auseinander, und hier steuert
+       die Zahl die Restnutzungsdauer und damit die Abschreibung. */
+    modPunkte: computeModPoints,
     STEPS: STEPS
   };
 })(typeof window !== 'undefined' ? window : globalThis);

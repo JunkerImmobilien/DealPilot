@@ -17290,3 +17290,840 @@ INSTANZ. Abfangen ueber einen Proxy auf den Konstruktor. Und: ein Regex ohne Kla
 Zeichenvorrat verliert jede Zeile mit Klammern — die Texte fehlten scheinbar im PDF.
 
 **Rest aus dem Konzept:** Summenfelder bei gefuelltem Konfigurator sperren (bewusst offen).
+
+**PROD-Rollout 20.09.2026 — v1454 bis v1459b** (Marcel: „dann bitte direkt weiter ausrollen").
+main per fast-forward auf `b13000b` (12 Commits, keine Migration), mb-backend neu gebaut
+(BORIS-Quellenvermerk). Vorher gesichert und angesehen: `haupt-20260920-0840.sql.gz` (11 MB,
+63 Tabellen), `mb-20260920-0840.sql.gz` (745 KB, 33 Tabellen). Nachweis: Fingerabdruck Prod =
+Staging (`7c2bf3a3354b`), Gold-Audit RC=0, keine Fehler im mb-Log, Seiten 200, Bodenrichtwert
+Wolfenbuettel auf Prod 260 EUR/m2 MIT Quellenvermerk; im Browser DpMfhEinheiten.berichtDaten,
+MietEntwicklung.sollSprung und DpAfaEigen geladen, style.css v1455b.
+
+## Rollout-Journal · 20.09.2026 (3) — Bankfassung traegt jetzt alles (Staging)
+
+Marcel: „die anderen Sachen muessen auch drauf aus dem jetzigen PDF, nur in diesem Design".
+
+**Die PDFs der App (Bestandsaufnahme):**
+
+| Datei | Einstieg | Was |
+|---|---|---|
+| `js/pdf.js` | `exportPDF()` | Investment-PDF, dunkle Fassung, seit V5.0 (3.406 Zeilen) |
+| `js/pdf-investment-bank.js` | `exportPDFBank()` | Investment Case, helle Bankfassung (v1436, jetzt vollstaendig) |
+| `js/werbungskosten-pdf.js` | `exportWerbungskostenPDF()` | Finanzamt: Werbungskosten je Jahr |
+| `js/pdf-anlage-bmf.js` | BMF-Modal | Anlage Kaufpreisaufteilung fuers Finanzamt (gestalterische Referenz der Bankfassung) |
+| `js/financing-pdf.js` | Finanzierungsanfrage | Unterlage fuer die Bank/Vermittler |
+| `js/rnd-pdf.js`, `rnd-docx.js` | RND-Assistent | Restnutzungsdauer-Dokument |
+| `js/rp-pdf-engine.js` | Partner-Portal | Objekt-Exposé im Reseller-Portal |
+| Marktbericht-Backend | Bericht | Wertermittlung nach ImmoWertV |
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1460 / b | `e48c573`, `d4a69be` | Bankfassung bekommt Score, Ertragsrechnung, Bewirtschaftung, Steuerwirkung, drei Phasen, Zinsaenderungsrisiko, Vermoegensaufbau (gezeichnete Kurve), Annahmen |
+| v1461 / b / c | `8ca4f01`, `6cc3909`, `2a1fd84` | Abschnitte FLIESSEN (vorher begann jeder Block auf halber Seite), Objektfotos, Kurzfazit aus dem Score, Zwischenzeilen |
+| v1462 … e | `84ee686` … `8f41335` | Fotos mittig zugeschnitten (Titelbild im Panorama, Galerie 4:3), Kennzahlenraster bricht um und bleibt zusammen samt Ueberschrift, groesseres Titelbild |
+
+**Nachweis:** PDF im Browser erzeugt, im Seitenstrom gelesen UND als Bild gerendert (pdf.js in der
+Messkabine): 4 Seiten ohne Fotos, 5 mit Fotos und Einheiten. Gold-Audit RC=0.
+
+**Zwei Fallen, teuer bezahlt:**
+1. **Das typografische Minus U+2212 kennt WinAnsi nicht.** jsPDF schaltet dann still auf
+   Doppelbyte um — im Dokument stand Kauderwelsch. Nur ASCII-Bindestrich verwenden.
+   Beim Messen am Seitenstrom faellt es auf, im Text-Extrakt sieht man `\u0012\u0000`.
+2. **`doc.addImage` mit einem frisch erzeugten `new Image()` zeichnet nichts**, solange es
+   nicht dekodiert ist. Das BEREITS geladene Element durchreichen. Und: jsPDF kann nicht
+   beschneiden — Zuschnitt vorher auf einer Leinwand.
+
+**Rest:** nicht auf Prod.
+
+## Rollout-Journal · 20.09.2026 (4) — Bankfassung vollstaendig, fuenf Szenarien geprueft
+
+Marcel: „vergleich das mal mit dem normalen Investment-PDF … da muss wirklich alles drauf",
+und „mit mehreren Finanzierungen, Tilgungsaussetzungsdarlehen, ETW und Mehrfamilienhaus".
+
+**Abgleich statt Schaetzen:** die Zeilenbeschriftungen aus `js/pdf.js` (104 Stueck) gegen die
+Bankfassung gehalten — **54 fehlten**. Alle nachgezogen (v1463): Nebenkosten einzeln,
+Darlehen im Detail mit Mischzins und Gesamtrate, Bausparvertrag komplett (`State.bsvSummary`,
+Zuteilung, Bauspardarlehen, Mindest-Sparquote), Kennzahlen je Phase, Exit und Vermoegens-
+zuwachs, die Bank-Diagramme, KI-Analyse, erweiterte Annahmen.
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1463 | `38bf256` | die 54 Positionen |
+| v1463b | `bf682d1` | Diagramme vorher zeichnen lassen; echte Bauspar-Feldnamen |
+| v1463c | `0fc61ec` | Diagramme notfalls in eine eigene Flaeche rendern |
+| v1463d | `40844af` | Diagramme als JPEG statt PNG — das Dokument war 13,7 MB |
+| v1463e | `e589c62` | Text aus der Oberflaeche WinAnsi-sicher (Haekchen U+2713) |
+| v1463f | `f636aaa` | groesstes SVG im Behaelter nehmen — im PDF standen Symbole statt Diagrammen |
+
+**Pruefstrecke (fuenf Szenarien am selben Objekt, nichts gespeichert):**
+ETW klassisch · ETW mit zwei Darlehen · ETW mit Tilgungsaussetzung und Bausparvertrag ·
+Mehrfamilienhaus mit fuenf Einheiten, Sanierung, Soll-Sprung und Fotos · Vollfinanzierung (EK 0).
+Je Lauf geprueft: Seitenzahl, Doppelbyte-Kauderwelsch, Text unter der Fusszeile, Text ueber dem
+Satzspiegel, ueberlappende Zeilen (Textpositionen aus pdf.js) und die erwarteten Bloecke.
+Ergebnis: 6/6/6/7/6 Seiten, 0,14–0,22 MB, **keine Fehler**. Drei Fassungen zusaetzlich echt
+heruntergeladen und auf der Platte geprueft (6/6/7 Seiten, 3/3/6 Bilder).
+
+**Fallen dazu:**
+1. Diagramme entstehen erst, wenn die Bankansicht offen war — sonst sind die Flaechen 0 px breit.
+   `BankCharts.renderAll()` allein wirft `tilgEffektivBrutto is not defined`; der Weg ist
+   `buildCharts()` oder das Rendern in eine eigene 640x340-Flaeche.
+2. `host.querySelector('svg')` trifft das Symbol in der Ueberschrift, nicht die Zeichnung.
+3. Diagramme als PNG in ein jsPDF-Dokument = 13,7 MB. JPEG 0,86 bei 1,6-facher Aufloesung reicht.
+4. Ein Zeichen ausserhalb WinAnsi (hier das Haekchen) kippt die ganze Zeile in Doppelbyte.
+
+**Rest:** die Stress-Matrix fehlt im PDF (rendert in der eigenen Flaeche nicht). Nicht auf Prod.
+
+## Rollout-Journal · 20.09.2026 (5) — Stress-Matrix im PDF, Rumpfjahr-Fehler gefunden
+
+Marcel: „kannst du den Rest auch ins PDF bauen und auch die Stress-Matrix?"
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1464 | `dd70340` | Belastungsprobe als 5x5-Tabelle mit Ampelfarben, Vermoegenszuwachs als Jahrestabelle, Bewirtschaftungskosten gesamt und als Quote, Leerstand in den Annahmen, effektive Restschuld am Bindungsende, Kaufpreis-Offerte der KI |
+| v1464b | `7e4e632` | alle Zeichen ausserhalb WinAnsi aus der Datei (Minus in den Spaltenkoepfen) |
+| v1465 | `6aef931` | **Fehler in der Bankansicht:** die Stress-Matrix rechnete auf cfRows[0] — beim Kauf im laufenden Jahr ein RUMPFJAHR (3.600 statt 11.124 EUR Miete, Zins und Tilgung anteilig, Restschuld voll). Im Szenario -2 Prozentpunkte wurde der Kapitaldienst rechnerisch null, die ganze untere Zeile zeigte 0,00 — auch in der App. Basis ist jetzt das erste VOLLE Jahr. Gemessen: untere Zeile 1,04 bis 1,56 statt 0,00 |
+
+**Die Matrix ist kein Diagramm, sondern HTML.** Sie wird unsichtbar gerendert
+(`BankCharts.renderStressMatrix(host, State)`), die 25 Zellen samt Ampelklasse werden
+ausgelesen und im PDF neu gesetzt — gerechnet wird weiterhin nur in bank-charts.js.
+
+**Nachweis:** fuenf Szenarien erneut gebaut und geprueft (ETW 7, zwei Darlehen 6,
+Tilgungsaussetzung 7, Mehrfamilienhaus 8, Vollfinanzierung 6 Seiten; 0,18-0,26 MB):
+kein Kauderwelsch, nichts unter der Fusszeile, keine Ueberlappung, kein Block fehlt.
+Drei Fassungen heruntergeladen und auf der Platte gegengelesen.
+
+## Rollout-Journal · 20.09.2026 (6) — Absender aus den Einstellungen, Gesellschaft, Rechenwege geprueft
+
+Marcel: „Waeren dort auch am Anfang ein Bild vom Objekt und auch die Daten des Kunden aus den
+Einstellungen? … Macht das auch Sinn ein PDF fuer die Gesellschaft zu haben? … Bitte pruefe auch
+alle Rechenwege und gleiche es mit den aktuellen Rechnungen ab."
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1466 / b | `dbb6b92`, `17abe71` | Absender und Ansprechpartner aus den Einstellungen, eigenes Logo im Kopf, Abschnitt „Erwerb ueber eine Gesellschaft" |
+
+**Befund an den drei abgelegten PDFs:** im Kopf stand „DealPilot", nicht die eigenen Daten.
+Ursache: die Plan-Sperre steckt BEREITS in `DealPilotConfig.branding.get()` (config.js V192:
+unter Pro die Vorgabewerte, ab Pro die Einstellungen). Die Bankfassung hatte darueber eine
+ZWEITE Sperre gelegt (`hasFeature(custom_logo)` UND Firma ungleich „Junker Immobilien") — sie
+unterdrueckte die Daten auch fuer den Pro-Nutzer. Jetzt nur noch `branding.get()`.
+Gemessen: Kopf und Block „Ansprechpartner" tragen Firma, Person, Anschrift, Telefon, E-Mail, Web.
+
+**Titelbild:** liegt am Objekt. Hat das Objekt Fotos, steht das erste im Panoramaschnitt oben auf
+Seite 1, die weiteren als Galerie. Das Testobjekt 2026-1033 hat keine — deshalb fehlte es dort.
+
+**Gesellschaft:** KEIN zweites Dokument. Die Rechnung kennt den Halter bereits
+(`DealPilotMandanten.effRate()` liefert KSt+GewSt, calc.js `_mtx`/`_mtxYear`, Verluste ohne
+Erstattung). Die Bankfassung zeigt jetzt automatisch den Abschnitt „Erwerb ueber eine
+Gesellschaft": Halter, Besteuerung, effektiver Satz, Ueberfuehrung (Stichtag, Verkehrswert,
+Ueberfuehrungspreis, uebernommene Restschuld), Gesellschafterdarlehen. Mit einem simulierten
+Halter geprueft (nichts angelegt): 8 Seiten, Block vollstaendig.
+
+**Rechenwege gegen die App abgeglichen** (ETW, 300.000 EUR, 60.000 EK, 3,8 % / 2,0 %, 10 Jahre):
+20 von 20 Betraegen deckungsgleich (Kaufpreis, jede Nebenkostenposition einzeln, Gesamt-
+investition, Finanzierung, Restschuld, Warm- und Kaltmiete, Cashflow vor und nach Steuern, AfA,
+zu versteuerndes Ergebnis, Bewirtschaftung gesamt und nicht umlagefaehig, Anschlussrate,
+Mehrbelastung, Verkaufspreis). Kennzahlen 8 von 8 (Equity Multiple 4,05 wird als 4,1 gerundet
+ausgewiesen). Drei Phasen und die Jahreszeile 1 stimmen Ziffer fuer Ziffer.
+
+**Das alte Investment-PDF bleibt unveraendert** (`js/pdf.js`, letzte Aenderung v1442 vom 19.09.).
+
+## Rollout-Journal · 20.09.2026 (7) — Titelbild in allen Faellen, Kopf, Hinweis statt Luecke
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1467 | `95d3e48` | Absenderblock endet 2 mm ueber der Goldlinie (mit vier Zeilen lag er darauf); Ansprechpartner steht auf Seite 1 unter dem Objekt |
+| v1468 | `02c85c6` | Abschnitt „Was in dieser Fassung fehlt" — nennt den Grund, wenn Vermoegensaufbau, Diagramme und Belastungsprobe nicht erscheinen |
+| v1469 | `f13db79` | Endwerte der Kurve weichen einander aus (ohne Darlehen lagen Objektwert und Eigenkapital uebereinander) |
+
+**Titelbild in allen Faellen geprueft** (echtes Objekt 2026-1004, Fotos liegen als Daten-URI vor,
+also kein Zugriffsproblem): ohne Foto keine Flaeche und kein leerer Block (4 Seiten, 0 Bilder);
+genau ein Foto = nur Titelbild (1 Bild); sechs Fotos = Titelbild plus vier in der Galerie
+(5 Bilder, Deckel greift); reines Hochformat wird mittig auf Panorama beschnitten (1 Bild).
+
+**Warum bei 2026-1004 keine Diagramme erscheinen** — und das ist KEIN Fehler: am Objekt steht
+ein Privat-Ende zum 01.01.2026, calc.js kappt den Betrachtungszeitraum darauf (v816-CUT,
+`State.btj` = 1, obwohl im Feld 15 steht). Die Bankdiagramme brauchen mindestens zwei
+Jahresreihen. Seit v1468 steht genau das im Dokument.
+
+**Nachweis auf der Platte:** Hoelderlinstr. 6 Seiten / 5 Bilder (Titelbild + Galerie),
+Hiddenhausen 7 Seiten / 3 Bilder (Diagramme); beide mit „Junker Immobilien" im Kopf und
+Block „Ansprechpartner". Keine Ueberlappung, kein Kauderwelsch.
+
+## Rollout-Journal · 21.09.2026 — zweite Pruefrunde am Investment Case (Staging)
+
+Marcel: „nochmal".
+
+**Geprueft wurde der Aufbau, nicht nur der Inhalt:** 20 Abschnitte auf 7 Seiten in fester
+Reihenfolge (Objekt · Ansprechpartner · Investition · Finanzierung | Kennzahlen · Warmmiete bis
+Cashflow | Bewirtschaftung · Steuerwirkung · Cashflow je Phase · Kennzahlen je Phase |
+Zinsaenderungsrisiko · Cashflow je Jahr · Vermoegensaufbau | Exit · Diagramme | Belastungsprobe ·
+Vermoegenszuwachs · Annahmen | Grundlagen). Raender gemessen: links 18 mm, rechts 17,6 mm,
+oben 17,7 mm, Fusszeile 11,5 mm — auf jeder Seite gleich. 530 Textelemente, keine Ueberlappung,
+kein Text unter der Fusszeile, kein Doppelbyte-Kauderwelsch.
+
+**Zahlen erneut gegen die laufende Rechnung:** 19 Einzelbetraege, 4 Phasenzeilen (je drei Spalten)
+und ALLE 10 Jahreszeilen (Miete, Bewirtschaftung, Zins, Tilgung, Cashflow, Restschuld) Ziffer fuer
+Ziffer deckungsgleich.
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1470 | `1dd2245` | Annahmen brachen mit EINER Waisenzeile auf die letzte Seite um — der Block bleibt jetzt zusammen |
+| v1470b | `71c37da` | Belastungsprobe: der Ausgangsfall heisst jetzt „gerechnet auf dem ersten vollen Jahr". Er kann leicht vom DSCR von heute abweichen (gemessen 0,85 gegen 0,84), seit die Matrix das Rumpfjahr meidet (v1465) — ohne den Zusatz sieht das aus wie ein Widerspruch |
+
+**Gegengeprueft:** Tilgungsaussetzung 7 Seiten (Bausparblock, Bauspardarlehen, Belastungsprobe),
+Mehrfamilienhaus 8 Seiten (Mieterliste, Ist gegen Soll, Objektfotos, rechtliche Einheit) —
+beide ohne Befund.
+
+## Rollout-Journal · 21.09.2026 (2) — Bodenabschlag, Objekt Rinteln, zwei Befunde
+
+Marcel: „ein Reiter mit 20% Abzug vom Grund und Boden … Leg das Objekt an … gib mir die
+Kaufpreisaufteilung vorher und nachher".
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1471 / b | `1463056`, `f4ec5c4` | neuer Reiter „Bodenabschlag" im BMF-Fenster: freier Abschlag (Vorgabe 20 %) auf den Bodenwert, Gegenueberstellung zur amtlichen Arbeitshilfe, Vertragstext mit Begruendung. Eigenes Modul `js/bmf-bodenabschlag.js` — `bmf-modal-v292.js` steht unter „Nicht anfassen" |
+| v1472 | `eb6e5ed` | die Live-Aktualisierung hing an BRW, Flaeche, Baujahr und Miete, NICHT an der Grundstuecksart |
+| v1473 | `b3eb04b` | **schwerer Befund:** in `bmf-modal-v292.js` steht `objart_bmf: 'Wohnungseigentum [WE]'` FEST verdrahtet. Die Reiter 3 und 4 (AfA-Vorschau, AfA-Hebel **samt Vertragstext**) rechneten damit bei JEDEM Objekt als waere es eine Eigentumswohnung. Gemessen am MFH Rinteln: 81,54 % Gebaeude gegen 80,59 % amtlich, Ertragswert 647.019 gegen 615.123 EUR. Von aussen umhuellt (`_v292CollectInputs`), die Art kommt jetzt aus `#bmf_art`. **Die Quelle gehoert noch bereinigt — dafuer muss die geschuetzte Datei angefasst werden.** |
+
+**Objekt 2026-1036 angelegt:** Wilhelm-Busch-Strasse 10 + 11, 31737 Rinteln, MFH, Bj 1972,
+607 m2, 8 Wohnungen, 2 Garagen, Grundstueck 1.493 m2, BRW 80 EUR/m2, Kaufpreis 690.000 EUR,
+GrESt 5 %, Notar 1,5 %, Grundbuch 0,5 %, Fahrtkosten 370 km (0,38 EUR/km = 140,60 EUR).
+
+**Amtliche Arbeitshilfe (nach der Korrektur):** Bodenwert 119.440 EUR, Ertragswert 615.123 EUR
+(massgebend), Sachwert 574.083 EUR, Gebaeudeanteil 80,59 %. Aufteilung der Anschaffungskosten
+738.440,60 EUR: Grund 143.304 EUR, Gebaeude 594.996 EUR.
+
+**Restnutzungsdauer im Programm** (DealPilotRND, Bj 1972, Stichtag 14.09.2026, GND 80, 0 Punkte,
+alle neun Gewerke „veraltet"): technische Alterswertminderung **13,00 Jahre** (fuehrend), Anlage 2
+25,81, linear 26, Vogels 29,78, Ross 34,77, Parabel 43,55. Das deckt sich mit der Anfrage
+(dort 13,00 als fuehrendes Verfahren, Bandbreite 15-19 Jahre als vorsichtige Rundung).
+
+## Rollout-Journal · 21.09.2026 (3) — Quelle sauber, PDF der Kaufpreisaufteilung
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1474 | `f0cebb7` | **Quelle bereinigt (Freigabe Marcel):** in `bmf-modal-v292.js` war `objart_bmf` fest auf „Wohnungseigentum [WE]" verdrahtet. Jetzt aus `#bmf_art`. Die Umhuellung aus v1473 wurde zurueckgenommen — zwei Stellen fuer dieselbe Regel waeren eine Falle |
+| v1475 | `f0cebb7` | neues `js/pdf-kaufpreisaufteilung.js`: Objekt und Grundlagen, Anschaffungskosten, **Herleitung** der amtlichen Arbeitshilfe, Aufteilungssatz amtlich gegen Abschlag, Abschreibung je Aufteilung, Vertragstext, Hinweise. Gestaltung wie die Bankfassung, Absender aus den Einstellungen. Knopf im Reiter Bodenabschlag |
+| v1476 | `ea57bf0` | **Befund:** in die amtliche Rechnung gehen nur Kaufpreis, GrESt, Notar, Grundbuch, Makler und Vermittlung (bmf-modal.js, runBmf). Fahrtkosten, Gutachten, Anwalt, Reise und Sonstiges NICHT. Dokument und Reiter rechnen jetzt auf derselben Grundlage und weisen den Rest getrennt aus |
+| v1477 | `d1a793f` | AfA-Beschriftung lief in die Zahlenspalte |
+
+**Objekt 2026-1036 (Rinteln) mit der korrigierten Nettokaltmiete 4.200 EUR/Monat:**
+Ertragswert 662.950 EUR (massgebend), Bodenwert 119.440 EUR, Gebaeudeanteil **81,99 %**,
+Anschaffungskosten in der Aufteilung 738.300 EUR -> Gebaeude 605.332 EUR, Grund 132.968 EUR.
+Mit 20 % Bodenabschlag: Gebaeudeanteil 85,59 %, Bemessungsgrundlage 631.926 EUR (+26.594).
+Restnutzungsdauer 13 Jahre (technische Alterswertminderung) -> 7,69 %: AfA 46.564 EUR amtlich,
+48.610 EUR mit Abschlag.
+
+**Nachweis:** PDF drei Seiten, 30 KB, keine Ueberlappung, alle Bloecke vorhanden, heruntergeladen
+und auf der Platte gegengelesen.
+
+**Offen zur Entscheidung:** ob Fahrtkosten, Gutachter- und Anwaltskosten in die amtliche
+Aufteilung einfliessen sollen. Das ist eine steuerliche Frage — Marcel entscheidet.
+
+## Rollout-Journal · 21.09.2026 (4) — Nebenkosten richtig zugeordnet, Vertragstext, RND-Spanne
+
+Marcel: „warum ist die Fahrt nicht mit drin? … auch meine Rechnung sollte mit einfliessen …
+schau mal genau im Netz nach, ob du dir da wirklich sicher bist."
+
+**Recherchiert und belegt:** Besichtigungsfahrten zum konkreten Objekt und Fahrten zum
+Notartermin sind ANSCHAFFUNGSNEBENKOSTEN, wenn der Kauf zustande kommt (BFH VIII R 195/77;
+Haufe, IWW). Ein Wertgutachten, das nach grundsaetzlich gefasster Erwerbsentscheidung der
+Anschaffung dient, ebenfalls. Sofort abziehbar bleiben Kosten, die erst die AfA ermitteln
+(Honorar Kaufpreisaufteilung, Restnutzungsdauergutachten, Steuerberatung) sowie Gutachten
+ueber Reparaturbedarf.
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1478 | `8a38ac5` | `runBmf` nimmt jetzt auch Fahrt, Gutachten, Anwalt und Sonstiges in die Summe, die die Arbeitshilfe aufteilt (vorher nur GrESt, Notar, Grundbuch, Makler, Vermittlung). Neues Feld „sofort abzugsfaehige Kosten" im Reiter — teilt sich NICHT auf, mit Steuerwirkung. Vertragstext nach Marcels Vorlage (verbindliche Erklaerung, Methode, BFH IX R 26/19, § 199 BewG, Stand) plus Zusatztext fuer Rueckfragen des Finanzamts |
+| v1479 | `8a38ac5` | Restnutzungsdauer als SPANNE: steht von/bis, rechnet das PDF jedes Jahr darin einzeln |
+| v1480 / v1481 | `94c02dd`, `c82f96e` | PDF ohne Umlaute (Umschrift ae/oe/ue/ss, auch fuer Werte, Ueberschriften und Texte aus der Oberflaeche); Nebenkostenliste im PDF an die des Programms angeglichen (605.332 gegen 605.939 EUR auseinandergelaufen) |
+| v1482 | `24b971c` | Hinweistext an die neue Zuordnung angepasst |
+
+**Objekt Rinteln, Endstand:** Anschaffungskosten 739.039,60 EUR (inkl. Fahrt 140,60 und
+Kurzbewertung 599), Gebaeudeanteil 81,99 %, Bemessungsgrundlage 605.939 EUR; mit 20 % Abschlag
+85,59 % und 632.559 EUR. Honorar Kaufpreisaufteilung 549 EUR sofort abziehbar.
+PDF vier Seiten, keine Umlaute, keine Ueberlappung, heruntergeladen und gegengelesen.
+
+**Preise laut junker-immobilien.io:** Kaufpreisaufteilung 549 EUR Festpreis,
+Restnutzungsdauergutachten ab 951 EUR, Wertgutachten ab 499 EUR, Schadensgutachten ab 399 EUR.
+
+## Rollout-Journal · 21.09.2026 (5) — Dokument ueberarbeitet, Arbeitshilfe als PDF
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1483 | `29bee30` | Absender: nur noch EINE Adresse. Gemessen: branding.get() liefert name = "info@junker-immobilien.io" (im Feld Name steht eine Adresse) und email = "info@dealpilot.immo" — beide standen untereinander. Der Name wird jetzt nur gedruckt, wenn er keine Adresse ist. Ueberschriften in normaler Schreibweise statt Versalien. Abschnitt heisst „Angepasste Kaufpreisaufteilung". Vertragstext kursiv und zentriert, der Zusatz steht direkt darunter und nur noch EINMAL. Dateiname ohne Umlaute |
+| v1484 / b | `29bee30`, `8a740d1` | **BMF-Arbeitshilfe als PDF**: derselbe LibreOffice-Weg wie der Recalc, nur `--convert-to pdf`. Backend `include_pdf`, Knopf im Reiter. Der Token liegt unter ji_token/auth_token bzw. Sub.getToken() — nicht dp_token (401 behoben) |
+| v1485 | `22d3800` | der Reiter zeichnet sich nach `runBmf()` selbst neu; vorher stand dort weiter „zuerst die amtliche Berechnung starten" |
+
+**Nachweis:** Kaufpreisaufteilung vier Seiten, null Umlaute, genau eine E-Mail-Adresse, Zusatz
+einmal, Ueberschriften normal. Arbeitshilfe als PDF sechs Seiten, 86 KB, ueber den Knopf
+heruntergeladen und auf der Platte geprueft.
+
+**Steuerliche Einordnung recherchiert und belegt** (siehe Rollout 21.09. (4)): Fahrten zum
+konkreten Objekt und zum Notartermin sowie ein Wertgutachten nach gefasster Erwerbsentscheidung
+sind Anschaffungsnebenkosten und teilen sich mit auf; Honorar fuer Kaufpreisaufteilung und
+Restnutzungsdauergutachten sind sofort abziehbar. Preis laut junker-immobilien.io: 549 EUR.
+
+## Rollout-Journal · 21.09.2026 (6) — Arbeitshilfe quer, Notarblatt, Grundstuecksart
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1486 | `ec41d18` | **Arbeitshilfe-PDF: quer und nur die Kaufpreisaufteilung.** Gemessen war es sechs Seiten hoch, weil LibreOffice ALLE NEUN Blaetter ausgibt (KPA, Fiktives Baujahr, Verweise, AfA, THK, SW-NHK, SW-Bau-Index, EW-BWK, EW-Bewertungsparameter). Die Aufteilung steht allein auf KPA und endet in Zeile 122 („Summe"). Jetzt: eine KOPIE fuer den Druck, darin alle anderen Blaetter versteckt, KPA quer und auf Seitenbreite — der vorlageneigene Festwert `scale 59` haette sonst dagegengehalten. Dazu `PageRange 1-2` als zweite Sicherung |
+| v1487 | `ec41d18` | Die angepasste Aufteilung beginnt auf einem **neuen Blatt** mit der Kopfzeile „Kaufpreisaufteilung fuer den Notarvertrag". Vertragstext und Zusatz wieder **normal, schwarz, linksbuendig** — nimmt v1483 zurueck: kursiv und mittig las sich wie ein Zitat, der Text ist aber der Wortlaut, den der Notar uebernimmt |
+| v1488 | `213be3c` | **Die BMF-Grundstuecksart kam aus dem Nichts.** `#bmf_art` stand immer auf „Wohnungseigentum [WE]" — der ersten Option der Liste; gesetzt wurde sie nirgends. Gemessen an Rinteln: `objart = MFH`, acht Einheiten, gerechnet als Eigentumswohnung. An der Art haengen in der Arbeitshilfe THK, Bewirtschaftungskosten und die Miteigentumsrechnung. Jetzt Abbildung `objart` -> Wortlaut der amtlichen Auswahlliste; HOTEL und GAR bleiben ungeraten |
+| v1489 | `8e88523` | Die Abschreibungstabelle stand ZWISCHEN angepasster Aufteilung und Vertragstext und hat dem Notarblatt die Kopfzeile weggenommen (gemessen: Seite 4 trug wieder „Kaufpreisaufteilung"). Abschreibung und Sofortkosten stehen jetzt als Anlage dahinter |
+
+**Nachweis, am echten Knopf erzeugt und mit pdf.js nachgemessen:**
+
+| | vorher | nachher |
+|---|---|---|
+| Arbeitshilfe | 6 Seiten, hoch, alle 9 Blaetter | **2 Seiten, quer**, nur KPA, mit Zeile „Summe" |
+| Kaufpreisaufteilung | 4 Seiten, Notarteil mitten drin | **5 Seiten**, Seite 3+4 „fuer den Notarvertrag", Seite 5 Steuerwirkung |
+| Vertragstext | kursiv, zentriert | normal, x=51 = linker Rand |
+| Grundstuecksart | Wohnungseigentum | Mietwohngrundstuecke (MFH) |
+
+**Zur Umlautfrage.** Gemessen an den erzeugten Dateien: die Kaufpreisaufteilung
+traegt **null Umlaute und null verstuemmelte Zeichen**. Die 121 Umlaute stehen in
+der **BMF-Arbeitshilfe** — das ist der Wortlaut des Ministeriums („Gebaeudeanteil",
+„Grundstueckart"), und LibreOffice setzt ihn korrekt, nicht verstuemmelt. Die Regel
+„PDF ohne Umlaute" kam von jsPDF, das nur WinAnsi kann; dieser Grund gilt hier
+nicht. **Ein amtliches Formular wird nicht umgeschrieben** — sonst behauptet das
+Blatt einen Wortlaut, den es amtlich nicht gibt.
+
+> **Blinder Fleck im eigenen Pruefwerkzeug, ausdruecklich vermerkt:** der Node-
+> Pruefer `umlaut-check.js` liest nur `(...)Tj` in Latin-1. Er meldete die
+> Arbeitshilfe als „Texte=0, Umlaute=0" — in Wahrheit liegen deren Texte in
+> **komprimierten Stroemen mit Teilschriften und CID-Kodierung**, an die er nicht
+> herankommt. Ein Pruefer, der nichts findet, weil er nichts lesen kann, sieht
+> aus wie ein Pruefer, der nichts zu beanstanden hat. **Umlaute nur noch mit
+> pdf.js messen** und die Zahl der gefundenen Textstuecke immer mitnennen.
+
+## Rollout-Journal · 21.09.2026 (7) — BMF-Modal durchgegangen, Umlaute zurueck
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1490 | `c4bf00e` | **Die Umlaut-Sperre aus v1475 ist zurueckgenommen.** Gemessen mit jsPDF 3.0 und mit pdf.js gegengelesen: „Mietwohngrundstücke (Mehrfamilienhäuser) Größe ÄÖÜäöüß · 690.000 €" kommt Zeichen fuer Zeichen an, kursiv wie normal. Umlaute, ß, Euro und Mittelpunkt stehen ALLE in WinAnsi. Die Transliteration war eine Vorsichtsmassnahme gegen ein Problem, das diese Zeichen gar nicht haben — kaputt gehen nur Zeichen AUSSERHALB Latin-1 (Pfeile, Haken, Gedankenstriche), und die ersetzt `sauber()` weiter. Nur der DATEINAME bleibt ohne Umlaute. Dazu: Vertragstext und Zusatz kursiv, linksbuendig, schwarz; aus der Urkunde faellt der Begruendungsteil („Diese Aufteilung wurde nach der Arbeitshilfe … Stand"), der Zusatztext traegt jetzt die Bodenrichtwert-Zahlen und den 80/20-Satz |
+| v1491 | `ff3a1ea` | **Vier AfA-Varianten statt drei.** Vorher hiess die unveraenderte BMF-Zahl „Konservativ" — ein Name, der eine Haltung behauptet, wo keine ist. `BODEN_FAKTOREN` jetzt **amtlich 1,00 · konservativ 0,85 · optimiert 0,80 · aggressiv 0,75**, Risikoscore 0/1/2/3, Vorauswahl **amtlich**. Raster auf vier Spalten (`minmax(0,1fr)`, engerer Innenrand), unter 1100 px zwei. Die Wahl in Reiter 4 setzt den Abschlag im Reiter Bodenabschlag; das Feld bleibt aenderbar und sagt, woher die Zahl kommt. **Beruehrt `bmf-modal-v292.js` — geschuetzte Datei, auf ausdrueckliche Ansage** |
+| v1492 | `2355da2` | Formatierungen: die Miete stand als nacktes „4200" neben lauter „690.000,00"; das Baujahr war das einzige linksbuendige Zahlenfeld. Reiter 3 und 4 bleiben zu, solange Pflichtangaben fehlen — vorher zeigten sie entweder nichts oder den Stand des ZULETZT gerechneten Objekts. Knopf **„Restnutzungsdauer berechnen"** im Reiter Bodenabschlag ueber `DealPilotRND.calcAll` — kein zweiter Rechenweg |
+| v1493 | `4a03d94` | **Die Sperre ging nicht wieder auf.** Gemessen: Baujahr geleert → Reiter zu (richtig), Baujahr nachgetragen → Reiter blieb zu. `_bmfPflichtZeichnen()` springt bei „nichts fehlt" frueh heraus, und das Nachziehen stand hinter dem Ausstieg. **Ein Schloss, das sich nicht wieder oeffnet, ist schlimmer als keines** |
+| v1494 / b | `104282b`, `70976a1` | 16 Textstellen im PDF von der Umschrift auf echte Umlaute: „Kaufpreisaufteilung für den Notarvertrag", „Gebäudeanteil", „Sofort abzugsfähige Kosten", „Möglicher Zusatz", „tragfähige", „einschließlich", „Begründung". In KOMMENTAREN bleibt ae/oe/ue |
+
+**Nachweis, am echten Knopf erzeugt und mit pdf.js nachgemessen:**
+
+| | Befund |
+|---|---|
+| Kaufpreisaufteilung | 5 Seiten · **73 Umlaute, 0 verstuemmelt, 0 Umschrift-Reste** |
+| Kopfzeilen | 1–2 „Kaufpreisaufteilung", **3–4 „für den Notarvertrag"**, 5 Steuerwirkung |
+| Abschnitte | alle neun vorhanden, Zusatz genau einmal, kein „Stand:" mehr |
+| Abschreibung | 9 Jahreszeilen aus der Spanne 18–26 |
+| Vier Kacheln | 258 px in 1057 px, kein Ueberlauf, gleiche Hoehe; 81,99 / 84,69 / 85,59 / 86,49 % |
+| Uebernahme | Kachel Konservativ → 15, Aggressiv → 25, Amtlich → 0; Herkunftszeile steht |
+| Reitersperre | Luecke → zu, nachgetragen → offen |
+| Restnutzungsdauer | Knopf: Bj 1972, GND 80, 0/16 Punkte → technisch 18, Anlage 2 26 Jahre |
+
+> **Die Lehre aus der Umlaut-Kehrtwende:** ich habe in v1475 eine PAUSCHALE
+> Vorsichtsmassnahme eingebaut, ohne zu messen, welche Zeichen ueberhaupt
+> betroffen sind. Der echte Befund aus v1221b betraf `→ ≥ ✓ —` — Zeichen
+> ausserhalb Latin-1. Umlaute waren nie das Problem. Die Folge war ein
+> Fachdokument, das „Gebaeudeanteil" schrieb: ein Wort, das in keinem Gesetz
+> steht. **Eine Schutzmassnahme braucht denselben Nachweis wie eine
+> Funktion** — sonst schuetzt sie vor nichts und kostet etwas.
+
+## Rollout-Journal · 21.09.2026 (8) — Erfundene Vorbelegungen, fehlendes Euro-Zeichen
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1495 | `a92c79f` | Die Abschreibungstabelle erzwingt keinen Seitenwechsel mehr, sie haengt am Notarblatt. „Sofort abzugsfaehige Kosten" komplett raus (Abschnitt, Feld, Tabellenzeile, Ereignisbindung). Klauseltext: die Betraege als **vollstaendiger Satz** statt eingerueckter Liste — in einer Urkunde steht ein Satz, den man vorlesen kann. Der Satz zur Bindungswirkung ist kein Vertragstext mehr, sondern steht als Information darunter, normal statt kursiv. Ueberschrift „Möglicher Zusatz …" in Gold |
+| v1496 | `ebb9059` | **Erfundene Vorbelegungen im BMF-Modal.** Im HTML standen FESTE Beispielwerte: `ak_fahrt_km` **2.151**, `ak_fahrt` **817,44 €**, `ak_verpfl` **56,00 €**, `ak_hotel` **40,00 €** — bei JEDEM Objekt. Seit v1478 gehen die Fahrtkosten in die AfA-Bemessungsgrundlage ein: **die Aufteilung rechnete mit einer erfundenen Zahl, und das PDF druckte sie als Beleg.** Dieselbe Falle bei `ak_kp` (87.569,13), `ak_grest` (4.250,00), `ak_notar` (1.492,26) — die Vorbefuellung aus dem Objekt setzt sie nur bei einem Wert > 0, stand dort nichts, blieb der Beispielwert in der Summe. Alle geleert, Platzhalter statt Wert. Der Kilometersatz 0,38 bleibt, das ist eine echte Pauschale |
+| v1497 | `edbcf2a` | **Im ganzen PDF stand kein einziges Euro-Zeichen.** Ursache war die eigene Schutzzeile in `sauber()`: `[^ -ÿ]` wirft alles ausserhalb Latin-1 weg — und das Euro-Zeichen ist **U+20AC**, liegt also ausserhalb. Dass jsPDF es als WinAnsi-Byte 0x80 drucken KANN, half nichts; es kam nie dorthin. Jetzt bleiben die WinAnsi-Sonderzeichen stehen. Dazu: Grunderwerbsteuer, Notar, Grundbuch und Makler tragen den **hinterlegten** Satz in Klammern (nicht zurueckgerechnet), Stichtag bleibt leer |
+
+**Nachweis am erzeugten PDF (pdf.js):** 4 Seiten · **68 Euro-Zeichen** (vorher 0) ·
+67 Umlaute, 0 verstuemmelt · „Grunderwerbsteuer (5,00 % vom Kaufpreis)", „Notar
+(1,50 %)", „Grundbuchamt (0,50 %)" · „Fahrtkosten (370 km × 0,38 €) 140,60 €" ·
+„Gutachten 549,00 €" · Stichtag leer · Gold der Zusatz-Ueberschrift gemessen
+**165,138,62** (= `#C9A84C` × 0,82) · Anschaffungskosten **738.989,60 €**.
+
+> **Zwei Fehler derselben Bauart, beide von mir, beide stumm.**
+> Eine **Vorbelegung, die wie eine Angabe aussieht**, ist schlimmer als ein
+> leeres Feld: niemand prueft eine Zahl, die schon dasteht. Und eine
+> **Schutzmassnahme ohne Nachweis** macht kaputt, was sie schuetzen soll —
+> `sauber()` sollte verstuemmelte Zeichen verhindern und hat dafuer die
+> Waehrung geloescht. Beides faellt nicht auf, weil das Ergebnis PLAUSIBEL
+> aussieht: 2.151 km koennten stimmen, und „140,60" liest man als Euro.
+> **Was das Dokument behauptet, gehoert gemessen — nicht, ob es gut aussieht.**
+
+> **Offen und gemeldet:** die Positionen im Reiter 1 (`ak_fahrt`, `ak_gutachten`,
+> `ak_anwalt`, `ak_sonst`, Reisekosten) haben **kein Gegenstueck am Objekt** und
+> werden nicht gespeichert. Seit die Beispielwerte weg sind, faellt das auf:
+> eingetragene Betraege sind beim naechsten Oeffnen weg. Vorher fiel es nicht
+> auf, weil immer etwas dastand — die falsche Zahl hat den fehlenden Speicher
+> verdeckt.
+
+## Rollout-Journal · 21.09.2026 (9) — BMF-Rechner durchgegangen
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1498 | `7003b7e` | Ergebnisspeicher in `bmfService.calculateKpa` (120 s, Schluessel = Hash ueber alle Eingaben plus Datei-Optionen). **Loest das Ladeproblem NICHT** — siehe Ruecknahme unten —, spart aber den doppelten LibreOffice-Lauf, wenn wirklich zweimal dasselbe gefragt wird (etwa Rechnung und PDF kurz nacheinander) |
+| v1499 | `9563451` | **Reiter 1 sofort statt drei Sekunden Wartezeit.** Gemessen: beim Oeffnen liefen `bmf/pipeline` (3.396 ms) und `bmf/aufteilung` (2.862 ms), und Reiter 1 zeigte solange ein Skelett mit „Pipeline berechnet…" und Punkten statt Zahlen. Die Antwort enthielt **nichts, was der Browser nicht schon wusste**: `prognose_ak` 738.300 = `ak_total`, `nk_aufschluesselung` = die vier `ak_`-Felder. Jetzt fuellt `_v292SofortSumme()` die Box aus den Feldern; die Pipeline laeuft beim **Wechsel auf Reiter 3 oder 4**, nicht beim Oeffnen und nicht bei jeder Eingabe. Gemessen danach: **kein einziger Backend-Ruf beim Oeffnen** |
+| v1500 | `983e205` | Bodenabschlag als Raster statt `flex/flex-end` — die RND-Spalte war wegen Knopf und Infozeile 143 px hoch gegen 60 px der Nachbarn und begann 83 px weiter oben. Jetzt drei Spalten, gemeinsame Oberkante, Knopf darunter. Der Abschlag ist eine **Auswahl mit genau vier Stufen** (0 / 15 / 20 / 25 %). Die goldenen AUTO- und Paragraphen-Pillen von 21 px auf 16 bzw. 14 px |
+| v1501 / v1502 | `4e588fa`, `f0f3fe8` | **Die Restnutzungsdauer wurde aus Vorbelegungen geraten.** Alle acht Modernisierungsfelder standen auf „nein" — das ist die Vorbelegung der Liste, nicht die Aussage „nichts wurde gemacht". Daraus wurde „alles veraltet" und **18 Jahre**; mit drei bewerteten Gewerken sind es **35 Jahre**. Ebenso fiel die Gesamtnutzungsdauer still auf 80 zurueck. Jetzt: fehlt die Objektart oder ist kein Gewerk bewertet, oeffnet sich **derselbe Wizard wie im Reiter Steuer** und sein Ergebnis kommt in die Felder zurueck. Vorbefuellung und Umrechnung gibt `deal-action` heraus statt einer zweiten Liste |
+| v1503 | `a0ea2fd` | **Vorbefuellung des Wizards repariert.** `ds2_energie`/`ds2_zustand` kamen als „– keine Angabe" und „– bitte waehlen" an: beide sind LEERE Auswahllisten, `el.value` ist `''`, und der Rueckfall auf `el.textContent` liest den Text ALLER Optionen. Strasse, PLZ, Ort und E-Mail des Auftraggebers blieben leer, weil nach `user_str`/`user_plz`/`user_ort` gesucht wurde — gespeichert sind sie als `pdf_address`/`pdf_plz`/`pdf_city`. Zweite Quelle ist jetzt das Branding |
+
+**Nachweis (gemessen im Browser):** Oeffnen ohne Backend-Ruf, Summenbox
+sofort gefuellt · Wechsel auf Reiter 3 loest `bmf/aufteilung` und
+`bmf/pipeline` aus, 13 Ergebnisse, vier Varianten · Bodenabschlag: drei
+Felder, eine Oberkante (371 px), Auswahl mit vier Stufen · RND-Knopf ohne
+Angaben → Wizard offen; mit drei bewerteten Gewerken → 35–36 Jahre samt
+Herkunft · Vorbefuellung: Name, E-Mail, Strasse, PLZ, Ort gefuellt,
+Platzhaltertexte weg.
+
+> **Eine Diagnose ausdruecklich zurueckgenommen.** Ich hatte gemeldet, die
+> beiden Backend-Rufe rechneten „dieselbe Arbeitshilfe doppelt", weil
+> `bmf/pipeline` intern `calculateKpa` ruft. **Das stimmt nicht:** die
+> Pipeline rechnet mit `phase3.prognose_ak` als Kaufpreis, die Route
+> `/aufteilung` mit dem Kaufpreis aus dem Modal. Zwei verschiedene Rechnungen,
+> kein Duplikat — der Speicher aus v1498 konnte dort also gar nicht greifen,
+> und die Messung hat das auch gezeigt (2.862 ms beim zweiten Ruf).
+
+> **Und eine Messfalle, die fast zu einer falschen Zahl gefuehrt haette:**
+> der Chrome-Tab lief im Hintergrund. Dort **drosselt Chrome jeden Timer auf
+> rund eine Sekunde** — meine erste Ladezeitmessung ergab dadurch exakt
+> 1006 ms fuer etwas, das synchron 0 ms braucht, und die Netzrufe standen
+> scheinbar im Sekundenabstand. `document.visibilityState` gehoert vor jede
+> Zeitmessung; ein Screenshot holt den Tab NICHT in den Vordergrund.
+
+**Zwischen den beiden Investment-PDFs wird nicht umgeschaltet, es sind zwei
+Knoepfe** — in der Aktionsleiste rechts stehen „Investment-PDF · Bank"
+(neue Bankfassung, `exportPDFBank`) und „Investment-PDF" (die alte,
+`exportPDF`) direkt untereinander.
+
+## Rollout-Journal · 22.09.2026 (1) — RND-Wizard, Investment-PDF-Sperre
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1504 | `3f6ea18` | Die Sofortbox im Reiter 1 zeigt dieselben Zeilen wie nach der Pipeline, auch die mit null. Eine Aufstellung, die beim Oeffnen kuerzer ist als zwei Sekunden spaeter, liest sich wie eine fehlende Tabelle |
+| v1505 | `3f6ea18` | **Das Investment-PDF prueft seine Zahlen.** Gemessen an Rinteln (Anfrage ohne Finanzierung): Zins 0, Tilgung 0, LTV 0, DSCR 0, Eigenkapitalrendite 0, Multiplikator 0, kein IRR — und das PDF entstand trotzdem ueber 20 Seiten. **Eine Null ist keine Aussage**, sie behauptet eine Finanzierung, die es nicht gibt. Gesperrt wird bei Kaufpreis, Miete, Finanzierung, Cashflow-Jahren; gewarnt bei DSCR null trotz Darlehen, fehlenden Bewirtschaftungskosten, fehlendem IRR, fehlender Steuerwirkung. `window.pruefeInvestmentDaten` steht nach aussen, damit die alte Fassung dieselbe Liste benutzt |
+| v1506 | `290bd0b` | **Der Wizard kannte gar keine Uebernahme.** Der letzte Schritt trug „Anfrage senden" und rief `_submitWizardAsRequest()` — und die Funktion ruft `onComplete` **gar nicht**. Wer ihn oeffnete, um eine Zahl zu bekommen, loeste eine Gutachten-Anfrage aus und bekam keinen Wert. Jetzt zwei Betriebsarten: `anfrage` (Reiter Steuer) und `uebernehmen` (Bodenabschlag). Dazu die **Spanne** unter der grossen Zahl (technische RND bis Punktraster nach Anlage 2) und `DM Sans` → `Inter` — DM Sans steht in keiner Markenliste |
+| v1507 | `c56ffd5` | Schritt 8 verlangte Name, E-Mail und Erstellungsort des Sachverstaendigen, „erforderlich fuer den Versand". Im Uebernahme-Modus wird nichts versendet — Pflichtangaben fuer einen Vorgang, den es nicht gibt, halten genau die Arbeit auf, fuer die der Knopf da ist |
+| v1508 | `2ee5fa4` | **Zweite Wahrheit beseitigt.** Der Wizard zeigte „Spanne 17 bis 26", uebernommen wurden 17 bis 24 — weil ich im Rueckweg NOCHMAL gerechnet habe, ueber `_buildCalcInputFromWizard`. Die Funktion erwartet `g.gewerkeBewertung`/`g.modPoints`, im Wizard-Zustand heissen die Felder `state.gewerke`/`state.mod`; sie rechnete mit leeren Gewerken. Genommen wird jetzt **das Ergebnis des Wizards** |
+
+**Nachweis:** Investment-PDF bei Rinteln gesperrt, Dialog nennt „Finanzierung ·
+Reiter Finanzierung" · Wizard-Knopf „✓ Werte übernehmen" · „Spanne 17 bis 26
+Jahre" im Wizard = 17 bis 26 in den Feldern · Wizard schliesst sich.
+
+### Bestandsaufnahme der RND-Module (auf Marcels Frage „hast du das richtige genommen?")
+
+**Ja.** `frontend/js/rnd-wizard.js` (`DealPilotRND_Wizard`, V3, zuletzt v1439
+vom 18.09.2026) ist die aktuelle Oberflaeche und wird von drei Stellen
+geoeffnet: Gutachten-Modal, Steuer-Reiter (`afa-eigen.js`) und jetzt dem
+Bodenabschlag.
+
+`frontend/js/rnd-ui.js` (`DealPilotRND_UI`, V2) ist die **aeltere Oberflaeche**
+und praktisch **unerreichbar**: ihr einziger Einstieg `openRND()` haengt an
+`submitExpert()` mit `typ === 'rnd'`, aber seit V144 faengt ein
+`change`-Listener am Radio genau diesen Fall ab und startet den Wizard. Der
+Zweig ist toter Code (~1.100 Zeilen plus ~200 in `deal-action.js`). Im
+`BACKLOG.md` steht sie zweimal nur noch als Aufraeumposten.
+
+Keine Leiche sind dagegen `rnd-calc.js` (Master-Kern 3.1.0), `rnd-gnd-table.js`,
+`rnd-bte-katalog.js`, `rnd-pdf.js`, `rnd-docx.js` — das sind die Bausteine.
+
+> **Warum das Modal „alt" aussah:** das CSS `frontend/css/rnd-styles.css` hing
+> in `index.html:54` mit dem Cache-Buster **`?v=W34`**, waehrend das JS bei
+> `v1439` stand. **Jede Stilaenderung der letzten Monate waere nie angekommen.**
+> Dazu war `DM Sans` die Hausschrift der Datei — eine Schrift, die in keiner
+> Markenliste steht. Beides behoben; Cormorant Garamond bleibt fuer die grosse
+> Zahl, die ist als Serifenschrift der Marke gedeckt.
+
+> **Offen und benannt:** der Wizard zeigt `final_rnd` weiterhin punktgenau als
+> grosse Zahl (die Spanne steht jetzt darunter). `tools/rnd-pruefung/rnd-spanne.js`
+> begruendet auf 50 Kommentarzeilen, warum nach aussen **nur** eine Spanne
+> gehoert — dieses Modul ist in der App nirgends eingebunden. Das ist der
+> groesste Widerspruch zwischen Konzept und Produkt und eine
+> Produktentscheidung, keine Reparatur.
+
+## Rollout-Journal · 22.09.2026 (2) — RND im Hausstil, Hellmodus, altes Modul raus
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1509 | `c8c338f` | **Keine feste Zahl mehr** — die Ergebnisanzeige zeigt die Spanne. Dazu der Abgleich mit dem Rechenkern: `calcAll` kennt `kernsaniert` (hebt im Punktraster die Quote von 0,70 auf 0,90), der Wizard hat die Kernsanierung als Auswahl und zaehlt sie bei den Punkten voll — **den Schalter aber nie uebergeben**. Ein kernsaniertes Haus rechnete wie ein normal modernisiertes. Schritt 8 wird jetzt vorbefuellt (Name, E-Mail, Erstellungsort) |
+| v1510 | `c8c338f` | **`rnd-ui.js` ausgebaut.** Script-Tag, Weiche in `submitExpert` und **221 Zeilen** toter Code (`openRND`, `_hideRNDExtras`, `_updateRNDHeadline`, `_rndDealData`, `submitRNDFromModule`) samt Exporten. Die Datei liegt unter `docs/abgeloest/rnd-ui.js` |
+| v1511 | `2c41471` | Die Pruefung vor dem Investment-PDF nennt den Stand des ReadyCheck („Bereit fuer die Bank?", 15 Grundfelder) samt fehlender Felder — als Warnung. **Es gibt fuenf Vollstaendigkeitszaehler nebeneinander** (DS2-KPIs 24, ReadyCheck 15, Workflow 6, zweimal Quick-Check); gekoppelt wird an den, der schon so heisst und schon als Bank-Gate dient |
+| v1512 | `2c41471` | „+ Neues Objekt hinzufuegen" stand bei **y=1721**, hinter allen Karten — jetzt bei y=174 ueber dem Portfolio; die obere Schaltflaeche ist weg, Quick-Check und Marktbericht tragen wieder ihre Beschriftung. Aktionsmenue im Hellmodus: Kasten war weiss, Eintraege aber Gold `#E8C964` darauf — **Kontrast 1,62 : 1** bei noetigen 4,5. Jetzt Tinte, gemessen **14,81 : 1** |
+| v1513 / b | `2035188`, `e664623` | RND-Wizard im Hausstil: **920 × 748 → 1143 × 915**, Radius 14 → 12, Grund Weiss → `#FDFCFA`, Schrittpunkte **28 → 18 px**, Felder zweispaltig ab 900 px. Das Ergebnis trug **58 Zeilen Inline-Stil** mit dunkler Flaeche, fuenf animierten Sternchen, einer von 0,15 auf 1 zoomenden 110-px-Zahl und Puls-Effekt — jetzt helle Karte, Goldlinie, keine Animation |
+| v1514 | `ec5be59` | Sechs Moeglichkeiten fuer die Objektkarten im Hellmodus als Vorschau: `frontend/design-hellmodus.html` |
+
+> **Warum „zu viel Creme" stimmt, in Zahlen:** Seite `#F7F5F1`, Seitenleiste
+> `#FBFAF7`, **Karte `#F5EDD8`** (kraeftiger Sandton), Rahmen `#E4D6AE`, **kein
+> Schatten**. Drei Cremetoene uebereinander — deshalb heben sich die Karten
+> nicht ab. Die Vorschau aendert genau diese drei Werte, sechsmal verschieden.
+
+> **Drei Anlaeufe fuer einen Block, zweimal zurueckgenommen — beide Male meine
+> eigene Falle.** Der erste Ersatz griff **146 statt 58 Zeilen** und nahm eine
+> Tabellenzeile mit (`git checkout --`). Der zweite zerlegte im Heredoc die
+> Anfuehrungszeichen um 'JetBrains Mono' — dieselbe Backslash-Falle, die in
+> der Memory steht. Der dritte Anlauf schrieb die Schriftnamen **ohne**
+> Anfuehrungszeichen (CSS erlaubt das) und kam ohne ein einziges Escape aus.
+> **Und beim Schreiben DIESES Eintrags ist sie ein drittes Mal zugeschlagen** —
+> der Satz ueber die Falle enthielt sie selbst. Lehre: Apostrophe in erzeugtem
+> Text nie tippen, sondern `String.fromCharCode(39)` benutzen.
+
+## Rollout-Journal · 22.09.2026 (3) — Bestandsaufnahme Landing, fuenf Ideen
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1515 | `4c6efde` | Fuenf Ideen fuer die Landing im Stil von junker-immobilien.io: `frontend/landing-ideen.html` |
+
+**Die Landing liegt in `frontend/landing/index.html` — 1,16 MB, 4.246 Zeilen**,
+eine Mini-Anwendung mit drei Ansichten (Landing, API-Doku, Leistungsumfang),
+ausgeliefert auf einer **eigenen Domain** (`{$LANDING_DOMAIN}` im Caddyfile,
+`/srv/landing`). Dort sind nur **drei** API-Pfade durchgereicht:
+`reseller-inquiries`, `track`, `market-rates`.
+
+### Sechs Befunde, alle belegt
+
+| Befund | Beleg |
+|---|---|
+| **Es gibt keinen Login** | Null Treffer auf login/anmelden/einloggen in der ganzen Datei. Alle **13** App-Verweise fuehren auf `?register=1`. Ein Bestandskunde findet keinen beschrifteten Weg in die App |
+| **Preise 5.544 px tief** | Siebter Abschnitt, nach Hero, Willkommensband, Stories, Workflow, Features und Marktzinsen. Die Zahl steht bereits im Repo (`flyer-code.js`) |
+| **Erstflug ist aus** | `promo-erstflug.js`: `ANZEIGE_AKTIV = false` — auf **Marcels eigene Anweisung vom 07.09.2026** („bitte nicht auf der Seite mehr angeben"). Sichtbar nur fuer Besucher ueber `/erstflug`. Ein Eingabefeld existiert nirgends; der Code kommt per Cookie und geht direkt an Stripe |
+| **Kein Kundenzaehler** | Keine Nutzungszahl auf der Seite; die vier Hero-Zahlen sind Produkteigenschaften. **Kein oeffentlicher Stats-Endpunkt** im Backend — alle Zahlen-Endpunkte sind `requireAdmin` |
+| **Zwei App-Domains** | **16** Links zeigen auf `app.dealpilot.junker-immobilien.io`, die Seite laeuft auf `dealpilot.immo`. Nachgemessen: **beide antworten mit 200** |
+| **1,16 MB Seitengroesse** | Viel inline-Base64, dazu ein **toter App-Preis-Baustein** (Zeilen 2780–3197), der auf der Landing nie greift |
+
+> **Zur Erstflug-Idee gehoert eine Rueckfrage, keine stille Aenderung.** Der
+> Rabatt ist nicht vergessen worden, er wurde **bewusst abgeschaltet** — und
+> zwar von Marcel selbst. Die Idee, ihn wieder aufpoppen zu lassen, dreht
+> diese Entscheidung um. Der Schalter ist eine Zeile; die Entscheidung ist es
+> nicht.
+
+> **Fuer den Kundenzaehler reicht Frontend-Arbeit nicht.** Noetig sind ein
+> oeffentlicher Endpunkt, ein zusaetzlicher `handle`-Block im Caddyfile fuer
+> die Landing-Domain und eine Pflegemaske im Admin (der Bereich „Landing"
+> waere der Platz — dort liegen schon Besucher und Funnel). Offene
+> Produktfrage: echte Zahlen aus der Datenbank oder gepflegte Werte.
+
+## Rollout-Journal · 22.09.2026 (4) — Score rechts, Erstflug, Kundenzaehler, Landing-Entwuerfe
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1516 | `6d3cc90` | Die Aktionsspalte zeigt unter dem Score die **fuenf Bereiche** (Rendite, Finanzierung, Risiko, Lage, Upside) mit Balken, Punktzahl und **Datentiefe je Bereich** — aus `DealScore2.compute()`, demselben Kern wie der Kopf |
+| v1517 | `6d3cc90` | **Umschalter fuer die sechs Kartenbilder** direkt in der App: nur in den hellen Profilen, nur auf Zuruf (Tastenfolge `kkk` oder `?karten=1`), setzt `<html data-dp-karte>`. Kopfleiste und Reiterzeile ziehen mit |
+| v1518 / v1519 | `9bd407b`, `959655c` | Die Spalte blieb leer, obwohl der Rechenkern Zahlen hatte: der **70-%-Riegel** in `calc.js` blendet den Kopf-Score aus, und die Spalte schrieb ihn nur ab. Jetzt stehen die Bereiche trotzdem, mit dem Grund darueber. **Der Zweig aus v1518 wurde nie erreicht** — eine Zeile darueber stieg vorher aus; zum zweiten Mal nach v1493 derselbe Fehlertyp |
+| v1520 | `c4e6ed6` | Im Hellmodus entfallen der Score-Block im Kopf und die aufklappbare Score-Karte im Reiter Kennzahlen — er steht jetzt rechts. Nur solange die Spalte da ist (`body.dp-hybrid-rail`) |
+| v1521 | `7504af2` | Bei 87 Punkten zeigte der Kopf **„Sehr gut"** — eine Stufe, die die Kette der Objektkarte nicht kennt (ab 85 = TOP). Die in CLAUDE.md vermerkte Abweichung. Solange der Kopf ausgeblendet ist, ist die Spalte die einzige Anzeige, also gilt dort die Kette |
+| v1522 / b | `ecf3493`, `081ce86` | **Erstflug als Fenster zum Annehmen**, nur ueber `/erstflug`. Die Entscheidung vom 07.09.2026 bleibt: auf der offenen Seite wird nichts beworben. Wer ablehnt, behaelt den Code. **Und ein Fehler, der teuer geworden waere:** das Fenster blieb im Hintergrund-Tab auf `opacity 0` stehen und haette als unsichtbare Flaeche die ganze Seite blockiert — `requestAnimationFrame` feuert dort nicht |
+| v1523 / b | `15bb4bb`, `a9fb9ed` | **Oeffentlicher Endpunkt** `GET /api/v1/public/stats` fuer die Landing: registrierte Nutzer ohne Testkonten plus Sockel aus `PUBLIC_STATS_SOCKEL` (865). Gerundet erst ab 2000 — **der erste Versuch machte aus 866 eine 860**, also weniger als der Sockel |
+| v1524 / b | `a3612c3`, `5478d2d` | **Zwei vollstaendige Landing-Entwuerfe** im Junker-Stil |
+
+> **Der Caddyfile-Umweg, der eine Stunde gekostet hat.** Der Endpunkt braucht
+> einen `handle`-Block in der Landing-Domain. Der Caddyfile ist im Git
+> **verfolgt** (obwohl CLAUDE.md sagt, er darf nie committet werden) und hat
+> den Deploy blockiert. Ich habe ihn mit `git checkout --` zurueckgesetzt,
+> deployed und die Fassung zurueckkopiert — und **danach griff die Aenderung
+> nicht**, obwohl `caddy reload` Erfolg meldete. Ursache: **ein Bind-Mount auf
+> eine einzelne DATEI haengt an der Inode.** `git checkout` ersetzt die Datei,
+> der Container haelt die alte; im Container lag eine Fassung **vom 21. Juli**.
+> Behebung nur mit `--force-recreate`. Seitdem: `git update-index
+> --skip-worktree Caddyfile` auf dem Server.
+
+### Die Landing-Entwuerfe
+
+`frontend/landing-entwurf-a.html` — „Substanz": heller Creme-Grund wie
+junker-immobilien.io, dunkle Akzentbaender, Laufband, Boarding-Karte mit
+animiertem Score-Ring, fuenf Schritte, neun Funktionskarten, drei
+Praxisgeschichten mit Strichzeichnungen.
+
+`frontend/landing-entwurf-b.html` — „Cockpit": sehr hell mit dunklen Akzenten,
+zentrierter Hero mit Cockpit-Streifen, drei Leistungsspalten, Vergleichstabelle
+„ohne und mit", vier Praxisfaelle, Preisleiste.
+
+**Beide zeigen, was die Bestandsaufnahme als Luecke ergab** und heute nirgends
+auf der Landing steht: **Erbbaurecht** (kein Bewertungsanbieter nimmt den
+Parameter ueberhaupt entgegen), **Bilanz und GuV fuer die Immobilien-GmbH**,
+**Ueberfuehrung Privat → GmbH**, **MFH-Konfigurator je Einheit**, **Datenraum**,
+**Anlage V 2025**, **Beleg-Import**. Alle Zahlen sind belegt: 24 Kennzahlen,
+6 RND-Verfahren, 27 Gebaeudetypen, 190 Bauteile, 22 Bodenrichtwert-Portale,
+25 Spalten Bankexport.
+
+> **Dreimal dieselbe Falle an einem Tag:** Animationen, die zur Bedingung
+> dafuer werden, dass man etwas SIEHT. Erst das Erstflug-Fenster, dann die
+> Reveal-Abschnitte der Entwuerfe. Im Hintergrund-Tab feuert
+> `requestAnimationFrame` nicht und CSS-Uebergaenge starten nicht. **Regel:
+> Endzustand zuerst setzen, Animation ist Zugabe** — plus ein Zeitnetz, das
+> nach 1,6 s alles sichtbar macht.
+
+## Rollout-Journal · 22.09.2026 (5) — Landing-Entwurf C
+
+| Paket | Commit | Was |
+|---|---|---|
+| v1525 / b | `022893c`, `1a71d5a` | **Entwurf C** — `frontend/landing/entwurf-c.html`, erreichbar unter `staging.dealpilot.immo/entwurf-c.html` |
+
+Marcel zu A und B: *„haben mir beide Entwuerfe noch nicht zugesagt."* Konkret:
+Video fehlt, zu wenig Effekte, Menuestruktur nicht professionell genug,
+Partner-Umschalter ohne Jahresansicht, Paketinhalte zu duenn aufgeschluesselt.
+
+**Von junker-immobilien.io uebernommen** (dort im Browser gemessen):
+
+| Gemessen | Uebernommen |
+|---|---|
+| Topbar mit Kontakt und Verweis aufs Schwesterangebot | Topbar mit Telefon, Mail und Link zum Sachverstaendigenbuero |
+| Menue mit **Untermenues**, je Eintrag Titel **plus Erklaerung** („Haeufige Fragen — Antworten zu Gutachten, AfA und Ablauf") | Drei Untermenues mit je Titel und Beschreibung |
+| Kicker vor jedem Abschnitt („Kompetenzfelder", „Fallbeispiele", „Unser Ansatz") | Kicker mit vorangestelltem Strich |
+| Ueberschriften mit Zeilenumbruch, zweite Zeile in Gold | Ebenso |
+| Abschnittshoehen 800–1300 px, Gesamthoehe 10.265 px | Grosszuegige Abschnitte |
+| 16 animierte Elemente, durchgehend `.rv` | Reveal auf allen Abschnitten, gestaffelt |
+
+**Neu gegenueber A und B:**
+- **Hero mit dem vorhandenen Video** `dp-hero-flug.mp4` (3,7 MB, lag ungenutzt
+  in `frontend/landing/assets/video/`), dazu ein wanderndes Raster und eine
+  zeilenweise einfahrende Ueberschrift
+- **Ablauf als Zeitstrahl**, dessen Goldlinie beim Erreichen waechst, mit
+  Punkten, Zeitangaben je Schritt und Hover-Effekt
+- **Preise mit ZWEI Umschaltern**: Einzelplatz/Partner **und** monatlich/
+  jaehrlich — auch die Partnerpreise rechnen jetzt aufs Jahr um
+- **Pakete aufgeschluesselt**: Kontingent getrennt vom Umfang, „alles aus X,
+  dazu" statt Wiederholung, ausgegraute Zeilen fuer das, was NICHT enthalten
+  ist; Partner mit der echten Staffel 24 / 19 / 15 EUR je Mandanten-Platz
+
+> **Warum der Entwurf im Landing-Ordner liegt und nicht neben den anderen:**
+> gemessen `readyState 0`, `videoWidth 0` — das Video lud nicht, weil der
+> Entwurf auf der App-Domain lag und das Video auf der Landing-Domain. Jetzt
+> liegt er dort, wo das Video liegt, und laedt es relativ.
+
+> **Und eine Messfalle, die dreimal zugeschlagen hat:** im Hintergrund-Tab
+> laedt Chrome **keine Videos** (`networkState 2`, aber `readyState 0` auf
+> Dauer), startet **keine CSS-Uebergaenge** und feuert **kein**
+> `requestAnimationFrame`. Alle drei Male sah es nach einem Fehler im Entwurf
+> aus. Wer eine Seite so prueft, muss `document.visibilityState` mitlesen —
+> und die Seite so bauen, dass sie **ohne** diese Dinge vollstaendig ist.
+
+
+## Rollout-Journal · 22.09.2026 — v1530 bis v1539: Landing, Partnerpreis, Hellmodus
+
+**Was.** Drei Stränge an einem Tag: die vollständige neue Landing samt zwei
+Unterseiten, die Umstellung des Partner-Pakets von 49 auf 99 EUR, und die
+Reparatur der Reiterleiste im Hellmodus.
+
+**Commits.** `c73cb3f` v1530 · `547aa3b` v1531 · `dce9760` v1532/33 ·
+`16fa004` v1534 · `2026cb1` v1535 · `a2a96fd` v1536/37 · `8c106f4` v1538 ·
+`38cf726` v1539. Alle auf Staging, Serverstand je Rollout gegengeprüft.
+
+### 1 · Landing (v1530–v1534)
+
+`frontend/landing/entwurf-voll.html` nimmt die alte Seite vollständig mit:
+20 Module in vier Gruppen, die Cockpit-Matrix mit 33 Zeilen, die Geschichte
+„Der Anruf am Donnerstagabend", Ablauf in sechs Schritten, Vertrauensband
+(Hetzner, DSGVO), Kundenstimmen. Dazu `sicherheit.html` und `fragen.html`
+mit gemeinsamem Gerüst in `dp-seite.css` / `dp-seite.js`.
+
+**Ohne Emoji:** 20 eigene SVG-Strichzeichnungen. Gemessen — im Dokument steht
+kein Zeichen aus den Emoji-Blöcken mehr, nur das Häkchen in der Matrix.
+
+**Der Hero trägt die weiße Investor-Deal-Score-Karte**, Aufbau eins zu eins an
+der laufenden App gemessen (`hybrid-aktionen.js` Z.73–160, `style.css`
+Z.37888–37942).
+
+**Gestaltung von junker-immobilien.io übernommen** (v1534). Die vier Mittel,
+die dort tragen: *gap:0 plus ein Außenrahmen plus 1px-Trenner* statt
+schwebender Karten; *fast keine Radien*; der *goldene 3px-Streifen*, der per
+`scaleY` herausfährt; *lange, leise Bewegungen* (Raster 46 s, Laufband 60 s)
+bei nur zwei kurzen Kurven.
+
+> **Die vierte Goldstufe.** Gold ist dort kein einzelner Wert, sondern ein
+> **Paar**: `#7d611a` für Gold als TEXT auf hellem Grund, `#E8CC7A` für Gold
+> AUF dunklem Grund. Unser `--gold-lo` `#a8842a` lag dazwischen und war auf
+> Creme zu blass — genau das, was Marcel als „zu hell mit Gold" beschrieben
+> hat. Neu als `--gold-txt`. Die drei Marken-Goldtöne bleiben unberührt.
+
+### 2 · Partner-Paket 49 → 99 EUR (v1535–v1537)
+
+> **Der Befund, der die Richtung geändert hat.** Mein Vorschlag war 159 EUR
+> mit drei BERATER-Plätzen. Beim Messen zeigte sich: **die gibt es nicht.**
+> `plans.max_users` steht für ALLE Pläne auf 1 und wird **nirgends
+> durchgesetzt** — nur angezeigt. Die `licenses`-Tabelle kennt ausschließlich
+> MANDANTEN-Seats, und die bekommen Investor-Tier. Die alte Landing bewirbt
+> seit v1250 „3 Berater-Seats inklusive": ein Versprechen ohne Entsprechung
+> im Code. **Marcels Entscheidung: 99 EUR mit drei MANDANTEN-Plätzen** — das
+> kann die Software heute.
+
+Der eigentliche Fehler war der Preis selbst: Partner kostete **49,00 EUR und
+lag damit 99 Cent UNTER Pro** (49,99) — bei vollem Pro-Umfang plus Whitelabel
+plus Reseller-Konsole.
+
+**Stripe**, beide Konten, neue Preise mit übertragenem `lookup_key`:
+
+| | monatlich | jährlich |
+|---|---|---|
+| Sandbox | `price_1UIS4VKEjyPDo0wonEnXVuAJ` | `price_1UIS4bKEjyPDo0wogWU0PSeG` |
+| **LIVE** | `price_1UIS6NGefFev8arzQhprWAKe` | `price_1UIS6rGefFev8arzIX3XuO3e` |
+
+9900 / 108900 Cent. Vorher geprüft: **auf den alten Partner-Preisen lief in
+Prod kein Abo**. Staging nachgemessen — `plans` steht auf 9900/108900, und
+`[plans-sync]` meldet *„nichts zu tun, plans stimmt mit Stripe überein"*.
+**Prod zieht beim nächsten Backend-Start nach; dort wurde nichts angefasst.**
+
+**Dass die drei Plätze wirken** (v1537): `syncPoolQuantity` rechnet
+`INKLUSIV_MANDANTEN = 3` auf die gekaufte Stripe-Menge auf — an der einen
+Stelle, die alle Aufrufer durchlaufen. Beim Aufrufer wäre es falsch: es gibt
+zwei, und ein dritter würde es vergessen. **Genau so ist das leere
+Berater-Seat-Versprechen entstanden.** Echter Funktionslauf im Container:
+
+    INKLUSIV_MANDANTEN = 3
+    10 gekauft → 13 Plätze (3 inklusiv, 10 bezahlt)
+     0 gekauft →  3 Plätze (3 inklusiv,  0 bezahlt)
+
+> **Der Seat-Rechner zeigte 35/29/24 und buchte 19/15/12 ab** (v1535). Der
+> Hinweistext im Kaufpanel nannte die richtige Staffel, der Rechner zwei
+> Zeilen darunter die alte von vor v1423. Fünf Seats: **angezeigt 175 EUR,
+> abgebucht 95 EUR.** Jährlich nahm er zehn Monatsraten, Stripe führt elf.
+> Beide Zahlen falsch, in verschiedene Richtungen. Die Staffel steht jetzt
+> EINMAL in einer Liste, Text und Summe lesen dieselbe.
+> Dazu: die alte Landing bewarb **24/19/15**, also zu hohe Preise — seit v1250.
+
+### 3 · Hellmodus: die Reiterleiste (v1538)
+
+> **Keine der sechs Kartenvarianten hat die Reiterleiste je eingefärbt** —
+> auch die Vorauswahl v4 nicht, und auch meine v1527-Regel in `style.css`
+> nicht. Nicht die Farbe war falsch, sondern die **Spezifität**.
+> `ui-varianten.css` färbt `nav.tabs` über eine Regel mit vier
+> Teilselektoren, und der stärkste ist
+>
+>     html[data-ui-theme] body header.hdr.has-v64-score + nav.tabs.tabs
+>     = 1 Attribut + 3 Klassen + 2 Typen = (0,4,2), mit !important
+>
+> Alle Varianten hatten (0,1,2). Aufgefallen ist es nicht, weil die Sidebar
+> richtig aussah: dort gibt es keinen so spezifischen Konkurrenten.
+> **Bei einer Regel mit mehreren Selektoren zählt für ein Element der
+> stärkste, der auf es passt** — nicht der erste und nicht der kürzeste.
+> Behoben mit demselben Anker plus doppelter Klasse `.tabs.tabs` = (0,5,2).
+> Ohne ID und ohne `:not(#id)`, das würde ID-Spezifität erben.
+
+Nachgemessen: Reiterleiste, Kopfleiste und Aktionsspalte alle `#FFFFFF`,
+Schriftkontrast **17,85** gegen **17,37** in der Aktionsspalte — praktisch
+gleich, wie gewünscht. Kein goldener Text mehr in Reiterleiste und Sidebar.
+
+> **Werkzeugfalle dabei:** Die Reiterschrift kommt als `oklab(...)`. Meine
+> Kontrastrechnung zog die Zahlen per Regex heraus und gab **22946** aus —
+> offensichtlicher Unsinn, aber ein Wert, den man ungeprüft übernehmen könnte.
+> Richtig geht es nur über den Browser selbst: Farbe auf ein 1×1-Canvas legen
+> und das Pixel auslesen.
+
+### 4 · Demo statt Alleingang (v1539)
+
+Nach v1538 ist `.dp-pfbar` die **einzige vollflächige Farbe** in der hellen
+Ansicht — 1280 × 78 Pixel Runway-Verlauf mit Kacheln in `#0a0a0a`. Im
+Dunkelmodus fügt es sich ein, im Hellmodus zieht es den Blick stärker an als
+die Felder, in denen gearbeitet wird. Das ist eine Optikentscheidung, keine
+Messfrage → `frontend/demo-preflight-hell.html` zeigt vier Fassungen im
+echten Umfeld. Empfehlung: Cremeband, weil es dieselbe Farbe ist wie die
+Objektkarte und dieselbe Aussage dieselbe Farbe tragen sollte.
+
+### Rest
+
+- **Prod-Backend nicht neu gestartet** — Stripe steht, die Prod-`plans` zieht
+  beim nächsten Start nach.
+- **Die drei Kundenstimmen sind Platzhalter** und im Quelltext so bezeichnet.
+  Erfundene Kundenurteile sind nach § 5 UWG abmahnbar — vor dem Livegang
+  durch echte ersetzen.
+- Die Fassung des Pre-Flight-Bands ist offen (Demo liegt).
+- `entwurf-voll.html` ist noch ein Entwurf neben der alten `index.html`.
+
+## Rollout-Journal · 24.09.2026 — PROD: die neue Landingpage geht live (v1593–v1596)
+
+**Was.** Marcels Freigabe: „dass du die dann so uebernimmst, die Seite und die
+auch auf Prod ausrollst." Dazu drei Wuensche: „DealPilot in Bewegung" raus (es
+gibt noch keine Videos), der Erstflug-Rabatt nur noch als Fenster ueber
+`/erstflug`, und das Haus-Icon vor dem Schriftzug weg — im Kopf und im Fuss.
+
+**Commit.** Staging `22569de` (v1593–v1595d, v1596) · Prod `346590c`.
+Nur `frontend/landing/`, 55 Dateien. Kein Backend, keine Migration, kein
+Rebuild — das Frontend ist volume-mounted. `main` und `staging` lagen 188
+Commits auseinander; ein Merge haette beide Straenge samt Migrationen
+mitgebracht, deshalb der gezielte `git checkout staging -- frontend/landing/`.
+
+**Nachweis.**
+- Gesichert und **angesehen** (nicht nur angelegt): `haupt-20260924-0733.sql.gz`
+  11 MB / 10.188 Zeilen, `mb-20260924-0733.sql.gz` 745 KB / 35.380 Zeilen.
+- Dreizehn Adressen auf `dealpilot.immo` einzeln abgerufen: jede liefert
+  **eigenen** Inhalt. Vorher reichte der catch-all bei `/fragen.html`,
+  `/sicherheit.html` und `/api.html` die Startseite durch (je 1.156.881 Byte) —
+  genau der Grund, aus dem v1568 sie aus der Sitemap genommen hatte.
+- `demo-wechsel.js` auf Prod und Staging **byte-gleich** (md5
+  `6d38c0dec8cd4aff13ed4427670f9f75`), zwoelf Stufen.
+- Startseite: 40.707 statt 1.156.881 Byte. Matrix 35 Zeilen, kein Haus-Icon,
+  Logos 23 px / 21 px, Videobereich verborgen, kein Waagerecht-Ueberlauf,
+  keine JS-Fehler.
+- `/erstflug` auf Prod: Fenster mit **15 %**, kein Balken, Adresse auf `/`
+  aufgeraeumt, 12 von 12 Anmeldelinks tragen den Code. Danach Wiederkehr auf
+  die Startseite: Code liegt noch, **Balken bleibt weg**, Rabatt wirkt weiter.
+
+**Der eigentliche Befund — der Balken kam aus der anderen Datei.**
+Meine Diagnose vom 23.09. (v1590: `promo-erstflug.js` an die Sitzung binden)
+war **falsch und ist zurueckgenommen**. Gemessen: Sitzungsmarke geloescht,
+Seite frisch geladen — Balken trotzdem da. Er kam aus `flyer-code.js`.
+Dort zeigte `start()` ihn genau dann, wenn jemand einen Code MITBRINGT, aber
+nicht frisch ueber `/erstflug` kam. Das war als Ausnahme gedacht und ist der
+Regelfall: der Code liegt in localStorage UND im Cookie, also traegt ihn jeder
+Besucher nach dem ersten Mal fuer immer mit. Der Selbstaufruf ist weg,
+`balkenZeigen` bleibt ueber die API erreichbar.
+
+**Zwei Geldfehler, gefunden weil vor dem Rollout hingesehen wurde.**
+1. `erstflug-popup.js` pruefte `d.active` am AEUSSEREN Objekt — die Antwort
+   ist aber verpackt (`{"promo":{…}}`). Also immer `cb(null)`, also immer der
+   Notnagel `: 15`. Die Zahl stimmte zufaellig und haette in dem Moment
+   gelogen, in dem der Coupon in Stripe einen anderen Satz bekommt.
+   `promo-erstflug.js` packt an derselben Stelle richtig aus — diese Kopie
+   hatte es nie mituebernommen.
+2. Der Notnagel fiel ersatzlos (**lieber keine Zahl als eine erfundene**) —
+   und machte damit einen zweiten Fehler sichtbar, den er jahrelang gedeckt
+   hatte: das Fenster fragte **fest die Produktions-API**, auch auf Staging.
+   Von `staging.dealpilot.immo` aus weist Prod die Anfrage ab („Failed to
+   fetch", gemessen). Der Host wird jetzt abgeleitet wie in `flyer-code.js`.
+
+> **Das ist der Grund, warum eine erfundene Zahl teurer ist als eine
+> fehlende: sie sieht aus wie ein Ergebnis.** Ein kaputter Abruf, den ein
+> Notnagel auffaengt, meldet sich nie.
+
+**Drei Lueckenbefunde, die ich zurueckgenommen habe.** Ein `grep` im Quelltext
+meldete, der neuen Seite fehlten FAQ, Kerosin und Marktbericht. Alle drei
+waren Werkzeugfehler: die Leistungstabelle wird per JS in `#mxBody` gebaut
+(im HTML steht null, im Browser stehen 35 Zeilen — Zeile fuer Zeile dieselben
+wie alt, `Marktbericht-Import` inklusive), „FAQ" traf in Base64-Bilddaten, und
+„Kerosin" heisst seit v1246 „Bewertungen nachkaufen" (`id="nachkauf"` ist da).
+**Die neue Seite hat sogar eine eigene FAQ-Seite (`fragen.html`), die alte
+hatte keine.**
+
+**Vier Funde auf den Unterseiten, alle vor dem Rollout behoben** (v1595):
+das Haus-Icon stand dort noch im Kopf UND im Fuss; der Cache-Buster von
+`dp2-teile.css` stand auf v1565, die Regel `.mark-gross` kam aber erst in
+v1592 (ohne Hochziehen waere die Aenderung nie angekommen); der Brotkrumen auf
+`sicherheit.html` zeigte auf `entwurf-voll.html`; und `entwurf-c.html`,
+`entwurf-voll.html`, `api-docs.html` hatten kein `noindex` — die beiden
+Entwuerfe tragen denselben `<title>` wie die Startseite.
+
+**Zur Notiz „Die drei Kundenstimmen sind Platzhalter · § 5 UWG":** sie stammt
+vom Landing-Entwurf C (22.09.) und betrifft `entwurf-voll.html`. **Die
+Live-Seite hat keine Kundenstimmen** — der Abschnitt „stories" sind erzaehlte
+Szenarien in Du-Form plus die Gruenderstimme von Marcel. Geprueft: kein
+Personenname mit Rollenangabe, kein Zitat, das jemandem zugeschrieben wird.
+`entwurf-voll.html` traegt jetzt `noindex` und ist von nirgends verlinkt.
+
+**Rest.**
+- `frontend/landing/flyer-code.js` und `frontend/js/flyer-code.js` sollen laut
+  ihrem eigenen Kommentar gleich bleiben und tun es seit laengerem nicht
+  (41 Zeilen, **schon vor v1593**). Die App-Kopie ist bewusst nicht
+  mitgegangen — sie zeigt den Balken ohnehin nie, weil `window.Auth` dort
+  existiert. Anzugleichen, wenn eine der beiden ohnehin angefasst wird.
+- Die Tarifknoepfe senden `?register=1&plan=…` bzw. `&paket=…`. **Niemand
+  liest beides:** `auth.js:461` loescht bei `?register=1` die ganze
+  Abfragezeichenfolge. Das war in der alten Seite genauso, ist also keine
+  Verschlechterung — aber ein vorausgewaehlter Tarif kommt nicht an. Der
+  Rabattcode ueberlebt dagegen, weil `flyer-code.js` seinen Listener in der
+  App vor `main.js` haengt und ihn liest, bevor `auth.js` aufraeumt.
+- Der Deal Score der Demo (76 „Gut") haelt den echten Schwellen nicht stand —
+  gerechnet sind es **39 „Schwach"**, weil die DSCR-Kurve erst bei 0,9 beginnt
+  und unser Wert 0,82 ist. Steht als Warnblock in `demo-ideen.html`.
+- Die Sitemap fuehrt acht Adressen; `/dp2.html` ist nur noch eine
+  Weiterleitung, `/alt-original.html` das Archiv mit `noindex`.

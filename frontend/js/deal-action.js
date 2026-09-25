@@ -1475,13 +1475,11 @@ window.DealPilotDealAction = (function() {
     var typeEl = document.querySelector('input[name="expert-type"]:checked');
     var typ    = typeEl ? typeEl.value : 'sonstiges';
 
-    // V63.77: Bei "Restnutzungsdauer-Gutachten" + Pro/Business-Plan → RND-Modul öffnen
-    // statt Mail-Anfrage.
-    if (typ === 'rnd' && planAllowsBankExport() && typeof window.DealPilotRND_UI !== 'undefined') {
-      closeModal();
-      setTimeout(openRND, 100);
-      return;
-    }
+    /* v1510: Hier stand die Weiche auf die ALTE Restnutzungsdauer-Oberflaeche
+       (rnd-ui.js). Sie war seit V144 unerreichbar: ein change-Listener am
+       Radio faengt die Auswahl "rnd" schon vorher ab und oeffnet den Wizard.
+       Oberflaeche und Weiche sind jetzt ausgebaut - die Datei liegt unter
+       docs/abgeloest/rnd-ui.js, falls jemand nachsehen will. */
 
     var msg    = val('da-expert-msg');
     var data   = collectObjectData();
@@ -1511,226 +1509,14 @@ window.DealPilotDealAction = (function() {
 
   // V63.77: RND-Modul öffnen (Pro/Business). Free/Starter/Investor sehen Anfrage-Hinweis.
   // V63.78: Pro-Mode komplett überarbeitet — Headline + CTA + Auto-Import, kein PDF-Export sichtbar
-  function openRND() {
-    var data = collectObjectData();
-    if (!data.objekt.adresse) {
-      return alert('Bitte zuerst Adresse im Objekt-Tab erfassen.');
-    }
-    var c = cfg();
-    var canUseModule = planAllowsBankExport() && typeof window.DealPilotRND_UI !== 'undefined';
+  /* v1510 · Marcel 22.09.2026: "kannst du das alte Modul ausbauen ... wenn
+     wir es einfach nicht brauchen, dann sollten wir es auch nicht abfragen."
+     Hier standen openRND(), _hideRNDExtras(), _updateRNDHeadline(),
+     _rndDealData() und submitRNDFromModule() - zusammen 221 Zeilen, die
+     alle nur die alte Oberflaeche bedient haben und seit V144 nicht mehr
+     erreichbar waren. Die beiden Helfer wurden ausschliesslich von openRND
+     benutzt (nachgesehen: keine weiteren Aufrufer). */
 
-    if (!canUseModule) {
-      // Kein Plan → Anfrage-Modal mit RND-spezifischem Vorschlagstext
-      openModal({
-        title: 'Restnutzungsdauer-Gutachten anfragen',
-        body: [
-          renderObjectPreview(data),
-          '<div class="da-rnd-upsell">',
-          '  <strong>RND-Vollmodul ist Pro/Business-exklusiv.</strong> Du kannst die Anfrage trotzdem stellen — wir erstellen das Gutachten manuell für dich.',
-          '</div>',
-          '<div class="da-cmt"><label>Was brauchst du genau?</label>',
-          '  <textarea id="da-rnd-msg" rows="4" placeholder="Beschreibe Modernisierungen, bekannte Schäden, Sondereinflüsse...">Ich benötige ein Restnutzungsdauer-Gutachten zur AfA-Optimierung für mein Objekt.</textarea>',
-          '</div>'
-        ].join(''),
-        foot: [
-          '<button class="btn btn-outline" onclick="DealPilotDealAction.closeModal()">Abbrechen</button>',
-          '<button class="btn btn-primary" onclick="DealPilotDealAction.submitRNDRequest()">' + ico('upload', 14) + ' Anfrage senden</button>'
-        ].join('')
-      });
-      return;
-    }
-
-    // V63.78: Pro/Business — neuer Aufbau
-    // - Großes Modal
-    // - Headline mit empfohlener RND prominent
-    // - RND-Modul gerendert (Export + AfA-Card per CSS-Klasse versteckt)
-    // - CTA "Gutachten beantragen" am Ende (sendet alles an dealpilot@)
-    openModal({
-      title: 'Restnutzungsdauer ermitteln — DealPilot Pro',
-      body: [
-        '<div class="da-rnd-headline" id="da-rnd-headline">',
-        '  <div class="da-rnd-headline-label">Empfohlene Restnutzungsdauer</div>',
-        '  <div class="da-rnd-headline-value">',
-        '    <span id="da-rnd-headline-num">—</span>',
-        '    <span class="da-rnd-headline-unit">Jahre</span>',
-        '  </div>',
-        '  <div class="da-rnd-headline-method" id="da-rnd-headline-method">wird berechnet…</div>',
-        '</div>',
-        '<div id="rnd-host" class="da-rnd-host da-rnd-host-pro"></div>'
-      ].join(''),
-      foot: [
-        '<button class="btn btn-outline" onclick="DealPilotDealAction.closeModal()">Schließen</button>',
-        '<button class="btn btn-primary da-rnd-cta" onclick="DealPilotDealAction.submitRNDFromModule()">',
-        ico('upload', 16) + ' Restnutzungsdauer-Gutachten beantragen',
-        '</button>'
-      ].join('')
-    });
-
-    // RND-Modul rendern + Objektdaten AUTOMATISCH übernehmen + Headline live updaten
-    setTimeout(function() {
-      var host = document.getElementById('rnd-host');
-      if (!host) return;
-      try {
-        window.DealPilotRND_UI.render(host, {
-          showPlanGate: false,
-          initialData: _rndDealData(data),
-          // V63.78: Bei jedem Recalc den Headline-Wert aktualisieren
-          onRecalc: function(result, afa) {
-            window._daRNDLastResult = { result: result, afa: afa };
-            _updateRNDHeadline(result);
-          }
-        });
-        // Objekt automatisch importieren — kein User-Klick nötig
-        if (typeof window.DealPilotRND_UI.loadObject === 'function') {
-          window.DealPilotRND_UI.loadObject(_rndDealData(data));
-        }
-        // V63.78: Cards verstecken die für den User nicht relevant sind
-        // (Berater-Sachen — Export, AfA-Vergleich mit Gutachterkosten, Override, Gutachten-Metadaten)
-        _hideRNDExtras(host);
-      } catch (e) {
-        console.error('[deal-action] RND init failed:', e);
-        host.innerHTML = '<p style="color:var(--red);padding:20px">RND-Modul konnte nicht geladen werden: ' + e.message + '</p>';
-      }
-    }, 50);
-  }
-
-  // V63.78: Versteckt Cards im RND-Modul, die für den End-User nicht relevant sind.
-  // Wir matchen über den H3-Text (robust gegen RND-interne Refactorings).
-  function _hideRNDExtras(host) {
-    var hideKeywords = [
-      'Export',
-      'AfA-Vergleich',
-      'Lohnt sich ein Gutachten',
-      'Sachverständigen-Override',
-      'Sachverständigen-RND',
-      'Gutachten-Daten',
-      'Gutachten-Metadaten'
-    ];
-    var cards = host.querySelectorAll('.rnd-card');
-    cards.forEach(function(card) {
-      var h3 = card.querySelector('h3');
-      if (!h3) return;
-      var text = (h3.textContent || '').trim();
-      for (var i = 0; i < hideKeywords.length; i++) {
-        if (text.indexOf(hideKeywords[i]) >= 0) {
-          card.style.display = 'none';
-          return;
-        }
-      }
-    });
-    // Disclaimer am Ende auch dezenter
-    var dis = host.querySelector('.rnd-disclaimer');
-    if (dis) dis.style.display = 'none';
-  }
-
-  // V63.78: Headline mit empfohlener RND aktualisieren
-  function _updateRNDHeadline(result) {
-    var num = $('da-rnd-headline-num');
-    var method = $('da-rnd-headline-method');
-    if (!result || !num) return;
-    // result-Struktur (RND-Modul): { rndJahre, methode, ... } oder result.empfehlung
-    var rnd = null, methodLabel = '';
-    if (result.empfehlung && result.empfehlung.rnd) {
-      rnd = result.empfehlung.rnd;
-      methodLabel = result.empfehlung.label || result.empfehlung.methode || '';
-    } else if (typeof result.rndJahre === 'number') {
-      rnd = result.rndJahre;
-      methodLabel = result.methode || '';
-    } else if (result.median) {
-      rnd = result.median;
-      methodLabel = 'Median über alle Verfahren';
-    }
-    if (rnd != null) num.textContent = Math.round(rnd);
-    if (methodLabel && method) method.textContent = 'Methode: ' + methodLabel;
-  }
-
-  // RND-Datenformat aus collectObjectData ableiten
-  function _rndDealData(d) {
-    var settings = {};
-    try { settings = JSON.parse(localStorage.getItem('dp_user_settings') || '{}'); } catch (e) {}
-    // V139: Komplettes Roh-Objekt aus localStorage holen, damit der V3-Mapper
-    // alle rate_*-Felder, ds2_*-Energieklasse, geb_ant etc. greifen kann.
-    var raw = {};
-    try {
-      var allObjs = JSON.parse(localStorage.getItem('ji_objects') || '[]');
-      var currentId = localStorage.getItem('dp_current_object_id') || '';
-      var match = allObjs.filter(function(o) { return o.id === currentId; })[0];
-      if (match && match.data) raw = match.data;
-    } catch (e) {}
-
-    return {
-      // Roh-Objekt-Felder für den V3-Mapper (rate_bad/boden/fenster/kueche, ds2_*, geb_ant)
-      kp:              d.finanz.kaufpreis || raw.kp,
-      geb_ant:         raw.geb_ant != null ? raw.geb_ant : 80,
-      rate_bad:        raw.rate_bad,
-      rate_boden:      raw.rate_boden,
-      rate_fenster:    raw.rate_fenster,
-      rate_kueche:     raw.rate_kueche,
-      ds2_energie:     raw.ds2_energie || raw.energieklasse,
-      ds2_zustand:     raw.ds2_zustand,
-      objart:          raw.objart || raw.objektTyp || 'etw',
-      grenz:           raw.grenz,
-      afa_satz:        raw.afa_satz,
-      // Plus die abstrahierten Felder als Fallback (V2-Kompat)
-      baujahr:         d.objekt.baujahr ? parseInt(d.objekt.baujahr, 10) : (raw.baujahr || null),
-      objektTyp:       'etw',
-      kaufdatum:       d.objekt.kaufdatum || raw.kaufdatum || new Date().toISOString().slice(0, 10),
-      kaufpreis:       d.finanz.kaufpreis || raw.kp,
-      grundstueckswert: 0,
-      adresse:         d.objekt.adresse,
-      einheit:         '',
-      wohnflaeche:     d.objekt.wohnflaeche || raw.wfl,
-      eigentuemer:     settings.user_name || '',
-      zve_geschaetzt:  0
-    };
-  }
-
-  // V63.78: Submit aus dem RND-Modul (Pro) — nutzt aktuelle Berechnung
-  function submitRNDFromModule() {
-    var data = collectObjectData();
-    var c    = cfg();
-    var rndResult = window._daRNDLastResult || {};
-    var rndStr = '';
-    try {
-      if (typeof window.DealPilotRND_UI !== 'undefined' && typeof window.DealPilotRND_UI.getCurrentResult === 'function') {
-        var current = window.DealPilotRND_UI.getCurrentResult();
-        if (current) rndResult = current;
-      }
-    } catch (e) {}
-
-    if (rndResult && rndResult.result) {
-      var emp = rndResult.result.empfehlung || {};
-      rndStr += '\n── Berechnete Restnutzungsdauer ──\n';
-      if (emp.rnd) rndStr += 'Empfohlene RND: ' + Math.round(emp.rnd) + ' Jahre\n';
-      if (emp.label || emp.methode) rndStr += 'Methode: ' + (emp.label || emp.methode) + '\n';
-      if (rndResult.result.byMethod) {
-        rndStr += 'Alle Verfahren:\n';
-        Object.keys(rndResult.result.byMethod).forEach(function(k) {
-          var v = rndResult.result.byMethod[k];
-          if (v && typeof v.rnd === 'number') {
-            rndStr += '  ' + k + ': ' + Math.round(v.rnd) + ' J.\n';
-          }
-        });
-      }
-    }
-
-    var subject = 'RND-Gutachten beantragen — ' + (data.objekt.adresse || 'Objekt');
-    var bodyText = buildEmailBody('expert', data, 'Bitte erstellt mir ein Restnutzungsdauer-Gutachten für mein Objekt. Die mit DealPilot ermittelten Werte habe ich unten beigefügt.') + rndStr;
-
-    submitWithFallback({
-      kind: 'expert',
-      to: c.expert && c.expert.email,
-      subject: subject,
-      body: bodyText,
-      data: data,
-      files: {}
-    }, function(success, mode) {
-      if (success) showSuccess('expert', c.expert.email, mode);
-      else alert('Versand fehlgeschlagen.');
-    });
-  }
-
-  // Submit der RND-Anfrage (Free/Starter/Investor — Mail-Workflow)
   function submitRNDRequest() {
     var msg  = val('da-rnd-msg');
     var data = collectObjectData();
@@ -1967,14 +1753,21 @@ window.DealPilotDealAction = (function() {
       'ds2_energie':     ['ds2_energie',   'input-ds2-energie'],
       'ds2_zustand':     ['ds2_zustand',   'input-ds2-zustand']
     };
+    /* v1503 · gemessen am 21.09.2026 an Rinteln: ds2_energie und ds2_zustand
+       kamen als "- keine Angabe" und "- bitte waehlen" im Wizard an. Beide
+       Felder sind LEERE Auswahllisten; `el.value` ist '', und der Rueckfall
+       auf `el.textContent` liest dann den Text ALLER Optionen. Eine leere
+       Liste wurde so zu einer Angabe - dieselbe Sorte Fehler wie die
+       Vorbelegungen im BMF-Modal. Bei Eingabefeldern gilt nur der Wert. */
     Object.keys(fieldMap).forEach(function(wizField) {
       var ids = fieldMap[wizField];
       for (var i = 0; i < ids.length; i++) {
         var el = document.getElementById(ids[i]);
-        if (el) {
-          var val = el.value || el.textContent || '';
-          if (val) { prefill[wizField] = val; break; }
-        }
+        if (!el) continue;
+        var istFeld = /^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName);
+        var val = istFeld ? (el.value || '') : (el.value || el.textContent || '');
+        val = String(val).trim();
+        if (val) { prefill[wizField] = val; break; }
       }
     });
 
@@ -2008,17 +1801,101 @@ window.DealPilotDealAction = (function() {
     if (prefill.mea) prefill.einheit = prefill.mea;
     if (prefill.kuerzel) prefill.kuerzel_kurz = prefill.kuerzel;
 
-    // Auftraggeber aus User-Settings
+    /* v1503 · Marcel: "schau, ob wir alle Felder schon vorbefuellen, die wir
+       vorbefuellen koennen."
+       Gemessen: Strasse, PLZ, Ort und E-Mail des Auftraggebers blieben LEER,
+       obwohl sie in den Einstellungen stehen - nur unter anderen Namen. Hier
+       wurde nach user_str/user_plz/user_ort/user_email gesucht, gespeichert
+       sind sie als pdf_address/pdf_plz/pdf_city/pdf_email. Ein
+       Namensraum-Irrtum, der still nichts findet.
+       Zweite Quelle ist das Branding - dasselbe, aus dem die PDFs ihren
+       Absender nehmen. Und wie dort gilt: steht im Namensfeld eine
+       E-Mail-Adresse, ist das kein Name. */
     try {
       var settings = JSON.parse(localStorage.getItem('dp_user_settings') || '{}');
-      if (settings.user_name)  prefill.auftraggeber_name    = settings.user_name;
-      if (settings.user_email) prefill.auftraggeber_email   = settings.user_email;
-      if (settings.user_str)   prefill.auftraggeber_strasse = settings.user_str;
-      if (settings.user_plz)   prefill.auftraggeber_plz     = settings.user_plz;
-      if (settings.user_ort)   prefill.auftraggeber_ort     = settings.user_ort;
+      var marke = {};
+      try {
+        if (window.DealPilotConfig && DealPilotConfig.branding &&
+            typeof DealPilotConfig.branding.get === 'function') {
+          marke = DealPilotConfig.branding.get() || {};
+        }
+      } catch(e2) {}
+      function istMail(s){ return /\S+@\S+\.\S+/.test(String(s || '')); }
+      function nimm(){
+        for (var i = 0; i < arguments.length; i++) {
+          var v = arguments[i];
+          if (v != null && String(v).trim() !== '') return String(v).trim();
+        }
+        return '';
+      }
+      var name = nimm(settings.user_name, marke.name, marke.company);
+      if (istMail(name)) name = nimm(settings.user_company, marke.company);
+      var mail = nimm(settings.pdf_email, settings.user_email, marke.email,
+                      istMail(settings.user_name) ? settings.user_name : '');
+      var str  = nimm(settings.pdf_address, settings.user_str, marke.address);
+      var plz  = nimm(settings.pdf_plz, settings.user_plz, marke.plz);
+      var ort  = nimm(settings.pdf_city, settings.user_ort, marke.city);
+      /* v1509 · Marcel: "am Schluss die E-Mail-Adresse, die haben wir ja
+         meistens auch, dann koennen wir das auch uebernehmen."
+         Schritt 8 des Wizards fragt Name, E-Mail und Erstellungsort des
+         SACHVERSTAENDIGEN - bei Marcel ist das er selbst. Die Angaben stehen
+         in denselben Einstellungen, aus denen der Absender der PDFs kommt. */
+      if (name) prefill.sv_name = name;
+      if (mail) prefill.sv_email = mail;
+      if (ort)  prefill.erstellungsort = ort;
+      if (name) prefill.auftraggeber_name    = name;
+      if (mail) prefill.auftraggeber_email   = mail;
+      if (str)  prefill.auftraggeber_strasse = str;
+      if (plz)  prefill.auftraggeber_plz     = plz;
+      if (ort)  prefill.auftraggeber_ort     = ort;
     } catch(e) {}
     // Stichtag = heute
     prefill.stichtag = new Date().toISOString().slice(0, 10);
+
+    /* v1608 · Der Modernisierungsgrad aus dem Objekt in den Assistenten.
+       Seit v1608 fragt der Sprechlauf die acht Bauteile nach Anlage 2
+       und legt sie als Objektfelder ab (mod_dach, mod_fenster, ...).
+       Ohne diese Zeilen fragt der Assistent dieselben acht Dinge gleich
+       noch einmal - und der Nutzer haette zu Recht das Gefuehl, dass
+       ihm niemand zuhoert.
+
+       buildInitialState() fuehrt Objekte zusammen statt sie zu
+       ersetzen, `mod` kommt also vollstaendig an. */
+    try {
+      var _mod = {};
+      ['dach', 'fenster', 'leitungen', 'heizung', 'aussenwand',
+       'baeder', 'innenausbau', 'grundriss'].forEach(function (k) {
+        var el = document.getElementById('mod_' + k);
+        var v = el && el.value ? String(el.value).trim() : '';
+        if (v) _mod[k] = v;
+      });
+      if (Object.keys(_mod).length) prefill.mod = _mod;
+    } catch (e) {}
+
+    /* v1598b · Gebaeudeanteil und Grenzsteuersatz fuer den AfA-Vergleich.
+       Ohne sie rechnete der Ergebnisschirm des Assistenten auf dem
+       Rueckfallwert 200.000 EUR - bei einem Objekt fuer 743.000 EUR
+       standen dort 4.000 EUR Standard-AfA statt 11.888 EUR.
+
+       rnd-wizard.js hat dafuer eine eigene Funktion, prefillFromDealPilot(),
+       die genau das richtig ausrechnet. Sie wird exportiert und von
+       NIEMANDEM aufgerufen (gemessen am 24.09.2026: ein grep ueber
+       frontend/js findet nur Definition und Export). Gefuettert wird der
+       Assistent von hier - also gehoeren die beiden Werte hierher.
+
+       Die Namen mit _dp davor sind die, die buildInitialState in den
+       State durchreicht und computeAfaEstimate dort wieder abholt.
+
+       Gerechnet wird mit parseDe - dem Parser, den calc.js fuer JEDES
+       Feld benutzt. Ein eigener parseFloat haette den deutschen
+       Tausenderpunkt als Dezimalpunkt gelesen: "743.000 €" wurde im
+       Trockenlauf zu 743, der Gebaeudeanteil damit zu 557 EUR. */
+    var _pd  = (typeof window.parseDe === 'function') ? window.parseDe : parseFloat;
+    var _kp  = _pd(prefill.kp) || 0;
+    var _ga  = _pd(prefill.geb_ant) || 80;
+    var _grz = _pd(prefill.grenz) || 42;
+    if (_kp > 0) prefill._dpGebaeudeanteil = _kp * _ga / 100;
+    prefill._dpGrenzsteuersatz = _grz / 100;
 
     console.log('[RND-Wizard] Prefill ermittelt:', prefill);
     return prefill;
@@ -2465,6 +2342,22 @@ window.DealPilotDealAction = (function() {
     openFB: openFB,
     openExpert: openExpert,
     openExpertWithRnd: openExpertWithRnd,
+    /* v1501 · Marcel 21.09.2026: "bei dem Button Restnutzungsdauer berechnen
+       gibt er automatisch eine Spanne an, das macht er im Tab Steuer nicht,
+       dort kommt ein Modal. Hat er denn ueberhaupt alle Werte dafuer im
+       BMF-Rechner?"
+       Nein, hatte er nicht - und das war der Fehler. Der Knopf im BMF-Rechner
+       nahm fehlende Modernisierungsangaben still als "veraltet" an und rechnete
+       damit eine zu kurze Restnutzungsdauer. Damit beide Wege dieselbe
+       Vorbefuellung benutzen statt zweier Listen, wird sie hier
+       herausgegeben. */
+    getRndPrefill: _getRndPrefill,
+    /* v1502: auch die Umrechnung der Wizard-Antworten in die Eingaben des
+       Rechenkerns wird herausgegeben - sonst baut der BMF-Rechner eine
+       zweite Abbildung derselben Felder, und die beiden laufen
+       auseinander, sobald eine Frage dazukommt. */
+    buildRndCalcInput: _buildCalcInputFromWizard,
+    openRndWizard: openExpertWithRnd,
     openPortfolioStrategy: openPortfolioStrategy,
     openDatenraumSettings: openDatenraumSettings,
     _rndOrderExpert: _rndOrderExpert,
@@ -2476,9 +2369,7 @@ window.DealPilotDealAction = (function() {
     openConsult: openConsult,
     openConsultQuick: openConsultQuick,
     submitExpert: submitExpert,
-    openRND: openRND,
     submitRNDRequest: submitRNDRequest,
-    submitRNDFromModule: submitRNDFromModule,
     submitConsultQuick: submitConsultQuick,
     bookSlot: bookSlot,
     submit: submit,

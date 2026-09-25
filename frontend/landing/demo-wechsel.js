@@ -23,10 +23,15 @@
    wie die vier statischen Fassungen auf demo-steuer.html. Zwei
    Darstellungen, eine Quelle.
 
-   Das Objekt ist erfunden (Lindenallee 14), die Zahlen sind in sich
-   gerechnet: Baujahr 1994, GND 80, Stichtag 2026 -> 32 Jahre Alter,
-   rechnerisch RND 48, mit neun Modernisierungspunkten 51 im Rahmen
-   44-56.
+   Die Anschrift ist erfunden (Gerberstraße 27), die ZAHLEN sind es
+   nicht: das Objekt wurde am 24.09.2026 in DealPilot angelegt und
+   komplett durchgerechnet (Staging 2026-1037). Bruttorendite 5,58 %,
+   DSCR 1,275, Faktor 17,9, DealPilot Score 88, Investor Deal Score 76.
+
+   Baujahr 1968, GND 70 (MFH, Anlage 1 ImmoWertV), Stichtag 2026 -> 58
+   Jahre Alter. Mit zwei Modernisierungspunkten nach Anlage 2 nennt der
+   Assistent den Rahmen 14 bis 24 Jahre - gegen die pauschalen 50 des
+   Regelfalls. Das ist der Sprung, den die Demo zeigt.
 
    Auch die Antworten des Co-Piloten sind GERECHNET, nicht getextet:
    der Break-Even ergibt sich aus der Mietsteigerung, das Vermoegen
@@ -77,9 +82,14 @@
   var OBJ = { adr: S.O.adr, art: S.O.art };
 
   /* ── Sprechlauf: was gesagt wird und wohin es fällt ──────────────── */
-  var SATZ = 'Lindenallee vierzehn, dreikommafünf Zimmer, zweiundachtzig '
-    + 'Quadratmeter, Baujahr vierundneunzig, Kaufpreis zweihundertneunund'
-    + 'achtzigtausend, Kaltmiete tausendachtzig, Hausgeld zweihundertzehn.';
+  /* v1600 · Vorher die Lindenallee, eine ETW fuer 289.000. Jetzt das
+     Mehrfamilienhaus, das in der App wirklich angelegt und
+     durchgerechnet wurde. Gesprochen wird, wie jemand spricht -
+     Zahlen als Woerter, keine Ziffern. */
+  var SATZ = 'Gerberstraße siebenundzwanzig, Mehrfamilienhaus, sechs '
+    + 'Einheiten, vierhundertzweiunddreißig Quadratmeter, Baujahr '
+    + 'achtundsechzig, Kaufpreis siebenhundertdreiundvierzigtausend, '
+    + 'Kaltmiete dreitausendvierhundertsechsundfünfzig.';
   var FELDER = [
     ['Kaufpreis', eur(S.O.kaufpreis)], ['Wohnfläche', S.O.wfl + ' m²'],
     ['Baujahr', String(S.O.bj)],
@@ -222,8 +232,11 @@
           'weiterrechnen lohnt sich')
         + '</div>'
         + karte('DEAL SCORE · QUICK-CHECK', Q.score, Q.stufe,
-          [['Rendite', 35, 68], ['Finanzierung', 25, 0], ['Risiko', 20, 62],
-           ['Lage & Markt', 10, 71], ['Upside', 10, 0]],
+          /* v1600 · dieselben Gewichte wie in Stufe 9 - es ist DIESELBE
+             Karte, nur frueher. Unterschiedliche Gewichte haetten den
+             Vergleich, um den es geht, still kaputtgemacht. */
+          [['Rendite', 40, 68], ['Finanzierung', 25, 0], ['Risiko', 20, 62],
+           ['Lage & Markt', 8, 68], ['Upside', 7, 0]],
           '<div class="wx-k-offen"><span class="l">NOCH OFFEN</span>'
           + Q.fehlt.map(function (x) {
               return '<div><span class="pt"></span>' + esc(x) + '</div>';
@@ -233,9 +246,18 @@
 
     /* ── 3 · MARKTPREISINDIKATION ────────────────────────────────── */
     if (a.k === 'indikation') {
-      var p0 = (S.MPI.von - 240000) / 80000 * 100;
-      var p1 = (S.MPI.bis - 240000) / 80000 * 100;
-      var pk = (S.O.kaufpreis - 240000) / 80000 * 100;
+      /* v1600 · Hier standen 240000 und 80000 fest - die Skala der
+         Lindenallee. Beim Mehrfamilienhaus lagen Spanne und Kaufpreis
+         komplett ausserhalb, der Balken waere aus dem Bild gelaufen.
+         Die Skala spannt sich jetzt aus den Werten selbst auf, mit
+         etwas Luft links und rechts. */
+      var _lo = Math.min(S.MPI.von, S.O.kaufpreis);
+      var _hi = Math.max(S.MPI.bis, S.O.kaufpreis);
+      var _luft = Math.max(20000, (_hi - _lo) * 0.35);
+      var _a = _lo - _luft, _spanne = (_hi + _luft) - _a;
+      var p0 = (S.MPI.von - _a) / _spanne * 100;
+      var p1 = (S.MPI.bis - _a) / _spanne * 100;
+      var pk = (S.O.kaufpreis - _a) / _spanne * 100;
       var mitte = (S.MPI.von + S.MPI.bis) / 2;
       return titel('STUFE 3 · MARKTPREISINDIKATION',
         'Liegt der Preis überhaupt im Rahmen?',
@@ -435,9 +457,16 @@
         + rz('Was den Unterschied macht', '', '',
           'Finanzierung gerechnet · Steuerwirkung bekannt · Werte amtlich belegt')
         + '</div>'
+        /* v1600 · Teilnoten UND Gewichte aus der laufenden App gelesen,
+           am 24.09.2026 an diesem Objekt (Staging 2026-1037):
+             Rendite 72 (40 %) · Finanzierung 90 (25 %) · Risiko 75 (20 %)
+             Lage & Markt 68 (8 %) · Upside 56 (7 %)  ->  76 Gut
+           Vorher standen hier 35/25/20/10/10 und andere Teilnoten -
+           geschaetzt, und sie ergaben die 76 nur zufaellig. Die
+           Gewichte der App sind andere. */
         + karte('INVESTOR DEAL SCORE', 76, 'Gut',
-          [['Rendite', 35, 72], ['Finanzierung', 25, 86], ['Risiko', 20, 79],
-           ['Lage & Markt', 10, 71], ['Upside', 10, 63]],
+          [['Rendite', 40, 72], ['Finanzierung', 25, 90], ['Risiko', 20, 75],
+           ['Lage & Markt', 8, 68], ['Upside', 7, 56]],
           '<div class="wx-k-kpi">'
           + '<div><b class="wx-zahl" data-ziel="' + eur(S.O.kaufpreis) + '">&nbsp;</b>'
           + '<span>KAUFPREIS</span></div>'
@@ -535,7 +564,7 @@
         }).join('') + '</div>'
       + '<div class="wx-ordner">'
       + '<div class="wx-o-h">' + ik('stapel', 15)
-      + '<span>Datenraum · Lindenallee 14</span></div>'
+      + '<span>Datenraum · Gerberstraße 27</span></div>'
       + ['01 Exposé & Inserat', '02 Objektunterlagen', '03 Bank',
          '04 Steuern', '05 Bewertung', '06 Fotos'].map(function (o, i) {
           var voll = /03|04|05/.test(o.slice(0, 2));

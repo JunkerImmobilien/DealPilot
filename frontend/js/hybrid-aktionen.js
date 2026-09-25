@@ -52,6 +52,18 @@
   /* Score aus dem Kopf uebernehmen (dort ausgeblendet, aber im DOM).
      Die Stufen-Schwellen stehen in js/dashboard.js:390 - hier wird nur
      eingefaerbt, nicht neu bewertet. */
+  /* v1521 · gemessen an der Hermannstrasse: der Kopf liefert bei 87 Punkten
+     'Sehr gut'. Die Kette der Objektkarte (js/dashboard.js:390) kennt diese
+     Stufe nicht - dort heisst es ab 85 TOP, ab 70 GUT, ab 50 SOLIDE, ab 35
+     SCHWACH, darunter KRITISCH. Die Abweichung steht in CLAUDE.md als offen
+     vermerkt; solange der Kopf im Hellmodus ausgeblendet ist, ist die Spalte
+     die EINZIGE Anzeige - dann muss dort die geltende Kette stehen.
+     Der Kopftext wird nur noch genommen, wenn er zur Kette passt. */
+  function stufe(n, st) {
+    var soll = n >= 85 ? 'TOP' : n >= 70 ? 'GUT' : n >= 50 ? 'SOLIDE' : n >= 35 ? 'SCHWACH' : 'KRITISCH';
+    var ausKopfText = (st && st.textContent.trim()) || '';
+    return ausKopfText.toUpperCase() === soll ? ausKopfText : soll;
+  }
   function farbe(n) { return n >= 85 ? '#2E8455' : n >= 70 ? '#3FA56C' : n >= 50 ? 'var(--wl-c9a84c, #C9A84C)' : n >= 35 ? '#C2703F' : '#B8625C'; }
   /* v1455c · gemessen: der Kopf LAESST den alten Score im DOM stehen und
      blendet ihn per Inline-Stil aus (display:none), dazu body.hdr-no-score.
@@ -61,15 +73,97 @@
   function score() {
     var host = document.getElementById('dp-hy-score'); if (!host) return;
     var mini = document.getElementById('hdr-score-mini');
-    if (document.body.classList.contains('hdr-no-score') || !gilt(mini)) { host.innerHTML = ''; host.style.display = 'none'; return; }
+    /* v1519 · gemessen: der Zweig aus v1518 wurde nie erreicht. Diese Zeile
+       steigt VORHER aus, wenn der Kopf keinen Score zeigt - und genau dann
+       soll die Spalte ja einspringen. Schon zum zweiten Mal in diesem
+       Projekt hat ein frueher Ausstieg eine neue Ergaenzung verschluckt
+       (siehe v1493). Wer unten etwas anhaengt, muss oben nachsehen, ob die
+       Funktion dort schon herausspringt. */
+    if (document.body.classList.contains('hdr-no-score') || !gilt(mini)) {
+      var nurTeile = bereiche();
+      if (!nurTeile) { host.innerHTML = ''; host.style.display = 'none'; return; }
+      host.style.display = '';
+      host.innerHTML = '<div class="lbl">Investor Deal Score</div>'
+        + '<div class="dp-hy-warte">' + wartetext() + '</div>'
+        + nurTeile;
+      return;
+    }
     var b = mini && mini.querySelector('b'), st = mini && mini.querySelector('span');
     var n = b ? parseInt(String(b.textContent).replace(/[^0-9]/g, ''), 10) : NaN;
-    if (!isFinite(n)) { host.innerHTML = ''; host.style.display = 'none'; return; }
+    if (!isFinite(n)) {
+      /* v1518 · gemessen an Rinteln: die Spalte blieb leer, obwohl der
+         Rechenkern laengst Zahlen hatte. Ursache ist der 70-%-Riegel in
+         calc.js: unter dieser Vollstaendigkeit zeigt der Kopf KEINEN Score
+         (body.hdr-banner-only), und die Spalte schrieb ihn nur ab.
+         Die Regel bleibt - eine Gesamtnote aus einem Drittel der Angaben
+         waere eine Behauptung. Aber die fuenf Bereiche stehen trotzdem, und
+         dazu der Grund, warum die Note fehlt. Das ist der Unterschied
+         zwischen 'nichts da' und 'noch nicht so weit'. */
+      var teile = bereiche();
+      if (!teile) { host.innerHTML = ''; host.style.display = 'none'; return; }
+      host.style.display = '';
+      host.innerHTML = '<div class="lbl">Investor Deal Score</div>'
+        + '<div class="dp-hy-warte">' + wartetext() + '</div>'
+        + teile;
+      return;
+    }
     host.style.display = '';
     host.innerHTML = '<div class="lbl">Investor Deal Score</div>'
       + '<div class="dp-hy-score-z"><b style="color:' + farbe(n) + '">' + n + '</b><span>/ 100</span>'
-      + '<em style="background:' + farbe(n) + '">' + ((st && st.textContent.trim()) || '') + '</em></div>'
-      + '<div class="dp-hy-bar"><i style="width:' + Math.max(2, Math.min(100, n)) + '%;background:' + farbe(n) + '"></i></div>';
+      + '<em style="background:' + farbe(n) + '">' + stufe(n, st) + '</em></div>'
+      + '<div class="dp-hy-bar"><i style="width:' + Math.max(2, Math.min(100, n)) + '%;background:' + farbe(n) + '"></i></div>'
+      + bereiche();
+  }
+
+  /* v1516 · Marcel 22.09.2026: "dass wir dort halt auch noch den Deal-Score
+     hinpacken ... also quasi das, was wir oben haben, mit den Parametern
+     Rendite, Finanzierung, Risiko, Lage und Upside."
+     Die Zahlen kommen aus DealScore2.compute() - demselben Kern, der auch
+     den Kopf speist. Kein zweiter Rechenweg, kein Abschreiben aus dem DOM:
+     nur die Gesamtzahl wird weiter aus dem Kopf uebernommen, weil sie dort
+     schon steht (und die Spalte sonst einen anderen Stand zeigen koennte als
+     der Kopf zwei Zentimeter daneben). */
+  var BEREICHE = [
+    ['rendite', 'Rendite'],
+    ['finanzierung', 'Finanzierung'],
+    ['risiko', 'Risiko'],
+    ['lage', 'Lage'],
+    ['upside', 'Upside'],
+  ];
+  function bereiche() {
+    var erg = null;
+    try {
+      if (window.DealScore2 && typeof window.DealScore2.compute === 'function'
+          && typeof window._buildDeal2FromState === 'function') {
+        erg = window.DealScore2.compute(window._buildDeal2FromState());
+      }
+    } catch (e) { return ''; }
+    if (!erg || !erg.categories) return '';
+    var zeilen = BEREICHE.map(function (b) {
+      var c = erg.categories[b[0]];
+      if (!c || c.score == null || !isFinite(c.score)) return '';
+      var w = Math.max(2, Math.min(100, Math.round(c.score)));
+      /* Wie viele Kennzahlen dahinterstehen, gehoert dazu: ein Bereich aus
+         einer einzigen Angabe ist etwas anderes als einer aus sechs. */
+      var tief = (c.availableKpis != null && c.totalKpis)
+        ? '<em>' + c.availableKpis + '/' + c.totalKpis + '</em>' : '';
+      return '<div class="dp-hy-br">'
+        + '<span>' + b[1] + tief + '</span>'
+        + '<div class="dp-hy-brbar"><i style="width:' + w + '%;background:' + farbe(c.score) + '"></i></div>'
+        + '<b>' + Math.round(c.score) + '</b>'
+        + '</div>';
+    }).join('');
+    if (!zeilen) return '';
+    return '<div class="dp-hy-bereiche">' + zeilen + '</div>';
+  }
+  /* Sagt, warum die Gesamtnote noch fehlt - mit der Zahl, die der Kopf
+     ohnehin fuehrt, nicht mit einer zweiten Rechnung. */
+  function wartetext() {
+    var t = ausKopf('.hdr-comp-text', '#hdr-completeness');
+    var proz = t && t.match(/(\d+)\s*%/);
+    return proz
+      ? 'Gesamtnote ab 70 % Vollst\u00e4ndigkeit \u00b7 aktuell ' + proz[1] + ' %'
+      : 'Gesamtnote erscheint ab 70 % Vollst\u00e4ndigkeit';
   }
   function ausKopf(sel, wirt) { var e = document.querySelector(sel); if (!e) return null; if (wirt && !gilt(document.querySelector(wirt))) return null; var t = e.textContent.trim().replace(/\s+/g, ' '); return t || null; }
   function kennzahlen() {

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Messkabine · DealPilot</title>
+<!--
+  messkabine.html · v1591
+
+  Die Fenstergröße des Browsers wirkt in dieser Umgebung NICHT auf den
+  Viewport der Seite — gemessen am 24.09.2026: resize_window auf 390 px
+  meldet Erfolg, innerWidth bleibt bei 1920. Responsives Verhalten lässt
+  sich so nicht prüfen.
+
+  Was funktioniert, ist ein iframe mit fester Breite. Weil er dieselbe
+  Herkunft hat wie die App, kann von außen hineingemessen werden.
+
+  Der Träger muss eine Seite OHNE laufende App sein: sonst läuft die
+  Anwendung zweimal, teilt sich localStorage und Service Worker, und man
+  misst am Ende die Störung statt die Seite.
+-->
+<style>
+  :root{color-scheme:dark}
+  *{box-sizing:border-box}
+  body{margin:0;background:#0b0b0c;color:#e9e6df;
+    font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+  header{padding:14px 18px;border-bottom:1px solid #2a2724;
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  h1{font-size:16px;margin:0;font-weight:700}
+  .hin{font-size:12px;color:#8b857b}
+  .geraete{display:flex;gap:6px;flex-wrap:wrap}
+  button{background:#1a1816;color:#d8d3ca;border:1px solid #33302b;
+    padding:7px 12px;font:600 12px/1 inherit;cursor:pointer}
+  button.an{background:#C9A84C;color:#241c06;border-color:#C9A84C}
+  main{padding:18px;display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+  .rahmen{border:1px solid #33302b;background:#000;flex:none;position:relative}
+  .rahmen b{position:absolute;top:-22px;left:0;font:600 11px/1 monospace;color:#8b857b}
+  iframe{display:block;border:0;width:100%;height:100%;background:#fff}
+  .werte{flex:1;min-width:260px;font:12px/1.7 ui-monospace,monospace;
+    background:#131211;border:1px solid #2a2724;padding:14px}
+  .werte h2{font-size:12px;margin:0 0 8px;letter-spacing:.1em;color:#C9A84C}
+  .ok{color:#5BD98E} .warn{color:#E8CC7A} .bad{color:#E4A89E}
+</style>
+</head>
+<body>
+<header>
+  <h1>Messkabine</h1>
+  <span class="hin">Der iframe hat dieselbe Herkunft — von außen messbar.</span>
+  <div class="geraete" id="g"></div>
+</header>
+<main>
+  <div class="rahmen" id="rahmen"><b id="lbl"></b><iframe id="f" title="Prüfling"></iframe></div>
+  <div class="werte" id="w"><h2>MESSWERTE</h2>wird geladen …</div>
+</main>
+<script>
+(function(){
+  'use strict';
+  var GERAETE = [
+    ['iPhone SE',        375,  667],
+    ['iPhone 14',        390,  844],
+    ['iPhone 14 Pro Max',430,  932],
+    ['iPad mini',        768, 1024],
+    ['iPad Pro 11"',     834, 1194],
+    ['Desktop',         1280,  800]
+  ];
+  var ZIEL = new URLSearchParams(location.search).get('ziel') || '/';
+  var f = document.getElementById('f'), rahmen = document.getElementById('rahmen');
+  var lbl = document.getElementById('lbl'), w = document.getElementById('w');
+  var aktuell = null;
+
+  GERAETE.forEach(function(g, i){
+    var b = document.createElement('button');
+    b.textContent = g[0] + ' · ' + g[1];
+    b.onclick = function(){ waehle(i); };
+    document.getElementById('g').appendChild(b);
+  });
+
+  function waehle(i){
+    var g = GERAETE[i];
+    aktuell = g;
+    [].forEach.call(document.querySelectorAll('#g button'), function(b, k){
+      b.className = k === i ? 'an' : '';
+    });
+    rahmen.style.width = g[1] + 'px';
+    rahmen.style.height = Math.min(g[2], 760) + 'px';
+    lbl.textContent = g[0] + ' — ' + g[1] + '×' + g[2];
+    f.src = ZIEL + (ZIEL.indexOf('?') >= 0 ? '&' : '?') + 'mk=' + Date.now();
+  }
+
+  f.addEventListener('load', function(){ setTimeout(messen, 1400); });
+
+  function messen(){
+    var d, win;
+    try { d = f.contentDocument; win = f.contentWindow; }
+    catch(e){ w.innerHTML = '<h2>MESSWERTE</h2><span class="bad">Kein Zugriff: ' + e.message + '</span>'; return; }
+    if (!d) { w.innerHTML = '<h2>MESSWERTE</h2><span class="bad">Kein Dokument</span>'; return; }
+
+    var de = d.documentElement, body = d.body;
+    var breite = win.innerWidth;
+    var ueberlauf = Math.max(de.scrollWidth, body ? body.scrollWidth : 0) - breite;
+
+    /* Was ragt heraus? Gegen den klippenden Vorfahren prüfen, nicht gegen
+       den Viewport — sonst zählt jedes Element in einem Scrollcontainer mit. */
+    var raus = [];
+    if (body) [].forEach.call(d.querySelectorAll('body *'), function(el){
+      var r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) return;
+      if (r.right > breite + 1) {
+        var p = el.parentElement, klippt = false;
+        while (p && p !== body) {
+          var ov = win.getComputedStyle(p).overflowX;
+          if (ov === 'auto' || ov === 'scroll' || ov === 'hidden') { klippt = true; break; }
+          p = p.parentElement;
+        }
+        if (!klippt) raus.push({
+          t: (el.tagName.toLowerCase() + '.' + (el.className || '').toString().split(' ')[0]).slice(0, 34),
+          px: Math.round(r.right - breite)
+        });
+      }
+    });
+    raus.sort(function(a,b){ return b.px - a.px; });
+
+    /* Klickflächen unter 44 px sind auf dem Finger schwer zu treffen. */
+    var klein = 0, gesamt = 0;
+    if (body) [].forEach.call(d.querySelectorAll('a,button,input,select,[role=button]'), function(el){
+      var r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) return;
+      gesamt++;
+      if (r.height < 40 || r.width < 40) klein++;
+    });
+
+    var txt = '<h2>MESSWERTE · ' + aktuell[0] + '</h2>';
+    txt += 'Viewport      ' + breite + ' × ' + win.innerHeight + '\n';
+    txt += 'Überlauf      ' + (ueberlauf > 1
+      ? '<span class="bad">' + ueberlauf + ' px zu breit</span>'
+      : '<span class="ok">keiner</span>') + '\n';
+    txt += 'Klickflächen  ' + gesamt + ', davon ' + (klein
+      ? '<span class="warn">' + klein + ' unter 40 px</span>'
+      : '<span class="ok">keine zu klein</span>') + '\n';
+    if (raus.length) {
+      txt += '\n<span class="bad">RAGT HERAUS</span>\n';
+      raus.slice(0, 8).forEach(function(r){ txt += '  ' + r.t + '  +' + r.px + ' px\n'; });
+      if (raus.length > 8) txt += '  … und ' + (raus.length - 8) + ' weitere\n';
+    }
+    w.innerHTML = txt.replace(/\n/g, '<br>');
+  }
+
+  waehle(1);
+})();
+</script>
+</body>
+</html>

@@ -29,7 +29,9 @@
   // ─── State ───────────────────────────────────────────────────────────
   window._v292State = {
     response: null,           // Backend-Response von /pipeline
-    selectedVariant: 'konservativ',
+    /* v1491: Vorauswahl ist die AMTLICHE Zahl - wer abweichen will, waehlt
+       das bewusst, nicht durch Nichtstun. */
+    selectedVariant: 'amtlich',
     isLoading: false,
     lastError: null,
     lastInputs: null
@@ -114,7 +116,15 @@
       ort:        _v('ort'),
       str:        _v('str'),
       hnr:        _v('hnr'),
-      objart_bmf: 'Wohnungseigentum [WE]',
+      /* v1474 · Hier stand 'Wohnungseigentum [WE]' FEST verdrahtet. Die
+         Pipeline rechnete damit jedes Objekt als Eigentumswohnung — auch ein
+         Mietwohngrundstueck. Gemessen am MFH Rinteln (21.09.2026): 81,54 %
+         Gebaeudeanteil statt 80,59 %, Ertragswert 647.019 statt 615.123 EUR.
+         Betroffen waren Reiter 3 und 4 inklusive des VERTRAGSTEXTES, waehrend
+         Reiter 2 (amtlicher Lauf) richtig rechnete — zwei Aufteilungen im
+         selben Fenster. Die Art kommt jetzt aus der Auswahl; der alte Wert
+         bleibt nur noch Rueckfall, wenn das Feld fehlt. */
+      objart_bmf: (_v('bmf_art') || 'Wohnungseigentum [WE]'),
       /* V293d-pane2-bevorzugt: Pane-2-Felder (bmf_*) BEVORZUGT vor Tab-Quellen.
        * Grund: Listener haengen auf bmf_* — Aenderung dort muss in die Berechnung.
        * Fallback auf Tab-Quelle, falls Pane-2-Feld leer. */
@@ -230,9 +240,17 @@
 
   // ─── Variant-Wahl ────────────────────────────────────────────────────
   window._v292SelectVariant = function(name){
-    if (!['konservativ', 'optimiert', 'aggressiv'].includes(name)) return;
+    if (!['amtlich', 'konservativ', 'optimiert', 'aggressiv'].includes(name)) return;
     window._v292State.selectedVariant = name;
     window._v292RenderAll();
+    /* v1491 · Marcel: "wenn man das auswaehlt, dass das auch uebernommen wird
+       und man dort nicht einfach eine Zahl eingeben kann" - der Reiter
+       Bodenabschlag zieht den Prozentsatz der gewaehlten Variante nach.
+       Aendern bleibt erlaubt; das Feld sagt dann nur nicht mehr, es komme
+       von hier. Die Uebernahme selbst steht in bmf-bodenabschlag.js. */
+    try {
+      if (typeof window._dpBodenAusVariante === 'function') window._dpBodenAusVariante(name);
+    } catch (e) { console.warn('[v1491] Bodenabschlag-Sync:', e.message); }
     /* V292.6.3-variant-klausel-sync: Klauseltext auch updaten
      * (selectKlausel updated 'AKTUELLE VARIANTE: XYZ' + Klauseltext-Box) */
     try {
@@ -404,15 +422,17 @@
     var p11 = r.phase11_risiko;
 
     var ampelEmoji = { gruen: '🟢', gelb: '🟡', rot: '🔴' };
-    var variants = ['konservativ', 'optimiert', 'aggressiv'];
+    /* v1491: vier Spalten - amtlich plus drei Abweichungen. */
+    var variants = ['amtlich', 'konservativ', 'optimiert', 'aggressiv'];
     var labels = {
-      konservativ: { name: 'Konservativ', sub: '× 1,00 · BMF-Wert' },
-      optimiert:   { name: 'Optimiert',   sub: '× 0,85 · Boden −15 %' },
+      amtlich:     { name: 'Amtlich',     sub: '× 1,00 · BMF-Arbeitshilfe' },
+      konservativ: { name: 'Konservativ', sub: '× 0,85 · Boden −15 %' },
+      optimiert:   { name: 'Optimiert',   sub: '× 0,80 · Boden −20 %' },
       aggressiv:   { name: 'Aggressiv',   sub: '× 0,75 · Boden −25 %' }
     };
 
     var html = '<div class="v292-pane3-header">' +
-      '<div class="banner info"><strong>Drei Vertragsvarianten — wählen Sie in Pane 4 die für Ihre Risikobereitschaft passende.</strong> ' +
+      '<div class="banner info"><strong>Die amtliche Aufteilung und drei Abweichungen davon — wählen Sie in Pane 4.</strong> ' +
       'Alle Werte basieren auf der BMF-Berechnung (' + _fmtPct(r.phase4_bmf.gebaeudeanteil_prozent) + ' Gebäude per Ertragswertverfahren).</div>' +
       '</div>' +
       '<table class="v292-vergleich-tbl">' +
@@ -478,19 +498,22 @@
 
     var ampelEmoji = { gruen: '🟢', gelb: '🟡', rot: '🔴' };
     var labels = {
+      amtlich:     'Amtlich',
       konservativ: 'Konservativ',
       optimiert:   'Optimiert',
       aggressiv:   'Aggressiv'
     };
     var subLabels = {
-      konservativ: '× 1,00 · BMF-Referenz',
-      optimiert:   '× 0,85 · Boden −15 %',
+      amtlich:     '× 1,00 · BMF-Arbeitshilfe',
+      konservativ: '× 0,85 · Boden −15 %',
+      optimiert:   '× 0,80 · Boden −20 %',
       aggressiv:   '× 0,75 · Boden −25 %'
     };
 
     var html = '';
-    ['konservativ', 'optimiert', 'aggressiv'].forEach(function(name){
+    ['amtlich', 'konservativ', 'optimiert', 'aggressiv'].forEach(function(name){
       var v = p5[name];
+      if (!v) return;
       var afa = p10[name];
       var risk = p11[name];
       var isSelected = name === selected;
@@ -585,7 +608,8 @@
       var klauselTextEl = document.getElementById('klauselText');
       if (klauselTextEl && (!klauselTextEl.innerHTML || klauselTextEl.innerHTML.trim() === '')) {
         if (typeof window.selectKlausel === 'function') {
-          window.selectKlausel(selected === 'konservativ' ? 'konservativ' : (selected === 'aggressiv' ? 'aggressiv' : 'moderat'));
+          /* v1491: vier Varianten auf die drei Klauseltexte abbilden. */
+          window.selectKlausel(selected === 'amtlich' ? 'konservativ' : (selected === 'aggressiv' ? 'aggressiv' : 'moderat'));
         }
       }
     } catch(e) { console.warn('[v292.2] selectKlausel:', e); }
@@ -658,7 +682,7 @@
         badge.style.cssText = 'margin-left:6px;padding:2px 6px;background:var(--gold,#C9A84C);color:#fff;border-radius:3px;font-size:10px;font-weight:600;letter-spacing:.05em';
         label.appendChild(badge);
       } else {
-        existingBadge.textContent = '🤖 BMF · ' + ({konservativ:'Kons',optimiert:'Opt',aggressiv:'Aggr'}[selected] || selected);
+        existingBadge.textContent = '🤖 BMF · ' + ({amtlich:'Amtl',konservativ:'Kons',optimiert:'Opt',aggressiv:'Aggr'}[selected] || selected);
       }
     }
 
@@ -745,37 +769,90 @@
       var bannerInfo = document.querySelector('#p-ak .banner.info');
       if (bannerInfo) bannerInfo.style.display = 'none';
 
-      var paneAk = document.getElementById('p-ak');
-      var skeleton = document.getElementById('v292_ak_summary');
-      if (paneAk && !skeleton) {
-        skeleton = document.createElement('div');
-        skeleton.id = 'v292_ak_summary';
-        skeleton.className = 'v292-summary-box';
-        skeleton.innerHTML =
-          '<div class="v292-summary-banner v292-compact">' +
-            '⏳ <strong>Pipeline berechnet...</strong> ' +
-            'Werte aus Tab Investition + Inventar-Detail-Box werden zusammengeführt.' +
-          '</div>' +
-          '<div class="v292-summary-grid v292-compact" style="opacity:0.4">' +
-            '<div class="v292-row"><span>Brutto-Kaufpreis</span><span>...</span></div>' +
-            '<div class="v292-row v292-row-minus"><span>− Inventar (Detail-Box)</span><span>...</span></div>' +
-            '<div class="v292-row v292-row-result"><span><b>= Immobilien-KP</b></span><span>...</span></div>' +
-            '<div class="v292-row v292-row-plus"><span>+ Nebenkosten</span><span>...</span></div>' +
-            '<div class="v292-row v292-row-final"><span><b>= Prognose-AK</b></span><span><b>...</b></span></div>' +
-          '</div>';
-        paneAk.insertBefore(skeleton, paneAk.firstChild);
-      }
-
-      // V292 Banner: zeigt dass Pipeline läuft
-      _renderLoading();
-
-      // Ersten Pipeline-Call triggern (direkt, nicht debounced)
-      _doPipelineCall();
+      /* v1499b: hier stand eine Platzhalterbox mit 'Pipeline berechnet...'
+         und Punkten statt Zahlen. Sie ist ersatzlos weg - die Werte stehen
+         sofort zur Verfuegung, es gibt nichts zu ueberbruecken. */
+      /* v1499: Reiter 1 wird sofort aus den Feldern gefuellt. Die Pipeline
+         laeuft NICHT mehr beim Oeffnen - sie fuettert Reiter 3 und 4, und die
+         sind zu, solange keine Pflichtangabe fehlt. Angestossen wird sie beim
+         Wechsel dorthin (switchPane in bmf-modal.js). Vorher standen beim
+         Oeffnen zwei Backend-Rufe von je rund drei Sekunden an, fuer einen
+         Reiter, der sie gar nicht braucht. */
+      try { _v292SofortSumme(); } catch (e) { console.warn('[v1499] Sofortsumme:', e.message); }
 
       // Event-Listener für Live-Berechnung bei Pane 2 GAA-Änderungen
       _attachLivePipelineListeners();
     }, 100);
   };
+
+  /* v1499 · Marcel 21.09.2026: "wenn ich auf BMF-Rechner klicke dauert es
+     extrem lange bis die Anschaffungskosten geladen sind."
+     Gemessen: die Zahlen sind nach 1 ms da - aber der Reiter zeigte ein
+     Skelett mit "Pipeline berechnet..." und Platzhalterpunkten, bis das
+     Backend nach rund drei Sekunden antwortete. Und die Antwort enthaelt
+     NICHTS, was der Browser nicht schon wuesste: Brutto-Kaufpreis, Inventar,
+     Nebenkosten und Prognose-AK stehen alle als Felder im DOM (gegengeprueft
+     an Rinteln: prognose_ak 738.300 = ak_total, nk_aufschluesselung = die
+     vier ak_-Felder). Das Backend hat drei Sekunden lang nachgerechnet, was
+     daneben schon stand.
+     Also: die Box wird SOFORT aus den Feldern gefuellt. Die Pipeline
+     ueberschreibt sie spaeter - und ist damit eine Gegenprobe statt einer
+     Wartezeit. */
+  function _v292SofortSumme(){
+    var paneAk = document.getElementById('p-ak');
+    if (!paneAk) return;
+    function z(id){
+      var el = document.getElementById(id);
+      if (!el) return 0;
+      var s = (el.value || el.textContent || '').toString();
+      s = s.replace(/\./g, '').replace(',', '.').replace(/[^\d.\-]/g, '');
+      var v = parseFloat(s);
+      return isNaN(v) ? 0 : v;
+    }
+    var kp       = z('ak_kp');
+    var inv      = z('inv_kueche') + z('inv_moebel') + z('inv_geraete')
+                 + z('inv_pv') + z('inv_stellplatz') + z('inv_sonst');
+    var grest    = z('ak_grest'), notar = z('ak_notar'), gba = z('ak_gba');
+    var makler   = z('ak_makler'), jiSonst = z('ak_ji');
+    var reise    = z('ak_fahrt') + z('ak_verpfl') + z('ak_hotel');
+    var sonstige = z('ak_gutachten') + z('ak_anwalt') + z('ak_sonst');
+    var nk       = grest + notar + gba + makler + jiSonst + reise + sonstige;
+    var immoKp   = kp - inv;
+    var ak       = immoKp + nk;
+    if (!kp && !nk) return;   /* nichts zu zeigen - dann auch keine leere Box */
+
+    var box = document.getElementById('v292_ak_summary');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'v292_ak_summary';
+      box.className = 'v292-summary-box';
+      paneAk.insertBefore(box, paneAk.firstChild);
+    }
+    box.innerHTML =
+      '<div class="v292-summary-banner v292-compact">' +
+        'Werte aus Tab Investition + Inventar-Detail-Box. Änderungen bitte dort.' +
+      '</div>' +
+      '<div class="v292-summary-grid v292-compact">' +
+        '<div class="v292-row"><span>Brutto-Kaufpreis</span><span>' + _fmtEur(kp) + '</span></div>' +
+        '<div class="v292-row v292-row-minus"><span>− Inventar (Detail-Box)</span><span>' + _fmtEur(inv) + '</span></div>' +
+        '<div class="v292-row v292-row-result"><span><b>= Immobilien-KP</b> <span class="v292-arrow">→ Basis für BMF</span></span><span><b>' + _fmtEur(immoKp) + '</b></span></div>' +
+        '<div class="v292-row v292-row-plus"><span>+ Nebenkosten</span><span>' + _fmtEur(nk) + '</span></div>' +
+        '<div class="v292-nk-detail">' +
+          /* v1504: dieselben Zeilen wie nach der Pipeline, auch mit null -
+             eine Aufstellung, die beim Oeffnen kuerzer ist als zwei Sekunden
+             spaeter, liest sich wie eine fehlende Tabelle. */
+          '<div>├ Grunderwerbsteuer: <b>' + _fmtEur(grest) + '</b></div>' +
+          '<div>├ Notar: <b>' + _fmtEur(notar) + '</b></div>' +
+          '<div>├ Grundbuchamt: <b>' + _fmtEur(gba) + '</b></div>' +
+          '<div>├ Makler: <b>' + _fmtEur(makler) + '</b></div>' +
+          '<div>├ Sonstiges (ji_e): <b>' + _fmtEur(jiSonst) + '</b></div>' +
+          (reise    > 0 ? '<div>├ Fahrtkosten: <b>' + _fmtEur(reise, 2) + '</b></div>' : '') +
+          (sonstige > 0 ? '<div>└ Gutachten/Anwalt/Sonstiges: <b>' + _fmtEur(sonstige, 2) + '</b></div>' : '') +
+        '</div>' +
+        '<div class="v292-row v292-row-final"><span><b>= Prognose-AK</b> <span class="v292-arrow">→ Basis für AfA</span></span><span class="v292-final-value"><b>' + _fmtEur(ak) + '</b></span></div>' +
+      '</div>';
+  }
+  window._v292SofortSumme = _v292SofortSumme;
 
   function _attachLivePipelineListeners(){
     // Verhindere doppeltes Anhängen

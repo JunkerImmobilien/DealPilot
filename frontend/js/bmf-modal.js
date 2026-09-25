@@ -142,6 +142,38 @@ function syncFromTabInvest(){
   // Vorher: Felder behielten HTML-Defaults (96,2 etc.) oder KI-Werte (brw 160)
   // wenn der Tab-Objekt-Wert 0 war. Jetzt: IMMER aus Tab Objekt setzen,
   // bei 0 leeren statt Default/KI-Wert behalten.
+  /* v1488 · gemessen am 21.09.2026 an Rinteln (objart = MFH, 8 Einheiten):
+     #bmf_art stand auf "Wohnungseigentum [WE]" - der ersten Option der Liste.
+     Die Grundstuecksart wurde NIRGENDS aus dem Objekt gesetzt, sie blieb
+     schlicht stehen. In der amtlichen Arbeitshilfe haengen daran die
+     typisierten Herstellungskosten, die Bewirtschaftungskosten und die
+     Miteigentumsrechnung - ein Mehrfamilienhaus als Eigentumswohnung
+     gerechnet ergibt eine falsche Aufteilung, und nichts widerspricht.
+     Die Liste der Arbeitshilfe kennt sieben Arten; abgebildet wird auf den
+     Wortlaut der Vorlage, denn die Zelle ist dort eine Auswahlliste. */
+  var _BMF_ART = {
+    ETW:   'Wohnungseigentum [WE]',
+    MFH:   'Mietwohngrundstücke (Mehrfamilienhäuser)',
+    EFH:   'Ein- und Zweifamilienhäuser [EFH/ZFH]',
+    ZFH:   'Ein- und Zweifamilienhäuser [EFH/ZFH]',
+    DHH:   'Ein- und Zweifamilienhäuser [EFH/ZFH]',
+    RH:    'Ein- und Zweifamilienhäuser [EFH/ZFH]',
+    BUERO: 'Geschäftsgrundstücke, Bürogebäude',
+    GESCH: 'Geschäftsgrundstücke, Geschäftshäuser',
+    GEW:   'Geschäftsgrundstücke, Geschäftshäuser',
+  };
+  (function () {
+    var sel = $('bmf_art'); if (!sel) return;
+    var art = _BMF_ART[String(_val('objart') || '').toUpperCase()];
+    if (!art) return;                       /* HOTEL, GAR, leer: nicht raten */
+    var kennt = false;
+    for (var i = 0; i < sel.options.length; i++) if (sel.options[i].value === art) kennt = true;
+    if (!kennt) return;
+    if (sel.value === art) return;
+    sel.value = art;
+    try { sel.dispatchEvent(new Event('change', { bubbles: true })); } catch (_) {}
+  })();
+
   _setField('bmf_bj', _val('baujahr'), true);
   _setField('bmf_datum', _val('kaufdat'), true);
   // Wohnfläche mit Komma-Format — IMMER setzen (auch leeren bei 0)
@@ -159,11 +191,18 @@ function syncFromTabInvest(){
 
   /* V300-miete-sync-readonly: bmf_miete aus nkm. Vorhanden -> readonly+Auto;
    * leer (Leerstand) -> editierbar + Pflichtfeld. */
+  /* v1492 · Marcel 21.09.2026: "fuer mich sieht das aus, als ob das manchmal
+     mit den Formatierungen nicht passt, der Felder."
+     Gemessen an Rinteln: jedes Euro-Feld im Reiter 1 steht als "690.000,00",
+     die Miete stand daneben als nacktes "4200". Zwei Schreibweisen fuer
+     dieselbe Sorte Zahl im selben Fenster - das liest sich wie ein Fehler,
+     auch wenn richtig gerechnet wird. Die Miete geht jetzt durch denselben
+     Formatierer. */
   var _nkm = parseDe(_val('nkm'));
   var _mEl = $('bmf_miete');
   if (_mEl) {
     if (_nkm > 0) {
-      _mEl.value = _nkm.toString().replace('.', ',');
+      _mEl.value = _formatEur(_nkm);   /* v1492: gleiches Format wie jedes andere Euro-Feld */
       _mEl.setAttribute('readonly', '');
       _mEl.setAttribute('data-auto', '');
       _mEl.classList.remove('dp-required-bmf');
@@ -281,7 +320,15 @@ function _bmfPflichtZeichnen(){
     if (el) el.classList.remove('dp-required-bmf');
   }
 
-  if (!fehlt.length){ box.hidden = true; box.innerHTML = ''; return fehlt; }
+  if (!fehlt.length){
+    box.hidden = true; box.innerHTML = '';
+    /* v1493: AUCH hier nachziehen. Vorher sprang die Funktion an dieser
+       Stelle heraus, und die Sperre aus dem Zustand davor blieb stehen -
+       gemessen: Baujahr nachgetragen, Reiter weiter zu. Ein Schloss, das
+       sich nicht wieder oeffnet, ist schlimmer als keines. */
+    try { _bmfTabsSperren(); } catch(e) {}
+    return fehlt;
+  }
 
   var zeilen = fehlt.map(function(e){
     var el = $(e.id);
@@ -300,11 +347,23 @@ function _bmfPflichtZeichnen(){
     + 'plausibel aussieht und vor dem Finanzamt nicht hält. Deshalb hält der '
     + 'Rechner hier an, statt eine Zahl zu liefern.</div>';
   box.hidden = false;
+  try { _bmfTabsSperren(); } catch(e) {}   /* v1492 */
   return fehlt;
 }
 
 // V289.2: Auto-Berechnen wenn alle Pflichtfelder ausgefüllt
-function _maybeAutoTriggerBmf(){
+/* v1499: ... aber nur, wenn das Ergebnis auch jemand sieht. Vorher lief die
+   Rechnung beim Oeffnen und nach jeder Eingabe - jedes Mal ein LibreOffice-
+   Lauf von rund drei Sekunden, auch wenn der Nutzer nur die
+   Anschaffungskosten eintippen wollte. Gerechnet wird jetzt, wenn ein Reiter
+   das Ergebnis zeigt. `erzwingen` ist der ausdrueckliche Wunsch - etwa beim
+   Wechsel auf Reiter 3 oder 4. */
+function _bmfErgebnisSichtbar(){
+  var aktiv = document.querySelector('.bmfmo-pane.active');
+  return !!aktiv && _BMF_BRAUCHT_ERGEBNIS.indexOf(aktiv.id) >= 0;
+}
+function _maybeAutoTriggerBmf(erzwingen){
+  if (!erzwingen && !_bmfErgebnisSichtbar()) return;
   /* v1382: derselbe Prueter wie fuer Kasten und Knopf. Die alte Liste
      stand hier als Literal und war zu kurz. */
   var fehlt = _bmfPflichtZeichnen();
@@ -337,7 +396,52 @@ document.addEventListener('keydown', function(e){
   }
 });
 
+/* v1492 · Marcel: "man kann es ja oeffnen, kann dann sagen, wenn Daten
+   fehlen und kann dann vielleicht nicht weiterklicken. Weil dafuer muessen ja
+   alle Daten vorhanden sein."
+   Vorher liess sich jeder Reiter oeffnen. Auf Reiter 3 und 4 stand dann
+   entweder nichts oder - schlimmer - der Stand des zuletzt gerechneten
+   Objekts: Zahlen, die aussehen wie die eigenen. Das Fenster geht weiter
+   auf (man soll ja sehen, was fehlt), aber die Reiter, die ein Ergebnis
+   zeigen, bleiben zu, bis es eines gibt. */
+var _BMF_BRAUCHT_ERGEBNIS = ['p-afa', 'p-hebel'];
+
+function _bmfTabsSperren(){
+  var fehlt = (typeof _bmfFehlend === 'function') ? _bmfFehlend() : [];
+  var zu = fehlt.length > 0;
+  document.querySelectorAll('.bmfmo-tab').forEach(function(b){
+    if (_BMF_BRAUCHT_ERGEBNIS.indexOf(b.dataset.pane) < 0) return;
+    b.classList.toggle('bmfmo-tab-gesperrt', zu);
+    b.setAttribute('aria-disabled', zu ? 'true' : 'false');
+    b.title = zu
+      ? 'Erst die Pflichtangaben ausfuellen - es fehlen noch ' + fehlt.length + '.'
+      : '';
+  });
+  var weiter = document.getElementById('btnBmfNext');
+  if (weiter) {
+    var aktiv = document.querySelector('.bmfmo-pane.active');
+    var zielGesperrt = zu && aktiv && _BMF_BRAUCHT_ERGEBNIS.indexOf(
+      _BMF_PANE_ORDER[_BMF_PANE_ORDER.indexOf(aktiv.id) + 1]) >= 0;
+    weiter.classList.toggle('bmfmo-tab-gesperrt', !!zielGesperrt);
+  }
+  return fehlt;
+}
+
 function switchPane(id){
+  /* Sperre zuerst - erst danach wird irgendetwas umgeschaltet. */
+  if (_BMF_BRAUCHT_ERGEBNIS.indexOf(id) >= 0) {
+    var fehlt = (typeof _bmfFehlend === 'function') ? _bmfFehlend() : [];
+    if (fehlt.length) {
+      if (typeof _bmfPflichtZeichnen === 'function') _bmfPflichtZeichnen();
+      var namen = fehlt.map(function(e){ return e.name; }).join(', ');
+      if (typeof window.toast === 'function') {
+        window.toast('Noch nicht so weit \u2014 es fehlt: ' + namen);
+      }
+      var box = document.getElementById('bmfPflichtBox');
+      if (box && box.scrollIntoView) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+  }
   // V289.2.3: Klassen-Fix — beim Mockup-Rename wurden HTML-Klassen .mtab → .bmfmo-tab
   // umbenannt, aber diese JS-Selektoren nicht mit gefixt → Tabs ohne Funktion.
   document.querySelectorAll('.bmfmo-tab').forEach(function(b){
@@ -348,6 +452,13 @@ function switchPane(id){
   });
   // V289.2.3: Footer-Navigation aktualisieren
   if(typeof _updateFooterNav === 'function') _updateFooterNav(id);
+  try { _bmfTabsSperren(); } catch(e) {}   /* v1492 */
+
+  /* v1499: JETZT rechnen - der Reiter zeigt gleich ein Ergebnis. */
+  if (_BMF_BRAUCHT_ERGEBNIS.indexOf(id) >= 0) {
+    try { if (typeof window._v292Pipeline === 'function') window._v292Pipeline(); } catch(e) {}
+    try { _maybeAutoTriggerBmf(true); } catch(e) {}
+  }
 
   // V289.2.5: Pane-spezifische Render-Funktionen
   if(id === 'p-afa' && typeof _renderVergleich === 'function'){
@@ -512,7 +623,19 @@ function runBmf(){
       var nk = (parseDe(_v('gest_e')) || 0) + (parseDe(_v('notar_e')) || 0)
              + (parseDe(_v('gba_e')) || 0) + (parseDe(_v('makler_e')) || 0)
              + (parseDe(_v('ji_e')) || 0);
-      return immoKp + nk;
+      /* v1478 · Marcel 21.09.2026: "warum ist die Fahrten nicht mit drin? das sind
+         Fahrten die ja mit dem Kauf zusammenhaengen". Richtig — Fahrten zum Objekt
+         und zum Notar, ein Wertgutachten zur Kaufentscheidung, Anwaltskosten des
+         Erwerbs und sonstige Erwerbskosten sind ANSCHAFFUNGSNEBENKOSTEN. Sie
+         gehoeren in die Summe, die die Arbeitshilfe aufteilt. Bis hierher kamen
+         nur GrESt, Notar, Grundbuch, Makler und Vermittlung an.
+         NICHT hier hinein gehoeren Kosten, die erst die AfA ermitteln
+         (Honorar fuer die Kaufpreisaufteilung, Restnutzungsdauergutachten,
+         Steuerberatung) — die sind sofort abziehbar und stehen im Reiter
+         Bodenabschlag als eigener Posten. */
+      var nkWeitere = (parseDe(_v('ak_fahrt')) || 0) + (parseDe(_v('ak_gutachten')) || 0)
+                    + (parseDe(_v('ak_anwalt')) || 0) + (parseDe(_v('ak_sonst')) || 0);
+      return immoKp + nk + nkWeitere;
     })(),
     baujahr: parseInt(($('bmf_bj') || {}).value || _v('baujahr')) || 0,
     wohnflaeche: parseDe(($('bmf_wfl') || {}).value || _v('wfl')),
@@ -901,6 +1024,13 @@ document.addEventListener('input', function(e){
     try{ _dpInjectTreeHk(); }catch(_e){}
     if(_dpPipeT) clearTimeout(_dpPipeT);
     _dpPipeT = setTimeout(function(){
+      /* v1499: die Pipeline fuettert Reiter 3 und 4. Wer im Reiter 1 tippt,
+         loest damit keinen Backend-Lauf mehr aus; die Summenbox rechnet
+         ohnehin lokal mit. */
+      if (typeof _bmfErgebnisSichtbar === 'function' && !_bmfErgebnisSichtbar()) {
+        try{ if(typeof window._v292SofortSumme === 'function') window._v292SofortSumme(); }catch(_e){}
+        return;
+      }
       try{ if(typeof window._v292Pipeline === 'function') window._v292Pipeline(); }catch(_e){}
     }, 400);
   }
@@ -1778,7 +1908,7 @@ function _ensureModalLoaded(callback){
   _bmfModalLoading = true;
   console.log('[bmf-modal] Modal-HTML wird geladen...');
 
-  fetch('/js/bmf-modal-html.html?v=v1382', { cache: 'no-store' })
+  fetch('/js/bmf-modal-html.html?v=v1496', { cache: 'no-store' })
     .then(function(r){
       if(!r.ok){ throw new Error('HTTP ' + r.status); }
       return r.text();
@@ -1801,6 +1931,9 @@ function _ensureModalLoaded(callback){
 }
 
 function openBMFModal(){
+  /* v1493: nach dem Vorbefuellen den Reiterzustand setzen. Ohne das stand
+     die Sperre aus dem Moment des Oeffnens, als die Felder noch leer waren. */
+  setTimeout(function(){ try { _bmfPflichtZeichnen(); } catch(e) {} }, 350);
   // V289.2.1: Plan-Check defensiv beim Klick
   // W41-bmf-gate: hier stand der Advanced-Check — das Pro-Extra. Damit war der
   //               ganze Rechner Pro-only, obwohl die Landing (Z.2850) Investor

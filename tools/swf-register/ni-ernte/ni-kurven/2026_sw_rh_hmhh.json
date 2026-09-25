@@ -1,0 +1,8 @@
+{
+  "workbook": "2026_sw_rh_hmhh",
+  "view": "Dash",
+  "kurven": [
+    { "merkmal": "Restnutzungsdauern", "normobjekt": "40", "stuetzstellen": {"20": 0.81, "25": 0.87, "30": 0.92, "35": 0.97, "40": 1.0, "45": 1.03, "50": 1.06, "55": 1.08, "60": 1.1, "65": 1.12, "70": 1.14, "75": 1.15} },
+    { "merkmal": "Standardstufen", "normobjekt": "2,5", "stuetzstellen": {"1,5": 0.95, "2,5": 1.0, "3,5": 1.05, "4,5": 1.11} }
+  ]
+}

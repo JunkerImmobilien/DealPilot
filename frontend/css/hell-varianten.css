@@ -1,0 +1,142 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   hell-varianten.css · v1517 — sechs Kartenbilder zum Umschalten
+   ───────────────────────────────────────────────────────────────────────
+   Greift nur, wenn <html data-dp-karte="v1..v6"> gesetzt ist. Ohne das
+   Attribut aendert diese Datei nichts. Jede Variante fasst dieselben drei
+   Flaechen an, die heute alle cremefarben sind: Seite, Seitenleiste und
+   Objektkarte - dazu Kopfleiste und Reiterzeile, damit die Ansicht als
+   Ganzes zusammenpasst.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Der Umschalter selbst ─────────────────────────────────────────── */
+#dp-kv-panel{
+  position:fixed; right:14px; bottom:14px; z-index:9998; width:214px;
+  background:#fff; border:1px solid #E6E0D3; border-radius:12px;
+  box-shadow:0 12px 34px rgba(42,39,39,.18); overflow:hidden;
+  font:13px/1.4 Inter,system-ui,sans-serif;
+}
+#dp-kv-panel .dp-kv-kopf{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:9px 12px; border-bottom:1px solid #F0ECE3;
+  font:600 10.5px/1 "JetBrains Mono",ui-monospace,monospace;
+  letter-spacing:.09em; text-transform:uppercase; color:#9a7f33;
+}
+#dp-kv-panel .dp-kv-zu{
+  background:none; border:0; font-size:17px; line-height:1; color:#A39B8C; cursor:pointer;
+}
+#dp-kv-panel button[data-v]{
+  display:block; width:100%; text-align:left; background:none; border:0;
+  border-bottom:1px solid #F5F2EA; padding:8px 12px; cursor:pointer;
+}
+#dp-kv-panel button[data-v]:hover{ background:#FBF8F1; }
+#dp-kv-panel button[data-v].an{ background:#FBF6E9; box-shadow:inset 3px 0 0 #C9A84C; }
+#dp-kv-panel button[data-v] b{ display:block; font-size:12.8px; font-weight:600; color:#2A2727; }
+#dp-kv-panel button[data-v] span{ display:block; font-size:11px; color:#8A8272; margin-top:1px; }
+#dp-kv-panel .dp-kv-fuss{
+  padding:7px 12px 9px; font-size:10.5px; color:#A39B8C; background:#FCFBF8;
+}
+
+/* ══ 1 · Weisse Karte auf Creme ═════════════════════════════════════ */
+html[data-dp-karte="v1"] body .sb-card{
+  background:#fff !important; border:1px solid #E8E2D6 !important;
+  box-shadow:0 1px 2px rgba(42,39,39,.04) !important;
+}
+html[data-dp-karte="v1"] body .sb-card:hover{
+  border-color:var(--wl-c9a84c,#C9A84C) !important;
+  box-shadow:0 3px 10px rgba(201,168,76,.16) !important;
+}
+html[data-dp-karte="v1"] body .sidebar{ background:#F7F5F1 !important; }
+
+/* ══ 2 · Goldkante links ════════════════════════════════════════════ */
+html[data-dp-karte="v2"] body .sb-card{
+  background:#fff !important; border:1px solid #EDE8DC !important;
+  border-left:3px solid var(--wl-c9a84c,#C9A84C) !important;
+  border-radius:0 8px 8px 0 !important; box-shadow:none !important;
+}
+html[data-dp-karte="v2"] body .sb-card:hover{
+  background:#FEFCF7 !important; border-left-color:var(--wl-b8932f,#b8932f) !important;
+}
+html[data-dp-karte="v2"] body .sidebar{ background:#FBFAF7 !important; }
+
+/* ══ 3 · Deutlicher Rahmen ══════════════════════════════════════════ */
+html[data-dp-karte="v3"] body .sb-card{
+  background:#fff !important; border:1.5px solid #D8D2C4 !important;
+  box-shadow:0 2px 5px rgba(42,39,39,.07) !important;
+}
+html[data-dp-karte="v3"] body .sb-card:hover{
+  border-color:#2A2727 !important; transform:translateY(-1px);
+  box-shadow:0 5px 14px rgba(42,39,39,.12) !important;
+}
+html[data-dp-karte="v3"] body .sidebar{ background:#F2F0EB !important; }
+html[data-dp-karte="v3"] body .sbc-score-overlay .sbc-mini-score-num{ color:#2A2727 !important; }
+
+/* ══ 4 · Ohne Creme - Grau und Weiss ════════════════════════════════ */
+html[data-dp-karte="v4"] body{ background:#F1F2F4 !important; }
+html[data-dp-karte="v4"] body .sidebar{ background:#F7F8FA !important; border-right-color:#E2E5E9 !important; }
+html[data-dp-karte="v4"] body .sb-card{
+  background:#fff !important; border:1px solid #E2E5E9 !important;
+  box-shadow:0 1px 3px rgba(20,25,35,.06) !important;
+}
+html[data-dp-karte="v4"] body .sb-card:hover{
+  border-color:#C6CBD3 !important; box-shadow:0 4px 12px rgba(20,25,35,.1) !important;
+}
+html[data-dp-karte="v4"] body header.hdr{ background:#fff !important; border-bottom-color:#E2E5E9 !important; }
+/* ═══ v1538 · die Reiterleiste ══════════════════════════════════════════
+   Marcel am 22.09.2026: "Bitte die Schriften in den Tab-Leisten/Header
+   richtig weiss wie rechts in der Leiste, wo Aktionen steht."
+   Gemessen: nav.tabs stand auf #FBFAF7 (--uv-chrome), nicht auf dem Wert
+   der Variante. Ursache war nicht die Farbe, sondern die Spezifitaet -
+   siehe der Kommentar am Selektor. v4 traegt jetzt Weiss wie die
+   Aktionsspalte (#FFFFFF), damit beide Leisten denselben Grund haben. */
+html[data-dp-karte="v4"] body header.hdr.has-v64-score + nav.tabs.tabs, 
+html[data-dp-karte="v4"] body nav.tabs.tabs{
+  background:#FFFFFF !important; border-bottom:1px solid #E2E5E9 !important; }
+html[data-dp-karte="v4"] body .card,
+html[data-dp-karte="v4"] body .panel{ background:#fff !important; border-color:#E2E5E9 !important; }
+
+/* ══ 5 · Karte mit Kopfleiste ═══════════════════════════════════════ */
+html[data-dp-karte="v5"] body .sb-card{
+  background:#fff !important; border:1px solid #E6E0D3 !important;
+  box-shadow:0 1px 3px rgba(42,39,39,.05) !important; overflow:hidden;
+}
+html[data-dp-karte="v5"] body .sbc-top-line1{
+  background:#FBF6E9; border-bottom:1px solid #EDE4CE;
+  margin:-9px -12px 8px; padding:6px 12px;
+}
+html[data-dp-karte="v5"] body .sb-card:hover{
+  border-color:var(--wl-c9a84c,#C9A84C) !important;
+  box-shadow:0 4px 12px rgba(201,168,76,.15) !important;
+}
+html[data-dp-karte="v5"] body .sidebar{ background:#F7F5F1 !important; }
+
+/* ══ 6 · Ruhige Liste ═══════════════════════════════════════════════ */
+html[data-dp-karte="v6"] body .sidebar{ background:#fff !important; }
+html[data-dp-karte="v6"] body .sb-card{
+  background:transparent !important; border:0 !important;
+  border-bottom:1px solid #EDE9E0 !important; border-radius:0 !important;
+  box-shadow:none !important; margin-bottom:0 !important;
+}
+html[data-dp-karte="v6"] body .sb-card:hover{ background:#FAF8F3 !important; }
+html[data-dp-karte="v6"] body .sb-card:last-of-type{ border-bottom:0 !important; }
+html[data-dp-karte="v6"] body .sbcm{ background:transparent !important; border-color:transparent !important; }
+
+/* ── Kopfleiste und Reiter ziehen mit (Marcels Wunsch) ─────────────── */
+html[data-dp-karte="v1"] body header.hdr,
+html[data-dp-karte="v3"] body header.hdr,
+html[data-dp-karte="v5"] body header.hdr{ background:#fff !important; }
+html[data-dp-karte="v2"] body header.hdr{
+  background:#fff !important; box-shadow:inset 0 -2px 0 rgba(201,168,76,.35);
+}
+html[data-dp-karte="v6"] body header.hdr{ background:#fff !important; box-shadow:none !important; }
+html[data-dp-karte="v1"] body header.hdr.has-v64-score + nav.tabs.tabs, 
+html[data-dp-karte="v1"] body nav.tabs.tabs,
+html[data-dp-karte="v2"] body header.hdr.has-v64-score + nav.tabs.tabs, 
+html[data-dp-karte="v2"] body nav.tabs.tabs,
+html[data-dp-karte="v5"] body header.hdr.has-v64-score + nav.tabs.tabs, 
+html[data-dp-karte="v5"] body nav.tabs.tabs{ background:#FBFAF7 !important; }
+html[data-dp-karte="v3"] body header.hdr.has-v64-score + nav.tabs.tabs, 
+html[data-dp-karte="v3"] body nav.tabs.tabs{
+  background:#F2F0EB !important; border-bottom:1.5px solid #D8D2C4 !important; }
+html[data-dp-karte="v6"] body header.hdr.has-v64-score + nav.tabs.tabs, 
+html[data-dp-karte="v6"] body nav.tabs.tabs{
+  background:#fff !important; border-bottom:1px solid #EDE9E0 !important; }

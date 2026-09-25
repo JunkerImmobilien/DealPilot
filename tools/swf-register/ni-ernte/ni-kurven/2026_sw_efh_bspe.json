@@ -1,0 +1,9 @@
+{
+  "workbook": "2026_sw_efh_bspe",
+  "view": "dash",
+  "kurven": [
+    { "merkmal": "Restnutzungsdauer", "normobjekt": "", "normobjekt_interpoliert": "40.7143", "stuetzstellen": {"15": 0.69, "25": 0.86, "35": 0.96, "45": 1.03, "55": 1.08, "65": 1.11, "75": 1.14, "80": 1.15} },
+    { "merkmal": "Standardstufen", "normobjekt": "2,5", "stuetzstellen": {"1,5": 0.83, "2,0": 0.93, "2,5": 1.0, "3,0": 1.05, "3,5": 1.09, "4,0": 1.12, "4,5": 1.15} },
+    { "merkmal": "Wohnflächen", "normobjekt": "140", "stuetzstellen": {"60": 0.81, "80": 0.88, "100": 0.92, "120": 0.97, "140": 1.0, "160": 1.03, "180": 1.06, "200": 1.08, "220": 1.1, "240": 1.12} }
+  ]
+}

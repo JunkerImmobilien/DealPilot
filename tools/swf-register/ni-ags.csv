@@ -1,0 +1,82 @@
+workbook;roh_name;ags;amtlicher_name;befund
+2026_sw_efh_aurbork;Borkum;;;kein Kreis - Gemeindeebene oder Kurzform
+2026_sw_efh_aurfest;Friesland und Os riesland;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_efh_bsbs;Stadt Braunschweig;03101;Braunschweig;direkt
+2026_sw_efh_bsce;Landkreis Celle;03351;Celle;direkt
+2026_sw_efh_bsgf;Landkreis Gi orn;03151;Gifhorn;ligatur:fh
+2026_sw_efh_bshe;Landkreis Helmstedt;03154;Helmstedt;direkt
+2026_sw_efh_bspe;Landkreis Peine;03157;Peine;direkt
+2026_sw_efh_bssz;Stadt Salzgi er;03102;Salzgitter;ligatur:tt
+2026_sw_efh_bswfmorte;Stadt Wolfenbü el mit Ortslagen Cremlingen, Hötzum, Sickte und Weddel;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_efh_bswfrest;Übriger Landkreis Wolfenbü el;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_efh_bswob;Stadt Wolfsburg;03103;Wolfsburg;direkt
+2026_sw_efh_hmhh;Reg. Hannover;03241;Region Hannover;direkt
+2026_sw_efh_hmhhi;Landkreis Hildesheim;03254;Hildesheim;direkt
+2026_sw_efh_hmhhm;Landkreis Hameln-Pyrmont;03252;Hameln-Pyrmont;direkt
+2026_sw_efh_hmhhsg;Landkreis Schaumburg;03257;Schaumburg;direkt
+2026_sw_efh_lgdan;Landkreis Lüchow-Dannenberg;03354;Lüchow-Dannenberg;direkt
+2026_sw_efh_lglg;?;;;kein Name im Kopfdatensatz
+2026_sw_efh_lgue;Landkreis Uelzen;03360;Uelzen;direkt
+2026_sw_efh_lgwl;Landkreis Harburg;03353;Harburg;direkt
+2026_sw_efh_nomakgoemorte;Gö ngen u. Orte: Bovenden, Eddigehausen, Rosdorf;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_efh_nomakgoeoorte;Altkreis Gö ngen ohne Orte: Bovenden, Eddigehausen, Rosdorf;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_efh_nomakoha;Altkreis Osterode am Harz;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_efh_nomgs;Landkreis Goslar;03153;Goslar;direkt
+2026_sw_efh_nomhol;Landkreis Holzminden;03255;Holzminden;direkt
+2026_sw_efh_nomnom;Landkreis Northeim;03155;Northeim;direkt
+2026_sw_efh_olclpclpvec;Landkreise Cloppenburg und Vechta;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_efh_olclpdelollabra;Stadt Delmenhorst und Lk Oldenburg und Wesermarsch;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_efh_olclpolstwst;Stadt Oldenburg und Westerstede;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_efh_osmep_osmepel;Landkreis Emsland;03454;Emsland;direkt
+2026_sw_efh_osmep_osmepnoh;Grafscha Bentheim;03456;Grafschaft Bentheim;ligatur:ft
+2026_sw_efh_osmep_osmeposla;Landkreis Osnabrück;03459;Osnabrück;direkt
+2026_sw_efh_osmep_osmeposst;Stadt Osnabrück;03404;Osnabrück;direkt
+2026_sw_efh_ott_cux;Landkreis Cuxhaven;03352;Cuxhaven;direkt
+2026_sw_efh_ott_ohz;Landkreis Osterholz;03356;Osterholz;direkt
+2026_sw_efh_ott_row;Landkreis Rotenburg (Wümme);03357;Rotenburg (Wümme);direkt
+2026_sw_efh_ott_std;Landkreis Stade;03359;Stade;direkt
+2026_sw_efh_sulverdhostsywe;Übriger Landkreis Diepholz;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_efh_sulverdhstsywe;Stuhr, Syke, Weyhe;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_efh_sulverhk;Landkreis Heidekreis;03358;Heidekreis;direkt
+2026_sw_efh_sulverniostni;Landkreis Nienburg - ohne Stadt Nienburg;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_efh_sulvernistni;Stadt Nienburg;;;kein Kreis - Gemeindeebene oder Kurzform
+2026_sw_efh_sulverver;Landkreis Verden;03361;Verden;direkt
+2026_sw_efhrh_hmhhihmshg;Landkreise Hildesheim, Hameln, Schaumburg;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_hof_aurfest;Friesland und Os riesland;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_hof_osmep_osmeposmep;Grafscha Bentheim, Landkreis Osnabrück und Landkreis Emsland;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_hof_sulverdhhkniver;Landkreise Diepholz, Heidekreis, Nienburg und Verden;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_rh_aurfest;Friesland und Os riesland;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_rh_bsbs;Stadt Braunschweig;03101;Braunschweig;direkt
+2026_sw_rh_bsce;Landkreis Celle;03351;Celle;direkt
+2026_sw_rh_bsgf;Landkreis Gi orn;03151;Gifhorn;ligatur:fh
+2026_sw_rh_bshe;Landkreis Helmstedt;03154;Helmstedt;direkt
+2026_sw_rh_bspe;Landkreis Peine;03157;Peine;direkt
+2026_sw_rh_bssz;Stadt Salzgi er;03102;Salzgitter;ligatur:tt
+2026_sw_rh_bswf;Landkreis Wolfenbü el;03158;Wolfenbüttel;ligatur:tt
+2026_sw_rh_bswob;Stadt Wolfsburg;03103;Wolfsburg;direkt
+2026_sw_rh_hmhh;Reg. Hannover;03241;Region Hannover;direkt
+2026_sw_rh_hmhhi;Landkreis Hildesheim;03254;Hildesheim;direkt
+2026_sw_rh_hmhhm;Landkreis Hameln-Pyrmont;03252;Hameln-Pyrmont;direkt
+2026_sw_rh_hmhshg;Landkreis Schaumburg;03257;Schaumburg;direkt
+2026_sw_rh_lglg;Landkreis Lüneburg;03355;Lüneburg;direkt
+2026_sw_rh_lguedan;Landkreise Uelzen und Lüchow-Dannenberg;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_rh_lgwl;Landkreis Harburg;03353;Harburg;direkt
+2026_sw_rh_nomakgoemorte;Gö ngen u. Orte: Bovenden, Eddigehausen, Rosdorf;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_rh_nomakgoeoorte;Altkreis Gö ngen ohne Orte: Bovenden, Eddigehausen, Rosdorf;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_rh_nomakoha;Altkreis Osterode am Harz;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_rh_nomgs;Landkreis Goslar;03153;Goslar;direkt
+2026_sw_rh_nomhol;Landkreis Holzminden;03255;Holzminden;direkt
+2026_sw_rh_nomnom;Landkreis Northeim;03155;Northeim;direkt
+2026_sw_rh_osmep_osmepel;Landkreis Emsland;03454;Emsland;direkt
+2026_sw_rh_osmep_osmepnoh;Grafscha Bentheim;03456;Grafschaft Bentheim;ligatur:ft
+2026_sw_rh_osmep_osmeposla;Landkreis Osnabrück;03459;Osnabrück;direkt
+2026_sw_rh_osmep_osmeposst;Stadt Osnabrück;03404;Osnabrück;direkt
+2026_sw_rh_ott_cux;Landkreis Cuxhaven;03352;Cuxhaven;direkt
+2026_sw_rh_ott_ohz;Landkreis Osterholz;03356;Osterholz;direkt
+2026_sw_rh_ott_row;Landkreis Rotenburg (Wümme);03357;Rotenburg (Wümme);direkt
+2026_sw_rh_ott_std;Landkreis Stade;03359;Stade;direkt
+2026_sw_rh_sulverdhostsywe;Übriger Landkreis Diepholz;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_rh_sulverdhstsywe;Stuhr, Syke, Weyhe;;;zusammengesetzt - mehrere Kreise oder Teilgebiet
+2026_sw_rh_sulverhk;Landkreis Heidekreis;03358;Heidekreis;direkt
+2026_sw_rh_sulverni;Landkreis Nienburg;03256;Nienburg (Weser);direkt
+2026_sw_rh_sulverver;Landkreis Verden;03361;Verden;direkt

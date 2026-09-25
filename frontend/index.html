@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1455b"><!-- v1148-spalt-1025px -->
+<link rel="stylesheet" href="css/style.css?v=v1529"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1192">
     <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
@@ -47,11 +47,12 @@
       f={'data-ui-theme':s.ui_theme,'data-ui-cards':s.ui_cards,'data-ui-surface':s.ui_surface};
       Object.keys(m).forEach(function(a){var v=f[a]||'';if(m[a].indexOf(v)>=0)r.setAttribute(a,v);});}catch(e){}})();</script>
 <link rel="stylesheet" href="css/bmf-modal.css?v=W34">  <!-- V289 -->
-<link rel="stylesheet" href="css/bmf-modal-v292.css?v=v1382"><!-- V292-modal-refactor -->
+<link rel="stylesheet" href="css/bmf-modal-v292.css?v=v1500"><!-- V292-modal-refactor -->
   <link rel="stylesheet" href="css/legal.css?v=W34">
 <link rel="stylesheet" href="css/pricing-modal.css?v=W34">
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
-<link rel="stylesheet" href="css/rnd-styles.css?v=W34">
+<link rel="stylesheet" href="css/hell-varianten.css?v=v1538">
+<link rel="stylesheet" href="css/rnd-styles.css?v=v1513b">
 <link rel="stylesheet" href="css/select-fix.css?v=W34">
     <link rel="stylesheet" href="css/v187-additions.css?v=W34">
   <link rel="stylesheet" href="credits-modal.css?v=W34">
@@ -662,20 +663,20 @@ label.dp-required.qc-required::after {
        die Vorgabe von v1266), die beiden Nachbarn tragen nur ihr Zeichen:
        drei Beschriftungen nebeneinander passen bei 323 px Seitenleiste
        nicht ohne Umbruch. Tacho = Quick-Check, Balken = Marktbericht. -->
+  <!-- v1512: Die Schaltflaeche "Objekt anlegen" ist hier raus - sie steht
+       jetzt als "+ Neues Objekt hinzufuegen" direkt ueber dem Portfolio.
+       Die beiden Nachbarn tragen dadurch wieder ihre Beschriftung; zu zweit
+       passen sie bei 323 px Seitenleiste ohne Umbruch. -->
   <div class="sb-neu-row">
-    <button type="button" class="sb-neu-btn" onclick="newObj()"
-            title="Neues Objekt anlegen und direkt zur Eingabe springen">
-      <span class="sb-neu-plus">+</span><span class="sb-neu-lbl">Objekt anlegen</span>
-    </button>
-    <button type="button" class="sb-neu-btn sb-neu-nur-ico" onclick="enterQuickCheckMode()"
+    <button type="button" class="sb-neu-btn" onclick="enterQuickCheckMode()"
             title="Quick-Check — Deal in einer Minute grob durchrechnen">
       <svg class="sb-neu-ico" width="17" height="17" aria-hidden="true"><use href="#i-gauge"/></svg>
-      <span class="sb-neu-sr">Quick-Check</span>
+      <span class="sb-neu-lbl">Quick-Check</span>
     </button>
-    <button type="button" class="sb-neu-btn sb-neu-nur-ico" onclick="openMarktberichtView()"
+    <button type="button" class="sb-neu-btn" onclick="openMarktberichtView()"
             title="Marktbericht — Lage, Mieten und Werte zur Adresse">
       <svg class="sb-neu-ico" width="17" height="17" aria-hidden="true"><use href="#i-bar"/></svg>
-      <span class="sb-neu-sr">Marktbericht</span>
+      <span class="sb-neu-lbl">Marktbericht</span>
     </button>
   </div>
 
@@ -1038,6 +1039,21 @@ label.dp-required.qc-required::after {
       <div class="f"><label>Etage</label><input id="etage" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
       <div class="f"><label>Anzahl Etagen</label><input id="etagen_ges" type="text" inputmode="decimal" placeholder="z.B. 3"></div>
       <div class="f"><label>Modernisierungsjahr</label><input id="modernis" type="text" inputmode="decimal" placeholder="z.B. 2025"></div>
+      <!-- v1608 · Modernisierungsgrad nach Anlage 2 ImmoWertV.
+           Acht Bauteile, Hoechstpunktzahl 20. Bis hierher standen sie nur
+           im Restnutzungsdauer-Assistenten und gingen mit ihm verloren.
+           Die Reihenfolge ist die der Anlage 2 und die von
+           computeModPoints() in rnd-wizard.js - sie darf nicht
+           auseinanderlaufen, weil die Punktzahl die Restnutzungsdauer
+           und damit die Abschreibung steuert. -->
+      <div class="f"><label>Dacherneuerung inkl. W&auml;rmed&auml;mmung <span class="hint">(max. 4 P.)</span></label><select id="mod_dach"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div>
+      <div class="f"><label>Fenster und Au&szlig;ent&uuml;ren <span class="hint">(max. 2 P.)</span></label><select id="mod_fenster"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div>
+      <div class="f"><label>Leitungssysteme (Strom, Gas, Wasser) <span class="hint">(max. 2 P.)</span></label><select id="mod_leitungen"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div>
+      <div class="f"><label>Heizungsanlage <span class="hint">(max. 2 P.)</span></label><select id="mod_heizung"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div>
+      <div class="f"><label>W&auml;rmed&auml;mmung Au&szlig;enw&auml;nde <span class="hint">(max. 4 P.)</span></label><select id="mod_aussenwand"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div>
+      <div class="f"><label>B&auml;der <span class="hint">(max. 2 P.)</span></label><select id="mod_baeder"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div>
+      <div class="f"><label>Innenausbau (Decken, Fu&szlig;b&ouml;den) <span class="hint">(max. 2 P.)</span></label><select id="mod_innenausbau"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div>
+      <div class="f"><label>Wesentliche &Auml;nderung der Grundrissgestaltung <span class="hint">(max. 2 P.)</span></label><select id="mod_grundriss"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div>
       <div class="f"><label>Garagenpl&auml;tze</label><input id="garagen" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
       <div class="f"><label>Au&szlig;enstellpl&auml;tze</label><input id="stellpl_aussen" type="text" inputmode="decimal" placeholder="z.B. 0"></div>
       <div class="f"><label>Balkon / Terrasse (m&sup2;)</label><div class="iw"><input id="balkon_flae" type="text" inputmode="decimal" placeholder="z.B. 10" class="tr"><span class="sfx">m&sup2;</span></div></div>
@@ -3402,9 +3418,11 @@ label.dp-required.qc-required::after {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="js/pdf-anlage-bmf.js?v=v992"></script>
-<script src="js/pdf-investment-bank.js?v=v1459"></script>
-<script src="js/bmf-modal.js?v=v1382"></script>
-<script src="js/bmf-modal-v292.js?v=v993"></script><!-- v987-v292-restore -->
+<script src="js/pdf-investment-bank.js?v=v1511"></script>
+<script src="js/bmf-modal.js?v=v1499"></script>
+<script src="js/bmf-modal-v292.js?v=v1504"></script>
+<script src="js/bmf-bodenabschlag.js?v=v1508"></script>
+<script src="js/pdf-kaufpreisaufteilung.js?v=v1497"></script><!-- v987-v292-restore -->
 <!-- V63.86: html2canvas für 1:1-Capture von Tab-Kennzahlen-Tabellen ins PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -3476,7 +3494,7 @@ label.dp-required.qc-required::after {
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=v1360"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v1450"></script>
+<script src="js/storage.js?v=v1608"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=W33"></script>
@@ -3512,13 +3530,14 @@ label.dp-required.qc-required::after {
 <script src="js/objektart-felder.js?v=v1437"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
 <script src="js/mfh-einheiten.js?v=v1459"></script>
-<script src="js/hybrid-aktionen.js?v=v1455c"></script>
+<script src="js/hell-varianten.js?v=v1527"></script>
+<script src="js/hybrid-aktionen.js?v=v1521"></script>
 <script src="js/adress-autocomplete.js?v=v1271"></script><!-- v1270: PLZ->Ort, Strassenliste -->
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
 <script src="js/ai-credits.js?v=v1296"></script>
 <script src="js/workflow.js?v=v1255"></script>
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
-<script src="js/bank-charts.js?v=W35"></script>
+<script src="js/bank-charts.js?v=v1465"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
 <script src="js/help.js?v=v1188"></script>
   <script src="js/dp-band-fix.js?v=1117"></script> <!-- v863-band-fix, v1117: 32/15 -->
@@ -3529,9 +3548,9 @@ label.dp-required.qc-required::after {
 <script src="js/feedback-modal.js?v=777e"></script>
   <script src="js/email-change.js?v=774"></script><!-- v774-change-email -->
 <!-- V63.74: Deal-Aktion Tab (10. Tab) -->
-<script src="js/deal-action.js?v=v1447"></script>
+<script src="js/deal-action.js?v=v1608"></script>
 <script src="js/gutachten-org.js?v=v1448b"></script>
-<script src="js/afa-eigen.js?v=v1450"></script>
+<script src="js/afa-eigen.js?v=v1599"></script>
 <script src="js/deal-action-readycheck.js?v=852"></script>
 <script src="js/deal-action-boarding.js?v=v1443"></script>
 <script src="js/deal-action-pilot.js?v=876"></script>
@@ -3554,8 +3573,7 @@ label.dp-required.qc-required::after {
 <script src="js/rnd-calc.js?v=v1426"></script>
 <script src="js/rnd-pdf.js?v=20260611105943"></script>
 <script src="js/rnd-docx.js?v=142"></script>
-<script src="js/rnd-ui.js?v=v1426"></script>
-<script src="js/rnd-wizard.js?v=v1439"></script>
+<script src="js/rnd-wizard.js?v=v1608"></script>
 <script src="js/free-lock.js?v=495"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
 <script src="js/investment-profile.js?v=v1431"></script>
@@ -3567,7 +3585,7 @@ label.dp-required.qc-required::after {
   <script src="js/object-actions.js?v=v1430"></script>
   <script src="js/dpsh-score-hero.js?v=v1443"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v1183"></script>
-  <script src="js/voice-import.js?v=v1440"></script>
+  <script src="js/voice-import.js?v=v1609"></script>
 </div><!-- .main-col --></div><!-- .app-wrap -->
 </form><!-- V32 dp-noform -->
 <!-- V54: Floating Save-Button entfernt — Speichern steht in der Tab-Leiste rechts. -->

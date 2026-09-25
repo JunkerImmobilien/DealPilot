@@ -517,7 +517,7 @@
   box-shadow: 0 30px 80px rgba(0,0,0,0.45);
   display: flex; flex-direction: column;
   overflow: hidden;
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   border: 1px solid var(--border, #E0DBD3);
 }
 
@@ -1089,7 +1089,7 @@
   }
 }
 .rnd-result-hero-unit {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 24px;
   font-weight: 500;
   color: var(--gold, #C9A84C);
@@ -1242,3 +1242,75 @@
   25% { transform: translateX(-3px); }
   75% { transform: translateX(3px); }
 }
+
+/* ─── v1506: DM Sans war hier die Hausschrift, steht aber in keiner
+   Markenliste. Ersetzt durch Inter (Fliesstext). Cormorant Garamond bleibt
+   fuer die grosse Zahl - die ist als Serifenschrift der Marke gedeckt.
+   Gemessen: 2 Fundstellen. */
+/* ══════════════════════════════════════════════════════════════════
+   v1513 · Marcel 22.09.2026: "das RND-Modul musst du bitte auch auf den
+   DealPilot-Stil bringen. Also so wie den BMF-Rechner, vielleicht auch
+   einfach das Modal in der gleichen Größe, die Anordnung passend machen.
+   Dann bitte auch die Checkboxen nochmal prüfen. Die sind viel zu groß."
+
+   Gemessen (beide Fenster nebeneinander im selben Browser):
+     BMF-Rechner : 1143 × 915 px · Radius 12 · Grund #FDFCFA
+     RND-Wizard  :  920 × 748 px · Radius 14 · Grund #FFFFFF
+     Schrittpunkte: 28 × 28 px  ← das sind die "Checkboxen"
+     Eingabefelder: 862 px breit, einspaltig untereinander
+
+   Der Wizard war also schmaler, weißer und runder als sein Nachbar, und
+   die Schrittpunkte waren so groß wie Bedienelemente, obwohl sie nur
+   anzeigen, wo man ist. Bei 1140 px Breite stehen die Felder jetzt zu
+   zweit nebeneinander - dieselbe Rasterlogik wie im BMF-Rechner.
+   ══════════════════════════════════════════════════════════════════ */
+
+.rnd-wiz-modal {
+  max-width: 1143px !important;
+  width: min(1143px, calc(100vw - 48px)) !important;
+  max-height: 915px !important;
+  border-radius: 12px !important;
+  /* v1513b: --surface ist im Hellprofil reines Weiss - hier soll die
+     Cremeflaeche des BMF-Rechners stehen, also der Wert direkt. */
+  background: #FDFCFA !important;
+}
+
+/* Die Schrittpunkte sind eine Anzeige, kein Knopf. */
+.rnd-wiz-step {
+  width: 18px !important;
+  height: 18px !important;
+  font-size: 10px !important;
+  line-height: 18px !important;
+}
+
+/* Zwei Spalten ab der Breite, die das Fenster jetzt hat. */
+@media (min-width: 900px) {
+  .rnd-wiz-body {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 22px;
+    align-items: start;
+  }
+  /* Was über die ganze Breite gehört: Überschriften, Hinweise, Ergebnis. */
+  .rnd-wiz-body > h3,
+  .rnd-wiz-body > p,
+  .rnd-wiz-body > .rnd-wiz-hint,
+  .rnd-wiz-body > .rnd-wiz-section,
+  .rnd-wiz-body > .rnd-wiz-result-hero,
+  .rnd-wiz-body > .rnd-wiz-full,
+  .rnd-wiz-body > table,
+  .rnd-wiz-body > div[style*="grid"] {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Felder etwas kompakter - der BMF-Rechner fasst mehr auf eine Seite. */
+.rnd-wiz-field { margin-bottom: 12px !important; }
+.rnd-wiz-field select,
+.rnd-wiz-field input[type="text"],
+.rnd-wiz-field input[type="number"],
+.rnd-wiz-field input[type="date"] {
+  padding: 7px 10px !important;
+  font-size: 14px !important;
+}
+.rnd-wiz-field label { font-size: 12px !important; }

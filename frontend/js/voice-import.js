@@ -2686,7 +2686,13 @@
        werden. Wer sie will, bekommt dafuer eine eigene, angekuendigte
        Runde — und am Ende den amtlichen Sachwertfaktor seines
        Gutachterausschusses aus unserem Register. */
-    { nr: 7, name: 'Wertermittlung', ziel: 'Sachwertverfahren nach ImmoWertV', extra: true }
+    { nr: 7, name: 'Wertermittlung', ziel: 'Sachwertverfahren nach ImmoWertV', extra: true },
+    /* v1608 · Eigene Etappe aus demselben Grund wie die Wertermittlung:
+       wer keine kuerzere Restnutzungsdauer nachweisen will, soll nicht
+       nach dem Zustand seiner Leitungssysteme gefragt werden. Wer sie
+       will, bekommt dafuer eine angekuendigte Runde - und am Ende die
+       Abschreibung, die ihm zusteht. */
+    { nr: 8, name: 'Restnutzungsdauer', ziel: 'Modernisierungsgrad nach Anlage 2', extra: true }
   ];
 
   var RFRAGEN = [
@@ -2697,7 +2703,17 @@
       frage: 'Wo steht das Objekt? Straße, Hausnummer, PLZ und Ort.' },
     /* v1437: 'einheiten' ist Kandidat — gefragt nur, wo die Art sie
        verlangt (MFH). 'zimmer' nur, wo es passt. Den Text baut _rfNachArt. */
-    { et: 1, ids: ['objart', 'wfl', 'zimmer', 'einheiten'], rang: 3, nachArt: 1,
+    /* v1606 · 'etagen_ges' kam dazu. objektart-felder.js fuehrt es bei
+       MFH, EFH, ZFH, DHH, RH und ETW unter `passt` - gefragt wurde es
+       trotzdem nie, weil es in keinem Katalogeintrag stand. Der
+       Restnutzungsdauer-Assistent braucht es (Schritt 1, Vollgeschosse);
+       beim Demo-Mehrfamilienhaus stand dort am 24.09.2026 eine 1 statt
+       einer 3, und ich musste sie von Hand nachtragen.
+
+       _rfNachArt filtert es fuer Buero, Hotel und Garage selbst wieder
+       heraus - die Maschinerie dafuer gibt es, sie bekam nur nie den
+       Kandidaten. */
+    { et: 1, ids: ['objart', 'wfl', 'zimmer', 'einheiten', 'etagen_ges'], rang: 3, nachArt: 1,
       frage: 'Was für ein Objekt ist es, und wie groß? Art, Wohnfläche, Zimmer.' },
     { et: 1, ids: ['baujahr', 'kp'],                rang: 1,
       frage: 'Baujahr und Kaufpreis?' },
@@ -2751,6 +2767,16 @@
       frage: 'Wie hoch ist das Hausgeld pro Jahr, und wie viel davon ist nicht umlagefähig?' },
     { et: 4, ids: ['mietstg', 'wertstg', 'leerstand'], rang: 14, vorbelegt: 1, profil: 'langfrist',
       frage: 'Womit rechnest du langfristig — Mietsteigerung, Wertsteigerung und Leerstand in Prozent?' },
+    /* v1609 · Das Mietausfall-Risiko fehlte im Katalog, obwohl der
+       Investor Deal Score es als eigenen KPI fuehrt (`mietausfall`,
+       Kategorie Risiko). Gemessen am 25.09.2026: der Score kam auf
+       11 von 24 KPIs, und dies war einer der leeren.
+
+       `skalen: 1` gibt ihm Klick-Knoepfe - das Feld ist eine Auswahl
+       mit fuenf Stufen, niemand soll "erhoeht" abtippen muessen. */
+    { et: 4, ids: ['ds2_mietausfall'], rang: 13, skalen: 1,
+      frage: 'Wie schätzt du das Mietausfall-Risiko ein? Bei mehreren Einheiten '
+           + 'verteilt es sich — bei einer trifft ein Auszug voll.' },
     { et: 4, ids: ['ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_wertsteigerung', 'ds2_entwicklung'],
       rang: 15, skalen: 1,
       frage: 'Wie entwickelt sich der Ort — Bevölkerung, Nachfrage, Wertsteigerung, Entwicklungsmöglichkeiten?' },
@@ -2796,6 +2822,37 @@
     { et: 7, ids: ['modernis'], rang: 5, wert: 1,
       frage: 'Was wurde am Gebäude modernisiert? Daraus ergibt sich die Restnutzungsdauer '
            + 'nach Anlage 2 ImmoWertV.' }
+  ];
+
+  /* ═══ v1608 · DIE RESTNUTZUNGSDAUER-STRECKE ═════════════════════════
+     Marcel: "wir koennen ja fragen ob die rnd strecke abgefragt werden
+     soll. wenn ja werden die fragen gestellt. am besten auch wieder mit
+     pillen zum klicken oder per sprache der kunde muss ja wissen was er
+     sagen muss"
+
+     WARUM SIE SICH LOHNT: Die Restnutzungsdauer steuert die
+     Abschreibung. Am Demo-Mehrfamilienhaus waren das 30.552 EUR im
+     Jahr - der Unterschied zwischen dem pauschalen Regelfall (50 Jahre,
+     2 %) und der nachgewiesenen Dauer (14 Jahre, 7,14 %).
+
+     WARUM ZWEI FRAGEN UND NICHT EINE: acht Auswahlfelder in einer Frage
+     ergeben auf dem Telefon eine Wand aus Knoepfen. Geteilt wird nach
+     der Sache, nicht nach der Zahl - erst die Huelle (Dach, Fenster,
+     Daemmung: zusammen 10 der 20 Punkte), dann Technik und Innenausbau.
+
+     `skalen: 1` ist der Schalter fuer die Klick-Knoepfe: _rfSkalen baut
+     sie aus den <option>s der echten Felder. Sprechen geht weiter - wer
+     "vor zehn Jahren" sagt, wird verstanden wie bisher. Und sind alle
+     Felder einer Frage gewaehlt, laeuft der Lauf von selbst weiter. */
+  var RFRAGEN_RND = [
+    { et: 8, ids: ['mod_dach', 'mod_fenster', 'mod_aussenwand'], rang: 5, rnd: 1, skalen: 1,
+      frage: 'Fangen wir mit der Hülle an: Wann wurden Dach, Fenster und die '
+           + 'Wärmedämmung der Außenwände zuletzt erneuert? Wenn nie, sag ruhig nie — '
+           + 'das ist auch eine Antwort.' },
+    { et: 8, ids: ['mod_heizung', 'mod_leitungen', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss'],
+      rang: 6, rnd: 1, skalen: 1,
+      frage: 'Und innen: Heizung, Leitungen, Bäder, Innenausbau — und ob der Grundriss '
+           + 'wesentlich geändert wurde.' }
   ];
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -3001,6 +3058,9 @@
       var teile = ['Art', /^(BUERO|GESCH|HOTEL|GEW|GAR)$/.test(art) ? 'Fläche' : 'Wohnfläche'];
       if (hat('zimmer')) teile.push('Zimmer');
       if (hat('einheiten')) teile.push('Zahl der Wohneinheiten');
+      /* v1606 · Die Vollgeschosse gehoeren in die Frage, sonst steht das
+         Feld im Katalog und wird trotzdem nicht erfragt. */
+      if (hat('etagen_ges')) teile.push('Vollgeschosse');
       k.frage = 'Was für ein Objekt ist es, und wie groß? ' + teile.slice(0, -1).join(', ') + ' und ' + teile[teile.length - 1] + '.';
     }
     if (hat('ds2_zustand')) {
@@ -4184,6 +4244,150 @@
          Wert waere schon eine Empfehlung. */
       '.vi-rf-knf{margin-top:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}',
       '@media(max-width:560px){.vi-rf-knf{grid-template-columns:1fr}}',
+
+      /* ═══ v1605 · DER GEFUEHRTE LAUF AUF DEM HANDY ═══════════════════
+         Marcel: "auch da kann man auf dem Handy aktuell nicht wirklich
+         was sehen. Ich meine den Frag mich durch."
+
+         Gemessen am 25.09.2026 im gleich-Origin-iframe bei 390 px:
+
+           .oabi-body   Hoehe 575, Inhalt braucht 815, overflow-y hidden
+           #vi-frage    Hoehe 547, Inhalt braucht 807, overflow-y visible
+           #vi-rf-dran  337 px - ueber die HAELFTE des Koerpers
+           alle Kinder  flex:0 0 auto
+
+         Weil alles 0 0 auto ist und der Koerper hidden, wird der Inhalt
+         NICHT abgeschnitten - er quillt heraus und legt sich auf die
+         Geschwister. Nachgewiesen: fuenf echte Ueberlappungen, u. a.
+         "Erklaer mir das" ueber dem Etappenband, das Mikrofon-Symbol
+         ueber "Geld" und "0/2" ueber "Anhalten".
+
+         Das ist dieselbe Falle wie in FALLEN.md, nur spiegelverkehrt:
+         dort schrumpfen Flex-Kinder statt zu scrollen, hier scrollt
+         nichts, weil keiner schrumpfen darf.
+
+         DIE ANTWORT IST DIE CHAT-SPALTE, die Marcel selbst
+         vorgeschlagen hat. Ein Telefon hat keinen Platz fuer fuenf
+         Dinge nebeneinander - Etappenband, Merkliste, Frage, Antworten
+         und Aufnahme. Ein Chat hat immer nur EINE Spalte: der Verlauf
+         scrollt, die Eingabe steht unten fest. Genau das wird hier
+         gebaut - ohne neue Maschinerie, nur mit Stil. */
+      '@media(max-width:600px){',
+      /* 1 · Der Verlauf scrollt, statt zu quellen. min-height:0 ist
+             Pflicht: ohne sie ignoriert ein Flex-Kind das overflow. */
+      '  .oabi-ov.vi-mode .oabi-body{overflow-y:auto;-webkit-overflow-scrolling:touch}',
+      '  .oabi-ov.vi-mode #vi-frage{overflow-y:auto;min-height:0;flex:1 1 auto}',
+      /* ═══ 2 · DAS GESPRAECH BEKOMMT DEN PLATZ ═══════════════════════
+         v1606 · Den Chat gibt es hier laengst - #vi-rf-chat mit Co- und
+         Du-Blasen. Er wurde nur erdrueckt. Gemessen am 25.09.2026 bei
+         390 px:
+
+             #vi-rf-chat     Hoehe 180, Inhalt braucht 577
+             .vi-rf-buehne   Hoehe   0, Inhalt braucht 412
+             #vi-rf-dran     Hoehe 237
+
+         Die Buehne steht auf flex:1 1 auto - aber es war kein freier
+         Platz mehr da, den sie haette nehmen koennen: Kopfzeile, Band,
+         Frage, Aufnahme, Uebernehmen und die Nebenknoepfe hatten die
+         Hoehe schon aufgebraucht. Also schrumpfte sie auf null, und ihr
+         Inhalt quoll ueber die Aufnahme (Chat bei 485, Aufnahme bei
+         500 - sie lagen uebereinander).
+
+         Die Nebensache bekam 237 Pixel, das Gespraech 180 von 577.
+         Genau das ist "man sieht nichts".
+
+         Jetzt ist die Ordnung die eines Messengers:
+             Kopfzeile + Band   oben, schmal
+             GESPRAECH          nimmt den ganzen Rest, scrollt
+             aktuelle Frage     darunter, gedeckelt
+             Nebenknoepfe
+             Aufnahme + Uebernehmen   unten festgeklebt          */
+      '  .oabi-ov.vi-mode #vi-frage{display:flex;flex-direction:column}',
+      /* v1606b · HIER STAND .oabi-ov.vi-mode - ZWEI Klassen, und die
+         Regel verlor. Der Kaskaden-Walker zeigte, wogegen:
+
+             .oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{min-height:0}
+
+         DREI Klassen am Vorfahren schlagen zwei, und eine Media-Query
+         erhoeht die Spezifitaet NICHT. Die Buehne blieb deshalb auf
+         Hoehe 0, obwohl min-height:38vh danebenstand und `order:3` aus
+         derselben Regelgruppe sichtbar ankam.
+
+         Genau der Fall aus CLAUDE.md: lieber Spezifitaet erhoehen als
+         auf Ladereihenfolge bauen - und welche Regel gewinnt, sagt nur
+         der Walker, nicht matches(). */
+      /* v1606c · height:100% reichte nicht: die Buehne hat min-height,
+         keine height - Prozent loest dagegen auf `auto` auf, also blieb
+         der Chat 577 px hoch in einem 265-px-Behaelter und quoll weiter.
+
+         Jetzt ist die Buehne selbst eine Flex-Spalte und der Chat ihr
+         einziges Kind mit flex:1 1 0 und min-height:0. Damit bekommt er
+         GENAU die Hoehe der Buehne und scrollt in sich - und
+         _rfAnsEnde() scrollt weiterhin das richtige Element ans Ende,
+         was bei einem Scroller weiter oben nicht mehr stimmen wuerde. */
+      '  .oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{flex:1 1 auto;min-height:38vh;',
+      '    display:flex;flex-direction:column}',
+      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-chat{flex:1 1 0;min-height:0;height:auto;',
+      '    max-height:none;overflow-y:auto;-webkit-overflow-scrolling:touch}',
+      /* v1606d · DIE MERKLISTE WAR DER EIGENTLICHE PLATZFRESSER.
+         Gemessen: #vi-rf-stand nahm 220 der 265 Pixel der Buehne - fuer
+         das Gespraech blieben 33. Das ist der Grund, warum man "nichts
+         sieht": die Checkliste verdraengt das Gespraech, nicht die
+         Frage und nicht die Aufnahme.
+
+         Auf dem Telefon ist sie Nachschlagewerk, kein Gespraech. Sie
+         zeigt nur noch ihren Kopf ("Was schon steht 0 / 16") und klappt
+         auf Antippen auf. Damit gehen 189 Pixel zurueck an den Chat. */
+      /* min-height:0 ist hier das Entscheidende. Es gibt bereits
+         .oabi-ov.vi-mode.vi-dialog .vi-rf-stand{min-height:220px}.
+         Beim ersten Anlauf habe ich nur `height` ueberschrieben - der
+         Koerper war dann ausgeblendet (0 px), die HUELLE blieb aber bei
+         220 und das Gespraech weiter bei 33. Eine halb ueberschriebene
+         Groesse ist keine Groesse. */
+      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-stand{flex:0 0 auto;min-height:0;height:auto}',
+      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-stand .vi-rf-stand-body{display:none}',
+      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-stand.auf .vi-rf-stand-body{display:block;',
+      '    max-height:30vh;overflow-y:auto}',
+      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-stand .vi-rf-stand-kopf{cursor:pointer;',
+      '    -webkit-tap-highlight-color:transparent}',
+      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-stand .vi-rf-stand-kopf::after{content:"▾";',
+      '    margin-left:8px;opacity:.55;display:inline-block;transition:transform .2s}',
+      '  .oabi-ov.vi-mode.vi-dialog #vi-rf-stand.auf .vi-rf-stand-kopf::after{',
+      '    transform:rotate(180deg)}',
+      /* Die aktuelle Frage ist die juengste Wortmeldung, nicht die halbe
+         Anzeige. Sie steht direkt ueber der Eingabe und scrollt in sich. */
+      '  .oabi-ov.vi-mode #vi-rf-dran{max-height:26vh;overflow-y:auto;min-height:0;flex:0 0 auto}',
+      /* Reihenfolge per order - ohne das DOM anzufassen. */
+      '  .oabi-ov.vi-mode .vi-rf-kopfzeile{order:1}',
+      '  .oabi-ov.vi-mode #vi-rf-band{order:2}',
+      '  .oabi-ov.vi-mode .vi-rf-buehne{order:3}',
+      '  .oabi-ov.vi-mode #vi-rf-dran{order:4}',
+      '  .oabi-ov.vi-mode #vi-rf-neben{order:5;flex:0 0 auto}',
+      '  .oabi-ov.vi-mode #vi-rf-mikro{order:6}',
+      '  .oabi-ov.vi-mode .vi-rf-zeile{order:7}',
+      /* 3 · Aufnahme und Uebernehmen kleben unten, zweizeilig wie die
+             Eingabeleiste eines Messengers. Der Versatz von 44 px ist
+             die Hoehe der Uebernehmen-Zeile darunter. */
+      '  .oabi-ov.vi-mode #vi-rf-mikro{position:sticky;bottom:44px;z-index:5;flex:0 0 auto;',
+      '    background:var(--cr,#FDFCFA);box-shadow:0 -8px 18px -10px rgba(0,0,0,.35)}',
+      '  .oabi-ov.vi-mode .vi-rf-zeile{position:sticky;bottom:0;z-index:6;flex:0 0 auto;',
+      '    background:var(--cr,#FDFCFA)}',
+      /* 4 · Das Etappenband bricht nicht mehr uebereinander. */
+      '  .oabi-ov.vi-mode #vi-rf-band{flex-wrap:wrap;row-gap:6px;height:auto;min-height:0}',
+      '  .oabi-ov.vi-mode .vi-rf-gr{flex-wrap:wrap;row-gap:4px}',
+      '  .oabi-ov.vi-mode .vi-rf-gr-n{flex:1 1 100%;white-space:normal;overflow:visible}',
+      /* 5 · Die Kopfzeile mit den zwei Schaltern darf umbrechen. */
+      '  .oabi-ov.vi-mode .vi-rf-kopfzeile{flex-wrap:wrap;row-gap:6px;height:auto}',
+      /* 6 · Die Aufnahmezeile stand auf nowrap: Symbol 30 + Text + Pegel
+             45 + Knopf 102 bei 296 px Breite. Fuer den Text blieben
+             GANZE 63 PIXEL - er brach nach jedem zweiten Wort um und
+             wurde 149 px hoch. Gemessen am 25.09.2026.
+             Jetzt wie in einem Messenger: die Ansage nimmt die erste
+             Zeile ganz, darunter Symbol, Pegel und Knopf nebeneinander. */
+      '  .oabi-ov.vi-mode .vi-rf-mikro{flex-wrap:wrap;row-gap:8px}',
+      '  .oabi-ov.vi-mode .vi-rf-mikro-txt{flex:1 1 100%;order:-1}',
+      '  .oabi-ov.vi-mode .vi-rf-halt{margin-left:auto}',
+      '}',
       '.vi-rf-knf-z{padding:8px 10px;border:1px solid rgba(42,39,39,.16);border-radius:8px;',
       '  background:rgba(42,39,39,.03)}',
       '.vi-rf-knf-z span{display:block;opacity:.55;text-transform:uppercase;letter-spacing:.04em;',
@@ -4258,6 +4462,22 @@
       '  font-weight:600 !important}'
     ].join('');
     document.head.appendChild(s);
+
+    /* v1606d · Der Aufklapper fuer die Merkliste auf dem Telefon.
+       Delegiert und genau EINMAL gebunden: die Liste wird bei jeder
+       Antwort neu gezeichnet, ein Listener am Element selbst waere
+       danach weg. Der Schalter haengt deshalb am Dokument und sucht
+       sich sein Ziel ueber closest().
+
+       Die Klasse liegt am BEHAELTER, nicht am Kopf - so steuert das CSS
+       Kopf und Koerper darueber, und der Zustand ueberlebt ein
+       Neuzeichnen des Koerpers. */
+    document.addEventListener('click', function (ev) {
+      var kopf = ev.target && ev.target.closest && ev.target.closest('.vi-rf-stand-kopf');
+      if (!kopf) return;
+      var box = kopf.closest('#vi-rf-stand');
+      if (box) box.classList.toggle('auf');
+    });
   }
 
   /* ═══ v1304 · `vi-frage` gehört DIREKT in den Körper ════════════════════
@@ -5184,6 +5404,20 @@
     deal.marktFaktor = _rfNum(_rfFeld('ds2_marktfaktor'));
     deal.wertsteigerung = _rfFeld('ds2_wertsteigerung') || null;
     deal.entwicklungsmoeglichkeiten = _rfFeld('ds2_entwicklung') || null;
+    /* v1609 · `qualitaetSterne` wurde nie gesetzt - der KPI
+       "Qualitaet & Zustand" blieb deshalb IMMER leer, egal was der
+       Nutzer angab. Das Formular fuehrt vier Sternebewertungen
+       (Kueche, Bad, Boden, Fenster); der Score will EINE Zahl von 1
+       bis 5. Gemittelt wird nur ueber die, die wirklich bewertet
+       wurden - ein nicht vergebener Stern ist keine Null, sondern
+       keine Angabe. */
+    var _st = ['qual_kueche', 'qual_bad', 'qual_boden', 'qual_fenster']
+      .map(function (id) { return _rfNum(_rfFeld(id)); })
+      .filter(function (v) { return v != null && v > 0; });
+    if (_st.length) {
+      deal.qualitaetSterne =
+        Math.round((_st.reduce(function (a, b) { return a + b; }, 0) / _st.length) * 10) / 10;
+    }
     var R = window.DealScore2.compute(deal);
     return { R: R, Z: Z, deal: deal };
   }
@@ -6433,6 +6667,7 @@
     if (art === 'tabelle')  { _rfZurTabelle(); return; }
     /* v1386 */
     if (art === 'wert')     { _rfBlase('ich', 'Ja, mach die Wertermittlung.'); _rfWertStarten(); return; }
+    if (art === 'rnd')      { _rfBlase('ich', 'Ja, ermittle die Restnutzungsdauer.'); _rfRndStarten(); return; }
 
 
     if (art === 'tiefe')    { _rf.tiefeOffen = 0; _rfBlase('ich', 'Ja, lass uns weitermachen.'); _rfTiefeStarten(); return; }
@@ -6741,7 +6976,64 @@
     /* v1121-WFRUEH: steht damit alles fuer die erweiterte Indikation?
        Dann laeuft sie ab jetzt nebenher statt erst am Ende. */
     try { _rfMarkt2Pruefen(); } catch (e) {}
+    try { _rfDarlehenAbleiten(); } catch (e) {}
+    /* v1608 · Sobald alle acht Bauteile stehen, faellt die Punktzahl von
+       selbst. Der Nutzer soll nicht noch einen Knopf druecken muessen,
+       um zu erfahren, was seine Antworten ergeben haben. Die Sperre
+       verhindert, dass die Meldung bei jedem weiteren Feld erneut
+       kommt. */
+    try {
+      if (id.indexOf('mod_') === 0 && id !== 'mod_punkte' && !_rf.modGerechnet) {
+        var voll = ['dach', 'fenster', 'leitungen', 'heizung', 'aussenwand',
+                    'baeder', 'innenausbau', 'grundriss']
+          .every(function (k) { return !!_rfFeld('mod_' + k); });
+        if (voll) { _rf.modGerechnet = 1; _rfModPunkte(); }
+      }
+    } catch (e) {}
     return true;
+  }
+
+  /* ═══ v1607 · DAS DARLEHEN WURDE NIE GEFRAGT UND NIE GERECHNET ═══════
+     Gemessen am 25.09.2026 am Demo-Mehrfamilienhaus: Feld `d1` geleert,
+     neu gerechnet — DSCR fiel auf 0,00, der Beleihungsauslauf auf 0,0 %.
+     Die ganze Finanzierungsseite bricht weg.
+
+     Etappe 2 fragt Eigenkapital, Zins, Tilgung und Zinsbindung — aber
+     NICHT den Darlehensbetrag. Abgeleitet wurde er auch nirgends. Wer
+     den Lauf brav zu Ende geht, bekommt am Schluss einen Investor Deal
+     Score, dessen Finanzierungsblock auf null steht. Beim Anlegen des
+     Demo-Objekts musste ich die Zahl von Hand nachtragen.
+
+     Danach FRAGEN waere die dumme Loesung: der Lauf kennt Kaufpreis,
+     Eigenkapital und die vier Nebenkostensaetze. Er rechnet es aus und
+     sagt, dass er es getan hat — die Quelle steht als `abgeleitet` am
+     Feld, also erscheint es nicht als eigene Angabe des Nutzers.
+
+     Was der Nutzer selbst eingibt, bleibt unangetastet: _rfSetzen
+     schreibt nie ueber einen vorhandenen Wert. */
+  function _rfDarlehenAbleiten() {
+    if (!_rf || !_rf.data || !_rf.data.fields) return;
+    var F = _rf.data.fields;
+    if (F.d1 !== undefined && F.d1 !== null && F.d1 !== '') return;   /* selbst gesetzt */
+    var zahl = function (v) {
+      if (v === undefined || v === null || v === '') return null;
+      var n = (typeof window.parseDe === 'function') ? window.parseDe(v) : parseFloat(v);
+      return isFinite(n) ? n : null;
+    };
+    var kp = zahl(F.kp), ek = zahl(F.ek);
+    if (!kp || kp <= 0 || ek === null || ek < 0) return;
+    /* Die Nebenkosten zaehlen mit - finanziert wird der GESAMTaufwand,
+       nicht der Kaufpreis. Fehlt ein Satz, gilt er als null; das ist
+       keine Erfindung, sondern die Angabe, die vorliegt. */
+    var nk = ['makler_p', 'notar_p', 'gba_p', 'gest_p'].reduce(function (s, id) {
+      return s + (zahl(F[id]) || 0);
+    }, 0);
+    var gesamt = kp * (1 + nk / 100);
+    var d1 = Math.round(gesamt - ek);
+    if (d1 <= 0) return;            /* voll aus Eigenkapital - kein Darlehen */
+    F.d1 = String(d1);
+    _rf.quelle = _rf.quelle || {};
+    _rf.quelle.d1 = 'abgeleitet aus Kaufpreis, Nebenkosten und Eigenkapital';
   }
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -6860,8 +7152,14 @@
         _rfAktion('lage', 'Aus der Marktpreisindikation liegen Makro- und Mikrolage vor.',
                   'Lagewerte übernehmen');
       } else if (_rfLageMoeglich()) {
+        /* v1609 · Hier stand "... Wertsteigerung und Entwicklung". Die
+           Entwicklungsmoeglichkeiten kann keine Marktabfrage liefern:
+           sie fragen, ob sich am OBJEKT etwas machen laesst - Dachausbau,
+           Teilung, Nachverdichtung. Das steht in keiner Statistik.
+           Versprochen wird jetzt, was wirklich kommt. */
         _rfAktion('lage', 'Ich recherchiere Makrolage, Mikrolage, Bevölkerungsentwicklung, ' +
-                  'Nachfrage, Wertsteigerung und Entwicklung — mit Quellenangabe.',
+                  'Nachfrage und Wertsteigerung — mit Quellenangabe. ' +
+                  'Die Entwicklungsmöglichkeiten bleiben deine Einschätzung.',
                   'Lage recherchieren');
       } else return '';
       _rf.abrufOffen = 'lage';
@@ -6969,6 +7267,36 @@
     setz('ds2_wertsteigerung', stufeWert(M.trendRaw), 'erweiterte Marktpreisindikation');
     setz('ds2_bevoelkerung', stufeBev(M.bevRaw), 'amtliche Bevoelkerungsstatistik');
     setz('ds2_nachfrage', stufeNachfrage(M.tageRaw), 'Angebotsdauer im Umkreis');
+
+    /* ═══ v1609 · ZWEI WEITERE, DIE DIE INDIKATION SCHON MITBRINGT ══════
+       Marcel: "Die Sachen kannst du aber ja aus der Schnittstelle
+       herauslesen. Die werden ja vom Marktbericht quasi zurueckgegeben.
+       Also koenntest du die automatisch befuellen."
+
+       Stimmt - und zwei blieben liegen, obwohl die Zahlen da waren:
+
+       MARKTMIETE: M.mietSqm ist der Median der Angebotsmieten je m2.
+       _rfScore2 hat ihn bisher nur INTERN als Rueckfall benutzt; das
+       FELD blieb leer, also fehlte er im gespeicherten Objekt und in
+       jeder spaeteren Rechnung. Jetzt steht er im Feld.
+
+       MARKTFAKTOR: der marktuebliche Kaufpreisfaktor. Er ist keine
+       eigene Auskunft der Schnittstelle, sondern faellt aus zwei
+       Zahlen, die sie liefert - Angebotspreis je m2 geteilt durch die
+       Jahresmiete je m2. Genau das rechnet auch der Score, wenn er
+       "Faktor vs. Markt" vergleicht. Abgeleitet, nicht erfunden: die
+       Herkunft steht am Feld.
+
+       BEIDE NUR, WENN BEIDE ZAHLEN DA SIND. Ein Faktor aus einem
+       geschaetzten Nenner waere eine erfundene Zahl mit Nachkommastelle. */
+    if (M.mietSqm != null && M.mietSqm > 0) {
+      setz('ds2_marktmiete', String(Math.round(M.mietSqm * 100) / 100),
+           'Median der Angebotsmieten im Umkreis');
+      if (M.sqm != null && M.sqm > 0) {
+        setz('ds2_marktfaktor', String(Math.round((M.sqm / (M.mietSqm * 12)) * 10) / 10),
+             'abgeleitet: Angebotspreis je m² zu Jahresmiete je m²');
+      }
+    }
     if (gesetzt.length) _rfStandZeichnen();
     return gesetzt.length;
   }
@@ -6982,9 +7310,24 @@
     if (!trifft) return;
     var kg = _rfKontingent();
     if (!kg || !kg.mpi_plus) return;
+    /* v1609 · HIER FEHLTE DIE PRUEFUNG. Angeboten - und damit abgerechnet -
+       wurde die erweiterte Stufe, sobald eine Entwicklungsfrage kam. Ob
+       ihre Eingaben ueberhaupt vorlagen, hat niemand gefragt. Marcels
+       Befund: "Der hatte aber glaube ich noch gar nicht alle Werte fuer
+       die erweiterte Marktpreisindikation."
+
+       _rfMarkt2Bereit() verlangt Ort, Wohnflaeche, Baujahr UND die
+       beiden, die den Unterschied zur einfachen Stufe ausmachen:
+       Zustand und Bodenrichtwert. Ohne sie rechnet die erweiterte Stufe
+       auf derselben Grundlage wie die einfache - der Kunde zahlt eine
+       Differenz fuer nichts.
+
+       Das Angebot faellt nicht weg, es kommt nur spaeter: beide Wege
+       werden nach jeder Uebernahme erneut geprueft. */
+    if (!_rfMarkt2Bereit()) return;
     _rf.marktPlusHier = 1;
     _rfAktion('markt2',
-      'Sie liefert Bevölkerung, Nachfrage, Wertsteigerung und Entwicklung mit — ' +
+      'Sie liefert Bevölkerung, Nachfrage, Wertsteigerung und die amtliche Lage mit — ' +
       'du musst sie dann nicht schätzen. Die erste Stufe ist schon bezahlt, es kostet die Differenz.',
       'Erweiterte Marktpreisindikation holen', { frei: kg.mpi_plus, stufe: 2 });
     _rf.abrufOffen = 'markt2';
@@ -7500,6 +7843,12 @@
     if (_rf.markt && !_rf.markt2 && !_rf.marktPlusGefragt) {
       var kg = _rfKontingent();
       if (!kg || !kg.mpi_plus) return;
+      /* v1609 · Auch hier fehlte die Pruefung - und der Satz darunter
+         behauptet woertlich "Jetzt haette ich alles beisammen ...
+         Zustand, Energieausweis, Bodenrichtwert". Er wurde gesagt, ohne
+         dass es jemand nachgesehen hat. Eine Behauptung, die Geld
+         kostet, gehoert geprueft, bevor sie faellt. */
+      if (!_rfMarkt2Bereit()) return;
       _rf.marktPlusGefragt = 1;
       _rf.abrufOffen = 'markt2';
       _rfBlase('co', 'Jetzt hätte ich alles beisammen für die <b>erweiterte Marktpreisindikation</b> — ' +
@@ -8697,6 +9046,70 @@
     _rfFrage();
   }
 
+  /* ═══ v1608 · DIE RESTNUTZUNGSDAUER-STRECKE ═════════════════════════
+     Gebaut wie die Wertermittlung: erst ein Angebot in der Leiste, dann
+     - auf Ja - zwei Fragen mit Klick-Knoepfen. Die Technik dafuer gibt
+     es vollstaendig; sie bekam nur nie einen zweiten Nutzer. */
+  function _rfRndAnbieten() {
+    if (!_rf || _rf.rndAn || _rf.rndGefragt) return false;
+    if (!_rf.alle) return false;                  /* nur im gefuehrten Weg */
+    /* Ohne Baujahr ist die Frage sinnlos: die Restnutzungsdauer wird aus
+       Alter und Modernisierungsgrad gebildet. Kein Baujahr, kein Alter. */
+    if (!_rfFeld('baujahr')) return false;
+    _rf.rndGefragt = 1;
+    _rfAktion('rnd',
+      'Soll ich die Restnutzungsdauer ermitteln? Acht kurze Fragen zum '
+        + 'Modernisierungsgrad — daraus wird deine Abschreibung.',
+      'Ja, Restnutzungsdauer');
+    return true;
+  }
+
+  function _rfRndStarten() {
+    if (!_rf || _rf.rndAn) return;
+    _rf.rndAn = 1;
+    _rfAktionWeg('rnd');
+    var neu = RFRAGEN_RND.filter(function (e) { return _rfFehlt(e); });
+    _rfBlase('co',
+      '<b>Restnutzungsdauer nach Anlage 2 ImmoWertV.</b><br>'
+    + '<span style="opacity:.8">Acht Bauteile, höchstens 20 Punkte. Je mehr '
+    + 'modernisiert wurde, desto länger die Restnutzungsdauer — und je '
+    + 'KÜRZER sie ist, desto höher deine jährliche Abschreibung. '
+    + 'Du kannst tippen, klicken oder sprechen.</span>');
+    if (!neu.length) { _rfModPunkte(); return; }
+    _rfKatalogErgaenzen(neu);
+    _rf.offen = _rf.offen.concat(_rfAufKatalog(neu, _rf.catalog));
+    _rfStandZeichnen();
+    _rfFrage();
+  }
+
+  /* Aus den acht Antworten die Punktzahl - mit der Funktion des
+     Assistenten, nicht mit einer Kopie. Eine zweite Umsetzung derselben
+     Vorschrift laeuft frueher oder spaeter auseinander, und diese Zahl
+     steuert die Abschreibung. */
+  function _rfModPunkte() {
+    var W = window.DealPilotRND_Wizard;
+    if (!W || typeof W.modPunkte !== 'function') return null;
+    var mod = {};
+    ['dach', 'fenster', 'leitungen', 'heizung', 'aussenwand',
+     'baeder', 'innenausbau', 'grundriss'].forEach(function (k) {
+      var v = _rfFeld('mod_' + k);
+      if (v) mod[k] = String(v);
+    });
+    var p = W.modPunkte(mod);
+    if (!p || typeof p.total !== 'number') return null;
+    _rfSetzen('mod_punkte', String(p.total), 'aus deinen Angaben nach Anlage 2');
+    var grad = p.total <= 1 ? 'nicht modernisiert'
+      : p.total <= 5 ? 'kleine Modernisierungen'
+      : p.total <= 10 ? 'mittlerer Modernisierungsgrad'
+      : p.total <= 17 ? 'überwiegend modernisiert' : 'umfassend modernisiert';
+    _rfBlase('co',
+      '<b>' + p.total + ' von 20 Punkten — ' + escH(grad) + '.</b><br>'
+    + '<span style="opacity:.8">Damit steht der Modernisierungsgrad im Objekt. '
+    + 'Die genaue Restnutzungsdauer rechnet der Assistent im Steuer-Bereich '
+    + 'daraus aus — er übernimmt deine Angaben.</span>');
+    return p.total;
+  }
+
   /* Der Abruf. Derselbe Endpunkt wie die erweiterte Indikation — er
      traegt das Sachwertverfahren bereits in sich (CrossCheckService);
      was ihm bisher fehlte, waren Standardstufe und Garagenflaeche. */
@@ -8711,8 +9124,19 @@
       var v = _rfFeld(id);
       if (v !== null && v !== undefined && v !== '') obj[id] = v;
     });
-    _rfBlase('co', '<span style="opacity:.75">Die Wertermittlung läuft — ich frage den '
-      + 'Gutachterausschuss deines Gebiets ab und rechne das Sachwertverfahren.</span>');
+    /* v1603 · Hier stand "Die Wertermittlung läuft — ich frage den
+       Gutachterausschuss deines Gebiets ab und rechne das
+       Sachwertverfahren." Abgerechnet wird aber wert_stufe 2, die
+       erweiterte Marktpreisindikation, und die rechnet seit v1435
+       genau das NICHT mehr. Versprochen wurde damit das Stufe-3-Produkt
+       zum Stufe-2-Preis - und geliefert wurde nichts.
+
+       Ob der Sprechlauf kuenftig Stufe 3 buchen soll, ist eine
+       Preisentscheidung und gehoert Marcel. Bis dahin sagt der Satz,
+       was wirklich passiert. */
+    _rfBlase('co', '<span style="opacity:.75">Die erweiterte Marktpreisindikation '
+      + 'läuft — ich hole Lage, Mieten und Vergleichswerte zu deiner '
+      + 'Adresse.</span>');
     Auth.apiCall('/marktbericht/reports/from-dealpilot',
                  { method: 'POST',
                    body: { wert_stufe: 2, wertermittlung: true, object: obj,
@@ -8766,6 +9190,29 @@
     }
 
     if (!zeilen.length) {
+      /* v1603 · ZWEI GRUENDE, DIE NICHTS MITEINANDER ZU TUN HABEN.
+         Hier stand immer "Für dieses Gebiet liegt kein Sachwertfaktor
+         vor" - auch dann, wenn es sehr wohl einen gibt und nur die
+         Stufe nicht gebucht war. Der Satz widersprach sich selbst:
+         "kein Sachwertfaktor vor. Grund: Boden-, Ertrags- und Sachwert
+         gehören zur Wertermittlung nach ImmoWertV (Stufe 3)."
+
+         Das ist derselbe Fehler wie eine erfundene Zahl, nur in Worten:
+         eine Begruendung behaupten, die nicht stimmt. Wer das liest,
+         sucht den Fehler bei seinem Gutachterausschuss statt bei
+         seinem Tarif. */
+      if (cc && cc.nicht_im_umfang) {
+        _rfBlase('co', '<b>Der Sachwert gehört zur Wertermittlung nach ImmoWertV.</b>'
+          + '<div class="vi-sc"><div class="vi-sc-annahmen">'
+          + 'Diese Auswertung ist eine erweiterte Marktpreisindikation — '
+          + 'Boden-, Ertrags- und Sachwert sind darin nicht enthalten. '
+          + 'Ob für dein Gebiet ein Sachwertfaktor vorliegt, ist damit '
+          + 'nicht gesagt; geprüft wurde es hier gar nicht.'
+          + '</div></div>');
+        _rf.wertAn = 2;
+        if (_fs.an && _fs.stream) _fsHoeren(true);
+        return;
+      }
       /* KEIN WERT IST AUCH EINE ANTWORT — aber nur mit dem Weg dorthin. */
       var grund = gaa.grund || cc.grund || null;
       _rfBlase('co', '<b>Für dieses Gebiet liegt kein Sachwertfaktor vor.</b>'
@@ -8841,6 +9288,13 @@
        merkt nichts davon. */
     if (!erzwungen && _rf && !_rf.wertGefragt) {
       try { _rfWertAnbieten(); } catch (e) {}
+    }
+    /* v1608 · Dasselbe fuer die Restnutzungsdauer. Sie steht VOR der
+       Wertermittlung in der Leiste, weil sie jedem nuetzt - auch ohne
+       Pro-Abo - und weil sie die Abschreibung bewegt: am
+       Demo-Mehrfamilienhaus 30.552 EUR im Jahr. */
+    if (!erzwungen && _rf && !_rf.rndGefragt) {
+      try { _rfRndAnbieten(); } catch (e) {}
     }
     if (_rf && !_rf.abschlussGezeigt) {
       _rf.abschlussGezeigt = 1;

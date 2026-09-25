@@ -219,7 +219,135 @@ function recalcWithLibreOffice(xlsxPath) {
 // ----------------------------------------------------------------------
 // Hauptfunktion: Eingaben → BMF-Berechnung → Ergebnis + Datei
 // ----------------------------------------------------------------------
+/* v1484 · Marcel 21.09.2026: "es waere super, wenn wir die BMF-Arbeitshilfe
+   mit ausgeben als PDF". Dieselbe LibreOffice-Strecke wie der Recalc, nur mit
+   --convert-to pdf. Die ausgefuellte Arbeitshilfe wird damit zum Beleg, den
+   man dem Finanzamt beilegen kann. Faellt die Umwandlung aus, bleibt es beim
+   XLSX - die Berechnung selbst haengt nicht daran. */
+/* v1486 · Marcel 21.09.2026: "bei der bmf arbeitshilfe ist die formatierung
+   falsch. auch sollte man querformat nehmen und auch nur bis zur
+   Kaufpreisaufteilung abbilden. die ersten 2 seiten".
+   Gemessen am erzeugten PDF: sechs Seiten hoch, weil LibreOffice ALLE NEUN
+   Blaetter der Arbeitshilfe ausgibt (KPA, Fiktives Baujahr, Verweise, AfA,
+   THK, SW-NHK, SW-Bau-Index, EW-BWK, EW-Bewertungsparameter). Die eigentliche
+   Kaufpreisaufteilung steht allein auf dem Blatt KPA und endet dort in
+   Zeile 122 ("Summe"). Also: fuer den Druck eine KOPIE anlegen, darin alle
+   anderen Blaetter verstecken (versteckte Blaetter druckt LibreOffice nicht),
+   das Blatt KPA auf Querformat und auf Seitenbreite ziehen - der Vorlage
+   eigener Festwert scale 59 wuerde sonst dagegenhalten.
+   Die Kopie wird nur gedruckt; gerechnet und heruntergeladen wird weiter die
+   unveraenderte Arbeitshilfe. */
+const DRUCK_BLATT = 'KPA';
+const DRUCK_BEREICH = 'C1:M122';
+
+async function druckfassung(xlsxPath) {
+  const ziel = xlsxPath.replace(/\.xlsx$/i, '') + '_druck.xlsx';
+  const wb = new ExcelJS.Workbook();
+  await wb.xlsx.readFile(xlsxPath);
+  let gefunden = false;
+  wb.eachSheet((ws) => {
+    if (ws.name === DRUCK_BLATT) {
+      gefunden = true;
+      ws.state = 'visible';
+      ws.pageSetup = Object.assign({}, ws.pageSetup, {
+        orientation: 'landscape',
+        fitToPage: true,
+        fitToWidth: 1,
+        fitToHeight: 0,
+        scale: undefined,
+        printArea: DRUCK_BEREICH,
+        horizontalCentered: true,
+        verticalCentered: false,
+        margins: { left: 0.3, right: 0.3, top: 0.4, bottom: 0.4, header: 0.2, footer: 0.2 },
+      });
+    } else {
+      ws.state = 'hidden';
+    }
+  });
+  if (!gefunden) return xlsxPath;   // Blatt umbenannt? Dann lieber alles drucken.
+  await wb.xlsx.writeFile(ziel);
+  return ziel;
+}
+
+function convertToPdf(xlsxPath) {
+  return new Promise((resolve) => {
+    const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bmf-pdf-'));
+    const profileDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lo-pdf-'));
+    const args = [
+      '--headless', '--norestore', '--nologo', '--nofirststartwizard',
+      `-env:UserInstallation=file://${profileDir}`,
+      '--calc', '--convert-to',
+      /* zusaetzlich hart auf die ersten zwei Seiten begrenzt - falls eine
+         kuenftige Fassung der Vorlage doch laenger laeuft. JSON-Filteroptionen
+         kann LibreOffice ab 7.4 (im Container laeuft 7.4.7.2). */
+      'pdf:calc_pdf_Export:{"PageRange":{"type":"string","value":"1-2"}}',
+      '--outdir', outDir, xlsxPath,
+    ];
+    const proc = spawn(LIBREOFFICE_BIN, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+    let stderr = '';
+    proc.stderr.on('data', (d) => { stderr += d.toString(); });
+    const timer = setTimeout(() => { try { proc.kill('SIGKILL'); } catch (_) {} }, RECALC_TIMEOUT_MS);
+    proc.on('close', () => {
+      clearTimeout(timer);
+      try {
+        const treffer = fs.readdirSync(outDir).filter((f) => f.toLowerCase().endsWith('.pdf'));
+        const pdf = treffer.length ? fs.readFileSync(path.join(outDir, treffer[0])).toString('base64') : null;
+        resolve(pdf);
+      } catch (e) { resolve(null); }
+      finally {
+        try { fs.rmSync(outDir, { recursive: true, force: true }); } catch (_) {}
+        try { fs.rmSync(profileDir, { recursive: true, force: true }); } catch (_) {}
+      }
+    });
+    proc.on('error', () => { clearTimeout(timer); resolve(null); });
+  });
+}
+
+/* v1498 · Marcel 21.09.2026: "wenn ich auf BMF-Rechner klicke dauert es
+   extrem lange."
+   Gemessen an Rinteln ueber Resource Timing: beim OEFFNEN laufen zwei
+   Backend-Rufe - bmf/pipeline (3.124 ms) und bmf/aufteilung (3.089 ms) -,
+   und bmf/pipeline ruft intern GENAU DIESE Funktion. Dieselbe Arbeitshilfe
+   geht also zweimal durch LibreOffice, mit denselben Eingaben, im Abstand
+   von einer Sekunde. Das ist keine Rechenzeit, das ist die doppelte.
+   Der Speicher haelt das Ergebnis kurz fest: gleiche Eingaben und gleiche
+   Optionen ergeben dieselbe Antwort ohne zweiten Lauf. Kurz gehalten, weil
+   das Ergebnis an Eingaben haengt, die laufend geaendert werden - der
+   Schluessel enthaelt sie alle, eine Aenderung faellt also nie in den
+   Speicher hinein. */
+const KPA_SPEICHER = new Map();
+const KPA_SPEICHER_MS = parseInt(process.env.BMF_CACHE_MS || '120000', 10);
+const KPA_SPEICHER_MAX = 12;
+
+function _kpaSchluessel(inputs, opts) {
+  const roh = JSON.stringify(inputs, Object.keys(inputs || {}).sort())
+    + '|' + (opts.includeFile !== false ? 'F' : '-')
+    + '|' + (opts.includePdf ? 'P' : '-');
+  return crypto.createHash('sha1').update(roh).digest('hex');
+}
+
+function _kpaAusSpeicher(schluessel) {
+  const e = KPA_SPEICHER.get(schluessel);
+  if (!e) return null;
+  if (Date.now() - e.zeit > KPA_SPEICHER_MS) { KPA_SPEICHER.delete(schluessel); return null; }
+  return e.wert;
+}
+
+function _kpaInSpeicher(schluessel, wert) {
+  KPA_SPEICHER.set(schluessel, { zeit: Date.now(), wert });
+  while (KPA_SPEICHER.size > KPA_SPEICHER_MAX) {
+    KPA_SPEICHER.delete(KPA_SPEICHER.keys().next().value);
+  }
+}
+
 async function calculateKpa(inputs, opts = {}) {
+  const _schluessel = _kpaSchluessel(inputs, opts);
+  const _gespeichert = _kpaAusSpeicher(_schluessel);
+  if (_gespeichert) {
+    return Object.assign({}, _gespeichert, {
+      meta: Object.assign({}, _gespeichert.meta, { aus_speicher: true }),
+    });
+  }
   if (!ExcelJS) throw new Error("exceljs nicht installiert — bitte 'npm i exceljs' im backend/");
   if (!fs.existsSync(TEMPLATE_PATH)) {
     throw new Error(`BMF-Vorlage fehlt: ${TEMPLATE_PATH}`);
@@ -324,16 +452,34 @@ async function calculateKpa(inputs, opts = {}) {
     filledBase64 = fs.readFileSync(workPath).toString('base64');
   }
 
+  // 5b) Arbeitshilfe zusaetzlich als PDF (v1484, nur auf Anforderung)
+  let pdfBase64 = null;
+  if (opts.includePdf) {
+    let druckPfad = null;
+    try {
+      druckPfad = await druckfassung(workPath);
+      pdfBase64 = await convertToPdf(druckPfad);
+    } catch (_) {
+      pdfBase64 = null;
+    } finally {
+      if (druckPfad && druckPfad !== workPath) {
+        try { fs.rmSync(druckPfad, { force: true }); } catch (_) {}
+      }
+    }
+  }
+
   // 6) Cleanup
   try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch (_) {}
 
-  return {
+  const _ergebnis = {
     ok: true,
     stage: 'done',
     inputs_received: inputs,
     results,
     file_base64: filledBase64,
     file_name: `BMF_Aufteilung_${new Date().toISOString().slice(0,10)}.xlsx`,
+    pdf_base64: pdfBase64,
+    pdf_name: `BMF_Arbeitshilfe_${new Date().toISOString().slice(0,10)}.pdf`,
     meta: {
       template_version: 'Fassung Juni 2023',
       template_path: TEMPLATE_PATH,
@@ -341,6 +487,9 @@ async function calculateKpa(inputs, opts = {}) {
       recalc_engine: 'LibreOffice headless',
     },
   };
+
+  _kpaInSpeicher(_schluessel, _ergebnis);
+  return _ergebnis;
 }
 
 // ----------------------------------------------------------------------

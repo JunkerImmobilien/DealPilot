@@ -7,7 +7,7 @@
  *  Phase 2: Inventar-Trennung      (KP − Inventar = Immobilien-KP)
  *  Phase 3: Prognose-AK            (Immo-KP + NK)
  *  Phase 4: BMF-Aufteilung         (bmfService.calculateKpa)
- *  Phase 5: 3 Varianten            (Konservativ × 1.0, Optimiert × 0.85, Aggressiv × 0.75)
+ *  Phase 5: 4 Varianten            (Amtlich × 1.0, Konservativ × 0.85, Optimiert × 0.80, Aggressiv × 0.75)
  *  Phase 6: Vertragsstruktur       (intern, kein eigener Output)
  *  Phase 7: NK-Verteilung          (Geb/Boden anteilig, NICHT Inventar)
  *  Phase 8: Finale AK              (Geb-KP + Geb-NK pro Variante)
@@ -24,11 +24,19 @@ const bmfService = require('./bmfService');
 
 const ENGINE_VERSION = 'v290.0.0';
 
-// User-confirmed Faktoren aus Konzept-Doc Kapitel 12
+/* v1491 · Marcel 21.09.2026: "vielleicht koennen wir eine vierte Kachel dazu
+   nehmen: einmal amtlich nach BMF-Grundlage, dann konservativ mit 15 Prozent,
+   dann optimiert mit 20 Prozent und aggressiv mit 25."
+   Vorher hiess die unveraenderte BMF-Zahl "Konservativ" - ein Name, der eine
+   Haltung behauptet, wo gar keine ist. Die amtliche Aufteilung ist keine
+   Variante unter Varianten, sie ist die GRUNDLAGE, von der die anderen drei
+   abweichen. Deshalb traegt sie jetzt ihren eigenen Namen, und die drei
+   Abweichungen stehen in gleichen Schritten daneben. */
 const BODEN_FAKTOREN = {
-  konservativ: 1.00,
-  optimiert:   0.85,
-  aggressiv:   0.75
+  amtlich:     1.00,   // BMF-Arbeitshilfe unveraendert
+  konservativ: 0.85,   // Boden -15 %
+  optimiert:   0.80,   // Boden -20 %
+  aggressiv:   0.75    // Boden -25 %
 };
 
 // AfA-Satz nach Baujahr (§ 7 Abs. 4 EStG, vereinfacht)
@@ -320,9 +328,13 @@ function _phase11_risiko(phase2, phase4, phase5, phase8, phase9, inputs) {
     const begruendungen = [];
 
     // Faktor 1: Variant-Typ
-    if (name === 'optimiert') {
+    /* v1491: vier Stufen - die amtliche Zahl traegt kein Eigenrisiko. */
+    if (name === 'konservativ') {
       score += 1;
-      begruendungen.push('Optimierte Aufteilung (Boden −15 %)');
+      begruendungen.push('Konservative Aufteilung (Boden −15 %)');
+    } else if (name === 'optimiert') {
+      score += 2;
+      begruendungen.push('Optimierte Aufteilung (Boden −20 %)');
     } else if (name === 'aggressiv') {
       score += 3;
       begruendungen.push('Aggressive Aufteilung (Boden −25 %)');
