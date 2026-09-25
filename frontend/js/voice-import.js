@@ -2697,7 +2697,17 @@
       frage: 'Wo steht das Objekt? Straße, Hausnummer, PLZ und Ort.' },
     /* v1437: 'einheiten' ist Kandidat — gefragt nur, wo die Art sie
        verlangt (MFH). 'zimmer' nur, wo es passt. Den Text baut _rfNachArt. */
-    { et: 1, ids: ['objart', 'wfl', 'zimmer', 'einheiten'], rang: 3, nachArt: 1,
+    /* v1606 · 'etagen_ges' kam dazu. objektart-felder.js fuehrt es bei
+       MFH, EFH, ZFH, DHH, RH und ETW unter `passt` - gefragt wurde es
+       trotzdem nie, weil es in keinem Katalogeintrag stand. Der
+       Restnutzungsdauer-Assistent braucht es (Schritt 1, Vollgeschosse);
+       beim Demo-Mehrfamilienhaus stand dort am 24.09.2026 eine 1 statt
+       einer 3, und ich musste sie von Hand nachtragen.
+
+       _rfNachArt filtert es fuer Buero, Hotel und Garage selbst wieder
+       heraus - die Maschinerie dafuer gibt es, sie bekam nur nie den
+       Kandidaten. */
+    { et: 1, ids: ['objart', 'wfl', 'zimmer', 'einheiten', 'etagen_ges'], rang: 3, nachArt: 1,
       frage: 'Was für ein Objekt ist es, und wie groß? Art, Wohnfläche, Zimmer.' },
     { et: 1, ids: ['baujahr', 'kp'],                rang: 1,
       frage: 'Baujahr und Kaufpreis?' },
@@ -3001,6 +3011,9 @@
       var teile = ['Art', /^(BUERO|GESCH|HOTEL|GEW|GAR)$/.test(art) ? 'Fläche' : 'Wohnfläche'];
       if (hat('zimmer')) teile.push('Zimmer');
       if (hat('einheiten')) teile.push('Zahl der Wohneinheiten');
+      /* v1606 · Die Vollgeschosse gehoeren in die Frage, sonst steht das
+         Feld im Katalog und wird trotzdem nicht erfragt. */
+      if (hat('etagen_ges')) teile.push('Vollgeschosse');
       k.frage = 'Was für ein Objekt ist es, und wie groß? ' + teile.slice(0, -1).join(', ') + ' und ' + teile[teile.length - 1] + '.';
     }
     if (hat('ds2_zustand')) {
@@ -4217,14 +4230,53 @@
              Pflicht: ohne sie ignoriert ein Flex-Kind das overflow. */
       '  .oabi-ov.vi-mode .oabi-body{overflow-y:auto;-webkit-overflow-scrolling:touch}',
       '  .oabi-ov.vi-mode #vi-frage{overflow-y:auto;min-height:0;flex:1 1 auto}',
-      /* 2 · Die Merkliste ist Nachschlagewerk, nicht Gespraech. Sie
-             bekommt eine Deckelhoehe und scrollt in sich - statt die
-             halbe Anzeige zu belegen. */
-      '  .oabi-ov.vi-mode #vi-rf-dran{max-height:34vh;overflow-y:auto;min-height:0}',
-      /* 3 · Die Aufnahme steht unten fest, wie die Eingabezeile in
-             einem Messenger. Sie ist das, was man dauernd braucht. */
-      '  .oabi-ov.vi-mode #vi-rf-mikro{position:sticky;bottom:0;z-index:5;',
+      /* ═══ 2 · DAS GESPRAECH BEKOMMT DEN PLATZ ═══════════════════════
+         v1606 · Den Chat gibt es hier laengst - #vi-rf-chat mit Co- und
+         Du-Blasen. Er wurde nur erdrueckt. Gemessen am 25.09.2026 bei
+         390 px:
+
+             #vi-rf-chat     Hoehe 180, Inhalt braucht 577
+             .vi-rf-buehne   Hoehe   0, Inhalt braucht 412
+             #vi-rf-dran     Hoehe 237
+
+         Die Buehne steht auf flex:1 1 auto - aber es war kein freier
+         Platz mehr da, den sie haette nehmen koennen: Kopfzeile, Band,
+         Frage, Aufnahme, Uebernehmen und die Nebenknoepfe hatten die
+         Hoehe schon aufgebraucht. Also schrumpfte sie auf null, und ihr
+         Inhalt quoll ueber die Aufnahme (Chat bei 485, Aufnahme bei
+         500 - sie lagen uebereinander).
+
+         Die Nebensache bekam 237 Pixel, das Gespraech 180 von 577.
+         Genau das ist "man sieht nichts".
+
+         Jetzt ist die Ordnung die eines Messengers:
+             Kopfzeile + Band   oben, schmal
+             GESPRAECH          nimmt den ganzen Rest, scrollt
+             aktuelle Frage     darunter, gedeckelt
+             Nebenknoepfe
+             Aufnahme + Uebernehmen   unten festgeklebt          */
+      '  .oabi-ov.vi-mode #vi-frage{display:flex;flex-direction:column}',
+      '  .oabi-ov.vi-mode .vi-rf-buehne{flex:1 1 auto;min-height:38vh;display:block}',
+      '  .oabi-ov.vi-mode #vi-rf-chat{height:100%;max-height:none;overflow-y:auto;',
+      '    -webkit-overflow-scrolling:touch}',
+      /* Die aktuelle Frage ist die juengste Wortmeldung, nicht die halbe
+         Anzeige. Sie steht direkt ueber der Eingabe und scrollt in sich. */
+      '  .oabi-ov.vi-mode #vi-rf-dran{max-height:26vh;overflow-y:auto;min-height:0;flex:0 0 auto}',
+      /* Reihenfolge per order - ohne das DOM anzufassen. */
+      '  .oabi-ov.vi-mode .vi-rf-kopfzeile{order:1}',
+      '  .oabi-ov.vi-mode #vi-rf-band{order:2}',
+      '  .oabi-ov.vi-mode .vi-rf-buehne{order:3}',
+      '  .oabi-ov.vi-mode #vi-rf-dran{order:4}',
+      '  .oabi-ov.vi-mode #vi-rf-neben{order:5;flex:0 0 auto}',
+      '  .oabi-ov.vi-mode #vi-rf-mikro{order:6}',
+      '  .oabi-ov.vi-mode .vi-rf-zeile{order:7}',
+      /* 3 · Aufnahme und Uebernehmen kleben unten, zweizeilig wie die
+             Eingabeleiste eines Messengers. Der Versatz von 44 px ist
+             die Hoehe der Uebernehmen-Zeile darunter. */
+      '  .oabi-ov.vi-mode #vi-rf-mikro{position:sticky;bottom:44px;z-index:5;flex:0 0 auto;',
       '    background:var(--cr,#FDFCFA);box-shadow:0 -8px 18px -10px rgba(0,0,0,.35)}',
+      '  .oabi-ov.vi-mode .vi-rf-zeile{position:sticky;bottom:0;z-index:6;flex:0 0 auto;',
+      '    background:var(--cr,#FDFCFA)}',
       /* 4 · Das Etappenband bricht nicht mehr uebereinander. */
       '  .oabi-ov.vi-mode #vi-rf-band{flex-wrap:wrap;row-gap:6px;height:auto;min-height:0}',
       '  .oabi-ov.vi-mode .vi-rf-gr{flex-wrap:wrap;row-gap:4px}',
