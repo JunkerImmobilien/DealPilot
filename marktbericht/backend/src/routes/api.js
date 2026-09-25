@@ -280,12 +280,37 @@ async function ensureFixtures() {
    (backend/src/routes/marktbericht.js:365, :374, :529-530). Wer hier
    raet statt alle drei Stellen zu lesen, speichert nichts mehr - und
    merkt es erst, wenn ein Replay ins Leere laeuft. */
+/* v1610 · HIER STAND parseInt - UND DAS IST AUF PRODUKTION IMMER NaN.
+
+   Gemessen am 25.09.2026 auf Prod: users.id ist dort eine UUID
+   (f214ade7-3f96-...), auf Staging eine Zahl. parseInt('f214ade7-...')
+   ergibt NaN, also wurde jede Anfrage mit "user_id erforderlich"
+   abgewiesen.
+
+   Das ist KEIN Fehler dieses Fixes: /marktbericht/objects und
+   /objects/history scheitern auf Prod genauso, und die tragen das
+   parseInt seit v942. Die nutzerbezogenen Marktbericht-Wege waren auf
+   Produktion nie benutzbar - es ist nur niemandem aufgefallen, weil
+   eine leere Liste wie "noch nichts da" aussieht.
+
+   Fuer die Fixtures loest sich das ohne Datenbank-Eingriff: ihr
+   Schluessel ist TEXT, die Kennung wandert als Zeichenkette hinein.
+   Die Tabellen market_reports und object_snapshots fuehren user_id
+   dagegen als INTEGER - dort braucht es eine Migration, und die
+   gehoert Marcel vorgelegt, nicht nebenbei gemacht.
+
+   Die Kennung wird nur noch auf Unbedenklichkeit geprueft, nicht auf
+   Zahligkeit: sie geht in einen Schluessel, nicht in eine Rechnung. */
 function _uidAus(req) {
   const b = req.body || {};
   const o = b.overrides || {};
   const v = req.query.user_id || b.user_id || o.user_id;
-  const n = parseInt(v, 10);
-  return n > 0 ? n : 0;
+  const s = String(v == null ? '' : v).trim();
+  if (!s || s === 'undefined' || s === 'null') return '';
+  /* Was im Schluessel landet, darf ihn nicht sprengen: Ziffern,
+     Buchstaben und Bindestriche decken Zahl und UUID ab. */
+  if (!/^[A-Za-z0-9-]{1,64}$/.test(s)) return '';
+  return s;
 }
 
 /* v1601 · uid ist jetzt Pflicht. Ohne sie wird NICHTS gespeichert -
@@ -668,7 +693,9 @@ router.get('/reports/fixtures', async (req, res) => {
     /* v1601 · Hier stand ein SELECT ohne WHERE. Die Liste nannte
        Schluessel und ANSCHRIFT jedes gespeicherten Berichts - auch der
        fremden. Jetzt gilt dieselbe Regel wie bei /objects. */
-    const uid = parseInt(req.query.user_id, 10);
+    /* v1610 · Die Kennung kommt aus _uidAus, nicht mehr aus parseInt -
+       auf Produktion ist sie eine UUID und wurde dort zu NaN. */
+    const uid = _uidAus(req);
     if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
     const r = await q(
       `SELECT key,address,created_at FROM mb.report_fixtures
@@ -690,10 +717,15 @@ router.get('/reports/replay', async (req, res) => {
        jetzt die Nutzerkennung, und eine fremde laesst sich nicht
        angeben: was hereinkommt, wird IMMER mit der eigenen uid
        praefixiert. */
-    const uid = parseInt(req.query.user_id, 10);
+    const uid = _uidAus(req);
     if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
     const roh = String(req.query.key || 'last');
-    const key = (roh === 'last') ? ('last:' + uid) : (uid + ':' + roh.replace(/^\d+:/, ''));
+    /* Ein mitgeschickter Praefix wird abgeschnitten, damit niemand die
+       Kennung eines anderen in den Schluessel schmuggelt. Er kann aus
+       Ziffern ODER einer UUID bestehen - beides faellt weg. */
+    const key = (roh === 'last')
+      ? ('last:' + uid)
+      : (uid + ':' + roh.replace(/^[A-Za-z0-9-]{1,64}:/, ''));
     const rows = await q('SELECT result FROM mb.report_fixtures WHERE key=$1', [key]);
     if (!rows.length) return res.status(404).json({ error: 'Kein gespeicherter Bericht (key=' + key + '). Erst einen Bericht erstellen.' });
     let out = rows[0].result;
