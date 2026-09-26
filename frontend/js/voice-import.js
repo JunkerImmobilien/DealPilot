@@ -3848,6 +3848,16 @@
          Genau die Falle, die ich am selben Tag in FALLEN.md geschrieben
          habe: eine Existenzprüfung ist keine Abnahme. Vier `.vi-rf-pille`
          im DOM heißt nicht, dass man vier Pillen sieht. */
+      /* v1619 · Der feste Fragestreifen ueber dem Verlauf. Er ist die
+         AUFGABE, nicht die Chronik - deshalb ruhig, aber deutlich. */
+      '.vi-rf-frage{margin:0 2px 10px;padding:11px 14px;border-radius:12px;',
+      'background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 9%, transparent);',
+      'border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);',
+      'flex:0 0 auto}',
+      '.vi-rf-frage-txt{font-size:14.5px;line-height:1.45;font-weight:600}',
+      '.vi-rf-frage .vi-rf-offen{background:transparent;border:0;padding:6px 0 0;margin:0}',
+      '@media(max-width:600px){.vi-rf-frage{margin:0 2px 7px;padding:9px 11px}',
+      '  .vi-rf-frage-txt{font-size:13.5px}}',
       '.vi-rf-pillen{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}',
       /* v1616 · Die Ablesehilfe: was noch offen ist, mit Beispiel. Sie
          steht UNTER den Pillen und ist ruhiger als sie - die Pillen
@@ -3965,7 +3975,24 @@
          Ausschlag, den man sieht, beantwortet die Frage „hoert er mich?"
          ohne ein Wort. Das Tippfeld rueckt darunter und heisst nur noch
          „... oder tippen". Und der Fokus springt nicht mehr hinein. */
-      '.vi-rf-mikro{display:flex;align-items:center;gap:12px;margin:12px 2px 10px;padding:11px 14px;',
+      /* ═══ v1619 · DER BALKEN NIMMT SICH ZURUECK ══════════════════════
+         Marcels Befund: „man sieht unten immer einen grossen Balken mit
+         dem Mikrofon und dann noch eine Beschreibung … und dadurch wird
+         das Anzeigefenster recht klein."
+
+         Der Kasten trug ZWEI Textzeilen: „Ich hoere zu" und darunter
+         „Ich merke selbst, wenn du fertig bist." Die zweite ist eine
+         einmalige Erklaerung, die dauerhaft Platz kostet. Sie steht
+         jetzt NEBEN der ersten und faellt auf kleinen Schirmen ganz weg -
+         wer zehnmal gesprochen hat, braucht sie nicht mehr.
+
+         Dazu schmalere Polsterung und Abstaende. Zusammen sind das rund
+         30 Pixel, die der Verlauf bekommt. */
+      '.vi-rf-mikro .vi-rf-mikro-txt{display:flex;align-items:baseline;gap:8px;',
+      '  flex-wrap:wrap;min-width:0}',
+      '.vi-rf-mikro .vi-rf-mikro-txt small{opacity:.62;font-size:11.5px}',
+      '@media(max-width:820px){.vi-rf-mikro .vi-rf-mikro-txt small{display:none}}',
+      '.vi-rf-mikro{display:flex;align-items:center;gap:12px;margin:9px 2px 8px;padding:8px 13px;',
       '  border-radius:12px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);',
       '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent);transition:border-color .2s ease}',
       '.vi-rf-mikro.hoert{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 70%, transparent)}',
@@ -7752,6 +7779,23 @@
   /* Genau EINE Blase trägt die Hervorhebung — die Frage, die gerade gilt.
      Die vorige verliert sie, sonst leuchtet nach zehn Fragen der halbe
      Verlauf und die Auszeichnung sagt nichts mehr. */
+  /** v1619 · Die laufende Frage oben festhalten.
+   *
+   *  Sie steht bewusst ZWEIMAL da: als Blase im Verlauf (dort gehoert sie
+   *  hin, der Verlauf soll vollstaendig sein) und fest oben. Doppelt ist
+   *  hier richtig - die Blase ist die Chronik, dieser Streifen ist die
+   *  Aufgabe. Wer sich etwas erklaeren laesst, verliert die Aufgabe sonst
+   *  aus dem Bild. */
+  function _rfFrageAnheften(e) {
+    var host = $('vi-rf-frage');
+    if (!host) return;
+    if (!e || !e.frage) { host.style.display = 'none'; host.innerHTML = ''; return; }
+    host.innerHTML =
+      '<div class="vi-rf-frage-txt">' + escH(e.frage) + '</div>' +
+      _rfAntwortHilfe(e);
+    host.style.display = '';
+  }
+
   function _rfDranBlase(b) {
     try {
       var chat = $('vi-rf-chat');
@@ -7778,6 +7822,7 @@
        waren laenger - nur an der offenen FRAGE sah man nichts davon. Eine
        Einstellung, deren Wirkung man an der Stelle nicht sieht, an der man
        sie erwartet, gilt als kaputt, auch wenn sie greift. */
+    _rfFrageAnheften(e);   /* v1619 · oben festhalten, nicht nur im Verlauf */
     _rfDranBlase(_rfBlase('co', escH(e.frage) + _rfDoppeldeutig(e) +
       (function () {
         if (_rfModus() !== 'lernen') return '';
@@ -8556,6 +8601,21 @@
       '<div id="vi-rf-band" style="display:none"></div>' +
       /* v1281: Verlauf und Stand nebeneinander - der Chat zeigt was WAR,
          die Spalte zeigt was IST. */
+      /* ═══ v1619 · DIE FRAGE BLEIBT STEHEN ═══════════════════════════
+         Marcels Befund vom 26.09.2026: „auch wenn ich mir was erklaeren
+         lasse, dann ist die eigentliche Frage weg, diese Pille in dem
+         Chat. Und man weiss nicht immer ganz genau, was man dann sagen
+         soll."
+
+         Die Frage stand bisher NUR als Blase im Verlauf. Sobald etwas
+         danach kam - eine Erklaerung, eine Rueckfrage, ein Zwischenstand -
+         schob sie sich nach oben aus dem Bild. Der Nutzer sah dann eine
+         Antwort und wusste nicht mehr, worauf.
+
+         Sie steht jetzt zusaetzlich fest ueber dem Verlauf, mit dem, was
+         noch offen ist. Sie scrollt nicht mit und verschwindet erst,
+         wenn die Frage beantwortet ist. */
+      '<div class="vi-rf-frage" id="vi-rf-frage" style="display:none"></div>' +
       '<div class="vi-rf-buehne">' +
         '<div class="vi-rf-chat" id="vi-rf-chat"></div>' +
         '<div class="vi-rf-stand" id="vi-rf-stand"></div>' +
@@ -8741,6 +8801,7 @@
     var pv = _rfProfilVorschlag(e);
     /* v1288: Bei einer Auswahl stehen die STUFEN in der Frage. Wir bewerten
        danach - also soll der Nutzer sie hoeren, statt Freitext zu raten. */
+    _rfFrageAnheften(e);   /* v1619 · oben festhalten, nicht nur im Verlauf */
     _rfDranBlase(_rfBlase('co', escH(e.frage) + _rfDoppeldeutig(e) +
       /* v1378 (C2): Im Lernmodus steht unter der Frage, WOZU die Angabe
          gebraucht wird. Vor den Pillen, damit der Grund vor der Auswahl
@@ -9466,6 +9527,10 @@
      Abschluss aus und es geht direkt zur Tabelle. Ein Fazit, das „keine
      Daten" sagt, ist ein Umweg. */
   function _rfFertig(erzwungen) {
+    /* v1619 · Ist nichts mehr zu beantworten, verschwindet auch der feste
+       Fragestreifen. Eine Aufgabe, die keine mehr ist, soll nicht
+       stehenbleiben. */
+    _rfFrageAnheften(null);
     /* v1386: Laeuft die Wertermittlungs-Schleife und sind ihre Fragen
        beantwortet, wird JETZT abgerufen — vor allem anderen. Sie ist der
        Grund, warum der Nutzer noch hier ist. `wertAn === 1` heisst
