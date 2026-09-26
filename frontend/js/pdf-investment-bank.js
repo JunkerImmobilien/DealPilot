@@ -343,7 +343,7 @@
     }).join('');
     ov.innerHTML =
       '<div style="background:#FDFCFA;border-radius:14px;max-width:520px;width:100%;padding:24px 26px;box-shadow:0 18px 50px rgba(0,0,0,.35)">' +
-        '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#9a7f33;margin-bottom:8px">Investment-PDF</div>' +
+        '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33);margin-bottom:8px">Investment-PDF</div>' +
         '<h3 style="margin:0 0 10px;font:600 19px/1.3 \'Space Grotesk\',sans-serif;color:#1a1a1a">Dafür fehlen noch Angaben</h3>' +
         '<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#6B6356">Das Dokument entsteht sonst mit Nullen an Stellen, an denen eine Bank eine Aussage erwartet.</p>' +
         '<ul style="margin:0 0 18px;padding-left:18px;font-size:13.5px;line-height:1.5;color:#2A2727">' + liste + '</ul>' +
