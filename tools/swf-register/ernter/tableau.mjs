@@ -120,10 +120,41 @@ export async function setzeAuswahl(seite, index, position) {
   /* Jeder Klick mit eigener Frist. Playwrights Vorgabe ist 30 s, das ist
      hier zu lang: bleibt einer haengen, steht das ganze Gebiet. Lieber
      frueh scheitern und den Punkt wiederholen. */
-  await seite.locator('[class*="ParameterControlBox"]').nth(index)
-             .click({ timeout: 15000 });
-  await seite.waitForSelector('.tabMenuItemName', { timeout: 15000 });
-  await seite.locator('.tabMenuItemName').nth(position).click({ timeout: 15000 });
+  /* ── WARUM ZWEI ANLAEUFE UND EIN SCROLL ────────────────────────────
+     GEMESSEN am 26.09.2026 an Goslar: die Lagen an POSITION 0 und 1
+     gingen, die an 2 und 3 fielen beide mit
+     `locator.click: Timeout 15000ms exceeded` aus. Positionsabhaengig,
+     nicht zufaellig - der Eintrag liegt unterhalb des sichtbaren
+     Bereichs der Klappliste, und Playwrights eingebautes Heranrollen
+     greift in Tableaus eigener Liste nicht zuverlaessig.
+
+     Die Folge war teuer und leise: das Gebiet galt als geerntet, mit
+     zwei von vier Lagen. Ein Faktor fehlte damit nicht sichtbar - er
+     fehlte als "Lage unbekannt", obwohl der Ausschuss sie fuehrt.
+
+     Deshalb: erst heranrollen, dann klicken; misslingt es, die Liste
+     schliessen, neu oeffnen und ein zweites Mal versuchen. Scheitert
+     auch das, FLIEGT DER FEHLER WEITER - die Lage wird als ausgefallen
+     BENANNT, nie stillschweigend uebergangen. */
+  for (let anlauf = 1; anlauf <= 2; anlauf++) {
+    try {
+      await seite.locator('[class*="ParameterControlBox"]').nth(index)
+                 .click({ timeout: 15000 });
+      await seite.waitForSelector('.tabMenuItemName', { timeout: 15000 });
+      const eintrag = seite.locator('.tabMenuItemName').nth(position);
+      await eintrag.scrollIntoViewIfNeeded({ timeout: 8000 }).catch(() => {});
+      await eintrag.click({ timeout: 15000 });
+      return;
+    } catch (e) {
+      if (anlauf === 2) throw e;
+      /* Die offene Liste schliessen, sonst schluckt sie den naechsten
+         Klick auf den Waehler (er SCHLIESST sie dann, statt zu
+         oeffnen). Ein Klick auf eine neutrale Stelle statt Escape -
+         Escape setzt anderswo eingegebene Zahlen zurueck. */
+      await seite.mouse.click(5, 5).catch(() => {});
+      await seite.waitForTimeout(1200);
+    }
+  }
 }
 
 /** Die Werte einer Auswahl lesen, ohne sie zu veraendern. */
