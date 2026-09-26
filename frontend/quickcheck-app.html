@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="qc-app"><!-- v1642c · verlaessliche Marke fuer dieses Dokument: qc-embedded setzt erst die Bruecke, steht also beim Einzelaufruf NICHT da -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -6497,7 +6497,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     var bar=document.getElementById('qc7-sources'); if(!bar) return false;
     if(!document.getElementById('qc-pf-lead')){
       var lead=document.createElement('div'); lead.id='qc-pf-lead'; lead.className='qc-pf-lead';
-      lead.innerHTML='<span class="qc-pf-lead-txt"><b>PRE-FLIGHT</b><small>Quellen w\u00e4hlen \u00b7 Boarding</small></span>'+
+      lead.innerHTML='<span class="qc-pf-lead-txt"><b>Datenaufnahme</b><small>Quellen w\u00e4hlen \u00b7 Boarding</small></span>'+
         '<span class="qc-pf-lead-cnt"><b>0</b> aktiv</span>';
       bar.parentNode.insertBefore(lead, bar);
       bar.addEventListener('change', update, true);
@@ -6586,6 +6586,6 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
   <!-- v1641 · Der Quick-Check ist ein eigenes Dokument im iframe - die
        Gestaltung der Datenaufnahme muss hier NOCH EINMAL geladen werden.
        Zuletzt, damit sie die eingebetteten Stile ueberstimmt. -->
-  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1642b">
+  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1642c">
 </body>
 </html>

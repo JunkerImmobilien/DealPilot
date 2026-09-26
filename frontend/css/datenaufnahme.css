@@ -301,7 +301,7 @@ body:not(.dp-chrome-hell) .dp-pfbar .dp-pf-led{ background:#2A2622 !important; }
 #qb-bp .contrail{ opacity:.25 !important; }
 
 /* ── Im Quick-Check gilt der helle Satz IMMER ────────────────────────
-   GEMESSEN: das QC-Dokument traegt `html.qc-embedded` und einen LEEREN
+   GEMESSEN: das QC-Dokument traegt `html.qc-app` (fest im Dokument) und
    body-Klassennamen - `body.dp-chrome-hell` gibt es dort nicht und kann
    es nicht geben, weil der Skin-Schalter in der Hauptanwendung sitzt.
    Die Zeile blieb deshalb rgb(19,18,16) auf einer inzwischen weissen
@@ -309,15 +309,15 @@ body:not(.dp-chrome-hell) .dp-pfbar .dp-pf-led{ background:#2A2622 !important; }
 
    > Zwei Dokumente, ein Aussehen: die Bedingung, die im einen Dokument
    > den hellen Satz einschaltet, muss im anderen eine ANDERE sein. */
-html.qc-embedded .dp-pfbar{ background:#FFFFFF !important; border-color:#E6E1D6 !important; }
-html.qc-embedded .dp-pfbar .dp-pf-grouplbl{ color:#9A9287 !important; }
-html.qc-embedded .dp-pfbar .dp-pf-tile{
+html.qc-app .dp-pfbar{ background:#FFFFFF !important; border-color:#E6E1D6 !important; }
+html.qc-app .dp-pfbar .dp-pf-grouplbl{ color:#9A9287 !important; }
+html.qc-app .dp-pfbar .dp-pf-tile{
   background:#FDFCFA !important; border-color:#E6E1D6 !important; color:#1A1A18 !important;
 }
-html.qc-embedded .dp-pfbar .dp-pf-tile.on{ background:#FFFDF8 !important; }
-html.qc-embedded .dp-pfbar .dp-pf-logo.dp{ color:#1A1A18 !important; }
-html.qc-embedded .dp-pfbar .dp-pf-led{ background:#CEC6B6 !important; }
-html.qc-embedded .dp-pfbar .dp-pf-tile.on .dp-pf-led{ background:#3FA56C !important; }
+html.qc-app .dp-pfbar .dp-pf-tile.on{ background:#FFFDF8 !important; }
+html.qc-app .dp-pfbar .dp-pf-logo.dp{ color:#1A1A18 !important; }
+html.qc-app .dp-pfbar .dp-pf-led{ background:#CEC6B6 !important; }
+html.qc-app .dp-pfbar .dp-pf-tile.on .dp-pf-led{ background:#3FA56C !important; }
 
 /* ── Kontrast im Cockpit ─────────────────────────────────────────────
    GEMESSEN auf weissem Grund: Beschriftungen standen auf
