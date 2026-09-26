@@ -18210,3 +18210,364 @@ Spalte auf Staging, nicht umgekehrt.
   so nicht mehr gibt. Braucht eine Migration auf text/uuid und eine
   eigene Freigabe.
 - Die Ernte ist weiterhin unangetastet.
+
+## Rollout-Journal · 25.09.2026 (2) — Aufklappmenue, dann Ernte
+
+**Was.** Marcel: „schau dir oben auf der landingpage noch die menü punkte
+an, wenn man die aufklappt passt dort die formatierung nicht. dann
+rollout und dann weiter mit der ernte."
+
+**Commit.** Staging `e392afa` · Prod `79f74f1` (nur das Menue; die
+Registersaetze bleiben zunaechst auf Staging).
+
+### 1 · Das Aufklappmenue stand quer (v1611)
+
+Gemessen bei 1521 px, Menuepunkt „Funktionen": vier schmale Textsaeulen
+NEBENEINANDER, Hoehen ausgefranst (115x152, 167x96, 108x170, 124x131).
+
+**Ursache:** `.nav ul{display:flex}` gilt fuer JEDE Liste im Menue — auch
+fuer die verschachtelte `.sub`. Die ist als senkrechte Liste gebaut
+(`min-width:330px`, `.sub li{display:block}`), aber in einem
+Flex-Behaelter werden Kinder zu Flex-Elementen, **egal was an ihnen
+steht**. Ein `display:block` am KIND kann sich gegen den Elternteil nicht
+wehren.
+
+Die Regel heisst `.nav ul.sub` und nicht `.sub`: `.nav ul` ist Klasse
+PLUS Typ und damit staerker. Derselbe Stolperstein wie im Sprechlauf,
+wo eine Regel mit drei Klassen meine mit zweien schlug.
+
+Nachher alle drei Menues: senkrecht, je 328 px breit, gleichmaessige
+Hoehen, kein Ueberlauf — auf Staging und Prod nachgemessen.
+
+### 2 · Ernte: vier neue Sachwertfaktor-Saetze (14 → 18)
+
+Aus der Ernte vom 23.09. wurden erstmals Rezepte gebaut. Zwei neue
+Werkzeuge: `ni-rezepte-bauen.js` (Gitter + Kurven + Kopfdaten → Rezept)
+und `ni-ins-register.js` (Rezept verschachtelt → Register flach, je
+Zweig).
+
+| AGS | Gebiet | Zweige | Fallzahl |
+|---|---|---|---|
+| 03102 | Salzgitter | ezfh + rhdhh | 287 / 417 |
+| 03154 | Helmstedt | ezfh | 262 |
+| 03157 | Peine | ezfh | 557 |
+
+Jeder Satz: 6x9-Gitter, drei Korrekturkurven, Normobjekt benannt.
+**Salzgitter ist das erste NI-Gebiet mit BEIDEN Zweigen.**
+Register gesamt 2498 → 2502, Sachwertfaktoren 392 → 396.
+
+**Kettenprueffung am Rechenkern im Container**, nicht am Diagnose-
+Endpunkt (der reicht `standardstufe` gar nicht durch):
+
+| Fall | Faktor |
+|---|---:|
+| Normobjekt (150 m², RND 31, Stufe 2,5) | 0,74 |
+| 200 m² | 0,79 |
+| RND 55 | 0,87 |
+| Stufe 3,5 | 0,84 |
+| alles zusammen | 1,07 |
+
+Alle drei Korrekturen angewandt, `korrekturen_offen` leer.
+
+### Zwei Zweige absichtlich NICHT gebaut
+
+`2026_sw_rh_bshe` und `2026_sw_rh_bspe`: dort liegt unter
+„Wohnflaechen" **Zeichen fuer Zeichen dieselbe Kurve** wie unter
+„Restnutzungsdauer" — Stuetzstellen 15/25/35/45/55/65/75, das sind
+Jahre, keine Quadratmeter. Der Kurvenleser hat die erste zweimal
+abgelegt; die echte Wohnflaechenkurve wurde nie gelesen.
+
+> Eine daraus gebaute Wohnflaechen-Korrektur waere fuer jedes Objekt
+> mit abweichender Flaeche STILL falsch — und **eine falsche Korrektur
+> ist gefaehrlicher als eine fehlende**, weil der Faktor mit ihr
+> genauso aussieht wie ohne. Der Bauer erkennt Doppelungen jetzt selbst
+> und verweigert das Rezept mit Begruendung.
+
+### Ein eigener Fehler, von der Pruefung gefangen
+
+Mein erster Lauf machte aus der Restnutzungsdauer 30,8333 Jahre **ganze
+308.333** — mein Zahlenleser strich den Punkt als Tausendertrenner. Das
+Dashboard schreibt deutsch („2,5"), der Kurvenleser legt aber
+„30.8333" mit Dezimalpunkt ab. **Beide Schreibweisen liegen nebeneinander
+und sehen gleich aus.** Jetzt entscheidet das Komma: gibt es eins, sind
+Punkte Tausender; gibt es keins, ist der Punkt der Dezimaltrenner.
+
+**Rest.**
+- Fuenf weitere geerntete Gebiete warten auf Rezepte, alle mit
+  Einschraenkung: Hameln-Pyrmont (nur RH, eine Kurve), Cuxhaven,
+  Osterholz und Stade (Kurven nur als Bild), Grafschaft Bentheim und
+  Osnabrueck (je eine Kurve). Sie brauchen einen Weg, die FEHLENDE
+  Korrektur im Ergebnis sichtbar zu machen — `korrekturen_offen` traegt
+  nur, was im Rezept deklariert ist.
+- Die beiden Reihenhaus-Zweige von Helmstedt und Peine brauchen eine
+  Nachernte der Wohnflaechenkurve am Kalkulator.
+- Die Registersaetze sind noch nicht auf Prod.
+
+---
+
+## Rollout-Journal 25.09.2026 (3) — Ernte abgeschlossen, Niedersachsen ausgeschoepft
+
+**Was.** Die zweite Ernte-Charge ins Register uebertragen, geprueft,
+ausgerollt; danach die restlichen Gebiete abgearbeitet und Bayern
+erschlossen.
+
+**Commit.** `7645b09` (13 neue NI-Saetze, 18 -> 31) und `23ab2af`
+(Verfuegbarkeitstabelle Bayern).
+
+**Nachweis.** `mb-backend` neu gebaut, `registerStand()` meldet **2.515
+Saetze**. Echter Funktionslauf durch `gutachterausschuss.sachwertfaktor()`
+an Stade: Faktor 0,96, Rechenweg „Tabellenwert 0,96", Fallzahl 807,
+Streuung 0,07, Quellenvermerk und Lizenz kommen mit — und die
+unbezifferte Korrektur erscheint in `korrekturen_offen`, statt still zu
+verschwinden. 14 von 16 abgefragten Zweigen treffen; die beiden
+Fehlenden sind genau die, die fehlen sollen.
+
+### Zwei eigene Fehler, beide vor der Auslieferung gefangen
+
+**Ein Objekt im Zahlenfeld.** Rezepte fuehren ihre Stichprobe teils als
+blanke Zahl, teils als Block (`faelle` + Kaufzeitraum + Spannen). Mein
+Rueckgriff schrieb den ganzen BLOCK in `fallzahl`. **JSON nimmt das
+klaglos an** — auffallen wuerde es erst, wenn jemand damit rechnet.
+`fallzahlAus()` packt jetzt aus und laesst nur Zahlen durch.
+
+**Cuxhaven-RH war faul.** 50 von 54 Gitterzellen trugen `0,15` — das ist
+kein Sachwertfaktor, sondern was der Kalkulator ausgibt, wenn die
+abgetastete Stellung ausserhalb seines Gueltigkeitsbereichs liegt. Nur
+vier Zellen waren echt, verstreut. **Eine Datei voller Zahlen, die
+aussah wie eine Ernte.** Der Satz ist raus, das Modell im Rezept
+gesperrt mit Grund; der EZFH-Zweig desselben Ausschusses ist nicht
+betroffen und bleibt.
+
+> Damit das nicht wiederkommt, prueft `gitterBefund()` jedes Gitter vor
+> der Uebernahme — ohne die Quelle zu kennen: wiederholt sich ein Wert
+> in mehr als einem Drittel der Zellen, oder steigt der Faktor mit
+> steigendem vorlaeufigem Sachwert mehr als einmal, wird abgewiesen
+> statt eingetragen. **Ein einzelner Schritt nach oben ist erlaubt** —
+> den tut Osnabrueck-Land in der untersten Bodenrichtwertzeile wirklich.
+
+### Niedersachsen ist ausgeschoepft — der Grund ist gemessen
+
+Alle elf noch offenen Kalkulatoren durchlaufen: **null neue Saetze.**
+Sechs melden keine Spanne, fuenf kommen komplett leer zurueck. Die
+Ursache ist jetzt scharf statt vermutet:
+
+**Der Kalkulator rechnet nur mit gesetzter Lage — und sobald IRGENDEIN
+Parameter in der URL steht, faellt die Lage auf leer.** Gemessen an
+Goslar: ohne Parameter liefert er Lage „GS 01" und Faktor 1,03; mit
+`Brw=60&Sach=250000` — also exakt den Vorgabewerten — ist die Lage weg
+und der Faktor leer.
+
+`Brw` und `Sach` sind die richtigen Namen (nachgewiesen: `Sach=310000`
+setzt 310.000). **`Lage` ist nur die Beschriftung, nicht der
+Parametername.** Fuenf Anlaeufe, den echten Namen zu finden, sind
+gescheitert: Werte-Varianten (`GS 01`, `GS01`, `GS 02 %26 GS 03`),
+Namensvarianten, und der Versuch, die Workbook-Definition ueber die
+Bootstrap-Sitzung zu lesen — der `tsConfigContainer` kommt leer und wird
+erst per JS gefuellt. Danach STOPP nach Regel 2.
+
+> **Es haengen 26 Kalkulatoren an diesem einen Namen**, rund 15 Kreise.
+> Das ist der groesste einzelne Hebel, der in Niedersachsen noch liegt.
+> Der naechste Anlauf gehoert in den Browser: die Lage einmal von Hand
+> klicken und den Netzwerkverkehr mitlesen — der Name steht dann in der
+> Anfrage. Raten hat funf Mal nicht funktioniert.
+
+### Bayern: kein Wert, aber der Weg dorthin
+
+Der Immobilienmarktbericht Bayern 2026 **veroeffentlicht die Zahlen
+nicht.** Kapitel 11 sagt woertlich: „Bei den wertermittlungsrelevanten
+Daten wird lediglich dargestellt, ob diese vorhanden sind." Die Werte
+sind beim oertlichen Ausschuss zu erfragen.
+
+Damit ist Bayern fuer die Wert-Ernte zu — aber nicht fuer die Doktrin.
+Geerntet wurde die Verfuegbarkeitstabelle aller **95** Kreise:
+
+| | |
+|---|---:|
+| fuehren Sachwertfaktoren | **59** |
+| fuehren Liegenschaftszinssaetze | **48** |
+| melden gar nichts | 24 |
+
+Aus „fuer diesen Ort ist nichts hinterlegt" wird damit „der zustaendige
+Ausschuss hat einen Sachwertfaktor abgeleitet — hier ist der Weg".
+Liegt in `register/verfuegbarkeit-by.json`, **ausdruecklich als
+Wegweiser gekennzeichnet, nicht als Wert.**
+
+Die AGS sind nicht geraten, sondern gegen die amtliche Kreisliste
+aufgeloest (OpenPLZ — dieselbe Quelle, die `AgsResolver.js` schon nutzt).
+90 trafen eindeutig, fuenf Schreibweisen wurden einzeln geprueft,
+darunter ein Tippfehler IM BERICHT („Doanu - Ries").
+
+**Rest.**
+- Der Lage-Parameter (26 Kalkulatoren, ~15 Kreise) — naechster Anlauf
+  ueber den Browser, nicht ueber Raten.
+- Die Wohnflaechenkurve von Helmstedt und Peine (RH) nachernten.
+- `verfuegbarkeit-by.json` wird noch von keinem Ausgabeweg gelesen —
+  die Datei liegt, die Anzeige „Weg zur Quelle" fehlt.
+- Die Registersaetze sind noch nicht auf Prod.
+
+---
+
+## Rollout-Journal 25.09.2026 (4) — der Lage-Parameter ist aufgeklaert
+
+**Was.** Den Blocker aus Eintrag (3) im Browser geknackt und die
+restlichen ungenutzten Quellen gegen das Register geprueft.
+
+**Commit.** siehe unten. **Nachweis.** Verkehr am laufenden Kalkulator
+mitgelesen, Befund in `tools/swf-register/BEFUND-lage-parameter.md`.
+
+### Der Name war nie ratbar
+
+```
+POST .../commands/tabdoc/set-parameter-value-from-index
+  parameterName = [Parameters].[Parameter 2]
+  idx           = 2      <- NULLBASIERTER INDEX, nicht der Wert
+```
+
+**Die Lage heisst intern `Parameter 2`.** „Lage" ist die Beschriftung,
+nicht der Name — fuenf Rateversuche konnten deshalb nicht treffen.
+
+> **Der URL-Weg ist damit nicht ungeloest, sondern tot:** ein Index
+> laesst sich in einer Tableau-URL nicht ausdruecken. Auch
+> `Parameter%202=GS%2001` greift nicht. Das ist ein Ergebnis, kein
+> Fehlschlag — es beendet eine Suche, die sonst wiederkommt.
+
+Dazu gemessen: **jeder** URL-Parameter loescht die Lage auf leer, und
+ohne Lage bleibt der Faktor leer. `Brw=60&Sach=250000` — exakt die
+Vorgabewerte — liefert nichts. Das erklaert die 54 leeren Zeilen im
+Protokoll vollstaendig.
+
+**Die Zahlen stehen nicht im DOM**: Tableau rendert die Kacheln als
+webp-Bilder, im DOM liegen nur die Beschriftungen. Ein Ernter kann den
+Wert nicht auslesen, er braucht den Sitzungs-Export.
+
+**Der Weg ist ein sitzungsgetriebener Ernter** — Sitzung aufbauen, drei
+Parameter per Befehl setzen, Wert aus dem Export lesen. Das ist ein Bau,
+kein Probelauf, und er braucht Marcels Entscheidung.
+
+> **Nebenbefund, der den Bau kleiner machen koennte:** das Diagramm
+> „Umrechnungskoeffizienten" zeigt **alle vier Lage-Kurven
+> gleichzeitig**, mit Legende. Fuer die KORREKTUREN braucht es den
+> Parameter womoeglich gar nicht, nur fuer den Faktor.
+
+### Die uebrigen Quellen sind abgearbeitet
+
+Alle 13 ungenutzten PDFs im Repo gegen das Register geprueft. **Zwoelf
+davon sind laengst drin** (BB fuenf Kreise, HE Kassel, HH, MV, RP,
+NI Wolfenbuettel). Offen war genau eines:
+
+**Darmstadt (06411) ist geschlossen — mit Grund.** Der Ausschuss
+veroeffentlicht beides, Marktanpassungsfaktoren (§ Sachwertfaktoren)
+UND Liegenschaftszinssaetze. Aber die Marktanpassungsfaktoren stehen
+**nur als Streudiagramm** (Abb. 9-10, „die punktierten Linien markieren
+die Bereiche, in denen zwei Drittel der Daten liegen"), und die
+Zinstabelle (Abb. 9-4) ist ebenfalls ein **Bild**. Aus einem
+Streudiagramm laesst sich kein Wert ablesen.
+
+> **Wo die Quelle endet, endet die Rechnung** — auch wenn die Zahl
+> sichtbar auf dem Papier steht. Darmstadt gehoert damit in die
+> „Weg dorthin"-Liste, nicht ins Wertregister.
+
+**Damit ist die Ernte an ihrer Grenze.** Was noch offen ist, sind Bauten
+und keine Abrufe.
+
+**Rest.**
+- Sitzungsgetriebener Ernter fuer die 26 NI-Kalkulatoren — **Marcels
+  Entscheidung**, ob sich der Bau fuer ~15 Kreise lohnt.
+- `verfuegbarkeit-by.json` wird von keinem Ausgabeweg gelesen; Darmstadt
+  gehoert in dieselbe Liste. **Die „Weg dorthin"-Anzeige fehlt ganz** —
+  das ist der Hebel, der jetzt am meisten bringt.
+- Die Wohnflaechenkurve von Helmstedt und Peine (RH) nachernten.
+- Die Registersaetze sind noch nicht auf Prod.
+
+---
+
+## Rollout-Journal 25.09.2026 (5) — der Weg zur Quelle hing am WERT statt am ORT
+
+**Was.** Die Auskunft „wo kein Wert vorliegt, bekommt der Kunde den Weg
+dorthin" vollstaendig gemacht.
+
+**Commit.** `1ed3d72` (v1614), `4b41e85` (v1614b), `699e7dc` (v1614c).
+
+### Eine Behauptung von mir war falsch — ausdruecklich zurueckgenommen
+
+Ich hatte gemeldet, die „Weg dorthin"-Anzeige **fehle ganz**. Das stimmt
+nicht. Sie ist seit v1099/v1118 gebaut und verdrahtet:
+`quellen_links.js` mit `quelleFuer()`/`quellenSatz()`, eingehaengt in
+drei Services, und `.wv-quelle` rendert `warum_kein_wert` **sichtbar und
+unabhaengig davon, ob ein Wert vorliegt**. Es gab sogar schon eine
+Bayern-Liste aus v1144 — aus derselben Tabelle, die ich heute geerntet
+habe.
+
+> Ich habe „ich habe es nicht gefunden" mit „es gibt es nicht"
+> verwechselt. Die Luecken waren enger als behauptet — dafuer waren sie
+> konkret und liessen sich schliessen.
+
+### Der eigentliche Fehler, zweimal derselbe
+
+**Der Weg zur Quelle hing am WERT statt am ORT.**
+
+`sachwertfaktor_quelle_link` wurde nur gesetzt, wenn ein Sachwert
+herauskam. Fehlte der Objekttyp, die Bruttogrundflaeche oder die
+Standardstufe, verlor der Kunde die Auskunft — **genau dann, wenn sie
+die einzige gewesen waere**, die wir ehrlich geben koennen.
+
+Und derselbe Denkfehler ein zweites Mal im PDF: der Quellenblock lag
+hinter `_swx.available && _swx.staffel.length`.
+
+> **Der erste Anlauf (v1614) hat nicht gefeuert**, und das war lehrreich:
+> ich hatte den Einhaenger INNERHALB von
+> `if (NHK_2010.geprueft && ref.property_type && …)` gesetzt. Fehlt der
+> Objekttyp, laeuft dieser Block gar nicht. Die richtige Idee an der
+> falschen Stelle — gefangen nur, weil ich nach dem Ausrollen im
+> Container nachgemessen habe statt es zu glauben. **Klammertiefe zaehlen
+> statt Zeilennummern vertrauen.**
+
+### Was jetzt dasteht
+
+| | vorher | jetzt |
+|---|---:|---:|
+| Ausschuss-Eintraege | 61 | **120** |
+| bayerische Kreise | 35 | **95** |
+| Grund je Kennzahl verschieden | 0 | **95** |
+
+Bayern war nur zur Haelfte erfasst: die Handliste fuehrte die 35
+Bereiche OHNE Sachwertfaktor. Der Gewinn steckt in den **59, die einen
+HABEN** — fuer sie gab es bisher nur den allgemeinen Landesverweis.
+„Dein Ausschuss hat einen, frag ihn" ist eine andere Auskunft als
+Schweigen, und sie ist amtlich belegt.
+
+**Ein Grund galt bisher fuer beide Kennzahlen.** Bei 13 bayerischen
+Kreisen ist das nachweislich falsch — sie fuehren die eine und die
+andere nicht. `warum_kein_wert` darf jetzt eine Karte nach Kennzahl
+sein; die rund 25 bestehenden Zeichenketten gelten unveraendert weiter.
+**Nach aussen geht trotzdem immer eine Zeichenkette**, sonst rendert
+eine Ansicht still `[object Object]`.
+
+Dazu **Darmstadt (06411)** neu, mit dem heute gemessenen Grund: der
+Ausschuss fuehrt beide Kennzahlen und druckt sie ab — aber nur als
+**Bild** (Streudiagramm Abb. 9-10, Grafik Abb. 9-4).
+
+### Beinahe-Regression, vor dem Ausrollen gefangen
+
+Die Schleife ueber die 95 Kreise haette **Nuernberg (09564)**
+ueberschrieben. Dort steht seit v1145 handrecherchiert, dass der Bericht
+online nur als Leseprobe vorliegt und die Faktortabelle die Ueberschrift
+„Leseprobe ohne Daten" traegt — deutlich mehr wert als der allgemeine
+Landessatz. **Ein Handeintrag wird jetzt nie ueberschrieben**, sondern
+nur um das ergaenzt, was er nicht sagt.
+
+**Nachweis.** 120 Ausschuesse und 16 Landesportale ueber beide
+Kennzahlen geprueft: kein Objekt, kein fehlender Text, kein fehlender
+Link. Im Container an drei Faellen ohne Sachwert nachgemessen
+(Starnberg, Muenchen, Darmstadt) — Link jedes Mal da, mit dem richtigen
+Grund. Im Browser die ECHTE `_renderWertverfahren()` mit der Backend-Form
+gefuettert: `.wv-quelle` erscheint, 1258 x 67 px, mit Text, Grund,
+Kostenhinweis und Link.
+
+Cache-Buster `app.js` 1602 -> 1614.
+
+**Rest.**
+- Sitzungsgetriebener Ernter fuer die 26 NI-Kalkulatoren — Marcels
+  Entscheidung.
+- Die Wohnflaechenkurve von Helmstedt und Peine (RH) nachernten.
+- Die Registersaetze und v1614 sind noch nicht auf Prod.

@@ -237,6 +237,23 @@ export const CrossCheckService = {
     const _bgfWhg = Number((p && p.bgf_direkt) || ref.bgf || 0);
 
     const _nhkTypWhg = (u) => (u > 20 ? '4.3' : (u > 6 ? '4.2' : '4.1'));
+    /* v1099-WQL: der Weg zur Quelle, unabhaengig davon, ob ein Wert
+       gefunden wird. Genau dann zaehlt er am meisten.
+
+       v1614-WGRD · STAND BIS HIERHER EINE EBENE TIEFER - und damit
+       INNERHALB des property_type-Deckels darunter. Fehlte der Objekttyp,
+       wurde er nie berechnet; der Kunde verlor genau dann den Weg zur
+       Quelle, wenn er die einzige Auskunft gewesen waere. Gemessen am
+       26.09.2026 im Container an Starnberg ohne Objekttyp: kein Link.
+
+       Er haengt deshalb jetzt an der Funktion, nicht am Rechenzweig. */
+    let _swfQuelle = null;
+    try {
+      const _qa = (p && p.ags) || ref.ags || null;
+      const _q = _qa ? quelleFuer(_qa) : null;
+      if (_q) _swfQuelle = { quelle_link: { ..._q, satz: quellenSatz(_q, 'sachwertfaktor') } };
+    } catch { _swfQuelle = null; }
+
     if (NHK_2010.geprueft && ref.property_type && (!istWohnung || _bgfWhg > 0)) {
       let _sw = nhkSachwert({   /* v1076-WLET-1 · weiter unten steht _sw = _sw2 */
         nhk_typ: (p && p.nhk_typ) || ref.nhk_typ
@@ -286,14 +303,6 @@ export const CrossCheckService = {
        * Ein gepflegter Wert aus der Parametertabelle hat Vorrang: die
        * Tabelle ist kuratiert, die Matrix gilt fuer genau einen Kreis. */
       let _swfTab = null;
-      /* v1099-WQL: der Weg zur Quelle, unabhaengig davon, ob ein Wert
-         gefunden wird. Genau dann zaehlt er am meisten. */
-      let _swfQuelle = null;
-      try {
-        const _qa = (p && p.ags) || ref.ags || null;
-        const _q = _qa ? quelleFuer(_qa) : null;
-        if (_q) _swfQuelle = { quelle_link: { ..._q, satz: quellenSatz(_q, 'sachwertfaktor') } };
-      } catch { _swfQuelle = null; }
       /* v1144-SWFELD · Dieselbe Feldverwechslung wie in nhk2010.js:868.
        * Geprüft wurde `.sachwertfaktor`, geliefert wird `.wert` — die Weiche
        * stand deshalb IMMER auf Tabellenweg, auch wenn ein eigener Wert
@@ -615,6 +624,27 @@ export const CrossCheckService = {
         out.notes.push('Sachwertfaktor 1,0 angesetzt: Ohne Daten des örtlichen Gutachterausschusses erfolgt KEINE Marktanpassung. Reale Sachwertfaktoren liegen je nach Lage zwischen 0,8 und 1,3 – der ausgewiesene Sachwert ist deshalb unangepasst und weicht systematisch vom Verkehrswert ab.');
         if (!istHaus && !istWohnung) out.notes.push('Objektart nicht eindeutig – Sachwert mit EFH-Ansatz gerechnet. Bei Nicht-Wohnnutzung ist er nicht belastbar.');
       }
+
+    }
+
+    /* ── v1614-WGRD · DER WEG ZUR QUELLE UEBERLEBT DEN NICHTTREFFER ──
+     *
+     * `sachwertfaktor_quelle_link` wurde bis hierher NUR im Zweig
+     * `_sw.wert != null` gesetzt. Fehlt aber der Objekttyp, die
+     * Bruttogrundflaeche oder die Standardstufe, entsteht
+     * `out.sachwert = { available:false, grund:… }` — und mit ihm
+     * verschwand der Link, obwohl der zustaendige Ausschuss bekannt ist.
+     *
+     * Das war genau verkehrt herum: wo kein Wert steht, ist der Weg zur
+     * Quelle die EINZIGE Auskunft, die wir geben koennen.
+     *
+     * Steht BEWUSST hier unten, ausserhalb des property_type-Deckels:
+     * der erste Anlauf lag innerhalb und feuerte deshalb in genau den
+     * Faellen nicht, fuer die er gebaut war. Eine Stelle fuer alle
+     * Zweige, damit ein spaeter ergaenzter ihn nicht wieder verliert. */
+    if (out.sachwert && !out.sachwert.sachwertfaktor_quelle_link
+        && _swfQuelle && _swfQuelle.quelle_link) {
+      out.sachwert.sachwertfaktor_quelle_link = _swfQuelle.quelle_link;
     }
 
     /* WKERN-2 · ERTRAGSWERT ueber den gemeinsamen Kern.
