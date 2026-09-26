@@ -1,0 +1,264 @@
+<title>Die Bordkarte — fünf Entwürfe</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@500;600&display=swap">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   DIE BORDKARTE — fünf Entwürfe · v1639
+
+   Marcel: „die Pre-Flight-Karte einmal überarbeiten, dass die wertiger
+   aussieht. Wir brauchen die ja dann auch nicht mehr Pre-Flight-Karte
+   nennen, sondern weiß ich nicht, Aktionsbox — oder vielleicht hast du
+   einen besseren Namen."
+
+   ── WAS SIE HEUTE IST (gemessen, nicht erinnert) ─────────────────────
+   Sechs Kacheln in zwei Gruppen, eine Perforation, eine Reisszone mit
+   Strichcode, ein QR-Feld und ein goldener „Abrufen"-Knopf. Seit v1637
+   sind es **vier** Kacheln: die beiden Bewertungspartner sind weg.
+
+     Marktbewertung   DealPilot
+     Daten einlesen   Exposé/Marktbericht · Sprache · ImmoMetrica
+
+   **Das ist das eigentliche Problem der Karte.** Sie trägt die Bildwelt
+   einer Bordkarte — Perforation, Abriss, Strichcode, QR — für eine
+   Aufgabe, die viel einfacher ist: *woher sollen die Daten kommen?*
+   Vier Kacheln und ein Knopf. Die Metapher kostet mehr Fläche, als die
+   Aufgabe wert ist, und ein Strichcode, der nichts codiert, ist Zierat.
+
+   > Eine Metapher trägt, solange sie etwas erklärt. Erklärt sie nichts
+   > mehr, ist sie Dekoration - und Dekoration ist genau das, was einem
+   > Banker auffällt.
+
+   ── DER NAME ─────────────────────────────────────────────────────────
+   „Pre-Flight" ist ein Fachwort aus dem Druck und der Luftfahrt, und
+   beides trifft nicht: hier wird nichts geprüft, hier wird *eingelesen*.
+   „Aktionsbox" beschreibt die Form, nicht den Zweck.
+
+   **Mein Vorschlag: „Datenaufnahme".**
+   Es sagt genau, was passiert, ein Steuerberater liest es ohne
+   Erklärung, und es bleibt kompatibel mit der Luftfahrt-Bildsprache
+   drumherum (Boarding, Cockpit, Runway) — es ist einfach nur der
+   nüchterne Name für den Vorgang, wie „Betankung".
+
+   Die Alternativen stehen in der Schau darüber.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root{
+  --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+  --obsidian:#050505; --gruen:#3FA56C; --rot:#B8625C;
+  --papier:#FDFCFA; --flaeche:#FFFFFF; --karte:#FBF6E9; --grau:#F4F2ED;
+  --linie:#E6E1D6; --linie-stark:#CEC6B6;
+  --tinte:#1A1A18; --leise:#6B645A; --sehr-leise:#9A9287;
+  --disp:'Space Grotesk', system-ui, sans-serif;
+  --mono:'JetBrains Mono', ui-monospace, monospace;
+  --body:'Inter', system-ui, sans-serif;
+  --serif:'Cormorant Garamond', Georgia, serif;
+}
+*{box-sizing:border-box} html,body{margin:0}
+body{background:#E8E5DE;color:var(--tinte);font-family:var(--body);font-size:15px;line-height:1.55}
+.schau{max-width:1180px;margin:0 auto;padding:28px 20px 90px}
+h1{font-family:var(--disp);font-size:26px;margin:0 0 6px;letter-spacing:-.02em}
+.vor{color:#5A554C;max-width:76ch;margin:0 0 20px;font-size:14.5px}
+.vor b{color:var(--tinte)}
+
+.namen{background:var(--flaeche);border:1px solid var(--linie-stark);border-radius:3px;
+  padding:16px 18px;margin:0 0 26px}
+.namen h2{font-family:var(--disp);font-size:17px;margin:0 0 10px}
+.namen table{width:100%;border-collapse:collapse;font-size:13.5px}
+.namen td{padding:6px 10px 6px 0;border-bottom:1px solid var(--linie);vertical-align:top}
+.namen tr:last-child td{border-bottom:0}
+.namen td:first-child{width:170px;font-weight:600;white-space:nowrap}
+.namen .empf td{background:#FBF6E9}
+.namen .empf td:first-child::after{content:' ✓';color:var(--gold-lo)}
+
+.waehler{position:sticky;top:0;z-index:50;display:flex;gap:6px;flex-wrap:wrap;
+  background:#E8E5DE;padding:10px 0 12px;border-bottom:1px solid #D3CFC6;margin-bottom:6px}
+.waehler button{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  padding:8px 13px;border:1px solid var(--linie-stark);background:var(--flaeche);
+  color:var(--leise);cursor:pointer;border-radius:2px}
+.waehler button:hover{border-color:var(--gold-lo);color:var(--tinte)}
+.waehler button[aria-pressed="true"]{background:var(--obsidian);color:#F2EDE3;border-color:var(--obsidian)}
+
+.block{margin:28px 0 0}
+.block h2{font-family:var(--disp);font-size:19px;margin:0 0 3px}
+.block .warum{color:#5A554C;font-size:14px;margin:0 0 14px;max-width:80ch}
+.rahmen{background:var(--papier);border:1px solid var(--linie-stark);border-radius:3px;
+  padding:22px 24px;box-shadow:0 10px 30px -22px rgba(0,0,0,.4)}
+.rahmen .ueber{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--sehr-leise);margin-bottom:12px}
+.notiz{margin-top:11px;display:grid;grid-template-columns:1fr 1fr;gap:8px 22px;font-size:13px;color:#4E4941}
+.notiz div{padding-left:15px;position:relative}
+.notiz div::before{content:'';position:absolute;left:0;top:8px;width:7px;height:1px;background:var(--gold-lo)}
+.notiz .minus::before{background:var(--rot)}
+.notiz b{color:var(--tinte)}
+
+/* ── gemeinsame Bausteine der Entwürfe ──────────────────────────── */
+.q{display:flex;align-items:center;gap:9px;padding:9px 13px;border:1px solid var(--linie);
+  background:var(--flaeche);border-radius:2px;cursor:pointer;font-size:13px;white-space:nowrap}
+.q:hover{border-color:var(--gold-lo)}
+.q.an{border-color:var(--gold);box-shadow:inset 3px 0 0 var(--gold);background:#FFFDF8}
+.q .ic{width:17px;text-align:center;color:var(--gold-lo);flex:0 0 auto}
+.q .led{width:6px;height:6px;border-radius:50%;background:var(--linie-stark);margin-left:auto;flex:0 0 auto}
+.q.an .led{background:var(--gruen)}
+.wm{font-family:var(--disp);font-weight:700;letter-spacing:-.02em}
+.wm i{font-style:normal;color:var(--gold-lo)}
+.los{font-family:var(--body);font-size:13px;font-weight:600;padding:9px 20px;border:0;
+  border-radius:2px;cursor:pointer;color:#141210;
+  background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo))}
+.los.geist{background:transparent;border:1px solid var(--linie-stark);color:var(--leise);font-weight:500}
+.mk{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--sehr-leise)}
+
+@media (max-width:820px){ .notiz{grid-template-columns:1fr} }
+</style>
+
+<div class="schau">
+<h1>Die Bordkarte — fünf Entwürfe</h1>
+<p class="vor">
+  Gemessen: die Karte trägt Perforation, Reisszone, Strichcode, QR-Feld und einen
+  Abriss-Knopf — für eine Aufgabe, die aus <b>vier Kacheln und einem Knopf</b>
+  besteht. Seit v1637 sind es nur noch vier, weil die beiden Bewertungspartner
+  raus sind. <b>Eine Metapher trägt, solange sie etwas erklärt.</b> Erklärt sie
+  nichts mehr, ist sie Dekoration — und Dekoration ist genau das, was einem
+  Banker auffällt.
+</p>
+
+<div class="namen">
+  <h2>Zuerst der Name</h2>
+  <table>
+    <tr><td>Pre-Flight</td><td>Fachwort aus Druck und Luftfahrt. Trifft nicht: hier wird nichts <i>geprüft</i>, hier wird <i>eingelesen</i>.</td></tr>
+    <tr><td>Aktionsbox</td><td>Beschreibt die Form, nicht den Zweck. „Box" sagt nichts darüber, was drin passiert.</td></tr>
+    <tr class="empf"><td>Datenaufnahme</td><td><b>Mein Vorschlag.</b> Sagt genau, was passiert. Ein Steuerberater liest es ohne Erklärung, und es passt zur Luftfahrt-Bildsprache wie „Betankung" — nüchtern, nicht verspielt.</td></tr>
+    <tr><td>Quellen</td><td>Kürzer, aber zu abstrakt: eine Quelle ist auch ein Gutachterausschuss.</td></tr>
+    <tr><td>Startklar</td><td>Hält die Bildwelt am lebendigsten. Klingt aber nach Zustand, nicht nach Werkzeug.</td></tr>
+  </table>
+</div>
+
+<div class="waehler" id="w"></div>
+<div id="buehne"></div>
+</div>
+
+<script>
+const QUELLEN = [
+  ['◎','DealPilot','Markteinschätzung', true],
+  ['▤','Exposé / Marktbericht','PDF einlesen', false],
+  ['🎙','Sprache','Frei einsprechen', false],
+  ['▦','ImmoMetrica','Bestand übernehmen', false]
+];
+const q = (i) => { const [ic,t,u,an]=QUELLEN[i];
+  return `<div class="q${an?' an':''}"><span class="ic">${ic}</span><span>${t}</span><span class="led"></span></div>`; };
+const qMit = (i) => { const [ic,t,u,an]=QUELLEN[i];
+  return `<div class="q${an?' an':''}" style="flex-direction:column;align-items:flex-start;gap:2px;padding:11px 13px;min-width:172px">
+    <span style="display:flex;align-items:center;gap:8px;width:100%"><span class="ic">${ic}</span>
+    <b style="font-size:13px;font-weight:600">${t}</b><span class="led"></span></span>
+    <small style="color:var(--sehr-leise);font-size:11.5px;padding-left:25px">${u}</small></div>`; };
+
+const E = [
+{ kurz:'1 · Zeile', titel:'Entwurf 1 — Eine Zeile',
+  warum:'Das Gegenteil von heute: kein Rahmen, keine Metapher. Eine Beschriftung links, die Quellen als Chips, der Knopf rechts. Nimmt 52 px statt 140.',
+  bau:()=>`<div class="rahmen"><div class="ueber">so sieht es im Objekt aus</div>
+    <div style="display:flex;align-items:center;gap:12px;padding:8px 14px;background:var(--flaeche);
+      border:1px solid var(--linie);border-radius:2px;flex-wrap:wrap">
+      <span class="mk" style="color:var(--leise)">Datenaufnahme</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${[0,1,2,3].map(q).join('')}</div>
+      <button class="los" style="margin-left:auto">Abrufen</button>
+    </div></div>`,
+  plus:['<b>Der kleinste Fussabdruck von allen.</b> Das Objekt beginnt fast sofort.','<b>Nichts zu erklären.</b> Vier Knöpfe, ein Knopf.'],
+  minus:['<b>Kein Platz für Erläuterungen.</b> Wer „ImmoMetrica" nicht kennt, erfährt es hier nicht.','<b>Wenig Gewicht.</b> Der wichtigste Schritt des Objekts sieht aus wie eine Werkzeugleiste.'] },
+
+{ kurz:'2 · Kartei', titel:'Entwurf 2 — Karteikarte',
+  warum:'Eine ruhige Karte mit Kopfzeile und Unterzeilen unter jeder Quelle. Bankfähig durch Zurückhaltung: Haarlinien, viel Weiss, Gold nur am Aktiven.',
+  bau:()=>`<div class="rahmen"><div class="ueber">so sieht es im Objekt aus</div>
+    <div style="background:var(--flaeche);border:1px solid var(--linie);border-radius:2px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 15px;border-bottom:1px solid var(--linie);background:var(--grau)">
+        <span class="wm" style="font-size:14px">Deal<i>Pilot</i></span>
+        <b style="font-size:13.5px">Datenaufnahme</b>
+        <span class="mk" style="margin-left:auto">1 von 4 gewählt</span>
+      </div>
+      <div style="display:flex;gap:9px;padding:14px 15px;flex-wrap:wrap">${[0,1,2,3].map(qMit).join('')}</div>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 15px;border-top:1px solid var(--linie)">
+        <span style="font-size:12.5px;color:var(--leise)">Adresse und Wohnfläche genügen für den Start.</span>
+        <button class="los" style="margin-left:auto">Abrufen</button>
+      </div>
+    </div></div>`,
+  plus:['<b>Jede Quelle erklärt sich selbst.</b> Eine Unterzeile reicht, damit niemand raten muss.','<b>Der ruhigste Entwurf.</b> Nichts blinkt, nichts glänzt — genau der Ton für Bank und Kanzlei.'],
+  minus:['<b>Braucht rund 150 px.</b> So viel wie heute, nur besser genutzt.','<b>Die Marke tritt zurück.</b> Wer Wiedererkennung will, findet ihn zu neutral.'] },
+
+{ kurz:'3 · Checkliste', titel:'Entwurf 3 — Checkliste',
+  warum:'Aus der Luftfahrt bleibt das, was wirklich trägt: die <i>Checkliste</i>. Untereinander, mit Haken für erledigt — man sieht auf einen Blick, was schon eingelesen wurde und was fehlt.',
+  bau:()=>`<div class="rahmen"><div class="ueber">so sieht es im Objekt aus</div>
+    <div style="background:var(--flaeche);border:1px solid var(--linie);border-radius:2px;max-width:520px">
+      <div style="display:flex;align-items:baseline;gap:10px;padding:11px 15px 9px;border-bottom:1px solid var(--linie)">
+        <b style="font-size:13.5px">Datenaufnahme</b>
+        <span class="mk">Checkliste</span>
+        <span class="mk" style="margin-left:auto">1 / 4</span>
+      </div>
+      ${QUELLEN.map(([ic,t,u,an],i)=>`
+        <div style="display:flex;align-items:center;gap:11px;padding:9px 15px;${i<3?'border-bottom:1px solid #F2EFE8':''}">
+          <span style="width:17px;text-align:center;color:${an?'var(--gruen)':'var(--linie-stark)'};font-size:13px">${an?'✓':'○'}</span>
+          <span style="flex:1;min-width:0"><b style="font-size:13px;font-weight:${an?600:500};display:block">${t}</b>
+            <small style="color:var(--sehr-leise);font-size:11.5px">${u}</small></span>
+          <button class="los geist" style="padding:5px 12px;font-size:12px">${an?'Erneut':'Starten'}</button>
+        </div>`).join('')}
+      <div style="padding:10px 15px;border-top:1px solid var(--linie);text-align:right">
+        <button class="los">Alle gewählten abrufen</button>
+      </div>
+    </div></div>`,
+  plus:['<b>Die einzige Luftfahrt-Metapher, die hier wirklich etwas erklärt.</b> Eine Checkliste ist genau das: abhaken, was erledigt ist.','<b>Jede Quelle einzeln startbar.</b> Wer nur das Exposé einlesen will, klickt eine Zeile.'],
+  minus:['<b>Der höchste Entwurf.</b> Vier Zeilen plus Kopf und Fuss brauchen Platz.','<b>Bei nur einer offenen Quelle wirkt es überdimensioniert.</b>'] },
+
+{ kurz:'4 · Trichter', titel:'Entwurf 4 — Trichter',
+  warum:'Zeigt den <i>Weg</i>: links die Quellen, rechts was daraus wird. Beantwortet die Frage, die Neue wirklich haben — „und was passiert dann?"',
+  bau:()=>`<div class="rahmen"><div class="ueber">so sieht es im Objekt aus</div>
+    <div style="display:flex;gap:0;background:var(--flaeche);border:1px solid var(--linie);border-radius:2px;overflow:hidden;flex-wrap:wrap">
+      <div style="flex:1;min-width:280px;padding:14px 15px">
+        <div class="mk" style="margin-bottom:9px">Woher die Daten kommen</div>
+        <div style="display:flex;flex-direction:column;gap:6px">${[0,1,2,3].map(q).join('')}</div>
+      </div>
+      <div style="width:52px;display:grid;place-items:center;background:var(--grau);border-left:1px solid var(--linie);border-right:1px solid var(--linie);color:var(--gold-lo);font-size:19px">›</div>
+      <div style="flex:1;min-width:250px;padding:14px 15px;background:#FEFDFB">
+        <div class="mk" style="margin-bottom:9px">Was dabei herauskommt</div>
+        ${[['Adresse, Fläche, Baujahr','Objektdaten'],['Kaufpreis und Miete','Investition'],['Marktwert und Spanne','Bewertung']]
+          .map(([a,b])=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid #F2EFE8;font-size:12.5px">
+            <span>${a}</span><span class="mk">${b}</span></div>`).join('')}
+        <button class="los" style="margin-top:12px;width:100%">Abrufen</button>
+      </div>
+    </div></div>`,
+  plus:['<b>Beantwortet die Anfängerfrage.</b> „Was passiert, wenn ich das drücke?" steht direkt daneben.','<b>Wertig ohne Zierat.</b> Die Zweiteilung trägt die Gestaltung, nicht ein Strichcode.'],
+  minus:['<b>Braucht Breite.</b> Unter 820 px bricht es auf zwei Blöcke um.','<b>Die rechte Spalte ist statisch.</b> Sie erklärt, sie zeigt keinen Fortschritt.'] },
+
+{ kurz:'5 · Bordkarte neu', titel:'Entwurf 5 — Bordkarte, aber ernst gemeint',
+  warum:'Die Metapher bleibt — aber nur das, was <i>etwas bedeutet</i>: der Abriss trennt „Quellen wählen" von „Abrufen". Perforation als feine Punktlinie, kein Strichcode, kein QR.',
+  bau:()=>`<div class="rahmen"><div class="ueber">so sieht es im Objekt aus</div>
+    <div style="display:flex;background:var(--flaeche);border:1px solid var(--linie-stark);border-radius:3px;overflow:hidden;flex-wrap:wrap">
+      <div style="flex:1;min-width:300px;padding:13px 16px">
+        <div style="display:flex;align-items:baseline;gap:9px;margin-bottom:11px">
+          <span class="wm" style="font-size:13px">Deal<i>Pilot</i></span>
+          <b style="font-size:13px">Datenaufnahme</b>
+          <span class="mk" style="margin-left:auto">Objekt 2026-1637</span>
+        </div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">${[0,1,2,3].map(q).join('')}</div>
+      </div>
+      <div style="width:0;border-left:2px dotted var(--linie-stark);margin:10px 0"></div>
+      <div style="width:190px;padding:13px 16px;background:#FBF6E9;display:flex;flex-direction:column;justify-content:center;gap:7px">
+        <span class="mk">Abschnitt</span>
+        <button class="los">Abrufen</button>
+        <small style="color:var(--leise);font-size:11.5px">1 Quelle gewählt</small>
+      </div>
+    </div></div>`,
+  plus:['<b>Wiedererkennbar.</b> Wer die Karte kennt, findet sie wieder — nur aufgeräumt.','<b>Der Abriss bekommt eine Bedeutung:</b> links wählen, rechts auslösen. Vorher war er nur Bild.'],
+  minus:['<b>Die Metapher bleibt eine Metapher.</b> Wer sie heute schon fremd findet, findet sie auch hier fremd.','<b>Der Cremeblock rechts ist die einzige Farbfläche</b> — er zieht Aufmerksamkeit auf den Knopf, manchen zu viel.'] }
+];
+
+let aktiv=0;
+const w=document.getElementById('w'), b=document.getElementById('buehne');
+E.forEach((e,i)=>{ const k=document.createElement('button'); k.textContent=e.kurz;
+  k.onclick=()=>{aktiv=i;zeichne();}; w.appendChild(k); });
+const alle=document.createElement('button'); alle.textContent='◫ Alle untereinander';
+alle.onclick=()=>{aktiv=-1;zeichne();}; w.appendChild(alle);
+
+function block(e){ return `<div class="block"><h2>${e.titel}</h2><p class="warum">${e.warum}</p>${e.bau()}
+  <div class="notiz">${e.plus.map(t=>`<div>${t}</div>`).join('')}${e.minus.map(t=>`<div class="minus">${t}</div>`).join('')}</div></div>`; }
+function zeichne(){
+  [...w.children].forEach((k,i)=>k.setAttribute('aria-pressed',String(i===aktiv)));
+  b.innerHTML = aktiv<0 ? E.map(block).join('') : block(E[aktiv]);
+  window.scrollTo({top:0,behavior:'instant'});
+}
+zeichne();
+</script>
