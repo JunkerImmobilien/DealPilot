@@ -4023,5 +4023,10 @@ document.addEventListener('DOMContentLoaded', function(){
     <script src="js/ui-varianten.js?v=v1380"></script>
     <script src="js/karten-kompakt.js?v=v1095c"></script><!--v1092-kompakt-aufklappbar-->
     <script src="js/deal-action-pdf-gate.js?v=W3"></script>
+    <!-- v1635 · Layout-Varianten. Stylesheet ZULETZT, damit es style.css
+         bei gleicher Spezifitaet ueberstimmt; Skript NACH settings.js,
+         weil es _dpDispSkin fuer den hellen Grund benutzt. -->
+    <link rel="stylesheet" href="css/layout-varianten.css?v=v1635">
+    <script src="js/layout-varianten.js?v=v1635"></script>
 </body>
 </html>

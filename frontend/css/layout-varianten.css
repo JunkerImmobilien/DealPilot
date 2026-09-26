@@ -1,0 +1,291 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   layout-varianten.css · v1635 — fünf Raumordnungen, eine App
+
+   Diese Datei ORDNET DEN RAUM. Sie färbt ihn nicht: der helle Grund kommt
+   von `body.dp-chrome-hell` (103 geprüfte Regeln), das `layout-varianten.js`
+   beim Umschalten mitsetzt. Eine zweite Hellfassung danebenzustellen hiesse,
+   jede künftige Änderung an zwei Stellen zu pflegen.
+
+   ── WAS JEDES LAYOUT GEMEINSAM TUT ───────────────────────────────────
+   1. `.sc-main` (der grosse Investor Deal Score) verschwindet, und
+      `#hdr-score-mini` tritt an seine Stelle. DEN GIBT ES SCHON - er ist
+      heute nur leer. Marcel: „brauchen wir nicht gross oben … wäre aber
+      gut, wenn man ihn noch irgendwo stehen hätte."
+   2. Die fünf `.sc-pill` werden zu einer Zeile von 40 px statt eines
+      Blocks von 141.
+   3. Die Reiterzeile verliert ihre Fülle und trägt den aktiven Reiter
+      über eine Goldkante - ein Millimeter Gold wirkt teurer als eine
+      goldene Kachel.
+
+   ── DIE SPEZIFITÄTSFRAGE ─────────────────────────────────────────────
+   `style.css` hat 36.929 Zeilen und 4.198 `!important`. Gegen die kommt
+   man nicht mit Token an - deshalb trägt hier jede Regel den Anker
+   `html[data-dp-layout]` (ein Attribut am Wurzelelement, 0-1-0) UND wo
+   nötig `!important`. Beides ist hier kein Faulheitszeichen, sondern die
+   einzige Art, eine 36.000-Zeilen-Datei punktuell zu überstimmen, ohne
+   sie anzufassen.
+
+   ── DIE SCHIENE ──────────────────────────────────────────────────────
+   Bei `links`/`rechts` steht sie `position:fixed` - `.main-col` hat über
+   sechzig Kinder, ein `display:grid` darauf würde jedes sichtbare davon
+   einsortieren. Aus dem Fluss genommen kollidiert sie mit keinem.
+   Bei `leiste`/`fuss` bleibt sie im Fluss und wird über `order` gesetzt.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+html[data-dp-layout]{
+  --dpl-schiene-b: 208px;
+  --dpl-papier:#FDFCFA;
+  --dpl-flaeche:#FFFFFF;
+  --dpl-grau:#F4F2ED;
+  --dpl-linie:#E6E1D6;
+  --dpl-linie-stark:#CEC6B6;
+  --dpl-tinte:#1A1A18;
+  --dpl-leise:#6B645A;
+  --dpl-sehr-leise:#9A9287;
+  --dpl-gold: var(--wl-c9a84c, #C9A84C);
+  --dpl-gold-lo: var(--wl-b8932f, #b8932f);
+}
+
+/* ═══ 1 · GEMEINSAM: der Kopf wird schmal ═══════════════════════════ */
+
+/* Der grosse Score geht - der kleine kommt. */
+html[data-dp-layout] .hdr-v61-row2 .sc-main{ display:none !important; }
+html[data-dp-layout] .hdr-v61-row2{
+  height:auto !important; min-height:0 !important; padding:6px 16px !important;
+  border-bottom:1px solid var(--dpl-linie) !important;
+}
+html[data-dp-layout] .hdr-v61-row2 .scores{
+  display:flex !important; gap:0 !important; height:auto !important;
+  min-height:0 !important; padding:0 !important; border:1px solid var(--dpl-linie) !important;
+  border-radius:2px !important; background:var(--dpl-flaeche) !important; overflow:hidden;
+}
+html[data-dp-layout] .hdr-v61-row2 .sc-pill{
+  flex:1 1 0 !important; min-width:0 !important; height:auto !important;
+  min-height:0 !important; padding:6px 12px !important; margin:0 !important;
+  border:0 !important; border-right:1px solid var(--dpl-linie) !important;
+  border-radius:0 !important; background:transparent !important; box-shadow:none !important;
+}
+html[data-dp-layout] .hdr-v61-row2 .sc-pill:last-child{ border-right:0 !important; }
+
+/* Der kleine Score im Kopf - er ist da, er war nur leer. */
+html[data-dp-layout] #hdr-score-mini{
+  display:inline-flex !important; align-items:center; gap:6px;
+  padding:3px 10px !important; margin-left:10px;
+  border:1px solid var(--dpl-linie-stark) !important; border-radius:2px !important;
+  background:var(--dpl-flaeche) !important; cursor:pointer; white-space:nowrap;
+  font-family:'JetBrains Mono', ui-monospace, monospace; font-size:11px; font-weight:700;
+  color:var(--dpl-tinte) !important;
+}
+html[data-dp-layout] #hdr-score-mini::before{
+  content:'SCORE'; font-size:8.5px; letter-spacing:.11em; font-weight:500;
+  color:var(--dpl-sehr-leise);
+}
+
+/* Die Reiter: Haarlinie statt Fläche, Gold nur als Kante. */
+html[data-dp-layout] nav.tabs{
+  background:var(--dpl-flaeche) !important;
+  border-bottom:1px solid var(--dpl-linie) !important;
+  box-shadow:none !important;
+}
+html[data-dp-layout] nav.tabs .tab{
+  background:transparent !important; border:0 !important; border-radius:0 !important;
+  box-shadow:none !important; color:var(--dpl-leise) !important;
+  border-bottom:2px solid transparent !important;
+}
+html[data-dp-layout] nav.tabs .tab.active{
+  color:var(--dpl-tinte) !important; font-weight:600 !important;
+  border-bottom-color:var(--dpl-gold) !important; background:transparent !important;
+}
+
+/* ═══ 2 · DIE SCHIENE ═══════════════════════════════════════════════ */
+html[data-dp-layout] .dpl-schiene{
+  background:var(--dpl-grau);
+  border-right:1px solid var(--dpl-linie);
+  display:flex; flex-direction:column; min-width:0;
+  font-family:'Inter', system-ui, sans-serif;
+}
+.dpl-schiene[data-stellung="links"],
+.dpl-schiene[data-stellung="rechts"]{
+  position:fixed; top:0; bottom:0; width:var(--dpl-schiene-b);
+  z-index:60; overflow:auto;
+}
+.dpl-schiene[data-stellung="links"]{ left:0; }
+.dpl-schiene[data-stellung="rechts"]{ right:0; left:auto;
+  border-right:0; border-left:1px solid var(--dpl-linie); }
+
+.dpl-marke{ height:46px; flex:0 0 auto; display:flex; align-items:center;
+  padding:0 14px; border-bottom:1px solid var(--dpl-linie);
+  background:var(--dpl-flaeche); }
+.dpl-wm{ font-family:'Space Grotesk', system-ui, sans-serif; font-weight:700;
+  font-size:15px; letter-spacing:-.02em; color:var(--dpl-tinte); }
+.dpl-wm i{ font-style:normal; color:var(--dpl-gold-lo); }
+
+.dpl-portfolio{ display:flex; align-items:center; gap:9px; width:calc(100% - 16px);
+  margin:10px 8px 4px; padding:7px 10px; border:1px solid var(--dpl-linie-stark);
+  background:var(--dpl-flaeche); border-radius:2px; cursor:pointer;
+  font-size:12.5px; color:var(--dpl-tinte); font-family:inherit; }
+.dpl-portfolio:hover{ border-color:var(--dpl-gold-lo); }
+.dpl-portfolio .dpl-i{ color:var(--dpl-gold-lo); }
+.dpl-portfolio .dpl-n{ margin-left:auto; font-family:'JetBrains Mono', monospace;
+  font-size:10.5px; color:var(--dpl-sehr-leise); }
+
+.dpl-teil{ min-width:0; }
+.dpl-teil-tabs{ padding:6px 8px; }
+.dpl-teil-aktionen{ padding:4px 8px 8px; }
+.dpl-teil-nutzer{ margin-top:auto; border-top:1px solid var(--dpl-linie);
+  background:var(--dpl-flaeche); }
+
+/* Die Reiter senkrecht - nur in der Schiene, nicht global. */
+.dpl-teil-tabs nav.tabs{
+  display:flex !important; flex-direction:column !important;
+  background:transparent !important; border:0 !important; padding:0 !important;
+  overflow:visible !important; height:auto !important;
+}
+.dpl-teil-tabs nav.tabs .tab{
+  justify-content:flex-start !important; text-align:left !important;
+  width:100% !important; padding:6px 10px !important; margin:0 0 1px !important;
+  border-bottom:0 !important; border-left:2px solid transparent !important;
+  border-radius:2px !important; font-size:12.5px !important;
+}
+.dpl-teil-tabs nav.tabs .tab.active{
+  background:var(--dpl-flaeche) !important;
+  border-left-color:var(--dpl-gold) !important;
+  border-bottom-color:transparent !important;
+}
+
+/* Die Aktionen: in der Schiene immer offen - ein Menü, das man erst
+   aufklappen muss, ist in einer 208-px-Spalte kein Gewinn. */
+.dpl-teil-aktionen #sb-actions-accordion{
+  display:block !important; height:auto !important; max-height:none !important;
+  overflow:visible !important; opacity:1 !important; visibility:visible !important;
+  padding:0 !important; margin:0 !important;
+}
+.dpl-teil-aktionen #sb-actions-trigger-btn{ display:none !important; }
+.dpl-teil-nutzer #sb-user{ margin:0 !important; border:0 !important; }
+
+/* ═══ 3 · DIE OBJEKTSPALTE ALS SCHUBLADE ════════════════════════════ */
+html[data-dp-layout="v1"] #sidebar,
+html[data-dp-layout="v3"] #sidebar,
+html[data-dp-layout="v4"] #sidebar{
+  position:fixed !important; top:0; bottom:0; z-index:70;
+  width:360px !important; max-width:88vw;
+  transform:translateX(-102%); transition:transform .18s ease;
+  box-shadow:0 0 40px -12px rgba(0,0,0,.45);
+}
+html[data-dp-layout="v1"] #sidebar{ left:var(--dpl-schiene-b) !important; }
+html[data-dp-layout="v3"] #sidebar,
+html[data-dp-layout="v4"] #sidebar{ left:0 !important; }
+
+html[data-dpl-portfolio="auf"] #sidebar{ transform:translateX(0); }
+html[data-dpl-portfolio="auf"]::after{
+  content:''; position:fixed; inset:0; z-index:65; background:rgba(20,18,15,.34);
+}
+
+/* ═══ 4 · DIE FÜNF ══════════════════════════════════════════════════ */
+
+/* ── v1 · AKTENMAPPE ─────────────────────────────────────────────────
+   Schiene links: Reiter als Gliederung, darunter Aktionen, unten Nutzer.
+   Die Objektspalte wird zur Schublade. */
+html[data-dp-layout="v1"] .app-wrap{ padding-left:var(--dpl-schiene-b) !important; }
+
+/* ── v2 · KANZLEI ────────────────────────────────────────────────────
+   Objektspalte bleibt stehen und wird dunkel; die Aktionen ziehen nach
+   RECHTS, neben das Objekt, auf das sie sich beziehen. */
+html[data-dp-layout="v2"] .app-wrap{ padding-right:var(--dpl-schiene-b) !important; }
+html[data-dp-layout="v2"] #sidebar{ width:264px !important; flex:0 0 264px !important; }
+html[data-dp-layout="v2"] .dpl-schiene[data-stellung="rechts"] .dpl-marke{ display:none; }
+
+/* ── v3 · WERKBANK ───────────────────────────────────────────────────
+   Keine Seitenspalte. Die Aktionsleiste kommt auf den Hauptbildschirm,
+   direkt über den Inhalt, auf den sie sich bezieht. */
+html[data-dp-layout="v3"] .main-col > *{ order:0; }
+html[data-dp-layout="v3"] header.hdr{ order:-3; }
+html[data-dp-layout="v3"] nav.tabs{ order:-2; }
+html[data-dp-layout="v3"] .dpl-schiene[data-stellung="leiste"]{ order:-1; }
+.dpl-schiene[data-stellung="leiste"]{
+  flex:0 0 auto; flex-direction:row; align-items:center; gap:8px;
+  padding:7px 16px; background:#FBF6E9;
+  border-right:0; border-bottom:1px solid var(--dpl-linie-stark); overflow-x:auto;
+}
+.dpl-schiene[data-stellung="leiste"] .dpl-portfolio{ margin:0; width:auto; flex:0 0 auto; }
+.dpl-schiene[data-stellung="leiste"] .dpl-teil{ padding:0; }
+.dpl-schiene[data-stellung="leiste"] .dpl-teil-nutzer{ margin-left:auto; margin-top:0;
+  border-top:0; background:transparent; }
+.dpl-schiene[data-stellung="leiste"] #sb-actions-accordion{
+  display:flex !important; flex-direction:row !important; gap:6px;
+  height:auto !important; max-height:none !important; overflow:visible !important;
+  opacity:1 !important; visibility:visible !important; white-space:nowrap;
+}
+.dpl-schiene[data-stellung="leiste"] #sb-actions-trigger-btn{ display:none !important; }
+
+/* ── v4 · DOSSIER ────────────────────────────────────────────────────
+   Die Anwendung sieht aus wie das Dokument, das am Ende herauskommt:
+   mittige Blattspalte auf grauem Grund, Aktionen in der Fussleiste. */
+html[data-dp-layout="v4"] .main-col{ background:#EDEAE3 !important; }
+html[data-dp-layout="v4"] header.hdr,
+html[data-dp-layout="v4"] nav.tabs,
+html[data-dp-layout="v4"] .body{
+  max-width:1080px; margin-left:auto !important; margin-right:auto !important;
+  width:100% !important;
+}
+html[data-dp-layout="v4"] .body{
+  background:var(--dpl-papier) !important;
+  border-left:1px solid var(--dpl-linie); border-right:1px solid var(--dpl-linie);
+}
+html[data-dp-layout="v4"] header.hdr{
+  background:var(--dpl-papier) !important;
+  border-left:1px solid var(--dpl-linie); border-right:1px solid var(--dpl-linie);
+}
+html[data-dp-layout="v4"] .main-col > *{ order:0; }
+html[data-dp-layout="v4"] header.hdr{ order:-3; }
+html[data-dp-layout="v4"] nav.tabs{ order:-2; }
+html[data-dp-layout="v4"] .dpl-schiene[data-stellung="fuss"]{ order:999; }
+.dpl-schiene[data-stellung="fuss"]{
+  position:sticky; bottom:0; z-index:40;
+  flex:0 0 auto; flex-direction:row; align-items:center; gap:8px;
+  padding:7px 20px; background:var(--dpl-flaeche);
+  border-right:0; border-top:1px solid var(--dpl-linie-stark); overflow-x:auto;
+}
+.dpl-schiene[data-stellung="fuss"] .dpl-portfolio{ margin:0; width:auto; flex:0 0 auto; }
+.dpl-schiene[data-stellung="fuss"] .dpl-teil{ padding:0; }
+.dpl-schiene[data-stellung="fuss"] .dpl-teil-nutzer{ margin-left:auto; margin-top:0;
+  border-top:0; background:transparent; }
+.dpl-schiene[data-stellung="fuss"] #sb-actions-accordion{
+  display:flex !important; flex-direction:row !important; gap:6px;
+  height:auto !important; max-height:none !important; overflow:visible !important;
+  opacity:1 !important; visibility:visible !important; white-space:nowrap;
+}
+.dpl-schiene[data-stellung="fuss"] #sb-actions-trigger-btn{ display:none !important; }
+
+/* ── v5 · COCKPIT HELL ───────────────────────────────────────────────
+   Die heutige Struktur, nur entschlackt: Objektspalte von 380 auf 276,
+   Kopf von 189 auf rund 95. Kein Umlernen. */
+html[data-dp-layout="v5"] #sidebar{ width:276px !important; flex:0 0 276px !important; }
+html[data-dp-layout="v5"] .sb-header{ padding:8px 12px !important; }
+html[data-dp-layout="v5"] .sb-header .app-logo-simple-wrap{ max-height:40px !important; }
+
+/* ═══ 5 · DER UMSCHALTER ════════════════════════════════════════════ */
+.dpl-schalter{
+  position:fixed; left:12px; bottom:12px; z-index:2147483000;
+  display:flex; align-items:center; gap:4px; flex-wrap:wrap; max-width:min(96vw,760px);
+  background:rgba(253,252,250,.97); border:1px solid #CEC6B6; border-radius:3px;
+  padding:6px 8px; box-shadow:0 8px 26px -14px rgba(0,0,0,.6);
+  font-family:'JetBrains Mono', ui-monospace, monospace;
+}
+.dpl-schalter-k{ font-size:9px; letter-spacing:.12em; text-transform:uppercase;
+  color:#9A9287; padding-right:4px; }
+.dpl-schalter button{
+  font-family:inherit; font-size:10.5px; letter-spacing:.05em;
+  padding:5px 9px; border:1px solid #CEC6B6; background:#fff; color:#6B645A;
+  cursor:pointer; border-radius:2px; }
+.dpl-schalter button:hover{ border-color:#b8932f; color:#1A1A18; }
+.dpl-schalter button[aria-pressed="true"]{ background:#141310; color:#F2EDE3;
+  border-color:#141310; }
+.dpl-schalter-zu{ margin-left:2px; }
+
+@media (max-width:900px){
+  html[data-dp-layout="v1"] .app-wrap{ padding-left:0 !important; }
+  html[data-dp-layout="v2"] .app-wrap{ padding-right:0 !important; }
+  .dpl-schiene[data-stellung="links"],
+  .dpl-schiene[data-stellung="rechts"]{ position:static; width:auto; }
+}
