@@ -80,15 +80,34 @@ window.generateBmfPdfAnlage = function(state){
   var _g0 = window._pdfGold();
   var _gd = [Math.round(_g0[0]*0.82), Math.round(_g0[1]*0.82), Math.round(_g0[2]*0.82)];
   doc.setFontSize(15); doc.setFont('helvetica','bold'); doc.setTextColor(26,26,26);
+  /* v1634 · Oben links steht das LOGO - Whitelabel vor DealPilot.
+     Der Firmenname tritt nur ein, wenn kein Logo da ist. Dieses
+     Dokument baut synchron, kann also nicht nachladen; `ausSpeicher`
+     gibt nur her, was schon vorgewaermt ist (siehe js/pdf-logo.js). */
+  var _bmfLogoOk = false;
+  try {
+    var _bl = window.DealPilotPdfLogo && window.DealPilotPdfLogo.ausSpeicher(brand);
+    if (_bl && _bl.b64) {
+      var _bm = window.DealPilotPdfLogo.masse(_bl, 34, 11);
+      doc.addImage(_bl.b64, marginL, y - 7, _bm.w, _bm.h, undefined, 'FAST');
+      _bmfLogoOk = true;
+    }
+  } catch (e) { _bmfLogoOk = false; }
   /* v1632 · kein Ersatzabsender - leer heisst leer. */
-  if (brand.company) doc.text(String(brand.company), marginL, y);
+  if (!_bmfLogoOk && brand.company) doc.text(String(brand.company), marginL, y);
   doc.setFontSize(6.6); doc.setFont('helvetica','normal'); doc.setTextColor(120);
   doc.text('I M M O B I L I E N - I N V E S T I T I O N S A N A L Y S E', marginL, y + 4.6);
   (function(){
     var bx = pageW - marginR, by = y - 2.5;
     doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(110);
     var lines = [];
-    if(brand._dpNeutral){ lines = ['DealPilot', 'dealpilot.junker-immobilien.io']; }
+    /* v1634 · Hier stand im neutralen Fall ['DealPilot',
+       'dealpilot.junker-immobilien.io'] - ein ABSENDER mit Webadresse,
+       den v1632 uebersehen hat. Der Block rechts oben ist die
+       Kontaktangabe des Erstellers; wer keine hinterlegt hat, hat
+       keine. DealPilot steht jetzt links als LOGO - als Werkzeug,
+       nicht als Absender. */
+    if(brand._dpNeutral){ lines = []; }
     else {
       if(brand.company) lines.push(String(brand.company));
       var l2 = [String(brand.address || '').trim(), ((brand.plz || '') + ' ' + (brand.city || '')).trim()].filter(Boolean).join(' \u00b7 ');

@@ -130,7 +130,20 @@
     function kopf(titel, unter) {
       y = 22;
       doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.setTextColor(26, 26, 26);
-      doc.text(sauber(firma), L, y);
+      /* v1634 · Auch hier oben links das LOGO - Whitelabel vor
+         DealPilot. Dieses Dokument baut synchron, holt also nur, was
+         vorgewaermt ist (siehe js/pdf-logo.js). Ohne Logo bleibt der
+         Firmenname, und ohne Firma bleibt die Stelle leer. */
+      var _kLogoOk = false;
+      try {
+        var _kl = window.DealPilotPdfLogo && window.DealPilotPdfLogo.ausSpeicher(b);
+        if (_kl && _kl.b64) {
+          var _km = window.DealPilotPdfLogo.masse(_kl, 34, 11);
+          doc.addImage(_kl.b64, L, y - 7, _km.w, _km.h, undefined, 'FAST');
+          _kLogoOk = true;
+        }
+      } catch (e) { _kLogoOk = false; }
+      if (!_kLogoOk && firma) doc.text(sauber(firma), L, y);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(120);
       doc.text('K A U F P R E I S A U F T E I L U N G   N A C H   B M F - A R B E I T S H I L F E', L, y + 4.6);
       doc.setFontSize(8); doc.setTextColor(110);

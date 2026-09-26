@@ -88,7 +88,16 @@ var _PHOTO_META = [];
 async function loadAssets() {
   if (_ASSETS.loaded) return;
   var files = [
-    { key: 'logoDealpilot', path: 'assets/dealpilot_logo.png' }
+    /* v1634 · HIER STAND `assets/dealpilot_logo.png` - MIT UNTERSTRICH.
+       Die Datei gibt es nicht; sie heisst `dealpilot-logo-rahmen-hell.png`.
+       Der Fehlgriff blieb jahrelang unsichtbar, weil die App auf JEDEN
+       Pfad mit 200 antwortet und die index.html liefert: das <img> bekam
+       HTML, loeste `onerror` aus, und `_getBrandingLogo()` gab still
+       `null` zurueck. **Das DealPilot-Logo stand auf keinem PDF.**
+       Ein 200 ist kein Nachweis - nur der Inhaltstyp ist einer.
+       Variante "hell" = schwarze Plakette, lesbar auf weissem Bogen.
+       Siehe `js/pdf-logo.js` fuer die Begruendung der Auswahl. */
+    { key: 'logoDealpilot', path: (window.DealPilotPdfLogo && window.DealPilotPdfLogo.pfad) || 'assets/dealpilot-logo-rahmen-hell.png' }
   ];
   await Promise.all(files.map(function(f) {
     return new Promise(function(resolve) {

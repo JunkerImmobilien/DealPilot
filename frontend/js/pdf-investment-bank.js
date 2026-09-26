@@ -375,15 +375,25 @@
     var G = gold(), GD = [Math.round(G[0] * 0.82), Math.round(G[1] * 0.82), Math.round(G[2] * 0.82)];
     var ab = absender();
 
+    /* v1634 · Das Logo VOR dem Bauen holen - `kopf()` laeuft synchron
+       und auf jeder Seite; ein Nachladen mittendrin kaeme zu spaet.
+       Rangfolge steckt in `fuerMarke`: Whitelabel vor DealPilot. */
+    var _logo = null;
+    try { _logo = await window.DealPilotPdfLogo.fuerMarke(ab.b); } catch (e) { _logo = null; }
+
     /* ── Bausteine ───────────────────────────────────────────── */
     function kopf(titel, unter) {
       y = 22;
       /* Eigenes Logo, wenn der Plan es hergibt - sonst der Firmenname. */
       var logoOk = false;
-      if (ab.b && ab.b.logo_b64) {
+      if (_logo && _logo.b64) {
         try {
-          var lw = 34, lh = 10;
-          doc.addImage(String(ab.b.logo_b64), L, y - 6.5, lw, lh, undefined, 'FAST');
+          /* v1634 · Nicht mehr auf 34x10 mm gequetscht - das verzerrt
+             jedes Logo, dessen Seitenverhaeltnis nicht zufaellig 3,4
+             ist. Die Plakette misst 512x160 (3,2), ein Partnerlogo
+             irgendetwas. `masse` rechnet proportional in den Rahmen. */
+          var m = window.DealPilotPdfLogo.masse(_logo, 34, 11);
+          doc.addImage(_logo.b64, L, y - 7, m.w, m.h, undefined, 'FAST');
           logoOk = true;
         } catch (e) { logoOk = false; }
       }
