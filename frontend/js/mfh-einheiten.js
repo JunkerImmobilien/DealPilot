@@ -177,7 +177,7 @@
          wirklich ist. Jetzt feste Aufteilung in Prozent - die Tabelle
          kann gar nicht mehr breiter werden als ihr Platz. */
       + '<table class="mfh-tab"><colgroup>'
-      + ['6%','13%','9%','7%','5%','10%','10%','9%','11%','12%','8%'].map(function (w) {
+      + ['6%','12%','8%','6%','5%','9%','9%','8%','10%','11%','8%','8%'].map(function (w) {
           return '<col style="width:' + w + '">'; }).join('')
       + '</colgroup><thead><tr style="text-align:left;color:#8A8272">'
       + '<th>Nr.</th><th>Lage</th><th>Art</th><th>m²</th><th>Zi.</th><th title="Aktuelle Nettokaltmiete dieser Einheit, in Euro pro Monat">Ist-Miete <small style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7">&euro;/Monat</small></th><th title="Erzielbare Nettokaltmiete nach Modernisierung, in Euro pro Monat">Soll-Miete <small style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7">&euro;/Monat</small></th><th>Status</th><th>Qualität</th><th>Maßnahme</th><th>Kosten</th><th></th></tr></thead>'
