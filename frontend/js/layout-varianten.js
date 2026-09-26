@@ -122,7 +122,27 @@
     if (L.schiene === 'links' || L.schiene === 'rechts') {
       var marke = document.createElement('div');
       marke.className = 'dpl-marke';
-      marke.innerHTML = '<span class="dpl-wm">Deal<i>Pilot</i></span>';
+      /* ── WESSEN MARKE HIER STEHT ──────────────────────────────────
+         Bei einem Whitelabel-Mandanten SEINE, sonst unsere. Gefragt
+         wird dieselbe Stelle, aus der auch die PDFs ihr Logo holen
+         (`DealPilotConfig.branding.get().logo_b64`) - nicht ein
+         zweiter Weg, der irgendwann auseinanderläuft.
+
+         Der Schriftzug trägt `--dpl-gold-lo`, und das hängt am Token
+         `--wl-b8932f`. Gemessen mit einem fremden Markenton: das „Pilot"
+         wurde rgb(35,85,138), also der Partnerton - ohne eine Zeile
+         Sonderbehandlung. */
+      var eigenes = '';
+      try {
+        var b = (window.DealPilotConfig && window.DealPilotConfig.branding
+          && typeof window.DealPilotConfig.branding.get === 'function')
+          ? (window.DealPilotConfig.branding.get() || {}) : {};
+        if (b.logo_b64) eigenes = String(b.logo_b64);
+      } catch (e) {}
+      marke.innerHTML = eigenes
+        ? '<img class="dpl-logo" alt="">'
+        : '<span class="dpl-wm">Deal<i>Pilot</i></span>';
+      if (eigenes) marke.querySelector('img').src = eigenes;
       schiene.appendChild(marke);
     }
 
