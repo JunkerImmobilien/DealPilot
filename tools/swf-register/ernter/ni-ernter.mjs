@@ -292,10 +292,36 @@ async function ernteGebiet(browser, wb, ags, name) {
     satz.achse_sachwert = achseS;
     console.log(`  Gitter ${achseB.length}x${achseS.length} je Lage, ${lagen.length} Lagen`);
 
+    /* ── TEILSTAND ─────────────────────────────────────────────────────
+       Goslar fuehrt 24 Lageklassen; eine davon dauert rund 900 Sekunden.
+       Die Zeitgrenze des Laufs hat das Gebiet zweimal abgebrochen und
+       dabei JEDE FERTIGE LAGE WEGGEWORFEN - beim zweiten Mal genau
+       dieselbe noch einmal. Ein Lauf, der jedes Mal bei null anfaengt,
+       kommt bei 24 Lagen nie an, egal wie oft man ihn startet.
+
+       Deshalb: nach JEDER Lage wird geschrieben, und ein vorhandener
+       Teilstand wird fortgesetzt statt ueberschrieben. `vollstaendig`
+       sagt, ob alle Lagen drin sind - nur ein vollstaendiger Satz darf
+       uebersprungen werden. */
     satz.gitter = {};
     let n = 0, leer = 0, verriegelt = 0;
     satz.lagen_ausgefallen = [];
+    if (fs.existsSync(zieldatei)) {
+      try {
+        const alt = JSON.parse(fs.readFileSync(zieldatei, 'utf8'));
+        if (alt && alt.gitter && Object.keys(alt.gitter).length) {
+          satz.gitter = alt.gitter;
+          n = alt.punkte || 0;
+          leer = alt.punkte_leer || 0;
+          verriegelt = alt.verriegelt || 0;
+          if (Array.isArray(alt.lagen_ausgefallen)) satz.lagen_ausgefallen = alt.lagen_ausgefallen;
+          console.log('  Teilstand gefunden: ' + Object.keys(alt.gitter).length
+            + ' von ' + lagen.length + ' Lagen schon da');
+        }
+      } catch (e) { console.log('  Teilstand unlesbar - fange neu an'); }
+    }
     for (let li = 0; li < lagen.length; li++) {
+     if (satz.gitter[lagen[li]]) { console.log('    Lage "' + lagen[li] + '" schon geerntet'); continue; }
      /* ── JEDE LAGE FUER SICH ──────────────────────────────────────────
         Faellt eine aus, bleibt der Rest stehen. Bis hierher riss ein
         haengendes Umschalten das ganze Gebiet mit - 20 fertige Punkte
@@ -358,7 +384,13 @@ async function ernteGebiet(browser, wb, ags, name) {
         }
       }
       satz.gitter[lagen[li]] = tafel;
-      console.log(`    Lage "${lagen[li]}" fertig (${n} Punkte, ${leer} leer, ${verriegelt}x nachgefasst)`);
+      /* Sofort sichern. Eine fertige Lage muss eine Zeitgrenze
+         ueberleben - sonst erntet der naechste Lauf dasselbe noch
+         einmal und scheitert an genau derselben Stelle. */
+      satz.punkte = n; satz.punkte_leer = leer; satz.verriegelt = verriegelt;
+      satz.vollstaendig = (Object.keys(satz.gitter).length + satz.lagen_ausgefallen.length) >= lagen.length;
+      fs.writeFileSync(zieldatei, JSON.stringify(satz, null, 1));
+      console.log(`    Lage "${lagen[li]}" fertig (${n} Punkte, ${leer} leer, ${verriegelt}x nachgefasst) - gesichert`);
      } catch (eL) {
       satz.lagen_ausgefallen.push({ lage: lagen[li], grund: String(eL && eL.message || eL) });
       console.log(`    Lage "${lagen[li]}" AUSGEFALLEN: ${eL && eL.message}`);
@@ -372,6 +404,10 @@ async function ernteGebiet(browser, wb, ags, name) {
     /* Wie oft das Bild den vorigen Zustand zeigte - eine Null hier
        waere verdaechtig, nicht beruhigend. */
     satz.verriegelt = verriegelt;
+    /* Das Siegel. Nur wer es traegt, wird beim naechsten Lauf
+       uebersprungen - alles andere ist ein Teilstand und wird
+       fortgesetzt. */
+    satz.vollstaendig = (Object.keys(satz.gitter).length + satz.lagen_ausgefallen.length) >= lagen.length;
     fs.writeFileSync(zieldatei, JSON.stringify(satz, null, 1));
     console.log(`  + ${wb} (${name}): ${n} Punkte, ${leer} ohne Wert, `
       + `${Object.keys(satz.gitter).length}/${lagen.length} Lagen`
