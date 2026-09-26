@@ -18821,3 +18821,86 @@ leer, null Nachfassen**. Rund sechs Minuten je Gebiet.
 - Die neun zusammengesetzten Gebiete ohne AGS.
 - `ni-lageachse.csv` gegenpruefen: Luechow-Dannenberg steht dort als
   blockiert, hat aber gar keine Lage-Auswahl.
+
+---
+
+## Rollout-Journal 26.09.2026 (4) — Sterne, Soll-Miete, Lage-Auswahl
+
+**Commits.** `c9e726e` (v1622), `v1623`/`v1623b` (Lage-Auswahl),
+`b2d9d2c` (Uebersetzer).
+
+### Die Sterne bleiben — aber die Namen nicht
+
+Marcels Entscheidung: behalten. Dann muss der Unterschied sichtbar
+werden. Beide speisen den Investor Deal Score als getrennte KPIs:
+
+| bisher | jetzt | speist |
+|---|---|---|
+| „Baujahr / Zustand" | **Bausubstanz** | Score **+ RND + AfA** |
+| „Qualitaet & Zustand" | **Ausstattungsqualitaet** | nur Score |
+
+> **Dass beide „Zustand" hiessen, war die ganze Verwirrung.** Zwei Namen
+> mit demselben Wort liest niemand als zwei Dinge — Marcel hielt sie
+> deshalb zu Recht fuer moeglicherweise doppelt.
+
+### Die Soll-Miete wurde berechnet und fallengelassen
+
+Der MFH-Konfigurator erhob sie, zeigte sie und **reichte sie niemandem
+weiter**. Wer sie nutzen wollte, musste sie abschreiben. Jetzt geht sie
+nach `me_soll` in der Mietentwicklung, und „Angestrebte Entwicklung"
+(`me_pct`) gleich mit — sie ergibt sich aus denselben zwei Zahlen.
+
+> **Einheitenwechsel, und daran waere es sonst gescheitert:** der
+> Konfigurator fuehrt die Soll-Miete je Einheit in **Euro pro Monat**,
+> `me_soll` in **Euro pro Quadratmeter**. Uebertragen wird die Summe
+> GETEILT DURCH DIE GESAMTFLAECHE. Rechenprobe: 6 Einheiten, 233 m²,
+> Ist 1.880 €/Monat, Soll 2.760 → **11,85 €/m²** und **46,8 %**;
+> Gegenprobe trifft die Summe zeichengleich.
+
+### Die Lage entscheidet — und ohne sie kommt kein Wert
+
+Die Ernte liefert je Gebiet MEHRERE Gitter, eines je Lageklasse. **An
+Goslar reicht dieselbe Stellung je nach Lage von 1,36 bis 1,00.**
+`findeZweig` nahm bis hierher den ERSTEN Treffer — eine Lage haette
+damit fuer alle gegolten, und das faellt niemandem auf: ein Faktor mit
+falscher Lage sieht aus wie einer mit richtiger.
+
+Jetzt: mehrere Saetze, keine Lage → **kein Wert**, dafuer `lage_noetig`
+mit der Liste der gefuehrten Lagen und dem Zuordnungsweg.
+
+> **Der erste Anlauf sass an der falschen Stelle** — hinter
+> `zweigWaehlen`. Der kam nie dorthin: `waehleAusGruppe` sieht zwei
+> Saetze desselben Zweigs, haelt sie fuer zwei BAUJAHRSGRUPPEN, findet
+> keine passende und gibt null. Der Bericht sagte dann
+> „objektart_nicht_abgeleitet", obwohl der Ausschuss die Objektart sehr
+> wohl fuehrt. **Genau diese Falle beschreibt der Kommentar bei v1093
+> fuer die Jahrgaenge** — Lageklassen laufen hinein wie sie. Die Lage
+> wird deshalb VOR der Zweigwahl ausgesiebt.
+
+**Nachweis** (`tools/swf-register/ernter/pruef-lageauswahl.mjs`, im
+Container gelaufen): ohne Lage kein Wert, Lage A 1,19, Lage B 0,91,
+unbekannte Lage abgewiesen. **Rueckschlagtest:** Stade 0,96 und Herford
+0,924 wie vorher, Register weiter 2.515 Saetze.
+
+### Der Angelpunkt: BORIS liefert die Gemarkung
+
+Die BORIS-Antwort traegt **41 Felder**, darunter `Gemarkungsnummer`
+(036271), `Gemarkungsname`, `Gemeindeschlüssel` und `Gemeindesname`.
+
+> **Damit faellt eine Annahme, die seit Monaten gilt.** In
+> `quellen_links.js` steht bei Rostock und der Region Hannover als
+> Grund: „welcher Bereich gilt, ist eine Frage des Ortsteils, und die
+> Anschrift eines Objekts sagt uns das nicht." Die Lageklasse ist ueber
+> die Gemarkung amtlich bestimmbar — beide Wege gehen auf: Goslar ueber
+> die Gemarkung (Dashboard 6271, BORIS 036271), Helmstedt ueber die
+> Gemeinde („Lehre, Velpke [1,08]"). **Die bestehenden Sperren gehoeren
+> nachgeprueft.**
+
+**Rest.**
+- Der Erntelauf (5 von 17 durch, alle sauber). Danach Rezepte, dann ins
+  Register — die Maschine kann sie jetzt auswerten.
+- Die Lage muss noch aus BORIS in den Bewertungsaufruf fliessen; heute
+  muss sie der Aufrufer mitgeben.
+- `ni-lageachse.csv`: Luechow-Dannenberg faellt korrekt mit „keine
+  Lage-Auswahl" heraus — es hat nur ein Zahlenfeld `Lagewert`. Der
+  Erkenner hat damals das Wort „Lage" darin getroffen.
