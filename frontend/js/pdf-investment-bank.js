@@ -77,7 +77,21 @@
     v = da(v); if (v === null) return '-';
     return new Intl.NumberFormat('de-DE', { minimumFractionDigits: dec == null ? 2 : dec, maximumFractionDigits: dec == null ? 2 : dec }).format(v) + ' %';
   }
-  function zahl(v, dec) {
+  /* v1630 · HIESS BIS HIERHER `zahl` - GENAU WIE DER ZAHLENPARSER
+     weiter unten (Z. ~254). Bei gleichnamigen Funktionsdeklarationen im
+     selben Bereich gewinnt die SPAETERE: dieser Formatierer war tot,
+     jeder Aufruf landete beim Parser, und das zweite Argument wurde
+     verschluckt.
+
+     Der Export starb daran mit "Type of text must be string or Array.
+     17.915702160493826" - und weil er starb, wurde doc.save() nie
+     erreicht. Marcel konnte das PDF nicht herunterladen, weil es gar
+     nicht entstand.
+
+     Wo das Ergebnis mit einer Zeichenkette verkettet wurde, fiel
+     nichts auf; dort stand die Zahl nur unformatiert. Zwei Stellen
+     gaben sie direkt an doc.text weiter, und die stuerzten ab. */
+  function fmt(v, dec) {
     v = da(v); if (v === null) return '-';
     return new Intl.NumberFormat('de-DE', { minimumFractionDigits: dec || 0, maximumFractionDigits: dec || 0 }).format(v);
   }
@@ -251,6 +265,10 @@
        Bewirtschaftungskosten von null etwa ueberzeichnen jeden Cashflow.
    Die Pruefung liegt hier und wird nach aussen gegeben, damit die alte
    Fassung dieselbe benutzt statt einer zweiten Liste. */
+  /* v1630 · DIESER HIER IST DER ZAHLENPARSER und heisst `zahl`. Der
+     FORMATIERER weiter oben heisst `fmt` - er hiess einmal auch
+     `zahl` und wurde davon ueberschrieben. Wer hier umbenennt, muss
+     dort nachsehen. */
   function zahl(v) { var n = Number(v); return isFinite(n) ? n : 0; }
   function feldZahl(id) {
     var e = document.getElementById(id);
@@ -504,7 +522,7 @@
         var wert = min + (sp * t) / 4, yy = py(wert);
         doc.line(bx, yy, bx + bw, yy);
         doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4); doc.setTextColor(140);
-        doc.text(zahl(Math.round(wert / 1000)) + 'k', bx - 2, yy + 1.6, { align: 'right' });
+        doc.text(fmt(Math.round(wert / 1000)) + 'k', bx - 2, yy + 1.6, { align: 'right' });
       }
       /* MARKER_V1469 · gemessen: liegen zwei Linien am Ende aufeinander (ohne
          Darlehen sind Objektwert und Eigenkapital gleich), druckten sich die
@@ -527,7 +545,7 @@
           while (belegt.some(function (v) { return Math.abs(v - ly) < 3.2; })) ly += 3.4;
           belegt.push(ly);
           doc.setFont('helvetica', 'bold'); doc.setFontSize(6.6); doc.setTextColor(f[0], f[1], f[2]);
-          doc.text(zahl(Math.round(letzte / 1000)) + 'k', bx + bw + 1.5, ly);
+          doc.text(fmt(Math.round(letzte / 1000)) + 'k', bx + bw + 1.5, ly);
         }
       });
       doc.setLineWidth(0.2);
@@ -578,7 +596,7 @@
     abschnitt('Objekt');
     zeile('Anschrift', adr || '-');
     zeile('Objektart', OBJART[txt('objart')] || txt('objart') || '-');
-    zeile('Wohnfläche', num('wfl') !== null ? zahl(num('wfl'), 0) + ' m²' : '-');
+    zeile('Wohnfläche', num('wfl') !== null ? fmt(num('wfl'), 0) + ' m²' : '-');
     zeile('Baujahr', txt('baujahr') || '-');     /* Jahreszahl nie durch Intl (CLAUDE.md) */
     if (txt('kaufdat')) zeile('Kaufdatum', txt('kaufdat'));
     y += 3;
@@ -613,7 +631,7 @@
     var aussetzung = (txt('d1_type') === 'tilgungsaussetzung');
     zeile('Eigenkapital' + (gi && ek !== null ? ' (' + pct(ek / gi * 100, 1) + ' der Gesamtinvestition)' : ''), eur(ek));
     zeile('Darlehen I' + (aussetzung ? ' · Tilgungsaussetzung' : ' · Annuitätendarlehen'), eur(d1));
-    zeile('Sollzins / Tilgung / Zinsbindung', [pct(num('d1z'), 2), aussetzung ? 'über Bausparvertrag' : pct(num('d1t'), 2), num('d1_bindj') !== null ? zahl(num('d1_bindj')) + ' Jahre' : '-'].join('  ·  '), { einzug: true, klein: true });
+    zeile('Sollzins / Tilgung / Zinsbindung', [pct(num('d1z'), 2), aussetzung ? 'über Bausparvertrag' : pct(num('d1t'), 2), num('d1_bindj') !== null ? fmt(num('d1_bindj')) + ' Jahre' : '-'].join('  ·  '), { einzug: true, klein: true });
     if (da(S.d1_rate_monthly)) zeile('Rate Darlehen I / Monat', eur(S.d1_rate_monthly, 2), { einzug: true, klein: true });
     if (d2an) {
       zeile('Darlehen II', eur(d2));
@@ -655,7 +673,7 @@
       if (num('bspar_quote_min') !== null) zeile('Mindest-Sparquote für die Zuteilung', pct(num('bspar_quote_min'), 0));
       var bs = S.bsvSummary;
       if (bs) {
-        if (da(bs.eingezahlt) !== null) zeile('Eingezahlt bis Ende der Zinsbindung' + (bs.jahre ? ' (' + zahl(bs.jahre) + ' Jahre)' : ''), eur(bs.eingezahlt));
+        if (da(bs.eingezahlt) !== null) zeile('Eingezahlt bis Ende der Zinsbindung' + (bs.jahre ? ' (' + fmt(bs.jahre) + ' Jahre)' : ''), eur(bs.eingezahlt));
         if (da(bs.guthaben) !== null) zeile('Guthaben inkl. Zinsen bei Bindungsende', eur(bs.guthaben));
         if (da(bs.restschuld) !== null) zeile('Restschuld Hauptdarlehen dann', eur(bs.restschuld));
         var effZ = rows.filter(function (r) { return da(r.eff_rs) !== null; });
@@ -677,16 +695,16 @@
     raster([
       ['Bruttomietrendite', pct(K.bmy, 2), 'auf Kaufpreis'],
       ['Nettomietrendite', pct(K.nmy, 2), 'auf Gesamtinvest.'],
-      ['Kaufpreisfaktor', zahl(K.fak, 1), 'fach'],
+      ['Kaufpreisfaktor', fmt(K.fak, 1), 'fach'],
       ['Cashflow vor Steuern', eur(K.cf_m), 'je Monat'],
-      ['DSCR', zahl(K.dscr, 2), ''],
+      ['DSCR', fmt(K.dscr, 2), ''],
       ['LTV', pct(K.ltv, 1), S.ltv_basis_label ? 'auf ' + S.ltv_basis_label : ''],
       ['EK-Rendite', pct(K.ekr, 2), 'p. a., vor Steuern'],
       ['Interner Zinsfuß (IRR)', da(K.irr) === null ? 'nicht bestimmbar' : pct(K.irr, 2), ''],
       ['Kaltmiete', rows[0] ? eur(rows[0].nkm_y) : '-', 'im ersten Jahr'],
-      ['Equity Multiple', da(K.em) === null ? '-' : zahl(K.em, 1) + 'x', 'über die Haltedauer'],
+      ['Equity Multiple', da(K.em) === null ? '-' : fmt(K.em, 1) + 'x', 'über die Haltedauer'],
       ['Wertpuffer / Equity', eur(K.wp_kpi), 'heute'],
-      ['Deal Score', (SC && SC.score) ? zahl(SC.score, 0) + ' / 100' : '-', (SC && SC.label) ? SC.label : '']
+      ['Deal Score', (SC && SC.score) ? fmt(SC.score, 0) + ' / 100' : '-', (SC && SC.label) ? SC.label : '']
     ], { titel: 'Kennzahlen' });
     if (SC && SC.interpretation) {
       platz(16);
@@ -796,9 +814,9 @@
     var bindj = num('d1_bindj');
     var hatPhasen = da(K.cf_ns_ezb) !== null || da(K.cf_ns_an) !== null;
     if (hatPhasen) {
-      platz(62, 'Drei Phasen', 'Heute · Ende der Zinsbindung' + (bindj ? ' (nach ' + zahl(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung');
+      platz(62, 'Drei Phasen', 'Heute · Ende der Zinsbindung' + (bindj ? ' (nach ' + fmt(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung');
       abschnitt('Cashflow je Phase');
-      einleitung('Heute · Ende der Zinsbindung' + (bindj ? ' (nach ' + zahl(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung mit dem angenommenen Zins.');
+      einleitung('Heute · Ende der Zinsbindung' + (bindj ? ' (nach ' + fmt(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung mit dem angenommenen Zins.');
       function ph(label, a, b, c) { return { werte: [label, a, b, c] }; }
       tabelle(
         [['', 46], ['Heute', 26], ['Ende Zinsbindung', 30], ['Anschluss', 26]],
@@ -835,7 +853,7 @@
 
       platz(44, 'Zinsänderungsrisiko', 'Was passiert, wenn die Zinsbindung endet');
       abschnitt('Zinsänderungsrisiko');
-      zeile('Zinsbindung', bindj !== null ? zahl(bindj) + ' Jahre' : '-');
+      zeile('Zinsbindung', bindj !== null ? fmt(bindj) + ' Jahre' : '-');
       zeile('Restschuld am Ende der Zinsbindung', eur(S.rs));
       zeile('Angenommener Anschlusszins / Tilgung', [pct(num('anschl_z'), 2), pct(num('anschl_t'), 2)].join('  ·  '));
       zeile('Rate nach Anschluss / Monat', eur(K.rate_an_m, 2));
@@ -867,7 +885,7 @@
     } else {
       tabZeile(sp.map(function (s) { return s[0]; }), false, true);
       rows.slice(0, 10).forEach(function (r) {
-        tabZeile([r.cal || r.y, zahl(r.nkm_y), zahl(r.bwk_y), zahl(r.zy), zahl(r.ty), zahl(r.cfop_y), zahl(r.rs), pct(r.ltv_y, 1)]);
+        tabZeile([r.cal || r.y, fmt(r.nkm_y), fmt(r.bwk_y), fmt(r.zy), fmt(r.ty), fmt(r.cfop_y), fmt(r.rs), pct(r.ltv_y, 1)]);
       });
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
       doc.text('Beträge in Euro je Jahr. CF v. St. = Cashflow vor Steuern (Kaltmiete - Bewirtschaftung - Zins - Tilgung).', L, y + 1);
@@ -920,9 +938,9 @@
       mZeile(spM.map(function (s) { return s[0]; }), true);
       MFH.zeilen.forEach(function (z) {
         if (y > H - 30) { doc.addPage(); kopf('Einheiten und Zustand', 'Fortsetzung'); mZeile(spM.map(function (s) { return s[0]; }), true); }
-        mZeile([z.e.nr || '', (z.e.lage || '').slice(0, 18), z.fl ? zahl(z.fl, 0) : '-',
-          z.e.ist ? zahl(Number(String(z.e.ist).replace(',', '.')), 0) : '-',
-          z.e.soll ? zahl(Number(String(z.e.soll).replace(',', '.')), 0) : '-',
+        mZeile([z.e.nr || '', (z.e.lage || '').slice(0, 18), z.fl ? fmt(z.fl, 0) : '-',
+          z.e.ist ? fmt(Number(String(z.e.ist).replace(',', '.')), 0) : '-',
+          z.e.soll ? fmt(Number(String(z.e.soll).replace(',', '.')), 0) : '-',
           z.e.status === 'leer' ? 'leer' : 'vermietet',
           z.punkte + ' P.' + (z.geerbt === 4 ? '*' : ''), z.rnd != null ? Math.round(z.rnd) + ' J.' : '-']);
       });
@@ -938,9 +956,9 @@
       zeile('Bruttomietrendite Ist (auf Kaufpreis)', pct(K.bmy, 2));
       zeile('Bruttomietrendite Soll (auf Gesamtinvestition)', da(K.gi) && K.gi > 0 ? pct(sollJ / K.gi * 100, 2) : '-');
       zeile('Rechtliche Einheit', MFH.aufgeteilt ? 'in Wohnungseigentum aufgeteilt (WEG)' : 'ungeteiltes Gebäude');
-      if (MFH.s.leer) zeile('Leerstand', MFH.s.leer + ' Einheiten / ' + zahl(MFH.s.leerFl, 0) + ' m²');
+      if (MFH.s.leer) zeile('Leerstand', MFH.s.leer + ' Einheiten / ' + fmt(MFH.s.leerFl, 0) + ' m²');
       if (MFH.s.kosten) zeile('Geplante Maßnahmen', eur(MFH.s.kosten));
-      zeile('Modernisierungsgrad (flächengewichtet)', zahl(MFH.punkteGew, 1) + ' von 20 Punkten');
+      zeile('Modernisierungsgrad (flächengewichtet)', fmt(MFH.punkteGew, 1) + ' von 20 Punkten');
       if (MFH.rndGew > 0) zeile('Restnutzungsdauer (flächengewichtet)', Math.round(MFH.rndGew) + ' Jahre', { summe: true });
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7.6); doc.setTextColor(130);
       var hin = MFH.sollAbJahr
@@ -957,7 +975,7 @@
       abschnitt('Exit und Vermögenszuwachs');
       zeile('Objektwert heute (Anker der Wertsteigerung)', eur(S.wert_basis));
       zeile('Angenommene Wertsteigerung p. a.', num('wertstg') !== null ? pct(num('wertstg'), 1) : '-');
-      zeile('Angenommener Verkaufspreis' + (S.btj ? ' nach ' + zahl(S.btj) + ' Jahren' : ''), eur(K.exit_vkp));
+      zeile('Angenommener Verkaufspreis' + (S.btj ? ' nach ' + fmt(S.btj) + ' Jahren' : ''), eur(K.exit_vkp));
       if (letzteZeile) zeile('Restschuld zum Verkaufszeitpunkt', eur(letzteZeile.rs));
       if (letzteZeile && da(K.exit_vkp) !== null) zeile('Möglicher Erlös nach Ablösung', eur(K.exit_vkp - Math.max(0, letzteZeile.rs || 0)), { summe: true });
       if (num('exit_bmy') !== null) zeile('Unterstellte Exit-Rendite (Verkaufsszenario)', pct(num('exit_bmy'), 1), { klein: true });
@@ -1144,7 +1162,7 @@
     zeile('Mietsteigerung p. a.', num('mietstg') !== null ? pct(num('mietstg'), 1) : '-');
     zeile('Kostensteigerung p. a.', num('kostenstg') !== null ? pct(num('kostenstg'), 1) : '-');
     zeile('Wertsteigerung p. a.', num('wertstg') !== null ? pct(num('wertstg'), 1) : '-');
-    zeile('Betrachtungszeitraum', S.btj ? zahl(S.btj) + ' Jahre' : '-');
+    zeile('Betrachtungszeitraum', S.btj ? fmt(S.btj) + ' Jahre' : '-');
     if (num('leerstand') !== null) zeile('Kalkulierter Leerstand p. a.', pct(num('leerstand'), 1));
     zeile('Anschlusszins / Anschlusstilgung (Annahme)', [pct(num('anschl_z'), 2), pct(num('anschl_t'), 2)].join('  ·  '));
     zeile('Persönlicher Grenzsteuersatz', num('grenz') !== null ? pct(num('grenz'), 2) : '-');
