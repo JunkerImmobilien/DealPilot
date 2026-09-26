@@ -204,7 +204,10 @@ hr.zart{border:0;border-top:1px solid var(--linie);margin:14px 0}
 .e1 .schiene a .i{width:15px;text-align:center;color:var(--gold-lo);font-size:11px}
 
 /* ═══ ENTWURF 2 · KANZLEI ═══════════════════════════════════════════ */
-.e2{display:flex;min-height:0}
+/* flex-direction MUSS hier stehen: .geraet setzt column, und eine
+   Seitenspalte, die das nicht zuruecksetzt, landet UNTER der Buehne.
+   Gemessen: die Arbeitsflaeche begann bei 662 statt 84 px. */
+.e2{display:flex;flex-direction:row;min-height:0}
 .e2 .nav{width:198px;flex:0 0 auto;background:var(--obsidian);color:#E9E3D6;
   display:flex;flex-direction:column;padding:0}
 .e2 .nav .marke{height:46px;display:flex;align-items:center;padding:0 14px;
@@ -237,7 +240,7 @@ hr.zart{border:0;border-top:1px solid var(--linie);margin:14px 0}
 .e3 .werkzeug .tr{width:1px;height:20px;background:var(--linie-stark);margin:0 4px;flex:0 0 auto}
 
 /* ═══ ENTWURF 4 · DOSSIER ═══════════════════════════════════════════ */
-.e4{display:flex;min-height:0;background:#EDEAE3}
+.e4{display:flex;flex-direction:row;min-height:0;background:#EDEAE3}
 .e4 .rail{width:52px;flex:0 0 auto;background:var(--obsidian);display:flex;
   flex-direction:column;align-items:center;padding:10px 0;gap:3px}
 .e4 .rail .m{width:30px;height:30px;display:grid;place-items:center;color:var(--gold);
@@ -258,7 +261,7 @@ hr.zart{border:0;border-top:1px solid var(--linie);margin:14px 0}
 .e4 .arbeit{padding:18px 26px 28px}
 
 /* ═══ ENTWURF 5 · COCKPIT HELL ══════════════════════════════════════ */
-.e5{display:flex;min-height:0}
+.e5{display:flex;flex-direction:row;min-height:0}
 .e5 .sb{width:252px;flex:0 0 auto;background:var(--grau);border-right:1px solid var(--linie);
   display:flex;flex-direction:column}
 .e5 .sb .marke{height:46px;display:flex;align-items:center;padding:0 14px;
