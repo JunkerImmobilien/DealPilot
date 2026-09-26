@@ -203,3 +203,21 @@ body.dp-chrome-hell .dp-pfbar .dp-pf-qr svg rect{ fill:#fff; }
   .dp-pfbar .dp-pf-rz{ width:100%; }
   .dp-pfbar .dp-pf-launch{ width:100% !important; }
 }
+
+/* GEMESSEN: die Status-LED einer GEWAEHLTEN Kachel war rgb(241,242,244) -
+   nahezu weiss, auf hellem Grund also unsichtbar. Der Zustand stand
+   damit nur noch in der Goldkante.
+
+   Gruen und Rot bleiben in jeder Marke gleich (CLAUDE.md:
+   "Statusfarben nie tokenisieren") - deshalb steht hier ein Literal und
+   KEIN --wl-Token. Der Gold-Waechter kennt diese beiden Toene nicht. */
+.dp-pfbar .dp-pf-led{ background:#CEC6B6 !important; }
+.dp-pfbar .dp-pf-tile.on .dp-pf-led{ background:#3FA56C !important; }
+body:not(.dp-chrome-hell) .dp-pfbar .dp-pf-led{ background:#2A2622 !important; }
+
+/* Auf dem Handy steht die erste Kachel allein in ihrer Gruppe - sie soll
+   dann die volle Breite nehmen wie die Gruppe darunter, sonst sieht es
+   aus, als fehle etwas daneben. */
+@media (max-width:700px){
+  .dp-pfbar .dp-pf-seg:first-of-type .dp-pf-tile{ flex:1 1 100% !important; }
+}
