@@ -177,8 +177,32 @@
     window.newObj.__nq = true;
   }
 
+  /* ── WARUM EIN WÄCHTER UND KEIN EINMALIGES UMHÜLLEN ──────────────────
+     GEMESSEN am 26.09.2026: nach dem ersten Umhüllen war
+     `window.newObj.__nq` wieder `false`. Ursache ist keine Zeitfrage,
+     sondern die Reihenfolge der Skripte:
+
+       `function newObj() {…}` ist eine DEKLARATION. Sie wird beim
+       Auswerten IHRES Skripts an `window` gebunden - und überschreibt
+       dabei alles, was vorher dort stand, auch meine Umhüllung.
+
+     > Eine Umhüllung, die vor der Deklaration läuft, wird von ihr
+     > aufgefressen. Wer nicht weiss, wann die Deklaration kommt, muss
+     > NACHSEHEN, nicht warten.
+
+     Deshalb: nicht aufhören, sobald einmal umhüllt wurde, sondern
+     nachsehen, ob die Umhüllung noch DA ist - dreissig Sekunden lang,
+     und ein letztes Mal nach `load`. Danach steht sie. */
   var n = 0;
-  (function warten() { umhuellen(); if (!orig && n++ < 40) setTimeout(warten, 250); })();
+  (function wache() {
+    if (!window.newObj || !window.newObj.__nq) { orig = null; umhuellen(); }
+    if (n++ < 120) setTimeout(wache, 250);
+  })();
+  window.addEventListener('load', function () {
+    setTimeout(function () {
+      if (!window.newObj || !window.newObj.__nq) { orig = null; umhuellen(); }
+    }, 400);
+  });
 
   window.DealPilotNeuesObjekt = {
     zeige: zeige,
