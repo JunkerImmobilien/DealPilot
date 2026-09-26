@@ -57,6 +57,18 @@ const faelle = [
    [satz('03902', 'Helmstedt, Königslutter [1,00]', true, ZU_GEMEINDE),
     satz('03902', 'Lehre, Velpke [1,08]', false, ZU_GEMEINDE)],
    { ags: '03902', ort: 'Lehrte' }, null],
+  ['C · Ortsteil "Beddingen" (Salzgitter staffelt nach Ortsteilen)',
+   [satz('03903', 'Barum, Beddingen, Beinum und Watenstedt', true, ZU_GEMEINDE),
+    satz('03903', 'Gebhardshagen, Lebenstedt und Thiede', false, ZU_GEMEINDE)],
+   { ags: '03903', gemeinde: 'Salzgitter', ortsteil: 'Beddingen' }, 1.19],
+  ['C · Ortsteil "Thiede" -> andere Lage',
+   [satz('03903', 'Barum, Beddingen, Beinum und Watenstedt', true, ZU_GEMEINDE),
+    satz('03903', 'Gebhardshagen, Lebenstedt und Thiede', false, ZU_GEMEINDE)],
+   { ags: '03903', gemeinde: 'Salzgitter', ortsteil: 'Thiede' }, 0.91],
+  ['C · fremder Ortsteil -> KEIN Wert',
+   [satz('03903', 'Barum, Beddingen, Beinum und Watenstedt', true, ZU_GEMEINDE),
+    satz('03903', 'Gebhardshagen, Lebenstedt und Thiede', false, ZU_GEMEINDE)],
+   { ags: '03903', gemeinde: 'Salzgitter', ortsteil: 'Irgendwo' }, null],
 ];
 
 let fehler = [];
