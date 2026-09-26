@@ -332,7 +332,11 @@ async function ernteGebiet(browser, wb, ags, name) {
           n = alt.punkte || 0;
           leer = alt.punkte_leer || 0;
           verriegelt = alt.verriegelt || 0;
-          if (Array.isArray(alt.lagen_ausgefallen)) satz.lagen_ausgefallen = alt.lagen_ausgefallen;
+          /* `lagen_ausgefallen` wird NICHT uebernommen. Jede Lage ohne
+             Gitter wird gleich neu versucht; stuende die alte Meldung
+             noch da und der neue Anlauf gelingt, behauptete die Datei
+             einen Ausfall, den es nicht mehr gibt. Die Liste soll den
+             LETZTEN Stand nennen, nicht die Geschichte. */
           console.log('  Teilstand gefunden: ' + Object.keys(alt.gitter).length
             + ' von ' + lagen.length + ' Lagen schon da');
         }
