@@ -65,11 +65,11 @@
   /* Welche Knoten wandern in die Schiene - je Layout.
      `tabs` steht nur bei v1 dabei: nur dort werden die Reiter senkrecht. */
   var LAYOUTS = {
-    v1: { name: 'Aktenmappe',   schiene: 'links',  nimmt: ['tabs', 'aktionen', 'nutzer'], objekteAls: 'schublade' },
-    v2: { name: 'Kanzlei',      schiene: 'rechts', nimmt: ['aktionen', 'nutzer'],          objekteAls: 'spalte' },
-    v3: { name: 'Werkbank',     schiene: 'leiste', nimmt: ['aktionen', 'nutzer'],          objekteAls: 'schublade' },
-    v4: { name: 'Dossier',      schiene: 'fuss',   nimmt: ['aktionen', 'nutzer'],          objekteAls: 'schublade' },
-    v5: { name: 'Cockpit hell', schiene: null,     nimmt: [],                              objekteAls: 'spalte' }
+    v1: { name: 'Aktenmappe',   schiene: 'links',  nimmt: ['tabs', 'aktionen', 'nutzer'], objekteAls: 'schublade', beschreibung: 'Menü links als Gliederung' },
+    v2: { name: 'Kanzlei',      schiene: 'rechts', nimmt: ['aktionen', 'nutzer'],          objekteAls: 'spalte', beschreibung: 'Objekte links, Aktionen rechts' },
+    v3: { name: 'Werkbank',     schiene: 'leiste', nimmt: ['aktionen', 'nutzer'],          objekteAls: 'schublade', beschreibung: 'Volle Breite, Leiste oben' },
+    v4: { name: 'Dossier',      schiene: 'fuss',   nimmt: ['aktionen', 'nutzer'],          objekteAls: 'schublade', beschreibung: 'Wie das fertige Dokument' },
+    v5: { name: 'Cockpit hell', schiene: null,     nimmt: [],                              objekteAls: 'spalte', beschreibung: 'Heutiger Aufbau, entschlackt' }
   };
 
   var KNOTEN = {
@@ -248,6 +248,67 @@
     });
   }
 
+  /* ── Der Platz in den Einstellungen ──────────────────────────────────
+     Marcel: „ich hoffe, die haben wir in den Einstellungen irgendwo bei
+     Anzeige oder Darstellung angegeben."
+
+     Der Abschnitt wird in das VORHANDENE Darstellungs-Panel eingehängt
+     (`#dpuv-panel` aus `ui-varianten.js`), mit dessen eigener
+     Markup-Sprache: `.dpuv-g` für die Gruppe, `.dpuv-seg`/`.dpuv-sgb`
+     für die Kacheln. Damit erbt er Aussehen, Abstände und jede künftige
+     Änderung an diesem Panel automatisch.
+
+     > `ui-varianten.js` hat 1.296 Zeilen und eine eigene Speicher- und
+     > Anwendungsmechanik. Dort hineinzuschreiben hiesse, sie zu
+     > verstehen UND zu riskieren. Ein Abschnitt, der sich von aussen
+     > einhängt, kann sie nicht kaputtmachen.
+
+     Eingehängt wird beim Öffnen - das Panel wird erst dann gebaut. */
+  var beobachter = null;
+  function inPanel() {
+    var panel = document.getElementById('dpuv-b');
+    if (!panel || document.getElementById('dpl-sek')) return;
+
+    var g = document.createElement('div');
+    g.className = 'dpuv-g';
+    g.id = 'dpl-sek';
+    var kacheln = [{ key: '', name: 'Heute', sub: 'Unverändert' }].concat(
+      Object.keys(LAYOUTS).map(function (k, i) {
+        return { key: k, name: (i + 1) + ' · ' + LAYOUTS[k].name, sub: LAYOUTS[k].beschreibung };
+      }));
+    g.innerHTML = '<h3>Aufbau</h3>'
+      + '<p class="dpuv-hint">Wo Menü, Aktionen und Objektliste stehen. '
+      + 'Die Arbeitsfläche bleibt in allen gleich — es wechselt nur der Rahmen. '
+      + 'Ein Aufbau schaltet die Oberfläche auf <b>hell</b>.</p>'
+      + '<div class="dpuv-seg" id="dpl-seg">'
+      + kacheln.map(function (o) {
+          return '<button type="button" class="dpuv-sgb' + (o.key === aktuell ? ' on' : '')
+            + '" data-v="' + o.key + '"><b>' + o.name + '</b><small>'
+            + (o.sub || '') + '</small></button>';
+        }).join('')
+      + '</div>';
+
+    /* Vor die Modus-Gruppe: der Aufbau ist die gröbere Entscheidung,
+       und grobe Entscheidungen gehören nach oben. */
+    panel.insertBefore(g, panel.firstChild);
+
+    g.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('.dpuv-sgb') : null;
+      if (!b) return;
+      setze(b.dataset.v);
+      [].forEach.call(g.querySelectorAll('.dpuv-sgb'), function (x) {
+        x.classList.toggle('on', x.dataset.v === aktuell);
+      });
+    });
+  }
+
+  function panelBeobachten() {
+    if (beobachter || !window.MutationObserver) return;
+    beobachter = new MutationObserver(function () { inPanel(); });
+    beobachter.observe(document.body, { childList: true });
+    inPanel();
+  }
+
   /* ── Start ──────────────────────────────────────────────────────── */
   function start() {
     var p = new URLSearchParams(location.search);
@@ -268,6 +329,7 @@
     var zeigen = false;
     try { zeigen = localStorage.getItem('dp_layout_schalter') === '1'; } catch (e) {}
     if (zeigen) { baueSchalter(); schalterNachziehen(); }
+    panelBeobachten();
 
     /* Die Objektzahl ändert sich, wenn Karten nachgeladen werden. */
     var l = el('#sb-list');

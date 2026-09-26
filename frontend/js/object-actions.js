@@ -27,6 +27,23 @@
   var AVM_PREFLIGHT_SOON = (typeof window !== 'undefined' && window.DP_AVM_PREFLIGHT_SOON != null)
     ? !!window.DP_AVM_PREFLIGHT_SOON
     : !/staging/i.test(String((typeof location !== 'undefined' && location.hostname) || ''));
+  /* ═══ v1637 · DIE BEIDEN BEWERTUNGSPARTNER SIND UNSICHTBAR ═══════════
+     Marcel: „wir lassen die Programmierung im Hintergrund, dass wir
+     später die Buttons wieder einfügen können."
+
+     Zugleich die Hausregel: **namentlich nie nach aussen**. Bis heute
+     standen beide Namen als Logokacheln auf der Bordkarte und in zwei
+     Hinweiszeilen darunter.
+
+     EIN Schalter statt sechs Löschungen. Auf `true` gesetzt, ist alles
+     wieder da - der Abrufweg (`avmFetch`, `_oabApplyExternal`, die
+     Reihenfolge in `order`) wurde NICHT angefasst.
+
+     > Ein auskommentierter Knopf ist eine Leiche. Ein Knopf hinter
+     > einem benannten Schalter ist eine Entscheidung. */
+  var PARTNER_AVM_SICHTBAR = (typeof window !== 'undefined' && window.DP_PARTNER_AVM != null)
+    ? !!window.DP_PARTNER_AVM : false;
+
   function provComingSoon(p) {
     if ((p === 'pricehubble' || p === 'sprengnetter') && AVM_PREFLIGHT_SOON) return true; /* v895h-avm-soon */
     if (p === 'pricehubble' && PH_COMING_SOON) return true;
@@ -301,8 +318,11 @@
         '<div class="dp-pf-lead"><span class="bp">BOARDING PASS</span><span class="k">PRE-FLIGHT</span><span class="s">DealPilot \u00b7 Boarding</span></div><span class="dp-pf-perf"></span>' + /* v572-leadtext */
         '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Marktbewertung</span><div class="dp-pf-row">' +
           /* v752-order */ pfTileLogo('dealpilot', _dpInner, false, 'Marktpreisbewertung') +
+          /* v1637 · unsichtbar, nicht geloescht - siehe PARTNER_AVM_SICHTBAR */
+          (PARTNER_AVM_SICHTBAR ? (
           pfTileLogo('sprengnetter', _snInner, (avmOff || provComingSoon('sprengnetter')), provComingSoon('sprengnetter') ? 'Coming soon' : (avmOff ? 'Marktradar derzeit deaktiviert' : 'Sprengnetter'), provComingSoon('sprengnetter') ? 'dp-pf-soon-on' : '') + /* v895h-avm-soon */
-          pfTileLogo('pricehubble', _phInner, (avmOff || provComingSoon('pricehubble')), provComingSoon('pricehubble') ? 'Coming soon' : (avmOff ? 'Marktradar derzeit deaktiviert' : 'PriceHubble'), provComingSoon('pricehubble') ? 'dp-pf-soon-on' : '') +
+          pfTileLogo('pricehubble', _phInner, (avmOff || provComingSoon('pricehubble')), provComingSoon('pricehubble') ? 'Coming soon' : (avmOff ? 'Marktradar derzeit deaktiviert' : 'PriceHubble'), provComingSoon('pricehubble') ? 'dp-pf-soon-on' : '')
+          ) : '') +
         '</div></div>' +
         '<div class="dp-pf-sep"></div>' +
         '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Daten einlesen</span><div class="dp-pf-row">' +
@@ -313,8 +333,8 @@
         '<a class="dp-pf-qr" id="oab-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot \u00f6ffnen">' + _qrSvg + '<span class="dp-pf-scan">Scan \u203a</span></a>' + '<span class="dp-pf-rz"><span class="dp-pf-bc"></span>' + '<button type="button" class="dp-pf-launch oab-act" id="oab-run">Abrufen</button>' + '</span>' +
       '</div></div>' +
       '<div class="oab-credit-hint" id="oab-credit-hint" style="display:none"></div>' +
-      (avmOff ? '<div class="oab-note" style="margin:-6px 0 12px">Marktradar (PriceHubble/Sprengnetter) ist derzeit deaktiviert \u2014 Import funktioniert.</div>' : '') +
-      ((!avmOff && (provComingSoon('sprengnetter') || provComingSoon('pricehubble'))) ? '<div class="oab-note" style="margin:-6px 0 12px">Marktbewertung aktuell \u00fcber die DealPilot-Markteinsch\u00e4tzung \u2014 Sprengnetter &amp; PriceHubble folgen in K\u00fcrze.</div>' : '') + /* v895h-avm-soon */
+      (avmOff ? '<div class="oab-note" style="margin:-6px 0 12px">Die externe Marktbewertung ist derzeit deaktiviert \u2014 Import funktioniert.</div>' : '') +
+      /* v1637 · Hier stand ein Hinweis, der die beiden Partner NAMENTLICH nannte. Er erschien nur zu den 'coming soon'-Kacheln, und die gibt es nicht mehr. */ '' +
       '<div class="oab-prog" id="oab-prog" style="display:none"></div>' +
       '<div class="oab-results" id="oab-results"></div>';
     // v570-pf: initial .on synchronisieren (DealPilot default aktiv) + LED-Kopplung sicherstellen
