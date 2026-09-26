@@ -18571,3 +18571,64 @@ Cache-Buster `app.js` 1602 -> 1614.
   Entscheidung.
 - Die Wohnflaechenkurve von Helmstedt und Peine (RH) nachernten.
 - Die Registersaetze und v1614 sind noch nicht auf Prod.
+
+---
+
+## Rollout-Journal 26.09.2026 — Produktion nachgezogen
+
+**Was.** Staging nach Prod gezogen: die Ernte aus Niedersachsen und
+Bayern und v1614/b/c (der Weg zur Quelle).
+
+**Commit.** `ad2080c` auf `main`. **Freigabe:** Marcel, ausdruecklich.
+
+### Erst gemessen, dann angefasst
+
+Der Abstand war **10 Commits und NULL Migrationen** — die Datenbanken
+wurden nicht angefasst. (Zum Vergleich: vor dem Zusammenziehen am
+25.09. lagen die Zweige 213 Commits auseinander. Wer regelmaessig
+nachzieht, muss nicht jedes Mal ein Risiko abwaegen.)
+
+`main` hatte elf eigene Commits (die `PROD:`-Reihe plus v1601/v1602/
+v1610). **Der direkte Baumvergleich zeigte trotzdem nur meine 23
+Dateien** — inhaltlich steckte alles von `main` schon in `staging`. Die
+Zusammenfuehrung lief deshalb ohne einen einzigen Konflikt, und das
+Ergebnis ist zeichengleich mit dem Staging-Baum (`git diff` leer).
+
+### Gesichert UND angesehen
+
+```
+/root/backups/haupt-20260926-0435.sql.gz    11M
+/root/backups/mb-20260926-0435.sql.gz      703K
+```
+
+Beide mit `zcat | head -3` geoeffnet, beide tragen den echten
+`PostgreSQL database dump`-Kopf. **Eine Sicherung, die man nicht
+ansieht, ist keine** — am 08.09. war eine davon 20 Byte gross und sah
+aus wie eine Sicherung.
+
+### Abnahme auf Produktion
+
+| | |
+|---|---|
+| Register | **2.515 Saetze** aus 24 Dateien |
+| Stade (neu geerntet) | Stufe B, Fallzahl 807 |
+| Ausschuss-Eintraege | **120** (vorher 61) |
+| Bad Toelz, zwei Kennzahlen | **verschiedene** Gruende — SWF „abgeleitet", LZ „keine abgeleitet" |
+| ohne Sachwert | Weg zur Quelle **da** |
+| `app.js` Cache-Buster | 1614 live, `_druckeQuelleSwf` im ausgelieferten Stand |
+| Rauchtest | app 200, Landing 200, alle fuenf Container oben |
+
+> **Ein 404 blieb stehen und ist KEIN Befund dieses Rollouts:**
+> `/api/v1/marktbericht/register/stand` antwortet auch auf Staging mit
+> 404 — die Route existiert im Router, haengt aber unter einem anderen
+> Praefix als geraten. Geprueft wurde das Register deshalb im Container,
+> wo es zaehlt. Nachzusehen, wenn jemand den Debug-Weg wirklich braucht.
+
+**Beide Zweige stehen jetzt exakt gleich** — null Commits Abstand in
+beide Richtungen.
+
+**Rest.**
+- Sitzungsgetriebener Ernter fuer die 26 NI-Kalkulatoren — offen,
+  Marcels Entscheidung.
+- Die Wohnflaechenkurve von Helmstedt und Peine (RH) nachernten.
+- Der Mountpfad von `/register/stand`.
