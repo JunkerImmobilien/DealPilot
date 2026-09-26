@@ -122,7 +122,7 @@
   /* Schritt 1 — Gebaeude */
   function schritt1() {
     function zeile(id, fuerWohnung) {
-      return '<tr><td style="padding:5px 10px 5px 0">' + esc(labelVon(id)) + '<div style="font-size:11px;color:#8A8272">max ' + maxPunkte(id) + ' P.'
+      return '<tr><td style="padding:5px 10px 5px 0">' + esc(labelVon(id)) + '<div style="font-size:11px;color:#8A8272" title="Anlage 2: maximal ' + maxPunkte(id) + ' von 20 Punkten">'
         + (fuerWohnung ? ' · gilt für jede Einheit, bis sie widerspricht' : ' · gilt für das ganze Haus') + '</div></td>'
         + '<td style="padding:5px 0;text-align:right">' + selHtml('data-geb="' + id + '"', _geb[id], STUFEN) + '</td></tr>';
     }
@@ -165,7 +165,7 @@
   function schritt2() {
     return '<div style="font-size:12.5px;color:#6B6356;margin-bottom:10px">Ähnliche Wohnungen mit ⧉ duplizieren. Übernommen werden Fläche, Einheitenzahl und Ist-Kaltmiete der vermieteten Einheiten.</div>'
       + '<div style="overflow:auto"><table style="border-collapse:collapse;font-size:12px;min-width:1080px"><thead><tr style="text-align:left;color:#8A8272">'
-      + '<th>Nr.</th><th>Lage</th><th>Art</th><th>m²</th><th>Zi.</th><th>Ist-Miete</th><th>Soll-Miete</th><th>Status</th><th>Qualität</th><th>Maßnahme</th><th>Kosten</th><th></th></tr></thead>'
+      + '<th>Nr.</th><th>Lage</th><th>Art</th><th>m²</th><th>Zi.</th><th title="Aktuelle Nettokaltmiete dieser Einheit, in Euro pro Monat">Ist-Miete <small style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7">&euro;/Monat</small></th><th title="Erzielbare Nettokaltmiete nach Modernisierung, in Euro pro Monat">Soll-Miete <small style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7">&euro;/Monat</small></th><th>Status</th><th>Qualität</th><th>Maßnahme</th><th>Kosten</th><th></th></tr></thead>'
       + '<tbody id="mfh-zeilen">' + _arbeit.map(zeileHtml).join('') + '</tbody></table></div>'
       + '<div style="margin-top:8px"><button type="button" id="mfh-neu" class="btn btn-outline btn-sm">+ Einheit</button></div>';
   }
@@ -255,7 +255,52 @@
     _arbeit.forEach(function (e, i) { var t = document.querySelector('[data-punkte="' + i + '"]'); if (t) t.textContent = punkteEinheit(e, _geb).punkte + ' P.'; });
   }
 
+
+  /* ═══ v1621 · DIE MARKE, EINMAL RICHTIG ══════════════════════════════
+     Der Konfigurator trug 56 Inline-Stile und keine Klasse. Jetzt
+     dieselbe Huelle wie das Einstellungs-Modal: Obsidian-Brandbar oben,
+     goldener Rahmen, weisse Flaeche. Die Werte kommen aus den
+     Whitelabel-Tokens, nicht aus festem Gold - ein Mandant faerbt das
+     Modal damit mit um. */
+  function stilEinhaengen() {
+    if (document.getElementById('mfh-stil-v2')) return;
+    var s = document.createElement('style');
+    s.id = 'mfh-stil-v2';
+    s.textContent = [
+      '#mfh-modal .mfh-karte{background:#fff;border-radius:14px;max-width:1080px;width:100%;',
+      '  max-height:92vh;display:flex;flex-direction:column;position:relative;padding-top:46px;',
+      '  overflow:hidden;color:#2A2727;font-family:Inter,sans-serif;',
+      '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent);',
+      '  box-shadow:0 24px 60px rgba(7,7,7,.32)}',
+      /* Die Brandbar - zeichengleich mit der des Einstellungs-Modals. */
+      '#mfh-modal .mfh-karte::before{content:"DealPilot";position:absolute;top:0;left:0;right:0;',
+      '  height:46px;display:flex;align-items:center;padding:0 24px;background:#070707;color:#fff;',
+      '  font:700 17px "Space Grotesk","DM Sans",system-ui,sans-serif;letter-spacing:.3px;z-index:8;',
+      '  pointer-events:none}',
+      '#mfh-modal .mfh-karte::after{content:"MEHRFAMILIENHAUS";position:absolute;top:0;right:24px;',
+      '  height:46px;display:flex;align-items:center;font:700 10px "JetBrains Mono",monospace;',
+      '  letter-spacing:2px;color:var(--wl-c9a84c, #C9A84C);z-index:8;pointer-events:none}',
+      '#mfh-modal .mfh-kopf{padding:16px 24px 8px}',
+      '#mfh-modal .mfh-kopf h3{margin:2px 0 10px;font:600 20px/1.3 "Space Grotesk",sans-serif;color:#070707}',
+      '#mfh-modal .mfh-body{overflow:auto;padding:12px 24px;flex:1 1 auto}',
+      '#mfh-modal .mfh-fuss{padding:10px 24px;border-top:1px solid #EFEBE3;font-size:13px}',
+      '#mfh-modal .mfh-knoepfe{padding:12px 24px 18px;display:flex;gap:8px;flex-wrap:wrap;',
+      '  border-top:1px solid #EFEBE3;background:#FDFCFA}',
+      /* Der Hauptknopf traegt Obsidian, die Nebenknoepfe den goldenen
+         Rahmen - dieselbe Ordnung wie ueberall sonst. */
+      '#mfh-modal .mfh-haupt{background:#070707;color:#fff;border:1px solid #070707}',
+      '#mfh-modal .mfh-haupt:hover{background:#2A2727}',
+      '#mfh-modal table th{font:600 11px/1.4 "JetBrains Mono",monospace;letter-spacing:.04em;',
+      '  text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33)}',
+      '#mfh-modal input[type="checkbox"]{width:15px;height:15px;accent-color:var(--wl-c9a84c, #C9A84C)}',
+      '@media(max-width:700px){#mfh-modal .mfh-kopf,#mfh-modal .mfh-body,',
+      '  #mfh-modal .mfh-fuss,#mfh-modal .mfh-knoepfe{padding-left:14px;padding-right:14px}}',
+    ].join('');
+    document.head.appendChild(s);
+  }
+
   function oeffnen(schritt) {
+    stilEinhaengen();
     schliessen();
     var d = daten();
     _arbeit = JSON.parse(JSON.stringify(d.einheiten || []));
@@ -265,18 +310,18 @@
     if (!_arbeit.length) _arbeit.push({ nr: '1', art: 'wohnen', status: 'vermietet' });
     var m = document.createElement('div'); m.id = 'mfh-modal';
     m.style.cssText = 'position:fixed;inset:0;background:rgba(42,39,39,.55);z-index:99998;display:flex;align-items:center;justify-content:center;padding:12px';
-    m.innerHTML = '<div style="background:#fff;border-radius:12px;max-width:1080px;width:100%;max-height:92vh;display:flex;flex-direction:column;border:1px solid #E6E0D3;color:#2A2727;font-family:Inter,sans-serif">' +
-      '<div style="padding:18px 20px 6px"><div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33)">Mehrfamilienhaus</div>' +
-      '<h3 style="margin:6px 0 8px;font:600 20px/1.3 \'Space Grotesk\',sans-serif">Einheiten und Zustand erfassen</h3>' +
+    m.innerHTML = '<div class="mfh-karte">' +
+      '<div class="mfh-kopf">' +
+      '<h3>Einheiten und Zustand erfassen</h3>' +
       '<div id="mfh-schritte" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"></div></div>' +
-      '<div style="overflow:auto;padding:12px 20px;flex:1 1 auto" id="mfh-body"></div>' +
-      '<div style="padding:10px 20px;border-top:1px solid #EFEBE3;font-size:13px" id="mfh-summe"></div>' +
-      '<label id="mfh-san-zeile" style="display:none;gap:8px;align-items:center;padding:0 20px 10px;font-size:13px"><input type="checkbox" id="mfh-san"> <span id="mfh-san-text"></span></label>' +
-      '<div style="padding:0 20px 16px;display:flex;gap:8px;flex-wrap:wrap">' +
+      '<div class="mfh-body" id="mfh-body"></div>' +
+      '<div class="mfh-fuss" id="mfh-summe"></div>' +
+      '<label id="mfh-san-zeile" style="display:none;gap:8px;align-items:center;padding:0 24px 10px;font-size:13px"><input type="checkbox" id="mfh-san"> <span id="mfh-san-text"></span></label>' +
+      '<div class="mfh-knoepfe">' +
       '<button type="button" id="mfh-zurueck" class="btn btn-outline btn-sm">‹ Zurück</button>' +
       '<button type="button" id="mfh-zu" class="btn btn-outline btn-sm" style="margin-left:auto">Abbrechen</button>' +
       '<button type="button" id="mfh-ok" class="btn btn-outline btn-sm">Speichern</button>' +
-      '<button type="button" id="mfh-weiter" class="btn btn-sm" style="background:#2A2727;color:#fff;border:none">Weiter ›</button></div></div>';
+      '<button type="button" id="mfh-weiter" class="btn btn-sm mfh-haupt">Weiter ›</button></div></div>';
     document.body.appendChild(m);
     m.addEventListener('input', function (ev) { var t = ev.target; if (t.dataset && t.dataset.k) { _arbeit[+t.dataset.i][t.dataset.k] = t.value; zeichnenSumme(); punkteZeigen(); } });
     m.addEventListener('change', function (ev) {
