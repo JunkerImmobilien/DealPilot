@@ -1964,14 +1964,14 @@
     var trig = document.createElement('button');
     trig.type = 'button'; trig.className = 'dp-pf-mtrigger';
     trig.innerHTML = '<span class="dp-pf-mt-ico">' + PLANE + '</span>' +
-      '<span class="dp-pf-mt-txt"><b>PRE-FLIGHT</b><small>Quellen w\u00e4hlen \u00b7 Boarding</small></span>' +
+      '<span class="dp-pf-mt-txt"><b>Datenaufnahme</b><small>Quellen w\u00e4hlen</small></span>' +
       '<span class="dp-pf-mt-cnt"><b>0</b> aktiv</span><span class="dp-pf-mt-chev">\u25B8</span>';
     host.insertBefore(trig, sheet);
     var bd = document.createElement('div'); bd.className = 'dp-pf-mbackdrop';
     host.insertBefore(bd, sheet);
     var head = document.createElement('div'); head.className = 'dp-pf-msheet-head';
     head.innerHTML = '<span class="dp-pf-mgrip"></span>' +
-      '<div class="dp-pf-mtitle"><b>PRE-FLIGHT</b><small>Datenquellen f\u00fcr diesen Abruf</small></div>' +
+      '<div class="dp-pf-mtitle"><b>Datenaufnahme</b><small>Datenquellen f\u00fcr diesen Abruf</small></div>' +
       '<button type="button" class="dp-pf-mclose" aria-label="Schlie\u00dfen">\u2715</button>';
     sheet.insertBefore(head, sheet.firstChild);
     function refresh() { var n = bar.querySelectorAll('.dp-pf-tile.on').length; var el = trig.querySelector('.dp-pf-mt-cnt b'); if (el) el.textContent = n; }
