@@ -485,15 +485,22 @@ function lageAusOrt(saetze, o) {
     return treffer ? treffer.lageklasse : null;
   }
 
-  /* Weg 2: die Lagenamen nennen die Gemeinden. Getroffen wird nur ein
-     VOLLSTAENDIGER Name — "Lehre" darf nicht auf "Lehrte" passen. */
-  const ort = norm(o.ort || o.gemeinde);
-  if (!ort) return null;
-  for (const s of saetze) {
-    const lage = (s.geltungsbereich || {}).lage;
-    if (!lage) continue;
-    const teile = String(lage).replace(/\s*\[.*?\]\s*$/, '').split(',');
-    if (teile.some((t) => norm(t) === ort)) return lage;
+  /* Weg 2: die Lagenamen nennen Orte. Getroffen wird nur ein
+     VOLLSTAENDIGER Name — "Lehre" darf nicht auf "Lehrte" passen.
+
+     ORTSTEIL VOR GEMEINDE. Salzgitter staffelt nach ORTSTEILEN ("Barum,
+     Beddingen, Beinum, …"), Helmstedt nach GEMEINDEN ("Lehre, Velpke").
+     Wer nur die Gemeinde prueft, findet in Salzgitter nie etwas — dort
+     heisst die Gemeinde immer "Salzgitter". Gemessen am 26.09.2026. */
+  const kandidaten = [o.ortsteil, o.ort, o.gemeinde].map(norm).filter(Boolean);
+  if (!kandidaten.length) return null;
+  for (const k of kandidaten) {
+    for (const s of saetze) {
+      const lage = (s.geltungsbereich || {}).lage;
+      if (!lage) continue;
+      const teile = String(lage).replace(/\s*\[.*?\]\s*$/, '').split(/,|\bund\b/);
+      if (teile.some((t) => norm(t) === k)) return lage;
+    }
   }
   return null;
 }

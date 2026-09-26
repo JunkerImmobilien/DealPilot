@@ -51,12 +51,37 @@ function zuordnungAus(satz) {
       tabelle: satz.lagetabelle,
     };
   }
+  /* ── NICHT JEDER LAGENAME IST EIN ORT ──────────────────────────────
+     Hameln-Pyrmont fuehrt "Hameln", "Bad Pyrmont", "Kleinstaedte" und
+     "Doerfer". Die ersten zwei sind Orte, die letzten zwei KATEGORIEN -
+     aus einer Anschrift nicht bestimmbar. Gemessen am 26.09.2026.
+
+     Das muss im Satz stehen, nicht nur im Kopf des Lesers: sonst sieht
+     ein Gebiet, in dem die Haelfte der Objekte nie eine Lage findet,
+     genauso aus wie eines, das vollstaendig zuordenbar ist. Die Maschine
+     verhaelt sich ohnehin richtig (kein Treffer -> `lage_noetig`), aber
+     erst diese Angabe macht sichtbar, WO nachgearbeitet werden muss. */
+  const GENERISCH = /^(doerfer|dörfer|kleinstaedte|kleinstädte|uebrige|übrige|sonstige|restgebiet|laendlich|ländlich|umland|kernstadt|stadtgebiet|land)$/i;
+  const namen = (satz.lagen || []).map((l) => String(l).replace(/\s*\[.*?\]\s*$/, '').trim());
+  const generisch = namen.filter((n) => n.split(/,|\bund\b/)
+    .every((t) => GENERISCH.test(t.trim())));
+
   return {
     art: 'gemeinde',
-    quelle: 'Die Lagenamen des Waehlers nennen die Gemeinden selbst',
-    hinweis: 'BORIS liefert `Gemeindesname` und `Gemeindeschlüssel`. Die '
-           + 'Lagenamen fuehren mehrere Gemeinden je Klasse, durch Komma '
-           + 'getrennt, und tragen den Koeffizienten in eckigen Klammern.',
+    quelle: 'Die Lagenamen des Waehlers nennen Orte (Gemeinden oder Ortsteile)',
+    hinweis: 'BORIS liefert `Gemeindesname`, `Gemeindeschlüssel` und '
+           + '`ortsteilName`. Die Lagenamen fuehren mehrere Orte je Klasse, '
+           + 'durch Komma oder "und" getrennt, und tragen den Koeffizienten '
+           + 'in eckigen Klammern. Salzgitter staffelt nach ORTSTEILEN, '
+           + 'Helmstedt nach GEMEINDEN - beides wird geprueft.',
+    vollstaendig: generisch.length === 0,
+    nicht_zuordenbar: generisch.length ? generisch : null,
+    nicht_zuordenbar_grund: generisch.length
+      ? 'Diese Lagen sind KATEGORIEN, keine Orte - aus einer Anschrift '
+        + 'nicht bestimmbar. Objekte, die dorthin gehoeren, bekommen '
+        + 'keinen Faktor, sondern die Auskunft, welche Lagen es gibt. '
+        + 'Eine geratene Lage waere teurer als gar kein Wert.'
+      : null,
     tabelle: null,
   };
 }
@@ -165,7 +190,10 @@ for (const f of dateien.sort()) {
     fundstelle: 'Grundstücksmarktinformationen 2026, Sachwertfaktor',
     stichprobe: e.stichprobe,
     /* DIE WICHTIGSTE ANGABE: wie kommt eine Anschrift zu ihrer Lage? */
-    geltungsbereich: { lagen: modelle.map((m) => m.lage), zuordnung: zuordnungAus(e) },
+    geltungsbereich: (function () {
+      const lagen = modelle.map((m) => m.lage);
+      return { lagen, zuordnung: zuordnungAus({ ...e, lagen }) };
+    })(),
     /* v1625 · HIER STAND EINE SPERRE, und sie galt zu Recht: solange
        findeZweig() den ersten Satz je (ags, zweig) nahm, haette ein
        Eintrag still eine Lage fuer alle gelten lassen. Seit v1623 siebt
