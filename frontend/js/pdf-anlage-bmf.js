@@ -70,8 +70,15 @@ window.generateBmfPdfAnlage = function(state){
     var comp = String(b.company || '').trim();
     var isDefaultOrEmpty = !comp || comp === 'Junker Immobilien';
     if(!canBrand || isDefaultOrEmpty){
+      /* v1634b · `website` stand hier bis heute auf
+         'dealpilot.junker-immobilien.io'. Gedruckt wird sie seit v1634
+         nicht mehr - aber ein Wert, der nur deshalb harmlos ist, weil
+         ihn gerade niemand liest, ist eine Falle fuer den naechsten.
+         `company: 'DealPilot'` bleibt: das steht in der FUSSZEILE neben
+         dem Dokumenttitel und sagt, WOMIT gerechnet wurde - wie
+         "KI-Analyse via DealPilot". Ein Absender ist es nicht. */
       return { company: 'DealPilot', name: '', role: '', address: '', plz: '', city: '',
-               phone: '', email: '', website: 'dealpilot.junker-immobilien.io', theme: b.theme, _dpNeutral: true };
+               phone: '', email: '', website: '', theme: b.theme, _dpNeutral: true };
     }
     return b;
   })();
