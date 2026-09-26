@@ -40,7 +40,7 @@
 
   /* Deutsche Chip-Labels (unabhaengig vom Score). */
   var LABELS = {
-    zins: 'Zinssatz', tilgung: 'Tilgung', baujahr: 'Baujahr / Zustand',
+    zins: 'Zinssatz', tilgung: 'Tilgung', baujahr: 'Bausubstanz',
     energie: 'Energieklasse', qualitaet: 'Qualit\u00e4t & Zustand',
     mikrolage: 'Mikrolage', makrolage: 'Makrolage', bevoelkerung: 'Bev\u00f6lkerung',
     nachfrage: 'Nachfrage', mietwachstum: 'Mietwachstum', wertsteigerung: 'Wertsteigerung',

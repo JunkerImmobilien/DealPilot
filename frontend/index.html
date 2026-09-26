@@ -1019,7 +1019,7 @@ label.dp-required.qc-required::after {
        kommentarlos kleiner aus oder ganz weg, und niemand weiss warum. -->
   <div class="wert-puffer" id="erb-abzug-zeile" style="display:none" title="Kein Bewertungspartner nimmt das Erbbaurecht entgegen - jede Marktbewertung ist ein Volleigentumswert. Dieser Abschlag nach § 50 ImmoWertV wird davon abgezogen, bevor Wertpuffer, Wertsteigerung und Deal Score daraus rechnen."><span>davon Erbbaurechts-Abschlag (§ 50 ImmoWertV)</span><span id="erb_abzug_wert" class="fw6"></span></div>
 
-  <!-- V53: Top-Reihe — Objektdaten links + Qualität & Zustand rechts (bündig, gleiche Höhe) -->
+  <!-- V53: Top-Reihe — Objektdaten links + Ausstattungsqualität rechts (bündig, gleiche Höhe) -->
   <div class="col2 col2-stretch">
     <div class="card card-stretch"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-home"/></svg></span>Objektdaten</div><div class="g2">
       <div class="f"><label class="dp-required" data-v236-required-set="1">PLZ</label><input id="plz" type="text" placeholder="z.B. 12345" autocomplete="off" data-form-type="other"></div>
@@ -1067,7 +1067,7 @@ label.dp-required.qc-required::after {
       <div class="f"><label class="dp-required" data-v236-required-set="1" data-v371-wu-req="1">Wirtsch. Übergang <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· Nutzen-/Lastenwechsel</span></label><input id="wirtschaftlicher_uebergang" type="date"></div><!-- mand-halter-block v815 (umgezogen nach Erwerb) --><!-- v816g-halter-show: sichtbar, Sperrung via JS --><div class="f" data-mand data-halter-lock="1"><label>Halter / Mandant <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· wer hält das Objekt</span></label><select id="halter"></select></div><input id="obj_herkunft" type="hidden" value="neukauf"><div class="f" data-mand style="grid-column:1/-1"><label class="cb-label"><input id="mand_ueberf_cb" type="checkbox" onchange="if(window.DealPilotMandanten)DealPilotMandanten.onUeberfToggle(this.checked)"><span>Dieses Objekt wurde aus dem Privatbestand überführt</span></label></div><div class="f mand-ueberf" data-mand style="display:none"><label>Verkehrswert <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(AfA-Basis Gesellschaft)</span></label><div class="iw"><span class="pfx">€</span><input id="verkehrswert_ueberf" type="text" inputmode="decimal" class="trl" placeholder="z.B. 450000"></div></div><div class="f mand-ueberf" data-mand style="display:none"><label>Überführungspreis <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(GrESt-Basis)</span></label><div class="iw"><span class="pfx">€</span><input id="ueberf_preis" type="text" inputmode="decimal" class="trl" placeholder="z.B. 340000"></div><span class="hint" id="mand-ueberf-pct">—</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Stichtag Überführung <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat → Gesellschaft)</span></label><input id="halter_seit" type="date" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Gesellschafterdarlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(gestundeter Kaufpreis)</span></label><div class="iw"><span class="pfx">€</span><input id="gesellschafterdarlehen" type="text" inputmode="decimal" class="trl" placeholder="0"></div></div><!-- v813-3d --><div class="f mand-ueberf" data-mand style="display:none"><label>&Uuml;bernommene Restschuld <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Darlehen geht mit in die Gesellschaft)</span></label><div class="iw"><span class="pfx">&euro;</span><input id="ueberf_restschuld" type="text" inputmode="decimal" class="trl" placeholder="0"></div><span class="hint" id="mand-rest-hint">&mdash;</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Zins &uuml;bernommenes Darlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">% p.a. (falls neu verhandelt)</span></label><input id="ueberf_rest_zins" type="text" inputmode="decimal" placeholder="z.B. 3,8" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Privat-Ende / überführt am <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat-Objekt rechnet bis hier, dann eingefroren)</span></label><input id="ueberf_ende" type="date" class="tr"></div><input id="_ueberf_link" type="hidden" value=""><!-- v816h-field-trl v816i-all-rightalign -->
     </div></div>
 
-    <div class="card card-stretch qz-card" id="qz-card"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-quality"/></svg></span>Qualität &amp; Zustand</div>
+    <div class="card card-stretch qz-card" id="qz-card"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-quality"/></svg></span>Ausstattungsqualität</div>
       <div class="g2">
         <div class="f"><label>Energieklasse <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.energieklasse" tabindex="-1" aria-label="Hilfe zu Energieklasse"></button></label>
           <select id="ds2_energie" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
@@ -3511,12 +3511,12 @@ label.dp-required.qc-required::after {
 <script src="js/bmf-data.js?v=166"></script>
 <script src="js/bmf-afa.js?v=287"></script>
 <!-- V311-A1-bmfui-removed: bmf-ui.js (V35-Modal) toter Code, durch V292-Modal abgeloest -->
-<script src="js/dealscore2.js?v=v1352"></script>
-<script src="js/dealscore2-ui.js?v=v1445"></script>
+<script src="js/dealscore2.js?v=v1622"></script>
+<script src="js/dealscore2-ui.js?v=v1622"></script>
 <script src="js/ds2-ai.js?v=166"></script>
 <script src="js/ki-lage.js?v=187h2"></script>
 <script src="js/ki-miete.js?v=v1242c"></script>
-<script src="js/star-rating.js?v=v1444"></script>
+<script src="js/star-rating.js?v=v1622"></script>
 <script src="js/pdf-import.js?v=v1252"></script>
 <script src="js/beleg-import.js?v=v1406"></script>
 <script src="js/financing.js?v=v1433"></script>
@@ -3529,7 +3529,7 @@ label.dp-required.qc-required::after {
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v1437"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v1621"></script>
+<script src="js/mfh-einheiten.js?v=v1622"></script>
 <script src="js/hell-varianten.js?v=v1527"></script>
 <script src="js/hybrid-aktionen.js?v=v1521"></script>
 <script src="js/adress-autocomplete.js?v=v1271"></script><!-- v1270: PLZ->Ort, Strassenliste -->
@@ -3551,7 +3551,7 @@ label.dp-required.qc-required::after {
 <script src="js/deal-action.js?v=v1608"></script>
 <script src="js/gutachten-org.js?v=v1448b"></script>
 <script src="js/afa-eigen.js?v=v1599"></script>
-<script src="js/deal-action-readycheck.js?v=852"></script>
+<script src="js/deal-action-readycheck.js?v=v1622"></script>
 <script src="js/deal-action-boarding.js?v=v1443"></script>
 <script src="js/deal-action-pilot.js?v=876"></script>
 <script src="js/netzwerk-einreichung.js?v=v1081"></script> <!-- v856-einreichung -->
@@ -3583,7 +3583,7 @@ label.dp-required.qc-required::after {
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
   <script src="js/object-actions.js?v=v1430"></script>
-  <script src="js/dpsh-score-hero.js?v=v1443"></script><!-- dpsh-score-hero -->
+  <script src="js/dpsh-score-hero.js?v=v1622"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v1183"></script>
   <script src="js/voice-import.js?v=v1619"></script>
 </div><!-- .main-col --></div><!-- .app-wrap -->

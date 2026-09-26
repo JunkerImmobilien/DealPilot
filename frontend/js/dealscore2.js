@@ -475,7 +475,7 @@ window.DealScore2 = (function() {
 
     var z = deal.zustand || null;
     bd.push({
-      key: 'baujahr', name: 'Baujahr / Zustand', value: z, unit: '',
+      key: 'baujahr', name: 'Bausubstanz', value: z, unit: '',
       points: z && c.zustand[z] !== undefined ? c.zustand[z] : null,
       weight: w.baujahr
     });
@@ -496,7 +496,13 @@ window.DealScore2 = (function() {
       weight: w.mietausfall
     });
 
-    // V42: Qualität & Zustand (Sternebewertung) — 1-5 Sterne → 0-100 Punkte
+    /* V42 · Ausstattungsqualitaet (Sternebewertung) - 1-5 Sterne -> 0-100 Punkte.
+       v1622: hiess bis zum 26.09.2026 "Qualitaet & Zustand" und stand damit
+       neben "Baujahr / Zustand". Zwei KPIs, die dasselbe Wort tragen, liest
+       niemand als zwei Dinge - Marcel hielt sie deshalb zu Recht fuer
+       moeglicherweise doppelt. Sie sind es nicht: die Sterne messen die
+       AUSSTATTUNG (Kueche, Bad, Boden, Fenster), `ds2_zustand` die
+       BAUSUBSTANZ - und die treibt zusaetzlich Restnutzungsdauer und AfA. */
     var qz = num(deal.qualitaetSterne);
     var qzPts = null;
     if (qz !== null && qz > 0) {
@@ -504,7 +510,7 @@ window.DealScore2 = (function() {
       qzPts = Math.min(100, Math.max(0, (qz - 1) / 4 * 100));
     }
     bd.push({
-      key: 'qualitaet', name: 'Qualität & Zustand', value: qz, unit: '★',
+      key: 'qualitaet', name: 'Ausstattungsqualität', value: qz, unit: '★',
       points: qzPts,
       weight: w.qualitaet
     });

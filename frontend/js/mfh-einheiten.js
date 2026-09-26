@@ -383,6 +383,41 @@
       if (s.flaeche > 0) setzen('wfl', s.flaeche);
       setzen('einheiten', s.wohnen);
       if (s.ist > 0) setzen('nkm', s.ist);
+      /* ═══ v1622 · DIE SOLL-MIETE GEHT IN DIE MIETENTWICKLUNG ═════════
+         Marcels Vorgabe vom 26.09.2026: "bitte auch bei dem MFH-
+         Konfigurator die Soll-Miete im Tab Miete unter Mietentwicklung
+         eintragen."
+
+         Sie wurde bisher BERECHNET (`s.soll`) und dann fallengelassen —
+         der Konfigurator hat sie erhoben, gezeigt und niemandem
+         weitergereicht. Wer sie nutzen wollte, musste sie abschreiben.
+
+         EINHEITENWECHSEL, und genau daran waere es sonst gescheitert:
+         der Konfigurator fuehrt die Soll-Miete je Einheit in EURO PRO
+         MONAT, das Feld `me_soll` ("Soll-Mietspiegel") in EURO PRO
+         QUADRATMETER. Uebertragen wird deshalb die Summe geteilt durch
+         die Gesamtflaeche — nicht die Summe selbst. Eine Monatsmiete in
+         ein Quadratmeterfeld zu schreiben waere ein Faktor in der
+         Groessenordnung der Wohnflaeche.
+
+         `s.soll` faellt je Einheit auf die Ist-Miete zurueck, wo keine
+         Soll-Miete steht — die Summe ist also der erzielbare Gesamt-
+         ertrag, nicht nur der veraenderte Teil. Leerstehende Einheiten
+         zaehlen dort mit, bei `s.ist` nicht; genau das ist das
+         Aufholpotenzial. */
+      if (s.hatSoll && s.flaeche > 0 && s.soll > 0) {
+        setzen('me_soll', s.soll / s.flaeche);
+        meldung += ' · Soll-Mietspiegel ' +
+          (Math.round(s.soll / s.flaeche * 100) / 100).toFixed(2).replace('.', ',') + ' €/m²';
+        /* Die angestrebte Entwicklung ergibt sich aus denselben zwei
+           Zahlen. Sie NICHT mitzusetzen hiesse, den Nutzer dieselbe
+           Rechnung von Hand machen zu lassen. */
+        if (s.ist > 0 && s.soll > s.ist) {
+          setzen('me_pct', (s.soll - s.ist) / s.ist * 100);
+          meldung += ' · Entwicklung ' +
+            (Math.round((s.soll - s.ist) / s.ist * 1000) / 10).toFixed(1).replace('.', ',') + ' %';
+        }
+      }
       if (s.kosten > 0 && el('mfh-san') && el('mfh-san').checked) { setzen('san', s.kosten); if (typeof window.syncSanTaxOnSanInput === 'function') try { window.syncSanTaxOnSanInput(); } catch (x) {} }
       /* Zustand und RND nur uebernehmen, wenn der Nutzer im Ergebnis
          zugestimmt hat — nie still. */

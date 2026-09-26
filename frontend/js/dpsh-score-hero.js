@@ -73,7 +73,7 @@
   [
     ['Bruttorendite', '', 's1'], ['Nettorendite', '', 's1'], ['Cashflow / Mon.', '', 's1'], ['Cash-on-Cash', '', 's1'],
     ['DSCR', '', 's3'], ['LTV', '', 's3'], ['Zinssatz', 'd1z', 's3'], ['Tilgung', 'd1t', 's3'], ['EK-Bedarf', 'd1', 's3'],
-    ['Leerstand', 'leerstand', 's4'], ['Instandhaltung', 'weg_r', 's4'], ['Baujahr / Zustand', 'ds2_zustand', 's0'],
+    ['Leerstand', 'leerstand', 's4'], ['Instandhaltung', 'weg_r', 's4'], ['Bausubstanz', 'ds2_zustand', 's0'],
     ['Energieklasse', 'ds2_energie', 's0'], ['Mietausfall-Risiko', 'ds2_mietausfall', 's0'], ['Qualit\u00e4t & Zustand', 'qz-stars-toggle', 's0'],
     ['Ist-/Marktmiete', 'ds2_marktmiete', 's0'], ['Mietwachstum p.a.', 'mietstg', 's1'], ['Bev\u00f6lkerung', 'ds2_bevoelkerung', 's0'],
     ['Nachfrage', 'ds2_nachfrage', 's0'], ['Mikrolage', 'mikrolage', 's0'], ['Mietsteigerung-Potenzial', 'ds2_marktmiete', 's0'],
@@ -187,7 +187,7 @@
     ['Tilgung', 'H\u00f6here Tilgung = schnellere Entschuldung, weniger Cashflow.'],
     ['Leerstand', 'Geringer ist besser \u2014 realistisch kalkulieren (oft 2\u20135 %).'],
     ['Instandhaltung', 'R\u00fccklage f\u00fcr Erhalt \u2014 zu niedrig = Risiko bei Reparaturen.'],
-    ['Baujahr / Zustand', 'Besserer Zustand = geringeres Sanierungsrisiko.'],
+    ['Bausubstanz', 'Baujahr und baulicher Zustand. Er bestimmt zugleich die Restnutzungsdauer und damit die AfA.'],
     ['Energieklasse', 'Bessere Klasse = niedrigere Nebenkosten, wertstabiler.'],
     ['Mietausfall-Risiko', 'Geringer ist besser \u2014 abh\u00e4ngig von Lage & Mieterstruktur.'],
     ['Qualit\u00e4t & Zustand', 'H\u00f6here Bewertung = bessere Vermietbarkeit & Werthaltigkeit.'],

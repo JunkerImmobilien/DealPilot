@@ -1,6 +1,9 @@
 'use strict';
 /* ═══════════════════════════════════════════════════════════════════════════
-   DealPilot V37 — Qualität & Zustand: 5-Sterne-Bewertung
+   DealPilot V37 — Ausstattungsqualität: 5-Sterne-Bewertung
+   (hiess bis v1622 "Qualität & Zustand" und stand damit neben dem
+    KPI "Baujahr / Zustand", heute "Bausubstanz" — zwei Namen mit
+    demselben Wort liest niemand als zwei Dinge.)
    
    Vier Bereiche: Küche, Badezimmer, Fußboden, Fenster.
    Werte landen in versteckten Inputs rate_kueche/rate_bad/rate_boden/rate_fenster
