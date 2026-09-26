@@ -45,17 +45,32 @@ window.DealPilotConfig = (function() {
    *  2) sonst → DealPilot-Defaults
    * Custom-Logo (settings.pdf_logo_b64) hat Vorrang vor dem DealPilot-Logo.
    */
-  // V192: Junker-Defaults als zentrale Konstante — werden für alle Pläne außer Pro genutzt
-  var JUNKER_DEFAULTS = {
-    company: 'Junker Immobilien',
-    name: '',
-    role: '',
-    address: 'Hermannstr. 9',
-    plz: '32609',
-    city: 'Hüllhorst',
-    phone: '+49 151 298 200 57',
-    email: 'info@dealpilot.immo',
-    website: 'https://www.junker-immobilien.io'
+  /* ═══ v1632 · KEIN ABSENDER OHNE ANGABE ══════════════════════════════
+     Hier standen bis zum 26.09.2026 die "Junker-Defaults" - Firma,
+     Anschrift, Telefon, E-Mail und Web -, die fuer alle Plaene ausser
+     Pro eingesetzt wurden und im Pro-Plan jedes leere Feld fuellten.
+
+     Marcels Entscheidung: "wenn es nicht angegeben wird, steht keine
+     E-Mail drin. Das erstellt der User ja fuer sich. Gibt er keine
+     Daten an, steht nix drauf."
+
+     Das ist mehr als eine Geschmacksfrage. EIN ABSENDERBLOCK IST EINE
+     BEHAUPTUNG darueber, wer das Dokument verschickt. Wer nichts
+     angibt, behauptet nichts; eine eingesetzte Vorgabe behauptet an
+     seiner Stelle etwas Falsches - gemessen am 26.09.2026 stand in
+     einem Investment-PDF FUER DIE BANK die Firma des Nutzers neben
+     info@dealpilot.immo.
+
+     Die Vorgabe mischte ueberdies drei Identitaeten: company "Junker
+     Immobilien", email "info@dealpilot.immo", website
+     "junker-immobilien.io". Welche gelten sollte, war nicht
+     entscheidbar. Jetzt ist die Frage gegenstandslos.
+
+     Leer heisst leer. Die PDF-Bausteine pruefen ohnehin auf Inhalt und
+     lassen weg, was fehlt. */
+  var LEERER_ABSENDER = {
+    company: '', name: '', role: '', address: '',
+    plz: '', city: '', phone: '', email: '', website: ''
   };
 
   function getBranding() {
@@ -75,55 +90,46 @@ window.DealPilotConfig = (function() {
         tagline: BRANDING_DEFAULTS.tagline,
         logo_b64: '',
         logo_path: BRANDING_DEFAULTS.logo_path,
-        company: JUNKER_DEFAULTS.company,
-        name: JUNKER_DEFAULTS.name,
-        role: JUNKER_DEFAULTS.role,
-        address: JUNKER_DEFAULTS.address,
-        plz: JUNKER_DEFAULTS.plz,
-        city: JUNKER_DEFAULTS.city,
-        phone: JUNKER_DEFAULTS.phone,
-        email: JUNKER_DEFAULTS.email,
-        website: JUNKER_DEFAULTS.website,
+        /* v1632 · Das Plan-Gating bleibt: wer nicht Pro ist, bekommt kein
+           eigenes Branding. Er bekommt jetzt nur eben auch keines von
+           uns - statt Junkers Anschrift in seinem Dokument. */
+        company: LEERER_ABSENDER.company,
+        name: LEERER_ABSENDER.name,
+        role: LEERER_ABSENDER.role,
+        address: LEERER_ABSENDER.address,
+        plz: LEERER_ABSENDER.plz,
+        city: LEERER_ABSENDER.city,
+        phone: LEERER_ABSENDER.phone,
+        email: LEERER_ABSENDER.email,
+        website: LEERER_ABSENDER.website,
         is_custom: false
       };
     }
     
-    /* Pro-Plan: eigenes Branding, wenn eines hinterlegt ist.
-       `eigenes` fragt breiter als das frueher `is_custom` tat: wer
-       Anschrift oder Web eingetragen hat, hat ebenso eine eigene
-       Identitaet wie jemand mit Firma oder Telefon. */
+    /* Pro-Plan: NUR die eigenen Angaben. Kein Rueckfall - was der Nutzer
+       nicht eingetragen hat, steht nicht im Dokument. */
     var eigenes = !!(s.user_company || s.pdf_phone || s.pdf_email
-                     || s.pdf_address || s.pdf_city || s.pdf_website);
+                     || s.pdf_address || s.pdf_city || s.pdf_website
+                     || s.user_name);
     return {
       product_name: BRANDING_DEFAULTS.product_name,
       tagline: BRANDING_DEFAULTS.tagline,
       logo_b64: s.pdf_logo_b64 || '',
       logo_path: BRANDING_DEFAULTS.logo_path,
-      /* ═══ v1631 · ZWEI IDENTITAETEN DUERFEN SICH NICHT MISCHEN ═══════
-         Bis hierher fiel JEDES Feld einzeln auf die Junker-Vorgabe
-         zurueck. Wer sein eigenes Unternehmen eingetragen hatte, aber
-         keine E-Mail, bekam im Dokument seine Firma mit
-         `info@dealpilot.immo` - gemessen am 26.09.2026 an Marcels
-         eigenem Profil, im Investment-PDF fuer die BANK.
-
-         Eine Bank, die auf so ein Dokument antwortet, schreibt an die
-         falsche Adresse. Und ein Kontaktblock, der zwei Absender mischt,
-         ist schlimmer als einer, dem eine Zeile fehlt.
-
-         Deshalb: hat der Nutzer EIGENE Angaben, gelten NUR seine. Was er
-         nicht ausgefuellt hat, bleibt leer und wird im PDF weggelassen -
-         die Bausteine pruefen ohnehin auf Inhalt. Nur wer gar nichts
-         eigenes hinterlegt hat, bekommt den vollstaendigen
-         Vorgabeblock. */
-      company: s.user_company || (eigenes ? '' : JUNKER_DEFAULTS.company),
+      /* v1632 · Jedes Feld genau so, wie der Nutzer es hinterlegt hat -
+         und leer, wo er nichts hinterlegt hat. Bis v1631 fiel jedes
+         Feld EINZELN auf die Vorgabe zurueck; wer seine Firma
+         eingetragen hatte, aber keine E-Mail, bekam seine Firma neben
+         info@dealpilot.immo. */
+      company: s.user_company || '',
       name: s.user_name || '',
       role: s.user_role || '',
-      address: s.pdf_address || (eigenes ? '' : JUNKER_DEFAULTS.address),
-      plz: s.pdf_plz || (eigenes ? '' : JUNKER_DEFAULTS.plz),
-      city: s.pdf_city || (eigenes ? '' : JUNKER_DEFAULTS.city),
-      phone: s.pdf_phone || (eigenes ? '' : JUNKER_DEFAULTS.phone),
-      email: s.pdf_email || (eigenes ? '' : JUNKER_DEFAULTS.email),
-      website: s.pdf_website || (eigenes ? '' : JUNKER_DEFAULTS.website),
+      address: s.pdf_address || '',
+      plz: s.pdf_plz || '',
+      city: s.pdf_city || '',
+      phone: s.pdf_phone || '',
+      email: s.pdf_email || '',
+      website: s.pdf_website || '',
       is_custom: eigenes
     };
   }

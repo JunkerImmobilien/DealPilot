@@ -109,7 +109,7 @@
     var W = 210, H = 297, L = 18, R_ = 18, CW = W - L - R_, y = 22;
     var G = gold(), GD = [Math.round(G[0] * 0.82), Math.round(G[1] * 0.82), Math.round(G[2] * 0.82)];
     var b = marke();
-    var firma = sauber(b.company) || 'DealPilot';
+    var firma = sauber(b.company) || '';   /* v1632 · kein Ersatzabsender */
     /* v1483 · Marcel 21.09.2026: "zwei E-Mail-Adressen - welche nimmt er?"
        Gemessen: branding.get() liefert name = "info@junker-immobilien.io" (im
        Einstellungsfeld Name steht eine Adresse) und email = "info@dealpilot.immo".

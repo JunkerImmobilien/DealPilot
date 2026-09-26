@@ -132,7 +132,11 @@
   }
   function absender() {
     var b = marke();
-    var firma = String(b.company || '').trim() || 'DealPilot';
+    /* v1632 · Hier stand `|| 'DealPilot'`. Ein Absenderblock ist eine
+       BEHAUPTUNG darueber, wer das Dokument verschickt - wer nichts
+       hinterlegt hat, behauptet nichts. Die Zeilen darunter werden
+       ohnehin nur aufgenommen, wenn sie Inhalt tragen. */
+    var firma = String(b.company || '').trim();
     var z = [firma];
     var person = String(b.name || '').trim();
     if (person && person !== firma) z.push(person + (b.role ? ' · ' + b.role : ''));

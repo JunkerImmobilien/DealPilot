@@ -80,7 +80,8 @@ window.generateBmfPdfAnlage = function(state){
   var _g0 = window._pdfGold();
   var _gd = [Math.round(_g0[0]*0.82), Math.round(_g0[1]*0.82), Math.round(_g0[2]*0.82)];
   doc.setFontSize(15); doc.setFont('helvetica','bold'); doc.setTextColor(26,26,26);
-  doc.text(String(brand.company || 'DealPilot'), marginL, y);
+  /* v1632 · kein Ersatzabsender - leer heisst leer. */
+  if (brand.company) doc.text(String(brand.company), marginL, y);
   doc.setFontSize(6.6); doc.setFont('helvetica','normal'); doc.setTextColor(120);
   doc.text('I M M O B I L I E N - I N V E S T I T I O N S A N A L Y S E', marginL, y + 4.6);
   (function(){
@@ -318,7 +319,7 @@ window.generateBmfPdfAnlage = function(state){
     var footerY = pageH - 12;
     var _footTxt = (window.DealPilotConfig && DealPilotConfig.branding && typeof DealPilotConfig.branding.formatFooter === 'function')
       ? DealPilotConfig.branding.formatFooter(brand)
-      : (brand.company || 'DealPilot');
+      : (brand.company || '');   /* v1632 · kein Ersatzabsender */
     doc.setDrawColor(226,221,210); doc.setLineWidth(0.2);
     doc.line(marginL, footerY - 4, pageW - marginR, footerY - 4);
     doc.text(_footTxt + ' \u00b7 Kaufpreisaufteilung nach BMF-Arbeitshilfe Juni 2023', marginL, footerY);

@@ -121,7 +121,7 @@ function _getBranding() {
 function _formatBrandingFooter(b, sep) {
   if (window.DealPilotConfig && DealPilotConfig.branding) return DealPilotConfig.branding.formatFooter(b, sep);
   // Minimal fallback
-  return b.company || 'DealPilot';
+  return b.company || '';   /* v1632 · kein Ersatzabsender */
 }
 // Logo: Custom-Logo aus Settings hat Vorrang, sonst geladenes DealPilot-Logo
 function _getBrandingLogo() {
@@ -3076,7 +3076,7 @@ async function _exportPDFInner() {
   doc.text('KI-INVESTMENT-ANALYSE', M + 5, cy + 9);
   doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
   doc.setTextColor(140, 130, 110);
-  (function(){var b=_getBranding();doc.text('KI-Analyse via ' + _pn() + ' \u00b7 ' + (b.company || 'DealPilot'), W - M, cy + 9, { align: 'right' });})();
+  (function(){var b=_getBranding();doc.text('KI-Analyse via ' + _pn() + (b.company ? ' \u00b7 ' + b.company : ''), W - M, cy + 9, { align: 'right' });})();
   cy += 16;
 
   // V27: Wenn neues JSON-Format (_aiAnalysis) vorliegt -> strukturiert rendern und Section-Parser überspringen
