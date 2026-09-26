@@ -64,6 +64,16 @@
   height:auto !important; min-height:0 !important; padding:0 !important;
   background:transparent !important; border:0 !important; flex:0 0 auto;
 }
+/* GEMESSEN nach der Richtungskorrektur: mit Vorspann brach die Zeile bei
+   1280 px auf zwei Reihen um (99 px). Der Vorspann sagt "Datenaufnahme" -
+   und genau das steht drei Zeilen darueber schon als Abschnittsueberschrift.
+
+   > Zwei Beschriftungen fuer dieselbe Sache kosten hier eine ganze Reihe.
+   > Die zweite faellt.
+
+   Der Knoten bleibt stehen (die Mechanik liest ihn nicht, aber jemand
+   koennte ihn suchen) - er wird nur unsichtbar. */
+.dp-pfbar .dp-pf-lead{ display:none !important; }
 .dp-pfbar .dp-pf-lead .bp{ display:none !important; }
 .dp-pfbar .dp-pf-lead .k{
   font-family:'JetBrains Mono', ui-monospace, monospace !important;
