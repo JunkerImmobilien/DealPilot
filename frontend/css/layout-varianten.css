@@ -126,13 +126,13 @@ html[data-dp-layout] .dpl-schiene{
   display:flex; flex-direction:column; min-width:0;
   font-family:'Inter', system-ui, sans-serif;
 }
-.dpl-schiene[data-stellung="links"],
-.dpl-schiene[data-stellung="rechts"]{
+html[data-dp-layout] .dpl-schiene[data-stellung="links"],
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"]{
   position:fixed; top:0; bottom:0; width:var(--dpl-schiene-b);
   z-index:60; overflow:auto;
 }
-.dpl-schiene[data-stellung="links"]{ left:0; }
-.dpl-schiene[data-stellung="rechts"]{ right:0; left:auto;
+html[data-dp-layout] .dpl-schiene[data-stellung="links"]{ left:0; }
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"]{ right:0; left:auto;
   border-right:0; border-left:1px solid var(--dpl-linie); }
 
 .dpl-marke{ height:46px; flex:0 0 auto; display:flex; align-items:center;
@@ -191,14 +191,14 @@ html[data-dp-layout] .dpl-schiene{
    bewirkte nichts - der innere blieb eine Spalte, und die Leiste war
    144 statt 48 px hoch. Eine Regel am Elternteil ordnet nicht, was im
    Kind steht. */
-.dpl-schiene[data-stellung="leiste"] .sb-actions-accordion-inner,
-.dpl-schiene[data-stellung="fuss"] .sb-actions-accordion-inner{
+html[data-dp-layout] .dpl-schiene[data-stellung="leiste"] .sb-actions-accordion-inner,
+html[data-dp-layout] .dpl-schiene[data-stellung="fuss"] .sb-actions-accordion-inner{
   display:flex !important; flex-direction:row !important; align-items:center;
   gap:6px !important; width:auto !important; height:auto !important;
   padding:0 !important; margin:0 !important; flex-wrap:nowrap;
 }
-.dpl-schiene[data-stellung="leiste"] .sb-actions-accordion-inner > *,
-.dpl-schiene[data-stellung="fuss"] .sb-actions-accordion-inner > *{
+html[data-dp-layout] .dpl-schiene[data-stellung="leiste"] .sb-actions-accordion-inner > *,
+html[data-dp-layout] .dpl-schiene[data-stellung="fuss"] .sb-actions-accordion-inner > *{
   flex:0 0 auto !important; width:auto !important; margin:0 !important;
   white-space:nowrap;
 }
@@ -280,21 +280,21 @@ html[data-dp-layout="v3"] .main-col > *{ order:0; }
 html[data-dp-layout="v3"] header.hdr{ order:-3; }
 html[data-dp-layout="v3"] nav.tabs{ order:-2; }
 html[data-dp-layout="v3"] .dpl-schiene[data-stellung="leiste"]{ order:-1; }
-.dpl-schiene[data-stellung="leiste"]{
+html[data-dp-layout] .dpl-schiene[data-stellung="leiste"]{
   flex:0 0 auto; flex-direction:row; align-items:center; gap:8px;
   padding:7px 16px; background:#FBF6E9;
   border-right:0; border-bottom:1px solid var(--dpl-linie-stark); overflow-x:auto;
 }
-.dpl-schiene[data-stellung="leiste"] .dpl-portfolio{ margin:0; width:auto; flex:0 0 auto; }
-.dpl-schiene[data-stellung="leiste"] .dpl-teil{ padding:0; }
-.dpl-schiene[data-stellung="leiste"] .dpl-teil-nutzer{ margin-left:auto; margin-top:0;
+html[data-dp-layout] .dpl-schiene[data-stellung="leiste"] .dpl-portfolio{ margin:0; width:auto; flex:0 0 auto; }
+html[data-dp-layout] .dpl-schiene[data-stellung="leiste"] .dpl-teil{ padding:0; }
+html[data-dp-layout] .dpl-schiene[data-stellung="leiste"] .dpl-teil-nutzer{ margin-left:auto; margin-top:0;
   border-top:0; background:transparent; }
-.dpl-schiene[data-stellung="leiste"] #sb-actions-accordion{
+html[data-dp-layout] .dpl-schiene[data-stellung="leiste"] #sb-actions-accordion{
   display:flex !important; flex-direction:row !important; gap:6px;
   height:auto !important; max-height:none !important; overflow:visible !important;
   opacity:1 !important; visibility:visible !important; white-space:nowrap;
 }
-.dpl-schiene[data-stellung="leiste"] #sb-actions-trigger-btn{ display:none !important; }
+html[data-dp-layout] .dpl-schiene[data-stellung="leiste"] #sb-actions-trigger-btn{ display:none !important; }
 
 /* ── v4 · DOSSIER ────────────────────────────────────────────────────
    Die Anwendung sieht aus wie das Dokument, das am Ende herauskommt:
@@ -318,22 +318,22 @@ html[data-dp-layout="v4"] .main-col > *{ order:0; }
 html[data-dp-layout="v4"] header.hdr{ order:-3; }
 html[data-dp-layout="v4"] nav.tabs{ order:-2; }
 html[data-dp-layout="v4"] .dpl-schiene[data-stellung="fuss"]{ order:999; }
-.dpl-schiene[data-stellung="fuss"]{
+html[data-dp-layout] .dpl-schiene[data-stellung="fuss"]{
   position:sticky; bottom:0; z-index:40;
   flex:0 0 auto; flex-direction:row; align-items:center; gap:8px;
   padding:7px 20px; background:var(--dpl-flaeche);
   border-right:0; border-top:1px solid var(--dpl-linie-stark); overflow-x:auto;
 }
-.dpl-schiene[data-stellung="fuss"] .dpl-portfolio{ margin:0; width:auto; flex:0 0 auto; }
-.dpl-schiene[data-stellung="fuss"] .dpl-teil{ padding:0; }
-.dpl-schiene[data-stellung="fuss"] .dpl-teil-nutzer{ margin-left:auto; margin-top:0;
+html[data-dp-layout] .dpl-schiene[data-stellung="fuss"] .dpl-portfolio{ margin:0; width:auto; flex:0 0 auto; }
+html[data-dp-layout] .dpl-schiene[data-stellung="fuss"] .dpl-teil{ padding:0; }
+html[data-dp-layout] .dpl-schiene[data-stellung="fuss"] .dpl-teil-nutzer{ margin-left:auto; margin-top:0;
   border-top:0; background:transparent; }
-.dpl-schiene[data-stellung="fuss"] #sb-actions-accordion{
+html[data-dp-layout] .dpl-schiene[data-stellung="fuss"] #sb-actions-accordion{
   display:flex !important; flex-direction:row !important; gap:6px;
   height:auto !important; max-height:none !important; overflow:visible !important;
   opacity:1 !important; visibility:visible !important; white-space:nowrap;
 }
-.dpl-schiene[data-stellung="fuss"] #sb-actions-trigger-btn{ display:none !important; }
+html[data-dp-layout] .dpl-schiene[data-stellung="fuss"] #sb-actions-trigger-btn{ display:none !important; }
 
 /* ── v5 · COCKPIT HELL ───────────────────────────────────────────────
    Die heutige Struktur, nur entschlackt: Objektspalte von 380 auf 276,
