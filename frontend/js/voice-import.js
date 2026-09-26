@@ -142,10 +142,15 @@
     bspar_sum: 'Bausparsumme in Euro', bspar_rate: 'Bauspar-Sparrate in Euro pro Monat',
     bspar_zins: 'Bauspar-Guthabenzins in Prozent', bspar_zuteil: 'Bauspar-Zuteilung',
     bspar_dar_z: 'Bauspardarlehen Zins in Prozent', bspar_dar_t: 'Bauspardarlehen Tilgung in Prozent',
-    hg_ul: 'Hausgeld umlagefaehig in Euro pro Monat', hg_nul: 'Hausgeld nicht umlagefaehig in Euro pro Monat',
-    grundsteuer: 'Grundsteuer in Euro pro Jahr', ul_sonst: 'Sonstige umlagefaehige Kosten in Euro pro Monat',
-    weg_r: 'WEG-Ruecklage in Euro pro Monat', eigen_r: 'Eigene Ruecklage in Euro pro Monat',
-    mietausfall: 'Mietausfallwagnis in Prozent', nul_sonst: 'Sonstige nicht umlagefaehige Kosten in Euro pro Monat',
+    /* v1617 · STANDEN HIER BIS ZUM 26.09.2026 ALS "pro Monat".
+       Im Formular tragen alle sechs "/ Jahr", und calc.js summiert sie
+       als Jahreswerte (Z. 1288 f.). Der KI eine andere Einheit zu
+       nennen als dem Rechenkern ist ein Faktor 12, den niemand sieht. */
+    hg_ul: 'Hausgeld-Anteil, der auf den Mieter UMLEGBAR ist, in Euro pro Jahr',
+    hg_nul: 'Hausgeld-Anteil, der NICHT umlegbar ist, in Euro pro Jahr',
+    grundsteuer: 'Grundsteuer in Euro pro Jahr', ul_sonst: 'Sonstige umlagefaehige Kosten in Euro pro Jahr',
+    weg_r: 'WEG-Ruecklage in Euro pro Jahr', eigen_r: 'Eigene Ruecklage in Euro pro Jahr',
+    mietausfall: 'Mietausfallwagnis in Prozent', nul_sonst: 'Sonstige nicht umlagefaehige Kosten in Euro pro Jahr',
     bwk_ul_pct: 'Bewirtschaftungskosten umlagefaehig in Prozent', bwk_nul_pct: 'Bewirtschaftungskosten nicht umlagefaehig in Prozent',
     bwk_kp_pct: 'Bewirtschaftungskosten in Prozent vom Kaufpreis',
     mietspiegel: 'Mietspiegel in Euro pro m2', me_soll: 'Soll-Miete in Euro pro m2',
@@ -1260,8 +1265,11 @@
 
     { id:'nkm',        g:2, label:'Kaltmiete',           kw:['kaltmiete','miete','nettokaltmiete','grundmiete'] },
     { id:'ze',         g:2, label:'Zusatzeinnahmen',     kw:['zusatzeinnahmen','zusatz'] },
-    { id:'hg_ul',      g:2, label:'Hausgeld',            kw:['hausgeld'] },
-    { id:'hg_nul',     g:2, label:'davon nicht umlagef.',kw:['nicht umlagefaehig','nicht umlagefahig'] },
+    /* v1617 · "Hausgeld" und "davon nicht umlagef." lasen sich wie
+       eine Summe und ihr Teil. Es sind aber ZWEI Teile derselben
+       Summe - Marcel hat sie deshalb zu Recht fuer doppelt gehalten. */
+    { id:'hg_ul',      g:2, label:'Hausgeld umlagefähig', kw:['hausgeld','umlagefaehig'] },
+    { id:'hg_nul',     g:2, label:'Hausgeld nicht umlagefähig', kw:['nicht umlagefaehig','nicht umlagefahig'] },
     { id:'grundsteuer',g:2, noc:1, label:'Grundsteuer',         kw:['grundsteuer'] },
 
     { id:'ek',         g:3, label:'Eigenkapital',        kw:['eigenkapital','eigenmittel'] },
@@ -2764,7 +2772,12 @@
     /* ── Etappe 4 · Feinschliff ───────────────────────────────────────
        Verfeinert die Rechnung, entscheidet aber nichts mehr. */
     { et: 4, ids: ['hg_ul', 'hg_nul'],              rang: 8, vorbelegt: 1, profil: 'bewirtschaftung', nachArt: 1,
-      frage: 'Wie hoch ist das Hausgeld pro Jahr, und wie viel davon ist nicht umlagefähig?' },
+      /* v1617 · FRAGTE BIS HIERHER NACH DER SUMME ("das Hausgeld pro
+         Jahr") und legte sie in `hg_ul` ab - dem Feld fuer den
+         umlagefaehigen TEIL. calc.js addiert danach `hg_nul` dazu, der
+         nicht umlagefaehige Anteil zaehlte also doppelt. Jetzt werden
+         die beiden Teile getrennt gefragt. */
+      frage: 'Wie teilt sich das Hausgeld im Jahr auf — welcher Teil ist auf den Mieter umlegbar, und welcher trägst du selbst?' },
     { et: 4, ids: ['mietstg', 'wertstg', 'leerstand'], rang: 14, vorbelegt: 1, profil: 'langfrist',
       frage: 'Womit rechnest du langfristig — Mietsteigerung, Wertsteigerung und Leerstand in Prozent?' },
     /* v1609 · Das Mietausfall-Risiko fehlte im Katalog, obwohl der
@@ -6213,8 +6226,8 @@
     mea:            ['Miteigentumsanteil',      '87 von 1000'],
     erbbauzins:     ['Erbbauzins im Jahr',      '1.800 Euro'],
     erb_restlz:     ['Restlaufzeit Erbbaurecht', '62 Jahre'],
-    hg_ul:          ['Hausgeld im Jahr',        '3.600 Euro'],
-    hg_nul:         ['davon nicht umlagefaehig', '1.200 Euro'],
+    hg_ul:          ['Hausgeld, umlegbarer Teil',     '1.400 Euro im Jahr'],
+    hg_nul:         ['Hausgeld, dein eigener Teil',   '1.540 Euro im Jahr'],
     /* Etappe 5 · Annahmen */
     mietstg:        ['Mietsteigerung im Jahr',  '2 Prozent'],
     wertstg:        ['Wertsteigerung im Jahr',  '1,5 Prozent'],
