@@ -19661,3 +19661,52 @@ davon hat er ausdrücklich bestellt (Partner raus, Score-Karten weiss,
 Beschriftung, Umbau der Karte) — offen ist nur, ob der Umbau der Karte
 auch im OBSIDIAN-Standard gelten soll oder nur in den hellen Fassungen.
 Das ist eine Produktentscheidung und liegt bei ihm.
+
+## Rollout-Journal 26.09.2026 (12) — die Zeile ist gebunden
+
+**Commit.** `db01b03` (v1645).
+
+Marcel: „ja binde die Zeile." Die umgebaute Datenaufnahme galt bis
+hierher ÜBERALL — auch im Obsidian-Auslieferungszustand.
+
+> **Der Auslieferungszustand ist ein Versprechen.** Wer nicht
+> umschaltet, bekommt die App so, wie er sie kennt. Ein Umbau, der sich
+> nicht abwählen lässt, ist kein Angebot, sondern eine Ansage.
+
+### EINE Marke statt 46 Verzweigungen
+
+Alle 46 Regeln in `datenaufnahme.css` tragen jetzt den Vorsatz
+`body.dp-neue-karte` — auch die elf in den Media-Queries, die beim
+ersten Durchgang durchgerutscht wären (sie sind eingerückt und trugen
+den Anker deshalb nicht; ohne sie hätte die ALTE Bordkarte auf dem Handy
+`flex-direction:column` bekommen).
+
+Gesetzt wird die Marke von einer einzigen Funktion, wenn eine von drei
+Bedingungen gilt:
+
+| Bedingung | heisst |
+|---|---|
+| `body.dp-chrome-hell` | der helle Modus ist an |
+| `html[data-dp-layout]` | eines der fünf Layouts ist gewählt |
+| `html.qc-app` | das Quick-Check-Dokument (immer hell) |
+
+Beobachtet werden `<body class>` UND `<html data-dp-layout>` — der
+Skin-Schalter setzt die Klasse am `<body>`, also wird dort zugehört
+statt auf ein eigenes Ereignis zu hoffen.
+
+### Nachgemessen, beide Seiten
+
+| | Standard (Obsidian) | Layout 1 (hell) |
+|---|---|---|
+| Marke `dp-neue-karte` | **nein** | **ja** |
+| Kartenhöhe | **78 px** | **54 px** |
+| Grund | dunkel | `rgb(255,255,255)` |
+| Streifen · Strichcode · Perforation | **alle da** | **alle weg** |
+| Vorspann | da | weg |
+
+**Die alte Bordkarte steht im Standard Zeichen für Zeichen wie vorher.**
+Einzige bleibende Änderung dort: die beiden Bewertungspartner fehlen —
+und das war ausdrücklich bestellt und ist zugleich Hausregel.
+
+Der Quick-Check trägt die Marke **fest im Dokument**
+(`<body class="dp-neue-karte">`), bleibt also hell, wie gewünscht.
