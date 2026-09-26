@@ -241,3 +241,24 @@ body:not(.dp-chrome-hell) .dp-pfbar .dp-pf-led{ background:#2A2622 !important; }
 @media (max-width:700px){
   .dp-pfbar button#oab-run{ width:100% !important; }
 }
+
+/* ═══ QUICK-CHECK ═══════════════════════════════════════════════════
+   GEMESSEN am 26.09.2026: der Quick-Check ist eine EIGENE App in einem
+   iframe (`quickcheck-app.html`). Deshalb hat ihn weder diese Datei
+   noch das Ausblenden der Bewertungspartner aus v1637 erreicht - dort
+   standen Sprengnetter und PriceHubble unveraendert auf der Karte.
+
+   > Ein iframe ist ein eigenes Dokument. Eine Regel, die in der
+   > Hauptanwendung wirkt, wirkt darin GAR NICHT - und das sieht man
+   > nur, wenn man hineinsieht.
+
+   Die Karte dort traegt dasselbe Markup (`.dp-pfbar`, `.dp-pf-tile`),
+   also greift alles oben, sobald diese Datei auch im iframe geladen
+   ist. Nur die beiden Partnerkacheln brauchen eine eigene Zeile, weil
+   sie dort STATISCH im HTML stehen statt aus JavaScript zu kommen.
+
+   Ausgeblendet, nicht geloescht: `QcApp.sprengnetter()` und
+   `QcApp.priceHubble()` bleiben vollstaendig. Wer sie zurueckwill,
+   loescht diese eine Regel. */
+.dp-pfbar .dp-pf-tile[data-src="spr"],
+.dp-pfbar .dp-pf-tile[data-src="ph"]{ display:none !important; }

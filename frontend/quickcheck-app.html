@@ -3390,7 +3390,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
     <!-- Multi-Select: Abruf-Quellen frei kombinieren -->
     <span class="qc7-sources dp-pfbar" id="qc7-sources"><!-- v570-qcpf -->
       <span class="dp-pf-stripe"></span>
-      <div class="dp-pf-lead"><span class="bp">QUICKBOARDING PASS</span><span class="k">PRE-FLIGHT</span><span class="s">DealPilot · Quickboarding</span></div><span class="dp-pf-perf"></span><!-- v597-qcpf -->
+      <div class="dp-pf-lead"><span class="bp">QUICKBOARDING PASS</span><span class="k">Datenaufnahme</span><span class="s">DealPilot · Quickboarding</span></div><span class="dp-pf-perf"></span><!-- v597-qcpf -->
       <div class="dp-pf-seg"><span class="dp-pf-grouplbl">Marktbewertung</span><div class="dp-pf-row"><!-- v833-chip-order: DealPilot zuerst -->
         <label class="qc7-src dp-pf-tile" data-src="dpmb" title="Marktpreisbewertung">
           <input type="checkbox" value="dpmb" onchange="QcApp.toggleSource(this)" style="display:none">
@@ -3406,7 +3406,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
         </label>
       </div></div>
       <div class="dp-pf-sep"></div>
-      <div class="dp-pf-seg"><span class="dp-pf-grouplbl">Daten einlesen</span><div class="dp-pf-row">
+      <div class="dp-pf-seg"><span class="dp-pf-grouplbl">Daten übernehmen aus</span><div class="dp-pf-row">
         <label class="qc7-src dp-pf-tile tool" data-src="expose">
           <input type="checkbox" value="expose" onchange="QcApp.toggleSource(this)" style="display:none">
           <span class="dp-pf-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg></span><span class="dp-pf-lbl">Exposé / Marktbericht</span><span class="dp-pf-led"></span>
@@ -6583,5 +6583,9 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
   };
 })();
 </script>
+  <!-- v1641 · Der Quick-Check ist ein eigenes Dokument im iframe - die
+       Gestaltung der Datenaufnahme muss hier NOCH EINMAL geladen werden.
+       Zuletzt, damit sie die eingebetteten Stile ueberstimmt. -->
+  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1641">
 </body>
 </html>
