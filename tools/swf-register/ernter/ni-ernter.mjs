@@ -264,15 +264,15 @@ async function ernteGebiet(browser, wb, ags, name) {
     let n = 0, leer = 0, verriegelt = 0;
     for (let li = 0; li < lagen.length; li++) {
       await T.setzeAuswahl(seite, lage.i, li);
-      await seite.waitForTimeout(3200);
+      await seite.waitForTimeout(1600);
       const tafel = {};
       for (const b of achseB) {
         await T.setzeZahl(seite, brw.i, b);
-        await seite.waitForTimeout(1400);
+        await seite.waitForTimeout(500);
         tafel[b] = [];
         for (const s of achseS) {
           await T.setzeZahl(seite, sw.i, s);
-          await seite.waitForTimeout(1600);
+          await seite.waitForTimeout(650);
           /* ── VERRIEGELUNG: zeigt das Bild WIRKLICH diesen Punkt? ──
              Nicht auf die Uhr warten, sondern nachsehen. Das Bild traegt
              die gesetzten Werte mit; stimmen sie nicht, war es der
@@ -288,7 +288,7 @@ async function ernteGebiet(browser, wb, ags, name) {
             verriegelt++;
             /* Ansteigend warten: der Kalkulator braucht nach einem
                Lagewechsel spuerbar laenger als nach einer Zahl. */
-            await seite.waitForTimeout(900 + versuch * 700);
+            await seite.waitForTimeout(700 + versuch * 600);
           }
           /* Kein passendes Bild = LUECKE, keine Zahl. Lieber ein Loch im
              Gitter, das man sieht, als ein Wert, der keiner ist. */
