@@ -115,7 +115,7 @@
   var _arbeit = [], _geb = {}, _schritt = 0, _weg = false;
 
   function selHtml(attrs, wert, opts) {
-    return '<select ' + attrs + ' style="padding:6px;border:1px solid #E6E0D3;border-radius:6px;font:13px Inter,sans-serif;max-width:100%">'
+    return '<select class="mfh-in mfh-sel" ' + attrs + '>'
       + opts.map(function (o) { return '<option value="' + o[0] + '"' + (String(wert || '') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>';
   }
 
@@ -144,7 +144,15 @@
 
   /* Schritt 2 — Einheitenliste */
   function zeileHtml(e, i) {
-    function inp(k, w, ph, typ) { return '<input data-i="' + i + '" data-k="' + k + '" value="' + esc(e[k] || '') + '" placeholder="' + (ph || '') + '" inputmode="' + (typ || 'text') + '" style="width:' + w + 'px;padding:6px 7px;border:1px solid #E6E0D3;border-radius:6px;font:13px Inter,sans-serif">'; }
+    /* v1627 · Vier Breitenstufen statt acht Einzelwerten - und KEINE
+       Gestaltung am Element. Rahmen, Polster, Schrift und Fokus kommen
+       aus dem Stilblock, genau wie bei .set-modal-v2. */
+    function stufe(w) { return w <= 46 ? 'xs' : (w <= 62 ? 'sm' : (w <= 90 ? 'md' : 'lg')); }
+    function inp(k, w, ph, typ) {
+      return '<input class="mfh-in mfh-' + stufe(w) + '" data-i="' + i + '" data-k="' + k
+        + '" value="' + esc(e[k] || '') + '" placeholder="' + (ph || '')
+        + '" inputmode="' + (typ || 'text') + '">';
+    }
     function sel(k, opts) { return selHtml('data-i="' + i + '" data-k="' + k + '"', e[k], opts); }
     return '<tr>' +
       '<td>' + inp('nr', 44, String(i + 1)) + '</td>' +
@@ -228,7 +236,7 @@
       + '<b>Gebäude gesamt:</b> ' + d.punkteGew.toFixed(1).replace('.', ',') + ' Punkte flächengewichtet'
       + (r > 0 ? ' · Restnutzungsdauer ' + r + ' Jahre' : '')
       + (d.s.hatSoll ? '<div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">Soll-Miete wirkt ab Jahr '
-        + '<input id="mfh-soll-jahr" type="text" inputmode="numeric" value="' + esc(String(daten().sollAbJahr || '')) + '" placeholder="z. B. 3" style="width:64px;padding:5px 7px;border:1px solid #E6E0D3;border-radius:6px;font:13px Inter,sans-serif">'
+        + '<input class="mfh-in mfh-sm" id="mfh-soll-jahr" type="text" inputmode="numeric" value="' + esc(String(daten().sollAbJahr || '')) + '" placeholder="z. B. 3">'
         + '<span style="font-size:12px;color:#6B6356">der Mietentwicklung (leer = kein Sprung)</span></div>' : '')
       + '<div style="margin-top:8px;display:grid;gap:6px">'
       + '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mfh-uep" checked> Modernisierungsgrad ins Objekt übernehmen (<b>' + opt + ' Punkte</b>)</label>'
@@ -292,7 +300,36 @@
       '#mfh-modal .mfh-haupt:hover{background:#2A2727}',
       '#mfh-modal table th{font:600 11px/1.4 "JetBrains Mono",monospace;letter-spacing:.04em;',
       '  text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33)}',
-      '#mfh-modal input[type="checkbox"]{width:15px;height:15px;accent-color:var(--wl-c9a84c, #C9A84C)}',
+      /* ── Felder: dieselbe Handschrift wie .set-modal-v2 ────────────
+         Rahmen, Radius, Fokus und der goldene Pfeil des BMF-Rechners.
+         Nur das Polster ist kleiner (5/8 statt 9/12): diese Felder
+         stehen in einer Tabellenzeile, nicht in einem Formular. */
+      '#mfh-modal .mfh-in{background:#fff;color:var(--ch, #2A2727);',
+      '  border:1px solid var(--border, #E6E0D3);border-radius:8px;',
+      '  padding:5px 8px;font:13px/1.35 Inter,sans-serif;box-sizing:border-box;',
+      '  transition:border-color .15s ease, box-shadow .15s ease}',
+      '#mfh-modal .mfh-in:focus{outline:none;',
+      '  border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 60%, transparent);',
+      '  box-shadow:0 0 0 3px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent)}',
+      '#mfh-modal .mfh-in::placeholder{color:rgba(42,39,39,.38)}',
+      /* Vier Stufen statt acht Einzelbreiten - erst dadurch stehen die
+         Spalten untereinander. */
+      '#mfh-modal .mfh-xs{width:52px;text-align:right}',
+      '#mfh-modal .mfh-sm{width:66px;text-align:right}',
+      '#mfh-modal .mfh-md{width:92px}',
+      '#mfh-modal .mfh-lg{width:128px}',
+      /* Der goldene Pfeil des BMF-Rechners, statt des Systemdreiecks. */
+      '#mfh-modal .mfh-sel{appearance:none;-webkit-appearance:none;-moz-appearance:none;',
+      '  padding-right:26px;max-width:100%;',
+      '  background-image:url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23C9A84C\' stroke-width=\'2.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polyline points=\'6 9 12 15 18 9\'/></svg>");',
+      '  background-repeat:no-repeat;background-position:right 8px center}',
+      '#mfh-modal td{padding:4px 6px 4px 0;vertical-align:middle}',
+      '#mfh-modal table{border-collapse:separate;border-spacing:0}',
+      /* Marcel am 26.09.2026: "auch die Checkboxen sind noch gross."
+         15 px waren der App-Durchschnitt - in einer Tabellenzeile mit
+         13-px-Schrift sind sie trotzdem der groesste Klotz. Hier 13. */
+      '#mfh-modal input[type="checkbox"]{width:13px;height:13px;margin:0;',
+      '  accent-color:var(--wl-c9a84c, #C9A84C)}',
       '@media(max-width:700px){#mfh-modal .mfh-kopf,#mfh-modal .mfh-body,',
       '  #mfh-modal .mfh-fuss,#mfh-modal .mfh-knoepfe{padding-left:14px;padding-right:14px}}',
     ].join('');
