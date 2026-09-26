@@ -353,9 +353,67 @@
     },
 
     // ──────── TAB 6: BEWIRTSCHAFTUNG ──────────────────────────────────────
+    /* ═══ v1620 · Die acht Modernisierungsfelder der Anlage 2 ═══════
+       Bis hierher stand die Punktzahl als Etikett am Feld ("max. 4 P.").
+       Sie half beim Ausfuellen nicht - sie sagt nichts darueber, WAS
+       man waehlen soll, nur wie schwer es am Ende wiegt. Jetzt steht
+       das Gewicht in der Erklaerung, zusammen mit dem, was wirklich
+       zaehlt: die Abgrenzung Modernisierung gegen Instandhaltung. Genau
+       daran scheitern die meisten Eingaben.
+
+       `severity: beginner` heisst: erscheint im Anfaengermodus,
+       im Profimodus nicht. */
+    'rnd.mod_dach': {
+      title: "Dacherneuerung inkl. Wärmedämmung",
+      body: "Wann wurde das Dach zuletzt erneuert — samt Dämmung? Das ist der schwerste Posten der Anlage 2: er bringt bis zu 4 von 20 Punkten. Je frischer, desto mehr Punkte, und desto länger die Restnutzungsdauer.",
+      paragraph: 'ImmoWertV Anlage 2',
+      severity: 'beginner'
+    },
+    'rnd.mod_fenster': {
+      title: "Fenster und Außentüren",
+      body: "Erneuerte Fenster und Außentüren zählen bis zu 2 von 20 Punkten. Gemeint ist der Austausch, nicht das Streichen.",
+      paragraph: 'ImmoWertV Anlage 2',
+      severity: 'beginner'
+    },
+    'rnd.mod_leitungen': {
+      title: "Leitungssysteme (Strom, Gas, Wasser)",
+      body: "Erneuerte Steig- und Verteilleitungen zählen bis zu 2 von 20 Punkten. Eine neue Sicherung allein genügt nicht — gemeint ist die Erneuerung der Stränge.",
+      paragraph: 'ImmoWertV Anlage 2',
+      severity: 'beginner'
+    },
+    'rnd.mod_heizung': {
+      title: "Heizungsanlage",
+      body: "Ein erneuerter Wärmeerzeuger zählt bis zu 2 von 20 Punkten. Der Austausch des Kessels reicht; eine gewartete Altanlage zählt nicht.",
+      paragraph: 'ImmoWertV Anlage 2',
+      severity: 'beginner'
+    },
+    'rnd.mod_aussenwand': {
+      title: "Wärmedämmung der Außenwände",
+      body: "Eine nachträglich gedämmte Fassade ist nach dem Dach der zweitschwerste Posten: bis zu 4 von 20 Punkten. Ein neuer Anstrich zählt nicht.",
+      paragraph: 'ImmoWertV Anlage 2',
+      severity: 'beginner'
+    },
+    'rnd.mod_baeder': {
+      title: "Bäder",
+      body: "Modernisierte Bäder zählen bis zu 2 von 20 Punkten. Gemeint ist die Erneuerung von Sanitärobjekten und Installation, nicht ein neuer Spiegelschrank.",
+      paragraph: 'ImmoWertV Anlage 2',
+      severity: 'beginner'
+    },
+    'rnd.mod_innenausbau': {
+      title: "Innenausbau (Decken, Fußböden, Treppen)",
+      body: "Erneuerter Innenausbau zählt bis zu 2 von 20 Punkten — Decken, Fußböden, Treppen. Tapete und Farbe sind Instandhaltung, keine Modernisierung.",
+      paragraph: 'ImmoWertV Anlage 2',
+      severity: 'beginner'
+    },
+    'rnd.mod_grundriss': {
+      title: "Wesentliche Änderung des Grundrisses",
+      body: "Eine wesentliche Grundrissänderung zählt bis zu 2 von 20 Punkten — etwa das Zusammenlegen von Räumen oder ein nachträgliches Bad. Eine versetzte Zwischenwand allein genügt nicht.",
+      paragraph: 'ImmoWertV Anlage 2',
+      severity: 'beginner'
+    },
     'tab6.hg_umlagefaehig': {
       title: 'Hausgeld (umlagefähig)',
-      body: 'Anteil des monatlichen Hausgelds, den du auf den Mieter umlegen darfst: Heizung, Wasser, Müll, Hausreinigung, Aufzugswartung, Hausmeister, Versicherungen, Grundsteuer. Steht in der Hausgeld-Abrechnung.',
+      body: 'Anteil des JAEHRLICHEN Hausgelds (das Feld rechnet in Euro pro Jahr), den du auf den Mieter umlegen darfst: Heizung, Wasser, Müll, Hausreinigung, Aufzugswartung, Hausmeister, Versicherungen, Grundsteuer. Steht in der Hausgeld-Abrechnung.',
       paragraph: 'BetrKV § 2',
       severity: 'beginner'
     },

@@ -2188,9 +2188,15 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   color: var(--ch);
   font-weight: 500;
 }
+/* v1620 · Checkboxgroesse vereinheitlicht: 15 px.
+   Marcel am 26.09.2026: "alle Checkboxen eine Nummer zu gross".
+   Gemessen waren sie ausserdem uneinheitlich - 14, 16, 18 und einmal
+   18 mit !important. Dasselbe Bedienelement sah an vier Stellen
+   verschieden aus. Die 14 px der Kachelansicht (.fesh-tile) bleiben:
+   dort waere kleiner kaum noch zu treffen. */
 .cb-label input[type="checkbox"] {
   margin: 0;
-  width: 16px; height: 16px;
+  width: 15px; height: 15px;
   cursor: pointer;
   accent-color: var(--gold);
 }
@@ -4649,8 +4655,8 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   accent-color: var(--gold);
   cursor: pointer;
   flex-shrink: 0;
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
 }
 .me-incze-text {
   display: flex;
@@ -14381,8 +14387,8 @@ body.hdr-no-score .tabs-workflow-bar { top: var(--wf-top, 102px) !important; }
 .beta-dsgvo-row input[type="checkbox"] {
   flex-shrink: 0;
   margin-top: 3px;
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
   accent-color: var(--gold);
 }
 .beta-dsgvo-text {
@@ -21855,7 +21861,7 @@ body.qc-standalone-active #s-quick::before {
   flex-wrap: wrap;
 }
 .set-modal-v2 .sec-2fa-confirm-saved input[type="checkbox"] {
-  width: 18px !important; height: 18px !important;
+  width: 15px !important; height: 15px !important;
   accent-color: var(--gold);
   cursor: pointer;
   margin: 0 !important;
@@ -23461,8 +23467,8 @@ body.plan-starter .st-tab[data-feature-required] {
   border-top: 1px solid var(--border);
 }
 .set-modal-v2 input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
   accent-color: var(--gold);
   flex-shrink: 0;
 }
