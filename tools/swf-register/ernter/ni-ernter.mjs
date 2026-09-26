@@ -187,7 +187,19 @@ function mitFrist(versprechen, ms, was) {
 
 async function ernteGebiet(browser, wb, ags, name) {
   const zieldatei = path.join(AUS, wb + '.json');
-  if (fs.existsSync(zieldatei)) { console.log(`  schon da: ${wb}`); return 'schon'; }
+  /* Uebersprungen wird nur, was das Siegel traegt.
+     GEMESSEN: `lauf.sh` fragte nach `vollstaendig`, DIESE Stelle aber
+     nur, ob die Datei da ist - und Goslar war in EINER Sekunde
+     "fertig", obwohl erst eine von vier Lagen drinsteht. Zwei Waechter
+     mit verschiedenen Massstaeben sind einer zu viel: der laxere
+     gewinnt, und der strengere sieht dabei aus, als wirke er. */
+  if (fs.existsSync(zieldatei)) {
+    try {
+      const alt = JSON.parse(fs.readFileSync(zieldatei, 'utf8'));
+      if (alt && (alt.vollstaendig || alt.gesperrt)) { console.log(`  schon da: ${wb}`); return 'schon'; }
+      console.log(`  Teilstand da: ${wb} - wird fortgesetzt`);
+    } catch (e) { console.log(`  ${wb}: Datei unlesbar - fange neu an`); }
+  }
 
   const seite = await T.seiteAuf(browser);
   const satz = { workbook: wb, ags, gebiet_name: name, geerntet_am: new Date().toISOString() };
