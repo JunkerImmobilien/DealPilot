@@ -1,16 +1,16 @@
 /* ═══════════════════════════════════════════════════════════════════════
    ernte2rezept.mjs · Aus der Ernte werden Rezepte
 
-   Die Ernte liefert je Gebiet MEHRERE Gitter — eines je Lageklasse. Das
-   Register kennt bisher nur EINES je (ags, zweig), und `findeZweig`
-   nimmt schlicht den ersten Treffer. Zwei Saetze fuer denselben Zweig
-   wuerden dort also still zum falschen Ergebnis fuehren.
+   Die Ernte liefert je Gebiet MEHRERE Gitter — eines je Lageklasse.
+   Dieses Werkzeug macht daraus Rezepte und legt die Lage sauber ab
+   (`geltungsbereich.lage`, `geltungsbereich.zuordnung`).
 
-   DESHALB SCHREIBT DIESES WERKZEUG NOCH NICHT INS REGISTER. Es baut die
-   Rezepte und legt die Lage sauber ab (`geltungsbereich.lage`,
-   `geltungsbereich.zuordnung`), damit die Maschine sie auswerten KANN,
-   sobald sie es tut. Bis dahin waere ein Eintrag im Register eine Zahl,
-   die aussieht wie ein Ergebnis — und das ist teurer als keine.
+   > **Hier stand bis v1625: „SCHREIBT NOCH NICHT INS REGISTER."** Das
+   > galt zu Recht, solange `findeZweig` den ersten Satz je (ags, zweig)
+   > nahm und `geltungsbereich` nicht las — ein Eintrag haette still eine
+   > Lage fuer alle gelten lassen. Seit v1623 siebt die Maschine die Lage
+   > VOR der Zweigwahl aus, seit v1624 bestimmt sie sie aus der
+   > BORIS-Gemarkung. Weiter geht es mit `rezept2register.mjs`.
 
    Warum die Lage nicht als Korrektur taugt: gemessen an Goslar sind die
    Verhaeltnisse zwischen den Lagen NICHT konstant. GS 06 gegen GS 01
@@ -166,12 +166,15 @@ for (const f of dateien.sort()) {
     stichprobe: e.stichprobe,
     /* DIE WICHTIGSTE ANGABE: wie kommt eine Anschrift zu ihrer Lage? */
     geltungsbereich: { lagen: modelle.map((m) => m.lage), zuordnung: zuordnungAus(e) },
-    /* Solange `findeZweig` den ersten Treffer nimmt, darf das hier NICHT
-       ins Register - sonst gilt still eine Lage fuer alle. */
-    noch_nicht_ins_register: 'findeZweig() waehlt den ersten Satz je '
-      + '(ags, zweig) und wertet `geltungsbereich` nicht aus. Mehrere '
-      + 'Saetze je Zweig - einer je Lage - waeren dort stillschweigend '
-      + 'falsch. Erst die Auswahl bauen, dann eintragen.',
+    /* v1625 · HIER STAND EINE SPERRE, und sie galt zu Recht: solange
+       findeZweig() den ersten Satz je (ags, zweig) nahm, haette ein
+       Eintrag still eine Lage fuer alle gelten lassen. Seit v1623 siebt
+       die Maschine die Lage VOR der Zweigwahl aus, seit v1624 bestimmt
+       sie sie aus der BORIS-Gemarkung. Eine Sperre, die nicht mehr gilt,
+       haelt Arbeit auf, die laengst erlaubt ist. */
+    register_bereit: 'Die Maschine wertet geltungsbereich.lage seit v1623 '
+      + 'aus und bestimmt die Lage seit v1624 aus der BORIS-Gemarkung. '
+      + 'Ohne bestimmbare Lage kommt kein Wert, sondern lage_noetig.',
     modelle,
   };
   fs.writeFileSync(path.join(AUS, `NI-${e.ags}-${zweig}.json`),
@@ -183,5 +186,4 @@ for (const f of dateien.sort()) {
 }
 
 console.log(`\nRezepte: ${gebaut} gebaut, ${gesperrt} gesperrt, ${abgewiesen} abgewiesen`);
-console.log('Sie liegen in ' + AUS + ' und gehen NOCH NICHT ins Register -');
-console.log('siehe Feld `noch_nicht_ins_register` in jedem Rezept.');
+console.log('Sie liegen in ' + AUS + '. Weiter mit rezept2register.mjs.');
