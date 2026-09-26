@@ -185,6 +185,28 @@ html[data-dp-layout] .dpl-schiene{
 .dpl-teil-aktionen #sb-actions-trigger-btn{ display:none !important; }
 .dpl-teil-nutzer #sb-user{ margin:0 !important; border:0 !important; }
 
+
+/* GEMESSEN: der Aktionsblock hat einen INNEREN Behaelter
+   (.sb-actions-accordion-inner). Die Zeilenregel am aeusseren Knoten
+   bewirkte nichts - der innere blieb eine Spalte, und die Leiste war
+   144 statt 48 px hoch. Eine Regel am Elternteil ordnet nicht, was im
+   Kind steht. */
+.dpl-schiene[data-stellung="leiste"] .sb-actions-accordion-inner,
+.dpl-schiene[data-stellung="fuss"] .sb-actions-accordion-inner{
+  display:flex !important; flex-direction:row !important; align-items:center;
+  gap:6px !important; width:auto !important; height:auto !important;
+  padding:0 !important; margin:0 !important; flex-wrap:nowrap;
+}
+.dpl-schiene[data-stellung="leiste"] .sb-actions-accordion-inner > *,
+.dpl-schiene[data-stellung="fuss"] .sb-actions-accordion-inner > *{
+  flex:0 0 auto !important; width:auto !important; margin:0 !important;
+  white-space:nowrap;
+}
+/* In der senkrechten Schiene bleibt der innere Behaelter eine Spalte,
+   nur ohne eigene Breite - 208 px sind knapp. */
+.dpl-teil-aktionen .sb-actions-accordion-inner{
+  width:auto !important; padding:0 !important; margin:0 !important;
+}
 /* ═══ 3 · DIE OBJEKTSPALTE ALS SCHUBLADE ════════════════════════════
    GEMESSEN am 26.09.2026, und es war nicht das, was ich erwartet hatte:
    **`.app-wrap` ist ein GRID**, nicht flex - `grid-template-columns:
