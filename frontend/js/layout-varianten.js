@@ -149,7 +149,17 @@
     /* Portfolio-Knopf: nur wo die Objektspalte zur Schublade wird.
        Er bedient den VORHANDENEN Umschalter, statt einen zweiten Weg
        aufzumachen - zwei Wege zu demselben Zustand laufen auseinander. */
-    if (L.objekteAls === 'schublade') {
+    /* v1639 · IMMER anlegen, auch wenn die Objektspalte dauerhaft steht.
+       Grund: unter 900 px wird sie in JEDEM Layout zur Schublade (siehe
+       layout-varianten.css) - ohne diesen Knopf gaebe es dort keinen Weg
+       mehr an die Objektliste. Auf breiten Schirmen blendet die CSS ihn
+       bei den Spalten-Layouts aus.
+
+       > Ein Bedienelement, das nur auf einem Geraet existiert, vergisst
+       > man beim Umbau des anderen. Lieber immer da und manchmal
+       > unsichtbar. */
+    {
+      schiene.setAttribute('data-objekte', L.objekteAls);
       var pb = document.createElement('button');
       pb.type = 'button';
       pb.className = 'dpl-portfolio';

@@ -361,11 +361,79 @@ html[data-dp-layout="v5"] .sb-header .app-logo-simple-wrap{ max-height:40px !imp
   border-color:#141310; }
 .dpl-schalter-zu{ margin-left:2px; }
 
+/* ═══ 8 · TABLET UND HANDY ══════════════════════════════════════════
+   GEMESSEN am 26.09.2026 im gleich-Origin-iframe bei 390 px: Layout 2
+   liess der Arbeitsflaeche **260 von 390 px** - die Schiene stand
+   weiterhin `position:fixed` mit 208 px Breite am rechten Rand.
+
+   Ursache war ZUM DRITTEN MAL an diesem Tag dieselbe: die Regeln in
+   dieser Media-Query trugen den Anker `html[data-dp-layout]` nicht und
+   waren damit (0,2,0) gegen (0,3,1) der Grundregel.
+
+   > **Eine Media-Query hebt die Spezifitaet nicht an.** Sie schraenkt
+   > nur ein, WANN eine Regel gilt - nicht, wie stark sie ist. Wer eine
+   > Grundregel innerhalb einer Media-Query ueberschreiben will, braucht
+   > dort denselben Anker oder mehr.
+
+   Inhaltlich: auf schmalen Geraeten wird aus jeder senkrechten Schiene
+   eine WAAGERECHTE Leiste oben. Eine 208-px-Spalte neben 182 px Inhalt
+   ist keine Bedienung, sondern eine Schikane. */
 @media (max-width:900px){
-  html[data-dp-layout="v1"] .app-wrap{ padding-left:0 !important; }
-  html[data-dp-layout="v2"] .app-wrap{ padding-right:0 !important; }
-  .dpl-schiene[data-stellung="links"],
-  .dpl-schiene[data-stellung="rechts"]{ position:static; width:auto; }
+  html[data-dp-layout] .app-wrap{
+    padding-left:0 !important; padding-right:0 !important;
+    grid-template-columns:1fr !important;
+  }
+  html[data-dp-layout] .dpl-schiene[data-stellung="links"],
+  html[data-dp-layout] .dpl-schiene[data-stellung="rechts"]{
+    position:static !important; width:auto !important;
+    flex-direction:row !important; align-items:center !important;
+    gap:8px; overflow-x:auto !important; overflow-y:visible !important;
+    border-right:0 !important; border-left:0 !important;
+    border-bottom:1px solid var(--dpl-linie) !important;
+    padding:6px 10px;
+  }
+  /* Die Marke und der Nutzerblock kosten in einer Leiste nur Platz -
+     das Logo steht oben im Kopf, der Nutzer im Portfolio. */
+  html[data-dp-layout] .dpl-schiene[data-stellung="links"] .dpl-marke,
+  html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-marke{ display:none !important; }
+  html[data-dp-layout] .dpl-schiene .dpl-teil{ padding:0 !important; }
+  html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer{
+    margin-top:0 !important; border-top:0 !important; background:transparent !important;
+  }
+  html[data-dp-layout] .dpl-portfolio{ margin:0 !important; width:auto !important; flex:0 0 auto; }
+  /* Die Reiter werden in der Leiste wieder waagerecht. */
+  html[data-dp-layout] .dpl-teil-tabs nav.tabs{
+    flex-direction:row !important; overflow-x:auto !important;
+  }
+  html[data-dp-layout] .dpl-teil-tabs nav.tabs .tab{
+    width:auto !important; border-left:0 !important;
+    border-bottom:2px solid transparent !important;
+  }
+  html[data-dp-layout] .dpl-teil-tabs nav.tabs .tab.active{
+    border-left-color:transparent !important;
+    border-bottom-color:var(--dpl-gold) !important;
+  }
+  /* Auch die Aktionen liegen dann in einer Reihe. */
+  html[data-dp-layout] .dpl-schiene .sb-actions-accordion-inner{
+    display:flex !important; flex-direction:row !important; gap:6px !important;
+    width:auto !important; flex-wrap:nowrap;
+  }
+  /* Objektspalte bei den SPALTEN-Layouts (v2, v5): hier wird NICHTS
+     eigenes gebaut. Die App hat unter 900 px längst ihre eigene
+     Schublade (`body #sidebar.sidebar{transform:translateX(-100%)}` in
+     style.css) samt Umschalter `#dp-sb-toggle`.
+
+     > Der beste Handy-Entwurf ist der, den es schon gibt. Ein zweiter
+     > daneben hätte einen zweiten Zustand - und zwei Zustände für
+     > dieselbe Schublade laufen auseinander.
+
+     Gesorgt werden muss nur dafür, dass die Gitterspur verschwindet -
+     das erledigt `grid-template-columns:1fr` weiter oben. */
+  html[data-dp-layout] .dpl-schiene .dpl-portfolio{ display:flex !important; }
+  /* Dossier: die Blattspalte nimmt die volle Breite. */
+  html[data-dp-layout="v4"] header.hdr,
+  html[data-dp-layout="v4"] nav.tabs,
+  html[data-dp-layout="v4"] .body{ max-width:none !important; }
 }
 
 /* ═══ 6 · DIE FASSUNGSWAHL VOR DEM EXPORT (v1636) ═══════════════════
@@ -473,3 +541,9 @@ html[data-dp-layout] .dpl-logo{
   var(--wl-c9a84c, #C9A84C) 55%, var(--wl-b8932f, #b8932f));
   color:#141210; border-color:transparent; font-weight:600; }
 .dpes-leise{ margin-left:auto; color:#8C8479; border-color:transparent; }
+
+/* Der Portfolio-Knopf wird IMMER gebaut (siehe layout-varianten.js),
+   aber bei den Spalten-Layouts auf breiten Schirmen nicht gebraucht -
+   dort steht die Objektliste ja dauerhaft daneben. Unter 900 px blendet
+   ihn die Media-Query oben wieder ein. */
+html[data-dp-layout] .dpl-schiene[data-objekte="spalte"] .dpl-portfolio{ display:none; }
