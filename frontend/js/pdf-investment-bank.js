@@ -388,7 +388,8 @@
         } catch (e) { logoOk = false; }
       }
       doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.setTextColor(26, 26, 26);
-      if (!logoOk) doc.text(ab.firma, L, y);
+      /* v1633 · kein Logo UND keine Firma heisst: hier steht nichts. */
+      if (!logoOk && ab.firma) doc.text(ab.firma, L, y);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(120);
       doc.text('I M M O B I L I E N - I N V E S T I T I O N S A N A L Y S E', L, y + 4.6);
       doc.setFontSize(8); doc.setTextColor(110);
@@ -579,7 +580,10 @@
         doc.setPage(p);
         doc.setDrawColor(226, 221, 210); doc.line(L, H - 16, W - R, H - 16);
         doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
-        doc.text(ab.firma + ' · Investment Case · erstellt am ' + heute(), L, H - 11.5);
+        /* v1633 · Ohne Firma stand hier ' · Investment Case · ...' - ein
+           Trennpunkt ohne etwas davor. Der Trenner gehoert zur Firma,
+           nicht zum Dokumenttitel. */
+        doc.text((ab.firma ? ab.firma + ' · ' : '') + 'Investment Case · erstellt am ' + heute(), L, H - 11.5);
         doc.text('Seite ' + p + ' von ' + n, W - R, H - 11.5, { align: 'right' });
       }
     }

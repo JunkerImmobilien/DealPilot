@@ -322,7 +322,10 @@ window.generateBmfPdfAnlage = function(state){
       : (brand.company || '');   /* v1632 · kein Ersatzabsender */
     doc.setDrawColor(226,221,210); doc.setLineWidth(0.2);
     doc.line(marginL, footerY - 4, pageW - marginR, footerY - 4);
-    doc.text(_footTxt + ' \u00b7 Kaufpreisaufteilung nach BMF-Arbeitshilfe Juni 2023', marginL, footerY);
+    /* v1633 \u00b7 Ohne Absender stand hier " \u00b7 Kaufpreisaufteilung ..." - ein
+       Trennpunkt ohne etwas davor. Der Trenner gehoert zum ABSENDER,
+       nicht zum Dokumenttitel. Folgefehler aus v1632. */
+    doc.text((_footTxt ? _footTxt + ' \u00b7 ' : '') + 'Kaufpreisaufteilung nach BMF-Arbeitshilfe Juni 2023', marginL, footerY);
     doc.text('Seite ' + i + ' / ' + pageCount, pageW - marginR, footerY, { align: 'right' });
     doc.setTextColor(0);
   }

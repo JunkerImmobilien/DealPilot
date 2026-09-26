@@ -212,7 +212,10 @@
         doc.setPage(p);
         doc.setDrawColor(226, 221, 210); doc.line(L, H - 16, W - R_, H - 16);
         doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
-        doc.text(firma + ' · Kaufpreisaufteilung · erstellt am ' + heute(), L, H - 11.5);
+        /* v1633 · Der Trenner gehoert zum ABSENDER, nicht zum Dokumenttitel.
+           Ohne Absender stand hier " · Kaufpreisaufteilung ..." - ein
+           Trennpunkt ohne etwas davor. Folgefehler aus v1632. */
+        doc.text((firma ? sauber(firma) + ' · ' : '') + 'Kaufpreisaufteilung · erstellt am ' + heute(), L, H - 11.5);
         doc.text('Seite ' + p + ' von ' + n, W - R_, H - 11.5, { align: 'right' });
       }
     }
