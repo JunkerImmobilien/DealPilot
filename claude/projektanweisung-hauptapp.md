@@ -18733,3 +18733,91 @@ Brueche**, und der Vorgabepunkt ergibt 1,03 wie im amtlichen PDF.
   deshalb losgeloest starten und mit `--memory` begrenzen.
 - Die neun zusammengesetzten Gebiete ohne AGS brauchen eine eigene
   Zuordnung.
+
+---
+
+## Rollout-Journal 26.09.2026 (3) — Objekt-Tab, MFH-Konfigurator, Ernter laeuft
+
+**Commits.** `2f0ad06` (v1620), `3144a10` (v1621), `d9bbbb5` (Ernter).
+
+### Punktzahlen raus, Erklaerungen rein
+
+Die acht Modernisierungsfelder der Anlage 2 trugen ihre Punktzahl als
+Etikett („max. 4 P."). **Sie half beim Ausfuellen nicht** — sie sagt
+nichts darueber, WAS man waehlen soll, nur wie schwer es am Ende wiegt.
+
+Jetzt acht Erklaerungen mit `severity: beginner`, also an den
+Anfaengermodus gekoppelt. Das Gewicht steht dort — zusammen mit dem, was
+wirklich zaehlt: die Abgrenzung Modernisierung gegen Instandhaltung
+(„Tapete und Farbe sind Instandhaltung"). Genau daran scheitern die
+meisten Eingaben.
+
+> Mitgenommen: der Hausgeld-Tooltip sagte „Anteil des MONATLICHEN
+> Hausgelds" — das Feld rechnet in Euro pro **Jahr**. Dieselbe
+> Verwechslung wie in v1617, nur eine Ebene weiter aussen.
+
+### Checkboxen waren nicht zu gross, sondern uneinheitlich
+
+Marcel: „alle Checkboxen eine Nummer zu gross." Gemessen waren sie
+ausserdem **14, 16, 18 und einmal 18 mit `!important`** — dasselbe
+Bedienelement sah an vier Stellen anders aus. Alle Standardgroessen jetzt
+15 px; die 14 px der Kachelansicht bleiben, dort waere kleiner kaum noch
+zu treffen.
+
+### Sterne oder Zustand — die Messung zu Marcels Frage
+
+| | speist | Gewicht |
+|---|---|---:|
+| `ds2_zustand` | Investor Score **+ `rnd-calc.js` + `afa-engine.js`** | 15 |
+| Sterne (4 Felder) | **nur** Investor Score | **20** |
+
+**Der Zustand kann nicht weg** — er verschiebt Restnutzungsdauer und
+AfA, nicht nur den Score. **Die Sterne koennten**, sind aber das
+schwerste Einzelstueck im Risiko-Block, und der Marktbericht nutzt sie
+**gar nicht**.
+
+> Sie messen Verschiedenes: die Sterne die AUSSTATTUNGSQUALITAET (Kueche,
+> Bad, Boden, Fenster), `ds2_zustand` den BAULICHEN Zustand. Die
+> Verwirrung kommt aus den Namen — im Score heissen sie „Qualitaet &
+> Zustand" und „Baujahr / Zustand". **Empfehlung: beide behalten,
+> umbenennen.** Wegwerfen ist eine Produktentscheidung und braucht eine
+> Umverteilung der 20 Punkte; sie liegt bei Marcel.
+
+### Der MFH-Konfigurator kannte die Marke gar nicht
+
+**56 Inline-Stile, keine einzige CSS-Klasse.** Er faellt nicht aus dem
+Stil, weil jemand etwas falsch gesetzt haette — er kennt ihn schlicht
+nicht. Jetzt dieselbe Huelle wie `.set-modal-v2`: Obsidian-Brandbar oben,
+goldener Rahmen, weisse Flaeche, Obsidian-Hauptknopf. Farben als
+`var(--wl-…)`, ein Mandant faerbt also mit um.
+
+Dazu: „max N P." raus (bleibt als Titel am Element), und **Ist-/Soll-
+Miete tragen jetzt ihre Einheit** — „EUR/Monat" unter der Ueberschrift,
+im Titel die Abgrenzung (Ist = aktuelle Nettokaltmiete, Soll =
+erzielbare nach Modernisierung).
+
+### Der Ernter laeuft — zwei weitere Fehler unterwegs
+
+**Helmstedt brauchte 20 Sekunden je Punkt statt 3.** Dahinter stand kein
+Fehler: die Verriegelung verglich auch die Lage, und die heisst dort
+„Helmstedt, Koenigslutter [1,00]" — das Vektorbild setzt die Klammer
+anders als der Waehler. Die Lage aendert sich je Punkt ohnehin nicht;
+der Nachweis ist deshalb nicht weggefallen, sondern **an die Stelle
+gewandert, an der sich wirklich etwas aendert**: direkt nach dem
+Umstellen, gegen den Waehler selbst.
+
+> Und die langen Wartezeiten sind wieder raus. Sie stammten aus der Zeit
+> vor dem Escape-Befund und sollten ein Problem loesen, das gar keines
+> war. **Die Verriegelung ist der Schutz, nicht die Wartezeit.**
+
+Stand des Laufs: Helmstedt 60 Punkte, Peine 80 Punkte, beide **null
+leer, null Nachfassen**. Rund sechs Minuten je Gebiet.
+
+**Rest.**
+- Der Lauf ueber die restlichen 15 Gebiete. Danach: Rezepte bauen, ins
+  Register, ausrollen.
+- Die Umbenennung „Qualitaet & Zustand" / „Baujahr / Zustand" — wartet
+  auf Marcels Entscheidung zu den Sternen.
+- Die neun zusammengesetzten Gebiete ohne AGS.
+- `ni-lageachse.csv` gegenpruefen: Luechow-Dannenberg steht dort als
+  blockiert, hat aber gar keine Lage-Auswahl.
