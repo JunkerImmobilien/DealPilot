@@ -19596,3 +19596,68 @@ beschaedigt.
 - Beim Testlauf ist ein LEERES Objekt entstanden (ueber „Neues Objekt").
   Es steht in Marcels Staging-Portfolio und kann weg — geloescht habe
   ich es nicht, das ist seine Liste.
+
+## Rollout-Journal 26.09.2026 (11) — Landing-Ziele und die Stripe-Trennung
+
+**Commit.** `ebb1d97` (v1644).
+
+### Die Landing führte aus der Testumgebung in die Produktion
+
+Marcels Befund, und er stimmt: **13 feste Verweise** auf
+`https://app.dealpilot.immo/…` allein in `landing/index.html` — Anmelden,
+Kostenlos starten, vier Tarifknöpfe, drei Nachlege-Knöpfe, Guthaben und
+drei weitere CTAs. Dazu je zwei bis drei in `api.html`, `fragen.html`,
+`leistungsumfang.html`, `sicherheit.html`.
+
+> **Eine Testumgebung, deren Knöpfe in die Produktion führen, ist keine
+> Testumgebung.** Wer auf Staging „Registrieren" drückte, legte ein
+> ECHTES Konto an.
+
+`landing/assets/umgebung.js` liest den Host und schreibt um — **eine
+Stelle statt dreizehn**, und sie erfasst auch jeden Link, den es heute
+noch nicht gibt (MutationObserver). Die Produktion wird ausdrücklich
+nicht angefasst.
+
+**Nachgemessen auf `staging.dealpilot.immo`:** 13 Verweise auf
+`app.staging.dealpilot.immo`, **null** auf die Produktion.
+
+### Die Stripe-Trennung ist sauber — gemessen, nicht geglaubt
+
+| | Staging | Produktion |
+|---|---|---|
+| Geheimschlüssel | `sk_test_…` | `sk_live_…` |
+| Konto in allen Preis-IDs | **KEjyPDo0wo** | **GefFev8arz** |
+| starter / investor / pro | 19,99 / 34,99 / 49,99 | dieselben |
+| partner | 99,00 | 99,00 |
+
+Auch die **Kerosin- und AVM-Pakete** in der Staging-`.env` tragen
+durchgehend `KEjyPDo0wo`. Die Landing zeigt 19,99 / 34,99 / 49,99 —
+deckungsgleich mit der `plans`-Tabelle, aus der abgebucht wird.
+
+Der Checkout läuft über `POST /api/v1/subscription/checkout`
+(**401** auf beiden Hosts, existiert also und verlangt Anmeldung) und
+erzeugt die Sitzung SERVERSEITIG. Der Schlüssel verlässt das Backend
+nicht — deshalb steht im Frontend auch keiner. **Ein Testkauf auf
+Staging läuft damit gegen die Sandbox.**
+
+### Was im Standard WIRKLICH anders ist als vorher
+
+Marcel nahm an, der Auslieferungszustand sei unverändert. Gemessen
+(Obsidian, kein Layout-Attribut):
+
+| | vorher | jetzt |
+|---|---|---|
+| Kopfband | 189 px | **219 px, unverändert** |
+| grosser Investor Deal Score | da | **da** |
+| Layout-Attribut | keins | **keins** |
+| Datenaufnahme-Karte | 78 px Bordkarte | **54 px Zeile**, dunkel |
+| Streifen · Perforation · Strichcode | da | **weg** |
+| Bewertungspartner | 2 Kacheln | **weg** |
+| Score-Karten (Bewertung) | dunkel | **weiss** |
+| Beschriftungen | „PRE-FLIGHT" | „Datenaufnahme" |
+
+**Die ersten drei Zeilen bestätigen ihn, die übrigen fünf nicht.** Vier
+davon hat er ausdrücklich bestellt (Partner raus, Score-Karten weiss,
+Beschriftung, Umbau der Karte) — offen ist nur, ob der Umbau der Karte
+auch im OBSIDIAN-Standard gelten soll oder nur in den hellen Fassungen.
+Das ist eine Produktentscheidung und liegt bei ihm.
