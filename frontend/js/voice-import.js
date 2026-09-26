@@ -4579,8 +4579,23 @@
      bleiben — sonst springt ihm die Ansicht mitten im Lesen weg. */
   function _rfAnsEnde(chat, erzwingen) {
     if (!chat) return;
-    var nah = (chat.scrollHeight - chat.clientHeight - chat.scrollTop) < 120;
-    if (!nah && !erzwingen) return;
+    /* ═══ v1618 · IMMER MITLAUFEN ══════════════════════════════════════
+       Marcels Vorgabe vom 26.09.2026: „die Anzeige der Werte und der
+       Chat muss immer nach unten gescrollt sein."
+
+       Bis hierher galt eine Schonfrist: wer weiter als 120 px vom Ende
+       weg war, wurde nicht nachgezogen. Das ist die uebliche Regel für
+       einen LESBAREN Verlauf — hier ist es aber ein GESPRAECH, in dem
+       die naechste Frage unten steht. Wer einmal hochgescrollt hat, sah
+       die Frage danach nicht mehr und wartete auf etwas, das laengst da
+       war.
+
+       Die Score-Karte bleibt ausgenommen: sie wird weiterhin an den
+       OBEREN Rand gezogen (v1306), damit die grosse Zahl im Bild ist
+       und nicht ueberlesen wird. Das war Marcels frueherer Befund und
+       widerspricht diesem nicht — er betrifft die Karte, nicht den
+       laufenden Verlauf. */
+    if (_rf && _rf.haltBlase && !erzwingen) return;
     var tu = function () { chat.scrollTop = chat.scrollHeight; };
     tu();
     if (window.requestAnimationFrame) requestAnimationFrame(tu);
@@ -5046,6 +5061,15 @@
       '<div class="vi-rf-stand-kopf">Was schon steht' +
         '<b>' + fertigN + ' / ' + gesamtN + '</b></div>' +
       '<div class="vi-rf-stand-body">' + html + '</div>';
+
+    /* v1618 · Auch die Werteliste laeuft mit. Sie waechst nach unten, und
+       das zuletzt Gesagte steht am Ende - genau das will man sehen, wenn
+       man gerade geantwortet hat. Bis hierher blieb sie oben stehen und
+       man musste selbst nachfassen. */
+    try {
+      var koerper = host.querySelector('.vi-rf-stand-body');
+      if (koerper) koerper.scrollTop = koerper.scrollHeight;
+    } catch (e) {}
   }
 
   function _rfStandZeichnen() {
@@ -5961,22 +5985,45 @@
     if (!_rf.halte) _rf.halte = {};
     if (_rf.halte[nachEtappe]) return false;
 
-    var karte = null, satz = '';
-    if (nachEtappe >= 3 && !_rf.halte.s1) {
-      karte = _rfScore1Karte();
-      if (karte) {
+    /* ═══ v1618 · FRUEHER, UND NICHT NUR EINER ═════════════════════════
+       Marcels Vorgabe vom 26.09.2026: „man muss relativ schnell das erste
+       Ergebnis bekommen — Dealscore, dann schnell den Dealscore2, dann
+       die Erweiterungen wie RND, Marktwert."
+
+       ZWEI BEFUNDE, beide gemessen:
+
+       1. DER DEAL SCORE KAM ZU SPAET. Er erschien nach Etappe 3, also
+          nach ELF Fragen. Gebraucht hat er nie mehr als Etappe 2 —
+          `_rfScore1` will Kaufpreis, Miete, Eigenkapital, Zins und
+          Tilgung, und die stehen nach SECHS Fragen. Fuenf Fragen lang
+          gab es also ein Ergebnis, das niemand zu sehen bekam.
+
+       2. PRO HALT GAB ES NUR EINE KARTE. Das `if (!karte && …)` liess
+          den zweiten Score liegen, sobald der erste an derselben Stelle
+          faellig war — genau Marcels Frage „wird auch IMMER der Dealscore
+          UND der Investor Dealscore angezeigt?". Antwort war: nein.
+          Jetzt koennen beide an einem Halt stehen, in ihrer Reihenfolge. */
+    var karten = [], satz = '';
+    if (nachEtappe >= 2 && !_rf.halte.s1) {
+      var k1 = _rfScore1Karte();
+      if (k1) {
         _rf.halte.s1 = 1;
+        karten.push(k1);
         satz = 'Das reicht schon für eine erste Antwort auf <b>„lohnt sich das?"</b>';
       }
     }
-    if (!karte && nachEtappe >= 4 && !_rf.halte.s2) {
-      karte = _rfScore2Karte();
-      if (karte) {
+    if (nachEtappe >= 4 && !_rf.halte.s2) {
+      var k2 = _rfScore2Karte();
+      if (k2) {
         _rf.halte.s2 = 1;
-        satz = 'Mit Lage und Zustand wird aus der Rechnung eine <b>Einschätzung</b> — das ist derselbe Score, den du in der Pilotanalyse siehst.';
+        karten.push(k2);
+        satz = karten.length > 1
+          ? 'Beide Scores stehen jetzt — der <b>Deal Score</b> rechnet, der <b>Investor Deal Score</b> ordnet ein.'
+          : 'Mit Lage und Zustand wird aus der Rechnung eine <b>Einschätzung</b> — das ist derselbe Score, den du in der Pilotanalyse siehst.';
       }
     }
-    if (!karte) return false;
+    if (!karten.length) return false;
+    var karte = karten.join('');
     _rf.halte[nachEtappe] = 1;
     var b = _rfBlase('co', satz + karte +
       '<div class="vi-sc-weiter"><i>▸</i> Weiter geht es mit <b>' + escH(_etName(nachEtappe)) + '</b> — ' +
