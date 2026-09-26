@@ -1,6 +1,7 @@
 /* Warum kommt die Vizualisierung im kopflosen Browser nicht hoch?
    Erst hinsehen, dann die Wartezeit hochdrehen. */
 import { chromium } from 'playwright';
+import * as T from './tableau.mjs';
 const UA = 'Mozilla/5.0 (DealPilot Registerpflege; amtliche Kennzahlen nach ImmoWertV)';
 const WB = process.argv[2] || '2026_sw_efh_nomgs';
 
@@ -22,7 +23,7 @@ seite.on('pageerror', (e) => fehler.push('PAGEERROR ' + String(e).slice(0, 140))
 const abgewiesen = [];
 seite.on('response', (r) => { if (r.status() >= 400) abgewiesen.push(r.status() + ' ' + r.url().slice(0, 110)); });
 
-await seite.goto(`https://public.tableau.com/views/${WB}/Dash?:showVizHome=no&:embed=true`,
+await seite.goto(`https://public.tableau.com/views/${WB}/${await T.viewName(WB)}?:showVizHome=no&:embed=true`,
                  { waitUntil: 'domcontentloaded', timeout: 60000 });
 await seite.waitForTimeout(15000);
 

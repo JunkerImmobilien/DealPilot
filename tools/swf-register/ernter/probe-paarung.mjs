@@ -8,6 +8,7 @@
    von ihrer Steuerung, auf gleicher Hoehe. Das ist robuster als die
    Reihenfolge im DOM, die je Ausschuss anders ist. */
 import { chromium } from 'playwright';
+import * as T from './tableau.mjs';
 const UA = 'Mozilla/5.0 (DealPilot Registerpflege; amtliche Kennzahlen nach ImmoWertV)';
 const WB = process.argv[2] || '2026_sw_efh_nomgs';
 
@@ -16,7 +17,7 @@ const seite = await browser.newPage({
   userAgent: UA, viewport: { width: 1400, height: 1000 },
   locale: 'de-DE', timezoneId: 'Europe/Berlin',
 });
-await seite.goto(`https://public.tableau.com/views/${WB}/Dash?:showVizHome=no&:embed=true`,
+await seite.goto(`https://public.tableau.com/views/${WB}/${await T.viewName(WB)}?:showVizHome=no&:embed=true`,
                  { waitUntil: 'networkidle', timeout: 90000 });
 await seite.waitForSelector('[class*="ParameterControlBox"]', { timeout: 60000 });
 

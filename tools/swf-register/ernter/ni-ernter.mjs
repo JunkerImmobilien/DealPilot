@@ -159,10 +159,26 @@ async function ernteGebiet(browser, wb, ags, name) {
     await T.dashboardAuf(seite, wb, V);
 
     const st = await T.steuerungen(seite);
-    const brw = T.finde(st, /Bodenrichtwert/i);
+    /* ── Die Steuerungen NACH IHRER BESCHRIFTUNG, nicht nach Position ──
+       Am 26.09.2026 an drei Ausfaellen gemessen, und jeder hatte einen
+       eigenen Grund:
+
+       · Luechow-Dannenberg kennt gar keinen "Bodenrichtwert" - dort
+         heisst dieselbe Groesse `Lagewert [EUR/m2]`.
+       · Helmstedt fuehrt ZWEI Auswahlwaehler: einen Wertermittlungs-
+         stichtag und die eigentliche Lage. `st.find(art === 'auswahl')`
+         nahm den ersten - und das war der Stichtag. Das Gebiet fiel
+         deshalb als "gesperrt" heraus, obwohl es vollstaendig ist.
+
+       Deshalb wird die Lage ueber ihre Beschriftung gesucht und der
+       Stichtag ausdruecklich ausgeschlossen. */
+    const brw = T.finde(st, /Bodenrichtwert|Lagewert/i);
     const sw = T.finde(st, /Sachwert/i);
-    const lage = st.find((s) => s.art === 'auswahl');
-    if (!brw || !sw) throw new Error('Bodenrichtwert- oder Sachwert-Steuerung fehlt');
+    const lage = st.find((s) => s.art === 'auswahl' && s.beschriftung
+                             && /lage/i.test(s.beschriftung)
+                             && !/stichtag/i.test(s.beschriftung));
+    if (!brw) throw new Error('weder Bodenrichtwert- noch Lagewert-Steuerung gefunden');
+    if (!sw) throw new Error('Sachwert-Steuerung fehlt');
     if (!lage) throw new Error('keine Lage-Auswahl - gehoert nicht zu diesem Ernter');
     satz.steuerungen = st.map((s) => ({ i: s.i, art: s.art, beschriftung: s.beschriftung }));
     /* Die Vorgabestellung IST das Normobjekt - sie wird festgehalten,
@@ -176,8 +192,17 @@ async function ernteGebiet(browser, wb, ags, name) {
     const texte0 = texteMitLage(erstes);
     satz.kopf = texte0.slice(0, 4).map((t) => t.t);
     satz.stichprobe = stichprobeAus(texte0);
-    const sBrw = satz.stichprobe['Bodenrichtwert [€/m²]'];
-    const sSw = satz.stichprobe['vorläufiger Sachwert [€]'];
+    /* Die Zeilennamen der Stichprobenuebersicht sind NICHT einheitlich -
+       mal "Bodenrichtwert [EUR/m2]", mal "Lagewert [EUR/m2]", und die
+       Schreibweise der Einheit wechselt. Ein exakter Schluessel liess
+       Hameln-Pyrmont am 26.09.2026 durchfallen, obwohl die Zahlen dort
+       stehen. Deshalb ueber ein Muster, nicht ueber den genauen Namen. */
+    const ausStichprobe = (muster) => {
+      const k = Object.keys(satz.stichprobe || {}).find((n) => muster.test(n));
+      return k ? satz.stichprobe[k] : null;
+    };
+    const sBrw = ausStichprobe(/Bodenrichtwert|Lagewert/i);
+    const sSw = ausStichprobe(/Sachwert/i);
     if (!sBrw || !sSw) throw new Error('Stichprobengrenzen nicht lesbar - nicht abgetastet');
 
     /* 2. Die Lagetabelle - OHNE SIE IST DAS GITTER UNBRAUCHBAR. */
@@ -190,9 +215,27 @@ async function ernteGebiet(browser, wb, ags, name) {
       const zu = seite.locator('text=Lage ausblenden').first();
       if (await zu.count()) { await zu.click(); await seite.waitForTimeout(2500); }
     }
-    if (!satz.lagetabelle) {
+    /* ── Nennt die Lage sich selbst? ──────────────────────────────────
+       Nicht jeder Ausschuss braucht eine Gemarkungstabelle. Helmstedt
+       nennt seine Lagegruppen direkt beim Namen und haengt sogar den
+       Koeffizienten an: "Helmstedt, Koenigslutter [1,00]". Eine solche
+       Angabe ist einer Anschrift zuzuordnen - eine Kennung wie "GS 01"
+       ist es nicht.
+
+       Die Unterscheidung wird MITGESCHRIEBEN, nicht nur getroffen: wer
+       den Satz spaeter prueft, muss sehen koennen, woran die Zuordnung
+       haengt. */
+    const lagenVorab = await T.auswahlWerte(seite, lage.i);
+    satz.lagen_sprechend = lagenVorab.every((w) =>
+      /[A-Za-zÄÖÜäöüß]{4,}/.test(String(w).replace(/\[.*?\]/g, '')));
+    satz.lage_schluessel = satz.lagetabelle ? 'gemarkungstabelle'
+      : (satz.lagen_sprechend ? 'lagenamen_im_waehler' : null);
+
+    if (!satz.lage_schluessel) {
       satz.gesperrt = true;
-      satz.gesperrt_grund = 'Die Zuordnung Gemarkung -> Lageklasse ist im Dashboard '
+      satz.gesperrt_grund = 'Es gibt keinen Weg, einer Anschrift eine Lage zuzuordnen: '
+        + 'weder eine Gemarkungstabelle ("Lage einblenden") noch sprechende '
+        + 'Lagenamen im Waehler - dort stehen nur Kennungen wie "GS 01". '
         + 'nicht lesbar. Ohne sie liesse sich einer Anschrift keine Lage zuordnen, '
         + 'und eine geratene Lage ist teurer als gar kein Wert (siehe Rostock, '
         + 'Spanne 2,68 gegen 1,77). Das Gitter waere Zahlenmaterial ohne Weg zur '
@@ -202,10 +245,14 @@ async function ernteGebiet(browser, wb, ags, name) {
       await seite.close();
       return 'gesperrt';
     }
-    console.log(`  Lagetabelle: ${satz.lagetabelle.length} Gemarkungen`);
+    /* Der Schluessel kann AUCH aus sprechenden Lagenamen kommen - dann
+       gibt es keine Gemarkungstabelle, und das ist kein Mangel. */
+    console.log(satz.lagetabelle
+      ? `  Lageschluessel: Gemarkungstabelle, ${satz.lagetabelle.length} Eintraege`
+      : `  Lageschluessel: sprechende Lagenamen im Waehler`);
 
     /* 3. Die Gitter, je Lage eines. */
-    const lagen = await T.auswahlWerte(seite, lage.i);
+    const lagen = lagenVorab;
     satz.lagen = lagen;
     const achseB = stuetzstellen(sBrw.min, sBrw.max, NB, 5);
     const achseS = stuetzstellen(sSw.min, sSw.max, NS, 10000);
@@ -265,8 +312,12 @@ async function ernteGebiet(browser, wb, ags, name) {
     return 'neu';
   } catch (e) {
     satz.fehler = String(e && e.message || e);
+    /* Die Spur mitschreiben: "Cannot read properties of undefined" ohne
+       Zeilennummer sagt nichts. */
+    satz.spur = String(e && e.stack || '').split(/\r?\n/).slice(0, 4).join(' | ');
     fs.writeFileSync(path.join(AUS, wb + '.FEHLER.json'), JSON.stringify(satz, null, 1));
     console.log(`  FEHLER ${wb} (${name}): ${satz.fehler}`);
+    if (satz.spur) console.log(`     ${satz.spur}`);
     try { await seite.close(); } catch {}
     return 'fehler';
   }
