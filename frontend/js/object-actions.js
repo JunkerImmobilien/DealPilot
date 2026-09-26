@@ -315,7 +315,7 @@
     mount.innerHTML =
       '<div class="dp-pf-scroll"><div class="dp-pfbar" id="oab-bar">' +
         '<span class="dp-pf-stripe"></span>' +
-        '<div class="dp-pf-lead"><span class="bp">BOARDING PASS</span><span class="k">PRE-FLIGHT</span><span class="s">DealPilot \u00b7 Boarding</span></div><span class="dp-pf-perf"></span>' + /* v572-leadtext */
+        '<div class="dp-pf-lead"><span class="bp">BOARDING PASS</span><span class="k">Datenaufnahme</span><span class="s">DealPilot \u00b7 Boarding</span></div><span class="dp-pf-perf"></span>' + /* v572-leadtext */
         '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Marktbewertung</span><div class="dp-pf-row">' +
           /* v752-order */ pfTileLogo('dealpilot', _dpInner, false, 'Marktpreisbewertung') +
           /* v1637 · unsichtbar, nicht geloescht - siehe PARTNER_AVM_SICHTBAR */
@@ -325,7 +325,7 @@
           ) : '') +
         '</div></div>' +
         '<div class="dp-pf-sep"></div>' +
-        '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Daten einlesen</span><div class="dp-pf-row">' +
+        '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Daten \u00fcbernehmen aus</span><div class="dp-pf-row">' +
           pfTileTool('import', _doc, 'Expos\u00e9 / Marktbericht', '') +
           (window.VoiceImport ? pfTileTool('voice', _mic, 'Sprache', 'Objekt frei einsprechen — im Plan enthalten') : '') +
           '<label class="dp-pf-tile tool" data-src="immometrica" id="oab-imo-tile" title="Aus ImmoMetrica importieren"><input type="checkbox" value="immometrica" disabled style="display:none"><span class="dp-pf-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h11M4 12h11M4 18h7"/><circle cx="19" cy="6" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></span><span class="dp-pf-lbl">ImmoMetrica</span><span class="dp-pf-led"></span></label>' +

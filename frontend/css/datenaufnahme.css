@@ -1,0 +1,168 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   datenaufnahme.css · v1639 — aus der Bordkarte wird eine Zeile
+
+   Marcel am 26.09.2026: „Ich fand den ersten Entwurf am besten … im Tab
+   Objekt und im Quick Check halt die helle Version."
+
+   ── WAS HIER PASSIERT, UND WAS AUSDRÜCKLICH NICHT ────────────────────
+   Diese Datei ändert **nur das Aussehen**. Der Markup-Vertrag, an dem
+   die gesamte Mechanik hängt, bleibt Zeichen für Zeichen stehen:
+
+     .dp-pf-tile  +  input[value=…]   ← `selectedSources()` liest genau das
+     #oab-run                          ← der Auslöser
+     #oab-results                      ← wohin die Marktpreisindikation kommt
+     .dp-pf-tile.on / .dp-pf-led       ← der Zustand je Quelle
+
+   > Eine Umgestaltung, die Markup anfasst, muss jede Mechanik daran neu
+   > beweisen. Eine, die nur Flächen setzt, muss gar nichts beweisen -
+   > sie KANN nichts kaputtmachen.
+
+   Deshalb wird hier nichts entfernt, sondern ausgeblendet: Streifen,
+   Perforation, Trennstrich und Strichcode tragen `display:none`. Wer die
+   Bordkarte zurückwill, löscht vier Zeilen.
+
+   ── WAS AUS DEM BILD BLEIBT ──────────────────────────────────────────
+   Der QR-Code. Er ist das einzige Element der alten Karte, das etwas
+   TUT - er führt auf DealPilot. Strichcode und Perforation codierten
+   nichts; sie waren Zierat, und Zierat ist das, was einem Banker
+   auffällt.
+
+   ── ZWEI FLÄCHENSÄTZE ────────────────────────────────────────────────
+   Die Karte steht in beiden Modi. Unten deshalb erst der dunkle Satz
+   (Vorgabe) und darunter der helle unter `body.dp-chrome-hell` - kein
+   eigener Schalter, sondern der, den die App ohnehin führt.
+
+   ── GEMESSEN VORHER ──────────────────────────────────────────────────
+   `.dp-pfbar` war **78 px** hoch, mit Streifen (1280x78), Vorspann
+   (151x78), Perforation, zwei Segmenten, Trenner, QR (54x68) und einer
+   Reisszone von 208x78, in der ein Strichcode von 174x52 stand.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Der Zierat ──────────────────────────────────────────────────── */
+.dp-pfbar .dp-pf-stripe,
+.dp-pfbar .dp-pf-perf,
+.dp-pfbar .dp-pf-sep,
+.dp-pfbar .dp-pf-bc{ display:none !important; }
+
+/* ── Die Zeile ───────────────────────────────────────────────────── */
+.dp-pfbar{
+  display:flex !important; align-items:center !important; flex-wrap:wrap;
+  gap:10px 14px !important;
+  min-height:0 !important; height:auto !important;
+  padding:8px 14px !important;
+  border-radius:3px !important;
+  background:#131210 !important;
+  border:1px solid #2A2622 !important;
+  box-shadow:none !important;
+}
+.dp-pf-scroll{ overflow:visible !important; }
+
+/* Der Vorspann: aus „BOARDING PASS / PRE-FLIGHT" wird eine Beschriftung. */
+.dp-pfbar .dp-pf-lead{
+  display:flex !important; align-items:baseline; gap:8px;
+  height:auto !important; min-height:0 !important; padding:0 !important;
+  background:transparent !important; border:0 !important; flex:0 0 auto;
+}
+.dp-pfbar .dp-pf-lead .bp{ display:none !important; }
+.dp-pfbar .dp-pf-lead .k{
+  font-family:'JetBrains Mono', ui-monospace, monospace !important;
+  font-size:11px !important; letter-spacing:.1em !important;
+  text-transform:uppercase !important; color:#BFB7A9 !important;
+  height:auto !important; padding:0 !important;
+}
+.dp-pfbar .dp-pf-lead .s{ display:none !important; }
+
+/* Die beiden Gruppen stehen nebeneinander, nicht übereinander. */
+.dp-pfbar .dp-pf-seg{
+  display:flex !important; align-items:center !important; gap:9px !important;
+  height:auto !important; min-height:0 !important; padding:0 !important;
+  flex:0 1 auto; min-width:0; flex-wrap:wrap;
+}
+.dp-pfbar .dp-pf-grouplbl{
+  font-family:'JetBrains Mono', ui-monospace, monospace !important;
+  font-size:9px !important; letter-spacing:.11em !important;
+  text-transform:uppercase !important; color:#8C8479 !important;
+  height:auto !important; width:auto !important; padding:0 !important;
+  margin:0 !important; white-space:nowrap; flex:0 0 auto;
+}
+.dp-pfbar .dp-pf-row{
+  display:flex !important; gap:6px !important; flex-wrap:wrap;
+  height:auto !important; min-height:0 !important; width:auto !important;
+}
+
+/* Die Kacheln: Haarlinie, Gold nur am Gewählten. */
+.dp-pfbar .dp-pf-tile{
+  display:flex !important; align-items:center !important; gap:7px !important;
+  height:auto !important; min-height:0 !important;
+  padding:6px 11px !important; margin:0 !important;
+  border:1px solid #2A2622 !important; border-radius:2px !important;
+  background:#0E0D0B !important; box-shadow:none !important;
+  transform:none !important; white-space:nowrap;
+}
+.dp-pfbar .dp-pf-tile:hover{ border-color:var(--wl-b8932f, #b8932f) !important; }
+.dp-pfbar .dp-pf-tile.on{
+  border-color:var(--wl-c9a84c, #C9A84C) !important;
+  box-shadow:inset 3px 0 0 var(--wl-c9a84c, #C9A84C) !important;
+}
+.dp-pfbar .dp-pf-lbl{ font-size:12.5px !important; }
+.dp-pfbar .dp-pf-logo img{ max-height:15px !important; width:auto !important; }
+.dp-pfbar .dp-pf-logo.dp{ font-size:12.5px !important; }
+.dp-pfbar .dp-pf-ic{ display:inline-flex !important; align-items:center; }
+.dp-pfbar .dp-pf-led{
+  width:6px !important; height:6px !important; border-radius:50% !important;
+  margin-left:2px !important; flex:0 0 auto;
+}
+
+/* QR und Auslöser ganz rechts. */
+.dp-pfbar .dp-pf-qr{
+  margin-left:auto !important; flex:0 0 auto;
+  width:auto !important; height:auto !important; padding:0 !important;
+  background:transparent !important; border:0 !important;
+  display:flex !important; align-items:center; gap:6px;
+}
+.dp-pfbar .dp-pf-qr svg{ width:28px !important; height:28px !important; border-radius:2px; }
+.dp-pfbar .dp-pf-scan{ display:none !important; }
+.dp-pfbar .dp-pf-rz{
+  display:flex !important; align-items:center !important;
+  height:auto !important; min-height:0 !important; width:auto !important;
+  padding:0 !important; background:transparent !important;
+  border:0 !important; flex:0 0 auto;
+}
+.dp-pfbar .dp-pf-rz::before,
+.dp-pfbar .dp-pf-rz::after{ display:none !important; }
+.dp-pfbar .dp-pf-launch{
+  height:auto !important; min-height:0 !important;
+  padding:8px 18px !important; font-size:13px !important;
+  border-radius:2px !important; white-space:nowrap;
+}
+
+/* ── Heller Satz ─────────────────────────────────────────────────── */
+body.dp-chrome-hell .dp-pfbar{
+  background:#FFFFFF !important; border-color:#E6E1D6 !important;
+}
+body.dp-chrome-hell .dp-pfbar .dp-pf-lead .k{ color:#6B645A !important; }
+body.dp-chrome-hell .dp-pfbar .dp-pf-grouplbl{ color:#9A9287 !important; }
+body.dp-chrome-hell .dp-pfbar .dp-pf-tile{
+  background:#FDFCFA !important; border-color:#E6E1D6 !important; color:#1A1A18 !important;
+}
+body.dp-chrome-hell .dp-pfbar .dp-pf-tile.on{ background:#FFFDF8 !important; }
+body.dp-chrome-hell .dp-pfbar .dp-pf-logo.dp{ color:#1A1A18 !important; }
+body.dp-chrome-hell .dp-pfbar .dp-pf-qr svg rect{ fill:#fff; }
+
+/* ── Tablet und Handy ────────────────────────────────────────────────
+   GEMESSEN: bei 390 px stehen vier Kacheln, zwei Beschriftungen, QR und
+   Knopf nicht in einer Zeile - sie MÜSSEN umbrechen. Der Knopf darf
+   dabei nicht in der Mitte landen: er ist der Abschluss und gehört
+   unten über die volle Breite, sonst sucht man ihn. */
+@media (max-width:1024px){
+  .dp-pfbar{ gap:8px 12px !important; padding:8px 12px !important; }
+  .dp-pfbar .dp-pf-qr{ display:none !important; }   /* auf dem Tablet kein QR - man hat das Gerät ja in der Hand */
+}
+@media (max-width:700px){
+  .dp-pfbar{ flex-direction:column !important; align-items:stretch !important; }
+  .dp-pfbar .dp-pf-seg{ width:100%; }
+  .dp-pfbar .dp-pf-row{ width:100%; }
+  .dp-pfbar .dp-pf-tile{ flex:1 1 calc(50% - 3px); justify-content:center !important; }
+  .dp-pfbar .dp-pf-rz{ width:100%; }
+  .dp-pfbar .dp-pf-launch{ width:100% !important; }
+}
