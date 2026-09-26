@@ -36,6 +36,87 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+## → OFFEN aus dem 26.09.2026 (Layouts, Datenaufnahme, Ernte)
+
+Der Tag ist ausgerollt und nachgemessen (Journal-Einträge 5 bis 12 in
+`claude/projektanweisung-hauptapp.md`). Was **nicht** fertig ist:
+
+### P1 · Produktion nachziehen — Marcel: „prod machen wir später"
+
+Staging liegt seit `9a3f147` wieder vor Prod. Dazwischen liegen unter
+anderem v1635–v1645: die fünf Layouts, die Datenaufnahme-Zeile, die
+Erststart-Karte, die Export-Rückfrage, die Checkliste beim Anlegen,
+`umgebung.js` für die Landing-Ziele.
+
+**Vor dem Merge:**
+- Beide Datenbanken sichern **und ansehen** (`ls -lh` plus `zcat … | head -2`).
+- `git diff --name-only origin/main..staging | grep -i migration` — beim
+  letzten Mal leer, muss aber jedes Mal neu gefragt werden.
+- Backend-Rebuild nicht vergessen, wenn `backend/src/**` dabei ist.
+  **Am 26.09. hatte ich genau das zuerst übersehen** und behauptet, es
+  sei kein Backend-Code dabei; es waren fünf Dateien.
+
+### P2 · Die Reihenhaus-Gitter der NI-Ernte hängen — DIAGNOSE OFFEN
+
+**Stand: 11 von 17 Gebieten vollständig, 6 ausgefallen.** Und darin
+steckt ein Muster, das noch niemand erklärt hat:
+
+| Gebiet | EFH | RH |
+|---|---|---|
+| Goslar | **4/4 Lagen, 80 Punkte** | **alle 4 Lagen hängen** |
+| Northeim | **4/4 Lagen, 80 Punkte** | **alle 4 Lagen hängen** |
+| Holzminden | **1/1 Lage, 20 Punkte** | **hängt** |
+
+> **Die EFH-Fassung derselben Stadt läuft in einer Minute je Lage durch,
+> die Reihenhaus-Fassung nicht in vier.** Auch „GS 01", die in der
+> EFH-Datei ohne Nachfassen fertig wurde. Das ist keine Zeitfrage,
+> sondern ein Unterschied im Dashboard.
+
+**Zwei weitere Ausfälle sind vermutlich dauerhaft und richtig:**
+- `2026_sw_efh_lgdan` (Lüchow-Dannenberg) — hat gar keine Lage-Auswahl,
+  gehört nicht zu diesem Ernter. Der Erkenner hat damals das Wort „Lage"
+  in einem Zahlenfeld `Lagewert` getroffen (`ni-lageachse.csv`).
+- `2026_sw_rh_sulverver` — Stichprobengrenzen nicht lesbar.
+
+**Nächster Schritt — nicht wiederholen, sondern messen:** eine
+RH-Fassung mit kleinem Gitter (`--punkte 2x2`) und angehobener
+Lage-Frist laufen lassen und den Zähler `verriegelt` ansehen. Steht er
+hoch, wiederholt sich jeder Punkt, weil die Verriegelung das Bild nicht
+wiedererkennt — dann liegt es am SVG der RH-Dashboards, nicht an der
+Geschwindigkeit.
+
+**Erst danach:** `ernte2rezept.mjs` → `rezept2register.mjs --schreiben`
+→ ausrollen → Kettenprüfung. Die elf fertigen Gebiete liegen bereit;
+`ernte2rezept` weist Teilstände seit v1638 von selbst ab.
+
+### P3 · Die Bordkarte — Umbau steht, Entwurf 3 fehlt
+
+Marcel wählte **Entwurf 1** (die Zeile, seit v1639 gebaut und seit
+v1645 an den hellen Modus gebunden) und **Entwurf 3** (die Checkliste).
+Die Checkliste ist als Dialog beim Anlegen gebaut (v1643) — **nicht**
+als Reiter oder Untermenü in der Seite, wie Marcel es als Möglichkeit
+genannt hatte („wenn es sich ergibt"). Das ist bewusst offen geblieben.
+
+Schau: `frontend/entwurf-aktionsbox.html`.
+
+### P4 · Kleinere Reste
+
+- **Ein leeres Testobjekt** liegt in Marcels Staging-Portfolio (beim
+  Nachweis der Checkliste entstanden). Kann weg — seine Liste.
+- **Marcels eigenes Profil:** seine E-Mail steht im **Namensfeld**, eine
+  PDF-E-Mail ist nicht gesetzt. Seine Daten.
+- **Handy-Layout der fünf Varianten** ist gebaut und gemessen, aber nur
+  an drei Breiten (1024 / 834 / 390) und nur in v1, v2, v4. v3 und v5
+  fehlen in der Messreihe.
+- **`verfuegbarkeit-by.json`** wird von keinem Ausgabeweg gelesen
+  (Befund vom 25.09., unverändert).
+- **`mb.market_reports.user_id` ist INTEGER**, `users.id` eine UUID —
+  die nutzerbezogenen Marktbericht-Wege scheitern daran seit v942 still.
+  Braucht eine Migration.
+
+---
+
+
 ## → HIER WEITERMACHEN: Marcels Backlog v22 vom 18.09.2026
 
 Volltext mit allen Unterpunkten: **`Dateien/dealpilot_backlog_v22.md`** —
