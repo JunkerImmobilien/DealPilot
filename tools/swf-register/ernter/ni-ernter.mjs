@@ -159,6 +159,26 @@ async function vektorbild(seite, ziel) {
   return null;
 }
 
+/** Irgendetwas mit einer Frist versehen.
+ *
+ *  GEMESSEN AM 26.09.2026: Goslar und Northeim blieben BEIDE nach der
+ *  ersten sauberen Lage stehen - 20 Punkte, null Nachfassen, dann
+ *  nichts mehr. Nicht am Download: der hat seit dem Vormittag eine
+ *  Frist. Sondern am Umschalten der Lage.
+ *
+ *  `seite.evaluate()` hat in Playwright KEINE Vorgabefrist. Haengt die
+ *  Seite, wartet es ohne Ende - und genau damit weise ich nach dem
+ *  Umschalten die Lage nach. Der Nachweis, der Vertrauen schaffen
+ *  sollte, war die Stelle, an der alles stehenblieb.
+ *
+ *  Es gibt keine Playwright-Einstellung dafuer; also ein Wettlauf. */
+function mitFrist(versprechen, ms, was) {
+  return Promise.race([
+    versprechen,
+    new Promise((_, ab) => setTimeout(() => ab(new Error(was + ' haengt (' + ms + ' ms)')), ms)),
+  ]);
+}
+
 async function ernteGebiet(browser, wb, ags, name) {
   const zieldatei = path.join(AUS, wb + '.json');
   if (fs.existsSync(zieldatei)) { console.log(`  schon da: ${wb}`); return 'schon'; }
@@ -274,17 +294,25 @@ async function ernteGebiet(browser, wb, ags, name) {
 
     satz.gitter = {};
     let n = 0, leer = 0, verriegelt = 0;
+    satz.lagen_ausgefallen = [];
     for (let li = 0; li < lagen.length; li++) {
-      await T.setzeAuswahl(seite, lage.i, li);
+     /* ── JEDE LAGE FUER SICH ──────────────────────────────────────────
+        Faellt eine aus, bleibt der Rest stehen. Bis hierher riss ein
+        haengendes Umschalten das ganze Gebiet mit - 20 fertige Punkte
+        gingen mit verloren, obwohl sie gut waren. Die ausgefallene Lage
+        wird BENANNT, nicht verschwiegen: ein Gebiet mit drei von vier
+        Lagen sieht sonst aus wie ein vollstaendiges. */
+     try {
+      await mitFrist(T.setzeAuswahl(seite, lage.i, li), 30000, 'Lage umstellen');
       await seite.waitForTimeout(1600);
       /* Die Lage EINMAL je Block nachweisen, statt bei jedem Punkt.
          Der Nachweis bleibt - er wandert nur an die Stelle, an der sich
          wirklich etwas aendert. Stimmt sie hier nicht, waere das ganze
          Gitter falsch beschriftet; das muss auffallen. */
-      const nachLage = await seite.evaluate((i) => {
+      const nachLage = await mitFrist(seite.evaluate((i) => {
         const b = document.querySelectorAll('[class*="ParameterControlBox"]')[i];
         return b ? ((b.querySelector('.tabComboBoxName') || {}).textContent || '').trim() : null;
-      }, lage.i);
+      }, lage.i), 20000, 'Lage-Nachweis');
       if (nachLage !== lagen[li]) {
         throw new Error(`Lage liess sich nicht auf "${lagen[li]}" stellen `
           + `(Waehler zeigt "${nachLage}") - Gebiet nicht abgetastet`);
@@ -331,6 +359,13 @@ async function ernteGebiet(browser, wb, ags, name) {
       }
       satz.gitter[lagen[li]] = tafel;
       console.log(`    Lage "${lagen[li]}" fertig (${n} Punkte, ${leer} leer, ${verriegelt}x nachgefasst)`);
+     } catch (eL) {
+      satz.lagen_ausgefallen.push({ lage: lagen[li], grund: String(eL && eL.message || eL) });
+      console.log(`    Lage "${lagen[li]}" AUSGEFALLEN: ${eL && eL.message}`);
+     }
+    }
+    if (!Object.keys(satz.gitter).length) {
+      throw new Error('keine einzige Lage abgetastet - Gebiet unbrauchbar');
     }
     satz.punkte = n;
     satz.punkte_leer = leer;
@@ -338,7 +373,9 @@ async function ernteGebiet(browser, wb, ags, name) {
        waere verdaechtig, nicht beruhigend. */
     satz.verriegelt = verriegelt;
     fs.writeFileSync(zieldatei, JSON.stringify(satz, null, 1));
-    console.log(`  + ${wb} (${name}): ${n} Punkte, ${leer} ohne Wert`);
+    console.log(`  + ${wb} (${name}): ${n} Punkte, ${leer} ohne Wert, `
+      + `${Object.keys(satz.gitter).length}/${lagen.length} Lagen`
+      + (satz.lagen_ausgefallen.length ? ` (AUSGEFALLEN: ${satz.lagen_ausgefallen.map((x) => x.lage).join(', ')})` : ''));
     await seite.close();
     return 'neu';
   } catch (e) {
