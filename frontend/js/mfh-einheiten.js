@@ -92,6 +92,67 @@
     return s;
   }
 
+
+  /* ── v1629 · Die Bruecke zum Objekt-Tab ────────────────────────────
+     Siehe Kopf dieser Datei: dieselben acht Gewerke, zwei Skalen, und
+     bis hierher kannten sich die beiden Seiten nicht. */
+  var STUFE_ZU_OBJEKT = { '0': 'Keine/Nie', h: '10 - 20 Jahre', v: '< 5 Jahre' };
+
+  /** Wie viele Punkte gibt ein Wert aus dem OBJEKT-TAB?
+   *  Wortgleich zu rnd-wizard.js (Z. 890) - wer das hier aendert, muss
+   *  es dort auch aendern, sonst rechnen zwei Stellen verschieden. */
+  function punkteObjekt(id, wert) {
+    var m = maxPunkte(id), z = String(wert || 'Keine/Nie');
+    if (z.indexOf('< 5') >= 0 || z.indexOf('Kernsanierung') >= 0) return m;
+    if (z.indexOf('5 - 10') >= 0 || z.indexOf('5-10') >= 0) return Math.round(m * 0.7);
+    if (z.indexOf('10 - 20') >= 0 || z.indexOf('10-20') >= 0) return Math.round(m * 0.4);
+    return 0;
+  }
+
+  /** Die Stufe des Modals, die denselben Punktwert traegt. */
+  function objektZuStufe(id, wert) {
+    var p = punkteObjekt(id, wert);
+    if (p <= 0) return '0';
+    return p >= maxPunkte(id) ? 'v' : 'h';
+  }
+
+  /** Was im Objekt-Tab steht, beim Oeffnen uebernehmen - sonst fragt das
+   *  Modal noch einmal, was der Nutzer laengst gesagt hat. */
+  var _objektVorher = {};
+  function ausObjektVorbelegen() {
+    _objektVorher = {};
+    GEB_IDS.concat(WE_IDS).forEach(function (id) {
+      var f = el('mod_' + id);
+      var w = f ? String(f.value || '') : '';
+      _objektVorher[id] = w;
+      /* Nur vorbelegen, wo das Modal noch nichts weiss - eine im Modal
+         getroffene Angabe ist die juengere und gilt. */
+      if (w && !_geb[id]) _geb[id] = objektZuStufe(id, w);
+    });
+  }
+
+  /** Und zurueck: die vier Gebaeude-Gewerke in den Objekt-Tab, damit das
+   *  RND-Gutachten die Herleitung hat und nicht nur die Summe.
+   *  Angefasst wird nur, was sich in den PUNKTEN unterscheidet - sonst
+   *  wuerde "5 - 10 Jahre" still zu "10 - 20 Jahre" vergroebert. */
+  function inObjektZurueck() {
+    var geaendert = [];
+    GEB_IDS.forEach(function (id) {
+      var stufe = _geb[id] || '';
+      if (!stufe) return;
+      var f = el('mod_' + id);
+      if (!f) return;
+      var alt = _objektVorher[id] || '';
+      if (punkteObjekt(id, alt) === punkteVon(id, stufe)) return;   /* gleich viel wert */
+      var neu = STUFE_ZU_OBJEKT[stufe];
+      if (!neu) return;
+      f.value = neu;
+      try { f.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) {}
+      geaendert.push(labelVon(id).replace(/^(Modernisierung|Verbesserung) /, ''));
+    });
+    return geaendert;
+  }
+
   /* ── Einstieg unter der Wohnflaeche ─────────────────────────────── */
   function knopf() {
     var art = (el('objart') && el('objart').value) || '';
@@ -126,9 +187,11 @@
         + (fuerWohnung ? ' · gilt für jede Einheit, bis sie widerspricht' : ' · gilt für das ganze Haus') + '</div></td>'
         + '<td style="padding:5px 0;text-align:right">' + selHtml('data-geb="' + id + '"', _geb[id], STUFEN) + '</td></tr>';
     }
+    var _vor = GEB_IDS.concat(WE_IDS).filter(function (id) { return _objektVorher[id]; }).length;
     var bj = (el('baujahr') && el('baujahr').value) || '—';
     return '<div style="font-size:12.5px;color:#6B6356;margin-bottom:10px">Baujahr ' + esc(bj) + ' · Gesamtnutzungsdauer ' + gnd() + ' Jahre. '
       + 'Die Kriterien sind die der Anlage 2 ImmoWertV — dieselben wie im Restnutzungsdauer-Assistenten.</div>'
+      + (_vor ? '<div style="font-size:12.5px;color:#6B6356;margin:-4px 0 10px">' + '<b>' + _vor + ' Angaben' + (_vor === 1 ? ' stammt' : ' stammen') + ' aus dem Tab Objekt</b> und sind unten schon gesetzt. Was du hier änderst, geht zurück dorthin.</div>' : '')
       + '<table style="width:100%;border-collapse:collapse;font-size:13px"><tbody>'
       + '<tr><td colspan="2" style="padding:8px 0 4px;font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8A8272">Gemeinsam — vom Haus geerbt</td></tr>'
       + GEB_IDS.map(function (id) { return zeile(id, false); }).join('')
@@ -348,6 +411,7 @@
 
   function oeffnen(schritt) {
     stilEinhaengen();
+    ausObjektVorbelegen();
     schliessen();
     var d = daten();
     _arbeit = JSON.parse(JSON.stringify(d.einheiten || []));
@@ -483,6 +547,11 @@
       if (s.kosten > 0 && el('mfh-san') && el('mfh-san').checked) { setzen('san', s.kosten); if (typeof window.syncSanTaxOnSanInput === 'function') try { window.syncSanTaxOnSanInput(); } catch (x) {} }
       /* Zustand und RND nur uebernehmen, wenn der Nutzer im Ergebnis
          zugestimmt hat — nie still. */
+      /* v1629 · Die vier Gebaeude-Gewerke zurueck in den Objekt-Tab.
+         Ohne sie steht im RND-Gutachten nur die Summe und keine
+         Herleitung - und das faellt erst im fertigen Dokument auf. */
+      var _zurueck = inObjektZurueck();
+      if (_zurueck.length) meldung += ' · ' + _zurueck.join(', ') + ' ins Objekt übernommen';
       if (el('mfh-uep') && el('mfh-uep').checked && el('mod_punkte')) {
         el('mod_punkte').value = String(optionFuer(d.punkteGew));
         try { el('mod_punkte').dispatchEvent(new Event('change', { bubbles: true })); } catch (x) {}
