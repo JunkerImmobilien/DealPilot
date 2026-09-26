@@ -180,7 +180,7 @@
       + ['6%','12%','8%','6%','5%','9%','9%','8%','10%','11%','8%','8%'].map(function (w) {
           return '<col style="width:' + w + '">'; }).join('')
       + '</colgroup><thead><tr style="text-align:left;color:#8A8272">'
-      + '<th>Nr.</th><th>Lage</th><th>Art</th><th>m²</th><th>Zi.</th><th title="Aktuelle Nettokaltmiete dieser Einheit, in Euro pro Monat">Ist-Miete <small style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7">&euro;/Monat</small></th><th title="Erzielbare Nettokaltmiete nach Modernisierung, in Euro pro Monat">Soll-Miete <small style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7">&euro;/Monat</small></th><th>Status</th><th>Qualität</th><th>Maßnahme</th><th>Kosten</th><th></th></tr></thead>'
+      + '<th>Nr.</th><th>Lage</th><th>Art</th><th>m²</th><th>Zi.</th><th title="Aktuelle Nettokaltmiete dieser Einheit, in Euro pro Monat">Ist-Miete<br><small style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7">&euro;/Monat</small></th><th title="Erzielbare Nettokaltmiete nach Modernisierung, in Euro pro Monat">Soll-Miete<br><small style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7">&euro;/Monat</small></th><th>Status</th><th>Qualität</th><th>Maßnahme</th><th>Kosten</th><th></th></tr></thead>'
       + '<tbody id="mfh-zeilen">' + _arbeit.map(zeileHtml).join('') + '</tbody></table>'
       + '<div style="margin-top:8px"><button type="button" id="mfh-neu" class="btn btn-outline btn-sm">+ Einheit</button></div>';
   }
@@ -324,7 +324,10 @@
       '#mfh-modal .mfh-xs,#mfh-modal .mfh-sm{text-align:right}',
       '#mfh-modal .mfh-tab{width:100%;table-layout:fixed;border-collapse:separate;',
       '  border-spacing:0;font-size:12px}',
-      '#mfh-modal .mfh-tab th{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '#mfh-modal .mfh-tab th{line-height:1.25;vertical-align:bottom;padding-bottom:4px;',
+      '  overflow:hidden}',
+      '#mfh-modal .mfh-tab th small{display:block;font-weight:400;text-transform:none;',
+      '  letter-spacing:0;opacity:.7}',
       /* Der goldene Pfeil des BMF-Rechners, statt des Systemdreiecks. */
       '#mfh-modal .mfh-sel{appearance:none;-webkit-appearance:none;-moz-appearance:none;',
       '  padding-right:26px;max-width:100%;',
