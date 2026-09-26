@@ -128,6 +128,26 @@ for (const f of dateien.sort()) {
     console.log(`  GESPERRT ${e.workbook}: ${String(e.gesperrt_grund).slice(0, 70)}…`);
     gesperrt++; continue;
   }
+  /* ── KEIN REZEPT AUS EINEM TEILSTAND ──────────────────────────────
+     Seit der Ernter nach jeder Lage sichert, liegen hier auch Saetze,
+     die noch mitten im Lauf sind. GEMESSEN am 26.09.2026: Goslar stand
+     mit 2 von 4 Lageklassen in der Liste - und das Rezept daraus haette
+     ausgesehen wie ein vollstaendiges.
+
+     Das waere die teuerste Sorte Fehler, die dieses Werkzeug machen
+     kann: der Bericht faende fuer die fehlenden Lagen keinen Wert und
+     saegte "lage_unbekannt", obwohl der Ausschuss sie sehr wohl fuehrt.
+     Eine Luecke, die wie eine Auskunft aussieht.
+
+     `vollstaendig` setzt der Ernter erst, wenn JEDE Lage ein Gitter
+     hat. Fehlt das Feld ganz, ist der Satz aelter als das Siegel - dann
+     entscheidet die Zahl der Lagen. */
+  if (e.lagen && e.lagen.length
+      && Object.keys(e.gitter || {}).length < e.lagen.length) {
+    console.log(`  TEILSTAND ${e.workbook}: ${Object.keys(e.gitter || {}).length}`
+      + ` von ${e.lagen.length} Lagen - noch kein Rezept`);
+    abgewiesen++; continue;
+  }
   if (!zweig) { console.log(`  KEIN ZWEIG aus ${e.workbook}`); abgewiesen++; continue; }
   if (!e.gitter || !Object.keys(e.gitter).length) {
     console.log(`  OHNE GITTER ${e.workbook}`); abgewiesen++; continue;
