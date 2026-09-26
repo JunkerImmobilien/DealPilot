@@ -39,13 +39,13 @@
    ═══════════════════════════════════════════════════════════════════════ */
 
 /* ── Der Zierat ──────────────────────────────────────────────────── */
-.dp-pfbar .dp-pf-stripe,
-.dp-pfbar .dp-pf-perf,
-.dp-pfbar .dp-pf-sep,
-.dp-pfbar .dp-pf-bc{ display:none !important; }
+body.dp-neue-karte .dp-pfbar .dp-pf-stripe,
+body.dp-neue-karte .dp-pfbar .dp-pf-perf,
+body.dp-neue-karte .dp-pfbar .dp-pf-sep,
+body.dp-neue-karte .dp-pfbar .dp-pf-bc{ display:none !important; }
 
 /* ── Die Zeile ───────────────────────────────────────────────────── */
-.dp-pfbar{
+body.dp-neue-karte .dp-pfbar{
   display:flex !important; flex-direction:row !important;
   align-items:center !important; flex-wrap:wrap !important;
   gap:10px 14px !important;
@@ -56,10 +56,10 @@
   border:1px solid #2A2622 !important;
   box-shadow:none !important;
 }
-.dp-pf-scroll{ overflow:visible !important; }
+body.dp-neue-karte .dp-pf-scroll{ overflow:visible !important; }
 
 /* Der Vorspann: aus „BOARDING PASS / PRE-FLIGHT" wird eine Beschriftung. */
-.dp-pfbar .dp-pf-lead{
+body.dp-neue-karte .dp-pfbar .dp-pf-lead{
   display:flex !important; align-items:baseline; gap:8px;
   height:auto !important; min-height:0 !important; padding:0 !important;
   background:transparent !important; border:0 !important; flex:0 0 auto;
@@ -73,15 +73,15 @@
 
    Der Knoten bleibt stehen (die Mechanik liest ihn nicht, aber jemand
    koennte ihn suchen) - er wird nur unsichtbar. */
-.dp-pfbar .dp-pf-lead{ display:none !important; }
-.dp-pfbar .dp-pf-lead .bp{ display:none !important; }
-.dp-pfbar .dp-pf-lead .k{
+body.dp-neue-karte .dp-pfbar .dp-pf-lead{ display:none !important; }
+body.dp-neue-karte .dp-pfbar .dp-pf-lead .bp{ display:none !important; }
+body.dp-neue-karte .dp-pfbar .dp-pf-lead .k{
   font-family:'JetBrains Mono', ui-monospace, monospace !important;
   font-size:11px !important; letter-spacing:.1em !important;
   text-transform:uppercase !important; color:#BFB7A9 !important;
   height:auto !important; padding:0 !important;
 }
-.dp-pfbar .dp-pf-lead .s{ display:none !important; }
+body.dp-neue-karte .dp-pfbar .dp-pf-lead .s{ display:none !important; }
 
 /* Die beiden Gruppen stehen nebeneinander, nicht übereinander. */
 /* GEMESSEN am 26.09.2026: hier stand nur display/align/gap - und die
@@ -94,27 +94,27 @@
    > ueber die Richtung - wer eine Spalte zur Zeile machen will, muss
    > BEIDES schreiben. Dasselbe gilt fuer "flex-wrap": ein geerbtes
    > "nowrap" schlaegt ein neues "wrap" ohne !important. */
-.dp-pfbar .dp-pf-seg{
+body.dp-neue-karte .dp-pfbar .dp-pf-seg{
   display:flex !important; flex-direction:row !important;
   align-items:center !important; gap:9px !important;
   height:auto !important; min-height:0 !important; padding:0 !important;
   flex:0 1 auto; min-width:0; flex-wrap:wrap;
 }
-.dp-pfbar .dp-pf-grouplbl{
+body.dp-neue-karte .dp-pfbar .dp-pf-grouplbl{
   font-family:'JetBrains Mono', ui-monospace, monospace !important;
   font-size:9px !important; letter-spacing:.11em !important;
   text-transform:uppercase !important; color:#8C8479 !important;
   height:auto !important; width:auto !important; padding:0 !important;
   margin:0 !important; white-space:nowrap; flex:0 0 auto;
 }
-.dp-pfbar .dp-pf-row{
+body.dp-neue-karte .dp-pfbar .dp-pf-row{
   display:flex !important; flex-direction:row !important;
   gap:6px !important; flex-wrap:wrap !important;
   height:auto !important; min-height:0 !important; width:auto !important;
 }
 
 /* Die Kacheln: Haarlinie, Gold nur am Gewählten. */
-.dp-pfbar .dp-pf-tile{
+body.dp-neue-karte .dp-pfbar .dp-pf-tile{
   display:flex !important; align-items:center !important; gap:7px !important;
   height:auto !important; min-height:0 !important;
   padding:6px 11px !important; margin:0 !important;
@@ -122,29 +122,29 @@
   background:#0E0D0B !important; box-shadow:none !important;
   transform:none !important; white-space:nowrap;
 }
-.dp-pfbar .dp-pf-tile:hover{ border-color:var(--wl-b8932f, #b8932f) !important; }
-.dp-pfbar .dp-pf-tile.on{
+body.dp-neue-karte .dp-pfbar .dp-pf-tile:hover{ border-color:var(--wl-b8932f, #b8932f) !important; }
+body.dp-neue-karte .dp-pfbar .dp-pf-tile.on{
   border-color:var(--wl-c9a84c, #C9A84C) !important;
   box-shadow:inset 3px 0 0 var(--wl-c9a84c, #C9A84C) !important;
 }
-.dp-pfbar .dp-pf-lbl{ font-size:12.5px !important; }
-.dp-pfbar .dp-pf-logo img{ max-height:15px !important; width:auto !important; }
-.dp-pfbar .dp-pf-logo.dp{ font-size:12.5px !important; }
-.dp-pfbar .dp-pf-ic{ display:inline-flex !important; align-items:center; }
-.dp-pfbar .dp-pf-led{
+body.dp-neue-karte .dp-pfbar .dp-pf-lbl{ font-size:12.5px !important; }
+body.dp-neue-karte .dp-pfbar .dp-pf-logo img{ max-height:15px !important; width:auto !important; }
+body.dp-neue-karte .dp-pfbar .dp-pf-logo.dp{ font-size:12.5px !important; }
+body.dp-neue-karte .dp-pfbar .dp-pf-ic{ display:inline-flex !important; align-items:center; }
+body.dp-neue-karte .dp-pfbar .dp-pf-led{
   width:6px !important; height:6px !important; border-radius:50% !important;
   margin-left:2px !important; flex:0 0 auto;
 }
 
 /* QR und Auslöser ganz rechts. */
-.dp-pfbar .dp-pf-qr{
+body.dp-neue-karte .dp-pfbar .dp-pf-qr{
   margin-left:auto !important; flex:0 0 auto;
   width:auto !important; height:auto !important; padding:0 !important;
   background:transparent !important; border:0 !important;
   display:flex !important; align-items:center; gap:6px;
 }
-.dp-pfbar .dp-pf-qr svg{ width:28px !important; height:28px !important; border-radius:2px; }
-.dp-pfbar .dp-pf-scan{ display:none !important; }
+body.dp-neue-karte .dp-pfbar .dp-pf-qr svg{ width:28px !important; height:28px !important; border-radius:2px; }
+body.dp-neue-karte .dp-pfbar .dp-pf-scan{ display:none !important; }
 /* GEMESSEN: die Reisszone blieb **208 px** breit, obwohl der Knopf darin
    nur 80 misst und der Strichcode auf display:none steht. Ursache war
    `min-width:208px` - ich hatte `width:auto` gesetzt und die Mindestbreite
@@ -157,16 +157,16 @@
    Diese 208 px waren der Grund, warum die Zeile bei 1280 px auf zwei
    Reihen umbrach: 1010 px Kinder plus 42 px Abstaende gegen 1028 px
    Platz. Ohne sie sind es 882. */
-.dp-pfbar .dp-pf-rz{
+body.dp-neue-karte .dp-pfbar .dp-pf-rz{
   display:flex !important; align-items:center !important;
   height:auto !important; min-height:0 !important;
   width:auto !important; min-width:0 !important; max-width:none !important;
   padding:0 !important; background:transparent !important;
   border:0 !important; flex:0 0 auto;
 }
-.dp-pfbar .dp-pf-rz::before,
-.dp-pfbar .dp-pf-rz::after{ display:none !important; }
-.dp-pfbar .dp-pf-launch{
+body.dp-neue-karte .dp-pfbar .dp-pf-rz::before,
+body.dp-neue-karte .dp-pfbar .dp-pf-rz::after{ display:none !important; }
+body.dp-neue-karte .dp-pfbar .dp-pf-launch{
   height:auto !important; min-height:0 !important;
   padding:8px 18px !important; font-size:13px !important;
   border-radius:2px !important; white-space:nowrap;
@@ -191,17 +191,17 @@ body.dp-chrome-hell .dp-pfbar .dp-pf-qr svg rect{ fill:#fff; }
    dabei nicht in der Mitte landen: er ist der Abschluss und gehört
    unten über die volle Breite, sonst sucht man ihn. */
 @media (max-width:1024px){
-  .dp-pfbar{ gap:8px 12px !important; padding:8px 12px !important; }
-  .dp-pfbar .dp-pf-qr{ display:none !important; }   /* auf dem Tablet kein QR - man hat das Gerät ja in der Hand */
+  body.dp-neue-karte .dp-pfbar{ gap:8px 12px !important; padding:8px 12px !important; }
+  body.dp-neue-karte .dp-pfbar .dp-pf-qr{ display:none !important; }   /* auf dem Tablet kein QR - man hat das Gerät ja in der Hand */
 }
 @media (max-width:700px){
-  .dp-pfbar{ flex-direction:column !important; align-items:stretch !important; }
-  .dp-pfbar .dp-pf-seg{ flex-wrap:wrap !important; }
-  .dp-pfbar .dp-pf-seg{ width:100%; }
-  .dp-pfbar .dp-pf-row{ width:100%; }
-  .dp-pfbar .dp-pf-tile{ flex:1 1 calc(50% - 3px) !important; justify-content:center !important; }
-  .dp-pfbar .dp-pf-rz{ width:100%; }
-  .dp-pfbar .dp-pf-launch{ width:100% !important; }
+  body.dp-neue-karte .dp-pfbar{ flex-direction:column !important; align-items:stretch !important; }
+  body.dp-neue-karte .dp-pfbar .dp-pf-seg{ flex-wrap:wrap !important; }
+  body.dp-neue-karte .dp-pfbar .dp-pf-seg{ width:100%; }
+  body.dp-neue-karte .dp-pfbar .dp-pf-row{ width:100%; }
+  body.dp-neue-karte .dp-pfbar .dp-pf-tile{ flex:1 1 calc(50% - 3px) !important; justify-content:center !important; }
+  body.dp-neue-karte .dp-pfbar .dp-pf-rz{ width:100%; }
+  body.dp-neue-karte .dp-pfbar .dp-pf-launch{ width:100% !important; }
 }
 
 /* GEMESSEN: die Status-LED einer GEWAEHLTEN Kachel war rgb(241,242,244) -
@@ -211,15 +211,15 @@ body.dp-chrome-hell .dp-pfbar .dp-pf-qr svg rect{ fill:#fff; }
    Gruen und Rot bleiben in jeder Marke gleich (CLAUDE.md:
    "Statusfarben nie tokenisieren") - deshalb steht hier ein Literal und
    KEIN --wl-Token. Der Gold-Waechter kennt diese beiden Toene nicht. */
-.dp-pfbar .dp-pf-led{ background:#CEC6B6 !important; }
-.dp-pfbar .dp-pf-tile.on .dp-pf-led{ background:#3FA56C !important; }
+body.dp-neue-karte .dp-pfbar .dp-pf-led{ background:#CEC6B6 !important; }
+body.dp-neue-karte .dp-pfbar .dp-pf-tile.on .dp-pf-led{ background:#3FA56C !important; }
 body:not(.dp-chrome-hell) .dp-pfbar .dp-pf-led{ background:#2A2622 !important; }
 
 /* Auf dem Handy steht die erste Kachel allein in ihrer Gruppe - sie soll
    dann die volle Breite nehmen wie die Gruppe darunter, sonst sieht es
    aus, als fehle etwas daneben. */
 @media (max-width:700px){
-  .dp-pfbar .dp-pf-seg:first-of-type .dp-pf-tile{ flex:1 1 100% !important; }
+  body.dp-neue-karte .dp-pfbar .dp-pf-seg:first-of-type .dp-pf-tile{ flex:1 1 100% !important; }
 }
 
 /* GEMESSEN: der Ausloeser blieb 50 px hoch und machte die ganze Zeile
@@ -232,14 +232,14 @@ body:not(.dp-chrome-hell) .dp-pfbar .dp-pf-led{ background:#2A2622 !important; }
    > schreibt und sich wundert, sucht als erstes eine ID.
 
    Deshalb hier mit ID: `.dp-pfbar button#oab-run` ist (1,1,1). */
-.dp-pfbar button#oab-run,
-.dp-pfbar #oab-run.dp-pf-launch{
+body.dp-neue-karte .dp-pfbar button#oab-run,
+body.dp-neue-karte .dp-pfbar #oab-run.dp-pf-launch{
   min-height:0 !important; height:auto !important;
   padding:8px 18px !important; font-size:13px !important;
   border-radius:2px !important;
 }
 @media (max-width:700px){
-  .dp-pfbar button#oab-run{ width:100% !important; }
+  body.dp-neue-karte .dp-pfbar button#oab-run{ width:100% !important; }
 }
 
 /* ═══ QUICK-CHECK ═══════════════════════════════════════════════════
@@ -260,8 +260,8 @@ body:not(.dp-chrome-hell) .dp-pfbar .dp-pf-led{ background:#2A2622 !important; }
    Ausgeblendet, nicht geloescht: `QcApp.sprengnetter()` und
    `QcApp.priceHubble()` bleiben vollstaendig. Wer sie zurueckwill,
    loescht diese eine Regel. */
-.dp-pfbar .dp-pf-tile[data-src="spr"],
-.dp-pfbar .dp-pf-tile[data-src="ph"]{ display:none !important; }
+body.dp-neue-karte .dp-pfbar .dp-pf-tile[data-src="spr"],
+body.dp-neue-karte .dp-pfbar .dp-pf-tile[data-src="ph"]{ display:none !important; }
 
 /* ═══ DAS QUICK-BOARDING-COCKPIT ════════════════════════════════════
    Marcel: „im Quick Check … dass du das so umbaust, dass sich das

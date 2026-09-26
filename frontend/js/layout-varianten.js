@@ -278,6 +278,54 @@
     });
   }
 
+  /* ── DIE MARKE FÜR DIE NEUE DATENAUFNAHME-ZEILE ──────────────────────
+     Marcel am 26.09.2026: „ja binde die Zeile."
+
+     Hintergrund: die umgebaute Karte (v1639) galt zunächst ÜBERALL —
+     auch im Obsidian-Auslieferungszustand. Marcel hatte angenommen, der
+     Standard sei unverändert; gemessen war er es nicht.
+
+     > **Der Auslieferungszustand ist ein Versprechen.** Wer nicht
+     >  umschaltet, bekommt die App so, wie er sie kennt. Ein Umbau, der
+     >  sich nicht abwählen lässt, ist kein Angebot, sondern eine
+     >  Ansage.
+
+     Jetzt hängt die neue Zeile an EINER Marke am `<body>`, und die wird
+     gesetzt, wenn eine der drei Bedingungen gilt:
+
+       body.dp-chrome-hell     der helle Modus ist an
+       html[data-dp-layout]    eines der fünf Layouts ist gewählt
+       html.qc-app             das Quick-Check-Dokument (immer hell)
+
+     Ohne eine davon steht die alte Bordkarte mit Streifen, Perforation
+     und Strichcode — Zeichen für Zeichen wie vorher. Die 46 Regeln in
+     `datenaufnahme.css` tragen dafür alle den Vorsatz
+     `body.dp-neue-karte`.
+
+     EINE Marke statt 46 Verzweigungen: wer eine Bedingung ändert, ändert
+     sie hier und nirgends sonst. */
+  function karteMarke() {
+    try {
+      var h = document.documentElement, b = document.body;
+      if (!b) return;
+      var an = b.classList.contains('dp-chrome-hell')
+        || h.hasAttribute('data-dp-layout')
+        || h.classList.contains('qc-app');
+      b.classList.toggle('dp-neue-karte', an);
+    } catch (e) {}
+  }
+
+  /* Der Skin-Schalter setzt `dp-chrome-hell` am `<body>` - also dort
+     zuhören, nicht auf einen eigenen Ereignisnamen hoffen. */
+  function markeBeobachten() {
+    karteMarke();
+    if (!window.MutationObserver || !document.body) return;
+    new MutationObserver(karteMarke).observe(document.body,
+      { attributes: true, attributeFilter: ['class'] });
+    new MutationObserver(karteMarke).observe(document.documentElement,
+      { attributes: true, attributeFilter: ['data-dp-layout', 'class'] });
+  }
+
   /* ── Der Platz in den Einstellungen ──────────────────────────────────
      Marcel: „ich hoffe, die haben wir in den Einstellungen irgendwo bei
      Anzeige oder Darstellung angegeben."
@@ -360,6 +408,7 @@
     try { zeigen = localStorage.getItem('dp_layout_schalter') === '1'; } catch (e) {}
     if (zeigen) { baueSchalter(); schalterNachziehen(); }
     panelBeobachten();
+    markeBeobachten();
 
     /* Die Objektzahl ändert sich, wenn Karten nachgeladen werden. */
     var l = el('#sb-list');
