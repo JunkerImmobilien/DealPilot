@@ -330,11 +330,49 @@ export function finde(kennzahl, ags) {
 }
 
 /** Ein Satz einer Kennzahl fuer einen Zweig (Objektart), oder null. */
-export function findeZweig(kennzahl, ags, zweig) {
+/** Welche Lagen fuehrt dieses Gebiet fuer diesen Zweig?
+ *
+ *  Leere Liste heisst: es gibt nur einen Satz, die Lage spielt keine
+ *  Rolle. Mehr als einer heisst: ohne Lage ist die Auswahl nicht
+ *  entscheidbar. */
+export function lagenFuer(kennzahl, ags, zweig) {
+  const z = String(zweig || '').toLowerCase();
+  const t = finde(kennzahl, ags).filter((s) => String(s.zweig || '').toLowerCase() === z);
+  if (t.length < 2) return [];
+  return t.map((s) => ((s.geltungsbereich || {}).lage) || null).filter(Boolean);
+}
+
+/**
+ * Den Satz fuer einen Zweig finden — und, wo noetig, fuer eine LAGE.
+ *
+ * v1623 · BIS HIERHER NAHM DIESE FUNKTION DEN ERSTEN TREFFER. Solange
+ * es je (ags, zweig) nur einen Satz gab, war das richtig. Die
+ * niedersaechsische Ernte liefert aber MEHRERE — einen je Lageklasse,
+ * und die Faktoren liegen weit auseinander: an Goslar reicht dieselbe
+ * Stellung je nach Lage von 1,36 bis 1,00.
+ *
+ * Den ersten zu nehmen hiesse, eine Lage fuer alle gelten zu lassen.
+ * Das faellt niemandem auf, weil ein Faktor mit falscher Lage genauso
+ * aussieht wie einer mit richtiger.
+ *
+ * Deshalb: gibt es mehrere und ist keine Lage bestimmt, kommt `null`
+ * zurueck — der Aufrufer sagt dann, dass die Lage fehlt, statt zu
+ * raten. Eine geratene Lageklasse ist teurer als gar kein Wert (an
+ * Rostock gemessen: 2,68 gegen 1,77).
+ */
+export function findeZweig(kennzahl, ags, zweig, lage) {
   const t = finde(kennzahl, ags);
   if (!t.length) return null;
   const z = String(zweig || '').toLowerCase();
-  return t.find((s) => String(s.zweig || '').toLowerCase() === z) || null;
+  const passend = t.filter((s) => String(s.zweig || '').toLowerCase() === z);
+  if (!passend.length) return null;
+  if (passend.length === 1) return passend[0];
+
+  /* Mehrere Saetze — die Lage entscheidet. */
+  const l = String(lage || '').trim().toLowerCase();
+  if (!l) return null;
+  return passend.find((s) =>
+    String(((s.geltungsbereich || {}).lage) || '').trim().toLowerCase() === l) || null;
 }
 
 /** Ist fuer dieses Gebiet ueberhaupt etwas hinterlegt? */
