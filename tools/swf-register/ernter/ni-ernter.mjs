@@ -1,0 +1,287 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ni-ernter.mjs · Die 26 Kalkulatoren mit Lage-Parameter ernten
+
+   WARUM ES DIESEN ERNTER GIBT. 26 niedersaechsische Kalkulatoren rechnen
+   nur mit gesetzter Lage, und die ist ueber die URL grundsaetzlich nicht
+   erreichbar: Tableau setzt sie per INDEX
+   (`set-parameter-value-from-index`, `[Parameters].[Parameter 2]`).
+   Ausserdem loescht JEDER URL-Parameter die Lage. Deshalb muss ein
+   echter Browser den Rechner bedienen.
+
+   WIE DER WERT HERAUSKOMMT. Nicht aus der Antwort - die traegt nur
+   Bildkacheln. Nicht aus dem Kurzhinweis - der ist abgeschaltet. Nicht
+   aus dem DOM - dort stehen nur Beschriftungen. Sondern aus dem
+   VEKTORBILD: es traegt den Text als Text, ohne die Ligaturfalle des
+   PDF ("Sachwer aktor"), und braucht rund 1,7 Sekunden je Punkt.
+
+   WAS MITGEERNTET WIRD, UND WARUM ES WICHTIGER IST ALS DIE ZAHLEN.
+   Der Knopf "Lage einblenden" zeigt eine Tabelle
+   `Gemarkung | Lageklasse | Gemarkungsnr`. OHNE SIE WAEREN DIE GITTER
+   UNBRAUCHBAR: wir wuessten den Faktor je Lageklasse, koennten einer
+   Anschrift aber keine zuordnen - genau der Grund, aus dem Rostock und
+   die Region Hannover bis heute keinen Wert bekommen (dort reicht die
+   Spanne von 2,68 bis 1,77, und eine geratene Lage waere teurer als gar
+   kein Wert). Die Gemarkung ist ein AMTLICHER Schluessel mit Nummer.
+   Deshalb wird sie zuerst geerntet, und ein Gebiet ohne lesbaren
+   Schluessel wird mit Grund uebersprungen.
+
+   Wiederaufnehmbar: was als Datei liegt, wird nicht neu geholt.
+
+   Aufruf:  node ni-ernter.mjs [--nur <workbook>] [--punkte 5x7]
+   ═══════════════════════════════════════════════════════════════════════ */
+import fs from 'fs';
+import path from 'path';
+import * as T from './tableau.mjs';
+import { faktorAus, texteMitLage, zahl, zustandAus } from './svg-lesen.mjs';
+
+const AUS = '/arb/ernte';
+const ROH = '/arb/roh';
+fs.mkdirSync(AUS, { recursive: true });
+fs.mkdirSync(ROH, { recursive: true });
+
+const args = process.argv.slice(2);
+const nur = (args.includes('--nur') ? args[args.indexOf('--nur') + 1] : null);
+const [NB, NS] = (args.includes('--punkte')
+  ? args[args.indexOf('--punkte') + 1] : '5x7').split('x').map(Number);
+
+/* ── Stuetzstellen NUR INNERHALB der Stichprobe ────────────────────────
+   "Wo die Quelle endet, endet die Rechnung." Der erste Erntelauf im
+   September tastete mit einem festen Gitter ab und erfand damit drei von
+   vier Zeilen. Hier werden die Grenzen aus der Stichprobenuebersicht des
+   Dashboards gelesen und NIE ueberschritten. */
+function stuetzstellen(lo, hi, n, rundung) {
+  if (!(hi > lo)) return [];
+  const aus = [];
+  for (let i = 0; i < n; i++) {
+    let v = lo + (hi - lo) * i / (n - 1);
+    v = Math.round(v / rundung) * rundung;
+    if (v < lo) v = Math.ceil(lo / rundung) * rundung;
+    if (v > hi) v = Math.floor(hi / rundung) * rundung;
+    if (v >= lo && v <= hi && !aus.includes(v)) aus.push(v);
+  }
+  return aus;
+}
+
+/** Die Stichprobenuebersicht aus dem Vektorbild: je Merkmal min|max|mittel
+ *  in einer Zeile. Gelesen ueber die Hoehe, nicht ueber die Reihenfolge. */
+function stichprobeAus(texte) {
+  const zeilen = {};
+  texte.forEach((x) => { const k = Math.round(x.y); (zeilen[k] = zeilen[k] || []).push(x); });
+  const aus = {};
+  for (const k of Object.keys(zeilen)) {
+    const z = zeilen[k].sort((a, b) => a.x - b.x);
+    if (z.length < 4) continue;
+    const name = z[0].t;
+    const werte = z.slice(1).map((e) => zahl(e.t) ?? Number(String(e.t).replace(/\./g, '')))
+                     .filter((v) => Number.isFinite(v));
+    if (werte.length >= 3) aus[name] = { min: werte[0], max: werte[1], mittel: werte[2] };
+  }
+  return aus;
+}
+
+/** Die Lagetabelle: Gemarkung -> Lageklasse (+ Gemarkungsnummer).
+ *  Gelesen ueber die Spaltenkoepfe, nicht ueber feste Abstaende. */
+function lagetabelleAus(texte) {
+  const kopf = {};
+  for (const n of ['Gemarkung', 'Lageklasse', 'Gemarkungsnr']) {
+    const t = texte.find((x) => x.t === n);
+    if (t) kopf[n] = t;
+  }
+  if (!kopf.Gemarkung || !kopf.Lageklasse) return null;
+  const zeilen = {};
+  texte.filter((x) => x.y > kopf.Gemarkung.y + 2).forEach((x) => {
+    const k = Math.round(x.y); (zeilen[k] = zeilen[k] || []).push(x);
+  });
+  const aus = [];
+  const nah = (x, spalte) => Math.abs(x.x - kopf[spalte].x) < 60;
+  for (const k of Object.keys(zeilen).sort((a, b) => a - b)) {
+    const z = zeilen[k];
+    const g = z.find((x) => nah(x, 'Gemarkung'));
+    const l = z.find((x) => nah(x, 'Lageklasse'));
+    const n = kopf.Gemarkungsnr ? z.find((x) => nah(x, 'Gemarkungsnr')) : null;
+    if (g && l) aus.push({ gemarkung: g.t, lageklasse: l.t, gemarkungsnr: n ? n.t : null });
+  }
+  return aus.length ? aus : null;
+}
+
+/** Ein Vektorbild holen.
+ *
+ *  ZWEI DINGE, die der erste Lauf gekostet hat:
+ *
+ *  1. Ein noch offenes Menue schluckt den naechsten Klick - der Knopf
+ *     SCHLIESST es dann, statt es zu oeffnen, und es kommt nie ein
+ *     Download. Deshalb vorher Escape. Gemessen am 26.09.2026: nach zwei
+ *     sauberen Lagen brach der dritte Abruf so ab.
+ *  2. Ein einzelner Fehlpunkt darf nicht das ganze Gebiet mitreissen.
+ *     Nach zwei Anlaeufen gibt diese Funktion `null` zurueck; der
+ *     Aufrufer traegt dann eine Luecke ein, statt eine Zahl zu erfinden
+ *     oder 100 gute Punkte zu verlieren. */
+async function vektorbild(seite, ziel) {
+  for (let versuch = 1; versuch <= 2; versuch++) {
+    try {
+      /* KEIN Escape hier. Es schliesst zwar ein offenes Menue, setzt aber
+         auch eine gerade eingegebene Zahl zurueck, wenn der Fokus noch im
+         Feld liegt (das Dashboard sagt das selbst im Hinweistext). Genau
+         daran starben verstreute Gitterpunkte. `setzeZahl` nimmt den Fokus
+         jetzt selbst heraus; ein offenes Menue wird hier durch einen Klick
+         auf eine neutrale Stelle geschlossen - das macht keine Eingabe
+         rueckgaengig. */
+      await seite.mouse.click(5, 5);
+      await seite.waitForTimeout(250);
+      const [dl] = await Promise.all([
+        seite.waitForEvent('download', { timeout: 45000 }),
+        (async () => {
+          await seite.locator('[data-tb-test-id="viz-viewer-toolbar-button-download"]').click();
+          await seite.waitForSelector('[data-tb-test-id="download-flyout-download-svg-MenuItem"]',
+                                      { timeout: 20000 });
+          await seite.locator('[data-tb-test-id="download-flyout-download-svg-MenuItem"]').click();
+        })(),
+      ]);
+      await dl.saveAs(ziel);
+      return fs.readFileSync(ziel, 'utf8');
+    } catch (e) {
+      if (versuch === 2) return null;
+      await seite.waitForTimeout(2500);
+    }
+  }
+  return null;
+}
+
+async function ernteGebiet(browser, wb, ags, name) {
+  const zieldatei = path.join(AUS, wb + '.json');
+  if (fs.existsSync(zieldatei)) { console.log(`  schon da: ${wb}`); return 'schon'; }
+
+  const seite = await T.seiteAuf(browser);
+  const satz = { workbook: wb, ags, gebiet_name: name, geerntet_am: new Date().toISOString() };
+  try {
+    const V = await T.viewName(wb);
+    satz.view = V;
+    await T.dashboardAuf(seite, wb, V);
+
+    const st = await T.steuerungen(seite);
+    const brw = T.finde(st, /Bodenrichtwert/i);
+    const sw = T.finde(st, /Sachwert/i);
+    const lage = st.find((s) => s.art === 'auswahl');
+    if (!brw || !sw) throw new Error('Bodenrichtwert- oder Sachwert-Steuerung fehlt');
+    if (!lage) throw new Error('keine Lage-Auswahl - gehoert nicht zu diesem Ernter');
+    satz.steuerungen = st.map((s) => ({ i: s.i, art: s.art, beschriftung: s.beschriftung }));
+    /* Die Vorgabestellung IST das Normobjekt - sie wird festgehalten,
+       damit spaeter nachvollziehbar ist, wofuer das Gitter gilt. */
+    satz.normobjekt = Object.fromEntries(st.filter((s) => s.beschriftung)
+      .map((s) => [s.beschriftung.replace(/\s*:\s*$/, ''), s.wert]));
+
+    /* 1. Ein Bild in Vorgabestellung: Stichprobengrenzen und Kopfdaten. */
+    const erstes = await vektorbild(seite, path.join(ROH, `${wb}-vorgabe.svg`));
+    if (!erstes) throw new Error('Vorgabebild nicht abrufbar - Gebiet nicht abgetastet');
+    const texte0 = texteMitLage(erstes);
+    satz.kopf = texte0.slice(0, 4).map((t) => t.t);
+    satz.stichprobe = stichprobeAus(texte0);
+    const sBrw = satz.stichprobe['Bodenrichtwert [€/m²]'];
+    const sSw = satz.stichprobe['vorläufiger Sachwert [€]'];
+    if (!sBrw || !sSw) throw new Error('Stichprobengrenzen nicht lesbar - nicht abgetastet');
+
+    /* 2. Die Lagetabelle - OHNE SIE IST DAS GITTER UNBRAUCHBAR. */
+    const knopf = seite.locator('text=Lage einblenden').first();
+    if (await knopf.count()) {
+      await knopf.click();
+      await seite.waitForTimeout(3500);
+      const bild = await vektorbild(seite, path.join(ROH, `${wb}-lagen.svg`));
+      satz.lagetabelle = bild ? lagetabelleAus(texteMitLage(bild)) : null;
+      const zu = seite.locator('text=Lage ausblenden').first();
+      if (await zu.count()) { await zu.click(); await seite.waitForTimeout(2500); }
+    }
+    if (!satz.lagetabelle) {
+      satz.gesperrt = true;
+      satz.gesperrt_grund = 'Die Zuordnung Gemarkung -> Lageklasse ist im Dashboard '
+        + 'nicht lesbar. Ohne sie liesse sich einer Anschrift keine Lage zuordnen, '
+        + 'und eine geratene Lage ist teurer als gar kein Wert (siehe Rostock, '
+        + 'Spanne 2,68 gegen 1,77). Das Gitter waere Zahlenmaterial ohne Weg zur '
+        + 'Anwendung - deshalb gar nicht erst abgetastet.';
+      fs.writeFileSync(zieldatei, JSON.stringify(satz, null, 1));
+      console.log(`  GESPERRT ${wb} (${name}): keine Lagetabelle`);
+      await seite.close();
+      return 'gesperrt';
+    }
+    console.log(`  Lagetabelle: ${satz.lagetabelle.length} Gemarkungen`);
+
+    /* 3. Die Gitter, je Lage eines. */
+    const lagen = await T.auswahlWerte(seite, lage.i);
+    satz.lagen = lagen;
+    const achseB = stuetzstellen(sBrw.min, sBrw.max, NB, 5);
+    const achseS = stuetzstellen(sSw.min, sSw.max, NS, 10000);
+    satz.achse_brw = achseB;
+    satz.achse_sachwert = achseS;
+    console.log(`  Gitter ${achseB.length}x${achseS.length} je Lage, ${lagen.length} Lagen`);
+
+    satz.gitter = {};
+    let n = 0, leer = 0, verriegelt = 0;
+    for (let li = 0; li < lagen.length; li++) {
+      await T.setzeAuswahl(seite, lage.i, li);
+      await seite.waitForTimeout(3200);
+      const tafel = {};
+      for (const b of achseB) {
+        await T.setzeZahl(seite, brw.i, b);
+        await seite.waitForTimeout(1400);
+        tafel[b] = [];
+        for (const s of achseS) {
+          await T.setzeZahl(seite, sw.i, s);
+          await seite.waitForTimeout(1600);
+          /* ── VERRIEGELUNG: zeigt das Bild WIRKLICH diesen Punkt? ──
+             Nicht auf die Uhr warten, sondern nachsehen. Das Bild traegt
+             die gesetzten Werte mit; stimmen sie nicht, war es der
+             vorige Zustand und der Punkt wird wiederholt. */
+          let r = { faktor: null, streuung: null };
+          for (let versuch = 1; versuch <= 6; versuch++) {
+            const bild = await vektorbild(seite, path.join(ROH, `${wb}-t.svg`));
+            if (!bild) { await seite.waitForTimeout(1500); continue; }
+            const z = zustandAus(bild);
+            if (z.brw === b && z.sachwert === s && z.lage === lagen[li]) {
+              r = faktorAus(bild); break;
+            }
+            verriegelt++;
+            /* Ansteigend warten: der Kalkulator braucht nach einem
+               Lagewechsel spuerbar laenger als nach einer Zahl. */
+            await seite.waitForTimeout(900 + versuch * 700);
+          }
+          /* Kein passendes Bild = LUECKE, keine Zahl. Lieber ein Loch im
+             Gitter, das man sieht, als ein Wert, der keiner ist. */
+          tafel[b].push(r.faktor);
+          if (r.faktor == null) leer++;
+          if (satz.streuung == null && r.streuung != null) satz.streuung = r.streuung;
+          n++;
+        }
+      }
+      satz.gitter[lagen[li]] = tafel;
+      console.log(`    Lage "${lagen[li]}" fertig (${n} Punkte, ${leer} leer, ${verriegelt}x nachgefasst)`);
+    }
+    satz.punkte = n;
+    satz.punkte_leer = leer;
+    /* Wie oft das Bild den vorigen Zustand zeigte - eine Null hier
+       waere verdaechtig, nicht beruhigend. */
+    satz.verriegelt = verriegelt;
+    fs.writeFileSync(zieldatei, JSON.stringify(satz, null, 1));
+    console.log(`  + ${wb} (${name}): ${n} Punkte, ${leer} ohne Wert`);
+    await seite.close();
+    return 'neu';
+  } catch (e) {
+    satz.fehler = String(e && e.message || e);
+    fs.writeFileSync(path.join(AUS, wb + '.FEHLER.json'), JSON.stringify(satz, null, 1));
+    console.log(`  FEHLER ${wb} (${name}): ${satz.fehler}`);
+    try { await seite.close(); } catch {}
+    return 'fehler';
+  }
+}
+
+/* ── Los ──────────────────────────────────────────────────────────────── */
+const liste = JSON.parse(fs.readFileSync('/arb/gebiete.json', 'utf8'))
+  .filter((g) => !nur || g.workbook === nur);
+console.log(`Zu ernten: ${liste.length} Gebiete, Gitter ${NB}x${NS} je Lage\n`);
+
+const browser = await T.browserAuf();
+const zaehler = { neu: 0, schon: 0, gesperrt: 0, fehler: 0 };
+for (const g of liste) {
+  console.log(`── ${g.workbook}  ${g.ags}  ${g.name}`);
+  zaehler[await ernteGebiet(browser, g.workbook, g.ags, g.name)]++;
+}
+await browser.close();
+console.log('\nFertig:', JSON.stringify(zaehler));

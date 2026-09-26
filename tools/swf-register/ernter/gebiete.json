@@ -1,0 +1,104 @@
+[
+ {
+  "workbook": "2026_sw_efh_bshe",
+  "ags": "03154",
+  "name": "Helmstedt",
+  "gebiet_roh": "Landkreis Helmstedt"
+ },
+ {
+  "workbook": "2026_sw_efh_bspe",
+  "ags": "03157",
+  "name": "Peine",
+  "gebiet_roh": "Landkreis Peine"
+ },
+ {
+  "workbook": "2026_sw_efh_bssz",
+  "ags": "03102",
+  "name": "Salzgitter",
+  "gebiet_roh": "Stadt Salzgi er"
+ },
+ {
+  "workbook": "2026_sw_efh_hmhhm",
+  "ags": "03252",
+  "name": "Hameln-Pyrmont",
+  "gebiet_roh": "- Landkreis Hameln-Pyrmont -"
+ },
+ {
+  "workbook": "2026_sw_efh_lgdan",
+  "ags": "03354",
+  "name": "Lüchow-Dannenberg",
+  "gebiet_roh": "Landkreis Lüchow-Dannenberg"
+ },
+ {
+  "workbook": "2026_sw_efh_nomgs",
+  "ags": "03153",
+  "name": "Goslar",
+  "gebiet_roh": "- Landkreis Goslar -"
+ },
+ {
+  "workbook": "2026_sw_efh_nomhol",
+  "ags": "03255",
+  "name": "Holzminden",
+  "gebiet_roh": "- Landkreis Holzminden -"
+ },
+ {
+  "workbook": "2026_sw_efh_nomnom",
+  "ags": "03155",
+  "name": "Northeim",
+  "gebiet_roh": "- Landkreis Northeim -"
+ },
+ {
+  "workbook": "2026_sw_efh_ott_row",
+  "ags": "03357",
+  "name": "Rotenburg (Wümme)",
+  "gebiet_roh": "- Landkreis Rotenburg (Wümme) -"
+ },
+ {
+  "workbook": "2026_sw_efh_sulverhk",
+  "ags": "03358",
+  "name": "Heidekreis",
+  "gebiet_roh": "Landkreis Heidekreis"
+ },
+ {
+  "workbook": "2026_sw_rh_bshe",
+  "ags": "03154",
+  "name": "Helmstedt",
+  "gebiet_roh": "Landkreis Helmstedt"
+ },
+ {
+  "workbook": "2026_sw_rh_bspe",
+  "ags": "03157",
+  "name": "Peine",
+  "gebiet_roh": "Landkreis Peine"
+ },
+ {
+  "workbook": "2026_sw_rh_bssz",
+  "ags": "03102",
+  "name": "Salzgitter",
+  "gebiet_roh": "Stadt Salzgi er"
+ },
+ {
+  "workbook": "2026_sw_rh_nomgs",
+  "ags": "03153",
+  "name": "Goslar",
+  "gebiet_roh": "- Landkreis Goslar -"
+ },
+ {
+  "workbook": "2026_sw_rh_nomhol",
+  "ags": "03255",
+  "name": "Holzminden",
+  "gebiet_roh": "- Landkreis Holzminden -"
+ },
+ {
+  "workbook": "2026_sw_rh_nomnom",
+  "ags": "03155",
+  "name": "Northeim",
+  "gebiet_roh": "- Landkreis Northeim -"
+ },
+ {
+  "workbook": "2026_sw_rh_sulverver",
+  "ags": "03361",
+  "name": "Verden",
+  "gebiet_roh": "Landkreis Verden"
+ }
+]

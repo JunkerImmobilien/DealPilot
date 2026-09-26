@@ -1,0 +1,6 @@
+{
+  "name": "ni-ernter",
+  "type": "module",
+  "private": true,
+  "description": "Sitzungsgetriebener Ernter fuer die niedersaechsischen Tableau-Kalkulatoren"
+}
