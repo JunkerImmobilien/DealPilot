@@ -19496,3 +19496,103 @@ Gerät existiert, vergisst man beim Umbau des anderen.*
 - Die Checkliste (Entwurf 3) beim Anlegen eines neuen Objekts.
 - Quick-Check: die beiden Score-Karten weiss wie im Reiter Aktionen.
 - Der echte Abruf mit Marktpreisindikation ist ungeprüft — er kostet.
+
+## Rollout-Journal 26.09.2026 (10) — Score-Karten, Quick-Check, Checkliste
+
+**Commits.** `9fae29f` (v1640), `991cc2c` (v1641), `eb4f387`/`2d25603`/
+`b396672` (v1642–c), `e8d5579`/`89c6eff` (v1643/b).
+
+### Die Score-Karten sind dauerhaft weiss (v1640)
+
+Marcel (Korrektur mitten im Lauf): „im Tab Bewertung ist der DealScore
+Karten." — Gemeint waren also `.dpsh-pass`, nicht die Deal-Aktion.
+
+**Die helle Fassung gab es schon: 22 Regeln.** Sie hingen nur an einer
+Bedingung (`:is(html[data-ui-theme="kontor"|…], body.dp-chrome-hell)`).
+
+> „Dauerhaft weiss" heisst deshalb nicht: neue Regeln schreiben. Es
+> heisst: **die Bedingung faellt weg.** Eine Gestaltung, die es schon
+> gibt, wird nicht nachgebaut — sie wird entfesselt.
+
+Im OBSIDIAN-Modus nachgemessen: beide Karten `rgb(255,255,255)`.
+Beschriftungen umbenannt: „DealPilot Score" und „Investor Deal Score"
+statt „Pre-Flight · …" (4 Stellen).
+
+### Der Quick-Check ist eine eigene App (v1641/v1642)
+
+**Der teuerste Befund des Tages.** `quickcheck-app.html` laeuft in einem
+iframe. Deshalb hatte ihn WEDER die neue Datenaufnahme (v1639) NOCH das
+Ausblenden der Bewertungspartner (v1637) erreicht — **Sprengnetter und
+PriceHubble standen dort unveraendert auf der Karte**, fuenf Stunden
+nachdem ich gemeldet hatte, sie seien weg.
+
+> Ein iframe ist ein eigenes Dokument. Eine Regel, die in der
+> Hauptanwendung wirkt, wirkt darin GAR NICHT — und das sieht man nur,
+> wenn man hineinsieht.
+
+Jetzt laedt der Quick-Check dieselbe CSS. Dazu:
+
+- Die Partnerkacheln stehen dort **statisch im HTML** (nicht aus JS) und
+  bekommen eine eigene Ausblendregel. `QcApp.sprengnetter()` und
+  `QcApp.priceHubble()` bleiben vollstaendig.
+- Das Cockpit `#qb-bp` war `rgb(10,10,10)`; sein rechter Abriss
+  `#qb-stub` war schon weiss. Jetzt beide weiss mit Goldband — dieselbe
+  Grammatik wie `.dpsh-pass`.
+- **Kontrast nachgerechnet:** Beschriftungen 5,84:1, Werte 17,43:1.
+  Vorher standen sie auf `rgb(154,144,128)` — *ein heller Grauton ist
+  auf Schwarz zurueckhaltend und auf Weiss unlesbar.*
+
+> **Und eine Marke, die es nicht gab:** `html.qc-embedded` setzt erst
+> die Bruecke. Beim Einzelaufruf war `html.className` LEER, die Regeln
+> griffen nicht. Das Dokument traegt jetzt fest `class="qc-app"`.
+
+**Zwei eigene Messfehler, beide zurueckgenommen:**
+- Ich meldete fast „die Abruffunktionen sind weg", weil `w.QcApp`
+  `undefined` war. **`const QcApp = …` auf oberster Ebene ist eine
+  LEXIKALISCHE Bindung, keine `window`-Eigenschaft.** Erst
+  `eval('typeof QcApp')` zeigt sie — alle vier sind `function`.
+- Und ich hielt eine CSS-Regel fuer wirkungslos, obwohl ich nur die
+  falsche Seite gemessen hatte (siehe `qc-embedded` oben).
+
+### Die Checkliste beim Anlegen (v1643)
+
+Fragt VOR dem Anlegen, woher die Daten kommen sollen, und waehlt sie
+danach auf der Datenaufnahme-Zeile vor — **ueber den echten Bedienweg**
+(`click()` auf die vorhandene Kachel), damit `.on`, LED und Zaehler
+mitgehen.
+
+> Wer einen Zustand an der Datenhaltung setzt statt am Bedienelement,
+> baut sich einen zweiten Weg — und der vergisst die Haelfte.
+
+**Sie loest den Abruf NICHT aus.** *Vorwaehlen ist eine Erleichterung.
+Ausloesen waere eine Entscheidung — und die trifft, wer bezahlt.*
+
+Die Quellen werden aus der Zeile GELESEN, nicht hier aufgezaehlt: eine
+feste Liste waere am ersten Tag richtig und am dreissigsten falsch.
+
+> **Die Umhuellung hielt beim ersten Anlauf nicht.** `newObj.__nq` war
+> nach dem Laden wieder `false`: `function newObj(){}` ist eine
+> DEKLARATION und bindet sich beim Auswerten ihres Skripts an `window` —
+> sie frisst jede Umhuellung, die vorher lief. **Wer nicht weiss, wann
+> die Deklaration kommt, muss NACHSEHEN, nicht warten.** Jetzt ein
+> Waechter ueber 30 Sekunden plus ein Nachfassen nach `load`.
+
+### Der Abruf, Ende zu Ende nachgewiesen
+
+Einmal ausgeloest (Marcels Freigabe), nur DealPilot gewaehlt:
+
+```
+1 Quelle · kein Konsens · DealPilot
+Markteinschaetzung   Mittel  715.000 €   -3,8 %   3.084 €/m²
+Einordnung           Leicht ueber Markt
+Marktpreisindikation — kein Gutachten n. § 194 BauGB
+```
+
+**Die Marktpreisindikation macht sich unter der Zeile auf** (370 px),
+mit dem richtigen Hinweis. Die Umgestaltung hat keine Schnittstelle
+beschaedigt.
+
+**Rest.**
+- Beim Testlauf ist ein LEERES Objekt entstanden (ueber „Neues Objekt").
+  Es steht in Marcels Staging-Portfolio und kann weg — geloescht habe
+  ich es nicht, das ist seine Liste.
