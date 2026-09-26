@@ -424,8 +424,33 @@ export const ReportOrchestrator = {
       ref.ortsteil = ref.ortsteil
         || (geo && geo.components && geo.components.district) || null;
     } catch (e) { /* ohne Ortsnamen laeuft alles weiter wie bisher */ }
+    /* ═══ v1624 · DIE GEMARKUNG IST DER SCHLUESSEL ZUR LAGEKLASSE ═══════
+       Viele Ausschuesse staffeln den Sachwertfaktor nach Lageklassen, und
+       die Spanne ist erheblich - an Goslar reicht dieselbe Stellung je
+       nach Lage von 1,36 bis 1,00.
+
+       Bis zum 26.09.2026 galt: „welcher Bereich gilt, ist eine Frage des
+       Ortsteils, und die Anschrift eines Objekts sagt uns das nicht" -
+       deshalb stehen Rostock und die Region Hannover bis heute ohne Wert
+       (quellen_links.js, `warum_kein_wert`).
+
+       DAS STIMMT NICHT. Die BORIS-Antwort traegt 41 Felder, darunter
+       `Gemarkungsnummer` und `Gemarkungsname`. Gemessen an Goslar:
+       036271 / "Goslar". Die Dashboards der Ausschuesse nennen dieselbe
+       Gemarkung vierstellig (6271) - die letzten vier Stellen sind der
+       Schluessel. Er lag die ganze Zeit in derselben Antwort, aus der wir
+       den Bodenrichtwert holen. */
+    try {
+      const _bpG = (landValue && landValue.properties_raw) || {};
+      ref.gemarkung = ref.gemarkung || _bpG.Gemarkungsname || _bpG.gemarkungsname || null;
+      ref.gemarkungsnr = ref.gemarkungsnr
+        || String(_bpG.Gemarkungsnummer || _bpG.gemarkungsnummer || '').trim() || null;
+    } catch (e) { /* ohne Gemarkung bleibt die Lage unbestimmt - das ist ein
+                     ehrliches Ergebnis, kein Fehler */ }
     step('ort: ' + (ref.gemeinde || 'KEINER')
-      + (ref.ortsteil ? ' / ' + ref.ortsteil : ''));
+      + (ref.ortsteil ? ' / ' + ref.ortsteil : '')
+      + (ref.gemarkung ? ' · Gemarkung ' + ref.gemarkung
+         + (ref.gemarkungsnr ? ' (' + ref.gemarkungsnr + ')' : '') : ''));
     step('wertparameter: ags=' + (_agsWert || 'KEINER'));
 
     /* v1075-WAGS-1 · ref.ags war NIE gesetzt (kein Formularfeld, keine

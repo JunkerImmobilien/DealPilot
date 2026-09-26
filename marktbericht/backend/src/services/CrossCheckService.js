@@ -341,6 +341,14 @@ export const CrossCheckService = {
              eine von vier Funktionen zu raten waere schlimmer als nichts. */
           ort: (p && p.gemeinde) || ref.gemeinde || null,
           ortsteil: (p && p.ortsteil) || ref.ortsteil || null,
+          /* v1624 · Die Gemarkung entscheidet ueber die LAGEKLASSE, wo ein
+             Ausschuss danach staffelt. Sie kommt aus derselben
+             BORIS-Antwort wie der Bodenrichtwert (ReportOrchestrator
+             hebt sie auf `ref`). Ohne sie meldet der Auswerter
+             `lage_noetig` und sagt, welche Lagen es gibt - eine geratene
+             waere teurer als gar kein Wert. */
+          gemarkung: (p && p.gemarkung) || ref.gemarkung || null,
+          gemarkungsnr: (p && p.gemarkungsnr) || ref.gemarkungsnr || null,
           /* v1103-WWFL - Havelland, Berliner Umland: Grundstuecks- mal
              Wohnflaeche. Ohne diese Zeile bliebe die halbe Tabelle leer. */
           wohnflaeche_qm: ref.living_area || null,

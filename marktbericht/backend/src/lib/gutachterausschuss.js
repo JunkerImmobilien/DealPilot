@@ -445,6 +445,59 @@ function unvollstaendig(satz) {
 /* v1084-WSWF · Der Register-Weg, ausgelagert, damit sachwertfaktor() lesbar
  * bleibt. Gibt null zurueck, wenn das Register fuer dieses Gebiet nichts
  * fuehrt — dann greift die Meldung "kein Ausschuss hinterlegt". */
+/**
+ * v1624 · Aus Gemarkung oder Gemeinde die LAGEKLASSE bestimmen.
+ *
+ * Die Ausschuesse veroeffentlichen die Zuordnung selbst — sie liegt im
+ * Registersatz unter `geltungsbereich.zuordnung`. Zwei Formen, beide
+ * aus der Ernte am 26.09.2026:
+ *
+ *   `gemarkung` — eine Tabelle Gemarkung -> Lageklasse (Goslar, 24
+ *      Eintraege). BORIS nennt die Gemarkungsnummer SECHSstellig mit
+ *      Landespraefix (036271), das Dashboard VIERstellig (6271); darum
+ *      wird auf die letzten vier Stellen verglichen.
+ *   `gemeinde` — die Lagenamen nennen die Gemeinden selbst, durch
+ *      Komma getrennt, teils mit Koeffizient in eckigen Klammern
+ *      ("Helmstedt, Koenigslutter [1,00]").
+ *
+ * Gibt `null` zurueck, wenn sich nichts sicher zuordnen laesst. DAS IST
+ * DER NORMALFALL FUER EINEN UNBEKANNTEN ORT und kein Fehler — der
+ * Aufrufer meldet dann `lage_noetig`. Eine halb passende Zuordnung
+ * waere schlimmer als keine: ein Faktor mit falscher Lage sieht aus wie
+ * einer mit richtiger.
+ */
+function lageAusOrt(saetze, o) {
+  const norm = (s) => String(s || '').trim().toLowerCase()
+    .replace(/\s*\[.*?\]\s*$/, '')          /* Koeffizient abschneiden */
+    .replace(/[^a-zäöüß0-9]+/g, '');
+  const z = (saetze[0].geltungsbereich || {}).zuordnung || {};
+
+  /* Weg 1: die Gemarkungstabelle des Ausschusses. */
+  if (z.art === 'gemarkung' && Array.isArray(z.tabelle) && z.tabelle.length) {
+    const nr = String(o.gemarkungsnr || '').replace(/\D/g, '');
+    const kurz = nr.length > 4 ? nr.slice(-4) : nr;
+    const name = norm(o.gemarkung);
+    const treffer = z.tabelle.find((e) => {
+      const en = String(e.gemarkungsnr || '').replace(/\D/g, '');
+      if (kurz && en && (en === kurz || en.slice(-4) === kurz)) return true;
+      return !!name && norm(e.gemarkung) === name;
+    });
+    return treffer ? treffer.lageklasse : null;
+  }
+
+  /* Weg 2: die Lagenamen nennen die Gemeinden. Getroffen wird nur ein
+     VOLLSTAENDIGER Name — "Lehre" darf nicht auf "Lehrte" passen. */
+  const ort = norm(o.ort || o.gemeinde);
+  if (!ort) return null;
+  for (const s of saetze) {
+    const lage = (s.geltungsbereich || {}).lage;
+    if (!lage) continue;
+    const teile = String(lage).replace(/\s*\[.*?\]\s*$/, '').split(',');
+    if (teile.some((t) => norm(t) === ort)) return lage;
+  }
+  return null;
+}
+
 function ausRegisterRechnen(o, ags) {
   /* v1084-WSWF · Kein Modul — dann rechnet das Register.
    *
@@ -471,7 +524,8 @@ function ausRegisterRechnen(o, ags) {
      sieht danach hoechstens einen Satz je Zweig. */
   const mitLage = reg.filter((s) => ((s.geltungsbereich || {}).lage));
   if (mitLage.length) {
-    const gewuenscht = String(o.lage || o.lageklasse || '').trim().toLowerCase();
+    const gewuenscht = String(o.lage || o.lageklasse
+      || lageAusOrt(mitLage, o) || '').trim().toLowerCase();
     const lagen = [...new Set(mitLage.map((s) => s.geltungsbereich.lage))];
     const behalten = gewuenscht
       ? reg.filter((s) => {
