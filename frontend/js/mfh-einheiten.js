@@ -172,9 +172,16 @@
   }
   function schritt2() {
     return '<div style="font-size:12.5px;color:#6B6356;margin-bottom:10px">Ähnliche Wohnungen mit ⧉ duplizieren. Übernommen werden Fläche, Einheitenzahl und Ist-Kaltmiete der vermieteten Einheiten.</div>'
-      + '<div style="overflow:auto"><table style="border-collapse:collapse;font-size:12px;min-width:1080px"><thead><tr style="text-align:left;color:#8A8272">'
+      /* v1628 · KEIN min-width MEHR. Es war die Ursache des
+         Seitwaerts-Scrollens: 1080 px fest, egal wie breit das Modal
+         wirklich ist. Jetzt feste Aufteilung in Prozent - die Tabelle
+         kann gar nicht mehr breiter werden als ihr Platz. */
+      + '<table class="mfh-tab"><colgroup>'
+      + ['6%','13%','9%','7%','5%','10%','10%','9%','11%','12%','8%'].map(function (w) {
+          return '<col style="width:' + w + '">'; }).join('')
+      + '</colgroup><thead><tr style="text-align:left;color:#8A8272">'
       + '<th>Nr.</th><th>Lage</th><th>Art</th><th>m²</th><th>Zi.</th><th title="Aktuelle Nettokaltmiete dieser Einheit, in Euro pro Monat">Ist-Miete <small style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7">&euro;/Monat</small></th><th title="Erzielbare Nettokaltmiete nach Modernisierung, in Euro pro Monat">Soll-Miete <small style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7">&euro;/Monat</small></th><th>Status</th><th>Qualität</th><th>Maßnahme</th><th>Kosten</th><th></th></tr></thead>'
-      + '<tbody id="mfh-zeilen">' + _arbeit.map(zeileHtml).join('') + '</tbody></table></div>'
+      + '<tbody id="mfh-zeilen">' + _arbeit.map(zeileHtml).join('') + '</tbody></table>'
       + '<div style="margin-top:8px"><button type="button" id="mfh-neu" class="btn btn-outline btn-sm">+ Einheit</button></div>';
   }
 
@@ -190,7 +197,7 @@
         + '<td style="padding:4px 0;text-align:right;font-weight:600" data-punkte="' + i + '">—</td></tr>';
     }).join('');
     return '<div style="font-size:12.5px;color:#6B6356;margin-bottom:10px">Vorgabe ist „wie Gebäude" — nur abweichende Wohnungen anfassen. Dach, Außenwand, Leitungen und Heizung kommen immer vom Haus.</div>'
-      + '<div style="overflow:auto"><table style="border-collapse:collapse;font-size:12.5px;min-width:760px"><thead>' + kopf + '</thead><tbody>' + zeilen + '</tbody></table></div>';
+      + '<table class="mfh-tab" style="font-size:12.5px"><thead>' + kopf + '</thead><tbody>' + zeilen + '</tbody></table>';
   }
 
   /* Schritt 4 — Ergebnis */
@@ -275,20 +282,14 @@
     var s = document.createElement('style');
     s.id = 'mfh-stil-v2';
     s.textContent = [
-      '#mfh-modal .mfh-karte{background:#fff;border-radius:14px;max-width:1080px;width:100%;',
-      '  max-height:92vh;display:flex;flex-direction:column;position:relative;padding-top:46px;',
+      '#mfh-modal .mfh-karte{background:#fff;border-radius:14px;max-width:1180px;width:100%;',
+      '  max-height:92vh;display:flex;flex-direction:column;position:relative;',
       '  overflow:hidden;color:#2A2727;font-family:Inter,sans-serif;',
       '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent);',
       '  box-shadow:0 24px 60px rgba(7,7,7,.32)}',
-      /* Die Brandbar - zeichengleich mit der des Einstellungs-Modals. */
-      '#mfh-modal .mfh-karte::before{content:"DealPilot";position:absolute;top:0;left:0;right:0;',
-      '  height:46px;display:flex;align-items:center;padding:0 24px;background:#070707;color:#fff;',
-      '  font:700 17px "Space Grotesk","DM Sans",system-ui,sans-serif;letter-spacing:.3px;z-index:8;',
-      '  pointer-events:none}',
-      '#mfh-modal .mfh-karte::after{content:"MEHRFAMILIENHAUS";position:absolute;top:0;right:24px;',
-      '  height:46px;display:flex;align-items:center;font:700 10px "JetBrains Mono",monospace;',
-      '  letter-spacing:2px;color:var(--wl-c9a84c, #C9A84C);z-index:8;pointer-events:none}',
-      '#mfh-modal .mfh-kopf{padding:16px 24px 8px}',
+      /* v1628 · Die selbstgebaute Brandbar (::before/::after) ist raus -
+         der echte .dp-modal-topband steht jetzt im Markup. */
+      '#mfh-modal .mfh-kopf{padding:10px 24px 4px}',
       '#mfh-modal .mfh-kopf h3{margin:2px 0 10px;font:600 20px/1.3 "Space Grotesk",sans-serif;color:#070707}',
       '#mfh-modal .mfh-body{overflow:auto;padding:12px 24px;flex:1 1 auto}',
       '#mfh-modal .mfh-fuss{padding:10px 24px;border-top:1px solid #EFEBE3;font-size:13px}',
@@ -314,10 +315,16 @@
       '#mfh-modal .mfh-in::placeholder{color:rgba(42,39,39,.38)}',
       /* Vier Stufen statt acht Einzelbreiten - erst dadurch stehen die
          Spalten untereinander. */
-      '#mfh-modal .mfh-xs{width:52px;text-align:right}',
-      '#mfh-modal .mfh-sm{width:66px;text-align:right}',
-      '#mfh-modal .mfh-md{width:92px}',
-      '#mfh-modal .mfh-lg{width:128px}',
+      /* v1628 · Keine festen Breiten mehr. Das Feld fuellt SEINE ZELLE,
+         und die Zelle bekommt ihren Anteil aus dem colgroup. So passt
+         sich alles der Modalbreite an - vorher gab die Summe der
+         Feldbreiten die Tabellenbreite vor, und die war groesser als
+         das Modal. */
+      '#mfh-modal .mfh-in{width:100%;min-width:0}',
+      '#mfh-modal .mfh-xs,#mfh-modal .mfh-sm{text-align:right}',
+      '#mfh-modal .mfh-tab{width:100%;table-layout:fixed;border-collapse:separate;',
+      '  border-spacing:0;font-size:12px}',
+      '#mfh-modal .mfh-tab th{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
       /* Der goldene Pfeil des BMF-Rechners, statt des Systemdreiecks. */
       '#mfh-modal .mfh-sel{appearance:none;-webkit-appearance:none;-moz-appearance:none;',
       '  padding-right:26px;max-width:100%;',
@@ -348,8 +355,22 @@
     var m = document.createElement('div'); m.id = 'mfh-modal';
     m.style.cssText = 'position:fixed;inset:0;background:rgba(42,39,39,.55);z-index:99998;display:flex;align-items:center;justify-content:center;padding:12px';
     m.innerHTML = '<div class="mfh-karte">' +
+      /* v1628 · DER TOPBAND DES EINSTELLUNGS-MODALS, nicht ein
+         nachgebauter. Am laufenden Modal ausgelesen: .dp-modal-topband
+         mit .dp-mtb-brand und .dp-mtb-hero. Wer die Marke nachbaut,
+         trifft sie nie ganz - und beim naechsten Umbau gar nicht mehr. */
+      '<div class="dp-modal-topband">' +
+        '<div class="dp-mtb-brand">' +
+          '<span class="dp-mtb-logo">DealPilot</span>' +
+          '<span class="dp-mtb-tag">MEHRFAMILIENHAUS</span>' +
+          '<button type="button" class="dp-band-close" id="mfh-band-zu" aria-label="Schließen">✕</button>' +
+        '</div>' +
+        '<div class="dp-mtb-hero dp-mtb-hero-titled">' +
+          '<div class="dp-mtb-h-title">Einheiten und Zustand erfassen</div>' +
+          '<div class="dp-mtb-h-sub">Fläche, Miete und Zustand je Einheit — daraus Restnutzungsdauer und Soll-Miete.</div>' +
+        '</div>' +
+      '</div>' +
       '<div class="mfh-kopf">' +
-      '<h3>Einheiten und Zustand erfassen</h3>' +
       '<div id="mfh-schritte" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"></div></div>' +
       '<div class="mfh-body" id="mfh-body"></div>' +
       '<div class="mfh-fuss" id="mfh-summe"></div>' +
@@ -377,6 +398,7 @@
       if (t.dataset && t.dataset.del != null) { _arbeit.splice(+t.dataset.del, 1); zeichnen(); }
     });
     el('mfh-zu').onclick = schliessen;
+    if (el('mfh-band-zu')) el('mfh-band-zu').onclick = schliessen;
     el('mfh-ok').onclick = uebernehmen;
     el('mfh-zurueck').onclick = function () { if (_schritt > 0) { _schritt--; zeichnen(); } };
     el('mfh-weiter').onclick = function () { if (_schritt < SCHRITTE.length - 1) { _schritt++; zeichnen(); } else uebernehmen(); };
