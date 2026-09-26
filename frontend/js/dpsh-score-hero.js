@@ -169,8 +169,8 @@
   }
   function isEmptyObject() { return numField('kp') <= 0 && numField('nkm') <= 0; }
   function emptyData(kind) {
-    if (kind === 'classic') return { empty: true, kind: 'classic', logo: 'DealPilot <b>Score</b>', eyebrow: 'Pre-Flight \u00b7 DealPilot Score', emptyName: 'DealPilot Score', stub: ['Deal-Pass', 'DEAL-PASS', 'Bereit'], seed: 73 };
-    return { empty: true, kind: 'investor', logo: 'Investor <b>Deal Score</b>', eyebrow: 'Pre-Flight \u00b7 Investor Deal Score', emptyName: 'Investor Deal Score', stub: ['Investor-Pass', 'IDS-PASS', 'Bereit'], seed: 70 };
+    if (kind === 'classic') return { empty: true, kind: 'classic', logo: 'DealPilot <b>Score</b>', eyebrow: 'DealPilot Score', emptyName: 'DealPilot Score', stub: ['Deal-Pass', 'DEAL-PASS', 'Bereit'], seed: 73 };
+    return { empty: true, kind: 'investor', logo: 'Investor <b>Deal Score</b>', eyebrow: 'Investor Deal Score', emptyName: 'Investor Deal Score', stub: ['Investor-Pass', 'IDS-PASS', 'Bereit'], seed: 70 };
   }
 
   /* Fachliche Bewertungs-Hinweise je KPI (Kontext, NICHT die Punkte). Schwellen an App angelehnt. */
@@ -262,7 +262,7 @@
     function inp(key) { var f = r.breakdown.filter(function (b) { return b.key === key; })[0]; return f ? f.input : '\u2014'; }
     var stats = [['Kaufpreis', kaufpreisTxt()], ['Cashflow', inp('cashflow')], ['DSCR', String(inp('risiko')).replace('DSCR ', '')]];
     return {
-      kind: 'classic', logo: 'DealPilot <b>Score</b>', eyebrow: 'Pre-Flight \u00b7 DealPilot Score',
+      kind: 'classic', logo: 'DealPilot <b>Score</b>', eyebrow: 'DealPilot Score',
       icon: IC.trend, action: { label: 'Gewichtung', icon: IC.sliders },
       score: r.score, depth: depthPct, label: r.label, detail: r.interpretation || '',
       cats: cats, stats: stats, stub: ['Deal-Pass', 'DEAL-PASS', 'Stand ' + today()], seed: 73
@@ -284,7 +284,7 @@
     });
     var stats = [['Kaufpreis', kaufpreisTxt()], ['KPIs', comp ? (comp.filled + '/' + comp.total) : '\u2014'], ['Datentiefe', comp ? (comp.percent + '\u00a0%') : '\u2014']];
     return {
-      kind: 'investor', logo: 'Investor <b>Deal Score</b>', eyebrow: 'Pre-Flight \u00b7 Investor Deal Score',
+      kind: 'investor', logo: 'Investor <b>Deal Score</b>', eyebrow: 'Investor Deal Score',
       icon: IC.shield, action: { label: 'Alle KPIs', icon: IC.list },
       score: r2.score, depth: comp ? comp.percent : null, label: r2.label, detail: investorNarrative(r2),
       cats: cats, stats: stats, stub: ['Investor-Pass', 'IDS-PASS', 'Stand ' + today()], seed: 70
@@ -727,28 +727,50 @@
    alten hellen Skin, sind beide Scores weisse Karten statt schwarzer Bordkarten.
    Sie folgen damit der globalen Einstellung - kein eigener Schalter. Statusfarben
    (Gruen/Gold/Rot) bleiben. Gemessen: vorher .dpsh-pass #1b1815 im hellen Profil. */
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-pass{background:#FFFFFF;box-shadow:0 1px 2px rgba(42,39,39,.05);border:1px solid #E6E0D3}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-main{background:#FFFFFF}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-star{display:none}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-chip{background:#F8F6F1}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-chip.t-g{color:#2e8a57}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-chip.t-o{color:var(--gold-lo, #b8932f)}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-chip.t-r{color:#B8625C}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-empty-ic{color:#8A8272;background:#F8F6F1;box-shadow:inset 0 0 0 1px #E6E0D3}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-empty-t{color:#2A2727}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-empty-s{color:#6B6356}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-logo{background:#FBF6E9}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-logo .t{color:#2A2727}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-n{color:#2A2727}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-st{border-left-color:#EFEBE3}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-sv{color:#2A2727}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-cbar-name{color:#2A2727}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-cbar-score{color:#2A2727}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-cbar-track{background:#EFEBE3}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-verdictbar{border-top-color:#EFEBE3}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-verdict{background:#FBFAF8;box-shadow:inset 0 0 0 1px #E6E0D3}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-vlead{color:#2A2727}',
-':is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"],body.dp-chrome-hell) .dpsh-notch{background:#F7F5F1}',
+/* ═══ v1640 · DIE SCORE-KARTEN SIND DAUERHAFT WEISS ══════════════════
+   Marcel am 26.09.2026: „wir haben den Investor Deal Score und den Deal
+   Score, die Karten … die können wir ja im Tab Bewertung dauerhaft
+   weiss machen."
+
+   Die helle Fassung gab es SCHON - alle 22 Regeln darunter. Sie hingen
+   nur an einer Bedingung:
+
+     :is(html[data-ui-theme="kontor"|"panel"|"kanzlei"|"boarding"],
+         body.dp-chrome-hell) .dpsh-…
+
+   „Dauerhaft weiss" heisst deshalb nicht: neue Regeln schreiben. Es
+   heisst: **die Bedingung faellt weg.** Alle 22 stehen jetzt ohne
+   Vorbedingung und ueberstimmen die dunkle Grundfassung weiter oben
+   (gleiche Spezifitaet, spaetere Regel gewinnt).
+
+   > Eine Gestaltung, die es schon gibt, wird nicht nachgebaut - sie
+   > wird entfesselt.
+
+   Die Goldbande `.dpsh-band` bleibt als einziger Farbakzent. Sie traegt
+   den Runway-Verlauf und damit die Marke; darunter ist alles Papier.
+   ═══════════════════════════════════════════════════════════════════ */
+'.dpsh-pass{background:#FFFFFF;box-shadow:0 1px 2px rgba(42,39,39,.05);border:1px solid #E6E0D3}',
+'.dpsh-main{background:#FFFFFF}',
+'.dpsh-star{display:none}',
+'.dpsh-chip{background:#F8F6F1}',
+'.dpsh-chip.t-g{color:#2e8a57}',
+'.dpsh-chip.t-o{color:var(--gold-lo, #b8932f)}',
+'.dpsh-chip.t-r{color:#B8625C}',
+'.dpsh-empty-ic{color:#8A8272;background:#F8F6F1;box-shadow:inset 0 0 0 1px #E6E0D3}',
+'.dpsh-empty-t{color:#2A2727}',
+'.dpsh-empty-s{color:#6B6356}',
+'.dpsh-logo{background:#FBF6E9}',
+'.dpsh-logo .t{color:#2A2727}',
+'.dpsh-n{color:#2A2727}',
+'.dpsh-st{border-left-color:#EFEBE3}',
+'.dpsh-sv{color:#2A2727}',
+'.dpsh-cbar-name{color:#2A2727}',
+'.dpsh-cbar-score{color:#2A2727}',
+'.dpsh-cbar-track{background:#EFEBE3}',
+'.dpsh-verdictbar{border-top-color:#EFEBE3}',
+'.dpsh-verdict{background:#FBFAF8;box-shadow:inset 0 0 0 1px #E6E0D3}',
+'.dpsh-vlead{color:#2A2727}',
+'.dpsh-notch{background:#F7F5F1}',
   ].join('\n');
 
   if (document.readyState !== 'loading') boot();
