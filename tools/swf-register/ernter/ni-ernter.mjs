@@ -137,7 +137,19 @@ async function vektorbild(seite, ziel) {
           await seite.locator('[data-tb-test-id="download-flyout-download-svg-MenuItem"]').click();
         })(),
       ]);
-      await dl.saveAs(ziel);
+      /* `saveAs` wartet, bis der Download WIRKLICH fertig ist - und hat
+         dafuer KEINE eigene Zeitgrenze. Bleibt er stecken, wartet es
+         ohne Ende. Genau so blieb der Lauf am 26.09.2026 mitten in
+         Goslar stehen: letztes Bild 06:51, CPU bei zwei Prozent,
+         anderthalb Stunden nichts. Alle anderen Playwright-Aufrufe hier
+         tragen eine Frist, dieser eine nicht.
+
+         Deshalb ein Wettlauf gegen die Uhr. Verliert er, gilt der Abruf
+         als misslungen und wird wiederholt - nicht als Wert eingetragen. */
+      await Promise.race([
+        dl.saveAs(ziel),
+        new Promise((_, ab) => setTimeout(() => ab(new Error('saveAs haengt')), 40000)),
+      ]);
       return fs.readFileSync(ziel, 'utf8');
     } catch (e) {
       if (versuch === 2) return null;

@@ -117,9 +117,13 @@ export async function setzeZahl(seite, index, wert) {
  *  weshalb sie ueber die URL grundsaetzlich nicht erreichbar ist. Genau
  *  deshalb gibt es diesen Ernter. */
 export async function setzeAuswahl(seite, index, position) {
-  await seite.locator('[class*="ParameterControlBox"]').nth(index).click();
-  await seite.waitForSelector('.tabMenuItemName', { timeout: 20000 });
-  await seite.locator('.tabMenuItemName').nth(position).click();
+  /* Jeder Klick mit eigener Frist. Playwrights Vorgabe ist 30 s, das ist
+     hier zu lang: bleibt einer haengen, steht das ganze Gebiet. Lieber
+     frueh scheitern und den Punkt wiederholen. */
+  await seite.locator('[class*="ParameterControlBox"]').nth(index)
+             .click({ timeout: 15000 });
+  await seite.waitForSelector('.tabMenuItemName', { timeout: 15000 });
+  await seite.locator('.tabMenuItemName').nth(position).click({ timeout: 15000 });
 }
 
 /** Die Werte einer Auswahl lesen, ohne sie zu veraendern. */
