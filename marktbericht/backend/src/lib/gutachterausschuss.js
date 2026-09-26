@@ -459,56 +459,57 @@ function ausRegisterRechnen(o, ags) {
   const reg = roh.filter((s) => ebeneErlaubt('sachwertfaktor', s));
   if (!reg.length) return null;      /* faellt auf 'kein_ausschuss_hinterlegt' */
 
+  /* ═══ v1623 · DIE LAGE WIRD VOR DER ZWEIGWAHL AUFGELOEST ════════════
+     Sie MUSS hier stehen, nicht danach. `waehleAusGruppe` sieht zwei
+     Saetze desselben Zweigs, haelt sie fuer zwei BAUJAHRSGRUPPEN, findet
+     keine passende und gibt null — der Bericht sagt dann
+     "objektart_nicht_abgeleitet", obwohl der Ausschuss die Objektart
+     sehr wohl fuehrt. Genau diese Falle beschreibt der Kommentar bei
+     v1093 fuer die Jahrgaenge; Lageklassen laufen hinein wie sie.
+
+     Also werden die Lagevarianten ZUERST ausgesiebt, und `zweigWaehlen`
+     sieht danach hoechstens einen Satz je Zweig. */
+  const mitLage = reg.filter((s) => ((s.geltungsbereich || {}).lage));
+  if (mitLage.length) {
+    const gewuenscht = String(o.lage || o.lageklasse || '').trim().toLowerCase();
+    const lagen = [...new Set(mitLage.map((s) => s.geltungsbereich.lage))];
+    const behalten = gewuenscht
+      ? reg.filter((s) => {
+          const l = (s.geltungsbereich || {}).lage;
+          return !l || String(l).trim().toLowerCase() === gewuenscht;
+        })
+      : [];
+    /* Ohne Lage, oder mit einer, die es hier nicht gibt: KEIN Wert.
+       Irgendeinen Satz zu nehmen faellt niemandem auf - ein Faktor mit
+       falscher Lage sieht aus wie einer mit richtiger. An Goslar reicht
+       dieselbe Stellung je nach Lage von 1,36 bis 1,00.
+
+       Die Lage ist bestimmbar, nicht zu raten: BORIS gibt zur Anschrift
+       `Gemarkungsnummer` und `Gemeindesname` zurueck, und die
+       Ausschuesse veroeffentlichen die Zuordnung selbst. */
+    if (!behalten.length || !behalten.some((s) => (s.geltungsbereich || {}).lage)) {
+      return {
+        verfuegbar: false,
+        grund: gewuenscht ? 'lage_unbekannt' : 'lage_noetig',
+        hinweis: 'Dieser Gutachterausschuss staffelt den Sachwertfaktor nach '
+          + 'Lageklassen, und sie liegen weit auseinander. '
+          + (gewuenscht
+              ? 'Die angegebene Lage „' + (o.lage || o.lageklasse) + '" ist hier nicht geführt. '
+              : 'Ohne die Lage lässt sich nicht entscheiden, welcher Faktor gilt. ')
+          + 'Geführt werden: ' + lagen.join(' · ') + '. '
+          + 'Eine geratene Lage wäre teurer als gar kein Wert.',
+        ausschuss: mitLage[0].gaa_name || null,
+        lagen,
+        lage_zuordnung: (mitLage[0].geltungsbereich || {}).zuordnung || null,
+      };
+    }
+    reg.length = 0; behalten.forEach((s) => reg.push(s));
+  }
+
   const gefuehrt = reg.map((x) => String(x.zweig || '').toLowerCase());
   let satz = zweigWaehlen(reg, gefuehrt, o.zweig || o.objektart,
                           o.baujahr || o.build_year);   /* v1088-WBJ */
 
-  /* ═══ v1623 · MEHRERE SAETZE JE ZWEIG SIND LAGEKLASSEN ═══════════════
-     Solange es je (ags, zweig) einen Satz gab, war die Auswahl trivial.
-     Die niedersaechsische Ernte liefert MEHRERE — einen je Lageklasse,
-     und sie liegen weit auseinander: an Goslar reicht dieselbe Stellung
-     je nach Lage von 1,36 bis 1,00, an Helmstedt tragen die Lagen ihren
-     Koeffizienten selbst (1,08 gegen 0,93).
-
-     Irgendeinen davon zu nehmen faellt NIEMANDEM auf — ein Faktor mit
-     falscher Lage sieht aus wie einer mit richtiger. Deshalb wird hier
-     lieber nichts geliefert und gesagt, was fehlt.
-
-     Die Lage ist bestimmbar, nicht zu raten: BORIS gibt zur Anschrift
-     `Gemarkungsnummer` und `Gemeindesname` zurueck (41 Felder, gemessen
-     am 26.09.2026), und die Ausschuesse veroeffentlichen die Zuordnung
-     selbst. */
-  if (satz) {
-    const zl = String(satz.zweig || '').toLowerCase();
-    const zweigSaetze = reg.filter((s) => String(s.zweig || '').toLowerCase() === zl);
-    if (zweigSaetze.length > 1) {
-      const gewuenscht = String(o.lage || o.lageklasse || '').trim().toLowerCase();
-      const treffer = gewuenscht
-        ? zweigSaetze.find((s) => String(((s.geltungsbereich || {}).lage) || '')
-                                    .trim().toLowerCase() === gewuenscht)
-        : null;
-      if (!treffer) {
-        const lagen = zweigSaetze
-          .map((s) => ((s.geltungsbereich || {}).lage) || null).filter(Boolean);
-        return {
-          verfuegbar: false,
-          grund: gewuenscht ? 'lage_unbekannt' : 'lage_noetig',
-          hinweis: 'Dieser Gutachterausschuss staffelt den Sachwertfaktor nach '
-            + 'Lageklassen, und sie liegen weit auseinander. '
-            + (gewuenscht
-                ? 'Die angegebene Lage „' + (o.lage || o.lageklasse) + '" ist hier nicht geführt. '
-                : 'Ohne die Lage lässt sich nicht entscheiden, welcher Faktor gilt. ')
-            + 'Geführt werden: ' + lagen.join(' · ') + '. '
-            + 'Eine geratene Lage wäre teurer als gar kein Wert.',
-          ausschuss: zweigSaetze[0].gaa_name || null,
-          zweig: satz.zweig,
-          lagen,
-          lage_zuordnung: (zweigSaetze[0].geltungsbereich || {}).zuordnung || null,
-        };
-      }
-      satz = treffer;
-    }
-  }
 
   if (!satz) {
     return { verfuegbar: false, grund: 'objektart_nicht_abgeleitet',
