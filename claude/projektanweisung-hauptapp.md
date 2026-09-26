@@ -19164,3 +19164,119 @@ in EINER SEKUNDE „fertig", obwohl erst eine von vier Lagen drinsteht.
   39 Commits offen, **keine Migration**. Der Merge auf `main` wurde vom
   Sicherheitsfilter abgewiesen („Production Deploy") — er braucht eine
   Freigabe im Werkzeug, nicht im Projekt.
+
+## Rollout-Journal 26.09.2026 (7) — fünf Layouts in der echten App
+
+**Commits.** `5b38c46` (v1635), `f119a16`/`f4db885`/`e88c10a`/`ec96bf0`
+(v1635b–e), `60aed83` (v1636), `d49f425`/`187b6c0` (v1636b/c).
+Vorher: `939db84` (Demo `frontend/entwurf-hell-bankfaehig.html`).
+
+### Die Bauweise: nichts nachgebaut
+
+`js/layout-varianten.js` erzeugt **keine zweite Oberfläche**. Es
+verschiebt die VORHANDENEN Knoten — Reiterleiste, Aktionsmenü,
+Nutzerblock — und lässt `css/layout-varianten.css` den Rest ordnen.
+
+> Ein nachgebautes Menü hätte am ersten Tag dieselben Einträge und am
+> dreissigsten nicht mehr. `appendChild` VERSCHIEBT; Ereignishorcher,
+> Datensätze und Zustände bleiben am Knoten. Deshalb sind in allen fünf
+> Layouts **alle zwölf Aktionen, Nutzer, Plan, Abmelden, Rundgang und
+> Support** da, ohne dass eine davon hier genannt wird.
+
+Zu jedem verschobenen Knoten ist **Elternteil UND nächstes Geschwister**
+gemerkt. Ohne das Geschwister landet ein Knoten beim Zurückstellen am
+Ende und die Reihenfolge kippt still.
+
+Der helle Grund kommt vom vorhandenen `body.dp-chrome-hell` (103
+geprüfte Regeln), das beim Umschalten mitgesetzt wird — keine zweite
+Hellfassung.
+
+### Gemessen: aus 189 px wurden 86
+
+| | heute | Layout |
+|---|---:|---:|
+| Kopfband | 189 px | **86 px** |
+| KPI-Block | 141 px | **37 px** |
+| eine KPI-Kachel | 93 px | **27 px** |
+| grosser Score | da | weg, `#hdr-score-mini` tritt an |
+
+**`#hdr-score-mini` gibt es seit jeher** — er war nur leer. Marcels
+„brauchen wir nicht gross oben … wäre aber gut, wenn man ihn noch
+irgendwo stehen hätte" war damit schon gebaut, nur nie benutzt.
+
+### Vier Fehler, und was sie lehren
+
+**1. `.app-wrap` ist ein GRID, kein Flex.** Mit `position:fixed`
+verschwindet die Objektspalte aus dem Fluss — **nicht aus dem Raster**.
+Die Hauptspalte rutschte in die 380-px-Spur und war 380 statt 1499 px
+breit.
+> Eine Spur bleibt stehen, auch wenn ihr Kind sie verlässt. Das Raster
+> gehört dem Elternteil, nicht dem Kind.
+
+**2. Die Grundregel schlug die Sonderregel.**
+`html[data-dp-layout] .dpl-schiene` ist (0,2,1),
+`.dpl-schiene[data-stellung="leiste"]` nur (0,2,0) — die
+Werkbank-Leiste blieb eine Spalte und war 144 statt 48 px hoch.
+**20 Stellen nachgezogen.** Genau die Falle aus `CLAUDE.md`.
+
+**3. Eine Regel am Elternteil ordnet nicht, was im Kind steht.** Der
+Aktionsblock hat einen inneren Behälter `.sb-actions-accordion-inner`;
+meine Zeilenregel am äusseren Knoten bewirkte nichts.
+
+**4. Eine falsche Diagnose, ausdrücklich zurückgenommen.** Ich hielt
+`transform` für von `style.css` überstimmt, weil `getComputedStyle` die
+Einheitsmatrix zurückgab — **auch bei INLINE gesetztem Wert**. Der
+Kaskaden-Walker fand aber keinen Überstimmer, und mit `transition:none`
+sass der Wert sofort bei −367 px.
+> **Der Tab lief im Hintergrund.** In einem versteckten Tab friert
+> Chrome jeden CSS-Übergang beim STARTWERT ein — die Messung zeigte
+> nicht den Zielzustand, sondern das erste Einzelbild eines Übergangs,
+> der nie weiterlief. `visibilityState` gehört vor JEDE Messung an einer
+> Animation. Das `!important` aus v1635c steht noch da; es schadet
+> nicht, löst aber nicht das Problem, für das ich es gesetzt habe.
+
+### Die Rückfrage vor dem Export (v1636)
+
+Marcel: „beim Bankexport müssen wir nachfragen, hell oder dunkel — da
+gibt's ja auch noch Abstufungen."
+
+**Gemessen, welche es wirklich gibt:** `window._dpPdfLight` (`pdf.js:600`,
+Vorgabe `false`) und `_cv(dunkel, hell)` an **13 Fundstellen**;
+`pdf-investment-bank.js` kennt den Schalter mit **null** Fundstellen.
+Daraus folgt genau eine Aufteilung — und **keine erfundene vierte**:
+
+| Fassung | was |
+|---|---|
+| **Bankfassung** | weisses Papier, immer hell |
+| **Investment-PDF · hell** | volles Dokument, helles Deckblatt |
+| **Investment-PDF · Obsidian** | volles Dokument, dunkles Deckblatt |
+
+Die beiden Exportfunktionen werden **umhüllt, nicht ersetzt**: jeder
+bestehende Aufrufer (Seitenmenü, Deal-Aktion, Dashboard-Karte,
+`hybrid-aktionen`) bekommt die Frage, ohne dass eine Aufrufstelle
+angefasst wurde.
+> Eine Umhüllung erreicht Aufrufer, die man noch gar nicht kennt. Eine
+> geänderte Aufrufstelle erreicht genau eine.
+
+Der Schalter gilt nur für DIESEN Export und geht danach auf den Stand
+des Mandanten zurück — ein Schalter, der stehen bleibt, färbt den
+nächsten Export mit, den niemand gewählt hat.
+
+### Abnahme (im Browser gemessen, Übergänge abgeschaltet)
+
+Alle fünf: Kopf 86 px · 9 Reiter sichtbar · 12 Aktionen sichtbar ·
+Nutzerblock und Abmelden da · Support und Rundgang da · **kein
+Querüberlauf**. Reiterwechsel über den echten Bedienweg geprüft
+(Objekt → Finanzierung). Export-Rückfrage erscheint mit drei Fassungen.
+
+**Umschalten:** `?layout=1..5`, oder der Umschalter unten links
+(bleibt sichtbar, sobald er einmal über die URL kam).
+
+**Rest.**
+- In **v5** bleibt das Aktionsmenü zugeklappt wie heute — dort ist die
+  heutige Bedienung ausdrücklich das Ziel.
+- Der alte **Kartenvarianten-Schalter** (v1517) erscheint jetzt
+  mit, weil die Layouts den hellen Skin setzen und er nur dort
+  auftaucht. Er ist ein eigenes Werkzeug und lässt sich schliessen.
+- Ein Layout für das Handy ist noch nicht gebaut; unter 900 px fallen
+  die Schienen in den Fluss zurück.
