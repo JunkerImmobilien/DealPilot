@@ -370,7 +370,22 @@ async function ernteGebiet(browser, wb, ags, name) {
          frueh: ich hielt Goslar fuer zu GROSS (ich hatte die 24
          Eintraege der Gemarkungstabelle fuer 24 Lagen gehalten - es
          sind VIER). Es war nie die Menge, es war ein Haenger. */
-      await mitFrist((async () => {
+      const _erg = await mitFrist((async () => {
+      /* ── DIE ABGELAUFENE ARBEIT DARF NICHTS MEHR SCHREIBEN ─────────
+         `mitFrist` BRICHT NICHT AB - es gewinnt nur den Wettlauf. Die
+         unterlegene Arbeit laeuft weiter und schrieb bis hierher
+         munter in `satz` hinein. GEMESSEN an Goslar-Reihenhaus: der
+         Satz meldete "1 von 4 Lagen" UND alle vier als ausgefallen,
+         dazu 43 Punkte, alle leer - ein Gitter, das eine abgelaufene
+         Lage nachtraeglich hineingeschrieben hatte.
+
+         Eine Frist, die den Verlierer weiterschreiben laesst, ist
+         SCHLIMMER als keine: sie erzeugt Daten, die niemand bestellt
+         hat, und zwar genau dort, wo gerade ein Fehler vermerkt wurde.
+
+         Deshalb sammelt dieser Block alles LOKAL und gibt es zurueck.
+         Uebernommen wird es erst draussen, nach erfolgreichem await. */
+      let ln = 0, lleer = 0, lverriegelt = 0, lstreuung = null;
       await mitFrist(T.setzeAuswahl(seite, lage.i, li), 30000, 'Lage umstellen');
       await seite.waitForTimeout(1600);
       /* Die Lage EINMAL je Block nachweisen, statt bei jedem Punkt.
@@ -412,7 +427,7 @@ async function ernteGebiet(browser, wb, ags, name) {
             if (z.brw === b && z.sachwert === s) {
               r = faktorAus(bild); break;
             }
-            verriegelt++;
+            lverriegelt++;
             /* Ansteigend warten: der Kalkulator braucht nach einem
                Lagewechsel spuerbar laenger als nach einer Zahl. */
             await seite.waitForTimeout(700 + versuch * 600);
@@ -420,13 +435,17 @@ async function ernteGebiet(browser, wb, ags, name) {
           /* Kein passendes Bild = LUECKE, keine Zahl. Lieber ein Loch im
              Gitter, das man sieht, als ein Wert, der keiner ist. */
           tafel[b].push(r.faktor);
-          if (r.faktor == null) leer++;
-          if (satz.streuung == null && r.streuung != null) satz.streuung = r.streuung;
-          n++;
+          if (r.faktor == null) lleer++;
+          if (lstreuung == null && r.streuung != null) lstreuung = r.streuung;
+          ln++;
         }
       }
-      satz.gitter[lagen[li]] = tafel;
+      return { tafel, ln, lleer, lverriegelt, lstreuung };
       })(), LAGE_FRIST, `Lage "${lagen[li]}" insgesamt`);
+      /* Erst hier - und nur hier - wandert das Ergebnis in den Satz. */
+      satz.gitter[lagen[li]] = _erg.tafel;
+      n += _erg.ln; leer += _erg.lleer; verriegelt += _erg.lverriegelt;
+      if (satz.streuung == null && _erg.lstreuung != null) satz.streuung = _erg.lstreuung;
       /* Sofort sichern. Eine fertige Lage muss eine Zeitgrenze
          ueberleben - sonst erntet der naechste Lauf dasselbe noch
          einmal und scheitert an genau derselben Stelle. */
