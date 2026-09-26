@@ -262,3 +262,40 @@ body:not(.dp-chrome-hell) .dp-pfbar .dp-pf-led{ background:#2A2622 !important; }
    loescht diese eine Regel. */
 .dp-pfbar .dp-pf-tile[data-src="spr"],
 .dp-pfbar .dp-pf-tile[data-src="ph"]{ display:none !important; }
+
+/* ═══ DAS QUICK-BOARDING-COCKPIT ════════════════════════════════════
+   Marcel: „im Quick Check … dass du das so umbaust, dass sich das
+   aehnelt" - gemeint sind die Score-Karten im Reiter Bewertung, die
+   seit v1640 dauerhaft weiss sind.
+
+   GEMESSEN: `#qb-bp` ist rgb(10,10,10), 1320x277. Sein rechter Abriss
+   `#qb-stub` war schon weiss - die Karte war also ohnehin zweifarbig.
+   Jetzt wird der linke Teil nachgezogen, mit derselben Grammatik wie
+   `.dpsh-pass`: weisser Koerper, Haarlinie, und das Kopfband als
+   EINZIGER Farbakzent.
+
+   Der Verlauf traegt die Whitelabel-Token, faerbt sich beim Mandanten
+   also mit. */
+#qb-bp{
+  background:#FFFFFF !important;
+  border:1px solid #E6E0D3 !important;
+  box-shadow:0 1px 2px rgba(42,39,39,.05) !important;
+  color:#1A1A18 !important;
+}
+#qb-bp .qb-main{ background:#FFFFFF !important; color:#1A1A18 !important; }
+#qb-bp .ghead{
+  background:linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A),
+    var(--wl-c9a84c, #C9A84C) 55%, var(--wl-b8932f, #b8932f)) !important;
+  color:#141210 !important;
+}
+#qb-bp .ghead *{ color:#141210 !important; }
+/* Die Textklassen, die gemessen hell gesetzt waren. Einzeln benannt -
+   ein Sammelselektor auf alle Kinder wuerde auch die Balken und den
+   Zeiger des Tachos treffen, und die tragen Statusfarben. */
+#qb-bp .mbody, #qb-bp .kt, #qb-bp .k, #qb-bp .r,
+#qb-bp .cbars, #qb-bp .cb, #qb-bp .dialwrap,
+#qb-bp .qcb-hinweis, #qb-bp .qcb-hinweis-satz,
+#qb-bp .qcb-rechenweg, #qb-bp .qcb-rows,
+#qb-bp .mbody b, #qb-bp .kt b{ color:#1A1A18 !important; }
+#qb-bp .qcb-hinweis{ background:#F7F5F1 !important; }
+#qb-bp .contrail{ opacity:.25 !important; }
