@@ -18904,3 +18904,157 @@ Die BORIS-Antwort traegt **41 Felder**, darunter `Gemarkungsnummer`
 - `ni-lageachse.csv`: Luechow-Dannenberg faellt korrekt mit „keine
   Lage-Auswahl" heraus — es hat nur ein Zahlenfeld `Lagewert`. Der
   Erkenner hat damals das Wort „Lage" darin getroffen.
+
+## Rollout-Journal 26.09.2026 (5) — der Ernter laeuft, das Bank-PDF war tot
+
+**Commits.** `c444104`, `e08f096`, `cabaebe` (Ernter), `c938973`
+(`rezept2register`), `c4f416d`/`7bc60ff`/`d800cb3` (v1624/v1626 Lage aus
+BORIS), `1c343ef` (v1627), `95125a1`/`72c4dc6`/`f...` (v1628–v1628c),
+`a84b4ba` (v1629), `efc7550` (v1630), `e47b84a` (v1631), `98ccf3b`
+(v1632).
+
+### Das Investment-PDF entstand gar nicht
+
+Marcel: „das kann ich nicht downloaden oder speichern." Gemessen im
+Browser wirft der Export
+
+```
+Type of text must be string or Array. 17.915702160493826
+```
+
+und bricht ab, **bevor `doc.save()` erreicht wird**. Es war kein
+Download-Problem — die Datei entstand nicht.
+
+**Ursache:** `pdf-investment-bank.js` hatte **zwei Funktionen namens
+`zahl`** — Z. 80 den Formatierer (gibt eine Zeichenkette), Z. 254 den
+Parser (gibt eine Zahl). Bei gleichnamigen Funktionsdeklarationen im
+selben Bereich gewinnt die **spaetere**. Der Formatierer war seit v1436
+tot, jeder Aufruf landete beim Parser, und das zweite Argument
+(Nachkommastellen) wurde verschluckt.
+
+> **Der Schaden war groesser als die zwei Abstuerze.** Wo das Ergebnis
+> mit einer Zeichenkette verkettet wurde („10" + " Jahre"), fiel nichts
+> auf — dort stand die Zahl nur unformatiert: `41460` statt `41.460`,
+> und `17.915702160493826` statt `17,9`. **Das waren Marcels
+> „Rundungsfehler mit 10 bis 12 Nachkommastellen"** — keine Rundung,
+> sondern ein toter Formatierer. Nur die zwei Stellen, die den Wert
+> DIREKT an `doc.text` gaben, stuerzten ab. Ein Fehler, der meistens
+> nur haesslich ist und zweimal toedlich.
+
+Der Formatierer heisst jetzt `fmt`, der Parser behaelt `zahl`; 25
+Anzeigestellen umgestellt.
+
+> **Und eine Lehre ueber das Messen:** meine erste Erhebung der
+> Aufrufstellen lief durch `head -30` und fand 14 von 20. **Eine
+> Messung mit `head()` ist keine Messung** — sie sagt „so viele habe
+> ich angesehen", nicht „so viele gibt es". Die sechs fehlenden waeren
+> unformatiert stehen geblieben.
+
+### Zwei E-Mail-Adressen in einem Dokument fuer die Bank
+
+Marcel fand im selben PDF **seine Firma neben `info@dealpilot.immo`**.
+Ursache war `JUNKER_DEFAULTS` in `config.js`: eine Vorgabe, die fuer
+alle Plaene ausser Pro eingesetzt wurde und im Pro-Plan **jedes leere
+Feld einzeln** fuellte. Wer die Firma eingetragen hatte, aber keine
+E-Mail, bekam seine Firma und unsere Adresse.
+
+Die Vorgabe mischte drei Identitaeten: company „Junker Immobilien",
+email `info@dealpilot.immo`, website `junker-immobilien.io`.
+
+**Marcels Entscheidung:** „wenn es nicht angegeben wird, steht keine
+E-Mail drin. Das erstellt der User ja fuer sich. Gibt er keine Daten
+an, steht nix drauf." Die Vorgabe ist damit **ganz raus** — `config.js`
+gibt `LEERER_ABSENDER` zurueck, sechs weitere Stellen (`pdf.js`,
+`pdf-anlage-bmf.js` 2×, `pdf-kaufpreisaufteilung.js`,
+`pdf-investment-bank.js`) haben ihren `|| 'DealPilot'` verloren.
+
+> **Ein Absenderblock ist eine BEHAUPTUNG darueber, wer das Dokument
+> verschickt.** Wer nichts angibt, behauptet nichts; eine eingesetzte
+> Vorgabe behauptet an seiner Stelle etwas Falsches. Der PRODUKTNAME
+> bleibt, wo er hingehoert — „KI-Analyse via DealPilot" sagt, WOMIT
+> gerechnet wurde, nicht WER sendet.
+>
+> **Nicht angefasst: das Plan-Gating.** Wer nicht Pro ist, bekommt
+> weiterhin kein eigenes Branding — er bekommt jetzt nur eben auch
+> keines von uns. Ob ein Nicht-Pro-Nutzer seine Daten sehen darf, ist
+> eine Preisentscheidung und gehoert Marcel.
+
+### Der Konfigurator und der Objekt-Tab kannten sich nicht
+
+Marcel: „die Angaben im Modal am Anfang kann man im Tab Objekt nochmal
+angeben. Ist das nicht doppelt?" **Ja — und schlimmer als doppelt.**
+
+| | Modal | Objekt-Tab |
+|---|---|---|
+| fragt | dieselben acht Anlage-2-Gewerke | `mod_dach` … `mod_grundriss` |
+| liest die andere Seite | **nie** | — |
+| schreibt zurueck | nur `mod_punkte` (die Summe) | — |
+
+Und sie speisen **verschiedene Verbraucher**: `mod_punkte` geht an
+gutachten-org, storage, voice-import; `mod_dach` & Co. an den
+RND-Assistenten, das RND-Gutachten (PDF/DOCX), das BMF-Modal und
+deal-action. **Wer den Konfigurator benutzte, hatte im RND-Gutachten
+leere Gewerke** — die Summe stimmte, die Herleitung fehlte. Das faellt
+erst im fertigen Gutachten auf.
+
+Jetzt: `ausObjektVorbelegen()` beim Oeffnen, `inObjektZurueck()` beim
+Uebernehmen.
+
+> **Die Skalen sind verschieden fein und decken sich nur in den
+> PUNKTEN** (`rnd-wizard.js:890` gegen `mfh-einheiten.js:51`).
+> Zurueckgeschrieben wird deshalb nur, was sich im PUNKTWERT
+> unterscheidet: stand im Objekt-Tab „5 - 10 Jahre" (Dach 3) und der
+> Nutzer hat die Vorbelegung nicht angeruehrt, bleibt es stehen —
+> sonst wuerde eine feinere Angabe still vergroebert.
+
+### Das Modal sah zweimal falsch aus, weil ich es nachgebaut habe
+
+Marcel musste **zweimal** sagen, dass der MFH-Konfigurator nicht wie das
+Einstellungen-Modal aussieht. Beim ersten Mal hatte ich eine
+Markenleiste als `::before` **nachgebaut**, statt den vorhandenen
+`.dp-modal-topband` zu benutzen. Erst als ich das offene Modal im
+Browser ausgelesen habe, war es zu sehen.
+
+> **Das colgroup hatte elf Eintraege, die Tabelle zwoelf Spalten** —
+> mein eigener Zaehlfehler. Die letzte Zelle bekam 0 px, die Knoepfe
+> quollen seitlich heraus, und genau das hatte Marcel gemeldet
+> („bei den Einheiten muss man seitlich scrollen"). Auch das fand erst
+> die Messung am offenen Modal.
+
+### Der Ernter steht
+
+`tools/swf-register/ernter/` — Tableau-Dashboards des niedersaechsischen
+Gutachterausschusses werden Punkt fuer Punkt abgefragt, der Faktor aus
+dem **gerenderten SVG** gelesen und gegen den zurueckgemeldeten Zustand
+(BRW, Sachwert, Lage) verriegelt.
+
+Drei Fallen, alle teuer:
+
+- **Tableau stirbt kopflos ohne Gebietsschema** — `RangeError: Incorrect
+  locale information provided`. `locale:'de-DE'` und
+  `timezoneId:'Europe/Berlin'` sind Pflicht.
+- **Mein eigenes `Escape` setzte den eingegebenen Wert zurueck** — der
+  Dashboard-Hinweistext sagt das selbst. 13 Loecher wurden mit
+  laengerem Warten zu 11 und mit `blur()` statt `Escape` zu **null**.
+  *Wartezeit zu erhoehen ist keine Diagnose.*
+- **`saveAs()` und `page.evaluate()` haben in Playwright KEINE Frist.**
+  Beide haben Laeufe haengen lassen; `evaluate` war der eigentliche
+  Taeter (Northeim hing noch MIT dem saveAs-Fix). Jetzt laeuft jedes
+  Gebiet in einem eigenen Container mit `timeout --signal=KILL 900`.
+
+**Erster Durchgang:** 10 Gebiete geerntet, 5 an der Zeitgrenze
+abgebrochen, 2 mit Grund ausgefallen. Holzminden-RH lieferte 20 Punkte,
+**alle leer** — die Datei wurde weggenommen und neu versucht.
+
+> **Eine Ernte ohne einen einzigen Wert ist keine Ernte.** Sie sieht im
+> Verzeichnis aus wie eine — gleicher Name, gleiche Struktur — und
+> wuerde beim naechsten Lauf uebersprungen. `gitterBefund()` weist
+> solche Gitter ab, bevor ein Rezept daraus wird.
+
+**Rest.**
+- Zweiter Durchgang der abgebrochenen Gebiete laeuft.
+- Danach `ernte2rezept.mjs` → `rezept2register.mjs --schreiben` →
+  ausrollen → Kettenpruefung.
+- Produktion ist wieder hinter Staging — braucht Freigabe.
+- Marcels eigenes Profil: seine E-Mail steht im **Namensfeld**, eine
+  PDF-E-Mail ist nicht gesetzt. Seine Daten, er zieht das nach.
