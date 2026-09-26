@@ -1,0 +1,613 @@
+<title>Heller Modus — fünf Entwürfe</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@500;600&display=swap">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   HELLER MODUS — BANKFÄHIG · fünf Entwürfe
+   Marcel, 26.09.2026: „eine schöne, bankfähige, auch für Steuerberater,
+   seriöse Version im helleren Design, wo der Arbeitsbereich ungefähr
+   gleich bleibt. Aber die ganzen Menüs können sich alle ändern."
+
+   ── WAS GEMESSEN WURDE, BEVOR ICH GEZEICHNET HABE ────────────────────
+   Am laufenden Staging-Stand (v1634b, 1707×917):
+
+     header.hdr      189 px hoch      <- das ist das Problem
+     nav.tabs         44 px
+     aside.sidebar   380 px breit
+     Boarding-Pass   danach nochmal eine Bande
+     Arbeitsfläche   beginnt erst bei rund 300 px
+
+   Fast ein Drittel der Höhe ist verbraucht, bevor die erste Eingabe
+   kommt. Genau das liest ein Banker oder Steuerberater als „Werkzeug für
+   Anleger", nicht als Arbeitsgerät.
+
+   ── WORAN SERIOSITÄT HÄNGT (und woran nicht) ─────────────────────────
+   Nicht an weniger Farbe. An diesen vier Dingen:
+
+   1. WENIGER EBENEN ÜBEREINANDER. Heute: Kopfband, KPI-Kacheln,
+      Reiterleiste, Bordkarte, Abschnittskopf — fünf, bevor etwas
+      passiert. Ein Gutachten hat Kopf und Inhalt.
+   2. HAARLINIEN STATT FLÄCHEN. Ränder trennen, Füllungen betonen. Wer
+      alles füllt, betont nichts.
+   3. ZAHLEN IN EINER MONO-SCHRIFT, rechtsbündig, gleiche Stellenzahl.
+      Daran erkennt ein Prüfer eine Tabelle, die stimmt.
+   4. GOLD ALS LINIE, NICHT ALS FLÄCHE. Ein Millimeter Gold am aktiven
+      Reiter wirkt teurer als eine goldene Kachel.
+
+   ── WAS IN JEDEM ENTWURF GLEICH BLEIBT ───────────────────────────────
+   Die Arbeitsfläche. Dieselben Felder, dieselbe Zweispaltigkeit,
+   dieselben Abschnitte — damit VERGLEICHBAR ist, was sich drumherum
+   ändert. Wer die Entwürfe durchschaltet, sieht nur den Rahmen wechseln.
+
+   ── DER INVESTOR DEAL SCORE ──────────────────────────────────────────
+   Marcel: „brauchen wir nicht groß oben anzeigen … wäre aber gut, wenn
+   man ihn noch irgendwo stehen hätte."  Jeder Entwurf löst das anders —
+   das ist bewusst, denn das ist die eigentliche Frage.
+
+   Marken-Token aus CLAUDE.md: Obsidian #050505 · Gold #C9A84C
+   (hell #E8CC7A, dunkel #b8932f) · Grün #3FA56C · Rot #B8625C
+   Creme #FDFCFA · Karte #FBF6E9
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root{
+  --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+  --obsidian:#050505; --gruen:#3FA56C; --rot:#B8625C;
+
+  /* Heller Satz. Papier ist nicht weiss - reines Weiss flimmert. */
+  --papier:#FDFCFA;        /* Grund */
+  --flaeche:#FFFFFF;       /* Karten, Felder */
+  --karte:#FBF6E9;         /* warme Hervorhebung, sparsam */
+  --grau:#F4F2ED;          /* Nebenflaechen, Kopfleisten */
+  --linie:#E6E1D6;         /* Haarlinie */
+  --linie-stark:#CEC6B6;   /* Abschluss, Tabellenkopf */
+  --tinte:#1A1A18;         /* Text */
+  --leise:#6B645A;         /* Beschriftung */
+  --sehr-leise:#9A9287;    /* Einheit, Hinweis */
+
+  --disp:'Space Grotesk', system-ui, sans-serif;
+  --mono:'JetBrains Mono', ui-monospace, monospace;
+  --body:'Inter', system-ui, sans-serif;
+  --serif:'Cormorant Garamond', Georgia, serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#E8E5DE;color:var(--tinte);font-family:var(--body);
+  line-height:1.55;-webkit-font-smoothing:antialiased;font-size:15px}
+
+/* ── Rahmen der Schau ────────────────────────────────────────────── */
+.schau{max-width:1560px;margin:0 auto;padding:28px 20px 90px}
+.schau h1{font-family:var(--disp);font-size:26px;font-weight:700;margin:0 0 6px;letter-spacing:-.02em}
+.schau .vor{color:#5A554C;max-width:74ch;margin:0 0 22px;font-size:14.5px}
+.schau .vor b{color:var(--tinte)}
+
+.waehler{position:sticky;top:0;z-index:50;display:flex;gap:6px;flex-wrap:wrap;
+  background:#E8E5DE;padding:10px 0 12px;margin-bottom:4px;border-bottom:1px solid #D3CFC6}
+.waehler button{font-family:var(--mono);font-size:11px;letter-spacing:.08em;
+  text-transform:uppercase;padding:8px 13px;border:1px solid var(--linie-stark);
+  background:var(--flaeche);color:var(--leise);cursor:pointer;border-radius:2px}
+.waehler button:hover{border-color:var(--gold-lo);color:var(--tinte)}
+.waehler button[aria-pressed="true"]{background:var(--obsidian);color:#F2EDE3;
+  border-color:var(--obsidian)}
+
+.block{margin:30px 0 0}
+.block > h2{font-family:var(--disp);font-size:19px;margin:0 0 3px;letter-spacing:-.01em}
+.block > .warum{color:#5A554C;font-size:14px;margin:0 0 6px;max-width:82ch}
+.block > .fuer{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--sehr-leise);margin:0 0 14px}
+.block > .fuer b{color:var(--gold-lo);font-weight:500}
+
+/* Der Bildschirm, in dem jeder Entwurf steckt. */
+.geraet{background:var(--papier);border:1px solid var(--linie-stark);
+  border-radius:3px;overflow:hidden;box-shadow:0 1px 0 rgba(0,0,0,.05),0 12px 34px -20px rgba(0,0,0,.4);
+  height:660px;display:flex;flex-direction:column;font-size:13px}
+
+/* ═══ GEMEINSAME BAUTEILE ═══════════════════════════════════════════ */
+.wm{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;white-space:nowrap}
+.wm i{font-style:normal;color:var(--gold-lo)}
+
+.mk{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--sehr-leise)}
+
+/* Arbeitsflaeche - in JEDEM Entwurf identisch */
+.arbeit{flex:1;overflow:auto;padding:20px 24px 30px;background:var(--papier)}
+.arbeit h3{font-family:var(--disp);font-size:17px;margin:0 0 2px;font-weight:600}
+.arbeit .unter{color:var(--leise);font-size:12.5px;margin:0 0 18px}
+.raster{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.kasten{background:var(--flaeche);border:1px solid var(--linie);border-radius:2px;padding:14px 16px 16px}
+.kasten > .kopf{display:flex;align-items:center;gap:8px;padding-bottom:9px;margin-bottom:12px;
+  border-bottom:1px solid var(--linie)}
+.kasten > .kopf .mk{color:var(--leise)}
+.kasten > .kopf::before{content:'';width:3px;height:11px;background:var(--gold);flex:0 0 auto}
+.feldpaar{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.feld{margin-bottom:10px}
+.feld label{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--sehr-leise);margin-bottom:4px}
+.feld .ein{border:1px solid var(--linie);background:var(--flaeche);border-radius:2px;
+  padding:6px 9px;font-size:13px;min-height:30px;display:flex;align-items:center;
+  justify-content:space-between;color:var(--tinte)}
+.feld .ein.z{font-family:var(--mono);justify-content:flex-end;font-variant-numeric:tabular-nums}
+.feld .ein .eh{color:var(--sehr-leise);font-size:11px;margin-left:8px;font-family:var(--mono)}
+.feld .ein.w::after{content:'▾';color:var(--sehr-leise);font-size:10px}
+
+/* Kennzahlen als ZEILE, nicht als Kachelwand */
+.kz-zeile{display:flex;align-items:stretch;border:1px solid var(--linie);
+  background:var(--flaeche);border-radius:2px;overflow:hidden}
+.kz{flex:1;padding:7px 12px;border-right:1px solid var(--linie);min-width:0}
+.kz:last-child{border-right:0}
+.kz .n{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--sehr-leise);display:block;margin-bottom:1px}
+.kz .v{font-family:var(--mono);font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+.kz .v.g{color:#2E8455} .kz .v.r{color:var(--rot)}
+
+/* Der Score - klein, aber da */
+.score-chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--linie-stark);
+  background:var(--flaeche);border-radius:2px;padding:4px 10px 4px 5px;cursor:pointer}
+.score-chip .ring{width:26px;height:26px;border-radius:50%;flex:0 0 auto;
+  background:conic-gradient(var(--gold) 0 79%, var(--linie) 79% 100%);
+  display:grid;place-items:center;position:relative}
+.score-chip .ring::after{content:'79';position:absolute;inset:3px;border-radius:50%;
+  background:var(--flaeche);display:grid;place-items:center;
+  font-family:var(--mono);font-size:10px;font-weight:700;color:var(--tinte)}
+.score-chip .tx{line-height:1.15}
+.score-chip .tx b{display:block;font-size:11.5px;font-weight:600}
+.score-chip .tx span{font-family:var(--mono);font-size:8.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--sehr-leise)}
+
+.pille{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;padding:2px 7px;border:1px solid var(--linie-stark);
+  border-radius:1px;color:var(--leise);background:var(--grau)}
+.pille.gut{color:#2E8455;border-color:#B8DCC7;background:#F0F8F3}
+
+/* Aktionen */
+.akt{display:flex;align-items:center;gap:7px;padding:6px 10px;border:1px solid var(--linie);
+  background:var(--flaeche);border-radius:2px;font-size:12px;cursor:pointer;white-space:nowrap}
+.akt:hover{border-color:var(--gold-lo)}
+.akt .i{width:15px;text-align:center;color:var(--gold-lo);font-size:12px}
+.akt.haupt{background:var(--obsidian);color:#F2EDE3;border-color:var(--obsidian)}
+.akt.haupt .i{color:var(--gold-hi)}
+
+/* Reiter, waagerecht */
+.reiter{display:flex;gap:0;background:var(--flaeche);border-bottom:1px solid var(--linie);
+  padding:0 16px;flex:0 0 auto;overflow-x:auto}
+.reiter a{padding:9px 13px 8px;font-size:12.5px;color:var(--leise);text-decoration:none;
+  border-bottom:2px solid transparent;white-space:nowrap}
+.reiter a.an{color:var(--tinte);font-weight:600;border-bottom-color:var(--gold)}
+.reiter a:hover{color:var(--tinte)}
+
+/* Objektwaehler im Kopf */
+.ow{display:flex;align-items:center;gap:9px;border:1px solid var(--linie);
+  background:var(--flaeche);border-radius:2px;padding:4px 10px 4px 8px;cursor:pointer;min-width:250px}
+.ow .bild{width:26px;height:26px;border-radius:2px;background:var(--grau);
+  border:1px solid var(--linie);display:grid;place-items:center;font-size:12px;flex:0 0 auto}
+.ow .tx{min-width:0;line-height:1.2}
+.ow .tx b{display:block;font-size:12.5px;font-weight:600;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.ow .tx span{font-family:var(--mono);font-size:9px;color:var(--sehr-leise);letter-spacing:.06em}
+.ow .pf{margin-left:auto;color:var(--sehr-leise);font-size:10px}
+
+hr.zart{border:0;border-top:1px solid var(--linie);margin:14px 0}
+
+/* ═══ ENTWURF 1 · AKTENMAPPE ════════════════════════════════════════ */
+.e1{display:flex;flex-direction:column}
+.e1 .kopf{height:46px;flex:0 0 auto;display:flex;align-items:center;gap:14px;
+  padding:0 16px;background:var(--flaeche);border-bottom:1px solid var(--linie-stark)}
+.e1 .kopf .wm{font-size:16px}
+.e1 .leib{flex:1;display:flex;min-height:0}
+.e1 .schiene{width:186px;flex:0 0 auto;background:var(--grau);
+  border-right:1px solid var(--linie);padding:12px 10px;overflow:auto}
+.e1 .schiene .gr{margin-bottom:16px}
+.e1 .schiene .gr > .mk{padding:0 6px 6px}
+.e1 .schiene a{display:flex;align-items:center;gap:9px;padding:6px 8px;font-size:12.5px;
+  color:var(--leise);text-decoration:none;border-radius:2px;border-left:2px solid transparent}
+.e1 .schiene a.an{background:var(--flaeche);color:var(--tinte);font-weight:600;
+  border-left-color:var(--gold)}
+.e1 .schiene a:hover{background:var(--flaeche);color:var(--tinte)}
+.e1 .schiene a .i{width:15px;text-align:center;color:var(--gold-lo);font-size:11px}
+
+/* ═══ ENTWURF 2 · KANZLEI ═══════════════════════════════════════════ */
+.e2{display:flex;min-height:0}
+.e2 .nav{width:198px;flex:0 0 auto;background:var(--obsidian);color:#E9E3D6;
+  display:flex;flex-direction:column;padding:0}
+.e2 .nav .marke{height:46px;display:flex;align-items:center;padding:0 14px;
+  border-bottom:1px solid #26231E}
+.e2 .nav .marke .wm{font-size:15px;color:#F2EDE3}
+.e2 .nav .liste{flex:1;overflow:auto;padding:12px 8px}
+.e2 .nav .mk{padding:10px 8px 5px;color:#7A7268}
+.e2 .nav a{display:flex;align-items:center;gap:9px;padding:6px 9px;font-size:12.5px;
+  color:#BFB7A9;text-decoration:none;border-radius:2px}
+.e2 .nav a.an{background:#141310;color:#F5EFE2;font-weight:600;
+  box-shadow:inset 2px 0 0 var(--gold)}
+.e2 .nav a:hover{color:#F5EFE2}
+.e2 .nav a .i{width:14px;text-align:center;color:var(--gold);font-size:11px}
+.e2 .nav .fuss{padding:10px 12px;border-top:1px solid #26231E;font-size:11px;color:#8C8479}
+.e2 .buehne{flex:1;display:flex;flex-direction:column;min-width:0}
+.e2 .obs{height:46px;flex:0 0 auto;display:flex;align-items:center;gap:12px;
+  padding:0 18px;background:var(--flaeche);border-bottom:1px solid var(--linie)}
+.e2 .mitte{flex:1;display:flex;min-height:0}
+.e2 .kontext{width:184px;flex:0 0 auto;border-left:1px solid var(--linie);
+  background:var(--grau);padding:13px 11px;overflow:auto}
+.e2 .kontext .akt{width:100%;margin-bottom:6px;font-size:11.5px;padding:6px 9px}
+
+/* ═══ ENTWURF 3 · WERKBANK ══════════════════════════════════════════ */
+.e3{display:flex;flex-direction:column}
+.e3 .kopf{height:52px;flex:0 0 auto;display:flex;align-items:center;gap:14px;
+  padding:0 18px;background:var(--flaeche);border-bottom:1px solid var(--linie)}
+.e3 .kopf .wm{font-size:16px}
+.e3 .werkzeug{flex:0 0 auto;display:flex;align-items:center;gap:7px;padding:8px 18px;
+  background:var(--karte);border-bottom:1px solid var(--linie-stark);overflow-x:auto}
+.e3 .werkzeug .tr{width:1px;height:20px;background:var(--linie-stark);margin:0 4px;flex:0 0 auto}
+
+/* ═══ ENTWURF 4 · DOSSIER ═══════════════════════════════════════════ */
+.e4{display:flex;min-height:0;background:#EDEAE3}
+.e4 .rail{width:52px;flex:0 0 auto;background:var(--obsidian);display:flex;
+  flex-direction:column;align-items:center;padding:10px 0;gap:3px}
+.e4 .rail .m{width:30px;height:30px;display:grid;place-items:center;color:var(--gold);
+  font-family:var(--disp);font-weight:700;font-size:14px;margin-bottom:8px}
+.e4 .rail a{width:34px;height:34px;display:grid;place-items:center;color:#8C8479;
+  text-decoration:none;border-radius:2px;font-size:13px}
+.e4 .rail a.an{background:#151310;color:var(--gold-hi);box-shadow:inset 2px 0 0 var(--gold)}
+.e4 .spalte{flex:1;overflow:auto;padding:0;display:flex;flex-direction:column;align-items:center}
+.e4 .blatt{width:100%;max-width:980px;background:var(--papier);min-height:100%;
+  border-left:1px solid var(--linie);border-right:1px solid var(--linie);
+  box-shadow:0 0 30px -18px rgba(0,0,0,.35);display:flex;flex-direction:column}
+.e4 .briefkopf{padding:16px 26px 12px;border-bottom:1px solid var(--linie-stark)}
+.e4 .briefkopf .zeile{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.e4 .briefkopf h4{font-family:var(--serif);font-size:22px;font-weight:600;margin:0 0 1px;
+  letter-spacing:.01em}
+.e4 .fussleiste{flex:0 0 auto;display:flex;align-items:center;gap:7px;padding:8px 26px;
+  background:var(--flaeche);border-top:1px solid var(--linie-stark);overflow-x:auto}
+.e4 .arbeit{padding:18px 26px 28px}
+
+/* ═══ ENTWURF 5 · COCKPIT HELL ══════════════════════════════════════ */
+.e5{display:flex;min-height:0}
+.e5 .sb{width:252px;flex:0 0 auto;background:var(--grau);border-right:1px solid var(--linie);
+  display:flex;flex-direction:column}
+.e5 .sb .marke{height:46px;display:flex;align-items:center;padding:0 14px;
+  border-bottom:1px solid var(--linie);background:var(--flaeche)}
+.e5 .sb .marke .wm{font-size:15px}
+.e5 .sb .suche{padding:9px 11px;border-bottom:1px solid var(--linie)}
+.e5 .sb .suche .ein{border:1px solid var(--linie);background:var(--flaeche);border-radius:2px;
+  padding:5px 9px;font-size:11.5px;color:var(--sehr-leise)}
+.e5 .sb .liste{flex:1;overflow:auto;padding:9px}
+.e5 .okarte{background:var(--flaeche);border:1px solid var(--linie);border-radius:2px;
+  padding:9px 10px;margin-bottom:7px;cursor:pointer}
+.e5 .okarte.an{border-color:var(--gold-lo);box-shadow:inset 2px 0 0 var(--gold)}
+.e5 .okarte .z1{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.e5 .okarte .adr{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis}
+.e5 .okarte .pkt{font-family:var(--mono);font-size:12px;font-weight:700}
+.e5 .okarte .z2{display:flex;justify-content:space-between;margin-top:3px}
+.e5 .okarte .pr{font-family:var(--mono);font-size:11.5px;color:var(--leise)}
+.e5 .buehne{flex:1;display:flex;flex-direction:column;min-width:0}
+.e5 .kopf{height:46px;flex:0 0 auto;display:flex;align-items:center;gap:12px;
+  padding:0 16px;background:var(--flaeche);border-bottom:1px solid var(--linie)}
+.e5 .band{flex:0 0 auto;padding:7px 16px;background:var(--flaeche);
+  border-bottom:1px solid var(--linie-stark)}
+
+/* Anmerkungen unter jedem Entwurf */
+.notiz{margin-top:11px;display:grid;grid-template-columns:1fr 1fr;gap:9px 22px;
+  font-size:13px;color:#4E4941}
+.notiz div{padding-left:16px;position:relative}
+.notiz div::before{content:'';position:absolute;left:0;top:8px;width:7px;height:1px;
+  background:var(--gold-lo)}
+.notiz b{color:var(--tinte);font-weight:600}
+.notiz .minus::before{background:var(--rot)}
+
+@media (max-width:1000px){
+  .raster{grid-template-columns:1fr}
+  .notiz{grid-template-columns:1fr}
+  .geraet{height:auto;min-height:560px}
+}
+</style>
+
+<div class="schau">
+<h1>Heller Modus — fünf Entwürfe</h1>
+<p class="vor">
+  Gemessen am laufenden Stand: das Kopfband ist <b>189 px</b> hoch, darunter
+  Reiterleiste und Bordkarte — die erste Eingabe beginnt erst bei rund
+  <b>300 px</b>. Fast ein Drittel der Höhe ist verbraucht, bevor gearbeitet wird.
+  Genau das liest ein Banker als „Werkzeug für Anleger", nicht als Arbeitsgerät.
+  <br><br>
+  <b>Die Arbeitsfläche ist in allen fünf Entwürfen identisch</b> — dieselben
+  Felder, dieselbe Zweispaltigkeit. Was wechselt, ist nur der Rahmen. So ist
+  vergleichbar, was sich wirklich unterscheidet.
+</p>
+
+<div class="waehler" id="w"></div>
+<div id="buehne"></div>
+</div>
+
+<script>
+/* Die Arbeitsfläche - EINMAL definiert, in jedem Entwurf dieselbe.
+   Genau das ist der Punkt: Marcel will sie behalten. */
+const ARBEIT = `
+<div class="arbeit">
+  <h3>Objekt &amp; Fotos</h3>
+  <p class="unter">Grunddaten, Lage und Objektfotos für den Bankreport</p>
+  <div class="raster">
+    <div class="kasten">
+      <div class="kopf"><span class="mk">Objektdaten</span></div>
+      <div class="feldpaar">
+        <div class="feld"><label>PLZ</label><div class="ein">32105</div></div>
+        <div class="feld"><label>Ort</label><div class="ein">Musterstadt</div></div>
+        <div class="feld"><label>Straße</label><div class="ein">Gerberstraße</div></div>
+        <div class="feld"><label>Hausnummer</label><div class="ein">27</div></div>
+      </div>
+      <div class="feld"><label>Objektart</label><div class="ein w">Mehrfamilienhaus (MFH)</div></div>
+      <div class="feldpaar">
+        <div class="feld"><label>Wohnfläche</label><div class="ein z">432<span class="eh">m²</span></div></div>
+        <div class="feld"><label>Baujahr</label><div class="ein z">1968</div></div>
+      </div>
+    </div>
+    <div class="kasten">
+      <div class="kopf"><span class="mk">Ausstattungsqualität</span></div>
+      <div class="feldpaar">
+        <div class="feld"><label>Energieklasse</label><div class="ein w">E</div></div>
+        <div class="feld"><label>Zustand</label><div class="ein w">Normaler Zustand</div></div>
+        <div class="feld"><label>Vermietungszustand</label><div class="ein w">Vollvermietet</div></div>
+        <div class="feld"><label>Ausstattung</label><div class="ein w">Normal</div></div>
+      </div>
+      <hr class="zart">
+      <div class="feldpaar">
+        <div class="feld"><label>Kaufpreis</label><div class="ein z">743.000<span class="eh">€</span></div></div>
+        <div class="feld"><label>Ist-Miete p. a.</label><div class="ein z">22.560<span class="eh">€</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>`;
+
+const KZ = `
+<div class="kz-zeile">
+  <div class="kz"><span class="n">Rendite</span><span class="v g">4,72 %</span></div>
+  <div class="kz"><span class="n">Finanzierung</span><span class="v">90 %</span></div>
+  <div class="kz"><span class="n">Risiko</span><span class="v r">47 %</span></div>
+  <div class="kz"><span class="n">Lage</span><span class="v">68 %</span></div>
+  <div class="kz"><span class="n">Upside</span><span class="v">56 %</span></div>
+  <div class="kz"><span class="n">DSCR</span><span class="v g">1,27</span></div>
+</div>`;
+
+const SCORE = `
+<div class="score-chip" title="Investor Deal Score - klicken für die Herleitung">
+  <div class="ring"></div>
+  <div class="tx"><b>Gute Bewertung</b><span>Investor Deal Score</span></div>
+</div>`;
+
+const OW = `
+<div class="ow">
+  <div class="bild">⌂</div>
+  <div class="tx"><b>Gerberstraße 27, Musterstadt</b><span>2026-1637 · MFH · 743.000 €</span></div>
+  <div class="pf">▾</div>
+</div>`;
+
+const REITER = (an) => `
+<nav class="reiter">${['Objekt','Investition','Miete','Finanzierung','Bewirtschaftung','Steuer','Pilot-Analyse','Bewertung','Deal-Aktion']
+  .map(t=>`<a href="#" class="${t===an?'an':''}">${t}</a>`).join('')}</nav>`;
+
+const AKTIONEN = [
+  ['📄','Exposé'],['📊','Marktbericht'],['🏦','Bankreport'],['🧾','Kaufpreisaufteilung'],
+  ['📐','Restnutzungsdauer'],['✈️','Pre-Flight'],['📤','Teilen']
+];
+
+const ENTWUERFE = [
+  {
+    kurz:'1 · Aktenmappe',
+    titel:'Entwurf 1 — Aktenmappe',
+    warum:'Die Reiter wandern nach LINKS und werden zur Gliederung, wie das Inhaltsverzeichnis eines Gutachtens. Oben bleibt eine 46-px-Leiste mit Objektwähler und Score-Chip. Die Aktionen stehen unter der Gliederung, im selben Zug lesbar.',
+    fuer:'Wirkt wie: <b>ein Aktenordner</b> · Kopfhöhe 46 px statt 189 · Score als Chip oben rechts',
+    bau:()=>`
+<div class="geraet e1">
+  <div class="kopf">
+    <span class="wm">Deal<i>Pilot</i></span>
+    ${OW}
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+      <span class="pille gut">Pre-Flight vollständig</span>
+      ${SCORE}
+    </div>
+  </div>
+  <div class="leib">
+    <div class="schiene">
+      <div class="gr">
+        <div class="mk">Objekt</div>
+        ${['Objekt &amp; Fotos','Investition','Miete','Finanzierung','Bewirtschaftung','Steuer']
+          .map((t,i)=>`<a href="#" class="${i===0?'an':''}"><span class="i">${['▤','▦','▥','▨','▧','▩'][i]}</span>${t}</a>`).join('')}
+      </div>
+      <div class="gr">
+        <div class="mk">Analyse</div>
+        ${['Pilot-Analyse','Bewertung','Deal-Aktion'].map(t=>`<a href="#"><span class="i">◈</span>${t}</a>`).join('')}
+      </div>
+      <div class="gr">
+        <div class="mk">Ausgabe</div>
+        ${AKTIONEN.slice(0,5).map(([i,t])=>`<a href="#"><span class="i">${i}</span>${t}</a>`).join('')}
+      </div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+      <div style="padding:9px 24px;background:var(--flaeche);border-bottom:1px solid var(--linie)">${KZ}</div>
+      ${ARBEIT}
+    </div>
+  </div>
+</div>`,
+    plus:['<b>Alles in einem Blick links.</b> Gliederung und Ausgabe stehen untereinander — kein Suchen zwischen Kopf, Reiter und Bordkarte.',
+          '<b>Der Kopf schrumpft von 189 auf 46 px.</b> Die Kennzahlen bleiben, aber als eine Zeile statt sechs Kacheln.'],
+    minus:['<b>186 px gehen links dauerhaft weg.</b> Bei schmalen Bildschirmen wird die Arbeitsfläche eng.',
+           '<b>Neun Reiter als Liste sind lang.</b> Die Gruppierung hilft, aber man scrollt.']
+  },
+  {
+    kurz:'2 · Kanzlei',
+    titel:'Entwurf 2 — Kanzlei',
+    warum:'Dunkle Navigationsspalte links als ruhiger Anker, helle Arbeitsfläche daneben — das Muster kennt jeder aus DATEV und Banksoftware. Die Aktionen sitzen RECHTS in einer Kontextschiene: was man mit diesem Objekt tun kann, steht neben dem Objekt.',
+    fuer:'Wirkt wie: <b>eine Steuerkanzlei-Anwendung</b> · Obsidian bleibt als Markenanker · Aktionen kontextuell rechts',
+    bau:()=>`
+<div class="geraet e2">
+  <div class="nav">
+    <div class="marke"><span class="wm">Deal<i>Pilot</i></span></div>
+    <div class="liste">
+      <div class="mk">Portfolio</div>
+      <a href="#"><span class="i">▣</span>Objekte (16)</a>
+      <a href="#"><span class="i">＋</span>Neues Objekt</a>
+      <div class="mk">Dieses Objekt</div>
+      ${['Objekt','Investition','Miete','Finanzierung','Bewirtschaftung','Steuer','Bewertung']
+        .map((t,i)=>`<a href="#" class="${i===0?'an':''}"><span class="i">${['▤','▦','▥','▨','▧','▩','◈'][i]}</span>${t}</a>`).join('')}
+      <div class="mk">Werkzeuge</div>
+      <a href="#"><span class="i">◎</span>Marktbericht</a>
+      <a href="#"><span class="i">◇</span>Pilot-Analyse</a>
+    </div>
+    <div class="fuss">Marcel Junker · Pro</div>
+  </div>
+  <div class="buehne">
+    <div class="obs">
+      ${OW}
+      <div style="margin-left:auto">${SCORE}</div>
+    </div>
+    <div class="mitte">
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+        <div style="padding:9px 20px;background:var(--flaeche);border-bottom:1px solid var(--linie)">${KZ}</div>
+        ${ARBEIT}
+      </div>
+      <div class="kontext">
+        <div class="mk" style="margin-bottom:8px">Ausgabe</div>
+        ${AKTIONEN.map(([i,t],n)=>`<div class="akt ${n===2?'haupt':''}"><span class="i">${i}</span>${t}</div>`).join('')}
+        <div class="mk" style="margin:14px 0 8px">Status</div>
+        <span class="pille gut">Pre-Flight ok</span>
+      </div>
+    </div>
+  </div>
+</div>`,
+    plus:['<b>Das vertrauteste Muster.</b> Wer DATEV oder eine Bankanwendung kennt, findet sich ohne Erklärung zurecht.',
+          '<b>Die Marke bleibt sichtbar</b>, ohne die Arbeitsfläche einzufärben — Obsidian steht links, das Blatt bleibt hell.'],
+    minus:['<b>Zwei Schienen kosten 382 px.</b> Das ist mehr als heute die Sidebar allein.',
+           '<b>Die dunkle Spalte ist Geschmackssache.</b> Manche lesen sie als „App", nicht als „Kanzlei".']
+  },
+  {
+    kurz:'3 · Werkbank',
+    titel:'Entwurf 3 — Werkbank',
+    warum:'Gar keine Seitenspalte. Der Objektwähler ist ein Auswahlfeld im Kopf, die Reiter bleiben waagerecht, und die <b>Aktionsleiste kommt direkt auf den Hauptbildschirm</b> — genau das, was du als Möglichkeit genannt hast. Die volle Breite gehört der Arbeit.',
+    fuer:'Wirkt wie: <b>ein Werkzeug</b> · maximale Arbeitsbreite · Aktionen immer in Reichweite',
+    bau:()=>`
+<div class="geraet e3">
+  <div class="kopf">
+    <span class="wm">Deal<i>Pilot</i></span>
+    ${OW}
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+      ${KZ.replace('kz-zeile','kz-zeile').replace(/<div class="kz"><span class="n">(Lage|Upside)<\/span>.*?<\/div>/g,'')}
+      ${SCORE}
+    </div>
+  </div>
+  ${REITER('Objekt')}
+  <div class="werkzeug">
+    ${AKTIONEN.map(([i,t],n)=>`<div class="akt ${n===2?'haupt':''}"><span class="i">${i}</span>${t}</div>`).join('<div class="tr"></div>')}
+  </div>
+  ${ARBEIT}
+</div>`,
+    plus:['<b>Die breiteste Arbeitsfläche von allen.</b> Nichts geht seitlich weg — bei Tabellen und Einheitenlisten der größte Gewinn.',
+          '<b>Die Aktionsleiste ist da, wo man sie sucht:</b> über dem Inhalt, auf den sie sich bezieht.'],
+    minus:['<b>Das Portfolio ist einen Klick weg.</b> Wer zwischen Objekten springt, klickt öfter als heute.',
+           '<b>Drei waagerechte Bänder übereinander</b> — Kopf, Reiter, Werkzeug. Das ist wieder nah an dem, was heute stört.']
+  },
+  {
+    kurz:'4 · Dossier',
+    titel:'Entwurf 4 — Dossier',
+    warum:'Der radikalste Entwurf: die Anwendung sieht aus wie das <b>Dokument, das am Ende herauskommt</b>. Mittige Spalte auf grauem Grund, Serifen-Überschrift, schmale Icon-Schiene links, Aktionen in der Fußleiste. Wer das der Bank zeigt, zeigt schon das Gutachten.',
+    fuer:'Wirkt wie: <b>ein Gutachten</b> · höchste Seriosität · Bildschirm und Ausdruck sehen gleich aus',
+    bau:()=>`
+<div class="geraet e4">
+  <div class="rail">
+    <div class="m">D</div>
+    ${['▣','▤','▦','▥','▨','◈','◎'].map((s,i)=>`<a href="#" class="${i===1?'an':''}">${s}</a>`).join('')}
+  </div>
+  <div class="spalte">
+    <div class="blatt">
+      <div class="briefkopf">
+        <div class="zeile">
+          <div>
+            <h4>Gerberstraße 27, 32105 Musterstadt</h4>
+            <div class="mk">Mehrfamilienhaus · Baujahr 1968 · 432 m² · Objekt 2026-1637</div>
+          </div>
+          ${SCORE}
+        </div>
+        <div style="margin-top:11px">${KZ}</div>
+      </div>
+      ${REITER('Objekt')}
+      ${ARBEIT}
+      <div class="fussleiste">
+        ${AKTIONEN.map(([i,t],n)=>`<div class="akt ${n===2?'haupt':''}"><span class="i">${i}</span>${t}</div>`).join('')}
+      </div>
+    </div>
+  </div>
+</div>`,
+    plus:['<b>Seriosität ohne jeden Zusatz.</b> Das Blatt IST die Sprache der Zielgruppe — Briefkopf, Kennzahlen, Inhalt.',
+          '<b>Der Score sitzt im Briefkopf</b>, wo bei einem Gutachten das Ergebnis steht. Klein, aber an der richtigen Stelle.'],
+    minus:['<b>Die feste Blattbreite verschenkt Platz</b> auf großen Bildschirmen — bei breiten Tabellen spürbar.',
+           '<b>Die Icon-Schiene ohne Text muss man lernen.</b> Für Gelegenheitsnutzer die schwerste Variante.']
+  },
+  {
+    kurz:'5 · Cockpit hell',
+    titel:'Entwurf 5 — Cockpit hell',
+    warum:'Der behutsame Weg: die heutige Struktur bleibt, wird aber entschlackt. Sidebar von 380 auf 252 px, Kopf von 189 auf 46 px, die sechs KPI-Kacheln werden <b>eine Zeile</b>, der große Score-Block verschwindet und wird zum Chip. Kein Umlernen.',
+    fuer:'Wirkt wie: <b>DealPilot, nur aufgeräumt</b> · geringstes Risiko · schnellste Umsetzung',
+    bau:()=>`
+<div class="geraet e5">
+  <div class="sb">
+    <div class="marke"><span class="wm">Deal<i>Pilot</i></span></div>
+    <div class="suche"><div class="ein">Suche…</div></div>
+    <div class="liste">
+      <div class="okarte an">
+        <div class="z1"><span class="adr">Gerberstraße 27</span><span class="pkt">79</span></div>
+        <div class="z2"><span class="pr">743.000 €</span><span class="pille gut">Gut</span></div>
+      </div>
+      ${[['Löhner Str. 278','350.000 €','71'],['Hermannstr. 9','305.900 €','64'],['Sachsenstr. 16','489.000 €','58'],['Am Markt 4','612.000 €','44']]
+        .map(([a,p,s])=>`<div class="okarte"><div class="z1"><span class="adr">${a}</span><span class="pkt">${s}</span></div><div class="z2"><span class="pr">${p}</span></div></div>`).join('')}
+    </div>
+  </div>
+  <div class="buehne">
+    <div class="kopf">
+      <div class="mk" style="font-size:11px;color:var(--leise)">2026-1637</div>
+      <b style="font-size:13.5px">Gerberstraße 27, Musterstadt</b>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <span class="pille gut">Pre-Flight ok</span>
+        ${SCORE}
+        <div class="akt haupt"><span class="i">🏦</span>Bankreport</div>
+      </div>
+    </div>
+    <div class="band">${KZ}</div>
+    ${REITER('Objekt')}
+    ${ARBEIT}
+  </div>
+</div>`,
+    plus:['<b>Niemand muss umlernen.</b> Dieselben Wege, nur kürzer — von rund 300 px bis zur ersten Eingabe auf etwa 135.',
+          '<b>Das Portfolio bleibt permanent sichtbar</b>, mit Score und Preis je Karte. Beim Vergleichen der stärkste Entwurf.'],
+    minus:['<b>Die Aktionen bleiben verstreut.</b> Nur die wichtigste steht im Kopf, der Rest liegt weiter im Reiter „Deal-Aktion".',
+           '<b>Es bleibt erkennbar dieselbe Oberfläche.</b> Wenn dich der heutige Eindruck grundsätzlich stört, ändert dieser Entwurf zu wenig.']
+  }
+];
+
+let aktiv = 0;
+const w = document.getElementById('w'), b = document.getElementById('buehne');
+ENTWUERFE.forEach((e,i)=>{
+  const k = document.createElement('button');
+  k.textContent = e.kurz;
+  k.onclick = ()=>{ aktiv = i; zeichne(); };
+  w.appendChild(k);
+});
+const alle = document.createElement('button');
+alle.textContent = '◫ Alle untereinander';
+alle.onclick = ()=>{ aktiv = -1; zeichne(); };
+w.appendChild(alle);
+
+function block(e){
+  return `<div class="block">
+    <h2>${e.titel}</h2>
+    <p class="warum">${e.warum}</p>
+    <p class="fuer">${e.fuer}</p>
+    ${e.bau()}
+    <div class="notiz">
+      ${e.plus.map(t=>`<div>${t}</div>`).join('')}
+      ${e.minus.map(t=>`<div class="minus">${t}</div>`).join('')}
+    </div>
+  </div>`;
+}
+function zeichne(){
+  [...w.children].forEach((k,i)=>k.setAttribute('aria-pressed', String(i===aktiv)));
+  b.innerHTML = aktiv < 0 ? ENTWUERFE.map(block).join('') : block(ENTWUERFE[aktiv]);
+  window.scrollTo({top:0, behavior:'instant'});
+}
+zeichne();
+</script>
