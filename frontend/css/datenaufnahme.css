@@ -145,9 +145,22 @@
 }
 .dp-pfbar .dp-pf-qr svg{ width:28px !important; height:28px !important; border-radius:2px; }
 .dp-pfbar .dp-pf-scan{ display:none !important; }
+/* GEMESSEN: die Reisszone blieb **208 px** breit, obwohl der Knopf darin
+   nur 80 misst und der Strichcode auf display:none steht. Ursache war
+   `min-width:208px` - ich hatte `width:auto` gesetzt und die Mindestbreite
+   vergessen.
+
+   > MIN-WIDTH SCHLAEGT WIDTH, genau wie min-height height schlaegt (die
+   > Falle steht so schon in CLAUDE.md). Ein `width:auto !important` sieht
+   > dabei aus, als haette man es geregelt.
+
+   Diese 208 px waren der Grund, warum die Zeile bei 1280 px auf zwei
+   Reihen umbrach: 1010 px Kinder plus 42 px Abstaende gegen 1028 px
+   Platz. Ohne sie sind es 882. */
 .dp-pfbar .dp-pf-rz{
   display:flex !important; align-items:center !important;
-  height:auto !important; min-height:0 !important; width:auto !important;
+  height:auto !important; min-height:0 !important;
+  width:auto !important; min-width:0 !important; max-width:none !important;
   padding:0 !important; background:transparent !important;
   border:0 !important; flex:0 0 auto;
 }
