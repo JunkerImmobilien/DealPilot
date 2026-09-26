@@ -172,6 +172,12 @@ async function vektorbild(seite, ziel) {
  *  sollte, war die Stelle, an der alles stehenblieb.
  *
  *  Es gibt keine Playwright-Einstellung dafuer; also ein Wettlauf. */
+
+/** Obergrenze fuer EINE Lage, komplett. Gemessen braucht eine volle
+ *  Lage mit 20 Punkten rund 60 Sekunden - vier Minuten sind das
+ *  Vierfache und treffen nur echte Haenger. */
+const LAGE_FRIST = 4 * 60 * 1000;
+
 function mitFrist(versprechen, ms, was) {
   return Promise.race([
     versprechen,
@@ -329,6 +335,26 @@ async function ernteGebiet(browser, wb, ags, name) {
         wird BENANNT, nicht verschwiegen: ein Gebiet mit drei von vier
         Lagen sieht sonst aus wie ein vollstaendiges. */
      try {
+      /* ── EINE FRIST UM DIE GANZE LAGE ────────────────────────────────
+         GEMESSEN am 26.09.2026 an Goslar: Lage 1 war nach EINER Minute
+         fertig, Lage 2 stand danach zwanzig Minuten ohne Ausgabe. Die
+         einzelnen Schritte tragen zwar Fristen - `setzeAuswahl` 30 s,
+         `evaluate` 20 s, `vektorbild` 40 s -, aber `setzeZahl` und die
+         Wartezeiten dazwischen nicht, und was ausserhalb jeder Frist
+         haengt, haengt unbegrenzt.
+
+         > EINE FRIST AUF JEDEM EINZELSCHRITT ERGIBT KEINE FRIST AUF DEM
+         > GANZEN. Dazwischen bleibt immer Code ohne Deckung.
+
+         Deshalb hier eine Obergrenze fuer den ganzen Block. Vier Minuten
+         sind reichlich: eine vollstaendige Lage mit 20 Punkten braucht
+         nach Messung rund 60 Sekunden.
+
+         Zurueckgenommen wird damit meine eigene Diagnose von heute
+         frueh: ich hielt Goslar fuer zu GROSS (ich hatte die 24
+         Eintraege der Gemarkungstabelle fuer 24 Lagen gehalten - es
+         sind VIER). Es war nie die Menge, es war ein Haenger. */
+      await mitFrist((async () => {
       await mitFrist(T.setzeAuswahl(seite, lage.i, li), 30000, 'Lage umstellen');
       await seite.waitForTimeout(1600);
       /* Die Lage EINMAL je Block nachweisen, statt bei jedem Punkt.
@@ -384,11 +410,12 @@ async function ernteGebiet(browser, wb, ags, name) {
         }
       }
       satz.gitter[lagen[li]] = tafel;
+      })(), LAGE_FRIST, `Lage "${lagen[li]}" insgesamt`);
       /* Sofort sichern. Eine fertige Lage muss eine Zeitgrenze
          ueberleben - sonst erntet der naechste Lauf dasselbe noch
          einmal und scheitert an genau derselben Stelle. */
       satz.punkte = n; satz.punkte_leer = leer; satz.verriegelt = verriegelt;
-      satz.vollstaendig = (Object.keys(satz.gitter).length + satz.lagen_ausgefallen.length) >= lagen.length;
+      satz.vollstaendig = Object.keys(satz.gitter).length >= lagen.length;
       fs.writeFileSync(zieldatei, JSON.stringify(satz, null, 1));
       console.log(`    Lage "${lagen[li]}" fertig (${n} Punkte, ${leer} leer, ${verriegelt}x nachgefasst) - gesichert`);
      } catch (eL) {
@@ -407,7 +434,7 @@ async function ernteGebiet(browser, wb, ags, name) {
     /* Das Siegel. Nur wer es traegt, wird beim naechsten Lauf
        uebersprungen - alles andere ist ein Teilstand und wird
        fortgesetzt. */
-    satz.vollstaendig = (Object.keys(satz.gitter).length + satz.lagen_ausgefallen.length) >= lagen.length;
+    satz.vollstaendig = Object.keys(satz.gitter).length >= lagen.length;
     fs.writeFileSync(zieldatei, JSON.stringify(satz, null, 1));
     console.log(`  + ${wb} (${name}): ${n} Punkte, ${leer} ohne Wert, `
       + `${Object.keys(satz.gitter).length}/${lagen.length} Lagen`
