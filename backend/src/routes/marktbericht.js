@@ -467,6 +467,23 @@ router.get('/geocode', authenticate, readGet('/geocode'));
    einwandfrei. Dasselbe Muster wie dealpilot_marktbewertung: die eine
    Seite schickt, die andere hoert nicht zu. */
 router.get('/quellen', authenticate, readGet('/quellen'));
+/* v1615 · Die zwei Diagnosewege des Registers. Sie liefen im mb-backend
+   seit v1083 und waren von aussen NIE erreichbar - dieselbe Positivliste
+   wie eine Zeile darueber, dieselbe 404.
+
+   Aufgefallen beim Prod-Rollout am 26.09.2026: ich habe den Registerstand
+   ueber die oeffentliche Schnittstelle geprueft, 404 bekommen und daraus
+   geschlossen, die Route haenge "unter einem anderen Praefix". Das war
+   falsch geraten - der Mount stimmte, die Liste war es. Der Kommentar
+   direkt darueber sagt das seit v1344c ausdruecklich; ich habe ihn nicht
+   gelesen.
+
+   Beide geben nur das zurueck, was ohnehin im Bericht steht (Zaehlungen
+   und amtliche Registersaetze), und beide liegen wie alles hier hinter
+   `authenticate`. Sie machen die Abnahme nach einem Rollout ohne
+   Container-Zugang moeglich - genau das hat gestern gefehlt. */
+router.get('/register/stand', authenticate, readGet('/register/stand'));
+router.get('/register/probe', authenticate, readGet('/register/probe'));
 router.post('/location-finder', authenticate, async function (req, res) {
   try { const out = await forward('POST', '/location-finder', { body: req.body || {} }); res.status(out.status).json(out.data); }
   catch (e) { res.status(502).json({ error: 'mb_unreachable', message: e.message }); }
