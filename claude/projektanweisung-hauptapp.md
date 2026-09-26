@@ -19058,3 +19058,109 @@ abgebrochen, 2 mit Grund ausgefallen. Holzminden-RH lieferte 20 Punkte,
 - Produktion ist wieder hinter Staging — braucht Freigabe.
 - Marcels eigenes Profil: seine E-Mail steht im **Namensfeld**, eine
   PDF-E-Mail ist nicht gesetzt. Seine Daten, er zieht das nach.
+
+## Rollout-Journal 26.09.2026 (6) — das Logo, das nie da war
+
+**Commits.** `df11ddb` (v1633), `9e6eb6a`/`53d029e`/`db0d812` (v1634–c),
+`8adb094`/`b13a22f` und der Waechter-Fix (Ernter).
+
+### Das DealPilot-Logo stand auf KEINEM PDF
+
+Marcel wollte es oben links auf dem hellen Bogen. Beim Einbauen kam
+heraus, dass es nie dort war: `pdf.js` lud
+
+```
+assets/dealpilot_logo.png     <- MIT UNTERSTRICH
+```
+
+Die Datei heisst `dealpilot-logo.png`, **mit Bindestrich**.
+
+> **Warum das jahrelang unsichtbar blieb:** die App antwortet auf JEDEN
+> Pfad mit **200** und liefert die `index.html`. Das `<img>` bekam also
+> HTML statt PNG, loeste `onerror` aus, `_getBrandingLogo()` gab still
+> `null` zurueck, und der Kopf fiel auf den Firmennamen zurueck — was
+> plausibel aussah.
+>
+> **Ein 200 ist kein Nachweis, dass eine Datei existiert.** Meine erste
+> Messung war genau deshalb falsch: `curl -o /dev/null -w "%{http_code}"`
+> meldete fuer alle vier Logopfade 200, und ich habe meinen richtigen
+> Befund daraufhin zurueckgenommen. Erst der **Inhaltstyp** hat es
+> gezeigt — `text/html` gegen `image/png`. Ich nehme die Ruecknahme
+> hiermit zurueck: der erste Befund stimmte.
+
+### Welche Variante, und warum nicht die von der Landingpage
+
+| Datei | zeigt | taugt fuer |
+|---|---|---|
+| `dealpilot-logo.png` | weisse Kontur + „by Junker Immobilien" | dunklen Grund |
+| `dealpilot-logo-rahmen.png` | weiss/gold, Goldrahmen | dunklen Grund |
+| **`dealpilot-logo-rahmen-hell.png`** | **schwarze Plakette** | **hellen Bogen** |
+
+Die Landingpage nimmt die erste. Auf einem weissen PDF-Bogen waere sie
+bis auf das Wort „Pilot" unsichtbar.
+
+> **Und ein zweiter Grund, der schwerer wiegt:** in `dealpilot-logo.png`
+> steht **„by Junker Immobilien" eingebrannt**. Das ist eine
+> Absenderbehauptung — genau die, die v1632 aus jedem Dokument entfernt
+> hat. Sie ueber ein BILD wieder hereinzuholen waere derselbe Fehler in
+> anderer Gestalt.
+
+Neu: `js/pdf-logo.js` als **ein** Bezugspunkt fuer alle vier
+PDF-Bausteine. Rangfolge **Whitelabel vor DealPilot vor nichts** — und
+„nichts" heisst auch hier kein Ersatztext. Masse proportional statt auf
+34×10 mm gequetscht.
+
+**Gemessen am gerenderten Blatt:** Logo bei x=18, y=14,4, 27×8,49 mm;
+Plakette 512×161 unverzerrt; `save` einmal; kein hängender Trenner.
+
+> **Der erste Anlauf sass falsch, und zwar sichtbar.** Mit 34×11 mm ab
+> y−7 reichte die Plakette bis y+3,7 und **schnitt die obere Haelfte von
+> „IMMOBILIEN-INVESTITIONSANALYSE" ab** (Grundlinie y+4,6). Im Code sah
+> der Kopf richtig aus; erst das gerenderte PDF hat es gezeigt. Die
+> Kopfmasse stehen jetzt EINMAL in `pdf-logo.js`, nicht dreimal.
+
+### Zwei Reste aus v1632
+
+- **v1633:** ohne hinterlegte Firma stand in drei Fusszeilen
+  `" · Investment Case · erstellt am …"` — ein Trennpunkt ohne etwas
+  davor. **Der Trenner gehoert zum ABSENDER, nicht zum Dokumenttitel.**
+- **v1634/c:** das BMF-Dokument druckte rechts oben weiterhin
+  „DealPilot" und `dealpilot.junker-immobilien.io` als Absender. Beides
+  raus; `company: 'DealPilot'` bleibt nur in der FUSSZEILE neben dem
+  Dokumenttitel — das sagt, WOMIT gerechnet wurde.
+
+### Der Ernter: drei Befunde, zwei davon meine eigenen Fehler
+
+**1. Teilstaende.** Eine fertige Lage ueberlebt die Zeitgrenze jetzt;
+`vollstaendig` ist das Siegel, `lauf.sh` gibt ueber `RUNDEN` mehrere
+Anlaeufe.
+
+**2. Meine Diagnose „Goslar ist zu gross" war falsch.** Ich hielt die
+**24 Eintraege der Gemarkungstabelle** fuer 24 Lageklassen. Es sind
+**vier**. Gemessen: Lage 1 nach EINER Minute fertig, Lage 2 danach
+zwanzig Minuten ohne Ausgabe. **Es war nie die Menge, es war ein
+Haenger.**
+
+> **Die Lehre dahinter:** `setzeAuswahl` (30 s), `evaluate` (20 s) und
+> `vektorbild` (40 s) tragen Fristen — `setzeZahl` und die Wartezeiten
+> dazwischen nicht. **Eine Frist auf jedem Einzelschritt ergibt keine
+> Frist auf dem Ganzen**; dazwischen bleibt immer Code ohne Deckung.
+> Jetzt liegt eine Frist von vier Minuten um die GANZE Lage (gemessen
+> braucht eine volle Lage rund 60 Sekunden).
+
+**3. Zwei Waechter mit verschiedenen Massstaeben.** Ich hatte das Siegel
+in `lauf.sh` abgefragt, aber der Ernter selbst prueft **auch** auf
+„schon da" — und der sah nur, ob die Datei existiert. Goslar war damit
+in EINER SEKUNDE „fertig", obwohl erst eine von vier Lagen drinsteht.
+
+> **Der laxere Waechter gewinnt, und der strengere sieht dabei aus, als
+> wirke er.** Dieselbe Bauart wie beim Gold-Audit, das 6 von 181 Dateien
+> las und „sauber" meldete.
+
+**Rest.**
+- Der Erntelauf laeuft (Runde 1 von 8, Grenze 1800 s).
+- **Produktion:** Marcel hat das Nachziehen freigegeben; beide
+  Datenbanken sind gesichert und angesehen (11 MB / 717 KB),
+  39 Commits offen, **keine Migration**. Der Merge auf `main` wurde vom
+  Sicherheitsfilter abgewiesen („Production Deploy") — er braucht eine
+  Freigabe im Werkzeug, nicht im Projekt.
