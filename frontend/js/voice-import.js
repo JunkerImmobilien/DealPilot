@@ -3836,6 +3836,15 @@
          habe: eine Existenzprüfung ist keine Abnahme. Vier `.vi-rf-pille`
          im DOM heißt nicht, dass man vier Pillen sieht. */
       '.vi-rf-pillen{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}',
+      /* v1616 · Die Ablesehilfe: was noch offen ist, mit Beispiel. Sie
+         steht UNTER den Pillen und ist ruhiger als sie - die Pillen
+         zeigen den Stand, diese Zeile sagt, was zu tun ist. */
+      '.vi-rf-offen{display:flex;flex-direction:column;gap:3px;margin-top:8px;',
+      'padding:8px 10px;border-radius:9px;font-size:12px;line-height:1.45;',
+      'background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.22)}',
+      '.vi-rf-offen-feld{display:block}',
+      '.vi-rf-offen-feld b{font-weight:600}',
+      '.vi-rf-bsp{opacity:.72}',
       '.vi-rf-pille{display:inline-flex;align-items:center;gap:4px;',
       '  padding:3px 9px;border-radius:99px;white-space:nowrap;',
       '  font:600 11px/1.35 Inter,system-ui,sans-serif;',
@@ -6147,7 +6156,112 @@
      Der Name steht im Formular, im `<label>` neben dem Feld. Diese
      Auflösung gilt jetzt für ALLE Stellen, die einen Feldnamen brauchen —
      Pillen, „noch offen", Übernahme-Meldungen. */
+
+  /* ═══ v1616 · JEDES FELD SAGT SELBST, WIE ES HEISST ═══════════════════
+     Marcels Befund vom 26.09.2026: "teilweise stehen in den Pillen
+     irgendwelche kryptischen Variablennamen. Also man weiss gar nicht,
+     was man eintippen soll."
+
+     URSACHE, gemessen: `_rfFeldName` holte die Beschriftung aus dem
+     FORMULAR — `el.closest('.f,.form-group,.fg')` und darin ein
+     `<label>`. Bei 19 der 64 Felder gibt es das so nicht, und dann fiel
+     die Funktion am Ende auf `return id` zurueck. Auf der Pille stand
+     dann `ds2_mietausfall` statt "Mietausfallrisiko".
+
+     Der Sprechlauf holt seine Woerter jetzt NICHT mehr aus dem Formular.
+     Er bringt sie mit. Eine Anzeige, die von der Bauform einer anderen
+     Ansicht abhaengt, bricht beim naechsten Umbau wieder — und man sieht
+     es ihr nicht an.
+
+     Zweite Spalte ist die ANTWORTHILFE: was der Nutzer sagen kann. Ohne
+     sie weiss man bei "Standardstufe" oder "Grenzsteuersatz" nicht, ob
+     eine Zahl, ein Wort oder ein Prozentsatz erwartet wird. */
+  var RFELD = {
+    /* Etappe 1 · Basis */
+    plz:            ['PLZ',                    '32120'],
+    ort:            ['Ort',                    'Hiddenhausen'],
+    str:            ['Strasse',                'Loehner Strasse'],
+    hnr:            ['Hausnummer',              '278'],
+    objart:         ['Objektart',               'Mehrfamilienhaus, Eigentumswohnung, Reihenhaus …'],
+    wfl:            ['Wohnflaeche',             '233 Quadratmeter'],
+    zimmer:         ['Zimmer',                  '4,5'],
+    einheiten:      ['Wohneinheiten',           '6'],
+    etagen_ges:     ['Vollgeschosse',           '3'],
+    baujahr:        ['Baujahr',                 '1964'],
+    kp:             ['Kaufpreis',               '743.000 Euro'],
+    /* Etappe 2 · Ertrag und Finanzierung */
+    nkm:            ['Kaltmiete im Monat',      '2.400 Euro'],
+    ze:             ['Zusatzeinnahmen im Monat', '120 Euro Stellplatz'],
+    ek:             ['Eigenkapital',            '150.000 Euro'],
+    d1z:            ['Sollzins',                '3,6 Prozent'],
+    d1t:            ['Anfangstilgung',          '2 Prozent'],
+    d1_bindj:       ['Zinsbindung',             '10 Jahre'],
+    makler_p:       ['Maklercourtage',          '3,57 Prozent'],
+    notar_p:        ['Notarkosten',             '1,5 Prozent'],
+    gba_p:          ['Grundbuchkosten',         '0,5 Prozent'],
+    gest_p:         ['Grunderwerbsteuer',       '6,5 Prozent'],
+    /* Etappe 3 · Lage und Zustand */
+    makrolage:      ['Lage der Region',         'gut, mittel, schwach'],
+    mikrolage:      ['Lage der Strasse',        'gut, mittel, schwach'],
+    ds2_zustand:    ['Gebaeudezustand',         'gepflegt, normal, renovierungsbeduerftig'],
+    ds2_energie:    ['Energieklasse',           'C, oder 95 Kilowattstunden'],
+    san:            ['Sanierungsbedarf',        'Bad und Heizung, rund 40.000 Euro'],
+    moebl:          ['Mitverkauft',             'Einbaukueche'],
+    /* Etappe 4 · Grundstueck */
+    brw:            ['Bodenrichtwert',          '280 Euro je Quadratmeter'],
+    gsfl:           ['Grundstuecksflaeche',     '620 Quadratmeter'],
+    mea:            ['Miteigentumsanteil',      '87 von 1000'],
+    erbbauzins:     ['Erbbauzins im Jahr',      '1.800 Euro'],
+    erb_restlz:     ['Restlaufzeit Erbbaurecht', '62 Jahre'],
+    hg_ul:          ['Hausgeld im Jahr',        '3.600 Euro'],
+    hg_nul:         ['davon nicht umlagefaehig', '1.200 Euro'],
+    /* Etappe 5 · Annahmen */
+    mietstg:        ['Mietsteigerung im Jahr',  '2 Prozent'],
+    wertstg:        ['Wertsteigerung im Jahr',  '1,5 Prozent'],
+    leerstand:      ['Leerstandsquote',         '3 Prozent'],
+    ds2_mietausfall: ['Mietausfallrisiko',      'gering, mittel, hoch'],
+    ds2_bevoelkerung: ['Bevoelkerung',          'wachsend, stabil, fallend'],
+    ds2_nachfrage:  ['Nachfrage',               'hoch, normal, schwach'],
+    ds2_wertsteigerung: ['Wertentwicklung am Ort', 'steigend, stabil, fallend'],
+    ds2_entwicklung: ['Entwicklungsmoeglichkeiten', 'Ausbau, Anbau, Teilung — oder keine'],
+    /* Etappe 6 · Kauf und Steuer */
+    kaufdat:        ['Kaufdatum',               'Maerz 2026'],
+    wirtschaftlicher_uebergang: ['Uebergang von Mieten und Kosten', '1. Mai 2026'],
+    afa_satz:       ['AfA-Satz',                '2 Prozent'],
+    geb_ant:        ['Gebaeudeanteil',          '75 Prozent'],
+    grenz:          ['Grenzsteuersatz',         '42 Prozent'],
+    zve:            ['zu versteuerndes Einkommen', '85.000 Euro'],
+    /* Etappe 7 · Einordnung */
+    thesis:         ['Warum dieses Objekt',     'Lage und Mietsteigerungspotenzial'],
+    risiken:        ['Risiken',                 'Sanierungsstau im Dach'],
+    notizen:        ['Notizen',                 'frei'],
+    /* Wertermittlung */
+    standardstufe:  ['Ausstattungsstufe',       '1 bis 5 — 3 ist normal'],
+    garagen:        ['Garagen',                 '2'],
+    stellpl_aussen: ['Stellplaetze im Freien',  '4'],
+    garagen_bgf_qm: ['Grundflaeche der Garagen', '36 Quadratmeter'],
+    modernis:       ['Modernisierungen',        'Dach 2015, Fenster 2018'],
+    /* Restnutzungsdauer */
+    mod_dach:       ['Dach',                    '2015, oder nicht gemacht'],
+    mod_fenster:    ['Fenster',                 '2018, oder nicht gemacht'],
+    mod_aussenwand: ['Aussenwaende und Daemmung', '2015, oder nicht gemacht'],
+    mod_heizung:    ['Heizung',                 '2020, oder nicht gemacht'],
+    mod_leitungen:  ['Leitungen',               'nicht gemacht'],
+    mod_baeder:     ['Baeder',                  '2019, oder nicht gemacht'],
+    mod_innenausbau: ['Innenausbau',            'nicht gemacht'],
+    mod_grundriss:  ['Grundriss',               'unveraendert, oder 2019 geoeffnet'],
+  };
+
+  /** Die Antworthilfe zu einem Feld — was der Nutzer sagen kann. */
+  function _rfFeldHilfe(id) {
+    var e = RFELD[id];
+    return e && e[1] ? e[1] : null;
+  }
+
   function _rfFeldName(id) {
+    /* v1616 · DIE EIGENE TABELLE ZUERST. Sie ist die einzige Quelle, die
+       nicht davon abhaengt, wie eine andere Ansicht gerade gebaut ist. */
+    if (RFELD[id] && RFELD[id][0]) return RFELD[id][0];
     var c = (_rf && _rf.catalog || []).filter(function (x) { return x.id === id; })[0];
     if (c && c.label) return String(c.label).replace(/\s*\(.*?\)\s*$/, '').trim();
     try {
@@ -6202,6 +6316,41 @@
       escH(String(zahl).replace('.', ',')) + ' %</b> aus deiner Prognose habe ich. ' +
       'Hier geht es um etwas anderes: wie du die <b>Lage</b> einsch\u00e4tzt \u2014 ' +
       'das flie\u00dft in den Score ein, nicht in die Rechnung.</div>';
+  }
+
+  /* ═══ v1616 · WAS GENAU NOCH FEHLT — UND WIE MAN ES SAGT ═══════════════
+     Marcels Befund vom 26.09.2026, zwei Saetze, eine Ursache:
+     „teilweise sind das doppelte Abfragen, die vorher schon kamen" und
+     „man weiss nicht immer ganz genau, was man dann sagen soll".
+
+     GEMESSEN: ein Frageblock wird nur uebersprungen, wenn ALLE seine
+     Felder stehen (`alleDa`). Sind zwei von drei beantwortet, kommt die
+     ganze Frage noch einmal — im Wortlaut samt dem, was laengst gesagt
+     wurde. Das IST keine Doppelfrage, es fuehlt sich aber genau so an,
+     und der Unterschied hilft niemandem.
+
+     Deshalb steht unter der Frage jetzt, was WIRKLICH offen ist, mit
+     einem Beispiel dahinter. Die Frage bleibt wie sie ist — sie ist der
+     Satz, den der Co-Pilot spricht; diese Zeile ist die Ablesehilfe. */
+  function _rfAntwortHilfe(eintrag) {
+    if (!eintrag || !eintrag.ids || !eintrag.ids.length) return '';
+    var offen = eintrag.ids.filter(function (id) {
+      var v = _rf && _rf.data && _rf.data.fields ? _rf.data.fields[id] : null;
+      if (v != null && String(v).trim() !== '') return false;
+      var w = _rfFeld(id);
+      return !(w != null && String(w).trim() !== '');
+    });
+    if (!offen.length) return '';
+    /* Bei Auswahlfeldern stehen die Knoepfe darunter - dort waere ein
+       Beispiel doppelt gemoppelt. */
+    var mitBeispiel = !eintrag.skalen;
+    var teile = offen.map(function (id) {
+      var h = mitBeispiel ? _rfFeldHilfe(id) : null;
+      return '<span class="vi-rf-offen-feld"><b>' + escH(_rfFeldName(id)) + '</b>'
+           + (h ? ' <span class="vi-rf-bsp">z. B. ' + escH(h) + '</span>' : '')
+           + '</span>';
+    });
+    return '<div class="vi-rf-offen">' + teile.join('') + '</div>';
   }
 
   function _rfPillen(eintrag) {
@@ -8541,7 +8690,7 @@
         var w = _rfWozu(e);
         return w ? '<div class="vi-rf-wozu"><b>Wozu?</b> ' + escH(w) + '</div>' : '';
       })() +
-      _rfPillen(e) + _rfSkalen(e) +
+      _rfPillen(e) + _rfAntwortHilfe(e) + _rfSkalen(e) +
 
       (pv ? '<div class="vi-rf-vorschlag">Aus deinen Einstellungen hätte ich: <b>' +
             escH(pv.text) + '</b></div>' : '') +
