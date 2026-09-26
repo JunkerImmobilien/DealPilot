@@ -392,8 +392,9 @@
              jedes Logo, dessen Seitenverhaeltnis nicht zufaellig 3,4
              ist. Die Plakette misst 512x160 (3,2), ein Partnerlogo
              irgendetwas. `masse` rechnet proportional in den Rahmen. */
-          var m = window.DealPilotPdfLogo.masse(_logo, 34, 11);
-          doc.addImage(_logo.b64, L, y - 7, m.w, m.h, undefined, 'FAST');
+          var _K = window.DealPilotPdfLogo.kopf;
+          var m = window.DealPilotPdfLogo.masse(_logo, _K.b, _K.h);
+          doc.addImage(_logo.b64, L, y + _K.dy, m.w, m.h, undefined, 'FAST');
           logoOk = true;
         } catch (e) { logoOk = false; }
       }

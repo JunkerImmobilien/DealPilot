@@ -138,8 +138,9 @@
       try {
         var _kl = window.DealPilotPdfLogo && window.DealPilotPdfLogo.ausSpeicher(b);
         if (_kl && _kl.b64) {
-          var _km = window.DealPilotPdfLogo.masse(_kl, 34, 11);
-          doc.addImage(_kl.b64, L, y - 7, _km.w, _km.h, undefined, 'FAST');
+          var _K = window.DealPilotPdfLogo.kopf;
+          var _km = window.DealPilotPdfLogo.masse(_kl, _K.b, _K.h);
+          doc.addImage(_kl.b64, L, y + _K.dy, _km.w, _km.h, undefined, 'FAST');
           _kLogoOk = true;
         }
       } catch (e) { _kLogoOk = false; }

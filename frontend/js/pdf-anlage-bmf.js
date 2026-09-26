@@ -88,8 +88,9 @@ window.generateBmfPdfAnlage = function(state){
   try {
     var _bl = window.DealPilotPdfLogo && window.DealPilotPdfLogo.ausSpeicher(brand);
     if (_bl && _bl.b64) {
-      var _bm = window.DealPilotPdfLogo.masse(_bl, 34, 11);
-      doc.addImage(_bl.b64, marginL, y - 7, _bm.w, _bm.h, undefined, 'FAST');
+      var _K = window.DealPilotPdfLogo.kopf;
+      var _bm = window.DealPilotPdfLogo.masse(_bl, _K.b, _K.h);
+      doc.addImage(_bl.b64, marginL, y + _K.dy, _bm.w, _bm.h, undefined, 'FAST');
       _bmfLogoOk = true;
     }
   } catch (e) { _bmfLogoOk = false; }

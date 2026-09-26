@@ -131,8 +131,24 @@
     return _mitFlagge(_cache);
   }
 
+  /* ── Der Kopfrahmen, einmal ────────────────────────────────────────
+     GEMESSEN am erzeugten Dokument (v1634, erster Anlauf): mit 34x11 mm
+     ab y-7 reichte die schwarze Plakette bis y+3,7 und ueberdeckte die
+     obere Haelfte der Zeile "IMMOBILIEN-INVESTITIONSANALYSE", deren
+     Grundlinie bei y+4,6 liegt. Auf dem Bildschirm sah der Kopf richtig
+     aus - erst im gerenderten PDF war es zu sehen.
+
+     Jetzt: 27 x 8,5 mm ab y-7,6, also Unterkante y+0,9. Die Unterzeile
+     beginnt rund bei y+3,0 - gut 2 mm Luft. Die Goldlinie bei y+8,5
+     bleibt unberuehrt.
+
+     Alle drei PDF-Bausteine nehmen diese Zahlen. Wer sie aendert, muss
+     sie danach am GERENDERTEN Blatt nachmessen, nicht im Code. */
+  var KOPF = { b: 27, h: 8.5, dy: -7.6 };
+
   window.DealPilotPdfLogo = {
     pfad: PFAD,
+    kopf: KOPF,
     dealpilot: dealpilotLogo,
     fuerMarke: fuerMarke,
     ausSpeicher: ausSpeicher,
