@@ -265,6 +265,18 @@ async function ernteGebiet(browser, wb, ags, name) {
     for (let li = 0; li < lagen.length; li++) {
       await T.setzeAuswahl(seite, lage.i, li);
       await seite.waitForTimeout(1600);
+      /* Die Lage EINMAL je Block nachweisen, statt bei jedem Punkt.
+         Der Nachweis bleibt - er wandert nur an die Stelle, an der sich
+         wirklich etwas aendert. Stimmt sie hier nicht, waere das ganze
+         Gitter falsch beschriftet; das muss auffallen. */
+      const nachLage = await seite.evaluate((i) => {
+        const b = document.querySelectorAll('[class*="ParameterControlBox"]')[i];
+        return b ? ((b.querySelector('.tabComboBoxName') || {}).textContent || '').trim() : null;
+      }, lage.i);
+      if (nachLage !== lagen[li]) {
+        throw new Error(`Lage liess sich nicht auf "${lagen[li]}" stellen `
+          + `(Waehler zeigt "${nachLage}") - Gebiet nicht abgetastet`);
+      }
       const tafel = {};
       for (const b of achseB) {
         await T.setzeZahl(seite, brw.i, b);
@@ -282,7 +294,14 @@ async function ernteGebiet(browser, wb, ags, name) {
             const bild = await vektorbild(seite, path.join(ROH, `${wb}-t.svg`));
             if (!bild) { await seite.waitForTimeout(1500); continue; }
             const z = zustandAus(bild);
-            if (z.brw === b && z.sachwert === s && z.lage === lagen[li]) {
+            /* NUR die beiden Zahlen vergleichen, die sich je Punkt
+               aendern. Die Lage wird einmal je Block gesetzt und kann
+               sich dazwischen nicht bewegen - sie mitzupruefen hat bei
+               Helmstedt jeden Punkt sechsmal wiederholen lassen, weil
+               der Waehler dort "Helmstedt, Koenigslutter [1,00]" zeigt
+               und das Bild die Klammer anders setzt. 20 Sekunden je
+               Punkt statt 3, und kein einziger Fehler dahinter. */
+            if (z.brw === b && z.sachwert === s) {
               r = faktorAus(bild); break;
             }
             verriegelt++;
