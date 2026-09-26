@@ -46,7 +46,8 @@
 
 /* ── Die Zeile ───────────────────────────────────────────────────── */
 .dp-pfbar{
-  display:flex !important; align-items:center !important; flex-wrap:wrap;
+  display:flex !important; flex-direction:row !important;
+  align-items:center !important; flex-wrap:wrap !important;
   gap:10px 14px !important;
   min-height:0 !important; height:auto !important;
   padding:8px 14px !important;
@@ -73,8 +74,19 @@
 .dp-pfbar .dp-pf-lead .s{ display:none !important; }
 
 /* Die beiden Gruppen stehen nebeneinander, nicht übereinander. */
+/* GEMESSEN am 26.09.2026: hier stand nur display/align/gap - und die
+   urspruengliche "flex-direction: column" hat ueberlebt. Die Leiste
+   blieb deshalb 77 statt 49 px hoch, weil Beschriftung und Kacheln
+   uebereinander standen.
+
+   > DISPLAY GESETZT, RICHTUNG VERGESSEN. Heute zum zweiten Mal (vorher
+   > die Schiene in layout-varianten.css). "display: flex" sagt nichts
+   > ueber die Richtung - wer eine Spalte zur Zeile machen will, muss
+   > BEIDES schreiben. Dasselbe gilt fuer "flex-wrap": ein geerbtes
+   > "nowrap" schlaegt ein neues "wrap" ohne !important. */
 .dp-pfbar .dp-pf-seg{
-  display:flex !important; align-items:center !important; gap:9px !important;
+  display:flex !important; flex-direction:row !important;
+  align-items:center !important; gap:9px !important;
   height:auto !important; min-height:0 !important; padding:0 !important;
   flex:0 1 auto; min-width:0; flex-wrap:wrap;
 }
@@ -86,7 +98,8 @@
   margin:0 !important; white-space:nowrap; flex:0 0 auto;
 }
 .dp-pfbar .dp-pf-row{
-  display:flex !important; gap:6px !important; flex-wrap:wrap;
+  display:flex !important; flex-direction:row !important;
+  gap:6px !important; flex-wrap:wrap !important;
   height:auto !important; min-height:0 !important; width:auto !important;
 }
 
@@ -160,9 +173,10 @@ body.dp-chrome-hell .dp-pfbar .dp-pf-qr svg rect{ fill:#fff; }
 }
 @media (max-width:700px){
   .dp-pfbar{ flex-direction:column !important; align-items:stretch !important; }
+  .dp-pfbar .dp-pf-seg{ flex-wrap:wrap !important; }
   .dp-pfbar .dp-pf-seg{ width:100%; }
   .dp-pfbar .dp-pf-row{ width:100%; }
-  .dp-pfbar .dp-pf-tile{ flex:1 1 calc(50% - 3px); justify-content:center !important; }
+  .dp-pfbar .dp-pf-tile{ flex:1 1 calc(50% - 3px) !important; justify-content:center !important; }
   .dp-pfbar .dp-pf-rz{ width:100%; }
   .dp-pfbar .dp-pf-launch{ width:100% !important; }
 }
