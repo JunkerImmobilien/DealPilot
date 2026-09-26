@@ -190,11 +190,11 @@ html[data-dp-layout="v4"] #sidebar{
   /* Zweiter Messbefund: `translateX(-102%)` schiebt um die EIGENE
      Breite. Mit `left:208px` blieben 159 px sichtbar stehen - eine
      Schublade, die halb offen klemmt. Jetzt links bündig und ganz weg. */
-  transform:translateX(-102%); transition:transform .18s ease;
+  transform:translateX(-102%) !important; transition:transform .18s ease;
   box-shadow:0 0 40px -12px rgba(0,0,0,.45);
 }
 
-html[data-dpl-portfolio="auf"] #sidebar{ transform:translateX(0); }
+html[data-dpl-portfolio="auf"] #sidebar{ transform:translateX(0) !important; }
 html[data-dpl-portfolio="auf"]::after{
   content:''; position:fixed; inset:0; z-index:65; background:rgba(20,18,15,.34);
 }
