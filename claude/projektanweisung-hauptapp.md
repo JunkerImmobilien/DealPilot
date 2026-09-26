@@ -19410,3 +19410,89 @@ Form statt den Zweck.
   Partnerschnittstellen · DealPilot) ist noch offen; Entwurf 3 und 4 der
   Demo sind die Vorlage dafür.
 - Der Erntelauf läuft weiter.
+
+## Rollout-Journal 26.09.2026 (9) — aus der Bordkarte wird eine Zeile
+
+**Commits.** `7de41be` (v1639), `33d865d`/`262b1e7`/`3df61ac`/`0b7bbea`/
+`b3e5db5`/`81f1d49` (v1639b–g), `8e3dc1a` (v1639h).
+
+### Ohne ein Zeichen Markup anzufassen
+
+Marcel wählte Entwurf 1. Der Umbau läuft **ausschliesslich über CSS** —
+der Vertrag, an dem die gesamte Mechanik hängt, bleibt Zeichen für
+Zeichen stehen:
+
+```
+.dp-pf-tile + input[value=…]   ← selectedSources() liest genau das
+#oab-run                        ← der Ausloeser
+#oab-results                    ← wohin die Marktpreisindikation kommt
+.dp-pf-tile.on / .dp-pf-led     ← der Zustand je Quelle
+```
+
+> Eine Umgestaltung, die Markup anfasst, muss jede Mechanik daran neu
+> beweisen. Eine, die nur Flächen setzt, **kann** nichts kaputtmachen.
+
+**Nachgewiesen über den echten Bedienweg:** ein Klick auf eine Kachel
+setzt `.on` UND `input.checked`; `#oab-results` steht bereit. Der Abruf
+selbst wurde NICHT ausgelöst — er kostet Kerosin, und das ist Marcels
+Entscheidung, nicht meine.
+
+Zierat wird **ausgeblendet, nicht gelöscht**: Streifen, Perforation,
+Trenner, Strichcode. Der QR bleibt — er ist das einzige Element der
+alten Karte, das etwas TUT.
+
+**Beschriftung:** „PRE-FLIGHT" → **„Datenaufnahme"** (an zwei Stellen:
+Aufklapper und Titel), „Daten einlesen" → **„Daten übernehmen aus"**.
+„Marktbewertung" stand schon da.
+
+### Vier Kaskadenfehler an einem Nachmittag — alle dieselbe Familie
+
+| # | Befund | Ursache |
+|---|---|---|
+| 1 | Leiste 77 statt 49 px | `.dp-pf-seg` behielt `flex-direction:column` |
+| 2 | Zeile brach bei 1280 um | `.dp-pf-rz` hatte `min-width:208px` |
+| 3 | Zeile 76 statt 54 px | `#oab-run` trägt `min-height:50px` |
+| 4 | Layout 2 auf 390 px kaputt | Media-Query-Regeln ohne Anker |
+
+> **1 · DISPLAY GESETZT, RICHTUNG VERGESSEN.** `display:flex` sagt
+> nichts über die Richtung. Wer eine Spalte zur Zeile machen will, muss
+> BEIDES schreiben — dasselbe gilt für `flex-wrap`.
+>
+> **2 · MIN-WIDTH SCHLÄGT WIDTH**, genau wie min-height height schlägt.
+> Ein `width:auto !important` sieht dabei aus, als hätte man es
+> geregelt. Diese 208 px waren der ganze Umbruch: 1010 px Kinder plus
+> 42 px Abstände gegen 1028 px Platz.
+>
+> **3 · ID SCHLÄGT KLASSE**, und `!important` hilft nicht — es
+> entscheidet erst bei GLEICHER Spezifität. Wer eine Klasse schreibt
+> und sich wundert, sucht als erstes eine ID.
+>
+> **4 · EINE MEDIA-QUERY HEBT DIE SPEZIFITÄT NICHT AN.** Sie schränkt
+> nur ein, WANN eine Regel gilt — nicht, wie stark sie ist. Meine
+> Prefix-Korrektur aus v1636b hatte die eingerückten Zeilen in der
+> Media-Query nicht erfasst.
+
+### Gemessen, in drei Breiten
+
+| | Zeile | Layouts (v1/v2/v4) |
+|---|---:|---|
+| ab 1280 px | **54 px** (vorher 78) | Arbeitsfläche voll |
+| 834–1024 px | 95 px, zwei Reihen | Schiene wird Leiste |
+| 390 px | 211 px, gestapelt | Arbeitsfläche **386 von 390 px** |
+
+**Kein Querüberlauf in keiner Breite, in keinem Layout.**
+
+> Bei 390 px liess Layout 2 der Arbeitsfläche vorher **260 von 390 px**.
+> Jetzt wird aus jeder senkrechten Schiene eine waagerechte Leiste, und
+> bei den Spalten-Layouts übernimmt die **vorhandene** Handy-Schublade
+> der App. Der beste Handy-Entwurf ist der, den es schon gibt — ein
+> zweiter daneben hätte einen zweiten Zustand.
+
+Der Portfolio-Knopf wird jetzt IMMER gebaut und auf breiten Schirmen bei
+den Spalten-Layouts ausgeblendet. *Ein Bedienelement, das nur auf einem
+Gerät existiert, vergisst man beim Umbau des anderen.*
+
+**Rest.**
+- Die Checkliste (Entwurf 3) beim Anlegen eines neuen Objekts.
+- Quick-Check: die beiden Score-Karten weiss wie im Reiter Aktionen.
+- Der echte Abruf mit Marktpreisindikation ist ungeprüft — er kostet.
