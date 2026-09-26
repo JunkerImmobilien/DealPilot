@@ -18632,3 +18632,104 @@ beide Richtungen.
   Marcels Entscheidung.
 - Die Wohnflaechenkurve von Helmstedt und Peine (RH) nachernten.
 - Der Mountpfad von `/register/stand`.
+
+---
+
+## Rollout-Journal 26.09.2026 (2) — Sprechlauf und der Ernter
+
+**Commits.** `97ac037` (v1617 Hausgeld), `95b29bc` (v1618 Scores und
+Scrollen), `cb2aece` (v1619 feste Frage), `7de4c79` + `30589a7`
+(Ernter). Alle auf Staging.
+
+### Ein Rechenfehler, der wie eine Doppelfrage aussah
+
+Marcel: „umlagefaehige Kosten und nicht umlagefaehige Kosten, meine ich,
+ist doppelt." Er hatte recht — und es war schlimmer:
+
+Die Frage lautete *„Wie hoch ist das Hausgeld pro Jahr, und wie viel
+davon ist nicht umlagefaehig?"*. Der Nutzer nennt also die **Summe**.
+Sie landete in `hg_ul` — und das ist laut Formular und `calc.js:1288`
+der umlagefaehige **Teil**. Danach addiert `calc.js` `hg_nul` dazu.
+**Die Bewirtschaftungskosten waren um den nicht umlagefaehigen Anteil zu
+hoch.**
+
+> Beim Nachsehen fiel ein zweiter Fehler auf: **sechs Felder** (`hg_ul`,
+> `hg_nul`, `ul_sonst`, `weg_r`, `eigen_r`, `nul_sonst`) waren der KI als
+> „pro Monat" beschrieben. Im Formular tragen alle „/ Jahr". **Der KI
+> eine andere Einheit zu nennen als dem Rechenkern ist ein Faktor 12,
+> den niemand sieht.** Gegengeprueft: `ze`, `umlagef` und `bspar_rate`
+> sind wirklich monatlich und bleiben.
+
+### Marcels Frage „sind die ganzen Werte relevant?" — nachgesehen
+
+Von **64** abgefragten Feldern speisen **51** einen Rechenkern oder den
+Score, die uebrigen 13 die Erbbaurechnung, das Dossier-PDF oder den
+Speicher. **Kein einziges Feld ist tot.** `ds2_zustand` geht nicht nur
+in den Investor-Score, sondern auch in `rnd-calc.js` und
+`afa-engine.js` — es verschiebt die Restnutzungsdauer und damit die AfA.
+
+Das Problem war also nicht, WAS gefragt wird, sondern WIE:
+`_rfFeldName` holte die Beschriftung aus dem **Formular**; bei 19 der 64
+Felder gibt es dort keinen passenden Wrapper mit `<label>`, und dann
+fiel die Funktion auf `return id` zurueck — auf der Pille stand
+`ds2_mietausfall`. Der Sprechlauf bringt seine Woerter jetzt selbst mit
+(64 von 64) und nennt unter jeder Frage, was **wirklich** offen ist, mit
+Beispiel.
+
+### Der Deal Score kam fuenf Fragen zu spaet
+
+Er erschien nach Etappe 3 — nach **elf** Fragen. Gebraucht hat er nie
+mehr als Etappe 2: Kaufpreis, Miete, Eigenkapital, Zins, Tilgung stehen
+nach **sechs**. Und pro Halt gab es nur EINE Karte, weshalb Marcels
+Frage „wird immer beides angezeigt?" mit nein zu beantworten war.
+
+Beides behoben. Dazu laeuft der Verlauf jetzt immer mit (die Schonfrist
+von 120 px passt zu einem Lesetext, nicht zu einem Gespraech, in dem die
+naechste Frage unten steht), und die Frage steht **fest ueber dem
+Verlauf** — wer sich etwas erklaeren laesst, verliert sie sonst.
+
+### Der Ernter steht
+
+Die Lage ist ueber die URL grundsaetzlich nicht erreichbar, also bedient
+ein echter Browser den Rechner. Der Wert kommt aus dem **Vektorbild** —
+nicht aus der Antwort (nur Kacheln), nicht aus dem Kurzhinweis
+(abgeschaltet), nicht aus dem DOM (nur Beschriftungen).
+
+**Mitgeerntet wird der Lageschluessel, und der ist wichtiger als die
+Zahlen.** „Lage einblenden" zeigt `Gemarkung | Lageklasse |
+Gemarkungsnr`; Helmstedt nennt seine Lagen gleich beim Namen
+(„Helmstedt, Koenigslutter [1,00]"). Ohne so einen Schluessel waeren die
+Gitter unbrauchbar — wir wuessten den Faktor je Lageklasse und koennten
+einer Anschrift keine zuordnen. Genau daran scheitern Rostock und die
+Region Hannover bis heute. **Ein Gebiet ohne Schluessel wird deshalb gar
+nicht erst abgetastet.**
+
+**Fuenf Fehler auf dem Weg, alle gemessen statt geraten** — die
+Gebietseinstellung im Container, der Versatz als `matrix` an der
+umgebenden `<g>`, `&amp;` gegen `&`, die drei Ausfallarten des
+Volllaufs. Der teuerste:
+
+> Der Ernter drueckte vor jedem Abruf **Escape**, um ein offenes Menue zu
+> schliessen — und machte damit die gerade gesetzte Zahl rueckgaengig.
+> Das Dashboard sagt es selbst im Hinweistext: *„…oder die Escape-Taste,
+> um den Wert zurueckzusetzen."* Das Ergebnis waren verstreute Loecher,
+> die nach einem Zeitproblem aussahen. Laengeres Warten half kaum (13 auf
+> 11 von 48); einzeln nachgestellt lief **jeder** dieser Punkte
+> einwandfrei. Danach: **48 von 48, null leer, null Nachfassen.**
+
+Abnahme an Goslar: das Gitter faellt mit steigendem Sachwert (36
+Schritte), steigt mit steigendem Bodenrichtwert (32 Schritte), **null
+Brueche**, und der Vorgabepunkt ergibt 1,03 wie im amtlichen PDF.
+
+**Rest.**
+- Der Volllauf ueber die 17 Gebiete laeuft (losgeloest, `/opt/ernter/
+  lauf.log`). Danach: Rezepte bauen, ins Register, ausrollen.
+- **`ni-lageachse.csv` ist verdaechtig:** Luechow-Dannenberg hat gar
+  keine Lage-Auswahl, nur ein Zahlenfeld `Lagewert`. Der Erkenner hat
+  damals vermutlich das Wort „Lage" in „Lagewert" getroffen. Dann stehen
+  dort Gebiete als blockiert, die es nie waren.
+- Der RAM des Staging-Servers ist knapp (3,8 GB): ein Browser-Container
+  neben der laufenden App hat die SSH-Sitzung einmal abgeraeumt. Laeufe
+  deshalb losgeloest starten und mit `--memory` begrenzen.
+- Die neun zusammengesetzten Gebiete ohne AGS brauchen eine eigene
+  Zuordnung.
