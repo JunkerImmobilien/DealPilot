@@ -221,3 +221,23 @@ body:not(.dp-chrome-hell) .dp-pfbar .dp-pf-led{ background:#2A2622 !important; }
 @media (max-width:700px){
   .dp-pfbar .dp-pf-seg:first-of-type .dp-pf-tile{ flex:1 1 100% !important; }
 }
+
+/* GEMESSEN: der Ausloeser blieb 50 px hoch und machte die ganze Zeile
+   76 statt 54 px. Ursache: `#oab-run` traegt `min-height:50px`, und ein
+   ID-Selektor (1,0,0) schlaegt jede Klassenregel (0,2,0) - auch mit
+   !important, denn !important entscheidet erst BEI GLEICHER Herkunft,
+   nicht ueber die Spezifitaet hinweg.
+
+   > ID-Selektoren sind der blinde Fleck aus FALLEN.md. Wer eine Klasse
+   > schreibt und sich wundert, sucht als erstes eine ID.
+
+   Deshalb hier mit ID: `.dp-pfbar button#oab-run` ist (1,1,1). */
+.dp-pfbar button#oab-run,
+.dp-pfbar #oab-run.dp-pf-launch{
+  min-height:0 !important; height:auto !important;
+  padding:8px 18px !important; font-size:13px !important;
+  border-radius:2px !important;
+}
+@media (max-width:700px){
+  .dp-pfbar button#oab-run{ width:100% !important; }
+}
