@@ -88,22 +88,43 @@ window.DealPilotConfig = (function() {
       };
     }
     
-    // Pro-Plan: User-Custom-Branding wenn gesetzt, sonst Junker-Defaults als Fallback
+    /* Pro-Plan: eigenes Branding, wenn eines hinterlegt ist.
+       `eigenes` fragt breiter als das frueher `is_custom` tat: wer
+       Anschrift oder Web eingetragen hat, hat ebenso eine eigene
+       Identitaet wie jemand mit Firma oder Telefon. */
+    var eigenes = !!(s.user_company || s.pdf_phone || s.pdf_email
+                     || s.pdf_address || s.pdf_city || s.pdf_website);
     return {
       product_name: BRANDING_DEFAULTS.product_name,
       tagline: BRANDING_DEFAULTS.tagline,
       logo_b64: s.pdf_logo_b64 || '',
       logo_path: BRANDING_DEFAULTS.logo_path,
-      company: s.user_company || JUNKER_DEFAULTS.company,
+      /* ═══ v1631 · ZWEI IDENTITAETEN DUERFEN SICH NICHT MISCHEN ═══════
+         Bis hierher fiel JEDES Feld einzeln auf die Junker-Vorgabe
+         zurueck. Wer sein eigenes Unternehmen eingetragen hatte, aber
+         keine E-Mail, bekam im Dokument seine Firma mit
+         `info@dealpilot.immo` - gemessen am 26.09.2026 an Marcels
+         eigenem Profil, im Investment-PDF fuer die BANK.
+
+         Eine Bank, die auf so ein Dokument antwortet, schreibt an die
+         falsche Adresse. Und ein Kontaktblock, der zwei Absender mischt,
+         ist schlimmer als einer, dem eine Zeile fehlt.
+
+         Deshalb: hat der Nutzer EIGENE Angaben, gelten NUR seine. Was er
+         nicht ausgefuellt hat, bleibt leer und wird im PDF weggelassen -
+         die Bausteine pruefen ohnehin auf Inhalt. Nur wer gar nichts
+         eigenes hinterlegt hat, bekommt den vollstaendigen
+         Vorgabeblock. */
+      company: s.user_company || (eigenes ? '' : JUNKER_DEFAULTS.company),
       name: s.user_name || '',
       role: s.user_role || '',
-      address: s.pdf_address || JUNKER_DEFAULTS.address,
-      plz: s.pdf_plz || JUNKER_DEFAULTS.plz,
-      city: s.pdf_city || JUNKER_DEFAULTS.city,
-      phone: s.pdf_phone || JUNKER_DEFAULTS.phone,
-      email: s.pdf_email || JUNKER_DEFAULTS.email,
-      website: s.pdf_website || JUNKER_DEFAULTS.website,
-      is_custom: !!(s.user_company || s.pdf_phone || s.pdf_email)
+      address: s.pdf_address || (eigenes ? '' : JUNKER_DEFAULTS.address),
+      plz: s.pdf_plz || (eigenes ? '' : JUNKER_DEFAULTS.plz),
+      city: s.pdf_city || (eigenes ? '' : JUNKER_DEFAULTS.city),
+      phone: s.pdf_phone || (eigenes ? '' : JUNKER_DEFAULTS.phone),
+      email: s.pdf_email || (eigenes ? '' : JUNKER_DEFAULTS.email),
+      website: s.pdf_website || (eigenes ? '' : JUNKER_DEFAULTS.website),
+      is_custom: eigenes
     };
   }
 
