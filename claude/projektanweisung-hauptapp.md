@@ -19280,3 +19280,133 @@ Querüberlauf**. Reiterwechsel über den echten Bedienweg geprüft
   auftaucht. Er ist ein eigenes Werkzeug und lässt sich schliessen.
 - Ein Layout für das Handy ist noch nicht gebaut; unter 900 px fallen
   die Schienen in den Fluss zurück.
+
+## Rollout-Journal 26.09.2026 (8) — Darstellung, Anbieter, Erststart
+
+**Commits.** `fdc2d30` (v1637), `608a768`/`4acdf18` (Gold), `a8700cd`
+(v1638), `0316ee7` (Demo Bordkarte).
+
+### Der Aufbau steht jetzt in der Darstellung
+
+Der Layout-Umschalter hängt sich **von aussen** in `#dpuv-panel` ein, mit
+dessen eigener Markup-Sprache (`.dpuv-g`, `.dpuv-seg`, `.dpuv-sgb`), und
+steht dort als **erste** Gruppe „Aufbau" — vor „Modus", weil der Aufbau
+die gröbere Entscheidung ist.
+
+> `ui-varianten.js` hat 1.296 Zeilen und eine eigene Speicher- und
+> Anwendungsmechanik. Dort hineinzuschreiben hiesse, sie zu verstehen UND
+> zu riskieren. Ein Abschnitt, der sich von aussen einhängt, kann sie
+> nicht kaputtmachen — und erbt jede künftige Änderung am Panel.
+
+### Die Bewertungspartner sind unsichtbar, nicht gelöscht
+
+Marcel: „wir lassen die Programmierung im Hintergrund, dass wir später
+die Buttons wieder einfügen können." Zugleich die Hausregel aus
+`CLAUDE.md`: **namentlich nie nach aussen.**
+
+**EIN Schalter statt sechs Löschungen:** `PARTNER_AVM_SICHTBAR` in
+`object-actions.js`. `window.DP_PARTNER_AVM = true` holt alles zurück;
+`avmFetch`, `_oabApplyExternal` und die Reihenfolge in `order` wurden
+nicht angefasst. Dazu zwei Hinweiszeilen entschärft, die beide Namen
+trugen.
+
+> Ein auskommentierter Knopf ist eine Leiche. Ein Knopf hinter einem
+> benannten Schalter ist eine Entscheidung.
+
+**Nachgemessen:** vier Kacheln statt sechs (DealPilot · Exposé ·
+Sprache · ImmoMetrica), null Partnerlogos, null Hinweistexte mit Namen,
+`_oabApplyExternal` weiterhin vorhanden.
+
+### Der Gold-Wächter hat mich erwischt — und das ist gut
+
+`gold-audit` meldete nach dem Layout-Paket **RC=1**:
+
+| Datei | Basislinie → jetzt |
+|---|---|
+| `css/layout-varianten.css` | 0 → **6** (Datei war sauber) |
+| `css/hell-varianten.css` | 0 → 5 |
+| `js/pdf-investment-bank.js` | 0 → 1 |
+| `js/voice-import.js` | 2 → 4 |
+
+Meine sechs waren echt. Die übrigen waren Altbestand, der nie in der
+Basislinie stand. **Alle zehn abgetragen** — `rgba(201,168,76,.16)` wird
+`color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent)`, damit
+der Mandantenton mitfärbt statt hart zu bleiben.
+
+**Danach RC=0**, und die Basislinie ist von **448 auf 439** gesunken.
+Der Deckel darf sinken, nie steigen.
+
+> Und eine Falle am Rande: `python3 … | tail` gab **RC=0** zurück,
+> obwohl der Audit rot war. Der Exit-Code nach einer Pipe ist der des
+> LETZTEN Gliedes. Steht schon in `FALLEN.md`, und ich bin trotzdem
+> hineingelaufen — erst die Umleitung in eine Datei hat es gezeigt.
+
+### Whitelabel: gemessen, nicht angenommen
+
+Mit einem fremden Markenton (`#2F6FB3`) über die echte Schnittstelle
+`DealPilotWhitelabel.apply()`:
+
+| | vorher | nachher |
+|---|---|---|
+| `--wl-c9a84c` | (leer) | `#2F6FB3` |
+| `--dpl-gold` | `#C9A84C` | `#2F6FB3` |
+| Schriftzug „Pilot" | Gold | `rgb(35,85,138)` |
+| Goldkante am Reiter | Gold | `rgb(47,111,179)` |
+
+**Alles folgt dem Partnerton, ohne eine Zeile Sonderbehandlung.** Dazu
+zeigt die Schiene jetzt das **Mandantenlogo**, wenn eines hinterlegt ist
+— aus derselben Quelle wie die PDFs (`branding.get().logo_b64`).
+
+> **Zweite falsche Diagnose desselben Tages, ausdrücklich
+> zurückgenommen.** Ich meldete zuerst „die Goldkante übernimmt den
+> Partnerton nicht" — sie tat es, der Tab lief nur im Hintergrund und
+> der CSS-Übergang stand beim Startwert. Mit `transition:none` sass der
+> Wert sofort richtig. **Vor jeder Messung an Farbe, Grösse oder Lage
+> gehört `*{transition:none !important}` eingespritzt**, nicht nur vor
+> Zeitmessungen.
+
+### Erststart (v1638): erst nachgesehen, dann gebaut
+
+Marcel wollte dem neuen Kunden sagen, welche Standardwerte er setzen
+soll. **Bevor hier etwas entstand, habe ich geprüft, ob es die gibt.**
+Es gibt sie alle, in `DealPilotInvestmentProfile`:
+
+| | gemessen |
+|---|---|
+| Zinssatz | **4,27 %** (aus `marketRates`, ECB/Bundesbank 02/2026 + Marge) |
+| Eigenkapital | 20 % |
+| Tilgung | 1 % |
+| Mietausfallwagnis | 2 % (+ Leerstand 2 %) |
+| Nicht umlagefähige Kosten | 17 % |
+
+**Die Karte legt deshalb KEINE neue Einstellung an.** Sie zeigt die
+laufenden Werte und führt mit einem Klick auf
+`showSettings('standardwerte')` — dieselbe Seite, die der Nutzer auch
+sonst benutzt. Eine zweite Vorgabeliste wäre der siebte Fall von „zwei
+Listen für dieselbe Sache" in diesem Projekt.
+
+Sie erscheint **einmal je Browser** und nur, wenn die Tour noch nicht
+abgeschlossen ist — wer die Tour kennt, ist nicht neu.
+
+### Demo: die Bordkarte (fünf Entwürfe + Name)
+
+`frontend/entwurf-aktionsbox.html`. Gemessen trägt die Karte heute
+Perforation, Reisszone, Strichcode, QR-Feld und Abriss-Knopf — für eine
+Aufgabe aus **vier Kacheln und einem Knopf**.
+
+> Eine Metapher trägt, solange sie etwas erklärt. Erklärt sie nichts
+> mehr, ist sie Dekoration — und Dekoration ist genau das, was einem
+> Banker auffällt.
+
+Fünf Entwürfe, 58 bis 325 px hoch (heute rund 140).
+**Namensvorschlag: „Datenaufnahme"** — „Pre-Flight" trifft nicht (hier
+wird nichts geprüft, hier wird eingelesen), „Aktionsbox" beschreibt die
+Form statt den Zweck.
+
+**Rest.**
+- Die Bordkarte ist bislang nur ein Entwurf — der Umbau wartet auf
+  Marcels Wahl.
+- Das Untermenü beim Anlegen eines neuen Objekts (PDF-Import ·
+  Partnerschnittstellen · DealPilot) ist noch offen; Entwurf 3 und 4 der
+  Demo sind die Vorlage dafür.
+- Der Erntelauf läuft weiter.
