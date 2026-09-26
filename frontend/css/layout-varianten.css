@@ -59,13 +59,35 @@ html[data-dp-layout] .hdr-v61-row2 .scores{
   min-height:0 !important; padding:0 !important; border:1px solid var(--dpl-linie) !important;
   border-radius:2px !important; background:var(--dpl-flaeche) !important; overflow:hidden;
 }
+/* Die Kachel wird zur ZEILE. Gemessen war sie 93 px hoch, weil vier
+   Blöcke untereinander stehen: Beschriftung 15, Wert 33, Zusatz 15,
+   Balken 4. Beschriftung und Wert rücken nebeneinander, der Zusatz
+   ("4 / 4 KPIs") entfällt - er wiederholt, was die Vollständigkeits-
+   anzeige im Kopf schon sagt -, und der Balken legt sich als 2-px-Linie
+   an den unteren Rand. */
 html[data-dp-layout] .hdr-v61-row2 .sc-pill{
   flex:1 1 0 !important; min-width:0 !important; height:auto !important;
-  min-height:0 !important; padding:6px 12px !important; margin:0 !important;
+  min-height:0 !important; margin:0 !important; position:relative !important;
+  display:grid !important; grid-template-columns:auto 1fr !important;
+  align-items:baseline !important; gap:0 8px !important;
+  padding:6px 12px 8px !important;
   border:0 !important; border-right:1px solid var(--dpl-linie) !important;
   border-radius:0 !important; background:transparent !important; box-shadow:none !important;
 }
 html[data-dp-layout] .hdr-v61-row2 .sc-pill:last-child{ border-right:0 !important; }
+html[data-dp-layout] .hdr-v61-row2 .sc-pill-l{
+  font-size:9px !important; letter-spacing:.1em !important; margin:0 !important;
+  color:var(--dpl-sehr-leise) !important;
+}
+html[data-dp-layout] .hdr-v61-row2 .sc-pill-v{
+  font-size:15px !important; line-height:1.15 !important; margin:0 !important;
+  text-align:right !important;
+}
+html[data-dp-layout] .hdr-v61-row2 .sc-pill-sub{ display:none !important; }
+html[data-dp-layout] .hdr-v61-row2 .sc-bar{
+  position:absolute !important; left:12px; right:12px; bottom:3px;
+  height:2px !important; margin:0 !important; grid-column:1 / -1;
+}
 
 /* Der kleine Score im Kopf - er ist da, er war nur leer. */
 html[data-dp-layout] #hdr-score-mini{
@@ -189,7 +211,23 @@ html[data-dp-layout="v4"] #sidebar{
   width:360px !important; max-width:88vw;
   /* Zweiter Messbefund: `translateX(-102%)` schiebt um die EIGENE
      Breite. Mit `left:208px` blieben 159 px sichtbar stehen - eine
-     Schublade, die halb offen klemmt. Jetzt links bündig und ganz weg. */
+     Schublade, die halb offen klemmt. Jetzt links bündig und ganz weg.
+
+     > DAS `!important` HIER IST EIN DENKMAL AN EINE FALSCHE DIAGNOSE.
+     > Ich hielt die Regel für überstimmt, weil `getComputedStyle` die
+     > Einheitsmatrix zurückgab - auch bei INLINE gesetztem Wert. Der
+     > Kaskaden-Walker fand aber keinen Überstimmer, und mit
+     > `transition:none` sass der Wert sofort bei -367 px.
+     >
+     > **Der Tab lief im Hintergrund.** In einem versteckten Tab friert
+     > Chrome jeden CSS-Übergang beim STARTWERT ein - die Messung zeigte
+     > also nicht den Zielzustand, sondern den ersten Einzelbild eines
+     > Übergangs, der nie weiterlief. `visibilityState` gehört vor jede
+     > Messung an einer Animation.
+     >
+     > Das `!important` bleibt stehen, weil es nicht schadet und in
+     > dieser Datei ohnehin die Hausordnung ist - aber es löst nicht das
+     > Problem, für das ich es gesetzt habe. */
   transform:translateX(-102%) !important; transition:transform .18s ease;
   box-shadow:0 0 40px -12px rgba(0,0,0,.45);
 }
