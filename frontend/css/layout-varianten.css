@@ -2327,3 +2327,179 @@ html[data-dp-layout] body header.hdr .sc-donut,
 html[data-dp-layout] body header.hdr .sc-ring{
   filter:none !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1655 · DIE ZUSAMMENSETZUNG DES DEAL SCORES, NACH DER DEMO
+
+   Marcel am 28.09.2026: „die Zusammensetzung des Deal Scores, das sieht
+   in der Demo noch anders aus."
+
+   ── ERST DER BEFUND, UND ER GEHT AUF MEIN KONTO ──────────────────────
+   Gemessen: `.sc-main` - der Block mit Ring, Note und Bezeichnung -
+   steht auf `display:none`, **gesetzt von dieser Datei** (Zeile 52).
+   Sichtbar sind nur die fuenf Anteils-Pillen und ein Textstueck
+   „70 Gut" in `#hdr-score-mini`.
+
+   Die Absicht von damals steht im Kopf dieser Datei: „der grosse
+   Investor Deal Score verschwindet, `#hdr-score-mini` tritt an seine
+   Stelle" - Marcel wollte ihn nicht gross oben, „waere aber gut, wenn
+   man ihn noch irgendwo stehen haette."
+
+   > **Ich habe ihn verschwinden lassen und nichts Gleichwertiges
+   > hingestellt.** Aus einem Ring mit Note wurde „70 Gut" in 11 px.
+   > Der Entwurf zeigt an dieser Stelle einen CHIP: Ring mit der Zahl,
+   > daneben die Note und darunter, wofuer sie steht.
+
+   ── WAS HIER PASSIERT ────────────────────────────────────────────────
+   `.sc-main` wird wieder eingeblendet - aber als Chip von rund 34 px
+   statt eines Blocks von 141. **Nachgebaut wird nichts:** Ring
+   (`.sc-donut`), Note (`.sc-grade`), Bezeichnung (`.sc-l`) und
+   Einordnung (`.sc-v`) sind alle vorhanden, sie waren nur unsichtbar.
+   Der echte Ring zeigt auch den echten Fortschritt - ein
+   nachgebauter haette eine zweite Wahrheit.
+
+   `#hdr-score-mini` tritt dafuer ab: derselbe Wert zweimal im selben
+   Kopf ist keine Redundanz, sondern eine offene Frage, welcher gilt.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+html[data-dp-layout] body header.hdr .hdr-v61-row2 .sc-main{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:9px !important;
+  flex:0 0 auto !important;
+  padding:4px 11px 4px 5px !important;
+  background:#171512 !important;
+  border:1px solid #2A2622 !important;
+  border-radius:6px !important;
+  height:auto !important; min-height:0 !important;
+  max-width:none !important; width:auto !important;
+  margin:0 12px 0 0 !important;
+  box-shadow:none !important;
+}
+/* Was der Entwurf an dieser Stelle NICHT zeigt: das Investor-Abzeichen,
+   die Aufzaehlung der Bestandteile und den Hinweiszeiger. Sie stehen
+   weiterhin im Reiter Bewertung, wo Platz fuer sie ist. */
+html[data-dp-layout] body header.hdr .sc-main .sc-investor-badge,
+html[data-dp-layout] body header.hdr .sc-main .sc-sub,
+html[data-dp-layout] body header.hdr .sc-main .sc-tip{
+  display:none !important;
+}
+html[data-dp-layout] body header.hdr .sc-main .si{
+  display:flex !important; align-items:center !important; gap:9px !important;
+  height:auto !important; padding:0 !important; margin:0 !important;
+}
+/* Der Ring. 30 px, und die Zahl darin lesbar. */
+html[data-dp-layout] body header.hdr .sc-main .sc-donut-wrap{
+  display:flex !important; align-items:center !important; gap:6px !important;
+  flex:0 0 auto !important; margin:0 !important; padding:0 !important;
+}
+html[data-dp-layout] body header.hdr .sc-main .sc-donut{
+  width:30px !important; height:30px !important;
+  flex:0 0 30px !important; margin:0 !important;
+  font-size:11px !important; font-weight:700 !important;
+}
+html[data-dp-layout] body header.hdr .sc-main .sc-donut > *{
+  font-size:11px !important; color:#F5EFE2 !important;
+}
+/* Die Note steht im Entwurf als kleine Pille neben dem Ring. */
+html[data-dp-layout] body header.hdr .sc-main .sc-grade{
+  font-family:'JetBrains Mono',ui-monospace,monospace !important;
+  font-size:9px !important; letter-spacing:.09em !important;
+  text-transform:uppercase !important;
+  padding:2px 6px !important; border-radius:999px !important;
+  background:#221F1A !important; border:1px solid #2A2622 !important;
+  margin:0 !important;
+}
+html[data-dp-layout] body header.hdr .sc-main .sc-info{
+  display:block !important; min-width:0 !important;
+  line-height:1.15 !important; margin:0 !important; padding:0 !important;
+}
+/* „Gute Bewertung" - die Einordnung, fett und in Leseschrift. */
+html[data-dp-layout] body header.hdr .sc-main .sc-v{
+  display:block !important;
+  font-size:11.5px !important; font-weight:600 !important;
+  color:#F5EFE2 !important; margin:0 !important;
+  white-space:nowrap !important;
+}
+/* „Investor Deal Score" - wofuer die Zahl steht. */
+html[data-dp-layout] body header.hdr .sc-main .sc-l{
+  display:flex !important; align-items:center !important; gap:4px !important;
+  font-family:'JetBrains Mono',ui-monospace,monospace !important;
+  font-size:8.5px !important; letter-spacing:.09em !important;
+  text-transform:uppercase !important;
+  color:#8C8578 !important; margin:0 !important;
+  white-space:nowrap !important;
+}
+html[data-dp-layout] body header.hdr .sc-main .sc-l .ic{
+  width:9px !important; height:9px !important; flex:0 0 9px !important;
+}
+/* Derselbe Wert zweimal im Kopf ist eine offene Frage, welcher gilt. */
+html[data-dp-layout] body header.hdr #hdr-score-mini{
+  display:none !important;
+}
+
+/* ── DIE KENNZAHLEN ALS EINE LEISTE ──────────────────────────────────
+   Im Entwurf ist `.kz-zeile` **ein** Band mit Trennlinien zwischen den
+   Zellen, jede gleich breit (`flex:1`) - nicht fuenf einzelne Kacheln
+   mit Abstand.
+
+   Gemessen war jede Pille **377 px** breit, weil sie sich auf 1.889 px
+   verteilten. Der Entwurf setzt sie in ein Band von fester Breite; so
+   stehen Zahl unter Zahl, und man vergleicht sie mit einem Blick.
+
+   > Fuenf Kacheln, die ueber einen ganzen Bildschirm gezogen werden,
+   > sind keine Zeile mehr, sondern fuenf Einzelaussagen. */
+html[data-dp-layout] body header.hdr .scores{
+  display:flex !important;
+  align-items:center !important;
+  gap:0 !important;
+  flex-wrap:nowrap !important;
+}
+html[data-dp-layout] body header.hdr .scores .sc-pill{
+  flex:1 1 0 !important;
+  max-width:190px !important; min-width:0 !important;
+  margin:0 !important;
+  border:1px solid #2A2622 !important;
+  border-right-width:0 !important;
+  border-radius:0 !important;
+  padding:5px 11px !important;
+  background:#171512 !important;
+}
+html[data-dp-layout] body header.hdr .scores .sc-pill:first-of-type{
+  border-top-left-radius:6px !important; border-bottom-left-radius:6px !important;
+}
+html[data-dp-layout] body header.hdr .scores .sc-pill:last-of-type{
+  border-right-width:1px !important;
+  border-top-right-radius:6px !important; border-bottom-right-radius:6px !important;
+}
+/* Der Wert in Mono mit gleichen Ziffernbreiten - sonst tanzen die
+   Zahlen, sobald sich eine aendert. */
+html[data-dp-layout] body header.hdr .scores .sc-pill .sc-pill-v{
+  font-family:'JetBrains Mono',ui-monospace,monospace !important;
+  font-size:15px !important; font-weight:700 !important;
+  font-variant-numeric:tabular-nums !important;
+  line-height:1.1 !important;
+}
+html[data-dp-layout] body header.hdr .scores .sc-pill .sc-pill-l{
+  font-family:'JetBrains Mono',ui-monospace,monospace !important;
+  font-size:9px !important; letter-spacing:.1em !important;
+  margin-bottom:1px !important;
+}
+html[data-dp-layout] body header.hdr .scores .sc-pill .sc-pill-sub{
+  font-variant-numeric:tabular-nums !important;
+}
+/* Der Balken bleibt - er traegt die Stufenfarbe und damit die
+   Bedeutung, die kein Text ersetzt. */
+html[data-dp-layout] body header.hdr .scores .sc-pill .sc-bar{
+  margin-top:3px !important;
+}
+
+/* Unter 1400 px hat die Leiste keinen Platz mehr fuer fuenf Zellen
+   nebeneinander; sie bricht um, statt die Zahlen zu quetschen. */
+@media (max-width: 1400px){
+  html[data-dp-layout] body header.hdr .scores{ flex-wrap:wrap !important; }
+  html[data-dp-layout] body header.hdr .scores .sc-pill{
+    flex:1 1 150px !important; border-right-width:1px !important;
+    border-radius:6px !important; margin:2px !important;
+  }
+}
