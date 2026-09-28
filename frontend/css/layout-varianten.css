@@ -2631,3 +2631,111 @@ html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut::before{
 html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-investor-badge{
   background-image:none !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1656 · MARCELS VIERTER DURCHGANG
+
+   „wenn wir auf Portfolio klicken, dann kann ich kein Objekt auswaehlen"
+   „Quick Check und Marktbericht brauche ich jetzt nicht, das koennte raus"
+   „die Investor-Deal-Score-Anzeige muss nicht einen schwarzen Hintergrund
+    haben, aber das soll schon mehr in Richtung Demo gehen"
+   „unter Bewertung die Karten schwarz umrahmen, generell schwarze
+    Umrahmungen"
+   „wenn man auf Portfolio klickt, koennte man darunter die Anzeige
+    wegmachen mit Objekt bis Deal-Aktion"
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1 · BEIM PORTFOLIO TRETEN DIE REITER ZURUECK ────────────────────
+   Die Reiter gehoeren zu EINEM Objekt. Solange die Liste offen ist,
+   ist noch keins gewaehlt - sie stehen dann fuer etwas, das gerade
+   nicht zur Debatte steht, und kosten den Platz, den die Liste braucht.
+
+   > Zwei Ebenen, die einander abloesen, statt uebereinander zu liegen:
+   > Portfolio ODER dieses Objekt. */
+html[data-dpl-portfolio="auf"] .dpl-schiene .dpl-teil-tabs{
+  display:none !important;
+}
+/* Dafuer bekommt die Liste den freien Platz. */
+html[data-dpl-portfolio="auf"] .dpl-schiene .dpl-teil-objekte{
+  max-height:none !important;
+  flex:1 1 auto !important;
+  min-height:0 !important;
+}
+
+/* ── 2 · DER SCORE-CHIP NACH DEM ENTWURF ─────────────────────────────
+   Der Entwurf setzt ihn auf `var(--flaeche)` - ein helles Blatt, nicht
+   Obsidian. Marcel: „muss nicht einen schwarzen Hintergrund haben."
+
+   Helle Karte auf dunklem Kopf, wie die Objektkarten auf dunklem Grund:
+   das Blatt hebt sich ab, und die Zahl darauf ist ohne Aufhellung
+   lesbar. Die Stufenfarben bleiben, wo sie Bedeutung tragen. */
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-green,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-gold,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-red,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-top{
+  background:#FBF6E9 !important;
+  background-image:none !important;
+  border:1px solid #0E0D0B !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut::before{
+  background:#FBF6E9 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut > *{
+  color:#1A1714 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v *{
+  color:#1A1714 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-l,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-l *{
+  color:#6E675C !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-grade{
+  background:#FFFFFF !important;
+  border:1px solid #0E0D0B !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-green .sc-grade{ color:#2E8455 !important; }
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-top .sc-grade{ color:#2E8455 !important; }
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-gold .sc-grade{ color:#8A6B1F !important; }
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-red .sc-grade{ color:#A6322A !important; }
+
+/* Die Kennzahlenleiste zieht mit - sie gehoert zum selben Band. */
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill{
+  background:#FBF6E9 !important; background-image:none !important;
+  border-color:#0E0D0B !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-v{ color:#1A1714 !important; }
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-l{ color:#6E675C !important; }
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-sub{
+  color:#8A8272 !important; display:block !important;
+}
+
+/* ── 3 · SCHWARZE UMRANDUNGEN STATT GRAUER ──────────────────────────
+   Marcel: „unter Bewertung den Investor Deal Score - die Karten
+   schwarz umrahmen. Generell, dass wir dort schwarze Umrahmungen
+   machen, das waere deutlich besser."
+
+   Obsidian als Kante statt Grau. Der Unterschied ist klein und wirkt
+   sofort: eine graue Linie ist ein Rand, eine schwarze ist eine
+   Fassung.
+
+   > Statusfarben bleiben unangetastet - eine rote Karte behaelt ihre
+   > rote Kante, sonst verschwindet die Warnung in der Fassung
+   > (CLAUDE.md). */
+/* GEMESSEN im Reiter Bewertung, statt geraten - welche Flaechen dort
+   ueberhaupt eine graue Kante tragen:
+
+     .dpsh-pass   x2   rgb(230,224,211)   <- die Score-Karten
+     .card        x8   rgb(230,225,214)
+
+   Alles andere im Reiter traegt bereits eine STATUSFARBE (Gold, Gruen,
+   Rot: .dscr-box, .bc-matrix-cell, .proj-sum-row, .pos, .neg). Die
+   bleiben unangetastet - eine rote Zelle behaelt ihre rote Kante,
+   sonst verschwindet die Warnung in der Fassung (CLAUDE.md). */
+html[data-dp-layout] body .dpsh-pass,
+html[data-dp-layout] body .card{
+  border-color:#0E0D0B !important;
+}

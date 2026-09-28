@@ -97,7 +97,7 @@
       objekteAls: 'liste',
       schienen: [
         { stellung: 'links', ton: 'dunkel', marke: true, portfolio: true,
-          nimmt: ['schnellstart', 'suche', 'objekte', 'tabs', 'aktionen', 'nutzer'] }
+          nimmt: ['suche', 'objekte', 'tabs', 'aktionen', 'nutzer'] }
       ]
     },
     v2: {
@@ -105,7 +105,7 @@
       objekteAls: 'liste',
       schienen: [
         { stellung: 'links',  ton: 'dunkel', marke: true, portfolio: true,
-          nimmt: ['schnellstart', 'suche', 'objekte', 'tabs', 'nutzer'] },
+          nimmt: ['suche', 'objekte', 'tabs', 'nutzer'] },
         { stellung: 'rechts', ton: 'hell',   marke: false, portfolio: false,
           nimmt: ['aktionen'], titel: 'Aktionen' }
       ]
@@ -284,11 +284,36 @@
       }
     });
 
-    /* Beide Stellungen stehen `position:fixed`; der Ort im Dokument ist
-       deshalb gleichgueltig. (Die waagerechten Stellungen `leiste` und
-       `fuss` gab es bis v1652 - sie sind mit Werkbank und Dossier
-       gestrichen, und mit ihnen die Sortierfrage.) */
-    mc.appendChild(schiene);
+    /* ── v1656 · DER ORT IST DOCH NICHT GLEICHGUELTIG ───────────────
+       Hier stand: „Beide Stellungen stehen `position:fixed`; der Ort im
+       Dokument ist deshalb gleichgueltig." **Das war falsch, und es hat
+       die Objektliste unbedienbar gemacht.**
+
+       Marcel am 28.09.2026: „wenn wir auf Portfolio klicken, dann kann
+       ich kein Objekt auswaehlen. Es wird zwar was angezeigt, aber so
+       richtig auswaehlen kann man das nicht."
+
+       Gemessen: `document.elementFromPoint()` auf die Mitte einer Karte
+       gibt **`HTML`** zurueck - an dieser Stelle ist fuer den Browser
+       nichts Klickbares. Kein Ueberdecker, kein `pointer-events:none`,
+       alle Vorfahren `auto`. Der Grund steht eine Ebene hoeher:
+
+         .main-col   overflow: hidden auto
+                     Box 208,0 1925x1050
+         Karte       Box  10,270 bis 186,329   -> KOMPLETT AUSSERHALB
+
+       Die Schiene hing im DOM in `.main-col` und ragte links aus ihm
+       heraus. Sichtbar blieb sie, treffbar nicht.
+
+       > **Ich habe mich auf `position:fixed` verlassen und den
+       > klippenden Vorfahren nicht geprueft.** Und schlimmer: als die
+       > Messung „VERDECKT von HTML" meldete, habe ich sie fuer ein
+       > Artefakt gehalten und mit einem `dispatchEvent` gegengeprueft -
+       > das die Trefferpruefung gerade UMGEHT. Ein simulierter Klick
+       > beweist nichts ueber Klickbarkeit.
+
+       Die Schiene haengt jetzt am `<body>`. Dort klippt sie niemand. */
+    document.body.appendChild(schiene);
     schienen.push(schiene);
   }
   function zahlNachziehen() {
