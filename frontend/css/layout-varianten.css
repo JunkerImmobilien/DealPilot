@@ -2503,3 +2503,75 @@ html[data-dp-layout] body header.hdr .scores .sc-pill .sc-bar{
     border-radius:6px !important; margin:2px !important;
   }
 }
+
+/* ── v1655b · DER CHIP WAR GOLDEN, UND „GUT" STAND DARUNTER ───────────
+   Zwei Messbefunde nach v1655:
+
+   **(a)** Der Chip trug einen goldenen Verlauf statt meiner dunklen
+   Flaeche. Sieger ist `#hdr-badges .sc-main.sc-tier-green` - (1,2,0)
+   mit `!important` aus `style.css`. **Zum dritten Mal heute derselbe
+   Elternteil**: `.hdr-v61-row2` heisst `#hdr-badges`, und gegen eine
+   ID hilft keine Klassenkette, so lang sie auch ist.
+
+   > Wer in dieser Kopfzeile etwas umfaerbt, nimmt `#hdr-badges` in den
+   > Selektor. Das ist keine Vorsicht, das ist die Hausordnung.
+
+   **(b)** `.sc-grade` („Gut") stand bei y=96 UNTER dem Chip, mit
+   `color:rgb(0,59,7)` auf `rgb(34,31,26)` - dunkelgruen auf dunkel.
+   Der Ring und die Note sollen NEBENEINANDER stehen; ohne
+   `flex-wrap:nowrap` bricht die Note um, sobald es eng wird. */
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-green,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-gold,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-red,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-top{
+  background:#171512 !important;
+  background-image:none !important;
+  border:1px solid #2A2622 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut-wrap{
+  flex-wrap:nowrap !important;
+}
+/* Die Note traegt ihre Stufenfarbe - aber in einer Helligkeit, die auf
+   Obsidian ankommt. Gruen und Rot bleiben Gruen und Rot (CLAUDE.md);
+   sie werden nur aufgehellt, nicht ersetzt. */
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-grade{
+  color:#BFB7A9 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-green .sc-grade{
+  color:#7BE3A6 !important; border-color:rgba(63,165,108,.42) !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-top .sc-grade{
+  color:#7BE3A6 !important; border-color:rgba(63,165,108,.42) !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-gold .sc-grade{
+  color:#E8CC7A !important; border-color:rgba(201,168,76,.42) !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-red .sc-grade{
+  color:#E89A94 !important; border-color:rgba(184,98,92,.45) !important;
+}
+/* Die Zahl im Ring und die beiden Textzeilen, jetzt mit ID im
+   Selektor - sonst gilt fuer sie dasselbe wie fuer die Flaeche. */
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut > *{
+  color:#F5EFE2 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v{
+  color:#F5EFE2 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-l{
+  color:#8C8578 !important;
+}
+/* Und die Kennzahlenleiste, aus demselben Grund. */
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill{
+  background:#171512 !important; background-image:none !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-v{
+  color:#F5EFE2 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-l{
+  color:#A69E90 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-sub{
+  color:#8C8578 !important; display:block !important;
+}
