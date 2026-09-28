@@ -1639,3 +1639,36 @@ html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-search input
 html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-card{
   border-color:#2A2622 !important;
 }
+
+/* v1653f · Die vier Beschriftungen, die in der dunklen Schublade
+   uebrig blieben. Gemessen gegen rgb(14,13,11):
+
+     .sb-neu-lbl  „Quick-Check"     1,60
+     .sb-neu-lbl  „Marktbericht"    1,60
+     (Portfolio-Ueberschrift)       1,60
+     .sb-add-new  „+ Neues Objekt"  1,09   <- unsichtbar
+
+   Zum dritten Mal heute dieselbe Ursache: der Behaelter wurde
+   umgefaerbt, seine Kinder nicht. Ich pruefe eine dunkle Flaeche ab
+   jetzt immer mit dem Kontrast-Walker ueber ALLE Texttraeger, nicht
+   mit dem Auge. */
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-neu-lbl,
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-add-new,
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-neu-row,
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-section-title > span,
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-section-title{
+  color:#BFB7A9 !important;
+}
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-add-new{
+  border-color:#2A2622 !important; background:#171512 !important;
+}
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-add-new:hover{
+  color:#F5EFE2 !important;
+}
+/* Die beiden Kopfknoepfe sind Knoepfe - sie bekommen eine eigene
+   Flaeche, damit sie als solche erkennbar bleiben. */
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-neu-btn,
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-neu-row > *{
+  background:#171512 !important; border-color:#2A2622 !important;
+  color:#BFB7A9 !important;
+}
