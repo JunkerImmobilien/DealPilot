@@ -491,18 +491,33 @@
          kommt im Auslieferungszustand hoch. */
       skinVorher = null;
       if (document.body) document.body.classList.remove('dp-neue-karte', 'dp-neue-karte-stil');
-      var warHell = false;
-      try { warHell = document.body.classList.contains('dp-chrome-hell'); } catch (e) {}
-      if (warHell) {
-        try { localStorage.setItem('dp_chrome_hell', '0'); } catch (e) {}
-        try {
-          var u = new URL(location.href);
-          u.searchParams.delete('layout');
-          location.replace(u.toString());
-          return;
-        } catch (e) { location.reload(); return; }
-      }
-      h.removeAttribute('data-dpl-portfolio');
+      /* v1661b · DIE MARKEN BLEIBEN, NICHT DIE TOKENS.
+
+         Gemessen im kaputten Zustand: --dp-s0 stand korrekt auf
+          - die Farbtokens waren also RICHTIG. Weiss war es
+         trotzdem, weil drei MARKEN haengen blieben:
+
+           body.dp-chrome-hell      die Hell-Fassung (103 Regeln)
+           html[data-ui-theme]      die Darstellung
+           html[data-dp-karte]      hell-varianten.js
+
+         > Der Skin ist nicht kaputt, er ist nur nicht abgemeldet.
+         > Wer Tokens misst und Marken vergisst, sucht an der
+         > falschen Stelle.
+
+         Ein Neuladen hatte ich zuerst versucht - es wird vom
+         beforeunload-Horcher der Seite abgefangen und findet gar nicht
+         statt. Die Marken direkt zu entfernen wirkt sofort und
+         braucht keine Navigation. */
+      try {
+        document.body.classList.remove('dp-chrome-hell');
+        localStorage.setItem('dp_chrome_hell', '0');
+      } catch (e) {}
+      h.removeAttribute('data-ui-theme');
+      h.removeAttribute('data-dp-karte');
+      /* Und die Vorlage neu rechnen lassen, damit die Tokens zu den
+         Marken passen. */
+      try { if (typeof window._dpDispRefresh === 'function') window._dpDispRefresh(); } catch (e) {}
       try { localStorage.removeItem(LS); } catch (e) {}
       schalterNachziehen();
       return;
