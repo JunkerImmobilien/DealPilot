@@ -6348,6 +6348,116 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 #qb-bp .qb-stub .cap{ font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.1em;text-transform:uppercase;color:#9a8f6a; }
 @media(max-width:560px){ #qb-bp{flex-direction:column} #qb-bp .qb-tear{display:none} #qb-bp .qb-stub{flex-direction:row;flex-wrap:wrap;gap:14px;border-top:2px dashed color-mix(in srgb, var(--gold, #C9A84C) 40%, transparent)} }
 </style>
+
+<!-- ── v1663f · DIE QUICKBOARDING-KARTE BEKOMMT DIE FORM DER DEALSCORE-KARTE ──
+     Marcel: „dass du das Quickboarding, dass du die Karte so umbaust wie den
+     DealScore und dass der QR-Code quasi unten in der Leiste dann angezeigt
+     wird. Auf der Landing-Page haben wir ja so eine DealScore-Karte
+     abgebildet und da haben wir unten so einen Streifen."
+
+     Die Vorlage ist `landing/index.html:117` `.idscard`, gemessen in
+     `landing/dp2-hero.css:87-158`. Sie ist eine SPALTE:
+
+       Goldband  .ids-band   -> hier .ghead, gibt es schon
+       Kopf      .ids-head
+       Koerper   .ids-body   -> hier .mbody (Ring + Balken)
+       Zahlen    .ids-stats  -> hier .kt
+       Abriss    .ids-tear   height:15px, Grund #0c0b09, 2px gestrichelt
+                             Gold 40%, zwei 15-px-Ausstanzungen links/rechts
+       STREIFEN  .ids-foot   Grund #0c0b09, Polster 0 18px 13px,
+                             links/mittig je ein Beschriftungspaar
+                             (8 px Mono #9a8f6a ueber 12 px #E8CC7A),
+                             rechts .ids-qr weiss mit 4 px Polster
+
+     Bisher war `#qb-bp` eine ZEILE mit weissem Abriss RECHTS - 208 px, die
+     der Karte quer weggenommen wurden. Der Abriss wird zur Fusszeile.
+
+     > Ein Abriss rechts halbiert die Karte, ein Abriss unten schliesst sie
+     > ab. Beides ist dieselbe Metapher - nur die eine kostet ein Sechstel
+     > der Breite und die andere 60 px Hoehe.
+
+     Umgebaut wird NUR mit CSS: die Teile `.bp`, `.no`, `.cap`, `.lnk` und
+     `.qrlink` sind alle schon da, sie stehen nur untereinander statt
+     nebeneinander. Ein Raster mit drei Spalten stellt sie so, wie die
+     Vorlage sie zeigt - ohne einen fremden Baum umzuhaengen. -->
+<style id="qb-dealscore-stil">
+#qb-bp{ flex-direction:column !important; }
+
+/* Der Abriss: aus der senkrechten Perforation wird eine waagerechte.
+   Die beiden Ausstanzungen kann die Vorlage als eigene Elemente fuehren
+   (.nl/.nr) - hier gibt es sie nicht, also uebernehmen zwei
+   Radialverlaeufe im Grund ihre Rolle. */
+#qb-bp .qb-tear{
+  width:auto !important; height:15px !important; flex:none !important;
+  border-left:0 !important; position:relative;
+  background:
+    radial-gradient(circle 8px at 0 50%, #050505 98%, transparent 100%),
+    radial-gradient(circle 8px at 100% 50%, #050505 98%, transparent 100%),
+    #0c0b09;
+}
+#qb-bp .qb-tear::before{
+  content:""; position:absolute; left:16px; right:16px; top:50%;
+  width:auto !important; height:0 !important; border-radius:0 !important;
+  background:none !important; transform:none !important;
+  border-top:2px dashed color-mix(in srgb, var(--gold, #C9A84C) 40%, transparent);
+}
+#qb-bp .qb-tear::after{ display:none !important; }
+
+/* Der Streifen. Drei Spalten wie in der Vorlage: zwei
+   Beschriftungspaare, dann der QR ganz rechts. */
+#qb-bp .qb-stub{
+  display:grid !important;
+  grid-template-columns:auto auto 1fr !important;
+  grid-template-rows:auto auto !important;
+  align-items:center !important; justify-content:start !important;
+  column-gap:30px !important; row-gap:1px !important;
+  width:auto !important; flex:none !important;
+  padding:11px 18px 13px !important;
+  background:#0c0b09 !important;
+}
+#qb-bp .qb-stub .bp{ grid-column:1; grid-row:1; color:#9a8f6a !important; }
+#qb-bp .qb-stub .no{
+  grid-column:1; grid-row:2;
+  color:var(--gold-hi, #E8CC7A) !important; font-size:12px !important;
+}
+#qb-bp .qb-stub .cap{ grid-column:2; grid-row:1; color:#9a8f6a !important; }
+#qb-bp .qb-stub .lnk{
+  grid-column:2; grid-row:2;
+  color:var(--gold-hi, #E8CC7A) !important; font-size:10px !important;
+  border-bottom-color:color-mix(in srgb, var(--gold, #C9A84C) 45%, transparent) !important;
+}
+#qb-bp .qb-stub .qrlink{
+  grid-column:3; grid-row:1 / span 2; justify-self:end;
+  border-radius:0 !important;
+}
+/* Der QR wie in der Vorlage: weisses Feld, 4 px Polster, keine Rundung -
+   und klein genug, dass der Streifen ein Streifen bleibt. */
+#qb-bp .qb-stub .qrtile{
+  width:auto !important; height:auto !important;
+  padding:4px !important; border:0 !important; border-radius:0 !important;
+  background:#fff !important;
+}
+#qb-bp .qb-stub .qrtile img,
+#qb-bp .qb-stub .qrtile canvas,
+#qb-bp .qb-stub .qrtile svg{
+  width:60px !important; height:60px !important; border-radius:0 !important;
+}
+#qb-bp .qb-stub .qrtile .ph{ color:#8d846d !important; }
+
+/* Auf schmalen Schirmen faellt der QR unter die Beschriftungen, statt
+   sie zu quetschen. */
+@media(max-width:560px){
+  #qb-bp .qb-tear{ display:block !important; }
+  #qb-bp .qb-stub{
+    grid-template-columns:auto 1fr !important;
+    grid-template-rows:auto auto auto !important;
+    border-top:0 !important;
+  }
+  #qb-bp .qb-stub .qrlink{ grid-column:2; grid-row:1 / span 3; }
+  #qb-bp .qb-stub .cap{ grid-column:1; grid-row:3; }
+  #qb-bp .qb-stub .lnk{ grid-column:1; grid-row:3; justify-self:end; }
+}
+</style>
 <script id="qb-reskin4-js">
 (function(){
   'use strict';
