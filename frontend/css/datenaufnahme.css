@@ -720,3 +720,52 @@ html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-rz{
 html[data-dp-karte="trichter"] .dp-pfbar > .dp-pf-lead{
   align-self:start !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1651e · drei Feinheiten, alle gemessen
+
+   ── DER FEHLER, DEN ICH JETZT ZUM DRITTEN MAL GEMACHT HABE ───────────
+   `.dp-pf-lead` stand in der Bordkarte UNTEREINANDER statt nebeneinander:
+   gemessen `flex-direction:column`, Kopf 55 px hoch statt 19.
+
+   Ich hatte `display:flex` und `align-items:baseline` gesetzt - und die
+   RICHTUNG vergessen. Dasselbe in v1640 bei `.dp-pf-seg`, dasselbe in
+   v1649 bei `.dpl-schiene`.
+
+   > **`display:flex` sagt nichts ueber die Richtung.** Wer ein Element
+   > zu einem Flex-Behaelter macht, das vorher schon einer war, erbt
+   > dessen `flex-direction` - und sie steht nicht da, wo man sie sucht.
+   > Ab jetzt gehoert `flex-direction` in jede Regel, die `display:flex`
+   > auf ein fremdes Element setzt, auch wenn `row` der Vorgabewert ist.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-lead{
+  flex-direction:row !important;
+  flex-wrap:wrap !important;
+  height:auto !important;
+}
+
+/* Die Perforation gehoert AN den Abschnitt, nicht irgendwohin.
+   Gemessen: sie stand bei x=1483, der Abschnitt bei x=1703 - 220 px
+   Luft dazwischen, weil `margin-left:auto` am Abschnitt hing und ihn
+   von ihr wegschob. Der Zwischenraum gehoert VOR die Trennung, nicht
+   hinter sie. */
+html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-perf{
+  margin-left:auto !important;
+}
+html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-rz{
+  margin-left:0 !important;
+}
+
+/* Der Trichter: der Abrufknopf klebte am unteren Rand, weit unter den
+   drei Ergebniszeilen. `margin-top:auto` schiebt ihn ans Ende des
+   Blocks - aber der Block ist so hoch wie die linke Spalte, nicht so
+   hoch wie sein Inhalt. Ein fester Abstand haelt ihn dort, wo der
+   Blick nach der letzten Zeile ankommt. */
+html[data-dp-karte="trichter"] .dpk-ertrag .dp-pf-rz{
+  margin-top:14px !important; padding-top:0 !important;
+}
+/* Und ein Atemzug zwischen dem Kopf und der ersten Gruppe. */
+html[data-dp-karte="trichter"] .dp-pfbar > .dp-pf-seg:first-of-type{
+  padding-top:11px !important;
+}
