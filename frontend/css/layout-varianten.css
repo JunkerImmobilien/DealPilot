@@ -1752,11 +1752,36 @@ html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-v61-row1 > a{
    und `#hdr-completeness` sind Pillen mit eigener Flaeche und standen
    in der Messung sauber - wer sie „sicherheitshalber" mitnimmt,
    zerstoert dieselbe Sache wie unter (a). */
-html[data-dp-layout] body header.hdr :is(#hdr-obj-num, #hdr-obj),
-html[data-dp-layout] body header.hdr :is(#hdr-obj-num, #hdr-obj) *{
+/* ── v1653i · EIN GLEICHSTAND, DER KEINER SEIN DARF ──────────────────
+   Die Objektnummer blieb auf 1,50, obwohl FUENF Regeln aus dieser Datei
+   sie hell setzen und alle fuenf `matches()` bestehen.
+
+   Der Gegner, vollstaendig ausgelesen:
+     `html[data-ui-theme="kontor"] body header.hdr #hdr-obj-num`
+     -> (1,2,3), `!important`, `ui-varianten.css`
+
+   Meine staerkste war
+     `html[data-dp-layout] body header.hdr :is(#hdr-obj-num, #hdr-obj)`
+     -> ebenfalls (1,2,3).
+
+   **Gleichstand.** Bei Gleichstand gewinnt die spaetere Quelle, und
+   `layout-varianten.css` laedt in `index.html` bei Zeile 4030 gegen
+   Zeile 40 - also meine. Gemessen gewinnt trotzdem der Gegner.
+
+   > **Diesen Widerspruch habe ich nicht aufgeloest.** Ich sage das
+   > lieber, als eine Erklaerung zu erfinden, die beim naechsten Mal in
+   > die Irre fuehrt. Moeglich waere ein zur Laufzeit eingefuegtes
+   > Stylesheet, das ich nicht gefunden habe.
+
+   Die Lehre aus CLAUDE.md trifft es ohnehin: **lieber Spezifitaet
+   erhoehen als auf Ladereihenfolge bauen.** Eine Klasse mehr, und die
+   Frage stellt sich nicht. */
+html[data-dp-layout] body header.hdr #hdr-obj-num.hdr-obj-num,
+html[data-dp-layout] body header.hdr #hdr-obj.hdr-obj-name,
+html[data-dp-layout] body header.hdr #hdr-obj.hdr-obj-name *{
   color:#E9E3D6 !important;
 }
-html[data-dp-layout] body header.hdr :is(#hdr-obj-num){
+html[data-dp-layout] body header.hdr #hdr-obj-num.hdr-obj-num{
   background:#171512 !important; border-color:#2A2622 !important;
 }
 html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-obj-num{
