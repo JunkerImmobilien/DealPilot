@@ -2802,3 +2802,167 @@ html[data-dp-layout] body .dpsh-pass{
 html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-sub{
   color:#6E675C !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1657 · MARCELS FUENFTER DURCHGANG
+
+   Alle Goldwerte hier stehen als `var(--wl-<hex>, #<hex>)` - das ist
+   die Whitelabel-Pflicht aus CLAUDE.md, und `gold-audit.py` prueft sie.
+   Statusfarben (Gruen, Rot) werden NICHT tokenisiert.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1 · DIE SCHIENE WIRD BREITER ────────────────────────────────────
+   208 px waren zu eng: die Kennung „2026-1037" und die Adresse teilten
+   sich 126 px, und „Quick-Check" passte nicht auf einen Knopf.
+   248 px geben der Adresse 40 % mehr Platz. */
+html[data-dp-layout]{ --dpl-schiene-b:248px; }
+
+/* ── 2 · DIE OBJEKTLISTE AUFGERAEUMT ─────────────────────────────────
+   Marcel: „da wird zum Beispiel DS2 und sowas angegeben, das braucht da
+   alles gar nicht drauf. Die ID kann man dann nicht lesen."
+
+   Gemessen an den Karten in der Schiene:
+
+     .sbc-seq       „2026-1037"  rgb(59,53,45)  -> Kontrast 1,6
+     .sbc-ds2-hint  „⚡ DS2"      51 px breit
+     .sbc-investor-ribbon „Investor" position:absolute, 83x19
+
+   Das Band und der DS2-Hinweis sind Signale fuer die BREITE Karte in
+   der alten Seitenspalte. In einer Zeile von 59 px nehmen sie den
+   Platz, den Kennung und Adresse brauchen - und verdecken sie dabei. */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-ds2-hint,
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-investor-ribbon,
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-ai-badge{
+  display:none !important;
+}
+/* Die Kennung wird lesbar: #8C8578 ergibt 4,6 gegen den Schienengrund. */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
+  color:#8C8578 !important;
+  font-size:9.5px !important; letter-spacing:.04em !important;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ── 3 · DER RAHMEN SAGT DIE BEWERTUNG ───────────────────────────────
+   Marcel: „vielleicht kann man das einfach passend einrahmen - wenn man
+   das oeffnet, dass irgendwie ein gelber oder ein gruener oder ein
+   roter Rahmen da drum gelegt ist."
+
+   Die Stufe steht schon an der Karte: `.sbc-mini-score` traegt
+   `sbc-score-green`, `-gold`, `-red` (die Kette bricht bei 85/70/50,
+   CLAUDE.md). `:has()` liest sie von aussen - so bleibt die Farbe an
+   EINER Stelle definiert, naemlich dort, wo sie berechnet wird.
+
+   > Die Kante traegt die Aussage, nicht die Flaeche. Eine farbige
+   > Flaeche in einer Liste von siebzehn waere ein Jahrmarkt; eine
+   > farbige Kante ist eine Auskunft. */
+html[data-dp-layout] .dpl-schiene .sb-card{
+  border-left-width:2px !important;
+  border-left-style:solid !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card:has(.sbc-score-top),
+html[data-dp-layout] .dpl-schiene .sb-card:has(.sbc-score-green){
+  border-left-color:#3FA56C !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card:has(.sbc-score-gold){
+  border-left-color:var(--wl-c9a84c, #C9A84C) !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card:has(.sbc-score-red){
+  border-left-color:#B8625C !important;
+}
+/* Ohne Bewertung bleibt die Kante ruhig - ein grauer Strich sagt
+   „noch nichts gerechnet", und das ist auch eine Auskunft. */
+html[data-dp-layout] .dpl-schiene .sb-card:not(:has(.sbc-mini-score)){
+  border-left-color:#2A2622 !important;
+}
+
+/* ── 4 · EINE EINHEITLICHE SPUR FUER DIE ICONS ───────────────────────
+   Marcel: „bei dem Kontingent sind zum Beispiel goldene Zahlen, bei dem
+   Fortschritt ist wieder grau. Da muessen wir irgendwie eine
+   einheitliche Spur fahren. Es ist ja ganz cool, wenn wir diese
+   goldenen Icons nehmen."
+
+   Gemessen im Kopf - drei Toene nebeneinander:
+
+     Hilfe-Knopf      Icon `fill:rgb(0,0,0)`  auf Obsidian = UNSICHTBAR
+     Kontingent       rgb(232,204,122)        gold
+     .sc-l-star       rgb(110,103,92)         grau
+     .ic              rgb(201,168,76)         gold
+
+   > Ein schwarzes Icon auf schwarzem Grund ist kein Kontrastproblem,
+   > sondern ein fehlendes Icon.
+
+   Alle Symbole tragen jetzt denselben Goldton. Die Schrift daneben
+   bleibt, wie sie ist - Gold auf Obsidian ist als FLAECHE stark genug,
+   als Fliesstext aber zu schwach (2,3:1, CLAUDE.md). */
+html[data-dp-layout] body header.hdr .hdr-icon-btn svg,
+html[data-dp-layout] body header.hdr .hdr-icon-btn svg *,
+html[data-dp-layout] body header.hdr .hdr-icon-btn .ic,
+html[data-dp-layout] body header.hdr .hdr-icon-btn{
+  color:var(--wl-c9a84c, #C9A84C) !important;
+  fill:currentColor !important;
+  stroke:currentColor !important;
+}
+html[data-dp-layout] body header.hdr .hdr-icon-btn:hover,
+html[data-dp-layout] body header.hdr .hdr-icon-btn:hover svg{
+  color:var(--wl-e8cc7a, #E8CC7A) !important;
+}
+/* Und in der Schiene: Reiter-Symbole, Abschnitts-Symbole, Aktionen. */
+html[data-dp-layout] .dpl-schiene nav.tabs .tab svg,
+html[data-dp-layout] .dpl-schiene nav.tabs .tab .ic,
+html[data-dp-layout] .dpl-schiene .sb-act-item svg,
+html[data-dp-layout] .dpl-schiene .sb-act-item .ic,
+html[data-dp-layout] .dpl-schiene .dpl-portfolio .dpl-i{
+  color:var(--wl-c9a84c, #C9A84C) !important;
+  fill:currentColor !important; stroke:currentColor !important;
+  opacity:1 !important;
+}
+/* Die Abschnittsueberschriften bekommen denselben Ton wie ihre
+   Zierlinie - „Ansichten", „Analyse", „Anlegen" gehoeren zusammen. */
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .sb-act-section-title{
+  color:var(--wl-c9a84c, #C9A84C) !important;
+  opacity:.85 !important;
+}
+
+/* ── 5 · DER ACCOUNT UNTEN, EINE ZEILE STATT ZWEI ────────────────────
+   Marcel: „vielleicht kriegen wir auch den aktuellen Plan und das
+   Abmelden mit neben das Pro."
+
+   Die Plan-Pille steht im Textblock, die Knoepfe in einer eigenen
+   Zeile darunter. Zusammen in EINE Zeile: Pille links, Version und
+   Knoepfe rechts. Das spart 24 px und stellt zusammen, was
+   zusammengehoert - wer bin ich, was habe ich, wie komme ich raus. */
+html[data-dp-layout] .dpl-schiene .sb-user-icons{
+  margin-top:6px !important; padding-top:6px !important;
+  justify-content:flex-end !important;
+}
+/* Die Plan-Pille wird von layout-varianten.js in die Knopfzeile
+   VERSCHOBEN - die echte, nicht eine nachgebaute. Ein `content:"PRO"`
+   im Pseudoelement haette bei jedem anderen Plan gelogen, und es gibt
+   mehr als einen. Hier steht nur ihr Platz in der Zeile. */
+html[data-dp-layout] .dpl-schiene .sb-user-icons .sb-user-plan-pill{
+  margin-right:auto !important;
+}
+
+/* ── 6 · SEITEN GETAUSCHT ────────────────────────────────────────────
+   `layout-varianten.js` dreht die Stellungen und setzt
+   `data-dpl-seiten="getauscht"` am `<html>`. Hier wandert das Polster
+   mit - ohne das laege die Schiene ueber dem Inhalt, derselbe Fehler
+   wie bei den Werkzeugfenstern. */
+html[data-dp-layout="v1"][data-dpl-seiten="getauscht"] .app-wrap,
+html[data-dp-layout="v1"] .app-wrap{
+  padding-left:0; padding-right:0;
+}
+html[data-dp-layout="v1"]:not([data-dpl-seiten]) .app-wrap{
+  padding-left:var(--dpl-schiene-b) !important;
+}
+html[data-dp-layout="v1"][data-dpl-seiten="getauscht"] .app-wrap{
+  padding-right:var(--dpl-schiene-b) !important;
+}
+html[data-dp-layout="v2"]:not([data-dpl-seiten]) .app-wrap{
+  padding-left:var(--dpl-schiene-b) !important;
+  padding-right:240px !important;
+}
+html[data-dp-layout="v2"][data-dpl-seiten="getauscht"] .app-wrap{
+  padding-left:240px !important;
+  padding-right:var(--dpl-schiene-b) !important;
+}

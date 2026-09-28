@@ -97,7 +97,7 @@
       objekteAls: 'liste',
       schienen: [
         { stellung: 'links', ton: 'dunkel', marke: true, portfolio: true,
-          nimmt: ['suche', 'objekte', 'tabs', 'aktionen', 'nutzer'] }
+          nimmt: ['suche', 'objekte', 'aktionen', 'tabs', 'nutzer'] }
       ]
     },
     v2: {
@@ -187,6 +187,7 @@
     if (!mc || !L.schienen) return;
     L.schienen.forEach(function (S) { baueEine(L, S, mc); });
     badgeInDenKopf();
+    planPilleZuDenKnoepfen();
     zahlNachziehen();
   }
 
@@ -204,6 +205,23 @@
      Verschoben wird über dieselbe Rückfahrkarte wie alles andere
      (`hole()`), damit „Heute" es wieder an seinen Platz in der
      Reiterleiste stellt. */
+  /* ── v1657 · Die Plan-Pille in die Knopfzeile ─────────────────────
+     Marcel: „vielleicht kriegen wir auch den aktuellen Plan und das
+     Abmelden mit neben das Pro."
+
+     Verschoben wird die ECHTE Pille (`.sb-user-plan-pill`), nicht eine
+     nachgebaute. Ein `content:'PRO'` im Pseudoelement waere bei jedem
+     anderen Plan eine Luege gewesen - und es gibt mehr als einen.
+
+     Die Rueckfahrkarte laeuft ueber `hole()` wie bei allem anderen. */
+  function planPilleZuDenKnoepfen() {
+    var pille = el('#sb-user .sb-user-plan-pill');
+    var zeile = el('#sb-user .sb-user-icons');
+    if (!pille || !zeile || pille.parentElement === zeile) return;
+    merker.push({ knoten: pille, eltern: pille.parentElement, naechstes: pille.nextElementSibling });
+    zeile.insertBefore(pille, zeile.firstChild);
+  }
+
   function badgeInDenKopf() {
     var badge = hole('#tabs-status-badge');
     if (!badge) return;
@@ -213,10 +231,36 @@
     reihe.appendChild(badge);
   }
 
+  /* ── v1657 · DIE SEITEN TAUSCHEN ──────────────────────────────────
+     Marcel am 28.09.2026: „in dem Kanzlei-Look waere es cool, wenn wir
+     auch die Moeglichkeit haetten, die Aktionen und auch das, was links
+     ist beim Objekt, zu tauschen. Also das, was rechts ist, kommt nach
+     links und andersrum."
+
+     Getauscht wird nur die STELLUNG, nicht der Ton: die dunkle
+     Navigation bleibt dunkel, auch wenn sie rechts steht, und die
+     helle Kontextschiene bleibt hell. Sonst waere es kein Tausch,
+     sondern ein zweites Layout.
+
+     Der Merker gilt fuer beide Layouts - bei der Aktenmappe mit ihrer
+     einzigen Schiene bedeutet er schlicht „Menue rechts". */
+  var LS_SEITEN = 'dp_layout_seiten';
+  function seitenGetauscht() {
+    try { return localStorage.getItem(LS_SEITEN) === '1'; } catch (e) { return false; }
+  }
+  function seitenTauschen(an) {
+    try { localStorage.setItem(LS_SEITEN, an ? '1' : '0'); } catch (e) {}
+    if (aktuell) setze(aktuell);          /* neu aufbauen */
+  }
+  function kehre(stellung) {
+    if (!seitenGetauscht()) return stellung;
+    return stellung === 'links' ? 'rechts' : (stellung === 'rechts' ? 'links' : stellung);
+  }
+
   function baueEine(L, S, mc) {
     var schiene = document.createElement('div');
     schiene.className = 'dpl-schiene';
-    schiene.setAttribute('data-stellung', S.stellung);
+    schiene.setAttribute('data-stellung', kehre(S.stellung));
     /* v1653: die FARBE haengt am Ton, nicht mehr an der Stellung.
        Die Kanzlei hat rechts eine HELLE Kontextschiene - mit der alten
        Regel `[data-stellung="rechts"]{background:#0E0D0B}` waere sie
@@ -379,6 +423,10 @@
     }
     h.setAttribute('data-dp-layout', v);
     h.setAttribute('data-dpl-portfolio', 'zu');
+    /* v1657: die CSS braucht die Seitenwahl, das Polster am .app-wrap
+       haengt daran. */
+    if (seitenGetauscht()) h.setAttribute('data-dpl-seiten', 'getauscht');
+    else h.removeAttribute('data-dpl-seiten');
     /* Der helle Grund kommt vom VORHANDENEN Skin, nicht von hier.
        `body.dp-chrome-hell` ist 103 geprüfte Regeln; eine zweite
        Hellfassung danebenzustellen hiesse, jede künftige Änderung an
@@ -563,7 +611,49 @@
       [].forEach.call(g.querySelectorAll('.dpuv-sgb'), function (x) {
         x.classList.toggle('on', x.dataset.v === aktuell);
       });
+      seitenKachelnNachziehen();
     });
+
+    /* ── v1657 · Seiten tauschen ────────────────────────────────────
+       Marcel: „waere cool, wenn wir auch die Moeglichkeit haetten, die
+       Aktionen und das, was links ist, zu tauschen."
+
+       Eigene Gruppe statt eines sechsten Aufbau-Knopfes: es ist keine
+       andere Anordnung, sondern dieselbe gespiegelt. Wer sie als
+       siebtes Layout fuehrt, muss jede kuenftige Aenderung zweimal
+       machen. */
+    var gs = document.createElement('div');
+    gs.className = 'dpuv-g';
+    gs.id = 'dpl-seiten-sek';
+    gs.innerHTML = '<h3>Seiten</h3>'
+      + '<p class="dpuv-hint">Auf welcher Seite das Menü steht. In der Kanzlei '
+      + 'tauschen Navigation und Aktionen dabei die Plätze.</p>'
+      + '<div class="dpuv-seg" id="dpl-seiten-seg">'
+      + '<button type="button" class="dpuv-sgb" data-s="0"><b>Menü links</b><small>Standard</small></button>'
+      + '<button type="button" class="dpuv-sgb" data-s="1"><b>Menü rechts</b><small>Gespiegelt</small></button>'
+      + '</div>';
+    if (g.nextSibling) panel.insertBefore(gs, g.nextSibling); else panel.appendChild(gs);
+
+    gs.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('.dpuv-sgb') : null;
+      if (!b) return;
+      seitenTauschen(b.dataset.s === '1');
+      seitenKachelnNachziehen();
+    });
+    seitenKachelnNachziehen();
+  }
+
+  function seitenKachelnNachziehen() {
+    var seg = document.getElementById('dpl-seiten-seg');
+    if (!seg) return;
+    var an = seitenGetauscht();
+    [].forEach.call(seg.querySelectorAll('.dpuv-sgb'), function (x) {
+      x.classList.toggle('on', (x.dataset.s === '1') === an);
+    });
+    /* Ohne Layout ist die Frage gegenstandslos - dann bleibt die
+       Gruppe sichtbar, aber sichtbar wirkungslos. Das ist ehrlicher
+       als sie zu verstecken: wer sie sucht, findet sie. */
+    seg.parentElement.style.opacity = aktuell ? '' : '.45';
   }
 
   function panelBeobachten() {
