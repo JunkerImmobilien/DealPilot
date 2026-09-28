@@ -3921,3 +3921,46 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill{
   min-height:auto !important;
   height:auto !important;
 }
+
+/* ── v1664d · DIE ZAHLEN WAREN DA, NUR NICHT ZU SEHEN ────────────────
+   Gemessen auf dem Schienengrund `rgb(14,13,11)`:
+
+     .sc-pill-v     rgb(26,23,20)   „36 %"   Kontrast 1,06
+     .sc-donut span rgb(26,26,26)   „56"     Kontrast 1,07
+
+   Beide Farben stammen aus v1653 und waren dort RICHTIG - das Band
+   stand auf Weiss. Beim Umzug in die dunkle Schiene ist die Flaeche
+   mitgewandert, die Schrift nicht.
+
+   > Eine Farbe ist nie richtig oder falsch, sondern nur richtig ODER
+   > falsch zu ihrem Grund. Wer eine Flaeche verschiebt, verschiebt
+   > eine Beziehung, kein Element.
+
+   Die Werte tragen jetzt ihre STUFE, wie ueberall sonst in der App -
+   Gruen, Rot und Gold sind hier keine Dekoration, sondern die Aussage.
+   CLAUDE.md: Statusfarben werden nicht tokenisiert, Gruen und Rot
+   bleiben in jeder Marke gleich; das Gold dagegen ist markenfaehig und
+   steht als `var(--wl-…)`. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill .sc-pill-v{
+  color:#F2EDE3 !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill.tier-green .sc-pill-v{
+  color:#5BD98E !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill.tier-red .sc-pill-v{
+  color:#D9685F !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill.tier-gold .sc-pill-v{
+  color:var(--wl-e8cc7a, #E8CC7A) !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-donut,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-donut span,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-donut > *{
+  color:#F2EDE3 !important;
+}
+/* Die Zaehlung „4 / 4 KPIs" war im Kopf ausgeblendet. In der Schiene
+   ist Platz dafuer, und sie beantwortet genau die Frage, die Marcel
+   schon einmal gestellt hat: wie viele Kennzahlen stecken dahinter. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill .sc-pill-sub{
+  display:block !important;
+}
