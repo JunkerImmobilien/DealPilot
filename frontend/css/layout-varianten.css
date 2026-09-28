@@ -1308,3 +1308,26 @@ html[data-dp-layout] .dpl-schiene .dpl-logo{
   max-height:46px !important; max-width:176px !important;
   width:auto !important; height:auto !important;
 }
+
+/* ── v1652d · DER EIGENE SCHALTER IST AUCH NUR EIN WERKZEUG ───────────
+   Gemessen auf 390 px, mit `elementsFromPoint` auf den Abrufknopf:
+
+     button              [118x44]   der Knopf im Schalter
+     div.dpl-schalter    [374x154] pos=fixed z=2147483000   <- liegt drauf
+     button#oab-run      [321x29]  pos=relative z=1
+
+   Die Umschaltleiste wird auf schmalen Schirmen 154 px hoch, weil ihre
+   sechs Knoepfe umbrechen - und sie liegt fest ueber allem. Damit war
+   der Abrufknopf auf dem Handy nicht zu druecken.
+
+   > Ich hatte gerade `#dp-kv-panel` aus demselben Grund ausgeblendet
+   > und danach MEINEN eigenen Schalter gemessen, der dasselbe tut.
+   > Ein Fehler, den man bei anderen findet, steht meist auch im
+   > eigenen Bau.
+
+   Dieselbe Entscheidung: unter 900 px weg. Verloren geht nichts - der
+   Aufbau steht in den Einstellungen unter „Darstellung", und `?layout=`
+   wirkt auf jeder Breite. */
+@media (max-width: 900px){
+  .dpl-schalter{ display:none !important; }
+}
