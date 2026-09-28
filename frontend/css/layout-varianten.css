@@ -4487,3 +4487,57 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score{
     border-top:0 !important;
   }
 }
+
+/* ── v1667 · LUFT ZWISCHEN DEAL-AKTION UND DEM SCORE ─────────────────
+   Marcel: „bei der Kanzlei wäre es cool, wenn wir den
+   Investor-Deal-Score auf der linken Seite von unten nach oben
+   positionieren. Dann wäre zwischen Deal-Aktion und dem
+   Investor-Deal-Score noch ein bisschen Platz."
+
+   Gemessen in der Kanzlei, linke Schiene:
+
+     Marke        0 ..  92
+     Portfolio  102 .. 135
+     Reiter     139 .. 423    (letzter: „Deal-Aktion")
+     Score      427 .. 695    <- nur 4 px Abstand
+     Nutzer     877 .. 988    <- davor 182 px Leere
+
+   Der Score steht also bereits oben — was fehlte, war der Abstand.
+   Vier Pixel lesen sich nicht als Trennung, sondern als Versehen,
+   während darunter 182 px ungenutzt liegen.
+
+   > Ein Block, der einem anderen auf vier Pixel rückt, gehört optisch
+   > dazu. Erst der Abstand sagt, dass hier etwas Neues anfängt — und
+   > Platz dafür war reichlich da, nur an der falschen Stelle.
+
+   Die 22 px gelten NUR für die Kanzlei: in der Aktenmappe liegen
+   Aktionen und Score zusammen bei 967 von 988 px, dort wäre jeder
+   zusätzliche Abstand eine fehlende Menüzeile. */
+html[data-dp-layout="v2"] .dpl-schiene .dpl-teil-score{
+  margin-top:22px !important;
+}
+
+/* ── v1667b · DAS LOGO NOCH EINE STUFE GRÖSSER ───────────────────────
+   Marcel: „oben das DealPilot-Logo könnte dann jetzt ja noch ein
+   bisschen größer erscheinen." 37 -> 42 px, der Block 92 -> 100.
+
+   **Mit Media-Grenze**, und zwar wegen v1666f: dort hatte ich eine
+   Regel ohne Grenze geschrieben, sie gewann auf dem Handy gegen die
+   Schmalschirm-Fassung, und die Marke stand plötzlich zentriert in
+   einer 174-px-Leiste. Auf schmalen Geräten trägt das Wortbild 19 px
+   und der Block gar keine Mindesthöhe — das bleibt so.
+
+   > Eine Regel, die nur für eine Form gilt, bekommt die Grenze dieser
+   > Form. Sonst findet sie die andere von allein. */
+@media (min-width: 901px){
+  html[data-dp-layout] .dpl-schiene .dpl-wm{
+    font-size:42px !important; line-height:50px !important;
+  }
+  html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .dpl-marke,
+  html[data-dp-layout] .dpl-schiene .dpl-marke{
+    min-height:100px !important;
+  }
+  html[data-dp-layout] .dpl-schiene .dpl-logo{
+    max-height:60px !important; max-width:216px !important;
+  }
+}
