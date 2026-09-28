@@ -843,3 +843,59 @@ html[data-dp-layout]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead::after{
   color:#8C8578;
   align-self:center;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1659 · DIE BORDKARTE, AN DER DEMO AUSGEMESSEN
+
+   Marcel: „die Datenaufnahme hast du noch nicht angepasst, das sollte
+   halt so sein wie in der Demo."
+
+   Die Demo im Browser geoeffnet (`entwurf-aktionsbox.html`,
+   „5 · Bordkarte neu") und jeden Wert ausgelesen:
+
+     Karte        flex · bg WEISS · Rahmen 1,11px rgb(206,198,182)
+                  radius 3px · overflow hidden · 1090x108
+     links        flex:1 · Polster 13px 16px · transparent
+     Perforation  1,11px DOTTED rgb(206,198,182) · Hoehe 86
+     Abschnitt    190px · bg rgb(251,246,233)
+
+   Meine Fassung wich in drei Werten ab: `#FFFDF9` statt Weiss,
+   `#DCD4C2` statt `#CEC6B6`, und die Perforation war 2 px statt 1.
+   Der Cremeblock rechts stimmte.
+   ═══════════════════════════════════════════════════════════════════════ */
+html[data-dp-kartenstil="bordkarte"] .dp-pfbar,
+html[data-dp-layout]:not([data-dp-kartenstil]) .dp-pfbar{
+  background:#FFFFFF !important;
+  border:1px solid #CEC6B6 !important;
+  border-radius:3px !important;
+}
+html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-perf,
+html[data-dp-layout]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-perf{
+  border-left:1px dotted #CEC6B6 !important;
+  margin:11px 0 !important;
+}
+/* Der Abschnitt rechts: 190 px und Creme, wie gemessen. */
+html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-rz,
+html[data-dp-layout]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-rz{
+  flex:0 0 190px !important; width:190px !important; min-width:190px !important;
+  background:#FBF6E9 !important;
+  padding:13px 16px !important;
+}
+/* Die linke Seite: Polster 13/16 wie im Entwurf. */
+html[data-dp-kartenstil="bordkarte"] .dp-pfbar > .dp-pf-seg,
+html[data-dp-layout]:not([data-dp-kartenstil]) .dp-pfbar > .dp-pf-seg{
+  padding:0 16px !important;
+}
+html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead,
+html[data-dp-layout]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead{
+  padding:13px 16px 0 !important;
+}
+html[data-dp-kartenstil="bordkarte"] .dp-pfbar > .dp-pf-seg:last-of-type,
+html[data-dp-layout]:not([data-dp-kartenstil]) .dp-pfbar > .dp-pf-seg:last-of-type{
+  padding-bottom:13px !important;
+}
+/* Die Quellkacheln: der Entwurf setzt sie mit 7 px Abstand nebeneinander. */
+html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-row,
+html[data-dp-layout]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-row{
+  gap:7px !important;
+}

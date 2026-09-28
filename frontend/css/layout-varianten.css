@@ -3355,3 +3355,88 @@ html[data-dp-layout] :is(#sb-list) .sb-card .sbc-deal-badge{
 @media (max-width: 900px){
   html[data-dp-layout] .app-wrap{ padding-top:146px !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1659 · DER SCORE-CHIP, AN DER DEMO AUSGEMESSEN
+
+   Marcel: „oben den Investor Deal Score - das passt irgendwie noch gar
+   nicht, das sieht sehr gekuenstelt aus."
+
+   Statt weiter zu naehern: die Demo im Browser geoeffnet und **jeden
+   Wert ausgelesen** (`entwurf-hell-bankfaehig.html`, `.score-chip`):
+
+     Chip     flex · gap 8px · Rahmen 1,11px rgb(206,198,182)
+              radius 2px · padding 4px 10px 4px 5px · bg WEISS · 163x36
+     Ring     26x26 · radius 50%
+              conic-gradient(rgb(201,168,76) 0deg … 79%)
+     Zahl     ::after · inset 3px · bg weiss · 10px · 700 · rgb(26,26,24)
+     Fett     block · 11,5px · 600 · rgb(26,26,24) · Zeile 13,2px
+     Klein    inline · 8,5px · Sperrung 0,765px · Versalien
+              rgb(154,146,135)
+
+   Was ich vorher gebaut hatte, wich in fuenf Werten ab: Creme statt
+   Weiss, schwarzer statt beigegrauer Rahmen, 6 statt 2 px Radius,
+   30 statt 26 px Ring, andere Polster.
+
+   > **„Sieht gekuenstelt aus" ist kein Geschmacksurteil, sondern ein
+   > Messbefund.** Fuenf Werte daneben, und das Auge merkt es, bevor
+   > man es benennen kann.
+   ═══════════════════════════════════════════════════════════════════════ */
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-green,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-gold,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-red,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-top{
+  background:#FFFFFF !important;
+  background-image:none !important;
+  border:1px solid #CEC6B6 !important;
+  border-radius:2px !important;
+  padding:4px 10px 4px 5px !important;
+  gap:8px !important;
+  align-items:center !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut{
+  width:26px !important; height:26px !important; flex:0 0 26px !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut::before{
+  background:#FFFFFF !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut > *{
+  font-size:10px !important; font-weight:700 !important;
+  color:#1A1A18 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v *{
+  font-size:11.5px !important; font-weight:600 !important;
+  color:#1A1A18 !important; line-height:1.15 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-l,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-l *{
+  font-size:8.5px !important; letter-spacing:.09em !important;
+  text-transform:uppercase !important;
+  color:#9A9287 !important; line-height:1.15 !important;
+}
+
+/* Die Kennzahlenleiste nimmt dieselben Toene - sie steht daneben und
+   darf nicht aus einer anderen Familie sein. */
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill{
+  background:#FFFFFF !important; background-image:none !important;
+  border-color:#CEC6B6 !important;
+  border-radius:2px !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill:first-of-type{
+  border-top-left-radius:2px !important; border-bottom-left-radius:2px !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill:last-of-type{
+  border-top-right-radius:2px !important; border-bottom-right-radius:2px !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-v{
+  color:#1A1A18 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-l{
+  color:#9A9287 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-sub{
+  color:#9A9287 !important;
+}
