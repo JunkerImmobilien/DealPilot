@@ -235,8 +235,22 @@ html[data-dp-layout="v3"] .app-wrap,
 html[data-dp-layout="v4"] .app-wrap{
   grid-template-columns:1fr !important;
 }
-html[data-dp-layout="v2"] .app-wrap{ grid-template-columns:264px 1fr !important; }
-html[data-dp-layout="v5"] .app-wrap{ grid-template-columns:276px 1fr !important; }
+/* v1653c · Die Spur, die niemand mehr belegt.
+
+   `.app-wrap` ist ein GRID. Solange die Objektspalte darin stand, war
+   `264px 1fr` richtig. Seit die Kanzlei sie als Schublade führt, steht
+   sie `position:fixed` - und **das nimmt sie aus dem Fluss, aber nicht
+   aus dem Gitter**: die 264-px-Spur blieb reserviert, und `.main-col`
+   rutschte als erstes verbliebenes Kind hinein.
+
+   Gemessen: Arbeitsfläche 264 px breit bei 2133 px Fenster, rechts
+   daneben 1421 px leer.
+
+   > Denselben Fehler hatte ich in v1 schon einmal behoben und beim
+   > Umstellen von v2 auf Schublade nicht mitgedacht. Eine Spurbreite
+   > gehört zur Frage „wer steht im Gitter" - nicht zur Frage „wie
+   > breit ist die Spalte". */
+html[data-dp-layout="v2"] .app-wrap{ grid-template-columns:1fr !important; }
 
 /* v1653b: an den ZUSTAND gehängt, nicht an eine Layout-Liste.
    `data-dpl-portfolio` setzt `setze()` bei jedem Layout, das die
