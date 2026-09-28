@@ -459,8 +459,19 @@
          hat. Marcel: 'wenn ich auf heute zurueckschalte, sieht es nicht
          so aus wie heute, es ist hell.' Wer auf Heute stellt, will den
          Auslieferungszustand - und der ist Obsidian. */
-      try { if (skinVorher && typeof window._dpDispSkin === 'function') {
-        window._dpDispSkin(skinVorher); skinVorher = null; } } catch (e) {}
+      /* v1660b: HART auf Obsidian, nicht auf den gemerkten Vorzustand.
+         Gemessen: der Merker las bereits 'hell', weil ein frueheres
+         Layout den Skin eingeschaltet und im localStorage hinterlassen
+         hatte - der 'Zustand vorher' war also schon verfaelscht.
+
+         > Marcel: 'es soll aber obsidian sein wie vorher'. Der
+         > Auslieferungszustand IST Obsidian; ein Merker, der von einer
+         > frueheren Sitzung stammt, darf das nicht ueberschreiben. Wer
+         > den Hellmodus WILL, waehlt ihn in den Einstellungen - dort
+         > gehoert er hin, nicht als Nebenwirkung eines Layouts. */
+      try { if (typeof window._dpDispSkin === 'function') window._dpDispSkin('obsidian'); } catch (e) {}
+      skinVorher = null;
+      if (document.body) document.body.classList.remove('dp-neue-karte', 'dp-neue-karte-stil');
       h.removeAttribute('data-dpl-portfolio');
       try { localStorage.removeItem(LS); } catch (e) {}
       schalterNachziehen();
