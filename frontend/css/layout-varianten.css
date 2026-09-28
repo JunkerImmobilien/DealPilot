@@ -4432,3 +4432,58 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill{
 html[data-dp-layout] .dpl-schiene .dpl-teil-score{
   margin-top:4px !important; padding:6px 0 0 !important;
 }
+
+/* ── v1666f · AUF DEM HANDY IST DIE SCHIENE EINE ZEILE ───────────────
+   In der Messkabine gemessen, 390 und 834 px:
+
+     .dpl-marke   x=119 (Handy) / x=341 (Tablet)   -> ZENTRIERT
+     Leiste       174 px hoch statt rund 103
+     Teile        aktionen AUS, nutzer AUS, score AN
+
+   Zwei Fehler meiner v1666-Regel:
+
+   **Erstens** hat sie `flex-direction:column !important` an die Schiene
+   geschrieben — ohne Media-Grenze. Die Schmalschirm-Regel setzt `row`,
+   beide gleich spezifisch, meine steht später und gewinnt. Die Leiste
+   war also eine Spalte, und `align-items:center` hat die Marke in die
+   Mitte gerückt.
+
+   > Eine Regel ohne Media-Grenze gilt auch dort, wo ihre Form nicht
+   > existiert. Bei gleicher Spezifität gewinnt die spätere — und das
+   > ist fast immer die neuere, also meine.
+
+   **Zweitens** blendet die Schmalschirm-Fassung seit v1659 Aktionen und
+   Nutzer aus, damit die Leiste schmal bleibt. Der Score kam in v1664
+   dazu und stand in keiner dieser Listen — er blieb als Einziger stehen
+   und machte die Leiste 71 px höher.
+
+   Er wird nicht mit ausgeblendet: vor v1664 stand er im Kopf und war
+   auf dem Handy sichtbar; ihn jetzt verschwinden zu lassen, wäre ein
+   Verlust, den niemand bestellt hat. Er bekommt stattdessen die Form,
+   die er im Kopf hatte — eine WAAGERECHTE Reihe, die mitrollt. */
+@media (max-width: 900px){
+  html[data-dp-layout] .dpl-schiene{
+    flex-direction:row !important;
+    align-items:center !important;
+  }
+  /* Der Score als Reihe, nicht als Stapel. */
+  html[data-dp-layout] .dpl-schiene .dpl-teil-score{
+    margin-top:0 !important; padding:0 !important;
+    border-top:0 !important; border-left:1px solid var(--dpl-linie) !important;
+    flex:0 0 auto !important;
+  }
+  html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .scores{
+    flex-direction:row !important; align-items:center !important;
+  }
+  html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main{
+    margin:0 !important; padding:2px 10px !important;
+  }
+  html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill{
+    padding:4px 10px 5px !important;
+    border-top:0 !important;
+    border-left:1px solid color-mix(in srgb, var(--dpl-linie) 55%, transparent) !important;
+  }
+  html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill + .sc-pill{
+    border-top:0 !important;
+  }
+}
