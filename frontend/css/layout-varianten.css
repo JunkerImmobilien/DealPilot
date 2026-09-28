@@ -747,3 +747,34 @@ html[data-dp-layout] .body .kpi-eval-light,
 html[data-dp-layout] .body small{
   color:var(--dpl-leise) !important;
 }
+
+/* ── Karten und Kennzahlenzeile (v1648) ─────────────────────────────
+   GEMESSEN am Blatt: die Karten tragen 12 px Radius und einen Schatten
+   `0 2px 12px`. Der Entwurf hatte 2 px und keinen Schatten.
+
+   > Ein Schatten hebt eine Karte von der Fläche ab - das will ein
+   > Dashboard. Ein Gutachten will das Gegenteil: alles liegt auf
+   > EINEM Blatt, getrennt durch Linien, nicht durch Höhe.
+
+   Und die Kennzahlen-Beschriftung stand noch in DM Sans; meine Regel
+   aus v1646 hatte dort nur die FARBE gesetzt. Eine Regel, die eine
+   Eigenschaft ändert, ändert nicht die andere mit. */
+html[data-dp-layout] .body .card{
+  border-radius:2px !important;
+  box-shadow:none !important;
+  border:1px solid var(--dpl-linie) !important;
+}
+html[data-dp-layout] .hdr-v61-row2 .sc-pill-l{
+  font-family:var(--dpl-mono) !important;
+}
+
+/* Die Sternebewertung stand als goldene Trennlinie quer durch die
+   Karte. Sie bleibt als Beschriftung - aber als Linie, nicht als
+   Leuchtschrift. */
+html[data-dp-layout] .body .qz-sep,
+html[data-dp-layout] .body .sterne-sep,
+html[data-dp-layout] .body .phase-divider{
+  color:var(--dpl-sehr-leise) !important;
+  font-family:var(--dpl-mono) !important;
+  font-size:9.5px !important; letter-spacing:.12em !important;
+}
