@@ -953,3 +953,39 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer{
   background:var(--dpl-flaeche) !important;
   border-top:1px solid var(--dpl-linie) !important;
 }
+
+/* ── Der Aktionsblock scrollt in sich (v1649e) ──────────────────────
+   GEMESSEN nach dem Engersetzen: 1023 px Inhalt bei 854 px Fenster -
+   immer noch 169 zu viel. Und der klebende Nutzerblock deckte dabei
+   „Bankexport" und „Export" zu: wieder das Opfer behandelt.
+
+   > **Auf den letzten Pixel zu optimieren bricht beim naechsten
+   > Eintrag.** Zwoelf Aktionen sind heute richtig; morgen sind es
+   > dreizehn, und dann faellt wieder etwas unter die Kante.
+
+   Deshalb die Flex-Grammatik statt der Rechnung:
+
+     Marke, Portfolio, Reiter, Nutzer   flex:0 0 auto   (stehen fest)
+     Aktionen                           flex:1 1 auto   (nehmen den Rest)
+                                        min-height:0    (duerfen schrumpfen)
+                                        overflow-y:auto (scrollen in sich)
+
+   `min-height:0` ist dabei Pflicht: ein Flex-Kind hat als Vorgabe
+   `min-height:auto` und schrumpft dann NICHT unter seinen Inhalt -
+   genau daran scheitert dieser Aufbau sonst.
+
+   Der Nutzerblock braucht kein `sticky` mehr: er steht am Ende der
+   Spalte und wird von nichts mehr verdraengt. */
+html[data-dp-layout] .dpl-schiene[data-stellung="links"],
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"]{
+  overflow:hidden !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-tabs{ flex:0 0 auto !important; }
+html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen{
+  flex:1 1 auto !important; min-height:0 !important;
+  overflow-y:auto !important; overflow-x:hidden !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer{
+  flex:0 0 auto !important; position:static !important;
+  margin-top:0 !important;
+}
