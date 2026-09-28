@@ -4006,3 +4006,31 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-investor-badge
   fill:var(--wl-e8cc7a, #E8CC7A) !important;
   stroke:var(--wl-e8cc7a, #E8CC7A) !important;
 }
+
+/* ── v1664f · RUECKNAHME: ICH HABE DENSELBEN FEHLER ZWEIMAL GEMACHT ──
+   In v1664d habe ich die Score-Zahl auf `#F2EDE3` gesetzt, weil der
+   Schienengrund `rgb(14,13,11)` ist - und dabei genau das getan, was
+   ich eine Datei weiter oben als Regel aufgeschrieben hatte:
+
+     > Eine Farbe ist nie richtig oder falsch, sondern nur richtig
+     > ODER FALSCH ZU IHREM GRUND.
+
+   Der Grund der Zahl ist NICHT die Schiene. Gemessen:
+
+     .sc-donut::before   inset:5px, 28x28, bg rgb(255,253,247)
+     .sc-donut span      col rgb(242,237,227)   -> Kontrast 1,03
+
+   Der Ring hat einen eigenen Innenkreis als Pseudoelement. Er war im
+   Kopf richtig - dort stand der Chip auf Weiss - und ist mitgewandert,
+   ohne dass ihn jemand gefragt haette.
+
+   **Das ist derselbe blinde Fleck, den ich schon einmal notiert habe**
+   („Pseudoelement heisst HTML"): ein Pruefer, der nur Elemente liest,
+   sieht diesen Grund nicht, und ein Blick auf den Bildschirm zeigt nur
+   einen weissen Kreis, in dem scheinbar nichts steht.
+
+   Der Innenkreis nimmt jetzt den Schienengrund auf; damit stimmt die
+   Beziehung wieder, und der Goldbogen bleibt der einzige Farbtraeger. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-donut::before{
+  background:#14120F !important;
+}
