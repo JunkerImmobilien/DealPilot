@@ -4231,3 +4231,113 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen #sb-actions-accordion{
 html[data-dp-layout] .dpl-schiene .dpl-teil-score{
   margin-top:10px !important;
 }
+
+/* ── v1666 · EIN UMSCHALTER STATT EINES STAPELS ──────────────────────
+   Marcel: „ich hätte gerne, dass wir bei der Aktenmappe keine
+   Scrollbar haben müssen. Wenn man oben auf Portfolio klickt,
+   verschwindet einfach das Aktionsmenü und es entsteht die Ansicht —
+   und man kann wieder umklicken. Und dass wir nicht diese graue
+   Leiste haben, zwischen dem linken Menü und dem Header."
+
+   Bisher lagen Aktionen, Objektliste und Score ALLE in der Schiene
+   untereinander; die Liste bekam `max-height:46vh` und rollte in sich,
+   die Schiene als Ganzes rollte auch. Zwei Rollbalken, und der äußere
+   stand als graue Leiste zwischen Menü und Inhalt.
+
+   > Wer drei Dinge gleichzeitig zeigt, von denen man immer nur eines
+   > braucht, verwaltet Platz statt ihn zu nutzen. Ein Umschalter zeigt
+   > eines davon ganz — und braucht keinen Rollbalken.
+
+   Portfolio AUF  -> Liste bekommt den ganzen Rest, Aktionen und Score
+                     treten ab
+   Portfolio ZU   -> Aktionen und Score wie bisher, Liste weg */
+html[data-dp-layout][data-dpl-portfolio="auf"] .dpl-schiene .dpl-teil-aktionen,
+html[data-dp-layout][data-dpl-portfolio="auf"] .dpl-schiene .dpl-teil-score{
+  display:none !important;
+}
+html[data-dp-layout][data-dpl-portfolio="auf"] .dpl-schiene .dpl-teil-objekte{
+  flex:1 1 auto !important;
+  max-height:none !important;
+  min-height:0 !important;
+  overflow-y:auto !important;
+}
+/* Zugeklappt trägt der Aktionsblock den Rest — er darf in sich rollen,
+   die Schiene aber nicht mehr. */
+html[data-dp-layout][data-dpl-portfolio="zu"] .dpl-schiene .dpl-teil-aktionen{
+  flex:1 1 auto !important;
+  min-height:0 !important;
+  overflow-y:auto !important;
+}
+/* ── Die graue Leiste ────────────────────────────────────────────────
+   Sie war der Rollbalken der Schiene. Die Schiene rollt jetzt gar
+   nicht mehr — es rollt nur noch der Block, der gerade dran ist, und
+   der zeigt seinen Balken schmal und tonig statt als Systemgrau. */
+html[data-dp-layout] .dpl-schiene{
+  overflow-y:hidden !important;
+  overflow-x:hidden !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-objekte,
+html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen{
+  scrollbar-width:thin;
+  scrollbar-color:#2A2622 transparent;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-objekte::-webkit-scrollbar,
+html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen::-webkit-scrollbar{
+  width:6px;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-objekte::-webkit-scrollbar-thumb,
+html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen::-webkit-scrollbar-thumb{
+  background:#2A2622; border-radius:99px;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-objekte::-webkit-scrollbar-track,
+html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen::-webkit-scrollbar-track{
+  background:transparent;
+}
+/* Damit „ein Block bekommt den Rest" aufgeht, muss die Schiene eine
+   Spalte mit fester Höhe sein — sonst wächst sie einfach mit. */
+html[data-dp-layout] .dpl-schiene{
+  display:flex !important; flex-direction:column !important;
+  height:100vh !important; max-height:100vh !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-marke,
+html[data-dp-layout] .dpl-schiene .dpl-portfolio,
+html[data-dp-layout] .dpl-schiene .dpl-teil-suche,
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer{
+  flex:0 0 auto !important;
+}
+
+/* ── v1666b · DER KOPF TRÄGT DENSELBEN TON ───────────────────────────
+   Marcel: „den oberen Header, wo wir den Straßennamen und die ID
+   drinne haben — das müsstest du farblich genauso gestalten, die
+   weicht noch ein bisschen ab."
+
+   Gemessen, Schiene `rgb(14,13,11)`:
+
+     header.hdr          rgb(14,13,11)   stimmt schon
+     #hdr-obj-num        rgb(23,21,18)   heller
+     #tabs-status-badge  rgb(23,21,18)   heller, Schrift rgb(20,19,16)
+     .tabs-status-bar    rgb(42,38,34)
+
+   Zwei neutrale Pillen in einem dritten Grauton, und beim
+   Fortschrittsband stand die Schrift mit Kontrast **1,05** auf seinem
+   eigenen Grund — da war eine Zahl, die niemand lesen konnte.
+
+   Die Statusflächen (grün für Auto-Save und Vollständigkeit) bleiben:
+   CLAUDE.md sagt, Statusfarben werden nicht tokenisiert und nicht
+   umgefärbt. Es geht nur um die NEUTRALEN Flächen. */
+html[data-dp-layout] body:has(#sb-user) header.hdr #hdr-obj-num,
+html[data-dp-layout] body:has(#sb-user) header.hdr #tabs-status-badge{
+  background:transparent !important;
+  border:1px solid var(--dpl-linie) !important;
+  color:#BFB7A9 !important;
+}
+html[data-dp-layout] body:has(#sb-user) header.hdr #tabs-status-badge *{
+  color:#BFB7A9 !important;
+}
+html[data-dp-layout] body:has(#sb-user) header.hdr .tabs-status-bar{
+  background:rgba(255,255,255,.10) !important;
+}
+html[data-dp-layout] body:has(#sb-user) header.hdr .tabs-status-fill,
+html[data-dp-layout] body:has(#sb-user) header.hdr .hdr-comp-fill{
+  background:var(--wl-c9a84c, #C9A84C) !important;
+}

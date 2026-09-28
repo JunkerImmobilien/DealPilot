@@ -92,14 +92,23 @@
      die Färbung an `data-stellung="links|rechts"` - damit wäre die
      helle Kontextschiene der Kanzlei zwangsläufig dunkel geworden. */
   var LAYOUTS = {
-    v1: {
-      name: 'Aktenmappe', beschreibung: 'Menü links als Gliederung',
-      objekteAls: 'liste',
-      schienen: [
-        { stellung: 'links', ton: 'dunkel', marke: true, portfolio: true,
-          nimmt: ['suche', 'objekte', 'aktionen', 'tabs', 'nutzer'] }
-      ]
-    },
+    /* ── v1666 · AKTENMAPPE 1 IST WEG ─────────────────────────────────
+       Marcel: „die Aktenmappe 1 nimmst du jetzt raus, die brauchen wir
+       nicht mehr. Wir bleiben bei der Aktenmappe 2, die können wir dann
+       umbenennen einfach in Aktenmappe."
+
+       Hier stand `v1` mit `'tabs'` in `nimmt` - die Fassung, bei der
+       die Reiter IN der Schiene standen. Der SCHLUESSEL `v1b` bleibt,
+       wie er ist: die neun CSS-Regeln hängen an
+       `[data-dp-layout^="v1"]` und treffen ihn weiter.
+
+       > Ein Name ist für den Menschen, ein Schlüssel für die Maschine.
+       > Wer beide gleichzeitig ändert, ändert zwei Dinge und kann
+       > hinterher nicht sagen, welches davon gewirkt hat.
+
+       Wer noch `v1` gemerkt hat, wird in `setze()` auf `v1b` umgelenkt
+       - ein Layout abzuschaffen darf niemanden aussperren, der es
+       gewählt hatte. */
     /* v1663 · AKTENMAPPE 2 - DIE REITER BLEIBEN OBEN.
 
        Marcel: „bei der Aktenmappe haben wir Objekt, Investition,
@@ -126,7 +135,7 @@
        `[data-dp-layout^="v1"]` - gleiche Spezifitaet, keine
        Verschiebung in der Kaskade. */
     v1b: {
-      name: 'Aktenmappe 2', beschreibung: 'Wie Aktenmappe, Reiter oben im Kopf',
+      name: 'Aktenmappe', beschreibung: 'Menü links, Reiter oben im Kopf',
       objekteAls: 'liste',
       schienen: [
         { stellung: 'links', ton: 'dunkel', marke: true, portfolio: true,
@@ -141,7 +150,13 @@
       objekteAls: 'liste',
       schienen: [
         { stellung: 'links',  ton: 'dunkel', marke: true, portfolio: true,
-          nimmt: ['suche', 'objekte', 'tabs', 'nutzer'] },
+          /* v1666: Marcel wollte den Score auch hier — „unter den
+             Deal-Aktionen oder über der Anmeldung". Die Aktionen stehen
+             in der Kanzlei RECHTS, also bleibt der Platz über dem
+             Nutzer — derselbe wie in der Aktenmappe. Eine Angabe, die
+             in zwei Layouts an derselben Stelle steht, muss man nicht
+             zweimal suchen. */
+          nimmt: ['suche', 'objekte', 'tabs', 'score', 'nutzer'] },
         { stellung: 'rechts', ton: 'hell',   marke: false, portfolio: false,
           nimmt: ['aktionen'], titel: 'Aktionen' }
       ]
@@ -476,6 +491,23 @@
     document.documentElement.setAttribute('data-dpl-portfolio', auf ? 'auf' : 'zu');
     var k = el('.dpl-portfolio');
     if (k) k.setAttribute('aria-expanded', auf ? 'true' : 'false');
+    /* ── v1666 · DER KNOPF SAGT, WOHIN ER FUEHRT ────────────────────
+       Marcel: „man kann oben wechseln, von Portfolio auf Aktionen und
+       wieder zurueck — also so ein Umschaltmenü."
+
+       Der Knopf hiess in beiden Zustaenden „Portfolio". Solange er nur
+       auf- und zuklappte, ging das; seit v1666 TAUSCHT er aber die
+       ganze untere Haelfte der Schiene aus — Objektliste gegen
+       Aktionen. Ein Schalter, der zwei Dinge tauscht, muss das Ziel
+       nennen, nicht die Herkunft.
+
+       > Eine Beschriftung, die sich nicht aendert, beschreibt einen
+       > Knopf. Eine, die sich aendert, beschreibt einen Weg. */
+    var t = k && k.querySelector('.dpl-t');
+    if (t) {
+      var wort = auf ? 'Aktionen' : 'Portfolio';
+      if (t.textContent !== wort) t.textContent = wort;
+    }
   }
 
   /* Ein Klick auf eine Objektkarte klappt die Liste zu - man hat ja
@@ -498,6 +530,9 @@
   /* ── Setzen ─────────────────────────────────────────────────────── */
   function setze(v) {
     v = String(v || '');
+    /* v1666: `v1` gibt es nicht mehr — wer es gemerkt hat, bekommt die
+       Aktenmappe, nicht „Heute". */
+    if (v === 'v1') v = 'v1b';
     if (v && !LAYOUTS[v]) v = '';
     zurueck();
     aktuell = v;
