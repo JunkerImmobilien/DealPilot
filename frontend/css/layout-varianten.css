@@ -1718,10 +1718,46 @@ html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-obj-name,
 html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-crumb,
 html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-sep,
 html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-v61-row1 > span,
-html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-v61-row1 > a,
-html[data-dp-layout][data-dp-layout] body header.hdr.hdr .sc-pill,
-html[data-dp-layout][data-dp-layout] body header.hdr.hdr .sc-pill *{
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-v61-row1 > a{
   color:#E9E3D6 !important;
+}
+
+/* ── v1653h · ZWEI KORREKTUREN, EINE DAVON AN MIR SELBST ─────────────
+
+   **(a) Die Pillen: Regel zurueckgenommen.** Ich hatte
+   `.sc-pill *{color:#E9E3D6}` gesetzt - und damit RENDITE, FINANZ.,
+   RISIKO, LAGE und UPSIDE auf Kontrast **1,28** gebracht: heller Text
+   auf einer Pille, die WEISS geblieben ist, weil ihr Elternteil
+   `#hdr-badges` heisst und jede ID meine Klassenregel schlaegt.
+
+   > Schrift aufhellen und die Flaeche nicht mitnehmen ist schlimmer
+   > als beides zu lassen. Vorher waren die Pillen lesbar.
+
+   Sie bleiben jetzt, wie sie sind: helle Kacheln auf dunklem Kopf, wie
+   die Objektkarten in der Schublade. Das erhaelt auch ihre
+   Stufenfarben (`.tier-gold`, `.tier-green` - die Score-Farbkette
+   bricht bei 85/70/50 und traegt Bedeutung).
+
+   **(b) Objektnummer und Objektname.** Gemessen 1,60 und 1,05. Beide
+   tragen IDs - `#hdr-obj-num` und `#hdr-obj` - und gegen eine ID hilft
+   kein `!important` auf einer Klasse. Die Liste ist im laufenden Kopf
+   ausgelesen, nicht geraten:
+
+     #hdr-mobile-menu #hdr-obj-num #hdr-obj #hdr-autosave
+     #hdr-completeness #hdr-score-mini #hdr-credits-pill
+     #tabs-status-badge #tabs-status-text #tabs-status-fill
+     #hdr-badges #hdr-toggle-btn
+
+   Angefasst werden nur die zwei, die zu dunkel sind. `#hdr-score-mini`
+   und `#hdr-completeness` sind Pillen mit eigener Flaeche und standen
+   in der Messung sauber - wer sie „sicherheitshalber" mitnimmt,
+   zerstoert dieselbe Sache wie unter (a). */
+html[data-dp-layout] body header.hdr :is(#hdr-obj-num, #hdr-obj),
+html[data-dp-layout] body header.hdr :is(#hdr-obj-num, #hdr-obj) *{
+  color:#E9E3D6 !important;
+}
+html[data-dp-layout] body header.hdr :is(#hdr-obj-num){
+  background:#171512 !important; border-color:#2A2622 !important;
 }
 html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-obj-num{
   background:#171512 !important; border:1px solid #2A2622 !important;
@@ -1747,6 +1783,8 @@ html[data-dp-layout][data-dp-layout] body header.hdr.hdr .tabs-status-text{
 /* Die Kennzahlen-Pillen behalten ihre Statusfarben - Gruen und Rot
    tragen Bedeutung und werden nie umgefaerbt (CLAUDE.md). Nur ihre
    Flaeche wird dunkel, damit sie auf Obsidian nicht leuchten. */
-html[data-dp-layout][data-dp-layout] body header.hdr.hdr .sc-pill{
-  background:#171512 !important; border-color:#2A2622 !important;
-}
+/* v1653h: die Pillenflaeche wird NICHT angefasst - siehe (a) oben.
+   Die Regel stand hier und hat ohnehin nie gegriffen, weil ihr
+   Elternteil `#hdr-badges` heisst. Sie zu entfernen ist ehrlicher, als
+   eine wirkungslose Zeile stehen zu lassen, die beim naechsten Lesen
+   wie eine Erklaerung aussieht. */
