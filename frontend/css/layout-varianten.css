@@ -1179,3 +1179,14 @@ html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] #sb-user button{
   background:#171512 !important; border:1px solid #2A2622 !important;
   color:#E9E3D6 !important;
 }
+
+/* Und der Reiter-BEHAELTER. Ich hatte in v1650 `nav.tabs .tab` dunkel
+   gemacht und dabei `nav.tabs` selbst vergessen - der Behaelter blieb
+   `rgb(251,250,247)`. Eine Regel aendert nur, was sie benennt. */
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] nav.tabs,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] nav.tabs,
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .dpl-teil,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-teil{
+  background:transparent !important;
+  border-color:#26231E !important; box-shadow:none !important;
+}

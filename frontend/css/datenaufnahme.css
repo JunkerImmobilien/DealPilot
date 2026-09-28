@@ -372,3 +372,212 @@ html.qc-app .dp-pfbar .dp-pf-tile.on .dp-pf-led{ background:#3FA56C !important; 
   .dpnq-merk{ margin-right:0; margin-bottom:4px; }
   .dpnq-b{ width:100%; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1651 · DIE ZWEITE ACHSE — Trichter und Bordkarte
+
+   Alles oben ist die BASIS (`body.dp-neue-karte`, Entwurf 1: die Zeile).
+   Was jetzt folgt, baut darauf auf und ordnet um. Ohne gewaehlten Stil
+   greift nichts davon - der Istzustand bleibt bitgenau.
+
+   Gesetzt wird der Stil von `js/karten-stil.js` als `data-dp-karte` am
+   `<html>`. Am `<html>` und nicht am `<body>`, damit er schon steht,
+   bevor der Koerper gebaut ist.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── ENTWURF 4 · TRICHTER ──────────────────────────────────────────────
+   Links die Quellen, rechts was daraus wird. Der Entwurf beantwortet
+   die Frage, die Neue wirklich haben: „und was passiert dann?"
+
+   Gebaut als Gitter mit ZWEI Spalten. Alle vorhandenen Kinder bleiben
+   in Spalte 1 - `.dpk-ertrag` ist das einzige, das in Spalte 2 gesetzt
+   wird und ueber alle Zeilen spannt (`grid-row:1 / -1`).
+
+   > Ich habe zuerst `grid-template-areas` versucht. Das scheitert,
+   > weil es in der Leiste ZWEIMAL `.dp-pf-seg` gibt - zwei Elemente in
+   > einem Bereich stapeln uebereinander, statt untereinander zu
+   > stehen. Mit Auto-Platzierung in Spalte 1 passiert genau das
+   > Richtige, ohne jedes Kind einzeln zu benennen. */
+html[data-dp-karte="trichter"] .dp-pfbar{
+  display:grid !important;
+  grid-template-columns:1fr 296px !important;
+  align-items:start !important;
+  gap:0 !important;
+  padding:0 !important;
+  height:auto !important; min-height:0 !important;
+  overflow:visible !important;
+  background:#FFFDF9 !important;
+  border:1px solid #E6E0D2 !important; border-radius:3px !important;
+}
+/* Alles Vorhandene bleibt links. */
+html[data-dp-karte="trichter"] .dp-pfbar > *{ grid-column:1 !important; }
+/* Die linke Spalte bekommt ihr eigenes Polster - das Gitter hat keins,
+   sonst saesse der Trennstrich zur rechten Spalte im Polster. */
+html[data-dp-karte="trichter"] .dp-pfbar > .dp-pf-seg{
+  padding:0 15px !important; margin:0 !important;
+}
+html[data-dp-karte="trichter"] .dp-pfbar > .dp-pf-seg:first-of-type{ padding-top:13px !important; }
+html[data-dp-karte="trichter"] .dp-pfbar .dp-pf-grouplbl{
+  display:block !important; margin-bottom:7px !important;
+}
+html[data-dp-karte="trichter"] .dp-pfbar .dp-pf-row{
+  flex-wrap:wrap !important; gap:7px !important;
+}
+/* Der Trenner zwischen den beiden Quellgruppen wird wieder sichtbar -
+   im Trichter hat er Platz und Bedeutung. */
+html[data-dp-karte="trichter"] .dp-pfbar > .dp-pf-sep{
+  display:block !important;
+  grid-column:1 !important;
+  height:1px !important; width:auto !important;
+  margin:12px 15px !important;
+  background:#F0ECE2 !important; border:0 !important;
+}
+/* Der QR bleibt links unten, klein und ruhig. */
+html[data-dp-karte="trichter"] .dp-pfbar > .dp-pf-qr{
+  margin:12px 0 13px 15px !important; justify-self:start !important;
+}
+
+/* Die rechte Spalte. */
+html[data-dp-karte="trichter"] .dp-pfbar .dpk-ertrag{
+  grid-column:2 !important; grid-row:1 / -1 !important;
+  display:flex !important; flex-direction:column !important;
+  padding:13px 15px !important;
+  background:#FBF9F4 !important;
+  border-left:1px solid #E6E0D2 !important;
+  align-self:stretch !important;
+}
+html[data-dp-karte="trichter"] .dpk-ertrag-titel{
+  font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.09em;
+  text-transform:uppercase; color:#8C8578;
+  margin-bottom:9px;
+}
+html[data-dp-karte="trichter"] .dpk-ertrag-zeile{
+  display:flex; justify-content:space-between; gap:10px;
+  padding:6px 0; border-bottom:1px solid #F2EFE8;
+  font-size:12.5px; color:#2C2A26; font-variant-numeric:tabular-nums;
+}
+html[data-dp-karte="trichter"] .dpk-ertrag-was{
+  font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.07em;
+  text-transform:uppercase; color:#8C8578; white-space:nowrap;
+}
+/* Der Abrufknopf sitzt im Trichter UNTER dem Ergebnis - dort, wo der
+   Blick nach dem Lesen ankommt. `margin-top:auto` schiebt ihn ans
+   untere Ende, egal wie hoch die linke Spalte geworden ist. */
+html[data-dp-karte="trichter"] .dpk-ertrag .dp-pf-rz{
+  margin-top:auto !important; padding-top:12px !important;
+  width:100% !important; min-width:0 !important; display:block !important;
+}
+html[data-dp-karte="trichter"] .dpk-ertrag .dp-pf-launch{
+  width:100% !important; justify-content:center !important;
+}
+
+/* ── ENTWURF 5 · BORDKARTE, ERNST GEMEINT ─────────────────────────────
+   Die Metapher bleibt - aber nur das, was ETWAS BEDEUTET: der Abriss
+   trennt „Quellen waehlen" von „Abrufen". Perforation als feine
+   Punktlinie, kein Strichcode, kein Streifen.
+
+   Hier ist kein einziges neues Element noetig. `.dp-pf-perf` IST die
+   Perforation; sie war in der Zeile nur versteckt. Ein Bauteil, das
+   schon dasteht, wieder einzublenden ist ehrlicher als ein zweites
+   danebenzustellen. */
+html[data-dp-karte="bordkarte"] .dp-pfbar{
+  display:flex !important; flex-wrap:wrap !important;
+  align-items:stretch !important;
+  padding:0 !important; height:auto !important; min-height:0 !important;
+  background:#FFFDF9 !important;
+  border:1px solid #DCD4C2 !important; border-radius:3px !important;
+  overflow:hidden !important;
+}
+/* Der Vorspann kommt zurueck - aber als Markenzeile, nicht als
+   Versalien-Aufdruck. Der alte Text wird auf Schriftgrad 0 gesetzt und
+   der neue im Pseudoelement gefuehrt: so bleibt der Knoten, an dem
+   `object-actions.js` haengt, unangetastet. */
+html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-lead{
+  display:flex !important; order:1 !important;
+  flex:1 0 100% !important; align-items:baseline !important; gap:9px !important;
+  padding:12px 16px 0 !important; margin:0 !important;
+}
+html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-lead .bp{
+  display:inline !important;
+  font-family:"Space Grotesk",sans-serif; font-weight:700;
+  letter-spacing:0; text-transform:none; color:#2C2A26;
+  font-size:0 !important;
+}
+html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-lead .bp::after{
+  content:"DealPilot"; font-size:13px; letter-spacing:.01em;
+}
+html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-lead .k{
+  display:inline !important; font-weight:700 !important; font-size:13px !important;
+  color:#2C2A26 !important; letter-spacing:0 !important; text-transform:none !important;
+}
+html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-lead .s{ display:none !important; }
+
+/* Die Quellen in der Mitte. */
+html[data-dp-karte="bordkarte"] .dp-pfbar > .dp-pf-seg{
+  order:2 !important; padding:11px 16px 0 !important;
+}
+html[data-dp-karte="bordkarte"] .dp-pfbar > .dp-pf-seg:last-of-type{
+  padding-bottom:13px !important;
+}
+html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-row{ flex-wrap:wrap !important; }
+html[data-dp-karte="bordkarte"] .dp-pfbar > .dp-pf-qr{ display:none !important; }
+html[data-dp-karte="bordkarte"] .dp-pfbar > .dp-pf-sep{ display:none !important; }
+html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-stripe,
+html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-bc{ display:none !important; }
+
+/* Die Perforation - zwischen Waehlen und Ausloesen, nicht als Zierat. */
+html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-perf{
+  display:block !important; order:8 !important;
+  flex:0 0 0 !important; width:0 !important; height:auto !important;
+  align-self:stretch !important;
+  margin:10px 0 !important; padding:0 !important;
+  background:none !important;
+  border-left:2px dotted #DCD4C2 !important;
+}
+
+/* Der Abschnitt rechts. Die einzige Farbflaeche der Karte - sie zieht
+   den Blick auf den Knopf, und genau das soll sie. */
+html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-rz{
+  order:9 !important;
+  flex:0 0 190px !important; width:190px !important; min-width:190px !important;
+  display:flex !important; flex-direction:column !important;
+  justify-content:center !important; gap:7px !important;
+  padding:13px 16px !important; margin:0 0 0 auto !important;
+  background:#FBF6E9 !important;
+  align-self:stretch !important;
+}
+html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-rz::before{
+  display:block !important;
+  content:"Abschnitt";
+  font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.09em;
+  text-transform:uppercase; color:#8C8578;
+}
+html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-launch{
+  width:100% !important; justify-content:center !important;
+}
+html[data-dp-karte="bordkarte"] .dpk-zahl{
+  font-size:11.5px; color:#8C8578; font-variant-numeric:tabular-nums;
+}
+
+/* ── SCHMALE SCHIRME ──────────────────────────────────────────────────
+   Der Trichter braucht Breite; unter 820 px bricht er auf zwei Bloecke
+   um - so steht es schon im Entwurf. Die Bordkarte legt ihren Abschnitt
+   unter die Quellen und behaelt die Perforation als WAAGERECHTE Linie:
+   ihre Bedeutung ist „hier wird getrennt", nicht „hier ist rechts". */
+@media (max-width: 820px){
+  html[data-dp-karte="trichter"] .dp-pfbar{ grid-template-columns:1fr !important; }
+  html[data-dp-karte="trichter"] .dp-pfbar .dpk-ertrag{
+    grid-column:1 !important; grid-row:auto !important;
+    border-left:0 !important; border-top:1px solid #E6E0D2 !important;
+    margin-top:12px !important;
+  }
+  html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-perf{
+    flex:0 0 100% !important; width:auto !important; height:0 !important;
+    margin:10px 16px !important;
+    border-left:0 !important; border-top:2px dotted #DCD4C2 !important;
+  }
+  html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-rz{
+    flex:0 0 100% !important; width:auto !important; min-width:0 !important;
+    margin:0 !important;
+  }
+}

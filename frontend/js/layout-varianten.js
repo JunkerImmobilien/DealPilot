@@ -372,7 +372,12 @@
       if (!b) return;
       var an = b.classList.contains('dp-chrome-hell')
         || h.hasAttribute('data-dp-layout')
-        || h.classList.contains('qc-app');
+        || h.classList.contains('qc-app')
+        /* v1651: ein GEWAEHLTER Kartenstil setzt die Marke ebenfalls.
+           Ohne diese Zeile waehlt jemand im Obsidian-Modus „Trichter",
+           bekommt die Umordnung, aber keine der 46 Grundregeln - das
+           sieht aus wie ein halb aufgetragener Anstrich. */
+        || h.hasAttribute('data-dp-karte');
       b.classList.toggle('dp-neue-karte', an);
     } catch (e) {}
   }
@@ -385,7 +390,7 @@
     new MutationObserver(karteMarke).observe(document.body,
       { attributes: true, attributeFilter: ['class'] });
     new MutationObserver(karteMarke).observe(document.documentElement,
-      { attributes: true, attributeFilter: ['data-dp-layout', 'class'] });
+      { attributes: true, attributeFilter: ['data-dp-layout', 'data-dp-karte', 'class'] });
   }
 
   /* ── Der Platz in den Einstellungen ──────────────────────────────────
@@ -486,6 +491,10 @@
     setze: setze,
     layouts: LAYOUTS,
     aktuell: function () { return aktuell; },
+    /* v1651: `karten-stil.js` braucht die Marke nach jedem Stilwechsel
+       neu ausgerechnet. Nach aussen gegeben statt dort nachgebaut - ein
+       zweiter Weg zu derselben Marke laeuft auseinander. */
+    karteMarke: karteMarke,
     schalter: function () { baueSchalter(); schalterNachziehen();
       try { localStorage.setItem('dp_layout_schalter', '1'); } catch (e) {} }
   };
