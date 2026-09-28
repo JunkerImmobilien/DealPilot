@@ -144,6 +144,26 @@
     if (z.textContent !== neu) z.textContent = neu;
   }
 
+  /* ── v1657 · Die Objektnummer in den Kopf der Bordkarte ───────────
+     Der Entwurf zeigt sie rechts in der Kopfzeile („Objekt 2026-1637")
+     und beantwortet damit, wofür hier abgerufen wird. Bei einer Karte,
+     die man aus einer Liste heraus öffnet, ist das keine Zierde.
+
+     Gelesen wird `#hdr-obj-num` - dieselbe Quelle wie im Kopf, nicht
+     eine zweite. Gesetzt als Attribut, damit die CSS sie über `attr()`
+     zeigen kann; so bleibt der Text an EINER Stelle. */
+  function objektnummerSetzen(bar) {
+    if (!bar) return;
+    var lead = bar.querySelector('.dp-pf-lead');
+    if (!lead) return;
+    var num = document.getElementById('hdr-obj-num');
+    var txt = num ? (num.textContent || '').trim().replace(/\s*✎\s*$/, '') : '';
+    var neu = txt ? 'Objekt ' + txt : '';
+    if (lead.getAttribute('data-dpk-objekt') !== neu) {
+      lead.setAttribute('data-dpk-objekt', neu);
+    }
+  }
+
   /* ── Anwenden ─────────────────────────────────────────────────────
      > **Ein Beobachter, der auf seine eigenen Änderungen reagiert,
      > ist eine Endlosschleife.** Genau das ist am 28.09.2026 passiert:
@@ -165,6 +185,7 @@
       var bar = document.getElementById('oab-bar');
       if (aktuell === 'trichter') { ertragBauen(bar); } else { ertragAbraeumen(); }
       zaehlung(bar);
+      objektnummerSetzen(bar);
     } catch (e) {
       try { console.warn('[karten-stil]', e); } catch (e2) {}
     }

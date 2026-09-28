@@ -3026,3 +3026,54 @@ html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-l{
 html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-grade{
   display:none !important;
 }
+
+/* ── v1657c · DIE AUFLOESUNG: `:is()` ERBT ID-SPEZIFITAET ────────────
+   Drei Anlaeufe lang blieb die Kennung auf 1,36, obwohl meine Regel im
+   Browser stand, `matches()` bestand und `!important` trug. Geprueft
+   und ausgeschlossen: doppelte Stylesheets, Inline-Stil, `@media`,
+   `@layer`. Ein Inline-`!important` wirkte, eine frische Regel mit
+   demselben Selektor nicht.
+
+   Der letzte Messschritt hat es gezeigt: die Gewinnerregel aus
+   `style.css` matcht als GANZES, aber **kein einziger ihrer
+   komma-getrennten Teile** - weil die Kommas INNERHALB eines `:is()`
+   stehen. Und:
+
+   > **`:is()` erbt die Spezifitaet seines staerksten Arguments.**
+   > Steht darin irgendwo eine ID, traegt die ganze Regel
+   > ID-Spezifitaet - auch fuer die Klasse, die daneben steht.
+
+   Das ist dieselbe Falle, die in CLAUDE.md fuer `:not(#id)` notiert
+   ist. Mein Kaskaden-Walker hat sie zweimal verschleiert, weil er
+   Selektoren am Komma zerlegt: bei `:is(a, b)` entstehen zwei
+   ungueltige Bruchstuecke, und die Regel faellt aus der Wertung.
+
+   **Damit ist auch `#hdr-obj-num` aus v1653i erklaert** - derselbe
+   Mechanismus, und ich habe ihn damals offen gelassen.
+
+   Die Antwort ist nicht mehr Klassen, sondern eine eigene ID. `#sb-list`
+   ist der Listenbehaelter und steht ohnehin darueber. */
+html[data-dp-layout] :is(#sb-list) .sb-card .sbc-seq{
+  color:#8C8578 !important;
+}
+html[data-dp-layout] :is(#sb-list) .sb-card{
+  border-left-width:2px !important;
+  border-left-style:solid !important;
+}
+html[data-dp-layout] :is(#sb-list) .sb-card:has(.sbc-score-top),
+html[data-dp-layout] :is(#sb-list) .sb-card:has(.sbc-score-green){
+  border-left-color:#3FA56C !important;
+}
+html[data-dp-layout] :is(#sb-list) .sb-card:has(.sbc-score-gold){
+  border-left-color:var(--wl-c9a84c, #C9A84C) !important;
+}
+html[data-dp-layout] :is(#sb-list) .sb-card:has(.sbc-score-red){
+  border-left-color:#B8625C !important;
+}
+html[data-dp-layout] :is(#sb-list) .sb-card:not(:has(.sbc-mini-score)){
+  border-left-color:#2A2622 !important;
+}
+/* Die Adresse aus demselben Grund - sie stand auf demselben Ton. */
+html[data-dp-layout] :is(#sb-list) .sb-card .sbc-address{
+  color:#E9E3D6 !important;
+}

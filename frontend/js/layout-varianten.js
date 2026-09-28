@@ -188,6 +188,7 @@
     L.schienen.forEach(function (S) { baueEine(L, S, mc); });
     badgeInDenKopf();
     planPilleZuDenKnoepfen();
+    nutzerBeobachten();
     zahlNachziehen();
   }
 
@@ -220,6 +221,23 @@
     if (!pille || !zeile || pille.parentElement === zeile) return;
     merker.push({ knoten: pille, eltern: pille.parentElement, naechstes: pille.nextElementSibling });
     zeile.insertBefore(pille, zeile.firstChild);
+  }
+
+  /* Der Nutzerblock wird von der Abo-Schicht nachgereicht - beim Aufbau
+     der Schiene steht die Plan-Pille oft noch nicht da. Gemessen: nach
+     `baueSchienen()` war sie in `.sb-user-text`, also ungerührt.
+
+     > Ein einmaliger Aufruf trifft nur, was schon existiert. Was
+     > nachgeliefert wird, braucht einen, der zusieht. */
+  var nutzerWache = null;
+  function nutzerBeobachten() {
+    if (nutzerWache || !window.MutationObserver) return;
+    var u = el('#sb-user');
+    if (!u) return;
+    nutzerWache = new MutationObserver(function () {
+      if (aktuell) planPilleZuDenKnoepfen();
+    });
+    nutzerWache.observe(u, { childList: true, subtree: true });
   }
 
   function badgeInDenKopf() {

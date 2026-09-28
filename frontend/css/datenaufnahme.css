@@ -805,3 +805,41 @@ html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead{
   justify-content:flex-start !important;
   text-align:left !important;
 }
+
+/* ── v1657 · DIE BORDKARTE, ZEILE FUER ZEILE NACH DEM ENTWURF ────────
+   Marcel: „die Datenaufnahme-Karte sieht auch nicht aus wie in der
+   Demo."
+
+   Der Entwurf (`entwurf-aktionsbox.html`, „5 · Bordkarte neu"):
+
+     [links, flex:1, Polster 13/16]
+       Kopfzeile:  DealPilot · Datenaufnahme · „Objekt 2026-1637" rechts
+       Quellen:    flex, gap 7, umbrechend
+     [Perforation: 2px punktiert, Rand 10px oben/unten]
+     [rechts, 190 px, Creme #FBF6E9, mittig]
+       „Abschnitt" · [Abrufen] · „1 Quelle gewaehlt"
+
+   Zwei Abweichungen, gemessen:
+   1. Der Kopf traegt „BOARDING PASS · Datenaufnahme · DealPilot ·
+      Boarding" - drei Angaben, von denen zwei dasselbe sagen.
+   2. **Die Objektnummer fehlt.** Im Entwurf steht sie rechts im Kopf
+      und beantwortet die Frage, fuer welches Objekt hier abgerufen
+      wird - bei einer Karte, die man aus einer Liste heraus oeffnet,
+      ist das keine Zierde.
+
+   Die Nummer kommt aus `#hdr-obj-num` und wird per `attr()` nicht
+   erreichbar; `karten-stil.js` setzt sie deshalb als
+   `data-dpk-objekt` an die Leiste. Hier steht nur ihre Gestalt. */
+html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead .s,
+html[data-dp-layout]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead .s{
+  display:none !important;
+}
+html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead::after,
+html[data-dp-layout]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead::after{
+  content:attr(data-dpk-objekt);
+  margin-left:auto;
+  font-family:"JetBrains Mono",ui-monospace,monospace;
+  font-size:10px; letter-spacing:.07em; text-transform:uppercase;
+  color:#8C8578;
+  align-self:center;
+}
