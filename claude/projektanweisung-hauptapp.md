@@ -21298,3 +21298,131 @@ ist eine Produktentscheidung, keine Textkorrektur, und liegt Marcel vor.
 - Der Kaskaden-Walker gehört weiterhin repariert (seit v1657 offen).
 - `.sc-pill-sub` („4 / 4 KPIs") ist in der Schiene eingeblendet, im Kopf
   bleibt sie verborgen — dort fehlt der Platz.
+
+---
+
+## Rollout-Journal · 28.09.2026 (14) — Das Messgerät hat gelogen
+
+**Was:** Reiterleiste dunkel, Account-Block in einer Zeile, die Brücke
+ins QuickBoarding repariert — und eine Runde, in der ich fünfmal
+hintereinander dem falschen Messwert geglaubt habe.
+
+**Commits:** `b8bba57` v1665 · `58d81a5` v1665c · `6c0bf05` v1665d ·
+`890fec0` v1665e · `2f4f0a9` v1665f · `f8395cf` v1665g
+
+**Nachweis:**
+
+| | Ist |
+|---|---|
+| Reiterleiste (v1b) | Grund `#0E0D0B`, Einträge `#BFB7A9`, Symbole gold |
+| Menüpunkte | alle bis **„Feedback & Support"** sichtbar |
+| Account-Block | eine Zeile: `[★ PRO] [Abmelden] … V1.1` |
+| Haken „Aktueller Plan" | **weg** |
+| QuickBoarding, Kartei | vier Kacheln **weiß**, wie im Objekt-Tab |
+| QuickBoarding, „Heute" | dunkel — **wie der Objekt-Tab dort auch** |
+
+---
+
+### 1 · Ein Beobachter, der sich zum Arbeiten abschaltet
+
+`data-dp-kartenstil` stand am Hauptdokument auf „kartei" und am
+iframe-Dokument auf **null** — die Brücke aus v1663d war nie gelaufen.
+
+Der Grund ist mein eigenes `anwenden()`: es hängt den
+MutationObserver ab, solange es arbeitet (gegen die Endlosschleife aus
+v1652). **Genau in diesem Fenster hängt `qc-bridge.js` das iframe ein.**
+
+> Ein Beobachter, der sich zum Arbeiten selbst abschaltet, hat ein
+> blindes Fenster. Wer darin etwas einhängt, wird nicht bemerkt — und
+> der Fehler sieht aus wie ein Timing-Zufall, weil er es auch ist.
+
+Die Brücke hängt jetzt am echten Ereignis: `load` steigt nicht auf,
+lässt sich aber in der **Einfangphase** am Dokument mithören.
+
+### 2 · Eine ID beweist es, vier Klassen nicht
+
+Die Reiterleiste blieb weiß. Gegenprobe im Browser, drei Stufen:
+
+```
+derselbe Selektor am Body-Ende      -> weiß
+vier zusätzliche Klassen            -> weiß
+body:has(#sb-user) davor            -> dunkel, sofort
+```
+
+Wieder die `:is()`-Falle. 13 Selektoren tragen jetzt `:has(#sb-user)`,
+das die ID-Spezifität holt, ohne eine fremde ID an eine falsche Stelle
+zu schreiben.
+
+### 3 · Ein Rollbalken, den man nicht sieht
+
+Der Aktionsblock stand auf `flex:1 1 auto` mit `overflow-y:auto` —
+Höhe **382**, Inhalt **469**. „Feedback & Support" war da, aber nur
+über einen zweiten, unsichtbaren Rollbalken *innerhalb* der Schiene.
+
+> Ein Rollbalken, den man nicht sieht, ist kein Rollbalken, sondern
+> ein Abschneider. Zwei ineinander sind einer zu viel.
+
+### 4 · Zwei Wege zum selben Ort
+
+Marcel: *„da hast du ein Häkchen drinne, da steht aktueller Plan. Ich
+kann aber auch auf Pro klicken und es wird mir das Gleiche angezeigt."*
+
+Gemessen: die Pille trägt `title="Aktueller Plan — Klick für …"`, der
+Knopf daneben heißt genauso.
+
+> Zwei Wege zum selben Ort sind kein Komfort, sondern eine Frage, die
+> der Nutzer beantworten muss, ohne dass es etwas zu entscheiden gäbe.
+
+Der Knopf fällt, die Pille bleibt — sie sagt zusätzlich, **welcher**
+Plan es ist. Gebaut mit `display:contents` statt einen Knoten zu
+verschieben: die Lehre aus v1660, als zehn „Pro" nebeneinander standen.
+
+### 5 · **Rücknahme, und die eigentliche Lehre: das Messgerät hat gelogen**
+
+Die Kacheln im QuickBoarding blieben dunkel. Ich habe daraufhin
+**fünf** Anläufe gebraucht, und vier davon beruhten auf einem
+falschen Messwert.
+
+Was `getComputedStyle` im iframe meldete: meine Regel matcht, trägt
+`!important`, steht im letzten Blatt — **und wirkt nicht.** Auch eine
+Regel mit zwei IDs nicht. Auch nicht, als ich die Quelle änderte.
+
+Der Test, der alles klärte:
+
+```
+el.style.setProperty('background', '#ff00ff', 'important')
+  -> getComputedStyle sagt weiterhin rgb(10,10,10)
+  -> das Attribut war nachweislich gesetzt (styleAttr danach: "")
+```
+
+**Ein Inline-`!important` schlägt alles. Wenn es nicht wirkt, wirkt
+nicht die Regel nicht — dann misst das Messgerät falsch.**
+
+> `getComputedStyle` auf ein Element **in einem iframe** liefert über
+> dieses Werkzeug veraltete Werte. Ein Bildausschnitt ist dort das
+> verlässlichere Messgerät. Ich habe vier Runden lang einer Zahl
+> geglaubt und dem Bild nicht.
+
+Der Bildausschnitt zeigte: die Kacheln **waren längst weiß.**
+
+**Und die falsche Änderung, die daraus folgte:** ich hatte die drei
+Stellen, an denen `quickcheck-app.html` seine Werkzeugkacheln dunkel
+färbt, an der Quelle hell gemacht (v1665d/f). Dann gemessen, was der
+Objekt-Tab **ohne** Layout tut — dunkel, `rgb(10,10,10)`.
+
+> Wer eine Sonderbehandlung an der Quelle entfernt, gleicht nicht an —
+> er dreht den Unterschied um.
+
+Alles zurückgenommen (v1665g); die Angleichung hängt jetzt an
+`data-dp-kartenstil`. Ohne Layout ist das QuickBoarding dunkel wie der
+Objekt-Tab, mit Kartei hell wie er.
+
+### Rest
+
+- **`getComputedStyle` im iframe ist als Messgerät verbrannt.** Für
+  Farben und Maße dort gilt: Bildausschnitt, oder im iframe-Kontext
+  selbst messen und das Ergebnis als Text zurückgeben.
+- Der Kaskaden-Walker gehört weiterhin repariert (seit v1657 offen).
+- `js/qc-bridge.js` `IFRAME_SRC` muss bei **jeder** Änderung an
+  `quickcheck-app.html` mit hoch — in v1665d ist genau das durch ein
+  sed ins Leere gelaufen, das ich nicht nachgezählt hatte.
