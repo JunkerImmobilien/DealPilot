@@ -20677,3 +20677,111 @@ gemacht werden. Eigene Gruppe „Seiten" in den Einstellungen.
   Komma zerlegen und muss `:is()`/`:not()`/`:has()`-Spezifität richtig
   rechnen. Solange das nicht passiert, nennt er bei jeder solchen Regel
   den falschen Sieger.
+
+---
+
+## Rollout-Journal · 28.09.2026 (9) — An der Demo ausgemessen
+
+**Was:** Score-Chip und Datenaufnahme nicht mehr genähert, sondern die
+Demos im Browser geöffnet und **jeden Wert ausgelesen**; dazu die
+Kartei als Standard, der Grauton im Arbeitsbereich, das Score-Band über
+die volle Breite und die Schmalschirm-Leiste repariert.
+
+**Commits:** `4251ab1` v1658 · `7e403de` v1658b · `fee562c` v1658c ·
+`812c85a` v1658d · `2d78ede` v1659 · `8b06b52` v1659b · `7ec7366` v1659c
+
+**Nachweis** (Aktenmappe, Objekt *Gerberstraße 27*):
+
+| | Ist | Soll (Demo) |
+|---|---|---|
+| Chip-Grund | `rgb(255,255,255)` | ✓ |
+| Chip-Rahmen | `rgb(206,198,182)` | ✓ |
+| Chip-Radius | `2px` | ✓ |
+| Ring | `25.99px` | ✓ (Demo: derselbe Wert) |
+| Kartei-Grund | `rgb(255,255,255)` | ✓ |
+| Kartei-Kopf | `rgb(244,242,237)` | ✓ |
+| Abrufknopf | **16 px vom rechten Rand** | ✓ |
+| Arbeitsbereich | `rgb(244,242,237)`, `.sec` durchsichtig | ✓ |
+| Score-Band | **1881 px**, Score + 5 Kennzahlen | ✓ |
+| Handy / Tablet | Marke, Portfolio, Reiter **alle ok** | — |
+
+---
+
+### 1 · „Sieht gekünstelt aus" ist ein Messbefund
+
+Marcel über den Score-Chip: *„das passt irgendwie noch gar nicht, das
+sieht sehr gekünstelt aus."*
+
+Statt ein viertes Mal zu nähern: die Demo geöffnet und jeden Wert
+ausgelesen. **Fünf Werte wichen ab** — Creme statt Weiss, schwarzer
+statt beigegrauer Rahmen (`#CEC6B6`), 6 statt 2 px Radius, 30 statt
+26 px Ring, andere Polster.
+
+> Fünf Werte daneben, und das Auge merkt es, bevor man es benennen
+> kann. **Ein Gestaltungsurteil ist messbar, wenn es eine Vorlage
+> gibt.**
+
+Bei der Bordkarte waren es drei: `#FFFDF9` statt Weiss, `#DCD4C2` statt
+`#CEC6B6`, Perforation 2 statt 1 px.
+
+### 2 · Die Kartei war nie gebaut
+
+Marcel: *„bei der Datenaufnahme hätte ich eigentlich gerne die Kartei,
+nur dass der Abruf-Button mit in die Kartei-Seite reinkommt, aber ganz
+auf die rechte Seite."*
+
+Der Entwurf 2 hat den Knopf **bereits** in einer Fusszeile ganz rechts.
+Es war also kein Umbau nötig — sondern der Entwurf, den ich noch nicht
+gebaut hatte. Er ist jetzt der Standard; ein gemerkter `trichter` oder
+`bordkarte` wird einmalig migriert.
+
+### 3 · Es fehlte nicht der Ton, sondern die Fläche
+
+Der Arbeitsbereich trug `#F8F6F1`, und trotzdem sah man kein Grau: die
+Abschnitte `.sec` darauf sind **weiss** und deckten ihn zu.
+
+> Die Abschnitte treten jetzt zurück, die Karten bleiben weiss — so
+> liegt das Papier auf dem Tisch und nicht auf Papier.
+
+`.sec` brauchte dafür wieder die **ID-Kette aus v1648** (zwölf IDs in
+einem `:is()`). Zum zweiten Mal an diesem Tag: wer sie gebaut hat, muss
+sie selbst wieder benutzen.
+
+### 4 · Zwei Kästchen sagen „zwei Dinge"
+
+Marcel: *„den Investor Deal Score hätte ich gerne über die gesamte
+Breite, mit den KPIs, und vielleicht am Anfang noch den Score."*
+
+Der Chip stand als eigenes Kästchen neben fünf Kacheln. Jetzt ist er
+die **erste Zelle desselben Bandes** — 1881 px, Score links, danach die
+fünf Kennzahlen mit ihrer Angabe „4 / 4 KPIs".
+
+> Die fünf Kennzahlen **sind** der Score. Zwei getrennte Kästchen
+> behaupten das Gegenteil.
+
+### 5 · Eine static-Leiste am body landet ganz unten
+
+Auf 834 px stand die Schiene bei **y = 1112** — unter dem Sichtfeld,
+kein Bedienelement erreichbar. Ursache war meine eigene Änderung aus
+v1656 (Schiene an den `<body>`, damit kein Vorfahr sie klippt): die
+Schmalschirm-Regel setzt sie auf `position:static`, und ein statisches
+Element am Ende des `<body>` steht hinter allem.
+
+Dazu zwei Fehler, die sich addierten und **in einer Messung sichtbar
+waren**: `z-index:80` gegen den Kopf mit 300 (unbedienbar), und
+`align-items:center` auf einer Flex-Spalte setzte ein 1026 px breites
+Kind in einem 834-px-Fenster auf **x = −96** (unsichtbar).
+
+### 6 · Rücknahmen
+
+- **Der schwarze Rahmen im Arbeitsbereich** ist zurückgenommen (wieder
+  golden, 22 %). Die Score-Karten behalten ihn — Marcel wollte ihn
+  dort. *Eine Rücknahme ist kein Rückschritt: der Rahmen war richtig,
+  wo er eine Fassung ist, und falsch, wo er acht Karten in Reihe zu
+  acht Traueranzeigen macht.*
+- **Gold bei Hilfe und Kontingent** ist zurückgenommen. Gold bleibt den
+  Symbolen, die zur Navigation gehören. *Wenn alles hervorgehoben ist,
+  ist nichts hervorgehoben.*
+- **Die Score-Kante an den Objektkarten** weicht dem **Deal-Status**:
+  grün gewonnen, rot verloren, gold in Bearbeitung. Ein Rahmen kann nur
+  eine Sache sagen.
