@@ -696,3 +696,54 @@ html[data-dp-layout] .ds2-grenze-wert{
   font-family:var(--dpl-mono) !important;
   font-variant-numeric:tabular-nums !important;
 }
+
+/* ── Abschnittsköpfe und Felder (v1647) ─────────────────────────────
+   GEMESSEN: die Abschnittsköpfe sind `.ct` — bereits Versalien mit
+   1,4 px Sperrung, aber in DM Sans. Sie brauchen nur die richtige
+   Schrift, keine neue Gestaltung.
+
+   > Die Feldbeschriftungen bleiben, wie sie sind. Im Entwurf standen
+   > sie als Mono-Versalien - das trägt bei „PLZ" und „Baujahr", aber
+   > **75 der 274 Beschriftungen sind ganze Sätze** („Erhöhung gilt auch
+   > für zusätzliche Einnahmen …"). Versalien in Mono wären dort
+   > unlesbar. Ein Entwurf, der mit acht Feldern gezeichnet wurde,
+   > gilt nicht ungeprüft für 274. */
+html[data-dp-layout] .body .ct{
+  font-family:var(--dpl-mono) !important;
+  font-size:10px !important; letter-spacing:.12em !important;
+  color:var(--dpl-leise) !important;
+}
+
+/* Felder flacher: Haarlinie statt 1,1 px, weisser Grund, kleiner
+   Radius. Die Höhe bleibt - 38 px sind auf dem Tablet die Grenze, ab
+   der ein Feld noch sicher zu treffen ist. */
+html[data-dp-layout] .body input[type=text],
+html[data-dp-layout] .body input[type=number],
+html[data-dp-layout] .body input[type=date],
+html[data-dp-layout] .body select,
+html[data-dp-layout] .body textarea{
+  border:1px solid var(--dpl-linie) !important;
+  border-radius:2px !important;
+  background:var(--dpl-flaeche) !important;
+}
+html[data-dp-layout] .body input:focus,
+html[data-dp-layout] .body select:focus,
+html[data-dp-layout] .body textarea:focus{
+  border-color:var(--dpl-gold) !important;
+  box-shadow:0 0 0 2px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent) !important;
+}
+
+/* ── Das restliche Gold in der Schrift ──────────────────────────────
+   Einzeln nachgemessen. Gruen und Rot bleiben - die tragen Bedeutung.
+   Der Stern `.ds2-stern-icon` bleibt golden: er IST die Wertung, kein
+   Text. */
+html[data-dp-layout] .sb-act-section-title,
+html[data-dp-layout] .body .vz-arrow,
+html[data-dp-layout] .body .phase-divider,
+html[data-dp-layout] .body .junker-action-banner-title,
+html[data-dp-layout] .body .dab-bp-code,
+html[data-dp-layout] .body .ds-top-deal-label,
+html[data-dp-layout] .body .kpi-eval-light,
+html[data-dp-layout] .body small{
+  color:var(--dpl-leise) !important;
+}
