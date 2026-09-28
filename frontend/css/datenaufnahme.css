@@ -1008,3 +1008,51 @@ html[data-dp-kartenstil="kartei"] .dp-pfbar #oab-run.dp-pf-launch{
   margin-left:auto !important;
   width:auto !important; min-width:0 !important;
 }
+
+/* ── v1660 · DIE KARTEI-KOPFZEILE, MIT DER ID DER LEISTE ─────────────
+   Gemessen: die Kopfzeile stand ZENTRIERT (`.bp` bei x=1105 in einer
+   1278 px breiten Zeile), `.bp` zeigte weiterhin „BOARDING PASS", und
+   die Zaehlung fehlte.
+
+   Alle drei Regeln aus v1659b waren richtig geschrieben und haben
+   verloren - dieselbe Ursache wie ueberall an diesem Tag: eine
+   `:is()`-Regel mit ID-Spezifitaet. **Die Leiste heisst `#oab-bar`**,
+   und mit ihrer eigenen ID im Selektor ist die Frage erledigt.
+
+   > Wenn ein Element eine ID hat, ist sie das kuerzeste Mittel gegen
+   > jede fremde Regel. Man muss sie nur benutzen. */
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-lead{
+  justify-content:flex-start !important;
+  text-align:left !important;
+}
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-lead .bp{
+  font-size:0 !important; line-height:0 !important;
+}
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-lead .bp::after{
+  content:'DealPilot' !important;
+  font-size:14px !important; line-height:1.2 !important;
+  font-family:'Space Grotesk',sans-serif; font-weight:700;
+  letter-spacing:.01em; color:#1A1A18;
+}
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-lead .k{
+  font-size:13.5px !important; font-weight:600 !important;
+  color:#1A1A18 !important;
+}
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-lead::after{
+  content:attr(data-dpk-wahl) !important;
+  margin-left:auto !important;
+  font-family:"JetBrains Mono",ui-monospace,monospace;
+  font-size:10px; letter-spacing:.07em; text-transform:uppercase;
+  color:#9A9287;
+}
+/* Die Quellgruppen linksbuendig - sie erbten dieselbe Zentrierung. */
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar > .dp-pf-seg{
+  justify-content:flex-start !important;
+  align-items:flex-start !important;
+}
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-row{
+  justify-content:flex-start !important;
+}
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-rz{
+  justify-content:flex-start !important;
+}

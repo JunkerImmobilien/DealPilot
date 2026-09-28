@@ -226,10 +226,30 @@
     }
   }
 
+  /* ── v1660 · DER STIL GILT NUR IN EINEM LAYOUT ────────────────────
+     Marcel: „wenn ich auf heute zurueckschalte, sieht es nicht so aus
+     wie heute … und auch die Pre-Flight-Karte soll die alte sein."
+
+     Gemessen nach dem Zurueckschalten: `data-dp-kartenstil="kartei"`
+     stand weiterhin am `<html>`, die Leiste war 266 px hoch und weiss -
+     die Kartei, nicht die alte Bordkarte.
+
+     > **Der Merker ueberlebt das Layout, die WIRKUNG darf es nicht.**
+     > „Heute" heisst Auslieferungszustand, und der kennt keinen
+     > Kartenstil. Wer spaeter wieder ein Layout waehlt, bekommt seinen
+     > Stil zurueck - der Merker bleibt ja.
+
+     Dasselbe Prinzip wie bei `hell-varianten.js` in v1653e: eine
+     Schicht, die neben einer echten Ansicht weiterfaerbt, macht jede
+     Abnahme wertlos. */
+  function layoutAktiv() {
+    return document.documentElement.hasAttribute('data-dp-layout');
+  }
+
   function setze(stil) {
     aktuell = STILE[stil] ? stil : '';
     var h = document.documentElement;
-    if (aktuell) h.setAttribute('data-dp-kartenstil', aktuell);
+    if (aktuell && layoutAktiv()) h.setAttribute('data-dp-kartenstil', aktuell);
     else h.removeAttribute('data-dp-kartenstil');
 
     /* Zeile, Trichter und Bordkarte sind alle drei die HELLE Karte -
@@ -382,6 +402,17 @@
     document.addEventListener('DOMContentLoaded', start);
   } else {
     start();
+  }
+
+  /* v1660: Wechselt der Aufbau, wird neu entschieden - sonst bliebe
+     der Stil haengen, den das letzte Layout gesetzt hat, oder er kaeme
+     beim Zurueckschalten nicht wieder. */
+  if (window.MutationObserver) {
+    new MutationObserver(function () { setze(aktuell || (function(){
+      try { return localStorage.getItem(LS) || ''; } catch (e) { return ''; }
+    })()); }).observe(document.documentElement, {
+      attributes: true, attributeFilter: ['data-dp-layout']
+    });
   }
 
   window.DealPilotKartenStil = {

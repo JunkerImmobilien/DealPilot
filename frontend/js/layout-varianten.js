@@ -149,6 +149,7 @@
   var merker = [];       /* [{ knoten, eltern, naechstes }] */
   var schienen = [];     /* v1653: die Kanzlei hat zwei */
   var aktuell = '';
+  var skinVorher = null;   /* v1660: der Skin VOR dem ersten Layout */
 
   function el(s) { return document.querySelector(s); }
 
@@ -187,8 +188,6 @@
     if (!mc || !L.schienen) return;
     L.schienen.forEach(function (S) { baueEine(L, S, mc); });
     badgeInDenKopf();
-    planPilleZuDenKnoepfen();
-    nutzerBeobachten();
     zahlNachziehen();
   }
 
@@ -215,12 +214,33 @@
      anderen Plan eine Luege gewesen - und es gibt mehr als einen.
 
      Die Rueckfahrkarte laeuft ueber `hole()` wie bei allem anderen. */
-  function planPilleZuDenKnoepfen() {
-    var pille = el('#sb-user .sb-user-plan-pill');
-    var zeile = el('#sb-user .sb-user-icons');
-    if (!pille || !zeile || pille.parentElement === zeile) return;
-    merker.push({ knoten: pille, eltern: pille.parentElement, naechstes: pille.nextElementSibling });
-    zeile.insertBefore(pille, zeile.firstChild);
+  /* ── v1660 · ZURUECKGENOMMEN, UND EIN AUFRAEUMER ──────────────────
+     Das Verschieben der Plan-Pille ist **raus**. Marcel: „unten links
+     steht zudem 10 mal Pro. da ist richtig was kaputt gegangen."
+
+     Der Mechanismus: die Abo-Schicht rendert `#sb-user` neu und baut
+     dabei eine NEUE Pille in `.sb-user-text`. Meine verschobene lag
+     weiter in der Knopfzeile - und der Beobachter, der das Verschieben
+     nachzog, legte bei jedem Lauf einen weiteren Merker-Eintrag an.
+     Beim Zurueckschalten stellte `zurueck()` sie alle wieder her.
+
+     > **Wer einen Knoten verschiebt, den ein anderes Modul neu baut,
+     > bekommt bei jedem Neubau eine Kopie dazu.** Das gilt fuer jeden
+     > Knoten, der nicht mir gehoert - und der Nutzerblock gehoert der
+     > Abo-Schicht.
+
+     Marcels Wunsch (Plan neben Abmelden) ist damit offen. Er waere
+     ueber CSS zu loesen, ohne den Knoten anzufassen - das gehoert
+     gemessen und nicht schnell nachgeschoben. Steht im Backlog.
+
+     Diese Funktion raeumt jetzt nur noch auf, was die alte Fassung
+     hinterlassen hat: ueberzaehlige Pillen in bereits geladenen
+     Browsern. */
+  function planPillenAufraeumen() {
+    var alle = document.querySelectorAll('#sb-user .sb-user-plan-pill');
+    for (var i = 1; i < alle.length; i++) {
+      if (alle[i].parentElement) alle[i].parentElement.removeChild(alle[i]);
+    }
   }
 
   /* Der Nutzerblock wird von der Abo-Schicht nachgereicht - beim Aufbau
@@ -235,7 +255,7 @@
     var u = el('#sb-user');
     if (!u) return;
     nutzerWache = new MutationObserver(function () {
-      if (aktuell) planPilleZuDenKnoepfen();
+      planPillenAufraeumen();
     });
     nutzerWache.observe(u, { childList: true, subtree: true });
   }
@@ -434,6 +454,13 @@
     if (!v) {
       kopfOffenHalten(false);
       h.removeAttribute('data-dp-layout');
+      h.removeAttribute('data-dpl-seiten');
+      /* v1660: Den Hellmodus zuruecknehmen, den setze() eingeschaltet
+         hat. Marcel: 'wenn ich auf heute zurueckschalte, sieht es nicht
+         so aus wie heute, es ist hell.' Wer auf Heute stellt, will den
+         Auslieferungszustand - und der ist Obsidian. */
+      try { if (skinVorher && typeof window._dpDispSkin === 'function') {
+        window._dpDispSkin(skinVorher); skinVorher = null; } } catch (e) {}
       h.removeAttribute('data-dpl-portfolio');
       try { localStorage.removeItem(LS); } catch (e) {}
       schalterNachziehen();
@@ -450,11 +477,19 @@
        Hellfassung danebenzustellen hiesse, jede künftige Änderung an
        zwei Stellen zu pflegen - und die zweite vergisst man. Diese
        Datei ordnet den Raum, sie färbt ihn nicht. */
-    try { if (typeof window._dpDispSkin === 'function') window._dpDispSkin('hell'); } catch (e) {}
+    try {
+      if (typeof window._dpDispSkin === 'function') {
+        if (skinVorher === null) {
+          skinVorher = document.body.classList.contains('dp-chrome-hell') ? 'hell' : 'obsidian';
+        }
+        window._dpDispSkin('hell');
+      }
+    } catch (e) {}
     kopfOffenHalten(true);
     baueSchienen(v);
     try { localStorage.setItem(LS, v); } catch (e) {}
     schalterNachziehen();
+    planPillenAufraeumen();
   }
 
   /* ── Der Umschalter ─────────────────────────────────────────────── */

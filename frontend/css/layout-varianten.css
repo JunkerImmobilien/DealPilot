@@ -3525,3 +3525,20 @@ html[data-dp-layout] .body :is(#s0,#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#s-qu
 html[data-dp-layout] .body :is(#s0,#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#s-quick,#s-marktbericht).sec{
   background:transparent !important;
 }
+
+/* ── v1660 · „+ NEUES OBJEKT HINZUFUEGEN" WAR UNSICHTBAR ─────────────
+   Gemessen: `rgb(26,23,20)` auf `rgb(14,13,11)` - **Kontrast 1,09**.
+   Meine Regel aus v1654b benennt `.sb-add-new` und hat verloren; wie
+   ueberall an diesem Tag hilft nur die ID des Behaelters. */
+html[data-dp-layout] :is(#sb-list) .sb-add-new,
+html[data-dp-layout] :is(#sb-list) .sb-add-new *{
+  color:#BFB7A9 !important;
+}
+html[data-dp-layout] :is(#sb-list) .sb-add-new{
+  background:#171512 !important;
+  border:1px solid #2A2622 !important;
+}
+html[data-dp-layout] :is(#sb-list) .sb-add-new:hover,
+html[data-dp-layout] :is(#sb-list) .sb-add-new:hover *{
+  color:#F5EFE2 !important;
+}
