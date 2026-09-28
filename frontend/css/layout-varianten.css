@@ -3888,3 +3888,36 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score,
 html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer{
   flex:0 0 auto !important;
 }
+
+/* ── v1664c · ERDRUECKT, NICHT ZU KLEIN GESETZT ──────────────────────
+   Gemessen nach v1664b: Gold weg, Polster (7/16/8) und Raster greifen -
+   und die Kacheln sind trotzdem **15 px** hoch statt 32.
+
+   Der Kaskaden-Walker sagte diesmal nichts, weil es keine
+   Kaskadenfrage war. Die Rechnung:
+
+     .dpl-teil-score   215 px insgesamt
+     .sc-main          113 px
+     Rest              102 px  fuer FUENF Kacheln  -> je 20
+
+   Die Kacheln sind Flex-Kinder einer Spalte, deren Platz die
+   Geschwister schon verbraucht haben. `flex-shrink` steht auf dem
+   Standardwert 1, also geben sie nach, bis nichts mehr da ist - und
+   schneiden ihren Inhalt ab, statt die Schiene rollen zu lassen.
+
+   > **Das steht in CLAUDE.md, wortwoertlich:** „Flex-Kinder in
+   > `overflow:auto`-Containern schrumpfen, statt zu scrollen. Der
+   > Inhalt wird dann still abgeschnitten -> `flex:0 0 auto` setzen."
+   > Ich habe es an der Schiene gesetzt und an ihrem Inhalt vergessen.
+
+   Ein zu kleines Polster sieht genauso aus wie ein erdruecktes Element.
+   Der Unterschied: beim Polster gewinnt eine Regel, beim Erdruecken
+   gewinnt die Rechnung - und keine Spezifitaet der Welt hilft dagegen. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .scores,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill{
+  flex:0 0 auto !important;
+  min-height:auto !important;
+  height:auto !important;
+}
