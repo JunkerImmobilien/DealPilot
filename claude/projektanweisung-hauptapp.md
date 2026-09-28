@@ -21426,3 +21426,113 @@ Objekt-Tab, mit Kartei hell wie er.
 - `js/qc-bridge.js` `IFRAME_SRC` muss bei **jeder** Änderung an
   `quickcheck-app.html` mit hoch — in v1665d ist genau das durch ein
   sed ins Leere gelaufen, das ich nicht nachgezählt hatte.
+
+---
+
+## Rollout-Journal · 28.09.2026 (15) — Ein Umschalter statt eines Stapels
+
+**Was:** Die Aktenmappe 1 ist abgeschafft, die zweite heißt jetzt
+einfach Aktenmappe. Die Schiene rollt nicht mehr, weil sie nur noch
+eines von zwei Dingen zeigt. Der Score steht auch in der Kanzlei, und
+der Kopf trägt denselben Ton wie das Menü.
+
+**Commits:** `dc6bdfb` v1666 · `30605d3` v1666c · `433f1c6` v1666e ·
+`67fc967` v1666f
+
+**Nachweis** (Aktenmappe, Objekt geladen, Schiene 988 px):
+
+| | Portfolio ZU | Portfolio AUF |
+|---|---|---|
+| Aktionen | **464 px** | aus |
+| Score | **271 px** | aus |
+| Objektliste | aus | **701 px**, 17 Karten |
+| Nutzer | 110 px | 110 px |
+| Knopf heißt | „Portfolio" | **„Aktionen"** |
+| Schiene `scrollHeight` | **988 = Höhe** | 988 = Höhe |
+| Letzter Menüpunkt | **„Feedback & Support" sichtbar** | — |
+
+| | |
+|---|---|
+| Umschalter | nur noch **Heute · Aktenmappe · Kanzlei** |
+| Kanzlei | Score links zwischen Reitern und Nutzer |
+| `#hdr-obj-num` | durchsichtig, `#BFB7A9` — vorher `rgb(23,21,18)` |
+| Handy 390 / Tablet 834 | Leiste **103 px**, `row`, Marke bei x=10, kein Überlauf |
+| Handy mit Objekt | Score als **Reihe**, fünf Kacheln auf y=122 |
+
+---
+
+### 1 · Drei Dinge, von denen man immer nur eines braucht
+
+Aktionen, Objektliste und Score lagen alle untereinander in der
+Schiene. Die Liste bekam `max-height:46vh` und rollte in sich, die
+Schiene rollte auch — **zwei Rollbalken**, und der äußere stand als
+graue Leiste zwischen Menü und Inhalt. Genau der Balken, den Marcel
+benannt hat.
+
+> Wer drei Dinge gleichzeitig zeigt, von denen man immer nur eines
+> braucht, verwaltet Platz statt ihn zu nutzen. Ein Umschalter zeigt
+> eines davon ganz — und braucht keinen Rollbalken.
+
+Der Knopf nennt jetzt sein **Ziel**, nicht seine Herkunft:
+
+> Eine Beschriftung, die sich nicht ändert, beschreibt einen Knopf.
+> Eine, die sich ändert, beschreibt einen Weg.
+
+### 2 · Ein Name ist für den Menschen, ein Schlüssel für die Maschine
+
+Die Aktenmappe 2 heißt jetzt „Aktenmappe" — der **Schlüssel** bleibt
+`v1b`. Die neun CSS-Regeln hängen an `[data-dp-layout^="v1"]` und
+treffen ihn weiter.
+
+> Wer Name und Schlüssel gleichzeitig ändert, ändert zwei Dinge und
+> kann hinterher nicht sagen, welches davon gewirkt hat.
+
+Ein gemerktes `v1` wird in `setze()` auf `v1b` umgelenkt — ein Layout
+abzuschaffen darf niemanden aussperren, der es gewählt hatte.
+
+### 3 · Die letzten fünfunddreißig Pixel
+
+Nach dem Umbau: 92 + 33 + 434 + 298 + 110 = **967 von 988**. Der
+Aktionsblock brauchte 469, hatte also 35 zu wenig — und die Folge war
+**genau eine fehlende Zeile**: „Feedback & Support".
+
+> Ein Block, dem fünfunddreißig Pixel fehlen, zeigt nicht neunzig
+> Prozent von etwas. Er zeigt alles bis auf die letzte Zeile — und die
+> sieht dann aus, als gäbe es sie nicht.
+
+Geholt wurden sie am Score: der Rat-Satz und die drei Stichwörter
+stehen im Arbeitsbereich ohnehin.
+
+> Was neben einer Zahl steht, muss sie erklären. Was sie nur
+> wiederholt, kostet Platz und erklärt nichts.
+
+### 4 · Zwei Fehler, die erst das Gerät zeigte
+
+In der Messkabine stand die Marke auf 390 px bei **x=119** — zentriert
+— und die Leiste war 174 statt 103 px hoch.
+
+**Erstens:** meine Regel schrieb `flex-direction:column !important` an
+die Schiene, ohne Media-Grenze. Die Schmalschirm-Regel setzt `row`,
+beide gleich spezifisch, meine steht später.
+
+> Eine Regel ohne Media-Grenze gilt auch dort, wo ihre Form nicht
+> existiert. Bei gleicher Spezifität gewinnt die spätere — und das ist
+> fast immer die neuere, also meine.
+
+**Zweitens:** die Schmalschirm-Fassung blendet seit v1659 Aktionen und
+Nutzer aus. Der Score kam in v1664 dazu und stand in **keiner** dieser
+Listen — er blieb als Einziger stehen.
+
+Ausgeblendet wird er trotzdem nicht: vor v1664 stand er im Kopf und war
+auf dem Handy sichtbar. Er bekommt dort jetzt die Form, die er im Kopf
+hatte — eine waagerechte Reihe, die mitrollt. Gemessen auf 390 px: fünf
+Kacheln auf y=122, kein Überlauf.
+
+### Rest
+
+- Der Aktionsblock rollt zugeklappt noch minimal in sich (464 von 469).
+  Das ist gewollt: lieber ein Block, der drei Pixel rollt, als eine
+  Zeile, die fehlt.
+- Der Kaskaden-Walker gehört weiterhin repariert (seit v1657 offen).
+- 22 tote CSS-Regeln für `v3`/`v4`/`v5` stehen weiter in der Datei;
+  seit heute kommen die von `v1` dazu.
