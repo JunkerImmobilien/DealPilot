@@ -21148,3 +21148,153 @@ Spalten stellt sie wie die Vorlage.
 - 22 tote CSS-Regeln für `v3`/`v4`/`v5` stehen weiter in
   `layout-varianten.css` — sie haben diesmal den Schlüsselnamen
   bestimmt.
+
+---
+
+## Rollout-Journal · 28.09.2026 (13) — Der Score wandert, und eine Währung geht
+
+**Was:** Das Score-Band zieht in der Aktenmappe 2 in die linke Schiene;
+die abgeschaffte Liter-Währung wird aus den letzten sichtbaren Stellen
+entfernt, zusammen mit einem Verstoß gegen die Anbieter-Neutralität,
+der daneben lag.
+
+**Commits:** `a1cfb0e` v1664 · `803881c` v1664b · `1248166` v1664c ·
+`cc12dfc` v1664d · `9232f3a` v1664e · `cc4e4ec` v1664f ·
+`5488436` v1664g · `a0b5537` v1664h
+
+**Nachweis** (Aktenmappe 2, Objekt *Musterstraße 12, Leipzig*,
+Schienengrund `rgb(14,13,11)`):
+
+| | Ist |
+|---|---|
+| Reihenfolge in der Schiene | suche · objekte · aktionen · **score** · nutzer |
+| „56" im Ring | `#F2EDE3`, Kontrast **16,65** |
+| „Verhandeln" | `#F2EDE3`, **16,65** |
+| „36 %" (tier-red) | `rgb(217,104,95)`, **5,64** |
+| „76 %" (tier-green) | `rgb(91,217,142)`, **10,88** |
+| Beschriftungen / Zählung | **5,31** / **3,48** |
+| Goldflächen in der Schiene | **keine** |
+| „Heute" / Aktenmappe 1 danach | Band zurück in `header.hdr` |
+| Sprache-Kachel | **kein** Kostenhinweis mehr |
+
+---
+
+### 1 · Vier Klassen schlagen keine ID — schon wieder
+
+Das Band stand nach v1664 an der richtigen Stelle und sah aus wie im
+Kopf: goldener Kasten 231×157, Kennzahlen auf 17 px gequetscht.
+
+```
+Sieger    body.dp-chrome-hell #hdr-badges .sc-main              (1,2,1)
+Verlierer html[data-dp-layout] .dpl-schiene .dpl-teil-score
+          .sc-main                                              (0,4,0)
+```
+
+> Das steht in CLAUDE.md, es steht in meinen eigenen Notizen, und ich
+> habe es trotzdem wieder gebaut.
+
+Alle 15 Kindregeln tragen jetzt `#hdr-badges` im Selektor. Dazu die
+Fläche, die ich übersehen hatte: das Gold sitzt nicht nur auf
+`.sc-main`, sondern eine Ebene **tiefer** auf `.si` — derselbe Befund
+wie v1650.
+
+### 2 · Erdrückt sieht aus wie zu klein gesetzt
+
+Danach griffen Polster (7/16/8) und Raster — und die Kacheln waren
+**15 px** hoch statt 32. Der Kaskaden-Walker sagte diesmal nichts,
+weil es keine Kaskadenfrage war:
+
+```
+.dpl-teil-score  215 px insgesamt
+.sc-main         113 px
+Rest             102 px für FÜNF Kacheln  ->  je 20
+```
+
+> **CLAUDE.md, wörtlich:** „Flex-Kinder in `overflow:auto`-Containern
+> schrumpfen, statt zu scrollen → `flex:0 0 auto` setzen." Ich habe es
+> an der Schiene gesetzt und an ihrem Inhalt vergessen.
+
+Ein zu kleines Polster sieht genauso aus wie ein erdrücktes Element.
+Beim Polster gewinnt eine Regel, beim Erdrücken die Rechnung — und
+keine Spezifität der Welt hilft dagegen.
+
+### 3 · Rücknahme: denselben Fehler zweimal, im Abstand von zwei Commits
+
+In v1664d habe ich geschrieben:
+
+> Eine Farbe ist nie richtig oder falsch, sondern nur richtig **oder
+> falsch zu ihrem Grund.**
+
+Und im selben Commit die Score-Zahl auf `#F2EDE3` gesetzt, weil der
+*Schienengrund* dunkel ist. Der Grund der Zahl ist aber nicht die
+Schiene:
+
+```
+.sc-donut::before   inset:5px, 28x28, bg rgb(255,253,247)
+.sc-donut span      col rgb(242,237,227)      -> Kontrast 1,03
+```
+
+Der Ring hat einen eigenen Innenkreis als **Pseudoelement**. Derselbe
+blinde Fleck, den ich unter „Pseudoelement heißt HTML" schon notiert
+hatte: ein Prüfer, der nur Elemente liest, sieht diesen Grund nicht,
+und auf dem Schirm steht bloß ein weißer Kreis, in dem scheinbar
+nichts ist.
+
+### 4 · Was nur sichtbar wurde, weil ich es aus dem Versteck holte
+
+`.sc-investor-badge` stand absolut bei y=485, der Chip beginnt bei 494
+— neun Pixel darüber, von der Trennlinie angeschnitten. **Im Kopf ist
+es `display:none`**; erst meine Schienenregeln haben es sichtbar
+gemacht, und zwar halb.
+
+> Ein Element, das man nur dadurch zu Gesicht bekommt, dass eine fremde
+> Regel es aus seinem Versteck holt, gehört nicht ans Licht, sondern
+> zurück.
+
+### 5 · Die Währung steckt in der Einheit — Teil drei
+
+Marcel: *„da steht auch noch, wenn ich Sprache auswähle, dass ein Liter
+Kerosin verbraucht wird. Das haben wir gar nicht mehr."*
+
+Der Hinweis im QuickBoarding rechnete weiter in Litern —
+`voice 1 L · ph 40 L · spr 20 L · dpmb 2 L`. **Derselbe Befund wie
+v1194 im Objekt-Tab, nur stand er im iframe und kam damals nicht mit.**
+
+Drei Fehler in vier Zeilen: die Einheit gibt es seit v1183 nicht mehr;
+die Sprachauswertung kostet **überhaupt nichts** (`ai.js:514`, „im Plan
+enthalten"); und 40/20 waren der alte Tarif, der Server zieht je
+Anbieter genau **einen** Abruf.
+
+> Für etwas Kostenloses ein Preisschild zu zeigen ist derselbe Fehler
+> wie eine abgeschaffte Währung, nur andersherum.
+
+**Und im Objekt-Tab eine halbe Abschaffung:** v1194 hatte den *Hinweis*
+umgestellt, das *Bestätigungs-Modal* daneben nicht. Der Nutzer las erst
+„1 Marktwert-Abruf" und bestätigte dann „Abrufen (60 L)".
+
+Zum Schluss einmal nach der **Einheit** gesucht statt nach dem Begriff.
+Alle übrigen Fundstellen stehen in Kommentaren oder sagen ausdrücklich
+„früher 2 L" — bis auf `admin/js/admin-app.js:541`, das die
+Kostentabelle mit „QuickCheck (2 L)" führte. Das war echte Oberfläche.
+
+### 6 · Der Verstoß, der danebenlag
+
+Beide Kostenhinweise nannten **Sprengnetter und PriceHubble beim
+Namen**. CLAUDE.md sagt dazu seit Langem „nie namentlich nach außen —
+unabhängige Bewertungspartner".
+
+> Eine Neutralitätsregel, die nur für Werbetexte gilt, ist keine. Sie
+> gilt genau dort, wo der Kunde hinsieht — und das ist der
+> Kostenhinweis über dem Knopf.
+
+**Offen:** in `quickcheck-app.html` stehen die beiden Anbieter noch als
+**Logo mit `alt`-Text** in zwei Kacheln (beide heute ausgeblendet). Das
+ist eine Produktentscheidung, keine Textkorrektur, und liegt Marcel vor.
+
+### Rest
+
+- Marcel schaut sich QuickBoarding und Quick-Check noch selbst an — die
+  Datenaufnahme dort „passt noch nicht".
+- Der Kaskaden-Walker gehört weiterhin repariert (seit v1657 offen).
+- `.sc-pill-sub` („4 / 4 KPIs") ist in der Schiene eingeblendet, im Kopf
+  bleibt sie verborgen — dort fehlt der Platz.
