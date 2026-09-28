@@ -671,3 +671,28 @@ html[data-dp-layout] .body .dp-infobox-icon,
 html[data-dp-layout] .hdr-v61-row2 .sc-pill-l{
   color:var(--dpl-leise) !important;
 }
+
+/* Die letzten DM-Sans-Reste, einzeln nachgemessen (79 Elemente):
+   die Score-Herleitung (ds-/ds2-*), die KPI-Werte und die
+   Kennzahlen-Zusatzzeile. Werte und Gewichte gehen dabei in Mono -
+   es sind Zahlen. */
+html[data-dp-layout] .ds-metric-weight,
+html[data-dp-layout] .ds-metric-name,
+html[data-dp-layout] .ds2-metric-weight,
+html[data-dp-layout] .ds2-metric-name,
+html[data-dp-layout] .ds2-tag,
+html[data-dp-layout] .ds2-grenze-name,
+html[data-dp-layout] .ds2-grenze-ampel,
+html[data-dp-layout] .sc-pill-sub,
+html[data-dp-layout] .body li,
+html[data-dp-layout] .body span{
+  font-family:var(--dpl-body) !important;
+}
+html[data-dp-layout] .ds-metric-score,
+html[data-dp-layout] .ds-metric-input,
+html[data-dp-layout] .ds2-metric-score,
+html[data-dp-layout] .ds2-metric-input,
+html[data-dp-layout] .ds2-grenze-wert{
+  font-family:var(--dpl-mono) !important;
+  font-variant-numeric:tabular-nums !important;
+}
