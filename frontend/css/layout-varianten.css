@@ -882,3 +882,26 @@ html[data-dp-layout] .dpl-schiene #sb-actions-accordion{
 /* Der Nutzerblock bleibt unten, solange Platz ist - sonst haengt er
    einfach hinter den Aktionen und scrollt mit. */
 html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer{ margin-top:auto !important; }
+
+/* ── Der wahre Taeter: das Menue ist ein Ueberlagerungsfeld (v1649c) ─
+   GEMESSEN: `#sb-actions-accordion` traegt `position:absolute`,
+   `top:161.8px`, `z-index:50`. In der Seitenleiste ist das richtig -
+   dort klappt es ueber die Objektliste auf und verdeckt sie absichtlich.
+
+   In der SCHIENE ist es falsch: der Behaelter bleibt 12 px hoch (nur
+   sein Polster), das Feld schwebt 637 px darueber und deckt die Reiter
+   zu.
+
+   > **Ich hatte zuerst `flex:0 0 auto` gesetzt - und damit das OPFER
+   > behandelt.** Ein Behaelter, dessen Kind aus dem Fluss ist, kann
+   > nicht wachsen, egal welchen Flex-Wert er traegt. Das steht so in
+   > meinen Notizen: verdeckt ein Element zum zweiten Mal etwas, ist
+   > die Ursache seine EIGENE Lage, nicht die des Verdeckten.
+
+   In der Schiene steht es deshalb im Fluss. */
+html[data-dp-layout] .dpl-schiene #sb-actions-accordion{
+  position:static !important;
+  top:auto !important; left:auto !important; right:auto !important;
+  width:auto !important; z-index:auto !important;
+  box-shadow:none !important; border:0 !important;
+}
