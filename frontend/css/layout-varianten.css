@@ -4341,3 +4341,66 @@ html[data-dp-layout] body:has(#sb-user) header.hdr .tabs-status-fill,
 html[data-dp-layout] body:has(#sb-user) header.hdr .hdr-comp-fill{
   background:var(--wl-c9a84c, #C9A84C) !important;
 }
+
+/* ── v1666c · DER SCORE MACHT PLATZ ──────────────────────────────────
+   Gerechnet, was in eine 988-px-Schiene passt:
+
+     Marke        92
+     Portfolio    33
+     Nutzer      110
+     ------------------
+     Rest        753   für Aktionen (469) UND Score
+
+   Der Score brauchte **356 px** — 72 zu viel, und die Folge war, dass
+   die Gruppe „System" (Einstellungen, Rundgang, Feedback) aus dem Bild
+   rutschte.
+
+   Gespart wird dort, wo dieselbe Angabe zwei Zeilen weiter noch einmal
+   steht: der Rat-Satz („KI rät: Verhandlung empfohlen") und die drei
+   Stichwörter stehen im Arbeitsbereich ohnehin. In einer 248-px-Spalte
+   brechen sie auf drei Zeilen und kosten mehr Platz als sie sagen.
+
+   > Was neben einer Zahl steht, muss sie erklären. Was sie nur
+   > wiederholt, kostet Platz und erklärt nichts. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-tip,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-sub{
+  display:none !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main{
+  padding:6px 12px 8px !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill{
+  padding:5px 16px 6px !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score{
+  margin-top:6px !important; padding:8px 0 2px !important;
+}
+
+/* ── v1666d · 100vh GILT NICHT AUF DEM HANDY ─────────────────────────
+   Die Schiene ist auf schmalen Geräten KEINE Spalte mehr, sondern eine
+   waagerechte Leiste oben (`position:static`, `flex-direction:row`).
+   `height:100vh` würde sie dort über den ganzen Schirm ziehen und den
+   Inhalt darunter schieben.
+
+   > Eine Regel, die eine Form voraussetzt, gehört in denselben
+   > Media-Block wie die Form. Sonst gilt sie auch dort, wo es die Form
+   > nicht gibt — und das sieht man erst auf dem Gerät.
+
+   Dieselbe Falle wie in v1659, als eine `position:static`-Leiste am
+   `<body>` bei y=1112 landete. */
+@media (max-width: 900px){
+  html[data-dp-layout] .dpl-schiene{
+    height:auto !important; max-height:none !important;
+    overflow-x:auto !important; overflow-y:visible !important;
+  }
+  /* Auf der Leiste ist der Umschalter gegenstandslos - dort steht
+     ohnehin alles nebeneinander und rollt waagerecht. */
+  html[data-dp-layout][data-dpl-portfolio="auf"] .dpl-schiene .dpl-teil-aktionen,
+  html[data-dp-layout][data-dpl-portfolio="auf"] .dpl-schiene .dpl-teil-score{
+    display:flex !important;
+  }
+  html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen,
+  html[data-dp-layout] .dpl-schiene .dpl-teil-objekte{
+    overflow:visible !important; max-height:none !important;
+  }
+}
