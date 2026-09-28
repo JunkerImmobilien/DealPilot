@@ -4404,3 +4404,31 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score{
     overflow:visible !important; max-height:none !important;
   }
 }
+
+/* ── v1666e · DIE LETZTEN NEUNUNDZWANZIG PIXEL ───────────────────────
+   Nach v1666c: Marke 92 + Portfolio 33 + Aktionen 434 + Score 298 +
+   Nutzer 110 = 967 von 988. Einundzwanzig Pixel frei — und der
+   Aktionsblock braucht 469, hat also 35 zu wenig. Die Folge war genau
+   eine fehlende Zeile: „Feedback & Support".
+
+   > Ein Block, dem fünfunddreißig Pixel fehlen, zeigt nicht neunzig
+   > Prozent von etwas. Er zeigt alles bis auf die letzte Zeile — und
+   > die sieht dann aus, als gäbe es sie nicht.
+
+   Geholt werden sie am Score-Chip: Ring 38 -> 34, Polster enger. Er
+   verliert nichts an Aussage, nur an Luft. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main{
+  padding:2px 12px 4px !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main .sc-donut{
+  width:34px !important; height:34px !important; flex:0 0 34px !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-grade{
+  padding:1px 6px !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill{
+  padding:4px 16px 5px !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score{
+  margin-top:4px !important; padding:6px 0 0 !important;
+}
