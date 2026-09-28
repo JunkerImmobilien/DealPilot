@@ -21536,3 +21536,92 @@ Kacheln auf y=122, kein Überlauf.
 - Der Kaskaden-Walker gehört weiterhin repariert (seit v1657 offen).
 - 22 tote CSS-Regeln für `v3`/`v4`/`v5` stehen weiter in der Datei;
   seit heute kommen die von `v1` dazu.
+
+---
+
+## Rollout-Journal · 28.09.2026 (16) — Drei Regeln ohne Media-Grenze
+
+**Was:** Abstand zwischen „Deal-Aktion" und dem Score in der Kanzlei,
+das Logo eine Stufe größer, die Menüzeilen enger — und dabei drei
+Regeln gefunden, die ihre Form nicht mitgedacht hatten.
+
+**Commits:** `d3983a3` v1667 · `a339f40` v1667c · `80ea174` v1667e
+
+**Nachweis:**
+
+| Kanzlei, linke Schiene | vorher | jetzt |
+|---|---|---|
+| Reiter → Score | **4 px** | **22 px** |
+| Score → Nutzer | 182 px | 47 px |
+| Wortbild / Block | 37 / 92 | **42 / 100** |
+
+| Aktenmappe (Fenster 987) | |
+|---|---|
+| Aktionsblock | **456 von 456** — nichts fehlt |
+| Menüpunkt-Höhe | 27 → **23 px** |
+| Letzter Punkt | „Feedback & Support" bei y=537, sichtbar |
+
+| Messkabine | Handy 390 (Aktenmappe) | Tablet 834 (Kanzlei) |
+|---|---|---|
+| Leiste | **89 px** (vorher 186) | **208 px** (vorher 244) |
+| Wortbild | **19 px** (vorher 37) | **19 px** |
+| `margin-top` Score | — | **0** (vorher 22) |
+| Überlauf | keiner | keiner |
+
+---
+
+### 1 · Der Score stand schon oben — es fehlte der Abstand
+
+Marcel wollte ihn „von unten nach oben". Gemessen stand er bereits
+direkt unter den Reitern — mit **vier Pixeln** Abstand, während
+darunter 182 px ungenutzt lagen.
+
+> Ein Block, der einem anderen auf vier Pixel rückt, gehört optisch
+> dazu. Erst der Abstand sagt, dass hier etwas Neues anfängt — und
+> Platz dafür war reichlich da, nur an der falschen Stelle.
+
+Die 22 px gelten **nur** in der Kanzlei: in der Aktenmappe liegen
+Aktionen und Score bei 967 von 988 px, dort wäre jeder zusätzliche
+Abstand eine fehlende Menüzeile.
+
+### 2 · Zwölfmal vier Pixel
+
+Das größere Logo kostete 8 px, und dem Aktionsblock fehlten danach
+109. Die acht Pixel waren nicht die Ursache — der Block war schon
+vorher knapp. Geholt wurde der Platz bei den Menüzeilen selbst:
+Polster 4 → 2 px, zwölf Zeilen, **48 px**.
+
+> Zwölfmal vier Pixel sind eine Menüzeile plus Überschrift. Enger
+> setzen ist kein Verlust — etwas weglassen wäre einer.
+
+Ergebnis: `456 von 456`, nichts mehr abgeschnitten.
+
+### 3 · **Dreimal dieselbe Falle an einem Tag**
+
+In v1666f hatte ich notiert: *„Eine Regel ohne Media-Grenze gilt auch
+dort, wo ihre Form nicht existiert."* In dieser Runde stand sie noch
+zweimal im Haus:
+
+**Die Logo-Regeln aus v1663b** (37 px / 92 px) trugen keine Grenze und
+standen **später** in der Datei als die Schmalschirm-Fassung weiter
+oben (19 px / min-height 0). Bei gleicher Spezifität gewinnt die
+spätere — auf 390 px trug das Wortbild deshalb 37 px und die Leiste war
+186 statt 89 px hoch.
+
+> **Aufgefallen ist es erst, als ich dieselbe Regel eine Stufe größer
+> noch einmal geschrieben habe — diesmal MIT Grenze — und die Messung
+> trotzdem 37 px meldete.** Der Fehler war älter als die Änderung, die
+> ihn sichtbar machte.
+
+**Und der Abstand aus Punkt 1** wirkte auch dort, wo die Schiene eine
+Zeile ist: auf 834 px war die Kanzlei-Leiste dadurch 244 px hoch.
+
+> Ein `margin-top` beschreibt „darunter". In einer Zeile gibt es kein
+> Darunter.
+
+### Rest
+
+- Auf dem Handy trägt das Wortbild bewusst 19 px — dort ist die Schiene
+  eine waagerechte Leiste, und ein 42-px-Logo würde die halbe Zeile
+  nehmen.
+- Der Kaskaden-Walker gehört weiterhin repariert (seit v1657 offen).
