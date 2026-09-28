@@ -20785,3 +20785,91 @@ Kind in einem 834-px-Fenster auf **x = −96** (unsichtbar).
 - **Die Score-Kante an den Objektkarten** weicht dem **Deal-Status**:
   grün gewonnen, rot verloren, gold in Bearbeitung. Ein Rahmen kann nur
   eine Sache sagen.
+
+---
+
+## Rollout-Journal · 28.09.2026 (10) — Drei Regressionen, zwei davon meine
+
+**Was:** Marcel meldete, dass „Heute" nicht mehr wie Heute aussieht, die
+Pre-Flight-Karte nicht die alte ist und unten links **zehnmal „Pro"**
+steht. Alle drei reproduziert und behoben.
+
+**Commits:** `372a7c1` v1660 · `a9d7709` v1660b
+
+**Nachweis** (Layout wählen, Objekt laden, auf „Heute" zurück):
+
+| | vorher | jetzt |
+|---|---|---|
+| Plan-Pillen | **10** | **1** |
+| Hellmodus nach „Heute" | `true` | **`false`** |
+| `dp-neue-karte` | `true` | **`false`** |
+| Kopfverlauf | `none` | `linear-gradient(rgb(10,8,5)…)` |
+| Arbeitsbereich | weiss | `rgb(248,246,241)` |
+| Datenaufnahme | 266 px (Kartei) | **78 px mit Streifen** — die alte |
+| `data-dp-kartenstil` | `kartei` | **`null`** |
+| „+ Neues Objekt" | Kontrast **1,09** | **9,16** |
+
+---
+
+### 1 · Zehn Plan-Pillen — der teuerste Fehler des Tages
+
+Ich hatte die Plan-Pille per JS aus `.sb-user-text` in die Knopfzeile
+verschoben (v1657), damit sie neben „Abmelden" steht.
+
+**Die Abo-Schicht rendert `#sb-user` aber neu** und baut dabei eine
+NEUE Pille. Meine verschobene lag weiter in der Knopfzeile, und der
+Beobachter, der das Verschieben nachzog, legte bei jedem Lauf einen
+weiteren Merker-Eintrag an. Beim Zurückschalten stellte `zurueck()` sie
+alle wieder her.
+
+> **Wer einen Knoten verschiebt, den ein anderes Modul neu baut,
+> bekommt bei jedem Neubau eine Kopie dazu.** Das gilt für jeden
+> Knoten, der nicht mir gehört — und der Nutzerblock gehört der
+> Abo-Schicht.
+
+Das Verschieben ist **zurückgenommen**; ein Aufräumer entfernt die
+entstandenen Dubletten in bereits geladenen Browsern. Marcels Wunsch
+bleibt offen und gehört über CSS gelöst, ohne den fremden Knoten
+anzufassen.
+
+### 2 · „Heute" blieb hell
+
+`setze()` schaltet den Hellmodus ein (das ist richtig — die Layouts
+sind helle Fassungen) und hat ihn **nie zurückgestellt**.
+
+Mein erster Versuch merkte sich den Skin *vor* dem Layout. Gemessen las
+dieser Merker bereits `hell` — weil ein früheres Layout ihn im
+`localStorage` hinterlassen hatte. **Der „Zustand vorher" war selbst
+schon verfälscht.**
+
+> Jetzt hart auf Obsidian. Der Auslieferungszustand IST Obsidian; ein
+> Merker aus einer früheren Sitzung darf das nicht überschreiben. Wer
+> den Hellmodus will, wählt ihn in den Einstellungen — dort gehört er
+> hin, nicht als Nebenwirkung eines Layouts.
+
+### 3 · Der Kartenstil wirkte ohne Layout
+
+`data-dp-kartenstil="kartei"` blieb nach dem Zurückschalten am `<html>`
+stehen. Ergebnis: die Kartei statt der alten Bordkarte.
+
+> **Der Merker überlebt das Layout, die WIRKUNG darf es nicht.**
+> Dasselbe Prinzip wie bei `hell-varianten.js` in v1653e: eine Schicht,
+> die neben einer echten Ansicht weiterfärbt, macht jede Abnahme
+> wertlos.
+
+Das Attribut wird jetzt nur bei aktivem Layout gesetzt; ein Beobachter
+auf `data-dp-layout` entscheidet bei jedem Wechsel neu.
+
+### 4 · Die Kartei-Kopfzeile
+
+Sie stand **zentriert** (`.bp` bei x=1105 in einer 1278-px-Zeile) und
+zeigte weiterhin „BOARDING PASS". Beide Regeln aus v1659b waren richtig
+geschrieben und haben verloren — wie überall an diesem Tag gegen eine
+`:is()`-Regel mit ID-Spezifität.
+
+**Die Leiste heisst `#oab-bar`.** Mit ihrer eigenen ID im Selektor ist
+die Frage erledigt: linksbündig, „DealPilot", Zählung „0 von 4
+gewählt".
+
+> Wenn ein Element eine ID hat, ist sie das kürzeste Mittel gegen jede
+> fremde Regel. Man muss sie nur benutzen.
