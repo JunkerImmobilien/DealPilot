@@ -20873,3 +20873,147 @@ gewählt".
 
 > Wenn ein Element eine ID hat, ist sie das kürzeste Mittel gegen jede
 > fremde Regel. Man muss sie nur benutzen.
+
+---
+
+## Rollout-Journal · 28.09.2026 (11) — Marken, Anker, Spezifität
+
+**Was:** Der Rückweg auf „Heute" ist repariert — in drei Stufen, weil
+jede Stufe einen eigenen Täter freigelegt hat. Dazu die Kartei wie in
+der Vorlage und das Score-Band neu aufgebaut.
+
+**Commits:** `134881f` v1661b · `36d4294` v1662 · `3adc7b6` v1662b ·
+`0fc5e1b` v1662c
+
+**Nachweis** (nach `setze('')`, Objekt *Musterstraße 12, Leipzig*):
+
+| | Ist | Soll |
+|---|---|---|
+| `data-*` am `<html>` | nur `data-bg` (fremd) | ✓ keine eigene Marke |
+| `body`-Klassen | `dp-tt-beginner dpsh-on plan-pro` | ✓ |
+| Seitenspalte | `rgb(0,0,0)`, **380x988 relative** | ✓ |
+| Reiterleiste | `rgb(10,8,5)` | ✓ |
+| Arbeitsbereich | x=380, **1753 px** | ✓ |
+| Bordkarte | **78 px**, Boarding-Pass mit QR | ✓ alte Karte |
+| „Pro"-Pillen | **1** | ✓ |
+| Merker `dp_karten_variante` | `""` | ✓ |
+| Handy 390 / Tablet 834 | `main-col` volle Breite, kein Überlauf | ✓ |
+
+---
+
+### 1 · Drei Täter hintereinander, für **einen** Befund
+
+Marcel sah eine Sache: *„die Karten sind hell geworden im
+Auslieferungszustand und auch oben die Tabbar."* Dahinter lagen drei
+verschiedene Ursachen, und jede war erst sichtbar, nachdem die davor
+weg war.
+
+**v1661b — die Marken.** `--dp-s0` stand korrekt auf `#000`; die
+Farbtokens waren richtig. Weiß war es trotzdem, weil drei **Marken**
+hängen blieben: `body.dp-chrome-hell`, `html[data-ui-theme]`,
+`html[data-dp-karte]`.
+
+> Wer Tokens misst und Marken vergisst, sucht an der falschen Stelle.
+
+**v1662 — der Merker.** Das Attribut zu entfernen reichte nicht: nach
+`setze('')` stand `data-dp-karte` **wieder** auf `v3`.
+`hell-varianten.js` horcht seit v1653e auf `data-dp-layout` und meldet
+sich aus seinem eigenen Merker wieder an, sobald das Layout fällt. Und
+`v3` färbt genau die drei Flächen hell, die Marcel benannt hat
+(`hell-varianten.css:62–138`).
+
+Der Kopf dieser Stelle sagte es bis dahin selbst: *„Der Merker bleibt
+erhalten: wer das Layout wieder auf Heute stellt, bekommt seine
+Kartenvariante zurück."* **Das war meine Entscheidung, und sie war
+falsch.**
+
+> „Heute" heißt Auslieferungszustand, nicht „mein letzter
+> Werkzeugstand". Ein Werkzeug, das sich selbst wieder anschaltet, ist
+> kein Werkzeug mehr, sondern ein Zustand.
+
+**v1662b — der Anker.** Jetzt stimmten alle Farben, und die App stand
+trotzdem in einer **380 px schmalen Spalte**, die Seitenspalte bei
+x=−367. Sieger war
+
+```
+html[data-dpl-portfolio] #sidebar{
+  position:fixed; left:0; transform:translateX(-102%); }
+```
+
+In v1653 hatte ich die Schubladenregel bewusst an dieses Attribut
+gehängt, weil die Layoutliste (`v1,v3,v4`) v2 vergessen hatte. Das
+Abmelden arbeitete weiter die **alte** Liste ab.
+
+> Wer einen Anker wechselt, muss auch den Abbau umhängen. Ein
+> Aufräumen, das die alte Liste abarbeitet, lässt genau das stehen,
+> was neu dazugekommen ist.
+
+Zwei Gurte: `setze('')` entfernt das Attribut, **und** alle zehn
+Regeln tragen jetzt `[data-dp-layout]` als zweiten Anker — ohne Layout
+können sie gar nicht mehr feuern.
+
+### 2 · `@media` erhöht keine Spezifität
+
+In der Messkabine bei 390 px: `.app-wrap` 390 px breit, `.main-col`
+aber **142 px** und bei x=248. Nicht die Rasterspur — das **Polster**.
+
+```
+computed padding-left = 248px
+Sieger:    html[data-dp-layout="v1"]:not([data-dpl-seiten]) .app-wrap   (0,3,1)
+Verlierer: @media (max-width:900px){ html[data-dp-layout] .app-wrap }   (0,2,1)
+```
+
+> Ein `@media`-Block ändert nichts an der Spezifität seiner Regeln.
+> Eine Schmalschirm-Regel gewinnt nicht, **weil** sie in einem `@media`
+> steht — sie muss denselben Anker tragen wie die Regel, die sie
+> aufheben soll.
+
+### 3 · „Untereinander" hieß etwas anderes, als ich verstanden hatte
+
+v1661 hatte die beiden **Gruppen** nebeneinander gestellt und ich hatte
+den Punkt für erledigt gehalten (gemessen: beide `.dp-pf-seg` auf
+y=172). Marcel meinte aber das, was **in** ihnen passiert.
+
+An der Vorlage gemessen (`entwurf-aktionsbox.html`, Entwurf 2): die
+Demo-Kartei hat **keine Gruppentitel**. Sie hat eine Reihe mit vier
+Quellen — `flex-direction:row; gap:9px; padding:14px 15px`.
+
+> Eine Überschrift über zwei Chips ordnet nichts, sie halbiert nur die
+> Reihe. Vier gleichrangige Quellen brauchen keine Einteilung, sie
+> brauchen eine Zeile.
+
+Gemessen danach: vier Kacheln auf **y=206**, alle 42 px hoch, bei
+x=550/658/860/981; Knopf bei x=1727. Kartenhöhe 131 → **110 px**.
+
+### 4 · „Zu flach" war nicht die Höhe
+
+**Rücknahme:** v1661 hatte auf „zu flach" mit mehr Polster und
+größerer Schrift geantwortet. Das war die falsche Antwort. Gemessen an
+der Struktur:
+
+```
+div.sc-pill      334x55   display:GRID
+  div.sc-pill-l   53x13   „RENDITE"      x=457
+  div.sc-pill-v  244x19   „36 %"         x=518   <- 244 px breit
+```
+
+Die Zahl saß in einer 244 px breiten, rechtsbündigen Zelle — über
+200 px Leere zwischen Wort und Wert, in einer 55 px hohen Zeile.
+
+> Eine Zahl, die weit von ihrer Beschriftung wegsteht, muss mit dem
+> Auge wieder eingesammelt werden. Fünfmal nebeneinander wird das zur
+> Arbeit.
+
+Jetzt wie die Vorlage (`.kz` 214x52, `.n` 9 px Mono `#9A9287` als
+Block, `.v` 15 px Mono fett): Beschriftung oben, Wert darunter,
+linksbündig. Gemessen: Pille 332x**76**, Label y=66, Wert y=82 in
+20 px, Zählung y=107, Balken als Kante unten.
+
+### Rest
+
+- **Der Kaskaden-Walker gehört weiterhin repariert** (Komma-Zerlegung,
+  `:is()`-Spezifität). Er steht seit v1657 auf dieser Liste.
+- „Plan neben Abmelden" ist weiter offen — ohne den fremden
+  `#sb-user`-Knoten zu verschieben.
+- `dp_layout_variante` liegt als toter Merker im localStorage; kein
+  Modul liest ihn mehr.

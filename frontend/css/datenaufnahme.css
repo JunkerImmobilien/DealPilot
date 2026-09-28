@@ -1195,5 +1195,7 @@ html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-rz{
   }
   html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar > .dp-pf-seg{
     padding-left:15px !important; padding-right:15px !important;
+    justify-content:flex-start !important;
+    align-items:flex-start !important;
   }
 }
