@@ -3764,14 +3764,14 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges{
   background:transparent !important; border:0 !important;
   box-shadow:none !important;
 }
-html[data-dp-layout] .dpl-schiene .dpl-teil-score .scores{
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .scores{
   display:flex !important; flex-direction:column !important;
   align-items:stretch !important; gap:0 !important;
   width:auto !important; background:transparent !important;
   border:0 !important; box-shadow:none !important;
 }
 /* Der Score-Chip als Kopf des Blocks. */
-html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-main{
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main{
   display:flex !important; flex-direction:row !important;
   align-items:center !important; gap:10px !important;
   width:auto !important; min-height:0 !important;
@@ -3779,26 +3779,26 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-main{
   background:transparent !important; border:0 !important;
   box-shadow:none !important;
 }
-html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-main .sc-donut{
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main .sc-donut{
   width:38px !important; height:38px !important; flex:0 0 38px !important;
 }
-html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-main .sc-donut,
-html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-main .sc-donut > *{
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main .sc-donut,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main .sc-donut > *{
   font-size:13px !important;
 }
-html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-main .sc-v,
-html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-main .sc-v *{
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main .sc-v,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main .sc-v *{
   font-size:13px !important; color:#F2EDE3 !important;
 }
-html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-main .sc-l,
-html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-main .sc-l *{
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main .sc-l,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main .sc-l *{
   color:#8C8578 !important;
 }
 /* Die fuenf Kennzahlen als Zeilen: Wort links, Zahl rechts. In einer
    248-px-Spalte ist das die einzige Anordnung, bei der beides ohne
    Umbruch lesbar bleibt - der gestapelte Aufbau aus dem Kopf braucht
    dort drei Zeilen je Kennzahl. */
-html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-pill{
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill{
   display:grid !important;
   grid-template-columns:1fr auto !important;
   grid-template-rows:auto auto !important;
@@ -3810,29 +3810,81 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-pill{
   border:0 !important; border-radius:0 !important;
   box-shadow:none !important;
 }
-html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-pill + .sc-pill{
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill + .sc-pill{
   border-top:1px solid color-mix(in srgb, var(--dpl-linie) 55%, transparent) !important;
 }
-html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-pill .sc-pill-l{
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill .sc-pill-l{
   grid-column:1; grid-row:1;
   font-size:9px !important; letter-spacing:.9px !important;
   color:#8C8578 !important;
 }
-html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-pill .sc-pill-v{
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill .sc-pill-v{
   grid-column:2; grid-row:1 / span 2;
   align-self:center !important;
   width:auto !important; text-align:right !important;
   font-size:15px !important; font-weight:700 !important;
 }
-html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-pill .sc-pill-sub{
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill .sc-pill-sub{
   grid-column:1; grid-row:2;
   font-size:8.5px !important; color:#6E675C !important;
 }
-html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-pill .sc-bar{
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill .sc-bar{
   display:none !important;
 }
 /* Der Kopf verliert damit seine zweite Zeile - ohne das behielte er
    die Hoehe des Bandes als leere Flaeche. */
 html[data-dp-layout="v1b"] body header.hdr{
   min-height:0 !important;
+}
+
+/* ── v1664b · DIE ID HOLEN, SONST GEWINNT STYLE.CSS ───────────────────
+   Gemessen nach v1664: das Band stand richtig in der Schiene, sah aber
+   aus wie im Kopf - Chip als goldener Kasten 231x157, die Kennzahlen
+   auf 17 px gequetscht und unten abgeschnitten.
+
+   Der Kaskaden-Walker nennt den Grund:
+
+     Sieger   body.dp-chrome-hell #hdr-badges .sc-main      (1,2,1)
+     Verlierer html[data-dp-layout] .dpl-schiene
+              .dpl-teil-score .sc-main                      (0,4,0)
+
+   > Vier Klassen schlagen keine ID. Das steht in CLAUDE.md, es steht in
+   > meinen eigenen Notizen, und ich habe es trotzdem wieder gebaut.
+
+   Alle Kindregeln tragen jetzt `#hdr-badges` im Selektor. Dazu die
+   beiden Flaechen, die ich uebersehen hatte: das Gold sitzt nicht nur
+   auf `.sc-main`, sondern eine Ebene TIEFER auf `.si` - derselbe
+   Befund wie in v1650. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main .si,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .scores{
+  background:transparent !important;
+  background-image:none !important;
+  border:0 !important; box-shadow:none !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main .si{
+  display:flex !important; flex-direction:row !important;
+  align-items:center !important; gap:10px !important;
+  padding:0 !important; width:100% !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main .sc-info{
+  display:flex !important; flex-direction:column !important;
+  align-items:flex-start !important; gap:1px !important; min-width:0 !important;
+}
+/* Der Rat-Satz („KI raet: Verhandlung empfohlen") ist im Kopf eine
+   Zeile und in einer 248-px-Spalte ein Absatz. Er bleibt, aber leise. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main .sc-sub,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main .sc-hint{
+  font-size:9px !important; line-height:1.35 !important;
+  color:#6E675C !important;
+}
+/* Die Schiene muss rollen koennen - Aktionen, Liste, Score und Nutzer
+   zusammen sind hoeher als ein Notebook-Schirm. Ohne das schneidet sie
+   still ab, und abgeschnitten sieht aus wie kaputt. */
+html[data-dp-layout] .dpl-schiene{
+  overflow-y:auto !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score,
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer{
+  flex:0 0 auto !important;
 }
