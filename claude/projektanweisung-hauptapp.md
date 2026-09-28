@@ -20338,3 +20338,111 @@ eigenem Marker, sonst könnte niemand den Trichter je wieder wählen.
 - Weiter offen: 61 tote Regelzeilen für v3/v4/v5; der ungeklärte
   Spezifitätsfall bei `#hdr-obj-num`; der Weg zu den Schaltern ist drei
   Klicks tief.
+
+---
+
+## Rollout-Journal · 28.09.2026 (6) — Der Deal Score bekommt seinen Chip
+
+**Was:** die Score-Zusammensetzung nach dem Entwurf — der Score war
+**ganz verschwunden**, gesetzt von dieser Datei.
+
+**Commits:** `ed0d449` v1655 · `6c39278` v1655b · `9e8f2ce` v1655c ·
+`fa6857b` v1655d
+
+**Nachweis** (Aktenmappe, Objekt *Gerberstraße 27*, Prüfer mit
+Alpha-Rechnung):
+
+| | |
+|---|---|
+| Chip | **40 px** (vorher: Block 141 px, dann gar nichts) |
+| Ring | 30 px mit „70", Kontrast **15,9** |
+| Note „Gut" | neben dem Ring, Kontrast 10,5 |
+| Kennzahlen | ein Band, je **190 px** (vorher 377) |
+| KPI-Angabe | „4 / 4 KPIs" unter jedem Wert |
+| Kopf | 26 geprüft, **0 unter 4,5** · Höhe 109 px |
+
+---
+
+### 1 · Der Score war weg, und ich hatte ihn weggenommen
+
+Gemessen: `.sc-main` — der Block mit Ring, Note und Bezeichnung — stand
+auf `display:none`, gesetzt von **dieser Datei**, Zeile 52. Sichtbar
+waren nur die fünf Anteils-Pillen und ein Textstück „70 Gut" in 11 px.
+
+Die Absicht von damals steht im Dateikopf und war richtig: Marcel wollte
+ihn *„nicht gross oben … wäre aber gut, wenn man ihn noch irgendwo
+stehen hätte."*
+
+> **Ich habe ihn verschwinden lassen und nichts Gleichwertiges
+> hingestellt.** Der Entwurf zeigt an dieser Stelle einen Chip: Ring mit
+> der Zahl, daneben die Note, darunter wofür sie steht.
+
+**Nachgebaut wurde nichts.** `.sc-donut`, `.sc-grade`, `.sc-v` und
+`.sc-l` waren alle vorhanden — nur unsichtbar. Der echte Ring zeigt
+auch den echten Fortschritt; ein nachgebauter hätte eine zweite
+Wahrheit. `#hdr-score-mini` tritt dafür ab: derselbe Wert zweimal im
+Kopf ist keine Redundanz, sondern eine offene Frage, welcher gilt.
+
+### 2 · Fünf Kacheln über einen Bildschirm sind keine Zeile
+
+Jede Pille war **377 px** breit, weil sich fünf auf 1.889 px verteilten.
+Der Entwurf setzt sie in **ein Band** mit Trennlinien, jede gleich
+breit. Jetzt 190 px, Werte in Mono mit gleichen Ziffernbreiten — so
+steht Zahl unter Zahl.
+
+### 3 · Drei Lücken in meinem eigenen Prüfer, an einem Tag
+
+| # | Lücke | Folge |
+|---|---|---|
+| 1 | Grund = Behälter statt erster Fläche | 23 statt 7 Befunde |
+| 2 | Alpha nicht ausgerechnet, `color(srgb)` unbekannt | „sauber" gemeldet, wo nichts lesbar war |
+| 3 | Pseudoelemente nicht geprüft | der weisse Ring-Innenkreis blieb unentdeckt |
+
+**Und beim Schliessen der dritten Lücke sofort ein Fehlalarm:** der
+erweiterte Prüfer meldete fünf Abschnittstitel auf 1,6. Nachgesehen ist
+ihr `::before` ein **goldener Zierstrich von 22×2 px,
+`position:absolute`** — kein Grund. Der echte Grund ist die Schiene,
+Kontrast **4,62**, im Bild einwandfrei lesbar.
+
+> **Ein Pseudoelement ist nur dann der Grund, wenn es die Fläche auch
+> deckt.** Ich habe die fünf Stellen deshalb NICHT angefasst — ein
+> Prüfer, dem man blind folgt, richtet denselben Schaden an wie einer,
+> der schweigt.
+
+### 4 · „Form geändert, Fläche vergessen" — zum zweiten Mal
+
+Der Chip sah golden aus, obwohl `.sc-main` gemessen `rgb(23,21,18)` und
+`background-image:none` trug. **Beide Messungen stimmten:** das Gold lag
+in `.si`, dem Behälter von Ring und Text — `linear-gradient(135deg,
+#E8CC7A, #C9A84C…)`, 193×30.
+
+Ich hatte `.si` auf `display:flex` gesetzt und seinen Hintergrund nicht
+angefasst. Derselbe Halbgriff wie bei den Score-Pillen in v1653h.
+
+### 5 · Die Richtung. Zum vierten Mal.
+
+Die Note stand **unter** dem Ring statt daneben. Ich hatte
+`flex-wrap:nowrap` gesetzt — gegen einen Umbruch, den es gar nicht gab.
+`.sc-donut-wrap` trägt `flex-direction:column`, und daran ändert
+`nowrap` nichts.
+
+Nach `.dp-pf-seg` (v1640), `.dpl-schiene` (v1649) und `.dp-pf-lead`
+(v1651e) ist das der vierte Fall.
+
+> **Wer an einem fremden Flex-Behälter etwas ändert, setzt
+> `flex-direction` mit — immer, auch wenn `row` die Vorgabe wäre.**
+
+### 6 · `#hdr-badges`, zum dritten Mal
+
+Der Chip-Hintergrund verlor gegen `#hdr-badges .sc-main.sc-tier-green`
+(1,2,0 mit `!important`). `.hdr-v61-row2` **heisst** `#hdr-badges`, und
+gegen eine ID hilft keine Klassenkette, so lang sie auch ist.
+
+> Wer in dieser Kopfzeile etwas umfärbt, nimmt `#hdr-badges` in den
+> Selektor. Das ist keine Vorsicht, das ist die Hausordnung.
+
+### Rest
+
+Die Kennzahlen zeigen weiterhin **Score-Anteile** („RENDITE 72 %"), der
+Entwurf daneben auch **echte Werte** (Rendite 4,72 %, DSCR 1,27). Das
+ist eine Produktentscheidung und steht als **P3c** im Backlog.
