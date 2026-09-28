@@ -1813,3 +1813,49 @@ html[data-dp-layout][data-dp-layout] body header.hdr.hdr .tabs-status-text{
    Elternteil `#hdr-badges` heisst. Sie zu entfernen ist ehrlicher, als
    eine wirkungslose Zeile stehen zu lassen, die beim naechsten Lesen
    wie eine Erklaerung aussieht. */
+
+/* ── v1653j · DIE LETZTEN 18 PIXEL, UND WARUM SIE NICHT REICHEN ───────
+   Mit geladenem Objekt braucht der Aktionsblock 508 px und hat 490.
+   Gemessene Bestandteile der 988 px hohen Schiene:
+
+     Marke        70     Portfolio  43     Reiter 284
+     Aktionen    490     Nutzer     97
+
+   Zwei Hebel, beide klein und keiner auf Kosten der Bedienbarkeit:
+   die fuenf Abschnittstitel tragen 9 px oben und 3 unten (5 x 4 = 20),
+   die zwoelf Eintraege sind 29 px hoch (12 x 1 = 12).
+
+   > **Aber eine Schiene, die bei zwoelf Aktionen gerade so passt,
+   > scrollt bei der dreizehnten wieder.** Platz schaffen allein loest
+   > das Problem nicht, es verschiebt es. Deshalb wird der Balken
+   > zusaetzlich duenn und ruhig - sichtbar nur, wenn er gebraucht
+   > wird, und dann nicht als heller Streifen auf Obsidian.
+
+   Gescrollt werden KANN weiter. Ein Menue, das seinen dreizehnten
+   Eintrag verschluckt, waere schlimmer als ein Balken. */
+html[data-dp-layout] .dpl-schiene .sb-act-section-title{
+  margin:7px 0 2px !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-act-item{
+  padding-top:4px !important; padding-bottom:4px !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen{
+  scrollbar-width:thin;
+  scrollbar-color:#2A2622 transparent;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen::-webkit-scrollbar{ width:6px; }
+html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen::-webkit-scrollbar-track{ background:transparent; }
+html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen::-webkit-scrollbar-thumb{
+  background:#2A2622; border-radius:3px;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen::-webkit-scrollbar-thumb:hover{
+  background:#3A352E;
+}
+/* Und in der HELLEN Kontextschiene der Kanzlei derselbe Gedanke mit
+   ihren Toenen. */
+html[data-dp-layout] .dpl-schiene[data-ton="hell"] .dpl-teil-aktionen{
+  scrollbar-color:#DCD4C2 transparent;
+}
+html[data-dp-layout] .dpl-schiene[data-ton="hell"] .dpl-teil-aktionen::-webkit-scrollbar-thumb{
+  background:#DCD4C2;
+}
