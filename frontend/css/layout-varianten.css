@@ -1029,3 +1029,9 @@ html[data-dp-layout] .dpl-schiene[data-stellung="leiste"] .sb-act-section-title,
 html[data-dp-layout] .dpl-schiene[data-stellung="fuss"] .sb-act-section-title{
   padding:0 !important; height:20px !important; width:1px !important;
 }
+
+/* Die `order`-Regeln fuer die waagerechten Stellungen sind damit
+   gegenstandslos: `.main-col` ist `display:block`, dort wirkt `order`
+   nicht. Der Ort kommt jetzt aus `layout-varianten.js` (insertBefore
+   hinter die Reiterleiste). Die Regeln bleiben als Merkposten stehen -
+   sie schaden nicht und erklaeren, warum es NICHT so geloest ist. */

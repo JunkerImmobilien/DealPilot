@@ -184,7 +184,31 @@
       }
     });
 
-    mc.appendChild(schiene);
+    /* ── WOHIN DIE SCHIENE IM DOKUMENT GEHOERT ──────────────────────
+       GEMESSEN am 28.09.2026: in der Werkbank stand die Leiste bei
+       "top: 3987" - weit unterhalb des Fensters. Keiner ihrer zwoelf
+       Knoepfe war erreichbar.
+
+       Ursache: die CSS ordnete sie mit "order:-1" direkt unter die
+       Reiter. **"order" wirkt aber nur in einem Flex-Container**, und
+       ".main-col" ist "display:block". Die Leiste blieb deshalb dort,
+       wo "appendChild" sie hingelegt hatte: ganz am Ende, hinter dem
+       gesamten Inhalt.
+
+       > Ich hatte damals ihre HOEHE gemessen (1702x95) und daraus
+       > geschlossen, sie sitze richtig. **Eine Groesse sagt nichts
+       > ueber einen Ort.**
+
+       Bei "links"/"rechts" ist der Ort gleichgueltig - sie stehen
+       "position:fixed". Bei "leiste" gehoert sie hinter die
+       Reiterleiste, bei "fuss" ans Ende (dort klebt sie unten). */
+    if (L.schiene === 'leiste') {
+      var reiter = el('nav.tabs');
+      if (reiter && reiter.parentElement === mc) mc.insertBefore(schiene, reiter.nextSibling);
+      else mc.insertBefore(schiene, mc.firstChild);
+    } else {
+      mc.appendChild(schiene);
+    }
     zahlNachziehen();
   }
 
