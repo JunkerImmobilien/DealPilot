@@ -2197,3 +2197,54 @@ html[data-dp-layout] .dpl-schiene .sb-user-icon-btn:hover{
 html[data-dp-layout] .dpl-schiene .sb-user-text .sb-user-plan-pill{
   display:inline-flex !important; margin-top:3px !important;
 }
+
+/* ── v1654c · DREI NACHBESSERUNGEN, ALLE GEMESSEN ─────────────────────
+
+   **(1) Der Textblock des Accounts war 38 px breit.** Mein
+   `flex:1 1 auto; min-width:0` aus v1654b war richtig - die ANNAHME
+   darunter nicht: ich hielt `.sb-user-icons` fuer eine eigene Zeile.
+   Gemessen ist es ein GESCHWISTER im selben Flex-Behaelter und 118 px
+   breit. Von 187 px blieben nach Avatar (28) und Icons (118) genau 38.
+
+   > Eine Breite, die nicht aufgeht, ist selten zu klein gesetzt -
+   > meistens nimmt sie jemand anders weg.
+
+   Die Icons bekommen ihre eigene Zeile (`flex-basis:100%`), und der
+   Text hat die Breite, die er braucht. */
+html[data-dp-layout] .dpl-schiene .sb-user-main{
+  flex-wrap:wrap !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-user-icons{
+  flex:1 0 100% !important; width:100% !important;
+  margin-top:7px !important; padding-top:7px !important;
+  border-top:1px solid #1E1B17 !important;
+}
+
+/* **(2) Quick-Check und Marktbericht waren abgeschnitten.** Zwei
+   Knoepfe nebeneinander bekommen in einer 208-px-Schiene je 93 px; bei
+   10 px Schrift passt „Quick-Check" knapp nicht und endet als
+   „QUICK-CH…". Untereinander haben beide die volle Breite.
+
+   > Ein Knopf, dessen Beschriftung man raten muss, ist kein Knopf. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-schnellstart .sb-neu-row{
+  flex-direction:column !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-schnellstart .sb-neu-row > *{
+  flex:0 0 auto !important; width:100% !important;
+  justify-content:flex-start !important;
+  font-size:11px !important; padding:6px 9px !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-schnellstart .sb-neu-lbl{
+  font-size:11px !important; overflow:visible !important;
+}
+
+/* **(3) Der Umschalter lag ueber dem Account.** Gemessen: die Leiste
+   steht bei 12,998 (328x40), der Nutzerblock bei 10,958 (187x78) -
+   sie ueberlappen.
+
+   Zum DRITTEN Mal heute ein Werkzeug ueber der Anwendung (nach
+   `#dp-kv-panel` und derselben Leiste bei 390 px). Sie zieht nach
+   rechts, wo unter ihr nichts liegt. */
+.dpl-schalter{
+  left:auto !important; right:14px !important;
+}
