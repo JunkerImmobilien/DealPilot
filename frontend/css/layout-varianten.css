@@ -126,12 +126,25 @@ html[data-dp-layout] .dpl-schiene{
   display:flex; flex-direction:column; min-width:0;
   font-family:'Inter', system-ui, sans-serif;
 }
-html[data-dp-layout] .dpl-schiene[data-ton="dunkel"]{
+/* ── ORT UND FARBE SIND ZWEI FRAGEN ──────────────────────────────────
+   v1653b · Beim Umstellen der FARBE auf `data-ton` habe ich ein Skript
+   benutzt, dessen Anker frueher traf als gedacht - und damit auch diese
+   drei STRUKTURregeln erwischt. Ergebnis: `[data-ton="dunkel"]{left:0}`
+   UND `[data-ton="dunkel"]{right:0}` trafen dieselbe Schiene, die
+   spaetere gewann, und die Aktenmappe stand RECHTS.
+
+   > **Ein Skript, dessen Anker man nicht nachzaehlt, ist ein
+   > Suchen-und-Ersetzen mit verbundenen Augen.** Die Zeilennummer
+   > gehoert geprueft, BEVOR es laeuft.
+
+   Die gemeinsame Grammatik gilt fuer jede Schiene, der Ort haengt an
+   der Stellung, die Farbe am Ton. */
+html[data-dp-layout] .dpl-schiene{
   position:fixed; top:0; bottom:0; width:var(--dpl-schiene-b);
   z-index:60; overflow:auto;
 }
-html[data-dp-layout] .dpl-schiene[data-ton="dunkel"]{ left:0; }
-html[data-dp-layout] .dpl-schiene[data-ton="dunkel"]{ right:0; left:auto;
+html[data-dp-layout] .dpl-schiene[data-stellung="links"]{ left:0; }
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"]{ right:0; left:auto;
   border-right:0; border-left:1px solid var(--dpl-linie); }
 
 .dpl-marke{ height:46px; flex:0 0 auto; display:flex; align-items:center;
@@ -266,11 +279,19 @@ html[data-dpl-portfolio="auf"]::after{
 html[data-dp-layout="v1"] .app-wrap{ padding-left:var(--dpl-schiene-b) !important; }
 
 /* ── v2 · KANZLEI ────────────────────────────────────────────────────
-   Objektspalte bleibt stehen und wird dunkel; die Aktionen ziehen nach
-   RECHTS, neben das Objekt, auf das sie sich beziehen. */
-html[data-dp-layout="v2"] .app-wrap{ padding-right:var(--dpl-schiene-b) !important; }
-html[data-dp-layout="v2"] #sidebar{ width:auto !important; }
-html[data-dp-layout="v2"] .dpl-schiene[data-ton="dunkel"] .dpl-marke{ display:none; }
+   v1653b · Dieser Block beschrieb die ALTE Kanzlei: Objektspalte links
+   stehend, Aktionen rechts. Der Entwurf will es anders (dunkle
+   Navigation links, helle Kontextschiene rechts, Objekte als
+   Schublade), und die maßgeblichen Regeln stehen jetzt am Ende dieser
+   Datei unter „v1653 · Punkt 7 und 8".
+
+   Was hier stand und WEG musste:
+   `[data-stellung="rechts"] .dpl-marke{display:none}` - gedacht gegen
+   eine doppelte Marke, als die Objektspalte links noch ihre eigene
+   trug. Nach der Umstellung auf `data-ton` traf die Regel die DUNKLE
+   Schiene, also die linke - und versteckte genau die Marke, die dort
+   stehen soll. */
+html[data-dp-layout="v2"] .dpl-schiene[data-stellung="rechts"] .dpl-marke{ display:none; }
 
 /* ── v3 · WERKBANK ───────────────────────────────────────────────────
    Keine Seitenspalte. Die Aktionsleiste kommt auf den Hauptbildschirm,
@@ -382,7 +403,7 @@ html[data-dp-layout="v5"] .sb-header .app-logo-simple-wrap{ max-height:40px !imp
     padding-left:0 !important; padding-right:0 !important;
     grid-template-columns:1fr !important;
   }
-  html[data-dp-layout] .dpl-schiene[data-ton="dunkel"]{
+  html[data-dp-layout] .dpl-schiene{
     position:static !important; width:auto !important;
     flex-direction:row !important; align-items:center !important;
     gap:8px; overflow-x:auto !important; overflow-y:visible !important;
@@ -392,7 +413,7 @@ html[data-dp-layout="v5"] .sb-header .app-logo-simple-wrap{ max-height:40px !imp
   }
   /* Die Marke und der Nutzerblock kosten in einer Leiste nur Platz -
      das Logo steht oben im Kopf, der Nutzer im Portfolio. */
-  html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .dpl-marke{ display:none !important; }
+  html[data-dp-layout] .dpl-schiene .dpl-marke{ display:none !important; }
   html[data-dp-layout] .dpl-schiene .dpl-teil{ padding:0 !important; }
   html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer{
     margin-top:0 !important; border-top:0 !important; background:transparent !important;
@@ -973,7 +994,7 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer{
 
    Der Nutzerblock braucht kein `sticky` mehr: er steht am Ende der
    Spalte und wird von nichts mehr verdraengt. */
-html[data-dp-layout] .dpl-schiene[data-ton="dunkel"]{
+html[data-dp-layout] .dpl-schiene{
   overflow:hidden !important;
 }
 html[data-dp-layout] .dpl-schiene .dpl-teil-tabs{ flex:0 0 auto !important; }
