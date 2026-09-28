@@ -1147,3 +1147,35 @@ html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] #sb-user *{
 html[data-dp-layout="v2"] #sidebar{
   background:#0E0D0B !important; border-right:1px solid #26231E !important;
 }
+
+/* GEMESSEN nach v1650: die Schiene ist dunkel (rgb(14,13,11)), aber
+   `#sb-actions-accordion` und sein innerer Behaelter tragen
+   `rgb(255,255,255)` samt Rahmen - ein weisser Kasten mitten in der
+   dunklen Spalte.
+
+   > Das Menue war als AUFKLAPPFELD ueber einer hellen Seitenleiste
+   > gedacht; dort ist ein weisser Grund mit Rahmen richtig. In der
+   > dunklen Schiene ist er ein Fremdkoerper. Wer ein Bauteil
+   > verpflanzt, erbt seine Annahmen mit. */
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] #sb-actions-accordion,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] #sb-actions-accordion,
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-actions-accordion-inner,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-actions-accordion-inner{
+  background:transparent !important;
+  border:0 !important; box-shadow:none !important; border-radius:0 !important;
+}
+/* Und alles, was darin noch eine helle Flaeche mitbringt. */
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-act-item,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-act-item{
+  border-color:transparent !important;
+}
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .dpl-teil-nutzer *,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-teil-nutzer *{
+  border-color:#26231E !important;
+}
+/* Der Knopf im Nutzerblock (Abmelden) bleibt erkennbar. */
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] #sb-user button,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] #sb-user button{
+  background:#171512 !important; border:1px solid #2A2622 !important;
+  color:#E9E3D6 !important;
+}
