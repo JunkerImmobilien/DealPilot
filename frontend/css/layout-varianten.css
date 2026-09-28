@@ -1859,3 +1859,11 @@ html[data-dp-layout] .dpl-schiene[data-ton="hell"] .dpl-teil-aktionen{
 html[data-dp-layout] .dpl-schiene[data-ton="hell"] .dpl-teil-aktionen::-webkit-scrollbar-thumb{
   background:#DCD4C2;
 }
+
+/* v1653k · Die sechs Ueberschriften der hellen Kontextschiene standen
+   auf 3,5 gegen #FBFAF7 - sie sind 10-px-Versalien, und da gilt 4,5.
+   #6E675C ergibt 5,6. Der Ton bleibt leise, nur nicht mehr zu leise. */
+html[data-dp-layout] .dpl-schiene[data-ton="hell"] .dpl-schiene-titel,
+html[data-dp-layout] .dpl-schiene[data-ton="hell"] .sb-act-section-title{
+  color:#6E675C !important;
+}
