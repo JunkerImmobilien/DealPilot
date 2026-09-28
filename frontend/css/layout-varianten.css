@@ -1035,3 +1035,17 @@ html[data-dp-layout] .dpl-schiene[data-stellung="fuss"] .sb-act-section-title{
    nicht. Der Ort kommt jetzt aus `layout-varianten.js` (insertBefore
    hinter die Reiterleiste). Die Regeln bleiben als Merkposten stehen -
    sie schaden nicht und erklaeren, warum es NICHT so geloest ist. */
+
+/* In der Leiste nimmt der Aktionsbereich den RESTPLATZ (flex:1 1 0),
+   nicht seine Wunschbreite (flex:0 1 auto). Sonst quillt er unter den
+   Nutzerblock, der rechts steht - gemessen verdeckte dessen Avatar die
+   letzten drei Knoepfe. `min-width:0` ist dabei Pflicht, sonst
+   schrumpft ein Flex-Kind nicht unter seinen Inhalt. */
+html[data-dp-layout] .dpl-schiene[data-stellung="leiste"] .dpl-teil-aktionen,
+html[data-dp-layout] .dpl-schiene[data-stellung="fuss"] .dpl-teil-aktionen{
+  flex:1 1 0 !important; min-width:0 !important;
+}
+html[data-dp-layout] .dpl-schiene[data-stellung="leiste"] .dpl-teil-nutzer,
+html[data-dp-layout] .dpl-schiene[data-stellung="fuss"] .dpl-teil-nutzer{
+  flex:0 0 auto !important; position:relative !important; z-index:1;
+}
