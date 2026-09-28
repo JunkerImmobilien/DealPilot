@@ -2575,3 +2575,31 @@ html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-l{
 html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-sub{
   color:#8C8578 !important; display:block !important;
 }
+
+/* ── v1655c · DIE RICHTUNG. ZUM VIERTEN MAL. ─────────────────────────
+   Die Note „Gut" stand bei y=96 unter dem Ring (y=60..90), nicht
+   daneben. Ich hatte `flex-wrap:nowrap` gesetzt - gegen einen Umbruch,
+   den es gar nicht gab. `.sc-donut-wrap` traegt
+   **`flex-direction:column`**, und daran aendert `nowrap` nichts.
+
+   > Nach `.dp-pf-seg` (v1640), `.dpl-schiene` (v1649) und
+   > `.dp-pf-lead` (v1651e) ist das der vierte Fall an diesem Bauteil-
+   > Typ. **Wer an einem fremden Flex-Behaelter etwas aendert, setzt
+   > `flex-direction` mit - immer, auch wenn `row` die Vorgabe waere.**
+
+   Dazu: „Investor Deal Score" stand auf Kontrast 1,5. Meine Regel
+   faerbt `.sc-l`, aber der Text liegt in einem KIND mit eigener Farbe -
+   und `color` erbt nicht durch ein Kind, das selbst eine hat. Dieselbe
+   Ursache wie bei `.tab-lbl` in v1652. */
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut-wrap{
+  flex-direction:row !important;
+  align-items:center !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-l,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-l *{
+  color:#8C8578 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v *{
+  color:#F5EFE2 !important;
+}
