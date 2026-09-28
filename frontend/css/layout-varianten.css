@@ -4034,3 +4034,32 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-investor-badge
 html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-donut::before{
   background:#14120F !important;
 }
+
+/* ── v1664g · DER REST DES CHIPS ─────────────────────────────────────
+   Gemessen, nachdem Ring und Werte stimmten:
+
+     .sc-tip  „KI raet: Verhandlung empfohlen"  rgb(59,53,45)  -> 1,9
+     .sc-sub  „Finanzierung · Substanz · Upside" rgb(110,103,92) -> 3,0
+     .sc-investor-badge  absolut bei y=485, Chip beginnt bei 494
+
+   Das Band stand NEUN Pixel ueber seinem Chip und wurde von der
+   Trennlinie der Schiene angeschnitten. Im Kopf ist es
+   `display:none` - dort hat es nie jemand gesehen. Erst meine
+   Schienenregeln haben es sichtbar gemacht, und zwar halb.
+
+   > Ein Element, das man nur dadurch zu Gesicht bekommt, dass eine
+   > fremde Regel es aus seinem Versteck holt, gehoert nicht ans Licht,
+   > sondern zurueck. Der Chip sagt „Investor Deal Score" zwei Zeilen
+   > weiter ohnehin.
+
+   Die beiden Textfarben stammen vom weissen Kopf und sind hier zu
+   leise - derselbe Befund wie bei der Score-Zahl, nur eine Stufe
+   weniger dramatisch. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-investor-badge{
+  display:none !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-tip,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-tip *,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-sub{
+  color:#8C8578 !important;
+}
