@@ -19788,3 +19788,80 @@ Versalien in Mono wären dort unlesbar.
 
 **Alles nur unter `html[data-dp-layout]`** — der Auslieferungszustand
 bleibt unberührt.
+
+## Rollout-Journal 28.09.2026 (2) — sichtbar war nicht bedienbar
+
+**Commits.** `0adf929` (v1649) bis `adfdc5a` (v1649h).
+
+Marcel: „die verknüpfungen passen nicht alle … teilweise nicht alles zu
+sehen. einstellungen kann man nicht anklicken."
+
+**Alle drei Befunde stimmten, und alle drei waren meine Fehler.**
+
+### 1 · `pointer-events: none` — alle zwölf Aktionen waren tot
+
+`elementFromPoint` auf die Mitte des Knopfes lieferte die Schiene, nicht
+den Knopf. Das Akkordeon setzt `pointer-events:none` im ZUGEKLAPPTEN
+Zustand; ich hatte beim Aufklappen `display`, `height`, `max-height`,
+`overflow`, `opacity` und `visibility` gesetzt — und das eine vergessen.
+
+> **Sichtbar ist nicht bedienbar.** Ich hatte gezählt, was man SIEHT,
+> und daraus geschlossen, dass es geht. Eine Zählung von Knöpfen ist
+> keine Prüfung von Knöpfen — das sagt nur `elementFromPoint` auf den
+> Punkt, den der Finger trifft.
+
+### 2 · Das Menü ist ein Überlagerungsfeld
+
+`#sb-actions-accordion` trägt `position:absolute` mit `z-index:50`. In
+der Seitenleiste richtig — dort klappt es über die Objektliste. In der
+Schiene falsch: der Behälter blieb **12 px**, das Feld schwebte **637 px**
+darüber und deckte die Reiter zu.
+
+> Mein erster Versuch war `flex:0 0 auto` am Behälter — **das Opfer
+> behandelt.** Ein Behälter, dessen Kind aus dem Fluss ist, kann nicht
+> wachsen, egal welchen Flex-Wert er trägt.
+
+### 3 · 1148 px Inhalt in 854 px Fenster
+
+Sechs Aktionen lagen unter der Kante. Erst enger gesetzt (→ 1036), dann
+die richtige Antwort: **Flex-Grammatik statt Rechnung.** Marke,
+Portfolio, Reiter und Nutzer stehen fest, der Aktionsblock nimmt den
+Rest (`flex:1 1 auto`, `min-height:0`, `overflow-y:auto`).
+
+> Auf den letzten Pixel zu optimieren bricht beim nächsten Eintrag.
+
+### 4 · Eine Grösse sagt nichts über einen Ort
+
+Die Werkbank-Leiste stand bei **`top: 3987`** — unterhalb des gesamten
+Inhalts, keiner ihrer Knöpfe erreichbar. Die CSS ordnete sie mit
+`order:-1`; **`order` wirkt aber nur in einem Flex-Container**, und
+`.main-col` ist `display:block`.
+
+> Ich hatte damals ihre HÖHE gemessen (1702×95) und daraus geschlossen,
+> sie sitze richtig. Sie hing die ganze Zeit am Ende.
+
+Jetzt setzt `layout-varianten.js` sie per `insertBefore` hinter die
+Reiterleiste.
+
+### 5 · Eine Regel ohne Stellungsanker gilt für alle vier
+
+Die Scroll-Grammatik aus Punkt 3 ordnet eine SPALTE. Ohne Anker traf sie
+auch die waagerechten Stellungen — Werkbank fiel von 9/12 auf **0/12**.
+Zwei Stellungen sind senkrecht, zwei waagerecht; sie können nicht
+dieselbe Grammatik haben.
+
+### Stand nach der Reparatur
+
+| Layout | Aktionen erreichbar | Reiter |
+|---|---|---|
+| 1 · Aktenmappe | **12/12** | **9/9** |
+| 2 · Kanzlei | **12/12** | **9/9** |
+| 3 · Werkbank | 9/12 | **9/9** |
+| 4 · Dossier | 9/12 | 8/9 |
+| 5 · Cockpit hell | keine Schiene (richtig) | — |
+
+**„Einstellungen" öffnet wieder** — `#settings-modal` gemessen mit
+1707×854. Die Marke oben links von 15 auf 20 px.
+
+**Offen:** in Werkbank und Dossier sind drei der zwölf Aktionen nur über
+waagerechtes Scrollen erreichbar.
