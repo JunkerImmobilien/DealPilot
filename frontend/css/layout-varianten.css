@@ -3515,3 +3515,13 @@ html[data-dp-layout] body header.hdr #hdr-badges .sc-pill:last-of-type{
     border-radius:2px !important; margin:2px !important;
   }
 }
+
+/* v1659c · `.sec` blieb weiss und deckte den Grauton zu. Dieselbe
+   Ursache wie bei der Kartenkante in v1656c: die ID-Kette aus v1648
+   (zwoelf IDs in einem `:is()`) ist die staerkste Regel im Haus, und
+   dagegen kommt keine Klassenregel an - auch keine eigene. Wer sie
+   gebaut hat, muss sie selbst wieder benutzen. */
+html[data-dp-layout] .body :is(#s0,#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#s-quick,#s-marktbericht),
+html[data-dp-layout] .body :is(#s0,#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#s-quick,#s-marktbericht).sec{
+  background:transparent !important;
+}
