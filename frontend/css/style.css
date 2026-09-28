@@ -30195,7 +30195,7 @@ html[data-bg="cream"] .sec {
    ═══════════════════════════════════════════════════════════════════ */
 
 /* Universeller Reset — extra spezifisch */
-.sec button:not(.dp-tip):not(.tab):not(.sb-action-btn):not(.fb-modal-close):not(.modal-close):not(.btn-clean):not(.fab-btn),
+.sec button:not(.dp-tip):not(.tab):not(.sb-action-btn):not(.fb-modal-close):not(.modal-close):not(.btn-clean):not(.fab-btn):not(.dp-pf-mtrigger),
 .sec .v235-next-btn,
 .sec .da-card-cta,
 .sec .da-bank-pdf-btn,

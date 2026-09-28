@@ -439,7 +439,7 @@ html[data-dp-karte="trichter"] .dp-pfbar > .dp-pf-qr{
 
 /* Die rechte Spalte. */
 html[data-dp-karte="trichter"] .dp-pfbar .dpk-ertrag{
-  grid-column:2 !important; grid-row:1 / -1 !important;
+  grid-column:2 !important; grid-row:1 / span 50 !important;
   display:flex !important; flex-direction:column !important;
   padding:13px 15px !important;
   background:#FBF9F4 !important;
@@ -680,4 +680,43 @@ html[data-dp-karte="bordkarte"] .dp-pf-rz #oab-run.dp-pf-launch{
 html[data-dp-karte="trichter"] .dpk-ertrag .dp-pf-rz,
 html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-rz{
   width:100% !important; box-sizing:border-box !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1651c · zwei Ursachen, beide gemessen
+
+   ── (1) `grid-row: 1 / -1` SPANNT NICHT, WENN ES KEIN EXPLIZITES
+          GITTER GIBT ───────────────────────────────────────────────────
+   Gemessen: `.dp-pf-lead` war 189 px hoch - auf den Pixel genau so hoch
+   wie `.dpk-ertrag` daneben. Beide standen in Gitterzeile 1.
+
+   Ursache: `-1` zaehlt die Linien des EXPLIZITEN Gitters. Ich hatte nur
+   `grid-template-columns` gesetzt, keine `grid-template-rows` - das
+   explizite Gitter hat also NULL Zeilen, und `1 / -1` fiel auf `1 / 1`
+   zusammen. Statt ueber alles zu spannen, stand der Ertragsblock in
+   Zeile 1 und blies sie auf seine eigene Hoehe auf.
+
+   > Eine Angabe, die auf ein Gitter zeigt, das es nicht gibt, ist
+   > nicht falsch - sie ist LEER. Und leer sieht aus wie gesetzt.
+
+   `span 50` ist unabhaengig vom expliziten Gitter. Die Leiste hat acht
+   Kinder; fuenfzig ist kein Rechenwert, sondern ein Deckel.
+
+   ── (2) DER AUFKLAPPER: `:not()` ERBT DIE SPEZIFITAET ────────────────
+   Mein `.dp-pf-mtrigger{display:none !important}` aus v1651b hat NICHT
+   gewirkt - gemessen, `inline-flex`, 283 px.
+
+   `.sec button:not(.dp-tip):not(.tab):not(.sb-action-btn)…` sind
+   acht Klassen plus ein Element, also (0,8,1). Meine eine Klasse ist
+   (0,1,0). **Zwischen zwei `!important` entscheidet die Spezifitaet**,
+   und sieben davon stecken in den `:not()`.
+
+   Behoben an der richtigen Stelle: `style.css:30198` fuehrt seine
+   Ausnahmen selbst, und der Aufklapper ist eine. Ein neuntes `:not()`
+   statt eines Gegengewichts hier.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Der Kopf der linken Spalte darf nicht mitwachsen. */
+html[data-dp-karte="trichter"] .dp-pfbar > .dp-pf-lead{
+  align-self:start !important;
 }
