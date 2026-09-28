@@ -3107,3 +3107,129 @@ html[data-dp-layout] .dpl-schiene:has(nav.tabs) nav.tabs .tab .ic{
   fill:currentColor !important; stroke:currentColor !important;
   opacity:1 !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1658 · ZURUECK ZUM OBSIDIAN-TON, UND DIE ICONS WERDEN RUHIG
+
+   Gemessen im Auslieferungszustand (`?layout=aus`, kein Hellmodus) -
+   das ist die Referenz, gegen die Marcel vergleicht:
+
+     .body    rgb(248,246,241)    der leicht graeuliche Ton
+     .card    Rahmen golden, 22 % Deckung
+     .sec     weiss
+     Kopf     dunkler Verlauf
+
+   Im Layout gemessen: `.body` weiss, `.card` mit schwarzem Rahmen.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1 · DER ARBEITSBEREICH BEKOMMT SEINEN TON ZURUECK ───────────────
+   Marcel: „mir ist aufgefallen, dass der Arbeitsbereich etwas anders
+   aussieht von den Farben wie in unserem urspruenglichen
+   Obsidian-Style. Da ist so ein leicht graeulicher Ton hinter."
+
+   Er kommt vom Hellmodus, den das Layout einschaltet: `dp-chrome-hell`
+   setzt `.body` auf Weiss. Der Auslieferungszustand hat dort
+   `rgb(248,246,241)` - ein Blatt, das sich vom Papierweiss der Karten
+   abhebt. Ohne diesen Unterschied schwimmen die Karten. */
+html[data-dp-layout] body .body{
+  background:#F8F6F1 !important;
+}
+
+/* ── 2 · DER SCHWARZE RAHMEN IM ARBEITSBEREICH: ZURUECKGENOMMEN ──────
+   Marcel am 28.09. zuerst: „unter Bewertung den Investor Deal Score -
+   die Karten schwarz umrahmen." Und jetzt: „was mir nicht gefaellt,
+   ist im Arbeitsbereich - wir haben ja dort jetzt einen schwarzen
+   Rahmen drum gesetzt."
+
+   Beides gilt: die **Score-Karten** (`.dpsh-pass`) behalten die
+   schwarze Fassung, die er dort wollte. Die **Arbeitskarten**
+   (`.card`) bekommen ihren goldenen Rahmen zurueck - genau den, den
+   der Auslieferungszustand fuehrt (22 % Deckung).
+
+   > Eine Ruecknahme ist kein Rueckschritt. Der schwarze Rahmen war
+   > richtig, wo er eine Fassung ist, und falsch, wo er acht Karten in
+   > Reihe zu acht Traueranzeigen macht. */
+html[data-dp-layout] .body :is(#s0,#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#s-quick,#s-marktbericht) .card{
+  border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent) !important;
+}
+
+/* ── 3 · HILFE UND KONTINGENT WERDEN RUHIG ──────────────────────────
+   Marcel: „die Hilfe, genauso wie die Indikation fuer wie viele
+   Marktbewertungen noch offen sind - die sind immer noch goldfarben.
+   Das muesste vielleicht auch in dem Grau angezeigt werden oder in
+   einem passenden Ton von dem Header."
+
+   Gold bleibt den Symbolen, die zur NAVIGATION gehoeren (Reiter,
+   Abschnitte) - dort ist es Wegweisung. Im Kopf sind Hilfe und
+   Kontingent Werkzeuge am Rand; ein Goldton macht sie wichtiger, als
+   sie sind.
+
+   > Wenn alles hervorgehoben ist, ist nichts hervorgehoben. */
+html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn,
+html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn svg,
+html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn svg *,
+html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn .ic{
+  color:#BFB7A9 !important;
+  fill:currentColor !important; stroke:currentColor !important;
+}
+html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn:hover,
+html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn:hover svg{
+  color:#F5EFE2 !important;
+}
+html[data-dp-layout] body header.hdr:has(#hdr-badges) #hdr-credits-pill{
+  background:#171512 !important;
+  border-color:#2A2622 !important;
+}
+html[data-dp-layout] body header.hdr:has(#hdr-badges) #hdr-credits-pill,
+html[data-dp-layout] body header.hdr:has(#hdr-badges) #hdr-credits-pill-label,
+html[data-dp-layout] body header.hdr:has(#hdr-badges) #hdr-credits-pill svg{
+  color:#BFB7A9 !important;
+}
+
+/* ── 4 · DAS LOGO ────────────────────────────────────────────────────
+   Marcel: „das DealPilot-Logo koennte an sich ein bisschen groesser
+   sein." 26 auf 31 px; die Schiene hat seit v1657 248 px und traegt
+   das ohne Umbruch. */
+html[data-dp-layout] .dpl-schiene .dpl-wm{
+  font-size:31px !important; line-height:38px !important;
+}
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .dpl-marke,
+html[data-dp-layout] .dpl-schiene .dpl-marke{
+  min-height:78px !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-logo{
+  max-height:54px !important; max-width:210px !important;
+}
+
+/* ── 5 · DER RAHMEN SAGT DEN STAND DES DEALS ─────────────────────────
+   Marcel: „bei all denen, die gewonnen sind - vielleicht koennen wir
+   es so machen, dass wir, wenn die gewonnen sind, einen komplett
+   gruenen Rahmen drum machen und wenn die verloren sind, dann halt rot
+   und wenn die in Bearbeitung sind, halt in Gold."
+
+   Die Klassen stehen schon an der Karte (`storage.js:1247`):
+   `deal-won`, `deal-lost` - und „in Bearbeitung" ist der Fall, in dem
+   keine von beiden steht.
+
+   Das ersetzt die Score-Kante aus v1657: **ein Rahmen kann nur eine
+   Sache sagen.** Der Stand des Deals schlaegt die Bewertung - wer
+   verkauft hat, interessiert sich nicht mehr fuer den Score. */
+html[data-dp-layout] :is(#sb-list) .sb-card{
+  border-width:1.5px !important;
+  border-style:solid !important;
+  border-left-width:1.5px !important;
+  border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent) !important;
+  border-left-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent) !important;
+}
+html[data-dp-layout] :is(#sb-list) .sb-card.deal-won{
+  border-color:#3FA56C !important; border-left-color:#3FA56C !important;
+}
+html[data-dp-layout] :is(#sb-list) .sb-card.deal-lost{
+  border-color:#B8625C !important; border-left-color:#B8625C !important;
+}
+/* Das „gewonnen"-Abzeichen verdeckte in der schmalen Zeile die
+   Kennung. Der gruene Rahmen sagt dasselbe, ohne Platz zu nehmen. */
+html[data-dp-layout] :is(#sb-list) .sb-card .sbc-won-badge,
+html[data-dp-layout] :is(#sb-list) .sb-card .sbc-deal-badge{
+  display:none !important;
+}
