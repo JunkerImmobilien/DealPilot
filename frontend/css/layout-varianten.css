@@ -3077,3 +3077,33 @@ html[data-dp-layout] :is(#sb-list) .sb-card:not(:has(.sbc-mini-score)){
 html[data-dp-layout] :is(#sb-list) .sb-card .sbc-address{
   color:#E9E3D6 !important;
 }
+
+/* ── v1657d · DAS HILFE-ICON, MIT DERSELBEN MECHANIK ─────────────────
+   Gemessen: der Knopf traegt `color:rgb(191,183,169)`, sein SVG aber
+   `fill:rgb(20,19,16)` - schwarz auf Obsidian. Meine Goldregel aus
+   v1657 hat verloren, aus demselben Grund wie die Kennung: eine
+   `:is()`-Regel mit ID-Spezifitaet.
+
+   **`:has()` erbt die Spezifitaet seines Arguments genauso wie
+   `:is()`.** `header.hdr:has(#hdr-badges)` ist deshalb (1,1,1) - und
+   trifft denselben Kopf, ohne dass ich eine fremde ID an eine Stelle
+   schreibe, an die sie nicht gehoert. */
+html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn,
+html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn svg,
+html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn svg *,
+html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn .ic{
+  color:var(--wl-c9a84c, #C9A84C) !important;
+  fill:currentColor !important;
+  stroke:currentColor !important;
+}
+html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn:hover,
+html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn:hover svg{
+  color:var(--wl-e8cc7a, #E8CC7A) !important;
+}
+/* Und die Symbole in der Schiene, aus demselben Grund mit `:has()`. */
+html[data-dp-layout] .dpl-schiene:has(nav.tabs) nav.tabs .tab svg,
+html[data-dp-layout] .dpl-schiene:has(nav.tabs) nav.tabs .tab .ic{
+  color:var(--wl-c9a84c, #C9A84C) !important;
+  fill:currentColor !important; stroke:currentColor !important;
+  opacity:1 !important;
+}
