@@ -778,3 +778,37 @@ html[data-dp-layout] .body .phase-divider{
   font-family:var(--dpl-mono) !important;
   font-size:9.5px !important; letter-spacing:.12em !important;
 }
+
+/* ── Der ID-Riegel (v1648b) ─────────────────────────────────────────
+   GEMESSEN mit dem Kaskaden-Walker: die Karten blieben bei 12 px
+   Radius, weil `#s0 .card{border-radius:12px !important}` in style.css
+   steht. Ein ID-Selektor ist (1,1,0); meine Regel
+   `html[data-dp-layout] .body .card` nur (0,3,1).
+
+   > **ID schlaegt Klasse, und `!important` hilft nicht darueber
+   > hinweg** - es entscheidet erst BEI GLEICHER Spezifitaet. Zum
+   > zweiten Mal in zwei Tagen dieselbe Falle (zuerst `#oab-run`).
+
+   `:is()` nimmt die Spezifitaet seines staerksten Arguments an. Die
+   Liste der Abschnitts-IDs ist gemessen, nicht geraten: s0 bis s8 plus
+   die beiden benannten. */
+html[data-dp-layout] .body
+  :is(#s0,#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#s-quick,#s-marktbericht) .card{
+  border-radius:2px !important;
+  box-shadow:none !important;
+  border:1px solid var(--dpl-linie) !important;
+}
+html[data-dp-layout] .body
+  :is(#s0,#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#s-quick,#s-marktbericht)
+  :is(input[type=text],input[type=number],input[type=date],select,textarea){
+  border:1px solid var(--dpl-linie) !important;
+  border-radius:2px !important;
+  background:var(--dpl-flaeche) !important;
+  font-family:var(--dpl-body) !important;
+}
+html[data-dp-layout] .body
+  :is(#s0,#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8) .ct{
+  font-family:var(--dpl-mono) !important;
+  font-size:10px !important; letter-spacing:.12em !important;
+  color:var(--dpl-leise) !important;
+}
