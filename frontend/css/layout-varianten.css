@@ -547,3 +547,127 @@ html[data-dp-layout] .dpl-logo{
    dort steht die Objektliste ja dauerhaft daneben. Unter 900 px blendet
    ihn die Media-Query oben wieder ein. */
 html[data-dp-layout] .dpl-schiene[data-objekte="spalte"] .dpl-portfolio{ display:none; }
+
+/* ═══ 9 · TYPOGRAFIE (v1646) ════════════════════════════════════════
+   Marcel am 28.09.2026: „das passt ja garnicht, sieht ja garnicht so
+   aus wie es soll. auch schriften etc nachziehen. das muss nicht gold
+   sein die schriftfarbe."
+
+   ── WAS GEMESSEN WURDE ──────────────────────────────────────────────
+   Auf EINEM Schirm liefen DREI Sans-Schriften gegeneinander:
+
+     Inter            1.501 Elemente   (mein Layout + der helle Skin)
+     IBM Plex Sans      507 Elemente   ueber `--font-main`, style.css:29164
+     DM Sans            154 Elemente   ueber 112 feste Regeln in style.css
+     JetBrains Mono     112 Elemente
+     Space Grotesk       79 Elemente
+
+   `CLAUDE.md` kennt vier Schriften: Space Grotesk (Display), JetBrains
+   Mono (Mono/Labels), Inter (Body), Cormorant Garamond (Serif). **IBM
+   Plex Sans und DM Sans stehen dort nicht.** Sie sind gewachsen
+   (V248-04 hat IBM Plex einmal zur „Hauptschrift" erklaert) und
+   widersprechen der Marke.
+
+   ── DER EIGENTLICHE GRUND, WARUM ES NICHT WIE DER ENTWURF AUSSAH ────
+   **Die Zahlen liefen in Inter.** `.num`, `.kv-v`, `.pos`, `.neg` —
+   alle proportional gesetzt. Im Entwurf standen sie in JetBrains Mono
+   mit `tabular-nums`, rechtsbuendig, gleiche Stellenbreite.
+
+   > Daran erkennt ein Pruefer eine Tabelle, die stimmt. Eine Spalte
+   > Zahlen, deren Ziffern verschieden breit sind, liest sich wie eine
+   > Liste - nicht wie eine Rechnung.
+
+   Das war der groesste einzelne Unterschied, und er stand in keiner
+   Farbe, sondern in der Schriftwahl.
+
+   ── GELTUNGSBEREICH ─────────────────────────────────────────────────
+   NUR `html[data-dp-layout]`. Der Auslieferungszustand bleibt unberuehrt
+   (siehe v1645) - dort gilt weiter, was gewachsen ist.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Die Token umbiegen: alles, was `--font-main` liest, folgt automatisch. */
+html[data-dp-layout]{
+  --font-main:'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono:'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --dpl-body:'Inter', system-ui, -apple-system, sans-serif;
+  --dpl-mono:'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --dpl-disp:'Space Grotesk', system-ui, sans-serif;
+}
+
+/* Die festen Fremdschriften ueberstimmen. Einzeln benannt statt per
+   Sammelselektor - ein `*{font-family:…}` wuerde auch die Mono-Stellen
+   und die Wortmarke treffen. */
+html[data-dp-layout] body,
+html[data-dp-layout] .body,
+html[data-dp-layout] input,
+html[data-dp-layout] select,
+html[data-dp-layout] option,
+html[data-dp-layout] optgroup,
+html[data-dp-layout] textarea,
+html[data-dp-layout] button,
+html[data-dp-layout] .btn,
+html[data-dp-layout] .tab,
+html[data-dp-layout] td,
+html[data-dp-layout] th,
+html[data-dp-layout] .cf,
+html[data-dp-layout] .hint,
+html[data-dp-layout] .sbc-btn,
+html[data-dp-layout] .dp-tip{
+  font-family:var(--dpl-body) !important;
+}
+
+/* ── Zahlen sind Mono ──────────────────────────────────────────────
+   Nicht „alles was aussieht wie eine Zahl", sondern die Klassen, die
+   gemessen Zahlen tragen. Dazu `tabular-nums`: ohne das sind auch in
+   einer Mono-Schrift die Ziffern nicht zwingend gleich breit. */
+html[data-dp-layout] .num,
+html[data-dp-layout] .kv-v,
+html[data-dp-layout] .pos,
+html[data-dp-layout] .neg,
+html[data-dp-layout] .sfx,
+html[data-dp-layout] .pfx,
+html[data-dp-layout] .kpi-val,
+html[data-dp-layout] .sc-pill-v,
+html[data-dp-layout] .trl,
+html[data-dp-layout] input[type=number],
+html[data-dp-layout] .body td.num,
+html[data-dp-layout] .body .betrag,
+html[data-dp-layout] .body .wert{
+  font-family:var(--dpl-mono) !important;
+  font-variant-numeric:tabular-nums !important;
+  font-feature-settings:'tnum' 1 !important;
+}
+
+/* Ueberschriften tragen die Displayschrift. */
+html[data-dp-layout] .body h1,
+html[data-dp-layout] .body h2,
+html[data-dp-layout] .body h3,
+html[data-dp-layout] .sec-title,
+html[data-dp-layout] .card-title{
+  font-family:var(--dpl-disp) !important;
+  letter-spacing:-.01em !important;
+}
+
+/* ── GOLD IST EINE LINIE, KEINE SCHRIFTFARBE ────────────────────────
+   Marcel ausdruecklich: „das muss nicht gold sein die schriftfarbe."
+
+   Gemessen trugen Gold: Abschnittsbeschriftungen, Aufklapp-Pfeile,
+   Hinweiszeilen, Kennzahlen-Beschriftungen. Auf hellem Grund liegt
+   #C9A84C bei rund 2,3:1 Kontrast - unter jeder Lesbarkeitsschwelle.
+
+   > Ein Akzent, der ueberall steht, ist kein Akzent. Gold bleibt an
+   > der Kante des aktiven Reiters und am Runway-Verlauf; Text ist
+   > Tinte.
+
+   Statusfarben (Gruen, Rot) bleiben unangetastet - die tragen
+   Bedeutung, nicht Marke. */
+html[data-dp-layout] .body .sec-lbl,
+html[data-dp-layout] .body .card-lbl,
+html[data-dp-layout] .body .obj-extra-chev,
+html[data-dp-layout] .body .qz-acc-chev,
+html[data-dp-layout] .body .ds-brand-accent,
+html[data-dp-layout] .body .dpfk-fl,
+html[data-dp-layout] .body .dp-infobox-icon,
+html[data-dp-layout] .hdr-v61-row2 .sc-pill-l{
+  color:var(--dpl-leise) !important;
+}
