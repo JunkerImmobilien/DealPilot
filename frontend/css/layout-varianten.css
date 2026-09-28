@@ -3293,3 +3293,57 @@ html[data-dp-layout] :is(#sb-list) .sb-card .sbc-deal-badge{
     flex:0 0 auto !important; white-space:nowrap !important;
   }
 }
+
+/* ── v1658c · DIE LEISTE LAG UNTER DEM KOPF ──────────────────────────
+   Gemessen auf 834 px mit `elementsFromPoint` auf den Portfolio-Knopf:
+
+     .hdr-v61-row1   z=2     (im Kopf)
+     header.hdr      z=300   <- liegt DARUEBER
+     .dpl-portfolio  z=auto  (in der Leiste, z=80)
+
+   Meine Leiste hatte `z-index:80`, der Kopf traegt 300. Und die Reiter
+   standen bei **x=-96**: die Schiene ist eine Flex-SPALTE mit
+   `align-items:center`, und ein 1026 px breites Kind wird in einem
+   834-px-Fenster mittig gesetzt - also links heraus.
+
+   > Zwei Fehler, die sich addieren: der eine macht unbedienbar, der
+   > andere unsichtbar. Beide waren in einer Messung zu sehen.
+
+   Die Leiste wird jetzt eine ZEILE (Marke und Portfolio nebeneinander,
+   Reiter darunter), liegt ueber dem Kopf, und ihre Kinder strecken
+   sich statt sich zu zentrieren. */
+@media (max-width: 900px){
+  html[data-dp-layout] .dpl-schiene{
+    z-index:400 !important;
+    flex-direction:row !important;
+    flex-wrap:wrap !important;
+    align-items:center !important;
+    gap:8px !important;
+    max-height:none !important;
+    padding:5px 10px !important;
+  }
+  html[data-dp-layout] .dpl-schiene .dpl-marke{
+    flex:0 0 auto !important; min-height:0 !important; height:auto !important;
+    margin:0 !important; border-bottom:0 !important; padding:0 !important;
+  }
+  html[data-dp-layout] .dpl-schiene .dpl-portfolio{
+    flex:0 0 auto !important; margin:0 !important;
+  }
+  /* Die Reiter bekommen die ganze zweite Zeile und scrollen darin. */
+  html[data-dp-layout] .dpl-schiene .dpl-teil-tabs{
+    flex:1 0 100% !important; width:100% !important;
+    min-width:0 !important; margin:0 !important; padding:0 !important;
+  }
+  html[data-dp-layout] .dpl-schiene .dpl-teil-objekte{
+    flex:1 0 100% !important; width:100% !important;
+    max-height:50vh !important;
+  }
+  html[data-dp-layout] .dpl-schiene .dpl-teil-suche{
+    flex:1 0 100% !important; width:100% !important;
+  }
+  /* Das Polster muss zur Leistenhoehe passen: Marke/Portfolio in einer
+     Zeile (~40) plus Reiterzeile (~34) plus Polster = 88. */
+  html[data-dp-layout] .app-wrap{
+    padding-top:88px !important;
+  }
+}
