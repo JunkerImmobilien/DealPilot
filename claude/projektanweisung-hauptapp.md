@@ -20446,3 +20446,119 @@ gegen eine ID hilft keine Klassenkette, so lang sie auch ist.
 Die Kennzahlen zeigen weiterhin **Score-Anteile** („RENDITE 72 %"), der
 Entwurf daneben auch **echte Werte** (Rendite 4,72 %, DSCR 1,27). Das
 ist eine Produktentscheidung und steht als **P3c** im Backlog.
+
+---
+
+## Rollout-Journal · 28.09.2026 (7) — Der Schleier, der keiner mehr sein durfte
+
+**Was:** die Objektliste wieder bedienbar (ein Überbleibsel von mir hat
+sie blockiert), Quick-Check und Marktbericht raus, beim Portfolio
+treten die Reiter zurück, der Score-Chip wird hell wie im Entwurf, und
+die Karten bekommen schwarze statt grauer Kanten.
+
+**Commits:** `f0d0bd4` v1656 · `0af8889` v1656b · `c4d0faf` v1656c
+
+**Nachweis** (Aktenmappe, Objekt *Gerberstraße 27*):
+
+| | |
+|---|---|
+| Portfolio-Knopf, Suche, Nutzer | **TRIFFT** (vorher: alle „daneben") |
+| Erste fünf Objektkarten | **5× ok** |
+| Klick über `elementFromPoint` | Objekt lädt, Liste klappt zu, Reiter zurück |
+| Kartenkanten | `rgb(14,13,11)` — 4 von 4 · Score-Karten 2 von 2 |
+| Score-Chip | `#FBF6E9` mit schwarzer Fassung, Ring „70", „Gut" |
+| Schiene | 37 geprüft, **0 unter 4,5** |
+
+---
+
+### 1 · Der eigentliche Fehler war ein Überbleibsel von mir
+
+Marcel: *„wenn wir auf Portfolio klicken, dann kann ich kein Objekt
+auswählen. Es wird zwar was angezeigt, aber so richtig auswählen kann
+man das nicht."*
+
+Gemessen: `elementFromPoint` auf **jede** Stelle der linken Spalte gab
+`HTML` zurück — Portfolio-Knopf, Suchfeld, Nutzerblock, alle Karten.
+Nur der Kopf (`#hdr-obj`, z-index 300) war treffbar.
+
+Der Täter:
+
+```css
+html[data-dpl-portfolio="auf"]::after{
+  content:''; position:fixed; inset:0; z-index:65;
+  background:rgba(20,18,15,.34); }
+```
+
+Das war der **Schleier hinter der Schublade** — richtig, solange sie
+über der Arbeitsfläche lag. Seit v1654 gibt es keine Schublade mehr,
+die Liste steht in der Schiene. Der Schleier blieb, deckt `inset:0` mit
+`z-index:65`, und die Schiene hat 60.
+
+> **Er war genau dann aktiv, wenn man Portfolio öffnet.** Deshalb ging
+> der Knopf noch, und danach nichts mehr.
+
+### 2 · „HTML liegt ganz oben" heisst nie, dass HTML etwas tut
+
+`elementsFromPoint` nannte den Stapel:
+
+```
+HTML            <- der Schleier, als Pseudoelement des <html>
+.dpl-portfolio
+.dpl-schiene
+```
+
+> **Ein Pseudoelement erscheint in `elementsFromPoint` unter dem Namen
+> seines Elements.** Steht dort `HTML` an erster Stelle, hängt ein
+> `::before` oder `::after` am Wurzelelement — es ist nie das
+> Wurzelelement selbst.
+
+**Ich habe diesen Befund zweimal gesehen.** Beim ersten Mal (v1654)
+habe ich ihn für ein Artefakt gehalten und mit einem `dispatchEvent`
+gegengeprüft — *das die Trefferprüfung gerade umgeht.* **Ein
+simulierter Klick beweist nichts über Klickbarkeit.** Ein Klick muss
+über das gehen, was `elementFromPoint` liefert; alles andere misst die
+eigene Absicht.
+
+### 3 · Eine Zurücknahme
+
+Ich hatte zunächst `.main-col` mit seinem `overflow:hidden auto` für
+die Ursache gehalten und die Schiene deshalb an den `<body>` gehängt.
+**Das war falsch** — nach dem Umhängen blieb der Treffer `HTML`. Die
+Schiene bleibt trotzdem am `<body>`: dort kann sie niemand klippen, und
+das ist der richtige Ort für ein `position:fixed`-Element.
+
+### 4 · Dreimal in Folge: der Gegner war meine eigene Regel
+
+| Stelle | Sieger | Spezifität |
+|---|---|---|
+| Score-Chip Fläche | `#hdr-badges .sc-main.sc-tier-green` (style.css) | (1,2,0) |
+| Kartenkante | `html[data-dp-layout] .body :is(#s0,…,#s-marktbericht) .card` | **(12,4,1)** |
+| Schleier | `html[data-dpl-portfolio="auf"]::after` | — |
+
+Die mittlere ist meine eigene ID-Kette aus v1648: **zwölf IDs in einem
+`:is()` ergeben zwölf ID-Punkte.** Dagegen kommt keine Klassenregel an,
+auch keine eigene.
+
+> Wer eine `:is()`-Kette aus IDs gebaut hat, muss sie beim nächsten Mal
+> selbst wieder benutzen. Sie ist die stärkste Regel im Haus.
+
+### 5 · Zwei Ebenen, die einander ablösen
+
+Marcel: *„wenn man auf Portfolio klickt, könnte man darunter die
+Anzeige wegmachen mit Objekt bis Deal-Aktion."*
+
+Die Reiter gehören zu **einem** Objekt. Solange die Liste offen ist, ist
+keins gewählt — sie stehen dann für etwas, das gerade nicht zur Debatte
+steht, und kosten den Platz, den die Liste braucht. Jetzt: Portfolio
+**oder** dieses Objekt.
+
+### 6 · Der Chip nach dem Entwurf
+
+Der Entwurf setzt ihn auf `var(--flaeche)` — ein helles Blatt, nicht
+Obsidian. Marcel: *„muss nicht einen schwarzen Hintergrund haben."*
+Jetzt `#FBF6E9` mit schwarzer Fassung; die Stufenfarben bleiben (Grün
+`#2E8455`, Gold `#8A6B1F`, Rot `#A6322A`).
+
+Die Kartenkanten: **gemessen im Reiter Bewertung, nicht geraten** —
+`.dpsh-pass` (×2, die Score-Karten) und `.card` (×8) trugen Grau. Alles
+andere dort trägt bereits eine Statusfarbe und bleibt unangetastet.
