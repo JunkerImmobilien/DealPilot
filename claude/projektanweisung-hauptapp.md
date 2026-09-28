@@ -19710,3 +19710,81 @@ und das war ausdrücklich bestellt und ist zugleich Hausregel.
 
 Der Quick-Check trägt die Marke **fest im Dokument**
 (`<body class="dp-neue-karte">`), bleibt also hell, wie gewünscht.
+
+## Rollout-Journal 28.09.2026 — die Typografie war der eigentliche Bruch
+
+**Commits.** `db39c9c` (v1646), `5a833f9` (v1646b), `4625447` (v1647),
+`b442dcb` (v1648), `c87735a` (v1648b).
+
+Marcel: „das passt ja garnicht. sieht ja garnicht so aus wie es soll.
+auch schriften etc nachziehen. das muss nicht gold sein die
+schriftfarbe." — Er hatte recht, und der Grund war messbar.
+
+### Drei Sans-Schriften auf einem Schirm
+
+| Schrift | vorher | nachher |
+|---|---:|---:|
+| Inter | 1.501 | 1.864 |
+| **IBM Plex Sans** | **507** | **0** |
+| **DM Sans** | **154** | **26** |
+| **JetBrains Mono** | **112** | **356** |
+| Space Grotesk | 79 | 68 |
+
+`CLAUDE.md` kennt vier Schriften. **IBM Plex Sans und DM Sans stehen
+dort nicht** — sie sind gewachsen (`style.css:29164` erklärt IBM Plex
+einmal zur „Hauptschrift", 112 weitere Regeln setzen DM Sans, darunter
+`body` und alle Eingabefelder).
+
+### Der grösste Einzelunterschied stand in keiner Farbe
+
+**Die Zahlen liefen in Inter.** `.num`, `.kv-v`, `.pos`, `.neg`,
+`.kpi-val` — alle proportional gesetzt, ohne `tabular-nums`.
+
+> Eine Spalte Zahlen, deren Ziffern verschieden breit sind, liest sich
+> wie eine Liste — nicht wie eine Rechnung. **Daran erkennt ein Prüfer
+> eine Tabelle, die stimmt.** Jetzt JetBrains Mono mit `tabular-nums`,
+> 356 statt 112 Stellen.
+
+### Gold ist eine Linie, keine Schriftfarbe
+
+Vierzehn Klassen trugen Gold als TEXTFARBE — Abschnittsbeschriftungen,
+Aufklapp-Pfeile, „TOP DEAL", Bannertitel. `#C9A84C` liegt auf hellem
+Grund bei rund **2,3:1** und damit unter jeder Lesbarkeitsschwelle.
+
+Grün und Rot bleiben; der Bewertungsstern bleibt golden — er IST die
+Wertung, kein Text.
+
+### Karten: flach statt schwebend
+
+Gemessen: 12 px Radius, Schatten `0 2px 12px`. Jetzt 2 px, kein
+Schatten, Haarlinie.
+
+> Ein Schatten hebt eine Karte von der Fläche ab — das will ein
+> Dashboard. Ein Gutachten will das Gegenteil: alles auf EINEM Blatt,
+> getrennt durch Linien, nicht durch Höhe.
+
+### Zwei eigene Fehler
+
+**1 · `#s0 .card{border-radius:12px !important}`.** Meine Regel
+`html[data-dp-layout] .body .card` ist (0,3,1), die ID-Regel (1,1,0).
+**ID schlägt Klasse, und `!important` hilft nicht darüber hinweg** — es
+entscheidet erst bei GLEICHER Spezifität. **Zum zweiten Mal in zwei
+Tagen** (zuerst `#oab-run`). Gelöst mit `:is()` über die *gemessene*
+Liste der Abschnitts-IDs.
+
+**2 · Eine Regel, die eine Eigenschaft ändert, ändert nicht die andere
+mit.** Ich hatte an `.sc-pill-l` in v1646 nur die FARBE gesetzt und
+später festgestellt, dass die Schrift noch DM Sans war.
+
+### Eine bewusste Abweichung vom Entwurf
+
+Im Entwurf standen die **Feldbeschriftungen** als Mono-Versalien. Das
+trägt bei „PLZ" und „Baujahr" — aber **75 der 274 Beschriftungen sind
+ganze Sätze** („Erhöhung gilt auch für zusätzliche Einnahmen …").
+Versalien in Mono wären dort unlesbar.
+
+> Ein Entwurf, der mit acht Feldern gezeichnet wurde, gilt nicht
+> ungeprüft für 274. Die Beschriftungen bleiben, wie sie sind.
+
+**Alles nur unter `html[data-dp-layout]`** — der Auslieferungszustand
+bleibt unberührt.
