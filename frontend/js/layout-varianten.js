@@ -94,18 +94,18 @@
   var LAYOUTS = {
     v1: {
       name: 'Aktenmappe', beschreibung: 'Menü links als Gliederung',
-      objekteAls: 'schublade',
+      objekteAls: 'liste',
       schienen: [
         { stellung: 'links', ton: 'dunkel', marke: true, portfolio: true,
-          nimmt: ['tabs', 'aktionen', 'nutzer'] }
+          nimmt: ['schnellstart', 'suche', 'objekte', 'tabs', 'aktionen', 'nutzer'] }
       ]
     },
     v2: {
       name: 'Kanzlei', beschreibung: 'Navigation links, Aktionen rechts',
-      objekteAls: 'schublade',
+      objekteAls: 'liste',
       schienen: [
         { stellung: 'links',  ton: 'dunkel', marke: true, portfolio: true,
-          nimmt: ['tabs', 'nutzer'] },
+          nimmt: ['schnellstart', 'suche', 'objekte', 'tabs', 'nutzer'] },
         { stellung: 'rechts', ton: 'hell',   marke: false, portfolio: false,
           nimmt: ['aktionen'], titel: 'Aktionen' }
       ]
@@ -116,7 +116,34 @@
     tabs:     'nav.tabs',
     aktionen: '#sb-actions-accordion',
     schalter: '#sb-actions-trigger-btn',
-    nutzer:   '#sb-user'
+    nutzer:   '#sb-user',
+    /* v1654: die Objektliste selbst. Marcel am 28.09.2026: „wenn ich
+       auf Portfolio klicke, dann oeffnet sich komischerweise eine neue
+       Ansicht mit Objekten und ich kann die nicht minimieren. Da waere
+       es vielleicht besser, wenn wir dort eine Liste anzeigen, die
+       aber auch einfach genau in diesem linken Menue dargestellt
+       wird."
+
+       Verschoben wird der VORHANDENE Knoten `#sb-list` - nicht eine
+       Kopie. `storage.js` rendert weiterhin hinein, jede Karte behaelt
+       ihren Klickhorcher und ihren Zustand. Eine nachgebaute Liste
+       haette am ersten Tag dieselben Objekte und am dreissigsten
+       nicht mehr. */
+    objekte:  '#sb-list',
+    /* Gemessen, bevor `#sidebar` aus den Layouts verschwindet - was
+       darin steckt und sonst verloren ginge:
+
+         .sb-header                     leer (49 px)
+         .sb-neu-row                    Quick-Check · Marktbericht
+         .sb-section-title-with-sort    „Portfolio" + SUCHE + SORTIERUNG
+         #sb-list                       die Karten + „Neues Objekt"
+
+       `Quick-Check` gibt es im Aktionsmenue NICHT (dort steht „Quick
+       Boarding"), und Suche und Sortierung gibt es nirgends sonst.
+       Beide wandern deshalb mit. Der leere `.sb-header` bleibt, wo er
+       ist. */
+    schnellstart: '.sb-neu-row',
+    suche:        '.sb-section-title-with-sort'
   };
 
   var merker = [];       /* [{ knoten, eltern, naechstes }] */
@@ -270,25 +297,40 @@
     if (z) z.textContent = n ? String(n) : '';
   }
 
-  /* ── Die Objektspalte als Schublade ─────────────────────────────── */
+  /* ── Die Objektliste IM Menü ────────────────────────────────────────
+     v1654 · Bis v1653 war dies eine Schublade: 380 px breit, über die
+     Arbeitsfläche gelegt. Marcel am 28.09.2026: „dann öffnet sich
+     komischerweise eine neue Ansicht mit Objekten und ich kann die
+     nicht minimieren."
+
+     > **„Nicht minimieren können" ist der eigentliche Befund.** Die
+     > Schublade hatte keinen Schliessen-Knopf - nur Escape und ein
+     > Klick auf eine Karte. Wer das nicht weiss, sitzt fest.
+
+     Jetzt klappt derselbe Knopf eine Liste IN der Schiene auf und zu,
+     wie ein Menüpunkt mit Unterpunkten. Dasselbe Attribut steuert es,
+     nur die CSS dahinter ist eine andere - und der Knopf zeigt seinen
+     Zustand an, statt ihn zu verstecken. */
   function portfolio(zu) {
     var auf = zu === undefined
       ? document.documentElement.getAttribute('data-dpl-portfolio') !== 'auf'
       : !zu;
     document.documentElement.setAttribute('data-dpl-portfolio', auf ? 'auf' : 'zu');
+    var k = el('.dpl-portfolio');
+    if (k) k.setAttribute('aria-expanded', auf ? 'true' : 'false');
   }
 
-  /* Ein Klick auf eine Objektkarte schliesst die Schublade - sonst steht
-     sie über dem Objekt, das man gerade geöffnet hat. */
+  /* Ein Klick auf eine Objektkarte klappt die Liste zu - man hat ja
+     gefunden, was man gesucht hat. */
   document.addEventListener('click', function (e) {
     if (!aktuell) return;
     if (document.documentElement.getAttribute('data-dpl-portfolio') !== 'auf') return;
-    var k = e.target.closest ? e.target.closest('.sb-card, .sb-add-new') : null;
+    var k = e.target.closest ? e.target.closest('.sb-card') : null;
     if (k) setTimeout(function () { portfolio(true); }, 60);
   }, true);
 
-  /* Escape schliesst die Schublade. NICHT die Reiter oder etwas anderes -
-     eine Taste, die mehr tut als eine Sache, überrascht. */
+  /* Escape klappt sie zu. NICHT die Reiter oder etwas anderes - eine
+     Taste, die mehr tut als eine Sache, überrascht. */
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && document.documentElement.getAttribute('data-dpl-portfolio') === 'auf') {
       portfolio(true);

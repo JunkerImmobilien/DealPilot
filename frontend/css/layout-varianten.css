@@ -1945,3 +1945,255 @@ html[data-dp-layout] body header.hdr .dp-kg-panel,
 html[data-dp-layout] body header.hdr .dp-kg-panel *{
   color:initial;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1654b · DIE OBJEKTLISTE IM MENUE, UND DER ACCOUNT NACH UNTEN
+
+   Zwei Wuensche von Marcel am 28.09.2026:
+
+   „wenn ich auf Portfolio klicke, dann oeffnet sich komischerweise eine
+   neue Ansicht mit Objekten und ich kann die nicht minimieren. Da waere
+   es vielleicht besser, wenn wir dort eine Liste anzeigen, die aber
+   auch einfach genau in diesem linken Menue dargestellt wird."
+
+   „die Versionierung, der aktuelle Plan und auch das Abmelden links,
+   wenn wir die Kanzlei haben, ist nicht schoen formatiert. Das koennte
+   vielleicht auch einfach in den unteren Bereich dargestellt werden,
+   also direkt unten links fuer diesen Account."
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1 · DIE SCHUBLADE IST ABGESCHAFFT ───────────────────────────────
+   `#sidebar` traegt in den Layouts nichts Nutzbares mehr: Liste,
+   Suche, Schnellstart, Aktionen und Nutzer sind alle in die Schiene
+   gewandert. Uebrig bleibt ein leerer `.sb-header` und ein 1-px-Spacer.
+
+   Sie wird ausgeblendet UND aus dem Gitter genommen - `display:none`
+   allein reicht bei einem Grid-Kind nicht, die Spur bliebe stehen
+   (derselbe Fehler wie in v1653d). */
+html[data-dp-layout] #sidebar{
+  display:none !important;
+}
+html[data-dp-layout] .app-wrap{
+  grid-template-columns:1fr !important;
+}
+
+/* ── 2 · DIE LISTE ALS MENUETEIL ─────────────────────────────────────
+   Zugeklappt nimmt sie keinen Platz. Aufgeklappt bekommt sie hoechstens
+   die halbe Schienenhoehe und scrollt darin - sonst schiebt sie bei 17
+   Objekten die Reiter aus dem Bild. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-objekte,
+html[data-dp-layout] .dpl-schiene .dpl-teil-suche{
+  overflow:hidden;
+}
+html[data-dpl-portfolio="zu"] .dpl-schiene .dpl-teil-objekte,
+html[data-dpl-portfolio="zu"] .dpl-schiene .dpl-teil-suche{
+  display:none !important;
+}
+html[data-dpl-portfolio="auf"] .dpl-schiene .dpl-teil-objekte{
+  display:block !important;
+  flex:0 1 auto !important;
+  max-height:46vh !important;
+  overflow-y:auto !important;
+  scrollbar-width:thin; scrollbar-color:#2A2622 transparent;
+}
+html[data-dpl-portfolio="auf"] .dpl-schiene .dpl-teil-suche{
+  display:block !important; flex:0 0 auto !important;
+}
+/* Der Knopf zeigt, dass es weitergeht - und in welche Richtung. */
+html[data-dp-layout] .dpl-portfolio::after{
+  content:'▸'; margin-left:auto; font-size:10px; opacity:.7;
+  transition:transform .15s ease; display:inline-block;
+}
+html[data-dpl-portfolio="auf"] .dpl-portfolio::after{ transform:rotate(90deg); }
+html[data-dpl-portfolio="auf"] .dpl-portfolio{
+  background:#221F1A !important;
+}
+
+/* ── 3 · AUS DER KARTE WIRD EINE ZEILE ───────────────────────────────
+   Gemessen: eine `.sb-card` ist **210 px** hoch und fuer 380 px Breite
+   gebaut - Foto, Score-Ring, drei Kennzahlkacheln mit Verlaufsgrafik.
+   In einer 208-px-Schiene ergibt das bei 17 Objekten 3.570 px.
+
+   > Eine Liste zum SUCHEN braucht Adresse und Kennung, nicht die
+   > Auswertung. Die steht auf der Seite, sobald man das Objekt
+   > geoeffnet hat.
+
+   Versteckt werden deshalb Thumbnail, Kennzahlkacheln und
+   Aktionsknoepfe. Der Score bleibt - er ist der Grund, warum man in
+   einer Liste ueberhaupt vergleicht. */
+html[data-dp-layout] .dpl-schiene .sb-card{
+  min-height:0 !important; height:auto !important;
+  margin:0 0 2px !important; padding:5px 8px !important;
+  border-radius:4px !important;
+  background:transparent !important;
+  border:1px solid transparent !important;
+  box-shadow:none !important;
+  display:block !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card:hover{
+  background:#1A1815 !important; border-color:#2A2622 !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card.active,
+html[data-dp-layout] .dpl-schiene .sb-card.is-active{
+  background:#221F1A !important; border-color:#3A352E !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-thumb,
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-mini-grid,
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-actions,
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-halter,
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-arrow,
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-score-label{
+  display:none !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-top{
+  display:flex !important; align-items:center !important; gap:7px !important;
+  padding:0 !important; margin:0 !important; min-height:0 !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-top-body{
+  min-width:0 !important; flex:1 1 auto !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-address{
+  font-size:12px !important; line-height:1.25 !important;
+  color:#E9E3D6 !important; font-weight:500 !important;
+  white-space:nowrap !important; overflow:hidden !important;
+  text-overflow:ellipsis !important; margin:0 !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-top-line1{
+  gap:5px !important; margin:0 0 1px !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
+  font-size:9.5px !important; color:#8C8578 !important;
+  background:none !important; padding:0 !important; border:0 !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-kp-row{ margin:0 !important; }
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-kp{
+  font-size:10.5px !important; color:#BFB7A9 !important;
+  font-variant-numeric:tabular-nums;
+}
+/* Der Score-Ring wird zur kleinen Zahl rechts. `position:absolute`
+   traegt ihn sonst ueber die Adresse - gemessen, nicht vermutet:
+   `.sbc-score-overlay` ist ein DIREKTES Kind der Karte und absolut
+   gesetzt (Strukturnotiz in CLAUDE.md). */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-score-overlay{
+  position:static !important;
+  float:right !important; margin:0 0 0 6px !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-mini-score{
+  width:26px !important; height:26px !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-mini-score svg{
+  width:26px !important; height:26px !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-mini-score-num{
+  font-size:10px !important;
+}
+/* „+ Neues Objekt hinzufuegen" bleibt, aber als Zeile. */
+html[data-dp-layout] .dpl-schiene .sb-add-new{
+  padding:6px 8px !important; margin:0 0 4px !important;
+  font-size:11.5px !important; border-radius:4px !important;
+}
+/* Suche und Sortierung. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-suche .sb-section-title{
+  padding:4px 8px !important; margin:0 !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-suche input{
+  background:#171512 !important; border:1px solid #2A2622 !important;
+  color:#E9E3D6 !important; font-size:11.5px !important;
+  padding:4px 7px !important; width:100% !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-suche input::placeholder{ color:#8C8578 !important; }
+
+/* Der Schnellstart (Quick-Check · Marktbericht) direkt unter der Marke. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-schnellstart{
+  flex:0 0 auto !important; padding:0 8px 6px !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-schnellstart .sb-neu-row{
+  display:flex !important; gap:5px !important; margin:0 !important;
+  padding:0 !important; width:auto !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-schnellstart .sb-neu-row > *{
+  flex:1 1 0 !important; min-width:0 !important;
+  font-size:10px !important; padding:5px 4px !important;
+  background:#171512 !important; border:1px solid #2A2622 !important;
+  color:#BFB7A9 !important; border-radius:4px !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-schnellstart .sb-neu-lbl{
+  font-size:10px !important; color:#BFB7A9 !important;
+  white-space:nowrap !important; overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+/* ── 4 · DER ACCOUNT GANZ UNTEN ──────────────────────────────────────
+   Gemessen in der Kanzlei: `#sb-user` sass bei **y=402**, mitten in der
+   Schiene - weil dort kein Aktionsblock steht, der den Platz bis unten
+   fuellt. Und `.sb-user-text` hatte **Breite 0**: Name und E-Mail
+   waren auf null gequetscht, die drei Symbole daneben standen frei.
+
+   `margin-top:auto` schiebt ihn ans Ende, egal was darueber steht. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer{
+  margin-top:auto !important;
+  flex:0 0 auto !important;
+  border-top:1px solid #26231E !important;
+  padding:8px 10px !important;
+  background:#0A0A09 !important;
+}
+html[data-dp-layout] .dpl-schiene #sb-user{
+  display:block !important; width:auto !important; height:auto !important;
+  padding:0 !important; margin:0 !important; background:transparent !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-user-main{
+  display:flex !important; align-items:center !important; gap:8px !important;
+  width:auto !important; height:auto !important; margin:0 0 6px !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-user-avatar{
+  flex:0 0 28px !important; width:28px !important; height:28px !important;
+  font-size:12px !important;
+}
+/* DAS war der Fehler: ohne `min-width:0` und `flex:1` bleibt ein
+   Flex-Kind mit langem Text auf null stehen, statt zu kuerzen. */
+html[data-dp-layout] .dpl-schiene .sb-user-text{
+  flex:1 1 auto !important; min-width:0 !important;
+  display:block !important; width:auto !important; height:auto !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-user-name{
+  font-size:12px !important; color:#E9E3D6 !important; font-weight:600 !important;
+  white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-user-email{
+  font-size:10px !important; color:#8C8578 !important;
+  white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important;
+}
+/* Plan und Version wandern in eine gemeinsame Fusszeile mit den
+   Knoepfen - drei Dinge, die zusammengehoeren, stehen auch zusammen. */
+html[data-dp-layout] .dpl-schiene .sb-user-icons{
+  display:flex !important; align-items:center !important; gap:6px !important;
+  width:auto !important; height:auto !important; margin:0 !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-user-plan-pill{
+  font-size:9.5px !important; padding:2px 7px !important;
+  margin:0 !important; height:auto !important;
+  background:rgba(201,168,76,.18) !important;
+  border:1px solid rgba(201,168,76,.42) !important;
+  color:#E8CC7A !important; border-radius:999px !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-version-badge{
+  font-size:9.5px !important; color:#8C8578 !important;
+  background:transparent !important; border:0 !important;
+  padding:0 !important; height:auto !important; margin-left:auto !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-user-icon-btn{
+  flex:0 0 26px !important; width:26px !important; height:26px !important;
+  background:#171512 !important; border:1px solid #2A2622 !important;
+  color:#BFB7A9 !important; border-radius:5px !important;
+  display:flex !important; align-items:center !important; justify-content:center !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-user-icon-btn:hover{
+  color:#F5EFE2 !important; border-color:#3A352E !important;
+}
+/* Die Plan-Pille steht im Textblock - das ist ihr einziger Platz im
+   DOM. Sie hier zu verstecken und in der Fusszeile zu erwarten waere
+   ein Denkfehler gewesen: ein Element ist nur einmal da. Sie bekommt
+   stattdessen eine eigene Zeile unter der E-Mail. */
+html[data-dp-layout] .dpl-schiene .sb-user-text .sb-user-plan-pill{
+  display:inline-flex !important; margin-top:3px !important;
+}
