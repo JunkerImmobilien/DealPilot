@@ -3720,14 +3720,26 @@ html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v *{
    **Staging-Abnahmepunkt:** ob „in einer Flucht" genau diese Linie
    meint, entscheidet das Auge, nicht die Messung. Die Zahlen stehen
    hier, damit die naechste Runde nicht wieder bei null anfaengt. */
-html[data-dp-layout] .dpl-schiene .dpl-wm{
-  font-size:37px !important; line-height:44px !important;
-}
-html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .dpl-marke,
-html[data-dp-layout] .dpl-schiene .dpl-marke{
-  min-height:92px !important;
-  padding-top:0 !important; padding-bottom:0 !important;
-  align-items:center !important;
+/* v1667d · MIT MEDIA-GRENZE NACHGEZOGEN. Diese beiden Regeln standen
+   seit v1663b OHNE Grenze und damit SPAETER als die Schmalschirm-
+   Fassung weiter oben (Zeile ~3284, 19 px / min-height:0). Bei gleicher
+   Spezifitaet gewinnt die spaetere - gemessen auf 390 px trug das
+   Wortbild deshalb 37 px und der Block 92, statt 19 und 0.
+
+   Aufgefallen ist es erst, als ich in v1667b dieselbe Regel eine Stufe
+   groesser noch einmal geschrieben habe - diesmal mit Grenze - und die
+   Messung trotzdem 37 px meldete. Der Fehler war also aelter als die
+   Aenderung, die ihn sichtbar machte. */
+@media (min-width: 901px){
+  html[data-dp-layout] .dpl-schiene .dpl-wm{
+    font-size:37px !important; line-height:44px !important;
+  }
+  html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .dpl-marke,
+  html[data-dp-layout] .dpl-schiene .dpl-marke{
+    min-height:92px !important;
+    padding-top:0 !important; padding-bottom:0 !important;
+    align-items:center !important;
+  }
 }
 
 /* ── v1664 · DAS SCORE-BAND IN DER SCHIENE ───────────────────────────
@@ -4561,4 +4573,20 @@ html[data-dp-layout="v2"] .dpl-schiene .dpl-teil-score{
    Auslieferungszustand bleibt, wie sie ist. */
 html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen .sb-act-item{
   padding:2px 9px !important;
+}
+
+/* ── v1667e · DER ABSTAND GILT NUR IN DER SPALTE ─────────────────────
+   Gemessen auf 834 px, Kanzlei: die Leiste war **244 px** hoch. Die
+   22 px Abstand aus v1667 standen ohne Media-Grenze und wirkten auch
+   dort, wo die Schiene eine ZEILE ist — dort schiebt ein `margin-top`
+   nichts auseinander, sondern macht die ganze Leiste höher.
+
+   > Dritte Regel an einem Tag, die ihre Form nicht mitgedacht hat.
+   > Ein `margin-top` beschreibt „darunter"; in einer Zeile gibt es
+   > kein Darunter. */
+@media (max-width: 900px){
+  html[data-dp-layout="v2"] .dpl-schiene .dpl-teil-score,
+  html[data-dp-layout] .dpl-schiene .dpl-teil-score{
+    margin-top:0 !important;
+  }
 }
