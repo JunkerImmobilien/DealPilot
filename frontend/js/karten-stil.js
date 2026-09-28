@@ -264,6 +264,50 @@
     if (window.DealPilotLayout && typeof window.DealPilotLayout.karteMarke === 'function') {
       try { window.DealPilotLayout.karteMarke(); } catch (e) {}
     }
+
+    rahmenNachziehen();
+  }
+
+  /* ── v1663d · DAS QUICKBOARDING IST EIN EIGENES DOKUMENT ───────────
+     Marcel: „da muesstest du auch noch mal nach der Pre-Flight-Karte
+     schauen. Die sieht halt dort immer noch genauso aus. Die soll ja
+     so aussehen wie im Tab Objekt."
+
+     Gemessen - ZWEI Gruende, nicht einer:
+
+       1. Das QuickBoarding laeuft im iframe `#qc-v17-frame`
+          (`quickcheck-app.html`). Sein `<html>` traegt
+          `class="qc-app qc-embedded"` und **kein**
+          `data-dp-kartenstil` - jede Regel, die damit anfaengt,
+          greift dort nicht. Die Marke sitzt am falschen Dokument.
+
+       2. Die Leiste heisst dort **`#qc7-sources`**, nicht `#oab-bar`.
+          Alle 29 Kartei-Regeln hatten die ID der Hauptanwendung im
+          Selektor - genau die ID, die sie ueberhaupt erst gewinnen
+          laesst. Sie heissen jetzt `:is(#oab-bar,#qc7-sources)`;
+          `:is()` behaelt die ID-Spezifitaet, die Kaskade verschiebt
+          sich also nicht.
+
+     > Zwei Ursachen, die dasselbe Bild erzeugen, sehen aus wie eine.
+     > Haette ich nur die ID geweitet, waere nichts passiert - und ich
+     > haette die Weitung fuer widerlegt gehalten.
+
+     Die Bruecke steht hier und nicht in `qc-bridge.js`: dessen
+     qcpm-Overlay ist als „nicht anfassen" vermerkt, und eine Marke
+     nachzuziehen ist Sache dessen, der sie setzt. */
+  function rahmenNachziehen() {
+    var f = document.getElementById('qc-v17-frame');
+    if (!f) return;
+    var doc;
+    try { doc = f.contentDocument || (f.contentWindow && f.contentWindow.document); } catch (e) { return; }
+    if (!doc || !doc.documentElement) return;
+    var h = doc.documentElement;
+    if (aktuell && layoutAktiv()) h.setAttribute('data-dp-kartenstil', aktuell);
+    else h.removeAttribute('data-dp-kartenstil');
+    if (!f._dpkLoad) {
+      f._dpkLoad = true;
+      f.addEventListener('load', function () { rahmenNachziehen(); });
+    }
   }
 
   /* ── Der Beobachter ───────────────────────────────────────────────
@@ -273,7 +317,13 @@
      Fehler, nicht wie ein Stil. */
   function beobachten() {
     if (wache || !window.MutationObserver) return;
-    wache = new MutationObserver(function () { if (aktuell) anwenden(); });
+    wache = new MutationObserver(function () {
+      if (aktuell) anwenden();
+      /* v1663d: das QuickBoarding-iframe entsteht erst beim ersten
+         Oeffnen - die Marke muss ihm nachgereicht werden, sobald es
+         da ist. Ein einmaliger Aufruf beim Start trifft es nie. */
+      rahmenNachziehen();
+    });
     wache.observe(document.body, { childList: true, subtree: true });
   }
 
