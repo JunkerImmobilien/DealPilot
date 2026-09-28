@@ -2248,3 +2248,82 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-schnellstart .sb-neu-lbl{
 .dpl-schalter{
   left:auto !important; right:14px !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1654d · DIE KENNZAHLEN-PILLEN — UND EINE ZWEITE RUECKNAHME
+
+   Marcel am 28.09.2026: „die Zusammensetzung des Deal Scores, das sieht
+   in der Demo noch anders aus. Man kann auch den KPIs nicht entnehmen,
+   wie viele angegeben wurden davon."
+
+   ── DIE ANGABE IST DA, SIE IST NUR AUSGEBLENDET ──────────────────────
+   Jede Pille traegt `.sc-pill-sub` mit genau dieser Auskunft:
+
+     RENDITE  72 %   4 / 4 KPIs
+     FINANZ.  90 %   5 / 5 KPIs
+     RISIKO   47 %   5 / 6 KPIs
+     LAGE     68 %   4 / 5 KPIs
+     UPSIDE   56 %   2 / 4 KPIs
+
+   Gemessen: `display:none`. Der Wert steht auch im `title` - aber ein
+   `title` erscheint erst nach einer Sekunde Stillhalten, und danach
+   sucht niemand.
+
+   > Eine Zahl, die man nur im Tooltip findet, ist fuer den, der sie
+   > braucht, nicht vorhanden. **„2 / 4 KPIs" bei Upside erklaert die
+   > 56 % — ohne die Angabe sieht die Zahl aus wie ein Urteil, dabei
+   > ist sie eine halbe Auskunft.**
+
+   ── UND DIE RUECKNAHME ───────────────────────────────────────────────
+   In v1653h habe ich meine Regel `.sc-pill *{color:#E9E3D6}`
+   zurueckgenommen, mit der Begruendung, die Pillen seien „helle
+   Kacheln auf dunklem Kopf" und deshalb lesbar.
+
+   **Das stimmt nicht mehr.** Gemessen: `.sc-pill-v` traegt
+   `rgb(26,23,20)`, und der Grund ist seit v1653g der Kopf selbst -
+   Obsidian. Kontrast rund 1,1. Meine eigene Aenderung an
+   `.hdr-v61-row2` hatte der Pille die weisse Flaeche genommen, und
+   das habe ich beim Zuruecknehmen nicht mitgedacht.
+
+   Diesmal wird beides zusammen gesetzt: Flaeche UND Schrift. Die
+   Stufenfarbe (`tier-gold`, `tier-green`, `tier-red`) bleibt, wo sie
+   Bedeutung traegt - auf dem Balken `.sc-bar`.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+html[data-dp-layout] body header.hdr .sc-pill{
+  background:#171512 !important;
+  border:1px solid #2A2622 !important;
+  border-radius:6px !important;
+}
+html[data-dp-layout] body header.hdr .sc-pill .sc-pill-v{
+  color:#F5EFE2 !important;
+}
+html[data-dp-layout] body header.hdr .sc-pill .sc-pill-l{
+  color:#A69E90 !important;     /* 6,2 gegen #171512 */
+}
+/* Die Auskunft, die Marcel vermisst hat. */
+html[data-dp-layout] body header.hdr .sc-pill .sc-pill-sub{
+  display:block !important;
+  color:#8C8578 !important;
+  font-size:9.5px !important;
+  letter-spacing:.02em !important;
+  margin-top:1px !important;
+  font-variant-numeric:tabular-nums;
+}
+/* Der grosse Score daneben. */
+html[data-dp-layout] body header.hdr .sc-main,
+html[data-dp-layout] body header.hdr #hdr-score-mini{
+  background:#171512 !important;
+  border:1px solid #2A2622 !important;
+}
+html[data-dp-layout] body header.hdr .sc-main *,
+html[data-dp-layout] body header.hdr #hdr-score-mini *{
+  color:#F5EFE2 !important;
+}
+/* Ausnahme: was eine Stufenfarbe traegt, behaelt sie. Gruen und Rot
+   bedeuten etwas und werden in keiner Marke umgefaerbt (CLAUDE.md). */
+html[data-dp-layout] body header.hdr .sc-bar,
+html[data-dp-layout] body header.hdr .sc-donut,
+html[data-dp-layout] body header.hdr .sc-ring{
+  filter:none !important;
+}
