@@ -118,14 +118,46 @@
       rz.appendChild(z);
     }
     var n = bar.querySelectorAll('.dp-pf-tile input:checked').length;
-    z.textContent = n === 1 ? '1 Quelle gewählt' : n + ' Quellen gewählt';
+    var neu = n === 1 ? '1 Quelle gewählt' : n + ' Quellen gewählt';
+    /* NUR schreiben, wenn sich etwas ändert. Siehe `anwenden()`. */
+    if (z.textContent !== neu) z.textContent = neu;
   }
 
-  /* ── Anwenden ─────────────────────────────────────────────────────── */
+  /* ── Anwenden ─────────────────────────────────────────────────────
+     > **Ein Beobachter, der auf seine eigenen Änderungen reagiert,
+     > ist eine Endlosschleife.** Genau das ist am 28.09.2026 passiert:
+     > `zaehlung()` setzte bei der Bordkarte jedes Mal `textContent`,
+     > der Beobachter (`childList`, `subtree`) feuerte darauf, rief
+     > `anwenden()`, und der Browser-Tab fror ein - kein Fehler in der
+     > Konsole, keine Meldung, nur Stille.
+     >
+     > Zwei Riegel, weil einer allein von der nächsten Änderung wieder
+     > aufgehoben werden kann: die Zählung schreibt nur bei echter
+     > Änderung (oben), UND der Beobachter ist abgeklemmt, solange hier
+     > gearbeitet wird. */
+  var inArbeit = false;
   function anwenden() {
-    var bar = document.getElementById('oab-bar');
-    if (aktuell === 'trichter') { ertragBauen(bar); } else { ertragAbraeumen(); }
-    zaehlung(bar);
+    if (inArbeit) return;
+    inArbeit = true;
+    if (wache) wache.disconnect();
+    try {
+      var bar = document.getElementById('oab-bar');
+      if (aktuell === 'trichter') { ertragBauen(bar); } else { ertragAbraeumen(); }
+      zaehlung(bar);
+    } catch (e) {
+      try { console.warn('[karten-stil]', e); } catch (e2) {}
+    }
+    inArbeit = false;
+    /* Erst im nächsten Bild wieder zuhören - sonst stehen die eigenen
+       Änderungen schon in der Warteschlange des Beobachters. */
+    if (wache) {
+      var w = wache;
+      (window.requestAnimationFrame || setTimeout)(function () {
+        if (w === wache && document.body) {
+          w.observe(document.body, { childList: true, subtree: true });
+        }
+      }, 0);
+    }
   }
 
   function setze(stil) {
