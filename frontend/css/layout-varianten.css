@@ -3440,3 +3440,78 @@ html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-l{
 html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-sub{
   color:#9A9287 !important;
 }
+
+/* ── v1659b · DER ARBEITSBEREICH BEKOMMT DEN LEICHTEN GRAUTON ────────
+   Marcel: „da haette ich ganz gerne, dass der Arbeitsbereich auch
+   leicht wie in der Demo bei der Kanzlei in diesem, ich glaube, da ist
+   ein ganz, ganz leichtes Grau hinter den Objekt- und Fotos."
+
+   Gemessen in der Demo: `--grau` ist **rgb(244,242,237)**. Der
+   Arbeitsbereich trug bisher `#F8F6F1` (den Obsidian-Wert), und die
+   Abschnitte `.sec` darauf sind WEISS - dadurch sieht man vom Grau
+   nichts.
+
+   > Es fehlte nicht der Ton, sondern die Flaeche, auf der er zu sehen
+   > ist. Die Abschnitte treten zurueck, die Karten bleiben weiss - so
+   > liegt das Papier auf dem Tisch und nicht auf Papier. */
+html[data-dp-layout] body .body{
+  background:#F4F2ED !important;
+}
+html[data-dp-layout] body .body > .sec,
+html[data-dp-layout] body .sec{
+  background:transparent !important;
+}
+
+/* ── v1659b · DER SCORE UEBER DIE GANZE BREITE ───────────────────────
+   Marcel: „oben den Investor Deal Score haette ich gerne ueber die
+   gesamte Breite, so wie es dort auch angegeben ist, mit den KPIs
+   aber, wie viele dann auch ausgefuellt sind, und vielleicht am Anfang
+   noch den Score."
+
+   Also: EIN Band ueber die volle Breite - links der Score, danach die
+   fuenf Kennzahlen mit ihrer Angabe „4 / 4 KPIs". Der Chip war bisher
+   ein eigenes Kaestchen daneben; jetzt ist er die erste Zelle
+   desselben Bandes.
+
+   > Ein Band sagt „das gehoert zusammen". Zwei Kaestchen sagen „das
+   > sind zwei Dinge" - und das sind es nicht: die fuenf Kennzahlen
+   > SIND der Score. */
+html[data-dp-layout] body header.hdr #hdr-badges{
+  display:flex !important; align-items:stretch !important;
+  gap:0 !important; width:100% !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .scores{
+  display:flex !important; align-items:stretch !important;
+  gap:0 !important; width:100% !important; flex:1 1 auto !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main{
+  flex:0 0 auto !important;
+  border-radius:2px 0 0 2px !important;
+  border-right-width:0 !important;
+  margin:0 !important;
+  align-self:stretch !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill{
+  flex:1 1 0 !important;
+  max-width:none !important;
+  border-radius:0 !important;
+  border-right-width:0 !important;
+  align-self:stretch !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill:last-of-type{
+  border-right-width:1px !important;
+  border-radius:0 2px 2px 0 !important;
+}
+/* Auf schmalen Schirmen bricht das Band um, statt die Zahlen zu
+   quetschen - fuenf Zellen brauchen mindestens 150 px je Stueck. */
+@media (max-width: 1400px){
+  html[data-dp-layout] body header.hdr #hdr-badges .scores{ flex-wrap:wrap !important; }
+  html[data-dp-layout] body header.hdr #hdr-badges .sc-main{
+    flex:0 0 auto !important; border-right-width:1px !important;
+    border-radius:2px !important; margin:2px !important;
+  }
+  html[data-dp-layout] body header.hdr #hdr-badges .sc-pill{
+    flex:1 1 150px !important; border-right-width:1px !important;
+    border-radius:2px !important; margin:2px !important;
+  }
+}

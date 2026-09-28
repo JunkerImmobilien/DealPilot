@@ -67,7 +67,8 @@
   var STILE = {
     zeile:     { name: 'Zeile',     sub: 'Eine Leiste, 55 px' },
     trichter:  { name: 'Trichter',  sub: 'Quellen links, Ergebnis rechts' },
-    bordkarte: { name: 'Bordkarte', sub: 'Abriss trennt Wählen und Abrufen' }
+    bordkarte: { name: 'Bordkarte', sub: 'Abriss trennt Wählen und Abrufen' },
+    kartei:    { name: 'Kartei',    sub: 'Kopfzeile, Quellen, Fusszeile' }
   };
 
   var aktuell = '';
@@ -144,6 +145,28 @@
     if (z.textContent !== neu) z.textContent = neu;
   }
 
+  /* ── v1659 · Die Zählung der Kartei ───────────────────────────────
+     Der Entwurf 2 führt sie rechts in der KOPFZEILE als „1 von 4
+     gewählt" - nicht unter dem Knopf wie die Bordkarte. Gesetzt wird
+     sie als Attribut an `.dp-pf-lead`, die CSS zeigt sie über
+     `attr()`; so bleibt der Text an einer Stelle und die Kopfzeile
+     braucht kein zusätzliches Element. */
+  function karteiZaehlung(bar) {
+    if (!bar) return;
+    var lead = bar.querySelector('.dp-pf-lead');
+    if (!lead) return;
+    if (aktuell !== 'kartei') {
+      if (lead.hasAttribute('data-dpk-wahl')) lead.removeAttribute('data-dpk-wahl');
+      return;
+    }
+    var alle = bar.querySelectorAll('.dp-pf-tile input').length;
+    var n = bar.querySelectorAll('.dp-pf-tile input:checked').length;
+    var neu = n + ' von ' + alle + ' gewählt';
+    if (lead.getAttribute('data-dpk-wahl') !== neu) {
+      lead.setAttribute('data-dpk-wahl', neu);
+    }
+  }
+
   /* ── v1657 · Die Objektnummer in den Kopf der Bordkarte ───────────
      Der Entwurf zeigt sie rechts in der Kopfzeile („Objekt 2026-1637")
      und beantwortet damit, wofür hier abgerufen wird. Bei einer Karte,
@@ -186,6 +209,7 @@
       if (aktuell === 'trichter') { ertragBauen(bar); } else { ertragAbraeumen(); }
       zaehlung(bar);
       objektnummerSetzen(bar);
+      karteiZaehlung(bar);
     } catch (e) {
       try { console.warn('[karten-stil]', e); } catch (e2) {}
     }
@@ -235,13 +259,14 @@
 
   /* Die Zählung muss auch auf Klicks reagieren, nicht nur auf Umbauten. */
   document.addEventListener('change', function (e) {
-    if (aktuell === 'bordkarte' && e.target && e.target.closest
+    if ((aktuell === 'bordkarte' || aktuell === 'kartei') && e.target && e.target.closest
         && e.target.closest('.dp-pf-tile')) {
       zaehlung(document.getElementById('oab-bar'));
+      karteiZaehlung(document.getElementById('oab-bar'));
     }
   }, true);
   document.addEventListener('click', function (e) {
-    if (aktuell === 'bordkarte' && e.target && e.target.closest
+    if ((aktuell === 'bordkarte' || aktuell === 'kartei') && e.target && e.target.closest
         && e.target.closest('.dp-pf-tile')) {
       setTimeout(function () { zaehlung(document.getElementById('oab-bar')); }, 30);
     }
@@ -329,10 +354,10 @@
     try { gemerkt = localStorage.getItem(LS) || ''; } catch (e) {}
 
     try {
-      if (gemerkt === 'trichter' && !localStorage.getItem(MIGRIERT)) {
-        gemerkt = 'bordkarte';
+      if ((gemerkt === 'trichter' || gemerkt === 'bordkarte') && !localStorage.getItem(MIGRIERT + 'b')) {
+        gemerkt = 'kartei';
         localStorage.setItem(LS, gemerkt);
-        localStorage.setItem(MIGRIERT, '1');
+        localStorage.setItem(MIGRIERT + 'b', '1');
       }
     } catch (e) {}
 
