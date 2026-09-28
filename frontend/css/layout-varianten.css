@@ -287,9 +287,38 @@ html[data-dpl-portfolio] #sidebar{
 }
 
 html[data-dpl-portfolio="auf"] #sidebar{ transform:translateX(0) !important; }
-html[data-dpl-portfolio="auf"]::after{
-  content:''; position:fixed; inset:0; z-index:65; background:rgba(20,18,15,.34);
-}
+
+/* ── v1656b · DER ABDUNKLER, DER DIE LISTE UNBEDIENBAR MACHTE ────────
+   Hier stand:
+
+     html[data-dpl-portfolio="auf"]::after{
+       content:''; position:fixed; inset:0; z-index:65;
+       background:rgba(20,18,15,.34); }
+
+   Das war der Schleier hinter der SCHUBLADE - richtig, solange sie
+   ueber der Arbeitsflaeche lag. Seit v1654 gibt es keine Schublade
+   mehr, die Liste steht IN der Schiene. Der Schleier blieb.
+
+   **Er deckt `inset:0` mit `z-index:65`, die Schiene hat 60.** Also
+   lag er ueber ihr - und zwar genau ab dem Moment, in dem man
+   Portfolio oeffnet. Marcel: „wenn wir auf Portfolio klicken, dann
+   kann ich kein Objekt auswaehlen. Es wird zwar was angezeigt, aber so
+   richtig auswaehlen kann man das nicht."
+
+   Gemessen mit `elementsFromPoint(103,96)`:
+
+     HTML            <- der Schleier, als Pseudoelement des <html>
+     .dpl-portfolio
+     .dpl-schiene
+
+   Der Kopf blieb bedienbar, weil er `z-index:300` traegt - deshalb
+   traf `#hdr-obj` und sonst nichts links davon.
+
+   > **Ein Pseudoelement erscheint in `elementsFromPoint` unter dem
+   > Namen seines Elements.** „HTML liegt ganz oben" heisst nie, dass
+   > das Wurzelelement etwas tut - es heisst, dass an ihm ein
+   > `::before` oder `::after` haengt. Ich habe diesen Befund zweimal
+   > gesehen und beim ersten Mal als Artefakt abgetan. */
 
 /* ═══ 4 · DIE FÜNF ══════════════════════════════════════════════════ */
 
