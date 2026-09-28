@@ -2603,3 +2603,31 @@ html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v,
 html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v *{
   color:#F5EFE2 !important;
 }
+
+/* ── v1655d · DAS GOLD SASS EINE EBENE TIEFER ────────────────────────
+   Der Chip sah golden aus, obwohl `.sc-main` gemessen
+   `background-color: rgb(23,21,18)` und `background-image: none`
+   trug. **Beide Messungen stimmten** - das Gold lag in `.si`, dem
+   Behaelter von Ring und Text: `linear-gradient(135deg, #E8CC7A,
+   #C9A84C…)`, 193x30, also ueber dem ganzen Inhalt.
+
+   > Ich hatte `.si` auf `display:flex` gesetzt und seinen Hintergrund
+   > nicht angefasst - derselbe Halbgriff wie bei den Score-Pillen in
+   > v1653h: **Form geaendert, Flaeche vergessen.**
+
+   Und noch eine Luecke in meinem Pruefer: `.sc-donut::before` traegt
+   `rgb(255,253,247)` - der helle Innenkreis des Rings, auf dem meine
+   helle Zahl stand. **Pseudoelemente prueft er nicht**, deshalb meldete
+   er auch hier sauber. Der Innenkreis wird dunkel; die Zahl bleibt
+   hell, und der farbige Ring aussen behaelt seine Stufenfarbe. */
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .si{
+  background:transparent !important;
+  background-image:none !important;
+  border:0 !important; box-shadow:none !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut::before{
+  background:#171512 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-investor-badge{
+  background-image:none !important;
+}
