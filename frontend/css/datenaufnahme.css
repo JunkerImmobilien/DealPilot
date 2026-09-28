@@ -769,3 +769,13 @@ html[data-dp-karte="trichter"] .dpk-ertrag .dp-pf-rz{
 html[data-dp-karte="trichter"] .dp-pfbar > .dp-pf-seg:first-of-type{
   padding-top:11px !important;
 }
+
+/* v1651f · und die AUSRICHTUNG. Der Kopf stand mittig, weil
+   `.dp-pf-lead` aus der Basis `justify-content:center` traegt - in
+   einer 55-px-Leiste richtig, in einer Karte nicht. Derselbe Satz wie
+   oben, nur die naechste Eigenschaft: eine Regel aendert nur, was sie
+   benennt. */
+html[data-dp-karte="bordkarte"] .dp-pfbar .dp-pf-lead{
+  justify-content:flex-start !important;
+  text-align:left !important;
+}
