@@ -130,7 +130,10 @@
       objekteAls: 'liste',
       schienen: [
         { stellung: 'links', ton: 'dunkel', marke: true, portfolio: true,
-          nimmt: ['suche', 'objekte', 'aktionen', 'nutzer'] }
+          /* v1664: Die Reihenfolge in `nimmt` IST die Reihenfolge in der
+             Schiene - der Score steht zwischen Aktionen und Nutzer,
+             genau da, wo Marcel ihn haben wollte. */
+          nimmt: ['suche', 'objekte', 'aktionen', 'score', 'nutzer'] }
       ]
     },
     v2: {
@@ -150,6 +153,21 @@
     aktionen: '#sb-actions-accordion',
     schalter: '#sb-actions-trigger-btn',
     nutzer:   '#sb-user',
+    /* ── v1664 · DAS SCORE-BAND ────────────────────────────────────
+       Marcel: „koennen wir es bei der Aktenmappe 2 so machen, dass wir
+       die Werte fuer Rendite, Finanzierung, Risiko, Lage, Upside
+       einfach mal unter diese Aktionen links machen, also ueber dem
+       Usernamen - und auch mit dem Score."
+
+       `#hdr-badges` ist der VORHANDENE Knoten aus `header.hdr`; er
+       traegt `.sc-main` (Ring + Stufe) und die fuenf `.sc-pill`. Er
+       wandert wie alles andere ueber die Rueckfahrkarte `hole()`, also
+       kommt er in „Heute" an seinen Platz im Kopf zurueck.
+
+       > Ein zweites Score-Band waere am ersten Tag dasselbe und am
+       > dreissigsten nicht mehr. Derselbe Grund, aus dem `#sb-list`
+       > verschoben und nicht nachgebaut wird. */
+    score:    '#hdr-badges',
     /* v1654: die Objektliste selbst. Marcel am 28.09.2026: „wenn ich
        auf Portfolio klicke, dann oeffnet sich komischerweise eine neue
        Ansicht mit Objekten und ich kann die nicht minimieren. Da waere

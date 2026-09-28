@@ -428,8 +428,17 @@
     var billed = sel.filter(function (s) { return KOSTET[s] != null; });
     if (!billed.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
     var demo = !!(_avmHealth && _avmHealth.mode === 'stub');
+    /* v1664 · Anbieter-Neutralitaet. v1194 hat hier die Waehrung
+       aufgeraeumt und die Namen stehen lassen - CLAUDE.md sagt aber
+       „Sprengnetter und PriceHubble nie namentlich nach aussen,
+       unabhaengige Bewertungspartner". DealPilot ist die eigene Marke
+       und darf stehen; ImmoMetrica duerfte es auch.
+
+       > Eine Neutralitaetsregel, die nur fuer Werbetexte gilt, ist
+       > keine. Sie gilt genau dort, wo der Kunde hinsieht - und das ist
+       > der Kostenhinweis ueber dem Knopf. */
     var parts = billed.map(function (s) {
-      var nm = s === 'pricehubble' ? 'PriceHubble' : (s === 'dealpilot' ? 'DealPilot' : 'Sprengnetter');
+      var nm = s === 'dealpilot' ? 'DealPilot' : 'unabhängiger Bewertungspartner';
       return '<b>' + KOSTET[s] + '</b> (' + nm + ')';
     }).join(' + ');
     var txt = 'Beim <b>Abrufen</b> ' + (billed.length > 1 ? 'werden ' : 'wird ') + parts + ' aus deinem Kontingent verbraucht.';
@@ -479,7 +488,22 @@
        und stuende mit "0 L" im Kasten. Wer nur die Sprachaufzeichnung
        waehlt, sieht jetzt gar kein Modal (costing ist leer -> direkt los).
        Fuer die AVM-Abrufe bleibt die Frage: die kosten wirklich. */
-    var KL = { pricehubble: 40, sprengnetter: 20, dealpilot: 2 };
+    /* ── v1664 · DAS MODAL RECHNETE WEITER IN LITERN ─────────────────────
+       Marcel: „geh das auch im Tab Objekt noch mal durch."
+
+       v1194 hat den HINWEIS unter der Leiste (`updateCreditHint`) von
+       Litern auf Abrufe umgestellt - dieses Modal daneben nicht. Es zeigte
+       weiter „40 L PriceHubble + 20 L Sprengnetter" und einen Knopf
+       „Abrufen (60 L)".
+
+       > Zwei Stellen, die dasselbe ankuendigen, und nur eine wurde
+       > umgestellt: der Nutzer liest erst „1 Marktwert-Abruf" und
+       > bestaetigt dann „60 L". Eine halbe Abschaffung ist schlimmer als
+       > keine - sie sieht aus wie ein Rechenfehler.
+
+       Die Zahlen bleiben als MENGE erhalten (ein Abruf je Anbieter,
+       `routes/avm.js:236`), nur ohne Einheit und ohne Anbieternamen. */
+    var KL = { pricehubble: 1, sprengnetter: 1, dealpilot: 1 };
     var demo = !!(typeof _avmHealth !== 'undefined' && _avmHealth && _avmHealth.mode === 'stub');
     var billed = sel.filter(function (x) { return KL[x] != null; });
     /* v1259: Im Demo-/Stub-Modus kostet kein AVM-Abruf etwas — und die
@@ -487,22 +511,25 @@
        kostet jetzt nirgends mehr. Also faellt das Modal im Demo ganz weg. */
     var costing = demo ? [] : billed;
     if (!costing.length) { try { runSelected(); } catch (e) {} return; }
-    var NM = { pricehubble: 'PriceHubble', sprengnetter: 'Sprengnetter', dealpilot: 'DealPilot' };  /* v1259: voice raus */
+    /* v1664: Anbieter-Neutralitaet - CLAUDE.md sagt "Sprengnetter und
+       PriceHubble nie namentlich nach aussen". DealPilot ist die eigene
+       Marke und darf stehen. */
+    var NM = { pricehubble: 'Marktwert-Abruf', sprengnetter: 'Marktwert-Abruf', dealpilot: 'Bewertung DealPilot' };
     var total = costing.reduce(function (a, x) { return a + KL[x]; }, 0);
-    var parts = costing.map(function (x) { return '<b>' + KL[x] + '\u00a0L</b> ' + NM[x]; }).join(' + ');
+    var parts = costing.map(function (x) { return '<b>' + KL[x] + '</b> ' + NM[x]; }).join(' + ');
     var ov = document.createElement('div'); ov.className = 'v754-ov';
     ov.innerHTML =
       '<div class="v754-modal" role="dialog" aria-modal="true">' +
         '<div class="v754-hero"><span class="bp">BOARDING PASS \u00b7 DEALPILOT</span><h3>Abruf best\u00e4tigen</h3></div>' +
         '<div class="v754-body">Für diesen Abruf wird dein Kontingent belastet:' +
-          '<div class="v754-cost">' + parts + (costing.length > 1 ? ' &nbsp;=&nbsp; <b>' + total + '\u00a0L</b> gesamt' : '') + '</div>' +
+          '<div class="v754-cost">' + parts + '</div>' +
           'M\u00f6chtest du fortfahren?' +
           '<label style="display:flex;align-items:center;gap:7px;margin-top:12px;font-size:12.5px;color:#6b6660;cursor:pointer">' +
             '<input type="checkbox" id="v754-skip" style="accent-color:var(--wl-c9a84c, #C9A84C)"> Nicht mehr fragen' +
           '</label></div>' +
         '<div class="v754-foot">' +
           '<button type="button" class="v754-btn v754-cancel" id="v754-cancel">Abbrechen</button>' +
-          '<button type="button" class="v754-btn v754-go" id="v754-go">Abrufen (' + total + '\u00a0L)</button>' +
+          '<button type="button" class="v754-btn v754-go" id="v754-go">Abrufen</button>' +
         '</div>' +
       '</div>';
     document.body.appendChild(ov);

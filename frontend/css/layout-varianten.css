@@ -3729,3 +3729,110 @@ html[data-dp-layout] .dpl-schiene .dpl-marke{
   padding-top:0 !important; padding-bottom:0 !important;
   align-items:center !important;
 }
+
+/* ── v1664 · DAS SCORE-BAND IN DER SCHIENE ───────────────────────────
+   Marcel: „die Werte fuer Rendite, Finanzierung, Risiko, Lage, Upside
+   einfach mal unter diese Aktionen links, ueber dem Usernamen - und
+   auch mit dem Score. Und natuerlich den Deal Score dann oben aus der
+   Tab-Leiste raus. Das ist alles goldfarben, das muesste in der Farbe
+   abgebildet werden wie wir jetzt den Rest auch abgebildet haben."
+
+   Im Kopf war das Band eine ZEILE: Chip plus fuenf Kacheln
+   nebeneinander, 1881 px breit. In einer 248-px-Schiene ist das keine
+   Zeile mehr, sondern sechs Spalten a 41 px.
+
+   > Ein Band, das die Seite wechselt, wechselt auch die Richtung.
+   > Nebeneinander heisst „gleichzeitig", untereinander heisst „der
+   > Reihe nach" - hier ist beides richtig, es kommt nur auf den Platz
+   > an.
+
+   Und der TON: im Kopf standen Chip und Kacheln auf Weiss mit
+   Goldrahmen. In der dunklen Schiene waere das ein Lichtfleck. Die
+   Flaechen treten deshalb zurueck (durchsichtig, Haarlinie als
+   Trenner) und nur die Werte tragen Farbe - dieselbe Sprache wie die
+   Reiter und die Objektliste daneben. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-score{
+  flex:0 0 auto !important;
+  margin-top:auto !important;
+  padding:10px 0 4px !important;
+  border-top:1px solid var(--dpl-linie) !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges{
+  display:block !important;
+  width:auto !important; max-width:none !important;
+  padding:0 !important; margin:0 !important;
+  background:transparent !important; border:0 !important;
+  box-shadow:none !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score .scores{
+  display:flex !important; flex-direction:column !important;
+  align-items:stretch !important; gap:0 !important;
+  width:auto !important; background:transparent !important;
+  border:0 !important; box-shadow:none !important;
+}
+/* Der Score-Chip als Kopf des Blocks. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-main{
+  display:flex !important; flex-direction:row !important;
+  align-items:center !important; gap:10px !important;
+  width:auto !important; min-height:0 !important;
+  margin:0 8px 8px !important; padding:0 8px !important;
+  background:transparent !important; border:0 !important;
+  box-shadow:none !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-main .sc-donut{
+  width:38px !important; height:38px !important; flex:0 0 38px !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-main .sc-donut,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-main .sc-donut > *{
+  font-size:13px !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-main .sc-v,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-main .sc-v *{
+  font-size:13px !important; color:#F2EDE3 !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-main .sc-l,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-main .sc-l *{
+  color:#8C8578 !important;
+}
+/* Die fuenf Kennzahlen als Zeilen: Wort links, Zahl rechts. In einer
+   248-px-Spalte ist das die einzige Anordnung, bei der beides ohne
+   Umbruch lesbar bleibt - der gestapelte Aufbau aus dem Kopf braucht
+   dort drei Zeilen je Kennzahl. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-pill{
+  display:grid !important;
+  grid-template-columns:1fr auto !important;
+  grid-template-rows:auto auto !important;
+  align-items:baseline !important;
+  column-gap:8px !important; row-gap:0 !important;
+  width:auto !important; min-height:0 !important;
+  margin:0 !important; padding:7px 16px 8px !important;
+  background:transparent !important;
+  border:0 !important; border-radius:0 !important;
+  box-shadow:none !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-pill + .sc-pill{
+  border-top:1px solid color-mix(in srgb, var(--dpl-linie) 55%, transparent) !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-pill .sc-pill-l{
+  grid-column:1; grid-row:1;
+  font-size:9px !important; letter-spacing:.9px !important;
+  color:#8C8578 !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-pill .sc-pill-v{
+  grid-column:2; grid-row:1 / span 2;
+  align-self:center !important;
+  width:auto !important; text-align:right !important;
+  font-size:15px !important; font-weight:700 !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-pill .sc-pill-sub{
+  grid-column:1; grid-row:2;
+  font-size:8.5px !important; color:#6E675C !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score .sc-pill .sc-bar{
+  display:none !important;
+}
+/* Der Kopf verliert damit seine zweite Zeile - ohne das behielte er
+   die Hoehe des Bandes als leere Flaeche. */
+html[data-dp-layout="v1b"] body header.hdr{
+  min-height:0 !important;
+}

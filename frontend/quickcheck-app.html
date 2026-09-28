@@ -3411,7 +3411,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
           <input type="checkbox" value="expose" onchange="QcApp.toggleSource(this)" style="display:none">
           <span class="dp-pf-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg></span><span class="dp-pf-lbl">Exposé / Marktbericht</span><span class="dp-pf-led"></span>
         </label>
-        <label class="qc7-src dp-pf-tile tool" data-src="voice" title="Objekt frei einsprechen — 1 L Kerosin">
+        <label class="qc7-src dp-pf-tile tool" data-src="voice" title="Objekt frei einsprechen — im Plan enthalten">
           <input type="checkbox" value="voice" onchange="QcApp.toggleSource(this)" style="display:none">
           <span class="dp-pf-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></span><span class="dp-pf-lbl">Sprachaufzeichnung</span><span class="dp-pf-led"></span>
         </label>
@@ -5681,14 +5681,37 @@ function renderTransferList() {
     var inputs = QcEngine.getInputs();
     var hasKp = !!QcEngine.num(inputs.kp);
     var parts = [];
-    /* v505-kerosin-hint: Liter-Saetze gemaess Backend (avm.js COST + ai.js extract-voice) */
-    if (sel.indexOf('voice') !== -1) parts.push('<b>1\u00a0L</b> Sprachauswertung');
-    if (sel.indexOf('ph')  !== -1) parts.push('<b>40\u00a0L</b> PriceHubble');
-    if (sel.indexOf('spr') !== -1) parts.push('<b>20\u00a0L</b> Sprengnetter');
-    if (sel.indexOf('dpmb') !== -1) parts.push('<b>2\u00a0L</b> DealPilot');
+    /* \u2500\u2500 v1664 \u00b7 DER HINWEIS RECHNETE HIER NOCH IN LITERN \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+       Marcel: \u201eda steht auch noch, wenn ich Sprache auswaehle, dass ein
+       Liter Kerosin verbraucht wird. Das haben wir gar nicht mehr."
+
+       Genau derselbe Befund wie in v1194 im Objekt-Tab - nur stand er
+       hier im iframe und ist damals nicht mitgekommen. Hier stand:
+
+         voice  1 L    ph  40 L    spr  20 L    dpmb  2 L
+
+       DREI Fehler in vier Zeilen:
+
+         \u00b7 Die Einheit gibt es seit v1183 nicht mehr.
+         \u00b7 Die Sprachauswertung kostet UEBERHAUPT nichts mehr
+           (`ai.js:514` bucht ueber `logExtract`, \u201eim Plan enthalten").
+           Fuer etwas Kostenloses ein Preisschild zu zeigen ist derselbe
+           Fehler wie eine abgeschaffte Waehrung, nur andersherum.
+         \u00b7 Die Zahlen 40 und 20 waren der alte Litertarif; der Server
+           zieht je Anbieter genau EINEN Abruf (`routes/avm.js:236`,
+           `required: 1`).
+
+       Und ein vierter, der nicht im Kerosin steckt: **die Zeilen nannten
+       die Bewertungspartner beim Namen.** CLAUDE.md sagt dazu
+       \u201eSprengnetter und PriceHubble nie namentlich nach aussen". Der
+       Objekt-Tab tat es bis v1664 ebenfalls. */
+    if (sel.indexOf('ph')  !== -1) parts.push('<b>1 Marktwert-Abruf</b>');
+    if (sel.indexOf('spr') !== -1) parts.push('<b>1 Marktwert-Abruf</b>');
+    if (sel.indexOf('dpmb') !== -1) parts.push('<b>1 Bewertung</b>');
     if (!parts.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
     var n = parts.length;
-    var txt = 'Beim <b>Abrufen</b> ' + (n > 1 ? 'werden ' : 'wird ') + parts.join(' + ') + ' Kerosin verbraucht.';
+    var txt = 'Beim <b>Abrufen</b> ' + (n > 1 ? 'werden ' : 'wird ') + parts.join(' + ')
+            + ' aus deinem Kontingent verbraucht.';
     var demo = false;
     try { demo = !!(window._qcAvmHealth && window._qcAvmHealth.mode === 'stub'); } catch (e) {}
     if (demo) txt += ' <span style="opacity:.75">Im Demo-Modus aktuell kostenlos.</span>';
