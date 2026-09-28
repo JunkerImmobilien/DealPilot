@@ -1253,3 +1253,58 @@ html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-act-section-title,
 html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-act-section-title{
   color:#8C8578 !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1652b · die zwei Reste und das groessere Logo
+
+   Nach v1652 blieben genau zwei Stellen unter 4,5 - gemessen, nicht
+   geschaetzt:
+
+     .tabs-status-text   1.08   „0 / 6 · 0 %"   (der Fortschritt)
+     .sb-actions-l       1.60   „Aktionen"      (der Aufklapper)
+
+   Der zweite ist lehrreich: meine Regel AUS v1652 benennt
+   `.sb-actions-l` ausdruecklich und hat trotzdem verloren.
+   `style.css:26792` schreibt
+   `aside.sidebar .sb-actions-trigger .sb-actions-l` - drei Klassen
+   und zwei Elemente gegen meine zwei Klassen und zwei Attribute. Beide
+   ohne `!important`, also entscheidet die Spezifitaet, und meine war
+   niedriger.
+
+   > **Eine Klasse zu benennen heisst nicht, sie zu treffen.** Wer eine
+   > fremde Farbe ueberschreibt, muss wissen, WELCHE Regel sie setzt -
+   > nicht nur, WIE das Element heisst.
+
+   ── DAS LOGO ────────────────────────────────────────────────────────
+   Marcel: „DealPilot Logo oben links duerfte groesser sein."
+   Gemessen: Schriftgrad 20 px in einem 58 px hohen Feld bei 208 px
+   Schienenbreite - der Schriftzug nahm 82 von 207 px ein, also 40 %.
+   Auf 26 px wird daraus rund 107 px, gut die Haelfte. Mehr traegt die
+   Schiene nicht, ohne dass „DealPilot" umbricht.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-actions-trigger .sb-actions-l,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-actions-trigger .sb-actions-l,
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] #sb-actions-trigger-btn .sb-actions-l,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] #sb-actions-trigger-btn .sb-actions-l{
+  color:#BFB7A9 !important;
+}
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .tabs-status-text,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .tabs-status-text{
+  color:#BFB7A9 !important;
+}
+
+/* Das Logo. */
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .dpl-marke,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-marke{
+  min-height:70px !important; padding-top:4px !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-wm{
+  font-size:26px !important; line-height:34px !important;
+}
+/* Ein Partnerlogo waechst mit - aber gedeckelt, sonst sprengt ein
+   breites Bild die 208 px. */
+html[data-dp-layout] .dpl-schiene .dpl-logo{
+  max-height:46px !important; max-width:176px !important;
+  width:auto !important; height:auto !important;
+}
