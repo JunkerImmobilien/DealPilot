@@ -905,3 +905,51 @@ html[data-dp-layout] .dpl-schiene #sb-actions-accordion{
   width:auto !important; z-index:auto !important;
   box-shadow:none !important; border:0 !important;
 }
+
+/* ── Die Schiene passt jetzt ins Fenster (v1649d) ───────────────────
+   Marcel: „teilweise nicht alles zu sehen."
+
+   GEMESSEN bei 854 px Fensterhoehe:
+
+     Marke            58
+     Portfolio        33
+     Reiter    9 x 31 = 330
+     Aktionen 12 x 37 + 5 Gruppentitel x 35 = 646
+     Nutzer           81
+     ────────────────────
+     Summe          1148   →  294 px zu viel
+
+   Sechs der zwoelf Aktionen lagen damit unter der Kante. Eine Schiene,
+   die scrollt, OHNE dass man es sieht, verliert die Haelfte ihrer
+   Eintraege - der Nutzer weiss nicht, dass dort noch etwas ist.
+
+   Gerechnet mit engeren Zeilen:
+     58 + 33 + 9x28 + (12x28 + 5x18) + 64 = 833  →  passt.
+
+   Die Marke bleibt gross (Marcels Wunsch) - gespart wird an den
+   Zeilen, nicht am Logo.
+
+   Zusaetzlich klebt der Nutzerblock unten fest: **Abmelden muss
+   erreichbar sein, auch wenn doch einmal gescrollt wird.** */
+html[data-dp-layout] .dpl-teil-tabs nav.tabs .tab{
+  padding:5px 10px !important; min-height:0 !important;
+  font-size:12.5px !important; line-height:1.4 !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-act-item{
+  padding:5px 9px !important; min-height:0 !important;
+  font-size:12.5px !important; line-height:1.35 !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-act-section-title{
+  padding:8px 9px 3px !important; min-height:0 !important;
+  font-family:var(--dpl-mono) !important; font-size:8.5px !important;
+  letter-spacing:.12em !important; line-height:1.2 !important;
+  color:var(--dpl-sehr-leise) !important;
+}
+html[data-dp-layout] .dpl-schiene #sb-user{
+  padding:8px 10px !important; min-height:0 !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer{
+  position:sticky !important; bottom:0 !important; z-index:2;
+  background:var(--dpl-flaeche) !important;
+  border-top:1px solid var(--dpl-linie) !important;
+}
