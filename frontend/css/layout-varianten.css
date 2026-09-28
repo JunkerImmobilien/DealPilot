@@ -230,7 +230,7 @@ html[data-dp-layout] .dpl-schiene[data-stellung="fuss"] .sb-actions-accordion-in
    > gehört dem Elternteil, nicht dem Kind.
 
    Deshalb wird hier ausdrücklich auf EINE Spur gestellt. */
-html[data-dp-layout="v1"] .app-wrap,
+html[data-dp-layout^="v1"] .app-wrap,
 html[data-dp-layout="v3"] .app-wrap,
 html[data-dp-layout="v4"] .app-wrap{
   grid-template-columns:1fr !important;
@@ -325,7 +325,7 @@ html[data-dp-layout][data-dpl-portfolio="auf"] #sidebar{ transform:translateX(0)
 /* ── v1 · AKTENMAPPE ─────────────────────────────────────────────────
    Schiene links: Reiter als Gliederung, darunter Aktionen, unten Nutzer.
    Die Objektspalte wird zur Schublade. */
-html[data-dp-layout="v1"] .app-wrap{ padding-left:var(--dpl-schiene-b) !important; }
+html[data-dp-layout^="v1"] .app-wrap{ padding-left:var(--dpl-schiene-b) !important; }
 
 /* ── v2 · KANZLEI ────────────────────────────────────────────────────
    v1653b · Dieser Block beschrieb die ALTE Kanzlei: Objektspalte links
@@ -2948,14 +2948,14 @@ html[data-dp-layout] .dpl-schiene .sb-user-icons .sb-user-plan-pill{
    `data-dpl-seiten="getauscht"` am `<html>`. Hier wandert das Polster
    mit - ohne das laege die Schiene ueber dem Inhalt, derselbe Fehler
    wie bei den Werkzeugfenstern. */
-html[data-dp-layout="v1"][data-dpl-seiten="getauscht"] .app-wrap,
-html[data-dp-layout="v1"] .app-wrap{
+html[data-dp-layout^="v1"][data-dpl-seiten="getauscht"] .app-wrap,
+html[data-dp-layout^="v1"] .app-wrap{
   padding-left:0; padding-right:0;
 }
-html[data-dp-layout="v1"]:not([data-dpl-seiten]) .app-wrap{
+html[data-dp-layout^="v1"]:not([data-dpl-seiten]) .app-wrap{
   padding-left:var(--dpl-schiene-b) !important;
 }
-html[data-dp-layout="v1"][data-dpl-seiten="getauscht"] .app-wrap{
+html[data-dp-layout^="v1"][data-dpl-seiten="getauscht"] .app-wrap{
   padding-right:var(--dpl-schiene-b) !important;
 }
 html[data-dp-layout="v2"]:not([data-dpl-seiten]) .app-wrap{
@@ -3666,7 +3666,7 @@ html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v *{
    Die Ursache war nicht die Rasterspur, sondern das POLSTER:
 
      computed padding-left = 248px
-     Sieger: html[data-dp-layout="v1"]:not([data-dpl-seiten])
+     Sieger: html[data-dp-layout^="v1"]:not([data-dpl-seiten])
              .app-wrap{ padding-left:var(--dpl-schiene-b) !important }
                                                           (0,3,1)
      Verlierer: @media (max-width:900px){
@@ -3682,9 +3682,9 @@ html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v *{
    volle Breite; jedes Polster dafuer ist dort falsch. Deshalb hier
    dieselben vier Selektoren, nur schmal. */
 @media (max-width:900px){
-  html[data-dp-layout="v1"]:not([data-dpl-seiten]) .app-wrap,
+  html[data-dp-layout^="v1"]:not([data-dpl-seiten]) .app-wrap,
   html[data-dp-layout="v2"]:not([data-dpl-seiten]) .app-wrap,
-  html[data-dp-layout="v1"][data-dpl-seiten="getauscht"] .app-wrap,
+  html[data-dp-layout^="v1"][data-dpl-seiten="getauscht"] .app-wrap,
   html[data-dp-layout="v2"][data-dpl-seiten="getauscht"] .app-wrap{
     padding-left:0 !important;
     padding-right:0 !important;

@@ -100,6 +100,39 @@
           nimmt: ['suche', 'objekte', 'aktionen', 'tabs', 'nutzer'] }
       ]
     },
+    /* v1663 · AKTENMAPPE 2 - DIE REITER BLEIBEN OBEN.
+
+       Marcel: „bei der Aktenmappe haben wir Objekt, Investition,
+       Miete - dass wir auch die Moeglichkeit haetten zu sagen, das
+       lassen wir oben als Tabbar anzeigen. Koennen wir noch eine
+       zweite Version Aktenmappe 2 machen, wo wir die Aufteilung oben
+       noch mit in den Header packen."
+
+       Der ganze Unterschied zu v1 ist EIN Wort weniger in `nimmt`:
+       ohne 'tabs' bleibt `nav.tabs` dort stehen, wo es hingebaut
+       wurde - als Leiste unter dem Kopf in `.main-col`. Die
+       allgemeinen Regeln `html[data-dp-layout] nav.tabs` (Haarlinie,
+       Gold nur als Kante) greifen dort genauso.
+
+       > Ein Layout, das sich nur in einer Zeile unterscheidet, darf
+       > auch nur eine Zeile kosten. Eine zweite Regelmenge waere ein
+       > zweiter Ort, an dem man kuenftig alles doppelt aendert.
+
+       Der Schluessel heisst `v1b` und nicht `v3`: `v3`, `v4` und `v5`
+       waren frueher eigene Layouts, und 22 ihrer CSS-Regeln stehen
+       noch in `layout-varianten.css`. Ein neues `v3` haette sie
+       stillschweigend geerbt. Damit die neun `[data-dp-layout="v1"]`
+       Regeln fuer beide gelten, heissen sie jetzt
+       `[data-dp-layout^="v1"]` - gleiche Spezifitaet, keine
+       Verschiebung in der Kaskade. */
+    v1b: {
+      name: 'Aktenmappe 2', beschreibung: 'Wie Aktenmappe, Reiter oben im Kopf',
+      objekteAls: 'liste',
+      schienen: [
+        { stellung: 'links', ton: 'dunkel', marke: true, portfolio: true,
+          nimmt: ['suche', 'objekte', 'aktionen', 'nutzer'] }
+      ]
+    },
     v2: {
       name: 'Kanzlei', beschreibung: 'Navigation links, Aktionen rechts',
       objekteAls: 'liste',

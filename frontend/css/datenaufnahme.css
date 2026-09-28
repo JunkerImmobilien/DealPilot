@@ -1199,3 +1199,33 @@ html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-rz{
     align-items:flex-start !important;
   }
 }
+
+/* ── v1663 · „DEAL" WAR NICHT GRAU, SONDERN UNSICHTBAR ───────────────
+   Marcel: „bei der DealPilot Datenaufnahme, da ist das Deal in einem
+   Grau, das muesste auch in hell sein, wie oben das Logo links."
+
+   Gemessen am Chip `.dp-pf-logo.dp`:
+
+     Grund  rgb(5,5,5)     die schwarze Pille
+     Text   rgb(26,26,24)  „Deal"        -> Kontrast 1,02
+     <b>    rgb(232,204,122) „Pilot"     -> liest sich
+
+   Das ist kein Grauton, das ist ein Wort, das nicht da ist. Ursache
+   ist eine Hellmodus-Regel (`body.dp-chrome-hell … {color:#1A1A18}`),
+   die annimmt, der Chip stuende auf hellem Grund - er behaelt aber
+   seine schwarze Pille.
+
+   > Eine Hellmodus-Regel, die nur die SCHRIFT umfaerbt, setzt voraus,
+   > dass auch die Flaeche mitgeht. Tut sie es nicht, loescht die Regel
+   > das Wort.
+
+   Die Marke oben links ist der Massstab, gemessen:
+   `.dpl-wm` = `#F2EDE3`, sein `<i>` = `#b8932f`. Der Chip bekommt
+   dasselbe Creme; das Gold des `<b>` bleibt das hellere `#E8CC7A`,
+   weil es auf Schwarz steht und nicht auf Creme. */
+html[data-dp-kartenstil] #oab-bar.dp-pfbar .dp-pf-logo.dp{
+  color:#F2EDE3 !important;
+}
+html[data-dp-kartenstil] #oab-bar.dp-pfbar .dp-pf-logo.dp b{
+  color:var(--wl-e8cc7a, #E8CC7A) !important;
+}
