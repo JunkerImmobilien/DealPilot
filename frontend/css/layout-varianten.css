@@ -3347,3 +3347,11 @@ html[data-dp-layout] :is(#sb-list) .sb-card .sbc-deal-badge{
     padding-top:88px !important;
   }
 }
+
+/* v1658d · Das Polster stand auf 88 px, die Leiste ist gemessen 139 px
+   hoch (auf 390 UND auf 834 px derselbe Wert - sie bricht auf beiden
+   gleich um). 51 px des Inhalts lagen darunter. Bedienbar war alles,
+   sichtbar nicht ganz. */
+@media (max-width: 900px){
+  html[data-dp-layout] .app-wrap{ padding-top:146px !important; }
+}
