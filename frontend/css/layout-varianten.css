@@ -1672,3 +1672,81 @@ html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-neu-row > *{
   background:#171512 !important; border-color:#2A2622 !important;
   color:#BFB7A9 !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1653g · DER KOPF WAR NUR SCHWARZ, SOLANGE KEIN OBJEKT GELADEN WAR
+
+   Nach v1653 sah der Kopf im Bild schwarz aus. Mit einem ECHTEN Objekt
+   war er wieder `rgb(255,255,255)`.
+
+   Der Kaskaden-Walker, diesmal mit ausgerechneter Spezifitaet, nennt
+   den Sieger:
+
+     html[data-ui-theme] body.dp-chrome-hell header.hdr.has-v64-score
+     -> (0,4,3), !important, ui-varianten.css
+
+   Meine Regel `html[data-dp-layout] header.hdr` ist (0,2,2). Sie hatte
+   nie eine Chance - sie hat nur gewonnen, solange `data-ui-theme` nicht
+   gesetzt war.
+
+   > **Ein Zustand, der beim Messen zufaellig fehlt, macht eine zu
+   > schwache Regel stark.** Deshalb gehoert jede Farbmessung an eine
+   > Ansicht mit ECHTEN Daten, nicht an ein leeres Objekt.
+
+   Hier wird bewusst ueber (0,4,3) gehoben: zwei Attribute und die
+   Klasse doppelt ergeben (0,5,3). Das ist unschoen und steht deshalb
+   hier an einer Stelle, kommentiert - nicht verteilt ueber die Datei.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr,
+html[data-dp-layout][data-dp-layout] body.dp-chrome-hell header.hdr.hdr{
+  background:#0E0D0B !important;
+  background-image:none !important;
+  border-bottom:1px solid #26231E !important;
+  color:#E9E3D6 !important;
+  box-shadow:none !important;
+}
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-v61-row1,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-v61-row2,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .scores{
+  background:transparent !important; background-image:none !important;
+  border-color:#26231E !important;
+}
+/* Jede Schrift im Kopf einzeln - `color` erbt nicht durch ein Kind,
+   das selbst eine hat. */
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-obj-name,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-crumb,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-sep,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-v61-row1 > span,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-v61-row1 > a,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .sc-pill,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .sc-pill *{
+  color:#E9E3D6 !important;
+}
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-obj-num{
+  background:#171512 !important; border:1px solid #2A2622 !important;
+  color:#E9E3D6 !important;
+}
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-icon-btn{
+  color:#BFB7A9 !important; background:transparent !important;
+  border-color:#26231E !important;
+}
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-icon-btn:hover{
+  color:#F5EFE2 !important; background:#171512 !important;
+}
+/* Das Fortschritts-Badge im Kopf. Gemessen stand es auf 1,99 gegen
+   Weiss - auf Obsidian mit #BFB7A9 sind es 8,5. */
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .dpl-badge-im-kopf,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .tabs-status-badge{
+  background:#171512 !important; border:1px solid #2A2622 !important;
+  margin-left:auto !important; margin-right:14px !important;
+}
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .tabs-status-text{
+  color:#BFB7A9 !important;
+}
+/* Die Kennzahlen-Pillen behalten ihre Statusfarben - Gruen und Rot
+   tragen Bedeutung und werden nie umgefaerbt (CLAUDE.md). Nur ihre
+   Flaeche wird dunkel, damit sie auf Obsidian nicht leuchten. */
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .sc-pill{
+  background:#171512 !important; border-color:#2A2622 !important;
+}
