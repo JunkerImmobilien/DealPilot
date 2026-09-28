@@ -20562,3 +20562,118 @@ Jetzt `#FBF6E9` mit schwarzer Fassung; die Stufenfarben bleiben (Grün
 Die Kartenkanten: **gemessen im Reiter Bewertung, nicht geraten** —
 `.dpsh-pass` (×2, die Score-Karten) und `.card` (×8) trugen Grau. Alles
 andere dort trägt bereits eine Statusfarbe und bleibt unangetastet.
+
+---
+
+## Rollout-Journal · 28.09.2026 (8) — `:is()` erbt ID-Spezifität
+
+**Was:** breitere Schiene, aufgeräumte Objektliste mit Stufenkante,
+einheitlich goldene Icons, Account in einer Zeile, Seiten tauschbar,
+Aktionen nach oben — **und die Auflösung eines Rätsels, das seit
+v1653i offen stand.**
+
+**Commits:** `dd15730` v1657 · `ab3071b` v1657b · `78fdf58` v1657c ·
+`8fa16fc` v1657d
+
+**Nachweis** (Aktenmappe, Objekt geladen):
+
+| | |
+|---|---|
+| Schiene | **248 px** (vorher 208) |
+| Kennung „2026-1037" | `rgb(140,133,120)` — vorher Kontrast **1,36** |
+| Kante | **2 px**, grün bei Score 70, grau ohne Bewertung |
+| DS2-Hinweis, Investor-Band | weg |
+| Icons Kopf / Reiter / Abschnitte | **alle `rgb(201,168,76)`** |
+| Plan-Pille | in `.sb-user-icons` |
+| Objektnummer in der Bordkarte | „Objekt 2026-1040" |
+
+---
+
+### 1 · Die Auflösung: `:is()` erbt die Spezifität seines stärksten Arguments
+
+**Drei Anläufe** lang blieb die Kennung unlesbar, obwohl meine Regel im
+Browser stand, `matches()` bestand und `!important` trug.
+
+Geprüft und **ausgeschlossen**: doppelt geladene Stylesheets, Inline-Stil,
+`@media`-Block, `@layer`. Ein Inline-`!important` wirkte; eine frische
+Regel mit demselben Selektor, ganz ans Ende gehängt, **nicht**.
+
+Der entscheidende Messschritt: die Gewinnerregel aus `style.css` matcht
+als **Ganzes**, aber **kein einziger ihrer komma-getrennten Teile** —
+weil die Kommas *innerhalb* eines `:is()` stehen.
+
+> **`:is()` erbt die Spezifität seines stärksten Arguments.** Steht
+> darin irgendwo eine ID, trägt die ganze Regel ID-Spezifität — auch
+> für die Klasse, die daneben steht. Dieselbe Falle, die CLAUDE.md für
+> `:not(#id)` notiert.
+
+**Und mein Kaskaden-Walker hat sie zweimal verschleiert**, weil er
+Selektoren am Komma zerlegt: bei `:is(a, b)` entstehen zwei ungültige
+Bruchstücke, und die Regel fällt aus der Wertung.
+
+**Damit ist `#hdr-obj-num` aus v1653i nachträglich erklärt** — derselbe
+Mechanismus, und ich hatte den Fall damals offen gelassen.
+
+Die Antwort ist nicht mehr Klassen, sondern eine eigene ID:
+`:is(#sb-list)` für die Liste, `header.hdr:has(#hdr-badges)` für den
+Kopf — **`:has()` erbt genauso.**
+
+### 2 · Was in der Liste nichts zu suchen hatte
+
+Gemessen an den 59-px-Zeilen:
+
+```
+.sbc-seq              „2026-1037"  rgb(59,53,45)   Kontrast 1,6
+.sbc-ds2-hint         „⚡ DS2"      51 px
+.sbc-investor-ribbon  „Investor"   position:absolute, 83x19
+```
+
+Band und DS2-Hinweis sind Signale für die **breite** Karte der alten
+Seitenspalte. In einer Zeile nehmen sie den Platz, den Kennung und
+Adresse brauchen — und verdecken sie dabei.
+
+Die Bewertung steht jetzt in der **Kante**: `:has(.sbc-score-green)`
+liest die Stufe dort, wo sie berechnet wird, keine zweite Wahrheit.
+
+> Die Kante trägt die Aussage, nicht die Fläche. Farbige Flächen wären
+> bei siebzehn Objekten ein Jahrmarkt; eine farbige Kante ist eine
+> Auskunft.
+
+### 3 · Ein schwarzes Icon auf schwarzem Grund
+
+Im Kopf standen drei Töne nebeneinander — Kontingent gold
+`rgb(232,204,122)`, `.sc-l-star` grau `rgb(110,103,92)`, und der
+Hilfe-Knopf mit `fill:rgb(0,0,0)`.
+
+> Ein schwarzes Icon auf schwarzem Grund ist kein Kontrastproblem,
+> sondern ein fehlendes Icon.
+
+Alle Symbole tragen jetzt denselben Goldton, als
+`var(--wl-c9a84c, #C9A84C)` — die Whitelabel-Pflicht gilt auch für neue
+Regeln.
+
+### 4 · Was nachgeliefert wird, braucht einen, der zusieht
+
+Die Plan-Pille wanderte nicht. Ursache: die Abo-Schicht reicht den
+Nutzerblock **nach**; beim Aufbau der Schiene stand sie noch nicht da.
+
+> Ein einmaliger Aufruf trifft nur, was schon existiert.
+
+Jetzt sieht ein `MutationObserver` auf `#sb-user` zu.
+
+### 5 · Seiten tauschen, ohne ein siebtes Layout
+
+Getauscht wird nur die **Stellung**, nicht der Ton: die dunkle
+Navigation bleibt dunkel, auch rechts. Sonst wäre es kein Tausch,
+sondern ein zweites Layout — und jede künftige Änderung müsste zweimal
+gemacht werden. Eigene Gruppe „Seiten" in den Einstellungen.
+
+### Rest
+
+- Die Bordkarte trägt die Objektnummer jetzt wie im Entwurf; der Kopf
+  („BOARDING PASS / DealPilot · Boarding") ist auf eine Angabe
+  zusammengezogen.
+- **Der Kaskaden-Walker gehört repariert**: er darf Selektoren nicht am
+  Komma zerlegen und muss `:is()`/`:not()`/`:has()`-Spezifität richtig
+  rechnen. Solange das nicht passiert, nennt er bei jeder solchen Regel
+  den falschen Sieger.
