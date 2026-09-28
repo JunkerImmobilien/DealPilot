@@ -2768,3 +2768,37 @@ html[data-dp-layout] body .dpsh-pass,
 html[data-dp-layout] body .card{
   border-color:#0E0D0B !important;
 }
+
+/* ── v1656c · DIE KARTENKANTE, UND WIEDER MEINE EIGENE REGEL ─────────
+   Marcel: „unter Bewertung den Investor Deal Score - die Karten schwarz
+   umrahmen. Generell, dass wir dort schwarze Umrahmungen machen."
+
+   Meine Regel aus v1656 (`body .card{border-color:#0E0D0B}`) hat nicht
+   gegriffen. Der Kaskaden-Walker nennt den Sieger - **wieder eine
+   Regel aus dieser Datei**, die ID-Kette aus v1648:
+
+     html[data-dp-layout] .body :is(#s0,#s1,…,#s-marktbericht) .card
+     -> Spezifitaet (12,4,1), `!important`
+
+   Zwoelf IDs in einem `:is()` ergeben zwoelf ID-Punkte. Dagegen kommt
+   keine Klassenregel an - auch keine eigene.
+
+   > **Wer eine `:is()`-Kette aus IDs gebaut hat, muss sie beim
+   > naechsten Mal selbst wieder benutzen.** Sie ist nicht nur stark,
+   > sie ist die staerkste Regel im Haus.
+
+   Die Farbe wird hier gesetzt, nicht `--dpl-linie` umdefiniert: diese
+   Variable traegt auch die Trennlinien in der Schiene, und die sollen
+   grau bleiben. */
+html[data-dp-layout] .body :is(#s0,#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#s-quick,#s-marktbericht) .card,
+html[data-dp-layout] .body :is(#s0,#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#s-quick,#s-marktbericht) .dpsh-pass,
+html[data-dp-layout] body .dpsh-pass{
+  border-color:#0E0D0B !important;
+}
+
+/* Und die KPI-Angabe auf dem hellen Chip: `#8A8272` ergab gegen
+   `#FBF6E9` nur **3,53**. `#6E675C` sind 5,6 - leise genug, um die
+   Zahl darueber nicht zu stoeren, und laut genug zum Lesen. */
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-sub{
+  color:#6E675C !important;
+}
