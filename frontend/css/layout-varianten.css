@@ -989,3 +989,43 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer{
   flex:0 0 auto !important; position:static !important;
   margin-top:0 !important;
 }
+
+/* ── Spalte und Leiste brauchen verschiedene Regeln (v1649f) ────────
+   GEMESSEN nach v1649e: in der Aktenmappe (Spalte) 12 von 12 Aktionen
+   erreichbar, in der Werkbank (Leiste) **0 von 12**.
+
+   Ursache: die Regeln aus v1649e sprechen `.dpl-teil-aktionen`
+   unabhaengig von der Stellung an. `flex:1 1 auto` mit
+   `overflow-y:auto` ordnet eine SPALTE. In einer ZEILE ist beides
+   falsch: der Block wird 522 px hoch, die Leiste zeigt 112, und der
+   Rest liegt ausserhalb des Fensters - `elementFromPoint` gibt dort
+   `null` zurueck.
+
+   > **Eine Regel ohne Stellungsanker gilt fuer alle vier Stellungen.**
+   > Zwei davon sind senkrecht, zwei waagerecht - sie koennen nicht
+   > dieselbe Grammatik haben.
+
+   Deshalb: die Scroll-Grammatik bekommt den Anker `links`/`rechts`
+   zurueck, und die waagerechten Stellungen bekommen ihre eigene. */
+html[data-dp-layout] .dpl-schiene[data-stellung="leiste"] .dpl-teil-aktionen,
+html[data-dp-layout] .dpl-schiene[data-stellung="fuss"] .dpl-teil-aktionen{
+  flex:0 1 auto !important; min-width:0 !important;
+  min-height:0 !important; height:auto !important;
+  overflow-x:auto !important; overflow-y:hidden !important;
+}
+html[data-dp-layout] .dpl-schiene[data-stellung="leiste"] #sb-actions-accordion,
+html[data-dp-layout] .dpl-schiene[data-stellung="fuss"] #sb-actions-accordion{
+  height:auto !important; max-height:none !important;
+}
+html[data-dp-layout] .dpl-schiene[data-stellung="leiste"] .dpl-teil-nutzer,
+html[data-dp-layout] .dpl-schiene[data-stellung="fuss"] .dpl-teil-nutzer{
+  flex:0 0 auto !important; margin-left:auto !important;
+  border-top:0 !important; background:transparent !important;
+}
+/* In der Leiste sind die Gruppentitel Trennstriche (siehe v1636c) -
+   die engeren Zeilen aus v1649d duerfen sie nicht wieder zu Text
+   machen. */
+html[data-dp-layout] .dpl-schiene[data-stellung="leiste"] .sb-act-section-title,
+html[data-dp-layout] .dpl-schiene[data-stellung="fuss"] .sb-act-section-title{
+  padding:0 !important; height:20px !important; width:1px !important;
+}
