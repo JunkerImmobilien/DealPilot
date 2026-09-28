@@ -847,3 +847,38 @@ html[data-dp-layout] .dpl-schiene nav.tabs *{
 html[data-dp-layout] .dpl-marke{ height:58px !important; padding:0 14px !important; }
 html[data-dp-layout] .dpl-wm{ font-size:20px !important; }
 html[data-dp-layout] .dpl-logo{ max-height:36px !important; }
+
+/* ── Erdrueckt statt fehlend, zum zweiten Mal (v1649b) ──────────────
+   GEMESSEN in der Schiene:
+
+     .dpl-teil-aktionen     12 px hoch
+     #sb-actions-accordion  637 px hoch, von 162 bis 798
+
+   Das Kind quillt um 625 px aus seinem Behaelter. Ursache:
+   `flex: 0 1 auto` - in einer Flex-SPALTE darf ein Kind damit
+   schrumpfen, und wenn die Geschwister die Hoehe schon verbraucht
+   haben, schrumpft es auf fast null und quillt ueber sie.
+
+   > **Das steht so schon in meinen Notizen** (der Chat im Sprechlauf,
+   > 33 von 577 px). Ich bin trotzdem wieder hineingelaufen - diesmal
+   > in die andere Richtung: nicht der Inhalt war weg, sondern er lag
+   > UNTER dem naechsten Block.
+
+   Dazu der zweite Taeter: `nav.tabs` traegt `position:sticky` mit
+   `z-index:250`. In einer Schiene ergibt das keinen Sinn - es erzeugt
+   nur einen Stapelkontext, der die ueberquellenden Aktionen verdeckt.
+   Fuenf der zwoelf Knoepfe lagen darunter.
+
+   Die Schiene scrollt ohnehin (`overflow:auto`); die Bloecke duerfen
+   ihre volle Hoehe nehmen. */
+html[data-dp-layout] .dpl-schiene .dpl-teil{ flex:0 0 auto !important; }
+html[data-dp-layout] .dpl-schiene .dpl-portfolio{ flex:0 0 auto !important; }
+html[data-dp-layout] .dpl-teil-tabs nav.tabs{
+  position:static !important; z-index:auto !important; top:auto !important;
+}
+html[data-dp-layout] .dpl-schiene #sb-actions-accordion{
+  height:auto !important; max-height:none !important; overflow:visible !important;
+}
+/* Der Nutzerblock bleibt unten, solange Platz ist - sonst haengt er
+   einfach hinter den Aktionen und scrollt mit. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer{ margin-top:auto !important; }
