@@ -3964,3 +3964,45 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-donut > *{
 html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill .sc-pill-sub{
   display:block !important;
 }
+
+/* ── v1664e · DIE LETZTEN ZWEI GOLDFLECKEN ───────────────────────────
+   Marcel: „das ist alles goldfarben, das muesste in der Farbe
+   abgebildet werden wie wir jetzt den Rest auch abgebildet haben."
+
+   Gemessen im Chip, nachdem Flaeche und Werte schon stimmten:
+
+     span.sc-grade         „Okay"      bg gold 16 %, col rgb(0,59,7)
+                                       -> dunkelgruen auf fast schwarz
+     span.sc-investor-badge „INVESTOR" Goldverlauf, col rgb(64,35,0)
+     div.si                             erbt col rgb(26,20,7)
+
+   Die Stufen-Pille sah aus wie ein leerer oliver Kasten - ihr Wort
+   war da, nur nicht lesbar. Das Investor-Band war der einzige
+   Goldverlauf, der in der Schiene uebrig blieb; neben fuenf ruhigen
+   Zeilen zieht er alles auf sich und sagt dabei am wenigsten.
+
+   > Ein Hervorheber, der als einziger uebrig bleibt, hebt nichts mehr
+   > hervor - er stoert nur. Gold traegt in dieser Schiene die
+   > Navigation, nicht die Auskunft. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main .si,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-main .si *{
+  color:#E9E3D6;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-grade{
+  background:transparent !important;
+  border:1px solid color-mix(in srgb, var(--dpl-linie) 90%, transparent) !important;
+  color:#BDB5A6 !important;
+  font-size:9px !important; letter-spacing:.06em !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-investor-badge{
+  background:transparent !important;
+  background-image:none !important;
+  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 38%, transparent) !important;
+  color:var(--wl-e8cc7a, #E8CC7A) !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-investor-badge .ic,
+html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-investor-badge .ic *{
+  color:var(--wl-e8cc7a, #E8CC7A) !important;
+  fill:var(--wl-e8cc7a, #E8CC7A) !important;
+  stroke:var(--wl-e8cc7a, #E8CC7A) !important;
+}
