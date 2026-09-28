@@ -3570,3 +3570,89 @@ html[data-dp-layout] body header.hdr #hdr-badges .sc-pill{
 html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-v{
   font-size:17px !important;
 }
+
+/* ── v1662 · DIE ZAHL GEHOERT UNTER IHR WORT ─────────────────────────
+   Marcel, zum zweiten Mal: „oben mit dem Investor Deal Score, das ist
+   viel zu flach. Das muesste ein bisschen breiter sein."
+
+   v1661 hatte nur Polster und Schriftgrad erhoeht - das war die
+   falsche Antwort, und ich nehme sie hiermit zurueck. Gemessen an der
+   Struktur, nicht am Eindruck:
+
+     div.sc-pill          334x55   display:GRID
+       div.sc-pill-l       53x13   „RENDITE"        x=457
+       div.sc-pill-v      244x19   „36 %"           x=518  <- 244 px breit
+       div.sc-pill-sub     53x14   „4 / 4 KPIs"
+       div.sc-bar         281x2    absolut, unten
+
+   Die Zahl sitzt in einer 244 px breiten, rechtsbuendigen Zelle. Vom
+   Wort „RENDITE" bis zur „36 %" liegen damit ueber 200 px Leere - in
+   einer 55 px hohen Zeile. Das ist das „flach": nicht zu wenig Hoehe,
+   sondern eine Zeile, die fast nur aus Abstand besteht.
+
+   > Eine Zahl, die weit von ihrer Beschriftung wegsteht, muss mit dem
+   > Auge wieder eingesammelt werden. Fuenfmal nebeneinander wird das
+   > zur Arbeit.
+
+   Die Vorlage macht es anders (`entwurf-hell-bankfaehig.html`,
+   Entwurf 1, gemessen): Zelle `.kz` 214x52, Polster 7/12, Trennlinie
+   rechts `#E6E1D6`; Beschriftung `.n` als BLOCK - 9 px JetBrains
+   Mono, Sperrung 0,9 px, `#9A9287`; darunter der Wert `.v` in 15 px
+   Mono fett. Zwei Zeilen, linksbuendig, keine Leere dazwischen.
+
+   Genau das bauen wir - plus die Zaehlung, die Marcel wollte, als
+   dritte Zeile. Das Band waechst dadurch auf rund 72 px. */
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  gap:1px !important;
+  padding:10px 14px !important;
+  min-height:72px !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-l{
+  order:1 !important;
+  width:auto !important; max-width:100% !important;
+  font-family:"JetBrains Mono",ui-monospace,monospace !important;
+  font-size:9px !important; letter-spacing:.9px !important;
+  color:#9A9287 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-v{
+  order:2 !important;
+  width:auto !important; max-width:100% !important;
+  text-align:left !important;
+  font-family:"JetBrains Mono",ui-monospace,monospace !important;
+  font-size:20px !important; font-weight:700 !important;
+  line-height:1.15 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-sub{
+  order:3 !important;
+  width:auto !important;
+  font-family:"JetBrains Mono",ui-monospace,monospace !important;
+  font-size:9px !important; letter-spacing:.06em !important;
+  color:#9A9287 !important;
+}
+/* Der Fortschrittsbalken bleibt, aber als Kante ganz unten - er ist
+   eine Randbemerkung, keine vierte Zeile. */
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-bar{
+  left:0 !important; right:0 !important; bottom:0 !important;
+  width:auto !important;
+}
+/* Der Score-Chip haelt dieselbe Hoehe, sonst steht er als Stufe
+   neben der Reihe. */
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main{
+  min-height:72px !important;
+  padding:10px 16px 10px 12px !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut{
+  width:42px !important; height:42px !important; flex:0 0 42px !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut > *{
+  font-size:14px !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v *{
+  font-size:14px !important;
+}

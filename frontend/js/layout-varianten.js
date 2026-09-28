@@ -514,6 +514,33 @@
         localStorage.setItem('dp_chrome_hell', '0');
       } catch (e) {}
       h.removeAttribute('data-ui-theme');
+      /* v1662 · EIN MERKER, DER ZURUECKKOMMT, IST KEIN AUSLIEFERUNGSZUSTAND.
+
+         Das Attribut zu entfernen reichte NICHT. hell-varianten.js
+         horcht seit v1653e auf 'data-dp-layout' und meldet sich
+         wieder an, sobald das Layout faellt - aus seinem eigenen
+         Merker 'dp_karten_variante'. Gemessen: nach setze('') stand
+         data-dp-karte wieder auf "v3", und v3 faerbt .sb-card,
+         .sidebar und nav.tabs hell (hell-varianten.css:62-138).
+
+         Der Kopf dieser Stelle sagte bis v1661b selbst: 'Der Merker
+         bleibt erhalten: wer das Layout wieder auf Heute stellt,
+         bekommt seine Kartenvariante zurueck.' Das war meine
+         Entscheidung, und sie ist falsch.
+
+         > 'Heute' heisst Auslieferungszustand, nicht 'mein letzter
+         > Werkzeugstand'. Ein Werkzeug, das sich selbst wieder
+         > anschaltet, ist kein Werkzeug mehr, sondern ein Zustand.
+
+         Deshalb wird der Merker GELOESCHT, nicht nur das Attribut.
+         Die Variante bleibt jederzeit ueber das Panel erreichbar. */
+      try {
+        if (window.DealPilotKartenVariante &&
+            typeof window.DealPilotKartenVariante.setze === 'function') {
+          window.DealPilotKartenVariante.setze('');
+        }
+      } catch (e) {}
+      try { localStorage.setItem('dp_karten_variante', ''); } catch (e) {}
       h.removeAttribute('data-dp-karte');
       /* Und die Vorlage neu rechnen lassen, damit die Tokens zu den
          Marken passen. */

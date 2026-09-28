@@ -1118,3 +1118,82 @@ html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-rz::before{
     border-top:1px solid #E6E1D6 !important;
   }
 }
+
+/* ── v1662 · VIER QUELLEN, EINE REIHE ────────────────────────────────
+   Marcel: „bei der Datenaufnahme, das passt noch gar nicht mit der
+   Marktbewertung, mit der Formatierung. Das ist untereinander."
+
+   v1661 hatte die beiden GRUPPEN nebeneinander gestellt und ich hatte
+   das fuer erledigt gehalten - gemessen: `.dp-pf-seg` bei x=550 und
+   x=1130, gleiche Hoehe. Marcel meinte aber das, was IN den Gruppen
+   passiert.
+
+   Gemessen an der Vorlage (`entwurf-aktionsbox.html`, Entwurf 2):
+   die Demo-Kartei hat **keine Gruppentitel**. Sie hat EINE Reihe mit
+   VIER Quellen - `display:flex; flex-direction:row; gap:9px;
+   padding:14px 15px` - und darunter die Fusszeile mit dem Knopf.
+   Chip: 172x64, Grund `#FFFDF8`, Rahmen 1 px Gold wenn gewaehlt,
+   Radius 2 px, Polster 11/13.
+
+   Unsere Leiste teilt dieselben vier Quellen in zwei Gruppen mit
+   einem Titel DARUEBER. Genau dieser Titel erzeugt das
+   „untereinander": Titel, darunter Chips - zweimal nebeneinander.
+
+   > Eine Ueberschrift ueber zwei Chips ordnet nichts, sie halbiert
+   > nur die Reihe. Vier gleichrangige Quellen brauchen keine
+   > Einteilung, sie brauchen eine Zeile.
+
+   Die Gruppen bleiben im DOM (sie werden woanders gebaut), treten
+   aber auf Inhaltsbreite zurueck; ihre Titel verschwinden. Das
+   Ergebnis ist die Reihe der Demo, ohne einen fremden Baum
+   umzuhaengen. */
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-grouplbl{
+  display:none !important;
+}
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar > .dp-pf-seg{
+  flex:0 1 auto !important;
+  padding:14px 0 14px 0 !important;
+  border-right:0 !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar > .dp-pf-seg:first-of-type{
+  padding-left:15px !important;
+}
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar > .dp-pf-seg + .dp-pf-seg{
+  padding-left:9px !important;
+}
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-row{
+  width:auto !important; flex-wrap:nowrap !important;
+  align-items:stretch !important;
+}
+/* Alle vier Chips gleich hoch und gleich gefasst - in einer Reihe
+   faellt jeder Unterschied sofort auf. Die Masse sind die der Demo,
+   ohne Unterzeile also flacher. */
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-tile{
+  min-height:42px !important;
+  align-items:center !important;
+  padding:0 13px !important;
+  border-radius:2px !important;
+  border:1px solid #E6E1D6 !important;
+  background:#FFFFFF !important;
+}
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-tile:has(input:checked),
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-tile.an{
+  border-color:var(--wl-c9a84c, #C9A84C) !important;
+  background:#FFFDF8 !important;
+}
+/* Der Knopf rechts an den Rand - ohne diesen Schub steht er direkt
+   neben dem letzten Chip, mitten in der Zeile. */
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-rz{
+  margin-left:auto !important;
+  border-left:0 !important;
+}
+@media (max-width: 900px){
+  html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-row{
+    flex-wrap:wrap !important;
+  }
+  html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar > .dp-pf-seg{
+    padding-left:15px !important; padding-right:15px !important;
+  }
+}
