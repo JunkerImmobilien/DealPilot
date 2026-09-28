@@ -3233,3 +3233,63 @@ html[data-dp-layout] :is(#sb-list) .sb-card .sbc-won-badge,
 html[data-dp-layout] :is(#sb-list) .sb-card .sbc-deal-badge{
   display:none !important;
 }
+
+/* ── v1658b · EINE STATIC-LEISTE AM BODY LANDET GANZ UNTEN ───────────
+   Gemessen auf 834 px: die Schiene stand bei **y=1112** - exakt unter
+   dem Sichtfeld, kein Bedienelement erreichbar. `position:static`,
+   137 px hoch, am Ende des `<body>`.
+
+   Ursache ist meine eigene Aenderung aus v1656: die Schiene haengt
+   seither am `<body>` (damit kein Vorfahr sie klippt). Die
+   Schmalschirm-Regel setzt sie auf `position:static` - und ein
+   statisches Element am Ende des `<body>` steht hinter allem.
+
+   > **Das ist derselbe Fehler wie bei der Werkbank in v1649**
+   > („top: 3987"), nur andersherum: damals half `insertBefore`, weil
+   > `order` in `display:block` nicht wirkt. Hier hilft es nicht - der
+   > Ort ist ja gerade das Problem. Sie bleibt deshalb auch schmal
+   > `fixed` und wird zur Leiste OBEN.
+
+   Das Polster wandert von der Seite nach oben; ohne das laege der
+   Inhalt unter der Leiste. */
+@media (max-width: 900px){
+  html[data-dp-layout] .dpl-schiene{
+    position:fixed !important;
+    top:0 !important; left:0 !important; right:0 !important; bottom:auto !important;
+    width:auto !important; max-width:none !important;
+    height:auto !important; max-height:44vh !important;
+    overflow-y:auto !important;
+    flex-direction:column !important;
+    border-right:0 !important; border-left:0 !important;
+    border-bottom:1px solid #26231E !important;
+    z-index:80 !important;
+    padding:6px 10px !important;
+  }
+  html[data-dp-layout] .app-wrap{
+    padding-left:0 !important; padding-right:0 !important;
+    padding-top:52px !important;
+  }
+  /* Zugeklappt zeigt die Leiste nur Marke, Portfolio und die Reiter -
+     das ist die Navigation. Aktionen und Nutzer kommen mit, wenn die
+     Liste offen ist; sonst waere die Leiste auf dem Handy hoeher als
+     der Inhalt. */
+  html[data-dp-layout][data-dpl-portfolio="zu"] .dpl-schiene .dpl-teil-aktionen,
+  html[data-dp-layout][data-dpl-portfolio="zu"] .dpl-schiene .dpl-teil-nutzer{
+    display:none !important;
+  }
+  html[data-dp-layout] .dpl-schiene .dpl-marke{
+    display:flex !important; min-height:0 !important;
+    padding:2px 4px !important;
+  }
+  html[data-dp-layout] .dpl-schiene .dpl-wm{
+    font-size:19px !important; line-height:24px !important;
+  }
+  html[data-dp-layout] .dpl-schiene .dpl-teil-tabs nav.tabs{
+    display:flex !important; flex-direction:row !important;
+    overflow-x:auto !important; gap:2px !important;
+    scrollbar-width:thin;
+  }
+  html[data-dp-layout] .dpl-schiene .dpl-teil-tabs nav.tabs .tab{
+    flex:0 0 auto !important; white-space:nowrap !important;
+  }
+}
