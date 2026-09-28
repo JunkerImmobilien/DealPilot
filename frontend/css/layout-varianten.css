@@ -126,13 +126,12 @@ html[data-dp-layout] .dpl-schiene{
   display:flex; flex-direction:column; min-width:0;
   font-family:'Inter', system-ui, sans-serif;
 }
-html[data-dp-layout] .dpl-schiene[data-stellung="links"],
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"]{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"]{
   position:fixed; top:0; bottom:0; width:var(--dpl-schiene-b);
   z-index:60; overflow:auto;
 }
-html[data-dp-layout] .dpl-schiene[data-stellung="links"]{ left:0; }
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"]{ right:0; left:auto;
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"]{ left:0; }
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"]{ right:0; left:auto;
   border-right:0; border-left:1px solid var(--dpl-linie); }
 
 .dpl-marke{ height:46px; flex:0 0 auto; display:flex; align-items:center;
@@ -271,7 +270,7 @@ html[data-dp-layout="v1"] .app-wrap{ padding-left:var(--dpl-schiene-b) !importan
    RECHTS, neben das Objekt, auf das sie sich beziehen. */
 html[data-dp-layout="v2"] .app-wrap{ padding-right:var(--dpl-schiene-b) !important; }
 html[data-dp-layout="v2"] #sidebar{ width:auto !important; }
-html[data-dp-layout="v2"] .dpl-schiene[data-stellung="rechts"] .dpl-marke{ display:none; }
+html[data-dp-layout="v2"] .dpl-schiene[data-ton="dunkel"] .dpl-marke{ display:none; }
 
 /* ── v3 · WERKBANK ───────────────────────────────────────────────────
    Keine Seitenspalte. Die Aktionsleiste kommt auf den Hauptbildschirm,
@@ -383,8 +382,7 @@ html[data-dp-layout="v5"] .sb-header .app-logo-simple-wrap{ max-height:40px !imp
     padding-left:0 !important; padding-right:0 !important;
     grid-template-columns:1fr !important;
   }
-  html[data-dp-layout] .dpl-schiene[data-stellung="links"],
-  html[data-dp-layout] .dpl-schiene[data-stellung="rechts"]{
+  html[data-dp-layout] .dpl-schiene[data-ton="dunkel"]{
     position:static !important; width:auto !important;
     flex-direction:row !important; align-items:center !important;
     gap:8px; overflow-x:auto !important; overflow-y:visible !important;
@@ -394,8 +392,7 @@ html[data-dp-layout="v5"] .sb-header .app-logo-simple-wrap{ max-height:40px !imp
   }
   /* Die Marke und der Nutzerblock kosten in einer Leiste nur Platz -
      das Logo steht oben im Kopf, der Nutzer im Portfolio. */
-  html[data-dp-layout] .dpl-schiene[data-stellung="links"] .dpl-marke,
-  html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-marke{ display:none !important; }
+  html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .dpl-marke{ display:none !important; }
   html[data-dp-layout] .dpl-schiene .dpl-teil{ padding:0 !important; }
   html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer{
     margin-top:0 !important; border-top:0 !important; background:transparent !important;
@@ -976,8 +973,7 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer{
 
    Der Nutzerblock braucht kein `sticky` mehr: er steht am Ende der
    Spalte und wird von nichts mehr verdraengt. */
-html[data-dp-layout] .dpl-schiene[data-stellung="links"],
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"]{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"]{
   overflow:hidden !important;
 }
 html[data-dp-layout] .dpl-schiene .dpl-teil-tabs{ flex:0 0 auto !important; }
@@ -1086,60 +1082,47 @@ html[data-dp-layout] body.dp-hdr-compact header.hdr{
    > Das ist die Grammatik, die jeder aus DATEV und Banksoftware kennt:
    > dunkle Navigation, helles Dokument. Die Marke steht in der Spalte,
    > die Arbeit auf dem Papier. */
-html[data-dp-layout] .dpl-schiene[data-stellung="links"],
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"]{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"]{
   background:#0E0D0B !important;
   border-right-color:#26231E !important;
   border-left-color:#26231E !important;
   color:#E9E3D6 !important;
 }
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .dpl-marke,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-marke{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .dpl-marke{
   background:transparent !important; border-bottom-color:#26231E !important;
 }
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .dpl-wm,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-wm{ color:#F2EDE3 !important; }
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .dpl-wm{ color:#F2EDE3 !important; }
 
 /* Reiter in der dunklen Schiene */
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] nav.tabs .tab,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] nav.tabs .tab{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] nav.tabs .tab{
   color:#BFB7A9 !important; background:transparent !important;
 }
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] nav.tabs .tab:hover,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] nav.tabs .tab:hover{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] nav.tabs .tab:hover{
   color:#F5EFE2 !important;
 }
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] nav.tabs .tab.active,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] nav.tabs .tab.active{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] nav.tabs .tab.active{
   color:#F5EFE2 !important; background:#171512 !important;
   border-left-color:var(--dpl-gold) !important;
 }
 
 /* Aktionen, Nutzerblock und Portfolio-Knopf in der dunklen Schiene */
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .dpl-portfolio,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-portfolio{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .dpl-portfolio{
   background:#171512 !important; border-color:#2A2622 !important; color:#E9E3D6 !important;
 }
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-act-item,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-act-item{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .sb-act-item{
   color:#BFB7A9 !important; background:transparent !important;
 }
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-act-item:hover,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-act-item:hover{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .sb-act-item:hover{
   color:#F5EFE2 !important; background:#171512 !important;
 }
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-act-section-title,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-act-section-title{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .sb-act-section-title{
   color:#7A7268 !important;
 }
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .dpl-teil-nutzer,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-teil-nutzer{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .dpl-teil-nutzer{
   background:#0A0A09 !important; border-top-color:#26231E !important;
 }
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] #sb-user,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] #sb-user,
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] #sb-user *,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] #sb-user *{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] #sb-user,
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] #sb-user *{
   color:#BFB7A9 !important; background:transparent !important;
 }
 /* Die Objektspalte der Kanzlei wird mit dunkel - sonst stehen zwei
@@ -1157,25 +1140,20 @@ html[data-dp-layout="v2"] #sidebar{
    > gedacht; dort ist ein weisser Grund mit Rahmen richtig. In der
    > dunklen Schiene ist er ein Fremdkoerper. Wer ein Bauteil
    > verpflanzt, erbt seine Annahmen mit. */
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] #sb-actions-accordion,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] #sb-actions-accordion,
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-actions-accordion-inner,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-actions-accordion-inner{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] #sb-actions-accordion,
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .sb-actions-accordion-inner{
   background:transparent !important;
   border:0 !important; box-shadow:none !important; border-radius:0 !important;
 }
 /* Und alles, was darin noch eine helle Flaeche mitbringt. */
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-act-item,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-act-item{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .sb-act-item{
   border-color:transparent !important;
 }
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .dpl-teil-nutzer *,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-teil-nutzer *{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .dpl-teil-nutzer *{
   border-color:#26231E !important;
 }
 /* Der Knopf im Nutzerblock (Abmelden) bleibt erkennbar. */
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] #sb-user button,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] #sb-user button{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] #sb-user button{
   background:#171512 !important; border:1px solid #2A2622 !important;
   color:#E9E3D6 !important;
 }
@@ -1183,10 +1161,8 @@ html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] #sb-user button{
 /* Und der Reiter-BEHAELTER. Ich hatte in v1650 `nav.tabs .tab` dunkel
    gemacht und dabei `nav.tabs` selbst vergessen - der Behaelter blieb
    `rgb(251,250,247)`. Eine Regel aendert nur, was sie benennt. */
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] nav.tabs,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] nav.tabs,
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .dpl-teil,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-teil{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] nav.tabs,
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .dpl-teil{
   background:transparent !important;
   border-color:#26231E !important; box-shadow:none !important;
 }
@@ -1228,29 +1204,22 @@ html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-teil{
    sie tragen Bedeutung und keine Lesbarkeitsschuld.
    ═══════════════════════════════════════════════════════════════════════ */
 
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .tab-lbl,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .tab-lbl,
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-act-l,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-act-l,
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-actions-l,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-actions-l{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .tab-lbl,
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .sb-act-l,
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .sb-actions-l{
   color:#BFB7A9 !important;   /* Kontrast 8.5 gegen #0E0D0B */
 }
 /* Der aktive Reiter hebt sich ab - sonst ist die Liste eine Wand. */
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] nav.tabs .tab.active .tab-lbl,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] nav.tabs .tab.active .tab-lbl{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] nav.tabs .tab.active .tab-lbl{
   color:#F5EFE2 !important; font-weight:600 !important;
 }
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] nav.tabs .tab:hover .tab-lbl,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] nav.tabs .tab:hover .tab-lbl,
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-act-item:hover .sb-act-l,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-act-item:hover .sb-act-l{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] nav.tabs .tab:hover .tab-lbl,
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .sb-act-item:hover .sb-act-l{
   color:#F5EFE2 !important;
 }
 /* Die Abschnittsueberschriften duerfen leiser sein - aber lesbar.
    4,10 auf 4,62. */
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-act-section-title,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-act-section-title{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .sb-act-section-title{
   color:#8C8578 !important;
 }
 
@@ -1283,20 +1252,16 @@ html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-act-section-title{
    Schiene nicht, ohne dass „DealPilot" umbricht.
    ═══════════════════════════════════════════════════════════════════════ */
 
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-actions-trigger .sb-actions-l,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-actions-trigger .sb-actions-l,
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] #sb-actions-trigger-btn .sb-actions-l,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] #sb-actions-trigger-btn .sb-actions-l{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .sb-actions-trigger .sb-actions-l,
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] #sb-actions-trigger-btn .sb-actions-l{
   color:#BFB7A9 !important;
 }
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .tabs-status-text,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .tabs-status-text{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .tabs-status-text{
   color:#BFB7A9 !important;
 }
 
 /* Das Logo. */
-html[data-dp-layout] .dpl-schiene[data-stellung="links"] .dpl-marke,
-html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-marke{
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .dpl-marke{
   min-height:70px !important; padding-top:4px !important;
 }
 html[data-dp-layout] .dpl-schiene .dpl-wm{
@@ -1330,4 +1295,245 @@ html[data-dp-layout] .dpl-schiene .dpl-logo{
    wirkt auf jeder Breite. */
 @media (max-width: 900px){
   .dpl-schalter{ display:none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1653 · MARCELS DURCHGANG VOM 28.09.2026
+
+   Sechs Punkte, alle gemessen, bevor eine Zeile geschrieben wurde.
+   Das Fenster war 2133 CSS-Pixel breit (der Screenshot 1568 - Faktor
+   1,36; wer an einem Bildschirmfoto misst, misst falsch).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1 · DER KOPF WIRD SCHWARZ ────────────────────────────────────────
+   Marcel: „Hast du die Möglichkeit, einmal oben den Header auch in
+   diesem Schwarz anzugeben und die Farben dann passend anzupassen?"
+
+   Gemessen: `header.hdr` trug `rgb(255,255,255)`, `position:sticky`,
+   z=300, 1921x61 - ein weisses Band über einer schwarzen Spalte.
+
+   > Dunkle Navigation, helles Dokument ist die Grammatik. Der Kopf
+   > gehört zur Navigation: er trägt Objektwähler, Fortschritt und die
+   > Werkzeugknöpfe, nicht den Inhalt. Also gehört er zur dunklen
+   > Seite - und die Arbeitsfläche bleibt das helle Blatt.
+
+   Gefärbt werden die FLÄCHEN einzeln. Eine Token-Überschreibung
+   reicht in `style.css` nicht (CLAUDE.md), und der Kopf hat drei
+   Kinder mit eigenen Gründen. */
+html[data-dp-layout] header.hdr{
+  background:#0E0D0B !important;
+  border-bottom:1px solid #26231E !important;
+  color:#E9E3D6 !important;
+  box-shadow:none !important;
+}
+html[data-dp-layout] header.hdr .hdr-v61-row1,
+html[data-dp-layout] header.hdr .hdr-v61-row2{
+  background:transparent !important;
+  border-color:#26231E !important;
+}
+/* Die Schrift im Kopf. Gemessen wurde vorher gegen WEISS - jeder
+   dieser Töne ist für hellen Grund gemacht und auf #0E0D0B unlesbar.
+   Dieselbe Ursache wie in v1652: Behälter umgefärbt, Kinder nicht. */
+html[data-dp-layout] header.hdr .hdr-obj-num,
+html[data-dp-layout] header.hdr .hdr-obj-name,
+html[data-dp-layout] header.hdr .hdr-crumb,
+html[data-dp-layout] header.hdr .hdr-sep,
+html[data-dp-layout] header.hdr .hdr-v61-row1 > span,
+html[data-dp-layout] header.hdr .hdr-v61-row1 > a{
+  color:#E9E3D6 !important;
+}
+html[data-dp-layout] header.hdr .hdr-icon-btn{
+  color:#BFB7A9 !important; background:transparent !important;
+  border-color:#26231E !important;
+}
+html[data-dp-layout] header.hdr .hdr-icon-btn:hover{
+  color:#F5EFE2 !important; background:#171512 !important;
+}
+/* Der Objektwähler ist eine Pille auf hellem Grund - auf Obsidian
+   braucht er einen eigenen, leicht abgesetzten Ton, sonst verschwindet
+   er in der Fläche. */
+html[data-dp-layout] header.hdr .hdr-obj-num{
+  background:#171512 !important; border:1px solid #2A2622 !important;
+}
+
+/* ── 2 und 3 · ZWEI KNÖPFE, DIE HIER NICHTS MEHR ZU TUN HABEN ────────
+   Marcel: „es gibt dort dieses Vollbild-Menü ausblenden, das müsste bei
+   der Ansicht raus" und „da ist auch dieses Ein- und Ausblenden oben
+   rechts, das könnte dann auch weg."
+
+   Gemessen:
+     #dp-sb-toggle     36x36  position:fixed  z=9000
+                       title=„Vollbild (Menü ausblenden)"
+     #hdr-toggle-btn   22x22  position:absolute, x=2093
+
+   Beide bedienen etwas, das es in diesen Layouts nicht mehr gibt:
+   `#dp-sb-toggle` blendet die Objektspalte aus - die ist hier ohnehin
+   eine Schublade und wird über „Portfolio" bedient. `#hdr-toggle-btn`
+   klappt die Score-Zeile ein - die hält `kopfOffenHalten()` seit
+   v1650b bewusst offen.
+
+   > **Ein Knopf, der einen Zustand umschaltet, den ein anderes Modul
+   > erzwingt, tut nichts - und wirkt dabei wie ein Fehler.** */
+html[data-dp-layout] #dp-sb-toggle,
+html[data-dp-layout] #hdr-toggle-btn{ display:none !important; }
+
+/* ── 4 · DIE SCHUBLADE ───────────────────────────────────────────────
+   Marcel: „wenn ich auf Portfolio klicke, öffnet sich ein Menü komplett
+   verzerrt. Ich kann aber meine Objekte nicht passend auswählen."
+
+   Gemessen mit offener Schublade: `aside#sidebar` 360x988,
+   `position:fixed`, z=70 - und `background: rgb(255,255,255)`. Ein
+   weisses Blatt, das sich über eine schwarze Ansicht legt.
+
+   Das „verzerrt" kommt dazu von der Kopfzeile: `.sb-header` ist 49 px
+   hoch mit `overflow:hidden`, die Knöpfe „Quick-Check" und
+   „Marktbericht" darin brauchen mehr und wurden abgeschnitten. Die
+   Spalte ist für 380 px gebaut, die Schublade gibt ihr 360. */
+html[data-dp-layout] #sidebar{
+  width:380px !important; max-width:92vw !important;
+  background:#0E0D0B !important;
+  border-right:1px solid #26231E !important;
+  color:#E9E3D6 !important;
+}
+html[data-dp-layout] #sidebar .sb-header{
+  height:auto !important; min-height:0 !important;
+  overflow:visible !important;
+  background:transparent !important; border-bottom-color:#26231E !important;
+  padding:10px 14px !important;
+}
+html[data-dp-layout] #sidebar .sb-section-title,
+html[data-dp-layout] #sidebar .sb-neu-row,
+html[data-dp-layout] #sidebar .sb-list{
+  background:transparent !important;
+}
+/* Die Objektkarten bleiben helle Karten auf dunklem Grund - genau so
+   sind sie gebaut, und eine Karte, die man anfasst, darf sich vom
+   Hintergrund abheben. Nur ihr Rahmen wird dunkler, sonst leuchtet
+   jede Kante. */
+html[data-dp-layout] #sidebar .sb-card{
+  border-color:#26231E !important;
+}
+/* Beschriftungen, die für hellen Grund gemacht sind. */
+html[data-dp-layout] #sidebar .sb-section-title,
+html[data-dp-layout] #sidebar .sb-sort-toggle,
+html[data-dp-layout] #sidebar .sb-search input,
+html[data-dp-layout] #sidebar .sb-wm{
+  color:#BFB7A9 !important;
+}
+html[data-dp-layout] #sidebar .sb-search input{
+  background:#171512 !important; border-color:#2A2622 !important;
+}
+html[data-dp-layout] #sidebar .sb-search input::placeholder{ color:#8C8578 !important; }
+
+/* ── 5 · DER SCROLLBALKEN IN DER SCHIENE ─────────────────────────────
+   Marcel: „und die Ansicht, da ist jetzt eine Scrollbar drinne."
+
+   Gemessen: der Aktionsblock hatte 462 px sichtbar bei 519 px Inhalt -
+   57 px zu wenig. Drei Stellschrauben, keine davon willkürlich:
+
+     · das Fortschritts-Badge verlässt die Schiene ( 29 px, Punkt 6)
+     · die Reiter rücken enger zusammen             (~18 px)
+     · die Abschnittsüberschriften werden schmaler  (~12 px)
+
+   Zusammen 59 px - der Balken verschwindet, ohne dass etwas kleiner
+   aussieht als nötig. Der `overflow:auto` BLEIBT: wer zwanzig Aktionen
+   hat, muss weiter scrollen können. */
+html[data-dp-layout] .dpl-schiene nav.tabs .tab{
+  padding-top:5px !important; padding-bottom:5px !important;
+  min-height:0 !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-act-section-title{
+  margin:9px 0 3px !important; padding:0 12px !important;
+  line-height:1.2 !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-act-item{
+  padding-top:5px !important; padding-bottom:5px !important;
+  min-height:0 !important;
+}
+
+/* ── 6 · DAS BADGE IM KOPF ───────────────────────────────────────────
+   `layout-varianten.js` hängt `#tabs-status-badge` in `.hdr-v61-row1`
+   und gibt ihm dort `.dpl-badge-im-kopf`. Hier bekommt es das Aussehen
+   für den dunklen Kopf - rechtsbündig, damit es dem Objektnamen nicht
+   in die Quere kommt. */
+html[data-dp-layout] header.hdr .dpl-badge-im-kopf{
+  margin-left:auto !important; margin-right:14px !important;
+  background:#171512 !important;
+  border:1px solid #2A2622 !important;
+  color:#BFB7A9 !important;
+}
+html[data-dp-layout] header.hdr .dpl-badge-im-kopf .tabs-status-text{
+  color:#BFB7A9 !important;
+}
+/* Der Fortschrittsbalken darin bleibt Gold - er trägt Bedeutung. */
+html[data-dp-layout] header.hdr .dpl-badge-im-kopf .tabs-status-bar{
+  background:#2A2622 !important;
+}
+
+/* ── 7 · DIE HELLE KONTEXTSCHIENE DER KANZLEI ────────────────────────
+   Der Entwurf („Entwurf 2 — Kanzlei"): dunkle Navigation links, helles
+   Blatt in der Mitte, und rechts eine Kontextschiene „Ausgabe" mit den
+   Aktionen — „was man mit diesem Objekt tun kann, steht neben dem
+   Objekt."
+
+   Sie ist HELL. Deshalb hängt die Färbung seit v1653 an `data-ton` und
+   nicht mehr an der Stellung: mit der alten Regel wäre jede rechte
+   Schiene zwangsläufig schwarz geworden. */
+html[data-dp-layout] .dpl-schiene[data-ton="hell"]{
+  background:#FBFAF7 !important;
+  border-left:1px solid #E6E0D2 !important;
+  border-right:0 !important;
+  color:#2C2A26 !important;
+}
+html[data-dp-layout] .dpl-schiene[data-ton="hell"] .dpl-schiene-titel{
+  font-family:"JetBrains Mono",ui-monospace,monospace;
+  font-size:10px; letter-spacing:.09em; text-transform:uppercase;
+  color:#8C8578; padding:14px 14px 8px;
+}
+html[data-dp-layout] .dpl-schiene[data-ton="hell"] .sb-act-item{
+  color:#2C2A26 !important; background:transparent !important;
+  border-color:transparent !important;
+}
+html[data-dp-layout] .dpl-schiene[data-ton="hell"] .sb-act-item:hover{
+  background:#F3F0E8 !important;
+}
+html[data-dp-layout] .dpl-schiene[data-ton="hell"] .sb-act-l{ color:#2C2A26 !important; }
+html[data-dp-layout] .dpl-schiene[data-ton="hell"] .sb-act-section-title{ color:#8C8578 !important; }
+html[data-dp-layout] .dpl-schiene[data-ton="hell"] #sb-actions-accordion,
+html[data-dp-layout] .dpl-schiene[data-ton="hell"] .sb-actions-accordion-inner{
+  background:transparent !important; border:0 !important; box-shadow:none !important;
+}
+/* Die Aktionen stehen in der Kanzlei OFFEN da - sie sind der Zweck
+   dieser Spalte. Ein Aufklapper vor einer Spalte, die nur Aktionen
+   enthält, verlangt einen Klick für nichts. */
+html[data-dp-layout="v2"] .dpl-schiene[data-ton="hell"] #sb-actions-trigger-btn{
+  display:none !important;
+}
+
+/* ── 8 · DER PLATZ FÜR ZWEI SCHIENEN ─────────────────────────────────
+   Die Kanzlei braucht links 208 und rechts 240 px. Das Polster steht
+   am `.app-wrap`; ohne das rechte läge die Kontextschiene über dem
+   Inhalt - derselbe Fehler, den ich heute schon zweimal bei
+   Werkzeugfenstern gemessen habe. */
+html[data-dp-layout="v2"] .app-wrap{
+  padding-left:208px !important;
+  padding-right:240px !important;
+}
+html[data-dp-layout="v2"] .dpl-schiene[data-stellung="rechts"]{
+  width:240px !important;
+}
+html[data-dp-layout="v2"] header.hdr{
+  margin-right:0 !important;
+}
+
+/* Unter 1100 px hat die Kontextschiene keinen Platz mehr. Sie
+   verschwindet NICHT - die Aktionen wandern zurück in den Fluss unter
+   den Inhalt, sonst wären zwölf Funktionen auf dem Tablet weg. */
+@media (max-width: 1100px){
+  html[data-dp-layout="v2"] .app-wrap{ padding-right:0 !important; }
+  html[data-dp-layout="v2"] .dpl-schiene[data-stellung="rechts"]{
+    position:static !important; width:auto !important;
+    border-left:0 !important; border-top:1px solid #E6E0D2 !important;
+    margin-top:18px !important;
+  }
 }

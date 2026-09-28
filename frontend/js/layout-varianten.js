@@ -62,14 +62,54 @@
 
   var LS = 'dp_layout';
 
-  /* Welche Knoten wandern in die Schiene - je Layout.
-     `tabs` steht nur bei v1 dabei: nur dort werden die Reiter senkrecht. */
+  /* ── DIE LAYOUTS ──────────────────────────────────────────────────
+     v1653 · Marcel am 28.09.2026: „Ich bin auch der Meinung, dass wir
+     uns jetzt komplett einmal auf die Aktenmappe und die Kanzlei
+     konzentrieren. Werkbank, Dossier und das andere nehmen wir raus."
+
+     **Werkbank, Dossier und Cockpit hell sind gestrichen.** Sie
+     standen ohnehin auf 9 von 12 erreichbaren Aktionen (Journal vom
+     26.09.), und drei halbfertige Layouts zu pflegen kostet mehr, als
+     zwei fertige wert sind.
+
+     > Ein gespeichertes `dp_layout=v3` landet sauber: `setze()` prüft
+     > `LAYOUTS[v]` und fällt bei Unbekanntem auf „Heute" zurück.
+
+     ── WARUM JETZT EIN ARRAY VON SCHIENEN ───────────────────────────
+     Die Kanzlei braucht ZWEI. Der Entwurf
+     (`entwurf-hell-bankfaehig.html`, „Entwurf 2 — Kanzlei") zeigt eine
+     **dunkle Navigationsspalte links** mit Marke, Portfolio, Reitern
+     und dem Nutzer im Fuss — und daneben rechts eine **helle
+     Kontextschiene** mit den Ausgabe-Aktionen: „was man mit diesem
+     Objekt tun kann, steht neben dem Objekt."
+
+     Gebaut war es **genau andersherum**: Objektliste hell links,
+     Aktionen dunkel rechts. Marcel: „auch da noch mal abgleichen mit
+     unserer Demo. Das sieht auch nicht so aus, wie wir es besprochen
+     haben."
+
+     `ton` sagt jetzt die Farbe, nicht mehr die Stellung. Vorher hing
+     die Färbung an `data-stellung="links|rechts"` - damit wäre die
+     helle Kontextschiene der Kanzlei zwangsläufig dunkel geworden. */
   var LAYOUTS = {
-    v1: { name: 'Aktenmappe',   schiene: 'links',  nimmt: ['tabs', 'aktionen', 'nutzer'], objekteAls: 'schublade', beschreibung: 'Menü links als Gliederung' },
-    v2: { name: 'Kanzlei',      schiene: 'rechts', nimmt: ['aktionen', 'nutzer'],          objekteAls: 'spalte', beschreibung: 'Objekte links, Aktionen rechts' },
-    v3: { name: 'Werkbank',     schiene: 'leiste', nimmt: ['aktionen', 'nutzer'],          objekteAls: 'schublade', beschreibung: 'Volle Breite, Leiste oben' },
-    v4: { name: 'Dossier',      schiene: 'fuss',   nimmt: ['aktionen', 'nutzer'],          objekteAls: 'schublade', beschreibung: 'Wie das fertige Dokument' },
-    v5: { name: 'Cockpit hell', schiene: null,     nimmt: [],                              objekteAls: 'spalte', beschreibung: 'Heutiger Aufbau, entschlackt' }
+    v1: {
+      name: 'Aktenmappe', beschreibung: 'Menü links als Gliederung',
+      objekteAls: 'schublade',
+      schienen: [
+        { stellung: 'links', ton: 'dunkel', marke: true, portfolio: true,
+          nimmt: ['tabs', 'aktionen', 'nutzer'] }
+      ]
+    },
+    v2: {
+      name: 'Kanzlei', beschreibung: 'Navigation links, Aktionen rechts',
+      objekteAls: 'schublade',
+      schienen: [
+        { stellung: 'links',  ton: 'dunkel', marke: true, portfolio: true,
+          nimmt: ['tabs', 'nutzer'] },
+        { stellung: 'rechts', ton: 'hell',   marke: false, portfolio: false,
+          nimmt: ['aktionen'], titel: 'Ausgabe' }
+      ]
+    }
   };
 
   var KNOTEN = {
@@ -80,7 +120,7 @@
   };
 
   var merker = [];       /* [{ knoten, eltern, naechstes }] */
-  var schiene = null;
+  var schienen = [];     /* v1653: die Kanzlei hat zwei */
   var aktuell = '';
 
   function el(s) { return document.querySelector(s); }
@@ -103,35 +143,68 @@
       } catch (e) {}
     }
     merker = [];
-    if (schiene && schiene.parentElement) schiene.parentElement.removeChild(schiene);
-    schiene = null;
+    /* Die Marke, die das Badge im Kopf trug, muss mit zurück - sonst
+       trägt es in „Heute" eine Klasse, deren Regeln ins Leere zeigen. */
+    var badge = el('#tabs-status-badge');
+    if (badge) badge.classList.remove('dpl-badge-im-kopf');
+    schienen.forEach(function (s) {
+      if (s && s.parentElement) s.parentElement.removeChild(s);
+    });
+    schienen = [];
   }
 
-  /* ── Die Schiene bauen ──────────────────────────────────────────── */
-  function baueSchiene(v) {
+  /* ── Die Schienen bauen ─────────────────────────────────────────── */
+  function baueSchienen(v) {
     var L = LAYOUTS[v];
     var mc = el('.main-col');
-    if (!mc) return;
+    if (!mc || !L.schienen) return;
+    L.schienen.forEach(function (S) { baueEine(L, S, mc); });
+    badgeInDenKopf();
+    zahlNachziehen();
+  }
 
-    schiene = document.createElement('div');
+  /* ── „0 / 6 · 0 %" gehört in den Kopf ─────────────────────────────
+     Marcel am 28.09.2026: „unter Deal-Aktion im Menübereich, dort haben
+     wir diese null von sechs Bereichen vollständig. Das könnte an der
+     Stelle vielleicht raus und gegebenenfalls oben mit in den Header
+     neben Neues Objekt."
+
+     `#tabs-status-badge` (149x29) steckt IN `nav.tabs` und wandert
+     deshalb mit den Reitern in die Schiene - wo es unter dem letzten
+     Reiter hängt, als wäre es ein zehnter. Es gehört zum OBJEKT, nicht
+     zur Navigation.
+
+     Verschoben wird über dieselbe Rückfahrkarte wie alles andere
+     (`hole()`), damit „Heute" es wieder an seinen Platz in der
+     Reiterleiste stellt. */
+  function badgeInDenKopf() {
+    var badge = hole('#tabs-status-badge');
+    if (!badge) return;
+    var reihe = el('header.hdr .hdr-v61-row1');
+    if (!reihe) { merker.pop(); return; }   /* nichts verschoben, nichts zu merken */
+    badge.classList.add('dpl-badge-im-kopf');
+    reihe.appendChild(badge);
+  }
+
+  function baueEine(L, S, mc) {
+    var schiene = document.createElement('div');
     schiene.className = 'dpl-schiene';
-    schiene.setAttribute('data-stellung', L.schiene);
+    schiene.setAttribute('data-stellung', S.stellung);
+    /* v1653: die FARBE haengt am Ton, nicht mehr an der Stellung.
+       Die Kanzlei hat rechts eine HELLE Kontextschiene - mit der alten
+       Regel `[data-stellung="rechts"]{background:#0E0D0B}` waere sie
+       zwangslaeufig dunkel geworden. */
+    schiene.setAttribute('data-ton', S.ton || 'dunkel');
+    schiene.setAttribute('data-objekte', L.objekteAls);
 
-    /* Marke oben - nur bei den senkrechten Schienen, sonst doppelt sich
-       das Logo mit der Objektspalte. */
-    if (L.schiene === 'links' || L.schiene === 'rechts') {
+    /* ── WESSEN MARKE HIER STEHT ──────────────────────────────────
+       Bei einem Whitelabel-Mandanten SEINE, sonst unsere. Gefragt
+       wird dieselbe Stelle, aus der auch die PDFs ihr Logo holen
+       (`DealPilotConfig.branding.get().logo_b64`) - nicht ein
+       zweiter Weg, der irgendwann auseinanderlaeuft. */
+    if (S.marke) {
       var marke = document.createElement('div');
       marke.className = 'dpl-marke';
-      /* ── WESSEN MARKE HIER STEHT ──────────────────────────────────
-         Bei einem Whitelabel-Mandanten SEINE, sonst unsere. Gefragt
-         wird dieselbe Stelle, aus der auch die PDFs ihr Logo holen
-         (`DealPilotConfig.branding.get().logo_b64`) - nicht ein
-         zweiter Weg, der irgendwann auseinanderläuft.
-
-         Der Schriftzug trägt `--dpl-gold-lo`, und das hängt am Token
-         `--wl-b8932f`. Gemessen mit einem fremden Markenton: das „Pilot"
-         wurde rgb(35,85,138), also der Partnerton - ohne eine Zeile
-         Sonderbehandlung. */
       var eigenes = '';
       try {
         var b = (window.DealPilotConfig && window.DealPilotConfig.branding
@@ -146,20 +219,20 @@
       schiene.appendChild(marke);
     }
 
-    /* Portfolio-Knopf: nur wo die Objektspalte zur Schublade wird.
-       Er bedient den VORHANDENEN Umschalter, statt einen zweiten Weg
-       aufzumachen - zwei Wege zu demselben Zustand laufen auseinander. */
-    /* v1639 · IMMER anlegen, auch wenn die Objektspalte dauerhaft steht.
-       Grund: unter 900 px wird sie in JEDEM Layout zur Schublade (siehe
-       layout-varianten.css) - ohne diesen Knopf gaebe es dort keinen Weg
-       mehr an die Objektliste. Auf breiten Schirmen blendet die CSS ihn
-       bei den Spalten-Layouts aus.
+    /* Eine Ueberschrift fuer die Kontextschiene - der Entwurf fuehrt
+       dort „Ausgabe", und eine Spalte ohne Namen ist eine Spalte, die
+       man erklaeren muss. */
+    if (S.titel) {
+      var t = document.createElement('div');
+      t.className = 'dpl-schiene-titel';
+      t.textContent = S.titel;
+      schiene.appendChild(t);
+    }
 
-       > Ein Bedienelement, das nur auf einem Geraet existiert, vergisst
-       > man beim Umbau des anderen. Lieber immer da und manchmal
-       > unsichtbar. */
-    {
-      schiene.setAttribute('data-objekte', L.objekteAls);
+    /* Der Portfolio-Knopf bedient den VORHANDENEN Umschalter, statt
+       einen zweiten Weg aufzumachen - zwei Wege zu demselben Zustand
+       laufen auseinander. */
+    if (S.portfolio) {
       var pb = document.createElement('button');
       pb.type = 'button';
       pb.className = 'dpl-portfolio';
@@ -169,13 +242,13 @@
       schiene.appendChild(pb);
     }
 
-    L.nimmt.forEach(function (art) {
+    S.nimmt.forEach(function (art) {
       var k = hole(KNOTEN[art]);
       if (k) {
         var h = document.createElement('div');
         h.className = 'dpl-teil dpl-teil-' + art;
         h.appendChild(k);
-        /* Der Aufklapper gehört zum Aktionsblock und wandert mit. */
+        /* Der Aufklapper gehoert zum Aktionsblock und wandert mit. */
         if (art === 'aktionen') {
           var s = hole(KNOTEN.schalter);
           if (s) h.insertBefore(s, k);
@@ -184,34 +257,13 @@
       }
     });
 
-    /* ── WOHIN DIE SCHIENE IM DOKUMENT GEHOERT ──────────────────────
-       GEMESSEN am 28.09.2026: in der Werkbank stand die Leiste bei
-       "top: 3987" - weit unterhalb des Fensters. Keiner ihrer zwoelf
-       Knoepfe war erreichbar.
-
-       Ursache: die CSS ordnete sie mit "order:-1" direkt unter die
-       Reiter. **"order" wirkt aber nur in einem Flex-Container**, und
-       ".main-col" ist "display:block". Die Leiste blieb deshalb dort,
-       wo "appendChild" sie hingelegt hatte: ganz am Ende, hinter dem
-       gesamten Inhalt.
-
-       > Ich hatte damals ihre HOEHE gemessen (1702x95) und daraus
-       > geschlossen, sie sitze richtig. **Eine Groesse sagt nichts
-       > ueber einen Ort.**
-
-       Bei "links"/"rechts" ist der Ort gleichgueltig - sie stehen
-       "position:fixed". Bei "leiste" gehoert sie hinter die
-       Reiterleiste, bei "fuss" ans Ende (dort klebt sie unten). */
-    if (L.schiene === 'leiste') {
-      var reiter = el('nav.tabs');
-      if (reiter && reiter.parentElement === mc) mc.insertBefore(schiene, reiter.nextSibling);
-      else mc.insertBefore(schiene, mc.firstChild);
-    } else {
-      mc.appendChild(schiene);
-    }
-    zahlNachziehen();
+    /* Beide Stellungen stehen `position:fixed`; der Ort im Dokument ist
+       deshalb gleichgueltig. (Die waagerechten Stellungen `leiste` und
+       `fuss` gab es bis v1652 - sie sind mit Werkbank und Dossier
+       gestrichen, und mit ihnen die Sortierfrage.) */
+    mc.appendChild(schiene);
+    schienen.push(schiene);
   }
-
   function zahlNachziehen() {
     var n = document.querySelectorAll('#sb-list .sb-card').length;
     var z = el('#dpl-obj-zahl');
@@ -267,7 +319,7 @@
        Datei ordnet den Raum, sie färbt ihn nicht. */
     try { if (typeof window._dpDispSkin === 'function') window._dpDispSkin('hell'); } catch (e) {}
     kopfOffenHalten(true);
-    if (LAYOUTS[v].schiene) baueSchiene(v);
+    baueSchienen(v);
     try { localStorage.setItem(LS, v); } catch (e) {}
     schalterNachziehen();
   }
