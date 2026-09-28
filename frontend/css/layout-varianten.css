@@ -3656,3 +3656,38 @@ html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v,
 html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v *{
   font-size:14px !important;
 }
+
+/* ── v1662c · @media ERHOEHT KEINE SPEZIFITAET ───────────────────────
+   Gemessen in der Messkabine bei 390 px: `.app-wrap` war 390 px
+   breit, der Arbeitsbereich `.main-col` aber nur **142 px** - und
+   begann bei x=248. Die Kartei-Chips standen dadurch bei x=276 in
+   einem 390-px-Fenster.
+
+   Die Ursache war nicht die Rasterspur, sondern das POLSTER:
+
+     computed padding-left = 248px
+     Sieger: html[data-dp-layout="v1"]:not([data-dpl-seiten])
+             .app-wrap{ padding-left:var(--dpl-schiene-b) !important }
+                                                          (0,3,1)
+     Verlierer: @media (max-width:900px){
+             html[data-dp-layout] .app-wrap{ padding-left:0
+             !important } }                               (0,2,1)
+
+   > Ein `@media`-Block aendert nichts an der Spezifitaet seiner
+   > Regeln. Eine Schmalschirm-Regel gewinnt nicht, WEIL sie in einem
+   > `@media` steht - sie muss denselben Anker tragen wie die Regel,
+   > die sie aufheben soll.
+
+   Auf 390 px gehoert die Schiene nach oben und der Inhalt ueber die
+   volle Breite; jedes Polster dafuer ist dort falsch. Deshalb hier
+   dieselben vier Selektoren, nur schmal. */
+@media (max-width:900px){
+  html[data-dp-layout="v1"]:not([data-dpl-seiten]) .app-wrap,
+  html[data-dp-layout="v2"]:not([data-dpl-seiten]) .app-wrap,
+  html[data-dp-layout="v1"][data-dpl-seiten="getauscht"] .app-wrap,
+  html[data-dp-layout="v2"][data-dpl-seiten="getauscht"] .app-wrap{
+    padding-left:0 !important;
+    padding-right:0 !important;
+    grid-template-columns:1fr !important;
+  }
+}
