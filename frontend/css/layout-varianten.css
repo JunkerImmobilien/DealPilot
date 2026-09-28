@@ -260,7 +260,7 @@ html[data-dp-layout="v2"] .app-wrap{ grid-template-columns:1fr !important; }
    > ist gerade passiert: v2 wurde von „Spalte" auf „Schublade"
    > umgestellt, stand aber nicht in dieser Liste - und die Objektliste
    > lag offen über der Arbeitsfläche. */
-html[data-dpl-portfolio] #sidebar{
+html[data-dp-layout][data-dpl-portfolio] #sidebar{
   position:fixed !important; top:0; bottom:0; left:0 !important; z-index:70;
   width:360px !important; max-width:88vw;
   /* Zweiter Messbefund: `translateX(-102%)` schiebt um die EIGENE
@@ -286,7 +286,7 @@ html[data-dpl-portfolio] #sidebar{
   box-shadow:0 0 40px -12px rgba(0,0,0,.45);
 }
 
-html[data-dpl-portfolio="auf"] #sidebar{ transform:translateX(0) !important; }
+html[data-dp-layout][data-dpl-portfolio="auf"] #sidebar{ transform:translateX(0) !important; }
 
 /* ── v1656b · DER ABDUNKLER, DER DIE LISTE UNBEDIENBAR MACHTE ────────
    Hier stand:
@@ -2014,18 +2014,18 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-objekte,
 html[data-dp-layout] .dpl-schiene .dpl-teil-suche{
   overflow:hidden;
 }
-html[data-dpl-portfolio="zu"] .dpl-schiene .dpl-teil-objekte,
-html[data-dpl-portfolio="zu"] .dpl-schiene .dpl-teil-suche{
+html[data-dp-layout][data-dpl-portfolio="zu"] .dpl-schiene .dpl-teil-objekte,
+html[data-dp-layout][data-dpl-portfolio="zu"] .dpl-schiene .dpl-teil-suche{
   display:none !important;
 }
-html[data-dpl-portfolio="auf"] .dpl-schiene .dpl-teil-objekte{
+html[data-dp-layout][data-dpl-portfolio="auf"] .dpl-schiene .dpl-teil-objekte{
   display:block !important;
   flex:0 1 auto !important;
   max-height:46vh !important;
   overflow-y:auto !important;
   scrollbar-width:thin; scrollbar-color:#2A2622 transparent;
 }
-html[data-dpl-portfolio="auf"] .dpl-schiene .dpl-teil-suche{
+html[data-dp-layout][data-dpl-portfolio="auf"] .dpl-schiene .dpl-teil-suche{
   display:block !important; flex:0 0 auto !important;
 }
 /* Der Knopf zeigt, dass es weitergeht - und in welche Richtung. */
@@ -2033,8 +2033,8 @@ html[data-dp-layout] .dpl-portfolio::after{
   content:'▸'; margin-left:auto; font-size:10px; opacity:.7;
   transition:transform .15s ease; display:inline-block;
 }
-html[data-dpl-portfolio="auf"] .dpl-portfolio::after{ transform:rotate(90deg); }
-html[data-dpl-portfolio="auf"] .dpl-portfolio{
+html[data-dp-layout][data-dpl-portfolio="auf"] .dpl-portfolio::after{ transform:rotate(90deg); }
+html[data-dp-layout][data-dpl-portfolio="auf"] .dpl-portfolio{
   background:#221F1A !important;
 }
 
@@ -2681,11 +2681,11 @@ html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-investor-badge{
 
    > Zwei Ebenen, die einander abloesen, statt uebereinander zu liegen:
    > Portfolio ODER dieses Objekt. */
-html[data-dpl-portfolio="auf"] .dpl-schiene .dpl-teil-tabs{
+html[data-dp-layout][data-dpl-portfolio="auf"] .dpl-schiene .dpl-teil-tabs{
   display:none !important;
 }
 /* Dafuer bekommt die Liste den freien Platz. */
-html[data-dpl-portfolio="auf"] .dpl-schiene .dpl-teil-objekte{
+html[data-dp-layout][data-dpl-portfolio="auf"] .dpl-schiene .dpl-teil-objekte{
   max-height:none !important;
   flex:1 1 auto !important;
   min-height:0 !important;

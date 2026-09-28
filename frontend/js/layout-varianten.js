@@ -514,6 +514,23 @@
         localStorage.setItem('dp_chrome_hell', '0');
       } catch (e) {}
       h.removeAttribute('data-ui-theme');
+      /* v1662b · DAS PORTFOLIO-ATTRIBUT GEHOERT MIT ABGEMELDET.
+
+         Gemessen nach setze(''): Farben alle richtig, aber die App
+         stand in einer 380 px schmalen Spalte. Ursache:
+
+           html[data-dpl-portfolio] #sidebar{
+             position:fixed; left:0; transform:translateX(-102%); }
+
+         `data-dpl-portfolio` blieb stehen - ich hatte in v1653 die
+         Schubladenregel bewusst AN DIESES Attribut gehaengt, weil die
+         Layoutliste (v1,v3,v4) v2 vergessen hatte. Damit hing sie an
+         einem Merker, den das Abmelden nicht kannte.
+
+         > Wer einen Anker wechselt, muss auch den Abbau umhaengen.
+         > Ein Aufraeumen, das die alte Liste abarbeitet, laesst genau
+         > das stehen, was neu dazugekommen ist. */
+      h.removeAttribute('data-dpl-portfolio');
       /* v1662 · EIN MERKER, DER ZURUECKKOMMT, IST KEIN AUSLIEFERUNGSZUSTAND.
 
          Das Attribut zu entfernen reichte NICHT. hell-varianten.js

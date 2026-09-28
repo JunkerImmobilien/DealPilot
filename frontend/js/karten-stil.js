@@ -256,7 +256,7 @@
        sie setzen alle `dp-neue-karte` voraus. Ohne diese Marke greift
        keine der 46 Grundregeln, und der Stil sähe aus wie ein halb
        aufgetragener Anstrich. */
-    if (document.body) document.body.classList.toggle('dp-neue-karte-stil', !!aktuell);
+    if (document.body) document.body.classList.toggle('dp-neue-karte-stil', !!aktuell && layoutAktiv());
 
     try { localStorage.setItem(LS, aktuell); } catch (e) {}
     anwenden();
