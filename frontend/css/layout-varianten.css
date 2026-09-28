@@ -2966,3 +2966,63 @@ html[data-dp-layout="v2"][data-dpl-seiten="getauscht"] .app-wrap{
   padding-left:240px !important;
   padding-right:var(--dpl-schiene-b) !important;
 }
+
+/* ── v1657b · ZWEIMAL DERSELBE WIDERSPRUCH, JETZT MIT ERKLAERUNG ─────
+   Die Kennung blieb auf Kontrast 1,36 und die Kante auf 1,11 px,
+   obwohl mein Kaskaden-Walker MEINE Regeln als Sieger nannte. Geprueft
+   und ausgeschlossen: doppelt geladene Stylesheets (nein), Inline-Stil
+   (nein), `@media`-Block (nein, Tiefe 0).
+
+   > **Der Fehler sitzt im Walker:** meine `spez()`-Funktion zaehlt
+   > `:is(.a,.b,.c)` als drei Klassen. CSS zaehlt nur das STAERKSTE
+   > Argument. Bei `:not()` genauso. Ein Walker, der Spezifitaet falsch
+   > rechnet, nennt den falschen Sieger - und ich habe ihm zweimal
+   > geglaubt (auch bei `#hdr-obj-num` in v1653i, der Fall ist damit
+   > nachtraeglich erklaert).
+
+   Statt weiter zu rechnen: die Klasse dreifach. Das ist (0,6,1) und
+   ueberbietet alles, was in `style.css` auf diese Elemente zeigt. */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq.sbc-seq.sbc-seq{
+  color:#8C8578 !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card.sb-card.sb-card{
+  border-left-width:2px !important;
+  border-left-style:solid !important;
+}
+
+/* ── DER SCORE-CHIP, ZEILE FUER ZEILE NACH DEM ENTWURF ───────────────
+   Marcel: „bitte auch den Investor Deal Score im Header pruefen, der
+   sieht nicht so aus wie in der Demo."
+
+   Der Entwurf (`entwurf-hell-bankfaehig.html`, `SCORE`):
+
+     <div class="score-chip">
+       <div class="ring"></div>            Ring mit der Zahl
+       <div class="tx">
+         <b>Gute Bewertung</b>             FETT, 11,5 px
+         <span>Investor Deal Score</span>  Mono, 8,5 px, Versalien
+       </div>
+     </div>
+
+   Zwei Abweichungen, beide gemessen:
+   1. Bei uns steht die BEZEICHNUNG oben und die Einordnung darunter -
+      im Entwurf andersherum. Zuerst die Aussage, dann wofuer sie gilt.
+   2. Der Entwurf hat KEINE Note-Pille neben dem Ring. Die Zahl im Ring
+      und „Gute Bewertung" sagen dasselbe; ein drittes Mal „GUT" ist
+      Wiederholung, kein Gewinn. */
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-info{
+  display:flex !important; flex-direction:column !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v{
+  order:1 !important;
+  font-size:11.5px !important; font-weight:600 !important;
+  line-height:1.15 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-l{
+  order:2 !important;
+  font-size:8.5px !important; letter-spacing:.09em !important;
+  line-height:1.15 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-grade{
+  display:none !important;
+}
