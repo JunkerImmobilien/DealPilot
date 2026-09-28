@@ -21017,3 +21017,134 @@ linksbündig. Gemessen: Pille 332x**76**, Label y=66, Wert y=82 in
   `#sb-user`-Knoten zu verschieben.
 - `dp_layout_variante` liegt als toter Merker im localStorage; kein
   Modul liest ihn mehr.
+
+---
+
+## Rollout-Journal · 28.09.2026 (12) — Aktenmappe 2, und zweimal zwei Ursachen
+
+**Was:** Sechs Punkte aus einem Zuruf — die unsichtbare Wortmarke in der
+Kartei, eine zweite Aktenmappe mit Reitern oben, das Logo in der
+Flucht, die Prüfung der Farbverknüpfung (mit einem gefundenen Fehler),
+die QuickBoarding-Karte in der Form der DealScore-Karte und die
+Pre-Flight-Karte im QuickBoarding.
+
+**Commits:** `a15b2dc` v1663 · `fe06785` v1663b · `4ffa80f` v1663c ·
+`8afae72` v1663d · `c088e6d` v1663e · `6556412` v1663f
+
+**Nachweis:**
+
+| | Ist |
+|---|---|
+| Kartei-Chip „Deal" | `#F2EDE3` auf `rgb(5,5,5)` — vorher Kontrast **1,02** |
+| Aktenmappe 2 (`v1b`) | Reiter bei **y=61**, 1881 px, **nicht** in der Schiene |
+| Aktenmappe 1 (`v1`) | Reiter weiter in der Schiene (y=561), Schiene 248 |
+| Logo | **37 px** (vorher 31), Block 92 px, mittig statt oben |
+| Farbwahl nach F5 | `--gold` = gewählter Wert, Logo-„Pilot" folgt |
+| Kartei im QuickBoarding | vier Kacheln auf **y=504**, 42 px, eine Reihe |
+| QuickBoarding-Karte | Spalte; Abriss **1278×15** unten, Streifen **77 px** |
+| „Heute" danach | nur `data-bg`, Seitenspalte schwarz, `.main-col` 1753 px |
+| Handy 390 / Tablet 834 | kein Überlauf, Reiter voll breit, Schiene oben |
+
+---
+
+### 1 · „Das Deal ist in einem Grau"
+
+Gemessen war es kein Grauton: der Chip `.dp-pf-logo.dp` trug Text
+`rgb(26,26,24)` auf Grund `rgb(5,5,5)` — **Kontrast 1,02**. Ursache
+ist eine Hellmodus-Regel, die nur die Schrift umfärbt und annimmt, die
+Fläche gehe mit. Der Chip behält aber seine schwarze Pille.
+
+> Eine Hellmodus-Regel, die nur die Schrift umfärbt, setzt voraus, dass
+> auch die Fläche mitgeht. Tut sie es nicht, **löscht** die Regel das
+> Wort.
+
+### 2 · Ein Layout, das eine Zeile kostet
+
+Der ganze Unterschied zwischen Aktenmappe und Aktenmappe 2 ist ein Wort
+weniger in `nimmt`: ohne `'tabs'` bleibt `nav.tabs` dort stehen, wo es
+hingebaut wurde. Die allgemeinen Regeln greifen dort genauso.
+
+**Der Schlüssel heißt `v1b` und nicht `v3`:** `v3`, `v4` und `v5` waren
+früher eigene Layouts, und **22 ihrer CSS-Regeln stehen noch in der
+Datei**. Ein neues `v3` hätte sie stillschweigend geerbt. Damit die
+neun `[data-dp-layout="v1"]`-Regeln für beide gelten, heißen sie jetzt
+`[data-dp-layout^="v1"]` — gleiche Spezifität, keine Verschiebung.
+
+### 3 · Die Farben sind verknüpft — der Rückweg fehlte
+
+Marcels Frage war, ob Einstellungen → Darstellung mit dem Whitelabel
+verknüpft ist. **Sie ist es, und zwar sauber:** das Panel hat keinen
+eigenen Färbe-Weg, `farbenAnwenden()` reicht Akzent und Grundfarbe
+unverändert an `DealPilotWhitelabel.apply()` durch — dieselben
+`--gold*`-, `--wl-*`- und `--obsidian`-Tokens. Ein Kanal, mehrere
+Schreiber.
+
+**Gemessen fehlte aber der Rückweg.** Alle drei Aufrufer von
+`farbenAnwenden()` stehen innerhalb der Panel-Bindungen.
+`startAufbau()` stellte Vorlage, Karten und Bereichsfarben wieder her —
+`ui_accent` und `ui_obsidian` las beim Start **niemand**.
+
+> Eine Farbe, die man wählen kann und die das Neuladen nicht überlebt,
+> ist keine Einstellung, sondern eine Vorschau. Und sie sieht genauso
+> aus wie eine, die funktioniert — bis man F5 drückt.
+
+Zwei Bedingungen im Boot: nur wenn wirklich etwas gewählt wurde (sonst
+schaltete jeder Seitenaufruf den Sweeper ohne Anlass ein), und **nie
+beim Mandanten eines Partners** — dort gehört die Marke dem Partner.
+
+**Offen** (Befunde der Prüfung, nicht angefasst): die Grundfarbe gibt es
+nur als eine von sechs Kacheln, ohne freien Wähler, gesperrt sobald eine
+Vorlage aktiv ist, und sie wirkt nur auf drei Flächen
+(`css/ui-varianten.css:2506-2520`). Der Standard steht doppelt —
+`OBSIDIAN_STD='#050505'` gegen `DEF.obsidian='#070707'`.
+
+### 4 · Zwei Ursachen, die dasselbe Bild erzeugen — zweimal
+
+**Die Pre-Flight-Karte im QuickBoarding.** Marcel: „die sieht halt dort
+immer noch genauso aus." Gemessen waren es **zwei** Gründe:
+
+1. Das QuickBoarding läuft im iframe `#qc-v17-frame`
+   (`quickcheck-app.html`). Sein `<html>` trägt `qc-app qc-embedded` und
+   **kein** `data-dp-kartenstil` — die Marke saß am falschen Dokument.
+2. Die Leiste heißt dort **`#qc7-sources`**, nicht `#oab-bar`. Alle 29
+   Kartei-Regeln trugen die ID der Hauptanwendung — genau die ID, die
+   sie überhaupt gewinnen lässt.
+
+> Zwei Ursachen, die dasselbe Bild erzeugen, sehen aus wie eine. Hätte
+> ich nur die ID geweitet, wäre nichts passiert — und ich hätte die
+> Weitung für widerlegt gehalten.
+
+**Und ein dritter Grund kam nach** (v1663e): nach der Reparatur stand
+das Attribut korrekt, die Quellen standen aber weiter untereinander —
+das iframe lud `datenaufnahme.css` noch mit `?v=v1661`. Die HTML-Datei
+selbst hängt unter `quickcheck-app.html?v=v1645` im Cache. **Ein neuer
+Buster IN einer Datei erreicht niemanden, solange die Datei selbst
+nicht neu geholt wird.**
+
+### 5 · Der Abriss wandert von rechts nach unten
+
+Vorlage gemessen (`landing/dp2-hero.css:145-158`, `.idscard`): eine
+Spalte mit `.ids-tear` (15 px, `#0c0b09`, 2 px gestrichelt Gold 40 %,
+zwei 15-px-Ausstanzungen) und `.ids-foot` (zwei Beschriftungspaare
+links, weißer QR rechts).
+
+`#qb-bp` war eine **Zeile** mit weißem Abriss rechts — 208 px, die der
+Karte quer weggenommen wurden.
+
+> Ein Abriss rechts halbiert die Karte, ein Abriss unten schließt sie
+> ab. Dieselbe Metapher — nur kostet die eine ein Sechstel der Breite
+> und die andere 60 px Höhe.
+
+Umgebaut nur mit CSS: `.bp`, `.no`, `.cap`, `.lnk` und `.qrlink` waren
+alle schon da, sie standen nur untereinander. Ein Raster mit drei
+Spalten stellt sie wie die Vorlage.
+
+### Rest
+
+- **Staging-Abnahmepunkt Logo:** ob „in einer Flucht" genau diese Linie
+  meint, entscheidet das Auge. Die Zahlen stehen im Journal, damit die
+  nächste Runde nicht bei null anfängt.
+- Der Kaskaden-Walker gehört weiterhin repariert (seit v1657 offen).
+- 22 tote CSS-Regeln für `v3`/`v4`/`v5` stehen weiter in
+  `layout-varianten.css` — sie haben diesmal den Schlüsselnamen
+  bestimmt.
