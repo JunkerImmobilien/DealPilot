@@ -1056,3 +1056,65 @@ html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-row{
 html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-rz{
   justify-content:flex-start !important;
 }
+
+/* ── v1661 · DIE QUELLEN NEBENEINANDER, DER KNOPF DANEBEN ────────────
+   Marcel: „bei der Datenaufnahme passt noch gar nicht die
+   Marktbewertung mit der Formatierung. Das ist untereinander. Das
+   sollte ja als Streifen nebeneinander und auch der Abruf-Button
+   daneben."
+
+   Gemessen: die beiden Quellgruppen („Marktbewertung" und „Daten
+   uebernehmen aus") standen als eigene Bloecke untereinander, der
+   Knopf in einer dritten Zeile. Das kostete 266 px Hoehe.
+
+   Jetzt ein Streifen: Kopfzeile oben ueber die volle Breite, darunter
+   die beiden Gruppen NEBENEINANDER, und der Abrufknopf rechts in
+   derselben Zeile.
+
+   > Eine Zeile sagt „das gehoert zusammen und passiert gleichzeitig".
+   > Drei Zeilen sagen „erst das, dann das, dann das" - und so ist es
+   > nicht: man waehlt Quellen und drueckt ab. */
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar{
+  flex-direction:row !important;
+  flex-wrap:wrap !important;
+  align-items:stretch !important;
+}
+/* Die Kopfzeile behaelt die volle Breite. */
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-lead{
+  flex:1 0 100% !important; width:100% !important;
+}
+/* Die beiden Gruppen teilen sich den Rest, der Knopf bekommt sein
+   eigenes Mass. */
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar > .dp-pf-seg{
+  flex:1 1 260px !important; min-width:0 !important;
+  padding:12px 15px !important;
+  border-right:1px solid #E6E1D6 !important;
+}
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar > .dp-pf-seg:last-of-type{
+  border-right:0 !important;
+}
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-rz{
+  flex:0 0 auto !important;
+  border-top:0 !important;
+  border-left:1px solid #E6E1D6 !important;
+  align-items:center !important;
+  padding:12px 15px !important;
+}
+/* Der erklaerende Satz gehoert bei dieser Anordnung nicht neben den
+   Knopf - dort steht er quer. Er faellt weg; die Gruppennamen sagen
+   dasselbe. */
+html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-rz::before{
+  content:none !important;
+}
+/* Unter 900 px untereinander - nebeneinander waere dort gequetscht. */
+@media (max-width: 900px){
+  html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar > .dp-pf-seg{
+    flex:1 0 100% !important;
+    border-right:0 !important;
+    border-bottom:1px solid #E6E1D6 !important;
+  }
+  html[data-dp-kartenstil="kartei"] #oab-bar.dp-pfbar .dp-pf-rz{
+    flex:1 0 100% !important; border-left:0 !important;
+    border-top:1px solid #E6E1D6 !important;
+  }
+}

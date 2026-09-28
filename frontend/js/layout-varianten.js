@@ -469,9 +469,39 @@
          > frueheren Sitzung stammt, darf das nicht ueberschreiben. Wer
          > den Hellmodus WILL, waehlt ihn in den Einstellungen - dort
          > gehoert er hin, nicht als Nebenwirkung eines Layouts. */
-      try { if (typeof window._dpDispSkin === 'function') window._dpDispSkin('obsidian'); } catch (e) {}
+      /* v1661 · NEU LADEN STATT IM LAUFENDEN TAB UMSCHALTEN.
+
+         Marcel: 'die Karten sind hell geworden im Auslieferungszustand
+         und auch oben die Tabbar'. Gemessen: eine FRISCH GELADENE Seite
+         ohne Layout ist einwandfrei dunkel (Sidebar rgb(0,0,0),
+         Reiterleiste rgb(10,8,5)). Der Schaden entsteht nur beim
+         Umschalten im laufenden Tab.
+
+         settings.js sagt warum, an seiner eigenen Stelle: '_dpDispSkin
+         loescht die Vorlage, wenn sie der Helligkeit widerspricht.'
+         Ein Skinwechsel zur Laufzeit hinterlaesst Inline-Variablen und
+         eine geloeschte Vorlage - style.disabled setzt nichts zurueck.
+
+         > **Was sich nicht sauber zuruecknehmen laesst, wird nicht
+         > zurueckgenommen, sondern neu geladen.** Ein Neuladen ist
+         > sichtbar und ehrlich; ein halb umgeschalteter Skin sieht aus
+         > wie ein Fehler und ist auch einer.
+
+         Der Merker steht auf 0, das Layout ist geloescht - die Seite
+         kommt im Auslieferungszustand hoch. */
       skinVorher = null;
       if (document.body) document.body.classList.remove('dp-neue-karte', 'dp-neue-karte-stil');
+      var warHell = false;
+      try { warHell = document.body.classList.contains('dp-chrome-hell'); } catch (e) {}
+      if (warHell) {
+        try { localStorage.setItem('dp_chrome_hell', '0'); } catch (e) {}
+        try {
+          var u = new URL(location.href);
+          u.searchParams.delete('layout');
+          location.replace(u.toString());
+          return;
+        } catch (e) { location.reload(); return; }
+      }
       h.removeAttribute('data-dpl-portfolio');
       try { localStorage.removeItem(LS); } catch (e) {}
       schalterNachziehen();

@@ -3542,3 +3542,31 @@ html[data-dp-layout] :is(#sb-list) .sb-add-new:hover,
 html[data-dp-layout] :is(#sb-list) .sb-add-new:hover *{
   color:#F5EFE2 !important;
 }
+
+/* ── v1661 · DAS SCORE-BAND WIRD KRAEFTIGER ──────────────────────────
+   Marcel: „oben mit dem Investor Deal Score, das ist viel zu flach.
+   Das muesste ein bisschen breiter sein."
+
+   Gemessen war das Band 59 px hoch bei einer Zeile von 1881 px - sehr
+   breit und sehr duenn. Mehr Polster und eine groessere Zahl geben ihm
+   Gewicht, ohne den Kopf aufzublaehen. */
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main{
+  padding:9px 14px 9px 9px !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut{
+  width:34px !important; height:34px !important; flex:0 0 34px !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-donut > *{
+  font-size:12px !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v,
+html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v *{
+  font-size:13px !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill{
+  padding:9px 14px !important;
+}
+html[data-dp-layout] body header.hdr #hdr-badges .sc-pill .sc-pill-v{
+  font-size:17px !important;
+}
