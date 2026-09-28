@@ -1268,13 +1268,57 @@
      diese Luecke schliesst (v1098), war zu dem Zeitpunkt noch nicht
      installiert. Ein Rueckbau muss aber immer vollstaendig sein, egal von
      wo er ausgeloest wird. */
-  function startAufbau() { logoUmhuellen(); chromeFarbenBooten(); bereicheUmhuellen(); resetUmhuellen(); }
+  /* ── v1663c · DIE GEWAEHLTE MARKENFARBE UEBERLEBTE KEIN NEULADEN ─────
+     Marcel: „dass man dort dann halt auch die Farben anpassen kann,
+     wenn man den Partnervertrag hat - kannst du schauen, ob du das
+     mit verknuepft hast?"
+
+     Verknuepft ist es, und zwar sauber: das Panel hat KEINEN eigenen
+     Faerbe-Weg, `farbenAnwenden()` reicht Akzent und Grundfarbe
+     unveraendert an `DealPilotWhitelabel.apply()` durch - dieselben
+     `--gold*`-, `--wl-*`- und `--obsidian`-Tokens, die auch das
+     Partner-Whitelabel setzt. Ein Kanal, mehrere Schreiber.
+
+     **Gemessen fehlte aber der Rueckweg.** Alle drei Aufrufer von
+     `farbenAnwenden()` (Z. 737, 774, 811) stehen INNERHALB der
+     Panel-Bindungen, also innerhalb von `oeffnen()`. `startAufbau()`
+     stellte Vorlage, Karten und die Bereichsfarben wieder her -
+     `ui_accent` und `ui_obsidian` las beim Start **niemand**.
+
+     > Eine Farbe, die man waehlen kann und die das Neuladen nicht
+     > ueberlebt, ist keine Einstellung, sondern eine Vorschau. Und sie
+     > sieht genauso aus wie eine, die funktioniert - bis man F5
+     > drueckt.
+
+     Zwei Bedingungen, damit das kein zweiter Schreiber wird:
+
+     - **Nur wenn wirklich etwas gewaehlt wurde.** Sonst riefe jeder
+       Seitenaufruf `apply()` mit den Standardwerten und schaltete den
+       Whitelabel-Sweeper ohne Anlass ein.
+     - **Nie beim Mandanten eines Partners.** Dort gehoert die Marke
+       dem Partner; `mandant-branding.js` setzt sie aus dem Cache und
+       erneut bei `dp:plan-ready`. Eine eigene Wahl davorzuschieben
+       waere ein Wettlauf, den mal der eine und mal der andere
+       gewinnt. */
+  function markenfarbenBooten() {
+    if (istMandant()) return;
+    var st = load();
+    if (!st.ui_accent && !st.ui_obsidian) return;
+    farbenAnwenden(st.ui_accent || GOLD_STD, st.ui_obsidian || OBSIDIAN_STD);
+  }
+
+  function startAufbau() { logoUmhuellen(); chromeFarbenBooten(); markenfarbenBooten(); bereicheUmhuellen(); resetUmhuellen(); }
   if (document.body) startAufbau();
   else document.addEventListener('DOMContentLoaded', startAufbau);
 
   /* Der Plan steht beim Laden noch nicht fest — nachziehen, wenn er kommt.
      dp:plan-ready statt Timer oder Polling (CLAUDE.md). */
   window.addEventListener('dp:plan-ready', gateSetzen);
+  /* v1663c: und die Markenfarbe danach noch einmal - `config.js`
+     entscheidet erst mit dem Plan, ob es selbst `--gold` setzen darf
+     (es ueberspringt den Akzent nur, solange `isActive()` gilt). Wer
+     zuletzt schreibt, gewinnt; das soll die Wahl des Nutzers sein. */
+  window.addEventListener('dp:plan-ready', markenfarbenBooten);
 
   window.DealPilotUiVarianten = {
     open:  oeffnen,
