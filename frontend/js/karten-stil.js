@@ -446,6 +446,34 @@
 
     beobachten();
     panelBeobachten();
+    rahmenHorchen();
+  }
+
+  /* ── v1665 · DER BEOBACHTER IST NICHT DA, WENN ER GEBRAUCHT WIRD ───
+     Gemessen: nach dem Oeffnen des QuickBoardings stand
+     `data-dp-kartenstil` am Hauptdokument auf „kartei" und am
+     iframe-Dokument auf **null** - meine Bruecke aus v1663d war nie
+     gelaufen (`_dpkLoad` stand auf false).
+
+     Der Grund ist mein eigener `anwenden()`: es haengt den
+     MutationObserver ab, solange es arbeitet (gegen die Endlosschleife
+     aus v1652). Genau in diesem Fenster haengt `qc-bridge.js` das
+     iframe ein - und der Beobachter sieht es nie.
+
+     > Ein Beobachter, der sich zum Arbeiten selbst abschaltet, hat ein
+     > blindes Fenster. Wer darin etwas einhaengt, wird nicht bemerkt -
+     > und der Fehler sieht aus wie ein Timing-Zufall, weil er es auch
+     > ist.
+
+     Deshalb haengt die Bruecke jetzt am ECHTEN Ereignis. `load` steigt
+     nicht auf, laesst sich aber in der EINFANGPHASE am Dokument
+     mithoeren - damit trifft es jedes iframe, auch ein spaeter
+     ausgetauschtes, ohne Beobachter und ohne Zeitgeber. */
+  function rahmenHorchen() {
+    document.addEventListener('load', function (e) {
+      var t = e.target;
+      if (t && t.tagName === 'IFRAME' && t.id === 'qc-v17-frame') rahmenNachziehen();
+    }, true);
   }
 
   if (document.readyState === 'loading') {

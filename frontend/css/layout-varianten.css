@@ -4063,3 +4063,141 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-tip *,
 html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-sub{
   color:#8C8578 !important;
 }
+
+/* ── v1665 · DIE REITERLEISTE GEHOERT ZUM MENUE ──────────────────────
+   Marcel: „die Tabbar sollte natuerlich auch in Schwarz oder in dem
+   Dunklen dargestellt werden, die Hintergrundfarbe wie das linke
+   Menue, und die Eintraege dann dementsprechend in der Farbe, wie wir
+   auch Neues Objekt, Quickboarding und Import genommen haben."
+
+   Gemessen in der Aktenmappe 2:
+
+     .dpl-schiene     Grund rgb(14,13,11)   Eintraege rgb(191,183,169)
+     nav.tabs         Grund rgb(255,255,255)
+       .tab aktiv     oklab(0.207 …)  ~ #2B2723
+       .tab ruhig     rgb(92,85,75)
+
+   Eine weisse Leiste zwischen schwarzem Menue und cremefarbenem
+   Arbeitsbereich ist ein drittes Material an einer Stelle, an der es
+   nur zwei geben sollte.
+
+   > Die Reiter sind Navigation, kein Inhalt. Sie gehoeren zum Menue -
+   > und was zusammengehoert, sieht gleich aus.
+
+   Gilt nur fuer v1b: in der Aktenmappe 1 stehen die Reiter IN der
+   Schiene und sind dort laengst dunkel. */
+html[data-dp-layout="v1b"] body nav.tabs,
+html[data-dp-layout="v1b"] body header.hdr + nav.tabs,
+html[data-dp-layout="v1b"] body nav.tabs.tabs{
+  background:#0E0D0B !important;
+  border-bottom:1px solid var(--dpl-linie) !important;
+  box-shadow:none !important;
+}
+html[data-dp-layout="v1b"] body nav.tabs .tab,
+html[data-dp-layout="v1b"] body nav.tabs .tab *{
+  color:#BFB7A9 !important;
+  background:transparent !important;
+}
+html[data-dp-layout="v1b"] body nav.tabs .tab:hover,
+html[data-dp-layout="v1b"] body nav.tabs .tab:hover *{
+  color:#F2EDE3 !important;
+}
+html[data-dp-layout="v1b"] body nav.tabs .tab.active,
+html[data-dp-layout="v1b"] body nav.tabs .tab.active *{
+  color:#F5EFE2 !important;
+}
+html[data-dp-layout="v1b"] body nav.tabs .tab.active{
+  border-bottom-color:var(--wl-c9a84c, #C9A84C) !important;
+}
+/* Die Symbole der Reiter tragen denselben Ton wie die des Menues. */
+html[data-dp-layout="v1b"] body nav.tabs .tab svg,
+html[data-dp-layout="v1b"] body nav.tabs .tab svg *{
+  color:var(--wl-c9a84c, #C9A84C) !important;
+  stroke:var(--wl-c9a84c, #C9A84C) !important;
+}
+/* Das Fortschrittsband am rechten Rand der Leiste steht sonst als
+   heller Block in der neuen dunklen Flaeche. */
+html[data-dp-layout="v1b"] body nav.tabs #tabs-status-badge{
+  background:transparent !important;
+  border:1px solid var(--dpl-linie) !important;
+  color:#BFB7A9 !important;
+}
+
+/* ── v1665b · DER ACCOUNT-BLOCK IN EINER ZEILE ───────────────────────
+   Marcel: „da hast du einmal aktueller Plan und das Abmelden, genauso
+   wie den Versionsstand ganz nach unten gepackt. Wie waere es denn,
+   wenn du das neben das aktueller Plan packst? … Da nehmen wir dieses
+   Haekchen neben dem V1.1 raus, das brauchen wir nicht. Machen das
+   Abmelden noch mit neben das Pro-Zeichen und die Versionsnummer
+   sollten wir auch irgendwo da noch mit reinpacken. Dass wir das alles
+   ein bisschen weiter runter bekommen, dass die Ansicht komplett
+   angezeigt wird mit den Einstellungen."
+
+   Gemessen, 227x125 px in drei Etagen:
+
+     .sb-user-main
+       .sb-user-avatar  „M"
+       .sb-user-text    Name · E-Mail · Pille „Pro"
+       .sb-user-icons   „V1.1" · Knopf „Aktueller Plan" · Knopf „Abmelden"
+
+   **Der Doppelweg, den Marcel gefunden hat:** die Pille „Pro" traegt
+   `title="Aktueller Plan — Klick fuer …"` und der Knopf daneben
+   heisst genauso. Zwei Bedienelemente, ein Ziel.
+
+   > Zwei Wege zum selben Ort sind kein Komfort, sondern eine Frage,
+   > die der Nutzer beantworten muss, ohne dass es etwas zu entscheiden
+   > gaebe. Der Knopf faellt, die Pille bleibt - sie sagt zusaetzlich,
+   > WELCHER Plan es ist.
+
+   Gebaut wird mit `display:contents` am Textblock: seine Kinder werden
+   damit zu direkten Rasterzellen von `.sb-user-main`, ohne dass ein
+   fremder Knoten umgehaengt wird. **Das ist hier keine Feinheit,
+   sondern die Lehre aus v1660** - als ich die Plan-Pille wirklich
+   verschoben habe, baute die Abo-Schicht `#sb-user` neu und es standen
+   zehn „Pro" nebeneinander. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer #sb-user .sb-user-main{
+  display:grid !important;
+  grid-template-columns:28px auto 1fr !important;
+  align-items:center !important;
+  column-gap:10px !important; row-gap:2px !important;
+  padding:10px 12px !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer #sb-user .sb-user-text{
+  display:contents !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer #sb-user .sb-user-avatar{
+  grid-column:1; grid-row:1 / span 2; align-self:center !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer #sb-user .sb-user-name{
+  grid-column:2 / -1; grid-row:1;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer #sb-user .sb-user-email{
+  grid-column:2 / -1; grid-row:2;
+}
+/* Die dritte Zeile: Pille, Abmelden, Version - nebeneinander. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer #sb-user .sb-user-plan-pill{
+  grid-column:1 / 3; grid-row:3; justify-self:start !important;
+  margin:4px 0 0 !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer #sb-user .sb-user-icons{
+  grid-column:3; grid-row:3;
+  display:flex !important; flex-direction:row !important;
+  align-items:center !important; justify-content:flex-end !important;
+  gap:6px !important; margin:4px 0 0 !important; padding:0 !important;
+}
+/* Das Haekchen faellt - es ist der zweite Weg zum Plan. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer #sb-user
+  .sb-user-icons .sb-user-icon-btn[title="Aktueller Plan"]{
+  display:none !important;
+}
+/* Die Version bleibt, aber leise - sie ist eine Auskunft, kein Knopf. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer #sb-user .sb-version-badge{
+  order:2 !important;
+  color:#6E675C !important; font-size:9px !important;
+  background:transparent !important; border:0 !important; padding:0 !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer #sb-user
+  .sb-user-icons .sb-user-icon-btn[title="Abmelden"]{
+  order:1 !important;
+  width:24px !important; height:24px !important;
+}
