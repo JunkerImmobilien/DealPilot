@@ -20029,3 +20029,157 @@ dasselbe noch einmal mit `justify-content`.
 **Rest:** der Weg zu beiden Schaltern ist **drei Klicks tief**
 (Einstellungen → Darstellung → „Darstellung öffnen"). Sie funktionieren,
 aber wer sie nicht kennt, findet sie nicht.
+
+---
+
+## Rollout-Journal · 28.09.2026 (4) — Marcels Durchgang, und nur noch zwei Layouts
+
+**Was:** Werkbank, Dossier und Cockpit hell gestrichen; die **Kanzlei
+nach dem Entwurf neu gebaut** (sie war andersherum); Kopf und Schublade
+schwarz; zwei Knöpfe raus; das Fortschritts-Badge in den Kopf; der
+Scrollbalken weg.
+
+**Commits:** `68aecb6` v1653 · `3032037` v1653b · `45b35b9` v1653c ·
+`5a07615` v1653d · `9e7a713` v1653e · `33a7125` v1653f · `1d39b7e`
+v1653g · `fcd1c7c` v1653h · `b3b77e7` v1653i · `da6f1e8` v1653j ·
+`e451a8f` v1653k
+
+**Nachweis** (Aktenmappe und Kanzlei, je mit **geladenem** Objekt):
+
+| | Aktenmappe | Kanzlei |
+|---|---|---|
+| Kopf | `rgb(14,13,11)`, 30 geprüft, **0 unter 4,5** | dito |
+| Navigation links | 35 geprüft, **0** | 18 geprüft, **0** |
+| Kontextschiene rechts | — | 18 geprüft, **0** |
+| Zwölf Aktionen | **12× bedienbar** | **12× bedienbar** |
+| Neun Reiter | **9× bedienbar** | — |
+| Aktionsblock | 490/490 — **kein Balken** | passt |
+| Arbeitsfläche | — | **1685 px** (vorher 264) |
+| Überlauf | nein | nein |
+
+---
+
+### 1 · Die Kanzlei war andersherum gebaut
+
+Der Entwurf (`entwurf-hell-bankfaehig.html`, „Entwurf 2 — Kanzlei")
+zeigt **dunkle Navigationsspalte links** mit Marke, Portfolio, Reitern
+und Nutzer im Fuss — und rechts eine **helle Kontextschiene** mit den
+Aktionen: *„was man mit diesem Objekt tun kann, steht neben dem
+Objekt."*
+
+Gebaut war: Objektliste **hell links**, Aktionen **dunkel rechts**.
+
+Dafür nimmt ein Layout jetzt **mehrere Schienen** (`schienen[]` statt
+`schiene`), und die Farbe hängt an `data-ton` statt an der Stellung —
+sonst wäre die helle Kontextschiene zwangsläufig dunkel geworden.
+
+### 2 · Ein Skript, dessen Anker man nicht nachzählt
+
+Beim Umstellen der Farbe auf `data-ton` setzte mein Skript am **ersten**
+Vorkommen des Selektors an — das lag 950 Zeilen früher als gedacht.
+Damit wurden sechs **Struktur**regeln miterfasst:
+`[data-ton="dunkel"]{left:0}` **und** `[data-ton="dunkel"]{right:0}`
+trafen dieselbe Schiene, die spätere gewann, **und die Aktenmappe stand
+rechts**.
+
+> Ort hängt an der Stellung, Farbe am Ton, die gemeinsame Grammatik an
+> `.dpl-schiene` ohne beides. Und: die Zeilennummer wird geprüft, BEVOR
+> das Skript läuft.
+
+### 3 · Die Spur, die niemand mehr belegt
+
+Die Arbeitsfläche der Kanzlei war **264 px** breit bei 2133 px Fenster.
+`.app-wrap` ist ein **Grid**; die Objektspalte steht als Schublade
+`position:fixed` — **das nimmt sie aus dem Fluss, aber nicht aus dem
+Gitter**. Die 264-px-Spur blieb reserviert, und `.main-col` rutschte als
+erstes verbliebenes Kind hinein.
+
+Denselben Fehler hatte ich in v1 schon behoben und beim Umstellen von v2
+auf Schublade nicht mitgedacht. Dazu ein zweiter aus derselben Familie:
+die Schubladen-Regel **zählte v1, v3 und v4 auf** — v2 stand nicht darin
+und lag offen über der Arbeitsfläche. Sie hängt jetzt am Zustand
+(`data-dpl-portfolio`), nicht an einer Namensliste.
+
+### 4 · Vier Gestaltungsschichten auf einem Element
+
+Am laufenden `<html>` standen gleichzeitig:
+
+```
+data-dp-layout="v2"          der Aufbau
+data-dp-kartenstil="trichter"  die Datenaufnahme
+data-ui-theme="kontor"       die Darstellung  (Kundenfeature)
+data-dp-karte="v2"           hell-varianten.js  (WERKZEUG)
+```
+
+Die 44 Regeln des letzten färbten genau um, was der Aufbau gerade setzt.
+Marcels Satz *„das sieht auch nicht so aus, wie wir es besprochen
+haben"* hatte hier seine Ursache — nicht in einer falschen Regel,
+sondern in **einer Schicht zu viel**.
+
+> Der Dateikopf von `hell-varianten.js` sagt es selbst: „ein WERKZEUG
+> zum Ansehen, keine Funktion für Kunden." **Ein Werkzeug hat
+> zurückzutreten, wenn eine echte Ansicht danebensteht.**
+
+Es tritt jetzt zurück, solange ein Layout steht; der Merker bleibt, der
+Rückweg auf „Heute" bringt es wieder.
+
+### 5 · Vier Mal dieselbe Spezifitätsfalle an einem Tag
+
+| Stelle | Gegner | seine Spezifität | meine |
+|---|---|---|---|
+| `.dp-pf-mtrigger` | `.sec button:not()×8` | (0,8,1) | (0,1,0) |
+| `.sb-actions-l` | `aside.sidebar .sb-actions-trigger …` | (0,3,2) | (0,2,2) |
+| `#sidebar` | `html[data-ui-theme] body.dp-chrome-hell aside.sidebar#sidebar` | (1,3,3) | (1,1,1) |
+| `header.hdr` | `html[data-ui-theme] body.dp-chrome-hell header.hdr.has-v64-score` | (0,4,3) | (0,2,2) |
+
+**Zwischen zwei `!important` entscheidet die Spezifität.** Ein
+`!important` ist kein Trumpf, sondern nur eine zweite Liga derselben
+Rangfolge.
+
+Beim Kopf kam ein zweiter Befund dazu: er war **nur schwarz, solange
+kein Objekt geladen war**. Ohne `data-ui-theme` gewann meine zu schwache
+Regel — *ein Zustand, der beim Messen zufällig fehlt, macht eine zu
+schwache Regel stark.* Farbmessungen gehören an eine Ansicht mit echten
+Daten.
+
+**Ein Fall blieb ungeklärt:** bei `#hdr-obj-num` hatten Gegner und ich
+exakt (1,2,3), und `layout-varianten.css` lädt später (Zeile 4030 gegen
+40) — meine hätte gewinnen müssen. Sie tat es nicht. Gelöst durch eine
+Klasse mehr, **die Ursache ist offen**; ich schreibe das lieber hin, als
+eine Erklärung zu erfinden.
+
+### 6 · Zwei Rücknahmen in eigener Sache
+
+**(a) Ich habe die Kennzahlen-Pillen selbst unlesbar gemacht.**
+`.sc-pill *{color:#E9E3D6}` brachte RENDITE, FINANZ., RISIKO, LAGE und
+UPSIDE auf **1,28** — heller Text auf einer Pille, die weiss geblieben
+ist, weil ihr Elternteil `#hdr-badges` heisst. **Vorher waren sie
+lesbar.** Schrift aufhellen und die Fläche nicht mitnehmen ist schlimmer
+als beides zu lassen.
+
+**(b) Mein Kontrast-Walker hat falsch gemessen.** Er hielt alles gegen
+den Kopfgrund und meldete **23** schlechte Stellen. Gegen den
+*tatsächlichen* Grund jedes Elements sind es **7** — die anderen 16
+lagen in Popups mit eigener heller Fläche, wo dunkler Text richtig ist.
+
+### 7 · Was sonst noch raus musste
+
+- **`#dp-sb-toggle`** („Vollbild (Menü ausblenden)", 36×36, `fixed`,
+  z=9000) und **`#hdr-toggle-btn`** („Investor Deal Score
+  ein-/ausblenden") — beide schalten einen Zustand um, den ein anderes
+  Modul erzwingt. *Ein Knopf, der nichts tut, wirkt wie ein Fehler.*
+- **`#tabs-status-badge`** („0 / 6 · 0 %") steckte in `nav.tabs` und
+  wanderte mit den Reitern in die Schiene, wo es wie ein zehnter Reiter
+  aussah. Es gehört zum Objekt und steht jetzt im Kopf.
+- **Der Scrollbalken:** 32 px aus engeren Titeln und Einträgen — aber
+  eine Schiene, die bei zwölf Aktionen gerade so passt, scrollt bei der
+  dreizehnten wieder. Deshalb **zusätzlich** ein dünner, ruhiger Balken
+  statt eines hellen Streifens auf Obsidian.
+
+### Rest
+
+- Der Weg zu den Schaltern ist weiter **drei Klicks tief**
+  (Einstellungen → Darstellung → „Darstellung öffnen").
+- In `layout-varianten.css` stehen noch **61 tote Regelzeilen** für
+  v3/v4/v5 und die Stellungen `leiste`/`fuss`. Sie treffen nichts mehr.
+  Abzutragen, wenn die Datei ohnehin angefasst wird.

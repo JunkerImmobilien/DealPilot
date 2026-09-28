@@ -91,6 +91,17 @@ Geschwindigkeit.
 
 ### P3 · Die Bordkarte — vier von fünf Entwürfen stehen (Stand 28.09.2026)
 
+> **Nachtrag 28.09. abends:** die Layouts sind auf **zwei** reduziert
+> (Aktenmappe, Kanzlei); Werkbank, Dossier und Cockpit hell sind
+> gestrichen. Die Kanzlei ist nach dem Entwurf neu gebaut — sie war
+> andersherum. Journal-Eintrag 28.09.2026 (4).
+>
+> **Offen dort:** in `layout-varianten.css` stehen noch 61 tote
+> Regelzeilen für v3/v4/v5 und die Stellungen `leiste`/`fuss`. Und
+> bei `#hdr-obj-num` gewinnt eine Regel aus `ui-varianten.css` trotz
+> gleicher Spezifität und früherer Ladung — **Ursache ungeklärt**,
+> umgangen durch eine Klasse mehr.
+
 | Entwurf | Stand |
 |---|---|
 | **1 · Zeile** | gebaut (v1639), wählbar als `?karte=zeile` |
