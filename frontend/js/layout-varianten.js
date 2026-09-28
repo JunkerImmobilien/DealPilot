@@ -377,7 +377,7 @@
            Ohne diese Zeile waehlt jemand im Obsidian-Modus „Trichter",
            bekommt die Umordnung, aber keine der 46 Grundregeln - das
            sieht aus wie ein halb aufgetragener Anstrich. */
-        || h.hasAttribute('data-dp-karte');
+        || h.hasAttribute('data-dp-kartenstil');
       b.classList.toggle('dp-neue-karte', an);
     } catch (e) {}
   }
@@ -390,7 +390,7 @@
     new MutationObserver(karteMarke).observe(document.body,
       { attributes: true, attributeFilter: ['class'] });
     new MutationObserver(karteMarke).observe(document.documentElement,
-      { attributes: true, attributeFilter: ['data-dp-layout', 'data-dp-karte', 'class'] });
+      { attributes: true, attributeFilter: ['data-dp-layout', 'data-dp-kartenstil', 'class'] });
   }
 
   /* ── Der Platz in den Einstellungen ──────────────────────────────────

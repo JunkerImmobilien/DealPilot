@@ -13,6 +13,27 @@
    sie in einen Schalter presst, kann die eine nicht ohne die andere
    beantworten.
 
+   ── WARUM DAS ATTRIBUT `data-dp-kartenstil` HEISST UND NICHT
+      `data-dp-karte` ───────────────────────────────────────────────────
+   Weil `data-dp-karte` schon vergeben war. `hell-varianten.js` (v1517,
+   22.09.2026) führt darunter sechs Kartenvarianten `v1`…`v6`, mit 44
+   Regeln in `hell-varianten.css`.
+
+   Ich hatte den Namen am 28.09. blind genommen. **Zwei Module, die auf
+   dasselbe Attribut schreiben, löschen sich gegenseitig** - wer den
+   Kartenstil wählt, verliert die Hellvariante und umgekehrt, ohne dass
+   irgendwo etwas widerspricht.
+
+   Aufgefallen ist es nicht am Umschalten, sondern bei einer
+   Bedienbarkeitsmessung auf 390 px: `#dp-kv-panel`, das Werkzeugfenster
+   jenes anderen Moduls, lag über der Datenaufnahme und verdeckte drei
+   von vier Kacheln. Erst beim Nachsehen, WOHER dieses Panel kommt, kam
+   die Namenskollision ans Licht.
+
+   > **Bevor ein neuer Schalter einen Namen bekommt, wird gegrept.**
+   > CLAUDE.md sagt „Namensräume nie mischen" - das gilt auch für
+   > Attributnamen, nicht nur für Versionsnummern.
+
    Deshalb ein eigenes Attribut am `<html>`:
 
      (kein Attribut)  automatisch — wie bisher: hell → Zeile, sonst die
@@ -163,8 +184,8 @@
   function setze(stil) {
     aktuell = STILE[stil] ? stil : '';
     var h = document.documentElement;
-    if (aktuell) h.setAttribute('data-dp-karte', aktuell);
-    else h.removeAttribute('data-dp-karte');
+    if (aktuell) h.setAttribute('data-dp-kartenstil', aktuell);
+    else h.removeAttribute('data-dp-kartenstil');
 
     /* Zeile, Trichter und Bordkarte sind alle drei die HELLE Karte -
        sie setzen alle `dp-neue-karte` voraus. Ohne diese Marke greift

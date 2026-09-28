@@ -140,3 +140,20 @@ html[data-dp-karte="v3"] body nav.tabs.tabs{
 html[data-dp-karte="v6"] body header.hdr.has-v64-score + nav.tabs.tabs, 
 html[data-dp-karte="v6"] body nav.tabs.tabs{
   background:#fff !important; border-bottom:1px solid #EDE9E0 !important; }
+
+/* ── v1652c · DAS WERKZEUG DARF DIE APP NICHT BEDIENEN ────────────────
+   `#dp-kv-panel` ist ein Ansichtswerkzeug (fest, rechts unten, 214 px
+   breit, bis 455 px hoch). Gemessen am 28.09.2026 in der Messkabine
+   bei 390 px Breite: es lag UEBER der Datenaufnahme und verdeckte drei
+   von vier Quellkacheln sowie den Abrufknopf - `elementsFromPoint`
+   nannte es an jedem der drei Punkte als oberste Schicht.
+
+   > Ein Werkzeug, das die Anwendung unbedienbar macht, misst nicht
+   > mehr sie, sondern sich selbst.
+
+   Auf schmalen Schirmen ist daher Schluss. Der Schalter bleibt ueber
+   `?karten=1` und die Tastenfolge erreichbar - nur eben dort, wo er
+   Platz hat. */
+@media (max-width: 900px){
+  #dp-kv-panel{ display:none !important; }
+}
