@@ -19865,3 +19865,167 @@ dieselbe Grammatik haben.
 
 **Offen:** in Werkbank und Dossier sind drei der zwölf Aktionen nur über
 waagerechtes Scrollen erreichbar.
+
+---
+
+## Rollout-Journal · 28.09.2026 (3) — Trichter, Bordkarte, dunkle Schiene
+
+**Was:** die Datenaufnahme bekommt eine **zweite Achse** neben dem
+Aufbau — drei wählbare Stile (Zeile, Trichter, Bordkarte); die dunkle
+Schiene wird zu Ende gefärbt; zwei Werkzeugfenster räumen auf dem Handy
+das Feld.
+
+**Commits:** `827d01b` v1650c · `d164c9e` v1651 · `7015e45` v1651b ·
+`b3524e8` v1651c · `ba83e22` v1651d · `641295e` v1651e · `87081a0`
+v1651f · `aff2d4c` v1652 · `8822884` v1652b · `c25c83b` v1652c ·
+`b1e54dd` v1652d
+
+**Nachweis:** siehe die einzelnen Messungen unten. Kurzfassung:
+Kontrast in beiden senkrechten Schienen **70 Textträger geprüft, null
+unter 4,5**; Bedienbarkeit der Datenaufnahme auf 390 / 834 / 1280 px
+**alle Kacheln und der Abrufknopf `ok`**, kein Überlauf; der
+Stilumschalter in den Einstellungen **10 von 10 Knöpfen klickbar**, und
+Trichter → Bordkarte → Automatisch setzt, merkt und wählt ab.
+
+---
+
+### 1 · Der neue Schalter hiess wie ein alter
+
+`karten-stil.js` setzte `data-dp-karte` am `<html>`. **Den Namen führt
+`hell-varianten.js` seit v1517 (22.09.) schon** — sechs Kartenvarianten
+`v1`…`v6`, 44 Regeln in `hell-varianten.css`.
+
+Zwei Module auf demselben Attribut löschen sich gegenseitig: wer den
+Kartenstil wählt, verliert die Hellvariante, und **nichts widerspricht**.
+
+> Aufgefallen ist es nicht beim Umschalten, sondern bei einer
+> Bedienbarkeitsmessung auf 390 px: `#dp-kv-panel` — das Werkzeugfenster
+> jenes anderen Moduls — lag über der Datenaufnahme. Erst die Frage,
+> WOHER dieses Panel kommt, brachte die Kollision ans Licht.
+
+Umbenannt auf `data-dp-kartenstil`, 60 Stellen. **CLAUDE.md sagt
+„Namensräume nie mischen" — das gilt auch für Attributnamen.**
+
+### 2 · Zwei Werkzeuge, die die Anwendung unbedienbar machten
+
+`elementsFromPoint` auf die Quellkacheln bei 390 px nannte zwei
+Verdecker, beide `position:fixed`:
+
+| Element | Grösse | z-index | Herkunft |
+|---|---|---|---|
+| `#dp-kv-panel` | 214×455 | 9998 | `hell-varianten.js` |
+| `.dpl-schalter` | 374×154 | 2147483000 | **meiner**, v1635 |
+
+Drei von vier Kacheln und der Abrufknopf waren nicht zu drücken.
+
+> Ich hatte das fremde Panel ausgeblendet und danach meinen eigenen
+> Schalter gemessen, der dasselbe tut. **Ein Fehler, den man bei
+> anderen findet, steht meist auch im eigenen Bau.**
+
+Beide unter 900 px weg. Verloren geht nichts: der Aufbau steht in den
+Einstellungen unter „Darstellung", `?layout=` und `?karte=` wirken auf
+jeder Breite.
+
+### 3 · Der Grund war dunkel, die Schrift nicht
+
+Nach v1650 war die Schiene obsidian — die **Schrift darin aber noch die
+für hellen Grund**. Mit dem Kaskaden-Walker über alle Textträger,
+Kontrast gegen `rgb(14,13,11)`:
+
+| Klasse | Farbe | Kontrast | Stellen |
+|---|---|---:|---:|
+| `.tab-lbl` | `rgb(26,23,20)` | **1,09** | 9 |
+| `.sb-act-l` | `rgb(59,53,45)` | 1,60 | 12 |
+| `.sb-actions-l` | `rgb(59,53,45)` | 1,60 | 1 |
+| `.sb-act-section-title` | `rgb(122,114,104)` | 4,10 | 5 |
+| `.tabs-status-text` | — | 1,08 | 1 |
+
+**1,09 heisst unsichtbar.** Der aktive Reiter „Objekt" stand als reines
+Symbol da; ich hatte seine Beschriftung deshalb für *leer* gehalten.
+
+Dabei ein zweiter Lehrsatz: meine erste Korrektur benannte
+`.sb-actions-l` ausdrücklich **und verlor trotzdem** —
+`style.css:26792` schreibt `aside.sidebar .sb-actions-trigger
+.sb-actions-l`, drei Klassen gegen meine zwei, beide ohne `!important`.
+
+> **Eine Klasse zu benennen heisst nicht, sie zu treffen.** Wer eine
+> fremde Farbe überschreibt, muss wissen, WELCHE Regel sie setzt.
+
+### 4 · Eine Angabe auf ein Gitter, das es nicht gibt, ist leer
+
+Im Trichter war `.dp-pf-lead` 189 px hoch — auf den Pixel so hoch wie
+der Ertragsblock daneben. Ursache: `grid-row: 1 / -1` zählt die Linien
+des **expliziten** Gitters. Ich hatte nur `grid-template-columns`
+gesetzt, keine `-rows`; das explizite Gitter hat also null Zeilen, und
+`1 / -1` fiel auf `1 / 1` zusammen. Statt zu spannen blies der Block
+Zeile 1 auf seine eigene Höhe auf. `span 50` hängt nicht daran.
+
+### 5 · `:not()` erbt die Spezifität seines Arguments
+
+Der Handy-Aufklapper `.dp-pf-mtrigger` stand bei **1706 px** Breite da,
+283 px breit — obwohl `style.css:33229` ihn versteckt und erst unter
+640 px einblendet.
+
+Täter ist eine Sammelregel:
+`.sec button:not(.dp-tip):not(.tab):not(.sb-action-btn)…{display:inline-flex !important}`
+— acht Klassen plus ein Element, also (0,8,1). Mein Gegengewicht war
+(0,1,0). **Zwischen zwei `!important` entscheidet die Spezifität**, und
+sieben davon steckten in den `:not()`.
+
+> Eine Ausnahmeliste aus acht `:not()` ist keine Präzision, sondern
+> eine Wette darauf, dass niemand einen neunten Knopf baut.
+
+Behoben an der Stelle, die ihre Ausnahmen führt: ein neuntes `:not()`.
+
+### 6 · Ein Beobachter, der auf seine eigenen Änderungen reagiert
+
+Die Bordkarte **fror den Browser-Tab ein**. `zaehlung()` setzte bei
+jedem Aufruf `textContent`, der MutationObserver (`childList`,
+`subtree`) feuerte darauf und rief `anwenden()`. Kein Fehler in der
+Konsole, keine Meldung — nur Stille.
+
+Zwei Riegel: nur bei echter Änderung schreiben, **und** den Beobachter
+abklemmen, solange gearbeitet wird (Wiederanschluss erst im nächsten
+Bild, sonst stehen die eigenen Änderungen schon in seiner Warteschlange).
+
+### 7 · Zwei Zurücknahmen
+
+**(a)** Ich habe an einem auf 62 % verkleinerten Bildschirmfoto
+behauptet, die Aktenmappe sei hell geblieben. Falsch — `elementFromPoint`
+an acht Punkten: überall `rgb(14,13,11)`. **Ein herunterskaliertes Bild
+ist kein Farbbeweis**; dunkle Flächen mit hellen Linien werden beim
+Verkleinern gemittelt.
+
+**(b)** Ich habe gemeldet, bei 1280 px verdecke die Objektliste zwei
+Kacheln. Falsch — `data-dpl-portfolio` stand auf `"zu"`, und mit
+abgeschalteter Animation sass die Liste bei **x = −367**. Die
+Messkabine lief im Hintergrund (`visibilityState: "hidden"`), und in
+einem versteckten Tab friert Chrome jeden Übergang beim Startwert ein.
+**Diese Falle steht als Kommentar an genau der Regel, die ich gemessen
+habe** — und ich bin trotzdem hineingelaufen, weil ich
+`visibilityState` nicht vorher gelesen habe.
+
+### 8 · `display:flex` sagt nichts über die Richtung
+
+Zum **dritten Mal** derselbe Fehler (nach `.dp-pf-seg` in v1640 und
+`.dpl-schiene` in v1649): `.dp-pf-lead` stand in der Bordkarte
+untereinander, weil ich `display` und `align-items` gesetzt habe und die
+Richtung nicht — sie erbte `column` aus der Zeilen-Grammatik. Danach
+dasselbe noch einmal mit `justify-content`.
+
+> Wer ein Element zum Flex-Behälter macht, **das vorher schon einer
+> war**, erbt dessen Richtung und Ausrichtung. Ab jetzt gehören beide
+> in jede solche Regel, auch wenn `row`/`flex-start` die Vorgabe sind.
+
+### Was jetzt steht
+
+| | |
+|---|---|
+| **Aufbau** (5 Layouts) | Einstellungen → Darstellung → „Darstellung öffnen" |
+| **Datenaufnahme** (3 Stile) | ebenda, direkt darunter |
+| Beides per URL | `?layout=1…5` · `?karte=zeile\|trichter\|bordkarte` |
+| Merker | `dp_layout` · `dp_karten_stil` |
+
+**Rest:** der Weg zu beiden Schaltern ist **drei Klicks tief**
+(Einstellungen → Darstellung → „Darstellung öffnen"). Sie funktionieren,
+aber wer sie nicht kennt, findet sie nicht.

@@ -89,15 +89,50 @@ Geschwindigkeit.
 → ausrollen → Kettenprüfung. Die elf fertigen Gebiete liegen bereit;
 `ernte2rezept` weist Teilstände seit v1638 von selbst ab.
 
-### P3 · Die Bordkarte — Umbau steht, Entwurf 3 fehlt
+### P3 · Die Bordkarte — vier von fünf Entwürfen stehen (Stand 28.09.2026)
 
-Marcel wählte **Entwurf 1** (die Zeile, seit v1639 gebaut und seit
-v1645 an den hellen Modus gebunden) und **Entwurf 3** (die Checkliste).
-Die Checkliste ist als Dialog beim Anlegen gebaut (v1643) — **nicht**
-als Reiter oder Untermenü in der Seite, wie Marcel es als Möglichkeit
-genannt hatte („wenn es sich ergibt"). Das ist bewusst offen geblieben.
+| Entwurf | Stand |
+|---|---|
+| **1 · Zeile** | gebaut (v1639), wählbar als `?karte=zeile` |
+| 2 · Karteikarte | nicht gebaut — von Marcel nie gewählt |
+| **3 · Checkliste** | gebaut (v1643) **als Dialog beim Anlegen** |
+| **4 · Trichter** | gebaut (v1651–v1651f) |
+| **5 · Bordkarte ernst** | gebaut (v1651–v1651f) |
+
+Der Umschalter steht in den Einstellungen unter „Darstellung" direkt
+unter dem Aufbau; Attribut `data-dp-kartenstil`, Merker
+`dp_karten_stil`, URL `?karte=zeile|trichter|bordkarte`.
+
+**Was offen blieb:**
+
+- **Entwurf 3 ist ein Dialog, kein Reiter.** Marcel hatte den Reiter
+  als Möglichkeit genannt („wenn es sich ergibt"). Unverändert offen.
+- **Der Weg zu beiden Schaltern ist drei Klicks tief:** Einstellungen →
+  Darstellung → „Darstellung öffnen" → dann erst Aufbau und
+  Datenaufnahme. Gemessen: alle zehn Knöpfe klickbar, das Umschalten
+  greift. Aber wer den Weg nicht kennt, findet ihn nicht — und Marcel
+  hat am 28.09. gesagt, er könne „Einstellungen nicht anklicken".
+  **Zu prüfen, ob die beiden Gruppen eine Ebene höher gehören**, direkt
+  neben „Obsidian / Hell".
+- **Entwurf 2** ist nie gebaut worden. Das ist kein Versäumnis — Marcel
+  hat ihn nicht gewählt. Steht hier nur, damit die Liste vollständig
+  ist.
 
 Schau: `frontend/entwurf-aktionsbox.html`.
+
+### P3b · Zwei Werkzeugfenster, die auf dem Handy im Weg standen
+
+Am 28.09. mit `elementsFromPoint` bei 390 px gemessen: `#dp-kv-panel`
+(aus `hell-varianten.js`) und `.dpl-schalter` (aus
+`layout-varianten.js`) lagen beide `position:fixed` über der
+Datenaufnahme; drei von vier Quellkacheln und der Abrufknopf waren nicht
+zu drücken. **Beide sind seit v1652c/d unter 900 px ausgeblendet.**
+
+> Zu bedenken, wenn irgendwann ein DRITTES Werkzeugfenster entsteht:
+> beide Fälle sahen auf dem Schreibtisch völlig unauffällig aus.
+> **Ein festes Fenster gehört vor dem Ausrollen einmal bei 390 px
+> gegen `elementsFromPoint` gehalten** — sichtbar ist nicht bedienbar.
+
 
 ### P4 · Kleinere Reste
 
