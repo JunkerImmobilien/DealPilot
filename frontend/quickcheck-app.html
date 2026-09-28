@@ -2895,8 +2895,10 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 .dp-pf-sep{width:1px;align-self:stretch;background:rgba(5,5,5,.22);margin:0 4px}
 .dp-pf-tile{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid rgba(0,0,0,.12);
   border-radius:9px;padding:7px 11px;cursor:pointer;transition:.18s;position:relative;user-select:none}
-.dp-pf-tile.tool{background:rgba(8,7,4,.86);color:#e9e3d2}
-.dp-pf-tile.tool .dp-pf-ic{color:#bdb398}
+/* v1665d: war background:rgba(8,7,4,.86);color:#e9e3d2 - die
+   Werkzeug-Kacheln sahen als einzige dunkel aus. */
+.dp-pf-tile.tool{background:#fff;color:#1A1A18}
+.dp-pf-tile.tool .dp-pf-ic{color:#9A9287}
 .dp-pf-tile .dp-pf-lbl{font-size:13px;font-weight:500}
 .dp-pf-tile:hover{transform:translateY(-1px)}
 .dp-pf-tile.dp-pf-disabled{opacity:.45;cursor:not-allowed}
@@ -2975,7 +2977,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 /* ===== v573 · PRE-FLIGHT Fix: Lead ganz schwarz + Kacheln solide (kein Durchscheinen) ===== */
 /* 1) Logo-Kacheln solide weiss — mix-blend-mode raus (war Ursache fuer "durchsichtig") */
 .dp-pf-tile{background:#ffffff !important}
-.dp-pf-tile.tool{background:#0a0a0a !important;color:#e9e3d2}
+.dp-pf-tile.tool{background:#ffffff !important;color:#1A1A18}
 .dp-pf-logo img{mix-blend-mode:normal !important;height:24px !important;max-width:150px !important}
 /* 2) Lead als ganzer schwarzer Block (breiter, mehr Praesenz) */
 .dp-pf-lead{background:#0a0a0a !important;border-radius:12px;padding:11px 20px !important;
@@ -3193,7 +3195,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 .dp-pfbar .dp-pf-launch .dp-pf-ic,.dp-pfbar .dp-pf-launch .dp-pf-ic svg,#qc7-sources .dp-pf-launch .dp-pf-ic,#qc7-sources .dp-pf-launch .dp-pf-ic svg{color:var(--gold-3, #9a7f33) !important;stroke:var(--gold-3, #9a7f33) !important}
 /* Provider-Kacheln solide, nie durchscheinend */
 .dp-pfbar .dp-pf-tile,#qc7-sources .dp-pf-tile{opacity:1 !important;filter:none !important;mix-blend-mode:normal !important;background:#ffffff !important}
-.dp-pfbar .dp-pf-tile.tool,#qc7-sources .dp-pf-tile.tool{background:#0a0a0a !important;color:#e9e3d2 !important}
+.dp-pfbar .dp-pf-tile.tool,#qc7-sources .dp-pf-tile.tool{background:#ffffff !important;color:#1A1A18 !important}
 .dp-pfbar .dp-pf-tile.dp-pf-disabled,#qc7-sources .dp-pf-tile.dp-pf-disabled{opacity:1 !important}
 /* v644-coming-soon: PriceHubble ausgegraut bis Zugang da */
 #qc7-sources .dp-pf-tile.dp-pf-soon-on,.dp-pfbar .dp-pf-tile.dp-pf-soon-on{opacity:.5 !important;filter:grayscale(.35) !important;cursor:not-allowed !important}
