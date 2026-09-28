@@ -216,11 +216,28 @@
     if (alt) alt.parentNode.removeChild(alt);
     pill.insertAdjacentHTML('beforeend', _panelHtml(s));
 
-    /* Der Browser-Tooltip bleibt als Rueckfall fuer Touch und Screenreader,
-       wo :hover nicht greift. */
-    pill.title = 'Dein Kontingent\n' + ARTEN.map(function (a) {
-      return '  ' + a.name + ': ' + _rest(s, a.key);
-    }).join('\n') + '\nZurücksetzung am ' + _datum(s.period_reset_at);
+    /* ── v1654 · EIN TOOLTIP, NICHT ZWEI ──────────────────────────────
+       Hier stand `pill.title = …` mit der Begruendung „Rueckfall fuer
+       Touch und Screenreader, wo :hover nicht greift."
+
+       Die Absicht war richtig, das Ergebnis nicht: **auf dem Schreib-
+       tisch erschienen beide** - das eigene Panel `.dp-kg-panel`
+       (385x155) UND der native Browser-Tooltip mit demselben Inhalt.
+       Marcel am 28.09.2026: „wenn ich bei dem Kontingent drueberfahre,
+       oeffnen sich zwei Felder-Menues."
+
+       > Ein `title` ist kein stiller Zusatz. Der Browser zeigt ihn,
+       > ob man will oder nicht, und er laesst sich nicht abschalten.
+
+       `aria-label` leistet dasselbe fuer Screenreader und erzeugt
+       keinen zweiten Kasten. Touch bleibt versorgt: das Panel oeffnet
+       ueber `:focus-within` (Zeile 116), und ein Tippen fokussiert die
+       Pille. */
+    var text = 'Dein Kontingent. ' + ARTEN.map(function (a) {
+      return a.name + ': ' + _rest(s, a.key);
+    }).join(', ') + '. Zurücksetzung am ' + _datum(s.period_reset_at);
+    pill.setAttribute('aria-label', text);
+    pill.removeAttribute('title');
   }
 
   // Render der Kontingent-Box im Einstellungen-Reiter „Plan"

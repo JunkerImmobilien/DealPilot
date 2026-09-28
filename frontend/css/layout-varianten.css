@@ -1867,3 +1867,81 @@ html[data-dp-layout] .dpl-schiene[data-ton="hell"] .dpl-schiene-titel,
 html[data-dp-layout] .dpl-schiene[data-ton="hell"] .sb-act-section-title{
   color:#6E675C !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1654 · DREI STELLEN, DIE MEIN PRUEFER UEBERSEHEN HATTE
+
+   Marcel am 28.09.2026: „oben die 20 von 24 Felder befuellt, auch das
+   kann man nicht richtig sehen. Genauso wie das Kontingent und auch
+   die Hilfe."
+
+   Ich hatte kurz zuvor „0 unter 4,5" gemeldet. **Beide Aussagen waren
+   richtig - mein Pruefer war falsch.** Er las den Hintergrund als
+   Zeichenkette und rechnete die ALPHA nicht heraus:
+
+     .hdr-comp-text       Grund `rgba(63,165,108,.12)`  gemeldet: ok
+     .hdr-autosave-text   dito
+     #hdr-credits-pill    Grund `color(srgb … / .08)`   gemeldet: null
+
+   Gegen den EFFEKTIVEN Grund - die Statusfarbe mit ihrer Deckung ueber
+   Obsidian gelegt - sind es:
+
+     .hdr-autosave-text        1,10
+     .hdr-comp-text            1,10
+     #hdr-credits-pill-label   1,44
+
+   > **Eine halbtransparente Flaeche hat keine Farbe, sondern eine
+   > Rechnung.** Ein Pruefer, der sie als Zeichenkette nimmt, misst
+   > einen Wert, den niemand sieht. Und `color(srgb …)` kannte er gar
+   > nicht - da gab er `null` zurueck und ich habe es als „nichts
+   > gefunden" gelesen.
+
+   Die FLAECHEN behalten ihre Statusfarbe (Gruen heisst vollstaendig,
+   Gold heisst Kontingent - das traegt Bedeutung und wird nie
+   umgefaerbt). Nur die Schrift wird hell, und die Deckung steigt so
+   weit, dass die Flaeche auf Obsidian ueberhaupt als Flaeche lesbar
+   ist.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+html[data-dp-layout] body header.hdr #hdr-completeness .hdr-comp-text,
+html[data-dp-layout] body header.hdr #hdr-autosave .hdr-autosave-text,
+html[data-dp-layout] body header.hdr #hdr-completeness,
+html[data-dp-layout] body header.hdr #hdr-autosave{
+  color:#E9E3D6 !important;
+}
+/* Die gruene Statusflaeche traegt auf Weiss 12 % - auf Obsidian
+   verschwindet sie. 22 % laesst sie erkennbar werden, ohne dass sie
+   leuchtet. */
+html[data-dp-layout] body header.hdr #hdr-completeness{
+  background:rgba(63,165,108,.22) !important;
+  border:1px solid rgba(63,165,108,.38) !important;
+}
+html[data-dp-layout] body header.hdr #hdr-autosave{
+  background:rgba(63,165,108,.14) !important;
+  border:1px solid rgba(63,165,108,.28) !important;
+}
+/* Der Zahlenwert darin bleibt gruen - er IST die Aussage. Auf dem
+   dunklen Grund in der helleren Stufe, sonst waere er wieder zu leise. */
+html[data-dp-layout] body header.hdr #hdr-completeness .hdr-comp-pct,
+html[data-dp-layout] body header.hdr #hdr-completeness b{
+  color:#7BE3A6 !important;
+}
+
+/* Das Kontingent. Gold als Flaeche, helle Schrift darauf. */
+html[data-dp-layout] body header.hdr #hdr-credits-pill{
+  background:rgba(201,168,76,.18) !important;
+  border:1px solid rgba(201,168,76,.42) !important;
+}
+html[data-dp-layout] body header.hdr #hdr-credits-pill,
+html[data-dp-layout] body header.hdr #hdr-credits-pill-label,
+html[data-dp-layout] body header.hdr #hdr-credits-pill svg{
+  color:#E8CC7A !important;
+}
+/* Das Aufklapp-Panel des Kontingents ist ein eigenes Blatt mit eigener
+   heller Flaeche - dort ist dunkle Schrift RICHTIG und bleibt. Genau
+   diese Unterscheidung hat mein Pruefer vorhin nicht gemacht und
+   deshalb 23 statt 7 Befunde gemeldet. */
+html[data-dp-layout] body header.hdr .dp-kg-panel,
+html[data-dp-layout] body header.hdr .dp-kg-panel *{
+  color:initial;
+}

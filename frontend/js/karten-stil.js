@@ -278,14 +278,55 @@
   }
 
   /* ── Start ────────────────────────────────────────────────────────── */
+  /* ── v1654 · DER TRICHTER IST NICHT MEHR DER STANDARD ──────────────
+     Marcel am 28.09.2026: „was mir auch nicht gefaellt, ist halt die
+     Pre-Flight-Karte mit dem Trichter. Da sollten wir die
+     standardmaessige Karte erst mal reinsetzen, die wir vorher hatten,
+     aber halt im neueren Design."
+
+     Das ist **Entwurf 5** — die Bordkarte, aber nur das, was etwas
+     bedeutet: der Abriss trennt Waehlen von Ausloesen, keine
+     Perforation als Zierat, kein Strichcode.
+
+     Zwei Dinge passieren hier:
+
+     1. Wer **nichts** gewaehlt hat, bekommt in den Layouts die
+        Bordkarte statt der Zeile. Der Trichter bleibt waehlbar.
+     2. Ein bereits gemerkter `trichter` wird **einmalig** auf
+        `bordkarte` umgestellt. Das ist ein Eingriff in einen fremden
+        Merker und deshalb genau einmal, mit eigenem Marker - sonst
+        koennte niemand den Trichter je wieder waehlen.
+
+     > Einen Merker still zu ueberschreiben waere falsch. Einmalig und
+     > erklaert ist es das, was verlangt wurde. */
+  var MIGRIERT = 'dp_karten_stil_v1654';
+
   function start() {
     var p = new URLSearchParams(location.search);
     var ausUrl = p.get('karte');
     var gemerkt = '';
     try { gemerkt = localStorage.getItem(LS) || ''; } catch (e) {}
 
+    try {
+      if (gemerkt === 'trichter' && !localStorage.getItem(MIGRIERT)) {
+        gemerkt = 'bordkarte';
+        localStorage.setItem(LS, gemerkt);
+        localStorage.setItem(MIGRIERT, '1');
+      }
+    } catch (e) {}
+
     if (ausUrl !== null) setze(ausUrl === 'aus' ? '' : ausUrl);
     else if (gemerkt) setze(gemerkt);
+    /* KEIN Standard per JS. Wer nichts gewaehlt hat, bekommt die
+       Bordkarte ueber die CSS-Regel
+       `html[data-dp-layout]:not([data-dp-kartenstil])` - also NUR in
+       einem Layout.
+
+       > Ein `setze('bordkarte')` hier wuerde `data-dp-kartenstil`
+       > setzen, damit `dp-neue-karte` ausloesen und den
+       > **Obsidian-Auslieferungszustand veraendern**. Wer nicht
+       > umschaltet, bekommt die App so, wie er sie kennt - das gilt
+       > auch fuer einen gut gemeinten Standard. */
 
     beobachten();
     panelBeobachten();
