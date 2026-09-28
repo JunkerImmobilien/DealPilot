@@ -1190,3 +1190,66 @@ html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-teil{
   background:transparent !important;
   border-color:#26231E !important; box-shadow:none !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1652 · DIE SCHRIFT IN DER DUNKLEN SCHIENE
+
+   ── ERST EINE ZURUECKNAHME ───────────────────────────────────────────
+   Ich habe beim Ansehen eines auf 62 % verkleinerten Bildschirmfotos
+   behauptet, die Aktenmappe sei hell geblieben. **Das war falsch.**
+   Gemessen an acht Punkten mit `elementFromPoint`: der sichtbare Grund
+   ist ueberall `rgb(14,13,11)`.
+
+   > Ein herunterskaliertes Bildschirmfoto ist kein Farbbeweis. Dunkle
+   > Flaechen mit hellen Linien darauf werden beim Verkleinern
+   > gemittelt und sehen hell aus. Farbe wird gemessen, nicht
+   > angeschaut.
+
+   ── DER ECHTE BEFUND ─────────────────────────────────────────────────
+   Der Grund ist dunkel, die SCHRIFT aber noch die fuer hellen Grund.
+   Mit dem Kaskaden-Walker ueber alle Texttraeger der Schiene, Kontrast
+   gegen `rgb(14,13,11)`:
+
+     .tab-lbl               rgb(26,23,20)    1.09   9 Stellen
+     .sb-act-l              rgb(59,53,45)    1.60  12 Stellen
+     .sb-actions-l          rgb(59,53,45)    1.60   1 Stelle
+     .sb-act-section-title  rgb(122,114,104) 4.10   5 Stellen
+
+   **1,09 heisst unsichtbar.** Der aktive Reiter „Objekt" stand als
+   reines Symbol da, seine Beschriftung war nicht zu sehen - ich hatte
+   sie deshalb fuer leer gehalten.
+
+   Ursache ist dieselbe wie beim weissen Aktionsmenue in v1650c: der
+   Behaelter wurde umgefaerbt, seine Kinder nicht. Eine Regel aendert
+   nur, was sie benennt - und `color` erbt nicht durch ein Kind, das
+   selbst eine hat.
+
+   Statusfarben (Gruen, Rot) und der Goldakzent bleiben unangetastet;
+   sie tragen Bedeutung und keine Lesbarkeitsschuld.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .tab-lbl,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .tab-lbl,
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-act-l,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-act-l,
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-actions-l,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-actions-l{
+  color:#BFB7A9 !important;   /* Kontrast 8.5 gegen #0E0D0B */
+}
+/* Der aktive Reiter hebt sich ab - sonst ist die Liste eine Wand. */
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] nav.tabs .tab.active .tab-lbl,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] nav.tabs .tab.active .tab-lbl{
+  color:#F5EFE2 !important; font-weight:600 !important;
+}
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] nav.tabs .tab:hover .tab-lbl,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] nav.tabs .tab:hover .tab-lbl,
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-act-item:hover .sb-act-l,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-act-item:hover .sb-act-l{
+  color:#F5EFE2 !important;
+}
+/* Die Abschnittsueberschriften duerfen leiser sein - aber lesbar.
+   4,10 auf 4,62. */
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-act-section-title,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-act-section-title{
+  color:#8C8578 !important;
+}
