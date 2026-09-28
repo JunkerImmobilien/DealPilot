@@ -3691,3 +3691,41 @@ html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v *{
     grid-template-columns:1fr !important;
   }
 }
+
+/* ── v1663b · DAS LOGO IN DIE FLUCHT ─────────────────────────────────
+   Marcel: „dann koennen wir das DealPilot-Logo ein bisschen groesser
+   machen und ein bisschen runterziehen, dass das alles in einer
+   Flucht ist."
+
+   Gemessen in der Aktenmappe 2 vor der Aenderung:
+
+     .dpl-marke   247x78, Polster 4/14/0, min-height 78
+     .dpl-wm      127x38 bei y=21..59, 31 px
+     .hdr-v61-row1  y=0..48   die Kopfzeile rechts daneben
+     .dpl-portfolio y=88..121 der erste Menuepunkt darunter
+
+   Das Wortbild endete bei y=59, der erste Menuepunkt begann bei 88 -
+   29 px Luft, in denen nichts steht. Rechts daneben laeuft die
+   Kopfzeile bis 48. Drei Kanten, keine gemeinsame.
+
+   Jetzt: 37 px statt 31, das Wortbild in einem 92-px-Block MITTIG
+   statt oben angeklebt. Damit sitzt seine Mitte auf y=46 - zwei Pixel
+   unter der Unterkante der Kopfzeile - und der erste Menuepunkt
+   ruecht auf 92 nach.
+
+   > Ein Logo, das oben am Rand klebt, hat keine Flucht, sondern einen
+   > Anschlag. Mittig in einem Block, dessen Unterkante eine echte
+   > Linie trifft, hat es beides.
+
+   **Staging-Abnahmepunkt:** ob „in einer Flucht" genau diese Linie
+   meint, entscheidet das Auge, nicht die Messung. Die Zahlen stehen
+   hier, damit die naechste Runde nicht wieder bei null anfaengt. */
+html[data-dp-layout] .dpl-schiene .dpl-wm{
+  font-size:37px !important; line-height:44px !important;
+}
+html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .dpl-marke,
+html[data-dp-layout] .dpl-schiene .dpl-marke{
+  min-height:92px !important;
+  padding-top:0 !important; padding-bottom:0 !important;
+  align-items:center !important;
+}
