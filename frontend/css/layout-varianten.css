@@ -1578,3 +1578,64 @@ html[data-dp-layout="v2"] header.hdr{
     margin-top:18px !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1653e · DIE SCHUBLADE, UND WARUM MEINE REGEL VERLOR
+
+   `html[data-dp-layout] #sidebar{background:#0E0D0B !important}` aus
+   v1653 hat die BREITE gesetzt (gemessen: 380 px, richtig) und die
+   FARBE nicht (gemessen: rgb(255,255,255)).
+
+   Der Kaskaden-Walker nennt den Sieger:
+     `html[data-ui-theme] body.dp-chrome-hell aside.sidebar#sidebar`
+     -> (1,3,3), `!important`, aus `ui-varianten.css`
+   Meine Regel war (1,1,1). **Zwischen zwei `!important` entscheidet die
+   Spezifitaet** - dieselbe Lehre wie heute schon bei `.dp-pf-mtrigger`
+   und `.sb-actions-l`, jetzt zum dritten Mal.
+
+   > Ein `!important` ist kein Trumpf, sondern nur eine zweite Liga
+   > derselben Rangfolge.
+
+   Die Breite kam durch, weil sie niemand sonst mit `!important` setzt.
+   **Dass eine Regel teilweise wirkt, beweist nichts fuer ihre anderen
+   Eigenschaften.**
+
+   Hier wird die Spezifitaet bewusst ueber den Sieger gehoben, statt auf
+   die Ladereihenfolge zu bauen (CLAUDE.md).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+html[data-dp-layout][data-dp-layout] body.dp-chrome-hell aside.sidebar#sidebar,
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar{
+  background:#0E0D0B !important;
+  border-right:1px solid #26231E !important;
+  color:#E9E3D6 !important;
+}
+/* Die Flaechen darin tragen eigene Gruende - jede einzeln, wie in
+   style.css ueblich. */
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-header,
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-neu-row,
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-section-title,
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-list{
+  background:transparent !important;
+  border-color:#26231E !important;
+}
+/* Beschriftungen, die fuer hellen Grund gemacht sind. Der Kontrast ist
+   gegen #0E0D0B gerechnet: #BFB7A9 ergibt 8,5. */
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-section-title,
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-sort-toggle,
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-wm,
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-count{
+  color:#BFB7A9 !important;
+}
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar input[type="text"],
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar input[type="search"],
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-search input{
+  background:#171512 !important; border-color:#2A2622 !important;
+  color:#E9E3D6 !important;
+}
+/* Die Objektkarten bleiben HELL. Sie sind als Karten gebaut, und eine
+   Karte, die man anfasst, darf sich vom Grund abheben - genau wie das
+   Blatt auf dem Schreibtisch. Nur die Kante wird ruhiger. */
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-card{
+  border-color:#2A2622 !important;
+}
