@@ -4541,3 +4541,24 @@ html[data-dp-layout="v2"] .dpl-schiene .dpl-teil-score{
     max-height:60px !important; max-width:216px !important;
   }
 }
+
+/* ── v1667c · DIE MENÜZEILEN RÜCKEN ZUSAMMEN ─────────────────────────
+   Gemessen in der Aktenmappe nach dem größeren Logo:
+
+     Aktionsblock   357 px hoch, Inhalt 466  ->  109 fehlen
+     12 Menüpunkte  je 27 px (Polster 4/9)   =  324
+     5 Gruppentitel                          = ~130
+
+   Die acht Pixel des Logos waren nicht die Ursache — der Block war
+   schon vorher knapp. Geholt wird der Platz bei den Zeilen selbst:
+   Polster 4 -> 2 px macht je Zeile 4 px, bei zwölf Zeilen **48 px**,
+   ohne dass eine Angabe verschwindet.
+
+   > Zwölfmal vier Pixel sind eine Menüzeile plus Überschrift. Enger
+   > setzen ist kein Verlust — etwas weglassen wäre einer.
+
+   Gilt nur in der Schiene: die normale Seitenspalte im
+   Auslieferungszustand bleibt, wie sie ist. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen .sb-act-item{
+  padding:2px 9px !important;
+}
