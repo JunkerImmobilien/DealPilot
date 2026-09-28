@@ -4086,38 +4086,38 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-sub{
 
    Gilt nur fuer v1b: in der Aktenmappe 1 stehen die Reiter IN der
    Schiene und sind dort laengst dunkel. */
-html[data-dp-layout="v1b"] body nav.tabs,
-html[data-dp-layout="v1b"] body header.hdr + nav.tabs,
-html[data-dp-layout="v1b"] body nav.tabs.tabs{
+html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs,
+html[data-dp-layout="v1b"] body:has(#sb-user) header.hdr + nav.tabs,
+html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs.tabs{
   background:#0E0D0B !important;
   border-bottom:1px solid var(--dpl-linie) !important;
   box-shadow:none !important;
 }
-html[data-dp-layout="v1b"] body nav.tabs .tab,
-html[data-dp-layout="v1b"] body nav.tabs .tab *{
+html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab,
+html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab *{
   color:#BFB7A9 !important;
   background:transparent !important;
 }
-html[data-dp-layout="v1b"] body nav.tabs .tab:hover,
-html[data-dp-layout="v1b"] body nav.tabs .tab:hover *{
+html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab:hover,
+html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab:hover *{
   color:#F2EDE3 !important;
 }
-html[data-dp-layout="v1b"] body nav.tabs .tab.active,
-html[data-dp-layout="v1b"] body nav.tabs .tab.active *{
+html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab.active,
+html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab.active *{
   color:#F5EFE2 !important;
 }
-html[data-dp-layout="v1b"] body nav.tabs .tab.active{
+html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab.active{
   border-bottom-color:var(--wl-c9a84c, #C9A84C) !important;
 }
 /* Die Symbole der Reiter tragen denselben Ton wie die des Menues. */
-html[data-dp-layout="v1b"] body nav.tabs .tab svg,
-html[data-dp-layout="v1b"] body nav.tabs .tab svg *{
+html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab svg,
+html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab svg *{
   color:var(--wl-c9a84c, #C9A84C) !important;
   stroke:var(--wl-c9a84c, #C9A84C) !important;
 }
 /* Das Fortschrittsband am rechten Rand der Leiste steht sonst als
    heller Block in der neuen dunklen Flaeche. */
-html[data-dp-layout="v1b"] body nav.tabs #tabs-status-badge{
+html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs #tabs-status-badge{
   background:transparent !important;
   border:1px solid var(--dpl-linie) !important;
   color:#BFB7A9 !important;
@@ -4200,4 +4200,34 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer #sb-user
   .sb-user-icons .sb-user-icon-btn[title="Abmelden"]{
   order:1 !important;
   width:24px !important; height:24px !important;
+}
+
+/* ── v1665c · EINE LEISTE, EIN ROLLBALKEN ────────────────────────────
+   Marcel: „dass wir das alles ein bisschen weiter runter bekommen,
+   dass die Ansicht komplett angezeigt wird mit den Einstellungen."
+
+   Gemessen: der Aktionsblock stand auf `flex:1 1 auto` mit
+   `overflow-y:auto` - Hoehe **382 px**, Inhalt **469 px**. „Feedback &
+   Support" war also da, aber nur ueber einen ZWEITEN Rollbalken
+   INNERHALB der Schiene erreichbar, der nicht als solcher zu erkennen
+   war.
+
+   > Ein Rollbalken, den man nicht sieht, ist kein Rollbalken, sondern
+   > ein Abschneider. Zwei ineinander sind einer zu viel.
+
+   Der Block zeigt jetzt seine volle Hoehe; gerollt wird die Schiene
+   als Ganzes. Damit steht alles untereinander, was zusammengehoert,
+   und es gibt genau einen Weg nach unten. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen{
+  flex:0 0 auto !important;
+  overflow:visible !important;
+  max-height:none !important;
+}
+html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen #sb-actions-accordion{
+  overflow:visible !important; max-height:none !important;
+}
+/* Der Score haengt nicht mehr am unteren Rand: mit `margin-top:auto`
+   wuerde er in einer rollenden Spalte den Rest vor sich herschieben. */
+html[data-dp-layout] .dpl-schiene .dpl-teil-score{
+  margin-top:10px !important;
 }
