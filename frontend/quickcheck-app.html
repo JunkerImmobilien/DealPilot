@@ -2928,7 +2928,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 .dp-pf-launch .dp-pf-ic,.dp-pf-launch .dp-pf-ic svg{width:16px;height:16px;color:var(--gold-hi, #E8CC7A);stroke:var(--gold-hi, #E8CC7A)}
 /* v570 · QC: alte qc7-src-Optik neutralisieren wo dp-pf-tile aktiv (Container = dp-pfbar) */
 #qc7-sources.dp-pfbar{display:flex !important;flex-wrap:nowrap}
-#qc7-sources .qc7-src.dp-pf-tile{border-radius:9px;font:inherit}
+#qc7-sources .qc7-src.dp-pf-tile{border-radius:2px;font:inherit}/* v1665f: war 9px */
 #qc7-sources .qc7-src.dp-pf-tile .qc7-box,#qc7-sources .qc7-src.dp-pf-tile .qc7-check{display:none !important}
 #qc7-sources .qc7-src.dp-pf-tile.on{background:#fff;box-shadow:none}
 #qc7-sources .qc7-src.dp-pf-tile.tool.on{background:rgba(8,7,4,.86)}
@@ -2949,7 +2949,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 .dp-pf-sep{margin:0 5px}
 /* Kacheln vereinheitlichen: gleiche Mindesthoehe, Logo links, LED konsequent rechts */
 .dp-pf-row{align-items:stretch}
-.dp-pf-tile{min-height:40px;justify-content:space-between;min-width:150px}
+.dp-pf-tile{min-height:42px;justify-content:space-between;min-width:150px}/* v1665f: war 40px */
 .dp-pf-tile.tool{min-width:200px}
 .dp-pf-logo{flex:1;justify-content:flex-start}
 .dp-pf-logo img{height:17px;max-width:130px}
@@ -3045,7 +3045,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 .dp-pf-grouplbl{font-size:9px !important;margin-bottom:2px !important}
 .dp-pf-row{gap:6px !important;flex-wrap:nowrap !important}
 /* Kacheln kompakter: weniger Padding, kleinere Logos, kleinere min-width */
-.dp-pf-tile{min-width:0 !important;min-height:34px !important;gap:6px !important;
+.dp-pf-tile{min-width:0 !important;min-height:42px !important;/* v1665f: war 34px */gap:6px !important;
   padding:6px 9px !important;justify-content:space-between !important}
 .dp-pf-tile.tool{min-width:0 !important}
 .dp-pf-logo img{height:18px !important;max-width:96px !important}
@@ -3119,7 +3119,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 .dp-pf-perf::after{bottom:-11px}
 /* Gruppen vertikal zentriert */
 .dp-pf-seg{justify-content:center;padding:12px 0}
-.dp-pf-tile{border-radius:9px}
+.dp-pf-tile{border-radius:2px}/* v1665f: war 9px */
 /* LED grün (armed/on) */
 .dp-pf-tile.on .dp-pf-led{background:radial-gradient(circle at 35% 30%,#5BD98E,#3FA56C 70%) !important;border-color:rgba(5,5,5,.4) !important;box-shadow:0 0 0 2px rgba(5,5,5,.16),0 0 9px 1px rgba(63,165,108,.9),inset 0 0 3px rgba(255,255,255,.6);animation:dpPfPulse 1.8s ease-in-out infinite}
 @keyframes dpPfPulse{0%,100%{box-shadow:0 0 0 2px rgba(5,5,5,.16),0 0 8px 1px rgba(63,165,108,.85),inset 0 0 3px rgba(255,255,255,.6)}50%{box-shadow:0 0 0 2px rgba(5,5,5,.16),0 0 14px 3px rgba(63,165,108,1),inset 0 0 3px rgba(255,255,255,.7)}}
