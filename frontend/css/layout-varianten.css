@@ -812,3 +812,38 @@ html[data-dp-layout] .body
   font-size:10px !important; letter-spacing:.12em !important;
   color:var(--dpl-leise) !important;
 }
+
+/* ═══ 10 · SICHTBAR IST NICHT BEDIENBAR (v1649) ═════════════════════
+   Marcel am 28.09.2026: „die Verknuepfungen passen nicht alle …
+   einstellungen kann man nicht anklicken."
+
+   GEMESSEN mit `elementFromPoint` auf die Mitte des Knopfes: dort lag
+   nicht der Knopf, sondern die Schiene. Ursache:
+
+     #sb-actions-accordion { pointer-events: none }
+
+   Das Akkordeon setzt das im ZUGEKLAPPTEN Zustand. Ich hatte beim
+   Aufklappen `display`, `height`, `max-height`, `overflow`, `opacity`
+   und `visibility` gesetzt - und `pointer-events` vergessen. **Alle
+   zwoelf Aktionen waren damit tot.**
+
+   > **Sichtbar ist nicht bedienbar.** Ich hatte gezaehlt, was man
+   > SIEHT, und daraus geschlossen, dass es geht. Eine Zaehlung von
+   > Knoepfen ist keine Pruefung von Knoepfen - das sagt nur
+   > `elementFromPoint` auf den Punkt, den der Finger trifft.
+
+   Dieselbe Familie wie zwei Fehler davor: eine Regel aendert nicht mit,
+   was sie nicht nennt. */
+html[data-dp-layout] .dpl-schiene #sb-actions-accordion,
+html[data-dp-layout] .dpl-schiene #sb-actions-accordion *,
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer,
+html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer *,
+html[data-dp-layout] .dpl-schiene nav.tabs,
+html[data-dp-layout] .dpl-schiene nav.tabs *{
+  pointer-events:auto !important;
+}
+
+/* ── Die Marke oben links groesser (Marcels Wunsch) ────────────────── */
+html[data-dp-layout] .dpl-marke{ height:58px !important; padding:0 14px !important; }
+html[data-dp-layout] .dpl-wm{ font-size:20px !important; }
+html[data-dp-layout] .dpl-logo{ max-height:36px !important; }
