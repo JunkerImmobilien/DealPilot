@@ -251,6 +251,7 @@
     aktuell = v;
     var h = document.documentElement;
     if (!v) {
+      kopfOffenHalten(false);
       h.removeAttribute('data-dp-layout');
       h.removeAttribute('data-dpl-portfolio');
       try { localStorage.removeItem(LS); } catch (e) {}
@@ -265,6 +266,7 @@
        zwei Stellen zu pflegen - und die zweite vergisst man. Diese
        Datei ordnet den Raum, sie färbt ihn nicht. */
     try { if (typeof window._dpDispSkin === 'function') window._dpDispSkin('hell'); } catch (e) {}
+    kopfOffenHalten(true);
     if (LAYOUTS[v].schiene) baueSchiene(v);
     try { localStorage.setItem(LS, v); } catch (e) {}
     schalterNachziehen();
@@ -328,6 +330,42 @@
 
      EINE Marke statt 46 Verzweigungen: wer eine Bedingung ändert, ändert
      sie hier und nirgends sonst. */
+  /* ── DER KOPF KLAPPT IN DEN LAYOUTS NICHT EIN ─────────────────────
+     Marcel: "die Ausgabe fehlt … Rendite, Finanzierung, Risiko sehe
+     ich gar nicht."
+
+     GEMESSEN: die Zeile steht im DOM mit allen Werten, hat aber Hoehe
+     0 - "body.hdr-collapsed .hdr-v61-row2" blendet sie per
+     display:none aus, und die Klasse bleibt gesetzt, auch wenn die
+     Seite ganz oben steht.
+
+     Eine CSS-Gegenregel hat NICHT gereicht: sie matchte mit hoeherer
+     Spezifitaet und !important und verlor trotzdem. Statt ein
+     Wettrennen zu fuehren, wird die Klasse hier entfernt - und wenn
+     der Scroll-Mechanismus sie zurueckschreibt, sofort wieder.
+
+     > Wo zwei Regeln um dieselbe Eigenschaft streiten, gewinnt die,
+     > die den ZUSTAND setzt - nicht die, die ihn ueberschreibt.
+
+     In den Layouts ist der Kopf mit 86 px ohnehin schmal; das
+     Einklappen spart 37 px und kostet die wichtigste Zeile. */
+  var kopfWache = null;
+  function kopfOffenHalten(an) {
+    var b = document.body;
+    if (!b) return;
+    if (kopfWache) { kopfWache.disconnect(); kopfWache = null; }
+    if (!an) return;
+    var frei = function () {
+      if (b.classList.contains('hdr-collapsed')) b.classList.remove('hdr-collapsed');
+      if (b.classList.contains('dp-hdr-compact')) b.classList.remove('dp-hdr-compact');
+    };
+    frei();
+    if (window.MutationObserver) {
+      kopfWache = new MutationObserver(frei);
+      kopfWache.observe(b, { attributes: true, attributeFilter: ['class'] });
+    }
+  }
+
   function karteMarke() {
     try {
       var h = document.documentElement, b = document.body;
