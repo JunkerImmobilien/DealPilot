@@ -238,9 +238,15 @@ html[data-dp-layout="v4"] .app-wrap{
 html[data-dp-layout="v2"] .app-wrap{ grid-template-columns:264px 1fr !important; }
 html[data-dp-layout="v5"] .app-wrap{ grid-template-columns:276px 1fr !important; }
 
-html[data-dp-layout="v1"] #sidebar,
-html[data-dp-layout="v3"] #sidebar,
-html[data-dp-layout="v4"] #sidebar{
+/* v1653b: an den ZUSTAND gehängt, nicht an eine Layout-Liste.
+   `data-dpl-portfolio` setzt `setze()` bei jedem Layout, das die
+   Objekte als Schublade führt - und das sind seit v1653 beide.
+
+   > Eine Aufzählung von Layoutnamen vergisst den nächsten. Genau das
+   > ist gerade passiert: v2 wurde von „Spalte" auf „Schublade"
+   > umgestellt, stand aber nicht in dieser Liste - und die Objektliste
+   > lag offen über der Arbeitsfläche. */
+html[data-dpl-portfolio] #sidebar{
   position:fixed !important; top:0; bottom:0; left:0 !important; z-index:70;
   width:360px !important; max-width:88vw;
   /* Zweiter Messbefund: `translateX(-102%)` schiebt um die EIGENE

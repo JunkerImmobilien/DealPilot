@@ -107,7 +107,7 @@
         { stellung: 'links',  ton: 'dunkel', marke: true, portfolio: true,
           nimmt: ['tabs', 'nutzer'] },
         { stellung: 'rechts', ton: 'hell',   marke: false, portfolio: false,
-          nimmt: ['aktionen'], titel: 'Ausgabe' }
+          nimmt: ['aktionen'], titel: 'Aktionen' }
       ]
     }
   };
