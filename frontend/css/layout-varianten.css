@@ -1049,3 +1049,101 @@ html[data-dp-layout] .dpl-schiene[data-stellung="leiste"] .dpl-teil-nutzer,
 html[data-dp-layout] .dpl-schiene[data-stellung="fuss"] .dpl-teil-nutzer{
   flex:0 0 auto !important; position:relative !important; z-index:1;
 }
+
+/* ═══ 11 · DIE KENNZAHLEN BLEIBEN STEHEN (v1650) ════════════════════
+   Marcel am 28.09.2026: „die Ausgabe fehlt … die Bewertung mit Rendite,
+   Finanzierung, Risiko, also das sehe ich dort alles gar nicht."
+
+   GEMESSEN: die Zeile IST da - `RENDITE 72 %`, `FINANZ. 90 %`,
+   `RISIKO 47 %`, `LAGE 68 %`, `UPSIDE 56 %` stehen im DOM. Sie hat nur
+   **Hoehe 0 und Breite 0**, weil `body.hdr-collapsed` sie per
+   `display:none !important` ausblendet - und diese Klasse bleibt
+   gesetzt, auch wenn die Seite wieder ganz oben steht.
+
+   > **Ein Einklapp-Mechanismus, der nicht wieder aufklappt, ist kein
+   > Einklappen, sondern ein Loeschen.** In den Layouts ist der Kopf mit
+   > 86 px ohnehin schmal; das Einklappen spart 37 px und kostet die
+   > wichtigste Information des Schirms.
+
+   Deshalb: in den Layouts klappt der Kopf nicht ein. */
+html[data-dp-layout] body.hdr-collapsed .hdr-v61-row2,
+html[data-dp-layout] body.dp-hdr-compact .hdr-v61-row2{
+  display:flex !important;
+}
+html[data-dp-layout] body.hdr-collapsed header.hdr,
+html[data-dp-layout] body.dp-hdr-compact header.hdr{
+  height:auto !important; max-height:none !important; overflow:visible !important;
+}
+
+/* ═══ 12 · DIE SENKRECHTEN SCHIENEN SIND DUNKEL (v1650) ═════════════
+   Marcel: „ich haette gerne die Aktenmappe, genauso wie die Kanzlei
+   auch mit dem Hintergrund im Schwarz."
+
+   Im Entwurf trug die Kanzlei eine dunkle Navigationsspalte - in der
+   App war sie hell geblieben. Jetzt beide: Obsidian als ruhiger Anker
+   links, das Blatt daneben hell.
+
+   > Das ist die Grammatik, die jeder aus DATEV und Banksoftware kennt:
+   > dunkle Navigation, helles Dokument. Die Marke steht in der Spalte,
+   > die Arbeit auf dem Papier. */
+html[data-dp-layout] .dpl-schiene[data-stellung="links"],
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"]{
+  background:#0E0D0B !important;
+  border-right-color:#26231E !important;
+  border-left-color:#26231E !important;
+  color:#E9E3D6 !important;
+}
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .dpl-marke,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-marke{
+  background:transparent !important; border-bottom-color:#26231E !important;
+}
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .dpl-wm,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-wm{ color:#F2EDE3 !important; }
+
+/* Reiter in der dunklen Schiene */
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] nav.tabs .tab,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] nav.tabs .tab{
+  color:#BFB7A9 !important; background:transparent !important;
+}
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] nav.tabs .tab:hover,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] nav.tabs .tab:hover{
+  color:#F5EFE2 !important;
+}
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] nav.tabs .tab.active,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] nav.tabs .tab.active{
+  color:#F5EFE2 !important; background:#171512 !important;
+  border-left-color:var(--dpl-gold) !important;
+}
+
+/* Aktionen, Nutzerblock und Portfolio-Knopf in der dunklen Schiene */
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .dpl-portfolio,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-portfolio{
+  background:#171512 !important; border-color:#2A2622 !important; color:#E9E3D6 !important;
+}
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-act-item,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-act-item{
+  color:#BFB7A9 !important; background:transparent !important;
+}
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-act-item:hover,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-act-item:hover{
+  color:#F5EFE2 !important; background:#171512 !important;
+}
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .sb-act-section-title,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .sb-act-section-title{
+  color:#7A7268 !important;
+}
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] .dpl-teil-nutzer,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] .dpl-teil-nutzer{
+  background:#0A0A09 !important; border-top-color:#26231E !important;
+}
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] #sb-user,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] #sb-user,
+html[data-dp-layout] .dpl-schiene[data-stellung="links"] #sb-user *,
+html[data-dp-layout] .dpl-schiene[data-stellung="rechts"] #sb-user *{
+  color:#BFB7A9 !important; background:transparent !important;
+}
+/* Die Objektspalte der Kanzlei wird mit dunkel - sonst stehen zwei
+   verschiedene Grauwerte nebeneinander. */
+html[data-dp-layout="v2"] #sidebar{
+  background:#0E0D0B !important; border-right:1px solid #26231E !important;
+}
