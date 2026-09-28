@@ -131,6 +131,26 @@ unter dem Aufbau; Attribut `data-dp-kartenstil`, Merker
 
 Schau: `frontend/entwurf-aktionsbox.html`.
 
+### P3c · Die Score-Zusammensetzung gegen die Demo — OFFEN
+
+Marcel am 28.09.2026: „die Zusammensetzung des Deal Scores, das sieht in
+der Demo noch anders aus."
+
+Die fehlende KPI-Angabe ist behoben (v1654d: `.sc-pill-sub` stand auf
+`display:none`, jetzt steht unter jeder Kennzahl „4 / 4 KPIs").
+**Die Gestaltung ist offen:**
+
+| | Demo (`entwurf-hell-bankfaehig.html`) | App |
+|---|---|---|
+| Score | Ring-Chip + „Gute Bewertung / Investor Deal Score" | Textblock „70 Gut" |
+| Kennzahlen | **echte Werte**: Rendite 4,72 %, DSCR 1,27 | Score-Anteile: „RENDITE 72 %" |
+| Anzahl | sechs (mit DSCR) | fünf |
+
+> Der Unterschied ist nicht nur Optik: „RENDITE 72 %" liest sich wie
+> eine Rendite, ist aber ein Score-Anteil. Die Demo zeigt beides
+> getrennt. **Das ist eine Produktentscheidung** — vor dem Bauen mit
+> Marcel klären, ob die Kennzahlenzeile die echten Werte tragen soll.
+
 ### P3b · Zwei Werkzeugfenster, die auf dem Handy im Weg standen
 
 Am 28.09. mit `elementsFromPoint` bei 390 px gemessen: `#dp-kv-panel`

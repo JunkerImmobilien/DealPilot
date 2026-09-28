@@ -20183,3 +20183,158 @@ lagen in Popups mit eigener heller Fläche, wo dunkler Text richtig ist.
 - In `layout-varianten.css` stehen noch **61 tote Regelzeilen** für
   v3/v4/v5 und die Stellungen `leiste`/`fuss`. Sie treffen nichts mehr.
   Abzutragen, wenn die Datei ohnehin angefasst wird.
+
+---
+
+## Rollout-Journal · 28.09.2026 (5) — Marcels Lesbarkeits-Durchgang
+
+**Was:** der Kontrast-Prüfer repariert (er hatte falsch gemessen), drei
+unlesbare Stellen im Kopf, der doppelte Tooltip am Kontingent, die
+Objektliste zieht ins Menü, der Account nach unten links, die Bordkarte
+statt des Trichters, und die KPI-Angabe wird sichtbar.
+
+**Commits:** `a2006b3` v1654 · `82efb50`+`290d024` v1654b · `60a622e`
+v1654c · `935678e` v1654d
+
+**Nachweis** (beide Layouts, Objekt *Gerberstraße 27* geladen, Prüfer
+mit Alpha-Rechnung):
+
+| | Aktenmappe | Kanzlei |
+|---|---|---|
+| Kopf | 24 geprüft, **0 unter 4,5** | 24 geprüft, **0** |
+| Navigation links | 39 geprüft, **0** | 22 geprüft, **0** |
+| Kontextschiene rechts | — | 18 geprüft, **0** |
+| KPI-Angabe sichtbar | **5 von 5** | **5 von 5** |
+| Account-Block | unten | **14 px vom Rand**, Text 127 px |
+| Objektliste | im Menü, 17 Einträge à 59 px | dito |
+| `#sidebar` | `display:none` | `display:none` |
+| Arbeitsfläche | — | 1685 px |
+
+---
+
+### 1 · Mein Prüfer hat falsch gemessen — zum zweiten Mal
+
+Ich hatte „0 unter 4,5" gemeldet; Marcel konnte drei Stellen nicht
+lesen. **Beide Aussagen waren richtig.**
+
+Der Prüfer las den Hintergrund als Zeichenkette:
+
+```
+.hdr-comp-text       Grund rgba(63,165,108,.12)   → gemeldet: in Ordnung
+.hdr-autosave-text   dito                          → gemeldet: in Ordnung
+#hdr-credits-pill    Grund color(srgb … / .08)     → gemeldet: null
+```
+
+> **Eine halbtransparente Fläche hat keine Farbe, sondern eine
+> Rechnung.** Und `color(srgb …)` kannte er gar nicht — da gab er
+> `null` zurück, und ich habe das als „nichts gefunden" gelesen.
+
+Gegen den *effektiven* Grund — alle Flächen von unten nach oben
+übereinandergelegt:
+
+| | Kontrast |
+|---|---:|
+| `.hdr-autosave-text` | **1,10** |
+| `.hdr-comp-text` („20 / 24 Felder") | **1,10** |
+| `#hdr-credits-pill-label` („31 · 4 · 7") | **1,44** |
+
+Der reparierte Prüfer steht im Journal-Anhang und gehört in jede
+künftige Farbmessung.
+
+### 2 · Die Angabe war da, sie war nur ausgeblendet
+
+Marcel: *„Man kann auch den KPIs nicht entnehmen, wie viele angegeben
+wurden davon."*
+
+Jede Pille trägt `.sc-pill-sub` mit genau dieser Auskunft — **4/4, 5/5,
+5/6, 4/5, 2/4** — und sie stand auf `display:none`. Der Wert steht auch
+im `title`, aber ein `title` erscheint erst nach einer Sekunde
+Stillhalten, und danach sucht niemand.
+
+> **„2 / 4 KPIs" bei Upside erklärt die 56 %.** Ohne die Angabe sieht
+> die Zahl aus wie ein Urteil, dabei ist sie eine halbe Auskunft.
+
+### 3 · Zweite Rücknahme an derselben Stelle
+
+In v1653h hatte ich `.sc-pill *{color:#E9E3D6}` zurückgenommen — mit der
+Begründung, die Pillen seien „helle Kacheln auf dunklem Kopf" und
+deshalb lesbar. **Das stimmte nicht mehr:** `.sc-pill-v` trägt
+`rgb(26,23,20)`, und der Grund war seit v1653g der Kopf selbst.
+Kontrast 1,1.
+
+Meine eigene Änderung an `.hdr-v61-row2` hatte der Pille die weisse
+Fläche genommen, und das habe ich beim Zurücknehmen nicht mitgedacht.
+Diesmal Fläche UND Schrift zusammen.
+
+### 4 · Ein `title` ist kein stiller Zusatz
+
+Die Kontingent-Pille trug ein `title`-Attribut **und** ein eigenes
+Panel `.dp-kg-panel` (385×155) mit demselben Inhalt. Beim Überfahren
+erschienen beide — Marcels „zwei Felder-Menüs".
+
+Der Kommentar an der Stelle begründete es mit „Rückfall für Touch und
+Screenreader". Die Absicht war richtig, das Mittel nicht: `aria-label`
+leistet dasselbe ohne zweiten Kasten, und Touch ist über
+`:focus-within` versorgt.
+
+### 5 · „Nicht minimieren können" war der eigentliche Befund
+
+Die Objektspalte war eine Schublade: 380 px, über die Arbeitsfläche
+gelegt, **ohne Schliessen-Knopf** — nur Escape und ein Klick auf eine
+Karte. Wer das nicht weiss, sitzt fest.
+
+Jetzt klappt derselbe Knopf eine Liste **in** der Schiene auf und zu und
+zeigt seinen Zustand mit einem Pfeil. Verschoben wird der vorhandene
+`#sb-list`, keine Kopie — `storage.js` rendert weiter hinein.
+
+Mit wandern, weil es sie sonst nirgends mehr gäbe:
+`.sb-neu-row` (Quick-Check steht **nicht** im Aktionsmenü) und
+`.sb-section-title-with-sort` (Suche **und** Sortierung). Danach trägt
+`#sidebar` nichts Nutzbares mehr und fällt weg, samt Gitterspur.
+
+Aus der **210-px-Karte** wird eine **59-px-Zeile**: Adresse, Kennung,
+Kaufpreis, Score. Thumbnail, Kennzahlkacheln und Aktionsknöpfe sind
+versteckt — eine Liste zum *Suchen* braucht keine Auswertung.
+
+**Geprüft mit einem echten Mausklick**, nicht mit `.click()`: Objekt
+wechselt, Liste klappt zu.
+
+### 6 · Eine Breite, die nicht aufgeht
+
+`.sb-user-text` war **38 px** breit. Meine Flex-Regel war richtig, die
+Annahme darunter nicht: ich hielt `.sb-user-icons` für eine eigene
+Zeile. Gemessen ist es ein **Geschwister** im selben Flex-Behälter und
+118 px breit — von 187 px blieben nach Avatar (28) und Icons (118)
+genau 38.
+
+> Eine Breite, die nicht aufgeht, ist selten zu klein gesetzt —
+> meistens nimmt sie jemand anders weg.
+
+### 7 · Zum dritten Mal ein Werkzeug über der Anwendung
+
+Meine eigene Umschaltleiste (`.dpl-schalter`, `position:fixed`) lag bei
+`12,998` über dem Account bei `10,958`. Nach `#dp-kv-panel` und
+derselben Leiste bei 390 px ist das der dritte Fall an einem Tag. Sie
+zieht nach rechts.
+
+### 8 · Der Trichter ist nicht mehr der Standard
+
+Wer nichts wählt, bekommt in einem Layout die **Bordkarte** (Entwurf 5).
+Gesetzt als CSS-Regel `html[data-dp-layout]:not([data-dp-kartenstil])`,
+**nicht** per JS: ein `setze('bordkarte')` hätte `data-dp-kartenstil`
+gesetzt, damit `dp-neue-karte` ausgelöst und den
+**Obsidian-Auslieferungszustand verändert**.
+
+Ein bereits gemerkter `trichter` wird **einmalig** migriert — mit
+eigenem Marker, sonst könnte niemand den Trichter je wieder wählen.
+
+### Rest
+
+- **Die Score-Zusammensetzung selbst** ist noch nicht die der Demo:
+  dort steht ein Ring-Chip mit „Gute Bewertung / Investor Deal Score"
+  und eine Kennzahlenzeile mit **echten Werten** (Rendite 4,72 %, DSCR
+  1,27) — die App zeigt Score-Anteile in Prozent. Die fehlende
+  KPI-Angabe ist behoben, die Gestaltung ist offen.
+- Weiter offen: 61 tote Regelzeilen für v3/v4/v5; der ungeklärte
+  Spezifitätsfall bei `#hdr-obj-num`; der Weg zu den Schaltern ist drei
+  Klicks tief.
