@@ -1402,3 +1402,28 @@ html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-s
 html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr{
   order:2 !important;
 }
+
+/* ── v1668e · DER QR IN DER MITTE DER KARTE ──────────────────────────
+   Marcel: „bei der Ansicht heute, da muss der QR-Code auch mittig auf
+   die Datenaufnahme-Karte."
+
+   Gemessen im Auslieferungszustand (`#oab-bar` 614..1894, 78 px hoch):
+
+     letzter Chip endet   ~1130
+     a.dp-pf-qr           1501 .. 1555   (54x68)
+     .dp-pf-rz beginnt     1686
+
+   Senkrecht sitzt er schon mittig (oben 5, unten 5). WAAGERECHT steht
+   er in einer 556 px breiten Lücke bei 371 px — also deutlich rechts
+   von deren Mitte, ohne dass etwas ihn dort hält.
+
+   > Ein Element, das in einer Lücke steht, aber nicht in ihrer Mitte,
+   > sieht nicht platziert aus, sondern liegengeblieben.
+
+   `margin:auto` auf beiden Seiten teilt den freien Raum gleich auf.
+   In der Kartei gilt weiter die eigene Regel aus v1668b — dort soll er
+   ausdrücklich neben dem Abrufknopf stehen. */
+:is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr{
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
