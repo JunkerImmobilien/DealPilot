@@ -21829,3 +21829,59 @@ teilt im Verhältnis der Einzelwerte.
   Rückfragesache.**
 - **Verkehrswertgutachten** zu Am Markt 18 liegt nicht im Repo.
 - **QR im QuickBoarding**: `.dp-pf-qr` fehlt dort im Markup.
+
+---
+
+## Rollout-Journal · 29.09.2026 (3) — Der QR im QuickBoarding
+
+**Was:** Der fehlende QR der Quellenleiste im QuickBoarding ist gebaut.
+
+**Commit:** `bff0389` v1670
+
+**Nachweis** (Prüflauf über die echte Nachricht `qc-autopass-code`,
+kein kostenpflichtiger Abruf):
+
+| | |
+|---|---|
+| ohne Ziel | `display:none`, **kein Platzhalter** |
+| mit Ziel | 46×46 px bei x=1007, `data-hat-ziel="1"` |
+| Abstand zum Abrufbereich | **18 px** |
+| Inhalt | echter `<canvas>` 40×40 |
+| Boarding-Pass-QR | **gleichzeitig mitbefüllt** |
+
+---
+
+### Warum er gefehlt hat
+
+Titel, Trennstrich und die goldene Kante stimmten nach v1668 im
+QuickBoarding bereits — der QR fehlte, weil es ihn **im Markup nie
+gab**. Der Objekt-Tab führt ihn seit jeher (`object-actions.js:365`),
+`quickcheck-app.html` baute die Leiste ohne ihn.
+
+Er hängt jetzt an derselben Quelle wie der QR des Boarding-Passes,
+`renderQR()` / `_shareUrl`.
+
+> Eine Auskunft, zwei Anzeigen — aber nur eine Quelle. Ein zweiter Weg
+> zum selben QR wäre am ersten Tag derselbe und am dreißigsten nicht
+> mehr.
+
+**Ohne Ziel bleibt er leer und nimmt keinen Platz.**
+
+> Ein QR-Kästchen, das man nicht scannen kann, ist kein Platzhalter,
+> sondern ein Versprechen, das nicht eingelöst wird.
+
+### Eine Rücknahme in eigener Sache
+
+Ich hatte diesen Punkt in der Runde davor als **Rückfrage**
+zurückgestellt („sag ob ich ihn machen soll"). Das war falsch: Marcels
+Auftrag lautete „das Ganze musst du im Quick-Check natürlich auch noch
+einmal ausprobieren", und ein fehlendes Element zu bauen ist keine
+Produktentscheidung.
+
+> CLAUDE.md nennt genau fünf Gründe für eine Rückfrage — Produktion,
+> Datenbank, Geld, Preise, Kündigungen. Ein fehlender QR steht nicht
+> darunter. **Eine unnötige Rückfrage kostet eine Runde und sieht aus
+> wie Sorgfalt.**
+
+Offen bleiben damit nur die zwei, die es zu Recht sind: die **Preise**
+(Geld) und das **Verkehrswertgutachten** (liegt nicht im Repo).
