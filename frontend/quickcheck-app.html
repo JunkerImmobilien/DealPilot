@@ -6829,6 +6829,30 @@ html[data-dp-kartenstil="kartei"] #qc7-sources .dp-pf-tile.on{
    es, zeigt die Leiste wieder, was der Objekt-Tab zeigt. Die Klasse
    `dp-neue-karte` bleibt unangetastet — sie traegt die Helligkeit,
    und die soll bleiben. */
+/* ── v1692b · BEI „HEUTE" DIE BORDKARTE, NICHT DIE KARTEI ───────────
+   Gemessen, beide Leisten bei Layout „Heute":
+
+     Tab Objekt   background-image: linear-gradient(110deg,
+                    rgb(213,187,115), rgb(201,168,76) 55%, …)  RUNWAY
+     QuickCheck   background-color: rgb(255,255,255)           WEISS
+
+   Nach v1692 stimmten Hoehe (78 px), Kopfzeile, Streifen und Barcode —
+   nur der Grund fehlte. Das QC-Dokument bringt seine eigene
+   `.dp-pfbar`-Regel mit und faerbt weiss; die Runway-Fassung aus
+   `style.css:32634` kommt hier nie an.
+
+   Dieselben Token wie im Original (`--gold-hi`, `--gold`,
+   `--wl-bd9a3e`), damit der Verlauf beim Mandanten mitfaerbt statt
+   golden stehenzubleiben. */
+html[data-dp-heute] #qc7-sources.dp-pfbar,
+html[data-dp-heute] body #qc7-sources.dp-pfbar{
+  background:linear-gradient(110deg,
+    var(--gold-hi, #E8CC7A),
+    var(--gold, #C9A84C) 55%,
+    var(--wl-bd9a3e, #bd9a3e)) !important;
+  border-radius:16px !important;
+  box-shadow:0 18px 44px -24px rgba(150,110,0,.7) !important;
+}
 html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-stripe{ display:block !important; }
 html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-lead{ display:flex !important; }
 html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-sep{ display:block !important; }
