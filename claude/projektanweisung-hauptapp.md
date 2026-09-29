@@ -23335,3 +23335,87 @@ Webrecherche-Links mit `utm_source`, Wohnflaechenpruefung bei
 Mehrfamilienhaeusern (390 m² Gesamtflaeche wird als EINE Wohnung
 geprueft), Marktpreis-Abruf aus dem Co-Piloten, und die Einheiten der
 Westerfeldstr. erfassen.
+
+---
+
+## Rollout-Journal 29.09.2026 (21) — der Score ohne Maßstab
+
+### 1 · Score 88 und trotzdem „Prüfen"
+
+Marcel: „Investor-Deal-Score 82, Deal-Score 88 — der sagt mir aber immer
+noch Prüfen in Gelb. Diese Grenzen passen nicht."
+
+Die Skala im Prompt deckt **LTV und DSCR** ab, den **Gesamt-Score
+nicht**. Die KI bekam die Zahl („DealScore: 88 / 100", Z. 219) ohne
+jede Bedeutung und hat frei geraten — zwei widersprüchliche Aussagen auf
+demselben Bildschirm.
+
+> **Eine Zahl ohne Maßstab ist keine Aussage.** Wer sie weitergibt, muss
+> den Maßstab mitgeben — sonst erfindet der Empfänger einen.
+
+Die Stufen aus CLAUDE.md stehen jetzt im Prompt (TOP ab 85, GUT ab 70,
+SOLIDE ab 50, SCHWACH ab 35, darunter KRITISCH), und die Empfehlung ist
+daran gebunden. **Abweichen ist erlaubt** — aber nur mit einem benannten
+Grund im ersten Satz. Sonst wäre die KI ein Papagei des Scores, und man
+könnte sie sparen.
+
+### 2 · 390 m² sind keine Wohnung
+
+Marcel: „er sagt, die Wohnungsgröße sei mit 390 m² zu groß, obwohl sich
+die auf acht Wohnungen verteilt."
+
+Gesendet wurden `objart` und `wfl`, sonst nichts zur Struktur. Die KI
+las EINE Wohnung daraus und verglich sie mit einem Mietspiegel, der für
+Wohnungen gilt.
+
+**Der MFH-Konfigurator führt die Einheiten längst** (`mfh-einheiten.js`,
+gespeichert als `_mfh` in `storage.js:182`) — **sie sind nur nie
+mitgefahren.** Jetzt schon, und der Prompt benennt die Fläche
+ausdrücklich als SUMME mit Durchschnitt je Einheit. Fehlt die
+Einheitenzahl bei einem Mehrfamilienhaus, wird gewarnt und die Aussage
+zur Wohnungsgröße untersagt — **eine ungewisse Angabe ist besser als
+eine falsche Gewissheit.**
+
+**Zwei eigene Fehler dabei:**
+
+- **Erster Anlauf an der falschen Stelle.** Ich hatte
+  `collectObjectData()` erweitert (`deal-action.js`) — das speist Bank,
+  FB und Gutachten, **nicht** die Pilot-Analyse. Die baut ihren Payload
+  in `ui.js:666`. Zurückgenommen.
+- **Die Miete heißt `ist`.** Ich las `e.miete` und `e.nkm` — beides gibt
+  es nicht. Die Mieten wären stillschweigend leer geblieben, und
+  **niemand hätte es gemerkt: eine fehlende Miete sieht aus wie eine
+  nicht erfasste.**
+
+Mitgekommen sind jetzt auch `art` und `status` je Einheit, der
+**Leerstand** als eigene Zeile (er steht in den Einheiten, wird aber
+überlesen, wenn man nur die Summe sieht), die **WEG-Aufteilung**, die
+Gesamtnutzungsdauer und der **Modernisierungsstand nach Anlage 2**.
+
+### 3 · Quellen-Links ohne Zählparameter
+
+`utm_source=openai` hängt die Web-Suche der OpenAI-API selbst an jede
+URL. Dazu wurde die ganze Rohzeile als Linktext gezeigt — man las die
+Adresse zweimal.
+
+> Eine Quelle soll zeigen, **woher** etwas kommt. Eine Zeichenkette mit
+> Zählparametern zeigt, **über wen** es kam. Das ist nicht dasselbe.
+
+Jetzt wird die URL gesäubert (`utm_*`, `gclid`, `fbclid`, `ref`) und der
+Text davor als Beschriftung genommen; fehlt er, erscheint der Hostname.
+Die volle Adresse steht im `title`.
+
+**Nachgemessen am echten Prompt (Westerfeldstr. als MFH mit 8
+Einheiten):** Score-Stufen drin · Gesamtfläche als Summe mit 49 m²
+Schnitt · Leerstand · WEG-Status · Modernisierung · Ist-Miete je
+Einheit. Gold-Audit **RC=0**.
+
+**Commits.** `c0fde46` · `a39bc3a` · `0747021`
+
+**Rest.** Offen aus Marcels Liste: der Pre-Flight-Streifen in Kanzlei /
+Tower / Aktenmappe, der Marktpreis-Abruf aus dem Co-Piloten — und die
+Einheiten der **Westerfeldstr. 140 selbst**. Die kann ich nicht
+erfassen, ohne sie zu erfinden: acht Wohnungen mit Fläche, Miete und
+Stand sind Angaben, die aus dem Objekt kommen müssen, nicht aus einer
+Schätzung. Im RND-Gutachten stehen Baujahr und Fläche; Aufteilung und
+Mieten stehen dort nicht.
