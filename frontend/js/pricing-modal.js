@@ -121,7 +121,22 @@
     // unabhängig vom aktuellen Plan. Der aktuelle Plan ist im UI als "✓ Aktueller Plan"
     // markiert (auf der jeweiligen Plan-Karte), aber initial sichtbar ist Investor.
     STATE.activeKey = 'investor';
-    _renderModal();
+    /* v1674 · Erst den echten Katalog, dann zeichnen.
+       Der Preis, der hier steht, muss der sein, der abgebucht wird —
+       und der kommt aus `/credits/bewertungen`, nicht aus einer
+       Ableitung. Der Abruf ist schnell und einmalig; scheitert er,
+       zeichnen wir trotzdem, dann eben mit dem abgeleiteten Wert.
+
+       > Lieber 200 ms warten als einen Preis zeigen, den die Kasse
+       > nicht kennt. */
+    var P = (window.DealPilotConfig && window.DealPilotConfig.pricing) || {};
+    if (typeof P.preiseAusKatalog === 'function') {
+      P.preiseAusKatalog()
+        .then(function () { KPACKS = _nkListe(); _renderModal(); })
+        .catch(function () { _renderModal(); });
+    } else {
+      _renderModal();
+    }
   };
   window.closePricingModal = function() {
     var modal = document.getElementById('pricing-modal');
@@ -376,6 +391,18 @@
     });
   }
 
+  /* ── v1674 · Den echten Katalog einmal holen ──────────────────────
+     `nachkaufFuer()` leitet den Paketpreis aus dem Monatsbeitrag ab.
+     Seit der Starter-Preis in Stripe auf 4,00 EUR steht, wäre diese
+     Ableitung (5,00) falsch — die Anzeige liefe von der Abbuchung weg.
+
+     `preiseAusKatalog()` holt `/credits/bewertungen`, also dieselbe
+     Quelle, aus der auch abgebucht wird, und überholt die Ableitung.
+     Bis sie da ist, steht der abgeleitete Wert — er kommt aus derselben
+     Datei und ist nie leer.
+
+     > Ein kurzer Moment mit der alten Zahl ist besser als ein leeres
+     > Feld. Falsch wird sie erst, wenn sie bleibt. */
   function _nkListe() {
     var P = (window.DealPilotConfig && window.DealPilotConfig.pricing) || {};
     if (typeof P.nachkaufFuer !== 'function') return [];

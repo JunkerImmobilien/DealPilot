@@ -507,6 +507,42 @@ window.DealPilotConfig = (function() {
 
      Free ist ausgenommen: dort gibt es nichts nachzukaufen, ohne dass
      zuerst ein Plan da ist. */
+  /* ── v1674 · DER ECHTE PREIS SCHLAEGT DIE ABLEITUNG ────────────────
+     Die Ableitung „Monatsbeitrag / 4" hat einen blinden Fleck: sie
+     kennt den BETRAG des Plans, nicht die ZUSAMMENSETZUNG seines
+     Kontingents. Beim Starter besteht es nur aus der billigsten Art —
+     und deshalb kam 5,00 EUR heraus, waehrend dieselben fuenf
+     Bewertungen einzeln 4,50 EUR kosteten.
+
+     Am 29.09.2026 ist der Stripe-Preis auf 4,00 EUR gesetzt worden.
+     Damit wuerde die Ableitung hier weiter 5,00 anzeigen, waehrend
+     Stripe 4,00 abbucht.
+
+     > Eine Anzeige, die ihren Preis selbst ausrechnet, ist so lange
+     > richtig, wie niemand den echten aendert. Sie ist keine Quelle,
+     > sie ist eine Vermutung mit Komma.
+
+     Deshalb liest `preiseAusKatalog()` einmal `/credits/bewertungen` —
+     dieselbe Quelle, aus der auch die Abbuchung kommt — und ueberholt
+     die Ableitung. Faellt der Abruf aus, bleibt die Ableitung als
+     Rueckfall: lieber eine alte Zahl als gar keine. */
+  var _katalogPreise = null;
+
+  function preiseAusKatalog() {
+    if (_katalogPreise) return Promise.resolve(_katalogPreise);
+    if (!window.Auth || typeof Auth.apiCall !== 'function') return Promise.resolve(null);
+    return Auth.apiCall('/credits/bewertungen').then(function (r) {
+      var kat = (r && (r.katalog || r)) || {};
+      var m = {};
+      Object.keys(kat).forEach(function (sku) {
+        var e = kat[sku];
+        if (e && typeof e.amount_cents === 'number') m[sku] = e.amount_cents / 100;
+      });
+      _katalogPreise = m;
+      return m;
+    }).catch(function () { return null; });
+  }
+
   function nachkaufFuer(planKey) {
     var p = PRICING[planKey];
     if (!p || !p.price_monthly_eur || p.price_monthly_eur <= 0) return null;
@@ -518,7 +554,12 @@ window.DealPilotConfig = (function() {
       /* Der Schluessel ist zugleich der Stripe-SKU (dp_pack_sku am Preis)
          und der lookup_key heisst dp_nachkauf_<plan>. */
       key:        'nachkauf_' + planKey,
-      preis_eur:  Math.round(p.price_monthly_eur / 4 * 100) / 100,
+      /* v1674: der Katalogpreis ueberholt die Ableitung, sobald er da ist. */
+      preis_eur:  (_katalogPreise && _katalogPreise["nachkauf_" + planKey] != null)
+                    ? _katalogPreise["nachkauf_" + planKey]
+                    : Math.round(p.price_monthly_eur / 4 * 100) / 100,
+      preis_quelle: (_katalogPreise && _katalogPreise["nachkauf_" + planKey] != null)
+                    ? "katalog" : "abgeleitet",
       kontingent: { mpi: k.mpi || 0, mpi_plus: k.mpi_plus || 0, wev: k.wev || 0 },
       menge:      menge,
       /* „5 · 5 · 5" wie in der Cockpit-Matrix */
@@ -785,6 +826,7 @@ window.DealPilotConfig = (function() {
          aeltere Leser (settings.js) nicht auf undefined laufen. */
       bewertungsPakete: [],
       nachkaufFuer: nachkaufFuer,
+      preiseAusKatalog: preiseAusKatalog,   /* v1674 */
       testphase: TESTPHASE,                 /* v1185 */
       yearlyBonus: YEARLY_BONUS,
       // V63.82: Service-Level
@@ -1397,5 +1439,34 @@ window.Plan = {
   function boot(){ applyTheme(); }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
   setTimeout(boot, 1600);   // nochmal nach Plan-/Sub-Load (Palette-Gating kann sich aendern)
+
+  /* ── v1674 · Den Bewertungs-Katalog einmal je Sitzung holen ────────
+     `nachkaufFuer()` zeigt sonst den ABGELEITETEN Preis
+     (Monatsbeitrag / 4), und der weicht seit dem 29.09.2026 beim
+     Starter vom echten ab: Stripe sagt 4,00 EUR, die Ableitung 5,00.
+
+     Der Abruf haengt an `dp:plan-ready` statt an einem Zeitgeber —
+     vorher ist niemand angemeldet und `/credits/bewertungen` waere ein
+     401. Dieselbe Regel steht in CLAUDE.md.
+
+     > Zwei Zahlen fuer denselben Preis laufen auseinander. Es gibt
+     > nur eine, die zaehlt: die, nach der abgebucht wird. */
+  /* Ueber die EXPORTIERTE Funktion, nicht ueber den Namen: dieser
+     Horcher steht in einem anderen IIFE als `preiseAusKatalog`, ein
+     direkter Aufruf waere ein ReferenceError — und der try/catch haette
+     ihn verschluckt, sodass niemand gemerkt haette, dass der Preis nie
+     nachgeladen wird.
+
+     > Ein try/catch um einen Aufruf, den es gar nicht gibt, macht aus
+     > einem Fehler ein Schweigen. Gemessen: zwischen Funktion und
+     > Horcher liegt eine IIFE-Grenze. */
+  try {
+    window.addEventListener('dp:plan-ready', function () {
+      try {
+        var P = window.DealPilotConfig && window.DealPilotConfig.pricing;
+        if (P && typeof P.preiseAusKatalog === 'function') P.preiseAusKatalog();
+      } catch (e) {}
+    });
+  } catch (e) {}
 })();
 /* ═══════════════════ /v901-theme ═══════════════════ */
