@@ -5069,3 +5069,26 @@ html[data-dp-layout^="v"] body:has(#sb-user) nav.tabs .tab.active{
   border-color:var(--wl-c9a84c, #C9A84C) !important;
   box-shadow:0 0 0 1px var(--wl-c9a84c, #C9A84C) inset !important;
 }
+
+/* v1699e — Der Kasten der Layout-Wahl in den Einstellungen.
+   Stand vorher als Inline-Stil im JS, mit dem Gold in Zahlenform. Gold
+   in `rgba(...)` faerbt sich beim Mandanten genauso wenig um wie ein
+   Hex — hier steht es als Token und wird mit umgefaerbt. */
+.dp-layoutw-box{
+  padding:12px 14px;
+  background:#FAF9F4;
+  border-radius:8px;
+  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);
+}
+.dp-layoutw-hinweis{
+  font-size:11.5px; color:var(--muted,#5F5E5A); margin-bottom:9px; line-height:1.45;
+}
+.dp-layoutw-gitter{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:9px;
+}
+.dp-layoutw{
+  min-height:44px; text-align:left; padding:10px 12px; border-radius:9px;
+  background:#fff; cursor:pointer; font:inherit;
+}
+.dp-layoutw-n{ display:block; font-weight:600; }
+.dp-layoutw-s{ display:block; font-size:11.5px; color:var(--muted,#5F5E5A); margin-top:1px; }

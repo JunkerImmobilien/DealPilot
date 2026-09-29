@@ -1371,21 +1371,21 @@
       }));
 
     host.innerHTML =
-        '<div style="padding:12px 14px;background:#FAF9F4;border-radius:8px;'
-      +   'border:1px solid rgba(201,168,76,0.25)">'
-      +   '<div style="font-size:11.5px;color:var(--muted,#5F5E5A);margin-bottom:9px">'
+        /* v1699e: Kasten und Rahmen stehen im CSS (`.dp-layoutw-box`).
+           Hier stand das Gold in ZAHLENFORM als Rahmenfarbe, und das
+           sich beim Mandanten genauso wenig umfaerbt wie ein Hex. Der
+           Waechter zaehlt es zu Recht mit; ich hatte beim Suchen nur
+           nach Hex geschaut und ihn dreimal vergeblich laufen lassen. */
+        '<div class="dp-layoutw-box">'
+      +   '<div class="dp-layoutw-hinweis">'
       +     'Wo Menü, Aktionen, Score und Ausgaben liegen. Farben, Formen und '
       +     'Schrift lassen sich frei dazu kombinieren.</div>'
-      +   '<div id="dp-layout-wahl" style="display:grid;'
-      +     'grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px">'
+      +   '<div id="dp-layout-wahl" class="dp-layoutw-gitter">'
       +     kacheln.map(function (o) {
             return '<button type="button" class="dp-layoutw'
-              + (o.key === aktuell ? ' on' : '') + '" data-v="' + o.key + '"'
-              + ' style="min-height:44px;text-align:left;padding:10px 12px;border-radius:9px;'
-              + 'border:1px solid rgba(0,0,0,.12);background:#fff;cursor:pointer;font:inherit">'
-              + '<span style="display:block;font-weight:600">' + o.name + '</span>'
-              + '<span style="display:block;font-size:11.5px;color:var(--muted,#5F5E5A);'
-              + 'margin-top:1px">' + (o.sub || '') + '</span></button>';
+              + (o.key === aktuell ? ' on' : '') + '" data-v="' + o.key + '">'
+              + '<span class="dp-layoutw-n">' + o.name + '</span>'
+              + '<span class="dp-layoutw-s">' + (o.sub || '') + '</span></button>';
           }).join('')
       +   '</div></div>';
 
