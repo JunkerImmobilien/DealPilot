@@ -1680,7 +1680,13 @@ html[data-dp-kartenstil="kartei"] .dp-pf-scroll::after{
    Luecke wieder auf, die v1686 gerade geschlossen hatte — gemessen
    113 px statt der gesetzten 18. Ein Element ohne Inhalt soll keinen
    Raum fordern. */
-:is(#oab-bar, #qc7-sources).dp-pfbar .dp-pf-qr[data-hat-ziel]{
+/* v1693b: die Bedingung `[data-hat-ziel]` gilt nur im QuickCheck —
+   dort setzt `renderQR()` das Attribut, sobald ein Pass existiert. Im
+   Objekt-Tab gibt es das Attribut NIE, dafuer ist der QR immer gefuellt
+   (gemessen: 54 px breit). Beide Leisten brauchen dieselbe Wirkung,
+   aber nicht dieselbe Bedingung. */
+#qc7-sources.dp-pfbar .dp-pf-qr[data-hat-ziel],
+#oab-bar.dp-pfbar .dp-pf-qr{
   margin-left:auto !important;
 }
 
@@ -1713,7 +1719,22 @@ html[data-dp-kartenstil="kartei"] .dp-pf-scroll::after{
 #qc7-sources.dp-pfbar:not(:has(.dp-pf-qr[data-hat-ziel])) .dp-pf-rz{
   margin-left:18px !important;
 }
-#oab-bar.dp-pfbar:not(:has(.dp-pf-qr[data-hat-ziel])) .dp-pf-rz{
+/* v1693b — ZURUECKGENOMMEN fuer den Objekt-Tab.
+   Diese Bedingung stammt aus v1686 und war fuer die QuickCheck-Leiste
+   gedacht, in der nach dem letzten Segment wirklich nichts mehr kommt.
+   Im Objekt-Tab steht der QR sehr wohl da (54 px breit) — er traegt nur
+   kein `data-hat-ziel`, weil dieses Attribut allein die QuickCheck-
+   Fassung setzt (`renderQR()`). Die Regel hat den Abruf-Bereich deshalb
+   246 px vor dem Ende festgenagelt.
+
+   > Eine Bedingung, die an EINER Stelle richtig ist, wird an der
+   > anderen zur Falle, wenn ihr Merkmal dort nie gesetzt wird.
+
+   Sie gilt jetzt nur noch fuer `#qc7-sources`; im Objekt-Tab uebernimmt
+   das `margin-left:auto` weiter unten. Die schwaechere Gegenregel
+   daneben zu stellen haette nicht geholfen: `:not(:has(…))` traegt hier
+   mehr Spezifitaet als die Ankerkette ohne sie. */
+#qc7-sources.dp-pfbar:not(:has(.dp-pf-qr[data-hat-ziel])) .dp-pf-rz{
   margin-left:18px !important;
 }
 
