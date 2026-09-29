@@ -6736,7 +6736,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
   <!-- v1641 · Der Quick-Check ist ein eigenes Dokument im iframe - die
        Gestaltung der Datenaufnahme muss hier NOCH EINMAL geladen werden.
        Zuletzt, damit sie die eingebetteten Stile ueberstimmt. -->
-  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1686b">
+  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1686c">
 <!-- ── v1665g · DIE KARTEI GILT AUCH HIER — ABER NUR SIE ──────────────
      Marcel: „ImmoMetrica, Expose, Marktbericht — das sieht nicht so aus
      wie im Tab Objekt."
@@ -6841,6 +6841,14 @@ html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-sep{ display:block !i
    Attribut und der Knopf rueckt von selbst wieder nach rechts. */
 #qc7-sources.dp-pfbar:not(:has(.dp-pf-qr[data-hat-ziel])) .dp-pf-rz{
   margin-left:18px !important;
+}
+/* v1686c — nachgerechnet: letztes Segment endet 927, QR sitzt mit
+   47,5 px Rand links UND rechts bei 975 (Breite 0), Abrufen beginnt
+   1040. 47,5+47,5+18 = 113, genau die gemessene Luecke. Die 18 waren
+   richtig; die 95 kamen von den Raendern eines Elements, das nichts
+   anzeigt. Ein QR ohne Ziel ist kein Bild, kein Weg, kein Abstand. */
+#qc7-sources.dp-pfbar .dp-pf-qr:not([data-hat-ziel]){
+  margin-left:0 !important; margin-right:0 !important; padding:0 !important;
 }
 /* v1686b: nur MIT Ziel den Platz beanspruchen - ein leerer QR
    schob sich sonst selbst nach rechts und riss die Luecke wieder auf,

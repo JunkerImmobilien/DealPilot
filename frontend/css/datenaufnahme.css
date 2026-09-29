@@ -1716,3 +1716,22 @@ html[data-dp-kartenstil="kartei"] .dp-pf-scroll::after{
 #oab-bar.dp-pfbar:not(:has(.dp-pf-qr[data-hat-ziel])) .dp-pf-rz{
   margin-left:18px !important;
 }
+
+/* v1686c — EIN ELEMENT MIT NULL BREITE TRUG 95 PX RAND.
+   Nachgerechnet, Leiste im QuickBoarding bei „Heute":
+
+     letztes Segment endet   927
+     QR  margin-left 47,5    ->  sitzt bei 975, Breite 0
+     QR  margin-right 47,5
+     Abrufen margin-left 18  ->  beginnt bei 1040
+
+   47,5 + 47,5 + 18 = 113 — genau die gemessene Luecke. Die 18 waren
+   gesetzt und richtig; die 95 kamen von den Raendern eines Elements,
+   das gar nichts anzeigt.
+
+   Ein QR ohne Ziel ist kein Bild, kein Weg und auch kein Abstand. */
+:is(#oab-bar, #qc7-sources).dp-pfbar .dp-pf-qr:not([data-hat-ziel]){
+  margin-left:0 !important;
+  margin-right:0 !important;
+  padding:0 !important;
+}
