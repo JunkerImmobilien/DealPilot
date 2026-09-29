@@ -638,7 +638,34 @@
        > beweist nichts ueber Klickbarkeit.
 
        Die Schiene haengt jetzt am `<body>`. Dort klippt sie niemand. */
-    document.body.appendChild(schiene);
+    /* ── v1681b · AM BODY IST SIE AUF DEM TABLET UNERREICHBAR ───────
+       Oben steht, warum die Schiene am `<body>` haengt: in `.main-col`
+       klippte sie und die Objektliste wurde unbedienbar (v1656). Das
+       gilt fuer die SCHWEBENDE Schiene — und nur fuer sie.
+
+       Unter 1100 px ist sie nicht mehr schwebend: dort setzt das CSS
+       `position:relative`, damit sie aus dem Schweben in den Fluss
+       wandert. Und im Fluss des `<body>` ist sie verloren. Gemessen
+       bei 817 px, Kanzlei 2:
+
+         Knopf liegt bei      y = 815
+         Sichtfeld endet bei  y = 757
+         body.scrollHeight    983  bei  overflow-y: HIDDEN
+         scrollende Vorfahren KEINE
+
+       Es gibt nichts zu scrollen — der Inhalt ist schlicht
+       abgeschnitten. Dasselbe galt fuer die Aktionen der Kanzlei,
+       seit es sie gibt.
+
+       Im Fluss gehoert sie deshalb dorthin, wo auch gescrollt wird:
+       ans Ende von `.main-col`. Geklippt wird sie dort nicht — Klippen
+       war das Problem der FIXIERTEN Schiene, die ausserhalb ihres
+       Behaelters lag. Eine mitscrollende liegt darin.                */
+    var imFluss = window.matchMedia('(max-width: 1100px)').matches
+                  && S.stellung === 'rechts';
+    var mcol = imFluss ? document.querySelector('.main-col') : null;
+    (mcol || document.body).appendChild(schiene);
+    if (mcol) schiene.setAttribute('data-dpl-im-fluss', '1');
     schienen.push(schiene);
   }
   function zahlNachziehen() {
@@ -1111,6 +1138,29 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
+
+  /* ── v1681b · DIE SCHWELLE MUSS BEIDE RICHTUNGEN KENNEN ───────────
+     Wo die rechte Schiene haengt, entscheidet sich beim Bauen: ueber
+     1100 px am `<body>` (schwebend), darunter in `.main-col`
+     (mitscrollend). Ohne Beobachter bleibt sie beim Drehen eines
+     Tablets oder beim Ziehen des Fensters dort, wo sie gebaut wurde —
+     und ist dann entweder geklippt oder unerreichbar.
+
+     `matchMedia().addEventListener('change')` feuert nur beim
+     UEBERSCHREITEN der Schwelle, nicht bei jedem Pixel. Ein
+     `resize`-Listener wuerde das Layout hundertfach neu bauen. */
+  try {
+    var mq = window.matchMedia('(max-width: 1100px)');
+    var umbau = function () {
+      /* `aktuell` direkt, nicht ueber `window.DealPilotLayout` — dieser
+         Block steht VOR der Zuweisung der API. Beim Feuern waere sie
+         zwar da, aber eine Abhaengigkeit, die nur zeitlich aufgeht, ist
+         eine, die beim naechsten Umbau kippt. */
+      if (aktuell) setze(aktuell);   /* neu bauen, damit der Ort stimmt */
+    };
+    if (mq.addEventListener) mq.addEventListener('change', umbau);
+    else if (mq.addListener) mq.addListener(umbau);   /* aeltere Browser */
+  } catch (e) { /* ohne Beobachter bleibt es beim Stand des Aufbaus */ }
 
   window.DealPilotLayout = {
     setze: setze,
