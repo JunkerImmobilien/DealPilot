@@ -668,6 +668,45 @@ function _buildAIPayload() {
       objart: g('objart'), wfl: parseDe(g('wfl')) || null, baujahr: g('baujahr'),
       makrolage: g('makrolage'), mikrolage: g('mikrolage'),
       thesis: g('thesis'), risiken: g('risiken'), notizen: g('notizen'),
+      /* ── v1700 · DIE EINHEITEN EINES MEHRFAMILIENHAUSES ─────────────
+         Marcel: „bei Mehrfamilienhaeusern gebe ich die Gesamtquadrat-
+         meterzahl an, und er sagt, die Wohnungsgroesse sei mit 390 m²
+         zu gross — obwohl sich die auf acht Wohnungen verteilt."
+
+         Gesendet wurden `objart` und `wfl`, sonst nichts zur Struktur.
+         Die KI sah „390 m²" und las EINE Wohnung daraus; gegen einen
+         Mietspiegel, der fuer Wohnungen gilt, ist das ein grober
+         Fehler.
+
+         Der MFH-Konfigurator (`mfh-einheiten.js`) fuehrt die Einheiten
+         laengst, samt Flaeche und Miete, und `storage.js:182` speichert
+         sie als `_mfh`. **Sie sind nur nie mitgefahren.**
+
+         > Eine Gesamtflaeche ohne die Zahl der Einheiten ist keine
+         > Wohnungsgroesse. Wer sie als solche liest, rechnet falsch —
+         > und merkt es nicht. */
+      einheiten: (function () {
+        try {
+          var m = window._dpMfh;
+          if (!m || !Array.isArray(m.einheiten) || !m.einheiten.length) return null;
+          var liste = m.einheiten.filter(function (e) { return e; });
+          var fl = liste.map(function (e) { return Number(e.wfl); })
+                        .filter(function (n) { return isFinite(n) && n > 0; });
+          var summe = fl.reduce(function (a, b) { return a + b; }, 0);
+          return {
+            anzahl: liste.length,
+            flaeche_summe: fl.length ? Math.round(summe) : null,
+            flaeche_schnitt: fl.length ? Math.round(summe / fl.length) : null,
+            je_einheit: liste.slice(0, 20).map(function (e) {
+              return {
+                wfl: Number(e.wfl) || null,
+                miete: Number(e.miete || e.nkm) || null,
+                zimmer: Number(e.zimmer) || null
+              };
+            })
+          };
+        } catch (e) { return null; }
+      })(),
       wertstg_pct: parseDe(g('wertstg')) || null,
       mietstg_pct: parseDe(g('mietstg')) || null
     },

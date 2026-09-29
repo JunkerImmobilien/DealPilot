@@ -125,6 +125,52 @@ function buildPrompt(payload) {
     '   Tilgung und Zins sind komfortabel gedeckt, ausreichender Puffer vorhanden.',
     '   Banken-Standard. Ab 1,5 gilt als sehr solide.',
     '',
+    /* ── v1700 · DIE STUFEN DES GESAMT-SCORES ──────────────────────────
+       Marcel: „Investor-Deal-Score 82, Deal-Score 88 — der sagt mir aber
+       immer noch ‚Prüfen' in Gelb. Diese Grenzen passen nicht."
+
+       Er hat recht, und die Ursache war eine Lücke: die Skala oben deckt
+       LTV und DSCR ab, den GESAMT-Score aber nicht. Die KI bekam die
+       Zahl („DealScore: 88 / 100", Z. 219) ohne jede Bedeutung und hat
+       frei geraten.
+
+       Die Schwellen stehen in CLAUDE.md und gelten überall in der App
+       (`js/dashboard.js:390`). Dass die Analyse sie nicht kannte, hat
+       zwei widersprüchliche Aussagen auf denselben Bildschirm gebracht.
+
+       > Eine Zahl ohne Maßstab ist keine Aussage. Wer sie weitergibt,
+       > muss den Maßstab mitgeben — sonst erfindet der Empfänger einen.
+
+       Die Empfehlung ist an die Stufe gebunden, aber nicht daran
+       gefesselt: Abweichen ist erlaubt und muss benannt werden. Sonst
+       wäre die KI ein Papagei des Scores, und man könnte sie sparen. */
+    '## DEAL-SCORE — DIE STUFEN (verbindlich)',
+    'Der DealScore steht unten als Zahl von 0 bis 100. Er bedeutet:',
+    '',
+    '🟢 TOP — 85 und mehr',
+    '🟢 GUT — 70 bis 84',
+    '🟡 SOLIDE — 50 bis 69',
+    '🟠 SCHWACH — 35 bis 49',
+    '🔴 KRITISCH — unter 35',
+    '',
+    'Dieselben Schwellen gelten für den Investor Deal Score.',
+    '',
+    'BINDUNG DER EMPFEHLUNG:',
+    '- TOP oder GUT (70+)  → "Kaufen"',
+    '- SOLIDE (50–69)      → "Prüfen"',
+    '- SCHWACH oder KRITISCH (unter 50) → "Nicht kaufen"',
+    '',
+    'Du DARFST davon abweichen, wenn ein konkreter, benennbarer Umstand',
+    'dagegen spricht — etwa ein DSCR unter 1,0, ein LTV über 100 %, ein',
+    'erkennbarer Sanierungsstau oder eine Lage mit fallender Nachfrage.',
+    'Dann MUSST du diesen Umstand im ersten Satz der Begründung nennen',
+    'und sagen, dass du deshalb von der Score-Stufe abweichst.',
+    '',
+    'Ohne einen solchen Grund ist eine Empfehlung, die unter der',
+    'Score-Stufe liegt, FALSCH. Ein Objekt mit 88 Punkten ist TOP — dort',
+    '"Prüfen" zu schreiben, widerspricht der eigenen Bewertung und',
+    'verwirrt den Nutzer, der beide Angaben nebeneinander sieht.',
+    '',
     'WICHTIGE INSTRUKTIONEN:',
     '- Verwende die Begriffe „SOLIDE", „ERHÖHT", „KRITISCH" / „KNAPP" exakt wie oben.',
     '- Formuliere positiv-konkret: Ein LTV von 84 % ist SOLIDE und gehört in den',
@@ -155,7 +201,47 @@ function buildPrompt(payload) {
     '## OBJEKT-DATEN',
     ortLine ? '- Adresse: ' + ortLine : '',
     o.objart ? '- Objektart: ' + o.objart : '',
-    o.wfl ? '- Wohnfläche: ' + o.wfl + ' m²' : '',
+    /* ── v1700 · GESAMTFLAECHE IST KEINE WOHNUNGSGROESSE ──────────────
+       Marcel: „er sagt mir, die Wohnungsgroesse sei mit 390 m² zu gross,
+       obwohl sich die auf acht Wohnungen verteilt."
+
+       Die Zahl allein laesst beides zu. Ohne die Einheiten liest jeder
+       Leser — auch ein Modell — eine Wohnung daraus und vergleicht sie
+       mit einem Mietspiegel, der fuer Wohnungen gilt.
+
+       Steht die Einheitenzahl fest, wird die Flaeche ausdruecklich als
+       SUMME benannt und die Durchschnittsgroesse danebengestellt. Fehlt
+       sie, wird bei einem Mehrfamilienhaus wenigstens gewarnt — eine
+       ungewisse Angabe ist besser als eine falsche Gewissheit. */
+    o.wfl
+      ? (o.einheiten && o.einheiten.anzahl > 1
+          ? '- Wohnfläche: ' + o.wfl + ' m² — das ist die GESAMTFLÄCHE über '
+            + o.einheiten.anzahl + ' Einheiten'
+            + (o.einheiten.flaeche_schnitt
+                ? ', im Schnitt ' + o.einheiten.flaeche_schnitt + ' m² je Einheit'
+                : '')
+          : '- Wohnfläche: ' + o.wfl + ' m²')
+      : '',
+    (o.einheiten && o.einheiten.anzahl > 1)
+      ? '- Einheiten: ' + o.einheiten.anzahl
+        + (o.einheiten.je_einheit && o.einheiten.je_einheit.length
+            ? ' (' + o.einheiten.je_einheit.filter(function (e) { return e.wfl; })
+                .map(function (e) {
+                  return e.wfl + ' m²' + (e.miete ? ' / ' + e.miete + ' €' : '');
+                }).join(' · ') + ')'
+            : '')
+      : '',
+    (o.einheiten && o.einheiten.anzahl > 1)
+      ? '  ACHTUNG: Vergleiche Mietspiegel und ortsübliche Größen mit der '
+        + 'Fläche JE EINHEIT, niemals mit der Gesamtfläche. Eine '
+        + 'Gesamtfläche von ' + o.wfl + ' m² ist bei ' + o.einheiten.anzahl
+        + ' Einheiten normal und KEIN Auffälligkeitsgrund.'
+      : (/mehrfamilien|mfh|wohnhaus|zinshaus/i.test(String(o.objart || ''))
+          ? '  ACHTUNG: Dies ist ein Mehrfamilienhaus. Die Wohnfläche ist die '
+            + 'SUMME aller Einheiten, nicht die Größe einer Wohnung. Die Zahl der '
+            + 'Einheiten liegt nicht vor — nenne deshalb KEINE Aussage zur '
+            + 'Wohnungsgröße und vergleiche sie nicht mit einem Mietspiegel.'
+          : ''),
     o.baujahr ? '- Baujahr: ' + o.baujahr : '',
     o.makrolage ? '- Makrolage (Selbstbewertung): ' + o.makrolage : '',
     o.mikrolage ? '- Mikrolage (Selbstbewertung): ' + o.mikrolage : '',
