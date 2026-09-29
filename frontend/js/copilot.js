@@ -133,10 +133,25 @@
       }
       var e = r.ergebnis || {};
       var zeilen = [];
+
+      /* v1703b: die Einheiten stehen im Datensatz, sie werden nicht
+         angenommen. `marktmieteCold` ist die MONATSMIETE in Euro - der
+         Quadratmeterpreis hat ein eigenes Feld (`marktmieteEurSqm`,
+         `eurPerSqm`), so liest es auch `avm-section.js:87/108`.
+
+         > Gemessen stand hier zuerst „Marktmiete: 693,00 EUR/m2". Das
+         > waren die 693 Euro Monatsmiete mit der falschen Einheit
+         > dahinter - eine Zahl, die dreihundertfach daneben liegt und
+         > trotzdem plausibel aussieht. */
       var mw = _eur(e.marktwert), lo = _eur(e.low), hi = _eur(e.high);
-      if (mw) zeilen.push('Marktwert-Indikation: ' + mw + (lo && hi ? '  (Spanne ' + lo + ' – ' + hi + ')' : ''));
-      var mm = _eurQm(e.marktmieteCold), mlo = _eurQm(e.marktmieteLow), mhi = _eurQm(e.marktmieteHigh);
-      if (mm) zeilen.push('Marktmiete: ' + mm + (mlo && mhi ? '  (Spanne ' + mlo + ' – ' + mhi + ')' : ''));
+      if (mw) zeilen.push('Marktwert-Indikation: ' + mw
+        + (lo && hi ? '  (Spanne ' + lo + ' – ' + hi + ')' : '')
+        + (_eurQm(e.eurPerSqm) ? '  ·  ' + _eurQm(e.eurPerSqm) : ''));
+
+      var mm = _eur(e.marktmieteCold), mlo = _eur(e.marktmieteLow), mhi = _eur(e.marktmieteHigh);
+      if (mm) zeilen.push('Marktmiete (kalt): ' + mm + '/Monat'
+        + (mlo && mhi ? '  (Spanne ' + mlo + ' – ' + mhi + ')' : '')
+        + (_eurQm(e.marktmieteEurSqm) ? '  ·  ' + _eurQm(e.marktmieteEurSqm) : ''));
 
       if (!zeilen.length) {
         /* Eine Antwort ohne Zahl ist keine Indikation. Lieber sagen, dass
@@ -148,9 +163,13 @@
       _mpErgebnis = {
         quelle: 'unabhaengiger Bewertungspartner',
         demo: !!r.demo,
-        marktwert: _zahl(e.marktwert), low: _zahl(e.low), high: _zahl(e.high),
-        marktmiete_eur_qm: _zahl(e.marktmieteCold),
-        marktmiete_low: _zahl(e.marktmieteLow), marktmiete_high: _zahl(e.marktmieteHigh),
+        marktwert_eur: _zahl(e.marktwert),
+        marktwert_low_eur: _zahl(e.low), marktwert_high_eur: _zahl(e.high),
+        marktwert_eur_qm: _zahl(e.eurPerSqm),
+        marktmiete_kalt_eur_monat: _zahl(e.marktmieteCold),
+        marktmiete_low_eur_monat: _zahl(e.marktmieteLow),
+        marktmiete_high_eur_monat: _zahl(e.marktmieteHigh),
+        marktmiete_eur_qm: _zahl(e.marktmieteEurSqm),
         stand: new Date().toISOString().slice(0, 10)
       };
 
