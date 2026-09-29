@@ -58,6 +58,30 @@
 
   var PLANE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5a2.1 2.1 0 0 0-3-3L13 8 4.8 6.2a.7.7 0 0 0-.7 1.1l5.2 4.3-2.6 2.6-2.3-.5a.6.6 0 0 0-.6 1l2 2.3 2.3 2a.6.6 0 0 0 1-.6l-.5-2.3 2.6-2.6 4.3 5.2a.7.7 0 0 0 1.1-.7Z"/></svg>';
 
+  /* ── v1705d · Schnellfragen ────────────────────────────────────────
+     Vier Fragen, die das Portfolio wirklich beantworten KANN - die
+     Daten dafuer stehen im Payload (Cashflow je Objekt, Zinsbindung,
+     Projektion, Kennzahlen je Objekt).
+
+     > Eine Schnellfrage, deren Antwort nicht in den Daten steht, ist
+     > eine Einladung zum Erfinden. Deshalb steht hier nichts zu
+     > Marktpreisen oder Standorten - dafuer braucht es die
+     > Web-Recherche, und die schaltet der Nutzer selbst ein. */
+  var FRAGEN = [
+    { kurz: 'Wer belastet den Cashflow?',
+      lang: 'Welche meiner Objekte belasten den Cashflow, welche tragen ihn? '
+          + 'Nenne sie mit Namen und Zahl, sortiert vom schlechtesten zum besten.' },
+    { kurz: 'Zinsbindungen',
+      lang: 'Wo laeuft als Naechstes eine Zinsbindung aus, und welche Restschuld haengt jeweils daran? '
+          + 'Sag mir, worauf ich mich einstellen muss. Steht bei einem Objekt keine Zinsbindung in den Daten, sag das.' },
+    { kurz: 'Eigenkapital in 10 Jahren',
+      lang: 'Wie entwickelt sich mein Eigenkapital ueber die naechsten zehn Jahre? '
+          + 'Nimm die Projektion und sag klar dazu, welche Annahmen darin stecken.' },
+    { kurz: 'Klumpenrisiken',
+      lang: 'Welche Klumpenrisiken habe ich - Lage, Objektart, Finanzierung, einzelne Objekte mit zu viel Gewicht? '
+          + 'Miss das an meiner Gesamtinvestition und nenne Prozentwerte.' }
+  ];
+
   /* ── Aufbau ──────────────────────────────────────────────────────── */
   function mount() {
     var host = el(HOST);
@@ -84,8 +108,17 @@
       '<div class="dp-pp-log" id="dp-pp-log">' +
         '<div class="dp-pp-hint">Ich kenne deine Vermoegensbilanz — Gesamtinvestition, Eigenkapital, Restschuld, ' +
         'Cashflow und die Entwicklung der naechsten zehn Jahre — und jedes einzelne Objekt darin. ' +
-        'Starte die Analyse oder frag direkt: „Welches Objekt zieht meinen Cashflow runter?“, ' +
-        '„Wo laeuft als Naechstes eine Zinsbindung aus?“, „Wie steht mein Eigenkapital in zehn Jahren?“</div>' +
+        'Starte die Analyse oder frag direkt.</div>' +
+      '</div>' +
+      /* v1705d: Schnellfragen. Ein leeres Eingabefeld ist eine Huerde -
+         wer nicht weiss, was das Werkzeug kann, fragt es nicht. Die vier
+         Fragen sind die, die das Portfolio wirklich beantworten kann,
+         weil die Daten dafuer im Payload stehen: Cashflow je Objekt,
+         Zinsbindung, Projektion, Klumpen. */
+      '<div class="dp-pp-chips" id="dp-pp-chips">' +
+        FRAGEN.map(function (f, i) {
+          return '<button type="button" class="dp-pp-chip" data-frage="' + i + '">' + esc(f.kurz) + '</button>';
+        }).join('') +
       '</div>' +
       '<div class="dp-pp-bar">' +
         '<textarea id="dp-pp-in" class="dp-pp-in" rows="1" placeholder="Frage zum Portfolio oder zu einem Objekt…"></textarea>' +
@@ -97,6 +130,16 @@
     if (w) w.addEventListener('change', function () { allowWeb = this.checked; });
     var g = el('dp-pp-go');
     if (g) g.addEventListener('click', analyse);
+    /* Ein Horcher am Behaelter statt vier an den Knoepfen - die Chips
+       werden nie neu gebaut, aber ein Horcher je Knopf waere trotzdem
+       vier Stellen, an denen man einen vergessen kann. */
+    var ch = el('dp-pp-chips');
+    if (ch) ch.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('.dp-pp-chip') : null;
+      if (!b) return;
+      var f = FRAGEN[+b.getAttribute('data-frage')];
+      if (f) senden(f.lang, f.kurz);
+    });
     var s = el('dp-pp-send');
     if (s) s.addEventListener('click', function () { frage(); });
     var i = el('dp-pp-in');

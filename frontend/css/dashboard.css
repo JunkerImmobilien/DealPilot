@@ -821,3 +821,23 @@ body.dp-theme-dark #dashboard-main .dp-pp-in{background:#1B1913;border-color:#3A
   #dashboard-main .dp-pp-go{width:100%;order:9}
   #dashboard-main .dp-pp-msg{max-width:96%}
 }
+
+/* v1705d - Schnellfragen unter dem Verlauf. Ein leeres Eingabefeld ist
+   eine Huerde: wer nicht weiss, was das Werkzeug kann, fragt es nicht. */
+#dashboard-main .dp-pp-chips{
+  display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 12px;
+}
+#dashboard-main .dp-pp-chip{
+  border:1px solid #E7E4DC;background:#FBFAF6;color:#5C554E;
+  font:500 11.5px/1 'Inter',sans-serif;padding:7px 11px;border-radius:99px;
+  cursor:pointer;white-space:nowrap;
+}
+#dashboard-main .dp-pp-chip:hover{
+  border-color:var(--gold);color:#2A2826;background:var(--gold-bg);
+}
+body.dp-theme-dark #dashboard-main .dp-pp-chip{
+  border-color:#2F2B22;background:#1B1913;color:#B5AE9F;
+}
+body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
+  border-color:var(--gold);color:#EDE7DA;background:#221F17;
+}
