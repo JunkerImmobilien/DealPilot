@@ -1095,12 +1095,25 @@
        Hellfassung danebenzustellen hiesse, jede künftige Änderung an
        zwei Stellen zu pflegen - und die zweite vergisst man. Diese
        Datei ordnet den Raum, sie färbt ihn nicht. */
+    /* ── v1699 · DER HELL-ZWANG IST RAUS ────────────────────────────
+       Hier stand `window._dpDispSkin('hell')` — jedes Layout hat die
+       Oberflaeche beim Einschalten auf hell gestellt.
+
+       Marcel: „auch standard den DealPilot-Dunkelmodus ausliefern. Den
+       Hell-Modus-Wechsel kann man dann unter ‚Darstellung oeffnen'
+       finden."
+
+       Er hat recht, und der Zwang war ohnehin eine Anmassung: wer ein
+       Layout waehlt, waehlt eine AUFTEILUNG. Die Helligkeit ist eine
+       zweite Entscheidung, und sie gehoert dem Nutzer. Ein Umbau, der
+       sich nicht abwaehlen laesst, ist kein Angebot, sondern eine
+       Ansage.
+
+       `skinVorher` wird weiter gemerkt — es traegt den Rueckweg fuer
+       `setze('')` und kostet nichts. */
     try {
-      if (typeof window._dpDispSkin === 'function') {
-        if (skinVorher === null) {
-          skinVorher = document.body.classList.contains('dp-chrome-hell') ? 'hell' : 'obsidian';
-        }
-        window._dpDispSkin('hell');
+      if (skinVorher === null && document.body) {
+        skinVorher = document.body.classList.contains('dp-chrome-hell') ? 'hell' : 'obsidian';
       }
     } catch (e) {}
     kopfOffenHalten(true);
