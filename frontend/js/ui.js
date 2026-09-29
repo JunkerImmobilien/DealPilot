@@ -937,6 +937,53 @@ function _esc(s) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+/* ── v1700b · QUELLEN-LINKS LESBAR MACHEN ───────────────────────────────
+   Marcel: „wenn ich die Webrecherche angemacht habe und dort Links
+   zurueckgegeben werden, werden die ganz komisch angegeben. Da steht
+   auch hinten irgendwie utm_source=openai."
+
+   Zwei Dinge steckten drin:
+
+   1. **`utm_source=openai`** haengt die Web-Suche der OpenAI-API selbst
+      an jede URL. Es ist eine Herkunftsmarkierung fuer den betreibenden
+      Dienst — fuer Marcel ist es Rauschen, und es macht den Link
+      laenger als die Aussage.
+   2. Die ganze Rohzeile wurde als LINKTEXT angezeigt. Wenn dort
+      „Mietspiegel Bielefeld 2024 — https://…?utm_source=openai" stand,
+      las man die URL zweimal.
+
+   Jetzt wird die URL gesaeubert und der Text davor als Beschriftung
+   genommen; steht kein Text da, erscheint der Hostname. Die volle
+   Adresse bleibt im `title` — wer sie braucht, sieht sie, ohne dass
+   jeder andere sie lesen muss.
+
+   > Eine Quelle soll zeigen, WOHER etwas kommt. Eine Zeichenkette mit
+   > Zaehlparametern zeigt, ueber WEN es kam. Das ist nicht dasselbe. */
+function _urlSauber(u) {
+  try {
+    var x = new URL(u);
+    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content',
+     'utm_id', 'gclid', 'fbclid', 'ref', 'referrer']
+      .forEach(function (p) { x.searchParams.delete(p); });
+    var s = x.toString();
+    return s.replace(/\?$/, '').replace(/#$/, '');
+  } catch (e) { return u; }
+}
+
+function _quelleZeile(q) {
+  var roh = '' + (q == null ? '' : q);
+  var m = roh.match(/https?:\/\/\S+/);
+  if (!m) return _esc(roh);
+  var url = _urlSauber(m[0].replace(/[),.;]+$/, ''));   /* Satzzeichen am Ende */
+  /* Was vor der URL steht, ist die Beschriftung — sonst der Hostname. */
+  var text = roh.slice(0, m.index).replace(/[\s–—:–—-]+$/, '').trim();
+  if (!text) {
+    try { text = new URL(url).hostname.replace(/^www\./, ''); } catch (e) { text = url; }
+  }
+  return '<a href="' + _esc(url) + '" target="_blank" rel="noopener noreferrer" title="'
+       + _esc(url) + '">' + _esc(text) + '</a>';
+}
+
 /**
  * V25.1: Markdown-Marker aus KI-Antworten entfernen, BEVOR sie im UI gerendert werden.
  * Das Modell liefert manchmal trotz expliziter Anweisung **fett** oder *kursiv* —
@@ -1099,7 +1146,7 @@ function _renderAIServerAnalysis(a) {
   pL += '</div>';
   if (Array.isArray(a.quellen) && a.quellen.length) {
     pL += '<div class="dp-pa-card">' + sec('', I.loc, 'QUELLEN') + '<ul class="dp-pa-src">' +
-      a.quellen.map(function (q) { var m = ('' + q).match(/https?:\/\/\S+/); return '<li>' + (m ? '<a href="' + _esc(m[0]) + '" target="_blank" rel="noopener">' + _esc(q) + '</a>' : _esc(q)) + '</li>'; }).join('') +
+      a.quellen.map(function (q) { return '<li>' + _quelleZeile(q) + '</li>'; }).join('') +
       '</ul></div>';
   }
 
