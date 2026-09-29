@@ -164,8 +164,8 @@ if ($voraus -eq "0") {
     git --no-pager log --oneline "origin/$ZWEIG..HEAD"
 }
 
-$standLokal = git rev-parse --short HEAD
-PruefeExit "git rev-parse --short HEAD"
+$standLokal = git rev-parse HEAD
+PruefeExit "git rev-parse HEAD"
 $standLokal = "$standLokal".Trim()
 
 # --- 5) Push ----------------------------------------------------------
@@ -229,13 +229,22 @@ PruefeExit "Ausrollen auf dem Server"
 #     Select-Object -Last 1: der Rueckgabewert ist die LETZTE Zeile. Ein
 #     Login-Banner, eine motd oder eine Warnung des ssh-Clients wuerden
 #     sonst mit im Vergleich landen.
-$standFern = ssh $SERVER "cd $REPOPFAD && git rev-parse --short HEAD" | Select-Object -Last 1
+# v1705e: VOLLER Hash, nicht --short.
+#     Gemessen am 29.09.2026: der Server meldete 8f5aa70, lokal stand
+#     8f5aa704 - DERSELBE Commit. `git rev-parse --short` kuerzt nur so
+#     weit, wie es im JEWEILIGEN Repo eindeutig ist, und die beiden Repos
+#     haben nicht dieselben Objekte. Der Deploy war erfolgreich, das
+#     Skript meldete Abbruch.
+#
+#     > Ein Waechter, der bei Erfolg Alarm schlaegt, wird abgeschaltet -
+#     > und dann faellt der echte Fall auch nicht mehr auf.
+$standFern = ssh $SERVER "cd $REPOPFAD && git rev-parse HEAD" | Select-Object -Last 1
 PruefeExit "Serverstand lesen"
 $standFern = "$standFern".Trim()
 if ($standFern -ne $standLokal) {
     Fail "Serverstand ist '$standFern', lokal steht '$standLokal'. Der Server hat NICHT uebernommen."
 }
-Write-Host "   [ok] Serverstand geprueft: $standFern == lokal $standLokal" -ForegroundColor Green
+Write-Host "   [ok] Serverstand geprueft: $($standFern.Substring(0,10)) == lokal $($standLokal.Substring(0,10))" -ForegroundColor Green
 
 Write-Host ""
 Write-Host "Fertig. Im Browser Strg+Shift+R." -ForegroundColor Green
