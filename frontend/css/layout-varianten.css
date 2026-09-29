@@ -2908,7 +2908,6 @@ html[data-dp-layout] body header.hdr .hdr-icon-btn:hover svg{
 /* Und in der Schiene: Reiter-Symbole, Abschnitts-Symbole, Aktionen. */
 html[data-dp-layout] .dpl-schiene nav.tabs .tab svg,
 html[data-dp-layout] .dpl-schiene nav.tabs .tab .ic,
-html[data-dp-layout] .dpl-schiene .sb-act-item svg,
 html[data-dp-layout] .dpl-schiene .sb-act-item .ic,
 html[data-dp-layout] .dpl-schiene .dpl-portfolio .dpl-i{
   color:var(--wl-c9a84c, #C9A84C) !important;
@@ -5180,4 +5179,35 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-actions .sbc-btn svg{
 html[data-dp-layout] .dpl-teil-aktionen .sb-act-tour,
 html[data-dp-layout] .dpl-teil-aktionen .sb-act-feedback{
   display:none !important;
+}
+
+/* =====================================================================
+   v1705c - DIE AKTIONS-SYMBOLE SIND LINIEN, KEINE FLAECHEN
+   =====================================================================
+   Marcel: "in den Layouts waere es toll wenn du die Icons der einzelnen
+   Punkte unter Aktionen aus der 'heute' Ansicht uebernimmst. Auch gerne
+   in Gold."
+
+   Gemessen am 29.09.2026 im Bildvergleich: in der normalen Ansicht sind
+   es feine Linien-Symbole (Haus, Balken, Dokument), in der Schiene
+   gefuellte Flaechen. Die Zeichnung ist dieselbe - nur die Fuellung
+   nicht.
+
+   URSACHE: die Goldregel darueber setzte `fill:currentColor !important`
+   mit. Die Symbole tragen aber `fill="none" stroke="currentColor"` als
+   Praesentationsattribut - und CSS schlaegt ein Praesentationsattribut.
+   Aus jedem Umriss wurde damit ein Klecks.
+
+   > Die Regel wollte die Farbe setzen und hat die Form mitgenommen.
+   > `color` faerbt ueber `currentColor` bereits beides; `fill` musste
+   > dafuer nie angefasst werden.
+
+   Hier steht deshalb NUR die Farbe. `fill` bleibt, was das Symbol selbst
+   sagt - dann sieht es aus wie in der normalen Ansicht, und ein Symbol,
+   das echt gefuellt gemeint ist, bleibt es auch.
+   ===================================================================== */
+html[data-dp-layout] .dpl-schiene .sb-act-item svg{
+  color:var(--wl-c9a84c, #C9A84C) !important;
+  stroke:currentColor !important;
+  opacity:1 !important;
 }
