@@ -21965,3 +21965,94 @@ war weiß — links 280 px, rechts 285 px.
   Anzeige und Abbuchung auseinanderlaufen — der Fehler, den die Notiz
   „ein Preis steht an vier Stellen" beschreibt. **Offen, weil der
   Zielbetrag eine Entscheidung ist.**
+
+---
+
+## Rollout-Journal · 29.09.2026 (5) — Die Preise an der echten Quelle
+
+**Was:** Der Paketpreis-Befund ist am **Stripe-Katalog** belegt statt an
+`config.js`; ein Wächter meldet ihn künftig selbst. Beide Backend-Fixes
+sind auf `main` vorbereitet — der Prod-Pull fehlt noch.
+
+**Commits:** `dfa73ec` v1673 (staging) · `0c6cda6` + `cc28127` (main,
+Cherry-Pick von v1669 und v1673)
+
+---
+
+### 1 · Der Messschritt, der mir gefehlt hat
+
+Ich hatte den Preisbefund aus `config.js` abgeleitet — der Datei, die
+nur **anzeigt**. Nie nachgesehen, was in Stripe wirklich steht.
+
+`GET /credits/bewertungen` liefert den echten Katalog:
+
+| Paket | Stripe | Inhalt | Einzelwert | |
+|---|---|---|---|---|
+| `nachkauf_investor` | 8,75 € | 5/5/0 | 14,00 € | −5,25 € |
+| `nachkauf_pro` | 12,50 € | 5/5/5 | 33,50 € | −21,00 € |
+| **`nachkauf_starter`** | **5,00 €** | 5/0/0 | 4,50 € | **+0,50 €** |
+
+**Anzeige und Stripe stimmen überein** (5 / 8,75 / 12,50) — es ist also
+kein Anzeigefehler. Der Preis ist wirklich so.
+
+> Ein Befund über Geld, der nur aus der Anzeigedatei stammt, ist eine
+> Vermutung. Erst die Quelle, die abrechnet, macht ihn zu einem Befund.
+
+### 2 · Der Wächter statt der Änderung
+
+Der Betrag steht in Stripe und wird **nicht** aus dem Code geändert —
+eine Abbuchung gehört nicht in eine Plausibilitätsprüfung.
+`_preisplausibilitaet()` in `bewertungsKatalog.js` vergleicht beim Laden
+jedes Paket mit der Summe seiner Einzelteile und meldet, wenn es teurer
+ist. Nachgemessen nach dem Rebuild: `nachkauf_starter` trägt
+`unplausibel: {aufschlag_cents: 50}`, die anderen nicht.
+
+> Ein Paket, das teurer ist als sein Inhalt, ist kein Angebot, sondern
+> eine Falle — und niemand merkt es, weil beide Zahlen für sich
+> plausibel aussehen.
+
+### 3 · **Ein stehengebliebener Cherry-Pick auf `main`**
+
+Beim Wechsel auf `main` meldete git: *„cherry-pick currently in
+progress"*. Im Sequencer stand seit einer früheren Sitzung:
+
+```
+pick a2a96fd v1536/v1537: Partner 49 -> 99 EUR, drei Mandanten-Plätze
+```
+
+**Nichts davon war angewendet** (`git diff --stat HEAD` leer, kein
+`CHERRY_PICK_HEAD`). Ich habe ihn mit `--quit` beendet — das räumt den
+Zustand, ohne den Baum anzufassen — und **nicht** fortgesetzt: eine
+Preisänderung, die ich nicht beurteilt habe, gehört nicht nebenbei auf
+`main`.
+
+> Ein halb begonnener Cherry-Pick auf dem Produktionszweig ist keine
+> Altlast, sondern eine Ladung. Wer ihn findet, beendet den Zustand und
+> **fragt**, statt ihn zu Ende zu führen.
+
+**Für Marcel:** Diese Preisänderung (Partner 49 → 99 €, drei
+Mandanten-Plätze) ist damit weiterhin **nicht** auf `main`. Falls sie
+dorthin soll, ist es ein eigener Vorgang.
+
+### 4 · Prod: vorbereitet, nicht ausgeführt
+
+Gesichert (beide Datenbanken, **angesehen**):
+
+```
+/root/backups/prod-haupt-20260929-0634.sql.gz   11M
+/root/backups/prod-mb-20260929-0634.sql.gz     717K
+beide beginnen mit "PostgreSQL database dump"
+```
+
+`main` trägt die beiden Fixes und ist auf GitHub. **Der Pull auf Prod
+wurde von meiner Umgebung abgewiesen** („Out-of-Place Publication") —
+das ist eine Schranke hier, keine fehlende Freigabe. Es fehlt genau:
+
+```
+ssh root@157.90.117.167
+cd /opt/dealpilot && git pull --ff-only origin main
+docker compose -f docker-compose.prod.yml up -d --build backend
+```
+
+Geändert werden dabei **zwei Dateien**, keine Migration, kein Frontend:
+`backend/src/services/bmfService.js` und `bewertungsKatalog.js`.
