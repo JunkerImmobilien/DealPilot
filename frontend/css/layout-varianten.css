@@ -5829,3 +5829,75 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   max-width:calc(100% - 132px) !important;
   overflow:hidden !important; text-overflow:ellipsis !important;
 }
+
+/* =====================================================================
+   v1709c - DIE LASCHE SASS IM BLATT, NICHT DARUEBER
+   =====================================================================
+   Marcel: "ne die karten sehen nicht so aus wie in der demo."
+
+   Er hat recht. GEMESSEN an der ersten Karte, Abstaende relativ zur
+   Kartenoberkante:
+
+     Lasche   y15 - 30      <- sollte y0 - 15 sein
+     Blatt    y14 - 58
+     Adresse  y22 - 38      <- liegt damit UNTER der Lasche
+
+   URSACHE: `position:absolute` richtet sich am naechsten POSITIONIERTEN
+   Vorfahren aus. Ich hatte `.sbc-top` in v1709 auf `position:relative`
+   stehen lassen - damit wurde das Blatt selbst zum Anker, und `top:0`
+   meinte die Blattoberkante statt der Karte. Die Lasche landete auf dem
+   Adresstext.
+
+   > `top:0` ist keine Angabe, sondern eine Frage: null wovon? Wer ein
+   > Element absolut setzt, muss den Anker mitprüfen - nicht nur den Wert.
+
+   ZWEITER BEFUND: der Blattrahmen war `rgb(230,225,214)` - das helle
+   Beige aus v1706f. Jene Regel setzt `border-color` EINZELN und schlaegt
+   damit meine `border`-Kurzschrift hier. Derselbe Mechanismus, den
+   v1706f selbst beschreibt, diesmal gegen mich.
+
+   DRITTER BEFUND: Blatt `rgb(21,20,15)` auf Schiene `rgb(14,13,11)` -
+   sieben Stufen Unterschied. In der Demo lag das Blatt auf `#050505`
+   und hob sich deutlich ab. Hier war die Mappe praktisch unsichtbar.
+   ===================================================================== */
+
+/* -- 1) Der Anker ist die KARTE, nicht das Blatt -------------------- */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-top{
+  position:static !important;
+}
+
+/* -- 2) Rahmen und Grund einzeln, nicht als Kurzschrift ------------- */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-top{
+  background-color:#17160F !important;
+  border-style:solid !important;
+  border-width:1px !important;
+  border-color:#332E26 !important;
+  border-top-color:#332E26 !important;
+  border-right-color:#332E26 !important;
+  border-bottom-color:#332E26 !important;
+  border-left-color:#332E26 !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card:hover .sbc-top{
+  background-color:#1E1B15 !important;
+  border-color:var(--wl-b8932f, #b8932f) !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card.active .sbc-top,
+html[data-dp-layout] .dpl-schiene .sb-card.is-active .sbc-top{
+  background-color:#26221A !important;
+  border-color:var(--wl-c9a84c, #C9A84C) !important;
+}
+
+/* -- 3) Der Score-Ring bleibt stehen --------------------------------
+   In v1709 verschwand er bei Hover und an der aktiven Karte, damit die
+   Aktionsknoepfe Platz haben. Das war falsch: in der Demo steht der Ring
+   IMMER, und er ist der Grund, warum man eine Liste ueberfliegt.
+
+   Die Knoepfe ruecken stattdessen nach links an ihm vorbei. */
+html[data-dp-layout] .dpl-schiene .sb-card:hover .sbc-score-overlay,
+html[data-dp-layout] .dpl-schiene .sb-card.active .sbc-score-overlay,
+html[data-dp-layout] .dpl-schiene .sb-card.is-active .sbc-score-overlay{
+  opacity:1 !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-actions{
+  right:42px !important;
+}
