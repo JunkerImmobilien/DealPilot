@@ -22108,3 +22108,105 @@ Gebraucht wird ein `git pull` für zwei cherry-gepickte Backend-Dateien.
 N1 Preise (Stripe) · N2 Prod-Pull · N3 halber Cherry-Pick auf `main` ·
 N4 Import-Modul (Neu-Integration, keine KPA-Rechnung darin) ·
 N5 RND-Verfahrenswahl.
+
+---
+
+## Rollout-Journal · 29.09.2026 (7) — Der Preis, und was daran hing
+
+**Was:** Der Starter-Nachkauf kostet jetzt **4,00 €** statt 5,00 — in
+Stripe, in der Anzeige, auf Staging und auf **Produktion**. Dazu die
+beiden Backend-Fixes und ein Werkzeug für schlanke Prod-Rollouts.
+
+**Commits:** `01616cf` v1674 (staging) · `0c6cda6` `cc28127` `93e3ff6`
+(main) · Prod steht auf `93e3ff6`
+
+---
+
+### 1 · Stripe: neuer Preis, alter stillgelegt
+
+Stripe-Preise sind unveränderlich. Also: neuer Preis mit **400 Cent**,
+`lookup_key` übertragen (`transfer_lookup_key`), alter auf
+`active: false` — **nicht gelöscht**. Wer früher gekauft hat, behält
+Gutschrift und Rechnung; der alte trägt jetzt
+`dp_abgeloest_durch`.
+
+| | Sandbox | Live |
+|---|---|---|
+| neu | `price_1UKunl…` 400 | `price_1UKupB…` 400 |
+| still | `price_1UCzxL…` 500 | `price_1UD0FQ…` 500 |
+
+Metadaten unverändert übernommen (`dp_kind`, `dp_pack_sku`, `mpi: 5`) —
+sonst schriebe der Webhook nichts mehr gut. `tax_behavior` je Konto so
+belassen, wie es war (Sandbox `unspecified`, Live `inclusive`).
+
+Nachgemessen: je `lookup_key` genau **ein** aktiver Preis.
+
+| | Paket | einzeln | |
+|---|---|---|---|
+| Starter | **4,00 €** | 4,50 € | **−11 %** |
+| Investor | 8,75 € | 14,00 € | −37,5 % |
+| Pro | 12,50 € | 33,50 € | −62,7 % |
+
+### 2 · Und damit wäre die Anzeige falsch geworden
+
+`config.js` leitet den Paketpreis aus dem Monatsbeitrag ab
+(`/ 4`) und hätte weiter **5,00 €** gezeigt, während die Kasse 4,00
+nimmt.
+
+> Eine Anzeige, die ihren Preis selbst ausrechnet, ist so lange
+> richtig, wie niemand den echten ändert. Sie ist keine Quelle, sie
+> ist eine Vermutung mit Komma.
+
+`preiseAusKatalog()` holt jetzt `/credits/bewertungen` — **dieselbe
+Quelle, aus der abgebucht wird** — und überholt die Ableitung. Fällt
+der Abruf aus, bleibt die Ableitung als Rückfall.
+
+Gemessen auf Staging: `starter: 4 € (katalog)`, und zwar **ohne**
+manuellen Aufruf — der `dp:plan-ready`-Horcher hatte ihn schon geholt.
+
+### 3 · **Ein try/catch, das ein Schweigen erzeugt hätte**
+
+Den Horcher hatte ich zuerst als direkten Aufruf `preiseAusKatalog()`
+ans Dateiende geschrieben. Gemessen: zwischen der Funktion und dieser
+Stelle liegt **eine IIFE-Grenze** — es wäre ein `ReferenceError`
+gewesen, und mein eigenes `try/catch` hätte ihn verschluckt.
+
+> Ein `try/catch` um einen Aufruf, den es gar nicht gibt, macht aus
+> einem Fehler ein Schweigen. Der Preis wäre nie nachgeladen worden,
+> und nichts hätte widersprochen.
+
+Jetzt über die exportierte Funktion.
+
+### 4 · `tools/nachziehen-prod.ps1`
+
+`rollout-prod.ps1` **merged** staging → main und brächte alle 346
+Commits samt Migrationen mit. Für ein Paket ist Cherry-Pick der Weg —
+danach fehlt nur noch der Pull. Genau das tut das neue Skript: prüfen,
+zeigen was ankommt, **beide Datenbanken sichern und hineinsehen**,
+fragen, ziehen, nachmessen.
+
+**Beim ersten Lauf brach es ab — zu Recht, und aus meinem eigenen
+Fehler:** `zcat … | head -2` kappt die Pipe, `zcat` stirbt an SIGPIPE,
+und unter `set -e` bricht der Block **genau dann ab, wenn die
+Sicherung gut ist**. Dieselbe Falle, die für `grep -q` notiert ist.
+Jetzt `sed -n '1,2p'` und `set +e` für den Ansichtsteil.
+
+### 5 · Produktion
+
+Gesichert und angesehen vor jedem Schritt. Prod steht auf `93e3ff6`:
+
+| | |
+|---|---|
+| `bmfService.js` | meldet unbekannte Eingabefelder (v1669) |
+| `bewertungsKatalog.js` | Preis-Plausibilität (v1673) |
+| `config.js` / `pricing-modal.js` | Preis aus dem Katalog (v1674) |
+| Buster auf Prod | `config.js?v=v1674` ✓ |
+
+### Rest
+
+- N3 (halber Cherry-Pick `a2a96fd`, Partner 49 → 99 €) bleibt offen.
+- N4 Import-Modul: Neu-Integration, enthält keine KPA-Rechnung.
+- N5 RND-Verfahrenswahl: Bewertungsfrage.
+- `tax_behavior` ist zwischen den Konten uneinheitlich
+  (Sandbox `unspecified`, Live `inclusive`). Nicht angefasst, aber
+  auffällig.
