@@ -22701,3 +22701,90 @@ bleibt im QuickBoarding leer, solange kein Pass erzeugt wurde; das ist
 gewollt, kostet aber jetzt keinen Platz mehr. **Der Staging-Account
 steht weiter auf `partner`** — zum Zurueckstellen genuegt ein `UPDATE`
 auf `pro`.
+
+---
+
+## Rollout-Journal 29.09.2026 (14) — die Leiste in allen vier Ansichten, und vier eigene Regeln
+
+### 1 · Bei „Heute" fehlten dem QuickBoarding vier Bauteile
+
+| | Tab Objekt | QuickBoarding |
+|---|---|---|
+| Hoehe | 78 px | 55 px |
+| Goldstreifen | sichtbar | **AUS** |
+| Kopfzeile | sichtbar | **AUS** |
+| Trenner | sichtbar | **AUS** |
+
+Ursache ist `body.dp-neue-karte`. Sie steht im QC-Dokument **fest**
+(`quickcheck-app.html:3290`, „dieses Dokument ist IMMER hell") und
+blendet diese drei nebenbei aus. **Die Haupt-App traegt sie bei „Heute"
+nicht** — dasselbe Bauteil sah auf beiden Seiten anders aus.
+
+`karten-stil.js` spiegelt jetzt `data-dp-heute` ins iframe. Die Klasse
+selbst bleibt: sie traegt die Helligkeit, und das Dokument IST hell.
+
+### 2 · Der Score sass in der Kanzlei 164 px zu hoch
+
+Auf `.dpl-teil-score` lagen **fuenf** `margin-top`-Regeln mit
+**identischem** Selektor: `auto`, `10px`, `6px`, `4px` — dazu `22px`
+fuer v2. Bei gleicher Spezifitaet gewinnt die letzte. **Mein `auto` aus
+v1679 stand ganz vorne und war seit vier eigenen Aenderungen tot.**
+
+> In der Aktenmappe sass der Block trotzdem unten — **durch Zufall**:
+> dort fuellt der Inhalt die Schiene fast genau aus (465+271+101+147 =
+> 984 von 988). Das sah richtig aus und war es nicht. Ein Ergebnis, das
+> stimmt, ohne dass die Regel greift, faellt beim naechsten Inhalt um.
+
+Die drei Ueberschreibungen sind raus, der Abstand kommt aus dem
+`padding`. Nachgemessen: Kanzlei `margin-top` **174 px** (das `auto`
+arbeitet), Nutzer in allen drei Layouts **buendig am Boden**.
+
+### 3 · Der Trennstrich ueber dem Nutzer — zurueckgenommen
+
+In v1679 hatte ich ihn entfernt: eine zweite Linie unter der des Scores
+waere „ein Doppelstrich ohne Inhalt dazwischen". **Zwischen beiden
+stehen Ring, Stufe und fuenf Kennzahlen.** Marcel wollte ihn in
+Aktenmappe UND Kanzlei. Gemessen: in allen drei Layouts **JA**.
+
+### 4 · „Das Abrufen ist ganz wild neben ImmoMetrica"
+
+Nachgerechnet, Leiste bei „Heute":
+
+```
+letztes Segment endet     927
+QR margin-left  47,5  ->  sitzt bei 975, Breite 0
+QR margin-right 47,5
+Abrufen margin-left 18 -> beginnt bei 1040
+```
+
+**47,5 + 47,5 + 18 = 113** — genau die gemessene Luecke. Die 18 waren
+gesetzt und richtig; die 95 kamen von den **Raendern eines Elements,
+das gar nichts anzeigt**.
+
+> Ein QR ohne Ziel ist kein Bild, kein Weg — und auch kein Abstand.
+
+Dazu die Einsicht, dass zwei fruehere Fixes einander widersprachen:
+v1682 hat den Knopf nach rechts geholt, weil er sonst mitten in der
+**zweizeiligen** Kartei-Leiste klebte. Einzeilig und ohne QR gehoert er
+an seinen Nachbarn. `:has(.dp-pf-qr[data-hat-ziel])` fragt nach dem
+ZIEL, nicht nach dem Element — sobald ein Pass entsteht, rueckt der
+Knopf von selbst wieder nach rechts.
+
+**Nachweis, alle vier Ansichten:**
+
+| Layout | Luecke | Marke im iframe |
+|---|---|---|
+| Aktenmappe | **18 px** | `kartei` |
+| Kanzlei | **18 px** | `kartei` |
+| Tower | **18 px** | `kartei` |
+| Heute | **18 px** | `data-dp-heute=1` |
+
+Gold-Audit **RC=0**.
+
+**Commits.** `b976b00` · `894daea` · `ee89876` · `84b793d`
+
+**Rest.** Der QR bleibt im QuickBoarding leer, solange kein Pass
+entstanden ist — der Code kommt erst, wenn genug eingegeben wurde
+(`qc-bridge.js` `_bufSave` -> `/passes/from-snapshot`). Das ist richtig
+so und kostet jetzt keinen Platz mehr. Der Staging-Account bleibt auf
+`partner`, wie gewuenscht.
