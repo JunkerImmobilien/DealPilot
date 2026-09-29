@@ -4776,3 +4776,35 @@ html[data-dp-layout="v2b"] .dpl-ausgaben-kopf{ padding-top:0 !important; }
     z-index:400 !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   v1681c — DIE LETZTEN 147 PIXEL LAGEN UNTER DEM BILDSCHIRMRAND
+   -------------------------------------------------------------------
+   Gemessen im iframe bei 817 x 1177 (iPad-Hochformat), Kanzlei 2, mit
+   `.main-col` bis zum Anschlag gescrollt:
+
+     .app-wrap    y =   0   Hoehe 1178   endet bei 1178   (= Viewport)
+     .main-col    y = 146   Hoehe 1178   endet bei 1324
+                  min-height: 1177,78px
+     ueberhang               147 px unter dem Viewport
+
+   `.main-col` beginnt 146 px unter dem Seitenanfang, bekommt aber die
+   VOLLE Viewporthoehe als `min-height`. Ihre letzten 147 Pixel liegen
+   damit immer unter dem Bildschirmrand — und `body` traegt
+   `overflow:hidden`, es gibt also nichts, womit man sie holen koennte.
+
+   Das trifft ALLES am Ende von `.main-col`, nicht nur die Schiene. Die
+   Aktionen der bestehenden Kanzlei stehen dort seit jeher.
+
+   An `min-height` selbst wird nichts geaendert: sie traegt die
+   Grundgeometrie der ganzen App, und `min-height` schlaegt `height`
+   ohnehin. Stattdessen bekommt der scrollende Bereich unten Platz —
+   dann laesst sich der Ueberhang herausscrollen. Der Zuschlag gilt nur
+   dort, wo wirklich eine mitscrollende Schiene haengt: `:has()` mit
+   einem Attribut bleibt bei Klassen-Spezifitaet.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 1100px){
+  .main-col:has(.dpl-schiene[data-dpl-im-fluss]){
+    padding-bottom:170px !important;
+  }
+}
