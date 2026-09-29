@@ -697,13 +697,33 @@ function _buildAIPayload() {
             anzahl: liste.length,
             flaeche_summe: fl.length ? Math.round(summe) : null,
             flaeche_schnitt: fl.length ? Math.round(summe / fl.length) : null,
+            /* v1700c: Die Miete heisst `ist`, nicht `miete` oder `nkm`.
+               Gemessen an `mfh-einheiten.js` — dort entsteht jede
+               Einheit als `{ nr, art, status, wfl, ist, lage }`. Mein
+               erster Anlauf las zwei Namen, die es nicht gibt; die
+               Mieten waeren stillschweigend leer geblieben.
+
+               `art` und `status` fahren mit, weil sie die Zahlen
+               erklaeren: eine leerstehende Gewerbeeinheit ist etwas
+               anderes als eine vermietete Wohnung, und ohne diese
+               Angabe sieht beides gleich aus. */
             je_einheit: liste.slice(0, 20).map(function (e) {
               return {
+                nr: e.nr || null,
                 wfl: Number(e.wfl) || null,
-                miete: Number(e.miete || e.nkm) || null,
-                zimmer: Number(e.zimmer) || null
+                miete: Number(e.ist) || null,
+                art: e.art || null,           /* wohnen | gewerbe */
+                status: e.status || null,     /* vermietet | leer  */
+                lage: e.lage || null
               };
-            })
+            }),
+            /* Die Gebaeude-Angaben des Konfigurators: Marcel wollte
+               „Modernisierung und Stand erfassen". Sie liegen dort
+               bereits nach Anlage 2 ImmoWertV. */
+            aufgeteilt: m.aufgeteilt != null ? !!m.aufgeteilt : null,
+            gnd: Number(m.gnd) || null,
+            stand: m.stand || null,
+            modernisierung: m.gebaeude || null
           };
         } catch (e) { return null; }
       })(),

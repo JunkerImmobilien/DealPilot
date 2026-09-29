@@ -222,14 +222,49 @@ function buildPrompt(payload) {
                 : '')
           : '- Wohnfläche: ' + o.wfl + ' m²')
       : '',
+    /* v1700c: je Einheit auch Art und Status — eine leerstehende
+       Gewerbeeinheit ist etwas anderes als eine vermietete Wohnung, und
+       ohne diese Angabe sieht beides gleich aus. Der Leerstand ist fuer
+       die Bewertung oft wichtiger als die Flaeche. */
     (o.einheiten && o.einheiten.anzahl > 1)
       ? '- Einheiten: ' + o.einheiten.anzahl
         + (o.einheiten.je_einheit && o.einheiten.je_einheit.length
-            ? ' (' + o.einheiten.je_einheit.filter(function (e) { return e.wfl; })
+            ? '\n' + o.einheiten.je_einheit.filter(function (e) { return e.wfl || e.miete; })
                 .map(function (e) {
-                  return e.wfl + ' m²' + (e.miete ? ' / ' + e.miete + ' €' : '');
-                }).join(' · ') + ')'
+                  return '  · ' + (e.nr ? 'Nr. ' + e.nr + ': ' : '')
+                    + (e.wfl ? e.wfl + ' m²' : 'Fläche offen')
+                    + (e.miete ? ', ' + e.miete + ' € Ist-Kaltmiete' : '')
+                    + (e.art ? ', ' + e.art : '')
+                    + (e.status ? ', ' + e.status : '')
+                    + (e.lage ? ', ' + e.lage : '');
+                }).join('\n')
             : '')
+      : '',
+    /* Leerstand ausdruecklich benennen: er steht in den Einheiten, wird
+       aber leicht ueberlesen, wenn man nur die Summe sieht. */
+    (function () {
+      var e = o.einheiten;
+      if (!e || !Array.isArray(e.je_einheit) || !e.je_einheit.length) return '';
+      var leer = e.je_einheit.filter(function (x) { return /leer/i.test(String(x.status || '')); });
+      if (!leer.length) return '- Leerstand: keiner laut Einheitenliste';
+      var flL = leer.reduce(function (a, x) { return a + (Number(x.wfl) || 0); }, 0);
+      return '- Leerstand: ' + leer.length + ' von ' + e.anzahl + ' Einheiten'
+        + (flL ? ' (' + Math.round(flL) + ' m²)' : '')
+        + ' — das ist Potenzial UND Risiko zugleich, bitte beides benennen.';
+    })(),
+    (o.einheiten && o.einheiten.aufgeteilt != null)
+      ? '- Aufteilung nach WEG: ' + (o.einheiten.aufgeteilt
+          ? 'JA — die Einheiten sind einzeln verkäuflich (Aufteilungsgewinn möglich)'
+          : 'NEIN — das Haus ist ungeteilt')
+      : '',
+    (o.einheiten && o.einheiten.gnd)
+      ? '- Gesamtnutzungsdauer laut Konfigurator: ' + o.einheiten.gnd + ' Jahre'
+      : '',
+    (o.einheiten && o.einheiten.modernisierung && Object.keys(o.einheiten.modernisierung).length)
+      ? '- Modernisierungsstand (Anlage 2 ImmoWertV): '
+        + Object.keys(o.einheiten.modernisierung).map(function (k) {
+            return k + '=' + o.einheiten.modernisierung[k];
+          }).join(', ')
       : '',
     (o.einheiten && o.einheiten.anzahl > 1)
       ? '  ACHTUNG: Vergleiche Mietspiegel und ortsübliche Größen mit der '
