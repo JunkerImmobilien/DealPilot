@@ -939,9 +939,28 @@ async function analyze(payload, opts) {
   return {
     success: true,
     model: used.model,
-    analysis: parsed,
+    /* v1704d: auch hier. `ui.js:_urlSauber` saeubert nur die
+       strukturierten Quellenfelder - die LANGTEXTE
+       (`makrolage_recherche`, `kaufpreisniveau`, …) tragen ihre Links im
+       Fliesstext und kamen dort nie an. */
+    analysis: _analyseUrlsSaeubern(parsed),
     raw_text: parsed ? null : used.text  // bei Parse-Fail Text zurückgeben für Debug
   };
+}
+
+/* Geht rekursiv durch die Analyse und saeubert jeden String. Zahlen,
+   Wahrheitswerte und null bleiben unangetastet - eine Saeuberung, die
+   Typen verbiegt, waere schlimmer als der Zaehlparameter. */
+function _analyseUrlsSaeubern(a) {
+  if (a == null) return a;
+  if (typeof a === 'string') return _urlsSaeubern(a);
+  if (Array.isArray(a)) return a.map(_analyseUrlsSaeubern);
+  if (typeof a === 'object') {
+    const out = {};
+    for (const k of Object.keys(a)) out[k] = _analyseUrlsSaeubern(a[k]);
+    return out;
+  }
+  return a;
 }
 
 /**
@@ -1929,6 +1948,51 @@ async function enrichMarketFields(text, fields, context, opts) {
  * KEIN Kerosin-Abzug (Aufrufer zieht nichts ab) — server-seitig rate-limited.
  * Modell: COPILOT_MODEL (.env) oder Default gpt-4.1-mini.
  */
+/* ── v1704d · ZAEHLPARAMETER AUS DEN LINKS ───────────────────────────
+   Marcel hatte das am 29.09.2026 an der Pilot-Analyse gemeldet: „Da steht
+   auch hinten irgendwie UTM Unterstrich Source gleich OpenAI." Behoben
+   wurde es damals in `ui.js` (`_urlSauber`) - aber nur fuer die
+   STRUKTURIERTEN Quellenfelder der JSON-Analyse.
+
+   Gemessen am Portfolio-Piloten, direkt nach dem Bau:
+     ([miete-aktuell.de](https://www.miete-aktuell.de/...?utm_source=openai))
+
+   Im Chat stehen die Links im Fliesstext, dort kam die Saeuberung nie an.
+
+   > Ein Fehler, der an einer Stelle behoben ist, ist nicht behoben. Er
+   > ist an EINER Stelle behoben - und die anderen Wege sehen aus wie
+   > neue Fehler, obwohl es derselbe ist.
+
+   Deshalb sitzt es jetzt im Backend, hinter `copilotChat`: damit gilt es
+   fuer den Co-Pilot im Tab Objekt, den Hilfe-Assistenten und den
+   Portfolio-Piloten auf einmal - drei Aufrufer, eine Saeuberung.
+
+   Entfernt werden nur Zaehl- und Herkunftsparameter. Ein Parameter, der
+   den INHALT bestimmt, bliebe sonst auf der Strecke und der Link liefe
+   ins Leere. */
+const _ZAEHLPARAM = /^(utm_[a-z_]+|gclid|fbclid|msclkid|igshid|mc_cid|mc_eid|ref|referrer|source)$/i;
+
+function _urlsSaeubern(text) {
+  if (!text || typeof text !== 'string') return text;
+  return text.replace(/https?:\/\/[^\s<>()\[\]"']+/gi, function (roh) {
+    /* Satzzeichen am Ende gehoeren zum Satz, nicht zur Adresse. */
+    var schwanz = '';
+    var m = roh.match(/[.,;:!?]+$/);
+    if (m) { schwanz = m[0]; roh = roh.slice(0, -schwanz.length); }
+    try {
+      var u = new URL(roh);
+      var weg = [];
+      u.searchParams.forEach(function (_v, k) { if (_ZAEHLPARAM.test(k)) weg.push(k); });
+      if (!weg.length) return roh + schwanz;
+      weg.forEach(function (k) { u.searchParams.delete(k); });
+      var s = u.toString();
+      /* Ein leer gewordenes `?` sieht aus wie ein Tippfehler. */
+      if (s.slice(-1) === '?') s = s.slice(0, -1);
+      return s + schwanz;
+    } catch (e) { return roh + schwanz; }
+  });
+}
+
 async function copilotChat(payload, opts) {
   opts = opts || {};
   payload = payload || {};
@@ -2013,7 +2077,7 @@ async function copilotChat(payload, opts) {
     model: model,
     aiOptions: { temperature: 0.4 }
   });
-  return { reply: res.text, model: res.model, allowWeb: allowWeb };
+  return { reply: _urlsSaeubern(res.text), model: res.model, allowWeb: allowWeb };
 }
 /* v585-copilot END */
 
