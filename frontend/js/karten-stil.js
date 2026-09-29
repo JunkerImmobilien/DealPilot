@@ -508,8 +508,23 @@
       }
     } catch (e) {}
 
+    /* v1702c: `else if (gemerkt)` stand hier - und genau daran scheiterte
+       die Migration darueber. Gemessen: der Beobachter unten wird
+       registriert, BEVOR `start()` laeuft (start haengt an
+       DOMContentLoaded). Setzt `layout-varianten.js` in diesem Fenster
+       `data-dp-layout`, ruft der Beobachter `setze(localStorage[LS])` -
+       also noch mit dem alten `kartei`. `start()` leert danach zwar den
+       Merker, ruft aber nichts mehr: das Attribut bleibt stehen, und der
+       naechste Beobachterlauf schreibt es aus `aktuell` zurueck in den
+       Merker.
+
+       > Einen Merker zu leeren raeumt nicht auf, was daraus schon
+       > geworden ist. `setze('')` tut es - es nimmt das Attribut ab und
+       > loescht `dp-neue-karte-stil`, also genau den
+       > Auslieferungszustand. Der Vorbehalt von v1660 („KEIN Standard
+       > per JS") bleibt gewahrt: '' ist kein Standard, sondern keiner. */
     if (ausUrl !== null) setze(ausUrl === 'aus' ? '' : ausUrl);
-    else if (gemerkt) setze(gemerkt);
+    else setze(gemerkt);
     /* KEIN Standard per JS. Wer nichts gewaehlt hat, bekommt die
        Bordkarte ueber die CSS-Regel
        `html[data-dp-layout]:not([data-dp-kartenstil])` - also NUR in
