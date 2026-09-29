@@ -88,7 +88,7 @@ Zwei Backend-Dateien, **keine Migration, kein Frontend**.
 `tools/rollout-prod.ps1` ist hier das falsche Werkzeug: es MERGED
 staging → main und brächte alle 346 Commits samt Migrationen mit.
 
-### N3 · Ein halber Cherry-Pick hing auf `main` — ENTSCHEIDUNG OFFEN
+### N3 · Ein halber Cherry-Pick hing auf `main` — ERLEDIGT, war ein Duplikat
 
 Beim Wechsel auf `main` meldete git einen seit einer früheren Sitzung
 stehengebliebenen Sequencer-Zustand:
@@ -101,7 +101,26 @@ pick a2a96fd v1536/v1537: Partner 49 -> 99 EUR, drei Mandanten-Plaetze
 Mit `--quit` beendet, **nicht** fortgeführt — eine Preisänderung gehört
 nicht nebenbei auf den Produktionszweig.
 
-**Offen:** Soll `a2a96fd` auf `main`? Das ist ein eigener Vorgang.
+**Nachgemessen am 29.09.2026 — es gab nichts zu entscheiden.** Der
+Commit liegt **bereits auf `main`**:
+
+| gemessen | Befund |
+|---|---|
+| `git log --oneline main --grep="v1536"` | `a2a96fd` — von `main` aus erreichbar |
+| `git ls-tree -r main` | `backend/migrations/075_partner_preis_v1536.sql` liegt dort |
+| Stripe live, `dp_plan_partner_monthly` | **9.900 Cent**, `dp_version: v1536`, `inklusiv_mandanten: 3` |
+| Prod-Landing | `<h4>Warum 99 € und nicht 49 €</h4>` |
+
+Der Sequencer-Eintrag war ein **zweiter Anlauf auf einen Commit, der
+schon drauf war** — deshalb war auch nichts angewendet. Anzeige und
+Abbuchung stimmen überein; das Gegenstück zum Starter-Fall (N1) besteht
+hier **nicht**.
+
+> **Die Lehre ist die Reihenfolge:** Ich habe den hängenden Sequencer
+> als offene Entscheidung gemeldet, ohne vorher zu prüfen, ob sein
+> Inhalt längst am Ziel ist. Ein `--grep` auf dem Zielzweig hätte die
+> Frage in zehn Sekunden erledigt. **Erst messen, ob es die Aufgabe
+> noch gibt, dann fragen.**
 
 ### N4 · Import-Modul v1.1.0 — NEU-Integration, kein Update
 
@@ -127,6 +146,14 @@ dieser Fassung nicht.
 
 **Andockstelle**, falls integriert wird: der Import-Hub
 (`js/import-export-modal.js:113`), heute nur Excel + Backup.
+
+**Die Rechen-Andockstelle ist jetzt dokumentiert:**
+`docs/kaufpreisaufteilung/SCHNITTSTELLE.md` (v1675) — Feldnamen,
+Antwortformat, `warnings`, und die Gegenrechnung am echten Gutachten.
+Damit ist Marcels Ziel („falls ich mal ein Update einspiele, passt
+alles") von der Modul-Seite entkoppelt: **ein Modul muss die Rechnung
+nicht mitbringen, nur die Eingaben füllen und `POST /bmf/aufteilung`
+rufen.** Die Rechnung bleibt an der amtlichen Vorlage.
 
 ### N5 · RND-Verfahrenswahl — BEWERTUNGSFRAGE für Marcel
 

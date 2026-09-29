@@ -22210,3 +22210,63 @@ Gesichert und angesehen vor jedem Schritt. Prod steht auf `93e3ff6`:
 - `tax_behavior` ist zwischen den Konten uneinheitlich
   (Sandbox `unspecified`, Live `inclusive`). Nicht angefasst, aber
   auffällig.
+
+---
+
+## Rollout-Journal 29.09.2026 (8) — N3 war keine Aufgabe, N4 hat jetzt eine Andockstelle
+
+**Was.** Zwei offene Nachfass-Punkte abgeräumt — der eine durch Messen,
+der andere durch eine Festlegung.
+
+**N3 — der halbe Cherry-Pick war ein Duplikat.** Ich hatte `a2a96fd`
+(„Partner 49 → 99 EUR") im Sequencer auf `main` gefunden, mit `--quit`
+beendet und als **offene Entscheidung** gemeldet: „Soll er auf `main`?"
+Nachgemessen:
+
+| gemessen | Befund |
+|---|---|
+| `git log --oneline main --grep="v1536"` | `a2a96fd` — von `main` erreichbar |
+| `git ls-tree -r main` | `backend/migrations/075_partner_preis_v1536.sql` liegt dort |
+| Stripe live `dp_plan_partner_monthly` | 9.900 Cent, `dp_version: v1536`, `inklusiv_mandanten: 3` |
+| Prod-Landing | „Warum 99 € und nicht 49 €" |
+
+Der Inhalt war längst am Ziel. Anzeige und Abbuchung stimmen überein —
+das Gegenstück zum Starter-Fall (N1, Anzeige 4 € / Abbuchung 5 €)
+besteht hier **nicht**.
+
+> **Eigener Fehler, ausdrücklich zurückgenommen:** Ich habe einen
+> hängenden Sequencer-Eintrag als offene Entscheidung an Marcel
+> weitergereicht, ohne vorher zu prüfen, ob es die Aufgabe überhaupt
+> noch gibt. Ein `--grep` auf dem Zielzweig hätte das in zehn Sekunden
+> geklärt. **Erst messen, ob die Aufgabe noch existiert, dann fragen** —
+> sonst kostet eine erledigte Sache eine Entscheidung.
+
+**N4 — die Rechnung bleibt hier, das Modul füllt nur die Felder.**
+Marcels Wunsch war: „falls ich mal ein Update des Moduls einspiele,
+passt nämlich dann alles." Die Fassung v1.1.0 kann das nicht liefern —
+sie enthält **keine** Kaufpreisaufteilungs-Rechnung, nur eine
+Klassifizierung. Statt darauf zu warten, ist die Richtung jetzt
+festgelegt und aufgeschrieben: `docs/kaufpreisaufteilung/SCHNITTSTELLE.md`.
+
+Darin steht, was ein Modul liefern muss, damit es andockt — die
+Feldnamen mit den fünf bekannten Verwechslungen, die Verfahrensweiche
+`miete_bekannt` (Sachwert gegen Ertragswert = 90,93 % gegen 93,13 %
+Gebäudeanteil), das Antwortformat samt `warnings`, und die
+Gegenrechnung an Am Markt 18: Bodenwert **auf den Cent gleich**
+(7.617,56 €), Gebäudeanteil 93,13 % gegen 94,35 % im Gutachten — ein
+Verfahrensunterschied, kein Fehler.
+
+**Der Kern der Festlegung:** Ein Import-Modul bringt die Rechnung
+**nicht** mit. Es füllt die Eingaben und ruft `POST /bmf/aufteilung`.
+Gerechnet wird weiter von der amtlichen BMF-Vorlage über LibreOffice —
+das ist der Grund, warum das Ergebnis vor einem Finanzamt Bestand hat,
+und den gibt man nicht für eine Portierung auf.
+
+**Commit.** siehe unten · **Nachweis.** Die vier Messungen der N3-Tabelle,
+je einzeln ausgeführt; die KPA-Zahlen aus dem Lauf vom 29.09.2026 gegen
+das Gutachten Az. 25DG02659.
+
+**Rest.** Offen bleibt allein **N5** (RND-Verfahrenswahl — Marcels
+Bewertungsentscheidung, ausdrücklich kein Defekt). N4 wartet auf die
+Auskunft, wo die v1.0.0 liegt (die README zeigt auf
+`/opt/dealpilot-v25/`, nicht in dieses Repo).
