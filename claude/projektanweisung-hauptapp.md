@@ -24439,3 +24439,91 @@ stehen in v1706d, und die ZAHL darin darf gold bleiben, sie ist der Wert.
 zaehlt nicht als hartes Gold, weil es dem vorgeschriebenen Muster folgt.
 
 **Commit.** `6dd58cd`
+
+### v1711 · Drei Rueckmeldungen, drei eigene Messfehler
+
+Marcel musste **drei Mal** sagen, dass es nicht passt — zuletzt „passt
+immer noch nicht auch schriftfarbe nicht". Er hatte jedes Mal recht,
+und jedes Mal lag es an meiner Messung, nicht am Befund.
+
+**Was die Messung verfehlte:** ich hatte `background` gesetzt und
+`background` geprueft. Der Text stand dabei auf `rgb(140,133,120)` — ein
+Grau, das ich nirgends gesetzt habe.
+
+```
+Lasche "2026-999"   Text rgb(140,133,120) auf rgb(63,165,108)
+                    KONTRAST 1,19
+```
+
+> **Lesbarkeit ist keine Eigenschaft einer Farbe, sondern eines
+> PAARES.** Ich habe jede Farbe einzeln geprueft und jede fuer sich
+> richtig gefunden. Wer nur `background` misst, sieht den Kontrast nie.
+
+Sichtbar wurde es erst, als ich die Karte **dreifach vergroessert
+fotografiert** habe. Die kleinen Zoom-Bilder davor waren zu unscharf,
+um Schrift auf Farbe zu beurteilen.
+
+**Drei Ursachen, nacheinander gefunden:**
+
+**1 · Das Prinzip war umgedreht.** Im Auslieferungszustand gemessen:
+`.sbc-seq` traegt **Text `rgb(205,175,90)` auf Gold mit 12 % Deckung** —
+farbige Schrift auf getoentem Grund. Ich hatte daraus dunkle Schrift auf
+Vollflaeche gemacht.
+
+**2 · `:is(#sb-list)` schlug meine Regel.**
+
+```
+html[data-dp-layout] :is(#sb-list) .sb-card .sbc-seq
+>> color: rgb(140,133,120) !important
+```
+
+`:is()` erbt die ID-Spezifitaet: (1,3,1) gegen meine `.sbc-seq.sbc-seq`
+mit (0,5,1). **Das steht so in CLAUDE.md, und ich bin trotzdem
+hineingelaufen** — weil ich die Spezifitaet an der sichtbaren
+Selektorlaenge geschaetzt habe statt am staerksten Argument. Fuenf
+Klassen sehen nach mehr aus als eine ID in Klammern.
+
+**3 · „Mal zusammen, mal nicht" hatte einen Grund.** Gemessen ueber alle
+Karten:
+
+```
+#0 gewonnen   ID 0-66   INVESTOR  71-149   <- Mitte
+#2 offen      ID 0-72   INVESTOR 135-213   <- rechts
+```
+
+v1709b hatte eine Ausweichregel
+`:has(.sbc-won-ribbon) .sbc-investor-ribbon { right:64px }`, damit
+INVESTOR nicht unter der damaligen WON-Lasche landet. Seit v1710 ist die
+**ausgeblendet** — steht aber weiter im DOM, und `:has()` fragt nach dem
+DOM, nicht nach der Sichtbarkeit.
+
+> **`display:none` entfernt nichts.** Wer eine Regel an `:has()` haengt,
+> muss sie mitloeschen, wenn das Gesuchte unsichtbar wird — sonst bleibt
+> eine Ruecksicht auf einen Gast, der laengst gegangen ist.
+
+Und weil genau die gewonnenen Karten auch ein Investor-Band tragen, sah
+es aus wie Zufall.
+
+### Nachweis
+
+| | Textfarbe | Kontrast | ID | INVESTOR |
+|---|---|---:|---|---|
+| gewonnen | `rgb(111,215,154)` | **8,09** | 0–66 | endet 213/214 |
+| offen | `rgb(226,201,126)` | **11,42** | 0–72 | endet 213/214 |
+
+Vorher: **1,19**. Alle zwoelf Karten gleich ausgerichtet, keine
+Ueberlappung. Adresse 14,18, Preis 8,22.
+
+### v1711d · Gold-Audit RC=1, und er hatte recht
+
+`css/layout-varianten.css 0 -> 3 (Datei war sauber!)` — meine drei
+`rgba(201,168,76,…)`. **Gold in rgba-Form zaehlt der Waechter mit**, und
+zu Recht: beim Mandanten faerbt sich das nicht um. Auf
+`color-mix(in srgb, var(--wl-c9a84c, #C9A84C) X%, transparent)`
+umgestellt, dasselbe Muster wie in `object-actions.js`. Danach RC=0,
+Kontraste unveraendert.
+
+Gruen und Rot bleiben als `rgba` hart — Statusfarben werden nie
+tokenisiert.
+
+**Commits.** `ba8c358` · `128e5a9` · `01a5a28` · `15f7412`
