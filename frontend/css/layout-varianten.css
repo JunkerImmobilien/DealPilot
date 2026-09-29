@@ -2906,7 +2906,6 @@ html[data-dp-layout] body header.hdr .hdr-icon-btn:hover svg{
   color:var(--wl-e8cc7a, #E8CC7A) !important;
 }
 /* Und in der Schiene: Reiter-Symbole, Abschnitts-Symbole, Aktionen. */
-html[data-dp-layout] .dpl-schiene nav.tabs .tab svg,
 html[data-dp-layout] .dpl-schiene nav.tabs .tab .ic,
 html[data-dp-layout] .dpl-schiene .sb-act-item .ic,
 html[data-dp-layout] .dpl-schiene .dpl-portfolio .dpl-i{
@@ -5545,4 +5544,31 @@ html[data-dp-layout] .dpl-schiene .sb-act-item.sb-act-item{
   padding-top:7px !important;
   padding-bottom:7px !important;
   margin-bottom:1px !important;
+}
+
+/* =====================================================================
+   v1707 - AUCH DIE REITER-SYMBOLE SIND LINIEN
+   =====================================================================
+   Marcel: "bei der Ansicht Kanzlei koennen natuerlich die Icons bei
+   Objekt, Investition, Miete und allem auch uebernommen werden, wie von
+   unserem urspruenglichen heute. Also die vernuenftigen Icons."
+
+   Gemessen in der Kanzlei: fill = stroke = dieselbe Farbe bei allen
+   neun Reitern - also gefuellte Flaechen statt Umrisse. Dieselbe
+   Ursache wie bei den Aktionen in v1705c: die Goldregel setzte
+   `fill:currentColor` mit, und CSS schlaegt das `fill="none"` des SVG.
+
+   > Derselbe Fehler, eine Zeile weiter oben im selben Selektor. Wer
+   > eine Sammelregel aufraeumt, geht ihre ganze Liste durch - nicht nur
+   > den Teil, ueber den gerade jemand gestolpert ist.
+
+   Hier steht wieder NUR die Farbe. Der aktive Reiter behaelt seinen
+   helleren Ton, damit die Auswahl sichtbar bleibt.
+   ===================================================================== */
+html[data-dp-layout] .dpl-schiene nav.tabs .tab svg{
+  stroke:currentColor !important;
+  opacity:1 !important;
+}
+html[data-dp-layout] .dpl-schiene nav.tabs .tab svg *{
+  stroke:currentColor !important;
 }
