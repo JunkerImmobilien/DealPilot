@@ -4240,9 +4240,10 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen #sb-actions-accordion{
 }
 /* Der Score haengt nicht mehr am unteren Rand: mit `margin-top:auto`
    wuerde er in einer rollenden Spalte den Rest vor sich herschieben. */
-html[data-dp-layout] .dpl-schiene .dpl-teil-score{
-  margin-top:10px !important;
-}
+/* v1685: `margin-top:10px` stand hier und hat das `auto` aus Z. 3766
+   erschlagen — gleicher Selektor, spaetere Regel gewinnt. Der Abstand
+   kommt jetzt aus dem `padding` weiter unten; `auto` muss frei bleiben,
+   sonst sitzt der Score nicht mehr unten. */
 
 /* ── v1666 · EIN UMSCHALTER STATT EINES STAPELS ──────────────────────
    Marcel: „ich hätte gerne, dass wir bei der Aktenmappe keine
@@ -4385,7 +4386,7 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill{
   padding:5px 16px 6px !important;
 }
 html[data-dp-layout] .dpl-schiene .dpl-teil-score{
-  margin-top:6px !important; padding:8px 0 2px !important;
+  padding:8px 0 2px !important;   /* v1685: margin-top raus, siehe Z. 3766 */
 }
 
 /* ── v1666d · 100vh GILT NICHT AUF DEM HANDY ─────────────────────────
@@ -4442,7 +4443,7 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill{
   padding:4px 16px 5px !important;
 }
 html[data-dp-layout] .dpl-schiene .dpl-teil-score{
-  margin-top:4px !important; padding:6px 0 0 !important;
+  padding:6px 0 0 !important;     /* v1685: margin-top raus, siehe Z. 3766 */
 }
 
 /* ── v1666f · AUF DEM HANDY IST DIE SCHIENE EINE ZEILE ───────────────
@@ -4525,9 +4526,9 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score{
    Die 22 px gelten NUR für die Kanzlei: in der Aktenmappe liegen
    Aktionen und Score zusammen bei 967 von 988 px, dort wäre jeder
    zusätzliche Abstand eine fehlende Menüzeile. */
-html[data-dp-layout^="v2"] .dpl-schiene .dpl-teil-score{
-  margin-top:22px !important;
-}
+/* v1685: margin-top:22px stand hier und hielt den Score in der
+   Kanzlei 164 px ueber dem Boden. Der Abstand zum Nutzer kommt aus
+   dessen border-top, die Lage aus dem auto in Z. 3766. */
 
 /* ── v1667b · DAS LOGO NOCH EINE STUFE GRÖSSER ───────────────────────
    Marcel: „oben das DealPilot-Logo könnte dann jetzt ja noch ein
@@ -4641,11 +4642,20 @@ html[data-dp-layout] body:has(#sb-user) .main-col{
 html[data-dp-layout] .dpl-schiene:has(.dpl-teil-score) .dpl-teil-nutzer{
   margin-top:0 !important;
 }
-/* Die Trennlinie steht dann schon ueber dem Score — eine zweite direkt
-   darunter waere ein Doppelstrich ohne Inhalt dazwischen. */
+/* v1685 — ZURUECKGENOMMEN: hier stand `border-top:0` mit der
+   Begruendung, eine zweite Linie direkt unter der des Scores waere ein
+   „Doppelstrich ohne Inhalt dazwischen". Zwischen beiden stehen aber
+   der Ring, die Stufe und fuenf Kennzahlen — das ist reichlich Inhalt.
+
+   Marcel: „bei der Aktenmappe aber da auch noch mal ein Trennstrich
+   ueber Marcel Junker und bei der Kanzlei auch." Der Anmeldebereich ist
+   ein eigener Abschnitt und traegt seine Linie wie jeder andere.
+
+   `margin-top:0` BLEIBT: nur einer darf den freien Platz beanspruchen,
+   und das ist der Score (siehe den Block darueber). */
 html[data-dp-layout] .dpl-schiene:has(.dpl-teil-score) .dpl-teil-nutzer{
-  border-top:0 !important;
-  padding-top:0 !important;
+  border-top:1px solid var(--dpl-linie) !important;
+  padding-top:10px !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════

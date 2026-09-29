@@ -6736,7 +6736,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
   <!-- v1641 · Der Quick-Check ist ein eigenes Dokument im iframe - die
        Gestaltung der Datenaufnahme muss hier NOCH EINMAL geladen werden.
        Zuletzt, damit sie die eingebetteten Stile ueberstimmt. -->
-  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1682b">
+  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1685">
 <!-- ── v1665g · DIE KARTEI GILT AUCH HIER — ABER NUR SIE ──────────────
      Marcel: „ImmoMetrica, Expose, Marktbericht — das sieht nicht so aus
      wie im Tab Objekt."
@@ -6810,6 +6810,28 @@ html[data-dp-kartenstil="kartei"] #qc7-sources .dp-pf-tile.on{
   margin-left:auto !important;
   border-bottom:0 !important;
 }
+
+/* ── v1685 · BEI „HEUTE" ZEIGT DAS QUICKBOARDING DASSELBE ───────────
+   Gemessen bei Layout „Heute", beide Leisten nebeneinander:
+
+                     Tab Objekt   QuickBoarding
+     Hoehe           78 px        55 px
+     Goldstreifen    sichtbar     AUS
+     Kopfzeile       sichtbar     AUS
+     Trenner         sichtbar     AUS
+
+   Ursache ist `body.dp-neue-karte`, die in DIESEM Dokument fest steht
+   (Z. 3290, „immer hell") und nebenbei diese drei ausblendet. Die
+   Haupt-App traegt sie bei „Heute" NICHT — also sah dasselbe Bauteil
+   auf beiden Seiten anders aus.
+
+   `karten-stil.js` spiegelt seit v1685 `data-dp-heute` herein. Steht
+   es, zeigt die Leiste wieder, was der Objekt-Tab zeigt. Die Klasse
+   `dp-neue-karte` bleibt unangetastet — sie traegt die Helligkeit,
+   und die soll bleiben. */
+html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-stripe{ display:block !important; }
+html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-lead{ display:flex !important; }
+html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-sep{ display:block !important; }
 #qc7-sources.dp-pfbar .dp-pf-qr{ margin-left:auto !important; }
 #qc7-sources.dp-pfbar .dp-pf-qr + .dp-pf-rz{ margin-left:14px !important; }
 </style>

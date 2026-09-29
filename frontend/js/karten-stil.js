@@ -304,6 +304,32 @@
     var h = doc.documentElement;
     if (aktuell && layoutAktiv()) h.setAttribute('data-dp-kartenstil', aktuell);
     else h.removeAttribute('data-dp-kartenstil');
+
+    /* ── v1685 · WAS DIE HAUPT-APP GERADE ZEIGT ───────────────────────
+       Marcel: „wenn ich beim Layout auf Heute stelle, sieht die
+       Pre-Flight-Karte im QuickBoarding nicht so aus wie im Tab Objekt."
+
+       Gemessen — es fehlt keine Regel, sondern eine Marke steht nur auf
+       EINER Seite:
+
+         Haupt-App `body` bei „Heute":  KEIN dp-neue-karte
+         iframe    `body` immer:        dp-neue-karte
+
+       Die Klasse steht im QC-Dokument FEST (`quickcheck-app.html:3290`,
+       „dieses Dokument ist IMMER hell") — und sie blendet nebenbei
+       `stripe`, `lead` und `sep` aus. Deshalb fehlten dem QuickBoarding
+       bei „Heute" der Goldstreifen, die Kopfzeile und der Trenner,
+       waehrend der Objekt-Tab sie zeigte.
+
+       Die Klasse bleibt: sie traegt die Helligkeit, und das Dokument
+       IST immer hell. Gespiegelt wird stattdessen, was die Haupt-App
+       tut — das iframe kann es sonst nicht wissen.                    */
+    try {
+      var hauptNeu = document.body && document.body.classList.contains('dp-neue-karte');
+      if (hauptNeu) h.removeAttribute('data-dp-heute');
+      else h.setAttribute('data-dp-heute', '1');
+    } catch (e) { /* ohne Spiegel bleibt es beim Stand des Aufbaus */ }
+
     if (!f._dpkLoad) {
       f._dpkLoad = true;
       f.addEventListener('load', function () { rahmenNachziehen(); });
