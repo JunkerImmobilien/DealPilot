@@ -1338,3 +1338,40 @@ html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-q
 html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-rz{
   margin-left:0 !important;
 }
+
+/* ── v1668c · ZWEI ELEMENTE, DIE NICHT IN DER REIHE STANDEN ──────────
+   Gemessen nach v1668b — die Leiste war auf 183 px gewachsen und zwei
+   Teile standen irgendwo:
+
+     .dp-pf-seg   [550,199]  und  [658,199]   <- die Reihe
+     .dp-pf-sep   [564,129 1x18]              <- daneben, oben
+     .dp-pf-qr    [1763,115 46x46]            <- ausserhalb der Karte
+
+   Beide tragen aus der Bordkarte `position:absolute`: dort war der
+   Trennstrich eine gezeichnete Linie auf der Karte und der QR eine
+   aufgedruckte Marke — beide lagen AUF dem Papier, nicht darin.
+
+   > `display:block` holt ein Element nicht in die Reihe zurück. Wer
+   > nur die Sichtbarkeit umschaltet und die Positionierung vergisst,
+   > macht etwas sichtbar, das trotzdem nicht mitzählt.
+
+   Dazu die Höhe: mit Titel braucht ein Segment 96 px, die Leiste kam
+   damit auf 183. Die Vorlage ist 78 px hoch plus 38 px Kopfzeile —
+   also Segmente auf 77. */
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-sep,
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr{
+  position:static !important;
+  top:auto !important; right:auto !important;
+  bottom:auto !important; left:auto !important;
+  transform:none !important;
+}
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-sep{
+  height:auto !important; min-height:0 !important;
+  margin:16px 16px !important;
+}
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg{
+  padding:8px 0 10px !important;
+}
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-grouplbl{
+  margin:0 0 4px !important;
+}
