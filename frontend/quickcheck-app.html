@@ -3416,6 +3416,10 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
           <span class="dp-pf-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></span><span class="dp-pf-lbl">Sprachaufzeichnung</span><span class="dp-pf-led"></span>
         </label>
       </div></div>
+      <!-- v1670: der QR der Quellenleiste. Er haengt an DERSELBEN Quelle wie
+           der QR des Boarding-Passes (renderQR/_shareUrl) - eine Auskunft,
+           zwei Anzeigen, kein zweiter Weg. -->
+      <a class="dp-pf-qr" id="qc7-qr" target="_blank" rel="noopener" title="Pass teilen"></a>
       <span class="dp-pf-rz"><span class="dp-pf-bc"></span><button class="dp-pf-launch qc6-run" data-provider="combo" onclick="QcApp.openCreditModal()"><!-- v575-qcbtn -->Abrufen<!-- v1430: Flugzeug-Symbol entfernt (Backlog v22 Punkt 14) --></button></span>
     </span>
 
@@ -6532,6 +6536,19 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     if(!tile) return;
     if(!window.QRCode){ if(tries<20) return void setTimeout(function(){renderQR(url,code,tries+1);},250); return; }
     if(_shareUrl){ tile.innerHTML=''; try{ new window.QRCode(tile,{text:_shareUrl,width:116,height:116,colorDark:'#141210',colorLight:'#fff',correctLevel:window.QRCode.CorrectLevel.M}); }catch(e){} }
+    /* v1670: derselbe Link auch in die Quellenleiste. Eigene Groesse,
+       damit er in die 42-px-Reihe passt; ohne Link bleibt er leer und
+       nimmt keinen Platz - ein QR ohne Ziel ist ein Bild, kein Weg. */
+    try{
+      var qa=document.getElementById('qc7-qr');
+      if(qa){
+        if(_shareUrl){
+          qa.href=_shareUrl; qa.innerHTML='';
+          new window.QRCode(qa,{text:_shareUrl,width:40,height:40,colorDark:'#141210',colorLight:'#fff',correctLevel:window.QRCode.CorrectLevel.M});
+          qa.setAttribute('data-hat-ziel','1');
+        } else { qa.innerHTML=''; qa.removeAttribute('data-hat-ziel'); }
+      }
+    }catch(e){}
   }
   window.addEventListener('message',function(ev){ var d=ev.data; if(!d||d.source!=='dp-app') return; if(d.type==='qc-autopass-code') renderQR(d.url,d.code,0); });
 
@@ -6719,7 +6736,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
   <!-- v1641 · Der Quick-Check ist ein eigenes Dokument im iframe - die
        Gestaltung der Datenaufnahme muss hier NOCH EINMAL geladen werden.
        Zuletzt, damit sie die eingebetteten Stile ueberstimmt. -->
-  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1668e">
+  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1670">
 <!-- ── v1665g · DIE KARTEI GILT AUCH HIER — ABER NUR SIE ──────────────
      Marcel: „ImmoMetrica, Expose, Marktbericht — das sieht nicht so aus
      wie im Tab Objekt."
