@@ -4914,3 +4914,20 @@ html[data-dp-layout] body header.hdr .hdr-credits-pill svg :is(path,circle,rect,
   stroke:currentColor !important;
   fill:none !important;
 }
+
+/* v1688b — `currentColor` war richtig und half trotzdem nicht.
+   Gemessen an der Kerosin-Pille:
+
+     .hdr-credits-pill      color  rgb(213,187,115)   gold
+       └ svg                color  rgb(213,187,115)   gold, geerbt
+           └ path           color  rgb(20, 19, 16)    EIGENE, schwarz
+
+   Eine Regel setzt dem `path` eine eigene `color`; `stroke:currentColor`
+   loeste danach folgerichtig zu Schwarz auf. Nicht der Strich war
+   falsch, sondern die Farbe, auf die er zeigte.
+
+   Deshalb zuerst die Vererbung wiederherstellen, dann darauf zeigen. */
+html[data-dp-layout] body header.hdr .hdr-credits-pill svg :is(path,circle,rect,line,polyline,polygon){
+  color:inherit !important;
+  stroke:currentColor !important;
+}
