@@ -363,6 +363,38 @@ async function calculateKpa(inputs, opts = {}) {
   const wb = new ExcelJS.Workbook();
   await wb.xlsx.readFile(workPath);
 
+  /* ── v1669 · EIN FELD, DAS NIEMAND KENNT, MUSS SICH MELDEN ──────────
+     Gemessen am 29.09.2026 an einer echten Kaufpreisaufteilung (Am
+     Markt 18, Kabelsketal): von zwoelf uebergebenen Feldern kamen
+     VIER nicht an, weil sie anders heissen als hier —
+     `grundstuecksflaeche` statt `grundstuecksgroesse`,
+     `miteigentumsanteil_zaehler/_nenner` statt `mea_zaehler/_nenner`,
+     `liegenschaftszins` statt `liegenschaftszinssatz`.
+
+     Die Schleife darunter ueberspringt, was sie nicht kennt. Das
+     Ergebnis kam trotzdem zurueck, mit `warnings: []`, und sah
+     plausibel aus: Bodenwert 22.087 EUR statt 7.618 — Faktor 2,9,
+     Gebaeudeanteil 87,39 % statt 94,35 %. Niemand haette das gemerkt.
+
+     > Ein Rechner, der unbekannte Eingaben stillschweigend verwirft,
+     > liefert kein falsches Ergebnis — er liefert ein RICHTIG
+     > AUSSEHENDES. Das ist der teurere Fehler.
+
+     Die Schleife bleibt, wie sie ist; nur sagt der Dienst jetzt, was
+     er weggeworfen hat. Bei einer Kaufpreisaufteilung haengt daran
+     die AfA-Bemessungsgrundlage. */
+  const unbekannt = Object.keys(inputs).filter(
+    (k) => !(k in INPUT_CELLS) && inputs[k] !== '' && inputs[k] !== null && typeof inputs[k] !== 'undefined'
+  );
+  const _warnungen = [];
+  if (unbekannt.length) {
+    _warnungen.push(
+      'Unbekannte Eingabefelder wurden NICHT in die Vorlage geschrieben und haben '
+      + 'das Ergebnis nicht beeinflusst: ' + unbekannt.join(', ')
+      + '. Bekannte Feldnamen: ' + Object.keys(INPUT_CELLS).join(', ') + '.'
+    );
+  }
+
   for (const [key, target] of Object.entries(INPUT_CELLS)) {
     if (!(key in inputs)) continue;
     let v = inputs[key];
@@ -475,6 +507,7 @@ async function calculateKpa(inputs, opts = {}) {
     ok: true,
     stage: 'done',
     inputs_received: inputs,
+    warnings: _warnungen,   /* v1669 */
     results,
     file_base64: filledBase64,
     file_name: `BMF_Aufteilung_${new Date().toISOString().slice(0,10)}.xlsx`,
