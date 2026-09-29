@@ -497,15 +497,6 @@
            (v1156-GRUND) — der Schalter waehlt nur eine, die zur
            gewuenschten Helligkeit passt, und laesst eine bereits passende
            stehen. */
-        '<div class="dpuv-g"><h3>Modus</h3>' +
-          '<p class="dpuv-hint">Grundhelligkeit der Oberfläche. Wählt die passende Vorlage ' +
-            'darunter mit aus — eine, die schon passt, bleibt stehen.</p>' +
-          '<div class="dp-tt-mode-toggle" id="dpuv-modus">' +
-            '<button type="button" class="dp-tt-mode-btn" data-v="obsidian">Dunkel' +
-              '<span class="dp-tt-mode-btn-label">Obsidian &amp; Gold</span></button>' +
-            '<button type="button" class="dp-tt-mode-btn" data-v="hell">Hell' +
-              '<span class="dp-tt-mode-btn-label">Helle Flächen</span></button>' +
-          '</div></div>' +
         /* ── v1684 · Seitenaufteilung ────────────────────────────────────
            Marcel: „ich wuerde mich freuen, wenn wir das Layout, den
            Umschalter, einfach unter Einstellungen Darstellung und dass
@@ -528,6 +519,15 @@
             '<p class="dpuv-hint">Wo Menü, Aktionen, Score und Ausgaben liegen.</p>' +
             segHtml('dpuv-layout', liste, jetzt, 2) + '</div>';
         })() +
+        '<div class="dpuv-g"><h3>Modus</h3>' +
+          '<p class="dpuv-hint">Grundhelligkeit der Oberfläche. Wählt die passende Vorlage ' +
+            'darunter mit aus — eine, die schon passt, bleibt stehen.</p>' +
+          '<div class="dp-tt-mode-toggle" id="dpuv-modus">' +
+            '<button type="button" class="dp-tt-mode-btn" data-v="obsidian">Dunkel' +
+              '<span class="dp-tt-mode-btn-label">Obsidian &amp; Gold</span></button>' +
+            '<button type="button" class="dp-tt-mode-btn" data-v="hell">Hell' +
+              '<span class="dp-tt-mode-btn-label">Helle Flächen</span></button>' +
+          '</div></div>' +
         '<div class="dpuv-g"><h3>App-Darstellung</h3>' +
           '<p class="dpuv-hint">Aufbau, Dichte und Typografie der gesamten Oberfläche.</p>' +
           segHtml('dpuv-theme', THEMES, get('ui_theme', THEMES)) + '</div>' +
