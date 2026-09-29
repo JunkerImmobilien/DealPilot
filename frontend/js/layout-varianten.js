@@ -1255,14 +1255,26 @@
     var g = document.createElement('div');
     g.className = 'dpuv-g';
     g.id = 'dpl-sek';
-    var kacheln = [{ key: '', name: 'Heute', sub: 'Unverändert' }].concat(
-      Object.keys(LAYOUTS).map(function (k, i) {
-        return { key: k, name: (i + 1) + ' · ' + LAYOUTS[k].name, sub: LAYOUTS[k].beschreibung };
+    /* v1690 — DIE NUMMERN WAREN EIN HINDERNIS.
+       Hier stand `(i + 1) + ' · ' + name`, also „1 · Aktenmappe",
+       „2 · Kanzlei", „3 · Tower". Marcel nennt sie ausnahmslos beim
+       Namen — die Nummer half niemandem und stand zwischen ihm und dem
+       Wort, das er sucht. Eine Reihenfolge braucht keine Nummer, wenn
+       die Reihenfolge schon sichtbar ist. */
+    var kacheln = [{ key: '', name: 'Heute', sub: 'Unveränderte Ansicht' }].concat(
+      Object.keys(LAYOUTS).map(function (k) {
+        return { key: k, name: LAYOUTS[k].name, sub: LAYOUTS[k].beschreibung };
       }));
-    g.innerHTML = '<h3>Aufbau</h3>'
-      + '<p class="dpuv-hint">Wo Menü, Aktionen und Objektliste stehen. '
+    /* v1690 — „Aussehen" statt „Aufbau". Marcel sucht diesen Abschnitt
+       dreimal unter „Darstellung → Aussehen" und findet ihn nicht: die
+       Ueberschrift hiess anders als das Wort, das er benutzt. Eine
+       Gruppe, die man nur findet, wenn man ihren Namen schon kennt, ist
+       fuer den, der sie sucht, nicht vorhanden. */
+    g.innerHTML = '<h3>Aussehen</h3>'
+      + '<p class="dpuv-hint">Wo Menü, Aktionen, Score und Ausgaben liegen. '
       + 'Die Arbeitsfläche bleibt in allen gleich — es wechselt nur der Rahmen. '
-      + 'Ein Aufbau schaltet die Oberfläche auf <b>hell</b>.</p>'
+      + 'Farben, Formen und Schrift stehen darunter und lassen sich frei '
+      + 'dazu kombinieren. Jede Ansicht ausser „Heute" schaltet auf <b>hell</b>.</p>'
       + '<div class="dpuv-seg" id="dpl-seg">'
       + kacheln.map(function (o) {
           return '<button type="button" class="dpuv-sgb' + (o.key === aktuell ? ' on' : '')
