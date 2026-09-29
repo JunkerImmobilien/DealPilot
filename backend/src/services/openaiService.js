@@ -1944,7 +1944,20 @@ async function copilotChat(payload, opts) {
     'gegebenen Zahlen (DSCR, LTV, Cashflow, Renditen, Kaufpreis). Erfinde keine Werte; fehlt etwas, sag es klar.',
     allowWeb
       ? 'Web-Recherche ist FREIGEGEBEN: nutze das web_search-Tool nur, wenn die Frage aktuelle externe Marktdaten erfordert, die nicht in den Objektdaten stehen. Nenne keine internen Anbieter-Namen.'
-      : 'Web-Recherche ist NICHT freigegeben: recherchiere NICHT im Web und rufe KEIN Such-Tool auf. Wenn die Frage externe oder aktuelle Marktdaten braucht, die nicht in den Daten stehen, erklaere in 1-2 Saetzen was dir fehlt und bitte den Nutzer, oben den Schalter \u201eWeb-Recherche\u201c zu aktivieren.'
+      : 'Web-Recherche ist NICHT freigegeben: recherchiere NICHT im Web und rufe KEIN Such-Tool auf. Wenn die Frage externe oder aktuelle Marktdaten braucht, die nicht in den Daten stehen, erklaere in 1-2 Saetzen was dir fehlt und bitte den Nutzer, oben den Schalter \u201eWeb-Recherche\u201c zu aktivieren.',
+    /* v1703: der Nutzer kann jetzt im Chat eine Marktpreis-Indikation
+       abrufen (Knopf \u201eMarktpreis \u00b7 1 Abruf"). Steht sie im Kontext, ist
+       sie die beste Zahl, die es gibt - sie kommt von einem
+       Bewertungspartner, nicht aus einem Formularfeld.
+
+       ANBIETER-NEUTRALITAET: CLAUDE.md sagt \u201eSprengnetter und
+       PriceHubble nie namentlich nach aussen". */
+    'MARKTPREIS-INDIKATION: Steht im Kontext ein Feld "marktpreis_indikation", dann wurde sie soeben bei einem',
+    'unabhaengigen Bewertungspartner abgerufen. Nutze sie als VORRANGIGEN Vergleichsanker fuer Kaufpreis-Einordnung,',
+    'Miete und Verhandlung - vor allgemeinen Annahmen. Nenne sie immer als "Indikation", NIE als Verkehrswert oder',
+    'Gutachten, und nenne die Spanne mit. Nenne NIEMALS einen Anbieternamen: die Quelle heisst "unabhaengiger',
+    'Bewertungspartner". Ist das Feld nicht da und die Frage braucht einen Marktpreis, weise in EINEM Satz auf den',
+    'Knopf \u201eMarktpreis \u00b7 1 Abruf\u201c oben hin - und rate keine Zahl.'
   ].join('\n');
 
   const ctxBlock = 'AKTUELLES OBJEKT (Kontext, JSON):\n' + JSON.stringify(ctx, null, 2);

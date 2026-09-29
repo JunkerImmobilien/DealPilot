@@ -34,6 +34,12 @@
            die Blackbox, die der Testbericht bemaengelt. */
         '<span class="dp-cp-badge" id="dp-cp-rest">' + cpBadgeText() + '</span>' +
         '<label class="dp-cp-web" title="Erlaubt dem Co-Pilot, fuer aktuelle Marktdaten im Web zu recherchieren"><input type="checkbox" id="dp-cp-web"><span>Web-Recherche</span></label>' +
+        /* v1703: Marcels Auftrag - „eine neue Anfrage an unsere
+           Schnittstelle, wie denn so die gaengigen Marktpreise sind.
+           Kann man ja vorher sagen, dass das einen Abruf kosten wuerde."
+           Die Kostenansage steht im Knopf, nicht erst im Modal: wer
+           klickt, soll vorher wissen, worauf er klickt. */
+        '<button type="button" class="dp-cp-mp" id="dp-cp-mp" title="Holt eine Marktpreis-Indikation von einem unabhaengigen Bewertungspartner. Kostet 1 Abruf.">Marktpreis · 1 Abruf</button>' +
       '</div>' +
       '<div class="dp-cp-log" id="dp-cp-log">' +
         '<div class="dp-cp-hint">Frag mich zu Lage, Verhandlung, Finanzierung oder Bank \u2014 ich arbeite mit den Daten dieses Objekts. Fuer aktuelle Marktdaten aus dem Web aktiviere oben die Web-Recherche.</div>' +
@@ -46,6 +52,8 @@
 
     var web = el('dp-cp-web');
     if (web) web.addEventListener('change', function () { allowWeb = this.checked; });
+    var mp = el('dp-cp-mp');
+    if (mp) mp.addEventListener('click', marktpreis);
     var snd = el('dp-cp-send');
     if (snd) snd.addEventListener('click', send);
     var inp = el('dp-cp-in');
@@ -68,9 +76,104 @@
   }
 
   function context() {
-    try { if (typeof _buildAIPayload === 'function') return _buildAIPayload(); } catch (e) {}
-    try { if (window._buildAIPayload) return window._buildAIPayload(); } catch (e) {}
-    return {};
+    var c = {};
+    try { if (typeof _buildAIPayload === 'function') c = _buildAIPayload(); } catch (e) {}
+    if (!c || !Object.keys(c).length) { try { if (window._buildAIPayload) c = window._buildAIPayload(); } catch (e) {} }
+    c = c || {};
+    /* v1703: eine abgerufene Indikation gehoert in JEDE Folgefrage. Sie
+       nur einmal in den Chat zu schreiben hiesse, dass das Modell sie
+       beim naechsten „und was heisst das fuer den Kaufpreis?" nicht mehr
+       hat - obwohl der Nutzer dafuer bezahlt hat. */
+    if (_mpErgebnis) {
+      try { c.marktpreis_indikation = _mpErgebnis; } catch (e) {}
+    }
+    return c;
+  }
+
+  /* ── v1703 · Marktpreis-Indikation aus dem Chat ────────────────────
+     Der Abruf selbst liegt in `object-actions.js` (`avmFetch`), samt
+     Pflichtfeldpruefung, Fehlertexten und Guthaben-Abzug. Hier steht nur
+     die Tuer und das, was im Chat davon zu lesen ist.
+
+     ANBIETER-NEUTRALITAET: CLAUDE.md sagt „Sprengnetter und PriceHubble
+     nie namentlich nach aussen". Im Chat steht deshalb „unabhaengiger
+     Bewertungspartner", nie `r.provider`. */
+  var _mpErgebnis = null;
+  var _mpLaeuft = false;
+
+  function _zahl(n) {
+    if (n == null || n === '' || !isFinite(Number(n))) return null;
+    return Number(n);
+  }
+  function _eur(n) {
+    var z = _zahl(n);
+    return z == null ? null : z.toLocaleString('de-DE', { maximumFractionDigits: 0 }) + ' €';
+  }
+  function _eurQm(n) {
+    var z = _zahl(n);
+    return z == null ? null : z.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €/m²';
+  }
+
+  function marktpreis() {
+    if (_mpLaeuft) return;
+    var oa = window.ObjectActions;
+    if (!oa || typeof oa.marktpreisFuerCopilot !== 'function') {
+      addMsg('assistant', '⚠ Der Marktpreis-Abruf steht hier gerade nicht bereit.');
+      return;
+    }
+    _mpLaeuft = true;
+    var btn = el('dp-cp-mp');
+    if (btn) btn.disabled = true;
+
+    oa.marktpreisFuerCopilot().then(function (r) {
+      if (!r || !r.ok) {
+        /* Abbruch ist kein Fehler - dann schreibt der Chat nichts. */
+        if (r && r.grund !== 'abgebrochen') addMsg('assistant', '⚠ ' + (r.text || 'Der Abruf hat nicht geklappt.'));
+        return;
+      }
+      var e = r.ergebnis || {};
+      var zeilen = [];
+      var mw = _eur(e.marktwert), lo = _eur(e.low), hi = _eur(e.high);
+      if (mw) zeilen.push('Marktwert-Indikation: ' + mw + (lo && hi ? '  (Spanne ' + lo + ' – ' + hi + ')' : ''));
+      var mm = _eurQm(e.marktmieteCold), mlo = _eurQm(e.marktmieteLow), mhi = _eurQm(e.marktmieteHigh);
+      if (mm) zeilen.push('Marktmiete: ' + mm + (mlo && mhi ? '  (Spanne ' + mlo + ' – ' + mhi + ')' : ''));
+
+      if (!zeilen.length) {
+        /* Eine Antwort ohne Zahl ist keine Indikation. Lieber sagen, dass
+           nichts kam, als eine leere Ueberschrift hinstellen. */
+        addMsg('assistant', 'Der Bewertungspartner hat zu diesem Objekt keine Indikation geliefert.');
+        return;
+      }
+
+      _mpErgebnis = {
+        quelle: 'unabhaengiger Bewertungspartner',
+        demo: !!r.demo,
+        marktwert: _zahl(e.marktwert), low: _zahl(e.low), high: _zahl(e.high),
+        marktmiete_eur_qm: _zahl(e.marktmieteCold),
+        marktmiete_low: _zahl(e.marktmieteLow), marktmiete_high: _zahl(e.marktmieteHigh),
+        stand: new Date().toISOString().slice(0, 10)
+      };
+
+      addMsg('assistant',
+        'Marktpreis-Indikation (unabhängiger Bewertungspartner'
+        + (r.demo ? ', Demo-Modus — kostenlos' : '') + '):\n\n'
+        + zeilen.join('\n')
+        + '\n\nDas ist eine Indikation, kein Verkehrswert. Sie liegt jetzt in meinen '
+        + 'Daten — frag mich, was sie für deinen Kaufpreis, die Miete oder die '
+        + 'Verhandlung bedeutet.');
+
+      /* Damit das Modell sie auch wirklich kennt, wandert sie zusaetzlich
+         als Gespraechszug in die Historie - `context` allein reicht dem
+         Modell zwar, aber so steht sie auch dort, wo es zuletzt gelesen
+         hat. */
+      history.push({ role: 'assistant', content: 'Abgerufene Marktpreis-Indikation: ' + zeilen.join(' | ') });
+    }).catch(function () {
+      addMsg('assistant', '⚠ Der Marktpreis-Abruf ist fehlgeschlagen.');
+    }).then(function () {
+      _mpLaeuft = false;
+      var b = el('dp-cp-mp');
+      if (b) b.disabled = false;
+    });
   }
 
   function userKeyExtra() {

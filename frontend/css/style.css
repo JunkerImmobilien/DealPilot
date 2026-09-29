@@ -32905,6 +32905,12 @@ body.hdr-banner-only .hdr-v61-row2 {
 .dp-cp-badge{font-size:10.5px;font-weight:600;color:#2F8E5A;background:#EBF3EF;border:1px solid #CDE5D6;border-radius:99px;padding:3px 9px;white-space:nowrap}
 .dp-cp-web{display:flex;align-items:center;gap:5px;font-size:11.5px;color:#5C554E;cursor:pointer;user-select:none}
 .dp-cp-web input{accent-color:var(--gold);margin:0}
+/* v1703 · Marktpreis-Abruf aus dem Chat. Die Kostenansage steht IM Knopf,
+   nicht erst im Modal - wer klickt, soll vorher wissen, worauf er klickt.
+   Farben ueber --gold, damit die Marke des Mandanten greift. */
+.dp-cp-mp{border:1px solid var(--wl-ece0be, #ECE0BE);background:var(--wl-fbf6e9, #FBF6E9);color:var(--wl-8a6d22, #8a6d22);font:600 11px/1 "JetBrains Mono",monospace;letter-spacing:.2px;padding:6px 10px;border-radius:99px;cursor:pointer;white-space:nowrap;flex:none}
+.dp-cp-mp:hover{background:var(--gold-bg);border-color:var(--gold)}
+.dp-cp-mp:disabled{opacity:.5;cursor:default}
 .dp-cp-log{max-height:340px;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
 .dp-cp-hint{font-size:12.5px;color:#938B7F;line-height:1.5}
 .dp-cp-msg{font-size:13px;line-height:1.55;padding:9px 12px;border-radius:11px;max-width:88%}
