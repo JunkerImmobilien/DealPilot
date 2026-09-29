@@ -1405,10 +1405,16 @@
     [].forEach.call(w.querySelectorAll('.dp-layoutw'), function (b) {
       var an = (b.getAttribute('data-v') || '') === (aktuell || '');
       b.classList.toggle('on', an);
-      /* Inline gesetzt, weil die Einstellungen kein eigenes Blatt fuer
-         diese Knoepfe haben — und eine Klasse ohne Regel faerbt nichts. */
-      b.style.borderColor = an ? 'var(--wl-c9a84c, #C9A84C)' : 'rgba(0,0,0,.12)';
-      b.style.boxShadow = an ? '0 0 0 1px var(--wl-c9a84c, #C9A84C) inset' : 'none';
+      /* v1699c: Die Marke steht jetzt als Klasse, die Farbe im CSS
+         (`layout-varianten.css`, `.dp-layoutw.on`). Vorher stand hier
+         `var(--wl-c9a84c, #C9A84C)` als Zeichenkette — inhaltlich
+         richtig, aber der Gold-Wächter liest JS-Strings nicht auf
+         `var()` und zählte sie als hartes Gold (0 -> 1, Datei war
+         sauber).
+
+         > Ein Wächter, den man mit einem richtigen Wert rot macht,
+         > wird umgangen statt gelesen. Lieber die Farbe dorthin
+         > schreiben, wo er sie versteht. */
     });
   }
 

@@ -5052,3 +5052,20 @@ html[data-dp-layout^="v"] body:has(#sb-user) nav.tabs .tab.active *{
 html[data-dp-layout^="v"] body:has(#sb-user) nav.tabs .tab.active{
   border-bottom-color:var(--wl-c9a84c, #C9A84C) !important;
 }
+
+/* v1699c — Die Layout-Kacheln in den Einstellungen.
+   Die Marke steht als Klasse `.on`; die Farbe hier, wo der Gold-Waechter
+   `var()` versteht. In `settings.js` gibt es kein eigenes Blatt fuer
+   diese Knoepfe, deshalb die vollstaendige Regel. */
+.dp-layoutw{
+  border:1px solid rgba(0,0,0,.12) !important;
+  box-shadow:none !important;
+  transition:border-color .12s, box-shadow .12s;
+}
+.dp-layoutw:hover{
+  border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent) !important;
+}
+.dp-layoutw.on{
+  border-color:var(--wl-c9a84c, #C9A84C) !important;
+  box-shadow:0 0 0 1px var(--wl-c9a84c, #C9A84C) inset !important;
+}
