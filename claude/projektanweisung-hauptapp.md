@@ -22056,3 +22056,55 @@ docker compose -f docker-compose.prod.yml up -d --build backend
 
 Geändert werden dabei **zwei Dateien**, keine Migration, kein Frontend:
 `backend/src/services/bmfService.js` und `bewertungsKatalog.js`.
+
+---
+
+## Rollout-Journal · 29.09.2026 (6) — Nachtrag: zweimal falsch gemessen
+
+**Was:** Zwei eigene Fehlmessungen zurückgenommen, die fünf offenen
+Punkte in den Backlog geschrieben (N1–N5).
+
+**Commit:** Backlog-Ergänzung
+
+---
+
+### Die Rücknahme
+
+Ich hatte im Journal (1) geschrieben, die RND-Verfahrenswahl „gehöre
+auf den Prüfstand", weil unser Kern bei Alexanderstr. 48 statt 33
+Jahre liefert. **Beide Teile dieser Aussage waren falsch gemessen:**
+
+**Erstens** hatte ich `calcPunktraster` direkt gerufen statt
+`calcAll()` — eine Teilfunktion statt des Wegs, den der Wizard geht.
+
+**Zweitens** hatte ich, nachdem ich das korrigiert hatte, die
+**Gewerke-Bewertungen geraten** („alle veraltet", „alle standard").
+Die technische Rechnung hängt vollständig daran. Meine 48 Jahre waren
+also das Ergebnis meiner Annahme, nicht des Kerns.
+
+Nachgesehen, ob der Wizard die Gewerke überhaupt erhebt:
+`rnd-wizard.js:1306-1323` baut eine Tabelle mit Radio-Buttons für alle
+neun Gewerke und schreibt sie nach `state.gewerke`. **Er erhebt sie.**
+
+> Zweimal am selben Befund vorbeigemessen: erst die falsche Funktion,
+> dann die falschen Eingaben. Eine Zahl, die aus geratenen Eingaben
+> kommt, ist kein Messwert — sie sieht nur so aus.
+
+Die Verfahrenswahl bleibt eine **Bewertungsfrage**, aber sie ist
+**kein Defekt**. Das steht jetzt so im Backlog (N5) statt als
+angeblicher Fehler.
+
+### Warum `tools/rollout-prod.ps1` hier nicht das Werkzeug ist
+
+Es gibt ein vorgesehenes Prod-Skript — es macht aber einen **Merge
+staging → main** und brächte alle 346 Commits samt Migrationen mit.
+Gebraucht wird ein `git pull` für zwei cherry-gepickte Backend-Dateien.
+
+> Ein Werkzeug, das mehr tut als gebraucht wird, ist an einer
+> gesperrten Tür keine Lösung, sondern ein Umweg um die Sperre.
+
+### Backlog
+
+N1 Preise (Stripe) · N2 Prod-Pull · N3 halber Cherry-Pick auf `main` ·
+N4 Import-Modul (Neu-Integration, keine KPA-Rechnung darin) ·
+N5 RND-Verfahrenswahl.

@@ -36,6 +36,118 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+## → OFFEN aus dem 29.09.2026 (Preise, Prod, Modul, RND)
+
+### N1 · Starter-Nachkauf ist teurer als der Einzelkauf — ENTSCHEIDUNG OFFEN
+
+Gemessen am **echten Stripe-Katalog** (`GET /credits/bewertungen`),
+nicht an `config.js`:
+
+| Paket | Stripe | Inhalt | Einzelwert | |
+|---|---|---|---|---|
+| `nachkauf_investor` | 8,75 € | 5/5/0 | 14,00 € | −5,25 € |
+| `nachkauf_pro` | 12,50 € | 5/5/5 | 33,50 € | −21,00 € |
+| **`nachkauf_starter`** | **5,00 €** | 5/0/0 | 4,50 € | **+0,50 €** |
+
+Anzeige und Stripe stimmen überein — **kein Anzeigefehler**. Ursache:
+`config.js:521` leitet den Paketpreis als Monatsbeitrag ÷ 4 ab und
+ignoriert, woraus das Kontingent besteht; beim Starter ist es nur die
+billigste Art.
+
+Seit v1673 meldet `_preisplausibilitaet()` in `bewertungsKatalog.js`
+den Fall beim Laden (`unplausibel: {aufschlag_cents: 50}`).
+
+**BLOCKIERT:** Der Betrag steht in Stripe (`price_1UCzxM…`,
+`dp_nachkauf_starter`), nicht im Code. Zwei Wege, beide brauchen
+Marcels Entscheidung:
+1. Stripe-Preis senken (z. B. 5,00 → 4,00 €)
+2. Starter-Kontingent aufwerten (z. B. +1 × `mpi_plus` → Einzelwert
+   6,40 €)
+
+Der Stripe-Konnektor braucht dafür eine neue Anmeldung per `/mcp`.
+
+### N2 · Zwei Backend-Fixes liegen auf `main`, der Prod-Pull fehlt
+
+`main` trägt seit `cc28127`:
+- `0c6cda6` v1669 — BMF-Aufteilung meldet unbekannte Eingabefelder
+- `cc28127` v1673 — Preis-Plausibilität
+
+Beide Sicherungen liegen und wurden **angesehen**:
+`/root/backups/prod-haupt-20260929-0634.sql.gz` (11 M) und
+`prod-mb-20260929-0634.sql.gz` (717 K).
+
+**BLOCKIERT:** Der Prod-Pull wurde von der Arbeitsumgebung abgewiesen
+(„Out-of-Place Publication"). Es fehlt genau:
+
+```
+cd /opt/dealpilot && git pull --ff-only origin main
+docker compose -f docker-compose.prod.yml up -d --build backend
+```
+
+Zwei Backend-Dateien, **keine Migration, kein Frontend**.
+`tools/rollout-prod.ps1` ist hier das falsche Werkzeug: es MERGED
+staging → main und brächte alle 346 Commits samt Migrationen mit.
+
+### N3 · Ein halber Cherry-Pick hing auf `main` — ENTSCHEIDUNG OFFEN
+
+Beim Wechsel auf `main` meldete git einen seit einer früheren Sitzung
+stehengebliebenen Sequencer-Zustand:
+
+```
+pick a2a96fd v1536/v1537: Partner 49 -> 99 EUR, drei Mandanten-Plaetze
+```
+
+**Nichts war angewendet** (kein `CHERRY_PICK_HEAD`, `git diff` leer).
+Mit `--quit` beendet, **nicht** fortgeführt — eine Preisänderung gehört
+nicht nebenbei auf den Produktionszweig.
+
+**Offen:** Soll `a2a96fd` auf `main`? Das ist ein eigener Vorgang.
+
+### N4 · Import-Modul v1.1.0 — NEU-Integration, kein Update
+
+`Dateien/dealpilot-import-v1_1_0.zip` (6 Dateien, ~55 KB). Geprüft am
+29.09.2026:
+
+- **Im Repo existiert keine Gegenstelle** — kein `import.js`,
+  `import_service.py`, `api_server_import_extensions.py`. Die v1.0.0
+  war laut README ein CLI-MVP und kam nie ins Git.
+- **Der Backend-Teil passt nicht zum Stack:** Python/FastAPI gegen
+  unser Node/Express. `import_service.py` und
+  `api_server_import_extensions.py` müssten portiert werden.
+- OCR-Fallback braucht `tesseract-ocr-deu` + `poppler-utils` im Image.
+- Der OpenAI-Schlüssel liegt im `localStorage` und geht per
+  `X-OpenAI-Key`-Header vom Browser — vor Produktion zu klären.
+- `IMPORT_SESSIONS` ist in-memory, übersteht keinen Neustart.
+
+**Und zur Kernfrage:** Das Modul enthält **keine**
+Kaufpreisaufteilungs-Rechnung. Es *klassifiziert* ein KPT-Dokument,
+hat aber weder Extraktions-Prompt noch Konsolidierungs-Zweig dafür —
+eine Lücke im Modul. „Die Rechnung aus dem Modul nehmen" geht mit
+dieser Fassung nicht.
+
+**Andockstelle**, falls integriert wird: der Import-Hub
+(`js/import-export-modal.js:113`), heute nur Excel + Backup.
+
+### N5 · RND-Verfahrenswahl — BEWERTUNGSFRAGE für Marcel
+
+`rnd-calc.js:419-433` wählt **immer die technische Alterswertminderung**,
+solange Alter < GND; das Punktraster ist nur Rückfall.
+
+Am Gutachten Alexanderstr. 11 (Bj 1976, GND 80, 2 Punkte, RND 33 J
+nach Anlage 2) trifft **unser Punktraster auf 0,2 Jahre genau**
+(32,80). Die technische Rechnung kommt je nach Gewerke-Eingabe auf
+einen anderen Wert.
+
+**Kein Defekt:** Der Wizard **erhebt** alle neun Gewerke
+(`rnd-wizard.js:1306-1323`, Radio-Tabelle). Die Regel ist bewusst
+gesetzt und dokumentiert.
+
+**Offen:** Soll das Punktraster führen, wenn es nach Anlage 2
+anwendbar ist — oder soll der Nutzer das Verfahren wählen? Marcel ist
+DESAG-Sachverständiger; das ist seine Entscheidung, nicht meine.
+
+---
+
 ## → OFFEN aus dem 26.09.2026 (Layouts, Datenaufnahme, Ernte)
 
 Der Tag ist ausgerollt und nachgemessen (Journal-Einträge 5 bis 12 in
