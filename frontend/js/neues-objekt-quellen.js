@@ -195,19 +195,33 @@
        Marke. */
     if (meinWrapper && window.newObj === meinWrapper) return;
 
-    orig = window.newObj;
+    /* ── v1695b · `orig` DARF NICHT GETEILT SEIN ────────────────────
+       Hier stand `orig = window.newObj` — eine MODULVARIABLE, die alle
+       je erzeugten Wrapper gemeinsam benutzen. Jede Erneuerung durch die
+       Wache hat sie umgebogen, auch fuer die ALTEN Wrapper, die noch in
+       fremden Umhuellungen stecken. Danach zeigte der alte auf den
+       neuen und der neue ueber die fremde Huelle auf den alten.
+
+       > Eine Umhuellung muss ihr Original selbst festhalten. Teilt sie
+       > es mit den anderen, zeigt nach dem naechsten Umhuellen jede auf
+       > die falsche — und irgendwann im Kreis.
+
+       `meinOrig` steht jetzt in der Closure. `orig` bleibt nur fuer die
+       Wache erhalten, die es zuruecksetzt.                            */
+    var meinOrig = window.newObj;
+    orig = meinOrig;
     meinWrapper = function (opt) {
       /* Mit `{ohneAuswahl:true}` bleibt der alte Weg offen - fuer
          Aufrufer, die ein Objekt aus einem Import heraus anlegen und
          dabei nicht gefragt werden wollen. */
-      if (opt && opt.ohneAuswahl) return orig.apply(this, arguments);
-      if (laeuft) return orig.apply(this, arguments);   /* Ringbremse */
+      if (opt && opt.ohneAuswahl) return meinOrig.apply(this, arguments);
+      if (laeuft) return meinOrig.apply(this, arguments);   /* Ringbremse */
       var selbst = this, args = arguments;
       zeige(function (wunsch) {
         var r;
         laeuft = true;
         try {
-          r = orig.apply(selbst, args);
+          r = meinOrig.apply(selbst, args);
         } catch (e) {
           /* v1695: NICHT mehr schlucken. Hier stand `catch (e) { r = null; }`
              — und genau das hat die Rekursion unsichtbar gemacht: der
