@@ -837,12 +837,12 @@
       }
 
       var kandidaten = ['sprengnetter', 'pricehubble'];
-      var frei = kandidaten.filter(function (p) { return !comingSoon(p) && !missingFor(p).length; });
+      var frei = kandidaten.filter(function (p) { return !provComingSoon(p) && !missingFor(p).length; });
 
       if (!frei.length) {
         /* Die kuerzeste Liste nennen - das ist der Weg mit dem wenigsten
            Aufwand fuer den Menschen. */
-        var beste = kandidaten.filter(function (p) { return !comingSoon(p); })
+        var beste = kandidaten.filter(function (p) { return !provComingSoon(p); })
                               .map(function (p) { return missingFor(p); })
                               .sort(function (a, b) { return a.length - b.length; })[0] || [];
         fertig({ ok: false, grund: 'felder', fehlend: beste,
