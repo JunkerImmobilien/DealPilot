@@ -22878,3 +22878,44 @@ Gold-Audit **RC=0**.
 oder sogar drei PDFs"), gibt es nicht: im Code liegen genau zwei Wege
 (PDF-Anlage und XLSX). Wenn er ein drittes Dokument meint, muss es
 benannt werden.
+
+### Nachtrag zu (15) · Warum Marcel den Umschalter dreimal vermisst hat
+
+Nach dem Entfernen meiner Doppelung stand die Frage noch im Raum:
+**warum hat er ihn nicht gefunden?** Nachgesehen — er hiess anders.
+
+| | vorher | jetzt |
+|---|---|---|
+| Ueberschrift | **Aufbau** | **Aussehen** |
+| Eintraege | „Heute", „1 · Aktenmappe", „2 · Kanzlei", „3 · Tower" | „Heute", „Aktenmappe", „Kanzlei", „Tower" |
+
+Marcel fragt dreimal nach „Darstellung → **Aussehen**". Die Gruppe hiess
+„Aufbau" und stand direkt vor ihm.
+
+> **Eine Gruppe, die man nur findet, wenn man ihren Namen schon kennt,
+> ist fuer den, der sie sucht, nicht vorhanden.** Und die Nummern
+> („1 · Aktenmappe") halfen niemandem — er nennt sie ausnahmslos beim
+> Namen. Eine Reihenfolge braucht keine Nummer, wenn sie ohnehin
+> sichtbar ist.
+
+Der Hinweistext sagt jetzt ausdruecklich, dass Farben, Formen und
+Schrift darunter stehen und frei kombinierbar sind — genau Marcels
+Anschlussfrage.
+
+**Kombinationstest, alle drei Achsen gleichzeitig gemessen:**
+
+| Achse | gesetzt | gemessen |
+|---|---|---|
+| Aussehen | Tower | `data-dp-layout="v2b"` |
+| Form | Rund | `data-ui-form="rund"`, Radius 7 px |
+| Marke | Oliv `#8E9A4E` | `--gold` und `--wl-c9a84c` beide gesetzt |
+| Ausgaben-Box | — | `rgb(142,154,78)`, **Farbton 69 = Soll 69** |
+
+Die drei Achsen greifen unabhaengig und gleichzeitig. Testfarbe danach
+auf DealPilot-Gold zurueckgesetzt.
+
+**Commit.** `4b1bf36`
+
+**Reihenfolge im Panel jetzt:** Aussehen · Datenaufnahme · Seiten ·
+Modus · App-Darstellung · Objektkarten · Kartenflaeche · Form · Schrift
+· Marke.
