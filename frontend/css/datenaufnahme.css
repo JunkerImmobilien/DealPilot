@@ -1751,7 +1751,20 @@ html[data-dp-kartenstil="kartei"] .dp-pf-scroll::after{
    das gar nichts anzeigt.
 
    Ein QR ohne Ziel ist kein Bild, kein Weg und auch kein Abstand. */
-:is(#oab-bar, #qc7-sources).dp-pfbar .dp-pf-qr:not([data-hat-ziel]){
+/* v1693c — DIE DRITTE REGEL MIT DEMSELBEN FEHLER.
+   `[data-hat-ziel]` setzt allein `renderQR()` im QuickCheck. Im
+   Objekt-Tab gibt es das Attribut NIE — also las diese Regel dort
+   dauerhaft „QR ohne Ziel" und nahm ihm den Rand, obwohl er 54 px breit
+   und gefuellt ist. Zusammen mit den beiden Geschwistern in v1693b hat
+   sie den Abruf-Bereich 249 px vor dem Ende festgehalten.
+
+   > Dreimal dieselbe Ursache an drei Stellen: ein Merkmal, das nur EINE
+   > der beiden Leisten kennt, als Bedingung fuer BEIDE geschrieben.
+   > Beim ersten Mal war es ein Versehen, beim dritten ein Muster.
+
+   Ab hier gilt: Regeln mit `data-hat-ziel` tragen `#qc7-sources` und
+   niemals `#oab-bar`. */
+#qc7-sources.dp-pfbar .dp-pf-qr:not([data-hat-ziel]){
   margin-left:0 !important;
   margin-right:0 !important;
   padding:0 !important;
