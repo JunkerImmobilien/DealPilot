@@ -3097,11 +3097,28 @@ html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn:hover,
 html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn:hover svg{
   color:var(--wl-e8cc7a, #E8CC7A) !important;
 }
-/* Und die Symbole in der Schiene, aus demselben Grund mit `:has()`. */
-html[data-dp-layout] .dpl-schiene:has(nav.tabs) nav.tabs .tab svg,
+/* Und die Symbole in der Schiene, aus demselben Grund mit :has().
+
+   v1708b: das SVG steht hier nicht mehr. Es war die ZWEITE Regel, die
+   `fill:currentColor` auf die Reiter-Symbole legte - v1707 hatte nur
+   die erste aufgeraeumt, und der Walker zeigte danach genau diese hier
+   als Sieger.
+
+   > Ich hatte in v1707 selbst geschrieben: wer eine Sammelregel
+   > aufraeumt, geht ihre ganze Liste durch. Dann habe ich nach der
+   > ersten aufgehoert. Zwei Regeln fuer dieselbe Flaeche, und die
+   > zweite sah aus wie ein neuer Fehler.
+
+   `.ic` bleibt drin: das sind Ikonen, die wirklich gefuellt gemeint
+   sind. Das SVG traegt sein `fill="none"` selbst. */
 html[data-dp-layout] .dpl-schiene:has(nav.tabs) nav.tabs .tab .ic{
   color:var(--wl-c9a84c, #C9A84C) !important;
   fill:currentColor !important; stroke:currentColor !important;
+  opacity:1 !important;
+}
+html[data-dp-layout] .dpl-schiene:has(nav.tabs) nav.tabs .tab svg{
+  color:var(--wl-c9a84c, #C9A84C) !important;
+  stroke:currentColor !important;
   opacity:1 !important;
 }
 
