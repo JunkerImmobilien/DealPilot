@@ -4741,3 +4741,38 @@ html[data-dp-layout="v2b"] .dpl-ausgaben-kopf{ padding-top:0 !important; }
    Die Geometrie stimmt fuer beide: links eine Schiene, rechts eine
    Schiene, nur der INHALT ist getauscht.
    ═══════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════
+   v1681 — z-index:400 AN EINEM position:static WIRKT NICHT
+   -------------------------------------------------------------------
+   Gemessen im iframe bei 817 px, Kanzlei 2, fuenf Ausgabe-Knoepfe:
+
+     Knopf 0 (y 590)  VERDECKT von .dp-example-placeholder
+     Knopf 1 (y 623)  VERDECKT von .dp-example-placeholder
+     Knopf 2 (y 656)  VERDECKT von .dp-required
+     Knopf 3 (y 688)  bedienbar
+     Knopf 4 (y 721)  bedienbar
+
+   Die Rechtecke ueberlappen NICHT (nachgerechnet: Platzhalter endet
+   bei y 566, Knopf beginnt bei 590) — trotzdem gibt `elementsFromPoint`
+   das fremde Element zurueck. Der Grund ist die Stapelung, nicht die
+   Lage.
+
+   Unter 1100 px setzt die Schiene `position:static`, damit sie aus dem
+   Schweben in den Fluss wandert. **`z-index` gilt nur fuer POSITIONIERTE
+   Elemente** — mit `static` ist die 400 wirkungslos, und jedes
+   positionierte Element des Hauptinhalts liegt darueber.
+
+   `relative` verhaelt sich im Fluss genau wie `static` (kein Versatz,
+   ohne top/left), stellt aber den z-index wieder her. Eine Zeile, und
+   sie repariert die Kanzlei gleich mit — dort stand derselbe Fehler.
+
+   > Sichtbar ist nicht bedienbar. Das Rechteck stimmte, die Stapelung
+   > nicht — und nur `elementsFromPoint` sagt den Unterschied.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 1100px){
+  html[data-dp-layout^="v2"] .dpl-schiene[data-stellung="rechts"]{
+    position:relative !important;
+    z-index:400 !important;
+  }
+}
