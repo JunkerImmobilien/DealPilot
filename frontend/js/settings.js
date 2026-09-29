@@ -761,28 +761,23 @@ function showSettings(initialTab) {
            oeffnen". Von grob nach fein.                               */
         '<div id="dp-layout-wahl-host" style="margin-bottom:12px"></div>' +
         '<div style="padding:12px 14px;background:#FAF9F4;border-radius:8px;border:1px solid rgba(201,168,76,0.25)">' +
-          '<div id="dp-profil-wahl" style="display:flex;gap:11px">' +
-            '<button type="button" class="dp-profil" data-profil="obsidian" onclick="_dpProfil(\'obsidian\')" ' +
-              'style="flex:1 1 0;min-height:44px;text-align:left;padding:11px 12px;border-radius:9px;' +
-              'border:1px solid rgba(0,0,0,.12);background:#fff;cursor:pointer;font:inherit">' +
-              '<span style="display:block;height:34px;border-radius:6px;margin-bottom:8px;' +
-                'background:linear-gradient(#141414,#040404);box-shadow:inset 0 0 0 1px rgba(201,168,76,.35)"></span>' +
-              '<span style="display:block;font-weight:600">Obsidian</span>' +
-              '<span style="display:block;font-size:11.5px;color:var(--muted,#5F5E5A);margin-top:1px">Auslieferungszustand</span>' +
-            '</button>' +
-            '<button type="button" class="dp-profil" data-profil="hell" onclick="_dpProfil(\'hell\')" ' +
-              'style="flex:1 1 0;min-height:44px;text-align:left;padding:11px 12px;border-radius:9px;' +
-              'border:1px solid rgba(0,0,0,.12);background:#fff;cursor:pointer;font:inherit">' +
-              '<span style="display:block;height:34px;border-radius:6px;margin-bottom:8px;' +
-                'background:#FBFAF7;box-shadow:inset 0 0 0 1px #E8E4DC"></span>' +
-              '<span style="display:block;font-weight:600">Hell</span>' +
-              '<span style="display:block;font-size:11.5px;color:var(--muted,#5F5E5A);margin-top:1px">Warm, mit Serife</span>' +
-            '</button>' +
-          '</div>' +
-          '<div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:10px">' +
-            '<span style="font-size:11.5px;color:var(--muted,#5F5E5A)">Einzeln einstellen — Vorlage, Karten, Form, Schrift, Farben</span>' +
-            '<button type="button" class="btn btn-sm btn-ghost" onclick="try{DealPilotUiVarianten.open()}catch(e){}">Darstellung öffnen</button>' +
-          '</div>' +
+          /* v1706: HIER STAND DIE WAHL OBSIDIAN / HELL UND DER KNOPF
+             DARSTELLUNG OEFFNEN.
+
+             Marcel: "unter Einstellungen, Darstellung hast du immer noch
+             die Auswahl zwischen Obsidian und Hell. Die kannst du
+             rausnehmen. Ich moechte aber, dass wir das zuruecksetzen. Das
+             darf gerne bleiben. Und das Darstellung oeffnen darf oben
+             unter dem Aussehen darf das raus."
+
+             Die Layout-Wahl darueber (#dp-layout-wahl-host) bleibt - sie
+             ist das, was hier wirklich entschieden wird. Das Feine steht
+             weiter im Darstellungs-Panel; erreichbar bleibt es ueber den
+             Knopf weiter unten in den Einstellungen.
+
+             > Zwei Wege zum selben Panel in einer Ansicht sind keine
+             > Bequemlichkeit, sondern eine Frage, die sich der Nutzer
+             > stellen muss: ob es derselbe ist. */
           /* ── v1698 · ZURUECKSETZEN ──────────────────────────────────
              Marcel: „auch sollte es dort die Moeglichkeit geben, die
              Einstellungen zurueckzusetzen."
