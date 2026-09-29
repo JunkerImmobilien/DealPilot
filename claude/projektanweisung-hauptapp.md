@@ -22585,3 +22585,119 @@ Aktionsliste; ein eigener Exposé-Weg (getrennt vom Gesamt-PDF) gibt es
 in der App nicht. Die Gesperrt-Kennzeichnung
 (`.dpl-ausgabe[data-gesperrt]`) ist vorbereitet, aber noch nicht an die
 Plan-Pruefung gehaengt.
+
+---
+
+## Rollout-Journal 29.09.2026 (13) — Tower, die Ausgaben, und der Partner-Test
+
+**Was.** Marcels fuenf Punkte.
+
+### 1 · Warum die Leiste im QuickBoarding anders aussah
+
+Gemessen, beide Leisten nebeneinander:
+
+| | Tab Objekt | QuickBoarding |
+|---|---|---|
+| QR-Inhalt | 6.109 Zeichen | **0 (leer)** |
+| QR angezeigt | ja | `display:none` |
+| Abrufen sitzt bei | x = 1585 | x = 650 |
+
+**Der Knopf war nicht verrutscht — ihm fehlte der Nachbar.** Der QR
+wird im iframe nie gefuellt: sein Ziel kommt per `qc-autopass-code` aus
+der Haupt-App, ohne Pass gibt es keins. Die Regel
+`#qc7-qr:not([data-hat-ziel])` klappt ihn dann ein — als Schutz gemeint
+(„ein QR ohne Ziel ist ein Bild, kein Weg") — und nimmt den Platz mit.
+
+> Ein Schutz, der Platz wegnimmt, verschiebt alles daneben.
+
+**Der erste Anlauf (v1682) wirkte nur halb:** die goldene Unterkante war
+weg, der Knopf klebte weiter mittendrin. Der Gegentest mit einem inline
+gesetzten `margin-left:auto` verschob ihn sauber (x 650 -> 1071) — also
+reine Kaskade, kein Layoutproblem. **Zwei Ursachen, beide in
+`datenaufnahme.css`:**
+
+- **`margin:0 !important`** auf `.dp-pf-rz` (Z. 998). Die Kurzschrift
+  setzt alle vier Seiten; jede spaetere `margin-left`-Regel lief ins
+  Leere. Jetzt steht `margin:0 0 0 auto` dort, wo auch der Rest seiner
+  Lage steht, statt als Gegenregel woanders.
+- **`#oab-run.dp-pf-launch`** (Z. 1007). Der Abruf-Knopf heisst **nur
+  im Objekt-Tab** so; im QuickBoarding traegt er `.qc6-run`. Die Regel
+  hat ihn in der einen Leiste nach rechts geschoben und in der anderen
+  nie. Jetzt `:is(#oab-run, .qc6-run)` — erbt die Spezifitaet der ID,
+  bleibt gleich stark, trifft beide. Nachgemessen: `margin-left`
+  **88,1 px**, der Knopf wandert.
+
+> **Eigene Fehlaussage, zurueckgenommen:** Ich hatte in v1680
+> geschrieben, das iframe lade `datenaufnahme.css` nicht. **Es laedt
+> sie** — gemessen an den Stylesheets des iframes. Richtig ist etwas
+> anderes: die dortigen Regeln kommen gegen die `!important`-Schichten
+> der QC-Seite oft nicht durch, deshalb steht die Angleichung zusaetzlich
+> im `qc-kartei-angleich`-Block.
+
+### 2+3 · Die Ausgaben gehen auf Dokumente, nicht auf Bereiche
+
+Marcel: „wenn ich auf Marktbericht klicke, wird der Bereich aufgemacht.
+Ich moechte aber auf das PDF zugreifen." Und: „mir fehlen
+Kaufpreisaufteilung, Anschaffungskosten und das Finanzamt-PDF."
+
+**Alle diese Wege gab es schon** — im Deal-Aktions-Tab als
+`DealActionBoarding.exportDoc()`. Sie werden jetzt gerufen, nicht
+nachgebaut. Die Liste: Exposé/Gesamt-PDF, Bankfassung, Marktbericht,
+**Kaufpreisaufteilung**, **Finanzamt-PDF**, Track Record, Export.
+
+- **Marktbericht** holt den juengsten vorhandenen Bericht als echtes
+  PDF (`downloadReport` -> die Engine in `marktbericht-app/app.js`),
+  geprueft ueber `/marktbericht/objects/history?ref=<objekt>`.
+- **Finanzamt-PDF** fragt vorher das Jahr. Die Jahre stammen aus
+  `State.cfRows` wie im Deal-Aktions-Tab — nicht aus dem Kalender: ein
+  Jahr, das die Rechnung nicht kennt, koennte niemand ausgeben.
+- **Gesperrt wird gezeigt, nicht versteckt:** ausgegraut plus X mit dem
+  Grund im Titel. Ein gescheiterter Abruf ist **nicht** dasselbe wie
+  „gibt es nicht" — sonst sucht der Nutzer einen Bericht, den er
+  laengst hat.
+
+Gemessen: `mb:ZU(noch keiner erstellt)`, alle uebrigen offen.
+
+### 4 · Seitenaufteilung in Einstellungen/Darstellung — und **Tower**
+
+Neue Gruppe ueber „App-Darstellung": erst WO die Dinge liegen, dann WIE
+sie aussehen. Die Liste kommt aus `DealPilotLayout.layouts`, nicht aus
+einer zweiten Pflege. **Nicht** ueber `segBinden` gebunden — das
+schriebe einen zweiten Speicherort neben den Merker von
+`DealPilotLayout`, und beim Neuladen gewaenne der falsche.
+
+**Kanzlei 2 heisst jetzt Tower.** Eine Nummer ist kein Name. Tower passt
+in die Bildsprache (Kerosin, Cockpit, Runway, Pre-Flight, Boarding) und
+beschreibt, was das Layout tut: alles im Blick, erteilt die Freigaben —
+Score und Ausgaben rechts, gearbeitet wird links.
+
+### 5 · Der Partner-Test
+
+`setOverride('partner')` wirkt **nicht** — und das ist richtig:
+`pruefOverride` laesst nur Herabstufung zu, „aber NIE hinauf" (v1163).
+Sonst machte sich jeder per `localStorage` zum Partner.
+
+Der Account `info@junker-immobilien.io` steht deshalb auf **Staging**
+jetzt auf `partner` (vorher `pro`, notiert). Zwei weitere Konten waren
+dort schon Partner.
+
+**Gemessen mit Mandantenansicht und Testfarbe Oliv `#8E9A4E`:**
+
+| | |
+|---|---|
+| `--wl-c9a84c` | `#8E9A4E` |
+| Objektzeile der Ausgaben-Box | `rgb(142,154,78)` |
+| Farbton gemessen / Soll | **69 / 69** |
+
+Die neue Ausgaben-Box faerbt sich beim Mandanten korrekt mit. Farbe und
+Ansicht danach zurueckgesetzt.
+
+**Commits.** `1bbcc26` · `bfd6cfa` · `e710c9e` · `ebacf9e`
+
+**Rest.** Die QuickBoarding-Leiste ist schmaler als die im Objekt-Tab —
+der Abruf-Knopf steht jetzt rechts in IHR, aber beide Leisten haben
+nicht dieselbe Breite. Das ist die verbleibende Abweichung. Der QR
+bleibt im QuickBoarding leer, solange kein Pass erzeugt wurde; das ist
+gewollt, kostet aber jetzt keinen Platz mehr. **Der Staging-Account
+steht weiter auf `partner`** — zum Zurueckstellen genuegt ein `UPDATE`
+auf `pro`.
