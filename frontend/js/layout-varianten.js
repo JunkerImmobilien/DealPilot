@@ -269,12 +269,31 @@
      `dpAusgabenAktualisieren()` haengt die Objektbezeichnung an, damit
      sichtbar ist, WOFUER ausgegeben wird — Marcel: „alles das fuer das
      ausgewaehlte Objekt".                                            */
+  /* ── v1683 · DIE AUSGABEN GEHEN AUF DOKUMENTE, NICHT AUF BEREICHE ──
+     Marcel: „wenn ich unter Ausgabe auf Marktbericht klicke, wird der
+     Bereich Marktbericht aufgemacht. Ich möchte aber auf das PDF
+     zugreifen. Wenn es kein PDF gibt, sollte das ausgegraut sein."
+     Und: „mir fehlen Kaufpreisaufteilung, Anschaffungskosten und das
+     Finanzamt-PDF — da muss natürlich gefragt werden, welches Jahr."
+
+     **Alle diese Wege gibt es schon** — im Deal-Aktions-Tab, als
+     `DealActionBoarding.exportDoc(…)`. Sie werden hier gerufen, nicht
+     nachgebaut: ein zweiter Weg zu demselben Dokument laeuft
+     auseinander, sobald einer von beiden gepflegt wird.
+
+     `art` sagt, woher der Knopf weiss, ob er etwas zu bieten hat:
+       dok    — erzeugt das Dokument aus den Daten, immer moeglich
+       vorrat — braucht einen vorhandenen Bestand (Marktbericht), wird
+                geprueft und sonst ausgegraut
+       jahr   — braucht vorher eine Jahresangabe                      */
   var AUSGABEN = [
-    { act: 'pdf',          ico: 'export-hub', l: 'Exposé / Gesamt-PDF', sub: 'Alle Kapitel als Dokument' },
-    { act: 'marktbericht', ico: 'market',     l: 'Marktbericht',        sub: 'Mikro- und Makrolage' },
-    { act: 'bankexport',   ico: 'bankexport', l: 'Bankexport',          sub: 'Selbstauskunft für die Bank', feature: 'bank_pdf_a3' },
-    { act: 'trackrec',     ico: 'trackrec',   l: 'Track Record',        sub: 'Nachweise für die Bank',      feature: 'track_record_pdf' },
-    { act: 'hub-export',   ico: 'export-hub', l: 'Export',              sub: 'PDF, CSV, Sicherung',         feature: 'export_csv' }
+    { act: 'invest',      art: 'dok',    ico: 'export-hub', l: 'Exposé / Gesamt-PDF',  sub: 'Alle Kapitel als Dokument' },
+    { act: 'invest_bank', art: 'dok',    ico: 'bankexport', l: 'Bankfassung',          sub: 'Investment-Case für die Bank', feature: 'bank_pdf_a3' },
+    { act: 'mb',          art: 'vorrat', ico: 'market',     l: 'Marktbericht',         sub: 'Als PDF, wenn einer vorliegt' },
+    { act: 'kpa',         art: 'dok',    ico: 'export-hub', l: 'Kaufpreisaufteilung',  sub: 'BMF-Anlage, Grund und Gebäude', feature: 'bmf_calc_export' },
+    { act: 'bmf',         art: 'jahr',   ico: 'export-hub', l: 'Finanzamt-PDF',        sub: 'Anlage V · Werbungskosten' },
+    { act: 'track',       art: 'dok',    ico: 'trackrec',   l: 'Track Record',         sub: 'Nachweise für die Bank',       feature: 'track_record_pdf' },
+    { act: 'hub-export',  art: 'dok',    ico: 'export-hub', l: 'Export',               sub: 'PDF, CSV, Sicherung',          feature: 'export_csv' }
   ];
 
   function baueAusgaben() {
@@ -303,20 +322,201 @@
 
     box.addEventListener('click', function (e) {
       var b = e.target.closest && e.target.closest('.dpl-ausgabe');
-      if (!b) return;
-      var act = b.getAttribute('data-act');
-      if (typeof window.sbActionsAction === 'function') window.sbActionsAction(act);
+      if (!b || b.getAttribute('data-gesperrt') === '1') return;
+      ausgabeStarten(b.getAttribute('data-act'), b);
     });
 
     document.body.appendChild(box);
     ausgabenIconsNachziehen(box);
     dpAusgabenAktualisieren();
+    ausgabenVorratPruefen();
     return box;
   }
 
   /* Die Icons kommen aus derselben Bibliothek wie die Aktionsliste.
      Fehlt sie, bleibt der Knopf trotzdem bedienbar — ein fehlendes
      Bild darf keinen Befehl kosten.                                  */
+  /* ── v1683 · Was beim Klick geschieht ────────────────────────────── */
+  var _mbBerichte = null;   /* null = noch nicht geprueft */
+
+  function ausgabeStarten(act, knopf) {
+    var DAB = window.DealActionBoarding;
+
+    if (act === 'hub-export') {
+      if (typeof window.openExportHub === 'function') return window.openExportHub();
+      if (typeof window.sbActionsAction === 'function') return window.sbActionsAction('hub-export');
+      return;
+    }
+
+    if (act === 'mb') {
+      /* Nicht den Bereich oeffnen, sondern den JUENGSTEN Bericht als PDF.
+         Ohne Bericht steht der Knopf gar nicht erst zur Verfuegung —
+         siehe ausgabenVorratPruefen(). */
+      if (!_mbBerichte || !_mbBerichte.length) { melde('Für dieses Objekt liegt noch kein Marktbericht vor.'); return; }
+      var neuester = _mbBerichte[0];
+      if (DAB && typeof DAB.downloadReport === 'function') {
+        melde('Marktbericht wird erzeugt …');
+        return DAB.downloadReport(neuester.report_id);
+      }
+      melde('Marktbericht-Ausgabe nicht geladen.');
+      return;
+    }
+
+    if (act === 'bmf') {
+      /* Marcel: „da muss natuerlich auch gefragt werden, welches Jahr."
+         `exportDoc('bmf')` liest das Jahr aus `#dab-fa-year` — einem
+         Feld, das nur im Deal-Aktions-Tab steht. Von hier aus wird
+         deshalb zuerst gefragt und die Antwort DORT hinterlegt, statt
+         einen zweiten Weg in den Export zu bauen. */
+      return jahrFragen(function (wert) {
+        var sel = document.getElementById('dab-fa-year');
+        if (!sel) {
+          /* Das Feld gibt es erst, wenn der Deal-Aktions-Tab einmal
+             aufgebaut wurde. Dann legen wir es verdeckt an — mit
+             demselben Namen, damit der Export es findet. */
+          sel = document.createElement('select');
+          sel.id = 'dab-fa-year';
+          sel.style.display = 'none';
+          document.body.appendChild(sel);
+        }
+        if (!sel.querySelector('option[value="' + wert + '"]')) {
+          var o = document.createElement('option');
+          o.value = wert; o.textContent = wert;
+          sel.appendChild(o);
+        }
+        sel.value = wert;
+        if (DAB && typeof DAB.exportDoc === 'function') return DAB.exportDoc('bmf');
+        melde('Finanzamt-PDF nicht geladen.');
+      });
+    }
+
+    if (DAB && typeof DAB.exportDoc === 'function') return DAB.exportDoc(act);
+    melde('Diese Ausgabe ist gerade nicht verfügbar.');
+  }
+
+  function melde(text) {
+    if (typeof window.toast === 'function') { window.toast(text); return; }
+    var el = document.getElementById('dpl-ausgaben-obj');
+    if (el) { el.textContent = text; }
+  }
+
+  /* Die Jahre stammen aus derselben Quelle wie im Deal-Aktions-Tab
+     (`State.cfRows`, siehe `fillFaYears`) — nicht aus dem Kalender.
+     Ein Jahr, das die Rechnung nicht kennt, koennte niemand ausgeben. */
+  function jahrFragen(weiter) {
+    var rows = (window.State && Array.isArray(window.State.cfRows)) ? window.State.cfRows.slice(0, 15) : [];
+    var alt = document.getElementById('dpl-jahr-frage');
+    if (alt) alt.remove();
+
+    var w = document.createElement('div');
+    w.id = 'dpl-jahr-frage';
+    w.className = 'dpl-jahr-frage';
+    w.innerHTML =
+        '<div class="dpl-jf-box">'
+      +   '<h3>Finanzamt-PDF — welches Jahr?</h3>'
+      +   '<p>Anlage V mit den Werbungskosten des gewählten Jahres.</p>'
+      +   '<div class="dpl-jf-liste">'
+      +     rows.map(function (r, i) {
+            return '<button type="button" class="dpl-jf-j" data-wert="' + i + '">' + (r.cal || ('Jahr ' + (i + 1))) + '</button>';
+          }).join('')
+      +     '<button type="button" class="dpl-jf-j dpl-jf-alle" data-wert="all">Alle Jahre</button>'
+      +   '</div>'
+      +   (rows.length ? '' : '<p class="dpl-jf-leer">Noch keine Jahre berechnet — erst die Investition ausfüllen.</p>')
+      +   '<button type="button" class="dpl-jf-ab">Abbrechen</button>'
+      + '</div>';
+    document.body.appendChild(w);
+
+    w.addEventListener('click', function (e) {
+      if (e.target === w || e.target.closest('.dpl-jf-ab')) { w.remove(); return; }
+      var j = e.target.closest('.dpl-jf-j');
+      if (!j) return;
+      var wert = j.getAttribute('data-wert');
+      w.remove();
+      weiter(wert);
+    });
+  }
+
+  /* ── v1683 · Was es gibt und was nicht ────────────────────────────
+     Marcel: „wenn es kein PDF gibt, sollte vielleicht ein kleines X
+     dahinter sein oder das ausgegraut sein."
+
+     Geprueft wird der VORRAT (liegt ein Marktbericht vor?) und das
+     RECHT (deckt der Plan die Ausgabe ab?). Beides wird angezeigt,
+     nicht versteckt: wer nicht sieht, was er nicht hat, weiss auch
+     nicht, was ihm fehlt.                                           */
+  async function ausgabenVorratPruefen() {
+    var box = document.getElementById('dpl-ausgaben');
+    if (!box) return;
+
+    /* 1 · Plan-Rechte */
+    box.querySelectorAll('.dpl-ausgabe[data-feature]').forEach(function (b) {
+      var f = b.getAttribute('data-feature');
+      var darf = true;
+      try {
+        if (window.DealPilotConfig && DealPilotConfig.pricing
+            && typeof DealPilotConfig.pricing.hasFeature === 'function') {
+          darf = DealPilotConfig.pricing.hasFeature(f);
+        }
+      } catch (e) { darf = true; }
+      sperre(b, !darf, darf ? '' : 'im Plan nicht enthalten');
+    });
+
+    /* 2 · Marktbericht-Vorrat */
+    var mbKnopf = box.querySelector('.dpl-ausgabe[data-act="mb"]');
+    if (!mbKnopf) return;
+    var id = objektKennung();
+    if (!id) { sperre(mbKnopf, true, 'kein Objekt gewählt'); _mbBerichte = []; return; }
+
+    sperre(mbKnopf, true, 'wird geprüft …');
+    try {
+      var t = null;
+      try { t = localStorage.getItem('dp_token') || localStorage.getItem('token'); } catch (e) {}
+      var res = await fetch('/api/v1/marktbericht/objects/history?ref=' + encodeURIComponent(id),
+                            { headers: t ? { Authorization: 'Bearer ' + t } : {} });
+      var j = await res.json();
+      var reps = ((j && j.history) || []).filter(function (h) { return h && h.report_id != null; });
+      reps.sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
+      _mbBerichte = reps;
+      if (reps.length) {
+        sperre(mbKnopf, false, '');
+        var sub = mbKnopf.querySelector('.dpl-ausgabe-sub');
+        if (sub) sub.textContent = reps.length === 1 ? 'Ein Bericht liegt vor' : (reps.length + ' Berichte — der neueste');
+      } else {
+        sperre(mbKnopf, true, 'noch keiner erstellt');
+      }
+    } catch (e) {
+      _mbBerichte = [];
+      /* Ein Abruf, der scheitert, ist nicht dasselbe wie „gibt es
+         nicht" — das gehoert unterschieden, sonst sucht der Nutzer
+         einen Bericht, den er laengst hat. */
+      sperre(mbKnopf, true, 'nicht abrufbar');
+    }
+  }
+
+  function sperre(knopf, zu, grund) {
+    knopf.setAttribute('data-gesperrt', zu ? '1' : '0');
+    var alt = knopf.querySelector('.dpl-ausgabe-x');
+    if (alt) alt.remove();
+    if (zu) {
+      var x = document.createElement('span');
+      x.className = 'dpl-ausgabe-x';
+      x.textContent = '✕';
+      x.title = grund || 'nicht verfügbar';
+      knopf.appendChild(x);
+      knopf.title = grund || 'nicht verfügbar';
+    } else {
+      knopf.removeAttribute('title');
+    }
+  }
+
+  function objektKennung() {
+    try {
+      if (typeof window._currentObjKey === 'string' && window._currentObjKey) return window._currentObjKey;
+    } catch (e) {}
+    return null;
+  }
+  window.dpAusgabenVorratPruefen = ausgabenVorratPruefen;
+
   function ausgabenIconsNachziehen(box) {
     /* GEMESSEN am 29.09.2026, nicht geraten: `_sbActionsRenderIcons()`
        ist die Funktion, die `.sb-act-ico[data-icon]` fuellt — im Versuch
@@ -373,7 +573,7 @@
     /* 400 ms, nicht 60: die `.active`-Marke auf der Karte wird NACH dem
        Ereignis gesetzt. Zu frueh gelesen steht dort noch die vorige
        Auswahl — oder gar keine.                                      */
-    setTimeout(dpAusgabenAktualisieren, 400);
+    setTimeout(function () { dpAusgabenAktualisieren(); ausgabenVorratPruefen(); }, 400);
   });
   /* Zweiter Weg, weil der erste eine Reihenfolge voraussetzt: ein Klick
      in der Objektliste fuehrt immer zu einer neuen Auswahl, ganz gleich
@@ -381,9 +581,15 @@
   document.addEventListener('click', function (e) {
     if (!document.getElementById('dpl-ausgaben')) return;
     if (e.target.closest && e.target.closest('.sb-card')) {
-      setTimeout(dpAusgabenAktualisieren, 400);
+      setTimeout(function () { dpAusgabenAktualisieren(); ausgabenVorratPruefen(); }, 400);
     }
   }, true);
+  /* Der Plan kommt spaeter als die Oberflaeche — `dp:plan-ready` statt
+     Timer oder Polling (subscription.js:154). Ohne das stuenden alle
+     Plan-Ausgaben beim ersten Aufbau faelschlich als gesperrt da. */
+  window.addEventListener('dp:plan-ready', function () {
+    if (document.getElementById('dpl-ausgaben')) ausgabenVorratPruefen();
+  });
 
   function hole(sel) {
     /* Die Ausgaben-Box existiert erst, wenn ein Layout sie anfordert. */

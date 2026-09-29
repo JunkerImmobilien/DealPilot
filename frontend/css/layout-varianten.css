@@ -4808,3 +4808,63 @@ html[data-dp-layout="v2b"] .dpl-ausgaben-kopf{ padding-top:0 !important; }
     padding-bottom:170px !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   v1683 — GESPERRTE AUSGABEN UND DIE JAHRESFRAGE
+   -------------------------------------------------------------------
+   Marcel: „wenn es kein PDF gibt, sollte vielleicht ein kleines X
+   dahinter sein oder das ausgegraut sein."
+
+   Beides: ausgegraut UND ein X, dazu der Grund im Titel. Gezeigt statt
+   versteckt — wer nicht sieht, was er nicht hat, weiss auch nicht, was
+   ihm fehlt. Das X ist bewusst KEIN Rot: „noch keiner erstellt" ist
+   kein Fehler, sondern ein Zustand.
+   ═══════════════════════════════════════════════════════════════════ */
+.dpl-ausgabe[data-gesperrt="1"]{
+  opacity:.42 !important;
+  cursor:not-allowed !important;
+}
+.dpl-ausgabe[data-gesperrt="1"]:hover{ background:none !important; }
+.dpl-ausgabe-x{
+  margin-left:auto;
+  flex:0 0 auto;
+  font-size:11px;
+  opacity:.75;
+  padding-left:6px;
+}
+
+/* ── Die Jahresfrage ─────────────────────────────────────────────── */
+.dpl-jahr-frage{
+  position:fixed; inset:0; z-index:10060;
+  background:rgba(5,5,5,.66);
+  display:flex; align-items:center; justify-content:center; padding:20px;
+}
+.dpl-jf-box{
+  width:min(420px,100%);
+  background:var(--surface,#14120f);
+  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 26%, transparent);
+  border-radius:13px; padding:20px 22px;
+}
+.dpl-jf-box h3{
+  font-family:'Space Grotesk',sans-serif; font-size:17px; margin:0 0 5px;
+}
+.dpl-jf-box p{ font-size:13px; opacity:.72; margin:0 0 15px; line-height:1.5; }
+.dpl-jf-liste{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:15px; }
+.dpl-jf-j{
+  padding:8px 13px; border-radius:7px; cursor:pointer; font:inherit; font-size:13px;
+  color:inherit;
+  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent);
+  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent);
+}
+.dpl-jf-j:hover{ background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 20%, transparent); }
+.dpl-jf-alle{ font-weight:600; }
+.dpl-jf-leer{ font-size:12.5px; opacity:.6; font-style:italic; }
+.dpl-jf-ab{
+  background:none; border:0; color:inherit; opacity:.6; cursor:pointer;
+  font:inherit; font-size:13px; padding:4px 0;
+}
+.dpl-jf-ab:hover{ opacity:1; }
+@media (max-width:560px){
+  .dpl-jf-box{ padding:16px 15px; }
+  .dpl-jf-j{ padding:7px 11px; font-size:12px; }
+}
