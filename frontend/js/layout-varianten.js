@@ -184,7 +184,14 @@
        stillschweigend geerbt — derselbe Grund, aus dem die zweite
        Aktenmappe `v1b` heisst.                                       */
     v2b: {
-      name: 'Kanzlei 2', beschreibung: 'Aktionen links, Score und Ausgaben rechts',
+      /* v1684 — „Kanzlei 2" war eine Nummer, kein Name. Marcel: „sollte
+         irgendwie einen anderen Namen bekommen." **Tower** passt in die
+         Bildsprache der App (Kerosin, Cockpit, Runway, Pre-Flight,
+         Boarding) und beschreibt genau, was dieses Layout tut: der Tower
+         hat alles im Blick und erteilt die Freigaben — hier den Score
+         und die Ausgaben, beide rechts, waehrend links gearbeitet wird.
+         „Cockpit" war nicht zu haben, das traegt das Portfolio. */
+      name: 'Tower', beschreibung: 'Aktionen links, Score und Ausgaben rechts',
       objekteAls: 'liste',
       schienen: [
         { stellung: 'links',  ton: 'dunkel', marke: true, portfolio: true,

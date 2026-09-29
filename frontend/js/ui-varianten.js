@@ -506,6 +506,28 @@
             '<button type="button" class="dp-tt-mode-btn" data-v="hell">Hell' +
               '<span class="dp-tt-mode-btn-label">Helle Flächen</span></button>' +
           '</div></div>' +
+        /* ── v1684 · Seitenaufteilung ────────────────────────────────────
+           Marcel: „ich wuerde mich freuen, wenn wir das Layout, den
+           Umschalter, einfach unter Einstellungen Darstellung und dass
+           wir das dann unter dem Aussehen auswaehlen koennen."
+
+           Steht ueber „App-Darstellung", weil es die groebere
+           Entscheidung ist: erst WO die Dinge liegen, dann WIE sie
+           aussehen. Die Liste kommt aus `DealPilotLayout.layouts` —
+           eine zweite, hier gepflegte Liste waere beim naechsten
+           Layout schon falsch. */
+        (function () {
+          var L = window.DealPilotLayout;
+          if (!L || !L.layouts) return '';
+          var jetzt = (typeof L.aktuell === 'function') ? (L.aktuell() || '') : '';
+          var liste = [{ key: '', name: 'Heute', sub: 'Unveränderte Ansicht' }];
+          Object.keys(L.layouts).forEach(function (k) {
+            liste.push({ key: k, name: L.layouts[k].name, sub: L.layouts[k].beschreibung || '' });
+          });
+          return '<div class="dpuv-g"><h3>Seitenaufteilung</h3>' +
+            '<p class="dpuv-hint">Wo Menü, Aktionen, Score und Ausgaben liegen.</p>' +
+            segHtml('dpuv-layout', liste, jetzt, 2) + '</div>';
+        })() +
         '<div class="dpuv-g"><h3>App-Darstellung</h3>' +
           '<p class="dpuv-hint">Aufbau, Dichte und Typografie der gesamten Oberfläche.</p>' +
           segHtml('dpuv-theme', THEMES, get('ui_theme', THEMES)) + '</div>' +
@@ -681,6 +703,29 @@
       });
       modusMarkieren();
     })();
+
+    /* ── v1684 · Seitenaufteilung ────────────────────────────────────
+       NICHT ueber `segBinden`: das schriebe den Wert in die
+       ui-varianten-Ablage und `DealPilotLayout` fuehrt seinen Merker
+       selbst. Zwei Speicherorte fuer denselben Wert waeren genau die
+       zweite Wahrheit, vor der der Backlog warnt — und beim naechsten
+       Neuladen gewaenne der falsche.
+
+       `setze('')` raeumt bereits alles ab (Attribute, Merker, Schienen,
+       Kartenvariante) und ist damit der richtige Weg zurueck zu
+       „Heute". */
+    var layoutSeg = document.getElementById('dpuv-layout');
+    if (layoutSeg) layoutSeg.addEventListener('click', function (ev) {
+      var b = ev.target.closest ? ev.target.closest('.dpuv-sgb') : null;
+      if (!b) return;
+      layoutSeg.querySelectorAll('.dpuv-sgb').forEach(function (x) { x.classList.remove('on'); });
+      b.classList.add('on');
+      try {
+        if (window.DealPilotLayout && typeof window.DealPilotLayout.setze === 'function') {
+          window.DealPilotLayout.setze(b.getAttribute('data-v') || '');
+        }
+      } catch (e) {}
+    });
 
     segBinden('dpuv-theme',   'ui_theme',   THEMES, modusMarkieren);
     segBinden('dpuv-cards',   'ui_cards',   CARDS);
