@@ -250,7 +250,7 @@ html[data-dp-layout="v4"] .app-wrap{
    > Umstellen von v2 auf Schublade nicht mitgedacht. Eine Spurbreite
    > gehört zur Frage „wer steht im Gitter" - nicht zur Frage „wie
    > breit ist die Spalte". */
-html[data-dp-layout="v2"] .app-wrap{ grid-template-columns:1fr !important; }
+html[data-dp-layout^="v2"] .app-wrap{ grid-template-columns:1fr !important; }
 
 /* v1653b: an den ZUSTAND gehängt, nicht an eine Layout-Liste.
    `data-dpl-portfolio` setzt `setze()` bei jedem Layout, das die
@@ -340,7 +340,7 @@ html[data-dp-layout^="v1"] .app-wrap{ padding-left:var(--dpl-schiene-b) !importa
    trug. Nach der Umstellung auf `data-ton` traf die Regel die DUNKLE
    Schiene, also die linke - und versteckte genau die Marke, die dort
    stehen soll. */
-html[data-dp-layout="v2"] .dpl-schiene[data-stellung="rechts"] .dpl-marke{ display:none; }
+html[data-dp-layout^="v2"] .dpl-schiene[data-stellung="rechts"] .dpl-marke{ display:none; }
 
 /* ── v3 · WERKBANK ───────────────────────────────────────────────────
    Keine Seitenspalte. Die Aktionsleiste kommt auf den Hauptbildschirm,
@@ -1197,7 +1197,7 @@ html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] #sb-user *{
 }
 /* Die Objektspalte der Kanzlei wird mit dunkel - sonst stehen zwei
    verschiedene Grauwerte nebeneinander. */
-html[data-dp-layout="v2"] #sidebar{
+html[data-dp-layout^="v2"] #sidebar{
   background:#0E0D0B !important; border-right:1px solid #26231E !important;
 }
 
@@ -1576,7 +1576,7 @@ html[data-dp-layout] .dpl-schiene[data-ton="hell"] .sb-actions-accordion-inner{
 /* Die Aktionen stehen in der Kanzlei OFFEN da - sie sind der Zweck
    dieser Spalte. Ein Aufklapper vor einer Spalte, die nur Aktionen
    enthält, verlangt einen Klick für nichts. */
-html[data-dp-layout="v2"] .dpl-schiene[data-ton="hell"] #sb-actions-trigger-btn{
+html[data-dp-layout^="v2"] .dpl-schiene[data-ton="hell"] #sb-actions-trigger-btn{
   display:none !important;
 }
 
@@ -1585,14 +1585,14 @@ html[data-dp-layout="v2"] .dpl-schiene[data-ton="hell"] #sb-actions-trigger-btn{
    am `.app-wrap`; ohne das rechte läge die Kontextschiene über dem
    Inhalt - derselbe Fehler, den ich heute schon zweimal bei
    Werkzeugfenstern gemessen habe. */
-html[data-dp-layout="v2"] .app-wrap{
+html[data-dp-layout^="v2"] .app-wrap{
   padding-left:208px !important;
   padding-right:240px !important;
 }
-html[data-dp-layout="v2"] .dpl-schiene[data-stellung="rechts"]{
+html[data-dp-layout^="v2"] .dpl-schiene[data-stellung="rechts"]{
   width:240px !important;
 }
-html[data-dp-layout="v2"] header.hdr{
+html[data-dp-layout^="v2"] header.hdr{
   margin-right:0 !important;
 }
 
@@ -1600,8 +1600,8 @@ html[data-dp-layout="v2"] header.hdr{
    verschwindet NICHT - die Aktionen wandern zurück in den Fluss unter
    den Inhalt, sonst wären zwölf Funktionen auf dem Tablet weg. */
 @media (max-width: 1100px){
-  html[data-dp-layout="v2"] .app-wrap{ padding-right:0 !important; }
-  html[data-dp-layout="v2"] .dpl-schiene[data-stellung="rechts"]{
+  html[data-dp-layout^="v2"] .app-wrap{ padding-right:0 !important; }
+  html[data-dp-layout^="v2"] .dpl-schiene[data-stellung="rechts"]{
     position:static !important; width:auto !important;
     border-left:0 !important; border-top:1px solid #E6E0D2 !important;
     margin-top:18px !important;
@@ -2958,11 +2958,11 @@ html[data-dp-layout^="v1"]:not([data-dpl-seiten]) .app-wrap{
 html[data-dp-layout^="v1"][data-dpl-seiten="getauscht"] .app-wrap{
   padding-right:var(--dpl-schiene-b) !important;
 }
-html[data-dp-layout="v2"]:not([data-dpl-seiten]) .app-wrap{
+html[data-dp-layout^="v2"]:not([data-dpl-seiten]) .app-wrap{
   padding-left:var(--dpl-schiene-b) !important;
   padding-right:240px !important;
 }
-html[data-dp-layout="v2"][data-dpl-seiten="getauscht"] .app-wrap{
+html[data-dp-layout^="v2"][data-dpl-seiten="getauscht"] .app-wrap{
   padding-left:240px !important;
   padding-right:var(--dpl-schiene-b) !important;
 }
@@ -3683,9 +3683,9 @@ html[data-dp-layout] body header.hdr #hdr-badges .sc-main .sc-v *{
    dieselben vier Selektoren, nur schmal. */
 @media (max-width:900px){
   html[data-dp-layout^="v1"]:not([data-dpl-seiten]) .app-wrap,
-  html[data-dp-layout="v2"]:not([data-dpl-seiten]) .app-wrap,
+  html[data-dp-layout^="v2"]:not([data-dpl-seiten]) .app-wrap,
   html[data-dp-layout^="v1"][data-dpl-seiten="getauscht"] .app-wrap,
-  html[data-dp-layout="v2"][data-dpl-seiten="getauscht"] .app-wrap{
+  html[data-dp-layout^="v2"][data-dpl-seiten="getauscht"] .app-wrap{
     padding-left:0 !important;
     padding-right:0 !important;
     grid-template-columns:1fr !important;
@@ -4525,7 +4525,7 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score{
    Die 22 px gelten NUR für die Kanzlei: in der Aktenmappe liegen
    Aktionen und Score zusammen bei 967 von 988 px, dort wäre jeder
    zusätzliche Abstand eine fehlende Menüzeile. */
-html[data-dp-layout="v2"] .dpl-schiene .dpl-teil-score{
+html[data-dp-layout^="v2"] .dpl-schiene .dpl-teil-score{
   margin-top:22px !important;
 }
 
@@ -4585,7 +4585,7 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen .sb-act-item{
    > Ein `margin-top` beschreibt „darunter"; in einer Zeile gibt es
    > kein Darunter. */
 @media (max-width: 900px){
-  html[data-dp-layout="v2"] .dpl-schiene .dpl-teil-score,
+  html[data-dp-layout^="v2"] .dpl-schiene .dpl-teil-score,
   html[data-dp-layout] .dpl-schiene .dpl-teil-score{
     margin-top:0 !important;
   }
@@ -4716,3 +4716,28 @@ html[data-dp-layout="v2b"] .dpl-schiene[data-stellung="rechts"] .dpl-teil-score{
    aufhoeren und die Ausgaben anfangen. */
 html[data-dp-layout="v2b"] .dpl-ausgaben-titel{ display:none !important; }
 html[data-dp-layout="v2b"] .dpl-ausgaben-kopf{ padding-top:0 !important; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   v1680c — WARUM ALLE v2-REGELN JETZT `^="v2"` HEISSEN
+   -------------------------------------------------------------------
+   Auf 390 px lagen in Kanzlei 2 BEIDE Schienen bei y=0 uebereinander,
+   je 388 px breit — die rechte als Deckel ueber der linken und ueber
+   der App. Gemessen im gleich-Origin-iframe:
+
+     v2   links y=0 h=222 · rechts y=840 h=294   (rechte liegt unten)
+     v2b  links y=0 h=89  · rechts y=0   h=359   (rechte liegt DRUEBER)
+
+   Der Grund war keine fehlende Regel fuer das Handy, sondern eine
+   Regel, die nur fuer EIN Layout galt: unter 1100 px setzt
+   `[data-dp-layout="v2"] .dpl-schiene[data-stellung="rechts"]` die
+   Schiene auf `position:static`, damit sie in den Fluss wandert
+   statt zu schweben. Kanzlei 2 war davon nicht erfasst.
+
+   Alle 15 v2-Regeln heissen deshalb jetzt `^="v2"` und gelten fuer
+   beide Kanzlei-Fassungen — dieselbe Loesung, mit der `v1` und `v1b`
+   schon zusammengefasst sind. Ein Attribut-Praefix hat dieselbe
+   Spezifitaet wie die Gleichheit, es verschiebt in der Kaskade nichts.
+
+   Die Geometrie stimmt fuer beide: links eine Schiene, rechts eine
+   Schiene, nur der INHALT ist getauscht.
+   ═══════════════════════════════════════════════════════════════════ */
