@@ -24185,3 +24185,86 @@ mehr. Gemessen an den geladenen Pfaden: `workflow.js?v=v1255`, waehrend
 **Gold-Audit RC=0**, Basislinie jetzt 438.
 
 **Commits.** `9fd6627` · `f8e6a56` · `4a5b435` · `e76a0c0`
+
+---
+
+## 29.09.2026 (28) — v1709: der Aktenreiter steht
+
+Marcel hat aus den zehn Entwuerfen von v1707 gewaehlt: **„setz die
+aktenreiter um"** (Entwurf 02).
+
+### Umgesetzt, ohne einen einzigen neuen Knoten
+
+Gemessen an der **echten** Karte, nicht aus der Demo uebernommen:
+
+| Teil | vorher | Rolle im Reiter |
+|---|---|---|
+| `.sbc-seq` | „2026-999" 45x14 | **die Lasche** |
+| `.sbc-top` | 166x48 | **das Blatt** |
+| `.sbc-address` | 166x15 | Titel im Blatt |
+| `.sbc-kp` | 48x12 | darunter |
+| `.sbc-score-overlay` | 26x31 | Ring rechts im Blatt |
+
+> Ein Entwurf, der neue Knoten braucht, muss von JS gebaut werden und
+> geht bei jedem Neurendern der Liste verloren. Einer, der die
+> vorhandenen umstellt, ueberlebt es.
+
+Die Lasche IST die Objektnummer, die ohnehin dastand — sie wurde nach
+oben gesetzt und bekam ihren eigenen Grund. Das Blatt traegt
+`border-radius: 0 5px 5px 5px`, damit die Lasche sitzt, als gehoere sie
+dazu.
+
+### Zwei Dinge, die die Demo nicht wusste
+
+**1 · Die Aktionsknoepfe mussten mit.** v1705 hatte sie auf `top:50%`
+der KARTE gelegt. Mit der Lasche ist die Kartenmitte nicht mehr die
+Blattmitte — sie saessen 6–7 px zu hoch und ragten in die Lasche.
+
+> Wer die Hoehe einer Flaeche aendert, verschiebt alles, was sich auf
+> ihre Mitte bezieht.
+
+**2 · Ein Kind, das in keinem Entwurf vorkam.** Gemessen nach dem ersten
+Anlauf: die Karte blieb **81 px statt 57**, der Score-Ring wurde 65 px
+hoch. Grund:
+
+```
+.sbc-won-ribbon   214 x 21   display:block   position:static
+```
+
+Das „Zuschlag erhalten"-Band steht **im Fluss** und schob das Blatt um
+21 px nach unten. Alles, was sich auf die Kartenhoehe bezog, rechnete
+danach falsch.
+
+> **Eine Demo zeigt den Fall, den sie zeigt.** Die echte Karte hat
+> Zustaende, die in keinem Entwurf vorkamen — Zuschlag erhalten,
+> Investor-Score berechnet. Wer nur den Entwurf umsetzt, baut fuer eine
+> Karte, die es so nicht gibt.
+
+Beide Baender wurden zu **Laschen rechts**, gegenueber der Objektnummer.
+Das passt zur Aktenmetapher und nimmt sie aus dem Fluss. Sind beide da,
+rueckt der Investor-Reiter per `:has()` nach links. **Gruen bleibt hart**
+— CLAUDE.md: Statusfarben werden nie tokenisiert, ein Zuschlag ist in
+jeder Marke gruen.
+
+### Nachweis (frischer Tab, Layout Kanzlei)
+
+```
+Karte              216 x 60   (vorher 81)
+sbc-investor-ribbon 64 x 14   @y1
+sbc-won-ribbon      40 x 14   @y1
+sbc-top (Blatt)    214 x 44   @y14
+sbc-score-overlay   26 x 44   @y14   (vorher 65)
+sbc-actions         61 x 44   @y14
+```
+
+Lasche gold `rgb(201,168,76)`, Radius `3px 3px 0 0`; Blatt
+`rgb(21,20,15)`, Radius `0 5px 5px`. Im Bild: goldene Nummernlasche
+links, INVESTOR-Lasche rechts, Adresse und Preis im Blatt.
+
+**Ohne Objektnummer keine leere Lasche:** `:empty` blendet sie aus, und
+das Blatt bekommt dann rundum denselben Radius — sonst stuende ein
+goldener Krumen ueber einer frisch angelegten Karte.
+
+**Gold-Audit RC=0**, Basislinie 438.
+
+**Commits.** `e44b865` · `9429de8`
