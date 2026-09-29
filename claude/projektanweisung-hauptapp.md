@@ -23589,3 +23589,104 @@ ein Angebot, keine Ansage.
 
 **Rest:** Marktpreis-Abruf aus dem Co-Piloten (1 Abruf, vorher ansagen)
 und der Portfolio-Pilot im Cockpit stehen noch offen.
+
+---
+
+## 29.09.2026 (23) — v1703: Marktpreis aus dem Co-Piloten
+
+Marcel: „es waere vielleicht auch cool, wenn wir aus dem Copiloten auch
+eine neue Anfrage machen koennten an unsere Schnittstelle, wie denn so
+die gaengigen Marktpreise oder Marktpreisindikationen sind. Kann man ja
+vorher sagen, dass das einen Abruf kosten wuerde."
+
+**Kein zweiter Abrufweg.** `avmFetch()` in `object-actions.js` ist der
+Weg — mit Pflichtfeldpruefung, den Fehlertexten des Servers, Persistenz
+und Guthaben-Abzug. Der Co-Pilot bekommt nur eine Tuer dorthin.
+
+> Ein zweiter Abrufweg waere ein zweiter Ort, an dem die Einheit „Abruf"
+> spaeter falsch stehen kann. Genau daran ist v1664 aufgefallen: „zwei
+> Stellen, die dasselbe ankuendigen, und nur eine wurde umgestellt."
+
+**Gebaut:**
+
+- Das Bestaetigungs-Modal aus v754 wurde herausgeloest:
+  `abrufFrage({posten, titel, frage, knopf, merker, los, ab})`.
+  `_v754ConfirmRun()` ruft es genauso — eine Quelle, zwei Aufrufer.
+- **`abrufFrage` hat jetzt einen Nein-Rueckweg (`ab`).** Ein Aufrufer,
+  der auf die Antwort wartet, haengt sonst ewig an einem Versprechen,
+  das sich nie aufloest.
+  > **Eine Frage ohne Nein-Rueckweg ist keine Frage.**
+- `marktpreisFuerCopilot()` nimmt den ersten Anbieter mit vollstaendigen
+  Pflichtfeldern. Fehlt ueberall etwas, wird **nicht** abgerufen und
+  **nichts** belastet — die fehlenden Felder kommen als Text zurueck.
+- Eigener Merker `dp_skip_abruf_copilot`: wer im Tab Objekt „nicht mehr
+  fragen" gesetzt hat, hat das fuer die Quellenleiste getan.
+  **Eine Zustimmung wandert nicht mit.**
+- `copilot.js`: Knopf **„Marktpreis · 1 Abruf"** in der Kopfzeile. Die
+  Kostenansage steht **im Knopf**, nicht erst im Modal.
+- Das Ergebnis liegt ab dann in **jeder** Folgefrage
+  (`context.marktpreis_indikation`). Es nur einmal in den Chat zu
+  schreiben hiesse, dass das Modell es beim naechsten „und was heisst
+  das fuer den Kaufpreis?" nicht mehr hat — obwohl dafuer bezahlt wurde.
+- Prompt-Regel im Backend: die Indikation ist **vorrangiger Anker**, nie
+  „Verkehrswert", Spanne mitnennen, Quelle heisst **„unabhaengiger
+  Bewertungspartner"** (Anbieter-Neutralitaet). Ohne das Feld wird auf
+  den Knopf verwiesen statt eine Zahl geraten.
+
+### Zwei eigene Fehler, beide im echten Bedienweg gefunden
+
+**v1703b — `comingSoon` gibt es nicht, die Funktion heisst
+`provComingSoon`** (`object-actions.js:47`). Ich hatte den Namen
+geraten. Regel 1 aus CLAUDE.md, an mir selbst: Struktur wird nie
+angenommen, immer ausgelesen. Der Knopf meldete „Der Marktpreis-Abruf
+ist fehlgeschlagen", der echte Grund stand erst im geworfenen Fehler.
+
+**v1703c — 693 Euro Monatsmiete standen als 693 €/m² da.** Gemessen an
+der Westerfeldstr. 140. `marktmieteCold` ist die **Monatsmiete**; der
+Quadratmeterpreis hat eigene Felder (`marktmieteEurSqm`, `eurPerSqm`) —
+so liest es auch `avm-section.js:87/108`.
+
+> **Eine Zahl, die dreihundertfach daneben liegt und trotzdem plausibel
+> aussieht.** Die Einheiten stehen im Datensatz; sie zu raten ist
+> derselbe Fehler wie eine Struktur zu raten. Die Feldnamen im Kontext
+> tragen die Einheit jetzt **im Namen** (`marktwert_eur`,
+> `marktmiete_kalt_eur_monat`, `marktmiete_eur_qm`), damit das Modell
+> sie nicht ebenfalls raten muss.
+
+### Nachweis (echter Bedienweg, Westerfeldstr. 140)
+
+Objekt ueber die Karte geladen, Reiter „Pilot-Analyse", Knopf
+`#dp-cp-mp` — vorher `elementFromPoint` geprueft, er ist wirklich oben:
+
+```
+Marktwert-Indikation: 190.053 €  (Spanne 172.948 € – 212.859 €) · 487,00 €/m²
+Marktmiete (kalt): 693 €/Monat   (Spanne 631 € – 776 €)         · 1,78 €/m²
+```
+
+693 / 390 m² = 1,78 — rechnerisch sauber. **Die Zahlen selbst sind
+Demo-Werte:** Staging steht auf `mode: stub`, dort kostet der Abruf
+nichts und das Modal entfaellt (wie im Tab Objekt seit v1259).
+
+**Folgefrage im Chat** („Wie ordnest du den Kaufpreis gegen die
+abgerufene Indikation ein?"):
+
+> „Der Kaufpreis von 545.000 € liegt deutlich ueber der
+> Marktpreis-Indikation von 190.053 € (Spanne 172.948 € – 212.859 €)."
+
+Die Zahl ist angekommen, wird „Indikation" genannt und traegt ihre
+Spanne. Kein Anbietername.
+
+**Das Modal einzeln geprueft** (`abrufFrage` direkt gerufen, weil es im
+Demo-Modus nicht erscheint): Kopf „BOARDING PASS · DEALPILOT",
+Ueberschrift „Marktpreis abrufen", Kostenkasten „1 Marktwert-Abruf",
+Runway-Verlauf. **Abbrechen gemessen:** Modal weg, `ab` feuert, `los`
+nicht, und der Merker wird **nicht** gesetzt.
+
+**Offen als Staging-Abnahmepunkt:** der Live-Modus. Auf `stub` laesst
+sich nicht pruefen, ob im Tab Objekt nach dem Umbau von
+`_v754ConfirmRun` wirklich abgebucht wird — der Pfad ist dort
+`costing.map(...)` → `abrufFrage`, und `abrufFrage` ist bewiesen.
+
+**Gold-Audit RC=0**, genau auf der Basislinie.
+
+**Commits.** `de9cdb4` · `727563c` · `520e4c5`
