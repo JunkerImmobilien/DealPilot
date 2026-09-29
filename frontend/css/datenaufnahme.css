@@ -1529,3 +1529,27 @@ html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dpk-copil
 html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dpk-copilot .dp-pf-lbl{
   font-weight:600 !important;
 }
+
+/* ── v1672b · `:first-of-type` ZÄHLT DEN TYP, NICHT DIE KLASSE ───────
+   Gemessen nach v1671: der Abstand vor „Marktbewertung" war weiter
+   **1 px**. Meine Regel lautete
+
+     > .dp-pf-seg:first-of-type{ padding-left:18px }
+
+   und traf nichts. `:first-of-type` fragt nach dem ersten Element
+   seines TYPS unter den Geschwistern — und das erste `div` in der
+   Leiste ist `.dp-pf-lead`, die Kopfzeile. Die Klasse im Selektor
+   ändert daran nichts; sie filtert nur, ob der Treffer am Ende noch
+   passt.
+
+   > `:first-of-type` ist keine Aussage über die Klasse, die davor
+   > steht. Wer `.klasse:first-of-type` schreibt, meint fast immer
+   > „das erste mit dieser Klasse" — und bekommt „das erste seines
+   > Typs, falls es zufällig diese Klasse hat".
+
+   Der genaue Anker ist der Nachbar: die Perforation steht im DOM
+   direkt vor dem ersten Segment (sie ist nur ausgeblendet, nicht
+   entfernt). */
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-perf + .dp-pf-seg{
+  padding-left:18px !important;
+}
