@@ -1503,3 +1503,29 @@ html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-lau
   font-size:13px !important;
   border-radius:2px !important;
 }
+
+/* ── v1672 · DIE CO-PILOT-KACHEL ─────────────────────────────────────
+   Sie sieht aus wie die anderen Kacheln, ist aber keine Quelle: kein
+   Ankreuzfeld, kein Lämpchen, keine Beteiligung an „n von 4 gewählt".
+   Sie startet etwas, statt etwas beizusteuern.
+
+   > Ein Knopf, der wie ein Schalter aussieht, wird für einen gehalten.
+   > Der Unterschied muss sichtbar sein — hier über die goldene Kante,
+   > die sonst nur der Abruf trägt. */
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dpk-copilot{
+  border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, #E6E1D6) !important;
+  background:#FFFDF8 !important;
+  cursor:pointer;
+}
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dpk-copilot:hover{
+  border-color:var(--wl-c9a84c, #C9A84C) !important;
+  background:#FFFBF0 !important;
+}
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dpk-copilot .dp-pf-ic,
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dpk-copilot .dp-pf-ic *{
+  color:var(--wl-c9a84c, #C9A84C) !important;
+  stroke:var(--wl-c9a84c, #C9A84C) !important;
+}
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dpk-copilot .dp-pf-lbl{
+  font-weight:600 !important;
+}

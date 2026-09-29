@@ -499,3 +499,122 @@
     stile: STILE
   };
 })();
+
+/* ═══════════════════════════════════════════════════════════════════
+   v1672 · DIE CO-PILOT-KACHEL
+
+   Marcel: „wenn wir unter Sprache auswählen und abrufen, dann haben
+   wir zwei Stück — einmal ‚Ich erzähle frei' und ‚Frag mich durch'.
+   Ich würde mir wünschen, dass wir bei der Datenaufnahme vor Exposé
+   und Marktbericht einfach einen neuen Button hinsetzen, wo wir
+   dieses ‚Frag mich durch' hinpacken. Da sollten wir uns einen coolen
+   Namen überlegen."
+
+   ── DER NAME ──────────────────────────────────────────────────────
+   **Co-Pilot.** Er steht schon in CLAUDE.md unter „Bildsprache
+   Luftfahrt" und beschreibt genau die Rolle: jemand sitzt daneben,
+   kennt die Checkliste und fragt sie ab. „Geführtes Anlegen"
+   beschreibt einen Vorgang, „Co-Pilot" beschreibt ein Gegenüber — und
+   genau das ist der Unterschied zu „Ich erzähle frei".
+
+   > Ein Name aus der eigenen Bildsprache muss nicht erklärt werden.
+   > Er erbt, was die anderen Begriffe schon aufgebaut haben.
+
+   ── WIE ER FUNKTIONIERT ───────────────────────────────────────────
+   Die Kachel ruft KEINE eigene Logik. Sie geht denselben Weg, den ein
+   Nutzer heute von Hand geht: Sprachquelle anhaken, Abruf auslösen,
+   im Überblendfenster „Frag mich durch" wählen.
+
+   > Ein zweiter Weg zu derselben Sache läuft irgendwann auseinander.
+   > Eine Abkürzung über die vorhandenen Bedienelemente nicht.
+
+   Sie ist deshalb auch KEINE Quelle: kein Ankreuzfeld, keine
+   Beteiligung an der Zählung „n von 4 gewählt". Sie startet etwas. */
+(function () {
+  'use strict';
+
+  var KACHEL_ID = 'dpk-copilot';
+
+  function leiste() {
+    return document.getElementById('oab-bar') || document.getElementById('qc7-sources');
+  }
+
+  /* Die Gruppe „Daten übernehmen aus" ist die ZWEITE; davor gehört sie
+     nicht, denn der Co-Pilot übernimmt nichts, er fragt. Marcel wollte
+     sie „vor Exposé und Marktbericht" — also an den Anfang genau
+     dieser Reihe. */
+  function reihe(bar) {
+    var segs = bar.querySelectorAll('.dp-pf-seg');
+    var s = segs.length > 1 ? segs[1] : segs[0];
+    return s ? s.querySelector('.dp-pf-row') : null;
+  }
+
+  function starten() {
+    var bar = leiste();
+    if (!bar) return;
+    /* 1 — die Sprachquelle anhaken, falls sie es nicht ist */
+    var spr = null;
+    [].forEach.call(bar.querySelectorAll('.dp-pf-tile'), function (t) {
+      if (/Sprach/i.test(t.textContent)) spr = t;
+    });
+    if (spr) {
+      var i = spr.querySelector('input');
+      if (i && !i.checked) {
+        i.checked = true;
+        i.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+    /* 2 — den vorhandenen Abruf auslösen */
+    var knopf = bar.querySelector('.dp-pf-launch');
+    if (!knopf) return;
+    knopf.click();
+
+    /* 3 — im Ueberblendfenster den gefuehrten Modus waehlen. Es kommt
+       nicht sofort; deshalb wird kurz gewartet statt geraten. */
+    var versuche = 0;
+    var warten = setInterval(function () {
+      versuche++;
+      var f = document.querySelector('.vi-sk-btn.vi-sk-fuehr');
+      if (f) { clearInterval(warten); f.click(); return; }
+      if (versuche > 40) clearInterval(warten);   /* 40 x 120 ms = knapp 5 s */
+    }, 120);
+  }
+
+  function setzen() {
+    var bar = leiste();
+    if (!bar) return;
+    /* Nur in der Kartei - in der Bordkarte ist kein Platz dafuer. */
+    var an = document.documentElement.getAttribute('data-dp-kartenstil') === 'kartei';
+    var da = bar.querySelector('#' + KACHEL_ID);
+    if (!an) { if (da) da.remove(); return; }
+    if (da) return;
+
+    var r = reihe(bar);
+    if (!r) return;
+
+    var k = document.createElement('button');
+    k.type = 'button';
+    k.id = KACHEL_ID;
+    k.className = 'dp-pf-tile tool dpk-copilot';
+    k.title = 'Co-Pilot — er fragt dich durch, du antwortest';
+    k.innerHTML =
+      '<span class="dp-pf-ic" aria-hidden="true">'
+      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" '
+      + 'stroke-linecap="round" stroke-linejoin="round">'
+      + '<path d="M12 3a5 5 0 0 0-5 5c0 1.8 1 2.9 1.6 3.8.4.6.4 1.2.4 1.7h6c0-.5 0-1.1.4-1.7C16 10.9 17 9.8 17 8a5 5 0 0 0-5-5z"/>'
+      + '<path d="M10 17h4"/><path d="M10.5 20h3"/></svg></span>'
+      + '<span class="dp-pf-lbl">Co-Pilot</span>';
+    k.addEventListener('click', function (e) { e.preventDefault(); starten(); });
+    r.insertBefore(k, r.firstChild);
+  }
+
+  function beobachten() {
+    if (!window.MutationObserver) return;
+    var w = new MutationObserver(function () { setzen(); });
+    w.observe(document.body, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { setzen(); beobachten(); });
+  } else { setzen(); beobachten(); }
+})();
