@@ -1574,3 +1574,43 @@ html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-p
 html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-perf + .dp-pf-seg{
   margin-left:18px !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   v1680 — DER SCHATTEN, DER EIN SCROLLEN BEHAUPTET
+   -------------------------------------------------------------------
+   Marcel: „unter Quick Boarding und der Ansicht Heute die Pre-Flight-
+   Karte pruefen, die sieht nicht aus wie vorher." Und vorher schon
+   einmal: „hinten am Abruf-Button ist irgend so eine goldene Kante."
+
+   GEMESSEN am Element, nicht an der Regel:
+
+     .dp-pf-scroll::after   34 x 126,6 px, rechts aussen
+                            linear-gradient(90deg, transparent,
+                                            rgba(0,0,0,.22))
+     .dp-pf-scroll          overflow-x: VISIBLE
+                            scrollWidth 1280 === clientWidth 1280
+
+   Der Schatten sagt „hier geht es rechts weiter". **Es geht nirgends
+   weiter** — die Leiste bricht seit dem Kartei-Umbau um, statt zu
+   scrollen. Uebrig bleibt ein dunkler Balken ueber dem Abrufen-Knopf,
+   der die Karte abzuschneiden scheint.
+
+   Er steht in `@media (min-width: 769px)` (style.css:36586) und trifft
+   damit genau den Schreibtisch, an dem Marcel ihn sieht. Auf dem Handy
+   scrollt die Leiste wirklich — dort bleibt er.
+
+   Die Bedingung ist nicht die Bildschirmbreite, sondern ob ueberhaupt
+   gescrollt wird. Diese Regel haengt deshalb an denselben Ankern, die
+   `overflow:visible` setzen: wo nichts ueberlaeuft, gibt es nichts
+   anzudeuten. `@media` erhoeht keine Spezifitaet — die Ankerkette muss
+   die Arbeit tun, nicht die Umgebung.
+   ═══════════════════════════════════════════════════════════════════ */
+body.dp-neue-karte .dp-pf-scroll:has(.dp-pfbar)::after,
+body.dp-neue-karte .dp-pf-scroll::after,
+html[data-dp-kartenstil="kartei"] .dp-pf-scroll:has(.dp-pfbar)::after,
+html[data-dp-kartenstil="kartei"] .dp-pf-scroll::after{
+  content:none !important;
+  display:none !important;
+  background:none !important;
+  width:0 !important;
+}
