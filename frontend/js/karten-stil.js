@@ -328,6 +328,27 @@
       var hauptNeu = document.body && document.body.classList.contains('dp-neue-karte');
       if (hauptNeu) h.removeAttribute('data-dp-heute');
       else h.setAttribute('data-dp-heute', '1');
+
+      /* ── v1692 · DIE KLASSE SELBST, NICHT EINZELNE REGELN ──────────
+         v1685 hat `data-dp-heute` gespiegelt und damit drei Regeln
+         zurueckgenommen (Streifen, Kopfzeile, Trenner). **Das reichte
+         nicht.** Gemessen bei „Heute":
+
+           Tab Objekt      Leiste GOLDEN, 78 px hoch, mit Barcode
+           QuickCheck      Leiste WEISS,  55 px hoch
+
+         An `body.dp-neue-karte` haengen im QC-Dokument nicht drei
+         Regeln, sondern die ganze Kartei-Optik. Sie einzeln
+         zurueckzunehmen hiesse, jede kuenftige dazu auch zu finden —
+         und ich habe sie dreimal hintereinander nicht alle gefunden.
+
+         Deshalb faellt die KLASSE, sobald die Haupt-App auf „Heute"
+         steht. Der Vermerk an `quickcheck-app.html:3290` sagt „dieses
+         Dokument ist IMMER hell" — das bleibt wahr: die alte
+         Bordkarten-Fassung ist ebenfalls hell, nur golden statt weiss.
+         Die Klasse traegt nicht die Helligkeit, sondern den UMBAU.   */
+      var fb = doc.body;
+      if (fb) fb.classList.toggle('dp-neue-karte', !!hauptNeu);
     } catch (e) { /* ohne Spiegel bleibt es beim Stand des Aufbaus */ }
 
     if (!f._dpkLoad) {
