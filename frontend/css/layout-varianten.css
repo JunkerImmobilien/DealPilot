@@ -5766,3 +5766,66 @@ html[data-dp-layout] .dpl-schiene .sb-card:has(.sbc-seq:empty) .sbc-top,
 html[data-dp-layout] .dpl-schiene .sb-card:not(:has(.sbc-seq)) .sbc-top{
   border-radius:5px !important;
 }
+
+/* =====================================================================
+   v1709b - DIE BAENDER WERDEN LASCHEN
+   =====================================================================
+   Gemessen nach v1709: die Karte blieb 81 px statt 57, und der
+   Score-Ring wurde 65 px hoch. Grund war ein Kind, das die Demo nicht
+   kannte:
+
+     .sbc-won-ribbon   214 x 21   display:block  position:static
+
+   Das "Zuschlag erhalten"-Band steht IM FLUSS und schiebt das Blatt um
+   21 px nach unten. Alles, was sich auf die Kartenhoehe bezog (Ring,
+   Aktionen), rechnete danach falsch.
+
+   > Eine Demo zeigt den Fall, den sie zeigt. Die echte Karte hat
+   > Zustaende, die in keinem Entwurf vorkamen - Zuschlag erhalten,
+   > Investor-Score berechnet. Wer nur den Entwurf umsetzt, baut fuer
+   > eine Karte, die es so nicht gibt.
+
+   Beide Baender werden zu Laschen RECHTS - gegenueber der Objektnummer.
+   Das passt zur Aktenmetapher (zwei Reiter an einer Mappe) und nimmt
+   sie aus dem Fluss, womit die Hoehenrechnung wieder stimmt.
+
+   Gruen bleibt hart: CLAUDE.md sagt, Statusfarben werden nie
+   tokenisiert - ein Zuschlag ist in jeder Marke gruen.
+   ===================================================================== */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-won-ribbon,
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-investor-ribbon{
+  position:absolute !important;
+  top:0 !important; bottom:auto !important; left:auto !important;
+  z-index:3 !important;
+  width:auto !important; min-width:0 !important; max-width:none !important;
+  padding:2px 7px !important; margin:0 !important;
+  font:700 7.5px/1.35 var(--dpl-mono, 'JetBrains Mono', monospace) !important;
+  letter-spacing:.1em !important;
+  border-radius:3px 3px 0 0 !important;
+  white-space:nowrap !important;
+  display:inline-flex !important; align-items:center !important; gap:3px !important;
+  border:0 !important; box-shadow:none !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-won-ribbon{
+  right:0 !important;
+  background:#3FA56C !important; color:#06170D !important;
+}
+/* Der Investor-Reiter rueckt nach links, wenn beide da sind. `:has()`
+   fragt die Karte, nicht den Zufall der Reihenfolge. */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-investor-ribbon{
+  right:0 !important;
+  background:var(--wl-e8cc7a, #E8CC7A) !important; color:#0E0D0B !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card:has(.sbc-won-ribbon) .sbc-investor-ribbon{
+  right:64px !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-won-ribbon svg,
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-investor-ribbon svg{
+  width:8px !important; height:8px !important; flex:none !important;
+}
+
+/* Die Lasche links darf nicht unter einen rechten Reiter laufen. */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
+  max-width:calc(100% - 132px) !important;
+  overflow:hidden !important; text-overflow:ellipsis !important;
+}
