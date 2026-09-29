@@ -6736,7 +6736,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
   <!-- v1641 · Der Quick-Check ist ein eigenes Dokument im iframe - die
        Gestaltung der Datenaufnahme muss hier NOCH EINMAL geladen werden.
        Zuletzt, damit sie die eingebetteten Stile ueberstimmt. -->
-  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1686">
+  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1686b">
 <!-- ── v1665g · DIE KARTEI GILT AUCH HIER — ABER NUR SIE ──────────────
      Marcel: „ImmoMetrica, Expose, Marktbericht — das sieht nicht so aus
      wie im Tab Objekt."
@@ -6842,7 +6842,10 @@ html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-sep{ display:block !i
 #qc7-sources.dp-pfbar:not(:has(.dp-pf-qr[data-hat-ziel])) .dp-pf-rz{
   margin-left:18px !important;
 }
-#qc7-sources.dp-pfbar .dp-pf-qr{ margin-left:auto !important; }
+/* v1686b: nur MIT Ziel den Platz beanspruchen - ein leerer QR
+   schob sich sonst selbst nach rechts und riss die Luecke wieder auf,
+   die v1686 gerade geschlossen hatte (gemessen: 113 px statt 18). */
+#qc7-sources.dp-pfbar .dp-pf-qr[data-hat-ziel]{ margin-left:auto !important; }
 #qc7-sources.dp-pfbar .dp-pf-qr + .dp-pf-rz{ margin-left:14px !important; }
 </style>
 

@@ -1675,7 +1675,12 @@ html[data-dp-kartenstil="kartei"] .dp-pf-scroll::after{
 :is(#oab-bar, #qc7-sources).dp-pfbar .dp-pf-qr + .dp-pf-rz{
   margin-left:14px !important;
 }
-:is(#oab-bar, #qc7-sources).dp-pfbar .dp-pf-qr{
+/* v1686b: nur MIT Ziel den Platz beanspruchen. Ein leerer QR (0 px
+   breit) schob sich sonst selbst an den rechten Rand und riss die
+   Luecke wieder auf, die v1686 gerade geschlossen hatte — gemessen
+   113 px statt der gesetzten 18. Ein Element ohne Inhalt soll keinen
+   Raum fordern. */
+:is(#oab-bar, #qc7-sources).dp-pfbar .dp-pf-qr[data-hat-ziel]{
   margin-left:auto !important;
 }
 
