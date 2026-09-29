@@ -22919,3 +22919,73 @@ auf DealPilot-Gold zurueckgesetzt.
 **Reihenfolge im Panel jetzt:** Aussehen · Datenaufnahme · Seiten ·
 Modus · App-Darstellung · Objektkarten · Kartenflaeche · Form · Schrift
 · Marke.
+
+---
+
+## Rollout-Journal 29.09.2026 (16) — Gold war der falsche Wert
+
+### 1 · Das Kopftext-Token stand auf Gold — zurueckgenommen
+
+Marcel: „oben die Hilfe und dein Kontingent auf einmal in Gold, was aber
+vorher in so einem Weisston war — so aehnlich wie die ID und die
+Strasse."
+
+Er hat recht, und **der richtige Wert stand die ganze Zeit im Code**:
+`style.css:35774` setzt fuer den dunklen Kopf
+`--dp-header-text:#f3ead0` — Creme. Genau der Ton, in dem Adresse und
+Kennung stehen.
+
+> **Mein Fehler war nicht die Stelle, sondern der Wert.** Ich habe das
+> Token auf die AKZENTfarbe gesetzt statt auf die TEXTfarbe. Gold ist
+> der Akzent — was in Gold steht, soll dadurch hervortreten. Faerbt man
+> alles gold, tritt nichts mehr hervor.
+
+Die Aufgabe war nur, `ui-varianten.css:1290` daran zu hindern, den Wert
+auf `--uv-chrome-ink` (fuer einen HELLEN Kopf gedacht) zu
+ueberschreiben. Der Akzent bleibt, wo er etwas heisst: am Kerosin-Stand.
+
+### 2 · Die Reiterleiste sah in jedem Layout anders aus
+
+Marcel: „erst Creme, danach Schwarz, dann beim Tower alles in Gold."
+Gemessen — drei Layouts, drei Zustaende:
+
+| | Grund | aktiv | normal |
+|---|---|---|---|
+| Aktenmappe | dunkel | 4,80 | 5,87 |
+| Kanzlei | dunkel | **16,95** | **9,77** |
+| Tower | **HELL** | **3,19** | **2,61** |
+
+Der Tower trug eine helle Flaeche mit Schriftfarben aus dem dunklen
+Satz — wieder eine Farbe, die zu ihrem alten Grund passt und nicht zum
+neuen. Vereinheitlicht auf die Kanzlei-Fassung, mit `^="v"` fuer alle
+Layouts. **Nachgemessen: 16,95 / 9,77 in allen dreien.**
+
+Der Akzent bleibt die UNTERSTREICHUNG, nicht die Schrift — sonst tritt
+der aktive Reiter durch zwei Mittel gleichzeitig hervor und wird dabei
+schlechter lesbar (4,80 gegen 16,95).
+
+> **Eigener Messfehler, zurueckgenommen:** Zwischendurch meldete ich
+> fuer die Aktenmappe 1,09 und wollte nachbessern. Die Zahl war falsch —
+> 1.500 ms Wartezeit statt 1.800, das Layout war noch nicht fertig. Beim
+> sauberen Lauf standen alle drei bei 16,95. Fast haette ich einen
+> Fehler behoben, den es nicht gab.
+
+### 3 · Das iframe hatte sein eigenes Markup
+
+Marcel: „bei Heute und Quick Check steht immer noch Datenaufnahme."
+
+Meine Zwei-Text-Loesung aus v1687 steckte nur in `object-actions.js` —
+der Haupt-App. **Das QuickCheck-Dokument baut seine Leiste selbst**
+(`quickcheck-app.html:3393`) und trug den neuen Text fest eingebrannt.
+Auf Prod steht an derselben Zeile `PRE-FLIGHT` und `Daten einlesen`.
+
+> **Das ist das dritte Mal in dieser Sitzung, dass eine Aenderung in der
+> Haupt-App am iframe vorbeigegangen ist.** Ein eigenes Dokument erbt
+> nichts — weder CSS noch Markup. Wer dort etwas aendert, muss beide
+> Stellen anfassen oder es ueber eine gespiegelte Marke steuern.
+
+Gemessen: `data-dp-heute="1"`, Kopfzeile **PRE-FLIGHT**.
+
+Gold-Audit **RC=0**.
+
+**Commits.** `39304d2` · `65fd3a3`
