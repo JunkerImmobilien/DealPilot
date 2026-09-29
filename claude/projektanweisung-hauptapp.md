@@ -23969,3 +23969,111 @@ Loecher).
 
 **Commits.** `87f80d3` · `a8dfff8` · `569a66f` · `c7f0697` · `8f5aa70` ·
 `9c682d9`
+
+---
+
+## 29.09.2026 (26) — v1706: Kopfleiste, Aktionen, Einstellungen, Kartei
+
+Marcels Nachricht enthielt neun Punkte. Alle abgearbeitet, alle
+nachgemessen.
+
+### 1 · Die Kopfleiste war unlesbar
+
+„wenn ich den Tower als Layout ausgewaehlt habe und oben im Header auf
+dein Kontingent klicke, dann ist die Schrift schwarz ... die Farbkombi
+genauso wie die Anzeige daneben mit dem hellen Bereich 0 von 6."
+
+**Gemessen, beide Zustaende:**
+
+| | ohne Layout | mit Layout |
+|---|---|---|
+| Panel-Ueberschrift | `rgb(201,168,76)` | **`rgb(0,0,0)`** |
+| Grund | `rgb(20,18,16)` | `rgb(20,18,16)` |
+| Kontrast | lesbar | **~1,0** |
+
+Schwarz auf Schwarz. Im Layout wurde der Kopfbereich hell gedacht und der
+Text dunkel gesetzt; das Panel darin ist dunkel geblieben und hat die
+Textfarbe geerbt.
+
+**Die Vorlage ist `.tabs-status-badge`** — gemessen, nicht geraten:
+Text `rgb(191,183,169)`, Grund transparent, Rahmen `rgb(230,225,214)`,
+Radius 7px. Uebernommen fuer Kontingent-Pille, Hilfe-Knopf und den
+Portfolio-Knopf.
+
+**Nachher:** Panel-Ueberschrift Kontrast **15,17**, die Zahl bleibt gold
+(9,95), Fussnote 5,11. Portfolio-Knopf exakt `rgb(191,183,169)` /
+`rgb(230,225,214)` — identisch mit der Vorlage. Im Bild stehen Pille und
+Vorlage nebeneinander und sehen gleich aus.
+
+**Vier Anlaeufe, und jeder hatte einen eigenen Grund:**
+
+- **v1706** — die vorhandene Regel `header.hdr:has(#hdr-badges)` greift
+  **nirgends**: `#hdr-badges` liegt gar nicht im Header
+  (`hdr.contains(badges)` ist false). Sie sieht richtig aus und trifft
+  nichts, wie der `#app`-Anker aus v1147.
+- **v1706d** — meine Regel `html[data-dp-layout] #hdr-credits-pill`
+  (1,1,0) verlor gegen `html[data-dp-layout] body header.hdr
+  #hdr-credits-pill` (1,2,2). Und die Panel-Regeln verloren gegen den
+  eigenen Stern-Selektor, weil der eine ID traegt.
+- **v1706e** — der Portfolio-Knopf haengt an
+  `.dpl-schiene[data-ton="dunkel"]`, ein Attribut mehr.
+- **v1706f** — die Rahmen: **`border:` ist eine Kurzschrift** und wird
+  im Kaskadenvergleich nicht zu `border-color` expandiert.
+  > Wer eine Farbe setzen will, setzt die Farbe. Die Kurzschrift setzt
+  > drei Dinge und verliert an jedem einzeln.
+
+> **Ein Werkzeugbefund, der Zeit gekostet hat:** `getComputedStyle`
+> meldete den Rahmen weiter als `oklab(...)` — **selbst nachdem ein
+> Inline-`!important` gesetzt war**, was unmoeglich ist. Dass
+> `border-radius: 7px` aus derselben Regel ankam, bewies, dass sie
+> greift. **Entschieden hat der Bildausschnitt, nicht die Zahl.**
+> Dasselbe Muster wie bei `getComputedStyle` im iframe.
+
+### 2 · Die Aktionsliste
+
+Zeilen von 5 auf **7 px** Polsterung plus 1 px Abstand, Ueberschriften
+von 8,5 auf **10 px** — sie waren kleiner als jede andere Schrift in der
+App. Die Gruppe **„Ausgeben" faellt weg**, aber nur dort, wo die
+Ausgaben-Box wirklich steht: die Bedingung ist
+`:has(.dpl-teil-ausgaben)`, nicht das Layout.
+
+> Eine Gruppe auszublenden, weil man ANNIMMT, dass es sie woanders gibt,
+> ist der Weg, auf dem Funktionen verschwinden.
+
+Gemessen: 4 Eintraege im DOM, **0 sichtbar**.
+
+### 3 · Einstellungen
+
+Profil-Wahl Obsidian/Hell und der obere Knopf „Darstellung oeffnen"
+entfernt. **Zuruecksetzen bleibt**, wie gewuenscht; die Layout-Wahl
+darueber auch — sie ist das, was hier wirklich entschieden wird.
+
+### 4 · Die Kartenstile
+
+**Trichter und Bordkarte sind raus**, nur `zeile` und `kartei` bleiben
+waehlbar (im Browser gegengeprueft: `stile: ["zeile","kartei"]`). Die
+CSS-Bloecke der beiden bleiben stehen — ohne Eintrag in `STILE` wird das
+Attribut nie gesetzt.
+
+> Ein Entwurf, den niemand mehr waehlen kann, richtet keinen Schaden an.
+> Ein halb entfernter richtet welchen an.
+
+**Die Kartei nachgezogen:** der QR war dort **gar nicht da** (er stand in
+derselben Ausblendliste wie Streifen und Perforation). Jetzt **92x92**
+statt 64, ohne Rahmen, Quellen-Pillen in Schwarz (`rgb(17,17,17)`).
+
+> **Eine Korrektur an mir selbst:** in v1706c stand
+> `background:transparent` am QR. Das war falsch — Marcel hat „keinen
+> Rahmen" gesagt, nicht „keinen Grund", und **ein QR ohne helle Ruhezone
+> ist nicht mehr scannbar**. Eine staerkere Regel hat es zufaellig
+> verhindert; richtig ist es erst, seit es ausdruecklich dasteht.
+> **Ein Rahmen ist Zierat. Die weisse Flaeche um einen QR ist Technik.**
+
+### Gold-Audit
+
+**RC=0 — und der Deckel ist GESUNKEN:** `js/settings.js` 26 → 25, weil
+die Fundstelle mit dem Obsidian/Hell-Block wegfiel. Basislinie
+nachgezogen, sonst bliebe Luft fuer neues Hartgold an derselben Stelle.
+
+**Commits.** `f630230` · `c68d2a0` · `20c3265` · `3663bca` · `71755ce` ·
+`7c4ec0f` · `c5ed702` · `d324301`
