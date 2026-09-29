@@ -4931,3 +4931,31 @@ html[data-dp-layout] body header.hdr .hdr-credits-pill svg :is(path,circle,rect,
   color:inherit !important;
   stroke:currentColor !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   v1688c — DAS TOKEN FUER DEN KOPFTEXT WAR NIE GESETZT
+   -------------------------------------------------------------------
+   Statt weitere Einzelregeln zu stapeln, die Wurzel. Gemessen in der
+   Kanzlei:
+
+     body                    dp-chrome-hell AKTIV  (heller Skin)
+     header.hdr  Grund       rgb(14, 13, 11)       DUNKEL
+     --dp-header-text        nicht gesetzt
+     style.css               color: var(--dp-header-text, #1a1a1a)
+
+   Der helle Skin setzt allen Kopftexten eine dunkle Farbe — er rechnet
+   mit einem hellen Kopf. Die Layouts faerben den Kopf aber dunkel. Zwei
+   Annahmen, die sich widersprechen, und der Fallback `#1a1a1a` gewinnt,
+   weil das Token niemand fuellt. Kontrast gemessen: **1,05**.
+
+   > Eine Farbe gilt immer nur zu IHREM Grund. Wer den Grund tauscht,
+   > muss die Farbe mittauschen — sonst bleibt sie richtig fuer eine
+   > Flaeche, die es nicht mehr gibt.
+
+   Das Token wird deshalb gesetzt, sobald ein Layout den Kopf uebernimmt.
+   Das trifft JEDEN Text im Kopf auf einmal, nicht nur das Symbol, an dem
+   es aufgefallen ist.
+   ═══════════════════════════════════════════════════════════════════ */
+html[data-dp-layout] body{
+  --dp-header-text: var(--wl-c9a84c, #C9A84C);
+}
