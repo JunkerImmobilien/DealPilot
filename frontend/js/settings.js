@@ -783,6 +783,22 @@ function showSettings(initialTab) {
             '<span style="font-size:11.5px;color:var(--muted,#5F5E5A)">Einzeln einstellen — Vorlage, Karten, Form, Schrift, Farben</span>' +
             '<button type="button" class="btn btn-sm btn-ghost" onclick="try{DealPilotUiVarianten.open()}catch(e){}">Darstellung öffnen</button>' +
           '</div>' +
+          /* ── v1698 · ZURUECKSETZEN ──────────────────────────────────
+             Marcel: „auch sollte es dort die Moeglichkeit geben, die
+             Einstellungen zurueckzusetzen."
+
+             Drei Achsen auf einmal, weil sie zusammen den Eindruck
+             machen: Seitenaufteilung, Darstellung (Vorlage, Karten,
+             Form, Schrift) und die Marke. Einzeln zurueckzusetzen
+             hiesse, dreimal an drei Orten zu suchen.
+
+             `setze('')` raeumt Attribute, Merker und Schienen ab;
+             `DealPilotWhitelabel.reset()` nimmt Partnerfarbe und -logo
+             zurueck. Beides sind die vorhandenen Wege, kein zweiter. */
+          '<div style="margin-top:9px;display:flex;align-items:center;justify-content:space-between;gap:10px">' +
+            '<span style="font-size:11.5px;color:var(--muted,#5F5E5A)">Alles auf den Auslieferungszustand — Aufteilung, Darstellung und Marke</span>' +
+            '<button type="button" class="btn btn-sm btn-ghost" onclick="_dpAussehenZuruecksetzen()">Zurücksetzen</button>' +
+          '</div>' +
         '</div>' +
         /* === V213 collapse-toggle profilanzeige START === */
         '<hr class="dvd">' +
@@ -3828,6 +3844,27 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
   var HELL_VORLAGE = 'kanzlei';   /* aus design/mockups/hell.png, am CSS geprueft */
 
   function laden() { try { return JSON.parse(localStorage.getItem(LSK) || '{}') || {}; } catch (e) { return {}; } }
+
+  /* ── v1698 · Zuruecksetzen ──────────────────────────────────────────
+     Drei Achsen auf einmal. Jede ueber IHREN vorhandenen Weg, keiner
+     nachgebaut:
+       Aufteilung  ->  DealPilotLayout.setze('')   (raeumt selbst ab)
+       Darstellung ->  die Ablage dieses Moduls leeren + anwenden lassen
+       Marke       ->  DealPilotWhitelabel.reset()
+
+     Mit Rueckfrage, weil es mehr wegnimmt, als der Knopf verspricht:
+     wer nur die Farbe zuruecksetzen wollte, verliert auch sein Layout. */
+  window._dpAussehenZuruecksetzen = function () {
+    var frage = 'Aufteilung, Darstellung und Marke auf den '
+              + 'Auslieferungszustand zurücksetzen?';
+    if (!window.confirm(frage)) return;
+    try { if (window.DealPilotLayout && window.DealPilotLayout.setze) window.DealPilotLayout.setze(''); } catch (e) {}
+    try { localStorage.removeItem(LSK); } catch (e) {}
+    try { if (window.DealPilotUiVarianten && window.DealPilotUiVarianten.apply) window.DealPilotUiVarianten.apply(); } catch (e) {}
+    try { if (window.DealPilotWhitelabel && window.DealPilotWhitelabel.reset) window.DealPilotWhitelabel.reset(); } catch (e) {}
+    try { if (typeof window._dpProfilMarkieren === 'function') window._dpProfilMarkieren(); } catch (e) {}
+    if (typeof window.toast === 'function') window.toast('Aussehen zurückgesetzt.');
+  };
 
   window._dpProfilAktiv = function () {
     var s = laden();
