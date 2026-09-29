@@ -776,7 +776,10 @@ label.dp-required.qc-required::after {
            Browser (tour-engine.js:1179, SEEN_KEY wird nie zurueckgesetzt) — und
            danach war sie nur noch ueber die Hilfe zu finden. Es fehlte also
            nicht die Tour, sondern der zweite Weg zu ihr. -->
-      <button class="sb-act-item" type="button" onclick="if(window.startTourFromSidebar)startTourFromSidebar();else if(window.startTour)startTour();">
+      <!-- v1705: eigene Klasse als ANKER. Die Layouts blenden diesen Punkt aus
+           (Marcels Wunsch), die normale Ansicht behaelt ihn - ohne Anker
+           muesste die Regel auf den onclick zielen, und der aendert sich. -->
+      <button class="sb-act-item sb-act-tour" type="button" onclick="if(window.startTourFromSidebar)startTourFromSidebar();else if(window.startTour)startTour();">
         <span class="sb-act-ico" data-icon="help"></span><span class="sb-act-l">Rundgang starten</span>
       </button>
       <button class="sb-act-item sb-act-feedback" type="button" onclick="sbActionsAction('feedback')">
@@ -4030,7 +4033,7 @@ document.addEventListener('DOMContentLoaded', function(){
          bei gleicher Spezifitaet ueberstimmt; Skript NACH settings.js,
          weil es _dpDispSkin fuer den hellen Grund benutzt. -->
     <link rel="stylesheet" href="css/datenaufnahme.css?v=v1702d"><!-- v1639 · aus der Bordkarte wird eine Zeile -->
-    <link rel="stylesheet" href="css/layout-varianten.css?v=v1699e">
+    <link rel="stylesheet" href="css/layout-varianten.css?v=v1705">
     <script src="js/pdf-wahl.js?v=v1636"></script><!-- v1636 · Rueckfrage vor dem Export -->
     <script src="js/layout-varianten.js?v=v1699e"></script>
     <script src="js/karten-stil.js?v=v1702c"></script><!-- v1651 · Trichter und Bordkarte -->

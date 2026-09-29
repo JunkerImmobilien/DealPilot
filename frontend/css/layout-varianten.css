@@ -2068,7 +2068,6 @@ html[data-dp-layout] .dpl-schiene .sb-card.is-active{
 }
 html[data-dp-layout] .dpl-schiene .sb-card .sbc-thumb,
 html[data-dp-layout] .dpl-schiene .sb-card .sbc-mini-grid,
-html[data-dp-layout] .dpl-schiene .sb-card .sbc-actions,
 html[data-dp-layout] .dpl-schiene .sb-card .sbc-halter,
 html[data-dp-layout] .dpl-schiene .sb-card .sbc-arrow,
 html[data-dp-layout] .dpl-schiene .sb-card .sbc-score-label{
@@ -5092,3 +5091,93 @@ html[data-dp-layout^="v"] body:has(#sb-user) nav.tabs .tab.active{
 }
 .dp-layoutw-n{ display:block; font-weight:600; }
 .dp-layoutw-s{ display:block; font-size:11.5px; color:var(--muted,#5F5E5A); margin-top:1px; }
+
+/* =====================================================================
+   v1705 - DIE AKTIONEN KOMMEN ZURUECK IN DIE SCHIENE
+   =====================================================================
+   Marcel: "man kann unter Portfolio wenn man die Objekte auswaehlt kein
+   Objekt mehr loeschen. das muessten wir realisieren dass das wieder
+   geht."
+
+   Gemessen am 29.09.2026: `.sbc-actions` stand in allen drei Layouts auf
+   `display:none` - die Knoepfe Duplizieren und Loeschen existierten
+   (22x22 px ohne Layout), waren aber nicht da. Ausgeblendet wurden sie
+   beim Umbau der Karte zur kompakten Listenzeile, zusammen mit
+   Thumbnail und Kennzahlkacheln.
+
+   > Eine Gestaltungsentscheidung hat eine Funktion mitgenommen. Das
+   > faellt nicht auf, solange niemand loeschen will - und dann sieht es
+   > aus, als sei die Funktion weg.
+
+   Der Zielkonflikt bleibt echt: die Zeile SOLL schmal sein. Geloest
+   ueber Sichtbarkeit statt Platz - die Knoepfe liegen absolut rechts in
+   der Zeile und erscheinen bei Hover oder wenn die Karte die
+   ausgewaehlte ist. Sie nehmen also nie Breite weg.
+
+   Auf schmalen Schirmen gibt es kein Hover. Dort stehen sie an der
+   aktiven Karte dauerhaft - sonst waere das Loeschen auf dem Handy
+   genau so weg wie vorher.
+   ===================================================================== */
+html[data-dp-layout] .dpl-schiene .sb-card{
+  position:relative !important;   /* Anker fuer die absoluten Knoepfe */
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-actions{
+  position:absolute !important;
+  right:6px !important; top:50% !important;
+  transform:translateY(-50%) !important;
+  display:flex !important; gap:3px !important;
+  opacity:0 !important; pointer-events:none !important;
+  transition:opacity .12s ease !important;
+  z-index:8 !important;
+  background:linear-gradient(90deg, transparent, #1A1815 22%) !important;
+  padding:2px 0 2px 16px !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card:hover .sbc-actions,
+html[data-dp-layout] .dpl-schiene .sb-card.active .sbc-actions,
+html[data-dp-layout] .dpl-schiene .sb-card.is-active .sbc-actions,
+html[data-dp-layout] .dpl-schiene .sb-card:focus-within .sbc-actions{
+  opacity:1 !important; pointer-events:auto !important;
+}
+/* Der Verlauf muss zum Grund der Zeile passen, sonst steht ein dunkler
+   Balken auf der hellen aktiven Zeile. Beide Zustaende einzeln benannt -
+   Token reichen hier nicht, die Flaechen sind hart gesetzt. */
+html[data-dp-layout] .dpl-schiene .sb-card.active .sbc-actions,
+html[data-dp-layout] .dpl-schiene .sb-card.is-active .sbc-actions{
+  background:linear-gradient(90deg, transparent, #221F1A 22%) !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-actions .sbc-btn{
+  width:20px !important; height:20px !important;
+  min-width:0 !important; min-height:0 !important;
+  padding:0 !important; border-radius:4px !important;
+  display:flex !important; align-items:center !important; justify-content:center !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-actions .sbc-btn svg{
+  width:12px !important; height:12px !important;
+}
+
+/* Kein Hover auf Touch: an der ausgewaehlten Zeile bleiben sie stehen. */
+@media (hover:none){
+  html[data-dp-layout] .dpl-schiene .sb-card.active .sbc-actions,
+  html[data-dp-layout] .dpl-schiene .sb-card.is-active .sbc-actions{
+    opacity:1 !important; pointer-events:auto !important;
+  }
+}
+
+/* =====================================================================
+   v1705 - ZWEI PUNKTE WENIGER UNTER AKTIONEN
+   =====================================================================
+   Marcel: "Unter Aktionen in den neuen Layouts kann unter System der
+   'Rundgang starten' raus und auch Feedback & Support."
+
+   Nur in den Layouts. Die normale Ansicht behaelt beide - dort ist die
+   Aktionsliste der einzige zweite Weg zur Tour (v1179), und den ohne
+   Not zu kappen waere eine Wegnahme.
+
+   `.sb-act-tour` ist ein Anker, den es vorher nicht gab (v1705 in
+   index.html). Ohne ihn muesste die Regel auf den `onclick` zielen -
+   und der aendert sich, sobald jemand die Tour umbenennt.
+   ===================================================================== */
+html[data-dp-layout] .dpl-teil-aktionen .sb-act-tour,
+html[data-dp-layout] .dpl-teil-aktionen .sb-act-feedback{
+  display:none !important;
+}
