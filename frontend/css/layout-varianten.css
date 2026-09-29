@@ -4706,3 +4706,13 @@ html[data-dp-layout="v2b"] .dpl-schiene[data-stellung="rechts"] .dpl-teil-score{
   .dpl-ausgabe-sub{ display:none; }
   .dpl-ausgabe-l{ font-size:12px; }
 }
+
+/* v1680b — In Kanzlei 2 heisst die Schiene selbst schon „Ausgabe"
+   (LAYOUTS.v2b.schienen[1].titel). Der Titel im Kopf der Box waere
+   dasselbe Wort zweimal untereinander. Der Objektbezug darunter bleibt
+   — er ist der eigentliche Inhalt der Zeile.
+   In der Kanzlei (v2) heisst die Schiene „Aktionen"; dort traegt der
+   Kopf den Titel weiter, sonst waere nicht erkennbar, wo die Aktionen
+   aufhoeren und die Ausgaben anfangen. */
+html[data-dp-layout="v2b"] .dpl-ausgaben-titel{ display:none !important; }
+html[data-dp-layout="v2b"] .dpl-ausgaben-kopf{ padding-top:0 !important; }
