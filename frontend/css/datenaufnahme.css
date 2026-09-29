@@ -1960,3 +1960,38 @@ html[data-dp-kartenstil="kartei"] .dp-pfbar .dp-pf-logo.dp{
 html[data-dp-kartenstil="kartei"] .dp-pfbar .dp-pf-tile.on .dp-pf-lbl{
   color:#000000 !important;
 }
+
+/* =====================================================================
+   v1706g - DER QR: GROESSER, OHNE RAHMEN, ABER MIT RUHEZONE
+   =====================================================================
+   Gemessen nach v1706c: der QR ist wieder da, aber 64x64 und mit
+   Rahmen - meine Groessenangabe war schwaecher als die vorhandene.
+   Hier mit doppelt genannter Klasse, ohne eine ID zu erfinden.
+
+   EINE KORREKTUR AN MIR SELBST: in v1706c stand
+   `background:transparent`. Das war falsch. Marcel hat "keinen Rahmen"
+   gesagt, nicht "keinen Grund" - und ein QR-Code ohne helle Ruhezone
+   ist nicht mehr scannbar. Die staerkere Regel hat das zufaellig
+   verhindert; richtig ist es trotzdem nur, wenn es hier ausdruecklich
+   steht.
+
+   > Ein Rahmen ist Zierat. Die weisse Flaeche um einen QR ist Technik.
+   ===================================================================== */
+html[data-dp-kartenstil="kartei"] .dp-pfbar > .dp-pf-qr.dp-pf-qr{
+  width:92px !important; height:92px !important;
+  min-width:92px !important; min-height:92px !important;
+  border:none !important; outline:none !important; box-shadow:none !important;
+  border-radius:4px !important;
+  background:#FFFFFF !important;     /* Ruhezone - nicht entfernen */
+  padding:5px !important;
+  margin:0 0 0 auto !important;
+  display:flex !important; align-items:center !important; justify-content:center !important;
+  flex:0 0 auto !important;
+}
+html[data-dp-kartenstil="kartei"] .dp-pfbar > .dp-pf-qr.dp-pf-qr canvas,
+html[data-dp-kartenstil="kartei"] .dp-pfbar > .dp-pf-qr.dp-pf-qr img,
+html[data-dp-kartenstil="kartei"] .dp-pfbar > .dp-pf-qr.dp-pf-qr svg{
+  width:82px !important; height:82px !important;
+  max-width:none !important; max-height:none !important;
+  border:none !important; box-shadow:none !important; border-radius:0 !important;
+}
