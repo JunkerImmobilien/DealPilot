@@ -1465,3 +1465,41 @@ html[data-dp-kartenstil="kartei"] #qc7-sources.dp-pfbar > #qc7-qr img,
 html[data-dp-kartenstil="kartei"] #qc7-sources.dp-pfbar > #qc7-qr canvas{
   width:100% !important; height:100% !important; display:block !important;
 }
+
+/* ── v1671 · ABSTAND, GRÖSSE, GEWICHT ────────────────────────────────
+   Marcel, drei Messbefunde an der Kartei:
+
+   1. „Am Anfang, vor Marktbewertung, setzt der Button direkt am Anfang
+      des Kastens an." — gemessen: das erste Segment beginnt **2 px**
+      hinter der Kartenkante. Die Kopfzeile darüber hat 16 px Einzug;
+      die Reihe darunter hatte keinen.
+
+      > Zwei Pixel sind kein Abstand, sondern das Fehlen eines
+      > Abstands. Was bündig sein soll, wirkt so, als sei es
+      > angestoßen.
+
+   2. „Der QR-Code ist relativ schmal und klein." — 46×46 px. Ein QR,
+      den man mit dem Handy treffen muss, lebt von der Modulgröße;
+      bei 37 Modulen sind 46 px rund 1,2 px je Modul.
+
+   3. „Den Abruf-Button ungefähr in der gleichen Größe wie die anderen
+      Buttons, so wie Weiter: Investition." — gemessen:
+
+        .dp-pf-launch        84 × 29   Polster 8/18
+        „Weiter: Investition" 164 × 40  Polster 10/16
+
+      Der wichtigste Knopf der Karte war der kleinste der Seite. */
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg:first-of-type{
+  padding-left:18px !important;
+}
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr,
+html[data-dp-kartenstil="kartei"] #qc7-sources.dp-pfbar > #qc7-qr[data-hat-ziel]{
+  width:64px !important; height:64px !important;
+  padding:4px !important;
+}
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-launch{
+  min-height:40px !important;
+  padding:10px 20px !important;
+  font-size:13px !important;
+  border-radius:2px !important;
+}

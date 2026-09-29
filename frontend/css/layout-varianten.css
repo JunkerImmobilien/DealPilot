@@ -4590,3 +4590,24 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen .sb-act-item{
     margin-top:0 !important;
   }
 }
+
+/* ── v1671 · DER GRAUTON BIS AN DEN RAND ─────────────────────────────
+   Marcel: „der Arbeitsbereich — da haben wir im Hintergrund so einen
+   Grauton und links und rechts ist noch weiß. Haben wir die
+   Möglichkeit dort auch den Grauton anzuwenden?"
+
+   Gemessen auf Höhe des Arbeitsbereichs:
+
+     .body      528 .. 1848   rgb(244,242,237)   der Grauton
+     .main-col  248 .. 2133   rgb(255,255,255)   weiß
+
+   Der Ton sitzt also auf dem INHALTSBAND, nicht auf der Fläche. Links
+   280 px und rechts 285 px bleiben weiß — und weil das Band mittig
+   liegt, sieht es aus wie ein Fehler in der Breite, nicht wie eine
+   Farbe.
+
+   > Ein Hintergrund, der an der Inhaltsbreite endet, ist kein
+   > Hintergrund, sondern eine breite Karte. */
+html[data-dp-layout] body:has(#sb-user) .main-col{
+  background:#F4F2ED !important;
+}
