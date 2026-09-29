@@ -1407,10 +1407,12 @@
       b.classList.toggle('on', an);
       /* v1699c: Die Marke steht jetzt als Klasse, die Farbe im CSS
          (`layout-varianten.css`, `.dp-layoutw.on`). Vorher stand hier
-         `var(--wl-c9a84c, #C9A84C)` als Zeichenkette — inhaltlich
-         richtig, aber der Gold-Wächter liest JS-Strings nicht auf
-         `var()` und zählte sie als hartes Gold (0 -> 1, Datei war
-         sauber).
+         das Gold-Token samt Rückfallwert als Zeichenkette für einen
+         Inline-Stil — inhaltlich richtig, aber der Gold-Wächter liest
+         JS-Strings nicht auf `var()` und zählte es als hartes Gold
+         (0 -> 1, Datei war sauber). Auch der Rückfallwert IM KOMMENTAR
+         zählte noch; der Wächter kann Erklärung und Code nicht
+         unterscheiden, und das ist richtig so.
 
          > Ein Wächter, den man mit einem richtigen Wert rot macht,
          > wird umgangen statt gelesen. Lieber die Farbe dorthin
