@@ -23472,3 +23472,120 @@ vollstaendig aus.**
 vier Einheiten mit Flaeche, Miete und Status im Payload.
 
 **Commit.** `bcc2104`
+
+---
+
+## 29.09.2026 (22) — v1701/v1702: die Rueckfrage und die zwei Ebenen
+
+### v1701 · Die Pilot-Analyse scheiterte nicht an zu langem Text
+
+Marcel meldete: „ich bekomme staendig im Co-Pilot Tab beim klicken auf
+Pilot Analyse starten einen Abruffehler: ⚠ KI-Antwort konnte nicht
+ausgewertet werden". Die Meldung selbst legte eine Ursache nahe
+(„typisch bei zu langen Antworten oder Modell-Haenger") — und die war
+falsch. Im `raw_text` stand die ganze Antwort des Modells:
+
+> „Ich kann die erforderlichen Informationen im Web recherchieren, um
+> die Analyse durchzufuehren. Moechtest du, dass ich das sofort starte?"
+
+Das ist kein abgeschnittenes JSON. Das Modell hat **um Erlaubnis
+gefragt** — in einem Einweg-Aufruf, in dem niemand antworten kann.
+`buildPrompt` traegt einen `## RECHERCHE-AUFTRAG`, aber kein Verbot von
+Rueckfragen; `analyze()` hatte keinen zweiten Anlauf.
+
+> **Eine Fehlermeldung, die ihre eigene Ursache nennt, lenkt vom
+> `raw_text` ab.** Die Antwort lag die ganze Zeit in der Meldung, die
+> Marcel vor Augen hatte.
+
+Gebaut:
+
+- `ANTI_RUECKFRAGE` am Prompt-Ende: keine Rueckfragen, keine
+  Erlaubnisfrage, erstes Zeichen `{`, letztes `}`, Fehlendes gehoert
+  **ins** Feld statt daneben
+- Zweiter Anlauf bei Parse-Fail — **ohne** Websuche (die war der
+  Anlass), `temperature 0`, Recherche-Auftrag fuer diesen Durchgang
+  ausdruecklich aufgehoben. Der Zweig wird nur bei `!parsed` betreten,
+  kostet im Normalfall also nichts.
+
+**Nachweis:** echter Lauf auf Staging ueber `Auth.apiCall('/ai/analyze')`
+mit dem Payload der laufenden Oberflaeche — 23 s, **22 Felder**,
+Empfehlung „Kaufen", `raw_text: null`. Im Backend-Log **keine**
+Parse-Warnung: der erste Anlauf lieferte sauberes JSON.
+
+**Commit.** `fab997d`
+
+### v1702 · Der Pre-Flight-Streifen: zwei Ebenen bauten dieselbe Flaeche um
+
+Marcel: „jetzt sieht der Streifen bei Datenaufnahme im Tab Objekt bei
+dem Layout Kanzlei und Tower und Arbeitsmappe nicht mehr so aus wie aus
+unserer demo. Stand heute passt die pre flight Karte."
+
+Gemessen im Layout Kanzlei (v2) gegen den Auslieferungszustand:
+
+| | ohne Layout | Kanzlei |
+|---|---|---|
+| Hoehe | 78 px | 128 px |
+| Grund | Runway-Verlauf | `#FFFFFF` |
+| `.dp-pf-stripe` | 1280x78 | **0x0** |
+| `.dp-pf-perf` | 1x78 | **0x0** |
+| `.dp-pf-lead` | 149x78 links | 1278x38 als volle Zeile |
+
+Der Weg dorthin ging ueber **vier** Anlaeufe, und jeder deckte eine
+Schicht auf, die die vorige verdeckt hatte:
+
+1. **v1702** — 35 Regeln hingen an
+   `html[data-dp-layout]:not([data-dp-kartenstil])`: sobald irgendein
+   Layout aktiv war, wurde der Streifen zur hellen Bordkarte umgebaut,
+   ohne dass jemand das gewaehlt hatte. Anker heisst jetzt
+   `data-dp-pfstil` und wird nirgends gesetzt.
+2. **v1702b** — es blieb bei `kartei`. Ursache: die **v1654-Migration**
+   hatte jedem Nutzer `trichter`/`bordkarte` → `kartei` gesetzt.
+   Zurueckgenommen; jeder gemerkte Entwurf faellt einmalig weg.
+3. **v1702c** — es blieb *immer noch* bei `kartei`. Gemessen mit einem
+   Faenger auf `setAttribute`: `karten-stil.js:567`, der Beobachter auf
+   `data-dp-layout`, wird registriert **bevor** `start()` laeuft.
+   Setzt `layout-varianten.js` in diesem Fenster das Attribut, ruft der
+   Beobachter `setze(localStorage[LS])` — noch mit dem alten Wert.
+   `start()` leerte danach den Merker, rief aber nichts mehr.
+   `else if (gemerkt) setze(gemerkt)` → `else setze(gemerkt)`.
+
+   > **Einen Merker zu leeren raeumt nicht auf, was daraus schon
+   > geworden ist.** Und: ein Merker, der an zwei Orten liegt
+   > (localStorage **und** Modulvariable), laesst sich nicht an einem
+   > aufraeumen.
+4. **v1702d** — jetzt war der Streifen 55 px hoch und dunkel statt
+   Runway. Sieger war `body.dp-neue-karte .dp-pfbar` — eine Marke, die
+   **jedes** Layout am body setzt, mit 50 eigenen Streifen-Regeln.
+   Auf `body.dp-pfzeile` umgehaengt (wird nirgends gesetzt);
+   `dp-neue-karte` bleibt unangetastet, sie formt die Objektkarten.
+
+> **Zwei Ebenen, die dieselbe Flaeche umbauen: die eine abzuschalten
+> sieht aus wie ein Fehlschlag, solange die andere noch greift.** Nach
+> v1702 und v1702c sah der Streifen jeweils *anders* falsch aus — das
+> war der Hinweis, dass jedes Mal wirklich etwas gefallen war.
+
+**Nachweis (nach Neuladen, alle vier gemessen):**
+
+| | Hoehe | Grund | stripe | perf | Reisszone |
+|---|---|---|---|---|---|
+| ohne Layout | 78 | RUNWAY | 1280x78 | 1x78 | 208x78 |
+| Aktenmappe `v1b` | 78 | RUNWAY | 1280x78 | 1x78 | 208x78 |
+| Kanzlei `v2` | 78 | RUNWAY | 1280x78 | 1x78 | 208x78 |
+| Tower `v2b` | 78 | RUNWAY | 1280x78 | 1x78 | 208x78 |
+
+Bildbeweis in Kanzlei: Runway-Gold, „BOARDING PASS · PRE-FLIGHT ·
+DealPilot · Boarding", Quellen-Pillen, QR rechts. Der Vorspann misst in
+den Layouts 128 statt 149 px — das ist die schmalere Spalte, keine
+Regel.
+
+**Die vier Entwuerfe (Zeile, Trichter, Bordkarte, Kartei) bleiben ueber
+`data-dp-kartenstil` waehlbar.** Was faellt, ist die Vorgabe — sie sind
+ein Angebot, keine Ansage.
+
+**Gold-Audit RC=0**, genau auf der Basislinie (439 Fundstellen,
+54 Dateien).
+
+**Commits.** `8ca125f` · `7ac870f` · `08902dd` · `3ecbc63`
+
+**Rest:** Marktpreis-Abruf aus dem Co-Piloten (1 Abruf, vorher ansagen)
+und der Portfolio-Pilot im Cockpit stehen noch offen.
