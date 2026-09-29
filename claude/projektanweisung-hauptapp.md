@@ -21885,3 +21885,83 @@ Produktentscheidung.
 
 Offen bleiben damit nur die zwei, die es zu Recht sind: die **Preise**
 (Geld) und das **Verkehrswertgutachten** (liegt nicht im Repo).
+
+---
+
+## Rollout-Journal · 29.09.2026 (4) — Co-Pilot, Maße, und drei CSS-Lehren
+
+**Was:** Die Datenaufnahme ist fertig geschliffen, die Co-Pilot-Kachel
+ist gebaut — und der Abstand vor „Marktbewertung" hat **drei Anläufe**
+gebraucht, jeder mit einer eigenen Lehre.
+
+**Commits:** `6ad8be0` v1671 · `614052f` v1672 · `d4b1c4a` v1672b ·
+`539203d` v1672c
+
+**Nachweis** (Kartei, Objekt geladen):
+
+| | vorher | jetzt |
+|---|---|---|
+| Abstand vor „Marktbewertung" | **1 px** | **19 px** |
+| QR | 46×46 | **64×64** |
+| Abrufknopf | 84×29 | **88×40** |
+| `.main-col` | `rgb(255,255,255)` | **`rgb(244,242,237)`** |
+| Co-Pilot-Kachel | — | vor Exposé, mit Lampe |
+
+---
+
+### 1 · Der Name: Co-Pilot
+
+Marcel wollte „Frag mich durch" als eigene Kachel, „mit einem coolen
+Namen". **Co-Pilot** steht schon in CLAUDE.md unter „Bildsprache
+Luftfahrt" und beschreibt genau die Rolle: jemand sitzt daneben, kennt
+die Checkliste und fragt sie ab.
+
+> „Geführtes Anlegen" beschreibt einen Vorgang, „Co-Pilot" ein
+> Gegenüber — und genau das ist der Unterschied zu „Ich erzähle frei".
+> Ein Name aus der eigenen Bildsprache muss nicht erklärt werden.
+
+Die Kachel ruft **keine eigene Logik**: sie hakt die Sprachquelle an,
+löst den vorhandenen Abruf aus und wählt im Überblendfenster
+`.vi-sk-fuehr`. Und sie ist **keine Quelle** — kein Ankreuzfeld, keine
+Beteiligung an der Zählung.
+
+### 2 · **Drei Anläufe für einen Abstand — drei verschiedene Ursachen**
+
+**Erster Versuch:** `> .dp-pf-seg:first-of-type{padding-left:18px}`.
+Wirkungslos.
+
+> `:first-of-type` fragt nach dem ersten Element seines **TYPS** unter
+> den Geschwistern. Das erste `div` in der Leiste ist `.dp-pf-lead`,
+> die Kopfzeile. Die Klasse im Selektor filtert nur, ob der Treffer am
+> Ende noch passt. Wer `.klasse:first-of-type` schreibt, meint fast
+> immer „das erste mit dieser Klasse" — und bekommt etwas anderes.
+
+**Zweiter Versuch:** der genaue Nachbar-Anker
+`.dp-pf-perf + .dp-pf-seg`. Auch wirkungslos.
+
+> Zwei Blöcke weiter oben steht `> .dp-pf-seg{padding:8px 0 10px
+> !important}`. **Eine Kurzschrift ist kein Wert, sondern vier** — sie
+> setzt auch `padding-left:0`, ist gleich spezifisch und steht später.
+
+**Dritter Versuch:** `margin-left`. Wirkt.
+
+> Wer nach einer Kurzschrift einen Einzelwert setzen will, muss ihn
+> entweder später schreiben oder auf eine Eigenschaft ausweichen, die
+> sie nicht berührt.
+
+### 3 · Der Grauton saß auf dem Inhaltsband
+
+`.body` (528..1848) trug `rgb(244,242,237)`, `.main-col` (248..2133)
+war weiß — links 280 px, rechts 285 px.
+
+> Ein Hintergrund, der an der Inhaltsbreite endet, ist kein
+> Hintergrund, sondern eine breite Karte.
+
+### Rest
+
+- **Preise:** die Zahl in `config.js:521` ist nur die **Anzeige**. Der
+  echte Betrag hängt am Stripe-Preis `dp_nachkauf_<plan>` (der
+  Kommentar dort sagt es selbst). Eine Änderung nur im Code ließe
+  Anzeige und Abbuchung auseinanderlaufen — der Fehler, den die Notiz
+  „ein Preis steht an vier Stellen" beschreibt. **Offen, weil der
+  Zielbetrag eine Entscheidung ist.**
