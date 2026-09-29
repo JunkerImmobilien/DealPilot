@@ -24358,3 +24358,84 @@ und Preis, Score-Ring rechts.
 **Gold-Audit RC=0.**
 
 **Commit.** `58766f8`
+
+---
+
+## 29.09.2026 (29) — v1710: der Status steckt im Rahmen
+
+Marcel: „man kann die ID oben nicht richtig lesen ... dann haben wir
+Objekte, da steht One dran. Also da haben wir alles Moegliche und wir
+haben ja gesagt, dass wir es rot umrahmen, wenn es verloren ist, golden,
+wenn es in Bearbeitung ist und gruen, wenn es gewonnen ist. Daher muss
+das One nicht drinne stehen ... und es muss halt drauf geachtet werden,
+dass das immer zusammen steht oder halt dass das Investor dann ganz auf
+der rechten Seite ist."
+
+**Vier Punkte, und sie haengen zusammen:**
+
+1. **Die WON-Lasche faellt weg.** Der Zustand steht im Rahmen — eine
+   zweite Anzeige daneben ist nur Wiederholung.
+2. **Der Blattrahmen traegt die Deal-Stufe.** `.deal-lost` rot,
+   `.deal-won` gruen, sonst gedaempftes Gold. **Gruen und Rot bleiben
+   hart** (CLAUDE.md: Statusfarben werden nie tokenisiert), Gold laeuft
+   ueber `--wl-`.
+3. **ID und INVESTOR: eine Gestaltung.** Gleicher Grund, gleiche
+   Schriftfarbe, gleiche Groesse.
+4. **Feste Plaetze.** ID immer links, INVESTOR immer ganz rechts.
+
+   > „Mal zusammen, mal nicht" ist kein Layout, sondern ein Zufall. Zwei
+   > feste Ecken sind ruhiger als ein Nebeneinander, dessen Abstand von
+   > der Laenge der Objektnummer abhaengt.
+
+**Zur Lesbarkeit:** die Laschen standen auf 8 px und 7,5 px — kleiner
+als jede andere Schrift in der App. Beide jetzt **9,5 px**.
+
+**Warum gedaempftes Gold fuer „in Bearbeitung":** das ist der Regelfall.
+Ein voll gesaettigter Rahmen an jeder Zeile laesst die Liste flimmern,
+und dann faellt der eine gruene oder rote nicht mehr auf. *Wenn alles
+hervorgehoben ist, ist nichts hervorgehoben.*
+
+Die Lasche nimmt den Statuston auf — sonst stuende eine goldene Klappe
+an einer gruenen Mappe.
+
+### Nachweis an ECHTEN Objekten (12 in der Liste)
+
+| Zustand | Anzahl | Rahmen |
+|---|---:|---|
+| gewonnen | 5 | `rgb(63,165,108)` gruen |
+| verloren | 1 | `rgb(184,98,92)` rot |
+| offen | 6 | `rgb(138,115,50)` gedaempftes Gold |
+
+Kein Zustand musste simuliert werden. Die INVESTOR-Lasche sitzt exakt am
+rechten Rand: `offsetLeft + offsetWidth = 214` bei `clientWidth 214`.
+
+> **Meine erste Pruefrechnung sagte „39 px daneben" und war falsch** —
+> sie verglich `getBoundingClientRect` gegen die Kartenbreite INKLUSIVE
+> Rahmen. `offsetLeft`/`offsetWidth` gegen `clientWidth` ist die Rechnung,
+> die zum Anker passt.
+
+### v1710b · Die Zahlen in der Kontingent-Pille
+
+Marcel: „zudem in dem header oben unter kontigend sind die zahlen noch
+gold." Gemessen: `.dp-kg-label` mit „31 · 4 · 7" stand auf
+`rgb(213,187,115)`.
+
+**Mein Fehler:** in v1706d hatte ich die Kinder ueber
+`> .hdr-credits-pill-label` angesprochen. **Diese Klasse gibt es nicht** —
+sie heisst `dp-kg-label`. Ich hatte den Namen aus dem Namen der Pille
+ABGELEITET statt ihn auszulesen. Die Regel sah plausibel aus und traf
+nichts.
+
+> **Zum dritten Mal in dieser Sitzung ein geratener Name:** erst
+> `comingSoon` statt `provComingSoon` (v1703b), dann die Tour-Klassen,
+> jetzt hier. **Ein `grep` dauert zehn Sekunden.**
+
+`:not(.dp-kg-panel)` nimmt das aufklappbare Panel aus — dessen Toene
+stehen in v1706d, und die ZAHL darin darf gold bleiben, sie ist der Wert.
+
+**Nachgemessen:** `rgb(191,183,169)` für „31 · 4 · 7".
+
+**Gold-Audit RC=0**, Basislinie 438 — das neue `var(--wl-8a7332, #8a7332)`
+zaehlt nicht als hartes Gold, weil es dem vorgeschriebenen Muster folgt.
+
+**Commit.** `6dd58cd`
