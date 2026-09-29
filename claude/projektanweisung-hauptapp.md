@@ -23690,3 +23690,143 @@ sich nicht pruefen, ob im Tab Objekt nach dem Umbau von
 **Gold-Audit RC=0**, genau auf der Basislinie.
 
 **Commits.** `de9cdb4` · `727563c` · `520e4c5`
+
+---
+
+## 29.09.2026 (24) — v1704: der Portfolio-Pilot im Cockpit
+
+Marcel: „im Portfolio Cockpit auch einen Piloten ... eine Pilot Analyse
+die das gesamte Portfolio analysiert und wo ich auch fragen stellen kann.
+das ist quasi der allwissende der mir zu jeder immobilie aber auch zur
+Vermoegensbilanz des gesamten Portfolios fragen beantworten kann. auch
+hier wieder mit und ohne web Recherche."
+
+### Drei Entscheidungen
+
+**1 · Er rechnet nichts nach.** `dashboard.js` bekommt
+`portfolioPayload()`, das `aggStats()` (die Aggregat-SSoT), `projectAll()`
+und `aggregateScore()` **liest**.
+
+> Eine zweite Aggregation waere eine zweite Wahrheit. Das Cockpit hat
+> davon schon drei (`aggStats`, `updateSidebarPortfolio`,
+> `_renderPortfolioHeader`), und sie laufen bereits auseinander.
+
+**2 · Die Analyse ist Fliesstext, kein JSON.** Die Einzelobjekt-Analyse
+fordert rund dreissig Felder — und ist genau daran **heute** gescheitert
+(v1701: das Modell fragte zurueck, statt zu antworten). Ein
+Portfolio-Prompt ist laenger, nicht kuerzer.
+
+> Ein Format, das scheitern kann, waehlt man, wenn es etwas bringt. Hier
+> bringt es nichts: der Text wird gelesen, nicht weiterverrechnet.
+
+Beides laeuft deshalb ueber `/ai/copilot`. Der Endpunkt ist **nicht** ans
+Einzelobjekt gebunden (`routes/ai.js:1545` schlaegt kein Objekt nach);
+`help.js` faehrt dort seit Langem einen voellig anderen Kontext.
+
+**3 · Die Analyse ist der erste Zug des Gespraechs** — sie landet in
+derselben `history` wie jede Frage danach.
+
+### Gebaut
+
+- **`frontend/js/portfolio-pilot.js`** (neu, 246 Z.): Kopfzeile mit
+  Web-Recherche-Schalter und „Portfolio-Analyse starten", Chat darunter.
+  Haengt sich per MutationObserver auf `data-dp-built` ein — `ensureMarkup()`
+  baut erst beim Oeffnen, und dafuer gibt es kein Ereignis.
+- **Ohne abgeschlossene Objekte wird nicht gefragt, sondern gesagt, dass
+  nichts da ist.** Ein Pilot ueber ein leeres Portfolio erfindet.
+- `objekte_im_payload` steht neben `anzahl_objekte`: ab 60 Objekten
+  rechnet das Modell sonst gegen eine Summe, zu der es die Posten nicht
+  hat — und merkt es nicht.
+- Einheiten stehen **im Feldnamen** (`_eur`, `_eur_jahr`, `_prozent`,
+  `_qm`) — die Lehre aus v1703c am selben Tag.
+- `openaiService`: `kontextArt='portfolio'` schaltet Ueberschrift, Rolle
+  und sechs Portfolio-Regeln um. Ohne den Diskriminator stuende
+  „AKTUELLES OBJEKT" ueber einer Vermoegensbilanz — **das Modell
+  antwortet auf die Ueberschrift.**
+
+### Zwei Rechenfehler im Cockpit, gefunden beim Bau
+
+**v1704b — die Modellprojektion rechnete in Cent.** `projectAll()` las
+`num(o._kaufpreis)`; der Kommentar an der SSoT sagt ausdruecklich, dass
+`_kaufpreis` **Cent** ist und `kp` **Euro**. Da Miete, Zins, Tilgung,
+AfA, Restschuld und Wert alle daraus abgeleitet werden, stand die
+**ganze** Projektion um Faktor 100 zu hoch — Tabelle **und** Charts.
+
+Gemessen auf Staging, 5 Objekte mit 848.000 € Kaufpreissumme:
+
+| | vorher | richtig |
+|---|---:|---:|
+| Wert 2026 | 84.800.000 € | 848.000 € |
+| Restschuld | 70.725.374 € | 808.698 € |
+| Miete | 4.240.000 € | 49.980 € |
+
+> **Aufgefallen ist es erst, weil der Pilot dieselbe Funktion liest und
+> seine Zahlen neben `aggStats()` standen. Eine Zahl allein sieht nie
+> falsch aus; erst die zweite, die dasselbe meint, verraet sie.**
+
+**v1704c — zwei Zahlen fuer dieselbe Miete in einer Ansicht.** Die
+Projektion las `ist_miete_j` / `kaltmiete_j` / `jahresmiete` — drei
+Feldnamen, die im Frontend **nirgends** gesetzt werden. Es griff immer
+der Notnagel `kp*0.05`: 42.400 € statt der 49.980 €, die das Cockpit
+daneben anzeigte. Jetzt dieselbe Kette wie `aggStats()`.
+
+**v1704d — ein Fehler, der an EINER Stelle behoben ist, ist nicht
+behoben.** Marcel hatte `utm_source=openai` an der Pilot-Analyse
+gemeldet; behoben wurde es in `ui.js` (`_urlSauber`) — aber nur fuer die
+**strukturierten** Quellenfelder. Gemessen am Portfolio-Piloten, direkt
+nach dem Bau:
+
+```
+([miete-aktuell.de](https://www.miete-aktuell.de/...?utm_source=openai))
+```
+
+Im Chat stehen die Links im Fliesstext, und in den **Langtexten** der
+Analyse (`makrolage_recherche`, `kaufpreisniveau`) ebenso. `_urlsSaeubern()`
+sitzt jetzt im Backend — hinter `copilotChat` (gilt fuer Co-Pilot,
+Hilfe-Assistent **und** Portfolio-Pilot) und rekursiv hinter `analyze`.
+Entfernt werden nur Zaehl- und Herkunftsparameter; ein Parameter, der den
+**Inhalt** bestimmt, bleibt, sonst liefe der Link ins Leere.
+
+### Nachweis (echter Bedienweg, Staging, 5 Objekte)
+
+Payload gegen die Cockpit-Anzeige:
+
+```
+Gesamtinvestition 933.926 | Kaufpreissumme 848.000 | EK 100.008
+Restschuld 819.701 | Miete 49.980/Jahr | BMR 5,89 % | NMR 5,81 %
+Projektion J1/J5/J10 Eigenkapital: 39.302 / 168.960 / 339.191
+```
+
+Objektwert Jahr 1 = **848.000 €** = exakt die Kaufpreissumme. Die
+Projektionstabelle zeigt in Zeile 2026 jetzt **49.980 €** Miete, dieselbe
+Zahl wie die Kennzahlen darueber.
+
+**Analyse gestartet** — sie nennt alle Zahlen des Payloads unveraendert
+und die Objekte beim Namen (Musterstrasse 12, Am Markt 9, Hermannstrasse
+9, Baeckerstr. 7) mit ihrem Cashflow.
+
+**Rueckfrage** („Welches Objekt zuerst anfassen?"): bezieht sich auf die
+Analyse, nennt LTV 100 % und Score 22 aus dem Payload — das Gespraech
+laeuft weiter, nicht neu.
+
+**Web-Recherche** (Schalter an): vier Links zurueck, **kein einziger
+Zaehlparameter**. Derselbe Link trug im Lauf davor noch `utm_source=openai`.
+
+**Ein Zwischenfall, der keiner war:** ein Lauf endete mit „OpenAI API
+Fehler 500 / server_error". Das ist OpenAIs Seite; die Meldung wird
+sauber durchgereicht, der zweite Lauf ging durch. Ebenso brach ein
+`git pull` auf dem Server einmal mit „Permission denied (publickey)" ab —
+beim Wiederholen lief er. Beides notiert, damit es beim naechsten Mal
+nicht wie ein neuer Fehler aussieht.
+
+**Gold-Audit RC=0**, genau auf der Basislinie.
+
+> **Anmerkung zur Historie:** der Commit `e107d11` zeigt 4968 geaenderte
+> Zeilen in `dashboard.js`. Das ist eine **einmalige Zeilenenden-
+> Normalisierung** durch `core.autocrlf=true`, kein Inhalt. Der Commit
+> danach ist wieder 12 Zeilen gross.
+
+**Commits.** `640eff0` · `e107d11` · `60bffa3` · `3c09b28`
+
+**Rest:** Partner-Logo in den Layouts (kein Logo auf dem Testkonto
+hinterlegt) und die Rundgang-Schrittanzeige sind weiterhin unbewiesen.
