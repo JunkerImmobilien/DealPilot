@@ -1937,8 +1937,16 @@ async function copilotChat(payload, opts) {
   const message = String(payload.message || '').trim();
   const allowWeb = payload.allowWeb === true;
 
+  /* v1704: derselbe Endpunkt traegt jetzt zwei Kontexte - ein Einzelobjekt
+     und das ganze Portfolio. Der Diskriminator steht VOR dem Systemtext,
+     weil der Systemtext ihn braucht. */
+  const istPortfolio = payload.kontextArt === 'portfolio'
+    || (ctx && ctx.art === 'portfolio');
+
   const sys = [
-    'Du bist der DealPilot Co-Pilot, ein sachlicher KI-Assistent fuer Immobilien-Investmentanalyse.',
+    istPortfolio
+      ? 'Du bist der DealPilot Portfolio-Pilot, ein sachlicher KI-Assistent fuer Immobilien-Investmentanalyse. Du siehst das GESAMTE Portfolio des Nutzers: seine Vermoegensbilanz und jedes einzelne Objekt darin.'
+      : 'Du bist der DealPilot Co-Pilot, ein sachlicher KI-Assistent fuer Immobilien-Investmentanalyse.',
     'Antworte praezise, auf Deutsch, in du-Form, ohne Floskeln und ohne Markdown-Ueberschriften.',
     'Nutze die bereitgestellten Objekt- und Kennzahlendaten als PRIMAERE Quelle. Rechne wo sinnvoll mit den',
     'gegebenen Zahlen (DSCR, LTV, Cashflow, Renditen, Kaufpreis). Erfinde keine Werte; fehlt etwas, sag es klar.',
@@ -1957,10 +1965,37 @@ async function copilotChat(payload, opts) {
     'Miete und Verhandlung - vor allgemeinen Annahmen. Nenne sie immer als "Indikation", NIE als Verkehrswert oder',
     'Gutachten, und nenne die Spanne mit. Nenne NIEMALS einen Anbieternamen: die Quelle heisst "unabhaengiger',
     'Bewertungspartner". Ist das Feld nicht da und die Frage braucht einen Marktpreis, weise in EINEM Satz auf den',
-    'Knopf \u201eMarktpreis \u00b7 1 Abruf\u201c oben hin - und rate keine Zahl.'
-  ].join('\n');
+    'Knopf \u201eMarktpreis \u00b7 1 Abruf\u201c oben hin - und rate keine Zahl.',
+    /* v1704: die Regeln, die nur fuer das Portfolio gelten. Sie stehen
+       hier und nicht im Frontend-Auftrag, weil sie auch fuer jede
+       Rueckfrage danach gelten muessen - nicht nur fuer die Analyse. */
+    istPortfolio
+      ? [
+          '',
+          'PORTFOLIO-REGELN (verbindlich):',
+          '- "vermoegensbilanz" ist die Summe ueber ALLE Objekte, bereits ausgerechnet. Rechne sie NICHT nach und',
+          '  stelle ihr keine eigene Summe gegenueber - du wuerdest gegen dieselben Zahlen anders rechnen.',
+          '- "objekte" ist die Einzelaufstellung. Sprich Objekte mit ihrem "name" an, nie mit ihrer Nummer allein.',
+          '- Steht "objekte_im_payload" unter "anzahl_objekte", hast du NICHT alle Objekte vor dir: die',
+          '  Vermoegensbilanz umfasst dann mehr als deine Liste. Sage das, bevor du Einzelobjekte gegen die Summe',
+          '  stellst - sonst behauptest du eine Vollstaendigkeit, die du nicht hast.',
+          '- "projektion" ist eine Modellfortschreibung, keine Prognose: sie unterstellt gleichbleibende Miete,',
+          '  Zins und Tilgung. Nenne sie so, wenn du sie verwendest.',
+          '- Die Einheit steht IM Feldnamen (_eur, _eur_jahr, _prozent, _qm). Lies sie dort ab, rate sie nicht.',
+          '- Fehlt ein Feld (null), ist es nicht erfasst - nicht null. Sage, was fehlt, statt es zu ueberspringen.'
+        ].join('\n')
+      : ''
+  ].filter(Boolean).join('\n');
 
-  const ctxBlock = 'AKTUELLES OBJEKT (Kontext, JSON):\n' + JSON.stringify(ctx, null, 2);
+  /* v1704: ohne den Diskriminator stuende „AKTUELLES OBJEKT" ueber einer
+     Vermoegensbilanz - und das Modell antwortet auf die Ueberschrift.
+
+     > Eine Beschriftung ist kein Schmuck. Sie sagt dem Modell, was es vor
+     > sich hat, und eine falsche belegt es mit einer Annahme, die durch
+     > keine Zahl im Datensatz widerlegt wird. */
+  const ctxBlock = (istPortfolio
+    ? 'GESAMTES PORTFOLIO DES NUTZERS (Kontext, JSON):\n'
+    : 'AKTUELLES OBJEKT (Kontext, JSON):\n') + JSON.stringify(ctx, null, 2);
 
   let convo = '';
   for (const m of history) {

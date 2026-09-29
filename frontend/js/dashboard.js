@@ -2261,7 +2261,119 @@
   }
 
   /* ════ PUBLIC API ════ */
+
+  /* ══════════════════════════════════════════════════════════════════
+     v1704 · DER PAYLOAD FUER DEN PORTFOLIO-PILOTEN
+     ══════════════════════════════════════════════════════════════════
+     Marcel: „im Portfolio Cockpit auch einen Piloten ... der mir zu jeder
+     Immobilie aber auch zur Vermoegensbilanz des gesamten Portfolios
+     Fragen beantworten kann."
+
+     Beides steht hier schon: `aggStats()` ist die Aggregat-SSoT,
+     `projectAll()` fuehrt Restschuld, Wert und Eigenkapital ueber die
+     Jahre fort, `aggregateScore()` gewichtet die Einzel-Scores. Der
+     Pilot rechnet davon NICHTS nach - er liest.
+
+     > Eine zweite Aggregation waere eine zweite Wahrheit. Das Cockpit
+     > hat davon schon drei (`aggStats`, `updateSidebarPortfolio`,
+     > `_renderPortfolioHeader`), und sie laufen bereits auseinander.
+
+     JE OBJEKT werden nur die Kernfelder mitgegeben, nicht der rohe
+     data-Blob: der Prompt hat eine Grenze, und ein Payload, der sie
+     reisst, faellt genau dann um, wenn das Portfolio gross genug ist,
+     um interessant zu werden. */
+  var PP_MAX_OBJEKTE = 60;
+
+  function _ppZahl(v) {
+    var n = num(v);
+    return (v == null || v === '' || !isFinite(n)) ? null : n;
+  }
+
+  function portfolioPayload() {
+    var arr = detailArr();
+    var a = aggStats();
+
+    var objekte = arr.slice(0, PP_MAX_OBJEKTE).map(function (o, i) {
+      var kp = _kpEuro(o);
+      var mieteJ = _ppZahl(o._kpis_miete_j);
+      if (mieteJ == null) { var mm = num(o.nkm) + num(o.ze); mieteJ = mm > 0 ? mm * 12 : null; }
+      return {
+        nr: i + 1,
+        name: o.name || o._name || null,
+        ort: o.ort || null,
+        objektart: o.objart || o.objektart || null,
+        baujahr: _ppZahl(o.baujahr),
+        wohnflaeche_qm: _ppZahl(o.wfl),
+        kaufpreis_eur: kp || null,
+        miete_kalt_eur_jahr: mieteJ,
+        cashflow_nach_steuer_eur_jahr: _ppZahl(o._kpis_cf_ns),
+        cashflow_vor_steuer_eur_jahr: _ppZahl(o._kpis_cf_vs),
+        eigenkapital_eur: _ppZahl(o.ek),
+        darlehen_eur: (num(o.d1) + num(o.d2)) || null,
+        restschuld_eur: Math.round(_restschuldOf(o)) || null,
+        zins_prozent: _ppZahl(o.d1z),
+        tilgung_prozent: _ppZahl(o.d1t),
+        zinsbindung_bis: o.d1_zbind || o.d1_zinsbindung || null,
+        dscr: _ppZahl(o._kpis_dscr),
+        ltv_prozent: _ppZahl(o.ltv) != null ? _ppZahl(o.ltv) : _ppZahl(o._kpis_ltv),
+        bruttomietrendite_prozent: _ppZahl(o._kpis_bmy),
+        dealpilot_score: _ppZahl(o._dealpilot_score),
+        investor_deal_score: _ppZahl(o._ds2_score)
+      };
+    });
+
+    /* Die Projektion in Stuetzjahren statt Jahr fuer Jahr - 1, 5, 10.
+       Wer zehn Zeilen liest, sieht dieselbe Kurve wie bei dreissig. */
+    var proj = null;
+    try {
+      var p = projectAll(10);
+      if (Array.isArray(p) && p.length) {
+        proj = [1, 5, 10].map(function (j) {
+          var z = p[j - 1] || p[p.length - 1];
+          if (!z) return null;
+          return { jahr: j, restschuld_eur: Math.round(z.rest || 0),
+                   objektwert_eur: Math.round(z.wert || 0),
+                   eigenkapital_eur: Math.round(z.eq != null ? z.eq : (z.wert || 0) - (z.rest || 0)) };
+        }).filter(Boolean);
+      }
+    } catch (e) { proj = null; }
+
+    var score = null;
+    /* aggregateScore() gibt {total, hasData, n, scored, cats} - NICHT .score.
+         Ausgelesen an dashboard.js:248, nicht angenommen. */
+      try { var s = aggregateScore(); if (s && s.hasData && s.total != null) score = s.total; } catch (e) {}
+
+    return {
+      art: 'portfolio',
+      stand: new Date().toISOString().slice(0, 10),
+      anzahl_objekte: a.n,
+      /* v1704: die Zahl der WIRKLICH mitgegebenen Objekte steht daneben.
+         Sonst rechnet das Modell bei einem grossen Bestand gegen eine
+         Summe, zu der es die Posten nicht hat - und merkt es nicht. */
+      objekte_im_payload: objekte.length,
+      vermoegensbilanz: {
+        gesamtinvestition_eur: Math.round(a.gi) || null,
+        kaufpreissumme_eur: Math.round(a.kp) || null,
+        eigenkapital_eingesetzt_eur: Math.round(a.ek) || null,
+        darlehen_aufgenommen_eur: Math.round(a.darl) || null,
+        restschuld_heute_eur: Math.round(a.rest) || null,
+        miete_kalt_eur_jahr: Math.round(a.mieteJ) || null,
+        miete_kalt_eur_monat: Math.round(a.mieteM) || null,
+        cashflow_nach_steuer_eur_jahr: Math.round(a.cfNsJ) || null,
+        cashflow_vor_steuer_eur_jahr: Math.round(a.cfVsJ) || null,
+        bruttomietrendite_prozent: a.brutto != null ? +a.brutto.toFixed(2) : null,
+        nettomietrendite_prozent: a.netto != null ? +a.netto.toFixed(2) : null,
+        dscr_portfolio: a.dscr != null ? +a.dscr.toFixed(2) : null
+      },
+      portfolio_score: score,
+      projektion: proj,
+      objekte: objekte
+    };
+  }
+
   window.DealPilotDashboard = {
+    /* v1704: der Portfolio-Pilot liest hier - er rechnet nichts nach. */
+    portfolioPayload: portfolioPayload,
     open: openDashboard, close: closeDashboard,
     setProjYears: setProjYears, setCardView: setCardView,
     steuerMappe: steuerMappe,   /* v1215-mappe */
