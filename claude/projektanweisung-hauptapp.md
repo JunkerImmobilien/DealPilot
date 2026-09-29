@@ -22480,3 +22480,108 @@ Texterkennung fuer Scans — beides ist im Modul, beides wuerde
 `tesseract-ocr-deu` im Image verlangen. Die uebernommenen Werte fliessen
 noch **nicht** automatisch in ein Objekt; heute werden sie angezeigt und
 als Rohdaten ausgegeben. Das ist der naechste Schritt.
+
+---
+
+## Rollout-Journal 29.09.2026 (12) — Kanzlei 2, die Ausgaben, und vier Fehler unter der Oberflaeche
+
+**Was.** Marcels vier Punkte: Pre-Flight-Karte pruefen, Score an die
+Linie ueber dem Account anschliessen, Ausgabe-Dokumente in die Kanzlei,
+und **Kanzlei 2** als dritte UI mit getauschten Seiten.
+
+### 1 · Die Pre-Flight-Karte — ein Schatten, der ein Scrollen behauptet
+
+Gemessen am Element, nicht an der Regel:
+
+| | |
+|---|---|
+| `.dp-pf-scroll::after` | 34 x 126,6 px rechts, `linear-gradient(90deg, transparent, rgba(0,0,0,.22))` |
+| `.dp-pf-scroll` | `overflow-x: VISIBLE`, `scrollWidth 1280 === clientWidth 1280` |
+
+Der Schatten deutet an, dass rechts noch etwas kommt. **Es kommt
+nichts** — die Leiste bricht seit dem Kartei-Umbau um, statt zu
+scrollen. Uebrig blieb ein dunkler Balken ueber dem Abrufen-Knopf.
+
+**Warum die beiden Karten verschieden aussahen:** im QuickBoarding gibt
+es diesen Schatten **gar nicht**. Das iframe ist ein eigenes Dokument
+mit eigenem CSS und laedt `datenaufnahme.css` nicht. Derselbe Bau, zwei
+Fassungen — genau der Unterschied, den Marcel gesehen hat.
+
+### 2 · Der Score hing in der Mitte — kein Abstandsfehler
+
+    .dpl-teil-score   margin-top: auto   (Z. 3766)
+    .dpl-teil-nutzer  margin-top: auto   (Z. 169)
+
+**Zwei Geschwister mit `margin-top:auto` teilen den freien Platz unter
+sich auf** — je die Haelfte. Ein groesserer Abstandswert haette nichts
+geaendert: `auto` ist kein Abstand, sondern ein Anspruch auf den Rest,
+und den darf nur einer erheben. Gemessen nach der Aenderung: **Luecke
+0,0 px.**
+
+### 3 · Ausgaben-Box und Kanzlei 2
+
+Die Box wird **gebaut**, nicht verschoben — es gibt sie im DOM nicht,
+die Befehle lagen verstreut. Sie enthaelt aber **keine eigene Logik**:
+jeder Knopf ruft `sbActionsAction()`. Ein zweiter Zugang zu denselben
+Befehlen laeuft nicht auseinander, eine zweite Umsetzung schon. Was
+gebaut wird, wird auch abgeraeumt — `zurueck()` entfernt sie
+ausdruecklich.
+
+`v2b` ist die Umkehrung von `v2`: links Aktionen und Portfolio, rechts
+Score und Ausgaben, Reiter oben im Kopf.
+
+### 4 · Vier eigene Fehler, alle beim Nachmessen gefunden
+
+**(a) Zwei geratene Namen, beide still ins Leere gelaufen.**
+`window.objects` **gibt es nicht** (`typeof` ist `undefined`, ebenso
+`objekte`, `OBJ`, `_objects`, `dpObjects`) — die Box zeigte immer „kein
+Objekt gewaehlt". `window.Icons.render` gibt es auch nicht; `Icons` ist
+eine Sammlung von Pfaden. Die richtigen Wege, beide gemessen: die
+**aktive Karte** (`.sb-card.active` mit `.sbc-seq`/`.sbc-address`) und
+`_sbActionsRenderIcons()`. **Beide Fehler haetten nie eine Meldung
+gegeben, sie haetten einfach nichts getan.**
+
+**(b) Auf 390 px lag Kanzlei 2 doppelt uebereinander.** Nicht wegen
+einer fehlenden Handy-Regel, sondern wegen einer, die nur fuer EIN
+Layout galt. Alle 15 `v2`-Regeln heissen jetzt `^="v2"` — dieselbe
+Loesung, mit der `v1` und `v1b` schon zusammengefasst sind.
+
+**(c) `z-index:400` an einem `position:static` wirkt nicht.** Drei von
+fuenf Knoepfen waren verdeckt, obwohl die Rechtecke sich **nicht**
+ueberlappten. `z-index` gilt nur fuer POSITIONIERTE Elemente;
+`relative` verhaelt sich im Fluss genauso und stellt ihn wieder her.
+Repariert die bestehende Kanzlei gleich mit.
+
+**(d) Die letzten 147 px von `.main-col` lagen unter dem
+Bildschirmrand.** Sie beginnt bei y=146, bekommt aber die volle
+Viewporthoehe als `min-height` — und `body` traegt `overflow:hidden`.
+**Alles am Ende von `.main-col` war auf dem Tablet unerreichbar**, auch
+die Aktionen der bestehenden Kanzlei, seit es sie gibt.
+
+> **Eigener Messfehler, ausdruecklich zurueckgenommen:** Ich habe
+> zwischendurch einen Ueberlapp gemeldet, den es nicht gab
+> (`echtUeberlappt: false`) — `elementsFromPoint` direkt nach
+> `scrollIntoView` gelesen, bevor das Layout stand. Und meine
+> Messkabine war mit 760 px Hoehe zu niedrig fuer ein Tablet; der
+> „Fehler" war zuerst mein Aufbau. Ein iPad im Hochformat ist
+> 820 x 1180.
+
+**Nachweis — im gleich-Origin-iframe, beide Formate:**
+
+| | 820 x 1180 | 390 x 844 |
+|---|---|---|
+| Ausgabe-Knoepfe bedienbar | **5 von 5** | **5 von 5** |
+| Kanzlei (v2) desgleichen | **5 von 5** | — |
+| Querscroll | keiner | keiner |
+| Schiene haengt in | `.main-col` | `.main-col` |
+
+Gold-Audit **RC=0**, genau auf der Basislinie.
+
+**Commits.** `955e181` · `ec59b54` · `25470e5` · `6f338cc` · `1cf5b83`
+· `b16ec03` · `70c968f` · `f0011c7`
+
+**Rest.** Die Ausgaben-Box ruft heute dieselben Befehle wie die
+Aktionsliste; ein eigener Exposé-Weg (getrennt vom Gesamt-PDF) gibt es
+in der App nicht. Die Gesperrt-Kennzeichnung
+(`.dpl-ausgabe[data-gesperrt]`) ist vorbereitet, aber noch nicht an die
+Plan-Pruefung gehaengt.
