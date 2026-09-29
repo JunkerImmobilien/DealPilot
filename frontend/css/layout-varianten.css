@@ -5354,3 +5354,88 @@ html[data-dp-layout] .dpl-schiene .sb-act-section-title:first-child{
 html[data-dp-layout]:has(.dpl-teil-ausgaben) .dpl-schiene .sb-act-ausgeben{
   display:none !important;
 }
+
+/* =====================================================================
+   v1706d - DIE KOPFLEISTE, MIT GENUG SPEZIFITAET
+   =====================================================================
+   v1706 hat das Panel lesbar gemacht (Kontrast 1,0 -> 9,4), aber Pille
+   und Hilfe-Knopf blieben gold. Der Kaskaden-Walker nennt den Grund,
+   und es sind ZWEI verschiedene:
+
+   1) PILLE: meine Regel war `html[data-dp-layout] #hdr-credits-pill`
+      = (1,1,0). Es gibt aber `html[data-dp-layout] body header.hdr
+      #hdr-credits-pill` = (1,2,2) - staerker, und ebenfalls !important.
+
+   2) HILFE: der Knopf traegt ein INLINE-Attribut `style="color:var(--gold)"`.
+      Gemessen mit getAttribute('style'), nicht vermutet.
+
+   > Wirkt eine Regel trotz !important nicht, ist die Frage nicht "warum
+   > greift sie nicht", sondern "wer ist staerker" - und das beantwortet
+   > nur der Walker, nicht matches().
+
+   Hier steht beides mit genug Spezifitaet. Die Panel-Regeln bekommen
+   die ID mit: ohne sie verliert `.dp-kg-panel .dp-kg-s` (0,3,0) gegen
+   den Stern-Selektor `#hdr-credits-pill *` (1,1,0), und die Zahl waere
+   nicht mehr gold.
+   ===================================================================== */
+
+/* -- Pille -------------------------------------------------------- */
+html[data-dp-layout] body header.hdr #hdr-credits-pill.hdr-credits-pill{
+  color:#BFB7A9 !important;
+  background:transparent !important;
+  border:1px solid #E6E1D6 !important;
+  border-radius:7px !important;
+}
+html[data-dp-layout] body header.hdr #hdr-credits-pill.hdr-credits-pill
+  > .hdr-credits-pill-label,
+html[data-dp-layout] body header.hdr #hdr-credits-pill.hdr-credits-pill
+  > .hdr-credits-pill-val{
+  color:#BFB7A9 !important;
+}
+html[data-dp-layout] body header.hdr #hdr-credits-pill.hdr-credits-pill:hover{
+  color:#F5EFE2 !important;
+  border-color:#F5EFE2 !important;
+}
+
+/* -- Hilfe-Knopf (schlaegt das Inline-Attribut) -------------------- */
+html[data-dp-layout] body header.hdr .hdr-icon-btn,
+html[data-dp-layout] body header.hdr .hdr-icon-btn[style],
+html[data-dp-layout] body header.hdr .hdr-icon-btn[style] svg,
+html[data-dp-layout] body header.hdr .hdr-icon-btn[style] svg *{
+  color:#BFB7A9 !important;
+  stroke:currentColor !important;
+  background:transparent !important;
+  border:1px solid #E6E1D6 !important;
+  border-radius:7px !important;
+}
+/* Das SVG darf keinen eigenen Rahmen bekommen - die Regel darueber
+   trifft es mit, und ein Kaestchen um ein Fragezeichen sieht nach einem
+   zweiten Knopf aus. */
+html[data-dp-layout] body header.hdr .hdr-icon-btn svg,
+html[data-dp-layout] body header.hdr .hdr-icon-btn[style] svg,
+html[data-dp-layout] body header.hdr .hdr-icon-btn[style] svg *{
+  border:none !important;
+}
+html[data-dp-layout] body header.hdr .hdr-icon-btn:hover,
+html[data-dp-layout] body header.hdr .hdr-icon-btn[style]:hover,
+html[data-dp-layout] body header.hdr .hdr-icon-btn[style]:hover svg{
+  color:#F5EFE2 !important;
+  border-color:#F5EFE2 !important;
+}
+
+/* -- Das Panel: mit der ID, sonst gewinnt der Stern ---------------- */
+html[data-dp-layout] #hdr-credits-pill .dp-kg-panel{
+  color:#E3DCCD !important;
+}
+html[data-dp-layout] #hdr-credits-pill .dp-kg-panel .dp-kg-h{
+  color:#EDE7DA !important;
+}
+html[data-dp-layout] #hdr-credits-pill .dp-kg-panel .dp-kg-n{
+  color:#E3DCCD !important;
+}
+html[data-dp-layout] #hdr-credits-pill .dp-kg-panel .dp-kg-s{
+  color:var(--wl-e8cc7a, #E8CC7A) !important;
+}
+html[data-dp-layout] #hdr-credits-pill .dp-kg-panel .dp-kg-f{
+  color:#8C8578 !important;
+}
