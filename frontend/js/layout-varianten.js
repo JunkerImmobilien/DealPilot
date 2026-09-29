@@ -157,8 +157,40 @@
              in zwei Layouts an derselben Stelle steht, muss man nicht
              zweimal suchen. */
           nimmt: ['suche', 'objekte', 'tabs', 'score', 'nutzer'] },
+        /* v1679: Marcel — „in unserer Demo haben wir bei Kanzlei rechts
+           auch die Moeglichkeit, Sachen anzugeben: Exposé, Marktbericht,
+           Bankexport, alles fuer das ausgewaehlte Objekt. Die Ausgaben
+           auch in unser aktuelles Kanzlei-Modul, einfach unter den
+           Aktionen." Genau da: nach `aktionen` in derselben Schiene. */
         { stellung: 'rechts', ton: 'hell',   marke: false, portfolio: false,
-          nimmt: ['aktionen'], titel: 'Aktionen' }
+          nimmt: ['aktionen', 'ausgaben'], titel: 'Aktionen' }
+      ]
+    },
+    /* ── v1679 · KANZLEI 2 — die Seiten getauscht ────────────────────
+       Marcel: „eine dritte UI, Kanzlei 2. Links im Menue die Aktionen
+       und das Portfolio, ungefaehr wie in der Aktenmappe. Rueber wandert
+       der Investor-Deal-Score auf die rechte Seite und die
+       Ausgabedokumente — die kommen dahin, wo jetzt Aktionen rechts
+       steht, oben. Und die Objektdaten-Reiter oben wie bei der
+       Aktenmappe."
+
+       Damit ist v2b die Umkehrung von v2: was dort links steht, steht
+       hier rechts. `tabs` fehlt in beiden `nimmt`-Listen — genau das
+       laesst die Reiterleiste im Kopf, wie in der Aktenmappe.
+
+       Der Schluessel heisst `v2b` und nicht `v3`: `v3`, `v4` und `v5`
+       waren frueher eigene Layouts, deren CSS-Regeln noch in
+       `layout-varianten.css` stehen. Ein neues `v3` haette sie
+       stillschweigend geerbt — derselbe Grund, aus dem die zweite
+       Aktenmappe `v1b` heisst.                                       */
+    v2b: {
+      name: 'Kanzlei 2', beschreibung: 'Aktionen links, Score und Ausgaben rechts',
+      objekteAls: 'liste',
+      schienen: [
+        { stellung: 'links',  ton: 'dunkel', marke: true, portfolio: true,
+          nimmt: ['suche', 'objekte', 'aktionen', 'nutzer'] },
+        { stellung: 'rechts', ton: 'hell',   marke: false, portfolio: false,
+          nimmt: ['ausgaben', 'score'], titel: 'Ausgabe' }
       ]
     }
   };
@@ -183,6 +215,7 @@
        > dreissigsten nicht mehr. Derselbe Grund, aus dem `#sb-list`
        > verschoben und nicht nachgebaut wird. */
     score:    '#hdr-badges',
+    ausgaben: '#dpl-ausgaben',   /* v1679 — wird bei Bedarf gebaut, s. baueAusgaben() */
     /* v1654: die Objektliste selbst. Marcel am 28.09.2026: „wenn ich
        auf Portfolio klicke, dann oeffnet sich komischerweise eine neue
        Ansicht mit Objekten und ich kann die nicht minimieren. Da waere
@@ -220,7 +253,107 @@
   function el(s) { return document.querySelector(s); }
 
   /* ── Verschieben mit Rückfahrkarte ──────────────────────────────── */
+  /* ── v1679 · DIE AUSGABEN-BOX ──────────────────────────────────────
+     Alles andere in `KNOTEN` wird VERSCHOBEN, nicht nachgebaut — ein
+     zweites Score-Band waere am ersten Tag dasselbe und am dreissigsten
+     nicht mehr. Hier geht das nicht: eine Ausgaben-Box gibt es im DOM
+     nicht, die Befehle liegen als einzelne Knoepfe verstreut in der
+     Aktionsliste („Ausgeben": Track Record, Bankexport, Export) und
+     unter „Analyse" (Marktbericht).
+
+     Deshalb wird die Box gebaut — aber sie enthaelt KEINE eigene Logik.
+     Jeder Knopf ruft `sbActionsAction(...)`, denselben Weg wie die
+     Aktionsliste. Ein zweiter Zugang zu denselben Befehlen laeuft nicht
+     auseinander; eine zweite Umsetzung derselben Befehle schon.
+
+     `dpAusgabenAktualisieren()` haengt die Objektbezeichnung an, damit
+     sichtbar ist, WOFUER ausgegeben wird — Marcel: „alles das fuer das
+     ausgewaehlte Objekt".                                            */
+  var AUSGABEN = [
+    { act: 'pdf',          ico: 'export-hub', l: 'Exposé / Gesamt-PDF', sub: 'Alle Kapitel als Dokument' },
+    { act: 'marktbericht', ico: 'market',     l: 'Marktbericht',        sub: 'Mikro- und Makrolage' },
+    { act: 'bankexport',   ico: 'bankexport', l: 'Bankexport',          sub: 'Selbstauskunft für die Bank', feature: 'bank_pdf_a3' },
+    { act: 'trackrec',     ico: 'trackrec',   l: 'Track Record',        sub: 'Nachweise für die Bank',      feature: 'track_record_pdf' },
+    { act: 'hub-export',   ico: 'export-hub', l: 'Export',              sub: 'PDF, CSV, Sicherung',         feature: 'export_csv' }
+  ];
+
+  function baueAusgaben() {
+    var vorhanden = document.getElementById('dpl-ausgaben');
+    if (vorhanden) return vorhanden;
+
+    var box = document.createElement('div');
+    box.id = 'dpl-ausgaben';
+    box.className = 'dpl-ausgaben';
+    box.innerHTML =
+        '<div class="dpl-ausgaben-kopf">'
+      +   '<span class="dpl-ausgaben-titel">Ausgabe</span>'
+      +   '<span class="dpl-ausgaben-obj" id="dpl-ausgaben-obj"></span>'
+      + '</div>'
+      + '<div class="dpl-ausgaben-liste">'
+      +   AUSGABEN.map(function (a) {
+            return '<button type="button" class="dpl-ausgabe" data-act="' + a.act + '"'
+                 + (a.feature ? ' data-feature="' + a.feature + '"' : '') + '>'
+                 + '<span class="sb-act-ico dpl-ausgabe-ico" data-icon="' + a.ico + '"></span>'
+                 + '<span class="dpl-ausgabe-txt">'
+                 +   '<span class="dpl-ausgabe-l">' + a.l + '</span>'
+                 +   '<span class="dpl-ausgabe-sub">' + a.sub + '</span>'
+                 + '</span></button>';
+          }).join('')
+      + '</div>';
+
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('.dpl-ausgabe');
+      if (!b) return;
+      var act = b.getAttribute('data-act');
+      if (typeof window.sbActionsAction === 'function') window.sbActionsAction(act);
+    });
+
+    document.body.appendChild(box);
+    ausgabenIconsNachziehen(box);
+    dpAusgabenAktualisieren();
+    return box;
+  }
+
+  /* Die Icons kommen aus derselben Bibliothek wie die Aktionsliste.
+     Fehlt sie, bleibt der Knopf trotzdem bedienbar — ein fehlendes
+     Bild darf keinen Befehl kosten.                                  */
+  function ausgabenIconsNachziehen(box) {
+    try {
+      if (window.Icons && typeof window.Icons.render === 'function') {
+        window.Icons.render(box);
+      } else if (typeof window._sbRenderActionIcons === 'function') {
+        window._sbRenderActionIcons();
+      }
+    } catch (e) { /* Bedienbarkeit haengt nicht am Bild */ }
+  }
+
+  function dpAusgabenAktualisieren() {
+    var el = document.getElementById('dpl-ausgaben-obj');
+    if (!el) return;
+    var name = '';
+    try {
+      var key = window._currentObjKey;   /* die einzige verlaessliche Objektreferenz */
+      if (key && window.objects && window.objects[key]) {
+        var o = window.objects[key];
+        name = o.seq || o.adresse || o.strasse || '';
+      }
+    } catch (e) { name = ''; }
+    el.textContent = name ? ('für ' + name) : 'kein Objekt gewählt';
+    el.classList.toggle('dpl-ausgaben-leer', !name);
+  }
+  window.dpAusgabenAktualisieren = dpAusgabenAktualisieren;
+
+  /* `dp:object-ready` auf WINDOW ist das einzige Ereignis, das wirklich
+     gefeuert wird — gemessen an `storage.js:137`. `dp:obj-loaded` und
+     `dp:object-loaded` gibt es nicht; ein Listener darauf schwiege für
+     immer, ohne dass irgendwo ein Fehler erschiene.                  */
+  window.addEventListener('dp:object-ready', function () {
+    setTimeout(dpAusgabenAktualisieren, 60);
+  });
+
   function hole(sel) {
+    /* Die Ausgaben-Box existiert erst, wenn ein Layout sie anfordert. */
+    if (sel === '#dpl-ausgaben') return baueAusgaben();
     var k = el(sel);
     if (!k) return null;
     merker.push({ knoten: k, eltern: k.parentElement, naechstes: k.nextElementSibling });
@@ -245,6 +378,16 @@
       if (s && s.parentElement) s.parentElement.removeChild(s);
     });
     schienen = [];
+
+    /* v1679: Die Ausgaben-Box wird GEBAUT, nicht verschoben — sie steht
+       deshalb in keinem `merker` und kaeme durch `zurueck()` allein
+       nicht weg. Liegt sie in einer Schiene, ist sie eben mit ihr
+       verschwunden; haengt sie noch am `<body>` (weil ein Lauf
+       abgebrochen ist), bliebe sie als Fenster ueber der App stehen.
+       Genau so ist `data-dpl-portfolio` einmal haengengeblieben und hat
+       „Heute" hell gelassen. Was gebaut wird, wird auch abgeraeumt. */
+    var ab = document.getElementById('dpl-ausgaben');
+    if (ab && ab.parentElement) ab.parentElement.removeChild(ab);
   }
 
   /* ── Die Schienen bauen ─────────────────────────────────────────── */
