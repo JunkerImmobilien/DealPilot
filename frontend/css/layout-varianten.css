@@ -5501,3 +5501,48 @@ html[data-dp-layout] .dpl-schiene .dpl-portfolio.dpl-portfolio:hover .dpl-i{
   color:#F5EFE2 !important;
   border-color:#F5EFE2 !important;
 }
+
+/* =====================================================================
+   v1706f - KURZSCHRIFT REICHT NICHT
+   =====================================================================
+   Gemessen nach v1706e:
+
+     Portfolio   rgb(191,183,169) / Rahmen rgb(230,225,214)   RICHTIG
+     Pille       Text richtig, Rahmen oklab(...)              alt
+     Hilfe       Symbol richtig, Rahmen oklab(...)            alt
+     Zeile       padding 2px 9px statt der gesetzten 7px      alt
+
+   Der Rahmen ist der blinde Fleck aus CLAUDE.md: `border:` ist eine
+   KURZSCHRIFT und wird im Kaskadenvergleich nicht zu `border-color`
+   expandiert. Eine spaetere Regel, die `border-color` EINZELN setzt,
+   gewinnt deshalb gegen eine `border`-Kurzschrift - auch wenn die
+   Kurzschrift staerker aussieht.
+
+   > Wer eine Farbe setzen will, setzt die Farbe. Die Kurzschrift setzt
+   > drei Dinge und verliert an jedem einzeln.
+
+   Beim Polster dasselbe Muster, nur mit Spezifitaet: die Klasse doppelt
+   zu nennen hebt sie ueber die vorhandene Regel, ohne eine ID oder ein
+   neues Attribut zu erfinden.
+   ===================================================================== */
+html[data-dp-layout] body header.hdr #hdr-credits-pill.hdr-credits-pill,
+html[data-dp-layout] body header.hdr .hdr-icon-btn.hdr-icon-btn{
+  border-color:#E6E1D6 !important;
+  border-top-color:#E6E1D6 !important;
+  border-right-color:#E6E1D6 !important;
+  border-bottom-color:#E6E1D6 !important;
+  border-left-color:#E6E1D6 !important;
+  border-style:solid !important;
+  border-width:1px !important;
+}
+html[data-dp-layout] body header.hdr #hdr-credits-pill.hdr-credits-pill:hover,
+html[data-dp-layout] body header.hdr .hdr-icon-btn.hdr-icon-btn:hover{
+  border-color:#F5EFE2 !important;
+}
+
+/* Die Zeilen der Aktionsliste: Marcel wollte "ein bisschen Abstand". */
+html[data-dp-layout] .dpl-schiene .sb-act-item.sb-act-item{
+  padding-top:7px !important;
+  padding-bottom:7px !important;
+  margin-bottom:1px !important;
+}
