@@ -6102,9 +6102,9 @@ html[data-dp-layout] body header.hdr #hdr-credits-pill:hover > *:not(.dp-kg-pane
 /* -- Grundform beider Laschen (Klasse doppelt = genug Spezifitaet) --- */
 html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq.sbc-seq,
 html[data-dp-layout] .dpl-schiene .sb-card .sbc-investor-ribbon.sbc-investor-ribbon{
-  background:rgba(201,168,76,.15) !important;
+  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 15%, transparent) !important;
   color:var(--wl-e2c97e, #E2C97E) !important;
-  border:1px solid rgba(201,168,76,.42) !important;
+  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 42%, transparent) !important;
   border-bottom:0 !important;
   font-weight:700 !important;
   padding:2px 8px 3px !important;
@@ -6134,7 +6134,7 @@ html[data-dp-layout] .dpl-schiene .sb-card.active .sbc-seq.sbc-seq,
 html[data-dp-layout] .dpl-schiene .sb-card.is-active .sbc-seq.sbc-seq,
 html[data-dp-layout] .dpl-schiene .sb-card.active .sbc-investor-ribbon.sbc-investor-ribbon,
 html[data-dp-layout] .dpl-schiene .sb-card.is-active .sbc-investor-ribbon.sbc-investor-ribbon{
-  background:rgba(201,168,76,.26) !important;
+  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 26%, transparent) !important;
   color:var(--wl-e8cc7a, #E8CC7A) !important;
 }
 html[data-dp-layout] .dpl-schiene .sb-card.deal-won.active .sbc-seq.sbc-seq,
