@@ -48,7 +48,7 @@ js/register-easter-egg.js	2
 js/reseller-portal.js	46
 js/rnd-wizard.js	19
 js/session-expired-banner.js	5
-js/settings.js	26
+js/settings.js	25
 js/star-rating.js	1
 js/tax-periods.js	20
 js/tax.js	8
