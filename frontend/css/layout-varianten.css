@@ -4878,3 +4878,39 @@ html[data-dp-layout="v2b"] .dpl-ausgaben-kopf{ padding-top:0 !important; }
   .dpl-jf-box{ padding:16px 15px; }
   .dpl-jf-j{ padding:7px 11px; font-size:12px; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   v1688 — SCHWARZE SYMBOLE AUF SCHWARZEM GRUND
+   -------------------------------------------------------------------
+   Marcel: „in der Kanzlei oben, dass die Hilfe und auch dein Kontingent,
+   da wird das Icon und so noch in Schwarz angezeigt."
+
+   GEMESSEN in der Kanzlei:
+
+     header.hdr            Grund   rgb(14, 13, 11)
+     .hdr-icon-btn svg     fill    rgb(20, 19, 16)   <- fast derselbe Ton
+                           stroke  rgb(20, 19, 16)
+     .hdr-credits-pill svg stroke  rgb(213,187,115)  (gold, richtig)
+       └ dessen path       stroke  rgb(20, 19, 16)   <- ueberschreibt es
+
+   Der Knopf SELBST traegt seit v1663 `color:var(--wl-c9a84c)` und
+   `fill:currentcolor` — die Regel zielt aber auf den KNOPF. Ein `svg`
+   mit eigenem `fill` erbt ihn nicht, und ein `path` im Inneren erst
+   recht nicht. Gold am Knopf, Schwarz im Bild.
+
+   Deshalb wird die Farbe bis auf die Zeichenebene durchgezogen. `path`,
+   `circle`, `rect` und `line` einzeln benannt — `*` waere hier zu
+   grob, es traefe auch `<defs>`-Inhalte und Verlaufsmarken.
+   ═══════════════════════════════════════════════════════════════════ */
+html[data-dp-layout] body header.hdr .hdr-icon-btn svg,
+html[data-dp-layout] body header.hdr .hdr-icon-btn svg :is(path,circle,rect,line,polyline,polygon){
+  fill:none !important;
+  stroke:var(--wl-c9a84c, #C9A84C) !important;
+}
+/* Die Kerosin-Pille traegt ihren eigenen, helleren Ton — der bleibt,
+   nur das Symbol darin wird nachgezogen. */
+html[data-dp-layout] body header.hdr .hdr-credits-pill svg,
+html[data-dp-layout] body header.hdr .hdr-credits-pill svg :is(path,circle,rect,line,polyline,polygon){
+  stroke:currentColor !important;
+  fill:none !important;
+}

@@ -1763,3 +1763,29 @@ body.dp-neue-karte .dp-pfbar .k-heute{ display:none; }
    genau dann, wenn die Haupt-App auf „Heute" steht (v1685). */
 html[data-dp-heute] .dp-pfbar .k-neu{ display:none !important; }
 html[data-dp-heute] .dp-pfbar .k-heute{ display:inline !important; }
+
+/* ── v1688 · Ausgabeleiste im BMF-Modal ─────────────────────────────
+   Erscheint erst nach der Berechnung. `downloadXlsx()` hatte bis hierher
+   keinen einzigen Aufrufer — die Funktion war exportiert und fuer den
+   Nutzer unerreichbar. */
+.bmf-ausgaben{
+  margin-top:16px; padding-top:14px;
+  border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 26%, transparent);
+}
+.bmf-ausgaben-kopf{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+  opacity:.6; margin-bottom:9px;
+}
+.bmf-ausgaben-liste{ display:flex; flex-wrap:wrap; gap:9px; }
+.bmf-ausg{
+  display:flex; flex-direction:column; gap:2px; align-items:flex-start;
+  flex:1 1 210px; padding:10px 13px; cursor:pointer; text-align:left;
+  font:inherit; color:inherit; border-radius:8px;
+  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent);
+  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent);
+}
+.bmf-ausg:hover{ background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 17%, transparent); }
+.bmf-ausg-l{ font-size:13.5px; line-height:1.25; }
+.bmf-ausg-s{ font-size:11px; line-height:1.3; opacity:.62; }
+@media (max-width:560px){ .bmf-ausg{ flex:1 1 100%; } }
