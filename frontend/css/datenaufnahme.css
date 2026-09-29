@@ -1553,3 +1553,24 @@ html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dpk-copil
 html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-perf + .dp-pf-seg{
   padding-left:18px !important;
 }
+
+/* ── v1672c · KURZSCHRIFT SCHLÄGT EINZELWERT, WENN SIE SPÄTER STEHT ──
+   Auch `.dp-pf-perf + .dp-pf-seg{padding-left:18px}` blieb wirkungslos
+   — gemessen weiter 1 px. Der Grund ist nicht die Spezifität, sondern
+   die Kurzschrift zwei Blöcke weiter oben:
+
+     > .dp-pf-seg{ padding:8px 0 10px !important }
+
+   `padding` setzt ALLE vier Seiten, also auch `padding-left:0`. Zwei
+   `!important`-Regeln, die dieselbe Eigenschaft berühren — und die
+   Kurzschrift gewinnt, weil sie in der Datei später steht als mein
+   Versuch von v1671 und gleich spezifisch ist wie der von v1672b.
+
+   > Eine Kurzschrift ist kein Wert, sondern vier. Wer danach einen
+   > davon einzeln setzen will, muss ihn ENTWEDER später schreiben
+   > ODER auf eine Eigenschaft ausweichen, die sie nicht berührt.
+
+   `margin-left` berührt sie nicht. */
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-perf + .dp-pf-seg{
+  margin-left:18px !important;
+}
