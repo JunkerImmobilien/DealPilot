@@ -724,7 +724,17 @@
            `_kpEuro()` ist die Stelle, die das seit jeher richtig macht -
            genommen wird sie, nicht eine zweite Umrechnung daneben. */
         var kp=_kpEuro(o);
-        var mieteJ=num(o.ist_miete_j)||num(o.kaltmiete_j)||num(o.jahresmiete)||kp*0.05;
+        /* v1704c: dieselbe Mietkette wie `aggStats()`. Hier standen drei
+           Feldnamen, die im Frontend NIRGENDS gesetzt werden - es griff
+           immer der Notnagel `kp*0.05`. Gemessen: die Projektion rechnete
+           mit 42.400 EUR, waehrend das Cockpit daneben 49.980 EUR anzeigte.
+
+           > Zwei Zahlen fuer dieselbe Miete in einer Ansicht. Die eine
+           > ist gemessen, die andere geschaetzt - und nichts sagte, welche.
+           Der Notnagel bleibt als LETZTER Zweig: wo keine Miete erfasst ist,
+           ist eine Modellannahme ehrlicher als eine Null. */
+        var mieteJ=num(o._kpis_miete_j)||((num(o.nkm)+num(o.ze))*12)
+                 ||num(o.ist_miete_j)||num(o.kaltmiete_j)||num(o.jahresmiete)||kp*0.05;
         var bwkJ=num(o.bwk_j)||num(o.bewirtschaftung_j)||mieteJ*0.2;
         var zinsJ=num(o.zins_j)||(kp*(num(o._kpis_ltv)/100||0.8)*ASSUMP.zinsApprox);
         var tilgJ=num(o.tilg_j)||(kp*(num(o._kpis_ltv)/100||0.8)*0.02);
