@@ -23244,3 +23244,94 @@ nicht mehr benutzt. Das gehoert nachgeprueft.
 **Hinweis.** Beim Messen sind auf Staging Testobjekte entstanden
 (`2026-1044`, `2026-1045`, beide „Unbenannt"). Sie koennen geloescht
 werden.
+
+---
+
+## Rollout-Journal 29.09.2026 (20) — die vier offenen Punkte
+
+### 1 · Das Anlege-Modal ist ausgehängt
+
+Marcel: „nimm bitte auch das Modal bei neues Objekt anlegen erstmal
+raus." Die Datei bleibt liegen und ist heil (v1695b behob die
+Endlosrekursion); nur die `<script>`-Zeile ist auskommentiert. Wieder
+einhaengen heisst das Kommentarzeichen entfernen. Nebenwirkung, die
+gelegen kommt: damit faellt **eine von drei Schichten** weg, die sich um
+`window.newObj` gelegt hatten.
+
+### 2 · Die Layouts stehen unter Einstellungen → Aussehen
+
+Marcel hat es dreimal gesagt. Sie standen im Darstellungs-Panel, das
+erst hinter „Darstellung oeffnen" erscheint — eine Klickebene zu tief.
+Der Abschnitt dort heisst bereits „Aussehen".
+
+`settings.js` legt nur den leeren Behaelter an; gefuellt wird er aus
+`layout-varianten.js`, wo die Liste zu Hause ist. **Eine zweite Liste in
+den Einstellungen waere beim naechsten Layout schon falsch.**
+
+Reihenfolge ist Absicht: erst WO die Dinge liegen, dann WIE hell, dann
+alles Einzelne hinter „Darstellung oeffnen". Von grob nach fein.
+
+### 3 · Das Partner-Logo kam nie an — ein Sammelselektor kannte die Schiene nicht
+
+Die **Farbe** kam an (gemessen: ein Layout-Wechsel haelt `#2E7D8F`). Das
+**Logo** nicht.
+
+`sweepWordmark()` sucht nach `[class*="wordmark"]`, `[class*="-logo"]`,
+`[class*="-brand"]`. Die Schiene traegt
+`<span class="dpl-wm">Deal<i>Pilot</i></span>` — Text genau
+„DealPilot", also richtig erkannt, aber **`dpl-wm` passt auf keines der
+Muster**.
+
+> **Ein Sammelselektor aus Mustern erfasst nur, wer die Muster kennt.**
+> Wer neu dazukommt, muss sich melden — er wird nicht gefunden.
+
+**Nicht nachgemessen:** auf dem Testkonto ist kein Partner-Logo
+hinterlegt (`logo_b64` leer). Der Selektor ist korrigiert, der Beweis
+steht aus.
+
+### 4 · Der Hell-Zwang ist raus, und der Merker ueberlebte ihn
+
+`setze()` rief bei JEDEM Layout `window._dpDispSkin('hell')`.
+
+> Wer ein Layout waehlt, waehlt eine AUFTEILUNG. Die Helligkeit ist eine
+> zweite Entscheidung und gehoert dem Nutzer. Ein Umbau, der sich nicht
+> abwaehlen laesst, ist kein Angebot, sondern eine Ansage.
+
+**Danach war die App trotzdem hell** — `dp_chrome_hell: "1"` stand noch
+im Speicher und stellte sie beim naechsten Start wieder um. Der Zwang
+war raus, die Wirkung blieb. Das Zuruecksetzen raeumt ihn jetzt mit ab,
+dazu `dp_karten_variante`, `dp_layout_variante`, `dp_layout_seiten`.
+
+**Nachgemessen:** Zuruecksetzen ergibt `hellKlasse: false`, Layout
+„Heute", Merker geleert.
+
+### 5 · Der Gold-Waechter, dreimal vergeblich
+
+RC=1 nach v1697, und ich habe **dreimal** nur nach Hex gesucht. Mit
+`--alle` sagt er es genau:
+
+```
+js/layout-varianten.js    rgba(201,168,76,..) x1
+```
+
+**Gold in Zahlenform** in einem Inline-Stil. Es faerbt sich beim
+Mandanten genauso wenig um wie ein Hex — der Waechter zaehlt es zu
+Recht. Dazu zaehlte er den Rueckfallwert in meinem eigenen KOMMENTAR
+mit; er kann Erklaerung und Code nicht unterscheiden, und das ist
+richtig so.
+
+> **Bei RC=1 nicht raten, sondern `--alle` fragen.** Er nennt Datei UND
+> Fundform. Drei Anlaeufe waren drei zu viel.
+
+Der ganze Kasten steht jetzt im CSS. **RC=0.**
+
+**Commits.** `7cedd86` · `6c79ad9` · `a4f0a92` · `3ba4b5d` · `3587d0a`
+· `43d039a` · `3bb4244`
+
+**Rest.** Der Pre-Flight-Streifen in Kanzlei / Tower / Aktenmappe soll
+noch wie in der Demo aussehen — bei „Heute" stimmt er seit v1692b.
+Dazu Marcels neue Liste: Score-Grenzen (Deal-Score 88 zeigt „pruefen"),
+Webrecherche-Links mit `utm_source`, Wohnflaechenpruefung bei
+Mehrfamilienhaeusern (390 m² Gesamtflaeche wird als EINE Wohnung
+geprueft), Marktpreis-Abruf aus dem Co-Piloten, und die Einheiten der
+Westerfeldstr. erfassen.
