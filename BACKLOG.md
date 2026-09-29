@@ -122,7 +122,60 @@ hier **nicht**.
 > Frage in zehn Sekunden erledigt. **Erst messen, ob es die Aufgabe
 > noch gibt, dann fragen.**
 
-### N4 · Import-Modul v1.1.0 — NEU-Integration, kein Update
+### N4 · Import-Modul v1.1.0 — erste Dokumentart angebunden (v1677)
+
+> **Zurückgenommen, 29.09.2026:** Unten stand „**Im Repo existiert keine
+> Gegenstelle**". Das ist falsch. Ich hatte nach den *Dateinamen des
+> Moduls* gesucht (`import.js`, `import_service.py`) statt nach der
+> *Funktion*. Die Gegenstelle ist **`frontend/js/pdf-import.js`** (V38,
+> 1.391 Zeilen): pdf.js → `POST /ai/extract-expose` → OpenAI →
+> Strukturdaten. **Dieselbe Architektur wie das Modul**, nur für ein
+> Dokument statt für einen Ordner. Marcel hatte recht — „das Modul, das
+> wir bereits integriert haben" gibt es.
+>
+> In meiner eigenen Merkdatei steht „ich hab es nicht gefunden" ist
+> nicht „es gibt es nicht". Genau das ist hier passiert.
+
+**Damit ist klar, was „das Update einspielen" heißt:** nicht FastAPI
+nach Express portieren, sondern **die Dokumentarten nachziehen, die das
+Modul kann und wir nicht**.
+
+Das Modul klassifiziert zehn Arten (`import_service.py:47-99`) und hat
+Extraktions-Prompts für acht — `grundbuch`, `kataster`, `kaufvertrag`,
+`weg_protokoll`, `boris`, `vwg_vorgutachten`, `rndg`, `marktbericht`.
+**`kpt` wird klassifiziert, aber nicht extrahiert** — der Prompt fehlt.
+Deshalb kann „die Rechnung aus dem Modul nehmen" nicht gehen: sie ist
+dort nicht.
+
+**Angebunden (v1677): das Restnutzungsdauergutachten.**
+`POST /api/v1/ai/extract-rndg`, Schema wörtlich aus
+`EXTRAKTIONS_PROMPTS['rndg']`. Am Container gemessen:
+
+| Prüfung | Ergebnis |
+|---|---|
+| Neun Felder aus einem RNDG-Text | **alle korrekt** (Bj 1962, GND 80, 4 Punkte, Verfahren „Punktraster") |
+| Kette gegen unseren Kern | Gutachten **25 J.** / `calcPunktraster` **25,51 J.** — 2 % |
+| Negativtest ohne Baujahr/GND | `rechenbar: false`, `fehlende_pflichtfelder: ["baujahr","gnd_jahre"]` |
+
+Der Negativtest ist der wichtige: **`rnd_jahre` aus dem Gutachten wird
+gelesen, aber nie übernommen.** Gerechnet wird mit `rnd-calc.js`, die
+Gutachtenzahl ist der Vergleichswert. Und fehlende Pflichtangaben werden
+benannt statt still mit Standardwerten überbrückt — der Fehler, der bei
+der Kaufpreisaufteilung (v1669) eine um Faktor 2,9 falsche, plausibel
+aussehende Antwort erzeugt hat.
+
+**Offen — die nächsten Dokumentarten**, jede nach demselben Muster
+(Schema aus dem Modul, Rechnung bei uns): `grundbuch`, `kataster`,
+`kaufvertrag`, `weg_protokoll`. Dazu fehlt dem Endpunkt noch ein
+Aufrufer im Frontend; `pdf-import.js` ist die Stelle.
+
+**Nicht übernommen und bewusst so:** der Ordner-Upload, die SSE-Anzeige,
+der OCR-Zweig und `IMPORT_SESSIONS` (in-memory, übersteht keinen
+Neustart). Der OpenAI-Schlüssel des Moduls liegt im `localStorage` und
+geht per `X-OpenAI-Key`-Header vom Browser — unser Weg über den
+Server-Key mit `extractLimiter` bleibt.
+
+### N4-alt · Der ursprüngliche Befund (überholt, s. o.)
 
 `Dateien/dealpilot-import-v1_1_0.zip` (6 Dateien, ~55 KB). Geprüft am
 29.09.2026:

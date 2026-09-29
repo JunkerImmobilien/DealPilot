@@ -22341,3 +22341,73 @@ Korrektur.
 nur, dass er die Alternativen jetzt sieht. Offen ausserdem: Vogels, Ross
 und Parabel stehen weiterhin **nicht im PDF und nicht im DOCX**. Das ist
 der naechste Schritt, wenn er die Anzeige so haben will.
+
+---
+
+## Rollout-Journal 29.09.2026 (10) — die Bruecke zum Import-Modul
+
+**Was.** Marcels Satz war: „Das ist eine neue Version von dem Modul
+welches wir bereits integriert haben." Ich hatte gemeldet, im Repo gebe
+es **keine Gegenstelle**.
+
+> **Das nehme ich zurueck — es war mein Fehler, nicht seiner.** Ich
+> hatte nach den DATEINAMEN des Moduls gesucht (`import.js`,
+> `import_service.py`) statt nach der FUNKTION. Die Gegenstelle ist
+> **`frontend/js/pdf-import.js`** (V38, 1.391 Zeilen): pdf.js →
+> `POST /ai/extract-expose` → OpenAI → Strukturdaten. **Dieselbe
+> Architektur wie das Modul**, nur fuer ein Dokument statt fuer einen
+> Ordner. In meiner eigenen Merkdatei steht „ich hab es nicht gefunden"
+> ist nicht „es gibt es nicht" — genau das ist hier passiert, und es
+> hat Marcel eine Rueckfrage gekostet, die er nicht haette stellen
+> muessen.
+
+**Damit war die Aufgabe erst richtig gestellt:** „das Update
+einspielen" heisst nicht, FastAPI nach Express zu portieren, sondern
+**die Dokumentarten nachzuziehen, die das Modul kann und wir nicht.**
+
+**Was das Modul wirklich enthaelt** (gemessen, nicht ueberflogen): zehn
+klassifizierte Arten, acht Extraktions-Prompts — `grundbuch`,
+`kataster`, `kaufvertrag`, `weg_protokoll`, `boris`,
+`vwg_vorgutachten`, `rndg`, `marktbericht`. **`kpt` wird klassifiziert,
+aber nicht extrahiert**; der Prompt fehlt. Damit ist auch Marcels
+Kernfrage beantwortet: „die Rechnung aus dem Modul nehmen" geht nicht,
+weil sie dort nicht ist — und sie soll auch nicht dorthin. Unsere
+Kaufpreisaufteilung rechnet die amtliche BMF-Vorlage ueber LibreOffice
+durch; das ist der Grund, warum sie vor einem Finanzamt Bestand hat.
+
+**Gebaut (v1677):** `POST /api/v1/ai/extract-rndg` und
+`openaiService.extractRndg()`. Das Schema stammt **woertlich** aus
+`EXTRAKTIONS_PROMPTS['rndg']`. Spielt Marcel eine neue Modulfassung
+ein, muss nur dieses Schema nachgezogen werden.
+
+**Nachweis — echter Funktionslauf im Staging-Container, nicht
+`node --check`:**
+
+| Pruefung | Ergebnis |
+|---|---|
+| Neun Felder aus einem RNDG-Text | **alle korrekt** (Bj 1962, GND 80, 4 Punkte, „Punktraster", Stichtag 15.09.2026) |
+| Kette gegen den eigenen Kern | Gutachten **25 J.** gegen `calcPunktraster` **25,51 J.** = 2 % |
+| Negativtest ohne Baujahr/GND | `rechenbar: false`, `fehlende_pflichtfelder: ["baujahr","gnd_jahre"]` |
+
+**Der Negativtest ist der wichtige.** Zwei Regeln sind darin gebaut:
+
+1. **`rnd_jahre` aus dem Gutachten wird gelesen, aber nie uebernommen.**
+   Gerechnet wird mit `rnd-calc.js`; die Gutachtenzahl ist der
+   Vergleichswert. Eine uebernommene Zahl, die niemand gegenprueft, ist
+   eine Behauptung — und ein Gutachten, das man nur abschreibt, haette
+   man auch nicht lesen muessen.
+2. **Fehlende Pflichtangaben werden benannt statt ueberbrueckt.** Genau
+   dieser Fehler hat bei der Kaufpreisaufteilung (v1669) eine um Faktor
+   2,9 falsche Antwort erzeugt, die plausibel aussah.
+
+**Commit.** `fe46615` · **Rebuild.** Backend auf Staging neu gebaut
+(`--build backend`), im Container nachgemessen:
+`typeof extractRndg === 'function'`, Route dreimal in `ai.js`.
+
+**Rest.** Der Endpunkt hat noch **keinen Aufrufer im Frontend** —
+`pdf-import.js` ist die Stelle. Die naechsten Dokumentarten nach
+demselben Muster: `grundbuch`, `kataster`, `kaufvertrag`,
+`weg_protokoll`. **Nicht uebernommen und bewusst so:** Ordner-Upload,
+SSE-Anzeige, OCR-Zweig, `IMPORT_SESSIONS` (in-memory) und der
+OpenAI-Schluessel im `localStorage` — unser Weg ueber den Server-Key
+mit `extractLimiter` bleibt.
