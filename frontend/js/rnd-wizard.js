@@ -728,6 +728,28 @@
       + '<div class="rnd-wiz-result-card-value">' + r.methods.linear.restnutzungsdauer + '</div>'
       + '<div class="rnd-wiz-result-card-unit">Jahre</div>'
       + '</div>'
+      /* v1676 — Vogels, Ross und Parabel wurden vom Kern immer gerechnet
+         (calcAll -> methods.*) und hier nie gezeigt. Sie brauchen KEINE
+         eigenen Eingaben, nur Alter und GND. An den drei Testobjekten
+         liegen die Verfahren 12,8 bis 19,2 Jahre auseinander - eine
+         Spreizung, die der Gutachter sehen muss, um sein Verfahren
+         begruenden zu koennen. Eine Zahl ohne ihre Alternativen sieht
+         nach Messung aus und ist eine Wahl.                             */
+      + '<div class="rnd-wiz-result-card">'
+      + '<div class="rnd-wiz-result-card-label">Vogels</div>'
+      + '<div class="rnd-wiz-result-card-value">' + r.methods.vogels.restnutzungsdauer + '</div>'
+      + '<div class="rnd-wiz-result-card-unit">Jahre</div>'
+      + '</div>'
+      + '<div class="rnd-wiz-result-card">'
+      + '<div class="rnd-wiz-result-card-label">Ross</div>'
+      + '<div class="rnd-wiz-result-card-value">' + r.methods.ross.restnutzungsdauer + '</div>'
+      + '<div class="rnd-wiz-result-card-unit">Jahre</div>'
+      + '</div>'
+      + '<div class="rnd-wiz-result-card">'
+      + '<div class="rnd-wiz-result-card-label">Parabel</div>'
+      + '<div class="rnd-wiz-result-card-value">' + r.methods.parabel.restnutzungsdauer + '</div>'
+      + '<div class="rnd-wiz-result-card-unit">Jahre</div>'
+      + '</div>'
       + '<div class="rnd-wiz-result-card">'
       + '<div class="rnd-wiz-result-card-label">Punktraster</div>'
       + '<div class="rnd-wiz-result-card-value">' + r.methods.punktraster.restnutzungsdauer + '</div>'
@@ -739,6 +761,28 @@
       + '<div class="rnd-wiz-result-card-unit">Jahre · maßgeblich</div>'
       + '</div>'
       + '</div>';
+
+    /* v1676 — Die Spreizung benennen. Sechs Verfahren nebeneinander zu
+       zeigen ohne zu sagen, wie weit sie auseinanderliegen, ueberlaesst
+       dem Leser das Rechnen. An den Testobjekten sind es 12,8 bis 19,2
+       Jahre - bei 1 % AfA-Unterschied je 20 Jahre ist das die halbe
+       Aussage des Gutachtens.                                          */
+    (function () {
+      var werte = ['linear', 'vogels', 'ross', 'parabel', 'punktraster', 'technisch']
+        .map(function (k) { return r.methods[k] && r.methods[k].restnutzungsdauer; })
+        .filter(function (v) { return typeof v === 'number' && isFinite(v) && v > 0; });
+      if (werte.length < 2) return;
+      var min = Math.min.apply(null, werte), max = Math.max.apply(null, werte);
+      var delta = Math.round((max - min) * 10) / 10;
+      if (delta <= 0) return;
+      html += '<div class="rnd-wiz-spreizung">'
+        + '<strong>Spreizung der Verfahren: ' + min + ' bis ' + max + ' Jahre</strong> ('
+        + String(delta).replace('.', ',') + ' Jahre Unterschied). '
+        + 'Maßgeblich ist ' + escapeHTML(r.final_source || '—') + '. '
+        + 'Die Wahl des Verfahrens gehört begründet — sie bewegt die '
+        + 'Abschreibung stärker als jede Einzelangabe.'
+        + '</div>';
+    })();
 
     // Lohnt sich AfA?
     html += '<div class="rnd-wiz-result-ampel rnd-wiz-ampel-' + ampelClass + '">'
