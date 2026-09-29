@@ -24077,3 +24077,111 @@ nachgezogen, sonst bliebe Luft fuer neues Hartgold an derselben Stelle.
 
 **Commits.** `f630230` · `c68d2a0` · `20c3265` · `3663bca` · `71755ce` ·
 `7c4ec0f` · `c5ed702` · `d324301`
+
+---
+
+## 29.09.2026 (27) — v1707/v1708: Demo, Reiter-Icons, eine Anzeige
+
+### 1 · Zehn Entwuerfe fuer die Objektkarten (Demo)
+
+Marcel: „kannst du mir bei den neuen layouts auch wenn man unter
+portfolio klickt schoenere objekt karteien angeben? kannst du mir 10
+ideen liefern als demo. aktuell sieht das so schlicht aus."
+
+**`design/mockups/objektkarten-schiene-v1707.html`** — Bordkarte,
+Aktenreiter, Score-Kante, Datenzeile, Bildkachel, Ampel, Kennzahlen,
+Minimal, Status, Cockpit.
+
+Gemessen am laufenden Stand, nicht geraten: Schiene **248 px**, Karte
+**216 x 81 px**. Die Objekte in der Demo sind **echt** aus dem
+Staging-Portfolio — mit langen Adressen, einem Fall ohne Namen
+(„Unbenannt") und einem ohne Score.
+
+> Ein Entwurf, der nur mit dem schoenen Fall funktioniert, faellt erst
+> beim Kunden auf.
+
+**Noch nichts davon ist gebaut** — die Demo ist die Entscheidungsvorlage.
+
+### 2 · Die Reiter-Symbole waren Flaechen statt Linien
+
+Marcel: „bei der Ansicht Kanzlei koennen natuerlich die Icons bei
+Objekt, Investition, Miete und allem auch uebernommen werden, wie von
+unserem urspruenglichen heute."
+
+Gemessen: `fill = stroke = dieselbe Farbe` bei allen neun Reitern.
+Dieselbe Ursache wie bei den Aktionen in v1705c.
+
+**Und derselbe Fehler zweimal gemacht:** v1707 raeumte eine Regel auf,
+danach sah es unveraendert aus. Der Walker nannte den Grund in einer
+Zeile — eine **zweite** Regel,
+`html[data-dp-layout] .dpl-schiene:has(nav.tabs) nav.tabs .tab svg`,
+legte `fill:currentColor !important` ebenfalls darauf.
+
+> **Ich hatte in v1707 selbst geschrieben:** „wer eine Sammelregel
+> aufraeumt, geht ihre ganze Liste durch." Dann habe ich nach der ersten
+> aufgehoert. Zwei Regeln fuer dieselbe Flaeche, und die zweite sah aus
+> wie ein neuer Fehler.
+
+**Nachgemessen (frischer Tab):** `fill=none` bei allen Reitern, im Bild
+saubere Umrisse — Haus, Uhr, €, Bank, Zahnrad, Dokument.
+
+### 3 · Eine Fortschrittsanzeige statt zwei
+
+Marcel: „in der Tabbar einmal diese alle sechs Bereiche vollstaendig ...
+und oben im Header nochmal 24 von 24 Felder fuer den Investor Deal Score
+... dann kann man sich eine Anzeige sparen."
+
+**Gemessen an der Westerfeldstr. 140, beide gleichzeitig sichtbar:**
+
+```
+#tabs-status-badge   "6 / 6 · 100 %"     sechs Bereiche
+#hdr-completeness    "21 / 24 Felder"    Investor Deal Score
+```
+
+> **Zwei Fortschrittsanzeigen nebeneinander beantworten nicht zwei
+> Fragen. Sie stellen eine dritte: welche gilt jetzt?**
+
+**Die Stufen sind Marcels:**
+
+| Zustand | Anzeige |
+|---|---|
+| einfache Bewertung unvollstaendig | `N / 6 Bereiche` |
+| vollstaendig **und** Plan traegt IDS | `N / 24 Felder` |
+| sonst | `Vollstaendig` |
+
+`hasFullFeature`, nicht `hasFeature`: der Free-Plan traegt
+`deal_score_v2` als „demo" (calc.js:130, Absicht). **Eine Demo ist kein
+Anspruch auf 24 Felder** — wer den Score nicht hat, soll nicht den Rest
+eines Features sehen, das er nicht bekommt.
+
+Die Kopf-Anzeige wird zur **Quelle**: ausgeblendet, aber im DOM und
+gefuellt, weil `hybrid-aktionen.js:162/174` `.hdr-comp-text` ausliest.
+
+> Eine Anzeige abzuschalten heisst nicht, ihre Daten wegzuwerfen. Jemand
+> anders liest sie vielleicht.
+
+**Nachgemessen:** Anzeige „21 / 24 Felder", Titel „Einfache Bewertung
+steht. Noch 3 Felder bis zum vollen Investor Deal Score.",
+`#hdr-completeness` auf `display:none`, `.hdr-comp-text` weiter gefuellt.
+
+### Zwei eigene Fehler, beide zurueckgenommen
+
+**1 · Die neue Funktion landete MITTEN in `updateProgress()`.** Der
+Haekchen-Block danach waere in ihr gelandet und haette `status` nicht
+mehr gehabt. **`node --check` war gruen** — es prueft nur Syntax. Per
+`git checkout --` zurueckgenommen, die Funktion ans Modulende gesetzt,
+Reihenfolge danach gegengeprueft (`wfStatus < haekchen < funktion`).
+
+**2 · Ein Messfehler, der wie ein Codefehler aussah:** zweimal meldete
+der Browser die alte Fassung, obwohl der Server die neue hatte —
+`location.reload(true)` macht in heutigem Chrome **keinen** Hard-Reload
+mehr. Gemessen an den geladenen Pfaden: `workflow.js?v=v1255`, waehrend
+`index.html` auf dem Server `v1708` trug.
+
+> **Ein Cache-Treffer sieht aus wie eine Regel, die nicht greift.** Vor
+> jeder Kaskadendiagnose die geladene Dateiversion lesen — und zum
+> Messen einen frischen Tab mit eigenem Query-Parameter nehmen.
+
+**Gold-Audit RC=0**, Basislinie jetzt 438.
+
+**Commits.** `9fd6627` · `f8e6a56` · `4a5b435` · `e76a0c0`
