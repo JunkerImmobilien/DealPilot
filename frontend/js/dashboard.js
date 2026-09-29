@@ -704,12 +704,34 @@
     for(var i=0;i<years;i++){
       var yr=2026+i, miete=0,bwk=0,zins=0,tilg=0,afa=0,rest=0,wert=0;
       arr.forEach(function(o){
-        var kp=num(o._kaufpreis);
+        /*    v1704b · DIE PROJEKTION RECHNETE IN CENT                 
+           Hier stand `num(o._kaufpreis)`. Der Kommentar an der SSoT
+           weiter oben sagt es ausdruecklich: `o.kp` ist EURO,
+           `o._kaufpreis` ist CENT. Da alle Folgewerte aus `kp` abgeleitet
+           werden (Miete, Zins, Tilgung, AfA, Restschuld, Wert), stand die
+           GANZE Projektion um Faktor 100 zu hoch.
+
+           Gemessen am 29.09.2026 auf Staging, 5 Objekte mit 848.000 EUR
+           Kaufpreissumme - die Tabelle zeigte:
+             Wert 84.800.000 | Restschuld 70.725.374 | Miete 4.240.000
+           Richtig waeren rund 848.000 / 820.000 / 42.400.
+
+           > Aufgefallen ist es erst, weil der Portfolio-Pilot dieselbe
+           > Funktion liest und seine Zahlen neben `aggStats()` standen.
+           > Eine Zahl allein sieht nie falsch aus; erst die zweite,
+           > die dasselbe meint, verraet sie.
+
+           `_kpEuro()` ist die Stelle, die das seit jeher richtig macht -
+           genommen wird sie, nicht eine zweite Umrechnung daneben. */
+        var kp=_kpEuro(o);
         var mieteJ=num(o.ist_miete_j)||num(o.kaltmiete_j)||num(o.jahresmiete)||kp*0.05;
         var bwkJ=num(o.bwk_j)||num(o.bewirtschaftung_j)||mieteJ*0.2;
         var zinsJ=num(o.zins_j)||(kp*(num(o._kpis_ltv)/100||0.8)*ASSUMP.zinsApprox);
         var tilgJ=num(o.tilg_j)||(kp*(num(o._kpis_ltv)/100||0.8)*0.02);
-        var restschuld=num(o._kpis_restschuld)||num(o.restschuld)||kp*(num(o._kpis_ltv)/100||0.8);
+        /* Auch hier war die Einheit gemischt: der erste Zweig liefert EURO,
+           der Fallback rechnete aus dem CENT-Kaufpreis. `_restschuldOf()` ist
+           die SSoT und fuehrt beide Wege in Euro. */
+        var restschuld=_restschuldOf(o)||kp*(num(o._kpis_ltv)/100||0.8);
         var rate=zinsJ+tilgJ;
         var restStart=Math.max(0,restschuld-tilgJ*i);
         var zinsI=Math.max(0,restStart*ASSUMP.zinsApprox);
