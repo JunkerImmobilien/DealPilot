@@ -146,9 +146,72 @@ async function ladeKatalog(force) {
     throw new Error('bewertungs_katalog_leer — kein Preis mit dp_-lookup_key im Stripe-Konto gefunden');
   }
 
+  _preisplausibilitaet(katalog);
+
   _cache = katalog;
   _cacheAt = Date.now();
   return katalog;
+}
+
+/* ── v1673 · EIN PAKET DARF NIE TEURER SEIN ALS SEIN INHALT ──────────
+   Marcel am 28.09.2026: „die Preise fuer einen Marktbericht — als
+   Paket ist es aktuell teurer als einzelne zu kaufen."
+
+   Gemessen am 29.09. am ECHTEN Katalog (nicht an `config.js`, die nur
+   anzeigt):
+
+     nachkauf_investor   8,75 EUR   5/5/0   Einzelwert 14,00   -5,25
+     nachkauf_pro       12,50 EUR   5/5/5   Einzelwert 33,50  -21,00
+     nachkauf_starter    5,00 EUR   5/0/0   Einzelwert  4,50   +0,50  <-
+
+   `config.js` leitet den Paketpreis als Monatsbeitrag/4 ab und
+   ignoriert dabei, WORAUS das Kontingent besteht. Beim Starter ist es
+   nur die billigste Art — und deshalb kippt genau dort das
+   Versprechen, das drei Zeilen darueber in derselben Datei steht:
+   „Die Einzelpreise liegen bewusst ueber dem Paketanteil."
+
+   > Ein Paket, das teurer ist als sein Inhalt, ist kein Angebot,
+   > sondern eine Falle — und niemand merkt es, weil beide Zahlen fuer
+   > sich plausibel aussehen.
+
+   **Der Preis selbst steht in Stripe und wird hier NICHT veraendert** —
+   eine Abbuchung gehoert nicht in eine Plausibilitaetspruefung. Diese
+   Funktion sagt nur Bescheid, damit es beim naechsten Mal auffaellt,
+   bevor ein Kunde es tut. */
+function _preisplausibilitaet(katalog) {
+  try {
+    const einzeln = {};
+    Object.keys(katalog).forEach(function (s) {
+      const e = katalog[s];
+      if (e.kind !== 'einzeln') return;
+      const arten = Object.keys(e.paket || {});
+      if (arten.length === 1 && e.paket[arten[0]] === 1) einzeln[arten[0]] = e.amount_cents;
+    });
+    Object.keys(katalog).forEach(function (s) {
+      const p = katalog[s];
+      if (p.kind !== 'paket') return;
+      let wert = 0, vollstaendig = true;
+      Object.keys(p.paket || {}).forEach(function (art) {
+        if (einzeln[art] == null) { vollstaendig = false; return; }
+        wert += einzeln[art] * p.paket[art];
+      });
+      if (!vollstaendig || wert <= 0) return;
+      if (p.amount_cents > wert) {
+        console.warn(
+          '[bewertungsKatalog] PREIS UNPLAUSIBEL: Paket "' + s + '" kostet '
+          + (p.amount_cents / 100).toFixed(2) + ' EUR, sein Inhalt einzeln nur '
+          + (wert / 100).toFixed(2) + ' EUR (+' + ((p.amount_cents - wert) / 100).toFixed(2)
+          + '). Stripe-Preis ' + p.price_id + ' (' + p.lookup_key + ') pruefen.'
+        );
+        p.unplausibel = {
+          einzelwert_cents: wert,
+          aufschlag_cents: p.amount_cents - wert
+        };
+      }
+    });
+  } catch (e) {
+    console.warn('[bewertungsKatalog] Plausibilitaetspruefung fehlgeschlagen:', e.message);
+  }
 }
 
 async function getBySku(sku) {
