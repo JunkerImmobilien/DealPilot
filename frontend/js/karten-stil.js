@@ -487,6 +487,28 @@
       }
     } catch (e) {}
 
+    /* v1702: die Gegenbewegung. Marcel will den Streifen in Kanzlei,
+       Tower und Aktenmappe wieder so sehen wie in der Demo. Die
+       CSS-Vorgabe ist dafuer gefallen (siehe datenaufnahme.css) - aber
+       wer `kartei` gemerkt hat, saehe weiter den Entwurf.
+
+       `kartei` hat niemand gewaehlt: der Zweig darueber hat es gesetzt.
+       Wessen Merker aus jener Migration stammt (`MIGRIERT+'b'` liegt
+       vor), bekommt ihn jetzt einmalig zurueckgenommen. Wer den Entwurf
+       danach bewusst waehlt, behaelt ihn - der neue Marker verhindert,
+       dass ihm das ein zweites Mal weggenommen wird.
+
+       > Dasselbe Prinzip wie oben: ein fremder Merker wird genau einmal
+       > angefasst, mit eigenem Marker, und erklaert. */
+    try {
+      if (gemerkt === 'kartei' && localStorage.getItem(MIGRIERT + 'b')
+          && !localStorage.getItem(MIGRIERT + 'c')) {
+        gemerkt = '';
+        localStorage.setItem(LS, '');
+        localStorage.setItem(MIGRIERT + 'c', '1');
+      }
+    } catch (e) {}
+
     if (ausUrl !== null) setze(ausUrl === 'aus' ? '' : ausUrl);
     else if (gemerkt) setze(gemerkt);
     /* KEIN Standard per JS. Wer nichts gewaehlt hat, bekommt die
