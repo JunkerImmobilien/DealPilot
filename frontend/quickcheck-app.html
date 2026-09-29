@@ -6736,7 +6736,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
   <!-- v1641 · Der Quick-Check ist ein eigenes Dokument im iframe - die
        Gestaltung der Datenaufnahme muss hier NOCH EINMAL geladen werden.
        Zuletzt, damit sie die eingebetteten Stile ueberstimmt. -->
-  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1685">
+  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1686">
 <!-- ── v1665g · DIE KARTEI GILT AUCH HIER — ABER NUR SIE ──────────────
      Marcel: „ImmoMetrica, Expose, Marktbericht — das sieht nicht so aus
      wie im Tab Objekt."
@@ -6832,6 +6832,16 @@ html[data-dp-kartenstil="kartei"] #qc7-sources .dp-pf-tile.on{
 html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-stripe{ display:block !important; }
 html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-lead{ display:flex !important; }
 html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-sep{ display:block !important; }
+
+/* v1686 — Ohne QR keine Luecke. Gemessen bei „Heute": im Objekt-Tab
+   fuellt der QR 289 px vor dem Abruf-Knopf, hier gibt es keinen Pass
+   und damit keinen QR — `margin-left:auto` liess 255 px weisse Flaeche
+   stehen. `:has(.dp-pf-qr[data-hat-ziel])` fragt nach dem ZIEL, nicht
+   nach dem Element: sobald ein Pass entsteht, setzt `renderQR()` das
+   Attribut und der Knopf rueckt von selbst wieder nach rechts. */
+#qc7-sources.dp-pfbar:not(:has(.dp-pf-qr[data-hat-ziel])) .dp-pf-rz{
+  margin-left:18px !important;
+}
 #qc7-sources.dp-pfbar .dp-pf-qr{ margin-left:auto !important; }
 #qc7-sources.dp-pfbar .dp-pf-qr + .dp-pf-rz{ margin-left:14px !important; }
 </style>

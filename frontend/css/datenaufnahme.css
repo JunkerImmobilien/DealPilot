@@ -1678,3 +1678,36 @@ html[data-dp-kartenstil="kartei"] .dp-pf-scroll::after{
 :is(#oab-bar, #qc7-sources).dp-pfbar .dp-pf-qr{
   margin-left:auto !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   v1686 — OHNE QR KEINE LUECKE
+   -------------------------------------------------------------------
+   Marcel: „das Abrufen, das ist irgendwo ganz wild neben ImmoMetrica."
+
+   GEMESSEN bei „Heute", beide Leisten einzeilig:
+
+                          Tab Objekt   QuickBoarding
+     QR-Breite            289 px       0 px
+     Luecke vor Abrufen   —            255 px weiss
+
+   Im Objekt-Tab FUELLT der QR den Raum vor dem Abruf-Knopf. Im
+   QuickBoarding gibt es keinen Pass und damit keinen QR — der Knopf
+   wurde von `margin-left:auto` an den rechten Rand geschoben und liess
+   eine handbreite leere Flaeche hinter sich.
+
+   Beides war fuer sich richtig und zusammen falsch: v1682 hat den Knopf
+   nach rechts geholt, weil er sonst mitten in der Leiste klebte; das
+   galt fuer die ZWEIZEILIGE Kartei-Fassung. Einzeilig und ohne QR
+   gehoert er wieder an seinen Nachbarn.
+
+   `:has(.dp-pf-qr[data-hat-ziel])` fragt genau das, worauf es ankommt —
+   ob ein QR mit ZIEL danebensteht, nicht ob das Element existiert.
+   Sobald ein Pass entsteht, setzt `renderQR()` das Attribut, der QR
+   erscheint, und der Knopf rueckt von selbst wieder nach rechts.
+   ═══════════════════════════════════════════════════════════════════ */
+#qc7-sources.dp-pfbar:not(:has(.dp-pf-qr[data-hat-ziel])) .dp-pf-rz{
+  margin-left:18px !important;
+}
+#oab-bar.dp-pfbar:not(:has(.dp-pf-qr[data-hat-ziel])) .dp-pf-rz{
+  margin-left:18px !important;
+}
