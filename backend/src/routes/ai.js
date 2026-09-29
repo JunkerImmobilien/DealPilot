@@ -19,6 +19,7 @@ const { requireUnderLimit } = require('../middleware/planLimits');
 const usageService = require('../services/usageService');
 const openaiService = require('../services/openaiService');
 const aiCreditsService = require('../services/aiCreditsService');  // V63.86
+const dokumentSchemas = require('../services/dokumentSchemas');   /* v1678 */
 const plzValidator = require('../services/plzValidator');  // V229: PLZ-Halluzinationsschutz
 const voiceExtractService = require('../services/voiceExtractService');  // v503-voice
 
@@ -548,6 +549,77 @@ router.post('/extract-expose', authenticate, extractLimiter, async (req, res, ne
     if (err.status) return res.status(502).json({ error: 'OpenAI-Fehler: ' + err.message });
     next(err);
   }
+});
+
+/**
+ * v1678: POST /api/v1/ai/extract-dokument
+ *
+ * Nimmt den Text EINES Dokuments, erkennt die Art selbst und liest sie
+ * mit dem passenden Schema aus. Neun Arten: Grundbuch, Kataster,
+ * Kaufvertrag, WEG-Protokoll, BORIS, Verkehrswertgutachten, RNDG,
+ * Kaufpreisaufteilung, Marktbericht.
+ *
+ * Body: { text, dateiname?, typ? }
+ *   `typ` überstimmt die Erkennung — der Nutzer soll korrigieren können,
+ *   was die Stichwortsuche falsch einsortiert.
+ *
+ * Erkennt die Route nichts Sicheres, wird NICHT geraten: sie gibt die
+ * Kandidaten zurück und lässt den Nutzer wählen. Ein falsches Schema
+ * liest stillschweigend falsche Felder.
+ *
+ * Wie extract-expose: kein Credit-Verbrauch (Extraktion ≠ Analyse).
+ */
+router.post('/extract-dokument', authenticate, extractLimiter, async (req, res, next) => {
+  try {
+    const { text, dateiname, typ: typWunsch, userApiKey: rawUserKey } = req.body || {};
+    const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
+
+    if (!config.openai.apiKey && !userApiKey) {
+      return res.status(503).json({ error: 'Kein OpenAI-API-Key verfügbar.', needs_user_key: true });
+    }
+    if (!text || typeof text !== 'string' || text.length < 50) {
+      return res.status(400).json({ error: 'Body muss "text" enthalten (mindestens 50 Zeichen).' });
+    }
+
+    const erkannt = dokumentSchemas.klassifiziere(text, dateiname || '');
+    const typ = (typWunsch && dokumentSchemas.SCHEMATA[typWunsch]) ? typWunsch : erkannt.typ;
+
+    if (!typ) {
+      return res.json({
+        success: false,
+        unklar: true,
+        error: 'Dokumentart nicht sicher erkannt.',
+        erkannt: erkannt,
+        auswahl: dokumentSchemas.typenListe()
+      });
+    }
+
+    const result = await openaiService.extractDokument(text, typ, { userApiKey });
+    result.erkennung = {
+      typ: erkannt.typ,
+      sicherheit: erkannt.sicherheit,
+      ueberstimmt: !!(typWunsch && typWunsch !== erkannt.typ)
+    };
+    try {
+      if (aiCreditsService && typeof aiCreditsService.logExtract === 'function') {
+        await aiCreditsService.logExtract(req.user.id, 'extract-dokument:' + typ);
+      }
+    } catch (e) { /* nicht kritisch */ }
+    res.json(result);
+  } catch (err) {
+    if (err.code === 'NO_API_KEY') return res.status(503).json({ error: err.message, needs_user_key: true });
+    if (err.status === 401) return res.status(401).json({ error: err.message });
+    if (err.status) return res.status(502).json({ error: 'OpenAI-Fehler: ' + err.message });
+    next(err);
+  }
+});
+
+/**
+ * v1678: GET /api/v1/ai/dokument-arten — welche Arten kann der Import?
+ * Damit das Frontend die Auswahlliste nicht doppelt führen muss.
+ */
+router.get('/dokument-arten', authenticate, (req, res) => {
+  res.json({ arten: dokumentSchemas.typenListe() });
 });
 
 /**

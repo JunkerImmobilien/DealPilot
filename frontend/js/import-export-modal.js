@@ -75,6 +75,26 @@
       '<div class="iexp-grid">' +
 
         // Excel-Import
+        /* v1678: Dokument-Import. Die Schemata stammen aus dem
+           Import-Modul, die Rechnung bleibt in DealPilot - deshalb
+           steht in der Karte ausdruecklich, dass fremde Gutachten
+           Eingaben liefern und keine Ergebnisse.                    */
+        '<div class="iexp-card" onclick="iexpImportDokument()">' +
+          '<div class="iexp-card-ico iexp-ico-gold">' + _icon('upload', 22) + '</div>' +
+          '<div class="iexp-card-tag">PDF · Gutachten &amp; Auszüge</div>' +
+          '<h3>Dokument einlesen</h3>' +
+          '<p>Erkennt die Art des Dokuments und liest die Angaben mit dem passenden ' +
+          'Schema aus. Neun Arten:</p>' +
+          '<ul class="iexp-bullets">' +
+            '<li>Grundbuch · Kataster · Kaufvertrag · WEG-Protokoll</li>' +
+            '<li>Bodenrichtwert · Verkehrswert- und Restnutzungsdauergutachten</li>' +
+            '<li>Kaufpreisaufteilung · Marktbericht</li>' +
+          '</ul>' +
+          '<p class="iexp-warn">Fremde Gutachten liefern <em>Eingaben</em>, keine Ergebnisse — ' +
+          'gerechnet wird weiter in DealPilot.</p>' +
+          '<div class="iexp-card-cta">Datei wählen <span>›</span></div>' +
+        '</div>' +
+
         '<div class="iexp-card" onclick="iexpImportExcel()">' +
           '<div class="iexp-card-ico iexp-ico-blue">' + _icon('upload', 22) + '</div>' +
           '<div class="iexp-card-tag">Excel · ImmoKalk · immocation</div>' +
@@ -116,6 +136,15 @@
       'Eingaben aus Excel laden oder ein DealPilot-Backup wiederherstellen.',
       _renderImportCards()
     );
+  };
+
+  window.iexpImportDokument = function() {
+    closeIexpModal();
+    if (window.DokumentImport && typeof window.DokumentImport.oeffnen === 'function') {
+      window.DokumentImport.oeffnen();
+    } else if (typeof toast === 'function') {
+      toast('⚠ Dokument-Import nicht verfügbar');
+    }
   };
 
   window.iexpImportExcel = function() {

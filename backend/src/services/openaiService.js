@@ -15,6 +15,7 @@
  */
 
 const config = require('../config');
+const dokumentSchemas = require('./dokumentSchemas');   /* v1678 */
 
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
 
@@ -1995,7 +1996,75 @@ async function extractBeleg(images, opts) {
 
 
 /**
+ * v1678 — extractDokument: eine beliebige Dokumentart einlesen.
+ *
+ * Löst den Einzelfall `extractRndg` (v1677) ab und bedient alle neun
+ * Arten aus `dokumentSchemas.js`. Die Schemata stammen aus dem
+ * Import-Modul v1.1.0; kommt eine neue Modulfassung, wird nur dort
+ * nachgezogen — diese Funktion bleibt unverändert.
+ *
+ * Zwei Regeln sind hier eingebaut, beide teuer bezahlt:
+ *
+ * 1. **Zahlen werden geprüft, nicht übernommen.** `Number(null)` ist 0
+ *    und besteht `Number.isFinite` — erst auf Abwesenheit prüfen. Jedes
+ *    Schema führt seine Grenzen; ein Bodenrichtwert von 4 Mio €/m² ist
+ *    ein Lesefehler, keine Lage.
+ * 2. **Fehlende Pflichtangaben werden benannt, nicht überbrückt.** Genau
+ *    das hat bei der Kaufpreisaufteilung (v1669) eine um Faktor 2,9
+ *    falsche Antwort erzeugt, die plausibel aussah.
+ */
+async function extractDokument(text, typ, opts) {
+  const prompt = dokumentSchemas.baueprompt(typ, text);
+  if (!prompt) {
+    return { success: false, error: 'Unbekannte Dokumentart: ' + typ };
+  }
+  const spec = dokumentSchemas.SCHEMATA[typ];
+
+  const r = await callOpenAI(prompt, Object.assign({ maxTokens: 1400 }, opts || {}));
+  const parsed = extractJson(r.text);
+  if (!parsed) {
+    return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.', raw_text: r.text };
+  }
+  const ext = parsed.extracted || parsed;
+
+  /* Zahlenfelder gegen die Grenzen des Schemas prüfen. Was durchfällt,
+     wird null UND gemeldet — stillschweigend verworfene Werte sind der
+     Fehler, den wir gerade erst behoben haben.                       */
+  const verworfen = [];
+  const grenzen = spec.zahlen || {};
+  Object.keys(grenzen).forEach(function (feld) {
+    if (!(feld in ext)) return;
+    const roh = ext[feld];
+    if (roh === null || roh === undefined || roh === '') { ext[feld] = null; return; }
+    const n = Number(roh);
+    const g = grenzen[feld];
+    if (!Number.isFinite(n) || n < g[0] || n > g[1]) {
+      verworfen.push({ feld: feld, wert: roh, erwartet: g[0] + ' bis ' + g[1] });
+      ext[feld] = null;
+    } else {
+      ext[feld] = n;
+    }
+  });
+
+  const fehlend = (spec.pflicht || []).filter(function (f) {
+    return ext[f] === null || ext[f] === undefined || ext[f] === '';
+  });
+
+  return {
+    success: true,
+    model: r.model,
+    typ: typ,
+    label: (dokumentSchemas.DOKUMENT_TYPEN[typ] || {}).label || typ,
+    extracted: ext,
+    rechenbar: fehlend.length === 0,
+    fehlende_pflichtfelder: fehlend,
+    verworfene_werte: verworfen
+  };
+}
+
+/**
  * v1677 — extractRndg: Restnutzungsdauergutachten einlesen.
+ * Bleibt als eigener Weg bestehen, weil der RND-Assistent ihn ruft.
  *
  * Das Schema stammt WÖRTLICH aus dem Import-Modul v1.1.0
  * (`import_service.py`, `EXTRAKTIONS_PROMPTS['rndg']`). Damit ist die
@@ -2086,6 +2155,7 @@ module.exports = {
   buildPrompt,
   callOpenAI,
   extractBeleg,
-  extractRndg,   /* v1677 */
+  extractRndg,       /* v1677 */
+  extractDokument,   /* v1678 */
   extractJson
 };
