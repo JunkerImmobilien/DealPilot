@@ -6201,3 +6201,35 @@ html[data-dp-layout] :is(#sb-list) .dpl-schiene .sb-card .sbc-address{
 html[data-dp-layout] :is(#sb-list) .dpl-schiene .sb-card .sbc-kp{
   color:var(--wl-cdaf5a, #CDAF5A) !important;
 }
+
+/* =====================================================================
+   v1711c - "MAL ZUSAMMEN, MAL NICHT" - DIE URSACHE
+   =====================================================================
+   Marcel: "dann ist das mal zusammen, dann ist es nicht zusammen."
+
+   GEMESSEN ueber alle Karten, Abstaende in der Karte (214 px breit):
+
+     #0 gewonnen   ID 0-66   INVESTOR  71-149   <- Mitte
+     #2 offen      ID 0-72   INVESTOR 135-213   <- rechts
+     #3 offen      ID 0-72   INVESTOR 135-213   <- rechts
+
+   URSACHE: v1709b hatte eine Ausweichregel
+
+     .sb-card:has(.sbc-won-ribbon) .sbc-investor-ribbon { right:64px }
+
+   damit INVESTOR nicht unter der damaligen WON-Lasche landet. Seit
+   v1710 ist die WON-Lasche AUSGEBLENDET - aber sie steht weiter im
+   DOM, und `:has()` fragt nach dem DOM, nicht nach der Sichtbarkeit.
+   Die Ausweichregel wich also vor etwas aus, das niemand mehr sieht.
+
+   > `display:none` entfernt nichts. Wer eine Regel an `:has()` haengt,
+   > muss sie mitloeschen, wenn das Gesuchte unsichtbar wird - sonst
+   > bleibt eine Rueckicht auf einen Gast, der laengst gegangen ist.
+
+   Und weil die WON-Karten genau die sind, die auch ein Investor-Band
+   tragen, sah es aus wie Zufall: mal rechts, mal in der Mitte.
+   ===================================================================== */
+html[data-dp-layout] .dpl-schiene .sb-card:has(.sbc-won-ribbon) .sbc-investor-ribbon,
+html[data-dp-layout] :is(#sb-list) .sb-card:has(.sbc-won-ribbon) .sbc-investor-ribbon{
+  right:0 !important;
+}
