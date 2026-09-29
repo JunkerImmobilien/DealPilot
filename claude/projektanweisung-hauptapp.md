@@ -23119,3 +23119,40 @@ letzten Kachel statt am Rand. Das ist Marcels frueherer Wunsch („das
 Abrufen ist ganz wild neben ImmoMetrica") und bleibt so, bis er etwas
 anderes sagt. Kleiner Unterschied nebenbei: die Wortmarke steht im
 Objekt-Tab als „DealPilot", im QuickCheck als „Pilot".
+
+### Nachtrag zu (18) · Auch im QuickCheck ans Ende
+
+Marcel: Abruf-Knopf und Barcode sollen im QuickCheck genauso am Ende
+stehen wie im Objekt-Tab.
+
+**Zurueckgenommen: die 18 px aus v1686.** Damals stand der Knopf am
+rechten Rand und liess 255 px weisse Flaeche hinter der letzten
+Kachel — das war die Beschwerde. **Die Luecke kam aber nicht von der
+Ausrichtung**, sondern von den 95 px Rand eines leeren QR; das war in
+v1686c gefunden und behoben.
+
+> **Eine Abhilfe, die den Anlass ueberlebt, wird zum naechsten Anlass.**
+> Ich hatte die 18 px stehenlassen, obwohl ihr Grund weg war — und sie
+> haben genau den Zustand hergestellt, den Marcel jetzt geruegt hat.
+
+Dazu: der leere QR behaelt `margin-left:auto` und verliert nur
+`margin-right` und `padding`. So schluckt er den freien Rest und nimmt
+Barcode wie Knopf mit ans Ende; die 47,5 px rechts, die die Luecke VOR
+dem Knopf aufrissen, bleiben weg. **Den freien Rest zu schlucken ist
+kein Abstand, sondern Ausrichtung.**
+
+**Nachgemessen im QuickCheck:**
+
+| | |
+|---|---|
+| Rand rechts vom Abruf-Bereich | **0** |
+| QR `margin-left` | **265,7 px (auto)** |
+| Abstand QR → Knopf | 14 px |
+| Knopf „Abrufen" | `rgb(26,20,7)` auf weiss, **bedienbar: true** |
+
+> **Eigener Messfehler, zurueckgenommen:** Im Zoom war der Knopf nicht
+> zu sehen, und ich hielt ihn fuer verschwunden. Der Ausschnitt war
+> falsch gerechnet — `elementFromPoint` gab ihn als obenauf und
+> bedienbar zurueck. **Ein Bildausschnitt beweist keine Abwesenheit.**
+
+**Commit.** `db66128`
