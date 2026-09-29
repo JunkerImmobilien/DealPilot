@@ -22788,3 +22788,93 @@ entstanden ist — der Code kommt erst, wenn genug eingegeben wurde
 (`qc-bridge.js` `_bufSave` -> `/passes/from-snapshot`). Das ist richtig
 so und kostet jetzt keinen Platz mehr. Der Staging-Account bleibt auf
 `partner`, wie gewuenscht.
+
+---
+
+## Rollout-Journal 29.09.2026 (15) — der Token-Name, der die Sitzung kostete
+
+### 1 · „Sitzung abgelaufen" — mein nacktes `fetch`
+
+**Der Token heisst `ji_token`** (`auth.js:14`). Meine Vorratspruefung aus
+v1683 schickte `localStorage.getItem('dp_token')` — einen Schluessel,
+den es nicht gibt. Die Anfrage ging **ohne Anmeldung** raus und kam mit
+401 zurueck.
+
+Schlimmer: es war ein **nacktes `fetch`**. Das umgeht den zentralen
+401-Handler — steht woertlich in CLAUDE.md. Der 401 galt deshalb als
+echter Sitzungsverlust: „Sitzung abgelaufen — bitte neu anmelden", bei
+**jedem** Objektwechsel, obwohl die Sitzung gueltig war. Danach gingen
+die Ausgaben nicht mehr.
+
+> Ein Pruefaufruf, der die Anmeldung kaputtmacht, ist teurer als die
+> Pruefung wert ist.
+
+### 2 · `downloadXlsx()` hatte keinen einzigen Aufrufer
+
+Gemessen mit `grep` ueber `frontend/js` und `index.html`: die Funktion
+war geschrieben, exportiert — und fuer den Nutzer unerreichbar. Marcel
+hat sie sich gewuenscht; es gab sie die ganze Zeit.
+
+Das BMF-Modal bekommt eine Ausgabeleiste mit beiden Wegen
+(`exportBmfPdf` und `downloadXlsx`), sichtbar **erst nach der
+Berechnung** — vorher haette sie nichts auszugeben.
+
+### 3 · Schwarze Symbole auf schwarzem Grund — die Wurzel
+
+Drei Anlaeufe, bis die Ursache stand. Der Reihe nach:
+
+| Anlauf | Befund |
+|---|---|
+| v1688 | `.hdr-icon-btn svg` hatte `fill:rgb(20,19,16)`. Die vorhandene Regel zielte auf den KNOPF; ein `svg` mit eigenem `fill` erbt ihn nicht. **Hilfe-Icon behoben (Kontrast 8,5).** |
+| v1688b | Die Pille blieb. `currentColor` war richtig — aber der `path` trug eine **eigene** `color: rgb(20,19,16)`. Nicht der Strich war falsch, sondern die Farbe, auf die er zeigte. |
+| v1688c/d | Die Wurzel: `ui-varianten.css:1290` setzt `--dp-header-text: var(--uv-chrome-ink)` = **`#141310`**, weil der Hell-Skin mit einem **hellen** Kopf rechnet. Die Layouts faerben ihn **dunkel**. |
+
+Meine erste Token-Regel verlor — **Spezifitaet nachgerechnet statt
+geschaetzt**:
+
+```
+ui-varianten.css:1290   html[data-ui-theme] body.dp-chrome-hell header.hdr   (0,3,3)
+meine erste Fassung     html[data-dp-layout] body                            (0,2,1)
+```
+
+> Eine Farbe gilt immer nur zu IHREM Grund. Wer den Grund tauscht, muss
+> die Farbe mittauschen — sonst bleibt sie richtig fuer eine Flaeche,
+> die es nicht mehr gibt.
+
+Gemessen nach der Korrektur: schlechtester Kontrast im Kopf **8,50**
+statt **1,05**, in allen drei Layouts, ueber acht Elemente.
+
+### 4 · Bei „Heute" heisst die Karte wieder PRE-FLIGHT
+
+Auf Prod nachgesehen (`object-actions.js:301`): dort steht bis heute
+**PRE-FLIGHT** und **„Daten einlesen"**. Ich hatte beides fuer die neuen
+Ansichten umbenannt und damit auch „Heute" veraendert — eine Ansicht,
+die ausdruecklich unveraendert bleiben soll. Die Karte gibt jetzt beide
+Texte aus; welcher gilt, entscheidet der Kartenstil. Gemessen: Heute
+**PRE-FLIGHT**, Aktenmappe **Datenaufnahme**.
+
+### 5 · Den Layout-Umschalter gab es laengst — meine Gruppe war eine Doppelung
+
+**Zurueckgenommen.** In v1684 habe ich eine Gruppe „Seitenaufteilung" in
+die Darstellung gebaut. **Die gab es da schon**: die Gruppe „Aufbau" an
+**Position 1** fuehrt dieselben vier Eintraege (Heute, Aktenmappe,
+Kanzlei, Tower) und schaltet ueber denselben Weg. Gefunden, als ich
+pruefte, warum meine Gruppe an Position 5 stand — davor lag die echte.
+
+> Zwei Schalter fuer dieselbe Sache sind schlimmer als keiner: sie
+> zeigen irgendwann verschiedene Staende, und niemand weiss, welcher
+> gilt. **Bevor etwas gebaut wird, das der Nutzer vermisst: nachsehen,
+> ob er es nur nicht gefunden hat.**
+
+Nachgemessen: Doppelung weg, der Schalter „Aufbau" wirkt (Klick auf
+Tower setzt `data-dp-layout="v2b"`).
+
+Gold-Audit **RC=0**.
+
+**Commits.** `694d955` · `9254a50` · `416a484` · `057dc5a` · `f86db36`
+· `85b476e` · `5eef321`
+
+**Rest.** Die dritte Ausgabe, die Marcel im BMF-Modal vermutete („zwei
+oder sogar drei PDFs"), gibt es nicht: im Code liegen genau zwei Wege
+(PDF-Anlage und XLSX). Wenn er ein drittes Dokument meint, muss es
+benannt werden.
