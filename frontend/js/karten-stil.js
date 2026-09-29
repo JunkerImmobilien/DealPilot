@@ -64,11 +64,26 @@
   'use strict';
 
   var LS = 'dp_karten_stil';
+  /* v1706c: Trichter und Bordkarte sind raus.
+
+     Marcel am 29.09.2026: "automatisch passt, die Zeile passt, der
+     Trichter, den kannst du rausnehmen, der sieht nicht gut aus,
+     genauso wie die Bordkarte, aber die Kartei, die nimmst du noch mit
+     rein."
+
+     Die CSS-Bloecke der beiden bleiben in datenaufnahme.css stehen -
+     sie greifen ueber data-dp-kartenstil und werden ohne Eintrag hier
+     nie gesetzt. Sie zu loeschen waere ein zweiter Eingriff in eine
+     Datei, die gerade nicht zur Debatte steht.
+
+     > Ein Entwurf, den niemand mehr waehlen kann, richtet keinen
+     > Schaden an. Ein halb entfernter richtet welchen an.
+
+     Wer einen der beiden gemerkt hat, faellt unten auf "kein Entwurf"
+     zurueck: STILE[stil] ist dann undefined, und setze() setzt ''. */
   var STILE = {
-    zeile:     { name: 'Zeile',     sub: 'Eine Leiste, 55 px' },
-    trichter:  { name: 'Trichter',  sub: 'Quellen links, Ergebnis rechts' },
-    bordkarte: { name: 'Bordkarte', sub: 'Abriss trennt Wählen und Abrufen' },
-    kartei:    { name: 'Kartei',    sub: 'Kopfzeile, Quellen, Fusszeile' }
+    zeile:  { name: 'Zeile',  sub: 'Eine Leiste, 55 px' },
+    kartei: { name: 'Kartei', sub: 'Kopfzeile, Quellen, Fusszeile' }
   };
 
   var aktuell = '';

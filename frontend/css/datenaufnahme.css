@@ -1912,3 +1912,51 @@ html[data-dp-heute] .dp-pfbar .k-heute{ display:inline !important; }
 #oab-bar.dp-pfbar .dp-pf-qr{
   margin-left:auto !important;
 }
+
+/* =====================================================================
+   v1706c - DIE KARTEI: QR GROESSER, OHNE RAHMEN, PILLEN IN SCHWARZ
+   =====================================================================
+   Marcel am 29.09.2026: "die Kartei, die nimmst du noch mit rein, mit
+   dem Unterschied, dass du da bitte um den QR-Code, dass du den ein
+   bisschen groesser machst und keinen Rahmen da drumrum und dass du die
+   Schriftart von Expose, Marktbericht, Sprache und ImmoMetrica
+   vielleicht noch in Schwarz anpasst."
+
+   Der QR war in der Kartei GAR NICHT da: er stand oben in derselben
+   Ausblendliste wie Streifen, Perforation und Strichcode
+   (`> .dp-pf-qr { display:none }`). Er wird hier wieder eingeblendet -
+   die Ausblendung bleibt stehen und wird gezielt ueberschrieben, damit
+   im Diff sichtbar bleibt, dass es eine Aenderung an IHR ist.
+   ===================================================================== */
+html[data-dp-kartenstil="kartei"] .dp-pfbar > .dp-pf-qr{
+  display:flex !important;
+  align-items:center !important; justify-content:center !important;
+  border:none !important; outline:none !important; box-shadow:none !important;
+  background:transparent !important;
+  padding:0 !important; margin:0 0 0 auto !important;
+  width:86px !important; height:86px !important;
+  flex:0 0 auto !important;
+}
+html[data-dp-kartenstil="kartei"] .dp-pfbar > .dp-pf-qr canvas,
+html[data-dp-kartenstil="kartei"] .dp-pfbar > .dp-pf-qr img,
+html[data-dp-kartenstil="kartei"] .dp-pfbar > .dp-pf-qr svg{
+  width:86px !important; height:86px !important;
+  border:none !important; box-shadow:none !important; border-radius:0 !important;
+}
+/* Die Beschriftung unter dem Code (SCAN) darf bleiben, aber sie traegt
+   keinen Rahmen mit - sonst waere der Rahmen nur verschoben. */
+html[data-dp-kartenstil="kartei"] .dp-pfbar > .dp-pf-qr *{
+  border:none !important; box-shadow:none !important;
+}
+
+/* Die Quellen-Pillen: Expose / Marktbericht, Sprache, ImmoMetrica.
+   Schwarz auf der hellen Kartei - der Text ist eine Beschriftung, keine
+   Auszeichnung. Der Haken und der Rahmen bleiben, wie sie sind. */
+html[data-dp-kartenstil="kartei"] .dp-pfbar .dp-pf-tile,
+html[data-dp-kartenstil="kartei"] .dp-pfbar .dp-pf-lbl,
+html[data-dp-kartenstil="kartei"] .dp-pfbar .dp-pf-logo.dp{
+  color:#111111 !important;
+}
+html[data-dp-kartenstil="kartei"] .dp-pfbar .dp-pf-tile.on .dp-pf-lbl{
+  color:#000000 !important;
+}
