@@ -23419,3 +23419,56 @@ erfassen, ohne sie zu erfinden: acht Wohnungen mit Fläche, Miete und
 Stand sind Angaben, die aus dem Objekt kommen müssen, nicht aus einer
 Schätzung. Im RND-Gutachten stehen Baujahr und Fläche; Aufteilung und
 Mieten stehen dort nicht.
+
+### Nachtrag zu (21) · Die Westerfeldstr. 140 hat vier Wohnungen
+
+Marcel hat die Zahl genannt, der Rest stand im Objekt:
+
+| | |
+|---|---|
+| Objektart | MFH, Baujahr 1967 |
+| Wohnfläche | 390 m² |
+| Ist-Kaltmiete | 3.195 €/Monat |
+| **Einheiten** | **4** (vorher leer) |
+
+Aufgeteilt zu je 97,5 m² und rund 799 € — die Summen stimmen auf den
+Euro. **Die gleichmässige Verteilung ist eine Annahme**, Marcels Angabe
+war die Zahl vier. Wenn die Wohnungen unterschiedlich gross sind,
+gehoert das nachgetragen; fuer den Zweck — die Analyse soll nicht mehr
+390 m² fuer EINE Wohnung halten — genuegt sie.
+
+**Was ich NICHT eingetragen habe:** die Modernisierung. Der
+Konfigurator rechnet ohne Angabe **0 Punkte und 22 Jahre
+Restnutzungsdauer**; das ist die Rechnung fuer ein unmodernisiertes Haus
+von 1967, keine Feststellung. Die beiden Uebernahme-Knoepfe
+(„Modernisierungsgrad ins Objekt" und „Restnutzungsdauer in die AfA")
+blieben deshalb ungedrueckt. **Nachgemessen: der AfA-Satz steht
+unveraendert auf 2,0 %.**
+
+> Eine 0, die aus einer Nicht-Eingabe entsteht, ist keine Null. Sie
+> weiterzureichen hiesse, eine Vermutung als Messung auszugeben — und
+> hier haette sie die Abschreibung veraendert.
+
+**Dabei ein eigener Fehler gefunden, und ein teurer:**
+
+Gemessen am eigenen Payload nach dem Eintragen:
+
+```
+wfl: null            je Einheit
+flaeche_schnitt: null
+miete: 799           kam an
+```
+
+Der Konfigurator speichert die Flaeche so, wie sie getippt wurde:
+**„97,5"**. `Number('97,5')` ist **NaN**. Die Mieten gingen durch, weil
+„799" keine Nachkommastelle hat — **deshalb sah der Datensatz
+vollstaendig aus.**
+
+> **Ein halb gefuellter Datensatz ist schlimmer als ein leerer.** Wer
+> eine getippte Zahl weiterreicht, muss sie umrechnen: das Komma ist
+> kein Schoenheitsfehler, es ist ein anderer Zahlentyp.
+
+**Nachgemessen nach der Korrektur:** Summe 390 m², Schnitt 98 m², alle
+vier Einheiten mit Flaeche, Miete und Status im Payload.
+
+**Commit.** `bcc2104`
