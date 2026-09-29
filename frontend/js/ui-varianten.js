@@ -497,28 +497,20 @@
            (v1156-GRUND) — der Schalter waehlt nur eine, die zur
            gewuenschten Helligkeit passt, und laesst eine bereits passende
            stehen. */
-        /* ── v1684 · Seitenaufteilung ────────────────────────────────────
-           Marcel: „ich wuerde mich freuen, wenn wir das Layout, den
-           Umschalter, einfach unter Einstellungen Darstellung und dass
-           wir das dann unter dem Aussehen auswaehlen koennen."
+        /* ── v1689b · ZURUECKGENOMMEN: HIER STAND EINE DOPPELUNG ──────
+           In v1684 habe ich eine Gruppe "Seitenaufteilung" gebaut, weil
+           Marcel den Layout-Umschalter in den Einstellungen haben wollte.
+           **Den gab es da schon** — die Gruppe "Aufbau" ganz oben fuehrt
+           dieselben vier Eintraege (Heute, Aktenmappe, Kanzlei, Tower)
+           und schaltet ueber denselben Weg.
 
-           Steht ueber „App-Darstellung", weil es die groebere
-           Entscheidung ist: erst WO die Dinge liegen, dann WIE sie
-           aussehen. Die Liste kommt aus `DealPilotLayout.layouts` —
-           eine zweite, hier gepflegte Liste waere beim naechsten
-           Layout schon falsch. */
-        (function () {
-          var L = window.DealPilotLayout;
-          if (!L || !L.layouts) return '';
-          var jetzt = (typeof L.aktuell === 'function') ? (L.aktuell() || '') : '';
-          var liste = [{ key: '', name: 'Heute', sub: 'Unveränderte Ansicht' }];
-          Object.keys(L.layouts).forEach(function (k) {
-            liste.push({ key: k, name: L.layouts[k].name, sub: L.layouts[k].beschreibung || '' });
-          });
-          return '<div class="dpuv-g"><h3>Seitenaufteilung</h3>' +
-            '<p class="dpuv-hint">Wo Menü, Aktionen, Score und Ausgaben liegen.</p>' +
-            segHtml('dpuv-layout', liste, jetzt, 2) + '</div>';
-        })() +
+           Zwei Schalter fuer dieselbe Sache sind schlimmer als keiner:
+           sie zeigen irgendwann verschiedene Staende, und niemand weiss,
+           welcher gilt. Gefunden, als ich pruefte, warum meine Gruppe an
+           Position 5 stand — davor lag die echte.
+
+           > Bevor etwas gebaut wird, das der Nutzer vermisst: nachsehen,
+           > ob er es nur nicht gefunden hat. */
         '<div class="dpuv-g"><h3>Modus</h3>' +
           '<p class="dpuv-hint">Grundhelligkeit der Oberfläche. Wählt die passende Vorlage ' +
             'darunter mit aus — eine, die schon passt, bleibt stehen.</p>' +
@@ -703,29 +695,6 @@
       });
       modusMarkieren();
     })();
-
-    /* ── v1684 · Seitenaufteilung ────────────────────────────────────
-       NICHT ueber `segBinden`: das schriebe den Wert in die
-       ui-varianten-Ablage und `DealPilotLayout` fuehrt seinen Merker
-       selbst. Zwei Speicherorte fuer denselben Wert waeren genau die
-       zweite Wahrheit, vor der der Backlog warnt — und beim naechsten
-       Neuladen gewaenne der falsche.
-
-       `setze('')` raeumt bereits alles ab (Attribute, Merker, Schienen,
-       Kartenvariante) und ist damit der richtige Weg zurueck zu
-       „Heute". */
-    var layoutSeg = document.getElementById('dpuv-layout');
-    if (layoutSeg) layoutSeg.addEventListener('click', function (ev) {
-      var b = ev.target.closest ? ev.target.closest('.dpuv-sgb') : null;
-      if (!b) return;
-      layoutSeg.querySelectorAll('.dpuv-sgb').forEach(function (x) { x.classList.remove('on'); });
-      b.classList.add('on');
-      try {
-        if (window.DealPilotLayout && typeof window.DealPilotLayout.setze === 'function') {
-          window.DealPilotLayout.setze(b.getAttribute('data-v') || '');
-        }
-      } catch (e) {}
-    });
 
     segBinden('dpuv-theme',   'ui_theme',   THEMES, modusMarkieren);
     segBinden('dpuv-cards',   'ui_cards',   CARDS);
