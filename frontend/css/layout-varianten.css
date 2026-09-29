@@ -1958,13 +1958,13 @@ html[data-dp-layout] body header.hdr #hdr-completeness b{
 
 /* Das Kontingent. Gold als Flaeche, helle Schrift darauf. */
 html[data-dp-layout] body header.hdr #hdr-credits-pill{
-  background:rgba(201,168,76,.18) !important;
-  border:1px solid rgba(201,168,76,.42) !important;
+  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent) !important;
+  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 42%, transparent) !important;
 }
 html[data-dp-layout] body header.hdr #hdr-credits-pill,
 html[data-dp-layout] body header.hdr #hdr-credits-pill-label,
 html[data-dp-layout] body header.hdr #hdr-credits-pill svg{
-  color:#E8CC7A !important;
+  color:var(--wl-e8cc7a, #E8CC7A) !important;
 }
 /* Das Aufklapp-Panel des Kontingents ist ein eigenes Blatt mit eigener
    heller Flaeche - dort ist dunkle Schrift RICHTIG und bleibt. Genau
@@ -2201,9 +2201,9 @@ html[data-dp-layout] .dpl-schiene .sb-user-icons{
 html[data-dp-layout] .dpl-schiene .sb-user-plan-pill{
   font-size:9.5px !important; padding:2px 7px !important;
   margin:0 !important; height:auto !important;
-  background:rgba(201,168,76,.18) !important;
-  border:1px solid rgba(201,168,76,.42) !important;
-  color:#E8CC7A !important; border-radius:999px !important;
+  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent) !important;
+  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 42%, transparent) !important;
+  color:var(--wl-e8cc7a, #E8CC7A) !important; border-radius:999px !important;
 }
 html[data-dp-layout] .dpl-schiene .sb-version-badge{
   font-size:9.5px !important; color:#8C8578 !important;
@@ -2574,7 +2574,7 @@ html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-top .sc-grade{
   color:#7BE3A6 !important; border-color:rgba(63,165,108,.42) !important;
 }
 html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-gold .sc-grade{
-  color:#E8CC7A !important; border-color:rgba(201,168,76,.42) !important;
+  color:var(--wl-e8cc7a, #E8CC7A) !important; border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 42%, transparent) !important;
 }
 html[data-dp-layout] body header.hdr #hdr-badges .sc-main.sc-tier-red .sc-grade{
   color:#E89A94 !important; border-color:rgba(184,98,92,.45) !important;
