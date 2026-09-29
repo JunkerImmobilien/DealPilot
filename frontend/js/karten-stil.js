@@ -479,33 +479,32 @@
     var gemerkt = '';
     try { gemerkt = localStorage.getItem(LS) || ''; } catch (e) {}
 
+    /* ── v1702b: DIE MIGRATION VON v1654 IST ZURUECKGENOMMEN ──────────
+       Hier stand: wer `trichter` oder `bordkarte` gemerkt hatte, bekam
+       einmalig `kartei` gesetzt. Genau das war die Ursache des Befundes
+       vom 29.09.2026 - in Kanzlei, Tower und Aktenmappe stand nicht die
+       Demo-Karte, sondern ein Entwurf, den niemand gewaehlt hatte.
+
+       Marcel: „jetzt sieht der Streifen ... nicht mehr so aus wie aus
+       unserer demo. Bitet fuer die anderen Layouts wieder umstellen."
+
+       Ein erster Anlauf hat nur die Traeger jener Migration entlastet.
+       Das reichte nicht: `aktuell` lebt als Modulvariable weiter, und
+       der Beobachter unten schreibt sie beim Layout-Wechsel in den
+       Merker zurueck (gemessen: karten-stil.js:567 setzt `kartei`
+       erneut, obwohl der Merker leer war). Ein Merker, der an zwei
+       Orten liegt, laesst sich nicht an einem aufraeumen.
+
+       Deshalb jetzt der ganze Schnitt: JEDER gemerkte Entwurf faellt
+       genau einmal weg, mit eigenem Marker. Danach ist die Vorgabe
+       „kein Entwurf" - der Streifen sieht in jedem Layout aus wie in
+       der Demo. Die vier Entwuerfe bleiben waehlbar; wer nach diesem
+       Stichtag einen waehlt, behaelt ihn. */
     try {
-      if ((gemerkt === 'trichter' || gemerkt === 'bordkarte') && !localStorage.getItem(MIGRIERT + 'b')) {
-        gemerkt = 'kartei';
-        localStorage.setItem(LS, gemerkt);
-        localStorage.setItem(MIGRIERT + 'b', '1');
-      }
-    } catch (e) {}
-
-    /* v1702: die Gegenbewegung. Marcel will den Streifen in Kanzlei,
-       Tower und Aktenmappe wieder so sehen wie in der Demo. Die
-       CSS-Vorgabe ist dafuer gefallen (siehe datenaufnahme.css) - aber
-       wer `kartei` gemerkt hat, saehe weiter den Entwurf.
-
-       `kartei` hat niemand gewaehlt: der Zweig darueber hat es gesetzt.
-       Wessen Merker aus jener Migration stammt (`MIGRIERT+'b'` liegt
-       vor), bekommt ihn jetzt einmalig zurueckgenommen. Wer den Entwurf
-       danach bewusst waehlt, behaelt ihn - der neue Marker verhindert,
-       dass ihm das ein zweites Mal weggenommen wird.
-
-       > Dasselbe Prinzip wie oben: ein fremder Merker wird genau einmal
-       > angefasst, mit eigenem Marker, und erklaert. */
-    try {
-      if (gemerkt === 'kartei' && localStorage.getItem(MIGRIERT + 'b')
-          && !localStorage.getItem(MIGRIERT + 'c')) {
+      if (gemerkt && !localStorage.getItem(MIGRIERT + 'v1702')) {
         gemerkt = '';
         localStorage.setItem(LS, '');
-        localStorage.setItem(MIGRIERT + 'c', '1');
+        localStorage.setItem(MIGRIERT + 'v1702', '1');
       }
     } catch (e) {}
 
