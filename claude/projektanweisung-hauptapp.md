@@ -24268,3 +24268,41 @@ goldener Krumen ueber einer frisch angelegten Karte.
 **Gold-Audit RC=0**, Basislinie 438.
 
 **Commits.** `e44b865` · `9429de8`
+
+### Die beiden alten Nachweispunkte sind geschlossen
+
+Beide standen seit Tagen als „unbewiesen" im Journal.
+
+**1 · Partner-Logo und -Farbe in den Layouts.** Bisher nicht pruefbar,
+weil auf dem Testkonto kein Logo hinterlegt ist. Jetzt ueber den echten
+Weg gemessen — `DealPilotWhitelabel.apply()` mit einem Testlogo, nur im
+laufenden Tab, ohne das Konto anzufassen:
+
+```
+vorher    .dpl-marke "Text: DealPilot"      --gold #C9A84C
+nachher   .dpl-marke IMG 90x21 (geladen)    --gold #1B5E9C
+          .sbc-seq (Aktenreiter-Lasche)     rgb(27,94,156)
+```
+
+Das Logo steht sichtbar in der Schiene, der aktive Reiter traegt die
+Partnerfarbe — **und die neuen Aktenreiter-Laschen faerben sich mit**,
+weil sie `var(--wl-c9a84c, #C9A84C)` tragen statt eines harten Goldwerts.
+Danach `reset()`, `--gold` zurueck auf `#C9A84C`.
+
+**2 · Die Rundgang-Schrittanzeige.** Gemessen an den ECHTEN Klassen aus
+`tour-engine.js:297-309` statt an geratenen:
+
+```
+dp-tour-overlay    2133 x 988
+dp-tour-spotlight   395 x 631
+dp-tour-bubble      460 x 369
+Text: "Schritt 1 von 37 - Willkommen bei DealPilot"
+```
+
+> Mein erster Versuch suchte nach `.dp-tour`, `.tour-overlay`, `#dp-tour`
+> und fand nichts — die Namen waren geraten. Drei Zeilen `grep` in der
+> Datei haetten es sofort gesagt.
+
+**Damit ist aus dieser Reihe nur noch ein Punkt offen:** die Abbuchung
+des Marktpreis-Abrufs im LIVE-Modus. Staging steht auf `stub`, dort
+kostet nichts — das laesst sich hier grundsaetzlich nicht messen.
