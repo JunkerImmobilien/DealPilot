@@ -943,10 +943,25 @@
   }
 
   /* Ein Klick auf eine Objektkarte klappt die Liste zu - man hat ja
-     gefunden, was man gesucht hat. */
+     gefunden, was man gesucht hat.
+
+     v1705b: AUSSER er galt den Aktionsknoepfen. Marcel: "man kann unter
+     Portfolio wenn man die Objekte auswaehlt kein Objekt mehr loeschen."
+
+     Gemessen am 29.09.2026: nach dem Klick auf eine Karte stand
+     data-dpl-portfolio auf "zu", .dpl-teil-objekte auf display:none
+     und damit die GANZE Liste auf 0x0 - samt Loeschknopf. Die Annahme im
+     Satz oben stimmt hier nicht:
+
+     > Wer loeschen will, hat NICHT gefunden, was er gesucht hat. Er will
+     > die Zeile weghaben - und sie klappt ihm unter dem Finger weg.
+
+     Das Zuklappen bleibt, es hat seinen Sinn. Es greift nur nicht mehr
+     fuer Klicks innerhalb von .sbc-actions. */
   document.addEventListener('click', function (e) {
     if (!aktuell) return;
     if (document.documentElement.getAttribute('data-dpl-portfolio') !== 'auf') return;
+    if (e.target.closest && e.target.closest('.sbc-actions')) return;
     var k = e.target.closest ? e.target.closest('.sb-card') : null;
     if (k) setTimeout(function () { portfolio(true); }, 60);
   }, true);
