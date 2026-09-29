@@ -1375,3 +1375,30 @@ html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-s
 html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-grouplbl{
   margin:0 0 4px !important;
 }
+
+/* ── v1668d · OHNE `order` STEHT MAN GANZ VORNE ──────────────────────
+   Gemessen: `position` war nach v1668c korrekt `static` — und beide
+   Teile standen trotzdem bei y=131 bzw. y=115 statt in der Reihe bei
+   y=199.
+
+   Der Grund ist nicht die Positionierung, sondern die REIHENFOLGE. Die
+   Kartei vergibt seit v1659 `order`:
+
+     .dp-pf-lead   order:1     die Kopfzeile
+     .dp-pf-seg    order:2     die Quellen
+     .dp-pf-rz     order:3     der Abruf
+
+   `.dp-pf-sep` und `.dp-pf-qr` waren damals ausgeblendet und haben
+   deshalb nie eines bekommen. Der Standardwert ist **0** — und 0 kommt
+   vor 1.
+
+   > Wer in einer geordneten Reihe kein `order` hat, steht nicht
+   > hinten, sondern ganz vorne. Ein vergessener Wert ist hier keine
+   > Auslassung, sondern eine Ansage.
+
+   Beide bekommen `order:2` und stehen damit dort, wo das DOM sie
+   ohnehin führt: Segment · Trennstrich · Segment · QR. */
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-sep,
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr{
+  order:2 !important;
+}
