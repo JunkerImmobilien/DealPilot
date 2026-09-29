@@ -1229,3 +1229,112 @@ html[data-dp-kartenstil] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-logo.dp{
 html[data-dp-kartenstil] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-logo.dp b{
   color:var(--wl-e8cc7a, #E8CC7A) !important;
 }
+
+/* ── v1668 · DIE KARTEI BEKOMMT ZURÜCK, WAS DIE KARTE HAT ────────────
+   Marcel: „So wie im Design heute muss auch ein Trennstrich zwischen
+   der Marktbewertung und dem Daten-übernehmen-aus sein. Auch die
+   Überschrift muss mit drauf sein. Zwischen den Buttons muss auf jeden
+   Fall Abstand sein. Dann fehlt der QR-Code."
+
+   Die Vorlage ist der Auslieferungszustand, gemessen an `#oab-bar`
+   (1280x78):
+
+     .dp-pf-lead     149x78  dunkler Kopfblock
+     .dp-pf-perf       1x78  Perforation
+     .dp-pf-seg      101x78  „Marktbewertung" ÜBER dem Chip
+     .dp-pf-sep        1x78  rgba(5,5,5,.22)      <- der Trennstrich
+     .dp-pf-seg      438x78  „Daten übernehmen aus" + drei Chips
+     a.dp-pf-qr       54x68                        <- der QR
+     .dp-pf-rz       208x78  Barcode + Abrufknopf
+
+   **Ich hatte in v1662 drei davon ausgeblendet** — Gruppentitel,
+   Trennstrich und QR — weil Marcel damals sagte, die Quellen stünden
+   „untereinander". Das stimmte, aber die Ursache war die Anordnung,
+   nicht die Beschriftung.
+
+   > Wer auf „das steht untereinander" mit „dann nehmen wir die
+   > Überschriften weg" antwortet, behebt das Symptom und nimmt dabei
+   > die Gliederung mit. Die Reihe war das Ziel, nicht die Kahlheit.
+
+   Sie kommen zurück — die Reihe bleibt. */
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-grouplbl{
+  display:block !important;
+  margin:0 0 6px !important;
+  font-family:"JetBrains Mono",ui-monospace,monospace !important;
+  font-size:9px !important; letter-spacing:.9px !important;
+  text-transform:uppercase !important;
+  color:#9A9287 !important;
+}
+/* Der Trennstrich zwischen den beiden Gruppen — dieselbe Haarlinie
+   wie auf der Karte, nur auf die Höhe der Kartei gebracht. */
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-sep{
+  display:block !important;
+  flex:0 0 1px !important;
+  width:1px !important;
+  align-self:stretch !important;
+  margin:14px 14px !important;
+  background:#E6E1D6 !important;
+}
+/* Die Gruppen brauchen jetzt wieder Kopfhöhe — und Luft zwischen den
+   Chips. Marcel ausdrücklich: „zwischen den Buttons muss auf jeden
+   Fall Abstand sein." */
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg{
+  flex-direction:column !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  padding:12px 0 14px !important;
+}
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row{
+  gap:12px !important;
+}
+
+/* ── v1668b · DER QR UND DIE GOLDENE KANTE ───────────────────────────
+   Marcel: „Dann fehlt der QR-Code. Der QR-Code müsste auch mittig
+   platziert werden, in Richtung Abruf-Button, aber natürlich auch mit
+   Abstand. Hinten am Abruf-Button ist irgend so eine goldene Kante,
+   das muss noch weg."
+
+   Gemessen in der Kartei:
+
+     a.dp-pf-qr    0x0                              <- ausgeblendet
+     .dp-pf-rz     border-right 1px rgb(201,168,76) <- die Kante
+                   border-radius 10px 16px 16px 10px
+
+   Die Kante ist ein Rest der Bordkarte: dort war `.dp-pf-rz` die
+   **Reisszone**, und die goldene Rundung markierte den Abriss. In der
+   Kartei gibt es keinen Abriss — die Kante markiert also nichts mehr
+   und sieht aus, als wäre sie vergessen worden. Sie war es auch.
+
+   > Eine Linie, die einmal etwas bedeutet hat, bedeutet nach dem Umbau
+   > nicht weniger, sondern etwas Falsches: sie verspricht eine Trennung,
+   > die es nicht gibt.
+
+   Den QR hatte ich in v1661 mit der Perforation und dem Strichcode
+   zusammen ausgeblendet — als Teil der Metapher. Er ist aber keine
+   Metapher, sondern ein Weg aufs Handy. */
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-rz{
+  border-right:0 !important;
+  border-radius:0 !important;
+}
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr{
+  display:flex !important;
+  flex:0 0 auto !important;
+  align-self:center !important;
+  width:46px !important; height:46px !important;
+  margin:0 18px 0 auto !important;
+  padding:3px !important;
+  background:#fff !important;
+  border:1px solid #E6E1D6 !important;
+  border-radius:2px !important;
+}
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr svg,
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr img,
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr canvas{
+  width:100% !important; height:100% !important; display:block !important;
+}
+/* Der Abrufbereich steht jetzt direkt neben dem QR und braucht seinen
+   Schub nach rechts nicht mehr — sonst reisst er die beiden
+   auseinander. */
+html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-rz{
+  margin-left:0 !important;
+}
