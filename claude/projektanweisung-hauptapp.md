@@ -21740,3 +21740,92 @@ Formularweg. Verworfen und über die Oberfläche gemessen.
 - **Kaufpreisaufteilung Am Markt 18**: die KPA rechnet mit **RND 57**,
   das RND-Gutachten desselben Büros mit **26**. Methodisch erklärbar
   (BMF-Arbeitshilfe nutzt die typisierte RND), gehört aber geprüft.
+
+---
+
+## Rollout-Journal · 29.09.2026 (2) — Die Kaufpreisaufteilung, gegengerechnet
+
+**Was:** Das Kaufpreisaufteilungs-Gutachten zu Am Markt 18 Schritt für
+Schritt nachgerechnet, durch unseren eigenen Rechner geschickt — und
+dabei einen Fehler gefunden, der jedes Ergebnis still verfälscht hat.
+
+**Commit:** `ad6d46e` v1669 (Backend, Rebuild auf Staging gelaufen)
+
+---
+
+### 1 · Das Gutachten rechnet richtig
+
+Alle dreizehn Schritte nachgerechnet (derGutachter.net, Az. 25DG02659):
+
+| | Gutachten | nachgerechnet |
+|---|---|---|
+| Kapitalisierungsfaktor 2,5 % / 57 J | 30,2100 | **30,2095** |
+| Diskontierungsfaktor `1,025^-57` | 0,2448 | **0,24476** |
+| Bodenwert MEA (3.878 × 130 × 15,11/1000) | 7.617,56 € | **7.617,56 €** |
+| Bodenrestwert nach RND | 1.864,78 € | **1.864,78 €** |
+| **rentierlicher** Bodenwert | 5.752,78 € | **5.752,78 €** |
+| Bodenwertverzinsung (× 2,5 %) | 143,82 € | **143,82 €** |
+| Gebäudeanteil vorläufig | 95,96 % | **95,9635 %** |
+| Gebäudeanteil final | 94,35 % | **94,349 %** |
+
+Bemerkenswert: das Gutachten verzinst **nur den rentierlichen
+Bodenwert** — genau die Regel, die CLAUDE.md für die Wertermittlung
+führt (§ 41). Der unrentierliche Teil (1.864,78 €) bleibt außen vor.
+
+### 2 · **Der Fehler: stille Verwerfung unbekannter Feldnamen**
+
+Unser Rechner (`POST /bmf/aufteilung` → LibreOffice auf der
+BMF-Vorlage) lieferte für dieselben Eingaben:
+
+```
+Bodenwert       22.087,39 €   statt 7.617,56   (Faktor 2,9)
+Gebäudeanteil       87,39 %   statt 94,35 %
+warnings                 []   ← LEER
+```
+
+Der Gegentest zeigte es: Bodenrichtwert verdoppeln → Bodenwert
+verdoppelt sich. **Grundstücksfläche halbieren → nichts ändert sich.**
+
+Ursache: die Felder heißen in `INPUT_CELLS` anders —
+`grundstuecksgroesse` statt `grundstuecksflaeche`,
+`mea_zaehler/_nenner` statt `miteigentumsanteil_*`,
+`liegenschaftszinssatz` statt `liegenschaftszins`. **Fünf von zwölf
+Feldern kamen nicht an**, und die Schreibschleife überspringt
+kommentarlos, was sie nicht kennt.
+
+> Ein Rechner, der unbekannte Eingaben stillschweigend verwirft,
+> liefert kein falsches Ergebnis — er liefert ein **richtig
+> aussehendes**. Das ist der teurere Fehler.
+
+`warnings` gab es im Ergebnis überhaupt nicht; die Route erzeugte mit
+`result.warnings || []` ein Array, das immer leer blieb. Seit v1669
+nennt der Dienst die verworfenen Felder **und** die bekannten Namen.
+Nachgemessen nach dem Rebuild: derselbe Aufruf meldet jetzt alle fünf.
+
+### 3 · Mit den richtigen Feldnamen: der Kern stimmt
+
+| | Gutachten | unser Rechner |
+|---|---|---|
+| Bodenwert | 7.617,56 € | **7.617,56 €** exakt |
+| Gebäudeanteil (Sachwert-Pfad) | — | 90,93 % |
+| Gebäudeanteil (**Ertragswert**-Pfad) | **94,35 %** | **93,13 %** |
+| Ertragswert | — | 110.803 € *(Kaufpreis: 110.911 €)* |
+
+Der Ertragswert trifft den Kaufpreis auf 0,1 % — beide Rechnungen
+bestätigen sich gegenseitig. Die Restdifferenz von **1,22
+Prozentpunkten** ist ein Verfahrensunterschied: das Gutachten teilt den
+um den Bodenrestwert **bereinigten** Kaufpreis, die BMF-Arbeitshilfe
+teilt im Verhältnis der Einzelwerte.
+
+> Ohne Miete wählt die Arbeitshilfe den Sachwert und landet bei
+> 90,93 %. Die Miete ist hier keine Nebenangabe, sondern die
+> Verfahrensweiche — drei Prozentpunkte AfA-Bemessungsgrundlage.
+
+### Rest
+
+- **Preise Marktbericht**: Starter-Nachkauf 5,00 € gegen 4,50 € einzeln
+  (`config.js:521`), und Hochstufen kostet keine Differenz mehr
+  (`marktbericht.js:100-104`). **Nichts geändert — Geld ist
+  Rückfragesache.**
+- **Verkehrswertgutachten** zu Am Markt 18 liegt nicht im Repo.
+- **QR im QuickBoarding**: `.dp-pf-qr` fehlt dort im Markup.
