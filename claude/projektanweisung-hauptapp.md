@@ -23044,3 +23044,78 @@ Gold-Audit **RC=0**.
 Gestaltung an EINER Klasse traegt, nimmt man die Klasse weg und nicht
 ihre Regeln. Wer Regeln einzeln zurueckdreht, uebersieht welche — und
 merkt es erst, wenn jemand beide Fassungen nebeneinander sieht.
+
+---
+
+## Rollout-Journal 29.09.2026 (18) — drei Regeln, eine Ursache
+
+### 1 · Sprengnetter und PriceHubble raus
+
+Gemessen, beide Leisten nebeneinander:
+
+| | Quellen |
+|---|---|
+| Tab Objekt | `dealpilot` · `import` · `voice` · `immometrica` (4) |
+| QuickCheck | `dpmb` · **`spr`** · **`ph`** · `expose` · `voice` · `immometrica` (6) |
+
+Im Tab Objekt stehen die beiden **gar nicht im DOM**; im QuickCheck sind
+sie fest ausgegeben (Z. 3399/3403). Sie verschwinden per Regel — das
+Markup bleibt, ein spaeteres Freischalten kostet dann nur zwei Zeilen.
+Passt zur Doktrin: **die beiden werden nach aussen ohnehin nie
+namentlich genannt, und wer sie zeigt, nennt sie.**
+
+### 2 · „0 Quellen gewaehlt" bei „Heute" weg
+
+`dpk-zahl` gibt es auf Prod nicht — die Zeile ist mit dem
+Bordkarten-Stil entstanden (v1672). **„Heute" heisst unveraendert; dazu
+gehoert auch, was NICHT da war.** Die Pruefung auf `aktuell` allein
+genuegte nicht: der Stil bleibt gemerkt, wenn das Layout faellt —
+deshalb zusaetzlich `layoutAktiv()`.
+
+### 3 · Der Abruf-Bereich stand 249 px vor dem Ende — **drei eigene Regeln, eine Ursache**
+
+Gegentest zuerst: ein inline gesetztes `margin-left:auto` verschob ihn
+sauber (823 → 1072). Also reine Kaskade, kein Flex-Problem.
+
+Der Kaskaden-Walker fand **drei** Regeln, alle von mir, alle mit
+demselben Denkfehler:
+
+| Version | Regel | Wirkung im Objekt-Tab |
+|---|---|---|
+| v1686 | `#oab-bar…:not(:has(.dp-pf-qr[data-hat-ziel])) .dp-pf-rz` | `18px` statt Ausrichtung |
+| v1686b | `:is(#oab-bar,#qc7-sources)… .dp-pf-qr[data-hat-ziel]` | `auto` griff nie |
+| v1686c | `:is(#oab-bar,#qc7-sources)… .dp-pf-qr:not([data-hat-ziel])` | `margin-left:0` |
+
+**`data-hat-ziel` setzt allein `renderQR()` im QuickCheck.** Im
+Objekt-Tab gibt es das Attribut nie — dafuer ist der QR dort immer
+gefuellt (54 px). Die Regeln lasen also dauerhaft „kein QR da" und
+nagelten den Knopf fest.
+
+> **Eine Bedingung, die an EINER Stelle richtig ist, wird an der anderen
+> zur Falle, wenn ihr Merkmal dort nie gesetzt wird.** Beim ersten Mal
+> war es ein Versehen, beim dritten ein Muster.
+
+Eine schwaechere Gegenregel danebenzustellen half nicht:
+`:not(:has(…))` traegt mehr Spezifitaet als die Ankerkette ohne. Die
+Bedingungen selbst sind korrigiert. **Ab jetzt gilt: Regeln mit
+`data-hat-ziel` tragen `#qc7-sources` und niemals `#oab-bar`.**
+
+**Nachgemessen, Tab Objekt:**
+
+| | vorher | jetzt |
+|---|---|---|
+| Rand rechts vom Abruf-Bereich | 249 px | **0** |
+| QR `margin-left` | 0 | **124,9 px (auto)** |
+| Abstand QR → Knopf | — | **14 px** |
+| „0 Quellen gewaehlt" | da | **weg** |
+
+Gold-Audit **RC=0**.
+
+**Commits.** `eda491c` · `f954831` · `ec11196`
+
+**Rest.** Der QR bleibt im QuickCheck leer, solange kein Pass entstanden
+ist — dort sitzt der Abruf-Bereich deshalb weiter kompakt hinter der
+letzten Kachel statt am Rand. Das ist Marcels frueherer Wunsch („das
+Abrufen ist ganz wild neben ImmoMetrica") und bleibt so, bis er etwas
+anderes sagt. Kleiner Unterschied nebenbei: die Wortmarke steht im
+Objekt-Tab als „DealPilot", im QuickCheck als „Pilot".
