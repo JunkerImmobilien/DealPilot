@@ -22989,3 +22989,58 @@ Gemessen: `data-dp-heute="1"`, Kopfzeile **PRE-FLIGHT**.
 Gold-Audit **RC=0**.
 
 **Commits.** `39304d2` · `65fd3a3`
+
+---
+
+## Rollout-Journal 29.09.2026 (17) — die Klasse faellt, nicht die Regel
+
+**Was.** Marcel zum vierten Mal: die Pre-Flight-Karte im Quick-Check
+sehe bei „Heute" immer noch nicht aus wie im Tab Objekt.
+
+**Er hatte jedes Mal recht, und mein Ansatz war jedes Mal zu klein.**
+Ich hatte in v1685 `data-dp-heute` ins iframe gespiegelt und damit drei
+Regeln zurueckgenommen — Streifen, Kopfzeile, Trenner. An
+`body.dp-neue-karte` haengt dort aber nicht ein Trio, sondern die ganze
+Kartei-Optik: Grundfarbe, Hoehe, Kacheln, Barcode.
+
+> **Sie einzeln zurueckzunehmen hiesse, jede kuenftige dazu auch zu
+> finden.** Ich habe sie dreimal hintereinander nicht alle gefunden; ein
+> viertes Mal waere kein Verfahren gewesen, sondern Hoffnung.
+
+**v1692 — die Klasse selbst faellt**, sobald die Haupt-App auf „Heute"
+steht (`karten-stil.js`, `rahmenNachziehen()`). Der Vermerk an
+`quickcheck-app.html:3290` („dieses Dokument ist IMMER hell") bleibt
+wahr: die alte Bordkarten-Fassung ist ebenfalls hell, nur golden statt
+weiss. **Die Klasse traegt nicht die Helligkeit, sondern den UMBAU.**
+
+**v1692b — der Runway fehlte noch.** Danach stimmten Hoehe, Kopfzeile,
+Streifen und Barcode, aber der Grund blieb weiss:
+
+| | Tab Objekt | QuickCheck |
+|---|---|---|
+| Grund | `linear-gradient(110deg, …)` **Runway** | `rgb(255,255,255)` |
+
+Das QC-Dokument bringt seine eigene `.dp-pfbar`-Regel mit; die
+Runway-Fassung aus `style.css:32634` kommt dort nie an. Jetzt gesetzt,
+mit denselben Token (`--gold-hi`, `--gold`, `--wl-bd9a3e`), damit der
+Verlauf beim Mandanten mitfaerbt.
+
+**Nachgemessen, und es schaltet in beide Richtungen:**
+
+| Layout | Klasse | Grund | Hoehe | Kopfzeile |
+|---|---|---|---|---|
+| **Heute** | — | **Runway** | **78** | **PRE-FLIGHT** |
+| Aktenmappe | `dp-neue-karte` | weiss | 86 | Datenaufnahme |
+| Tower | `dp-neue-karte` | weiss | 86 | Datenaufnahme |
+| **Heute** (zurueck) | — | **Runway** | **78** | **PRE-FLIGHT** |
+
+Der letzte Eintrag ist der wichtige: der Weg zurueck funktioniert auch.
+
+Gold-Audit **RC=0**.
+
+**Commits.** `5e307c1` · `1e37a75`
+
+**Die Lehre fuer das iframe:** Wenn ein eigenes Dokument eine ganze
+Gestaltung an EINER Klasse traegt, nimmt man die Klasse weg und nicht
+ihre Regeln. Wer Regeln einzeln zurueckdreht, uebersieht welche — und
+merkt es erst, wenn jemand beide Fassungen nebeneinander sieht.
