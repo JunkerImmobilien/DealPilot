@@ -22411,3 +22411,72 @@ demselben Muster: `grundbuch`, `kataster`, `kaufvertrag`,
 SSE-Anzeige, OCR-Zweig, `IMPORT_SESSIONS` (in-memory) und der
 OpenAI-Schluessel im `localStorage` — unser Weg ueber den Server-Key
 mit `extractLimiter` bleibt.
+
+---
+
+## Rollout-Journal 29.09.2026 (11) — Dokument-Import, neun Arten, mit Bedienung
+
+**Was.** v1677 hatte einen Endpunkt ohne Aufrufer geliefert. **Ein
+Endpunkt, den niemand rufen kann, ist keine Funktion** — und CLAUDE.md
+sagt dazu „Standard ist: machen. Nicht fragen, ob gebaut werden soll."
+Ich hatte am Ende gefragt. Nachgeholt:
+
+| Neu | |
+|---|---|
+| `backend/src/services/dokumentSchemas.js` | neun Arten: Klassifikation + Extraktionsschemata, portiert aus dem Modul v1.1.0 |
+| `openaiService.extractDokument()` | generisch, prueft jeden Zahlenwert gegen die Grenzen seines Schemas |
+| `POST /ai/extract-dokument`, `GET /ai/dokument-arten` | erkennt die Art selbst, `typ` ueberstimmt |
+| `frontend/js/dokument-import.js` + Karte im Import-Hub | die Bedienung |
+
+**`kpt` hat bei uns einen Prompt, den das Modul nicht hat.** Dort wird
+die Kaufpreisaufteilung klassifiziert (Z. 82) und nie extrahiert. Unser
+Schema liefert **exakt die Feldnamen von `POST /bmf/aufteilung`** —
+genau an falschen Feldnamen ist v1669 gescheitert.
+
+**Drei eigene Fehler, alle beim ersten echten Lauf gefunden:**
+
+**(1) v1678b — der portierte Klassifikator bestrafte die gruendlichere
+Liste.** Das Modul rechnet `score / (len(keywords) * 3)`. Damit wird
+eine Art umso schwerer erkannt, je sorgfaeltiger ihre Stichwortliste
+gepflegt ist. Eine echte Kaufpreisaufteilung, in der
+„Kaufpreisaufteilung" UND „umgekehrten Ertragswertmethode" woertlich
+stehen: **2/24 = 0,08, also „unbekannt"**. **Ein Mass, das die
+gruendlichere Liste bestraft, misst die Liste und nicht das Dokument.**
+
+**(2) v1678c — allgemeine Woerter schlugen spezifische.** Nach dem Fix
+gewann `kaufvertrag` gegen `kpt`: zwei Treffer gegen zwei Treffer, und
+bei Gleichstand entscheidet die Reihenfolge im Objekt. „Kaufpreis",
+„Notar", „Kaeufer" stehen in JEDEM Immobiliendokument. Jetzt fuehrt
+jede Art eine `leit`-Liste (3 Punkte im Text, 6 im Dateinamen) neben
+den `keywords` (1/2). **Gemessen an zehn Faellen: 10 von 10**, darunter
+die beiden, die NICHT erkannt werden duerfen.
+
+**(3) v1678d — mein Prompt widersprach sich selbst.** „Extrahiere die
+EINGANGSDATEN — **nicht die Ergebnisse** des Gutachtens" stand ueber
+einem Schema, das zwei Ergebnisfelder abfragt. Die KI hat gehorcht und
+beide leer gelassen, obwohl 94,35 % und 7.617,56 € woertlich dastanden.
+**Eine Verneinung taugt nicht als Abgrenzung, wenn die Ausnahme im
+selben Schema steht.**
+
+**Nachweis — echte Laeufe im Staging-Container:**
+
+| | Ergebnis |
+|---|---|
+| Klassifikation, zehn Faelle | **10 von 10**, Rauschen bleibt `null` |
+| KPT Am Markt 18, Endlauf | **alle 13 Felder**, Sicherheit 1, nichts verworfen |
+| davon Vergleichswerte | 94,35 % und 7.617,56 € — wie im Gutachten |
+| RNDG-Negativtest | `rechenbar: false`, Pflichtfelder benannt |
+| Gold-Audit | **RC=0**, genau auf der Basislinie |
+
+**Die Doktrin steht in der Oberflaeche.** Mitgelesene Gutachtenwerte
+erscheinen unter der Ueberschrift „Ergebnis des fremden Gutachtens" mit
+dem Satz, dass sie **nicht uebernommen** werden. DealPilot rechnet
+selbst — das Gutachten liefert Eingaben.
+
+**Commits.** `c3d55b5` · `825a45b` · `9303018` · `8501385`
+
+**Rest.** Kein Ordner-Upload (eine Datei je Durchgang), keine
+Texterkennung fuer Scans — beides ist im Modul, beides wuerde
+`tesseract-ocr-deu` im Image verlangen. Die uebernommenen Werte fliessen
+noch **nicht** automatisch in ein Objekt; heute werden sie angezeigt und
+als Rohdaten ausgegeben. Das ist der naechste Schritt.
