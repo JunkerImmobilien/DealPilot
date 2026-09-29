@@ -751,15 +751,19 @@ label.dp-required.qc-required::after {
         <span class="sb-act-ico" data-icon="import-hub"></span><span class="sb-act-l">Import</span>
       </button>
 
-      <div class="sb-act-section-title">Ausgeben</div>
+      <!-- v1706: Marke fuer die Layouts. Dort steht die Ausgaben-Box schon
+           in der Schiene (Track Record, Bankexport, Export) - diese Gruppe
+           waere die zweite Stelle fuer dieselbe Sache. In der normalen
+           Ansicht bleibt sie, dort gibt es die Box nicht. -->
+      <div class="sb-act-section-title sb-act-ausgeben">Ausgeben</div>
       <!-- v816h-no-allobjects: Akkordeon-Eintrag entfernt -->
-      <button class="sb-act-item" type="button" onclick="sbActionsAction('trackrec')" data-feature="track_record_pdf">
+      <button class="sb-act-item sb-act-ausgeben" type="button" onclick="sbActionsAction('trackrec')" data-feature="track_record_pdf">
         <span class="sb-act-ico" data-icon="trackrec"></span><span class="sb-act-l">Track Record</span>
       </button>
-      <button class="sb-act-item" type="button" onclick="sbActionsAction('bankexport')" data-feature="bank_pdf_a3">
+      <button class="sb-act-item sb-act-ausgeben" type="button" onclick="sbActionsAction('bankexport')" data-feature="bank_pdf_a3">
         <span class="sb-act-ico" data-icon="bankexport"></span><span class="sb-act-l">Bankexport</span>
       </button>
-      <button class="sb-act-item" type="button" data-feature="export_csv" onclick="sbActionsAction('hub-export')">
+      <button class="sb-act-item sb-act-ausgeben" type="button" data-feature="export_csv" onclick="sbActionsAction('hub-export')">
         <span class="sb-act-ico" data-icon="export-hub"></span><span class="sb-act-l">Export</span>
       </button>
 
@@ -4033,7 +4037,7 @@ document.addEventListener('DOMContentLoaded', function(){
          bei gleicher Spezifitaet ueberstimmt; Skript NACH settings.js,
          weil es _dpDispSkin fuer den hellen Grund benutzt. -->
     <link rel="stylesheet" href="css/datenaufnahme.css?v=v1702d"><!-- v1639 · aus der Bordkarte wird eine Zeile -->
-    <link rel="stylesheet" href="css/layout-varianten.css?v=v1705c">
+    <link rel="stylesheet" href="css/layout-varianten.css?v=v1706">
     <script src="js/pdf-wahl.js?v=v1636"></script><!-- v1636 · Rueckfrage vor dem Export -->
     <script src="js/layout-varianten.js?v=v1705b"></script>
     <script src="js/karten-stil.js?v=v1702c"></script><!-- v1651 · Trichter und Bordkarte -->

@@ -5211,3 +5211,146 @@ html[data-dp-layout] .dpl-schiene .sb-act-item svg{
   stroke:currentColor !important;
   opacity:1 !important;
 }
+
+/* =====================================================================
+   v1706 - KOPFLEISTE: KONTINGENT, HILFE UND PORTFOLIO
+   =====================================================================
+   Marcel: "wenn ich den Tower als Layout ausgewaehlt habe und oben im
+   Header auf dein Kontingent klicke, dann ist die Schrift schwarz ...
+   ein goldener Rahmen mit goldener Schrift und das Gleiche daneben auch
+   bei der Hilfe. Da wuerde ich mir wuenschen, dass wir die Farbkombi
+   genauso machen wie die Anzeige daneben mit dem hellen Bereich
+   0 von 6 Bereichen vollstaendig ... Das Gleiche haben wir beim
+   Portfolio."
+
+   GEMESSEN am 29.09.2026, beide Zustaende:
+
+     ohne Layout   Panel-Ueberschrift rgb(201,168,76) auf rgb(20,18,16)
+     mit Layout    Panel-Ueberschrift rgb(0,0,0)      auf rgb(20,18,16)
+
+   Schwarz auf Schwarz. Der Kontrast liegt bei rund 1,0 - das ist nicht
+   schwer zu lesen, das ist unsichtbar.
+
+   > Eine Farbe gilt immer nur zu ihrem Grund. Im Layout wurde der
+   > Kopfbereich hell gedacht und der Text dunkel gesetzt; das Panel
+   > darin ist aber dunkel geblieben und hat die Textfarbe geerbt.
+
+   DIE VORLAGE ist `.tabs-status-badge` - gemessen, nicht geraten:
+     Text rgb(191,183,169) | Grund transparent | Rahmen rgb(230,225,214)
+     Radius 7px
+
+   Warum hier eine NEUE Regel und nicht die vorhandene: der Block weiter
+   oben zielt auf `header.hdr:has(#hdr-badges)`. Gemessen liegt
+   `#hdr-badges` GAR NICHT im Header - `hdr.contains(badges)` ist false,
+   `:has()` matcht nie. Der Block sieht richtig aus und greift nirgends,
+   genau wie der `#app`-Anker aus v1147.
+   ===================================================================== */
+
+/* -- 1) Die Kontingent-Pille und der Hilfe-Knopf ------------------- */
+html[data-dp-layout] #hdr-credits-pill,
+html[data-dp-layout] .hdr-icon-btn{
+  color:#BFB7A9 !important;
+  background:transparent !important;
+  border:1px solid #E6E1D6 !important;
+  border-radius:7px !important;
+}
+html[data-dp-layout] #hdr-credits-pill *,
+html[data-dp-layout] .hdr-icon-btn svg,
+html[data-dp-layout] .hdr-icon-btn svg *,
+html[data-dp-layout] .hdr-icon-btn .ic{
+  color:#BFB7A9 !important;
+  stroke:currentColor !important;
+}
+html[data-dp-layout] #hdr-credits-pill:hover,
+html[data-dp-layout] .hdr-icon-btn:hover,
+html[data-dp-layout] #hdr-credits-pill:hover *,
+html[data-dp-layout] .hdr-icon-btn:hover svg{
+  color:#F5EFE2 !important;
+  border-color:#F5EFE2 !important;
+}
+/* Das Panel bleibt AUSGENOMMEN - es haengt zwar in der Pille, ist aber
+   eine eigene Flaeche mit eigenem Grund. Ohne diese Ausnahme wuerde der
+   Stern-Selektor darueber seine Texte alle auf denselben Ton ziehen. */
+
+/* -- 2) Das Kontingent-Panel --------------------------------------- */
+html[data-dp-layout] .dp-kg-panel{
+  color:#E3DCCD !important;
+}
+html[data-dp-layout] .dp-kg-panel .dp-kg-h{
+  color:#EDE7DA !important;
+}
+html[data-dp-layout] .dp-kg-panel .dp-kg-n{
+  color:#E3DCCD !important;
+}
+/* Die ZAHL darf gold bleiben - sie ist der Wert, um den es geht, und
+   Gold ist hier Wegweisung, nicht Schmuck. */
+html[data-dp-layout] .dp-kg-panel .dp-kg-s{
+  color:var(--wl-e8cc7a, #E8CC7A) !important;
+}
+html[data-dp-layout] .dp-kg-panel .dp-kg-f{
+  color:#8C8578 !important;
+}
+
+/* -- 3) Der Portfolio-Knopf in der Schiene ------------------------- */
+html[data-dp-layout] .dpl-portfolio{
+  color:#BFB7A9 !important;
+  background:transparent !important;
+  border:1px solid #E6E1D6 !important;
+  border-radius:7px !important;
+}
+html[data-dp-layout] .dpl-portfolio .dpl-t,
+html[data-dp-layout] .dpl-portfolio .dpl-n{
+  color:#BFB7A9 !important;
+}
+html[data-dp-layout] .dpl-portfolio .dpl-i,
+html[data-dp-layout] .dpl-portfolio .dpl-i svg{
+  color:#BFB7A9 !important;
+  stroke:currentColor !important;
+}
+html[data-dp-layout] .dpl-portfolio:hover,
+html[data-dp-layout] .dpl-portfolio:hover .dpl-t,
+html[data-dp-layout] .dpl-portfolio:hover .dpl-n,
+html[data-dp-layout] .dpl-portfolio:hover .dpl-i{
+  color:#F5EFE2 !important;
+  border-color:#F5EFE2 !important;
+}
+
+/* =====================================================================
+   v1706 - DIE AKTIONSLISTE ATMET
+   =====================================================================
+   Marcel: "da finde ich koennte zwischen den einzelnen Sachen ein
+   bisschen Abstand sein und Ansichten, Analyse, Anlegen, Ausgeben,
+   System, das koennte ein bisschen groesser sein, dass man da vielleicht
+   ein bisschen mehr sieht. Das Ausgeben kann tatsaechlich sogar an
+   dieser Stelle weg, weil wir die Ausgabe ja beim Tower auf der anderen
+   Seite haben ... da musst du gucken, dass das auch nicht doppelt ist."
+
+   GEMESSEN vorher: .sb-act-item padding 5px 9px, Schrift 12.5px;
+   .sb-act-section-title Schrift 8.5px. Die Ueberschriften waren damit
+   kleiner als jede andere Schrift in der App.
+   ===================================================================== */
+html[data-dp-layout] .dpl-schiene .sb-act-item{
+  padding:7px 9px !important;
+  margin-bottom:1px !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-act-section-title{
+  padding:14px 9px 5px !important;
+  font-size:10px !important;
+  letter-spacing:.14em !important;
+}
+/* Die erste Ueberschrift braucht oben keinen Abstand - sonst steht die
+   Liste mit einer Luecke da, die niemand bestellt hat. */
+html[data-dp-layout] .dpl-schiene .sb-act-section-title:first-child{
+  padding-top:4px !important;
+}
+
+/* -- "Ausgeben" faellt weg, WO die Ausgaben-Box steht ---------------
+   Die Bedingung ist die Box selbst, nicht das Layout: gibt es sie
+   einmal nicht, bleibt die Gruppe stehen, statt ersatzlos zu fehlen.
+
+   > Eine Gruppe auszublenden, weil man ANNIMMT, dass es sie woanders
+   > gibt, ist der Weg, auf dem Funktionen verschwinden. Die Regel fragt
+   > deshalb nach, ob es die zweite Stelle wirklich gibt. */
+html[data-dp-layout]:has(.dpl-teil-ausgaben) .dpl-schiene .sb-act-ausgeben{
+  display:none !important;
+}
