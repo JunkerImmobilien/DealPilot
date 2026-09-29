@@ -3859,7 +3859,24 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
               + 'Auslieferungszustand zurücksetzen?';
     if (!window.confirm(frage)) return;
     try { if (window.DealPilotLayout && window.DealPilotLayout.setze) window.DealPilotLayout.setze(''); } catch (e) {}
-    try { localStorage.removeItem(LSK); } catch (e) {}
+    /* v1699b: `dp_chrome_hell` MIT abraeumen. Ohne ihn blieb die
+       Oberflaeche hell, auch nachdem v1699 den Zwang aus den Layouts
+       genommen hat — der Merker ueberlebt und stellt sie beim naechsten
+       Start wieder hell. Gemessen: `dp_chrome_hell: "1"` stand noch da,
+       obwohl nichts mehr danach fragte.
+
+       Und `dp_karten_variante`/`dp_layout_variante`, weil sonst der
+       Kartenstil einer abgeraeumten Aufteilung weiterlebt — genau der
+       Fehler, der „Heute" schon einmal hell gelassen hat. */
+    try {
+      localStorage.removeItem(LSK);
+      localStorage.removeItem('dp_chrome_hell');
+      localStorage.removeItem('dp_karten_variante');
+      localStorage.removeItem('dp_layout_variante');
+      localStorage.removeItem('dp_layout_seiten');
+    } catch (e) {}
+    try { if (document.body) document.body.classList.remove('dp-chrome-hell'); } catch (e) {}
+    try { if (typeof window._dpDispSkin === 'function') window._dpDispSkin('obsidian'); } catch (e) {}
     try { if (window.DealPilotUiVarianten && window.DealPilotUiVarianten.apply) window.DealPilotUiVarianten.apply(); } catch (e) {}
     try { if (window.DealPilotWhitelabel && window.DealPilotWhitelabel.reset) window.DealPilotWhitelabel.reset(); } catch (e) {}
     try { if (typeof window._dpProfilMarkieren === 'function') window._dpProfilMarkieren(); } catch (e) {}
