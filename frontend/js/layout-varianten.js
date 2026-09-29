@@ -318,11 +318,17 @@
      Fehlt sie, bleibt der Knopf trotzdem bedienbar — ein fehlendes
      Bild darf keinen Befehl kosten.                                  */
   function ausgabenIconsNachziehen(box) {
+    /* GEMESSEN am 29.09.2026, nicht geraten: `_sbActionsRenderIcons()`
+       ist die Funktion, die `.sb-act-ico[data-icon]` fuellt — im Versuch
+       ging der Inhalt von 0 auf 352 Zeichen, und die echte Aktionsliste
+       wurde im selben Lauf mitgefuellt (318).
+
+       `window.Icons` existiert zwar, hat aber kein `render` — es ist
+       eine Sammlung von Pfaden. Ein Aufruf darauf waere still
+       gescheitert und die Knoepfe waeren fuer immer blind geblieben. */
     try {
-      if (window.Icons && typeof window.Icons.render === 'function') {
-        window.Icons.render(box);
-      } else if (typeof window._sbRenderActionIcons === 'function') {
-        window._sbRenderActionIcons();
+      if (typeof window._sbActionsRenderIcons === 'function') {
+        window._sbActionsRenderIcons();
       }
     } catch (e) { /* Bedienbarkeit haengt nicht am Bild */ }
   }
@@ -330,12 +336,28 @@
   function dpAusgabenAktualisieren() {
     var el = document.getElementById('dpl-ausgaben-obj');
     if (!el) return;
+    /* v1679b — ZURUECKGENOMMEN: hier stand `window.objects[key]`.
+       **`window.objects` gibt es nicht** (gemessen: `typeof` ist
+       `undefined`, ebenso `objekte`, `OBJ`, `_objects`, `dpObjects`).
+       Der Name blieb deshalb immer „kein Objekt gewaehlt", obwohl
+       `_currentObjKey` gesetzt war — ein geratener Speichername, der
+       still ins Leere lief.
+
+       Die gemessene Quelle ist die AKTIVE KARTE in der Objektliste:
+       `.sb-card.active` traegt `.sbc-seq` („2026-999") und
+       `.sbc-address` („Musterstrasse 12, Leipzig"). Das ist dieselbe
+       Anzeige, die der Nutzer sieht — sie kann gar nicht auseinander
+       laufen.                                                        */
     var name = '';
     try {
-      var key = window._currentObjKey;   /* die einzige verlaessliche Objektreferenz */
-      if (key && window.objects && window.objects[key]) {
-        var o = window.objects[key];
-        name = o.seq || o.adresse || o.strasse || '';
+      var karte = document.querySelector('.sb-card.active, .sb-card.sel, .sb-card[aria-current]');
+      if (karte) {
+        var adr = karte.querySelector('.sbc-address');
+        var seq = karte.querySelector('.sbc-seq');
+        var a = adr && adr.textContent ? adr.textContent.trim() : '';
+        var s = seq && seq.textContent ? seq.textContent.trim() : '';
+        name = a || s;
+        if (a && s) name = s + ' · ' + a;
       }
     } catch (e) { name = ''; }
     el.textContent = name ? ('für ' + name) : 'kein Objekt gewählt';
@@ -348,8 +370,20 @@
      `dp:object-loaded` gibt es nicht; ein Listener darauf schwiege für
      immer, ohne dass irgendwo ein Fehler erschiene.                  */
   window.addEventListener('dp:object-ready', function () {
-    setTimeout(dpAusgabenAktualisieren, 60);
+    /* 400 ms, nicht 60: die `.active`-Marke auf der Karte wird NACH dem
+       Ereignis gesetzt. Zu frueh gelesen steht dort noch die vorige
+       Auswahl — oder gar keine.                                      */
+    setTimeout(dpAusgabenAktualisieren, 400);
   });
+  /* Zweiter Weg, weil der erste eine Reihenfolge voraussetzt: ein Klick
+     in der Objektliste fuehrt immer zu einer neuen Auswahl, ganz gleich
+     ob und wann ein Ereignis feuert. */
+  document.addEventListener('click', function (e) {
+    if (!document.getElementById('dpl-ausgaben')) return;
+    if (e.target.closest && e.target.closest('.sb-card')) {
+      setTimeout(dpAusgabenAktualisieren, 400);
+    }
+  }, true);
 
   function hole(sel) {
     /* Die Ausgaben-Box existiert erst, wenn ein Layout sie anfordert. */
