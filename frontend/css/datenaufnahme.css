@@ -1735,3 +1735,31 @@ html[data-dp-kartenstil="kartei"] .dp-pf-scroll::after{
   margin-right:0 !important;
   padding:0 !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   v1687 — ZWEI BESCHRIFTUNGEN, EINE JE ZUSTAND
+   -------------------------------------------------------------------
+   Marcel: „wenn ich auf Heute umstelle und dann auf Quick Check gehe,
+   ist immer noch die Pre-Flight-Karte — die hast du umgewandelt in
+   Datenaufnahme. Das muss wieder so sein wie vorher."
+
+   Auf Prod nachgesehen (`157.90.117.167`, `object-actions.js:301`):
+   dort steht bis heute **PRE-FLIGHT** und **Daten einlesen**. Ich hatte
+   beides fuer die neuen Ansichten umbenannt und damit auch „Heute"
+   veraendert — eine Ansicht, die ausdruecklich UNVERAENDERT bleiben
+   soll.
+
+   Die Karte gibt jetzt beide Texte aus; welcher gilt, entscheidet der
+   Kartenstil. Eine Quelle, zwei Zustaende — nicht zwei Staende
+   derselben Karte.
+   ═══════════════════════════════════════════════════════════════════ */
+.dp-pfbar .k-neu{ display:none; }
+.dp-pfbar .k-heute{ display:inline; }
+html[data-dp-kartenstil] .dp-pfbar .k-neu,
+body.dp-neue-karte .dp-pfbar .k-neu{ display:inline; }
+html[data-dp-kartenstil] .dp-pfbar .k-heute,
+body.dp-neue-karte .dp-pfbar .k-heute{ display:none; }
+/* Im iframe entscheidet die gespiegelte Marke: `data-dp-heute` steht
+   genau dann, wenn die Haupt-App auf „Heute" steht (v1685). */
+html[data-dp-heute] .dp-pfbar .k-neu{ display:none !important; }
+html[data-dp-heute] .dp-pfbar .k-heute{ display:inline !important; }

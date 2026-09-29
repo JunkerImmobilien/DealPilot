@@ -476,11 +476,26 @@
 
     sperre(mbKnopf, true, 'wird geprüft …');
     try {
-      var t = null;
-      try { t = localStorage.getItem('dp_token') || localStorage.getItem('token'); } catch (e) {}
-      var res = await fetch('/api/v1/marktbericht/objects/history?ref=' + encodeURIComponent(id),
-                            { headers: t ? { Authorization: 'Bearer ' + t } : {} });
-      var j = await res.json();
+      /* ── v1687 · ZURUECKGENOMMEN: hier stand ein nacktes `fetch` mit
+         `localStorage.getItem('dp_token')`. **Beides falsch**, und
+         zusammen haben sie Marcel die Sitzung gekostet:
+
+         1. Der Token heisst `ji_token` (`auth.js:14`). `dp_token` gibt
+            es nicht — die Anfrage ging also OHNE Anmeldung raus und kam
+            mit 401 zurueck.
+         2. Ein nacktes `fetch` umgeht den zentralen 401-Handler. Steht
+            woertlich in CLAUDE.md. Der 401 wurde deshalb als echter
+            Sitzungsverlust gewertet: „Sitzung abgelaufen — bitte neu
+            anmelden", bei JEDEM Objektwechsel, obwohl die Sitzung
+            gueltig war. Danach gingen die Ausgaben nicht mehr.
+
+         > Ein Pruefaufruf, der die Anmeldung kaputtmacht, ist teurer
+         > als die Pruefung wert ist.
+
+         `Auth.apiCall` setzt den Header selbst und kennt den Handler;
+         `getApiBase()` enthaelt bereits `/api/v1`.               */
+      var j = await Auth.apiCall('/marktbericht/objects/history?ref=' + encodeURIComponent(id),
+                                 { method: 'GET' });
       var reps = ((j && j.history) || []).filter(function (h) { return h && h.report_id != null; });
       reps.sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
       _mbBerichte = reps;
