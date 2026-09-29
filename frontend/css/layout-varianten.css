@@ -4956,6 +4956,22 @@ html[data-dp-layout] body header.hdr .hdr-credits-pill svg :is(path,circle,rect,
    Das trifft JEDEN Text im Kopf auf einmal, nicht nur das Symbol, an dem
    es aufgefallen ist.
    ═══════════════════════════════════════════════════════════════════ */
-html[data-dp-layout] body{
-  --dp-header-text: var(--wl-c9a84c, #C9A84C);
+/* Spezifitaet nachgerechnet, nicht geschaetzt:
+     ui-varianten.css:1290
+       html[data-ui-theme] body.dp-chrome-hell header.hdr   (0,3,3)
+     meine erste Fassung
+       html[data-dp-layout] body                            (0,2,1)   VERLOR
+
+   Die Gegenregel geht davon aus, dass der Kopf im Hell-Skin HELL ist
+   (sie setzt selbst den Grund auf `--uv-chrome`) und faerbt den Text
+   deshalb mit `--uv-chrome-ink: #141310` — genau die gemessene Farbe.
+   In den Layouts ist der Kopf aber DUNKEL. Zwei Regelwerke, jedes fuer
+   sich richtig, zusammen falsch.
+
+   Diese Fassung traegt beide Attribute und die Klasse und liegt damit
+   bei (0,5,3). */
+html[data-dp-layout][data-ui-theme] body.dp-chrome-hell header.hdr,
+html[data-dp-layout] body header.hdr{
+  --dp-header-text: var(--wl-c9a84c, #C9A84C) !important;
+  color: var(--wl-c9a84c, #C9A84C) !important;
 }
