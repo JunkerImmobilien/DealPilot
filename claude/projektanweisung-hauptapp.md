@@ -23830,3 +23830,142 @@ nicht wie ein neuer Fehler aussieht.
 
 **Rest:** Partner-Logo in den Layouts (kein Logo auf dem Testkonto
 hinterlegt) und die Rundgang-Schrittanzeige sind weiterhin unbewiesen.
+
+---
+
+## 29.09.2026 (25) — v1705: Loeschen, Menue, Icons, Schnellfragen
+
+### v1705 / v1705b · Das Loeschen im Portfolio
+
+Marcel: „man kann unter Portfolio wenn man die Objekte auswaehlt kein
+Objekt mehr loeschen. das muessten wir realisieren dass das wieder geht."
+
+**Zwei Ursachen uebereinander**, und die erste verdeckte die zweite:
+
+**1 · `.sbc-actions` stand in allen drei Layouts auf `display:none`.**
+Ausgeblendet beim Umbau der Karte zur kompakten Listenzeile, zusammen
+mit Thumbnail und Kennzahlkacheln. Die Knoepfe existierten (22x22 px
+ohne Layout), waren aber nicht da.
+
+> Eine Gestaltungsentscheidung hat eine Funktion mitgenommen. Das faellt
+> nicht auf, solange niemand loeschen will — und dann sieht es aus, als
+> sei die Funktion weg.
+
+Der Zielkonflikt bleibt echt: die Zeile SOLL schmal sein. Geloest ueber
+**Sichtbarkeit statt Platz** — absolut rechts in der Zeile, sichtbar bei
+Hover oder an der ausgewaehlten Karte. Sie nehmen nie Breite weg. Auf
+Touch (`@media (hover:none)`) stehen sie an der aktiven Karte dauerhaft,
+sonst waere das Loeschen auf dem Handy genauso weg wie vorher.
+
+**2 · Der Klick auf eine Karte klappt die ganze Liste zu.** Erst im
+ECHTEN Bedienweg gemessen (Karte anklicken statt `.active` von Hand
+setzen):
+
+```
+data-dpl-portfolio: zu | .dpl-teil-objekte: display none
+sichtbare Karten: 0
+```
+
+Der Kommentar an der Stelle (v1653) sagt: „man hat ja gefunden, was man
+gesucht hat."
+
+> **Wer loeschen will, hat NICHT gefunden, was er gesucht hat.** Er will
+> die Zeile weghaben — und sie klappt ihm unter dem Finger weg.
+
+Das Zuklappen bleibt, es hat seinen Sinn. Es greift nur nicht mehr fuer
+Klicks innerhalb von `.sbc-actions`.
+
+**Nachweis (echter Bedienweg, alle drei Layouts):** Liste auf → Objekt
+anklicken (Liste klappt zu) → Liste wieder auf → die aktive Karte traegt
+ihre Knoepfe: `opacity 1`, **20x20 px**, `elementFromPoint` trifft
+`BUTTON.sbc-btn sbc-del`. Bildbeweis: die Karte zeigt rechts Duplizieren
+und ×, die Adresse bleibt lesbar.
+
+*Ehrlicher Abnahmepunkt:* der Klick auf Loeschen selbst oeffnet ein
+`confirm()` und laesst sich nicht automatisiert ausloesen. Bewiesen ist,
+dass der Knopf da und erreichbar ist — `cardDelete` dahinter ist
+unveraendert.
+
+### v1705 · Zwei Punkte weniger unter Aktionen
+
+„Rundgang starten" und „Feedback & Support" **nur in den Layouts**
+ausgeblendet. Die normale Ansicht behaelt beide — dort ist die
+Aktionsliste der einzige zweite Weg zur Tour (v1179). `.sb-act-tour` als
+Anker neu gesetzt; ohne ihn muesste die Regel auf den `onclick` zielen,
+und der aendert sich.
+
+### v1705c · Die Icons waren Kleckse statt Umrisse
+
+Marcel: „die Icons der einzelnen Punkte unter Aktionen aus der ‚heute'
+Ansicht uebernimmst. Auch gerne in Gold."
+
+Erst im **Bildvergleich** sichtbar geworden: in der normalen Ansicht
+feine Linien-Symbole, in der Schiene gefuellte Flaechen. Die Zahlen
+hatten es verschwiegen — die Icons waren vorhanden, gold und gleich
+gross.
+
+**Ursache:** die Goldregel setzte `fill:currentColor !important` mit. Die
+Symbole tragen `fill="none" stroke="currentColor"` als
+Praesentationsattribut, und **CSS schlaegt ein Praesentationsattribut** —
+aus jedem Umriss wurde ein Klecks.
+
+> **Die Regel wollte die Farbe setzen und hat die Form mitgenommen.**
+> `color` faerbt ueber `currentColor` bereits beides; `fill` musste dafuer
+> nie angefasst werden.
+
+Nachgemessen: `fill=none`, `stroke=rgb(201,168,76)` — und im Bild wieder
+dieselben Umrisse wie in der normalen Ansicht.
+
+### v1705d · Schnellfragen fuer den Portfolio-Piloten
+
+Vier Chips unter dem Verlauf: Cashflow-Belastung, Zinsbindungen,
+Eigenkapital in 10 Jahren, Klumpenrisiken. Alle vier sind Fragen, die das
+Portfolio wirklich beantworten KANN — die Daten stehen im Payload.
+
+> Eine Schnellfrage, deren Antwort nicht in den Daten steht, ist eine
+> Einladung zum Erfinden.
+
+Deshalb nichts zu Marktpreisen oder Standorten — dafuer braucht es die
+Web-Recherche, und die schaltet der Nutzer selbst ein. Jede Frage sagt
+dem Modell ausserdem, was bei fehlender Angabe zu tun ist.
+
+**Nachweis:** Chip geklickt, im Chat steht die kurze Fassung, das Modell
+bekam die lange und antwortete mit allen fuenf Objekten samt Zahl,
+sortiert.
+
+### v1705e · Der Waechter schlug bei Erfolg Alarm
+
+`deploy-staging.ps1` brach ab: „Serverstand ist '8f5aa70', lokal steht
+'8f5aa704'". **Derselbe Commit.** `git rev-parse --short` kuerzt nur so
+weit, wie es im JEWEILIGEN Repo eindeutig ist, und die beiden Repos haben
+nicht dieselben Objekte. Voller Hash gegengeprueft: identisch.
+
+> **Ein Waechter, der bei Erfolg Alarm schlaegt, wird abgeschaltet — und
+> dann faellt der echte Fall auch nicht mehr auf.**
+
+Beide Seiten lesen jetzt den vollen Hash; die Meldung zeigt zehn Zeichen.
+Mit sich selbst bewiesen: `9c682d9159 == lokal 9c682d9159`.
+
+### v1704e · Ein eigener Fehler, ausdruecklich zurueckgenommen
+
+`dashboard.js` galt fuer `grep` und `file` als **Binaerdatei** — 18
+NUL-Bytes. Ich hatte die Rahmenzeichen U+2500 in einen **latin1**-
+Schreibvorgang gegeben; latin1 nimmt nur das niedere Byte, aus jedem
+wurde `0x00`. Aufgefallen erst, als eine Suche in der Datei nur noch
+„Binary file matches" lieferte.
+
+> **`node --check` war die ganze Zeit gruen.** Ein Syntaxpruefer sagt
+> nicht, ob eine Datei heil ist. Er sagt nur, ob sie sich parsen laesst.
+
+Behoben, alle anderen angefassten Dateien gegengeprueft (0 NUL).
+**Lehre:** in einen latin1-Schreibvorgang gehoert nur latin1 — Rahmen und
+Gedankenstriche als ASCII, oder die Datei als utf8 lesen UND schreiben.
+Dazu: **Backticks gehoeren nicht in einen `node -e`-Einzeiler mit
+doppelten Quotes** — Bash frisst sie als Kommandosubstitution, vier
+Kommentarzeilen kamen leer an (der Code war korrekt, nur der Text hatte
+Loecher).
+
+**Gold-Audit RC=0**, genau auf der Basislinie.
+
+**Commits.** `87f80d3` · `a8dfff8` · `569a66f` · `c7f0697` · `8f5aa70` ·
+`9c682d9`
