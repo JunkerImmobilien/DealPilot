@@ -90,7 +90,7 @@ function klassifiziere(text, dateiname) {
   const d = String(dateiname || '').toLowerCase();
 
   const alle = {};
-  let bester = null, besterWert = 0;
+  let bester = null, besterScore = 0;
 
   Object.keys(DOKUMENT_TYPEN).forEach(function (id) {
     const kws = DOKUMENT_TYPEN[id].keywords;
@@ -101,21 +101,40 @@ function klassifiziere(text, dateiname) {
       if (t.indexOf(k) !== -1) score += 1;
       if (d.indexOf(k) !== -1) score += 2;
     });
-    const wert = score / (kws.length * 3);
-    alle[id] = Math.round(wert * 100) / 100;
-    if (wert > besterWert) { besterWert = wert; bester = id; }
+    alle[id] = score;
+    if (score > besterScore) { besterScore = score; bester = id; }
   });
 
-  /* Unter 10 % ist es Rauschen. Lieber „unbekannt" als eine Art, die
-     der Nutzer dann stillschweigend übernimmt — eine falsche
-     Dokumentart zieht ein falsches Schema nach sich.                 */
-  if (!bester || besterWert <= 0.1) {
-    return { typ: null, label: null, sicherheit: Math.round(besterWert * 100) / 100, alle: alle };
+  /* v1678b — NICHT gegen die Stichwortzahl normalisieren.
+     ─────────────────────────────────────────────────────
+     Das Modul rechnet `score / (len(keywords) * 3)`. Damit wird eine
+     Art umso schwerer erkannt, je sorgfältiger ihre Stichwortliste
+     gepflegt ist: `kpt` führt acht Stichwörter, `rndg` fünf. Gemessen
+     an einer echten Kaufpreisaufteilung, in der „Kaufpreisaufteilung"
+     UND „umgekehrten Ertragswertmethode" wörtlich stehen: 2/24 = 0,08
+     — unter der Schwelle, also „unbekannt", während ein einzelner
+     schwacher Treffer bei einer schlanken Liste durchkommt.
+
+     Ein Maß, das die gründlichere Liste bestraft, misst die Liste und
+     nicht das Dokument. Deshalb zählen jetzt die TREFFER selbst:
+     zwei Punkte genügen (ein Wort im Text plus eines im Dateinamen,
+     oder zwei im Text). Die Sicherheit ist der Score gegen sechs
+     Punkte gedeckelt — bei sechs ist die Sache klar.                 */
+  const SCHWELLE = 2;
+  const sicherheit = Math.min(1, besterScore / 6);
+
+  if (!bester || besterScore < SCHWELLE) {
+    return {
+      typ: null, label: null,
+      sicherheit: Math.round(sicherheit * 100) / 100,
+      punkte: besterScore, alle: alle
+    };
   }
   return {
     typ: bester,
     label: DOKUMENT_TYPEN[bester].label,
-    sicherheit: Math.round(besterWert * 100) / 100,
+    sicherheit: Math.round(sicherheit * 100) / 100,
+    punkte: besterScore,
     alle: alle
   };
 }
