@@ -551,6 +551,46 @@ router.post('/extract-expose', authenticate, extractLimiter, async (req, res, ne
 });
 
 /**
+ * v1677: POST /api/v1/ai/extract-rndg
+ * Liest ein Restnutzungsdauergutachten (PDF-Text) und gibt Baujahr,
+ * Gesamt- und Restnutzungsdauer, Modernisierungspunkte und das dort
+ * gewählte Verfahren zurück.
+ *
+ * Das Extraktionsschema kommt aus dem Import-Modul v1.1.0. Die
+ * RECHNUNG kommt weiter aus `rnd-calc.js` — das Gutachten liefert die
+ * Eingaben, nicht das Ergebnis. Deshalb wird `rnd_jahre` zwar gelesen,
+ * aber als Vergleichswert, nicht als Übernahme.
+ *
+ * Wie extract-expose: kein Credit-Verbrauch (Extraktion ≠ Analyse).
+ */
+router.post('/extract-rndg', authenticate, extractLimiter, async (req, res, next) => {
+  try {
+    const { text, userApiKey: rawUserKey } = req.body || {};
+    const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
+
+    if (!config.openai.apiKey && !userApiKey) {
+      return res.status(503).json({ error: 'Kein OpenAI-API-Key verfügbar.', needs_user_key: true });
+    }
+    if (!text || typeof text !== 'string' || text.length < 50) {
+      return res.status(400).json({ error: 'Body muss "text" enthalten (mindestens 50 Zeichen).' });
+    }
+
+    const result = await openaiService.extractRndg(text, { userApiKey });
+    try {
+      if (aiCreditsService && typeof aiCreditsService.logExtract === 'function') {
+        await aiCreditsService.logExtract(req.user.id, 'extract-rndg');
+      }
+    } catch (e) { /* nicht kritisch */ }
+    res.json(result);
+  } catch (err) {
+    if (err.code === 'NO_API_KEY') return res.status(503).json({ error: err.message, needs_user_key: true });
+    if (err.status === 401) return res.status(401).json({ error: err.message });
+    if (err.status) return res.status(502).json({ error: 'OpenAI-Fehler: ' + err.message });
+    next(err);
+  }
+});
+
+/**
  * V63.91: POST /api/v1/ai/extract-market-data
  * Extrahiert Marktwert/Verkehrswert + Lage-Scores aus einem PDF-Marktbericht
  * (PriceHubble, Sprengnetter, Maklergutachten). Wird im Tab Objekt durch einen

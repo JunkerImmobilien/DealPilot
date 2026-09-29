@@ -1994,6 +1994,86 @@ async function extractBeleg(images, opts) {
 }
 
 
+/**
+ * v1677 — extractRndg: Restnutzungsdauergutachten einlesen.
+ *
+ * Das Schema stammt WÖRTLICH aus dem Import-Modul v1.1.0
+ * (`import_service.py`, `EXTRAKTIONS_PROMPTS['rndg']`). Damit ist die
+ * Brücke gebaut, um die es ging: das Modul liefert die EXTRAKTION,
+ * DealPilot rechnet. Kommt eine neue Modulfassung, muss nur dieses
+ * Schema nachgezogen werden — die Rechnung bleibt, wo sie hingehört.
+ *
+ * `rnd_jahre` wird mitgelesen, obwohl wir sie selbst rechnen: nur so
+ * lässt sich die eigene Rechnung gegen das Gutachten halten. Eine
+ * übernommene Zahl, die niemand gegenprüft, ist eine Behauptung.
+ */
+async function extractRndg(text, opts) {
+  const prompt = [
+    'Aus dem folgenden deutschen Restnutzungsdauergutachten extrahiere die',
+    'Kernzahlen als JSON. Wenn ein Feld nicht auffindbar ist: null.',
+    '',
+    'Schema:',
+    '{',
+    '  "gutachten_nr": string,',
+    '  "objekt_adresse": string,',
+    '  "baujahr": number,',
+    '  "bewertungsstichtag": string im Format DD.MM.JJJJ,',
+    '  "gnd_jahre": number (Gesamtnutzungsdauer),',
+    '  "rnd_jahre": number (Restnutzungsdauer laut Gutachten),',
+    '  "modernisierungspunkte": number (0 bis 20, Anlage 2 ImmoWertV),',
+    '  "verfahren_gewaehlt": string, einer von "Linear"/"Punktraster"/"Technisch",',
+    '  "ausstattung": {"veraltet_pct": number, "standard_pct": number, "gehoben_pct": number}',
+    '}',
+    '',
+    'Antworte NUR mit JSON.',
+    '',
+    'RNDG:',
+    text
+  ].join('\n');
+
+  const r = await callOpenAI(prompt, Object.assign({ maxTokens: 900 }, opts || {}));
+  const parsed = extractJson(r.text);
+  if (!parsed) {
+    return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.', raw_text: r.text };
+  }
+  const ext = parsed.extracted || parsed;
+
+  /* Number(null) ist 0 und besteht Number.isFinite — deshalb erst auf
+     Abwesenheit prüfen, dann rechnen. Steht so in CLAUDE.md.          */
+  function zahl(v, min, max) {
+    if (v === null || v === undefined || v === '') return null;
+    const n = Number(v);
+    if (!Number.isFinite(n)) return null;
+    if (min != null && n < min) return null;
+    if (max != null && n > max) return null;
+    return n;
+  }
+
+  const out = {
+    gutachten_nr:          ext.gutachten_nr || null,
+    objekt_adresse:        ext.objekt_adresse || null,
+    bewertungsstichtag:    ext.bewertungsstichtag || null,
+    verfahren_gewaehlt:    ext.verfahren_gewaehlt || null,
+    baujahr:               zahl(ext.baujahr, 1500, 2100),
+    gnd_jahre:             zahl(ext.gnd_jahre, 10, 120),
+    rnd_jahre:             zahl(ext.rnd_jahre, 0, 120),
+    modernisierungspunkte: zahl(ext.modernisierungspunkte, 0, 20),
+    ausstattung:           (ext.ausstattung && typeof ext.ausstattung === 'object') ? ext.ausstattung : null
+  };
+
+  /* Was fehlt, damit der Kern rechnen kann — benannt, nicht geraten.
+     Ein Import, der stillschweigend mit Standardwerten weiterrechnet,
+     liefert kein falsches Ergebnis, sondern ein richtig aussehendes
+     (derselbe Fehler wie bei der Kaufpreisaufteilung, v1669).        */
+  const fehlend = [];
+  if (out.baujahr == null) fehlend.push('baujahr');
+  if (out.gnd_jahre == null) fehlend.push('gnd_jahre');
+  out.rechenbar = fehlend.length === 0;
+  out.fehlende_pflichtfelder = fehlend;
+
+  return { success: true, model: r.model, extracted: out };
+}
+
 module.exports = {
   copilotChat,  /* v585 */
   analyze,
@@ -2006,5 +2086,6 @@ module.exports = {
   buildPrompt,
   callOpenAI,
   extractBeleg,
+  extractRndg,   /* v1677 */
   extractJson
 };
