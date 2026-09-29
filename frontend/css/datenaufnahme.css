@@ -1614,3 +1614,49 @@ html[data-dp-kartenstil="kartei"] .dp-pf-scroll::after{
   background:none !important;
   width:0 !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   v1682 — WARUM DIE LEISTE IM QUICKBOARDING ANDERS AUSSAH
+   -------------------------------------------------------------------
+   Marcel: „die Datenaufnahme im Quickboarding sieht nicht so aus wie im
+   Tab Objekt. Der Abruf-Button ist rübergerutscht und da ist auch noch
+   was Goldenes mit drin."
+
+   GEMESSEN, beide Leisten nebeneinander:
+
+                        Tab Objekt        QuickBoarding
+     QR-Inhalt          6.109 Zeichen     0  (leer)
+     QR angezeigt       ja                display:none
+     Abrufen sitzt bei  x = 1585 (rechts) x = 650 (mitten drin)
+     goldene Unterkante ja                ja
+
+   **Der Abruf-Knopf ist nicht verrutscht — ihm fehlt der Nachbar.**
+   Der QR wird im iframe nie gefüllt: sein Ziel kommt per Nachricht
+   `qc-autopass-code` aus der Haupt-App, und ohne Pass gibt es keins.
+   Die Regel `#qc7-qr:not([data-hat-ziel])` klappt ihn dann ein — das
+   war als Schutz gemeint („ein QR ohne Ziel ist ein Bild, kein Weg")
+   und hat den Platz gleich mit eingezogen.
+
+   > Ein Schutz, der Platz wegnimmt, verschiebt alles daneben. Der
+   > Knopf stand nie falsch; die Lücke neben ihm war zu gross.
+
+   Deshalb: der Abruf-Bereich haelt seinen Platz am rechten Rand aus
+   eigener Kraft (`margin-left:auto`) und haengt nicht mehr davon ab,
+   ob ein QR danebensteht.
+
+   Und die goldene Unterkante faellt weg — sie steht an BEIDEN Leisten,
+   aber erst wenn der Knopf mitten im Fluss sitzt, sieht man sie als
+   Strich quer durch die Karte. Marcel hat sie zweimal gemeldet.
+   ═══════════════════════════════════════════════════════════════════ */
+:is(#oab-bar, #qc7-sources).dp-pfbar .dp-pf-rz{
+  margin-left:auto !important;
+  border-bottom:0 !important;
+}
+/* Steht ein QR daneben, gehoert der Abstand zwischen beide - nicht
+   zwischen Segment und Knopf. */
+:is(#oab-bar, #qc7-sources).dp-pfbar .dp-pf-qr + .dp-pf-rz{
+  margin-left:14px !important;
+}
+:is(#oab-bar, #qc7-sources).dp-pfbar .dp-pf-qr{
+  margin-left:auto !important;
+}

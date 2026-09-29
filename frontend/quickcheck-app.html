@@ -6736,7 +6736,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
   <!-- v1641 · Der Quick-Check ist ein eigenes Dokument im iframe - die
        Gestaltung der Datenaufnahme muss hier NOCH EINMAL geladen werden.
        Zuletzt, damit sie die eingebetteten Stile ueberstimmt. -->
-  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1672c">
+  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1682">
 <!-- ── v1665g · DIE KARTEI GILT AUCH HIER — ABER NUR SIE ──────────────
      Marcel: „ImmoMetrica, Expose, Marktbericht — das sieht nicht so aus
      wie im Tab Objekt."
@@ -6786,6 +6786,32 @@ html[data-dp-kartenstil="kartei"] #qc7-sources .dp-pf-tile.on{
   border-color:var(--wl-c9a84c, #C9A84C) !important;
   background:#FFFDF8 !important;
 }
+
+/* ── v1682 · DER ABRUF-KNOPF HAELT SEINEN PLATZ SELBST ──────────────
+   Gemessen gegen den Objekt-Tab:
+
+                        Tab Objekt        hier
+     QR-Inhalt          6.109 Zeichen     0  (leer)
+     Abrufen sitzt bei  x = 1585          x = 650
+
+   **Der Knopf ist nicht verrutscht — ihm fehlt der Nachbar.** Der QR
+   wird hier nie gefuellt: sein Ziel kommt per `qc-autopass-code` aus
+   der Haupt-App, und ohne Pass gibt es keins. Die Regel
+   `#qc7-qr:not([data-hat-ziel])` klappt ihn dann ein und nimmt den
+   Platz gleich mit.
+
+   Ein Schutz, der Platz wegnimmt, verschiebt alles daneben.
+
+   Die gleichlautenden Regeln stehen auch in `datenaufnahme.css` —
+   HIER stehen sie noch einmal, weil die dortigen Regeln gegen die
+   `!important`-Schichten dieser Seite nachweislich nicht durchkommen
+   (siehe den Vermerk ueber diesem Block, weiterhin ungeloest). */
+#qc7-sources.dp-pfbar .dp-pf-rz{
+  margin-left:auto !important;
+  border-bottom:0 !important;
+}
+#qc7-sources.dp-pfbar .dp-pf-qr{ margin-left:auto !important; }
+#qc7-sources.dp-pfbar .dp-pf-qr + .dp-pf-rz{ margin-left:14px !important; }
 </style>
 
 </body>
