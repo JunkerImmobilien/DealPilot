@@ -1339,11 +1339,72 @@
     seg.parentElement.style.opacity = aktuell ? '' : '.45';
   }
 
+  /* ── v1697 · DIE LAYOUTS IN DEN EINSTELLUNGEN ──────────────────────
+     `settings.js` legt unter „Aussehen" einen leeren Behaelter
+     `#dp-layout-wahl-host` an. Gefuellt wird er hier, weil hier die
+     Liste steht — `settings.js` wuesste sonst nicht, welche Layouts es
+     gibt, und eine zweite Liste dort waere beim naechsten schon falsch.
+
+     Derselbe Bau wie im Darstellungs-Panel (`.dpuv-g`/`.dpuv-sgb`), nur
+     ohne dessen Rahmen: die Einstellungen bringen ihren eigenen mit. */
+  function inEinstellungen() {
+    var host = document.getElementById('dp-layout-wahl-host');
+    if (!host || host.getAttribute('data-gefuellt') === '1') return;
+    host.setAttribute('data-gefuellt', '1');
+
+    var kacheln = [{ key: '', name: 'Heute', sub: 'Unveränderte Ansicht' }].concat(
+      Object.keys(LAYOUTS).map(function (k) {
+        return { key: k, name: LAYOUTS[k].name, sub: LAYOUTS[k].beschreibung };
+      }));
+
+    host.innerHTML =
+        '<div style="padding:12px 14px;background:#FAF9F4;border-radius:8px;'
+      +   'border:1px solid rgba(201,168,76,0.25)">'
+      +   '<div style="font-size:11.5px;color:var(--muted,#5F5E5A);margin-bottom:9px">'
+      +     'Wo Menü, Aktionen, Score und Ausgaben liegen. Farben, Formen und '
+      +     'Schrift lassen sich frei dazu kombinieren.</div>'
+      +   '<div id="dp-layout-wahl" style="display:grid;'
+      +     'grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px">'
+      +     kacheln.map(function (o) {
+            return '<button type="button" class="dp-layoutw'
+              + (o.key === aktuell ? ' on' : '') + '" data-v="' + o.key + '"'
+              + ' style="min-height:44px;text-align:left;padding:10px 12px;border-radius:9px;'
+              + 'border:1px solid rgba(0,0,0,.12);background:#fff;cursor:pointer;font:inherit">'
+              + '<span style="display:block;font-weight:600">' + o.name + '</span>'
+              + '<span style="display:block;font-size:11.5px;color:var(--muted,#5F5E5A);'
+              + 'margin-top:1px">' + (o.sub || '') + '</span></button>';
+          }).join('')
+      +   '</div></div>';
+
+    markiereEinstellungen();
+
+    host.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('.dp-layoutw') : null;
+      if (!b) return;
+      setze(b.getAttribute('data-v') || '');
+      markiereEinstellungen();
+    });
+  }
+
+  function markiereEinstellungen() {
+    var w = document.getElementById('dp-layout-wahl');
+    if (!w) return;
+    [].forEach.call(w.querySelectorAll('.dp-layoutw'), function (b) {
+      var an = (b.getAttribute('data-v') || '') === (aktuell || '');
+      b.classList.toggle('on', an);
+      /* Inline gesetzt, weil die Einstellungen kein eigenes Blatt fuer
+         diese Knoepfe haben — und eine Klasse ohne Regel faerbt nichts. */
+      b.style.borderColor = an ? 'var(--wl-c9a84c, #C9A84C)' : 'rgba(0,0,0,.12)';
+      b.style.boxShadow = an ? '0 0 0 1px var(--wl-c9a84c, #C9A84C) inset' : 'none';
+    });
+  }
+
   function panelBeobachten() {
     if (beobachter || !window.MutationObserver) return;
-    beobachter = new MutationObserver(function () { inPanel(); });
-    beobachter.observe(document.body, { childList: true });
+    beobachter = new MutationObserver(function () { inPanel(); inEinstellungen(); });
+    beobachter.observe(document.body, { childList: true, subtree: true });
     inPanel();
+    inEinstellungen();
   }
 
   /* ── Start ──────────────────────────────────────────────────────── */

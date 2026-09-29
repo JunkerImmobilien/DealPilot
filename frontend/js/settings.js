@@ -742,6 +742,24 @@ function showSettings(initialTab) {
            API anwenden. Wer es einzeln will, geht wie bisher ins Panel. */
         '<hr class="dvd">' +
         '<h3 class="set-section-h">Aussehen</h3>' +
+        /* ── v1697 · DIE LAYOUTS STEHEN HIER, NICHT HINTER EINEM KNOPF ──
+           Marcel dreimal: „die Layouts sollten direkt unter Einstellungen
+           → Darstellung und dann unter Aussehen waehlbar sein."
+
+           Sie standen im Darstellungs-Panel, das erst ueber „Darstellung
+           oeffnen" erscheint — eine Klickebene zu tief. Der Abschnitt
+           hier heisst bereits „Aussehen"; er ist der Ort, den Marcel
+           beschreibt.
+
+           Die Liste kommt aus `DealPilotLayout.layouts`, nicht aus einer
+           zweiten Pflege: eine hier gefuehrte Liste waere beim naechsten
+           Layout schon falsch. Der Wahlknopf ruft `setze()` — denselben
+           Weg wie das Panel, damit es nicht zwei Zustaende gibt.
+
+           Die Reihenfolge ist Absicht: erst WO die Dinge liegen, dann
+           WIE hell es ist, dann alles Einzelne hinter „Darstellung
+           oeffnen". Von grob nach fein.                               */
+        '<div id="dp-layout-wahl-host" style="margin-bottom:12px"></div>' +
         '<div style="padding:12px 14px;background:#FAF9F4;border-radius:8px;border:1px solid rgba(201,168,76,0.25)">' +
           '<div id="dp-profil-wahl" style="display:flex;gap:11px">' +
             '<button type="button" class="dp-profil" data-profil="obsidian" onclick="_dpProfil(\'obsidian\')" ' +
