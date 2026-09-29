@@ -704,7 +704,7 @@
     for(var i=0;i<years;i++){
       var yr=2026+i, miete=0,bwk=0,zins=0,tilg=0,afa=0,rest=0,wert=0;
       arr.forEach(function(o){
-        /*    v1704b · DIE PROJEKTION RECHNETE IN CENT                 
+        /* -- v1704b · DIE PROJEKTION RECHNETE IN CENT ----------------
            Hier stand `num(o._kaufpreis)`. Der Kommentar an der SSoT
            weiter oben sagt es ausdruecklich: `o.kp` ist EURO,
            `o._kaufpreis` ist CENT. Da alle Folgewerte aus `kp` abgeleitet
