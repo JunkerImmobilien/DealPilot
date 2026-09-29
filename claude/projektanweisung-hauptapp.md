@@ -23156,3 +23156,91 @@ kein Abstand, sondern Ausrichtung.**
 > bedienbar zurueck. **Ein Bildausschnitt beweist keine Abwesenheit.**
 
 **Commit.** `db66128`
+
+---
+
+## Rollout-Journal 29.09.2026 (19) — zwei tote Knöpfe, beide Altbestand
+
+Marcel hat sechs Punkte gemeldet. **Zwei davon waren harte
+Funktionsfehler** — die haben Vorrang bekommen, weil sie die App
+unbrauchbar machen. Die vier Gestaltungs- und Struktur-Punkte sind
+**offen** und stehen unten.
+
+### 1 · „Objekt anlegen" tat nichts — eine Endlosrekursion
+
+Gemessen: `newObj({ohneAuswahl:true})` wirft **`Maximum call stack size
+exceeded`**.
+
+`window.newObj` wird von **drei** Stellen umhuellt:
+
+| Datei | Marke |
+|---|---|
+| `neues-objekt-quellen.js:164` | `__nq` |
+| `newobj-fixes.js:134` | `_v434Wrapped` |
+| `object-actions.js:1951` | `_dpObjNewWrap` |
+
+**Zwei Ursachen, beide gemessen:**
+
+**(a) `orig` war eine Modulvariable.** Alle je erzeugten Wrapper
+benutzten dieselbe. Jede Erneuerung durch die 250-ms-Wache bog sie um —
+auch fuer die ALTEN Wrapper, die noch in fremden Umhuellungen steckten.
+Danach zeigte der alte auf den neuen und der neue ueber die fremde
+Huelle auf den alten.
+
+> **Eine Umhuellung muss ihr Original selbst festhalten.** Teilt sie es
+> mit den anderen, zeigt nach dem naechsten Umhuellen jede auf die
+> falsche — und irgendwann im Kreis.
+
+**(b) `newobj-fixes.js` reichte `__nq` nicht durch.** Die Datei gibt
+`_v434Wrapped` und `_dpWrapped` weiter; `__nq` fehlte, es gab die Marke
+zu dem Zeitpunkt noch nicht. Ohne sie haelt die Wache ihre Umhuellung
+fuer verloren und legt eine zweite darueber — genau die Erneuerungen,
+die (a) zum Ring gemacht hat.
+
+**Dazu ein verschlucktes `catch`:** in
+`neues-objekt-quellen.js` stand `catch (e) { r = null; }`. **Genau das
+hat die Rekursion unsichtbar gemacht** — der Klick lief ins Leere, ohne
+dass irgendwo etwas stand. Jetzt `console.error` plus Meldung.
+
+**Nachgemessen:** kein Fehler mehr, Objekt wird angelegt (13 → 14), das
+Modal schliesst, im Tower entsteht `2026-1045`.
+
+### 2 · „Rundgang starten" war seit V270 tot
+
+Nicht nur im Tower — **nirgends**, auch nicht bei „Heute". Der Kopf von
+`tour-sidebar.js` sagt seit V270 „Tour starten aus Aktionen-Sidebar
+entfernt", und die Funktion suchte danach `window.startTour`. **Das gibt
+es nicht** (gemessen: `undefined`), den Ersatzknopf
+`[data-action="start-tour"]` auch nicht. Der Eintrag in der Aktionsliste
+(`index.html:779`) ist aber stehengeblieben.
+
+> **Wer eine Funktion abschaltet, muss ihren Knopf mitnehmen.** Sonst
+> bleibt eine Schaltflaeche zurueck, die nichts tut — und das sieht wie
+> ein Fehler aus, weil es einer ist.
+
+Die Engine laeuft weiter: `tour-engine.js` haengt sie als
+`window.DpTour` ein (`start`, `reset`, `isComplete`, `getPlan` —
+gemessen). Der Knopf zeigt jetzt dorthin, mit `reset()` davor, damit ein
+abgeschlossener Rundgang nicht still nichts tut.
+
+**Nachgemessen:** Der Aufruf startet die Engine (sie oeffnet als ersten
+Schritt das Anlegen-Modal). **Ob ihre Schritt-Anzeige vollstaendig
+laeuft, ist NICHT bestaetigt** — sie wurde seit V270 ueber diesen Weg
+nicht mehr benutzt. Das gehoert nachgeprueft.
+
+### Offen aus derselben Meldung
+
+1. **Der Pre-Flight-Streifen in Kanzlei / Tower / Aktenmappe** soll
+   wieder wie in der Demo aussehen (bei „Heute" stimmt er jetzt).
+2. **Die Layouts direkt unter Einstellungen → Darstellung**, nicht erst
+   hinter „Darstellung oeffnen".
+3. **Partner-Branding** (Logo und Farbe aus dem Partner-Portal) wird in
+   den neuen Layouts nicht uebernommen; dazu fehlt ein Zuruecksetzen.
+4. **Standard soll der DealPilot-Dunkelmodus sein**, der Hell-Wechsel
+   gehoert unter „Darstellung oeffnen".
+
+**Commits.** `3085172` · `2fe8f7b` · `9313569`
+
+**Hinweis.** Beim Messen sind auf Staging Testobjekte entstanden
+(`2026-1044`, `2026-1045`, beide „Unbenannt"). Sie koennen geloescht
+werden.
