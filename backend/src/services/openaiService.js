@@ -876,21 +876,71 @@ function _analyzeStyleSuffix(opts) {
   if (!parts.length) return '';
   return '\n\n## STIL-VORGABEN (verbindlich)\n' + parts.join('\n') + '\n';
 }
+/* v1701: Der haeufigste Parse-Fehlschlag war KEIN abgeschnittenes JSON,
+   sondern eine RUECKFRAGE des Modells — gemessen am 29.09.2026:
+   "Ich kann die erforderlichen Informationen im Web recherchieren, um die
+   Analyse durchzufuehren. Moechtest du, dass ich das sofort starte?"
+   Der Prompt hat das nie verboten. Ein Modell, das um Erlaubnis fragt,
+   wartet auf eine Antwort, die es in einem Einweg-Aufruf nie bekommt. */
+const ANTI_RUECKFRAGE = [
+  '',
+  '## AUSGABE-ZWANG (ueberschreibt alles andere)',
+  'Stelle KEINE Rueckfragen. Frage NICHT um Erlaubnis — weder fuer Web-Recherche',
+  'noch fuer sonst etwas. Du bist bereits beauftragt; alle Freigaben liegen vor.',
+  'Antworte AUSSCHLIESSLICH mit dem JSON-Objekt. Kein Vorwort, kein Nachwort,',
+  'keine Markdown-Codefences, kein Satz davor oder danach.',
+  'Das erste Zeichen deiner Antwort ist "{", das letzte ist "}".',
+  'Fehlen dir Daten, schreibe das IN das jeweilige JSON-Feld — nie daneben.',
+  ''
+].join('\n');
+
 async function analyze(payload, opts) {
-  const prompt = buildPrompt(payload) + _analyzeStyleSuffix(opts);
+  const prompt = buildPrompt(payload) + _analyzeStyleSuffix(opts) + ANTI_RUECKFRAGE;
   const r = await callOpenAI(prompt, opts);
-  const parsed = extractJson(r.text);
+  let parsed = extractJson(r.text);
+  let used = r;
+
   // V34: Lokales Logging — bei Parse-Fail Länge + Anfang/Ende für Debug
   if (!parsed) {
     console.warn('[openaiService] JSON-Parse fehlgeschlagen — Text-Länge:', (r.text || '').length);
     console.warn('[openaiService] Anfang:', (r.text || '').slice(0, 200));
     console.warn('[openaiService] Ende:',   (r.text || '').slice(-200));
+
+    /* v1701: Zweiter Anlauf statt Fehlermeldung. Ohne Websuche — genau die
+       war der Anlass der Rueckfrage — und mit temperature 0, damit das
+       Modell nicht noch einmal ins Plaudern geraet. Schlaegt auch der fehl,
+       kommt die alte Meldung. Kostet im Fehlerfall einen zweiten Aufruf,
+       sonst nichts: der Zweig wird nur bei !parsed betreten. */
+    try {
+      const r2 = await callOpenAI(
+        prompt + '\n\nDein vorheriger Versuch war KEIN gueltiges JSON. Der RECHERCHE-AUFTRAG ' +
+                 'oben ist fuer diesen Durchgang aufgehoben: recherchiere NICHT im Web, rufe KEIN ' +
+                 'Such-Tool auf und frage nicht danach. Arbeite allein mit den oben gegebenen ' +
+                 'Daten und deinem Wissen; die Recherche-Felder fuellst du aus deinem Wissen oder ' +
+                 'laesst sie leer. Antworte jetzt nur mit dem JSON-Objekt, beginnend mit "{" und ' +
+                 'endend mit "}".',
+        Object.assign({}, opts, {
+          noWebSearch: true,
+          aiOptions: Object.assign({}, (opts && opts.aiOptions) || {}, { temperature: 0 })
+        })
+      );
+      const p2 = extractJson(r2.text);
+      if (p2) {
+        console.warn('[openaiService] Zweiter Anlauf hat geliefert (ohne Websuche).');
+        parsed = p2; used = r2;
+      } else {
+        console.warn('[openaiService] Zweiter Anlauf ebenfalls ohne JSON:', (r2.text || '').slice(0, 200));
+      }
+    } catch (e) {
+      console.warn('[openaiService] Zweiter Anlauf fehlgeschlagen:', e.message);
+    }
   }
+
   return {
     success: true,
-    model: r.model,
+    model: used.model,
     analysis: parsed,
-    raw_text: parsed ? null : r.text  // bei Parse-Fail Text zurückgeben für Debug
+    raw_text: parsed ? null : used.text  // bei Parse-Fail Text zurückgeben für Debug
   };
 }
 
