@@ -157,23 +157,75 @@
   }
 
   /* ── Umhüllen ────────────────────────────────────────────────────── */
+  /* ── v1695 · DREI UMHÜLLUNGEN, EIN RING ─────────────────────────────
+     Marcel: „wenn ich ein neues Objekt anlegen möchte, öffnet sich ein
+     Modal, es macht aber nichts, wenn ich auf Objekt anlegen klicke."
+
+     GEMESSEN: `newObj({ohneAuswahl:true})` wirft
+     **`Maximum call stack size exceeded`** — eine Endlosrekursion.
+
+     `window.newObj` wird von DREI Stellen umhüllt:
+       `neues-objekt-quellen.js:164`  (diese, mit `__nq`)
+       `newobj-fixes.js:134`
+       `object-actions.js:1951`      (mit `_dpObjNewWrap`)
+
+     Die Wache unten erneuert alle 250 ms, sobald `__nq` fehlt — und das
+     fehlt auch dann, wenn eine der ANDEREN Umhüllungen zuletzt
+     geschrieben hat. Dann wird deren Wrapper als `orig` genommen, der
+     seinerseits auf unseren alten zeigt. **Ring geschlossen.**
+
+     > Eine Wache, die nur fragt „ist meine Marke noch da?", kann nicht
+     > unterscheiden, ob sie überschrieben oder UMHÜLLT wurde. Im ersten
+     > Fall muss sie neu umhüllen, im zweiten darf sie es gerade nicht.
+
+     Zwei Sperren, beide nötig:
+     1. `meinWrapper` — nie die eigene Fassung als „Original" nehmen,
+        auch nicht mittelbar über eine fremde Umhüllung.
+     2. `laeuft` — sollte ein Ring trotzdem entstehen, bricht er beim
+        zweiten Eintritt ab, statt den Stapel zu sprengen. */
   var orig = null;
+  var meinWrapper = null;
+  var laeuft = false;
+
   function umhuellen() {
     if (typeof window.newObj !== 'function' || window.newObj.__nq) return;
+    /* Zeigt die aktuelle Fassung (mittelbar) auf uns, waere jede
+       weitere Umhuellung ein Ring. Dann lieber gar nichts tun: der
+       bestehende Weg funktioniert, er traegt nur nicht mehr unsere
+       Marke. */
+    if (meinWrapper && window.newObj === meinWrapper) return;
+
     orig = window.newObj;
-    window.newObj = function (opt) {
+    meinWrapper = function (opt) {
       /* Mit `{ohneAuswahl:true}` bleibt der alte Weg offen - fuer
          Aufrufer, die ein Objekt aus einem Import heraus anlegen und
          dabei nicht gefragt werden wollen. */
       if (opt && opt.ohneAuswahl) return orig.apply(this, arguments);
+      if (laeuft) return orig.apply(this, arguments);   /* Ringbremse */
       var selbst = this, args = arguments;
       zeige(function (wunsch) {
         var r;
-        try { r = orig.apply(selbst, args); } catch (e) { r = null; }
+        laeuft = true;
+        try {
+          r = orig.apply(selbst, args);
+        } catch (e) {
+          /* v1695: NICHT mehr schlucken. Hier stand `catch (e) { r = null; }`
+             — und genau das hat die Rekursion unsichtbar gemacht: der
+             Klick lief ins Leere, ohne dass irgendwo etwas stand.
+             Ein Fehler, den niemand sieht, wird nicht behoben. */
+          r = null;
+          try { console.error('[neues-objekt] Anlegen fehlgeschlagen:', e); } catch (e2) {}
+          if (typeof window.toast === 'function') {
+            window.toast('Objekt konnte nicht angelegt werden — bitte neu laden.');
+          }
+        } finally {
+          laeuft = false;
+        }
         if (wunsch && wunsch.length) setTimeout(function () { vorwaehlen(wunsch); }, 900);
         return r;
       });
     };
+    window.newObj = meinWrapper;
     window.newObj.__nq = true;
   }
 
