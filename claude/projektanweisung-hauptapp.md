@@ -24306,3 +24306,55 @@ Text: "Schritt 1 von 37 - Willkommen bei DealPilot"
 **Damit ist aus dieser Reihe nur noch ein Punkt offen:** die Abbuchung
 des Marktpreis-Abrufs im LIVE-Modus. Staging steht auf `stub`, dort
 kostet nichts — das laesst sich hier grundsaetzlich nicht messen.
+
+### v1709c — Nachtrag: die Lasche sass IM Blatt
+
+Marcel: „ne die karten sehen nicht so aus wie in der demo." **Er hatte
+recht, und meine Messung aus v1709b hatte es nicht gezeigt** — sie
+verglich Groessen, nicht Lagen.
+
+Gemessen, Abstaende relativ zur Kartenoberkante:
+
+```
+Lasche   y15 - 30      <- sollte y0 - 15 sein
+Blatt    y14 - 58
+Adresse  y22 - 38      <- lag damit UNTER der Lasche
+```
+
+**Ursache:** `position:absolute` richtet sich am naechsten
+POSITIONIERTEN Vorfahren aus. Ich hatte `.sbc-top` auf
+`position:relative` stehen lassen — damit wurde das Blatt selbst zum
+Anker, und `top:0` meinte die Blattoberkante statt der Karte. Die
+goldene Lasche landete quer auf dem Adresstext.
+
+> **`top:0` ist keine Angabe, sondern eine Frage: null wovon?** Wer ein
+> Element absolut setzt, muss den Anker mitpruefen, nicht nur den Wert.
+
+**Drei weitere Befunde im selben Lauf:**
+
+- Der Blattrahmen war `rgb(230,225,214)` — das helle Beige aus v1706f.
+  Jene Regel setzt `border-color` **einzeln** und schlaegt damit meine
+  `border`-Kurzschrift. **Derselbe Mechanismus, den v1706f selbst
+  beschreibt, diesmal gegen mich.**
+- Blatt `rgb(21,20,15)` auf Schiene `rgb(14,13,11)` — sieben Stufen
+  Unterschied, die Mappe war praktisch unsichtbar. Jetzt `#17160F` mit
+  Rahmen `#332E26`.
+- Der Score-Ring verschwand bei Hover und an der aktiven Karte (meine
+  eigene Regel aus v1709). Falsch: in der Demo steht er **immer**, und
+  er ist der Grund, warum man eine Liste ueberfliegt. Die Aktionsknoepfe
+  ruecken jetzt links an ihm vorbei.
+
+**Nachgemessen:** Lasche y1–16, Blatt y14–58, Adresse y22–38,
+`ueberlappt: false`. Im Bild: goldene Nummernlasche „2026-999", daneben
+INVESTOR, rechts die gruene WON-Lasche, darunter das Blatt mit Adresse
+und Preis, Score-Ring rechts.
+
+> **Eine Messung, die nur Groessen vergleicht, findet keine
+> Verschiebung.** v1709b meldete „Karte 60 px, Blatt 44 px, Laschen
+> oben" — alles richtig, und die Karte sah trotzdem falsch aus. Erst der
+> Vergleich der LAGEN (y-Bereiche von Lasche, Blatt und Text
+> gegeneinander) zeigte die Ueberlappung.
+
+**Gold-Audit RC=0.**
+
+**Commit.** `58766f8`
