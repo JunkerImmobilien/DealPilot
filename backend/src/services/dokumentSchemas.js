@@ -26,45 +26,66 @@
    3. `foto` fehlt: Bilder gehen bei uns über `extractBeleg` (Vision).
 ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Klassifikation ───────────────────────────────────────────────────── */
+/* ── Klassifikation ───────────────────────────────────────────────────────
+   v1678c — `leit` gegen `keywords`.
+
+   Ein Wort ist nicht so viel wert wie das andere. „Kaufpreis", „Notar"
+   und „Käufer" stehen in JEDEM Immobiliendokument; „Kaufpreisaufteilung"
+   oder „BFH IX R 12/21" stehen nur in einem. Mit einer flachen Zählung
+   gewann deshalb `kaufvertrag` gegen `kpt` an einer echten
+   Kaufpreisaufteilung — zwei Treffer gegen zwei Treffer, und bei
+   Gleichstand entscheidet die Reihenfolge im Objekt.
+
+   `leit` sind die beweisenden Begriffe: 3 Punkte im Text, 6 im
+   Dateinamen. `keywords` sind Beiwerk: 1 und 2. Ein einziger
+   Leitbegriff schlägt damit jedes Beiwerk.
+   ───────────────────────────────────────────────────────────────────── */
 const DOKUMENT_TYPEN = {
   grundbuch: {
     label: 'Grundbuchauszug',
+    leit: ['Grundbuchauszug', 'Bestandsverzeichnis', 'Abteilung III'],
     keywords: ['Grundbuch', 'Abteilung I', 'Abteilung II', 'Abteilung III',
                'Bestandsverzeichnis', 'Blatt', 'Amtsgericht']
   },
   kataster: {
     label: 'Katasterauszug',
+    leit: ['Liegenschaftskataster', 'ALKIS', 'Katasteramt'],
     keywords: ['Liegenschaftskataster', 'ALKIS', 'Flurstück', 'Gemarkung',
                'Katasteramt', 'Flur']
   },
   kaufvertrag: {
     label: 'Kaufvertrag',
+    leit: ['Kaufvertrag', 'Auflassung', 'UR-Nr'],
     keywords: ['Kaufvertrag', 'Notar', 'UR-Nr', 'Kaufpreis', 'Auflassung',
                'Verkäufer', 'Käufer', 'Miteigentumsanteil']
   },
   weg_protokoll: {
     label: 'WEG-Protokoll',
+    leit: ['Eigentuemerversammlung', 'Eigentümerversammlung', 'Instandhaltungsrücklage', 'WEG-Protokoll'],
     keywords: ['Eigentümerversammlung', 'WEG', 'Beschluss', 'Verwalter',
                'Instandhaltungsrücklage', 'Hausgeld', 'Protokoll']
   },
   boris: {
     label: 'Bodenrichtwert-Auszug',
+    leit: ['Bodenrichtwert', 'BORIS', 'Bodenrichtwertzone'],
     keywords: ['Bodenrichtwert', 'BORIS', 'BRW', 'Bodenrichtwertzone',
                'Gutachterausschuss', 'Bauland']
   },
   vwg_vorgutachten: {
     label: 'Verkehrswertgutachten',
+    leit: ['Verkehrswertgutachten', 'NHK 2010', '§ 194 BauGB'],
     keywords: ['Verkehrswertgutachten', 'Sachwertverfahren', 'NHK 2010',
                '§ 194 BauGB', 'Verkehrswert']
   },
   rndg: {
     label: 'Restnutzungsdauergutachten',
+    leit: ['Restnutzungsdauer', 'RNDG', 'Punktrastermethode', 'Modernisierungspunkte'],
     keywords: ['Restnutzungsdauer', 'RNDG', '§ 7 Abs. 4', 'Punktrastermethode',
                'Modernisierungspunkte']
   },
   kpt: {
     label: 'Kaufpreisaufteilung',
+    leit: ['Kaufpreisaufteilung', 'KPT', 'Jacoby', 'BFH IX R 12/21', 'umgekehrten Ertragswertmethode', 'steuerlich absetzbarer Gebäudeanteil'],
     keywords: ['Kaufpreisaufteilung', 'Jacoby', 'Aufteilung Gebäude und Boden',
                'BFH IX R 12/21', 'umgekehrten Ertragswertmethode',
                'Kapitalisierungsfaktor', 'Bodenwertverzinsung',
@@ -72,6 +93,7 @@ const DOKUMENT_TYPEN = {
   },
   marktbericht: {
     label: 'Marktbericht',
+    leit: ['Grundstücksmarktbericht', 'Kaufpreissammlung', 'Marktbericht'],
     keywords: ['Marktbericht', 'Grundstücksmarktbericht', 'Immobilienmarkt',
                'Kaufpreissammlung', 'Vergleichspreise']
   }
@@ -90,19 +112,32 @@ function klassifiziere(text, dateiname) {
   const d = String(dateiname || '').toLowerCase();
 
   const alle = {};
-  let bester = null, besterScore = 0;
+  let bester = null, besterScore = 0, besterLeit = 0;
 
   Object.keys(DOKUMENT_TYPEN).forEach(function (id) {
-    const kws = DOKUMENT_TYPEN[id].keywords;
-    if (!kws.length) return;
-    let score = 0;
+    const def = DOKUMENT_TYPEN[id];
+    const leit = def.leit || [];
+    const kws = def.keywords || [];
+    if (!kws.length && !leit.length) return;
+
+    let score = 0, leitTreffer = 0;
+
+    /* Leitbegriffe zuerst — sie entscheiden. */
+    leit.forEach(function (kw) {
+      const k = kw.toLowerCase();
+      if (t.indexOf(k) !== -1) { score += 3; leitTreffer++; }
+      if (d.indexOf(k) !== -1) { score += 6; leitTreffer++; }
+    });
+    /* Beiwerk: bestätigt, beweist aber nichts allein. */
     kws.forEach(function (kw) {
       const k = kw.toLowerCase();
+      if (leit.indexOf(kw) !== -1) return;   /* nicht doppelt zählen */
       if (t.indexOf(k) !== -1) score += 1;
       if (d.indexOf(k) !== -1) score += 2;
     });
+
     alle[id] = score;
-    if (score > besterScore) { besterScore = score; bester = id; }
+    if (score > besterScore) { besterScore = score; bester = id; besterLeit = leitTreffer; }
   });
 
   /* v1678b — NICHT gegen die Stichwortzahl normalisieren.
@@ -119,15 +154,19 @@ function klassifiziere(text, dateiname) {
      nicht das Dokument. Deshalb zählen jetzt die TREFFER selbst:
      zwei Punkte genügen (ein Wort im Text plus eines im Dateinamen,
      oder zwei im Text). Die Sicherheit ist der Score gegen sechs
-     Punkte gedeckelt — bei sechs ist die Sache klar.                 */
-  const SCHWELLE = 2;
-  const sicherheit = Math.min(1, besterScore / 6);
+     Punkte gedeckelt — bei sechs ist die Sache klar.
 
-  if (!bester || besterScore < SCHWELLE) {
+     v1678c: Die Schwelle ist jetzt ein LEITBEGRIFF oder vier Punkte
+     Beiwerk. Allein „Kaufpreis" und „Käufer" reichen nicht mehr aus,
+     um ein Dokument zum Kaufvertrag zu erklären.                     */
+  const sicherheit = Math.min(1, besterScore / 9);
+  const reicht = besterLeit >= 1 || besterScore >= 4;
+
+  if (!bester || !reicht) {
     return {
       typ: null, label: null,
       sicherheit: Math.round(sicherheit * 100) / 100,
-      punkte: besterScore, alle: alle
+      punkte: besterScore, leitbegriffe: besterLeit, alle: alle
     };
   }
   return {
@@ -135,6 +174,7 @@ function klassifiziere(text, dateiname) {
     label: DOKUMENT_TYPEN[bester].label,
     sicherheit: Math.round(sicherheit * 100) / 100,
     punkte: besterScore,
+    leitbegriffe: besterLeit,
     alle: alle
   };
 }
