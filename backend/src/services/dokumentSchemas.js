@@ -328,12 +328,22 @@ const SCHEMATA = {
      falschen Feldnamen ist v1669 gescheitert: fuenf verworfene Felder,
      Bodenwert um Faktor 2,9 daneben, Antwort sah plausibel aus.      */
   kpt: {
+    /* v1678d — der Prompt widersprach sich selbst: „nicht die
+       Ergebnisse" stand ueber einem Schema, das zwei Ergebnisfelder
+       abfragt. Die KI hat gehorcht und beide leer gelassen, obwohl
+       94,35 % und 7.617,56 € woertlich im Text standen. Jetzt ist die
+       Trennung benannt statt verneint.                              */
     einleitung: [
       'Aus der folgenden Kaufpreisaufteilung (Gutachten zur Aufteilung des',
-      'Kaufpreises auf Grund und Boden und Gebaeude) extrahiere die',
-      'EINGANGSDATEN als JSON — nicht die Ergebnisse des Gutachtens,',
-      'sondern die Angaben, mit denen es gerechnet hat.'
-    ].join(' '),
+      'Kaufpreises auf Grund und Boden und Gebaeude) extrahiere zweierlei als JSON:',
+      '',
+      '(A) die EINGANGSDATEN, mit denen das Gutachten gerechnet hat, und',
+      '(B) genau zwei ERGEBNISSE des Gutachtens — sie tragen im Schema',
+      '    ausdruecklich die Endung "_laut_gutachten" und werden nur zum',
+      '    Abgleich benoetigt.',
+      '',
+      'Fuelle BEIDE Gruppen, soweit sie im Text stehen.'
+    ].join('\n'),
     schema: [
       '{',
       '  "lage": string (Anschrift des Objekts),',
