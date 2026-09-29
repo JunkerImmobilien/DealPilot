@@ -4970,8 +4970,85 @@ html[data-dp-layout] body header.hdr .hdr-credits-pill svg :is(path,circle,rect,
 
    Diese Fassung traegt beide Attribute und die Klasse und liegt damit
    bei (0,5,3). */
+/* v1691 — ZURUECKGENOMMEN: hier stand GOLD.
+   Marcel: „oben die Hilfe und dein Kontingent auf einmal in Gold, was
+   aber vorher in so einem Weisston war — so aehnlich wie die ID und die
+   Strasse."
+
+   Er hat recht, und der richtige Wert stand die ganze Zeit im Code:
+   `style.css:35774` setzt fuer den dunklen Kopf
+   `--dp-header-text:#f3ead0` — Creme. Genau der Ton, in dem Adresse und
+   Kennung stehen.
+
+   Mein Fehler war nicht die Stelle, sondern der Wert: ich habe das
+   Token auf die AKZENTfarbe gesetzt statt auf die TEXTfarbe. Gold ist
+   der Akzent — was in Gold steht, soll dadurch hervortreten. Faerbt man
+   alles gold, tritt nichts mehr hervor.
+
+   Die Aufgabe war nur, `ui-varianten.css:1290` daran zu hindern, den
+   Wert auf `--uv-chrome-ink` (#141310, fuer einen HELLEN Kopf gedacht)
+   zu ueberschreiben. Jetzt steht dort der Ton, der zum dunklen Kopf
+   gehoert. */
 html[data-dp-layout][data-ui-theme] body.dp-chrome-hell header.hdr,
 html[data-dp-layout] body header.hdr{
-  --dp-header-text: var(--wl-c9a84c, #C9A84C) !important;
-  color: var(--wl-c9a84c, #C9A84C) !important;
+  --dp-header-text: #f3ead0 !important;
+  color: #f3ead0 !important;
+}
+/* Der Akzent bleibt dort, wo er etwas heisst: am Kerosin-Stand. */
+html[data-dp-layout] body header.hdr .hdr-credits-pill{
+  color: var(--wl-e2c97e, #E2C97E) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   v1691 — DIE REITERLEISTE SAH IN JEDEM LAYOUT ANDERS AUS
+   -------------------------------------------------------------------
+   Marcel: „erst wurde die Tabbar in Creme angezeigt, danach in Schwarz,
+   dann ist beim Tower alle Schrift in Gold. Bei der Aktenmappe passt
+   sie aber wieder."
+
+   GEMESSEN, Kontrast gegen den jeweiligen Grund:
+
+     Aktenmappe  Grund dunkel        aktiv  4,80   normal  5,87
+     Kanzlei     Grund dunkel        aktiv 16,95   normal  9,77   <- richtig
+     Tower       Grund HELL          aktiv  3,19   normal  2,61   <- zu schwach
+
+   Drei Layouts, drei Zustaende. Der Tower ist der schlechteste: seine
+   Leiste traegt eine HELLE Flaeche, die Schriftfarben stammen aber aus
+   dem dunklen Satz — wieder eine Farbe, die zu ihrem alten Grund passt
+   und nicht zum neuen.
+
+   Die Kanzlei macht es richtig: dunkle Leiste, Cremetoene. Der Kopf ist
+   in allen drei dunkel und die Leiste sitzt direkt darunter — es gibt
+   keinen Grund, sie in einem Layout hell zu machen.
+
+   Die bestehenden Regeln tragen `body:has(#sb-user)` und damit
+   ID-Spezifitaet; diese hier muss denselben Bau haben, sonst verliert
+   sie. `^="v"` trifft alle Layouts auf einmal, damit der naechste nicht
+   wieder einzeln nachgezogen werden muss.
+   ═══════════════════════════════════════════════════════════════════ */
+html[data-dp-layout^="v"] body:has(#sb-user) nav.tabs,
+html[data-dp-layout^="v"] body:has(#sb-user) header.hdr + nav.tabs,
+html[data-dp-layout^="v"] body:has(#sb-user) nav.tabs.tabs{
+  background:#0E0D0B !important;
+  border-bottom:1px solid var(--dpl-linie) !important;
+  box-shadow:none !important;
+}
+html[data-dp-layout^="v"] body:has(#sb-user) nav.tabs .tab,
+html[data-dp-layout^="v"] body:has(#sb-user) nav.tabs .tab *{
+  color:#BFB7A9 !important;
+  background:transparent !important;
+}
+html[data-dp-layout^="v"] body:has(#sb-user) nav.tabs .tab:hover,
+html[data-dp-layout^="v"] body:has(#sb-user) nav.tabs .tab:hover *{
+  color:#F2EDE3 !important;
+}
+html[data-dp-layout^="v"] body:has(#sb-user) nav.tabs .tab.active,
+html[data-dp-layout^="v"] body:has(#sb-user) nav.tabs .tab.active *{
+  color:#F5EFE2 !important;
+}
+/* Der Akzent bleibt die UNTERSTREICHUNG, nicht die Schrift — sonst
+   tritt der aktive Reiter durch zwei Mittel gleichzeitig hervor und
+   die Schrift wird dabei schlechter lesbar (4,80 gegen 16,95). */
+html[data-dp-layout^="v"] body:has(#sb-user) nav.tabs .tab.active{
+  border-bottom-color:var(--wl-c9a84c, #C9A84C) !important;
 }
