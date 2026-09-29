@@ -5589,3 +5589,180 @@ html[data-dp-layout] .dpl-schiene nav.tabs .tab svg{
 html[data-dp-layout] .dpl-schiene nav.tabs .tab svg *{
   stroke:currentColor !important;
 }
+
+/* =====================================================================
+   v1709 - DIE OBJEKTKARTE WIRD EIN AKTENREITER
+   =====================================================================
+   Marcel hat aus den zehn Entwuerfen (v1707) Nummer 02 gewaehlt:
+   "setz die aktenreiter um".
+
+   GEMESSEN an der echten Karte, nicht aus der Demo uebernommen:
+     .sb-card            216 x 81
+     .sbc-seq            "2026-999"     45 x 14   -> wird die Lasche
+     .sbc-address        Adresse       166 x 15
+     .sbc-kp             "189.000 EUR"  48 x 12
+     .sbc-score-overlay  Ring + Stufe   26 x 31
+     .sbc-mini-grid      ausgeblendet    0 x 0
+     .sbc-thumb          ausgeblendet    0 x 0
+
+   Es wird KEIN Element neu gebaut. Die Lasche ist die Objektnummer, die
+   ohnehin dasteht - sie wird nur nach oben gesetzt und bekommt ihren
+   eigenen Grund.
+
+   > Ein Entwurf, der neue Knoten braucht, muss von JS gebaut werden und
+   > geht bei jedem Neurendern der Liste verloren. Einer, der die
+   > vorhandenen umstellt, ueberlebt es.
+   ===================================================================== */
+
+/* -- 1) Die Karte traegt die Lasche, hat aber selbst keinen Grund --- */
+html[data-dp-layout] .dpl-schiene .sb-card{
+  position:relative !important;
+  background:transparent !important;
+  border:0 !important;
+  border-radius:0 !important;
+  padding:13px 0 0 0 !important;   /* Platz fuer die Lasche */
+  margin:0 0 5px 0 !important;
+  min-height:0 !important; height:auto !important;
+  overflow:visible !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card:hover,
+html[data-dp-layout] .dpl-schiene .sb-card.active,
+html[data-dp-layout] .dpl-schiene .sb-card.is-active{
+  background:transparent !important;
+  border-color:transparent !important;
+}
+
+/* -- 2) Die Objektnummer wird zur Lasche ---------------------------- */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
+  position:absolute !important;
+  top:0 !important; left:0 !important;
+  z-index:3 !important;
+  display:inline-block !important;
+  width:auto !important; min-width:0 !important;
+  padding:2px 8px 2px 7px !important;
+  margin:0 !important;
+  background:var(--wl-c9a84c, #C9A84C) !important;
+  color:#0E0D0B !important;
+  font:700 8px/1.35 var(--dpl-mono, 'JetBrains Mono', monospace) !important;
+  letter-spacing:.1em !important;
+  border-radius:3px 3px 0 0 !important;
+  white-space:nowrap !important;
+}
+/* Die aktive Karte hebt ihre Lasche heller hervor - die Auswahl muss
+   sichtbar bleiben, auch wenn das Blatt darunter schon einen Rahmen
+   traegt. */
+html[data-dp-layout] .dpl-schiene .sb-card.active .sbc-seq,
+html[data-dp-layout] .dpl-schiene .sb-card.is-active .sbc-seq{
+  background:var(--wl-e8cc7a, #E8CC7A) !important;
+}
+
+/* -- 3) `.sbc-top` wird zum Blatt ----------------------------------- */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-top{
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  padding:7px 9px !important;
+  margin:0 !important;
+  min-height:0 !important;
+  background:var(--dpl-flaeche2, #15140F) !important;
+  border:1px solid var(--dpl-linie, #2A2622) !important;
+  border-radius:0 5px 5px 5px !important;
+  transition:border-color .12s ease, background .12s ease !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card:hover .sbc-top{
+  border-color:var(--wl-b8932f, #b8932f) !important;
+  background:#1A1815 !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card.active .sbc-top,
+html[data-dp-layout] .dpl-schiene .sb-card.is-active .sbc-top{
+  border-color:var(--wl-c9a84c, #C9A84C) !important;
+  background:#221F1A !important;
+}
+
+/* -- 4) Adresse und Preis untereinander ----------------------------- */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-top-body{
+  flex:1 1 auto !important; min-width:0 !important;
+  display:block !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-address{
+  font:600 12px/1.3 'Inter', sans-serif !important;
+  white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important;
+  margin:0 !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-kp-row{
+  display:block !important; margin:2px 0 0 !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-kp{
+  font:600 10.5px/1 var(--dpl-mono, 'JetBrains Mono', monospace) !important;
+  color:var(--dpl-tinte-leise, #B5AE9F) !important;
+}
+/* Datum und Pfeil in der ersten Zeile braucht der Reiter nicht - die
+   Nummer steht ja in der Lasche. */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-top-line1{
+  display:block !important; min-height:0 !important; margin:0 !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-top-line1 > *:not(.sbc-seq){
+  display:none !important;
+}
+
+/* -- 5) Der Score-Ring rechts im Blatt ------------------------------ */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-score-overlay{
+  position:absolute !important;
+  right:9px !important;
+  top:auto !important; bottom:0 !important;
+  height:calc(100% - 13px) !important;
+  display:flex !important; align-items:center !important;
+  z-index:2 !important;
+  pointer-events:none !important;   /* der Klick gehoert der Karte */
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-score-label{
+  display:none !important;          /* die Stufe steht im Titel */
+}
+/* Rechts Platz fuer den Ring, damit die Adresse nicht darunter laeuft. */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-top-body{
+  padding-right:30px !important;
+}
+
+/* -- 6) Die Aktionen sitzen jetzt im Blatt, nicht an der Karte ------
+   v1705 hatte sie auf `top:50%` der KARTE gelegt. Mit der Lasche ist die
+   Mitte der Karte nicht mehr die Mitte des Blattes - sie saessen 6-7 px
+   zu hoch und ragten in die Lasche.
+
+   > Wer die Hoehe einer Flaeche aendert, verschiebt alles, was sich auf
+   > ihre Mitte bezieht. */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-actions{
+  top:auto !important;
+  bottom:0 !important;
+  height:calc(100% - 13px) !important;
+  transform:none !important;
+  align-items:center !important;
+  right:8px !important;
+  padding:0 0 0 18px !important;
+  background:linear-gradient(90deg, transparent, #15140F 24%) !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card:hover .sbc-actions{
+  background:linear-gradient(90deg, transparent, #1A1815 24%) !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card.active .sbc-actions,
+html[data-dp-layout] .dpl-schiene .sb-card.is-active .sbc-actions{
+  background:linear-gradient(90deg, transparent, #221F1A 24%) !important;
+}
+/* Solange die Aktionen sichtbar sind, tritt der Ring zurueck - sonst
+   stehen zwei Dinge uebereinander. */
+html[data-dp-layout] .dpl-schiene .sb-card:hover .sbc-score-overlay,
+html[data-dp-layout] .dpl-schiene .sb-card.active .sbc-score-overlay,
+html[data-dp-layout] .dpl-schiene .sb-card.is-active .sbc-score-overlay{
+  opacity:0 !important;
+  transition:opacity .12s ease !important;
+}
+
+/* -- 7) Ohne Objektnummer keine leere Lasche ------------------------
+   Ein Objekt ohne Nummer gibt es (frisch angelegt). Eine Lasche mit
+   null Inhalt waere ein goldener Krumen ueber der Karte. */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq:empty{
+  display:none !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card:has(.sbc-seq:empty) .sbc-top,
+html[data-dp-layout] .dpl-schiene .sb-card:not(:has(.sbc-seq)) .sbc-top{
+  border-radius:5px !important;
+}
