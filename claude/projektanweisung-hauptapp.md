@@ -21625,3 +21625,118 @@ Zeile ist: auf 834 px war die Kanzlei-Leiste dadurch 244 px hoch.
   eine waagerechte Leiste, und ein 42-px-Logo würde die halbe Zeile
   nehmen.
 - Der Kaskaden-Walker gehört weiterhin repariert (seit v1657 offen).
+
+---
+
+## Rollout-Journal · 29.09.2026 (1) — Datenaufnahme, drei Gutachten, drei Objekte
+
+**Was:** Die Kartei bekommt zurück, was die Karte hat (Trennstrich,
+Überschriften, QR); die drei Restnutzungsdauer-Gutachten sind gegen den
+echten Kern gerechnet; drei Objekte sind angelegt.
+
+**Commits:** `4672936` v1668 · `626fdd2` v1668c · `4f96482` v1668d ·
+`e889566` v1668e
+
+---
+
+### 1 · Was ich in v1662 zu viel weggenommen hatte
+
+Marcel wollte Trennstrich, Überschriften, Abstand und den QR zurück.
+Alle drei hatte **ich** in v1662 ausgeblendet, weil er damals sagte,
+die Quellen stünden „untereinander".
+
+> Wer auf „das steht untereinander" mit „dann nehmen wir die
+> Überschriften weg" antwortet, behebt das Symptom und nimmt dabei die
+> Gliederung mit. Die Reihe war das Ziel, nicht die Kahlheit.
+
+Vorlage gemessen am Auslieferungszustand (`#oab-bar`, 1280×78): Kopf ·
+Perforation · Segment · **`.dp-pf-sep` 1×78** · Segment ·
+**`a.dp-pf-qr` 54×68** · Abrufzone.
+
+**Zwei Fallen beim Zurückholen:**
+
+`display:block` allein reichte nicht — beide tragen aus der Bordkarte
+`position:absolute` (dort lagen sie *auf* dem Papier, nicht darin).
+
+> `display:block` holt ein Element nicht in die Reihe zurück. Wer nur
+> die Sichtbarkeit umschaltet und die Positionierung vergisst, macht
+> etwas sichtbar, das trotzdem nicht mitzählt.
+
+Und danach standen sie immer noch falsch, weil die Kartei seit v1659
+`order` vergibt (lead 1, seg 2, rz 3) — die beiden hatten **keines**.
+
+> Wer in einer geordneten Reihe kein `order` hat, steht nicht hinten,
+> sondern ganz vorne. Ein vergessener Wert ist hier keine Auslassung,
+> sondern eine Ansage.
+
+**Die goldene Kante** am Abrufbereich (`border-right 1px #C9A84C`,
+`border-radius 10px 16px 16px 10px`) ist ein Rest der Bordkarte, wo
+`.dp-pf-rz` die Reißzone war.
+
+> Eine Linie, die einmal etwas bedeutet hat, bedeutet nach dem Umbau
+> nicht weniger, sondern etwas Falsches: sie verspricht eine Trennung,
+> die es nicht gibt.
+
+**Offen:** im QuickBoarding gibt es `.dp-pf-qr` **im Markup nicht**
+(`quickcheck-app.html:3391` führt die Leiste ohne QR). Titel,
+Trennstrich und Kante stimmen dort; der QR braucht Markup und eine
+Quelle für den Link.
+
+### 2 · Die drei Gutachten gegen `rnd-calc.js`
+
+Echter Lauf gegen den Kern (v3.1.0), nicht gegen eine nachgebaute
+Formel:
+
+| Objekt | Alter/GND/Punkte | Gutachten | Punktraster-Kern | Δ |
+|---|---|---|---|---|
+| Alexanderstr. 11 | 48 / 80 / 2 | 33 | **32,80** | **−0,20** |
+| Am Markt 18 | 30 / 70 / 0 | 26 | 40 *(unter Schwelle)* | +14,00 |
+| Westerfeldstr. 140 | 58 / 80 / 2 | 16 | 24,31 | +8,31 |
+
+**Der Kern ist bestätigt** — Fall 1 trifft die Anlage-2-Rechnung auf
+0,2 Jahre genau (der Gutachter rundet auf 33).
+
+Die anderen beiden sind **keine Kernfehler, sondern andere Verfahren**:
+Am Markt 18 rechnet der Gutachter die *technische* RND über den
+BTE-Lebensdauerkatalog (er selbst kommt im Punktraster auf 44,07);
+Westerfeldstr. nutzt Sprengnetter-Methodik mit Gebäudestandard 2,4.
+`rnd-calc.js` kann beide (`calcTechnisch`, `calcVogels`, `calcRoss`) —
+sie brauchen nur andere Eingaben.
+
+> Drei Gutachten, drei Büros, drei Verfahren. Wer alle drei durch
+> dieselbe Formel schickt, misst die Büros, nicht den Kern.
+
+### 3 · Drei Objekte angelegt
+
+Über `POST /objects` auf Basis eines vorhandenen Objekts als Vorlage —
+so stimmen alle 207 Feldnamen. Gemessen **an der App**, nicht am
+eigenen Nachbau:
+
+| Objekt | Preis | Score | DSCR | CF/Jahr | BMR |
+|---|---|---|---|---|---|
+| Westerfeldstr. 140 (MFH, 6 WE) | 545.000 € | **82** | 1,67 | **+6.982 €** | 7,23 % |
+| Alexanderstr. 11 (ETW, DG) | 129.000 € | **69** | 1,60 | **+1.162 €** | 5,79 % |
+| Am Markt 18 (ETW, WE 2) | 110.911 € | **65** | 1,78 | **+1.104 €** | 5,53 % |
+
+**Ein Befund dabei:** frisch per API angelegte Objekte zeigen in der
+Liste zunächst die **Kennzahlen des Vorlageobjekts** (alle drei hatten
+DSCR 1,04 · CF −82 € · BMR 4,95 % — die Werte der Musterstraße). Erst
+nach einmaligem Öffnen rechnet die Karte eigene Werte.
+
+> Zwei Objekte mit verschiedenen Preisen, Mieten und Zinsen, die auf
+> die Kommastelle dasselbe anzeigen, sind kein Zufall — sie zeigen
+> etwas Geerbtes.
+
+Ein erster Messversuch über `DealKpis.compute(d)` lieferte
+`dscr: 0` und `kd_dscr: 0`: der Kapitaldienst entsteht erst im
+Formularweg. Verworfen und über die Oberfläche gemessen.
+
+### Rest / offen
+
+- **Preise Marktbericht** — Befund steht, aber **Geld ist
+  Rückfragesache** (CLAUDE.md). Nichts geändert.
+- **Verkehrswertgutachten** zu Am Markt 18 ist im Repo **nicht
+  vorhanden** — weder Einzeldatei noch Archiv.
+- **Kaufpreisaufteilung Am Markt 18**: die KPA rechnet mit **RND 57**,
+  das RND-Gutachten desselben Büros mit **26**. Methodisch erklärbar
+  (BMF-Arbeitshilfe nutzt die typisierte RND), gehört aber geprüft.
