@@ -5901,3 +5901,165 @@ html[data-dp-layout] .dpl-schiene .sb-card.is-active .sbc-score-overlay{
 html[data-dp-layout] .dpl-schiene .sb-card .sbc-actions{
   right:42px !important;
 }
+
+/* =====================================================================
+   v1710 - DER STATUS STECKT IM RAHMEN, NICHT IN EINEM BAND
+   =====================================================================
+   Marcel: "man kann die ID oben nicht richtig lesen ... dann haben wir
+   Objekte, da steht One dran. Also da haben wir alles Moegliche und wir
+   haben ja gesagt, dass wir es rot umrahmen, wenn es verloren ist, es
+   gelb umrahmen oder golden umrahmen, wenn es in Bearbeitung ist und
+   gruen, wenn es gewonnen ist. Daher muss das One nicht drinne stehen
+   und die Schriftfarbe von der ID koennte die gleiche sein wie bei
+   Investor und auch der Hintergrund koennte gleich sein und es muss
+   halt drauf geachtet werden, dass das immer zusammen steht oder halt
+   dass das Investor dann ganz auf der rechten Seite ist."
+
+   VIER SACHEN, und sie haengen zusammen:
+
+   1. Die WON-Lasche faellt weg. Der Zustand steht im RAHMEN - und dann
+      ist eine zweite Anzeige daneben nur Wiederholung.
+   2. Der Rahmen des Blattes traegt die Deal-Stufe:
+        .deal-lost  rot     verloren
+        .deal-won   gruen   gewonnen
+        sonst       gold    in Bearbeitung
+      Gruen und Rot bleiben HART - CLAUDE.md: Statusfarben werden nie
+      tokenisiert. Gold laeuft ueber `--wl-`, es ist die Marke.
+   3. ID und INVESTOR bekommen dieselbe Optik - eine Lasche sieht aus
+      wie die andere, nur der Inhalt ist verschieden.
+   4. Feste Plaetze: ID immer LINKS, INVESTOR immer GANZ RECHTS.
+
+      > „Mal zusammen, mal nicht" ist kein Layout, sondern ein Zufall.
+      > Zwei feste Ecken sind ruhiger als ein Nebeneinander, dessen
+      > Abstand von der Laenge der Objektnummer abhaengt.
+
+   Zur Lesbarkeit: die Laschen standen auf 8 px und 7,5 px. Das ist
+   kleiner als jede andere Schrift in der App und auf einem goldenen
+   Grund schwer zu treffen. Beide jetzt 9,5 px.
+   ===================================================================== */
+
+/* -- 1) Die WON-Lasche faellt weg ----------------------------------- */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-won-ribbon{
+  display:none !important;
+}
+
+/* -- 2) Beide Laschen, eine Gestaltung ------------------------------ */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq,
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-investor-ribbon{
+  position:absolute !important;
+  top:0 !important; bottom:auto !important;
+  z-index:3 !important;
+  display:inline-flex !important; align-items:center !important; gap:3px !important;
+  width:auto !important; min-width:0 !important; max-width:none !important;
+  padding:2px 8px !important; margin:0 !important;
+  background:var(--wl-c9a84c, #C9A84C) !important;
+  color:#0E0D0B !important;
+  font:700 9.5px/1.4 var(--dpl-mono, 'JetBrains Mono', monospace) !important;
+  letter-spacing:.08em !important;
+  border:0 !important; box-shadow:none !important;
+  border-radius:3px 3px 0 0 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important; text-overflow:ellipsis !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
+  left:0 !important; right:auto !important;
+  max-width:calc(100% - 92px) !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-investor-ribbon{
+  right:0 !important; left:auto !important;
+  max-width:88px !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card.active .sbc-seq,
+html[data-dp-layout] .dpl-schiene .sb-card.is-active .sbc-seq,
+html[data-dp-layout] .dpl-schiene .sb-card.active .sbc-investor-ribbon,
+html[data-dp-layout] .dpl-schiene .sb-card.is-active .sbc-investor-ribbon{
+  background:var(--wl-e8cc7a, #E8CC7A) !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-investor-ribbon svg{
+  width:9px !important; height:9px !important; flex:none !important;
+}
+
+/* -- 3) Der Rahmen traegt die Deal-Stufe ---------------------------
+   In Bearbeitung ist der Regelfall - deshalb gedaempftes Gold. Ein
+   voll gesaettigter Rahmen an jeder Zeile laesst die Liste flimmern,
+   und dann faellt der eine gruene oder rote nicht mehr auf.
+
+   > Wenn alles hervorgehoben ist, ist nichts hervorgehoben. */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-top{
+  border-color:var(--wl-8a7332, #8a7332) !important;
+  border-top-color:var(--wl-8a7332, #8a7332) !important;
+  border-right-color:var(--wl-8a7332, #8a7332) !important;
+  border-bottom-color:var(--wl-8a7332, #8a7332) !important;
+  border-left-color:var(--wl-8a7332, #8a7332) !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card.deal-won .sbc-top{
+  border-color:#3FA56C !important;
+  border-top-color:#3FA56C !important; border-right-color:#3FA56C !important;
+  border-bottom-color:#3FA56C !important; border-left-color:#3FA56C !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card.deal-lost .sbc-top{
+  border-color:#B8625C !important;
+  border-top-color:#B8625C !important; border-right-color:#B8625C !important;
+  border-bottom-color:#B8625C !important; border-left-color:#B8625C !important;
+}
+/* Die Lasche nimmt den Ton auf, sonst steht eine goldene Klappe an
+   einer gruenen Mappe. */
+html[data-dp-layout] .dpl-schiene .sb-card.deal-won .sbc-seq,
+html[data-dp-layout] .dpl-schiene .sb-card.deal-won .sbc-investor-ribbon{
+  background:#3FA56C !important; color:#04140A !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card.deal-lost .sbc-seq,
+html[data-dp-layout] .dpl-schiene .sb-card.deal-lost .sbc-investor-ribbon{
+  background:#B8625C !important; color:#190706 !important;
+}
+
+/* Hover und Auswahl heben den jeweiligen Ton an, statt ihn zu
+   ueberschreiben - sonst verliert die gewonnene Karte beim Anklicken
+   ihre Farbe. */
+html[data-dp-layout] .dpl-schiene .sb-card:hover .sbc-top,
+html[data-dp-layout] .dpl-schiene .sb-card.active .sbc-top,
+html[data-dp-layout] .dpl-schiene .sb-card.is-active .sbc-top{
+  border-color:var(--wl-c9a84c, #C9A84C) !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card.deal-won:hover .sbc-top,
+html[data-dp-layout] .dpl-schiene .sb-card.deal-won.active .sbc-top{
+  border-color:#5FC98A !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card.deal-lost:hover .sbc-top,
+html[data-dp-layout] .dpl-schiene .sb-card.deal-lost.active .sbc-top{
+  border-color:#D8564C !important;
+}
+
+/* =====================================================================
+   v1710b - DIE ZAHLEN IN DER KONTINGENT-PILLE
+   =====================================================================
+   Marcel: "zudem in dem header oben unter kontigend sind die zahlen
+   noch gold."
+
+   Gemessen: `.dp-kg-label` mit "31 - 4 - 7" steht auf rgb(213,187,115),
+   und das Symbol davor ebenso.
+
+   MEIN FEHLER: in v1706d habe ich die Kinder ueber
+   `> .hdr-credits-pill-label` und `> .hdr-credits-pill-val` angesprochen.
+   Diese Klassen gibt es nicht - sie heissen `dp-kg-label`. Ich hatte
+   die Namen aus dem Namen der Pille ABGELEITET statt sie auszulesen.
+   Die Regel sah plausibel aus und traf nichts.
+
+   > Zum dritten Mal in dieser Sitzung ein geratener Name: erst
+   > `comingSoon` statt `provComingSoon`, dann die Tour-Klassen, jetzt
+   > hier. Ein `grep` dauert zehn Sekunden.
+
+   `:not(.dp-kg-panel)` nimmt das aufklappbare Panel aus - dessen Toene
+   stehen in v1706d und sollen bleiben (die ZAHL darin darf gold sein,
+   sie ist der Wert).
+   ===================================================================== */
+html[data-dp-layout] body header.hdr #hdr-credits-pill > *:not(.dp-kg-panel),
+html[data-dp-layout] body header.hdr #hdr-credits-pill > .dp-kg-label,
+html[data-dp-layout] body header.hdr #hdr-credits-pill > svg,
+html[data-dp-layout] body header.hdr #hdr-credits-pill > svg *{
+  color:#BFB7A9 !important;
+  stroke:currentColor !important;
+}
+html[data-dp-layout] body header.hdr #hdr-credits-pill:hover > *:not(.dp-kg-panel){
+  color:#F5EFE2 !important;
+}
