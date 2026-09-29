@@ -6063,3 +6063,85 @@ html[data-dp-layout] body header.hdr #hdr-credits-pill > svg *{
 html[data-dp-layout] body header.hdr #hdr-credits-pill:hover > *:not(.dp-kg-panel){
   color:#F5EFE2 !important;
 }
+
+/* =====================================================================
+   v1711 - LASCHEN: FARBIGE SCHRIFT AUF GETOENTEM GRUND
+   =====================================================================
+   Marcel, dritte Rueckmeldung: "passt immer noch nicht auch
+   schriftfarbe nicht."
+
+   Er hat drei Mal recht gehabt, und ich habe drei Mal zu kurz gemessen.
+   Erst die Karte DREIFACH vergroessert fotografiert zeigte es:
+
+     Lasche "2026-999"  Text rgb(140,133,120) auf rgb(63,165,108)
+                        KONTRAST 1,19
+
+   Zwei Fehler auf einmal:
+
+   1. Ich hatte die Lasche VOLL gefuellt (Gruen/Gold/Rot als Flaeche).
+      Im Auslieferungszustand ist sie das NICHT - dort gemessen:
+        .sbc-seq  Text rgb(205,175,90) auf gold mit 12 % Deckung
+      Also farbige Schrift auf getoentem Grund, nicht dunkle Schrift auf
+      Vollflaeche. Ich hatte das Prinzip umgedreht.
+
+   2. Meine `color`-Regel griff gar nicht - der Text stand auf
+      rgb(140,133,120), einem Grau, das ich nirgends gesetzt habe. Eine
+      andere Regel war staerker. Sichtbar wurde das erst, als Grund UND
+      Text zusammen gemessen wurden.
+
+   > Ich habe die Farben einzeln geprueft und jede fuer sich richtig
+   > gefunden. Lesbarkeit ist aber keine Eigenschaft einer Farbe,
+   > sondern eines PAARES. Wer nur `background` misst, sieht den
+   > Kontrast nie.
+
+   Jetzt wie im Original: die Statusfarbe traegt die SCHRIFT, der Grund
+   ist derselbe Ton mit wenig Deckung. Das ist lesbar, zeigt den Status
+   und bleibt ruhig - drei volle Farbflaechen je Zeile waren zu laut.
+   ===================================================================== */
+
+/* -- Grundform beider Laschen (Klasse doppelt = genug Spezifitaet) --- */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq.sbc-seq,
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-investor-ribbon.sbc-investor-ribbon{
+  background:rgba(201,168,76,.15) !important;
+  color:var(--wl-e2c97e, #E2C97E) !important;
+  border:1px solid rgba(201,168,76,.42) !important;
+  border-bottom:0 !important;
+  font-weight:700 !important;
+  padding:2px 8px 3px !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq.sbc-seq *,
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-investor-ribbon.sbc-investor-ribbon *{
+  color:inherit !important; stroke:currentColor !important;
+}
+
+/* -- Gewonnen: gruen. Text hell genug fuer den dunklen Grund. ------- */
+html[data-dp-layout] .dpl-schiene .sb-card.deal-won .sbc-seq.sbc-seq,
+html[data-dp-layout] .dpl-schiene .sb-card.deal-won .sbc-investor-ribbon.sbc-investor-ribbon{
+  background:rgba(63,165,108,.17) !important;
+  color:#6FD79A !important;
+  border-color:rgba(63,165,108,.5) !important;
+}
+/* -- Verloren: rot ------------------------------------------------- */
+html[data-dp-layout] .dpl-schiene .sb-card.deal-lost .sbc-seq.sbc-seq,
+html[data-dp-layout] .dpl-schiene .sb-card.deal-lost .sbc-investor-ribbon.sbc-investor-ribbon{
+  background:rgba(184,98,92,.17) !important;
+  color:#E08C86 !important;
+  border-color:rgba(184,98,92,.5) !important;
+}
+
+/* -- Ausgewaehlte Karte: etwas heller, nicht anders ---------------- */
+html[data-dp-layout] .dpl-schiene .sb-card.active .sbc-seq.sbc-seq,
+html[data-dp-layout] .dpl-schiene .sb-card.is-active .sbc-seq.sbc-seq,
+html[data-dp-layout] .dpl-schiene .sb-card.active .sbc-investor-ribbon.sbc-investor-ribbon,
+html[data-dp-layout] .dpl-schiene .sb-card.is-active .sbc-investor-ribbon.sbc-investor-ribbon{
+  background:rgba(201,168,76,.26) !important;
+  color:var(--wl-e8cc7a, #E8CC7A) !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card.deal-won.active .sbc-seq.sbc-seq,
+html[data-dp-layout] .dpl-schiene .sb-card.deal-won.active .sbc-investor-ribbon.sbc-investor-ribbon{
+  background:rgba(63,165,108,.28) !important; color:#8FE7B4 !important;
+}
+html[data-dp-layout] .dpl-schiene .sb-card.deal-lost.active .sbc-seq.sbc-seq,
+html[data-dp-layout] .dpl-schiene .sb-card.deal-lost.active .sbc-investor-ribbon.sbc-investor-ribbon{
+  background:rgba(184,98,92,.28) !important; color:#F0A9A4 !important;
+}
