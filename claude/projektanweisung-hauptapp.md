@@ -22270,3 +22270,74 @@ das Gutachten Az. 25DG02659.
 Bewertungsentscheidung, ausdrücklich kein Defekt). N4 wartet auf die
 Auskunft, wo die v1.0.0 liegt (die README zeigt auf
 `/opt/dealpilot-v25/`, nicht in dieses Repo).
+
+---
+
+## Rollout-Journal 29.09.2026 (9) — drei Verfahren, die nie jemand sah
+
+**Was.** Marcels Frage lautete: „unser Kern kann die Objekte auch
+rechnen, aber andere Eingaben. Warum machen wir das aktuell nicht?
+**Haben wir die Eingabefelder** und warum hast du es nicht damit
+geprueft?" Ich hatte darauf geantwortet, das sei seine
+Bewertungsentscheidung (N5). Das war eine richtige Aussage als falsche
+Antwort — die Frage nach den Eingabefeldern ist eine MESSFRAGE.
+
+**Gemessen:**
+
+| | |
+|---|---|
+| `calcAll()` liefert | **sechs** Verfahren in `methods.*` |
+| `rnd-wizard.js:728-738` zeigte | **drei** — linear, punktraster, technisch |
+| Vogels, Ross, Parabel | gerechnet und **verworfen**: keine Anzeige, `grep -c "methods\."` in `rnd-pdf.js` und `rnd-docx.js` = **0** |
+| Eingabebedarf dieser drei | **keiner** — `calcVogels(alter, gnd)` und Geschwister nehmen nur Alter und GND |
+
+Es gab also keinen technischen Grund fuer ihr Fehlen. Sie sind nie in
+die Oberflaeche gekommen.
+
+**Die Spreizung, am echten Kern in Node gerechnet:**
+
+| Objekt | linear | Vogels | Ross | Parabel | Punktraster | Spreizung |
+|---|---:|---:|---:|---:|---:|---:|
+| Am Markt 18 | 16 | 23,7 | 22,4 | 28,8 | 25,5 | **12,8 J.** |
+| Westerfeldstr. 140 | 18 | 24,8 | 25,0 | 32,0 | 35,8 | **17,8 J.** |
+| Alexanderstr. 11 | 22 | 27,2 | 30,0 | 38,0 | 41,2 | **19,2 J.** |
+
+Bei rund 1 % AfA-Unterschied je 20 Jahre Restnutzungsdauer ist das die
+halbe Aussage eines Gutachtens.
+
+**Zweiter Befund, beim Einbau gefunden:** die Verfahrensuebersicht hatte
+**nie CSS**. `grep -o "\.rnd-wiz-result[a-z-]*"` auf `rnd-styles.css`
+gab nur `-bar` und `-hero` — `-grid`, `-card`, `-card-label`,
+`-card-value`, `-card-unit` und `.highlight` waren **nirgends
+definiert**. Die drei Karten standen als ungestylte Bloecke
+untereinander. Angelegt, Gold ueber `var(--wl-…)`, Handy-Fassung ab
+560 px, und eine Spreizungszeile dazu.
+
+**Eigener Fehler beim Ausrollen, gleich mitkorrigiert (v1676b):** Der
+Gold-Audit gab RC=1 — `css/layout-varianten.css  0 -> 8`, eine Datei,
+die mit NULL in der Basislinie stand. Alle acht Stellen stammten aus
+meiner eigenen Arbeit an diesem Tag, drei davon als `rgba(201,168,76,…)`
+statt als Hex. **Dass der Waechter Zahlenform genauso zaehlt, ist
+richtig:** eine Farbe in `rgba` faerbt sich beim Mandanten genauso wenig
+um wie ein Hex-Literal. Nach der Umstellung auf `var(--wl-e8cc7a)` und
+`color-mix(… var(--wl-c9a84c) …)`: **RC=0, genau auf der Basislinie.**
+
+> **Die Lehre, und sie ist unbequem:** „Das ist deine
+> Bewertungsentscheidung" hat hier eine kaputte Anzeige zugedeckt. Die
+> Zustaendigkeitsfrage stimmte — die Verfahrenswahl gehoert dem
+> Sachverstaendigen — und genau deshalb habe ich nicht mehr hingesehen.
+> **Bevor eine Frage als Entscheidung zurueckgeht, wird gemessen, ob
+> ueberhaupt alles da ist, worueber entschieden werden soll.** Marcel
+> konnte sich zwischen Verfahren nicht entscheiden, von denen drei gar
+> nicht auf dem Bildschirm standen.
+
+**Commit.** `7e586b7` (v1676), `c884475` (v1676b) · **Nachweis.**
+Node-Lauf gegen `rnd-calc.js` fuer die Spreizungstabelle;
+`grep -c "methods\."` = 0 in PDF und DOCX; `grep -o` auf
+`rnd-styles.css` fuer die fehlenden Klassen; Gold-Audit RC=0 nach der
+Korrektur.
+
+**Rest.** Die Verfahrens**wahl** bleibt Marcels Entscheidung — neu ist
+nur, dass er die Alternativen jetzt sieht. Offen ausserdem: Vogels, Ross
+und Parabel stehen weiterhin **nicht im PDF und nicht im DOCX**. Das ist
+der naechste Schritt, wenn er die Anzeige so haben will.

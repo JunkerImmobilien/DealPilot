@@ -173,6 +173,33 @@ gesetzt und dokumentiert.
 anwendbar ist — oder soll der Nutzer das Verfahren wählen? Marcel ist
 DESAG-Sachverständiger; das ist seine Entscheidung, nicht meine.
 
+> **Nachtrag 29.09.2026 — ich hatte hier zu früh „kein Defekt" gesagt.**
+> Marcels Frage war „**haben wir die Eingabefelder?**", und das ist eine
+> Messfrage. Gemessen:
+>
+> - `calcAll()` gibt **sechs** Verfahren zurück (`methods.linear/vogels/
+>   ross/parabel/punktraster/technisch`).
+> - `rnd-wizard.js` zeigte **drei**. **Vogels, Ross und Parabel wurden
+>   gerechnet und verworfen** — keine Anzeige, kein PDF (`grep -c` = 0),
+>   kein DOCX.
+> - Diese drei brauchen **keine eigenen Eingabefelder**: sie nehmen nur
+>   Alter und GND, die immer vorliegen. Es gab also keinen technischen
+>   Grund für ihr Fehlen.
+>
+> An den drei Testobjekten liegen die Verfahren **12,8 / 17,8 / 19,2
+> Jahre** auseinander. Behoben in **v1676** — samt dem zweiten Befund,
+> dass die Verfahrensübersicht **nie CSS hatte** (von sechs ausgegebenen
+> Klassen war keine definiert).
+>
+> **Die Lehre:** „Das ist eine Bewertungsentscheidung" ist eine richtige
+> Aussage, die eine falsche Antwort war. Die Verfahrens*wahl* gehört
+> Marcel — die Verfahrens*anzeige* war schlicht kaputt, und das hätte
+> ich messen müssen, bevor ich die Frage zurückgegeben habe.
+
+**Was jetzt noch Marcels Entscheidung ist** (unverändert): welches
+Verfahren führen soll. Neu ist nur, dass er die Alternativen jetzt
+sieht.
+
 ---
 
 ## → OFFEN aus dem 26.09.2026 (Layouts, Datenaufnahme, Ernte)
