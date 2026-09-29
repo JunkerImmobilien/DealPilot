@@ -1716,8 +1716,16 @@ html[data-dp-kartenstil="kartei"] .dp-pf-scroll::after{
    Sobald ein Pass entsteht, setzt `renderQR()` das Attribut, der QR
    erscheint, und der Knopf rueckt von selbst wieder nach rechts.
    ═══════════════════════════════════════════════════════════════════ */
-#qc7-sources.dp-pfbar:not(:has(.dp-pf-qr[data-hat-ziel])) .dp-pf-rz{
-  margin-left:18px !important;
+/* v1694 — ZURUECKGENOMMEN: hier stand margin-left:18px. Marcel will
+   den Abruf-Knopf und den Barcode auch im QuickCheck am Ende. Die 18 px
+   stammen aus v1686, als der Knopf am Rand stand und 255 px weisse
+   Flaeche hinter der letzten Kachel liess. Die Luecke kam aber nicht von
+   der Ausrichtung, sondern von den 95 px Rand eines LEEREN QR (v1686c).
+   Der Grund ist behoben, die Notloesung nicht mehr noetig.
+
+   > Eine Abhilfe, die den Anlass ueberlebt, wird zum naechsten Anlass. */
+#qc7-sources.dp-pfbar .dp-pf-rz{
+  margin-left:auto !important;
 }
 /* v1693b — ZURUECKGENOMMEN fuer den Objekt-Tab.
    Diese Bedingung stammt aus v1686 und war fuer die QuickCheck-Leiste
@@ -1734,8 +1742,8 @@ html[data-dp-kartenstil="kartei"] .dp-pf-scroll::after{
    das `margin-left:auto` weiter unten. Die schwaechere Gegenregel
    daneben zu stellen haette nicht geholfen: `:not(:has(…))` traegt hier
    mehr Spezifitaet als die Ankerkette ohne sie. */
-#qc7-sources.dp-pfbar:not(:has(.dp-pf-qr[data-hat-ziel])) .dp-pf-rz{
-  margin-left:18px !important;
+#qc7-sources.dp-pfbar .dp-pf-rz{
+  margin-left:auto !important;
 }
 
 /* v1686c — EIN ELEMENT MIT NULL BREITE TRUG 95 PX RAND.
@@ -1764,8 +1772,13 @@ html[data-dp-kartenstil="kartei"] .dp-pf-scroll::after{
 
    Ab hier gilt: Regeln mit `data-hat-ziel` tragen `#qc7-sources` und
    niemals `#oab-bar`. */
+/* v1694: margin-LEFT bleibt auto, damit der leere QR den freien Platz
+   schluckt und Barcode wie Abruf-Knopf mit ans Ende nimmt. Weg muessen
+   nur margin-RIGHT und padding - die 47,5 px rechts rissen die Luecke
+   VOR dem Knopf auf. Den freien Rest zu schlucken ist kein Abstand,
+   sondern Ausrichtung. */
 #qc7-sources.dp-pfbar .dp-pf-qr:not([data-hat-ziel]){
-  margin-left:0 !important;
+  margin-left:auto !important;
   margin-right:0 !important;
   padding:0 !important;
 }

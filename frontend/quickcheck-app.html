@@ -6736,7 +6736,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
   <!-- v1641 · Der Quick-Check ist ein eigenes Dokument im iframe - die
        Gestaltung der Datenaufnahme muss hier NOCH EINMAL geladen werden.
        Zuletzt, damit sie die eingebetteten Stile ueberstimmt. -->
-  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1693c">
+  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1694">
 <!-- ── v1665g · DIE KARTEI GILT AUCH HIER — ABER NUR SIE ──────────────
      Marcel: „ImmoMetrica, Expose, Marktbericht — das sieht nicht so aus
      wie im Tab Objekt."
@@ -6881,16 +6881,32 @@ html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-sep{ display:block !i
    stehen. `:has(.dp-pf-qr[data-hat-ziel])` fragt nach dem ZIEL, nicht
    nach dem Element: sobald ein Pass entsteht, setzt `renderQR()` das
    Attribut und der Knopf rueckt von selbst wieder nach rechts. */
-#qc7-sources.dp-pfbar:not(:has(.dp-pf-qr[data-hat-ziel])) .dp-pf-rz{
-  margin-left:18px !important;
+/* v1694 — ZURUECKGENOMMEN: hier stand margin-left:18px.
+   Marcel: der Abruf-Knopf und der Barcode sollen im QuickCheck AUCH ans
+   Ende, wie im Tab Objekt.
+
+   Die 18 px stammen aus v1686. Damals stand der Knopf am rechten Rand
+   und liess 255 px weisse Flaeche hinter der letzten Kachel — das war
+   die Beschwerde. Die Luecke kam aber nicht von der Ausrichtung,
+   sondern von den 95 px Rand eines leeren QR (v1686c). Der Grund ist
+   behoben, die Notloesung nicht mehr noetig.
+
+   > Eine Abhilfe, die den Anlass ueberlebt, wird zum naechsten Anlass. */
+#qc7-sources.dp-pfbar .dp-pf-rz{
+  margin-left:auto !important;
 }
 /* v1686c — nachgerechnet: letztes Segment endet 927, QR sitzt mit
    47,5 px Rand links UND rechts bei 975 (Breite 0), Abrufen beginnt
    1040. 47,5+47,5+18 = 113, genau die gemessene Luecke. Die 18 waren
    richtig; die 95 kamen von den Raendern eines Elements, das nichts
    anzeigt. Ein QR ohne Ziel ist kein Bild, kein Weg, kein Abstand. */
+/* v1694: margin-LEFT bleibt auto, damit der leere QR den freien Platz
+   schluckt und Barcode wie Abruf-Knopf mit ans Ende nimmt. Weg muessen
+   nur margin-RIGHT und padding — die 47,5 px rechts waren es, die die
+   Luecke VOR dem Knopf aufrissen. Den freien Rest zu schlucken ist kein
+   Abstand, sondern Ausrichtung. */
 #qc7-sources.dp-pfbar .dp-pf-qr:not([data-hat-ziel]){
-  margin-left:0 !important; margin-right:0 !important; padding:0 !important;
+  margin-left:auto !important; margin-right:0 !important; padding:0 !important;
 }
 /* v1686b: nur MIT Ziel den Platz beanspruchen - ein leerer QR
    schob sich sonst selbst nach rechts und riss die Luecke wieder auf,
