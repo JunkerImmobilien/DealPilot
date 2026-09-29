@@ -690,7 +690,26 @@ function _buildAIPayload() {
           var m = window._dpMfh;
           if (!m || !Array.isArray(m.einheiten) || !m.einheiten.length) return null;
           var liste = m.einheiten.filter(function (e) { return e; });
-          var fl = liste.map(function (e) { return Number(e.wfl); })
+          /* ── v1700d · DEUTSCHES KOMMA ──────────────────────────────
+             Der Konfigurator speichert die Flaeche so, wie sie getippt
+             wurde: „97,5". `Number('97,5')` ist NaN — die Flaechen
+             waren deshalb alle `null`, waehrend die Mieten ankamen
+             („799" hat keine Nachkommastelle und geht durch).
+
+             Gemessen am eigenen Payload, nachdem die vier Einheiten der
+             Westerfeldstr. eingetragen waren: `wfl: null`,
+             `flaeche_schnitt: null`, `miete: 799`. Ein halb gefuellter
+             Datensatz ist schlimmer als ein leerer — er sieht
+             vollstaendig aus.
+
+             > Wer eine getippte Zahl weiterreicht, muss sie umrechnen.
+             > Das Komma ist kein Schoenheitsfehler, es ist ein anderer
+             > Zahlentyp. */
+          var zahl = function (v) {
+            if (v == null || v === '') return NaN;
+            return Number(String(v).replace(/\./g, '').replace(',', '.'));
+          };
+          var fl = liste.map(function (e) { return zahl(e.wfl); })
                         .filter(function (n) { return isFinite(n) && n > 0; });
           var summe = fl.reduce(function (a, b) { return a + b; }, 0);
           return {
@@ -710,8 +729,8 @@ function _buildAIPayload() {
             je_einheit: liste.slice(0, 20).map(function (e) {
               return {
                 nr: e.nr || null,
-                wfl: Number(e.wfl) || null,
-                miete: Number(e.ist) || null,
+                wfl: zahl(e.wfl) || null,
+                miete: zahl(e.ist) || null,
                 art: e.art || null,           /* wohnen | gewerbe */
                 status: e.status || null,     /* vermietet | leer  */
                 lage: e.lage || null
