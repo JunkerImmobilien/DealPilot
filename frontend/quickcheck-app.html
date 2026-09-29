@@ -6736,7 +6736,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
   <!-- v1641 · Der Quick-Check ist ein eigenes Dokument im iframe - die
        Gestaltung der Datenaufnahme muss hier NOCH EINMAL geladen werden.
        Zuletzt, damit sie die eingebetteten Stile ueberstimmt. -->
-  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1688">
+  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1693">
 <!-- ── v1665g · DIE KARTEI GILT AUCH HIER — ABER NUR SIE ──────────────
      Marcel: „ImmoMetrica, Expose, Marktbericht — das sieht nicht so aus
      wie im Tab Objekt."
@@ -6844,6 +6844,24 @@ html[data-dp-kartenstil="kartei"] #qc7-sources .dp-pf-tile.on{
    Dieselben Token wie im Original (`--gold-hi`, `--gold`,
    `--wl-bd9a3e`), damit der Verlauf beim Mandanten mitfaerbt statt
    golden stehenzubleiben. */
+/* ── v1693 · DIESELBEN QUELLEN WIE IM TAB OBJEKT ────────────────────
+   Marcel: Sprengnetter und PriceHubble sollen raus, so wie auf der
+   Tab-Objekt-Seite.
+
+   Gemessen, beide Leisten nebeneinander:
+     Tab Objekt   dealpilot · import · voice · immometrica   (4)
+     QuickCheck   dpmb · spr · ph · expose · voice · immometrica (6)
+
+   Im Tab Objekt stehen die beiden gar nicht im DOM. Hier werden sie
+   fest ausgegeben (Z. 3399/3403). Sie verschwinden deshalb per Regel —
+   das Markup bleibt unangetastet, damit ein spaeteres Freischalten nur
+   diese Zeilen kostet.
+
+   Dazu passt die Doktrin: die beiden werden nach aussen ohnehin nie
+   namentlich genannt. Wer sie zeigt, nennt sie. */
+#qc7-sources .qc7-src[data-src="spr"],
+#qc7-sources .qc7-src[data-src="ph"]{ display:none !important; }
+
 html[data-dp-heute] #qc7-sources.dp-pfbar,
 html[data-dp-heute] body #qc7-sources.dp-pfbar{
   background:linear-gradient(110deg,

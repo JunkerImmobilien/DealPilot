@@ -133,7 +133,16 @@
     var rz = bar.querySelector('.dp-pf-rz');
     if (!rz) return;
     var z = rz.querySelector('.dpk-zahl');
-    if (aktuell !== 'bordkarte') { if (z) z.remove(); return; }
+    /* v1693: … und nur, solange ein Layout laeuft. Marcel hat die Zeile
+       bei „Heute" gesehen: „da steht irgendwas mit 0 Quellen in schwarz
+       drueber, das muss alles passen."
+
+       Auf Prod gibt es `dpk-zahl` nicht (nachgesehen, kein Treffer in
+       `frontend/js`) — sie ist mit dem Bordkarten-Stil entstanden.
+       „Heute" heisst unveraendert; dazu gehoert auch, was NICHT da war.
+       `aktuell` allein genuegt nicht: der Stil bleibt gemerkt, wenn das
+       Layout faellt. */
+    if (aktuell !== 'bordkarte' || !layoutAktiv()) { if (z) z.remove(); return; }
     if (!z) {
       z = document.createElement('small');
       z.className = 'dpk-zahl';

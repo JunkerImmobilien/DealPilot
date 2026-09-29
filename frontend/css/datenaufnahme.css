@@ -1789,3 +1789,43 @@ html[data-dp-heute] .dp-pfbar .k-heute{ display:inline !important; }
 .bmf-ausg-l{ font-size:13.5px; line-height:1.25; }
 .bmf-ausg-s{ font-size:11px; line-height:1.3; opacity:.62; }
 @media (max-width:560px){ .bmf-ausg{ flex:1 1 100%; } }
+
+/* ═══════════════════════════════════════════════════════════════════
+   v1693 — DER ABRUF-BEREICH STAND NICHT AM ENDE
+   -------------------------------------------------------------------
+   Marcel: „bitte auch im Tab Objekt den Button noch passend wieder
+   rechts ans Ende der Pre-Flight-Karte, genauso wie den Barcode
+   dahinter."
+
+   Gemessen bei „Heute", Tab Objekt:
+
+     Leiste endet rechts bei   1894
+     Abruf-Bereich endet bei   1656
+     Rand dazwischen            238 px
+
+   Die Regel aus v1686 gibt dem Bereich `margin-left:18px`, wenn kein
+   QR mit Ziel danebensteht — das war fuer die QuickCheck-Leiste
+   gedacht, in der nach dem letzten Segment nichts mehr kam. Im Tab
+   Objekt steht der QR sehr wohl da (54 px), er traegt nur kein
+   `data-hat-ziel`, weil das Attribut nur die QuickCheck-Fassung setzt.
+
+   > Eine Bedingung, die an EINER Stelle richtig ist, wird an der
+   > anderen zur Falle, wenn ihr Merkmal dort nie gesetzt wird.
+
+   Der Abruf-Bereich ist das letzte Element der Leiste und gehoert an
+   ihr Ende — unabhaengig davon, was davor steht. `margin-left:auto`
+   sagt genau das; die 18 px bleiben als ABSTAND zum Nachbarn, nicht
+   als Ersatz fuer die Ausrichtung.
+   ═══════════════════════════════════════════════════════════════════ */
+#oab-bar.dp-pfbar .dp-pf-rz{
+  margin-left:auto !important;
+}
+/* Steht ein QR daneben, gehoert der Abstand zwischen die beiden. */
+#oab-bar.dp-pfbar .dp-pf-qr + .dp-pf-rz{
+  margin-left:14px !important;
+}
+/* Der QR wandert dann mit ans Ende — er gehoert zum Abruf, nicht zu
+   den Quellen davor. */
+#oab-bar.dp-pfbar .dp-pf-qr{
+  margin-left:auto !important;
+}
