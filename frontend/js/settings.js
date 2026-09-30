@@ -760,6 +760,11 @@ function showSettings(initialTab) {
            WIE hell es ist, dann alles Einzelne hinter „Darstellung
            oeffnen". Von grob nach fein.                               */
         '<div id="dp-layout-wahl-host" style="margin-bottom:12px"></div>' +
+        /* v1715: die Objektkarten-Wahl direkt unter der Layout-Wahl.
+           Marcel: "bitte arbeite unter Darstellung auch den wechsel der
+           Karten ein." Die Reihenfolge ist Absicht: erst WO die Dinge
+           liegen, dann WIE die Objektkarten darin aussehen. */
+        '<div id="dp-objkarte-wahl-host" style="margin-bottom:12px"></div>' +
         '<div style="padding:12px 14px;background:#FAF9F4;border-radius:8px;border:1px solid rgba(201,168,76,0.25)">' +
           /* v1706: HIER STAND DIE WAHL OBSIDIAN / HELL UND DER KNOPF
              DARSTELLUNG OEFFNEN.

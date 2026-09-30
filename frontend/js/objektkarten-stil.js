@@ -1,35 +1,39 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   objektkarten-stil.js · v1714 — die Entwürfe zum Umschalten
+   objektkarten-stil.js · v1715 — die Entwürfe unter „Darstellung"
 
-   Marcel am 30.09.2026: „bei den Objektkarten möchte ich dass du mir die
-   anderen auch baust zum wechseln. erst mal auf dem bildschirm zum
-   umswitchen."
+   Marcel am 30.09.2026, zweiter Durchgang:
+     „bitte arbeite unter Darstellung auch den wechsel der Karten ein.
+      Bau alle ein außer Status und Cockpit. Nehme die information
+      Investor aus der Design Optik bei allen raus außer bei unserem
+      standard Obsidian look. Das Fenster kannst du dann wieder
+      entfernen."
 
-   Gemeint sind die zehn Entwürfe aus `design/mockups/
-   objektkarten-schiene-v1707.html`. Gebaut ist bisher Nummer 02, der
-   Aktenreiter (v1709–v1712). Die übrigen kommen hier dazu — als
-   WÄHLBARE Varianten, nicht als Ersatz.
+   Drei Änderungen gegenüber v1714:
 
-   ── WARUM EIN EIGENES ATTRIBUT ────────────────────────────────────────
-   `data-dp-objkarte` am `<html>`. Vorher gegrept, wie CLAUDE.md es
-   verlangt: der Name ist frei. Belegt sind bereits `data-bg`,
-   `data-dp-karte` (hell-varianten.js), `data-dpl-portfolio`,
-   `data-flyer-code`, `data-dp-layout`, `data-dp-kartenstil`,
-   `data-ui-cards`, `data-ui-form`.
+   1. Das schwebende Fenster ist WEG. Es war zum Ausprobieren gebaut
+      („erst mal auf dem bildschirm zum umswitchen") und hat seinen
+      Zweck erfüllt. Die Wahl steht jetzt dort, wo sie hingehört:
+      Einstellungen → Darstellung → Aussehen.
 
-   > Sieben Gestaltungsattribute liegen damit gleichzeitig am `<html>`.
-   > Das ist viel — aber ein achtes mit einem schon belegten Namen wäre
-   > schlimmer: zwei Module auf einem Attribut löschen sich lautlos.
+      > Ein Werkzeug, das zum Ausprobieren gebaut wurde, wird nach dem
+      > Ausprobieren abgebaut. Sonst steht es irgendwann in der
+      > Auslieferung und niemand weiß mehr, warum.
 
-   ── DER STANDARD TRÄGT KEIN ATTRIBUT ─────────────────────────────────
-   Ohne Wahl bleibt der Aktenreiter. Das leere Attribut ist der
-   Istzustand und trägt keine Regel — derselbe Grundsatz wie in
-   `karten-stil.js` und `layout-varianten.js`.
+   2. Status und Cockpit sind raus — Marcels Auswahl.
+
+   3. Die INVESTOR-Lasche erscheint nur noch im Standard (Aktenreiter).
+      In den anderen Entwürfen wäre sie ein Fremdkörper: sie gehört zur
+      Aktenmetapher, nicht zu einer Datenzeile oder einer Ampel. Das
+      steht in der CSS (layout-varianten.css, v1715).
+
+   ── DAS ATTRIBUT ─────────────────────────────────────────────────────
+   `data-dp-objkarte` am `<html>`, vorher gegrept: frei. Ohne Wahl bleibt
+   der Aktenreiter — das leere Attribut ist der Istzustand und trägt
+   keine Regel.
 
    ── NUR IN DEN LAYOUTS ───────────────────────────────────────────────
-   Die Entwürfe formen die Karte in der Layout-SCHIENE. In der normalen
-   Ansicht gibt es die Schiene nicht, also wird das Attribut dort auch
-   nicht gesetzt — sonst stünde eine halb aufgetragene Gestaltung da.
+   Die Entwürfe formen die Karte in der Layout-SCHIENE. Ohne Layout gibt
+   es sie nicht, also wird das Attribut dort auch nicht gesetzt.
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -38,17 +42,16 @@
 
   var LS = 'dp_objkarte_stil';
   var ATTR = 'data-dp-objkarte';
+  var HOST = 'dp-objkarte-wahl-host';
 
   var STILE = {
-    '':          { name: 'Aktenreiter', sub: 'Lasche mit Objektnummer (Standard)' },
-    bordkarte:   { name: 'Bordkarte',   sub: 'Abriss links, Jahr hochkant' },
+    '':          { name: 'Aktenreiter', sub: 'Lasche mit Objektnummer · Standard' },
+    bordkarte:   { name: 'Bordkarte',   sub: 'Abriss links, Nummer hochkant' },
     kante:       { name: 'Score-Kante', sub: 'Farbiger Strich statt Ring' },
     datenzeile:  { name: 'Datenzeile',  sub: 'Mono, eine Zeile, bündig' },
     ampel:       { name: 'Ampel',       sub: 'Ein Punkt sagt die Stufe' },
     kennzahlen:  { name: 'Kennzahlen',  sub: 'Preis, Rendite, Cashflow' },
-    minimal:     { name: 'Minimal',     sub: 'Nur Adresse und Ring' },
-    status:      { name: 'Status',      sub: 'Deal-Stufe zuerst' },
-    cockpit:     { name: 'Cockpit',     sub: 'Score als Rundinstrument' }
+    minimal:     { name: 'Minimal',     sub: 'Nur Adresse und Ring' }
   };
 
   var aktuell = '';
@@ -63,52 +66,57 @@
     if (aktuell && layoutAktiv()) h.setAttribute(ATTR, aktuell);
     else h.removeAttribute(ATTR);
     try { localStorage.setItem(LS, aktuell); } catch (e) {}
-    schalterNachziehen();
+    wahlNachziehen();
   }
 
-  /* ── Der Schalter ──────────────────────────────────────────────────
-     Ein Panel auf dem Bildschirm, wie `DealPilotLayout.schalter()`. Er
-     ist zum AUSPROBIEREN da, nicht zum Ausliefern - deshalb erscheint er
-     nur, wenn er ausdrücklich angefordert wurde (Merker oder Aufruf). */
-  var MERKER = 'dp_objkarte_schalter';
-
-  function baueSchalter() {
-    if (document.getElementById('dp-ok-schalter')) return;
-    var box = document.createElement('div');
-    box.id = 'dp-ok-schalter';
-    box.className = 'dp-ok-schalter';
-    box.innerHTML =
-      '<div class="dp-ok-kopf">' +
-        '<span class="dp-ok-t">Objektkarte</span>' +
-        '<button type="button" class="dp-ok-zu" id="dp-ok-zu" title="Schließen">✕</button>' +
-      '</div>' +
-      '<div class="dp-ok-liste">' +
-        Object.keys(STILE).map(function (k) {
-          return '<button type="button" class="dp-ok-w" data-ok="' + k + '">' +
-                   '<span class="dp-ok-n">' + STILE[k].name + '</span>' +
-                   '<span class="dp-ok-s">' + STILE[k].sub + '</span>' +
-                 '</button>';
-        }).join('') +
-      '</div>' +
-      '<div class="dp-ok-fuss">Nur in den Layouts. Die Wahl bleibt gemerkt.</div>';
-    document.body.appendChild(box);
-
-    box.addEventListener('click', function (e) {
-      var zu = e.target.closest ? e.target.closest('#dp-ok-zu') : null;
-      if (zu) { box.remove(); try { localStorage.removeItem(MERKER); } catch (x) {} return; }
-      var b = e.target.closest ? e.target.closest('.dp-ok-w') : null;
+  /* ── Die Wahl in den Einstellungen ─────────────────────────────────
+     Gebaut wird in `#dp-objkarte-wahl-host`, den `settings.js` im
+     Abschnitt „Aussehen" anlegt — genau wie bei der Layout-Wahl (v1697).
+     Die Farben stehen im CSS, nicht hier: eine Marke, die im JS klebt,
+     färbt sich beim Mandanten nicht um. */
+  function baueWahl() {
+    var host = document.getElementById(HOST);
+    if (!host || host.getAttribute('data-gebaut') === '1') return;
+    host.setAttribute('data-gebaut', '1');
+    host.innerHTML =
+      '<div class="dp-okw-box">' +
+        '<div class="dp-okw-kopf">Objektkarten in der Liste</div>' +
+        '<div class="dp-okw-gitter">' +
+          Object.keys(STILE).map(function (k) {
+            return '<button type="button" class="dp-okw" data-ok="' + k + '">' +
+                     '<span class="dp-okw-n">' + STILE[k].name + '</span>' +
+                     '<span class="dp-okw-s">' + STILE[k].sub + '</span>' +
+                   '</button>';
+          }).join('') +
+        '</div>' +
+        '<div class="dp-okw-fuss">Wirkt in den Layouts Aktenmappe, Kanzlei und Tower — ' +
+        'die normale Ansicht bleibt, wie sie ist.</div>' +
+      '</div>';
+    host.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('.dp-okw') : null;
       if (!b) return;
       setze(b.getAttribute('data-ok'));
     });
-    schalterNachziehen();
+    wahlNachziehen();
   }
 
-  function schalterNachziehen() {
-    var box = document.getElementById('dp-ok-schalter');
-    if (!box) return;
-    box.querySelectorAll('.dp-ok-w').forEach(function (b) {
+  function wahlNachziehen() {
+    var host = document.getElementById(HOST);
+    if (!host) return;
+    host.querySelectorAll('.dp-okw').forEach(function (b) {
       b.classList.toggle('an', b.getAttribute('data-ok') === aktuell);
     });
+  }
+
+  /* Der Abschnitt „Aussehen" wird erst beim Öffnen der Einstellungen
+     gebaut. Ein Beobachter hängt die Wahl ein, sobald der Host da ist -
+     ein Timer würde raten, wann das ist. */
+  function hostBeobachten() {
+    if (document.getElementById(HOST)) baueWahl();
+    if (!window.MutationObserver) return;
+    new MutationObserver(function () {
+      if (document.getElementById(HOST)) baueWahl();
+    }).observe(document.body, { childList: true, subtree: true });
   }
 
   function start() {
@@ -120,17 +128,19 @@
     if (ausUrl !== null) setze(ausUrl === 'aus' ? '' : ausUrl);
     else setze(gemerkt);
 
-    /* Der Schalter erscheint, wenn er einmal angefordert wurde - über
-       `?objkarte-schalter`, den Merker oder den Aufruf von außen. */
-    var will = p.has('objkarte-schalter');
-    if (!will) { try { will = localStorage.getItem(MERKER) === '1'; } catch (e) {} }
-    if (will) {
-      try { localStorage.setItem(MERKER, '1'); } catch (e) {}
-      baueSchalter();
-    }
+    /* v1715: der Merker des alten Schwebefensters wird abgeräumt. Wer ihn
+       noch trägt, bekäme sonst nie etwas zu sehen und wüsste nicht,
+       warum - das Fenster gibt es nicht mehr. */
+    try { localStorage.removeItem('dp_objkarte_schalter'); } catch (e) {}
+    try {
+      var alt = document.getElementById('dp-ok-schalter');
+      if (alt) alt.remove();
+    } catch (e) {}
 
-    /* Wechselt das Layout, wird neu entschieden: ohne Layout gibt es
-       keine Schiene, und dann darf das Attribut nicht stehen bleiben. */
+    hostBeobachten();
+
+    /* Wechselt das Layout, wird neu entschieden: ohne Layout keine
+       Schiene, und dann darf das Attribut nicht stehen bleiben. */
     if (window.MutationObserver) {
       new MutationObserver(function () { setze(aktuell); })
         .observe(document.documentElement, { attributes: true, attributeFilter: ['data-dp-layout'] });
@@ -143,10 +153,6 @@
   window.DealPilotObjektkarte = {
     setze: setze,
     stile: STILE,
-    aktuell: function () { return aktuell; },
-    schalter: function () {
-      try { localStorage.setItem(MERKER, '1'); } catch (e) {}
-      baueSchalter();
-    }
+    aktuell: function () { return aktuell; }
   };
 })();

@@ -6520,38 +6520,66 @@ html[data-dp-objkarte="cockpit"] .dpl-schiene :is(#sb-list) .sb-card .sbc-invest
   right:auto !important; left:0 !important;
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   DER SCHALTER
-   ═══════════════════════════════════════════════════════════════════ */
-.dp-ok-schalter{
-  position:fixed; right:18px; bottom:18px; z-index:99998;
-  width:232px; max-height:78vh; overflow:auto;
-  background:#15140F; border:1px solid #332E26; border-radius:12px;
-  box-shadow:0 18px 44px rgba(0,0,0,.55);
-  font-family:'Inter',system-ui,sans-serif;
+
+
+/* =====================================================================
+   v1715 - DIE KARTENWAHL IN DEN EINSTELLUNGEN
+   =====================================================================
+   Marcel: "bitte arbeite unter Darstellung auch den wechsel der Karten
+   ein ... Das Fenster kannst du dann wieder entfernen."
+
+   Das schwebende Fenster aus v1714 ist weg - es war zum Ausprobieren
+   gebaut und hat seinen Zweck erfuellt.
+
+   > Ein Werkzeug, das zum Ausprobieren gebaut wurde, wird nach dem
+   > Ausprobieren abgebaut. Sonst steht es irgendwann in der Auslieferung
+   > und niemand weiss mehr, warum.
+
+   Die Wahl sitzt jetzt im Abschnitt "Aussehen", direkt unter der
+   Layout-Wahl. Der Abschnitt liegt auf HELLEM Grund (#FAF9F4), deshalb
+   sind die Toene hier hell gedacht - nicht aus der dunklen Schiene
+   uebernommen.
+   ===================================================================== */
+.dp-okw-box{
+  padding:12px 14px; background:#FAF9F4; border-radius:8px;
+  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);
 }
-.dp-ok-kopf{
-  display:flex; align-items:center; justify-content:space-between;
-  padding:9px 11px; border-bottom:1px solid #2A2622; background:#1B1913;
-  position:sticky; top:0;
+.dp-okw-kopf{
+  font:700 11px/1 'JetBrains Mono',monospace; letter-spacing:.1em;
+  color:#8A7F62; margin-bottom:9px; text-transform:uppercase;
 }
-.dp-ok-t{ font:700 11.5px/1 'Space Grotesk',sans-serif; color:#EDE7DA; }
-.dp-ok-zu{
-  border:0; background:transparent; color:#8C8578; cursor:pointer;
-  font-size:13px; line-height:1; padding:2px 4px;
+.dp-okw-gitter{ display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:7px; }
+.dp-okw{
+  text-align:left; border:1px solid rgba(0,0,0,.12); background:#fff;
+  border-radius:8px; padding:8px 10px; cursor:pointer; font:inherit; min-height:44px;
 }
-.dp-ok-zu:hover{ color:#EDE7DA; }
-.dp-ok-liste{ padding:7px; display:flex; flex-direction:column; gap:3px; }
-.dp-ok-w{
-  text-align:left; border:1px solid transparent; background:transparent;
-  border-radius:6px; padding:6px 8px; cursor:pointer; display:block; width:100%;
+.dp-okw:hover{ border-color:var(--wl-c9a84c, #C9A84C); }
+.dp-okw.an{
+  border-color:var(--wl-c9a84c, #C9A84C);
+  box-shadow:inset 0 0 0 1px var(--wl-c9a84c, #C9A84C);
+  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, #fff);
 }
-.dp-ok-w:hover{ background:#1E1B15; border-color:#3A352E; }
-.dp-ok-w.an{ background:#221F17; border-color:var(--wl-c9a84c, #C9A84C); }
-.dp-ok-n{ display:block; font:600 12px/1.3 'Inter',sans-serif; color:#EDE7DA; }
-.dp-ok-w.an .dp-ok-n{ color:var(--wl-e8cc7a, #E8CC7A); }
-.dp-ok-s{ display:block; font-size:10.5px; line-height:1.35; color:#8C8578; margin-top:1px; }
-.dp-ok-fuss{
-  padding:7px 11px 9px; font-size:10px; line-height:1.4; color:#6E675C;
-  border-top:1px solid #2A2622;
+.dp-okw-n{ display:block; font-weight:600; font-size:12.5px; color:#2A2826; }
+.dp-okw-s{ display:block; font-size:11px; line-height:1.35; color:var(--muted,#5F5E5A); margin-top:2px; }
+.dp-okw-fuss{ margin-top:9px; font-size:11.5px; line-height:1.45; color:var(--muted,#5F5E5A); }
+
+/* =====================================================================
+   v1715 - INVESTOR NUR IM STANDARD
+   =====================================================================
+   Marcel: "Nehme die information Investor aus der Design Optik bei allen
+   raus ausser bei unserem standard Obsidian look."
+
+   Die INVESTOR-Lasche gehoert zur AKTENMETAPHER - zwei Reiter an einer
+   Mappe. In einer Datenzeile, an einer Ampel oder auf einer Score-Kante
+   ist sie ein Fremdkoerper: dort gibt es keine Mappe, an der sie haengen
+   koennte.
+
+   > Ein Bauteil, das aus einer Metapher stammt, laesst sich nicht in
+   > eine andere mitnehmen. Es sieht dort nicht schlicht aus, sondern
+   > uebrig.
+
+   Der Aktenreiter (kein Attribut) behaelt sie.
+   ===================================================================== */
+html[data-dp-objkarte] .dpl-schiene :is(#sb-list) .sb-card .sbc-investor-ribbon{
+  display:none !important;
 }
