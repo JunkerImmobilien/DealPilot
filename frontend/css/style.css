@@ -38154,6 +38154,22 @@ header.hdr #hdr-badges:not(:has(*)){
    Diagramme) setzen fill und stroke an ihren eigenen Knoten und bleiben
    unberuehrt - sie standen in der Messung auch nie im Weg.
    ===================================================================== */
-svg:has(> use:only-child){
+   NACHTRAG v1723b - DIE REGEL WAR ZU BREIT.
+   Erst global gesetzt und nachgemessen: die acht .ct-ico im Objekt-Tab
+   fielen dadurch von Kontrast 21 auf 2,29. Sie sind das EINZIGE sichtbare
+   Element ihrer Kachel und standen auf Weiss - schwarz war dort richtig,
+   gold ist dort schwaecher.
+
+   > Eine Regel, die ein gemessenes Problem loest und ein ungemessenes
+   > schafft, ist kein Fortschritt. Marcels "vielleicht bei den anderen
+   > auch" war eine Vermutung, keine Beobachtung.
+
+   Deshalb nur die DUNKLEN Flaechen: dort ist Schwarz nie richtig, und
+   dort standen auch die beiden Faelle, die Marcel wirklich gesehen hat.
+   Helle Karten bleiben unberuehrt. */
+.dpl-schiene svg:has(> use:only-child),
+aside.sidebar svg:has(> use:only-child),
+header.hdr svg:has(> use:only-child),
+nav.tabs svg:has(> use:only-child){
   fill:currentColor;
 }
