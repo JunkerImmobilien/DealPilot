@@ -496,6 +496,35 @@
        Layout bliebe eine Wahl stehen, die beim Klicken nichts aendert. */
     var k = document.getElementById('dpk-seg');
     if (k && k.parentElement) k.parentElement.style.display = layout ? '' : 'none';
+
+    /* ── v1726 · ZWEI WEITERE, DIE NUR MIT LAYOUT WIRKEN ──────────────
+       Marcel: „nicht bei allen Aussehern layouts macht der Seiten wechsel
+       sinn. das muss geprueft werden. Modus wechsel macht der ueberall
+       sinn genauso wie die Objektkarten?"
+
+       Alle Gruppen in jedem Layout durchgeklickt und je Stellung eine
+       Signatur aus Farben, Radien, Schrift UND Geometrie verglichen:
+
+                            Standard  Aktenmappe  Kanzlei  Tower
+         Seiten               NEIN       ja         ja      ja
+         Kartengestalt        NEIN       ja         -       -
+         Modus                ja         ja         -       -
+         Objektkarten-Dichte  ja         ja         -       -
+
+       Die Seitenwahl schiebt die Schiene - ohne Schiene gibt es nichts zu
+       schieben. Die Kartengestalt haengt an `data-dp-objkarte`, das
+       `objektkarten-stil.js` nur unter `layoutAktiv()` setzt (gemessen:
+       im Standard bleibt das Attribut leer, alle 21 Paare identisch).
+
+       Modus und Dichte wirken ueberall und bleiben stehen - Marcels Frage
+       dazu ist damit beantwortet, ohne dass etwas verschwindet. */
+    var se = document.getElementById('dpl-seiten-seg');
+    if (se && se.parentElement) se.parentElement.style.display = layout ? '' : 'none';
+
+    /* Die Gestalt teilt sich den Block mit der Dichte, die ueberall wirkt -
+       deshalb nur der Host, nicht der ganze Abschnitt. */
+    var og = document.querySelector('#dpuv-panel .dp-objkarte-wahl-host');
+    if (og) og.style.display = layout ? '' : 'none';
   }
 
   /* v1720b: die Lage aendert sich auf ZWEI Wegen, nicht auf einem.
