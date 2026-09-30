@@ -765,26 +765,26 @@ function showSettings(initialTab) {
            Karten ein." Die Reihenfolge ist Absicht: erst WO die Dinge
            liegen, dann WIE die Objektkarten darin aussehen. */
         '<div id="dp-objkarte-wahl-host" style="margin-bottom:12px"></div>' +
-        /*    v1719 � DER WEG INS PANEL STEHT BEI DEM, WAS ER FEINER MACHT
-           Marcel: Darstellung oeffnen moechte ich bitte auch in den
+        /* ── v1719 · DER WEG INS PANEL STEHT BEI DEM, WAS ER FEINER MACHT
+           Marcel: „Darstellung oeffnen moechte ich bitte auch in den
            Einstellungen weiter oben bei der Layout auswahl haben."
 
            v1706 hatte den Knopf aus diesem Block genommen und nur den
            unten stehen lassen. Das war die halbe Bewegung: oben wird
            GROB gewaehlt (Layout, Objektkarten), das Feine liegt im
-           Panel  der Weg dorthin gehoert also hierher, nicht ans Ende
+           Panel — der Weg dorthin gehoert also hierher, nicht ans Ende
            einer langen Seite. Der untere Abschnitt faellt dafuer weg,
            damit es bei EINEM Weg bleibt.
 
-           GESPERRT AB PLAN: Marcel: Erst ab Pro ist das Darstellung
+           GESPERRT AB PLAN: Marcel: „Erst ab Pro ist das Darstellung
            oeffnen moeglich." Gemessen an der laufenden App, dass genau
            das schon im Datenmodell steht:
 
-             free (fehlt) � starter (fehlt) � investor (fehlt)
-             pro  true    � partner true       <- features.theme_palette
+             free (fehlt) · starter (fehlt) · investor (fehlt)
+             pro  true    · partner true       <- features.theme_palette
 
            Der Schluessel wird also nicht erfunden, sondern der
-           vorhandene benutzt  ein neuer waere fuer JEDEN false
+           vorhandene benutzt — ein neuer waere fuer JEDEN false
            (auch fuer Pro) und haette die Funktion still abgeschaltet.
            Geprueft wird mit `Plan.full()`, nicht `Plan.can()`: gemessen
            gibt `can('theme_palette')` auch im Partner-Plan false,
@@ -795,7 +795,7 @@ function showSettings(initialTab) {
           if (frei) {
             return '<button type="button" class="btn" style="margin-bottom:12px" onclick="_dpOpenFromSettings()">Darstellung \u00f6ffnen</button>';
           }
-          /* Sichtbar, aber zu  wer nicht weiss, dass es das gibt, fragt
+          /* Sichtbar, aber zu — wer nicht weiss, dass es das gibt, fragt
              auch nicht danach. Der Grund steht daneben, nicht im Tooltip. */
           return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">' +
                    '<button type="button" class="btn" disabled style="opacity:.5;cursor:not-allowed">Darstellung \u00f6ffnen</button>' +
