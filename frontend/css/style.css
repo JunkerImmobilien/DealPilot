@@ -38067,3 +38067,47 @@ html[data-ui-theme="kanzlei"] body.dp-hybrid-rail #dp-hybrid-aktionen{ padding-b
 :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .dp-pf-lead *:not(b):not(strong){ color:#4A443B !important; }
 :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .dp-kg-panel b,
 :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .dp-pf-lead b{ color:#1C1A16 !important; }
+
+/* =====================================================================
+   v1721 - DER LEERE BADGE-STREIFEN UNTER DEM KOPF
+   =====================================================================
+   Marcel: "zwischen header und menue links und rechts ist jetzt ein
+   heller streifen"
+
+   Gemessen im Standard-Layout, Vorlage Kontor:
+
+     #hdr-badges   :empty = true, 0 Kinder
+                   und trotzdem 1749 x 8 px, background rgb(255,255,255)
+                   padding 4px 14px, box-sizing border-box
+
+   Ein leerer Behaelter mit Innenabstand ist kein leerer Behaelter - er
+   ist ein Streifen. Sichtbar wird er erst, wenn eine Vorlage ihm eine
+   eigene Flaeche gibt: bei Kontor und Panel weiss, bei Kanzlei 251/250/247,
+   bei Boarding creme. Auf Obsidian und Konsole faellt er nicht auf, weil
+   die Flaeche dort so dunkel ist wie der Kopf darueber.
+
+   ZWEI Regeln wollten das schon verhindern, beide greifen nicht:
+
+     style.css:13630  .hdr-v61-row2:empty {display:none}
+                      ohne !important - verliert gegen
+                      `body:not(.hdr-collapsed) #hdr-badges
+                       {display:block !important}` (ID schlaegt Klasse)
+
+     style.css:36281  header.hdr #hdr-badges:not(:has(.hdr-incomplete-banner))
+                      {display:none !important}
+                      steht INNERHALB von @media (max-width:...) - auf dem
+                      Desktop gibt es sie nicht
+
+   > Zwei Waechter mit demselben Auftrag, und keiner steht da, wo es
+   > passiert. Der eine ist zu schwach, der andere zu schmal.
+
+   Diese Regel traegt die ID selbst und gilt in jeder Breite. Sie greift
+   ausschliesslich am LEEREN Behaelter - sobald der Score oder der
+   70-Prozent-Hinweis darin steht, ist sie aus dem Weg. `:not(:has(*))`
+   steht daneben, weil `:empty` schon an einem einzigen Leerzeichen
+   scheitert, das ein spaeterer Aufbau hinterlaesst.
+   ===================================================================== */
+header.hdr #hdr-badges:empty,
+header.hdr #hdr-badges:not(:has(*)){
+  display:none !important;
+}
