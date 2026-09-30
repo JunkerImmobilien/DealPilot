@@ -25153,3 +25153,116 @@ ausgeglichen, Diff 44 Zeilen.
 `style.css` ist Latin-1. Sie gehört vor jedem Skript-Eingriff gemessen,
 nicht angenommen — am selben Tag hatte derselbe Fehler in der anderen
 Richtung `settings.js` beschädigt (v1719b).
+
+---
+
+## v1722–v1724 · Zwei unsichtbare Icons, ein Rahmen zum Erahnen, und ein
+## Panel, das die App in Ruhe lässt
+
+### v1722 · Die zwei Icons, die Marcel gesehen hat
+
+Alle sichtbaren `<use>`-Icons auf Kontrast gegen ihren **effektiven** Grund
+gemessen: von zehn waren genau zwei unlesbar, beide auf Obsidian.
+
+| Icon | fill | Grund | Kontrast |
+|---|---|---|---:|
+| `#i-portfolio` | `rgb(0,0,0)` | `rgb(14,13,11)` | **1,08** |
+| `#i-clock` | `rgb(0,0,0)` | `rgb(14,13,11)` | **1,08** |
+
+Beim Portfolio-Knopf stand die Absicht schon da:
+`layout-varianten.css:5510` setzt `stroke:currentColor !important`. Das
+Symbol wird aber über **fill** gezeichnet (gemessen `stroke=none`).
+
+> Die Zeile meinte das Richtige und traf die falsche Eigenschaft.
+
+Dazu der Rahmen von `.sbc-btn` (Duplizieren ⎘, Löschen ×):
+`rgba(255,255,255,0.08)` — Kontrast **1,16** gegen den effektiven Grund
+`rgb(5,5,4)`. Die Schrift darin stand bei 9,84: man sah ein Zeichen
+schweben, keinen Knopf. Jetzt 0.35, rund 3,0.
+
+**Ergebnis:** 1,08 → **5,34** (Uhr) · 1,08 → **3,29** (Portfolio) ·
+1,16 → **3,07** (Rahmen). Helle Kacheln unberührt bei 21.
+**Commits `2320df2`, `7983551`.**
+
+### v1723 → v1723b · Eine Regel, die ein ungemessenes Problem schuf
+
+Marcels „vielleicht bei den anderen auch" habe ich zu einer globalen Regel
+gemacht: `svg:has(> use:only-child){fill:currentColor}`. Nachgemessen fielen
+die acht `.ct-ico` im Objekt-Tab dadurch von Kontrast **21 auf 2,29** — sie
+sind das einzige sichtbare Element ihrer Kachel und stehen auf Weiß.
+Schwarz war dort richtig.
+
+> Eine Regel, die ein gemessenes Problem löst und ein ungemessenes schafft,
+> ist kein Fortschritt. „Vielleicht bei den anderen auch" war eine
+> Vermutung, keine Beobachtung — ich habe daraus einen Flächenumbau gemacht.
+
+Eingeschränkt auf `.dpl-schiene`, `aside.sidebar`, `header.hdr` und
+`nav.tabs`: dort ist Schwarz nie richtig, und dort standen auch die beiden
+echten Fälle.
+
+### v1723c · Mein Kommentar hat die eigene Regel verschluckt
+
+Beim Einschränken begann der Ersetzungstext mit Kommentartext, obwohl der
+Kommentar davor mit `*/` schon geschlossen war. Danach stand nackter Text im
+CSS — der Browser verwirft ab da, und die Regel kam nie im Stylesheet an.
+
+Das Muster benennt es genau:
+
+```
+el.matches(selektor)        true      <- der Selektor passt
+Kaskaden-Walker: Regeln     0         <- sie steht nicht in der Kaskade
+Inline-Gegentest            wirkt     <- die Eigenschaft ist nicht blockiert
+```
+
+> Passt der Selektor, wirkt inline, und die Regel steht trotzdem nicht in
+> der Kaskade — dann ist sie gar nicht erst geparst worden.
+
+**Die Klammerbilanz war dabei ausgeglichen und hat nichts gemerkt.** Eine
+**Kommentarbilanz** (`/*` gegen `*/`) gehört künftig in dieselbe Prüfung.
+
+### v1724 · Das Panel lässt die App in Ruhe
+
+Marcel: „dass man, wenn man das offen hat, halt auch in der App noch
+durchklicken kann. Also quasi wie so ein Overlay-Menü … Damit man erst mal
+alles einstellen kann und wenn man zufrieden ist, macht man es aus."
+
+Gemessen lag `#dpuv-back` als 2133 × 988-Fläche über allem, und
+`elementFromPoint` in der Bildschirmmitte nannte ihn — kein Klick kam durch.
+Dazu dunkelte er mit 28 %: wer eine Vorlage beurteilen will, sah sie durch
+einen Schleier.
+
+> Ein Einstellfenster, das die Sache verdeckt, die es einstellt, zwingt zum
+> Zumachen nach jedem Klick.
+
+Der Abdunkler bleibt als Träger der Ein- und Ausblendung, wird aber
+durchsichtig und durchlässig. Geschlossen wird über ✕ oder „Fertig" — ein
+Klick daneben schließt nicht mehr, weil daneben jetzt die App liegt. Das
+Panel hebt sich stattdessen durch seinen Schatten ab.
+
+**Dazu die Kartenwahl im Panel.** Sie stand nur in den Einstellungen. Eine
+zweite ID wäre ein Duplikat, und der Browser nimmt dann still die erste —
+deshalb trägt der zweite Ort eine **Klasse**. `objektkarten-stil.js`
+arbeitet jetzt über `hosts()` statt über ein einzelnes Element und hält
+beide Orte per `wahlNachziehen()` gleich.
+
+**Nachweis** (mit stillgelegten Übergängen, sonst misst man den
+eingefrorenen Startwert):
+
+```
+Panel steht           1757 bis 2133 von 2133      sichtbar
+Reiter                obenauf tab-lbl             erreichbar
+Eingabefeld           obenauf Platzhalter         erreichbar
+Menuepunkt            obenauf sb-act-l            erreichbar
+Abdunkler im Stapel   nirgends
+Kartenwahl im Panel   7 Knoepfe
+```
+
+**Gold-Audit RC=0. Commit `e9e1089`.**
+
+> **Zum dritten Mal an einem Tag** hat mich der verborgene Messtab
+> getäuscht: das Panel meldete `translateX(376px)` und schien zu, obwohl
+> `.open` gesetzt war. Mit `transition:none` steht es bei 1757. Ein
+> Mausklick kommt in einem verborgenen Tab ebenfalls nicht an — „Clicked
+> at" im Werkzeugprotokoll ist kein Beweis für einen Treffer. Belastbar ist
+> `elementsFromPoint`: es ist dieselbe Trefferprüfung, die der Browser beim
+> echten Klick fährt.
