@@ -765,6 +765,43 @@ function showSettings(initialTab) {
            Karten ein." Die Reihenfolge ist Absicht: erst WO die Dinge
            liegen, dann WIE die Objektkarten darin aussehen. */
         '<div id="dp-objkarte-wahl-host" style="margin-bottom:12px"></div>' +
+        /*    v1719 · DER WEG INS PANEL STEHT BEI DEM, WAS ER FEINER MACHT
+           Marcel: Darstellung oeffnen moechte ich bitte auch in den
+           Einstellungen weiter oben bei der Layout auswahl haben."
+
+           v1706 hatte den Knopf aus diesem Block genommen und nur den
+           unten stehen lassen. Das war die halbe Bewegung: oben wird
+           GROB gewaehlt (Layout, Objektkarten), das Feine liegt im
+           Panel  der Weg dorthin gehoert also hierher, nicht ans Ende
+           einer langen Seite. Der untere Abschnitt faellt dafuer weg,
+           damit es bei EINEM Weg bleibt.
+
+           GESPERRT AB PLAN: Marcel: Erst ab Pro ist das Darstellung
+           oeffnen moeglich." Gemessen an der laufenden App, dass genau
+           das schon im Datenmodell steht:
+
+             free (fehlt) · starter (fehlt) · investor (fehlt)
+             pro  true    · partner true       <- features.theme_palette
+
+           Der Schluessel wird also nicht erfunden, sondern der
+           vorhandene benutzt  ein neuer waere fuer JEDEN false
+           (auch fuer Pro) und haette die Funktion still abgeschaltet.
+           Geprueft wird mit `Plan.full()`, nicht `Plan.can()`: gemessen
+           gibt `can('theme_palette')` auch im Partner-Plan false,
+           `full()` und `mode()` sagen beide 'full'. */
+        (function(){
+          var frei = true;
+          try { if (window.Plan && typeof Plan.full === 'function') frei = !!Plan.full('theme_palette'); } catch(e){}
+          if (frei) {
+            return '<button type="button" class="btn" style="margin-bottom:12px" onclick="_dpOpenFromSettings()">Darstellung \u00f6ffnen</button>';
+          }
+          /* Sichtbar, aber zu  wer nicht weiss, dass es das gibt, fragt
+             auch nicht danach. Der Grund steht daneben, nicht im Tooltip. */
+          return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">' +
+                   '<button type="button" class="btn" disabled style="opacity:.5;cursor:not-allowed">Darstellung \u00f6ffnen</button>' +
+                   '<span class="hint" style="margin:0">Feineinstellungen (Vorlagen, Farben, Schrift) ab <strong>Pro</strong></span>' +
+                 '</div>';
+        })() +
         '<div style="padding:12px 14px;background:#FAF9F4;border-radius:8px;border:1px solid rgba(201,168,76,0.25)">' +
           /* v1706: HIER STAND DIE WAHL OBSIDIAN / HELL UND DER KNOPF
              DARSTELLUNG OEFFNEN.
@@ -879,11 +916,11 @@ function showSettings(initialTab) {
           '<button type="button" class="dp-tt-mode-btn' + (_mbThemePref()==='dark'?' active':'') + '" data-mbth="dark" onclick="_setMbThemeDark()">Dunkel<span class="dp-tt-mode-btn-label">Obsidian/Gold</span></button>' +
         '</div>' +
         /* === v648-mb-theme END === */
-        /* === v931-disp-button === */
-        '<hr class="dvd">' +
-        '<h2 class="set-section-h2">Darstellung</h2>' +
-        '<p class="hint" style="margin-bottom:12px">Farben, Schrift und Modus stellst du im Darstellungs-Men\u00fc direkt in der App ein \u2014 so siehst du jede \u00c4nderung sofort.</p>' +
-        '<button type="button" class="btn" onclick="_dpOpenFromSettings()">Darstellung \u00f6ffnen</button>' +
+        /* v1719: der zweite Knopf DARSTELLUNG OEFFNEN stand hier. Er ist
+           nach oben zur Layout-Wahl gewandert (siehe dort). Zwei Wege zum
+           selben Panel in einer Ansicht sind keine Bequemlichkeit, sondern
+           eine Frage, die sich der Nutzer stellen muss: ob es derselbe
+           ist. (Dieselbe Begruendung stand schon in v1706.) */
       '</div>' +
       '</div>' +    // pane-wrap Ende
       '<div class="settings-footer save-row">' +

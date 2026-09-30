@@ -252,7 +252,7 @@
                        '.dp-pf-tile', '.sb-act-item', '.hdr-icon-btn',
                        '#hdr-credits-pill', '.dpl-portfolio', '.tabs-status-badge'];
 
-  /* PP v1716i � DIE KASKADE WAR DER FALSCHE WEG PPPPPPPPPPPPPPPPPPPP
+  /* PP v1716i � DIE KASKADE WAR DER FALSCHE WEG PPPPPPPPPPPPPPPPPPPP
      Marcel: "Auch auf rund oder kantig ... das funktioniert nicht."
 
      SIEBEN Anlaeufe ueber CSS, und die Messung blieb bei 2 von 9
@@ -1556,7 +1556,37 @@
      Die Pruefung wandert deshalb hierher auf die Farbsektion (gateSetzen).
      Der Wrapper wird nicht entfernt, sondern ueberschrieben: diese Datei
      laedt nach settings.js, also gilt diese Zuweisung. */
+  /* ── v1719 · AB PRO ──────────────────────────────────────────────────
+     Marcel: „Erst ab Pro ist das Darstellung oeffnen moeglich."
+
+     Der Knopf in den Einstellungen zeigt sich seither gesperrt; hier
+     steht dasselbe Tor noch einmal im WEG. Ein Knopf, der nur ausgegraut
+     ist, sperrt nichts - er bittet darum, nicht gedrueckt zu werden.
+
+     Geprueft wird `features.theme_palette`, der Schluessel, der die
+     Trennung schon traegt (gemessen: free/starter/investor fuehren ihn
+     nicht, pro und partner auf true). `Plan.full()` statt `Plan.can()`:
+     gemessen gibt `can('theme_palette')` auch im Partner-Plan false.
+
+     Im Zweifel OFFEN, nicht zu: ist `Plan` noch nicht geladen, waere ein
+     hartes Nein schlimmer als ein zu frueh geoeffnetes Panel - der Nutzer
+     haette eine bezahlte Funktion vor sich, die ihn abweist. */
+  function darstellungFrei() {
+    try {
+      if (window.Plan && typeof Plan.full === 'function') return !!Plan.full('theme_palette');
+    } catch (e) {}
+    return true;
+  }
+
   window._dpOpenFromSettings = function () {
+    if (!darstellungFrei()) {
+      try {
+        if (typeof toast === 'function') {
+          toast('Die Feineinstellungen der Darstellung gibt es ab dem Pro-Plan.');
+        }
+      } catch (e) {}
+      return;
+    }
     try { if (typeof closeSettings === 'function') closeSettings(); } catch (e) {}
     setTimeout(oeffnen, 140);
   };
