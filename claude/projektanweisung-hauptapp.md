@@ -25080,3 +25080,76 @@ Danach: 10.890 Regeln, 19 auf `#hdr-badges`, Täter sofort benannt.
 Dieselbe Bauart steckte in mehreren Messungen dieser Sitzung und erklärt
 rückwirkend mindestens zwei „0 Treffer"-Befunde, auf die ich Diagnosen
 gestützt habe.
+
+---
+
+## v1721 · Der leere Badge-Streifen unter dem Kopf
+
+**Was.** Marcel: „zwischen header und menü links und rechts ist jetzt ein
+heller streifen"
+
+Gemessen im Standard-Layout, Vorlage Kontor:
+
+```
+#hdr-badges   :empty = true, 0 Kinder
+              und trotzdem 1749 x 8 px, background rgb(255,255,255)
+              padding 4px 14px, box-sizing border-box
+```
+
+**Ein leerer Behälter mit Innenabstand ist kein leerer Behälter — er ist
+ein Streifen.** Sichtbar wird er erst, wenn eine Vorlage ihm eine eigene
+Fläche gibt: Kontor und Panel weiß, Kanzlei 251/250/247, Boarding creme.
+Auf Obsidian und Konsole fällt er nicht auf, weil die Fläche dort so dunkel
+ist wie der Kopf darüber — deshalb sieht man ihn erst beim Wechsel.
+
+**Zwei Wächter wollten das schon verhindern, keiner steht da, wo es
+passiert:**
+
+| Ort | warum die Regel nicht greift |
+|---|---|
+| `style.css:13630` | `.hdr-v61-row2:empty{display:none}` — **ohne `!important`**, verliert gegen `body:not(.hdr-collapsed) #hdr-badges{display:block !important}`; die ID schlägt die Klasse |
+| `style.css:36281` | `#hdr-badges:not(:has(.hdr-incomplete-banner)){display:none !important}` — steht **innerhalb einer `@media(max-width)`-Query**, auf dem Desktop gibt es sie nicht |
+
+> Der eine ist zu schwach, der andere zu schmal. Zwei Wächter mit demselben
+> Auftrag ersetzen keinen, der wirkt.
+
+Die neue Regel trägt die ID selbst, gilt in jeder Breite und greift
+ausschließlich am LEEREN Behälter. `:not(:has(*))` steht daneben, weil
+`:empty` schon an einem einzigen Leerzeichen scheitert, das ein späterer
+Aufbau hinterlässt.
+
+**Nachweis.** Alle **24** Kombinationen (4 Layouts × 6 Vorlagen): vorher
+vier Treffer im Standard, jetzt **kein einziger**. Gegenprobe, dass nicht
+zu viel verschwindet:
+
+```
+Behaelter leer           0 px, unsichtbar
+mit 70-Prozent-Hinweis   137 px, sichtbar, Text lesbar
+```
+
+**Gold-Audit RC=0. Commit `7807adf`.**
+
+### Beinahe-Schaden: style.css ist NICHT UTF-8
+
+Mein erster Anlauf las und schrieb `style.css` als `utf8` — die Datei ist
+aber **Latin-1** und enthält eine Stelle, die als UTF-8 ungültig ist. Das
+Lesen ersetzte sie durch U+FFFD, das Schreiben hätte den Ersatz
+festgeschrieben. Aufgefallen an einer Zeile, die stutzig machte:
+
+```
+style.css vorher | UTF-8: false      <- vor dem Eingriff
+nachher          | UTF-8: true       <- "repariert", also verfälscht
+```
+
+> Eine Datei, die plötzlich gültiger wird, ist ein Warnzeichen, kein
+> Fortschritt.
+
+Zurückgesetzt und mit `latin1` wiederholt, die Sonderzeichen im Kommentar
+vorher auf ASCII gebracht. Gegengeprüft: Steuerzeichen keine,
+Ersatzzeichen 1 wie vorher, Hoch-Bytes 125832 unverändert, Klammerbilanz
+ausgeglichen, Diff 44 Zeilen.
+
+**Zur Kodierung gilt damit gemessen:** `settings.js` ist UTF-8,
+`style.css` ist Latin-1. Sie gehört vor jedem Skript-Eingriff gemessen,
+nicht angenommen — am selben Tag hatte derselbe Fehler in der anderen
+Richtung `settings.js` beschädigt (v1719b).
