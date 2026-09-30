@@ -6583,3 +6583,43 @@ html[data-dp-objkarte="cockpit"] .dpl-schiene :is(#sb-list) .sb-card .sbc-invest
 html[data-dp-objkarte] .dpl-schiene :is(#sb-list) .sb-card .sbc-investor-ribbon{
   display:none !important;
 }
+
+/* =====================================================================
+   v1718 - DER 70-PROZENT-HINWEIS STAND ZU ZWEI DRITTELN AUSSERHALB
+   =====================================================================
+   Marcel: "wenn der investor deal score nicht erreicht ist steht unten
+   links im menue 'Bitte mindestens 70% der ....' das kann man nicht
+   komplett lesen."
+
+   Gemessen in v1b und v2, mit dem echten Markup aus calc.js:217 und
+   vollstaendig nachgestelltem Zustand (hdr-banner-only gesetzt,
+   hdr-no-score entfernt, _updateHdrHeight gerufen):
+
+     Text   711 px breit      Platz  247 px     unsichtbar  464 px
+     Ort    .dpl-schiene, overflow:hidden, bei y=780 - unten links
+
+   Im Standard sitzt der Banner im Header und hat 1491 px - dort ist
+   `white-space:nowrap` (style.css:13429) richtig, eine Kopfzeile soll
+   nicht umbrechen. In den neuen Layouts wandert derselbe Banner in die
+   248 px schmale Schiene, und dort schneidet deren `overflow:hidden`
+   zwei Drittel des Satzes ab - ohne Ellipse, ohne Scrollbalken. Es
+   sieht aus wie ein Text, der zu Ende ist.
+
+   > `nowrap` ist eine Aussage ueber den PLATZ, nicht ueber den Text.
+   > Wandert das Element in einen schmaleren Ort, wandert die Aussage
+   > nicht mit - sie wird dort zur Luege.
+
+   Gegengemessen: mit Umbruch 217 x 73 px, alles lesbar, und die Schiene
+   ist an der Stelle 945 px hoch - es passt. Der Standard bleibt
+   unberuehrt, weil jede Regel an `[data-dp-layout]` haengt.
+   ===================================================================== */
+html[data-dp-layout] body .hdr-incomplete-banner{
+  flex-wrap:wrap;
+  align-items:flex-start;
+}
+/* min-width:0 loest die Mindestbreite des Flex-Kindes - ohne sie schrumpft
+   ein nicht umbrechendes Kind nicht unter seine Inhaltsbreite. */
+html[data-dp-layout] body .hdr-incomplete-text{
+  white-space:normal;
+  min-width:0;
+}
