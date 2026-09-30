@@ -2155,3 +2155,53 @@ html[data-dp-kartenstil="buetten"] .dp-pfbar :is(#oab-run, .qc6-run).dp-pf-launc
   border:0 !important;
   box-shadow:0 1px 3px rgba(120,100,60,.3) !important;
 }
+
+/* =====================================================================
+   v1713b - DER QR RISS DIE BUETTEN-LEISTE AUF 334 PX
+   =====================================================================
+   Gemessen nach v1713: die Leiste war 1280x334 statt rund 90. Alle
+   Kinder standen auf 323 px Hoehe - weil EINES so hoch war und
+   `align-items:stretch` den Rest mitzieht:
+
+     .dp-pf-qr   328 x 323
+
+   Ich hatte dem QR bei Buetten keine Groesse gegeben, nur Polsterung.
+   Ohne Grenze nimmt er, was da ist.
+
+   > `align-items:stretch` macht aus einem zu grossen Kind eine zu grosse
+   > Zeile. Der Fehler sieht dann aus, als waere die ganze Leiste falsch
+   > gebaut - dabei ist es ein einziges Element.
+   ===================================================================== */
+html[data-dp-kartenstil="buetten"] .dp-pfbar{
+  align-items:center !important;
+}
+html[data-dp-kartenstil="buetten"] .dp-pfbar > .dp-pf-qr{
+  width:64px !important; height:64px !important;
+  min-width:64px !important; min-height:0 !important;
+  max-width:64px !important; max-height:64px !important;
+  flex:0 0 64px !important;
+  align-self:center !important;
+}
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-qr canvas,
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-qr img,
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-qr svg{
+  width:52px !important; height:52px !important;
+  max-width:52px !important; max-height:52px !important;
+}
+/* Der Pre-Flight-Block darf die Hoehe vorgeben, aber nicht mehr als
+   noetig - er ist die Bordkarte, nicht die Seite. */
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-lead{
+  align-self:stretch !important;
+  min-height:0 !important;
+}
+html[data-dp-kartenstil="buetten"] .dp-pfbar > .dp-pf-seg{
+  align-self:center !important;
+  padding:10px 12px !important;
+}
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-perf,
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-sep{
+  align-self:stretch !important;
+}
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-rz{
+  align-self:center !important;
+}
