@@ -25447,3 +25447,59 @@ document.body.appendChild(f);      // 8 s warten, dann contentDocument messen
 Darin **immer** `transition:none` setzen, sonst misst man den eingefrorenen
 Startwert. Und die Reiterleiste beim Überlauf-Test ausklammern: sie scrollt
 absichtlich horizontal.
+
+---
+
+## v1730/v1730b · Die Investor-Pille war nicht zu dunkel, sie war zu klein
+
+Marcel: „den investor deal score im menü rechts die schrift schlecht
+lesen" — dazu der Screenshot `Dateien/investor.png`. Gemeint ist die
+**INVESTOR-Pille** oben rechts auf jeder Objektkarte, nicht der Score im
+Hauptbereich. Das Bild hat die Suche entschieden; vorher hatte ich zweimal
+an der falschen Stelle gemessen.
+
+Gemessen an den neun Pillen der Objektliste:
+
+| | Farbe | Grund | Kontrast |
+|---|---|---|---:|
+| Pille (gold) | `rgb(226,201,126)` | `rgb(42,36,21)` | **9,45** |
+| Pille (grün) | `rgb(111,215,154)` | `rgb(22,39,27)` | **8,86** |
+| Lasche daneben | | | **8,07** |
+
+> Der Kontrast war nie das Problem. 9,45 ist mehr als das Doppelte des
+> Nötigen — was fehlt, ist Größe. **Eine Schrift, die man nicht lesen
+> kann, ist nicht zwingend zu blass.**
+
+### Der erste Anlauf war wirkungslos
+
+`style.css` führt für die Pille `font-size: 8.5px`. Ich habe diesen Wert
+gelesen und auf 9,5 px angehoben — **gemessen stand sie aber bereits auf
+9,5**, weil die Textgrößen-Einstellung den Grundwert hochskaliert.
+
+> Ein Wert im Stylesheet ist nicht der Wert auf dem Schirm. Wer eine Größe
+> anhebt, muss vorher die **gemessene** lesen, nicht die geschriebene.
+
+### Der zweite Anlauf
+
+Gegengemessen, was auf die 216 px breite Karte passt:
+
+```
+10,5px -> Pille 83     11px -> 86     11,5px -> 88     12px -> 88
+```
+
+Bei **11 px** stehen Pille und Lasche zusammen auf 152 von 216 — Platz
+genug, und der Sprung ist groß genug, um ihn zu sehen. Die Lasche zieht
+mit: zwei Größen nebeneinander lesen sich schlechter als eine.
+
+**Nachgemessen:**
+
+```
+vorher   Pille 78x19 @9,5px   Lasche 66x19 @9,5px
+jetzt    Pille 86x21 @11px    Lasche 74x21 @11px   "2026-999" vollstaendig
+ueber die Karte ragt nichts (9 Karten geprueft)
+```
+
+Nur in den Ansichten — dort hat Marcel es gesehen, und der
+Auslieferungszustand bleibt unberührt.
+
+**Gold-Audit RC=0. Commits `a6f7d47`, `621707a`.**
