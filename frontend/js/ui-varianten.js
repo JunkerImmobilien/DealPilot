@@ -219,7 +219,7 @@
     attr('data-ui-surface', get('ui_surface', SURFACE));
     attr('data-ui-form',    get('ui_form',    FORMEN));   /* v1098 */
     formRadien(get('ui_form', FORMEN));                  /* v1716e */
-    grundSperre();                                        /* v1156 */
+    grundSperre();                                        /* v1156 */
 
     machbarkeit();           /* v1720 */
   }
@@ -497,6 +497,26 @@
     var k = document.getElementById('dpk-seg');
     if (k && k.parentElement) k.parentElement.style.display = layout ? '' : 'none';
   }
+
+  /* v1720b: die Lage aendert sich auf ZWEI Wegen, nicht auf einem.
+     Gemessen nach v1720: nach einem Vorlagenwechsel stimmte die Anzeige,
+     nach einem LAYOUT-Wechsel nicht - der laeuft ueber
+     `DealPilotLayout.setze()` und kommt an `anwenden()` vorbei.
+
+     > Wer eine Anzeige an einen Zustand haengt, muss jeden Weg kennen,
+     > auf dem dieser Zustand sich aendert. Zwei Aufrufstellen sind eine
+     > Vermutung; das Attribut selbst zu beobachten ist eine Zusage.
+
+     Der Beobachter haengt am Attribut, nicht am Knopf - damit gilt er
+     auch fuer den Umschalter in den Einstellungen und jeden spaeteren
+     Weg. Keine Schleife: machbarkeit() fasst nur `style.display` im
+     Panel an, nie diese Attribute. */
+  try {
+    new MutationObserver(machbarkeit).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-dp-layout', 'data-ui-theme']
+    });
+  } catch (e) {}
 
   /* ── v1156c · Eine ausgegraute Sperre ist nur eine optische ────────────
      Im Pruefstand gemessen: `.dpuv-lock.locked>.dpuv-inner` setzt
@@ -1423,7 +1443,7 @@
   function oeffnen() {
     bauen();
     gateSetzen();
-    grundSperre();           /* v1156: beim Aufbau, nicht erst beim naechsten Klick */
+    grundSperre();           /* v1156: beim Aufbau, nicht erst beim naechsten Klick */
 
     machbarkeit();           /* v1720 */
     markeAuffrischen();      /* v1098: Reseller-Zustand und Logo sind aeusserer Zustand */
