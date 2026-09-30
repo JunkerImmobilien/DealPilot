@@ -25360,3 +25360,90 @@ Impressum/Datenschutz 10 px  Kontrast 2,32
 
 Beides ist schwach, aber **keines davon ist der Investor Deal Score**. Ich
 nenne es hier, statt es stillschweigend für Marcels Befund zu halten.
+
+---
+
+## v1727–v1729 · Die Vorlagen raus, und die App auf Handy und Tablet
+
+### v1727 · Eine Vorlage, die man nicht mehr abwählen kann
+
+Marcel: „die app darstellung die einstellung passt nicht zusammen mit den
+neuen layouts. das darf nicht auswählbar sein unter darstellung öffnen."
+
+Die sechs Vorlagen **wirken** in den neuen Ansichten — gemessen sind alle
+sechs unterscheidbar. Sie passen nur nicht dazu, und das ist eine
+Gestaltungsfrage, keine Messfrage: die Ansichten bringen ihre eigene
+Typografie und Flächenaufteilung mit.
+
+> Ausblenden allein genügt hier nicht. Wer eine Vorlage aktiv hat und dann
+> eine Ansicht wählt, sähe den Abschnitt verschwinden — mitsamt dem
+> einzigen Weg zurück. Die Vorlage hinge dann fest.
+
+Deshalb wird sie beim Wechsel **zurückgesetzt**, über denselben Weg, den
+der Nutzer sonst geht (`save` + `anwenden`). Nachgemessen:
+
+```
+Standard              Vorlagen waehlbar, wirken
+Vorlage gesetzt       data-ui-theme=kanzlei
+dann Layout gewaehlt  data-ui-theme leer, Abschnitt weg
+```
+
+Umgekehrt zu allen anderen Gruppen: hier blendet das **Layout** aus, nicht
+sein Fehlen. **Commit `6455142`.**
+
+### v1728/v1729 · Handy und Tablet
+
+Marcel: „alles muss auf dem handy und tablet funktionieren"
+
+Gemessen in der Messkabine (gleich-Origin-iframe mit fester Breite — die
+Fenstergröße allein wirkt nicht auf Media-Queries).
+
+**Handy, 387 px:** das Kontingent-Blatt stand bei −15..370 und war links
+abgeschnitten. Ursache: `min-width:270px` plus Inhalt an einer
+rechtsbündigen Pille — die Breite wuchs über den Schirm, und `right:0` hält
+nur die rechte Kante.
+
+> Eine Mindestbreite ist ein Versprechen an den Inhalt. Auf einem schmalen
+> Schirm wird daraus ein Anspruch, den der Schirm nicht einlösen kann.
+
+**Tablet, 765 px:** der Abrufen-Knopf der Datenaufnahme stand bei
+**808..1016** — 251 px außerhalb und unerreichbar, der QR-Code 29 px. Die
+Kinder liefen über ihren **eigenen** Container hinaus: flex mit `nowrap`,
+kein Schrumpfen, `overflow-x:visible`. Die Seite scrollt deshalb auch
+nicht — es gab keinen Weg zu dem Knopf.
+
+Gegengemessen: `overflow-x:auto` ändert nichts (der Container wächst nicht
+mit), `flex-wrap:wrap` holt ihn auf 48..256.
+
+> Ein Knopf, den man nicht erreichen kann, ist kein Knopf.
+
+**Abnahme über drei Breiten:**
+
+```
+            Abrufen-Knopf   Leiste   Ueberlaeufe
+Handy  387   30..386  ok    415 px        0
+Tablet 765   48..256  ok    190 px        0
+Desktop 1437 1074..1282 ok   89 px        0
+```
+
+Der Umbruch greift nur zwischen 701 und 1100 px: darunter hat die
+Handy-Fassung ihre eigene Gestaltung (dort wurde bei 387 px kein einziger
+Überlauf gemessen), darüber bleibt die Leiste einzeilig.
+
+**Gold-Audit RC=0. Commits `4122400`, `23f3b97`.**
+
+### Werkzeugnotiz: die Messkabine
+
+Responsive lässt sich nur im **gleich-Origin-iframe mit fester Breite**
+messen. Der Ablauf, der sich bewährt hat:
+
+```js
+var f = document.createElement("iframe");
+f.style.cssText = "position:fixed;left:0;bottom:0;width:390px;height:844px;z-index:2147483000";
+f.src = "/?kabine=handy";          // gleicher Origin, eigene Instanz
+document.body.appendChild(f);      // 8 s warten, dann contentDocument messen
+```
+
+Darin **immer** `transition:none` setzen, sonst misst man den eingefrorenen
+Startwert. Und die Reiterleiste beim Überlauf-Test ausklammern: sie scrollt
+absichtlich horizontal.
