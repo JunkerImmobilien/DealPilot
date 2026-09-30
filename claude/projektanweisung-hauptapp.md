@@ -25618,3 +25618,93 @@ Objektart **MFH** (`#objart`). Alle vier Schritte durchgeklickt:
 
 Läuft durch. Der Testzustand wurde danach zurückgenommen (Abbrechen,
 Objektart wieder leer).
+
+---
+
+## Durchgang 30.09.2026 · Testobjekte, Bilder, PDFs
+
+### Der Einstiegspunkt, den ich zweimal nicht gefunden hatte
+
+Zweimal habe ich gemeldet, ein Objekt lasse sich „im Messtab nicht laden" —
+weder `.click()`, noch ein echter Mausklick, noch ein synthetisches
+`MouseEvent`. Das war **Aufgeben, keine Diagnose**. Der Weg steht im Code:
+
+```js
+storage.js:1490   loadSaved(this.getAttribute('data-key'))
+```
+
+`loadSaved(key)` ist global und genau der Weg, den der Klick selbst nimmt.
+
+> Wenn ein Werkzeug nicht durchkommt, ist die Frage nicht „welche
+> Klick-Variante noch", sondern „was ruft der Klick eigentlich auf".
+
+### Testobjekt Löhner Str. 278 (2026-1006)
+
+```
+gefuellt   15 von 57 Feldern
+
+  plz 32120 · ort Hiddenhausen · str "Löhner Str." · hnr 278
+  objart EFH · wfl 233 · baujahr 1964 · zimmer 7 · gsfl 700
+  wirtschaftlicher_uebergang 2026-08-12 · ds2_zustand gut
+  vermstand Vollvermietet · ausst Normal · exitstr Langfristig · erbpacht on
+
+leer       alle acht Modernisierungsfelder
+  mod_dach · mod_fenster · mod_leitungen · mod_heizung
+  mod_aussenwand · mod_baeder · mod_innenausbau · mod_grundriss
+```
+
+**Zwei Dinge zum Nachsehen:** CLAUDE.md führt das Objekt als **ZFH**, im
+Datensatz steht **EFH**. Und ohne die Modernisierungspunkte rechnet die
+Restnutzungsdauer nach Anlage 2 mit dem Rückfall statt mit dem Zustand.
+
+**Eine eigene Fehlmessung dabei:** Ich hatte zuerst „Baujahr leer,
+Straße leer" gemeldet — beides falsch. Ich hatte die Feld-IDs geraten
+(`bj`, `strasse`) statt sie auszulesen (`baujahr`, `str`).
+
+### Bilder: sechs von zwölf
+
+```
+mit Bild   2026-999 · 2026-1008 · 2026-1007 · 2026-1002 · 2026-004 · 2026-001
+ohne Bild  2026-1006 · 2026-1050 · 2026-1042 · 2026-1041 · 2026-1040 · 2026-1036
+```
+
+Die vorhandenen liegen als **eingebettetes Bild** (data-URI, rund 11 000
+Zeichen) im CSS-Hintergrund von `.sbc-thumb-photo`, nicht als `<img>`.
+
+**Kein Defekt, aber eine Fehlmessung von mir:** Ich hatte „Foto-Klasse
+gesetzt, aber kein Bild" gemeldet, weil ich nach `<img>` gesucht und im
+zugeklappten Portfolio gemessen hatte (`.sbc-thumb` steht dort auf
+`display:none`, die Karte auf 0×0).
+
+### PDF-Export: ein belastbarer Verdacht
+
+`exportPDFBlob()` liefert **keinen Blob** — in drei Anläufen, ohne Fehler
+und ohne Konsolenausgabe:
+
+```
+exportPDFBlob()                                31 ms   kein Blob
+exportPDF({ohneRueckfrage:true}) + Blob-Modus 815 ms   kein Blob
+mit gemerkter Wahl dp_pdf_wahl=obsidian       670 ms   kein Blob
+
+geprueft und frei:  Paywall.gate(exports)=true · jspdf geladen
+                    State.kpis.kp=350000 · loadAssets/loadPhotoMeta fehlerfrei
+```
+
+**Warum das zählt:** `deal-action.js:1205` hängt das Investment-PDF über
+genau diese Funktion an die E-Mail. Kommt kein Blob, läuft der Code
+weiter — **ohne Anhang und ohne Meldung**:
+
+```js
+.then(function(result) {
+  if (result && result.blob) { … files['_investmentanalyse'] = [pdfFile]; }
+  step2_addBankPdf();        // sonst einfach weiter
+})
+```
+
+> Eine stille Verwerfung ist der teure Fehler: der Absender sieht eine
+> versandte Mail, der Empfänger eine ohne Anhang.
+
+**Nicht abschließend bewiesen** — es kann auch am Messaufbau liegen (der
+Tab läuft im Hintergrund). Der schnellste Gegentest ist ein echter: in der
+Deal-Aktion eine Mail mit Investment-PDF-Anhang erzeugen und nachsehen, ob
+die Datei dranhängt.
