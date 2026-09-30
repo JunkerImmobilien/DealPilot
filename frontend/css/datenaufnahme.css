@@ -1995,3 +1995,163 @@ html[data-dp-kartenstil="kartei"] .dp-pfbar > .dp-pf-qr.dp-pf-qr svg{
   max-width:none !important; max-height:none !important;
   border:none !important; box-shadow:none !important; border-radius:0 !important;
 }
+
+/* =====================================================================
+   v1713 - ENTWURF 21 "BUETTEN" ALS KARTENSTIL
+   =====================================================================
+   Marcel hat das Bild geschickt (Dateien/karte.png): Variante 21 aus
+   design/mockups/preflight-varianten-v1425.html, Zeile 838 ff.
+
+   "Schweres Buettenpapier mit sichtbarer Faser; die Kacheln sind nicht
+    gedruckt, sondern blindgepraegt - der aktive Zustand ist eine
+    Vertiefung mit Goldkante."
+
+   Die Regeln sind aus der Demo UEBERNOMMEN, nicht nachgebaut. Nur die
+   Klassennamen sind gemappt - in der echten App tragen sie das Praefix
+   `dp-`, im Uebrigen heissen sie gleich:
+
+     .v-buetten      ->  html[data-dp-kartenstil="buetten"] .dp-pfbar
+     .pf-lead        ->  .dp-pf-lead      .pf-tile   -> .dp-pf-tile
+     .pf-bp/.k/.s    ->  .dp-pf-lead .bp/.k/.s
+     .pf-tile.an     ->  .dp-pf-tile.on   .pf-led    -> .dp-pf-led
+     .pf-grouplbl    ->  .dp-pf-grouplbl  .pf-sep    -> .dp-pf-sep
+     .pf-qr .code    ->  .dp-pf-qr        .pf-perf   -> .dp-pf-perf
+     .pf-rz          ->  .dp-pf-rz
+
+   Gegengeprueft im Browser: alle siebzehn Teile existieren unter diesen
+   Namen.
+
+   > Eine Vorlage wird uebernommen, nicht interpretiert. Wer sie
+   > nachbaut, baut sein eigenes Bild von ihr.
+
+   Der helle Grund ist hier Absicht und kein Versehen: Buetten IST
+   Papier. Deshalb kehren auch die Textfarben um - dunkle Tinte auf
+   hellem Grund, nur der Pre-Flight-Block links bleibt dunkel.
+   ===================================================================== */
+html[data-dp-kartenstil="buetten"] .dp-pfbar{
+  --loch:#0B0B09;
+  background:
+    repeating-linear-gradient(0deg, rgba(150,132,96,.035) 0 1px, transparent 1px 2px),
+    repeating-linear-gradient(90deg, rgba(150,132,96,.03) 0 1px, transparent 1px 2px),
+    radial-gradient(120% 100% at 30% 0%, #FFFDF7, #F6F0E2 62%) !important;
+  box-shadow:0 14px 36px rgba(90,76,40,.24), inset 0 1px 0 rgba(255,255,255,.9) !important;
+  border:0 !important;
+  border-radius:16px !important;
+  overflow:hidden !important;
+  display:flex !important; align-items:stretch !important;
+  padding:0 !important; gap:0 !important;
+  min-height:78px !important; height:auto !important;
+}
+
+/* Der Pre-Flight-Block links bleibt dunkel - er ist die Bordkarte im
+   Papier, nicht Teil des Bogens. */
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-lead{
+  background:#100E0A !important;
+  border-radius:16px 0 0 16px !important;
+  box-shadow:inset -1px 0 0 rgba(184,147,47,.4) !important;
+  display:flex !important; flex-direction:column !important;
+  justify-content:center !important;
+  padding:12px 16px !important;
+  flex:0 0 auto !important;
+  order:0 !important;
+}
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-lead .bp{ color:#8A7F62 !important; }
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-lead .k { color:#F5EEDC !important; }
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-lead .s { color:#A2977E !important; display:block !important; }
+
+/* Abschnittsbeschriftungen: MARKTBEWERTUNG, DATEN EINLESEN */
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-grouplbl{
+  color:#9A8F76 !important;
+}
+
+/* Die Kacheln sind blindgepraegt, nicht gedruckt. */
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-tile{
+  background:#FFFDF7 !important;
+  color:#2A2418 !important;
+  border:0 !important;
+  box-shadow:inset 0 0 0 1px rgba(150,132,96,.24),
+             inset 0 1px 0 rgba(255,255,255,.9),
+             0 1px 2px rgba(120,100,60,.14) !important;
+}
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-tile .dp-pf-lbl,
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-tile .dp-pf-logo,
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-tile .dp-pf-logo.dp{
+  color:#2A2418 !important;
+}
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-tile .dp-pf-ic,
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-tile svg{
+  color:#9A8B62 !important; stroke:currentColor !important;
+}
+/* Der aktive Zustand ist eine VERTIEFUNG mit Goldkante - kein Leuchten. */
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-tile.on{
+  background:#FFFDF7 !important;
+  box-shadow:inset 0 0 0 1.5px rgba(184,147,47,.7),
+             inset 0 2px 4px rgba(150,120,50,.18) !important;
+}
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-led{
+  background:#DDD3BC !important;
+  box-shadow:inset 0 1px 2px rgba(120,100,60,.3) !important;
+}
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-tile.on .dp-pf-led{
+  background:var(--wl-b8932f, #b8932f) !important;
+  box-shadow:0 0 8px rgba(184,147,47,.6), inset 0 1px 1px rgba(255,255,255,.5) !important;
+}
+
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-sep{
+  background:rgba(150,132,96,.3) !important;
+  display:block !important; width:1px !important;
+}
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-perf{
+  border-left-color:rgba(120,100,60,.4) !important;
+  display:block !important;
+}
+
+/* QR und Reisszone */
+html[data-dp-kartenstil="buetten"] .dp-pfbar > .dp-pf-qr{
+  display:flex !important; align-items:center !important; justify-content:center !important;
+  background:transparent !important; border:0 !important;
+  flex:0 0 auto !important; padding:0 10px !important;
+}
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-qr canvas,
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-qr img,
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-qr svg{
+  border-color:#2A2418 !important;
+}
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-scan{ color:#9A8F76 !important; }
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-rz{
+  background:radial-gradient(120% 100% at 50% 0%, #FFFDF7, #F4EDDD) !important;
+  display:flex !important; align-items:center !important;
+  margin-left:auto !important; flex:0 0 auto !important;
+  padding:0 14px !important;
+}
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-bc{
+  display:block !important; opacity:.8 !important;
+}
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-stripe{
+  display:none !important;   /* der Runway-Verlauf gehoert nicht aufs Papier */
+}
+
+/* Die beiden Loecher oben und unten - im Entwurf sitzen sie auf der
+   Perforation und machen aus dem Bogen einen Abriss. */
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-perf{
+  position:relative !important;
+}
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-perf::before,
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-perf::after{
+  content:'' !important;
+  position:absolute !important;
+  left:50% !important; transform:translateX(-50%) !important;
+  width:11px !important; height:11px !important;
+  border-radius:50% !important;
+  background:var(--loch, #0B0B09) !important;
+}
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-perf::before{ top:-6px !important; }
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-perf::after { bottom:-6px !important; }
+
+/* Der Abruf-Knopf bleibt gold - er ist die Handlung, nicht das Papier. */
+html[data-dp-kartenstil="buetten"] .dp-pfbar :is(#oab-run, .qc6-run).dp-pf-launch{
+  background:linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C) 55%, var(--wl-b8932f, #b8932f)) !important;
+  color:#1A1407 !important;
+  border:0 !important;
+  box-shadow:0 1px 3px rgba(120,100,60,.3) !important;
+}

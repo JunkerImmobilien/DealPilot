@@ -83,7 +83,11 @@
      zurueck: STILE[stil] ist dann undefined, und setze() setzt ''. */
   var STILE = {
     zeile:  { name: 'Zeile',  sub: 'Eine Leiste, 55 px' },
-    kartei: { name: 'Kartei', sub: 'Kopfzeile, Quellen, Fusszeile' }
+    kartei: { name: 'Kartei', sub: 'Kopfzeile, Quellen, Fusszeile' },
+    /* v1713: Entwurf 21 aus preflight-varianten-v1425.html. Marcel hat
+       das Bild geschickt (Dateien/karte.png) - schweres Papier, die
+       Kacheln blindgepraegt statt gedruckt. */
+    buetten: { name: 'Buetten', sub: 'Papier, Kacheln blindgepraegt' }
   };
 
   var aktuell = '';
