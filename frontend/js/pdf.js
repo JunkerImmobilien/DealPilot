@@ -650,8 +650,40 @@ function pE(n, sgn) {
   else if (n < 0) sign = '-';
   return sign + Math.round(a).toLocaleString('de-DE');
 }
-function pP(n, d) { d = d || 2; return isNaN(n) ? '-' : n.toFixed(d).replace('.', ',') + ' %'; }
-function pN(n, d) { d = d || 1; return isNaN(n) ? '-' : n.toFixed(d).replace('.', ','); }
+/* ══ v1732 · EIN LEERES PROZENTFELD HAT DAS GANZE PDF ABGEBROCHEN ══
+   Gemessen am Objekt 2026-1006 (Löhner Str. 278):
+
+     TypeError: n.toFixed is not a function
+       at pP        (pdf.js:653)
+       at _exportPDFInner (pdf.js:1274)   <- pP(v('makler_p'), 2)
+
+   `v('makler_p')` liefert den FELDWERT, und der ist ein String - hier
+   der leere. `isNaN('')` ist **false**, weil der leere String zu 0
+   wird; der Wächter lässt ihn also durch, und `''.toFixed` gibt es
+   nicht. Dasselbe gilt für jeden gefüllten Zahlenstring: `isNaN('2.2')`
+   ist ebenfalls false.
+
+   > `isNaN` prüft, ob sich etwas in eine Zahl VERWANDELN lässt, nicht,
+   > ob es eine ist. Wer danach `toFixed` ruft, verlässt sich auf eine
+   > Prüfung, die eine andere Frage beantwortet hat.
+
+   WAS DAS ANRICHTET: der Fehler fliegt in `_exportPDFInner` bei rund
+   35 % Fortschritt. `exportPDF` fängt ihn, zeigt einen Toast und
+   schliesst das Fenster - es gibt KEIN PDF. Und `deal-action.js:1205`
+   hängt das Investment-PDF über `exportPDFBlob()` an die Mail: kommt
+   nichts zurück, läuft der Code **still** weiter. Der Absender sieht
+   eine versandte Mail, der Empfänger eine ohne Anhang.
+
+   Beide Funktionen wandeln jetzt selbst und prüfen auf ABWESENHEIT,
+   bevor sie rechnen - dieselbe Regel wie bei `_euro(null)` und
+   `Number(null)` in CLAUDE.md. */
+function _pfZahl(n) {
+  if (n === null || n === undefined || n === '') return NaN;
+  var x = (typeof n === 'number') ? n : Number(String(n).replace(',', '.'));
+  return isFinite(x) ? x : NaN;
+}
+function pP(n, d) { d = d || 2; var x = _pfZahl(n); return isNaN(x) ? '-' : x.toFixed(d).replace('.', ',') + ' %'; }
+function pN(n, d) { d = d || 1; var x = _pfZahl(n); return isNaN(x) ? '-' : x.toFixed(d).replace('.', ','); }
 
 /* ── PAGE TEMPLATE ──────────────────────────────── */
 function pageTpl(doc, num, subtitle, W, M) {
