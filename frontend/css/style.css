@@ -38153,7 +38153,8 @@ header.hdr #hdr-badges:not(:has(*)){
    die Symbol-Icons aus dem Sprite. Mehrteilige SVGs (Score-Ring,
    Diagramme) setzen fill und stroke an ihren eigenen Knoten und bleiben
    unberuehrt - sie standen in der Messung auch nie im Weg.
-   ===================================================================== */
+   =====================================================================
+
    NACHTRAG v1723b - DIE REGEL WAR ZU BREIT.
    Erst global gesetzt und nachgemessen: die acht .ct-ico im Objekt-Tab
    fielen dadurch von Kontrast 21 auf 2,29. Sie sind das EINZIGE sichtbare
