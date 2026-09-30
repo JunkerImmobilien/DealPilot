@@ -6271,3 +6271,278 @@ html[data-dp-layout] :is(#sb-list) .sb-card:hover{
   box-shadow:none !important;
   outline:0 !important;
 }
+
+/* =====================================================================
+   v1714 - DIE OBJEKTKARTEN-ENTWUERFE ZUM UMSCHALTEN
+   =====================================================================
+   Marcel: "bei den Objektkarten moechte ich dass du mir die anderen auch
+   baust zum wechseln. erst mal auf dem bildschirm zum umswitchen."
+
+   Acht Entwuerfe aus design/mockups/objektkarten-schiene-v1707.html,
+   gewaehlt ueber `data-dp-objkarte` (objektkarten-stil.js). Ohne Attribut
+   bleibt der Aktenreiter - der ist der Standard seit v1709.
+
+   ALLE ERBEN VOM AKTENREITER und schalten nur um, was sie anders machen.
+   Das haelt die Bloecke kurz und sorgt dafuer, dass Gemeinsames (kein
+   Kartenrahmen, Score-Ring rechts, Aktionen bei Hover) an EINER Stelle
+   steht.
+
+   > Acht vollstaendige Entwuerfe nebeneinander waeren acht Orte, an denen
+   > dieselbe Korrektur nachgezogen werden muss.
+
+   Der Anker `:is(#sb-list)` ist noetig: die Grundregeln der Sidebar
+   tragen ihn, und ohne ihn verliert jede Klassenkette gegen sie (v1711b).
+   ===================================================================== */
+
+/* ── 01 BORDKARTE · Abriss links, Jahr hochkant ────────────────────── */
+html[data-dp-objkarte="bordkarte"] :is(#sb-list) .dpl-schiene .sb-card{
+  padding:0 !important;
+}
+html[data-dp-objkarte="bordkarte"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq{
+  position:absolute !important;
+  top:0 !important; bottom:0 !important; left:0 !important; right:auto !important;
+  width:16px !important; max-width:16px !important;
+  display:flex !important; align-items:center !important; justify-content:center !important;
+  writing-mode:vertical-rl !important;
+  border-radius:5px 0 0 5px !important;
+  border:0 !important; border-right:1px dashed rgba(201,168,76,.5) !important;
+  background:transparent !important;
+  font-size:7.5px !important; letter-spacing:.14em !important;
+  padding:0 !important;
+}
+html[data-dp-objkarte="bordkarte"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top{
+  border-radius:0 5px 5px 0 !important;
+  margin-left:16px !important;
+}
+html[data-dp-objkarte="bordkarte"] :is(#sb-list) .dpl-schiene .sb-card .sbc-investor-ribbon{
+  top:auto !important; bottom:4px !important; right:4px !important;
+  border-radius:3px !important; font-size:7.5px !important;
+  border-bottom:1px solid !important;
+}
+
+/* ── 03 SCORE-KANTE · farbiger Strich statt Ring ───────────────────── */
+html[data-dp-objkarte="kante"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top{
+  border:0 !important;
+  border-left:3px solid var(--wl-c9a84c, #C9A84C) !important;
+  border-radius:0 4px 4px 0 !important;
+  background-color:#17160F !important;
+}
+html[data-dp-objkarte="kante"] :is(#sb-list) .dpl-schiene .sb-card.deal-won .sbc-top{
+  border-left-color:#3FA56C !important;
+}
+html[data-dp-objkarte="kante"] :is(#sb-list) .dpl-schiene .sb-card.deal-lost .sbc-top{
+  border-left-color:#B8625C !important;
+}
+html[data-dp-objkarte="kante"] :is(#sb-list) .dpl-schiene .sb-card .sbc-score-overlay{
+  display:none !important;
+}
+html[data-dp-objkarte="kante"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top-body{
+  padding-right:6px !important;
+}
+html[data-dp-objkarte="kante"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq{
+  border:0 !important; background:transparent !important;
+  padding:1px 0 1px 8px !important;
+}
+
+/* ── 04 DATENZEILE · Mono, eine Zeile, buendig ─────────────────────── */
+html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card{
+  padding:0 !important; margin-bottom:1px !important;
+}
+html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq{
+  position:static !important;
+  display:inline-block !important;
+  border:0 !important; background:transparent !important;
+  padding:0 !important; margin:0 !important;
+  font-size:9px !important;
+  width:38px !important; max-width:38px !important;
+  vertical-align:middle !important;
+}
+html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top{
+  border:0 !important; border-radius:3px !important;
+  background-color:transparent !important;
+  padding:4px 7px !important;
+  align-items:center !important;
+}
+html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card:hover .sbc-top{
+  background-color:#1A1815 !important;
+}
+html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card.active .sbc-top{
+  background-color:#221F1A !important;
+}
+html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card .sbc-address{
+  font-family:var(--dpl-mono, 'JetBrains Mono', monospace) !important;
+  font-size:11px !important; font-weight:400 !important;
+}
+html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card .sbc-kp-row{
+  display:none !important;
+}
+html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card .sbc-investor-ribbon{
+  display:none !important;
+}
+html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top-line1{
+  display:inline-block !important; width:38px !important; vertical-align:middle !important;
+}
+
+/* ── 06 AMPEL · ein Punkt sagt die Stufe ───────────────────────────── */
+html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card{
+  padding:0 !important;
+}
+html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top{
+  border:0 !important; border-radius:4px !important;
+  background-color:transparent !important;
+  padding:6px 8px 6px 20px !important;
+  position:relative !important;
+}
+html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card:hover .sbc-top{
+  background-color:#1A1815 !important;
+}
+html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card.active .sbc-top{
+  background-color:#221F1A !important;
+}
+html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top::before{
+  content:'' !important;
+  position:absolute !important; left:7px !important; top:50% !important;
+  transform:translateY(-50%) !important;
+  width:8px !important; height:8px !important; border-radius:50% !important;
+  background:var(--wl-c9a84c, #C9A84C) !important;
+}
+html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card.deal-won .sbc-top::before{
+  background:#3FA56C !important;
+}
+html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card.deal-lost .sbc-top::before{
+  background:#B8625C !important;
+}
+html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq,
+html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card .sbc-investor-ribbon,
+html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card .sbc-kp-row{
+  display:none !important;
+}
+
+/* ── 07 KENNZAHLEN · Preis, Rendite, Cashflow ──────────────────────── */
+html[data-dp-objkarte="kennzahlen"] :is(#sb-list) .dpl-schiene .sb-card .sbc-mini-grid{
+  display:flex !important;
+  gap:7px !important;
+  padding:0 9px 7px !important;
+  margin:-1px 0 0 !important;
+  border:1px solid var(--wl-8a7332, #8a7332) !important;
+  border-top:0 !important;
+  border-radius:0 0 5px 5px !important;
+  background-color:#17160F !important;
+}
+html[data-dp-objkarte="kennzahlen"] :is(#sb-list) .dpl-schiene .sb-card.deal-won .sbc-mini-grid{
+  border-color:#3FA56C !important;
+}
+html[data-dp-objkarte="kennzahlen"] :is(#sb-list) .dpl-schiene .sb-card.deal-lost .sbc-mini-grid{
+  border-color:#B8625C !important;
+}
+html[data-dp-objkarte="kennzahlen"] :is(#sb-list) .dpl-schiene .sb-card .sbcm{
+  flex:1 1 0 !important; min-width:0 !important;
+  font-size:9px !important;
+  display:block !important;
+}
+html[data-dp-objkarte="kennzahlen"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top{
+  border-radius:0 5px 0 0 !important;
+  border-bottom:0 !important;
+}
+
+/* ── 08 MINIMAL · nur Adresse und Ring ─────────────────────────────── */
+html[data-dp-objkarte="minimal"] :is(#sb-list) .dpl-schiene .sb-card{
+  padding:0 !important;
+}
+html[data-dp-objkarte="minimal"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top{
+  border:0 !important; border-radius:4px !important;
+  background-color:transparent !important;
+  padding:8px 9px !important;
+}
+html[data-dp-objkarte="minimal"] :is(#sb-list) .dpl-schiene .sb-card:hover .sbc-top{
+  background-color:#1A1815 !important;
+}
+html[data-dp-objkarte="minimal"] :is(#sb-list) .dpl-schiene .sb-card.active .sbc-top{
+  background-color:#221F1A !important;
+}
+html[data-dp-objkarte="minimal"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq,
+html[data-dp-objkarte="minimal"] :is(#sb-list) .dpl-schiene .sb-card .sbc-investor-ribbon,
+html[data-dp-objkarte="minimal"] :is(#sb-list) .dpl-schiene .sb-card .sbc-kp-row{
+  display:none !important;
+}
+html[data-dp-objkarte="minimal"] :is(#sb-list) .dpl-schiene .sb-card .sbc-address{
+  font-weight:500 !important;
+}
+
+/* ── 09 STATUS · Deal-Stufe zuerst ─────────────────────────────────── */
+html[data-dp-objkarte="status"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq{
+  font-size:7.5px !important;
+  letter-spacing:.12em !important;
+}
+/* Die Lasche zeigt die Stufe statt der Nummer - der Text kommt aus dem
+   Pseudoelement, damit der Knoten unangetastet bleibt. */
+html[data-dp-objkarte="status"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq{
+  font-size:0 !important;
+}
+html[data-dp-objkarte="status"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq::after{
+  content:'IN ARBEIT' !important;
+  font-size:9px !important; letter-spacing:.1em !important;
+}
+html[data-dp-objkarte="status"] :is(#sb-list) .dpl-schiene .sb-card.deal-won .sbc-seq::after{
+  content:'GEWONNEN' !important;
+}
+html[data-dp-objkarte="status"] :is(#sb-list) .dpl-schiene .sb-card.deal-lost .sbc-seq::after{
+  content:'VERLOREN' !important;
+}
+
+/* ── 10 COCKPIT · Score als Rundinstrument ─────────────────────────── */
+html[data-dp-objkarte="cockpit"] :is(#sb-list) .dpl-schiene .sb-card .sbc-score-overlay{
+  left:9px !important; right:auto !important;
+}
+html[data-dp-objkarte="cockpit"] :is(#sb-list) .dpl-schiene .sb-card .sbc-mini-score{
+  border:1px solid var(--wl-3a352e, #3A352E) !important;
+  border-top-color:currentColor !important;
+  border-radius:50% !important;
+  background:#0B0A08 !important;
+}
+html[data-dp-objkarte="cockpit"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top-body{
+  padding-left:32px !important; padding-right:6px !important;
+}
+html[data-dp-objkarte="cockpit"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq{
+  left:auto !important; right:0 !important;
+  border-radius:3px 3px 0 0 !important;
+}
+html[data-dp-objkarte="cockpit"] :is(#sb-list) .dpl-schiene .sb-card .sbc-investor-ribbon{
+  right:auto !important; left:0 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DER SCHALTER
+   ═══════════════════════════════════════════════════════════════════ */
+.dp-ok-schalter{
+  position:fixed; right:18px; bottom:18px; z-index:99998;
+  width:232px; max-height:78vh; overflow:auto;
+  background:#15140F; border:1px solid #332E26; border-radius:12px;
+  box-shadow:0 18px 44px rgba(0,0,0,.55);
+  font-family:'Inter',system-ui,sans-serif;
+}
+.dp-ok-kopf{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:9px 11px; border-bottom:1px solid #2A2622; background:#1B1913;
+  position:sticky; top:0;
+}
+.dp-ok-t{ font:700 11.5px/1 'Space Grotesk',sans-serif; color:#EDE7DA; }
+.dp-ok-zu{
+  border:0; background:transparent; color:#8C8578; cursor:pointer;
+  font-size:13px; line-height:1; padding:2px 4px;
+}
+.dp-ok-zu:hover{ color:#EDE7DA; }
+.dp-ok-liste{ padding:7px; display:flex; flex-direction:column; gap:3px; }
+.dp-ok-w{
+  text-align:left; border:1px solid transparent; background:transparent;
+  border-radius:6px; padding:6px 8px; cursor:pointer; display:block; width:100%;
+}
+.dp-ok-w:hover{ background:#1E1B15; border-color:#3A352E; }
+.dp-ok-w.an{ background:#221F17; border-color:var(--wl-c9a84c, #C9A84C); }
+.dp-ok-n{ display:block; font:600 12px/1.3 'Inter',sans-serif; color:#EDE7DA; }
+.dp-ok-w.an .dp-ok-n{ color:var(--wl-e8cc7a, #E8CC7A); }
+.dp-ok-s{ display:block; font-size:10.5px; line-height:1.35; color:#8C8578; margin-top:1px; }
+.dp-ok-fuss{
+  padding:7px 11px 9px; font-size:10px; line-height:1.4; color:#6E675C;
+  border-top:1px solid #2A2622;
+}
