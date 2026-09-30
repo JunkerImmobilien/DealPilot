@@ -2517,3 +2517,118 @@ html:not([data-ui-theme]) body header.hdr.has-v64-score + nav.tabs.tabs {
 html:not([data-ui-theme]) body .main-col > header.hdr {
   background: linear-gradient(var(--wl-obs-hi, #0a0805) 0%, var(--wl-obs-lo, #000000) 100%) !important;
 }
+
+/* =====================================================================
+   v1716 - "RUND" UND "KANTIG" WIRKEN JETZT AUCH OHNE VORLAGE
+   =====================================================================
+   Marcel: "Auch auf rund oder kantig oder solche Sachen, das
+   funktioniert nicht."
+
+   Er hat recht, und der Grund stand seit v1098 im Kommentar darueber:
+
+     "GRENZE, ehrlich benannt: das wirkt nur MIT einer Vorlage. Ohne
+      data-ui-theme liest keine Regel dieser Datei --uv-r."
+
+   Die Tokens werden gesetzt, aber niemand liest sie. Gemessen mit UND
+   ohne Layout - beide Male keine Wirkung.
+
+   > Eine Einstellung, die nur unter einer Bedingung wirkt, die nirgends
+   > steht, ist fuer den Nutzer kaputt. Ob sie "so gemeint" war, aendert
+   > daran nichts.
+
+   WARUM DAS TROTZDEM KEIN EINGRIFF IN DEN AUSLIEFERUNGSZUSTAND IST:
+   jede Regel hier haengt an `[data-ui-form]`. Ohne Wahl steht das
+   Attribut nicht, und dann greift keine einzige. Die Zusicherung "wer
+   nicht umschaltet, merkt nichts" bleibt also woertlich erfuellt - sie
+   galt nie fuer den, der ausdruecklich umschaltet.
+
+   GEMESSEN, welche Flaechen ueberhaupt Radien tragen (und damit
+   umgestellt werden muessen):
+
+     button.tab            0px      .sbc-top          0 5px 5px
+     input/select/textarea 2px      .dp-pfbar        16px
+     .card                 2px      .dp-pf-tile       9px
+     .hdr-icon-btn         7px      #hdr-credits-pill 7px
+     .tabs-status-badge    7px      .dpl-portfolio    7px
+
+   KANTIG heisst 0, RUND heisst grosszuegig. Beide Male bleibt die
+   FUNKTION unangetastet - nur die Ecken aendern sich.
+   ===================================================================== */
+
+/* -- KANTIG: alles auf null ---------------------------------------- */
+html[data-ui-form="kantig"] .btn,
+html[data-ui-form="kantig"] button.tab,
+html[data-ui-form="kantig"] input,
+html[data-ui-form="kantig"] select,
+html[data-ui-form="kantig"] textarea,
+html[data-ui-form="kantig"] .card,
+html[data-ui-form="kantig"] .sb-card,
+html[data-ui-form="kantig"] .sbc-top,
+html[data-ui-form="kantig"] .sbc-seq,
+html[data-ui-form="kantig"] .sbc-investor-ribbon,
+html[data-ui-form="kantig"] .dp-pfbar,
+html[data-ui-form="kantig"] .dp-pf-tile,
+html[data-ui-form="kantig"] .dp-pf-lead,
+html[data-ui-form="kantig"] .hdr-icon-btn,
+html[data-ui-form="kantig"] #hdr-credits-pill,
+html[data-ui-form="kantig"] .tabs-status-badge,
+html[data-ui-form="kantig"] .dpl-portfolio,
+html[data-ui-form="kantig"] .sb-act-item,
+html[data-ui-form="kantig"] .dpl-teil,
+html[data-ui-form="kantig"] .dp-kg-panel{
+  border-radius:0 !important;
+}
+
+/* -- RUND: grosszuegig, aber nicht beliebig -------------------------
+   Zwei Masse statt einem: Flaechen (14 px) und Bedienelemente (10 px).
+   Ein einziger Wert laesst entweder die Karten zu eckig oder die
+   Knoepfe zu kugelig aussehen. */
+html[data-ui-form="rund"] .card,
+html[data-ui-form="rund"] .sb-card,
+html[data-ui-form="rund"] .sbc-top,
+html[data-ui-form="rund"] .dp-pfbar,
+html[data-ui-form="rund"] .dpl-teil,
+html[data-ui-form="rund"] .dp-kg-panel{
+  border-radius:14px !important;
+}
+html[data-ui-form="rund"] .btn,
+html[data-ui-form="rund"] button.tab,
+html[data-ui-form="rund"] input,
+html[data-ui-form="rund"] select,
+html[data-ui-form="rund"] textarea,
+html[data-ui-form="rund"] .dp-pf-tile,
+html[data-ui-form="rund"] .hdr-icon-btn,
+html[data-ui-form="rund"] #hdr-credits-pill,
+html[data-ui-form="rund"] .tabs-status-badge,
+html[data-ui-form="rund"] .dpl-portfolio,
+html[data-ui-form="rund"] .sb-act-item{
+  border-radius:10px !important;
+}
+
+/* -- Die Laschen behalten IHRE Form --------------------------------
+   Eine Lasche mit rundum gleichen Ecken ist keine Lasche mehr, sondern
+   ein Kaestchen ueber der Karte. Oben rund, unten eckig - das bleibt
+   auch in "rund" so, nur das Mass folgt der Wahl. */
+html[data-ui-form="rund"] .dpl-schiene .sb-card .sbc-seq,
+html[data-ui-form="rund"] .dpl-schiene .sb-card .sbc-investor-ribbon{
+  border-radius:8px 8px 0 0 !important;
+}
+html[data-ui-form="kantig"] .dpl-schiene .sb-card .sbc-seq,
+html[data-ui-form="kantig"] .dpl-schiene .sb-card .sbc-investor-ribbon{
+  border-radius:0 !important;
+}
+/* Und das Blatt behaelt seine offene Ecke oben links, wo die Lasche
+   sitzt - sonst schwebt sie darueber statt daran. */
+html[data-ui-form="rund"] .dpl-schiene .sb-card .sbc-top{
+  border-radius:0 14px 14px 14px !important;
+}
+html[data-ui-form="kantig"] .dpl-schiene .sb-card .sbc-top{
+  border-radius:0 !important;
+}
+
+/* Runde Ecken an einer Flaeche mit Inhalt brauchen `overflow`, sonst
+   stehen die Ecken der Kinder darueber hinaus. */
+html[data-ui-form="rund"] .dp-pfbar,
+html[data-ui-form="rund"] .sbc-top{
+  overflow:hidden !important;
+}
