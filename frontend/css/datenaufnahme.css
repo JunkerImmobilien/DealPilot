@@ -2219,3 +2219,32 @@ html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-sep{
 html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-rz{
   align-self:center !important;
 }
+
+/* =====================================================================
+   v1729 - AUF DEM TABLET STAND DER ABRUFEN-KNOPF AUSSERHALB DES BILDES
+   =====================================================================
+   Marcel: "alles muss auf dem handy und tablet funktionieren"
+
+   In der Messkabine bei 765 px gemessen:
+
+     Leiste        34..727   (693 px breit)
+     QR-Code      740..794   -  29 px draussen
+     Abrufen      808..1016  - 251 px draussen, komplett unerreichbar
+
+   Die Kinder laufen ueber ihren EIGENEN Container hinaus: die Leiste ist
+   flex mit nowrap, die Teile schrumpfen nicht, und der Container traegt
+   overflow-x:visible. Die Seite scrollt deshalb auch nicht - es gibt
+   keinen Weg zu dem Knopf.
+
+   Gegengemessen:  aendert nichts (der Container waechst
+   nicht mit),  holt den Knopf auf 48..256 ins Bild. Die
+   Leiste wird dabei 190 statt 78 px hoch - auf einem Tablet ist das der
+   richtige Tausch.
+
+   > Ein Knopf, den man nicht erreichen kann, ist kein Knopf.
+
+   Nur der Tablet-Bereich: unter 700 px greift die eigene Handy-Fassung,
+   dort wurde bei 387 px kein einziger Ueberlauf gemessen. */
+@media (min-width:701px) and (max-width:1100px){
+  .dp-pfbar{ flex-wrap:wrap !important; }
+}
