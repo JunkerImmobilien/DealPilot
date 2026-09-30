@@ -525,6 +525,12 @@
        deshalb nur der Host, nicht der ganze Abschnitt. */
     var og = document.querySelector('#dpuv-panel .dp-objkarte-wahl-host');
     if (og) og.style.display = layout ? '' : 'none';
+
+    /* v1727: die Vorlagen gehoeren nicht in die neuen Ansichten - siehe
+       die Begruendung am Beobachter weiter unten. Umgekehrt zu allen
+       anderen: hier blendet das LAYOUT aus, nicht sein Fehlen. */
+    var th = document.getElementById('dpuv-theme');
+    if (th && th.parentElement) th.parentElement.style.display = layout ? 'none' : '';
   }
 
   /* v1720b: die Lage aendert sich auf ZWEI Wegen, nicht auf einem.
@@ -540,8 +546,37 @@
      auch fuer den Umschalter in den Einstellungen und jeden spaeteren
      Weg. Keine Schleife: machbarkeit() fasst nur `style.display` im
      Panel an, nie diese Attribute. */
+  /* ══ v1727 · EINE VORLAGE, DIE MAN NICHT MEHR ABWAEHLEN KANN ═══════
+     Marcel: „die app darstellung die einstellung passt nicht zusammen
+     mit den neuen layouts. das darf nicht auswaehlbar sein unter
+     darstellung oeffnen."
+
+     Die sechs Vorlagen WIRKEN in den neuen Ansichten - gemessen sind
+     alle sechs unterscheidbar. Sie passen nur nicht dazu, und das ist
+     eine Gestaltungsfrage, keine Messfrage: die Ansichten bringen ihre
+     eigene Typografie und Flaechenaufteilung mit, eine Vorlage darueber
+     ergibt zwei Handschriften in einem Bild.
+
+     > Ausblenden allein genuegt hier nicht. Wer eine Vorlage aktiv hat
+     > und dann eine Ansicht waehlt, saehe den Abschnitt verschwinden -
+     > mitsamt dem einzigen Weg zurueck. Die Vorlage haenge dann fest.
+
+     Deshalb wird sie beim Wechsel ZURUECKGESETZT, ueber denselben Weg,
+     den der Nutzer sonst geht (`save` + `anwenden`), nicht durch
+     Attribut-Entfernen von aussen. Keine Schleife: beim zweiten
+     Durchlauf ist `ui_theme` bereits leer. */
   try {
-    new MutationObserver(machbarkeit).observe(document.documentElement, {
+    new MutationObserver(function () {
+      try {
+        if (document.documentElement.getAttribute('data-dp-layout') &&
+            get('ui_theme', THEMES)) {
+          save({ ui_theme: '' });
+          anwenden();            /* ruft machbarkeit() selbst */
+          return;
+        }
+      } catch (e) {}
+      machbarkeit();
+    }).observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['data-dp-layout', 'data-ui-theme']
     });
