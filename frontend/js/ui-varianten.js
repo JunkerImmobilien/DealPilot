@@ -219,7 +219,9 @@
     attr('data-ui-surface', get('ui_surface', SURFACE));
     attr('data-ui-form',    get('ui_form',    FORMEN));   /* v1098 */
     formRadien(get('ui_form', FORMEN));                  /* v1716e */
-    grundSperre();                                        /* v1156 */
+    grundSperre();                                        /* v1156 */
+
+    machbarkeit();           /* v1720 */
   }
 
   /* PP v1716e � DIE FORM BRAUCHT EIN STYLESHEET AM ENDE PPPPPPPPPP
@@ -442,6 +444,58 @@
     var vorlageAktiv = !!document.documentElement.getAttribute('data-ui-theme');
     l.classList.toggle('locked', vorlageAktiv);
     sperreHart(l, vorlageAktiv);
+  }
+
+  /* ══ v1720 · NUR ZEIGEN, WAS HIER AUCH WIRKT ═══════════════════════════
+     Marcel: „Sachen die nicht gehen bitte ausblenden bei dem jeweiligen
+     aussehen. Nur das einblenden und einstellbare anzeigen was wirklich
+     funktioniert."
+
+     Alle neun Schaltergruppen durchgeklickt und je Stellung eine Signatur
+     aus Farben, Radien, Schrift und Geometrie verglichen. Zwei Gruppen
+     hatten Stellungen, die sich NICHT unterscheiden liessen:
+
+       Schriftfamilie   wirkt nur OHNE Vorlage und OHNE Layout
+       Datenaufnahme    wirkt nur MIT Layout
+
+     Beide Male ist es kein Zufall, sondern gebaut:
+     - `ui-varianten.css` setzt `html[data-ui-theme] body {font-family:
+       var(--uv-f-body) !important}`, `layout-varianten.css` dasselbe mit
+       `var(--dpl-body)`. Eine Vorlage bringt ihre Schrift mit - das ist
+       ihr Wesen. Die Nutzerwahl kann dagegen nicht gewinnen, und sie
+       SOLL es auch nicht.
+     - `karten-stil.js:280` setzt sein Attribut nur unter `layoutAktiv()`.
+
+     > Ein Schalter, der nichts tut, ist schlimmer als ein fehlender: der
+     > fehlende wirft eine Frage auf, der tote wirft einen Zweifel auf das
+     > ganze Panel.
+
+     Die Textgroesse (A- A A+) bleibt stehen - sie wirkt gemessen in jeder
+     Lage und teilt sich nur den Block mit der Familie. */
+  function machbarkeit() {
+    var h = document.documentElement;
+    var layout  = !!h.getAttribute('data-dp-layout');
+    var vorlage = !!h.getAttribute('data-ui-theme');
+
+    var f = document.getElementById('dpuv-font');
+    if (f) {
+      var schriftFrei = !layout && !vorlage;
+      f.style.display = schriftFrei ? '' : 'none';
+      /* Der Hinweis darueber verspricht sonst etwas, das nicht mehr da
+         ist - er gehoert mitgezogen, nicht stehengelassen. */
+      var hin = f.parentElement ? f.parentElement.querySelector('.dpuv-hint') : null;
+      if (hin) {
+        hin.textContent = schriftFrei
+          ? 'Schriftfamilie und Textgröße der gesamten App.'
+          : 'Textgröße der gesamten App. Die Schrift bringt '
+            + (vorlage ? 'die Vorlage' : 'die Ansicht') + ' mit.';
+      }
+    }
+
+    /* Die Datenaufnahme-Karte gibt es nur in den neuen Ansichten. Ohne
+       Layout bliebe eine Wahl stehen, die beim Klicken nichts aendert. */
+    var k = document.getElementById('dpk-seg');
+    if (k && k.parentElement) k.parentElement.style.display = layout ? '' : 'none';
   }
 
   /* ── v1156c · Eine ausgegraute Sperre ist nur eine optische ────────────
@@ -1369,7 +1423,9 @@
   function oeffnen() {
     bauen();
     gateSetzen();
-    grundSperre();           /* v1156: beim Aufbau, nicht erst beim naechsten Klick */
+    grundSperre();           /* v1156: beim Aufbau, nicht erst beim naechsten Klick */
+
+    machbarkeit();           /* v1720 */
     markeAuffrischen();      /* v1098: Reseller-Zustand und Logo sind aeusserer Zustand */
     targetUmhuellen();       /* v1098: erst hier, damit reseller-portal.js sicher geladen ist */
     resetUmhuellen();
