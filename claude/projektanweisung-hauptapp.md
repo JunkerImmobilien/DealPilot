@@ -24851,3 +24851,85 @@ Dateien.
 
 **Commits.** `82f184b` … `d70c756` (v1716–v1716f), `f8f1625` (v1716g),
 `2adf34c` (v1716h), `2d72394` (v1716i)
+
+---
+
+## v1717 · Die Kanzlei-Vorlage reserviert eine Spalte für eine Sidebar,
+## die es nicht mehr gibt
+
+**Was.** Marcel: „wenn ich den Akzent setze, dann wird der Header irgendwie
+verschoben, auch mit den Grundfarben und allem".
+
+**Am Akzent lag es nicht.** Das habe ich über vier Layouts und drei
+Bedienwege gemessen — Farbkreise, freier Farbwähler, Regler — jedes Mal mit
+nachgewiesenem Farbwechsel (`--gold` änderte sich) und jedes Mal identischer
+Geometrie. Der Satz „auch mit den Grundfarben und allem" war der Hinweis:
+**es ist die VORLAGE.**
+
+`style.css:37799` setzt für die Kanzlei-Vorlage zwei Grid-Spalten — 300 px
+für die Sidebar, der Rest für den Inhalt. In allen drei neuen Layouts ist
+`aside.sidebar` aber `display:none`, die Navigation liegt dort woanders.
+Dann fällt `.main-col` als einziges sichtbares Kind in die **leere**
+300-px-Spalte:
+
+| Layout | `aside.sidebar` | Grid | `.main-col` | Header |
+|---|---|---|---:|---|
+| Standard | `flex`, 300 px | 300 + 1833 | 1833 | 1617 × 57 ✓ |
+| Aktenmappe v1b | **none** | 300 + 1585 | **300** | **84 × 191** ✗ |
+| Kanzlei v2 | **none** | 300 + 1345 | **300** | **84 × 191** ✗ |
+| Tower v2b | **none** | 300 + 1345 | **300** | **84 × 191** ✗ |
+
+Der Header war nie „verschoben" — er war **erdrückt**. 84 px breit, 191 px
+hoch, weil er in einer Spalte steckte, die für etwas anderes gedacht war.
+
+> Eine Spaltenbreite ist ein Versprechen über den Inhalt. Verschwindet der
+> Inhalt, wird aus der Reserve eine Falle — und das Opfer sieht aus wie der
+> Täter.
+
+**Wie.** Die Regel behält ihren Platz und bekommt den fehlenden Vorbehalt
+`:not([data-dp-layout])`. `:not()` erbt die Spezifität seines Arguments (ein
+Attribut), die Regel steigt also von (0,2,2) auf (0,3,2) — sie schlägt damit
+nichts Neues, sie **greift nur seltener**. Im Standard, wo die Sidebar
+wirklich steht, wirkt die Kanzlei-Vorlage unverändert.
+
+**Nachweis.** Alle **24** Kombinationen über den echten Bedienweg
+durchgeklickt — 4 Layouts × 6 Vorlagen, Header-Maße gelesen:
+
+```
+                DealPilot  Kontor  Panel   Kanzlei  Boarding  Konsole
+Standard        1749x49    1749x57 1749x57 1537x57  1749x57   1749x49
+Aktenmappe v1b  1881x49    1881x49 1881x49 1669x49  1881x49   1881x49
+Kanzlei    v2   1641x49    1641x49 1641x49 1429x49  1641x49   1641x49
+Tower      v2b  1641x49    1641x49 1641x49 1429x49  1641x49   1641x49
+
+kaputt: keine   (vorher: 3 x 84x191)
+```
+
+**Gold-Audit RC=0.** **Commit.** `d8fd7bb`
+
+### Kartei und Objektkarten — gemessen, kein Bruch gefunden
+
+Marcels dritter Punkt („auf Kartei gestellt … sind verzerrt. Auch die
+Objektkarten funktionieren dann nicht bei allen") ist damit **nicht**
+erledigt, aber eingegrenzt:
+
+- **Kartei-Stil** (`data-dp-kartenstil="kartei"`, Layout Tower): Leiste
+  1280 × 132, QR 92 × 92 wie vorgesehen, **kein Überlauf** bei keinem Kind.
+  Im Bild sitzt die Kopfzeile sauber, nichts ragt heraus.
+- **Alle vier Objektkarten-Stile** auf Überlauf geprüft: Kompakt 344 × 82,
+  Standard 344 × 212, Wallet 344 × 233, Stapel 344 × 64 — **kein Überlauf**.
+  Dass bei Kompakt und Stapel die drei Mini-Kacheln fehlen, ist **Absicht**
+  („Meiste" bzw. „Handy-Optik"), kein Defekt.
+
+**Ein eigener Messfehler dabei:** ich habe den Kartei-Stil zuerst im
+Layout „Heute" gesetzt und gemessen, dass nichts passiert.
+`karten-stil.js:280` setzt das Attribut nur unter `layoutAktiv()` — ohne
+neues Layout gibt es keinen Kartenstil. Das ist dieselbe Bauart von Grenze,
+die `rund`/`kantig` bis v1716 hatte, hier aber vermutlich gewollt.
+
+**Was im Bild auffällt und Marcels Urteil braucht:** bei Karten mit
+Investor-Kennzeichnung sitzt die **INVESTOR-Pille mittig über der Karte und
+die Nummern-Lasche linksbündig darunter** — zwei gestapelte Reiter statt
+einer Zeile. Das ist der „doppelte Rahmen"-Eindruck aus `Screenshot1.png`.
+Ob die beiden nebeneinander gehören, ist eine Gestaltungsfrage und wird
+nicht geraten.
