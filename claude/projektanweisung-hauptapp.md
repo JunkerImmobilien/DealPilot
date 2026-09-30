@@ -24742,3 +24742,112 @@ ist der Hinweis im Panel**, dass die Option eine Vorlage braucht.
 **Gold-Audit RC=0.**
 
 **Commit.** `18ebe9a`
+
+---
+
+## v1716–v1716i · `rund`/`kantig` wirkt — nach acht Anlaeufen, und der
+## achte war ein Messfehler
+
+**Was.** Die Einstellung „Form" im Darstellungs-Panel (Kantig · Passend ·
+Rund) veraendert jetzt in allen vier Layouts alle gemessenen Flaechen.
+
+| | Passend (Auslieferung) | Kantig | Rund |
+|---|---:|---:|---:|
+| Eingabefeld | 2 px | 0 | 10 px |
+| Karte | 2 px | 0 | 14 px |
+| Pre-Flight-Leiste | 16 px | 0 | 14 px |
+| Kachel | 9 px | 0 | 10 px |
+| Hilfe-Knopf / Pille / Status | 7 px | 0 | 10 px |
+| Reiter | 0 | 0 | 10 px 10 px 0 0 |
+| Kartenblatt | 0 5 px 5 px | 0 | 0 14 px 14 px |
+| Lasche | 3 px 3 px 0 0 | 0 | 8 px 8 px 0 0 |
+
+Reiter, Blatt und Lasche behalten ihre Gestalt: eine Lasche mit rundum
+gleichen Ecken ist keine Lasche mehr, und die Unterstreichung des aktiven
+Reiters muss gerade bleiben.
+
+**Nachweis.** Ueber den echten Bedienweg (Panel oeffnen, Knopf klicken):
+
+```
+Heute (Standard)   9 von 9      Aktenmappe (v1b)   9 von 9
+Kanzlei (v2)       9 von 9      Tower (v2b)        9 von 9
+
+Rueckkehr auf „Passend" == Auslieferungszustand   ja
+Inline-Reste nach dem Zurueckschalten            0
+Nachzug auf neu gerendertes DOM                  wirkt
+```
+
+**Warum acht Anlaeufe.** Sieben davon versuchten es ueber die Kaskade und
+blieben bei zwei von neun Flaechen. Der Weg dorthin, weil jede Station
+eine eigene Lehre trug:
+
+| | Befund |
+|---|---|
+| v1716 | die Regeln lasen `--uv-r`, das ohne Vorlage niemand setzt |
+| v1716b | eigene Regeln zu schwach — `body` davor |
+| v1716c | **ein Attribut zweimal zu nennen bringt nichts** — der Browser fasst `[x="a"][x="a"]` zusammen. Bei Klassen (`.a.a`) geht der Trick |
+| v1716d | meine eigenen Layout-Regeln waren der Gegner |
+| v1716e | Stylesheet ans Ende des `<head>` |
+| v1716f | **ein Stylesheet am Ende gewinnt nur bei Gleichstand** |
+| v1716g | **„ans Ende gehaengt" ist eine Aussage ueber den Zeitpunkt, nicht ueber die Position** — das Blatt entstand beim ersten Modullauf oben im `<head>`, danach kamen 19 weitere `<link>`. Position 24 von 43 |
+| v1716h | **das Ende des `<head>` ist nicht das Ende des Dokuments** — vier Blaetter haengen im `<body>`, darunter der Sieger `layout-varianten.css` |
+
+Nach v1716h lag das Blatt auf **43 von 43**, die Regel matchte das Feld,
+trug `!important` — und der Wert blieb 2 px. Das ist nach den
+Kaskadenregeln unmoeglich.
+
+> Ein Weg, der nach sieben Anlaeufen zwei von neun Flaechen erreicht, ist
+> nicht fast fertig. Er ist der falsche Weg.
+
+**v1716i wechselt die Ebene.** `radSetzen()` schreibt die Radien inline
+mit `!important` auf die Elemente, markiert sie mit `data-dp-radius`
+(vorher gegrept, frei) und raeumt beim Wechsel **zuerst** ab — ohne das
+bliebe beim Wechsel von rund auf kantig ein alter Wert an Elementen
+stehen, die der neue Durchlauf nicht mehr trifft, und „Passend" waere nie
+wieder der Standard. Ein MutationObserver zieht nach Neu-Rendern nach,
+gedrosselt auf 120 ms; das Stylesheet aus v1716e–h bleibt daneben und
+deckt genau diese 120 ms ab (gemessen: neue Elemente tragen die Radien
+schon vor dem Nachzug).
+
+### Die eigentliche Lehre: der achte Anlauf war mein Messfehler
+
+Nach v1716i meldete die Messung **6 von 9** — Kachel und Hilfe-Knopf
+trugen mein `inline !important` und zeigten trotzdem den alten Wert.
+Auch das ist unmoeglich; inline mit `!important` steht ueber jeder Regel.
+Der Grund:
+
+```
+.dp-pf-tile    transition: all 0.18s    gemeldet 10px   ohne Transition 0px
+.hdr-icon-btn  transition: all 0.2s     gemeldet  6px   ohne Transition 0px
+```
+
+**Im verborgenen Tab friert eine Transition auf ihrem STARTwert ein**, weil
+keine Frames gerendert werden — und `getComputedStyle` meldet genau diesen
+eingefrorenen Startwert. Mit einem Messblatt
+`*{transition:none !important}` sprang das Ergebnis auf **11 von 11**.
+
+> Ein eingefrorener Uebergang sieht aus wie eine Regel, die verliert.
+> Vor jeder Radius- oder Farbmessung gehoert `transition:none` gesetzt —
+> `visibilityState` allein zu pruefen reicht nicht, weil die Zahl auch
+> im verborgenen Tab plausibel aussieht.
+
+**Das faellt auf mich zurueck:** „Im verborgenen Tab feuert `rAF` nie" und
+„`visibilityState` vor jede Zeitmessung" stehen beide in meinen eigenen
+Notizen. Ich habe sie auf Timer bezogen und nicht auf Uebergaenge — und
+damit sieben Anlaeufe lang gegen eine Diagnose gebaut, die zum Teil aus
+meinem Messwerkzeug kam. **Wie viel der sieben CSS-Anlaeufe wirklich
+wirkungslos war, ist damit offen**; belegt ist nur, dass der Inline-Weg
+traegt. Die CSS-Fassung bleibt als Abdeckung stehen, statt sie auf
+Verdacht wieder auszubauen.
+
+**Rest.** Zwei Punkte aus Marcels Auftrag stehen weiter offen:
+die Header-Verschiebung beim Akzent (nicht reproduzierbar — der Befund
+vom vorigen Eintrag ist zurueckgenommen, es war dasselbe
+Verborgener-Tab-Artefakt) und die Kartei-Verzerrung, die bildlich
+abgenommen gehoert statt automatisiert.
+
+**Gold-Audit RC=0** — genau auf der Basislinie, 438 Fundstellen in 54
+Dateien.
+
+**Commits.** `82f184b` … `d70c756` (v1716–v1716f), `f8f1625` (v1716g),
+`2adf34c` (v1716h), `2d72394` (v1716i)
