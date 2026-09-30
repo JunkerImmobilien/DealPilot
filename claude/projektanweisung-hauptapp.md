@@ -25708,3 +25708,95 @@ weiter — **ohne Anhang und ohne Meldung**:
 Tab läuft im Hintergrund). Der schnellste Gegentest ist ein echter: in der
 Deal-Aktion eine Mail mit Investment-PDF-Anhang erzeugen und nachsehen, ob
 die Datei dranhängt.
+
+---
+
+## v1732 · Ein leeres Prozentfeld hat das ganze Investment-PDF abgebrochen
+
+Der wichtigste Fund des Durchgangs — und er wäre beinahe als „Verdacht,
+bitte selbst testen" liegengeblieben.
+
+### Die Spur
+
+`exportPDFBlob()` lieferte nie einen Blob. Drei Anläufe, kein Fehler, keine
+Konsolenausgabe. Der Reflex wäre gewesen, dem Messaufbau die Schuld zu
+geben. Stattdessen habe ich den Ablauf instrumentiert:
+
+```
+modal(true) → 5 % → 12 % → 22 % → 35 % → modal(false)
+```
+
+**Ein PDF, das fertig wird, geht bis 100.** Der Ausstieg bei 35 % mit
+`modal(false)` ist der catch-Zweig — es gab also einen Fehler. Mit
+`console.error` abgefangen:
+
+```
+TypeError: n.toFixed is not a function
+  at pP               (pdf.js:653)
+  at _exportPDFInner  (pdf.js:1274)   <- pP(v('makler_p'), 2)
+```
+
+### Die Ursache
+
+```js
+function pP(n, d) { return isNaN(n) ? '-' : n.toFixed(d)… }
+```
+
+`v('makler_p')` liefert den **Feldwert**, also einen String — beim
+Testobjekt den leeren. Und `isNaN('')` ist **false**, weil der leere String
+zu 0 wird. Der Wächter lässt ihn durch, `''.toFixed` gibt es nicht.
+Dasselbe gilt für jeden gefüllten Zahlenstring: `isNaN('2.2')` ist
+ebenfalls false.
+
+> `isNaN` prüft, ob sich etwas in eine Zahl **verwandeln** lässt, nicht, ob
+> es eine ist. Wer danach `toFixed` ruft, verlässt sich auf eine Prüfung,
+> die eine andere Frage beantwortet hat.
+
+### Was das anrichtet
+
+Der Fehler fliegt bei rund 35 % Fortschritt. `exportPDF` fängt ihn, zeigt
+einen Toast und schließt das Fenster — **es gibt kein PDF**. Schlimmer:
+`deal-action.js:1205` hängt das Investment-PDF über `exportPDFBlob()` an die
+Mail, und kommt nichts zurück, läuft der Code **still** weiter:
+
+```js
+if (result && result.blob) { files['_investmentanalyse'] = [pdfFile]; }
+step2_addBankPdf();          // sonst einfach weiter
+```
+
+> Der Absender sieht eine versandte Mail, der Empfänger eine ohne Anhang.
+
+**Es reicht ein leeres Prozentfeld** — beim Testobjekt war es die
+Maklercourtage.
+
+### Der Fix
+
+`_pfZahl()` wandelt selbst und prüft auf **Abwesenheit**, bevor gerechnet
+wird — dieselbe Regel wie bei `_euro(null)` und `Number(null)` in
+CLAUDE.md. Beide Formatierer nutzen sie.
+
+**Nachgewiesen an der Funktion, die abgestürzt ist:**
+
+```
+pP('')     -> "-"        (vorher: TypeError, PDF-Abbruch bei 35 %)
+pP('2.2')  -> "2,20 %"
+pP(2.2)    -> "2,20 %"
+pP('3,5')  -> "3,50 %"   (Komma-Eingabe als Zugabe)
+pN('')     -> "-"
+```
+
+Und der Export läuft seither über 70 Sekunden ohne Fehler weiter, statt
+nach 900 ms abzubrechen. Dass er im **verborgenen** Messtab so lange
+braucht, ist Chromes Timer-Drosselung im Hintergrund, kein Mangel.
+
+**Auf Prod nachgezogen** (`6ec21be`) — der Rollout davor hatte den Fehler
+noch. Nachweis: `_pfZahl` steht dreimal in der ausgelieferten `pdf.js`.
+
+### Was ich daraus mitnehme
+
+Ich hatte den Befund schon als „nicht abschließend bewiesen, bitte
+gegentesten" gemeldet. Das war zu früh aufgegeben: der Ablauf war
+messbar, der Fehler abfangbar, die Ursache lesbar.
+
+> Ein Fehler, der ohne Konsolenausgabe stirbt, ist nicht unauffindbar —
+> er ist nur noch nicht abgefangen.
