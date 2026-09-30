@@ -274,9 +274,18 @@
        > JEDEM Umschalten neu ans Ende.
 
        `appendChild` auf ein bereits vorhandenes Element verschiebt es -
-       darum steht der Aufruf jetzt ausserhalb des `if`. Das kostet
-       nichts und macht aus Position 24 die 43. */
-    document.head.appendChild(st);
+       darum steht der Aufruf ausserhalb des `if`.
+
+       DAS ENDE DES <head> IST NICHT DAS ENDE DES DOKUMENTS. Nach dem
+       Verschieben lag das Blatt auf 25 von 43, und die Messung zeigte,
+       warum - VIER Blaetter liegen im <body>:
+
+         40 datenraum.css   41 marktbewertung-card.css
+         42 datenaufnahme.css   43 layout-varianten.css   <- der Sieger
+
+       Vom <head> aus ist der Sieger unerreichbar, egal wie oft man
+       anhaengt. Das Blatt gehoert also an den BODY. */
+    (document.body || document.head).appendChild(st);
     if (!wert) { st.textContent = ''; return; }
 
     var fl = (wert === 'kantig') ? '0' : '14px';
