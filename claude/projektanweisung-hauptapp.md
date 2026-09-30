@@ -25266,3 +25266,97 @@ Kartenwahl im Panel   7 Knoepfe
 > at" im Werkzeugprotokoll ist kein Beweis für einen Treffer. Belastbar ist
 > `elementsFromPoint`: es ist dieselbe Trefferprüfung, die der Browser beim
 > echten Klick fährt.
+
+---
+
+## v1725–v1726 · Ein Barcode, dem die Box fehlte, und zwei Schalter ohne
+## Wirkung
+
+### v1725 · Bei Bütten war der Barcode 9 px hoch statt 53
+
+Über alle vier Kartenstile gemessen:
+
+| Stil | Barcode | Abruf-Box |
+|---|---|---|
+| Automatisch | 174 × 53 | 208 × 78 |
+| Zeile | 174 × 53 | 208 × 78 |
+| Kartei | ausgeblendet | 110 × 92 |
+| **Bütten** | **174 × 9** | 208 × **34** |
+
+**Der Barcode ist nicht gequetscht — seine Box ist zu flach.** Er liegt
+absolut mit `inset:12px 16px` (`style.css:32995`), und bei Bütten schrumpft
+`.dp-pf-rz` durch `align-self:center` auf Inhaltshöhe:
+
+```
+78 − 2×12 = 54   (gemessen 53)
+34 − 2×12 = 10   (gemessen  9)
+```
+
+> Ein Rand in festen Pixeln ist eine Aussage über die Höhe des Elternteils.
+> Wird das Elternteil flacher, frisst der Rand den Inhalt — und der Inhalt
+> sieht aus, als wäre er kaputt.
+
+Die Bütten-Gestaltung bleibt (kompakter Block, mittig auf dem Papier), nur
+der Rand folgt der kleineren Box: `inset:5px 12px` → **182 × 23**.
+Automatisch unverändert bei 174 × 53. **Commit `a080e25`.**
+
+### v1726 · Was in dieser Ansicht nichts tut, steht nicht mehr da
+
+Marcel: „nicht bei allen Aussehern layouts macht der Seiten wechsel sinn.
+das muss geprüft werden. Modus wechsel macht der überall sinn genauso wie
+die Objektkarten?"
+
+Alle Gruppen in jedem Layout durchgeklickt, je Stellung eine Signatur aus
+Farben, Radien, Schrift **und Geometrie** verglichen:
+
+| Gruppe | Standard | Aktenmappe | Kanzlei | Tower |
+|---|---|---|---|---|
+| Seiten (Menü links/rechts) | **nein** | ja | ja | ja |
+| Kartengestalt (7 Entwürfe) | **nein** | ja | – | – |
+| Modus (Dunkel/Hell) | ja | ja | – | – |
+| Objektkarten-Dichte | ja | ja | – | – |
+
+Die Seitenwahl schiebt die Schiene — **ohne Schiene gibt es nichts zu
+schieben.** Die Kartengestalt hängt an `data-dp-objkarte`, das
+`objektkarten-stil.js` nur unter `layoutAktiv()` setzt; im Standard bleibt
+das Attribut leer und alle **21 Paare** der sieben Entwürfe sind identisch.
+
+**Modus und Dichte wirken überall und bleiben stehen** — Marcels Frage dazu
+ist damit beantwortet, ohne dass etwas verschwindet.
+
+Die Gestalt teilt sich ihren Block mit der Dichte, deshalb fällt dort nur
+der Host weg, nicht der ganze Abschnitt.
+
+**Stand der Sichtbarkeit im Panel** (nachgemessen):
+
+```
+                 Standard  Aktenmappe  Tower
+Seiten             weg        da        da
+Datenaufnahme      weg        da        da
+Kartengestalt      weg        da        da
+Objektkarten       da         da        da
+Modus              da         da        da
+Schrift            da         weg       weg
+Textgroesse        da         da        da
+```
+
+**Gold-Audit RC=0. Commit `0bc7693`.**
+
+### Offen: der Investor Deal Score im Tower
+
+Marcels erster Punkt — „im tower modus kann ich leider den investor deal
+score im menü rechts die schrift schlecht lesen" — ist **nicht**
+abgeschlossen. Der Score erscheint erst mit einem geladenen Objekt, und im
+verborgenen Messtab lädt keines: weder `.click()`, noch ein echter
+Mausklick, noch ein synthetisches `MouseEvent` auf die Objektkarte haben
+`_currentObjKey` gesetzt.
+
+Was in der rechten Spalte ohne Objekt messbar war:
+
+```
+ds2-tag  "DS2"       9 px   Kontrast 2,29   (zweimal)
+Impressum/Datenschutz 10 px  Kontrast 2,32
+```
+
+Beides ist schwach, aber **keines davon ist der Investor Deal Score**. Ich
+nenne es hier, statt es stillschweigend für Marcels Befund zu halten.
