@@ -25896,3 +25896,235 @@ eigener Lauf — er gehört Marcels Entscheidung, weil es Kundendaten sind.
 **Und die Grenze bleibt:** echte Fotos ersetzen die Grafiken, sobald es
 welche gibt. Der Upload liegt im Objektformular (`#img-inp`, Mehrfachwahl,
 bis sechs Bilder, das erste ist das Titelbild).
+
+---
+
+## v1733 / v1734 · Ein PDF-Eintrag, lesbare Diagramme, sechs neue Objekte
+
+Marcels Auftrag vom 30.09.2026 hatte fünf Teile. Drei davon führten auf
+Fehler, die niemand gesucht hatte.
+
+### 1 · „Egal worauf ich klicke, es öffnet sich immer das Modal"
+
+Stimmte — und war schärfer, als es klang. Seit `v1636` umhüllt
+`pdf-wahl.js` **beide** Exportfunktionen, `exportPDF` UND `exportPDFBank`.
+Die zwei Menüzeilen landeten im selben Dialog mit denselben drei Karten;
+der einzige Unterschied war die Vorauswahl, und die markiert nur eine
+Karte, sie wählt nichts aus.
+
+> Zwei Türen in denselben Raum sind keine Wahl, sondern eine Frage, die
+> der Nutzer sich stellt und die niemand beantwortet.
+
+Der zweite Eintrag stammte aus `v1436`, als die Bankfassung noch ein
+eigener Weg war. Seit der Umhüllung beschrieb er einen Weg, den es nicht
+mehr gibt. Eine Zeile also, in `deal-action-boarding.js` **und** in
+`hybrid-aktionen.js`.
+
+### 2 · Der Weg zurück, den der Dialog versprach
+
+Beim Messen daneben gefunden: unter dem Kästchen „Diese Wahl merken"
+stand „(änderbar in den Einstellungen)".
+
+```
+DealPilotPdfWahl.vergessen()   Aufrufer ausserhalb der eigenen Datei: 0
+Einstellungen                  Eintrag dafuer: keiner
+```
+
+Wer einmal anhakte, sah den Dialog nie wieder und kam an die anderen
+beiden Fassungen nicht mehr heran.
+
+> Eine Sackgasse, die sich selbst als änderbar ausgibt, ist schlimmer als
+> eine ehrliche: man sucht den Ausgang, den es gibt.
+
+Jetzt steht neben dem PDF-Knopf ein zweiter, „Fassung", der immer fragt —
+am Ort der Handlung, nicht in den Einstellungen, wo ihn niemand gesucht
+hätte, der gerade exportieren will.
+
+### 3 · „Die Diagramme sind gar nicht gut angegeben"
+
+Der interessanteste Fund. Gemessen an `renderEquityBuild`:
+
+```
+Texte im SVG                      21
+davon MIT font-size-Attribut       8
+davon ohne - aus dem Stylesheet   13
+<style>-Block im SVG            keiner
+```
+
+**Ein serialisiertes SVG in einer data-URI ist ein eigenes Dokument.** Es
+sieht das Stylesheet der App nicht. Die dreizehn Texte ohne eigenes
+Attribut fielen darin auf die SVG-Vorgabe zurück: **16px statt 10,5px, und
+schwarz statt grau**, weil auch `fill` aus dem CSS kam. Das Layout war für
+10,5px gerechnet — am Bildschirm sah alles richtig aus, im Bild standen
+die Beschriftungen übereinander.
+
+> Dieselbe Falle wie beim iframe, zum wiederholten Mal: das eigene
+> Dokument erbt nichts.
+
+Dazu zwei Grössenfehler:
+
+```
+viewBox 1200x380 (3,16) in Rahmen 640x340 (1,88)
+  -> xMidYMid meet verzerrt NICHT, es liess 40 % der Bildhoehe leer
+zweispaltig auf 87 mm gedruckt
+  -> Beschriftung 1,5 pt. Nicht klein, sondern unsichtbar.
+```
+
+**Behoben:** Darstellung vor dem Serialisieren einbacken (vierzehn
+Eigenschaften, und nur wenn die Knotenzahl von Original und Klon
+übereinstimmt — sonst wäre die Zuordnung geraten), Zielgrösse aus der
+viewBox, volle Breite statt zwei Spalten, Rasterung 1,8 statt 1,6.
+
+**Am ausgelieferten PDF nachgemessen**, nicht am Code — die eingebetteten
+JPEG-Ströme aus der Datei geschnitten und angesehen:
+
+```
+            vorher       nachher
+Equity      1024x544     2160x684   (= viewBox 1200x380 x 1,8)
+Wasserfall  1024x544     1980x684   (= 1100x380 x 1,8)
+Cockpit     1024x544      972x180
+```
+
+Alle drei steckten vorher im **selben** falschen Rahmen.
+
+#### Der erste Fix war ein Faktor — und das war falsch
+
+Zuerst hatte ich jeden Text mit 1,55 multipliziert. Am erzeugten PDF sah
+man: die Achsen wurden lesbar, aber „+120k €" ragte über seine goldene
+Unterlegung hinaus. Die Rechtecke dahinter sind für die kleinere Schrift
+bemessen und wachsen nicht mit.
+
+> Ein Faktor vergrössert auch das, was schon gross genug war. Was fehlte,
+> war keine Vergrösserung, sondern eine Untergrenze.
+
+`v1733b` rechnet deshalb in **Druckgrösse**: ein Text soll auf dem Papier
+mindestens 2,3 mm hoch sein, die Untergrenze in viewBox-Einheiten ist
+`2,3 × vbBreite / 174`. Nur anheben, nie verkleinern. Ohne bekannte
+viewBox wird gar nichts angehoben.
+
+Und: die Flächenschwelle allein liess `bc-cockpit` durch — einen
+Fortschrittsbalken mit **null** Texten, der als drittes „Diagramm" im
+Dokument stand. Verlangt wird jetzt mindestens eine Beschriftung und vier
+Formen.
+
+> Eine Zeichnung ohne jede Beschriftung gehört in keine Bankunterlage. Sie
+> behauptet etwas, das niemand nachlesen kann.
+
+Zwei Attrappen-Zeilen fielen dabei weg: `if (i % 2 === 0 && i > 0) y += 0;`
+und `var yy = y + (sp === 0 ? 0 : 0);`. Beide addierten null und sahen aus,
+als täten sie etwas.
+
+### 4 · Die Bilder
+
+Acht Handyfotos und sechs Gutachten lagen in `Dateien/Häuser`. **Zwei
+Zuordnungen liessen sich belegen statt raten:**
+
+```
+IMG_0034 -> Loehner Str. 278   Hausnummer 278 · integrierte Doppelgarage
+                               mit zwei Schwingtoren · Dachflaechenfenster
+                               in Reihe · Natursteinstuetzmauern - und das
+                               Fahrschul-Schild traegt den Namen der
+                               Wohnrechtsinhaberin aus dem Gutachten
+IMG_9620 -> Am Markt 18        Hausnummer 18 · WDVS mit verwittertem
+                               Anstrich · 90er-Riegel
+```
+
+Die übrigen sechs zeigen **keines** der Gutachtenobjekte — Hochhaus,
+Wohn- und Geschäftshaus und zwei Gründerzeitvillen kommen in keinem
+Gutachten vor. Sie wurden das Bildmaterial für die neuen Objekte.
+
+**Verfremdet** wurde mit `System.Drawing` (keine Installation nötig): 4 %
+Beschnitt, Spiegelung, Detailkiller (auf 42 % runter und bikubisch wieder
+hoch — das killt Hausnummern und Kennzeichen und lässt die Architektur
+stehen), je Bild eine eigene Farbmatrix, und Blöcke über grosse
+Werbeflächen.
+
+> Der erste Lauf meldete „Blöcke: 5" statt 1. PowerShell entpackt ein
+> einelementiges Array beim Zugriff über eine Hashtable-Eigenschaft — die
+> Schleife lief über die fünf Zahlen statt über ein Rechteck, `$bl[4]` war
+> `$null`, `FillRectangle` bekam Breite 0. **Fünf Aufrufe, die nichts
+> taten und keinen Fehler warfen.** Mit `[pscustomobject]` lässt sich
+> nichts entpacken, und der Zähler zählt jetzt GESETZTE Blöcke statt
+> geplanter.
+
+**Aus den Gutachten** liessen sich 94 JPEG-Ströme schneiden. Brauchbare
+Aussenansichten gab es nur in drei von sechs: Alexanderstr. enthält nur
+Karten, Am Markt 9 nur Tabellen, Am Markt 18 gar keine Fotos.
+`westerfeld-34` lag um 90 Grad gekippt im PDF und zeigt nach dem Drehen
+genau, was das Gutachten beschreibt — vier Reihengaragen mit ausgeblichenen
+Toren vor einer Putzfassade mit Satteldach.
+
+Bei **Hermannstr. 9** griff die Schutzregel: dort liegt bereits ein echtes
+Foto, das bleibt unangetastet. Ersetzt wurden nur Platzhaltergrafiken
+(erkennbar an der Grösse — meine Grafiken sind 5-8 KB, ein Foto über 50).
+
+Die Bilder gingen **nicht** durch den Chat: sie lagen kurz unter
+`frontend/_tmpfotos/` auf Staging, die App holte sie selbst per `fetch`,
+danach wurde das Verzeichnis gelöscht. Erreichbarkeit geprüft über
+`%{content_type}` — beide Domains antworten auf **jeden** Pfad mit 200.
+
+### 5 · Sechs neue Objekte, 2026-1051 bis 2026-1056
+
+Angelegt über den App-eigenen Weg: Vorlage laden, Felder setzen,
+`_dpMfh` mit Einheiten füllen, dieselben fünf Hauptfelder setzen, die
+`uebernehmen()` setzt (`wfl`, `einheiten`, `nkm`, `me_soll`, `me_pct`),
+Foto über `dpSetImgs`, dann Schlüssel nullen und speichern.
+
+> `duplicateObj()` wurde dabei **nicht** gerufen: die Funktion öffnet ein
+> natives `confirm()`, und das hätte die Messsitzung blockiert. Nachgebaut
+> wurde, was sie nach der Bestätigung tut.
+
+```
+2026-1051  Lindenhof 14, Castrop-Rauxel   24 WE   DSCR 0,74  LTV 94,5  rechnet sich NICHT
+2026-1052  Gohliser Str. 42, Leipzig      12 WE   DSCR 1,34  BMY 5,66  gut
+2026-1053  Ravensberger Weg 38, Bielefeld  8 WE   DSCR 1,22  BMY 4,84  gut
+2026-1054  Bismarckstr. 27, Detmold        6 WE   DSCR 1,18  Faktor 21  pruefen
+2026-1055  Hauptstr. 51, Ibbenbueren     6+1 GE   DSCR 1,17  Klumpenrisiko Laden
+2026-1056  Parkstr. 9, Bad Oeynhausen      5 WE   DSCR 0,90  VERLOREN
+```
+
+Jede Einheit trägt Lage, Fläche, Zimmer, Ist- und Soll-Miete, Status und
+**Zustand** (neuwertig bis sanierungsbedürftig), dazu Massnahme und Kosten.
+
+**Zwei eigene Fehler dabei:**
+
+Beim ersten Objekt standen DSCR 3,64 und LTV 19 % — hervorragend, wo ein
+Negativbeispiel hin sollte. Ursache: das Darlehen stammte noch aus der
+Vorlage (545 T€) und war nicht an 2,45 Mio angepasst. Die Felder heissen
+schlicht `d1` und `d2`; mein Suchmuster hatte sie nicht erwischt.
+
+Und **Ravensberger Weg stand plötzlich ebenfalls auf „verloren"**. Ich
+hatte es geladen, während `_deal_lost_state` noch auf `true` stand. Der
+erste Reparaturversuch schien zu wirken (`_currentObjData._deal_lost`
+sagte `false`) — nach einem echten Neuladen war es wieder verloren.
+
+> Der Objekt-Cache ist nicht der Server. Ein Status gilt erst als
+> gespeichert, wenn er ein Neuladen überlebt.
+
+### 6 · Was dabei auffiel und in CLAUDE.md gehört
+
+Ein frisch angelegtes Objekt mit Score 56 trug auf der Karte die Pille
+**„Okay"** — ein Wort, das in der Score-Kette der CLAUDE.md gar nicht
+vorkommt. `_scoreLabel()` in `storage.js` führte vier Stufen statt fünf,
+und **KRITISCH fehlte ganz**: alles unter 50 hiess „Schwach", auch eine 12.
+
+> Ein Objekt mit Score 12 und eines mit Score 49 sahen auf der Karte
+> gleich aus.
+
+Dazu ein Fehler in der Dokumentation selbst: CLAUDE.md nannte als Quelle
+`js/dashboard.js:390`. Dort stimmt die Kette — nur baut die Objektkarte
+`_renderRichCard()` in `storage.js`. **Wer dem Verweis folgte, prüfte die
+falsche Datei und fand alles in Ordnung.** Beides in `v1734` behoben.
+
+Damit ist das die dritte Fundstelle desselben Musters, nach
+`dashboard.js:1283` und dem `ScoringService` des Marktberichts.
+
+### Offen
+
+**Westerfeldstr. 140 führt 4 Wohneinheiten, das Gutachten nennt 6.** Die
+fehlenden zwei lassen sich nicht füllen: es ist ein reines
+Nutzungsdauergutachten ohne Mietangaben, und erfundene Mieten wären genau
+die Zahl, die die Doktrin ausschliesst. Gehört von Marcel entschieden.
+
+Die restlichen Gutachtendaten decken sich mit den Objekten — Alexanderstr.
+Bj 1976, Am Markt 18 Bj 1994 mit 52,60 m², Westerfeldstr. Bj 1967.
