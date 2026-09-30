@@ -6628,3 +6628,31 @@ html[data-dp-layout] body .hdr-incomplete-text{
   white-space:normal;
   min-width:0;
 }
+
+/* =====================================================================
+   v1730 - DIE INVESTOR-PILLE WAR NICHT ZU DUNKEL, SIE WAR ZU KLEIN
+   =====================================================================
+   Marcel: "den investor deal score im menue rechts die schrift schlecht
+   lesen" - dazu der Screenshot Dateien/investor.png.
+
+   Gemessen an den neun Pillen der Objektliste:
+
+     Farbe        rgb(226,201,126) auf rgb(42,36,21)   Kontrast 9,45
+     gruene Lage  rgb(111,215,154) auf rgb(22,39,27)   Kontrast 8,86
+     Lasche       daneben                              Kontrast 8,07
+     Schrift      8,5 px Grundwert, Versalien, gesperrt
+
+   > Der Kontrast war nie das Problem. Neun Komma vier ist mehr als
+   > doppelt so viel wie noetig - was fehlt, ist Groesse. Eine Schrift,
+   > die man nicht lesen kann, ist nicht zwingend zu blass.
+
+   Die Pille steht neben der Nummern-Lasche, die 9,5 px fuehrt. Zwei
+   Groessen nebeneinander lesen sich schlechter als eine; die Pille zieht
+   auf denselben Wert nach. Bei 78 px Breite auf einer 216 px breiten
+   Karte ist der Platz da.
+
+   Nur in den Ansichten - dort hat Marcel es gesehen, und der
+   Auslieferungszustand bleibt unberuehrt. */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-investor-ribbon{
+  font-size:9.5px !important;
+}
