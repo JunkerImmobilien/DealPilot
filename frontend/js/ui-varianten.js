@@ -218,7 +218,68 @@
     attr('data-ui-cards',   get('ui_cards',   CARDS));
     attr('data-ui-surface', get('ui_surface', SURFACE));
     attr('data-ui-form',    get('ui_form',    FORMEN));   /* v1098 */
+    formRadien(get('ui_form', FORMEN));                  /* v1716e */
     grundSperre();                                        /* v1156 */
+  }
+
+  /* PP v1716e � DIE FORM BRAUCHT EIN STYLESHEET AM ENDE PPPPPPPPPP
+     Marcel: "Auch auf rund oder kantig ... das funktioniert nicht."
+
+     Vier Anlaeufe ueber CSS-Spezifitaet sind gescheitert. Der Walker
+     zeigt warum - GLEICHSTAND, und dann entscheidet die Reihenfolge
+     der Dateien:
+
+       html[data-dp-layout][data-ui-form="kantig"] .body input  (0,3,2)
+       html[data-dp-layout] .body input[type="text"]            (0,3,2)
+
+     `ui-varianten.css` wird vor `layout-varianten.css` geladen, also
+     gewinnt das Layout. Die Dateireihenfolge zu tauschen waere ein
+     Eingriff in alle anderen Achsen gleichzeitig - zu grob.
+
+     > Wer bei Gleichstand gewinnen will, muss spaeter kommen. Ein
+     > Stylesheet, das erst beim Umschalten entsteht, kommt immer
+     > spaeter als jede Datei.
+
+     Dieses Blatt steht am Ende des <head> und traegt NUR die Radien.
+     Ohne Wahl ist es leer - der Auslieferungszustand bleibt unberuehrt.
+     Dasselbe Muster nutzt `whitelabel-override.js` fuer seine Farben. */
+  var FORM_ID = 'dp-form-radien';
+
+  /* Gemessen, welche Flaechen Radien tragen; je Gruppe ein Mass.
+     Flaechen 14 px, Bedienelemente 10 px, kantig alles 0. */
+  var FORM_FLAECHEN = ['.card', '.dpl-teil', '.dp-kg-panel', '.dp-pfbar'];
+  var FORM_BEDIEN   = ['.btn', 'input', 'input[type="text"]', 'select', 'textarea',
+                       '.dp-pf-tile', '.sb-act-item', '.hdr-icon-btn',
+                       '#hdr-credits-pill', '.dpl-portfolio', '.tabs-status-badge'];
+
+  function formRadien(wert) {
+    var st = document.getElementById(FORM_ID);
+    if (!st) {
+      st = document.createElement('style');
+      st.id = FORM_ID;
+      document.head.appendChild(st);   /* ans ENDE, das ist der Punkt */
+    }
+    if (!wert) { st.textContent = ''; return; }
+
+    var fl = (wert === 'kantig') ? '0' : '14px';
+    var be = (wert === 'kantig') ? '0' : '10px';
+    function regel(liste, mass) {
+      return liste.map(function (s) { return 'html body ' + s; }).join(',')
+           + '{border-radius:' + mass + ' !important}';
+    }
+    var css = regel(FORM_FLAECHEN, fl) + regel(FORM_BEDIEN, be);
+
+    /* Der Reiter nur oben - seine Unterstreichung muss gerade bleiben. */
+    css += 'html body button.tab{border-radius:' +
+           (wert === 'kantig' ? '0' : '10px 10px 0 0') + ' !important}';
+    /* Die Mappe behaelt die offene Ecke, wo die Lasche sitzt - rundum
+       gleich waere kein Aktenreiter mehr. */
+    css += 'html body .sb-card .sbc-top{border-radius:' +
+           (wert === 'kantig' ? '0' : '0 14px 14px 14px') + ' !important}';
+    css += 'html body .sb-card .sbc-seq,html body .sb-card .sbc-investor-ribbon' +
+           '{border-radius:' + (wert === 'kantig' ? '0' : '8px 8px 0 0') + ' !important}';
+
+    st.textContent = css;
   }
 
   /* ── v1156-GRUND · Die Grundfarbe gilt nur ohne Vorlage ────────────────
