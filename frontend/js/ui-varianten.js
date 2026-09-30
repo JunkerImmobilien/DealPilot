@@ -659,9 +659,28 @@
     '.dpuv-pf{flex:1;font-size:12.5px;font-weight:600;padding:12px;border-radius:8px;cursor:pointer;min-height:44px;',
       'border:1px solid #DCD5C4;background:#fff;color:#3d382f}',
     '.dpuv-pf.gold{background:var(--wl-c9a84c, #C9A84C);border-color:var(--wl-c9a84c, #C9A84C);color:#1a1407}',
-    '#dpuv-back{position:fixed;inset:0;z-index:2147481999;background:rgba(0,0,0,.28);opacity:0;',
+    /* ── v1724 · DAS PANEL LAESST DIE APP IN RUHE ───────────────────
+       Marcel: „dass man, wenn man das offen hat, halt auch in der App
+       noch durchklicken kann. Also quasi wie so ein Overlay-Menue, dass
+       man dann umschalten kann und dann schliessen kann."
+
+       Gemessen: `#dpuv-back` lag als 2133x988-Flaeche ueber allem und
+       `elementFromPoint` in der Bildschirmmitte nannte ihn - kein Klick
+       kam durch. Dazu dunkelte er mit 28 %: wer eine Vorlage beurteilen
+       will, sah sie durch einen Schleier.
+
+       > Ein Einstellfenster, das die Sache verdeckt, die es einstellt,
+       > zwingt zum Zumachen nach jedem Klick.
+
+       Der Abdunkler bleibt als Traeger der Ein-/Ausblendung, wird aber
+       durchsichtig und durchlaessig. Geschlossen wird ueber das ✕ oder
+       „Fertig" - ein Klick daneben schliesst nicht mehr, weil daneben
+       jetzt die App liegt. Das Panel hebt sich stattdessen durch
+       seinen Schatten ab. */
+    '#dpuv-back{position:fixed;inset:0;z-index:2147481999;background:transparent;opacity:0;',
       'pointer-events:none;transition:opacity .22s}',
-    '#dpuv-back.on{opacity:1;pointer-events:auto}',
+    '#dpuv-back.on{opacity:1;pointer-events:none}',
+    '#dpuv-panel.open{box-shadow:-18px 0 44px -12px rgba(0,0,0,.42)}',
     /* Handy: Blatt von unten statt Spalte von rechts — bei 390px waere eine
        376px-Spalte der ganze Schirm und die Live-Vorschau waere weg. */
     '@media (max-width:700px){',
@@ -808,7 +827,13 @@
           segHtml('dpuv-theme', THEMES, get('ui_theme', THEMES)) + '</div>' +
         '<div class="dpuv-g"><h3>Objektkarten</h3>' +
           '<p class="dpuv-hint">Wie viel jede Karte in der Objektliste zeigt.</p>' +
-          segHtml('dpuv-cards', CARDS, get('ui_cards', CARDS)) + '</div>' +
+          segHtml('dpuv-cards', CARDS, get('ui_cards', CARDS)) +
+          /* v1724: die Gestalt der Karte - dieselbe Wahl wie in den
+             Einstellungen, hier als KLASSE statt ID (zwei gleiche IDs
+             waeren ein Duplikat). `objektkarten-stil.js` baut in beide
+             Orte und haelt sie ueber `wahlNachziehen()` gleich. */
+          '<div class="dp-objkarte-wahl-host" style="margin-top:10px"></div>' +
+        '</div>' +
         '<div class="dpuv-g"><h3>Kartenfläche</h3>' +
           '<p class="dpuv-hint">Karten folgen der Vorlage oder bleiben weiß.</p>' +
           segHtml('dpuv-surface', SURFACE, get('ui_surface', SURFACE), 2) + '</div>' +

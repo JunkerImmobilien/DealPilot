@@ -44,6 +44,18 @@
   var ATTR = 'data-dp-objkarte';
   var HOST = 'dp-objkarte-wahl-host';
 
+  /* v1724: die Wahl steht jetzt an ZWEI Orten - in den Einstellungen
+     (ID, wie bisher) und im Darstellungs-Panel (Klasse). Marcel:
+     "wenn wir das auch mit unter Darstellung oeffnen anbieten".
+
+     Eine zweite ID waere ein Duplikat und der Browser nimmt dann still
+     die erste - deshalb traegt der zweite Ort eine KLASSE. `hosts()`
+     liefert beide, und jede Funktion arbeitet ueber die Liste statt
+     ueber ein einzelnes Element. */
+  function hosts() {
+    return Array.prototype.slice.call(document.querySelectorAll('#' + HOST + ', .' + HOST));
+  }
+
   var STILE = {
     '':          { name: 'Aktenreiter', sub: 'Lasche mit Objektnummer · Standard' },
     bordkarte:   { name: 'Bordkarte',   sub: 'Abriss links, Nummer hochkant' },
@@ -75,7 +87,7 @@
      Die Farben stehen im CSS, nicht hier: eine Marke, die im JS klebt,
      färbt sich beim Mandanten nicht um. */
   function baueWahl() {
-    var host = document.getElementById(HOST);
+    hosts().forEach(function (host) {
     if (!host || host.getAttribute('data-gebaut') === '1') return;
     host.setAttribute('data-gebaut', '1');
     host.innerHTML =
@@ -97,14 +109,15 @@
       if (!b) return;
       setze(b.getAttribute('data-ok'));
     });
+    });
     wahlNachziehen();
   }
 
   function wahlNachziehen() {
-    var host = document.getElementById(HOST);
-    if (!host) return;
-    host.querySelectorAll('.dp-okw').forEach(function (b) {
-      b.classList.toggle('an', b.getAttribute('data-ok') === aktuell);
+    hosts().forEach(function (host) {
+      host.querySelectorAll('.dp-okw').forEach(function (b) {
+        b.classList.toggle('an', b.getAttribute('data-ok') === aktuell);
+      });
     });
   }
 
@@ -112,10 +125,10 @@
      gebaut. Ein Beobachter hängt die Wahl ein, sobald der Host da ist -
      ein Timer würde raten, wann das ist. */
   function hostBeobachten() {
-    if (document.getElementById(HOST)) baueWahl();
+    if (hosts().length) baueWahl();
     if (!window.MutationObserver) return;
     new MutationObserver(function () {
-      if (document.getElementById(HOST)) baueWahl();
+      if (hosts().length) baueWahl();
     }).observe(document.body, { childList: true, subtree: true });
   }
 
