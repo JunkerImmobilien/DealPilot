@@ -6233,3 +6233,41 @@ html[data-dp-layout] .dpl-schiene .sb-card:has(.sbc-won-ribbon) .sbc-investor-ri
 html[data-dp-layout] :is(#sb-list) .sb-card:has(.sbc-won-ribbon) .sbc-investor-ribbon{
   right:0 !important;
 }
+
+/* =====================================================================
+   v1712 - ZWEI RAHMEN UM DIESELBE KARTE
+   =====================================================================
+   Marcel hat einen Screenshot geschickt (Dateien/Screenshot1.png). Darauf
+   sieht man es sofort: die Karten sind KAESTEN mit Kopfzeile, kein
+   Aktenreiter. Die Lasche sitzt IM Rahmen statt darauf.
+
+   GEMESSEN:
+     KARTE  Rahmen 1,11px solid rgb(63,165,108)   <- der stoert
+     BLATT  Rahmen 1,11px       rgb(63,165,108)
+
+   Zwei Rahmen um dieselbe Sache. Meine `border:0` an `.sb-card` aus
+   v1709 greift nicht: `aside.sidebar .sb-card.deal-won` aus style.css
+   ist staerker, und dieselbe Datei faerbt auch den offenen Fall
+   (`color(srgb … / .45)`).
+
+   > Ein Reiter entsteht dadurch, dass die Lasche AUSSERHALB des Blattes
+   > sitzt. Zieht man einen zweiten Rahmen um beide, ist es wieder eine
+   > Schachtel - und die Form, die man bauen wollte, ist weg.
+
+   Der Anker `:is(#sb-list)` ist derselbe, der in v1711b meine
+   Schriftfarbe geschlagen hat. Diesmal steht er auf meiner Seite.
+   ===================================================================== */
+html[data-dp-layout] :is(#sb-list) .sb-card,
+html[data-dp-layout] :is(#sb-list) .sb-card.deal-won,
+html[data-dp-layout] :is(#sb-list) .sb-card.deal-lost,
+html[data-dp-layout] :is(#sb-list) .sb-card.active,
+html[data-dp-layout] :is(#sb-list) .sb-card.deal-won.active,
+html[data-dp-layout] :is(#sb-list) .sb-card.deal-lost.active,
+html[data-dp-layout] :is(#sb-list) .sb-card:hover{
+  border:0 !important;
+  border-color:transparent !important;
+  background:transparent !important;
+  background-color:transparent !important;
+  box-shadow:none !important;
+  outline:0 !important;
+}
