@@ -6305,7 +6305,8 @@ html[data-dp-objkarte="bordkarte"] .dpl-schiene :is(#sb-list) .sb-card .sbc-seq{
   display:flex !important; align-items:center !important; justify-content:center !important;
   writing-mode:vertical-rl !important;
   border-radius:5px 0 0 5px !important;
-  border:0 !important; border-right:1px dashed rgba(201,168,76,.5) !important;
+  border:0 !important;
+  border-right:1px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent) !important;
   background:transparent !important;
   font-size:7.5px !important; letter-spacing:.14em !important;
   padding:0 !important;
