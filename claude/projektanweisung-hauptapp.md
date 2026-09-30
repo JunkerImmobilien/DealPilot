@@ -24933,3 +24933,150 @@ die Nummern-Lasche linksbündig darunter** — zwei gestapelte Reiter statt
 einer Zeile. Das ist der „doppelte Rahmen"-Eindruck aus `Screenshot1.png`.
 Ob die beiden nebeneinander gehören, ist eine Gestaltungsfrage und wird
 nicht geraten.
+
+---
+
+## v1718–v1720b · Vier Texte, ein Knopf, ein Plan-Tor — und zwei eigene
+## Werkzeugfehler
+
+### v1718 · Der 70-Prozent-Hinweis stand zu zwei Dritteln außerhalb
+
+Marcel: „wenn der investor deal score nicht erreicht ist steht unten links
+im menü ‚Bitte mindestens 70% der ….' das kann man nicht komplett lesen."
+
+Gemessen mit dem echten Markup aus `calc.js:217` und vollständig
+nachgestelltem Zustand:
+
+```
+Text   711 px breit     Platz  247 px     unsichtbar  464 px
+Ort    .dpl-schiene, overflow:hidden, bei y=780 — unten links
+```
+
+Im Standard sitzt der Banner im Header und hat 1491 px; dort ist das
+`white-space:nowrap` aus `style.css:13429` richtig. In den neuen Layouts
+wandert derselbe Banner in die 248 px schmale Schiene, und deren
+`overflow:hidden` schneidet zwei Drittel des Satzes ab — ohne Ellipse, ohne
+Scrollbalken. Es sieht aus wie ein Text, der zu Ende ist.
+
+> `nowrap` ist eine Aussage über den PLATZ, nicht über den Text. Wandert
+> das Element an einen schmaleren Ort, wandert die Aussage nicht mit — sie
+> wird dort zur Lüge.
+
+Nachgemessen nach dem Umbruch: v1b, v2 und v2b je **0 px unsichtbar**
+(217 × 73), Standard unverändert einzeilig. **Commit `b592cb7`.**
+
+#### Ein Befund, den ich zurücknehme
+
+Zwischendurch maß ich „Banner ragt 48 px unter den Header, 44 px
+Überlappung mit der Reiterleiste". **Das war ein Artefakt meines halben
+Nachbaus:** ich hatte `hdr-banner-only` gesetzt, aber `hdr-no-score` nicht
+entfernt — `calc.js:226` tut beides. Mit vollständigem Zustand liegt der
+Banner bei 56–105, die Reiterleiste bei 114–158, Überlappung **−9**.
+
+### v1719/v1719b · „Darstellung öffnen" nach oben, und ab Pro
+
+**Ort:** v1706 hatte den Knopf aus dem Aussehen-Block genommen und nur den
+unteren stehen lassen. Oben wird GROB gewählt (Layout, Objektkarten), das
+Feine liegt im Panel — der Weg dorthin gehört dorthin. Der untere Abschnitt
+fällt weg, damit es bei EINEM Weg bleibt. Nachgemessen über
+`compareDocumentPosition`: Layout-Wahl → Objektkarten → Knopf, genau einer.
+
+**Plan:** Marcels Regel steht bereits im Datenmodell — gemessen an der
+laufenden App:
+
+| free | starter | investor | pro | partner |
+|---|---|---|---|---|
+| fehlt | fehlt | fehlt | **true** | **true** |
+
+`features.theme_palette`. Der vorhandene Schlüssel wird benutzt, **kein
+neuer erfunden** — ein unbekannter wäre für JEDEN false, auch für Pro, und
+hätte die Funktion still abgeschaltet. Geprüft mit `Plan.full()`, nicht
+`Plan.can()`: gemessen gibt `can('theme_palette')` auch im Partner-Plan
+`false`.
+
+Das Tor steht an **beiden** Stellen: der Knopf zeigt sich gesperrt mit
+Grund, und `_dpOpenFromSettings` weist ab. Ein Knopf, der nur ausgegraut
+ist, sperrt nichts. Gegengeprüft mit gestubbtem Plan: Knopf `disabled`,
+Hinweis „Feineinstellungen (Vorlagen, Farben, Schrift) ab Pro", Panel
+öffnet nicht. **Commits `8a9f931`, `c4852d7`.**
+
+#### Zweiter eigener Fehler: latin1 auf eine UTF-8-Datei
+
+`settings.js` war gültiges UTF-8. Mein Einbauskript las und schrieb sie als
+**latin1**, und die Sonderzeichen MEINES Kommentars fielen um:
+
+```
+──  (U+2500) -> 2x NUL      „ (U+201E) -> 2x RS      —  (U+2014) -> 3x DC4
+```
+
+Vor v1719 null Steuerzeichen, danach sieben. Die Datei war damit für `grep`
+binär und kein gültiges UTF-8 mehr. Funktional harmlos — nur Kommentartext —
+aber **genau die Falle, die ich mir selbst notiert habe**. Statt die Bytes
+nachträglich zu flicken: Datei auf den Stand davor zurückgesetzt und den
+Einbau mit `utf8` wiederholt. Geprüft sind jetzt UTF-8-Gültigkeit,
+Steuerzeichen (keine), Zeilenenden (4200 CRLF, 0 LF) und die Syntax; der
+echte Inhaltsunterschied zum Ausgangsstand sind 42 Einfügungen, 5 Löschungen.
+
+### v1720/v1720b · Nur zeigen, was in dieser Lage auch wirkt
+
+Marcel: „Sachen die nicht gehen bitte ausblenden bei dem jeweiligen
+aussehen. Nur das einblenden und einstellbare anzeigen was wirklich
+funktioniert."
+
+Alle **neun** Schaltergruppen durchgeklickt und je Stellung eine Signatur
+aus Farben, Radien, Schrift und Geometrie verglichen. Sieben wirken überall:
+Layout, Vorlage (6), Modus, Grundfläche, Objektkarten (4), Form (3),
+Textgröße (3). **Zwei hatten ununterscheidbare Stellungen:**
+
+| Gruppe | wirkt nur | Ursache |
+|---|---|---|
+| Schriftfamilie (4) | ohne Vorlage **und** ohne Layout | beide setzen `font-family: … !important` (`--uv-f-body`, `--dpl-body`) |
+| Datenaufnahme (4) | mit Layout | `karten-stil.js:280` setzt sein Attribut nur unter `layoutAktiv()` |
+
+Beide Male ist das kein Defekt, sondern gebaut: eine Vorlage bringt ihre
+Schrift mit, das ist ihr Wesen. Die Nutzerwahl kann dagegen nicht gewinnen
+und soll es nicht.
+
+> Ein Schalter, der nichts tut, ist schlimmer als ein fehlender: der
+> fehlende wirft eine Frage auf, der tote einen Zweifel auf das ganze Panel.
+
+`machbarkeit()` blendet beide in der jeweiligen Lage aus und **zieht den
+Hinweistext mit** — er verspräche sonst etwas, das nicht mehr da ist. Die
+Textgröße bleibt stehen: sie wirkt gemessen in jeder Lage und teilt sich nur
+den Block mit der Familie.
+
+**v1720b:** nach v1720 stimmte die Anzeige nach einem Vorlagenwechsel, nach
+einem **Layout**-Wechsel nicht — der läuft über `DealPilotLayout.setze()`
+und kommt an `anwenden()` vorbei.
+
+> Wer eine Anzeige an einen Zustand hängt, muss jeden Weg kennen, auf dem
+> dieser Zustand sich ändert. Zwei Aufrufstellen sind eine Vermutung; das
+> Attribut selbst zu beobachten ist eine Zusage.
+
+Abgenommen über alle vier Lagen:
+
+```
+Lage            Schriftfamilie  Textgroesse  Datenaufnahme
+nichts aktiv    sichtbar        sichtbar     versteckt
+nur Vorlage     versteckt       sichtbar     versteckt
+nur Layout      versteckt       sichtbar     sichtbar
+beides          versteckt       sichtbar     sichtbar
+```
+
+**Commits `ff0ff22`, `56ebe7c`. Gold-Audit RC=0.**
+
+### Der Kaskaden-Walker war kaputt — und hatte mich mehrfach belogen
+
+Bei der Suche nach der Höhe-0-Regel meldete der Walker **0 Treffer bei 40
+lesbaren Stylesheets**. Die Deckungsprüfung zeigte: `regelnGesamt: 0`. Er
+hatte also nie etwas gezählt.
+
+Ursache: `if (r.cssRules) { … return; }` als Container-Erkennung. **Eine
+`CSSStyleRule` trägt heute selbst eine (leere) `cssRules`-Liste** für
+verschachtelte Regeln — damit galt jede Regel als Container und wurde
+übersprungen. Korrekt ist `if (!r.selectorText) { if (r.cssRules) … }`.
+Danach: 10.890 Regeln, 19 auf `#hdr-badges`, Täter sofort benannt.
+
+Dieselbe Bauart steckte in mehreren Messungen dieser Sitzung und erklärt
+rückwirkend mindestens zwei „0 Treffer"-Befunde, auf die ich Diagnosen
+gestützt habe.
