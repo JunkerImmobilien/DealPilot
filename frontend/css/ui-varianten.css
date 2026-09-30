@@ -2632,3 +2632,93 @@ html[data-ui-form="rund"] .dp-pfbar,
 html[data-ui-form="rund"] .sbc-top{
   overflow:hidden !important;
 }
+
+/* =====================================================================
+   v1716b - DIE FORM BRAUCHT MEHR SPEZIFITAET
+   =====================================================================
+   Nach v1716 gemessen: von sieben Flaechen reagierte genau EINE.
+
+     Flaeche      ohne    kantig   rund
+     Leiste       16px      0px    14px   <- wirkt
+     Reiter        0px      0px     0px
+     Eingabe       2px      2px     2px
+     Karte         2px      2px     2px
+     Kachel       10px     10px    10px
+     Hilfe         6px      6px     6px
+     Pille         7px      7px     7px
+
+   Die Leiste hat funktioniert, weil dort keine staerkere Regel steht.
+   Bei den anderen schon: `#hdr-credits-pill` traegt eine ID, die
+   Objektkarten haengen an `:is(#sb-list)`, und die Eingabefelder holen
+   ihre 2 px aus einer laengeren Kette in style.css.
+
+   > Eine Einstellung, die an sechs von sieben Stellen verliert, ist
+   > nicht halb eingebaut - sie ist aus. Der Nutzer sieht keine
+   > Teilwirkung, er sieht: nichts passiert.
+
+   Hier stehen dieselben Regeln mit genug Spezifitaet. `body` davor hebt
+   jede um ein Element, die ID-Faelle bekommen ihre ID mit, und die
+   Objektkarten den Anker, der sie ohnehin haelt.
+   ===================================================================== */
+
+/* -- KANTIG --------------------------------------------------------- */
+html[data-ui-form="kantig"] body .btn,
+html[data-ui-form="kantig"] body button.tab,
+html[data-ui-form="kantig"] body input,
+html[data-ui-form="kantig"] body select,
+html[data-ui-form="kantig"] body textarea,
+html[data-ui-form="kantig"] body .card,
+html[data-ui-form="kantig"] body .dp-pf-tile,
+html[data-ui-form="kantig"] body .sb-act-item,
+html[data-ui-form="kantig"] body .dpl-teil,
+html[data-ui-form="kantig"] body .dp-kg-panel,
+html[data-ui-form="kantig"] body .tabs-status-badge{
+  border-radius:0 !important;
+}
+html[data-ui-form="kantig"] body header.hdr #hdr-credits-pill.hdr-credits-pill,
+html[data-ui-form="kantig"] body header.hdr .hdr-icon-btn.hdr-icon-btn,
+html[data-ui-form="kantig"] body .dpl-schiene .dpl-portfolio.dpl-portfolio{
+  border-radius:0 !important;
+}
+html[data-ui-form="kantig"] .dpl-schiene :is(#sb-list) .sb-card,
+html[data-ui-form="kantig"] .dpl-schiene :is(#sb-list) .sb-card .sbc-top,
+html[data-ui-form="kantig"] .dpl-schiene :is(#sb-list) .sb-card .sbc-seq,
+html[data-ui-form="kantig"] .dpl-schiene :is(#sb-list) .sb-card .sbc-investor-ribbon{
+  border-radius:0 !important;
+}
+
+/* -- RUND: Flaechen 14, Bedienelemente 10 --------------------------- */
+html[data-ui-form="rund"] body .card,
+html[data-ui-form="rund"] body .dpl-teil,
+html[data-ui-form="rund"] body .dp-kg-panel{
+  border-radius:14px !important;
+}
+html[data-ui-form="rund"] body .btn,
+html[data-ui-form="rund"] body button.tab,
+html[data-ui-form="rund"] body input,
+html[data-ui-form="rund"] body select,
+html[data-ui-form="rund"] body textarea,
+html[data-ui-form="rund"] body .dp-pf-tile,
+html[data-ui-form="rund"] body .sb-act-item,
+html[data-ui-form="rund"] body .tabs-status-badge{
+  border-radius:10px !important;
+}
+html[data-ui-form="rund"] body header.hdr #hdr-credits-pill.hdr-credits-pill,
+html[data-ui-form="rund"] body header.hdr .hdr-icon-btn.hdr-icon-btn,
+html[data-ui-form="rund"] body .dpl-schiene .dpl-portfolio.dpl-portfolio{
+  border-radius:10px !important;
+}
+html[data-ui-form="rund"] .dpl-schiene :is(#sb-list) .sb-card .sbc-top{
+  border-radius:0 14px 14px 14px !important;
+}
+html[data-ui-form="rund"] .dpl-schiene :is(#sb-list) .sb-card .sbc-seq,
+html[data-ui-form="rund"] .dpl-schiene :is(#sb-list) .sb-card .sbc-investor-ribbon{
+  border-radius:8px 8px 0 0 !important;
+}
+
+/* Reiter: die Unterstreichung des aktiven bleibt gerade, sonst sieht
+   die Leiste aus, als haette jemand die Linie verrutscht. Nur die obere
+   Kante folgt der Wahl. */
+html[data-ui-form="rund"] body button.tab{
+  border-radius:10px 10px 0 0 !important;
+}
