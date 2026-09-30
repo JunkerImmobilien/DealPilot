@@ -5508,6 +5508,11 @@ html[data-dp-layout] .dpl-schiene .dpl-portfolio.dpl-portfolio .dpl-i,
 html[data-dp-layout] .dpl-schiene .dpl-portfolio.dpl-portfolio .dpl-i svg{
   color:#BFB7A9 !important;
   stroke:currentColor !important;
+  /* v1722: hier stand nur `stroke`. Das Symbol #i-portfolio wird aber
+     ueber FILL gezeichnet - gemessen: stroke=none, fill=rgb(0,0,0).
+     Die Zeile meinte das Richtige und traf die falsche Eigenschaft;
+     das Icon blieb schwarz auf rgb(14,13,11), Kontrast 1,08. */
+  fill:currentColor !important;
 }
 html[data-dp-layout] .dpl-schiene[data-ton="dunkel"] .dpl-portfolio:hover,
 html[data-dp-layout] .dpl-schiene .dpl-portfolio.dpl-portfolio:hover,
