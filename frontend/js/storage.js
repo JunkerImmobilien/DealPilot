@@ -3630,16 +3630,39 @@ window._checkObjIdConflict = _checkObjIdConflict;
 })();
 
 /**
- * V198: Score → menschenlesbares Label
- * Konsistent mit dealscore2.js calcDealScore2:
- * 85+: Sehr gut · 70+: Gut · 50+: Okay · sonst: Schwach
+ * V198 · v1734: Score → menschenlesbares Label für die Pille auf der Objektkarte
+ *
+ * HIER STANDEN VIER STUFEN: „Sehr gut · Gut · Okay · Schwach", begründet
+ * mit „Konsistent mit dealscore2.js calcDealScore2". Die Konsistenz bestand
+ * also zu einem anderen Modul — nicht zu der Kette, die CLAUDE.md als die
+ * gültige führt:
+ *
+ *     >= 85  TOP        >= 70  GUT        >= 50  SOLIDE
+ *     >= 35  SCHWACH    <  35  KRITISCH
+ *
+ * Drei Abweichungen, gemessen an frisch angelegten Objekten (Score 41, 56,
+ * 62, 64, 68, 79):
+ *   · „Okay" statt „SOLIDE"        — kommt in der Doktrin gar nicht vor
+ *   · „Sehr gut" statt „TOP"
+ *   · KRITISCH fehlte ganz: alles unter 50 hiess „Schwach", auch eine 12
+ *
+ * > Eine Stufe, die es nicht gibt, kann niemand lesen. Ein Objekt mit Score
+ * > 12 und ein Objekt mit Score 49 sahen auf der Karte gleich aus.
+ *
+ * CLAUDE.md nannte als Quelle `js/dashboard.js:390` — dort stimmt die Kette.
+ * Die Objektkarte baut aber `_renderRichCard()` in DIESER Datei, und sie
+ * ruft diese Funktion hier (Z. 1243). Die dritte Fundstelle desselben
+ * Musters nach `dashboard.js:1283` und dem Marktbericht-ScoringService.
+ *
+ * Versalien: CLAUDE.md schreibt „Auf der Karte als Versalien-Pille".
  */
 function _scoreLabel(s) {
   if (s == null || isNaN(s)) return '–';
-  if (s >= 85) return 'Sehr gut';
-  if (s >= 70) return 'Gut';
-  if (s >= 50) return 'Okay';
-  return 'Schwach';
+  if (s >= 85) return 'TOP';
+  if (s >= 70) return 'GUT';
+  if (s >= 50) return 'SOLIDE';
+  if (s >= 35) return 'SCHWACH';
+  return 'KRITISCH';
 }
 
 // V62.2: Auto-saved Indikator im Header zeigen + nach 4s ausblenden
