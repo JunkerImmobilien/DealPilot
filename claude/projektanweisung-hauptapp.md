@@ -25847,3 +25847,52 @@ zeigte dort ein Gebäude, das es nicht ist. Dasselbe PDF geht zur Bank.
 
 > Ein Bild in einer Unterlage ist eine Behauptung über das Objekt. Ein
 > hübsches falsches Bild ist schlechter als ein ehrlicher Platzhalter.
+
+### Nachtrag: die Bilder sind eingesetzt (Staging)
+
+Ich hatte oben geschrieben, Fremdfotos bei echten Adressen wären eine
+Falschaussage, und es damit bei sechs leeren Karten belassen. Das war
+halb richtig und ganz unfertig: **das Argument gilt für FOTOS, nicht für
+Bilder.**
+
+> Ein Foto behauptet „so sieht dieses Haus aus". Eine Grafik behauptet das
+> nicht — sie zeigt eine Gattung. Wer den Unterschied einebnet, lehnt eine
+> Aufgabe ab, die lösbar war.
+
+**Gebaut:** `_objGrafik(art)` zeichnet auf Canvas eine stilisierte
+Gebäudegrafik in Markenfarben (Obsidian-Verlauf, Gold `#C9A84C`) und gibt
+sie als JPEG-data-URI zurück — dasselbe Format und dieselbe
+Größenordnung wie die vorhandenen Thumbnails (5 KB gegen 8 KB).
+
+```
+EFH   Giebel, 3x2 Fenster
+ZFH   Giebel mit Mittellinie (zwei Einheiten)
+MFH   Block, 5x4 Fenster
+ETW   Block mit hervorgehobener Wohnung
+```
+
+**Eingesetzt über den App-eigenen Weg**, nicht an der App vorbei:
+`dpSetImgs([{src, name}])` setzt die Fotoliste — das erste Bild ist das
+Titelbild „in Liste & PDF" — danach `saveObj({silent:true})`. Genau der
+Weg, den ein Upload über `#img-inp` nimmt.
+
+**Zwei Schutzregeln in der Routine:**
+- vorhandene Fotos werden **nie** überschrieben (`dpGetImgs().length` wird
+  vorher geprüft) — das echte Foto bei 2026-999 ist unangetastet
+- der Objektschlüssel wird nach dem Laden **gegengeprüft**, bevor
+  geschrieben wird (sonst landet das Bild im falschen Objekt)
+
+**Ergebnis:**
+
+```
+vorher   6 mit Bild · 6 ohne
+jetzt   12 mit Bild · 0 ohne
+```
+
+**Nur auf Staging.** Prod hat eine eigene Datenbank; dort stehen die
+Karten unverändert. Wenn die Grafiken auch dort sollen, ist das ein
+eigener Lauf — er gehört Marcels Entscheidung, weil es Kundendaten sind.
+
+**Und die Grenze bleibt:** echte Fotos ersetzen die Grafiken, sobald es
+welche gibt. Der Upload liegt im Objektformular (`#img-inp`, Mehrfachwahl,
+bis sechs Bilder, das erste ist das Titelbild).
