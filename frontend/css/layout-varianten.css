@@ -6653,6 +6653,21 @@ html[data-dp-layout] body .hdr-incomplete-text{
 
    Nur in den Ansichten - dort hat Marcel es gesehen, und der
    Auslieferungszustand bleibt unberuehrt. */
-html[data-dp-layout] .dpl-schiene .sb-card .sbc-investor-ribbon{
-  font-size:9.5px !important;
+/* NACHTRAG v1730b - DIE ERSTE FASSUNG WAR WIRKUNGSLOS.
+   Sie setzte 9,5 px, und gemessen stand die Pille bereits auf 9,5:
+   der Grundwert 8,5 aus style.css wird von der Textgroessen-Einstellung
+   hochskaliert. Ich hatte den GRUNDWERT gelesen und den ISTWERT gemeint.
+
+   > Ein Wert im Stylesheet ist nicht der Wert auf dem Schirm. Wer eine
+   > Groesse anhebt, muss vorher die gemessene lesen, nicht die
+   > geschriebene.
+
+   Gegengemessen, was passt (Karte 216 px, Lasche 66 px):
+     10,5px -> Pille 83   11px -> 86   11,5px -> 88   12px -> 88
+   Bei 11 px stehen Pille und Lasche zusammen auf 152 von 216 - Platz
+   genug, und der Sprung ist gross genug, um ihn zu sehen. Die Lasche
+   zieht mit: zwei Groessen nebeneinander lesen sich schlechter als eine. */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-investor-ribbon,
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
+  font-size:11px !important;
 }
