@@ -37796,7 +37796,7 @@ html[data-ui-theme="kanzlei"] body.dp-hybrid-rail #dp-hybrid-aktionen {
    66px Inhalt -> Zeilen ueberlappten; jetzt auto. Die schwebenden Baender Won/Investor
    passen nicht in eine Listenzeile: Won wird ein Statuspunkt links, Investor faellt
    (der Score steht rechts). */
-@media (min-width: 1025px) { html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) .app-wrap { grid-template-columns:300px minmax(0,1fr) !important; } }  /* v1449d: nur Desktop - am Handy/Tablet ist die Leiste eine Schublade */
+@media (min-width: 1025px) { html[data-ui-theme="kanzlei"]:not([data-dp-layout]) body:not(.dp-sidebar-collapsed) .app-wrap { grid-template-columns:300px minmax(0,1fr) !important; } }  /* v1449d: nur Desktop - am Handy/Tablet ist die Leiste eine Schublade. v1717: und nur OHNE neues Layout - dort ist aside.sidebar display:none, dann faellt .main-col in die leere 300px-Spalte (Header 84x191 statt 1617x57) */
 html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-top { height:auto !important; max-height:none !important; }
 html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-investor-ribbon, html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-won-ribbon { display:none !important; }
 html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card.deal-won { border-left:3px solid #2E8A57 !important; }
